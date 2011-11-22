@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx"
+		 creationComplete="creationCompleteHandler(event)"
+		 width="100%" height="100%" xmlns:component="org.openforis.collect.ui.component.*">
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.events.FlexEvent;
+			
+			import org.openforis.collect.presenter.MasterPresenter;
+			
+			private var _masterPresenter:MasterPresenter;
+			
+			protected function creationCompleteHandler(event:FlexEvent):void {
+				this._masterPresenter = new MasterPresenter(this); 
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	
+	<s:layout>
+		<s:VerticalLayout horizontalAlign="center" />
+	</s:layout>
+	
+	<s:states>
+		<s:State name="home" />
+		<s:State name="list" />
+		<s:State name="detail" />
+	</s:states>
+	
+	<component:HomeView includeIn="home" width="100%" height="100%" />
+	<component:ListView includeIn="list" width="100%" height="100%" />
+	<component:DetailView includeIn="detail" width="100%" height="100%"/>
+	
+</s:Group>

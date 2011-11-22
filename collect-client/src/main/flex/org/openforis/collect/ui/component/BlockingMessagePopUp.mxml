@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx"
+			   showCloseButton="false"
+			   >
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.core.FlexGlobals;
+			import mx.managers.PopUpManager;
+			
+			[Bindable]
+			public var message:String;
+			[Bindable]
+			public var messageIconClass:Class;
+			
+			public static function show(title:String, message:String, messageIconClass:Class = null):void {
+				var popUp:BlockingMessagePopUp = new BlockingMessagePopUp();
+				popUp.title = title;
+				popUp.message = message;
+				if(messageIconClass != null) {
+					popUp.messageIconClass = messageIconClass;
+					popUp.currentState = "messageIconVisible";
+				}
+				PopUpManager.addPopUp(popUp, FlexGlobals.topLevelApplication as DisplayObject, true);
+				PopUpManager.centerPopUp(popUp);
+			}
+		]]>
+	</fx:Script>
+	
+	<mx:states>
+		<s:State name="default">
+			
+		</s:State>
+		<s:State name="messageIconVisible">
+			
+		</s:State>
+	</mx:states>
+	
+	<mx:HBox>
+		<mx:Box includeIn="messageIconVisible" styleName="imageWrapper">
+			<s:Image source="{messageIconClass}" />
+		</mx:Box>
+		<mx:Text text="{message}" styleName="blockingMessageText" />
+	</mx:HBox>
+	
+</mx:TitleWindow>

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:ViewStack xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			  xmlns:s="library://ns.adobe.com/flex/spark" 
+			  xmlns:mx="library://ns.adobe.com/flex/mx" 
+			  width="100%" height="100%"
+			  initialize="initializeHandler(event)">
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.collections.Array;
+			import mx.events.FlexEvent;
+			
+			private var _forms:Array;
+			//TODO this must be the Object instance
+			private var _data:Object;
+			
+			public function addRecordDetail(recordDetail:RecordDetail):void {
+				this._forms[recordDetail.version]=recordDetail;
+			}
+						
+			public function setActiveForm(version:Object):void {
+				//TODO
+				this.selectedChild = this._forms[version.id];
+			}
+			
+			protected function initializeHandler(event:FlexEvent):void {
+				this._forms = new Array();
+			}
+
+			public function get data():Object {
+				return _data;
+			}
+
+			public function set data(value:Object):void {
+				_data = value;
+			}
+
+
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	
+	
+</mx:ViewStack>

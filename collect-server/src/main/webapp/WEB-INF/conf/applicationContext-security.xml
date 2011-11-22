@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<b:beans xmlns:b="http://www.springframework.org/schema/beans"
+    xmlns="http://www.springframework.org/schema/security"
+    xmlns:p="http://www.springframework.org/schema/p"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:util="http://www.springframework.org/schema/util"
+    xsi:schemaLocation="http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.0.xsd
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+
+
+<!-- 	access-decision-manager-ref="globalAccessDecisionManager" -->
+	<global-method-security pre-post-annotations="enabled" access-decision-manager-ref="globalAccessDecisionManager">
+		<expression-handler ref="expressionHandler"/>
+<!-- 		<protect-pointcut expression="execution(* org.fao.openforis.web.service.Service.getItemsList(..))" access="ROLE_USER"/> -->
+<!-- 		<protect-pointcut expression="execution(* org.fao.openforis.web.service.Service.getItem(..))" access="ROLE_EDITOR"/> -->
+<!-- 		<protect-pointcut expression="execution(* org.fao.openforis.web.service.Service.isRecordIdValid(..))" access="ROLE_EDITOR"/> -->
+<!--     	<protect-pointcut expression="execution(* org.fao.openforis.web.service.Service.saveItem(..))" access="ROLE_EDITOR"/> -->
+<!--     	<protect-pointcut expression="execution(* org.fao.openforis.web.service.Service.deleteItem(..))" access="ROLE_EDITOR"/> -->
+<!--     	<protect-pointcut expression="execution(* org.fao.openforis.web.service.Service.changeItemId(..))" access="ROLE_EDITOR"/> -->
+<!--     	<protect-pointcut expression="execution(* org.fao.openforis.web.service.Service.newDocument(..))" access="ROLE_EDITOR"/> -->
+<!--     	<protect-pointcut expression="execution(* org.fao.openforis.web.service.Service.syncAllModel(..))" access="ROLE_EDITOR"/> -->
+<!--     	<protect-pointcut expression="execution(* org.fao.openforis.web.service.Service.syncModel(..))" access="ROLE_EDITOR"/> -->
+<!--     	<protect-pointcut expression="execution(* org.fao.openforis.web.service.Service.swapChildren(..))" access="ROLE_EDITOR"/> -->
+<!--     	<protect-pointcut expression="execution(* org.fao.openforis.web.service.Service.moveChild(..))" access="ROLE_EDITOR"/> -->
+<!--     	<protect-pointcut expression="execution(* org.fao.openforis.web.service.Service.unlockAllItemsPerCurrentUser(..))" access="ROLE_EDITOR"/> -->
+<!--     	<protect-pointcut expression="execution(* org.fao.openforis.web.service.Service.getItemLock(..))" access="ROLE_EDITOR"/> -->
+<!--     	<protect-pointcut expression="execution(* org.fao.openforis.web.service.Service.lockItem(..))" access="ROLE_EDITOR"/> -->
+<!--     	<protect-pointcut expression="execution(* org.fao.openforis.web.service.Service.isCurrentUserEditingAnItem(..))" access="ROLE_EDITOR"/> -->
+<!--     	<protect-pointcut expression="execution(* org.fao.openforis.web.service.Service.isItemLocked(..))" access="ROLE_EDITOR"/> -->
+<!--     	<protect-pointcut expression="execution(* org.fao.openforis.web.service.Service.keepAlive(..))" access="ROLE_EDITOR"/> -->
+<!--     	<protect-pointcut expression="execution(* org.fao.openforis.web.service.Service.getSessionId(..))" access="ROLE_USER"/> -->
+<!-- 		<protect-pointcut expression="execution(* org.fao.openforis.web.service.Service.findValues(..))" access="ROLE_EDITOR"/> -->
+<!-- 		<protect-pointcut expression="execution(* org.fao.openforis.web.service.Service.searchTaxon(..))" access="ROLE_EDITOR"/> -->
+<!--     	<protect-pointcut expression="execution(* org.fao.openforis.web.service.Service.validate(..))" access="ROLE_EDITOR"/> -->
+<!--     	<protect-pointcut expression="execution(* org.fao.openforis.web.service.Service.getRelevantCodeListItemsById(..))" access="ROLE_EDITOR"/> -->
+<!--     	<protect-pointcut expression="execution(* org.fao.openforis.web.service.Service.getRelevantCodeListParent(..))" access="ROLE_EDITOR"/> -->
+<!--     	<protect-pointcut expression="execution(* org.fao.openforis.web.service.Service.getVersions(..))" access="ROLE_EDITOR"/> -->
+  	</global-method-security>
+	
+<!--     <global-method-security pre-post-annotations="enabled" /> -->
+      
+	<http use-expressions="true">
+		<intercept-url pattern="/*" access="permitAll"/>
+<!-- 		<intercept-url pattern="/" access="isAuthenticated()" /> -->
+<!-- 		<intercept-url pattern="/index.htm" access="hasAnyRole('ROLE_ADMIN','ROLE_EDITOR','ROLE_USER')" /> -->
+<!-- 		<intercept-url pattern="/**/*.swf" access="hasAnyRole('ROLE_ADMIN','ROLE_EDITOR','ROLE_USER')" /> -->
+<!-- 		<intercept-url pattern="/script/**" access="hasAnyRole('ROLE_ADMIN','ROLE_EDITOR','ROLE_USER')" /> -->
+<!-- 		<intercept-url pattern="/flash/**" access="hasAnyRole('ROLE_ADMIN','ROLE_EDITOR','ROLE_USER')" /> -->
+<!-- 		<intercept-url pattern="/messagebroker/*" access="hasAnyRole('ROLE_ADMIN','ROLE_EDITOR','ROLE_USER')" /> -->
+<!-- 		<intercept-url pattern="/exist/**" access="hasAnyRole('ROLE_ADMIN','ROLE_EDITOR','ROLE_USER')" /> -->
+<!-- 		<intercept-url pattern="/upload" access="hasAnyRole('ROLE_ADMIN','ROLE_EDITOR','ROLE_USER')" /> -->
+<!-- 		<intercept-url pattern="/download" access="hasAnyRole('ROLE_ADMIN','ROLE_EDITOR','ROLE_USER')" /> -->
+<!-- 		<intercept-url pattern="/deleteFile" access="hasAnyRole('ROLE_ADMIN','ROLE_EDITOR','ROLE_USER')" /> -->
+<!-- 		<intercept-url pattern="/unlockItem" access="hasAnyRole('ROLE_ADMIN','ROLE_EDITOR','ROLE_USER')" /> -->
+<!-- 		<intercept-url pattern="/validateAllItems" access="hasAnyRole('ROLE_ADMIN','ROLE_EDITOR')"/> -->
+<!-- 		<intercept-url pattern="/validateItem" 	access="hasAnyRole('ROLE_ADMIN','ROLE_EDITOR')"/> -->
+<!-- 		<intercept-url pattern="/exportPlots" 	access="hasAnyRole('ROLE_ADMIN','ROLE_EDITOR')"/> -->
+<!-- 		<intercept-url pattern="/exportData" 	access="hasAnyRole('ROLE_ADMIN','ROLE_EDITOR')"/> -->
+<!-- 		<intercept-url pattern="/backup/**" 	access="hasAnyRole('ROLE_ADMIN','ROLE_EDITOR')" /> -->
+		
+<!-- 		<intercept-url pattern="/error.htm" access="permitAll"/> -->
+<!-- 		<intercept-url pattern="/login.htm*" access="permitAll"/> -->
+		
+<!-- 		<intercept-url pattern="/**" access="denyAll" /> -->
+		
+		<form-login login-page="/login.htm" authentication-failure-url="/login.htm?login_error=1" />
+        <http-basic/>
+        <logout logout-success-url="/index.htm"/>
+        <!-- remember-me /-->
+		
+	</http>
+	
+    <authentication-manager alias="authManager">
+        <authentication-provider>
+        	<password-encoder hash="md5" />
+        	<user-service properties="/WEB-INF/conf/users.properties"/>
+        </authentication-provider>
+    </authentication-manager>
+    
+	<b:bean id="expressionHandler"
+      		class="org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler">
+  	</b:bean>
+
+	<b:bean id="globalAccessDecisionManager" class="org.springframework.security.access.vote.AffirmativeBased">
+		<b:property name="decisionVoters">
+			<b:list>
+				<b:bean class="org.springframework.security.access.prepost.PreInvocationAuthorizationAdviceVoter">
+					<b:constructor-arg>
+						<b:bean class="org.springframework.security.access.expression.method.ExpressionBasedPreInvocationAdvice" />
+					</b:constructor-arg>
+				</b:bean>
+				<b:ref bean="roleVoter"/>
+				<b:ref bean="authenticatedVoter"/>
+			</b:list>
+		</b:property>
+	</b:bean>
+	
+	<b:bean id="httpAccessDecisionManager" class="org.springframework.security.access.vote.AffirmativeBased">
+		<b:property name="decisionVoters">
+			<b:list>
+				<b:ref bean="authenticatedVoter"/>
+				<b:bean class="org.springframework.security.web.access.expression.WebExpressionVoter"/>
+				<b:ref bean="roleVoter"/>
+			</b:list>
+		</b:property>
+	</b:bean>
+    
+    <!-- Not working... -->
+    <b:bean id="roleVoter" class="org.springframework.security.access.vote.RoleHierarchyVoter">
+    	<b:constructor-arg ref="roleHierarchy"/>
+	</b:bean>
+	
+	<b:bean id="roleHierarchy"
+        class="org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl">
+	    <b:property name="hierarchy">
+	    	<b:value>
+	        ROLE_ADMIN > ROLE_EDITOR
+	        ROLE_EDITOR > ROLE_USER
+	        ROLE_USER > ROLE_GUEST
+	        </b:value>
+	    </b:property>
+	</b:bean>
+	
+	<b:bean id="authenticatedVoter" class="org.springframework.security.access.vote.AuthenticatedVoter" />
+</b:beans>
