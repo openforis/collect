@@ -160,13 +160,13 @@
 			<artifactId>xbean-spring</artifactId>
 			<version>3.5</version>
 		</dependency>
-		<dependency>
-			<groupId>com</groupId>
-			<artifactId>farata</artifactId>
-			<version>1.0</version>
-			<scope>system</scope>
-			<systemPath>${basedir}/lib/com.farata.dto2fx.annotations.jar</systemPath>
-		</dependency>
+<!-- 		<dependency> -->
+<!-- 			<groupId>com</groupId> -->
+<!-- 			<artifactId>farata</artifactId> -->
+<!-- 			<version>1.0</version> -->
+<!-- 			<scope>system</scope> -->
+<!-- 			<systemPath>${basedir}/lib/com.farata.dto2fx.annotations.jar</systemPath> -->
+<!-- 		</dependency> -->
 		<dependency>
 			<groupId>net.sourceforge.saxon</groupId>
 			<artifactId>saxon</artifactId>
