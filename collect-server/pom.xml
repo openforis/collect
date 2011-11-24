@@ -4,12 +4,11 @@
 	<parent>
 		<artifactId>collect</artifactId>
 		<groupId>org.openforis</groupId>
-		<version>0.0.1-SNAPSHOT</version>
 		<relativePath>..</relativePath>
+		<version>3.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>collect-server</artifactId>
-	<packaging>war</packaging>
 
 	<properties>
 		<geotools.version>2.6.5</geotools.version>
@@ -47,39 +46,9 @@
 				</configuration>
 			</plugin>
 
-			<plugin>
-				<groupId>org.codehaus.mojo.jspc</groupId>
-				<artifactId>jspc-maven-plugin</artifactId>
-				<executions>
-					<execution>
-						<phase>prepare-package</phase>
-						<goals>
-							<goal>compile</goal>
-						</goals>
-					</execution>
-				</executions>
-				<!-- Use the Tomcat 6 JSP compiler -->
-				<dependencies>
-					<dependency>
-						<groupId>org.codehaus.mojo.jspc</groupId>
-						<artifactId>jspc-compiler-tomcat6</artifactId>
-						<version>2.0-alpha-3</version>
-					</dependency>
-				</dependencies>
-			</plugin>
-
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-war-plugin</artifactId>
-				<version>2.1-beta-1</version>
-				<configuration>
-					<webXml>${basedir}/target/jspweb.xml</webXml>
-					<failOnMissingWebXml>false</failOnMissingWebXml>
-				</configuration>
-			</plugin>
 		</plugins>
 
-		<finalName>collect</finalName>
+<!-- 		<finalName>collect</finalName> -->
 	</build>
 
 	<dependencies>

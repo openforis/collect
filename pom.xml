@@ -3,13 +3,14 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.openforis</groupId>
 	<artifactId>collect</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>3.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>Open Foris Collect</name>
 
 	<modules>
 		<module>collect-server</module>
 		<module>collect-client</module>
+		<module>collect-web</module>
 	</modules>
 
 	<repositories>

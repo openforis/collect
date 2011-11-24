@@ -6,16 +6,16 @@ package org.openforis.collect.client {
 	 * */
 	public class ClientFactory {
 		
-		private static var _applicationClient:ApplicationClient;
+		private static var _sessionClient:SessionClient;
 		
 		public function ClientFactory() {
 		}
 		
-		public static function get applicationClient():ApplicationClient{
-			if(_applicationClient == null){
-				_applicationClient = new ApplicationClient();
+		public static function get sessionClient():SessionClient{
+			if(_sessionClient == null){
+				_sessionClient = new SessionClient();
 			}
-			return _applicationClient;
+			return _sessionClient;
 		}
 	}
 }

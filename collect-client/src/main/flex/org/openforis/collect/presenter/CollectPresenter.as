@@ -7,7 +7,7 @@ package org.openforis.collect.presenter {
 	import mx.rpc.events.ResultEvent;
 	
 	import org.openforis.collect.Application;
-	import org.openforis.collect.client.ApplicationClient;
+	import org.openforis.collect.client.SessionClient;
 	import org.openforis.collect.client.ClientFactory;
 
 	/**
@@ -19,7 +19,7 @@ package org.openforis.collect.presenter {
 		private static const KEEP_ALIVE_FREQUENCY:Number = 30000;
 
 		private var _view:collect;
-		private var _applicationClient:ApplicationClient;
+		private var _sessionClient:SessionClient;
 		
 		private var _keepAliveTimer:Timer;
 		
@@ -27,15 +27,14 @@ package org.openforis.collect.presenter {
 			super();
 			
 			this._view = view;
-			this._applicationClient = ClientFactory.applicationClient;
+			this._sessionClient = ClientFactory.sessionClient;
 			
 			_keepAliveTimer = new Timer(KEEP_ALIVE_FREQUENCY)
 			_keepAliveTimer.addEventListener(TimerEvent.TIMER, sendKeepAliveMessage);
 			_keepAliveTimer.start();
 			
-			this._applicationClient.getSessionId(new ItemResponder(getSessionIdResult, faultResult));
+			this._sessionClient.getSessionState(new ItemResponder(getSessionStateResult, faultResult));
 			
-			this._applicationClient.sendTestInterface("mino","togna",new ItemResponder(res,faultResult));
 		}
 		
 		override internal function initEventListeners():void {
@@ -45,13 +44,13 @@ package org.openforis.collect.presenter {
 			trace(event);
 		}
 		
-		internal function getSessionIdResult(event:ResultEvent, token:Object = null):void {
-			Application.SESSION_ID = event.result as String;
-			
+		internal function getSessionStateResult(event:ResultEvent, token:Object = null):void {
+			//Application.SESSION_ID = event.result as String;
+			//TODO: Add sessionState to Application
 		}
 		
 		internal function sendKeepAliveMessage(event:TimerEvent):void {
-			this._applicationClient.keepAlive(new ItemResponder(keepAliveResult, faultResult));
+			this._sessionClient.keepAlive(new ItemResponder(keepAliveResult, faultResult));
 		}
 		
 		internal function keepAliveResult(event:ResultEvent, token:Object = null):void {
