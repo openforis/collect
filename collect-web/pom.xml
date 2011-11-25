@@ -1,18 +1,22 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <artifactId>collect</artifactId>
-    <groupId>org.openforis</groupId>
-    <version>3.0-SNAPSHOT</version>
-    <relativePath>..</relativePath>
-  </parent>
-  
-  <artifactId>collect-web</artifactId>
-  <packaging>war</packaging>
-  
-  <build>
-  	<plugins>
-  				<plugin>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.openforis.collect</groupId>
+		<artifactId>collect</artifactId>
+		<version>3.0-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>collect-web</artifactId>
+	<packaging>war</packaging>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+			</plugin>
+			<plugin>
 				<groupId>org.codehaus.mojo.jspc</groupId>
 				<artifactId>jspc-maven-plugin</artifactId>
 				<executions>
@@ -42,18 +46,18 @@
 					<failOnMissingWebXml>false</failOnMissingWebXml>
 				</configuration>
 			</plugin>
-  	</plugins>
-  	
-  	<finalName>collect</finalName>
-  </build>
-  
-  <dependencies>
-  	<dependency>
-  		<groupId>org.openforis</groupId>
-  		<artifactId>collect-server</artifactId>
-  		<version>${project.version}</version>
-  		<type>jar</type>
-  	</dependency>
-  </dependencies>
-  
+		</plugins>
+
+		<finalName>collect</finalName>
+	</build>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.openforis.collect</groupId>
+			<artifactId>collect-server</artifactId>
+			<version>${project.version}</version>
+			<type>jar</type>
+		</dependency>
+	</dependencies>
+
 </project>

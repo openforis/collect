@@ -2,16 +2,15 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
+		<groupId>org.openforis.collect</groupId>
 		<artifactId>collect</artifactId>
-		<groupId>org.openforis</groupId>
-		<relativePath>..</relativePath>
 		<version>3.0-SNAPSHOT</version>
 	</parent>
 
 	<properties>
 		<flexmojos.version>4.0-beta-5</flexmojos.version>
 	</properties>
-
+<!-- 
 	<build>
 		<plugins>
 			<plugin>
@@ -27,34 +26,33 @@
 					</execution>
 				</executions>
 				<configuration>
-<!-- 					 <generatorToUse>graniteds2</generatorToUse>  -->
 					<outputDirectory>${project.build.directory}/generated-sources/flex</outputDirectory>
 					<includeJavaClasses>
 						<includeClass>org.openforis.collect.model.*</includeClass>
 						<includeClass>org.openforis.idm.model.*</includeClass>
-<!-- 						<includeClass>org.openforis.collect.model.SessionState</includeClass> -->
-<!-- 						<includeClass>org.openforis.collect.model.UpdateRequest</includeClass> -->
-<!-- 						<includeClass>org.openforis.collect.model.User</includeClass> -->
 					</includeJavaClasses>
 				</configuration>
 			</plugin>
 		</plugins>
 	</build>
+ -->
 
 	<artifactId>collect-client</artifactId>
 	<dependencies>
-<!-- 		<dependency> -->
-<!-- 			<groupId>org.openforis.collect.idml</groupId> -->
-<!-- 			<artifactId>idml</artifactId> -->
-<!-- 			<version>0.0.1-SNAPSHOT</version> -->
-<!-- 		</dependency> -->
+		<!-- <dependency> -->
+		<!-- <groupId>org.openforis.collect.idml</groupId> -->
+		<!-- <artifactId>idml</artifactId> -->
+		<!-- <version>0.0.1-SNAPSHOT</version> -->
+		<!-- </dependency> -->
+		<!-- 
 		<dependency>
 			<groupId>org.openforis</groupId>
 			<artifactId>idm</artifactId>
 			<version>3.0.0-SNAPSHOT</version>
 		</dependency>
+		 -->
 		<dependency>
-			<groupId>org.openforis</groupId>
+			<groupId>org.openforis.collect</groupId>
 			<artifactId>collect-server</artifactId>
 			<version>${project.version}</version>
 			<scope>provided</scope>

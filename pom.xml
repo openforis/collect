@@ -1,11 +1,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	
+	<name>Open Foris Collect</name>
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.openforis</groupId>
+	<groupId>org.openforis.collect</groupId>
 	<artifactId>collect</artifactId>
 	<version>3.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
-	<name>Open Foris Collect</name>
 
 	<modules>
 		<module>collect-server</module>
@@ -13,6 +14,21 @@
 		<module>collect-web</module>
 	</modules>
 
+	<build>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<version>2.0.2</version>
+					<configuration>
+						<source>1.6</source>
+						<target>1.6</target>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
 	<repositories>
 		<!-- <repository> -->
 		<!-- <id>flex-mojos-repository</id> -->
