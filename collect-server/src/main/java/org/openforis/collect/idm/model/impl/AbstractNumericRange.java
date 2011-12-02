@@ -22,8 +22,8 @@ public abstract class AbstractNumericRange<T extends Number> extends AbstractVal
 	}
 
 	protected boolean isValidRange() {
-		if (!isBlank()) {
-			Matcher matcher = PATTERN.matcher(getValue1());
+		if (!this.isBlank()) {
+			Matcher matcher = PATTERN.matcher(this.getValue1());
 			return matcher.matches();
 		}
 		return false;

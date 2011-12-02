@@ -31,9 +31,9 @@ public class DateValueImpl extends AbstractTimestampValue implements DateValue {
 	 */
 	@Override
 	public Calendar toCalendar() {
-		Date date = getDate();
+		Date date = this.getDate();
 		if (date != null) {
-			Calendar calendar = getDefaultCalendar();
+			Calendar calendar = this.getDefaultCalendar();
 			calendar.setTime(date);
 			return calendar;
 		}
@@ -47,7 +47,7 @@ public class DateValueImpl extends AbstractTimestampValue implements DateValue {
 	 */
 	@Override
 	public Integer getDay() {
-		Calendar calendar = toCalendar();
+		Calendar calendar = this.toCalendar();
 		if (calendar != null) {
 			return calendar.get(Calendar.DAY_OF_MONTH);
 		}
@@ -61,7 +61,7 @@ public class DateValueImpl extends AbstractTimestampValue implements DateValue {
 	 */
 	@Override
 	public Integer getMonth() {
-		Calendar calendar = toCalendar();
+		Calendar calendar = this.toCalendar();
 		if (calendar != null) {
 			return calendar.get(Calendar.MONTH) + 1;
 		}
@@ -75,7 +75,7 @@ public class DateValueImpl extends AbstractTimestampValue implements DateValue {
 	 */
 	@Override
 	public Integer getYear() {
-		Calendar calendar = toCalendar();
+		Calendar calendar = this.toCalendar();
 		if (calendar != null) {
 			return calendar.get(Calendar.YEAR);
 		}
@@ -88,7 +88,7 @@ public class DateValueImpl extends AbstractTimestampValue implements DateValue {
 	private Date getDate() {
 		Date date = null;
 		try {
-			date = DATE_FORMAT.parse(getValue1());
+			date = DATE_FORMAT.parse(this.getValue1());
 		} catch (ParseException e) {
 			// invalid date
 		}

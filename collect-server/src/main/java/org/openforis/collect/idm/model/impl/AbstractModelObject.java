@@ -77,9 +77,9 @@ public class AbstractModelObject<D extends ModelObjectDefinition> implements Mod
 	}
 
 	public String getPath() {
-		return path;
+		return this.path;
 	}
-	
+
 	void setPath(String path) {
 		this.path = path;
 	}

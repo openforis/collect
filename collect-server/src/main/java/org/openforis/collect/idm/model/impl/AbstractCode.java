@@ -13,7 +13,7 @@ public abstract class AbstractCode<T> extends AbstractValue implements Code<T> {
 
 	public AbstractCode(String code, String qualifier) {
 		this(code);
-		setValue2(qualifier);
+		this.setValue2(qualifier);
 	}
 
 	public AbstractCode(String code) {
@@ -23,6 +23,7 @@ public abstract class AbstractCode<T> extends AbstractValue implements Code<T> {
 	@Override
 	public String getQualifier() {
 		return this.getValue2();
+
 	}
 
 }

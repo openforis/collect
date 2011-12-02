@@ -18,7 +18,7 @@ public class IntegerValueImpl extends AbstractNumericValue<Integer> implements I
 	@Override
 	public Integer getNumber() {
 		try {
-			return Integer.parseInt(getValue1());
+			return Integer.parseInt(this.getValue1());
 		} catch (NumberFormatException e) {
 			return null;
 		}

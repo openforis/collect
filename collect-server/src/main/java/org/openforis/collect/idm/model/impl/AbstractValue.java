@@ -43,8 +43,9 @@ public abstract class AbstractValue implements Value {
 			if (string.length() == 1) {
 				Character character = string.charAt(0);
 				for (Symbol symbol : values()) {
-					if (symbol.equals(character))
+					if (symbol.equals(character)) {
 						return symbol;
+					}
 				}
 			}
 			return null;
@@ -78,53 +79,57 @@ public abstract class AbstractValue implements Value {
 	}
 
 	public Symbol getSymbol() {
-		return symbol;
+		return this.symbol;
 	}
 
 	/**
 	 * @return the value2
 	 */
 	protected String getValue2() {
-		return value2;
+		return this.value2;
 	}
 
 	/**
 	 * @return the value3
 	 */
 	protected String getValue3() {
-		return value3;
+		return this.value3;
 	}
 
 	/**
 	 * @return the value4
 	 */
 	protected String getValue4() {
-		return value4;
+		return this.value4;
 	}
 
 	/**
-	 * @param value1 the value1 to set
+	 * @param value1
+	 *            the value1 to set
 	 */
 	protected void setValue1(String value1) {
 		this.value1 = value1;
 	}
 
 	/**
-	 * @param value2 the value2 to set
+	 * @param value2
+	 *            the value2 to set
 	 */
 	protected void setValue2(String value2) {
 		this.value2 = value2;
 	}
 
 	/**
-	 * @param value3 the value3 to set
+	 * @param value3
+	 *            the value3 to set
 	 */
 	protected void setValue3(String value3) {
 		this.value3 = value3;
 	}
 
 	/**
-	 * @param value4 the value4 to set
+	 * @param value4
+	 *            the value4 to set
 	 */
 	protected void setValue4(String value4) {
 		this.value4 = value4;

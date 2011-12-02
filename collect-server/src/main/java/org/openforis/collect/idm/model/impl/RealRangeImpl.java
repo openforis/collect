@@ -7,7 +7,7 @@ import org.openforis.idm.model.RealRange;
 
 /**
  * @author M. Togna
- *
+ * 
  */
 public class RealRangeImpl extends AbstractNumericRange<Double> implements RealRange {
 
@@ -15,7 +15,9 @@ public class RealRangeImpl extends AbstractNumericRange<Double> implements RealR
 		super(stringValue);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.openforis.idm.model.NumericRange#getFrom()
 	 */
 	@Override
@@ -24,7 +26,9 @@ public class RealRangeImpl extends AbstractNumericRange<Double> implements RealR
 		return null;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.openforis.idm.model.NumericRange#getTo()
 	 */
 	@Override
@@ -32,6 +36,5 @@ public class RealRangeImpl extends AbstractNumericRange<Double> implements RealR
 		// TODO Auto-generated method stub
 		return null;
 	}
-
 
 }

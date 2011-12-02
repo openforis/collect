@@ -41,7 +41,7 @@ public class EntityImpl extends AbstractModelObject<EntityDefinition> implements
 
 	@Override
 	public void add(ModelObject<? extends ModelObjectDefinition> o) {
-		beforeUpdate(o);
+		this.beforeUpdate(o);
 
 		String name = o.getDefinition().getName();
 		List<ModelObject<?>> list = this.get(name);
@@ -51,18 +51,18 @@ public class EntityImpl extends AbstractModelObject<EntityDefinition> implements
 		}
 		list.add(o);
 
-		updateList(list.size() - 1, name);
+		this.updateList(list.size() - 1, name);
 	}
 
 	@Override
 	public void add(ModelObject<? extends ModelObjectDefinition> o, int index) {
-		beforeUpdate(o);
+		this.beforeUpdate(o);
 
 		String name = o.getDefinition().getName();
 		List<ModelObject<?>> list = this.get(name);
 		list.add(index, o);
 
-		updateList(index, name);
+		this.updateList(index, name);
 	}
 
 	@Override
@@ -70,7 +70,7 @@ public class EntityImpl extends AbstractModelObject<EntityDefinition> implements
 		List<ModelObject<? extends ModelObjectDefinition>> list = this.get(name);
 		ModelObject<? extends ModelObjectDefinition> modelObject = list.remove(index);
 
-		updateList(index, name);
+		this.updateList(index, name);
 
 		return modelObject;
 	}
@@ -87,12 +87,12 @@ public class EntityImpl extends AbstractModelObject<EntityDefinition> implements
 
 	@Override
 	public ModelObject<?> set(ModelObject<? extends ModelObjectDefinition> o, int index) {
-		beforeUpdate(o);
+		this.beforeUpdate(o);
 		String name = o.getDefinition().getName();
 		List<ModelObject<? extends ModelObjectDefinition>> list = this.get(name);
 		ModelObject<? extends ModelObjectDefinition> object = list.set(index, o);
 
-		updateList(index, name);
+		this.updateList(index, name);
 
 		return object;
 	}
