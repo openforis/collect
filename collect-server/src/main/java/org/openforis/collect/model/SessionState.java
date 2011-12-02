@@ -6,7 +6,7 @@ package org.openforis.collect.model;
 import org.openforis.idm.model.Record;
 
 /**
- * @author Mino Togna
+ * @author M. Togna
  * 
  */
 public class SessionState {
@@ -23,7 +23,7 @@ public class SessionState {
 	 * @uml.property name="user"
 	 */
 	public User getUser() {
-		return user;
+		return this.user;
 	}
 
 	/**
@@ -49,7 +49,7 @@ public class SessionState {
 	 * @uml.property name="sessionId"
 	 */
 	public String getSessionId() {
-		return sessionId;
+		return this.sessionId;
 	}
 
 	/**
@@ -75,7 +75,7 @@ public class SessionState {
 	 * @uml.property name="activeRecord"
 	 */
 	public Record getActiveRecord() {
-		return activeRecord;
+		return this.activeRecord;
 	}
 
 	/**

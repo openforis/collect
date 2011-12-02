@@ -16,21 +16,23 @@ public class SpringFactory implements FlexFactory {
 
 	/**
 	 * 
-	 * This method can be used to initialize the factory itself. It is called with configuration parameters from the factory tag which
-	 * defines the id of the factory.
+	 * This method can be used to initialize the factory itself. It is called with configuration parameters from the factory tag which defines the id
+	 * of the factory.
 	 */
 
+	@Override
 	public void initialize(String id, ConfigMap configMap) {
 	}
 
 	/**
 	 * 
-	 * This method is called when we initialize the definition of an instance which will be looked up by this factory. It should validate
-	 * that the properties supplied are valid to define an instance. Any valid properties used for this configuration must be accessed to
-	 * avoid warnings about unused configuration elements. If your factory is only used for application scoped components, this method can
-	 * simply return a factory instance which delegates the creation of the component to the FactoryInstance's lookup method.
+	 * This method is called when we initialize the definition of an instance which will be looked up by this factory. It should validate that the
+	 * properties supplied are valid to define an instance. Any valid properties used for this configuration must be accessed to avoid warnings about
+	 * unused configuration elements. If your factory is only used for application scoped components, this method can simply return a factory instance
+	 * which delegates the creation of the component to the FactoryInstance's lookup method.
 	 */
 
+	@Override
 	public FactoryInstance createFactoryInstance(String id, ConfigMap properties) {
 		SpringFactoryInstance instance = new SpringFactoryInstance(this, id, properties);
 		instance.setSource(properties.getPropertyAsString(SOURCE, instance.getId()));
@@ -40,15 +42,15 @@ public class SpringFactory implements FlexFactory {
 
 	/**
 	 * 
-	 * Returns the instance specified by the source and properties arguments. For the factory, this may mean constructing a new instance,
-	 * optionally registering it in some other name space such as the session or JNDI, and then returning it or it may mean creating a new
-	 * instance and returning it. This method is called for each request to operate on the given item by the system so it should be
-	 * relatively efficient.
+	 * Returns the instance specified by the source and properties arguments. For the factory, this may mean constructing a new instance, optionally
+	 * registering it in some other name space such as the session or JNDI, and then returning it or it may mean creating a new instance and returning
+	 * it. This method is called for each request to operate on the given item by the system so it should be relatively efficient.
 	 * <p>
 	 * If your factory does not support the scope property, it report an error if scope is supplied in the properties for this instance.
 	 * </p>
 	 */
 
+	@Override
 	public Object lookup(FactoryInstance inst) {
 		SpringFactoryInstance factoryInstance = (SpringFactoryInstance) inst;
 		return factoryInstance.lookup();
@@ -59,13 +61,15 @@ public class SpringFactory implements FlexFactory {
 			super(factory, id, properties);
 		}
 
+		@Override
 		public String toString() {
-			return "SpringFactory instance for id=" + getId() + " source=" + getSource() + " scope=" + getScope();
+			return "SpringFactory instance for id=" + this.getId() + " source=" + this.getSource() + " scope=" + this.getScope();
 		}
 
+		@Override
 		public Object lookup() {
 			ApplicationContext appContext = WebApplicationContextUtils.getWebApplicationContext(flex.messaging.FlexContext.getServletConfig().getServletContext());
-			String beanName = getSource();
+			String beanName = this.getSource();
 			try {
 				return appContext.getBean(beanName);
 			} catch (NoSuchBeanDefinitionException nexc) {

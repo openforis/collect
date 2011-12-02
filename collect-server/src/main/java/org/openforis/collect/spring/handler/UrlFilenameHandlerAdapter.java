@@ -12,7 +12,7 @@ import org.springframework.web.servlet.mvc.LastModified;
 import org.springframework.web.servlet.mvc.UrlFilenameViewController;
 
 /**
- * @author Mino Togna
+ * @author M. Togna
  * 
  */
 public class UrlFilenameHandlerAdapter implements HandlerAdapter {
@@ -41,7 +41,7 @@ public class UrlFilenameHandlerAdapter implements HandlerAdapter {
 	 */
 	@Override
 	public ModelAndView handle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-		String viewName = getViewName(request);
+		String viewName = this.getViewName(request);
 		return new ModelAndView(viewName);
 	}
 

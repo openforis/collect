@@ -18,7 +18,7 @@ import flex.messaging.FlexContext;
 
 /**
  * 
- * @author Mino Togna
+ * @author M. Togna
  */
 public class SessionManager {
 
@@ -36,10 +36,10 @@ public class SessionManager {
 			FlexContext.getHttpRequest().getSession().setAttribute(SESSION_STATE_SESSION_ATTRIBUTE_NAME, sessionState);
 		}
 
-		Record activeRecord = getActiveRecord();
+		Record activeRecord = this.getActiveRecord();
 		sessionState.setActiveRecord(activeRecord);
 
-		User user = getLoggedInUser();
+		User user = this.getLoggedInUser();
 		sessionState.setUser(user);
 
 		return sessionState;

@@ -21,7 +21,7 @@ import org.springframework.flex.remoting.RemotingInclude;
 import org.springframework.security.access.AccessDeniedException;
 
 /**
- * @author Mino Togna
+ * @author M. Togna
  */
 public class DataService {
 
@@ -56,7 +56,7 @@ public class DataService {
 	}
 
 	@RemotingInclude
-	public List<ModelObject<?, ?>> updateActiveRecord(UpdateRequest request) {
+	public List<ModelObject<?>> updateActiveRecord(UpdateRequest request) {
 		return null;
 	}
 
@@ -69,7 +69,7 @@ public class DataService {
 	}
 
 	@RemotingInclude
-	public void updateModelObjectHierarchy(ModelObject<?, ?> modelObject, int newPosition) {
+	public void updateModelObjectHierarchy(ModelObject<?> modelObject, int newPosition) {
 	}
 
 	@RemotingInclude

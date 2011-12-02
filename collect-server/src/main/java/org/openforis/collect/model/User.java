@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @author Mino Togna
+ * @author M. Togna
  * 
  */
 public class User {
@@ -25,7 +25,7 @@ public class User {
 	}
 
 	public void addAuthority(String authority) {
-		getAuthorities().add(authority);
+		this.getAuthorities().add(authority);
 	}
 
 	/**
@@ -35,10 +35,10 @@ public class User {
 	 * @uml.property name="authorities"
 	 */
 	public List<String> getAuthorities() {
-		if (authorities == null) {
-			authorities = new ArrayList<String>();
+		if (this.authorities == null) {
+			this.authorities = new ArrayList<String>();
 		}
-		return authorities;
+		return this.authorities;
 	}
 
 	/**
@@ -48,7 +48,7 @@ public class User {
 	 * @uml.property name="name"
 	 */
 	public String getName() {
-		return name;
+		return this.name;
 	}
 
 	/**

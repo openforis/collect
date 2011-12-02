@@ -4,7 +4,7 @@
 package org.openforis.collect.exception;
 
 /**
- * @author Mino Togna
+ * @author M. Togna
  * 
  */
 public class MultipleEditException extends Exception {
