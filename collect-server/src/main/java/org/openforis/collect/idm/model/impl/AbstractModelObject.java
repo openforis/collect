@@ -23,7 +23,8 @@ public class AbstractModelObject<D extends ModelObjectDefinition> implements Mod
 	private List<Check> warnings;
 	private RecordImpl record;
 	private String path;
-
+	private String type;
+	
 	@Override
 	public D getDefinition() {
 		return this.definition;
@@ -83,4 +84,9 @@ public class AbstractModelObject<D extends ModelObjectDefinition> implements Mod
 	void setPath(String path) {
 		this.path = path;
 	}
+
+	public String getType() {
+		return type;
+	}
+
 }
