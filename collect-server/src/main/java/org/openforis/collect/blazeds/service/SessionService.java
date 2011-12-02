@@ -9,12 +9,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.flex.remoting.RemotingInclude;
 
 /**
- * @author Mino Togna
+ * @author M. Togna
  * 
  */
 public class SessionService {
 
-//	private static Log LOG = LogUtils.getLog(SessionService.class);
+	// private static Log LOG = LogUtils.getLog(SessionService.class);
 
 	@Autowired
 	protected SessionManager sessionManager;
@@ -24,7 +24,7 @@ public class SessionService {
 	 */
 	@RemotingInclude
 	public void keepAlive() {
-		sessionManager.keepSessionAlive();
+		this.sessionManager.keepSessionAlive();
 	}
 
 	/**
@@ -33,7 +33,7 @@ public class SessionService {
 	 */
 	@RemotingInclude
 	public SessionState getSessionState() {
-		return sessionManager.getSessionState();
+		return this.sessionManager.getSessionState();
 	}
 
 }

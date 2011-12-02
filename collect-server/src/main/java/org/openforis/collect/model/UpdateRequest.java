@@ -2,7 +2,7 @@ package org.openforis.collect.model;
 
 /**
  * 
- * @author Mino Togna
+ * @author M. Togna
  * 
  */
 public class UpdateRequest {

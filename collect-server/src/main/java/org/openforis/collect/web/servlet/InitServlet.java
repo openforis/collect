@@ -21,7 +21,7 @@ import javax.xml.parsers.FactoryConfigurationError;
 import org.apache.log4j.xml.DOMConfigurator;
 
 /**
- * @author Mino Togna
+ * @author M. Togna
  * 
  */
 public class InitServlet extends HttpServlet {
@@ -51,7 +51,7 @@ public class InitServlet extends HttpServlet {
 		// TODO init path
 		// FileUtil.init(basePath);
 
-		initLog4J();
+		this.initLog4J();
 		// initValiadtionMap();
 
 		System.out.println("====================================================");
@@ -62,8 +62,8 @@ public class InitServlet extends HttpServlet {
 	 */
 	protected void initLog4J() throws FactoryConfigurationError {
 		// Get data from web.xml
-		String file = getInitParameter("log4j-init-file");
-		String logdir = getInitParameter("log4j-log-dir");
+		String file = this.getInitParameter("log4j-init-file");
+		String logdir = this.getInitParameter("log4j-log-dir");
 
 		if (logdir == null) {
 			// Use default location for OpenForis logs if not specified in web.xml
@@ -71,22 +71,22 @@ public class InitServlet extends HttpServlet {
 		}
 
 		// Get path where OpenForis is running
-		String openForisDir = getServletContext().getRealPath("/");
+		String openForisDir = this.getServletContext().getRealPath("/");
 
 		// Define location of logfiles
 		File logsdir = new File(openForisDir, logdir);
 		logsdir.mkdirs();
 
-		System.out.println(getTimestamp() + " - OpenForis logs dir=" + logsdir.getAbsolutePath());
+		System.out.println(this.getTimestamp() + " - OpenForis logs dir=" + logsdir.getAbsolutePath());
 
 		// Get log4j configuration file
 		File srcConfigFile = new File(openForisDir, file);
 
 		// Convert
 		File log4jConfigFile = new File(openForisDir, "WEB-INF/TMPfile.xml");
-		convertLogFile(srcConfigFile, log4jConfigFile, logsdir);
+		this.convertLogFile(srcConfigFile, log4jConfigFile, logsdir);
 
-		System.out.println(getTimestamp() + " - OpenForis log4j configuration=" + log4jConfigFile.getAbsolutePath());
+		System.out.println(this.getTimestamp() + " - OpenForis log4j configuration=" + log4jConfigFile.getAbsolutePath());
 
 		// Configure log4j
 		DOMConfigurator.configure(log4jConfigFile.getAbsolutePath());
