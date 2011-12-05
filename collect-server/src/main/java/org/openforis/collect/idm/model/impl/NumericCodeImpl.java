@@ -28,7 +28,7 @@ public class NumericCodeImpl extends AbstractCode<Integer> implements NumericCod
 	public Integer getCode() {
 		Integer code = null;
 		try {
-			code = Integer.parseInt(this.getValue1());
+			code = Integer.parseInt(this.getText1());
 		} catch (NumberFormatException e) {
 		}
 		return code;

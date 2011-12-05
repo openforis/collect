@@ -19,9 +19,9 @@ public class BooleanValueImpl extends AbstractValue implements BooleanValue {
 	@Override
 	public Boolean getBoolean() {
 		if (!this.isBlank()) {
-			if (TRUE.equals(this.getValue1())) {
+			if (TRUE.equals(this.getText1())) {
 				return Boolean.TRUE;
-			} else if (FALSE.equals(this.getValue1())) {
+			} else if (FALSE.equals(this.getText1())) {
 				return Boolean.FALSE;
 			}
 		}

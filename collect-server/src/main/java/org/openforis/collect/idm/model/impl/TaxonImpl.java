@@ -17,9 +17,9 @@ public class TaxonImpl extends AbstractValue implements Taxon {
 
 	public TaxonImpl(String code, String scientificName, String vernacularName, String languageVariant) {
 		this(code);
-		setValue2(scientificName);
-		setValue3(vernacularName);
-		setValue4(languageVariant);
+		setText2(scientificName);
+		setText3(vernacularName);
+		setText4(languageVariant);
 	}
 
 	/*
@@ -29,7 +29,7 @@ public class TaxonImpl extends AbstractValue implements Taxon {
 	 */
 	@Override
 	public String getCode() {
-		return getValue1();
+		return getText1();
 	}
 
 	/*

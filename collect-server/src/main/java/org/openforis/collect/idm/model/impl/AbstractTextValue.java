@@ -22,7 +22,7 @@ public abstract class AbstractTextValue extends AbstractValue implements TextVal
 	 */
 	@Override
 	public String getString() {
-		return this.getValue1();
+		return this.getText1();
 	}
 
 }

@@ -14,9 +14,9 @@ public class CoordinateValueImpl extends AbstractValue implements Coordinate {
 
 	public CoordinateValueImpl(String x, String y, String z, String srsId) {
 		super(x);
-		super.setValue2(x);
-		super.setValue3(z);
-		super.setValue4(srsId);
+		super.setText2(x);
+		super.setText3(z);
+		super.setText4(srsId);
 	}
 
 	public CoordinateValueImpl(String x, String y, String srsId) {
@@ -31,7 +31,7 @@ public class CoordinateValueImpl extends AbstractValue implements Coordinate {
 	@Override
 	public Long getX() {
 		try {
-			return Long.parseLong(getValue1());
+			return Long.parseLong(getText1());
 		} catch (NumberFormatException e) {
 			return null;
 		}
@@ -45,7 +45,7 @@ public class CoordinateValueImpl extends AbstractValue implements Coordinate {
 	@Override
 	public Long getY() {
 		try {
-			return Long.parseLong(getValue2());
+			return Long.parseLong(getText2());
 		} catch (NumberFormatException e) {
 			return null;
 		}
@@ -59,7 +59,7 @@ public class CoordinateValueImpl extends AbstractValue implements Coordinate {
 	@Override
 	public Long getZ() {
 		try {
-			return Long.parseLong(getValue3());
+			return Long.parseLong(getText3());
 		} catch (NumberFormatException e) {
 			return null;
 		}

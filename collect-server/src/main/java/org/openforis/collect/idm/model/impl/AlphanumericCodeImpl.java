@@ -26,7 +26,7 @@ public class AlphanumericCodeImpl extends AbstractCode<String> implements Alphan
 
 	@Override
 	public String getCode() {
-		return this.getValue1();
+		return this.getText1();
 	}
 
 }

@@ -18,7 +18,7 @@ public class RealValueImpl extends AbstractNumericValue<Double> implements RealV
 	@Override
 	public Double getNumber() {
 		try {
-			return Double.parseDouble(this.getValue1());
+			return Double.parseDouble(this.getText1());
 		} catch (NumberFormatException e) {
 			return null;
 		}

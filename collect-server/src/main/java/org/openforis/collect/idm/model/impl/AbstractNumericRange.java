@@ -23,7 +23,7 @@ public abstract class AbstractNumericRange<T extends Number> extends AbstractVal
 
 	protected boolean isValidRange() {
 		if (!this.isBlank()) {
-			Matcher matcher = PATTERN.matcher(this.getValue1());
+			Matcher matcher = PATTERN.matcher(this.getText1());
 			return matcher.matches();
 		}
 		return false;

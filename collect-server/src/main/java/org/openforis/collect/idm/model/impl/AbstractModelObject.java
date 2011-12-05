@@ -7,6 +7,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import javax.persistence.Column;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.MappedSuperclass;
+
 import org.openforis.idm.metamodel.Check;
 import org.openforis.idm.metamodel.ModelObjectDefinition;
 import org.openforis.idm.model.ModelObject;
@@ -15,7 +21,13 @@ import org.openforis.idm.model.ModelObject;
  * @author M. Togna
  * 
  */
+@MappedSuperclass
 public class AbstractModelObject<D extends ModelObjectDefinition> implements ModelObject<D> {
+
+	@Column(unique = true, name = "id")
+	@Id
+	@GeneratedValue(strategy = GenerationType.SEQUENCE)
+	private Long id;
 
 	private D definition;
 	private boolean relevant;
@@ -24,7 +36,7 @@ public class AbstractModelObject<D extends ModelObjectDefinition> implements Mod
 	private RecordImpl record;
 	private String path;
 	private String type;
-	
+
 	@Override
 	public D getDefinition() {
 		return this.definition;
@@ -87,6 +99,10 @@ public class AbstractModelObject<D extends ModelObjectDefinition> implements Mod
 
 	public String getType() {
 		return type;
+	}
+
+	public Long getId() {
+		return id;
 	}
 
 }

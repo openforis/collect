@@ -88,7 +88,7 @@ public class DateValueImpl extends AbstractTimestampValue implements DateValue {
 	private Date getDate() {
 		Date date = null;
 		try {
-			date = DATE_FORMAT.parse(this.getValue1());
+			date = DATE_FORMAT.parse(this.getText1());
 		} catch (ParseException e) {
 			// invalid date
 		}

@@ -52,10 +52,14 @@ public abstract class AbstractValue implements Value {
 		}
 	}
 
-	private String value1;
-	private String value2;
-	private String value3;
-	private String value4;
+	private String text1;
+	private String text2;
+	private String text3;
+	private String text4;
+
+	private String remarks;
+	private boolean approved;
+
 	private Symbol symbol;
 
 	// public AbstractValue() {
@@ -63,19 +67,17 @@ public abstract class AbstractValue implements Value {
 	// }
 
 	public AbstractValue(String stringValue) {
+		this.text1 = stringValue;
 		this.symbol = Symbol.fromString(stringValue);
-		if (this.symbol == null) {
-			this.value1 = stringValue;
-		}
 	}
 
 	@Override
 	public boolean isBlank() {
-		return StringUtils.isBlank(this.value1);
+		return StringUtils.isBlank(this.text1);
 	}
 
-	protected String getValue1() {
-		return this.value1;
+	protected String getText1() {
+		return this.text1;
 	}
 
 	public Symbol getSymbol() {
@@ -83,56 +85,63 @@ public abstract class AbstractValue implements Value {
 	}
 
 	/**
-	 * @return the value2
+	 * @return the text2
 	 */
-	protected String getValue2() {
-		return this.value2;
+	protected String getText2() {
+		return this.text2;
 	}
 
 	/**
-	 * @return the value3
+	 * @return the text3
 	 */
-	protected String getValue3() {
-		return this.value3;
+	protected String getText3() {
+		return this.text3;
 	}
 
 	/**
-	 * @return the value4
+	 * @param text1
+	 *            the text1 to set
 	 */
-	protected String getValue4() {
-		return this.value4;
+	protected void setText1(String value1) {
+		this.text1 = value1;
 	}
 
 	/**
-	 * @param value1
-	 *            the value1 to set
+	 * @param text2
+	 *            the text2 to set
 	 */
-	protected void setValue1(String value1) {
-		this.value1 = value1;
+	protected void setText2(String value2) {
+		this.text2 = value2;
 	}
 
 	/**
-	 * @param value2
-	 *            the value2 to set
+	 * @param text3
+	 *            the text3 to set
 	 */
-	protected void setValue2(String value2) {
-		this.value2 = value2;
+	protected void setText3(String value3) {
+		this.text3 = value3;
 	}
 
 	/**
-	 * @param value3
-	 *            the value3 to set
+	 * @return the remarks
 	 */
-	protected void setValue3(String value3) {
-		this.value3 = value3;
+	protected String getRemarks() {
+		return remarks;
 	}
 
 	/**
-	 * @param value4
-	 *            the value4 to set
+	 * @return the approved
 	 */
-	protected void setValue4(String value4) {
-		this.value4 = value4;
+	protected boolean isApproved() {
+		return approved;
+	}
+
+	public String getText4() {
+		return text4;
+	}
+
+	public void setText4(String text4) {
+		this.text4 = text4;
 	}
 
 }

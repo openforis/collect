@@ -8,16 +8,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.persistence.Entity;
+import javax.persistence.Table;
+
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.ModelObjectDefinition;
-import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.ModelObject;
 
 /**
  * @author M. Togna
  * 
  */
-public class EntityImpl extends AbstractModelObject<EntityDefinition> implements Entity {
+@Entity
+@Table(name="entity")
+public class EntityImpl extends AbstractModelObject<EntityDefinition> implements org.openforis.idm.model.Entity {
 
 	private Map<String, List<ModelObject<? extends ModelObjectDefinition>>> children;
 

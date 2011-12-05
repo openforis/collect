@@ -32,7 +32,7 @@ public class TimeValueImpl extends AbstractTimestampValue implements TimeValue {
 	public Calendar toCalendar() {
 		if (this.isValidTime()) {
 			Calendar calendar = this.getDefaultCalendar();
-			String[] strings = this.getValue1().split(TIME_SEPARATOR);
+			String[] strings = this.getText1().split(TIME_SEPARATOR);
 			calendar.set(Calendar.HOUR_OF_DAY, Integer.parseInt(strings[0]));
 			calendar.set(Calendar.MINUTE, Integer.parseInt(strings[1]));
 			return calendar;
@@ -48,7 +48,7 @@ public class TimeValueImpl extends AbstractTimestampValue implements TimeValue {
 	@Override
 	public Integer getHour() {
 		if (this.isValidTime()) {
-			String[] strings = this.getValue1().split(TIME_SEPARATOR);
+			String[] strings = this.getText1().split(TIME_SEPARATOR);
 			return Integer.parseInt(strings[0]);
 		}
 		return null;
@@ -62,7 +62,7 @@ public class TimeValueImpl extends AbstractTimestampValue implements TimeValue {
 	@Override
 	public Integer getMinute() {
 		if (this.isValidTime()) {
-			String[] strings = this.getValue1().split(TIME_SEPARATOR);
+			String[] strings = this.getText1().split(TIME_SEPARATOR);
 			return Integer.parseInt(strings[1]);
 		}
 		return null;
@@ -70,7 +70,7 @@ public class TimeValueImpl extends AbstractTimestampValue implements TimeValue {
 
 	private boolean isValidTime() {
 		if (!this.isBlank()) {
-			Matcher matcher = PATTERN.matcher(this.getValue1());
+			Matcher matcher = PATTERN.matcher(this.getText1());
 			return matcher.matches();
 		}
 		return false;

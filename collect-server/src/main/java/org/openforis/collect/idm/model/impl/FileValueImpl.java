@@ -20,7 +20,7 @@ public class FileValueImpl extends AbstractValue implements FileValue {
 	public FileValueImpl(String fileName, Long fileSize) {
 		super(fileName);
 		this.fileSize = fileSize;
-		this.setValue2(String.valueOf(this.fileSize));
+		this.setText2(String.valueOf(this.fileSize));
 	}
 
 	/*
@@ -30,7 +30,7 @@ public class FileValueImpl extends AbstractValue implements FileValue {
 	 */
 	@Override
 	public String getFilename() {
-		return this.getValue1();
+		return this.getText1();
 	}
 
 	/*
