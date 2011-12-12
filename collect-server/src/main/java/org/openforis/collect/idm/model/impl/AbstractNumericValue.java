@@ -15,4 +15,9 @@ public abstract class AbstractNumericValue<T extends Number> extends AbstractVal
 		super(stringValue);
 	}
 
+	@Override
+	public boolean isFormatValid() {
+		return getNumber() != null;
+	}
+
 }

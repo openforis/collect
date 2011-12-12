@@ -28,4 +28,9 @@ public class BooleanValueImpl extends AbstractValue implements BooleanValue {
 		return null;
 	}
 
+	@Override
+	public boolean isFormatValid() {
+		return getBoolean() != null;
+	}
+
 }

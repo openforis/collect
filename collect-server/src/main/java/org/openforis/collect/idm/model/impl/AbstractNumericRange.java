@@ -14,19 +14,30 @@ import org.openforis.idm.model.NumericRange;
  */
 public abstract class AbstractNumericRange<T extends Number> extends AbstractValue implements NumericRange<T> {
 
-	private static final String REGEX = "[0-9]+-[0-9]+";
-	private static final Pattern PATTERN = Pattern.compile(REGEX);
-
 	public AbstractNumericRange(String stringValue) {
-		super(stringValue);
+		super("");
+		Matcher matcher = getPattern().matcher(stringValue);
+		if (matcher.matches()) {
+			String text1 = matcher.group(1);
+			String text2 = matcher.group(2);
+			setText1(text1);
+			setText2(text2);
+		} else {
+			setText1(stringValue);
+		}
+		// super(stringValue);
+
 	}
 
-	protected boolean isValidRange() {
+	@Override
+	public boolean isFormatValid() {
 		if (!this.isBlank()) {
-			Matcher matcher = PATTERN.matcher(this.getText1());
+			Matcher matcher = getPattern().matcher(this.getText1());
 			return matcher.matches();
 		}
 		return false;
 	}
+	
+	protected abstract Pattern getPattern();
 
 }

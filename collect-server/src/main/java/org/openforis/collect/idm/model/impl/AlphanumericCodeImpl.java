@@ -29,4 +29,9 @@ public class AlphanumericCodeImpl extends AbstractCode<String> implements Alphan
 		return this.getText1();
 	}
 
+	@Override
+	public boolean isFormatValid() {
+		return false;
+	}
+
 }

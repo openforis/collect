@@ -25,4 +25,9 @@ public abstract class AbstractTextValue extends AbstractValue implements TextVal
 		return this.getText1();
 	}
 
+	@Override
+	public boolean isFormatValid() {
+		return true;
+	}
+
 }

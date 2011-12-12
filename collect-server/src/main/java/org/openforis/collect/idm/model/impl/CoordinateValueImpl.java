@@ -3,6 +3,7 @@
  */
 package org.openforis.collect.idm.model.impl;
 
+import org.apache.commons.lang3.StringUtils;
 import org.openforis.idm.metamodel.SpatialReferenceSystem;
 import org.openforis.idm.model.Coordinate;
 
@@ -74,6 +75,20 @@ public class CoordinateValueImpl extends AbstractValue implements Coordinate {
 	public SpatialReferenceSystem getSpatialReferenceSystem() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public boolean isFormatValid() {
+		return !(getX() == null || getY() == null || StringUtils.isEmpty(getText4()));
+	}
+
+	public static void main(String[] args) {
+		String x = "423423";
+		String y = "fds";
+		String srsId = "fsdfsa";
+		CoordinateValueImpl c = new CoordinateValueImpl(x, y, srsId);
+		System.out.println(c.isFormatValid());
+		System.exit(0);
 	}
 
 }

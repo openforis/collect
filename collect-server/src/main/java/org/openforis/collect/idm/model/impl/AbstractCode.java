@@ -23,7 +23,11 @@ public abstract class AbstractCode<T> extends AbstractValue implements Code<T> {
 	@Override
 	public String getQualifier() {
 		return this.getText2();
+	}
 
+	@Override
+	public boolean isFormatValid() {
+		return getCode() != null;
 	}
 
 }

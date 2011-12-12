@@ -76,4 +76,9 @@ public class TimeValueImpl extends AbstractTimestampValue implements TimeValue {
 		return false;
 	}
 
+	@Override
+	public boolean isFormatValid() {
+		return true;
+	}
+
 }

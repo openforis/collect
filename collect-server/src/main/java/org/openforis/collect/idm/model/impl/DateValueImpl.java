@@ -96,4 +96,9 @@ public class DateValueImpl extends AbstractTimestampValue implements DateValue {
 
 	}
 
+	@Override
+	public boolean isFormatValid() {
+		return getDate() != null;
+	}
+
 }

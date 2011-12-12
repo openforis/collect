@@ -43,4 +43,9 @@ public class FileValueImpl extends AbstractValue implements FileValue {
 		return this.fileSize;
 	}
 
+	@Override
+	public boolean isFormatValid() {
+		return true;
+	}
+
 }

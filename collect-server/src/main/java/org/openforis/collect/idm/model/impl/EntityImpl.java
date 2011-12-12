@@ -20,7 +20,7 @@ import org.openforis.idm.model.ModelObject;
  * 
  */
 @Entity
-@Table(name="entity")
+@Table(name = "entity")
 public class EntityImpl extends AbstractModelObject<EntityDefinition> implements org.openforis.idm.model.Entity {
 
 	private Map<String, List<ModelObject<? extends ModelObjectDefinition>>> children;
@@ -31,7 +31,7 @@ public class EntityImpl extends AbstractModelObject<EntityDefinition> implements
 
 	@Override
 	public ModelObject<? extends ModelObjectDefinition> get(String name, int index) {
-		List<ModelObject<? extends ModelObjectDefinition>> list = this.get(name);
+		List<ModelObject<? extends ModelObjectDefinition>> list = this.children.get(name);
 		if (list != null) {
 			return list.get(index);
 		}
@@ -39,16 +39,11 @@ public class EntityImpl extends AbstractModelObject<EntityDefinition> implements
 	}
 
 	@Override
-	public List<ModelObject<? extends ModelObjectDefinition>> get(String name) {
-		return this.children.get(name);
-	}
-
-	@Override
 	public void add(ModelObject<? extends ModelObjectDefinition> o) {
 		this.beforeUpdate(o);
 
 		String name = o.getDefinition().getName();
-		List<ModelObject<? extends ModelObjectDefinition>> list = this.get(name);
+		List<ModelObject<? extends ModelObjectDefinition>> list = this.children.get(name);
 		if (list == null) {
 			list = new ArrayList<ModelObject<? extends ModelObjectDefinition>>();
 			this.children.put(name, list);
@@ -63,15 +58,29 @@ public class EntityImpl extends AbstractModelObject<EntityDefinition> implements
 		this.beforeUpdate(o);
 
 		String name = o.getDefinition().getName();
-		List<ModelObject<? extends ModelObjectDefinition>> list = this.get(name);
+		List<ModelObject<? extends ModelObjectDefinition>> list = this.children.get(name);
 		list.add(index, o);
 
 		this.updateList(index, name);
 	}
 
 	@Override
+	public int getCount(String name) {
+		List<ModelObject<? extends ModelObjectDefinition>> list = this.children.get(name);
+		return list != null ? list.size() : 0;
+	}
+
+	@Override
+	public void move(String name, int oldIndex, int newIndex) {
+		List<ModelObject<? extends ModelObjectDefinition>> list = this.children.get(name);
+		ModelObject<? extends ModelObjectDefinition> obj = list.remove(oldIndex);
+		list.add(newIndex, obj);
+		updateList(newIndex, name);
+	}
+
+	@Override
 	public ModelObject<? extends ModelObjectDefinition> remove(String name, int index) {
-		List<ModelObject<? extends ModelObjectDefinition>> list = this.get(name);
+		List<ModelObject<? extends ModelObjectDefinition>> list = this.children.get(name);
 		ModelObject<? extends ModelObjectDefinition> modelObject = list.remove(index);
 
 		this.updateList(index, name);
@@ -79,27 +88,27 @@ public class EntityImpl extends AbstractModelObject<EntityDefinition> implements
 		return modelObject;
 	}
 
-	@Override
-	public void clear(String name) {
-		this.children.remove(name);
-	}
+	// @Override
+	// public void clear(String name) {
+	// this.children.remove(name);
+	// }
+	//
+	// @Override
+	// public void clear() {
+	// this.children.clear();
+	// }
 
-	@Override
-	public void clear() {
-		this.children.clear();
-	}
-
-	@Override
-	public ModelObject<? extends ModelObjectDefinition> set(ModelObject<? extends ModelObjectDefinition> o, int index) {
-		this.beforeUpdate(o);
-		String name = o.getDefinition().getName();
-		List<ModelObject<? extends ModelObjectDefinition>> list = this.get(name);
-		ModelObject<? extends ModelObjectDefinition> object = list.set(index, o);
-
-		this.updateList(index, name);
-
-		return object;
-	}
+	// @Override
+	// public ModelObject<? extends ModelObjectDefinition> set(ModelObject<? extends ModelObjectDefinition> o, int index) {
+	// this.beforeUpdate(o);
+	// String name = o.getDefinition().getName();
+	// List<ModelObject<? extends ModelObjectDefinition>> list = this.get(name);
+	// ModelObject<? extends ModelObjectDefinition> object = list.set(index, o);
+	//
+	// this.updateList(index, name);
+	//
+	// return object;
+	// }
 
 	private void beforeUpdate(ModelObject<? extends ModelObjectDefinition> o) {
 		((AbstractModelObject<? extends ModelObjectDefinition>) o).setRecord(this.getRecord());

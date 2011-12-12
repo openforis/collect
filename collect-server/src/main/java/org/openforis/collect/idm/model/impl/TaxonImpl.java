@@ -76,4 +76,10 @@ public class TaxonImpl extends AbstractValue implements Taxon {
 		return null;
 	}
 
+	@Override
+	public boolean isFormatValid() {
+		// TODO Auto-generated method stub
+		return true;
+	}
+
 }

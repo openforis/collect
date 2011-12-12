@@ -3,17 +3,12 @@
  */
 package org.openforis.collect.idm.model.impl;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 
-import org.openforis.idm.metamodel.Check;
 import org.openforis.idm.metamodel.ModelObjectDefinition;
 import org.openforis.idm.model.ModelObject;
 
@@ -22,7 +17,7 @@ import org.openforis.idm.model.ModelObject;
  * 
  */
 @MappedSuperclass
-public class AbstractModelObject<D extends ModelObjectDefinition> implements ModelObject<D> {
+public abstract class AbstractModelObject<D extends ModelObjectDefinition> implements ModelObject<D> {
 
 	@Column(unique = true, name = "id")
 	@Id
@@ -30,9 +25,9 @@ public class AbstractModelObject<D extends ModelObjectDefinition> implements Mod
 	private Long id;
 
 	private D definition;
-	private boolean relevant;
-	private List<Check> errors;
-	private List<Check> warnings;
+	private boolean relevant = true;
+	private boolean required = false;
+	
 	private RecordImpl record;
 	private String path;
 	private String type;
@@ -43,44 +38,20 @@ public class AbstractModelObject<D extends ModelObjectDefinition> implements Mod
 	}
 
 	@Override
-	public Boolean isRelevant() {
+	public boolean isRelevant() {
 		return this.relevant;
 	}
 
 	@Override
-	public List<Check> getFailedChecks() {
-		List<Check> failedChecks = new ArrayList<Check>();
-		if (this.hasErrors()) {
-			failedChecks.addAll(this.errors);
-		}
-		if (this.hasWarnings()) {
-			failedChecks.addAll(this.warnings);
-		}
-		return Collections.unmodifiableList(failedChecks);
+	public boolean isRequired() {
+		return this.required;
 	}
 
 	@Override
-	public List<Check> getErrors() {
-		List<Check> errors = this.errors != null ? this.errors : new ArrayList<Check>();
-		return Collections.unmodifiableList(errors);
+	public String getName() {
+		return this.getDefinition().getName();
 	}
-
-	@Override
-	public List<Check> getWarnings() {
-		List<Check> warnings = this.warnings != null ? this.warnings : new ArrayList<Check>();
-		return Collections.unmodifiableList(warnings);
-	}
-
-	@Override
-	public boolean hasErrors() {
-		return (this.errors != null) && !this.errors.isEmpty();
-	}
-
-	@Override
-	public boolean hasWarnings() {
-		return (this.warnings != null) && !this.warnings.isEmpty();
-	}
-
+	
 	protected RecordImpl getRecord() {
 		return this.record;
 	}

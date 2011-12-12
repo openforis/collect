@@ -40,7 +40,7 @@ public abstract class AbstractValue implements Value {
 		}
 
 		public static Symbol fromString(String string) {
-			if (string.length() == 1) {
+			if (string != null && string.length() == 1) {
 				Character character = string.charAt(0);
 				for (Symbol symbol : values()) {
 					if (symbol.equals(character)) {
@@ -71,10 +71,11 @@ public abstract class AbstractValue implements Value {
 		this.symbol = Symbol.fromString(stringValue);
 	}
 
-	@Override
 	public boolean isBlank() {
 		return StringUtils.isBlank(this.text1);
 	}
+
+	public abstract boolean isFormatValid();
 
 	protected String getText1() {
 		return this.text1;
@@ -140,7 +141,7 @@ public abstract class AbstractValue implements Value {
 		return text4;
 	}
 
-	public void setText4(String text4) {
+	protected void setText4(String text4) {
 		this.text4 = text4;
 	}
 
