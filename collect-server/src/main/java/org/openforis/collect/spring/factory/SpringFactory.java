@@ -1,4 +1,4 @@
-package org.openforis.collect.spring.factories;
+package org.openforis.collect.spring.factory;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
