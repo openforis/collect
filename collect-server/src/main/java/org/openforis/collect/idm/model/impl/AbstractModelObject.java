@@ -27,8 +27,9 @@ public abstract class AbstractModelObject<D extends ModelObjectDefinition> imple
 	private D definition;
 	private boolean relevant = true;
 	private boolean required = false;
-	
+
 	private RecordImpl record;
+	private ModelObject<? extends ModelObjectDefinition> parent;
 	private String path;
 	private String type;
 
@@ -51,7 +52,16 @@ public abstract class AbstractModelObject<D extends ModelObjectDefinition> imple
 	public String getName() {
 		return this.getDefinition().getName();
 	}
-	
+
+	@Override
+	public ModelObject<? extends ModelObjectDefinition> getParent() {
+		return this.parent;
+	}
+
+	protected void setParent(ModelObject<? extends ModelObjectDefinition> parent) {
+		this.parent = parent;
+	}
+
 	protected RecordImpl getRecord() {
 		return this.record;
 	}

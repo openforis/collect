@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.persistence.Entity;
 import javax.persistence.Table;
@@ -14,6 +15,8 @@ import javax.persistence.Table;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.ModelObjectDefinition;
 import org.openforis.idm.model.ModelObject;
+
+import edu.emory.mathcs.backport.java.util.Collections;
 
 /**
  * @author M. Togna
@@ -86,6 +89,13 @@ public class EntityImpl extends AbstractModelObject<EntityDefinition> implements
 		this.updateList(index, name);
 
 		return modelObject;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public Set<String> getChildNames() {
+		Set<String> childNames = children.keySet();
+		return Collections.unmodifiableSet(childNames);
 	}
 
 	// @Override

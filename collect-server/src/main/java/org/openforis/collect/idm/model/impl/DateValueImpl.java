@@ -10,6 +10,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 import org.openforis.idm.model.DateValue;
+import org.openforis.idm.model.Value;
 
 /**
  * @author M. Togna
@@ -99,6 +100,18 @@ public class DateValueImpl extends AbstractTimestampValue implements DateValue {
 	@Override
 	public boolean isFormatValid() {
 		return getDate() != null;
+	}
+
+	@Override
+	public boolean equals(Value obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		DateValueImpl other = (DateValueImpl) obj;
+		return other.getDate().equals(this.getDate());
 	}
 
 }

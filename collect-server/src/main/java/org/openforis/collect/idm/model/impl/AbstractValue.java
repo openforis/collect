@@ -4,6 +4,8 @@
 package org.openforis.collect.idm.model.impl;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.openforis.idm.model.Value;
 
 /**
@@ -143,6 +145,23 @@ public abstract class AbstractValue implements Value {
 
 	protected void setText4(String text4) {
 		this.text4 = text4;
+	}
+
+	@Override
+	public int hashCode() {
+		return new HashCodeBuilder().append(this.text1).toHashCode();
+	}
+
+	@Override
+	public boolean equals(Value obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		AbstractValue other = (AbstractValue) obj;
+		return new EqualsBuilder().append(this.text1, other.text1).isEquals();
 	}
 
 }

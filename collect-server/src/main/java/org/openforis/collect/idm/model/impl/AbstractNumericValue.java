@@ -3,13 +3,13 @@
  */
 package org.openforis.collect.idm.model.impl;
 
-import org.openforis.idm.model.NumericValue;
+import org.openforis.idm.model.NumberValue;
 
 /**
  * @author M. Togna
  * 
  */
-public abstract class AbstractNumericValue<T extends Number> extends AbstractValue implements NumericValue<T> {
+public abstract class AbstractNumericValue<T extends Number> extends AbstractValue implements NumberValue<T> {
 
 	public AbstractNumericValue(String stringValue) {
 		super(stringValue);

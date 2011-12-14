@@ -10,13 +10,12 @@ import java.util.List;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.CheckFailure;
-import org.openforis.idm.model.Value;
 
 /**
  * @author M. Togna
  * 
  */
-public class AttributeImpl<D extends AttributeDefinition, V extends Value> extends AbstractModelObject<D> implements Attribute<D, V> {
+public class AttributeImpl<D extends AttributeDefinition, V extends AbstractValue> extends AbstractModelObject<D> implements Attribute<D, V> {
 
 	private V value;
 

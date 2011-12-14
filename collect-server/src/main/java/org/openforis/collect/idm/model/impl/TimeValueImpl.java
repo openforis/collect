@@ -7,7 +7,9 @@ import java.util.Calendar;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.openforis.idm.model.TimeValue;
+import org.openforis.idm.model.Value;
 
 /**
  * @author M. Togna
@@ -79,6 +81,18 @@ public class TimeValueImpl extends AbstractTimestampValue implements TimeValue {
 	@Override
 	public boolean isFormatValid() {
 		return true;
+	}
+
+	@Override
+	public boolean equals(Value obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		TimeValueImpl other = (TimeValueImpl) obj;
+		return new EqualsBuilder().append(this.getHour(), other.getHour()).append(this.getMinute(), other.getMinute()).isEquals();
 	}
 
 }

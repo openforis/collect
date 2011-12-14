@@ -82,13 +82,4 @@ public class CoordinateValueImpl extends AbstractValue implements Coordinate {
 		return !(getX() == null || getY() == null || StringUtils.isEmpty(getText4()));
 	}
 
-	public static void main(String[] args) {
-		String x = "423423";
-		String y = "fds";
-		String srsId = "fsdfsa";
-		CoordinateValueImpl c = new CoordinateValueImpl(x, y, srsId);
-		System.out.println(c.isFormatValid());
-		System.exit(0);
-	}
-
 }
