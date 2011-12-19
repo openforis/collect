@@ -9,4 +9,5 @@ import org.openforis.idm.model.Value;
 public interface LenientValue extends Value {
 	boolean isBlank();
 	boolean isValid();
+	String[] getStringValues();
 }

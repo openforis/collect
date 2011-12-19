@@ -4,31 +4,31 @@
 package org.openforis.collect.model;
 
 import org.apache.commons.lang3.StringUtils;
-import org.openforis.idm.model.IntegerRange;
+import org.openforis.idm.model.RealRange;
 
 /**
  * @author M. Togna
  * @author G. Miceli
  * 
  */
-public class LenientIntegerRange extends IntegerRange implements LenientValue {
+public class LenientRealRange extends RealRange implements LenientValue {
 
 	private String stringValue;
 
-	public LenientIntegerRange(String stringValue) {
+	public LenientRealRange(String stringValue) {
 		super(parseFrom(stringValue), parseTo(stringValue));
 		this.stringValue = stringValue;
 	}
 
-	private static Integer parseFrom(String stringValue) {
+	private static Double parseFrom(String stringValue) {
 		return parse(stringValue, 0);
 	}
 
-	private static Integer parseTo(String stringValue) {
+	private static Double parseTo(String stringValue) {
 		return parse(stringValue, 1);
 	}
 
-	private static Integer parse(String stringValue, int part) {
+	private static Double parse(String stringValue, int part) {
 		if (stringValue != null) {
 			String[] parts = stringValue.split("-");
 			String s;
@@ -39,7 +39,7 @@ public class LenientIntegerRange extends IntegerRange implements LenientValue {
 					s = parts[part];
 				}
 				try {
-					return new Integer(s);
+					return new Double(s);
 				} catch (NumberFormatException nfe) {
 				}
 			}
@@ -64,7 +64,7 @@ public class LenientIntegerRange extends IntegerRange implements LenientValue {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		LenientIntegerRange other = (LenientIntegerRange) obj;
+		LenientRealRange other = (LenientRealRange) obj;
 		if (stringValue == null) {
 			if (other.stringValue != null)
 				return false;
@@ -81,5 +81,10 @@ public class LenientIntegerRange extends IntegerRange implements LenientValue {
 	@Override
 	public boolean isValid() {
 		return getFrom() != null && getTo() != null;
+	}
+
+	@Override
+	public String[] getStringValues() {
+		return new String[] {stringValue};
 	}
 }

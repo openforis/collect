@@ -4,18 +4,18 @@
 package org.openforis.collect.model;
 
 import org.apache.commons.lang3.StringUtils;
-import org.openforis.idm.model.RealValue;
+import org.openforis.idm.model.IntegerValue;
 
 /**
  * @author M. Togna
  * @author G. Miceli
  * 
  */
-public class LenientRealValue extends RealValue implements LenientValue {
+public class LenientIntegerValue extends IntegerValue implements LenientValue {
 
 	private String stringValue;
 
-	public LenientRealValue(String stringValue) {
+	public LenientIntegerValue(String stringValue) {
 		super(parse(stringValue));
 		this.stringValue = stringValue;
 	}
@@ -33,7 +33,7 @@ public class LenientRealValue extends RealValue implements LenientValue {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		LenientRealValue other = (LenientRealValue) obj;
+		LenientIntegerValue other = (LenientIntegerValue) obj;
 		if (stringValue == null) {
 			if (other.stringValue != null)
 				return false;
@@ -42,12 +42,12 @@ public class LenientRealValue extends RealValue implements LenientValue {
 		return true;
 	}
 
-	private static Double parse(String stringValue) {
+	private static Integer parse(String stringValue) {
 		if (StringUtils.isBlank(stringValue)) {
 			return null;
 		} else {
 			try {
-				return new Double(stringValue);
+				return Integer.parseInt(stringValue);
 			} catch (NumberFormatException e) {
 				return null;
 			}
@@ -62,5 +62,10 @@ public class LenientRealValue extends RealValue implements LenientValue {
 	@Override
 	public boolean isValid() {
 		return getNumber()!=null;
+	}
+
+	@Override
+	public String[] getStringValues() {
+		return new String[] {stringValue};
 	}
 }
