@@ -7,6 +7,7 @@ package org.openforis.collect.client {
 	public class ClientFactory {
 		
 		private static var _sessionClient:SessionClient;
+		private static var _dataClient:DataClient;
 		
 		public function ClientFactory() {
 		}
@@ -16,6 +17,13 @@ package org.openforis.collect.client {
 				_sessionClient = new SessionClient();
 			}
 			return _sessionClient;
+		}
+		
+		public static function get dataClient():DataClient{
+			if(_dataClient == null){
+				_dataClient = new DataClient();
+			}
+			return _dataClient;
 		}
 	}
 }

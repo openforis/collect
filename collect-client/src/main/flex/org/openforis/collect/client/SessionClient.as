@@ -3,10 +3,6 @@ package org.openforis.collect.client {
 	import mx.rpc.IResponder;
 	import mx.rpc.remoting.Operation;
 	
-	import test.Test;
-	import test.TestImpl;
-	import test._TestImpl;
-	
 	/**
 	 * 
 	 * @author Mino Togna
@@ -14,13 +10,19 @@ package org.openforis.collect.client {
 	public class SessionClient extends AbstractClient {
 		
 		private var _getSessionStateOperation:Operation;
-		private var _keepAlive:Operation;
+		private var _keepAliveOperation:Operation;
+		
+		
+		private var _testGetValueOperation:Operation;
+		private var remoteCallQueueProcessor:RemoteCallQueueProcessor = new RemoteCallQueueProcessor();
+		
 		
 		public function SessionClient() {
-			super();
+			super("sessionService");
 			
 			this._getSessionStateOperation = getOperation("getSessionState");
-			this._keepAlive = getOperation("keepAlive");
+			this._keepAliveOperation = getOperation("keepAlive");
+			this._testGetValueOperation = getOperation("testGetValue");
 		}
 		
 		public function getSessionState(responder:IResponder):void {
@@ -29,10 +31,20 @@ package org.openforis.collect.client {
 		}
 		
 		public function keepAlive(responder:IResponder):void {
-			var token:AsyncToken = this._keepAlive.send();
+			var token:AsyncToken = this._keepAliveOperation.send();
 			token.addResponder(responder);
 		}
 		
+		
+		// TEST
+		public function testGetValue(responder:IResponder):void {
+			/*
+			var token:AsyncToken = this._testGetValue.send();
+			token.addResponder(responder);
+			*/
+			
+			remoteCallQueueProcessor.append(responder, this._testGetValueOperation, 1, 2);
+		}
 		
 	}
 }

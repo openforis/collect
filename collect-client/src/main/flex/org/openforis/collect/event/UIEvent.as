@@ -8,6 +8,9 @@ package org.openforis.collect.event {
 	
 	public class UIEvent extends Event {
 		
+		public static const NEW_RECORD_CREATED:String = "newRecordCreated";
+		public static const BACK_TO_LIST:String = "backToList";
+		
 		private var _obj:Object;
 		
 		public function UIEvent(type:String, bubbles:Boolean=false, cancelable:Boolean=false) {

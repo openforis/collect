@@ -3,7 +3,9 @@
 		 xmlns:s="library://ns.adobe.com/flex/spark" 
 		 xmlns:mx="library://ns.adobe.com/flex/mx"
 		 creationComplete="creationCompleteHandler(event)"
-		 width="100%" height="100%" xmlns:component="org.openforis.collect.ui.component.*">
+		 width="100%" height="100%" xmlns:component="org.openforis.collect.ui.component.*"
+		 currentState="list"
+		 >
 	
 	<fx:Script>
 		<![CDATA[
@@ -34,8 +36,18 @@
 		<s:State name="detail" />
 	</s:states>
 	
-	<component:HomeView includeIn="home" width="100%" height="100%" />
-	<component:ListView includeIn="list" width="100%" height="100%" />
-	<component:DetailView includeIn="detail" width="100%" height="100%"/>
+	<mx:ViewStack width="100%" height="100%" selectedIndex.home="0" selectedIndex.list="1" selectedIndex.detail="2"
+			creationPolicy="all">
+		<s:NavigatorContent width="100%" height="100%">
+			<component:HomeView id="homeView" width="100%" height="100%" />
+		</s:NavigatorContent>
+		<s:NavigatorContent width="100%" height="100%">
+			<component:ListView id="listView" width="100%" height="100%" />
+		</s:NavigatorContent>	
+		<s:NavigatorContent width="100%" height="100%">
+			<component:DetailView id="detailView" width="100%" height="100%"/>
+		</s:NavigatorContent>
+	</mx:ViewStack>
+		
 	
 </s:Group>

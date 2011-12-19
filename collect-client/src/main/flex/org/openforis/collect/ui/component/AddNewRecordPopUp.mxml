@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx"
+			   creationPolicy="all"
+			   title="{Message.get('list.newRecordPopUp.title')}"
+			   creationComplete="creationCompleteHandler(event)"
+			   >
+	<fx:Script>
+		<![CDATA[
+			import mx.events.FlexEvent;
+			
+			import org.openforis.collect.i18n.Message;
+			import org.openforis.collect.presenter.AddNewRecordPopUpPresenter;
+			
+			private var _presenter:AddNewRecordPopUpPresenter;
+
+			protected function creationCompleteHandler(event:FlexEvent):void {
+				_presenter = new AddNewRecordPopUpPresenter(this);
+			}
+
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	
+	<fx:Script>
+		<![CDATA[
+			
+		]]>
+	</fx:Script>
+	
+	<s:VGroup width="100%" verticalAlign="middle" gap="5">
+		<s:Form>
+			<s:layout>
+				<s:HorizontalLayout />
+			</s:layout>
+			<s:FormItem label="{Message.get('list.newRecordPopUp.idLabel')}">
+				<s:TextInput id="idTextInput" width="100" />
+			</s:FormItem>
+			<s:FormItem label="{Message.get('list.newRecordPopUp.formVersionLabel')}">
+				<s:DropDownList id="versionsDropDownList" 
+								labelField="label" 
+								prompt="---" 
+								/>
+			</s:FormItem>
+		</s:Form>
+		
+		<s:HGroup id="buttonBar" width="100%" horizontalAlign="center" verticalAlign="middle" gap="20">
+			<s:Button id="addButton" buttonMode="true" useHandCursor="true"
+					  label="{Message.get('list.newRecordPopUp.add')}"/>
+			<s:Button id="cancelButton" buttonMode="true" useHandCursor="true"
+					  label="{Message.get('list.newRecordPopUp.cancel')}"/>
+		</s:HGroup>
+	</s:VGroup>
+	
+</s:TitleWindow>

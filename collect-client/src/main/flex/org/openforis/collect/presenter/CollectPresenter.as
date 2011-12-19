@@ -7,8 +7,10 @@ package org.openforis.collect.presenter {
 	import mx.rpc.events.ResultEvent;
 	
 	import org.openforis.collect.Application;
-	import org.openforis.collect.client.SessionClient;
 	import org.openforis.collect.client.ClientFactory;
+	import org.openforis.collect.client.SessionClient;
+	import org.openforis.collect.idm.model.impl.AbstractValue;
+	import org.openforis.collect.idm.model.impl.BooleanValueImpl;
 
 	/**
 	 * 
@@ -20,6 +22,7 @@ package org.openforis.collect.presenter {
 
 		private var _view:collect;
 		private var _sessionClient:SessionClient;
+		private var _contextMenuPresenter:ContextMenuPresenter;
 		
 		private var _keepAliveTimer:Timer;
 		
@@ -28,13 +31,22 @@ package org.openforis.collect.presenter {
 			
 			this._view = view;
 			this._sessionClient = ClientFactory.sessionClient;
-			
+			/*
 			_keepAliveTimer = new Timer(KEEP_ALIVE_FREQUENCY)
 			_keepAliveTimer.addEventListener(TimerEvent.TIMER, sendKeepAliveMessage);
 			_keepAliveTimer.start();
 			
 			this._sessionClient.getSessionState(new ItemResponder(getSessionStateResult, faultResult));
+			*/
+			this._contextMenuPresenter = new ContextMenuPresenter(view);
 			
+			//this._sessionClient.testGetValue(new ItemResponder(getValueResultHandler, faultHandler));
+				
+			function getValueResultHandler(event:ResultEvent, token:Object = null):void {
+				var abstractValue:AbstractValue = event.result as AbstractValue;
+				var booleanValue:BooleanValueImpl = event.result as BooleanValueImpl;
+				trace(abstractValue.text1);
+			}
 		}
 		
 		override internal function initEventListeners():void {
@@ -50,7 +62,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		internal function sendKeepAliveMessage(event:TimerEvent):void {
-			this._sessionClient.keepAlive(new ItemResponder(keepAliveResult, faultResult));
+			this._sessionClient.keepAlive(new ItemResponder(keepAliveResult, faultHandler));
 		}
 		
 		internal function keepAliveResult(event:ResultEvent, token:Object = null):void {
