@@ -25,8 +25,8 @@ public class SessionManager {
 	private static Log LOG = LogUtils.getLog(SessionManager.class);
 
 	private static final String SESSION_STATE_SESSION_ATTRIBUTE_NAME = "sessionState";
-	private static final String ACTIVE_RECORD_SESSION_ATTRIBUTE_NAME = "sessionState";
-	private static final String USER_SESSION_ATTRIBUTE_NAME = "sessionState";
+	private static final String ACTIVE_RECORD_SESSION_ATTRIBUTE_NAME = "activeRecord";
+	private static final String USER_SESSION_ATTRIBUTE_NAME = "user";
 	private static final String KEEP_ALIVE_SESSION_ATTRIBUTE_NAME = "keepAlive";
 
 	public SessionState getSessionState() {
