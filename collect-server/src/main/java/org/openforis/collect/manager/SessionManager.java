@@ -49,6 +49,10 @@ public class SessionManager {
 		FlexContext.getHttpRequest().getSession().setAttribute(ACTIVE_RECORD_SESSION_ATTRIBUTE_NAME, record);
 	}
 
+	public void clearActiveRecord() {
+		FlexContext.getHttpRequest().getSession().setAttribute(ACTIVE_RECORD_SESSION_ATTRIBUTE_NAME, null);
+	}
+
 	public void keepSessionAlive() {
 		HttpSession session = FlexContext.getHttpRequest().getSession();
 		session.setAttribute(KEEP_ALIVE_SESSION_ATTRIBUTE_NAME, new Date());
