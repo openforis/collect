@@ -4,7 +4,7 @@
 package org.openforis.collect.blazeds.service;
 
 import org.openforis.collect.manager.SessionManager;
-import org.openforis.collect.model.SessionState;
+import org.openforis.collect.session.SessionState;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.flex.remoting.RemotingInclude;
 

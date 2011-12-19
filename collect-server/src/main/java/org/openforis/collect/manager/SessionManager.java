@@ -6,8 +6,8 @@ import java.util.Date;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.logging.Log;
-import org.openforis.collect.model.SessionState;
 import org.openforis.collect.model.User;
+import org.openforis.collect.session.SessionState;
 import org.openforis.collect.util.LogUtils;
 import org.openforis.idm.model.Record;
 import org.springframework.security.core.Authentication;

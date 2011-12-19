@@ -11,8 +11,6 @@ import org.openforis.collect.exception.MultipleEditException;
 import org.openforis.collect.exception.NonexistentIdException;
 import org.openforis.collect.exception.RecordLockedException;
 import org.openforis.collect.manager.SessionManager;
-import org.openforis.collect.model.RecordListItem;
-import org.openforis.collect.model.UpdateRequest;
 import org.openforis.idm.metamodel.CodeListItem;
 import org.openforis.idm.model.ModelObject;
 import org.openforis.idm.model.Record;
