@@ -10,9 +10,6 @@
 	
 	<fx:Script>
 		<![CDATA[
-			import com.flexspy.FlexSpy;
-			
-			import mx.collections.ArrayCollection;
 			import mx.events.FlexEvent;
 			import mx.messaging.Consumer;
 			import mx.messaging.Producer;
@@ -31,13 +28,6 @@
 			
 			protected function creationCompleteHandler(event:FlexEvent):void {
 				this._collectPresenter = new CollectPresenter(this);
-				
-				CONFIG::debugging {
-					this.addEventListener(KeyboardEvent.KEY_DOWN, function(event:KeyboardEvent):void {
-						if(event.ctrlKey && event.shiftKey && event.charCode == 83)
-							FlexSpy.show();
-					});
-				}
 			}
 			
 		]]>
