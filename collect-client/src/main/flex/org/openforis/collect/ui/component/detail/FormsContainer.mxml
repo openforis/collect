@@ -35,7 +35,6 @@
 				_data = value;
 			}
 
-
 		]]>
 	</fx:Script>
 	<fx:Declarations>

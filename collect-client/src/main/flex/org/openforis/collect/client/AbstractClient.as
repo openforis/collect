@@ -2,7 +2,7 @@ package org.openforis.collect.client {
 	
 	import mx.rpc.remoting.Operation;
 	import mx.rpc.remoting.RemoteObject;
-	
+	 
 	/**
 	 * 
 	 * @author Mino Togna

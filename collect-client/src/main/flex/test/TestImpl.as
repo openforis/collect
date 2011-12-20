@@ -1,4 +1,3 @@
-
 package test {
   
   [RemoteClass(alias="test.TestImpl")]
