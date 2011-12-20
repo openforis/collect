@@ -137,7 +137,9 @@ public class DataService {
 	 * @return
 	 */
 	@RemotingInclude
-	public List<CodeListItem> findCodeListItemsById(String context, String ids) {
+	public List<CodeListItem> findCodeListItemsById(Long id, String ids) {
+		@SuppressWarnings("unchecked")
+		CollectAttribute<? extends CodeAttributeDefinition,? extends Code<?>> code = (CollectAttribute<? extends CodeAttributeDefinition, ? extends Code<?>>) this.getActiveRecord().getModelObjectById(id);
 		return null;
 	}
 	
