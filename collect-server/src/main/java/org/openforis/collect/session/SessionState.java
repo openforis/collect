@@ -3,9 +3,9 @@
  */
 package org.openforis.collect.session;
 
+import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.User;
 import org.openforis.idm.metamodel.Survey;
-import org.openforis.idm.model.Record;
 
 /**
  * @author M. Togna
@@ -15,9 +15,9 @@ public class SessionState {
 
 	private User user;
 	private String sessionId;
-	private Record activeRecord;
+	private CollectRecord activeRecord;
 	private Survey activeSurvey;
-	
+
 	/**
 	 * Getter of the property <tt>user</tt>
 	 * 
@@ -56,13 +56,12 @@ public class SessionState {
 		this.sessionId = sessionId;
 	}
 
-
 	/**
 	 * Getter of the property <tt>activeRecord</tt>
 	 * 
 	 * @return Returns the activeRecord.
 	 */
-	public Record getActiveRecord() {
+	public CollectRecord getActiveRecord() {
 		return this.activeRecord;
 	}
 
@@ -72,7 +71,7 @@ public class SessionState {
 	 * @param activeRecord
 	 *            The activeRecord to set.
 	 */
-	public void setActiveRecord(Record activeRecord) {
+	public void setActiveRecord(CollectRecord activeRecord) {
 		this.activeRecord = activeRecord;
 	}
 
