@@ -35,5 +35,5 @@ public class SessionService {
 	public SessionState getSessionState() {
 		return this.sessionManager.getSessionState();
 	}
-
+	
 }
