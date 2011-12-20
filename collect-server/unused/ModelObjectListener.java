@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.openforis.collect.model;
+package org.openforis.idm.model.impl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +18,6 @@ public class ModelObjectListener {
 	private List<ModelObject<? extends ModelObjectDefinition>> changedObjects;
 
 	public ModelObjectListener() {
-		super();
 		this.changedObjects = new ArrayList<ModelObject<? extends ModelObjectDefinition>>();
 	}
 

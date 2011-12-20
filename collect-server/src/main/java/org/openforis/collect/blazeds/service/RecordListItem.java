@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.openforis.collect.model;
+package org.openforis.collect.blazeds.service;
 
 import java.util.Date;
 

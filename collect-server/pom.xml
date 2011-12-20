@@ -39,9 +39,18 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 			</plugin>
+			<!-- Additional configuration for Eclipse IDE -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-eclipse-plugin</artifactId>
+				<version>2.8</version>
+				<configuration>
+					<additionalProjectFacets>
+						<jpt.jpa>2.0</jpt.jpa>
+					</additionalProjectFacets>
+				</configuration>
+			</plugin>
 		</plugins>
-
-<!-- 		<finalName>collect</finalName> -->
 	</build>
 
 	<dependencies>
@@ -54,7 +63,6 @@
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>3.8.2</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -315,7 +323,19 @@
 			<artifactId>cachefilter</artifactId>
 			<version>2.0</version>
 		</dependency>
-
+<!-- 
+		<dependency>
+			<groupId>javax.persistence</groupId>
+			<artifactId>persistence-api</artifactId>
+			<version>1.0.2</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.hibernate</groupId>
+		    <artifactId>hibernate-entitymanager</artifactId>
+		    <version>3.6.8.Final</version>
+		    <scope>test</scope>
+		</dependency>
+ -->
 
 <!-- 		<dependency> -->
 <!-- 			<groupId>javax.jms</groupId> -->

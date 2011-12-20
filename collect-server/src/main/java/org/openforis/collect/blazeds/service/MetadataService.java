@@ -5,7 +5,7 @@ import java.util.Collection;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.SpatialReferenceSystem;
 
-public class MetaDataService {
+public class MetadataService {
 
 	/**
 		 */
