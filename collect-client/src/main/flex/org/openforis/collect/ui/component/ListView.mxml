@@ -2,11 +2,58 @@
 <s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
 		 xmlns:s="library://ns.adobe.com/flex/spark" 
 		 xmlns:mx="library://ns.adobe.com/flex/mx" 
-		 width="100%" height="100%">
-	<s:layout>
-		<s:VerticalLayout />
-	</s:layout>
+		 width="100%" height="100%" xmlns:input="org.openforis.collect.ui.component.detail.input.*" xmlns:datagrid="org.openforis.collect.ui.component.datagrid.*"
+		 creationComplete="creationCompleteHandler(event)">
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.collections.ArrayCollection;
+			import mx.events.FlexEvent;
+			
+			import org.openforis.collect.i18n.Message;
+			import org.openforis.collect.presenter.ListPresenter;
+			
+			private var _presenter:ListPresenter;
+			
+			[Bindable]
+			private var dataProvider:ArrayCollection = new ArrayCollection([
+				{code: 1, label: "item 1"},
+				{code: 2, label: "item 2"},
+				{code: 3, label: "item 3"}
+			]);
+
+			protected function creationCompleteHandler(event:FlexEvent):void {
+				_presenter = new ListPresenter(this);
+			}
+
+		]]>
+	</fx:Script>
+	
 	<fx:Declarations>
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
 	</fx:Declarations>
+	
+	<s:layout>
+		<s:VerticalLayout />
+	</s:layout>
+	
+	<s:states>
+		<s:State name="list" />
+		<s:State name="selection" />
+	</s:states>
+	
+	<datagrid:DataGrid dataProvider="{dataProvider}" height="100%" width="100%">
+		<datagrid:columns>
+			<s:ArrayList>
+				<s:GridColumn visible="false" visible.selection="true" headerRenderer="org.openforis.collect.ui.component.datagrid.SelectRecordColumnHeaderRenderer"
+							  itemRenderer="org.openforis.collect.ui.component.datagrid.SelectRecordColumnItemRenderer"
+							  />
+			</s:ArrayList>
+		</datagrid:columns>
+	</datagrid:DataGrid>
+	
+	<s:HGroup id="controlsBar" width="100%" horizontalAlign="center">
+		<s:Button id="newRecordButton" label="{Message.get('list.newRecord')}" />
+		<s:Button id="editRecordButton" label="{Message.get('list.editRecord')}" />
+	</s:HGroup>
 </s:Group>

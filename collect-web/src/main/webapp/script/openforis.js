@@ -4,7 +4,7 @@
 var OPENFORIS = {
 	LEAVING_PAGE_MESSAGE: "If you leave this page without saving, all changes will be lost.",
 	
-	FLASH_OBJECT_ID: "Main",
+	FLASH_OBJECT_ID: "collect",
 			
 	isEditingItem: false,
 	

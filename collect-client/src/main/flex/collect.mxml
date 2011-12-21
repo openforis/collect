@@ -6,27 +6,16 @@
 			   width="100%" height="100%" 
 			   minWidth="955" minHeight="450" 
 			   initialize="initializeHandler(event)"
-			   creationComplete="creationCompleteHandler(event)">
+			   creationComplete="creationCompleteHandler(event)" xmlns:input="org.openforis.collect.ui.component.detail.input.*" xmlns:presenter="org.openforis.collect.presenter.*">
 	
 	<fx:Script>
 		<![CDATA[
-			import mx.controls.Alert;
 			import mx.events.FlexEvent;
 			import mx.messaging.Consumer;
-			import mx.messaging.FlexClient;
 			import mx.messaging.Producer;
-			import mx.messaging.events.MessageAckEvent;
-			import mx.messaging.events.MessageEvent;
-			import mx.messaging.events.MessageFaultEvent;
-			import mx.messaging.messages.AsyncMessage;
-			import mx.messaging.messages.IMessage;
 			
 			import org.openforis.collect.Application;
-			import org.openforis.collect.client.ChannelSetFactory;
-			import org.openforis.collect.presenter.AbstractPresenter;
 			import org.openforis.collect.presenter.CollectPresenter;
-			import org.openforis.collect.presenter.MasterPresenter;
-			import org.osmf.events.MediaFactoryEvent;
 			
 			private var _collectPresenter:CollectPresenter;
 			
@@ -38,52 +27,7 @@
 			private var consumer:Consumer;
 			
 			protected function creationCompleteHandler(event:FlexEvent):void {
-				
 				this._collectPresenter = new CollectPresenter(this);
-				
-				/* producer = new Producer();
-				consumer = new Consumer();
-				
-				producer.destination = "edit-record-jms";
-				producer.channelSet = ChannelSetFactory.messagingChannelSet;
-				producer.addEventListener(MessageAckEvent.ACKNOWLEDGE, msgAcknowledge);
-				producer.addEventListener(MessageFaultEvent.FAULT, fault);
-				producer.connect();
-				
-				consumer.destination = "update-result-topic";
-				consumer.channelSet = ChannelSetFactory.messagingChannelSet;
-				consumer.addEventListener(MessageEvent.MESSAGE, msgEvent);
-				consumer.addEventListener(MessageFaultEvent.FAULT, fault);
-				consumer.subscribe(); */
-			}
-			
-			/* private function msgAcknowledge(event:MessageAckEvent):void{
-				trace("59: msgAcknowledge");
-				trace(event.type);
-			}
-			
-			private function msgEvent(event:MessageEvent):void {
-				trace("64 msgEvent");
-				trace(event.message.toString());
-				echo.text += event.message.body.toString() + "\n";
-			}
-			
-			private function fault(event:MessageFaultEvent):void {
-				trace("69 fault");
-				trace(event);
-			}
-			 */
-			protected function submitClickHandler(event:MouseEvent):void {
-				/* var msg:AsyncMessage = new AsyncMessage();
-				var obj:Object = new Object();
-				obj.msg = textArea.text;
-				obj.clientId = FlexClient.getInstance().id;
-				msg.body = obj;
-				var headers:Object = new Object();
-				headers.sessionId = org.openforis.collect.Application.SESSION_ID;
-				msg.headers = headers;
-				
-				producer.send(msg); */
 			}
 			
 		]]>
@@ -97,15 +41,21 @@
 		[ResourceBundle("messages")]
 	</fx:Metadata>
 	
-	<s:layout>
-		<s:VerticalLayout horizontalAlign="center" />
-	</s:layout>
+	<fx:Style source="assets/style.css" />
 	
-	<s:TextArea id="textArea" />
-	<s:Button id="submit" label="Send"  click="submitClickHandler(event)"/>
-	<s:TextArea id="echo" />
-	<!--<component:Header width="100%" height="1%" />
-	<component:MasterView width="100%" height="100%" />
-	<component:Footer width="100%" height="1%" />-->
-	
+	<s:SkinnableContainer height="100%" width="1000" horizontalCenter="0">
+		<s:layout>
+			<s:VerticalLayout />
+		</s:layout>
+		<component:Header width="100%" />
+		<component:MasterView width="100%" height="100%" />
+		<component:Footer width="100%" />
+	</s:SkinnableContainer>
+		
+	<!--
+	<input:DateInputField />
+	<input:CodeInputField />
+	<input:TaxonInputField />
+	<input:CoordinateInputField />
+	-->
 </s:Application>

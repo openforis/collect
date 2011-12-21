@@ -7,6 +7,9 @@
 	<fx:Script>
 		<![CDATA[
 			import org.openforis.collect.ui.Images;
+			import org.openforis.collect.ui.component.detail.input.InputField;
+			
+			import spark.components.FormItem;
 			private var _parentEntity:Object;			
 
 			public function get parentEntity():Object {
@@ -17,8 +20,11 @@
 				_parentEntity = value;
 			}
 
-			public function addFormItem():void {
-				
+			public function addFormItem(label:String, inputField:InputField):void {
+				var formItem:FormItem = new FormItem();
+				formItem.label = label;
+				formItem.addElement(inputField);
+				form.addElement(formItem);
 			}
 			
 			public function insertAddSection():void {

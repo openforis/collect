@@ -1,32 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
-<s:VGroup xmlns:fx="http://ns.adobe.com/mxml/2009" 
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
 		 xmlns:s="library://ns.adobe.com/flex/spark" 
 		 xmlns:mx="library://ns.adobe.com/flex/mx" 
-		 width="100%" height="100%">
+		 width="100%" height="100%" xmlns:detail="org.openforis.collect.ui.component.detail.*"
+		 >
 	
 	<fx:Script>
 		<![CDATA[
-			import org.openforis.collect.ui.component.detail.FormContainer;
+			import org.openforis.collect.i18n.Message;
+			import org.openforis.collect.presenter.DetailPresenter;
 			
-			public function addFormContainer(value:FormContainer):void {
-				viewStack.addElement(value);
+			private var _presenter:DetailPresenter;
+			
+			override protected function initializationComplete():void {
+				super.initializationComplete();
+				_presenter = new DetailPresenter(this);
 			}
+
 		]]>
 	</fx:Script>
 	
-	<fx:Declarations>
-	</fx:Declarations>
-
+	<s:layout>
+		<s:VerticalLayout />
+	</s:layout>
+	
 	<s:HGroup id="header" width="100%" height="10%">
 		<!-- Record id, form version, save msg, etc.. -->
 	</s:HGroup>
 	
-	<mx:ViewStack width="100%" height="90%" id="viewStack">
-		<!-- view stack for all forms-->
-	</mx:ViewStack>
+	<!--<s:Group id="formWrapper" width="100%" height="100%" />-->
 	
-	<s:HGroup width="100%" height="10%" id="buttonBar">
+	<detail:FormsContainer id="formsContainer" height="100%" width="100%" />
+	
+	<s:HGroup width="100%" id="buttonBar" horizontalAlign="center" verticalAlign="middle" gap="30">
 		<!-- Buttons: save, back to list etc...-->
+		<s:Button id="backToListButton" label="{Message.get('edit.backToList')}" />
+		<s:Button id="saveButton" label="{Message.get('edit.save')}" />
 	</s:HGroup>
 	
-</s:VGroup>
+</s:Group>

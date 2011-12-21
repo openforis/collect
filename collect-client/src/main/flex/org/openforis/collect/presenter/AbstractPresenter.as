@@ -15,11 +15,11 @@ package org.openforis.collect.presenter {
 	 * */
 	internal class AbstractPresenter {
 
-		private static var serverOffline:Boolean = false;
+		private static var _serverOffline:Boolean = false;
 		private static var _serverOffLineMessage:String;
 		
-		public  function AbstractPresenter() {
-			initEventListeners();	
+		public function AbstractPresenter() {
+			initEventListeners();
 		}
 		
 		internal static function get serverOffLineMessage():String {
@@ -33,15 +33,15 @@ package org.openforis.collect.presenter {
 			return EventDispatcherFactory.getEventDispatcher();
 		}
 		
-		public static function faultResult(event:FaultEvent, token:Object=null):void {
+		public static function faultHandler(event:FaultEvent, token:Object=null):void {
 			if(event.fault.faultCode == "Channel.Call.Failed"
 				|| event.fault.faultCode == "Client.Error.MessageSend"
 				|| event.fault.faultCode == "Client.Error.DeliveryInDoubt") {
 				//server offline
-				if(!serverOffline) {
+				if(! _serverOffline) {
 					BlockingMessagePopUp.show(Message.get("global.serverOffLine"), serverOffLineMessage, Images.ERROR);
 				}
-				serverOffline = true;
+				_serverOffline = true;
 			} else {
 				Alert.show(Message.get("global.faultHandlerMsg")+"\n\n"+ event.toString());
 			}
@@ -49,5 +49,8 @@ package org.openforis.collect.presenter {
 		
 		internal function initEventListeners():void {}
 		
+		public static function get serverOffline():Boolean {
+			return _serverOffline;
+		}
 	}
 }

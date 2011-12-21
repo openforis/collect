@@ -37,8 +37,8 @@
             params.allowscriptaccess = "sameDomain";
             params.allowfullscreen = "true";
             var attributes = {};
-            attributes.id = "Main";
-            attributes.name = "Main";
+            attributes.id = "collect";
+            attributes.name = "collect";
             attributes.align = "middle";
             swfobject.embedSWF(
                 "collect.swf", "flashContent", 
