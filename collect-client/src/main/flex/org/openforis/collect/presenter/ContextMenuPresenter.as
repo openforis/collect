@@ -11,6 +11,7 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.event.InputFieldEvent;
 	import org.openforis.collect.i18n.Message;
 	import org.openforis.collect.model.Phase;
+	import org.openforis.collect.presenter.input.RemarksPopUpPresenter;
 	import org.openforis.collect.ui.component.datagroup.DataGroupItemRenderer;
 	import org.openforis.collect.ui.component.detail.input.InputField;
 	import org.openforis.collect.util.ArrayUtil;
@@ -51,19 +52,21 @@ package org.openforis.collect.presenter
 		
 		private static var contextMouseClickGlobalPoint:Point;
 		
-		private static var contextMenu:Menu;
-		{
-			//init customContextMenu
-			contextMenu = new Menu();
-			contextMenu.variableRowHeight = true;
-			contextMenu.styleName = "contextMenu";
-			contextMenu.addEventListener(MenuEvent.ITEM_CLICK, contextMenuItemClickHandler);
-		}
+		private var _remarksPopUpPresenter:RemarksPopUpPresenter;
+		
+		private var contextMenu:Menu;
 		
 		public function ContextMenuPresenter(view:collect) {
 			super();
 			
+			contextMenu = new Menu();
+			contextMenu.variableRowHeight = true;
+			contextMenu.styleName = "contextMenu";
+			contextMenu.addEventListener(MenuEvent.ITEM_CLICK, contextMenuItemClickHandler);
+			
 			initExternalInterface();
+			
+			_remarksPopUpPresenter = new RemarksPopUpPresenter();
 		}
 		
 		override internal function initEventListeners():void {
@@ -81,12 +84,12 @@ package org.openforis.collect.presenter
 		}
 		
 		//called from External Interface (javascript)
-		public static function isEditingItem():Boolean {
+		public function isEditingItem():Boolean {
 			return true;
 			//return ! (AbstractPresenter.serverOffline) && _view.isEditingItem();
 		}
 		
-		public static function openContextMenu():Boolean {
+		public function openContextMenu():Boolean {
 			contextMouseClickGlobalPoint = new Point(FlexGlobals.topLevelApplication.mouseX, FlexGlobals.topLevelApplication.mouseY);
 			contextMouseClickGlobalPoint = FlexGlobals.topLevelApplication.localToGlobal(contextMouseClickGlobalPoint);
 			
@@ -183,9 +186,9 @@ package org.openforis.collect.presenter
 			lastMouseOverInputField = null;
 		}
 		
-		private static function contextMenuItemClickHandler(event:MenuEvent):void {
-			/*
+		private function contextMenuItemClickHandler(event:MenuEvent):void {
 			switch(event.item) {
+				/*
 				case BLANK_ON_FORM_MENU_ITEM:
 					contextInputField.changeReasonBlankInfo(FieldExtraInfo.BLANK_ON_FORM_CODE);
 					break;
@@ -195,9 +198,11 @@ package org.openforis.collect.presenter
 				case ILLEGIBLE_MENU_ITEM:
 					contextInputField.changeReasonBlankInfo(FieldExtraInfo.ILLEGIBLE_CODE);
 					break;
+				*/
 				case EDIT_REMARKS_MENU_ITEM:
-					ExtraInfoPopUpManager.openPopUp(contextInputField, false, false, contextMouseClickGlobalPoint);
+					_remarksPopUpPresenter.openPopUp(contextInputField, false, contextMouseClickGlobalPoint);
 					break;
+				/*
 				case APPROVE_ERROR_MENU_ITEM:
 					contextInputField.approveError();
 					break;
@@ -222,8 +227,9 @@ package org.openforis.collect.presenter
 						contextDataGroupRow.replaceBlankOnRowWithReasonBlankInfo(contextDataGroupRow.itemIndex, FieldExtraInfo.DASH_CODE);
 					}
 					break;
+				*/
 			}
-			
+			/*
 			function doDeleteRow():void {
 				if(contextDataGroupRow) {
 					(contextDataGroupRow.parent as OpenForisDataGroup).deleteItemAt(contextDataGroupRow.itemIndex);

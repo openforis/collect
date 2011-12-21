@@ -1,10 +1,8 @@
 package org.openforis.collect.ui {
-	import mx.binding.utils.BindingUtils;
 	import mx.core.Container;
 	
 	import org.openforis.collect.ui.component.detail.EntityFormContainer;
 	import org.openforis.collect.ui.component.detail.FormContainer;
-	import org.openforis.collect.ui.component.detail.RecordDetail;
 	import org.openforis.collect.ui.component.detail.RootEntityFormContainer;
 	import org.openforis.collect.ui.component.detail.input.InputField;
 	import org.openforis.collect.ui.component.detail.input.StringInputField;

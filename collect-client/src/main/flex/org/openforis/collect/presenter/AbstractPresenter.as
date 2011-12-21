@@ -18,8 +18,8 @@ package org.openforis.collect.presenter {
 		private static var _serverOffline:Boolean = false;
 		private static var _serverOffLineMessage:String;
 		
-		public  function AbstractPresenter() {
-			initEventListeners();	
+		public function AbstractPresenter() {
+			initEventListeners();
 		}
 		
 		internal static function get serverOffLineMessage():String {

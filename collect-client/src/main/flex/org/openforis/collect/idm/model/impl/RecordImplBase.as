@@ -10,9 +10,9 @@ package org.openforis.collect.idm.model.impl {
     import flash.utils.IDataInput;
     import flash.utils.IDataOutput;
     import flash.utils.IExternalizable;
+    
     import org.openforis.idm.metamodel.ModelVersion;
     import org.openforis.idm.metamodel.Survey;
-    import org.openforis.idm.model.Entity;
 
     [Bindable]
     public class RecordImplBase implements IExternalizable {
@@ -23,7 +23,7 @@ package org.openforis.collect.idm.model.impl {
         private var _listener:ModelObjectListener;
         private var _modifiedBy:String;
         private var _modifiedDate:Date;
-        private var _rootEntity:Entity;
+        private var _rootEntity:EntityImpl;
         private var _survey:Survey;
         private var _version:ModelVersion;
 
@@ -62,10 +62,10 @@ package org.openforis.collect.idm.model.impl {
             return _modifiedDate;
         }
 
-        public function set rootEntity(value:Entity):void {
+        public function set rootEntity(value:EntityImpl):void {
             _rootEntity = value;
         }
-        public function get rootEntity():Entity {
+        public function get rootEntity():EntityImpl {
             return _rootEntity;
         }
 
@@ -88,7 +88,7 @@ package org.openforis.collect.idm.model.impl {
             _listener = input.readObject() as ModelObjectListener;
             _modifiedBy = input.readObject() as String;
             _modifiedDate = input.readObject() as Date;
-            _rootEntity = input.readObject() as Entity;
+            _rootEntity = input.readObject() as EntityImpl;
             _survey = input.readObject() as Survey;
             _version = input.readObject() as ModelVersion;
         }

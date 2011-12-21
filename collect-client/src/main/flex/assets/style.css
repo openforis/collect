@@ -1,0 +1,17 @@
+/* CSS file */
+@namespace s "library://ns.adobe.com/flex/spark";
+@namespace mx "library://ns.adobe.com/flex/mx";
+@namespace detail "org.openforis.collect.ui.component.detail.*";
+
+/*
+detail|FormContainer {
+	skin-class: ClassReference("org.openforis.collect.ui.skins.detail.FormContainerSkin");
+}
+
+detail|EntityFormContainer {
+	skin-class: ClassReference("org.openforis.collect.ui.skins.detail.EntityFormContainerSkin");
+}
+*/
+detail|MultipleEntityFormContainer {
+	skin-class: ClassReference("org.openforis.collect.ui.component.detail.skin.MultipleEntityFormContainerSkin");
+}

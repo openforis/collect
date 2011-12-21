@@ -41,6 +41,8 @@
 		[ResourceBundle("messages")]
 	</fx:Metadata>
 	
+	<fx:Style source="assets/style.css" />
+	
 	<s:SkinnableContainer height="100%" width="1000" horizontalCenter="0">
 		<s:layout>
 			<s:VerticalLayout />

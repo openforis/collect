@@ -1,9 +1,14 @@
 package org.openforis.collect {
 	
+	import mx.collections.IList;
 	import mx.core.FlexGlobals;
 	import mx.managers.CursorManager;
 	import mx.managers.ToolTipManager;
 	import mx.utils.URLUtil;
+	
+	import org.openforis.collect.idm.model.impl.EntityImpl;
+	import org.openforis.collect.model.Phase;
+	import org.openforis.idm.metamodel.Survey;
 	
 	/**
 	 * @author Mino Togna
@@ -12,6 +17,11 @@ package org.openforis.collect {
 		
 		public static var SESSION_ID:String;
 
+		public static var SURVEYS:IList;
+		
+		public static var selectedSurvey:Survey;
+		public static var selectedRootEntity:EntityImpl;
+		public static var selectedPhase:Phase;
 		
 		private static var initialized:Boolean = false;
 		internal static const CONTEXT_NAME:String = "collect";

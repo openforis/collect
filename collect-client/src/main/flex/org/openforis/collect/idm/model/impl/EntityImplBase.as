@@ -9,16 +9,15 @@ package org.openforis.collect.idm.model.impl {
 
     import flash.utils.IDataInput;
     import flash.utils.IDataOutput;
-    import org.granite.collections.IMap;
 
     [Bindable]
     public class EntityImplBase extends AbstractModelObject {
 
-        private var _children:IMap;
+        private var _children:Object;
 
         override public function readExternal(input:IDataInput):void {
             super.readExternal(input);
-            _children = input.readObject() as IMap;
+            _children = input.readObject() as Object;
         }
 
         override public function writeExternal(output:IDataOutput):void {

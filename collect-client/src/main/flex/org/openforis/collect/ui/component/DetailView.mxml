@@ -30,14 +30,7 @@
 	
 	<!--<s:Group id="formWrapper" width="100%" height="100%" />-->
 	
-	<mx:ViewStack width="100%" height="100%" id="viewStack">
-		<!-- view stack for all forms-->
-		<mx:Repeater id="formVersionsRP" height="100%" width="100%">
-			<s:NavigatorContent id="formContainers" height="100%" width="100%">
-				
-			</s:NavigatorContent>
-		</mx:Repeater>
-	</mx:ViewStack>
+	<detail:FormsContainer id="formsContainer" height="100%" width="100%" />
 	
 	<s:HGroup width="100%" id="buttonBar" horizontalAlign="center" verticalAlign="middle" gap="30">
 		<!-- Buttons: save, back to list etc...-->

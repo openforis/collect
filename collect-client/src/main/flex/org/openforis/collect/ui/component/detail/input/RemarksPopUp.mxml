@@ -3,7 +3,6 @@
 		  xmlns:s="library://ns.adobe.com/flex/spark" 
 		  xmlns:mx="library://ns.adobe.com/flex/mx"
 		  creationComplete="creationCompleteHandler(event)" xmlns:component="org.fao.openforis.flex.component.*"
-		  mouseDownOutside="mouseDownOutsideHandler(event)"
 		  creationPolicy="all"
 		  alpha="1"
 		  >
@@ -17,14 +16,9 @@
 			import mx.events.FlexEvent;
 			import mx.events.FlexMouseEvent;
 			
-			import org.fao.openforis.flex.component.input.OpenForisInputField;
-			import org.fao.openforis.flex.event.DialogEvent;
-			import org.fao.openforis.flex.model.FieldExtraInfo;
-			import org.fao.openforis.flex.util.StringUtil;
 			import org.openforis.collect.i18n.Message;
 			import org.openforis.collect.idm.model.impl.AbstractValue;
 			import org.openforis.collect.idm.model.impl.AbstractValue$Symbol;
-			import org.openforis.collect.presenter.input.RemarksPopUpPresenter;
 			
 			[Bindable]
 			private var _showReasonBlank:Boolean = true;
@@ -35,36 +29,19 @@
 			}
 			
 			public function reset():void {
-				lastSelectedRadioButton = null;
-				_fieldExtraInfo = null;
+				//lastSelectedRadioButton = null;
+				//_fieldExtraInfo = null;
 			}
-			
+			/*
 			protected function mouseDownOutsideHandler(event:FlexMouseEvent):void {
 				save();
 			}
-			
+			*/
 			public function updateCurrentState():void {
 				this.currentState = calculateCurrentState();
 			}
 			
 			//getters and setters
-			
-			public function get inputField():OpenForisInputField {
-				return _inputField;
-			}
-
-			public function set inputField(value:OpenForisInputField):void {
-				_inputField = value;
-			}
-
-			public function get fieldExtraInfo():FieldExtraInfo {
-				return _fieldExtraInfo;
-			}
-			
-			public function set fieldExtraInfo(value:FieldExtraInfo):void {
-				_fieldExtraInfo = value;
-				lastSelectedRadioButton = radioButtonGroup.selection;
-			}
 			
 			public function get showReasonBlank():Boolean {
 				return _showReasonBlank;
@@ -75,14 +52,6 @@
 				updateCurrentState();
 			}
 			
-			public function get showErrorReasonBlankMissing():Boolean {
-				return _showErrorReasonBlankMissing;
-			}
-			
-			public function set showErrorReasonBlankMissing(value:Boolean):void {
-				_showErrorReasonBlankMissing = value;
-				updateCurrentState();
-			}
 			
 			protected function remarksTextAreaKeyDownHandler(event:KeyboardEvent):void {
 				switch(event.keyCode) {
@@ -106,7 +75,7 @@
 			
 			
 			public function close():void {
-				dispatchEvent(new DialogEvent(DialogEvent.CANCEL));
+				//dispatchEvent(new DialogEvent(DialogEvent.CANCEL));
 			}
 
 
@@ -117,7 +86,7 @@
 	</fx:Script>
 	<fx:Declarations>
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
-		<s:RadioButtonGroup id="radioButtonGroup" selectedValue="{_fieldExtraInfo.reasonBlank}" />
+		<s:RadioButtonGroup id="radioButtonGroup" />
 	</fx:Declarations>
 	
 	<s:states>
@@ -125,14 +94,15 @@
 		<s:State name="canSpecifyReasonBlank" />
 	</s:states>
 	
-	<s:VGroup id="reasonBlankGroup" includeIn="canSpecifyReasonBlank">
+	<s:VGroup id="reasonBlankGroup" visible="false" includeInLayout="false" 
+			  visible.canSpecifyReasonBlank="true" includeInLayout.canSpecifyReasonBlank="true">
 		<s:Label text="Reason left blank:" />
 		<s:RadioButton id="blankOnFormRadioButton" value="{AbstractValue$Symbol.BLANK_ON_FORM}" group="{radioButtonGroup}" 
 					   label="{Message.get('edit.contextMenu.blankOnForm')}" />
-		<s:RadioButton id="dashRadioButton" value="{AbstractValue$Symbol.DASH_ON_FORM}" group="{radioButtonGroup}" 
-					   label="{Message.get('edit.contextMenu.dashOnForm')}" click="radioButtonClickHandler(event)" keyDown="radioButtonsKeyDownHandler(event)" />
+		<s:RadioButton id="dashOnFormRadioButton" value="{AbstractValue$Symbol.DASH_ON_FORM}" group="{radioButtonGroup}" 
+					   label="{Message.get('edit.contextMenu.dashOnForm')}" />
 		<s:RadioButton id="illegibleRadioButton" value="{AbstractValue$Symbol.ILLEGIBLE}" group="{radioButtonGroup}" 
-					   label="{Message.get('edit.contextMenu.illegible')" click="radioButtonClickHandler(event)" keyDown="radioButtonsKeyDownHandler(event)" />
+					   label="{Message.get('edit.contextMenu.illegible')" />
 	</s:VGroup>
 	
 	<s:VGroup id="remarksGroup">
@@ -142,7 +112,7 @@
 	</s:VGroup>
 	
 	<s:HGroup width="100%" horizontalAlign="center">
-		<s:Button id="okButton" label="OK" click="saveClickHandler(event)" />
+		<s:Button id="okButton" label="OK" />
 	</s:HGroup>
 	
 </s:SkinnableContainer>

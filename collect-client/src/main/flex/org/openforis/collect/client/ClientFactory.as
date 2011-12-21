@@ -6,6 +6,7 @@ package org.openforis.collect.client {
 	 * */
 	public class ClientFactory {
 		
+		private static var _metaModelClient:MetaModelClient;
 		private static var _sessionClient:SessionClient;
 		private static var _dataClient:DataClient;
 		
@@ -24,6 +25,13 @@ package org.openforis.collect.client {
 				_dataClient = new DataClient();
 			}
 			return _dataClient;
+		}
+		
+		public static function get metaModelClient():MetaModelClient{
+			if(_metaModelClient == null){
+				_metaModelClient = new MetaModelClient();
+			}
+			return _metaModelClient;
 		}
 	}
 }

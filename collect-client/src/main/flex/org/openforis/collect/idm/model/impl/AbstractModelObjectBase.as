@@ -68,5 +68,43 @@ package org.openforis.collect.idm.model.impl {
             output.writeObject(_type);
             output.writeObject(_warnings);
         }
+
+		public function set definition(value:ModelObjectDefinition):void {
+			_definition = value;
+		}
+
+		public function set errors(value:ListCollectionView):void {
+			_errors = value;
+		}
+
+		public function set path(value:String):void {
+			_path = value;
+		}
+
+		public function get record():RecordImpl {
+			return _record;
+		}
+
+		public function set record(value:RecordImpl):void {
+			_record = value;
+		}
+
+		public function get relevant():Boolean {
+			return _relevant;
+		}
+
+		public function set relevant(value:Boolean):void {
+			_relevant = value;
+		}
+
+		public function set type(value:String):void {
+			_type = value;
+		}
+
+		public function set warnings(value:ListCollectionView):void {
+			_warnings = value;
+		}
+
+
     }
 }

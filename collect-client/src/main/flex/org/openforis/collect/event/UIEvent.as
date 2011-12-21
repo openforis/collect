@@ -8,6 +8,8 @@ package org.openforis.collect.event {
 	
 	public class UIEvent extends Event {
 		
+		public static const SURVEY_SELECTED:String = "surveySelected";
+		public static const ROOT_ENTITY_SELECTED:String = "rootEntitySelected";
 		public static const NEW_RECORD_CREATED:String = "newRecordCreated";
 		public static const BACK_TO_LIST:String = "backToList";
 		

@@ -7,39 +7,105 @@
 	
 	<fx:Script>
 		<![CDATA[
-			import mx.collections.Array;
+			import mx.collections.ArrayCollection;
 			import mx.events.FlexEvent;
 			
-			private var _forms:Array;
+			import org.openforis.collect.ui.component.detail.input.DateInputField;
+			import org.openforis.collect.ui.component.detail.input.InputField;
+			import org.openforis.collect.ui.component.detail.input.MemoInputField;
+			
+			private var _formVersions:ArrayCollection;
+			
 			//TODO this must be the Object instance
 			private var _data:Object;
 			
-			public function addRecordDetail(recordDetail:RecordDetail):void {
-				this._forms[recordDetail.version]=recordDetail;
-			}
-						
-			public function setActiveForm(version:Object):void {
-				//TODO
-				this.selectedChild = this._forms[version.id];
-			}
-			
 			protected function initializeHandler(event:FlexEvent):void {
-				this._forms = new Array();
+				//this._forms = new Array();
 			}
 
-			public function get data():Object {
+			/*
+			public function addRecordDetail(recordDetail:RecordDetail):void {
+				this._forms[recordDetail.version] = recordDetail;
+			}
+			*/		
+			
+			protected function isFormInitialized(version:Object):Boolean {
+				var index:int = formVersions.getItemIndex(version);
+				var formContentWrapper:NavigatorContent = formContentWrappers[index];
+				return formContentWrapper.numElements > 0;
+			}
+			
+			public function setActiveForm(version:Object):void {
+				//TODO
+				var index:int = formVersions.getItemIndex(version);
+				var formContentWrapper:NavigatorContent = formContentWrappers[index];
+				
+				if(! isFormInitialized(version)) {
+					//init form container
+					var formContainer:FormContainer = null; //UIGenerator.generateDetailPageForms(
+					
+					//test
+					formContainer = new FormContainer();
+					formContentWrapper.addElement(formContainer);
+					
+					formContainer.version = version;
+					var rootEntityFormContainer:RootEntityFormContainer = new RootEntityFormContainer();
+					formContainer.addEntityFormContainer(rootEntityFormContainer);
+					
+					rootEntityFormContainer.label = "Cluster " + version.id;
+					var inputField:InputField = new DateInputField();
+					rootEntityFormContainer.addFormItem("Test", inputField);
+					
+					rootEntityFormContainer = new RootEntityFormContainer();
+					formContainer.addEntityFormContainer(rootEntityFormContainer);
+					rootEntityFormContainer.label = "Plots";
+					inputField = new MemoInputField();
+					rootEntityFormContainer.addFormItem("Test 2", inputField);
+					
+					var multipleEntityFormContainer:MultipleEntityFormContainer = new MultipleEntityFormContainer();
+					formContainer.addElement(multipleEntityFormContainer);
+					inputField = new DateInputField();
+					multipleEntityFormContainer.addFormItem("Test 3", inputField);
+					var entity:Object = {label: "Household Survey"};
+					multipleEntityFormContainer.entity = entity;
+					
+				}
+				selectedChild = formContentWrapper;
+			}
+			
+			public function addFormContainer(value:FormContainer, version:Object):void {
+				//viewStack.addElement(value);
+				(getChildAt(formVersions.getItemIndex(version)) as NavigatorContent).addElement(value);
+			}
+			
+			
+			
+			override public function get data():Object {
 				return _data;
 			}
 
-			public function set data(value:Object):void {
+			override public function set data(value:Object):void {
 				_data = value;
 			}
+			
+			[Bindable]
+			public function get formVersions():ArrayCollection {
+				return _formVersions;
+			}
 
+			public function set formVersions(value:ArrayCollection):void {
+				_formVersions = value;
+			}
+			
 		]]>
 	</fx:Script>
 	<fx:Declarations>
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
 	</fx:Declarations>
 	
-	
+	<mx:Repeater id="formVersionsRP" dataProvider="{formVersions}" height="100%" width="100%">
+		<s:NavigatorContent id="formContentWrappers" height="100%" width="100%">
+			
+		</s:NavigatorContent>
+	</mx:Repeater>
 </mx:ViewStack>

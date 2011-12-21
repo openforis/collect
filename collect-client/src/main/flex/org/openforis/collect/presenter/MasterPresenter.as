@@ -5,10 +5,16 @@ package org.openforis.collect.presenter {
 	 * */
 	import flash.events.MouseEvent;
 	
+	import mx.collections.ArrayCollection;
+	import mx.collections.IList;
 	import mx.events.EventListenerRequest;
 	
+	import org.openforis.collect.Application;
+	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.event.UIEvent;
+	import org.openforis.collect.idm.model.impl.EntityImpl;
 	import org.openforis.collect.ui.component.MasterView;
+	import org.openforis.idm.metamodel.Survey;
 
 	public class MasterPresenter extends AbstractPresenter {
 		
@@ -17,13 +23,82 @@ package org.openforis.collect.presenter {
 		public function MasterPresenter(view:MasterView) {
 			this._view = view;
 			super();
+			
+			_view.currentState = "loading";
+			
+			/*
+			wait for surveys and sessionState loading, then dispatch APPLICATION_INITIALIZED event
+			if more than one survey is found, then whow surveySelection view
+			*/
 		}
 		
 		override internal function initEventListeners():void{
+			eventDispatcher.addEventListener(ApplicationEvent.APPLICATION_INITIALIZED, applicationInitializedHandler);
+			eventDispatcher.addEventListener(ApplicationEvent.SCHEMA_LOADED, rootEntitiesLoadedHandler);
+			eventDispatcher.addEventListener(UIEvent.SURVEY_SELECTED, surveySelectedHandler);
+			eventDispatcher.addEventListener(UIEvent.ROOT_ENTITY_SELECTED, rootEntitySelectedHandler);
 			eventDispatcher.addEventListener(UIEvent.NEW_RECORD_CREATED, newRecordCreatedHandler);
 			eventDispatcher.addEventListener(UIEvent.BACK_TO_LIST, backToListHandler);
+		}
+
+		protected function applicationInitializedHandler(event:ApplicationEvent):void {
+			if(Application.SURVEYS.length > 1) {
+				_view.currentState = "surveySelection";
+			} else {
+				//select first survey
+				selectSurvey(Application.SURVEYS[0]);
+			}
+		}
+		
+		protected function surveySelectedHandler(event:UIEvent):void {
+			selectSurvey(event.obj as Survey);
+		}
+		
+		protected function selectSurvey(survey:Survey):void {
+			//TODO load root entities for the selected survey
+			Application.selectedSurvey = survey;
+			loadSchema();
+		}
+		
+		protected function loadSchema():void {
+			//TODO call metamodelclient...
+			//_view.currentState = "loading";
 			
-			
+			//test data
+			/*
+			var rootEntities:ArrayCollection = new ArrayCollection([
+				{label: "Cluster", id: "cluster"},
+				{label: "Plot", id: "plot"}
+			]);
+			*/
+			var applicationEvent:ApplicationEvent = new ApplicationEvent(ApplicationEvent.SCHEMA_LOADED);
+			applicationEvent.result = Application.selectedSurvey.schema;
+			eventDispatcher.dispatchEvent(applicationEvent);
+			_view.currentState = "rootEntitySelection";
+		}
+		
+		protected function rootEntitiesLoadedHandler(event:ApplicationEvent):void {
+			var rootEntities:ArrayCollection = /*event.result as ArrayCollection;*/ null;
+			if(rootEntities != null && rootEntities.length > 0) {
+				if(rootEntities.length == 1) {
+					//TODO load records for the unique root entity
+					_view.currentState = "list";
+				} else {
+					_view.currentState = "rootEntitySelection";
+				}
+			} else {
+				//TODO error, no root entities found
+			}
+		}
+		
+		protected function rootEntitySelectedHandler(event:UIEvent):void {
+			var rootEntity:EntityImpl = event.obj as EntityImpl;
+			selectRootEntity(rootEntity);
+		}
+		
+		protected function selectRootEntity(rootEntity:EntityImpl):void {
+			Application.selectedRootEntity = rootEntity;
+			//loadRecords();
 		}
 		
 		protected function newRecordCreatedHandler(event:UIEvent):void {

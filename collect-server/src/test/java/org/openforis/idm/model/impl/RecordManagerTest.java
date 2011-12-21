@@ -18,7 +18,7 @@ public class RecordManagerTest {
 
 //    private EntityManager em;
     
-    @BeforeClass
+    //@BeforeClass
     protected void setUp() throws Exception {
         try {
             logger.info("Starting in-memory database for unit tests");
@@ -39,7 +39,7 @@ public class RecordManagerTest {
     }
 
 
-    @AfterClass
+    //@AfterClass
     protected void tearDown() throws Exception {
 //        logger.info("Shuting down Hibernate JPA layer.");
 //        if (em != null) {
@@ -60,7 +60,7 @@ public class RecordManagerTest {
 //        VFMemoryStorageFactory.purgeDatabase(new File("unit-testing-jpa").getCanonicalPath());
     }
     
-    @Test
+    //@Test
     public void testPersistence() {
         try {
 
