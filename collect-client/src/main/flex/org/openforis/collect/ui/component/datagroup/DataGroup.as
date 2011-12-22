@@ -16,6 +16,7 @@ package org.openforis.collect.ui.component.datagroup {
 			vl.gap = 2;			
 			this.layout = vl;
 		}
+		/*
 		override protected function commitProperties():void {
 			super.commitProperties();
 			addDataProviderListener();
@@ -36,11 +37,6 @@ package org.openforis.collect.ui.component.datagroup {
 		
 		override public function set dataProvider(value:IList):void {
 			super.dataProvider = value;
-			if(_selectedIndex >= 0) {
-				itemSelected(_selectedIndex, false);
-			}
-			_selectedIndex = -1;
-			_selectedItem = null;
 		}
 		
 		public function deleteItemAt(index:int):void {
@@ -82,5 +78,6 @@ package org.openforis.collect.ui.component.datagroup {
 			this.itemRenderer = null;
 			this.itemRenderer = iFactory;
 		}
+		*/
 	}
 }

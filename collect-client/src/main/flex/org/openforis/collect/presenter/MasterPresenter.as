@@ -31,6 +31,12 @@ package org.openforis.collect.presenter {
 			wait for surveys and sessionState loading, then dispatch APPLICATION_INITIALIZED event
 			if more than one survey is found, then whow surveySelection view
 			*/
+			
+			/*
+			
+			flow: loading -> surveySelection (optional) -> rootEntitySelection (optional) -> list -> edit
+			
+			*/
 		}
 		
 		override internal function initEventListeners():void{
@@ -92,7 +98,7 @@ package org.openforis.collect.presenter {
 					//TODO error, no root entities found
 				}
 			} else {
-				//TODO error
+				//TODO error, schema not found
 			}
 		}
 		
