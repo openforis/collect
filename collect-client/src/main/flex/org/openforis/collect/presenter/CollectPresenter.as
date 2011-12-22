@@ -55,7 +55,7 @@ package org.openforis.collect.presenter {
 			
 			*/
 			
-			this._sessionClient.testGetValue(new ItemResponder(res, faultHandler));
+			//this._sessionClient.testGetValue(new ItemResponder(getValueResultHandler, faultHandler));
 			
 			
 			this._contextMenuPresenter = new ContextMenuPresenter(view);
@@ -63,9 +63,16 @@ package org.openforis.collect.presenter {
 			//this._sessionClient.testGetValue(new ItemResponder(getValueResultHandler, faultHandler));
 				
 			function getValueResultHandler(event:ResultEvent, token:Object = null):void {
+				/*
+				var result:ArrayCollection = event.result as ArrayCollection;
+				for each(var item:FakeObject in result) {
+					trace(item.privateProp);
+				}
+				
 				var abstractValue:AbstractValue = event.result as AbstractValue;
 				var booleanValue:BooleanValueImpl = event.result as BooleanValueImpl;
 				trace(abstractValue.text1);
+				*/
 			}
 			
 			
@@ -76,19 +83,23 @@ package org.openforis.collect.presenter {
 			var survey:SurveyImpl = new TestSurvey();
 			survey.name = "Survey 1";
 			surveys.addItem(survey);
-			
+			/*
 			survey = new TestSurvey();
 			survey.name = "Survey 2";
 			surveys.addItem(survey);
-			
+			*/
 			Application.SURVEYS = surveys;
 			eventDispatcher.dispatchEvent(new ApplicationEvent(ApplicationEvent.SURVEYS_LOADED));
 			
 			//symulate loading...
+			/*
 			setTimeout(
 				function():void {
 					eventDispatcher.dispatchEvent(new ApplicationEvent(ApplicationEvent.APPLICATION_INITIALIZED));
 				}, 2000);
+			*/
+			
+			eventDispatcher.dispatchEvent(new ApplicationEvent(ApplicationEvent.APPLICATION_INITIALIZED));
 		}
 		
 		override internal function initEventListeners():void {

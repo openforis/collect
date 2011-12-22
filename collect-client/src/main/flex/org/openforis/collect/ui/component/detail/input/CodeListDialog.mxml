@@ -50,9 +50,9 @@
 
 	<s:VGroup id="loadCompleteContainer" height="100%" width="100%" includeIn="default">
 		<s:Scroller height="100%" width="100%">
-			<input:ListOfCodesDataGroup width="100%" id="items" dataProvider="{dataProvider}"
+			<input:CodeListDialogDataGroup width="100%" id="items" dataProvider="{dataProvider}"
 							   multiple="{multiple}" maxSpecified="{maxSpecified}">
-			</input:ListOfCodesDataGroup>
+			</input:CodeListDialogDataGroup>
 		</s:Scroller>
 		
 		<s:HGroup width="100%" horizontalAlign="center" verticalAlign="middle" gap="30">

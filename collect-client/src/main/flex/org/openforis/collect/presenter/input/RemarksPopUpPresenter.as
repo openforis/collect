@@ -30,8 +30,6 @@ package org.openforis.collect.presenter.input
 		
 		public function RemarksPopUpPresenter(popUp:RemarksPopUp = null) {
 			this.popUp = popUp;
-			
-			initPopUp();
 		}
 		
 		protected function initPopUp():void {
@@ -62,19 +60,22 @@ package org.openforis.collect.presenter.input
 		}
 		
 		public function openPopUp(inputField:InputField, alignToField:Boolean = false, alignmentPoint:Point = null):void {
-			if(popUp == null) {
-				//init popup
+			var firstOpen:Boolean = popUp == null;
+			if(firstOpen) {
 				popUp = new RemarksPopUp();
-				initPopUp();
 			}
-			popUp.reset();
 			//popUp.showReasonBlank = inputField.canShowReasonBlankOnPopUp() && PhaseUtil.currentPhaseCode == PhaseUtil.DATA_ENTRY_CODE;
 			
 			if(! popUpOpened) {
 				PopUpManager.addPopUp(popUp, inputField);
+				
+				if(firstOpen) {
+					//init popup only after rendering to avoid null pointer exception accessing null objects
+					initPopUp();
+				}
 			}
-			//popUp.callLater(function():void {popUp.setFocusOnFirstField();});
-			
+			popUp.reset();
+
 			var alignmentPoint:Point;
 			if(alignToField) {
 				PopUpUtil.alignPopUpToField(popUp, inputField, PopUpUtil.POSITION_RIGHT, PopUpUtil.VERTICAL_ALIGN_BOTTOM);

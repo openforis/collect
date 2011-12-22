@@ -29,7 +29,15 @@ package org.openforis.idm.metamodel.impl {
         public function get type():NumericAttributeDefinition$Type {
             return _type;
         }
-
+		
+		public function set precisionDefinitions(value:ListCollectionView):void {
+			_precisionDefinitions = value;
+		}
+		
+		public function set type(value:NumericAttributeDefinition$Type):void {
+			_type = value;
+		}
+		
         override public function readExternal(input:IDataInput):void {
             super.readExternal(input);
             _precisionDefinitions = input.readObject() as ListCollectionView;
@@ -41,5 +49,7 @@ package org.openforis.idm.metamodel.impl {
             output.writeObject(_precisionDefinitions);
             output.writeObject(_type);
         }
+
+		
     }
 }

@@ -29,6 +29,14 @@ package org.openforis.idm.metamodel.impl {
             return _since;
         }
 
+		public function set deprecated(value:ModelVersion):void {
+			_deprecated = value;
+		}
+		
+		public function set since(value:ModelVersion):void {
+			_since = value;
+		}
+
         public function readExternal(input:IDataInput):void {
             _deprecated = input.readObject() as ModelVersion;
             _since = input.readObject() as ModelVersion;
@@ -38,5 +46,8 @@ package org.openforis.idm.metamodel.impl {
             output.writeObject(_deprecated);
             output.writeObject(_since);
         }
+
+		
+
     }
 }

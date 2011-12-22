@@ -28,6 +28,14 @@ package org.openforis.idm.metamodel.impl {
             return _checks;
         }
 
+		public function set checks(value:ListCollectionView):void {
+			_checks = value;
+		}
+		
+		public function set attributeDefaults(value:ListCollectionView):void {
+			_attributeDefaults = value;
+		}
+
         override public function readExternal(input:IDataInput):void {
             super.readExternal(input);
             _attributeDefaults = input.readObject() as ListCollectionView;
@@ -39,5 +47,8 @@ package org.openforis.idm.metamodel.impl {
             output.writeObject(_attributeDefaults);
             output.writeObject(_checks);
         }
+
+		
+
     }
 }

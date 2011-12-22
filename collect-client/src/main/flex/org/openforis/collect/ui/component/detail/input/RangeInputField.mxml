@@ -3,6 +3,7 @@
 				  xmlns:s="library://ns.adobe.com/flex/spark" 
 				  xmlns:mx="library://ns.adobe.com/flex/mx" 
 				  xmlns:input="org.openforis.collect.ui.component.detail.input.*" 
+				  width="100"
 				  >
 	
 	<fx:Declarations>

@@ -71,41 +71,7 @@ package org.openforis.idm.metamodel.impl {
             return _relevantExpression;
         }
 
-        override public function readExternal(input:IDataInput):void {
-            super.readExternal(input);
-            _annotations = input.readObject() as ListCollectionView;
-            _cardinality = input.readObject() as Cardinality;
-            _deprecatedAttribute = input.readObject() as String;
-            _descriptions = input.readObject() as ListCollectionView;
-            _labels = input.readObject() as ListCollectionView;
-            _maxCount = function(o:*):Number { return (o is Number ? o as Number : Number.NaN) } (input.readObject());
-            _minCount = function(o:*):Number { return (o is Number ? o as Number : Number.NaN) } (input.readObject());
-            _multiple = input.readObject() as Boolean;
-            _name = input.readObject() as String;
-            _parentDefinition = input.readObject() as EntityDefinition;
-            _relevantExpression = input.readObject() as String;
-            _requiredExpression = input.readObject() as String;
-            _sinceAttribute = input.readObject() as String;
-        }
-
-        override public function writeExternal(output:IDataOutput):void {
-            super.writeExternal(output);
-            output.writeObject(_annotations);
-            output.writeObject(_cardinality);
-            output.writeObject(_deprecatedAttribute);
-            output.writeObject(_descriptions);
-            output.writeObject(_labels);
-            output.writeObject(_maxCount);
-            output.writeObject(_minCount);
-            output.writeObject(_multiple);
-            output.writeObject(_name);
-            output.writeObject(_parentDefinition);
-            output.writeObject(_relevantExpression);
-            output.writeObject(_requiredExpression);
-            output.writeObject(_sinceAttribute);
-        }
-
-		public function set annotations(value:ListCollectionView):void {
+        public function set annotations(value:ListCollectionView):void {
 			_annotations = value;
 		}
 
@@ -177,6 +143,38 @@ package org.openforis.idm.metamodel.impl {
 			_sinceAttribute = value;
 		}
 
-
+		override public function readExternal(input:IDataInput):void {
+			super.readExternal(input);
+			_annotations = input.readObject() as ListCollectionView;
+			_cardinality = input.readObject() as Cardinality;
+			_deprecatedAttribute = input.readObject() as String;
+			_descriptions = input.readObject() as ListCollectionView;
+			_labels = input.readObject() as ListCollectionView;
+			_maxCount = function(o:*):Number { return (o is Number ? o as Number : Number.NaN) } (input.readObject());
+			_minCount = function(o:*):Number { return (o is Number ? o as Number : Number.NaN) } (input.readObject());
+			_multiple = input.readObject() as Boolean;
+			_name = input.readObject() as String;
+			_parentDefinition = input.readObject() as EntityDefinition;
+			_relevantExpression = input.readObject() as String;
+			_requiredExpression = input.readObject() as String;
+			_sinceAttribute = input.readObject() as String;
+		}
+		
+		override public function writeExternal(output:IDataOutput):void {
+			super.writeExternal(output);
+			output.writeObject(_annotations);
+			output.writeObject(_cardinality);
+			output.writeObject(_deprecatedAttribute);
+			output.writeObject(_descriptions);
+			output.writeObject(_labels);
+			output.writeObject(_maxCount);
+			output.writeObject(_minCount);
+			output.writeObject(_multiple);
+			output.writeObject(_name);
+			output.writeObject(_parentDefinition);
+			output.writeObject(_relevantExpression);
+			output.writeObject(_requiredExpression);
+			output.writeObject(_sinceAttribute);
+		}
     }
 }

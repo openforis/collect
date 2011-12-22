@@ -50,8 +50,11 @@
 		<component:Header width="100%" />
 		<component:MasterView width="100%" height="100%" />
 		<component:Footer width="100%" />
+
+		<input:TaxonInputField />
+
 	</s:SkinnableContainer>
-		
+	
 	<!--
 	<input:DateInputField />
 	<input:CodeInputField />

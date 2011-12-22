@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <input:InputField xmlns:fx="http://ns.adobe.com/mxml/2009" 
 				  xmlns:s="library://ns.adobe.com/flex/spark" 
-				  xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:input="org.openforis.collect.ui.component.detail.input.*" 
-				  width="20">
+				  xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:input="org.openforis.collect.ui.component.detail.input.*"
+				  width="100">
 	<fx:Declarations>
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
 	</fx:Declarations>
 	
-	<input:TextInput id="textInput" width="100%" maxChars="1"
+	<input:TextInput id="textInput" width="100%" 
 							  remarksIconVisible="{remarksIconVisible}"
 							  approvedIconVisible="{approvedIconVisible}"
 							  editable="{editable}" focusOut="focusOutEventHandler(event)" />

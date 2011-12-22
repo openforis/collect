@@ -39,6 +39,7 @@
 		<s:State name="detail" />
 	</s:states>
 	
+	<!-- use view stack instead of includeIn to start rendering immediately the components -->
 	<mx:ViewStack width="100%" height="100%" 
 				  selectedIndex.loading="0"
 				  selectedIndex.home="1" 

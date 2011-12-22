@@ -1,21 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<s:SkinnableContainer xmlns:fx="http://ns.adobe.com/mxml/2009" 
-		 xmlns:s="library://ns.adobe.com/flex/spark" 
-		 xmlns:mx="library://ns.adobe.com/flex/mx"
-		 mouseDownOutside="mouseDownOutsideHandler(event)"
-		 focusEnabled="false"
-		>
-	
+<s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx"
+			   close="close()"
+			   title="{Message.get('edit.taxon.searchPopUp.title')}"
+			   >
 	<fx:Script>
 		<![CDATA[
-			import mx.events.FlexMouseEvent;
+			import mx.events.CloseEvent;
 			
 			import org.openforis.collect.event.input.TaxonInputFieldEvent;
+			import org.openforis.collect.i18n.Message;
 			
-			[Bindable]
-			public var dataProvider:Object;
-			
-					
 			protected function speciesDataGridDoubleClickHandler(event:MouseEvent=null):void {
 				if(speciesDataGrid.selectedItem!=null) {
 					selectItem(speciesDataGrid.selectedItem);
@@ -23,12 +19,8 @@
 			}
 			
 			protected function close():void {
-				var taxonEvent:TaxonInputFieldEvent = new TaxonInputFieldEvent(TaxonInputFieldEvent.TAXON_AUTOCOMPLETE_POPUP_CLOSE);
+				var taxonEvent:TaxonInputFieldEvent = new TaxonInputFieldEvent(TaxonInputFieldEvent.TAXON_SEARCH_POPUP_CLOSE);
 				dispatchEvent(taxonEvent);
-			}
-			
-			protected function mouseDownOutsideHandler(event:FlexMouseEvent):void {
-				close();
 			}
 			
 			protected function speciesDataGridKeyDownHandler(event:KeyboardEvent):void {
@@ -44,19 +36,33 @@
 				taxonEvent.taxon = value;
 				dispatchEvent(taxonEvent);
 			}
-			
+
+			protected function titlewindow1_closeHandler(event:CloseEvent):void
+			{
+				// TODO Auto-generated method stub
+			}
 
 		]]>
 	</fx:Script>
-	
 	<fx:Declarations>
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
 	</fx:Declarations>
-
+	
 	<fx:Metadata>
-		[Event(name="taxonAutocompletePopUpClose", type="org.openforis.collect.event.input.TaxonInputFieldEvent")] 
-		[Event(name="taxonSelect", type="org.openforis.collect.event.input.TaxonInputFieldEvent")] 
+		[Event(name="taxonSearchPopUpClose", type="org.openforis.collect.event.input.TaxonInputFieldEvent")] 
+		[Event(name="taxonSelect", type="org.openforis.collect.event.input.TaxonInputFieldEvent")]
+		[Event(name="taxonSearchPopUpSearchTextChange", type="org.openforis.collect.event.input.TaxonInputFieldEvent")] 
 	</fx:Metadata>
+	
+	<s:layout>
+		<s:VerticalLayout />
+	</s:layout>
+	
+	<s:Form id="searchForm">
+		<s:FormItem label="{Message.get('edit.taxon.searchPopUp.speciesSearchFieldLabel')}">
+			<mx:TextInput id="searchTextInput" />
+		</s:FormItem>
+	</s:Form>
 	
 	<mx:DataGrid width="100%" 
 				 height="200"
@@ -65,7 +71,7 @@
 				 doubleClick="speciesDataGridDoubleClickHandler(event)"
 				 keyDown="speciesDataGridKeyDownHandler(event)"
 				 selectable="true"
-				 dataProvider="{dataProvider}">
+				 >
 		<mx:columns>
 			<mx:DataGridColumn headerText="Code" dataField="id" width="100" />
 			<mx:DataGridColumn editable="true" headerText="Scientific name" width="168" dataField="scientificName" />
@@ -74,4 +80,8 @@
 		</mx:columns>
 	</mx:DataGrid>
 	
-</s:SkinnableContainer>
+	<s:HGroup width="100%" horizontalAlign="center">
+		<s:Button click="speciesDataGridDoubleClickHandler(null)" label="Select" useHandCursor="true" buttonMode="true"/>
+	</s:HGroup>
+	
+</s:TitleWindow>

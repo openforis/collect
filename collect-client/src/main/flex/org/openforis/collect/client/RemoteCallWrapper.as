@@ -23,7 +23,7 @@ package org.openforis.collect.client {
 		}
 		
 		public function send():AsyncToken {
-			var token:AsyncToken = this._operation.send.call(null, this._args) as AsyncToken; 
+			var token:AsyncToken = this._operation.send.apply(null, this._args) as AsyncToken; 
 			token.addResponder(this._responder);
 			this._active = true;
 			this._attempts ++;
