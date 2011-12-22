@@ -6,19 +6,17 @@ package org.openforis.collect.blazeds.service;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.blazeds.service.UpdateRequest.Method;
 import org.openforis.collect.exception.DuplicateIdException;
 import org.openforis.collect.exception.InvalidIdException;
 import org.openforis.collect.exception.MultipleEditException;
 import org.openforis.collect.exception.NonexistentIdException;
 import org.openforis.collect.exception.RecordLockedException;
-import org.openforis.collect.manager.CollectRecordManager;
+import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.model.CollectAttribute;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.util.VersioningUtils;
-import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeDefinition;
 import org.openforis.idm.metamodel.CodeList;
@@ -31,7 +29,6 @@ import org.openforis.idm.model.Code;
 import org.openforis.idm.model.ModelObject;
 import org.openforis.idm.model.Record;
 import org.openforis.idm.model.Value;
-import org.openforis.idm.model.impl.ModelExpression;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.flex.remoting.RemotingInclude;
 import org.springframework.security.access.AccessDeniedException;
@@ -45,7 +42,7 @@ public class DataService {
 	private SessionManager sessionManager;
 
 	@Autowired
-	private CollectRecordManager recordManager;
+	private RecordManager recordManager;
 
 	@RemotingInclude
 	public Record loadRecord(String entityName, long id) throws RecordLockedException, MultipleEditException, NonexistentIdException, AccessDeniedException {
@@ -202,7 +199,7 @@ public class DataService {
 		return sessionManager;
 	}
 
-	protected CollectRecordManager getRecordManager() {
+	protected RecordManager getRecordManager() {
 		return recordManager;
 	}
 }
