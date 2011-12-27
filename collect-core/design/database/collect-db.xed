@@ -1,0 +1,92 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Diagram version="1.0" type="POSTGRES" versionMajor="9" versionMinor="0" groupSchema="false">
+   <Table id="0" name="schema_definition" schema="" database="" background="16777165">
+      <Column id="1" name="id" type="integer" length="25" nulls="false"/>
+      <Column id="2" name="node_type" type="char" length="1" nulls="false"/>
+      <Column id="3" name="name" type="varchar" length="255" nulls="false"/>
+      <Column id="4" name="path" type="varchar" length="1024" nulls="false"/>
+      <Column id="5" name="parent_id" type="integer" length="25" nulls="true"/>
+      <Column id="6" name="survey_id" type="integer" length="25" nulls="false"/>
+      <Storage name="TempTable" value="false"></Storage>
+   </Table>
+   <Table id="7" name="data" schema="" database="" background="16777165">
+      <Column id="8" name="id" type="integer" length="25" nulls="false"/>
+      <Column id="9" name="record_id" type="integer" length="25" nulls="false"/>
+      <Column id="10" name="definition_id" type="integer" length="25" nulls="false"/>
+      <Column id="11" name="number1" type="float" length="25" nulls="true"/>
+      <Column id="12" name="number2" type="float" length="25" nulls="true"/>
+      <Column id="13" name="number3" type="float" length="25" nulls="true"/>
+      <Column id="14" name="text1" type="varchar" length="2048" nulls="true"/>
+      <Column id="15" name="remarks" type="varchar" length="2048" nulls="true"/>
+      <Column id="16" name="symbol" type="char" length="1" nulls="true"/>
+      <Column id="17" name="state" type="char" length="1" nulls="true"/>
+      <Column id="18" name="parent_id" type="integer" length="25" nulls="true"/>
+      <Column id="19" name="idx" type="integer" length="25" nulls="false"/>
+      <Storage name="TempTable" value="false"></Storage>
+   </Table>
+   <Table id="20" name="survey" schema="" database="" background="16777165">
+      <Column id="21" name="id" type="integer" length="25" nulls="false"/>
+      <Column id="22" name="name" type="varchar" length="255" nulls="false"/>
+      <Column id="23" name="uri" type="varchar" length="255" nulls="true"/>
+      <Column id="24" name="idml" type="text" length="25" nulls="false"/>
+      <Storage name="TempTable" value="false"></Storage>
+   </Table>
+   <Table id="25" name="record" schema="" database="" background="16777165">
+      <Column id="26" name="id" type="integer" length="25" nulls="false"/>
+      <Column id="27" name="root_entity_id" type="integer" length="25" nulls="false"/>
+      <Column id="28" name="date_created" type="timestamp" length="25" nulls="true"/>
+      <Column id="29" name="created_by" type="varchar" length="255" nulls="true"/>
+      <Column id="30" name="date_modified" type="timestamp" length="25" nulls="true"/>
+      <Column id="31" name="modified_by" type="varchar" length="255" nulls="true"/>
+      <Storage name="TempTable" value="false"></Storage>
+   </Table>
+   <Relation id="32" name="REL_data_definition" cardinality="-2" identifying="false" nulls="false">
+      <FK>1</FK>
+      <PK>10</PK>
+      <Text></Text>
+   </Relation>
+   <Relation id="33" name="REL_data_parent" cardinality="-2" identifying="false" nulls="true">
+      <FK>8</FK>
+      <PK>18</PK>
+      <Text></Text>
+   </Relation>
+   <Relation id="34" name="REL_definition_parent" cardinality="-2" identifying="false" nulls="false">
+      <FK>1</FK>
+      <PK>5</PK>
+      <Text></Text>
+   </Relation>
+   <Relation id="35" name="REL_definition_survey" cardinality="-2" identifying="false" nulls="false">
+      <FK>21</FK>
+      <PK>6</PK>
+      <Text></Text>
+   </Relation>
+   <Relation id="36" name="REL_record_root_entity" cardinality="-2" identifying="false" nulls="false">
+      <FK>1</FK>
+      <PK>27</PK>
+      <Text></Text>
+   </Relation>
+   <Relation id="37" name="REL_data_record" cardinality="-2" identifying="false" nulls="false">
+      <FK>26</FK>
+      <PK>9</PK>
+      <Text></Text>
+   </Relation>
+   <Constraint table="0" name="PK_xxx_schema" type="PrimKey">
+      <ConstraintColumn id="1"></ConstraintColumn>
+   </Constraint>
+   <Constraint table="0" name="UK_xxx_definition_path" type="Unique">
+      <ConstraintColumn id="4"></ConstraintColumn>
+   </Constraint>
+   <Sheet name="Untitled 1" id="38" disp_at="true" disp_ph="true" disp_co="true">
+      <Place id="36" visible="true">500,0,0,0</Place>
+      <Place id="34" visible="true">500,0,0,0</Place>
+      <Place id="32" visible="true">500,0,0,0</Place>
+      <Place id="7" visible="true">1023,382,190,230</Place>
+      <Place id="20" visible="true">720,18,170,90</Place>
+      <Place id="35" visible="true">500,0,0,0</Place>
+      <Place id="25" visible="true">435,395,210,130</Place>
+      <Place id="37" visible="true" options="435.73142802294234,395.6914329693463,210.0,130.0,1023.2761429532038,382.20693271404417,190.0,230.0,2,646.0,490.0,1023.2761429532038,490.0">500,0,0,0</Place>
+      <Place id="33" visible="true">500,0,0,0</Place>
+      <Place id="0" visible="true">718,178,170,130</Place>
+   </Sheet>
+   <Settings sheet="38" zoom="1.0"></Settings>
+</Diagram>
