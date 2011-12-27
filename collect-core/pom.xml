@@ -135,11 +135,7 @@
 			<groupId>org.openforis.idm</groupId>
 			<artifactId>idm-api</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>org.openforis.idm</groupId>
-			<artifactId>idm-ri</artifactId>
-		</dependency>
-
+		
 		<!-- Apache commons -->
 		<dependency>
 			<groupId>commons-logging</groupId>

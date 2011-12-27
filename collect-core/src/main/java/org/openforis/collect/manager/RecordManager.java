@@ -5,15 +5,15 @@ package org.openforis.collect.manager;
 
 import java.util.List;
 
-import org.openforis.collect.blazeds.service.RecordListItem;
+import org.openforis.collect.exception.AccessDeniedException;
 import org.openforis.collect.exception.DuplicateIdException;
 import org.openforis.collect.exception.InvalidIdException;
 import org.openforis.collect.exception.MultipleEditException;
 import org.openforis.collect.exception.NonexistentIdException;
 import org.openforis.collect.exception.RecordLockedException;
+import org.openforis.collect.model.RecordListItem;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.model.Record;
-import org.springframework.security.access.AccessDeniedException;
 
 /**
  * @author M. Togna
