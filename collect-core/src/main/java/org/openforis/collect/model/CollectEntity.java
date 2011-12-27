@@ -1,6 +1,6 @@
 package org.openforis.collect.model;
 
-import org.openforis.idm.model.impl.DefaultEntity;
+import org.openforis.idm.model.DefaultEntity;
 
 /**
  * @author G. Miceli

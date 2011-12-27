@@ -21,7 +21,7 @@ import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeDefinition;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
-import org.openforis.idm.metamodel.ModelObjectDefinition;
+import org.openforis.idm.metamodel.SchemaObjectDefinition;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.model.Attribute;
@@ -83,7 +83,7 @@ public class DataService {
 	}
 
 	@RemotingInclude
-	public List<ModelObject<? extends ModelObjectDefinition>> updateActiveRecord(UpdateRequest request) {
+	public List<ModelObject<? extends SchemaObjectDefinition>> updateActiveRecord(UpdateRequest request) {
 		Method method = request.getMethod();
 		switch (method) {
 			case ADD:
@@ -110,7 +110,7 @@ public class DataService {
 	}
 
 	@RemotingInclude
-	public void updateModelObjectHierarchy(ModelObject<? extends ModelObjectDefinition> modelObject, int newPosition) {
+	public void updateModelObjectHierarchy(ModelObject<? extends SchemaObjectDefinition> modelObject, int newPosition) {
 	}
 
 	@RemotingInclude
@@ -148,7 +148,7 @@ public class DataService {
 
 		List<CodeListItem> items = new ArrayList<CodeListItem>();
 		CodeListItem parent = findCodeListParent(code);
-		List<CodeListItem> children = parent.getChildren();
+		List<CodeListItem> children = parent.getChildItems();
 
 		ModelVersion recordVersion = activeRecord.getVersion();
 		if (recordVersion != null) {
@@ -170,8 +170,8 @@ public class DataService {
 	 * @return
 	 */
 	@RemotingInclude
-	public CodeListItem findCodeListParent(ModelObject<? extends ModelObjectDefinition> modelObject) {
-//		ModelObject<? extends ModelObjectDefinition> modelObject = record.getModelObjectById(id);
+	public CodeListItem findCodeListParent(ModelObject<? extends SchemaObjectDefinition> modelObject) {
+//		ModelObject<? extends SchemaObjectDefinition> modelObject = record.getModelObjectById(id);
 		if (modelObject != null && modelObject instanceof CollectAttribute) {
 			//TODO
 		}

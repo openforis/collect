@@ -4,7 +4,7 @@
 package org.openforis.collect.util;
 
 import org.openforis.idm.metamodel.ModelVersion;
-import org.openforis.idm.metamodel.Versionable;
+import org.openforis.idm.metamodel.VersionableModelDefinition;
 
 /**
  * @author M. Togna
@@ -12,22 +12,22 @@ import org.openforis.idm.metamodel.Versionable;
  */
 public class VersioningUtils {
 
-	public static boolean isValidVersion(ModelVersion version, ModelVersion since, ModelVersion deprecated) {
-		if (version != null && since != null && deprecated != null) {
-			return version.getPosition() >= since.getPosition() && version.getPosition() < deprecated.getPosition();
+	public static boolean isValidVersion(ModelVersion modelVersion, ModelVersion since, ModelVersion deprecated) {
+		if (modelVersion != null && since != null && deprecated != null) {
+			return modelVersion.getPosition() >= since.getPosition() && modelVersion.getPosition() < deprecated.getPosition();
 		} else if (since != null) {
-			return version.getPosition() >= since.getPosition();
+			return modelVersion.getPosition() >= since.getPosition();
 		} else if (deprecated != null) {
-			return version.getPosition() < deprecated.getPosition();
+			return modelVersion.getPosition() < deprecated.getPosition();
 		} else {
 			return true;
 		}
 	}
 
-	public static boolean hasValidVersion(Versionable versionable, ModelVersion version) {
-		ModelVersion since = versionable.getSince();
-		ModelVersion deprecated = versionable.getDeprecated();
-		return isValidVersion(version, since, deprecated);
+	public static boolean hasValidVersion(VersionableModelDefinition versionableModelDefinition, ModelVersion modelVersion) {
+		ModelVersion since = versionableModelDefinition.getSince();
+		ModelVersion deprecated = versionableModelDefinition.getDeprecated();
+		return isValidVersion(modelVersion, since, deprecated);
 	}
 
 }

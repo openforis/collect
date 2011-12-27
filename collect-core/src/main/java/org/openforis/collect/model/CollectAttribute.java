@@ -1,8 +1,8 @@
 package org.openforis.collect.model;
 
 import org.openforis.idm.metamodel.AttributeDefinition;
+import org.openforis.idm.model.DefaultAttribute;
 import org.openforis.idm.model.Value;
-import org.openforis.idm.model.impl.DefaultAttribute;
 
 /**
  * @author G. Miceli

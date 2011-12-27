@@ -3,11 +3,11 @@ package org.openforis.collect.model;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.openforis.idm.metamodel.ModelObjectDefinition;
+import org.openforis.idm.metamodel.SchemaObjectDefinition;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.Survey;
+import org.openforis.idm.model.DefaultRecord;
 import org.openforis.idm.model.ModelObject;
-import org.openforis.idm.model.impl.DefaultRecord;
 
 /**
  * @author G. Miceli
@@ -20,13 +20,13 @@ public class CollectRecord extends DefaultRecord {
 
 	private Step step;
 	private boolean submitted;
-	private Map<Long, ModelObject<? extends ModelObjectDefinition>> modelObjectsMap;
+	private Map<Long, ModelObject<? extends SchemaObjectDefinition>> modelObjectsMap;
 
-	public CollectRecord(Survey survey, ModelVersion version) {
-		super(survey, version);
+	public CollectRecord(Survey survey, ModelVersion modelVersion) {
+		super(survey, modelVersion);
 		this.step = Step.ENTRY;
 		this.submitted = false;
-		this.modelObjectsMap = new HashMap<Long, ModelObject<? extends ModelObjectDefinition>>();
+		this.modelObjectsMap = new HashMap<Long, ModelObject<? extends SchemaObjectDefinition>>();
 	}
 
 	public void setSubmitted(boolean submitted) {
@@ -45,7 +45,7 @@ public class CollectRecord extends DefaultRecord {
 		this.step = step;
 	}
 
-	public ModelObject<? extends ModelObjectDefinition> getModelObjectById(Long id) {
+	public ModelObject<? extends SchemaObjectDefinition> getModelObjectById(Long id) {
 		return this.modelObjectsMap.get(id);
 	}
 }
