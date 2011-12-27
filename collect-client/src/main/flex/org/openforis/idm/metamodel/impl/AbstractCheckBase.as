@@ -19,8 +19,8 @@ package org.openforis.idm.metamodel.impl {
     public class AbstractCheckBase implements IExternalizable, Check {
 
         private var _condition:String;
-        protected var _flag:Check$Flag;
-        protected var _messages:ListCollectionView;
+        private var _flag:Check$Flag;
+        private var _messages:ListCollectionView;
 
         [Bindable(event="unused")]
         public function get condition():String {
@@ -37,6 +37,18 @@ package org.openforis.idm.metamodel.impl {
             return _messages;
         }
 
+		public function set condition(value:String):void {
+			_condition = value;
+		}
+		
+		public function set flag(value:Check$Flag):void {
+			_flag = value;
+		}
+		
+		public function set messages(value:ListCollectionView):void {
+			_messages = value;
+		}
+		
         public function readExternal(input:IDataInput):void {
             _condition = input.readObject() as String;
             _flag = Enum.readEnum(input) as Check$Flag;
@@ -48,5 +60,9 @@ package org.openforis.idm.metamodel.impl {
             output.writeObject(_flag);
             output.writeObject(_messages);
         }
+
+		
+
+
     }
 }

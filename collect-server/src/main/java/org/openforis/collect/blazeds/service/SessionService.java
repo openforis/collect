@@ -12,9 +12,9 @@ import javax.xml.bind.Unmarshaller.Listener;
 
 import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.session.SessionState;
-import org.openforis.idm.metamodel.SurveyImpl;
-import org.openforis.idm.metamodel.SurveyUnmarshallerListener;
 import org.openforis.idm.metamodel.Survey;
+import org.openforis.idm.metamodel.SurveyUnmarshallerListener;
+import org.openforis.idm.metamodel.impl.SurveyImpl;
 import org.openforis.idm.util.XmlBindingUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.flex.remoting.RemotingInclude;

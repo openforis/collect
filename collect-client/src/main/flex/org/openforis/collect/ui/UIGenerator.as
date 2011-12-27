@@ -1,6 +1,7 @@
 package org.openforis.collect.ui {
 	import mx.core.Container;
 	
+	import org.openforis.collect.ui.component.datagroup.DataGroupItemRenderer;
 	import org.openforis.collect.ui.component.detail.EntityFormContainer;
 	import org.openforis.collect.ui.component.detail.FormContainer;
 	import org.openforis.collect.ui.component.detail.RootEntityFormContainer;
@@ -67,6 +68,17 @@ package org.openforis.collect.ui {
 				inputField.presenter.path = null; //TODO
 				form.addFormItem(attributeDescripor.label, inputField);
 			}
+		}
+		
+		private static function getEntityItemRenderer(entityDescriptor:*):DataGroupItemRenderer {
+			var itemRenderer:DataGroupItemRenderer = new DataGroupItemRenderer();
+			for each(var modelObjectDefinition:* in entityDescriptor.childDefinitions) {
+				//if model object is attribute
+				var attributeDescriptor:* = modelObjectDefinition;
+				var inputField:InputField = getInputField(attributeDescriptor);
+				itemRenderer.addElement(inputField);
+			}
+			return itemRenderer;
 		}
 		
 		//TODO

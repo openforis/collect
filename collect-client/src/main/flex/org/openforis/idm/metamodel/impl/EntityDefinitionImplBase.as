@@ -21,7 +21,7 @@ package org.openforis.idm.metamodel.impl {
         public function get childDefinitions():ListCollectionView {
             return _childDefinitions;
         }
-		public function set childDefinitions(value:ListCollectionView) {
+		public function set childDefinitions(value:ListCollectionView):void {
 			_childDefinitions = value;
 		}
 		

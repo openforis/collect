@@ -15,6 +15,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.idm.model.impl.EntityImpl;
 	import org.openforis.collect.ui.component.MasterView;
 	import org.openforis.idm.metamodel.Survey;
+	import org.openforis.idm.metamodel.impl.SchemaImpl;
 
 	public class MasterPresenter extends AbstractPresenter {
 		
@@ -30,11 +31,17 @@ package org.openforis.collect.presenter {
 			wait for surveys and sessionState loading, then dispatch APPLICATION_INITIALIZED event
 			if more than one survey is found, then whow surveySelection view
 			*/
+			
+			/*
+			
+			flow: loading -> surveySelection (optional) -> rootEntitySelection (optional) -> list -> edit
+			
+			*/
 		}
 		
 		override internal function initEventListeners():void{
 			eventDispatcher.addEventListener(ApplicationEvent.APPLICATION_INITIALIZED, applicationInitializedHandler);
-			eventDispatcher.addEventListener(ApplicationEvent.SCHEMA_LOADED, rootEntitiesLoadedHandler);
+			eventDispatcher.addEventListener(ApplicationEvent.SCHEMA_LOADED, schemaLoadedHandler);
 			eventDispatcher.addEventListener(UIEvent.SURVEY_SELECTED, surveySelectedHandler);
 			eventDispatcher.addEventListener(UIEvent.ROOT_ENTITY_SELECTED, rootEntitySelectedHandler);
 			eventDispatcher.addEventListener(UIEvent.NEW_RECORD_CREATED, newRecordCreatedHandler);
@@ -74,20 +81,24 @@ package org.openforis.collect.presenter {
 			var applicationEvent:ApplicationEvent = new ApplicationEvent(ApplicationEvent.SCHEMA_LOADED);
 			applicationEvent.result = Application.selectedSurvey.schema;
 			eventDispatcher.dispatchEvent(applicationEvent);
-			_view.currentState = "rootEntitySelection";
 		}
 		
-		protected function rootEntitiesLoadedHandler(event:ApplicationEvent):void {
-			var rootEntities:ArrayCollection = /*event.result as ArrayCollection;*/ null;
-			if(rootEntities != null && rootEntities.length > 0) {
-				if(rootEntities.length == 1) {
-					//TODO load records for the unique root entity
-					_view.currentState = "list";
+		protected function schemaLoadedHandler(event:ApplicationEvent):void {
+			var schema:SchemaImpl = event.result as SchemaImpl;
+			if(schema != null) {
+				var rootEntities:IList = schema.rootEntityDefinitions;
+				if(rootEntities != null && rootEntities.length > 0) {
+					if(rootEntities.length == 1) {
+						//TODO load records for the unique root entity
+						_view.currentState = "list";
+					} else {
+						_view.currentState = "rootEntitySelection";
+					}
 				} else {
-					_view.currentState = "rootEntitySelection";
+					//TODO error, no root entities found
 				}
 			} else {
-				//TODO error, no root entities found
+				//TODO error, schema not found
 			}
 		}
 		

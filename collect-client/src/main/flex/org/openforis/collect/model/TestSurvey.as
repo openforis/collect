@@ -61,6 +61,7 @@ package org.openforis.collect.model {
 			schemaImpl.rootEntityDefinitions.addItem(rootEntity);
 			
 			//RootEntity 2
+			/*
 			entityDefinition = new EntityDefinitionImpl();
 			entityDefinition.name = "RootEntity2";
 			
@@ -69,7 +70,7 @@ package org.openforis.collect.model {
 			rootEntity.definition = entityDefinition;
 			
 			schemaImpl.rootEntityDefinitions.addItem(rootEntity);
-			
+			*/
 			//end schema
 		}
 	}

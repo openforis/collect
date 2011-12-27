@@ -2,6 +2,7 @@
 @namespace s "library://ns.adobe.com/flex/spark";
 @namespace mx "library://ns.adobe.com/flex/mx";
 @namespace detail "org.openforis.collect.ui.component.detail.*";
+@namespace input "org.openforis.collect.ui.component.detail.input.*";
 
 /*
 detail|FormContainer {
@@ -14,4 +15,8 @@ detail|EntityFormContainer {
 */
 detail|MultipleEntityFormContainer {
 	skin-class: ClassReference("org.openforis.collect.ui.component.detail.skin.MultipleEntityFormContainerSkin");
+}
+
+input|RemarksPopUp {
+	skin-class: ClassReference("org.openforis.collect.ui.component.detail.skin.RemarksPopUpSkin");
 }

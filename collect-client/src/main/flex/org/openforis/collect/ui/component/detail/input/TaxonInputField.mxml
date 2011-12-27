@@ -7,20 +7,44 @@
 				  >
 	<fx:Script>
 		<![CDATA[
+			import mx.core.FlexGlobals;
+			import mx.core.UIComponent;
+			
 			import org.openforis.collect.ui.Images;
 			
+			import spark.components.Group;
+			
+			// Define a static variable.
+			private static var defaultStylesInited:Boolean = initDefaultStyles();
+			
+			// Define a static method.
+			private static function initDefaultStyles():Boolean {
+				if (!FlexGlobals.topLevelApplication.styleManager.getStyleDeclaration("org.openforis.collect.ui.component.detail.input.TaxonInputField"))
+				{
+					// If there is no CSS definition for StyledRectangle, 
+					// then create one and set the default value.
+					var myStyles:CSSStyleDeclaration = new CSSStyleDeclaration();
+					myStyles.defaultFactory = function():void
+					{
+						this.searchIconVisible = true;
+					}
+					FlexGlobals.topLevelApplication.styleManager.setStyleDeclaration("org.openforis.collect.ui.component.detail.input.TaxonInputField", myStyles, true);
+				}
+				return true;
+			}
 			
 			override protected function updateDisplayList(unscaledWidth:Number, unscaledHeight:Number):void {
 				super.updateDisplayList(unscaledWidth, unscaledHeight);
 				
 				var searchIconVisibleStyle:String = getStyle("searchIconVisible");
 				var searchIconVisible:Boolean = Boolean(searchIconVisibleStyle);
-
+				
+				//hide or show search icons
 				idSearchImg.includeInLayout = idSearchImg.visible = 
-				scientificNameSearchImg.includeInLayout = scientificNameSearchImg.visible =
-				vernacularNameSearchImg.includeInLayout = vernacularNameSearchImg.visible =
-				vernacularLangSearchImg.includeInLayout = vernacularLangSearchImg.visible =
-				searchIconVisible;
+					scientificNameSearchImg.includeInLayout = scientificNameSearchImg.visible =
+					vernacularNameSearchImg.includeInLayout = vernacularNameSearchImg.visible =
+					vernacularLangSearchImg.includeInLayout = vernacularLangSearchImg.visible =
+					searchIconVisible;
 			}
 		]]>
 	</fx:Script>

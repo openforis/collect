@@ -5,8 +5,14 @@ package org.openforis.collect.ui.component.datagrid
 	
 	import spark.components.DataGrid;
 	
+	/**
+	 * @author S. Ricci
+	 */
 	public class DataGrid extends spark.components.DataGrid
 	{
+		/**
+		 * list of items selected using checkboxes (see SelectRecordColumnHeaderRenderer and SelectRecordColumnItemRenderer) 
+		 */ 
 		[Bindable]
 		public var selectedByCheckBox:ArrayCollection = new ArrayCollection();
 		
