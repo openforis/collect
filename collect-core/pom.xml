@@ -135,7 +135,7 @@
 			<groupId>org.openforis.idm</groupId>
 			<artifactId>idm-api</artifactId>
 		</dependency>
-		
+
 		<!-- Apache commons -->
 		<dependency>
 			<groupId>commons-logging</groupId>
@@ -210,10 +210,22 @@
 		  <artifactId>jooq</artifactId>
 		  <version>2.0.1</version>
 		</dependency>
+		<!-- Spring dependencies -->
 		<dependency>
-		  <groupId>org.jooq</groupId>
-		  <artifactId>jooq-codegen-maven</artifactId>
-		  <version>2.0.1</version>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-jdbc</artifactId>
+			<version>3.0.6.RELEASE</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 

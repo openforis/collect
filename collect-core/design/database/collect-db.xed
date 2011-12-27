@@ -72,20 +72,26 @@
    <Constraint table="19" name="PK_survey" type="PrimKey">
       <ConstraintColumn id="20"></ConstraintColumn>
    </Constraint>
+   <Constraint table="19" name="UK_survey_name" type="Unique">
+      <ConstraintColumn id="21"></ConstraintColumn>
+   </Constraint>
+   <Constraint table="19" name="UK_survey_uri" type="Unique">
+      <ConstraintColumn id="22"></ConstraintColumn>
+   </Constraint>
    <Constraint table="24" name="PK_record" type="PrimKey">
       <ConstraintColumn id="25"></ConstraintColumn>
    </Constraint>
    <Sheet name="Untitled 1" id="37" disp_at="true" disp_ph="true" disp_co="true">
       <Place id="24" visible="true">195,415,210,130</Place>
-      <Place id="31" visible="true">500,0,0,0</Place>
-      <Place id="34" visible="true">500,0,0,0</Place>
-      <Place id="6" visible="true">883,392,190,230</Place>
-      <Place id="0" visible="true">498,188,200,110</Place>
-      <Place id="32" visible="true">500,0,0,0</Place>
       <Place id="33" visible="true" options="510.4099033025427,28.334718324070636,170.0,90.0,498.0,188.0,200.0,110.0,2,590.0,118.33471832407064,590.0,188.0">500,0,0,0</Place>
-      <Place id="19" visible="true">510,28,170,90</Place>
-      <Place id="35" visible="true" options="195.0,415.0,210.0,130.0,883.2761429532038,392.20693271404417,190.0,230.0,4,405.0,480.0,405.0,490.0,883.2761429532038,490.0,883.2761429532038,500.0">500,0,0,0</Place>
+      <Place id="31" visible="true">500,0,0,0</Place>
+      <Place id="6" visible="true">883,392,190,230</Place>
       <Place id="36" visible="true">500,0,0,0</Place>
+      <Place id="32" visible="true">500,0,0,0</Place>
+      <Place id="35" visible="true" options="195.0,415.0,210.0,130.0,883.2761429532038,392.20693271404417,190.0,230.0,4,405.0,480.0,405.0,490.0,883.2761429532038,490.0,883.2761429532038,500.0">500,0,0,0</Place>
+      <Place id="34" visible="true">500,0,0,0</Place>
+      <Place id="19" visible="true">510,28,170,90</Place>
+      <Place id="0" visible="true">498,188,200,110</Place>
    </Sheet>
    <Settings sheet="37" zoom="1.0"></Settings>
 </Diagram>
