@@ -9,8 +9,10 @@
 	<packaging>pom</packaging>
 
 	<modules>
-		<module>collect-server</module>
 		<module>collect-client</module>
+		<module>collect-core</module>
+		<module>collect-mobile</module>
+		<module>collect-server</module>
 		<module>collect-web</module>
 	</modules>
 
