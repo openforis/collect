@@ -5,6 +5,7 @@ package org.openforis.collect.manager;
 
 import java.util.List;
 
+import org.openforis.collect.blazeds.service.RecordListItem;
 import org.openforis.collect.exception.DuplicateIdException;
 import org.openforis.collect.exception.InvalidIdException;
 import org.openforis.collect.exception.MultipleEditException;
@@ -56,11 +57,11 @@ public class RecordManager {
 		// TODO Auto-generated method stub
 		return null;
 	}
-//
-//	public List<RecordListItem> getRecordsSummary() {
-//		// TODO
-//		return null;
-//	}
+
+	public List<RecordListItem> getRecordsSummary() {
+		// TODO
+		return null;
+	}
 
 	public Record create(String name, Survey survey, String rootEntityId) throws MultipleEditException, DuplicateIdException, InvalidIdException, DuplicateIdException, AccessDeniedException,
 			RecordLockedException {
