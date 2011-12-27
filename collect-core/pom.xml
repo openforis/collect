@@ -43,7 +43,7 @@
 			<groupId>org.openforis.idm</groupId>
 			<artifactId>idm-api</artifactId>
 		</dependency>
-		
+
 		<!-- Apache commons -->
 		<dependency>
 			<groupId>commons-logging</groupId>
@@ -112,6 +112,17 @@
 			<groupId>commons-dbcp</groupId>
 			<artifactId>commons-dbcp</artifactId>
 			<version>1.4</version>
+		</dependency>
+		<!-- Spring dependencies -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-webmvc</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-test</artifactId>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 
