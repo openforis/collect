@@ -6,10 +6,10 @@ import java.util.Date;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.User;
 import org.openforis.collect.session.SessionState;
-import org.openforis.collect.util.LogUtils;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -22,7 +22,7 @@ import flex.messaging.FlexContext;
  */
 public class SessionManager {
 
-	private static Log LOG = LogUtils.getLog(SessionManager.class);
+	private static Log LOG = LogFactory.getLog(SessionManager.class);
 
 	private static final String SESSION_STATE_SESSION_ATTRIBUTE_NAME = "sessionState";
 	// private static final String ACTIVE_RECORD_SESSION_ATTRIBUTE_NAME = "activeRecord";

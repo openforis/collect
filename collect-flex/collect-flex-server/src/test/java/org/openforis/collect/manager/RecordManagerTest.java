@@ -2,9 +2,6 @@ package org.openforis.collect.manager;
 
 import java.util.logging.Logger;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -24,8 +21,8 @@ public class RecordManagerTest {
 	
     private static Logger logger = Logger.getLogger(RecordManagerTest.class.getName());
     
-    @PersistenceContext
-    private EntityManager em;
+//    @PersistenceContext
+//    private EntityManager em;
     
     @BeforeClass
     public static void setUp() throws Exception {

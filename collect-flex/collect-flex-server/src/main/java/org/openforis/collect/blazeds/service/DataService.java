@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.openforis.collect.blazeds.service.UpdateRequest.Method;
+import org.openforis.collect.exception.AccessDeniedException;
 import org.openforis.collect.exception.DuplicateIdException;
 import org.openforis.collect.exception.InvalidIdException;
 import org.openforis.collect.exception.MultipleEditException;
@@ -16,13 +17,13 @@ import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.model.CollectAttribute;
 import org.openforis.collect.model.CollectRecord;
-import org.openforis.collect.util.VersioningUtils;
+import org.openforis.collect.model.RecordListItem;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeDefinition;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
-import org.openforis.idm.metamodel.SchemaObjectDefinition;
 import org.openforis.idm.metamodel.ModelVersion;
+import org.openforis.idm.metamodel.SchemaObjectDefinition;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Code;
@@ -31,7 +32,6 @@ import org.openforis.idm.model.Record;
 import org.openforis.idm.model.Value;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.flex.remoting.RemotingInclude;
-import org.springframework.security.access.AccessDeniedException;
 
 /**
  * @author M. Togna
@@ -153,9 +153,10 @@ public class DataService {
 		ModelVersion recordVersion = activeRecord.getVersion();
 		if (recordVersion != null) {
 			for (CodeListItem codeListItem : children) {
-				if (VersioningUtils.hasValidVersion(codeListItem, recordVersion)) {
-					items.add(codeListItem);
-				}
+				//TODO
+//				if (VersioningUtils.hasValidVersion(codeListItem, recordVersion)) {
+//					items.add(codeListItem);
+//				}
 			}
 		} else {
 			items.addAll(children);
