@@ -14,6 +14,7 @@
     http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd"
 	default-lazy-init="true">
 
+<!-- 
 	<bean id="persistenceUnitManager" class="org.springframework.orm.jpa.persistenceunit.DefaultPersistenceUnitManager">
 		<property name="persistenceXmlLocations">
 			<list>
@@ -22,11 +23,9 @@
 		</property>
 		<property name="dataSources">
 			<map>
-				<!-- <entry key="localDataSource" value-ref="local-db" /> -->
 				<entry key="testDataSource" value-ref="testDataSource" />
 			</map>
 		</property>
-		<!-- if no datasource is specified, use this one -->
 		<property name="defaultDataSource" ref="testDataSource" />
 	</bean>
 
@@ -34,6 +33,7 @@
 		<property name="persistenceUnitManager" ref="persistenceUnitManager" />
 		<property name="persistenceUnitName" value="collectPersistenceUnit" />
 	</bean>
+ -->
 
 	<!--
 		Ensure persistence.xml has no custom properties specified or Spring will generate the following misleading exception:
@@ -41,21 +41,30 @@
 	 -->
 	<bean id="testDataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
 		<property name="driverClassName" value="org.postgresql.Driver" />
-		<property name="url" value="jdbc:postgresql://localhost:5432/naforma" />
+		<property name="url" value="jdbc:postgresql://localhost:5432/collect" />
 		<property name="username" value="postgres" />
 		<property name="password" value="postgres" />
 	</bean>
 
 	<!-- enables interpretation of the @PersistenceUnit/@PersistenceContext 
 		annotations providing convenient access to EntityManagerFactory/EntityManager -->
+		<!-- 
 	<bean
 		class="org.springframework.orm.jpa.support.PersistenceAnnotationBeanPostProcessor" />
+		 -->
 
 	<!-- transaction manager for use with a single JPA EntityManagerFactory 
 		for transactional data access to a single datasource -->
+		<!-- 
 	<bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
 		<property name="entityManagerFactory" ref="entityManagerFactory" />
 	</bean>
+		 -->
+
+
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+    	<property name="dataSource" ref="testDataSource"/>
+    </bean>
 
 	<!-- enables interpretation of the @Transactional annotation for declerative transaction managment using the specified JpaTransactionManager -->
 	<tx:annotation-driven transaction-manager="transactionManager" proxy-target-class="false" />
