@@ -16,7 +16,7 @@
 
 	<properties>
 		<spring-security.version>3.0.5.RELEASE</spring-security.version>
-		<spring.version>3.0.4.RELEASE</spring.version>		
+		<spring.version>3.0.6.RELEASE</spring.version>		
 	</properties>
 	
 	<build>
