@@ -20,9 +20,28 @@
 			<url>http://download.osgeo.org/webdav/geotools/</url>
 		</repository>
 	</repositories>
-
 	<build>
 		<plugins>
+  <plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-dependency-plugin</artifactId>
+    <executions>
+      <execution>
+        <id>copy-dependencies</id>
+        <phase>package</phase>
+        <goals>
+          <goal>copy-dependencies</goal>
+        </goals>
+        <configuration>
+          <outputDirectory>${project.build.directory}/alternateLocation</outputDirectory>
+          <overWriteReleases>false</overWriteReleases>
+          <overWriteSnapshots>false</overWriteSnapshots>
+          <overWriteIfNewer>true</overWriteIfNewer>
+          <includeScope>compile</includeScope>
+        </configuration>
+      </execution>
+    </executions>
+  </plugin>
 			<!-- Additional configuration for Eclipse IDE -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -35,11 +54,11 @@
 				</configuration>
 			</plugin>
 			<!-- jOOQ code generator plugin -->
+			<!-- 
 			<plugin>
 				<groupId>org.jooq</groupId>
 				<artifactId>jooq-codegen-maven</artifactId>
 				<version>2.0.1</version>
-				<!-- The plugin should hook into the generate goal -->
 				<executions>
 					<execution>
 						<phase>generate-sources</phase>
@@ -48,7 +67,6 @@
 						</goals>
 					</execution>
 				</executions>
-				<!-- Manage the plugin's dependency. In this example, we'll use a Postgres  database -->
 				<dependencies>
 					<dependency>
 						<groupId>postgresql</groupId>
@@ -57,16 +75,13 @@
 					</dependency>
 				</dependencies>
 		
-				<!-- Specify the plugin configuration -->
 				<configuration>
-					<!-- JDBC connection parameters -->
 					<jdbc>
 						<driver>org.postgresql.Driver</driver>
 						<url>jdbc:postgresql://localhost:5432/collect</url>
 						<user>postgres</user>
 						<password>postgres</password>
 					</jdbc>
-					<!-- Generator parameters -->
 					<generator>
 						<name>org.jooq.util.DefaultGenerator</name>
 						<database>
@@ -93,6 +108,7 @@
 					</generator>
 				</configuration>
 			</plugin>
+			 -->
 		</plugins>
 		<pluginManagement>
 			<plugins>
