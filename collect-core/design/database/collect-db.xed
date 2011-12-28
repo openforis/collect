@@ -2,96 +2,89 @@
 <Diagram version="1.0" type="POSTGRES" versionMajor="9" versionMinor="0" groupSchema="false">
    <Table id="0" name="schema_definition" schema="collect" database="" background="16777165">
       <Column id="1" name="id" type="integer" length="25" nulls="false"/>
-      <Column id="2" name="name" type="varchar" length="255" nulls="false"/>
-      <Column id="3" name="survey_id" type="integer" length="25" nulls="false"/>
-      <Column id="4" name="parent_id" type="integer" length="25" nulls="true"/>
-      <Column id="5" name="preorder_idx" type="integer" length="25" nulls="false"/>
+      <Column id="2" name="survey_id" type="integer" length="25" nulls="false"/>
+      <Column id="3" name="path" type="varchar" length="255" nulls="false"/>
       <Storage name="TempTable" value="false"></Storage>
    </Table>
-   <Table id="6" name="data" schema="collect" database="" background="16777165">
-      <Column id="7" name="id" type="integer" length="25" nulls="false"/>
-      <Column id="8" name="record_id" type="integer" length="25" nulls="false"/>
-      <Column id="9" name="definition_id" type="integer" length="25" nulls="false"/>
-      <Column id="10" name="number1" type="float" length="25" nulls="true"/>
-      <Column id="11" name="number2" type="float" length="25" nulls="true"/>
-      <Column id="12" name="number3" type="float" length="25" nulls="true"/>
-      <Column id="13" name="text1" type="varchar" length="2048" nulls="true"/>
-      <Column id="14" name="remarks" type="varchar" length="2048" nulls="true"/>
-      <Column id="15" name="symbol" type="char" length="1" nulls="true"/>
-      <Column id="16" name="state" type="char" length="1" nulls="true"/>
-      <Column id="17" name="parent_id" type="integer" length="25" nulls="true"/>
-      <Column id="18" name="idx" type="integer" length="25" nulls="false"/>
+   <Table id="4" name="data" schema="collect" database="" background="16777165">
+      <Column id="5" name="id" type="integer" length="25" nulls="false"/>
+      <Column id="6" name="record_id" type="integer" length="25" nulls="false"/>
+      <Column id="7" name="definition_id" type="integer" length="25" nulls="false"/>
+      <Column id="8" name="number1" type="float" length="25" nulls="true"/>
+      <Column id="9" name="number2" type="float" length="25" nulls="true"/>
+      <Column id="10" name="number3" type="float" length="25" nulls="true"/>
+      <Column id="11" name="text1" type="varchar" length="2048" nulls="true"/>
+      <Column id="12" name="remarks" type="varchar" length="2048" nulls="true"/>
+      <Column id="13" name="symbol" type="char" length="1" nulls="true"/>
+      <Column id="14" name="state" type="char" length="1" nulls="true"/>
+      <Column id="15" name="parent_id" type="integer" length="25" nulls="true"/>
+      <Column id="16" name="idx" type="integer" length="25" nulls="false"/>
       <Storage name="TempTable" value="false"></Storage>
    </Table>
-   <Table id="19" name="survey" schema="collect" database="" background="16777165">
-      <Column id="20" name="id" type="integer" length="25" nulls="false"/>
-      <Column id="21" name="name" type="varchar" length="255" nulls="false"/>
-      <Column id="22" name="uri" type="varchar" length="255" nulls="true"/>
-      <Column id="23" name="idml" type="text" length="25" nulls="false"/>
+   <Table id="17" name="survey" schema="collect" database="" background="16777165">
+      <Column id="18" name="id" type="integer" length="25" nulls="false"/>
+      <Column id="19" name="name" type="varchar" length="255" nulls="false"/>
+      <Column id="20" name="uri" type="varchar" length="255" nulls="true"/>
+      <Column id="21" name="idml" type="text" length="25" nulls="false"/>
       <Storage name="TempTable" value="false"></Storage>
    </Table>
-   <Table id="24" name="record" schema="collect" database="" background="16777165">
-      <Column id="25" name="id" type="integer" length="25" nulls="false"/>
-      <Column id="26" name="root_entity_id" type="integer" length="25" nulls="false"/>
-      <Column id="27" name="date_created" type="timestamp" length="25" nulls="true"/>
-      <Column id="28" name="created_by" type="varchar" length="255" nulls="true"/>
-      <Column id="29" name="date_modified" type="timestamp" length="25" nulls="true"/>
-      <Column id="30" name="modified_by" type="varchar" length="255" nulls="true"/>
+   <Table id="22" name="record" schema="collect" database="" background="16777165">
+      <Column id="23" name="id" type="integer" length="25" nulls="false"/>
+      <Column id="24" name="root_entity_id" type="integer" length="25" nulls="false"/>
+      <Column id="25" name="date_created" type="timestamp" length="25" nulls="true"/>
+      <Column id="26" name="created_by" type="varchar" length="255" nulls="true"/>
+      <Column id="27" name="date_modified" type="timestamp" length="25" nulls="true"/>
+      <Column id="28" name="modified_by" type="varchar" length="255" nulls="true"/>
       <Storage name="TempTable" value="false"></Storage>
    </Table>
-   <Relation id="31" name="FK_data_schema_definition" cardinality="-2" identifying="false" nulls="false">
+   <Relation id="29" name="FK_data_schema_definition" cardinality="-2" identifying="false" nulls="false">
       <FK>1</FK>
-      <PK>9</PK>
+      <PK>7</PK>
    </Relation>
-   <Relation id="32" name="FK_data_parent" cardinality="-2" identifying="false" nulls="true">
-      <FK>7</FK>
-      <PK>17</PK>
+   <Relation id="30" name="FK_data_parent" cardinality="-2" identifying="false" nulls="true">
+      <FK>5</FK>
+      <PK>15</PK>
    </Relation>
-   <Relation id="33" name="FK_schema_definition_survey" cardinality="-2" identifying="false" nulls="false">
-      <FK>20</FK>
-      <PK>3</PK>
+   <Relation id="31" name="FK_schema_definition_survey" cardinality="-2" identifying="false" nulls="false">
+      <FK>18</FK>
+      <PK>2</PK>
    </Relation>
-   <Relation id="34" name="FK_record_root_entity" cardinality="-2" identifying="false" nulls="false">
+   <Relation id="32" name="FK_record_root_entity" cardinality="-2" identifying="false" nulls="false">
       <FK>1</FK>
-      <PK>26</PK>
+      <PK>24</PK>
    </Relation>
-   <Relation id="35" name="FK_data_record" cardinality="-2" identifying="false" nulls="false">
-      <FK>25</FK>
-      <PK>8</PK>
-   </Relation>
-   <Relation id="36" name="FK_schema_definition_parent" cardinality="-2" identifying="false" nulls="true">
-      <FK>1</FK>
-      <PK>4</PK>
+   <Relation id="33" name="FK_data_record" cardinality="-2" identifying="false" nulls="false">
+      <FK>23</FK>
+      <PK>6</PK>
    </Relation>
    <Constraint table="0" name="PK_schema_definition" type="PrimKey">
       <ConstraintColumn id="1"></ConstraintColumn>
    </Constraint>
-   <Constraint table="6" name="PK_data" type="PrimKey">
-      <ConstraintColumn id="7"></ConstraintColumn>
+   <Constraint table="4" name="PK_data" type="PrimKey">
+      <ConstraintColumn id="5"></ConstraintColumn>
    </Constraint>
-   <Constraint table="19" name="PK_survey" type="PrimKey">
+   <Constraint table="17" name="PK_survey" type="PrimKey">
+      <ConstraintColumn id="18"></ConstraintColumn>
+   </Constraint>
+   <Constraint table="17" name="UK_survey_name" type="Unique">
+      <ConstraintColumn id="19"></ConstraintColumn>
+   </Constraint>
+   <Constraint table="17" name="UK_survey_uri" type="Unique">
       <ConstraintColumn id="20"></ConstraintColumn>
    </Constraint>
-   <Constraint table="19" name="UK_survey_name" type="Unique">
-      <ConstraintColumn id="21"></ConstraintColumn>
+   <Constraint table="22" name="PK_record" type="PrimKey">
+      <ConstraintColumn id="23"></ConstraintColumn>
    </Constraint>
-   <Constraint table="19" name="UK_survey_uri" type="Unique">
-      <ConstraintColumn id="22"></ConstraintColumn>
-   </Constraint>
-   <Constraint table="24" name="PK_record" type="PrimKey">
-      <ConstraintColumn id="25"></ConstraintColumn>
-   </Constraint>
-   <Sheet name="Untitled 1" id="37" disp_at="true" disp_ph="true" disp_co="true">
-      <Place id="24" visible="true">195,415,210,130</Place>
-      <Place id="33" visible="true" options="510.4099033025427,28.334718324070636,170.0,90.0,498.0,188.0,200.0,110.0,2,590.0,118.33471832407064,590.0,188.0">500,0,0,0</Place>
-      <Place id="31" visible="true">500,0,0,0</Place>
-      <Place id="6" visible="true">883,392,190,230</Place>
-      <Place id="36" visible="true">500,0,0,0</Place>
+   <Sheet name="Untitled 1" id="34" disp_at="true" disp_ph="true" disp_co="true">
+      <Place id="31" visible="true" options="510.4099033025427,28.334718324070636,170.0,90.0,498.0,188.0,200.0,83.0,4,590.0,118.33471832407064,595.0,118.33471832407064,595.0,188.0,600.0,188.0">500,0,0,0</Place>
+      <Place id="33" visible="true" options="195.0,415.0,210.0,130.0,883.2761429532038,392.20693271404417,190.0,230.0,4,405.0,480.0,405.0,490.0,883.2761429532038,490.0,883.2761429532038,500.0">500,0,0,0</Place>
+      <Place id="30" visible="true">500,0,0,0</Place>
+      <Place id="17" visible="true">510,28,170,90</Place>
+      <Place id="29" visible="true">500,0,0,0</Place>
+      <Place id="4" visible="true">883,392,190,230</Place>
+      <Place id="22" visible="true">195,415,210,130</Place>
+      <Place id="0" visible="true">498,188,200,83</Place>
       <Place id="32" visible="true">500,0,0,0</Place>
-      <Place id="35" visible="true" options="195.0,415.0,210.0,130.0,883.2761429532038,392.20693271404417,190.0,230.0,4,405.0,480.0,405.0,490.0,883.2761429532038,490.0,883.2761429532038,500.0">500,0,0,0</Place>
-      <Place id="34" visible="true">500,0,0,0</Place>
-      <Place id="19" visible="true">510,28,170,90</Place>
-      <Place id="0" visible="true">498,188,200,110</Place>
    </Sheet>
-   <Settings sheet="37" zoom="1.0"></Settings>
+   <Settings sheet="34" zoom="1.0"></Settings>
 </Diagram>
