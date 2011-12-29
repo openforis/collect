@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:SkinnableContainer xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx"
+		 mouseDownOutside="mouseDownOutsideHandler(event)"
+		 focusEnabled="false"
+		>
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.events.FlexMouseEvent;
+			
+			import org.openforis.collect.event.TaxonInputFieldEvent;
+			
+			[Bindable]
+			public var dataProvider:Object;
+			
+					
+			protected function speciesDataGridDoubleClickHandler(event:MouseEvent=null):void {
+				if(speciesDataGrid.selectedItem!=null) {
+					selectItem(speciesDataGrid.selectedItem);
+				}
+			}
+			
+			protected function close():void {
+				var taxonEvent:TaxonInputFieldEvent = new TaxonInputFieldEvent(TaxonInputFieldEvent.TAXON_AUTOCOMPLETE_POPUP_CLOSE);
+				dispatchEvent(taxonEvent);
+			}
+			
+			protected function mouseDownOutsideHandler(event:FlexMouseEvent):void {
+				close();
+			}
+			
+			protected function speciesDataGridKeyDownHandler(event:KeyboardEvent):void {
+				if(event.keyCode == Keyboard.ENTER && speciesDataGrid.selectedItem!=null) {
+					selectItem(speciesDataGrid.selectedItem);
+				} else if(event.keyCode == Keyboard.ESCAPE) {
+					close();
+				}
+			}
+			
+			protected function selectItem(value:Object):void {
+				var taxonEvent:TaxonInputFieldEvent = new TaxonInputFieldEvent(TaxonInputFieldEvent.TAXON_SELECT);
+				taxonEvent.taxon = value;
+				dispatchEvent(taxonEvent);
+			}
+			
+
+		]]>
+	</fx:Script>
+	
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+
+	<fx:Metadata>
+		[Event(name="taxonAutocompletePopUpClose", type="org.openforis.collect.event.TaxonInputFieldEvent")] 
+		[Event(name="taxonSelect", type="org.openforis.collect.event.TaxonInputFieldEvent")] 
+	</fx:Metadata>
+	
+	<mx:DataGrid width="100%" 
+				 height="200"
+				 id="speciesDataGrid" 
+				 doubleClickEnabled="true" 
+				 doubleClick="speciesDataGridDoubleClickHandler(event)"
+				 keyDown="speciesDataGridKeyDownHandler(event)"
+				 selectable="true"
+				 dataProvider="{dataProvider}">
+		<mx:columns>
+			<mx:DataGridColumn headerText="Code" dataField="id" width="100" />
+			<mx:DataGridColumn editable="true" headerText="Scientific name" width="168" dataField="scientificName" />
+			<mx:DataGridColumn headerText="Vernacular name" width="168" dataField="vernacularName" />
+			<mx:DataGridColumn headerText="Language/dialect" width="100" dataField="vernacularLang" />
+		</mx:columns>
+	</mx:DataGrid>
+	
+</s:SkinnableContainer>

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:DataGroup xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			 xmlns:s="library://ns.adobe.com/flex/spark" 
+			 xmlns:mx="library://ns.adobe.com/flex/mx">
+	
+	<fx:Script>
+		<![CDATA[
+			[Bindable]
+			public var maxSpecified:int = 1;
+			[Bindable]
+			public var multiple:Boolean = false;
+			
+			internal function checkSelection(lastSelectedData:Object):void {
+				if(! multiple) {
+					for each(var data:Object in dataProvider) {
+						if(data != lastSelectedData) {
+							//reset selection
+							data.selected = false;
+						}
+					}
+				}
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<s:layout>
+		<s:VerticalLayout gap="1" paddingLeft="2"/>
+	</s:layout>
+	
+	<s:itemRenderer>
+		<fx:Component>
+			<s:ItemRenderer width="100%" autoDrawBackground="false">
+				<fx:Script>
+					<![CDATA[
+						
+						private function txtInputChangeHandler(event:Event):void {
+							
+						}
+						
+						private function checkBoxChangeHandler(event:Event):void {
+							data.selected = checkBox.selected;
+							
+							outerDocument.checkSelection(data);
+						}
+						
+					]]>
+				</fx:Script>
+				
+				<s:layout>
+					<s:HorizontalLayout verticalAlign="middle" horizontalAlign="left"
+										gap="0"
+										paddingBottom="0" paddingRight="0" paddingLeft="0" paddingTop="0" />
+				</s:layout>
+
+				<s:CheckBox id="checkBox" selected="{data.selected}" change="checkBoxChangeHandler(event)" label="{data.label}" />
+				
+				<mx:TextInput height="20" id="txtInput" visible="{data.qualifiable}" includeInLayout="{data.qualifiable}"
+							  text="{data.qualifier}"
+							  change="txtInputChangeHandler(event)"/>
+			</s:ItemRenderer>
+		</fx:Component>
+	</s:itemRenderer>
+	
+</s:DataGroup>
