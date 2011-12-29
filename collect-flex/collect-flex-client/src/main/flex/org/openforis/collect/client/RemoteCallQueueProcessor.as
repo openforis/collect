@@ -1,5 +1,5 @@
-package org.openforis.collect.client
-{
+package org.openforis.collect.client {
+	
 	import mx.rpc.AbstractOperation;
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.AsyncToken;
@@ -10,8 +10,6 @@ package org.openforis.collect.client
 	import org.openforis.collect.model.Queue;
 
 	/**
-	 * 
-	 * @author M. Togna
 	 * @author S. Ricci
 	 */
 	public class RemoteCallQueueProcessor {
@@ -20,18 +18,18 @@ package org.openforis.collect.client
 		private var _faultHandler:Function;
 		private var _maxAttempts:int;
 		
-		public function RemoteCallQueueProcessor(maxAttempts:int = 1, faultHandler:Function = null) {
+		public function RemoteCallQueueProcessor(maxAttempts:int = 3, faultHandler:Function = null) {
 			this._queue = new Queue();
 			this._maxAttempts = maxAttempts;
 			this._faultHandler = faultHandler;
-			_responder = new AsyncResponder(internalResultHandler, internalFaultHandler);
+			_responder = new AsyncResponder(responderResultHandler, responderFaultHandler);
 		}
 		
 		public function isEmpty():Boolean {
 			return this._queue.isEmpty();
 		}
 		
-		public function append(responder:IResponder, operation:AbstractOperation, ... args:Array):void {
+		public function appendOperation(responder:IResponder, operation:AbstractOperation, ... args:Array):void {
 			var queueItem:RemoteCallWrapper = new RemoteCallWrapper(responder, operation, args);
 			_queue.push(queueItem);
 			sendHeadRemoteCall();
@@ -48,13 +46,13 @@ package org.openforis.collect.client
 			}
 		}
 
-		protected function internalResultHandler(event:ResultEvent, token:Object = null):void {
+		protected function responderResultHandler(event:ResultEvent, token:Object = null):void {
 			var call:RemoteCallWrapper = RemoteCallWrapper(_queue.pop()); //removes the first element
 			call.reset();
 			sendHeadRemoteCall();
 		}
 		
-		protected function internalFaultHandler(event:FaultEvent, token:Object = null):void {
+		protected function responderFaultHandler(event:FaultEvent, token:Object = null):void {
 			//after it fails 3 times, the system has to be stopped.
 			var remoteCall:RemoteCallWrapper = getHeadElement();
 			if(remoteCall.attempts >= _maxAttempts){

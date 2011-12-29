@@ -10,7 +10,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.Application;
 	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.event.UIEvent;
-	import org.openforis.collect.ui.component.RootEntitySelectionView;
+	import org.openforis.collect.ui.view.RootEntitySelectionView;
 	import org.openforis.idm.metamodel.Schema;
 	
 	public class RootEntitySelectionPresenter extends AbstractPresenter {

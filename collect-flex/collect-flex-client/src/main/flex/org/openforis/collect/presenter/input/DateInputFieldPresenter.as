@@ -8,11 +8,11 @@ package org.openforis.collect.presenter.input {
 	import mx.events.FlexEvent;
 	
 	import org.openforis.collect.event.InputFieldEvent;
-	import org.openforis.collect.event.input.DateInputFieldEvent;
+	import org.openforis.collect.event.DateInputFieldEvent;
 	import org.openforis.collect.idm.model.impl.AbstractValue;
 	import org.openforis.collect.presenter.InputFieldPresenter;
-	import org.openforis.collect.ui.component.detail.input.DateInputField;
-	import org.openforis.collect.ui.component.detail.input.InputField;
+	import org.openforis.collect.ui.component.input.DateInputField;
+	import org.openforis.collect.ui.component.input.InputField;
 	import org.openforis.collect.util.StringUtil;
 	import org.openforis.collect.util.UIUtil;
 	

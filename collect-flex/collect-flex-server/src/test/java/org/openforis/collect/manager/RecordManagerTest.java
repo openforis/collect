@@ -13,10 +13,10 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.transaction.TransactionConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 
-@RunWith( SpringJUnit4ClassRunner.class )
-@ContextConfiguration( locations = {"classpath:test-context.xml"} )
-@TransactionConfiguration(transactionManager="transactionManager", defaultRollback=false)
-@Transactional
+//@RunWith( SpringJUnit4ClassRunner.class )
+//@ContextConfiguration( locations = {"classpath:test-context.xml"} )
+//@TransactionConfiguration(transactionManager="transactionManager", defaultRollback=false)
+//@Transactional
 public class RecordManagerTest {
 	
     private static Logger logger = Logger.getLogger(RecordManagerTest.class.getName());
@@ -24,7 +24,7 @@ public class RecordManagerTest {
 //    @PersistenceContext
 //    private EntityManager em;
     
-    @BeforeClass
+//    @BeforeClass
     public static void setUp() throws Exception {
 //        try {
 //            logger.info("Starting in-memory database for unit tests");
@@ -45,7 +45,7 @@ public class RecordManagerTest {
     }
 
 
-    @AfterClass
+//    @AfterClass
     public static void tearDown() throws Exception {
 //        logger.info("Shutting down Hibernate JPA layer.");
 //        if (em != null) {
@@ -66,7 +66,7 @@ public class RecordManagerTest {
 //        VFMemoryStorageFactory.purgeDatabase(new File("unit-testing-jpa").getCanonicalPath());
     }
     
-    @Test
+//    @Test
     public void testPersistence() {
         try {
 

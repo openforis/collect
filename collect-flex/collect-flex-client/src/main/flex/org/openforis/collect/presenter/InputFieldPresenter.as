@@ -8,7 +8,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.event.InputFieldEvent;
 	import org.openforis.collect.idm.model.impl.AbstractValue;
 	import org.openforis.collect.idm.model.impl.AbstractValue$Symbol;
-	import org.openforis.collect.ui.component.detail.input.InputField;
+	import org.openforis.collect.ui.component.input.InputField;
 	import org.openforis.collect.util.UIUtil;
 	
 	/**

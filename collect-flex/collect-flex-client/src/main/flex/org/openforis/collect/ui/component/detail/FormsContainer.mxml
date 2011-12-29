@@ -10,9 +10,9 @@
 			import mx.collections.ArrayCollection;
 			import mx.events.FlexEvent;
 			
-			import org.openforis.collect.ui.component.detail.input.DateInputField;
-			import org.openforis.collect.ui.component.detail.input.InputField;
-			import org.openforis.collect.ui.component.detail.input.MemoInputField;
+			import org.openforis.collect.ui.component.input.DateInputField;
+			import org.openforis.collect.ui.component.input.InputField;
+			import org.openforis.collect.ui.component.input.MemoInputField;
 			
 			private var _formVersions:ArrayCollection;
 			

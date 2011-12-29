@@ -1,6 +1,6 @@
 package org.openforis.collect.event
 {
-	import org.openforis.collect.ui.component.detail.input.InputField;
+	import org.openforis.collect.ui.component.input.InputField;
 
 	public class InputFieldEvent extends UIEvent
 	{

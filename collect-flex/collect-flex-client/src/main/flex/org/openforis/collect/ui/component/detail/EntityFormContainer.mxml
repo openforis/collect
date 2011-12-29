@@ -7,7 +7,7 @@
 	<fx:Script>
 		<![CDATA[
 			import org.openforis.collect.ui.Images;
-			import org.openforis.collect.ui.component.detail.input.InputField;
+			import org.openforis.collect.ui.component.input.InputField;
 			
 			import spark.components.FormItem;
 			private var _parentEntity:Object;			

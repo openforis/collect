@@ -12,8 +12,8 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.Application;
 	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.event.UIEvent;
-	import org.openforis.collect.ui.component.MasterView;
-	import org.openforis.collect.ui.component.SurveySelectionView;
+	import org.openforis.collect.ui.view.MasterView;
+	import org.openforis.collect.ui.view.SurveySelectionView;
 	import org.openforis.idm.metamodel.Survey;
 	import org.openforis.idm.metamodel.impl.SurveyImpl;
 	

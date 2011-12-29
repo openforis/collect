@@ -28,7 +28,7 @@ package org.openforis.collect.presenter {
 			super();
 		}
 		
-		override internal function initEventListeners():void{
+		override internal function initEventListeners():void {
 			//test data
 			var versions:ArrayCollection = new ArrayCollection([
 				{id: "1", label: "version 1"},

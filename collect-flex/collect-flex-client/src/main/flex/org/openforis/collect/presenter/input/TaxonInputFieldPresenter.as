@@ -14,14 +14,14 @@ package org.openforis.collect.presenter.input {
 	import mx.rpc.events.ResultEvent;
 	import mx.utils.StringUtil;
 	
-	import org.openforis.collect.event.input.TaxonInputFieldEvent;
+	import org.openforis.collect.event.TaxonInputFieldEvent;
 	import org.openforis.collect.idm.model.impl.AbstractValue;
 	import org.openforis.collect.idm.model.impl.Taxon;
 	import org.openforis.collect.presenter.InputFieldPresenter;
-	import org.openforis.collect.ui.component.detail.input.InputField;
-	import org.openforis.collect.ui.component.detail.input.TaxonAutoCompletePopUp;
-	import org.openforis.collect.ui.component.detail.input.TaxonInputField;
-	import org.openforis.collect.ui.component.detail.input.TaxonSearchPopUp;
+	import org.openforis.collect.ui.component.input.InputField;
+	import org.openforis.collect.ui.component.input.TaxonAutoCompletePopUp;
+	import org.openforis.collect.ui.component.input.TaxonInputField;
+	import org.openforis.collect.ui.component.input.TaxonSearchPopUp;
 	import org.openforis.collect.util.PopUpUtil;
 	
 	/**

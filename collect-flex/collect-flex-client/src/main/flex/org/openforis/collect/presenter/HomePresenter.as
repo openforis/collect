@@ -9,7 +9,7 @@ package org.openforis.collect.presenter {
 	
 	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.event.UIEvent;
-	import org.openforis.collect.ui.component.HomeView;
+	import org.openforis.collect.ui.view.HomeView;
 
 	public class HomePresenter extends AbstractPresenter {
 		
