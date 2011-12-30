@@ -1,18 +1,16 @@
 package org.openforis.collect.model;
 
-import org.openforis.idm.model.DefaultEntity;
+import org.openforis.idm.metamodel.EntityDefinition;
+import org.openforis.idm.model.Entity;
 
 /**
  * @author G. Miceli
  */
-public class CollectEntity extends DefaultEntity {
-	private Long id;
+public class CollectEntity extends Entity {
 
-	public Long getId() {
-		return id;
+	public CollectEntity(EntityDefinition definition) {
+		super(definition);
+		// TODO Auto-generated constructor stub
 	}
 
-	public void setId(Long id) {
-		this.id = id;
-	}
 }

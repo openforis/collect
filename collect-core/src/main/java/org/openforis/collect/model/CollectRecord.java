@@ -1,29 +1,44 @@
 package org.openforis.collect.model;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.openforis.idm.metamodel.SchemaObjectDefinition;
-import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.Survey;
-import org.openforis.idm.model.DefaultRecord;
 import org.openforis.idm.model.ModelObject;
+import org.openforis.idm.model.Record;
 
 /**
  * @author G. Miceli
  */
-public class CollectRecord extends DefaultRecord {
+public class CollectRecord extends Record {
 
 	public enum Step {
-		ENTRY, CLEANSING, ANALYSIS
+		ENTRY(1), CLEANSING(2), ANALYSIS(3);
+		
+		private int stepNumber;
+		
+		private Step(int stepNumber) {
+			this.stepNumber = stepNumber;
+		}
+		
+		public int getStepNumber() {
+			return stepNumber;
+		}
 	}
 
 	private Step step;
+	// TODO Replace submitted with state enum
 	private boolean submitted;
 	private Map<Long, ModelObject<? extends SchemaObjectDefinition>> modelObjectsMap;
+	private Date creationDate;
+	private String createdBy;
+	private Date modifiedDate;
+	private String modifiedBy;
 
-	public CollectRecord(Survey survey, ModelVersion modelVersion) {
-		super(survey, modelVersion);
+	public CollectRecord(Survey survey, String rootEntity, String versionName) {
+		super(survey, rootEntity, versionName);
 		this.step = Step.ENTRY;
 		this.submitted = false;
 		this.modelObjectsMap = new HashMap<Long, ModelObject<? extends SchemaObjectDefinition>>();
@@ -47,5 +62,37 @@ public class CollectRecord extends DefaultRecord {
 
 	public ModelObject<? extends SchemaObjectDefinition> getModelObjectById(Long id) {
 		return this.modelObjectsMap.get(id);
+	}
+
+	public Date getCreationDate() {
+		return this.creationDate;
+	}
+
+	public void setCreationDate(Date creationDate) {
+		this.creationDate = creationDate;
+	}
+
+	public String getCreatedBy() {
+		return this.createdBy;
+	}
+
+	public void setCreatedBy(String createdBy) {
+		this.createdBy = createdBy;
+	}
+
+	public Date getModifiedDate() {
+		return this.modifiedDate;
+	}
+
+	public void setModifiedDate(Date modifiedDate) {
+		this.modifiedDate = modifiedDate;
+	}
+
+	public String getModifiedBy() {
+		return this.modifiedBy;
+	}
+
+	public void setModifiedBy(String modifiedBy) {
+		this.modifiedBy = modifiedBy;
 	}
 }
