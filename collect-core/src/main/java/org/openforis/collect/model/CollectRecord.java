@@ -4,15 +4,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.openforis.idm.metamodel.SchemaObjectDefinition;
-import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.Survey;
-import org.openforis.idm.model.DefaultRecord;
 import org.openforis.idm.model.ModelObject;
+import org.openforis.idm.model.Record;
 
 /**
  * @author G. Miceli
  */
-public class CollectRecord extends DefaultRecord {
+public class CollectRecord extends Record {
 
 	public enum Step {
 		ENTRY, CLEANSING, ANALYSIS
@@ -22,8 +21,8 @@ public class CollectRecord extends DefaultRecord {
 	private boolean submitted;
 	private Map<Long, ModelObject<? extends SchemaObjectDefinition>> modelObjectsMap;
 
-	public CollectRecord(Survey survey, ModelVersion modelVersion) {
-		super(survey, modelVersion);
+	public CollectRecord(Survey survey, String rootEntityName, String version) {
+		super(survey, rootEntityName, version);
 		this.step = Step.ENTRY;
 		this.submitted = false;
 		this.modelObjectsMap = new HashMap<Long, ModelObject<? extends SchemaObjectDefinition>>();

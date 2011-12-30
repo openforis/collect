@@ -1,24 +1,18 @@
 package org.openforis.collect.model;
 
 import org.openforis.idm.metamodel.AttributeDefinition;
-import org.openforis.idm.model.DefaultAttribute;
-import org.openforis.idm.model.Value;
+import org.openforis.idm.model.Attribute;
 
 /**
  * @author G. Miceli
  */
-public class CollectAttribute<D extends AttributeDefinition, V extends Value> extends DefaultAttribute<D, V> {
-	private Long id;
+public class CollectAttribute<D extends AttributeDefinition, V> extends Attribute<D, V> {
 	private Character symbol;
 	private String remarks;
 	private boolean accepted;
-	
-	public Long getId() {
-		return id;
-	}
 
-	public void setId(Long id) {
-		this.id = id;
+	public CollectAttribute(D definition) {
+		super(definition);
 	}
 
 	public Character getSymbol() {
