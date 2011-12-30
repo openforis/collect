@@ -36,27 +36,28 @@
       <Column id="27" name="created_by" type="varchar" length="255" nulls="true"/>
       <Column id="28" name="date_modified" type="timestamp" length="25" nulls="true"/>
       <Column id="29" name="modified_by" type="varchar" length="255" nulls="true"/>
-      <Column id="30" name="step" type="integer" length="25" nulls="true"/>
-      <Column id="31" name="state" type="char" length="1" nulls="true"/>
+      <Column id="30" name="model_version" type="varchar" length="255" nulls="false"/>
+      <Column id="31" name="step" type="integer" length="25" nulls="true"/>
+      <Column id="32" name="state" type="char" length="1" nulls="true"/>
       <Storage name="TempTable" value="false"></Storage>
    </Table>
-   <Relation id="32" name="FK_data_schema_definition" cardinality="-2" identifying="false" nulls="false">
+   <Relation id="33" name="FK_data_schema_definition" cardinality="-2" identifying="false" nulls="false">
       <FK>1</FK>
       <PK>7</PK>
    </Relation>
-   <Relation id="33" name="FK_data_parent" cardinality="-2" identifying="false" nulls="true">
+   <Relation id="34" name="FK_data_parent" cardinality="-2" identifying="false" nulls="true">
       <FK>5</FK>
       <PK>16</PK>
    </Relation>
-   <Relation id="34" name="FK_schema_definition_survey" cardinality="-2" identifying="false" nulls="false">
+   <Relation id="35" name="FK_schema_definition_survey" cardinality="-2" identifying="false" nulls="false">
       <FK>19</FK>
       <PK>2</PK>
    </Relation>
-   <Relation id="35" name="FK_record_root_entity" cardinality="-2" identifying="false" nulls="false">
+   <Relation id="36" name="FK_record_root_entity" cardinality="-2" identifying="false" nulls="false">
       <FK>1</FK>
       <PK>25</PK>
    </Relation>
-   <Relation id="36" name="FK_data_record" cardinality="-2" identifying="false" nulls="false">
+   <Relation id="37" name="FK_data_record" cardinality="-2" identifying="false" nulls="false">
       <FK>24</FK>
       <PK>6</PK>
    </Relation>
@@ -78,16 +79,16 @@
    <Constraint table="23" name="PK_record" type="PrimKey">
       <ConstraintColumn id="24"></ConstraintColumn>
    </Constraint>
-   <Sheet name="Untitled 1" id="37" disp_at="true" disp_ph="true" disp_co="true">
-      <Place id="35" visible="true">500,0,0,0</Place>
-      <Place id="33" visible="true">500,0,0,0</Place>
+   <Sheet name="Untitled 1" id="38" disp_at="true" disp_ph="true" disp_co="true">
+      <Place id="23" visible="true">195,415,220,180</Place>
+      <Place id="37" visible="true" options="195.0,415.0,220.0,180.0,883.0,392.0,190.0,259.0,5,415.0,490.0,410.0,490.0,410.0,495.0,883.2761429532038,495.0,883.2761429532038,490.0">500,0,0,0</Place>
       <Place id="0" visible="true">498,188,200,83</Place>
-      <Place id="34" visible="true" options="510.4099033025427,28.334718324070636,170.0,90.0,498.0,188.0,200.0,83.0,4,590.0,118.33471832407064,595.0,118.33471832407064,595.0,188.0,600.0,188.0">500,0,0,0</Place>
-      <Place id="32" visible="true">500,0,0,0</Place>
-      <Place id="36" visible="true" options="195.0,415.0,210.0,160.0,883.0,392.0,190.0,259.0,2,405.0,490.0,883.2761429532038,490.0">500,0,0,0</Place>
-      <Place id="23" visible="true">195,415,210,160</Place>
-      <Place id="18" visible="true">510,28,170,90</Place>
       <Place id="4" visible="true">883,392,190,259</Place>
+      <Place id="35" visible="true" options="510.4099033025427,28.334718324070636,170.0,90.0,498.0,188.0,200.0,83.0,4,590.0,118.33471832407064,595.0,118.33471832407064,595.0,188.0,600.0,188.0">500,0,0,0</Place>
+      <Place id="36" visible="true">500,0,0,0</Place>
+      <Place id="18" visible="true">510,28,170,90</Place>
+      <Place id="33" visible="true">500,0,0,0</Place>
+      <Place id="34" visible="true">500,0,0,0</Place>
    </Sheet>
-   <Settings sheet="37" zoom="1.0"></Settings>
+   <Settings sheet="38" zoom="1.0"></Settings>
 </Diagram>

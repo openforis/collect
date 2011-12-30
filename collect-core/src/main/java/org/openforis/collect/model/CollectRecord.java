@@ -31,7 +31,7 @@ public class CollectRecord extends Record {
 	private Step step;
 	// TODO Replace submitted with state enum
 	private boolean submitted;
-	private Map<Long, ModelObject<? extends SchemaObjectDefinition>> modelObjectsMap;
+	private Map<Integer, ModelObject<? extends SchemaObjectDefinition>> modelObjectsById;
 	private Date creationDate;
 	private String createdBy;
 	private Date modifiedDate;
@@ -41,7 +41,7 @@ public class CollectRecord extends Record {
 		super(survey, rootEntity, versionName);
 		this.step = Step.ENTRY;
 		this.submitted = false;
-		this.modelObjectsMap = new HashMap<Long, ModelObject<? extends SchemaObjectDefinition>>();
+		this.modelObjectsById = new HashMap<Integer, ModelObject<? extends SchemaObjectDefinition>>();
 	}
 
 	public void setSubmitted(boolean submitted) {
@@ -60,8 +60,8 @@ public class CollectRecord extends Record {
 		this.step = step;
 	}
 
-	public ModelObject<? extends SchemaObjectDefinition> getModelObjectById(Long id) {
-		return this.modelObjectsMap.get(id);
+	public ModelObject<? extends SchemaObjectDefinition> getModelObjectById(int id) {
+		return this.modelObjectsById.get(id);
 	}
 
 	public Date getCreationDate() {
