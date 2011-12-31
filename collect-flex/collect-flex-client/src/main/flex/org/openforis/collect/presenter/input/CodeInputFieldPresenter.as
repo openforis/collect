@@ -12,15 +12,15 @@ package org.openforis.collect.presenter.input {
 	import mx.rpc.events.ResultEvent;
 	import mx.utils.StringUtil;
 	
-	import org.openforis.collect.event.input.CodeInputFieldEvent;
+	import org.openforis.collect.event.CodeInputFieldEvent;
 	import org.openforis.collect.i18n.Message;
 	import org.openforis.collect.idm.model.impl.AbstractValue;
 	import org.openforis.collect.presenter.InputFieldPresenter;
-	import org.openforis.collect.ui.component.detail.input.CodeInputField;
-	import org.openforis.collect.ui.component.detail.input.CodeListDialog;
-	import org.openforis.collect.ui.component.detail.input.CodeListItem;
-	import org.openforis.collect.ui.component.detail.input.DateInputField;
-	import org.openforis.collect.ui.component.detail.input.InputField;
+	import org.openforis.collect.ui.component.input.CodeInputField;
+	import org.openforis.collect.ui.component.input.CodeListDialog;
+	import org.openforis.collect.ui.component.input.CodeListItem;
+	import org.openforis.collect.ui.component.input.DateInputField;
+	import org.openforis.collect.ui.component.input.InputField;
 	
 	/**
 	 * 

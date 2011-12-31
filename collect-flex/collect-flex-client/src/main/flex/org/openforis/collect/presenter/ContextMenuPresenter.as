@@ -13,7 +13,7 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.model.Phase;
 	import org.openforis.collect.presenter.input.RemarksPopUpPresenter;
 	import org.openforis.collect.ui.component.datagroup.DataGroupItemRenderer;
-	import org.openforis.collect.ui.component.detail.input.InputField;
+	import org.openforis.collect.ui.component.input.InputField;
 	import org.openforis.collect.util.ArrayUtil;
 	import org.openforis.collect.util.PopUpUtil;
 

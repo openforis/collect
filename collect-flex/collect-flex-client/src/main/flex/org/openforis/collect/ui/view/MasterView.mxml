@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx"
+		 creationComplete="creationCompleteHandler(event)"
+		 width="100%" height="100%" xmlns:component="org.openforis.collect.ui.component.*" xmlns:view="org.openforis.collect.ui.view.*"
+		 >
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.events.FlexEvent;
+			
+			import org.openforis.collect.i18n.Message;
+			import org.openforis.collect.presenter.MasterPresenter;
+			
+			private var _masterPresenter:MasterPresenter;
+			
+			protected function creationCompleteHandler(event:FlexEvent):void {
+				this._masterPresenter = new MasterPresenter(this); 
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	
+	<s:layout>
+		<s:VerticalLayout horizontalAlign="center" />
+	</s:layout>
+	
+	<s:states>
+		<s:State name="loading" />
+		<s:State name="home" />
+		<s:State name="surveySelection" />
+		<s:State name="rootEntitySelection" />
+		<s:State name="list" />
+		<s:State name="detail" />
+	</s:states>
+	
+	<!-- use view stack instead of includeIn to start rendering immediately the components -->
+	<!--WHAT DOES that mean??? USE: itemCreationPolicy="immediate" -->
+	<mx:ViewStack width="100%" height="100%" 
+				  selectedIndex.loading="0"
+				  selectedIndex.home="1" 
+				  selectedIndex.surveySelection="2" 
+				  selectedIndex.rootEntitySelection="3"
+				  selectedIndex.list="4" 
+				  selectedIndex.detail="5"
+				  creationPolicy="all">
+		<s:NavigatorContent width="100%" height="100%">
+			<s:layout>
+				<s:VerticalLayout horizontalAlign="center" verticalAlign="middle" />
+			</s:layout>
+			<s:Label text="{Message.get('master.loading')}" />
+		</s:NavigatorContent>
+<!--		<s:NavigatorContent width="100%" height="100%">
+			<component:HomeView id="homeView" width="100%" height="100%" />
+		</s:NavigatorContent>
+		<s:NavigatorContent width="100%" height="100%">
+			<component:SurveySelectionView id="surveySelectionView" width="100%" height="100%" />
+		</s:NavigatorContent>
+		<s:NavigatorContent width="100%" height="100%">
+			<component:RootEntitySelectionView id="rootEntitySelectionView" width="100%" height="100%" />
+		</s:NavigatorContent>-->
+		<s:NavigatorContent width="100%" height="100%">
+			<view:ListView id="listView" width="100%" height="100%" />
+		</s:NavigatorContent>	
+		<s:NavigatorContent width="100%" height="100%">
+			<view:DetailView id="detailView" width="100%" height="100%"/>
+		</s:NavigatorContent>
+	</mx:ViewStack>
+		
+	
+</s:Group>

@@ -4,6 +4,7 @@ package org.openforis.collect.client {
 	import mx.rpc.IResponder;
 
 	/**
+	 * @author M. Togna
 	 * @author S. Ricci
 	 **/
 	public class RemoteCallWrapper {

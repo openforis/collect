@@ -51,7 +51,7 @@ public class CollectRecord extends Record {
 	public boolean isSubmitted() {
 		return submitted;
 	}
-
+	
 	public Step getStep() {
 		return step;
 	}
@@ -96,3 +96,4 @@ public class CollectRecord extends Record {
 		this.modifiedBy = modifiedBy;
 	}
 }
+

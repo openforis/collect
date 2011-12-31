@@ -3,6 +3,7 @@
 @namespace mx "library://ns.adobe.com/flex/mx";
 @namespace detail "org.openforis.collect.ui.component.detail.*";
 @namespace input "org.openforis.collect.ui.component.detail.input.*";
+@namespace input1 "org.openforis.collect.ui.component.input.*";
 
 /*
 detail|FormContainer {
@@ -14,9 +15,9 @@ detail|EntityFormContainer {
 }
 */
 detail|MultipleEntityFormContainer {
-	skin-class: ClassReference("org.openforis.collect.ui.component.detail.skin.MultipleEntityFormContainerSkin");
+	skin-class: ClassReference("org.openforis.collect.ui.skin.MultipleEntityFormContainerSkin");
 }
 
-input|RemarksPopUp {
-	skin-class: ClassReference("org.openforis.collect.ui.component.detail.skin.RemarksPopUpSkin");
+input1|RemarksPopUp {
+	skin-class: ClassReference("org.openforis.collect.ui.skin.RemarksPopUpSkin");
 }

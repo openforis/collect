@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<input1:InputField xmlns:fx="http://ns.adobe.com/mxml/2009" 
+				  xmlns:s="library://ns.adobe.com/flex/spark" 
+				  xmlns:mx="library://ns.adobe.com/flex/mx" 
+				  xmlns:input="org.openforis.collect.ui.component.detail.input.*"
+				  presenterClass="org.openforis.collect.presenter.input.CodeInputFieldPresenter" xmlns:input1="org.openforis.collect.ui.component.input.*"
+				  >
+	<fx:Script>
+		<![CDATA[
+			import org.openforis.collect.ui.Images;
+			
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	
+	<input:states>
+		<s:State name="default" />
+		<s:State name="descriptionVisible" />
+	</input:states>
+	
+	<s:HGroup width="100%">
+		<input1:TextInput id="textInput" focusOut="focusOutEventHandler(event)" width="100%" height="100%" />
+		
+		<s:Image id="openImage" source="{Images.EDIT}" useHandCursor="true" buttonMode="true" />
+		
+		<s:Label id="descriptionLabel" includeIn="descriptionVisible" />
+	</s:HGroup>
+	
+</input1:InputField>

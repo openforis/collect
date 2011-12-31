@@ -7,14 +7,13 @@ import org.openforis.idm.model.Attribute;
  * @author G. Miceli
  */
 public class CollectAttribute<D extends AttributeDefinition, V> extends Attribute<D, V> {
-	public CollectAttribute(D definition) {
-		super(definition);
-		// TODO Auto-generated constructor stub
-	}
-
 	private Character symbol;
 	private String remarks;
 	private boolean accepted;
+
+	public CollectAttribute(D definition) {
+		super(definition);
+	}
 
 	public Character getSymbol() {
 		return symbol;

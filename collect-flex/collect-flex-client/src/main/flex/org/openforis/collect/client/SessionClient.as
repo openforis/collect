@@ -43,7 +43,7 @@ package org.openforis.collect.client {
 			token.addResponder(responder);
 			*/
 			
-			remoteCallQueueProcessor.append(responder, this._testGetValueOperation);
+			remoteCallQueueProcessor.appendOperation(responder, this._testGetValueOperation);
 		}
 		
 	}

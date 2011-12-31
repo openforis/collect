@@ -6,8 +6,8 @@ package org.openforis.collect.presenter.input {
 	
 	import org.openforis.collect.idm.model.impl.AbstractValue;
 	import org.openforis.collect.presenter.InputFieldPresenter;
-	import org.openforis.collect.ui.component.detail.input.CoordinateInputField;
-	import org.openforis.collect.ui.component.detail.input.InputField;
+	import org.openforis.collect.ui.component.input.CoordinateInputField;
+	import org.openforis.collect.ui.component.input.InputField;
 	
 	/**
 	 * 

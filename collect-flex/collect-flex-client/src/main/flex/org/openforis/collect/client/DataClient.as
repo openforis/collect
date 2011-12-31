@@ -32,7 +32,7 @@ package org.openforis.collect.client {
 		}
 		
 		public function update(responder:IResponder, request:UpdateRequest):void {
-			this._updateQueueProcessor.append(responder, this._updateOperation, request);
+			this._updateQueueProcessor.appendOperation(responder, this._updateOperation, request);
 			/*
 			var token:AsyncToken = this._updateOperation.send(request);
 			token.addResponder(responder);

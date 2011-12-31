@@ -18,19 +18,7 @@ package org.openforis.collect.ui {
 		//[Embed("/assets/images/edit.gif")]
 		[Embed("/assets/images/popup.gif")]
 		public static const EDIT:Class;
-		
-		[Embed("/assets/images/page_edit.png")]
-		public static const PAGE_EDIT:Class;
-		
-		[Embed("/assets/images/expand.gif")]
-		public static const EXPAND:Class;
-		
-		[Embed("/assets/images/collapse.gif")]
-		public static const COLLAPSE:Class;
-		
-		[Embed("/assets/images/chart_line.png")]
-		public static const CHART_LINE:Class;
-		
+
 		[Embed("/assets/images/magnifier.png")]
 		public static const MAGNIFIER:Class;
 		

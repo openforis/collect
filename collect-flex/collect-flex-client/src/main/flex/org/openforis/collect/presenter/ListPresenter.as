@@ -19,7 +19,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.client.DataClient;
 	import org.openforis.collect.event.UIEvent;
-	import org.openforis.collect.ui.component.ListView;
+	import org.openforis.collect.ui.view.ListView;
 	import org.openforis.collect.ui.component.AddNewRecordPopUp;
 
 	public class ListPresenter extends AbstractPresenter {

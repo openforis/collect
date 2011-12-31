@@ -3,7 +3,7 @@ package org.openforis.collect.ui.component.detail
 	import mx.binding.utils.BindingUtils;
 	import mx.collections.ArrayCollection;
 	
-	import org.openforis.collect.ui.component.detail.input.InputField;
+	import org.openforis.collect.ui.component.input.InputField;
 	
 	import spark.components.DropDownList;
 	import spark.components.FormItem;
