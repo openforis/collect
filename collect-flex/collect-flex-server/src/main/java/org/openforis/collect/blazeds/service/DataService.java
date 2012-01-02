@@ -53,7 +53,7 @@ public class DataService {
 
 	@RemotingInclude
 	public List<RecordListItem> getRecordsSummary() {
-		List<RecordListItem> list = recordManager.getRecordsSummary();
+		List<RecordListItem> list = recordManager.getSummaries();
 		return list;
 	}
 
