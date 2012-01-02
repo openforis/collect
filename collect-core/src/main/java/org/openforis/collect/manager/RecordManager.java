@@ -58,8 +58,8 @@ public class RecordManager {
 		return null;
 	}
 
-	public List<RecordListItem> getRecordsSummary() {
-		// TODO
+	public List<RecordListItem> getSummaries() {
+		// TODO implement getRecordSummaries
 		return null;
 	}
 

@@ -10,22 +10,21 @@ import org.openforis.idm.model.ModelObject;
 /**
  * @author G. Miceli
  */
-public class EntityRowMapper implements ModelObjectTypeMapper {
+class EntityRowMapper extends ModelObjectMapper {
 
 	@Override
-	public Class<?> getMappedClass() {
+	Class<? extends SchemaObjectDefinition> getMappedClass() {
 		return EntityDefinition.class;
 	}
 
 	@Override
-	public void setInsertFields(ModelObject<?> obj, InsertSetStep<?> insert) {
+	void setInsertFields(ModelObject<?> obj, InsertSetStep<?> insert) {
 		// NOOP
 	}
 
 	@Override
-	public Entity addObject(SchemaObjectDefinition defn, Record r, Entity parent) {
+	Entity addObject(SchemaObjectDefinition defn, Record r, Entity parent) {
 		String name = defn.getName();
-		Entity entity = parent.addEntity(name);
-		return entity;
+		return parent.addEntity(name);
 	}
 }

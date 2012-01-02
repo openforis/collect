@@ -7,6 +7,7 @@ import java.util.GregorianCalendar;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import static org.junit.Assert.*;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openforis.collect.model.CollectRecord;
@@ -36,27 +37,45 @@ public class DAOIntegrationTest {
 	protected RecordDAO recordDao;
 	
 	@Test
-	public void testCRUD() throws SurveyNotFoundException, IOException, SurveyImportException, DataInconsistencyException  {
-		// IMPORT MODEL
-		Survey survey = importModel();
+	public void testCRUD() throws IOException, SurveyImportException, DataInconsistencyException  {
+		// LOAD MODEL
+		Survey survey = surveyDao.load("archenland1");
 		
-		// CREATE
+		// IMPORT MODEL
+//		Survey survey = importModel();
+		
+		// SAVE NEW
 		CollectRecord record = createRecord(survey);
 		recordDao.saveOrUpdate(record);
 		
-		// READ
-		record = recordDao.load(survey, record.getId());
+		String saved = record.toString();
+		log.debug("Saving record:\n"+saved);
 		
-		updateRecord(record);
+		// RELOAD
+		record = recordDao.load(survey, record.getId());
+		String reloaded = record.toString();
+		log.debug("Reloaded as:\n"+reloaded);
+		
+		assertEquals(saved, reloaded);
+		
+		// UPDATE
+//		updateRecord(record);
 		
 //		assertEquals(1, cluster.getCount("time_study"));
 
-		recordDao.saveOrUpdate(record);
+//		recordDao.saveOrUpdate(record);
 	}
 	
-	@Test(expected=SurveyNotFoundException.class)
-	public void testSurveyNotFound() throws SurveyNotFoundException  {
-		surveyDao.load(-100);
+	@Test
+	public void testSurveyNotFoundById() {		
+		Survey survey = surveyDao.load(-100);
+		assertNull(survey);
+	}
+	
+	@Test
+	public void testSurveyNotFoundByName() {		
+		Survey survey = surveyDao.load("!!!!!!");
+		assertNull(survey);
 	}
 
 	private Survey importModel() throws IOException, SurveyImportException {
@@ -91,20 +110,20 @@ public class DAOIntegrationTest {
 			plot.addValue("no", new NumericCode(1));
 			Entity tree1 = plot.addEntity("tree");
 			tree1.addValue("dbh", 54.2);
-			tree1.addValue("total_height", 2);
+			tree1.addValue("total_height", 2.0);
 			Entity tree2 = plot.addEntity("tree");
 			tree2.addValue("dbh", 82.8);
-			tree2.addValue("total_height", 3);
+			tree2.addValue("total_height", 3.0);
 		}
 		{
 			Entity plot = cluster.addEntity("plot");
 			plot.addValue("no", new NumericCode(2));
 			Entity tree1 = plot.addEntity("tree");
 			tree1.addValue("dbh", 34.2);
-			tree1.addValue("total_height", 2);
+			tree1.addValue("total_height", 2.0);
 			Entity tree2 = plot.addEntity("tree");
 			tree2.addValue("dbh", 85.8);
-			tree2.addValue("total_height", 4);
+			tree2.addValue("total_height", 4.0);
 		}
 		
 		return record;
@@ -120,6 +139,6 @@ public class DAOIntegrationTest {
 		Entity cluster = record.getRootEntity();
 		cluster.remove("time_study", 0);
 		
-		// TODO
+		// TODO write update test
 	}
 }

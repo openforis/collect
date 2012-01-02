@@ -55,37 +55,71 @@ public class SurveyDAO extends CollectDAO {
 	}
 	
 	@Transactional
-	public Survey load(int surveyId) throws SurveyNotFoundException {
+	public Survey load(int id) {
+		// Load IDML from SURVEY table
+		Factory jf = getJooqFactory();
+		Record row = jf.select()
+					  .from(SURVEY)
+					  .where(SURVEY.ID.equal(id))
+					  .fetchOne();
+		Survey survey = processSurveyRow(row);
+		// Load schema object definition ids from SCHEMA_DEFINITION table
+		if ( survey != null ) {
+			loadSchemaObjectDefinitions(survey);
+		}
+		return survey;
+	}
+	
+	@Transactional
+	public Survey load(String name) {
+		// Load IDML from SURVEY table
+		Factory jf = getJooqFactory();
+		Record row = jf.select()
+					  .from(SURVEY)
+					  .where(SURVEY.NAME.equal(name))
+					  .fetchOne();
+		Survey survey = processSurveyRow(row);
+		// Load schema object definition ids from SCHEMA_DEFINITION table 
+		if ( survey != null ) {
+			loadSchemaObjectDefinitions(survey);
+		}
+		return survey;
+	}
+	
+	private Survey processSurveyRow(Record row) {
 		try {
-			Factory jf = getJooqFactory();
-			
-			// Load IDML from SURVEY tabel
-			Record surveyRecord = jf.select()
-									  .from(SURVEY)
-									  .where(SURVEY.ID.equal(surveyId))
-									  .fetchOne();
-			if ( surveyRecord == null ) {
-				throw new SurveyNotFoundException();
+			if ( row == null ) {
+				return null;
 			}
-			String idml = surveyRecord.getValueAsString(SURVEY.IDML);
-			ByteArrayInputStream is = new ByteArrayInputStream(idml.getBytes());
-			Survey survey = Survey.unmarshal(is);
-
-			// Internal IDs by path and associate with each node in tree
-			Schema schema = survey.getSchema();
-			Result<Record> result = jf.select()
-									  .from(SCHEMA_DEFINITION)
-									  .where(SCHEMA_DEFINITION.SURVEY_ID.equal(surveyId))
-									  .fetch();
-			for (Record defnRecord : result) {
-				int defnId = defnRecord.getValueAsInteger(SCHEMA_DEFINITION.ID);
-				String path = defnRecord.getValueAsString(SCHEMA_DEFINITION.PATH);
-				SchemaObjectDefinition defn = schema.getByPath(path);
-				defn.setId(defnId);
-			}
+			String idml = row.getValueAsString(SURVEY.IDML);
+			Survey survey = unmarshalIdml(idml);
+			survey.setId(row.getValueAsInteger(SURVEY.ID));
 			return survey;
 		} catch (IOException e) {
-			throw new RuntimeException("Unexpected exception",e);
+			throw new RuntimeException("Error deserializing IDML from database",e);
+		}
+	}
+
+	private Survey unmarshalIdml(String idml) throws IOException {
+		byte[] bytes = idml.getBytes("UTF-8");
+		ByteArrayInputStream is = new ByteArrayInputStream(bytes);
+		Survey survey = Survey.unmarshal(is);
+		return survey;
+	}
+
+	private void loadSchemaObjectDefinitions(Survey survey) {
+		Factory jf = getJooqFactory();
+		// Internal IDs by path and associate with each node in tree
+		Schema schema = survey.getSchema();
+		Result<Record> result = jf.select()
+								  .from(SCHEMA_DEFINITION)
+								  .where(SCHEMA_DEFINITION.SURVEY_ID.equal(survey.getId()))
+								  .fetch();
+		for (Record defnRecord : result) {
+			int defnId = defnRecord.getValueAsInteger(SCHEMA_DEFINITION.ID);
+			String path = defnRecord.getValueAsString(SCHEMA_DEFINITION.PATH);
+			SchemaObjectDefinition defn = schema.getByPath(path);
+			defn.setId(defnId);
 		}
 	}
 

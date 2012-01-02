@@ -1,12 +1,8 @@
 package org.openforis.collect.model;
 
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
-import org.openforis.idm.metamodel.SchemaObjectDefinition;
 import org.openforis.idm.metamodel.Survey;
-import org.openforis.idm.model.ModelObject;
 import org.openforis.idm.model.Record;
 
 /**
@@ -29,9 +25,8 @@ public class CollectRecord extends Record {
 	}
 
 	private Step step;
-	// TODO Replace submitted with state enum
+	// TODO Replace submitted flag with state enum
 	private boolean submitted;
-	private Map<Integer, ModelObject<? extends SchemaObjectDefinition>> modelObjectsById;
 	private Date creationDate;
 	private String createdBy;
 	private Date modifiedDate;
@@ -41,7 +36,6 @@ public class CollectRecord extends Record {
 		super(survey, rootEntity, versionName);
 		this.step = Step.ENTRY;
 		this.submitted = false;
-		this.modelObjectsById = new HashMap<Integer, ModelObject<? extends SchemaObjectDefinition>>();
 	}
 
 	public void setSubmitted(boolean submitted) {
@@ -58,10 +52,6 @@ public class CollectRecord extends Record {
 
 	public void setStep(Step step) {
 		this.step = step;
-	}
-
-	public ModelObject<? extends SchemaObjectDefinition> getModelObjectById(int id) {
-		return this.modelObjectsById.get(id);
 	}
 
 	public Date getCreationDate() {

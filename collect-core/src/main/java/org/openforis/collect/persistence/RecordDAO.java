@@ -5,22 +5,22 @@ import static org.openforis.collect.persistence.jooq.Sequences.RECORD_ID_SEQ;
 import static org.openforis.collect.persistence.jooq.tables.Data.DATA;
 import static org.openforis.collect.persistence.jooq.tables.Record.RECORD;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Stack;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.jooq.InsertSetMoreStep;
 import org.jooq.Record;
 import org.jooq.Result;
 import org.jooq.impl.Factory;
 import org.openforis.collect.model.CollectRecord;
-import org.openforis.collect.persistence.jooq.ModelObjectMapper;
+import org.openforis.collect.persistence.jooq.DataMapper;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.SchemaObjectDefinition;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.ModelObject;
+import org.openforis.idm.model.ModelObjectVisitor;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -29,10 +29,10 @@ import org.springframework.transaction.annotation.Transactional;
  */
 public class RecordDAO extends CollectDAO {
 
-	private ModelObjectMapper jooqMapper;
+	private DataMapper dataMapper;
 	
 	public RecordDAO() {
-		this.jooqMapper = new ModelObjectMapper();
+		this.dataMapper = new DataMapper();
 	}
 	
 	@Transactional
@@ -81,52 +81,47 @@ public class RecordDAO extends CollectDAO {
 		Survey survey = record.getSurvey();
 		Schema schema = survey.getSchema();
 		Factory jf = getJooqFactory();
-		// Fetch all data for record
+		
+		// Fetch all data for one record
 		Result<Record> data = 
 				   jf.select()
 					 .from(DATA)
 					 .where(DATA.RECORD_ID.equal(record.getId()))
 					 .orderBy(DATA.ID)
 					 .fetch();
-
+		
+		// Interate results and build tree
+		Map<Integer, ModelObject<? extends SchemaObjectDefinition>> objectsById = new HashMap<Integer, ModelObject<? extends SchemaObjectDefinition>>();
 		for (Record row : data) {
+			Integer id = row.getValueAsInteger(DATA.ID);
 			Integer parentId = row.getValueAsInteger(DATA.PARENT_ID);
 			Integer defnId = row.getValueAsInteger(DATA.DEFINITION_ID);
-			Entity parent;
+			ModelObject<?> o;
 			if ( parentId == null ) {
-				// Check and process root entity
-				Entity rootEntity = record.getRootEntity();
-				if ( rootEntity.getDefinition().getId() != defnId ) {
-					throw new DataInconsistencyException(DATA.DEFINITION_ID+" does not match "+RECORD.ROOT_ENTITY_ID);
+				// Process root entity
+				o = record.getRootEntity();
+				Integer rootEntityDefnId = o.getDefinition().getId();
+				if ( !rootEntityDefnId.equals(defnId) ) {
+					throw new DataInconsistencyException(DATA.DEFINITION_ID+" "+defnId+" does not match "+RECORD.ROOT_ENTITY_ID+" "+rootEntityDefnId);
 				}
-				parent = null;
 			} else {
 				// Process other objects 
-				parent = getParentEntity(record, parentId); 
+				ModelObject<? extends SchemaObjectDefinition> parent = objectsById.get(parentId);
+				if ( parent == null ) {
+					throw new DataInconsistencyException("Parent "+parentId+" not yet loaded");					
+				}
+				if ( !(parent instanceof Entity) ) {
+					throw new DataInconsistencyException("Parent "+parentId+" not an entity");
+				}
+				SchemaObjectDefinition defn = schema.getById(defnId);
+				if ( defn == null ) {
+					throw new DataInconsistencyException("Unknown schema definition "+DATA.DEFINITION_ID);					
+				}
+				o = dataMapper.addObject(defn, row, (Entity) parent);
 			}
-			SchemaObjectDefinition defn = getDefinition(schema, defnId);
-			jooqMapper.addObject(defn, row, parent);
+			o.setId(id);
+			objectsById.put(id, o);
 		}
-	}
-
-	private SchemaObjectDefinition getDefinition(Schema schema, Integer defnId)
-			throws DataInconsistencyException {
-		SchemaObjectDefinition defn = schema.getById(defnId);
-		if ( defn == null ) {
-			throw new DataInconsistencyException("Unknown schema definition "+DATA.DEFINITION_ID);					
-		}
-		return defn;
-	}
-
-	private Entity getParentEntity(CollectRecord record, int parentId) throws DataInconsistencyException {
-		ModelObject<? extends SchemaObjectDefinition> parentObject = record.getModelObjectById(parentId);
-		if ( parentObject == null ) {
-			throw new DataInconsistencyException("Parent "+parentId+" not yet loaded for "+DATA.PARENT_ID);					
-		}
-		if ( !(parentObject instanceof Entity) ) {
-			throw new DataInconsistencyException("Invalid parent "+parentId+" for "+DATA.PARENT_ID);
-		}
-		return (Entity) parentObject;
 	}
 
 	private void insertRecord(CollectRecord record) {
@@ -181,32 +176,15 @@ public class RecordDAO extends CollectDAO {
 	}
 
 	// N.B.: traversal order matters; parent id's must be set before children!
-	private void insertData(CollectRecord record) {
+	private void insertData(final CollectRecord record) {
 		// Initialize stack with root entity
-		Entity root = record.getRootEntity();
-		ModelObjectStack stack = new ModelObjectStack(root);
-		// While there are still nodes to insert
-		while (!stack.isEmpty()) {
-			// Pop the next list of nodes to insert
-			List<ModelObject<? extends SchemaObjectDefinition>> nodes = stack.pop();
-			// Insert this list in order
-			for (int i=0; i<nodes.size(); i++) {
-				ModelObject<? extends SchemaObjectDefinition> node = nodes.get(i);
-				insertDataRow(record, node, i);
-				// For entities, add existing child nodes to the stack
-				if (node instanceof Entity) {
-					Entity entity = (Entity) node;
-					List<SchemaObjectDefinition> childDefns = entity.getDefinition().getChildDefinitions();
-					for (SchemaObjectDefinition childDefn : childDefns) {
-						List<ModelObject<? extends SchemaObjectDefinition>> children = entity.getAll(childDefn.getName());
-						if ( children != null ) {
-							stack.push(children);
-						}					
-					}
-				}
+		final Entity root = record.getRootEntity();
+		root.traverse(new ModelObjectVisitor() {
+			@Override
+			public void visit(ModelObject<? extends SchemaObjectDefinition> node, int idx) {
+				insertDataRow(record, node, idx);
 			}
-		}
-		
+		});
 	}
 	
 	private void insertDataRow(CollectRecord record, ModelObject<? extends SchemaObjectDefinition> node, int idx) {
@@ -222,20 +200,10 @@ public class RecordDAO extends CollectDAO {
 				  .set(DATA.DEFINITION_ID, defnId)
 				  .set(DATA.RECORD_ID, record.getId())
 				  .set(DATA.IDX, idx+1);
-		jooqMapper.setInsertFields(node, insert);
+		dataMapper.setInsertFields(node, insert);
 
 		insert.execute();
 		
 		node.setId(dataRowId);
-	}
-
-	private class ModelObjectStack extends Stack<List<ModelObject<? extends SchemaObjectDefinition>>> {
-		private static final long serialVersionUID = 1L;
-		
-		public ModelObjectStack(Entity root) {
-			ArrayList<ModelObject<? extends SchemaObjectDefinition>> rootList = new ArrayList<ModelObject<? extends SchemaObjectDefinition>>(1);
-			rootList.add(root);
-			push(rootList);
-		}
 	}
 }
