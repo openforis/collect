@@ -14,21 +14,13 @@ import org.jooq.Record;
 import org.jooq.Result;
 import org.jooq.impl.Factory;
 import org.openforis.collect.model.CollectRecord;
-import org.openforis.collect.persistence.jooq.tables.records.DataRecord;
-import org.openforis.idm.metamodel.CodeAttributeDefinition;
+import org.openforis.collect.persistence.jooq.ModelObjectMapper;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.SchemaObjectDefinition;
 import org.openforis.idm.metamodel.Survey;
-import org.openforis.idm.model.Code;
-import org.openforis.idm.model.CodeAttribute;
-import org.openforis.idm.model.Date;
-import org.openforis.idm.model.DateAttribute;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.ModelObject;
-import org.openforis.idm.model.NumberAttribute;
-import org.openforis.idm.model.Time;
-import org.openforis.idm.model.TimeAttribute;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -37,7 +29,32 @@ import org.springframework.transaction.annotation.Transactional;
  */
 public class RecordDAO extends CollectDAO {
 
+	private ModelObjectMapper jooqMapper;
+	
+	public RecordDAO() {
+		this.jooqMapper = new ModelObjectMapper();
+	}
+	
+	@Transactional
 	public CollectRecord load(Survey survey, int recordId) throws DataInconsistencyException {
+		CollectRecord record = loadRecord(survey, recordId);	
+		loadData(record);
+		
+		return record;
+	}
+
+	@Transactional
+	public void saveOrUpdate(CollectRecord record) {
+		if ( record.getId() == null ) {
+			insertRecord(record);
+		} else {
+			updateRecord(record);
+			deleteData(record.getId());
+		}
+		insertData(record);
+	}
+
+	private CollectRecord loadRecord(Survey survey, int recordId) {
 		Factory jf = getJooqFactory();
 		Record r = jf.select().from(RECORD).where(RECORD.ID.equal(recordId)).fetchOne();
 		int rootEntityId = r.getValueAsInteger(RECORD.ROOT_ENTITY_ID);
@@ -57,8 +74,6 @@ public class RecordDAO extends CollectDAO {
 		record.setModifiedDate(r.getValueAsDate(RECORD.DATE_MODIFIED));
 		record.setModifiedBy(r.getValueAsString(RECORD.MODIFIED_BY));
 		
-		loadData(record);
-		
 		return record;
 	}
 	
@@ -66,62 +81,55 @@ public class RecordDAO extends CollectDAO {
 		Survey survey = record.getSurvey();
 		Schema schema = survey.getSchema();
 		Factory jf = getJooqFactory();
+		// Fetch all data for record
 		Result<Record> data = 
 				   jf.select()
 					 .from(DATA)
 					 .where(DATA.RECORD_ID.equal(record.getId()))
 					 .orderBy(DATA.ID)
 					 .fetch();
-//		Entity entity = null;
-		for (Record r : data) {
-			Integer parentId = r.getValueAsInteger(DATA.PARENT_ID);
-			Integer id = r.getValueAsInteger(DATA.ID);
-			Integer defnId = r.getValueAsInteger(DATA.DEFINITION_ID);
+
+		for (Record row : data) {
+			Integer parentId = row.getValueAsInteger(DATA.PARENT_ID);
+			Integer defnId = row.getValueAsInteger(DATA.DEFINITION_ID);
+			Entity parent;
 			if ( parentId == null ) {
 				// Check and process root entity
 				Entity rootEntity = record.getRootEntity();
 				if ( rootEntity.getDefinition().getId() != defnId ) {
 					throw new DataInconsistencyException(DATA.DEFINITION_ID+" does not match "+RECORD.ROOT_ENTITY_ID);
 				}
-				rootEntity.setId(id);
+				parent = null;
 			} else {
 				// Process other objects 
-				ModelObject<? extends SchemaObjectDefinition> parent = record.getModelObjectById(parentId);
-				if ( parent == null ) {
-					throw new DataInconsistencyException("Unknown parent "+parentId+" in "+DATA.PARENT_ID);					
-				}
-				if ( !(parent instanceof Entity) ) {
-					throw new DataInconsistencyException("Invalid parent "+parentId+" in "+DATA.PARENT_ID);					
-				}
-				Entity parentEntity = (Entity) parent; 
-				SchemaObjectDefinition defn = schema.getById(defnId);
-				ModelObject o = null;
-				if ( defn instanceof EntityDefinition ) {
-//					o = parentEntity.addEntity(defn.getName());
-				} else if ( defn instanceof CodeAttributeDefinition ) {
-//					o = parentEntity.addValue(name, value)
-					// TODO Store scheme with codes?
-				}
-				o.setId(id);
+				parent = getParentEntity(record, parentId); 
 			}
-//			}
+			SchemaObjectDefinition defn = getDefinition(schema, defnId);
+			jooqMapper.addObject(defn, row, parent);
 		}
-		// TODO Auto-generated method stub
-		
 	}
 
-	@Transactional
-	public void saveOrUpdate(CollectRecord record) {
-		if ( record.getId() == null ) {
-			insert(record);
-		} else {
-			update(record);
-			deleteData(record.getId());
+	private SchemaObjectDefinition getDefinition(Schema schema, Integer defnId)
+			throws DataInconsistencyException {
+		SchemaObjectDefinition defn = schema.getById(defnId);
+		if ( defn == null ) {
+			throw new DataInconsistencyException("Unknown schema definition "+DATA.DEFINITION_ID);					
 		}
-		insertData(record);
+		return defn;
 	}
 
-	private void insert(CollectRecord record) {
+	private Entity getParentEntity(CollectRecord record, int parentId) throws DataInconsistencyException {
+		ModelObject<? extends SchemaObjectDefinition> parentObject = record.getModelObjectById(parentId);
+		if ( parentObject == null ) {
+			throw new DataInconsistencyException("Parent "+parentId+" not yet loaded for "+DATA.PARENT_ID);					
+		}
+		if ( !(parentObject instanceof Entity) ) {
+			throw new DataInconsistencyException("Invalid parent "+parentId+" for "+DATA.PARENT_ID);
+		}
+		return (Entity) parentObject;
+	}
+
+	private void insertRecord(CollectRecord record) {
 		EntityDefinition rootEntityDefinition = record.getRootEntity().getDefinition();
 		Integer rootEntityId = rootEntityDefinition.getId();
 		if ( rootEntityId == null ) {
@@ -142,7 +150,7 @@ public class RecordDAO extends CollectDAO {
 		record.setId(recordId);
 	}
 	
-	private void update(CollectRecord record) {
+	private void updateRecord(CollectRecord record) {
 		EntityDefinition rootEntityDefinition = record.getRootEntity().getDefinition();
 		Integer recordId = record.getId();
 		if ( recordId == null ) {
@@ -184,7 +192,7 @@ public class RecordDAO extends CollectDAO {
 			// Insert this list in order
 			for (int i=0; i<nodes.size(); i++) {
 				ModelObject<? extends SchemaObjectDefinition> node = nodes.get(i);
-				insertData(record, node, i);
+				insertDataRow(record, node, i);
 				// For entities, add existing child nodes to the stack
 				if (node instanceof Entity) {
 					Entity entity = (Entity) node;
@@ -201,66 +209,33 @@ public class RecordDAO extends CollectDAO {
 		
 	}
 	
-	private void insertData(CollectRecord record, ModelObject<? extends SchemaObjectDefinition> node, int idx) {
+	private void insertDataRow(CollectRecord record, ModelObject<? extends SchemaObjectDefinition> node, int idx) {
 		Integer defnId = node.getDefinition().getId();
 		if ( defnId == null ) {
 			throw new IllegalArgumentException("Null schema object definition id");			
 		}
 		Factory jf = getJooqFactory();
-		int id = jf.nextval(DATA_ID_SEQ).intValue();
-		InsertSetMoreStep<DataRecord> insert = 
+		int dataRowId = jf.nextval(DATA_ID_SEQ).intValue();
+		InsertSetMoreStep<?> insert = 
 				jf.insertInto(DATA)
-				  .set(DATA.ID, id)
+				  .set(DATA.ID, dataRowId)
 				  .set(DATA.DEFINITION_ID, defnId)
 				  .set(DATA.RECORD_ID, record.getId())
 				  .set(DATA.IDX, idx+1);
-		
-		// Store link to parent node
-		if ( node.getParent() != null ) {
-			insert.set(DATA.PARENT_ID, node.getParent().getId());
-		}
-		
-		if ( node instanceof Entity ) {
-			// NOOP
-		} else if ( node instanceof CodeAttribute ) {
-			Code<?> value = ((CodeAttribute<?>) node).getValue();
-			insert.set(DATA.TEXT1, String.valueOf(value.getCode()));
-			insert.set(DATA.TEXT2, value.getQualifier());
-		} else if ( node instanceof NumberAttribute ) {
-			Number value = ((NumberAttribute<?>) node).getValue();
-			insert.set(DATA.NUMBER1, value == null ? null : value.doubleValue());
-		} else if ( node instanceof DateAttribute ) {
-			Date value = ((DateAttribute) node).getValue();
-			if ( value != null ) {
-				insert.set(DATA.NUMBER1, value.getYear() == null ? null : value.getYear().doubleValue());
-				insert.set(DATA.NUMBER2, value.getMonth() == null ? null : value.getMonth().doubleValue());
-				insert.set(DATA.NUMBER3, value.getDay() == null ? null : value.getDay().doubleValue());
-			}
-		} else if ( node instanceof TimeAttribute ) {
-			Time value = ((TimeAttribute) node).getValue();
-			if ( value != null ) {
-				insert.set(DATA.NUMBER1, value.getHour() == null ? null : value.getHour().doubleValue());
-				insert.set(DATA.NUMBER2, value.getMinute() == null ? null : value.getMinute().doubleValue());
-			}
-		} else {
-			throw new UnsupportedOperationException("Cannot save "+node.getClass());
-		}
-		
+		jooqMapper.setInsertFields(node, insert);
+
 		insert.execute();
 		
-		node.setId(id);
+		node.setId(dataRowId);
 	}
 
 	private class ModelObjectStack extends Stack<List<ModelObject<? extends SchemaObjectDefinition>>> {
 		private static final long serialVersionUID = 1L;
-		
 		
 		public ModelObjectStack(Entity root) {
 			ArrayList<ModelObject<? extends SchemaObjectDefinition>> rootList = new ArrayList<ModelObject<? extends SchemaObjectDefinition>>(1);
 			rootList.add(root);
 			push(rootList);
 		}
-//		public ModelObject<? extends SchemaObjectDefinition> push(ModelObject<? extends SchemaObjectDefinition> item) {
-//		}
 	}
 }
