@@ -119,7 +119,6 @@ public class RecordDAO extends CollectDAO {
 				}
 				o = dataMapper.addObject(defn, row, (Entity) parent);
 			}
-			o.setId(id);
 			objectsById.put(id, o);
 		}
 	}
@@ -204,6 +203,5 @@ public class RecordDAO extends CollectDAO {
 
 		insert.execute();
 		
-		node.setId(dataRowId);
 	}
 }
