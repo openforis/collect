@@ -133,14 +133,14 @@ public class DataService {
 	 * @return
 	 */
 	@RemotingInclude
-	public List<CodeListItem> findCodeListItemsById(Long id, String ids) {
+	public List<CodeListItem> findCodeListItemsById(Integer id, String ids) {
 		@SuppressWarnings("unchecked")
 		CollectAttribute<? extends CodeAttributeDefinition,? extends Code<?>> code = (CollectAttribute<? extends CodeAttributeDefinition, ? extends Code<?>>) this.getActiveRecord().getNodeById(id);
 		return null;
 	}
 	
 	@RemotingInclude
-	public List<CodeListItem> findCodeList(Long id) {
+	public List<CodeListItem> findCodeList(Integer id) {
 		CollectRecord activeRecord = this.getActiveRecord();
 		@SuppressWarnings("unchecked")
 		Attribute<CodeAttributeDefinition, ?> code = (Attribute<CodeAttributeDefinition, ?>) activeRecord.getNodeById(id);

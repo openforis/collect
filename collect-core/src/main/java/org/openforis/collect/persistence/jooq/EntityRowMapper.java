@@ -23,7 +23,7 @@ class EntityRowMapper extends NodeMapper {
 	}
 
 	@Override
-	Entity addObject(NodeDefinition defn, Record r, Entity parent) {
+	Entity addNode(NodeDefinition defn, Record r, Entity parent) {
 		String name = defn.getName();
 		return parent.addEntity(name);
 	}

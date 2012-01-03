@@ -117,7 +117,7 @@ public class RecordDAO extends CollectDAO {
 				if ( defn == null ) {
 					throw new DataInconsistencyException("Unknown schema definition "+DATA.DEFINITION_ID);					
 				}
-				o = dataMapper.addObject(defn, row, (Entity) parent);
+				o = dataMapper.addNode(defn, row, (Entity) parent);
 			}
 			objectsById.put(id, o);
 		}

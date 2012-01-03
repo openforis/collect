@@ -16,13 +16,18 @@ import org.openforis.idm.model.Node;
  */
 public class DataMapper {
 	private Map<Class<?>, NodeMapper> mappers;
-	
+
 	public DataMapper() {
 		this.mappers = new HashMap<Class<?>, NodeMapper>();
+		addMapper(new BooleanAttributeMapper());
 		addMapper(new CodeAttributeMapper());
+		addMapper(new CoordinateAttributeMapper());
 		addMapper(new DateAttributeMapper());
 		addMapper(new EntityRowMapper());
+		addMapper(new FileAttributeMapper());
 		addMapper(new NumberAttributeMapper());
+		addMapper(new TaxonAttributeMapper());
+		addMapper(new TextAttributeMapper());
 		addMapper(new TimeAttributeMapper());
 	}
 
@@ -32,15 +37,15 @@ public class DataMapper {
 
 	private NodeMapper getMapper(Class<?> defnClass) {
 		NodeMapper mapper = mappers.get(defnClass);
-		if ( mapper == null ) {
-			throw new UnsupportedOperationException("No NodeMapper registered for "+defnClass);
+		if (mapper == null) {
+			throw new UnsupportedOperationException("No NodeMapper registered for " + defnClass);
 		}
 		return mapper;
 	}
 
 	public void setInsertFields(Node<?> obj, InsertSetMoreStep<?> insert) {
 		// Store link to parent node
-		if ( obj.getParent() != null ) {
+		if (obj.getParent() != null) {
 			insert.set(DATA.PARENT_ID, obj.getParent().getId());
 		}
 		NodeDefinition defn = obj.getDefinition();
@@ -48,10 +53,10 @@ public class DataMapper {
 		NodeMapper mapper = getMapper(defnClass);
 		mapper.setInsertFields(obj, insert);
 	}
-	
-	public <D extends NodeDefinition, O extends Node<D>> Node<?> addObject(D defn, Record r, Entity parent) {
+
+	public <D extends NodeDefinition, O extends Node<D>> Node<?> addNode(D defn, Record r, Entity parent) {
 		NodeMapper mapper = getMapper(defn.getClass());
-		Node<?> o = mapper.addObject(defn, r, parent);
+		Node<?> o = mapper.addNode(defn, r, parent);
 		return o;
 	}
 

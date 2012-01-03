@@ -30,7 +30,7 @@ class CodeAttributeMapper extends NodeMapper {
 	}
 
 	@Override
-	CodeAttribute<?> addObject(NodeDefinition defn, Record r, Entity parent) {
+	CodeAttribute<?> addNode(NodeDefinition defn, Record r, Entity parent) {
 		String name = defn.getName();
 		String code = r.getValueAsString(DATA.TEXT1);
 		String qualifier = r.getValueAsString(DATA.TEXT2);

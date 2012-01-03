@@ -32,7 +32,7 @@ class DateAttributeMapper extends NodeMapper {
 	}
 
 	@Override
-	Node<?> addObject(NodeDefinition defn, Record r, Entity parent) {
+	Node<?> addNode(NodeDefinition defn, Record r, Entity parent) {
 		Integer year = r.getValueAsInteger(DATA.NUMBER1);
 		Integer month = r.getValueAsInteger(DATA.NUMBER2);
 		Integer day = r.getValueAsInteger(DATA.NUMBER3);

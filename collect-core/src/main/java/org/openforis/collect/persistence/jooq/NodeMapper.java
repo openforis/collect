@@ -15,5 +15,5 @@ abstract class NodeMapper {
 	
 	abstract void setInsertFields(Node<?> node, InsertSetStep<?> insert);
 	
-	abstract Node<?> addObject(NodeDefinition defn, Record r, Entity parent);
+	abstract Node<?> addNode(NodeDefinition defn, Record r, Entity parent);
 }

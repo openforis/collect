@@ -27,7 +27,7 @@ class NumberAttributeMapper extends NodeMapper {
 	}
 
 	@Override
-	NumberAttribute<?> addObject(NodeDefinition defn, Record r, Entity parent) {
+	NumberAttribute<?> addNode(NodeDefinition defn, Record r, Entity parent) {
 		String name = defn.getName();
 		if ( ((NumberAttributeDefinition) defn).isInteger() ) {
 			Integer value = r.getValueAsInteger(DATA.NUMBER1);

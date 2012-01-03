@@ -31,7 +31,7 @@ class TimeAttributeMapper extends NodeMapper {
 	}
 
 	@Override
-	Node<?> addObject(NodeDefinition defn, Record r, Entity parent) {
+	Node<?> addNode(NodeDefinition defn, Record r, Entity parent) {
 		String name = defn.getName();
 		Integer hour= r.getValueAsInteger(DATA.NUMBER1);
 		Integer minute = r.getValueAsInteger(DATA.NUMBER2);
