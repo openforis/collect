@@ -10,7 +10,8 @@
 		<param-value>
             /WEB-INF/conf/applicationContext.xml
 			/WEB-INF/conf/applicationContext-security.xml
-			/WEB-INF/conf/applicationContext-blazeds.xml
+			/WEB-INF/conf/applicationContext-graniteds.xml
+<!-- 			/WEB-INF/conf/applicationContext-blazeds.xml -->
         </param-value>
 	</context-param>
 <!-- 			/WEB-INF/conf/applicationContext-jms.xml -->
@@ -18,6 +19,11 @@
         <param-name>webAppRootKey</param-name>
         <param-value>collect.root</param-value>
     </context-param>
+    
+    <!-- Granite config context listener -->
+    <listener>
+        <listener-class>org.granite.config.GraniteConfigListener</listener-class>
+    </listener>
     
     <filter>
         <filter-name>localizationFilter</filter-name>

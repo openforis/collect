@@ -165,6 +165,17 @@
 			<artifactId>aspectjweaver</artifactId>
 			<version>1.5.4</version>
 		</dependency>
+		
+		<dependency>
+			<groupId>org.graniteds</groupId>
+			<artifactId>granite-core</artifactId>
+			<version>2.3.0.GA</version>
+		</dependency>
+		<dependency>
+			<groupId>org.graniteds</groupId>
+			<artifactId>granite-spring</artifactId>
+			<version>2.3.0.GA</version>
+		</dependency>
 	</dependencies>
 
 </project>
