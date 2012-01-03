@@ -23,11 +23,11 @@ import org.openforis.idm.metamodel.CodeDefinition;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
 import org.openforis.idm.metamodel.ModelVersion;
-import org.openforis.idm.metamodel.SchemaObjectDefinition;
+import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Code;
-import org.openforis.idm.model.ModelObject;
+import org.openforis.idm.model.Node;
 import org.openforis.idm.model.Record;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.flex.remoting.RemotingInclude;
@@ -82,7 +82,7 @@ public class DataService {
 	}
 
 	@RemotingInclude
-	public List<ModelObject<? extends SchemaObjectDefinition>> updateActiveRecord(UpdateRequest request) {
+	public List<Node<? extends NodeDefinition>> updateActiveRecord(UpdateRequest request) {
 		Method method = request.getMethod();
 		switch (method) {
 			case ADD:
@@ -109,7 +109,7 @@ public class DataService {
 	}
 
 	@RemotingInclude
-	public void updateModelObjectHierarchy(ModelObject<? extends SchemaObjectDefinition> modelObject, int newPosition) {
+	public void updateNodeHierarchy(Node<? extends NodeDefinition> node, int newPosition) {
 	}
 
 	@RemotingInclude
@@ -135,7 +135,7 @@ public class DataService {
 	@RemotingInclude
 	public List<CodeListItem> findCodeListItemsById(Long id, String ids) {
 		@SuppressWarnings("unchecked")
-		CollectAttribute<? extends CodeAttributeDefinition,? extends Code<?>> code = (CollectAttribute<? extends CodeAttributeDefinition, ? extends Code<?>>) this.getActiveRecord().getModelObjectById(id);
+		CollectAttribute<? extends CodeAttributeDefinition,? extends Code<?>> code = (CollectAttribute<? extends CodeAttributeDefinition, ? extends Code<?>>) this.getActiveRecord().getNodeById(id);
 		return null;
 	}
 	
@@ -143,7 +143,7 @@ public class DataService {
 	public List<CodeListItem> findCodeList(Long id) {
 		CollectRecord activeRecord = this.getActiveRecord();
 		@SuppressWarnings("unchecked")
-		Attribute<CodeAttributeDefinition, ?> code = (Attribute<CodeAttributeDefinition, ?>) activeRecord.getModelObjectById(id);
+		Attribute<CodeAttributeDefinition, ?> code = (Attribute<CodeAttributeDefinition, ?>) activeRecord.getNodeById(id);
 
 		List<CodeListItem> items = new ArrayList<CodeListItem>();
 		CodeListItem parent = findCodeListParent(code);
@@ -170,9 +170,9 @@ public class DataService {
 	 * @return
 	 */
 	@RemotingInclude
-	public CodeListItem findCodeListParent(ModelObject<? extends SchemaObjectDefinition> modelObject) {
-//		ModelObject<? extends SchemaObjectDefinition> modelObject = record.getModelObjectById(id);
-		if (modelObject != null && modelObject instanceof CollectAttribute) {
+	public CodeListItem findCodeListParent(Node<? extends NodeDefinition> node) {
+//		Node<? extends NodeDefinition> node = record.getNodeById(id);
+		if (node != null && node instanceof CollectAttribute) {
 			//TODO
 		}
 		return null;

@@ -11,7 +11,7 @@ public class UpdateRequest {
 		UPDATE, ADD, DELETE;
 	}
 
-	private String modelObjectId;
+	private String nodeId;
 	private String value;
 	private Method method;
 	
@@ -27,12 +27,12 @@ public class UpdateRequest {
 		this.method = method;
 	}
 
-	public String getModelObjectId() {
-		return modelObjectId;
+	public String getNodeId() {
+		return nodeId;
 	}
 
-	public void setModelObjectId(String modelObjectId) {
-		this.modelObjectId = modelObjectId;
+	public void setNodeId(String nodeId) {
+		this.nodeId = nodeId;
 	}
 
 	public String getValue() {

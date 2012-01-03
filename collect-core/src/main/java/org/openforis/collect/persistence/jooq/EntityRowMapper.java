@@ -3,27 +3,27 @@ package org.openforis.collect.persistence.jooq;
 import org.jooq.InsertSetStep;
 import org.jooq.Record;
 import org.openforis.idm.metamodel.EntityDefinition;
-import org.openforis.idm.metamodel.SchemaObjectDefinition;
+import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.model.Entity;
-import org.openforis.idm.model.ModelObject;
+import org.openforis.idm.model.Node;
 
 /**
  * @author G. Miceli
  */
-class EntityRowMapper extends ModelObjectMapper {
+class EntityRowMapper extends NodeMapper {
 
 	@Override
-	Class<? extends SchemaObjectDefinition> getMappedClass() {
+	Class<? extends NodeDefinition> getMappedClass() {
 		return EntityDefinition.class;
 	}
 
 	@Override
-	void setInsertFields(ModelObject<?> obj, InsertSetStep<?> insert) {
+	void setInsertFields(Node<?> obj, InsertSetStep<?> insert) {
 		// NOOP
 	}
 
 	@Override
-	Entity addObject(SchemaObjectDefinition defn, Record r, Entity parent) {
+	Entity addObject(NodeDefinition defn, Record r, Entity parent) {
 		String name = defn.getName();
 		return parent.addEntity(name);
 	}

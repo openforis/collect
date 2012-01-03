@@ -40,9 +40,11 @@ public class DAOIntegrationTest {
 	public void testCRUD() throws IOException, SurveyImportException, DataInconsistencyException  {
 		// LOAD MODEL
 		Survey survey = surveyDao.load("archenland1");
-		
-		// IMPORT MODEL
-//		Survey survey = importModel();
+
+		if ( survey == null ) {
+			// IMPORT MODEL
+			survey = importModel();
+		}
 		
 		// SAVE NEW
 		CollectRecord record = createRecord(survey);
