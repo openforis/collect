@@ -1,5 +1,8 @@
 package org.openforis.collect.persistence;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -7,7 +10,6 @@ import java.util.GregorianCalendar;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import static org.junit.Assert.*;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openforis.collect.model.CollectRecord;
@@ -15,7 +17,6 @@ import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.model.AlphanumericCode;
 import org.openforis.idm.model.Date;
 import org.openforis.idm.model.Entity;
-import org.openforis.idm.model.NumericCode;
 import org.openforis.idm.model.Time;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -109,7 +110,7 @@ public class DAOIntegrationTest {
 		}
 		{
 			Entity plot = cluster.addEntity("plot");
-			plot.addValue("no", new NumericCode(1));
+			plot.addValue("no", new AlphanumericCode("1"));
 			Entity tree1 = plot.addEntity("tree");
 			tree1.addValue("dbh", 54.2);
 			tree1.addValue("total_height", 2.0);
@@ -119,7 +120,7 @@ public class DAOIntegrationTest {
 		}
 		{
 			Entity plot = cluster.addEntity("plot");
-			plot.addValue("no", new NumericCode(2));
+			plot.addValue("no", new AlphanumericCode("2"));
 			Entity tree1 = plot.addEntity("tree");
 			tree1.addValue("dbh", 34.2);
 			tree1.addValue("total_height", 2.0);

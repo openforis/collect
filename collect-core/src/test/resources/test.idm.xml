@@ -3130,7 +3130,7 @@
                 <precision unit="m" decimalDigits="0"/>
                 <compare gte="0" lte="20000" flag="error"/>
             </number>
-            <entity name="time_study" required="true" maxCount="5">
+            <entity name="time_study" required="true" maxCount="2">
                 <label>Time study</label>
                 <description>Date, start time and end time of visit to the cluster.</description>
                 <date name="date">
