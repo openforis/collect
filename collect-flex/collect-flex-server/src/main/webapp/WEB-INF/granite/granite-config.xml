@@ -2,7 +2,7 @@
 
 <!DOCTYPE granite-config PUBLIC
   "-//Granite Data Services//DTD granite-config internal//EN"
-  "http://www.graniteds.org/public/dtd/2.2.1/granite-config.dtd">
+  "http://www.graniteds.org/public/dtd/2.3.0/granite-config.dtd">
   
 <!--
   GRANITE DATA SERVICES
@@ -34,7 +34,7 @@
     ! Used to get persistent class from HibernateProxy.
     !-->
     
-	<classgetter type="org.granite.hibernate.HibernateClassGetter"/>
+	<class-getter type="org.granite.hibernate.HibernateClassGetter"/>
    <!--
     ! Use HibernateExternalizer to externalize all instances of classes annotated
     ! with @Entity or @MappedSuperclass, and DefaultExternalizer for those
