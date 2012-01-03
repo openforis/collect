@@ -29,7 +29,6 @@ import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Code;
 import org.openforis.idm.model.ModelObject;
 import org.openforis.idm.model.Record;
-import org.openforis.idm.model.Value;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.flex.remoting.RemotingInclude;
 
@@ -144,7 +143,7 @@ public class DataService {
 	public List<CodeListItem> findCodeList(Long id) {
 		CollectRecord activeRecord = this.getActiveRecord();
 		@SuppressWarnings("unchecked")
-		Attribute<CodeAttributeDefinition, ? extends Value> code = (Attribute<CodeAttributeDefinition, ? extends Value>) activeRecord.getModelObjectById(id);
+		Attribute<CodeAttributeDefinition, ?> code = (Attribute<CodeAttributeDefinition, ?>) activeRecord.getModelObjectById(id);
 
 		List<CodeListItem> items = new ArrayList<CodeListItem>();
 		CodeListItem parent = findCodeListParent(code);
