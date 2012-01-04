@@ -44,10 +44,6 @@ public class DataMapper {
 	}
 
 	public void setInsertFields(Node<?> obj, InsertSetMoreStep<?> insert) {
-		// Store link to parent node
-		if (obj.getParent() != null) {
-			insert.set(DATA.PARENT_ID, obj.getParent().getId());
-		}
 		NodeDefinition defn = obj.getDefinition();
 		Class<? extends NodeDefinition> defnClass = defn.getClass();
 		NodeMapper mapper = getMapper(defnClass);

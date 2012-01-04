@@ -178,15 +178,29 @@ public class RecordDAO extends CollectDAO {
 	private void insertData(final CollectRecord record) {
 		// Initialize stack with root entity
 		final Entity root = record.getRootEntity();
+		final Map<Integer,Integer> dataIds = new HashMap<Integer, Integer>();
 		root.traverse(new NodeVisitor() {
 			@Override
 			public void visit(Node<? extends NodeDefinition> node, int idx) {
-				insertDataRow(record, node, idx);
+				// Get database ID of parent
+				Integer internalId = node.getId();
+				Integer parentDataId = null;
+				if ( node.getParent() != null ) {
+					Integer parentId = node.getParent().getId();
+					if ( parentId == null ) {
+						throw new NullPointerException("Parent id not set ");
+					}
+					parentDataId = dataIds.get(parentId);
+				}
+				
+				int dataId = insertDataRow(record, node, parentDataId, idx);
+				
+				dataIds.put(internalId, dataId);
 			}
 		});
 	}
 	
-	private void insertDataRow(CollectRecord record, Node<? extends NodeDefinition> node, int idx) {
+	private int insertDataRow(CollectRecord record, Node<? extends NodeDefinition> node, Integer parentId, int idx) {
 		Integer defnId = node.getDefinition().getId();
 		if ( defnId == null ) {
 			throw new IllegalArgumentException("Null schema object definition id");			
@@ -198,10 +212,12 @@ public class RecordDAO extends CollectDAO {
 				  .set(DATA.ID, dataRowId)
 				  .set(DATA.DEFINITION_ID, defnId)
 				  .set(DATA.RECORD_ID, record.getId())
-				  .set(DATA.IDX, idx+1);
+				  .set(DATA.IDX, idx+1)
+				  .set(DATA.PARENT_ID, parentId);
 		dataMapper.setInsertFields(node, insert);
 
 		insert.execute();
 		
+		return dataRowId;
 	}
 }
