@@ -35,8 +35,4 @@
   	    
     <graniteds:flex-filter url-pattern="/*"/>
 
-	<flex:remoting-destination ref="sessionService" destination-id="sessionService" />
-	<flex:remoting-destination ref="taxonService" destination-id="taxonService" />
-	<flex:remoting-destination ref="metaDataService" destination-id="metaDataService" />
-	<flex:remoting-destination ref="dataService" destination-id="dataService" /> 
 </beans>

@@ -15,30 +15,35 @@
 		<flexmojos.version>4.0-beta-5</flexmojos.version>
 	</properties>
 	
-<!-- 	<build> -->
-<!-- 		<plugins> -->
-<!-- 			<plugin> -->
-<!-- 				<groupId>org.sonatype.flexmojos</groupId> -->
-<!-- 				<artifactId>flexmojos-maven-plugin</artifactId> -->
-<!-- 				<version>${flexmojos.version}</version> -->
-<!-- 				<executions> -->
-<!-- 					<execution> -->
-<!-- 						<phase>generate-sources</phase> -->
-<!-- 						<goals> -->
-<!-- 							<goal>generate</goal> -->
-<!-- 						</goals> -->
-<!-- 					</execution> -->
-<!-- 				</executions> -->
-<!-- 				<configuration> -->
-<!-- 					<outputDirectory>${project.build.directory}/generated-sources/flex</outputDirectory> -->
-<!-- 					<includeJavaClasses> -->
-<!-- 						<includeClass>org.openforis.collect.model.**</includeClass> -->
-<!-- 						<includeClass>org.openforis.collect.idm.model.**</includeClass> -->
-<!-- 					</includeJavaClasses> -->
-<!-- 				</configuration> -->
-<!-- 			</plugin> -->
-<!-- 		</plugins> -->
-<!-- 	</build> -->
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.sonatype.flexmojos</groupId>
+				<artifactId>flexmojos-maven-plugin</artifactId>
+				<version>${flexmojos.version}</version>
+				<executions>
+					<execution>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<outputDirectory>${project.build.directory}/generated-sources/flex</outputDirectory>
+					<includeJavaClasses>
+						<includeClass>org.openforis.collect.session.**</includeClass>
+						<includeClass>org.openforis.collect.model.**</includeClass>
+						<includeClass>org.openforis.idm.model.**</includeClass>
+						<includeClass>org.openforis.idm.metamodel.**</includeClass>
+					</includeJavaClasses>
+<!-- 					<excludeJavaClasses> -->
+<!-- 						<excludeClass>org.openforis.idm.metamodel.CodeList</excludeClass> -->
+<!-- 					</excludeJavaClasses> -->
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 
 	<dependencies>
 <!-- 		<dependency> -->
@@ -50,6 +55,12 @@
 			<groupId>org.openforis.collect</groupId>
 			<artifactId>collect-core</artifactId>
 			<version>${project.version}</version>
+			<scope>provided</scope>
+			<type>jar</type>
+		</dependency>
+		<dependency>
+			<groupId>org.openforis.idm</groupId>
+			<artifactId>idm-api</artifactId>
 			<scope>provided</scope>
 			<type>jar</type>
 		</dependency>
