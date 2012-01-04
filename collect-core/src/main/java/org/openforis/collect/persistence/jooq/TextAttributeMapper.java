@@ -24,7 +24,7 @@ public class TextAttributeMapper extends NodeMapper {
 	}
 
 	@Override
-	void setInsertFields(Node<?> node, InsertSetStep<?> insert) {
+	void setFields(Node<?> node, InsertSetStep<?> insert) {
 		TextAttribute t = (TextAttribute) node;
 		String value = t.getValue();
 		insert.set(Data.DATA.TEXT1, value);

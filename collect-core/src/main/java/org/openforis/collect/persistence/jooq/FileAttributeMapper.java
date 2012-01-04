@@ -25,7 +25,7 @@ public class FileAttributeMapper extends NodeMapper {
 	}
 
 	@Override
-	void setInsertFields(Node<?> node, InsertSetStep<?> insert) {
+	void setFields(Node<?> node, InsertSetStep<?> insert) {
 		FileAttribute f = (FileAttribute) node;
 		File value = f.getValue();
 		if (value != null) {

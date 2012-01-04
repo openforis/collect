@@ -21,7 +21,7 @@ class NumberAttributeMapper extends NodeMapper {
 	}
 
 	@Override
-	void setInsertFields(Node<?> node, InsertSetStep<?> insert) {
+	void setFields(Node<?> node, InsertSetStep<?> insert) {
 		Number value = ((NumberAttribute<?>) node).getValue();
 		insert.set(DATA.NUMBER1, value == null ? null : value.doubleValue());
 	}

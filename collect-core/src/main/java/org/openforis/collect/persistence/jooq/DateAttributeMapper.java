@@ -22,7 +22,7 @@ class DateAttributeMapper extends NodeMapper {
 	}
 
 	@Override
-	void setInsertFields(Node<?> node, InsertSetStep<?> insert) {
+	void setFields(Node<?> node, InsertSetStep<?> insert) {
 		Date value = ((DateAttribute) node).getValue();
 		if ( value != null ) {
 			insert.set(DATA.NUMBER1, value.getYear() == null ? null : value.getYear().doubleValue());

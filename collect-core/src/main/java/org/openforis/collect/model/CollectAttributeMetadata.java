@@ -6,9 +6,11 @@ import org.openforis.idm.model.AttributeMetadata;
  * @author G. Miceli
  */
 public class CollectAttributeMetadata implements AttributeMetadata {
+	// TODO replace symbol with enum
 	private Character symbol;
 	private String remarks;
-	private boolean accepted;
+	// TODO replace state with enum
+	private Character state;
 
 	public Character getSymbol() {
 		return symbol;
@@ -26,11 +28,11 @@ public class CollectAttributeMetadata implements AttributeMetadata {
 		this.remarks = remarks;
 	}
 
-	public boolean isAccepted() {
-		return accepted;
+	public Character getState() {
+		return state;
 	}
-
-	public void setAccepted(boolean accepted) {
-		this.accepted = accepted;
+	
+	public void setState(Character state) {
+		this.state = state;
 	}
 }

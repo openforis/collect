@@ -25,7 +25,7 @@ class CodeAttributeMapper extends NodeMapper {
 	}
 
 	@Override
-	void setInsertFields(Node<?> node, InsertSetStep<?> insert) {
+	void setFields(Node<?> node, InsertSetStep<?> insert) {
 		Code<?> value = ((CodeAttribute<?>) node).getValue();
 		if ( value instanceof NumericCode){
 			Integer code = ((NumericCode)value).getCode();

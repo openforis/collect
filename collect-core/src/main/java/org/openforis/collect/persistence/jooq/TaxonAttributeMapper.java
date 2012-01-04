@@ -2,8 +2,6 @@
  * 
  */
 package org.openforis.collect.persistence.jooq;
-import static org.openforis.collect.persistence.jooq.tables.Data.DATA;
-
 import org.jooq.InsertSetStep;
 import org.jooq.Record;
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -24,7 +22,7 @@ class TaxonAttributeMapper extends NodeMapper {
 	}
 
 	@Override
-	void setInsertFields(Node<?> node, InsertSetStep<?> insert) {
+	void setFields(Node<?> node, InsertSetStep<?> insert) {
 		//taxon name id
 		//TODO
 	}

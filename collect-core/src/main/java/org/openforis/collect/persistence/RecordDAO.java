@@ -1,22 +1,17 @@
 package org.openforis.collect.persistence;
 
-import static org.openforis.collect.persistence.jooq.Sequences.DATA_ID_SEQ;
 import static org.openforis.collect.persistence.jooq.Sequences.RECORD_ID_SEQ;
 import static org.openforis.collect.persistence.jooq.tables.Data.DATA;
 import static org.openforis.collect.persistence.jooq.tables.Record.RECORD;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.jooq.InsertSetMoreStep;
 import org.jooq.Record;
-import org.jooq.Result;
 import org.jooq.impl.Factory;
 import org.openforis.collect.model.CollectRecord;
-import org.openforis.collect.persistence.jooq.DataMapper;
+import org.openforis.collect.persistence.jooq.DataLoader;
+import org.openforis.collect.persistence.jooq.DataPersister;
 import org.openforis.idm.metamodel.EntityDefinition;
-import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.NodeDefinition;
+import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Node;
@@ -29,10 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 public class RecordDAO extends CollectDAO {
 
-	private DataMapper dataMapper;
-	
 	public RecordDAO() {
-		this.dataMapper = new DataMapper();
 	}
 	
 	@Transactional
@@ -78,49 +70,8 @@ public class RecordDAO extends CollectDAO {
 	}
 	
 	private void loadData(CollectRecord record) throws DataInconsistencyException {
-		Survey survey = record.getSurvey();
-		Schema schema = survey.getSchema();
-		Factory jf = getJooqFactory();
-		
-		// Fetch all data for one record
-		Result<Record> data = 
-				   jf.select()
-					 .from(DATA)
-					 .where(DATA.RECORD_ID.equal(record.getId()))
-					 .orderBy(DATA.ID)
-					 .fetch();
-		
-		// Interate results and build tree
-		Map<Integer, Node<? extends NodeDefinition>> objectsById = new HashMap<Integer, Node<? extends NodeDefinition>>();
-		for (Record row : data) {
-			Integer id = row.getValueAsInteger(DATA.ID);
-			Integer parentId = row.getValueAsInteger(DATA.PARENT_ID);
-			Integer defnId = row.getValueAsInteger(DATA.DEFINITION_ID);
-			Node<?> o;
-			if ( parentId == null ) {
-				// Process root entity
-				o = record.getRootEntity();
-				Integer rootEntityDefnId = o.getDefinition().getId();
-				if ( !rootEntityDefnId.equals(defnId) ) {
-					throw new DataInconsistencyException(DATA.DEFINITION_ID+" "+defnId+" does not match "+RECORD.ROOT_ENTITY_ID+" "+rootEntityDefnId);
-				}
-			} else {
-				// Process other objects 
-				Node<? extends NodeDefinition> parent = objectsById.get(parentId);
-				if ( parent == null ) {
-					throw new DataInconsistencyException("Parent "+parentId+" not yet loaded");					
-				}
-				if ( !(parent instanceof Entity) ) {
-					throw new DataInconsistencyException("Parent "+parentId+" not an entity");
-				}
-				NodeDefinition defn = schema.getById(defnId);
-				if ( defn == null ) {
-					throw new DataInconsistencyException("Unknown schema definition "+DATA.DEFINITION_ID);					
-				}
-				o = dataMapper.addNode(defn, row, (Entity) parent);
-			}
-			objectsById.put(id, o);
-		}
+		DataLoader loader = new DataLoader(getJooqFactory());
+		loader.load(record);
 	}
 
 	private void insertRecord(CollectRecord record) {
@@ -174,50 +125,15 @@ public class RecordDAO extends CollectDAO {
 		  .execute();
 	}
 
-	// N.B.: traversal order matters; parent id's must be set before children!
 	private void insertData(final CollectRecord record) {
-		// Initialize stack with root entity
-		final Entity root = record.getRootEntity();
-		final Map<Integer,Integer> dataIds = new HashMap<Integer, Integer>();
+		// N.B.: traversal order matters; dfs so that parent id's are assigned before children
+		Entity root = record.getRootEntity();
 		root.traverse(new NodeVisitor() {
+			DataPersister persister = new DataPersister(getJooqFactory());
 			@Override
 			public void visit(Node<? extends NodeDefinition> node, int idx) {
-				// Get database ID of parent
-				Integer internalId = node.getId();
-				Integer parentDataId = null;
-				if ( node.getParent() != null ) {
-					Integer parentId = node.getParent().getId();
-					if ( parentId == null ) {
-						throw new NullPointerException("Parent id not set ");
-					}
-					parentDataId = dataIds.get(parentId);
-				}
-				
-				int dataId = insertDataRow(record, node, parentDataId, idx);
-				
-				dataIds.put(internalId, dataId);
+				persister.persist(node, idx);
 			}
 		});
-	}
-	
-	private int insertDataRow(CollectRecord record, Node<? extends NodeDefinition> node, Integer parentId, int idx) {
-		Integer defnId = node.getDefinition().getId();
-		if ( defnId == null ) {
-			throw new IllegalArgumentException("Null schema object definition id");			
-		}
-		Factory jf = getJooqFactory();
-		int dataRowId = jf.nextval(DATA_ID_SEQ).intValue();
-		InsertSetMoreStep<?> insert = 
-				jf.insertInto(DATA)
-				  .set(DATA.ID, dataRowId)
-				  .set(DATA.DEFINITION_ID, defnId)
-				  .set(DATA.RECORD_ID, record.getId())
-				  .set(DATA.IDX, idx+1)
-				  .set(DATA.PARENT_ID, parentId);
-		dataMapper.setInsertFields(node, insert);
-
-		insert.execute();
-		
-		return dataRowId;
 	}
 }

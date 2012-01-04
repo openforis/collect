@@ -26,7 +26,7 @@ public class CoordinateAttributeMapper extends NodeMapper {
 	}
 
 	@Override
-	void setInsertFields(Node<?> node, InsertSetStep<?> insert) {
+	void setFields(Node<?> node, InsertSetStep<?> insert) {
 		CoordinateAttribute c = (CoordinateAttribute) node;
 		Coordinate value = c.getValue();
 		if (value != null) {
