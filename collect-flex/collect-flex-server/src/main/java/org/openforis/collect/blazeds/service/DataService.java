@@ -15,9 +15,8 @@ import org.openforis.collect.exception.NonexistentIdException;
 import org.openforis.collect.exception.RecordLockedException;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SessionManager;
-import org.openforis.collect.model.CollectAttribute;
 import org.openforis.collect.model.CollectRecord;
-import org.openforis.collect.model.RecordListItem;
+import org.openforis.collect.model.RecordSummary;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
@@ -50,8 +49,8 @@ public class DataService {
 	}
 
 	@RemotingInclude
-	public List<RecordListItem> getRecordsSummary() {
-		List<RecordListItem> list = recordManager.getSummaries();
+	public List<RecordSummary> getRecordsSummary() {
+		List<RecordSummary> list = recordManager.getSummaries();
 		return list;
 	}
 
@@ -134,7 +133,7 @@ public class DataService {
 	@RemotingInclude
 	public List<CodeListItem> findCodeListItemsById(Integer id, String ids) {
 		@SuppressWarnings("unchecked")
-		CollectAttribute<? extends CodeAttributeDefinition, ? extends Code<?>> code = (CollectAttribute<? extends CodeAttributeDefinition, ? extends Code<?>>) this.getActiveRecord().getNodeById(id);
+		Attribute<? extends CodeAttributeDefinition, ? extends Code<?>> code = (Attribute<? extends CodeAttributeDefinition, ? extends Code<?>>) this.getActiveRecord().getNodeById(id);
 		return null;
 	}
 
@@ -171,7 +170,7 @@ public class DataService {
 	@RemotingInclude
 	public CodeListItem findCodeListParent(Node<? extends NodeDefinition> node) {
 		// Node<? extends NodeDefinition> node = record.getNodeById(id);
-		if (node != null && node instanceof CollectAttribute) {
+		if (node != null && node instanceof Attribute) {
 			// TODO
 		}
 		return null;
