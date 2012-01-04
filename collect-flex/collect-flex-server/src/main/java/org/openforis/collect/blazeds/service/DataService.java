@@ -19,7 +19,6 @@ import org.openforis.collect.model.CollectAttribute;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.RecordListItem;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
-import org.openforis.idm.metamodel.CodeDefinition;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
 import org.openforis.idm.metamodel.ModelVersion;
@@ -135,10 +134,10 @@ public class DataService {
 	@RemotingInclude
 	public List<CodeListItem> findCodeListItemsById(Integer id, String ids) {
 		@SuppressWarnings("unchecked")
-		CollectAttribute<? extends CodeAttributeDefinition,? extends Code<?>> code = (CollectAttribute<? extends CodeAttributeDefinition, ? extends Code<?>>) this.getActiveRecord().getNodeById(id);
+		CollectAttribute<? extends CodeAttributeDefinition, ? extends Code<?>> code = (CollectAttribute<? extends CodeAttributeDefinition, ? extends Code<?>>) this.getActiveRecord().getNodeById(id);
 		return null;
 	}
-	
+
 	@RemotingInclude
 	public List<CodeListItem> findCodeList(Integer id) {
 		CollectRecord activeRecord = this.getActiveRecord();
@@ -152,10 +151,10 @@ public class DataService {
 		ModelVersion recordVersion = activeRecord.getVersion();
 		if (recordVersion != null) {
 			for (CodeListItem codeListItem : children) {
-				//TODO
-//				if (VersioningUtils.hasValidVersion(codeListItem, recordVersion)) {
-//					items.add(codeListItem);
-//				}
+				// TODO
+				// if (VersioningUtils.hasValidVersion(codeListItem, recordVersion)) {
+				// items.add(codeListItem);
+				// }
 			}
 		} else {
 			items.addAll(children);
@@ -171,26 +170,24 @@ public class DataService {
 	 */
 	@RemotingInclude
 	public CodeListItem findCodeListParent(Node<? extends NodeDefinition> node) {
-//		Node<? extends NodeDefinition> node = record.getNodeById(id);
+		// Node<? extends NodeDefinition> node = record.getNodeById(id);
 		if (node != null && node instanceof CollectAttribute) {
-			//TODO
+			// TODO
 		}
 		return null;
 	}
 
-	private CodeListItem getCodeListItem(CodeList codeList, Object value){
-				List<CodeListItem> items = codeList.getItems();
-				for (CodeListItem codeListItem : items) {
-					List<CodeDefinition> codes = codeListItem.getCodes();
-					for (CodeDefinition codeDefinition : codes) {
-						if(codeDefinition.getCode().equals(value.toString())){
-							return codeListItem;
-						}
-					}
-				}
+	private CodeListItem getCodeListItem(CodeList codeList, Object value) {
+		List<CodeListItem> items = codeList.getItems();
+		for (CodeListItem codeListItem : items) {
+			String code = codeListItem.getCode();
+			if (code.equals(value.toString())) {
+				return codeListItem;
+			}
+		}
 		return null;
 	}
-	
+
 	protected CollectRecord getActiveRecord() {
 		return this.sessionManager.getSessionState().getActiveRecord();
 	}

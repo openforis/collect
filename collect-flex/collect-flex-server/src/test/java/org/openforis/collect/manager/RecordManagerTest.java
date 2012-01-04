@@ -7,7 +7,6 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.openforis.idm.model.RealValue;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.transaction.TransactionConfiguration;
@@ -72,8 +71,6 @@ public class RecordManagerTest {
 
 //            em.getTransaction().begin();
 
-            RealValue val = new RealValue(12.2);
-        	System.out.println(val.getNumber());
 //            em.persist(val);
 //            Assert.assertTrue(em.contains(val));
             
