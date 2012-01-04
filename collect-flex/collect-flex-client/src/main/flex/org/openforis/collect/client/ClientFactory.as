@@ -10,9 +10,6 @@ package org.openforis.collect.client {
 		private static var _sessionClient:SessionClient;
 		private static var _dataClient:DataClient;
 		
-		
-		private static var _testClient:TestClient;
-		
 		public function ClientFactory() {
 		}
 		
@@ -37,11 +34,5 @@ package org.openforis.collect.client {
 			return _modelClient;
 		}
 		
-		public static function get testClient():TestClient{
-			if(_testClient == null){
-				_testClient = new TestClient();
-			}
-			return _testClient;
-		}
 	}
 }

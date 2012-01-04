@@ -12,7 +12,6 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.client.ModelClient;
 	import org.openforis.collect.client.SessionClient;
-	import org.openforis.collect.client.TestClient;
 	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.model.SessionState;
 	import org.openforis.idm.metamodel.Survey;
@@ -28,7 +27,6 @@ package org.openforis.collect.presenter {
 		private var _view:collect;
 		private var _modelClient:ModelClient;
 		private var _sessionClient:SessionClient;
-		private var _testClient:TestClient;
 		private var _contextMenuPresenter:ContextMenuPresenter;
 		
 		private var _keepAliveTimer:Timer;
@@ -43,7 +41,6 @@ package org.openforis.collect.presenter {
 			this._view = view;
 			this._modelClient = ClientFactory.modelClient;
 			this._sessionClient = ClientFactory.sessionClient;
-			this._testClient = ClientFactory.testClient;
 
 			_keepAliveTimer = new Timer(KEEP_ALIVE_FREQUENCY)
 			_keepAliveTimer.addEventListener(TimerEvent.TIMER, sendKeepAliveMessage);
@@ -53,7 +50,7 @@ package org.openforis.collect.presenter {
 			
 			//this._metaModelClient.getSurveys(new ItemResponder(getSurveysResultHandler, faultHandler));
 			
-			//this._modelClient.getSurvey(new ItemResponder(getSurveyResultHandler, faultHandler), 1);
+			this._modelClient.getSurvey(new ItemResponder(getSurveyResultHandler, faultHandler), 1);
 			
 			//this._sessionClient.testGetValue(new ItemResponder(getValueResultHandler, faultHandler));
 			//this._testClient.test(new ItemResponder(getValueResultHandler, faultHandler));
@@ -78,8 +75,8 @@ package org.openforis.collect.presenter {
 			
 			//test initialization...
 			//test data
-			var surveys:ArrayCollection = new ArrayCollection();
 			/*
+			var surveys:ArrayCollection = new ArrayCollection();
 			var survey:SurveyImpl = new TestSurvey();
 			survey.name = "Survey 1";
 			surveys.addItem(survey);
