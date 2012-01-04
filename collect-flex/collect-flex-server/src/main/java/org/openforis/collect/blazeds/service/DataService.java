@@ -15,9 +15,8 @@ import org.openforis.collect.exception.NonexistentIdException;
 import org.openforis.collect.exception.RecordLockedException;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SessionManager;
-import org.openforis.collect.model.CollectAttribute;
 import org.openforis.collect.model.CollectRecord;
-import org.openforis.collect.model.RecordListItem;
+import org.openforis.collect.model.RecordSummary;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
@@ -41,20 +40,17 @@ public class DataService {
 	@Autowired
 	private RecordManager recordManager;
 
-	//@RemotingInclude
 	public Record loadRecord(String entityName, long id) throws RecordLockedException, MultipleEditException, NonexistentIdException, AccessDeniedException {
 		Record record = recordManager.checkout(entityName, id);
 		sessionManager.setActiveRecord((CollectRecord) record);
 		return record;
 	}
 
-	//@RemotingInclude
-	public List<RecordListItem> getRecordsSummary() {
-		List<RecordListItem> list = recordManager.getSummaries();
+	public List<RecordSummary> getRecordsSummary() {
+		List<RecordSummary> list = recordManager.getSummaries();
 		return list;
 	}
 
-	//@RemotingInclude
 	public Record newRecord(String name, Survey survey, String rootEntityId) throws MultipleEditException, DuplicateIdException, InvalidIdException, DuplicateIdException, AccessDeniedException,
 			RecordLockedException {
 
@@ -62,24 +58,20 @@ public class DataService {
 		return record;
 	}
 
-	//@RemotingInclude
 	public void saveActiveRecord() {
 		Record record = this.sessionManager.getSessionState().getActiveRecord();
 		recordManager.save(record);
 	}
 
-	//@RemotingInclude
 	public void deleteActiveRecord() {
 		Record record = this.sessionManager.getSessionState().getActiveRecord();
 		recordManager.delete(record.getRootEntity().getName(), record.getId());
 		this.sessionManager.clearActiveRecord();
 	}
 
-	//@RemotingInclude
 	public void updateRootEntityKey(String recordId, String newRootEntityKey) throws DuplicateIdException, InvalidIdException, NonexistentIdException, AccessDeniedException, RecordLockedException {
 	}
 
-	//@RemotingInclude
 	public List<Node<? extends NodeDefinition>> updateActiveRecord(UpdateRequest request) {
 		Method method = request.getMethod();
 		switch (method) {
@@ -96,21 +88,17 @@ public class DataService {
 		return null;
 	}
 
-	//@RemotingInclude
 	public void promote(String recordId) throws InvalidIdException, MultipleEditException, NonexistentIdException, AccessDeniedException, RecordLockedException {
 		this.recordManager.promote(recordId);
 	}
 
-	//@RemotingInclude
 	public void demote(String recordId) throws InvalidIdException, MultipleEditException, NonexistentIdException, AccessDeniedException, RecordLockedException {
 		this.recordManager.demote(recordId);
 	}
 
-	//@RemotingInclude
 	public void updateNodeHierarchy(Node<? extends NodeDefinition> node, int newPosition) {
 	}
 
-	//@RemotingInclude
 	public List<String> find(String context, String query) {
 		return null;
 	}
@@ -118,7 +106,6 @@ public class DataService {
 	/**
 	 * remove the active record from the current session
 	 */
-	//@RemotingInclude
 	public void clearActiveRecord() {
 		this.sessionManager.clearActiveRecord();
 	}
@@ -130,14 +117,12 @@ public class DataService {
 	 * @param ids
 	 * @return
 	 */
-	//@RemotingInclude
 	public List<CodeListItem> findCodeListItemsById(Integer id, String ids) {
 		@SuppressWarnings("unchecked")
-		CollectAttribute<? extends CodeAttributeDefinition, ? extends Code<?>> code = (CollectAttribute<? extends CodeAttributeDefinition, ? extends Code<?>>) this.getActiveRecord().getNodeById(id);
+		Attribute<? extends CodeAttributeDefinition, ? extends Code<?>> code = (Attribute<? extends CodeAttributeDefinition, ? extends Code<?>>) this.getActiveRecord().getNodeById(id);
 		return null;
 	}
 
-	//@RemotingInclude
 	public List<CodeListItem> findCodeList(Integer id) {
 		CollectRecord activeRecord = this.getActiveRecord();
 		@SuppressWarnings("unchecked")
@@ -167,10 +152,9 @@ public class DataService {
 	 * @param contextPath
 	 * @return
 	 */
-	//@RemotingInclude
 	public CodeListItem findCodeListParent(Node<? extends NodeDefinition> node) {
 		// Node<? extends NodeDefinition> node = record.getNodeById(id);
-		if (node != null && node instanceof CollectAttribute) {
+		if (node != null && node instanceof Attribute) {
 			// TODO
 		}
 		return null;

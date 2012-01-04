@@ -9,7 +9,7 @@ import java.util.Date;
  * @author M. Togna
  * 
  */
-public class RecordListItem {
+public class RecordSummary {
 
 	/**
 	 * @uml.property name="createdBy" readOnly="true"

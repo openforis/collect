@@ -11,7 +11,7 @@ import org.openforis.collect.exception.InvalidIdException;
 import org.openforis.collect.exception.MultipleEditException;
 import org.openforis.collect.exception.NonexistentIdException;
 import org.openforis.collect.exception.RecordLockedException;
-import org.openforis.collect.model.RecordListItem;
+import org.openforis.collect.model.RecordSummary;
 import org.openforis.collect.persistence.RecordDAO;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.model.Record;
@@ -56,7 +56,7 @@ public class RecordManager {
 		return null;
 	}
 
-	public List<RecordListItem> getSummaries() {
+	public List<RecordSummary> getSummaries() {
 		// TODO implement getRecordSummaries
 		return null;
 	}
