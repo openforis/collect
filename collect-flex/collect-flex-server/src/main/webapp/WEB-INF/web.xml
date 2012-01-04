@@ -20,11 +20,6 @@
         <param-value>collect.root</param-value>
     </context-param>
     
-    <!-- Granite config context listener -->
-    <listener>
-        <listener-class>org.granite.config.GraniteConfigListener</listener-class>
-    </listener>
-    
     <filter>
         <filter-name>localizationFilter</filter-name>
         <filter-class>org.springframework.web.filter.RequestContextFilter</filter-class>
@@ -88,6 +83,11 @@
         <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
     </listener>
 	
+	<!-- Granite config context listener -->
+    <listener>
+        <listener-class>org.granite.config.GraniteConfigListener</listener-class>
+    </listener>
+    
 	<servlet>
 		<servlet-name>openforis-collect-init-servlet</servlet-name>
 		<servlet-class>org.openforis.collect.web.servlet.InitServlet</servlet-class>
@@ -108,9 +108,14 @@
 		<load-on-startup>1</load-on-startup>
 	</servlet>
 	
+<!-- 	<servlet-mapping> -->
+<!-- 		<servlet-name>dispatcher</servlet-name> -->
+<!-- 		<url-pattern>/messagebroker/*</url-pattern> -->
+<!-- 	</servlet-mapping> -->
+	
 	<servlet-mapping>
 		<servlet-name>dispatcher</servlet-name>
-		<url-pattern>/messagebroker/*</url-pattern>
+		<url-pattern>/graniteamf/*</url-pattern>
 	</servlet-mapping>
 	
 	<servlet-mapping>

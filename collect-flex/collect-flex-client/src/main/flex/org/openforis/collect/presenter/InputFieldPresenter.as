@@ -1,13 +1,10 @@
 package org.openforis.collect.presenter {
-	import flash.display.DisplayObject;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
 	
 	import mx.core.UIComponent;
 	
 	import org.openforis.collect.event.InputFieldEvent;
-	import org.openforis.collect.idm.model.impl.AbstractValue;
-	import org.openforis.collect.idm.model.impl.AbstractValue$Symbol;
 	import org.openforis.collect.ui.component.input.InputField;
 	import org.openforis.collect.util.UIUtil;
 	
@@ -20,7 +17,7 @@ package org.openforis.collect.presenter {
 		protected var _path:String;
 		protected var _inputField:InputField;
 		
-		protected var _attributeValue:AbstractValue;
+		protected var _attributeValue:*;
 		
 		public function InputFieldPresenter(inputField:InputField = null) {
 			super();
@@ -73,7 +70,7 @@ package org.openforis.collect.presenter {
 			}
 		}
 
-		protected function applyChanges(newAttributeValue:AbstractValue = null):void {
+		protected function applyChanges(newAttributeValue:* = null):void {
 			//prepare request
 			if(newAttributeValue == null) {
 				newAttributeValue = createValue();
@@ -97,11 +94,11 @@ package org.openforis.collect.presenter {
 			_inputField.currentState = InputField.STATE_ERROR_SAVING;
 		}
 		
-		public function get value():AbstractValue {
+		public function get value():* {
 			return _attributeValue;
 		}
 
-		public function set value(value:AbstractValue):void {
+		public function set value(value:*):void {
 			_attributeValue = value;
 			/*
 			if(_attributeValue != null && _attributeValue.path == this._path) {
@@ -114,14 +111,18 @@ package org.openforis.collect.presenter {
 			*/
 		}
 
-		public function createValue():AbstractValue {
-			var newAttributeValue:AbstractValue = new AbstractValue();
+		public function createValue():* {
+			var result:* = null;
+			return result;
+			/*
+			var newAttributeValue:* = new AbstractValue();
 			newAttributeValue.text1 = _inputField.text;
 			if(value != null) {
 				//copy old informations
 				newAttributeValue.remarks = value.remarks;
 			}
 			return newAttributeValue;
+			*/
 		}
 		
 		public function get path():String {
@@ -132,7 +133,8 @@ package org.openforis.collect.presenter {
 			_path = value;
 		}
 		
-		public function changeReasonBlank(symbol:AbstractValue$Symbol):void {
+		public function changeReasonBlank(symbol:*):void {
+			/*
 			var newAttributeValue:AbstractValue = new AbstractValue();
 			newAttributeValue.symbol = symbol;
 			if(_attributeValue != null) {
@@ -140,6 +142,7 @@ package org.openforis.collect.presenter {
 				newAttributeValue.remarks = _attributeValue.remarks;
 			}
 			applyChanges(newAttributeValue);
+			*/
 		}
 		
 	}

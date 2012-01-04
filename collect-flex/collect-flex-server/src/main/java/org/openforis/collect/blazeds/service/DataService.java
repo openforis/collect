@@ -29,7 +29,6 @@ import org.openforis.idm.model.Code;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.Record;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.flex.remoting.RemotingInclude;
 
 /**
  * @author M. Togna
@@ -42,20 +41,20 @@ public class DataService {
 	@Autowired
 	private RecordManager recordManager;
 
-	@RemotingInclude
+	//@RemotingInclude
 	public Record loadRecord(String entityName, long id) throws RecordLockedException, MultipleEditException, NonexistentIdException, AccessDeniedException {
 		Record record = recordManager.checkout(entityName, id);
 		sessionManager.setActiveRecord((CollectRecord) record);
 		return record;
 	}
 
-	@RemotingInclude
+	//@RemotingInclude
 	public List<RecordListItem> getRecordsSummary() {
 		List<RecordListItem> list = recordManager.getSummaries();
 		return list;
 	}
 
-	@RemotingInclude
+	//@RemotingInclude
 	public Record newRecord(String name, Survey survey, String rootEntityId) throws MultipleEditException, DuplicateIdException, InvalidIdException, DuplicateIdException, AccessDeniedException,
 			RecordLockedException {
 
@@ -63,24 +62,24 @@ public class DataService {
 		return record;
 	}
 
-	@RemotingInclude
+	//@RemotingInclude
 	public void saveActiveRecord() {
 		Record record = this.sessionManager.getSessionState().getActiveRecord();
 		recordManager.save(record);
 	}
 
-	@RemotingInclude
+	//@RemotingInclude
 	public void deleteActiveRecord() {
 		Record record = this.sessionManager.getSessionState().getActiveRecord();
 		recordManager.delete(record.getRootEntity().getName(), record.getId());
 		this.sessionManager.clearActiveRecord();
 	}
 
-	@RemotingInclude
+	//@RemotingInclude
 	public void updateRootEntityKey(String recordId, String newRootEntityKey) throws DuplicateIdException, InvalidIdException, NonexistentIdException, AccessDeniedException, RecordLockedException {
 	}
 
-	@RemotingInclude
+	//@RemotingInclude
 	public List<Node<? extends NodeDefinition>> updateActiveRecord(UpdateRequest request) {
 		Method method = request.getMethod();
 		switch (method) {
@@ -97,21 +96,21 @@ public class DataService {
 		return null;
 	}
 
-	@RemotingInclude
+	//@RemotingInclude
 	public void promote(String recordId) throws InvalidIdException, MultipleEditException, NonexistentIdException, AccessDeniedException, RecordLockedException {
 		this.recordManager.promote(recordId);
 	}
 
-	@RemotingInclude
+	//@RemotingInclude
 	public void demote(String recordId) throws InvalidIdException, MultipleEditException, NonexistentIdException, AccessDeniedException, RecordLockedException {
 		this.recordManager.demote(recordId);
 	}
 
-	@RemotingInclude
+	//@RemotingInclude
 	public void updateNodeHierarchy(Node<? extends NodeDefinition> node, int newPosition) {
 	}
 
-	@RemotingInclude
+	//@RemotingInclude
 	public List<String> find(String context, String query) {
 		return null;
 	}
@@ -119,7 +118,7 @@ public class DataService {
 	/**
 	 * remove the active record from the current session
 	 */
-	@RemotingInclude
+	//@RemotingInclude
 	public void clearActiveRecord() {
 		this.sessionManager.clearActiveRecord();
 	}
@@ -131,14 +130,14 @@ public class DataService {
 	 * @param ids
 	 * @return
 	 */
-	@RemotingInclude
+	//@RemotingInclude
 	public List<CodeListItem> findCodeListItemsById(Integer id, String ids) {
 		@SuppressWarnings("unchecked")
 		CollectAttribute<? extends CodeAttributeDefinition, ? extends Code<?>> code = (CollectAttribute<? extends CodeAttributeDefinition, ? extends Code<?>>) this.getActiveRecord().getNodeById(id);
 		return null;
 	}
 
-	@RemotingInclude
+	//@RemotingInclude
 	public List<CodeListItem> findCodeList(Integer id) {
 		CollectRecord activeRecord = this.getActiveRecord();
 		@SuppressWarnings("unchecked")
@@ -168,7 +167,7 @@ public class DataService {
 	 * @param contextPath
 	 * @return
 	 */
-	@RemotingInclude
+	//@RemotingInclude
 	public CodeListItem findCodeListParent(Node<? extends NodeDefinition> node) {
 		// Node<? extends NodeDefinition> node = record.getNodeById(id);
 		if (node != null && node instanceof CollectAttribute) {

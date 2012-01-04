@@ -2,13 +2,36 @@
 <services-config>
 	
 	<factories>
-		<factory id="spring" class="org.openforis.collect.spring.factories.SpringFactory"/>
-	</factories>
-	
+        <factory id="springFactory" class="org.granite.spring.SpringServiceFactory" />
+    </factories>
+    
     <services>
 <!--        <service-include file-path="proxy-config.xml" />-->
-        <service-include file-path="remoting-config.xml" />
+<!--         <service-include file-path="remoting-config.xml" /> -->
 <!--         <service-include file-path="messaging-config.xml" /> -->
+			
+		<service
+            id="granite-service"
+            class="flex.messaging.services.RemotingService"
+            messageTypes="flex.messaging.messages.RemotingMessage">
+            
+            <destination id="sessionService">
+		        <properties>
+		        	<factory>springFactory</factory>
+		            <source>sessionService</source>
+		            <scope>application</scope>
+		        </properties>
+			</destination>
+			
+			 <destination id="modelService">
+		        <properties>
+		        	<factory>springFactory</factory>
+		            <source>modelService</source>
+		            <scope>application</scope>
+		        </properties>
+			</destination>
+        </service>
+
         <default-channels>
             <channel ref="my-amf"/>
         </default-channels>

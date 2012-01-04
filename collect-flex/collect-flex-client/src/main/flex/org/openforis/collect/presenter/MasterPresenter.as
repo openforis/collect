@@ -3,19 +3,15 @@ package org.openforis.collect.presenter {
 	 * 
 	 * @author Mino Togna
 	 * */
-	import flash.events.MouseEvent;
-	
-	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
-	import mx.events.EventListenerRequest;
 	
 	import org.openforis.collect.Application;
 	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.event.UIEvent;
-	import org.openforis.collect.idm.model.impl.EntityImpl;
 	import org.openforis.collect.ui.view.MasterView;
+	import org.openforis.idm.metamodel.Schema;
 	import org.openforis.idm.metamodel.Survey;
-	import org.openforis.idm.metamodel.impl.SchemaImpl;
+	import org.openforis.idm.model.Entity;
 
 	public class MasterPresenter extends AbstractPresenter {
 		
@@ -84,7 +80,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function schemaLoadedHandler(event:ApplicationEvent):void {
-			var schema:SchemaImpl = event.result as SchemaImpl;
+			var schema:Schema = event.result as Schema;
 			if(schema != null) {
 				var rootEntities:IList = schema.rootEntityDefinitions;
 				if(rootEntities != null && rootEntities.length > 0) {
@@ -103,11 +99,11 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function rootEntitySelectedHandler(event:UIEvent):void {
-			var rootEntity:EntityImpl = event.obj as EntityImpl;
+			var rootEntity:Entity = event.obj as Entity;
 			selectRootEntity(rootEntity);
 		}
 		
-		protected function selectRootEntity(rootEntity:EntityImpl):void {
+		protected function selectRootEntity(rootEntity:Entity):void {
 			Application.selectedRootEntity = rootEntity;
 			//loadRecords();
 		}

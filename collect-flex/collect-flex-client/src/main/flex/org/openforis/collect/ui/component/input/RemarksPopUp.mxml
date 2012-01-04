@@ -14,16 +14,13 @@
 	<fx:Script>
 		<![CDATA[
 			import mx.events.FlexEvent;
-			import mx.events.FlexMouseEvent;
 			
 			import org.openforis.collect.i18n.Message;
-			import org.openforis.collect.idm.model.impl.AbstractValue;
-			import org.openforis.collect.idm.model.impl.AbstractValue$Symbol;
 			
 			[Bindable]
 			private var _showReasonBlank:Boolean = true;
 			[Bindable]
-			private var _abstractValue:AbstractValue;
+			private var _abstractValue:*;
 			
 			protected function creationCompleteHandler(event:FlexEvent):void {
 			}
@@ -97,11 +94,11 @@
 	<s:VGroup id="reasonBlankGroup" visible="false" includeInLayout="false" 
 			  visible.canSpecifyReasonBlank="true" includeInLayout.canSpecifyReasonBlank="true">
 		<s:Label text="Reason left blank:" />
-		<s:RadioButton id="blankOnFormRadioButton" value="{AbstractValue$Symbol.BLANK_ON_FORM}" group="{radioButtonGroup}" 
+		<s:RadioButton id="blankOnFormRadioButton" value="{'*'}" group="{radioButtonGroup}" 
 					   label="{Message.get('edit.contextMenu.blankOnForm')}" />
-		<s:RadioButton id="dashOnFormRadioButton" value="{AbstractValue$Symbol.DASH_ON_FORM}" group="{radioButtonGroup}" 
+		<s:RadioButton id="dashOnFormRadioButton" value="{'-'}" group="{radioButtonGroup}" 
 					   label="{Message.get('edit.contextMenu.dashOnForm')}" />
-		<s:RadioButton id="illegibleRadioButton" value="{AbstractValue$Symbol.ILLEGIBLE}" group="{radioButtonGroup}" 
+		<s:RadioButton id="illegibleRadioButton" value="{'?'}" group="{radioButtonGroup}" 
 					   label="{Message.get('edit.contextMenu.illegible')" />
 	</s:VGroup>
 	

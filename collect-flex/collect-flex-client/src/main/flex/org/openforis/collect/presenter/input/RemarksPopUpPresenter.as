@@ -8,10 +8,8 @@ package org.openforis.collect.presenter.input
 	
 	import mx.events.FlexEvent;
 	import mx.managers.PopUpManager;
-	import mx.rpc.AsyncToken;
 	
 	import org.openforis.collect.event.RemarksPopUpEvent;
-	import org.openforis.collect.idm.model.impl.AbstractValue$Symbol;
 	import org.openforis.collect.ui.component.input.InputField;
 	import org.openforis.collect.ui.component.input.RemarksPopUp;
 	import org.openforis.collect.util.PopUpUtil;
@@ -112,6 +110,7 @@ package org.openforis.collect.presenter.input
 				case Keyboard.ESCAPE:
 					cancelHandler(null);
 			}
+			/*
 			var symbol:AbstractValue$Symbol = null;
 			switch(event.charCode) {
 				case 42: //asterisk (*)
@@ -124,12 +123,13 @@ package org.openforis.collect.presenter.input
 					symbol = AbstractValue$Symbol.ILLEGIBLE;
 					break;
 			}
-			if(symbol != null) {
+			*/
+			//if(symbol != null) {
 				/*
 				radioButtonGroup.selectedValue = symbol;
 				radioButtonGroup.selection.setFocus();
 				*/
-			}
+			//}
 		}
 		
 		protected function reasonBlankGroupCreationCompleteHandler(event:FlexEvent):void {

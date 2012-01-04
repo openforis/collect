@@ -2,7 +2,6 @@ package org.openforis.collect.presenter {
 	
 	import flash.events.TimerEvent;
 	import flash.utils.Timer;
-	import flash.utils.setTimeout;
 	
 	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
@@ -11,13 +10,12 @@ package org.openforis.collect.presenter {
 	
 	import org.openforis.collect.Application;
 	import org.openforis.collect.client.ClientFactory;
-	import org.openforis.collect.client.MetaModelClient;
+	import org.openforis.collect.client.ModelClient;
 	import org.openforis.collect.client.SessionClient;
+	import org.openforis.collect.client.TestClient;
 	import org.openforis.collect.event.ApplicationEvent;
-	import org.openforis.collect.idm.model.impl.AbstractValue;
-	import org.openforis.collect.idm.model.impl.BooleanValueImpl;
-	import org.openforis.collect.model.TestSurvey;
-	import org.openforis.idm.metamodel.impl.SurveyImpl;
+	import org.openforis.collect.model.SessionState;
+	import org.openforis.idm.metamodel.Survey;
 
 	/**
 	 * 
@@ -28,8 +26,9 @@ package org.openforis.collect.presenter {
 		private static const KEEP_ALIVE_FREQUENCY:Number = 30000;
 
 		private var _view:collect;
-		private var _metaModelClient:MetaModelClient;
+		private var _modelClient:ModelClient;
 		private var _sessionClient:SessionClient;
+		private var _testClient:TestClient;
 		private var _contextMenuPresenter:ContextMenuPresenter;
 		
 		private var _keepAliveTimer:Timer;
@@ -42,21 +41,22 @@ package org.openforis.collect.presenter {
 			super();
 			
 			this._view = view;
-			this._metaModelClient = ClientFactory.metaModelClient;
+			this._modelClient = ClientFactory.modelClient;
 			this._sessionClient = ClientFactory.sessionClient;
-			/*
+			this._testClient = ClientFactory.testClient;
+
 			_keepAliveTimer = new Timer(KEEP_ALIVE_FREQUENCY)
 			_keepAliveTimer.addEventListener(TimerEvent.TIMER, sendKeepAliveMessage);
 			_keepAliveTimer.start();
 			
 			this._sessionClient.getSessionState(new ItemResponder(getSessionStateResultHandler, faultHandler));
 			
-			this._metaModelClient.getSurveys(new ItemResponder(getSurveysResultHandler, faultHandler));
+			//this._metaModelClient.getSurveys(new ItemResponder(getSurveysResultHandler, faultHandler));
 			
-			*/
+			//this._modelClient.getSurvey(new ItemResponder(getSurveyResultHandler, faultHandler), 1);
 			
 			//this._sessionClient.testGetValue(new ItemResponder(getValueResultHandler, faultHandler));
-			
+			//this._testClient.test(new ItemResponder(getValueResultHandler, faultHandler));
 			
 			this._contextMenuPresenter = new ContextMenuPresenter(view);
 			
@@ -79,17 +79,18 @@ package org.openforis.collect.presenter {
 			//test initialization...
 			//test data
 			var surveys:ArrayCollection = new ArrayCollection();
-			
+			/*
 			var survey:SurveyImpl = new TestSurvey();
 			survey.name = "Survey 1";
 			surveys.addItem(survey);
+			*/
 			/*
 			survey = new TestSurvey();
 			survey.name = "Survey 2";
 			surveys.addItem(survey);
 			*/
-			Application.SURVEYS = surveys;
-			eventDispatcher.dispatchEvent(new ApplicationEvent(ApplicationEvent.SURVEYS_LOADED));
+			/*Application.SURVEYS = surveys;
+			eventDispatcher.dispatchEvent(new ApplicationEvent(ApplicationEvent.SURVEYS_LOADED));*/
 			
 			//symulate loading...
 			/*
@@ -99,7 +100,7 @@ package org.openforis.collect.presenter {
 				}, 2000);
 			*/
 			
-			eventDispatcher.dispatchEvent(new ApplicationEvent(ApplicationEvent.APPLICATION_INITIALIZED));
+			//eventDispatcher.dispatchEvent(new ApplicationEvent(ApplicationEvent.APPLICATION_INITIALIZED));
 		}
 		
 		override internal function initEventListeners():void {
@@ -117,6 +118,20 @@ package org.openforis.collect.presenter {
 			eventDispatcher.dispatchEvent(new ApplicationEvent(ApplicationEvent.SURVEYS_LOADED));
 		}
 		
+		internal function getSurveyResultHandler(event:ResultEvent, token:Object = null):void {
+			var survey:Survey = event.result as Survey;
+			
+			Application.SURVEYS = new ArrayCollection();
+			Application.SURVEYS.addItem(survey);
+			
+			eventDispatcher.dispatchEvent(new ApplicationEvent(ApplicationEvent.SURVEYS_LOADED));
+			
+			eventDispatcher.dispatchEvent(new ApplicationEvent(ApplicationEvent.APPLICATION_INITIALIZED));
+			
+			trace(survey.name);
+		}
+		
+		
 		internal function checkInitializationComplete():void {
 			//when all information is loaded, dispatch applicationInitialized event
 			if(_surveysLoaded && _sessionStateLoaded ) {
@@ -127,7 +142,7 @@ package org.openforis.collect.presenter {
 		internal function getSessionStateResultHandler(event:ResultEvent, token:Object = null):void {
 			//Application.SESSION_ID = event.result as String;
 			//TODO: Add sessionState to Application
-			
+			var sessionState:SessionState = event.result as SessionState;
 			eventDispatcher.dispatchEvent(new ApplicationEvent(ApplicationEvent.SESSION_STATE_LOADED));
 		}
 		

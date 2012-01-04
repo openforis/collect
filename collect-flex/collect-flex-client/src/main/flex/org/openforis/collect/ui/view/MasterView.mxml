@@ -55,15 +55,15 @@
 			</s:layout>
 			<s:Label text="{Message.get('master.loading')}" />
 		</s:NavigatorContent>
-<!--		<s:NavigatorContent width="100%" height="100%">
-			<component:HomeView id="homeView" width="100%" height="100%" />
+		<s:NavigatorContent width="100%" height="100%">
+			<view:HomeView id="homeView" width="100%" height="100%" />
 		</s:NavigatorContent>
 		<s:NavigatorContent width="100%" height="100%">
-			<component:SurveySelectionView id="surveySelectionView" width="100%" height="100%" />
+			<view:SurveySelectionView id="surveySelectionView" width="100%" height="100%" />
 		</s:NavigatorContent>
 		<s:NavigatorContent width="100%" height="100%">
-			<component:RootEntitySelectionView id="rootEntitySelectionView" width="100%" height="100%" />
-		</s:NavigatorContent>-->
+			<view:RootEntitySelectionView id="rootEntitySelectionView" width="100%" height="100%" />
+		</s:NavigatorContent>
 		<s:NavigatorContent width="100%" height="100%">
 			<view:ListView id="listView" width="100%" height="100%" />
 		</s:NavigatorContent>	

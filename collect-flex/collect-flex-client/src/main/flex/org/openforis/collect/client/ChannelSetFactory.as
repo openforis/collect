@@ -9,8 +9,8 @@ package org.openforis.collect.client {
 	 * */
 	public class ChannelSetFactory {
 		
-		internal static const AMF_SERVICES_CONTEXT_PATH:String = "messagebroker/amf";
-		internal static const AMF_MESSAGING_CONTEXT_PATH:String = "messagebroker/amfpolling";
+		internal static const AMF_SERVICES_CONTEXT_PATH:String = "graniteamf/amf";
+		internal static const AMF_MESSAGING_CONTEXT_PATH:String = "graniteamf/amfpolling";
 		
 		private static var _servicesChannelSet:ChannelSet;
 		private static var _messagingChannelSet:ChannelSet;

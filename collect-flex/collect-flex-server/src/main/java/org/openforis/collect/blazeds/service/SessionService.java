@@ -6,7 +6,6 @@ package org.openforis.collect.blazeds.service;
 import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.session.SessionState;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.flex.remoting.RemotingInclude;
 
 /**
  * @author M. Togna
@@ -22,7 +21,7 @@ public class SessionService {
 	/**
 	 * Method used to keep the session alive
 	 */
-	@RemotingInclude
+	//@RemotingInclude
 	public void keepAlive() {
 		this.sessionManager.keepSessionAlive();
 	}
@@ -31,7 +30,7 @@ public class SessionService {
 	 * Return the session state of the active httpsession
 	 * 
 	 */
-	@RemotingInclude
+	//@RemotingInclude
 	public SessionState getSessionState() {
 		return this.sessionManager.getSessionState();
 	}

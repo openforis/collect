@@ -3,18 +3,15 @@ package org.openforis.collect.manager;
 import java.util.Collection;
 import java.util.Date;
 
-import javax.servlet.http.HttpSession;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.granite.context.GraniteContext;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.User;
 import org.openforis.collect.session.SessionState;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-
-import flex.messaging.FlexContext;
 
 /**
  * 
@@ -30,10 +27,10 @@ public class SessionManager {
 	private static final String KEEP_ALIVE_SESSION_ATTRIBUTE_NAME = "keepAlive";
 
 	public SessionState getSessionState() {
-		SessionState sessionState = (SessionState) FlexContext.getHttpRequest().getSession().getAttribute(SESSION_STATE_SESSION_ATTRIBUTE_NAME);
+		SessionState sessionState = (SessionState) getSessionAttribute(SESSION_STATE_SESSION_ATTRIBUTE_NAME);
 		if (sessionState == null) {
 			sessionState = new SessionState();
-			FlexContext.getHttpRequest().getSession().setAttribute(SESSION_STATE_SESSION_ATTRIBUTE_NAME, sessionState);
+			setSessionAttribute(SESSION_STATE_SESSION_ATTRIBUTE_NAME, sessionState);
 		}
 
 		// CollectRecord activeRecord = this.getActiveRecord();
@@ -58,8 +55,9 @@ public class SessionManager {
 	}
 
 	public void keepSessionAlive() {
-		HttpSession session = FlexContext.getHttpRequest().getSession();
-		session.setAttribute(KEEP_ALIVE_SESSION_ATTRIBUTE_NAME, new Date());
+		setSessionAttribute(KEEP_ALIVE_SESSION_ATTRIBUTE_NAME, new Date());
+		//HttpSession session = FlexContext.getHttpRequest().getSession();
+		//session.setAttribute(KEEP_ALIVE_SESSION_ATTRIBUTE_NAME, new Date());
 		if (LOG.isDebugEnabled()) {
 			LOG.debug("Keep alive request received");
 		}
@@ -71,13 +69,13 @@ public class SessionManager {
 	// }
 
 	private User getLoggedInUser() {
-		SessionState sessionState = (SessionState) FlexContext.getHttpRequest().getSession().getAttribute(SESSION_STATE_SESSION_ATTRIBUTE_NAME);
+		SessionState sessionState = (SessionState) getSessionAttribute(SESSION_STATE_SESSION_ATTRIBUTE_NAME);
 		User user = sessionState.getUser();
 		if (user == null) {
 			Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 			String name = authentication.getName();
 			user = new User(name);
-			Collection<GrantedAuthority> authorities = authentication.getAuthorities();
+			Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
 			for (GrantedAuthority grantedAuthority : authorities) {
 				user.addAuthority(grantedAuthority.getAuthority());
 			}
@@ -85,5 +83,21 @@ public class SessionManager {
 		}
 		return user;
 	}
+	
+	private Object getSessionAttribute(String attributeName) {
+		//blazeds
+		//FlexContext.getHttpRequest().getSession().getAttribute(attributeName);
 
+		//graniteds
+		Object result = GraniteContext.getCurrentInstance().getSessionMap().get(attributeName);
+		return result;
+	}
+	
+	private void setSessionAttribute(String attributeName, Object value) {
+		//blazeds
+		//FlexContext.getHttpRequest().getSession().setAttribute(attributeName, value);
+		
+		//graniteds
+		GraniteContext.getCurrentInstance().getSessionMap().put(attributeName, value);
+	}
 }

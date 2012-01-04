@@ -1,16 +1,9 @@
 package org.openforis.collect.model {
 	import mx.collections.ArrayCollection;
 	
-	import org.openforis.collect.idm.model.impl.EntityImpl;
-	import org.openforis.idm.metamodel.impl.AbstractAttributeDefinition;
-	import org.openforis.idm.metamodel.impl.DateAttributeDefinitionImpl;
-	import org.openforis.idm.metamodel.impl.EntityDefinitionImpl;
-	import org.openforis.idm.metamodel.impl.ModelObjectLabelImpl;
-	import org.openforis.idm.metamodel.impl.ModelVersionImpl;
-	import org.openforis.idm.metamodel.impl.SchemaImpl;
-	import org.openforis.idm.metamodel.impl.SurveyImpl;
+	import org.openforis.idm.metamodel.Survey;
 	
-	public class TestSurvey extends SurveyImpl {
+	public class TestSurvey extends Survey {
 		
 		public function TestSurvey() {
 			super();

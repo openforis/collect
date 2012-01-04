@@ -24,7 +24,7 @@
 	<bean class="org.openforis.collect.spring.handler.UrlFilenameHandlerAdapter" autowire="byName" />
 
 	<util:map id="urlMappings">
-		<entry key="**/messagebroker/**" value-ref="_messageBroker" />
+<!-- 		<entry key="**/messagebroker/**" value-ref="_messageBroker" /> -->
 		<entry key="/index.htm" value-ref="fileNameViewController" />
 		<entry key="/error.htm" value-ref="fileNameViewController" />
 		<entry key="/accessDenied.htm" value-ref="fileNameViewController" />
@@ -61,7 +61,7 @@
 	<bean id="taxonService" class="org.openforis.collect.blazeds.service.TaxonService" autowire="byName">
 	</bean>
 
-	<bean id="metaDataService" class="org.openforis.collect.blazeds.service.MetaDataService" autowire="byName">
+	<bean id="modelService" class="org.openforis.collect.blazeds.service.ModelService" autowire="byName">
 	</bean>
 
 	<bean id="dataService" class="org.openforis.collect.blazeds.service.DataService" autowire="byName">
@@ -82,7 +82,21 @@
 	<!-- ===================================== -->
 	<bean id="sessionManager" class="org.openforis.collect.manager.SessionManager" />
 
+	
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+		<property name="driverClassName" value="org.postgresql.Driver" />
+		<property name="url" value="jdbc:postgresql://localhost:5432/collect" />
+		<property name="username" value="postgres" />
+		<property name="password" value="postgres" />
+	</bean>
 
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+    	<property name="dataSource" ref="testDataSource"/>
+    </bean>
+    
+	<bean id="surveyDao" class="org.openforis.collect.persistence.SurveyDAO">
+    	<property name="dataSource" ref="dataSource"/>
+	</bean>
 
 	<!-- DAO's -->
 	<!-- <bean id="applicationDao" class="org.fao.openforis.collect.dao.xml.ApplicationDaoImpl"> -->

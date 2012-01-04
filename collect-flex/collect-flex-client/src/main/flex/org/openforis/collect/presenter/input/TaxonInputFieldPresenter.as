@@ -15,8 +15,6 @@ package org.openforis.collect.presenter.input {
 	import mx.utils.StringUtil;
 	
 	import org.openforis.collect.event.TaxonInputFieldEvent;
-	import org.openforis.collect.idm.model.impl.AbstractValue;
-	import org.openforis.collect.idm.model.impl.Taxon;
 	import org.openforis.collect.presenter.InputFieldPresenter;
 	import org.openforis.collect.ui.component.input.InputField;
 	import org.openforis.collect.ui.component.input.TaxonAutoCompletePopUp;
@@ -78,7 +76,7 @@ package org.openforis.collect.presenter.input {
 			
 		}
 		
-		override public function set value(value:AbstractValue):void {
+		override public function set value(value:*):void {
 			_attributeValue = value;
 			//this._inputField.attribute = attribute;
 			this._taxonInputField.idTextInput.text = value.text1;
@@ -93,7 +91,10 @@ package org.openforis.collect.presenter.input {
 			this._inputField.approved = value.approved;
 		}
 		
-		override public function createValue():AbstractValue {
+		override public function createValue():* {
+			var result:* = null;
+			return result;
+			/*
 			var value:AbstractValue = new AbstractValue();
 			value.text1 = _taxonInputField.idTextInput.text;
 			value.text2 = _taxonInputField.scientificNameTextInput.text;
@@ -105,6 +106,7 @@ package org.openforis.collect.presenter.input {
 				value.remarks = value.remarks;
 			}
 			return value;
+			*/
 		}
 		
 		protected function textInputChangeHandler(event:Event):void {

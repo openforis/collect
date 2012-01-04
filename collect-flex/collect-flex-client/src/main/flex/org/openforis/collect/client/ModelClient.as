@@ -11,20 +11,27 @@ package org.openforis.collect.client {
 	 * 
 	 * @author S. Ricci
 	 * */
-	public class MetaModelClient extends AbstractClient {
+	public class ModelClient extends AbstractClient {
 		
 		private var _getSurveysOperation:Operation;
+		private var _getSurveyOperation:Operation;
 		private var _getSchemaOperation:Operation;
 		
-		public function MetaModelClient() {
-			super("metaModelService");
+		public function ModelClient() {
+			super("modelService");
 			
 			this._getSurveysOperation = getOperation("getSurveys");
+			this._getSurveyOperation = getOperation("getSurvey");
 			this._getSchemaOperation = getOperation("getSchema");
 		}
 		
 		public function getSurveys(responder:IResponder):void {
 			var token:AsyncToken = this._getSurveysOperation.send();
+			token.addResponder(responder);
+		}
+		
+		public function getSurvey(responder:IResponder, id:int):void {
+			var token:AsyncToken = this._getSurveyOperation.send(id);
 			token.addResponder(responder);
 		}
 		

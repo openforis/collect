@@ -6,9 +6,9 @@ package org.openforis.collect {
 	import mx.managers.ToolTipManager;
 	import mx.utils.URLUtil;
 	
-	import org.openforis.collect.idm.model.impl.EntityImpl;
 	import org.openforis.collect.model.Phase;
 	import org.openforis.idm.metamodel.Survey;
+	import org.openforis.idm.model.Entity;
 	
 	/**
 	 * @author Mino Togna
@@ -20,7 +20,7 @@ package org.openforis.collect {
 		public static var SURVEYS:IList;
 		
 		public static var selectedSurvey:Survey;
-		public static var selectedRootEntity:EntityImpl;
+		public static var selectedRootEntity:Entity;
 		public static var selectedPhase:Phase;
 		
 		private static var initialized:Boolean = false;

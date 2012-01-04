@@ -13,7 +13,8 @@
 
 	<properties>
 		<geotools.version>2.6.5</geotools.version>
-		<spring-security.version>3.0.5.RELEASE</spring-security.version>
+		<graniteds.version>2.3.0.GA</graniteds.version>
+<!-- 		<spring-security.version>3.0.5.RELEASE</spring-security.version> -->
 		<!-- 3.1.0.CI -->
 	</properties>
 	
@@ -97,11 +98,13 @@
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-webmvc</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>org.springframework.flex</groupId>
-			<artifactId>spring-flex</artifactId>
-			<version>1.0.3.RELEASE</version>
-		</dependency>
+		
+<!-- 		<dependency> -->
+<!-- 			<groupId>org.springframework.flex</groupId> -->
+<!-- 			<artifactId>spring-flex</artifactId> -->
+<!-- 			<version>1.0.3.RELEASE</version> -->
+<!-- 		</dependency> -->
+		
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-test</artifactId>
@@ -125,10 +128,10 @@
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-taglibs</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>org.springframework.security</groupId>
-			<artifactId>spring-security-cas-client</artifactId>
-		</dependency>
+<!-- 		<dependency> -->
+<!-- 			<groupId>org.springframework.security</groupId> -->
+<!-- 			<artifactId>spring-security-cas-client</artifactId> -->
+<!-- 		</dependency> -->
 
 		<!-- JSTL -->
 		<dependency>
@@ -169,12 +172,23 @@
 		<dependency>
 			<groupId>org.graniteds</groupId>
 			<artifactId>granite-core</artifactId>
-			<version>2.3.0.GA</version>
+			<version>${graniteds.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.graniteds</groupId>
 			<artifactId>granite-spring</artifactId>
-			<version>2.3.0.GA</version>
+			<version>${graniteds.version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<version>9.1-901.jdbc4</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-dbcp</groupId>
+			<artifactId>commons-dbcp</artifactId>
+			<version>1.4</version>
 		</dependency>
 	</dependencies>
 

@@ -8,7 +8,7 @@
 package org.openforis.collect.model {
 
     [Bindable]
-    [RemoteClass(alias="org.openforis.collect.model.SessionState")]
+    [RemoteClass(alias="org.openforis.collect.session.SessionState")]
     public class SessionState extends SessionStateBase {
     }
 }

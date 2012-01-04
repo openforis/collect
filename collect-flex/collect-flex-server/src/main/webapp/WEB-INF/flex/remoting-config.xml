@@ -20,4 +20,11 @@
 <!--         </properties> -->
 <!-- 	</destination> -->
     
+<!-- 	<destination id="sessionService"> -->
+<!--         <properties> -->
+<!--         	<factory>spring</factory> -->
+<!--             <source>sessionService</source> -->
+<!--             <scope>application</scope> -->
+<!--         </properties> -->
+<!-- 	</destination> -->
 </service>

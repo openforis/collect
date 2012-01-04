@@ -5,16 +5,11 @@ package org.openforis.collect.presenter.input {
 	import mx.controls.DateField;
 	import mx.events.CalendarLayoutChangeEvent;
 	import mx.events.DropdownEvent;
-	import mx.events.FlexEvent;
 	
-	import org.openforis.collect.event.InputFieldEvent;
-	import org.openforis.collect.event.DateInputFieldEvent;
-	import org.openforis.collect.idm.model.impl.AbstractValue;
 	import org.openforis.collect.presenter.InputFieldPresenter;
 	import org.openforis.collect.ui.component.input.DateInputField;
 	import org.openforis.collect.ui.component.input.InputField;
 	import org.openforis.collect.util.StringUtil;
-	import org.openforis.collect.util.UIUtil;
 	
 	/**
 	 * 
@@ -56,7 +51,8 @@ package org.openforis.collect.presenter.input {
 			}
 		}
 		
-		override public function set value(value:AbstractValue):void {
+		override public function set value(value:*):void {
+			/*
 			_attributeValue = value;
 			//this._inputField.attribute = attribute;
 			this._dateInputField.year.text = value.text1;
@@ -64,9 +60,13 @@ package org.openforis.collect.presenter.input {
 			this._dateInputField.day.text = value.text3;
 			this._inputField.remarks = value.remarks;
 			this._inputField.approved = value.approved;
+			*/
 		}
 		
-		override public function createValue():AbstractValue {
+		override public function createValue():* {
+			var result:* = null;
+			return result;
+			/*
 			var newAttributeValue:AbstractValue = new AbstractValue();
 			newAttributeValue.text1 = _dateInputField.year.text;
 			newAttributeValue.text2 = _dateInputField.month.text;
@@ -77,6 +77,7 @@ package org.openforis.collect.presenter.input {
 				newAttributeValue.remarks = value.remarks;
 			}
 			return newAttributeValue;
+			*/
 		}
 		
 		protected function dateFieldOpenHandler(event:Event):void {
