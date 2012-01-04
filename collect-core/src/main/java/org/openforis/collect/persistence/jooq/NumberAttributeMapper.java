@@ -5,29 +5,29 @@ import static org.openforis.collect.persistence.jooq.tables.Data.DATA;
 import org.jooq.InsertSetStep;
 import org.jooq.Record;
 import org.openforis.idm.metamodel.NumberAttributeDefinition;
-import org.openforis.idm.metamodel.SchemaObjectDefinition;
+import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.model.Entity;
-import org.openforis.idm.model.ModelObject;
+import org.openforis.idm.model.Node;
 import org.openforis.idm.model.NumberAttribute;
 
 /**
  * @author G. Miceli
  */
-class NumberAttributeMapper extends ModelObjectMapper {
+class NumberAttributeMapper extends NodeMapper {
 
 	@Override
-	Class<? extends SchemaObjectDefinition> getMappedClass() {
+	Class<? extends NodeDefinition> getMappedClass() {
 		return NumberAttributeDefinition.class;
 	}
 
 	@Override
-	void setInsertFields(ModelObject<?> node, InsertSetStep<?> insert) {
+	void setInsertFields(Node<?> node, InsertSetStep<?> insert) {
 		Number value = ((NumberAttribute<?>) node).getValue();
 		insert.set(DATA.NUMBER1, value == null ? null : value.doubleValue());
 	}
 
 	@Override
-	NumberAttribute<?> addObject(SchemaObjectDefinition defn, Record r, Entity parent) {
+	NumberAttribute<?> addNode(NodeDefinition defn, Record r, Entity parent) {
 		String name = defn.getName();
 		if ( ((NumberAttributeDefinition) defn).isInteger() ) {
 			Integer value = r.getValueAsInteger(DATA.NUMBER1);

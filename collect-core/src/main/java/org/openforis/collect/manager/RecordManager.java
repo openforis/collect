@@ -12,6 +12,7 @@ import org.openforis.collect.exception.MultipleEditException;
 import org.openforis.collect.exception.NonexistentIdException;
 import org.openforis.collect.exception.RecordLockedException;
 import org.openforis.collect.model.RecordListItem;
+import org.openforis.collect.persistence.RecordDAO;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.model.Record;
 
@@ -21,12 +22,9 @@ import org.openforis.idm.model.Record;
  */
 public class RecordManager {
 
-	public Survey getSurvey() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public Record create(String entityName) {
+	private RecordDAO recordDAO;
+	
+	public Record create(Survey survey, String entityName) {
 		// TODO Auto-generated method stub
 		return null;
 	}

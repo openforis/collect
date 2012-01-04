@@ -1,5 +1,8 @@
 package org.openforis.collect.persistence;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -7,12 +10,12 @@ import java.util.GregorianCalendar;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import static org.junit.Assert.*;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.model.AlphanumericCode;
+import org.openforis.idm.model.Coordinate;
 import org.openforis.idm.model.Date;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.NumericCode;
@@ -40,9 +43,11 @@ public class DAOIntegrationTest {
 	public void testCRUD() throws IOException, SurveyImportException, DataInconsistencyException  {
 		// LOAD MODEL
 		Survey survey = surveyDao.load("archenland1");
-		
-		// IMPORT MODEL
-//		Survey survey = importModel();
+
+		if ( survey == null ) {
+			// IMPORT MODEL
+			survey = importModel();
+		}
 		
 		// SAVE NEW
 		CollectRecord record = createRecord(survey);
@@ -93,6 +98,11 @@ public class DAOIntegrationTest {
 
 		Entity cluster = record.getRootEntity();
 		cluster.addValue("id", new AlphanumericCode("123_456"));
+		cluster.addValue("gps_realtime", Boolean.TRUE);
+		cluster.addValue("region", new NumericCode(001));
+		cluster.addValue("district", new NumericCode(002));
+		cluster.addValue("vehicle_location", new Coordinate(432423423l, 4324324l,"srs"));
+		cluster.addValue("gps_model", "TomTom 1.232");
 		{
 			Entity ts = cluster.addEntity("time_study");
 			ts.addValue("date", new Date(2011,2,14));
@@ -107,7 +117,7 @@ public class DAOIntegrationTest {
 		}
 		{
 			Entity plot = cluster.addEntity("plot");
-			plot.addValue("no", new NumericCode(1));
+			plot.addValue("no", new AlphanumericCode("1"));
 			Entity tree1 = plot.addEntity("tree");
 			tree1.addValue("dbh", 54.2);
 			tree1.addValue("total_height", 2.0);
@@ -117,7 +127,7 @@ public class DAOIntegrationTest {
 		}
 		{
 			Entity plot = cluster.addEntity("plot");
-			plot.addValue("no", new NumericCode(2));
+			plot.addValue("no", new AlphanumericCode("2"));
 			Entity tree1 = plot.addEntity("tree");
 			tree1.addValue("dbh", 34.2);
 			tree1.addValue("total_height", 2.0);
@@ -125,7 +135,7 @@ public class DAOIntegrationTest {
 			tree2.addValue("dbh", 85.8);
 			tree2.addValue("total_height", 4.0);
 		}
-		
+		System.err.println(record);
 		return record;
 	}
 

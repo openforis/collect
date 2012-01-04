@@ -6,27 +6,27 @@ package org.openforis.idm.model.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.openforis.idm.metamodel.ModelObjectDefinition;
-import org.openforis.idm.model.ModelObject;
+import org.openforis.idm.metamodel.NodeDefinition;
+import org.openforis.idm.model.Node;
 
 /**
  * @author M. Togna
  * 
  */
-public class ModelObjectListener {
+public class NodeListener {
 
-	private List<ModelObject<? extends ModelObjectDefinition>> changedObjects;
+	private List<Node<? extends NodeDefinition>> changedObjects;
 
-	public ModelObjectListener() {
-		this.changedObjects = new ArrayList<ModelObject<? extends ModelObjectDefinition>>();
+	public NodeListener() {
+		this.changedObjects = new ArrayList<Node<? extends NodeDefinition>>();
 	}
 
-	public void onStateChange(ModelObject<? extends ModelObjectDefinition> modelObject) {
-		this.changedObjects.add(modelObject);
+	public void onStateChange(Node<? extends NodeDefinition> node) {
+		this.changedObjects.add(node);
 	}
 
 	public void clear() {
-		this.changedObjects = new ArrayList<ModelObject<? extends ModelObjectDefinition>>();
+		this.changedObjects = new ArrayList<Node<? extends NodeDefinition>>();
 	}
 
 }

@@ -16,11 +16,11 @@ import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.persistence.jooq.DataMapper;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.Schema;
-import org.openforis.idm.metamodel.SchemaObjectDefinition;
+import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.model.Entity;
-import org.openforis.idm.model.ModelObject;
-import org.openforis.idm.model.ModelObjectVisitor;
+import org.openforis.idm.model.Node;
+import org.openforis.idm.model.NodeVisitor;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -61,7 +61,7 @@ public class RecordDAO extends CollectDAO {
 		String version = r.getValueAsString(RECORD.MODEL_VERSION);
 		
 		Schema schema = survey.getSchema();
-		SchemaObjectDefinition rootEntityDefn = schema.getById(rootEntityId);
+		NodeDefinition rootEntityDefn = schema.getById(rootEntityId);
 		if ( rootEntityDefn == null ) {
 			throw new NullPointerException("Unknown root entity id "+rootEntityId);
 		}
@@ -91,12 +91,12 @@ public class RecordDAO extends CollectDAO {
 					 .fetch();
 		
 		// Interate results and build tree
-		Map<Integer, ModelObject<? extends SchemaObjectDefinition>> objectsById = new HashMap<Integer, ModelObject<? extends SchemaObjectDefinition>>();
+		Map<Integer, Node<? extends NodeDefinition>> objectsById = new HashMap<Integer, Node<? extends NodeDefinition>>();
 		for (Record row : data) {
 			Integer id = row.getValueAsInteger(DATA.ID);
 			Integer parentId = row.getValueAsInteger(DATA.PARENT_ID);
 			Integer defnId = row.getValueAsInteger(DATA.DEFINITION_ID);
-			ModelObject<?> o;
+			Node<?> o;
 			if ( parentId == null ) {
 				// Process root entity
 				o = record.getRootEntity();
@@ -106,18 +106,18 @@ public class RecordDAO extends CollectDAO {
 				}
 			} else {
 				// Process other objects 
-				ModelObject<? extends SchemaObjectDefinition> parent = objectsById.get(parentId);
+				Node<? extends NodeDefinition> parent = objectsById.get(parentId);
 				if ( parent == null ) {
 					throw new DataInconsistencyException("Parent "+parentId+" not yet loaded");					
 				}
 				if ( !(parent instanceof Entity) ) {
 					throw new DataInconsistencyException("Parent "+parentId+" not an entity");
 				}
-				SchemaObjectDefinition defn = schema.getById(defnId);
+				NodeDefinition defn = schema.getById(defnId);
 				if ( defn == null ) {
 					throw new DataInconsistencyException("Unknown schema definition "+DATA.DEFINITION_ID);					
 				}
-				o = dataMapper.addObject(defn, row, (Entity) parent);
+				o = dataMapper.addNode(defn, row, (Entity) parent);
 			}
 			objectsById.put(id, o);
 		}
@@ -178,15 +178,29 @@ public class RecordDAO extends CollectDAO {
 	private void insertData(final CollectRecord record) {
 		// Initialize stack with root entity
 		final Entity root = record.getRootEntity();
-		root.traverse(new ModelObjectVisitor() {
+		final Map<Integer,Integer> dataIds = new HashMap<Integer, Integer>();
+		root.traverse(new NodeVisitor() {
 			@Override
-			public void visit(ModelObject<? extends SchemaObjectDefinition> node, int idx) {
-				insertDataRow(record, node, idx);
+			public void visit(Node<? extends NodeDefinition> node, int idx) {
+				// Get database ID of parent
+				Integer internalId = node.getId();
+				Integer parentDataId = null;
+				if ( node.getParent() != null ) {
+					Integer parentId = node.getParent().getId();
+					if ( parentId == null ) {
+						throw new NullPointerException("Parent id not set ");
+					}
+					parentDataId = dataIds.get(parentId);
+				}
+				
+				int dataId = insertDataRow(record, node, parentDataId, idx);
+				
+				dataIds.put(internalId, dataId);
 			}
 		});
 	}
 	
-	private void insertDataRow(CollectRecord record, ModelObject<? extends SchemaObjectDefinition> node, int idx) {
+	private int insertDataRow(CollectRecord record, Node<? extends NodeDefinition> node, Integer parentId, int idx) {
 		Integer defnId = node.getDefinition().getId();
 		if ( defnId == null ) {
 			throw new IllegalArgumentException("Null schema object definition id");			
@@ -198,10 +212,12 @@ public class RecordDAO extends CollectDAO {
 				  .set(DATA.ID, dataRowId)
 				  .set(DATA.DEFINITION_ID, defnId)
 				  .set(DATA.RECORD_ID, record.getId())
-				  .set(DATA.IDX, idx+1);
+				  .set(DATA.IDX, idx+1)
+				  .set(DATA.PARENT_ID, parentId);
 		dataMapper.setInsertFields(node, insert);
 
 		insert.execute();
 		
+		return dataRowId;
 	}
 }

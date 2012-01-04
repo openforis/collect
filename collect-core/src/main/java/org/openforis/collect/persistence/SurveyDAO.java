@@ -14,7 +14,7 @@ import org.jooq.Record;
 import org.jooq.Result;
 import org.jooq.impl.Factory;
 import org.openforis.idm.metamodel.Schema;
-import org.openforis.idm.metamodel.SchemaObjectDefinition;
+import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Survey;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,8 +41,8 @@ public class SurveyDAO extends CollectDAO {
 		
 		// Insert SCHEMA_DEFINITIONs
 		Schema schema = survey.getSchema();
-		Collection<SchemaObjectDefinition> definitions = schema.getDefinitions();
-		for ( SchemaObjectDefinition definition : definitions ) {
+		Collection<NodeDefinition> definitions = schema.getDefinitions();
+		for ( NodeDefinition definition : definitions ) {
 			int definitionId = jf.nextval(SCHEMA_DEFINITION_ID_SEQ).intValue();
 			String path = definition.getPath();
 			jf.insertInto(SCHEMA_DEFINITION)
@@ -65,7 +65,7 @@ public class SurveyDAO extends CollectDAO {
 		Survey survey = processSurveyRow(row);
 		// Load schema object definition ids from SCHEMA_DEFINITION table
 		if ( survey != null ) {
-			loadSchemaObjectDefinitions(survey);
+			loadNodeDefinitions(survey);
 		}
 		return survey;
 	}
@@ -81,7 +81,7 @@ public class SurveyDAO extends CollectDAO {
 		Survey survey = processSurveyRow(row);
 		// Load schema object definition ids from SCHEMA_DEFINITION table 
 		if ( survey != null ) {
-			loadSchemaObjectDefinitions(survey);
+			loadNodeDefinitions(survey);
 		}
 		return survey;
 	}
@@ -107,7 +107,7 @@ public class SurveyDAO extends CollectDAO {
 		return survey;
 	}
 
-	private void loadSchemaObjectDefinitions(Survey survey) {
+	private void loadNodeDefinitions(Survey survey) {
 		Factory jf = getJooqFactory();
 		// Internal IDs by path and associate with each node in tree
 		Schema schema = survey.getSchema();
@@ -118,7 +118,7 @@ public class SurveyDAO extends CollectDAO {
 		for (Record defnRecord : result) {
 			int defnId = defnRecord.getValueAsInteger(SCHEMA_DEFINITION.ID);
 			String path = defnRecord.getValueAsString(SCHEMA_DEFINITION.PATH);
-			SchemaObjectDefinition defn = schema.getByPath(path);
+			NodeDefinition defn = schema.getByPath(path);
 			defn.setId(defnId);
 		}
 	}
