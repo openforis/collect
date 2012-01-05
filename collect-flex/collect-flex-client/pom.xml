@@ -9,18 +9,23 @@
 	</parent>
 
 	<artifactId>collect-flex-client</artifactId>
-	<packaging>pom</packaging>
+	<packaging>swf</packaging>
 	
 	<properties>
-		<flexmojos.version>4.0-beta-5</flexmojos.version>
+		<graniteds.version>2.3.0.GA</graniteds.version>
+		<flex.framework.version>4.5.1.21328</flex.framework.version>
+<!-- 		<flex.framework.version>4.5.0.18623</flex.framework.version> -->
+<!-- 		<flex.framework.version>4.1.0.16076</flex.framework.version> -->
 	</properties>
 	
 	<build>
+		<sourceDirectory>src/main/flex</sourceDirectory>
+		<testSourceDirectory>src/test/flex</testSourceDirectory>
 		<plugins>
 			<plugin>
 				<groupId>org.sonatype.flexmojos</groupId>
 				<artifactId>flexmojos-maven-plugin</artifactId>
-				<version>${flexmojos.version}</version>
+				<extensions>true</extensions>
 				<executions>
 					<execution>
 						<phase>generate-sources</phase>
@@ -30,6 +35,7 @@
 					</execution>
 				</executions>
 				<configuration>
+					<staticLinkRuntimeSharedLibraries>true</staticLinkRuntimeSharedLibraries>
 					<outputDirectory>${project.build.directory}/generated-sources/flex</outputDirectory>
 					<includeJavaClasses>
 						<includeClass>org.openforis.collect.session.**</includeClass>
@@ -37,12 +43,48 @@
 						<includeClass>org.openforis.idm.model.**</includeClass>
 						<includeClass>org.openforis.idm.metamodel.**</includeClass>
 					</includeJavaClasses>
-<!-- 					<excludeJavaClasses> -->
-<!-- 						<excludeClass>org.openforis.idm.metamodel.CodeList</excludeClass> -->
-<!-- 					</excludeJavaClasses> -->
+					<sourcePaths>
+						<path>${basedir}/src/main/flex</path>
+					   	<path>${project.build.directory}/generated-sources/flex</path>
+					   	<path>${project.build.directory}/generated-sources/flexmojos</path>
+					</sourcePaths>
+<!-- 					<resourceBundlePath>{basedir}/src/main/locales/{locale}</resourceBundlePath> -->
+<!-- 					<useResourceBundleMetadata>true</useResourceBundleMetadata> -->
+<!-- 					<mergeResourceBundle>true</mergeResourceBundle> -->
+<!-- 					<localesSourcePath>{basedir}/src/main/locales/{locale}</localesSourcePath> -->
+<!-- 					<locales> -->
+<!-- 						<locale>en_US</locale> -->
+<!-- 					</locales> -->
+<!--                     <includeResourceBundles>  -->
+<!--                         <bundle>messages</bundle>  -->
+<!--                     </includeResourceBundles> -->
+<!--                     <localesCompiled> -->
+<!--                     	<locale>en_US</locale> -->
+<!--                     </localesCompiled> -->
+<!--                     <localesRuntime> -->
+<!--                     	<locale>en_US</locale> -->
+<!--                   	</localesRuntime> -->
+<!--                   	<compiledLocales> -->
+<!--                   		<locale>en_US</locale> -->
+<!--                   	</compiledLocales> -->
+<!-- 					<compilerLocales> -->
+<!--                   		<locale>en_US</locale> -->
+<!--                   	</compilerLocales> -->
+<!-- 					<runtimeLocales> -->
+<!-- 						<locale>en_US</locale> -->
+<!-- 					</runtimeLocales> -->
 				</configuration>
+				<dependencies>
+	                <dependency>
+	                    <groupId>com.adobe.flex</groupId>
+	                    <artifactId>compiler</artifactId>
+	                    <version>${flex.framework.version}</version>
+	                    <type>pom</type>
+	                </dependency>
+	            </dependencies>
 			</plugin>
 		</plugins>
+		<finalName>collect</finalName>
 	</build>
 
 	<dependencies>
@@ -64,11 +106,18 @@
 			<scope>provided</scope>
 			<type>jar</type>
 		</dependency>
+
 		<dependency>
-			<groupId>org.sonatype.flexmojos</groupId>
-			<artifactId>flexmojos-maven-plugin</artifactId>
-			<type>maven-plugin</type>
-			<version>${flexmojos.version}</version><!--$NO-MVN-MAN-VER$ -->
+			<groupId>com.adobe.flex.framework</groupId>
+			<artifactId>flex-framework</artifactId>
+			<version>${flex.framework.version}</version>
+			<type>pom</type>
 		</dependency>
+		<dependency>
+            <groupId>org.graniteds</groupId>
+            <artifactId>granite-swc</artifactId>
+            <version>${graniteds.version}</version>
+            <type>swc</type>
+        </dependency>
 	</dependencies>
 </project>
