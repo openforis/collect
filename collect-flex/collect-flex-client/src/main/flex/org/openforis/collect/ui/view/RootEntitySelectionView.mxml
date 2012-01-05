@@ -54,7 +54,7 @@
 					<fx:Script>
 						<![CDATA[
 							import org.openforis.idm.metamodel.EntityDefinition;
-							import org.openforis.idm.metamodel.NodeDefinitionLabel;
+							import org.openforis.idm.metamodel.NodeLabel;
 							import org.openforis.idm.model.Entity;
 							
 							[Bindable]
@@ -63,7 +63,7 @@
 							override public function set data(value:Object):void {
 								super.data = value;
 								
-								entityLabel = ((value as EntityDefinition).labels.getItemAt(0) as NodeDefinitionLabel).text;
+								entityLabel = ((value as EntityDefinition).labels.getItemAt(0) as NodeLabel).text;
 							}
 						]]>
 					</fx:Script>
