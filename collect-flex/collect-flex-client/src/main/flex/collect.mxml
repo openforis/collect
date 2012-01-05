@@ -50,9 +50,6 @@
 		<view:Header width="100%" />
 		<view:MasterView width="100%" height="100%" />
 		<view:Footer width="100%" />
-
-		<input:TaxonInputField />
-
 	</s:SkinnableContainer>
 	
 	<!--

@@ -37,7 +37,6 @@ package org.openforis.collect.presenter {
 		
 		override internal function initEventListeners():void{
 			eventDispatcher.addEventListener(ApplicationEvent.APPLICATION_INITIALIZED, applicationInitializedHandler);
-			eventDispatcher.addEventListener(ApplicationEvent.SCHEMA_LOADED, schemaLoadedHandler);
 			eventDispatcher.addEventListener(UIEvent.SURVEY_SELECTED, surveySelectedHandler);
 			eventDispatcher.addEventListener(UIEvent.ROOT_ENTITY_SELECTED, rootEntitySelectedHandler);
 			eventDispatcher.addEventListener(UIEvent.NEW_RECORD_CREATED, newRecordCreatedHandler);
@@ -49,7 +48,9 @@ package org.openforis.collect.presenter {
 				_view.currentState = "surveySelection";
 			} else {
 				//select first survey
-				selectSurvey(Application.SURVEYS[0]);
+				var uiEvent:UIEvent = new UIEvent(UIEvent.SURVEY_SELECTED);
+				uiEvent.obj = Application.SURVEYS[0]; 
+				eventDispatcher.dispatchEvent(uiEvent);
 			}
 		}
 		
@@ -60,36 +61,24 @@ package org.openforis.collect.presenter {
 		protected function selectSurvey(survey:Survey):void {
 			//TODO load root entities for the selected survey
 			Application.selectedSurvey = survey;
-			loadSchema();
-		}
-		
-		protected function loadSchema():void {
-			//TODO call metamodelclient...
-			//_view.currentState = "loading";
 			
-			//test data
-			/*
-			var rootEntities:ArrayCollection = new ArrayCollection([
-				{label: "Cluster", id: "cluster"},
-				{label: "Plot", id: "plot"}
-			]);
-			*/
-			var applicationEvent:ApplicationEvent = new ApplicationEvent(ApplicationEvent.SCHEMA_LOADED);
-			applicationEvent.result = Application.selectedSurvey.schema;
-			eventDispatcher.dispatchEvent(applicationEvent);
-		}
-		
-		protected function schemaLoadedHandler(event:ApplicationEvent):void {
-			var schema:Schema = event.result as Schema;
+			var schema:Schema = survey.schema;
 			if(schema != null) {
 				var rootEntities:IList = schema.rootEntityDefinitions;
 				if(rootEntities != null && rootEntities.length > 0) {
+					
+					//FORCE THE SELECTION OF FIRST ROOT ENTITY
+					var uiEvent:UIEvent = new UIEvent(UIEvent.ROOT_ENTITY_SELECTED);
+					uiEvent.obj = rootEntities[0];
+					eventDispatcher.dispatchEvent(uiEvent);
+					/*
 					if(rootEntities.length == 1) {
 						//TODO load records for the unique root entity
 						_view.currentState = "list";
 					} else {
 						_view.currentState = "rootEntitySelection";
 					}
+					*/
 				} else {
 					//TODO error, no root entities found
 				}
@@ -105,7 +94,9 @@ package org.openforis.collect.presenter {
 		
 		protected function selectRootEntity(rootEntity:Entity):void {
 			Application.selectedRootEntity = rootEntity;
-			//loadRecords();
+			
+			_view.currentState = "list";
+			//TODO loadRecords();
 		}
 		
 		protected function newRecordCreatedHandler(event:UIEvent):void {

@@ -51,7 +51,23 @@
 		<s:itemRenderer>
 			<fx:Component>
 				<s:ItemRenderer>
-					<s:Button label="{data.definition.name}" height="100" width="100" click="{this.outerDocument.itemSelected(data)}" />
+					<fx:Script>
+						<![CDATA[
+							import org.openforis.idm.metamodel.EntityDefinition;
+							import org.openforis.idm.metamodel.NodeDefinitionLabel;
+							import org.openforis.idm.model.Entity;
+							
+							[Bindable]
+							private var entityLabel:String;
+							
+							override public function set data(value:Object):void {
+								super.data = value;
+								
+								entityLabel = ((value as EntityDefinition).labels.getItemAt(0) as NodeDefinitionLabel).text;
+							}
+						]]>
+					</fx:Script>
+					<s:Button label="{entityLabel}" height="100" width="100" click="{this.outerDocument.itemSelected(data)}" />
 				</s:ItemRenderer>
 			</fx:Component>
 		</s:itemRenderer>

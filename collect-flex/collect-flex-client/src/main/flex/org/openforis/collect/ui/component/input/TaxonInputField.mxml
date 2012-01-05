@@ -7,6 +7,8 @@
 				  >
 	<fx:Script>
 		<![CDATA[
+			import flash.utils.getQualifiedClassName;
+			
 			import mx.core.FlexGlobals;
 			import mx.core.UIComponent;
 			
@@ -19,7 +21,7 @@
 			
 			// Define a static method.
 			private static function initDefaultStyles():Boolean {
-				if (!FlexGlobals.topLevelApplication.styleManager.getStyleDeclaration("org.openforis.collect.ui.component.detail.input.TaxonInputField"))
+				if (!FlexGlobals.topLevelApplication.styleManager.getStyleDeclaration("org.openforis.collect.ui.component.input.TaxonInputField"))
 				{
 					// If there is no CSS definition for StyledRectangle, 
 					// then create one and set the default value.
@@ -28,7 +30,7 @@
 					{
 						this.searchIconVisible = true;
 					}
-					FlexGlobals.topLevelApplication.styleManager.setStyleDeclaration("org.openforis.collect.ui.component.detail.input.TaxonInputField", myStyles, true);
+					FlexGlobals.topLevelApplication.styleManager.setStyleDeclaration("org.openforis.collect.ui.component.input.TaxonInputField", myStyles, true);
 				}
 				return true;
 			}
@@ -54,7 +56,7 @@
 	</fx:Declarations>
 	
 	<fx:Metadata>
-		[Style(name="searchIconVisible",type="Boolean",inherit="yes",default="true")]
+		[Style(name="searchIconVisible",type="Boolean",inherit="yes")]
 	</fx:Metadata>
 	
 	<s:BorderContainer 

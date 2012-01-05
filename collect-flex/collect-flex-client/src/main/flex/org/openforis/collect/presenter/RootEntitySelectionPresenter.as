@@ -12,6 +12,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.event.UIEvent;
 	import org.openforis.collect.ui.view.RootEntitySelectionView;
 	import org.openforis.idm.metamodel.Schema;
+	import org.openforis.idm.metamodel.Survey;
 	
 	public class RootEntitySelectionPresenter extends AbstractPresenter {
 		
@@ -23,12 +24,12 @@ package org.openforis.collect.presenter {
 		}
 		
 		override internal function initEventListeners():void{
-			eventDispatcher.addEventListener(ApplicationEvent.SCHEMA_LOADED, schemaLoadedHandler);
+			eventDispatcher.addEventListener(UIEvent.SURVEY_SELECTED, surveySelectedHandler);
 			_view.addEventListener(UIEvent.ROOT_ENTITY_SELECTED, rootEntitySelectedHandler);
 		}
 		
-		protected function schemaLoadedHandler(event:ApplicationEvent):void {
-			_view.rootEntitiesDataGroup.dataProvider = (event.result as Schema).rootEntityDefinitions;
+		protected function surveySelectedHandler(event:UIEvent):void {
+			_view.rootEntitiesDataGroup.dataProvider = (event.obj as Survey).schema.rootEntityDefinitions;
 		}
 		
 		protected function rootEntitySelectedHandler(event:UIEvent):void {

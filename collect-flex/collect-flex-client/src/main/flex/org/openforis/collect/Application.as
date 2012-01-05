@@ -7,6 +7,7 @@ package org.openforis.collect {
 	import mx.utils.URLUtil;
 	
 	import org.openforis.collect.model.Phase;
+	import org.openforis.collect.util.ModelClassInitializer;
 	import org.openforis.idm.metamodel.Survey;
 	import org.openforis.idm.model.Entity;
 	
@@ -59,6 +60,7 @@ package org.openforis.collect {
 				ToolTipManager.showDelay = 0;				
 				ToolTipManager.hideDelay = 3000;
 				
+				ModelClassInitializer.init();
 				
 				initialized = true;
 				CursorManager.removeBusyCursor();
