@@ -10,19 +10,22 @@ package org.openforis.collect.model {
     import flash.utils.IDataInput;
     import flash.utils.IDataOutput;
     import flash.utils.IExternalizable;
+    
+    import org.openforis.idm.metamodel.Survey;
     import org.openforis.idm.model.Record;
 
     [Bindable]
     public class SessionStateBase implements IExternalizable {
 
-        private var _activeRecord:Record;
+        private var _activeRecord:CollectRecord;
         private var _sessionId:String;
         private var _user:User;
+		private var _activeSurvey:Survey;
 
-        public function set activeRecord(value:Record):void {
+        public function set activeRecord(value:CollectRecord):void {
             _activeRecord = value;
         }
-        public function get activeRecord():Record {
+        public function get activeRecord():CollectRecord {
             return _activeRecord;
         }
 
@@ -39,17 +42,28 @@ package org.openforis.collect.model {
         public function get user():User {
             return _user;
         }
+		
+		public function get activeSurvey():Survey {
+			return _activeSurvey;
+		}
+		
+		public function set activeSurvey(value:Survey):void {
+			_activeSurvey = value;
+		}
 
         public function readExternal(input:IDataInput):void {
-            _activeRecord = input.readObject() as Record;
+            _activeRecord = input.readObject() as CollectRecord;
             _sessionId = input.readObject() as String;
             _user = input.readObject() as User;
+			_activeSurvey = input.readObject() as Survey;
         }
 
         public function writeExternal(output:IDataOutput):void {
             output.writeObject(_activeRecord);
             output.writeObject(_sessionId);
             output.writeObject(_user);
+			output.writeObject(_activeSurvey);
         }
+
     }
 }
