@@ -82,7 +82,12 @@
 	<!-- ===================================== -->
 	<bean id="sessionManager" class="org.openforis.collect.manager.SessionManager" />
 
+	<bean id="surveyManager" class="org.openforis.collect.manager.SurveyManager" />
+
 	
+	<!-- ===================================== -->
+	<!-- Data Source -->
+	<!-- ===================================== -->
 	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
 		<property name="driverClassName" value="${db.driver}" />
 		<property name="url" value="${db.connectionUrl}" />
@@ -94,11 +99,13 @@
     	<property name="dataSource" ref="dataSource"/>
     </bean>
     
+    <!-- ===================================== -->
+	<!-- DAOs -->
+	<!-- ===================================== -->
 	<bean id="surveyDao" class="org.openforis.collect.persistence.SurveyDAO">
     	<property name="dataSource" ref="dataSource"/>
 	</bean>
 
-	<!-- DAO's -->
 	<!-- <bean id="applicationDao" class="org.fao.openforis.collect.dao.xml.ApplicationDaoImpl"> -->
 	<!-- <property name="recordDao" ref="recordDao" /> -->
 	<!-- <property name="versionDao" ref="versionDao" /> -->
