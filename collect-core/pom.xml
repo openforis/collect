@@ -8,7 +8,8 @@
 	</parent>
 
 	<artifactId>collect-core</artifactId>
-
+	<packaging>jar</packaging>
+	
 	<properties>
 		<geotools.version>2.6.5</geotools.version>
 	</properties>
@@ -20,7 +21,79 @@
 			<url>http://download.osgeo.org/webdav/geotools/</url>
 		</repository>
 	</repositories>
+	
+	<profiles>
+	   <profile>
+	   	<!--  
+	   		To regenerate jOOQ classes: 
+	   		mvn generate-sources -P codegen 
+	   	 -->
+	     <id>codegen</id>
+	     <build>
+	       <plugins>
+				<!-- jOOQ code generator plugin -->
+				<plugin>
+					<groupId>org.jooq</groupId>
+					<artifactId>jooq-codegen-maven</artifactId>
+					<version>2.0.1</version>
+					<executions>
+						<execution>
+							<phase>generate-sources</phase>
+							<goals>
+								<goal>generate</goal>
+							</goals>
+						</execution>
+					</executions>
+					<dependencies>
+						<dependency>
+							<groupId>postgresql</groupId>
+							<artifactId>postgresql</artifactId>
+							<version>9.1-901.jdbc4</version>
+						</dependency>
+					</dependencies>
+			
+					<configuration>
+						<jdbc>
+							<driver>org.postgresql.Driver</driver>
+							<url>jdbc:postgresql://localhost:5432/collect</url>
+							<user>postgres</user>
+							<password>postgres</password>
+						</jdbc>
+						<generator>
+							<name>org.jooq.util.DefaultGenerator</name>
+							<database>
+								<name>org.jooq.util.postgres.PostgresDatabase</name>
+								<includes>.*</includes>
+								<excludes></excludes>
+								<inputSchema>collect</inputSchema>
+							</database>
+							<generate>
+								<relations>true</relations>
+								<deprecated>false</deprecated>
+							</generate>
+							<target>
+								<packageName>org.openforis.collect.persistence.jooq</packageName>
+								<directory>${basedir}/src/generated/java</directory>
+							</target>
+							<masterDataTables>
+								<masterDataTable>
+									<name>t_language</name>
+									<literal>cd</literal>
+									<description>description</description>
+								</masterDataTable>
+							</masterDataTables>
+						</generator>
+					</configuration>
+				</plugin>
+	       </plugins>
+	     </build>
+	   </profile>
+   </profiles>
+	
+	
+	
 	<build>
+	
 		<plugins>
 		<!-- 
 		  <plugin>
@@ -43,76 +116,46 @@
 		      </execution>
 		    </executions>
 		  </plugin>
+	      <plugin>
+	        <groupId>org.apache.maven.plugins</groupId>
+	        <artifactId>maven-eclipse-plugin</artifactId>
+	        <version>2.8</version>
+	        <configuration>
+	          <sourceIncludes>
+	            <sourceInclude>src/generated/java</sourceInclude>
+	          </sourceIncludes>
+	        </configuration>
+	      </plugin>
 			 -->
-			<!-- Additional configuration for Eclipse IDE -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-eclipse-plugin</artifactId>
-				<version>2.8</version>
-				<configuration>
-					<additionalProjectFacets>
-						<jpt.jpa>2.0</jpt.jpa>
-					</additionalProjectFacets>
-				</configuration>
-			</plugin>
-			<!-- jOOQ code generator plugin -->
-			<plugin>
-				<groupId>org.jooq</groupId>
-				<artifactId>jooq-codegen-maven</artifactId>
-				<version>2.0.1</version>
-				<executions>
-					<execution>
-						<phase>generate-sources</phase>
-						<goals>
-							<goal>generate</goal>
-						</goals>
-					</execution>
-				</executions>
-				<dependencies>
-					<dependency>
-						<groupId>postgresql</groupId>
-						<artifactId>postgresql</artifactId>
-						<version>9.1-901.jdbc4</version>
-					</dependency>
-				</dependencies>
-		
-				<configuration>
-					<jdbc>
-						<driver>org.postgresql.Driver</driver>
-						<url>jdbc:postgresql://localhost:5432/collect</url>
-						<user>postgres</user>
-						<password>postgres</password>
-					</jdbc>
-					<generator>
-						<name>org.jooq.util.DefaultGenerator</name>
-						<database>
-							<name>org.jooq.util.postgres.PostgresDatabase</name>
-							<includes>.*</includes>
-							<excludes></excludes>
-							<inputSchema>collect</inputSchema>
-						</database>
-						<generate>
-							<relations>true</relations>
-							<deprecated>false</deprecated>
-						</generate>
-						<target>
-							<packageName>org.openforis.collect.persistence.jooq</packageName>
-							<directory>${basedir}/target/generated-sources/jooq</directory>
-						</target>
-						<masterDataTables>
-							<masterDataTable>
-								<name>t_language</name>
-								<literal>cd</literal>
-								<description>description</description>
-							</masterDataTable>
-						</masterDataTables>
-					</generator>
-				</configuration>
-			</plugin>
+			 
+			<!--  Add generated sources to build path -->
+		   <plugin>
+		        <groupId>org.codehaus.mojo</groupId>
+		        <artifactId>build-helper-maven-plugin</artifactId>
+		        <version>1.1</version>
+		        <executions>
+		          <execution>
+		            <id>add-source</id>
+		            <phase>generate-sources</phase>
+		            <goals>
+		              <goal>add-source</goal>
+		            </goals>
+		            <configuration>
+		              <sources>
+		                <source>src/generated/java</source>
+		              </sources>
+		            </configuration>
+		          </execution>
+		    	</executions>
+		    </plugin>			
 		</plugins>
 		<pluginManagement>
 			<plugins>
-				<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+				<!--
+					Set up Eclipse m2e settings to remove errors show in IDE. 
+					
+					This has no influence on the build itself.
+				-->
 				<plugin>
 					<groupId>org.eclipse.m2e</groupId>
 					<artifactId>lifecycle-mapping</artifactId>
@@ -123,16 +166,20 @@
 								<pluginExecution>
 									<pluginExecutionFilter>
 										<groupId>org.jooq</groupId>
-										<artifactId>
-											jooq-codegen-maven
-										</artifactId>
-										<versionRange>
-											[2.0.1,)
-										</versionRange>
+										<artifactId>jooq-codegen-maven</artifactId>
+										<versionRange>[2.0.1,)</versionRange>
 										<goals>
 											<goal>generate</goal>
 										</goals>
 									</pluginExecutionFilter>
+<!-- 									<pluginExecutionFilter> -->
+<!-- 								        <groupId>org.codehaus.mojo</groupId> -->
+<!-- 								        <artifactId>build-helper-maven-plugin</artifactId> -->
+<!-- 										<versionRange>[1.1,)</versionRange> -->
+<!-- 										<goals> -->
+<!-- 											<goal>java</goal> -->
+<!-- 										</goals> -->
+<!-- 									</pluginExecutionFilter> -->
 									<action>
 										<ignore></ignore>
 									</action>
