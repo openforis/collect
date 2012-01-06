@@ -27,52 +27,50 @@
 				<artifactId>flexmojos-maven-plugin</artifactId>
 				<extensions>true</extensions>
 				<executions>
+					<!-- 
 					<execution>
+						<id>generate-as-sources</id>
 						<phase>generate-sources</phase>
 						<goals>
 							<goal>generate</goal>
 						</goals>
+						<configuration>
+							<outputDirectory>${project.build.directory}/generated-sources/flex</outputDirectory>
+				
+							<includeJavaClasses>
+								<includeClass>org.openforis.collect.session.**</includeClass>
+								<includeClass>org.openforis.collect.model.**</includeClass>
+								<includeClass>org.openforis.idm.model.**</includeClass>
+								<includeClass>org.openforis.idm.metamodel.**</includeClass>
+							</includeJavaClasses>
+						</configuration>
+					</execution>
+					 -->
+					<execution>
+						<id>compile-flex-sources</id>
+						<phase>compile</phase>
+						<goals>
+							<goal>compile-swf</goal>
+						</goals>
 					</execution>
 				</executions>
 				<configuration>
-					<staticLinkRuntimeSharedLibraries>true</staticLinkRuntimeSharedLibraries>
-					<outputDirectory>${project.build.directory}/generated-sources/flex</outputDirectory>
-					<includeJavaClasses>
-						<includeClass>org.openforis.collect.session.**</includeClass>
-						<includeClass>org.openforis.collect.model.**</includeClass>
-						<includeClass>org.openforis.idm.model.**</includeClass>
-						<includeClass>org.openforis.idm.metamodel.**</includeClass>
-					</includeJavaClasses>
-					<sourcePaths>
-						<path>${basedir}/src/main/flex</path>
-					   	<path>${project.build.directory}/generated-sources/flex</path>
-					   	<path>${project.build.directory}/generated-sources/flexmojos</path>
-					</sourcePaths>
-<!-- 					<resourceBundlePath>{basedir}/src/main/locales/{locale}</resourceBundlePath> -->
-<!-- 					<useResourceBundleMetadata>true</useResourceBundleMetadata> -->
-<!-- 					<mergeResourceBundle>true</mergeResourceBundle> -->
-<!-- 					<localesSourcePath>{basedir}/src/main/locales/{locale}</localesSourcePath> -->
-<!-- 					<locales> -->
-<!-- 						<locale>en_US</locale> -->
-<!-- 					</locales> -->
-<!--                     <includeResourceBundles>  -->
-<!--                         <bundle>messages</bundle>  -->
-<!--                     </includeResourceBundles> -->
-<!--                     <localesCompiled> -->
-<!--                     	<locale>en_US</locale> -->
-<!--                     </localesCompiled> -->
-<!--                     <localesRuntime> -->
-<!--                     	<locale>en_US</locale> -->
-<!--                   	</localesRuntime> -->
-<!--                   	<compiledLocales> -->
-<!--                   		<locale>en_US</locale> -->
-<!--                   	</compiledLocales> -->
-<!-- 					<compilerLocales> -->
-<!--                   		<locale>en_US</locale> -->
-<!--                   	</compilerLocales> -->
-<!-- 					<runtimeLocales> -->
-<!-- 						<locale>en_US</locale> -->
-<!-- 					</runtimeLocales> -->
+						<showWarnings>false</showWarnings>
+						<staticLinkRuntimeSharedLibraries>true</staticLinkRuntimeSharedLibraries>
+						<sourceDirectory>${basedir}/src/main/flex</sourceDirectory>
+						<sourceFile>collect.mxml</sourceFile>
+				
+						<resourceBundlePath>{basedir}/src/main/locales/{locale}</resourceBundlePath>
+						<mergeResourceBundle>true</mergeResourceBundle>
+						<locales>
+							<locale>en_US</locale>
+						</locales>
+						<localesCompiled>
+							<locale>en_US</locale>
+						</localesCompiled>
+						<includeResourceBundles>
+							<bundle>messages</bundle>
+						</includeResourceBundles>
 				</configuration>
 				<dependencies>
 	                <dependency>
@@ -82,7 +80,29 @@
 	                    <type>pom</type>
 	                </dependency>
 	            </dependencies>
+	            
 			</plugin>
+
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<version>1.7</version>
+				<executions>
+					<execution>
+						<id>add-flex-resource-source-path</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>add-source</goal>
+						</goals>
+						<configuration>
+							<sources>
+								  	<source>${project.build.directory}/generated-sources/flex</source>
+					   				<source>${project.build.directory}/generated-sources/flexmojos</source>
+							</sources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin> 
 		</plugins>
 		<finalName>collect</finalName>
 	</build>
