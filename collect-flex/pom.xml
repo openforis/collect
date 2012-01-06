@@ -16,4 +16,38 @@
   	<module>collect-flex-client</module>
   </modules>
   
+  <build>
+	<pluginManagement>
+		<plugins>
+			<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself. -->
+			<plugin>
+				<groupId>org.eclipse.m2e</groupId>
+				<artifactId>lifecycle-mapping</artifactId>
+				<version>1.0.0</version>
+				<configuration>
+					<lifecycleMappingMetadata>
+						<pluginExecutions>
+							<pluginExecution>
+								<pluginExecutionFilter>
+									<groupId>org.sonatype.flexmojos</groupId>
+									<artifactId>flexmojos-maven-plugin</artifactId>
+									<versionRange>[4.0-pre-alpha-1,)</versionRange>
+									<goals>
+										<goal>compile-swf</goal>
+										<goal>test-compile</goal>
+										<goal>copy-flex-resources</goal>
+										<goal>generate</goal>
+									</goals>
+								</pluginExecutionFilter>
+								<action>
+									<execute/>
+								</action>
+							</pluginExecution>
+						</pluginExecutions>
+					</lifecycleMappingMetadata>
+				</configuration>
+			</plugin>
+		</plugins>
+	</pluginManagement>
+  </build>
 </project>
