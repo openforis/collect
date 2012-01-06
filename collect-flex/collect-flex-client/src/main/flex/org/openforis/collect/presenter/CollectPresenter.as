@@ -64,17 +64,23 @@ package org.openforis.collect.presenter {
 			_surveysLoaded = true;
 			checkInitializationComplete();
 			var surveys:IList = event.result as IList;
-			Application.SURVEYS = surveys;
+			
+			var applicationEvent:ApplicationEvent = new ApplicationEvent(ApplicationEvent.SURVEYS_LOADED);
+			applicationEvent.result = surveys;
+			
 			eventDispatcher.dispatchEvent(new ApplicationEvent(ApplicationEvent.SURVEYS_LOADED));
 		}
 		
 		internal function getSurveyResultHandler(event:ResultEvent, token:Object = null):void {
 			var survey:Survey = event.result as Survey;
 			
-			Application.SURVEYS = new ArrayCollection();
-			Application.SURVEYS.addItem(survey);
+			var surveys:ArrayCollection = new ArrayCollection();
+			surveys.addItem(survey);
 			
-			eventDispatcher.dispatchEvent(new ApplicationEvent(ApplicationEvent.SURVEYS_LOADED));
+			var applicationEvent:ApplicationEvent = new ApplicationEvent(ApplicationEvent.SURVEYS_LOADED);
+			applicationEvent.result = surveys;
+			
+			eventDispatcher.dispatchEvent(applicationEvent);
 			
 			eventDispatcher.dispatchEvent(new ApplicationEvent(ApplicationEvent.APPLICATION_INITIALIZED));
 		}
