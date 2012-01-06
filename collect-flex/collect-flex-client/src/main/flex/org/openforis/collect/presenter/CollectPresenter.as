@@ -13,6 +13,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.client.ModelClient;
 	import org.openforis.collect.client.SessionClient;
 	import org.openforis.collect.event.ApplicationEvent;
+	import org.openforis.collect.metamodel.proxy.SurveyProxy;
 	import org.openforis.collect.model.SessionState;
 	import org.openforis.idm.metamodel.Survey;
 
@@ -69,10 +70,10 @@ package org.openforis.collect.presenter {
 		}
 		
 		internal function getSurveyResultHandler(event:ResultEvent, token:Object = null):void {
-			var survey:Survey = event.result as Survey;
+			var survey:SurveyProxy = event.result as SurveyProxy;
 			
-			Application.SURVEYS = new ArrayCollection();
-			Application.SURVEYS.addItem(survey);
+/*			Application.SURVEYS = new ArrayCollection();
+			Application.SURVEYS.addItem(survey);*/
 			
 			eventDispatcher.dispatchEvent(new ApplicationEvent(ApplicationEvent.SURVEYS_LOADED));
 			

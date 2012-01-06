@@ -9,12 +9,10 @@ package org.openforis.idm.metamodel {
 
     import flash.utils.IDataInput;
     import flash.utils.IDataOutput;
-/*    import java.util.regex.Pattern;
-*/
+
     [Bindable]
     public class PatternCheckBase extends Check {
 
-/*        private var _pattern:Pattern;*/
         private var _regularExpression:String;
 
         [Bindable(event="unused")]
@@ -24,13 +22,11 @@ package org.openforis.idm.metamodel {
 
         override public function readExternal(input:IDataInput):void {
             super.readExternal(input);
-/*            _pattern = input.readObject() as Pattern;*/
             _regularExpression = input.readObject() as String;
         }
 
         override public function writeExternal(output:IDataOutput):void {
             super.writeExternal(output);
-/*            output.writeObject(_pattern);*/
             output.writeObject(_regularExpression);
         }
     }

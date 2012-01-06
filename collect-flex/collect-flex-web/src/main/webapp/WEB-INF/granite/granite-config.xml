@@ -115,6 +115,7 @@
 			<include instance-of="org.openforis.idm.model.Time" />
 			<include instance-of="org.openforis.idm.model.TimeAttribute" />
 			<include instance-of="org.openforis.idm.model.Validator" />
+			<include instance-of="org.openforis.collect.metamodel.proxy.SurveyProxy" />
         </externalizer>
     </externalizers>
   

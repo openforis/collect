@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.openforis.collect.manager.SurveyManager;
-import org.openforis.collect.persistence.SurveyDAO;
+import org.openforis.collect.metamodel.proxy.SurveyProxy;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.SpatialReferenceSystem;
 import org.openforis.idm.metamodel.Survey;
@@ -31,8 +31,9 @@ public class ModelService {
 		return null;
 	}
 	
-	public Survey getSurvey(String name) {
+	public SurveyProxy getSurvey(String name) {
 		Survey survey = surveyManager.load(name);
-		return survey;
+		SurveyProxy proxy = new SurveyProxy(survey);
+		return proxy;
 	}
 }
