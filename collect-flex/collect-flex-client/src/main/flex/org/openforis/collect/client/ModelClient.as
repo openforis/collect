@@ -30,8 +30,8 @@ package org.openforis.collect.client {
 			token.addResponder(responder);
 		}
 		
-		public function getSurvey(responder:IResponder, id:int):void {
-			var token:AsyncToken = this._getSurveyOperation.send(id);
+		public function getSurvey(responder:IResponder, name:String):void {
+			var token:AsyncToken = this._getSurveyOperation.send(name);
 			token.addResponder(responder);
 		}
 		

@@ -3,6 +3,7 @@ package org.openforis.collect.blazeds.service;
 import java.util.Collection;
 import java.util.List;
 
+import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.persistence.SurveyDAO;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.SpatialReferenceSystem;
@@ -12,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class ModelService {
 
 	@Autowired
-	protected SurveyDAO surveyDao;
+	protected SurveyManager surveyManager;
 	
 	/**
 		 */
@@ -30,8 +31,8 @@ public class ModelService {
 		return null;
 	}
 	
-	public Survey getSurvey(int id) {
-		Survey survey = surveyDao.load(id);
+	public Survey getSurvey(String name) {
+		Survey survey = surveyManager.load(name);
 		return survey;
 	}
 }

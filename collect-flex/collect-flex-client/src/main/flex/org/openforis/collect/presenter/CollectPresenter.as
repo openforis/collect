@@ -48,7 +48,7 @@ package org.openforis.collect.presenter {
 			
 			this._sessionClient.getSessionState(new ItemResponder(getSessionStateResultHandler, faultHandler));
 			
-			this._modelClient.getSurvey(new ItemResponder(getSurveyResultHandler, faultHandler), 1);
+			this._modelClient.getSurvey(new ItemResponder(getSurveyResultHandler, faultHandler), "archenland1");
 			
 			this._contextMenuPresenter = new ContextMenuPresenter(view);
 		}
