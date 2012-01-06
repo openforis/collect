@@ -21,6 +21,18 @@
 	<build>
 		<sourceDirectory>src/main/flex</sourceDirectory>
 		<testSourceDirectory>src/test/flex</testSourceDirectory>
+		<resources>
+            <resource>
+            	<directory>${basedir}/src/main/flex/assets</directory>
+	             <includes>
+		             <include>*.xml</include>
+		             <include>*.png</include>
+		             <include>*.jpg</include>
+		             <include>*.gif</include>
+		             <include>*.css</include>
+	             </includes>
+            </resource>
+        </resources>
 		<plugins>
 			<plugin>
 				<groupId>org.sonatype.flexmojos</groupId>
