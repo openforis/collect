@@ -1,15 +1,19 @@
 package org.openforis.collect {
 	
+	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
 	import mx.core.FlexGlobals;
 	import mx.managers.CursorManager;
 	import mx.managers.ToolTipManager;
 	import mx.utils.URLUtil;
 	
+	import org.openforis.collect.event.ApplicationEvent;
+	import org.openforis.collect.event.EventDispatcherFactory;
 	import org.openforis.collect.model.Phase;
 	import org.openforis.collect.util.ModelClassInitializer;
 	import org.openforis.idm.metamodel.Survey;
 	import org.openforis.idm.model.Entity;
+
 	
 	/**
 	 * @author Mino Togna
@@ -18,11 +22,11 @@ package org.openforis.collect {
 		
 		public static var SESSION_ID:String;
 
-		public static var SURVEYS:IList;
+		private static var _surveys:IList;
 		
-		public static var selectedSurvey:Survey;
-		public static var selectedRootEntity:Entity;
-		public static var selectedPhase:Phase;
+		private static var _selectedSurvey:Survey;
+		private static var _selectedRootEntity:Entity;
+		private static var _selectedPhase:Phase;
 		
 		private static var initialized:Boolean = false;
 		internal static const CONTEXT_NAME:String = "collect";
@@ -36,8 +40,6 @@ package org.openforis.collect {
 		private static var _FILEDOWNLOAD_URL:String; 
 		private static var _FILEDELETE_URL:String; 
 		private static var _EXPORT_DATA_URL:String;
-		
-		
 		
 		private static var _HOST:String;
 		private static var _PORT:uint;
@@ -64,9 +66,50 @@ package org.openforis.collect {
 				
 				initialized = true;
 				CursorManager.removeBusyCursor();
+				
+				EventDispatcherFactory.getEventDispatcher().addEventListener(ApplicationEvent.SURVEYS_LOADED, surveysLoadedHandler);
 			}
 		}
 		
+		private static function surveysLoadedHandler(event:ApplicationEvent):void {
+			_surveys = event.result as IList;
+		}
+		
+		public static function get surveys():IList {
+			var result:IList = new ArrayCollection();
+			for each(var survey:Survey in _surveys) {
+				result.addItem(survey);
+			}
+			return result;
+		}
+		
+		
+		public static function get selectedSurvey():Survey {
+			return _selectedSurvey;
+		}
+
+		public static function set selectedSurvey(value:Survey):void {
+			_selectedSurvey = value;
+		}
+
+		[Bindable]
+		public static function get selectedRootEntity():Entity {
+			return _selectedRootEntity;
+		}
+		
+		public static function set selectedRootEntity(value:Entity):void {
+			_selectedRootEntity = value;
+		}
+
+		[Bindable]
+		public static function get selectedPhase():Phase {
+			return _selectedPhase;
+		}
+		
+		public static function set selectedPhase(value:Phase):void {
+			_selectedPhase = value;
+		}
+
 		public static function get FILEUPLOAD_URL():String {
 			return _FILEUPLOAD_URL;
 		}
@@ -114,5 +157,7 @@ package org.openforis.collect {
 			_FILEDELETE_URL = _URL + FILE_DELETE_SERVLET_NAME;
 			_EXPORT_DATA_URL = _URL + EXPORT_DATA_SERVLET_NAME;
 		}
+
+		
 	}
 }

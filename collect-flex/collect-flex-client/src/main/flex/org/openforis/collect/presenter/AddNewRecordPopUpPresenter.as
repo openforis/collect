@@ -3,6 +3,7 @@ package org.openforis.collect.presenter {
 	import flash.events.MouseEvent;
 	
 	import mx.collections.ArrayCollection;
+	import mx.collections.IList;
 	import mx.events.CloseEvent;
 	import mx.events.FlexEvent;
 	import mx.managers.PopUpManager;
@@ -11,6 +12,7 @@ package org.openforis.collect.presenter {
 	import mx.rpc.events.FaultEvent;
 	import mx.rpc.events.ResultEvent;
 	
+	import org.openforis.collect.Application;
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.client.DataClient;
 	import org.openforis.collect.event.UIEvent;
@@ -30,6 +32,8 @@ package org.openforis.collect.presenter {
 		
 		override internal function initEventListeners():void {
 			//test data
+			//var versions:IList = Application.selectedSurvey.
+			
 			var versions:ArrayCollection = new ArrayCollection([
 				{id: "1", label: "version 1"},
 				{id: "2", label: "version 2"},
