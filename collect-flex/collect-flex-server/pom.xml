@@ -64,6 +64,8 @@
 						</goals>
 					</execution>
 				</executions>
+				<configuration>
+				</configuration>
 			</plugin>
 		</plugins>
 
@@ -79,8 +81,9 @@
 		<dependency>
 			<groupId>org.openforis.collect</groupId>
 			<artifactId>collect-flex-client</artifactId>
-			<type>swf</type>
 			<version>${project.version}</version>
+			<type>swf</type>
+			<scope>runtime</scope>
 		</dependency>
 		<!-- <dependency> -->
 		<!-- <groupId>org.openforis.collect</groupId> -->

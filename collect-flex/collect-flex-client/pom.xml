@@ -39,7 +39,6 @@
 				<artifactId>flexmojos-maven-plugin</artifactId>
 				<extensions>true</extensions>
 				<executions>
-					<!-- 
 					<execution>
 						<id>generate-as-sources</id>
 						<phase>generate-sources</phase>
@@ -47,8 +46,6 @@
 							<goal>generate</goal>
 						</goals>
 						<configuration>
-							<outputDirectory>${project.build.directory}/generated-sources/flex</outputDirectory>
-				
 							<includeJavaClasses>
 								<includeClass>org.openforis.collect.session.**</includeClass>
 								<includeClass>org.openforis.collect.model.**</includeClass>
@@ -57,13 +54,15 @@
 							</includeJavaClasses>
 						</configuration>
 					</execution>
-					 -->
 					<execution>
 						<id>compile-flex-sources</id>
 						<phase>compile</phase>
 						<goals>
 							<goal>compile-swf</goal>
 						</goals>
+						<configuration>
+							<output>${project.build.directory}/</output>
+						</configuration>
 					</execution>
 				</executions>
 				<configuration>
@@ -95,7 +94,6 @@
 	            
 			</plugin>
 			
-			<!-- 
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>build-helper-maven-plugin</artifactId>
@@ -109,14 +107,13 @@
 						</goals>
 						<configuration>
 							<sources>
-								  	<source>${project.build.directory}/generated-sources/flex</source>
+<!-- 								  	<source>${project.build.directory}/generated-sources/flex</source> -->
 					   				<source>${project.build.directory}/generated-sources/flexmojos</source>
 							</sources>
 						</configuration>
 					</execution>
 				</executions>
 			</plugin> 
-			 -->
 		</plugins>
 		<finalName>collect</finalName>
 	</build>
