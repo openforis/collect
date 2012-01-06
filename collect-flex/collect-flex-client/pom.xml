@@ -83,7 +83,6 @@
 						<includeResourceBundles>
 							<bundle>messages</bundle>
 						</includeResourceBundles>
-						<output>${project.build.directory}</output>
 				</configuration>
 				<dependencies>
 	                <dependency>
