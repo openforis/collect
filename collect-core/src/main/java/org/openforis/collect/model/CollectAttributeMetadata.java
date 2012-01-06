@@ -12,6 +12,15 @@ public class CollectAttributeMetadata implements AttributeMetadata {
 	// TODO replace state with enum
 	private Character state;
 
+	public CollectAttributeMetadata() {
+	}
+	
+	public CollectAttributeMetadata(Character symbol, Character state, String remarks) {
+		this.symbol = symbol;
+		this.remarks = remarks;
+		this.state = state;
+	}
+
 	public Character getSymbol() {
 		return symbol;
 	}

@@ -97,7 +97,7 @@
 						</generate>
 						<target>
 							<packageName>org.openforis.collect.persistence.jooq</packageName>
-							<directory>target/generated-sources/jooq</directory>
+							<directory>${basedir}/target/generated-sources/jooq</directory>
 						</target>
 						<masterDataTables>
 							<masterDataTable>
