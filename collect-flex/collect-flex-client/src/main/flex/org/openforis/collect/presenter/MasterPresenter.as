@@ -44,12 +44,12 @@ package org.openforis.collect.presenter {
 		}
 
 		protected function applicationInitializedHandler(event:ApplicationEvent):void {
-			if(Application.SURVEYS.length > 1) {
+			if(Application.surveys.length > 1) {
 				_view.currentState = "surveySelection";
 			} else {
 				//select first survey
 				var uiEvent:UIEvent = new UIEvent(UIEvent.SURVEY_SELECTED);
-				uiEvent.obj = Application.SURVEYS[0]; 
+				uiEvent.obj = Application.surveys[0]; 
 				eventDispatcher.dispatchEvent(uiEvent);
 			}
 		}

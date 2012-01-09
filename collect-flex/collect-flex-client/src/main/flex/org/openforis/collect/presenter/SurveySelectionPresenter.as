@@ -23,7 +23,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function surveysLoadedHandler(event:ApplicationEvent):void {
-			_view.surveyDataGroup.dataProvider = Application.SURVEYS;
+			_view.surveyDataGroup.dataProvider = Application.surveys;
 		}
 		
 		protected function surveySelectedHandler(event:UIEvent):void {
