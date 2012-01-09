@@ -3,7 +3,6 @@ package org.openforis.collect.metamodel.proxy;
 import java.util.List;
 
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
-import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.Survey;
 
 public class SurveyProxy implements ProxyBase {
@@ -48,7 +47,7 @@ public class SurveyProxy implements ProxyBase {
 		return ModelVersionProxy.fromList(survey.getVersions());
 	}
 
-	//@ExternalizedProperty
+	@ExternalizedProperty
 	public List<CodeListProxy> getCodeLists() {
 		return CodeListProxy.fromList(survey.getCodeLists());
 	}
