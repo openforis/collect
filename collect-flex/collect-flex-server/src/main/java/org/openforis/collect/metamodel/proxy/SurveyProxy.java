@@ -55,12 +55,14 @@ public class SurveyProxy implements ProxyBase {
 		return survey.getCodeLists();
 	}
 
-	public List<Unit> getUnits() {
-		return survey.getUnits();
+	@ExternalizedProperty
+	public List<UnitProxy> getUnits() {
+		return UnitProxy.fromList(survey.getUnits());
 	}
 
-	public List<SpatialReferenceSystem> getSpatialReferenceSystems() {
-		return survey.getSpatialReferenceSystems();
+	@ExternalizedProperty
+	public List<SpatialReferenceSystemProxy> getSpatialReferenceSystems() {
+		return SpatialReferenceSystemProxy.fromList(survey.getSpatialReferenceSystems());
 	}
 
 	public Schema getSchema() {
