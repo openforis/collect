@@ -14,8 +14,6 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.client.SessionClient;
 	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.metamodel.proxy.SurveyProxy;
-	import org.openforis.collect.model.SessionState;
-	import org.openforis.idm.metamodel.Survey;
 
 	/**
 	 * 
@@ -47,18 +45,13 @@ package org.openforis.collect.presenter {
 			_keepAliveTimer.addEventListener(TimerEvent.TIMER, sendKeepAliveMessage);
 			_keepAliveTimer.start();
 			
-			this._sessionClient.getSessionState(new ItemResponder(getSessionStateResultHandler, faultHandler));
 			
 			this._modelClient.getSurvey(new ItemResponder(getSurveyResultHandler, faultHandler), "archenland1");
-			
 			this._contextMenuPresenter = new ContextMenuPresenter(view);
 		}
 		
 		override internal function initEventListeners():void {
 			
-		}
-		internal function res(event:ResultEvent, token:Object = null):void {
-			trace(event);
 		}
 		
 		internal function getSurveysResultHandler(event:ResultEvent, token:Object = null):void {
@@ -84,9 +77,10 @@ package org.openforis.collect.presenter {
 */
 			var surveys:IList = new ArrayCollection();
 			surveys.addItem(survey);
+			Application.surveys = surveys;
 			
 			var applicationEvent:ApplicationEvent = new ApplicationEvent(ApplicationEvent.SURVEYS_LOADED);
-			/*applicationEvent.result = surveys;*/
+			
 			
 			eventDispatcher.dispatchEvent(applicationEvent);
 			
@@ -101,12 +95,6 @@ package org.openforis.collect.presenter {
 			}
 		}
 		
-		internal function getSessionStateResultHandler(event:ResultEvent, token:Object = null):void {
-			//Application.SESSION_ID = event.result as String;
-			//TODO: Add sessionState to Application
-			var sessionState:SessionState = event.result as SessionState;
-			eventDispatcher.dispatchEvent(new ApplicationEvent(ApplicationEvent.SESSION_STATE_LOADED));
-		}
 		
 		internal function sendKeepAliveMessage(event:TimerEvent):void {
 			this._sessionClient.keepAlive(new ItemResponder(keepAliveResult, faultHandler));

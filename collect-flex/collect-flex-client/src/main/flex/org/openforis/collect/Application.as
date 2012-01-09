@@ -9,10 +9,11 @@ package org.openforis.collect {
 	
 	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.event.EventDispatcherFactory;
+	import org.openforis.collect.metamodel.proxy.SurveyProxy;
 	import org.openforis.collect.model.Phase;
 	import org.openforis.collect.util.ModelClassInitializer;
-	import org.openforis.idm.metamodel.Survey;
-	import org.openforis.idm.model.Entity;
+
+	/*import org.openforis.idm.model.Entity;*/
 
 	
 	/**
@@ -24,8 +25,8 @@ package org.openforis.collect {
 
 		private static var _surveys:IList;
 		
-		private static var _selectedSurvey:Survey;
-		private static var _selectedRootEntity:Entity;
+		private static var _activeSurvey:SurveyProxy;
+		/*private static var _selectedRootEntity:Entity;*/
 		private static var _selectedPhase:Phase;
 		
 		private static var initialized:Boolean = false;
@@ -75,31 +76,33 @@ package org.openforis.collect {
 			_surveys = event.result as IList;
 		}
 		
+		public static function set surveys(list:IList):void {
+			_surveys = list;
+		}
+		
 		public static function get surveys():IList {
-			var result:IList = new ArrayCollection();
-			for each(var survey:Survey in _surveys) {
-				result.addItem(survey);
-			}
-			return result;
+			var list:ArrayCollection = new ArrayCollection();
+			list.addAll(_surveys);
+			return list;
 		}
 		
 		
-		public static function get selectedSurvey():Survey {
-			return _selectedSurvey;
+		public static function get activeSurvey():SurveyProxy {
+			return _activeSurvey;
 		}
 
-		public static function set selectedSurvey(value:Survey):void {
-			_selectedSurvey = value;
+		public static function set activeSurvey(value:SurveyProxy):void {
+			_activeSurvey = value;
 		}
 
-		[Bindable]
-		public static function get selectedRootEntity():Entity {
-			return _selectedRootEntity;
+		/*[BINDABLE]
+		PUBLIC STATIC FUNCTION GET SELECTEDROOTENTITY():ENTITY {
+			RETURN _SELECTEDROOTENTITY;
 		}
 		
-		public static function set selectedRootEntity(value:Entity):void {
-			_selectedRootEntity = value;
-		}
+		PUBLIC STATIC FUNCTION SET SELECTEDROOTENTITY(VALUE:ENTITY):VOID {
+			_SELECTEDROOTENTITY = VALUE;
+		}*/
 
 		[Bindable]
 		public static function get selectedPhase():Phase {

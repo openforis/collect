@@ -46,11 +46,12 @@
 							<goal>generate</goal>
 						</goals>
 						<configuration>
+							<outputDirectory>${basedir}/src/generated/flex</outputDirectory>
 							<includeJavaClasses>
-								<includeClass>org.openforis.collect.session.**</includeClass>
-								<includeClass>org.openforis.collect.model.**</includeClass>
+<!-- 								<includeClass>org.openforis.collect.session.**</includeClass> -->
+<!-- 								<includeClass>org.openforis.collect.model.**</includeClass> -->
 <!-- 								<includeClass>org.openforis.idm.model.**</includeClass> -->
-<!-- 								<includeClass>org.openforis.idm.metamodel.**</includeClass> -->
+
 								<includeClass>org.openforis.collect.metamodel.proxy.*</includeClass>
 							</includeJavaClasses>
 						</configuration>
@@ -108,7 +109,7 @@
 						</goals>
 						<configuration>
 							<sources>
-<!-- 								  	<source>${project.build.directory}/generated-sources/flex</source> -->
+								  	<source>${basedir}/src/generated/flex</source>
 					   				<source>${project.build.directory}/generated-sources/flexmojos</source>
 							</sources>
 						</configuration>

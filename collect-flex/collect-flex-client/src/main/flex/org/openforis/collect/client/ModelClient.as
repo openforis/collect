@@ -5,8 +5,6 @@ package org.openforis.collect.client {
 	import mx.rpc.events.FaultEvent;
 	import mx.rpc.remoting.Operation;
 	
-	import org.openforis.collect.model.UpdateRequest;
-	
 	/**
 	 * 
 	 * @author S. Ricci

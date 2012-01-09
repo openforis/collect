@@ -10,9 +10,8 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.Application;
 	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.event.UIEvent;
+	import org.openforis.collect.metamodel.proxy.SurveyProxy;
 	import org.openforis.collect.ui.view.RootEntitySelectionView;
-	import org.openforis.idm.metamodel.Schema;
-	import org.openforis.idm.metamodel.Survey;
 	
 	public class RootEntitySelectionPresenter extends AbstractPresenter {
 		
@@ -29,7 +28,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function surveySelectedHandler(event:UIEvent):void {
-			_view.rootEntitiesDataGroup.dataProvider = (event.obj as Survey).schema.rootEntityDefinitions;
+			//_view.rootEntitiesDataGroup.dataProvider = (event.obj as SurveyProxy).schema.rootEntityDefinitions;
 		}
 		
 		protected function rootEntitySelectedHandler(event:UIEvent):void {

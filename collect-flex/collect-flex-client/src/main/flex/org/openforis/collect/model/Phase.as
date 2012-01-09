@@ -1,5 +1,7 @@
 package org.openforis.collect.model {
 
+
+	//TODO: Remove? generated from client?
     [Bindable]
     public class Phase {
 

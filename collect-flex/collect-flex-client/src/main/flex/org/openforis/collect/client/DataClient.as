@@ -5,7 +5,7 @@ package org.openforis.collect.client {
 	import mx.rpc.events.FaultEvent;
 	import mx.rpc.remoting.Operation;
 	
-	import org.openforis.collect.model.UpdateRequest;
+/*	import org.openforis.collect.model.UpdateRequest;*/
 	
 	/**
 	 * 
@@ -31,13 +31,13 @@ package org.openforis.collect.client {
 			token.addResponder(responder);
 		}
 		
-		public function update(responder:IResponder, request:UpdateRequest):void {
-			this._updateQueueProcessor.appendOperation(responder, this._updateOperation, request);
+	//	public function update(responder:IResponder, request:UpdateRequest):void {
+	//		this._updateQueueProcessor.appendOperation(responder, this._updateOperation, request);
 			/*
 			var token:AsyncToken = this._updateOperation.send(request);
 			token.addResponder(responder);
 			*/
-		}
+//		}
 		
 		protected function faultHandler(event:FaultEvent):void {
 			Alert.show("Error\n\n" + event.fault.message);

@@ -33,6 +33,7 @@
     
 	<externalizers>
         <externalizer type="org.granite.messaging.amf.io.util.externalizer.DefaultExternalizer">
+        	<!--  
         	<include instance-of="org.openforis.idm.metamodel.Annotatable" />
 			<include instance-of="org.openforis.idm.metamodel.AttributeDefault" />
 			<include instance-of="org.openforis.idm.metamodel.AttributeDefinition" />
@@ -115,7 +116,9 @@
 			<include instance-of="org.openforis.idm.model.Time" />
 			<include instance-of="org.openforis.idm.model.TimeAttribute" />
 			<include instance-of="org.openforis.idm.model.Validator" />
-			<include instance-of="org.openforis.collect.metamodel.proxy.SurveyProxy" />
+        	-->
+			
+			<include instance-of="org.openforis.collect.metamodel.proxy.ProxyBase" />
         </externalizer>
     </externalizers>
   

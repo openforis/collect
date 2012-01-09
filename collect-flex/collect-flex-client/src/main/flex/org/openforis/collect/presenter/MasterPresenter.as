@@ -8,10 +8,8 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.Application;
 	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.event.UIEvent;
+	import org.openforis.collect.metamodel.proxy.SurveyProxy;
 	import org.openforis.collect.ui.view.MasterView;
-	import org.openforis.idm.metamodel.Schema;
-	import org.openforis.idm.metamodel.Survey;
-	import org.openforis.idm.model.Entity;
 
 	public class MasterPresenter extends AbstractPresenter {
 		
@@ -55,14 +53,16 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function surveySelectedHandler(event:UIEvent):void {
-			selectSurvey(event.obj as Survey);
+			selectSurvey(event.obj as SurveyProxy);
 		}
 		
-		protected function selectSurvey(survey:Survey):void {
+		protected function selectSurvey(survey:SurveyProxy):void {
 			//TODO load root entities for the selected survey
-			Application.selectedSurvey = survey;
+			Application.activeSurvey = survey;
 			
-			var schema:Schema = survey.schema;
+			//TODO
+			
+/*			var schema:Schema = survey.schema;
 			if(schema != null) {
 				var rootEntities:IList = schema.rootEntityDefinitions;
 				if(rootEntities != null && rootEntities.length > 0) {
@@ -78,22 +78,22 @@ package org.openforis.collect.presenter {
 					} else {
 						_view.currentState = "rootEntitySelection";
 					}
-					*/
 				} else {
 					//TODO error, no root entities found
 				}
 			} else {
 				//TODO error, schema not found
 			}
+					*/
 		}
 		
 		protected function rootEntitySelectedHandler(event:UIEvent):void {
-			var rootEntity:Entity = event.obj as Entity;
+			var rootEntity:Object = event.obj as Object;
 			selectRootEntity(rootEntity);
 		}
 		
-		protected function selectRootEntity(rootEntity:Entity):void {
-			Application.selectedRootEntity = rootEntity;
+		protected function selectRootEntity(rootEntity:Object):void {
+	//		Application.selectedRootEntity = rootEntity;
 			
 			_view.currentState = "list";
 			//TODO loadRecords();
