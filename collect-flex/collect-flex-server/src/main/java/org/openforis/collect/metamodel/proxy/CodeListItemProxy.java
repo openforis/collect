@@ -44,12 +44,20 @@ public class CodeListItemProxy implements ProxyBase {
 
 	@ExternalizedProperty
 	public ModelVersionProxy getSinceVersion() {
-		return new ModelVersionProxy(codeListItem.getSinceVersion());
+		if(codeListItem.getSinceVersion() != null) {
+			return new ModelVersionProxy(codeListItem.getSinceVersion());
+		} else {
+			return null;
+		}
 	}
 
 	@ExternalizedProperty
 	public ModelVersionProxy getDeprecatedVersion() {
-		return new ModelVersionProxy(codeListItem.getDeprecatedVersion());
+		if(codeListItem.getDeprecatedVersion() != null) {
+			return new ModelVersionProxy(codeListItem.getDeprecatedVersion());
+		} else {
+			return null;
+		}
 	}
 
 	@ExternalizedProperty
