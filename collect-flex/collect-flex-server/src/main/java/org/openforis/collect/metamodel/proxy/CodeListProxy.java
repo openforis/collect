@@ -3,82 +3,120 @@
  */
 package org.openforis.collect.metamodel.proxy;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.idm.metamodel.CodeList;
-import org.openforis.idm.metamodel.CodeList.CodeScope;
-import org.openforis.idm.metamodel.CodeList.CodeType;
-import org.openforis.idm.metamodel.CodeListItem;
-import org.openforis.idm.metamodel.CodeListLabel;
-import org.openforis.idm.metamodel.CodeListLevel;
-import org.openforis.idm.metamodel.LanguageSpecificText;
-import org.openforis.idm.metamodel.ModelVersion;
-import org.openforis.idm.metamodel.Survey;
 
 /**
  * @author M. Togna
- *@author S. Ricci
+ * @author S. Ricci
  */
 public class CodeListProxy implements ProxyBase {
 
 	private transient CodeList codeList;
 
+	public enum CodeType {
+		NUMERIC, ALPHANUMERIC
+	}
+
+	public enum CodeScope {
+		SCHEME, LOCAL
+	}
+
+	public CodeListProxy(CodeList codeList) {
+		super();
+		this.codeList = codeList;
+	}
+
+	public static List<CodeListProxy> fromList(List<CodeList> list) {
+		List<CodeListProxy> proxies = new ArrayList<CodeListProxy>();
+		if (list != null) {
+			for (CodeList v : list) {
+				proxies.add(new CodeListProxy(v));
+			}
+		}
+		return proxies;
+	}
+
+	@ExternalizedProperty
 	public String getSinceVersionName() {
 		return codeList.getSinceVersionName();
 	}
 
+	@ExternalizedProperty
 	public String getDeprecatedVersionName() {
 		return codeList.getDeprecatedVersionName();
 	}
 
-	public ModelVersion getSinceVersion() {
-		return codeList.getSinceVersion();
+	@ExternalizedProperty
+	public ModelVersionProxy getSinceVersion() {
+		if (codeList.getSinceVersion() != null) {
+			return new ModelVersionProxy(codeList.getSinceVersion());
+		} else
+			return null;
 	}
 
-	public ModelVersion getDeprecatedVersion() {
-		return codeList.getDeprecatedVersion();
+	@ExternalizedProperty
+	public ModelVersionProxy getDeprecatedVersion() {
+		if (codeList.getDeprecatedVersion() != null) {
+			return new ModelVersionProxy(codeList.getDeprecatedVersion());
+		} else
+			return null;
 	}
 
+	@ExternalizedProperty
 	public String getName() {
 		return codeList.getName();
 	}
 
-	public List<CodeListLabel> getLabels() {
-		return codeList.getLabels();
+	@ExternalizedProperty
+	public List<CodeListLabelProxy> getLabels() {
+		return CodeListLabelProxy.fromList(codeList.getLabels());
 	}
 
-	public List<LanguageSpecificText> getDescriptions() {
-		return codeList.getDescriptions();
+	@ExternalizedProperty
+	public List<LanguageSpecificTextProxy> getDescriptions() {
+		return LanguageSpecificTextProxy.fromList(codeList.getDescriptions());
 	}
 
-	public List<CodeListLevel> getHierarchy() {
-		return codeList.getHierarchy();
+	@ExternalizedProperty
+	public List<CodeListLevelProxy> getHierarchy() {
+		return CodeListLevelProxy.fromList(codeList.getHierarchy());
 	}
 
-	public List<CodeListItem> getItems() {
-		return codeList.getItems();
+	@ExternalizedProperty
+	public List<CodeListItemProxy> getItems() {
+		return CodeListItemProxy.fromList(codeList.getItems());
 	}
 
+	@ExternalizedProperty
 	public CodeType getCodeType() {
-		return codeList.getCodeType();
+		if (codeList.getCodeType() != null) {
+			return CodeType.valueOf(codeList.getCodeType().toString());
+		} else {
+			return null;
+		}
 	}
 
+	@ExternalizedProperty
 	public CodeScope getCodeScope() {
-		return codeList.getCodeScope();
+		if (codeList.getCodeScope() != null) {
+			return CodeScope.valueOf(codeList.getCodeScope().toString());
+		} else {
+			return null;
+		}
 	}
 
+	@ExternalizedProperty
 	public boolean isAlphanumeric() {
 		return codeList.isAlphanumeric();
 	}
 
+	@ExternalizedProperty
 	public boolean isNumeric() {
 		return codeList.isNumeric();
 	}
 
-	public Survey getSurvey() {
-		return codeList.getSurvey();
-	}
-	
-	
-	
 }
