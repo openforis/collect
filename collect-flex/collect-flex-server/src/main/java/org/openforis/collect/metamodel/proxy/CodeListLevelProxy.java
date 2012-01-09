@@ -6,6 +6,7 @@ package org.openforis.collect.metamodel.proxy;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.idm.metamodel.CodeListLevel;
 
 /**
@@ -31,18 +32,19 @@ public class CodeListLevelProxy implements ProxyBase {
 		return proxies;
 	}
 	
+	@ExternalizedProperty
 	public List<LanguageSpecificTextProxy> getLabels() {
 		return LanguageSpecificTextProxy.fromList(codeListLevel.getLabels());
 	}
 
+	@ExternalizedProperty
 	public List<LanguageSpecificTextProxy> getDescriptions() {
 		return LanguageSpecificTextProxy.fromList(codeListLevel.getDescriptions());
 	}
 
+	@ExternalizedProperty
 	public String getName() {
 		return codeListLevel.getName();
 	};
-	
-	
 	
 }

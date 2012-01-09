@@ -6,6 +6,7 @@ package org.openforis.collect.metamodel.proxy;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.idm.metamodel.CodeListItem;
 
 /**
@@ -31,38 +32,47 @@ public class CodeListItemProxy implements ProxyBase {
 		return proxies;
 	}
 	
+	@ExternalizedProperty
 	public String getSinceVersionName() {
 		return codeListItem.getSinceVersionName();
 	}
 
+	@ExternalizedProperty
 	public String getDeprecatedVersionName() {
 		return codeListItem.getDeprecatedVersionName();
 	}
 
+	@ExternalizedProperty
 	public ModelVersionProxy getSinceVersion() {
 		return new ModelVersionProxy(codeListItem.getSinceVersion());
 	}
 
+	@ExternalizedProperty
 	public ModelVersionProxy getDeprecatedVersion() {
 		return new ModelVersionProxy(codeListItem.getDeprecatedVersion());
 	}
 
+	@ExternalizedProperty
 	public boolean isQualifiable() {
 		return codeListItem.isQualifiable();
 	}
 
+	@ExternalizedProperty
 	public String getCode() {
 		return codeListItem.getCode();
 	}
 
+	@ExternalizedProperty
 	public List<LanguageSpecificTextProxy> getLabels() {
 		return LanguageSpecificTextProxy.fromList(codeListItem.getLabels());
 	}
 
+	@ExternalizedProperty
 	public List<LanguageSpecificTextProxy> getDescriptions() {
 		return LanguageSpecificTextProxy.fromList(codeListItem.getDescriptions());
 	}
 
+	@ExternalizedProperty
 	public List<CodeListItemProxy> getChildItems() {
 		return CodeListItemProxy.fromList(codeListItem.getChildItems());
 	}

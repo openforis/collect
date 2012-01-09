@@ -6,6 +6,7 @@ package org.openforis.collect.metamodel.proxy;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.idm.metamodel.CodeList;
 
 /**
@@ -16,14 +17,14 @@ public class CodeListProxy implements ProxyBase {
 
 	private transient CodeList codeList;
 
-	public enum CodeTypeProxy {
+	public enum CodeType {
 		NUMERIC, ALPHANUMERIC
 	}
 
-	public enum CodeScopeProxy {
+	public enum CodeScope {
 		SCHEME, LOCAL
 	}
-	
+
 	public CodeListProxy(CodeList codeList) {
 		super();
 		this.codeList = codeList;
@@ -38,76 +39,84 @@ public class CodeListProxy implements ProxyBase {
 		}
 		return proxies;
 	}
-	
+
+	@ExternalizedProperty
 	public String getSinceVersionName() {
 		return codeList.getSinceVersionName();
 	}
 
+	@ExternalizedProperty
 	public String getDeprecatedVersionName() {
 		return codeList.getDeprecatedVersionName();
 	}
 
+	@ExternalizedProperty
 	public ModelVersionProxy getSinceVersion() {
-		if(codeList.getSinceVersion() != null) {
+		if (codeList.getSinceVersion() != null) {
 			return new ModelVersionProxy(codeList.getSinceVersion());
-		} else return null;
+		} else
+			return null;
 	}
 
+	@ExternalizedProperty
 	public ModelVersionProxy getDeprecatedVersion() {
-		if(codeList.getDeprecatedVersion() != null) {
+		if (codeList.getDeprecatedVersion() != null) {
 			return new ModelVersionProxy(codeList.getDeprecatedVersion());
-		} else return null;
+		} else
+			return null;
 	}
 
+	@ExternalizedProperty
 	public String getName() {
 		return codeList.getName();
 	}
 
+	@ExternalizedProperty
 	public List<CodeListLabelProxy> getLabels() {
 		return CodeListLabelProxy.fromList(codeList.getLabels());
 	}
 
+	@ExternalizedProperty
 	public List<LanguageSpecificTextProxy> getDescriptions() {
 		return LanguageSpecificTextProxy.fromList(codeList.getDescriptions());
 	}
 
+	@ExternalizedProperty
 	public List<CodeListLevelProxy> getHierarchy() {
 		return CodeListLevelProxy.fromList(codeList.getHierarchy());
 	}
 
+	@ExternalizedProperty
 	public List<CodeListItemProxy> getItems() {
 		return CodeListItemProxy.fromList(codeList.getItems());
 	}
 
-	public CodeTypeProxy getCodeType() {
-		switch(codeList.getCodeType()) {
-			case ALPHANUMERIC:
-				return CodeTypeProxy.ALPHANUMERIC;
-			case NUMERIC:
-				return CodeTypeProxy.NUMERIC;
-			default:
-				return null;
+	@ExternalizedProperty
+	public CodeType getCodeType() {
+		if (codeList.getCodeType() != null) {
+			return CodeType.valueOf(codeList.getCodeType().toString());
+		} else {
+			return null;
 		}
 	}
 
-	public CodeScopeProxy getCodeScope() {
-		switch(codeList.getCodeScope()) {
-			case LOCAL:
-				return CodeScopeProxy.LOCAL;
-			case SCHEME:
-				return CodeScopeProxy.SCHEME;
-			default:
-				return null;
+	@ExternalizedProperty
+	public CodeScope getCodeScope() {
+		if (codeList.getCodeScope() != null) {
+			return CodeScope.valueOf(codeList.getCodeScope().toString());
+		} else {
+			return null;
 		}
 	}
 
+	@ExternalizedProperty
 	public boolean isAlphanumeric() {
 		return codeList.isAlphanumeric();
 	}
 
+	@ExternalizedProperty
 	public boolean isNumeric() {
 		return codeList.isNumeric();
 	}
 
-	
 }

@@ -6,6 +6,7 @@ package org.openforis.collect.metamodel.proxy;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.idm.metamodel.CodeListLabel;
 
 /**
@@ -16,7 +17,7 @@ public class CodeListLabelProxy implements ProxyBase {
 
 	private transient CodeListLabel codeListLabel;
 
-	public enum TypeProxy { ITEM, LIST }
+	public enum Type { ITEM, LIST }
 	
 	public CodeListLabelProxy(CodeListLabel codeListLabel) {
 		super();
@@ -33,21 +34,21 @@ public class CodeListLabelProxy implements ProxyBase {
 		return proxies;
 	}
 	
-	public TypeProxy getType() {
-		switch(codeListLabel.getType()) {
-			case ITEM:
-				return TypeProxy.ITEM;
-			case LIST:
-				return TypeProxy.LIST;
-			default:
-				return null;
+	@ExternalizedProperty
+	public Type getType() {
+		if (codeListLabel.getType() != null) {
+			return Type.valueOf(codeListLabel.getType().toString());
+		} else {
+			return null;
 		}
 	}
 
+	@ExternalizedProperty
 	public String getLanguage() {
 		return codeListLabel.getLanguage();
 	}
 
+	@ExternalizedProperty
 	public String getText() {
 		return codeListLabel.getText();
 	}
