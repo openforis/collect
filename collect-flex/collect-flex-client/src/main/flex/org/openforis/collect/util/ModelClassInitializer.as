@@ -1,7 +1,13 @@
 package org.openforis.collect.util {
 	
 	import org.granite.collections.BasicMap;
+	import org.openforis.collect.metamodel.proxy.CodeListItemProxy;
+	import org.openforis.collect.metamodel.proxy.CodeListLabelProxy;
+	import org.openforis.collect.metamodel.proxy.CodeListLabelProxy$Type;
+	import org.openforis.collect.metamodel.proxy.CodeListLevelProxy;
 	import org.openforis.collect.metamodel.proxy.CodeListProxy;
+	import org.openforis.collect.metamodel.proxy.CodeListProxy$CodeScope;
+	import org.openforis.collect.metamodel.proxy.CodeListProxy$CodeType;
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.LanguageSpecificTextProxy;
 	import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
@@ -21,7 +27,13 @@ package org.openforis.collect.util {
 			var array:Array = [
 				BasicMap, 
 				
+				CodeListItemProxy,
+				CodeListLabelProxy,
+				CodeListLabelProxy$Type,
+				CodeListLevelProxy,
 				CodeListProxy,
+				CodeListProxy$CodeScope,
+				CodeListProxy$CodeType,
 				EntityDefinitionProxy,
 				LanguageSpecificTextProxy,
 				ModelVersionProxy,
