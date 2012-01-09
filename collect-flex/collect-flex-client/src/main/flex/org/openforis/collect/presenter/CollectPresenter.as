@@ -86,7 +86,7 @@ package org.openforis.collect.presenter {
 			surveys.addItem(survey);
 			
 			var applicationEvent:ApplicationEvent = new ApplicationEvent(ApplicationEvent.SURVEYS_LOADED);
-			applicationEvent.result = surveys;
+			/*applicationEvent.result = surveys;*/
 			
 			eventDispatcher.dispatchEvent(applicationEvent);
 			
