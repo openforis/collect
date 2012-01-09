@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.idm.metamodel.CodeList;
-import org.openforis.idm.metamodel.LanguageSpecificText;
 import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.SpatialReferenceSystem;
 import org.openforis.idm.metamodel.Survey;
@@ -32,8 +31,9 @@ public class SurveyProxy implements ProxyBase {
 		return survey.getName();
 	}
 
-	public List<LanguageSpecificText> getProjectNames() {
-		return survey.getProjectNames();
+	@ExternalizedProperty
+	public List<LanguageSpecificTextProxy> getProjectNames() {
+		return LanguageSpecificTextProxy.fromList(survey.getProjectNames());
 	}
 
 	@ExternalizedProperty

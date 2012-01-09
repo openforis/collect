@@ -67,13 +67,7 @@ package org.openforis.collect {
 				
 				initialized = true;
 				CursorManager.removeBusyCursor();
-				
-				EventDispatcherFactory.getEventDispatcher().addEventListener(ApplicationEvent.SURVEYS_LOADED, surveysLoadedHandler);
 			}
-		}
-		
-		private static function surveysLoadedHandler(event:ApplicationEvent):void {
-			_surveys = event.result as IList;
 		}
 		
 		public static function set surveys(list:IList):void {

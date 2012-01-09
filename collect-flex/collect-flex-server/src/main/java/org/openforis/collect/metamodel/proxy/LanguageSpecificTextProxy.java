@@ -13,9 +13,9 @@ import org.openforis.idm.metamodel.LanguageSpecificText;
  * @author M. Togna
  * 
  */
-public class LanguageSpecificTextProxy implements ProxyBase{
+public class LanguageSpecificTextProxy implements ProxyBase {
 
-	private transient LanguageSpecificText text;
+	private transient LanguageSpecificText languageSpecificText;
 
 	public static List<LanguageSpecificTextProxy> fromList(List<LanguageSpecificText> list) {
 		List<LanguageSpecificTextProxy> proxies = new ArrayList<LanguageSpecificTextProxy>();
@@ -28,18 +28,17 @@ public class LanguageSpecificTextProxy implements ProxyBase{
 	}
 
 	public LanguageSpecificTextProxy(LanguageSpecificText text) {
-		super();
-		this.text = text;
+		this.languageSpecificText = text;
 	}
 
 	@ExternalizedProperty
 	public String getLanguage() {
-		return text.getLanguage();
+		return languageSpecificText.getLanguage();
 	}
 
 	@ExternalizedProperty
 	public String getText() {
-		return text.getText();
+		return languageSpecificText.getText();
 	}
 
 }

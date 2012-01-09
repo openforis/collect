@@ -89,10 +89,14 @@
 	<!-- Data Source -->
 	<!-- ===================================== -->
 	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
-		<property name="driverClassName" value="${db.driver}" />
+		<property name="driverClassName" value="${db.driverClassName}" />
 		<property name="url" value="${db.connectionUrl}" />
 		<property name="username" value="${db.user}" />
 		<property name="password" value="${db.password}" />
+		
+		<property name="initialSize" value="${db.pool.initialSize}"/>
+		<property name="maxActive" value="${db.pool.maxActive}" />
+		<property name="maxIdle" value="${db.pool.maxIdle}" />
 	</bean>
 
     <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
