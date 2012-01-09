@@ -85,7 +85,7 @@ package org.openforis.collect.presenter
 		
 		//called from External Interface (javascript)
 		public function isEditingItem():Boolean {
-			return true;
+			return false;
 			//return ! (AbstractPresenter.serverOffline) && _view.isEditingItem();
 		}
 		
