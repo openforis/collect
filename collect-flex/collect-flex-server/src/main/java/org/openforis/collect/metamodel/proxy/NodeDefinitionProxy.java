@@ -3,12 +3,15 @@
  */
 package org.openforis.collect.metamodel.proxy;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
 import javax.xml.namespace.QName;
 
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
+import org.openforis.idm.metamodel.AttributeDefinition;
+import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 
 /**
@@ -22,6 +25,22 @@ public class NodeDefinitionProxy implements ProxyBase {
 	public NodeDefinitionProxy(NodeDefinition nodeDefinition) {
 		super();
 		this.nodeDefinition = nodeDefinition;
+	}
+
+	static List<NodeDefinitionProxy> fromList(List<NodeDefinition> list) {
+		List<NodeDefinitionProxy> proxies = new ArrayList<NodeDefinitionProxy>();
+		if (list != null) {
+			for (NodeDefinition n : list) {
+				NodeDefinitionProxy p = null;
+				if (n instanceof AttributeDefinition) {
+					p = new AttributeDefinitionProxy((AttributeDefinition) n);
+				} else if (n instanceof EntityDefinition) {
+					p = new EntityDefinitionProxy((EntityDefinition) n);
+				}
+				proxies.add(p);
+			}
+		}
+		return proxies;
 	}
 
 	public String getSinceVersionName() {

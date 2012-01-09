@@ -1,6 +1,8 @@
 package org.openforis.collect.util {
 	
 	import org.granite.collections.BasicMap;
+	import org.openforis.collect.metamodel.proxy.AttributeDefaultProxy;
+	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.CodeListItemProxy;
 	import org.openforis.collect.metamodel.proxy.CodeListLabelProxy;
 	import org.openforis.collect.metamodel.proxy.CodeListLabelProxy$Type;
@@ -27,6 +29,8 @@ package org.openforis.collect.util {
 			var array:Array = [
 				BasicMap, 
 				
+				AttributeDefaultProxy,
+				AttributeDefinitionProxy,
 				CodeListItemProxy,
 				CodeListLabelProxy,
 				CodeListLabelProxy$Type,

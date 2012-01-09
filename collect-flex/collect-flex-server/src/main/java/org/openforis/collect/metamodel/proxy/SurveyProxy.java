@@ -48,7 +48,7 @@ public class SurveyProxy implements ProxyBase {
 		return ModelVersionProxy.fromList(survey.getVersions());
 	}
 
-	@ExternalizedProperty
+	//@ExternalizedProperty
 	public List<CodeListProxy> getCodeLists() {
 		return CodeListProxy.fromList(survey.getCodeLists());
 	}

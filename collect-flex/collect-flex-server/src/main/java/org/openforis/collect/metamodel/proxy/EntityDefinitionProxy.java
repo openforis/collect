@@ -6,6 +6,7 @@ package org.openforis.collect.metamodel.proxy;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.idm.metamodel.EntityDefinition;
 
 /**
@@ -31,9 +32,9 @@ public class EntityDefinitionProxy extends NodeDefinitionProxy {
 		return proxies;
 	}
 
-//	public List<NodeDefinition> getChildDefinitions() {
-//		return entityDefinition.getChildDefinitions();
-//	}
-
+	@ExternalizedProperty
+	public List<NodeDefinitionProxy> getChildDefinitions() {
+		return NodeDefinitionProxy.fromList(entityDefinition.getChildDefinitions());
+	}
 
 }
