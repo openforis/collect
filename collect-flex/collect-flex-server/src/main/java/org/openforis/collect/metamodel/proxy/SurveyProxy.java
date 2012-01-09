@@ -4,10 +4,7 @@ import java.util.List;
 
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.idm.metamodel.CodeList;
-import org.openforis.idm.metamodel.Schema;
-import org.openforis.idm.metamodel.SpatialReferenceSystem;
 import org.openforis.idm.metamodel.Survey;
-import org.openforis.idm.metamodel.Unit;
 
 public class SurveyProxy implements ProxyBase {
 
@@ -65,8 +62,9 @@ public class SurveyProxy implements ProxyBase {
 		return SpatialReferenceSystemProxy.fromList(survey.getSpatialReferenceSystems());
 	}
 
-	public Schema getSchema() {
-		return survey.getSchema();
+	@ExternalizedProperty
+	public SchemaProxy getSchema() {
+		return new SchemaProxy(survey.getSchema());
 	}
 
 }
