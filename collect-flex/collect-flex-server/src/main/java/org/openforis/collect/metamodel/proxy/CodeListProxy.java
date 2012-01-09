@@ -3,26 +3,42 @@
  */
 package org.openforis.collect.metamodel.proxy;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.openforis.idm.metamodel.CodeList;
-import org.openforis.idm.metamodel.CodeList.CodeScope;
-import org.openforis.idm.metamodel.CodeList.CodeType;
-import org.openforis.idm.metamodel.CodeListItem;
-import org.openforis.idm.metamodel.CodeListLabel;
-import org.openforis.idm.metamodel.CodeListLevel;
-import org.openforis.idm.metamodel.LanguageSpecificText;
-import org.openforis.idm.metamodel.ModelVersion;
-import org.openforis.idm.metamodel.Survey;
 
 /**
  * @author M. Togna
- *@author S. Ricci
+ * @author S. Ricci
  */
 public class CodeListProxy implements ProxyBase {
 
 	private transient CodeList codeList;
 
+	public enum CodeTypeProxy {
+		NUMERIC, ALPHANUMERIC
+	}
+
+	public enum CodeScopeProxy {
+		SCHEME, LOCAL
+	}
+	
+	public CodeListProxy(CodeList codeList) {
+		super();
+		this.codeList = codeList;
+	}
+
+	public static List<CodeListProxy> fromList(List<CodeList> list) {
+		List<CodeListProxy> proxies = new ArrayList<CodeListProxy>();
+		if (list != null) {
+			for (CodeList v : list) {
+				proxies.add(new CodeListProxy(v));
+			}
+		}
+		return proxies;
+	}
+	
 	public String getSinceVersionName() {
 		return codeList.getSinceVersionName();
 	}
@@ -31,40 +47,58 @@ public class CodeListProxy implements ProxyBase {
 		return codeList.getDeprecatedVersionName();
 	}
 
-	public ModelVersion getSinceVersion() {
-		return codeList.getSinceVersion();
+	public ModelVersionProxy getSinceVersion() {
+		if(codeList.getSinceVersion() != null) {
+			return new ModelVersionProxy(codeList.getSinceVersion());
+		} else return null;
 	}
 
-	public ModelVersion getDeprecatedVersion() {
-		return codeList.getDeprecatedVersion();
+	public ModelVersionProxy getDeprecatedVersion() {
+		if(codeList.getDeprecatedVersion() != null) {
+			return new ModelVersionProxy(codeList.getDeprecatedVersion());
+		} else return null;
 	}
 
 	public String getName() {
 		return codeList.getName();
 	}
 
-	public List<CodeListLabel> getLabels() {
-		return codeList.getLabels();
+	public List<CodeListLabelProxy> getLabels() {
+		return CodeListLabelProxy.fromList(codeList.getLabels());
 	}
 
-	public List<LanguageSpecificText> getDescriptions() {
-		return codeList.getDescriptions();
+	public List<LanguageSpecificTextProxy> getDescriptions() {
+		return LanguageSpecificTextProxy.fromList(codeList.getDescriptions());
 	}
 
-	public List<CodeListLevel> getHierarchy() {
-		return codeList.getHierarchy();
+	public List<CodeListLevelProxy> getHierarchy() {
+		return CodeListLevelProxy.fromList(codeList.getHierarchy());
 	}
 
-	public List<CodeListItem> getItems() {
-		return codeList.getItems();
+	public List<CodeListItemProxy> getItems() {
+		return CodeListItemProxy.fromList(codeList.getItems());
 	}
 
-	public CodeType getCodeType() {
-		return codeList.getCodeType();
+	public CodeTypeProxy getCodeType() {
+		switch(codeList.getCodeType()) {
+			case ALPHANUMERIC:
+				return CodeTypeProxy.ALPHANUMERIC;
+			case NUMERIC:
+				return CodeTypeProxy.NUMERIC;
+			default:
+				return null;
+		}
 	}
 
-	public CodeScope getCodeScope() {
-		return codeList.getCodeScope();
+	public CodeScopeProxy getCodeScope() {
+		switch(codeList.getCodeScope()) {
+			case LOCAL:
+				return CodeScopeProxy.LOCAL;
+			case SCHEME:
+				return CodeScopeProxy.SCHEME;
+			default:
+				return null;
+		}
 	}
 
 	public boolean isAlphanumeric() {
@@ -75,10 +109,5 @@ public class CodeListProxy implements ProxyBase {
 		return codeList.isNumeric();
 	}
 
-	public Survey getSurvey() {
-		return codeList.getSurvey();
-	}
-	
-	
 	
 }
