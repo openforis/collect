@@ -22,7 +22,7 @@ public class CodeListItemProxy implements ProxyBase {
 		this.codeListItem = codeListItem;
 	}
 
-	public static List<CodeListItemProxy> fromList(List<CodeListItem> list) {
+	static List<CodeListItemProxy> fromList(List<CodeListItem> list) {
 		List<CodeListItemProxy> proxies = new ArrayList<CodeListItemProxy>();
 		if (list != null) {
 			for (CodeListItem v : list) {

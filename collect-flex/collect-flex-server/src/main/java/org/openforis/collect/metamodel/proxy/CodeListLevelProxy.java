@@ -11,7 +11,7 @@ import org.openforis.idm.metamodel.CodeListLevel;
 
 /**
  * @author S. Ricci
- *
+ * 
  */
 public class CodeListLevelProxy implements ProxyBase {
 
@@ -22,7 +22,7 @@ public class CodeListLevelProxy implements ProxyBase {
 		this.codeListLevel = codeListLevel;
 	}
 
-	public static List<CodeListLevelProxy> fromList(List<CodeListLevel> list) {
+	static List<CodeListLevelProxy> fromList(List<CodeListLevel> list) {
 		List<CodeListLevelProxy> proxies = new ArrayList<CodeListLevelProxy>();
 		if (list != null) {
 			for (CodeListLevel v : list) {
@@ -31,7 +31,7 @@ public class CodeListLevelProxy implements ProxyBase {
 		}
 		return proxies;
 	}
-	
+
 	@ExternalizedProperty
 	public List<LanguageSpecificTextProxy> getLabels() {
 		return LanguageSpecificTextProxy.fromList(codeListLevel.getLabels());
@@ -46,5 +46,5 @@ public class CodeListLevelProxy implements ProxyBase {
 	public String getName() {
 		return codeListLevel.getName();
 	};
-	
+
 }

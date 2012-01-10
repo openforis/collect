@@ -116,7 +116,7 @@ public class NodeDefinitionProxy implements ProxyBase {
 		return nodeDefinition.getPath();
 	}
 
-	// TODO do we need the parent definition ?
+	// TODO do we need the parent definition in flex-ui?
 	// public EntityDefinition getParentDefinition() {
 	// return nodeDefinition.getParentDefinition();
 	// }
