@@ -1,9 +1,11 @@
 package org.openforis.collect.metamodel.proxy;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.idm.metamodel.Survey;
+import org.w3c.dom.Element;
 
 public class SurveyProxy implements ProxyBase {
 
@@ -65,6 +67,23 @@ public class SurveyProxy implements ProxyBase {
 	@ExternalizedProperty
 	public SchemaProxy getSchema() {
 		return new SchemaProxy(survey.getSchema());
+	}
+
+	@ExternalizedProperty
+	public UIConfiguration getUiConfiguration() {
+		Element element = survey.getConfigurationElement();
+		if (element != null) {
+			Element uiConfigElement = (Element) element.getFirstChild();
+			try {
+				UIConfiguration uiConfiguration = UIConfiguration.unmarshal(uiConfigElement);
+				return uiConfiguration;
+			} catch (IOException e) {
+					//log.error
+				return null;
+			}
+		} else {
+			return null;
+		}
 	}
 
 }
