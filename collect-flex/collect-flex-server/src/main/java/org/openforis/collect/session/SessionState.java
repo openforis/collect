@@ -86,11 +86,11 @@ public class SessionState {
 		this.activeSurvey = activeSurvey;
 	}
 
-	protected Locale getLocale() {
+	public Locale getLocale() {
 		return locale;
 	}
 
-	protected void setLocale(Locale locale) {
+	public void setLocale(Locale locale) {
 		this.locale = locale;
 	}
 }
