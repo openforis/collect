@@ -6,6 +6,8 @@ package org.openforis.collect.presenter {
 	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
 	import mx.collections.ItemResponder;
+	import mx.core.FlexGlobals;
+	import mx.rpc.AsyncResponder;
 	import mx.rpc.events.ResultEvent;
 	
 	import org.openforis.collect.Application;
@@ -14,7 +16,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.client.SessionClient;
 	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.metamodel.proxy.SurveyProxy;
-
+	
 	/**
 	 * 
 	 * @author Mino Togna
@@ -44,14 +46,23 @@ package org.openforis.collect.presenter {
 			_keepAliveTimer = new Timer(KEEP_ALIVE_FREQUENCY)
 			_keepAliveTimer.addEventListener(TimerEvent.TIMER, sendKeepAliveMessage);
 			_keepAliveTimer.start();
-			
-			
-			this._modelClient.getSurvey(new ItemResponder(getSurveyResultHandler, faultHandler), "archenland1");
+
+			//init context menu presenter
 			this._contextMenuPresenter = new ContextMenuPresenter(view);
+			
+			//set language in session
+			var localeString:String = FlexGlobals.topLevelApplication.parameters.lang as String;
+			if(localeString != null) {
+				this._sessionClient.setLocale(new AsyncResponder(setLocaleResultHandler, faultHandler), localeString);
+			}
 		}
 		
 		override internal function initEventListeners():void {
 			
+		}
+		
+		internal function setLocaleResultHandler(event:ResultEvent, token:Object = null):void {
+			this._modelClient.getSurvey(new ItemResponder(getSurveyResultHandler, faultHandler), "archenland1");
 		}
 		
 		internal function getSurveysResultHandler(event:ResultEvent, token:Object = null):void {

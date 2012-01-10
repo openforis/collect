@@ -3,12 +3,16 @@ package org.openforis.collect.metamodel.proxy;
 import java.io.IOException;
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.idm.metamodel.Survey;
 import org.w3c.dom.Element;
 
 public class SurveyProxy implements ProxyBase {
 
+	private static Log LOG = LogFactory.getLog(SurveyProxy.class);
+	
 	private transient Survey survey;
 
 	public SurveyProxy(Survey survey) {
@@ -78,7 +82,7 @@ public class SurveyProxy implements ProxyBase {
 				UIConfiguration uiConfiguration = UIConfiguration.unmarshal(uiConfigElement);
 				return uiConfiguration;
 			} catch (IOException e) {
-					//log.error
+				LOG.error(e);
 				return null;
 			}
 		} else {

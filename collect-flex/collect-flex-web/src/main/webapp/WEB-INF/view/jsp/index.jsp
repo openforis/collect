@@ -29,7 +29,9 @@
             var swfVersionStr = "10.2.0";
             // To use express install, set to playerProductInstall.swf, otherwise the empty string. 
             var xiSwfUrlStr = "flash/playerProductInstall.swf";
-            var flashvars = {};
+            var flashvars = {
+            	lang: 'en_US'
+            };
             var params = {};
             params.wmode = "opaque";
             params.quality = "high";
@@ -53,7 +55,7 @@
         </script>
         
     </head>
-	<body>
+    <body>
 		<!-- SWFObject's dynamic embed method replaces this alternative HTML content with Flash content when enough 
              JavaScript and Flash plug-in support is available. The div is initially hidden so that it doesn't show
              when JavaScript is disabled.

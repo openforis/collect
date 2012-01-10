@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class SessionService {
 
-	// private static Log LOG = LogUtils.getLog(SessionService.class);
+	//private static Log LOG = LogFactory.getLog(SessionService.class);
 
 	@Autowired
 	protected SessionManager sessionManager;
@@ -35,4 +35,12 @@ public class SessionService {
 		return this.sessionManager.getSessionState();
 	}
 
+	/**
+	 * Set a locale (language, country) into the session state object
+	 * 
+	 */
+	public void setLocale(String locale) {
+		this.sessionManager.setLocale(locale);
+	}
+	
 }

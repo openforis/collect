@@ -2,6 +2,8 @@ package org.openforis.collect.manager;
 
 import java.util.Collection;
 import java.util.Date;
+import java.util.Locale;
+import java.util.StringTokenizer;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -60,6 +62,19 @@ public class SessionManager {
 		//session.setAttribute(KEEP_ALIVE_SESSION_ATTRIBUTE_NAME, new Date());
 		if (LOG.isDebugEnabled()) {
 			LOG.debug("Keep alive request received");
+		}
+	}
+	
+	public void setLocale(String localeString) {
+		StringTokenizer stringTokenizer = new StringTokenizer(localeString, "_");
+		if(stringTokenizer.countTokens() == 2) {
+			String language = stringTokenizer.nextToken();
+			String country = stringTokenizer.nextToken();
+			Locale locale = new Locale(language, country);
+			SessionState sessionState = getSessionState();
+			sessionState.setLocale(locale);
+		} else {
+			throw new RuntimeException("Wrong locale parameter: " + localeString);
 		}
 	}
 

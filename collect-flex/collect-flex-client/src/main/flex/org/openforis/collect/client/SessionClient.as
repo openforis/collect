@@ -11,6 +11,7 @@ package org.openforis.collect.client {
 		
 		private var _getSessionStateOperation:Operation;
 		private var _keepAliveOperation:Operation;
+		private var _setLocaleOperation:Operation;
 		
 		
 		private var _testGetValueOperation:Operation;
@@ -22,7 +23,7 @@ package org.openforis.collect.client {
 			
 			this._getSessionStateOperation = getOperation("getSessionState");
 			this._keepAliveOperation = getOperation("keepAlive");
-			this._testGetValueOperation = getOperation("testGetValue");
+			this._setLocaleOperation = getOperation("setLocale");
 		}
 		
 		public function getSessionState(responder:IResponder):void {
@@ -35,6 +36,10 @@ package org.openforis.collect.client {
 			token.addResponder(responder);
 		}
 		
+		public function setLocale(responder:IResponder, localeString:String):void {
+			var token:AsyncToken = this._setLocaleOperation.send(localeString);
+			token.addResponder(responder);
+		}
 		
 		// TEST
 		public function testGetValue(responder:IResponder):void {
