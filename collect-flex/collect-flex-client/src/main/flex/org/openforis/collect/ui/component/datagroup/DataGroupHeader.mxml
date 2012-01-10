@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" width="400" height="300">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.collections.ArrayCollection;
+			
+			import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
+			import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
+			
+			[Bindable]
+			private var _modelVersion:ModelVersionProxy;
+			[Bindable]
+			private var _entityDefinition:EntityDefinitionProxy;
+			[Bindable]
+			private var childDefinitionsInVersion:ArrayCollection;
+			
+			[Bindable]
+			public function get entityDefinition():EntityDefinitionProxy {
+				return _entityDefinition;
+			}
+			
+			public function set entityDefinition(value:EntityDefinitionProxy):void {
+				_entityDefinition = value;
+			}
+			
+			[Bindable]
+			public function get modelVersion():ModelVersion {
+				return _modelVersion;
+			}
+			
+			public function set modelVersion(value:ModelVersion):void {
+				_modelVersion = value;
+			}
+			/*
+			[Bindable]
+			private var _dataProvider:Object;
+			
+			public function get dataProvider():Object {
+			return _dataProvider;
+			}
+			
+			public function set dataProvider(value:Object):void {
+			_dataProvider = value;
+			}
+			*/
+		]]>
+	</fx:Script>
+	
+	<s:layout>
+		<s:HorizontalLayout />
+	</s:layout>
+	
+	<s:DataGroup dataProvider="{childDefinitionsInVersion}">
+		<s:itemRenderer>
+			<fx:Component>
+				<fx:Script>
+					<![CDATA[
+						import mx.messaging.management.Attribute;
+						
+						import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
+						import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
+
+						[Bindable]
+						private var headerText:String;
+						[Bindable]
+						private var headerTextWidth:Number;
+						[Bindable]
+						private var isInVersion:Boolean;
+						
+						override public function set data(value:NodeDefinitionProxy):void {
+							super.data = value;
+							
+							if(value.labels != null && value.labels.length > 0) {
+								headerText = value.labels.getItemAt(0);
+								
+								//TODO set headerTextWidth
+								if(value instanceof AttributeDefinitionProxy) {
+								}
+							}
+						}
+					]]>
+				</fx:Script>
+				
+				<s:Label text="{headerText}" width="{headerTextWidth}" />
+			</fx:Component>
+		</s:itemRenderer>
+	</s:DataGroup>
+	
+</s:Group>
