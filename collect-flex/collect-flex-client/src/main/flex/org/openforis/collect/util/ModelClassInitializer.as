@@ -20,6 +20,8 @@ package org.openforis.collect.util {
 	import org.openforis.collect.metamodel.proxy.SchemaProxy;
 	import org.openforis.collect.metamodel.proxy.SpatialReferenceSystemProxy;
 	import org.openforis.collect.metamodel.proxy.SurveyProxy;
+	import org.openforis.collect.metamodel.proxy.UIConfiguration;
+	import org.openforis.collect.metamodel.proxy.UITab;
 	import org.openforis.collect.metamodel.proxy.UnitProxy;
 
 	public class ModelClassInitializer {
@@ -48,7 +50,10 @@ package org.openforis.collect.util {
 				SchemaProxy,
 				SpatialReferenceSystemProxy,
 				SurveyProxy,
-				UnitProxy
+				UnitProxy,
+				
+				UIConfiguration,
+				UITab
 				
 			];
 		}
