@@ -2,9 +2,13 @@ package org.openforis.collect.blazeds.service;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 
+import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.metamodel.proxy.SurveyProxy;
+import org.openforis.collect.model.SurveySummary;
+import org.openforis.collect.session.SessionState;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.SpatialReferenceSystem;
 import org.openforis.idm.metamodel.Survey;
@@ -13,8 +17,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class ModelService {
 
 	@Autowired
-	protected SurveyManager surveyManager;
-	
+	private SurveyManager surveyManager;
+
+	@Autowired
+	private SessionManager sessionManager;
+
 	/**
 		 */
 	public Collection<SpatialReferenceSystem> getSpatialReferenceSystems() {
@@ -27,13 +34,29 @@ public class ModelService {
 		return null;
 	}
 
-	public List<Survey> getSurveys() {
-		return null;
-	}
-	
 	public SurveyProxy getSurvey(String name) {
 		Survey survey = surveyManager.load(name);
 		SurveyProxy proxy = new SurveyProxy(survey);
 		return proxy;
 	}
+
+	public List<SurveySummary> getSurveySummaries() {
+		SessionState sessionState = sessionManager.getSessionState();
+		Locale locale = sessionState.getLocale();
+		String lang = "en";
+		if (locale != null) {
+			lang = locale.getLanguage();
+		}
+		List<SurveySummary> summaries = surveyManager.getSurveySummaries(lang);
+		return summaries;
+	}
+
+	protected SessionManager getSessionManager() {
+		return sessionManager;
+	}
+
+	protected SurveyManager getSurveyManager() {
+		return surveyManager;
+	}
+
 }

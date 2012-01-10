@@ -1,15 +1,16 @@
 package org.openforis.collect.persistence;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.GregorianCalendar;
+import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openforis.collect.model.CollectAttributeMetadata;
@@ -20,7 +21,6 @@ import org.openforis.idm.model.Coordinate;
 import org.openforis.idm.model.Date;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.NumericCode;
-import org.openforis.idm.model.RealAttribute;
 import org.openforis.idm.model.Time;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -40,6 +40,11 @@ public class DAOIntegrationTest {
 	
 	@Autowired
 	protected RecordDAO recordDao;
+	
+	@Before
+	public void beforeTest(){
+		surveyDao.loadAll();
+	}
 	
 	@Test
 	public void testCRUD() throws IOException, SurveyImportException, DataInconsistencyException  {
@@ -138,10 +143,17 @@ public class DAOIntegrationTest {
 			tree2.addValue("dbh", 85.8);
 			tree2.addValue("total_height", 4.0);
 		}
-		System.err.println(record);
+		//System.err.println(record);
 		return record;
 	}
 
+	@Test
+	public void testLoadAllSurvey(){
+		List<Survey> list = this.surveyDao.loadAll();
+		assertNotNull(list);
+		assertEquals(1, list.size());
+		
+	}
 
 	private void updateRecord(CollectRecord record) {
 		// Update modified date
@@ -154,4 +166,5 @@ public class DAOIntegrationTest {
 		
 		// TODO write update test
 	}
+	
 }

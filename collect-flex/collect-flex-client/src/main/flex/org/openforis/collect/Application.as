@@ -23,7 +23,7 @@ package org.openforis.collect {
 		
 		public static var SESSION_ID:String;
 
-		private static var _surveys:IList;
+		private static var _surveySummaries:IList;
 		
 		private static var _activeSurvey:SurveyProxy;
 		/*private static var _selectedRootEntity:Entity;*/
@@ -70,13 +70,13 @@ package org.openforis.collect {
 			}
 		}
 		
-		public static function set surveys(list:IList):void {
-			_surveys = list;
+		public static function set surveySummaries(list:IList):void {
+			_surveySummaries = list;
 		}
 		
-		public static function get surveys():IList {
+		public static function get surveySummaries():IList {
 			var list:ArrayCollection = new ArrayCollection();
-			list.addAll(_surveys);
+			list.addAll(_surveySummaries);
 			return list;
 		}
 		

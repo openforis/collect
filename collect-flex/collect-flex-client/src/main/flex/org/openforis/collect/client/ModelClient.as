@@ -18,12 +18,12 @@ package org.openforis.collect.client {
 		public function ModelClient() {
 			super("modelService");
 			
-			this._getSurveysOperation = getOperation("getSurveys");
+			this._getSurveysOperation = getOperation("getSurveySummaries");
 			this._getSurveyOperation = getOperation("getSurvey");
 			this._getSchemaOperation = getOperation("getSchema");
 		}
 		
-		public function getSurveys(responder:IResponder):void {
+		public function getSurveySummaries(responder:IResponder):void {
 			var token:AsyncToken = this._getSurveysOperation.send();
 			token.addResponder(responder);
 		}

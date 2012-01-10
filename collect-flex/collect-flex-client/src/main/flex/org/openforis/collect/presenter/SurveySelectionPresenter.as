@@ -19,11 +19,11 @@ package org.openforis.collect.presenter {
 		
 		override internal function initEventListeners():void{
 			eventDispatcher.addEventListener(ApplicationEvent.SURVEYS_LOADED, surveysLoadedHandler);
-			_view.addEventListener(UIEvent.SURVEY_SELECTED, surveySelectedHandler);
+			//_view.addEventListener(UIEvent.SURVEY_SELECTED, surveySelectedHandler);
 		}
 		
 		protected function surveysLoadedHandler(event:ApplicationEvent):void {
-			_view.surveyDataGroup.dataProvider = Application.surveys;
+			_view.surveyDataGroup.dataProvider = Application.surveySummaries;
 		}
 		
 		protected function surveySelectedHandler(event:UIEvent):void {

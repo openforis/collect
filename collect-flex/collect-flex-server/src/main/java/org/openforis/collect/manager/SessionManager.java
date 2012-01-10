@@ -58,26 +58,29 @@ public class SessionManager {
 
 	public void keepSessionAlive() {
 		setSessionAttribute(KEEP_ALIVE_SESSION_ATTRIBUTE_NAME, new Date());
-		//HttpSession session = FlexContext.getHttpRequest().getSession();
-		//session.setAttribute(KEEP_ALIVE_SESSION_ATTRIBUTE_NAME, new Date());
+		// HttpSession session = FlexContext.getHttpRequest().getSession();
+		// session.setAttribute(KEEP_ALIVE_SESSION_ATTRIBUTE_NAME, new Date());
 		if (LOG.isDebugEnabled()) {
 			LOG.debug("Keep alive request received");
 		}
 	}
-	
-	public void setLocale(String localeString) {
-		StringTokenizer stringTokenizer = new StringTokenizer(localeString, "_");
-		if(stringTokenizer.countTokens() == 2) {
-			String language = stringTokenizer.nextToken();
-			String country = stringTokenizer.nextToken();
-			Locale locale = new Locale(language, country);
-			SessionState sessionState = getSessionState();
-			sessionState.setLocale(locale);
-		} else {
-			throw new RuntimeException("Wrong locale parameter: " + localeString);
-		}
-	}
 
+	public void setLocale(String string) {
+		StringTokenizer stringTokenizer = new StringTokenizer(string, "_");
+		int tokens = stringTokenizer.countTokens();
+		if (tokens < 1 || tokens > 2) {
+			throw new IllegalArgumentException("Invalid locale string: " + string);
+		}
+		String language = stringTokenizer.nextToken();
+		String country = "";
+		if (stringTokenizer.hasMoreTokens()) {
+			country = stringTokenizer.nextToken();
+		}
+		Locale locale = new Locale(language, country);
+		SessionState sessionState = getSessionState();
+		sessionState.setLocale(locale);
+	}
+	
 	// private Record getActiveRecord() {
 	// Record record = (Record) FlexContext.getHttpRequest().getSession().getAttribute(ACTIVE_RECORD_SESSION_ATTRIBUTE_NAME);
 	// return record;
@@ -98,21 +101,21 @@ public class SessionManager {
 		}
 		return user;
 	}
-	
-	private Object getSessionAttribute(String attributeName) {
-		//blazeds
-		//FlexContext.getHttpRequest().getSession().getAttribute(attributeName);
 
-		//graniteds
+	private Object getSessionAttribute(String attributeName) {
+		// blazeds
+		// FlexContext.getHttpRequest().getSession().getAttribute(attributeName);
+
+		// graniteds
 		Object result = GraniteContext.getCurrentInstance().getSessionMap().get(attributeName);
 		return result;
 	}
-	
+
 	private void setSessionAttribute(String attributeName, Object value) {
-		//blazeds
-		//FlexContext.getHttpRequest().getSession().setAttribute(attributeName, value);
-		
-		//graniteds
+		// blazeds
+		// FlexContext.getHttpRequest().getSession().setAttribute(attributeName, value);
+
+		// graniteds
 		GraniteContext.getCurrentInstance().getSessionMap().put(attributeName, value);
 	}
 }

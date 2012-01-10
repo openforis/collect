@@ -82,7 +82,7 @@
 	<!-- ===================================== -->
 	<bean id="sessionManager" class="org.openforis.collect.manager.SessionManager" />
 
-	<bean id="surveyManager" class="org.openforis.collect.manager.SurveyManager" />
+	<bean id="surveyManager" class="org.openforis.collect.manager.SurveyManager" init-method="init" />
 
 	
 	<!-- ===================================== -->

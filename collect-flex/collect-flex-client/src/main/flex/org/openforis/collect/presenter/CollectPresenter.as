@@ -15,7 +15,9 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.client.ModelClient;
 	import org.openforis.collect.client.SessionClient;
 	import org.openforis.collect.event.ApplicationEvent;
+	import org.openforis.collect.event.UIEvent;
 	import org.openforis.collect.metamodel.proxy.SurveyProxy;
+	import org.openforis.collect.model.SurveySummary;
 	
 	/**
 	 * 
@@ -31,10 +33,6 @@ package org.openforis.collect.presenter {
 		private var _contextMenuPresenter:ContextMenuPresenter;
 		
 		private var _keepAliveTimer:Timer;
-		
-		//semaphores
-		private var _sessionStateLoaded:Boolean = false;
-		private var _surveysLoaded:Boolean = false;
 		
 		public function CollectPresenter(view:collect) {
 			super();
@@ -58,53 +56,51 @@ package org.openforis.collect.presenter {
 		}
 		
 		override internal function initEventListeners():void {
-			
+			eventDispatcher.addEventListener(UIEvent.SURVEY_SELECTED, surveySelectedHandler);
 		}
 		
 		internal function setLocaleResultHandler(event:ResultEvent, token:Object = null):void {
-			this._modelClient.getSurvey(new ItemResponder(getSurveyResultHandler, faultHandler), "archenland1");
+			getSurveySummaries();
 		}
 		
-		internal function getSurveysResultHandler(event:ResultEvent, token:Object = null):void {
-			_surveysLoaded = true;
-			checkInitializationComplete();
-			var surveys:IList = event.result as IList;
+		/**
+		 * Get Survey Summaries
+		 * 
+		 * */
+		internal function getSurveySummaries():void {
+			_modelClient.getSurveySummaries(new ItemResponder(getSurveySummariesResultHandler, faultHandler));
+		}
+		
+		internal function getSurveySummariesResultHandler(event:ResultEvent, token:Object = null):void {
+			var summaries:IList =  event.result as IList;
+			Application.surveySummaries = summaries;
 			
-			var applicationEvent:ApplicationEvent = new ApplicationEvent(ApplicationEvent.SURVEYS_LOADED);
-			applicationEvent.result = surveys;
-			
-			eventDispatcher.dispatchEvent(new ApplicationEvent(ApplicationEvent.SURVEYS_LOADED));
+			if(summaries.length > 1){
+				//TODO 
+			} else {
+				var s:SurveySummary = summaries.getItemAt(0) as SurveySummary;
+				
+				var uiEvent:UIEvent = new UIEvent(UIEvent.SURVEY_SELECTED);
+				uiEvent.obj = s;
+				eventDispatcher.dispatchEvent(uiEvent);
+			}
+		}
+		
+		/**
+		 * 
+		 * 
+		 * */
+		protected function surveySelectedHandler(event:UIEvent):void {
+			var s:SurveySummary = event.obj as SurveySummary;
+			var name:String = s.name;
+			_modelClient.getSurvey(new ItemResponder(getSurveyResultHandler, faultHandler), name);			
 		}
 		
 		internal function getSurveyResultHandler(event:ResultEvent, token:Object = null):void {
 			var survey:SurveyProxy = event.result as SurveyProxy;
 			
-
-/*			Application.SURVEYS = new ArrayCollection();
-			Application.SURVEYS.addItem(survey);
-			var surveys:ArrayCollection = new ArrayCollection();
-			surveys.addItem(survey);
-
-*/
-			var surveys:IList = new ArrayCollection();
-			surveys.addItem(survey);
-			Application.surveys = surveys;
-			
-			var applicationEvent:ApplicationEvent = new ApplicationEvent(ApplicationEvent.SURVEYS_LOADED);
-			
-			
-			eventDispatcher.dispatchEvent(applicationEvent);
-			
-			eventDispatcher.dispatchEvent(new ApplicationEvent(ApplicationEvent.APPLICATION_INITIALIZED));
 		}
 		
-		
-		internal function checkInitializationComplete():void {
-			//when all information is loaded, dispatch applicationInitialized event
-			if(_surveysLoaded && _sessionStateLoaded ) {
-				eventDispatcher.dispatchEvent(new ApplicationEvent(ApplicationEvent.APPLICATION_INITIALIZED));
-			}
-		}
 		
 		
 		internal function sendKeepAliveMessage(event:TimerEvent):void {
