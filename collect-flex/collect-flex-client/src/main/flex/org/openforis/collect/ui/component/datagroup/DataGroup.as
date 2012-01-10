@@ -8,7 +8,7 @@ package org.openforis.collect.ui.component.datagroup {
 	import spark.components.DataGroup;
 	import spark.layouts.VerticalLayout;
 	
-	public class DataGroup extends DataGroup {
+	public class DataGroup extends spark.components.DataGroup {
 		
 		public function DataGroup() {
 			super();
