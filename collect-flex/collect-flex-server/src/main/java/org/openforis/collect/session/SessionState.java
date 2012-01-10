@@ -3,6 +3,8 @@
  */
 package org.openforis.collect.session;
 
+import java.util.Locale;
+
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.User;
 import org.openforis.idm.metamodel.Survey;
@@ -17,7 +19,8 @@ public class SessionState {
 	private String sessionId;
 	private CollectRecord activeRecord;
 	private Survey activeSurvey;
-
+	private Locale locale;
+	
 	/**
 	 * Getter of the property <tt>user</tt>
 	 * 
@@ -81,5 +84,13 @@ public class SessionState {
 
 	public void setActiveSurvey(Survey activeSurvey) {
 		this.activeSurvey = activeSurvey;
+	}
+
+	protected Locale getLocale() {
+		return locale;
+	}
+
+	protected void setLocale(Locale locale) {
+		this.locale = locale;
 	}
 }
