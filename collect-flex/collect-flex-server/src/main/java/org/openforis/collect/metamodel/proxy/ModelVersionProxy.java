@@ -22,7 +22,7 @@ public class ModelVersionProxy implements ProxyBase {
 		this.version = version;
 	}
 
-	public static List<ModelVersionProxy> fromList(List<ModelVersion> list) {
+	static List<ModelVersionProxy> fromList(List<ModelVersion> list) {
 		List<ModelVersionProxy> proxies = new ArrayList<ModelVersionProxy>();
 		if (list != null) {
 			for (ModelVersion v : list) {

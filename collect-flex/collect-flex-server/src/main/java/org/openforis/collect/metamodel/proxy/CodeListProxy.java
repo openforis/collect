@@ -30,7 +30,7 @@ public class CodeListProxy implements ProxyBase {
 		this.codeList = codeList;
 	}
 
-	public static List<CodeListProxy> fromList(List<CodeList> list) {
+	static List<CodeListProxy> fromList(List<CodeList> list) {
 		List<CodeListProxy> proxies = new ArrayList<CodeListProxy>();
 		if (list != null) {
 			for (CodeList v : list) {

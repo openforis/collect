@@ -11,20 +11,22 @@ import org.openforis.idm.metamodel.CodeListLabel;
 
 /**
  * @author S. Ricci
- *
+ * 
  */
 public class CodeListLabelProxy implements ProxyBase {
 
 	private transient CodeListLabel codeListLabel;
 
-	public enum Type { ITEM, LIST }
-	
+	public enum Type {
+		ITEM, LIST
+	}
+
 	public CodeListLabelProxy(CodeListLabel codeListLabel) {
 		super();
 		this.codeListLabel = codeListLabel;
 	}
 
-	public static List<CodeListLabelProxy> fromList(List<CodeListLabel> list) {
+	static List<CodeListLabelProxy> fromList(List<CodeListLabel> list) {
 		List<CodeListLabelProxy> proxies = new ArrayList<CodeListLabelProxy>();
 		if (list != null) {
 			for (CodeListLabel v : list) {
@@ -33,7 +35,7 @@ public class CodeListLabelProxy implements ProxyBase {
 		}
 		return proxies;
 	}
-	
+
 	@ExternalizedProperty
 	public Type getType() {
 		if (codeListLabel.getType() != null) {
@@ -52,7 +54,5 @@ public class CodeListLabelProxy implements ProxyBase {
 	public String getText() {
 		return codeListLabel.getText();
 	}
-	
-	
-	
+
 }
