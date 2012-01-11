@@ -84,6 +84,8 @@
 
 	<bean id="surveyManager" class="org.openforis.collect.manager.SurveyManager" init-method="init" />
 
+	<bean id="recordManager" class="org.openforis.collect.manager.RecordManager" />
+
 	
 	<!-- ===================================== -->
 	<!-- Data Source -->
@@ -110,6 +112,10 @@
     	<property name="dataSource" ref="dataSource"/>
 	</bean>
 
+	<bean id="recordDao" class="org.openforis.collect.persistence.RecordDAO">
+    	<property name="dataSource" ref="dataSource"/>
+	</bean>
+	
 	<!-- <bean id="applicationDao" class="org.fao.openforis.collect.dao.xml.ApplicationDaoImpl"> -->
 	<!-- <property name="recordDao" ref="recordDao" /> -->
 	<!-- <property name="versionDao" ref="versionDao" /> -->

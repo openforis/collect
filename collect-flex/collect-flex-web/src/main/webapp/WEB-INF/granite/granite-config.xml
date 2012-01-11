@@ -35,6 +35,7 @@
         <externalizer type="org.granite.messaging.amf.io.util.externalizer.DefaultExternalizer">
 			<include instance-of="org.openforis.collect.metamodel.proxy.ProxyBase" />
 			<include type="org.openforis.collect.model.SurveySummary"/>
+			<include type="org.openforis.collect.model.RecordSummary"/>
         </externalizer>
     </externalizers>
   

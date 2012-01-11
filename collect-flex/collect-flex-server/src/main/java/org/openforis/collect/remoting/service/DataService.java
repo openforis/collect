@@ -46,9 +46,19 @@ public class DataService {
 		return record;
 	}
 
-	public List<RecordSummary> getRecordsSummary() {
+	public List<RecordSummary> getRecordSummaries() {
 		List<RecordSummary> list = recordManager.getSummaries();
 		return list;
+	}
+
+	public List<RecordSummary> getRecordSummaries(int fromIndex, int toIndex, String orderByFieldName) {
+		List<RecordSummary> list = recordManager.getSummaries(fromIndex, toIndex, orderByFieldName);
+		return list;
+	}
+
+	public int getCountRecords() {
+		int count = recordManager.getCountRecords();
+		return count;
 	}
 
 	public Record newRecord(String name, Survey survey, String rootEntityId) throws MultipleEditException, DuplicateIdException, InvalidIdException, DuplicateIdException, AccessDeniedException,

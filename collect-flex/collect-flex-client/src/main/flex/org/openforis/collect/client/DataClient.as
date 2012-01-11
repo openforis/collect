@@ -17,6 +17,8 @@ package org.openforis.collect.client {
 
 		private var _updateOperation:Operation;
 		private var _newRecordOperation:Operation;
+		private var _getCountRecordsOperation:Operation;
+		private var _getRecordsSummaryOperation:Operation;
 		
 		public function DataClient() {
 			super("dataService");
@@ -24,10 +26,22 @@ package org.openforis.collect.client {
 			this._updateQueueProcessor = new RemoteCallQueueProcessor(3, faultHandler);
 			this._updateOperation = getOperation("update");
 			this._newRecordOperation = getOperation("newRecord");
+			this._getCountRecordsOperation = getOperation("getCountRecords");
+			this._getRecordsSummaryOperation = getOperation("getRecordSummaries");
+		}
+		
+		public function getCountRecords(responder:IResponder):void {
+			var token:AsyncToken = this._getCountRecordsOperation.send();
+			token.addResponder(responder);
 		}
 		
 		public function newRecord(responder:IResponder, newId:String, versionId:String):void {
 			var token:AsyncToken = this._newRecordOperation.send(newId, versionId);
+			token.addResponder(responder);
+		}
+		
+		public function getRecordsSummary(responder:IResponder, fromIndex:int, toIndex:int, orderByField:String):void {
+			var token:AsyncToken = this._getRecordsSummaryOperation.send(fromIndex, toIndex, orderByField);
 			token.addResponder(responder);
 		}
 		

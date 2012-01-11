@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx">
+	<s:layout>
+		<s:HorizontalLayout verticalAlign="bottom"/>
+	</s:layout>
+	
+	<s:Button id="previousPageButton" label="Previous Page" />
+	
+	<s:NumericStepper id="goToPageStepper" />
+	<s:Button id="goToPageButton" label="Go To Page" />
+	
+	<s:Button id="nextPageButton" label="Next Page" />
+	
+	<s:Label text="Records from:" />
+	<s:Label id="recordsFromText" />
+	<s:Label text="to:" />
+	<s:Label id="recordsToText" />
+	<s:Label text="Total Records:" />
+	<s:Label id="totalRecordsText" />
+	
+</s:Group>

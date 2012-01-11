@@ -15,6 +15,7 @@ import org.openforis.collect.model.RecordSummary;
 import org.openforis.collect.persistence.RecordDAO;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.model.Record;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author M. Togna
@@ -22,6 +23,7 @@ import org.openforis.idm.model.Record;
  */
 public class RecordManager {
 
+	@Autowired
 	private RecordDAO recordDAO;
 	
 	public Record create(Survey survey, String entityName) {
@@ -59,6 +61,16 @@ public class RecordManager {
 	public List<RecordSummary> getSummaries() {
 		// TODO implement getRecordSummaries
 		return null;
+	}
+	
+	public List<RecordSummary> getSummaries(int fromIndex, int toIndex, String orderByFieldName) {
+		List<RecordSummary> recordsSummary = recordDAO.getRecordsSummary(fromIndex, toIndex, orderByFieldName);
+		return recordsSummary;
+	}
+	
+	public int getCountRecords() {
+		int count = recordDAO.getCountRecords();
+		return count;
 	}
 
 	public Record create(String name, Survey survey, String rootEntityId) throws MultipleEditException, DuplicateIdException, InvalidIdException, DuplicateIdException, AccessDeniedException,

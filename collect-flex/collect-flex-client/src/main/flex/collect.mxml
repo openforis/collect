@@ -49,7 +49,7 @@
 			<s:VerticalLayout />
 		</s:layout>
 		<view:Header width="100%" />
-		<view:MasterView width="100%" height="100%" />
+		<view:MasterView id="masterView" width="100%" height="100%" />
 		<view:Footer width="100%" />
 	</s:SkinnableContainer>
 	
