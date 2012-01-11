@@ -63,8 +63,8 @@ public class RecordManager {
 		return null;
 	}
 	
-	public List<RecordSummary> getSummaries(int fromIndex, int toIndex, String orderByFieldName) {
-		List<RecordSummary> recordsSummary = recordDAO.getRecordsSummary(fromIndex, toIndex, orderByFieldName);
+	public List<RecordSummary> getSummaries(int rootEntityId, int fromIndex, int toIndex, String orderByFieldName) {
+		List<RecordSummary> recordsSummary = recordDAO.getRecordsSummary(rootEntityId, fromIndex, toIndex, orderByFieldName);
 		return recordsSummary;
 	}
 	
