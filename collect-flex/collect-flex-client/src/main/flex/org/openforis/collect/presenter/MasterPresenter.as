@@ -8,6 +8,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.Application;
 	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.event.UIEvent;
+	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.SurveyProxy;
 	import org.openforis.collect.model.SurveySummary;
 	import org.openforis.collect.ui.view.MasterView;
@@ -20,7 +21,7 @@ package org.openforis.collect.presenter {
 			this._view = view;
 			super();
 			
-			_view.currentState = "loading";
+			_view.currentState = MasterView.LOADING_STATE;
 			
 			/*
 			wait for surveys and sessionState loading, then dispatch APPLICATION_INITIALIZED event
@@ -45,24 +46,19 @@ package org.openforis.collect.presenter {
 		}*/
 		
 		protected function rootEntitySelectedHandler(event:UIEvent):void {
-			var rootEntity:Object = event.obj as Object;
-			selectRootEntity(rootEntity);
-		}
-		
-		protected function selectRootEntity(rootEntity:Object):void {
-	//		Application.selectedRootEntity = rootEntity;
+			var entityDef:EntityDefinitionProxy = event.obj as EntityDefinitionProxy;
 			
-			_view.currentState = "list";
-			//TODO loadRecords();
+			
+			_view.currentState = MasterView.LIST_STATE;
 		}
+
 		
 		protected function newRecordCreatedHandler(event:UIEvent):void {
-			_view.currentState = "detail";
+			_view.currentState = MasterView.DETAIL_STATE;
 		}
 		
 		protected function backToListHandler(event:UIEvent):void {
-			_view.currentState = "list";
-			
+			_view.currentState = MasterView.LIST_STATE;
 			//load clusters...
 		}
 			

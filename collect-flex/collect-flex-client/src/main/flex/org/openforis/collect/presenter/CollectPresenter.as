@@ -6,6 +6,7 @@ package org.openforis.collect.presenter {
 	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
 	import mx.collections.ItemResponder;
+	import mx.collections.ListCollectionView;
 	import mx.core.FlexGlobals;
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.events.ResultEvent;
@@ -16,6 +17,8 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.client.SessionClient;
 	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.event.UIEvent;
+	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
+	import org.openforis.collect.metamodel.proxy.SchemaProxy;
 	import org.openforis.collect.metamodel.proxy.SurveyProxy;
 	import org.openforis.collect.model.SurveySummary;
 	
@@ -98,7 +101,16 @@ package org.openforis.collect.presenter {
 		
 		internal function getSurveyResultHandler(event:ResultEvent, token:Object = null):void {
 			var survey:SurveyProxy = event.result as SurveyProxy;
-			
+			var schema:SchemaProxy = survey.schema;
+			var rootEntityDefinitions:ListCollectionView = schema.rootEntityDefinitions;
+			if(rootEntityDefinitions.length == 1){
+				var rootEntityDef:EntityDefinitionProxy = rootEntityDefinitions.getItemAt(0) as EntityDefinitionProxy;
+				var uiEvent:UIEvent = new UIEvent(UIEvent.ROOT_ENTITY_SELECTED);
+				uiEvent.obj = rootEntityDef;
+				eventDispatcher.dispatchEvent(uiEvent);
+			} else {
+				//TODO
+			}
 		}
 		
 		
