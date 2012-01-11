@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.openforis.collect.blazeds.service;
+package org.openforis.collect.remoting.service;
 
 import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.session.SessionState;

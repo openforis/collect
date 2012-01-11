@@ -79,7 +79,7 @@
 <!-- 		class="org.fao.openforis.web.context.ApplicationContextAwareImpl"></bean> -->
 
 	<!-- BlazeDs services -->
-	<bean id="applicationService" class="org.openforis.collect.blazeds.service.ConnectivityService">
+	<bean id="applicationService" class="org.openforis.collect.remoting.service.ConnectivityService">
 	</bean>
 <!-- 	<bean id="service" class="org.fao.openforis.web.service.Service" scope="session"> -->
 <!-- 		<property name="applicationDao" ref="applicationDao" /> -->

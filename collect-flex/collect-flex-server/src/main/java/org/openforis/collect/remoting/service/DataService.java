@@ -1,12 +1,11 @@
 /**
  * 
  */
-package org.openforis.collect.blazeds.service;
+package org.openforis.collect.remoting.service;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.openforis.collect.blazeds.service.UpdateRequest.Method;
 import org.openforis.collect.exception.AccessDeniedException;
 import org.openforis.collect.exception.DuplicateIdException;
 import org.openforis.collect.exception.InvalidIdException;
@@ -17,6 +16,7 @@ import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.RecordSummary;
+import org.openforis.collect.remoting.service.UpdateRequest.Method;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.openforis.collect.blazeds.service;
+package org.openforis.collect.remoting.service;
 
 import java.util.List;
 
