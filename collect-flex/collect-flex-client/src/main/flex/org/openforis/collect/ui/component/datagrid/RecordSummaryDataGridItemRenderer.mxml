@@ -6,26 +6,23 @@
 					>
 	<fx:Script> 
 		<![CDATA[ 
-			import mx.events.FlexEvent;
+			import org.openforis.collect.event.EventDispatcherFactory;
+			import org.openforis.collect.event.UIEvent;
 			
-			import org.fao.openforis.flex.event.EventDispatcherUtil;
-			import org.fao.openforis.flex.event.UIEvent;
-			import org.fao.openforis.flex.util.StringUtil;
-			import org.fao.openforis.flex.util.XMLUtil;
 			
 			override public function set data(value:Object):void {
 				super.data = value;
 				
-				updateCurrentState();
+				/* updateCurrentState(); */
 			}
 			
-			override public function prepare(hasBeenRecycled:Boolean):void {
-				if(data != null) {
+ 			override public function prepare(hasBeenRecycled:Boolean):void {
+				if(data != null && data.hasOwnProperty(column.dataField)) {
 					lblData.text = data[column.dataField];
 				}
-			} 
+			}  
 			
-			protected function updateCurrentState():void {
+/* 			protected function updateCurrentState():void {
 				if(data != null && data.submitted) {
 					this.currentState = "submitted";
 				} else if(data != null && data.rejected) {
@@ -33,14 +30,15 @@
 				} else {
 					this.currentState = "normal";
 				}
-			}
+			} */
 			
 			protected function doubleClickHandler(event:MouseEvent):void {
-				var uiEvent:UIEvent = new UIEvent(UIEvent.EDIT_ITEM_BUTTON);
-				EventDispatcherUtil.dispatchUIEvent(uiEvent);
+				var uiEvent:UIEvent = new UIEvent(UIEvent.RECORD_SELECTED);
+				uiEvent.obj = data;
+				EventDispatcherFactory.getEventDispatcher().dispatchEvent(uiEvent);
 			}
 			
-			override protected function getCurrentRendererState():String {
+/* 			override protected function getCurrentRendererState():String {
 				var newRenderState:String = super.getCurrentRendererState();
 				var prefix:String = null;
 				if(StringUtil.startsWith(currentState, "submitted")) {
@@ -62,7 +60,7 @@
 					}
 				}
 				return newRenderState;
-			}
+			} */
 
 		]]> 
 	</fx:Script>

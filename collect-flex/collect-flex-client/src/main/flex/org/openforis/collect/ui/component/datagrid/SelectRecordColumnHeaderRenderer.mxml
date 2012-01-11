@@ -12,7 +12,7 @@
 			
 			
 			protected function creationCompleteHandler(event:FlexEvent):void {
-				var dataGrid:DataGrid = this.column.grid.dataGrid as DataGrid;
+				var dataGrid:RecordSummaryDataGrid = this.column.grid.dataGrid as RecordSummaryDataGrid;
 				dataGrid.selectedByCheckBox.addEventListener(CollectionEvent.COLLECTION_CHANGE, selectedItemsByCheckBoxChangeHandler);
 			}
 			
@@ -21,7 +21,7 @@
 			}
 			
 			protected function changeHandler(event:Event):void {
-				var dataGrid:DataGrid = this.column.grid.dataGrid as DataGrid;
+				var dataGrid:RecordSummaryDataGrid = this.column.grid.dataGrid as RecordSummaryDataGrid;
 				var dataProvider:IList = dataGrid.dataProvider as IList;
 				var selected:Boolean = (event.target as CheckBox).selected;
 				
@@ -34,7 +34,7 @@
 			}
 			
 			private function updateCheckBoxStyle():void {
-				var dataGrid:DataGrid = this.column.grid.dataGrid as DataGrid;
+				var dataGrid:RecordSummaryDataGrid = this.column.grid.dataGrid as RecordSummaryDataGrid;
 				var count:int = dataGrid.selectedByCheckBox.length;
 				var totalRecordsCount:int = dataGrid.dataProvider.length;
 				

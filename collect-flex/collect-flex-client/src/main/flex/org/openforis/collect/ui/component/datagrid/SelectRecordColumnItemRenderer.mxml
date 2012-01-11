@@ -11,7 +11,7 @@
 			
 			
 			protected function creationCompleteHandler(event:FlexEvent):void {
-				var dataGrid:DataGrid = this.column.grid.dataGrid as DataGrid;
+				var dataGrid:RecordSummaryDataGrid = this.column.grid.dataGrid as RecordSummaryDataGrid;
 				dataGrid.selectedByCheckBox.addEventListener(CollectionEvent.COLLECTION_CHANGE, selectedItemsByCheckBoxChangeHandler);
 			}
 			
@@ -25,13 +25,13 @@
 			}
 			
 			protected function updateCheckBoxSelection(event:Event = null):void {
-				var dataGrid:DataGrid = this.column.grid.dataGrid as DataGrid;
+				var dataGrid:RecordSummaryDataGrid = this.column.grid.dataGrid as RecordSummaryDataGrid;
 				var selected:Boolean = dataGrid.selectedByCheckBox.contains(data);
 				checkBox.selected = selected;
 			}
 			
 			protected function checkBoxChangeHandler(evt:Event):void {
-				var dataGrid:DataGrid = this.column.grid.dataGrid as DataGrid;
+				var dataGrid:RecordSummaryDataGrid = this.column.grid.dataGrid as RecordSummaryDataGrid;
 				var selectedList:ArrayCollection = dataGrid.selectedByCheckBox
 				if(checkBox.selected){
 					selectedList.addItem(data);

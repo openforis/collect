@@ -4,12 +4,14 @@ package org.openforis.collect.presenter {
 	 * @author Mino Togna
 	 * */
 	import mx.collections.IList;
+	import mx.controls.Alert;
 	
 	import org.openforis.collect.Application;
 	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.event.UIEvent;
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.SurveyProxy;
+	import org.openforis.collect.model.RecordSummary;
 	import org.openforis.collect.model.SurveySummary;
 	import org.openforis.collect.ui.view.MasterView;
 
@@ -39,10 +41,15 @@ package org.openforis.collect.presenter {
 			//eventDispatcher.addEventListener(ApplicationEvent.APPLICATION_INITIALIZED, applicationInitializedHandler);
 			eventDispatcher.addEventListener(UIEvent.ROOT_ENTITY_SELECTED, rootEntitySelectedHandler);
 			eventDispatcher.addEventListener(UIEvent.BACK_TO_LIST, backToListHandler);
+			eventDispatcher.addEventListener(UIEvent.RECORD_SELECTED, recordSelectedHandler);
 		}
 
 		/*protected function applicationInitializedHandler(event:ApplicationEvent):void {
 		}*/
+		internal function recordSelectedHandler(uiEvent:UIEvent):void {
+			var record:RecordSummary = uiEvent.obj as RecordSummary;
+			Alert.show(record.id);
+		}
 		
 		protected function rootEntitySelectedHandler(event:UIEvent):void {
 			var entityDef:EntityDefinitionProxy = event.obj as EntityDefinitionProxy;

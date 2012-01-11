@@ -53,7 +53,6 @@ package org.openforis.collect.presenter {
 
 		override internal function initEventListeners():void {
 			eventDispatcher.addEventListener(UIEvent.ROOT_ENTITY_SELECTED, rootEntitySelectedHandler);
-			eventDispatcher.addEventListener(UIEvent.RECORD_SELECTED, recordSelectedHandler);
 
 			this._view.newRecordButton.addEventListener(MouseEvent.CLICK, newRecordButtonClickHandler);
 			this._view.addEventListener(StateChangeEvent.CURRENT_STATE_CHANGE, currentStateChangeHandler);
@@ -72,9 +71,7 @@ package org.openforis.collect.presenter {
 
 		}
 		
-		internal function recordSelectedHandler(uiEvent:UIEvent):void {
-		
-		}
+	
 		protected function newRecordButtonClickHandler(event:MouseEvent):void {
 			if(_newRecordPopUp == null) {
 				_newRecordPopUp = new AddNewRecordPopUp();
