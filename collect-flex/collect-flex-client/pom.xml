@@ -54,6 +54,7 @@
 								<includeClass>org.openforis.collect.model.SurveySummary</includeClass>
 								<includeClass>org.openforis.collect.model.RecordSummary</includeClass>
 								<includeClass>org.openforis.collect.metamodel.proxy.*</includeClass>
+								<includeClass>org.openforis.collect.model.proxy.*</includeClass>
 							</includeJavaClasses>
 						</configuration>
 					</execution>
