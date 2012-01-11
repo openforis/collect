@@ -60,8 +60,8 @@ package org.openforis.collect.presenter {
 			if(this._view != null) {
 				this._view.newRecordButton.addEventListener(MouseEvent.CLICK, newRecordButtonClickHandler);
 				this._view.addEventListener(StateChangeEvent.CURRENT_STATE_CHANGE, currentStateChangeHandler);
-				this._view.paginationBar.previousPageButton.addEventListener(MouseEvent.CLICK, nextPageClickHandler);
-				this._view.paginationBar.nextPageButton.addEventListener(MouseEvent.CLICK, previousPageClickHandler);
+				this._view.paginationBar.previousPageButton.addEventListener(MouseEvent.CLICK, previousPageClickHandler);
+				this._view.paginationBar.nextPageButton.addEventListener(MouseEvent.CLICK, nextPageClickHandler);
 				this._view.paginationBar.goToPageButton.addEventListener(MouseEvent.CLICK, goToPageClickHandler);
 			}
 			
@@ -146,10 +146,10 @@ package org.openforis.collect.presenter {
 			totalRecords = event.result as int;
 			currentPage = 1;
 			totalPages = Math.ceil(totalRecords / MAX_RECORDS_PER_PAGE);
-			_view.paginationBar.goToPageSpinner.minimum = 1;
-			_view.paginationBar.goToPageSpinner.maximum = totalPages;
+			_view.paginationBar.goToPageStepper.minimum = 1;
+			_view.paginationBar.goToPageStepper.maximum = totalPages;
+			_view.paginationBar.totalRecordsText.text = String(totalRecords);
 			loadRecordsSummaryCurrentPage();
-			trace(totalRecords);
 		}
 		
 		protected function loadRecordsSummaryCurrentPage():void {
@@ -161,6 +161,8 @@ package org.openforis.collect.presenter {
 		protected function getRecordsSummaryResultHandler(event:ResultEvent, token:Object = null):void {
 			var result:IList = event.result as IList;
 			_view.dataGrid.dataProvider = result;
+			_view.paginationBar.recordsFromText.text = String(((currentPage - 1) * MAX_RECORDS_PER_PAGE) + 1);
+			_view.paginationBar.recordsToText.text = String(((currentPage - 1) * MAX_RECORDS_PER_PAGE) + result.length);
 		}
 		
 		protected function nextPageClickHandler(event:Event):void {
@@ -178,7 +180,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function goToPageClickHandler(event:Event):void {
-			currentPage = _view.paginationBar.goToPageSpinner.value;
+			currentPage = _view.paginationBar.goToPageStepper.value;
 			loadRecordsSummaryCurrentPage();
 		}
 		
