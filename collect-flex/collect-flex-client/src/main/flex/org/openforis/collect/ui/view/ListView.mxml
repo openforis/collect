@@ -2,8 +2,10 @@
 <s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
 		 xmlns:s="library://ns.adobe.com/flex/spark" 
 		 xmlns:mx="library://ns.adobe.com/flex/mx" 
-		 width="100%" height="100%" xmlns:input="org.openforis.collect.ui.component.input.*" xmlns:datagrid="org.openforis.collect.ui.component.datagrid.*"
-		 creationComplete="creationCompleteHandler(event)">
+		 width="100%" height="100%" 
+		 xmlns:input="org.openforis.collect.ui.component.input.*" 
+		 xmlns:datagrid="org.openforis.collect.ui.component.datagrid.*"
+		 >
 	
 	<fx:Script>
 		<![CDATA[
@@ -13,19 +15,21 @@
 			import org.openforis.collect.i18n.Message;
 			import org.openforis.collect.presenter.ListPresenter;
 			
-			private var _presenter:ListPresenter;
+			public static const DEFAULT_STATE:String = "default";
+			public static const SELECTION_STATE:String = "selection";
 			
-			[Bindable]
-			private var dataProvider:ArrayCollection = new ArrayCollection([
-				{code: 1, label: "item 1"},
-				{code: 2, label: "item 2"},
-				{code: 3, label: "item 3"}
-			]);
-
-			protected function creationCompleteHandler(event:FlexEvent):void {
+			private var _presenter:ListPresenter;
+			/* 
+			override public function initialize():void {
+				super.initialize();
 				_presenter = new ListPresenter(this);
 			}
-
+			 */
+			
+			override protected function initializationComplete():void {
+				super.initializationComplete();
+				_presenter = new ListPresenter(this);
+			}
 		]]>
 	</fx:Script>
 	
@@ -38,19 +42,13 @@
 	</s:layout>
 	
 	<s:states>
-		<s:State name="list" />
+		<s:State name="default" />
 		<s:State name="selection" />
 	</s:states>
 	
-	<datagrid:DataGrid dataProvider="{dataProvider}" height="100%" width="100%">
-		<datagrid:columns>
-			<s:ArrayList>
-				<s:GridColumn visible="false" visible.selection="true" headerRenderer="org.openforis.collect.ui.component.datagrid.SelectRecordColumnHeaderRenderer"
-							  itemRenderer="org.openforis.collect.ui.component.datagrid.SelectRecordColumnItemRenderer"
-							  />
-			</s:ArrayList>
-		</datagrid:columns>
-	</datagrid:DataGrid>
+	<datagrid:DataGrid id="dataGrid" height="100%" width="100%" />
+	
+	<datagrid:PaginationBar id="paginationBar" />
 	
 	<s:HGroup id="controlsBar" width="100%" horizontalAlign="center">
 		<s:Button id="newRecordButton" label="{Message.get('list.newRecord')}" />

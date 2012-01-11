@@ -46,6 +46,17 @@ public class RecordSummary {
 	 */
 	private int warningCount;
 
+	public RecordSummary(String id, int errorCount, int warningCount, String createdBy, Date creationDate, String modifiedBy, Date modifiedDate) {
+		super();
+		this.id = id;
+		this.errorCount = errorCount;
+		this.warningCount = warningCount;
+		this.createdBy = createdBy;
+		this.creationDate = creationDate;
+		this.modifiedBy = modifiedBy;
+		this.modifiedDate = modifiedDate;
+	}
+
 	/**
 	 * Getter of the property <tt>createdBy</tt>
 	 * 

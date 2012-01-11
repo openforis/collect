@@ -9,6 +9,7 @@ package org.openforis.collect {
 	
 	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.event.EventDispatcherFactory;
+	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.SurveyProxy;
 	import org.openforis.collect.model.Phase;
 	import org.openforis.collect.util.ModelClassInitializer;
@@ -26,8 +27,8 @@ package org.openforis.collect {
 		private static var _surveySummaries:IList;
 		
 		private static var _activeSurvey:SurveyProxy;
-		/*private static var _selectedRootEntity:Entity;*/
-		private static var _selectedPhase:Phase;
+		private static var _activeRootEntity:EntityDefinitionProxy;
+		private static var _activePhase:Phase;
 		
 		private static var initialized:Boolean = false;
 		internal static const CONTEXT_NAME:String = "collect";
@@ -89,22 +90,21 @@ package org.openforis.collect {
 			_activeSurvey = value;
 		}
 
-		/*[BINDABLE]
-		PUBLIC STATIC FUNCTION GET SELECTEDROOTENTITY():ENTITY {
-			RETURN _SELECTEDROOTENTITY;
+		public static function get activeRootEntity():EntityDefinitionProxy {
+			return _activeRootEntity;
 		}
 		
-		PUBLIC STATIC FUNCTION SET SELECTEDROOTENTITY(VALUE:ENTITY):VOID {
-			_SELECTEDROOTENTITY = VALUE;
-		}*/
+		public static function set activeRootEntity(value:EntityDefinitionProxy):void {
+			_activeRootEntity = value;
+		}
 
 		[Bindable]
-		public static function get selectedPhase():Phase {
-			return _selectedPhase;
+		public static function get activePhase():Phase {
+			return _activePhase;
 		}
 		
-		public static function set selectedPhase(value:Phase):void {
-			_selectedPhase = value;
+		public static function set activePhase(value:Phase):void {
+			_activePhase = value;
 		}
 
 		public static function get FILEUPLOAD_URL():String {

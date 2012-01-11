@@ -21,6 +21,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.metamodel.proxy.SchemaProxy;
 	import org.openforis.collect.metamodel.proxy.SurveyProxy;
 	import org.openforis.collect.model.SurveySummary;
+	import org.openforis.collect.ui.view.ListView;
 	
 	/**
 	 * 
@@ -60,6 +61,7 @@ package org.openforis.collect.presenter {
 		
 		override internal function initEventListeners():void {
 			eventDispatcher.addEventListener(UIEvent.SURVEY_SELECTED, surveySelectedHandler);
+			eventDispatcher.addEventListener(UIEvent.ROOT_ENTITY_SELECTED, rootEntitySelectedHandler);
 		}
 		
 		internal function setLocaleResultHandler(event:ResultEvent, token:Object = null):void {
@@ -101,6 +103,7 @@ package org.openforis.collect.presenter {
 		
 		internal function getSurveyResultHandler(event:ResultEvent, token:Object = null):void {
 			var survey:SurveyProxy = event.result as SurveyProxy;
+			Application.activeSurvey = survey;
 			var schema:SchemaProxy = survey.schema;
 			var rootEntityDefinitions:ListCollectionView = schema.rootEntityDefinitions;
 			if(rootEntityDefinitions.length == 1){
@@ -110,10 +113,24 @@ package org.openforis.collect.presenter {
 				eventDispatcher.dispatchEvent(uiEvent);
 			} else {
 				//TODO
+				
+				//REMOVE IT: TEMPORARY select of first root entity
+				
+				var listView:ListView = _view.masterView.listView;
+				
+				var rootEntityDef:EntityDefinitionProxy = rootEntityDefinitions.getItemAt(0) as EntityDefinitionProxy;
+				Application.activeRootEntity = rootEntityDef;
+				
+				var uiEvent:UIEvent = new UIEvent(UIEvent.ROOT_ENTITY_SELECTED);
+				uiEvent.obj = rootEntityDef;
+				eventDispatcher.dispatchEvent(uiEvent);
 			}
 		}
 		
-		
+		protected function rootEntitySelectedHandler(event:UIEvent):void {
+			var rootEntityDef:EntityDefinitionProxy = event.obj as EntityDefinitionProxy;
+			Application.activeRootEntity = rootEntityDef;
+		}
 		
 		internal function sendKeepAliveMessage(event:TimerEvent):void {
 			this._sessionClient.keepAlive(new ItemResponder(keepAliveResult, faultHandler));

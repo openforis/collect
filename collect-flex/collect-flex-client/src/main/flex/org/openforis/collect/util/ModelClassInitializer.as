@@ -23,6 +23,8 @@ package org.openforis.collect.util {
 	import org.openforis.collect.metamodel.proxy.UIConfiguration;
 	import org.openforis.collect.metamodel.proxy.UITab;
 	import org.openforis.collect.metamodel.proxy.UnitProxy;
+	import org.openforis.collect.model.RecordSummary;
+	import org.openforis.collect.model.SurveySummary;
 
 	public class ModelClassInitializer {
 		
@@ -47,9 +49,11 @@ package org.openforis.collect.util {
 				NodeLabelProxy$Type,
 				PromptProxy,
 				PromptProxy$Type,
+				RecordSummary,
 				SchemaProxy,
 				SpatialReferenceSystemProxy,
 				SurveyProxy,
+				SurveySummary,
 				UnitProxy,
 				
 				UIConfiguration,

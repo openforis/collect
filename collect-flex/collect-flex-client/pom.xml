@@ -52,6 +52,7 @@
 <!-- 								<includeClass>org.openforis.collect.model.**</includeClass> -->
 <!-- 								<includeClass>org.openforis.idm.model.**</includeClass> -->
 								<includeClass>org.openforis.collect.model.SurveySummary</includeClass>
+								<includeClass>org.openforis.collect.model.RecordSummary</includeClass>
 								<includeClass>org.openforis.collect.metamodel.proxy.*</includeClass>
 							</includeJavaClasses>
 						</configuration>

@@ -30,6 +30,14 @@
 		            <scope>application</scope>
 		        </properties>
 			</destination>
+			
+			<destination id="dataService">
+		        <properties>
+		        	<factory>springFactory</factory>
+		            <source>dataService</source>
+		            <scope>application</scope>
+		        </properties>
+			</destination>
         </service>
 
         <default-channels>
