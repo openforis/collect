@@ -51,12 +51,14 @@ public class RecordDAO extends CollectDAO {
 		insertData(record);
 	}
 
+	@Transactional
 	public int getCountRecords() {
 		Factory jf = getJooqFactory();
 		Record r = jf.select(Factory.count()).from(RECORD).fetchOne();
 		return r.getValueAsInteger(0);
 	}
 
+	@Transactional
 	public List<RecordSummary> getRecordsSummary(int fromIndex, int toIndex, String orderByFieldName) {
 		Factory jf = getJooqFactory();
 		List<Record> records = jf.select().from(RECORD).limit(fromIndex, toIndex).fetch();
