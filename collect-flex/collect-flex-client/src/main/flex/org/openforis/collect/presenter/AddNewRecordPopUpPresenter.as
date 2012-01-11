@@ -55,20 +55,19 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function newRecordResultHandler(event:ResultEvent, token:Object = null):void {
-			var uiEvent:UIEvent = new UIEvent(UIEvent.NEW_RECORD_CREATED);
-			/* TODO - take record from result */
+/*			var uiEvent:UIEvent = new UIEvent(UIEvent.NEW_RECORD_CREATED);
+			
 			uiEvent.obj = {versionId: _view.versionsDropDownList.selectedItem.id};
 			eventDispatcher.dispatchEvent(uiEvent);
-			PopUpManager.removePopUp(_view);
+			PopUpManager.removePopUp(_view);*/
 		}
 		
 		protected function newRecordFaultHandler(event:FaultEvent, token:Object = null):void {
-			/* TEST */
 			
-			var uiEvent:UIEvent = new UIEvent(UIEvent.NEW_RECORD_CREATED);
+/*			var uiEvent:UIEvent = new UIEvent(UIEvent.NEW_RECORD_CREATED);
 			uiEvent.obj = {versionId: _view.versionsDropDownList.selectedItem.id};
 			eventDispatcher.dispatchEvent(uiEvent);
-			PopUpManager.removePopUp(_view);
+			PopUpManager.removePopUp(_view);*/
 		}
 		
 	}

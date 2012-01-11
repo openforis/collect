@@ -38,20 +38,19 @@ package org.openforis.collect.presenter {
 			super();
 		}
 		
-		override internal function initEventListeners():void{
+		override internal function initEventListeners():void {
 			_view.formsContainer.formVersions = formVersions;
-			eventDispatcher.addEventListener(UIEvent.NEW_RECORD_CREATED, newRecordCreatedHandler);
 			
-			_view.backToListButton.addEventListener(MouseEvent.CLICK, backToListClickHandler);
+			_view.backToListButton.addEventListener(MouseEvent.CLICK, backToListButtonClickHandler);
 		}
 		
-		protected function newRecordCreatedHandler(event:UIEvent):void {
+		/*protected function newRecordCreatedHandler(event:UIEvent):void {
 			var record:Object = event.obj;
 			var version:Object = ArrayUtil.getItem(formVersions, record.versionId, 'id');
 			_view.formsContainer.setActiveForm(version);
-		}
+		}*/
 		
-		protected function backToListClickHandler(event:Event):void {
+		protected function backToListButtonClickHandler(event:Event):void {
 			var uiEvent:UIEvent = new UIEvent(UIEvent.BACK_TO_LIST);
 			eventDispatcher.dispatchEvent(uiEvent);
 		}

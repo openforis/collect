@@ -19,8 +19,8 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.client.DataClient;
 	import org.openforis.collect.event.UIEvent;
-	import org.openforis.collect.ui.view.ListView;
 	import org.openforis.collect.ui.component.AddNewRecordPopUp;
+	import org.openforis.collect.ui.view.ListView;
 
 	public class ListPresenter extends AbstractPresenter {
 		
@@ -34,9 +34,14 @@ package org.openforis.collect.presenter {
 		}
 		
 		override internal function initEventListeners():void{
-			if(this._view != null) {
-				this._view.newRecordButton.addEventListener(MouseEvent.CLICK, newRecordButtonClickHandler);
-			}
+			eventDispatcher.addEventListener(UIEvent.RECORD_SELECTED, recordSelectedHandler);
+			//if(this._view != null) {
+			this._view.newRecordButton.addEventListener(MouseEvent.CLICK, newRecordButtonClickHandler);
+			//}
+		}
+		
+		internal function recordSelectedHandler(uiEvent:UIEvent):void {
+		
 		}
 		
 		protected function newRecordButtonClickHandler(event:MouseEvent):void {
