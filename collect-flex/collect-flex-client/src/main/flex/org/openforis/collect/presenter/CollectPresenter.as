@@ -61,7 +61,6 @@ package org.openforis.collect.presenter {
 		
 		override internal function initEventListeners():void {
 			eventDispatcher.addEventListener(UIEvent.SURVEY_SELECTED, surveySelectedHandler);
-			eventDispatcher.addEventListener(UIEvent.ROOT_ENTITY_SELECTED, rootEntitySelectedHandler);
 		}
 		
 		internal function setLocaleResultHandler(event:ResultEvent, token:Object = null):void {
@@ -125,11 +124,6 @@ package org.openforis.collect.presenter {
 				uiEvent.obj = rootEntityDef;
 				eventDispatcher.dispatchEvent(uiEvent);
 			}
-		}
-		
-		protected function rootEntitySelectedHandler(event:UIEvent):void {
-			var rootEntityDef:EntityDefinitionProxy = event.obj as EntityDefinitionProxy;
-			Application.activeRootEntity = rootEntityDef;
 		}
 		
 		internal function sendKeepAliveMessage(event:TimerEvent):void {

@@ -52,10 +52,12 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function rootEntitySelectedHandler(event:UIEvent):void {
-			var entityDef:EntityDefinitionProxy = event.obj as EntityDefinitionProxy;
-			
-			
+			var rootEntityDef:EntityDefinitionProxy = event.obj as EntityDefinitionProxy;
+			Application.activeRootEntity = rootEntityDef;
 			_view.currentState = MasterView.LIST_STATE;
+			
+			var uiEvent:UIEvent = new UIEvent(UIEvent.LOAD_RECORD_SUMMARIES);
+			eventDispatcher.dispatchEvent(uiEvent);
 		}
 
 		

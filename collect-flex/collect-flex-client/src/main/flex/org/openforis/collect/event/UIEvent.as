@@ -16,6 +16,9 @@ package org.openforis.collect.event {
 		
 		public static const RECORD_SELECTED:String = "recordSelected";
 		
+		//List events		
+		public static const LOAD_RECORD_SUMMARIES:String = "loadRecordSummaries"; 
+		
 		private var _obj:Object;
 		
 		public function UIEvent(type:String, bubbles:Boolean=false, cancelable:Boolean=false) {
