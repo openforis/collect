@@ -14,12 +14,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.bind.PropertyException;
+
 import org.jooq.Record;
 import org.jooq.Result;
 import org.jooq.impl.Factory;
+import org.openforis.collect.model.CollectNamespacePrefixMapper;
+import org.openforis.collect.model.UIConfiguration.UIConfigurationAdapter;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.Survey;
+import org.openforis.idm.metamodel.xml.BindingContext;
 import org.openforis.idm.metamodel.xml.InvalidIdmlException;
 import org.openforis.idm.metamodel.xml.SurveyMarshaller;
 import org.openforis.idm.metamodel.xml.SurveyUnmarshaller;
@@ -33,10 +38,14 @@ public class SurveyDAO extends CollectDAO {
 
 	private Map<String, Survey> surveysByName;
 	private Map<Integer, Survey> surveysById;
+	private BindingContext bindingContext;
 
 	public SurveyDAO() {
 		surveysById = new HashMap<Integer, Survey>();
 		surveysByName = new HashMap<String, Survey>();
+		bindingContext = new BindingContext();
+		UIConfigurationAdapter configurationAdapter = new UIConfigurationAdapter();
+		bindingContext.setConfigurationAdapter(configurationAdapter);
 	}
 
 	@Transactional
@@ -109,7 +118,7 @@ public class SurveyDAO extends CollectDAO {
 	private Survey unmarshalIdml(String idml) throws IOException {
 		byte[] bytes = idml.getBytes("UTF-8");
 		ByteArrayInputStream is = new ByteArrayInputStream(bytes);
-		SurveyUnmarshaller su = new SurveyUnmarshaller();
+		SurveyUnmarshaller su = bindingContext.createSurveyUnmarshaller();
 		Survey survey;
 		try {
 			survey = su.unmarshal(is);
@@ -136,12 +145,16 @@ public class SurveyDAO extends CollectDAO {
 		try {
 			// Serialize Survey to XML
 			ByteArrayOutputStream os = new ByteArrayOutputStream();
-			SurveyMarshaller sm = new SurveyMarshaller();
+			SurveyMarshaller sm = bindingContext.createSurveyMarshaller();
+			CollectNamespacePrefixMapper namespacePrefixMapper = new CollectNamespacePrefixMapper();
+			sm.setProperty("com.sun.xml.internal.bind.namespacePrefixMapper", namespacePrefixMapper);
 			sm.setIndent(true);
 			sm.marshal(survey, os);
 			return os.toString("UTF-8");
-		} catch (IOException ex) {
-			throw new SurveyImportException("Error unmarshalling survey", ex);
+		} catch (IOException e) {
+			throw new SurveyImportException("Error unmarshalling survey", e);
+		} catch (PropertyException e) {
+			throw new SurveyImportException("Error unmarshalling survey", e);
 		}
 	}
 }

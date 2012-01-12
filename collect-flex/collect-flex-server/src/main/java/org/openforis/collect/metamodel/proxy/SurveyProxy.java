@@ -6,13 +6,15 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
+import org.openforis.collect.model.UIConfiguration;
+import org.openforis.idm.metamodel.Configuration;
 import org.openforis.idm.metamodel.Survey;
 import org.w3c.dom.Element;
 
 public class SurveyProxy implements ProxyBase {
 
 	private static Log LOG = LogFactory.getLog(SurveyProxy.class);
-	
+
 	private transient Survey survey;
 
 	public SurveyProxy(Survey survey) {
@@ -75,19 +77,24 @@ public class SurveyProxy implements ProxyBase {
 
 	@ExternalizedProperty
 	public UIConfiguration getUiConfiguration() {
-		Element element = survey.getConfigurationElement();
-		if (element != null) {
-			Element uiConfigElement = (Element) element.getFirstChild();
-			try {
-				UIConfiguration uiConfiguration = UIConfiguration.unmarshal(uiConfigElement);
-				return uiConfiguration;
-			} catch (IOException e) {
-				LOG.error(e);
-				return null;
-			}
+		List<Configuration> configuration = survey.getConfiguration();
+		if (configuration != null) {
+			return (UIConfiguration) configuration;
 		} else {
 			return null;
 		}
+		// if (element != null) {
+		// Element uiConfigElement = (Element) element.getFirstChild();
+		// try {
+		// UIConfiguration uiConfiguration = UIConfiguration.unmarshal(uiConfigElement);
+		// return uiConfiguration;
+		// } catch (IOException e) {
+		// LOG.error(e);
+		// return null;
+		// }
+		// } else {
+		// return null;
+		// }
 	}
 
 }

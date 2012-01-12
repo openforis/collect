@@ -15,7 +15,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openforis.collect.model.CollectAttributeMetadata;
 import org.openforis.collect.model.CollectRecord;
+import org.openforis.collect.model.UIConfiguration.UIConfigurationAdapter;
 import org.openforis.idm.metamodel.Survey;
+import org.openforis.idm.metamodel.xml.BindingContext;
 import org.openforis.idm.metamodel.xml.InvalidIdmlException;
 import org.openforis.idm.metamodel.xml.SurveyUnmarshaller;
 import org.openforis.idm.model.AlphanumericCode;
@@ -37,6 +39,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class DAOIntegrationTest {
 	private final Log log = LogFactory.getLog(DAOIntegrationTest.class);
 	
+	private BindingContext bindingContext;
+	
 	@Autowired
 	protected SurveyDAO surveyDao;
 	
@@ -46,6 +50,9 @@ public class DAOIntegrationTest {
 	@Before
 	public void beforeTest(){
 		surveyDao.loadAll();
+		bindingContext = new BindingContext();
+		UIConfigurationAdapter configurationAdapter = new UIConfigurationAdapter();
+		bindingContext.setConfigurationAdapter(configurationAdapter);
 	}
 	
 	@Test
@@ -95,7 +102,7 @@ public class DAOIntegrationTest {
 	private Survey importModel() throws IOException, SurveyImportException, InvalidIdmlException {
 		URL idm = ClassLoader.getSystemResource("test.idm.xml");
 		InputStream is = idm.openStream();
-		SurveyUnmarshaller surveyUnmarshaller = new SurveyUnmarshaller();
+		SurveyUnmarshaller surveyUnmarshaller =  bindingContext.createSurveyUnmarshaller();
 		Survey survey = surveyUnmarshaller.unmarshal(is);
 		surveyDao.importModel(survey);
 		return survey;
