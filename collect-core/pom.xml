@@ -274,6 +274,10 @@
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-jdbc</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>com.sun.xml.bind</groupId>
+			<artifactId>jaxb-impl</artifactId>
+		</dependency>  
 		<!-- Spring dependencies -->
 		<dependency>
 			<groupId>org.springframework</groupId>

@@ -23,13 +23,13 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "", propOrder = { "tabs" }, namespace = "http://www.openforis.org/collect/3.0/ui")
-@XmlRootElement(name = "flex", namespace = "http://www.openforis.org/collect/3.0/ui")
+@XmlType(name = "", propOrder = { "tabs" })
+@XmlRootElement(name = "flex")
 
 public class UIConfiguration implements Configuration {
 
-	@XmlElementWrapper(name = "tabs", namespace = "http://www.openforis.org/collect/3.0/ui")
-	@XmlElement(name = "tab", type = UITab.class, namespace = "http://www.openforis.org/collect/3.0/ui")
+	@XmlElementWrapper(name = "tabs")
+	@XmlElement(name = "tab", type = UITab.class)
 	private List<UITab> tabs;
 
 	public List<UITab> getTabs() {
@@ -68,8 +68,8 @@ public class UIConfiguration implements Configuration {
 				JAXBContext jc = JAXBContext.newInstance(UIConfiguration.class);
 				Marshaller marshaller = jc.createMarshaller();
 				DOMImplementation domImplementation = documentBuilder.getDOMImplementation();
-				Document document = domImplementation.createDocument("http://www.openforis.org/collect/3.0/ui", "ui:flex", null);
-//				Document document = documentBuilder.newDocument();
+//				Document document = domImplementation.createDocument("http://www.openforis.org/collect/3.0/ui", null, null);
+				Document document = documentBuilder.newDocument();
 //				document.setPrefix("ui");
 				//document.set
 				marshaller.marshal(config, document);

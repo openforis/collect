@@ -14,12 +14,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.bind.PropertyException;
-
 import org.jooq.Record;
 import org.jooq.Result;
 import org.jooq.impl.Factory;
-import org.openforis.collect.model.CollectNamespacePrefixMapper;
 import org.openforis.collect.model.UIConfiguration.UIConfigurationAdapter;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Schema;
@@ -145,16 +142,12 @@ public class SurveyDAO extends CollectDAO {
 		try {
 			// Serialize Survey to XML
 			ByteArrayOutputStream os = new ByteArrayOutputStream();
-			SurveyMarshaller sm = bindingContext.createSurveyMarshaller();
-			CollectNamespacePrefixMapper namespacePrefixMapper = new CollectNamespacePrefixMapper();
-			sm.setProperty("com.sun.xml.internal.bind.namespacePrefixMapper", namespacePrefixMapper);
+			SurveyMarshaller sm = bindingContext.createSurveyMarshaller();			
 			sm.setIndent(true);
 			sm.marshal(survey, os);
 			return os.toString("UTF-8");
 		} catch (IOException e) {
 			throw new SurveyImportException("Error unmarshalling survey", e);
-		} catch (PropertyException e) {
-			throw new SurveyImportException("Error unmarshalling survey", e);
-		}
+		} 
 	}
 }
