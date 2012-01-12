@@ -147,14 +147,14 @@ public class SurveyDAO extends CollectDAO {
 			ByteArrayOutputStream os = new ByteArrayOutputStream();
 			SurveyMarshaller sm = bindingContext.createSurveyMarshaller();
 			CollectNamespacePrefixMapper namespacePrefixMapper = new CollectNamespacePrefixMapper();
-			sm.setProperty("com.sun.xml.internal.bind.namespacePrefixMapper", namespacePrefixMapper);
+//			sm.setProperty("com.sun.xml.internal.bind.namespacePrefixMapper", namespacePrefixMapper);
 			sm.setIndent(true);
 			sm.marshal(survey, os);
 			return os.toString("UTF-8");
 		} catch (IOException e) {
 			throw new SurveyImportException("Error unmarshalling survey", e);
-		} catch (PropertyException e) {
+		} /*catch (PropertyException e) {
 			throw new SurveyImportException("Error unmarshalling survey", e);
-		}
+		}*/
 	}
 }
