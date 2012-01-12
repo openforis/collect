@@ -1,6 +1,5 @@
 package org.openforis.collect.metamodel.proxy;
 
-import java.io.IOException;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -9,7 +8,6 @@ import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedPro
 import org.openforis.collect.model.UIConfiguration;
 import org.openforis.idm.metamodel.Configuration;
 import org.openforis.idm.metamodel.Survey;
-import org.w3c.dom.Element;
 
 public class SurveyProxy implements ProxyBase {
 

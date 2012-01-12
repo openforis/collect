@@ -18,7 +18,6 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.openforis.idm.metamodel.Configuration;
 import org.openforis.idm.metamodel.xml.ConfigurationAdapter;
-import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -67,11 +66,7 @@ public class UIConfiguration implements Configuration {
 			try {
 				JAXBContext jc = JAXBContext.newInstance(UIConfiguration.class);
 				Marshaller marshaller = jc.createMarshaller();
-				DOMImplementation domImplementation = documentBuilder.getDOMImplementation();
-//				Document document = domImplementation.createDocument("http://www.openforis.org/collect/3.0/ui", null, null);
 				Document document = documentBuilder.newDocument();
-//				document.setPrefix("ui");
-				//document.set
 				marshaller.marshal(config, document);
 				Element documentElement = document.getDocumentElement();
 				return documentElement;
