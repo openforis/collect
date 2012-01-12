@@ -59,9 +59,9 @@ public class RecordDAO extends CollectDAO {
 	}
 
 	@Transactional
-	public List<RecordSummary> getRecordsSummary(int fromIndex, int toIndex, String orderByFieldName) {
+	public List<RecordSummary> getRecordsSummary(int rootEntityId, int fromIndex, int toIndex, String orderByFieldName) {
 		Factory jf = getJooqFactory();
-		List<Record> records = jf.select().from(RECORD).limit(fromIndex, toIndex).fetch();
+		List<Record> records = jf.select().from(RECORD).where(RECORD.ROOT_ENTITY_ID.equal(rootEntityId)).limit(fromIndex, toIndex).fetch();
 		List<RecordSummary> result = new ArrayList<RecordSummary>();
 		for (Record r : records) {
 			String id = r.getValueAsString(RECORD.ID);

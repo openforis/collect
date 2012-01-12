@@ -51,8 +51,8 @@ public class DataService {
 		return list;
 	}
 
-	public List<RecordSummary> getRecordSummaries(int fromIndex, int toIndex, String orderByFieldName) {
-		List<RecordSummary> list = recordManager.getSummaries(fromIndex, toIndex, orderByFieldName);
+	public List<RecordSummary> getRecordSummaries(int rootEntityId, int fromIndex, int toIndex, String orderByFieldName) {
+		List<RecordSummary> list = recordManager.getSummaries(rootEntityId, fromIndex, toIndex, orderByFieldName);
 		return list;
 	}
 

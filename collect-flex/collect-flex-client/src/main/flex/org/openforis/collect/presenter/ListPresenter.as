@@ -153,7 +153,8 @@ package org.openforis.collect.presenter {
 		protected function loadRecordsSummaryCurrentPage():void {
 			var fromIndex:int = (currentPage - 1) * MAX_RECORDS_PER_PAGE + 1;
 			var toIndex:int = (currentPage * MAX_RECORDS_PER_PAGE);
-			_dataClient.getRecordsSummary(new AsyncResponder(getRecordsSummaryResultHandler, faultHandler), fromIndex, toIndex, null);
+			_dataClient.getRecordsSummary(new AsyncResponder(getRecordsSummaryResultHandler, faultHandler), 
+				Application.activeRootEntity.id, fromIndex, toIndex, null);
 		}
 		
 		protected function getRecordsSummaryResultHandler(event:ResultEvent, token:Object = null):void {

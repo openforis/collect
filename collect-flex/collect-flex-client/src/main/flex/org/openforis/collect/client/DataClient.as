@@ -40,8 +40,8 @@ package org.openforis.collect.client {
 			token.addResponder(responder);
 		}
 		
-		public function getRecordsSummary(responder:IResponder, fromIndex:int, toIndex:int, orderByField:String):void {
-			var token:AsyncToken = this._getRecordsSummaryOperation.send(fromIndex, toIndex, orderByField);
+		public function getRecordsSummary(responder:IResponder, rootEntityId:int, fromIndex:int, toIndex:int, orderByField:String):void {
+			var token:AsyncToken = this._getRecordsSummaryOperation.send(rootEntityId, fromIndex, toIndex, orderByField);
 			token.addResponder(responder);
 		}
 		
