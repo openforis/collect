@@ -17,9 +17,12 @@ import java.util.Map;
 import org.jooq.Record;
 import org.jooq.Result;
 import org.jooq.impl.Factory;
-import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.NodeDefinition;
+import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.Survey;
+import org.openforis.idm.metamodel.xml.InvalidIdmlException;
+import org.openforis.idm.metamodel.xml.SurveyMarshaller;
+import org.openforis.idm.metamodel.xml.SurveyUnmarshaller;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -30,7 +33,7 @@ public class SurveyDAO extends CollectDAO {
 
 	private Map<String, Survey> surveysByName;
 	private Map<Integer, Survey> surveysById;
-	
+
 	public SurveyDAO() {
 		surveysById = new HashMap<Integer, Survey>();
 		surveysByName = new HashMap<String, Survey>();
@@ -106,7 +109,13 @@ public class SurveyDAO extends CollectDAO {
 	private Survey unmarshalIdml(String idml) throws IOException {
 		byte[] bytes = idml.getBytes("UTF-8");
 		ByteArrayInputStream is = new ByteArrayInputStream(bytes);
-		Survey survey = Survey.unmarshal(is);
+		SurveyUnmarshaller su = new SurveyUnmarshaller();
+		Survey survey;
+		try {
+			survey = su.unmarshal(is);
+		} catch (InvalidIdmlException e) {
+			throw new DataInconsistencyException("Invalid idm");
+		}
 		return survey;
 	}
 
@@ -127,7 +136,9 @@ public class SurveyDAO extends CollectDAO {
 		try {
 			// Serialize Survey to XML
 			ByteArrayOutputStream os = new ByteArrayOutputStream();
-			survey.marshal(os, false);
+			SurveyMarshaller sm = new SurveyMarshaller();
+			sm.setIndent(true);
+			sm.marshal(survey, os);
 			return os.toString("UTF-8");
 		} catch (IOException ex) {
 			throw new SurveyImportException("Error unmarshalling survey", ex);

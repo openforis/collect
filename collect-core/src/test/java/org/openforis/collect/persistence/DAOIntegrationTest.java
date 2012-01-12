@@ -16,6 +16,8 @@ import org.junit.runner.RunWith;
 import org.openforis.collect.model.CollectAttributeMetadata;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.idm.metamodel.Survey;
+import org.openforis.idm.metamodel.xml.InvalidIdmlException;
+import org.openforis.idm.metamodel.xml.SurveyUnmarshaller;
 import org.openforis.idm.model.AlphanumericCode;
 import org.openforis.idm.model.Coordinate;
 import org.openforis.idm.model.Date;
@@ -47,7 +49,7 @@ public class DAOIntegrationTest {
 	}
 	
 	@Test
-	public void testCRUD() throws IOException, SurveyImportException, DataInconsistencyException  {
+	public void testCRUD() throws IOException, SurveyImportException, DataInconsistencyException, InvalidIdmlException  {
 		// LOAD MODEL
 		Survey survey = surveyDao.load("archenland1");
 
@@ -90,10 +92,11 @@ public class DAOIntegrationTest {
 		assertNull(survey);
 	}
 
-	private Survey importModel() throws IOException, SurveyImportException {
+	private Survey importModel() throws IOException, SurveyImportException, InvalidIdmlException {
 		URL idm = ClassLoader.getSystemResource("test.idm.xml");
 		InputStream is = idm.openStream();
-		Survey survey = Survey.unmarshal(is);
+		SurveyUnmarshaller surveyUnmarshaller = new SurveyUnmarshaller();
+		Survey survey = surveyUnmarshaller.unmarshal(is);
 		surveyDao.importModel(survey);
 		return survey;
 	}
