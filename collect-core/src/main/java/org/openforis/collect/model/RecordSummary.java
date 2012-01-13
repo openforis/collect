@@ -42,11 +42,16 @@ public class RecordSummary {
 	private Date modifiedDate;
 
 	/**
+	 * @uml.property name="rootEntityKey" readOnly="true"
+	 */
+	private String rootEntityKey;
+	
+	/**
 	 * @uml.property name="warningCount" readOnly="true"
 	 */
 	private int warningCount;
 
-	public RecordSummary(String id, int errorCount, int warningCount, String createdBy, Date creationDate, String modifiedBy, Date modifiedDate) {
+	public RecordSummary(String id, String rootEntityKey, int errorCount, int warningCount, String createdBy, Date creationDate, String modifiedBy, Date modifiedDate) {
 		super();
 		this.id = id;
 		this.errorCount = errorCount;
@@ -55,6 +60,7 @@ public class RecordSummary {
 		this.creationDate = creationDate;
 		this.modifiedBy = modifiedBy;
 		this.modifiedDate = modifiedDate;
+		this.rootEntityKey = rootEntityKey;
 	}
 
 	/**
@@ -117,6 +123,16 @@ public class RecordSummary {
 		return this.modifiedDate;
 	}
 
+	/**
+	 * Getter of the property <tt>rootEntityKey</tt>
+	 * 
+	 * @return Returns the id.
+	 * @uml.property name="rootEntityKey"
+	 */
+	public String getRootEntityKey() {
+		return this.rootEntityKey;
+	}
+	
 	/**
 	 * Getter of the property <tt>warningCount</tt>
 	 * 

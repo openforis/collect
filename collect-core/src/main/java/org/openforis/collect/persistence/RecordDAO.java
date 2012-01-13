@@ -15,6 +15,7 @@ import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.RecordSummary;
 import org.openforis.collect.persistence.jooq.DataLoader;
 import org.openforis.collect.persistence.jooq.DataPersister;
+import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Schema;
@@ -53,16 +54,17 @@ public class RecordDAO extends CollectDAO {
 	}
 
 	@Transactional
-	public int getCountRecords(int rootEntityId, String filter) {
+	public int getCountRecords(EntityDefinition rootEntityDefinition, String filter) {
 		Factory jf = getJooqFactory();
-		Record r = jf.select(Factory.count()).from(RECORD).where(RECORD.ROOT_ENTITY_ID.equal(rootEntityId)).fetchOne();
+		Record r = jf.select(Factory.count()).from(RECORD).where(RECORD.ROOT_ENTITY_ID.equal(rootEntityDefinition.getId())).fetchOne();
 		return r.getValueAsInteger(0);
 	}
 
 	@Transactional
-	public List<RecordSummary> getRecordSummaries(int rootEntityId, int offset, int maxNumberOfRecords, String orderByFieldName, String filter) {
+	public List<RecordSummary> getRecordSummaries(EntityDefinition rootEntityDefinition, int offset, int maxNumberOfRecords, String orderByFieldName, String filter) {
 		Factory jf = getJooqFactory();
-
+		int rootEntityKeyNodeDefinitionId = getRootEntityKeyNodeDefinitionId(rootEntityDefinition);
+		
 		//default: order by ID
 		TableField<?, ?> orderByField = RECORD.ID;
 		if(orderByFieldName != null) {
@@ -79,17 +81,22 @@ public class RecordDAO extends CollectDAO {
 			}
 		}
 		//TODO add filter to where conditions
-		List<Record> records = jf.select().from(RECORD).where(RECORD.ROOT_ENTITY_ID.equal(rootEntityId)).orderBy(orderByField).limit(offset, maxNumberOfRecords).fetch();
+		List<Record> records = jf.select(RECORD.ID, RECORD.CREATED_BY, RECORD.DATE_CREATED, RECORD.MODIFIED_BY, RECORD.DATE_MODIFIED, DATA.TEXT1)
+				.from(RECORD).join(DATA).on(DATA.DEFINITION_ID.equal(rootEntityKeyNodeDefinitionId))
+				.where(RECORD.ROOT_ENTITY_ID.equal(rootEntityDefinition.getId()))
+				.orderBy(orderByField).limit(offset, maxNumberOfRecords).fetch();
 		List<RecordSummary> result = new ArrayList<RecordSummary>();
 		for (Record r : records) {
+			String rootEntityKey = r.getValueAsString(DATA.TEXT1);
 			String id = r.getValueAsString(RECORD.ID);
 			String createdBy = r.getValueAsString(RECORD.CREATED_BY);
 			Date dateCreated = r.getValueAsDate(RECORD.DATE_CREATED);
 			String modifiedBy = r.getValueAsString(RECORD.MODIFIED_BY);
 			Date modifiedDate = r.getValueAsDate(RECORD.DATE_MODIFIED);
+			//TODO add errors and warnings count
 			int warningCount = 0;
 			int errorCount = 0;
-			RecordSummary recordSummary = new RecordSummary(id, errorCount, warningCount, createdBy, dateCreated, modifiedBy, modifiedDate);
+			RecordSummary recordSummary = new RecordSummary(id, rootEntityKey, errorCount, warningCount, createdBy, dateCreated, modifiedBy, modifiedDate);
 			result.add(recordSummary);
 		}
 		return result;
@@ -171,5 +178,18 @@ public class RecordDAO extends CollectDAO {
 				persister.persist(node, idx);
 			}
 		});
+	}
+	
+	private int getRootEntityKeyNodeDefinitionId(EntityDefinition rootEntityDefinition) {
+		List<NodeDefinition> childDefinitions = rootEntityDefinition.getChildDefinitions();
+		for (NodeDefinition nodeDefinition : childDefinitions) {
+			if(nodeDefinition instanceof CodeAttributeDefinition) {
+				CodeAttributeDefinition codeAttributeDefinition = (CodeAttributeDefinition) nodeDefinition;
+				if(codeAttributeDefinition.isKey()) {
+					return codeAttributeDefinition.getId();
+				}
+			}
+		}
+		throw new RuntimeException("key attribute not found for entity with name : " + rootEntityDefinition.getName());
 	}
 }

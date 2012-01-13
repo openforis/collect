@@ -98,6 +98,13 @@ package org.openforis.collect.presenter {
 			var rootEntity:EntityDefinitionProxy = Application.activeRootEntity;
 			var columns:IList = new ArrayList();
 			var column:GridColumn;
+			//TO DO id columns
+			/*
+			column = new GridColumn();
+			column.headerText = "ID";
+			column.dataField = "id";
+			columns.addItem(column);
+			*/
 			//selection column
 			column = new SelectRecordColumn();
 			columns.addItem(column);
@@ -141,8 +148,8 @@ package org.openforis.collect.presenter {
 			//offset starts from 0
 			var offset:int = (currentPage - 1) * MAX_RECORDS_PER_PAGE;
 			
-			_dataClient.getRecordsSummary(new AsyncResponder(getRecordsSummaryResultHandler, faultHandler), 
-				Application.activeRootEntity.id, offset, MAX_RECORDS_PER_PAGE, null, null);
+			_dataClient.getRecordSummaries(new AsyncResponder(getRecordsSummaryResultHandler, faultHandler), 
+				Application.activeRootEntity.name, offset, MAX_RECORDS_PER_PAGE, null, null);
 		}
 		
 		protected function getRecordsSummaryResultHandler(event:ResultEvent, token:Object = null):void {
