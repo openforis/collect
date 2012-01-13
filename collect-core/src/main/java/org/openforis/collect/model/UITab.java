@@ -17,19 +17,19 @@ import javax.xml.bind.annotation.XmlType;
  */
 
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "", propOrder = { "name", "label", "tabs" }, namespace = "http://www.openforis.org/collect/3.0/ui")
+@XmlType(name = "", propOrder = { "name", "label", "tabs" })
 public class UITab implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	@XmlAttribute(name = "name", namespace = "http://www.openforis.org/collect/3.0/ui")
+	@XmlAttribute(name = "name")
 	private String name;
 
-	@XmlElement(name = "label", namespace = "http://www.openforis.org/collect/3.0/ui")
+	@XmlElement(name = "label")
 	private String label;
 
-	@XmlElementWrapper(name = "tabs", namespace = "http://www.openforis.org/collect/3.0/ui")
-	@XmlElement(name = "tab", type = UITab.class, namespace = "http://www.openforis.org/collect/3.0/ui")
+	@XmlElementWrapper(name = "tabs")
+	@XmlElement(name = "tab", type = UITab.class)
 	private List<UITab> tabs;
 
 	public String getName() {
