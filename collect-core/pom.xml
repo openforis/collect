@@ -93,8 +93,34 @@
 	
 	
 	<build>
-	
 		<plugins>
+			<!-- replace version in file -->
+			<plugin>
+				<groupId>com.google.code.maven-replacer-plugin</groupId>
+				<artifactId>maven-replacer-plugin</artifactId>
+				<version>1.4.0</version>
+				<executions>
+					<execution>
+						<!-- the replace should happen before the app is packaged -->
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>replace</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<includes>
+						<!-- replace the token in this file -->
+						<include>${project.build.directory}/classes/org/openforis/collect/version.properties</include>
+					</includes>
+					<regex>false</regex>
+					<!-- the name of the token to replace -->
+					<token>PROJECT_VERSION</token>
+					<!-- replace it with the maven project version -->
+					<value>${project.version}</value>
+				</configuration>
+			</plugin>
+				
 		<!-- 
 		  <plugin>
 		    <groupId>org.apache.maven.plugins</groupId>
