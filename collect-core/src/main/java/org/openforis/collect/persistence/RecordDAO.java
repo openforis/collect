@@ -90,7 +90,6 @@ public class RecordDAO extends CollectDAO {
 			Date dateCreated = r.getValueAsDate(RECORD.DATE_CREATED);
 			String modifiedBy = r.getValueAsString(RECORD.MODIFIED_BY);
 			Date modifiedDate = r.getValueAsDate(RECORD.DATE_MODIFIED);
-
 			int step = r.getValueAsInteger(RECORD.STEP);
 			int warningCount = 0;
 			int errorCount = 0;
@@ -139,7 +138,7 @@ public class RecordDAO extends CollectDAO {
 		int recordId = jf.nextval(RECORD_ID_SEQ).intValue();
 		jf.insertInto(RECORD).set(RECORD.ID, recordId).set(RECORD.ROOT_ENTITY_ID, rootEntityId).set(RECORD.DATE_CREATED, toTimestamp(record.getCreationDate()))
 				.set(RECORD.CREATED_BY, record.getCreatedBy()).set(RECORD.DATE_MODIFIED, toTimestamp(record.getModifiedDate())).set(RECORD.MODIFIED_BY, record.getModifiedBy())
-				.set(RECORD.MODEL_VERSION, record.getVersion().getName()).execute();
+				.set(RECORD.MODEL_VERSION, record.getVersion().getName()).set(RECORD.STEP, record.getStep().getStepNumber()).execute();
 		record.setId(recordId);
 	}
 
@@ -157,7 +156,7 @@ public class RecordDAO extends CollectDAO {
 		Factory jf = getJooqFactory();
 		jf.update(RECORD).set(RECORD.ROOT_ENTITY_ID, rootEntityId).set(RECORD.DATE_CREATED, toTimestamp(record.getCreationDate())).set(RECORD.CREATED_BY, record.getCreatedBy())
 				.set(RECORD.DATE_MODIFIED, toTimestamp(record.getModifiedDate())).set(RECORD.MODIFIED_BY, record.getModifiedBy()).set(RECORD.MODEL_VERSION, record.getVersion().getName())
-				.where(RECORD.ID.equal(recordId)).execute();
+				.set(RECORD.STEP, record.getStep().getStepNumber()).where(RECORD.ID.equal(recordId)).execute();
 	}
 
 	private void deleteData(int recordId) {
@@ -177,5 +176,5 @@ public class RecordDAO extends CollectDAO {
 			}
 		});
 	}
-	
+
 }

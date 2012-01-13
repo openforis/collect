@@ -15,6 +15,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openforis.collect.model.CollectAttributeMetadata;
 import org.openforis.collect.model.CollectRecord;
+import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.RecordSummary;
 import org.openforis.collect.model.UIConfiguration.UIConfigurationAdapter;
 import org.openforis.idm.metamodel.EntityDefinition;
@@ -114,7 +115,7 @@ public class DAOIntegrationTest {
 		CollectRecord record = new CollectRecord(survey, "cluster", "2.0");
 		record.setCreationDate(new GregorianCalendar(2011, 12, 31, 23, 59).getTime());
 		record.setCreatedBy("DAOIntegrationTest");
-
+		record.setStep(Step.ENTRY);
 		Entity cluster = record.getRootEntity();
 		cluster.addValue("id", new AlphanumericCode("123_456"));
 		cluster.addValue("gps_realtime", Boolean.TRUE);
@@ -179,6 +180,9 @@ public class DAOIntegrationTest {
 		List<RecordSummary> list = this.recordDao.getRecordSummaries(rootEntity, offset, maxNumberOfRecords, orderByFieldName, filter);
 		assertNotNull(list);
 		assertEquals(1, list.size());
+		
+		RecordSummary summary = list.get(0);
+		assertEquals(1, summary.getStep());
 	}
 	
 	private void updateRecord(CollectRecord record) {
