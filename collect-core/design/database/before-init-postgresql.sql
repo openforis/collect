@@ -12,3 +12,16 @@ GO
 
 CREATE SEQUENCE collect.survey_id_seq
 GO
+
+CREATE SEQUENCE collect.taxonomy_id_seq
+GO
+
+CREATE SEQUENCE collect.taxon_id_seq
+GO
+
+CREATE SEQUENCE collect.taxon_name_id_seq
+GO
+
+
+
+

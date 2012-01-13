@@ -33,6 +33,21 @@ public final class Tables {
 	public static org.openforis.collect.persistence.jooq.tables.Survey SURVEY = org.openforis.collect.persistence.jooq.tables.Survey.SURVEY;
 
 	/**
+	 * The table collect.taxon
+	 */
+	public static org.openforis.collect.persistence.jooq.tables.Taxon TAXON = org.openforis.collect.persistence.jooq.tables.Taxon.TAXON;
+
+	/**
+	 * The table collect.taxon_name
+	 */
+	public static org.openforis.collect.persistence.jooq.tables.TaxonName TAXON_NAME = org.openforis.collect.persistence.jooq.tables.TaxonName.TAXON_NAME;
+
+	/**
+	 * The table collect.taxonomy
+	 */
+	public static org.openforis.collect.persistence.jooq.tables.Taxonomy TAXONOMY = org.openforis.collect.persistence.jooq.tables.Taxonomy.TAXONOMY;
+
+	/**
 	 * No instances
 	 */
 	private Tables() {}

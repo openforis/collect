@@ -33,6 +33,21 @@ public final class Sequences {
 	public static final org.jooq.Sequence<java.lang.Long> SURVEY_ID_SEQ = new org.jooq.impl.SequenceImpl<java.lang.Long>("survey_id_seq", org.openforis.collect.persistence.jooq.Collect.COLLECT, org.jooq.impl.SQLDataType.BIGINT);
 
 	/**
+	 * The sequence collect.collect.taxon_id_seq
+	 */
+	public static final org.jooq.Sequence<java.lang.Long> TAXON_ID_SEQ = new org.jooq.impl.SequenceImpl<java.lang.Long>("taxon_id_seq", org.openforis.collect.persistence.jooq.Collect.COLLECT, org.jooq.impl.SQLDataType.BIGINT);
+
+	/**
+	 * The sequence collect.collect.taxon_name_id_seq
+	 */
+	public static final org.jooq.Sequence<java.lang.Long> TAXON_NAME_ID_SEQ = new org.jooq.impl.SequenceImpl<java.lang.Long>("taxon_name_id_seq", org.openforis.collect.persistence.jooq.Collect.COLLECT, org.jooq.impl.SQLDataType.BIGINT);
+
+	/**
+	 * The sequence collect.collect.taxonomy_id_seq
+	 */
+	public static final org.jooq.Sequence<java.lang.Long> TAXONOMY_ID_SEQ = new org.jooq.impl.SequenceImpl<java.lang.Long>("taxonomy_id_seq", org.openforis.collect.persistence.jooq.Collect.COLLECT, org.jooq.impl.SQLDataType.BIGINT);
+
+	/**
 	 * No instances
 	 */
 	private Sequences() {}
