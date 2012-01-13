@@ -22,9 +22,11 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.client.DataClient;
 	import org.openforis.collect.event.UIEvent;
 	import org.openforis.collect.i18n.Message;
+	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.NodeLabelProxy;
+	import org.openforis.collect.ui.UIBuilder;
 	import org.openforis.collect.ui.component.AddNewRecordPopUp;
 	import org.openforis.collect.ui.component.datagrid.SelectRecordColumn;
 	import org.openforis.collect.ui.view.ListView;
@@ -96,51 +98,7 @@ package org.openforis.collect.presenter {
 		
 		protected function updateDataGrid():void {
 			var rootEntity:EntityDefinitionProxy = Application.activeRootEntity;
-			var columns:IList = new ArrayList();
-			var column:GridColumn;
-			//TO DO id columns
-			/*
-			column = new GridColumn();
-			column.headerText = "ID";
-			column.dataField = "id";
-			columns.addItem(column);
-			*/
-			//selection column
-			column = new SelectRecordColumn();
-			columns.addItem(column);
-			var firstLevelDefs:ListCollectionView = rootEntity.childDefinitions;
-			for each(var nodeDef:NodeDefinitionProxy in firstLevelDefs) {
-				if(nodeDef is EntityDefinitionProxy) {
-					column = new GridColumn();
-					column.headerText = NodeLabelProxy(nodeDef.labels.getItemAt(0)).text + " Count";
-					column.dataField = nodeDef.name + "Count";
-					columns.addItem(column);
-				}
-			}
-			
-			//errors count column
-			column = new GridColumn();
-			column.headerText = Message.get("list.errorCount");
-			column.dataField = "errorCount";
-			columns.addItem(column);
-			//warnings count column
-			column = new GridColumn();
-			column.headerText = Message.get("list.warningCount");
-			column.dataField = "warningCount";
-			columns.addItem(column);
-			//creation date column
-			column = new GridColumn();
-			column.headerText = Message.get("list.creationDate");
-			column.dataField = "creationDate";
-			column.labelFunction = dateLabelFunction;
-			columns.addItem(column);
-			//date modified column
-			column = new GridColumn();
-			column.headerText = Message.get("list.dateModified");
-			column.dataField = "dateModified";
-			column.labelFunction = dateLabelFunction;
-			columns.addItem(column);
-
+			var columns:IList = UIBuilder.generateRecordSummaryListColumns(rootEntity);
 			_view.dataGrid.columns = columns;
 		}
 		
@@ -194,17 +152,6 @@ package org.openforis.collect.presenter {
 		protected function goToPageClickHandler(event:Event):void {
 			currentPage = _view.paginationBar.goToPageStepper.value;
 			loadRecordSummariesCurrentPage();
-		}
-		
-		private function dateLabelFunction(item:Object,column:GridColumn):String {
-			if(item.hasOwnProperty(column.dataField)) {
-				var date:Date = item[column.dataField];
-				var dateFormatter:DateTimeFormatter = new DateTimeFormatter();
-				dateFormatter.dateTimePattern = "dd-MM-yyyy hh:mm:ss";
-				return dateFormatter.format(date);
-			} else {
-				return null;
-			}
 		}
 		
 	}

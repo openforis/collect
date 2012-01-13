@@ -6,19 +6,27 @@ import static org.openforis.collect.persistence.jooq.tables.Record.RECORD;
 
 import java.sql.Date;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.jooq.Record;
+import org.jooq.Result;
 import org.jooq.TableField;
 import org.jooq.impl.Factory;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.RecordSummary;
 import org.openforis.collect.persistence.jooq.DataLoader;
 import org.openforis.collect.persistence.jooq.DataPersister;
+import org.openforis.idm.metamodel.AttributeDefinition;
+import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
+import org.openforis.idm.metamodel.NumberAttributeDefinition;
 import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.Survey;
+import org.openforis.idm.metamodel.TextAttributeDefinition;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.NodeVisitor;
@@ -70,7 +78,7 @@ public class RecordDAO extends CollectDAO {
 				orderByField = RECORD.ID;
 			} else if ("createdBy".equals(orderByFieldName)) {
 				orderByField = RECORD.CREATED_BY;
-			} else if ("modifiedByBy".equals(orderByFieldName)) {
+			} else if ("modifiedBy".equals(orderByFieldName)) {
 				orderByField = RECORD.MODIFIED_BY;
 			} else if ("creationDate".equals(orderByFieldName)) {
 				orderByField = RECORD.DATE_CREATED;
@@ -85,20 +93,22 @@ public class RecordDAO extends CollectDAO {
 
 		List<RecordSummary> result = new ArrayList<RecordSummary>();
 		for (Record r : records) {
-			String id = r.getValueAsString(RECORD.ID);
+			Integer id = r.getValueAsInteger(RECORD.ID);
 			String createdBy = r.getValueAsString(RECORD.CREATED_BY);
 			Date dateCreated = r.getValueAsDate(RECORD.DATE_CREATED);
 			String modifiedBy = r.getValueAsString(RECORD.MODIFIED_BY);
 			Date modifiedDate = r.getValueAsDate(RECORD.DATE_MODIFIED);
 			int step = r.getValueAsInteger(RECORD.STEP);
+			//TODO add errors and warnings count
 			int warningCount = 0;
 			int errorCount = 0;
-			RecordSummary recordSummary = new RecordSummary(id, errorCount, warningCount, createdBy, dateCreated, modifiedBy, modifiedDate, step);
+			Map<String, String> keyAttributes = getKeyAttributes(jf, rootEntityDefinition, id);
+			RecordSummary recordSummary = new RecordSummary(id, keyAttributes, errorCount, warningCount, createdBy, dateCreated, modifiedBy, modifiedDate, step);
 			result.add(recordSummary);
 		}
 		return result;
 	}
-
+	
 	private CollectRecord loadRecord(Survey survey, int recordId) {
 		Factory jf = getJooqFactory();
 		Record r = jf.select().from(RECORD).where(RECORD.ID.equal(recordId)).fetchOne();
@@ -177,4 +187,43 @@ public class RecordDAO extends CollectDAO {
 		});
 	}
 
+	/**
+	 * 
+	 * @param jf
+	 * @param rootEntityDefinition
+	 * @param recordId
+	 * @return List of Map with name (attribute name) and value pairs
+	 */
+	
+	private Map<String, String> getKeyAttributes(Factory jf, EntityDefinition rootEntityDefinition, int recordId) {
+		Map<String, String> result = new HashMap<String, String>();
+		List<AttributeDefinition> keyAttributeDefinitions = rootEntityDefinition.getKeyAttributeDefinitions();
+		Collection<Integer> keyAttriuteDefinitionIds = new ArrayList<Integer>();
+		Map<Integer, AttributeDefinition> keyAttributeDefinitionsMap = new HashMap<Integer, AttributeDefinition>();
+		for (AttributeDefinition attributeDefinition : keyAttributeDefinitions) {
+			Integer attributeDefinitionId = attributeDefinition.getId();
+			keyAttriuteDefinitionIds.add(attributeDefinitionId);
+			keyAttributeDefinitionsMap.put(attributeDefinitionId, attributeDefinition);
+		}
+		Result<Record> records = jf.select()
+				.from(DATA)
+				.where(DATA.RECORD_ID.equal(recordId).and(DATA.DEFINITION_ID.in(keyAttriuteDefinitionIds)))
+				.fetch();
+		for (Record record : records) {
+			String value;
+			Object valueObj = null;
+			Integer attributeDefinitionId = record.getValueAsInteger(DATA.DEFINITION_ID);
+			AttributeDefinition attributeDefinition = keyAttributeDefinitionsMap.get(attributeDefinitionId);
+			if(attributeDefinition instanceof CodeAttributeDefinition || attributeDefinition instanceof TextAttributeDefinition) {
+				valueObj = record.getValueAsString(DATA.TEXT1);
+			} else if(attributeDefinition instanceof NumberAttributeDefinition) {
+				valueObj = record.getValueAsInteger(DATA.NUMBER1);
+			}
+			if(valueObj != null) {
+				value = valueObj.toString();
+				result.put(attributeDefinition.getName(), value);
+			}
+		}
+		return result;
+	}
 }

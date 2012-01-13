@@ -49,7 +49,7 @@ package org.openforis.collect.presenter {
 		 * */
 		internal function recordSelectedHandler(uiEvent:UIEvent):void {
 			var record:RecordSummary = uiEvent.obj as RecordSummary;
-			Alert.show(record.id);
+			Alert.show(record.rootEntityKeys.get("id"));
 		}
 		
 		protected function rootEntitySelectedHandler(event:UIEvent):void {
