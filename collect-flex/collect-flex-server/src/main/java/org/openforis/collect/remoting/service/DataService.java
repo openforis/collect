@@ -80,7 +80,6 @@ public class DataService {
 
 	public Record newRecord(String name, Survey survey, String rootEntityId) throws MultipleEditException, DuplicateIdException, InvalidIdException, DuplicateIdException, AccessDeniedException,
 			RecordLockedException {
-
 		Record record = recordManager.create(name, survey, rootEntityId);
 		return record;
 	}

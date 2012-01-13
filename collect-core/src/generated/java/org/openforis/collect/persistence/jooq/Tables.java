@@ -48,6 +48,16 @@ public final class Tables {
 	public static org.openforis.collect.persistence.jooq.tables.Taxonomy TAXONOMY = org.openforis.collect.persistence.jooq.tables.Taxonomy.TAXONOMY;
 
 	/**
+	 * The table collect.user
+	 */
+	public static org.openforis.collect.persistence.jooq.tables.User USER = org.openforis.collect.persistence.jooq.tables.User.USER;
+
+	/**
+	 * The table collect.user_role
+	 */
+	public static org.openforis.collect.persistence.jooq.tables.UserRole USER_ROLE = org.openforis.collect.persistence.jooq.tables.UserRole.USER_ROLE;
+
+	/**
 	 * No instances
 	 */
 	private Tables() {}

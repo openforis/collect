@@ -5,24 +5,32 @@ package org.openforis.collect.presenter {
 	 * */
 	import mx.collections.IList;
 	import mx.controls.Alert;
+	import mx.rpc.AsyncResponder;
+	import mx.rpc.events.ResultEvent;
 	
 	import org.openforis.collect.Application;
+	import org.openforis.collect.client.ClientFactory;
+	import org.openforis.collect.client.DataClient;
 	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.event.UIEvent;
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.SurveyProxy;
 	import org.openforis.collect.model.RecordSummary;
 	import org.openforis.collect.model.SurveySummary;
+	import org.openforis.collect.model.proxy.RecordProxy;
 	import org.openforis.collect.ui.view.MasterView;
 
 	public class MasterPresenter extends AbstractPresenter {
 		
 		private var _view:MasterView;
+		private var _dataClient:DataClient;
 		
 		public function MasterPresenter(view:MasterView) {
-			this._view = view;
 			super();
 			
+			this._view = view;
+			this._dataClient = ClientFactory.dataClient;
+
 			_view.currentState = MasterView.LOADING_STATE;
 			
 			/*
@@ -31,9 +39,7 @@ package org.openforis.collect.presenter {
 			*/
 			
 			/*
-			
 			flow: loading -> surveySelection (optional) -> rootEntitySelection (optional) -> list -> edit
-			
 			*/
 		}
 		
@@ -45,14 +51,28 @@ package org.openforis.collect.presenter {
 		}
 		
 		/**
-		 * Record selected from list page
+		 * RecordSummary selected from list page
 		 * */
 		internal function recordSelectedHandler(uiEvent:UIEvent):void {
 			var record:RecordSummary = uiEvent.obj as RecordSummary;
-			Alert.show(record.id);
+			var id:String = record.id;
+			var entityName:String = Application.activeRootEntity.name;
+			_dataClient.loadRecord(new AsyncResponder(loadRecordResultHandler, faultHandler), entityName, id);
 		}
 		
-		protected function rootEntitySelectedHandler(event:UIEvent):void {
+		/**
+		 * Record selected in list page loaded from server
+		 * */
+		protected function loadRecordResultHandler(event:ResultEvent, token:Object = null):void {
+			var record:RecordProxy = event.target;
+			
+		}
+		
+		
+		/**
+		 * Root entity selected
+		 * */
+		internal function rootEntitySelectedHandler(event:UIEvent):void {
 			var rootEntityDef:EntityDefinitionProxy = event.obj as EntityDefinitionProxy;
 			Application.activeRootEntity = rootEntityDef;
 			_view.currentState = MasterView.LIST_STATE;
@@ -62,13 +82,13 @@ package org.openforis.collect.presenter {
 		}
 
 		
-		protected function newRecordCreatedHandler(event:UIEvent):void {
+		internal function newRecordCreatedHandler(event:UIEvent):void {
 			_view.currentState = MasterView.DETAIL_STATE;
 		}
 		
-		protected function backToListHandler(event:UIEvent):void {
+		internal function backToListHandler(event:UIEvent):void {
+			//reload record summaries 
 			_view.currentState = MasterView.LIST_STATE;
-			//load clusters...
 		}
 			
 	}

@@ -48,6 +48,16 @@ public final class Sequences {
 	public static final org.jooq.Sequence<java.lang.Long> TAXONOMY_ID_SEQ = new org.jooq.impl.SequenceImpl<java.lang.Long>("taxonomy_id_seq", org.openforis.collect.persistence.jooq.Collect.COLLECT, org.jooq.impl.SQLDataType.BIGINT);
 
 	/**
+	 * The sequence collect.collect.user_id_seq
+	 */
+	public static final org.jooq.Sequence<java.lang.Long> USER_ID_SEQ = new org.jooq.impl.SequenceImpl<java.lang.Long>("user_id_seq", org.openforis.collect.persistence.jooq.Collect.COLLECT, org.jooq.impl.SQLDataType.BIGINT);
+
+	/**
+	 * The sequence collect.collect.user_role_id_seq
+	 */
+	public static final org.jooq.Sequence<java.lang.Long> USER_ROLE_ID_SEQ = new org.jooq.impl.SequenceImpl<java.lang.Long>("user_role_id_seq", org.openforis.collect.persistence.jooq.Collect.COLLECT, org.jooq.impl.SQLDataType.BIGINT);
+
+	/**
 	 * No instances
 	 */
 	private Sequences() {}

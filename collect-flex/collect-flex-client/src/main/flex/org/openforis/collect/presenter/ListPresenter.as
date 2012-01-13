@@ -11,6 +11,7 @@ package org.openforis.collect.presenter {
 	import mx.collections.IList;
 	import mx.collections.ListCollectionView;
 	import mx.controls.List;
+	import mx.core.ClassFactory;
 	import mx.core.FlexGlobals;
 	import mx.events.StateChangeEvent;
 	import mx.managers.PopUpManager;
@@ -26,7 +27,8 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.NodeLabelProxy;
 	import org.openforis.collect.ui.component.AddNewRecordPopUp;
-	import org.openforis.collect.ui.component.datagrid.SelectRecordColumn;
+	import org.openforis.collect.ui.component.datagrid.SelectRecordColumnHeaderRenderer;
+	import org.openforis.collect.ui.component.datagrid.SelectRecordColumnItemRenderer;
 	import org.openforis.collect.ui.view.ListView;
 	
 	import spark.components.gridClasses.GridColumn;
@@ -105,9 +107,13 @@ package org.openforis.collect.presenter {
 			column.dataField = "id";
 			columns.addItem(column);
 			*/
+			
 			//selection column
-			column = new SelectRecordColumn();
-			columns.addItem(column);
+			/*column = new GridColumn();
+			column.itemRenderer = new ClassFactory(SelectRecordColumnItemRenderer);
+			column.headerRenderer = new ClassFactory(SelectRecordColumnHeaderRenderer);
+			columns.addItem(column);*/
+			
 			var firstLevelDefs:ListCollectionView = rootEntity.childDefinitions;
 			for each(var nodeDef:NodeDefinitionProxy in firstLevelDefs) {
 				if(nodeDef is EntityDefinitionProxy) {
