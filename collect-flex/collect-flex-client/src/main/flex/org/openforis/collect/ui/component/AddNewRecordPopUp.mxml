@@ -11,12 +11,17 @@
 			import mx.events.FlexEvent;
 			
 			import org.openforis.collect.i18n.Message;
+			import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
 			import org.openforis.collect.presenter.AddNewRecordPopUpPresenter;
 			
 			private var _presenter:AddNewRecordPopUpPresenter;
 
 			protected function creationCompleteHandler(event:FlexEvent):void {
 				_presenter = new AddNewRecordPopUpPresenter(this);
+			}
+			
+			protected function versionLabelFunction(item:ModelVersionProxy):String {
+				return ModelVersionProxy.getDefaultLabel(item.labels, "en_US");
 			}
 
 		]]>
@@ -41,8 +46,9 @@
 			</s:FormItem>
 			<s:FormItem label="{Message.get('list.newRecordPopUp.formVersionLabel')}">
 				<s:DropDownList id="versionsDropDownList" 
-								labelField="label" 
-								prompt="---" 
+								labelFunction="versionLabelFunction"
+								prompt="---"
+								width="150"
 								/>
 			</s:FormItem>
 		</s:Form>

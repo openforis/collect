@@ -63,13 +63,13 @@ public class RecordManager {
 		return null;
 	}
 	
-	public List<RecordSummary> getSummaries(int rootEntityId, int fromIndex, int toIndex, String orderByFieldName) {
-		List<RecordSummary> recordsSummary = recordDAO.getRecordsSummary(rootEntityId, fromIndex, toIndex, orderByFieldName);
+	public List<RecordSummary> getSummaries(int rootEntityId, int offset, int maxNumberOfRecords, String orderByFieldName, String filter) {
+		List<RecordSummary> recordsSummary = recordDAO.getRecordSummaries(rootEntityId, offset, maxNumberOfRecords, orderByFieldName, filter);
 		return recordsSummary;
 	}
 	
-	public int getCountRecords() {
-		int count = recordDAO.getCountRecords();
+	public int getCountRecords(int rootEntityId, String filter) {
+		int count = recordDAO.getCountRecords(rootEntityId, filter);
 		return count;
 	}
 

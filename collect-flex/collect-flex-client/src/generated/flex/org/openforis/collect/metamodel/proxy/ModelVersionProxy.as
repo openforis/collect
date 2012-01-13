@@ -6,9 +6,25 @@
  */
 
 package org.openforis.collect.metamodel.proxy {
+	import mx.collections.IList;
 
     [Bindable]
     [RemoteClass(alias="org.openforis.collect.metamodel.proxy.ModelVersionProxy")]
     public class ModelVersionProxy extends ModelVersionProxyBase {
+		
+		public static function getDefaultLabel(labels:IList, language:String):String {
+			if(labels.length == 1) {
+				return LanguageSpecificTextProxy(labels.getItemAt(0)).text;
+			} else {
+				for each(var label:LanguageSpecificTextProxy in labels) {
+					if(label.language == language) {
+						return label.text;
+					}
+				}
+			}
+			//if label not found
+			return null;
+		}
+
     }
 }

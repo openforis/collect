@@ -16,51 +16,91 @@
       <Column id="11" name="text1" type="varchar" length="2048" nulls="true"/>
       <Column id="12" name="text2" type="varchar" length="2048" nulls="true"/>
       <Column id="13" name="text3" type="varchar" length="2048" nulls="true"/>
-      <Column id="14" name="remarks" type="varchar" length="2048" nulls="true"/>
-      <Column id="15" name="symbol" type="char" length="1" nulls="true"/>
-      <Column id="16" name="state" type="char" length="1" nulls="true"/>
-      <Column id="17" name="parent_id" type="integer" length="25" nulls="true"/>
-      <Column id="18" name="idx" type="integer" length="25" nulls="false"/>
+      <Column id="14" name="taxon_id" type="integer" length="25" nulls="true"/>
+      <Column id="15" name="remarks" type="varchar" length="2048" nulls="true"/>
+      <Column id="16" name="symbol" type="char" length="1" nulls="true"/>
+      <Column id="17" name="state" type="char" length="1" nulls="true"/>
+      <Column id="18" name="parent_id" type="integer" length="25" nulls="true"/>
+      <Column id="19" name="idx" type="integer" length="25" nulls="false"/>
       <Storage name="TempTable" value="false"></Storage>
    </Table>
-   <Table id="19" name="survey" schema="collect" database="" background="16777165">
-      <Column id="20" name="id" type="integer" length="25" nulls="false"/>
-      <Column id="21" name="name" type="varchar" length="255" nulls="false"/>
-      <Column id="22" name="uri" type="varchar" length="255" nulls="true"/>
-      <Column id="23" name="idml" type="text" length="25" nulls="false"/>
+   <Table id="20" name="survey" schema="collect" database="" background="16777165">
+      <Column id="21" name="id" type="integer" length="25" nulls="false"/>
+      <Column id="22" name="name" type="varchar" length="255" nulls="false"/>
+      <Column id="23" name="uri" type="varchar" length="255" nulls="true"/>
+      <Column id="24" name="idml" type="text" length="25" nulls="false"/>
       <Storage name="TempTable" value="false"></Storage>
    </Table>
-   <Table id="24" name="record" schema="collect" database="" background="16777165">
-      <Column id="25" name="id" type="integer" length="25" nulls="false"/>
-      <Column id="26" name="root_entity_id" type="integer" length="25" nulls="false"/>
-      <Column id="27" name="date_created" type="timestamp" length="25" nulls="true"/>
-      <Column id="28" name="created_by" type="varchar" length="255" nulls="true"/>
-      <Column id="29" name="date_modified" type="timestamp" length="25" nulls="true"/>
-      <Column id="30" name="modified_by" type="varchar" length="255" nulls="true"/>
-      <Column id="31" name="model_version" type="varchar" length="255" nulls="false"/>
-      <Column id="32" name="step" type="integer" length="25" nulls="true"/>
-      <Column id="33" name="state" type="char" length="1" nulls="true"/>
+   <Table id="25" name="record" schema="collect" database="" background="16777165">
+      <Column id="26" name="id" type="integer" length="25" nulls="false"/>
+      <Column id="27" name="root_entity_id" type="integer" length="25" nulls="false"/>
+      <Column id="28" name="date_created" type="timestamp" length="25" nulls="true"/>
+      <Column id="29" name="created_by" type="varchar" length="255" nulls="true"/>
+      <Column id="30" name="date_modified" type="timestamp" length="25" nulls="true"/>
+      <Column id="31" name="modified_by" type="varchar" length="255" nulls="true"/>
+      <Column id="32" name="model_version" type="varchar" length="255" nulls="false"/>
+      <Column id="33" name="step" type="integer" length="25" nulls="true"/>
+      <Column id="34" name="state" type="char" length="1" nulls="true"/>
       <Storage name="TempTable" value="false"></Storage>
    </Table>
-   <Relation id="34" name="FK_data_schema_definition" cardinality="-2" identifying="false" nulls="false">
+   <Table id="35" name="taxon" schema="collect" database="" background="16777165">
+      <Column id="36" name="id" type="integer" length="25" nulls="false"/>
+      <Column id="37" name="scientific_name" type="varchar" length="255" nulls="false"/>
+      <Column id="38" name="level" type="integer" length="25" nulls="false"/>
+      <Column id="39" name="taxonomy_id" type="integer" length="25" nulls="false"/>
+      <Column id="40" name="step" type="integer" length="25" nulls="false"/>
+      <Storage name="TempTable" value="false"></Storage>
+   </Table>
+   <Table id="41" name="taxon_name" schema="collect" database="" background="16777165">
+      <Column id="42" name="id" type="integer" length="25" nulls="false"/>
+      <Column id="43" name="name" type="varchar" length="255" nulls="true"/>
+      <Column id="44" name="language_code" type="char" length="3" nulls="false"/>
+      <Column id="45" name="language_variety" type="varchar" length="255" nulls="true">
+         <CP name="COMMENTS">Dialect, lect, sublanguage or other</CP>
+      </Column>
+      <Column id="46" name="taxon_id" type="integer" length="25" nulls="true"/>
+      <Column id="47" name="step" type="integer" length="25" nulls="false"/>
+      <Storage name="TempTable" value="false"></Storage>
+   </Table>
+   <Table id="48" name="taxonomy" schema="collect" database="" background="16777165">
+      <Column id="49" name="id" type="integer" length="25" nulls="false"/>
+      <Column id="50" name="key" type="varchar" length="255" nulls="false"/>
+      <Column id="51" name="metadata" type="text" length="25" nulls="false"/>
+      <Storage name="TempTable" value="false"></Storage>
+   </Table>
+   <Relation id="52" name="FK_data_schema_definition" cardinality="-2" identifying="false" nulls="false">
       <FK>1</FK>
       <PK>7</PK>
    </Relation>
-   <Relation id="35" name="FK_data_parent" cardinality="-2" identifying="false" nulls="true">
+   <Relation id="53" name="FK_data_parent" cardinality="-2" identifying="false" nulls="true">
       <FK>5</FK>
-      <PK>17</PK>
+      <PK>18</PK>
    </Relation>
-   <Relation id="36" name="FK_schema_definition_survey" cardinality="-2" identifying="false" nulls="false">
-      <FK>20</FK>
+   <Relation id="54" name="FK_schema_definition_survey" cardinality="-2" identifying="false" nulls="false">
+      <FK>21</FK>
       <PK>2</PK>
    </Relation>
-   <Relation id="37" name="FK_record_root_entity" cardinality="-2" identifying="false" nulls="false">
+   <Relation id="55" name="FK_record_root_entity" cardinality="-2" identifying="false" nulls="false">
       <FK>1</FK>
-      <PK>26</PK>
+      <PK>27</PK>
    </Relation>
-   <Relation id="38" name="FK_data_record" cardinality="-2" identifying="false" nulls="false">
-      <FK>25</FK>
+   <Relation id="56" name="FK_data_record" cardinality="-2" identifying="false" nulls="false">
+      <FK>26</FK>
       <PK>6</PK>
+      <Text></Text>
+   </Relation>
+   <Relation id="57" name="FK_taxon_name_taxon" cardinality="-2" identifying="true" nulls="false">
+      <FK>36</FK>
+      <PK>46</PK>
+   </Relation>
+   <Relation id="58" name="FK_taxon_taxonomy" cardinality="-2" identifying="false" nulls="false">
+      <FK>49</FK>
+      <PK>39</PK>
+   </Relation>
+   <Relation id="59" name="FK_data_taxon" cardinality="-2" identifying="false" nulls="false">
+      <FK>36</FK>
+      <PK>14</PK>
+      <Text></Text>
    </Relation>
    <Constraint table="0" name="PK_schema_definition" type="PrimKey">
       <ConstraintColumn id="1"></ConstraintColumn>
@@ -68,28 +108,45 @@
    <Constraint table="4" name="PK_data" type="PrimKey">
       <ConstraintColumn id="5"></ConstraintColumn>
    </Constraint>
-   <Constraint table="19" name="PK_survey" type="PrimKey">
-      <ConstraintColumn id="20"></ConstraintColumn>
-   </Constraint>
-   <Constraint table="19" name="UK_survey_name" type="Unique">
+   <Constraint table="20" name="PK_survey" type="PrimKey">
       <ConstraintColumn id="21"></ConstraintColumn>
    </Constraint>
-   <Constraint table="19" name="UK_survey_uri" type="Unique">
+   <Constraint table="20" name="UK_survey_name" type="Unique">
       <ConstraintColumn id="22"></ConstraintColumn>
    </Constraint>
-   <Constraint table="24" name="PK_record" type="PrimKey">
-      <ConstraintColumn id="25"></ConstraintColumn>
+   <Constraint table="20" name="UK_survey_uri" type="Unique">
+      <ConstraintColumn id="23"></ConstraintColumn>
    </Constraint>
-   <Sheet name="Untitled 1" id="39" disp_at="true" disp_ph="true" disp_co="true">
-      <Place id="24" visible="true">195,415,220,180</Place>
-      <Place id="37" visible="true">500,0,0,0</Place>
-      <Place id="38" visible="true" options="195.0,415.0,220.0,180.0,883.0,392.0,190.0,260.0,5,415.0,490.0,410.0,490.0,410.0,495.0,883.2761429532038,495.0,883.1380714766019,490.0">500,0,0,0</Place>
-      <Place id="4" visible="true">883,392,190,260</Place>
-      <Place id="34" visible="true">500,0,0,0</Place>
-      <Place id="36" visible="true" options="510.4099033025427,28.334718324070636,170.0,90.0,498.0,188.0,200.0,83.0,4,590.0,118.33471832407064,595.0,118.33471832407064,595.0,188.0,600.0,188.0">500,0,0,0</Place>
-      <Place id="35" visible="true">500,0,0,0</Place>
+   <Constraint table="25" name="PK_record" type="PrimKey">
+      <ConstraintColumn id="26"></ConstraintColumn>
+   </Constraint>
+   <Constraint table="35" name="PK_taxon" type="PrimKey">
+      <ConstraintColumn id="36"></ConstraintColumn>
+   </Constraint>
+   <Constraint table="41" name="PK_taxon_name" type="PrimKey">
+      <ConstraintColumn id="42"></ConstraintColumn>
+   </Constraint>
+   <Constraint table="48" name="PK_taxonomy" type="PrimKey">
+      <ConstraintColumn id="49"></ConstraintColumn>
+   </Constraint>
+   <Sheet name="Main" id="60" disp_at="true" disp_ph="true" disp_co="true">
+      <Place id="59" visible="true">500,0,0,0</Place>
+      <Place id="20" visible="true">510,28,170,90</Place>
+      <Place id="56" visible="true" options="185.0,365.0,220.0,180.0,783.0,382.0,190.0,280.0,2,405.0,480.0,783.0,480.0">500,0,0,0</Place>
+      <Place id="54" visible="true" options="510.4099033025427,28.334718324070636,170.0,90.0,498.0,188.0,200.0,83.0,4,590.0,118.33471832407064,595.0,118.33471832407064,595.0,188.0,600.0,188.0">500,0,0,0</Place>
+      <Place id="55" visible="true" options="498.0,188.0,200.0,83.0,185.0,365.0,220.0,180.0,3,560.0,271.0,560.0,440.0,405.0,440.0">706,-27,0,0</Place>
+      <Place id="4" visible="true">783,382,190,280</Place>
       <Place id="0" visible="true">498,188,200,83</Place>
-      <Place id="19" visible="true">510,28,170,90</Place>
+      <Place id="52" visible="true">500,0,0,0</Place>
+      <Place id="25" visible="true">185,365,220,180</Place>
+      <Place id="53" visible="true">500,0,0,0</Place>
    </Sheet>
-   <Settings sheet="39" zoom="1.0"></Settings>
+   <Sheet name="Species" id="61" disp_at="true" disp_ph="true" disp_co="true" disp_rn="true">
+      <Place id="57" visible="true" options="278.0,300.0,230.0,110.0,280.0,539.0,240.0,130.0,4,390.0,410.0,395.0,410.0,395.0,539.0,400.0,539.0">500,0,0,0</Place>
+      <Place id="48" visible="true">320,108,180,90</Place>
+      <Place id="35" visible="true">278,300,230,110</Place>
+      <Place id="58" visible="true" options="320.046668618879,108.48766959017955,180.0,90.0,278.0,300.0,230.0,110.0,4,400.0,198.48766959017956,400.0,249.24383479508978,390.0,249.24383479508978,390.0,300.0">500,0,0,0</Place>
+      <Place id="41" visible="true">280,539,240,130</Place>
+   </Sheet>
+   <Settings sheet="60" zoom="1.0"></Settings>
 </Diagram>
