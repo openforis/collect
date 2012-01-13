@@ -68,12 +68,14 @@ package org.openforis.collect.presenter {
 			eventDispatcher.addEventListener(UIEvent.LOAD_RECORD_SUMMARIES, loadRecordSummariesHandler);
 
 			this._view.newRecordButton.addEventListener(MouseEvent.CLICK, newRecordButtonClickHandler);
-			this._view.addEventListener(StateChangeEvent.CURRENT_STATE_CHANGE, currentStateChangeHandler);
 			this._view.paginationBar.previousPageButton.addEventListener(MouseEvent.CLICK, previousPageClickHandler);
 			this._view.paginationBar.nextPageButton.addEventListener(MouseEvent.CLICK, nextPageClickHandler);
 			this._view.paginationBar.goToPageButton.addEventListener(MouseEvent.CLICK, goToPageClickHandler);
 		}
 	
+		/**
+		 * New Record Button clicked 
+		 * */
 		protected function newRecordButtonClickHandler(event:MouseEvent):void {
 			if(_newRecordPopUp == null) {
 				_newRecordPopUp = new AddNewRecordPopUp();
@@ -83,20 +85,13 @@ package org.openforis.collect.presenter {
 			PopUpManager.centerPopUp(_newRecordPopUp);
 		}
 		
+		/**
+		 * Loads records summaries for active root entity
+		 * */
 		protected function loadRecordSummariesHandler(event:UIEvent):void {
 			updateDataGrid();
 			currentPage = 1;
 			loadRecordSummariesCurrentPage();
-		}
-		
-		protected function currentStateChangeHandler(event:StateChangeEvent):void {
-			var selectionColumn:SelectRecordColumn = null;
-			if(_view.dataGrid.columns.length > 0) {
-				selectionColumn = _view.dataGrid.columns.getItemAt(0) as SelectRecordColumn;
-				if(selectionColumn != null) {
-					selectionColumn.visible = (event.newState == ListView.SELECTION_STATE);
-				}
-			}
 		}
 		
 		protected function updateDataGrid():void {
@@ -171,6 +166,10 @@ package org.openforis.collect.presenter {
 			_view.dataGrid.dataProvider = records;
 		}
 		
+		
+		/**
+		 * Pagination bar events
+		 * */
 		protected function nextPageClickHandler(event:Event):void {
 			if(currentPage < totalPages) {
 				currentPage ++;
@@ -194,7 +193,7 @@ package org.openforis.collect.presenter {
 			if(item.hasOwnProperty(column.dataField)) {
 				var date:Date = item[column.dataField];
 				var dateFormatter:DateTimeFormatter = new DateTimeFormatter();
-				dateFormatter.dateTimePattern = "MM/dd/yyyy hh:mm:ss";
+				dateFormatter.dateTimePattern = "dd-MM-yyyy hh:mm:ss";
 				return dateFormatter.format(date);
 			} else {
 				return null;

@@ -114,7 +114,6 @@ package org.openforis.collect.presenter {
 				//TODO
 				
 				//REMOVE IT: TEMPORARY select of first root entity
-				
 				var listView:ListView = _view.masterView.listView;
 				
 				var rootEntityDef:EntityDefinitionProxy = rootEntityDefinitions.getItemAt(0) as EntityDefinitionProxy;
