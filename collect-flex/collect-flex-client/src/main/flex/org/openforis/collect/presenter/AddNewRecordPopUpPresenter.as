@@ -4,6 +4,7 @@ package org.openforis.collect.presenter {
 	
 	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
+	import mx.collections.ListCollectionView;
 	import mx.events.CloseEvent;
 	import mx.events.FlexEvent;
 	import mx.managers.PopUpManager;
@@ -16,13 +17,14 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.client.DataClient;
 	import org.openforis.collect.event.UIEvent;
+	import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
+	import org.openforis.collect.metamodel.proxy.SurveyProxy;
 	import org.openforis.collect.ui.component.AddNewRecordPopUp;
 
 	public class AddNewRecordPopUpPresenter extends AbstractPresenter {
 		private var _view:AddNewRecordPopUp;
 		
 		private var _newRecordResponder:IResponder;
-		
 		
 		public function AddNewRecordPopUpPresenter(view:AddNewRecordPopUp) {
 			this._view = view;
@@ -31,18 +33,23 @@ package org.openforis.collect.presenter {
 		}
 		
 		override internal function initEventListeners():void {
-			//test data
-			//var versions:IList = Application.selectedSurvey.
-			
-			var versions:ArrayCollection = new ArrayCollection([
-				{id: "1", label: "version 1"},
-				{id: "2", label: "version 2"},
-				{id: "3", label: "version 3"}
-			]);
+			eventDispatcher.addEventListener(UIEvent.SURVEY_SELECTED, surveySelectedHandler);
 			_view.addEventListener(CloseEvent.CLOSE, cancelClickHandler);
-			_view.versionsDropDownList.dataProvider = versions;
 			_view.addButton.addEventListener(MouseEvent.CLICK, addClickHandler);
 			_view.cancelButton.addEventListener(MouseEvent.CLICK, cancelClickHandler);
+			
+			if(Application.activeSurvey != null) {
+				var versions:ListCollectionView = Application.activeSurvey.versions;
+				_view.versionsDropDownList.dataProvider = versions;
+			}
+		}
+		
+		protected function surveySelectedHandler(event:UIEvent):void {
+			var survey:SurveyProxy = event.obj as SurveyProxy;
+			if(survey != null) {
+				var versions:ListCollectionView = survey.versions;
+				_view.versionsDropDownList.dataProvider = versions;
+			}
 		}
 		
 		protected function addClickHandler(event:Event):void {
