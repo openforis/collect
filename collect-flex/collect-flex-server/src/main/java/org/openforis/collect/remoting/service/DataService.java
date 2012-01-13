@@ -19,11 +19,14 @@ import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.RecordSummary;
 import org.openforis.collect.remoting.service.UpdateRequest.Method;
+import org.openforis.collect.session.SessionState;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
+import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.NodeDefinition;
+import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Code;
@@ -55,17 +58,21 @@ public class DataService {
 
 	/**
 	 * 
-	 * @param rootEntityId
+	 * @param rootEntityName
 	 * @param offset
 	 * @param toIndex
 	 * @param orderByFieldName
 	
 	 * @return map with "count" and "records" items
 	 */
-	public Map<String, Object> getRecordSummaries(int rootEntityId, int offset, int maxNumberOfRows, String orderByFieldName, String filter) {
+	public Map<String, Object> getRecordSummaries(String rootEntityName, int offset, int maxNumberOfRows, String orderByFieldName, String filter) {
 		Map<String, Object> result = new HashMap<String, Object>();
-		int count = recordManager.getCountRecords(rootEntityId, filter);
-		List<RecordSummary> list = recordManager.getSummaries(rootEntityId, offset, maxNumberOfRows, orderByFieldName, filter);
+		SessionState sessionState = sessionManager.getSessionState();
+		Survey activeSurvey = sessionState.getActiveSurvey();
+		Schema schema = activeSurvey.getSchema();
+		EntityDefinition rootEntityDefinition = schema.getRootEntityDefinition(rootEntityName);
+		int count = recordManager.getCountRecords(rootEntityDefinition, filter);
+		List<RecordSummary> list = recordManager.getSummaries(rootEntityDefinition, offset, maxNumberOfRows, orderByFieldName, filter);
 		result.put("count", count);
 		result.put("records", list);
 		return result;
