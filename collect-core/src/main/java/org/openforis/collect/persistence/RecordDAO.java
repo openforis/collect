@@ -63,22 +63,22 @@ public class RecordDAO extends CollectDAO {
 	public List<RecordSummary> getRecordSummaries(int rootEntityId, int offset, int maxNumberOfRecords, String orderByFieldName, String filter) {
 		Factory jf = getJooqFactory();
 
-		//default: order by ID
+		// default: order by ID
 		TableField<?, ?> orderByField = RECORD.ID;
-		if(orderByFieldName != null) {
-			if("id".equals(orderByFieldName)) {
+		if (orderByFieldName != null) {
+			if ("id".equals(orderByFieldName)) {
 				orderByField = RECORD.ID;
-			} else if("createdBy".equals(orderByFieldName)) {
+			} else if ("createdBy".equals(orderByFieldName)) {
 				orderByField = RECORD.CREATED_BY;
-			} else if("modifiedByBy".equals(orderByFieldName)) {
+			} else if ("modifiedByBy".equals(orderByFieldName)) {
 				orderByField = RECORD.MODIFIED_BY;
-			} else if("creationDate".equals(orderByFieldName)) {
+			} else if ("creationDate".equals(orderByFieldName)) {
 				orderByField = RECORD.DATE_CREATED;
-			} else if("modifiedDate".equals(orderByFieldName)) {
+			} else if ("modifiedDate".equals(orderByFieldName)) {
 				orderByField = RECORD.DATE_MODIFIED;
 			}
 		}
-		//TODO add filter to where conditions
+
 		List<Record> records = jf.select().from(RECORD).where(RECORD.ROOT_ENTITY_ID.equal(rootEntityId)).orderBy(orderByField).limit(offset, maxNumberOfRecords).fetch();
 		List<RecordSummary> result = new ArrayList<RecordSummary>();
 		for (Record r : records) {
@@ -87,9 +87,10 @@ public class RecordDAO extends CollectDAO {
 			Date dateCreated = r.getValueAsDate(RECORD.DATE_CREATED);
 			String modifiedBy = r.getValueAsString(RECORD.MODIFIED_BY);
 			Date modifiedDate = r.getValueAsDate(RECORD.DATE_MODIFIED);
+			int step = r.getValueAsInteger(RECORD.STEP);
 			int warningCount = 0;
 			int errorCount = 0;
-			RecordSummary recordSummary = new RecordSummary(id, errorCount, warningCount, createdBy, dateCreated, modifiedBy, modifiedDate);
+			RecordSummary recordSummary = new RecordSummary(id, errorCount, warningCount, createdBy, dateCreated, modifiedBy, modifiedDate, step);
 			result.add(recordSummary);
 		}
 		return result;
@@ -151,8 +152,8 @@ public class RecordDAO extends CollectDAO {
 		// Insert into SURVEY table
 		Factory jf = getJooqFactory();
 		jf.update(RECORD).set(RECORD.ROOT_ENTITY_ID, rootEntityId).set(RECORD.DATE_CREATED, toTimestamp(record.getCreationDate())).set(RECORD.CREATED_BY, record.getCreatedBy())
-				.set(RECORD.DATE_MODIFIED, toTimestamp(record.getModifiedDate())).set(RECORD.MODIFIED_BY, record.getModifiedBy())
-				.set(RECORD.MODEL_VERSION, record.getVersion().getName()).where(RECORD.ID.equal(recordId)).execute();
+				.set(RECORD.DATE_MODIFIED, toTimestamp(record.getModifiedDate())).set(RECORD.MODIFIED_BY, record.getModifiedBy()).set(RECORD.MODEL_VERSION, record.getVersion().getName())
+				.where(RECORD.ID.equal(recordId)).execute();
 	}
 
 	private void deleteData(int recordId) {
