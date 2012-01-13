@@ -13,6 +13,10 @@ import org.openforis.collect.exception.NonexistentIdException;
 import org.openforis.collect.exception.RecordLockedException;
 import org.openforis.collect.model.RecordSummary;
 import org.openforis.collect.persistence.RecordDAO;
+import org.openforis.idm.metamodel.AttributeDefinition;
+import org.openforis.idm.metamodel.CodeAttributeDefinition;
+import org.openforis.idm.metamodel.EntityDefinition;
+import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.model.Record;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,13 +67,13 @@ public class RecordManager {
 		return null;
 	}
 	
-	public List<RecordSummary> getSummaries(int rootEntityId, int offset, int maxNumberOfRecords, String orderByFieldName, String filter) {
-		List<RecordSummary> recordsSummary = recordDAO.getRecordSummaries(rootEntityId, offset, maxNumberOfRecords, orderByFieldName, filter);
+	public List<RecordSummary> getSummaries(EntityDefinition rootEntityDefinition, int offset, int maxNumberOfRecords, String orderByFieldName, String filter) {
+		List<RecordSummary> recordsSummary = recordDAO.getRecordSummaries(rootEntityDefinition, offset, maxNumberOfRecords, orderByFieldName, filter);
 		return recordsSummary;
 	}
 	
-	public int getCountRecords(int rootEntityId, String filter) {
-		int count = recordDAO.getCountRecords(rootEntityId, filter);
+	public int getCountRecords(EntityDefinition rootEntityDefinition, String filter) {
+		int count = recordDAO.getCountRecords(rootEntityDefinition, filter);
 		return count;
 	}
 
@@ -96,4 +100,5 @@ public class RecordManager {
 
 	public void demote(String recordId) throws InvalidIdException, MultipleEditException, NonexistentIdException, AccessDeniedException, RecordLockedException {
 	}
+	
 }

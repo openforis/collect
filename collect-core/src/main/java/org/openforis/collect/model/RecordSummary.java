@@ -4,6 +4,7 @@
 package org.openforis.collect.model;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author M. Togna
@@ -19,6 +20,7 @@ public class RecordSummary {
 	private Date modifiedDate;
 	private int warningCount;
 	private int step;
+	private List<String> rootEntityKeys;
 
 	public RecordSummary(String id, int errorCount, int warningCount, String createdBy, Date creationDate, String modifiedBy, Date modifiedDate, int step) {
 		this.id = id;
@@ -61,6 +63,10 @@ public class RecordSummary {
 
 	public int getStep() {
 		return step;
+	}
+
+	public List<String> getRootEntityKeys() {
+		return rootEntityKeys;
 	}
 
 }

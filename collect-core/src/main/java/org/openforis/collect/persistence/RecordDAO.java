@@ -53,14 +53,14 @@ public class RecordDAO extends CollectDAO {
 	}
 
 	@Transactional
-	public int getCountRecords(int rootEntityId, String filter) {
+	public int getCountRecords(EntityDefinition rootEntityDefinition, String filter) {
 		Factory jf = getJooqFactory();
-		Record r = jf.select(Factory.count()).from(RECORD).where(RECORD.ROOT_ENTITY_ID.equal(rootEntityId)).fetchOne();
+		Record r = jf.select(Factory.count()).from(RECORD).where(RECORD.ROOT_ENTITY_ID.equal(rootEntityDefinition.getId())).fetchOne();
 		return r.getValueAsInteger(0);
 	}
 
 	@Transactional
-	public List<RecordSummary> getRecordSummaries(int rootEntityId, int offset, int maxNumberOfRecords, String orderByFieldName, String filter) {
+	public List<RecordSummary> getRecordSummaries(EntityDefinition rootEntityDefinition, int offset, int maxNumberOfRecords, String orderByFieldName, String filter) {
 		Factory jf = getJooqFactory();
 
 		// default: order by ID
@@ -79,7 +79,10 @@ public class RecordDAO extends CollectDAO {
 			}
 		}
 
-		List<Record> records = jf.select().from(RECORD).where(RECORD.ROOT_ENTITY_ID.equal(rootEntityId)).orderBy(orderByField).limit(offset, maxNumberOfRecords).fetch();
+		// TODO add filter to where conditions
+		List<Record> records = jf.select(RECORD.ID, RECORD.CREATED_BY, RECORD.DATE_CREATED, RECORD.MODIFIED_BY, RECORD.DATE_MODIFIED, RECORD.STEP).from(RECORD)
+				.where(RECORD.ROOT_ENTITY_ID.equal(rootEntityDefinition.getId())).orderBy(orderByField).limit(offset, maxNumberOfRecords).fetch();
+
 		List<RecordSummary> result = new ArrayList<RecordSummary>();
 		for (Record r : records) {
 			String id = r.getValueAsString(RECORD.ID);
@@ -87,6 +90,7 @@ public class RecordDAO extends CollectDAO {
 			Date dateCreated = r.getValueAsDate(RECORD.DATE_CREATED);
 			String modifiedBy = r.getValueAsString(RECORD.MODIFIED_BY);
 			Date modifiedDate = r.getValueAsDate(RECORD.DATE_MODIFIED);
+
 			int step = r.getValueAsInteger(RECORD.STEP);
 			int warningCount = 0;
 			int errorCount = 0;
@@ -173,4 +177,5 @@ public class RecordDAO extends CollectDAO {
 			}
 		});
 	}
+	
 }
