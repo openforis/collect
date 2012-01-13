@@ -76,23 +76,12 @@ public class SurveyProxy implements ProxyBase {
 	@ExternalizedProperty
 	public UIConfiguration getUiConfiguration() {
 		List<Configuration> configuration = survey.getConfiguration();
-		if (configuration != null) {
-			return (UIConfiguration) configuration;
+		if (configuration != null && !configuration.isEmpty()) {
+			UIConfiguration uiConf = (UIConfiguration) configuration.get(0);
+			return uiConf;
 		} else {
 			return null;
 		}
-		// if (element != null) {
-		// Element uiConfigElement = (Element) element.getFirstChild();
-		// try {
-		// UIConfiguration uiConfiguration = UIConfiguration.unmarshal(uiConfigElement);
-		// return uiConfiguration;
-		// } catch (IOException e) {
-		// LOG.error(e);
-		// return null;
-		// }
-		// } else {
-		// return null;
-		// }
 	}
 
 }
