@@ -15,7 +15,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openforis.collect.model.CollectAttributeMetadata;
 import org.openforis.collect.model.CollectRecord;
+import org.openforis.collect.model.RecordSummary;
 import org.openforis.collect.model.UIConfiguration.UIConfigurationAdapter;
+import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.xml.BindingContext;
 import org.openforis.idm.metamodel.xml.InvalidIdmlException;
@@ -165,6 +167,21 @@ public class DAOIntegrationTest {
 		
 	}
 
+	@Test
+	public void testLoadRecordSummaries() {
+		Survey survey = surveyDao.load("archenland1");
+		//get the first root entity
+		EntityDefinition rootEntity = survey.getSchema().getRootEntityDefinitions().get(0);
+		int rootEntityId = rootEntity.getId();
+		int offset = 0;
+		int maxNumberOfRecords = 1;
+		String orderByFieldName = "id";
+		String filter = null;
+		List<RecordSummary> list = this.recordDao.getRecordSummaries(rootEntityId, offset, maxNumberOfRecords, orderByFieldName, filter);
+		assertNotNull(list);
+		assertEquals(1, list.size());
+	}
+	
 	private void updateRecord(CollectRecord record) {
 		// Update modified date
 		record.setModifiedDate(new GregorianCalendar(2012, 1, 1, 0, 1).getTime());

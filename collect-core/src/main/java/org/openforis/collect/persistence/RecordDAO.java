@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.jooq.Record;
+import org.jooq.TableField;
 import org.jooq.impl.Factory;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.RecordSummary;
@@ -52,16 +53,33 @@ public class RecordDAO extends CollectDAO {
 	}
 
 	@Transactional
-	public int getCountRecords() {
+	public int getCountRecords(int rootEntityId, String filter) {
 		Factory jf = getJooqFactory();
-		Record r = jf.select(Factory.count()).from(RECORD).fetchOne();
+		Record r = jf.select(Factory.count()).from(RECORD).where(RECORD.ROOT_ENTITY_ID.equal(rootEntityId)).fetchOne();
 		return r.getValueAsInteger(0);
 	}
 
 	@Transactional
-	public List<RecordSummary> getRecordsSummary(int rootEntityId, int fromIndex, int toIndex, String orderByFieldName) {
+	public List<RecordSummary> getRecordSummaries(int rootEntityId, int offset, int maxNumberOfRecords, String orderByFieldName, String filter) {
 		Factory jf = getJooqFactory();
-		List<Record> records = jf.select().from(RECORD).where(RECORD.ROOT_ENTITY_ID.equal(rootEntityId)).limit(fromIndex, toIndex).fetch();
+
+		//default: order by ID
+		TableField<?, ?> orderByField = RECORD.ID;
+		if(orderByFieldName != null) {
+			if("id".equals(orderByFieldName)) {
+				orderByField = RECORD.ID;
+			} else if("createdBy".equals(orderByFieldName)) {
+				orderByField = RECORD.CREATED_BY;
+			} else if("modifiedByBy".equals(orderByFieldName)) {
+				orderByField = RECORD.MODIFIED_BY;
+			} else if("creationDate".equals(orderByFieldName)) {
+				orderByField = RECORD.DATE_CREATED;
+			} else if("modifiedDate".equals(orderByFieldName)) {
+				orderByField = RECORD.DATE_MODIFIED;
+			}
+		}
+		//TODO add filter to where conditions
+		List<Record> records = jf.select().from(RECORD).where(RECORD.ROOT_ENTITY_ID.equal(rootEntityId)).orderBy(orderByField).limit(offset, maxNumberOfRecords).fetch();
 		List<RecordSummary> result = new ArrayList<RecordSummary>();
 		for (Record r : records) {
 			String id = r.getValueAsString(RECORD.ID);
@@ -69,7 +87,9 @@ public class RecordDAO extends CollectDAO {
 			Date dateCreated = r.getValueAsDate(RECORD.DATE_CREATED);
 			String modifiedBy = r.getValueAsString(RECORD.MODIFIED_BY);
 			Date modifiedDate = r.getValueAsDate(RECORD.DATE_MODIFIED);
-			RecordSummary recordSummary = new RecordSummary(id, 0, 0, createdBy, dateCreated, modifiedBy, modifiedDate);
+			int warningCount = 0;
+			int errorCount = 0;
+			RecordSummary recordSummary = new RecordSummary(id, errorCount, warningCount, createdBy, dateCreated, modifiedBy, modifiedDate);
 			result.add(recordSummary);
 		}
 		return result;

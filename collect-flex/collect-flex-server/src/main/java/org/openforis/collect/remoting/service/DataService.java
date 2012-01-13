@@ -4,7 +4,9 @@
 package org.openforis.collect.remoting.service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.openforis.collect.exception.AccessDeniedException;
 import org.openforis.collect.exception.DuplicateIdException;
@@ -51,14 +53,22 @@ public class DataService {
 		return list;
 	}
 
-	public List<RecordSummary> getRecordSummaries(int rootEntityId, int fromIndex, int toIndex, String orderByFieldName) {
-		List<RecordSummary> list = recordManager.getSummaries(rootEntityId, fromIndex, toIndex, orderByFieldName);
-		return list;
-	}
-
-	public int getCountRecords() {
-		int count = recordManager.getCountRecords();
-		return count;
+	/**
+	 * 
+	 * @param rootEntityId
+	 * @param offset
+	 * @param toIndex
+	 * @param orderByFieldName
+	
+	 * @return map with "count" and "records" items
+	 */
+	public Map<String, Object> getRecordSummaries(int rootEntityId, int offset, int maxNumberOfRows, String orderByFieldName, String filter) {
+		Map<String, Object> result = new HashMap<String, Object>();
+		int count = recordManager.getCountRecords(rootEntityId, filter);
+		List<RecordSummary> list = recordManager.getSummaries(rootEntityId, offset, maxNumberOfRows, orderByFieldName, filter);
+		result.put("count", count);
+		result.put("records", list);
+		return result;
 	}
 
 	public Record newRecord(String name, Survey survey, String rootEntityId) throws MultipleEditException, DuplicateIdException, InvalidIdException, DuplicateIdException, AccessDeniedException,

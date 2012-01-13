@@ -15,14 +15,8 @@
 				
 				/* updateCurrentState(); */
 			}
-			
- 			override public function prepare(hasBeenRecycled:Boolean):void {
-				if(data != null && data.hasOwnProperty(column.dataField)) {
-					lblData.text = data[column.dataField];
-				}
-			}  
-			
-/* 			protected function updateCurrentState():void {
+
+			/* protected function updateCurrentState():void {
 				if(data != null && data.submitted) {
 					this.currentState = "submitted";
 				} else if(data != null && data.rejected) {
@@ -83,6 +77,6 @@
 		</s:fill>
 	</s:Rect>
 	
-	<s:Label id="lblData" top="5" left="3" color.submitted="0x505050" alpha.submitted="0.5" minHeight="20" />
+	<s:Label id="labelDisplay" top="5" left="3" color.submitted="0x505050" alpha.submitted="0.5" minHeight="20" />
 	
 </s:GridItemRenderer>

@@ -10,6 +10,7 @@ package org.openforis.collect.presenter {
 	import mx.collections.ArrayList;
 	import mx.collections.IList;
 	import mx.collections.ListCollectionView;
+	import mx.controls.List;
 	import mx.core.FlexGlobals;
 	import mx.events.StateChangeEvent;
 	import mx.managers.PopUpManager;
@@ -29,6 +30,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.ui.view.ListView;
 	
 	import spark.components.gridClasses.GridColumn;
+	import spark.formatters.DateTimeFormatter;
 
 
 	public class ListPresenter extends AbstractPresenter {
@@ -38,10 +40,22 @@ package org.openforis.collect.presenter {
 		
 		private var _newRecordPopUp:AddNewRecordPopUp;
 		
+		/**
+		 * The total number of records.
+		 */
 		private var totalRecords:int;
-		private var currentPage:int;
+		/**
+		 * The total pages of the pagination.
+		 */
 		private var totalPages:int;
-		
+		/**
+		 * the current page of the pagination.
+		 * It starts from 1 
+		 */
+		private var currentPage:int;
+		/**
+		 * Max number of records that can be loaded for a single page.
+		 */
 		private const MAX_RECORDS_PER_PAGE:int = 10;
 		
 		public function ListPresenter(view:ListView) {
@@ -49,28 +63,16 @@ package org.openforis.collect.presenter {
 			this._dataClient = ClientFactory.dataClient;
 			super();
 		}
-	
 
 		override internal function initEventListeners():void {
-			eventDispatcher.addEventListener(UIEvent.ROOT_ENTITY_SELECTED, rootEntitySelectedHandler);
+			eventDispatcher.addEventListener(UIEvent.LOAD_RECORD_SUMMARIES, loadRecordSummariesHandler);
 
 			this._view.newRecordButton.addEventListener(MouseEvent.CLICK, newRecordButtonClickHandler);
 			this._view.addEventListener(StateChangeEvent.CURRENT_STATE_CHANGE, currentStateChangeHandler);
 			this._view.paginationBar.previousPageButton.addEventListener(MouseEvent.CLICK, previousPageClickHandler);
 			this._view.paginationBar.nextPageButton.addEventListener(MouseEvent.CLICK, nextPageClickHandler);
 			this._view.paginationBar.goToPageButton.addEventListener(MouseEvent.CLICK, goToPageClickHandler);
-
-			
-			//workaround: updateDataGrid when the presenter is created
-			if(Application.activeRootEntity != null) {
-				updateDataGrid(Application.activeRootEntity);
-				
-				//load records summary
-				loadRecordsSummary();
-			}
-
 		}
-		
 	
 		protected function newRecordButtonClickHandler(event:MouseEvent):void {
 			if(_newRecordPopUp == null) {
@@ -81,9 +83,10 @@ package org.openforis.collect.presenter {
 			PopUpManager.centerPopUp(_newRecordPopUp);
 		}
 		
-		protected function rootEntitySelectedHandler(event:UIEvent):void {
-			var rootEntity:EntityDefinitionProxy = event.obj as EntityDefinitionProxy;
-			updateDataGrid(rootEntity);
+		protected function loadRecordSummariesHandler(event:UIEvent):void {
+			updateDataGrid();
+			currentPage = 1;
+			loadRecordSummariesCurrentPage();
 		}
 		
 		protected function currentStateChangeHandler(event:StateChangeEvent):void {
@@ -96,7 +99,8 @@ package org.openforis.collect.presenter {
 			}
 		}
 		
-		protected function updateDataGrid(rootEntity:EntityDefinitionProxy):void {
+		protected function updateDataGrid():void {
+			var rootEntity:EntityDefinitionProxy = Application.activeRootEntity;
 			var columns:IList = new ArrayList();
 			var column:GridColumn;
 			//selection column
@@ -126,63 +130,76 @@ package org.openforis.collect.presenter {
 			column = new GridColumn();
 			column.headerText = Message.get("list.creationDate");
 			column.dataField = "creationDate";
+			column.labelFunction = dateLabelFunction;
 			columns.addItem(column);
 			//date modified column
 			column = new GridColumn();
 			column.headerText = Message.get("list.dateModified");
 			column.dataField = "dateModified";
+			column.labelFunction = dateLabelFunction;
 			columns.addItem(column);
 
 			_view.dataGrid.columns = columns;
 		}
 		
-		protected function loadRecordsSummary():void {
-			_dataClient.getCountRecords(new AsyncResponder(getCountRecordsResultHandler, faultHandler));
-		}
-		
-		protected function getCountRecordsResultHandler(event:ResultEvent, token:Object = null):void {
-			totalRecords = event.result as int;
-			currentPage = 1;
-			totalPages = Math.ceil(totalRecords / MAX_RECORDS_PER_PAGE);
-			_view.paginationBar.goToPageStepper.minimum = 1;
-			_view.paginationBar.goToPageStepper.maximum = totalPages;
-			_view.paginationBar.totalRecordsText.text = String(totalRecords);
-			loadRecordsSummaryCurrentPage();
-		}
-		
-		protected function loadRecordsSummaryCurrentPage():void {
-			var fromIndex:int = (currentPage - 1) * MAX_RECORDS_PER_PAGE + 1;
-			var toIndex:int = (currentPage * MAX_RECORDS_PER_PAGE);
+		protected function loadRecordSummariesCurrentPage():void {
+			//offset starts from 0
+			var offset:int = (currentPage - 1) * MAX_RECORDS_PER_PAGE;
+			
 			_dataClient.getRecordsSummary(new AsyncResponder(getRecordsSummaryResultHandler, faultHandler), 
-				Application.activeRootEntity.id, fromIndex, toIndex, null);
+				Application.activeRootEntity.id, offset, MAX_RECORDS_PER_PAGE, null, null);
 		}
 		
 		protected function getRecordsSummaryResultHandler(event:ResultEvent, token:Object = null):void {
-			var result:IList = event.result as IList;
-			_view.dataGrid.dataProvider = result;
-			_view.paginationBar.recordsFromText.text = String(((currentPage - 1) * MAX_RECORDS_PER_PAGE) + 1);
-			_view.paginationBar.recordsToText.text = String(((currentPage - 1) * MAX_RECORDS_PER_PAGE) + result.length);
+			var result:Object = event.result;
+			var records:ListCollectionView = result.records;
+			totalRecords = result.count as int;
+			totalPages = Math.ceil(totalRecords / MAX_RECORDS_PER_PAGE);
+			
+			//update pagination bar
+			_view.paginationBar.goToPageStepper.minimum = 1;
+			_view.paginationBar.goToPageStepper.maximum = totalPages;
+			_view.paginationBar.totalRecordsText.text = String(totalRecords);
+			
+			//records from position is the indexFrom value + 1
+			var recordsFromPosition:int = ((currentPage - 1) * MAX_RECORDS_PER_PAGE) + 1;
+			var recordsToPosition:int = recordsFromPosition + records.length - 1;
+			_view.paginationBar.recordsFromText.text = String(recordsFromPosition);
+			_view.paginationBar.recordsToText.text = String(recordsToPosition);
+			
+			//update datagrid dataprovider
+			_view.dataGrid.dataProvider = records;
 		}
 		
 		protected function nextPageClickHandler(event:Event):void {
 			if(currentPage < totalPages) {
 				currentPage ++;
-				loadRecordsSummaryCurrentPage();
+				loadRecordSummariesCurrentPage();
 			}
 		}
 		
 		protected function previousPageClickHandler(event:Event):void {
 			if(currentPage > 1) {
 				currentPage --;
-				loadRecordsSummaryCurrentPage();
+				loadRecordSummariesCurrentPage();
 			}
 		}
 		
 		protected function goToPageClickHandler(event:Event):void {
 			currentPage = _view.paginationBar.goToPageStepper.value;
-			loadRecordsSummaryCurrentPage();
+			loadRecordSummariesCurrentPage();
 		}
 		
+		private function dateLabelFunction(item:Object,column:GridColumn):String {
+			if(item.hasOwnProperty(column.dataField)) {
+				var date:Date = item[column.dataField];
+				var dateFormatter:DateTimeFormatter = new DateTimeFormatter();
+				dateFormatter.dateTimePattern = "MM/dd/yyyy hh:mm:ss";
+				return dateFormatter.format(date);
+			} else {
+				return null;
+			}
+		}
 		
 	}
 }
