@@ -22,6 +22,8 @@ GO
 CREATE SEQUENCE collect.taxon_name_id_seq
 GO
 
+CREATE SEQUENCE collect.user_id_seq	
+GO
 
-
-
+CREATE SEQUENCE collect.user_role_id_seq
+GO

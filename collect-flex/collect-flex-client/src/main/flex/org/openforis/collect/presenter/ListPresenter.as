@@ -11,6 +11,7 @@ package org.openforis.collect.presenter {
 	import mx.collections.IList;
 	import mx.collections.ListCollectionView;
 	import mx.controls.List;
+	import mx.core.ClassFactory;
 	import mx.core.FlexGlobals;
 	import mx.events.StateChangeEvent;
 	import mx.managers.PopUpManager;
@@ -28,7 +29,8 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.metamodel.proxy.NodeLabelProxy;
 	import org.openforis.collect.ui.UIBuilder;
 	import org.openforis.collect.ui.component.AddNewRecordPopUp;
-	import org.openforis.collect.ui.component.datagrid.SelectRecordColumn;
+	import org.openforis.collect.ui.component.datagrid.SelectRecordColumnHeaderRenderer;
+	import org.openforis.collect.ui.component.datagrid.SelectRecordColumnItemRenderer;
 	import org.openforis.collect.ui.view.ListView;
 	
 	import spark.components.gridClasses.GridColumn;

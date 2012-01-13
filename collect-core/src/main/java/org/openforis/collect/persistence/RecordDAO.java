@@ -77,9 +77,9 @@ public class RecordDAO extends CollectDAO {
 			if ("id".equals(orderByFieldName)) {
 				orderByField = RECORD.ID;
 			} else if ("createdBy".equals(orderByFieldName)) {
-				orderByField = RECORD.CREATED_BY;
+				//orderByField = RECORD.CREATED_BY;
 			} else if ("modifiedBy".equals(orderByFieldName)) {
-				orderByField = RECORD.MODIFIED_BY;
+				//orderByField = RECORD.MODIFIED_BY;
 			} else if ("creationDate".equals(orderByFieldName)) {
 				orderByField = RECORD.DATE_CREATED;
 			} else if ("modifiedDate".equals(orderByFieldName)) {
@@ -88,15 +88,15 @@ public class RecordDAO extends CollectDAO {
 		}
 
 		// TODO add filter to where conditions
-		List<Record> records = jf.select(RECORD.ID, RECORD.CREATED_BY, RECORD.DATE_CREATED, RECORD.MODIFIED_BY, RECORD.DATE_MODIFIED, RECORD.STEP).from(RECORD)
+		List<Record> records = jf.select().from(RECORD)
 				.where(RECORD.ROOT_ENTITY_ID.equal(rootEntityDefinition.getId())).orderBy(orderByField).limit(offset, maxNumberOfRecords).fetch();
 
 		List<RecordSummary> result = new ArrayList<RecordSummary>();
 		for (Record r : records) {
 			Integer id = r.getValueAsInteger(RECORD.ID);
-			String createdBy = r.getValueAsString(RECORD.CREATED_BY);
+			String createdBy = null; //r.getValueAsString(RECORD.CREATED_BY);
 			Date dateCreated = r.getValueAsDate(RECORD.DATE_CREATED);
-			String modifiedBy = r.getValueAsString(RECORD.MODIFIED_BY);
+			String modifiedBy = null; //r.getValueAsString(RECORD.MODIFIED_BY);
 			Date modifiedDate = r.getValueAsDate(RECORD.DATE_MODIFIED);
 			int step = r.getValueAsInteger(RECORD.STEP);
 			//TODO add errors and warnings count
@@ -125,9 +125,9 @@ public class RecordDAO extends CollectDAO {
 		CollectRecord record = new CollectRecord(survey, rootEntityName, version);
 		record.setId(recordId);
 		record.setCreationDate(r.getValueAsDate(RECORD.DATE_CREATED));
-		record.setCreatedBy(r.getValueAsString(RECORD.CREATED_BY));
+		//record.setCreatedBy(r.getValueAsString(RECORD.CREATED_BY));
 		record.setModifiedDate(r.getValueAsDate(RECORD.DATE_MODIFIED));
-		record.setModifiedBy(r.getValueAsString(RECORD.MODIFIED_BY));
+		//record.setModifiedBy(r.getValueAsString(RECORD.MODIFIED_BY));
 
 		return record;
 	}
@@ -147,7 +147,9 @@ public class RecordDAO extends CollectDAO {
 		Factory jf = getJooqFactory();
 		int recordId = jf.nextval(RECORD_ID_SEQ).intValue();
 		jf.insertInto(RECORD).set(RECORD.ID, recordId).set(RECORD.ROOT_ENTITY_ID, rootEntityId).set(RECORD.DATE_CREATED, toTimestamp(record.getCreationDate()))
-				.set(RECORD.CREATED_BY, record.getCreatedBy()).set(RECORD.DATE_MODIFIED, toTimestamp(record.getModifiedDate())).set(RECORD.MODIFIED_BY, record.getModifiedBy())
+				//.set(RECORD.CREATED_BY, record.getCreatedBy())
+				.set(RECORD.DATE_MODIFIED, toTimestamp(record.getModifiedDate()))
+				//.set(RECORD.MODIFIED_BY, record.getModifiedBy())
 				.set(RECORD.MODEL_VERSION, record.getVersion().getName()).set(RECORD.STEP, record.getStep().getStepNumber()).execute();
 		record.setId(recordId);
 	}
@@ -164,8 +166,11 @@ public class RecordDAO extends CollectDAO {
 		}
 		// Insert into SURVEY table
 		Factory jf = getJooqFactory();
-		jf.update(RECORD).set(RECORD.ROOT_ENTITY_ID, rootEntityId).set(RECORD.DATE_CREATED, toTimestamp(record.getCreationDate())).set(RECORD.CREATED_BY, record.getCreatedBy())
-				.set(RECORD.DATE_MODIFIED, toTimestamp(record.getModifiedDate())).set(RECORD.MODIFIED_BY, record.getModifiedBy()).set(RECORD.MODEL_VERSION, record.getVersion().getName())
+		jf.update(RECORD).set(RECORD.ROOT_ENTITY_ID, rootEntityId).set(RECORD.DATE_CREATED, toTimestamp(record.getCreationDate()))
+				//.set(RECORD.CREATED_BY, record.getCreatedBy())
+				.set(RECORD.DATE_MODIFIED, toTimestamp(record.getModifiedDate()))
+				//.set(RECORD.MODIFIED_BY, record.getModifiedBy())
+				.set(RECORD.MODEL_VERSION, record.getVersion().getName())
 				.set(RECORD.STEP, record.getStep().getStepNumber()).where(RECORD.ID.equal(recordId)).execute();
 	}
 

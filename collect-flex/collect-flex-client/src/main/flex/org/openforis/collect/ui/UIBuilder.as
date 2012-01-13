@@ -11,7 +11,6 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.NodeLabelProxy;
 	import org.openforis.collect.model.RecordSummary;
-	import org.openforis.collect.ui.component.datagrid.SelectRecordColumn;
 	import org.openforis.collect.ui.component.datagroup.DataGroupItemRenderer;
 	import org.openforis.collect.ui.component.detail.EntityFormContainer;
 	import org.openforis.collect.ui.component.detail.FormContainer;
