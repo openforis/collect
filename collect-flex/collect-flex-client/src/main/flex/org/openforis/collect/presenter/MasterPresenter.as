@@ -43,9 +43,10 @@ package org.openforis.collect.presenter {
 			eventDispatcher.addEventListener(UIEvent.BACK_TO_LIST, backToListHandler);
 			eventDispatcher.addEventListener(UIEvent.RECORD_SELECTED, recordSelectedHandler);
 		}
-
-		/*protected function applicationInitializedHandler(event:ApplicationEvent):void {
-		}*/
+		
+		/**
+		 * Record selected from list page
+		 * */
 		internal function recordSelectedHandler(uiEvent:UIEvent):void {
 			var record:RecordSummary = uiEvent.obj as RecordSummary;
 			Alert.show(record.id);
