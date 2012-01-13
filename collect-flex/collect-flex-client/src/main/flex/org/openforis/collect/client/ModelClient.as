@@ -12,14 +12,14 @@ package org.openforis.collect.client {
 	public class ModelClient extends AbstractClient {
 		
 		private var _getSurveysOperation:Operation;
-		private var _getSurveyOperation:Operation;
+		private var _setActiveSurveyOperation:Operation;
 		private var _getSchemaOperation:Operation;
 		
 		public function ModelClient() {
 			super("modelService");
 			
 			this._getSurveysOperation = getOperation("getSurveySummaries");
-			this._getSurveyOperation = getOperation("getSurvey");
+			this._setActiveSurveyOperation = getOperation("setActiveSurvey");
 			this._getSchemaOperation = getOperation("getSchema");
 		}
 		
@@ -28,8 +28,8 @@ package org.openforis.collect.client {
 			token.addResponder(responder);
 		}
 		
-		public function getSurvey(responder:IResponder, name:String):void {
-			var token:AsyncToken = this._getSurveyOperation.send(name);
+		public function setActiveSurvey(responder:IResponder, name:String):void {
+			var token:AsyncToken = this._setActiveSurveyOperation.send(name);
 			token.addResponder(responder);
 		}
 		

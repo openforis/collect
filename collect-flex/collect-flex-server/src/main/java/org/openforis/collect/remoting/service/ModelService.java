@@ -34,8 +34,10 @@ public class ModelService {
 		return null;
 	}
 
-	public SurveyProxy getSurvey(String name) {
+	public SurveyProxy setActiveSurvey(String name) {
 		Survey survey = surveyManager.load(name);
+		SessionState sessionState = sessionManager.getSessionState();
+		sessionState.setActiveSurvey(survey);
 		SurveyProxy proxy = new SurveyProxy(survey);
 		return proxy;
 	}
