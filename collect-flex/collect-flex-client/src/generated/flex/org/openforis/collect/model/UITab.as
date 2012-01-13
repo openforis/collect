@@ -5,10 +5,10 @@
  * your custom code here.
  */
 
-package org.openforis.collect.metamodel.proxy {
+package org.openforis.collect.model {
 
     [Bindable]
-    [RemoteClass(alias="org.openforis.collect.metamodel.proxy.UITab")]
+    [RemoteClass(alias="org.openforis.collect.model.UITab")]
     public class UITab extends UITabBase {
     }
 }

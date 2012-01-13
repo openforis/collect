@@ -5,10 +5,10 @@
  * your custom code here.
  */
 
-package org.openforis.collect.metamodel.proxy {
+package org.openforis.collect.model {
 
     [Bindable]
-    [RemoteClass(alias="org.openforis.collect.metamodel.proxy.UIConfiguration")]
+    [RemoteClass(alias="org.openforis.collect.model.UIConfiguration")]
     public class UIConfiguration extends UIConfigurationBase {
     }
 }
