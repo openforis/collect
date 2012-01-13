@@ -72,22 +72,25 @@
 					</execution>
 				</executions>
 				<configuration>
-						<showWarnings>false</showWarnings>
-						<staticLinkRuntimeSharedLibraries>true</staticLinkRuntimeSharedLibraries>
-						<sourceDirectory>${basedir}/src/main/flex</sourceDirectory>
-						<sourceFile>collect.mxml</sourceFile>
-				
-						<resourceBundlePath>{basedir}/src/main/locales/{locale}</resourceBundlePath>
-						<mergeResourceBundle>true</mergeResourceBundle>
-						<locales>
-							<locale>en_US</locale>
-						</locales>
-						<localesCompiled>
-							<locale>en_US</locale>
-						</localesCompiled>
-						<includeResourceBundles>
-							<bundle>messages</bundle>
-						</includeResourceBundles>
+					<showWarnings>false</showWarnings>
+					<staticLinkRuntimeSharedLibraries>true</staticLinkRuntimeSharedLibraries>
+					<sourceDirectory>${basedir}/src/main/flex</sourceDirectory>
+					<sourceFile>collect.mxml</sourceFile>
+			
+					<resourceBundlePath>{basedir}/src/main/locales/{locale}</resourceBundlePath>
+					<mergeResourceBundle>true</mergeResourceBundle>
+					<locales>
+						<locale>en_US</locale>
+					</locales>
+					<localesCompiled>
+						<locale>en_US</locale>
+					</localesCompiled>
+					<includeResourceBundles>
+						<bundle>messages</bundle>
+					</includeResourceBundles>
+					<themes>
+						<filename>${project.build.outputDirectory}/dependencies/halo-${flex.framework.version}-theme.swc</filename>
+					</themes>
 				</configuration>
 				<dependencies>
 	                <dependency>
@@ -120,6 +123,23 @@
 					</execution>
 				</executions>
 			</plugin> 
+			<plugin>
+			    <groupId>org.apache.maven.plugins</groupId>
+			    <artifactId>maven-dependency-plugin</artifactId>
+			    <executions>
+			        <execution>
+			            <id>copy-theme-file</id>
+			            <phase>process-resources</phase>
+			            <goals>
+			                <goal>copy-dependencies</goal>
+			            </goals>
+			            <configuration>
+			                <outputDirectory>${project.build.outputDirectory}/dependencies</outputDirectory>
+			                <includeArtifactIds>halo</includeArtifactIds>
+			            </configuration>
+			        </execution>
+			    </executions>
+			</plugin>
 		</plugins>
 		<finalName>collect</finalName>
 	</build>
@@ -150,12 +170,18 @@
 			<scope>provided</scope>
 			<type>jar</type>
 		</dependency>
-
 		<dependency>
 			<groupId>com.adobe.flex.framework</groupId>
 			<artifactId>flex-framework</artifactId>
 			<version>${flex.framework.version}</version>
 			<type>pom</type>
+		</dependency>
+		<dependency>
+		    <groupId>com.adobe.flex.framework</groupId>
+		    <artifactId>halo</artifactId>
+		    <version>${flex.framework.version}</version>
+		    <classifier>theme</classifier>
+		    <type>swc</type>
 		</dependency>
 		<dependency>
             <groupId>org.graniteds</groupId>
