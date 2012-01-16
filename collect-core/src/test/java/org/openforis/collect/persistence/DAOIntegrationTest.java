@@ -175,9 +175,9 @@ public class DAOIntegrationTest {
 		EntityDefinition rootEntity = survey.getSchema().getRootEntityDefinitions().get(0);
 		int offset = 0;
 		int maxNumberOfRecords = 1;
-		String orderByFieldName = "id";
+		String orderByFieldName = "key_id";
 		String filter = null;
-		List<RecordSummary> list = this.recordDao.getRecordSummaries(rootEntity, offset, maxNumberOfRecords, orderByFieldName, filter);
+		List<RecordSummary> list = this.recordDao.loadRecordSummaries(rootEntity, offset, maxNumberOfRecords, orderByFieldName, filter);
 		assertNotNull(list);
 		assertEquals(1, list.size());
 		

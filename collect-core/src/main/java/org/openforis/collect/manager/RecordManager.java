@@ -68,7 +68,7 @@ public class RecordManager {
 	}
 	
 	public List<RecordSummary> getSummaries(EntityDefinition rootEntityDefinition, int offset, int maxNumberOfRecords, String orderByFieldName, String filter) {
-		List<RecordSummary> recordsSummary = recordDAO.getRecordSummaries(rootEntityDefinition, offset, maxNumberOfRecords, orderByFieldName, filter);
+		List<RecordSummary> recordsSummary = recordDAO.loadRecordSummaries(rootEntityDefinition, offset, maxNumberOfRecords, orderByFieldName, filter);
 		return recordsSummary;
 	}
 	
