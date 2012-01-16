@@ -9,8 +9,8 @@ package org.openforis.collect.i18n {
 		public function Message() {
 		}
 		
-		public static function get(resource:String, bundle:String="messages"):String {
-			return ResourceManager.getInstance().getString(bundle, resource);
+		public static function get(resource:String, parameters:Array=null, bundle:String="messages"):String {
+			return ResourceManager.getInstance().getString(bundle, resource,parameters);
 		} 
 	}
 }
