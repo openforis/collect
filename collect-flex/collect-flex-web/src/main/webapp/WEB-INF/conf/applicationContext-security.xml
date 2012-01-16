@@ -59,11 +59,10 @@
 	<b:bean id="roleHierarchy" class="org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl">
 		<b:property name="hierarchy">
 			<b:value>
-				ROLE_ADMIN > ROLE_ANALYST
-				ROLE_ANALYST > ROLE_CLEANSER
-				ROLE_CLEANSER > ROLE_EDITOR
-				ROLE_EDITOR > ROLE_USER
-				ROLE_USER > ROLE_GUEST
+				ROLE_ADMIN > ROLE_ANALYSIS
+				ROLE_ANALYSIS > ROLE_CLEANSING
+				ROLE_CLEANSING > ROLE_ENTRY
+				ROLE_ENTRY > ROLE_GUEST
 			</b:value>
 		</b:property>
 	</b:bean>
