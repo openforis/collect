@@ -43,10 +43,11 @@
 <!--     <global-method-security pre-post-annotations="enabled" /> -->
       
 	<http use-expressions="true">
-		<intercept-url pattern="/*" access="permitAll"/>
-<!-- 		<intercept-url pattern="/" access="isAuthenticated()" /> -->
-<!-- 		<intercept-url pattern="/index.htm" access="hasAnyRole('ROLE_ADMIN','ROLE_EDITOR','ROLE_USER')" /> -->
-<!-- 		<intercept-url pattern="/**/*.swf" access="hasAnyRole('ROLE_ADMIN','ROLE_EDITOR','ROLE_USER')" /> -->
+		<intercept-url pattern="/error.htm" access="permitAll"/>
+		<intercept-url pattern="/login.htm*" access="permitAll"/>
+		<intercept-url pattern="/*" access="isAuthenticated()" />
+		<intercept-url pattern="/index.htm" access="hasAnyRole('ROLE_ADMIN','ROLE_EDITOR','ROLE_USER')" />
+		<intercept-url pattern="/**/*.swf" access="hasAnyRole('ROLE_ADMIN','ROLE_EDITOR','ROLE_USER')" />
 <!-- 		<intercept-url pattern="/script/**" access="hasAnyRole('ROLE_ADMIN','ROLE_EDITOR','ROLE_USER')" /> -->
 <!-- 		<intercept-url pattern="/flash/**" access="hasAnyRole('ROLE_ADMIN','ROLE_EDITOR','ROLE_USER')" /> -->
 <!-- 		<intercept-url pattern="/messagebroker/*" access="hasAnyRole('ROLE_ADMIN','ROLE_EDITOR','ROLE_USER')" /> -->
@@ -61,22 +62,19 @@
 <!-- 		<intercept-url pattern="/exportData" 	access="hasAnyRole('ROLE_ADMIN','ROLE_EDITOR')"/> -->
 <!-- 		<intercept-url pattern="/backup/**" 	access="hasAnyRole('ROLE_ADMIN','ROLE_EDITOR')" /> -->
 		
-<!-- 		<intercept-url pattern="/error.htm" access="permitAll"/> -->
-<!-- 		<intercept-url pattern="/login.htm*" access="permitAll"/> -->
-		
 <!-- 		<intercept-url pattern="/**" access="denyAll" /> -->
 		
 		<form-login login-page="/login.htm" authentication-failure-url="/login.htm?login_error=1" />
         <http-basic/>
         <logout logout-success-url="/index.htm"/>
         <!-- remember-me /-->
-		
 	</http>
 	
     <authentication-manager alias="authManager">
-        <authentication-provider>
+        <authentication-provider user-service-ref="userDao">
         	<password-encoder hash="md5" />
-        	<user-service properties="/WEB-INF/conf/users.properties"/>
+<!--         	<user-service properties="/WEB-INF/conf/users.properties"/> -->
+<!-- 			<jdbc-user-service data-source-ref="dataSource"/> -->
         </authentication-provider>
     </authentication-manager>
     
