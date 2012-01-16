@@ -52,7 +52,7 @@ package org.openforis.collect.ui {
 			return formContainer;
 		}
 		
-		public static function generateRecordSummaryListColumns(rootEntity:EntityDefinitionProxy):IList {
+		public static function getRecordSummaryListColumns(rootEntity:EntityDefinitionProxy):IList {
 			var columns:IList = new ArrayList();
 			var column:GridColumn;
 			var nodeDef:NodeDefinitionProxy;

@@ -100,16 +100,16 @@ package org.openforis.collect.presenter {
 		
 		protected function updateDataGrid():void {
 			var rootEntity:EntityDefinitionProxy = Application.activeRootEntity;
-			var columns:IList = UIBuilder.generateRecordSummaryListColumns(rootEntity);
+			var columns:IList = UIBuilder.getRecordSummaryListColumns(rootEntity);
 			_view.dataGrid.columns = columns;
 		}
 		
 		protected function loadRecordSummariesCurrentPage():void {
 			//offset starts from 0
+			_view.paginationBar.currentPageText.text = new String(currentPage);
 			var offset:int = (currentPage - 1) * MAX_RECORDS_PER_PAGE;
 			
-			_dataClient.getRecordSummaries(new AsyncResponder(getRecordsSummaryResultHandler, faultHandler), 
-				Application.activeRootEntity.name, offset, MAX_RECORDS_PER_PAGE, null, null);
+			_dataClient.getRecordSummaries(new AsyncResponder(getRecordsSummaryResultHandler, faultHandler), Application.activeRootEntity.name, offset, MAX_RECORDS_PER_PAGE);
 		}
 		
 		protected function getRecordsSummaryResultHandler(event:ResultEvent, token:Object = null):void {
@@ -119,8 +119,8 @@ package org.openforis.collect.presenter {
 			totalPages = Math.ceil(totalRecords / MAX_RECORDS_PER_PAGE);
 			
 			//update pagination bar
-			_view.paginationBar.goToPageStepper.minimum = 1;
-			_view.paginationBar.goToPageStepper.maximum = totalPages;
+			//_view.paginationBar.goToPageStepper.minimum = 1;
+			//_view.paginationBar.goToPageStepper.maximum = totalPages;
 			//_view.paginationBar.totalRecordsText.text = String(totalRecords);
 			
 			//records from position is the indexFrom value + 1
@@ -152,7 +152,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function goToPageClickHandler(event:Event):void {
-			currentPage = _view.paginationBar.goToPageStepper.value;
+			//currentPage = _view.paginationBar.goToPageStepper.value;
 			loadRecordSummariesCurrentPage();
 		}
 		
