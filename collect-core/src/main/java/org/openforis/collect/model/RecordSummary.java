@@ -22,10 +22,12 @@ public class RecordSummary {
 	private int warningCount;
 	private int step;
 	private Map<String, String> rootEntityKeys;
+	private Map<String, Integer> entityCounts;
 
-	public RecordSummary(Integer id, Map<String, String> rootEntityKeys, int errorCount, int warningCount, String createdBy, Date creationDate, String modifiedBy, Date modifiedDate, int step) {
+	public RecordSummary(Integer id, Map<String, String> rootEntityKeys,  Map<String, Integer> entityCounts, int errorCount, int warningCount, String createdBy, Date creationDate, String modifiedBy, Date modifiedDate, int step) {
 		this.id = id;
 		this.rootEntityKeys = rootEntityKeys;
+		this.entityCounts = entityCounts;
 		this.errorCount = errorCount;
 		this.warningCount = warningCount;
 		this.createdBy = createdBy;
@@ -69,6 +71,10 @@ public class RecordSummary {
 
 	public Map<String, String> getRootEntityKeys() {
 		return rootEntityKeys;
+	}
+
+	public Map<String, Integer> getEntityCounts() {
+		return entityCounts;
 	}
 
 }

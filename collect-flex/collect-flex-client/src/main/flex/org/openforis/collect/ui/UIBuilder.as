@@ -10,6 +10,7 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.NodeLabelProxy;
+	import org.openforis.collect.metamodel.proxy.NodeLabelProxy$Type;
 	import org.openforis.collect.model.RecordSummary;
 	import org.openforis.collect.ui.component.datagroup.DataGroupItemRenderer;
 	import org.openforis.collect.ui.component.detail.EntityFormContainer;
@@ -61,18 +62,22 @@ package org.openforis.collect.ui {
 			for each(nodeDef in firstLevelDefs) {
 				if(nodeDef is AttributeDefinitionProxy && (nodeDef as AttributeDefinitionProxy).key) {
 					column = new GridColumn();
-					column.headerText = NodeLabelProxy(nodeDef.labels.getItemAt(0)).text;
+					column.headerText = NodeDefinitionProxy.getDefaultLabel(nodeDef.labels, NodeLabelProxy$Type.INSTANCE, "en");
 					column.labelFunction = recordSummariesKeyLabelFunction;
-					column.dataField = nodeDef.name;
+					column.dataField = "key" + nodeDef.name;
 					columns.addItem(column);
 				}
-			}		
+			}
 			for each(nodeDef in firstLevelDefs) {
 				if(nodeDef is EntityDefinitionProxy) {
-					column = new GridColumn();
-					column.headerText = NodeLabelProxy(nodeDef.labels.getItemAt(0)).text + " Count";
-					column.dataField = nodeDef.name + "Count";
-					columns.addItem(column);
+					var entityDef:EntityDefinitionProxy = EntityDefinitionProxy(nodeDef);
+					if(entityDef.countInSummaryList) {
+						column = new GridColumn();
+						column.headerText = "Count " + NodeDefinitionProxy.getDefaultLabel(entityDef.labels, NodeLabelProxy$Type.INSTANCE, "en");
+						column.dataField = "count_" + entityDef.name;
+						column.labelFunction = recordSummariesCountEntityLabelFunction;
+						columns.addItem(column);
+					}
 				}
 			}
 			
@@ -172,7 +177,15 @@ package org.openforis.collect.ui {
 		private static function recordSummariesKeyLabelFunction(item:Object, gridColumn:GridColumn):String {
 			var recordSummary:RecordSummary = item as RecordSummary;
 			var keys:IMap = recordSummary.rootEntityKeys;
-			return keys.get(gridColumn.dataField);
+			var key:String = gridColumn.dataField;
+			return String(keys.get(key));
+		}
+		
+		private static function recordSummariesCountEntityLabelFunction(item:Object, gridColumn:GridColumn):String {
+			var recordSummary:RecordSummary = item as RecordSummary;
+			var counts:IMap = recordSummary.entityCounts;
+			var key:String = gridColumn.dataField;
+			return String(counts.get(key));
 		}
 		
 	}
