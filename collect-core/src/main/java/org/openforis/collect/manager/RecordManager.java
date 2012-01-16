@@ -5,18 +5,17 @@ package org.openforis.collect.manager;
 
 import java.util.List;
 
-import org.openforis.collect.exception.AccessDeniedException;
-import org.openforis.collect.exception.DuplicateIdException;
-import org.openforis.collect.exception.InvalidIdException;
 import org.openforis.collect.exception.MultipleEditException;
-import org.openforis.collect.exception.NonexistentIdException;
-import org.openforis.collect.exception.RecordLockedException;
+import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.RecordSummary;
+import org.openforis.collect.model.User;
+import org.openforis.collect.persistence.AccessDeniedException;
+import org.openforis.collect.persistence.DuplicateIdException;
+import org.openforis.collect.persistence.InvalidIdException;
+import org.openforis.collect.persistence.NonexistentIdException;
 import org.openforis.collect.persistence.RecordDAO;
-import org.openforis.idm.metamodel.AttributeDefinition;
-import org.openforis.idm.metamodel.CodeAttributeDefinition;
+import org.openforis.collect.persistence.RecordLockedException;
 import org.openforis.idm.metamodel.EntityDefinition;
-import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.model.Record;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,9 +56,10 @@ public class RecordManager {
 	 * @param id
 	 * @return
 	 */
-	public Record checkout(String entityName, long id) throws RecordLockedException, MultipleEditException, NonexistentIdException, AccessDeniedException {
-		// TODO Auto-generated method stub
-		return null;
+	public CollectRecord checkout(Survey survey, User user, int recordId) throws RecordLockedException,  NonexistentIdException, AccessDeniedException {
+		CollectRecord record = recordDAO.load(survey, recordId);
+		recordDAO.lock(recordId, user);
+		return record;
 	}
 
 	public List<RecordSummary> getSummaries() {

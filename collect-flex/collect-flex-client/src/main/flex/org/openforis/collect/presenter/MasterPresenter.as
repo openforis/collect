@@ -56,8 +56,8 @@ package org.openforis.collect.presenter {
 		internal function recordSelectedHandler(uiEvent:UIEvent):void {
 			var record:RecordSummary = uiEvent.obj as RecordSummary;
 			var id:Number = record.id;
-			var entityName:String = Application.activeRootEntity.name;
-			_dataClient.loadRecord(new AsyncResponder(loadRecordResultHandler, faultHandler), entityName, id);
+			//var entityName:String = Application.activeRootEntity.name;
+			_dataClient.loadRecord(new AsyncResponder(loadRecordResultHandler, faultHandler), id);
 		}
 		
 		/**

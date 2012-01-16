@@ -17,6 +17,7 @@ import org.jooq.TableField;
 import org.jooq.impl.Factory;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.RecordSummary;
+import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.jooq.DataLoader;
 import org.openforis.collect.persistence.jooq.DataPersister;
 import org.openforis.idm.metamodel.AttributeDefinition;
@@ -42,7 +43,7 @@ public class RecordDAO extends CollectDAO {
 	}
 
 	@Transactional
-	public CollectRecord load(Survey survey, int recordId) throws DataInconsistencyException {
+	public CollectRecord load(Survey survey, int recordId) throws DataInconsistencyException, NonexistentIdException {
 		CollectRecord record = loadRecord(survey, recordId);
 		loadData(record);
 
@@ -77,9 +78,9 @@ public class RecordDAO extends CollectDAO {
 			if ("id".equals(orderByFieldName)) {
 				orderByField = RECORD.ID;
 			} else if ("createdBy".equals(orderByFieldName)) {
-				//orderByField = RECORD.CREATED_BY;
+				// orderByField = RECORD.CREATED_BY;
 			} else if ("modifiedBy".equals(orderByFieldName)) {
-				//orderByField = RECORD.MODIFIED_BY;
+				// orderByField = RECORD.MODIFIED_BY;
 			} else if ("creationDate".equals(orderByFieldName)) {
 				orderByField = RECORD.DATE_CREATED;
 			} else if ("modifiedDate".equals(orderByFieldName)) {
@@ -88,18 +89,17 @@ public class RecordDAO extends CollectDAO {
 		}
 
 		// TODO add filter to where conditions
-		List<Record> records = jf.select().from(RECORD)
-				.where(RECORD.ROOT_ENTITY_ID.equal(rootEntityDefinition.getId())).orderBy(orderByField).limit(offset, maxNumberOfRecords).fetch();
+		List<Record> records = jf.select().from(RECORD).where(RECORD.ROOT_ENTITY_ID.equal(rootEntityDefinition.getId())).orderBy(orderByField).limit(offset, maxNumberOfRecords).fetch();
 
 		List<RecordSummary> result = new ArrayList<RecordSummary>();
 		for (Record r : records) {
 			Integer id = r.getValueAsInteger(RECORD.ID);
-			String createdBy = null; //r.getValueAsString(RECORD.CREATED_BY);
+			String createdBy = null; // r.getValueAsString(RECORD.CREATED_BY);
 			Date dateCreated = r.getValueAsDate(RECORD.DATE_CREATED);
-			String modifiedBy = null; //r.getValueAsString(RECORD.MODIFIED_BY);
+			String modifiedBy = null; // r.getValueAsString(RECORD.MODIFIED_BY);
 			Date modifiedDate = r.getValueAsDate(RECORD.DATE_MODIFIED);
 			int step = r.getValueAsInteger(RECORD.STEP);
-			//TODO add errors and warnings count
+			// TODO add errors and warnings count
 			int warningCount = 0;
 			int errorCount = 0;
 			Map<String, String> keyAttributes = getKeyAttributes(jf, rootEntityDefinition, id);
@@ -108,13 +108,54 @@ public class RecordDAO extends CollectDAO {
 		}
 		return result;
 	}
-	
-	private CollectRecord loadRecord(Survey survey, int recordId) {
+
+	@Transactional
+	public void lock(Integer recordId, User user) throws RecordLockedException {
+		Factory jf = getJooqFactory();
+		Record selectResult = jf.select(RECORD.LOCKED_BY_ID, org.openforis.collect.persistence.jooq.tables.User.USER.USERNAME).from(RECORD)
+				.leftOuterJoin(org.openforis.collect.persistence.jooq.tables.User.USER).on(RECORD.LOCKED_BY_ID.equal(org.openforis.collect.persistence.jooq.tables.User.USER.ID))
+				.where(RECORD.ID.equal(recordId)).fetchOne();
+		Integer lockedById = selectResult.getValueAsInteger(RECORD.LOCKED_BY_ID);
+		if (lockedById == null || lockedById.equals(user.getId())) {
+			jf.update(RECORD).set(RECORD.LOCKED_BY_ID, user.getId()).where(RECORD.ID.equal(recordId)).execute();
+		} else {
+			String userName = selectResult.getValueAsString(org.openforis.collect.persistence.jooq.tables.User.USER.USERNAME);
+			throw new RecordLockedException("Record already locked", userName);
+		}
+
+	}
+
+	@Transactional
+	public void unlock(Integer recordId, User user) throws RecordLockedException {
+		Factory jf = getJooqFactory();
+		Record selectResult = jf.select(RECORD.LOCKED_BY_ID, org.openforis.collect.persistence.jooq.tables.User.USER.USERNAME).from(RECORD)
+				.leftOuterJoin(org.openforis.collect.persistence.jooq.tables.User.USER).on(RECORD.LOCKED_BY_ID.equal(org.openforis.collect.persistence.jooq.tables.User.USER.ID))
+				.where(RECORD.ID.equal(recordId)).fetchOne();
+		Integer lockedById = selectResult.getValueAsInteger(RECORD.LOCKED_BY_ID);
+		if (lockedById != null && lockedById.equals(user.getId())) {
+			jf.update(RECORD).set(RECORD.LOCKED_BY_ID, (Integer)null).where(RECORD.ID.equal(recordId)).execute();
+		} else {
+			String userName = selectResult.getValueAsString(org.openforis.collect.persistence.jooq.tables.User.USER.USERNAME);
+			throw new RecordLockedException("Record locked by another user", userName);
+		}
+	}
+
+	@Transactional
+	public void unlockAll() {
+		Factory jf = getJooqFactory();
+		jf.update(RECORD).set(RECORD.LOCKED_BY_ID, (Integer)null).execute();
+	}
+
+	private CollectRecord loadRecord(Survey survey, int recordId) throws NonexistentIdException {
 		Factory jf = getJooqFactory();
 		Record r = jf.select().from(RECORD).where(RECORD.ID.equal(recordId)).fetchOne();
 		int rootEntityId = r.getValueAsInteger(RECORD.ROOT_ENTITY_ID);
 		String version = r.getValueAsString(RECORD.MODEL_VERSION);
-
+		
+		Integer id = r.getValueAsInteger(RECORD.ID);
+		if(id==null){
+			throw new NonexistentIdException();
+		}
 		Schema schema = survey.getSchema();
 		NodeDefinition rootEntityDefn = schema.getById(rootEntityId);
 		if (rootEntityDefn == null) {
@@ -125,9 +166,9 @@ public class RecordDAO extends CollectDAO {
 		CollectRecord record = new CollectRecord(survey, rootEntityName, version);
 		record.setId(recordId);
 		record.setCreationDate(r.getValueAsDate(RECORD.DATE_CREATED));
-		//record.setCreatedBy(r.getValueAsString(RECORD.CREATED_BY));
+		// record.setCreatedBy(r.getValueAsString(RECORD.CREATED_BY));
 		record.setModifiedDate(r.getValueAsDate(RECORD.DATE_MODIFIED));
-		//record.setModifiedBy(r.getValueAsString(RECORD.MODIFIED_BY));
+		// record.setModifiedBy(r.getValueAsString(RECORD.MODIFIED_BY));
 
 		return record;
 	}
@@ -147,9 +188,9 @@ public class RecordDAO extends CollectDAO {
 		Factory jf = getJooqFactory();
 		int recordId = jf.nextval(RECORD_ID_SEQ).intValue();
 		jf.insertInto(RECORD).set(RECORD.ID, recordId).set(RECORD.ROOT_ENTITY_ID, rootEntityId).set(RECORD.DATE_CREATED, toTimestamp(record.getCreationDate()))
-				//.set(RECORD.CREATED_BY, record.getCreatedBy())
+		// .set(RECORD.CREATED_BY, record.getCreatedBy())
 				.set(RECORD.DATE_MODIFIED, toTimestamp(record.getModifiedDate()))
-				//.set(RECORD.MODIFIED_BY, record.getModifiedBy())
+				// .set(RECORD.MODIFIED_BY, record.getModifiedBy())
 				.set(RECORD.MODEL_VERSION, record.getVersion().getName()).set(RECORD.STEP, record.getStep().getStepNumber()).execute();
 		record.setId(recordId);
 	}
@@ -167,11 +208,10 @@ public class RecordDAO extends CollectDAO {
 		// Insert into SURVEY table
 		Factory jf = getJooqFactory();
 		jf.update(RECORD).set(RECORD.ROOT_ENTITY_ID, rootEntityId).set(RECORD.DATE_CREATED, toTimestamp(record.getCreationDate()))
-				//.set(RECORD.CREATED_BY, record.getCreatedBy())
+		// .set(RECORD.CREATED_BY, record.getCreatedBy())
 				.set(RECORD.DATE_MODIFIED, toTimestamp(record.getModifiedDate()))
-				//.set(RECORD.MODIFIED_BY, record.getModifiedBy())
-				.set(RECORD.MODEL_VERSION, record.getVersion().getName())
-				.set(RECORD.STEP, record.getStep().getStepNumber()).where(RECORD.ID.equal(recordId)).execute();
+				// .set(RECORD.MODIFIED_BY, record.getModifiedBy())
+				.set(RECORD.MODEL_VERSION, record.getVersion().getName()).set(RECORD.STEP, record.getStep().getStepNumber()).where(RECORD.ID.equal(recordId)).execute();
 	}
 
 	private void deleteData(int recordId) {
@@ -199,7 +239,7 @@ public class RecordDAO extends CollectDAO {
 	 * @param recordId
 	 * @return List of Map with name (attribute name) and value pairs
 	 */
-	
+
 	private Map<String, String> getKeyAttributes(Factory jf, EntityDefinition rootEntityDefinition, int recordId) {
 		Map<String, String> result = new HashMap<String, String>();
 		List<AttributeDefinition> keyAttributeDefinitions = rootEntityDefinition.getKeyAttributeDefinitions();
@@ -210,21 +250,18 @@ public class RecordDAO extends CollectDAO {
 			keyAttriuteDefinitionIds.add(attributeDefinitionId);
 			keyAttributeDefinitionsMap.put(attributeDefinitionId, attributeDefinition);
 		}
-		Result<Record> records = jf.select()
-				.from(DATA)
-				.where(DATA.RECORD_ID.equal(recordId).and(DATA.DEFINITION_ID.in(keyAttriuteDefinitionIds)))
-				.fetch();
+		Result<Record> records = jf.select().from(DATA).where(DATA.RECORD_ID.equal(recordId).and(DATA.DEFINITION_ID.in(keyAttriuteDefinitionIds))).fetch();
 		for (Record record : records) {
 			String value;
 			Object valueObj = null;
 			Integer attributeDefinitionId = record.getValueAsInteger(DATA.DEFINITION_ID);
 			AttributeDefinition attributeDefinition = keyAttributeDefinitionsMap.get(attributeDefinitionId);
-			if(attributeDefinition instanceof CodeAttributeDefinition || attributeDefinition instanceof TextAttributeDefinition) {
+			if (attributeDefinition instanceof CodeAttributeDefinition || attributeDefinition instanceof TextAttributeDefinition) {
 				valueObj = record.getValueAsString(DATA.TEXT1);
-			} else if(attributeDefinition instanceof NumberAttributeDefinition) {
+			} else if (attributeDefinition instanceof NumberAttributeDefinition) {
 				valueObj = record.getValueAsInteger(DATA.NUMBER1);
 			}
-			if(valueObj != null) {
+			if (valueObj != null) {
 				value = valueObj.toString();
 				result.put(attributeDefinition.getName(), value);
 			}

@@ -8,16 +8,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.openforis.collect.exception.AccessDeniedException;
-import org.openforis.collect.exception.DuplicateIdException;
-import org.openforis.collect.exception.InvalidIdException;
 import org.openforis.collect.exception.MultipleEditException;
-import org.openforis.collect.exception.NonexistentIdException;
-import org.openforis.collect.exception.RecordLockedException;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.RecordSummary;
+import org.openforis.collect.model.User;
+import org.openforis.collect.model.proxy.RecordProxy;
+import org.openforis.collect.persistence.AccessDeniedException;
+import org.openforis.collect.persistence.DuplicateIdException;
+import org.openforis.collect.persistence.InvalidIdException;
+import org.openforis.collect.persistence.NonexistentIdException;
+import org.openforis.collect.persistence.RecordLockedException;
 import org.openforis.collect.remoting.service.UpdateRequest.Method;
 import org.openforis.collect.session.SessionState;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
@@ -45,11 +47,14 @@ public class DataService {
 	@Autowired
 	private RecordManager recordManager;
 
-	public Record loadRecord(String entityName, long id) throws RecordLockedException, MultipleEditException, NonexistentIdException, AccessDeniedException {
-		Record record = recordManager.checkout(entityName, id);
+	public RecordProxy loadRecord(int id) throws RecordLockedException, MultipleEditException, NonexistentIdException, AccessDeniedException {
+		Survey survey = getActiveSurvey();
+		User user = getUserInSession();;
+		CollectRecord record = recordManager.checkout(survey, user , id);
 		sessionManager.setActiveRecord((CollectRecord) record);
-		return record;
+		return new RecordProxy(record);
 	}
+
 
 	public List<RecordSummary> getRecordSummaries() {
 		List<RecordSummary> list = recordManager.getSummaries();
@@ -62,7 +67,7 @@ public class DataService {
 	 * @param offset
 	 * @param toIndex
 	 * @param orderByFieldName
-	
+	 * 
 	 * @return map with "count" and "records" items
 	 */
 	public Map<String, Object> getRecordSummaries(String rootEntityName, int offset, int maxNumberOfRows, String orderByFieldName, String filter) {
@@ -196,9 +201,23 @@ public class DataService {
 		}
 		return null;
 	}
+	
+	private User getUserInSession() {
+		SessionState sessionState = getSessionManager().getSessionState();
+		User user = sessionState.getUser();
+		return user;
+	}
+
+	private Survey getActiveSurvey() {
+		SessionState sessionState = getSessionManager().getSessionState();
+		Survey activeSurvey = sessionState.getActiveSurvey();
+		return activeSurvey;
+	}
 
 	protected CollectRecord getActiveRecord() {
-		return this.sessionManager.getSessionState().getActiveRecord();
+		SessionState sessionState = getSessionManager().getSessionState();
+		CollectRecord activeRecord = sessionState.getActiveRecord();
+		return activeRecord;
 	}
 
 	protected SessionManager getSessionManager() {
@@ -208,4 +227,5 @@ public class DataService {
 	protected RecordManager getRecordManager() {
 		return recordManager;
 	}
+
 }

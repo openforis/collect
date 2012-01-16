@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.openforis.collect.exception;
+package org.openforis.collect.persistence;
 
 /**
  * @author M. Togna
