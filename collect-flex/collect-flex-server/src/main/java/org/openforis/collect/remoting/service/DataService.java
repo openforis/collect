@@ -49,7 +49,7 @@ public class DataService {
 
 	public RecordProxy loadRecord(int id) throws RecordLockedException, MultipleEditException, NonexistentIdException, AccessDeniedException {
 		Survey survey = getActiveSurvey();
-		User user = getUserInSession();;
+		User user = getUserInSession();
 		CollectRecord record = recordManager.checkout(survey, user , id);
 		sessionManager.setActiveRecord((CollectRecord) record);
 		return new RecordProxy(record);

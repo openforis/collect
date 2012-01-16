@@ -86,6 +86,7 @@
 
 	<bean id="recordManager" class="org.openforis.collect.manager.RecordManager" />
 
+	<bean id="userManager" class="org.openforis.collect.manager.UserManager" />
 	
 	<!-- ===================================== -->
 	<!-- Data Source -->
@@ -113,6 +114,10 @@
 	</bean>
 
 	<bean id="recordDao" class="org.openforis.collect.persistence.RecordDAO">
+    	<property name="dataSource" ref="dataSource"/>
+	</bean>
+	
+	<bean id="userDao" class="org.openforis.collect.persistence.UserDAO">
     	<property name="dataSource" ref="dataSource"/>
 	</bean>
 	

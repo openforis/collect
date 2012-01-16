@@ -13,8 +13,8 @@ public class User {
 	private List<String> roles;
 	private String name;
 
-	public User(String name) {
-		super();
+	public User(int id, String name) {
+		this.id = id;
 		this.name = name;
 	}
 

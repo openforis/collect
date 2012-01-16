@@ -14,14 +14,11 @@
 	
 	<s:Image source="{Images.FIRST}" width="16" height="16" useHandCursor="true" buttonMode="true" />
 	<s:Image source="{Images.PREV}" width="16" height="16" useHandCursor="true" buttonMode="true" />
-	<!--<s:Button id="firstPageButton" icon="{Images.FIRST}" width="16" height="16"  />
-	<s:Button id="previousPageButton" icon="{Images.PREV}"  />-->
-	<s:NumericStepper id="goToPageStepper" />
+	
+	<mx:Text fontSize="11" fontWeight="bold" id="currentPageText" />
+	
 	<s:Image source="{Images.NEXT}" width="16" height="16" useHandCursor="true" buttonMode="true" />
 	<s:Image source="{Images.LAST}" width="16" height="16" useHandCursor="true" buttonMode="true" />
-	<!--<s:Button id="goToPageButton" label="Go To Page" />-->
-	<!--<s:Button id="nextPageButton" icon="{Images.NEXT}" />
-	<s:Button id="lastPageButton" icon="{Images.LAST}" />-->
 	
 	<!--
 	<s:Label text="Records from:" />
