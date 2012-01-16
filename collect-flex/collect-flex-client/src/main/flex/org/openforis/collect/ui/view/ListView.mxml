@@ -34,7 +34,7 @@
 	</fx:Script>
 	
 	<s:layout>
-		<s:VerticalLayout />
+		<s:VerticalLayout horizontalAlign="center" gap="10" />
 	</s:layout>
 	
 	<s:states>
@@ -42,11 +42,11 @@
 		<s:State name="selection" />
 	</s:states>
 	
-	<datagrid:RecordSummaryDataGrid id="dataGrid" height="100%" width="100%" horizontalScrollPolicy="off" selectionMode="singleRow" doubleClickEnabled="true" />
+	<datagrid:RecordSummaryDataGrid id="dataGrid" height="95%" width="100%" horizontalScrollPolicy="off" selectionMode="singleRow" doubleClickEnabled="true" />
 	
-	<datagrid:PaginationBar id="paginationBar" />
+	<datagrid:PaginationBar id="paginationBar" height="16" />
 	
-	<s:HGroup id="controlsBar" width="100%" horizontalAlign="center">
+	<s:HGroup id="controlsBar" width="100%" horizontalAlign="center" verticalAlign="bottom" height="30">
 		<s:Button id="newRecordButton" label="{Message.get('list.newRecord')}" />
 		<s:Button id="editRecordButton" label="{Message.get('list.editRecord')}" />
 	</s:HGroup>
