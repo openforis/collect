@@ -6,8 +6,11 @@ package org.openforis.collect.metamodel.proxy;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.namespace.QName;
+
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.idm.metamodel.EntityDefinition;
+import org.openforis.idm.metamodel.NodeDefinition;
 
 /**
  * @author M. Togna
@@ -36,5 +39,12 @@ public class EntityDefinitionProxy extends NodeDefinitionProxy {
 	public List<NodeDefinitionProxy> getChildDefinitions() {
 		return NodeDefinitionProxy.fromList(entityDefinition.getChildDefinitions());
 	}
-
+	
+	@ExternalizedProperty
+	public boolean isCountInSummaryList() {
+		QName countInSummaryListAnnotation = new QName("http://www.openforis.org/collect/3.0/ui", "countInSummaryList");
+		String annotation = entityDefinition.getAnnotation(countInSummaryListAnnotation);
+		return annotation != null && Boolean.parseBoolean(annotation);
+	}
+	
 }
