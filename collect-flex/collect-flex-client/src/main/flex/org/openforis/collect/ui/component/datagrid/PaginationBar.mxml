@@ -3,21 +3,32 @@
 		 xmlns:s="library://ns.adobe.com/flex/spark" 
 		 xmlns:mx="library://ns.adobe.com/flex/mx">
 	<s:layout>
-		<s:HorizontalLayout verticalAlign="bottom"/>
+		<s:HorizontalLayout verticalAlign="middle" gap="10"/>
 	</s:layout>
 	
-	<s:Button id="previousPageButton" label="Previous Page" />
+	<fx:Script>
+		<![CDATA[
+			import org.openforis.collect.ui.Images;
+		]]>
+	</fx:Script>
 	
+	<s:Image source="{Images.FIRST}" width="16" height="16" useHandCursor="true" buttonMode="true" />
+	<s:Image source="{Images.PREV}" width="16" height="16" useHandCursor="true" buttonMode="true" />
+	<!--<s:Button id="firstPageButton" icon="{Images.FIRST}" width="16" height="16"  />
+	<s:Button id="previousPageButton" icon="{Images.PREV}"  />-->
 	<s:NumericStepper id="goToPageStepper" />
-	<s:Button id="goToPageButton" label="Go To Page" />
+	<s:Image source="{Images.NEXT}" width="16" height="16" useHandCursor="true" buttonMode="true" />
+	<s:Image source="{Images.LAST}" width="16" height="16" useHandCursor="true" buttonMode="true" />
+	<!--<s:Button id="goToPageButton" label="Go To Page" />-->
+	<!--<s:Button id="nextPageButton" icon="{Images.NEXT}" />
+	<s:Button id="lastPageButton" icon="{Images.LAST}" />-->
 	
-	<s:Button id="nextPageButton" label="Next Page" />
-	
+	<!--
 	<s:Label text="Records from:" />
 	<s:Label id="recordsFromText" />
 	<s:Label text="to:" />
 	<s:Label id="recordsToText" />
 	<s:Label text="Total Records:" />
 	<s:Label id="totalRecordsText" />
-	
+	-->
 </s:Group>

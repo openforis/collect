@@ -72,9 +72,9 @@ package org.openforis.collect.presenter {
 			eventDispatcher.addEventListener(UIEvent.LOAD_RECORD_SUMMARIES, loadRecordSummariesHandler);
 
 			this._view.newRecordButton.addEventListener(MouseEvent.CLICK, newRecordButtonClickHandler);
-			this._view.paginationBar.previousPageButton.addEventListener(MouseEvent.CLICK, previousPageClickHandler);
-			this._view.paginationBar.nextPageButton.addEventListener(MouseEvent.CLICK, nextPageClickHandler);
-			this._view.paginationBar.goToPageButton.addEventListener(MouseEvent.CLICK, goToPageClickHandler);
+			//this._view.paginationBar.previousPageButton.addEventListener(MouseEvent.CLICK, previousPageClickHandler);
+			//this._view.paginationBar.nextPageButton.addEventListener(MouseEvent.CLICK, nextPageClickHandler);
+			//this._view.paginationBar.goToPageButton.addEventListener(MouseEvent.CLICK, goToPageClickHandler);
 		}
 	
 		/**
@@ -121,13 +121,13 @@ package org.openforis.collect.presenter {
 			//update pagination bar
 			_view.paginationBar.goToPageStepper.minimum = 1;
 			_view.paginationBar.goToPageStepper.maximum = totalPages;
-			_view.paginationBar.totalRecordsText.text = String(totalRecords);
+			//_view.paginationBar.totalRecordsText.text = String(totalRecords);
 			
 			//records from position is the indexFrom value + 1
 			var recordsFromPosition:int = ((currentPage - 1) * MAX_RECORDS_PER_PAGE) + 1;
 			var recordsToPosition:int = recordsFromPosition + records.length - 1;
-			_view.paginationBar.recordsFromText.text = String(recordsFromPosition);
-			_view.paginationBar.recordsToText.text = String(recordsToPosition);
+			//_view.paginationBar.recordsFromText.text = String(recordsFromPosition);
+			//_view.paginationBar.recordsToText.text = String(recordsToPosition);
 			
 			//update datagrid dataprovider
 			_view.dataGrid.dataProvider = records;

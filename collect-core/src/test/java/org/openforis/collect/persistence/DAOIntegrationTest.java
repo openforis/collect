@@ -59,7 +59,7 @@ public class DAOIntegrationTest {
 	}
 	
 	@Test
-	public void testCRUD() throws IOException, SurveyImportException, DataInconsistencyException, InvalidIdmlException  {
+	public void testCRUD() throws IOException, SurveyImportException, DataInconsistencyException, InvalidIdmlException, NonexistentIdException  {
 		// LOAD MODEL
 		Survey survey = surveyDao.load("archenland1");
 

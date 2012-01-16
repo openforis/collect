@@ -47,8 +47,8 @@ package org.openforis.collect.client {
 			token.addResponder(responder);
 		}
 		
-		public function loadRecord(responder:IResponder, entityName:String, id:int):void {
-			var token:AsyncToken = this._loadRecordOperation.send(entityName, id);
+		public function loadRecord(responder:IResponder, id:int):void {
+			var token:AsyncToken = this._loadRecordOperation.send(id);
 			token.addResponder(responder);
 		}
 	//	public function update(responder:IResponder, request:UpdateRequest):void {
