@@ -34,6 +34,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.ui.view.ListView;
 	
 	import spark.components.gridClasses.GridColumn;
+	import spark.events.GridSortEvent;
 	import spark.formatters.DateTimeFormatter;
 
 
@@ -57,6 +58,9 @@ package org.openforis.collect.presenter {
 		 * It starts from 1 
 		 */
 		private var currentPage:int;
+		
+		private var currentOrderByFieldName:String;
+		
 		/**
 		 * Max number of records that can be loaded for a single page.
 		 */
@@ -72,6 +76,8 @@ package org.openforis.collect.presenter {
 			eventDispatcher.addEventListener(UIEvent.LOAD_RECORD_SUMMARIES, loadRecordSummariesHandler);
 
 			this._view.newRecordButton.addEventListener(MouseEvent.CLICK, newRecordButtonClickHandler);
+			
+			this._view.dataGrid.addEventListener(GridSortEvent.SORT_CHANGING, dataGridSortChangingHandler);
 			//this._view.paginationBar.previousPageButton.addEventListener(MouseEvent.CLICK, previousPageClickHandler);
 			//this._view.paginationBar.nextPageButton.addEventListener(MouseEvent.CLICK, nextPageClickHandler);
 			//this._view.paginationBar.goToPageButton.addEventListener(MouseEvent.CLICK, goToPageClickHandler);
@@ -156,5 +162,8 @@ package org.openforis.collect.presenter {
 			loadRecordSummariesCurrentPage();
 		}
 		
+		protected function dataGridSortChangingHandler(event:GridSortEvent):void {
+			var newSortFields:Array = event.newSortFields;
+		}
 	}
 }
