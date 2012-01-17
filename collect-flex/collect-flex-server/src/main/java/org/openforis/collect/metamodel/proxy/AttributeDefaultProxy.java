@@ -7,13 +7,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
+import org.openforis.collect.Proxy;
 import org.openforis.idm.metamodel.AttributeDefault;
 
 /**
  * @author M. Togna
  * 
  */
-public class AttributeDefaultProxy implements ProxyBase {
+public class AttributeDefaultProxy implements Proxy {
 
 	private transient AttributeDefault attributeDefault;
 

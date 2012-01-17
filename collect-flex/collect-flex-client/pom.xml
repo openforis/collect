@@ -57,6 +57,7 @@
 								<includeClass>org.openforis.collect.model.UIConfiguration</includeClass>
 								<includeClass>org.openforis.collect.metamodel.proxy.*</includeClass>
 								<includeClass>org.openforis.collect.model.proxy.*</includeClass>
+								<includeClass>org.openforis.collect.Proxy</includeClass>
 							</includeJavaClasses>
 						</configuration>
 					</execution>

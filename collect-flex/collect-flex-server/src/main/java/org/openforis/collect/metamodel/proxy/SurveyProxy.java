@@ -5,11 +5,12 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
+import org.openforis.collect.Proxy;
 import org.openforis.collect.model.UIConfiguration;
 import org.openforis.idm.metamodel.Configuration;
 import org.openforis.idm.metamodel.Survey;
 
-public class SurveyProxy implements ProxyBase {
+public class SurveyProxy implements Proxy {
 
 	private static Log LOG = LogFactory.getLog(SurveyProxy.class);
 

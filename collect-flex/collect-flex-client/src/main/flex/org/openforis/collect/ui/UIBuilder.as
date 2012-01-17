@@ -28,7 +28,7 @@ package org.openforis.collect.ui {
 	public class UIBuilder {
 		
 		//TODO: use entityDescriptor
-		public static function generateDetailPageForms(parentContainer:Container, entityDescriptor:*, version:*):FormContainer {
+		public static function generateEditForms(parentContainer:Container, entityDescriptor:*, version:*):FormContainer {
 			//foreach version
 				var formContainer:FormContainer = new FormContainer();
 				formContainer.version = null;

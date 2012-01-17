@@ -10,6 +10,7 @@ import java.util.Set;
 import javax.xml.namespace.QName;
 
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
+import org.openforis.collect.Proxy;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -18,7 +19,7 @@ import org.openforis.idm.metamodel.NodeDefinition;
  * @author M. Togna
  * 
  */
-public class NodeDefinitionProxy implements ProxyBase {
+public class NodeDefinitionProxy implements Proxy {
 
 	private transient NodeDefinition nodeDefinition;
 

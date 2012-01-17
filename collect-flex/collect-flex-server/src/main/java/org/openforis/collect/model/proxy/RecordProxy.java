@@ -6,6 +6,7 @@ package org.openforis.collect.model.proxy;
 import java.util.Date;
 
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
+import org.openforis.collect.Proxy;
 import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
 import org.openforis.collect.model.CollectRecord;
 
@@ -13,7 +14,7 @@ import org.openforis.collect.model.CollectRecord;
  * @author M. Togna
  * 
  */
-public class RecordProxy implements ModelProxy {
+public class RecordProxy implements Proxy {
 	public enum Step {
 		ENTRY(1), CLEANSING(2), ANALYSIS(3);
 

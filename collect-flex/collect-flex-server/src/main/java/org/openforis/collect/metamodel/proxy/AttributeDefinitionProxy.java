@@ -6,6 +6,7 @@ package org.openforis.collect.metamodel.proxy;
 import java.util.List;
 
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
+import org.openforis.collect.Proxy;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.KeyAttributeDefinition;
 
@@ -13,7 +14,7 @@ import org.openforis.idm.metamodel.KeyAttributeDefinition;
  * @author M. Togna
  * 
  */
-public class AttributeDefinitionProxy extends NodeDefinitionProxy implements ProxyBase {
+public class AttributeDefinitionProxy extends NodeDefinitionProxy implements Proxy {
 
 	private transient AttributeDefinition attributeDefinition;
 
