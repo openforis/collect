@@ -25,10 +25,15 @@
 		<s:VerticalLayout gap="5" />
 	</s:layout>
 	
-	<s:HGroup id="header" width="100%" height="10%" gap="10">
+	<s:HGroup id="header" width="100%" height="10%" gap="0">
 		<!-- Record id, form version, save msg, etc.. -->
-		<s:HGroup width="50%">
+		<s:HGroup width="50%" gap="10" verticalAlign="middle">
 			<s:Button useHandCursor="true" buttonMode="true" id="backToListButton" icon="{Images.BACK}" label="{Message.get('edit.backToList')}"  />
+			<s:Line yFrom="0" yTo="18" xFrom="1" xTo="0">
+				<s:stroke>
+					<s:SolidColorStroke color="gray" alpha="0.8"/>
+				</s:stroke>
+			</s:Line>
 			<mx:Text id="rootEntityDefinitionText" fontSize="13" fontWeight="bold" />
 			<mx:Text id="keyAttributeValuesText" fontSize="13" fontWeight="bold" />
 		</s:HGroup>
