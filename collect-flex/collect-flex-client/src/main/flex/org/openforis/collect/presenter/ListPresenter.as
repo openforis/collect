@@ -118,8 +118,10 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function loadRecordSummariesCurrentPage():void {
-			//offset starts from 0
 			_view.paginationBar.currentPageText.text = new String(currentPage);
+			_view.paginationBar.currentState = PaginationBar.LOADING_STATE;
+			
+			//offset starts from 0
 			var offset:int = (currentPage - 1) * MAX_RECORDS_PER_PAGE;
 			
 			_dataClient.getRecordSummaries(new AsyncResponder(getRecordsSummaryResultHandler, faultHandler), Application.activeRootEntity.name, 
@@ -142,7 +144,7 @@ package org.openforis.collect.presenter {
 			var recordsToPosition:int = recordsFromPosition + _view.dataGrid.dataProvider.length - 1;
 			
 			//calculate pagination bar state
-			if(totalPages == 0) {
+			if(totalRecords == 0) {
 				//no records found
 				_view.paginationBar.currentState = PaginationBar.NO_PAGES_STATE;
 			} else if(totalPages == 1) {
