@@ -29,7 +29,7 @@ public class SessionManager {
 
 	@Autowired
 	private UserManager userManager;
-	
+
 	public SessionState getSessionState() {
 		SessionState sessionState = (SessionState) getSessionAttribute(SESSION_STATE_SESSION_ATTRIBUTE_NAME);
 		if (sessionState == null) {
@@ -75,29 +75,41 @@ public class SessionManager {
 		SessionState sessionState = getSessionState();
 		sessionState.setLocale(locale);
 	}
-	
+
 	private User getLoggedInUser() {
 		SessionState sessionState = (SessionState) getSessionAttribute(SESSION_STATE_SESSION_ATTRIBUTE_NAME);
-		User user = sessionState.getUser();
-		if (user == null) {
-			Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-			String name = authentication.getName();
-			Integer userId =userManager.getUserId(name);
-			user = new User(userId, name);
-			Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
-			for (GrantedAuthority grantedAuthority : authorities) {
-				user.addAuthority(grantedAuthority.getAuthority());
+		if (sessionState != null) {
+			User user = sessionState.getUser();
+			if (user == null) {
+				Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+				String name = authentication.getName();
+				Integer userId = userManager.getUserId(name);
+				user = new User(userId, name);
+				Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+				for (GrantedAuthority grantedAuthority : authorities) {
+					user.addAuthority(grantedAuthority.getAuthority());
+				}
 			}
+			return user;
+		} else {
+			return null;
 		}
-		return user;
 	}
 
 	private Object getSessionAttribute(String attributeName) {
-		Object result = GraniteContext.getCurrentInstance().getSessionMap().get(attributeName);
-		return result;
+		GraniteContext graniteContext = GraniteContext.getCurrentInstance();
+		if (graniteContext != null) {
+			Object result = graniteContext.getSessionMap().get(attributeName);
+			return result;
+		} else {
+			return null;
+		}
 	}
 
 	private void setSessionAttribute(String attributeName, Object value) {
-		GraniteContext.getCurrentInstance().getSessionMap().put(attributeName, value);
+		GraniteContext graniteContext = GraniteContext.getCurrentInstance();
+		if (graniteContext != null) {
+			graniteContext.getSessionMap().put(attributeName, value);
+		}
 	}
 }

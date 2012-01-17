@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:security="http://www.springframework.org/schema/security" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:context="http://www.springframework.org/schema/context" xmlns:p="http://www.springframework.org/schema/p" xmlns:util="http://www.springframework.org/schema/util"
+<beans 
+	xmlns="http://www.springframework.org/schema/beans" 
+	xmlns:security="http://www.springframework.org/schema/security" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context" 
+	xmlns:p="http://www.springframework.org/schema/p" 
+	xmlns:util="http://www.springframework.org/schema/util"
+    xmlns:tx="http://www.springframework.org/schema/tx"
 	xsi:schemaLocation="
     http://www.springframework.org/schema/beans
     http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
@@ -9,7 +15,9 @@
     http://www.springframework.org/schema/context
     http://www.springframework.org/schema/context/spring-context-3.0.xsd
     http://www.springframework.org/schema/util
-    http://www.springframework.org/schema/util/spring-util-3.0.xsd"
+    http://www.springframework.org/schema/util/spring-util-3.0.xsd
+    http://www.springframework.org/schema/tx 
+    http://www.springframework.org/schema/tx/spring-tx-3.0.xsd"
 	default-lazy-init="true">
 
 	<context:annotation-config />
@@ -84,7 +92,7 @@
 
 	<bean id="surveyManager" class="org.openforis.collect.manager.SurveyManager" init-method="init" />
 
-	<bean id="recordManager" class="org.openforis.collect.manager.RecordManager" />
+	<bean id="recordManager" class="org.openforis.collect.manager.RecordManager" init-method="init" />
 
 	<bean id="userManager" class="org.openforis.collect.manager.UserManager" />
 	
@@ -105,6 +113,8 @@
     <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
     	<property name="dataSource" ref="dataSource"/>
     </bean>
+    
+    <tx:annotation-driven transaction-manager="transactionManager" proxy-target-class="true" />
     
     <!-- ===================================== -->
 	<!-- DAOs -->

@@ -19,6 +19,7 @@ import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.model.Record;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author M. Togna
@@ -28,22 +29,30 @@ public class RecordManager {
 
 	@Autowired
 	private RecordDAO recordDAO;
-	
+
+	protected void init() {
+		unlockAll();
+	}
+
+	@Transactional
 	public Record create(Survey survey, String entityName) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
+	@Transactional
 	public Record load(String entityName, long id) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
+	@Transactional
 	public void save(Record record) {
 		// TODO Auto-generated method stub
 
 	}
 
+	@Transactional
 	public void delete(String entityName, long id) {
 		// TODO Auto-generated method stub
 
@@ -56,49 +65,64 @@ public class RecordManager {
 	 * @param id
 	 * @return
 	 */
-	public CollectRecord checkout(Survey survey, User user, int recordId) throws RecordLockedException,  NonexistentIdException, AccessDeniedException {
+	@Transactional
+	public CollectRecord checkout(Survey survey, User user, int recordId) throws RecordLockedException, NonexistentIdException, AccessDeniedException {
 		CollectRecord record = recordDAO.load(survey, recordId);
 		recordDAO.lock(recordId, user);
 		return record;
 	}
 
+	@Transactional
 	public List<RecordSummary> getSummaries() {
 		// TODO implement getRecordSummaries
 		return null;
 	}
-	
+
+	@Transactional
 	public List<RecordSummary> getSummaries(EntityDefinition rootEntityDefinition, int offset, int maxNumberOfRecords, String orderByFieldName, String filter) {
 		List<RecordSummary> recordsSummary = recordDAO.loadRecordSummaries(rootEntityDefinition, offset, maxNumberOfRecords, orderByFieldName, filter);
 		return recordsSummary;
 	}
-	
+
+	@Transactional
 	public int getCountRecords(EntityDefinition rootEntityDefinition, String filter) {
 		int count = recordDAO.getCountRecords(rootEntityDefinition, filter);
 		return count;
 	}
 
+	@Transactional
 	public Record create(String name, Survey survey, String rootEntityId) throws MultipleEditException, DuplicateIdException, InvalidIdException, DuplicateIdException, AccessDeniedException,
 			RecordLockedException {
 		// TODO
 		return null;
 	}
 
+	@Transactional
 	public void lock(Record record) {
 
 	}
 
+	@Transactional
 	public void unlock(Record record) {
 
 	}
 
+	@Transactional
+	public void unlockAll() {
+		recordDAO.unlockAll();
+	}
+
+	@Transactional
 	public void updateRootEntityKey(String recordId, String newRootEntityKey) throws DuplicateIdException, InvalidIdException, NonexistentIdException, AccessDeniedException, RecordLockedException {
 
 	}
 
+	@Transactional
 	public void promote(String recordId) throws InvalidIdException, MultipleEditException, NonexistentIdException, AccessDeniedException, RecordLockedException {
 	}
 
+	@Transactional
 	public void demote(String recordId) throws InvalidIdException, MultipleEditException, NonexistentIdException, AccessDeniedException, RecordLockedException {
 	}
-	
+
 }

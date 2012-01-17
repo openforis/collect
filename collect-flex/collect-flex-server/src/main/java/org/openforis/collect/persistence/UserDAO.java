@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.jooq.Field;
 import org.jooq.Record;
 import org.jooq.Result;
 import org.jooq.impl.Factory;
@@ -17,6 +16,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author M. Togna
@@ -25,6 +25,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 public class UserDAO extends CollectDAO implements UserDetailsService {
 
 	@Override
+	@Transactional
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
 		Factory factory = getJooqFactory();
@@ -47,6 +48,7 @@ public class UserDAO extends CollectDAO implements UserDetailsService {
 		}
 	}
 
+	@Transactional
 	public int getUserId(String username) {
 		Factory jooqFactory = getJooqFactory();
 		Record record = jooqFactory.select(User.USER.ID).from(User.USER).where(User.USER.USERNAME.equal(username)).fetchOne();

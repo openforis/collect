@@ -35,6 +35,7 @@ import org.openforis.idm.model.Code;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.Record;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author M. Togna
@@ -47,6 +48,7 @@ public class DataService {
 	@Autowired
 	private RecordManager recordManager;
 
+	@Transactional
 	public RecordProxy loadRecord(int id) throws RecordLockedException, MultipleEditException, NonexistentIdException, AccessDeniedException {
 		Survey survey = getActiveSurvey();
 		User user = getUserInSession();
@@ -55,7 +57,7 @@ public class DataService {
 		return new RecordProxy(record);
 	}
 
-
+	@Transactional
 	public List<RecordSummary> getRecordSummaries() {
 		List<RecordSummary> list = recordManager.getSummaries();
 		return list;
@@ -70,6 +72,7 @@ public class DataService {
 	 * 
 	 * @return map with "count" and "records" items
 	 */
+	@Transactional
 	public Map<String, Object> getRecordSummaries(String rootEntityName, int offset, int maxNumberOfRows, String orderByFieldName, String filter) {
 		Map<String, Object> result = new HashMap<String, Object>();
 		SessionState sessionState = sessionManager.getSessionState();
@@ -82,18 +85,18 @@ public class DataService {
 		result.put("records", list);
 		return result;
 	}
-
+	@Transactional
 	public Record newRecord(String name, Survey survey, String rootEntityId) throws MultipleEditException, DuplicateIdException, InvalidIdException, DuplicateIdException, AccessDeniedException,
 			RecordLockedException {
 		Record record = recordManager.create(name, survey, rootEntityId);
 		return record;
 	}
-
+	@Transactional
 	public void saveActiveRecord() {
 		Record record = this.sessionManager.getSessionState().getActiveRecord();
 		recordManager.save(record);
 	}
-
+	@Transactional
 	public void deleteActiveRecord() {
 		Record record = this.sessionManager.getSessionState().getActiveRecord();
 		recordManager.delete(record.getRootEntity().getName(), record.getId());
@@ -118,11 +121,11 @@ public class DataService {
 		}
 		return null;
 	}
-
+	@Transactional
 	public void promote(String recordId) throws InvalidIdException, MultipleEditException, NonexistentIdException, AccessDeniedException, RecordLockedException {
 		this.recordManager.promote(recordId);
 	}
-
+	@Transactional
 	public void demote(String recordId) throws InvalidIdException, MultipleEditException, NonexistentIdException, AccessDeniedException, RecordLockedException {
 		this.recordManager.demote(recordId);
 	}
