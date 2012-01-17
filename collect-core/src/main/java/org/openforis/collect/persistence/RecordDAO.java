@@ -68,8 +68,6 @@ public class RecordDAO extends CollectDAO {
 		List<RecordSummary> result = recordSummaryLoader.load(rootEntityDefinition, offset, maxNumberOfRecords, orderByFieldName, filter);
 		return result;
 	}
-	
-	
 
 	@Transactional
 	public void lock(Integer recordId, User user) throws RecordLockedException {
