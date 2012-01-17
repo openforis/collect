@@ -4,10 +4,7 @@ import static org.openforis.collect.persistence.jooq.Sequences.RECORD_ID_SEQ;
 import static org.openforis.collect.persistence.jooq.tables.Data.DATA;
 import static org.openforis.collect.persistence.jooq.tables.Record.RECORD;
 
-import java.util.ArrayList;
 import java.util.List;
-
-import javax.xml.namespace.QName;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -20,7 +17,6 @@ import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.jooq.DataLoader;
 import org.openforis.collect.persistence.jooq.DataPersister;
 import org.openforis.collect.persistence.jooq.RecordSummaryQueryBuilder;
-import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Schema;
@@ -36,8 +32,6 @@ import org.springframework.transaction.annotation.Transactional;
  */
 public class RecordDAO extends CollectDAO {
 	private final Log LOG = LogFactory.getLog(RecordDAO.class);
-	
-	private static final QName COUNT_IN_SUMMARY_LIST_ANNOTATION = new QName("http://www.openforis.org/collect/3.0/ui", "countInSummaryList");
 	
 	public RecordDAO() {
 	}
@@ -72,16 +66,13 @@ public class RecordDAO extends CollectDAO {
 	public List<RecordSummary> loadRecordSummaries(EntityDefinition rootEntityDefinition, int offset, int maxNumberOfRecords, String orderByFieldName, String filter) {
 		Factory jf = getJooqFactory();
 		
-		List<AttributeDefinition> keyAttributeDefinitions = rootEntityDefinition.getKeyAttributeDefinitions();
-		List<EntityDefinition> countInSummaryListEntityDefs = getCountInSummaryListEntityDefinitions(rootEntityDefinition);
+		RecordSummaryQueryBuilder recordSummaryLoader = new RecordSummaryQueryBuilder(jf, rootEntityDefinition);
 		
-		RecordSummaryQueryBuilder recordSummaryLoader = new RecordSummaryQueryBuilder(jf);
-		
-		SelectQuery selectQuery = recordSummaryLoader.buildSelect(rootEntityDefinition, keyAttributeDefinitions, countInSummaryListEntityDefs, offset, maxNumberOfRecords, orderByFieldName, filter);
+		SelectQuery selectQuery = recordSummaryLoader.buildSelect(offset, maxNumberOfRecords, orderByFieldName, filter);
 		
 		List<Record> records = selectQuery.fetch();
 
-		List<RecordSummary> result = RecordSummaryQueryBuilder.parseResult(records, keyAttributeDefinitions, countInSummaryListEntityDefs);
+		List<RecordSummary> result = recordSummaryLoader.parseResult(records);
 		
 		if(LOG.isDebugEnabled()) {
 			String sql = selectQuery.getSQL();
@@ -213,26 +204,5 @@ public class RecordDAO extends CollectDAO {
 			}
 		});
 	}
-	
-	/**
-	 * 
-	 * @param rootEntityDefinition
-	 * @return first level entity definitions of the passed root entity that have the attribute countInSummaryList set to true
-	 */
-	private static List<EntityDefinition> getCountInSummaryListEntityDefinitions(EntityDefinition rootEntityDefinition) {
-		List<EntityDefinition> result = new ArrayList<EntityDefinition>();
-		List<NodeDefinition> childDefinitions = rootEntityDefinition.getChildDefinitions();
-		for (NodeDefinition childDefinition : childDefinitions) {
-			if(childDefinition instanceof EntityDefinition) {
-				EntityDefinition entityDefinition = (EntityDefinition) childDefinition;
-				String annotation = childDefinition.getAnnotation(COUNT_IN_SUMMARY_LIST_ANNOTATION);
-				if(annotation != null && Boolean.parseBoolean(annotation)) {
-					result.add(entityDefinition);
-				}
-			}
-		}
-		return result;
-	}
-	
 	
 }

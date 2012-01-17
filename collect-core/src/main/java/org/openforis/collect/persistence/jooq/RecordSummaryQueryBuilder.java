@@ -13,6 +13,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.namespace.QName;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jooq.Field;
@@ -38,11 +40,16 @@ public class RecordSummaryQueryBuilder {
 	private final Log LOG = LogFactory.getLog(RecordSummaryQueryBuilder.class);
 	
 	private Factory jooqFactory;
+	private EntityDefinition rootEntityDefinition;
+	private List<AttributeDefinition> keyAttributeDefinitions; 
+	private List<EntityDefinition> countInSummaryListEntityDefs;
 	
+	private static final QName COUNT_IN_SUMMARY_LIST_ANNOTATION = new QName("http://www.openforis.org/collect/3.0/ui", "countInSummaryList");
+
 	private static final String USER_TABLE_CREATED_BY_ALIAS = "user_created_by";
 	private static final String USER_TABLE_MODIFIED_BY_ALIAS = "user_modified_by";
 	private static final String COUNT_COLUMN_ALIAS_PREFIX = "count_";
-	private static final String KEY_COLUMN_ALIAS_PREFIX = "count_";
+	private static final String KEY_COLUMN_ALIAS_PREFIX = "key_";
 	
 	private static final String ORDER_BY_CREATED_BY_FIELD_NAME = "createdBy";
 	private static final String ORDER_BY_MODIFIED_BY_FIELD_NAME = "createdBy";
@@ -50,9 +57,13 @@ public class RecordSummaryQueryBuilder {
 	private static final String ORDER_BY_DATE_CREATED_FIELD_NAME = "creationDate";
 	
 	
-	public RecordSummaryQueryBuilder(Factory jooqFactory) {
+	public RecordSummaryQueryBuilder(Factory jooqFactory, EntityDefinition rootEntityDefinition) {
 		super();
 		this.jooqFactory = jooqFactory;
+		this.rootEntityDefinition = rootEntityDefinition;
+		
+		keyAttributeDefinitions = rootEntityDefinition.getKeyAttributeDefinitions();
+		countInSummaryListEntityDefs = getCountInSummaryListEntityDefinitions(rootEntityDefinition);
 	}
 	
 	/**
@@ -74,7 +85,7 @@ public class RecordSummaryQueryBuilder {
 	 * - user created by and modified by info
 	 *  
 	 */
-	public SelectQuery buildSelect(EntityDefinition rootEntityDefinition, List<AttributeDefinition> keyAttributeDefinitions, List<EntityDefinition> countInSummaryListEntityDefs, int offset, int maxNumberOfRecords, String orderByFieldName, String filter) {
+	public SelectQuery buildSelect(int offset, int maxNumberOfRecords, String orderByFieldName, String filter) {
 		//CREATE SELECT QUERY
 		SelectQuery selectQuery = jooqFactory.selectQuery();
 		
@@ -212,7 +223,7 @@ public class RecordSummaryQueryBuilder {
 	 * @param countInSummaryListEntityDefs
 	 * @return parses the result records into a list of RecordSummary objects
 	 */
-	public static List<RecordSummary> parseResult(List<Record> result, List<AttributeDefinition> keyAttributeDefinitions, List<EntityDefinition> countInSummaryListEntityDefs) {
+	public List<RecordSummary> parseResult(List<Record> result) {
 		List<RecordSummary> summaries = new ArrayList<RecordSummary>();
 		for (Record r : result) {
 			Integer id = r.getValueAsInteger(RECORD.ID);
@@ -245,6 +256,27 @@ public class RecordSummaryQueryBuilder {
 			summaries.add(recordSummary);
 		}
 		return summaries;
+	}
+	
+	/**
+	 * Returns first level entity definitions of the passed root entity that have the attribute countInSummaryList set to true
+	 * 
+	 * @param rootEntityDefinition
+	 * @return 
+	 */
+	private static List<EntityDefinition> getCountInSummaryListEntityDefinitions(EntityDefinition rootEntityDefinition) {
+		List<EntityDefinition> result = new ArrayList<EntityDefinition>();
+		List<NodeDefinition> childDefinitions = rootEntityDefinition.getChildDefinitions();
+		for (NodeDefinition childDefinition : childDefinitions) {
+			if(childDefinition instanceof EntityDefinition) {
+				EntityDefinition entityDefinition = (EntityDefinition) childDefinition;
+				String annotation = childDefinition.getAnnotation(COUNT_IN_SUMMARY_LIST_ANNOTATION);
+				if(annotation != null && Boolean.parseBoolean(annotation)) {
+					result.add(entityDefinition);
+				}
+			}
+		}
+		return result;
 	}
 	
 }
