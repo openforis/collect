@@ -33,7 +33,7 @@ import org.openforis.idm.metamodel.NumberAttributeDefinition;
 import org.openforis.idm.metamodel.TextAttributeDefinition;
 
 /**
- * @author riccist
+ * @author S. Ricci
  *
  */
 public class RecordSummaryLoader {
@@ -202,4 +202,5 @@ public class RecordSummaryLoader {
 		}
 		return summaries;
 	}
-	}
+	
+}
