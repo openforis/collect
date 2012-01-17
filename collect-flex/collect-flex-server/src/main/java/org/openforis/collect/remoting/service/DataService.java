@@ -52,7 +52,7 @@ public class DataService {
 	public RecordProxy loadRecord(int id) throws RecordLockedException, MultipleEditException, NonexistentIdException, AccessDeniedException {
 		Survey survey = getActiveSurvey();
 		User user = getUserInSession();
-		CollectRecord record = recordManager.checkout(survey, user , id);
+		CollectRecord record = recordManager.checkout(survey, user, id);
 		sessionManager.setActiveRecord((CollectRecord) record);
 		return new RecordProxy(record);
 	}
@@ -85,17 +85,20 @@ public class DataService {
 		result.put("records", list);
 		return result;
 	}
+
 	@Transactional
 	public Record newRecord(String name, Survey survey, String rootEntityId) throws MultipleEditException, DuplicateIdException, InvalidIdException, DuplicateIdException, AccessDeniedException,
 			RecordLockedException {
 		Record record = recordManager.create(name, survey, rootEntityId);
 		return record;
 	}
+
 	@Transactional
 	public void saveActiveRecord() {
 		Record record = this.sessionManager.getSessionState().getActiveRecord();
 		recordManager.save(record);
 	}
+
 	@Transactional
 	public void deleteActiveRecord() {
 		Record record = this.sessionManager.getSessionState().getActiveRecord();
@@ -121,10 +124,12 @@ public class DataService {
 		}
 		return null;
 	}
+
 	@Transactional
 	public void promote(String recordId) throws InvalidIdException, MultipleEditException, NonexistentIdException, AccessDeniedException, RecordLockedException {
 		this.recordManager.promote(recordId);
 	}
+
 	@Transactional
 	public void demote(String recordId) throws InvalidIdException, MultipleEditException, NonexistentIdException, AccessDeniedException, RecordLockedException {
 		this.recordManager.demote(recordId);
@@ -139,8 +144,12 @@ public class DataService {
 
 	/**
 	 * remove the active record from the current session
+	 * @throws RecordLockedException 
 	 */
-	public void clearActiveRecord() {
+	public void clearActiveRecord() throws RecordLockedException {
+		CollectRecord activeRecord = getActiveRecord();
+		User user = getUserInSession();
+		this.recordManager.unlock(activeRecord, user);
 		this.sessionManager.clearActiveRecord();
 	}
 
@@ -204,7 +213,7 @@ public class DataService {
 		}
 		return null;
 	}
-	
+
 	private User getUserInSession() {
 		SessionState sessionState = getSessionManager().getSessionState();
 		User user = sessionState.getUser();

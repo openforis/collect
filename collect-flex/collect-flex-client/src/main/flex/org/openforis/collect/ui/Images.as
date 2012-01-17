@@ -51,5 +51,8 @@ package org.openforis.collect.ui {
 		
 		[Embed("/assets/images/last.png")]
 		public static const LAST:Class;
+		
+		[Embed("/assets/images/back.png")]
+		public static const BACK:Class;
 	}
 }

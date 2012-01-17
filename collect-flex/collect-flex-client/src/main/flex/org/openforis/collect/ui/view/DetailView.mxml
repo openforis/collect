@@ -9,6 +9,7 @@
 		<![CDATA[
 			import org.openforis.collect.i18n.Message;
 			import org.openforis.collect.presenter.DetailPresenter;
+			import org.openforis.collect.ui.Images;
 			
 			private var _presenter:DetailPresenter;
 			
@@ -21,11 +22,19 @@
 	</fx:Script>
 	
 	<s:layout>
-		<s:VerticalLayout />
+		<s:VerticalLayout gap="5" />
 	</s:layout>
 	
-	<s:HGroup id="header" width="100%" height="10%">
+	<s:HGroup id="header" width="100%" height="10%" gap="10">
 		<!-- Record id, form version, save msg, etc.. -->
+		<s:HGroup width="50%">
+			<s:Button useHandCursor="true" buttonMode="true" id="backToListButton" icon="{Images.BACK}" label="{Message.get('edit.backToList')}"  />
+			<mx:Text id="rootEntityDefinitionText" fontSize="13" fontWeight="bold" />
+			<mx:Text id="keyAttributeValuesText" fontSize="13" fontWeight="bold" />
+		</s:HGroup>
+		<s:HGroup width="50%" textAlign="right" paddingRight="5">
+				<mx:Text id="formVersionText" fontSize="10" fontWeight="bold" />
+		</s:HGroup>
 	</s:HGroup>
 	
 	<!--<s:Group id="formWrapper" width="100%" height="100%" />-->
@@ -33,9 +42,8 @@
 	<detail:FormsContainer id="formsContainer" height="100%" width="100%" />
 	
 	<s:HGroup width="100%" id="buttonBar" horizontalAlign="center" verticalAlign="middle" gap="30">
-		<!-- Buttons: save, back to list etc...-->
-		<s:Button id="backToListButton" label="{Message.get('edit.backToList')}" />
-		<s:Button id="saveButton" label="{Message.get('edit.save')}" />
+		<!-- Buttons: save, etc...-->
+		<s:Button useHandCursor="true" buttonMode="true" id="saveButton" label="{Message.get('edit.save')}" />
 	</s:HGroup>
 	
 </s:Group>

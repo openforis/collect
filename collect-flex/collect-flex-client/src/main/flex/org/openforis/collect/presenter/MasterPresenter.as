@@ -57,7 +57,7 @@ package org.openforis.collect.presenter {
 			var record:RecordSummary = uiEvent.obj as RecordSummary;
 			var id:Number = record.id;
 			//var entityName:String = Application.activeRootEntity.name;
-			_dataClient.loadRecord(new AsyncResponder(loadRecordResultHandler, faultHandler), id);
+			_dataClient.loadRecord(new AsyncResponder(loadRecordResultHandler, faultHandler, record), id);
 		}
 		
 		/**
@@ -65,7 +65,12 @@ package org.openforis.collect.presenter {
 		 * */
 		protected function loadRecordResultHandler(event:ResultEvent, token:Object = null):void {
 			var record:RecordProxy = RecordProxy(event.result);
+			var summary:RecordSummary = token as RecordSummary;
+			record.rootEntityKeys = summary.rootEntityKeys;
+			_view.currentState = MasterView.DETAIL_STATE;
 			
+			var uiEvent:UIEvent = new UIEvent(UIEvent.ACTIVE_RECORD_CHANGED);
+			eventDispatcher.dispatchEvent(uiEvent);
 		}
 		
 		
@@ -89,6 +94,8 @@ package org.openforis.collect.presenter {
 		internal function backToListHandler(event:UIEvent):void {
 			//reload record summaries 
 			_view.currentState = MasterView.LIST_STATE;
+			var uiEvent:UIEvent = new UIEvent(UIEvent.LOAD_RECORD_SUMMARIES);
+			eventDispatcher.dispatchEvent(uiEvent);
 		}
 			
 	}

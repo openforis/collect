@@ -12,6 +12,7 @@ package org.openforis.collect {
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.SurveyProxy;
 	import org.openforis.collect.model.Phase;
+	import org.openforis.collect.model.proxy.RecordProxy;
 	import org.openforis.collect.util.ModelClassInitializer;
 
 	/*import org.openforis.idm.model.Entity;*/
@@ -27,6 +28,7 @@ package org.openforis.collect {
 		private static var _surveySummaries:IList;
 		
 		private static var _activeSurvey:SurveyProxy;
+		private static var _activeRecord:RecordProxy;
 		private static var _activeRootEntity:EntityDefinitionProxy;
 		private static var _activePhase:Phase;
 		
@@ -98,6 +100,14 @@ package org.openforis.collect {
 			_activeRootEntity = value;
 		}
 
+		public static function get activeRecord():RecordProxy {
+			return _activeRecord;
+		}
+		
+		public static function set activeRecord(record:RecordProxy):void{
+			_activeRecord = record;
+		}
+		
 		[Bindable]
 		public static function get activePhase():Phase {
 			return _activePhase;

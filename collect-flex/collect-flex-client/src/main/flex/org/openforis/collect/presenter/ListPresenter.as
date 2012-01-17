@@ -132,21 +132,14 @@ package org.openforis.collect.presenter {
 			totalRecords = result.count as int;
 			totalPages = Math.ceil(totalRecords / MAX_RECORDS_PER_PAGE);
 			
-			//update datagrid dataprovider
 			_view.dataGrid.dataProvider = records;
 
 			updatePaginationBar();
 		}
 		
 		protected function updatePaginationBar():void {
-			//_view.paginationBar.goToPageStepper.minimum = 1;
-			//_view.paginationBar.goToPageStepper.maximum = totalPages;
-			//_view.paginationBar.totalRecordsText.text = String(totalRecords);
-			
 			var recordsFromPosition:int = ((currentPage - 1) * MAX_RECORDS_PER_PAGE) + 1;
 			var recordsToPosition:int = recordsFromPosition + _view.dataGrid.dataProvider.length - 1;
-			//_view.paginationBar.recordsFromText.text = String(recordsFromPosition);
-			//_view.paginationBar.recordsToText.text = String(recordsToPosition);
 			
 			//calculate pagination bar state
 			if(totalPages == 0) {

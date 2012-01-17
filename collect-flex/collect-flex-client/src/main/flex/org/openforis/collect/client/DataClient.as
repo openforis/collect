@@ -20,6 +20,7 @@ package org.openforis.collect.client {
 		private var _getCountRecordsOperation:Operation;
 		private var _getRecordSummariesOperation:Operation;
 		private var _loadRecordOperation:Operation;
+		private var _clearActiveRecordOperation:Operation;
 		
 		public function DataClient() {
 			super("dataService");
@@ -30,6 +31,7 @@ package org.openforis.collect.client {
 			this._getCountRecordsOperation = getOperation("getCountRecords");
 			this._getRecordSummariesOperation = getOperation("getRecordSummaries");
 			this._loadRecordOperation = getOperation("loadRecord");
+			this._clearActiveRecordOperation = getOperation("clearActiveRecord");	
 		}
 		
 		public function getCountRecords(responder:IResponder):void {
@@ -49,6 +51,11 @@ package org.openforis.collect.client {
 		
 		public function loadRecord(responder:IResponder, id:int):void {
 			var token:AsyncToken = this._loadRecordOperation.send(id);
+			token.addResponder(responder);
+		}
+		
+		public function clearActiveRecord(responder:IResponder):void {
+			var token:AsyncToken = this._clearActiveRecordOperation.send();
 			token.addResponder(responder);
 		}
 	//	public function update(responder:IResponder, request:UpdateRequest):void {

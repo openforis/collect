@@ -62,9 +62,9 @@ package org.openforis.collect.ui {
 			for each(nodeDef in firstLevelDefs) {
 				if(nodeDef is AttributeDefinitionProxy && (nodeDef as AttributeDefinitionProxy).key) {
 					column = new GridColumn();
-					column.headerText = NodeDefinitionProxy.getDefaultLabel(nodeDef.labels, NodeLabelProxy$Type.INSTANCE, "en");
+					column.headerText = NodeDefinitionProxy.getLabel(nodeDef.labels, NodeLabelProxy$Type.INSTANCE, "en");
 					column.labelFunction = recordSummariesKeyLabelFunction;
-					column.dataField = "key_" + nodeDef.name;
+					column.dataField = nodeDef.name;
 					columns.addItem(column);
 				}
 			}
@@ -73,8 +73,8 @@ package org.openforis.collect.ui {
 					var entityDef:EntityDefinitionProxy = EntityDefinitionProxy(nodeDef);
 					if(entityDef.countInSummaryList) {
 						column = new GridColumn();
-						column.headerText = Message.get("list.headerCount", [NodeDefinitionProxy.getDefaultLabel(entityDef.labels, NodeLabelProxy$Type.INSTANCE, "en")]);
-						column.dataField = "count_" + entityDef.name;
+						column.headerText = Message.get("list.headerCount", [NodeDefinitionProxy.getLabel(entityDef.labels, NodeLabelProxy$Type.INSTANCE, "en")]);
+						column.dataField = entityDef.name;
 						column.labelFunction = recordSummariesCountEntityLabelFunction;
 						columns.addItem(column);
 					}

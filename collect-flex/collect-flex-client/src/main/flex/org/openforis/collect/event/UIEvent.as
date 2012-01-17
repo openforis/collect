@@ -19,6 +19,9 @@ package org.openforis.collect.event {
 		//List events		
 		public static const LOAD_RECORD_SUMMARIES:String = "loadRecordSummaries"; 
 		
+		//Edit events
+		public static const ACTIVE_RECORD_CHANGED:String = "activeRecordChanged";
+		
 		private var _obj:Object;
 		
 		public function UIEvent(type:String, bubbles:Boolean=false, cancelable:Boolean=false) {
