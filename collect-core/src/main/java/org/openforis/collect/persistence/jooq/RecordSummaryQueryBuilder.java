@@ -40,6 +40,7 @@ public class RecordSummaryQueryBuilder {
 	private final Log LOG = LogFactory.getLog(RecordSummaryQueryBuilder.class);
 	
 	private Factory jooqFactory;
+	
 	private EntityDefinition rootEntityDefinition;
 	private List<AttributeDefinition> keyAttributeDefinitions; 
 	private List<EntityDefinition> countInSummaryListEntityDefs;
@@ -49,6 +50,7 @@ public class RecordSummaryQueryBuilder {
 	private static final String USER_TABLE_CREATED_BY_ALIAS = "user_created_by";
 	private static final String USER_TABLE_MODIFIED_BY_ALIAS = "user_modified_by";
 	private static final String COUNT_COLUMN_ALIAS_PREFIX = "count_";
+	private static final String KEY_DATA_TABLE_ALIAS_PREFIX = "data_";
 	private static final String KEY_COLUMN_ALIAS_PREFIX = "key_";
 	
 	private static final String ORDER_BY_CREATED_BY_FIELD_NAME = "createdBy";
@@ -112,6 +114,10 @@ public class RecordSummaryQueryBuilder {
 		//limit query results
 		selectQuery.addLimit(offset, maxNumberOfRecords);
 		
+		if(LOG.isDebugEnabled()) {
+			String sql = selectQuery.getSQL();
+			LOG.debug(sql);
+		}
 		return selectQuery;
 
 	}
@@ -158,7 +164,7 @@ public class RecordSummaryQueryBuilder {
 		//for each key attribute add a left join, a field in the projection and in the order by (if matches orderByFieldName)
 		TableField<?, ?> orderByField = null;
 		for (AttributeDefinition attributeDefinition : keyAttributeDefinitions) {
-			String dataTableAlias = "data_" + attributeDefinition.getName();
+			String dataTableAlias = KEY_DATA_TABLE_ALIAS_PREFIX + attributeDefinition.getName();
 			//left join with DATA table to get the key attribute
 			selectQuery.addJoin(DATA.as(dataTableAlias), JoinType.LEFT_OUTER_JOIN, 
 					DATA.as(dataTableAlias).RECORD_ID.equal(RECORD.ID), DATA.as(dataTableAlias).DEFINITION_ID.equal(attributeDefinition.getId()));
@@ -239,7 +245,7 @@ public class RecordSummaryQueryBuilder {
 			Map<String, String> keyAttributes = new HashMap<String, String>();
 			for (AttributeDefinition attributeDefinition : keyAttributeDefinitions) {
 				String keyValueProjectionAlias = KEY_COLUMN_ALIAS_PREFIX + attributeDefinition.getName();
-				String key = keyValueProjectionAlias;
+				String key = attributeDefinition.getName();
 				Object value = r.getValue(keyValueProjectionAlias);
 				String valueStr = value != null ? value.toString(): "";
 				keyAttributes.put(key, valueStr);
@@ -248,7 +254,7 @@ public class RecordSummaryQueryBuilder {
 			Map<String, Integer> entityCounts = new HashMap<String, Integer>();
 			for (EntityDefinition entityDefinition : countInSummaryListEntityDefs) {
 				String keyValueProjectionAlias = COUNT_COLUMN_ALIAS_PREFIX + entityDefinition.getName();
-				String key = keyValueProjectionAlias;
+				String key = entityDefinition.getName();
 				Integer value = r.getValueAsInteger(keyValueProjectionAlias);
 				entityCounts.put(key, value);
 			}
