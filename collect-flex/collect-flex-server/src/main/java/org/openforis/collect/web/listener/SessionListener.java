@@ -8,9 +8,12 @@ import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.openforis.collect.manager.RecordManager;
-import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.model.CollectRecord;
+import org.openforis.collect.model.User;
+import org.openforis.collect.persistence.RecordLockedException;
 import org.openforis.collect.session.SessionState;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
@@ -21,6 +24,8 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  */
 public class SessionListener implements HttpSessionListener {
 
+	private static Log LOG = LogFactory.getLog(SessionListener.class);
+
 	@Override
 	public void sessionCreated(HttpSessionEvent se) {
 	}
@@ -29,16 +34,24 @@ public class SessionListener implements HttpSessionListener {
 	public void sessionDestroyed(HttpSessionEvent se) {
 		HttpSession session = se.getSession();
 		ServletContext servletContext = session.getServletContext();
-		WebApplicationContext applicationContext = WebApplicationContextUtils.getWebApplicationContext(servletContext);
-		if (applicationContext != null) {
-			RecordManager recordManager = (RecordManager) applicationContext.getBean("recordManager");
-			SessionManager sessionManager = (SessionManager) applicationContext.getBean("sessionManager");
-			SessionState sessionState = sessionManager.getSessionState();
-			if (sessionState != null) {
-				CollectRecord record = sessionState.getActiveRecord();
-				recordManager.unlock(record);
+		Object object = session.getAttribute(SessionState.SESSION_ATTRIBUTE_NAME);
+		if (object != null) {
+			SessionState sessionState = (SessionState) object;
+			CollectRecord record = sessionState.getActiveRecord();
+			User user = sessionState.getUser();
+			if (record != null && user != null) {
+				WebApplicationContext applicationContext = WebApplicationContextUtils.getWebApplicationContext(servletContext);
+				RecordManager recordManager = (RecordManager) applicationContext.getBean("recordManager");
+				try {
+					recordManager.unlock(record, user);
+				} catch (RecordLockedException e) {
+					if (LOG.isErrorEnabled()) {
+						LOG.error("Error while unlocking record after session expired", e);
+					}
+				}
 			}
 		}
+
 	}
 
 }

@@ -24,17 +24,16 @@ public class SessionManager {
 
 	private static Log LOG = LogFactory.getLog(SessionManager.class);
 
-	private static final String SESSION_STATE_SESSION_ATTRIBUTE_NAME = "sessionState";
 	private static final String KEEP_ALIVE_SESSION_ATTRIBUTE_NAME = "keepAlive";
 
 	@Autowired
 	private UserManager userManager;
 
 	public SessionState getSessionState() {
-		SessionState sessionState = (SessionState) getSessionAttribute(SESSION_STATE_SESSION_ATTRIBUTE_NAME);
+		SessionState sessionState = (SessionState) getSessionAttribute(SessionState.SESSION_ATTRIBUTE_NAME);
 		if (sessionState == null) {
 			sessionState = new SessionState();
-			setSessionAttribute(SESSION_STATE_SESSION_ATTRIBUTE_NAME, sessionState);
+			setSessionAttribute(SessionState.SESSION_ATTRIBUTE_NAME, sessionState);
 		}
 
 		User user = this.getLoggedInUser();
@@ -77,7 +76,7 @@ public class SessionManager {
 	}
 
 	private User getLoggedInUser() {
-		SessionState sessionState = (SessionState) getSessionAttribute(SESSION_STATE_SESSION_ATTRIBUTE_NAME);
+		SessionState sessionState = (SessionState) getSessionAttribute(SessionState.SESSION_ATTRIBUTE_NAME);
 		if (sessionState != null) {
 			User user = sessionState.getUser();
 			if (user == null) {

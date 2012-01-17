@@ -103,8 +103,8 @@ public class RecordManager {
 	}
 
 	@Transactional
-	public void unlock(Record record) {
-
+	public void unlock(Record record, User user) throws RecordLockedException {
+		recordDAO.unlock(record.getId(), user);
 	}
 
 	@Transactional
