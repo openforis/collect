@@ -202,9 +202,7 @@ public class RecordSummaryQueryBuilder {
 		TableField<?, ?> orderByField = null;
 		//order by
 		if (orderByFieldName != null) {
-			if ("id".equals(orderByFieldName)) {
-				orderByField = RECORD.ID;
-			} else if (ORDER_BY_CREATED_BY_FIELD_NAME.equals(orderByFieldName)) {
+			if (ORDER_BY_CREATED_BY_FIELD_NAME.equals(orderByFieldName)) {
 				orderByField = USER.as(USER_TABLE_CREATED_BY_ALIAS).USERNAME;
 			} else if (ORDER_BY_MODIFIED_BY_FIELD_NAME.equals(orderByFieldName)) {
 				orderByField = USER.as(USER_TABLE_MODIFIED_BY_ALIAS).USERNAME;
@@ -214,11 +212,11 @@ public class RecordSummaryQueryBuilder {
 				orderByField = RECORD.DATE_MODIFIED;
 			}
 		}
-		//default: order by ID
-		if(orderByField == null) {
-			orderByField = RECORD.ID;
+		if(orderByField != null) {
+			selectQuery.addOrderBy(orderByField);
 		}
-		selectQuery.addOrderBy(orderByField);
+		//always order by ID to avoid pagination issues
+		selectQuery.addOrderBy(RECORD.ID);
 	}
 
 	
