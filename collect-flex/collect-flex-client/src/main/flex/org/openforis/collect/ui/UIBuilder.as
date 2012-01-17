@@ -4,14 +4,12 @@ package org.openforis.collect.ui {
 	import mx.collections.ListCollectionView;
 	import mx.core.Container;
 	
-	import org.granite.collections.IMap;
 	import org.openforis.collect.i18n.Message;
 	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
-	import org.openforis.collect.metamodel.proxy.NodeLabelProxy;
 	import org.openforis.collect.metamodel.proxy.NodeLabelProxy$Type;
-	import org.openforis.collect.model.RecordSummary;
+	import org.openforis.collect.ui.component.datagrid.RecordSummaryDataGrid;
 	import org.openforis.collect.ui.component.datagroup.DataGroupItemRenderer;
 	import org.openforis.collect.ui.component.detail.EntityFormContainer;
 	import org.openforis.collect.ui.component.detail.FormContainer;
@@ -20,7 +18,6 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.ui.component.input.StringInputField;
 	
 	import spark.components.gridClasses.GridColumn;
-	import spark.formatters.DateTimeFormatter;
 	
 	/**
 	 * @author Mino Togna
@@ -63,7 +60,7 @@ package org.openforis.collect.ui {
 				if(nodeDef is AttributeDefinitionProxy && (nodeDef as AttributeDefinitionProxy).key) {
 					column = new GridColumn();
 					column.headerText = NodeDefinitionProxy.getLabel(nodeDef.labels, NodeLabelProxy$Type.INSTANCE, "en");
-					column.labelFunction = recordSummariesKeyLabelFunction;
+					column.labelFunction = RecordSummaryDataGrid.recordSummariesKeyLabelFunction;
 					column.dataField = nodeDef.name;
 					columns.addItem(column);
 				}
@@ -75,7 +72,7 @@ package org.openforis.collect.ui {
 						column = new GridColumn();
 						column.headerText = Message.get("list.headerCount", [NodeDefinitionProxy.getLabel(entityDef.labels, NodeLabelProxy$Type.INSTANCE, "en")]);
 						column.dataField = entityDef.name;
-						column.labelFunction = recordSummariesCountEntityLabelFunction;
+						column.labelFunction = RecordSummaryDataGrid.recordSummariesCountEntityLabelFunction;
 						columns.addItem(column);
 					}
 				}
@@ -95,13 +92,13 @@ package org.openforis.collect.ui {
 			column = new GridColumn();
 			column.headerText = Message.get("list.creationDate");
 			column.dataField = "creationDate";
-			column.labelFunction = dateLabelFunction;
+			column.labelFunction = RecordSummaryDataGrid.dateLabelFunction;
 			columns.addItem(column);
 			//date modified column
 			column = new GridColumn();
 			column.headerText = Message.get("list.dateModified");
 			column.dataField = "dateModified";
-			column.labelFunction = dateLabelFunction;
+			column.labelFunction = RecordSummaryDataGrid.dateLabelFunction;
 			columns.addItem(column);
 			return columns;
 		}
@@ -162,30 +159,6 @@ package org.openforis.collect.ui {
 					break;
 			}
 			return inputField;
-		}
-		
-		public static function dateLabelFunction(item:Object,column:GridColumn):String {
-			if(item.hasOwnProperty(column.dataField)) {
-				var date:Date = item[column.dataField];
-				var dateFormatter:DateTimeFormatter = new DateTimeFormatter();
-				dateFormatter.dateTimePattern = "dd-MM-yyyy hh:mm:ss";
-				return dateFormatter.format(date);
-			} else {
-				return null;
-			}
-		}
-		private static function recordSummariesKeyLabelFunction(item:Object, gridColumn:GridColumn):String {
-			var recordSummary:RecordSummary = item as RecordSummary;
-			var keys:IMap = recordSummary.rootEntityKeys;
-			var key:String = gridColumn.dataField;
-			return String(keys.get(key));
-		}
-		
-		private static function recordSummariesCountEntityLabelFunction(item:Object, gridColumn:GridColumn):String {
-			var recordSummary:RecordSummary = item as RecordSummary;
-			var counts:IMap = recordSummary.entityCounts;
-			var key:String = gridColumn.dataField;
-			return String(counts.get(key));
 		}
 		
 	}

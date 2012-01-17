@@ -59,6 +59,12 @@ public class RecordDAO extends CollectDAO {
 	}
 
 	@Transactional
+	public void delete(CollectRecord record) {
+		deleteData(record.getId());
+		deleteRecord(record);
+	}
+	
+	@Transactional
 	public int getCountRecords(EntityDefinition rootEntityDefinition, String filter) {
 		Factory jf = getJooqFactory();
 		Record r = jf.select(Factory.count()).from(RECORD).where(RECORD.ROOT_ENTITY_ID.equal(rootEntityDefinition.getId())).fetchOne();
@@ -76,11 +82,6 @@ public class RecordDAO extends CollectDAO {
 		List<Record> records = selectQuery.fetch();
 
 		List<RecordSummary> result = recordSummaryLoader.parseResult(records);
-		
-		if(LOG.isDebugEnabled()) {
-			String sql = selectQuery.getSQL();
-			LOG.debug(sql);
-		}
 		
 		return result;
 	}
@@ -193,6 +194,15 @@ public class RecordDAO extends CollectDAO {
 				.set(RECORD.DATE_MODIFIED, toTimestamp(record.getModifiedDate()))
 				// .set(RECORD.MODIFIED_BY, record.getModifiedBy())
 				.set(RECORD.MODEL_VERSION, record.getVersion().getName()).set(RECORD.STEP, record.getStep().getStepNumber()).where(RECORD.ID.equal(recordId)).execute();
+	}
+	
+	private void deleteRecord(CollectRecord record) {
+		Integer recordId = record.getId();
+		if (recordId == null) {
+			throw new IllegalArgumentException("Cannot update unsaved record");
+		}
+		Factory jf = getJooqFactory();
+		jf.delete(RECORD).where(RECORD.ID.equal(recordId)).execute();
 	}
 
 	private void deleteData(int recordId) {
