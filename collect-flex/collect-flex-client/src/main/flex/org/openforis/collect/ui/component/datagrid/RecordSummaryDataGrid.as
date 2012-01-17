@@ -48,18 +48,23 @@ package org.openforis.collect.ui.component.datagrid
 		}
 		
 		public static function recordSummariesKeyLabelFunction(item:Object, gridColumn:GridColumn):String {
-			return mapFieldLabelFunction(item, gridColumn, "rootEntityKeys");
+			return mapFieldLabelFunction(item, gridColumn, "rootEntityKeys", "key_");
 		}
 		
 		public static function recordSummariesCountEntityLabelFunction(item:Object, gridColumn:GridColumn):String {
-			return mapFieldLabelFunction(item, gridColumn, "entityCounts");
+			return mapFieldLabelFunction(item, gridColumn, "entityCounts", "count_");
 		}
 		
-		private static function mapFieldLabelFunction(item:Object, gridColumn:GridColumn, mapFieldName:String):String {
+		private static function mapFieldLabelFunction(item:Object, gridColumn:GridColumn, mapFieldName:String, prefix:String):String {
 			var recordSummary:RecordSummary = item as RecordSummary;
 			var map:IMap = recordSummary[mapFieldName];
-			var key:String = gridColumn.dataField;
-			return String(map.get(key));
+			var dataField:String = gridColumn.dataField;
+			if(dataField.indexOf(prefix) == 0) {
+				//dataField starts with the correct prefix
+				var key:String = dataField.substr(prefix.length);
+				return String(map.get(key));
+			}
+			return null;
 		}
 	}
 }

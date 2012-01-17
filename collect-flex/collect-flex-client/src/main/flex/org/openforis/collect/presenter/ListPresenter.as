@@ -68,7 +68,7 @@ package org.openforis.collect.presenter {
 		/**
 		 * Max number of records that can be loaded for a single page.
 		 */
-		private const MAX_RECORDS_PER_PAGE:int = 10;
+		private const MAX_RECORDS_PER_PAGE:int = 20;
 		
 		public function ListPresenter(view:ListView) {
 			this._view = view;
@@ -88,6 +88,8 @@ package org.openforis.collect.presenter {
 			this._view.paginationBar.nextPageButton.addEventListener(MouseEvent.CLICK, nextPageClickHandler);
 			this._view.paginationBar.lastPageButton.addEventListener(MouseEvent.CLICK, lastPageClickHandler);
 			//this._view.paginationBar.goToPageButton.addEventListener(MouseEvent.CLICK, goToPageClickHandler);
+
+			this._view.dataGrid.requestedRowCount = MAX_RECORDS_PER_PAGE;
 		}
 	
 		/**

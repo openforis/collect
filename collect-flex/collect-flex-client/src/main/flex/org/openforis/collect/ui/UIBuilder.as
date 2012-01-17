@@ -53,25 +53,24 @@ package org.openforis.collect.ui {
 		public static function getRecordSummaryListColumns(rootEntity:EntityDefinitionProxy):IList {
 			var columns:IList = new ArrayList();
 			var column:GridColumn;
-			var nodeDef:NodeDefinitionProxy;
 			//key attributes columns
-			var firstLevelDefs:ListCollectionView = rootEntity.childDefinitions;
-			for each(nodeDef in firstLevelDefs) {
-				if(nodeDef is AttributeDefinitionProxy && (nodeDef as AttributeDefinitionProxy).key) {
-					column = new GridColumn();
-					column.headerText = NodeDefinitionProxy.getLabel(nodeDef.labels, NodeLabelProxy$Type.INSTANCE, "en");
-					column.labelFunction = RecordSummaryDataGrid.recordSummariesKeyLabelFunction;
-					column.dataField = nodeDef.name;
-					columns.addItem(column);
-				}
+			var keyAttributeDefs:IList = rootEntity.keyAttributeDefinitions();
+			for each(var keyAttributeDef:AttributeDefinitionProxy in keyAttributeDefs) {
+				column = new GridColumn();
+				column.headerText = keyAttributeDef.getLabelText();
+				column.labelFunction = RecordSummaryDataGrid.recordSummariesKeyLabelFunction;
+				column.dataField = "key_" + keyAttributeDef.name;
+				columns.addItem(column);
 			}
-			for each(nodeDef in firstLevelDefs) {
+			//count entity columns
+			var firstLevelDefs:IList = rootEntity.childDefinitions;
+			for each(var nodeDef:NodeDefinitionProxy in firstLevelDefs) {
 				if(nodeDef is EntityDefinitionProxy) {
 					var entityDef:EntityDefinitionProxy = EntityDefinitionProxy(nodeDef);
 					if(entityDef.countInSummaryList) {
 						column = new GridColumn();
-						column.headerText = Message.get("list.headerCount", [NodeDefinitionProxy.getLabel(entityDef.labels, NodeLabelProxy$Type.INSTANCE, "en")]);
-						column.dataField = entityDef.name;
+						column.headerText = Message.get("list.headerCount", [entityDef.getLabelText()]);
+						column.dataField = "count_" + entityDef.name;
 						column.labelFunction = RecordSummaryDataGrid.recordSummariesCountEntityLabelFunction;
 						columns.addItem(column);
 					}
