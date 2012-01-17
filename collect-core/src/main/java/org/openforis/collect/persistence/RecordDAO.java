@@ -9,7 +9,10 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jooq.Record;
+import org.jooq.Result;
+import org.jooq.SelectConditionStep;
 import org.jooq.SelectQuery;
+import org.jooq.exception.DataTypeException;
 import org.jooq.impl.Factory;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.RecordSummary;
@@ -83,8 +86,13 @@ public class RecordDAO extends CollectDAO {
 	}
 
 	@Transactional
-	public void lock(Integer recordId, User user) throws RecordLockedException {
+	public void lock(Integer recordId, User user) throws RecordLockedException, AccessDeniedException {
 		Factory jf = getJooqFactory();
+		//check if user has already locked another record
+		  Record r = jf.select(RECORD.ID).from(RECORD).where(RECORD.LOCKED_BY_ID.equal(user.getId())).fetchAny();
+		 if(r != null){
+			 throw new AccessDeniedException("User has locked another record " + r.getValueAsInteger(RECORD.ID));
+		 }
 		Record selectResult = jf.select(RECORD.LOCKED_BY_ID, org.openforis.collect.persistence.jooq.tables.User.USER.USERNAME).from(RECORD)
 				.leftOuterJoin(org.openforis.collect.persistence.jooq.tables.User.USER).on(RECORD.LOCKED_BY_ID.equal(org.openforis.collect.persistence.jooq.tables.User.USER.ID))
 				.where(RECORD.ID.equal(recordId)).fetchOne();
