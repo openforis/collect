@@ -95,7 +95,7 @@ public class DataService {
 	public Record newRecord(Map<String, Object> keyMap, String rootEntityName, String versionName) throws MultipleEditException, DuplicateIdException, InvalidIdException, DuplicateIdException, AccessDeniedException,
 			RecordLockedException {
 		if(keyMap == null) {
-			//TODO throw exception
+			throw new RuntimeException("Invalid parameters");
 		}
 		SessionState sessionState = sessionManager.getSessionState();
 		Survey activeSurvey = sessionState.getActiveSurvey();
@@ -106,7 +106,7 @@ public class DataService {
 		//validate key map: there must be a value for each key attribute definition
 		for (AttributeDefinition keyAttributeDef: keyAttributeDefinitions) {
 			if(! keyMap.containsKey(keyAttributeDef.getName())) {
-				//TODO throw exception
+				throw new RuntimeException("Invalid parameters");
 			}
 		}
 		Record record = recordManager.create(keyMap, activeSurvey, rootEntityDefinition.getId(), version.getName());

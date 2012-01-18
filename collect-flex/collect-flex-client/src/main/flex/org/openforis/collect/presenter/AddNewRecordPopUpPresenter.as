@@ -97,7 +97,9 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function newRecordFaultHandler(event:FaultEvent, token:Object = null):void {
-			
+			var faultCode:String = event.fault.faultCode;
+			trace(faultCode);
+			faultHandler(event, token);
 /*			var uiEvent:UIEvent = new UIEvent(UIEvent.NEW_RECORD_CREATED);
 			uiEvent.obj = {versionId: _view.versionsDropDownList.selectedItem.id};
 			eventDispatcher.dispatchEvent(uiEvent);
