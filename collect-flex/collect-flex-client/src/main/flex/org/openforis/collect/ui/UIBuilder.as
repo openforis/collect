@@ -59,7 +59,7 @@ package org.openforis.collect.ui {
 				column = new GridColumn();
 				column.headerText = keyAttributeDef.getLabelText();
 				column.labelFunction = RecordSummaryDataGrid.recordSummariesKeyLabelFunction;
-				column.dataField = "key_" + keyAttributeDef.name;
+				column.dataField = keyAttributeDef.name;
 				columns.addItem(column);
 			}
 			//count entity columns
@@ -70,8 +70,9 @@ package org.openforis.collect.ui {
 					if(entityDef.countInSummaryList) {
 						column = new GridColumn();
 						column.headerText = Message.get("list.headerCount", [entityDef.getLabelText()]);
-						column.dataField = "count_" + entityDef.name;
+						column.dataField = entityDef.name;
 						column.labelFunction = RecordSummaryDataGrid.recordSummariesCountEntityLabelFunction;
+						column.width = 150;
 						columns.addItem(column);
 					}
 				}
@@ -81,23 +82,27 @@ package org.openforis.collect.ui {
 			column = new GridColumn();
 			column.headerText = Message.get("list.errorCount");
 			column.dataField = "errorCount";
+			column.width = 150;
 			columns.addItem(column);
 			//warnings count column
 			column = new GridColumn();
 			column.headerText = Message.get("list.warningCount");
 			column.dataField = "warningCount";
+			column.width = 150;
 			columns.addItem(column);
 			//creation date column
 			column = new GridColumn();
 			column.headerText = Message.get("list.creationDate");
 			column.dataField = "creationDate";
 			column.labelFunction = RecordSummaryDataGrid.dateLabelFunction;
+			column.width = 150;
 			columns.addItem(column);
 			//date modified column
 			column = new GridColumn();
 			column.headerText = Message.get("list.dateModified");
 			column.dataField = "dateModified";
 			column.labelFunction = RecordSummaryDataGrid.dateLabelFunction;
+			column.width = 150;
 			columns.addItem(column);
 			return columns;
 		}

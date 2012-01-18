@@ -147,7 +147,7 @@ public class RecordSummaryQueryBuilder {
 			String alias = COUNT_COLUMN_ALIAS_PREFIX + nodeDefinition.getName();
 			Field<Object> countField = createCountField(nodeDefinition, alias);
 			selectQuery.addSelect(countField);
-			if(orderByField == null && orderByFieldName != null && orderByFieldName.equals(alias)) {
+			if(orderByField == null && orderByFieldName != null && orderByFieldName.equals(nodeDefinition.getName())) {
 				selectQuery.addOrderBy(countField);
 			}
 		}
@@ -184,7 +184,7 @@ public class RecordSummaryQueryBuilder {
 				selectQuery.addSelect(fieldAlias);
 
 				//add field to order by conditions if matches orderByFieldName
-				if(orderByField == null && orderByFieldName != null && orderByFieldName.equals(keyColumnAlias)) {
+				if(orderByField == null && orderByFieldName != null && orderByFieldName.equals(attributeDefinition.getName())) {
 					selectQuery.addOrderBy(fieldAlias);
 				}
 			}
