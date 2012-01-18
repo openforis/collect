@@ -2,7 +2,8 @@
 <s:GridItemRenderer xmlns:fx="http://ns.adobe.com/mxml/2009"
 					xmlns:s="library://ns.adobe.com/flex/spark" 
 					xmlns:mx="library://ns.adobe.com/flex/mx" clipAndEnableScrolling="true"
-					doubleClick="doubleClickHandler(event)"
+					doubleClick="doubleClickHandler(event)" 
+					
 					>
 	<fx:Script> 
 		<![CDATA[ 
@@ -77,6 +78,6 @@
 		</s:fill>
 	</s:Rect>
 	
-	<s:Label id="labelDisplay" top="5" left="3" color.submitted="0x505050" alpha.submitted="0.5" minHeight="20" />
+	<s:Label id="labelDisplay" top="5" left="3" paddingLeft="5" color.submitted="0x505050" alpha.submitted="0.5" minHeight="20" textAlign="left" verticalAlign="middle" height="100%" width="100%" />
 	
 </s:GridItemRenderer>
