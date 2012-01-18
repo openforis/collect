@@ -4,17 +4,25 @@ package org.openforis.collect.ui {
 	import mx.collections.ListCollectionView;
 	import mx.core.Container;
 	
+	import org.openforis.collect.Application;
 	import org.openforis.collect.i18n.Message;
 	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
+	import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
 	import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.NodeLabelProxy$Type;
+	import org.openforis.collect.model.UIConfiguration;
+	import org.openforis.collect.model.UITab;
 	import org.openforis.collect.ui.component.datagrid.RecordSummaryDataGrid;
 	import org.openforis.collect.ui.component.datagroup.DataGroupItemRenderer;
 	import org.openforis.collect.ui.component.detail.EntityFormContainer;
 	import org.openforis.collect.ui.component.detail.FormContainer;
-	import org.openforis.collect.ui.component.detail.RootEntityFormContainer;
+	import org.openforis.collect.ui.component.input.BooleanInputField;
+	import org.openforis.collect.ui.component.input.CodeInputField;
+	import org.openforis.collect.ui.component.input.DateInputField;
 	import org.openforis.collect.ui.component.input.InputField;
+	import org.openforis.collect.ui.component.input.NumericInputField;
+	import org.openforis.collect.ui.component.input.RangeInputField;
 	import org.openforis.collect.ui.component.input.StringInputField;
 	
 	import spark.components.gridClasses.GridColumn;
@@ -25,17 +33,34 @@ package org.openforis.collect.ui {
 	public class UIBuilder {
 		
 		//TODO: use entityDescriptor
-		public static function generateEditForms(parentContainer:Container, entityDescriptor:*, version:*):FormContainer {
+		public static function buildForm(entity:EntityDefinitionProxy, version:ModelVersionProxy):FormContainer {
 			//foreach version
 				var formContainer:FormContainer = new FormContainer();
-				formContainer.version = null;
-				//Root entity description
-				var form:RootEntityFormContainer = new RootEntityFormContainer();
-				form.label = "";
-				formContainer.addEntityFormContainer(form);
-				//set the version
-				addFormItems(form, null);
-					
+				formContainer.initialize();
+				
+				
+				//Root entity definition				
+				var rootEntityForm:EntityFormContainer = new EntityFormContainer();
+				rootEntityForm.label = entity.getLabelText();
+				formContainer.rootFormContainer =rootEntityForm;
+				
+				var uiConfig:UIConfiguration = Application.activeSurvey.uiConfiguration;
+				var uiTab:UITab = null;
+				if(uiConfig != null) {
+						var tabs:ListCollectionView = uiConfig.tabs;
+						if(tabs != null){
+							for each (var tab:UITab in tabs) {
+								if(tab.name == entity.name){
+									uiTab = tab;
+									break;
+								}
+							}
+						} 
+				}
+				addFormItems(rootEntityForm, entity, version, uiTab);
+				
+				
+				/*
 				//foreach main entities
 					var entityFormContainer:EntityFormContainer = new EntityFormContainer();
 					entityFormContainer.label = "";
@@ -47,6 +72,7 @@ package org.openforis.collect.ui {
 					addFormItems(entityFormContainer, null);
 			
 			parentContainer.addElement(formContainer);
+				*/
 			return formContainer;
 		}
 		
@@ -108,7 +134,21 @@ package org.openforis.collect.ui {
 		}
 		
 		//TODO
-		private static function addFormItems(form:EntityFormContainer, entityDescriptor:*):void {
+		private static function addFormItems(form:EntityFormContainer, entity:EntityDefinitionProxy, version:ModelVersionProxy, uiTab:UITab):void {
+			if(uiTab == null || uiTab.tabs == null || uiTab.tabs.length == 0) {
+				var defns:ListCollectionView = entity.childDefinitions;
+				if(defns != null && defns.length >0){
+					for each (var def:NodeDefinitionProxy in defns) {
+						if(def is AttributeDefinitionProxy){
+							addAttributeFormItem(form, def);
+						} else if(def is EntityDefinitionProxy) {
+							
+						}
+					}
+				}
+			} else {
+				//TODO iterate over the tabs
+			}
 			/*
            	for(var childSchemaObjectDescriptor:Object in childrenSchemaObjectDescriptors) {
 				if(childSchemaObjectDescriptor.type == 'attribute') {
@@ -130,16 +170,16 @@ package org.openforis.collect.ui {
     				
 		}
 		
-		private static function addAttributeFormItem(form:EntityFormContainer, attributeDescriptor:*):void {
-			/*
-			if(attributeDescriptor.multiple) {
-				
+		private static function addAttributeFormItem(form:EntityFormContainer, definition:AttributeDefinitionProxy):void {
+			
+			if(definition.multiple) {
+				//TODO multiple attributes
 			} else {
-				var inputField:InputField = getInputField(attributeDescripor);
+				var inputField:InputField = getInputField(definition);
 				inputField.presenter.path = null; //TODO
-				form.addFormItem(attributeDescripor.label, inputField);
+				form.addFormItem(definition.getLabelText(), inputField);
 			}
-			*/
+			
 		}
 		
 		private static function getEntityItemRenderer(entityDescriptor:*):DataGroupItemRenderer {
@@ -160,6 +200,27 @@ package org.openforis.collect.ui {
 			switch(type) {
 				case 'string':
 					inputField = new StringInputField();
+					break;
+				case 'date':
+					inputField = new DateInputField();
+					break;
+				case 'time':
+					//inputField = new TIF();
+					break;
+				case 'code':
+					inputField = new CodeInputField();
+					break;
+				case 'number':
+					inputField = new NumericInputField();
+					break;
+				case 'range':
+					inputField = new RangeInputField();
+					break;
+				case 'boolean':
+					inputField = new BooleanInputField();
+					break;
+				case 'file':
+					//inputField = new FIS();
 					break;
 			}
 			return inputField;
