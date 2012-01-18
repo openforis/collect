@@ -56,7 +56,7 @@ package org.openforis.collect.presenter {
 			var activeRootEntity:EntityDefinitionProxy = Application.activeRootEntity;
 			
 			var keyValues:String = "";
-			var keyAttributeDefinitions:IList = activeRootEntity.keyAttributeDefinitions();
+			var keyAttributeDefinitions:IList = activeRootEntity.keyAttributeDefinitions;
 			for each (var k:AttributeDefinitionProxy in keyAttributeDefinitions) {
 				keyValues += activeRecord.rootEntityKeys.get(k.name);
 			}

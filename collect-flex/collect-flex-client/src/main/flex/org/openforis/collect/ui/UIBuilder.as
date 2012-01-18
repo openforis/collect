@@ -54,7 +54,7 @@ package org.openforis.collect.ui {
 			var columns:IList = new ArrayList();
 			var column:GridColumn;
 			//key attributes columns
-			var keyAttributeDefs:IList = rootEntity.keyAttributeDefinitions();
+			var keyAttributeDefs:IList = rootEntity.keyAttributeDefinitions;
 			for each(var keyAttributeDef:AttributeDefinitionProxy in keyAttributeDefs) {
 				column = new GridColumn();
 				column.headerText = keyAttributeDef.getLabelText();

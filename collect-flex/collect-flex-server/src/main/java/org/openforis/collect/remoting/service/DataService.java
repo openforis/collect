@@ -8,6 +8,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.namespace.QName;
+
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.model.CollectRecord;
@@ -22,6 +24,7 @@ import org.openforis.collect.persistence.NonexistentIdException;
 import org.openforis.collect.persistence.RecordLockedException;
 import org.openforis.collect.remoting.service.UpdateRequest.Method;
 import org.openforis.collect.session.SessionState;
+import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
@@ -41,6 +44,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author M. Togna
  */
 public class DataService {
+	private static final QName COUNT_IN_SUMMARY_LIST_ANNOTATION = new QName("http://www.openforis.org/collect/3.0/ui", "countInSummaryList");
 
 	@Autowired
 	private SessionManager sessionManager;
@@ -80,16 +84,32 @@ public class DataService {
 		Schema schema = activeSurvey.getSchema();
 		EntityDefinition rootEntityDefinition = schema.getRootEntityDefinition(rootEntityName);
 		int count = recordManager.getCountRecords(rootEntityDefinition, filter);
-		List<RecordSummary> list = recordManager.getSummaries(rootEntityDefinition, offset, maxNumberOfRows, orderByFieldName, filter);
+		List<EntityDefinition> countInSummaryListEntityDefinitions = getCountInSummaryListEntityDefinitions(rootEntityDefinition);
+		List<RecordSummary> list = recordManager.getSummaries(rootEntityDefinition, countInSummaryListEntityDefinitions, offset, maxNumberOfRows, orderByFieldName, filter);
 		result.put("count", count);
 		result.put("records", list);
 		return result;
 	}
 
 	@Transactional
-	public Record newRecord(String name, Survey survey, String rootEntityId) throws MultipleEditException, DuplicateIdException, InvalidIdException, DuplicateIdException, AccessDeniedException,
+	public Record newRecord(Map<String, Object> keyMap, String rootEntityName, String versionName) throws MultipleEditException, DuplicateIdException, InvalidIdException, DuplicateIdException, AccessDeniedException,
 			RecordLockedException {
-		Record record = recordManager.create(name, survey, rootEntityId);
+		if(keyMap == null) {
+			//TODO throw exception
+		}
+		SessionState sessionState = sessionManager.getSessionState();
+		Survey activeSurvey = sessionState.getActiveSurvey();
+		ModelVersion version = activeSurvey.getVersion(versionName);
+		Schema schema = activeSurvey.getSchema();
+		EntityDefinition rootEntityDefinition = schema.getRootEntityDefinition(rootEntityName);
+		List<AttributeDefinition> keyAttributeDefinitions = rootEntityDefinition.getKeyAttributeDefinitions();
+		//validate key map: there must be a value for each key attribute definition
+		for (AttributeDefinition keyAttributeDef: keyAttributeDefinitions) {
+			if(! keyMap.containsKey(keyAttributeDef.getName())) {
+				//TODO throw exception
+			}
+		}
+		Record record = recordManager.create(keyMap, activeSurvey, rootEntityDefinition.getId(), version.getName());
 		return record;
 	}
 
@@ -240,4 +260,24 @@ public class DataService {
 		return recordManager;
 	}
 
+	/**
+	 * Returns first level entity definitions of the passed root entity that have the attribute countInSummaryList set to true
+	 * 
+	 * @param rootEntityDefinition
+	 * @return 
+	 */
+	private List<EntityDefinition> getCountInSummaryListEntityDefinitions(EntityDefinition rootEntityDefinition) {
+		List<EntityDefinition> result = new ArrayList<EntityDefinition>();
+		List<NodeDefinition> childDefinitions = rootEntityDefinition.getChildDefinitions();
+		for (NodeDefinition childDefinition : childDefinitions) {
+			if(childDefinition instanceof EntityDefinition) {
+				EntityDefinition entityDefinition = (EntityDefinition) childDefinition;
+				String annotation = childDefinition.getAnnotation(COUNT_IN_SUMMARY_LIST_ANNOTATION);
+				if(annotation != null && Boolean.parseBoolean(annotation)) {
+					result.add(entityDefinition);
+				}
+			}
+		}
+		return result;
+	}
 }
