@@ -140,7 +140,7 @@ package org.openforis.collect.ui {
 				if(defns != null && defns.length >0){
 					for each (var def:NodeDefinitionProxy in defns) {
 						if(def is AttributeDefinitionProxy){
-							addAttributeFormItem(form, def);
+							addAttributeFormItem(form, AttributeDefinitionProxy(def));
 						} else if(def is EntityDefinitionProxy) {
 							
 						}
