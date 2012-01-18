@@ -7,6 +7,7 @@ package org.openforis.collect.presenter {
 	import flash.events.MouseEvent;
 	
 	import mx.collections.IList;
+	import mx.events.IndexChangedEvent;
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.events.ResultEvent;
 	
@@ -17,9 +18,9 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
-	import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
-	import org.openforis.collect.metamodel.proxy.NodeLabelProxy$Type;
 	import org.openforis.collect.model.proxy.RecordProxy;
+	import org.openforis.collect.ui.UIBuilder;
+	import org.openforis.collect.ui.component.detail.FormContainer;
 	import org.openforis.collect.ui.view.DetailView;
 
 	public class DetailPresenter extends AbstractPresenter {
@@ -34,19 +35,10 @@ package org.openforis.collect.presenter {
 		}
 		
 		override internal function initEventListeners():void {
-			//_view.formsContainer.formVersions = formVersions;
-			
 			_view.backToListButton.addEventListener(MouseEvent.CLICK, backToListButtonClickHandler);
 			
 			eventDispatcher.addEventListener(UIEvent.ACTIVE_RECORD_CHANGED, activeRecordChangedListener);
-		
 		}
-		
-		/*protected function newRecordCreatedHandler(event:UIEvent):void {
-			var record:Object = event.obj;
-			var version:Object = ArrayUtil.getItem(formVersions, record.versionId, 'id');
-			_view.formsContainer.setActiveForm(version);
-		}*/
 		
 		/**
 		 * Active record changed
@@ -56,7 +48,7 @@ package org.openforis.collect.presenter {
 			var activeRootEntity:EntityDefinitionProxy = Application.activeRootEntity;
 			
 			var keyValues:String = "";
-			var keyAttributeDefinitions:IList = activeRootEntity.keyAttributeDefinitions();
+			var keyAttributeDefinitions:IList = activeRootEntity.keyAttributeDefinitions;
 			for each (var k:AttributeDefinitionProxy in keyAttributeDefinitions) {
 				keyValues += activeRecord.rootEntityKeys.get(k.name);
 			}
@@ -66,12 +58,20 @@ package org.openforis.collect.presenter {
 			_view.rootEntityDefinitionText.text = activeRootEntity.getLabelText();
 			_view.formVersionText.text = version.getLabelText();
 			
-			if (_view.formsContainer.hasForm(version,activeRootEntity)){
+			var form:FormContainer = null;
+			if (_view.formsContainer.contatinsForm(version,activeRootEntity)){
 				_view.currentState = DetailView.EDIT_STATE;
+				form = _view.formsContainer.getForm(version, activeRootEntity);
 			} else {
 				//build form 
 				_view.currentState = DetailView.LOADING_STATE;
+				form = UIBuilder.buildForm(activeRootEntity, version);
+				_view.formsContainer.addForm(form, version, activeRootEntity);
+				_view.currentState = DetailView.EDIT_STATE;
 			}
+			
+			form = _view.formsContainer.setActiveForm(version, activeRootEntity);
+			form.record = activeRecord;
 		}
 		
 		/**

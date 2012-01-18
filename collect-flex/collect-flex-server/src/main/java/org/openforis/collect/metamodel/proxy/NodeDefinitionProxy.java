@@ -12,8 +12,17 @@ import javax.xml.namespace.QName;
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.collect.Proxy;
 import org.openforis.idm.metamodel.AttributeDefinition;
+import org.openforis.idm.metamodel.BooleanAttributeDefinition;
+import org.openforis.idm.metamodel.CodeAttributeDefinition;
+import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
+import org.openforis.idm.metamodel.DateAttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
+import org.openforis.idm.metamodel.FileAttributeDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
+import org.openforis.idm.metamodel.NumericAttributeDefinition;
+import org.openforis.idm.metamodel.TaxonAttributeDefinition;
+import org.openforis.idm.metamodel.TextAttributeDefinition;
+import org.openforis.idm.metamodel.TimeAttributeDefinition;
 
 /**
  * @author M. Togna
@@ -34,7 +43,27 @@ public class NodeDefinitionProxy implements Proxy {
 			for (NodeDefinition n : list) {
 				NodeDefinitionProxy p = null;
 				if (n instanceof AttributeDefinition) {
-					p = new AttributeDefinitionProxy((AttributeDefinition) n);
+					if(n instanceof BooleanAttributeDefinition) {
+						p = new BooleanAttributeDefinitionProxy((BooleanAttributeDefinition) n);
+					} else if(n instanceof CodeAttributeDefinition) {
+						p = new CodeAttributeDefinitionProxy((CodeAttributeDefinition) n);
+					} else if(n instanceof CoordinateAttributeDefinition) {
+						p = new CoordinateAttributeDefinitionProxy((CoordinateAttributeDefinition) n);
+					} else if(n instanceof DateAttributeDefinition) {
+						p = new DateAttributeDefinitionProxy((DateAttributeDefinition) n);
+					} else if(n instanceof FileAttributeDefinition) {
+						p = new FileAttributeDefinitionProxy((FileAttributeDefinition) n);
+					} else if(n instanceof NumericAttributeDefinition) {
+						p = new NumericAttributeDefinitionProxy((NumericAttributeDefinition) n);
+					} else if(n instanceof TaxonAttributeDefinition) {
+						p = new TaxonAttributeDefinitionProxy((TaxonAttributeDefinition) n);
+					} else if(n instanceof TextAttributeDefinition) {
+						p = new TextAttributeDefinitionProxy((TextAttributeDefinition) n);
+					} else if(n instanceof TimeAttributeDefinition) {
+						p = new TimeAttributeDefinitionProxy((TimeAttributeDefinition) n);
+					} else {
+						throw new RuntimeException("AttributeDefinition not supported: " + p.getClass().getSimpleName());
+					}
 				} else if (n instanceof EntityDefinition) {
 					p = new EntityDefinitionProxy((EntityDefinition) n);
 				}

@@ -73,6 +73,8 @@ package org.openforis.collect.presenter {
 		public function ListPresenter(view:ListView) {
 			this._view = view;
 			this._dataClient = ClientFactory.dataClient;
+			this._view.dataGrid.requestedRowCount = MAX_RECORDS_PER_PAGE;
+			
 			super();
 		}
 
@@ -89,7 +91,6 @@ package org.openforis.collect.presenter {
 			this._view.paginationBar.lastPageButton.addEventListener(MouseEvent.CLICK, lastPageClickHandler);
 			//this._view.paginationBar.goToPageButton.addEventListener(MouseEvent.CLICK, goToPageClickHandler);
 
-			this._view.dataGrid.requestedRowCount = MAX_RECORDS_PER_PAGE;
 		}
 	
 		/**

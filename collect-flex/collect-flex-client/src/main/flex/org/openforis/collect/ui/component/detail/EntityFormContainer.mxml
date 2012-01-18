@@ -6,17 +6,19 @@
 	
 	<fx:Script>
 		<![CDATA[
+			import org.openforis.collect.model.proxy.EntityProxy;
 			import org.openforis.collect.ui.Images;
 			import org.openforis.collect.ui.component.input.InputField;
 			
 			import spark.components.FormItem;
-			private var _parentEntity:Object;			
+			private var _parentEntity:EntityProxy;			
 
-			public function get parentEntity():Object {
+			[Bindable]
+			public function get parentEntity():EntityProxy {
 				return _parentEntity;
 			}
 
-			public function set parentEntity(value:Object):void {
+			public function set parentEntity(value:EntityProxy):void {
 				_parentEntity = value;
 			}
 
@@ -57,11 +59,17 @@
 		
 		<s:Scroller height="100%" width="100%">
 			<s:Group height="100%" width="100%">
-				<s:Form height="100%" width="100%" id="form">
-					<s:layout>
-						<s:FormLayout gap="-10" paddingLeft="0" />
-					</s:layout>
-				</s:Form>
+				<s:BorderContainer borderColor="#CCCCCC" borderAlpha="0.8" borderStyle="solid" borderWeight="1" width="100%" height="100%">
+					<s:Form height="100%" width="100%" id="form">
+						<s:layout>
+							<s:FormLayout gap="-10" paddingLeft="0" />
+						</s:layout>
+						
+						<s:FormItem label="Test">
+							<s:TextInput width="156"/>
+						</s:FormItem>
+					</s:Form>
+				</s:BorderContainer>
 			</s:Group>
 		</s:Scroller>
 	</s:VGroup>

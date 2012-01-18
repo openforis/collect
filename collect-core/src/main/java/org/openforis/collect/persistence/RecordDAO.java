@@ -9,10 +9,7 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jooq.Record;
-import org.jooq.Result;
-import org.jooq.SelectConditionStep;
 import org.jooq.SelectQuery;
-import org.jooq.exception.DataTypeException;
 import org.jooq.impl.Factory;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.RecordSummary;
@@ -20,6 +17,7 @@ import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.jooq.DataLoader;
 import org.openforis.collect.persistence.jooq.DataPersister;
 import org.openforis.collect.persistence.jooq.RecordSummaryQueryBuilder;
+import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Schema;
@@ -72,16 +70,33 @@ public class RecordDAO extends CollectDAO {
 	}
 
 	@Transactional
-	public List<RecordSummary> loadRecordSummaries(EntityDefinition rootEntityDefinition, int offset, int maxNumberOfRecords, String orderByFieldName, String filter) {
+	public List<RecordSummary> loadRecordSummaries(EntityDefinition rootEntityDefinition, List<EntityDefinition> countEntityDefinitions, int offset, int maxNumberOfRecords, String orderByFieldName, String filter) {
 		Factory jf = getJooqFactory();
 		
-		RecordSummaryQueryBuilder recordSummaryLoader = new RecordSummaryQueryBuilder(jf, rootEntityDefinition);
+		RecordSummaryQueryBuilder recordSummaryQueryBuilder = new RecordSummaryQueryBuilder(jf);
+
+		//add root entity definition to filter the records 
+		recordSummaryQueryBuilder.setRootEntityDefinition(rootEntityDefinition);
 		
-		SelectQuery selectQuery = recordSummaryLoader.buildSelect(offset, maxNumberOfRecords, orderByFieldName, filter);
+		//add key attribute definitions
+		List<AttributeDefinition> keyAttributeDefinitions = rootEntityDefinition.getKeyAttributeDefinitions();
+		recordSummaryQueryBuilder.addKeyAttributes(keyAttributeDefinitions);
+		
+		//add count of entities
+		recordSummaryQueryBuilder.addCountEntityDefinitions(countEntityDefinitions);
+
+		//add order by
+		recordSummaryQueryBuilder.addOrderBy(orderByFieldName);
+		
+		//add limit
+		recordSummaryQueryBuilder.addLimit(offset, maxNumberOfRecords);
+		
+		//build select
+		SelectQuery selectQuery = recordSummaryQueryBuilder.buildSelect();
 		
 		List<Record> records = selectQuery.fetch();
 
-		List<RecordSummary> result = recordSummaryLoader.parseResult(records);
+		List<RecordSummary> result = RecordDAOUtil.parseRecordSummariesSelectResult(records, keyAttributeDefinitions, countEntityDefinitions);
 		
 		return result;
 	}

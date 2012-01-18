@@ -4,6 +4,7 @@
 package org.openforis.collect.manager;
 
 import java.util.List;
+import java.util.Map;
 
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.RecordSummary;
@@ -79,8 +80,8 @@ public class RecordManager {
 	}
 
 	@Transactional
-	public List<RecordSummary> getSummaries(EntityDefinition rootEntityDefinition, int offset, int maxNumberOfRecords, String orderByFieldName, String filter) {
-		List<RecordSummary> recordsSummary = recordDAO.loadRecordSummaries(rootEntityDefinition, offset, maxNumberOfRecords, orderByFieldName, filter);
+	public List<RecordSummary> getSummaries(EntityDefinition rootEntityDefinition, List<EntityDefinition> countEntityDefinitions, int offset, int maxNumberOfRecords, String orderByFieldName, String filter) {
+		List<RecordSummary> recordsSummary = recordDAO.loadRecordSummaries(rootEntityDefinition, countEntityDefinitions, offset, maxNumberOfRecords, orderByFieldName, filter);
 		return recordsSummary;
 	}
 
@@ -91,7 +92,7 @@ public class RecordManager {
 	}
 
 	@Transactional
-	public Record create(String name, Survey survey, String rootEntityId) throws MultipleEditException, DuplicateIdException, InvalidIdException, DuplicateIdException, AccessDeniedException,
+	public Record create(Map<String, Object> keyMap, Survey survey, int rootEntityId, String modelVersionName) throws MultipleEditException, DuplicateIdException, InvalidIdException, DuplicateIdException, AccessDeniedException,
 			RecordLockedException {
 		// TODO
 		return null;

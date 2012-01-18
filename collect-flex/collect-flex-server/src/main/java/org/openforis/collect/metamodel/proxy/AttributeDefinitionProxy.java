@@ -14,7 +14,7 @@ import org.openforis.idm.metamodel.KeyAttributeDefinition;
  * @author M. Togna
  * 
  */
-public class AttributeDefinitionProxy extends NodeDefinitionProxy implements Proxy {
+public abstract class AttributeDefinitionProxy extends NodeDefinitionProxy implements Proxy {
 
 	private transient AttributeDefinition attributeDefinition;
 
