@@ -6,9 +6,22 @@
  */
 
 package org.openforis.collect.metamodel.proxy {
+	import mx.collections.ArrayCollection;
+	import mx.collections.IList;
 
     [Bindable]
     [RemoteClass(alias="org.openforis.collect.metamodel.proxy.EntityDefinitionProxy")]
     public class EntityDefinitionProxy extends EntityDefinitionProxyBase {
-    }
+		
+		public function keyAttributeDefinitions():IList {
+			var list:ArrayCollection = new ArrayCollection();
+			for each(var nodeDef:NodeDefinitionProxy in childDefinitions) {
+				if(nodeDef is AttributeDefinitionProxy && (nodeDef as AttributeDefinitionProxy).key) {
+					list.addItem(nodeDef);
+				}
+			}
+			return list;
+		}
+	}
+		
 }

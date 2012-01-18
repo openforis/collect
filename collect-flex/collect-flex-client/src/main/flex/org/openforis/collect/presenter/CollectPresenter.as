@@ -97,10 +97,10 @@ package org.openforis.collect.presenter {
 		protected function surveySelectedHandler(event:UIEvent):void {
 			var s:SurveySummary = event.obj as SurveySummary;
 			var name:String = s.name;
-			_modelClient.getSurvey(new ItemResponder(getSurveyResultHandler, faultHandler), name);			
+			_modelClient.setActiveSurvey(new ItemResponder(setActiveSurveyResultHandler, faultHandler), name);			
 		}
 		
-		internal function getSurveyResultHandler(event:ResultEvent, token:Object = null):void {
+		internal function setActiveSurveyResultHandler(event:ResultEvent, token:Object = null):void {
 			var survey:SurveyProxy = event.result as SurveyProxy;
 			Application.activeSurvey = survey;
 			var schema:SchemaProxy = survey.schema;
@@ -114,7 +114,6 @@ package org.openforis.collect.presenter {
 				//TODO
 				
 				//REMOVE IT: TEMPORARY select of first root entity
-				
 				var listView:ListView = _view.masterView.listView;
 				
 				var rootEntityDef:EntityDefinitionProxy = rootEntityDefinitions.getItemAt(0) as EntityDefinitionProxy;

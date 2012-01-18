@@ -11,10 +11,9 @@
             /WEB-INF/conf/applicationContext.xml
 			/WEB-INF/conf/applicationContext-security.xml
 			/WEB-INF/conf/applicationContext-graniteds.xml
-<!-- 			/WEB-INF/conf/applicationContext-blazeds.xml -->
         </param-value>
 	</context-param>
-<!-- 			/WEB-INF/conf/applicationContext-jms.xml -->
+
 	<context-param>
         <param-name>webAppRootKey</param-name>
         <param-value>collect.root</param-value>
@@ -70,10 +69,10 @@
 	</filter-mapping>
 	<!-- end of cache filter mapping -->
 
-<!-- 	TODO -->
-<!--     <listener> -->
-<!-- 		<listener-class>org.fao.openforis.web.listener.SessionListener</listener-class> -->
-<!-- 	</listener> -->
+    <listener>
+		<listener-class>org.openforis.collect.web.listener.SessionListener</listener-class>
+	</listener>
+	
 	<!--
       - Loads the root application context of this web app at startup.
       - The application context is then available via
@@ -107,11 +106,6 @@
 		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
 		<load-on-startup>1</load-on-startup>
 	</servlet>
-	
-<!-- 	<servlet-mapping> -->
-<!-- 		<servlet-name>dispatcher</servlet-name> -->
-<!-- 		<url-pattern>/messagebroker/*</url-pattern> -->
-<!-- 	</servlet-mapping> -->
 	
 	<servlet-mapping>
 		<servlet-name>dispatcher</servlet-name>

@@ -39,5 +39,20 @@ package org.openforis.collect.ui {
 		
 		[Embed("/assets/images/settings.png")]
 		public static const SETTINGS:Class;
+		
+		[Embed("/assets/images/next.png")]
+		public static const NEXT:Class;
+		
+		[Embed("/assets/images/previous.png")]
+		public static const PREV:Class;
+		
+		[Embed("/assets/images/first.png")]
+		public static const FIRST:Class;
+		
+		[Embed("/assets/images/last.png")]
+		public static const LAST:Class;
+		
+		[Embed("/assets/images/back.png")]
+		public static const BACK:Class;
 	}
 }

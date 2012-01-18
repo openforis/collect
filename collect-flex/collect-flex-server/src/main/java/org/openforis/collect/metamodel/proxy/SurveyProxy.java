@@ -5,11 +5,12 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
+import org.openforis.collect.Proxy;
 import org.openforis.collect.model.UIConfiguration;
 import org.openforis.idm.metamodel.Configuration;
 import org.openforis.idm.metamodel.Survey;
 
-public class SurveyProxy implements ProxyBase {
+public class SurveyProxy implements Proxy {
 
 	private static Log LOG = LogFactory.getLog(SurveyProxy.class);
 
@@ -76,23 +77,12 @@ public class SurveyProxy implements ProxyBase {
 	@ExternalizedProperty
 	public UIConfiguration getUiConfiguration() {
 		List<Configuration> configuration = survey.getConfiguration();
-		if (configuration != null) {
-			return (UIConfiguration) configuration;
+		if (configuration != null && !configuration.isEmpty()) {
+			UIConfiguration uiConf = (UIConfiguration) configuration.get(0);
+			return uiConf;
 		} else {
 			return null;
 		}
-		// if (element != null) {
-		// Element uiConfigElement = (Element) element.getFirstChild();
-		// try {
-		// UIConfiguration uiConfiguration = UIConfiguration.unmarshal(uiConfigElement);
-		// return uiConfiguration;
-		// } catch (IOException e) {
-		// LOG.error(e);
-		// return null;
-		// }
-		// } else {
-		// return null;
-		// }
 	}
 
 }

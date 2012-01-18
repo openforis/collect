@@ -11,6 +11,7 @@ import org.openforis.collect.persistence.SurveyDAO;
 import org.openforis.idm.metamodel.LanguageSpecificText;
 import org.openforis.idm.metamodel.Survey;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author M. Togna
@@ -23,12 +24,14 @@ public class SurveyManager {
 
 	@Autowired
 	private SurveyDAO surveyDAO;
-
+	
+	@Transactional
 	public Survey load(String name) {
 		Survey survey = surveyDAO.load(name);
 		return survey;
 	}
-
+	
+	@Transactional
 	public List<SurveySummary> getSurveySummaries(String lang) {
 		List<SurveySummary> summaries = new ArrayList<SurveySummary>();
 		for (Survey survey : surveys) {
@@ -40,7 +43,6 @@ public class SurveyManager {
 		}
 		return summaries;
 	}
-
 	private String getProjectName(Survey survey, String lang) {
 		List<LanguageSpecificText> names = survey.getProjectNames();
 		if (names == null || names.size() == 0) {
@@ -56,9 +58,9 @@ public class SurveyManager {
 		}
 		return "";
 	}
-
-	@SuppressWarnings("unused")
-	private void init() {
+	
+	@Transactional
+	protected void init() {
 		surveys = surveyDAO.loadAll();
 	}
 

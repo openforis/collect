@@ -6,13 +6,14 @@ package org.openforis.collect.metamodel.proxy;
 import java.util.List;
 
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
+import org.openforis.collect.Proxy;
 import org.openforis.idm.metamodel.Schema;
 
 /**
  * @author M. Togna
  * 
  */
-public class SchemaProxy implements ProxyBase {
+public class SchemaProxy implements Proxy {
 
 	private transient Schema schema;
 

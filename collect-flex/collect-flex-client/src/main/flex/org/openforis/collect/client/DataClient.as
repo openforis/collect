@@ -18,7 +18,9 @@ package org.openforis.collect.client {
 		private var _updateOperation:Operation;
 		private var _newRecordOperation:Operation;
 		private var _getCountRecordsOperation:Operation;
-		private var _getRecordsSummaryOperation:Operation;
+		private var _getRecordSummariesOperation:Operation;
+		private var _loadRecordOperation:Operation;
+		private var _clearActiveRecordOperation:Operation;
 		
 		public function DataClient() {
 			super("dataService");
@@ -27,7 +29,9 @@ package org.openforis.collect.client {
 			this._updateOperation = getOperation("update");
 			this._newRecordOperation = getOperation("newRecord");
 			this._getCountRecordsOperation = getOperation("getCountRecords");
-			this._getRecordsSummaryOperation = getOperation("getRecordSummaries");
+			this._getRecordSummariesOperation = getOperation("getRecordSummaries");
+			this._loadRecordOperation = getOperation("loadRecord");
+			this._clearActiveRecordOperation = getOperation("clearActiveRecord");	
 		}
 		
 		public function getCountRecords(responder:IResponder):void {
@@ -40,11 +44,20 @@ package org.openforis.collect.client {
 			token.addResponder(responder);
 		}
 		
-		public function getRecordsSummary(responder:IResponder, rootEntityId:int, offset:int, maxNumberOfRecords:int, orderByField:String, filter:String = null):void {
-			var token:AsyncToken = this._getRecordsSummaryOperation.send(rootEntityId, offset, maxNumberOfRecords, orderByField, filter);
+		public function getRecordSummaries(responder:IResponder, rootEntityName:String, offset:int, maxNumberOfRecords:int, orderByField:String=null, filter:String = null):void {
+			var token:AsyncToken = this._getRecordSummariesOperation.send(rootEntityName, offset, maxNumberOfRecords, orderByField, filter);
 			token.addResponder(responder);
 		}
 		
+		public function loadRecord(responder:IResponder, id:int):void {
+			var token:AsyncToken = this._loadRecordOperation.send(id);
+			token.addResponder(responder);
+		}
+		
+		public function clearActiveRecord(responder:IResponder):void {
+			var token:AsyncToken = this._clearActiveRecordOperation.send();
+			token.addResponder(responder);
+		}
 	//	public function update(responder:IResponder, request:UpdateRequest):void {
 	//		this._updateQueueProcessor.appendOperation(responder, this._updateOperation, request);
 			/*

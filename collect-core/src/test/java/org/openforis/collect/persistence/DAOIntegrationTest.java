@@ -15,6 +15,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openforis.collect.model.CollectAttributeMetadata;
 import org.openforis.collect.model.CollectRecord;
+import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.RecordSummary;
 import org.openforis.collect.model.UIConfiguration.UIConfigurationAdapter;
 import org.openforis.idm.metamodel.EntityDefinition;
@@ -58,7 +59,7 @@ public class DAOIntegrationTest {
 	}
 	
 	@Test
-	public void testCRUD() throws IOException, SurveyImportException, DataInconsistencyException, InvalidIdmlException  {
+	public void testCRUD() throws IOException, SurveyImportException, DataInconsistencyException, InvalidIdmlException, NonexistentIdException  {
 		// LOAD MODEL
 		Survey survey = surveyDao.load("archenland1");
 
@@ -114,7 +115,7 @@ public class DAOIntegrationTest {
 		CollectRecord record = new CollectRecord(survey, "cluster", "2.0");
 		record.setCreationDate(new GregorianCalendar(2011, 12, 31, 23, 59).getTime());
 		record.setCreatedBy("DAOIntegrationTest");
-
+		record.setStep(Step.ENTRY);
 		Entity cluster = record.getRootEntity();
 		cluster.addValue("id", new AlphanumericCode("123_456"));
 		cluster.addValue("gps_realtime", Boolean.TRUE);
@@ -172,14 +173,16 @@ public class DAOIntegrationTest {
 		Survey survey = surveyDao.load("archenland1");
 		//get the first root entity
 		EntityDefinition rootEntity = survey.getSchema().getRootEntityDefinitions().get(0);
-		int rootEntityId = rootEntity.getId();
 		int offset = 0;
 		int maxNumberOfRecords = 1;
-		String orderByFieldName = "id";
+		String orderByFieldName = "key_id";
 		String filter = null;
-		List<RecordSummary> list = this.recordDao.getRecordSummaries(rootEntityId, offset, maxNumberOfRecords, orderByFieldName, filter);
+		List<RecordSummary> list = this.recordDao.loadRecordSummaries(rootEntity, offset, maxNumberOfRecords, orderByFieldName, filter);
 		assertNotNull(list);
 		assertEquals(1, list.size());
+		
+		RecordSummary summary = list.get(0);
+		assertEquals(1, summary.getStep());
 	}
 	
 	private void updateRecord(CollectRecord record) {

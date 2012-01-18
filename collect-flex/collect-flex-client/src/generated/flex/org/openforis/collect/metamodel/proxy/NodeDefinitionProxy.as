@@ -12,8 +12,14 @@ package org.openforis.collect.metamodel.proxy {
     [RemoteClass(alias="org.openforis.collect.metamodel.proxy.NodeDefinitionProxy")]
     public class NodeDefinitionProxy extends NodeDefinitionProxyBase {
 		
-		public static function getDefaultLabel(labels:IList, type:NodeLabelProxy$Type, language:String):String {
-			if(labels.length == 1) {
+		public function getLabelText(language:String = "en"):String {
+			return getLabel(this.labels, NodeLabelProxy$Type.INSTANCE, language);
+		}
+		
+		public static function getLabel(labels:IList, type:NodeLabelProxy$Type, language:String = "en"):String {
+			if(labels == null || labels.length <= 0) {
+				return null;
+			} else if(labels.length == 1) {
 				return NodeLabelProxy(labels.getItemAt(0)).text;
 			} else {
 				for each(var label:NodeLabelProxy in labels) {
@@ -21,9 +27,8 @@ package org.openforis.collect.metamodel.proxy {
 						return label.text;
 					}
 				}
+				return "";
 			}
-			//if label not found
-			return null;
 		}
 		
     }

@@ -12,8 +12,10 @@ package org.openforis.collect.metamodel.proxy {
     [RemoteClass(alias="org.openforis.collect.metamodel.proxy.ModelVersionProxy")]
     public class ModelVersionProxy extends ModelVersionProxyBase {
 		
-		public static function getDefaultLabel(labels:IList, language:String):String {
-			if(labels.length == 1) {
+		public function getLabelText(language:String="en"):String {
+			if(labels == null || labels.length <=0){
+				return "";
+			} else if(labels.length == 1) {
 				return LanguageSpecificTextProxy(labels.getItemAt(0)).text;
 			} else {
 				for each(var label:LanguageSpecificTextProxy in labels) {
@@ -22,8 +24,7 @@ package org.openforis.collect.metamodel.proxy {
 					}
 				}
 			}
-			//if label not found
-			return null;
+			return "";
 		}
 
     }

@@ -21,7 +21,7 @@
 			}
 			
 			protected function versionLabelFunction(item:ModelVersionProxy):String {
-				return ModelVersionProxy.getDefaultLabel(item.labels, "en_US");
+				return item.getLabelText();
 			}
 
 		]]>

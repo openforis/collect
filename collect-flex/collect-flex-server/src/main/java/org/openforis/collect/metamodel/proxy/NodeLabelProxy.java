@@ -7,13 +7,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
+import org.openforis.collect.Proxy;
 import org.openforis.idm.metamodel.NodeLabel;
 
 /**
  * @author M. Togna
  * 
  */
-public class NodeLabelProxy implements ProxyBase {
+public class NodeLabelProxy implements Proxy {
 
 	private transient NodeLabel nodeLabel;
 

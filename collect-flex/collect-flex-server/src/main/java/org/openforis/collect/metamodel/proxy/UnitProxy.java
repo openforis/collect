@@ -7,13 +7,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
+import org.openforis.collect.Proxy;
 import org.openforis.idm.metamodel.Unit;
 
 /**
  * @author M. Togna
  * 
  */
-public class UnitProxy implements ProxyBase {
+public class UnitProxy implements Proxy {
 
 	private transient Unit unit;
 

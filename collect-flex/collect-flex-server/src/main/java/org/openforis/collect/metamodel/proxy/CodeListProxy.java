@@ -7,13 +7,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
+import org.openforis.collect.Proxy;
 import org.openforis.idm.metamodel.CodeList;
 
 /**
  * @author M. Togna
  * @author S. Ricci
  */
-public class CodeListProxy implements ProxyBase {
+public class CodeListProxy implements Proxy {
 
 	private transient CodeList codeList;
 

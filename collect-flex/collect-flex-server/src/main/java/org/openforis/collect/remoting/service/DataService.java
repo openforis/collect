@@ -8,28 +8,34 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.openforis.collect.exception.AccessDeniedException;
-import org.openforis.collect.exception.DuplicateIdException;
-import org.openforis.collect.exception.InvalidIdException;
-import org.openforis.collect.exception.MultipleEditException;
-import org.openforis.collect.exception.NonexistentIdException;
-import org.openforis.collect.exception.RecordLockedException;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.RecordSummary;
+import org.openforis.collect.model.User;
+import org.openforis.collect.model.proxy.RecordProxy;
+import org.openforis.collect.persistence.AccessDeniedException;
+import org.openforis.collect.persistence.DuplicateIdException;
+import org.openforis.collect.persistence.InvalidIdException;
+import org.openforis.collect.persistence.MultipleEditException;
+import org.openforis.collect.persistence.NonexistentIdException;
+import org.openforis.collect.persistence.RecordLockedException;
 import org.openforis.collect.remoting.service.UpdateRequest.Method;
+import org.openforis.collect.session.SessionState;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
+import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.NodeDefinition;
+import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Code;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.Record;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author M. Togna
@@ -42,12 +48,16 @@ public class DataService {
 	@Autowired
 	private RecordManager recordManager;
 
-	public Record loadRecord(String entityName, long id) throws RecordLockedException, MultipleEditException, NonexistentIdException, AccessDeniedException {
-		Record record = recordManager.checkout(entityName, id);
+	@Transactional
+	public RecordProxy loadRecord(int id) throws RecordLockedException, MultipleEditException, NonexistentIdException, AccessDeniedException {
+		Survey survey = getActiveSurvey();
+		User user = getUserInSession();
+		CollectRecord record = recordManager.checkout(survey, user, id);
 		sessionManager.setActiveRecord((CollectRecord) record);
-		return record;
+		return new RecordProxy(record);
 	}
 
+	@Transactional
 	public List<RecordSummary> getRecordSummaries() {
 		List<RecordSummary> list = recordManager.getSummaries();
 		return list;
@@ -55,34 +65,41 @@ public class DataService {
 
 	/**
 	 * 
-	 * @param rootEntityId
+	 * @param rootEntityName
 	 * @param offset
 	 * @param toIndex
 	 * @param orderByFieldName
-	
+	 * 
 	 * @return map with "count" and "records" items
 	 */
-	public Map<String, Object> getRecordSummaries(int rootEntityId, int offset, int maxNumberOfRows, String orderByFieldName, String filter) {
+	@Transactional
+	public Map<String, Object> getRecordSummaries(String rootEntityName, int offset, int maxNumberOfRows, String orderByFieldName, String filter) {
 		Map<String, Object> result = new HashMap<String, Object>();
-		int count = recordManager.getCountRecords(rootEntityId, filter);
-		List<RecordSummary> list = recordManager.getSummaries(rootEntityId, offset, maxNumberOfRows, orderByFieldName, filter);
+		SessionState sessionState = sessionManager.getSessionState();
+		Survey activeSurvey = sessionState.getActiveSurvey();
+		Schema schema = activeSurvey.getSchema();
+		EntityDefinition rootEntityDefinition = schema.getRootEntityDefinition(rootEntityName);
+		int count = recordManager.getCountRecords(rootEntityDefinition, filter);
+		List<RecordSummary> list = recordManager.getSummaries(rootEntityDefinition, offset, maxNumberOfRows, orderByFieldName, filter);
 		result.put("count", count);
 		result.put("records", list);
 		return result;
 	}
 
+	@Transactional
 	public Record newRecord(String name, Survey survey, String rootEntityId) throws MultipleEditException, DuplicateIdException, InvalidIdException, DuplicateIdException, AccessDeniedException,
 			RecordLockedException {
-
 		Record record = recordManager.create(name, survey, rootEntityId);
 		return record;
 	}
 
+	@Transactional
 	public void saveActiveRecord() {
 		Record record = this.sessionManager.getSessionState().getActiveRecord();
 		recordManager.save(record);
 	}
 
+	@Transactional
 	public void deleteActiveRecord() {
 		Record record = this.sessionManager.getSessionState().getActiveRecord();
 		recordManager.delete(record.getRootEntity().getName(), record.getId());
@@ -108,10 +125,12 @@ public class DataService {
 		return null;
 	}
 
+	@Transactional
 	public void promote(String recordId) throws InvalidIdException, MultipleEditException, NonexistentIdException, AccessDeniedException, RecordLockedException {
 		this.recordManager.promote(recordId);
 	}
 
+	@Transactional
 	public void demote(String recordId) throws InvalidIdException, MultipleEditException, NonexistentIdException, AccessDeniedException, RecordLockedException {
 		this.recordManager.demote(recordId);
 	}
@@ -125,8 +144,12 @@ public class DataService {
 
 	/**
 	 * remove the active record from the current session
+	 * @throws RecordLockedException 
 	 */
-	public void clearActiveRecord() {
+	public void clearActiveRecord() throws RecordLockedException {
+		CollectRecord activeRecord = getActiveRecord();
+		User user = getUserInSession();
+		this.recordManager.unlock(activeRecord, user);
 		this.sessionManager.clearActiveRecord();
 	}
 
@@ -191,8 +214,22 @@ public class DataService {
 		return null;
 	}
 
+	private User getUserInSession() {
+		SessionState sessionState = getSessionManager().getSessionState();
+		User user = sessionState.getUser();
+		return user;
+	}
+
+	private Survey getActiveSurvey() {
+		SessionState sessionState = getSessionManager().getSessionState();
+		Survey activeSurvey = sessionState.getActiveSurvey();
+		return activeSurvey;
+	}
+
 	protected CollectRecord getActiveRecord() {
-		return this.sessionManager.getSessionState().getActiveRecord();
+		SessionState sessionState = getSessionManager().getSessionState();
+		CollectRecord activeRecord = sessionState.getActiveRecord();
+		return activeRecord;
 	}
 
 	protected SessionManager getSessionManager() {
@@ -202,4 +239,5 @@ public class DataService {
 	protected RecordManager getRecordManager() {
 		return recordManager;
 	}
+
 }

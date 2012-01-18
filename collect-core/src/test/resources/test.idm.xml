@@ -3154,7 +3154,7 @@
             <text type="memo" name="remarks">
                 <label>Remarks</label>
             </text>
-            <entity name="plot" multiple="true" ui:tab="plot">
+            <entity name="plot" multiple="true" ui:tab="plot" ui:countInSummaryList="true">
                 <label>Plot</label>
                 <code name="no" list="sampling_design" parent="parent()/id" ui:tab="plot_det" strict="false" key="true">
                     <label>No.</label>

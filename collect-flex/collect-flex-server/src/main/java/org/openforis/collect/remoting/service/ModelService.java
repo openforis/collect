@@ -13,7 +13,13 @@ import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.SpatialReferenceSystem;
 import org.openforis.idm.metamodel.Survey;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * 
+ * @author M. Togna
+ *
+ */
 public class ModelService {
 
 	@Autowired
@@ -33,13 +39,17 @@ public class ModelService {
 	public Collection<ModelVersion> getModelVersions() {
 		return null;
 	}
-
-	public SurveyProxy getSurvey(String name) {
+	
+	@Transactional
+	public SurveyProxy setActiveSurvey(String name) {
 		Survey survey = surveyManager.load(name);
+		SessionState sessionState = sessionManager.getSessionState();
+		sessionState.setActiveSurvey(survey);
 		SurveyProxy proxy = new SurveyProxy(survey);
 		return proxy;
 	}
-
+	
+	@Transactional
 	public List<SurveySummary> getSurveySummaries() {
 		SessionState sessionState = sessionManager.getSessionState();
 		Locale locale = sessionState.getLocale();

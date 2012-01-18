@@ -7,13 +7,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
+import org.openforis.collect.Proxy;
 import org.openforis.idm.metamodel.LanguageSpecificText;
 
 /**
  * @author M. Togna
  * 
  */
-public class LanguageSpecificTextProxy implements ProxyBase {
+public class LanguageSpecificTextProxy implements Proxy {
 
 	private transient LanguageSpecificText languageSpecificText;
 
