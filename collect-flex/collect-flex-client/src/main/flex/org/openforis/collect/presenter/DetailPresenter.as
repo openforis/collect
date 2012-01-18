@@ -16,6 +16,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.event.UIEvent;
 	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
+	import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
 	import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.NodeLabelProxy$Type;
 	import org.openforis.collect.model.proxy.RecordProxy;
@@ -60,9 +61,17 @@ package org.openforis.collect.presenter {
 				keyValues += activeRecord.rootEntityKeys.get(k.name);
 			}
 			
+			var version:ModelVersionProxy = activeRecord.version;
 			_view.keyAttributeValuesText.text = keyValues;
 			_view.rootEntityDefinitionText.text = activeRootEntity.getLabelText();
-			_view.formVersionText.text = activeRecord.version.getLabelText();
+			_view.formVersionText.text = version.getLabelText();
+			
+			if (_view.formsContainer.hasForm(version,activeRootEntity)){
+				_view.currentState = DetailView.EDIT_STATE;
+			} else {
+				//build form 
+				_view.currentState = DetailView.LOADING_STATE;
+			}
 		}
 		
 		/**

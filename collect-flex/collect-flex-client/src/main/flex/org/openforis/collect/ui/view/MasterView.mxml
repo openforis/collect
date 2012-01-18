@@ -44,12 +44,7 @@
 		<s:State name="detail" />
 	</s:states>
 	
-	<s:NavigatorContent width="100%" height="100%" includeIn="loading" itemCreationPolicy="immediate">
-		<s:layout>
-			<s:VerticalLayout horizontalAlign="center" verticalAlign="middle" />
-		</s:layout>
-		<mx:ProgressBar indeterminate="true" label="{Message.get('master.loading')}" /> 
-	</s:NavigatorContent>
+	<component:LoadingContent width="100%" height="100%" includeIn="loading" itemCreationPolicy="immediate"/>
 	<view:HomeView id="homeView" includeIn="home" itemCreationPolicy="immediate" />
 	<!--
 	<view:SurveySelectionView id="surveySelectionView" includeIn="surveySelection" itemCreationPolicy="immediate" />

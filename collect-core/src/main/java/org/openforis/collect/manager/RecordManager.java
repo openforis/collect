@@ -5,13 +5,13 @@ package org.openforis.collect.manager;
 
 import java.util.List;
 
-import org.openforis.collect.exception.MultipleEditException;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.RecordSummary;
 import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.AccessDeniedException;
 import org.openforis.collect.persistence.DuplicateIdException;
 import org.openforis.collect.persistence.InvalidIdException;
+import org.openforis.collect.persistence.MultipleEditException;
 import org.openforis.collect.persistence.NonexistentIdException;
 import org.openforis.collect.persistence.RecordDAO;
 import org.openforis.collect.persistence.RecordLockedException;
