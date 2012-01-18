@@ -6,25 +6,27 @@
 	
 	<fx:Script>
 		<![CDATA[
-			private var _rootFormContent:RootEntityFormContainer;
-			//TODO change to version object
-			private var _version:Object;
+			import org.openforis.collect.model.proxy.RecordProxy;
 			
-			public function get rootFormContent():RootEntityFormContainer {
-				return _rootFormContent;
-			}
-			
-			public function set rootFormContent(value:RootEntityFormContainer):void {
-				_rootFormContent = value;
-			}
+			private var _rootFormContainer:EntityFormContainer;
+			private var _record:RecordProxy;
 			
 			[Bindable]
-			public function get version():Object {
-				return _version;
+			public function get record():RecordProxy {
+				return _record;
+			}
+
+			public function set record(value:RecordProxy):void {
+				_record = value;
+			}
+
+			public function get rootFormContainer():EntityFormContainer {
+				return _rootFormContainer;
 			}
 			
-			public function set version(value:Object):void {
-				_version = value;
+			public function set rootFormContainer(value:EntityFormContainer):void {
+				_rootFormContainer = value;
+				this.viewStack.addElement(_rootFormContainer);
 			}
 			
 			public function addEntityFormContainer(form:EntityFormContainer):void {
@@ -40,10 +42,13 @@
 		<s:VerticalLayout gap="0" />
 	</s:layout>
 	
+	<!--
 	<s:Group width="100%">
 		<s:TabBar id="buttonBar" dataProvider="{viewStack}" />
-		<s:Label id="formVersionLabel" text="{version.label}" right="0" verticalCenter="0" />
+		<s:Label id="formVersionLabel" text="{record.version.getLabelText()}" right="0" verticalCenter="0" />
 	</s:Group>
+	-->
+	<s:ButtonBar dataProvider="{viewStack}"/>
 	<mx:ViewStack width="100%" height="100%" id="viewStack">
 		<!-- view stack for all entity forms-->
 	</mx:ViewStack>

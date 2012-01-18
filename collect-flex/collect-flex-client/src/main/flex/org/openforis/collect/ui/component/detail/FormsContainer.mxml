@@ -8,65 +8,47 @@
 	
 	<fx:Script>
 		<![CDATA[
-			import mx.collections.ArrayCollection;
 			import mx.events.FlexEvent;
 			
 			import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 			import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
-			import org.openforis.collect.ui.component.input.DateInputField;
-			import org.openforis.collect.ui.component.input.InputField;
-			import org.openforis.collect.ui.component.input.MemoInputField;
 			
-			private var _formVersions:ArrayCollection;
-			
-			//TODO this must be the Object instance
-			private var _data:Object;
-			
-			public function hasForm(version:ModelVersionProxy, entity:EntityDefinitionProxy):Boolean {
-				return false;
-			}
+			private var _forms:Array = new Array();
 			
 			protected function initializeHandler(event:FlexEvent):void {
-				//this._forms = new Array();
 			}
 
-			/*
-			public function addRecordDetail(recordDetail:RecordDetail):void {
-				this._forms[recordDetail.version] = recordDetail;
-			}
-			*/		
-			
-			protected function isFormInitialized(version:Object):Boolean {
-				//var index:int = formVersions.getItemIndex(version);
-				//var formContentWrapper:NavigatorContent = formContentWrappers[index];
-				//return formContentWrapper.numElements > 0;
-				return false;
+			/**
+			 * Return true if the form for teh specified version / entity definition has been generated
+			 * */
+			public function contatinsForm(version:ModelVersionProxy, entity:EntityDefinitionProxy):Boolean {
+				var form:FormContainer = getForm(version, entity);
+				var containsForm:Boolean = form != null;
+				return containsForm;
 			}
 			
-			public function setActiveForm(version:Object):void {
-				//TODO
-				//var index:int = formVersions.getItemIndex(version);
-				//var formContentWrapper:NavigatorContent = formContentWrappers[index];
-				
-				if(! isFormInitialized(version)) { 
-				}
+			public function addForm(form:FormContainer, version:ModelVersionProxy, entity:EntityDefinitionProxy):void {
+				var name:String = getFormName(version,entity);
+				_forms[name] = form; 
+				this.addElement(form);
 			}
 			
-			public function addFormContainer(value:FormContainer, version:Object):void {
-				//viewStack.addElement(value);
-				//(getChildAt(formVersions.getItemIndex(version)) as NavigatorContent).addElement(value);
+			public function getForm(version:ModelVersionProxy, entity:EntityDefinitionProxy):FormContainer{
+				var name:String = getFormName(version,entity);
+				var form:FormContainer = _forms[name] as FormContainer;
+				return form;
 			}
 			
-			
-			
-			override public function get data():Object {
-				return _data;
+			public function setActiveForm(version:ModelVersionProxy, entity:EntityDefinitionProxy):FormContainer {
+				var form:FormContainer = getForm(version, entity);
+				this.selectedChild = form;
+				return form;
 			}
-
-			override public function set data(value:Object):void {
-				_data = value;
+			
+			private function getFormName(version:ModelVersionProxy, entity:EntityDefinitionProxy):String {
+				var name:String = entity.name + "_" + version.name;
+				return name;
 			}
-
 			
 		]]>
 	</fx:Script>

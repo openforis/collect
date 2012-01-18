@@ -21,6 +21,7 @@ package org.openforis.collect.event {
 		
 		//Edit events
 		public static const ACTIVE_RECORD_CHANGED:String = "activeRecordChanged";
+		public static const BUILD_FORM:String = "buildForm";
 		
 		private var _obj:Object;
 		
