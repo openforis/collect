@@ -2,8 +2,12 @@
 <services-config>
 	
 	<factories>
-        <factory id="springFactory" class="org.granite.spring.SpringServiceFactory" />
-    </factories>
+		<factory id="springFactory" class="org.granite.spring.SpringServiceFactory">
+			<properties>
+				<service-exception-handler>org.openforis.collect.remoting.service.ServiceExceptionHandler</service-exception-handler>
+			</properties>
+		</factory>
+	</factories>
     
     <services>
 <!--        <service-include file-path="proxy-config.xml" />-->

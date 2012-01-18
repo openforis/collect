@@ -39,8 +39,8 @@ package org.openforis.collect.client {
 			token.addResponder(responder);
 		}
 		
-		public function newRecord(responder:IResponder, newId:String, versionId:String):void {
-			var token:AsyncToken = this._newRecordOperation.send(newId, versionId);
+		public function newRecord(responder:IResponder, keyMap:Object, rootEntityName:String, versionName:String):void {
+			var token:AsyncToken = this._newRecordOperation.send(keyMap, rootEntityName, versionName);
 			token.addResponder(responder);
 		}
 		

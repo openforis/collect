@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
 
@@ -175,9 +176,12 @@ public class DAOIntegrationTest {
 		EntityDefinition rootEntity = survey.getSchema().getRootEntityDefinitions().get(0);
 		int offset = 0;
 		int maxNumberOfRecords = 1;
-		String orderByFieldName = "key_id";
+		String orderByFieldName = "id";
 		String filter = null;
-		List<RecordSummary> list = this.recordDao.loadRecordSummaries(rootEntity, offset, maxNumberOfRecords, orderByFieldName, filter);
+		List<EntityDefinition> countInSummaryListEntityDefinitions = new ArrayList<EntityDefinition>();
+		EntityDefinition plotEntity = (EntityDefinition) rootEntity.getChildDefinition("plot");
+		countInSummaryListEntityDefinitions.add(plotEntity);
+		List<RecordSummary> list = this.recordDao.loadRecordSummaries(rootEntity, countInSummaryListEntityDefinitions, offset, maxNumberOfRecords, orderByFieldName, filter);
 		assertNotNull(list);
 		assertEquals(1, list.size());
 		

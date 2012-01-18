@@ -11,11 +11,12 @@
 			import mx.events.FlexEvent;
 			
 			import org.openforis.collect.i18n.Message;
+			import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 			import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
 			import org.openforis.collect.presenter.AddNewRecordPopUpPresenter;
 			
 			private var _presenter:AddNewRecordPopUpPresenter;
-
+			
 			protected function creationCompleteHandler(event:FlexEvent):void {
 				_presenter = new AddNewRecordPopUpPresenter(this);
 			}
@@ -23,32 +24,38 @@
 			protected function versionLabelFunction(item:ModelVersionProxy):String {
 				return item.getLabelText();
 			}
-
-		]]>
-	</fx:Script>
-	<fx:Declarations>
-		<!-- Place non-visual elements (e.g., services, value objects) here -->
-	</fx:Declarations>
-	
-	<fx:Script>
-		<![CDATA[
 			
 		]]>
 	</fx:Script>
 	
-	<s:VGroup width="100%" verticalAlign="middle" gap="5">
+	<s:VGroup verticalAlign="middle" gap="5">
 		<s:Form>
 			<s:layout>
-				<s:HorizontalLayout />
+				<s:VerticalLayout />
 			</s:layout>
-			<s:FormItem label="{Message.get('list.newRecordPopUp.idLabel')}">
-				<s:TextInput id="idTextInput" width="100" />
-			</s:FormItem>
-			<s:FormItem label="{Message.get('list.newRecordPopUp.formVersionLabel')}">
+			
+			<s:DataGroup id="keyDataGroup">
+				<s:itemRenderer>
+					<fx:Component>
+						<s:ItemRenderer autoDrawBackground="false">
+							<fx:Script>
+								<![CDATA[
+									import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
+								]]>
+							</fx:Script>
+							<s:FormItem label="{(data as AttributeDefinitionProxy).getLabelText()}" width="150">
+								<s:TextInput id="keyTextInput" width="100" />
+							</s:FormItem>
+						</s:ItemRenderer>
+					</fx:Component>
+				</s:itemRenderer>
+			</s:DataGroup>
+			
+			<s:FormItem label="{Message.get('list.newRecordPopUp.version')}">
 				<s:DropDownList id="versionsDropDownList" 
 								labelFunction="versionLabelFunction"
 								prompt="---"
-								width="150"
+								width="250"
 								/>
 			</s:FormItem>
 		</s:Form>
