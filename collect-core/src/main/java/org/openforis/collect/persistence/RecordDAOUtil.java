@@ -1,5 +1,6 @@
 package org.openforis.collect.persistence;
 
+import static org.openforis.collect.persistence.jooq.tables.Data.DATA;
 import static org.openforis.collect.persistence.jooq.tables.Record.RECORD;
 import static org.openforis.collect.persistence.jooq.tables.User.USER;
 
@@ -9,11 +10,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.jooq.Field;
 import org.jooq.Record;
+import org.jooq.Table;
+import org.jooq.TableField;
 import org.openforis.collect.model.RecordSummary;
+import org.openforis.collect.persistence.jooq.tables.Data;
+import org.openforis.collect.persistence.jooq.tables.records.DataRecord;
 import org.openforis.idm.metamodel.AttributeDefinition;
+import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
-
+import org.openforis.idm.metamodel.NumberAttributeDefinition;
+import org.openforis.idm.metamodel.TextAttributeDefinition;
+import static org.openforis.collect.persistence.jooq.tables.Data.DATA;
 /**
  * 
  * @author S. Ricci
@@ -62,5 +71,17 @@ public class RecordDAOUtil {
 			summaries.add(recordSummary);
 		}
 		return summaries;
+	}
+	
+	public static TableField<DataRecord, ?> getKeyValueField(Data dataTable, AttributeDefinition attributeDefinition) {
+		TableField<DataRecord, ?> dataField = null;
+		
+		if(attributeDefinition instanceof CodeAttributeDefinition || attributeDefinition instanceof TextAttributeDefinition) {
+			dataField = dataTable.TEXT1;
+		} else if(attributeDefinition instanceof NumberAttributeDefinition) {
+			dataField = dataTable.NUMBER1;
+		}
+		
+		return dataField;
 	}
 }

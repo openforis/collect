@@ -16,13 +16,12 @@ import org.jooq.JoinType;
 import org.jooq.SelectQuery;
 import org.jooq.TableField;
 import org.jooq.impl.Factory;
+import org.openforis.collect.persistence.RecordDAOUtil;
+import org.openforis.collect.persistence.jooq.tables.Data;
 import org.openforis.collect.persistence.jooq.tables.records.DataRecord;
 import org.openforis.idm.metamodel.AttributeDefinition;
-import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
-import org.openforis.idm.metamodel.NumberAttributeDefinition;
-import org.openforis.idm.metamodel.TextAttributeDefinition;
 
 /**
  * @author S. Ricci
@@ -201,19 +200,15 @@ public class RecordSummaryQueryBuilder {
 		//for each key attribute add a left join and a field in the projection
 		TableField<?, ?> orderByField = null;
 		for (AttributeDefinition attributeDefinition : keyAttributeDefinitions) {
-			String dataTableAlias = KEY_DATA_TABLE_ALIAS_PREFIX + attributeDefinition.getName();
+			String dataTableAliasName = KEY_DATA_TABLE_ALIAS_PREFIX + attributeDefinition.getName();
 			//left join with DATA table to get the key attribute
-			selectQuery.addJoin(DATA.as(dataTableAlias), JoinType.LEFT_OUTER_JOIN, 
-					DATA.as(dataTableAlias).RECORD_ID.equal(RECORD.ID), DATA.as(dataTableAlias).DEFINITION_ID.equal(attributeDefinition.getId()));
+			Data dataTableAlias = DATA.as(dataTableAliasName);
+			selectQuery.addJoin(dataTableAlias, JoinType.LEFT_OUTER_JOIN, 
+					dataTableAlias.RECORD_ID.equal(RECORD.ID), 
+					dataTableAlias.DEFINITION_ID.equal(attributeDefinition.getId()));
 			
-			TableField<DataRecord, ?> dataField = null;
+			TableField<DataRecord, ?> dataField = RecordDAOUtil.getKeyValueField(dataTableAlias, attributeDefinition);
 			
-			if(attributeDefinition instanceof CodeAttributeDefinition || attributeDefinition instanceof TextAttributeDefinition) {
-				dataField = DATA.as(dataTableAlias).TEXT1;
-			} else if(attributeDefinition instanceof NumberAttributeDefinition) {
-				dataField = DATA.as(dataTableAlias).NUMBER1;
-			}
-
 			if(dataField != null) {
 				//add key field to the projection fields
 				Field<?> fieldAlias = dataField.as(KEY_COLUMN_PREFIX + attributeDefinition.getName());

@@ -5,11 +5,13 @@ import static org.openforis.collect.persistence.jooq.tables.Data.DATA;
 import static org.openforis.collect.persistence.jooq.tables.Record.RECORD;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jooq.Record;
 import org.jooq.SelectQuery;
+import org.jooq.TableField;
 import org.jooq.impl.Factory;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.RecordSummary;
@@ -17,6 +19,7 @@ import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.jooq.DataLoader;
 import org.openforis.collect.persistence.jooq.DataPersister;
 import org.openforis.collect.persistence.jooq.RecordSummaryQueryBuilder;
+import org.openforis.collect.persistence.jooq.tables.Data;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
