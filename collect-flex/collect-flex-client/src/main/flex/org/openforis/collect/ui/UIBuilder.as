@@ -2,7 +2,6 @@ package org.openforis.collect.ui {
 	import mx.collections.ArrayList;
 	import mx.collections.IList;
 	import mx.collections.ListCollectionView;
-	import mx.core.Container;
 	
 	import org.openforis.collect.Application;
 	import org.openforis.collect.i18n.Message;
@@ -10,19 +9,13 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
 	import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
-	import org.openforis.collect.metamodel.proxy.NodeLabelProxy$Type;
 	import org.openforis.collect.model.UIConfiguration;
 	import org.openforis.collect.model.UITab;
 	import org.openforis.collect.ui.component.datagrid.RecordSummaryDataGrid;
 	import org.openforis.collect.ui.component.datagroup.DataGroupItemRenderer;
 	import org.openforis.collect.ui.component.detail.EntityFormContainer;
 	import org.openforis.collect.ui.component.detail.FormContainer;
-	import org.openforis.collect.ui.component.input.BooleanInputField;
-	import org.openforis.collect.ui.component.input.CodeInputField;
-	import org.openforis.collect.ui.component.input.DateInputField;
 	import org.openforis.collect.ui.component.input.InputField;
-	import org.openforis.collect.ui.component.input.NumericInputField;
-	import org.openforis.collect.ui.component.input.RangeInputField;
 	import org.openforis.collect.ui.component.input.StringInputField;
 	
 	import spark.components.gridClasses.GridColumn;
@@ -140,7 +133,7 @@ package org.openforis.collect.ui {
 				if(defns != null && defns.length >0){
 					for each (var def:NodeDefinitionProxy in defns) {
 						if(def is AttributeDefinitionProxy){
-							addAttributeFormItem(form, def as AttributeDefinitionProxy);
+							addAttributeFormItem(form, AttributeDefinitionProxy(def));
 						} else if(def is EntityDefinitionProxy) {
 							
 						}

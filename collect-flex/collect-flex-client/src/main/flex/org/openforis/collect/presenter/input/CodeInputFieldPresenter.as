@@ -4,7 +4,6 @@ package org.openforis.collect.presenter.input {
 	import flash.events.MouseEvent;
 	import flash.utils.setTimeout;
 	
-	import mx.binding.utils.BindingUtils;
 	import mx.collections.ArrayCollection;
 	import mx.core.FlexGlobals;
 	import mx.managers.PopUpManager;
@@ -14,12 +13,10 @@ package org.openforis.collect.presenter.input {
 	
 	import org.openforis.collect.event.CodeInputFieldEvent;
 	import org.openforis.collect.i18n.Message;
-	import org.openforis.collect.idm.model.impl.AbstractValue;
 	import org.openforis.collect.presenter.InputFieldPresenter;
 	import org.openforis.collect.ui.component.input.CodeInputField;
 	import org.openforis.collect.ui.component.input.CodeListDialog;
 	import org.openforis.collect.ui.component.input.CodeListItem;
-	import org.openforis.collect.ui.component.input.DateInputField;
 	import org.openforis.collect.ui.component.input.InputField;
 	
 	/**
@@ -48,7 +45,7 @@ package org.openforis.collect.presenter.input {
 		}
 		
 		
-		override public function set value(value:AbstractValue):void {
+		override public function set value(value:*):void {
 			_attributeValue = value;
 		}
 

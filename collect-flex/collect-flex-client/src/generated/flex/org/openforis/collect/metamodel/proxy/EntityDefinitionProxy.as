@@ -13,7 +13,7 @@ package org.openforis.collect.metamodel.proxy {
     [RemoteClass(alias="org.openforis.collect.metamodel.proxy.EntityDefinitionProxy")]
     public class EntityDefinitionProxy extends EntityDefinitionProxyBase {
 		
-		public function keyAttributeDefinitions():IList {
+		public function get keyAttributeDefinitions():IList {
 			var list:ArrayCollection = new ArrayCollection();
 			for each(var nodeDef:NodeDefinitionProxy in childDefinitions) {
 				if(nodeDef is AttributeDefinitionProxy && (nodeDef as AttributeDefinitionProxy).key) {
