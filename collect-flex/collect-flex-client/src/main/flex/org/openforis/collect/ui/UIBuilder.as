@@ -15,6 +15,7 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.ui.component.datagroup.DataGroupItemRenderer;
 	import org.openforis.collect.ui.component.detail.EntityFormContainer;
 	import org.openforis.collect.ui.component.detail.FormContainer;
+	import org.openforis.collect.ui.component.detail.FormsContainer;
 	import org.openforis.collect.ui.component.input.InputField;
 	import org.openforis.collect.ui.component.input.StringInputField;
 	
@@ -26,16 +27,17 @@ package org.openforis.collect.ui {
 	public class UIBuilder {
 		
 		//TODO: use entityDescriptor
-		public static function buildForm(entity:EntityDefinitionProxy, version:ModelVersionProxy):FormContainer {
+		public static function buildForm(entity:EntityDefinitionProxy, version:ModelVersionProxy, container:FormsContainer):FormContainer {
 			//foreach version
 				var formContainer:FormContainer = new FormContainer();
 				formContainer.initialize();
-				
+				container.addForm(formContainer, version, entity);
 				
 				//Root entity definition				
-				var rootEntityForm:EntityFormContainer = new EntityFormContainer();
-				rootEntityForm.label = entity.getLabelText();
-				formContainer.rootFormContainer =rootEntityForm;
+				var form:EntityFormContainer = new EntityFormContainer();
+				//form.initialize();
+				formContainer.rootFormContainer =form;
+				form.label = entity.getLabelText();
 				
 				var uiConfig:UIConfiguration = Application.activeSurvey.uiConfiguration;
 				var uiTab:UITab = null;
@@ -50,7 +52,7 @@ package org.openforis.collect.ui {
 							}
 						} 
 				}
-				addFormItems(rootEntityForm, entity, version, uiTab);
+				addFormItems(form, entity, version, uiTab);
 				
 				
 				/*
@@ -73,7 +75,7 @@ package org.openforis.collect.ui {
 			var columns:IList = new ArrayList();
 			var column:GridColumn;
 			//key attributes columns
-			var keyAttributeDefs:IList = rootEntity.keyAttributeDefinitions();
+			var keyAttributeDefs:IList = rootEntity.keyAttributeDefinitions;
 			for each(var keyAttributeDef:AttributeDefinitionProxy in keyAttributeDefs) {
 				column = new GridColumn();
 				column.headerText = keyAttributeDef.getLabelText();
@@ -169,7 +171,7 @@ package org.openforis.collect.ui {
 				//TODO multiple attributes
 			} else {
 				var inputField:InputField = getInputField(definition);
-				inputField.presenter.path = null; //TODO
+				
 				form.addFormItem(definition.getLabelText(), inputField);
 			}
 			
