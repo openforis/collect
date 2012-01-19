@@ -1,13 +1,7 @@
 package org.openforis.collect.presenter.input {
-	import flash.events.Event;
 	import flash.events.FocusEvent;
 	
-	import mx.controls.DateField;
-	import mx.events.CalendarLayoutChangeEvent;
-	import mx.events.DropdownEvent;
-	
 	import org.openforis.collect.presenter.InputFieldPresenter;
-	import org.openforis.collect.ui.component.input.DateInputField;
 	import org.openforis.collect.ui.component.input.InputField;
 	import org.openforis.collect.ui.component.input.TimeInputField;
 	import org.openforis.collect.util.StringUtil;
