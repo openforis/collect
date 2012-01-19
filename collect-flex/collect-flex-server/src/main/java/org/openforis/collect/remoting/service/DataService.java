@@ -24,7 +24,6 @@ import org.openforis.collect.persistence.NonexistentIdException;
 import org.openforis.collect.persistence.RecordLockedException;
 import org.openforis.collect.remoting.service.UpdateRequest.Method;
 import org.openforis.collect.session.SessionState;
-import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
@@ -92,27 +91,18 @@ public class DataService {
 	}
 
 	@Transactional
-	public Record newRecord(Map<String, Object> keyMap, String rootEntityName, String versionName) throws MultipleEditException, DuplicateIdException, InvalidIdException, DuplicateIdException, AccessDeniedException,
-			RecordLockedException {
-		if(keyMap == null) {
-			throw new RuntimeException("Invalid parameters");
-		}
+	public RecordProxy newRecord(String rootEntityName, String versionName) throws MultipleEditException, AccessDeniedException, RecordLockedException {
 		SessionState sessionState = sessionManager.getSessionState();
+		User user = getUserInSession();
 		Survey activeSurvey = sessionState.getActiveSurvey();
 		ModelVersion version = activeSurvey.getVersion(versionName);
 		Schema schema = activeSurvey.getSchema();
 		EntityDefinition rootEntityDefinition = schema.getRootEntityDefinition(rootEntityName);
-		List<AttributeDefinition> keyAttributeDefinitions = rootEntityDefinition.getKeyAttributeDefinitions();
-		//validate key map: there must be a value for each key attribute definition
-		for (AttributeDefinition keyAttributeDef: keyAttributeDefinitions) {
-			if(! keyMap.containsKey(keyAttributeDef.getName())) {
-				throw new RuntimeException("Invalid parameters");
-			}
-		}
-		Record record = recordManager.create(keyMap, activeSurvey, rootEntityDefinition.getId(), version.getName());
-		return record;
+		CollectRecord record = recordManager.create(activeSurvey, rootEntityDefinition, user, version.getName());
+		RecordProxy recordProxy = new RecordProxy(record);
+		return recordProxy;
 	}
-
+	
 	@Transactional
 	public void saveActiveRecord() {
 		Record record = this.sessionManager.getSessionState().getActiveRecord();

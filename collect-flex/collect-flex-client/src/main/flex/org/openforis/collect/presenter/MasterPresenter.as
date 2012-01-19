@@ -48,6 +48,7 @@ package org.openforis.collect.presenter {
 			eventDispatcher.addEventListener(UIEvent.ROOT_ENTITY_SELECTED, rootEntitySelectedHandler);
 			eventDispatcher.addEventListener(UIEvent.BACK_TO_LIST, backToListHandler);
 			eventDispatcher.addEventListener(UIEvent.RECORD_SELECTED, recordSelectedHandler);
+			eventDispatcher.addEventListener(UIEvent.RECORD_CREATED, recordCreatedHandler);
 		}
 		
 		/**
@@ -61,12 +62,25 @@ package org.openforis.collect.presenter {
 		}
 		
 		/**
+		 * New Record created
+		 * */
+		internal function recordCreatedHandler(uiEvent:UIEvent):void {
+			var record:RecordProxy = uiEvent.obj as RecordProxy;
+			setActiveRecord(record);
+		}
+		
+		/**
 		 * Record selected in list page loaded from server
 		 * */
 		protected function loadRecordResultHandler(event:ResultEvent, token:Object = null):void {
 			var record:RecordProxy = RecordProxy(event.result);
 			var summary:RecordSummary = token as RecordSummary;
 			record.rootEntityKeys = summary.rootEntityKeys;
+			
+			setActiveRecord(record);
+		}
+		
+		protected function setActiveRecord(record:RecordProxy):void {
 			Application.activeRecord = record;
 			
 			_view.currentState = MasterView.DETAIL_STATE;
@@ -74,7 +88,6 @@ package org.openforis.collect.presenter {
 			var uiEvent:UIEvent = new UIEvent(UIEvent.ACTIVE_RECORD_CHANGED);
 			eventDispatcher.dispatchEvent(uiEvent);
 		}
-		
 		
 		/**
 		 * Root entity selected

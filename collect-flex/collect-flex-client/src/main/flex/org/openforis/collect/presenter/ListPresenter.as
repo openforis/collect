@@ -25,10 +25,12 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.i18n.Message;
 	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
+	import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
 	import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.NodeLabelProxy;
+	import org.openforis.collect.model.RecordSummary;
 	import org.openforis.collect.ui.UIBuilder;
-	import org.openforis.collect.ui.component.AddNewRecordPopUp;
+	import org.openforis.collect.ui.component.AddRecordPopUp;
 	import org.openforis.collect.ui.component.datagrid.PaginationBar;
 	import org.openforis.collect.ui.component.datagrid.SelectRecordColumnHeaderRenderer;
 	import org.openforis.collect.ui.component.datagrid.SelectRecordColumnItemRenderer;
@@ -45,7 +47,7 @@ package org.openforis.collect.presenter {
 		private var _view:ListView;
 		private var _dataClient:DataClient;
 		
-		private var _newRecordPopUp:AddNewRecordPopUp;
+		private var _addRecordPopUp:AddRecordPopUp;
 		
 		/**
 		 * The total number of records.
@@ -81,7 +83,9 @@ package org.openforis.collect.presenter {
 		override internal function initEventListeners():void {
 			eventDispatcher.addEventListener(UIEvent.LOAD_RECORD_SUMMARIES, loadRecordSummariesHandler);
 
-			this._view.newRecordButton.addEventListener(MouseEvent.CLICK, newRecordButtonClickHandler);
+			this._view.addButton.addEventListener(MouseEvent.CLICK, addButtonClickHandler);
+			this._view.editButton.addEventListener(MouseEvent.CLICK, editButtonClickHandler);
+			this._view.deleteButton.addEventListener(MouseEvent.CLICK, deleteButtonClickHandler);
 			
 			this._view.dataGrid.addEventListener(GridSortEvent.SORT_CHANGING, dataGridSortChangingHandler);
 			
@@ -96,13 +100,38 @@ package org.openforis.collect.presenter {
 		/**
 		 * New Record Button clicked 
 		 * */
-		protected function newRecordButtonClickHandler(event:MouseEvent):void {
-			if(_newRecordPopUp == null) {
-				_newRecordPopUp = new AddNewRecordPopUp();
-				
+		protected function addButtonClickHandler(event:MouseEvent):void {
+			if(_addRecordPopUp == null) {
+				_addRecordPopUp = new AddRecordPopUp();
 			}
-			PopUpManager.addPopUp(_newRecordPopUp, FlexGlobals.topLevelApplication as DisplayObject, true);
-			PopUpManager.centerPopUp(_newRecordPopUp);
+			PopUpManager.addPopUp(_addRecordPopUp, FlexGlobals.topLevelApplication as DisplayObject, true);
+			PopUpManager.centerPopUp(_addRecordPopUp);
+		}
+		
+		/**
+		 * Edit Button clicked 
+		 * */
+		protected function editButtonClickHandler(event:MouseEvent):void {
+			var selectedRecord:RecordSummary = _view.dataGrid.selectedItem as RecordSummary;
+			if(selectedRecord != null) {
+				var uiEvent:UIEvent = new UIEvent(UIEvent.RECORD_SELECTED);
+				uiEvent.obj = selectedRecord;
+				eventDispatcher.dispatchEvent(uiEvent);
+			} else {
+				//TODO show error
+			}
+		}
+		
+		/**
+		 * Delete Button clicked 
+		 * */
+		protected function deleteButtonClickHandler(event:MouseEvent):void {
+			var selectedRecord:RecordSummary = _view.dataGrid.selectedItem as RecordSummary;
+			if(selectedRecord != null) {
+				
+			} else {
+				//TODO show error
+			}
 		}
 		
 		/**

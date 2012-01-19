@@ -3,10 +3,11 @@
  */
 package org.openforis.collect.manager;
 
+import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import org.openforis.collect.model.CollectRecord;
+import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.RecordSummary;
 import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.AccessDeniedException;
@@ -62,8 +63,9 @@ public class RecordManager {
 	/**
 	 * Returns a record and lock it
 	 * 
-	 * @param entityName
-	 * @param id
+	 * @param survey
+	 * @param user
+	 * @param recordId
 	 * @return
 	 */
 	@Transactional
@@ -92,10 +94,15 @@ public class RecordManager {
 	}
 
 	@Transactional
-	public Record create(Map<String, Object> keyMap, Survey survey, int rootEntityId, String modelVersionName) throws MultipleEditException, DuplicateIdException, InvalidIdException, DuplicateIdException, AccessDeniedException,
-			RecordLockedException {
-		// TODO
-		return null;
+	public CollectRecord create(Survey survey, EntityDefinition rootEntityDefinition, User user, String modelVersionName) throws MultipleEditException, AccessDeniedException, RecordLockedException {
+		CollectRecord record = new CollectRecord(survey, rootEntityDefinition.getName(), modelVersionName);
+		record.setCreationDate(new Date());
+		//record.setCreatedBy(user.getId());
+		record.setStep(Step.ENTRY);
+		recordDAO.saveOrUpdate(record);
+		Integer recordId = record.getId();
+		recordDAO.lock(recordId, user);
+		return record;
 	}
 
 	@Transactional

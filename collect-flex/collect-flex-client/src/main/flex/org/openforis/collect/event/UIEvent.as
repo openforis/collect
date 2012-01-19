@@ -15,6 +15,7 @@ package org.openforis.collect.event {
 		public static const BACK_TO_LIST:String = "backToList";
 		
 		public static const RECORD_SELECTED:String = "recordSelected";
+		public static const RECORD_CREATED:String = "recordCreated";
 		
 		//List events		
 		public static const LOAD_RECORD_SUMMARIES:String = "loadRecordSummaries"; 

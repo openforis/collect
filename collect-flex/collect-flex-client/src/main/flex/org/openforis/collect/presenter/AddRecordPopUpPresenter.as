@@ -5,6 +5,7 @@ package org.openforis.collect.presenter {
 	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
 	import mx.collections.ListCollectionView;
+	import mx.controls.Alert;
 	import mx.events.CloseEvent;
 	import mx.events.FlexEvent;
 	import mx.managers.PopUpManager;
@@ -13,29 +14,34 @@ package org.openforis.collect.presenter {
 	import mx.rpc.events.FaultEvent;
 	import mx.rpc.events.ResultEvent;
 	
+	import org.granite.collections.BasicMap;
 	import org.granite.collections.IMap;
 	import org.openforis.collect.Application;
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.client.DataClient;
 	import org.openforis.collect.event.UIEvent;
+	import org.openforis.collect.i18n.Message;
 	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
 	import org.openforis.collect.metamodel.proxy.SurveyProxy;
-	import org.openforis.collect.ui.component.AddNewRecordPopUp;
+	import org.openforis.collect.model.RecordSummary;
+	import org.openforis.collect.model.proxy.RecordProxy;
+	import org.openforis.collect.ui.component.AddRecordPopUp;
+	import org.openforis.collect.util.AlertUtil;
 	
 	import spark.components.FormItem;
 	import spark.components.TextInput;
 	import spark.components.supportClasses.ItemRenderer;
 
-	public class AddNewRecordPopUpPresenter extends AbstractPresenter {
-		private var _view:AddNewRecordPopUp;
+	public class AddRecordPopUpPresenter extends AbstractPresenter {
+		private var _view:AddRecordPopUp;
 		
 		private var _newRecordResponder:IResponder;
 		
-		public function AddNewRecordPopUpPresenter(view:AddNewRecordPopUp) {
+		public function AddRecordPopUpPresenter(view:AddRecordPopUp) {
 			this._view = view;
-			_newRecordResponder = new AsyncResponder(newRecordResultHandler, newRecordFaultHandler);
+			_newRecordResponder = new AsyncResponder(createRecordResultHandler, newRecordFaultHandler);
 			super();
 			
 			if(Application.activeSurvey != null) {
@@ -43,7 +49,7 @@ package org.openforis.collect.presenter {
 				_view.versionsDropDownList.dataProvider = versions;
 			}
 			if(Application.activeRootEntity != null) {
-				_view.keyDataGroup.dataProvider = Application.activeRootEntity.keyAttributeDefinitions;
+				updatePopUp();
 			}
 		}
 		
@@ -65,45 +71,44 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function rootEntitySelectedHandler(event:UIEvent):void {
-			var rootEntity:EntityDefinitionProxy = event.obj as EntityDefinitionProxy;
-			_view.keyDataGroup.dataProvider = rootEntity.keyAttributeDefinitions;
+			updatePopUp();
 		}
 		
 		protected function addClickHandler(event:Event):void {
 			var dataClient:DataClient = ClientFactory.dataClient;
-			var keyMap:Object = new Object();
-			var keyAttributeDefs:IList = _view.keyDataGroup.dataProvider;
-			for(var index:int = 0; index < keyAttributeDefs.length; index ++) {
-				var keyAttributeDef:AttributeDefinitionProxy = AttributeDefinitionProxy(keyAttributeDefs.getItemAt(index));
-				var keyItemRenderer:ItemRenderer = _view.keyDataGroup.getElementAt(index) as ItemRenderer;
-				var formItem:FormItem = keyItemRenderer.getElementAt(0) as FormItem;
-				var textInput:TextInput = formItem.getElementAt(0) as TextInput;
-				keyMap[keyAttributeDef.name] = textInput.text;
-			}
 			var version:ModelVersionProxy = ModelVersionProxy(_view.versionsDropDownList.selectedItem);
-			dataClient.newRecord(_newRecordResponder, keyMap, Application.activeRootEntity.name, version.name);
+			var rootEntityName:String = Application.activeRootEntity.name;
+			dataClient.newRecord(_newRecordResponder, rootEntityName, version.name);
 		}
 		
 		protected function cancelClickHandler(event:Event):void {
 			PopUpManager.removePopUp(_view);
 		}
 		
-		protected function newRecordResultHandler(event:ResultEvent, token:Object = null):void {
-/*			var uiEvent:UIEvent = new UIEvent(UIEvent.NEW_RECORD_CREATED);
-			
-			uiEvent.obj = {versionId: _view.versionsDropDownList.selectedItem.id};
+		protected function createRecordResultHandler(event:ResultEvent, token:Object = null):void {
+			var record:RecordProxy = event.result as RecordProxy;
+			record.rootEntityKeys = new BasicMap();
+			var uiEvent:UIEvent = new UIEvent(UIEvent.RECORD_CREATED);
+			uiEvent.obj = record;
 			eventDispatcher.dispatchEvent(uiEvent);
-			PopUpManager.removePopUp(_view);*/
+			PopUpManager.removePopUp(_view);
 		}
 		
 		protected function newRecordFaultHandler(event:FaultEvent, token:Object = null):void {
 			var faultCode:String = event.fault.faultCode;
-			trace(faultCode);
-			faultHandler(event, token);
-/*			var uiEvent:UIEvent = new UIEvent(UIEvent.NEW_RECORD_CREATED);
-			uiEvent.obj = {versionId: _view.versionsDropDownList.selectedItem.id};
-			eventDispatcher.dispatchEvent(uiEvent);
-			PopUpManager.removePopUp(_view);*/
+			switch(faultCode) {
+				case "org.openforis.collect.persistence.MultipleEditException":
+					AlertUtil.showError(event.fault.message);
+					break;
+				default:
+					faultHandler(event, token);
+			}
+		}
+		
+		protected function updatePopUp():void {
+			if(Application.activeRootEntity != null) {
+				_view.title = Message.get('list.newRecordPopUp.title', [Application.activeRootEntity.getLabelText()]);
+			}
 		}
 		
 	}
