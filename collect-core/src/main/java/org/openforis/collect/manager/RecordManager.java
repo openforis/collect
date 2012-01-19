@@ -64,12 +64,6 @@ public class RecordManager {
 	}
 
 	@Transactional
-	public List<RecordSummary> getSummaries() {
-		// TODO implement getRecordSummaries
-		return null;
-	}
-
-	@Transactional
 	public List<RecordSummary> getSummaries(EntityDefinition rootEntityDefinition, List<EntityDefinition> countEntityDefinitions, int offset, int maxNumberOfRecords, String orderByFieldName, String filter) {
 		List<RecordSummary> recordsSummary = recordDAO.loadRecordSummaries(rootEntityDefinition, countEntityDefinitions, offset, maxNumberOfRecords, orderByFieldName, filter);
 		return recordsSummary;

@@ -81,27 +81,29 @@ public class RecordDAO extends CollectDAO {
 		
 		RecordSummaryQueryBuilder recordSummaryQueryBuilder = new RecordSummaryQueryBuilder(jf);
 
-		//add root entity definition to filter the records 
+		//set root entity definition to filter the records 
 		recordSummaryQueryBuilder.setRootEntityDefinition(rootEntityDefinition);
 		
-		//add key attribute definitions
+		//set key attribute definitions
 		List<AttributeDefinition> keyAttributeDefinitions = rootEntityDefinition.getKeyAttributeDefinitions();
-		recordSummaryQueryBuilder.addKeyAttributes(keyAttributeDefinitions);
+		recordSummaryQueryBuilder.setKeyAttributes(keyAttributeDefinitions);
 		
-		//add count of entities
-		recordSummaryQueryBuilder.addCountEntityDefinitions(countEntityDefinitions);
+		//set entities to count
+		recordSummaryQueryBuilder.setCountEntityDefinitions(countEntityDefinitions);
 
-		//add order by
-		recordSummaryQueryBuilder.addOrderBy(orderByFieldName);
+		//set order by
+		recordSummaryQueryBuilder.setOrderBy(orderByFieldName);
 		
-		//add limit
-		recordSummaryQueryBuilder.addLimit(offset, maxNumberOfRecords);
+		//set limit
+		recordSummaryQueryBuilder.setLimit(offset, maxNumberOfRecords);
 		
 		//build select
 		SelectQuery selectQuery = recordSummaryQueryBuilder.buildSelect();
 		
+		//execute query
 		List<Record> records = selectQuery.fetch();
 
+		//parse the result
 		List<RecordSummary> result = RecordDAOUtil.parseRecordSummariesSelectResult(records, keyAttributeDefinitions, countEntityDefinitions);
 		
 		return result;

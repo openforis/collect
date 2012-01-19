@@ -145,19 +145,19 @@ public class RecordSummaryQueryBuilder {
 		this.rootEntityDefinition = rootEntityDefinition;
 	}
 	
-	public void addKeyAttributes(List<AttributeDefinition> keyAttributeDefinitions) {
+	public void setKeyAttributes(List<AttributeDefinition> keyAttributeDefinitions) {
 		this.keyAttributeDefinitions = keyAttributeDefinitions;
 	}
 	
-	public void addCountEntityDefinitions(List<EntityDefinition> entityDefinitions) {
+	public void setCountEntityDefinitions(List<EntityDefinition> entityDefinitions) {
 		this.countEntityDefinitions = entityDefinitions;
 	}
 	
-	public void addOrderBy(String fieldName) {
+	public void setOrderBy(String fieldName) {
 		this.orderByFieldName = fieldName;
 	}
 	
-	public void addLimit(int offset, int maxNumberOfRecords) {
+	public void setLimit(int offset, int maxNumberOfRecords) {
 		this.offset = offset;
 		this.maxNumberOfRecords = maxNumberOfRecords;
 	}
