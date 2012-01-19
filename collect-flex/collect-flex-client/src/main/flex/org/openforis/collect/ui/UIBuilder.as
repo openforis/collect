@@ -16,6 +16,7 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.ui.component.detail.EntityFormContainer;
 	import org.openforis.collect.ui.component.detail.FormContainer;
 	import org.openforis.collect.ui.component.detail.FormsContainer;
+	import org.openforis.collect.ui.component.detail.MultipleAttributeContainer;
 	import org.openforis.collect.ui.component.input.InputField;
 	import org.openforis.collect.ui.component.input.StringInputField;
 	
@@ -166,12 +167,13 @@ package org.openforis.collect.ui {
 		}
 		
 		private static function addAttributeFormItem(form:EntityFormContainer, definition:AttributeDefinitionProxy):void {
-			
 			if(definition.multiple) {
-				//TODO multiple attributes
+				var container:MultipleAttributeContainer = new MultipleAttributeContainer();
+				container.initialize();
+				container.attributeDefinition = definition;
+				form.addFormItem(definition.getLabelText(), container);
 			} else {
 				var inputField:InputField = getInputField(definition);
-				
 				form.addFormItem(definition.getLabelText(), inputField);
 			}
 			
@@ -189,7 +191,7 @@ package org.openforis.collect.ui {
 		}
 		
 		//TODO
-		private static function getInputField(def:AttributeDefinitionProxy):InputField {
+		public static function getInputField(def:AttributeDefinitionProxy):InputField {
 			var inputField:InputField = null;
 			inputField = new StringInputField();
 			//var type:String = def.
@@ -220,6 +222,22 @@ package org.openforis.collect.ui {
 					break;
 			}*/
 			return inputField;
+		}
+		
+		public static function isInVersion(node:NodeDefinitionProxy, currentVersion:ModelVersionProxy):Boolean {
+			var since:ModelVersionProxy = node.sinceVersion;
+			var deprecated:ModelVersionProxy = node.deprecatedVersion;
+			var result:Boolean;
+			if(since == null && deprecated == null){
+				result = true;
+			} else if(since != null && deprecated != null){
+				result = currentVersion.compare(since) >= 0 && currentVersion.compare(deprecated) < 0;
+			} else if(since != null){
+				result = currentVersion.compare(since) >= 0;
+			} else if(deprecated != null){
+				result = currentVersion.compare(deprecated) < 0;
+			}
+			return result;
 		}
 		
 	}

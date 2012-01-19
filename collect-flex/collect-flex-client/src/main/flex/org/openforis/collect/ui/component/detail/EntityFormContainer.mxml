@@ -8,6 +8,8 @@
 	
 	<fx:Script>
 		<![CDATA[
+			import mx.core.IVisualElement;
+			
 			import org.openforis.collect.model.proxy.EntityProxy;
 			import org.openforis.collect.ui.Images;
 			import org.openforis.collect.ui.component.input.InputField;
@@ -20,14 +22,21 @@
 				return _parentEntity;
 			}
 
+			override protected function createChildren():void {
+				super.createChildren();
+				if(!this.borderContainer.initialized){
+					this.borderContainer.initialize();
+				}
+			}
+			
 			public function set parentEntity(value:EntityProxy):void {
 				_parentEntity = value;
 			}
 
-			public function addFormItem(label:String, inputField:InputField):void {
+			public function addFormItem(label:String, component:IVisualElement):void {
 				var formItem:FormItem = new FormItem();
 				formItem.label = label;
-				formItem.addElement(inputField);
+				formItem.addElement(component);
 				form.addElement(formItem);
 			}
 			
@@ -61,17 +70,13 @@
 		
 		<s:Scroller height="100%" width="100%" id="scroller">
 			<s:Group height="100%" width="100%" id="group">
-				<!--<s:BorderContainer borderColor="#CCCCCC" borderAlpha="0.8" borderStyle="solid" borderWeight="1" width="100%" height="100%" id="borderContainer">-->
+				<s:BorderContainer borderColor="#CCCCCC" borderAlpha="0.8" borderStyle="solid" borderWeight="1" width="100%" height="100%" id="borderContainer">
 					<s:Form height="100%" width="100%" id="form">
 						<s:layout>
-							<s:FormLayout gap="-10" paddingLeft="0" paddingLeft="10" />
+							<s:FormLayout gap="-10" paddingLeft="0" />
 						</s:layout>
-						
-						<s:FormItem label="Test">
-							<s:TextInput width="156"/>
-						</s:FormItem>
 					</s:Form>
-				<!--</s:BorderContainer>-->
+				</s:BorderContainer>
 			</s:Group>
 		</s:Scroller>
 	</s:VGroup>

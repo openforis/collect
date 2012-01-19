@@ -3,8 +3,7 @@
 			  xmlns:s="library://ns.adobe.com/flex/spark" 
 			  xmlns:mx="library://ns.adobe.com/flex/mx" 
 			  width="100%" height="100%"
-			  
-			  initialize="initializeHandler(event)">
+			  >
 	
 	<fx:Script>
 		<![CDATA[
@@ -12,12 +11,9 @@
 			
 			import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 			import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
-			
+						
 			private var _forms:Array = new Array();
 			
-			protected function initializeHandler(event:FlexEvent):void {
-			}
-
 			/**
 			 * Return true if the form for teh specified version / entity definition has been generated
 			 * */
@@ -27,18 +23,27 @@
 				return containsForm;
 			}
 			
+			/**
+			 * Add the form to the stack
+			 * */
 			public function addForm(form:FormContainer, version:ModelVersionProxy, entity:EntityDefinitionProxy):void {
 				var name:String = getFormName(version,entity);
 				_forms[name] = form; 
 				this.addElement(form);
 			}
 			
+			/**
+			 * Return the form for the given version and entity definition, null if it has not been created yet. 
+			 * */
 			public function getForm(version:ModelVersionProxy, entity:EntityDefinitionProxy):FormContainer{
 				var name:String = getFormName(version,entity);
 				var form:FormContainer = _forms[name] as FormContainer;
 				return form;
 			}
 			
+			/**
+			 * Show the the form for the given version and entity definition
+			 * */
 			public function setActiveForm(version:ModelVersionProxy, entity:EntityDefinitionProxy):FormContainer {
 				var form:FormContainer = getForm(version, entity);
 				this.selectedChild = form;
