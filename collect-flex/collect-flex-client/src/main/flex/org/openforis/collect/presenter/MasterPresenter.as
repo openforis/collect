@@ -6,9 +6,11 @@ package org.openforis.collect.presenter {
 	import mx.collections.IList;
 	import mx.controls.Alert;
 	import mx.rpc.AsyncResponder;
+	import mx.rpc.events.FaultEvent;
 	import mx.rpc.events.ResultEvent;
 	
 	import org.openforis.collect.Application;
+	import org.openforis.collect.client.ClientExceptions;
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.client.DataClient;
 	import org.openforis.collect.event.ApplicationEvent;
@@ -19,6 +21,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.model.SurveySummary;
 	import org.openforis.collect.model.proxy.RecordProxy;
 	import org.openforis.collect.ui.view.MasterView;
+	import org.openforis.collect.util.AlertUtil;
 
 	public class MasterPresenter extends AbstractPresenter {
 		
@@ -58,7 +61,7 @@ package org.openforis.collect.presenter {
 			var record:RecordSummary = uiEvent.obj as RecordSummary;
 			var id:Number = record.id;
 			//var entityName:String = Application.activeRootEntity.name;
-			_dataClient.loadRecord(new AsyncResponder(loadRecordResultHandler, faultHandler, record), id);
+			_dataClient.loadRecord(new AsyncResponder(loadRecordResultHandler, loadRecordFaultHandler, record), id);
 		}
 		
 		/**
@@ -111,6 +114,23 @@ package org.openforis.collect.presenter {
 			_view.currentState = MasterView.LIST_STATE;
 			var uiEvent:UIEvent = new UIEvent(UIEvent.LOAD_RECORD_SUMMARIES);
 			eventDispatcher.dispatchEvent(uiEvent);
+		}
+		
+		internal function loadRecordFaultHandler(event:FaultEvent, token:Object = null):void {
+			var faultCode:String = event.fault.faultCode;
+			switch(faultCode) {
+				case ClientExceptions.ACCESS_DENIED:
+					AlertUtil.showError('list.error.accessDenied');
+					break;
+				case ClientExceptions.MULTIPLE_EDIT:
+					AlertUtil.showError('list.error.multipleEdit');
+					break;
+				case ClientExceptions.RECORD_LOCKED:
+					AlertUtil.showError('list.delete.error.recordLocked');
+					break;
+				default:
+					faultHandler(event, token);
+			}
 		}
 			
 	}

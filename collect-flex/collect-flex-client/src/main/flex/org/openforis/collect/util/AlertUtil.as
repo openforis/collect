@@ -10,17 +10,22 @@ package org.openforis.collect.util
 	 */
 	public class AlertUtil
 	{
-		private static const ERROR_TITLE:String = Message.get("global.errorAlertTitle");
+		private static const ERROR_TITLE_RESOURCE:String = "global.errorAlertTitle";
 		
-		public static function showError(message:String, title:String = null):void {
-			if(title == null) {
-				title = ERROR_TITLE;
+		public static function showError(messageResource:String, parameters:Array = null, titleResource:String = null):void {
+			if(titleResource == null) {
+				titleResource = ERROR_TITLE_RESOURCE;
 			}
+			var message:String = Message.get(messageResource, parameters);
+			var title:String = Message.get(titleResource, parameters);
 			Alert.show(message, title, Alert.OK, null, null, Images.ERROR);
 		}
 		
-		public static function showMessage(message:String, title:String=""):void {
+		public static function showMessage(resource:String, title:String=""):void {
+			var message:String = Message.get(resource);
+			
 			Alert.show(message, title);
 		}
+			
 	}
 }

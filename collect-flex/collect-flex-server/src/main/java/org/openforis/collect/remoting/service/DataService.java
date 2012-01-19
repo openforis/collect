@@ -60,18 +60,13 @@ public class DataService {
 		return new RecordProxy(record);
 	}
 
-	@Transactional
-	public List<RecordSummary> getRecordSummaries() {
-		List<RecordSummary> list = recordManager.getSummaries();
-		return list;
-	}
-
 	/**
 	 * 
 	 * @param rootEntityName
 	 * @param offset
 	 * @param toIndex
 	 * @param orderByFieldName
+	 * @param filter
 	 * 
 	 * @return map with "count" and "records" items
 	 */

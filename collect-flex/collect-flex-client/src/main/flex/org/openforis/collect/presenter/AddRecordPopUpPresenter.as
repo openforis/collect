@@ -99,7 +99,7 @@ package org.openforis.collect.presenter {
 			var faultCode:String = event.fault.faultCode;
 			switch(faultCode) {
 				case ClientExceptions.MULTIPLE_EDIT:
-					AlertUtil.showError(Message.get('list.error.multipleEdit'));
+					AlertUtil.showError('list.error.multipleEdit');
 					break;
 				default:
 					faultHandler(event, token);

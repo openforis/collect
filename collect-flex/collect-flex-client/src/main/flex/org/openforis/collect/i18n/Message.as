@@ -10,7 +10,7 @@ package org.openforis.collect.i18n {
 		}
 		
 		public static function get(resource:String, parameters:Array=null, bundle:String="messages"):String {
-			return ResourceManager.getInstance().getString(bundle, resource,parameters);
+			return ResourceManager.getInstance().getString(bundle, resource, parameters);
 		} 
 	}
 }

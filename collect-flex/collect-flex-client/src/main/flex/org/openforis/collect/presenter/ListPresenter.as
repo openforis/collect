@@ -120,7 +120,7 @@ package org.openforis.collect.presenter {
 		protected function deleteButtonClickHandler(event:MouseEvent):void {
 			var selectedRecord:RecordSummary = _view.dataGrid.selectedItem as RecordSummary;
 			if(selectedRecord != null) {
-				ConfirmUtil.showConfirm(Message.get("list.delete.confirm"), Message.get("list.delete.confirmTitle"), executeDelete);
+				ConfirmUtil.showConfirm("list.delete.confirm", "list.delete.confirmTitle", executeDelete);
 				
 				function executeDelete():void {
 					_dataClient.deleteRecord(new AsyncResponder(deleteRecordResultHandler, deleteRecordFaultHandler), selectedRecord.id);
@@ -147,7 +147,8 @@ package org.openforis.collect.presenter {
 		
 		protected function loadRecordSummariesCurrentPage():void {
 			_view.paginationBar.currentPageText.text = new String(currentPage);
-			_view.paginationBar.currentState = PaginationBar.LOADING_STATE;
+			
+			_view.currentState = ListView.INACTIVE_STATE;
 			
 			//offset starts from 0
 			var offset:int = (currentPage - 1) * MAX_RECORDS_PER_PAGE;
@@ -163,6 +164,8 @@ package org.openforis.collect.presenter {
 			totalPages = Math.ceil(totalRecords / MAX_RECORDS_PER_PAGE);
 			
 			_view.dataGrid.dataProvider = records;
+			
+			_view.currentState = ListView.DEFAULT_STATE;
 
 			updatePaginationBar();
 		}
@@ -176,11 +179,13 @@ package org.openforis.collect.presenter {
 			var message:String = event.fault.message;
 			switch(code) {
 				case ClientExceptions.MULTIPLE_EDIT:
-					AlertUtil.showError(Message.get('list.error.multipleEdit'));
+					AlertUtil.showError('list.error.multipleEdit');
 					break;
 				case ClientExceptions.RECORD_LOCKED:
-					AlertUtil.showError(Message.get('list.delete.error.recordLocked'));
+					AlertUtil.showError('list.delete.error.recordLocked');
 					break;
+				default:
+					faultHandler(event, token);
 			}
 		}
 		
