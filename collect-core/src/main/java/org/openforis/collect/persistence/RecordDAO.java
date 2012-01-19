@@ -5,13 +5,11 @@ import static org.openforis.collect.persistence.jooq.tables.Data.DATA;
 import static org.openforis.collect.persistence.jooq.tables.Record.RECORD;
 
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jooq.Record;
 import org.jooq.SelectQuery;
-import org.jooq.TableField;
 import org.jooq.impl.Factory;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.RecordSummary;
@@ -19,7 +17,6 @@ import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.jooq.DataLoader;
 import org.openforis.collect.persistence.jooq.DataPersister;
 import org.openforis.collect.persistence.jooq.RecordSummaryQueryBuilder;
-import org.openforis.collect.persistence.jooq.tables.Data;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -61,8 +58,14 @@ public class RecordDAO extends CollectDAO {
 
 	@Transactional
 	public void delete(CollectRecord record) {
-		deleteData(record.getId());
-		deleteRecord(record);
+		Integer id = record.getId();
+		delete(id);
+	}
+	
+	@Transactional
+	public void delete(Integer id) {
+		deleteData(id);
+		deleteRecord(id);
 	}
 	
 	@Transactional
@@ -214,15 +217,14 @@ public class RecordDAO extends CollectDAO {
 				.set(RECORD.MODEL_VERSION, record.getVersion().getName()).set(RECORD.STEP, record.getStep().getStepNumber()).where(RECORD.ID.equal(recordId)).execute();
 	}
 	
-	private void deleteRecord(CollectRecord record) {
-		Integer recordId = record.getId();
+	private void deleteRecord(Integer recordId) {
 		if (recordId == null) {
 			throw new IllegalArgumentException("Cannot update unsaved record");
 		}
 		Factory jf = getJooqFactory();
 		jf.delete(RECORD).where(RECORD.ID.equal(recordId)).execute();
 	}
-
+	
 	private void deleteData(int recordId) {
 		Factory jf = getJooqFactory();
 		jf.delete(DATA).where(DATA.RECORD_ID.equal(recordId)).execute();

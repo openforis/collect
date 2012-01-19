@@ -17,6 +17,7 @@ package org.openforis.collect.presenter {
 	import org.granite.collections.BasicMap;
 	import org.granite.collections.IMap;
 	import org.openforis.collect.Application;
+	import org.openforis.collect.client.ClientExceptions;
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.client.DataClient;
 	import org.openforis.collect.event.UIEvent;
@@ -97,8 +98,8 @@ package org.openforis.collect.presenter {
 		protected function newRecordFaultHandler(event:FaultEvent, token:Object = null):void {
 			var faultCode:String = event.fault.faultCode;
 			switch(faultCode) {
-				case "org.openforis.collect.persistence.MultipleEditException":
-					AlertUtil.showError(event.fault.message);
+				case ClientExceptions.MULTIPLE_EDIT:
+					AlertUtil.showError(Message.get('list.error.multipleEdit'));
 					break;
 				default:
 					faultHandler(event, token);

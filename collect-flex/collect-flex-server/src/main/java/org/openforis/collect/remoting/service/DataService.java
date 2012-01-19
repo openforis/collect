@@ -93,14 +93,22 @@ public class DataService {
 	@Transactional
 	public RecordProxy newRecord(String rootEntityName, String versionName) throws MultipleEditException, AccessDeniedException, RecordLockedException {
 		SessionState sessionState = sessionManager.getSessionState();
-		User user = getUserInSession();
+		User user = sessionState.getUser();
 		Survey activeSurvey = sessionState.getActiveSurvey();
 		ModelVersion version = activeSurvey.getVersion(versionName);
 		Schema schema = activeSurvey.getSchema();
 		EntityDefinition rootEntityDefinition = schema.getRootEntityDefinition(rootEntityName);
 		CollectRecord record = recordManager.create(activeSurvey, rootEntityDefinition, user, version.getName());
+		sessionManager.setActiveRecord((CollectRecord) record);
 		RecordProxy recordProxy = new RecordProxy(record);
 		return recordProxy;
+	}
+	
+	@Transactional
+	public void deleteRecord(int id) throws RecordLockedException, AccessDeniedException {
+		SessionState sessionState = sessionManager.getSessionState();
+		User user = sessionState.getUser();
+		recordManager.delete(id, user);
 	}
 	
 	@Transactional
@@ -110,9 +118,11 @@ public class DataService {
 	}
 
 	@Transactional
-	public void deleteActiveRecord() {
-		Record record = this.sessionManager.getSessionState().getActiveRecord();
-		recordManager.delete(record.getRootEntity().getName(), record.getId());
+	public void deleteActiveRecord() throws RecordLockedException, AccessDeniedException {
+		SessionState sessionState = sessionManager.getSessionState();
+		User user = sessionState.getUser();
+		Record record = sessionState.getActiveRecord();
+		recordManager.delete(record.getId(), user);
 		this.sessionManager.clearActiveRecord();
 	}
 

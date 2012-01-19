@@ -7,39 +7,31 @@ package org.openforis.collect.presenter {
 	import flash.events.Event;
 	import flash.events.MouseEvent;
 	
-	import mx.collections.ArrayList;
 	import mx.collections.IList;
 	import mx.collections.ListCollectionView;
-	import mx.controls.List;
-	import mx.core.ClassFactory;
 	import mx.core.FlexGlobals;
-	import mx.events.StateChangeEvent;
 	import mx.managers.PopUpManager;
 	import mx.rpc.AsyncResponder;
+	import mx.rpc.events.FaultEvent;
 	import mx.rpc.events.ResultEvent;
 	
 	import org.openforis.collect.Application;
+	import org.openforis.collect.client.ClientExceptions;
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.client.DataClient;
 	import org.openforis.collect.event.UIEvent;
 	import org.openforis.collect.i18n.Message;
-	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
-	import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
-	import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
-	import org.openforis.collect.metamodel.proxy.NodeLabelProxy;
 	import org.openforis.collect.model.RecordSummary;
 	import org.openforis.collect.ui.UIBuilder;
 	import org.openforis.collect.ui.component.AddRecordPopUp;
 	import org.openforis.collect.ui.component.datagrid.PaginationBar;
-	import org.openforis.collect.ui.component.datagrid.SelectRecordColumnHeaderRenderer;
-	import org.openforis.collect.ui.component.datagrid.SelectRecordColumnItemRenderer;
 	import org.openforis.collect.ui.view.ListView;
+	import org.openforis.collect.util.AlertUtil;
+	import org.openforis.collect.util.ConfirmUtil;
 	
 	import spark.collections.SortField;
-	import spark.components.gridClasses.GridColumn;
 	import spark.events.GridSortEvent;
-	import spark.formatters.DateTimeFormatter;
 
 
 	public class ListPresenter extends AbstractPresenter {
@@ -118,7 +110,7 @@ package org.openforis.collect.presenter {
 				uiEvent.obj = selectedRecord;
 				eventDispatcher.dispatchEvent(uiEvent);
 			} else {
-				//TODO show error
+				AlertUtil.showError("list.error.recordNotSelected");
 			}
 		}
 		
@@ -128,9 +120,13 @@ package org.openforis.collect.presenter {
 		protected function deleteButtonClickHandler(event:MouseEvent):void {
 			var selectedRecord:RecordSummary = _view.dataGrid.selectedItem as RecordSummary;
 			if(selectedRecord != null) {
+				ConfirmUtil.showConfirm(Message.get("list.delete.confirm"), Message.get("list.delete.confirmTitle"), executeDelete);
 				
+				function executeDelete():void {
+					_dataClient.deleteRecord(new AsyncResponder(deleteRecordResultHandler, deleteRecordFaultHandler), selectedRecord.id);
+				}
 			} else {
-				//TODO show error
+				AlertUtil.showError("list.error.recordNotSelected");
 			}
 		}
 		
@@ -169,6 +165,23 @@ package org.openforis.collect.presenter {
 			_view.dataGrid.dataProvider = records;
 
 			updatePaginationBar();
+		}
+		
+		protected function deleteRecordResultHandler(event:ResultEvent, token:Object = null):void {
+			loadRecordSummariesCurrentPage();
+		}
+
+		protected function deleteRecordFaultHandler(event:FaultEvent, token:Object = null):void {
+			var code:String = event.fault.faultCode;
+			var message:String = event.fault.message;
+			switch(code) {
+				case ClientExceptions.MULTIPLE_EDIT:
+					AlertUtil.showError(Message.get('list.error.multipleEdit'));
+					break;
+				case ClientExceptions.RECORD_LOCKED:
+					AlertUtil.showError(Message.get('list.delete.error.recordLocked'));
+					break;
+			}
 		}
 		
 		protected function updatePaginationBar():void {

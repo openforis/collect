@@ -37,27 +37,15 @@ public class RecordManager {
 	}
 
 	@Transactional
-	public Record create(Survey survey, String entityName) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Transactional
-	public Record load(String entityName, long id) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Transactional
 	public void save(Record record) {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Transactional
-	public void delete(String entityName, long id) {
-		// TODO Auto-generated method stub
-
+	public void delete(int recordId, User user) throws RecordLockedException, AccessDeniedException {
+		recordDAO.lock(recordId, user);
+		recordDAO.delete(recordId);
 	}
 
 	/**

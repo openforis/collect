@@ -17,6 +17,7 @@ package org.openforis.collect.client {
 
 		private var _updateOperation:Operation;
 		private var _newRecordOperation:Operation;
+		private var _deleteRecordOperation:Operation;
 		private var _getCountRecordsOperation:Operation;
 		private var _getRecordSummariesOperation:Operation;
 		private var _loadRecordOperation:Operation;
@@ -28,6 +29,7 @@ package org.openforis.collect.client {
 			this._updateQueueProcessor = new RemoteCallQueueProcessor(3, faultHandler);
 			this._updateOperation = getOperation("update");
 			this._newRecordOperation = getOperation("newRecord");
+			this._deleteRecordOperation = getOperation("deleteRecord");
 			this._getCountRecordsOperation = getOperation("getCountRecords");
 			this._getRecordSummariesOperation = getOperation("getRecordSummaries");
 			this._loadRecordOperation = getOperation("loadRecord");
@@ -41,6 +43,11 @@ package org.openforis.collect.client {
 		
 		public function newRecord(responder:IResponder, rootEntityName:String, versionName:String):void {
 			var token:AsyncToken = this._newRecordOperation.send(rootEntityName, versionName);
+			token.addResponder(responder);
+		}
+		
+		public function deleteRecord(responder:IResponder, id:int):void {
+			var token:AsyncToken = this._deleteRecordOperation.send(id);
 			token.addResponder(responder);
 		}
 		
