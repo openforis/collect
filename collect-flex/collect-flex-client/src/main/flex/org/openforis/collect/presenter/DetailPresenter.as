@@ -65,8 +65,8 @@ package org.openforis.collect.presenter {
 			} else {
 				//build form 
 				_view.currentState = DetailView.LOADING_STATE;
-				form = UIBuilder.buildForm(activeRootEntity, version);
-				_view.formsContainer.addForm(form, version, activeRootEntity);
+				form = UIBuilder.buildForm(activeRootEntity, version,_view.formsContainer);
+				//_view.formsContainer.addForm(form, version, activeRootEntity,);
 				_view.currentState = DetailView.EDIT_STATE;
 			}
 			

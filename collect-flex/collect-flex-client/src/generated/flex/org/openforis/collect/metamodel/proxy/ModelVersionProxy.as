@@ -27,5 +27,17 @@ package org.openforis.collect.metamodel.proxy {
 			return "";
 		}
 
+		public function compare(other:ModelVersionProxy):int {
+			if(this.date == other.date){
+				return 0;
+			} else if (this.date < other.date){
+				return -1;
+			} else if(this.date > other.date){
+				return 1;
+			}
+			return 0;
+		}
+		
+		
     }
 }

@@ -2,7 +2,6 @@ package org.openforis.collect.ui {
 	import mx.collections.ArrayList;
 	import mx.collections.IList;
 	import mx.collections.ListCollectionView;
-	import mx.core.Container;
 	
 	import org.openforis.collect.Application;
 	import org.openforis.collect.i18n.Message;
@@ -10,19 +9,15 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
 	import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
-	import org.openforis.collect.metamodel.proxy.NodeLabelProxy$Type;
 	import org.openforis.collect.model.UIConfiguration;
 	import org.openforis.collect.model.UITab;
 	import org.openforis.collect.ui.component.datagrid.RecordSummaryDataGrid;
 	import org.openforis.collect.ui.component.datagroup.DataGroupItemRenderer;
 	import org.openforis.collect.ui.component.detail.EntityFormContainer;
 	import org.openforis.collect.ui.component.detail.FormContainer;
-	import org.openforis.collect.ui.component.input.BooleanInputField;
-	import org.openforis.collect.ui.component.input.CodeInputField;
-	import org.openforis.collect.ui.component.input.DateInputField;
+	import org.openforis.collect.ui.component.detail.FormsContainer;
+	import org.openforis.collect.ui.component.detail.MultipleAttributeContainer;
 	import org.openforis.collect.ui.component.input.InputField;
-	import org.openforis.collect.ui.component.input.NumericInputField;
-	import org.openforis.collect.ui.component.input.RangeInputField;
 	import org.openforis.collect.ui.component.input.StringInputField;
 	
 	import spark.components.gridClasses.GridColumn;
@@ -33,16 +28,17 @@ package org.openforis.collect.ui {
 	public class UIBuilder {
 		
 		//TODO: use entityDescriptor
-		public static function buildForm(entity:EntityDefinitionProxy, version:ModelVersionProxy):FormContainer {
+		public static function buildForm(entity:EntityDefinitionProxy, version:ModelVersionProxy, container:FormsContainer):FormContainer {
 			//foreach version
 				var formContainer:FormContainer = new FormContainer();
 				formContainer.initialize();
-				
+				container.addForm(formContainer, version, entity);
 				
 				//Root entity definition				
-				var rootEntityForm:EntityFormContainer = new EntityFormContainer();
-				rootEntityForm.label = entity.getLabelText();
-				formContainer.rootFormContainer =rootEntityForm;
+				var form:EntityFormContainer = new EntityFormContainer();
+				//form.initialize();
+				formContainer.rootFormContainer =form;
+				form.label = entity.getLabelText();
 				
 				var uiConfig:UIConfiguration = Application.activeSurvey.uiConfiguration;
 				var uiTab:UITab = null;
@@ -57,7 +53,7 @@ package org.openforis.collect.ui {
 							}
 						} 
 				}
-				addFormItems(rootEntityForm, entity, version, uiTab);
+				addFormItems(form, entity, version, uiTab);
 				
 				
 				/*
@@ -171,12 +167,13 @@ package org.openforis.collect.ui {
 		}
 		
 		private static function addAttributeFormItem(form:EntityFormContainer, definition:AttributeDefinitionProxy):void {
-			
 			if(definition.multiple) {
-				//TODO multiple attributes
+				var container:MultipleAttributeContainer = new MultipleAttributeContainer();
+				container.initialize();
+				container.attributeDefinition = definition;
+				form.addFormItem(definition.getLabelText(), container);
 			} else {
 				var inputField:InputField = getInputField(definition);
-				inputField.presenter.path = null; //TODO
 				form.addFormItem(definition.getLabelText(), inputField);
 			}
 			
@@ -194,10 +191,11 @@ package org.openforis.collect.ui {
 		}
 		
 		//TODO
-		private static function getInputField(attributeDescripor:*):InputField {
+		public static function getInputField(def:AttributeDefinitionProxy):InputField {
 			var inputField:InputField = null;
-			var type:String = 'string'; //attributeDescripor.type
-			switch(type) {
+			inputField = new StringInputField();
+			//var type:String = def.
+			/*switch(type) {
 				case 'string':
 					inputField = new StringInputField();
 					break;
@@ -222,8 +220,24 @@ package org.openforis.collect.ui {
 				case 'file':
 					//inputField = new FIS();
 					break;
-			}
+			}*/
 			return inputField;
+		}
+		
+		public static function isInVersion(node:NodeDefinitionProxy, currentVersion:ModelVersionProxy):Boolean {
+			var since:ModelVersionProxy = node.sinceVersion;
+			var deprecated:ModelVersionProxy = node.deprecatedVersion;
+			var result:Boolean;
+			if(since == null && deprecated == null){
+				result = true;
+			} else if(since != null && deprecated != null){
+				result = currentVersion.compare(since) >= 0 && currentVersion.compare(deprecated) < 0;
+			} else if(since != null){
+				result = currentVersion.compare(since) >= 0;
+			} else if(deprecated != null){
+				result = currentVersion.compare(deprecated) < 0;
+			}
+			return result;
 		}
 		
 	}

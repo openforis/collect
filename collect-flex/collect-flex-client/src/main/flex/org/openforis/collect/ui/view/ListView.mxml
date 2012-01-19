@@ -47,9 +47,8 @@
 	<datagrid:PaginationBar id="paginationBar" height="16" />
 	
 	<s:HGroup id="controlsBar" width="100%" horizontalAlign="center" verticalAlign="bottom" height="30">
-		<s:Button id="addButton" label="{Message.get('list.add')}" />
-		<s:Button id="editButton" label="{Message.get('list.edit')}" />
-		<s:Button id="deleteButton" label="{Message.get('list.delete')}" />
-		<s:Button id="changeKeyButton" label="{Message.get('list.changeKey')}" />
+		<s:Button id="addButton" label="{Message.get('list.add')}" useHandCursor="true" buttonMode="true" />
+		<s:Button id="editButton" label="{Message.get('list.edit')}" useHandCursor="true" buttonMode="true" />
+		<s:Button id="deleteButton" label="{Message.get('list.delete')}" useHandCursor="true" buttonMode="true" />
 	</s:HGroup>
 </s:Group>

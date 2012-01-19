@@ -5,14 +5,10 @@
 				  xmlns:input="org.openforis.collect.ui.component.input.*" 
 				  >
 	
-	<fx:Declarations>
-		<!-- Place non-visual elements (e.g., services, value objects) here -->
-	</fx:Declarations>
-	
-	<input:TextInput id="hoursTextInput" width="100%" />
+	<input:TextInput id="hoursTextInput" width="30" maxChars="2" restrict="0-9" />
 	
 	<s:Label text=":" id="separator" width="5" />
 	
-	<input:TextInput id="minutesTextInput" width="100%" />
+	<input:TextInput id="minutesTextInput" width="30" maxChars="2" restrict="0-9" />
 	
 </input:InputField>

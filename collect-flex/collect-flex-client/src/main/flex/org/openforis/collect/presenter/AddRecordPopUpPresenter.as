@@ -79,7 +79,7 @@ package org.openforis.collect.presenter {
 			var dataClient:DataClient = ClientFactory.dataClient;
 			var version:ModelVersionProxy = ModelVersionProxy(_view.versionsDropDownList.selectedItem);
 			var rootEntityName:String = Application.activeRootEntity.name;
-			dataClient.newRecord(_newRecordResponder, rootEntityName, version.name);
+			dataClient.createNewRecord(_newRecordResponder, rootEntityName, version.name);
 		}
 		
 		protected function cancelClickHandler(event:Event):void {
