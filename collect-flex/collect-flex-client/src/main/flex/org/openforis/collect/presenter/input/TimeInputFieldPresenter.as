@@ -58,24 +58,16 @@ package org.openforis.collect.presenter.input {
 			return newAttributeValue;
 			*/
 		}
-		/*
-		protected function setTimeOnFields(time:Time):void {
+		
+		protected function setTimeOnFields(time:Object):void {
 			_timeInputField.hoursTextInput.text = String(time.hour);
 			_timeInputField.minutesTextInput.text = String(time.minute);
 		}
-		*/
+		
 		protected function getTimeFromFields():Date {
 			//check if input text is valid
 			if(StringUtil.isNotBlank(_timeInputField.hoursTextInput.text) && 
 				StringUtil.isNotBlank(_timeInputField.minutesTextInput.text)) {
-				var tempDate:Date = new Date(_dateInputField.year.text, _dateInputField.month.text, _dateInputField.day.text);
-				//check that the generated date is valid
-				if(String(tempDate.fullYear) == _dateInputField.year.text &&
-					String(tempDate.month) == _dateInputField.month.text &&
-					String(tempDate.day) == _dateInputField.day.text
-				) {
-					return tempDate;
-				}
 			}
 			return null;
 		}

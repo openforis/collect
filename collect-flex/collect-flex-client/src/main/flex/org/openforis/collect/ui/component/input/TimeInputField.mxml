@@ -3,6 +3,7 @@
 				  xmlns:s="library://ns.adobe.com/flex/spark" 
 				  xmlns:mx="library://ns.adobe.com/flex/mx" 
 				  xmlns:input="org.openforis.collect.ui.component.input.*" 
+				  presenterClass="org.openforis.collect.presenter.input.TimeInputFieldPresenter"
 				  >
 	
 	<input:TextInput id="hoursTextInput" width="30" maxChars="2" restrict="0-9" />

@@ -53,10 +53,4 @@
 		<view:Footer width="100%" />
 	</s:SkinnableContainer>
 	
-	<!--
-	<input:DateInputField />
-	<input:CodeInputField />
-	<input:TaxonInputField />
-	<input:CoordinateInputField />
-	-->
 </s:Application>
