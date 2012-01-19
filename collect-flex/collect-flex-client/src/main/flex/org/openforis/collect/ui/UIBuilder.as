@@ -80,7 +80,7 @@ package org.openforis.collect.ui {
 			var columns:IList = new ArrayList();
 			var column:GridColumn;
 			//key attributes columns
-			var keyAttributeDefs:IList = rootEntity.keyAttributeDefinitions;
+			var keyAttributeDefs:IList = rootEntity.keyAttributeDefinitions();
 			for each(var keyAttributeDef:AttributeDefinitionProxy in keyAttributeDefs) {
 				column = new GridColumn();
 				column.headerText = keyAttributeDef.getLabelText();
@@ -140,7 +140,7 @@ package org.openforis.collect.ui {
 				if(defns != null && defns.length >0){
 					for each (var def:NodeDefinitionProxy in defns) {
 						if(def is AttributeDefinitionProxy){
-							addAttributeFormItem(form, def);
+							addAttributeFormItem(form, def as AttributeDefinitionProxy);
 						} else if(def is EntityDefinitionProxy) {
 							
 						}
@@ -194,10 +194,11 @@ package org.openforis.collect.ui {
 		}
 		
 		//TODO
-		private static function getInputField(attributeDescripor:*):InputField {
+		private static function getInputField(def:AttributeDefinitionProxy):InputField {
 			var inputField:InputField = null;
-			var type:String = 'string'; //attributeDescripor.type
-			switch(type) {
+			inputField = new StringInputField();
+			//var type:String = def.
+			/*switch(type) {
 				case 'string':
 					inputField = new StringInputField();
 					break;
@@ -222,7 +223,7 @@ package org.openforis.collect.ui {
 				case 'file':
 					//inputField = new FIS();
 					break;
-			}
+			}*/
 			return inputField;
 		}
 		
