@@ -16,7 +16,6 @@
 			import mx.events.FlexEvent;
 			import mx.messaging.Consumer;
 			import mx.messaging.Producer;
-			import mx.resources.ResourceBundle;
 			
 			import org.openforis.collect.Application;
 			import org.openforis.collect.presenter.CollectPresenter;
