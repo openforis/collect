@@ -44,7 +44,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author M. Togna
  */
 public class DataService {
-	private static final QName COUNT_IN_SUMMARY_LIST_ANNOTATION = new QName("http://www.openforis.org/collect/3.0/ui", "countInSummaryList");
+	private static final QName COUNT_ANNOTATION = new QName("http://www.openforis.org/collect/3.0/collect", "count");
 
 	@Autowired
 	private SessionManager sessionManager;
@@ -281,7 +281,7 @@ public class DataService {
 		for (NodeDefinition childDefinition : childDefinitions) {
 			if(childDefinition instanceof EntityDefinition) {
 				EntityDefinition entityDefinition = (EntityDefinition) childDefinition;
-				String annotation = childDefinition.getAnnotation(COUNT_IN_SUMMARY_LIST_ANNOTATION);
+				String annotation = childDefinition.getAnnotation(COUNT_ANNOTATION);
 				if(annotation != null && Boolean.parseBoolean(annotation)) {
 					result.add(entityDefinition);
 				}
