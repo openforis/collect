@@ -108,7 +108,7 @@ public class RecordDAO extends CollectDAO {
 		
 		return result;
 	}
-
+	
 	@Transactional
 	public void lock(Integer recordId, User user) throws RecordLockedException, AccessDeniedException, MultipleEditException {
 		Factory jf = getJooqFactory();

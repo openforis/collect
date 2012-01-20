@@ -32,7 +32,9 @@ public class RecordSummaryQueryBuilder {
 
 	private static final String USER_TABLE_CREATED_BY_ALIAS = "user_created_by";
 	private static final String USER_TABLE_MODIFIED_BY_ALIAS = "user_modified_by";
-	private static final String KEY_DATA_TABLE_ALIAS_PREFIX = "data_";
+	private static final String KEY_DATA_TABLE_ALIAS_PREFIX = "data_key_";
+	private static final String COUNT_DATA_TABLE_ALIAS_PREFIX = "data_count_";
+	
 	private static final String COUNT_COLUMN_PREFIX = "count_";
 	private static final String KEY_COLUMN_PREFIX = "key_";
 	
@@ -121,8 +123,11 @@ public class RecordSummaryQueryBuilder {
 			selectQuery.addConditions(RECORD.ROOT_ENTITY_ID.equal(rootEntityDefinition.getId()));
 		}
 		
-		//TODO add filter on key attributes
+		if(countEntityDefinitions != null && countEntityDefinitions.size() > 0) {
+			addGroupByToQuery();
+		}
 		
+		//TODO add filter on key attributes
 		
 		if(orderByFieldName != null) {
 			addOrderByToQuery();
@@ -169,8 +174,9 @@ public class RecordSummaryQueryBuilder {
 	 * @param alias
 	 * @return
 	 */
-	private Field<Object> createCountField(NodeDefinition nodeDefinition, String alias) {
-		Field<Object> countField = jooqFactory.selectCount().from(DATA).where(DATA.RECORD_ID.equal(RECORD.ID).and(DATA.DEFINITION_ID.equal(nodeDefinition.getId()))).asField(alias);
+	private Field<Integer> createCountField(Field<?> field, String alias) {
+		//Field<Object> countField = jooqFactory.selectCount().from(DATA).where(DATA.RECORD_ID.equal(RECORD.ID).and(DATA.DEFINITION_ID.equal(nodeDefinition.getId()))).asField(alias);
+		Field<Integer> countField = jooqFactory.count(field).as(alias);
 		return countField;
 	}
 	
@@ -181,8 +187,15 @@ public class RecordSummaryQueryBuilder {
 	private void addCountColumnsToQuery() {
 		TableField<?, ?> orderByField = null;
 		for (NodeDefinition nodeDefinition : countEntityDefinitions) {
+			String dataTableAliasName = COUNT_DATA_TABLE_ALIAS_PREFIX + nodeDefinition.getName();
+			//left join with DATA table
+			Data dataTableAlias = DATA.as(dataTableAliasName);
+			selectQuery.addJoin(dataTableAlias, JoinType.LEFT_OUTER_JOIN, 
+					dataTableAlias.RECORD_ID.equal(RECORD.ID), 
+					dataTableAlias.DEFINITION_ID.equal(nodeDefinition.getId()));
+			
 			String alias = COUNT_COLUMN_PREFIX + nodeDefinition.getName();
-			Field<Object> countField = createCountField(nodeDefinition, alias);
+			Field<Integer> countField = createCountField(dataTableAlias.ID, alias);
 			selectQuery.addSelect(countField);
 			
 			//add order by condition
@@ -190,6 +203,7 @@ public class RecordSummaryQueryBuilder {
 				selectQuery.addOrderBy(countField);
 			}
 		}
+		
 	}
 	
 	/**
@@ -214,11 +228,18 @@ public class RecordSummaryQueryBuilder {
 				Field<?> fieldAlias = dataField.as(KEY_COLUMN_PREFIX + attributeDefinition.getName());
 				selectQuery.addSelect(fieldAlias);
 				
+				selectQuery.addGroupBy(fieldAlias);
+				
 				if(orderByField == null && orderByFieldName != null && orderByFieldName.equals(attributeDefinition.getName())) {
 					selectQuery.addOrderBy(fieldAlias);
 				}
 			}
 		}
+	}
+	
+	private void addGroupByToQuery() {
+		selectQuery.addGroupBy(RECORD.ID, USER.as(USER_TABLE_CREATED_BY_ALIAS).USERNAME, USER.as(USER_TABLE_MODIFIED_BY_ALIAS).USERNAME);
+		
 	}
 	
 	/**
