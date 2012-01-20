@@ -50,6 +50,7 @@ public class SessionManager {
 	public void clearActiveRecord() {
 		SessionState sessionState = getSessionState();
 		sessionState.setActiveRecord(null);
+		sessionState.setActiveRecordState(null);
 	}
 
 	public void keepSessionAlive() {

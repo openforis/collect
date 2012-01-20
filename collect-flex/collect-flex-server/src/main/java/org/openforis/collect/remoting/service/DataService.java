@@ -24,6 +24,7 @@ import org.openforis.collect.persistence.NonexistentIdException;
 import org.openforis.collect.persistence.RecordLockedException;
 import org.openforis.collect.remoting.service.UpdateRequest.Method;
 import org.openforis.collect.session.SessionState;
+import org.openforis.collect.session.SessionState.RecordState;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
@@ -56,7 +57,9 @@ public class DataService {
 		Survey survey = getActiveSurvey();
 		User user = getUserInSession();
 		CollectRecord record = recordManager.checkout(survey, user, id);
-		sessionManager.setActiveRecord((CollectRecord) record);
+		SessionState sessionState = sessionManager.getSessionState();
+		sessionState.setActiveRecord((CollectRecord) record);
+		sessionState.setActiveRecordState(RecordState.SAVED);
 		return new RecordProxy(record);
 	}
 
@@ -94,7 +97,8 @@ public class DataService {
 		Schema schema = activeSurvey.getSchema();
 		EntityDefinition rootEntityDefinition = schema.getRootEntityDefinition(rootEntityName);
 		CollectRecord record = recordManager.create(activeSurvey, rootEntityDefinition, user, version.getName());
-		sessionManager.setActiveRecord((CollectRecord) record);
+		sessionState.setActiveRecord((CollectRecord) record);
+		sessionState.setActiveRecordState(RecordState.NEW);
 		RecordProxy recordProxy = new RecordProxy(record);
 		return recordProxy;
 	}
@@ -104,12 +108,15 @@ public class DataService {
 		SessionState sessionState = sessionManager.getSessionState();
 		User user = sessionState.getUser();
 		recordManager.delete(id, user);
+		sessionManager.clearActiveRecord();
 	}
 	
 	@Transactional
 	public void saveActiveRecord() {
-		Record record = this.sessionManager.getSessionState().getActiveRecord();
+		SessionState sessionState = sessionManager.getSessionState();
+		Record record = sessionState.getActiveRecord();
 		recordManager.save(record);
+		sessionState.setActiveRecordState(RecordState.SAVED);
 	}
 
 	@Transactional
@@ -118,7 +125,7 @@ public class DataService {
 		User user = sessionState.getUser();
 		Record record = sessionState.getActiveRecord();
 		recordManager.delete(record.getId(), user);
-		this.sessionManager.clearActiveRecord();
+		sessionManager.clearActiveRecord();
 	}
 
 	public void updateRootEntityKey(String recordId, String newRootEntityKey) throws DuplicateIdException, InvalidIdException, NonexistentIdException, AccessDeniedException, RecordLockedException {
@@ -160,11 +167,17 @@ public class DataService {
 	/**
 	 * remove the active record from the current session
 	 * @throws RecordLockedException 
+	 * @throws AccessDeniedException 
 	 */
-	public void clearActiveRecord() throws RecordLockedException {
+	public void clearActiveRecord() throws RecordLockedException, AccessDeniedException {
 		CollectRecord activeRecord = getActiveRecord();
 		User user = getUserInSession();
 		this.recordManager.unlock(activeRecord, user);
+		Integer recordId = activeRecord.getId();
+		SessionState sessionState = this.sessionManager.getSessionState();
+		if(RecordState.NEW == sessionState.getActiveRecordState()) {
+			this.recordManager.delete(recordId, user);
+		}
 		this.sessionManager.clearActiveRecord();
 	}
 
