@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx"
+		 width="100%">
+	
+	<fx:Script>
+		<![CDATA[
+			import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
+			import org.openforis.collect.model.proxy.EntityProxy;
+			
+			import spark.components.FormItem;
+			
+			private var _parentEntity:EntityProxy;
+			private var _entityDefinition:EntityDefinitionProxy;
+			private var _childrenAdded:Boolean = false;
+			
+			override protected function createChildren():void {
+				super.createChildren();
+				addElement(form);
+				
+				/* var formItem:FormItem = new FormItem();
+				formItem.label = entityDefinition.getLabelText();
+				form.addElement(formItem); */
+			}
+			
+			[Bindable]
+			public function get parentEntity():EntityProxy {
+				return _parentEntity;
+			}
+
+			public function set parentEntity(value:EntityProxy):void {
+				_parentEntity = value;
+			}
+
+			[Bindable]
+			public function get entityDefinition():EntityDefinitionProxy {
+				return _entityDefinition;
+			}
+
+			public function set entityDefinition(value:EntityDefinitionProxy):void {
+				_entityDefinition = value;
+			}
+
+			internal function get childrenAdded():Boolean {
+				return _childrenAdded;
+			}
+			
+			internal function set childrenAdded(value:Boolean):void {
+				_childrenAdded = value;
+			}
+		]]>
+	</fx:Script>
+	
+	<s:layout>
+		<s:VerticalLayout/>
+	</s:layout>
+	
+	<fx:Declarations>
+		
+		<s:Form height="100%" width="100%" id="form">
+			<s:layout>
+				<s:FormLayout gap="-10" paddingLeft="10" />
+			</s:layout>
+		</s:Form>
+		
+	</fx:Declarations>
+	
+</s:Group>
