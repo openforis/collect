@@ -52,7 +52,7 @@ package org.openforis.collect.ui {
 						var tabs:ListCollectionView = uiConfig.tabs;
 						if(tabs != null){
 							for each (var tab:UITab in tabs) {
-								if(tab.name == entity.name){
+								if(tab.name == entity.name) {
 									uiTab = tab;
 									break;
 								}
@@ -148,8 +148,11 @@ package org.openforis.collect.ui {
 								form.addFormItem(attrFormItem);
 								
 							} else if(def is EntityDefinitionProxy) {
-								var entityFormItem:EntityFormItem = getEntityFormItem(EntityDefinitionProxy(def));
-								form.addEntityFormItem(entityFormItem);
+								var proxy:EntityDefinitionProxy = EntityDefinitionProxy(def);
+								if(proxy.uiTabName==null){
+									var entityFormItem:EntityFormItem = getEntityFormItem(proxy);
+									form.addEntityFormItem(entityFormItem);
+								}
 							}
 						}
 					}
@@ -182,8 +185,6 @@ package org.openforis.collect.ui {
 				var formItem:AttributeFormItem = null;
 				if(definition.multiple) {
 					formItem = new MultipleAttributeFormItem();
-					/*var container:MultipleAttributeFormItem = new MultipleAttributeFormItem();
-					container.initialize();*/
 				} else {
 					formItem = new SingleAttributeFormItem();
 				}

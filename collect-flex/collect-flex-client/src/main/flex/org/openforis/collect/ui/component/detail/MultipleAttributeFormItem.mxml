@@ -3,8 +3,12 @@
 		 xmlns:s="library://ns.adobe.com/flex/spark" 
 		 xmlns:mx="library://ns.adobe.com/flex/mx"
 		 xmlns:detail="org.openforis.collect.ui.component.detail.*"
-		 xmlns:input="org.openforis.collect.ui.component.input.*">
+		 xmlns:input="org.openforis.collect.ui.component.input.*" >
 
+	<detail:layout>
+		<s:VerticalLayout gap="-5" />
+	</detail:layout>
+	
 	<fx:Style>
 		@namespace s "library://ns.adobe.com/flex/spark";
 		@namespace mx "library://ns.adobe.com/flex/mx";

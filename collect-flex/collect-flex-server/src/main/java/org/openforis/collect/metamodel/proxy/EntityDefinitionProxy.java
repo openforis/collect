@@ -38,12 +38,18 @@ public class EntityDefinitionProxy extends NodeDefinitionProxy {
 	public List<NodeDefinitionProxy> getChildDefinitions() {
 		return NodeDefinitionProxy.fromList(entityDefinition.getChildDefinitions());
 	}
-	
+
 	@ExternalizedProperty
 	public boolean isCountInSummaryList() {
 		QName countInSummaryListAnnotation = new QName("http://www.openforis.org/collect/3.0/ui", "countInSummaryList");
 		String annotation = entityDefinition.getAnnotation(countInSummaryListAnnotation);
 		return annotation != null && Boolean.parseBoolean(annotation);
 	}
-	
+
+	@ExternalizedProperty
+	public String getUiTabName() {
+		QName qName = new QName("http://www.openforis.org/collect/3.0/ui", "tab");
+		String annotation = entityDefinition.getAnnotation(qName);
+		return annotation;
+	}
 }
