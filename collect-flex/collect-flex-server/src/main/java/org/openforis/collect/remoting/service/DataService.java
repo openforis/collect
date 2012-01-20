@@ -104,7 +104,7 @@ public class DataService {
 	}
 	
 	@Transactional
-	public void deleteRecord(int id) throws RecordLockedException, AccessDeniedException {
+	public void deleteRecord(int id) throws RecordLockedException, AccessDeniedException, MultipleEditException {
 		SessionState sessionState = sessionManager.getSessionState();
 		User user = sessionState.getUser();
 		recordManager.delete(id, user);
@@ -120,7 +120,7 @@ public class DataService {
 	}
 
 	@Transactional
-	public void deleteActiveRecord() throws RecordLockedException, AccessDeniedException {
+	public void deleteActiveRecord() throws RecordLockedException, AccessDeniedException, MultipleEditException {
 		SessionState sessionState = sessionManager.getSessionState();
 		User user = sessionState.getUser();
 		Record record = sessionState.getActiveRecord();
@@ -168,8 +168,9 @@ public class DataService {
 	 * remove the active record from the current session
 	 * @throws RecordLockedException 
 	 * @throws AccessDeniedException 
+	 * @throws MultipleEditException 
 	 */
-	public void clearActiveRecord() throws RecordLockedException, AccessDeniedException {
+	public void clearActiveRecord() throws RecordLockedException, AccessDeniedException, MultipleEditException {
 		CollectRecord activeRecord = getActiveRecord();
 		User user = getUserInSession();
 		this.recordManager.unlock(activeRecord, user);

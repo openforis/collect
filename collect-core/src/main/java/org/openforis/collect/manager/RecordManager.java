@@ -43,7 +43,7 @@ public class RecordManager {
 	}
 
 	@Transactional
-	public void delete(int recordId, User user) throws RecordLockedException, AccessDeniedException {
+	public void delete(int recordId, User user) throws RecordLockedException, AccessDeniedException, MultipleEditException {
 		recordDAO.lock(recordId, user);
 		recordDAO.delete(recordId);
 	}
@@ -55,9 +55,10 @@ public class RecordManager {
 	 * @param user
 	 * @param recordId
 	 * @return
+	 * @throws MultipleEditException 
 	 */
 	@Transactional
-	public CollectRecord checkout(Survey survey, User user, int recordId) throws RecordLockedException, NonexistentIdException, AccessDeniedException {
+	public CollectRecord checkout(Survey survey, User user, int recordId) throws RecordLockedException, NonexistentIdException, AccessDeniedException, MultipleEditException {
 		CollectRecord record = recordDAO.load(survey, recordId);
 		recordDAO.lock(recordId, user);
 		return record;
@@ -81,6 +82,7 @@ public class RecordManager {
 		record.setCreationDate(new Date());
 		//record.setCreatedBy(user.getId());
 		record.setStep(Step.ENTRY);
+		recordDAO.checkCanLock(user);
 		recordDAO.saveOrUpdate(record);
 		Integer recordId = record.getId();
 		recordDAO.lock(recordId, user);

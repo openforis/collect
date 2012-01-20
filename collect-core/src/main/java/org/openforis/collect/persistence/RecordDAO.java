@@ -110,13 +110,10 @@ public class RecordDAO extends CollectDAO {
 	}
 
 	@Transactional
-	public void lock(Integer recordId, User user) throws RecordLockedException, AccessDeniedException {
+	public void lock(Integer recordId, User user) throws RecordLockedException, AccessDeniedException, MultipleEditException {
 		Factory jf = getJooqFactory();
 		//check if user has already locked another record
-		  Record r = jf.select(RECORD.ID).from(RECORD).where(RECORD.LOCKED_BY_ID.equal(user.getId())).fetchAny();
-		 if(r != null){
-			 throw new AccessDeniedException("User has locked another record " + r.getValueAsInteger(RECORD.ID));
-		 }
+		checkCanLock(user);
 		Record selectResult = jf.select(RECORD.LOCKED_BY_ID, org.openforis.collect.persistence.jooq.tables.User.USER.USERNAME).from(RECORD)
 				.leftOuterJoin(org.openforis.collect.persistence.jooq.tables.User.USER).on(RECORD.LOCKED_BY_ID.equal(org.openforis.collect.persistence.jooq.tables.User.USER.ID))
 				.where(RECORD.ID.equal(recordId)).fetchOne();
@@ -127,9 +124,25 @@ public class RecordDAO extends CollectDAO {
 			String userName = selectResult.getValueAsString(org.openforis.collect.persistence.jooq.tables.User.USER.USERNAME);
 			throw new RecordLockedException("Record already locked", userName);
 		}
-
 	}
 
+	public void checkCanLock(User user) throws MultipleEditException  {
+		Factory jf = getJooqFactory();
+		Integer lockedRecordId = getLockedRecordId(jf, user);
+		if(lockedRecordId != null) {
+			throw new MultipleEditException("User has locked another record " + lockedRecordId);
+		}
+	}
+	
+	private Integer getLockedRecordId(Factory jf, User user) {
+		Record r = jf.select(RECORD.ID).from(RECORD).where(RECORD.LOCKED_BY_ID.equal(user.getId())).fetchAny();
+		if(r != null){
+			return r.getValueAsInteger(RECORD.ID);
+		} else {
+			return null;
+		}
+	}
+	
 	@Transactional
 	public void unlock(Integer recordId, User user) throws RecordLockedException {
 		Factory jf = getJooqFactory();
