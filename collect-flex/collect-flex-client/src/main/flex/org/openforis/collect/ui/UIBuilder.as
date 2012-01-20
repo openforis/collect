@@ -13,10 +13,15 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.model.UITab;
 	import org.openforis.collect.ui.component.datagrid.RecordSummaryDataGrid;
 	import org.openforis.collect.ui.component.datagroup.DataGroupItemRenderer;
+	import org.openforis.collect.ui.component.detail.AttributeFormItem;
 	import org.openforis.collect.ui.component.detail.EntityFormContainer;
+	import org.openforis.collect.ui.component.detail.EntityFormItem;
 	import org.openforis.collect.ui.component.detail.FormContainer;
 	import org.openforis.collect.ui.component.detail.FormsContainer;
-	import org.openforis.collect.ui.component.detail.MultipleAttributeContainer;
+	import org.openforis.collect.ui.component.detail.MultipleAttributeFormItem;
+	import org.openforis.collect.ui.component.detail.MultipleEntityFormItem;
+	import org.openforis.collect.ui.component.detail.SingleAttributeFormItem;
+	import org.openforis.collect.ui.component.detail.SingleEntityFormItem;
 	import org.openforis.collect.ui.component.input.InputField;
 	import org.openforis.collect.ui.component.input.StringInputField;
 	
@@ -28,15 +33,16 @@ package org.openforis.collect.ui {
 	public class UIBuilder {
 		
 		//TODO: use entityDescriptor
-		public static function buildForm(entity:EntityDefinitionProxy, version:ModelVersionProxy, container:FormsContainer):FormContainer {
+		public static function buildForm(entity:EntityDefinitionProxy, version:ModelVersionProxy):FormContainer {
 			//foreach version
 				var formContainer:FormContainer = new FormContainer();
 				formContainer.initialize();
-				container.addForm(formContainer, version, entity);
+				//container.addForm(formContainer, version, entity);
 				
 				//Root entity definition				
 				var form:EntityFormContainer = new EntityFormContainer();
 				//form.initialize();
+				
 				formContainer.rootFormContainer =form;
 				form.label = entity.getLabelText();
 				
@@ -135,10 +141,16 @@ package org.openforis.collect.ui {
 				var defns:ListCollectionView = entity.childDefinitions;
 				if(defns != null && defns.length >0){
 					for each (var def:NodeDefinitionProxy in defns) {
-						if(def is AttributeDefinitionProxy){
-							addAttributeFormItem(form, AttributeDefinitionProxy(def));
-						} else if(def is EntityDefinitionProxy) {
-							
+						if(isInVersion(def, version)) {
+						
+							if(def is AttributeDefinitionProxy){
+								var attrFormItem:AttributeFormItem = getAttributeFormItem(AttributeDefinitionProxy(def) );
+								form.addFormItem(attrFormItem);
+								
+							} else if(def is EntityDefinitionProxy) {
+								var entityFormItem:EntityFormItem = getEntityFormItem(EntityDefinitionProxy(def));
+								form.addEntityFormItem(entityFormItem);
+							}
 						}
 					}
 				}
@@ -166,20 +178,31 @@ package org.openforis.collect.ui {
     				
 		}
 		
-		private static function addAttributeFormItem(form:EntityFormContainer, definition:AttributeDefinitionProxy):void {
-			if(definition.multiple) {
-				var container:MultipleAttributeContainer = new MultipleAttributeContainer();
-				container.initialize();
-				container.attributeDefinition = definition;
-				form.addFormItem(definition.getLabelText(), container);
-			} else {
-				var inputField:InputField = getInputField(definition);
-				form.addFormItem(definition.getLabelText(), inputField);
-			}
-			
+		public static function getAttributeFormItem(definition:AttributeDefinitionProxy):AttributeFormItem {
+				var formItem:AttributeFormItem = null;
+				if(definition.multiple) {
+					formItem = new MultipleAttributeFormItem();
+					/*var container:MultipleAttributeFormItem = new MultipleAttributeFormItem();
+					container.initialize();*/
+				} else {
+					formItem = new SingleAttributeFormItem();
+				}
+				formItem.attributeDefinition = definition;
+				return formItem;
 		}
 		
-		private static function getEntityItemRenderer(entityDescriptor:*):DataGroupItemRenderer {
+		public static function getEntityFormItem(definition:EntityDefinitionProxy):EntityFormItem {
+			var entityFormItem:EntityFormItem = null;
+			if(definition.multiple) {
+				entityFormItem = new MultipleEntityFormItem();
+			} else {
+				entityFormItem = new SingleEntityFormItem();
+			}
+			entityFormItem.entityDefinition = definition;
+			return entityFormItem;
+		}
+		
+/*		private static function getEntityItemRenderer(entityDescriptor:*):DataGroupItemRenderer {
 			var itemRenderer:DataGroupItemRenderer = new DataGroupItemRenderer();
 			for each(var modelObjectDefinition:* in entityDescriptor.childDefinitions) {
 				//if model object is attribute
@@ -188,7 +211,7 @@ package org.openforis.collect.ui {
 				itemRenderer.addElement(inputField);
 			}
 			return itemRenderer;
-		}
+		}*/
 		
 		//TODO
 		public static function getInputField(def:AttributeDefinitionProxy):InputField {

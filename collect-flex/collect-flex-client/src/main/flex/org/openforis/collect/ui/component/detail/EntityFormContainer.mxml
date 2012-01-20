@@ -9,14 +9,17 @@
 	<fx:Script>
 		<![CDATA[
 			import mx.core.IVisualElement;
+			import mx.events.FlexEvent;
 			
 			import org.openforis.collect.model.proxy.EntityProxy;
 			import org.openforis.collect.ui.Images;
 			import org.openforis.collect.ui.component.input.InputField;
 			
 			import spark.components.FormItem;
-			private var _parentEntity:EntityProxy;			
-
+		
+			private var _parentEntity:EntityProxy;
+			private var _internalForm:Boolean;
+		
 			[Bindable]
 			public function get parentEntity():EntityProxy {
 				return _parentEntity;
@@ -24,20 +27,31 @@
 
 			override protected function createChildren():void {
 				super.createChildren();
-				if(!this.borderContainer.initialized){
-					this.borderContainer.initialize();
-				}
+				
+				addElement(container);
+				borderContainer.addElement(form);
+				/* if(!borderContainer.initialized){
+					borderContainer.initialize();
+				} */
 			}
 			
 			public function set parentEntity(value:EntityProxy):void {
 				_parentEntity = value;
 			}
 
-			public function addFormItem(label:String, component:IVisualElement):void {
-				var formItem:FormItem = new FormItem();
+			public function addFormItem(attributeFormItem:AttributeFormItem):void {
+				/* var formItem:FormItem = new FormItem();
 				formItem.label = label;
-				formItem.addElement(component);
+				formItem.addElement(component); */
+				form.addElement(attributeFormItem);
+			}
+			
+			public function addEntityFormItem(entityFormItem:EntityFormItem):void {
+				var formItem:FormItem = new FormItem();
+				formItem.label = entityFormItem.entityDefinition.getLabelText();
 				form.addElement(formItem);
+				
+				form.addElement(entityFormItem);
 			}
 			
 			public function insertAddSection():void {
@@ -64,21 +78,22 @@
 						   id="addRecordButton"
 						   click="addRecordButtonClickHandler(event)" />
 		</s:Group>
+		
+		<s:VGroup id="container" width="100%" height="100%" gap="10">
+			<s:Scroller height="100%" width="100%" visible="true">
+				<s:Group height="100%" width="100%" id="group">
+					<s:BorderContainer borderColor="#CCCCCC" borderAlpha="0.8" borderStyle="solid" borderWeight="1" width="100%" height="100%" id="borderContainer">
+					</s:BorderContainer>
+				</s:Group>
+			</s:Scroller>
+		</s:VGroup>
+		
+		<s:Form height="100%" width="100%" id="form">
+			<s:layout>
+				<s:FormLayout gap="-10" paddingLeft="0" />
+			</s:layout>
+		</s:Form>
 	</fx:Declarations>
 	
-	<s:VGroup id="container" width="100%" height="100%" gap="10">
-		
-		<s:Scroller height="100%" width="100%" id="scroller">
-			<s:Group height="100%" width="100%" id="group">
-				<s:BorderContainer borderColor="#CCCCCC" borderAlpha="0.8" borderStyle="solid" borderWeight="1" width="100%" height="100%" id="borderContainer">
-					<s:Form height="100%" width="100%" id="form">
-						<s:layout>
-							<s:FormLayout gap="-10" paddingLeft="0" />
-						</s:layout>
-					</s:Form>
-				</s:BorderContainer>
-			</s:Group>
-		</s:Scroller>
-	</s:VGroup>
 	
 </s:NavigatorContent>
