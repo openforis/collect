@@ -29,7 +29,7 @@
 				super.createChildren();
 				
 				addElement(container);
-				borderContainer.addElement(form);
+				//borderContainer.addElement(form);
 				/* if(!borderContainer.initialized){
 					borderContainer.initialize();
 				} */
@@ -80,19 +80,19 @@
 		</s:Group>
 		
 		<s:VGroup id="container" width="100%" height="100%" gap="10">
-			<s:Scroller height="100%" width="100%" visible="true">
-				<s:Group height="100%" width="100%" id="group">
-					<s:BorderContainer borderColor="#CCCCCC" borderAlpha="0.8" borderStyle="solid" borderWeight="1" width="100%" height="100%" id="borderContainer">
-					</s:BorderContainer>
-				</s:Group>
-			</s:Scroller>
+			<s:BorderContainer borderColor="#CCCCCC" borderAlpha="0.8" borderStyle="solid" borderWeight="1" width="100%" height="100%" id="borderContainer">
+				<s:Scroller height="100%" width="100%" visible="true">
+					<s:Group width="100%" id="group">
+						<s:Form height="100%" width="100%" id="form">
+							<s:layout>
+								<s:FormLayout gap="-15" paddingLeft="0" />
+							</s:layout>
+						</s:Form>
+					</s:Group>
+				</s:Scroller>
+			</s:BorderContainer>
 		</s:VGroup>
 		
-		<s:Form height="100%" width="100%" id="form">
-			<s:layout>
-				<s:FormLayout gap="-10" paddingLeft="0" />
-			</s:layout>
-		</s:Form>
 	</fx:Declarations>
 	
 	

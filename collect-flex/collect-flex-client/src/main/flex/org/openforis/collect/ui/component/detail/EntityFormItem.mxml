@@ -60,7 +60,7 @@
 		
 		<s:Form height="100%" width="100%" id="form">
 			<s:layout>
-				<s:FormLayout gap="-10" paddingLeft="10" />
+				<s:FormLayout gap="-15" paddingLeft="10" />
 			</s:layout>
 		</s:Form>
 		
