@@ -2,38 +2,23 @@ package org.openforis.collect.presenter {
 	import flash.events.Event;
 	import flash.events.MouseEvent;
 	
-	import mx.collections.ArrayCollection;
-	import mx.collections.IList;
 	import mx.collections.ListCollectionView;
-	import mx.controls.Alert;
 	import mx.events.CloseEvent;
-	import mx.events.FlexEvent;
 	import mx.managers.PopUpManager;
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.IResponder;
-	import mx.rpc.events.FaultEvent;
 	import mx.rpc.events.ResultEvent;
 	
 	import org.granite.collections.BasicMap;
-	import org.granite.collections.IMap;
 	import org.openforis.collect.Application;
-	import org.openforis.collect.client.ClientExceptions;
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.client.DataClient;
 	import org.openforis.collect.event.UIEvent;
 	import org.openforis.collect.i18n.Message;
-	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
-	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
 	import org.openforis.collect.metamodel.proxy.SurveyProxy;
-	import org.openforis.collect.model.RecordSummary;
 	import org.openforis.collect.model.proxy.RecordProxy;
 	import org.openforis.collect.ui.component.AddRecordPopUp;
-	import org.openforis.collect.util.AlertUtil;
-	
-	import spark.components.FormItem;
-	import spark.components.TextInput;
-	import spark.components.supportClasses.ItemRenderer;
 
 	public class AddRecordPopUpPresenter extends AbstractPresenter {
 		private var _view:AddRecordPopUp;
@@ -42,7 +27,7 @@ package org.openforis.collect.presenter {
 		
 		public function AddRecordPopUpPresenter(view:AddRecordPopUp) {
 			this._view = view;
-			_newRecordResponder = new AsyncResponder(createRecordResultHandler, newRecordFaultHandler);
+			_newRecordResponder = new AsyncResponder(createRecordResultHandler, faultHandler);
 			super();
 			
 			if(Application.activeSurvey != null) {
@@ -93,17 +78,6 @@ package org.openforis.collect.presenter {
 			uiEvent.obj = record;
 			eventDispatcher.dispatchEvent(uiEvent);
 			PopUpManager.removePopUp(_view);
-		}
-		
-		protected function newRecordFaultHandler(event:FaultEvent, token:Object = null):void {
-			var faultCode:String = event.fault.faultCode;
-			switch(faultCode) {
-				case ClientExceptions.MULTIPLE_EDIT:
-					AlertUtil.showError('list.error.multipleEdit');
-					break;
-				default:
-					faultHandler(event, token);
-			}
 		}
 		
 		protected function updatePopUp():void {

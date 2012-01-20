@@ -12,15 +12,12 @@ package org.openforis.collect.presenter {
 	import mx.core.FlexGlobals;
 	import mx.managers.PopUpManager;
 	import mx.rpc.AsyncResponder;
-	import mx.rpc.events.FaultEvent;
 	import mx.rpc.events.ResultEvent;
 	
 	import org.openforis.collect.Application;
-	import org.openforis.collect.client.ClientExceptions;
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.client.DataClient;
 	import org.openforis.collect.event.UIEvent;
-	import org.openforis.collect.i18n.Message;
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 	import org.openforis.collect.model.RecordSummary;
 	import org.openforis.collect.ui.UIBuilder;
@@ -28,7 +25,6 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.ui.component.datagrid.PaginationBar;
 	import org.openforis.collect.ui.view.ListView;
 	import org.openforis.collect.util.AlertUtil;
-	import org.openforis.collect.util.ConfirmUtil;
 	
 	import spark.collections.SortField;
 	import spark.events.GridSortEvent;
@@ -120,10 +116,10 @@ package org.openforis.collect.presenter {
 		protected function deleteButtonClickHandler(event:MouseEvent):void {
 			var selectedRecord:RecordSummary = _view.dataGrid.selectedItem as RecordSummary;
 			if(selectedRecord != null) {
-				ConfirmUtil.showConfirm("list.delete.confirm", "list.delete.confirmTitle", executeDelete);
+				AlertUtil.showConfirm("list.delete.confirm", "list.delete.confirmTitle", executeDelete);
 				
 				function executeDelete():void {
-					_dataClient.deleteRecord(new AsyncResponder(deleteRecordResultHandler, deleteRecordFaultHandler), selectedRecord.id);
+					_dataClient.deleteRecord(new AsyncResponder(deleteRecordResultHandler, faultHandler), selectedRecord.id);
 				}
 			} else {
 				AlertUtil.showError("list.error.recordNotSelected");
@@ -174,21 +170,6 @@ package org.openforis.collect.presenter {
 			loadRecordSummariesCurrentPage();
 		}
 
-		protected function deleteRecordFaultHandler(event:FaultEvent, token:Object = null):void {
-			var code:String = event.fault.faultCode;
-			var message:String = event.fault.message;
-			switch(code) {
-				case ClientExceptions.MULTIPLE_EDIT:
-					AlertUtil.showError('list.error.multipleEdit');
-					break;
-				case ClientExceptions.RECORD_LOCKED:
-					AlertUtil.showError('list.delete.error.recordLocked');
-					break;
-				default:
-					faultHandler(event, token);
-			}
-		}
-		
 		protected function updatePaginationBar():void {
 			var recordsFromPosition:int = ((currentPage - 1) * MAX_RECORDS_PER_PAGE) + 1;
 			var recordsToPosition:int = recordsFromPosition + _view.dataGrid.dataProvider.length - 1;
