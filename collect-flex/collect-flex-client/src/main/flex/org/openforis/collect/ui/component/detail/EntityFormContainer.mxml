@@ -54,10 +54,11 @@
 			}
 			
 			public function addFormItem(attributeFormItem:AttributeFormItem):void {
-				/* var formItem:FormItem = new FormItem();
-				formItem.label = label;
-				formItem.addElement(component); */
-				form.addElement(attributeFormItem);
+				var formItem:FormItem = new FormItem();
+				formItem.label = attributeFormItem.attributeDefinition.getLabelText();
+				//formItem.addElement(component);
+				formItem.addElement(attributeFormItem);
+				form.addElement(formItem);
 			}
 			
 			public function addEntityFormItem(entityFormItem:EntityFormItem):void {

@@ -8,14 +8,24 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.i18n.Message;
 	import org.openforis.collect.metamodel.proxy.AttributeDefaultProxy;
 	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
+	import org.openforis.collect.metamodel.proxy.BooleanAttributeDefinitionProxy;
+	import org.openforis.collect.metamodel.proxy.CodeAttributeDefinitionProxy;
+	import org.openforis.collect.metamodel.proxy.CoordinateAttributeDefinitionProxy;
+	import org.openforis.collect.metamodel.proxy.DateAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
+	import org.openforis.collect.metamodel.proxy.FileAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
 	import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
+	import org.openforis.collect.metamodel.proxy.NumericAttributeDefinitionProxy;
+	import org.openforis.collect.metamodel.proxy.RangeAttributeDefinitionProxy;
+	import org.openforis.collect.metamodel.proxy.TextAttributeDefinitionProxy;
+	import org.openforis.collect.metamodel.proxy.TimeAttributeDefinitionProxy;
 	import org.openforis.collect.model.UIConfiguration;
 	import org.openforis.collect.model.UITab;
 	import org.openforis.collect.ui.component.datagrid.RecordSummaryDataGrid;
 	import org.openforis.collect.ui.component.datagroup.DataGroupItemRenderer;
 	import org.openforis.collect.ui.component.detail.AttributeFormItem;
+	import org.openforis.collect.ui.component.detail.CoordinateAttributeFormItem;
 	import org.openforis.collect.ui.component.detail.EntityFormContainer;
 	import org.openforis.collect.ui.component.detail.EntityFormItem;
 	import org.openforis.collect.ui.component.detail.FormContainer;
@@ -24,13 +34,21 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.ui.component.detail.MultipleEntityFormItem;
 	import org.openforis.collect.ui.component.detail.SingleAttributeFormItem;
 	import org.openforis.collect.ui.component.detail.SingleEntityFormItem;
+	import org.openforis.collect.ui.component.input.BooleanInputField;
+	import org.openforis.collect.ui.component.input.CodeInputField;
+	import org.openforis.collect.ui.component.input.CoordinateInputField;
+	import org.openforis.collect.ui.component.input.DateInputField;
 	import org.openforis.collect.ui.component.input.InputField;
+	import org.openforis.collect.ui.component.input.NumericInputField;
+	import org.openforis.collect.ui.component.input.RangeInputField;
 	import org.openforis.collect.ui.component.input.StringInputField;
+	import org.openforis.collect.ui.component.input.TimeInputField;
 	
 	import spark.components.HGroup;
 	import spark.components.Label;
 	import spark.components.VGroup;
 	import spark.components.gridClasses.GridColumn;
+	import spark.components.supportClasses.Range;
 	
 	/**
 	 * @author Mino Togna
@@ -165,6 +183,7 @@ package org.openforis.collect.ui {
 						if(isInVersion(def, version)) {
 							if(def is AttributeDefinitionProxy){
 								var attrFormItem:AttributeFormItem = getAttributeFormItem(AttributeDefinitionProxy(def) );
+								//attrFormItem.add(form);
 								form.addFormItem(attrFormItem);
 							} else if(def is EntityDefinitionProxy) {
 								var proxy:EntityDefinitionProxy = EntityDefinitionProxy(def);
@@ -205,7 +224,10 @@ package org.openforis.collect.ui {
 		
 		public static function getAttributeFormItem(definition:AttributeDefinitionProxy):AttributeFormItem {
 				var formItem:AttributeFormItem = null;
-				if(definition.multiple) {
+				if(definition is CoordinateAttributeDefinitionProxy){
+					//todo multiple
+					formItem = new CoordinateAttributeFormItem();
+				} else if(definition.multiple) {
 					formItem = new MultipleAttributeFormItem();
 				} else {
 					formItem = new SingleAttributeFormItem();
@@ -244,35 +266,29 @@ package org.openforis.collect.ui {
 		public static function getInputField(def:AttributeDefinitionProxy, isInDataGroup:Boolean = false):InputField {
 			//TODO
 			var inputField:InputField = null;
-			inputField = new StringInputField();
-			
-			//var type:String = def.
-			/*switch(type) {
-				case 'string':
+			if(isInDataGroup) {
+				inputField = new StringInputField();
+			} else {
+				if(def is TextAttributeDefinitionProxy) {
 					inputField = new StringInputField();
-					break;
-				case 'date':
+				} else if(def is DateAttributeDefinitionProxy) {
 					inputField = new DateInputField();
-					break;
-				case 'time':
-					//inputField = new TIF();
-					break;
-				case 'code':
+				} else if(def is TimeAttributeDefinitionProxy) {
+					inputField = new TimeInputField();
+				} else if(def is CodeAttributeDefinitionProxy) {
 					inputField = new CodeInputField();
-					break;
-				case 'number':
+				} else if(def is NumericAttributeDefinitionProxy) {
 					inputField = new NumericInputField();
-					break;
-				case 'range':
+				} else if(def is RangeAttributeDefinitionProxy) {
 					inputField = new RangeInputField();
-					break;
-				case 'boolean':
+				} else if(def is BooleanAttributeDefinitionProxy) {
 					inputField = new BooleanInputField();
-					break;
-				case 'file':
-					//inputField = new FIS();
-					break;
-			}*/
+				} else if(def is CoordinateAttributeDefinitionProxy) {
+					inputField = new CoordinateInputField();
+				} else if(def is FileAttributeDefinitionProxy) {
+					//inputField = new FileInputField();
+				} 
+			}
 			inputField.width = getInputFieldWidth(def, isInDataGroup);
 			
 			return inputField;
