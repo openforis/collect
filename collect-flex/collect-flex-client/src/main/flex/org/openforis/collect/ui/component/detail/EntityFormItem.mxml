@@ -17,7 +17,6 @@
 			
 			override protected function createChildren():void {
 				super.createChildren();
-				addElement(form);
 				
 				/* var formItem:FormItem = new FormItem();
 				formItem.label = entityDefinition.getLabelText();
@@ -53,7 +52,7 @@
 	</fx:Script>
 	
 	<s:layout>
-		<s:VerticalLayout/>
+		<s:VerticalLayout  />
 	</s:layout>
 	
 	<fx:Declarations>

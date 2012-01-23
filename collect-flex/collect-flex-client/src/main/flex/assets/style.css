@@ -49,3 +49,17 @@ s|Button.deleteButton {
 input|RemarksPopUp {
 	skin-class: ClassReference("org.openforis.collect.ui.skin.RemarksPopUpSkin");
 }
+
+s|Label.bold {
+	fontWeight: bold;
+}
+
+s|Button.roundCorners {
+	corner-radius: 3;
+	border-style: none;
+	border-color: white;
+}
+
+mx|LinkButton.roundCorners {
+	corner-radius: 8;
+}
