@@ -65,7 +65,7 @@ public class NodeDefinitionProxy implements Proxy {
 					} else if(n instanceof TimeAttributeDefinition) {
 						p = new TimeAttributeDefinitionProxy((TimeAttributeDefinition) n);
 					} else {
-						throw new RuntimeException("AttributeDefinition not supported: " + p.getClass().getSimpleName());
+						throw new RuntimeException("AttributeDefinition not supported: " + n.getClass().getSimpleName());
 					}
 				} else if (n instanceof EntityDefinition) {
 					p = new EntityDefinitionProxy((EntityDefinition) n);
