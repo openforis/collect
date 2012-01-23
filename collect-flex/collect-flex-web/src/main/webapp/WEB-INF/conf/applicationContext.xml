@@ -55,7 +55,10 @@
 	<!-- Controllers -->
 	<bean id="fileNameViewController" class="org.springframework.web.servlet.mvc.UrlFilenameViewController">
 	</bean>
-
+	
+	<bean id="unlockController" class="org.openforis.collect.web.controller.UnlockController">
+	</bean>
+	
 	<!-- TODO -->
 	<!-- <bean id="contextApplicationContextProvider" -->
 	<!-- class="org.fao.openforis.web.context.ApplicationContextAwareImpl"></bean> -->

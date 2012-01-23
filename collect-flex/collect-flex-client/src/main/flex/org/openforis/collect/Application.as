@@ -1,5 +1,7 @@
 package org.openforis.collect {
 	
+	import flash.external.ExternalInterface;
+	
 	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
 	import mx.core.FlexGlobals;
@@ -7,17 +9,13 @@ package org.openforis.collect {
 	import mx.managers.ToolTipManager;
 	import mx.utils.URLUtil;
 	
-	import org.openforis.collect.event.ApplicationEvent;
-	import org.openforis.collect.event.EventDispatcherFactory;
+	import org.openforis.collect.i18n.Message;
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.SurveyProxy;
 	import org.openforis.collect.model.Phase;
 	import org.openforis.collect.model.proxy.RecordProxy;
 	import org.openforis.collect.util.ModelClassInitializer;
 
-	/*import org.openforis.idm.model.Entity;*/
-
-	
 	/**
 	 * @author Mino Togna
 	 * */
@@ -31,6 +29,7 @@ package org.openforis.collect {
 		private static var _activeRecord:RecordProxy;
 		private static var _activeRootEntity:EntityDefinitionProxy;
 		private static var _activePhase:Phase;
+		private static var _serverOffline:Boolean;
 		
 		private static var initialized:Boolean = false;
 		internal static const CONTEXT_NAME:String = "collect";
@@ -60,6 +59,8 @@ package org.openforis.collect {
 			if(!initialized) {
 				CursorManager.setBusyCursor();
 				
+				initExternalInterface();
+				
 				var url:String = FlexGlobals.topLevelApplication.url;
 				setUrl(url);
 				
@@ -71,6 +72,23 @@ package org.openforis.collect {
 				initialized = true;
 				CursorManager.removeBusyCursor();
 			}
+		}
+		
+		private static function initExternalInterface():void {
+			if(ExternalInterface.available) {
+				ExternalInterface.addCallback("isEditingRecord", isEditingRecord);
+				ExternalInterface.addCallback("getLeavingPageMessage", getLeavingPageMessage);
+			}
+		}
+		
+		//called from External Interface (javascript)
+		public static function isEditingRecord():Boolean {
+			return ! serverOffline && Application.activeRecord != null;
+		}
+		
+		public static function getLeavingPageMessage():String {
+			var message:String = Message.get("global.leavingPage");
+			return message;
 		}
 		
 		public static function set surveySummaries(list:IList):void {
@@ -115,6 +133,14 @@ package org.openforis.collect {
 		
 		public static function set activePhase(value:Phase):void {
 			_activePhase = value;
+		}
+
+		public static function get serverOffline():Boolean {
+			return _serverOffline;
+		}
+		
+		public static function set serverOffline(value:Boolean):void {
+			_serverOffline = value;
 		}
 
 		public static function get FILEUPLOAD_URL():String {
