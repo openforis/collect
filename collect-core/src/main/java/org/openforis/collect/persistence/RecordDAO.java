@@ -6,8 +6,6 @@ import static org.openforis.collect.persistence.jooq.tables.Record.RECORD;
 
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.jooq.Record;
 import org.jooq.SelectQuery;
 import org.jooq.impl.Factory;
@@ -33,7 +31,6 @@ import org.springframework.transaction.annotation.Transactional;
  * @author M. Togna
  */
 public class RecordDAO extends CollectDAO {
-	private final Log LOG = LogFactory.getLog(RecordDAO.class);
 	
 	public RecordDAO() {
 	}
@@ -81,35 +78,18 @@ public class RecordDAO extends CollectDAO {
 		Factory jf = getJooqFactory();
 		
 		RecordSummaryQueryBuilder recordSummaryQueryBuilder = new RecordSummaryQueryBuilder(jf);
-
-		//set root entity definition to filter the records 
 		recordSummaryQueryBuilder.setRootEntityDefinition(rootEntityDefinition);
-		
-		//set key attribute definitions
 		List<AttributeDefinition> keyAttributeDefinitions = rootEntityDefinition.getKeyAttributeDefinitions();
-		
 		for (AttributeDefinition attributeDefinition : keyAttributeDefinitions) {
 			recordSummaryQueryBuilder.addKeyAttribute(attributeDefinition);
 		}
-		
-		//set entities to count
 		for (EntityDefinition entityDefinition : countEntityDefinitions) {
 			recordSummaryQueryBuilder.addCountColumn(entityDefinition);
 		}
-
-		//set order by
 		recordSummaryQueryBuilder.addOrderBy(orderByFieldName);
-		
-		//set limit
 		recordSummaryQueryBuilder.addLimit(offset, maxNumberOfRecords);
-		
-		//build select
 		SelectQuery selectQuery = recordSummaryQueryBuilder.toQuery();
-		
-		//execute query
 		List<Record> records = selectQuery.fetch();
-
-		//parse the result
 		List<RecordSummary> result = RecordSummaryParser.parseSelectResult(records, keyAttributeDefinitions, countEntityDefinitions);
 		
 		return result;
@@ -119,24 +99,24 @@ public class RecordDAO extends CollectDAO {
 	public void lock(Integer recordId, User user) throws RecordLockedException, AccessDeniedException, MultipleEditException {
 		Factory jf = getJooqFactory();
 		//check if user has already locked another record
-		checkCanLock(user);
-		Record selectResult = jf.select(RECORD.LOCKED_BY_ID, org.openforis.collect.persistence.jooq.tables.User.USER.USERNAME).from(RECORD)
+		checkLock(user);
+		Record result = jf.select(RECORD.LOCKED_BY_ID, org.openforis.collect.persistence.jooq.tables.User.USER.USERNAME).from(RECORD)
 				.leftOuterJoin(org.openforis.collect.persistence.jooq.tables.User.USER).on(RECORD.LOCKED_BY_ID.equal(org.openforis.collect.persistence.jooq.tables.User.USER.ID))
 				.where(RECORD.ID.equal(recordId)).fetchOne();
-		Integer lockedById = selectResult.getValueAsInteger(RECORD.LOCKED_BY_ID);
+		Integer lockedById = result.getValueAsInteger(RECORD.LOCKED_BY_ID);
 		if (lockedById == null || lockedById.equals(user.getId())) {
 			jf.update(RECORD).set(RECORD.LOCKED_BY_ID, user.getId()).where(RECORD.ID.equal(recordId)).execute();
 		} else {
-			String userName = selectResult.getValueAsString(org.openforis.collect.persistence.jooq.tables.User.USER.USERNAME);
+			String userName = result.getValueAsString(org.openforis.collect.persistence.jooq.tables.User.USER.USERNAME);
 			throw new RecordLockedException("Record already locked", userName);
 		}
 	}
 
-	public void checkCanLock(User user) throws MultipleEditException  {
+	public void checkLock(User user) throws MultipleEditException  {
 		Factory jf = getJooqFactory();
-		Integer lockedRecordId = getLockedRecordId(jf, user);
-		if(lockedRecordId != null) {
-			throw new MultipleEditException("User has locked another record " + lockedRecordId);
+		Integer recordId = getLockedRecordId(jf, user);
+		if(recordId != null) {
+			throw new MultipleEditException("User has locked another record " + recordId);
 		}
 	}
 	

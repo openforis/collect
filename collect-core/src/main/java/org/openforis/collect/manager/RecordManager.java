@@ -25,7 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author M. Togna
- * 
+ * @author S. Ricci
  */
 public class RecordManager {
 
@@ -78,11 +78,12 @@ public class RecordManager {
 
 	@Transactional
 	public CollectRecord create(Survey survey, EntityDefinition rootEntityDefinition, User user, String modelVersionName) throws MultipleEditException, AccessDeniedException, RecordLockedException {
+		recordDAO.checkLock(user);
+		
 		CollectRecord record = new CollectRecord(survey, rootEntityDefinition.getName(), modelVersionName);
 		record.setCreationDate(new Date());
 		//record.setCreatedBy(user.getId());
 		record.setStep(Step.ENTRY);
-		recordDAO.checkCanLock(user);
 		recordDAO.saveOrUpdate(record);
 		Integer recordId = record.getId();
 		recordDAO.lock(recordId, user);
