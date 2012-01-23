@@ -2,6 +2,7 @@
 <s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
 		 xmlns:s="library://ns.adobe.com/flex/spark" 
 		 xmlns:mx="library://ns.adobe.com/flex/mx">
+	
 	<s:layout>
 		<s:HorizontalLayout verticalAlign="middle" gap="10"/>
 	</s:layout>
@@ -30,25 +31,57 @@
 	</s:states>
 	
 	<!-- TODO change Image in Button and use skin to apply image background -->
+	<s:Image 
+			id="firstPageButton" 
+			source="{Images.FIRST}" 
+			toolTip="{Message.get('list.first')}" 
+			width="16" 
+			height="16" 
+			useHandCursor="true" 
+			buttonMode="true"
+			 enabled.inactive="false" 
+			 visible.firstPage="false" 
+			 />
 	
-	<s:Image id="firstPageButton" source="{Images.FIRST}" toolTip="{Message.get('list.first')}" width="16" height="16" useHandCursor="true" buttonMode="true"
-			 enabled.inactive="false" visible.firstPage="false" />
-	<s:Image id="previousPageButton" source="{Images.PREV}" toolTip="{Message.get('list.previous')}" width="16" height="16" useHandCursor="true" buttonMode="true"
-			 enabled.inactive="false" visible.firstPage="false" />
+	<s:Image 
+			id="previousPageButton" 
+			source="{Images.PREV}" 
+			toolTip="{Message.get('list.previous')}" 
+			width="16" 
+			height="16" 
+			useHandCursor="true" 
+			buttonMode="true"
+			 enabled.inactive="false" 
+			 visible.firstPage="false" 
+			 />
 	
-	<mx:Text fontSize="11" fontWeight="bold" id="currentPageText" />
+	<mx:Text 
+			fontSize="12" 
+			 fontWeight="bold" 
+			 id="currentPageText" 
+			 />
 	
-	<s:Image id="nextPageButton" source="{Images.NEXT}" toolTip="{Message.get('list.next')}" width="16" height="16" useHandCursor="true" buttonMode="true"
-			 enabled.inactive="false" visible.lastPage="false" />
-	<s:Image id="lastPageButton" source="{Images.LAST}" toolTip="{Message.get('list.last')}" width="16" height="16" useHandCursor="true" buttonMode="true"
-			 enabled.inactive="false" visible.lastPage="false" />
+	<s:Image 
+			id="nextPageButton" 
+			source="{Images.NEXT}" 
+			toolTip="{Message.get('list.next')}" 
+			width="16" 
+			height="16" 
+			useHandCursor="true" 
+			buttonMode="true"
+			enabled.inactive="false" 
+			visible.lastPage="false" 
+			/>
 	
-	<!--
-	<s:Label text="Records from:" />
-	<s:Label id="recordsFromText" />
-	<s:Label text="to:" />
-	<s:Label id="recordsToText" />
-	<s:Label text="Total Records:" />
-	<s:Label id="totalRecordsText" />
-	-->
+	<s:Image 
+			id="lastPageButton" 
+			 source="{Images.LAST}" 
+			 toolTip="{Message.get('list.last')}" 
+			 width="16" 
+			 height="16" 
+			 useHandCursor="true" 
+			 buttonMode="true"
+			 enabled.inactive="false" 
+			 visible.lastPage="false" />
+	
 </s:Group>

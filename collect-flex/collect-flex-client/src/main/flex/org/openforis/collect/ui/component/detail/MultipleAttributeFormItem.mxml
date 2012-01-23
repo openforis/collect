@@ -9,22 +9,6 @@
 		<s:VerticalLayout gap="-5" />
 	</detail:layout>
 	
-	<fx:Style>
-		@namespace s "library://ns.adobe.com/flex/spark";
-		@namespace mx "library://ns.adobe.com/flex/mx";
-		@namespace input "org.openforis.collect.ui.component.input.*";
-		
-		s|Button.roundCorners {
-			corner-radius: 9;
-			border-style: none;
-			border-color: white;
-		}
-		
-		mx|LinkButton.roundCorners {
-			corner-radius: 8;
-		}
-	</fx:Style>	
-	
 	<fx:Script>
 		<![CDATA[
 			
@@ -47,6 +31,7 @@
 						<![CDATA[
 							import org.openforis.collect.ui.component.input.InputField;
 							import org.openforis.collect.ui.UIBuilder;
+							
 							override protected function createChildren():void {
 								super.createChildren();
 								var inputField:InputField = UIBuilder.getInputField(outerDocument.attributeDefinition);

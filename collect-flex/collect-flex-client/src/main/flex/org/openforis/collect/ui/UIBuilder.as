@@ -2,9 +2,11 @@ package org.openforis.collect.ui {
 	import mx.collections.ArrayList;
 	import mx.collections.IList;
 	import mx.collections.ListCollectionView;
+	import mx.core.IVisualElement;
 	
 	import org.openforis.collect.Application;
 	import org.openforis.collect.i18n.Message;
+	import org.openforis.collect.metamodel.proxy.AttributeDefaultProxy;
 	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
@@ -25,6 +27,9 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.ui.component.input.InputField;
 	import org.openforis.collect.ui.component.input.StringInputField;
 	
+	import spark.components.HGroup;
+	import spark.components.Label;
+	import spark.components.VGroup;
 	import spark.components.gridClasses.GridColumn;
 	
 	/**
@@ -41,15 +46,17 @@ package org.openforis.collect.ui {
 				
 				//Root entity definition				
 				var form:EntityFormContainer = new EntityFormContainer();
+				form.entityDefinitionProxy = entity;
 				//form.initialize();
 				
 				formContainer.rootFormContainer =form;
-				form.label = entity.getLabelText();
+				//form.label = entity.getLabelText();
 				
 				var uiConfig:UIConfiguration = Application.activeSurvey.uiConfiguration;
+				var tabs:ListCollectionView = null;
 				var uiTab:UITab = null;
 				if(uiConfig != null) {
-						var tabs:ListCollectionView = uiConfig.tabs;
+						tabs = uiConfig.tabs;
 						if(tabs != null){
 							for each (var tab:UITab in tabs) {
 								if(tab.name == entity.name) {
@@ -61,6 +68,20 @@ package org.openforis.collect.ui {
 				}
 				addFormItems(form, entity, version, uiTab);
 				
+				if(tabs != null) {
+					for each (tab in tabs) {
+						var childForm:EntityFormContainer = new EntityFormContainer();
+						var child:NodeDefinitionProxy = entity.getChildDefinition(tab.name);
+						if(child is EntityDefinitionProxy) {
+							var edp:EntityDefinitionProxy = child as EntityDefinitionProxy;
+							childForm.entityDefinitionProxy = edp;
+							
+							formContainer.addEntityFormContainer(childForm);
+							
+							addFormItems(childForm, edp, version, tab);			
+						}
+					}
+				}
 				
 				/*
 				//foreach main entities
@@ -214,10 +235,16 @@ package org.openforis.collect.ui {
 			return itemRenderer;
 		}*/
 		
-		//TODO
-		public static function getInputField(def:AttributeDefinitionProxy):InputField {
+		public static function getInputFieldWidth(def:AttributeDefinitionProxy, isInDataGroup:Boolean = false):int {
+			//TODO
+			return 100;
+		}
+		
+		public static function getInputField(def:AttributeDefinitionProxy, isInDataGroup:Boolean = false):InputField {
+			//TODO
 			var inputField:InputField = null;
 			inputField = new StringInputField();
+			
 			//var type:String = def.
 			/*switch(type) {
 				case 'string':
@@ -245,8 +272,80 @@ package org.openforis.collect.ui {
 					//inputField = new FIS();
 					break;
 			}*/
+			inputField.width = getInputFieldWidth(def, isInDataGroup);
+			
 			return inputField;
 		}
+		
+		public static function buildDataGroupHeaders(defn:EntityDefinitionProxy):HGroup {
+			var h:HGroup = new HGroup();
+			h.gap = 2;
+			var childDefn:ListCollectionView = defn.childDefinitions;
+			for each (var childDef:NodeDefinitionProxy in childDefn) {
+				var elem:IVisualElement = getDataGroupHeader(childDef);
+				h.addElement(elem);
+			}
+			
+			return h;
+		}
+		
+		private static function getDataGroupHeader(defn:NodeDefinitionProxy):IVisualElement {
+			var elem:IVisualElement = null;
+			if(defn is AttributeDefinitionProxy){
+				elem = getAttributeDataGroupHeader(defn as AttributeDefinitionProxy);							
+			} else if(defn is EntityDefinitionProxy) {
+				elem = getEntityDataGroupHeader(defn as EntityDefinitionProxy);
+			}
+			return elem;
+		}
+		
+		private static function getEntityDataGroupHeader(defn:EntityDefinitionProxy):IVisualElement {
+			var v:VGroup = new VGroup();
+			//v.width = getInputFieldWidth(defn, true);
+			v.percentHeight = 100;
+			v.verticalAlign = "bottom";
+			var l:Label = new Label();
+			l.styleName = "bold";
+			l.text = defn.getLabelText();
+			v.addElement(l);
+				
+			
+			
+			var hGroup:HGroup = new HGroup();
+			hGroup.percentHeight = 100;
+			hGroup.verticalAlign = "bottom";
+			var childDefn:ListCollectionView = defn.childDefinitions;
+			var width:int = 0;
+			for each (var childDef:NodeDefinitionProxy in childDefn) {
+				var elem:IVisualElement = getDataGroupHeader(childDef);
+				width += elem.width;
+				hGroup.addElement(elem);
+			}
+			v.width = width;
+			
+			return v;
+		}
+		
+		private static function getAttributeDataGroupHeader(defn:AttributeDefinitionProxy):IVisualElement {
+			var width:int = getInputFieldWidth(defn, true);
+			
+			var v:VGroup = new VGroup();
+			v.width = width;
+			v.percentHeight = 100;
+			v.verticalAlign = "bottom";
+			
+			var l:Label = new Label();
+			l.width = width;
+			l.styleName = "bold";
+			l.text = defn.getLabelText();
+			v.addElement(l);
+			
+			return v;
+		}
+		
+		/*private static function getEntityDataGroupHeaderWidth():int {
+			
+		}*/
 		
 		public static function isInVersion(node:NodeDefinitionProxy, currentVersion:ModelVersionProxy):Boolean {
 			var since:ModelVersionProxy = node.sinceVersion;
