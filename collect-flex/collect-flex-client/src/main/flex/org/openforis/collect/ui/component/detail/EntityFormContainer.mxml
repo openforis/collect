@@ -49,6 +49,10 @@
 				_parentEntity = value;
 			}
 
+			public function addItem(collectFormItem:CollectFormItem):void {
+				collectFormItem.add(form);
+			}
+			
 			public function addFormItem(attributeFormItem:AttributeFormItem):void {
 				/* var formItem:FormItem = new FormItem();
 				formItem.label = label;

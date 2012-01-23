@@ -12,7 +12,7 @@
 			
 			
 			override protected function createChildren():void {
-				if(!childrenAdded){
+				if(!childrenAdded) {
 					super.createChildren();
 				
 					var inputField:InputField = UIBuilder.getInputField(attributeDefinition);

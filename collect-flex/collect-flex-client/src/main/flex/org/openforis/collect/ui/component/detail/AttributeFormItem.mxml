@@ -2,7 +2,8 @@
 <s:FormItem xmlns:fx="http://ns.adobe.com/mxml/2009" 
 			xmlns:s="library://ns.adobe.com/flex/spark" 
 			xmlns:mx="library://ns.adobe.com/flex/mx"
-			width="100%">
+			width="100%"
+			implements="org.openforis.collect.ui.component.detail.CollectFormItem">
 	
 	<s:layout>
 		<s:VerticalLayout/>
@@ -10,6 +11,8 @@
 	
 	<fx:Script>
 		<![CDATA[
+			import mx.core.IVisualElementContainer;
+			
 			import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 			
 			private var _attributeDefinition:AttributeDefinitionProxy;
@@ -35,6 +38,10 @@
 			
 			internal function set childrenAdded(value:Boolean):void {
 				_childrenAdded = value;
+			}
+			
+			public function add(parent:IVisualElementContainer):void {
+				parent.addElement(this);
 			}
 		]]>
 	</fx:Script>
