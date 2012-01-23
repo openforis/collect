@@ -6,13 +6,38 @@
 
 mx|Alert {
 	color: #1B1B1B;
-	borderColor:#000000;
-	titleStyleName: dialogHeaderStyle;
-	cornerRadius: 3;
-	roundedBottomCorners:true;
-	backgroundColor: #FFFFFF;
-	backgroundAlpha: 0.8;
-	borderAlpha: 0.5;
+	border-color:#000000;
+	border-alpha: 0.5;
+	title-style-name: dialogHeaderStyle;
+	corner-radius: 3;
+	rounded-bottom-corners:true;
+	background-color: #FFFFFF;
+	background-alpha: 0.8;
+}
+
+/*
+s|TitleWindow {
+	skin-class: ClassReference("org.openforis.collect.ui.skin.TitleWindowSkin");
+	title-style-name: dialogHeaderStyle;
+	border-color: #000000;
+	border-weight: 10;
+	border-alpha: 0.5;
+	corner-radius: 3;
+	background-color: #FFFFFF;
+	background-alpha: 0;
+}
+*/
+
+s|Button.closeButton {
+	skin-class: ClassReference("org.openforis.collect.ui.skin.CloseButtonSkin");
+}
+
+s|Button.addButton {
+	skin-class: ClassReference("org.openforis.collect.ui.skin.AddButtonSkin");
+}
+
+s|Button.deleteButton {
+	skin-class: ClassReference("org.openforis.collect.ui.skin.DeleteButtonSkin");
 }
 
 .dialogHeaderStyle {
