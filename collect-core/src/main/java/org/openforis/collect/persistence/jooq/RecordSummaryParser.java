@@ -1,4 +1,4 @@
-package org.openforis.collect.persistence;
+package org.openforis.collect.persistence.jooq;
 
 import static org.openforis.collect.persistence.jooq.tables.Record.RECORD;
 import static org.openforis.collect.persistence.jooq.tables.User.USER;
@@ -10,21 +10,15 @@ import java.util.List;
 import java.util.Map;
 
 import org.jooq.Record;
-import org.jooq.TableField;
 import org.openforis.collect.model.RecordSummary;
-import org.openforis.collect.persistence.jooq.tables.Data;
-import org.openforis.collect.persistence.jooq.tables.records.DataRecord;
 import org.openforis.idm.metamodel.AttributeDefinition;
-import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
-import org.openforis.idm.metamodel.NumberAttributeDefinition;
-import org.openforis.idm.metamodel.TextAttributeDefinition;
 /**
  * 
  * @author S. Ricci
  *
  */
-public class RecordDAOUtil {
+public class RecordSummaryParser {
 
 	private static final String USER_TABLE_CREATED_BY_ALIAS = "user_created_by";
 	private static final String USER_TABLE_MODIFIED_BY_ALIAS = "user_modified_by";
@@ -34,7 +28,7 @@ public class RecordDAOUtil {
 	/**
 	 * Parses the result of a select query into a list of RecordSummary objects
 	 */
-	public static List<RecordSummary> parseRecordSummariesSelectResult(List<Record> records, List<AttributeDefinition> keyAttributeDefinitions, List<EntityDefinition> countEntityDefinitions) {
+	public static List<RecordSummary> parseSelectResult(List<Record> records, List<AttributeDefinition> keyAttributeDefinitions, List<EntityDefinition> countEntityDefinitions) {
 		List<RecordSummary> summaries = new ArrayList<RecordSummary>();
 		for (Record r : records) {
 			Integer id = r.getValueAsInteger(RECORD.ID);
@@ -67,24 +61,6 @@ public class RecordDAOUtil {
 			summaries.add(recordSummary);
 		}
 		return summaries;
-	}
-	
-	public static List<RecordSummary> parseRecordSummariesViewSelectResult(List<Record> records, List<AttributeDefinition> keyAttributeDefinitions, List<EntityDefinition> countEntityDefinitions) {
-		List<RecordSummary> summaries = new ArrayList<RecordSummary>();
-		return summaries;
-	}
-		
-	
-	public static TableField<DataRecord, ?> getKeyValueField(Data dataTable, AttributeDefinition attributeDefinition) {
-		TableField<DataRecord, ?> dataField = null;
-		
-		if(attributeDefinition instanceof CodeAttributeDefinition || attributeDefinition instanceof TextAttributeDefinition) {
-			dataField = dataTable.TEXT1;
-		} else if(attributeDefinition instanceof NumberAttributeDefinition) {
-			dataField = dataTable.NUMBER1;
-		}
-		
-		return dataField;
 	}
 	
 }

@@ -16,6 +16,7 @@ import org.openforis.collect.model.RecordSummary;
 import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.jooq.DataLoader;
 import org.openforis.collect.persistence.jooq.DataPersister;
+import org.openforis.collect.persistence.jooq.RecordSummaryParser;
 import org.openforis.collect.persistence.jooq.RecordSummaryQueryBuilder;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
@@ -86,25 +87,30 @@ public class RecordDAO extends CollectDAO {
 		
 		//set key attribute definitions
 		List<AttributeDefinition> keyAttributeDefinitions = rootEntityDefinition.getKeyAttributeDefinitions();
-		recordSummaryQueryBuilder.setKeyAttributes(keyAttributeDefinitions);
+		
+		for (AttributeDefinition attributeDefinition : keyAttributeDefinitions) {
+			recordSummaryQueryBuilder.addKeyAttribute(attributeDefinition);
+		}
 		
 		//set entities to count
-		recordSummaryQueryBuilder.setCountEntityDefinitions(countEntityDefinitions);
+		for (EntityDefinition entityDefinition : countEntityDefinitions) {
+			recordSummaryQueryBuilder.addCountColumn(entityDefinition);
+		}
 
 		//set order by
-		recordSummaryQueryBuilder.setOrderBy(orderByFieldName);
+		recordSummaryQueryBuilder.addOrderBy(orderByFieldName);
 		
 		//set limit
-		recordSummaryQueryBuilder.setLimit(offset, maxNumberOfRecords);
+		recordSummaryQueryBuilder.addLimit(offset, maxNumberOfRecords);
 		
 		//build select
-		SelectQuery selectQuery = recordSummaryQueryBuilder.buildSelect();
+		SelectQuery selectQuery = recordSummaryQueryBuilder.toQuery();
 		
 		//execute query
 		List<Record> records = selectQuery.fetch();
 
 		//parse the result
-		List<RecordSummary> result = RecordDAOUtil.parseRecordSummariesSelectResult(records, keyAttributeDefinitions, countEntityDefinitions);
+		List<RecordSummary> result = RecordSummaryParser.parseSelectResult(records, keyAttributeDefinitions, countEntityDefinitions);
 		
 		return result;
 	}

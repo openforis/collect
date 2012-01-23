@@ -16,12 +16,13 @@ import org.jooq.JoinType;
 import org.jooq.SelectQuery;
 import org.jooq.TableField;
 import org.jooq.impl.Factory;
-import org.openforis.collect.persistence.RecordDAOUtil;
 import org.openforis.collect.persistence.jooq.tables.Data;
 import org.openforis.collect.persistence.jooq.tables.records.DataRecord;
 import org.openforis.idm.metamodel.AttributeDefinition;
+import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
-import org.openforis.idm.metamodel.NodeDefinition;
+import org.openforis.idm.metamodel.NumberAttributeDefinition;
+import org.openforis.idm.metamodel.TextAttributeDefinition;
 
 /**
  * @author S. Ricci
@@ -55,48 +56,14 @@ public class RecordSummaryQueryBuilder {
 	 */
 	private EntityDefinition rootEntityDefinition;
 	
-	/**
-	 * key attribute definitions used to build the key columns of the select
-	 */
-	private List<AttributeDefinition> keyAttributeDefinitions; 
-	
-	/**
-	 * entity definitions of the entities to count in the select
-	 */
-	private List<EntityDefinition> countEntityDefinitions;
-	
-	/**
-	 * Index of record to start from
-	 */
-	private Integer offset;
-	
-	/**
-	 * Maximum number of records returned.
-	 */
-	private Integer maxNumberOfRecords;
-	
-	/**
-	 * Field name used in the order by condition
-	 */
-	private String orderByFieldName;
-
-	
 	public RecordSummaryQueryBuilder(Factory jooqFactory) {
 		super();
 		this.jooqFactory = jooqFactory;
+		
+		init();
 	}
 	
-	/**
-	 * Build the select query to load record summaries.
-	 * 
-	 * the projection will contain:
-	 * - key attribute columns
-	 * - count of entities annotated with countInRecordSummary
-	 * - record table fields
-	 * - user created by and modified by info
-	 *  
-	 */
-	public SelectQuery buildSelect() {
+	private void init() {
 		//CREATE SELECT QUERY
 		selectQuery = jooqFactory.selectQuery();
 		
@@ -109,39 +76,34 @@ public class RecordSummaryQueryBuilder {
 		selectQuery.addJoin(USER.as(USER_TABLE_CREATED_BY_ALIAS), JoinType.LEFT_OUTER_JOIN, RECORD.CREATED_BY_ID.equal(USER.as(USER_TABLE_CREATED_BY_ALIAS).ID));
 		selectQuery.addJoin(USER.as(USER_TABLE_MODIFIED_BY_ALIAS), JoinType.LEFT_OUTER_JOIN, RECORD.MODIFIED_BY_ID.equal(USER.as(USER_TABLE_MODIFIED_BY_ALIAS).ID));
 		
+		//required when using count of entities
+		selectQuery.addGroupBy(RECORD.ID, USER.as(USER_TABLE_CREATED_BY_ALIAS).USERNAME, USER.as(USER_TABLE_MODIFIED_BY_ALIAS).USERNAME);
 		
-		//add key attribute column(s)
-		if(keyAttributeDefinitions != null) {
-			addKeyAttributeJoinsToQuery();
-		}
-		
-		//add count of entities columns
-		addCountColumnsToQuery();
-
+		//always order by id to avoid pagination problems
+		selectQuery.addOrderBy(RECORD.ID);
+	}
+	
+	/**
+	 * Build the select query to load record summaries.
+	 * 
+	 * the projection will contain:
+	 * - key attribute columns
+	 * - count of entities annotated with countInRecordSummary
+	 * - record table fields
+	 * - user created by and modified by info
+	 *  
+	 */
+	public SelectQuery toQuery() {
 		//where conditions
 		if(rootEntityDefinition != null) {
 			selectQuery.addConditions(RECORD.ROOT_ENTITY_ID.equal(rootEntityDefinition.getId()));
-		}
-		
-		if(countEntityDefinitions != null && countEntityDefinitions.size() > 0) {
-			addGroupByToQuery();
-		}
-		
-		//TODO add filter on key attributes
-		
-		if(orderByFieldName != null) {
-			addOrderByToQuery();
-		}
-		
-		//limit query results
-		if(offset != null && maxNumberOfRecords != null) {
-			selectQuery.addLimit(offset, maxNumberOfRecords);
 		}
 		
 		if(LOG.isDebugEnabled()) {
 			String sql = selectQuery.toString();
 			LOG.debug(sql);
 		}
+		
 		return selectQuery;
 
 	}
@@ -150,21 +112,8 @@ public class RecordSummaryQueryBuilder {
 		this.rootEntityDefinition = rootEntityDefinition;
 	}
 	
-	public void setKeyAttributes(List<AttributeDefinition> keyAttributeDefinitions) {
-		this.keyAttributeDefinitions = keyAttributeDefinitions;
-	}
-	
-	public void setCountEntityDefinitions(List<EntityDefinition> entityDefinitions) {
-		this.countEntityDefinitions = entityDefinitions;
-	}
-	
-	public void setOrderBy(String fieldName) {
-		this.orderByFieldName = fieldName;
-	}
-	
-	public void setLimit(int offset, int maxNumberOfRecords) {
-		this.offset = offset;
-		this.maxNumberOfRecords = maxNumberOfRecords;
+	public void addLimit(int offset, int maxNumberOfRecords) {
+		selectQuery.addLimit(offset, maxNumberOfRecords);
 	}
 	
 	/**
@@ -176,7 +125,7 @@ public class RecordSummaryQueryBuilder {
 	 */
 	private Field<Integer> createCountField(Field<?> field, String alias) {
 		//Field<Object> countField = jooqFactory.selectCount().from(DATA).where(DATA.RECORD_ID.equal(RECORD.ID).and(DATA.DEFINITION_ID.equal(nodeDefinition.getId()))).asField(alias);
-		Field<Integer> countField = jooqFactory.count(field).as(alias);
+		Field<Integer> countField = Factory.count(field).as(alias);
 		return countField;
 	}
 	
@@ -184,70 +133,49 @@ public class RecordSummaryQueryBuilder {
 	 * Adds count columns to the selection to get the count of entities annotated with counInSummaryList
 	 * 
 	 */
-	private void addCountColumnsToQuery() {
-		TableField<?, ?> orderByField = null;
-		for (NodeDefinition nodeDefinition : countEntityDefinitions) {
-			String dataTableAliasName = COUNT_DATA_TABLE_ALIAS_PREFIX + nodeDefinition.getName();
-			//left join with DATA table
-			Data dataTableAlias = DATA.as(dataTableAliasName);
-			selectQuery.addJoin(dataTableAlias, JoinType.LEFT_OUTER_JOIN, 
-					dataTableAlias.RECORD_ID.equal(RECORD.ID), 
-					dataTableAlias.DEFINITION_ID.equal(nodeDefinition.getId()));
-			
-			String alias = COUNT_COLUMN_PREFIX + nodeDefinition.getName();
-			Field<Integer> countField = createCountField(dataTableAlias.ID, alias);
-			selectQuery.addSelect(countField);
-			
-			//add order by condition
-			if(orderByField == null && orderByFieldName != null && orderByFieldName.equals(alias)) {
-				selectQuery.addOrderBy(countField);
-			}
-		}
+	public void addCountColumn(EntityDefinition entityDefinition) {
+		String dataTableAliasName = COUNT_DATA_TABLE_ALIAS_PREFIX + entityDefinition.getName();
+		//left join with DATA table
+		Data dataTableAlias = DATA.as(dataTableAliasName);
+		selectQuery.addJoin(dataTableAlias, JoinType.LEFT_OUTER_JOIN, 
+				dataTableAlias.RECORD_ID.equal(RECORD.ID), 
+				dataTableAlias.DEFINITION_ID.equal(entityDefinition.getId()));
 		
+		String alias = COUNT_COLUMN_PREFIX + entityDefinition.getName();
+		Field<Integer> countField = createCountField(dataTableAlias.ID, alias);
+		selectQuery.addSelect(countField);
 	}
 	
 	/**
 	 * Adds joins with DATA table to get key attribute values
 	 * 
 	 */
-	private void addKeyAttributeJoinsToQuery() {
+	public void addKeyAttribute(AttributeDefinition keyAttributeDefinition) {
 		//for each key attribute add a left join and a field in the projection
-		TableField<?, ?> orderByField = null;
-		for (AttributeDefinition attributeDefinition : keyAttributeDefinitions) {
-			String dataTableAliasName = KEY_DATA_TABLE_ALIAS_PREFIX + attributeDefinition.getName();
-			//left join with DATA table to get the key attribute
-			Data dataTableAlias = DATA.as(dataTableAliasName);
-			selectQuery.addJoin(dataTableAlias, JoinType.LEFT_OUTER_JOIN, 
-					dataTableAlias.RECORD_ID.equal(RECORD.ID), 
-					dataTableAlias.DEFINITION_ID.equal(attributeDefinition.getId()));
-			
-			TableField<DataRecord, ?> dataField = RecordDAOUtil.getKeyValueField(dataTableAlias, attributeDefinition);
-			
-			if(dataField != null) {
-				//add key field to the projection fields
-				Field<?> fieldAlias = dataField.as(KEY_COLUMN_PREFIX + attributeDefinition.getName());
-				selectQuery.addSelect(fieldAlias);
-				
-				selectQuery.addGroupBy(fieldAlias);
-				
-				if(orderByField == null && orderByFieldName != null && orderByFieldName.equals(attributeDefinition.getName())) {
-					selectQuery.addOrderBy(fieldAlias);
-				}
-			}
+		String dataTableAliasName = KEY_DATA_TABLE_ALIAS_PREFIX + keyAttributeDefinition.getName();
+		//left join with DATA table to get the key attribute
+		Data dataTableAlias = DATA.as(dataTableAliasName);
+		selectQuery.addJoin(dataTableAlias, JoinType.LEFT_OUTER_JOIN, 
+				dataTableAlias.RECORD_ID.equal(RECORD.ID), 
+				dataTableAlias.DEFINITION_ID.equal(keyAttributeDefinition.getId()));
+		
+		TableField<DataRecord, ?> dataField = getKeyValueField(dataTableAlias, keyAttributeDefinition);
+		
+		if(dataField != null) {
+			//add key field to the projection fields
+			Field<?> fieldAlias = dataField.as(KEY_COLUMN_PREFIX + keyAttributeDefinition.getName());
+			selectQuery.addSelect(fieldAlias);
+			//necessary due to the count of entities in the select
+			selectQuery.addGroupBy(fieldAlias);
 		}
 	}
 	
-	private void addGroupByToQuery() {
-		selectQuery.addGroupBy(RECORD.ID, USER.as(USER_TABLE_CREATED_BY_ALIAS).USERNAME, USER.as(USER_TABLE_MODIFIED_BY_ALIAS).USERNAME);
-		
-	}
-	
 	/**
-	 * Adds order by conditions to the select query
+	 * Adds order by condition to the select query
 	 * 
 	 */
-	private void addOrderByToQuery() {
-		TableField<?, ?> orderByField = null;
+	public void addOrderBy(String orderByFieldName) {
+		Field<?> orderByField = null;
 		if (orderByFieldName != null) {
 			if (ORDER_BY_CREATED_BY_FIELD_NAME.equals(orderByFieldName)) {
 				orderByField = USER.as(USER_TABLE_CREATED_BY_ALIAS).USERNAME;
@@ -257,6 +185,14 @@ public class RecordSummaryQueryBuilder {
 				orderByField = RECORD.DATE_CREATED;
 			} else if (ORDER_BY_DATE_MODIFIED_FIELD_NAME.equals(orderByFieldName)) {
 				orderByField = RECORD.DATE_MODIFIED;
+			} else {
+				List<Field<?>> selectFields = selectQuery.getSelect();
+				for (Field<?> field : selectFields) {
+					if(orderByFieldName.equals(field.getName())) {
+						orderByField = field;
+						break;
+					}
+				}
 			}
 		}
 		if(orderByField != null) {
@@ -264,4 +200,15 @@ public class RecordSummaryQueryBuilder {
 		}
 	}
 	
+	private TableField<DataRecord, ?> getKeyValueField(Data dataTable, AttributeDefinition attributeDefinition) {
+		TableField<DataRecord, ?> dataField = null;
+		
+		if(attributeDefinition instanceof CodeAttributeDefinition || attributeDefinition instanceof TextAttributeDefinition) {
+			dataField = dataTable.TEXT1;
+		} else if(attributeDefinition instanceof NumberAttributeDefinition) {
+			dataField = dataTable.NUMBER1;
+		}
+		
+		return dataField;
+	}
 }

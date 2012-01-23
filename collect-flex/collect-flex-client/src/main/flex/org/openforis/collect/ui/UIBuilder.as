@@ -87,7 +87,7 @@ package org.openforis.collect.ui {
 				column = new GridColumn();
 				column.headerText = keyAttributeDef.getLabelText();
 				column.labelFunction = RecordSummaryDataGrid.recordSummariesKeyLabelFunction;
-				column.dataField = keyAttributeDef.name;
+				column.dataField = "key_" + keyAttributeDef.name;
 				columns.addItem(column);
 			}
 			//count entity columns
@@ -98,7 +98,7 @@ package org.openforis.collect.ui {
 					if(entityDef.countInSummaryList) {
 						column = new GridColumn();
 						column.headerText = Message.get("list.headerCount", [entityDef.getLabelText()]);
-						column.dataField = entityDef.name;
+						column.dataField = "count_" +entityDef.name;
 						column.labelFunction = RecordSummaryDataGrid.recordSummariesCountEntityLabelFunction;
 						column.width = 150;
 						columns.addItem(column);
