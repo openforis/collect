@@ -78,15 +78,8 @@ package org.openforis.collect.presenter
 		
 		private function initExternalInterface():void {
 			if(ExternalInterface.available) {
-				ExternalInterface.addCallback("isEditingItem", isEditingItem);
 				ExternalInterface.addCallback("openContextMenu", openContextMenu);
 			}
-		}
-		
-		//called from External Interface (javascript)
-		public function isEditingItem():Boolean {
-			return false;
-			//return ! (AbstractPresenter.serverOffline) && _view.isEditingItem();
 		}
 		
 		public function openContextMenu():Boolean {

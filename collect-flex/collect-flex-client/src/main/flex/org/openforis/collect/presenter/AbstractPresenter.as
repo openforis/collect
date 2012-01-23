@@ -5,6 +5,7 @@ package org.openforis.collect.presenter {
 	import mx.controls.Alert;
 	import mx.rpc.events.FaultEvent;
 	
+	import org.openforis.collect.Application;
 	import org.openforis.collect.event.EventDispatcherFactory;
 	import org.openforis.collect.i18n.Message;
 	import org.openforis.collect.ui.Images;
@@ -16,7 +17,6 @@ package org.openforis.collect.presenter {
 	 * */
 	internal class AbstractPresenter {
 
-		private static var _serverOffline:Boolean = false;
 		private static var _serverOffLineMessage:String;
 		
 		public function AbstractPresenter() {
@@ -50,10 +50,10 @@ package org.openforis.collect.presenter {
 					"Client.Error.MessageSend"
 					"Client.Error.DeliveryInDoubt"
 					//server offline
-					if(! _serverOffline) {
+					if(! Application.serverOffline) {
 						BlockingMessagePopUp.show(Message.get("global.serverOffLine"), serverOffLineMessage, Images.ERROR);
 					}
-					_serverOffline = true;
+					Application.serverOffline = true;
 					break;
 				default:
 					Alert.show(Message.get("global.faultHandlerMsg")+"\n\n"+ event.toString());
@@ -62,8 +62,5 @@ package org.openforis.collect.presenter {
 		
 		internal function initEventListeners():void {}
 		
-		public static function get serverOffline():Boolean {
-			return _serverOffline;
-		}
 	}
 }
