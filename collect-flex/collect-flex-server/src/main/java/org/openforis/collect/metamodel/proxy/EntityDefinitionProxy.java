@@ -41,7 +41,7 @@ public class EntityDefinitionProxy extends NodeDefinitionProxy {
 
 	@ExternalizedProperty
 	public boolean isCountInSummaryList() {
-		QName countInSummaryListAnnotation = new QName("http://www.openforis.org/collect/3.0/ui", "countInSummaryList");
+		QName countInSummaryListAnnotation = new QName("http://www.openforis.org/collect/3.0/collect", "count");
 		String annotation = entityDefinition.getAnnotation(countInSummaryListAnnotation);
 		return annotation != null && Boolean.parseBoolean(annotation);
 	}
