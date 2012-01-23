@@ -163,11 +163,9 @@ package org.openforis.collect.ui {
 				if(defns != null && defns.length >0){
 					for each (var def:NodeDefinitionProxy in defns) {
 						if(isInVersion(def, version)) {
-						
 							if(def is AttributeDefinitionProxy){
 								var attrFormItem:AttributeFormItem = getAttributeFormItem(AttributeDefinitionProxy(def) );
 								form.addFormItem(attrFormItem);
-								
 							} else if(def is EntityDefinitionProxy) {
 								var proxy:EntityDefinitionProxy = EntityDefinitionProxy(def);
 								if(proxy.uiTabName==null){
@@ -179,7 +177,10 @@ package org.openforis.collect.ui {
 					}
 				}
 			} else {
-				//TODO iterate over the tabs
+				for each (var tab:UITab in uiTab.tabs) {
+					
+				}
+				
 			}
 			/*
            	for(var childSchemaObjectDescriptor:Object in childrenSchemaObjectDescriptors) {
@@ -276,7 +277,8 @@ package org.openforis.collect.ui {
 			
 			return inputField;
 		}
-		
+	
+		//TODO check ifisinversion
 		public static function buildDataGroupHeaders(defn:EntityDefinitionProxy):HGroup {
 			var h:HGroup = new HGroup();
 			h.gap = 2;
@@ -308,8 +310,6 @@ package org.openforis.collect.ui {
 			l.styleName = "bold";
 			l.text = defn.getLabelText();
 			v.addElement(l);
-				
-			
 			
 			var hGroup:HGroup = new HGroup();
 			hGroup.percentHeight = 100;
