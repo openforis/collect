@@ -4,9 +4,9 @@
 	xmlns:s="library://ns.adobe.com/flex/spark"
 	xmlns:skins="org.openforis.collect.ui.skin.*"
 	
-	upImage="@Embed(source='/assets/images/delete.png')"
-	overImage="@Embed(source='/assets/images/delete.png')"
-	downImage="@Embed(source='/assets/images/delete.png')"
-	disabledImage="@Embed(source='/assets/images/delete.png')"
+	upImage="@Embed(source='/assets/images/add.png')"
+	overImage="@Embed(source='/assets/images/add.png')"
+	downImage="@Embed(source='/assets/images/add.png')"
+	disabledImage="@Embed(source='/assets/images/add.png')"
 	>
 </skins:ButtonImageBaseSkin>
