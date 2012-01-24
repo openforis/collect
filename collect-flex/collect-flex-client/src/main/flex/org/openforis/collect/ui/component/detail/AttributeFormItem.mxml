@@ -40,7 +40,7 @@
 				_childrenAdded = value;
 			}
 			
-			public function add(parent:IVisualElementContainer):void {
+			public function addTo(parent:IVisualElementContainer):void {
 				parent.addElement(this);
 			}
 		]]>

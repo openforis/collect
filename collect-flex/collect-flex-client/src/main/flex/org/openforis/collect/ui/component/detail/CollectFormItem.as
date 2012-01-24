@@ -7,7 +7,7 @@ package org.openforis.collect.ui.component.detail {
 	 * */
 	public interface CollectFormItem {
 		
-		function add(parent:IVisualElementContainer):void ;
+		function addTo(parent:IVisualElementContainer):void ;
 		
 	}
 }

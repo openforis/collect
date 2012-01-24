@@ -8,8 +8,6 @@
 		<![CDATA[
 			import org.openforis.collect.ui.UIBuilder;
 			import org.openforis.collect.ui.component.input.InputField;
-			 
-			
 			
 			override protected function createChildren():void {
 				if(!childrenAdded) {
@@ -20,15 +18,7 @@
 					childrenAdded = true;
 				}
 			}
-
-			
 		]]>
 	</fx:Script>
-	
-	<fx:Declarations>
-		<!-- Place non-visual elements (e.g., services, value objects) here -->
-	</fx:Declarations>
-	
-	
 	
 </detail:AttributeFormItem>

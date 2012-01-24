@@ -4,6 +4,10 @@
 		 xmlns:mx="library://ns.adobe.com/flex/mx"
 		 width="100%"
 		 implements="org.openforis.collect.ui.component.detail.CollectFormItem">
+
+	<s:layout>
+		<s:VerticalLayout  />
+	</s:layout>
 	
 	<fx:Script>
 		<![CDATA[
@@ -20,10 +24,6 @@
 			
 			override protected function createChildren():void {
 				super.createChildren();
-				
-				/* var formItem:FormItem = new FormItem();
-				formItem.label = entityDefinition.getLabelText();
-				form.addElement(formItem); */
 			}
 			
 			[Bindable]
@@ -52,24 +52,10 @@
 				_childrenAdded = value;
 			}
 			
-			public function add(parent:IVisualElementContainer):void {
+			public function addTo(parent:IVisualElementContainer):void {
 				parent.addElement(this);
 			}
 		]]>
 	</fx:Script>
-	
-	<s:layout>
-		<s:VerticalLayout  />
-	</s:layout>
-	
-	<fx:Declarations>
-		
-		<s:Form height="100%" width="100%" id="form">
-			<s:layout>
-				<s:FormLayout gap="-15" paddingLeft="10" />
-			</s:layout>
-		</s:Form>
-		
-	</fx:Declarations>
 	
 </s:Group>
