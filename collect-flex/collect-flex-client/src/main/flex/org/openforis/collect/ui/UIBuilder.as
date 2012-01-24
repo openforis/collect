@@ -145,17 +145,29 @@ package org.openforis.collect.ui {
 				}
 			}
 			
+			//skipped count column
+			column = new GridColumn();
+			column.headerText = Message.get("list.skipped");
+			column.dataField = "skipped";
+			column.width = 100;
+			columns.addItem(column);
+			//missing count column
+			column = new GridColumn();
+			column.headerText = Message.get("list.missing");
+			column.dataField = "missing";
+			column.width = 100;
+			columns.addItem(column);
 			//errors count column
 			column = new GridColumn();
-			column.headerText = Message.get("list.errorCount");
-			column.dataField = "errorCount";
-			column.width = 150;
+			column.headerText = Message.get("list.errors");
+			column.dataField = "errors";
+			column.width = 100;
 			columns.addItem(column);
 			//warnings count column
 			column = new GridColumn();
-			column.headerText = Message.get("list.warningCount");
-			column.dataField = "warningCount";
-			column.width = 150;
+			column.headerText = Message.get("list.warnings");
+			column.dataField = "warnings";
+			column.width = 100;
 			columns.addItem(column);
 			//creation date column
 			column = new GridColumn();

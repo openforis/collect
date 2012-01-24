@@ -45,6 +45,10 @@ public class RecordSummaryQueryBuilder {
 	private static final String ORDER_BY_MODIFIED_BY_FIELD_NAME = "createdBy";
 	private static final String ORDER_BY_DATE_MODIFIED_FIELD_NAME = "modifiedDate";
 	private static final String ORDER_BY_DATE_CREATED_FIELD_NAME = "creationDate";
+	private static final String ORDER_BY_SKIPPED_FIELD_NAME = "skipped";
+	private static final String ORDER_BY_MISSING_FIELD_NAME = "missing";
+	private static final String ORDER_BY_ERRORS_FIELD_NAME = "errors";
+	private static final String ORDER_BY_WARNINGS_FIELD_NAME = "warnings";
 	
 	private Factory jooqFactory;
 	
@@ -77,8 +81,6 @@ public class RecordSummaryQueryBuilder {
 		//add join with user table
 		selectQuery.addJoin(USER.as(USER_TABLE_CREATED_BY_ALIAS), JoinType.LEFT_OUTER_JOIN, RECORD.CREATED_BY_ID.equal(USER.as(USER_TABLE_CREATED_BY_ALIAS).ID));
 		selectQuery.addJoin(USER.as(USER_TABLE_MODIFIED_BY_ALIAS), JoinType.LEFT_OUTER_JOIN, RECORD.MODIFIED_BY_ID.equal(USER.as(USER_TABLE_MODIFIED_BY_ALIAS).ID));
-		//always order by id to avoid pagination problems
-		selectQuery.addOrderBy(RECORD.ID);
 	}
 	
 	/**
@@ -96,12 +98,13 @@ public class RecordSummaryQueryBuilder {
 		if(rootEntityDefinition != null) {
 			selectQuery.addConditions(RECORD.ROOT_ENTITY_ID.equal(rootEntityDefinition.getId()));
 		}
-		
+		//always order by id to avoid pagination problems
+		selectQuery.addOrderBy(RECORD.ID);
+
 		if(LOG.isDebugEnabled()) {
 			String sql = selectQuery.toString();
 			LOG.debug(sql);
 		}
-		
 		return selectQuery;
 
 	}
@@ -168,6 +171,16 @@ public class RecordSummaryQueryBuilder {
 				orderByField = RECORD.DATE_CREATED;
 			} else if (ORDER_BY_DATE_MODIFIED_FIELD_NAME.equals(orderByFieldName)) {
 				orderByField = RECORD.DATE_MODIFIED;
+			} else if (ORDER_BY_SKIPPED_FIELD_NAME.equals(orderByFieldName)) {
+				orderByField = RECORD.SKIPPED;
+			} else if (ORDER_BY_MISSING_FIELD_NAME.equals(orderByFieldName)) {
+				orderByField = RECORD.MISSING;
+			} else if (ORDER_BY_ERRORS_FIELD_NAME.equals(orderByFieldName)) {
+				orderByField = RECORD.ERRORS;
+			} else if (ORDER_BY_WARNINGS_FIELD_NAME.equals(orderByFieldName)) {
+				orderByField = RECORD.WARNINGS;
+			} else if (ORDER_BY_MODIFIED_BY_FIELD_NAME.equals(orderByFieldName)) {
+				orderByField = USER.as(USER_TABLE_MODIFIED_BY_ALIAS).USERNAME;
 			} else {
 				List<Field<?>> selectFields = selectQuery.getSelect();
 				for (Field<?> field : selectFields) {
