@@ -1,8 +1,10 @@
 package org.openforis.collect.persistence;
 
+
 import static org.openforis.collect.persistence.jooq.Sequences.RECORD_ID_SEQ;
 import static org.openforis.collect.persistence.jooq.tables.Data.DATA;
 import static org.openforis.collect.persistence.jooq.tables.Record.RECORD;
+import static org.openforis.collect.persistence.jooq.tables.UserAccount.USER_ACCOUNT;
 
 import java.util.List;
 
@@ -10,7 +12,6 @@ import org.jooq.Record;
 import org.jooq.SelectQuery;
 import org.jooq.impl.Factory;
 import org.openforis.collect.model.CollectRecord;
-import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.RecordSummary;
 import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.jooq.DataLoader;
@@ -101,14 +102,14 @@ public class RecordDAO extends CollectDAO {
 		Factory jf = getJooqFactory();
 		//check if user has already locked another record
 		checkLock(user);
-		Record result = jf.select(RECORD.LOCKED_BY_ID, org.openforis.collect.persistence.jooq.tables.User.USER.USERNAME).from(RECORD)
-				.leftOuterJoin(org.openforis.collect.persistence.jooq.tables.User.USER).on(RECORD.LOCKED_BY_ID.equal(org.openforis.collect.persistence.jooq.tables.User.USER.ID))
+		Record result = jf.select(RECORD.LOCKED_BY_ID, USER_ACCOUNT.USERNAME).from(RECORD)
+				.leftOuterJoin(USER_ACCOUNT).on(RECORD.LOCKED_BY_ID.equal(USER_ACCOUNT.ID))
 				.where(RECORD.ID.equal(recordId)).fetchOne();
 		Integer lockedById = result.getValueAsInteger(RECORD.LOCKED_BY_ID);
 		if (lockedById == null || lockedById.equals(user.getId())) {
 			jf.update(RECORD).set(RECORD.LOCKED_BY_ID, user.getId()).where(RECORD.ID.equal(recordId)).execute();
 		} else {
-			String userName = result.getValueAsString(org.openforis.collect.persistence.jooq.tables.User.USER.USERNAME);
+			String userName = result.getValueAsString(org.openforis.collect.persistence.jooq.tables.UserAccount.USER_ACCOUNT.USERNAME);
 			throw new RecordLockedException("Record already locked", userName);
 		}
 	}
@@ -133,14 +134,14 @@ public class RecordDAO extends CollectDAO {
 	@Transactional
 	public void unlock(Integer recordId, User user) throws RecordLockedException {
 		Factory jf = getJooqFactory();
-		Record selectResult = jf.select(RECORD.LOCKED_BY_ID, org.openforis.collect.persistence.jooq.tables.User.USER.USERNAME).from(RECORD)
-				.leftOuterJoin(org.openforis.collect.persistence.jooq.tables.User.USER).on(RECORD.LOCKED_BY_ID.equal(org.openforis.collect.persistence.jooq.tables.User.USER.ID))
+		Record selectResult = jf.select(RECORD.LOCKED_BY_ID, USER_ACCOUNT.USERNAME).from(RECORD)
+				.leftOuterJoin(USER_ACCOUNT).on(RECORD.LOCKED_BY_ID.equal(USER_ACCOUNT.ID))
 				.where(RECORD.ID.equal(recordId)).fetchOne();
 		Integer lockedById = selectResult.getValueAsInteger(RECORD.LOCKED_BY_ID);
 		if (lockedById != null && lockedById.equals(user.getId())) {
 			jf.update(RECORD).set(RECORD.LOCKED_BY_ID, (Integer)null).where(RECORD.ID.equal(recordId)).execute();
 		} else {
-			String userName = selectResult.getValueAsString(org.openforis.collect.persistence.jooq.tables.User.USER.USERNAME);
+			String userName = selectResult.getValueAsString(USER_ACCOUNT.USERNAME);
 			throw new RecordLockedException("Record locked by another user", userName);
 		}
 	}

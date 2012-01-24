@@ -6,7 +6,7 @@ package org.openforis.collect.persistence.jooq;
 import static org.openforis.collect.persistence.jooq.tables.Data.DATA;
 import static org.openforis.collect.persistence.jooq.tables.NodeCountView.NODE_COUNT_VIEW;
 import static org.openforis.collect.persistence.jooq.tables.Record.RECORD;
-import static org.openforis.collect.persistence.jooq.tables.User.USER;
+import static org.openforis.collect.persistence.jooq.tables.UserAccount.USER_ACCOUNT;
 
 import java.util.List;
 
@@ -75,12 +75,12 @@ public class RecordSummaryQueryBuilder {
 		//select
 		selectQuery.addSelect(RECORD.DATE_CREATED, RECORD.DATE_MODIFIED, RECORD.ERRORS, RECORD.ID, RECORD.LOCKED_BY_ID, RECORD.MISSING,  
 				RECORD.MODEL_VERSION, RECORD.MODIFIED_BY_ID, RECORD.ROOT_ENTITY_ID, RECORD.SKIPPED, RECORD.STATE, RECORD.STEP, RECORD.WARNINGS, 
-				USER.as(USER_TABLE_CREATED_BY_ALIAS).USERNAME, USER.as(USER_TABLE_MODIFIED_BY_ALIAS).USERNAME);
+				USER_ACCOUNT.as(USER_TABLE_CREATED_BY_ALIAS).USERNAME, USER_ACCOUNT.as(USER_TABLE_MODIFIED_BY_ALIAS).USERNAME);
 		//from
 		selectQuery.addFrom(RECORD);
 		//add join with user table
-		selectQuery.addJoin(USER.as(USER_TABLE_CREATED_BY_ALIAS), JoinType.LEFT_OUTER_JOIN, RECORD.CREATED_BY_ID.equal(USER.as(USER_TABLE_CREATED_BY_ALIAS).ID));
-		selectQuery.addJoin(USER.as(USER_TABLE_MODIFIED_BY_ALIAS), JoinType.LEFT_OUTER_JOIN, RECORD.MODIFIED_BY_ID.equal(USER.as(USER_TABLE_MODIFIED_BY_ALIAS).ID));
+		selectQuery.addJoin(USER_ACCOUNT.as(USER_TABLE_CREATED_BY_ALIAS), JoinType.LEFT_OUTER_JOIN, RECORD.CREATED_BY_ID.equal(USER_ACCOUNT.as(USER_TABLE_CREATED_BY_ALIAS).ID));
+		selectQuery.addJoin(USER_ACCOUNT.as(USER_TABLE_MODIFIED_BY_ALIAS), JoinType.LEFT_OUTER_JOIN, RECORD.MODIFIED_BY_ID.equal(USER_ACCOUNT.as(USER_TABLE_MODIFIED_BY_ALIAS).ID));
 	}
 	
 	/**
@@ -164,9 +164,9 @@ public class RecordSummaryQueryBuilder {
 		Field<?> orderByField = null;
 		if (orderByFieldName != null) {
 			if (ORDER_BY_CREATED_BY_FIELD_NAME.equals(orderByFieldName)) {
-				orderByField = USER.as(USER_TABLE_CREATED_BY_ALIAS).USERNAME;
+				orderByField = USER_ACCOUNT.as(USER_TABLE_CREATED_BY_ALIAS).USERNAME;
 			} else if (ORDER_BY_MODIFIED_BY_FIELD_NAME.equals(orderByFieldName)) {
-				orderByField = USER.as(USER_TABLE_MODIFIED_BY_ALIAS).USERNAME;
+				orderByField = USER_ACCOUNT.as(USER_TABLE_MODIFIED_BY_ALIAS).USERNAME;
 			} else if (ORDER_BY_DATE_CREATED_FIELD_NAME.equals(orderByFieldName)) {
 				orderByField = RECORD.DATE_CREATED;
 			} else if (ORDER_BY_DATE_MODIFIED_FIELD_NAME.equals(orderByFieldName)) {
@@ -180,7 +180,7 @@ public class RecordSummaryQueryBuilder {
 			} else if (ORDER_BY_WARNINGS_FIELD_NAME.equals(orderByFieldName)) {
 				orderByField = RECORD.WARNINGS;
 			} else if (ORDER_BY_MODIFIED_BY_FIELD_NAME.equals(orderByFieldName)) {
-				orderByField = USER.as(USER_TABLE_MODIFIED_BY_ALIAS).USERNAME;
+				orderByField = USER_ACCOUNT.as(USER_TABLE_MODIFIED_BY_ALIAS).USERNAME;
 			} else {
 				List<Field<?>> selectFields = selectQuery.getSelect();
 				for (Field<?> field : selectFields) {

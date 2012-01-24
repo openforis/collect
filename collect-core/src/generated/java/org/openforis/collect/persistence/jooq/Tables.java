@@ -58,9 +58,9 @@ public final class Tables {
 	public static org.openforis.collect.persistence.jooq.tables.Taxonomy TAXONOMY = org.openforis.collect.persistence.jooq.tables.Taxonomy.TAXONOMY;
 
 	/**
-	 * The table collect.user
+	 * The table collect.user_account
 	 */
-	public static org.openforis.collect.persistence.jooq.tables.User USER = org.openforis.collect.persistence.jooq.tables.User.USER;
+	public static org.openforis.collect.persistence.jooq.tables.UserAccount USER_ACCOUNT = org.openforis.collect.persistence.jooq.tables.UserAccount.USER_ACCOUNT;
 
 	/**
 	 * The table collect.user_role

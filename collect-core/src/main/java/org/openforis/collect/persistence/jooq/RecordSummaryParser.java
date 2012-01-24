@@ -1,7 +1,7 @@
 package org.openforis.collect.persistence.jooq;
 
 import static org.openforis.collect.persistence.jooq.tables.Record.RECORD;
-import static org.openforis.collect.persistence.jooq.tables.User.USER;
+import static org.openforis.collect.persistence.jooq.tables.UserAccount.USER_ACCOUNT;
 
 import java.sql.Date;
 import java.util.ArrayList;
@@ -32,9 +32,9 @@ public class RecordSummaryParser {
 		List<RecordSummary> summaries = new ArrayList<RecordSummary>();
 		for (Record r : records) {
 			Integer id = r.getValueAsInteger(RECORD.ID);
-			String createdBy = r.getValueAsString(USER.as(USER_TABLE_CREATED_BY_ALIAS).USERNAME);
+			String createdBy = r.getValueAsString(USER_ACCOUNT.as(USER_TABLE_CREATED_BY_ALIAS).USERNAME);
 			Date dateCreated = r.getValueAsDate(RECORD.DATE_CREATED);
-			String modifiedBy = r.getValueAsString(USER.as(USER_TABLE_MODIFIED_BY_ALIAS).USERNAME);
+			String modifiedBy = r.getValueAsString(USER_ACCOUNT.as(USER_TABLE_MODIFIED_BY_ALIAS).USERNAME);
 			Date modifiedDate = r.getValueAsDate(RECORD.DATE_MODIFIED);
 			Integer step = r.getValueAsInteger(RECORD.STEP);
 			Integer warnings = r.getValueAsInteger(RECORD.WARNINGS);
