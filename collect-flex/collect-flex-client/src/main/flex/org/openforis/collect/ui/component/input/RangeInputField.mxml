@@ -6,10 +6,6 @@
 				  width="100"
 				  >
 	
-	<fx:Declarations>
-		<!-- Place non-visual elements (e.g., services, value objects) here -->
-	</fx:Declarations>
-	
 	<input:TextInput id="textInput" focusIn="textInputFocusInHandler(event)" focusOut="focusOutEventHandler(event)" change="textInputChangeHandler(event)"
 				  width="100%" />
 	

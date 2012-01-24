@@ -7,6 +7,8 @@ package org.openforis.collect.ui.component.input {
 	import mx.events.FlexEvent;
 	
 	import org.openforis.collect.event.EventDispatcherFactory;
+	import org.openforis.collect.event.InputFieldEvent;
+	import org.openforis.collect.event.UIEvent;
 	import org.openforis.collect.presenter.InputFieldPresenter;
 	import org.openforis.collect.util.StringUtil;
 	import org.openforis.collect.util.UIUtil;
@@ -62,12 +64,14 @@ package org.openforis.collect.ui.component.input {
 		}
 		
 		protected function textInputFocusInHandler(event:Event):void {
-			//dispatch event InputFieldEvent
+			var inputFieldEvent:InputFieldEvent = new InputFieldEvent(InputFieldEvent.INPUT_FIELD_FOCUS_IN);
+			this.dispatchEvent(inputFieldEvent);
 		}
 		
 		protected function focusOutEventHandler(event:*):void {
 			if(changed) {
-				//dispatch event field changed
+				var inputFieldEvent:InputFieldEvent = new InputFieldEvent(InputFieldEvent.INPUT_FIELD_VALUE_CHANGE);
+				this.dispatchEvent(inputFieldEvent);
 			} else {
 				//dispatch event validate field
 			}
