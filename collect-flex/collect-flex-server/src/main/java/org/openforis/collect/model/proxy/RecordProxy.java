@@ -64,8 +64,10 @@ public class RecordProxy implements Proxy {
 	}
 
 	@ExternalizedProperty
-	public String getCreatedBy() {
-		return record.getCreatedBy();
+	public UserProxy getCreatedBy() {
+		if(record.getCreatedBy() != null) {
+			return new UserProxy(record.getCreatedBy());
+		} else return null;
 	}
 
 	@ExternalizedProperty
@@ -79,8 +81,12 @@ public class RecordProxy implements Proxy {
 	}
 
 	@ExternalizedProperty
-	public String getModifiedBy() {
-		return record.getModifiedBy();
+	public UserProxy getModifiedBy() {
+		if(record.getModifiedBy() != null) {
+			return new UserProxy(record.getModifiedBy());
+		} else {
+			return null;
+		}
 	}
 
 	@ExternalizedProperty

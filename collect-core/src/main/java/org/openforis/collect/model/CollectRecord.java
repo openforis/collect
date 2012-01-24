@@ -28,9 +28,13 @@ public class CollectRecord extends Record {
 	// TODO Replace submitted flag with state enum
 	private boolean submitted;
 	private Date creationDate;
-	private String createdBy;
+	private User createdBy;
 	private Date modifiedDate;
-	private String modifiedBy;
+	private User modifiedBy;
+	private Integer missing;
+	private Integer skipped;
+	private Integer errors;
+	private Integer warnings;
 
 	public CollectRecord(Survey survey, String rootEntity, String versionName) {
 		super(survey, rootEntity, versionName);
@@ -62,11 +66,11 @@ public class CollectRecord extends Record {
 		this.creationDate = creationDate;
 	}
 
-	public String getCreatedBy() {
+	public User getCreatedBy() {
 		return this.createdBy;
 	}
 
-	public void setCreatedBy(String createdBy) {
+	public void setCreatedBy(User createdBy) {
 		this.createdBy = createdBy;
 	}
 
@@ -78,12 +82,45 @@ public class CollectRecord extends Record {
 		this.modifiedDate = modifiedDate;
 	}
 
-	public String getModifiedBy() {
+	public User getModifiedBy() {
 		return this.modifiedBy;
 	}
 
-	public void setModifiedBy(String modifiedBy) {
+	public void setModifiedBy(User modifiedBy) {
 		this.modifiedBy = modifiedBy;
 	}
+	
+	public Integer getSkipped() {
+		return skipped;
+	}
+	
+	public void setSkipped(Integer skipped) {
+		this.skipped = skipped;
+	}
+	
+	public Integer getMissing() {
+		return missing;
+	}
+	
+	public void setMissing(Integer missing) {
+		this.missing = missing;
+	}
+	
+	public Integer getErrors() {
+		return errors;
+	}
+	
+	public void setErrors(Integer errors) {
+		this.errors = errors;
+	}
+	
+	public Integer getWarnings() {
+		return warnings;
+	}
+	
+	public void setWarnings(Integer warnings) {
+		this.warnings = warnings;
+	}
+	
 }
 
