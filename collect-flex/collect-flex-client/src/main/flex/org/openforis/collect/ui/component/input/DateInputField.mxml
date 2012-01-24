@@ -6,21 +6,9 @@
 				  presenterClass="org.openforis.collect.presenter.input.DateInputFieldPresenter"
 				  >
 	
-	<fx:Script>
-		<![CDATA[
-			
-
-		]]>
-	</fx:Script>
-	
-	<fx:Declarations>
-		<!-- Place non-visual elements (e.g., services, value objects) here -->
-	</fx:Declarations>
-	
 	<s:BorderContainer 
 		id="inputBox"
 		minHeight="0"
-		styleName="noError"
 		tabEnabled="false">
 		<s:layout>
 			<s:HorizontalLayout>
