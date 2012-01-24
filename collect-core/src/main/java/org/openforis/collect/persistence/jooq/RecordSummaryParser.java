@@ -36,10 +36,11 @@ public class RecordSummaryParser {
 			Date dateCreated = r.getValueAsDate(RECORD.DATE_CREATED);
 			String modifiedBy = r.getValueAsString(USER.as(USER_TABLE_MODIFIED_BY_ALIAS).USERNAME);
 			Date modifiedDate = r.getValueAsDate(RECORD.DATE_MODIFIED);
-			int step = r.getValueAsInteger(RECORD.STEP);
-			//TODO add errors and warnings count
-			int warningCount = 0;
-			int errorCount = 0;
+			Integer step = r.getValueAsInteger(RECORD.STEP);
+			Integer warnings = r.getValueAsInteger(RECORD.WARNINGS);
+			Integer errors = r.getValueAsInteger(RECORD.ERRORS);
+			Integer skipped = r.getValueAsInteger(RECORD.SKIPPED);
+			Integer missing = r.getValueAsInteger(RECORD.MISSING);
 			//create key attributes map
 			Map<String, String> keyAttributes = new HashMap<String, String>();
 			for (AttributeDefinition attributeDefinition : keyAttributeDefinitions) {
@@ -57,7 +58,8 @@ public class RecordSummaryParser {
 				Integer value = r.getValueAsInteger(projectionAlias);
 				entityCounts.put(key, value);
 			}
-			RecordSummary recordSummary = new RecordSummary(id, keyAttributes, entityCounts, errorCount, warningCount, createdBy, dateCreated, modifiedBy, modifiedDate, step);
+			RecordSummary recordSummary = new RecordSummary(id, keyAttributes, entityCounts, createdBy, dateCreated, modifiedBy, modifiedDate, step,
+					skipped, missing, errors, warnings);
 			summaries.add(recordSummary);
 		}
 		return summaries;

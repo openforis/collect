@@ -18,6 +18,11 @@ public final class Tables {
 	public static org.openforis.collect.persistence.jooq.tables.Data DATA = org.openforis.collect.persistence.jooq.tables.Data.DATA;
 
 	/**
+	 * The table collect.entity_count_view
+	 */
+	public static org.openforis.collect.persistence.jooq.tables.EntityCountView ENTITY_COUNT_VIEW = org.openforis.collect.persistence.jooq.tables.EntityCountView.ENTITY_COUNT_VIEW;
+
+	/**
 	 * The table collect.record
 	 */
 	public static org.openforis.collect.persistence.jooq.tables.Record RECORD = org.openforis.collect.persistence.jooq.tables.Record.RECORD;
