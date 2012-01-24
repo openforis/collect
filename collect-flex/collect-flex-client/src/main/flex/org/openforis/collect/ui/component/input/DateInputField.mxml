@@ -19,9 +19,9 @@
 			</s:HorizontalLayout>
 		</s:layout>
 
-		<input:TextInput tabEnabled="true" width="20" maxChars="2" id="day" />
+		<input:TextInput tabEnabled="true" width="25" maxChars="2" id="day" />
 		<s:Label id="separator1" paddingLeft="1" />
-		<input:TextInput width="20" maxChars="2" id="month" />
+		<input:TextInput width="25 " maxChars="2" id="month" />
 		<s:Label id="separator2" paddingLeft="1" />
 		<input:TextInput width="40" maxChars="4" id="year" />
 		<s:Spacer width="8" />

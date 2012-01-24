@@ -20,6 +20,7 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.metamodel.proxy.RangeAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.TaxonAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.TextAttributeDefinitionProxy;
+	import org.openforis.collect.metamodel.proxy.TextAttributeDefinitionProxy$Type;
 	import org.openforis.collect.metamodel.proxy.TimeAttributeDefinitionProxy;
 	import org.openforis.collect.model.UIConfiguration;
 	import org.openforis.collect.model.UITab;
@@ -40,6 +41,7 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.ui.component.input.CoordinateInputField;
 	import org.openforis.collect.ui.component.input.DateInputField;
 	import org.openforis.collect.ui.component.input.InputField;
+	import org.openforis.collect.ui.component.input.MemoInputField;
 	import org.openforis.collect.ui.component.input.NumericInputField;
 	import org.openforis.collect.ui.component.input.RangeInputField;
 	import org.openforis.collect.ui.component.input.StringInputField;
@@ -213,14 +215,55 @@ package org.openforis.collect.ui {
 		}
 		
 		public static function getInputFieldWidth(def:AttributeDefinitionProxy, isInDataGroup:Boolean = false):int {
-			//TODO
-			return 100;
+			if(def is TextAttributeDefinitionProxy) {
+				var textAttributeDef:TextAttributeDefinitionProxy = TextAttributeDefinitionProxy(def);
+				var type:TextAttributeDefinitionProxy$Type = textAttributeDef.type;
+				switch(type) {
+					case TextAttributeDefinitionProxy$Type.MEMO:
+						return 300;
+					case TextAttributeDefinitionProxy$Type.SHORT:
+					default:
+						return 100;
+				}
+				
+			} else if(def is DateAttributeDefinitionProxy) {
+				return 150;
+			} else if(def is TimeAttributeDefinitionProxy) {
+				return 80;
+			} else if(def is CodeAttributeDefinitionProxy) {
+				return 100;
+			} else if(def is NumericAttributeDefinitionProxy) {
+				return 100;
+			} else if(def is RangeAttributeDefinitionProxy) {
+				return 120;
+			} else if(def is BooleanAttributeDefinitionProxy) {
+				return 20;
+			} else if(def is CoordinateAttributeDefinitionProxy) {
+				return 100;
+			} else if(def is TaxonAttributeDefinitionProxy) {
+				return 400;
+			} else if(def is FileAttributeDefinitionProxy) {
+				return 300;
+			} else {
+				return 100;
+			}
 		}
 		
 		public static function getInputField(def:AttributeDefinitionProxy, isInDataGroup:Boolean = false):InputField {
 			var inputField:InputField = null;
 			if(def is TextAttributeDefinitionProxy) {
-				inputField = new StringInputField();
+				var textAttributeDef:TextAttributeDefinitionProxy = TextAttributeDefinitionProxy(def);
+				var type:TextAttributeDefinitionProxy$Type = textAttributeDef.type;
+				switch(type) {
+					case TextAttributeDefinitionProxy$Type.MEMO:
+						inputField = new MemoInputField();
+						break;
+					case TextAttributeDefinitionProxy$Type.SHORT:
+					default:
+						inputField = new StringInputField();
+						break;
+				}
+				
 			} else if(def is DateAttributeDefinitionProxy) {
 				inputField = new DateInputField();
 			} else if(def is TimeAttributeDefinitionProxy) {
@@ -239,7 +282,9 @@ package org.openforis.collect.ui {
 				inputField = new TaxonInputField();
 			} else if(def is FileAttributeDefinitionProxy) {
 				//inputField = new FileInputField();
-			} 
+			} else {
+				inputField = new StringInputField();
+			}
 			inputField.width = getInputFieldWidth(def, isInDataGroup);
 			
 			return inputField;

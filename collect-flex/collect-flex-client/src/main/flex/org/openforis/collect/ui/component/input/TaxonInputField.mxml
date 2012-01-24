@@ -62,6 +62,7 @@
 	<s:BorderContainer 
 		id="inputBox"
 		minHeight="0"
+		width="100%"
 		styleName="noError"
 		tabEnabled="false">
 		<s:layout>
