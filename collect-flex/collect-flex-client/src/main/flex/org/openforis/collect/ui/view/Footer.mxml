@@ -8,7 +8,8 @@
 	</s:layout>
 	
 	<fx:Declarations>
-		<!-- Place non-visual elements (e.g., services, value objects) here -->
 	</fx:Declarations>
+	
+<!--	<s:Image source="{Images.FOOTER}" />-->
 	
 </s:Group>

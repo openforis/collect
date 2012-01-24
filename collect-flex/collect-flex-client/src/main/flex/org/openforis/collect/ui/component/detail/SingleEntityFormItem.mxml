@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<detail:EntityFormItem xmlns:fx="http://ns.adobe.com/mxml/2009" 
-		 xmlns:s="library://ns.adobe.com/flex/spark" 
-		 xmlns:mx="library://ns.adobe.com/flex/mx"
-		 xmlns:detail="org.openforis.collect.ui.component.detail.*"
-		 >
+<detail:EntityFormItem 
+		xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		xmlns:s="library://ns.adobe.com/flex/spark" 
+		xmlns:mx="library://ns.adobe.com/flex/mx"
+		xmlns:detail="org.openforis.collect.ui.component.detail.*"
+		>
 
 	<detail:layout>
 		<s:VerticalLayout paddingLeft="10" gap="0" />
@@ -19,8 +20,9 @@
 			import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
 			import org.openforis.collect.ui.UIBuilder;
 			
+			import spark.components.FormItem;
+			
 			override protected function createChildren():void {
-				
 				if(!childrenAdded){
 					super.createChildren();
 					addElement(form);
@@ -29,30 +31,32 @@
 					for each (var def:NodeDefinitionProxy in childDefinitions) {
 						if(UIBuilder.isInVersion(entityDefinition, Application.activeRecord.version)) {
 							if(def is AttributeDefinitionProxy){
-								var attrFormItem:AttributeFormItem = UIBuilder.getAttributeFormItem(AttributeDefinitionProxy(def) );
-								form.addElement(attrFormItem);
+								var ad:AttributeDefinitionProxy = AttributeDefinitionProxy(def);
+								var formItem:FormItem = new FormItem();
+								formItem.label = ad.getLabelText();
+								var attrFormItem:AttributeFormItem = UIBuilder.getAttributeFormItem(ad);
+								attrFormItem.addTo(formItem);
+								form.addElement(formItem);
 								
 							} else if(def is EntityDefinitionProxy) {
 								var entityFormItem:EntityFormItem = UIBuilder.getEntityFormItem(EntityDefinitionProxy(def));
-								form.addElement(entityFormItem);
+								entityFormItem.addTo(form);
+								//form.addChild(entityFormItem);
 							}
 						}
-						
-					} 
-					
+					}
 					childrenAdded = true;
 				}
 			}
-			
-
-			
 		]]>
 	</fx:Script>
 	
 	<fx:Declarations>
-		<!-- Place non-visual elements (e.g., services, value objects) here -->
+		<s:Form height="100%" width="100%" id="form">
+			<s:layout>
+				<s:FormLayout gap="-15" paddingLeft="10" />
+			</s:layout>
+		</s:Form>
 	</fx:Declarations>
-	
-	
 	
 </detail:EntityFormItem>

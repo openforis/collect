@@ -57,17 +57,11 @@ package org.openforis.collect.ui {
 		
 		//TODO: use entityDescriptor
 		public static function buildForm(entity:EntityDefinitionProxy, version:ModelVersionProxy):FormContainer {
-			//foreach version
 				var formContainer:FormContainer = new FormContainer();
 				formContainer.initialize();
-				//container.addForm(formContainer, version, entity);
 				
-				//Root entity definition				
 				var form:EntityFormContainer = new EntityFormContainer();
 				form.entityDefinitionProxy = entity;
-				//form.initialize();
-				
-				//form.label = entity.getLabelText();
 				
 				var uiConfig:UIConfiguration = Application.activeSurvey.uiConfiguration;
 				var tabs:ListCollectionView = null;
@@ -98,20 +92,6 @@ package org.openforis.collect.ui {
 						}
 					}
 				}
-				
-				/*
-				//foreach main entities
-					var entityFormContainer:EntityFormContainer = new EntityFormContainer();
-					entityFormContainer.label = "";
-					formContainer.addEntityFormContainer(entityFormContainer);
-					//BindingUtils.
-					entityFormContainer.parentEntity = form.entity;
-					//if multiple
-						entityFormContainer.insertAddSection();
-					addFormItems(entityFormContainer, null);
-			
-			parentContainer.addElement(formContainer);
-				*/
 			return formContainer;
 		}
 		
@@ -184,50 +164,25 @@ package org.openforis.collect.ui {
 			return columns;
 		}
 		
-		//TODO
 		private static function addFormItems(form:EntityFormContainer, entity:EntityDefinitionProxy, version:ModelVersionProxy, uiTab:UITab):void {
 			var defns:ListCollectionView = entity.childDefinitions;
 			form.uiTabs = uiTab.tabs;
 			if(defns != null && defns.length >0){
-				//if(uiTab == null || uiTab.tabs == null || uiTab.tabs.length == 0) {
 				for each (var def:NodeDefinitionProxy in defns) {
 					if(isInVersion(def, version)) {
-						if(def is AttributeDefinitionProxy){
+						if(def is AttributeDefinitionProxy) {
 							var attrFormItem:AttributeFormItem = getAttributeFormItem(AttributeDefinitionProxy(def) );
-							//attrFormItem.add(form);
-							form.addFormItem(attrFormItem, def.uiTabName);
+							form.addAttributeFormItem(attrFormItem, def.uiTabName);
 						} else if(def is EntityDefinitionProxy) {
 							var proxy:EntityDefinitionProxy = EntityDefinitionProxy(def);
-							if(proxy.uiTabName==null){
+							if(proxy.uiTabName == null || uiTab.hasChildTab(def.uiTabName)) {
 								var entityFormItem:EntityFormItem = getEntityFormItem(proxy);
 								form.addEntityFormItem(entityFormItem, def.uiTabName);
 							}
 						}
 					}
 				}
-				//}
-	//			else {
-		//		}
 			} 
-			/*
-           	for(var childSchemaObjectDescriptor:Object in childrenSchemaObjectDescriptors) {
-				if(childSchemaObjectDescriptor.type == 'attribute') {
-					var attributeDescription:Object = childSchemaObjectDescriptor as Object;
-					addAttributeFormItem(form, attributeDescripor);
-				} else {
-					
-				}
-			}
-			*/
-			//foreach childSchemaObjectDescription
-     			//if attribute
-      				//if single
-      				//else if multiple
-  			
-      			//else if entity
-      				//if single
-      				//else if multiple
-    				
 		}
 		
 		public static function getAttributeFormItem(definition:AttributeDefinitionProxy, isInDataGroup:Boolean = false):AttributeFormItem {
@@ -255,24 +210,12 @@ package org.openforis.collect.ui {
 			return entityFormItem;
 		}
 		
-/*		private static function getEntityItemRenderer(entityDescriptor:*):DataGroupItemRenderer {
-			var itemRenderer:DataGroupItemRenderer = new DataGroupItemRenderer();
-			for each(var modelObjectDefinition:* in entityDescriptor.childDefinitions) {
-				//if model object is attribute
-				var attributeDescriptor:* = modelObjectDefinition;
-				var inputField:InputField = getInputField(attributeDescriptor);
-				itemRenderer.addElement(inputField);
-			}
-			return itemRenderer;
-		}*/
-		
 		public static function getInputFieldWidth(def:AttributeDefinitionProxy, isInDataGroup:Boolean = false):int {
 			//TODO
 			return 100;
 		}
 		
 		public static function getInputField(def:AttributeDefinitionProxy, isInDataGroup:Boolean = false):InputField {
-			//TODO
 			var inputField:InputField = null;
 			if(isInDataGroup) {
 				inputField = new StringInputField();
@@ -327,7 +270,6 @@ package org.openforis.collect.ui {
 		
 		private static function getEntityDataGroupHeader(defn:EntityDefinitionProxy):IVisualElement {
 			var v:VGroup = new VGroup();
-			//v.width = getInputFieldWidth(defn, true);
 			v.percentHeight = 100;
 			v.verticalAlign = "bottom";
 			var l:Label = new Label();
@@ -366,10 +308,6 @@ package org.openforis.collect.ui {
 			
 			return v;
 		}
-		
-		/*private static function getEntityDataGroupHeaderWidth():int {
-			
-		}*/
 		
 		public static function isInVersion(node:NodeDefinitionProxy, currentVersion:ModelVersionProxy):Boolean {
 			var since:ModelVersionProxy = node.sinceVersion;

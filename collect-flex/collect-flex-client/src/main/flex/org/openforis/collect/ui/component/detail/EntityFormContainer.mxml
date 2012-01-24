@@ -14,15 +14,11 @@
 	<fx:Script>
 		<![CDATA[
 			import mx.collections.ListCollectionView;
-			import mx.core.IVisualElement;
-			import mx.events.FlexEvent;
 			
 			import org.openforis.collect.i18n.Message;
 			import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 			import org.openforis.collect.model.UITab;
 			import org.openforis.collect.model.proxy.EntityProxy;
-			import org.openforis.collect.ui.Images;
-			import org.openforis.collect.ui.component.input.InputField;
 			
 			import spark.components.FormItem;
 		
@@ -47,15 +43,7 @@
 					borderContainer.addElement(scroller);
 				} else {
 					borderContainer.addElement(scrollableForms);
-					/* for each (var f:ScrollableFormContainer in _forms) {
-						viewStack.addElement(f);
-					} */
-					
 				}
-				//borderContainer.addElement(form);
-				/* if(!borderContainer.initialized){
-					borderContainer.initialize();
-				} */
 			}
 			
 			public function set parentEntity(value:EntityProxy):void {
@@ -63,13 +51,13 @@
 			}
 
 			public function addItem(collectFormItem:CollectFormItem):void {
-				collectFormItem.add(form);
+				collectFormItem.addTo(form);
 			}
 			
-			public function addFormItem(attributeFormItem:AttributeFormItem, tabName:String = null):void {
+			public function addAttributeFormItem(attributeFormItem:AttributeFormItem, tabName:String = null):void {
 				var formItem:FormItem = new FormItem();
 				formItem.label = attributeFormItem.attributeDefinition.getLabelText();
-				//formItem.addElement(component);
+				
 				formItem.addElement(attributeFormItem);
 				if(tabName == null || tabName == ''){
 					form.addElement(formItem);

@@ -26,8 +26,8 @@ package org.openforis.collect.metamodel.proxy {
 					if(label.type == type && label.language == language) {
 						return label.text;
 					}
-				}
-				return "";
+				} 
+				return (labels.getItemAt(0) as NodeLabelProxy).text;
 			}
 		}
 		
