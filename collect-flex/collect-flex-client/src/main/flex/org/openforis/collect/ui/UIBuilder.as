@@ -67,7 +67,6 @@ package org.openforis.collect.ui {
 				form.entityDefinitionProxy = entity;
 				//form.initialize();
 				
-				formContainer.rootFormContainer =form;
 				//form.label = entity.getLabelText();
 				
 				var uiConfig:UIConfiguration = Application.activeSurvey.uiConfiguration;
@@ -85,6 +84,7 @@ package org.openforis.collect.ui {
 						} 
 				}
 				addFormItems(form, entity, version, uiTab);
+				formContainer.addEntityFormContainer(form);
 				
 				if(tabs != null) {
 					for each (tab in tabs) {
@@ -92,11 +92,9 @@ package org.openforis.collect.ui {
 						var child:NodeDefinitionProxy = entity.getChildDefinition(tab.name);
 						if(child is EntityDefinitionProxy) {
 							var edp:EntityDefinitionProxy = child as EntityDefinitionProxy;
-							childForm.entityDefinitionProxy = edp;
-							
-							formContainer.addEntityFormContainer(childForm);
-							
+							childForm.entityDefinitionProxy = edp;														
 							addFormItems(childForm, edp, version, tab);			
+							formContainer.addEntityFormContainer(childForm);
 						}
 					}
 				}
@@ -188,31 +186,29 @@ package org.openforis.collect.ui {
 		
 		//TODO
 		private static function addFormItems(form:EntityFormContainer, entity:EntityDefinitionProxy, version:ModelVersionProxy, uiTab:UITab):void {
-			if(uiTab == null || uiTab.tabs == null || uiTab.tabs.length == 0) {
-				var defns:ListCollectionView = entity.childDefinitions;
-				if(defns != null && defns.length >0){
-					for each (var def:NodeDefinitionProxy in defns) {
-						if(isInVersion(def, version)) {
-							if(def is AttributeDefinitionProxy){
-								var attrFormItem:AttributeFormItem = getAttributeFormItem(AttributeDefinitionProxy(def) );
-								//attrFormItem.add(form);
-								form.addFormItem(attrFormItem);
-							} else if(def is EntityDefinitionProxy) {
-								var proxy:EntityDefinitionProxy = EntityDefinitionProxy(def);
-								if(proxy.uiTabName==null){
-									var entityFormItem:EntityFormItem = getEntityFormItem(proxy);
-									form.addEntityFormItem(entityFormItem);
-								}
+			var defns:ListCollectionView = entity.childDefinitions;
+			form.uiTabs = uiTab.tabs;
+			if(defns != null && defns.length >0){
+				//if(uiTab == null || uiTab.tabs == null || uiTab.tabs.length == 0) {
+				for each (var def:NodeDefinitionProxy in defns) {
+					if(isInVersion(def, version)) {
+						if(def is AttributeDefinitionProxy){
+							var attrFormItem:AttributeFormItem = getAttributeFormItem(AttributeDefinitionProxy(def) );
+							//attrFormItem.add(form);
+							form.addFormItem(attrFormItem, def.uiTabName);
+						} else if(def is EntityDefinitionProxy) {
+							var proxy:EntityDefinitionProxy = EntityDefinitionProxy(def);
+							if(proxy.uiTabName==null){
+								var entityFormItem:EntityFormItem = getEntityFormItem(proxy);
+								form.addEntityFormItem(entityFormItem, def.uiTabName);
 							}
 						}
 					}
 				}
-			} else {
-				for each (var tab:UITab in uiTab.tabs) {
-					
-				}
-				
-			}
+				//}
+	//			else {
+		//		}
+			} 
 			/*
            	for(var childSchemaObjectDescriptor:Object in childrenSchemaObjectDescriptors) {
 				if(childSchemaObjectDescriptor.type == 'attribute') {

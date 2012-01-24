@@ -44,25 +44,25 @@ public class NodeDefinitionProxy implements Proxy {
 			for (NodeDefinition n : list) {
 				NodeDefinitionProxy p = null;
 				if (n instanceof AttributeDefinition) {
-					if(n instanceof BooleanAttributeDefinition) {
+					if (n instanceof BooleanAttributeDefinition) {
 						p = new BooleanAttributeDefinitionProxy((BooleanAttributeDefinition) n);
-					} else if(n instanceof CodeAttributeDefinition) {
+					} else if (n instanceof CodeAttributeDefinition) {
 						p = new CodeAttributeDefinitionProxy((CodeAttributeDefinition) n);
-					} else if(n instanceof CoordinateAttributeDefinition) {
+					} else if (n instanceof CoordinateAttributeDefinition) {
 						p = new CoordinateAttributeDefinitionProxy((CoordinateAttributeDefinition) n);
-					} else if(n instanceof DateAttributeDefinition) {
+					} else if (n instanceof DateAttributeDefinition) {
 						p = new DateAttributeDefinitionProxy((DateAttributeDefinition) n);
-					} else if(n instanceof FileAttributeDefinition) {
+					} else if (n instanceof FileAttributeDefinition) {
 						p = new FileAttributeDefinitionProxy((FileAttributeDefinition) n);
-					} else if(n instanceof NumericAttributeDefinition) {
+					} else if (n instanceof NumericAttributeDefinition) {
 						p = new NumericAttributeDefinitionProxy((NumericAttributeDefinition) n);
-					} else if(n instanceof RangeAttributeDefinition) {
+					} else if (n instanceof RangeAttributeDefinition) {
 						p = new RangeAttributeDefinitionProxy((RangeAttributeDefinition) n);
-					} else if(n instanceof TaxonAttributeDefinition) {
+					} else if (n instanceof TaxonAttributeDefinition) {
 						p = new TaxonAttributeDefinitionProxy((TaxonAttributeDefinition) n);
-					} else if(n instanceof TextAttributeDefinition) {
+					} else if (n instanceof TextAttributeDefinition) {
 						p = new TextAttributeDefinitionProxy((TextAttributeDefinition) n);
-					} else if(n instanceof TimeAttributeDefinition) {
+					} else if (n instanceof TimeAttributeDefinition) {
 						p = new TimeAttributeDefinitionProxy((TimeAttributeDefinition) n);
 					} else {
 						throw new RuntimeException("AttributeDefinition not supported: " + n.getClass().getSimpleName());
@@ -147,6 +147,14 @@ public class NodeDefinitionProxy implements Proxy {
 	@ExternalizedProperty
 	public String getPath() {
 		return nodeDefinition.getPath();
+	}
+
+	@ExternalizedProperty
+	public String getUiTabName() {
+		String namespaceURI = "http://www.openforis.org/collect/3.0/ui";
+		QName qname = new QName(namespaceURI, "tab");
+		String string = nodeDefinition.getAnnotation(qname);
+		return string;
 	}
 
 	// TODO do we need the parent definition in flex-ui?

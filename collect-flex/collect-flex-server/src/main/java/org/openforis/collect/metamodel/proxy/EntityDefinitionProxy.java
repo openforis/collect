@@ -46,10 +46,4 @@ public class EntityDefinitionProxy extends NodeDefinitionProxy {
 		return annotation != null && Boolean.parseBoolean(annotation);
 	}
 
-	@ExternalizedProperty
-	public String getUiTabName() {
-		QName qName = new QName("http://www.openforis.org/collect/3.0/ui", "tab");
-		String annotation = entityDefinition.getAnnotation(qName);
-		return annotation;
-	}
 }

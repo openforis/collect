@@ -13,11 +13,13 @@
 	
 	<fx:Script>
 		<![CDATA[
+			import mx.collections.ListCollectionView;
 			import mx.core.IVisualElement;
 			import mx.events.FlexEvent;
 			
 			import org.openforis.collect.i18n.Message;
 			import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
+			import org.openforis.collect.model.UITab;
 			import org.openforis.collect.model.proxy.EntityProxy;
 			import org.openforis.collect.ui.Images;
 			import org.openforis.collect.ui.component.input.InputField;
@@ -26,7 +28,8 @@
 		
 			private var _parentEntity:EntityProxy;
 			private var _entityDefinitionProxy:EntityDefinitionProxy;
-			
+			private var _uiTabs:ListCollectionView;	
+			private var _forms:Array = new Array();
 			
 			[Bindable]
 			public function get parentEntity():EntityProxy {
@@ -38,7 +41,17 @@
 				addElement(container);
 				if(entityDefinitionProxy.multiple) {
 					borderContainer.addElementAt(addSection, 0);
-				}	
+				}
+				
+				if(uiTabs == null) {
+					borderContainer.addElement(scroller);
+				} else {
+					borderContainer.addElement(scrollableForms);
+					/* for each (var f:ScrollableFormContainer in _forms) {
+						viewStack.addElement(f);
+					} */
+					
+				}
 				//borderContainer.addElement(form);
 				/* if(!borderContainer.initialized){
 					borderContainer.initialize();
@@ -53,26 +66,33 @@
 				collectFormItem.add(form);
 			}
 			
-			public function addFormItem(attributeFormItem:AttributeFormItem):void {
+			public function addFormItem(attributeFormItem:AttributeFormItem, tabName:String = null):void {
 				var formItem:FormItem = new FormItem();
 				formItem.label = attributeFormItem.attributeDefinition.getLabelText();
 				//formItem.addElement(component);
 				formItem.addElement(attributeFormItem);
-				form.addElement(formItem);
+				if(tabName == null || tabName == ''){
+					form.addElement(formItem);
+				} else {
+					var f:ScrollableFormContainer = (_forms[tabName] as ScrollableFormContainer);
+					f.addToForm(formItem);
+				}
 			}
 			
-			public function addEntityFormItem(entityFormItem:EntityFormItem):void {
+			public function addEntityFormItem(entityFormItem:EntityFormItem, tabName:String = null):void {
 				var formItem:FormItem = new FormItem();
 				formItem.label = entityFormItem.entityDefinition.getLabelText();
-				form.addElement(formItem);
 				
-				form.addElement(entityFormItem);
+				if(tabName == null || tabName == '') {
+					form.addElement(formItem);
+					form.addElement(entityFormItem);
+				} else {
+					var f:ScrollableFormContainer = (_forms[tabName] as ScrollableFormContainer);
+					f.addToForm(formItem);
+					f.addToForm(entityFormItem);
+				}
 			}
 			
-			public function insertAddSection():void {
-				this.container.addElementAt(addSection, 0);
-			}
-
 			protected function addRecordButtonClickHandler(event:MouseEvent):void {
 				
 			}
@@ -86,9 +106,28 @@
 				_entityDefinitionProxy = value;
 			}
 
+			[Bindable]
+			public function get uiTabs():ListCollectionView {
+				return _uiTabs;
+			}
+
+			public function set uiTabs(value:ListCollectionView):void {
+				_uiTabs = value;
+				for each (var tab:UITab in uiTabs) {
+					var f:ScrollableFormContainer = new ScrollableFormContainer();
+					f.entityDefinition = this.entityDefinitionProxy;
+					f.label = tab.label;
+					_forms[tab.name] = f;
+					f.initialize();
+					viewStack.addElement(f);
+				}
+			}
+
 		]]>
 	</fx:Script>
+	
 	<fx:Declarations>
+		
 		<s:Group width="100%" id="addSection">
 			<s:layout>
 				<s:HorizontalLayout paddingTop="5" horizontalAlign="left" paddingLeft="10" gap="12" verticalAlign="middle" />
@@ -104,19 +143,25 @@
 				<s:layout>
 					<s:VerticalLayout/>
 				</s:layout>
-				<s:Scroller height="100%" width="100%" visible="true">
-					<s:Group width="100%" id="group">
-						<s:Form height="100%" width="100%" id="form">
-							<s:layout>
-								<s:FormLayout gap="-15" paddingLeft="0" />
-							</s:layout>
-						</s:Form>
-					</s:Group>
-				</s:Scroller>
+				
 			</s:BorderContainer>
 		</s:VGroup>
 		
+		<s:Scroller height="100%" width="100%" visible="true" id="scroller">
+			<s:Group width="100%" id="group">
+				<s:Form height="100%" width="100%" id="form">
+					<s:layout>
+						<s:FormLayout gap="-15" paddingLeft="0" />
+					</s:layout>
+				</s:Form>
+			</s:Group>
+		</s:Scroller>
+		
+		<s:VGroup id="scrollableForms" width="100%" height="100%" gap="0">
+			<s:ButtonBar id="buttonBar"  dataProvider="{viewStack}" />
+			<mx:ViewStack id="viewStack" width="100%" height="100%" verticalGap="0" />
+		</s:VGroup>
+			
 	</fx:Declarations>
-	
 	
 </s:NavigatorContent>

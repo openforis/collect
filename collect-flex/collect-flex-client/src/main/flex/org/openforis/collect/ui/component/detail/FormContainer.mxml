@@ -8,7 +8,7 @@
 		<![CDATA[
 			import org.openforis.collect.model.proxy.RecordProxy;
 			
-			private var _rootFormContainer:EntityFormContainer;
+			//private var _rootFormContainer:EntityFormContainer;
 			private var _record:RecordProxy;
 			
 			[Bindable]
@@ -20,14 +20,14 @@
 				_record = value;
 			}
 
-			public function get rootFormContainer():EntityFormContainer {
+	/* 		public function get rootFormContainer():EntityFormContainer {
 				return _rootFormContainer;
 			}
 			
 			public function set rootFormContainer(value:EntityFormContainer):void {
 				_rootFormContainer = value;
 				this.viewStack.addElement(_rootFormContainer);
-			}
+			} */
 			
 			public function addEntityFormContainer(form:EntityFormContainer):void {
 				this.viewStack.addElement(form);

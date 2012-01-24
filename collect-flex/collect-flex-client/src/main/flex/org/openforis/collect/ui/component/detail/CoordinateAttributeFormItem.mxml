@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<detail:AttributeFormItem 
+							xmlns:fx="http://ns.adobe.com/mxml/2009" 
+						  	xmlns:s="library://ns.adobe.com/flex/spark" 
+						  	xmlns:mx="library://ns.adobe.com/flex/mx" 
+						  	xmlns:detail="org.openforis.collect.ui.component.detail.*" 
+						  	xmlns:input="org.openforis.collect.ui.component.input.*"
+							
+							currentState="vertical">
+	<fx:Script>
+		<![CDATA[
+			import org.openforis.collect.i18n.Message;
+			
+			public static const STATE_HORIZONTAL:String = "horizontal";
+			public static const STATE_VERTICAL:String = "vertical";
+		]]>
+	</fx:Script>
+	
+	<detail:states>
+		<s:State name="vertical" />
+		<s:State name="horizontal" />
+	</detail:states>
+	
+	<s:HGroup includeIn="horizontal">
+		<s:DropDownList id="srsDropDown" width="150" includeIn="horizontal" />
+		<input:NumericInputField id="xInputField" includeIn="horizontal" />
+		<input:NumericInputField id="yInputField" includeIn="horizontal" />
+	</s:HGroup>
+	
+	<s:VGroup includeIn="vertical">
+		<s:HGroup>
+			<s:Label text="{Message.get('edit.coordinate.srs')}" width="100" />
+			<fx:Reparent target="srsDropDown" includeIn="vertical" />
+		</s:HGroup>
+		<s:HGroup>
+			<s:Label text="{Message.get('edit.coordinate.x')}" width="100" />
+			<fx:Reparent target="xInputField" includeIn="vertical" />
+		</s:HGroup>
+		<s:HGroup>
+			<s:Label text="{Message.get('edit.coordinate.y')}" width="100" />
+			<fx:Reparent target="yInputField" includeIn="vertical" />
+		</s:HGroup>
+	</s:VGroup>
+	
+</detail:AttributeFormItem>

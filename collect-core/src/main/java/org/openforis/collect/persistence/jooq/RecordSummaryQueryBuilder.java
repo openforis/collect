@@ -4,9 +4,9 @@
 package org.openforis.collect.persistence.jooq;
 
 import static org.openforis.collect.persistence.jooq.tables.Data.DATA;
+import static org.openforis.collect.persistence.jooq.tables.NodeCountView.NODE_COUNT_VIEW;
 import static org.openforis.collect.persistence.jooq.tables.Record.RECORD;
 import static org.openforis.collect.persistence.jooq.tables.User.USER;
-import static org.openforis.collect.persistence.jooq.tables.EntityCountView.ENTITY_COUNT_VIEW;
 
 import java.util.List;
 
@@ -18,7 +18,7 @@ import org.jooq.SelectQuery;
 import org.jooq.TableField;
 import org.jooq.impl.Factory;
 import org.openforis.collect.persistence.jooq.tables.Data;
-import org.openforis.collect.persistence.jooq.tables.EntityCountView;
+import org.openforis.collect.persistence.jooq.tables.NodeCountView;
 import org.openforis.collect.persistence.jooq.tables.records.DataRecord;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
@@ -124,7 +124,7 @@ public class RecordSummaryQueryBuilder {
 	public void addCountColumn(EntityDefinition entityDefinition) {
 		String viewAliasName = COUNT_VIEW_ALIAS_PREFIX + entityDefinition.getName();
 		//left join with ENTITY_COUNT_VIEW
-		EntityCountView viewAlias = ENTITY_COUNT_VIEW.as(viewAliasName);
+		NodeCountView viewAlias = NODE_COUNT_VIEW.as(viewAliasName);
 		selectQuery.addJoin(viewAlias, JoinType.LEFT_OUTER_JOIN, 
 				viewAlias.RECORD_ID.equal(RECORD.ID), 
 				viewAlias.DEFINITION_ID.equal(entityDefinition.getId()));

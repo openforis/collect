@@ -18,9 +18,14 @@ public final class Tables {
 	public static org.openforis.collect.persistence.jooq.tables.Data DATA = org.openforis.collect.persistence.jooq.tables.Data.DATA;
 
 	/**
-	 * The table collect.entity_count_view
+	 * The table collect.logo
 	 */
-	public static org.openforis.collect.persistence.jooq.tables.EntityCountView ENTITY_COUNT_VIEW = org.openforis.collect.persistence.jooq.tables.EntityCountView.ENTITY_COUNT_VIEW;
+	public static org.openforis.collect.persistence.jooq.tables.Logo LOGO = org.openforis.collect.persistence.jooq.tables.Logo.LOGO;
+
+	/**
+	 * The table collect.node_count_view
+	 */
+	public static org.openforis.collect.persistence.jooq.tables.NodeCountView NODE_COUNT_VIEW = org.openforis.collect.persistence.jooq.tables.NodeCountView.NODE_COUNT_VIEW;
 
 	/**
 	 * The table collect.record
