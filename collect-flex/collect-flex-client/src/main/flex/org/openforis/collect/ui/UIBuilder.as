@@ -222,7 +222,7 @@ package org.openforis.collect.ui {
     				
 		}
 		
-		public static function getAttributeFormItem(definition:AttributeDefinitionProxy):AttributeFormItem {
+		public static function getAttributeFormItem(definition:AttributeDefinitionProxy, isInDataGroup:Boolean = false):AttributeFormItem {
 				var formItem:AttributeFormItem = null;
 				if(definition is CoordinateAttributeDefinitionProxy){
 					//todo multiple
@@ -236,7 +236,7 @@ package org.openforis.collect.ui {
 				return formItem;
 		}
 		
-		public static function getEntityFormItem(definition:EntityDefinitionProxy):EntityFormItem {
+		public static function getEntityFormItem(definition:EntityDefinitionProxy, isInDataGroup:Boolean = false):EntityFormItem {
 			var entityFormItem:EntityFormItem = null;
 			if(definition.multiple) {
 				entityFormItem = new MultipleEntityFormItem();
