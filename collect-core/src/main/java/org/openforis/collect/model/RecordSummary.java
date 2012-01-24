@@ -20,7 +20,7 @@ public class RecordSummary {
 	private String modifiedBy;
 	private Date modifiedDate;
 	private Integer skipped;
-	private Integer warning;
+	private Integer warnings;
 	private int step;
 	private Map<String, String> rootEntityKeys;
 	private Map<String, Integer> entityCounts;
@@ -38,7 +38,7 @@ public class RecordSummary {
 		this.skipped = skippedCount;
 		this.missing = missing;
 		this.errors = errors;
-		this.warning = warnings;
+		this.warnings = warnings;
 	}
 
 	public String getCreatedBy() {
@@ -66,7 +66,7 @@ public class RecordSummary {
 	}
 
 	public Integer getWarnings() {
-		return this.warning;
+		return this.warnings;
 	}
 
 	public int getStep() {
