@@ -18,6 +18,7 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.NumericAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.RangeAttributeDefinitionProxy;
+	import org.openforis.collect.metamodel.proxy.TaxonAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.TextAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.TimeAttributeDefinitionProxy;
 	import org.openforis.collect.model.UIConfiguration;
@@ -42,6 +43,7 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.ui.component.input.NumericInputField;
 	import org.openforis.collect.ui.component.input.RangeInputField;
 	import org.openforis.collect.ui.component.input.StringInputField;
+	import org.openforis.collect.ui.component.input.TaxonInputField;
 	import org.openforis.collect.ui.component.input.TimeInputField;
 	
 	import spark.components.HGroup;
@@ -231,17 +233,17 @@ package org.openforis.collect.ui {
 		}
 		
 		public static function getAttributeFormItem(definition:AttributeDefinitionProxy, isInDataGroup:Boolean = false):AttributeFormItem {
-				var formItem:AttributeFormItem = null;
-				if(definition is CoordinateAttributeDefinitionProxy){
-					//todo multiple
-					formItem = new CoordinateAttributeFormItem();
-				} else if(definition.multiple) {
-					formItem = new MultipleAttributeFormItem();
-				} else {
-					formItem = new SingleAttributeFormItem();
-				}
-				formItem.attributeDefinition = definition;
-				return formItem;
+			var formItem:AttributeFormItem = null;
+			if(definition is CoordinateAttributeDefinitionProxy){
+				//todo multiple
+				formItem = new CoordinateAttributeFormItem();
+			} else if(definition.multiple) {
+				formItem = new MultipleAttributeFormItem();
+			} else {
+				formItem = new SingleAttributeFormItem();
+			}
+			formItem.attributeDefinition = definition;
+			return formItem;
 		}
 		
 		public static function getEntityFormItem(definition:EntityDefinitionProxy, isInDataGroup:Boolean = false):EntityFormItem {
@@ -274,29 +276,27 @@ package org.openforis.collect.ui {
 		public static function getInputField(def:AttributeDefinitionProxy, isInDataGroup:Boolean = false):InputField {
 			//TODO
 			var inputField:InputField = null;
-			if(isInDataGroup) {
+			if(def is TextAttributeDefinitionProxy) {
 				inputField = new StringInputField();
-			} else {
-				if(def is TextAttributeDefinitionProxy) {
-					inputField = new StringInputField();
-				} else if(def is DateAttributeDefinitionProxy) {
-					inputField = new DateInputField();
-				} else if(def is TimeAttributeDefinitionProxy) {
-					inputField = new TimeInputField();
-				} else if(def is CodeAttributeDefinitionProxy) {
-					inputField = new CodeInputField();
-				} else if(def is NumericAttributeDefinitionProxy) {
-					inputField = new NumericInputField();
-				} else if(def is RangeAttributeDefinitionProxy) {
-					inputField = new RangeInputField();
-				} else if(def is BooleanAttributeDefinitionProxy) {
-					inputField = new BooleanInputField();
-				} else if(def is CoordinateAttributeDefinitionProxy) {
-					inputField = new CoordinateInputField();
-				} else if(def is FileAttributeDefinitionProxy) {
-					//inputField = new FileInputField();
-				} 
-			}
+			} else if(def is DateAttributeDefinitionProxy) {
+				inputField = new DateInputField();
+			} else if(def is TimeAttributeDefinitionProxy) {
+				inputField = new TimeInputField();
+			} else if(def is CodeAttributeDefinitionProxy) {
+				inputField = new CodeInputField();
+			} else if(def is NumericAttributeDefinitionProxy) {
+				inputField = new NumericInputField();
+			} else if(def is RangeAttributeDefinitionProxy) {
+				inputField = new RangeInputField();
+			} else if(def is BooleanAttributeDefinitionProxy) {
+				inputField = new BooleanInputField();
+			} else if(def is CoordinateAttributeDefinitionProxy) {
+				inputField = new CoordinateInputField();
+			} else if(def is TaxonAttributeDefinitionProxy) {
+				inputField = new TaxonInputField();
+			} else if(def is FileAttributeDefinitionProxy) {
+				//inputField = new FileInputField();
+			} 
 			inputField.width = getInputFieldWidth(def, isInDataGroup);
 			
 			return inputField;
