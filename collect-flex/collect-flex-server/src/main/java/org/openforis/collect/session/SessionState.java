@@ -17,11 +17,16 @@ public class SessionState {
 
 	public static String SESSION_ATTRIBUTE_NAME = "sessionState";
 	
+	public enum RecordState {
+		NEW, SAVED
+	}
+	
 	private User user;
 	private String sessionId;
 	private CollectRecord activeRecord;
 	private Survey activeSurvey;
 	private Locale locale;
+	private RecordState activeRecordState;
 
 	public User getUser() {
 		return this.user;
@@ -61,5 +66,13 @@ public class SessionState {
 
 	public void setLocale(Locale locale) {
 		this.locale = locale;
+	}
+
+	public RecordState getActiveRecordState() {
+		return activeRecordState;
+	}
+
+	public void setActiveRecordState(RecordState activeRecordState) {
+		this.activeRecordState = activeRecordState;
 	}
 }

@@ -5,17 +5,18 @@ package org.openforis.collect.presenter {
 	import mx.controls.Alert;
 	import mx.rpc.events.FaultEvent;
 	
+	import org.openforis.collect.Application;
 	import org.openforis.collect.event.EventDispatcherFactory;
 	import org.openforis.collect.i18n.Message;
 	import org.openforis.collect.ui.Images;
 	import org.openforis.collect.ui.component.BlockingMessagePopUp;
+	import org.openforis.collect.util.AlertUtil;
 
 	/**
 	 * @author Mino Togna
 	 * */
 	internal class AbstractPresenter {
 
-		private static var _serverOffline:Boolean = false;
 		private static var _serverOffLineMessage:String;
 		
 		public function AbstractPresenter() {
@@ -34,23 +35,32 @@ package org.openforis.collect.presenter {
 		}
 		
 		public static function faultHandler(event:FaultEvent, token:Object=null):void {
-			if(event.fault.faultCode == "Channel.Call.Failed"
-				|| event.fault.faultCode == "Client.Error.MessageSend"
-				|| event.fault.faultCode == "Client.Error.DeliveryInDoubt") {
-				//server offline
-				if(! _serverOffline) {
-					BlockingMessagePopUp.show(Message.get("global.serverOffLine"), serverOffLineMessage, Images.ERROR);
-				}
-				_serverOffline = true;
-			} else {
-				Alert.show(Message.get("global.faultHandlerMsg")+"\n\n"+ event.toString());
+			var faultCode:String = event.fault.faultCode;
+			switch(faultCode) {
+				case "org.openforis.collect.persistence.AccessDeniedException":
+					AlertUtil.showError('error.accessDenied');
+					break;
+				case "org.openforis.collect.persistence.MultipleEditException":
+					AlertUtil.showError('error.multipleEdit');
+					break;
+				case "org.openforis.collect.persistence.RecordLockedException":
+					AlertUtil.showError('error.recordLocked');
+					break;
+				case "Channel.Call.Failed":
+					"Client.Error.MessageSend"
+					"Client.Error.DeliveryInDoubt"
+					//server offline
+					if(! Application.serverOffline) {
+						BlockingMessagePopUp.show(Message.get("global.serverOffLine"), serverOffLineMessage, Images.ERROR);
+					}
+					Application.serverOffline = true;
+					break;
+				default:
+					Alert.show(Message.get("global.faultHandlerMsg")+"\n\n"+ event.toString());
 			}
 		}
 		
 		internal function initEventListeners():void {}
 		
-		public static function get serverOffline():Boolean {
-			return _serverOffline;
-		}
 	}
 }

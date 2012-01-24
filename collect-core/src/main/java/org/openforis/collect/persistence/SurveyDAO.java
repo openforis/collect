@@ -14,10 +14,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.namespace.QName;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.jooq.Record;
 import org.jooq.Result;
 import org.jooq.impl.Factory;
 import org.openforis.collect.model.UIConfiguration.UIConfigurationAdapter;
+import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.Survey;
@@ -32,6 +37,9 @@ import org.springframework.transaction.annotation.Transactional;
  * @author M. Togna
  */
 public class SurveyDAO extends CollectDAO {
+	private final Log LOG = LogFactory.getLog(SurveyDAO.class);
+	
+	private static final QName COUNT_ANNOTATION = new QName("http://www.openforis.org/collect/3.0/collect", "count");
 
 	private Map<String, Survey> surveysByName;
 	private Map<Integer, Survey> surveysById;
@@ -69,7 +77,7 @@ public class SurveyDAO extends CollectDAO {
 		surveysById.put(survey.getId(), survey);
 		surveysByName.put(survey.getName(), survey);
 	}
-
+	
 	public Survey load(int id) {
 		Survey survey = surveysById.get(id);
 		return survey;
@@ -149,5 +157,26 @@ public class SurveyDAO extends CollectDAO {
 		} catch (IOException e) {
 			throw new SurveyImportException("Error unmarshalling survey", e);
 		} 
+	}
+	
+	/**
+	 * Returns first level entity definitions of the passed root entity that have the attribute "count" set to true
+	 * 
+	 * @param rootEntityDefinition
+	 * @return 
+	 */
+	private List<EntityDefinition> getCountEntityDefinitions(EntityDefinition rootEntityDefinition) {
+		List<EntityDefinition> result = new ArrayList<EntityDefinition>();
+		List<NodeDefinition> childDefinitions = rootEntityDefinition.getChildDefinitions();
+		for (NodeDefinition childDefinition : childDefinitions) {
+			if(childDefinition instanceof EntityDefinition) {
+				EntityDefinition entityDefinition = (EntityDefinition) childDefinition;
+				String annotation = childDefinition.getAnnotation(COUNT_ANNOTATION);
+				if(annotation != null && Boolean.parseBoolean(annotation)) {
+					result.add(entityDefinition);
+				}
+			}
+		}
+		return result;
 	}
 }

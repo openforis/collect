@@ -1,4 +1,4 @@
-package org.openforis.collect.persistence;
+package org.openforis.collect.persistence.jooq;
 
 import static org.openforis.collect.persistence.jooq.tables.Record.RECORD;
 import static org.openforis.collect.persistence.jooq.tables.User.USER;
@@ -13,13 +13,12 @@ import org.jooq.Record;
 import org.openforis.collect.model.RecordSummary;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
-
 /**
  * 
  * @author S. Ricci
  *
  */
-public class RecordDAOUtil {
+public class RecordSummaryParser {
 
 	private static final String USER_TABLE_CREATED_BY_ALIAS = "user_created_by";
 	private static final String USER_TABLE_MODIFIED_BY_ALIAS = "user_modified_by";
@@ -29,7 +28,7 @@ public class RecordDAOUtil {
 	/**
 	 * Parses the result of a select query into a list of RecordSummary objects
 	 */
-	public static List<RecordSummary> parseRecordSummariesSelectResult(List<Record> records, List<AttributeDefinition> keyAttributeDefinitions, List<EntityDefinition> countEntityDefinitions) {
+	public static List<RecordSummary> parseSelectResult(List<Record> records, List<AttributeDefinition> keyAttributeDefinitions, List<EntityDefinition> countEntityDefinitions) {
 		List<RecordSummary> summaries = new ArrayList<RecordSummary>();
 		for (Record r : records) {
 			Integer id = r.getValueAsInteger(RECORD.ID);
@@ -63,4 +62,5 @@ public class RecordDAOUtil {
 		}
 		return summaries;
 	}
+	
 }

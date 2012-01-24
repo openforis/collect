@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<detail:AttributeFormItem xmlns:fx="http://ns.adobe.com/mxml/2009" 
+						  xmlns:s="library://ns.adobe.com/flex/spark" 
+						  xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:detail="org.openforis.collect.ui.component.detail.*" xmlns:input="org.openforis.collect.ui.component.input.*">
+	<fx:Script>
+		<![CDATA[
+			import org.openforis.collect.i18n.Message;
+		]]>
+	</fx:Script>
+	
+	
+	<s:FormItem label="{Message.get('edit.coordinate.srs')}">
+		<s:DropDownList id="srsDropDown" width="150" />
+	</s:FormItem>
+	<s:FormItem label="{Message.get('edit.coordinate.x')}">
+		<input:NumericInputField id="xInputField" />
+	</s:FormItem>
+	<s:FormItem label="{Message.get('edit.coordinate.y')}">
+		<input:NumericInputField id="yInputFiedl" />
+	</s:FormItem>
+	
+</detail:AttributeFormItem>

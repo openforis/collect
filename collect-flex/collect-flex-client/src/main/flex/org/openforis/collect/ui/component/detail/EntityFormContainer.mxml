@@ -2,31 +2,71 @@
 <s:NavigatorContent xmlns:fx="http://ns.adobe.com/mxml/2009" 
 					xmlns:s="library://ns.adobe.com/flex/spark" 
 					xmlns:mx="library://ns.adobe.com/flex/mx" 
-					width="100%" height="100%">
+					width="100%" height="100%"
+					
+					creationPolicy="all"
+					label="{entityDefinitionProxy.getLabelText()}">
+	
+	<s:layout>
+		<s:VerticalLayout gap="15" />
+	</s:layout>
 	
 	<fx:Script>
 		<![CDATA[
+			import mx.core.IVisualElement;
+			import mx.events.FlexEvent;
+			
+			import org.openforis.collect.i18n.Message;
+			import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 			import org.openforis.collect.model.proxy.EntityProxy;
 			import org.openforis.collect.ui.Images;
 			import org.openforis.collect.ui.component.input.InputField;
 			
 			import spark.components.FormItem;
-			private var _parentEntity:EntityProxy;			
-
+		
+			private var _parentEntity:EntityProxy;
+			private var _entityDefinitionProxy:EntityDefinitionProxy;
+			
+			
 			[Bindable]
 			public function get parentEntity():EntityProxy {
 				return _parentEntity;
 			}
 
+			override protected function createChildren():void {
+				super.createChildren();
+				addElement(container);
+				if(entityDefinitionProxy.multiple) {
+					borderContainer.addElementAt(addSection, 0);
+				}	
+				//borderContainer.addElement(form);
+				/* if(!borderContainer.initialized){
+					borderContainer.initialize();
+				} */
+			}
+			
 			public function set parentEntity(value:EntityProxy):void {
 				_parentEntity = value;
 			}
 
-			public function addFormItem(label:String, inputField:InputField):void {
+			public function addItem(collectFormItem:CollectFormItem):void {
+				collectFormItem.add(form);
+			}
+			
+			public function addFormItem(attributeFormItem:AttributeFormItem):void {
 				var formItem:FormItem = new FormItem();
-				formItem.label = label;
-				formItem.addElement(inputField);
+				formItem.label = attributeFormItem.attributeDefinition.getLabelText();
+				//formItem.addElement(component);
+				formItem.addElement(attributeFormItem);
 				form.addElement(formItem);
+			}
+			
+			public function addEntityFormItem(entityFormItem:EntityFormItem):void {
+				var formItem:FormItem = new FormItem();
+				formItem.label = entityFormItem.entityDefinition.getLabelText();
+				form.addElement(formItem);
+				
+				form.addElement(entityFormItem);
 			}
 			
 			public function insertAddSection():void {
@@ -37,41 +77,46 @@
 				
 			}
 
+			[Bindable]
+			public function get entityDefinitionProxy():EntityDefinitionProxy {
+				return _entityDefinitionProxy;
+			}
+
+			public function set entityDefinitionProxy(value:EntityDefinitionProxy):void {
+				_entityDefinitionProxy = value;
+			}
+
 		]]>
 	</fx:Script>
 	<fx:Declarations>
 		<s:Group width="100%" id="addSection">
 			<s:layout>
-				<s:VerticalLayout>
-					<s:horizontalAlign>left</s:horizontalAlign>
-					<s:paddingRight>10</s:paddingRight>
-					<s:paddingLeft>10</s:paddingLeft>
-				</s:VerticalLayout>
+				<s:HorizontalLayout paddingTop="5" horizontalAlign="left" paddingLeft="10" gap="12" verticalAlign="middle" />
 			</s:layout>
-			<mx:LinkButton icon="{Images.ADD}" labelPlacement="left" 
-						   label="Add" useHandCursor="true" buttonMode="true" 
-						   id="addRecordButton"
-						   click="addRecordButtonClickHandler(event)" />
+			<s:Label text="{entityDefinitionProxy.getLabelText()}" styleName="bold" />
+			<s:DropDownList prompt="{Message.get('global.dropDownPrompt')}" width="150" id="dropDownList" />
+			<s:Button styleName="addButton" buttonMode="true" useHandCursor="true" />
+			<s:Button styleName="deleteButton" buttonMode="true" useHandCursor="true" />
 		</s:Group>
+		
+		<s:VGroup id="container" width="100%" height="100%" gap="10">
+			<s:BorderContainer borderColor="#CCCCCC" borderAlpha="0.8" borderStyle="solid" borderWeight="1" width="100%" height="100%" id="borderContainer">
+				<s:layout>
+					<s:VerticalLayout/>
+				</s:layout>
+				<s:Scroller height="100%" width="100%" visible="true">
+					<s:Group width="100%" id="group">
+						<s:Form height="100%" width="100%" id="form">
+							<s:layout>
+								<s:FormLayout gap="-15" paddingLeft="0" />
+							</s:layout>
+						</s:Form>
+					</s:Group>
+				</s:Scroller>
+			</s:BorderContainer>
+		</s:VGroup>
+		
 	</fx:Declarations>
 	
-	<s:VGroup id="container" width="100%" height="100%" gap="10">
-		
-		<s:Scroller height="100%" width="100%">
-			<s:Group height="100%" width="100%">
-				<s:BorderContainer borderColor="#CCCCCC" borderAlpha="0.8" borderStyle="solid" borderWeight="1" width="100%" height="100%">
-					<s:Form height="100%" width="100%" id="form">
-						<s:layout>
-							<s:FormLayout gap="-10" paddingLeft="0" />
-						</s:layout>
-						
-						<s:FormItem label="Test">
-							<s:TextInput width="156"/>
-						</s:FormItem>
-					</s:Form>
-				</s:BorderContainer>
-			</s:Group>
-		</s:Scroller>
-	</s:VGroup>
 	
 </s:NavigatorContent>

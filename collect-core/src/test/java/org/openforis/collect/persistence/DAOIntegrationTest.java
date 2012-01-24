@@ -176,7 +176,7 @@ public class DAOIntegrationTest {
 		EntityDefinition rootEntity = survey.getSchema().getRootEntityDefinitions().get(0);
 		int offset = 0;
 		int maxNumberOfRecords = 1;
-		String orderByFieldName = "id";
+		String orderByFieldName = "key_id";
 		String filter = null;
 		List<EntityDefinition> countInSummaryListEntityDefinitions = new ArrayList<EntityDefinition>();
 		EntityDefinition plotEntity = (EntityDefinition) rootEntity.getChildDefinition("plot");

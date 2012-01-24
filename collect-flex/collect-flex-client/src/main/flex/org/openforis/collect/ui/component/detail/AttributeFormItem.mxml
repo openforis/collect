@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			xmlns:s="library://ns.adobe.com/flex/spark" 
+			xmlns:mx="library://ns.adobe.com/flex/mx"
+			width="100%"
+			implements="org.openforis.collect.ui.component.detail.CollectFormItem">
+	
+	<s:layout>
+		<s:VerticalLayout gap="8" />
+	</s:layout>
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.core.IVisualElementContainer;
+			
+			import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
+			
+			private var _attributeDefinition:AttributeDefinitionProxy;
+			private var _childrenAdded:Boolean = false;
+			
+			override protected function createChildren():void {
+				super.createChildren();
+				//this.label = attributeDefinition.getLabelText();
+			}
+			
+			[Bindable]
+			public function get attributeDefinition():AttributeDefinitionProxy {
+				return _attributeDefinition;
+			}
+			
+			public function set attributeDefinition(value:AttributeDefinitionProxy):void {
+				_attributeDefinition = value;
+			}
+			
+			internal function get childrenAdded():Boolean {
+				return _childrenAdded;
+			}
+			
+			internal function set childrenAdded(value:Boolean):void {
+				_childrenAdded = value;
+			}
+			
+			public function add(parent:IVisualElementContainer):void {
+				parent.addElement(this);
+			}
+		]]>
+	</fx:Script>
+	
+	
+	
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	
+	
+</s:Group>

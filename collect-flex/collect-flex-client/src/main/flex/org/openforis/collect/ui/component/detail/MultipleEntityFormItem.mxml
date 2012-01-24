@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<detail:EntityFormItem xmlns:fx="http://ns.adobe.com/mxml/2009"
+					   xmlns:s="library://ns.adobe.com/flex/spark"
+					   xmlns:mx="library://ns.adobe.com/flex/mx"
+					   xmlns:datagroup="org.openforis.collect.ui.component.datagroup.*"
+					   xmlns:detail="org.openforis.collect.ui.component.detail.*"
+					   
+					   >
+	
+	<detail:layout>
+		<s:VerticalLayout paddingLeft="30" paddingTop="15" />
+	</detail:layout>
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.collections.ArrayCollection;
+			import mx.collections.ListCollectionView;
+			import mx.core.IVisualElement;
+			
+			import org.openforis.collect.Application;
+			import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
+			import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
+			import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
+			import org.openforis.collect.ui.Images;
+			import org.openforis.collect.ui.UIBuilder;
+			import org.openforis.collect.util.UIUtil;
+			
+			import spark.components.HGroup;
+
+			override protected function createChildren():void {
+				if(!childrenAdded) {
+					super.createChildren();
+					
+					var headers:HGroup = UIBuilder.buildDataGroupHeaders(this.entityDefinition);					
+					
+					addElement(headers);
+					addElement(dataGroup);
+					addElement(addButton);
+					
+					//TEST FORM
+					var c:ArrayCollection = new ArrayCollection();
+					c.addItem(new Object());
+					dataGroup.dataProvider = c;
+					super.childrenAdded = true;
+				}
+			}
+			
+			protected function addClickHandler(event:MouseEvent):void {
+				
+			}
+		
+		]]>
+	</fx:Script>
+	
+	<fx:Declarations>
+		<s:DataGroup width="100%" id="dataGroup">
+			<s:itemRenderer>
+				<fx:Component>
+					<s:ItemRenderer>
+						<s:layout>
+							<s:HorizontalLayout gap="2"/>
+						</s:layout>
+						<fx:Script>
+							<![CDATA[
+								import mx.collections.ListCollectionView;
+								
+								import org.openforis.collect.Application;
+								import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
+								import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
+								import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
+								import org.openforis.collect.ui.UIBuilder;
+								import org.openforis.collect.ui.component.input.InputField;
+								
+								override public function set data(value:Object):void {
+									super.data = value;
+								}
+								
+								override protected function createChildren():void {
+									var childDefinitions:ListCollectionView = outerDocument.entityDefinition.childDefinitions;
+									for each (var def:NodeDefinitionProxy in childDefinitions) {
+										if(UIBuilder.isInVersion(outerDocument.entityDefinition, Application.activeRecord.version)) {
+											if(def is AttributeDefinitionProxy) {
+												//var attrFormItem:AttributeFormItem = UIBuilder.getAttributeFormItem(AttributeDefinitionProxy(def) );
+												var inputField:InputField = UIBuilder.getInputField(def as AttributeDefinitionProxy, true);
+												addElement(inputField);
+											} else if(def is EntityDefinitionProxy) {
+												var entityDefinitionProxy:EntityDefinitionProxy = EntityDefinitionProxy(def);
+												/* 											var entityFormItem:EntityFormItem = UIBuilder.getEntityFormItem(); */
+												if(entityDefinitionProxy.multiple) {
+													//TODO
+												} else {
+													//TODO
+												}
+												
+											}
+										}
+										
+									}
+								}
+							]]>
+						</fx:Script>
+					</s:ItemRenderer>
+				</fx:Component>
+			</s:itemRenderer>
+		</s:DataGroup>
+		
+		<mx:LinkButton
+					id="addButton"
+					label="Add" 
+					buttonMode="true" 
+					click="addClickHandler(event)" 
+					focusIn="UIUtil.ensureElementIsVisible(event.target as IVisualElement)"
+					icon="{Images.ADD}" 
+					labelPlacement="left" 
+					useHandCursor="true"
+					/>
+	</fx:Declarations>
+	
+	
+	<!--<datagroup:DataGroupHeader id="dataGroupHeader" />-->
+	
+	<!--<datagroup:DataGroup id="dataGroup" />-->
+	
+	
+	
+</detail:EntityFormItem>

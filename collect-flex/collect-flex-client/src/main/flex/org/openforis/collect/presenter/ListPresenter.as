@@ -7,13 +7,9 @@ package org.openforis.collect.presenter {
 	import flash.events.Event;
 	import flash.events.MouseEvent;
 	
-	import mx.collections.ArrayList;
 	import mx.collections.IList;
 	import mx.collections.ListCollectionView;
-	import mx.controls.List;
-	import mx.core.ClassFactory;
 	import mx.core.FlexGlobals;
-	import mx.events.StateChangeEvent;
 	import mx.managers.PopUpManager;
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.events.ResultEvent;
@@ -22,22 +18,16 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.client.DataClient;
 	import org.openforis.collect.event.UIEvent;
-	import org.openforis.collect.i18n.Message;
-	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
-	import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
-	import org.openforis.collect.metamodel.proxy.NodeLabelProxy;
+	import org.openforis.collect.model.RecordSummary;
 	import org.openforis.collect.ui.UIBuilder;
-	import org.openforis.collect.ui.component.AddNewRecordPopUp;
+	import org.openforis.collect.ui.component.AddRecordPopUp;
 	import org.openforis.collect.ui.component.datagrid.PaginationBar;
-	import org.openforis.collect.ui.component.datagrid.SelectRecordColumnHeaderRenderer;
-	import org.openforis.collect.ui.component.datagrid.SelectRecordColumnItemRenderer;
 	import org.openforis.collect.ui.view.ListView;
+	import org.openforis.collect.util.AlertUtil;
 	
 	import spark.collections.SortField;
-	import spark.components.gridClasses.GridColumn;
 	import spark.events.GridSortEvent;
-	import spark.formatters.DateTimeFormatter;
 
 
 	public class ListPresenter extends AbstractPresenter {
@@ -45,7 +35,7 @@ package org.openforis.collect.presenter {
 		private var _view:ListView;
 		private var _dataClient:DataClient;
 		
-		private var _newRecordPopUp:AddNewRecordPopUp;
+		private var _addRecordPopUp:AddRecordPopUp;
 		
 		/**
 		 * The total number of records.
@@ -81,7 +71,9 @@ package org.openforis.collect.presenter {
 		override internal function initEventListeners():void {
 			eventDispatcher.addEventListener(UIEvent.LOAD_RECORD_SUMMARIES, loadRecordSummariesHandler);
 
-			this._view.newRecordButton.addEventListener(MouseEvent.CLICK, newRecordButtonClickHandler);
+			this._view.addButton.addEventListener(MouseEvent.CLICK, addButtonClickHandler);
+			this._view.editButton.addEventListener(MouseEvent.CLICK, editButtonClickHandler);
+			this._view.deleteButton.addEventListener(MouseEvent.CLICK, deleteButtonClickHandler);
 			
 			this._view.dataGrid.addEventListener(GridSortEvent.SORT_CHANGING, dataGridSortChangingHandler);
 			
@@ -96,13 +88,42 @@ package org.openforis.collect.presenter {
 		/**
 		 * New Record Button clicked 
 		 * */
-		protected function newRecordButtonClickHandler(event:MouseEvent):void {
-			if(_newRecordPopUp == null) {
-				_newRecordPopUp = new AddNewRecordPopUp();
-				
+		protected function addButtonClickHandler(event:MouseEvent):void {
+			if(_addRecordPopUp == null) {
+				_addRecordPopUp = new AddRecordPopUp();
 			}
-			PopUpManager.addPopUp(_newRecordPopUp, FlexGlobals.topLevelApplication as DisplayObject, true);
-			PopUpManager.centerPopUp(_newRecordPopUp);
+			PopUpManager.addPopUp(_addRecordPopUp, FlexGlobals.topLevelApplication as DisplayObject, true);
+			PopUpManager.centerPopUp(_addRecordPopUp);
+		}
+		
+		/**
+		 * Edit Button clicked 
+		 * */
+		protected function editButtonClickHandler(event:MouseEvent):void {
+			var selectedRecord:RecordSummary = _view.dataGrid.selectedItem as RecordSummary;
+			if(selectedRecord != null) {
+				var uiEvent:UIEvent = new UIEvent(UIEvent.RECORD_SELECTED);
+				uiEvent.obj = selectedRecord;
+				eventDispatcher.dispatchEvent(uiEvent);
+			} else {
+				AlertUtil.showError("list.error.recordNotSelected");
+			}
+		}
+		
+		/**
+		 * Delete Button clicked 
+		 * */
+		protected function deleteButtonClickHandler(event:MouseEvent):void {
+			var selectedRecord:RecordSummary = _view.dataGrid.selectedItem as RecordSummary;
+			if(selectedRecord != null) {
+				AlertUtil.showConfirm("list.delete.confirm", "list.delete.confirmTitle", executeDelete);
+				
+				function executeDelete():void {
+					_dataClient.deleteRecord(new AsyncResponder(deleteRecordResultHandler, faultHandler), selectedRecord.id);
+				}
+			} else {
+				AlertUtil.showError("list.error.recordNotSelected");
+			}
 		}
 		
 		/**
@@ -122,7 +143,8 @@ package org.openforis.collect.presenter {
 		
 		protected function loadRecordSummariesCurrentPage():void {
 			_view.paginationBar.currentPageText.text = new String(currentPage);
-			_view.paginationBar.currentState = PaginationBar.LOADING_STATE;
+			
+			_view.currentState = ListView.INACTIVE_STATE;
 			
 			//offset starts from 0
 			var offset:int = (currentPage - 1) * MAX_RECORDS_PER_PAGE;
@@ -138,10 +160,16 @@ package org.openforis.collect.presenter {
 			totalPages = Math.ceil(totalRecords / MAX_RECORDS_PER_PAGE);
 			
 			_view.dataGrid.dataProvider = records;
+			
+			_view.currentState = ListView.DEFAULT_STATE;
 
 			updatePaginationBar();
 		}
 		
+		protected function deleteRecordResultHandler(event:ResultEvent, token:Object = null):void {
+			loadRecordSummariesCurrentPage();
+		}
+
 		protected function updatePaginationBar():void {
 			var recordsFromPosition:int = ((currentPage - 1) * MAX_RECORDS_PER_PAGE) + 1;
 			var recordsToPosition:int = recordsFromPosition + _view.dataGrid.dataProvider.length - 1;

@@ -4,7 +4,6 @@ package org.openforis.collect.presenter.input {
 	
 	import mx.events.DropdownEvent;
 	
-	import org.openforis.collect.idm.model.impl.AbstractValue;
 	import org.openforis.collect.presenter.InputFieldPresenter;
 	import org.openforis.collect.ui.component.input.CoordinateInputField;
 	import org.openforis.collect.ui.component.input.InputField;
@@ -38,7 +37,7 @@ package org.openforis.collect.presenter.input {
 			}
 		}
 		
-		override public function set value(value:AbstractValue):void {
+		override public function set value(value:*):void {
 			_attributeValue = value;
 			//this._inputField.attribute = attribute;
 			this._coordinateInputField.srsDropDown.selectedItem = value.text1;
@@ -48,8 +47,8 @@ package org.openforis.collect.presenter.input {
 			this._inputField.approved = value.approved;
 		}
 		
-		override public function createValue():AbstractValue {
-			var newAttributeValue:AbstractValue = new AbstractValue();
+		override public function createValue():* {
+			var newAttributeValue:Object = new Object();
 			newAttributeValue.text1 = srsDropDownLabelFunction(_coordinateInputField.srsDropDown.selectedItem);
 			newAttributeValue.text2 = _coordinateInputField.xTextInput.text;
 			newAttributeValue.text3 = _coordinateInputField.yTextInput.text;

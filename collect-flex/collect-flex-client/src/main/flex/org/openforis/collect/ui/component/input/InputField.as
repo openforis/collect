@@ -51,8 +51,9 @@ package org.openforis.collect.ui.component.input {
 		}
 		
 		protected function initializePresenter():void {
-			if(_presenterFactory == null)
+			if(_presenterFactory == null) {
 				_presenterFactory = new ClassFactory(InputFieldPresenter);
+			}
 			
 			if(this._presenter == null) {
 				this._presenter = _presenterFactory.newInstance() as InputFieldPresenter;

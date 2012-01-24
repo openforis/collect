@@ -16,6 +16,7 @@
 			import org.openforis.collect.presenter.ListPresenter;
 			
 			public static const DEFAULT_STATE:String = "default";
+			public static const INACTIVE_STATE:String = "inactive";
 			public static const SELECTION_STATE:String = "selection";
 			
 			private var _presenter:ListPresenter;
@@ -39,15 +40,23 @@
 	
 	<s:states>
 		<s:State name="default" />
+		<s:State name="inactive" />
 		<s:State name="selection" />
 	</s:states>
 	
 	<datagrid:RecordSummaryDataGrid id="dataGrid" width="100%" horizontalScrollPolicy="off" selectionMode="singleRow" doubleClickEnabled="true" verticalScrollPolicy="off" />
 	
-	<datagrid:PaginationBar id="paginationBar" height="16" />
+	<datagrid:PaginationBar id="paginationBar" height="16" currentState.inactive="{PaginationBar.LOADING_STATE}" />
 	
 	<s:HGroup id="controlsBar" width="100%" horizontalAlign="center" verticalAlign="bottom" height="30">
-		<s:Button id="newRecordButton" label="{Message.get('list.newRecord')}" />
-		<s:Button id="editRecordButton" label="{Message.get('list.editRecord')}" />
+		<s:Button id="addButton" label="{Message.get('list.add')}" 
+				  useHandCursor="true" buttonMode="true" 
+				  enabled.inactive="false" />
+		<s:Button id="editButton" label="{Message.get('list.edit')}" 
+				  useHandCursor="true" buttonMode="true" 
+				  enabled.inactive="false" />
+		<s:Button id="deleteButton" label="{Message.get('list.delete')}" 
+				  useHandCursor="true" buttonMode="true" 
+				  enabled.inactive="false" />
 	</s:HGroup>
 </s:Group>

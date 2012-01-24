@@ -126,7 +126,11 @@ package org.openforis.collect.presenter {
 		}
 		
 		internal function sendKeepAliveMessage(event:TimerEvent):void {
-			this._sessionClient.keepAlive(new ItemResponder(keepAliveResult, faultHandler));
+			if(! Application.serverOffline) {
+				this._sessionClient.keepAlive(new ItemResponder(keepAliveResult, faultHandler));
+			} else {
+				_keepAliveTimer.stop();
+			}
 		}
 		
 		internal function keepAliveResult(event:ResultEvent, token:Object = null):void {

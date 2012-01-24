@@ -1,6 +1,7 @@
 <survey 
      xmlns="http://www.openforis.org/idml/3.0"
      xmlns:ui="http://www.openforis.org/collect/3.0/ui"
+     xmlns:collect="http://www.openforis.org/collect/3.0/collect"
      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
      xsi:schemaLocation="
                          http://www.openforis.org/idml/3.0 https://raw.github.com/openforis/idm/reengineering/idm-api/src/main/resources/idml3.xsd">
@@ -3154,7 +3155,7 @@
             <text type="memo" name="remarks">
                 <label>Remarks</label>
             </text>
-            <entity name="plot" multiple="true" ui:tab="plot" ui:countInSummaryList="true">
+            <entity name="plot" multiple="true" ui:tab="plot" collect:count="true">
                 <label>Plot</label>
                 <code name="no" list="sampling_design" parent="parent()/id" ui:tab="plot_det" strict="false" key="true">
                     <label>No.</label>

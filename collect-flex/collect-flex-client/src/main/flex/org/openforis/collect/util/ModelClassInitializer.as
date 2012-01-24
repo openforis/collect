@@ -25,6 +25,7 @@ package org.openforis.collect.util {
 	import org.openforis.collect.metamodel.proxy.PrecisionProxy;
 	import org.openforis.collect.metamodel.proxy.PromptProxy;
 	import org.openforis.collect.metamodel.proxy.PromptProxy$Type;
+	import org.openforis.collect.metamodel.proxy.RangeAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.SchemaProxy;
 	import org.openforis.collect.metamodel.proxy.SpatialReferenceSystemProxy;
 	import org.openforis.collect.metamodel.proxy.SurveyProxy;
@@ -69,6 +70,7 @@ package org.openforis.collect.util {
 				PrecisionProxy,
 				PromptProxy,
 				PromptProxy$Type,
+				RangeAttributeDefinitionProxy,
 				RecordSummary,
 				SchemaProxy,
 				SpatialReferenceSystemProxy,

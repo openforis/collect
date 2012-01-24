@@ -3,6 +3,8 @@
  */
 package org.openforis.collect.remoting.service;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.granite.messaging.service.DefaultServiceExceptionHandler;
 import org.granite.messaging.service.ServiceException;
 import org.granite.messaging.service.ServiceInvocationContext;
@@ -13,9 +15,8 @@ import org.granite.messaging.service.ServiceInvocationContext;
  */
 public class ServiceExceptionHandler extends DefaultServiceExceptionHandler  {
 
-	/**
-	 * 
-	 */
+	private static Log LOG = LogFactory.getLog(ServiceExceptionHandler.class);
+	
 	private static final long serialVersionUID = 1L;
 
 	/**
@@ -25,6 +26,9 @@ public class ServiceExceptionHandler extends DefaultServiceExceptionHandler  {
 	 */
 	@Override
 	public ServiceException handleInvocationException(ServiceInvocationContext serviceInvocationContext, Throwable cause) {
+		if(LOG.isErrorEnabled()){
+			LOG.error("Error while communicating with collect server",cause);
+		}
 		String code = cause.getClass().getName();
 		String message = cause.getMessage();
 		String detail = null;

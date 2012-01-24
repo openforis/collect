@@ -20,6 +20,7 @@ import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.FileAttributeDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NumericAttributeDefinition;
+import org.openforis.idm.metamodel.RangeAttributeDefinition;
 import org.openforis.idm.metamodel.TaxonAttributeDefinition;
 import org.openforis.idm.metamodel.TextAttributeDefinition;
 import org.openforis.idm.metamodel.TimeAttributeDefinition;
@@ -55,6 +56,8 @@ public class NodeDefinitionProxy implements Proxy {
 						p = new FileAttributeDefinitionProxy((FileAttributeDefinition) n);
 					} else if(n instanceof NumericAttributeDefinition) {
 						p = new NumericAttributeDefinitionProxy((NumericAttributeDefinition) n);
+					} else if(n instanceof RangeAttributeDefinition) {
+						p = new RangeAttributeDefinitionProxy((RangeAttributeDefinition) n);
 					} else if(n instanceof TaxonAttributeDefinition) {
 						p = new TaxonAttributeDefinitionProxy((TaxonAttributeDefinition) n);
 					} else if(n instanceof TextAttributeDefinition) {
@@ -62,7 +65,7 @@ public class NodeDefinitionProxy implements Proxy {
 					} else if(n instanceof TimeAttributeDefinition) {
 						p = new TimeAttributeDefinitionProxy((TimeAttributeDefinition) n);
 					} else {
-						throw new RuntimeException("AttributeDefinition not supported: " + p.getClass().getSimpleName());
+						throw new RuntimeException("AttributeDefinition not supported: " + n.getClass().getSimpleName());
 					}
 				} else if (n instanceof EntityDefinition) {
 					p = new EntityDefinitionProxy((EntityDefinition) n);

@@ -82,6 +82,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		internal function clearActiveRecordHandler(event:ResultEvent, token:Object = null):void {
+			Application.activeRecord = null;
 			var uiEvent:UIEvent = new UIEvent(UIEvent.BACK_TO_LIST);
 			eventDispatcher.dispatchEvent(uiEvent);
 		}

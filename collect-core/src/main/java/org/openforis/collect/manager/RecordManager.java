@@ -3,10 +3,11 @@
  */
 package org.openforis.collect.manager;
 
+import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import org.openforis.collect.model.CollectRecord;
+import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.RecordSummary;
 import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.AccessDeniedException;
@@ -24,7 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author M. Togna
- * 
+ * @author S. Ricci
  */
 public class RecordManager {
 
@@ -36,47 +37,31 @@ public class RecordManager {
 	}
 
 	@Transactional
-	public Record create(Survey survey, String entityName) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Transactional
-	public Record load(String entityName, long id) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Transactional
 	public void save(Record record) {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Transactional
-	public void delete(String entityName, long id) {
-		// TODO Auto-generated method stub
-
+	public void delete(int recordId, User user) throws RecordLockedException, AccessDeniedException, MultipleEditException {
+		recordDAO.lock(recordId, user);
+		recordDAO.delete(recordId);
 	}
 
 	/**
 	 * Returns a record and lock it
 	 * 
-	 * @param entityName
-	 * @param id
+	 * @param survey
+	 * @param user
+	 * @param recordId
 	 * @return
+	 * @throws MultipleEditException 
 	 */
 	@Transactional
-	public CollectRecord checkout(Survey survey, User user, int recordId) throws RecordLockedException, NonexistentIdException, AccessDeniedException {
+	public CollectRecord checkout(Survey survey, User user, int recordId) throws RecordLockedException, NonexistentIdException, AccessDeniedException, MultipleEditException {
 		CollectRecord record = recordDAO.load(survey, recordId);
 		recordDAO.lock(recordId, user);
 		return record;
-	}
-
-	@Transactional
-	public List<RecordSummary> getSummaries() {
-		// TODO implement getRecordSummaries
-		return null;
 	}
 
 	@Transactional
@@ -92,10 +77,17 @@ public class RecordManager {
 	}
 
 	@Transactional
-	public Record create(Map<String, Object> keyMap, Survey survey, int rootEntityId, String modelVersionName) throws MultipleEditException, DuplicateIdException, InvalidIdException, DuplicateIdException, AccessDeniedException,
-			RecordLockedException {
-		// TODO
-		return null;
+	public CollectRecord create(Survey survey, EntityDefinition rootEntityDefinition, User user, String modelVersionName) throws MultipleEditException, AccessDeniedException, RecordLockedException {
+		recordDAO.checkLock(user);
+		
+		CollectRecord record = new CollectRecord(survey, rootEntityDefinition.getName(), modelVersionName);
+		record.setCreationDate(new Date());
+		//record.setCreatedBy(user.getId());
+		record.setStep(Step.ENTRY);
+		recordDAO.saveOrUpdate(record);
+		Integer recordId = record.getId();
+		recordDAO.lock(recordId, user);
+		return record;
 	}
 
 	@Transactional

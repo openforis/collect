@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<detail:AttributeFormItem xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx"
+		 xmlns:detail="org.openforis.collect.ui.component.detail.*"
+		 xmlns:input="org.openforis.collect.ui.component.input.*" >
+
+	<detail:layout>
+		<s:VerticalLayout gap="-5" />
+	</detail:layout>
+	
+	<fx:Script>
+		<![CDATA[
+			
+			import org.openforis.collect.i18n.Message;
+			import org.openforis.collect.ui.Images;
+			import org.openforis.collect.ui.component.input.InputField;
+			
+			protected function addButtonClickHandler(event:MouseEvent):void {
+				//TODO
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<s:DataGroup id="dataGroup">
+		<s:itemRenderer>
+			<fx:Component>
+				<s:Group>
+					<fx:Script>
+						<![CDATA[
+							import org.openforis.collect.ui.component.input.InputField;
+							import org.openforis.collect.ui.UIBuilder;
+							
+							override protected function createChildren():void {
+								super.createChildren();
+								var inputField:InputField = UIBuilder.getInputField(outerDocument.attributeDefinition);
+								addElement(inputField);
+							}
+						]]>
+					</fx:Script>
+				</s:Group>
+			</fx:Component>
+		</s:itemRenderer>
+	</s:DataGroup>
+	
+	<s:Button 
+				icon="{Images.ADD}" 
+				label="{Message.get('global.add')}" 
+			  	id="addButton" click="addButtonClickHandler(event)" 
+				height="24"  
+				useHandCursor="true"
+				buttonMode="true"
+				styleName="roundCorners"
+				/>
+	
+	<!--<mx:LinkButton 
+			icon="{Images.ADD}" 
+			width="16" 
+			height="16" 
+			styleName="roundCorners" 
+			useHandCursor="true" 
+			buttonMode="true" 
+			label="{Message.get('global.add')}" />
+	-->
+	
+</detail:AttributeFormItem>

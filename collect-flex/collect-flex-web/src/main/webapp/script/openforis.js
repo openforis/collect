@@ -2,11 +2,11 @@
  * @author S. Ricci
  */
 var OPENFORIS = {
-	LEAVING_PAGE_MESSAGE: "If you leave this page without saving, all changes will be lost.",
+	CLEAR_ACTIVE_RECORD_PATH: "clearActiveRecord.htm",
 	
 	FLASH_OBJECT_ID: "collect",
 			
-	isEditingItem: false,
+	isEditingRecord: false,
 	
 	init: function() {
 		//init beforeunload and unload event listeners
@@ -29,19 +29,20 @@ var OPENFORIS = {
 	onBeforeUnloadFun: function() {
 		//if there is an item being edited, show a confirm before exiting page
 		var mainApp = OPENFORIS.getFlexApp();
-		OPENFORIS.isEditingItem = mainApp != null && mainApp.isEditingItem();
-		if(OPENFORIS.isEditingItem) {
-			return OPENFORIS.LEAVING_PAGE_MESSAGE;
+		var leavingPageMessage = mainApp.getLeavingPageMessage();
+		OPENFORIS.isEditingRecord = mainApp != null && mainApp.isEditingRecord();
+		if(OPENFORIS.isEditingRecord) {
+			return leavingPageMessage;
 		}
 	},
 	
 	onUnloadFun: function() {
 		//unlock current item being edited (if any)
-		if(OPENFORIS.isEditingItem) {
+		if(OPENFORIS.isEditingRecord) {
 			$.ajax({
 			  async: false,
 			  type: "POST",
-			  url: "unlockItem",
+			  url: OPENFORIS.CLEAR_ACTIVE_RECORD_PATH,
 			  success: function(){
 				//do nothing
 			  }

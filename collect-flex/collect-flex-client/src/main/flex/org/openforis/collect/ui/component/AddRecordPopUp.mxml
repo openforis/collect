@@ -3,7 +3,6 @@
 			   xmlns:s="library://ns.adobe.com/flex/spark" 
 			   xmlns:mx="library://ns.adobe.com/flex/mx"
 			   creationPolicy="all"
-			   title="{Message.get('list.newRecordPopUp.title')}"
 			   creationComplete="creationCompleteHandler(event)"
 			   >
 	<fx:Script>
@@ -11,14 +10,13 @@
 			import mx.events.FlexEvent;
 			
 			import org.openforis.collect.i18n.Message;
-			import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 			import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
-			import org.openforis.collect.presenter.AddNewRecordPopUpPresenter;
+			import org.openforis.collect.presenter.AddRecordPopUpPresenter;
 			
-			private var _presenter:AddNewRecordPopUpPresenter;
+			private var _presenter:AddRecordPopUpPresenter;
 			
 			protected function creationCompleteHandler(event:FlexEvent):void {
-				_presenter = new AddNewRecordPopUpPresenter(this);
+				_presenter = new AddRecordPopUpPresenter(this);
 			}
 			
 			protected function versionLabelFunction(item:ModelVersionProxy):String {
@@ -33,24 +31,6 @@
 			<s:layout>
 				<s:VerticalLayout />
 			</s:layout>
-			
-			<s:DataGroup id="keyDataGroup">
-				<s:itemRenderer>
-					<fx:Component>
-						<s:ItemRenderer autoDrawBackground="false">
-							<fx:Script>
-								<![CDATA[
-									import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
-								]]>
-							</fx:Script>
-							<s:FormItem label="{(data as AttributeDefinitionProxy).getLabelText()}" width="150">
-								<s:TextInput id="keyTextInput" width="100" />
-							</s:FormItem>
-						</s:ItemRenderer>
-					</fx:Component>
-				</s:itemRenderer>
-			</s:DataGroup>
-			
 			<s:FormItem label="{Message.get('list.newRecordPopUp.version')}">
 				<s:DropDownList id="versionsDropDownList" 
 								labelFunction="versionLabelFunction"

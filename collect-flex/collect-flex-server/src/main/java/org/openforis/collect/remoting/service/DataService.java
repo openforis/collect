@@ -24,7 +24,7 @@ import org.openforis.collect.persistence.NonexistentIdException;
 import org.openforis.collect.persistence.RecordLockedException;
 import org.openforis.collect.remoting.service.UpdateRequest.Method;
 import org.openforis.collect.session.SessionState;
-import org.openforis.idm.metamodel.AttributeDefinition;
+import org.openforis.collect.session.SessionState.RecordState;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
@@ -44,7 +44,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author M. Togna
  */
 public class DataService {
-	private static final QName COUNT_IN_SUMMARY_LIST_ANNOTATION = new QName("http://www.openforis.org/collect/3.0/ui", "countInSummaryList");
+	private static final QName COUNT_ANNOTATION = new QName("http://www.openforis.org/collect/3.0/collect", "count");
 
 	@Autowired
 	private SessionManager sessionManager;
@@ -57,14 +57,10 @@ public class DataService {
 		Survey survey = getActiveSurvey();
 		User user = getUserInSession();
 		CollectRecord record = recordManager.checkout(survey, user, id);
-		sessionManager.setActiveRecord((CollectRecord) record);
+		SessionState sessionState = sessionManager.getSessionState();
+		sessionState.setActiveRecord((CollectRecord) record);
+		sessionState.setActiveRecordState(RecordState.SAVED);
 		return new RecordProxy(record);
-	}
-
-	@Transactional
-	public List<RecordSummary> getRecordSummaries() {
-		List<RecordSummary> list = recordManager.getSummaries();
-		return list;
 	}
 
 	/**
@@ -73,6 +69,7 @@ public class DataService {
 	 * @param offset
 	 * @param toIndex
 	 * @param orderByFieldName
+	 * @param filter
 	 * 
 	 * @return map with "count" and "records" items
 	 */
@@ -92,38 +89,43 @@ public class DataService {
 	}
 
 	@Transactional
-	public Record newRecord(Map<String, Object> keyMap, String rootEntityName, String versionName) throws MultipleEditException, DuplicateIdException, InvalidIdException, DuplicateIdException, AccessDeniedException,
-			RecordLockedException {
-		if(keyMap == null) {
-			throw new RuntimeException("Invalid parameters");
-		}
+	public RecordProxy createNewRecord(String rootEntityName, String versionName) throws MultipleEditException, AccessDeniedException, RecordLockedException {
 		SessionState sessionState = sessionManager.getSessionState();
+		User user = sessionState.getUser();
 		Survey activeSurvey = sessionState.getActiveSurvey();
 		ModelVersion version = activeSurvey.getVersion(versionName);
 		Schema schema = activeSurvey.getSchema();
 		EntityDefinition rootEntityDefinition = schema.getRootEntityDefinition(rootEntityName);
-		List<AttributeDefinition> keyAttributeDefinitions = rootEntityDefinition.getKeyAttributeDefinitions();
-		//validate key map: there must be a value for each key attribute definition
-		for (AttributeDefinition keyAttributeDef: keyAttributeDefinitions) {
-			if(! keyMap.containsKey(keyAttributeDef.getName())) {
-				throw new RuntimeException("Invalid parameters");
-			}
-		}
-		Record record = recordManager.create(keyMap, activeSurvey, rootEntityDefinition.getId(), version.getName());
-		return record;
+		CollectRecord record = recordManager.create(activeSurvey, rootEntityDefinition, user, version.getName());
+		sessionState.setActiveRecord((CollectRecord) record);
+		sessionState.setActiveRecordState(RecordState.NEW);
+		RecordProxy recordProxy = new RecordProxy(record);
+		return recordProxy;
 	}
-
+	
+	@Transactional
+	public void deleteRecord(int id) throws RecordLockedException, AccessDeniedException, MultipleEditException {
+		SessionState sessionState = sessionManager.getSessionState();
+		User user = sessionState.getUser();
+		recordManager.delete(id, user);
+		sessionManager.clearActiveRecord();
+	}
+	
 	@Transactional
 	public void saveActiveRecord() {
-		Record record = this.sessionManager.getSessionState().getActiveRecord();
+		SessionState sessionState = sessionManager.getSessionState();
+		Record record = sessionState.getActiveRecord();
 		recordManager.save(record);
+		sessionState.setActiveRecordState(RecordState.SAVED);
 	}
 
 	@Transactional
-	public void deleteActiveRecord() {
-		Record record = this.sessionManager.getSessionState().getActiveRecord();
-		recordManager.delete(record.getRootEntity().getName(), record.getId());
-		this.sessionManager.clearActiveRecord();
+	public void deleteActiveRecord() throws RecordLockedException, AccessDeniedException, MultipleEditException {
+		SessionState sessionState = sessionManager.getSessionState();
+		User user = sessionState.getUser();
+		Record record = sessionState.getActiveRecord();
+		recordManager.delete(record.getId(), user);
+		sessionManager.clearActiveRecord();
 	}
 
 	public void updateRootEntityKey(String recordId, String newRootEntityKey) throws DuplicateIdException, InvalidIdException, NonexistentIdException, AccessDeniedException, RecordLockedException {
@@ -165,11 +167,18 @@ public class DataService {
 	/**
 	 * remove the active record from the current session
 	 * @throws RecordLockedException 
+	 * @throws AccessDeniedException 
+	 * @throws MultipleEditException 
 	 */
-	public void clearActiveRecord() throws RecordLockedException {
+	public void clearActiveRecord() throws RecordLockedException, AccessDeniedException, MultipleEditException {
 		CollectRecord activeRecord = getActiveRecord();
 		User user = getUserInSession();
 		this.recordManager.unlock(activeRecord, user);
+		Integer recordId = activeRecord.getId();
+		SessionState sessionState = this.sessionManager.getSessionState();
+		if(RecordState.NEW == sessionState.getActiveRecordState()) {
+			this.recordManager.delete(recordId, user);
+		}
 		this.sessionManager.clearActiveRecord();
 	}
 
@@ -272,7 +281,7 @@ public class DataService {
 		for (NodeDefinition childDefinition : childDefinitions) {
 			if(childDefinition instanceof EntityDefinition) {
 				EntityDefinition entityDefinition = (EntityDefinition) childDefinition;
-				String annotation = childDefinition.getAnnotation(COUNT_IN_SUMMARY_LIST_ANNOTATION);
+				String annotation = childDefinition.getAnnotation(COUNT_ANNOTATION);
 				if(annotation != null && Boolean.parseBoolean(annotation)) {
 					result.add(entityDefinition);
 				}
