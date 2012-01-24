@@ -23,7 +23,7 @@ package org.openforis.collect.ui.component.detail {
 			_yInputField = createYInputField();
 		}
 		
-		override public function add(parent:IVisualElementContainer):void {
+		public function add(parent:IVisualElementContainer):void {
 			if(this._isInDataGroup) {
 				parent.addElement(_srsDropDownList);
 				parent.addElement(_xInputField);
