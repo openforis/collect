@@ -10,6 +10,7 @@ import org.jooq.Record;
 import org.jooq.SelectQuery;
 import org.jooq.impl.Factory;
 import org.openforis.collect.model.CollectRecord;
+import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.RecordSummary;
 import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.jooq.DataLoader;
@@ -173,7 +174,11 @@ public class RecordDAO extends CollectDAO {
 		// record.setCreatedBy(r.getValueAsString(RECORD.CREATED_BY));
 		record.setModifiedDate(r.getValueAsDate(RECORD.DATE_MODIFIED));
 		// record.setModifiedBy(r.getValueAsString(RECORD.MODIFIED_BY));
-
+		record.setMissing(r.getValueAsInteger(RECORD.MISSING));
+		record.setSkipped(r.getValueAsInteger(RECORD.SKIPPED));
+		record.setErrors(r.getValueAsInteger(RECORD.ERRORS));
+		record.setWarnings(r.getValueAsInteger(RECORD.WARNINGS));
+			
 		return record;
 	}
 
@@ -191,11 +196,20 @@ public class RecordDAO extends CollectDAO {
 		// Insert into SURVEY table
 		Factory jf = getJooqFactory();
 		int recordId = jf.nextval(RECORD_ID_SEQ).intValue();
-		jf.insertInto(RECORD).set(RECORD.ID, recordId).set(RECORD.ROOT_ENTITY_ID, rootEntityId).set(RECORD.DATE_CREATED, toTimestamp(record.getCreationDate()))
-		// .set(RECORD.CREATED_BY, record.getCreatedBy())
+		jf.insertInto(RECORD)
+				.set(RECORD.ID, recordId)
+				.set(RECORD.ROOT_ENTITY_ID, rootEntityId)
+				.set(RECORD.DATE_CREATED, toTimestamp(record.getCreationDate()))
+				.set(RECORD.CREATED_BY_ID, record.getCreatedBy() != null ? record.getCreatedBy().getId(): null)
 				.set(RECORD.DATE_MODIFIED, toTimestamp(record.getModifiedDate()))
-				// .set(RECORD.MODIFIED_BY, record.getModifiedBy())
-				.set(RECORD.MODEL_VERSION, record.getVersion().getName()).set(RECORD.STEP, record.getStep().getStepNumber()).execute();
+				.set(RECORD.MODIFIED_BY_ID, record.getModifiedBy() != null ? record.getModifiedBy().getId(): null)
+				.set(RECORD.MODEL_VERSION, record.getVersion().getName())
+				.set(RECORD.STEP, record.getStep().getStepNumber())
+				.set(RECORD.SKIPPED, record.getSkipped())
+				.set(RECORD.MISSING, record.getMissing())
+				.set(RECORD.ERRORS, record.getErrors())
+				.set(RECORD.WARNINGS, record.getWarnings())
+			.execute();
 		record.setId(recordId);
 	}
 
@@ -211,11 +225,20 @@ public class RecordDAO extends CollectDAO {
 		}
 		// Insert into SURVEY table
 		Factory jf = getJooqFactory();
-		jf.update(RECORD).set(RECORD.ROOT_ENTITY_ID, rootEntityId).set(RECORD.DATE_CREATED, toTimestamp(record.getCreationDate()))
-		// .set(RECORD.CREATED_BY, record.getCreatedBy())
+		jf.update(RECORD)
+				.set(RECORD.ROOT_ENTITY_ID, rootEntityId)
+				.set(RECORD.DATE_CREATED, toTimestamp(record.getCreationDate()))
+				.set(RECORD.CREATED_BY_ID, record.getCreatedBy() != null ? record.getCreatedBy().getId(): null)
 				.set(RECORD.DATE_MODIFIED, toTimestamp(record.getModifiedDate()))
-				// .set(RECORD.MODIFIED_BY, record.getModifiedBy())
-				.set(RECORD.MODEL_VERSION, record.getVersion().getName()).set(RECORD.STEP, record.getStep().getStepNumber()).where(RECORD.ID.equal(recordId)).execute();
+				.set(RECORD.MODIFIED_BY_ID, record.getModifiedBy() != null ? record.getModifiedBy().getId(): null)
+				.set(RECORD.MODEL_VERSION, record.getVersion().getName())
+				.set(RECORD.STEP, record.getStep().getStepNumber())
+				.set(RECORD.SKIPPED, record.getSkipped())
+				.set(RECORD.MISSING, record.getMissing())
+				.set(RECORD.ERRORS, record.getErrors())
+				.set(RECORD.WARNINGS, record.getWarnings())
+			.where(RECORD.ID.equal(recordId))
+			.execute();
 	}
 	
 	private void deleteRecord(Integer recordId) {

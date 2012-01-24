@@ -15,25 +15,30 @@ public class RecordSummary {
 	private Integer id;
 	private String createdBy;
 	private Date creationDate;
-	private int errorCount;
+	private Integer errors;
+	private Integer missing;
 	private String modifiedBy;
 	private Date modifiedDate;
-	private int warningCount;
+	private Integer skipped;
+	private Integer warning;
 	private int step;
 	private Map<String, String> rootEntityKeys;
 	private Map<String, Integer> entityCounts;
 
-	public RecordSummary(Integer id, Map<String, String> rootEntityKeys,  Map<String, Integer> entityCounts, int errorCount, int warningCount, String createdBy, Date creationDate, String modifiedBy, Date modifiedDate, int step) {
+	public RecordSummary(Integer id, Map<String, String> rootEntityKeys,  Map<String, Integer> entityCounts, String createdBy, Date creationDate, String modifiedBy, Date modifiedDate, int step, 
+			Integer skippedCount, Integer missing, Integer errors, Integer warnings) {
 		this.id = id;
 		this.rootEntityKeys = rootEntityKeys;
 		this.entityCounts = entityCounts;
-		this.errorCount = errorCount;
-		this.warningCount = warningCount;
 		this.createdBy = createdBy;
 		this.creationDate = creationDate;
 		this.modifiedBy = modifiedBy;
 		this.modifiedDate = modifiedDate;
 		this.step = step;
+		this.skipped = skippedCount;
+		this.missing = missing;
+		this.errors = errors;
+		this.warning = warnings;
 	}
 
 	public String getCreatedBy() {
@@ -44,8 +49,8 @@ public class RecordSummary {
 		return this.creationDate;
 	}
 
-	public int getErrorCount() {
-		return this.errorCount;
+	public Integer getErrors() {
+		return this.errors;
 	}
 
 	public Integer getId() {
@@ -60,8 +65,8 @@ public class RecordSummary {
 		return this.modifiedDate;
 	}
 
-	public int getWarningCount() {
-		return this.warningCount;
+	public Integer getWarnings() {
+		return this.warning;
 	}
 
 	public int getStep() {
@@ -74,6 +79,14 @@ public class RecordSummary {
 
 	public Map<String, Integer> getEntityCounts() {
 		return entityCounts;
+	}
+
+	public Integer getMissing() {
+		return missing;
+	}
+
+	public Integer getSkipped() {
+		return skipped;
 	}
 
 }

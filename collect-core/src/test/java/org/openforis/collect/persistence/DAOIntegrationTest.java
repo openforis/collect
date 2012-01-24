@@ -115,7 +115,7 @@ public class DAOIntegrationTest {
 	private CollectRecord createRecord(Survey survey) {
 		CollectRecord record = new CollectRecord(survey, "cluster", "2.0");
 		record.setCreationDate(new GregorianCalendar(2011, 12, 31, 23, 59).getTime());
-		record.setCreatedBy("DAOIntegrationTest");
+		//record.setCreatedBy("DAOIntegrationTest");
 		record.setStep(Step.ENTRY);
 		Entity cluster = record.getRootEntity();
 		cluster.addValue("id", new AlphanumericCode("123_456"));
@@ -192,7 +192,7 @@ public class DAOIntegrationTest {
 	private void updateRecord(CollectRecord record) {
 		// Update modified date
 		record.setModifiedDate(new GregorianCalendar(2012, 1, 1, 0, 1).getTime());
-		record.setModifiedBy("DAOIntegrationTest");
+		//record.setModifiedBy("DAOIntegrationTest");
 		
 		// Remove first time_study
 		Entity cluster = record.getRootEntity();
