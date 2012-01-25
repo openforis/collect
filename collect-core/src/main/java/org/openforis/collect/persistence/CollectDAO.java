@@ -1,6 +1,8 @@
 package org.openforis.collect.persistence;
 
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Date;
 
@@ -19,8 +21,25 @@ public abstract class CollectDAO extends JdbcDaoSupport {
 
 	protected Factory getJooqFactory() {
 		Connection conn = getConnection();
-		Factory jooqFactory = new Factory(conn, SQLDialect.POSTGRES);
+		SQLDialect dialect = getDialect(conn);
+		Factory jooqFactory = new Factory(conn, dialect);
 		return jooqFactory; 
+	}
+
+	private SQLDialect getDialect(Connection conn) {
+		try {
+			DatabaseMetaData metaData = conn.getMetaData();
+			String dbName = metaData.getDatabaseProductName();
+			if ( dbName.equals("Apache Derby") ) {
+				return SQLDialect.DERBY;
+			} else if ( dbName.equals("PostgreSQL") ) {
+				return SQLDialect.POSTGRES;
+			} else {
+				throw new IllegalArgumentException("Unknown database "+dbName);
+			}
+		} catch (SQLException e) {
+			throw new RuntimeException("Error getting database name", e);
+		}
 	}
 
 	protected Log getLog() {
