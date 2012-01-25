@@ -130,7 +130,7 @@ public class RecordSummaryQueryBuilder {
 				viewAlias.DEFINITION_ID.equal(entityDefinition.getId()));
 		
 		String alias = COUNT_COLUMN_PREFIX + entityDefinition.getName();
-		Field<Long> countField = viewAlias.COUNT.as(alias);
+		Field<Long> countField = viewAlias.NODE_COUNT.as(alias);
 		selectQuery.addSelect(countField);
 	}
 	
