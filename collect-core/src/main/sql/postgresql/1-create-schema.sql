@@ -1,2 +1,2 @@
-CREATE SCHEMA collect
+CREATE SCHEMA "collect"
 GO
