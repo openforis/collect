@@ -6,7 +6,7 @@
 				  presenterClass="org.openforis.collect.presenter.input.TimeInputFieldPresenter"
 				  >
 	<input:layout>
-		<s:HorizontalLayout gap="2" />
+		<s:HorizontalLayout gap="2" verticalAlign="middle" />
 	</input:layout>
 	
 	<input:TextInput id="hoursTextInput" width="30" maxChars="2" restrict="0-9" />
