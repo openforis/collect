@@ -21,6 +21,8 @@ import org.apache.commons.logging.LogFactory;
 import org.jooq.Record;
 import org.jooq.Result;
 import org.jooq.impl.Factory;
+import org.jooq.impl.SQLDataType;
+import org.jooq.util.derby.DerbyDataType;
 import org.openforis.collect.model.UIConfiguration.UIConfigurationAdapter;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -60,7 +62,11 @@ public class SurveyDAO extends CollectDAO {
 		// Insert into SURVEY table
 		Factory jf = getJooqFactory();
 		int surveyId = jf.nextval(SURVEY_ID_SEQ).intValue();
-		jf.insertInto(SURVEY).set(SURVEY.ID, surveyId).set(SURVEY.NAME, survey.getName()).set(SURVEY.IDML, idml).execute();
+		jf.insertInto(SURVEY)
+			.set(SURVEY.ID, surveyId)
+			.set(SURVEY.NAME, survey.getName())
+			.set(SURVEY.IDML, jf.val(idml, SQLDataType.CLOB))
+			.execute();
 
 		survey.setId(surveyId);
 
@@ -70,7 +76,11 @@ public class SurveyDAO extends CollectDAO {
 		for (NodeDefinition definition : definitions) {
 			int definitionId = jf.nextval(SCHEMA_DEFINITION_ID_SEQ).intValue();
 			String path = definition.getPath();
-			jf.insertInto(SCHEMA_DEFINITION).set(SCHEMA_DEFINITION.ID, definitionId).set(SCHEMA_DEFINITION.SURVEY_ID, surveyId).set(SCHEMA_DEFINITION.PATH, path).execute();
+			jf.insertInto(SCHEMA_DEFINITION)
+				.set(SCHEMA_DEFINITION.ID, definitionId)
+				.set(SCHEMA_DEFINITION.SURVEY_ID, surveyId)
+				.set(SCHEMA_DEFINITION.PATH, path)
+				.execute();
 			definition.setId(definitionId);
 		}
 

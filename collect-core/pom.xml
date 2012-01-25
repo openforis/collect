@@ -50,19 +50,36 @@
 							<artifactId>postgresql</artifactId>
 							<version>9.1-901.jdbc4</version>
 						</dependency>
+						<dependency>
+							<groupId>org.apache.derby</groupId>
+							<artifactId>derbyclient</artifactId>
+							<version>10.8.2.2</version>
+						</dependency>
+						<dependency>
+							<groupId>org.apache.derby</groupId>
+							<artifactId>derby</artifactId>
+							<version>10.8.2.2</version>
+						</dependency>
 					</dependencies>
 			
 					<configuration>
+<!-- 						<jdbc> -->
+<!-- 							<driver>org.postgresql.Driver</driver> -->
+<!-- 							<url>jdbc:postgresql://localhost:5432/collect</url> -->
+<!-- 							<user>postgres</user> -->
+<!-- 							<password>postgres</password> -->
+<!-- 						</jdbc> -->
 						<jdbc>
-							<driver>org.postgresql.Driver</driver>
-							<url>jdbc:postgresql://localhost:5432/collect</url>
-							<user>postgres</user>
-							<password>postgres</password>
+							<driver>org.apache.derby.jdbc.ClientDriver</driver>
+							<url>jdbc:derby://localhost:1527/collect;create=true</url>
+							<user>derbyuser</user>
+							<password>derbyuser</password>
 						</jdbc>
 						<generator>
 							<name>org.jooq.util.DefaultGenerator</name>
 							<database>
-								<name>org.jooq.util.postgres.PostgresDatabase</name>
+<!-- 								<name>org.jooq.util.postgres.PostgresDatabase</name> -->
+								<name>org.jooq.util.derby.DerbyDatabase</name>
 								<includes>.*</includes>
 								<excludes></excludes>
 								<inputSchema>collect</inputSchema>

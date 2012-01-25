@@ -27,10 +27,7 @@ class BooleanAttributeMapper extends NodeMapper {
 	@Override
 	void setFields(Node<?> node, InsertSetStep<?> insert) {
 		Boolean value = ((BooleanAttribute) node).getValue();
-		if (value != null) {
-			Double doubleValue = value ? Double.valueOf(1) : Double.valueOf(0);
-			insert.set(DATA.NUMBER1, doubleValue);
-		}
+		insert.set(DATA.NUMBER1, toNumeric(value));
 	}
 
 	@Override

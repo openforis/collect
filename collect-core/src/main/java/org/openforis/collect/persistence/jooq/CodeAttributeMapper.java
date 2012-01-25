@@ -29,7 +29,7 @@ class CodeAttributeMapper extends NodeMapper {
 		Code<?> value = ((CodeAttribute<?>) node).getValue();
 		if ( value instanceof NumericCode){
 			Integer code = ((NumericCode)value).getCode();
-			insert.set(DATA.NUMBER1, code == null ? null : code.doubleValue());
+			insert.set(DATA.NUMBER1, toNumeric(code));
 			insert.set(DATA.TEXT2, value.getQualifier());
 		} else {
 			insert.set(DATA.TEXT1, ((AlphanumericCode)value).getCode());

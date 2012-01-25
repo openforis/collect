@@ -17,6 +17,8 @@ import org.springframework.jdbc.core.support.JdbcDaoSupport;
  * @author M. Togna
  */
 public abstract class CollectDAO extends JdbcDaoSupport {
+	private static final String POSTGRESQL_DBNAME = "PostgreSQL";
+	private static final String APACHE_DERBY_DBNAME = "Apache Derby";
 	private final Log log = LogFactory.getLog(getClass());
 
 	protected Factory getJooqFactory() {
@@ -30,9 +32,9 @@ public abstract class CollectDAO extends JdbcDaoSupport {
 		try {
 			DatabaseMetaData metaData = conn.getMetaData();
 			String dbName = metaData.getDatabaseProductName();
-			if ( dbName.equals("Apache Derby") ) {
+			if ( dbName.equals(APACHE_DERBY_DBNAME) ) {
 				return SQLDialect.DERBY;
-			} else if ( dbName.equals("PostgreSQL") ) {
+			} else if ( dbName.equals(POSTGRESQL_DBNAME) ) {
 				return SQLDialect.POSTGRES;
 			} else {
 				throw new IllegalArgumentException("Unknown database "+dbName);

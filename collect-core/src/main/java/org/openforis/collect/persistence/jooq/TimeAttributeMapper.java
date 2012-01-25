@@ -25,8 +25,8 @@ class TimeAttributeMapper extends NodeMapper {
 	void setFields(Node<?> node, InsertSetStep<?> insert) {
 		Time value = ((TimeAttribute) node).getValue();
 		if ( value != null ) {
-			insert.set(DATA.NUMBER1, value.getHour() == null ? null : value.getHour().doubleValue());
-			insert.set(DATA.NUMBER2, value.getMinute() == null ? null : value.getMinute().doubleValue());
+			insert.set(DATA.NUMBER1, toNumeric(value.getHour()));
+			insert.set(DATA.NUMBER2, toNumeric(value.getMinute()));
 		}
 	}
 

@@ -76,7 +76,7 @@ public class RecordDAO extends CollectDAO {
 	}
 
 	@Transactional
-	public List<RecordSummary> loadRecordSummaries(EntityDefinition rootEntityDefinition, List<EntityDefinition> countEntityDefinitions, int offset, int maxNumberOfRecords, String orderByFieldName, String filter) {
+	public List<RecordSummary> loadRecordSummaries(EntityDefinition rootEntityDefinition, List<EntityDefinition> countEntityDefinitions, int offset, int maxRecords, String orderByField, String filter) {
 		Factory jf = getJooqFactory();
 		
 		RecordSummaryQueryBuilder recordSummaryQueryBuilder = new RecordSummaryQueryBuilder(jf);
@@ -88,8 +88,8 @@ public class RecordDAO extends CollectDAO {
 		for (EntityDefinition entityDefinition : countEntityDefinitions) {
 			recordSummaryQueryBuilder.addCountColumn(entityDefinition);
 		}
-		recordSummaryQueryBuilder.addOrderBy(orderByFieldName);
-		recordSummaryQueryBuilder.addLimit(offset, maxNumberOfRecords);
+		recordSummaryQueryBuilder.addOrderBy(orderByField);
+		recordSummaryQueryBuilder.addLimit(offset, maxRecords);
 		SelectQuery selectQuery = recordSummaryQueryBuilder.toQuery();
 		List<Record> records = selectQuery.fetch();
 		List<RecordSummary> result = RecordSummaryParser.parseSelectResult(records, keyAttributeDefinitions, countEntityDefinitions);

@@ -30,7 +30,7 @@ public class FileAttributeMapper extends NodeMapper {
 		File value = f.getValue();
 		if (value != null) {
 			insert.set(Data.DATA.TEXT1, value.getFilename());
-			insert.set(Data.DATA.NUMBER1, value.getSize().doubleValue());
+			insert.set(Data.DATA.NUMBER1, toNumeric(value.getSize()));
 		}
 
 	}
