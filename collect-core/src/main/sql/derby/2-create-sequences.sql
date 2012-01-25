@@ -1,6 +1,3 @@
-CREATE SCHEMA collect
-GO
-
 CREATE SEQUENCE collect.data_id_seq
 GO
 
