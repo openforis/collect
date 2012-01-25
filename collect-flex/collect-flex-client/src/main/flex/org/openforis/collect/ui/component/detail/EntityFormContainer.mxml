@@ -139,7 +139,7 @@
 			<s:Group width="100%" id="group">
 				<s:Form height="100%" width="100%" id="form">
 					<s:layout>
-						<s:FormLayout gap="-15" paddingLeft="0" />
+						<s:FormLayout gap="-15" paddingLeft="0" paddingRight="10" />
 					</s:layout>
 				</s:Form>
 			</s:Group>

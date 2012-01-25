@@ -67,6 +67,7 @@
 								import org.openforis.collect.Application;
 								import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 								import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
+								import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
 								import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
 								import org.openforis.collect.ui.UIBuilder;
 								import org.openforis.collect.ui.component.input.InputField;
@@ -76,25 +77,10 @@
 								}
 								
 								override protected function createChildren():void {
-									var childDefinitions:ListCollectionView = outerDocument.entityDefinition.childDefinitions;
-									for each (var def:NodeDefinitionProxy in childDefinitions) {
-										if(UIBuilder.isInVersion(outerDocument.entityDefinition, Application.activeRecord.version)) {
-											if(def is AttributeDefinitionProxy) {
-												//var attrFormItem:AttributeFormItem = UIBuilder.getAttributeFormItem(AttributeDefinitionProxy(def) );
-												var inputField:InputField = UIBuilder.getInputField(def as AttributeDefinitionProxy, true);
-												addElement(inputField);
-											} else if(def is EntityDefinitionProxy) {
-												var entityDefinitionProxy:EntityDefinitionProxy = EntityDefinitionProxy(def);
-												/* 											var entityFormItem:EntityFormItem = UIBuilder.getEntityFormItem(); */
-												if(entityDefinitionProxy.multiple) {
-													//TODO
-												} else {
-													//TODO
-												}
-												
-											}
-										}
-										
+									var version:ModelVersionProxy = Application.activeRecord.version;
+									var edp:EntityDefinitionProxy = outerDocument.entityDefinition;
+									if(UIBuilder.isInVersion(edp, version)) {
+										UIBuilder.buildDataGroupItemRendererRow(edp, version, this);
 									}
 								}
 							]]>

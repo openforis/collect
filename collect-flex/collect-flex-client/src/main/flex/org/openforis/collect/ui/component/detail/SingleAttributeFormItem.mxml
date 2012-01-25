@@ -18,6 +18,7 @@
 					childrenAdded = true;
 				}
 			}
+
 		]]>
 	</fx:Script>
 	

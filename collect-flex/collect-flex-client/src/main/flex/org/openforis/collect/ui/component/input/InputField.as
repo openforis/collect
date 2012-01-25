@@ -9,6 +9,8 @@ package org.openforis.collect.ui.component.input {
 	import org.openforis.collect.event.EventDispatcherFactory;
 	import org.openforis.collect.event.InputFieldEvent;
 	import org.openforis.collect.event.UIEvent;
+	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
+	import org.openforis.collect.model.proxy.AttributeProxy;
 	import org.openforis.collect.presenter.InputFieldPresenter;
 	import org.openforis.collect.util.StringUtil;
 	import org.openforis.collect.util.UIUtil;
@@ -41,6 +43,10 @@ package org.openforis.collect.ui.component.input {
 		protected var changed:Boolean = false;
 		
 		protected var _textInput:UIComponent;
+		
+		
+		private var _attribute:AttributeProxy;
+		private var _attributeDefinition:AttributeDefinitionProxy;
 		
 		public function InputField() {
 			super();
@@ -173,6 +179,24 @@ package org.openforis.collect.ui.component.input {
 
 		public function set presenterClass(value:IFactory):void {
 			_presenterFactory = value;
+		}
+
+		[Bindable]
+		public function get attribute():AttributeProxy {
+			return _attribute;
+		}
+
+		public function set attribute(value:AttributeProxy):void {
+			_attribute = value;
+		}
+
+		[Bindable]
+		public function get attributeDefinition():AttributeDefinitionProxy {
+			return _attributeDefinition;
+		}
+
+		public function set attributeDefinition(value:AttributeDefinitionProxy):void {
+			_attributeDefinition = value;
 		}
 
 
