@@ -309,7 +309,7 @@ package org.openforis.collect.ui {
 				inputField = new StringInputField();
 			}
 			inputField.width = getInputFieldWidth(def, isInDataGroup);
-			
+			inputField.attributeDefinition = def;
 			return inputField;
 		}
 	
