@@ -3,6 +3,7 @@ package org.openforis.collect.ui {
 	import mx.collections.IList;
 	import mx.collections.ListCollectionView;
 	import mx.core.IVisualElement;
+	import mx.core.IVisualElementContainer;
 	
 	import org.openforis.collect.Application;
 	import org.openforis.collect.i18n.Message;
@@ -27,6 +28,7 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.ui.component.datagrid.RecordSummaryDataGrid;
 	import org.openforis.collect.ui.component.datagroup.DataGroupItemRenderer;
 	import org.openforis.collect.ui.component.detail.AttributeFormItem;
+	import org.openforis.collect.ui.component.detail.CollectFormItem;
 	import org.openforis.collect.ui.component.detail.CoordinateAttributeFormItem;
 	import org.openforis.collect.ui.component.detail.EntityFormContainer;
 	import org.openforis.collect.ui.component.detail.EntityFormItem;
@@ -189,8 +191,30 @@ package org.openforis.collect.ui {
 			} 
 		}
 		
+		public static function buildDataGroupItemRendererRow(entity:EntityDefinitionProxy, version:ModelVersionProxy, component:IVisualElementContainer):void {
+			var children:ListCollectionView = entity.childDefinitions;
+			for each (var defn:NodeDefinitionProxy in children) {
+				if(isInVersion(defn, version)){
+					if(defn is AttributeDefinitionProxy) {
+						//var attrFormItem:AttributeFormItem = UIBuilder.getAttributeFormItem(AttributeDefinitionProxy(def) );
+						var inputField:InputField = getInputField(defn as AttributeDefinitionProxy, true);
+						component.addElement(inputField);
+						//return inputField;
+					} else if(defn is EntityDefinitionProxy) {
+						var edp:EntityDefinitionProxy = EntityDefinitionProxy(defn);
+						if(edp.multiple) {
+							//TODO
+						} else {
+							buildDataGroupItemRendererRow(edp, version ,component);
+						}
+					}
+				}
+			}
+		}
+		
 		public static function getAttributeFormItem(definition:AttributeDefinitionProxy, isInDataGroup:Boolean = false):AttributeFormItem {
 			var formItem:AttributeFormItem = null;
+			
 			if(definition is CoordinateAttributeDefinitionProxy){
 				//todo multiple
 				formItem = new CoordinateAttributeFormItem();
@@ -199,6 +223,7 @@ package org.openforis.collect.ui {
 			} else {
 				formItem = new SingleAttributeFormItem();
 			}
+			
 			formItem.attributeDefinition = definition;
 			return formItem;
 		}
@@ -225,7 +250,6 @@ package org.openforis.collect.ui {
 					default:
 						return 100;
 				}
-				
 			} else if(def is DateAttributeDefinitionProxy) {
 				return 150;
 			} else if(def is TimeAttributeDefinitionProxy) {
@@ -263,7 +287,6 @@ package org.openforis.collect.ui {
 						inputField = new StringInputField();
 						break;
 				}
-				
 			} else if(def is DateAttributeDefinitionProxy) {
 				inputField = new DateInputField();
 			} else if(def is TimeAttributeDefinitionProxy) {
