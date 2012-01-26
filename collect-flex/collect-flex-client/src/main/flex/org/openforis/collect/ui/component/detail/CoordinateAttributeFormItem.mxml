@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<detail:AttributeFormItem xmlns:fx="http://ns.adobe.com/mxml/2009" 
+						  xmlns:s="library://ns.adobe.com/flex/spark" 
+						  xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:detail="org.openforis.collect.ui.component.detail.*" xmlns:input="org.openforis.collect.ui.component.input.*">
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.core.IVisualElementContainer;
+			
+			import org.openforis.collect.i18n.Message;
+			
+			import spark.components.FormItem;
+			
+			private static const FORM_ITEM_STYLE_NAME:String = "indent";
+			
+			override public function addTo(parent:IVisualElementContainer):void {
+				if(this.isInDataGroup) {
+					parent.addElement(srsDropDownList);
+					parent.addElement(xInputField);
+					parent.addElement(yInputField);
+				} else {
+					var formItem:FormItem;
+					//srs
+					formItem = new FormItem();
+					formItem.styleName = FORM_ITEM_STYLE_NAME;
+					formItem.label = Message.get('edit.coordinate.srs');
+					formItem.addElement(srsDropDownList);
+					parent.addElement(formItem);
+					//x
+					formItem = new FormItem();
+					formItem.styleName = FORM_ITEM_STYLE_NAME;
+					formItem.label = Message.get('edit.coordinate.x');
+					formItem.addElement(xInputField);
+					parent.addElement(formItem);
+					//y
+					formItem = new FormItem();
+					formItem.styleName = FORM_ITEM_STYLE_NAME;
+					formItem.label = Message.get('edit.coordinate.y');
+					formItem.addElement(yInputField);
+					parent.addElement(formItem);
+				}
+			}
+
+		]]>
+	</fx:Script>
+	
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+		
+		<s:DropDownList id="srsDropDownList" width="150" prompt="{Message.get('global.dropDownPrompt')}" />
+		<input:NumericInputField id="xInputField" />
+		<input:NumericInputField id="yInputField" />
+	</fx:Declarations>
+	
+</detail:AttributeFormItem>
