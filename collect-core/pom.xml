@@ -21,94 +21,54 @@
 			<url>http://download.osgeo.org/webdav/geotools/</url>
 		</repository>
 	</repositories>
-	
-	<profiles>
-	   <profile>
-	   	<!--  
-	   		To regenerate jOOQ classes: 
-	   		mvn generate-sources -P codegen 
-	   	 -->
-	     <id>codegen</id>
-	     <build>
-	       <plugins>
-				<!-- jOOQ code generator plugin -->
-				<plugin>
-					<groupId>org.jooq</groupId>
-					<artifactId>jooq-codegen-maven</artifactId>
-					<version>2.0.1</version>
-					<executions>
-						<execution>
-							<phase>generate-sources</phase>
-							<goals>
-								<goal>generate</goal>
-							</goals>
-						</execution>
-					</executions>
-					<dependencies>
-						<dependency>
-							<groupId>postgresql</groupId>
-							<artifactId>postgresql</artifactId>
-							<version>9.1-901.jdbc4</version>
-						</dependency>
-					</dependencies>
-					<configuration>
-						<jdbc>
-							<driver>org.postgresql.Driver</driver>
-							<url>${collect.devdb.url}</url>
-							<user>${collect.devdb.username}</user>
-							<password>${collect.devdb.password}</password>
-						</jdbc>
-						<generator>
-							<name>org.jooq.util.DefaultGenerator</name>
-							<database>
-								<name>org.jooq.util.postgres.PostgresDatabase</name>
-								<includes>.*</includes>
-								<excludes></excludes>
-								<inputSchema>collect</inputSchema>
-							</database>
-							<generate>
-								<relations>true</relations>
-								<deprecated>false</deprecated>
-							</generate>
-							<target>	
-								<packageName>org.openforis.collect.persistence.jooq</packageName>
-								<directory>${basedir}/src/generated/java</directory>
-							</target>
-							<masterDataTables>
-								<masterDataTable>
-									<name>t_language</name>
-									<literal>cd</literal>
-									<description>description</description>
-								</masterDataTable>
-							</masterDataTables>
-						</generator>
-					</configuration>
-				</plugin>
-	       </plugins>
-	     </build>
-	   </profile>
-   </profiles>
-	
+
 	<build>
 		<plugins>
 			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>properties-maven-plugin</artifactId>
-				<version>1.0-alpha-2</version>
-				<executions>
-					<execution>
-						<phase>initialize</phase>
-						<goals>
-							<goal>read-project-properties</goal>
-						</goals>
-						<configuration>
-							<files>
-								<file>dev.properties</file>
-							</files>
-						</configuration>
-					</execution>
-				</executions>
+				<groupId>org.jooq</groupId>
+				<artifactId>jooq-codegen-maven</artifactId>
+				<version>2.0.1</version>
+				<dependencies>
+					<dependency>
+						<groupId>postgresql</groupId>
+						<artifactId>postgresql</artifactId>
+						<version>9.1-901.jdbc4</version>
+					</dependency>
+				</dependencies>
+				<configuration>
+					<jdbc>
+						<driver>org.postgresql.Driver</driver>
+						<url>${collect.devdb.url}</url>
+						<user>${collect.devdb.username}</user>
+						<password>${collect.devdb.password}</password>
+					</jdbc>
+					<generator>
+						<name>org.jooq.util.DefaultGenerator</name>
+						<database>
+							<name>org.jooq.util.postgres.PostgresDatabase</name>
+							<includes>.*</includes>
+							<excludes></excludes>
+							<inputSchema>collect</inputSchema>
+						</database>
+						<generate>
+							<relations>true</relations>
+							<deprecated>false</deprecated>
+						</generate>
+						<target>	
+							<packageName>org.openforis.collect.persistence.jooq</packageName>
+							<directory>${basedir}/src/generated/java</directory>
+						</target>
+						<masterDataTables>
+							<masterDataTable>
+								<name>t_language</name>
+								<literal>cd</literal>
+								<description>description</description>
+							</masterDataTable>
+						</masterDataTables>
+					</generator>
+				</configuration>
 			</plugin>
+			
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
