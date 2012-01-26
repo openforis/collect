@@ -4,8 +4,8 @@ import static org.openforis.collect.persistence.jooq.tables.Data.DATA;
 
 import org.jooq.InsertSetStep;
 import org.jooq.Record;
-import org.openforis.idm.metamodel.NumberAttributeDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
+import org.openforis.idm.metamodel.NumberAttributeDefinition;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.NumberAttribute;
@@ -23,7 +23,7 @@ class NumberAttributeMapper extends NodeMapper {
 	@Override
 	void setFields(Node<?> node, InsertSetStep<?> insert) {
 		Number value = ((NumberAttribute<?>) node).getValue();
-		insert.set(DATA.NUMBER1, value == null ? null : value.doubleValue());
+		insert.set(DATA.NUMBER1, toNumeric(value));
 	}
 
 	@Override

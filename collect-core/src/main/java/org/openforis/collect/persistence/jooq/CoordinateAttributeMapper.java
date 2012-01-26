@@ -30,15 +30,9 @@ public class CoordinateAttributeMapper extends NodeMapper {
 		CoordinateAttribute c = (CoordinateAttribute) node;
 		Coordinate value = c.getValue();
 		if (value != null) {
-			if (value.getX() != null) {
-				insert.set(DATA.NUMBER1, value.getX().doubleValue());
-			}
-			if (value.getY() != null) {
-				insert.set(DATA.NUMBER2, value.getY().doubleValue());
-			}
-			if (value.getZ() != null) {
-				insert.set(DATA.NUMBER3, value.getZ().doubleValue());
-			}
+			insert.set(DATA.NUMBER1, toNumeric(value.getX()));
+			insert.set(DATA.NUMBER2, toNumeric(value.getY()));
+			insert.set(DATA.NUMBER3, toNumeric(value.getZ()));
 			insert.set(DATA.TEXT1, value.getSrsId());
 		}
 	}

@@ -1,5 +1,6 @@
 package org.openforis.collect.persistence.jooq;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -46,4 +47,20 @@ abstract class NodeMapper {
 	abstract void setFields(Node<?> node, InsertSetStep<?> insert);
 	
 	abstract Node<?> addNode(NodeDefinition defn, Record r, Entity parent);
+	
+	static BigDecimal toNumeric(Number value) {
+		if ( value == null ) {
+			return null; 
+		} else {
+			return BigDecimal.valueOf(value.doubleValue());
+		}
+	}
+	
+	static BigDecimal toNumeric(Boolean value) {
+		if (value == null) {
+			return null;
+		} else {
+			return value ? BigDecimal.valueOf(1) : BigDecimal.valueOf(0);
+		}
+	}
 }

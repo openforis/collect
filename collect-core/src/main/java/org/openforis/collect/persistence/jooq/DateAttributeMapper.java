@@ -25,9 +25,9 @@ class DateAttributeMapper extends NodeMapper {
 	void setFields(Node<?> node, InsertSetStep<?> insert) {
 		Date value = ((DateAttribute) node).getValue();
 		if ( value != null ) {
-			insert.set(DATA.NUMBER1, value.getYear() == null ? null : value.getYear().doubleValue());
-			insert.set(DATA.NUMBER2, value.getMonth() == null ? null : value.getMonth().doubleValue());
-			insert.set(DATA.NUMBER3, value.getDay() == null ? null : value.getDay().doubleValue());
+			insert.set(DATA.NUMBER1, value.getYear() == null ? null : toNumeric(value.getYear()));
+			insert.set(DATA.NUMBER2, value.getMonth() == null ? null : toNumeric(value.getMonth()));
+			insert.set(DATA.NUMBER3, value.getDay() == null ? null : toNumeric(value.getDay()));
 		}
 	}
 

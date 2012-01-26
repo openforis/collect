@@ -73,9 +73,9 @@ public class RecordSummaryQueryBuilder {
 	
 	private void init() {
 		// Aliases used in query
-		Record r = RECORD.as("r");
-		UserAccount u1 = USER_ACCOUNT.as("u1");
-		UserAccount u2 = USER_ACCOUNT.as("u2");
+		private static final Record r = RECORD.as("r");
+		private static final UserAccount u1 = USER_ACCOUNT.as("u1");
+		private static final UserAccount u2 = USER_ACCOUNT.as("u2");
 		
 		//CREATE SELECT QUERY
 		selectQuery = jooqFactory.selectQuery();
