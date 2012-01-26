@@ -55,16 +55,29 @@ package org.openforis.collect.ui.component.datagrid
 			return mapFieldLabelFunction(item, gridColumn, "entityCounts", "count_");
 		}
 		
+		public static function numberLabelFunction(item:Object, gridColumn:GridColumn):String {
+			var dataField:String = gridColumn.dataField;
+			if(item.hasOwnProperty(dataField)) {
+				var value:Number = item[dataField];
+				if(! isNaN(value)) {
+					return value.toString();
+				}
+			}
+			return "";
+		}
+		
 		private static function mapFieldLabelFunction(item:Object, gridColumn:GridColumn, mapFieldName:String, dataFieldPrefix:String):String {
 			var recordSummary:RecordSummary = item as RecordSummary;
 			var map:IMap = recordSummary[mapFieldName];
 			var dataField:String = gridColumn.dataField;
 			if(dataField.indexOf(dataFieldPrefix) == 0) {
 				var key:String = dataField.substring(dataFieldPrefix.length);
-				return String(map.get(key));
-			} else {
-				return null;
+				var count:Number = map.get(key);
+				if(! isNaN(count)) {
+					return String(count);
+				}
 			}
+			return "";
 		}
 	}
 }

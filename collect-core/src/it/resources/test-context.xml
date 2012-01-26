@@ -25,7 +25,6 @@
 		<property name="password" value="${collect.devdb.password}" />
 	</bean>
  
-
     <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
     	<property name="dataSource" ref="testDataSource"/>
     </bean>
@@ -35,6 +34,10 @@
 	</bean>
 
 	<bean id="recordDao" class="org.openforis.collect.persistence.RecordDAO">
+    	<property name="dataSource" ref="testDataSource"/>
+	</bean>
+	
+	<bean id="recordSummaryDao" class="org.openforis.collect.persistence.RecordSummaryDAO">
     	<property name="dataSource" ref="testDataSource"/>
 	</bean>
 	

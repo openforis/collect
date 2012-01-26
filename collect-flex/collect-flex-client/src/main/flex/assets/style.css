@@ -28,6 +28,10 @@ s|TitleWindow {
 }
 */
 
+s|BorderContainer.noError {
+	border-color: #FFFFFF;
+}
+
 s|Button.closeButton {
 	skin-class: ClassReference("org.openforis.collect.ui.skin.CloseButtonSkin");
 }

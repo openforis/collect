@@ -63,11 +63,6 @@ public final class Tables {
 	public static org.openforis.collect.persistence.jooq.tables.UserRole USER_ROLE = org.openforis.collect.persistence.jooq.tables.UserRole.USER_ROLE;
 
 	/**
-	 * The table collect.node_count_view
-	 */
-	public static org.openforis.collect.persistence.jooq.tables.NodeCountView NODE_COUNT_VIEW = org.openforis.collect.persistence.jooq.tables.NodeCountView.NODE_COUNT_VIEW;
-
-	/**
 	 * No instances
 	 */
 	private Tables() {}

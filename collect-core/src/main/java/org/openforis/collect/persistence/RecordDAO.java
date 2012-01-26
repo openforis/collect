@@ -7,17 +7,19 @@ import static org.openforis.collect.persistence.jooq.tables.Record.RECORD;
 import static org.openforis.collect.persistence.jooq.tables.UserAccount.USER_ACCOUNT;
 
 import java.util.List;
+import java.util.Map;
 
+import org.jooq.Field;
+import org.jooq.InsertSetMoreStep;
 import org.jooq.Record;
-import org.jooq.SelectQuery;
+import org.jooq.TableField;
+import org.jooq.UpdateSetMoreStep;
 import org.jooq.impl.Factory;
 import org.openforis.collect.model.CollectRecord;
-import org.openforis.collect.model.RecordSummary;
 import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.jooq.DataLoader;
 import org.openforis.collect.persistence.jooq.DataPersister;
-import org.openforis.collect.persistence.jooq.RecordSummaryParser;
-import org.openforis.collect.persistence.jooq.RecordSummaryQueryBuilder;
+import org.openforis.collect.persistence.jooq.tables.records.RecordRecord;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -46,11 +48,13 @@ public class RecordDAO extends CollectDAO {
 	}
 
 	@Transactional
-	public void saveOrUpdate(CollectRecord record) {
+	public void saveOrUpdate(CollectRecord record, List<EntityDefinition> countDefns) {
+		Entity rootEntity = record.getRootEntity();
+		List<AttributeDefinition> keyDefns = rootEntity.getDefinition().getKeyAttributeDefinitions();
 		if (record.getId() == null) {
-			insertRecord(record);
+			insertRecord(record, keyDefns, countDefns);
 		} else {
-			updateRecord(record);
+			updateRecord(record, keyDefns, countDefns);
 			deleteData(record.getId());
 		}
 		insertData(record);
@@ -69,34 +73,12 @@ public class RecordDAO extends CollectDAO {
 	}
 	
 	@Transactional
-	public int getCountRecords(EntityDefinition rootEntityDefinition, String filter) {
+	public int getCountRecords(EntityDefinition rootEntityDefinition) {
 		Factory jf = getJooqFactory();
 		Record r = jf.select(Factory.count()).from(RECORD).where(RECORD.ROOT_ENTITY_ID.equal(rootEntityDefinition.getId())).fetchOne();
 		return r.getValueAsInteger(0);
 	}
 
-	@Transactional
-	public List<RecordSummary> loadRecordSummaries(EntityDefinition rootEntityDefinition, List<EntityDefinition> countEntityDefinitions, int offset, int maxRecords, String orderByField, String filter) {
-		Factory jf = getJooqFactory();
-		
-		RecordSummaryQueryBuilder recordSummaryQueryBuilder = new RecordSummaryQueryBuilder(jf);
-		recordSummaryQueryBuilder.setRootEntityDefinition(rootEntityDefinition);
-		List<AttributeDefinition> keyAttributeDefinitions = rootEntityDefinition.getKeyAttributeDefinitions();
-		for (AttributeDefinition attributeDefinition : keyAttributeDefinitions) {
-			recordSummaryQueryBuilder.addKeyAttribute(attributeDefinition);
-		}
-		for (EntityDefinition entityDefinition : countEntityDefinitions) {
-			recordSummaryQueryBuilder.addCountColumn(entityDefinition);
-		}
-		recordSummaryQueryBuilder.addOrderBy(orderByField);
-		recordSummaryQueryBuilder.addLimit(offset, maxRecords);
-		SelectQuery selectQuery = recordSummaryQueryBuilder.toQuery();
-		List<Record> records = selectQuery.fetch();
-		List<RecordSummary> result = RecordSummaryParser.parseSelectResult(records, keyAttributeDefinitions, countEntityDefinitions);
-		
-		return result;
-	}
-	
 	@Transactional
 	public void lock(Integer recordId, User user) throws RecordLockedException, AccessDeniedException, MultipleEditException {
 		Factory jf = getJooqFactory();
@@ -188,7 +170,8 @@ public class RecordDAO extends CollectDAO {
 		loader.load(record);
 	}
 
-	private void insertRecord(CollectRecord record) {
+	@SuppressWarnings("unchecked")
+	private void insertRecord(CollectRecord record, List<AttributeDefinition> keyDefns, List<EntityDefinition> countDefns) {
 		EntityDefinition rootEntityDefinition = record.getRootEntity().getDefinition();
 		Integer rootEntityId = rootEntityDefinition.getId();
 		if (rootEntityId == null) {
@@ -197,7 +180,7 @@ public class RecordDAO extends CollectDAO {
 		// Insert into SURVEY table
 		Factory jf = getJooqFactory();
 		int recordId = jf.nextval(RECORD_ID_SEQ).intValue();
-		jf.insertInto(RECORD)
+		InsertSetMoreStep<RecordRecord> setStep = jf.insertInto(RECORD)
 				.set(RECORD.ID, recordId)
 				.set(RECORD.ROOT_ENTITY_ID, rootEntityId)
 				.set(RECORD.DATE_CREATED, toTimestamp(record.getCreationDate()))
@@ -210,11 +193,34 @@ public class RecordDAO extends CollectDAO {
 				.set(RECORD.MISSING, record.getMissing())
 				.set(RECORD.ERRORS, record.getErrors())
 				.set(RECORD.WARNINGS, record.getWarnings())
-			.execute();
+				;
+		//set counts
+		int position = 1;
+		Map<String, Integer> counts = record.getCounts();
+		for (EntityDefinition def : countDefns) {
+			String path = def.getPath();
+			Integer count = counts.get(path);
+			@SuppressWarnings("rawtypes")
+			Field countField = RecordDAOUtil.getCountField(RECORD, position);
+			setStep.set(countField, count);
+			position ++;
+		}
+		//set keys
+		position = 1;
+		Map<String, Object> keys = record.getKeys();
+		for (AttributeDefinition def : keyDefns) {
+			String path = def.getPath();
+			Object keyValue = keys.get(path);
+			@SuppressWarnings("rawtypes")
+			Field field = RecordDAOUtil.getKeyField(RECORD, def, position);
+			setStep.set(field, keyValue);
+		}
+		setStep.execute();
 		record.setId(recordId);
 	}
 
-	private void updateRecord(CollectRecord record) {
+	@SuppressWarnings("unchecked")
+	private void updateRecord(CollectRecord record, List<AttributeDefinition> keyDefns, List<EntityDefinition> countDefns) {
 		EntityDefinition rootEntityDefinition = record.getRootEntity().getDefinition();
 		Integer recordId = record.getId();
 		if (recordId == null) {
@@ -226,7 +232,7 @@ public class RecordDAO extends CollectDAO {
 		}
 		// Insert into SURVEY table
 		Factory jf = getJooqFactory();
-		jf.update(RECORD)
+		UpdateSetMoreStep<RecordRecord> updateStep = jf.update(RECORD)
 				.set(RECORD.ROOT_ENTITY_ID, rootEntityId)
 				.set(RECORD.DATE_CREATED, toTimestamp(record.getCreationDate()))
 				.set(RECORD.CREATED_BY_ID, record.getCreatedBy() != null ? record.getCreatedBy().getId(): null)
@@ -238,7 +244,28 @@ public class RecordDAO extends CollectDAO {
 				.set(RECORD.MISSING, record.getMissing())
 				.set(RECORD.ERRORS, record.getErrors())
 				.set(RECORD.WARNINGS, record.getWarnings())
-			.where(RECORD.ID.equal(recordId))
+				;
+		//set counts
+		int position = 1;
+		Map<String, Integer> counts = record.getCounts();
+		for (EntityDefinition def : countDefns) {
+			String path = def.getPath();
+			Integer count = counts.get(path);
+			TableField<RecordRecord,Integer> countField = RecordDAOUtil.getCountField(RECORD, position);
+			updateStep.set(countField, count);
+			position ++;
+		}
+		//set keys
+		position = 1;
+		Map<String, Object> keys = record.getKeys();
+		for (AttributeDefinition def : keyDefns) {
+			String path = def.getPath();
+			Object keyValue = keys.get(path);
+			@SuppressWarnings("rawtypes")
+			Field field = RecordDAOUtil.getKeyField(RECORD, def, position);
+			updateStep.set(field, keyValue);
+		}
+		updateStep.where(RECORD.ID.equal(recordId))
 			.execute();
 	}
 	

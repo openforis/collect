@@ -37,7 +37,7 @@
 					addElement(dataGroup);
 					addElement(addButton);
 					
-					//TEST FORM
+					//TEST data
 					var c:ArrayCollection = new ArrayCollection();
 					c.addItem(new Object());
 					dataGroup.dataProvider = c;
