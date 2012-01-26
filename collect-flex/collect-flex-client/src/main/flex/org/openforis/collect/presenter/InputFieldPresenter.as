@@ -10,7 +10,8 @@ package org.openforis.collect.presenter {
 	
 	/**
 	 * 
-	 * @author Mino Togna
+	 * @author M. Togna
+	 * @author S. Ricci
 	 * */
 	public class InputFieldPresenter extends AbstractPresenter {
 		
@@ -38,8 +39,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		override internal function initEventListeners():void {
-			//eventDispatcher.addEventListener(
-			
+			super.initEventListeners();
 		}
 		
 		protected function inputFieldChangeHandler(event:Event):void {

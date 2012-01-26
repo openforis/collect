@@ -2,17 +2,28 @@
 <input:InputField xmlns:fx="http://ns.adobe.com/mxml/2009" 
 				  xmlns:s="library://ns.adobe.com/flex/spark" 
 				  xmlns:mx="library://ns.adobe.com/flex/mx" 
-				  presenterClass="org.openforis.collect.presenter.input.CodeInputFieldPresenter" 
 				  xmlns:input="org.openforis.collect.ui.component.input.*"
+				  
+				  creationComplete="creationCompleteHandler(event)"
 				  >
 	<fx:Script>
 		<![CDATA[
+			import mx.events.FlexEvent;
+			
+			import org.openforis.collect.i18n.Message;
+			import org.openforis.collect.presenter.CodeInputFieldPresenter;
 			import org.openforis.collect.ui.Images;
 			
+
+			protected function creationCompleteHandler(event:FlexEvent):void {
+				this.presenter = new CodeInputFieldPresenter(this);
+			}
+
 		]]>
 	</fx:Script>
+	
 	<fx:Declarations>
-		<!-- Place non-visual elements (e.g., services, value objects) here -->
+		<input:CodeListDialog id="popup" title="{attributeDefinition.getLabelText()}" />
 	</fx:Declarations>
 	
 	<input:states>

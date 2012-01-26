@@ -52,12 +52,13 @@ package org.openforis.collect.ui.component.input {
 			super();
 		}
 		
-		override protected function initializationComplete():void {
+		/*override protected function initializationComplete():void {
 			super.initializationComplete();
 			
 			initializePresenter();
-		}
+		}*/
 		
+		[Deprecated]
 		protected function initializePresenter():void {
 			if(_presenterFactory == null) {
 				_presenterFactory = new ClassFactory(InputFieldPresenter);
