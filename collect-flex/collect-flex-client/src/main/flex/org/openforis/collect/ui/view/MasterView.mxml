@@ -35,8 +35,8 @@
 	
 	<s:states>
 		<s:State name="loading" />
-		<s:State name="home" />
 		<!--
+		<s:State name="home" />
 		<s:State name="surveySelection" />
 		<s:State name="rootEntitySelection" />
 		-->
@@ -45,7 +45,7 @@
 	</s:states>
 	
 	<component:LoadingContent width="100%" height="100%" includeIn="loading" itemCreationPolicy="immediate"/>
-	<view:HomeView id="homeView" includeIn="home" itemCreationPolicy="immediate" />
+	
 	<!--
 	<view:SurveySelectionView id="surveySelectionView" includeIn="surveySelection" itemCreationPolicy="immediate" />
 	<view:RootEntitySelectionView id="rootEntitySelectionView" includeIn="rootEntitySelection" itemCreationPolicy="immediate" />

@@ -3,61 +3,66 @@
 				  xmlns:s="library://ns.adobe.com/flex/spark" 
 				  xmlns:mx="library://ns.adobe.com/flex/mx" 
 				  xmlns:input="org.openforis.collect.ui.component.input.*"
-				  
-				  width="500" height="400"
+				  xmlns:component="org.openforis.collect.ui.component.*"
+				  width="500" height="400" 
 				  >
 	<fx:Script>
 		<![CDATA[
-			import mx.collections.ArrayCollection;
+			import org.openforis.collect.i18n.Message;
 			
-			import org.openforis.collect.event.EventDispatcherFactory;
-			import org.openforis.collect.event.CodeInputFieldEvent;
+			private var _maxSpecified:int = 1;
+			private var _multiple:Boolean = false;
 			
 			[Bindable]
-			public var dataProvider:ArrayCollection;
-			[Bindable]
-			public var maxSpecified:int = 1;
-			[Bindable]
-			public var multiple:Boolean = false;
-			
-			private function applyButtonClickHandler(event:Event):void {
-				var codeInputFieldEvent:CodeInputFieldEvent = new CodeInputFieldEvent(CodeInputFieldEvent.CODE_LIST_DIALOG_APPLY_CLICK);
-				dispatchEvent(codeInputFieldEvent);
+			public function get multiple():Boolean {
+				return _multiple;
 			}
-			
-			private function cancelButtonClickHandler(event:Event):void {
-				var codeInputFieldEvent:CodeInputFieldEvent = new CodeInputFieldEvent(CodeInputFieldEvent.CODE_LIST_DIALOG_CANCEL_CLICK);
-				dispatchEvent(codeInputFieldEvent);
+
+			public function set multiple(value:Boolean):void {
+				_multiple = value;
 			}
+
+			[Bindable]
+			public function get maxSpecified():int {
+				return _maxSpecified;
+			}
+
+			public function set maxSpecified(value:int):void {
+				_maxSpecified = value;
+			}
+
 		]]>
 	</fx:Script>
-	
-	<fx:Metadata> 
-		[Event(name="codeListDialogApplyClick", type="org.openforis.collect.event.CodeInputFieldEvent")] 
-		[Event(name="codeListDialogCancelClick", type="org.openforis.collect.event.CodeInputFieldEvent")]
-	</fx:Metadata> 
-	
+		
 	<s:states>
 		<s:State name="default" />
 		<s:State name="loading" />
 	</s:states>
 	
-	<s:Group id="loadingContainer" height="100%" width="100%" includeIn="loading">
-		<s:Label verticalCenter="0" horizontalCenter="0" text="Loading, please wait..." />
-		
-		<s:Button bottom="0" horizontalCenter="0" useHandCursor="true" buttonMode="true" id="cancelLoading" label="Cancel" click="cancelButtonClickHandler(event)" />
+	<s:Group id="loadingContainer" height="100%" width="100%" includeIn="loading" itemCreationPolicy="immediate">
+		<component:LoadingContent />
+		<s:Button 
+				bottom="0" 
+				horizontalCenter="0" 
+				useHandCursor="true" 
+				buttonMode="true" 
+				id="cancelLoading" 
+				label="{Message.get('global.cancel')}" 
+				/>
 	</s:Group>
 
-	<s:VGroup id="loadCompleteContainer" height="100%" width="100%" includeIn="default">
+	<s:VGroup id="dataContainer" height="100%" width="100%" includeIn="default"  itemCreationPolicy="immediate">
 		<s:Scroller height="100%" width="100%">
-			<input:CodeListDialogDataGroup width="100%" id="items" dataProvider="{dataProvider}"
-							   multiple="{multiple}" maxSpecified="{maxSpecified}">
-			</input:CodeListDialogDataGroup>
+			<input:CodeListDialogDataGroup
+					width="100%" 
+					id="dataGroup" 
+					multiple="{multiple}" 
+					maxSpecified="{maxSpecified}" />
 		</s:Scroller>
 		
 		<s:HGroup width="100%" horizontalAlign="center" verticalAlign="middle" gap="30">
-			<s:Button useHandCursor="true" buttonMode="true" id="applyButton" label="Apply" click="applyButtonClickHandler(event)" />
-			<s:Button useHandCursor="true" buttonMode="true" id="cancelButton" label="Cancel" click="cancelButtonClickHandler(event)" />
+			<s:Button useHandCursor="true" buttonMode="true" id="applyButton" label="{Message.get('global.apply')}"  />
+			<s:Button useHandCursor="true" buttonMode="true" id="cancelButton" label="{Message.get('global.cancel')}"  />
 		</s:HGroup>
 	</s:VGroup>
 	

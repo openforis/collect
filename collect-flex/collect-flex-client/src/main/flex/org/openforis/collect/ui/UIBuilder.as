@@ -34,6 +34,7 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.ui.component.detail.EntityFormItem;
 	import org.openforis.collect.ui.component.detail.FormContainer;
 	import org.openforis.collect.ui.component.detail.FormsContainer;
+	import org.openforis.collect.ui.component.detail.MultipleAttributeDataGroupFormItem;
 	import org.openforis.collect.ui.component.detail.MultipleAttributeFormItem;
 	import org.openforis.collect.ui.component.detail.MultipleEntityFormItem;
 	import org.openforis.collect.ui.component.detail.SingleAttributeFormItem;
@@ -201,10 +202,13 @@ package org.openforis.collect.ui {
 			for each (var defn:NodeDefinitionProxy in children) {
 				if(isInVersion(defn, version)){
 					if(defn is AttributeDefinitionProxy) {
-						//var attrFormItem:AttributeFormItem = UIBuilder.getAttributeFormItem(AttributeDefinitionProxy(def) );
-						var inputField:InputField = getInputField(defn as AttributeDefinitionProxy, true);
-						component.addElement(inputField);
-						//return inputField;
+						if(defn.multiple){
+							var formItem:AttributeFormItem = getAttributeFormItem(defn as AttributeDefinitionProxy, true);
+							formItem.addTo(component);															
+						} else {
+							var inputField:InputField = getInputField(defn as AttributeDefinitionProxy, true);
+							component.addElement(inputField);
+						}
 					} else if(defn is EntityDefinitionProxy) {
 						var edp:EntityDefinitionProxy = EntityDefinitionProxy(defn);
 						if(edp.multiple) {
@@ -226,7 +230,11 @@ package org.openforis.collect.ui {
 			} else if(definition is TaxonAttributeDefinitionProxy){
 				formItem = new TaxonAttributeFormItem();
 			} else if(definition.multiple) {
-				formItem = new MultipleAttributeFormItem();
+				if(isInDataGroup){
+					formItem = new MultipleAttributeDataGroupFormItem();
+				} else {
+					formItem = new MultipleAttributeFormItem();
+				}
 			} else {
 				formItem = new SingleAttributeFormItem();
 			}
