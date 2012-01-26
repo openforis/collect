@@ -39,9 +39,9 @@
 			height="16" 
 			useHandCursor="true" 
 			buttonMode="true"
-			 enabled.inactive="false" 
-			 visible.firstPage="false" 
-			 />
+			enabled.inactive="false" 
+			enabled.firstPage="false" 
+			/>
 	
 	<s:Image 
 			id="previousPageButton" 
@@ -51,15 +51,15 @@
 			height="16" 
 			useHandCursor="true" 
 			buttonMode="true"
-			 enabled.inactive="false" 
-			 visible.firstPage="false" 
-			 />
+			enabled.inactive="false" 
+			enabled.firstPage="false" 
+			/>
 	
 	<mx:Text 
 			fontSize="12" 
-			 fontWeight="bold" 
-			 id="currentPageText" 
-			 />
+			fontWeight="bold" 
+			id="currentPageText" 
+			/>
 	
 	<s:Image 
 			id="nextPageButton" 
@@ -70,7 +70,7 @@
 			useHandCursor="true" 
 			buttonMode="true"
 			enabled.inactive="false" 
-			visible.lastPage="false" 
+			enabled.lastPage="false" 
 			/>
 	
 	<s:Image 

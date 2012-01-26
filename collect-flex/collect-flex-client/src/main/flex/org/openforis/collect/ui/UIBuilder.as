@@ -51,6 +51,7 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.ui.component.input.TaxonInputField;
 	import org.openforis.collect.ui.component.input.TimeInputField;
 	
+	import spark.components.FormItem;
 	import spark.components.HGroup;
 	import spark.components.Label;
 	import spark.components.VGroup;
@@ -179,16 +180,24 @@ package org.openforis.collect.ui {
 			var defns:ListCollectionView = entity.childDefinitions;
 			form.uiTabs = uiTab.tabs;
 			if(defns != null && defns.length >0){
-				for each (var def:NodeDefinitionProxy in defns) {
-					if(isInVersion(def, version)) {
-						if(def is AttributeDefinitionProxy) {
-							var attrFormItem:AttributeFormItem = getAttributeFormItem(AttributeDefinitionProxy(def) );
-							form.addAttributeFormItem(attrFormItem, def.uiTabName);
-						} else if(def is EntityDefinitionProxy) {
-							var proxy:EntityDefinitionProxy = EntityDefinitionProxy(def);
-							if(proxy.uiTabName == null || uiTab.hasChildTab(def.uiTabName)) {
+				for each (var defn:NodeDefinitionProxy in defns) {
+					if(isInVersion(defn, version)) {
+						if(defn is AttributeDefinitionProxy) {
+							var attrFormItem:AttributeFormItem = getAttributeFormItem(AttributeDefinitionProxy(defn));
+							var formItem:FormItem = new FormItem();
+							formItem.label = defn.getLabelText();
+							if(defn is CoordinateAttributeDefinitionProxy || defn is TaxonAttributeDefinitionProxy){
+								form.addFormItem(formItem, defn.uiTabName);
+								form.addAttributeFormItem(attrFormItem, defn.uiTabName);
+							} else {
+								formItem.addElement(attrFormItem);
+								form.addFormItem(formItem, defn.uiTabName);
+							}
+						} else if(defn is EntityDefinitionProxy) {
+							var proxy:EntityDefinitionProxy = EntityDefinitionProxy(defn);
+							if(proxy.uiTabName == null || uiTab.hasChildTab(defn.uiTabName)) {
 								var entityFormItem:EntityFormItem = getEntityFormItem(proxy);
-								form.addEntityFormItem(entityFormItem, def.uiTabName);
+								form.addEntityFormItem(entityFormItem, defn.uiTabName);
 							}
 						}
 					}
@@ -201,9 +210,10 @@ package org.openforis.collect.ui {
 			for each (var defn:NodeDefinitionProxy in children) {
 				if(isInVersion(defn, version)){
 					if(defn is AttributeDefinitionProxy) {
-						//var attrFormItem:AttributeFormItem = UIBuilder.getAttributeFormItem(AttributeDefinitionProxy(def) );
-						var inputField:InputField = getInputField(defn as AttributeDefinitionProxy, true);
-						component.addElement(inputField);
+						var attrFormItem:AttributeFormItem = UIBuilder.getAttributeFormItem(AttributeDefinitionProxy(defn), true);
+						//var inputField:InputField = getInputField(defn as AttributeDefinitionProxy, true);
+						//component.addElement(inputField);
+						attrFormItem.addTo(component);
 						//return inputField;
 					} else if(defn is EntityDefinitionProxy) {
 						var edp:EntityDefinitionProxy = EntityDefinitionProxy(defn);
@@ -232,6 +242,7 @@ package org.openforis.collect.ui {
 			}
 			
 			formItem.attributeDefinition = definition;
+			formItem.isInDataGroup = isInDataGroup;
 			return formItem;
 		}
 		

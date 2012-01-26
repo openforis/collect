@@ -14,6 +14,7 @@
 	<fx:Script>
 		<![CDATA[
 			import mx.collections.ListCollectionView;
+			import mx.core.IVisualElement;
 			
 			import org.openforis.collect.i18n.Message;
 			import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
@@ -54,11 +55,7 @@
 				collectFormItem.addTo(form);
 			}
 			
-			public function addAttributeFormItem(attributeFormItem:AttributeFormItem, tabName:String = null):void {
-				var formItem:FormItem = new FormItem();
-				formItem.label = attributeFormItem.attributeDefinition.getLabelText();
-				
-				formItem.addElement(attributeFormItem);
+			public function addFormItem(formItem:IVisualElement, tabName:String = null):void {
 				if(tabName == null || tabName == ''){
 					form.addElement(formItem);
 				} else {
@@ -66,6 +63,15 @@
 					f.addToForm(formItem);
 				}
 			}
+			
+			 public function addAttributeFormItem(attributeFormItem:AttributeFormItem, tabName:String = null):void {
+				if(tabName == null || tabName == ''){
+					attributeFormItem.addTo(form);
+				} else {
+					var f:ScrollableFormContainer = (_forms[tabName] as ScrollableFormContainer);
+					attributeFormItem.addTo(f.form);
+				}
+			} 
 			
 			public function addEntityFormItem(entityFormItem:EntityFormItem, tabName:String = null):void {
 				var formItem:FormItem = new FormItem();

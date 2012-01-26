@@ -18,6 +18,8 @@
 			private var _attributeDefinition:AttributeDefinitionProxy;
 			private var _childrenAdded:Boolean = false;
 			
+			private var _isInDataGroup:Boolean = false;
+			
 			override protected function createChildren():void {
 				super.createChildren();
 				//this.label = attributeDefinition.getLabelText();
@@ -43,14 +45,16 @@
 			public function addTo(parent:IVisualElementContainer):void {
 				parent.addElement(this);
 			}
+
+			public function get isInDataGroup():Boolean {
+				return _isInDataGroup;
+			}
+
+			public function set isInDataGroup(value:Boolean):void {
+				_isInDataGroup = value;
+			}
+
 		]]>
 	</fx:Script>
-	
-	
-	
-	<fx:Declarations>
-		<!-- Place non-visual elements (e.g., services, value objects) here -->
-	</fx:Declarations>
-	
 	
 </s:Group>
