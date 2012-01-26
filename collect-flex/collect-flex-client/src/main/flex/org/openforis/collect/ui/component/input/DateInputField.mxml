@@ -9,6 +9,7 @@
 	<s:BorderContainer 
 		id="inputBox"
 		minHeight="0"
+		styleName="noError"
 		tabEnabled="false">
 		<s:layout>
 			<s:HorizontalLayout>
