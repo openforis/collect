@@ -1,6 +1,9 @@
 package org.openforis.collect.model;
 
+import java.math.BigDecimal;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.model.Record;
@@ -35,11 +38,17 @@ public class CollectRecord extends Record {
 	private Integer skipped;
 	private Integer errors;
 	private Integer warnings;
-
+	
+	private Map<String, Object> keys;
+	private Map<String, Integer> counts;
+	
 	public CollectRecord(Survey survey, String rootEntity, String versionName) {
 		super(survey, rootEntity, versionName);
 		this.step = Step.ENTRY;
 		this.submitted = false;
+		
+		keys = new HashMap<String, Object>();
+		counts = new HashMap<String, Integer>();
 	}
 
 	public void setSubmitted(boolean submitted) {
@@ -120,6 +129,22 @@ public class CollectRecord extends Record {
 	
 	public void setWarnings(Integer warnings) {
 		this.warnings = warnings;
+	}
+	
+	public Map<String, Object> getKeys() {
+		return keys;
+	}
+	
+	public void setKeys(Map<String, Object> keys) {
+		this.keys = keys;
+	}
+	
+	public Map<String, Integer> getCounts() {
+		return counts;
+	}
+	
+	public void setCounts(Map<String, Integer> counts) {
+		this.counts = counts;
 	}
 	
 }

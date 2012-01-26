@@ -5,6 +5,7 @@ import static org.junit.Assert.assertNotNull;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Map;
@@ -20,7 +21,9 @@ import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.RecordSummary;
 import org.openforis.collect.model.UIConfiguration.UIConfigurationAdapter;
+import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
+import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.xml.BindingContext;
 import org.openforis.idm.metamodel.xml.InvalidIdmlException;
@@ -51,9 +54,14 @@ public class RecordDAOTest {
 	@Autowired
 	protected RecordDAO recordDao;
 	
+	@Autowired
+	protected RecordSummaryDAO recordSummaryDao;
+	
 	private Survey survey;
 	
 	private List<CollectRecord> sampleRecords;
+	
+	private int numberOfSampleRecords = 1000;
 	
 //	@Before
 	public void beforeTest(){
@@ -68,7 +76,7 @@ public class RecordDAOTest {
 		createAndSaveSampleRecords();
 	}
 	
-	//@After
+//	@After
 	public void afterTest() {
 		//delete sample records
 		for (CollectRecord record : sampleRecords) {
@@ -78,18 +86,20 @@ public class RecordDAOTest {
 	
 	/**
 	 * 
-	 * Creates 9 sample records with different id and different number of plots.
+	 * Creates sample records with different id and different number of plots.
 	 * 
 	 */
 	private void createAndSaveSampleRecords() {
-		int numberOfClusters = 1000;
+		EntityDefinition rootEntityDefinition = survey.getSchema().getRootEntityDefinition("cluster");
+		EntityDefinition plotDef = (EntityDefinition) rootEntityDefinition.getChildDefinition("plot");
+		
 		sampleRecords = new ArrayList<CollectRecord>();
 		
 		//create and save clusters
-		for (int i = 1; i <= numberOfClusters ; i++) {
+		for (int i = 1; i <= numberOfSampleRecords ; i++) {
 			CollectRecord record = createRecord(survey, i);
 			sampleRecords.add(record);
-			recordDao.saveOrUpdate(record);
+			recordDao.saveOrUpdate(record, Arrays.asList(plotDef));
 		}
 	}
 	
@@ -105,7 +115,7 @@ public class RecordDAOTest {
 		List<EntityDefinition> countInSummaryListEntityDefinitions = new ArrayList<EntityDefinition>();
 		EntityDefinition plotEntity = (EntityDefinition) rootEntity.getChildDefinition("plot");
 		countInSummaryListEntityDefinitions.add(plotEntity);
-		List<RecordSummary> list = this.recordDao.loadRecordSummaries(rootEntity, countInSummaryListEntityDefinitions, offset, maxNumberOfRecords, orderByFieldName, filter);
+		List<RecordSummary> list = this.recordSummaryDao.load(rootEntity, countInSummaryListEntityDefinitions, offset, maxNumberOfRecords, orderByFieldName, filter);
 
 		assertNotNull(list);
 		assertEquals(maxNumberOfRecords, list.size());
@@ -139,7 +149,7 @@ public class RecordDAOTest {
 		List<EntityDefinition> countInSummaryListEntityDefinitions = new ArrayList<EntityDefinition>();
 		EntityDefinition plotEntity = (EntityDefinition) rootEntity.getChildDefinition("plot");
 		countInSummaryListEntityDefinitions.add(plotEntity);
-		List<RecordSummary> list = this.recordDao.loadRecordSummaries(rootEntity, countInSummaryListEntityDefinitions, offset, maxNumberOfRecords, orderByFieldName, filter);
+		List<RecordSummary> list = this.recordSummaryDao.load(rootEntity, countInSummaryListEntityDefinitions, offset, maxNumberOfRecords, orderByFieldName, filter);
 		
 		assertNotNull(list);
 		assertEquals(maxNumberOfRecords, list.size());
@@ -167,6 +177,7 @@ public class RecordDAOTest {
 		int warningsCount = new Double(Math.ceil((double) (Math.random() * 30))).intValue();
 		int numberOfPlots = new Double(Math.ceil((double) (Math.random() * 20))).intValue();
 		int numberOfTrees = new Double(Math.ceil((double) (Math.random() * 30))).intValue();;
+		
 		CollectRecord record = new CollectRecord(survey, "cluster", "2.0");
 		record.setCreationDate(new GregorianCalendar(2011, 0, sequenceNumber, 8, 30).getTime());
 		//record.setCreatedBy("DAOIntegrationTest");
@@ -177,7 +188,8 @@ public class RecordDAOTest {
 		record.setErrors(errorsCount);
 		record.setWarnings(warningsCount);
 		Entity cluster = record.getRootEntity();
-		cluster.addValue("id", new AlphanumericCode(Integer.toString(sequenceNumber)));
+		String keyId = Integer.toString(sequenceNumber);
+		cluster.addValue("id", new AlphanumericCode(keyId));
 		cluster.addValue("gps_realtime", Boolean.TRUE);
 		cluster.addValue("region", new NumericCode(001));
 		cluster.addValue("district", new NumericCode(002));
@@ -206,6 +218,13 @@ public class RecordDAOTest {
 				tree.addValue("bole_height", (Double) null).setMetadata(new CollectAttributeMetadata('*',null,"No value specified"));
 			}
 		}
+		//set counts
+		EntityDefinition plotDef = (EntityDefinition) cluster.getDefinition().getChildDefinition("plot");
+		record.getCounts().put(plotDef.getPath(), numberOfPlots);
+		//set keys
+		NodeDefinition idDef = cluster.getDefinition().getChildDefinition("id");
+		record.getKeys().put(idDef.getPath(), keyId);
+		
 		return record;
 	}
 

@@ -38,6 +38,17 @@ CREATE TABLE "collect"."record"  (
 	"missing"       	integer NULL,
 	"errors"        	integer NULL,
 	"warnings"      	integer NULL,
+	"key_number1"   	numeric(15,5) NULL,
+	"key_number2"   	numeric(15,5) NULL,
+	"key_number3"   	numeric(15,5) NULL,
+	"key_text1"     	varchar(2048) NULL,
+	"key_text2"     	varchar(2048) NULL,
+	"key_text3"     	varchar(2048) NULL,
+	"count1"        	integer NULL,
+	"count2"        	integer NULL,
+	"count3"        	integer NULL,
+	"count4"        	integer NULL,
+	"count5"        	integer NULL,
 	PRIMARY KEY("id")
 )
 GO

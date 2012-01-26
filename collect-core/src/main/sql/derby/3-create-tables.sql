@@ -38,6 +38,17 @@ CREATE TABLE "collect"."record"  (
 	"missing"       	INTEGER,
 	"errors"        	INTEGER,
 	"warnings"      	INTEGER,
+	"key_number1"   	DECIMAL(15,5) NULL,
+	"key_number2"   	DECIMAL(15,5) NULL,
+	"key_number3"   	DECIMAL(15,5) NULL,
+	"key_text1"     	VARCHAR(2048) NULL,
+	"key_text2"     	VARCHAR(2048) NULL,
+	"key_text3"     	VARCHAR(2048) NULL,
+	"count1"        	INTEGER NULL,
+	"count2"        	INTEGER NULL,
+	"count3"        	INTEGER NULL,
+	"count4"        	INTEGER NULL,
+	"count5"        	INTEGER NULL,
 	CONSTRAINT "PK_record" PRIMARY KEY("id")
 )
 GO

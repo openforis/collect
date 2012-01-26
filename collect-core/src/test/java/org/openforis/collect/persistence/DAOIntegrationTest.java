@@ -1,18 +1,18 @@
 package org.openforis.collect.persistence;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.GregorianCalendar;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.jooq.exception.DataAccessException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -22,6 +22,7 @@ import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.RecordSummary;
 import org.openforis.collect.model.UIConfiguration.UIConfigurationAdapter;
 import org.openforis.idm.metamodel.EntityDefinition;
+import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.xml.BindingContext;
 import org.openforis.idm.metamodel.xml.InvalidIdmlException;
@@ -53,6 +54,9 @@ public class DAOIntegrationTest {
 	@Autowired
 	protected RecordDAO recordDao;
 	
+	@Autowired
+	protected RecordSummaryDAO recordSummaryDao;
+	
 	@Before
 	public void beforeTest(){
 		surveyDao.loadAll();
@@ -73,8 +77,12 @@ public class DAOIntegrationTest {
 		}
 		
 		// SAVE NEW
+		EntityDefinition rootEntityDefinition = survey.getSchema().getRootEntityDefinition("cluster");
+		EntityDefinition plotDef = (EntityDefinition) rootEntityDefinition.getChildDefinition("plot");
+		
 		CollectRecord record = createRecord(survey);
-		recordDao.saveOrUpdate(record);
+		
+		recordDao.saveOrUpdate(record, Arrays.asList(plotDef));
 		
 		String saved = record.toString();
 		log.debug("Saving record:\n"+saved);
@@ -124,7 +132,8 @@ public class DAOIntegrationTest {
 		//record.setCreatedBy("DAOIntegrationTest");
 		record.setStep(Step.ENTRY);
 		Entity cluster = record.getRootEntity();
-		cluster.addValue("id", new AlphanumericCode("123_456"));
+		String id = "123_456";
+		cluster.addValue("id", new AlphanumericCode(id));
 		cluster.addValue("gps_realtime", Boolean.TRUE);
 		cluster.addValue("region", new NumericCode(001));
 		cluster.addValue("district", new NumericCode(002));
@@ -163,6 +172,12 @@ public class DAOIntegrationTest {
 			tree2.addValue("dbh", 85.8);
 			tree2.addValue("total_height", 4.0);
 		}
+		//set counts
+		EntityDefinition plotDef = (EntityDefinition) cluster.getDefinition().getChildDefinition("plot");
+		record.getCounts().put(plotDef.getPath(), 2);
+		//set keys
+		NodeDefinition idDef = cluster.getDefinition().getChildDefinition("id");
+		record.getKeys().put(idDef.getPath(), id);
 		//System.err.println(record);
 		return record;
 	}
@@ -174,7 +189,7 @@ public class DAOIntegrationTest {
 		assertEquals(1, list.size());
 		
 	}
-/*
+	
 	@Test
 	public void testLoadRecordSummaries() {
 		Survey survey = surveyDao.load("archenland1");
@@ -185,14 +200,14 @@ public class DAOIntegrationTest {
 		String orderByFieldName = "key_id";
 		String filter = null;
 		EntityDefinition plotDefn = (EntityDefinition) rootEntity.getChildDefinition("plot");
-		List<RecordSummary> list = this.recordDao.loadRecordSummaries(rootEntity, Arrays.asList(plotDefn), offset, maxNumberOfRecords, orderByFieldName, filter);
+		List<RecordSummary> list = this.recordSummaryDao.load(rootEntity, Arrays.asList(plotDefn), offset, maxNumberOfRecords, orderByFieldName, filter);
 		assertNotNull(list);
 		assertEquals(1, list.size());
 		
 		RecordSummary summary = list.get(0);
 		assertEquals(1, summary.getStep());
 	}
-*/
+
 	private void updateRecord(CollectRecord record) {
 		// Update modified date
 		record.setModifiedDate(new GregorianCalendar(2012, 1, 1, 0, 1).getTime());
