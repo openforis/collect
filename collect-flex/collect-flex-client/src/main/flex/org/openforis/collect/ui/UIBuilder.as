@@ -38,6 +38,7 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.ui.component.detail.MultipleEntityFormItem;
 	import org.openforis.collect.ui.component.detail.SingleAttributeFormItem;
 	import org.openforis.collect.ui.component.detail.SingleEntityFormItem;
+	import org.openforis.collect.ui.component.detail.TaxonAttributeFormItem;
 	import org.openforis.collect.ui.component.input.BooleanInputField;
 	import org.openforis.collect.ui.component.input.CodeInputField;
 	import org.openforis.collect.ui.component.input.CoordinateInputField;
@@ -133,24 +134,28 @@ package org.openforis.collect.ui {
 			column = new GridColumn();
 			column.headerText = Message.get("list.skipped");
 			column.dataField = "skipped";
+			column.labelFunction = RecordSummaryDataGrid.numberLabelFunction;
 			column.width = 100;
 			columns.addItem(column);
 			//missing count column
 			column = new GridColumn();
 			column.headerText = Message.get("list.missing");
 			column.dataField = "missing";
+			column.labelFunction = RecordSummaryDataGrid.numberLabelFunction;
 			column.width = 100;
 			columns.addItem(column);
 			//errors count column
 			column = new GridColumn();
 			column.headerText = Message.get("list.errors");
 			column.dataField = "errors";
+			column.labelFunction = RecordSummaryDataGrid.numberLabelFunction;
 			column.width = 100;
 			columns.addItem(column);
 			//warnings count column
 			column = new GridColumn();
 			column.headerText = Message.get("list.warnings");
 			column.dataField = "warnings";
+			column.labelFunction = RecordSummaryDataGrid.numberLabelFunction;
 			column.width = 100;
 			columns.addItem(column);
 			//creation date column
@@ -162,8 +167,8 @@ package org.openforis.collect.ui {
 			columns.addItem(column);
 			//date modified column
 			column = new GridColumn();
-			column.headerText = Message.get("list.dateModified");
-			column.dataField = "dateModified";
+			column.headerText = Message.get("list.modifiedDate");
+			column.dataField = "modifiedDate";
 			column.labelFunction = RecordSummaryDataGrid.dateLabelFunction;
 			column.width = 150;
 			columns.addItem(column);
@@ -218,6 +223,8 @@ package org.openforis.collect.ui {
 			if(definition is CoordinateAttributeDefinitionProxy){
 				//todo multiple
 				formItem = new CoordinateAttributeFormItem();
+			} else if(definition is TaxonAttributeDefinitionProxy){
+				formItem = new TaxonAttributeFormItem();
 			} else if(definition.multiple) {
 				formItem = new MultipleAttributeFormItem();
 			} else {
