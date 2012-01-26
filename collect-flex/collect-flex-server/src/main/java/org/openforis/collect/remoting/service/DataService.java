@@ -44,8 +44,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author M. Togna
  */
 public class DataService {
-	private static final QName COUNT_ANNOTATION = new QName("http://www.openforis.org/collect/3.0/collect", "count");
-
+	
 	@Autowired
 	private SessionManager sessionManager;
 
@@ -80,9 +79,8 @@ public class DataService {
 		Survey activeSurvey = sessionState.getActiveSurvey();
 		Schema schema = activeSurvey.getSchema();
 		EntityDefinition rootEntityDefinition = schema.getRootEntityDefinition(rootEntityName);
-		int count = recordManager.getCountRecords(rootEntityDefinition, filter);
-		List<EntityDefinition> countInSummaryListEntityDefinitions = getCountInSummaryListEntityDefinitions(rootEntityDefinition);
-		List<RecordSummary> list = recordManager.getSummaries(rootEntityDefinition, countInSummaryListEntityDefinitions, offset, maxNumberOfRows, orderByFieldName, filter);
+		int count = recordManager.getCountRecords(rootEntityDefinition);
+		List<RecordSummary> list = recordManager.getSummaries(rootEntityDefinition, offset, maxNumberOfRows, orderByFieldName, filter);
 		result.put("count", count);
 		result.put("records", list);
 		return result;
@@ -114,7 +112,7 @@ public class DataService {
 	@Transactional
 	public void saveActiveRecord() {
 		SessionState sessionState = sessionManager.getSessionState();
-		Record record = sessionState.getActiveRecord();
+		CollectRecord record = sessionState.getActiveRecord();
 		recordManager.save(record);
 		sessionState.setActiveRecordState(RecordState.SAVED);
 	}
@@ -269,24 +267,4 @@ public class DataService {
 		return recordManager;
 	}
 
-	/**
-	 * Returns first level entity definitions of the passed root entity that have the attribute countInSummaryList set to true
-	 * 
-	 * @param rootEntityDefinition
-	 * @return 
-	 */
-	private List<EntityDefinition> getCountInSummaryListEntityDefinitions(EntityDefinition rootEntityDefinition) {
-		List<EntityDefinition> result = new ArrayList<EntityDefinition>();
-		List<NodeDefinition> childDefinitions = rootEntityDefinition.getChildDefinitions();
-		for (NodeDefinition childDefinition : childDefinitions) {
-			if(childDefinition instanceof EntityDefinition) {
-				EntityDefinition entityDefinition = (EntityDefinition) childDefinition;
-				String annotation = childDefinition.getAnnotation(COUNT_ANNOTATION);
-				if(annotation != null && Boolean.parseBoolean(annotation)) {
-					result.add(entityDefinition);
-				}
-			}
-		}
-		return result;
-	}
 }
