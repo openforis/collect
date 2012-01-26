@@ -15,7 +15,6 @@ mx|Alert {
 	background-alpha: 0.8;
 }
 
-/*
 s|TitleWindow {
 	skin-class: ClassReference("org.openforis.collect.ui.skin.TitleWindowSkin");
 	title-style-name: dialogHeaderStyle;
@@ -24,9 +23,8 @@ s|TitleWindow {
 	border-alpha: 0.5;
 	corner-radius: 3;
 	background-color: #FFFFFF;
-	background-alpha: 0;
+	background-alpha: 0.8;
 }
-*/
 
 s|BorderContainer.noError {
 	border-color: #FFFFFF;
@@ -67,3 +65,16 @@ s|Button.roundCorners {
 mx|LinkButton.roundCorners {
 	corner-radius: 8;
 }
+
+s|FormItem.indent {
+	skin-class: ClassReference("org.openforis.collect.ui.skin.FormItemSkin");
+	label-style-name: "indent";
+}
+
+s|Label.indent {
+	padding-left: 10;
+	fontWeight: normal;
+	font-size: 9;
+}
+
+

@@ -55,16 +55,17 @@
          */
         override protected function updateDisplayList(unscaledWidth:Number, unscaledHeight:Number):void
         {
-            if (getStyle("borderVisible") == true)
-            {
+			var borderWeight:Number = getStyle('borderWeight');
+			if(isNaN(borderWeight)) {
+				borderWeight = 1;
+			}
+            if (getStyle("borderVisible") == true)  {
                 border.visible = true;
-                background.left = background.top = background.right = background.bottom = 1;
-                contents.left = contents.top = contents.right = contents.bottom = 1;
-            }
-            else
-            {
+                //background.left = background.top = background.right = background.bottom = borderWeight;
+                contents.left = contents.top = contents.right = contents.bottom = borderWeight;
+            } else {
                 border.visible = false;
-                background.left = background.top = background.right = background.bottom = 0;
+                //background.left = background.top = background.right = background.bottom = 0;
                 contents.left = contents.top = contents.right = contents.bottom = 0;
             }
             
@@ -76,8 +77,7 @@
                  currentState == "normalWithControlBar" ||
                  currentState == "inactiveWithControlBar");
             
-            if (cornerRadius != cr)
-            {
+            if (cornerRadius != cr) {
                 cornerRadius = cr;
                 
                 dropShadow.tlRadius = cornerRadius;
@@ -90,13 +90,15 @@
                 setPartCornerRadii(background, withControls);
             }
             
-            if (bottomMaskRect) setPartCornerRadii(bottomMaskRect, withControls); 
+            if (bottomMaskRect) {
+				setPartCornerRadii(bottomMaskRect, withControls);
+			}
             
             borderStroke.color = getStyle("borderColor");
             borderStroke.alpha = getStyle("borderAlpha");
             backgroundFill.color = getStyle("backgroundColor");
             backgroundFill.alpha = getStyle("backgroundAlpha");
-            
+			
             super.updateDisplayList(unscaledWidth, unscaledHeight);
         }
         
@@ -158,26 +160,14 @@
                 <!--- Defines the TitleWindowSkin class's border stroke. The default value is 1. -->
                 <s:SolidColorStroke id="borderStroke" color="#000000" weight="10" alpha="0.5" />
             </s:stroke>
-			<s:fill>
-				<s:SolidColor alpha="0" />
-			</s:fill>
         </s:Rect>
-        
-        <!-- layer 2: background fill -->
-        <!--- Defines the appearance of the TitleWindowSkin class's background. -->
         
         <!-- layer 3: contents -->
         <!--- Contains the vertical stack of title bar content and control bar. -->
-        <s:Group left="10" right="10" top="0" bottom="10" id="contents">
+        <s:Group left="10" right="10" top="30" bottom="10" id="contents">
             <s:layout>
                 <s:VerticalLayout gap="0" horizontalAlign="justify" />
             </s:layout>
-			
-			<s:Rect id="background" left="10" top="10" right="10" bottom="10">
-				<s:fill>
-					<s:SolidColor id="backgroundFill" color="#FFFFFF"/>
-				</s:fill>
-			</s:Rect>
 			
             <!--- @private -->
             <s:Group id="topGroup" mask="{topGroupMask}">
@@ -199,7 +189,7 @@
                 
                 <!-- layer 2: moveArea -->
                 <!--- @copy spark.components.TitleWindow#moveArea -->
-                <s:Group id="moveArea" left="0" right="0" top="0" bottom="0" />
+                <s:Group id="moveArea" left="0" right="0" top="-10" bottom="0" />
             </s:Group>
             
             <!--
@@ -208,12 +198,20 @@
                 more about it here: http://bugs.adobe.com/jira/browse/SDK-21143
             -->
 
-			<!--- @copy spark.components.SkinnableContainer#contentGroup -->
-			<s:Group id="contentGroup" minWidth="0" minHeight="0" right="10" left="10" bottom="10" top="0">
-				<s:layout>
-					<s:VerticalLayout paddingLeft="10" paddingBottom="10" paddingRight="10" />
-				</s:layout>
+			<s:Group id="contentGroupWrapper" minWidth="0" minHeight="0">
+				<s:Rect id="background" height="100%" width="100%">
+					<s:fill>
+						<s:SolidColor id="backgroundFill" color="#FFFFFF"/>
+					</s:fill>
+				</s:Rect>
+				
+				<s:Group id="contentGroup" minWidth="0" minHeight="0">
+					<s:layout>
+						<s:VerticalLayout paddingLeft="10" paddingBottom="10" paddingRight="10" />
+					</s:layout>
+				</s:Group>
 			</s:Group>
+				
 			
             <!--- @private -->
             <s:Group id="bottomGroup" minWidth="0" minHeight="0" 
