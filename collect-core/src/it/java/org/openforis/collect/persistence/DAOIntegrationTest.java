@@ -1,27 +1,29 @@
 package org.openforis.collect.persistence;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.GregorianCalendar;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.jooq.exception.DataAccessException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openforis.collect.model.CollectAttributeMetadata;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
-import org.openforis.collect.model.RecordSummary;
 import org.openforis.collect.model.UIConfiguration.UIConfigurationAdapter;
-import org.openforis.idm.metamodel.EntityDefinition;
+import org.openforis.collect.persistence.DataInconsistencyException;
+import org.openforis.collect.persistence.NonexistentIdException;
+import org.openforis.collect.persistence.RecordDAO;
+import org.openforis.collect.persistence.SurveyDAO;
+import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.xml.BindingContext;
 import org.openforis.idm.metamodel.xml.InvalidIdmlException;

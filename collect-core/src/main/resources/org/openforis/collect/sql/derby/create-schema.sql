@@ -1,3 +1,35 @@
+CREATE SCHEMA "collect"
+GO
+
+CREATE SEQUENCE "collect"."data_id_seq"
+GO
+
+CREATE SEQUENCE "collect"."record_id_seq"
+GO
+
+CREATE SEQUENCE "collect"."schema_definition_id_seq"
+GO
+
+CREATE SEQUENCE "collect"."survey_id_seq"
+GO
+
+CREATE SEQUENCE "collect"."taxonomy_id_seq"
+GO
+
+CREATE SEQUENCE "collect"."taxon_id_seq"
+GO
+
+CREATE SEQUENCE "collect"."taxon_name_id_seq"
+GO
+
+CREATE SEQUENCE "collect"."user_id_seq"	
+GO
+
+CREATE SEQUENCE "collect"."user_role_id_seq"
+GO
+
+--- BEGIN GENERATED CREATE TABLES ---
+
 CREATE TABLE "collect"."data"  ( 
 	"id"           	INTEGER NOT NULL,
 	"record_id"    	INTEGER NOT NULL,
@@ -164,4 +196,14 @@ ALTER TABLE "collect"."record"
 	ADD CONSTRAINT "FK_record_modified_by_user"
 	FOREIGN KEY("modified_by_id")
 	REFERENCES "collect"."user_account"("id")
+GO
+ 
+--- END GENERATED CREATE TABLES ---
+
+CREATE VIEW "collect"."node_count_view"
+    ("record_id", "definition_id", "node_count") 
+AS
+    SELECT "record_id", "definition_id", count("id")
+    FROM "collect"."data"
+    GROUP BY "record_id", "definition_id"
 GO
