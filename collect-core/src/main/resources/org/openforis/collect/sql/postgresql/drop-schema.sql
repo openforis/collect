@@ -25,9 +25,6 @@ GO
 DROP SEQUENCE "collect"."user_role_id_seq" 
 GO
 
-DROP VIEW "collect"."node_count_view"
-GO
-
 -- START GENERATED --
 
 ALTER TABLE "collect"."data"
