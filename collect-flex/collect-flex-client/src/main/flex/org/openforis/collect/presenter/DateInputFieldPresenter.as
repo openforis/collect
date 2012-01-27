@@ -1,4 +1,4 @@
-package org.openforis.collect.presenter.input {
+package org.openforis.collect.presenter {
 	import flash.events.Event;
 	import flash.events.FocusEvent;
 	
@@ -6,7 +6,6 @@ package org.openforis.collect.presenter.input {
 	import mx.events.CalendarLayoutChangeEvent;
 	import mx.events.DropdownEvent;
 	
-	import org.openforis.collect.presenter.InputFieldPresenter;
 	import org.openforis.collect.ui.component.input.DateInputField;
 	import org.openforis.collect.ui.component.input.InputField;
 	import org.openforis.collect.util.StringUtil;
@@ -22,33 +21,29 @@ package org.openforis.collect.presenter.input {
 		[Bindable]
 		public static var separator:String = "/";
 
-		private var _dateInputField:DateInputField;
+		private var _view:DateInputField;
 		
 		public function DateInputFieldPresenter(inputField:DateInputField = null) {
-			super();
-			this.inputField = inputField;
+			_view = inputField;
+			_view.separator1.text = separator;
+			_view.separator2.text = separator;
+			
+			_view.dateField.formatString = dateFormat;
+
+			super(inputField);
 		}
 		
-		override public function set inputField(value:InputField):void {
-			super.inputField = value;
+		override internal function initEventListeners():void {
+			super.initEventListeners();
 			
-			_dateInputField = value as DateInputField;
-			
-			if(_dateInputField != null) {
-				_dateInputField.year.addEventListener(FocusEvent.FOCUS_IN, inputFieldFocusInHandler);
-				_dateInputField.year.addEventListener(FocusEvent.FOCUS_OUT, inputFieldFocusOutHandler);
-				_dateInputField.month.addEventListener(FocusEvent.FOCUS_IN, inputFieldFocusInHandler);
-				_dateInputField.month.addEventListener(FocusEvent.FOCUS_OUT, inputFieldFocusOutHandler);
-				_dateInputField.day.addEventListener(FocusEvent.FOCUS_IN, inputFieldFocusInHandler);
-				_dateInputField.day.addEventListener(FocusEvent.FOCUS_OUT, inputFieldFocusOutHandler);
-				_dateInputField.dateField.addEventListener(CalendarLayoutChangeEvent.CHANGE, dateFieldChangeHandler);
-				_dateInputField.dateField.addEventListener(DropdownEvent.OPEN, dateFieldOpenHandler);
-				
-				_dateInputField.separator1.text = separator;
-				_dateInputField.separator2.text = separator;
-				
-				_dateInputField.dateField.formatString = dateFormat;
-			}
+			_view.year.addEventListener(FocusEvent.FOCUS_IN, focusInHandler);
+			_view.year.addEventListener(FocusEvent.FOCUS_OUT, focusOutHandler);
+			_view.month.addEventListener(FocusEvent.FOCUS_IN, focusInHandler);
+			_view.month.addEventListener(FocusEvent.FOCUS_OUT, focusOutHandler);
+			_view.day.addEventListener(FocusEvent.FOCUS_IN, focusInHandler);
+			_view.day.addEventListener(FocusEvent.FOCUS_OUT, focusOutHandler);
+			_view.dateField.addEventListener(CalendarLayoutChangeEvent.CHANGE, dateFieldChangeHandler);
+			_view.dateField.addEventListener(DropdownEvent.OPEN, dateFieldOpenHandler);
 		}
 		
 		override public function set value(value:*):void {
@@ -83,7 +78,7 @@ package org.openforis.collect.presenter.input {
 		protected function dateFieldOpenHandler(event:Event):void {
 			var date:Date = getDateFromFields();
 			if(date != null){
-				_dateInputField.dateField.selectedDate = date;
+				_view.dateField.selectedDate = date;
 			}
 		}
 		
@@ -95,21 +90,21 @@ package org.openforis.collect.presenter.input {
 		}
 		
 		protected function setDateOnFields(date:Date):void {
-			_dateInputField.year.text = String(date.fullYear);
-			_dateInputField.month.text = String(date.month);
-			_dateInputField.day.text = String(date.date);
+			_view.year.text = String(date.fullYear);
+			_view.month.text = String(date.month);
+			_view.day.text = String(date.date);
 		}
 		
 		protected function getDateFromFields():Date {
 			//check if input text is valid
-			if(StringUtil.isNotBlank(_dateInputField.day.text) && 
-				StringUtil.isNotBlank(_dateInputField.month.text) && 
-				StringUtil.isNotBlank(_dateInputField.year.text)) {
-				var tempDate:Date = new Date(_dateInputField.year.text, _dateInputField.month.text, _dateInputField.day.text);
+			if(StringUtil.isNotBlank(_view.day.text) && 
+				StringUtil.isNotBlank(_view.month.text) && 
+				StringUtil.isNotBlank(_view.year.text)) {
+				var tempDate:Date = new Date(_view.year.text, _view.month.text, _view.day.text);
 				//check that the generated date is valid
-				if(String(tempDate.fullYear) == _dateInputField.year.text &&
-					String(tempDate.month) == _dateInputField.month.text &&
-					String(tempDate.day) == _dateInputField.day.text
+				if(String(tempDate.fullYear) == _view.year.text &&
+					String(tempDate.month) == _view.month.text &&
+					String(tempDate.day) == _view.day.text
 				) {
 					return tempDate;
 				}

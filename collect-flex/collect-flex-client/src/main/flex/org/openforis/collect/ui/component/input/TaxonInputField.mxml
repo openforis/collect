@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<input1:InputField xmlns:fx="http://ns.adobe.com/mxml/2009" 
+<input:InputField xmlns:fx="http://ns.adobe.com/mxml/2009" 
 				  xmlns:s="library://ns.adobe.com/flex/spark" 
 				  xmlns:mx="library://ns.adobe.com/flex/mx" 
-				  xmlns:input="org.openforis.collect.ui.component.detail.input.*" 
-				  presenterClass="org.openforis.collect.presenter.input.TaxonInputFieldPresenter" xmlns:input1="org.openforis.collect.ui.component.input.*"
+				  xmlns:input="org.openforis.collect.ui.component.input.*"
 				  >
 	<fx:Script>
 		<![CDATA[
@@ -12,12 +11,17 @@
 			import mx.core.FlexGlobals;
 			import mx.core.UIComponent;
 			
+			import org.openforis.collect.presenter.TaxonInputFieldPresenter;
 			import org.openforis.collect.ui.Images;
 			
 			import spark.components.Group;
 			
 			// Define a static variable.
 			private static var defaultStylesInited:Boolean = initDefaultStyles();
+			
+			override protected function initPresenter():void {
+				this.presenter = new TaxonInputFieldPresenter(this);
+			}
 			
 			// Define a static method.
 			private static function initDefaultStyles():Boolean {
@@ -51,10 +55,6 @@
 		]]>
 	</fx:Script>
 	
-	<fx:Declarations>
-		<!-- Place non-visual elements (e.g., services, value objects) here -->
-	</fx:Declarations>
-	
 	<fx:Metadata>
 		[Style(name="searchIconVisible",type="Boolean",inherit="yes")]
 	</fx:Metadata>
@@ -73,22 +73,22 @@
 				<s:paddingLeft>0</s:paddingLeft>
 			</s:HorizontalLayout>
 		</s:layout>
-		<input1:TextInput id="idTextInput"
+		<input:TextInput id="idTextInput"
 						 width="100%" />
 		<mx:Image source="{Images.MAGNIFIER}" 
 				  id="idSearchImg"
 				  useHandCursor="true" buttonMode="true"/>
-		<input1:TextInput id="scientificNameTextInput"
+		<input:TextInput id="scientificNameTextInput"
 						 width="100%" />
 		<mx:Image source="{Images.MAGNIFIER}" 
 				  id="scientificNameSearchImg"
 				  useHandCursor="true" buttonMode="true"/>
-		<input1:TextInput id="vernacularNameTextInput"
+		<input:TextInput id="vernacularNameTextInput"
 						 width="100%" />
 		<mx:Image source="{Images.MAGNIFIER}" 
 				  id="vernacularNameSearchImg"
 				  useHandCursor="true" buttonMode="true"/>
-		<input1:TextInput id="vernacularLangTextInput"
+		<input:TextInput id="vernacularLangTextInput"
 						 width="100%" />
 		<mx:Image source="{Images.MAGNIFIER}" 
 				  id="vernacularLangSearchImg"
@@ -96,4 +96,4 @@
 		
 	</s:BorderContainer>
 	
-</input1:InputField>
+</input:InputField>

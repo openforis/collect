@@ -25,12 +25,13 @@ package org.openforis.collect.presenter {
 		
 		public function CodeInputFieldPresenter(inputField:CodeInputField) {
 			this._view = inputField;
-			this.inputField = inputField;
 			
-			super();
+			super(inputField);
 		}
 		
 		override internal function initEventListeners():void {
+			super.initEventListeners();
+			
 			_view.openImage.addEventListener(MouseEvent.CLICK, openImageClickHandler);
 			
 			_view.popup.addEventListener(CloseEvent.CLOSE, closePopupHandler);

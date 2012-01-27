@@ -2,15 +2,17 @@
 <input:InputField xmlns:fx="http://ns.adobe.com/mxml/2009" 
 				  xmlns:s="library://ns.adobe.com/flex/spark" 
 				  xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:input="org.openforis.collect.ui.component.input.*"
-				  presenterClass="org.openforis.collect.presenter.input.CoordinateInputFieldPresenter">
+				  >
 	<fx:Script>
 		<![CDATA[
 			import org.openforis.collect.i18n.Message;
+			import org.openforis.collect.presenter.CoordinateInputFieldPresenter;
+			
+			override protected function initPresenter():void {
+				this.presenter = new CoordinateInputFieldPresenter(this);
+			}
 		]]>
 	</fx:Script>
-	<fx:Declarations>
-		<!-- Place non-visual elements (e.g., services, value objects) here -->
-	</fx:Declarations>
 
 	<s:BorderContainer 
 		id="inputBox"

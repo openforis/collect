@@ -1,4 +1,4 @@
-package org.openforis.collect.presenter.input {
+package org.openforis.collect.presenter {
 	import flash.display.DisplayObject;
 	import flash.events.Event;
 	import flash.events.FocusEvent;
@@ -15,7 +15,6 @@ package org.openforis.collect.presenter.input {
 	import mx.utils.StringUtil;
 	
 	import org.openforis.collect.event.TaxonInputFieldEvent;
-	import org.openforis.collect.presenter.InputFieldPresenter;
 	import org.openforis.collect.ui.component.input.InputField;
 	import org.openforis.collect.ui.component.input.TaxonAutoCompletePopUp;
 	import org.openforis.collect.ui.component.input.TaxonInputField;
@@ -37,58 +36,51 @@ package org.openforis.collect.presenter.input {
 		
 		public var minCharsToStartAutoComplete:int = 2;
 		
-		private var _taxonInputField:TaxonInputField;
+		private var _view:TaxonInputField;
 		
 		public function TaxonInputFieldPresenter(inputField:TaxonInputField = null) {
-			super();
-			this.inputField = inputField;
+			_view = inputField;
+			super(inputField);
 		}
 		
-		override public function set inputField(value:InputField):void {
-			super.inputField = value;
-			
-			_taxonInputField = value as TaxonInputField;
-			
-			if(_taxonInputField != null) {
-				//add event listeners
-				//id text input
-				_taxonInputField.idTextInput.addEventListener(Event.CHANGE, textInputChangeHandler);
-				_taxonInputField.idTextInput.addEventListener(FocusEvent.FOCUS_IN, inputFieldFocusInHandler);
-				_taxonInputField.idTextInput.addEventListener(FocusEvent.FOCUS_OUT, inputFieldFocusOutHandler);
-				//scientific name text input
-				_taxonInputField.scientificNameTextInput.addEventListener(Event.CHANGE, textInputChangeHandler);
-				_taxonInputField.scientificNameTextInput.addEventListener(FocusEvent.FOCUS_IN, inputFieldFocusInHandler);
-				_taxonInputField.scientificNameTextInput.addEventListener(FocusEvent.FOCUS_OUT, inputFieldFocusOutHandler);
-				//vernacular name text input
-				_taxonInputField.vernacularNameTextInput.addEventListener(Event.CHANGE, textInputChangeHandler);
-				_taxonInputField.vernacularNameTextInput.addEventListener(FocusEvent.FOCUS_IN, inputFieldFocusInHandler);
-				_taxonInputField.vernacularNameTextInput.addEventListener(FocusEvent.FOCUS_OUT, inputFieldFocusOutHandler);
-				//vernacular lang text input
-				_taxonInputField.vernacularLangTextInput.addEventListener(Event.CHANGE, textInputChangeHandler);
-				_taxonInputField.vernacularLangTextInput.addEventListener(FocusEvent.FOCUS_IN, inputFieldFocusInHandler);
-				_taxonInputField.vernacularLangTextInput.addEventListener(FocusEvent.FOCUS_OUT, inputFieldFocusOutHandler);
-				//search icons
-				_taxonInputField.idSearchImg.addEventListener(MouseEvent.CLICK, searchImageClickHandler);
-				_taxonInputField.scientificNameSearchImg.addEventListener(MouseEvent.CLICK, searchImageClickHandler);
-				_taxonInputField.vernacularNameSearchImg.addEventListener(MouseEvent.CLICK, searchImageClickHandler);
-				_taxonInputField.vernacularLangSearchImg.addEventListener(MouseEvent.CLICK, searchImageClickHandler);
-			}	
-			
+		override internal function initEventListeners():void {
+			super.initEventListeners();
+			//id text input
+			_view.idTextInput.addEventListener(Event.CHANGE, textInputChangeHandler);
+			_view.idTextInput.addEventListener(FocusEvent.FOCUS_IN, focusInHandler);
+			_view.idTextInput.addEventListener(FocusEvent.FOCUS_OUT, focusOutHandler);
+			//scientific name text input
+			_view.scientificNameTextInput.addEventListener(Event.CHANGE, textInputChangeHandler);
+			_view.scientificNameTextInput.addEventListener(FocusEvent.FOCUS_IN, focusInHandler);
+			_view.scientificNameTextInput.addEventListener(FocusEvent.FOCUS_OUT, focusOutHandler);
+			//vernacular name text input
+			_view.vernacularNameTextInput.addEventListener(Event.CHANGE, textInputChangeHandler);
+			_view.vernacularNameTextInput.addEventListener(FocusEvent.FOCUS_IN, focusInHandler);
+			_view.vernacularNameTextInput.addEventListener(FocusEvent.FOCUS_OUT, focusOutHandler);
+			//vernacular lang text input
+			_view.vernacularLangTextInput.addEventListener(Event.CHANGE, textInputChangeHandler);
+			_view.vernacularLangTextInput.addEventListener(FocusEvent.FOCUS_IN, focusInHandler);
+			_view.vernacularLangTextInput.addEventListener(FocusEvent.FOCUS_OUT, focusOutHandler);
+			//search icons
+			_view.idSearchImg.addEventListener(MouseEvent.CLICK, searchImageClickHandler);
+			_view.scientificNameSearchImg.addEventListener(MouseEvent.CLICK, searchImageClickHandler);
+			_view.vernacularNameSearchImg.addEventListener(MouseEvent.CLICK, searchImageClickHandler);
+			_view.vernacularLangSearchImg.addEventListener(MouseEvent.CLICK, searchImageClickHandler);
 		}
 		
 		override public function set value(value:*):void {
 			_attributeValue = value;
 			//this._inputField.attribute = attribute;
-			this._taxonInputField.idTextInput.text = value.text1;
-			this._taxonInputField.scientificNameTextInput.text = value.text2;
-			this._taxonInputField.vernacularNameTextInput.text = value.text3;
-			this._taxonInputField.vernacularLangTextInput.text = value.text4;
+			this._view.idTextInput.text = value.text1;
+			this._view.scientificNameTextInput.text = value.text2;
+			this._view.vernacularNameTextInput.text = value.text3;
+			this._view.vernacularLangTextInput.text = value.text4;
 			/*
 			this._inputField.error = value.error;
 			this._inputField.warning = value.warning;
 			*/
-			this._inputField.remarks = value.remarks;
-			this._inputField.approved = value.approved;
+			this._view.remarks = value.remarks;
+			this._view.approved = value.approved;
 		}
 		
 		override public function createValue():* {
@@ -125,13 +117,13 @@ package org.openforis.collect.presenter.input {
 		protected function getSubElementName(textInput:TextInput):String {
 			var subElementName:String = "id";
 			switch(textInput) {
-				case _taxonInputField.idTextInput:
+				case _view.idTextInput:
 					break;
-				case _taxonInputField.scientificNameTextInput:
+				case _view.scientificNameTextInput:
 					break;
-				case _taxonInputField.vernacularNameTextInput:
+				case _view.vernacularNameTextInput:
 					break;
-				case _taxonInputField.vernacularLangTextInput:
+				case _view.vernacularLangTextInput:
 					break;
 			}
 			return subElementName;

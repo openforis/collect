@@ -1,4 +1,4 @@
-package org.openforis.collect.presenter.input
+package org.openforis.collect.presenter
 {
 	import flash.events.Event;
 	import flash.events.KeyboardEvent;

@@ -198,20 +198,19 @@
                 more about it here: http://bugs.adobe.com/jira/browse/SDK-21143
             -->
 
-			<s:Group id="contentGroupWrapper" minWidth="0" minHeight="0">
+			
+			<s:Group id="contentGroupWrapper" minWidth="0" minHeight="0" height="100%" width="100%">
 				<s:Rect id="background" height="100%" width="100%">
 					<s:fill>
 						<s:SolidColor id="backgroundFill" color="#FFFFFF"/>
 					</s:fill>
 				</s:Rect>
-				
-				<s:Group id="contentGroup" minWidth="0" minHeight="0">
+				<s:Group id="contentGroup" minWidth="0" minHeight="0" height="100%" width="100%">
 					<s:layout>
 						<s:VerticalLayout paddingLeft="10" paddingBottom="10" paddingRight="10" />
 					</s:layout>
 				</s:Group>
 			</s:Group>
-				
 			
             <!--- @private -->
             <s:Group id="bottomGroup" minWidth="0" minHeight="0" 

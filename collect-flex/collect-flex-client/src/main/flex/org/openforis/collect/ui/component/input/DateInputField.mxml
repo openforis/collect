@@ -3,8 +3,17 @@
 				  xmlns:s="library://ns.adobe.com/flex/spark" 
 				  xmlns:mx="library://ns.adobe.com/flex/mx" 
 				  xmlns:input="org.openforis.collect.ui.component.input.*"
-				  presenterClass="org.openforis.collect.presenter.input.DateInputFieldPresenter"
 				  >
+	
+	<fx:Script>
+		<![CDATA[
+			import org.openforis.collect.presenter.DateInputFieldPresenter;
+			
+			override protected function initPresenter():void {
+				this.presenter = new DateInputFieldPresenter(this);
+			}
+		]]>
+	</fx:Script>
 	
 	<s:BorderContainer 
 		id="inputBox"

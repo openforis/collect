@@ -34,58 +34,27 @@ package org.openforis.collect.ui.component.input {
 		public static const STATE_SAVE_COMPLETE:String = "saveComplete";
 		public static const STATE_ERROR_SAVING:String = "errorSaving";
 		
-		private var _presenterFactory:IFactory;
-		
 		private var _presenter:InputFieldPresenter;
 
 		private var _renderInDataGroup:Boolean;
 		
-		protected var changed:Boolean = false;
-		
 		protected var _textInput:UIComponent;
 		
-		
 		private var _attribute:AttributeProxy;
+		
 		private var _attributeDefinition:AttributeDefinitionProxy;
 		
 		public function InputField() {
 			super();
+			this.addEventListener(FlexEvent.CREATION_COMPLETE, creationCompleteHandler);
 		}
 		
-		/*override protected function initializationComplete():void {
-			super.initializationComplete();
-			
-			initializePresenter();
-		}*/
-		
-		[Deprecated]
-		protected function initializePresenter():void {
-			if(_presenterFactory == null) {
-				_presenterFactory = new ClassFactory(InputFieldPresenter);
-			}
-			
-			if(this._presenter == null) {
-				this._presenter = _presenterFactory.newInstance() as InputFieldPresenter;
-				this._presenter.inputField = this;
-			}
+		protected function creationCompleteHandler(event:FlexEvent):void {
+			initPresenter();
 		}
 		
-		protected function textInputFocusInHandler(event:Event):void {
-			var inputFieldEvent:InputFieldEvent = new InputFieldEvent(InputFieldEvent.INPUT_FIELD_FOCUS_IN);
-			this.dispatchEvent(inputFieldEvent);
-		}
-		
-		protected function focusOutEventHandler(event:*):void {
-			if(changed) {
-				var inputFieldEvent:InputFieldEvent = new InputFieldEvent(InputFieldEvent.INPUT_FIELD_VALUE_CHANGE);
-				this.dispatchEvent(inputFieldEvent);
-			} else {
-				//dispatch event validate field
-			}
-		}
-		
-		protected function textInputChangeHandler(event:Event):void {
-			changed = true;
+		protected function initPresenter():void {
+			this._presenter = new InputFieldPresenter(this);
 		}
 		
 		protected function createAttributeValue():Object {
@@ -169,17 +138,8 @@ package org.openforis.collect.ui.component.input {
 			return _presenter;
 		}
 
-		public function set presenter(value:InputFieldPresenter):void
-		{
+		public function set presenter(value:InputFieldPresenter):void {
 			_presenter = value;
-		}
-
-		public function get presenterClass():IFactory {
-			return _presenterFactory;
-		}
-
-		public function set presenterClass(value:IFactory):void {
-			_presenterFactory = value;
 		}
 
 		[Bindable]

@@ -1,5 +1,6 @@
 package org.openforis.collect.presenter {
 	import flash.events.Event;
+	import flash.events.FocusEvent;
 	import flash.events.MouseEvent;
 	
 	import mx.core.UIComponent;
@@ -16,43 +17,39 @@ package org.openforis.collect.presenter {
 	public class InputFieldPresenter extends AbstractPresenter {
 		
 		protected var _path:String;
-		protected var _inputField:InputField;
+		private var _view:InputField;
 		
 		protected var _attributeValue:*;
 		
 		public function InputFieldPresenter(inputField:InputField = null) {
+			_view = inputField;
 			super();
-			this.inputField = inputField;
-		}
-		
-		public function set inputField(value:InputField):void {
-			_inputField = value;
-			
-			if(_inputField != null) {
-				_inputField.addEventListener(InputFieldEvent.INPUT_FIELD_VALUE_CHANGE, inputFieldChangeHandler);
-				_inputField.addEventListener(InputFieldEvent.INPUT_FIELD_FOCUS_OUT, inputFieldFocusOutHandler);
-				_inputField.addEventListener(InputFieldEvent.INPUT_FIELD_FOCUS_IN, inputFieldFocusInHandler);
-				
-				_inputField.addEventListener(MouseEvent.MOUSE_OVER, inputFieldMouseOverHandler);
-				_inputField.addEventListener(MouseEvent.MOUSE_OUT, inputFieldMouseOutHandler);
-			}
 		}
 		
 		override internal function initEventListeners():void {
 			super.initEventListeners();
+			
+			_view.addEventListener(MouseEvent.MOUSE_OVER, mouseOverHandler);
+			_view.addEventListener(MouseEvent.MOUSE_OUT, mouseOutHandler);
+			
+			if(_view.textInput != null) {
+				_view.textInput.addEventListener(Event.CHANGE, changeHandler);
+				_view.textInput.addEventListener(FocusEvent.FOCUS_OUT, focusOutHandler);
+				_view.textInput.addEventListener(FocusEvent.FOCUS_IN, focusInHandler);
+			}
 		}
 		
-		protected function inputFieldChangeHandler(event:Event):void {
+		protected function changeHandler(event:Event):void {
 			//if autocomplete enabled show autocomplete popup...
 			
 		}
 		
-		protected function inputFieldFocusOutHandler(event:Event):void {
+		protected function focusOutHandler(event:FocusEvent):void {
 			//TO DO
 			applyChanges();
 		}
 		
-		protected function inputFieldMouseOverHandler(event:MouseEvent):void {
+		protected function mouseOverHandler(event:MouseEvent):void {
 			var target:UIComponent = event.currentTarget as UIComponent;
 			if(target != null && target.document != null) {
 				var inputFieldEvent:InputFieldEvent = new InputFieldEvent(InputFieldEvent.INPUT_FIELD_MOUSE_OVER);
@@ -61,7 +58,7 @@ package org.openforis.collect.presenter {
 			}
 		}
 		
-		protected function inputFieldMouseOutHandler(event:MouseEvent):void {
+		protected function mouseOutHandler(event:MouseEvent):void {
 			var target:UIComponent = event.currentTarget as UIComponent;
 			if(target != null && target.document != null) {
 				var inputFieldEvent:InputFieldEvent = new InputFieldEvent(InputFieldEvent.INPUT_FIELD_MOUSE_OUT);
@@ -78,7 +75,7 @@ package org.openforis.collect.presenter {
 			//send request to server and wait for the answer...
 		}
 		
-		protected function inputFieldFocusInHandler(event:Event):void {
+		protected function focusInHandler(event:FocusEvent):void {
 			UIUtil.ensureElementIsVisible(event.target);
 		}
 		
@@ -87,11 +84,11 @@ package org.openforis.collect.presenter {
 			//update input field
 			this.value = null;
 			
-			_inputField.currentState = InputField.STATE_SAVE_COMPLETE;
+			_view.currentState = InputField.STATE_SAVE_COMPLETE;
 		}
 
 		protected function modelSyncErrorHandler(event:Event):void {
-			_inputField.currentState = InputField.STATE_ERROR_SAVING;
+			_view.currentState = InputField.STATE_ERROR_SAVING;
 		}
 		
 		public function get value():* {

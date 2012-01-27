@@ -11,9 +11,6 @@
 	
 	<input:TextInput 
 				id="textInput" 
-				focusIn="textInputFocusInHandler(event)" 
-				focusOut="focusOutEventHandler(event)" 
-				change="textInputChangeHandler(event)"
 				width="100%" />
 	
 </input:InputField>
