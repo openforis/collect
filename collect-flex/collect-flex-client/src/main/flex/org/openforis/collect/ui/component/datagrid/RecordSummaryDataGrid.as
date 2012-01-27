@@ -72,9 +72,9 @@ package org.openforis.collect.ui.component.datagrid
 			var dataField:String = gridColumn.dataField;
 			if(dataField.indexOf(dataFieldPrefix) == 0) {
 				var key:String = dataField.substring(dataFieldPrefix.length);
-				var count:Number = map.get(key);
-				if(! isNaN(count)) {
-					return String(count);
+				var value:Object = map.get(key);
+				if((value is Number && !isNaN(Number(value))) || value != null) {
+					return String(value);
 				}
 			}
 			return "";
