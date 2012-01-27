@@ -1,0 +1,17 @@
+Compile with:
+
+	mvn compile
+   
+Run unit tests with:
+
+	mvn package
+
+Run integration tests with*:
+
+	mvn verify
+   
+Regenerate jOOQ stub classes*: 
+
+	mvn jooq-codegen:generate
+	 
+*Require dev database settings in ~/.m2/settings.xml.   See http://km.fao.org/OFwiki/index.php/Open_Foris_Collect_Development_Environment for more info.

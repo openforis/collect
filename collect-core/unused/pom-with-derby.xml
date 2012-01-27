@@ -1,0 +1,411 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>org.openforis.collect</groupId>
+		<artifactId>collect</artifactId>
+		<version>3.0-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>collect-core</artifactId>
+	<packaging>jar</packaging>
+	
+	<properties>
+		<geotools.version>2.6.5</geotools.version>
+		<tmpdb.path>${project.build.directory}/tempdb</tmpdb.path>
+		<tmpdb.url>jdbc:derby:${tmpdb.path};create=true</tmpdb.url>
+		<tmpdb.username>derbyuser</tmpdb.username>
+		<tmpdb.password>derbyuser</tmpdb.password>
+		<tmpdb.driver>org.apache.derby.jdbc.EmbeddedDriver</tmpdb.driver>
+		<jooq.codegen.dbname>org.jooq.util.derby.DerbyDatabase</jooq.codegen.dbname>
+		<database.default-schema>collect</database.default-schema>
+	</properties>
+
+	<repositories>
+		<repository>
+			<id>osgeo</id>
+			<name>Open Source Geospatial Foundation Repository</name>
+			<url>http://download.osgeo.org/webdav/geotools/</url>
+		</repository>
+	</repositories>
+	
+	<build>
+		<plugins>
+			<!-- If there, Remove temporary embedded database for codegen and testing -->
+			<plugin>
+				<artifactId>maven-clean-plugin</artifactId>
+				<version>2.4.1</version>
+				<configuration>
+					<filesets>
+						<fileset>
+							<directory>${tmpdb.path}</directory>
+							<followSymlinks>false</followSymlinks>
+						</fileset>
+					</filesets>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>clean</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<!-- Set up embedded database for codegen and testing -->
+			<plugin>
+		        <groupId>org.codehaus.mojo</groupId>
+		        <artifactId>sql-maven-plugin</artifactId>
+		        <version>1.5</version>
+		        <dependencies>
+		          <dependency>
+					<groupId>org.apache.derby</groupId>
+					<artifactId>derby</artifactId>
+					<version>10.8.2.2</version>
+		          </dependency>
+		        </dependencies>
+		        <configuration>
+					<driver>${tmpdb.driver}</driver>
+					<url>${tmpdb.url}</url>
+					<username>${tmpdb.username}</username>
+					<password>${tmpdb.password}</password>
+		        </configuration>
+		        <executions>
+		          <execution>
+		            <phase>generate-sources</phase>
+		            <goals>
+		              <goal>execute</goal>
+		            </goals>
+					<configuration>
+						<delimiter>GO</delimiter>
+						<delimiterType>row</delimiterType>
+						<srcFiles>
+							<srcFile>${basedir}/design/sql/derby/1-create-schema.sql</srcFile>
+							<srcFile>${basedir}/design/sql/derby/2-create-sequences.sql</srcFile>
+							<srcFile>${basedir}/design/sql/derby/3-create-tables.sql</srcFile>
+							<srcFile>${basedir}/design/sql/derby/4-create-views.sql</srcFile>
+						</srcFiles>
+					</configuration>
+		          </execution>
+		        </executions>
+		      </plugin>
+
+				<!-- jOOQ code generator plugin -->
+				<plugin>
+					<groupId>org.jooq</groupId>
+					<artifactId>jooq-codegen-maven</artifactId>
+					<version>2.0.1</version>
+					<executions>
+						<execution>
+							<phase>generate-sources</phase>
+							<goals>
+								<goal>generate</goal>
+							</goals>
+						</execution>
+					</executions>
+					<dependencies>
+						<dependency>
+							<groupId>org.apache.derby</groupId>
+							<artifactId>derby</artifactId>
+							<version>10.8.2.2</version>
+						</dependency>
+					</dependencies>
+					<configuration>
+						<jdbc>
+							<driver>${tmpdb.driver}</driver>
+							<url>${tmpdb.url}</url>
+							<user>${tmpdb.username}</user>
+							<password>${tmpdb.password}</password>
+						</jdbc>
+						<generator>
+							<name>org.jooq.util.DefaultGenerator</name>
+							<database>
+								<name>${jooq.codegen.dbname}</name>
+								<includes>.*</includes>
+								<excludes></excludes>
+								<inputSchema>${database.default-schema}</inputSchema>
+							</database>
+							<generate>
+								<relations>true</relations>
+								<deprecated>false</deprecated>
+							</generate>
+							<target>
+								<packageName>org.openforis.collect.persistence.jooq</packageName>
+								<directory>${basedir}/src/generated/java</directory>
+							</target>
+							<masterDataTables>
+								<masterDataTable>
+									<name>t_language</name>
+									<literal>cd</literal>
+									<description>description</description>
+								</masterDataTable>
+							</masterDataTables>
+						</generator>
+					</configuration>
+				</plugin>
+
+
+
+
+
+
+
+
+
+
+
+		
+			<!-- replace version in file -->
+			<plugin>
+				<groupId>com.google.code.maven-replacer-plugin</groupId>
+				<artifactId>maven-replacer-plugin</artifactId>
+				<version>1.4.0</version>
+				<executions>
+					<execution>
+						<!-- the replace should happen before the app is packaged -->
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>replace</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<includes>
+						<!-- replace the token in this file -->
+						<include>${project.build.directory}/classes/org/openforis/collect/version.properties</include>
+					</includes>
+					<regex>false</regex>
+					<!-- the name of the token to replace -->
+					<token>PROJECT_VERSION</token>
+					<!-- replace it with the maven project version -->
+					<value>${project.version}</value>
+				</configuration>
+			</plugin>
+			
+		<!-- 
+		  <plugin>
+		    <groupId>org.apache.maven.plugins</groupId>
+		    <artifactId>maven-dependency-plugin</artifactId>
+		    <executions>
+		      <execution>
+		        <id>copy-dependencies</id>
+		        <phase>package</phase>
+		        <goals>
+		          <goal>copy-dependencies</goal>
+		        </goals>
+		        <configuration>
+		          <outputDirectory>${project.build.directory}/alternateLocation</outputDirectory>
+		          <overWriteReleases>false</overWriteReleases>
+		          <overWriteSnapshots>false</overWriteSnapshots>
+		          <overWriteIfNewer>true</overWriteIfNewer>
+		          <includeScope>compile</includeScope>
+		        </configuration>
+		      </execution>
+		    </executions>
+		  </plugin>
+	      <plugin>
+	        <groupId>org.apache.maven.plugins</groupId>
+	        <artifactId>maven-eclipse-plugin</artifactId>
+	        <version>2.8</version>
+	        <configuration>
+	          <sourceIncludes>
+	            <sourceInclude>src/generated/java</sourceInclude>
+	          </sourceIncludes>
+	        </configuration>
+	      </plugin>
+			 -->
+			 
+			<!--  Add generated sources to build path -->
+		   <plugin>
+		        <groupId>org.codehaus.mojo</groupId>
+		        <artifactId>build-helper-maven-plugin</artifactId>
+		        <version>1.1</version>
+		        <executions>
+		          <execution>
+		            <id>add-source</id>
+		            <phase>generate-sources</phase>
+		            <goals>
+		              <goal>add-source</goal>
+		            </goals>
+		            <configuration>
+		              <sources>
+		                <source>src/generated/java</source>
+		              </sources>
+		            </configuration>
+		          </execution>
+		    	</executions>
+		    </plugin>			
+		</plugins>
+		<pluginManagement>
+			<plugins>
+				<!--
+					Set up Eclipse m2e settings to remove errors show in IDE. 
+					
+					This has no influence on the build itself.
+				-->
+				<plugin>
+					<groupId>org.eclipse.m2e</groupId>
+					<artifactId>lifecycle-mapping</artifactId>
+					<version>1.0.0</version>
+					<configuration>
+						<lifecycleMappingMetadata>
+							<pluginExecutions>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>org.jooq</groupId>
+										<artifactId>jooq-codegen-maven</artifactId>
+										<versionRange>[2.0.1,)</versionRange>
+										<goals>
+											<goal>generate</goal>
+										</goals>
+									</pluginExecutionFilter>
+<!-- 									<pluginExecutionFilter> -->
+<!-- 								        <groupId>org.codehaus.mojo</groupId> -->
+<!-- 								        <artifactId>build-helper-maven-plugin</artifactId> -->
+<!-- 										<versionRange>[1.1,)</versionRange> -->
+<!-- 										<goals> -->
+<!-- 											<goal>java</goal> -->
+<!-- 										</goals> -->
+<!-- 									</pluginExecutionFilter> -->
+									<action>
+										<ignore></ignore>
+									</action>
+								</pluginExecution>
+							</pluginExecutions>
+						</lifecycleMappingMetadata>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.openforis.idm</groupId>
+			<artifactId>idm-api</artifactId>
+		</dependency>
+
+		<!-- Apache commons -->
+		<dependency>
+			<groupId>commons-logging</groupId>
+			<artifactId>commons-logging</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>commons-collections</groupId>
+			<artifactId>commons-collections</artifactId>
+		</dependency>
+<!-- 		<dependency> -->
+<!-- 			<groupId>commons-io</groupId> -->
+<!-- 			<artifactId>commons-io</artifactId> -->
+<!-- 		</dependency> -->
+<!-- 		<dependency> -->
+<!-- 			<groupId>commons-fileupload</groupId> -->
+<!-- 			<artifactId>commons-fileupload</artifactId> -->
+<!-- 		</dependency> -->
+<!-- 		<dependency> -->
+<!-- 			<groupId>commons-vfs</groupId> -->
+<!-- 			<artifactId>commons-vfs</artifactId> -->
+<!-- 		</dependency> -->
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+		</dependency>
+
+		<!-- TODO: check if antlr is needed -->
+<!-- 		<dependency> -->
+<!-- 			<groupId>antlr</groupId> -->
+<!-- 			<artifactId>antlr</artifactId> -->
+<!-- 			<version>2.7.7</version> -->
+<!-- 		</dependency> -->
+
+		<!-- GeoTools -->
+		<dependency>
+			<groupId>org.geotools</groupId>
+			<artifactId>gt-main</artifactId>
+			<version>${geotools.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.geotools</groupId>
+			<artifactId>gt-metadata</artifactId>
+			<version>${geotools.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.geotools</groupId>
+			<artifactId>gt-referencing</artifactId>
+			<version>${geotools.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.geotools</groupId>
+			<artifactId>gt-epsg-wkt</artifactId>
+			<version>${geotools.version}</version>
+		</dependency>
+		<dependency>
+		  <groupId>org.jooq</groupId>
+		  <artifactId>jooq</artifactId>
+		  <version>2.0.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-tx</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>cglib</groupId>
+			<artifactId>cglib</artifactId>
+			<version>2.2.2</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-jdbc</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.sun.xml.bind</groupId>
+			<artifactId>jaxb-impl</artifactId>
+		</dependency>  
+		<!-- Spring dependencies -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+<!-- 		<dependency> -->
+<!-- 			<groupId>org.springframework</groupId> -->
+<!-- 			<artifactId>spring-jdbc</artifactId> -->
+<!-- 			<version>3.0.6.RELEASE</version> -->
+<!-- 			<scope>test</scope> -->
+<!-- 		</dependency> -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<version>9.1-901.jdbc4</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.derby</groupId>
+			<artifactId>derbyclient</artifactId>
+			<version>10.8.2.2</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>commons-dbcp</groupId>
+			<artifactId>commons-dbcp</artifactId>
+			<version>1.4</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			  <groupId>org.mockito</groupId>
+			  <artifactId>mockito-all</artifactId>  
+			  <version>1.9.0</version> 
+			  <scope>test</scope>
+		</dependency>
+  	</dependencies>
+
+</project>

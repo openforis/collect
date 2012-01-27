@@ -21,96 +21,91 @@
 			<url>http://download.osgeo.org/webdav/geotools/</url>
 		</repository>
 	</repositories>
-	
-	<profiles>
-	   <profile>
-	   	<!--  
-	   		To regenerate jOOQ classes: 
-	   		mvn generate-sources -P codegen 
-	   	 -->
-	     <id>codegen</id>
-	     <build>
-	       <plugins>
-				<!-- jOOQ code generator plugin -->
-				<plugin>
-					<groupId>org.jooq</groupId>
-					<artifactId>jooq-codegen-maven</artifactId>
-					<version>2.0.1</version>
-					<executions>
-						<execution>
-							<phase>generate-sources</phase>
-							<goals>
-								<goal>generate</goal>
-							</goals>
-						</execution>
-					</executions>
-					<dependencies>
-						<dependency>
-							<groupId>postgresql</groupId>
-							<artifactId>postgresql</artifactId>
-							<version>9.1-901.jdbc4</version>
-						</dependency>
-						<dependency>
-							<groupId>org.apache.derby</groupId>
-							<artifactId>derbyclient</artifactId>
-							<version>10.8.2.2</version>
-						</dependency>
-						<dependency>
-							<groupId>org.apache.derby</groupId>
-							<artifactId>derby</artifactId>
-							<version>10.8.2.2</version>
-						</dependency>
-					</dependencies>
-			
-					<configuration>
-						<jdbc>
-							<driver>org.postgresql.Driver</driver>
-							<url>jdbc:postgresql://localhost:5432/collect</url>
-							<user>postgres</user>
-							<password>postgres</password>
-						</jdbc>
-<!-- 						<jdbc> -->
-<!-- 							<driver>org.apache.derby.jdbc.ClientDriver</driver> -->
-<!-- 							<url>jdbc:derby://localhost:1527/collect;create=true</url> -->
-<!-- 							<user>derbyuser</user> -->
-<!-- 							<password>derbyuser</password> -->
-<!-- 						</jdbc> -->
-						<generator>
-							<name>org.jooq.util.DefaultGenerator</name>
-							<database>
-								<name>org.jooq.util.postgres.PostgresDatabase</name>
-<!-- 								<name>org.jooq.util.derby.DerbyDatabase</name> -->
-								<includes>.*</includes>
-								<excludes></excludes>
-								<inputSchema>collect</inputSchema>
-							</database>
-							<generate>
-								<relations>true</relations>
-								<deprecated>false</deprecated>
-							</generate>
-							<target>
-								<packageName>org.openforis.collect.persistence.jooq</packageName>
-								<directory>${basedir}/src/generated/java</directory>
-							</target>
-							<masterDataTables>
-								<masterDataTable>
-									<name>t_language</name>
-									<literal>cd</literal>
-									<description>description</description>
-								</masterDataTable>
-							</masterDataTables>
-						</generator>
-					</configuration>
-				</plugin>
-	       </plugins>
-	     </build>
-	   </profile>
-   </profiles>
-	
-	
-	
+
 	<build>
 		<plugins>
+			<plugin>
+				<groupId>org.jooq</groupId>
+				<artifactId>jooq-codegen-maven</artifactId>
+				<version>2.0.1</version>
+				<dependencies>
+					<dependency>
+						<groupId>postgresql</groupId>
+						<artifactId>postgresql</artifactId>
+						<version>9.1-901.jdbc4</version>
+					</dependency>
+				</dependencies>
+				<configuration>
+					<jdbc>
+						<driver>org.postgresql.Driver</driver>
+						<url>${collect.devdb.url}</url>
+						<user>${collect.devdb.username}</user>
+						<password>${collect.devdb.password}</password>
+					</jdbc>
+					<generator>
+						<name>org.jooq.util.DefaultGenerator</name>
+						<database>
+							<name>org.jooq.util.postgres.PostgresDatabase</name>
+							<includes>.*</includes>
+							<excludes></excludes>
+							<inputSchema>collect</inputSchema>
+						</database>
+						<generate>
+							<relations>true</relations>
+							<deprecated>false</deprecated>
+						</generate>
+						<target>	
+							<packageName>org.openforis.collect.persistence.jooq</packageName>
+							<directory>${basedir}/src/generated/java</directory>
+						</target>
+						<masterDataTables>
+							<masterDataTable>
+								<name>t_language</name>
+								<literal>cd</literal>
+								<description>description</description>
+							</masterDataTable>
+						</masterDataTables>
+					</generator>
+				</configuration>
+			</plugin>
+			
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.11</version>
+				<configuration>
+					<testSourceDirectory>${basedir}/src/test/java</testSourceDirectory>
+					<excludes>
+						<exclude>**/*IntegrationTest.java</exclude>
+					</excludes>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-failsafe-plugin</artifactId>
+				<version>2.11</version>
+				<configuration>
+					<failIfNoTests>true</failIfNoTests>
+					<testSourceDirectory>${basedir}/src/it/java</testSourceDirectory>
+					<includes>
+						<include>**/*IntegrationTest.java</include>
+					</includes>
+					<systemPropertyVariables>
+						<collect.devdb.url>${collect.devdb.url}</collect.devdb.url>
+						<collect.devdb.username>${collect.devdb.username}</collect.devdb.username>
+						<collect.devdb.password>${collect.devdb.password}</collect.devdb.password>
+					</systemPropertyVariables>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>integration-test</goal>
+							<goal>verify</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>		
+			
 			<!-- replace version in file -->
 			<plugin>
 				<groupId>com.google.code.maven-replacer-plugin</groupId>
@@ -137,48 +132,15 @@
 					<value>${project.version}</value>
 				</configuration>
 			</plugin>
-				
-		<!-- 
-		  <plugin>
-		    <groupId>org.apache.maven.plugins</groupId>
-		    <artifactId>maven-dependency-plugin</artifactId>
-		    <executions>
-		      <execution>
-		        <id>copy-dependencies</id>
-		        <phase>package</phase>
-		        <goals>
-		          <goal>copy-dependencies</goal>
-		        </goals>
-		        <configuration>
-		          <outputDirectory>${project.build.directory}/alternateLocation</outputDirectory>
-		          <overWriteReleases>false</overWriteReleases>
-		          <overWriteSnapshots>false</overWriteSnapshots>
-		          <overWriteIfNewer>true</overWriteIfNewer>
-		          <includeScope>compile</includeScope>
-		        </configuration>
-		      </execution>
-		    </executions>
-		  </plugin>
-	      <plugin>
-	        <groupId>org.apache.maven.plugins</groupId>
-	        <artifactId>maven-eclipse-plugin</artifactId>
-	        <version>2.8</version>
-	        <configuration>
-	          <sourceIncludes>
-	            <sourceInclude>src/generated/java</sourceInclude>
-	          </sourceIncludes>
-	        </configuration>
-	      </plugin>
-			 -->
 			 
 			<!--  Add generated sources to build path -->
 		   <plugin>
 		        <groupId>org.codehaus.mojo</groupId>
 		        <artifactId>build-helper-maven-plugin</artifactId>
-		        <version>1.1</version>
+		        <version>1.7</version>
 		        <executions>
 		          <execution>
-		            <id>add-source</id>
+		            <id>add-generated-source</id>
 		            <phase>generate-sources</phase>
 		            <goals>
 		              <goal>add-source</goal>
@@ -187,6 +149,32 @@
 		              <sources>
 		                <source>src/generated/java</source>
 		              </sources>
+		            </configuration>
+		          </execution>
+		          <execution>
+		            <id>add-integration-test-esources</id>
+		            <phase>compile</phase>
+		            <goals>
+		              <goal>add-test-source</goal>
+		            </goals>
+		            <configuration>
+		            	<sources>
+		            		<source>src/it/java</source>
+		            	</sources>
+		            </configuration>
+		          </execution>
+		          <execution>
+		            <id>add-integration-test-resources</id>
+		            <phase>compile</phase>
+		            <goals>
+		              <goal>add-test-resource</goal>
+		            </goals>
+		            <configuration>
+		            	<resources>
+		            		<resource>
+			            		<directory>src/it/resources</directory>
+		            		</resource>
+		            	</resources>
 		            </configuration>
 		          </execution>
 		    	</executions>
@@ -215,14 +203,19 @@
 											<goal>generate</goal>
 										</goals>
 									</pluginExecutionFilter>
-<!-- 									<pluginExecutionFilter> -->
-<!-- 								        <groupId>org.codehaus.mojo</groupId> -->
-<!-- 								        <artifactId>build-helper-maven-plugin</artifactId> -->
-<!-- 										<versionRange>[1.1,)</versionRange> -->
-<!-- 										<goals> -->
-<!-- 											<goal>java</goal> -->
-<!-- 										</goals> -->
-<!-- 									</pluginExecutionFilter> -->
+									<action>
+										<ignore></ignore>
+									</action>
+								</pluginExecution>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>org.codehaus.mojo</groupId>
+										<artifactId>properties-maven-plugin</artifactId>
+										<versionRange>[1.0-alpha-2,)</versionRange>
+										<goals>
+											<goal>read-project-properties</goal>
+										</goals>
+									</pluginExecutionFilter>
 									<action>
 										<ignore></ignore>
 									</action>
@@ -254,30 +247,10 @@
 			<groupId>commons-collections</groupId>
 			<artifactId>commons-collections</artifactId>
 		</dependency>
-<!-- 		<dependency> -->
-<!-- 			<groupId>commons-io</groupId> -->
-<!-- 			<artifactId>commons-io</artifactId> -->
-<!-- 		</dependency> -->
-<!-- 		<dependency> -->
-<!-- 			<groupId>commons-fileupload</groupId> -->
-<!-- 			<artifactId>commons-fileupload</artifactId> -->
-<!-- 		</dependency> -->
-<!-- 		<dependency> -->
-<!-- 			<groupId>commons-vfs</groupId> -->
-<!-- 			<artifactId>commons-vfs</artifactId> -->
-<!-- 		</dependency> -->
 		<dependency>
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
 		</dependency>
-
-		<!-- TODO: check if antlr is needed -->
-<!-- 		<dependency> -->
-<!-- 			<groupId>antlr</groupId> -->
-<!-- 			<artifactId>antlr</artifactId> -->
-<!-- 			<version>2.7.7</version> -->
-<!-- 		</dependency> -->
-
 		<!-- GeoTools -->
 		<dependency>
 			<groupId>org.geotools</groupId>
@@ -321,18 +294,13 @@
 			<groupId>com.sun.xml.bind</groupId>
 			<artifactId>jaxb-impl</artifactId>
 		</dependency>  
-		<!-- Spring dependencies -->
+		
+		<!--  TEST DEPENDENCIES -->
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-<!-- 		<dependency> -->
-<!-- 			<groupId>org.springframework</groupId> -->
-<!-- 			<artifactId>spring-jdbc</artifactId> -->
-<!-- 			<version>3.0.6.RELEASE</version> -->
-<!-- 			<scope>test</scope> -->
-<!-- 		</dependency> -->
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
@@ -363,5 +331,4 @@
 			  <scope>test</scope>
 		</dependency>
   	</dependencies>
-
 </project>

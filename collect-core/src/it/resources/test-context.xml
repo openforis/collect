@@ -15,21 +15,16 @@
 	default-lazy-init="true">
 	
     <context:annotation-config/>
+    
+    <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
      
 	<bean id="testDataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
 		<property name="driverClassName" value="org.postgresql.Driver" />
-		<property name="url" value="jdbc:postgresql://localhost:5432/collect" />
-		<property name="username" value="postgres" />
-		<property name="password" value="postgres" />
+		<property name="url" value="${collect.devdb.url}"/>
+		<property name="username" value="${collect.devdb.username}" />
+		<property name="password" value="${collect.devdb.password}" />
 	</bean>
-
-<!-- 	<bean id="testDataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close"> -->
-<!-- 		<property name="driverClassName" value="org.apache.derby.jdbc.ClientDriver" /> -->
-<!-- 		<property name="url" value="jdbc:derby://localhost:1527/collect;create=true" /> -->
-<!-- 		<property name="username" value="derbyuser" /> -->
-<!-- 		<property name="password" value="derbyuser" /> -->
-<!-- 	</bean> -->
-
+ 
     <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
     	<property name="dataSource" ref="testDataSource"/>
     </bean>

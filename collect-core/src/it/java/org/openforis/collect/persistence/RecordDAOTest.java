@@ -12,16 +12,11 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.openforis.collect.model.CollectAttributeMetadata;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.RecordSummary;
 import org.openforis.collect.model.UIConfiguration.UIConfigurationAdapter;
-import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Survey;
@@ -34,10 +29,6 @@ import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.NumericCode;
 import org.openforis.idm.model.Time;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.transaction.TransactionConfiguration;
-import org.springframework.transaction.annotation.Transactional;
 
 //@RunWith( SpringJUnit4ClassRunner.class )
 //@ContextConfiguration( locations = {"classpath:test-context.xml"} )
