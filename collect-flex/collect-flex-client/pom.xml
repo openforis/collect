@@ -105,7 +105,7 @@
 					<staticLinkRuntimeSharedLibraries>true</staticLinkRuntimeSharedLibraries>
 					<sourceDirectory>${basedir}/src/main/flex</sourceDirectory>
 					<sourceFile>collect.mxml</sourceFile>
-			
+					<loadConfig>${project.build.outputDirectory}/flex-config.xml</loadConfig>
 					<resourceBundlePath>{basedir}/src/main/locales/{locale}</resourceBundlePath>
 					<mergeResourceBundle>true</mergeResourceBundle>
 					<locales>
