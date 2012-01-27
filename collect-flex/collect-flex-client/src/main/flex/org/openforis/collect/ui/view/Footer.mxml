@@ -3,13 +3,22 @@
 		 xmlns:s="library://ns.adobe.com/flex/spark" 
 		 xmlns:mx="library://ns.adobe.com/flex/mx" width="100%">
 	
+	<fx:Script>
+		<![CDATA[
+			import org.openforis.collect.i18n.Message;
+			private const version:String = CONFIG::version;
+		]]>
+	</fx:Script>
+	
 	<s:layout>
 		<s:HorizontalLayout verticalAlign="middle" />
 	</s:layout>
 	
-	<fx:Declarations>
-	</fx:Declarations>
 	
 <!--	<s:Image source="{Images.FOOTER}" />-->
 	
+	<s:HGroup height="100%" width="100%" horizontalAlign="right">
+		<s:Label styleName="appVersionLabel" text="{Message.get('footer.versionLabel')}" />
+		<s:Label styleName="appVersionText" text="{version}" />
+	</s:HGroup>
 </s:Group>
