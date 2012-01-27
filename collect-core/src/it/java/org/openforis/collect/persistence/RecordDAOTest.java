@@ -22,11 +22,10 @@ import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.xml.BindingContext;
 import org.openforis.idm.metamodel.xml.InvalidIdmlException;
-import org.openforis.idm.model.AlphanumericCode;
+import org.openforis.idm.model.Code;
 import org.openforis.idm.model.Coordinate;
 import org.openforis.idm.model.Date;
 import org.openforis.idm.model.Entity;
-import org.openforis.idm.model.NumericCode;
 import org.openforis.idm.model.Time;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -180,10 +179,10 @@ public class RecordDAOTest {
 		record.setWarnings(warningsCount);
 		Entity cluster = record.getRootEntity();
 		String keyId = Integer.toString(sequenceNumber);
-		cluster.addValue("id", new AlphanumericCode(keyId));
+		cluster.addValue("id", new Code(keyId));
 		cluster.addValue("gps_realtime", Boolean.TRUE);
-		cluster.addValue("region", new NumericCode(001));
-		cluster.addValue("district", new NumericCode(002));
+		cluster.addValue("region", new Code("001"));
+		cluster.addValue("district", new Code("002"));
 		cluster.addValue("vehicle_location", new Coordinate(432423423l, 4324324l,"srs"));
 		cluster.addValue("gps_model", "TomTom 1.232");
 		{
@@ -200,7 +199,7 @@ public class RecordDAOTest {
 		}
 		for (int i = 0; i < numberOfPlots; i++) {
 			Entity plot = cluster.addEntity("plot");
-			plot.addValue("no", new AlphanumericCode(Integer.toString(i + 1)));
+			plot.addValue("no", new Code(Integer.toString(i + 1)));
 			
 			for (int j = 0; j < numberOfTrees; j++) {
 				Entity tree = plot.addEntity("tree");

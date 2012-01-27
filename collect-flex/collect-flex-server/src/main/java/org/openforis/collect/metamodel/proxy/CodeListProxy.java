@@ -18,10 +18,6 @@ public class CodeListProxy implements Proxy {
 
 	private transient CodeList codeList;
 
-	public enum CodeType {
-		NUMERIC, ALPHANUMERIC
-	}
-
 	public enum CodeScope {
 		SCHEME, LOCAL
 	}
@@ -93,31 +89,12 @@ public class CodeListProxy implements Proxy {
 	}
 
 	@ExternalizedProperty
-	public CodeType getCodeType() {
-		if (codeList.getCodeType() != null) {
-			return CodeType.valueOf(codeList.getCodeType().toString());
-		} else {
-			return null;
-		}
-	}
-
-	@ExternalizedProperty
 	public CodeScope getCodeScope() {
 		if (codeList.getCodeScope() != null) {
 			return CodeScope.valueOf(codeList.getCodeScope().toString());
 		} else {
 			return null;
 		}
-	}
-
-	@ExternalizedProperty
-	public boolean isAlphanumeric() {
-		return codeList.isAlphanumeric();
-	}
-
-	@ExternalizedProperty
-	public boolean isNumeric() {
-		return codeList.isNumeric();
 	}
 
 }

@@ -79,8 +79,8 @@ public class RecordManager {
 			String name = def.getName();
 			Object value = null;
 			Node<? extends NodeDefinition> node = rootEntity.get(name, 0);
-			if(node instanceof CodeAttribute<?>) {
-				value = ((CodeAttribute<?>) node).getValue();
+			if(node instanceof CodeAttribute) {
+				value = ((CodeAttribute) node).getValue();
 			} else if(node instanceof TextAttribute) {
 				value = ((TextAttribute) node).getValue();
 			} else if(node instanceof NumberAttribute<?>) {

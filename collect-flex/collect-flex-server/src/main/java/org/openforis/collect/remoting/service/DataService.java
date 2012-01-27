@@ -189,7 +189,7 @@ public class DataService {
 	 */
 	public List<CodeListItem> findCodeListItemsById(Integer id, String ids) {
 		@SuppressWarnings("unchecked")
-		Attribute<? extends CodeAttributeDefinition, ? extends Code<?>> code = (Attribute<? extends CodeAttributeDefinition, ? extends Code<?>>) this.getActiveRecord().getNodeById(id);
+		Attribute<? extends CodeAttributeDefinition, ? extends Code> code = (Attribute<? extends CodeAttributeDefinition, ? extends Code>) this.getActiveRecord().getNodeById(id);
 		return null;
 	}
 

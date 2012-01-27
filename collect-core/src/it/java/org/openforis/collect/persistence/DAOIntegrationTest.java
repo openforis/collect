@@ -27,11 +27,10 @@ import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.xml.BindingContext;
 import org.openforis.idm.metamodel.xml.InvalidIdmlException;
 import org.openforis.idm.metamodel.xml.SurveyUnmarshaller;
-import org.openforis.idm.model.AlphanumericCode;
+import org.openforis.idm.model.Code;
 import org.openforis.idm.model.Coordinate;
 import org.openforis.idm.model.Date;
 import org.openforis.idm.model.Entity;
-import org.openforis.idm.model.NumericCode;
 import org.openforis.idm.model.Time;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -133,10 +132,10 @@ public class DAOIntegrationTest {
 		record.setStep(Step.ENTRY);
 		Entity cluster = record.getRootEntity();
 		String id = "123_456";
-		cluster.addValue("id", new AlphanumericCode(id));
+		cluster.addValue("id", new Code(id));
 		cluster.addValue("gps_realtime", Boolean.TRUE);
-		cluster.addValue("region", new NumericCode(001));
-		cluster.addValue("district", new NumericCode(002));
+		cluster.addValue("region", new Code("001"));
+		cluster.addValue("district", new Code("002"));
 		cluster.addValue("vehicle_location", new Coordinate(432423423l, 4324324l,"srs"));
 		cluster.addValue("gps_model", "TomTom 1.232");
 		{
@@ -153,7 +152,7 @@ public class DAOIntegrationTest {
 		}
 		{
 			Entity plot = cluster.addEntity("plot");
-			plot.addValue("no", new AlphanumericCode("1"));
+			plot.addValue("no", new Code("1"));
 			Entity tree1 = plot.addEntity("tree");
 			tree1.addValue("dbh", 54.2);
 			tree1.addValue("total_height", 2.0);
@@ -164,7 +163,7 @@ public class DAOIntegrationTest {
 		}
 		{
 			Entity plot = cluster.addEntity("plot");
-			plot.addValue("no", new AlphanumericCode("2"));
+			plot.addValue("no", new Code("2"));
 			Entity tree1 = plot.addEntity("tree");
 			tree1.addValue("dbh", 34.2);
 			tree1.addValue("total_height", 2.0);
