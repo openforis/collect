@@ -40,16 +40,24 @@ public class UnlockController {
 			HttpSession session = request.getSession();
 			if(session != null) {
 				SessionState sessionState = (SessionState) session.getAttribute(SessionState.SESSION_ATTRIBUTE_NAME);
-				CollectRecord activeRecord = sessionState.getActiveRecord();
-				Integer id = activeRecord.getId();
-				User user = sessionState.getUser();
-				recordManager.unlock(activeRecord, user);
-				if(RecordState.NEW == sessionState.getActiveRecordState()) {
-					this.recordManager.delete(id, user);
+				if(sessionState != null) {
+					CollectRecord activeRecord = sessionState.getActiveRecord();
+					if(activeRecord != null) {
+						Integer id = activeRecord.getId();
+						User user = sessionState.getUser();
+						recordManager.unlock(activeRecord, user);
+						if(RecordState.NEW == sessionState.getActiveRecordState()) {
+							this.recordManager.delete(id, user);
+						}
+						//clear session state
+						sessionState.setActiveRecord(null);
+						sessionState.setActiveRecordState(null);
+					} else {
+						//nothing to unlock
+					}
+				} else {
+					//session expired probably
 				}
-				//clear session state
-				sessionState.setActiveRecord(null);
-				sessionState.setActiveRecordState(null);
 			}
 			return "ok";
 		} catch (Exception e) {
