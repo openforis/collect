@@ -3,13 +3,16 @@
 			   xmlns:s="library://ns.adobe.com/flex/spark" 
 			   xmlns:mx="library://ns.adobe.com/flex/mx"
 			   xmlns:component="org.openforis.collect.ui.component.*"
-			   width="100%" height="100%" 
-			   minWidth="955" minHeight="450" 
-			   initialize="initializeHandler(event)"
-			   creationComplete="creationCompleteHandler(event)" 
 			   xmlns:input="org.openforis.collect.ui.component.input.*"
 			   xmlns:presenter="org.openforis.collect.presenter.*"
-			   xmlns:view="org.openforis.collect.ui.view.*">
+			   xmlns:view="org.openforis.collect.ui.view.*"
+			   
+			   width="100%" height="100%" 
+			   minWidth="955" minHeight="450"
+			   
+			   creationComplete="creationCompleteHandler(event)" 
+			   initialize="initializeHandler(event)"
+			   >
 	
 	<fx:Script>
 		<![CDATA[
@@ -46,13 +49,13 @@
 	
 	<fx:Style source="assets/style.css" />
 	
-	<s:SkinnableContainer height="100%" width="1000" horizontalCenter="0">
+	<s:SkinnableContainer height="100%" horizontalCenter="0" width="974">
 		<s:layout>
 			<s:VerticalLayout />
 		</s:layout>
 		<view:Header width="100%" />
-		<view:MasterView id="masterView" width="974" height="100%" />
-		<view:Footer width="100%" />
+		<view:MasterView id="masterView" width="100%" height="100%" />
+		<view:Footer width="100%"  />
 	</s:SkinnableContainer>
 	
 </s:Application>
