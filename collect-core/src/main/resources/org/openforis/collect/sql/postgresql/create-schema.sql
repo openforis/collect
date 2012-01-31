@@ -29,7 +29,6 @@ CREATE SEQUENCE "collect"."user_role_id_seq"
 GO
 
 --- BEGIN GENERATED CREATE TABLES ---
-
 CREATE TABLE "collect"."data"  ( 
 	"id"           	integer NOT NULL,
 	"record_id"    	integer NOT NULL,
@@ -102,9 +101,10 @@ GO
 CREATE TABLE "collect"."taxon"  ( 
 	"id"             	integer NOT NULL,
 	"scientific_name"	varchar(255) NOT NULL,
-	"level"          	integer NOT NULL,
+	"taxon_rank"     	varchar(128) NOT NULL,
 	"taxonomy_id"    	integer NOT NULL,
 	"step"           	integer NOT NULL,
+	"parent_id"      	integer NULL,
 	PRIMARY KEY("id")
 )
 GO
@@ -183,6 +183,11 @@ GO
 ALTER TABLE "collect"."data"
 	ADD CONSTRAINT "FK_data_taxon"
 	FOREIGN KEY("taxon_id")
+	REFERENCES "collect"."taxon"("id")
+GO
+ALTER TABLE "collect"."taxon"
+	ADD CONSTRAINT "FK_taxon_parent"
+	FOREIGN KEY("parent_id")
 	REFERENCES "collect"."taxon"("id")
 GO
 ALTER TABLE "collect"."taxon"

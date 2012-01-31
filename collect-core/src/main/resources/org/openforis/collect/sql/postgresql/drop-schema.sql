@@ -26,7 +26,6 @@ DROP SEQUENCE "collect"."user_role_id_seq"
 GO
 
 -- START GENERATED --
-
 ALTER TABLE "collect"."data"
 	DROP CONSTRAINT "FK_data_parent" CASCADE 
 GO
@@ -47,6 +46,9 @@ ALTER TABLE "collect"."taxon_name"
 GO
 ALTER TABLE "collect"."data"
 	DROP CONSTRAINT "FK_data_taxon" CASCADE 
+GO
+ALTER TABLE "collect"."taxon"
+	DROP CONSTRAINT "FK_taxon_parent" CASCADE 
 GO
 ALTER TABLE "collect"."taxon"
 	DROP CONSTRAINT "FK_taxon_taxonomy" CASCADE 
@@ -89,7 +91,6 @@ DROP TABLE IF EXISTS "collect"."user_account"
 GO
 DROP TABLE IF EXISTS "collect"."user_role"
 GO
-
 -- END GENERATED --
 
 DROP SCHEMA "collect"
