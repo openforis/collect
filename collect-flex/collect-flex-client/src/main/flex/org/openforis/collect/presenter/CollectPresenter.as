@@ -1,7 +1,8 @@
 package org.openforis.collect.presenter {
 	
-	import com.flexspy.FlexSpy;
-	
+	CONFIG::debugging {
+		import com.flexspy.FlexSpy;
+	}
 	import flash.events.KeyboardEvent;
 	import flash.events.TimerEvent;
 	import flash.utils.Timer;
