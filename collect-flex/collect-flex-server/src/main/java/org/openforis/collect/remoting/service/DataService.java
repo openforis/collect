@@ -35,6 +35,7 @@ import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Code;
+import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.Record;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -130,10 +131,22 @@ public class DataService {
 	}
 
 	public List<Node<? extends NodeDefinition>> updateActiveRecord(UpdateRequest request) {
+		SessionState sessionState = sessionManager.getSessionState();
+		CollectRecord record = sessionState.getActiveRecord();
 		Method method = request.getMethod();
+		
 		switch (method) {
 			case ADD:
-
+				if(request.getNodeId() == null) {
+					int parentNodeId = request.getParentNodeId();
+					Node<? extends NodeDefinition> parentNode = record.getNodeById(parentNodeId);
+					NodeDefinition parentDef = parentNode.getDefinition();
+					if(parentDef instanceof EntityDefinition) {
+						
+					} else {
+						//todo error
+					}
+				}
 				break;
 			case UPDATE:
 

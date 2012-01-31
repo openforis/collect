@@ -1,5 +1,8 @@
 package org.openforis.collect.presenter {
 	
+	import com.flexspy.FlexSpy;
+	
+	import flash.events.KeyboardEvent;
 	import flash.events.TimerEvent;
 	import flash.utils.Timer;
 	
@@ -8,6 +11,7 @@ package org.openforis.collect.presenter {
 	import mx.collections.ItemResponder;
 	import mx.collections.ListCollectionView;
 	import mx.core.FlexGlobals;
+	import mx.managers.SystemManager;
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.events.ResultEvent;
 	
@@ -56,6 +60,14 @@ package org.openforis.collect.presenter {
 			var localeString:String = FlexGlobals.topLevelApplication.parameters.lang as String;
 			if(localeString != null) {
 				this._sessionClient.setLocale(new AsyncResponder(setLocaleResultHandler, faultHandler), localeString);
+			}
+			
+			CONFIG::debugging {
+				view.addEventListener(KeyboardEvent.KEY_DOWN, function(event:KeyboardEvent):void {
+					//open FlexSpy popup pressing CTRL+SHIFT+S
+					if(event.ctrlKey && event.shiftKey && event.charCode == 83)
+						FlexSpy.show();
+				});
 			}
 		}
 		

@@ -12,12 +12,14 @@
 	
 	<fx:Script>
 		<![CDATA[
+			import mx.binding.utils.BindingUtils;
 			import mx.collections.ListCollectionView;
 			
 			import org.openforis.collect.Application;
 			import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 			import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 			import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
+			import org.openforis.collect.model.proxy.EntityProxy;
 			import org.openforis.collect.ui.UIBuilder;
 			
 			import spark.components.FormItem;
@@ -38,6 +40,7 @@
 								attrFormItem.addTo(formItem);
 								form.addElement(formItem);
 								
+								BindingUtils.bindProperty(attrFormItem, "parentEntity", this, "entity");
 							} else if(def is EntityDefinitionProxy) {
 								var entityFormItem:EntityFormItem = UIBuilder.getEntityFormItem(EntityDefinitionProxy(def));
 								entityFormItem.addTo(form);
@@ -47,6 +50,16 @@
 					}
 					childrenAdded = true;
 				}
+			}
+			
+			override public function set parentEntity(value:EntityProxy):void {
+				super.parentEntity = value;
+				
+				var child:EntityProxy = null;
+				if(value != null) {
+					child = value.getChild(entityDefinition.name, 0) as EntityProxy;
+				}
+				entity = child;
 			}
 		]]>
 	</fx:Script>

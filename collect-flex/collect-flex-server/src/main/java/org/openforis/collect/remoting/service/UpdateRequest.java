@@ -3,6 +3,7 @@ package org.openforis.collect.remoting.service;
 /**
  * 
  * @author M. Togna
+ * @author S. Ricci
  * 
  */
 public class UpdateRequest {
@@ -11,7 +12,9 @@ public class UpdateRequest {
 		UPDATE, ADD, DELETE;
 	}
 
-	private String nodeId;
+	private Integer parentNodeId;
+	private String attributeName;
+	private Integer nodeId;
 	private String value;
 	private Method method;
 	
@@ -27,11 +30,11 @@ public class UpdateRequest {
 		this.method = method;
 	}
 
-	public String getNodeId() {
+	public Integer getNodeId() {
 		return nodeId;
 	}
 
-	public void setNodeId(String nodeId) {
+	public void setNodeId(Integer nodeId) {
 		this.nodeId = nodeId;
 	}
 
@@ -41,6 +44,22 @@ public class UpdateRequest {
 
 	public void setValue(String value) {
 		this.value = value;
+	}
+
+	public Integer getParentNodeId() {
+		return parentNodeId;
+	}
+
+	public void setParentNodeId(Integer parentNodeId) {
+		this.parentNodeId = parentNodeId;
+	}
+
+	public String getAttributeName() {
+		return attributeName;
+	}
+
+	public void setAttributeName(String attributeName) {
+		this.attributeName = attributeName;
 	}
 
 }

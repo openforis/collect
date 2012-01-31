@@ -38,6 +38,7 @@
 			<include type="org.openforis.collect.model.RecordSummary"/>
 			<include type="org.openforis.collect.model.UITab"/>
 			<include type="org.openforis.collect.model.UIConfiguration"/>
+			<include type="org.openforis.collect.remoting.service.UpdateRequest"/>
         </externalizer>
     </externalizers>
   

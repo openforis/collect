@@ -38,6 +38,15 @@ package org.openforis.collect.util {
 	import org.openforis.collect.model.SurveySummary;
 	import org.openforis.collect.model.UIConfiguration;
 	import org.openforis.collect.model.UITab;
+	import org.openforis.collect.model.proxy.AttributeProxy;
+	import org.openforis.collect.model.proxy.CodeProxy;
+	import org.openforis.collect.model.proxy.CoordinateProxy;
+	import org.openforis.collect.model.proxy.DateProxy;
+	import org.openforis.collect.model.proxy.EntityProxy;
+	import org.openforis.collect.model.proxy.IntegerRangeProxy;
+	import org.openforis.collect.model.proxy.RealRangeProxy;
+	import org.openforis.collect.model.proxy.TaxonProxy;
+	import org.openforis.collect.model.proxy.TimeProxy;
 
 	public class ModelClassInitializer {
 		
@@ -48,6 +57,7 @@ package org.openforis.collect.util {
 				
 				AttributeDefaultProxy,
 				AttributeDefinitionProxy,
+				AttributeProxy,
 				BooleanAttributeDefinitionProxy,
 				CodeAttributeDefinitionProxy,
 				CodeListItemProxy,
@@ -57,10 +67,15 @@ package org.openforis.collect.util {
 				CodeListProxy,
 				CodeListProxy$CodeScope,
 				CodeListProxy$CodeType,
+				CodeProxy,
 				CoordinateAttributeDefinitionProxy,
+				CoordinateProxy,
 				DateAttributeDefinitionProxy,
+				DateProxy,
 				EntityDefinitionProxy,
+				EntityProxy,
 				FileAttributeDefinitionProxy,
+				IntegerRangeProxy,
 				LanguageSpecificTextProxy,
 				ModelVersionProxy,
 				NodeLabelProxy,
@@ -71,15 +86,18 @@ package org.openforis.collect.util {
 				PromptProxy,
 				PromptProxy$Type,
 				RangeAttributeDefinitionProxy,
+				RealRangeProxy,
 				RecordSummary,
 				SchemaProxy,
 				SpatialReferenceSystemProxy,
 				SurveyProxy,
 				SurveySummary,
 				TaxonAttributeDefinitionProxy,
+				TaxonProxy,
 				TextAttributeDefinitionProxy,
 				TextAttributeDefinitionProxy$Type,
 				TimeAttributeDefinitionProxy,
+				TimeProxy,
 				UnitProxy,
 				
 				UIConfiguration,

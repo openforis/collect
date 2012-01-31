@@ -6,6 +6,10 @@
 	
 	<fx:Script>
 		<![CDATA[
+			import mx.binding.utils.BindingUtils;
+			import mx.core.IVisualElement;
+			
+			import org.openforis.collect.model.proxy.EntityProxy;
 			import org.openforis.collect.model.proxy.RecordProxy;
 			
 			//private var _rootFormContainer:EntityFormContainer;
@@ -31,6 +35,8 @@
 			
 			public function addEntityFormContainer(form:EntityFormContainer):void {
 				this.viewStack.addElement(form);
+				
+				BindingUtils.bindProperty(form, "entity", this, ["record", "rootEntity"]);
 			}
 		]]>
 	</fx:Script>

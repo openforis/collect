@@ -67,22 +67,18 @@ package org.openforis.collect.presenter {
 			_view.vernacularNameSearchImg.addEventListener(MouseEvent.CLICK, searchImageClickHandler);
 			_view.vernacularLangSearchImg.addEventListener(MouseEvent.CLICK, searchImageClickHandler);
 		}
-		
-		override public function set value(value:*):void {
-			_attributeValue = value;
+		/*
+		override public function set value(value:Object):void {
+			_value = value;
 			//this._inputField.attribute = attribute;
 			this._view.idTextInput.text = value.text1;
 			this._view.scientificNameTextInput.text = value.text2;
 			this._view.vernacularNameTextInput.text = value.text3;
 			this._view.vernacularLangTextInput.text = value.text4;
-			/*
-			this._inputField.error = value.error;
-			this._inputField.warning = value.warning;
-			*/
 			this._view.remarks = value.remarks;
 			this._view.approved = value.approved;
 		}
-		
+		*/
 		override public function createValue():* {
 			var result:* = null;
 			return result;

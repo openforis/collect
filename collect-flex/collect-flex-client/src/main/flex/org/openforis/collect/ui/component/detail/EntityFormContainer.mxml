@@ -5,7 +5,7 @@
 					width="100%" height="100%"
 					
 					creationPolicy="all"
-					label="{entityDefinitionProxy.getLabelText()}">
+					label="{entityDefinition.getLabelText()}">
 	
 	<s:layout>
 		<s:VerticalLayout gap="15" />
@@ -13,6 +13,8 @@
 	
 	<fx:Script>
 		<![CDATA[
+			import mx.collections.IList;
+			import mx.binding.utils.BindingUtils;
 			import mx.collections.ListCollectionView;
 			import mx.core.IVisualElement;
 			
@@ -24,6 +26,7 @@
 			import spark.components.FormItem;
 		
 			private var _parentEntity:EntityProxy;
+			private var _entity:EntityProxy;
 			private var _entityDefinitionProxy:EntityDefinitionProxy;
 			private var _uiTabs:ListCollectionView;	
 			private var _forms:Array = new Array();
@@ -33,10 +36,29 @@
 				return _parentEntity;
 			}
 
+			public function set parentEntity(value:EntityProxy):void {
+				_parentEntity = value;
+				
+				if(value != null && entityDefinition != null) {
+					var children:IList = value.getChildren(entityDefinition.name);
+					//todo set dropdown dataprovider
+					
+				}
+			}
+			
+			[Bindable]
+			public function get entity():EntityProxy {
+				return _entity;
+			}
+			
+			public function set entity(value:EntityProxy):void {
+				_entity = value;
+			}
+			
 			override protected function createChildren():void {
 				super.createChildren();
 				addElement(container);
-				if(entityDefinitionProxy.multiple) {
+				if(entityDefinition.multiple) {
 					borderContainer.addElementAt(addSection, 0);
 				}
 				
@@ -47,10 +69,6 @@
 				}
 			}
 			
-			public function set parentEntity(value:EntityProxy):void {
-				_parentEntity = value;
-			}
-
 			public function addItem(collectFormItem:CollectFormItem):void {
 				collectFormItem.addTo(form);
 			}
@@ -92,11 +110,11 @@
 			}
 
 			[Bindable]
-			public function get entityDefinitionProxy():EntityDefinitionProxy {
+			public function get entityDefinition():EntityDefinitionProxy {
 				return _entityDefinitionProxy;
 			}
 
-			public function set entityDefinitionProxy(value:EntityDefinitionProxy):void {
+			public function set entityDefinition(value:EntityDefinitionProxy):void {
 				_entityDefinitionProxy = value;
 			}
 
@@ -109,13 +127,15 @@
 				_uiTabs = value;
 				for each (var tab:UITab in uiTabs) {
 					var f:ScrollableFormContainer = new ScrollableFormContainer();
-					f.entityDefinition = this.entityDefinitionProxy;
+					f.entityDefinition = this.entityDefinition;
 					f.label = tab.label;
 					_forms[tab.name] = f;
 					f.initialize();
 					viewStack.addElement(f);
 				}
 			}
+
+
 
 		]]>
 	</fx:Script>
@@ -126,7 +146,7 @@
 			<s:layout>
 				<s:HorizontalLayout paddingTop="5" horizontalAlign="left" paddingLeft="10" gap="12" verticalAlign="middle" />
 			</s:layout>
-			<s:Label text="{entityDefinitionProxy.getLabelText()}" styleName="bold" />
+			<s:Label text="{entityDefinition.getLabelText()}" styleName="bold" />
 			<s:DropDownList prompt="{Message.get('global.dropDownPrompt')}" width="150" id="dropDownList" />
 			<s:Button styleName="addButton" buttonMode="true" useHandCursor="true" />
 			<s:Button styleName="deleteButton" buttonMode="true" useHandCursor="true" />

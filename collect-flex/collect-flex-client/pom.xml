@@ -86,6 +86,8 @@
 								<includeClass>org.openforis.collect.metamodel.proxy.*</includeClass>
 								<includeClass>org.openforis.collect.model.proxy.*</includeClass>
 								<includeClass>org.openforis.collect.Proxy</includeClass>
+								<includeClass>org.openforis.collect.remoting.service.UpdateRequest</includeClass>
+								<includeClass>org.openforis.collect.remoting.service.UpdateRequest$Method</includeClass>
 							</includeJavaClasses>
 						</configuration>
 					</execution>

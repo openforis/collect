@@ -3,19 +3,60 @@
  */
 package org.openforis.collect.model.proxy;
 
-import org.openforis.collect.Proxy;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
+import org.openforis.idm.metamodel.EntityDefinition;
+import org.openforis.idm.metamodel.NodeDefinition;
+import org.openforis.idm.model.Attribute;
+import org.openforis.idm.model.CodeAttribute;
+import org.openforis.idm.model.DateAttribute;
 import org.openforis.idm.model.Entity;
+import org.openforis.idm.model.Node;
 
 /**
  * @author M. Togna
  * 
  */
-public class EntityProxy implements Proxy {
+public class EntityProxy extends NodeProxy {
 
 	private transient Entity entity;
 
 	public EntityProxy(Entity entity) {
+		super(entity);
 		this.entity = entity;
 	}
-
+	
+	@SuppressWarnings("rawtypes")
+	@ExternalizedProperty
+	public Map<String, List<NodeProxy>> getChildrenByName() {
+		Map<String, List<NodeProxy>> result = new HashMap<String, List<NodeProxy>>();
+		EntityDefinition definition = this.entity.getDefinition();
+		List<NodeDefinition> childDefinitions = definition.getChildDefinitions();
+		for (NodeDefinition childDefinition : childDefinitions) {
+			String name = childDefinition.getName();
+			List<Node<? extends NodeDefinition>> childrenByName = this.entity.getAll(name);
+			if(childrenByName != null) {
+				List<NodeProxy> childrenByNameProxies = new ArrayList<NodeProxy>();
+				for (Node<? extends NodeDefinition> childNode : childrenByName) {
+					if(childNode instanceof Attribute) {
+						AttributeProxy attributeProxy = new AttributeProxy((Attribute) childNode);
+						childrenByNameProxies.add(attributeProxy);
+					} else if(childNode instanceof Entity) {
+						EntityProxy entityProxy = new EntityProxy((Entity) childNode);
+						childrenByNameProxies.add(entityProxy);
+					}
+				}
+				result.put(name, childrenByNameProxies);
+			}
+		}
+		return result;
+	}
+	
+	
 }
