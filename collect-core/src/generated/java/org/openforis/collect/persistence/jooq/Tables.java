@@ -23,11 +23,6 @@ public final class Tables {
 	public static org.openforis.collect.persistence.jooq.tables.Logo LOGO = org.openforis.collect.persistence.jooq.tables.Logo.LOGO;
 
 	/**
-	 * The table collect.node_count_view
-	 */
-	public static org.openforis.collect.persistence.jooq.tables.NodeCountView NODE_COUNT_VIEW = org.openforis.collect.persistence.jooq.tables.NodeCountView.NODE_COUNT_VIEW;
-
-	/**
 	 * The table collect.record
 	 */
 	public static org.openforis.collect.persistence.jooq.tables.Record RECORD = org.openforis.collect.persistence.jooq.tables.Record.RECORD;
