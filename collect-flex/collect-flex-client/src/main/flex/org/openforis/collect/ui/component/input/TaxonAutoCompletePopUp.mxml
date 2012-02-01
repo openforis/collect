@@ -67,7 +67,7 @@
 				 selectable="true"
 				 dataProvider="{dataProvider}">
 		<mx:columns>
-			<mx:DataGridColumn headerText="Code" dataField="id" width="100" />
+			<mx:DataGridColumn headerText="Code" dataField="code" width="100" />
 			<mx:DataGridColumn editable="true" headerText="Scientific name" width="168" dataField="scientificName" />
 			<mx:DataGridColumn headerText="Vernacular name" width="168" dataField="vernacularName" />
 			<mx:DataGridColumn headerText="Language/dialect" width="100" dataField="vernacularLang" />

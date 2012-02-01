@@ -1,12 +1,14 @@
 package org.openforis.collect.remoting.service;
 
+import org.openforis.collect.Proxy;
+
 /**
  * 
  * @author M. Togna
  * @author S. Ricci
  * 
  */
-public class UpdateRequest {
+public class UpdateRequest implements Proxy {
 
 	public enum Method {
 		UPDATE, ADD, DELETE;

@@ -161,8 +161,6 @@ package org.openforis.collect.presenter {
 			
 			_view.dataGrid.dataProvider = records;
 			
-			_view.currentState = ListView.DEFAULT_STATE;
-
 			updatePaginationBar();
 		}
 		

@@ -10,46 +10,51 @@
 			import mx.core.IVisualElementContainer;
 			
 			import org.openforis.collect.i18n.Message;
+			import org.openforis.collect.presenter.TaxonAttributeFormItemPresenter;
 			
 			import spark.components.FormItem;
 			
+			private var _presenter:TaxonAttributeFormItemPresenter;
+			
 			override public function addTo(parent:IVisualElementContainer):void {
 				if(this.isInDataGroup) {
-					parent.addElement(codeInputField);
-					parent.addElement(scientificNameInputField);
-					parent.addElement(vernacularNameInputField);
-					parent.addElement(vernacularLangInputField);
+					parent.addElement(codeTextInput);
+					parent.addElement(scientificNameTextInput);
+					parent.addElement(vernacularNameTextInput);
+					parent.addElement(vernacularLangTextInput);
 				} else {
 					var formItem:FormItem;
 					//code
 					formItem = new FormItem();
 					formItem.label = Message.get('edit.taxon.code');
-					formItem.addElement(codeInputField);
+					formItem.addElement(codeTextInput);
 					parent.addElement(formItem);
 					//scientific name
 					formItem = new FormItem();
 					formItem.label = Message.get('edit.taxon.scientificName');
-					formItem.addElement(scientificNameInputField);
+					formItem.addElement(scientificNameTextInput);
 					parent.addElement(formItem);
 					//vernacular name
 					formItem = new FormItem();
 					formItem.label = Message.get('edit.taxon.vernacularName');
-					formItem.addElement(vernacularNameInputField);
+					formItem.addElement(vernacularNameTextInput);
 					parent.addElement(formItem);
 					//vernacular lang
 					formItem = new FormItem();
 					formItem.label = Message.get('edit.taxon.vernacularLang');
-					formItem.addElement(vernacularLangInputField);
+					formItem.addElement(vernacularLangTextInput);
 					parent.addElement(formItem);
 				}
+				//init presenter
+				_presenter = new TaxonAttributeFormItemPresenter(this);
 			}
 		]]>
 	</fx:Script>
 	
 	<fx:Declarations>
-		<input:StringInputField id="codeInputField" width="100" />
-		<input:StringInputField id="scientificNameInputField" width="100" />
-		<input:StringInputField id="vernacularNameInputField" width="100" />
-		<input:StringInputField id="vernacularLangInputField" width="100" />
+		<input:TextInput id="codeTextInput" width="100" />
+		<input:TextInput id="scientificNameTextInput" width="100" />
+		<input:TextInput id="vernacularNameTextInput" width="100" />
+		<input:TextInput id="vernacularLangTextInput" width="100" />
 	</fx:Declarations>
 </detail:AttributeFormItem>

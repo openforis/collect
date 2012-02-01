@@ -122,6 +122,9 @@ public class ModelDAOIntegrationTest {
 		cluster.addValue("gps_realtime", Boolean.TRUE);
 		cluster.addValue("region", new Code("001"));
 		cluster.addValue("district", new Code("002"));
+		cluster.addValue("crew_no", 10);
+		cluster.addValue("map_sheet", "value 1");
+		cluster.addValue("map_sheet", "value 2");
 		cluster.addValue("vehicle_location", new Coordinate(432423423l, 4324324l,"srs"));
 		cluster.addValue("gps_model", "TomTom 1.232");
 		{
@@ -140,10 +143,12 @@ public class ModelDAOIntegrationTest {
 			Entity plot = cluster.addEntity("plot");
 			plot.addValue("no", new Code("1"));
 			Entity tree1 = plot.addEntity("tree");
+			tree1.addValue("tree_no", 1);
 			tree1.addValue("dbh", 54.2);
 			tree1.addValue("total_height", 2.0);
 			tree1.addValue("bole_height", (Double) null).setMetadata(new CollectAttributeMetadata('*',null,"No value specified"));
 			Entity tree2 = plot.addEntity("tree");
+			tree2.addValue("tree_no", 2);
 			tree2.addValue("dbh", 82.8);
 			tree2.addValue("total_height", 3.0);
 		}
@@ -151,9 +156,11 @@ public class ModelDAOIntegrationTest {
 			Entity plot = cluster.addEntity("plot");
 			plot.addValue("no", new Code("2"));
 			Entity tree1 = plot.addEntity("tree");
+			tree1.addValue("tree_no", 1);
 			tree1.addValue("dbh", 34.2);
 			tree1.addValue("total_height", 2.0);
 			Entity tree2 = plot.addEntity("tree");
+			tree2.addValue("tree_no", 2);
 			tree2.addValue("dbh", 85.8);
 			tree2.addValue("total_height", 4.0);
 		}

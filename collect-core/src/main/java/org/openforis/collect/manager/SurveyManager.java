@@ -4,7 +4,9 @@
 package org.openforis.collect.manager;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.openforis.collect.model.SurveySummary;
 import org.openforis.collect.persistence.SurveyDAO;
@@ -19,18 +21,24 @@ import org.springframework.transaction.annotation.Transactional;
  */
 public class SurveyManager {
 	// private EntityManager entityManager;
-
+	private Map<String, Survey> surveysByName;
+	private Map<Integer, Survey> surveysById;
 	private List<Survey> surveys;
+
+	public SurveyManager() {
+		surveysById = new HashMap<Integer, Survey>();
+		surveysByName = new HashMap<String, Survey>();
+	}
 
 	@Autowired
 	private SurveyDAO surveyDAO;
-	
+
 	@Transactional
-	public Survey load(String name) {
-		Survey survey = surveyDAO.load(name);
+	public Survey get(String name) {
+		Survey survey = surveysByName.get(name);
 		return survey;
 	}
-	
+
 	@Transactional
 	public List<SurveySummary> getSurveySummaries(String lang) {
 		List<SurveySummary> summaries = new ArrayList<SurveySummary>();
@@ -43,6 +51,7 @@ public class SurveyManager {
 		}
 		return summaries;
 	}
+
 	private String getProjectName(Survey survey, String lang) {
 		List<LanguageSpecificText> names = survey.getProjectNames();
 		if (names == null || names.size() == 0) {
@@ -58,10 +67,14 @@ public class SurveyManager {
 		}
 		return "";
 	}
-	
+
 	@Transactional
 	protected void init() {
 		surveys = surveyDAO.loadAll();
+		for (Survey survey : surveys) {
+			surveysById.put(survey.getId(), survey);
+			surveysByName.put(survey.getName(), survey);
+		}
 	}
 
 }

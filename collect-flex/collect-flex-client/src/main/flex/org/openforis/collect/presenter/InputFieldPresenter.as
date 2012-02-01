@@ -100,7 +100,7 @@ package org.openforis.collect.presenter {
 				newAttributeValue = createValue();
 			}
 			//send request to server and wait for the answer...
-			if(_view.attributes == null) {
+			if(_view.attribute != null) {
 				//use attribute 
 			} else {
 				//create attribute in record...
@@ -137,10 +137,11 @@ package org.openforis.collect.presenter {
 			var attribute:AttributeProxy = _view.attribute;
 			if(attribute != null) {
 				var value:Object = attribute.value;
-				return String(value);
-			} else {
-				return "";
+				if(value != null) {
+					return value.toString();
+				}
 			}
+			return "";
 		}
 
 		public function createValue():* {
@@ -181,13 +182,10 @@ package org.openforis.collect.presenter {
 		public function updateView():void {
 			//update textInput in view (generic text value)
 			if(_view.attributeDefinition != null) {
-				if(_view.attributeDefinition.multiple) {
-					//todo
-				} else {
-					var textInput:TextInput = _view.textInput as TextInput;
-					if(textInput != null) {
-						textInput.text = textValue;
-					}
+				var textInput:TextInput = _view.textInput as TextInput;
+				if(textInput != null) {
+					var text:String = this.textValue;
+					textInput.text = text;
 				}
 			}
 			/*

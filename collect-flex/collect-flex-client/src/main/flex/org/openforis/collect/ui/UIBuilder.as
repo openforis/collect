@@ -297,7 +297,7 @@ package org.openforis.collect.ui {
 			} else if(def is RangeAttributeDefinitionProxy) {
 				return 120;
 			} else if(def is BooleanAttributeDefinitionProxy) {
-				return 20;
+				return 100;
 			} else if(def is CoordinateAttributeDefinitionProxy) {
 				return 100;
 			} else if(def is TaxonAttributeDefinitionProxy) {

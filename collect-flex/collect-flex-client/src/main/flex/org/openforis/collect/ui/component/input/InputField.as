@@ -38,14 +38,12 @@ package org.openforis.collect.ui.component.input {
 		public static const STATE_ERROR_SAVING:String = "errorSaving";
 		
 		private var _presenter:InputFieldPresenter;
-
-		private var _isInDataGroup:Boolean;
 		
 		protected var _textInput:UIComponent;
 		
-		private var _attributes:IList; 
-		
 		private var _attributeDefinition:AttributeDefinitionProxy;
+
+		private var _attribute:AttributeProxy; 
 		
 		private var _parentEntity:EntityProxy;
 		
@@ -125,20 +123,6 @@ package org.openforis.collect.ui.component.input {
 			return _textInput;
 		}
 		
-		/**
-		 * Set to true when this input field is used insed a data group (i.e. if the parent is a multiple entity)
-		 * */
-		public function get isInDataGroup():Boolean {
-			return _isInDataGroup;
-		}
-
-		/**
-		 * @private
-		 */
-		public function set isInDataGroup(value:Boolean):void {
-			_isInDataGroup = value;
-		}
-
 		public function get presenter():InputFieldPresenter {
 			return _presenter;
 		}
@@ -147,35 +131,15 @@ package org.openforis.collect.ui.component.input {
 			_presenter = value;
 		}
 
-		[Bindable(event="attributesChanged")]
-		public function get attributes():IList {
-			return _attributes;
-		}
-
-		public function set attributes(value:IList):void {
-			_attributes = value;
-			dispatchEvent(new Event("attributesChanged"));
-		}
-
-		[Bindable(event="attributesChanged")]
+		[Bindable]
 		public function get attribute():AttributeProxy {
-			if(_attributes != null && _attributes.length == 1) {
-				return _attributes.getItemAt(0) as AttributeProxy;
-			} else {
-				return null;
-			}
+			return _attribute;
 		}
 		
 		public function set attribute(value:AttributeProxy):void {
-			if(value != null) {
-				var temp:IList = new ArrayList();
-				temp.addItem(value);
-				_attributes = temp;
-			} else {
-				_attributes = null;
-			}
+			this._attribute = value;
 			
-			if(_presenter) {
+			if(_presenter != null) {
 				_presenter.updateView();
 			}
 		}
