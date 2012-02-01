@@ -24,6 +24,19 @@
 
 	<build>
 		<plugins>
+			<!-- Read dev properties -->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>properties-maven-plugin</artifactId>
+				<version>1.0-alpha-2</version>
+				<configuration>
+					<files>
+						<file>dev.properties</file>
+					</files>
+					<quiet>true</quiet>
+				</configuration>
+			</plugin>
+			<!--  Generate jOOQ stub classes -->		
 			<plugin>
 				<groupId>org.jooq</groupId>
 				<artifactId>jooq-codegen-maven</artifactId>
@@ -90,11 +103,6 @@
 					<includes>
 						<include>**/*IntegrationTest.java</include>
 					</includes>
-					<systemPropertyVariables>
-						<collect.devdb.url>${collect.devdb.url}</collect.devdb.url>
-						<collect.devdb.username>${collect.devdb.username}</collect.devdb.username>
-						<collect.devdb.password>${collect.devdb.password}</collect.devdb.password>
-					</systemPropertyVariables>
 				</configuration>
 				<executions>
 					<execution>
@@ -209,11 +217,40 @@
 								</pluginExecution>
 								<pluginExecution>
 									<pluginExecutionFilter>
-										<groupId>org.codehaus.mojo</groupId>
-										<artifactId>properties-maven-plugin</artifactId>
-										<versionRange>[1.0-alpha-2,)</versionRange>
+										<groupId>
+											org.codehaus.mojo
+										</groupId>
+										<artifactId>
+											maven-properties-plugin
+										</artifactId>
+										<versionRange>
+											[1.0-SNAPSHOT,)
+										</versionRange>
 										<goals>
-											<goal>read-project-properties</goal>
+											<goal>
+												read-project-properties
+											</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore></ignore>
+									</action>
+								</pluginExecution>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>
+											org.codehaus.mojo
+										</groupId>
+										<artifactId>
+											properties-maven-plugin
+										</artifactId>
+										<versionRange>
+											[1.0-alpha-2,)
+										</versionRange>
+										<goals>
+											<goal>
+												read-project-properties
+											</goal>
 										</goals>
 									</pluginExecutionFilter>
 									<action>

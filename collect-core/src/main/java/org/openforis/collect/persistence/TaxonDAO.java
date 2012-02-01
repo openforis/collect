@@ -36,5 +36,4 @@ public class TaxonDAO extends CollectDAO {
 		r.setValue(TAXON.STEP, taxon.getStep());
 		r.store();
 	}
-
 }
