@@ -13,14 +13,12 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openforis.collect.model.CollectAttributeMetadata;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.RecordSummary;
-import org.openforis.collect.model.UIConfiguration.UIConfigurationAdapter;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Survey;
@@ -42,30 +40,20 @@ import org.springframework.transaction.annotation.Transactional;
 @ContextConfiguration( locations = {"classpath:test-context.xml"} )
 @TransactionConfiguration(defaultRollback=false)
 @Transactional
-public class DAOIntegrationTest {
-	private final Log log = LogFactory.getLog(DAOIntegrationTest.class);
-	
-	private BindingContext bindingContext;
+public class ModelDAOIntegrationTest {
+	private final Log log = LogFactory.getLog(ModelDAOIntegrationTest.class);
 	
 	@Autowired
 	protected SurveyDAO surveyDao;
 	
 	@Autowired
 	protected RecordDAO recordDao;
-	
+
 	@Autowired
 	protected RecordSummaryDAO recordSummaryDao;
-	
-	@Before
-	public void beforeTest(){
-		surveyDao.loadAll();
-		bindingContext = new BindingContext();
-		UIConfigurationAdapter configurationAdapter = new UIConfigurationAdapter();
-		bindingContext.setConfigurationAdapter(configurationAdapter);
-	}
-	
+
 	@Test
-	public void testCRUD() throws IOException, SurveyImportException, DataInconsistencyException, InvalidIdmlException, NonexistentIdException  {
+	public void testCRUD() throws Exception  {
 //		try {
 		// LOAD MODEL
 		Survey survey = surveyDao.load("archenland1");
@@ -119,7 +107,8 @@ public class DAOIntegrationTest {
 	private Survey importModel() throws IOException, SurveyImportException, InvalidIdmlException {
 		URL idm = ClassLoader.getSystemResource("test.idm.xml");
 		InputStream is = idm.openStream();
-		SurveyUnmarshaller surveyUnmarshaller =  bindingContext.createSurveyUnmarshaller();
+		BindingContext bindingContext = new BindingContext();;
+		SurveyUnmarshaller surveyUnmarshaller = bindingContext .createSurveyUnmarshaller();
 		Survey survey = surveyUnmarshaller.unmarshal(is);
 		surveyDao.importModel(survey);
 		return survey;
@@ -128,7 +117,7 @@ public class DAOIntegrationTest {
 	private CollectRecord createRecord(Survey survey) {
 		CollectRecord record = new CollectRecord(survey, "cluster", "2.0");
 		record.setCreationDate(new GregorianCalendar(2011, 12, 31, 23, 59).getTime());
-		//record.setCreatedBy("DAOIntegrationTest");
+		//record.setCreatedBy("ModelDAOIntegrationTest");
 		record.setStep(Step.ENTRY);
 		Entity cluster = record.getRootEntity();
 		String id = "123_456";
@@ -206,17 +195,4 @@ public class DAOIntegrationTest {
 		RecordSummary summary = list.get(0);
 		assertEquals(1, summary.getStep());
 	}
-
-	private void updateRecord(CollectRecord record) {
-		// Update modified date
-		record.setModifiedDate(new GregorianCalendar(2012, 1, 1, 0, 1).getTime());
-		//record.setModifiedBy("DAOIntegrationTest");
-		
-		// Remove first time_study
-		Entity cluster = record.getRootEntity();
-		cluster.remove("time_study", 0);
-		
-		// TODO write update test
-	}
-	
 }
