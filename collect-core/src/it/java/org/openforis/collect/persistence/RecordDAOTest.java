@@ -16,11 +16,10 @@ import org.openforis.collect.model.CollectAttributeMetadata;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.RecordSummary;
-import org.openforis.collect.model.UIConfiguration.UIConfigurationAdapter;
+import org.openforis.collect.persistence.xml.CollectIdmlBindingContext;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Survey;
-import org.openforis.idm.metamodel.xml.BindingContext;
 import org.openforis.idm.metamodel.xml.InvalidIdmlException;
 import org.openforis.idm.model.Code;
 import org.openforis.idm.model.Coordinate;
@@ -36,7 +35,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class RecordDAOTest {
 	private final Log log = LogFactory.getLog(RecordDAOTest.class);
 	
-	private BindingContext bindingContext;
+	private CollectIdmlBindingContext idmlBindingContext;
 	
 	@Autowired
 	protected SurveyDAO surveyDao;
@@ -56,9 +55,7 @@ public class RecordDAOTest {
 //	@Before
 	public void beforeTest(){
 		surveyDao.loadAll();
-		bindingContext = new BindingContext();
-		UIConfigurationAdapter configurationAdapter = new UIConfigurationAdapter();
-		bindingContext.setConfigurationAdapter(configurationAdapter);
+		idmlBindingContext = new CollectIdmlBindingContext();
 		
 		// LOAD MODEL
 		survey = surveyDao.load("archenland1");
@@ -170,7 +167,7 @@ public class RecordDAOTest {
 		
 		CollectRecord record = new CollectRecord(survey, "cluster", "2.0");
 		record.setCreationDate(new GregorianCalendar(2011, 0, sequenceNumber, 8, 30).getTime());
-		//record.setCreatedBy("DAOIntegrationTest");
+		//record.setCreatedBy("ModelDAOIntegrationTest");
 		record.setStep(Step.ENTRY);
 		record.setModifiedDate(new GregorianCalendar(2011, 1, sequenceNumber, 8, 30).getTime());
 		record.setSkipped(skippedCount);

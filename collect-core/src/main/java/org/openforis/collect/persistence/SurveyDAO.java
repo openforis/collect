@@ -16,19 +16,15 @@ import java.util.Map;
 
 import javax.xml.namespace.QName;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.jooq.Record;
 import org.jooq.Result;
 import org.jooq.impl.Factory;
 import org.jooq.impl.SQLDataType;
-import org.jooq.util.derby.DerbyDataType;
-import org.openforis.collect.model.UIConfiguration.UIConfigurationAdapter;
+import org.openforis.collect.persistence.xml.CollectIdmlBindingContext;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.Survey;
-import org.openforis.idm.metamodel.xml.BindingContext;
 import org.openforis.idm.metamodel.xml.InvalidIdmlException;
 import org.openforis.idm.metamodel.xml.SurveyMarshaller;
 import org.openforis.idm.metamodel.xml.SurveyUnmarshaller;
@@ -39,20 +35,18 @@ import org.springframework.transaction.annotation.Transactional;
  * @author M. Togna
  */
 public class SurveyDAO extends CollectDAO {
-	private final Log LOG = LogFactory.getLog(SurveyDAO.class);
+//	private final Log LOG = LogFactory.getLog(SurveyDAO.class);
 	
 	private static final QName COUNT_ANNOTATION = new QName("http://www.openforis.org/collect/3.0/collect", "count");
 
 	private Map<String, Survey> surveysByName;
 	private Map<Integer, Survey> surveysById;
-	private BindingContext bindingContext;
+	private CollectIdmlBindingContext bindingContext;
 
 	public SurveyDAO() {
 		surveysById = new HashMap<Integer, Survey>();
 		surveysByName = new HashMap<String, Survey>();
-		bindingContext = new BindingContext();
-		UIConfigurationAdapter configurationAdapter = new UIConfigurationAdapter();
-		bindingContext.setConfigurationAdapter(configurationAdapter);
+		bindingContext = new CollectIdmlBindingContext();
 	}
 
 	@Transactional
@@ -65,7 +59,7 @@ public class SurveyDAO extends CollectDAO {
 		jf.insertInto(SURVEY)
 			.set(SURVEY.ID, surveyId)
 			.set(SURVEY.NAME, survey.getName())
-			.set(SURVEY.IDML, jf.val(idml, SQLDataType.CLOB))
+			.set(SURVEY.IDML, Factory.val(idml, SQLDataType.CLOB))
 			.execute();
 
 		survey.setId(surveyId);

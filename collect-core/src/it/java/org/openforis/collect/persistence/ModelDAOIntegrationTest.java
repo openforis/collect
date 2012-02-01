@@ -19,10 +19,11 @@ import org.openforis.collect.model.CollectAttributeMetadata;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.RecordSummary;
+import org.openforis.collect.persistence.xml.CollectIdmlBindingContext;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Survey;
-import org.openforis.idm.metamodel.xml.BindingContext;
+import org.openforis.idm.metamodel.xml.IdmlBindingContext;
 import org.openforis.idm.metamodel.xml.InvalidIdmlException;
 import org.openforis.idm.metamodel.xml.SurveyUnmarshaller;
 import org.openforis.idm.model.Code;
@@ -107,8 +108,8 @@ public class ModelDAOIntegrationTest {
 	private Survey importModel() throws IOException, SurveyImportException, InvalidIdmlException {
 		URL idm = ClassLoader.getSystemResource("test.idm.xml");
 		InputStream is = idm.openStream();
-		BindingContext bindingContext = new BindingContext();;
-		SurveyUnmarshaller surveyUnmarshaller = bindingContext .createSurveyUnmarshaller();
+		CollectIdmlBindingContext idmlBindingContext = new CollectIdmlBindingContext();
+		SurveyUnmarshaller surveyUnmarshaller = idmlBindingContext.createSurveyUnmarshaller();
 		Survey survey = surveyUnmarshaller.unmarshal(is);
 		surveyDao.importModel(survey);
 		return survey;
