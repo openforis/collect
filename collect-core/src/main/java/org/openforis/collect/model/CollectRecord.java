@@ -1,8 +1,8 @@
 package org.openforis.collect.model;
 
-import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.openforis.idm.metamodel.Survey;
@@ -48,7 +48,7 @@ public class CollectRecord extends Record {
 		this.submitted = false;
 		
 		keys = new HashMap<String, Object>();
-		counts = new HashMap<String, Integer>();
+		counts = new LinkedHashMap<String, Integer>();
 	}
 
 	public void setSubmitted(boolean submitted) {

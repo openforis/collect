@@ -5,7 +5,6 @@ import static org.junit.Assert.assertNotNull;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Map;
@@ -80,16 +79,13 @@ public class RecordDAOTest {
 	 * 
 	 */
 	private void createAndSaveSampleRecords() {
-		EntityDefinition rootEntityDefinition = survey.getSchema().getRootEntityDefinition("cluster");
-		EntityDefinition plotDef = (EntityDefinition) rootEntityDefinition.getChildDefinition("plot");
-		
 		sampleRecords = new ArrayList<CollectRecord>();
 		
 		//create and save clusters
 		for (int i = 1; i <= numberOfSampleRecords ; i++) {
 			CollectRecord record = createRecord(survey, i);
 			sampleRecords.add(record);
-			recordDao.saveOrUpdate(record, Arrays.asList(plotDef));
+			recordDao.saveOrUpdate(record);
 		}
 	}
 	

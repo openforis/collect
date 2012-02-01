@@ -76,12 +76,8 @@ public class DAOIntegrationTest {
 		}
 		
 		// SAVE NEW
-		EntityDefinition rootEntityDefinition = survey.getSchema().getRootEntityDefinition("cluster");
-		EntityDefinition plotDef = (EntityDefinition) rootEntityDefinition.getChildDefinition("plot");
-		
 		CollectRecord record = createRecord(survey);
-		
-		recordDao.saveOrUpdate(record, Arrays.asList(plotDef));
+		recordDao.saveOrUpdate(record);
 		
 		String saved = record.toString();
 		log.debug("Saving record:\n"+saved);
