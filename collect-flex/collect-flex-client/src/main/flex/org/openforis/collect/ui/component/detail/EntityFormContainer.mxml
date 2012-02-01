@@ -13,12 +13,10 @@
 	
 	<fx:Script>
 		<![CDATA[
-			import mx.binding.utils.BindingUtils;
 			import mx.collections.IList;
 			import mx.collections.ListCollectionView;
 			import mx.core.IVisualElement;
 			
-			import org.openforis.collect.Application;
 			import org.openforis.collect.i18n.Message;
 			import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 			import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
@@ -27,11 +25,9 @@
 			import org.openforis.collect.model.proxy.CodeProxy;
 			import org.openforis.collect.model.proxy.CoordinateProxy;
 			import org.openforis.collect.model.proxy.EntityProxy;
-			import org.openforis.collect.model.proxy.NodeProxy;
 			import org.openforis.collect.util.StringUtil;
 			
 			import spark.components.FormItem;
-			import spark.components.gridClasses.GridColumn;
 			import spark.events.IndexChangeEvent;
 		
 			private var _parentEntity:EntityProxy;
@@ -70,18 +66,20 @@
 			
 			override protected function createChildren():void {
 				super.createChildren();
-				addElement(container);
+				addElement(externalContainer);
+				externalContainer.addElement(internalContainer);
+				
 				if(entityDefinition.multiple) {
-					borderContainer.addElementAt(addSection, 0);
-					this.currentState = "entityNotSelected";
+					externalContainer.addElementAt(addSection, 0);
+					internalContainer.visible = false;
 				} else {
-					this.currentState = "single";
+					internalContainer.visible = true;
 				}
 				
 				if(uiTabs == null) {
-					borderContainer.addElement(scroller);
+					internalContainer.addElement(scroller);
 				} else {
-					borderContainer.addElement(scrollableForms);
+					internalContainer.addElement(scrollableForms);
 				}
 			}
 			
@@ -181,29 +179,38 @@
 
 			protected function dropDownListChangeHandler(event:IndexChangeEvent):void {
 				entity = dropDownList.selectedItem as EntityProxy;
-				this.currentState = "entitySelected";
+				if(internalContainer.visible) {
+					//internal container already visible, call programmatically the showEffect
+					showFormEffect.play([internalContainer]);
+					
+					//todo reset entity form scrollers, set first tab
+				} else {
+					internalContainer.visible = true;
+				}
 			}
 			
 		]]>
 	</fx:Script>
 	
-	<s:states>
-		<s:State name="single" />
-		<s:State name="multiple" />
-		<s:State name="entityNotSelected" basedOn="multiple" />
-		<s:State name="entitySelected" basedOn="multiple" />
-	</s:states>
-	
-	<s:transitions>
-		<s:Transition id="entitySelectedTransition" fromState="*" toState="entitySelected">
-			<s:Fade target="{borderContainer}" duration="400" alphaFrom="0" alphaTo="1" />
-		</s:Transition>
-		<s:Transition id="entityNotSelectedTransition" fromState="*" toState="entityNotSelected">
-			<s:Fade target="{borderContainer}" duration="400" alphaFrom="1" alphaTo="0" />
-		</s:Transition>
-	</s:transitions>
-	
 	<fx:Declarations>
+		
+		<s:Fade id="showFormEffect" 
+				duration="600" 
+				alphaFrom="0" 
+				alphaTo="1"
+				/>
+		
+		<s:Fade id="hideFormEffect" 
+				duration="400" 
+				alphaFrom="1" 
+				alphaTo="0"
+				/>
+		
+		<s:BorderContainer width="100%" height="100%" id="externalContainer" styleName="entityForm">
+			<s:layout>
+				<s:VerticalLayout/>
+			</s:layout>
+		</s:BorderContainer>
 		
 		<s:Group width="100%" id="addSection">
 			<s:layout>
@@ -216,16 +223,9 @@
 			<s:Button styleName="deleteButton" buttonMode="true" useHandCursor="true" />
 		</s:Group>
 		
-		<s:VGroup id="container" width="100%" height="100%" gap="10">
-			<s:BorderContainer width="100%" height="100%" id="borderContainer" styleName="entityForm">
-				<s:layout>
-					<s:VerticalLayout/>
-				</s:layout>
-				
-			</s:BorderContainer>
-		</s:VGroup>
+		<s:Group id="internalContainer" height="100%" width="100%" showEffect="{showFormEffect}" hideEffect="{hideFormEffect}" />
 		
-		<s:Scroller height="100%" width="100%" visible="true" id="scroller" visible.entityNotSelected="false">
+		<s:Scroller height="100%" width="100%" id="scroller">
 			<s:Group width="100%" id="group">
 				<s:Form height="100%" width="100%" id="form">
 					<s:layout>
@@ -235,7 +235,7 @@
 			</s:Group>
 		</s:Scroller>
 		
-		<s:VGroup id="scrollableForms" width="100%" height="100%" gap="0" visible.entityNotSelected="false">
+		<s:VGroup id="scrollableForms" width="100%" height="100%" gap="0">
 			<s:ButtonBar id="buttonBar"  dataProvider="{viewStack}" />
 			<mx:ViewStack id="viewStack" width="100%" height="100%" verticalGap="0" />
 		</s:VGroup>

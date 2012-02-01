@@ -6,40 +6,76 @@
 		 xmlns:input="org.openforis.collect.ui.component.input.*" >
 
 	<detail:layout>
-		<s:VerticalLayout gap="-5" />
+		<s:VerticalLayout gap="2" />
 	</detail:layout>
 	
 	<fx:Script>
 		<![CDATA[
+			import mx.collections.ArrayList;
+			import mx.collections.IList;
 			
 			import org.openforis.collect.i18n.Message;
+			import org.openforis.collect.model.proxy.EntityProxy;
 			import org.openforis.collect.ui.Images;
 			import org.openforis.collect.ui.component.input.InputField;
+			
+			[Bindable]
+			private var dataGroupDataProvider:IList;
 			
 			protected function addButtonClickHandler(event:MouseEvent):void {
 				//TODO
 			}
 			
+			override public function set parentEntity(value:EntityProxy):void {
+				super.parentEntity = value;
+				
+				if(attributeDefinition != null && parentEntity != null) {
+					var attributes:IList = parentEntity.getChildren(attributeDefinition.name);
+					if(attributes != null && attributes.length > 0) {
+						dataGroupDataProvider = attributes;
+						return;
+					}
+				}
+				//add empty row if dataGroupDataProvider has not been set
+				var temp:IList = new ArrayList();
+				temp.addItem(new Object());
+				dataGroupDataProvider = temp;
+			}
+			
 		]]>
 	</fx:Script>
 	
-	<s:DataGroup id="dataGroup">
+	<s:DataGroup id="dataGroup" dataProvider="{dataGroupDataProvider}">
+		<s:layout>
+			<s:VerticalLayout gap="2" />
+		</s:layout>
 		<s:itemRenderer>
 			<fx:Component>
-				<s:Group>
+				<s:ItemRenderer>
 					<fx:Script>
 						<![CDATA[
-							import org.openforis.collect.ui.component.input.InputField;
+							import mx.binding.utils.BindingUtils;
+							import mx.events.FlexEvent;
+							
+							import org.openforis.collect.model.proxy.AttributeProxy;
 							import org.openforis.collect.ui.UIBuilder;
+							import org.openforis.collect.ui.component.input.InputField;
+							
+							[Bindable(event="dataChange")]
+							public function get attribute():AttributeProxy {
+								return super.data as AttributeProxy;
+							}
 							
 							override protected function createChildren():void {
 								super.createChildren();
 								var inputField:InputField = UIBuilder.getInputField(outerDocument.attributeDefinition);
+								BindingUtils.bindProperty(inputField, "parentEntity", outerDocument, "parentEntity");
+								BindingUtils.bindProperty(inputField, "attribute", this, "attribute");
 								addElement(inputField);
 							}
 						]]>
 					</fx:Script>
-				</s:Group>
+				</s:ItemRenderer>
 			</fx:Component>
 		</s:itemRenderer>
 	</s:DataGroup>

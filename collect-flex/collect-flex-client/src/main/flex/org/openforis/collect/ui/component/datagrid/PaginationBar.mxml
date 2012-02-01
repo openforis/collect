@@ -82,6 +82,6 @@
 			 useHandCursor="true" 
 			 buttonMode="true"
 			 enabled.inactive="false" 
-			 visible.lastPage="false" />
+			 enabled.lastPage="false" />
 	
 </s:Group>

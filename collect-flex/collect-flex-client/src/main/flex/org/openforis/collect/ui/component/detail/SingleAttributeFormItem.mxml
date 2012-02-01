@@ -16,7 +16,6 @@
 					super.createChildren();
 				
 					var inputField:InputField = UIBuilder.getInputField(attributeDefinition);
-					inputField.isInDataGroup = this.isInDataGroup;
 					
 					//bind input field attribute to the same instance of this
 					BindingUtils.bindProperty(inputField, "attribute", this, "attribute");
