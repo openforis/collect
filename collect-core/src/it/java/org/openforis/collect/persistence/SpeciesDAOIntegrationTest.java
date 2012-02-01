@@ -1,7 +1,5 @@
 package org.openforis.collect.persistence;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openforis.collect.model.species.Taxon;
@@ -17,10 +15,10 @@ import org.springframework.transaction.annotation.Transactional;
 @TransactionConfiguration(defaultRollback=false)
 @Transactional
 public class SpeciesDAOIntegrationTest {
-	private final Log log = LogFactory.getLog(ModelDAOIntegrationTest.class);
+//	private final Log log = LogFactory.getLog(ModelDAOIntegrationTest.class);
 
 	@Autowired
-	protected RecordDAO taxonDao;
+	protected TaxonomyDAO taxonomyDao;
 
 	@Test
 	public void testCRUD() throws Exception  {
@@ -30,6 +28,9 @@ public class SpeciesDAOIntegrationTest {
 	private void insertTaxonomy() throws Exception {
 		Taxonomy t = new Taxonomy();
 		t.setName("trees");
+		taxonomyDao.insert(t);
+		t.setName("bamboo");
+		taxonomyDao.update(t);
 	}
 
 	private void insertTaxon() throws Exception {

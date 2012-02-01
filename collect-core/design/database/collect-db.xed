@@ -202,6 +202,9 @@
    <Constraint table="65" name="PK_taxonomy" type="PrimKey">
       <ConstraintColumn id="66"></ConstraintColumn>
    </Constraint>
+   <Constraint table="65" name="UK_taxonomy_name" type="Unique">
+      <ConstraintColumn id="67"></ConstraintColumn>
+   </Constraint>
    <Constraint table="69" name="PK_user" type="PrimKey">
       <ConstraintColumn id="70"></ConstraintColumn>
    </Constraint>
@@ -212,31 +215,31 @@
       <ConstraintColumn id="79"></ConstraintColumn>
    </Constraint>
    <Sheet name="Main" id="94" disp_at="true" disp_ph="true" disp_co="true">
+      <Place id="83" visible="true" options="499.0,17.0,191.0,92.0,498.0,188.0,200.0,83.0,2,600.0,109.0,600.0,188.0">500,0,0,0</Place>
       <Place id="74" visible="true">40,40,211,91</Place>
-      <Place id="84" visible="true" options="498.0,188.0,200.0,83.0,45.0,415.0,216.0,456.0,5,560.0,271.0,560.0,440.0,462.0,440.0,462.0,440.0,261.0,440.0">706,-27,0,0</Place>
-      <Place id="90" visible="true" options="40.0,200.0,191.0,101.0,45.0,415.0,216.0,456.0,2,100.0,301.0,100.0,415.0">500,0,0,0</Place>
-      <Place id="82" visible="true">500,0,0,0</Place>
+      <Place id="81" visible="true">500,0,0,0</Place>
+      <Place id="89" visible="true" options="40.0,200.0,191.0,101.0,40.0,40.0,211.0,91.0,2,140.0,200.0,140.0,131.0">434,33,0,0</Place>
+      <Place id="92" visible="true" options="40.0,200.0,191.0,101.0,45.0,415.0,216.0,456.0,4,180.0,301.0,180.0,380.0,180.0,380.0,180.0,415.0">500,0,0,0</Place>
       <Place id="20" visible="true">499,17,191,92</Place>
       <Place id="4" visible="true">783,382,190,280</Place>
-      <Place id="89" visible="true" options="40.0,200.0,191.0,101.0,40.0,40.0,211.0,91.0,2,140.0,200.0,140.0,131.0">434,33,0,0</Place>
+      <Place id="69" visible="true">40,200,191,101</Place>
+      <Place id="82" visible="true">500,0,0,0</Place>
       <Place id="25" visible="true">45,415,216,456</Place>
+      <Place id="88" visible="true">500,0,0,0</Place>
+      <Place id="91" visible="true" options="40.0,200.0,191.0,101.0,45.0,415.0,216.0,456.0,4,140.0,301.0,140.0,380.0,140.0,380.0,140.0,415.0">500,0,0,0</Place>
+      <Place id="84" visible="true" options="498.0,188.0,200.0,83.0,45.0,415.0,216.0,456.0,5,560.0,271.0,560.0,440.0,462.0,440.0,462.0,440.0,261.0,440.0">706,-27,0,0</Place>
+      <Place id="90" visible="true" options="40.0,200.0,191.0,101.0,45.0,415.0,216.0,456.0,2,100.0,301.0,100.0,415.0">500,0,0,0</Place>
       <Place id="78" visible="true">799,110,120,60</Place>
       <Place id="85" visible="true" options="45.0,415.0,216.0,456.0,783.0,382.0,190.0,280.0,2,261.0,590.0,783.0,590.0">500,0,0,0</Place>
-      <Place id="83" visible="true" options="499.0,17.0,191.0,92.0,498.0,188.0,200.0,83.0,2,600.0,109.0,600.0,188.0">500,0,0,0</Place>
-      <Place id="81" visible="true">500,0,0,0</Place>
-      <Place id="69" visible="true">40,200,191,101</Place>
-      <Place id="92" visible="true" options="40.0,200.0,191.0,101.0,45.0,415.0,216.0,456.0,4,180.0,301.0,180.0,380.0,180.0,380.0,180.0,415.0">500,0,0,0</Place>
-      <Place id="88" visible="true">500,0,0,0</Place>
       <Place id="0" visible="true">498,188,200,83</Place>
-      <Place id="91" visible="true" options="40.0,200.0,191.0,101.0,45.0,415.0,216.0,456.0,4,140.0,301.0,140.0,380.0,140.0,380.0,140.0,415.0">500,0,0,0</Place>
    </Sheet>
    <Sheet name="Species" id="95" disp_at="true" disp_ph="true" disp_co="true" disp_rn="true">
-      <Place id="51" visible="true">278,300,230,130</Place>
       <Place id="86" visible="true" options="278.0,300.0,230.0,130.0,280.0,549.0,240.0,130.0,2,400.0,430.0,400.0,549.0">500,0,0,0</Place>
+      <Place id="65" visible="true">300,108,170,80</Place>
+      <Place id="87" visible="true" options="300.0,108.0,170.0,80.0,278.0,300.0,230.0,130.0,2,390.0,188.0,390.0,300.0">500,0,0,0</Place>
       <Place id="58" visible="true">280,549,240,130</Place>
-      <Place id="87" visible="true" options="300.0,108.0,180.0,90.0,278.0,300.0,230.0,130.0,2,390.0,198.0,390.0,300.0">500,0,0,0</Place>
+      <Place id="51" visible="true">278,300,230,130</Place>
       <Place id="93" visible="true">500,0,0,0</Place>
-      <Place id="65" visible="true">300,108,180,90</Place>
    </Sheet>
    <Settings sheet="95" zoom="1.0"></Settings>
 </Diagram>
