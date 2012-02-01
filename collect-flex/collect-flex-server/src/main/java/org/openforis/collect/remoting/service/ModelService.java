@@ -42,7 +42,7 @@ public class ModelService {
 	
 	@Transactional
 	public SurveyProxy setActiveSurvey(String name) {
-		Survey survey = surveyManager.load(name);
+		Survey survey = surveyManager.get(name);
 		SessionState sessionState = sessionManager.getSessionState();
 		sessionState.setActiveSurvey(survey);
 		SurveyProxy proxy = new SurveyProxy(survey);

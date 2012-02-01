@@ -10,9 +10,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.xml.namespace.QName;
 
@@ -39,13 +37,10 @@ public class SurveyDAO extends CollectDAO {
 	
 	private static final QName COUNT_ANNOTATION = new QName("http://www.openforis.org/collect/3.0/collect", "count");
 
-	private Map<String, Survey> surveysByName;
-	private Map<Integer, Survey> surveysById;
+	
 	private CollectIdmlBindingContext bindingContext;
 
 	public SurveyDAO() {
-		surveysById = new HashMap<Integer, Survey>();
-		surveysByName = new HashMap<String, Survey>();
 		bindingContext = new CollectIdmlBindingContext();
 	}
 
@@ -77,18 +72,31 @@ public class SurveyDAO extends CollectDAO {
 				.execute();
 			definition.setId(definitionId);
 		}
-
-		surveysById.put(survey.getId(), survey);
-		surveysByName.put(survey.getName(), survey);
 	}
 	
 	public Survey load(int id) {
-		Survey survey = surveysById.get(id);
+		Factory jf = getJooqFactory();
+		Record record = jf.select()
+				.from(SURVEY)
+				.where(SURVEY.ID.equal(id))
+				.fetchOne();
+		Survey survey = processSurveyRow(record);
+		if ( survey != null ) {
+			loadNodeDefinitions(survey);
+		}
 		return survey;
 	}
 
 	public Survey load(String name) {
-		Survey survey = surveysByName.get(name);
+		Factory jf = getJooqFactory();
+		Record record = jf.select()
+				.from(SURVEY)
+				.where(SURVEY.NAME.equal(name))
+				.fetchOne();
+		Survey survey = processSurveyRow(record);
+		if ( survey != null ) {
+			loadNodeDefinitions(survey);
+		}
 		return survey;
 	}
 
@@ -102,9 +110,6 @@ public class SurveyDAO extends CollectDAO {
 			if (survey != null) {
 				loadNodeDefinitions(survey);
 				surveys.add(survey);
-
-				surveysById.put(survey.getId(), survey);
-				surveysByName.put(survey.getName(), survey);
 			}
 		}
 		return surveys;
