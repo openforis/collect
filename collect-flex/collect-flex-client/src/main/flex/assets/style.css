@@ -44,6 +44,13 @@ s|BorderContainer.noError {
 	border-color: #FFFFFF;
 }
 
+s|BorderContainer.entityForm {
+	borderColor: #CCCCCC;
+	borderAlpha: 0.8;
+	borderStyle: solid;
+	borderWeight: 1; 
+}
+
 s|Button.closeButton {
 	skin-class: ClassReference("org.openforis.collect.ui.skin.CloseButtonSkin");
 }

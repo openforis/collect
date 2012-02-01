@@ -35,8 +35,6 @@
 			
 			public function addEntityFormContainer(form:EntityFormContainer):void {
 				this.viewStack.addElement(form);
-				
-				BindingUtils.bindProperty(form, "entity", this, ["record", "rootEntity"]);
 			}
 		]]>
 	</fx:Script>

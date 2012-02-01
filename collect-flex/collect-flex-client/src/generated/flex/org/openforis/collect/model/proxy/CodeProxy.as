@@ -6,9 +6,14 @@
  */
 
 package org.openforis.collect.model.proxy {
+	import org.openforis.collect.util.StringUtil;
 
     [Bindable]
     [RemoteClass(alias="org.openforis.collect.model.proxy.CodeProxy")]
     public class CodeProxy extends CodeProxyBase {
-    }
+		
+		public function toString():String {
+			return StringUtil.concat("; ", code, qualifier);
+		}
+	}
 }

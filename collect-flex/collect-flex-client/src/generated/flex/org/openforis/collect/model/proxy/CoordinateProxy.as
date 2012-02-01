@@ -6,9 +6,18 @@
  */
 
 package org.openforis.collect.model.proxy {
+	import org.openforis.collect.Application;
+	import org.openforis.collect.util.ArrayUtil;
+	import org.openforis.collect.util.StringUtil;
 
     [Bindable]
     [RemoteClass(alias="org.openforis.collect.model.proxy.CoordinateProxy")]
     public class CoordinateProxy extends CoordinateProxyBase {
+		
+		public function toString():String {
+			//todo add srs
+			return StringUtil.concat(" - ", x, y);
+		}
+		
     }
 }

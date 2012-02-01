@@ -26,13 +26,13 @@ package org.openforis.collect.model.proxy {
 			}
 		}
 		
-		public function getChildren(attributeName:String):IList {
-			var children:IList = childrenByName.get(attributeName);
+		public function getChildren(nodeName:String):IList {
+			var children:IList = childrenByName.get(nodeName);
 			return children;
 		}
 
-		public function getChild(attributeName:String, index:int):NodeProxy {
-			var children:IList = getChildren(attributeName);
+		public function getChild(nodeName:String, index:int):NodeProxy {
+			var children:IList = getChildren(nodeName);
 			if(children != null && children.length > index) {
 				return children.getItemAt(index) as NodeProxy;
 			} else {

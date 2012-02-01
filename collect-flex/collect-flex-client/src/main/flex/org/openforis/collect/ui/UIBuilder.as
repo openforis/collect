@@ -89,7 +89,12 @@ package org.openforis.collect.ui {
 				}
 				addFormItems(form, entity, version, uiTab);
 				formContainer.addEntityFormContainer(form);
-				
+				/*
+					in this case the parentEntity of the formContainer will be null and 
+					the "entity" will be record's "rootEntity"
+				*/
+				BindingUtils.bindProperty(form, "entity", formContainer, ["record", "rootEntity"]);
+
 				if(tabs != null) {
 					for each (tab in tabs) {
 						var childForm:EntityFormContainer = new EntityFormContainer();
@@ -99,6 +104,10 @@ package org.openforis.collect.ui {
 							childForm.entityDefinition = edp;														
 							addFormItems(childForm, edp, version, tab);			
 							formContainer.addEntityFormContainer(childForm);
+							/*
+								in this case the parentEntity will be the record's rootEntity
+							*/
+							BindingUtils.bindProperty(childForm, "parentEntity", formContainer, ["record", "rootEntity"]);
 						}
 					}
 				}
