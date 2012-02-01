@@ -1,4 +1,5 @@
 package org.openforis.collect.ui {
+	import mx.binding.utils.BindingUtils;
 	import mx.collections.ArrayList;
 	import mx.collections.IList;
 	import mx.collections.ListCollectionView;
@@ -70,7 +71,7 @@ package org.openforis.collect.ui {
 				formContainer.initialize();
 				
 				var form:EntityFormContainer = new EntityFormContainer();
-				form.entityDefinitionProxy = entity;
+				form.entityDefinition = entity;
 				
 				var uiConfig:UIConfiguration = Application.activeSurvey.uiConfiguration;
 				var tabs:ListCollectionView = null;
@@ -88,16 +89,25 @@ package org.openforis.collect.ui {
 				}
 				addFormItems(form, entity, version, uiTab);
 				formContainer.addEntityFormContainer(form);
-				
+				/*
+					in this case the parentEntity of the formContainer will be null and 
+					the "entity" will be record's "rootEntity"
+				*/
+				BindingUtils.bindProperty(form, "entity", formContainer, ["record", "rootEntity"]);
+
 				if(tabs != null) {
 					for each (tab in tabs) {
 						var childForm:EntityFormContainer = new EntityFormContainer();
 						var child:NodeDefinitionProxy = entity.getChildDefinition(tab.name);
 						if(child is EntityDefinitionProxy) {
 							var edp:EntityDefinitionProxy = child as EntityDefinitionProxy;
-							childForm.entityDefinitionProxy = edp;														
+							childForm.entityDefinition = edp;														
 							addFormItems(childForm, edp, version, tab);			
 							formContainer.addEntityFormContainer(childForm);
+							/*
+								in this case the parentEntity will be the record's rootEntity
+							*/
+							BindingUtils.bindProperty(childForm, "parentEntity", formContainer, ["record", "rootEntity"]);
 						}
 					}
 				}
@@ -194,11 +204,15 @@ package org.openforis.collect.ui {
 								formItem.addElement(attrFormItem);
 								form.addFormItem(formItem, defn.uiTabName);
 							}
+							//bind parentEntity of each attrFormItem to the "entity" of the form 
+							BindingUtils.bindProperty(attrFormItem, "parentEntity", form, "entity");
 						} else if(defn is EntityDefinitionProxy) {
 							var proxy:EntityDefinitionProxy = EntityDefinitionProxy(defn);
 							if(proxy.uiTabName == null || uiTab.hasChildTab(defn.uiTabName)) {
 								var entityFormItem:EntityFormItem = getEntityFormItem(proxy);
 								form.addEntityFormItem(entityFormItem, defn.uiTabName);
+								//bind parentEntity of each attrFormItem to the "entity" of the form 
+								BindingUtils.bindProperty(entityFormItem, "parentEntity", form, "entity");
 							}
 						}
 					}
@@ -212,7 +226,9 @@ package org.openforis.collect.ui {
 				if(isInVersion(defn, version)){
 					if(defn is AttributeDefinitionProxy) {
 						var formItem:AttributeFormItem = getAttributeFormItem(defn as AttributeDefinitionProxy, true);
-						formItem.addTo(component);			
+						formItem.addTo(component);
+						
+						BindingUtils.bindProperty(formItem, "parentEntity", component, "entity");
 					} else if(defn is EntityDefinitionProxy) {
 						var edp:EntityDefinitionProxy = EntityDefinitionProxy(defn);
 						if(edp.multiple) {
@@ -381,20 +397,90 @@ package org.openforis.collect.ui {
 		}
 		
 		private static function getAttributeDataGroupHeader(defn:AttributeDefinitionProxy):IVisualElement {
-			var width:int = getInputFieldWidth(defn, true);
-			
-			var v:VGroup = new VGroup();
-			v.width = width;
-			v.percentHeight = 100;
-			v.verticalAlign = "bottom";
-			
-			var l:Label = new Label();
-			l.width = width;
-			l.styleName = "bold";
-			l.text = defn.getLabelText();
-			v.addElement(l);
-			
-			return v;
+			var v:VGroup;
+			var h:HGroup;
+			var l:Label;
+			if(defn is TaxonAttributeDefinitionProxy) {
+				v = new VGroup();
+				v.width = 406;
+				v.percentHeight = 100;
+				v.verticalAlign = "bottom";
+				//attribute label
+				l = new Label();
+				l.width = 100;
+				l.styleName = "bold";
+				l.text = defn.getLabelText();
+				v.addElement(l);
+				//subheader
+				h = new HGroup();
+				l = new Label();
+				l.width = 100;
+				l.styleName = "bold";
+				l.text = Message.get('edit.taxon.code');
+				h.addElement(l);
+				l = new Label();
+				l.width = 100;
+				l.styleName = "bold";
+				l.text = Message.get('edit.taxon.scientificName');
+				h.addElement(l);
+				l = new Label();
+				l.width = 100;
+				l.styleName = "bold";
+				l.text = Message.get('edit.taxon.vernacularName');
+				h.addElement(l);
+				l = new Label();
+				l.width = 100;
+				l.styleName = "bold";
+				l.text = Message.get('edit.taxon.vernacularLang');
+				h.addElement(l);
+				v.addElement(h);
+				return v;
+			} else if(defn is CoordinateAttributeDefinitionProxy) {
+				v = new VGroup();
+				v.width = 302;
+				v.percentHeight = 100;
+				v.verticalAlign = "bottom";
+				//attribute label
+				l = new Label();
+				l.width = 100;
+				l.styleName = "bold";
+				l.text = defn.getLabelText();
+				v.addElement(l);
+				//subheader
+				h = new HGroup();
+				l = new Label();
+				l.width = 100;
+				l.styleName = "bold";
+				l.text = Message.get('edit.coordinate.srs');
+				h.addElement(l);
+				l = new Label();
+				l.width = 100;
+				l.styleName = "bold";
+				l.text = Message.get('edit.coordinate.x');
+				h.addElement(l);
+				l = new Label();
+				l.width = 100;
+				l.styleName = "bold";
+				l.text = Message.get('edit.coordinate.y');
+				h.addElement(l);
+				v.addElement(h);
+				return v;
+			}else {
+				var width:int = getInputFieldWidth(defn, true);
+				
+				v = new VGroup();
+				v.width = width;
+				v.percentHeight = 100;
+				v.verticalAlign = "bottom";
+				
+				l = new Label();
+				l.width = width;
+				l.styleName = "bold";
+				l.text = defn.getLabelText();
+				v.addElement(l);
+				
+				return v;
+			}
 		}
 		
 		public static function isInVersion(node:NodeDefinitionProxy, currentVersion:ModelVersionProxy):Boolean {

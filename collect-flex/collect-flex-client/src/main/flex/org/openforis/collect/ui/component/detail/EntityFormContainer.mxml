@@ -5,7 +5,7 @@
 					width="100%" height="100%"
 					
 					creationPolicy="all"
-					label="{entityDefinitionProxy.getLabelText()}">
+					label="{entityDefinition.getLabelText()}">
 	
 	<s:layout>
 		<s:VerticalLayout gap="15" />
@@ -13,31 +13,69 @@
 	
 	<fx:Script>
 		<![CDATA[
+			import mx.binding.utils.BindingUtils;
+			import mx.collections.IList;
 			import mx.collections.ListCollectionView;
 			import mx.core.IVisualElement;
 			
+			import org.openforis.collect.Application;
 			import org.openforis.collect.i18n.Message;
+			import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 			import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 			import org.openforis.collect.model.UITab;
+			import org.openforis.collect.model.proxy.AttributeProxy;
+			import org.openforis.collect.model.proxy.CodeProxy;
+			import org.openforis.collect.model.proxy.CoordinateProxy;
 			import org.openforis.collect.model.proxy.EntityProxy;
+			import org.openforis.collect.model.proxy.NodeProxy;
+			import org.openforis.collect.util.StringUtil;
 			
 			import spark.components.FormItem;
+			import spark.components.gridClasses.GridColumn;
+			import spark.events.IndexChangeEvent;
 		
 			private var _parentEntity:EntityProxy;
-			private var _entityDefinitionProxy:EntityDefinitionProxy;
+			private var _entity:EntityProxy;
+			private var _entityDefinition:EntityDefinitionProxy;
 			private var _uiTabs:ListCollectionView;	
 			private var _forms:Array = new Array();
+			
+			[Bindable]
+			private var dropDownDataProvider:IList;
 			
 			[Bindable]
 			public function get parentEntity():EntityProxy {
 				return _parentEntity;
 			}
 
+			public function set parentEntity(value:EntityProxy):void {
+				_parentEntity = value;
+				
+				if(_parentEntity != null && _entityDefinition != null) {
+					var children:IList = _parentEntity.getChildren(_entityDefinition.name);
+					if(_entityDefinition.multiple) {
+						dropDownDataProvider = children;
+					}
+				}
+			}
+			
+			[Bindable]
+			public function get entity():EntityProxy {
+				return _entity;
+			}
+			
+			public function set entity(value:EntityProxy):void {
+				_entity = value;
+			}
+			
 			override protected function createChildren():void {
 				super.createChildren();
 				addElement(container);
-				if(entityDefinitionProxy.multiple) {
+				if(entityDefinition.multiple) {
 					borderContainer.addElementAt(addSection, 0);
+					this.currentState = "entityNotSelected";
+				} else {
+					this.currentState = "single";
 				}
 				
 				if(uiTabs == null) {
@@ -47,10 +85,6 @@
 				}
 			}
 			
-			public function set parentEntity(value:EntityProxy):void {
-				_parentEntity = value;
-			}
-
 			public function addItem(collectFormItem:CollectFormItem):void {
 				collectFormItem.addTo(form);
 			}
@@ -92,12 +126,12 @@
 			}
 
 			[Bindable]
-			public function get entityDefinitionProxy():EntityDefinitionProxy {
-				return _entityDefinitionProxy;
+			public function get entityDefinition():EntityDefinitionProxy {
+				return _entityDefinition;
 			}
 
-			public function set entityDefinitionProxy(value:EntityDefinitionProxy):void {
-				_entityDefinitionProxy = value;
+			public function set entityDefinition(value:EntityDefinitionProxy):void {
+				_entityDefinition = value;
 			}
 
 			[Bindable]
@@ -109,7 +143,7 @@
 				_uiTabs = value;
 				for each (var tab:UITab in uiTabs) {
 					var f:ScrollableFormContainer = new ScrollableFormContainer();
-					f.entityDefinition = this.entityDefinitionProxy;
+					f.entityDefinition = this.entityDefinition;
 					f.label = tab.label;
 					_forms[tab.name] = f;
 					f.initialize();
@@ -117,8 +151,57 @@
 				}
 			}
 
+			private function dropDownLabelFunction(item:Object):String {
+				if(item is EntityProxy) {
+					var entity:EntityProxy = EntityProxy(item);
+					var keyDefs:IList = _entityDefinition.keyAttributeDefinitions;
+					var keyParts:Array = new Array();
+					for each (var def:AttributeDefinitionProxy in keyDefs) {
+						var key:AttributeProxy = entity.getSingleAttribute(def.name);
+						if(key != null) {
+							var keyValue:Object = key.value;
+							var keyPart:String = null;
+							if(keyValue is CodeProxy) {
+								keyPart = CodeProxy(keyValue).toString();
+							} else if(keyValue is CoordinateProxy) {
+								//todo
+								keyPart = CoordinateProxy(keyValue).toString();
+							} else {
+								keyPart = String(keyValue);
+							}
+							keyParts.push(keyPart);
+						}
+					}
+					return StringUtil.concat(" - ", keyParts);
+				} else {
+					return "";
+				}
+			}
+												   
+
+			protected function dropDownListChangeHandler(event:IndexChangeEvent):void {
+				entity = dropDownList.selectedItem as EntityProxy;
+				this.currentState = "entitySelected";
+			}
+			
 		]]>
 	</fx:Script>
+	
+	<s:states>
+		<s:State name="single" />
+		<s:State name="multiple" />
+		<s:State name="entityNotSelected" basedOn="multiple" />
+		<s:State name="entitySelected" basedOn="multiple" />
+	</s:states>
+	
+	<s:transitions>
+		<s:Transition id="entitySelectedTransition" fromState="*" toState="entitySelected">
+			<s:Fade target="{borderContainer}" duration="400" alphaFrom="0" alphaTo="1" />
+		</s:Transition>
+		<s:Transition id="entityNotSelectedTransition" fromState="*" toState="entityNotSelected">
+			<s:Fade target="{borderContainer}" duration="400" alphaFrom="1" alphaTo="0" />
+		</s:Transition>
+	</s:transitions>
 	
 	<fx:Declarations>
 		
@@ -126,14 +209,15 @@
 			<s:layout>
 				<s:HorizontalLayout paddingTop="5" horizontalAlign="left" paddingLeft="10" gap="12" verticalAlign="middle" />
 			</s:layout>
-			<s:Label text="{entityDefinitionProxy.getLabelText()}" styleName="bold" />
-			<s:DropDownList prompt="{Message.get('global.dropDownPrompt')}" width="150" id="dropDownList" />
+			<s:Label text="{entityDefinition.getLabelText()}" styleName="bold" />
+			<s:DropDownList prompt="{Message.get('global.dropDownPrompt')}" width="150" id="dropDownList" dataProvider="{dropDownDataProvider}" labelFunction="dropDownLabelFunction"
+							change="dropDownListChangeHandler(event)"/>
 			<s:Button styleName="addButton" buttonMode="true" useHandCursor="true" />
 			<s:Button styleName="deleteButton" buttonMode="true" useHandCursor="true" />
 		</s:Group>
 		
 		<s:VGroup id="container" width="100%" height="100%" gap="10">
-			<s:BorderContainer borderColor="#CCCCCC" borderAlpha="0.8" borderStyle="solid" borderWeight="1" width="100%" height="100%" id="borderContainer">
+			<s:BorderContainer width="100%" height="100%" id="borderContainer" styleName="entityForm">
 				<s:layout>
 					<s:VerticalLayout/>
 				</s:layout>
@@ -141,7 +225,7 @@
 			</s:BorderContainer>
 		</s:VGroup>
 		
-		<s:Scroller height="100%" width="100%" visible="true" id="scroller">
+		<s:Scroller height="100%" width="100%" visible="true" id="scroller" visible.entityNotSelected="false">
 			<s:Group width="100%" id="group">
 				<s:Form height="100%" width="100%" id="form">
 					<s:layout>
@@ -151,7 +235,7 @@
 			</s:Group>
 		</s:Scroller>
 		
-		<s:VGroup id="scrollableForms" width="100%" height="100%" gap="0">
+		<s:VGroup id="scrollableForms" width="100%" height="100%" gap="0" visible.entityNotSelected="false">
 			<s:ButtonBar id="buttonBar"  dataProvider="{viewStack}" />
 			<mx:ViewStack id="viewStack" width="100%" height="100%" verticalGap="0" />
 		</s:VGroup>

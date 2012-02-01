@@ -6,6 +6,7 @@
 	<fx:Script>
 		<![CDATA[
 			import org.openforis.collect.i18n.Message;
+			
 			private const version:String = CONFIG::version;
 		]]>
 	</fx:Script>

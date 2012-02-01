@@ -6,9 +6,38 @@
  */
 
 package org.openforis.collect.model.proxy {
+	import mx.collections.IList;
 
     [Bindable]
     [RemoteClass(alias="org.openforis.collect.model.proxy.EntityProxy")]
     public class EntityProxy extends EntityProxyBase {
+		
+		public function getSingleAttribute(attributeName:String):AttributeProxy {
+			var attributes:IList = childrenByName.get(attributeName);
+			if(attributes != null) {
+				if(attributes.length == 1) {
+					var attribute:AttributeProxy = attributes.getItemAt(0) as AttributeProxy;
+					return attribute;
+				} else {
+					throw new Error("Single attribute expected");
+				}
+			} else {
+				return null;
+			}
+		}
+		
+		public function getChildren(nodeName:String):IList {
+			var children:IList = childrenByName.get(nodeName);
+			return children;
+		}
+
+		public function getChild(nodeName:String, index:int):NodeProxy {
+			var children:IList = getChildren(nodeName);
+			if(children != null && children.length > index) {
+				return children.getItemAt(index) as NodeProxy;
+			} else {
+				return null;
+			}
+		}
     }
 }

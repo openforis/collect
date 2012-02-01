@@ -6,6 +6,7 @@ package org.openforis.collect.presenter {
 	import mx.events.CalendarLayoutChangeEvent;
 	import mx.events.DropdownEvent;
 	
+	import org.openforis.collect.model.proxy.DateProxy;
 	import org.openforis.collect.ui.component.input.DateInputField;
 	import org.openforis.collect.ui.component.input.InputField;
 	import org.openforis.collect.util.StringUtil;
@@ -45,9 +46,9 @@ package org.openforis.collect.presenter {
 			_view.dateField.addEventListener(CalendarLayoutChangeEvent.CHANGE, dateFieldChangeHandler);
 			_view.dateField.addEventListener(DropdownEvent.OPEN, dateFieldOpenHandler);
 		}
-		
-		override public function set value(value:*):void {
-			/*
+
+		/*
+		override protected function set value(value:Object):void {
 			_attributeValue = value;
 			//this._inputField.attribute = attribute;
 			this._dateInputField.year.text = value.text1;
@@ -55,9 +56,8 @@ package org.openforis.collect.presenter {
 			this._dateInputField.day.text = value.text3;
 			this._inputField.remarks = value.remarks;
 			this._inputField.approved = value.approved;
-			*/
 		}
-		
+		*/
 		override public function createValue():* {
 			var result:* = null;
 			return result;
@@ -95,6 +95,7 @@ package org.openforis.collect.presenter {
 			_view.day.text = String(date.date);
 		}
 		
+		
 		protected function getDateFromFields():Date {
 			//check if input text is valid
 			if(StringUtil.isNotBlank(_view.day.text) && 
@@ -112,5 +113,17 @@ package org.openforis.collect.presenter {
 			return null;
 		}
 		
+		override public function updateView():void {
+			if(_view.attribute != null) {
+				var date:DateProxy = _view.attribute.value as DateProxy;
+				if(date != null) {
+					_view.year.text = String(date.year);
+					_view.month.text = String(date.month);
+					_view.day.text = String(date.day);
+				} else {
+					_view.year.text = _view.month.text = _view.day.text = "";
+				}
+			}
+		}
 	}
 }

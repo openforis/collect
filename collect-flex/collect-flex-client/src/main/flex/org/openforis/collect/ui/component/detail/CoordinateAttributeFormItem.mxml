@@ -11,7 +11,7 @@
 			
 			import spark.components.FormItem;
 			
-			private static const FORM_ITEM_STYLE_NAME:String = "indent";
+			private static const INDENTED_FORM_ITEM_STYLE_NAME:String = "indent";
 			
 			override public function addTo(parent:IVisualElementContainer):void {
 				if(this.isInDataGroup) {
@@ -22,19 +22,19 @@
 					var formItem:FormItem;
 					//srs
 					formItem = new FormItem();
-					formItem.styleName = FORM_ITEM_STYLE_NAME;
+					formItem.styleName = INDENTED_FORM_ITEM_STYLE_NAME
 					formItem.label = Message.get('edit.coordinate.srs');
 					formItem.addElement(srsDropDownList);
 					parent.addElement(formItem);
 					//x
 					formItem = new FormItem();
-					formItem.styleName = FORM_ITEM_STYLE_NAME;
+					formItem.styleName = INDENTED_FORM_ITEM_STYLE_NAME;
 					formItem.label = Message.get('edit.coordinate.x');
 					formItem.addElement(xInputField);
 					parent.addElement(formItem);
 					//y
 					formItem = new FormItem();
-					formItem.styleName = FORM_ITEM_STYLE_NAME;
+					formItem.styleName = INDENTED_FORM_ITEM_STYLE_NAME;
 					formItem.label = Message.get('edit.coordinate.y');
 					formItem.addElement(yInputField);
 					parent.addElement(formItem);

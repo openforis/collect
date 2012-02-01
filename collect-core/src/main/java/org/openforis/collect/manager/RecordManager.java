@@ -59,38 +59,11 @@ public class RecordManager {
 
 	@Transactional
 	public void save(CollectRecord record) {
-		Entity rootEntity = record.getRootEntity();
-		EntityDefinition rootEntityDef = rootEntity.getDefinition();
-		List<AttributeDefinition> keyDefns = rootEntityDef.getKeyAttributeDefinitions();
-		List<EntityDefinition> countableDefns = getCountableInList(rootEntityDef);
+		updateCounts(record);
 		
-		//set counts
-		Map<String, Integer> counts = new HashMap<String, Integer>();
-		for (EntityDefinition def : countableDefns) {
-			String path = def.getPath();
-			int count = rootEntity.getCount(path);
-			counts.put(path, count);
-		}
-		record.setCounts(counts);
-		//set keys
-		Map<String, Object> keys = new HashMap<String, Object>();
-		for (AttributeDefinition def: keyDefns) {
-			String path = def.getPath();
-			String name = def.getName();
-			Object value = null;
-			Node<? extends NodeDefinition> node = rootEntity.get(name, 0);
-			if(node instanceof CodeAttribute) {
-				value = ((CodeAttribute) node).getValue();
-			} else if(node instanceof TextAttribute) {
-				value = ((TextAttribute) node).getValue();
-			} else if(node instanceof NumberAttribute<?>) {
-				value = ((NumberAttribute<?>) node).getValue();
-			}
-			keys.put(path, value);
-		}
-		record.setKeys(keys);
+		updateKeys(record);
 		
-		recordDAO.saveOrUpdate(record, countableDefns);
+		recordDAO.saveOrUpdate(record);
 	}
 
 	@Transactional
@@ -130,15 +103,13 @@ public class RecordManager {
 
 	@Transactional
 	public CollectRecord create(Survey survey, EntityDefinition rootEntityDefinition, User user, String modelVersionName) throws MultipleEditException, AccessDeniedException, RecordLockedException {
-		List<EntityDefinition> countableDefns = getCountableInList(rootEntityDefinition);
-		
 		recordDAO.checkLock(user);
 		
 		CollectRecord record = new CollectRecord(survey, rootEntityDefinition.getName(), modelVersionName);
 		record.setCreationDate(new Date());
 		//record.setCreatedBy(user.getId());
 		record.setStep(Step.ENTRY);
-		recordDAO.saveOrUpdate(record, countableDefns);
+		recordDAO.saveOrUpdate(record);
 		Integer recordId = record.getId();
 		recordDAO.lock(recordId, user);
 		return record;
@@ -191,5 +162,43 @@ public class RecordManager {
 			}
 		}
 		return result;
+	}
+	
+	private void updateCounts(CollectRecord record) {
+		Entity rootEntity = record.getRootEntity();
+		EntityDefinition rootEntityDef = rootEntity.getDefinition();
+		List<EntityDefinition> countableDefns = getCountableInList(rootEntityDef);
+		
+		//set counts
+		Map<String, Integer> counts = new HashMap<String, Integer>();
+		for (EntityDefinition def : countableDefns) {
+			String path = def.getPath();
+			int count = rootEntity.getCount(path);
+			counts.put(path, count);
+		}
+		record.setCounts(counts);
+	}
+	
+	private void updateKeys(CollectRecord record) {
+		Entity rootEntity = record.getRootEntity();
+		EntityDefinition rootEntityDef = rootEntity.getDefinition();
+		List<AttributeDefinition> keyDefns = rootEntityDef.getKeyAttributeDefinitions();
+		//set keys
+		Map<String, Object> keys = new HashMap<String, Object>();
+		for (AttributeDefinition def: keyDefns) {
+			String path = def.getPath();
+			String name = def.getName();
+			Object value = null;
+			Node<? extends NodeDefinition> node = rootEntity.get(name, 0);
+			if(node instanceof CodeAttribute) {
+				value = ((CodeAttribute) node).getValue();
+			} else if(node instanceof TextAttribute) {
+				value = ((TextAttribute) node).getValue();
+			} else if(node instanceof NumberAttribute<?>) {
+				value = ((NumberAttribute<?>) node).getValue();
+			}
+			keys.put(path, value);
+		}
+		record.setKeys(keys);
 	}
 }

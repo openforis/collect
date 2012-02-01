@@ -6,6 +6,8 @@
 	
 	<fx:Script>
 		<![CDATA[
+			import mx.binding.utils.BindingUtils;
+			
 			import org.openforis.collect.ui.UIBuilder;
 			import org.openforis.collect.ui.component.input.InputField;
 			
@@ -14,6 +16,11 @@
 					super.createChildren();
 				
 					var inputField:InputField = UIBuilder.getInputField(attributeDefinition);
+					inputField.isInDataGroup = this.isInDataGroup;
+					
+					//bind input field attribute to the same instance of this
+					BindingUtils.bindProperty(inputField, "attribute", this, "attribute");
+					
 					addElement(inputField);
 					childrenAdded = true;
 				}

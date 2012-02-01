@@ -14,8 +14,15 @@
 			import mx.core.IVisualElementContainer;
 			
 			import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
+			import org.openforis.collect.model.proxy.AttributeProxy;
+			import org.openforis.collect.model.proxy.EntityProxy;
+			
+			private var _parentEntity:EntityProxy;
 			
 			private var _attributeDefinition:AttributeDefinitionProxy;
+
+			private var _attribute:AttributeProxy;
+			
 			private var _childrenAdded:Boolean = false;
 			
 			private var _isInDataGroup:Boolean = false;
@@ -53,6 +60,32 @@
 			public function set isInDataGroup(value:Boolean):void {
 				_isInDataGroup = value;
 			}
+
+			[Bindable]
+			public function get parentEntity():EntityProxy {
+				return _parentEntity;
+			}
+
+			public function set parentEntity(value:EntityProxy):void {
+				_parentEntity = value;
+				
+				if(value != null && attributeDefinition != null) {
+					if(! attributeDefinition.multiple) {
+						var attribute:AttributeProxy = _parentEntity.getSingleAttribute(attributeDefinition.name);
+						this.attribute = attribute;
+					}
+				}
+			}
+
+			[Bindable]
+			public function get attribute():AttributeProxy {
+				return _attribute;
+			}
+
+			public function set attribute(value:AttributeProxy):void {
+				_attribute = value;
+			}
+
 
 		]]>
 	</fx:Script>

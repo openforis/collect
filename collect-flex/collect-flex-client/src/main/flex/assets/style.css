@@ -3,6 +3,20 @@
 @namespace mx "library://ns.adobe.com/flex/mx";
 @namespace detail "org.openforis.collect.ui.component.detail.*";
 @namespace input "org.openforis.collect.ui.component.input.*";
+@namespace view "org.openforis.collect.ui.view.*";
+
+view|Footer {
+	padding-bottom: 5;
+}
+
+.appVersionLabel, .appVersionText {
+	font-style: italic;
+	font-size: 9;
+	padding-bottom: 5;
+}
+
+.appVersionText {
+}
 
 mx|Alert {
 	color: #1B1B1B;
@@ -13,15 +27,6 @@ mx|Alert {
 	rounded-bottom-corners:true;
 	background-color: #FFFFFF;
 	background-alpha: 0.8;
-}
-
-.appVersionLabel, .appVersionText {
-	font-style: italic;
-	font-size: 9;
-}
-
-.appVersionText {
-	font-weight: bold;
 }
 
 s|TitleWindow {
@@ -37,6 +42,13 @@ s|TitleWindow {
 
 s|BorderContainer.noError {
 	border-color: #FFFFFF;
+}
+
+s|BorderContainer.entityForm {
+	borderColor: #CCCCCC;
+	borderAlpha: 0.8;
+	borderStyle: solid;
+	borderWeight: 1; 
 }
 
 s|Button.closeButton {

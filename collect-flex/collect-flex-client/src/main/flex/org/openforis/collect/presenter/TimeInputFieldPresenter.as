@@ -1,6 +1,7 @@
 package org.openforis.collect.presenter {
 	import flash.events.FocusEvent;
 	
+	import org.openforis.collect.model.proxy.TimeProxy;
 	import org.openforis.collect.ui.component.input.InputField;
 	import org.openforis.collect.ui.component.input.TimeInputField;
 	import org.openforis.collect.util.StringUtil;
@@ -28,10 +29,7 @@ package org.openforis.collect.presenter {
 			_view.hoursTextInput.addEventListener(FocusEvent.FOCUS_IN, focusInHandler);
 			_view.minutesTextInput.addEventListener(FocusEvent.FOCUS_OUT, focusOutHandler);
 		}
-		
-		override public function set value(value:*):void {
-		}
-		
+
 		override public function createValue():* {
 			var result:* = null;
 			return result;
@@ -48,17 +46,24 @@ package org.openforis.collect.presenter {
 			*/
 		}
 		
-		protected function setTimeOnFields(time:Object):void {
-			_view.hoursTextInput.text = String(time.hour);
-			_view.minutesTextInput.text = String(time.minute);
-		}
-		
-		protected function getTimeFromFields():Date {
+		protected function getTimeFromFields():TimeProxy {
 			//check if input text is valid
 			if(StringUtil.isNotBlank(_view.hoursTextInput.text) && 
 				StringUtil.isNotBlank(_view.minutesTextInput.text)) {
 			}
 			return null;
+		}
+		
+		override public function updateView():void {
+			if(_view.attribute != null) {
+				var time:TimeProxy = _view.attribute.value as TimeProxy;
+				if(time != null) {
+					_view.hoursTextInput.text = String(time.hour);
+					_view.minutesTextInput.text = String(time.minute);
+				} else {
+					_view.hoursTextInput.text =_view.minutesTextInput.text = "";
+				}
+			}
 		}
 		
 	}

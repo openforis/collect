@@ -6,6 +6,7 @@ import static org.openforis.collect.persistence.jooq.tables.Data.DATA;
 import static org.openforis.collect.persistence.jooq.tables.Record.RECORD;
 import static org.openforis.collect.persistence.jooq.tables.UserAccount.USER_ACCOUNT;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -48,13 +49,13 @@ public class RecordDAO extends CollectDAO {
 	}
 
 	@Transactional
-	public void saveOrUpdate(CollectRecord record, List<EntityDefinition> countDefns) {
+	public void saveOrUpdate(CollectRecord record) {
 		Entity rootEntity = record.getRootEntity();
 		List<AttributeDefinition> keyDefns = rootEntity.getDefinition().getKeyAttributeDefinitions();
 		if (record.getId() == null) {
-			insertRecord(record, keyDefns, countDefns);
+			insertRecord(record, keyDefns);
 		} else {
-			updateRecord(record, keyDefns, countDefns);
+			updateRecord(record, keyDefns);
 			deleteData(record.getId());
 		}
 		insertData(record);
@@ -171,7 +172,7 @@ public class RecordDAO extends CollectDAO {
 	}
 
 	@SuppressWarnings("unchecked")
-	private void insertRecord(CollectRecord record, List<AttributeDefinition> keyDefns, List<EntityDefinition> countDefns) {
+	private void insertRecord(CollectRecord record, List<AttributeDefinition> keyDefns) {
 		EntityDefinition rootEntityDefinition = record.getRootEntity().getDefinition();
 		Integer rootEntityId = rootEntityDefinition.getId();
 		if (rootEntityId == null) {
@@ -195,13 +196,10 @@ public class RecordDAO extends CollectDAO {
 				.set(RECORD.WARNINGS, record.getWarnings())
 				;
 		//set counts
+		Collection<Integer> counts = record.getCounts().values();
 		int position = 1;
-		Map<String, Integer> counts = record.getCounts();
-		for (EntityDefinition def : countDefns) {
-			String path = def.getPath();
-			Integer count = counts.get(path);
-			@SuppressWarnings("rawtypes")
-			Field countField = RecordDAOUtil.getCountField(RECORD, position);
+		for (Integer count : counts) {
+			TableField<RecordRecord,Integer> countField = RecordDAOUtil.getCountField(RECORD, position);
 			setStep.set(countField, count);
 			position ++;
 		}
@@ -220,7 +218,7 @@ public class RecordDAO extends CollectDAO {
 	}
 
 	@SuppressWarnings("unchecked")
-	private void updateRecord(CollectRecord record, List<AttributeDefinition> keyDefns, List<EntityDefinition> countDefns) {
+	private void updateRecord(CollectRecord record, List<AttributeDefinition> keyDefns) {
 		EntityDefinition rootEntityDefinition = record.getRootEntity().getDefinition();
 		Integer recordId = record.getId();
 		if (recordId == null) {
@@ -246,11 +244,9 @@ public class RecordDAO extends CollectDAO {
 				.set(RECORD.WARNINGS, record.getWarnings())
 				;
 		//set counts
+		Collection<Integer> counts = record.getCounts().values();
 		int position = 1;
-		Map<String, Integer> counts = record.getCounts();
-		for (EntityDefinition def : countDefns) {
-			String path = def.getPath();
-			Integer count = counts.get(path);
+		for (Integer count : counts) {
 			TableField<RecordRecord,Integer> countField = RecordDAOUtil.getCountField(RECORD, position);
 			updateStep.set(countField, count);
 			position ++;

@@ -10,5 +10,21 @@ package org.openforis.collect.metamodel.proxy {
     [Bindable]
     [RemoteClass(alias="org.openforis.collect.metamodel.proxy.CodeListItemProxy")]
     public class CodeListItemProxy extends CodeListItemProxyBase {
+		
+		public function getLabelText(language:String="en"):String {
+			if(labels == null || labels.length <=0){
+				return "";
+			} else if(labels.length == 1) {
+				return LanguageSpecificTextProxy(labels.getItemAt(0)).text;
+			} else {
+				for each(var label:LanguageSpecificTextProxy in labels) {
+					if(label.language == language) {
+						return label.text;
+					}
+				}
+			}
+			return "";
+		}
+		
     }
 }

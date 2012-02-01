@@ -11,8 +11,11 @@ package org.openforis.collect.presenter {
 	import mx.rpc.events.ResultEvent;
 	import mx.utils.StringUtil;
 	
+	import org.openforis.collect.model.proxy.AttributeProxy;
+	import org.openforis.collect.model.proxy.CodeProxy;
 	import org.openforis.collect.ui.component.input.CodeInputField;
 	import org.openforis.collect.ui.component.input.CodeListItem;
+	import org.openforis.collect.ui.component.input.TextInput;
 	
 	/**
 	 * 
@@ -39,10 +42,6 @@ package org.openforis.collect.presenter {
 			_view.popup.applyButton.addEventListener(MouseEvent.CLICK, applyButtonClickHandelr);
 		}
 		
-		override public function set value(value:*):void {
-			_attributeValue = value;
-		}
-
 		/**
 		 * Close the popup
 		 * */
@@ -91,6 +90,27 @@ package org.openforis.collect.presenter {
 		
 		protected function cancelButtonClickHandelr(event:MouseEvent):void {
 			PopUpManager.removePopUp(_view.popup);
+		}
+
+		override protected function get textValue():String {
+			if(_view.attributeDefinition != null) {
+				if(_view.attributeDefinition.multiple) {
+					//todo
+				} else {
+					if(_view.attribute != null) {
+						var value:CodeProxy = _view.attribute.value as CodeProxy;
+						if(value != null) {
+							var code:String = value.code;
+							return code;
+						}
+					}
+				}
+			}
+			return "";
+		}
+		
+		override public function updateView():void {
+			super.updateView();
 		}
 		
 	}

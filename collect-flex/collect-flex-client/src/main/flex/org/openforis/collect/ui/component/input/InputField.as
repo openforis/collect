@@ -1,6 +1,8 @@
 package org.openforis.collect.ui.component.input {
 	import flash.events.Event;
 	
+	import mx.collections.ArrayList;
+	import mx.collections.IList;
 	import mx.core.ClassFactory;
 	import mx.core.IFactory;
 	import mx.core.UIComponent;
@@ -11,6 +13,7 @@ package org.openforis.collect.ui.component.input {
 	import org.openforis.collect.event.UIEvent;
 	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 	import org.openforis.collect.model.proxy.AttributeProxy;
+	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.presenter.InputFieldPresenter;
 	import org.openforis.collect.util.StringUtil;
 	import org.openforis.collect.util.UIUtil;
@@ -36,13 +39,15 @@ package org.openforis.collect.ui.component.input {
 		
 		private var _presenter:InputFieldPresenter;
 
-		private var _renderInDataGroup:Boolean;
+		private var _isInDataGroup:Boolean;
 		
 		protected var _textInput:UIComponent;
 		
-		private var _attribute:AttributeProxy;
+		private var _attributes:IList; 
 		
 		private var _attributeDefinition:AttributeDefinitionProxy;
+		
+		private var _parentEntity:EntityProxy;
 		
 		public function InputField() {
 			super();
@@ -123,15 +128,15 @@ package org.openforis.collect.ui.component.input {
 		/**
 		 * Set to true when this input field is used insed a data group (i.e. if the parent is a multiple entity)
 		 * */
-		public function get renderInDataGroup():Boolean {
-			return _renderInDataGroup;
+		public function get isInDataGroup():Boolean {
+			return _isInDataGroup;
 		}
 
 		/**
 		 * @private
 		 */
-		public function set renderInDataGroup(value:Boolean):void {
-			_renderInDataGroup = value;
+		public function set isInDataGroup(value:Boolean):void {
+			_isInDataGroup = value;
 		}
 
 		public function get presenter():InputFieldPresenter {
@@ -142,15 +147,39 @@ package org.openforis.collect.ui.component.input {
 			_presenter = value;
 		}
 
-		[Bindable]
+		[Bindable(event="attributesChanged")]
+		public function get attributes():IList {
+			return _attributes;
+		}
+
+		public function set attributes(value:IList):void {
+			_attributes = value;
+			dispatchEvent(new Event("attributesChanged"));
+		}
+
+		[Bindable(event="attributesChanged")]
 		public function get attribute():AttributeProxy {
-			return _attribute;
+			if(_attributes != null && _attributes.length == 1) {
+				return _attributes.getItemAt(0) as AttributeProxy;
+			} else {
+				return null;
+			}
 		}
-
+		
 		public function set attribute(value:AttributeProxy):void {
-			_attribute = value;
+			if(value != null) {
+				var temp:IList = new ArrayList();
+				temp.addItem(value);
+				_attributes = temp;
+			} else {
+				_attributes = null;
+			}
+			
+			if(_presenter) {
+				_presenter.updateView();
+			}
 		}
-
+		
 		[Bindable]
 		public function get attributeDefinition():AttributeDefinitionProxy {
 			return _attributeDefinition;
@@ -158,6 +187,14 @@ package org.openforis.collect.ui.component.input {
 
 		public function set attributeDefinition(value:AttributeDefinitionProxy):void {
 			_attributeDefinition = value;
+		}
+
+		public function get parentEntity():EntityProxy {
+			return _parentEntity;
+		}
+
+		public function set parentEntity(value:EntityProxy):void {
+			_parentEntity = value;
 		}
 
 
