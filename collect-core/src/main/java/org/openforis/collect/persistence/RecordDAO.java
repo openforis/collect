@@ -6,17 +6,23 @@ import static org.openforis.collect.persistence.jooq.tables.Data.DATA;
 import static org.openforis.collect.persistence.jooq.tables.Record.RECORD;
 import static org.openforis.collect.persistence.jooq.tables.UserAccount.USER_ACCOUNT;
 
+import java.sql.Date;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.jooq.Field;
 import org.jooq.InsertSetMoreStep;
 import org.jooq.Record;
+import org.jooq.Result;
+import org.jooq.SelectQuery;
 import org.jooq.TableField;
 import org.jooq.UpdateSetMoreStep;
 import org.jooq.impl.Factory;
 import org.openforis.collect.model.CollectRecord;
+import org.openforis.collect.model.RecordSummary;
 import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.jooq.DataLoader;
 import org.openforis.collect.persistence.jooq.DataPersister;
@@ -37,6 +43,12 @@ import org.springframework.transaction.annotation.Transactional;
  */
 public class RecordDAO extends CollectDAO {
 	
+	public static final String DATE_CREATED_ALIAS = "creationDate";
+	public static final String DATE_MODIFIED_ALIAS = "modifiedDate";
+	
+	public static final String KEY_ALIAS_PREFIX = "key_";
+	public static final String COUNT_ALIAS_PREFIX = "count_";
+	
 	public RecordDAO() {
 	}
 
@@ -50,12 +62,10 @@ public class RecordDAO extends CollectDAO {
 
 	@Transactional
 	public void saveOrUpdate(CollectRecord record) {
-		Entity rootEntity = record.getRootEntity();
-		List<AttributeDefinition> keyDefns = rootEntity.getDefinition().getKeyAttributeDefinitions();
 		if (record.getId() == null) {
-			insertRecord(record, keyDefns);
+			insertRecord(record);
 		} else {
-			updateRecord(record, keyDefns);
+			updateRecord(record);
 			deleteData(record.getId());
 		}
 		insertData(record);
@@ -166,13 +176,127 @@ public class RecordDAO extends CollectDAO {
 		return record;
 	}
 
+	@Transactional
+	public List<RecordSummary> loadSummaries(Survey survey, String rootEntity, List<EntityDefinition> countable, int offset, int maxRecords, String orderByField, String filter) {
+		Schema schema = survey.getSchema();
+		EntityDefinition rootEntityDef = schema.getRootEntityDefinition(rootEntity);
+		List<AttributeDefinition> keyDefs = rootEntityDef.getKeyAttributeDefinitions();
+		
+		Factory jf = getJooqFactory();
+		org.openforis.collect.persistence.jooq.tables.Record r = RECORD.as("r");
+		
+		SelectQuery q = jf.selectQuery();
+		
+		q.addFrom(r);
+		
+		q.addSelect(
+				r.DATE_CREATED.as(DATE_CREATED_ALIAS), 
+				r.DATE_MODIFIED.as(DATE_MODIFIED_ALIAS), 
+				r.ERRORS, 
+				r.ID, 
+				r.LOCKED_BY_ID, 
+				r.MISSING,  
+				r.MODEL_VERSION, 
+				r.MODIFIED_BY_ID, 
+				r.ROOT_ENTITY_ID, 
+				r.SKIPPED, 
+				r.STATE, 
+				r.STEP, 
+				r.WARNINGS
+				);
+		{
+			//add keys to select with an alias like KEY_ALIAS_PREFIX + ATTRIBUTE_NAME
+			int position = 1;
+			for (AttributeDefinition def : keyDefs) {
+				String alias = KEY_ALIAS_PREFIX + def.getName();
+				Field<?> field = getKeyField(r, position).as(alias);
+				q.addSelect(field);
+				position ++;
+			}
+		}
+		{
+			//add count columns to select with an alias like COUNT_ALIAS_PREFIX + ENTITY_NAME
+			int position = 1;
+			for (EntityDefinition def : countable) {
+				String alias = COUNT_ALIAS_PREFIX + def.getName();
+				Field<?> field = getCountField(r, position).as(alias);
+				q.addSelect(field);
+				position ++;
+			}
+		}
+		//add order by condition
+		Field<?> orderBy = null;
+		if(orderByField != null) {
+			List<Field<?>> selectFields = q.getSelect();
+			for (Field<?> field : selectFields) {
+				if(orderByField.equals(field.getName())) {
+					orderBy = field;
+					break;
+				}
+			}
+		}
+		if(orderBy != null) {
+			q.addOrderBy(orderBy);
+		}
+		//always order by ID to avoid pagination issues
+		q.addOrderBy(r.ID);
+		
+		//add limit
+		q.addLimit(offset, maxRecords);
+		
+		//fetch results
+		Result<Record> records = q.fetch();
+		
+		List<RecordSummary> result = mapRecordsToSummaries(records, keyDefs, countable);
+		return result;
+	}
+
+	private List<RecordSummary> mapRecordsToSummaries(List<Record> records, List<AttributeDefinition> keyDefs, List<EntityDefinition> countable) {
+		List<RecordSummary> result = new ArrayList<RecordSummary>();
+		
+		for (Record record : records) {
+			Integer id = record.getValueAsInteger(RECORD.ID);
+			//String createdBy = r.getValueAsString(USER_MODIFIED_BY_ALIAS);
+			String createdBy = null;
+			Date dateCreated = record.getValueAsDate(DATE_CREATED_ALIAS);
+			//String modifiedBy = r.getValueAsString(USER_CREATED_BY_ALIAS);
+			String modifiedBy = null;
+			Date modifiedDate = record.getValueAsDate(DATE_MODIFIED_ALIAS);
+			Integer step = record.getValueAsInteger(RECORD.STEP);
+			Integer warnings = record.getValueAsInteger(RECORD.WARNINGS);
+			Integer errors = record.getValueAsInteger(RECORD.ERRORS);
+			Integer skipped = record.getValueAsInteger(RECORD.SKIPPED);
+			Integer missing = record.getValueAsInteger(RECORD.MISSING);
+			//create count map
+			Map<String, Integer> entityCounts = new HashMap<String, Integer>();
+			for (EntityDefinition def : countable) {
+				String alias = COUNT_ALIAS_PREFIX + def.getName();
+				String key = def.getName();
+				Integer value = record.getValueAsInteger(alias);
+				entityCounts.put(key, value);
+			}
+			//create key attributes map
+			Map<String, String> keyAttributes = new HashMap<String, String>();
+			for (AttributeDefinition attributeDefinition : keyDefs) {
+				String projectionAlias = KEY_ALIAS_PREFIX + attributeDefinition.getName();
+				String key = attributeDefinition.getName();
+				Object value = record.getValue(projectionAlias);
+				String valueStr = value != null ? value.toString(): "";
+				keyAttributes.put(key, valueStr);
+			}
+			RecordSummary recordSummary = new RecordSummary(id, keyAttributes, entityCounts, createdBy, dateCreated, modifiedBy, modifiedDate, step,
+					skipped, missing, errors, warnings);
+			result.add(recordSummary);
+		}
+		return result;
+	}
 	private void loadData(CollectRecord record) throws DataInconsistencyException {
 		DataLoader loader = new DataLoader(getJooqFactory());
 		loader.load(record);
 	}
 
 	@SuppressWarnings("unchecked")
-	private void insertRecord(CollectRecord record, List<AttributeDefinition> keyDefns) {
+	private void insertRecord(CollectRecord record) {
 		EntityDefinition rootEntityDefinition = record.getRootEntity().getDefinition();
 		Integer rootEntityId = rootEntityDefinition.getId();
 		if (rootEntityId == null) {
@@ -199,26 +323,24 @@ public class RecordDAO extends CollectDAO {
 		Collection<Integer> counts = record.getCounts().values();
 		int position = 1;
 		for (Integer count : counts) {
-			TableField<RecordRecord,Integer> countField = RecordDAOUtil.getCountField(RECORD, position);
+			TableField<RecordRecord,Integer> countField = getCountField(RECORD, position);
 			setStep.set(countField, count);
 			position ++;
 		}
 		//set keys
 		position = 1;
-		Map<String, Object> keys = record.getKeys();
-		for (AttributeDefinition def : keyDefns) {
-			String path = def.getPath();
-			Object keyValue = keys.get(path);
+		Collection<String> keys = record.getKeys().values();
+		for (String key : keys) {
 			@SuppressWarnings("rawtypes")
-			Field field = RecordDAOUtil.getKeyField(RECORD, def, position);
-			setStep.set(field, keyValue);
+			Field field = getKeyField(RECORD, position);
+			setStep.set(field, key);
 		}
 		setStep.execute();
 		record.setId(recordId);
 	}
 
 	@SuppressWarnings("unchecked")
-	private void updateRecord(CollectRecord record, List<AttributeDefinition> keyDefns) {
+	private void updateRecord(CollectRecord record) {
 		EntityDefinition rootEntityDefinition = record.getRootEntity().getDefinition();
 		Integer recordId = record.getId();
 		if (recordId == null) {
@@ -247,19 +369,17 @@ public class RecordDAO extends CollectDAO {
 		Collection<Integer> counts = record.getCounts().values();
 		int position = 1;
 		for (Integer count : counts) {
-			TableField<RecordRecord,Integer> countField = RecordDAOUtil.getCountField(RECORD, position);
+			TableField<RecordRecord,Integer> countField = getCountField(RECORD, position);
 			updateStep.set(countField, count);
 			position ++;
 		}
 		//set keys
 		position = 1;
-		Map<String, Object> keys = record.getKeys();
-		for (AttributeDefinition def : keyDefns) {
-			String path = def.getPath();
-			Object keyValue = keys.get(path);
+		Collection<String> keys = record.getKeys().values();
+		for (String key : keys) {
 			@SuppressWarnings("rawtypes")
-			Field field = RecordDAOUtil.getKeyField(RECORD, def, position);
-			updateStep.set(field, keyValue);
+			Field field = getKeyField(RECORD, position);
+			updateStep.set(field, key);
 		}
 		updateStep.where(RECORD.ID.equal(recordId))
 			.execute();
@@ -291,4 +411,33 @@ public class RecordDAO extends CollectDAO {
 		});
 	}
 	
+	private static TableField<RecordRecord, ?> getKeyField( org.openforis.collect.persistence.jooq.tables.Record r, int position) {
+		switch(position) {
+			case 1:
+				return r.KEY1;
+			case 2:
+				return r.KEY2;
+			case 3:
+				return r.KEY3;
+			default:
+				throw new RuntimeException("Exceeded maximum number of supported keys for this root entity");
+		}
+	}
+	
+	private static TableField<RecordRecord, Integer> getCountField( org.openforis.collect.persistence.jooq.tables.Record r, int position) {
+		switch(position) {
+			case 1:
+				return r.COUNT1;
+			case 2:
+				return r.COUNT2;
+			case 3:
+				return r.COUNT3;
+			case 4:
+				return r.COUNT4;
+			case 5:
+				return r.COUNT5;
+			default:
+				throw new RuntimeException("Exceeded maximum number of countable entities");
+		}
+	}
 }

@@ -39,15 +39,15 @@ public class CollectRecord extends Record {
 	private Integer errors;
 	private Integer warnings;
 	
-	private Map<String, Object> keys;
+	private Map<String, String> keys;
 	private Map<String, Integer> counts;
 	
 	public CollectRecord(Survey survey, String rootEntity, String versionName) {
 		super(survey, rootEntity, versionName);
 		this.step = Step.ENTRY;
 		this.submitted = false;
-		
-		keys = new HashMap<String, Object>();
+		//use LinkedHashMale to preserve the order of the keys in the maps
+		keys = new LinkedHashMap<String, String>();
 		counts = new LinkedHashMap<String, Integer>();
 	}
 
@@ -131,11 +131,11 @@ public class CollectRecord extends Record {
 		this.warnings = warnings;
 	}
 	
-	public Map<String, Object> getKeys() {
+	public Map<String, String> getKeys() {
 		return keys;
 	}
 	
-	public void setKeys(Map<String, Object> keys) {
+	public void setKeys(Map<String, String> keys) {
 		this.keys = keys;
 	}
 	

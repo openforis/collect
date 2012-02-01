@@ -23,7 +23,6 @@ import org.openforis.collect.persistence.xml.CollectIdmlBindingContext;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Survey;
-import org.openforis.idm.metamodel.xml.IdmlBindingContext;
 import org.openforis.idm.metamodel.xml.InvalidIdmlException;
 import org.openforis.idm.metamodel.xml.SurveyUnmarshaller;
 import org.openforis.idm.model.Code;
@@ -49,9 +48,6 @@ public class ModelDAOIntegrationTest {
 	
 	@Autowired
 	protected RecordDAO recordDao;
-
-	@Autowired
-	protected RecordSummaryDAO recordSummaryDao;
 
 	@Test
 	public void testCRUD() throws Exception  {
@@ -187,12 +183,13 @@ public class ModelDAOIntegrationTest {
 		Survey survey = surveyDao.load("archenland1");
 		//get the first root entity
 		EntityDefinition rootEntity = survey.getSchema().getRootEntityDefinitions().get(0);
+		String rootEntityName = rootEntity.getName();
 		int offset = 0;
 		int maxNumberOfRecords = 1;
 		String orderByFieldName = "key_id";
 		String filter = null;
 		EntityDefinition plotDefn = (EntityDefinition) rootEntity.getChildDefinition("plot");
-		List<RecordSummary> list = this.recordSummaryDao.load(rootEntity, Arrays.asList(plotDefn), offset, maxNumberOfRecords, orderByFieldName, filter);
+		List<RecordSummary> list = this.recordDao.loadSummaries(survey, rootEntityName, Arrays.asList(plotDefn), offset, maxNumberOfRecords, orderByFieldName, filter);
 		assertNotNull(list);
 		assertEquals(1, list.size());
 		

@@ -24,11 +24,12 @@ import org.openforis.collect.persistence.MultipleEditException;
 import org.openforis.collect.persistence.NonexistentIdException;
 import org.openforis.collect.persistence.RecordDAO;
 import org.openforis.collect.persistence.RecordLockedException;
-import org.openforis.collect.persistence.RecordSummaryDAO;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
+import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.Survey;
+import org.openforis.idm.model.Code;
 import org.openforis.idm.model.CodeAttribute;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Node;
@@ -49,9 +50,6 @@ public class RecordManager {
 
 	@Autowired
 	private RecordDAO recordDAO;
-
-	@Autowired
-	private RecordSummaryDAO recordSummaryDAO;
 
 	protected void init() {
 		unlockAll();
@@ -89,9 +87,11 @@ public class RecordManager {
 	}
 
 	@Transactional
-	public List<RecordSummary> getSummaries(EntityDefinition rootEntityDefinition, int offset, int maxNumberOfRecords, String orderByFieldName, String filter) {
+	public List<RecordSummary> getSummaries(Survey survey, String rootEntity, int offset, int maxNumberOfRecords, String orderByFieldName, String filter) {
+		Schema schema = survey.getSchema();
+		EntityDefinition rootEntityDefinition = schema.getRootEntityDefinition(rootEntity);
 		List<EntityDefinition> countableInList = getCountableInList(rootEntityDefinition);
-		List<RecordSummary> recordsSummary = recordSummaryDAO.load(rootEntityDefinition, countableInList, offset, maxNumberOfRecords, orderByFieldName, filter);
+		List<RecordSummary> recordsSummary = recordDAO.loadSummaries(survey, rootEntity, countableInList, offset, maxNumberOfRecords, orderByFieldName, filter);
 		return recordsSummary;
 	}
 
@@ -184,20 +184,25 @@ public class RecordManager {
 		EntityDefinition rootEntityDef = rootEntity.getDefinition();
 		List<AttributeDefinition> keyDefns = rootEntityDef.getKeyAttributeDefinitions();
 		//set keys
-		Map<String, Object> keys = new HashMap<String, Object>();
+		Map<String, String> keys = new HashMap<String, String>();
 		for (AttributeDefinition def: keyDefns) {
 			String path = def.getPath();
 			String name = def.getName();
 			Object value = null;
+			String textValue = null;
 			Node<? extends NodeDefinition> node = rootEntity.get(name, 0);
 			if(node instanceof CodeAttribute) {
-				value = ((CodeAttribute) node).getValue();
+				Code code = ((CodeAttribute) node).getValue();
+				textValue = code.getCode();
 			} else if(node instanceof TextAttribute) {
-				value = ((TextAttribute) node).getValue();
+				textValue = ((TextAttribute) node).getValue();
 			} else if(node instanceof NumberAttribute<?>) {
 				value = ((NumberAttribute<?>) node).getValue();
+				if(value != null) {
+					textValue = value.toString();
+				}
 			}
-			keys.put(path, value);
+			keys.put(path, textValue);
 		}
 		record.setKeys(keys);
 	}

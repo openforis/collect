@@ -42,9 +42,6 @@ public class RecordDAOTest {
 	@Autowired
 	protected RecordDAO recordDao;
 	
-	@Autowired
-	protected RecordSummaryDAO recordSummaryDao;
-	
 	private Survey survey;
 	
 	private List<CollectRecord> sampleRecords;
@@ -89,7 +86,7 @@ public class RecordDAOTest {
 //	@Test
 	public void testLoadRecordSummariesOrderedByClusterId() throws IOException, SurveyImportException, DataInconsistencyException, InvalidIdmlException, NonexistentIdException  {
 		EntityDefinition rootEntity = survey.getSchema().getRootEntityDefinitions().get(0);
-
+		String rootEntityName = rootEntity.getName();
 		//load record summaries
 		int offset = 0;
 		int maxNumberOfRecords = 5;
@@ -98,7 +95,7 @@ public class RecordDAOTest {
 		List<EntityDefinition> countInSummaryListEntityDefinitions = new ArrayList<EntityDefinition>();
 		EntityDefinition plotEntity = (EntityDefinition) rootEntity.getChildDefinition("plot");
 		countInSummaryListEntityDefinitions.add(plotEntity);
-		List<RecordSummary> list = this.recordSummaryDao.load(rootEntity, countInSummaryListEntityDefinitions, offset, maxNumberOfRecords, orderByFieldName, filter);
+		List<RecordSummary> list = this.recordDao.loadSummaries(survey, rootEntityName, countInSummaryListEntityDefinitions, offset, maxNumberOfRecords, orderByFieldName, filter);
 
 		assertNotNull(list);
 		assertEquals(maxNumberOfRecords, list.size());
@@ -122,7 +119,7 @@ public class RecordDAOTest {
 	//@Test
 	public void testLoadRecordSummariesOrderedByPlotCount() throws IOException, SurveyImportException, DataInconsistencyException, InvalidIdmlException, NonexistentIdException  {
 		EntityDefinition rootEntity = survey.getSchema().getRootEntityDefinitions().get(0);
-
+		String rootEntityName = rootEntity.getName();
 		//load record summaries
 		int offset = 0;
 		int maxNumberOfRecords = 5;
@@ -132,7 +129,7 @@ public class RecordDAOTest {
 		List<EntityDefinition> countInSummaryListEntityDefinitions = new ArrayList<EntityDefinition>();
 		EntityDefinition plotEntity = (EntityDefinition) rootEntity.getChildDefinition("plot");
 		countInSummaryListEntityDefinitions.add(plotEntity);
-		List<RecordSummary> list = this.recordSummaryDao.load(rootEntity, countInSummaryListEntityDefinitions, offset, maxNumberOfRecords, orderByFieldName, filter);
+		List<RecordSummary> list = this.recordDao.loadSummaries(survey, rootEntityName, countInSummaryListEntityDefinitions, offset, maxNumberOfRecords, orderByFieldName, filter);
 		
 		assertNotNull(list);
 		assertEquals(maxNumberOfRecords, list.size());
