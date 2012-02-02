@@ -29,7 +29,7 @@ public class TaxonomyDAO extends MappingJooqDaoSupport<Taxonomy, TaxonomyDAO.Joo
 		return t;
 	}
 	
-	static class JooqFactory extends MappingJooqFactory<Taxonomy> {
+	protected static class JooqFactory extends MappingJooqFactory<Taxonomy> {
 
 		private static final long serialVersionUID = 1L;
 
