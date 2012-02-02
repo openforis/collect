@@ -12,14 +12,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import javax.xml.namespace.QName;
-
 import org.jooq.Record;
 import org.jooq.Result;
 import org.jooq.impl.Factory;
 import org.jooq.impl.SQLDataType;
+import org.openforis.collect.persistence.jooq.JooqDaoSupport;
 import org.openforis.collect.persistence.xml.CollectIdmlBindingContext;
-import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.Survey;
@@ -32,11 +30,8 @@ import org.springframework.transaction.annotation.Transactional;
  * @author G. Miceli
  * @author M. Togna
  */
-public class SurveyDAO extends CollectDAO {
+public class SurveyDAO extends JooqDaoSupport {
 //	private final Log LOG = LogFactory.getLog(SurveyDAO.class);
-	
-	private static final QName COUNT_ANNOTATION = new QName("http://www.openforis.org/collect/3.0/collect", "count");
-
 	
 	private CollectIdmlBindingContext bindingContext;
 
@@ -167,25 +162,5 @@ public class SurveyDAO extends CollectDAO {
 			throw new SurveyImportException("Error unmarshalling survey", e);
 		} 
 	}
-	
-	/**
-	 * Returns first level entity definitions of the passed root entity that have the attribute "count" set to true
-	 * 
-	 * @param rootEntityDefinition
-	 * @return 
-	 */
-	private List<EntityDefinition> getCountEntityDefinitions(EntityDefinition rootEntityDefinition) {
-		List<EntityDefinition> result = new ArrayList<EntityDefinition>();
-		List<NodeDefinition> childDefinitions = rootEntityDefinition.getChildDefinitions();
-		for (NodeDefinition childDefinition : childDefinitions) {
-			if(childDefinition instanceof EntityDefinition) {
-				EntityDefinition entityDefinition = (EntityDefinition) childDefinition;
-				String annotation = childDefinition.getAnnotation(COUNT_ANNOTATION);
-				if(annotation != null && Boolean.parseBoolean(annotation)) {
-					result.add(entityDefinition);
-				}
-			}
-		}
-		return result;
-	}
+
 }

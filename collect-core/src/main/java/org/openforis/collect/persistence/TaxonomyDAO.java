@@ -8,55 +8,33 @@ import java.sql.Connection;
 import org.jooq.Record;
 import org.jooq.UpdatableRecord;
 import org.openforis.collect.model.species.Taxonomy;
+import org.openforis.collect.persistence.jooq.MappingJooqDaoSupport;
 import org.openforis.collect.persistence.jooq.MappingJooqFactory;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author G. Miceli
  */
-public class TaxonomyDAO extends CollectDAO {
+public class TaxonomyDAO extends MappingJooqDaoSupport<Taxonomy, TaxonomyDAO.JooqFactory> {
 
 	public TaxonomyDAO() {
+		super(TaxonomyDAO.JooqFactory.class);
 	}
 	
-	private TaxonomyJooqFactory createJooqFactory() {
-		return new TaxonomyJooqFactory(getConnection());
-		
-	}
-	public Taxonomy load(int id) {
-		TaxonomyJooqFactory jf = createJooqFactory();
-		Record r = jf.selectByIdQuery(id).fetchOne();
-		Taxonomy t = jf.fromRecord(r);
-		return t;
-	}
-	
+	@Transactional
 	public Taxonomy load(String name) {
-		TaxonomyJooqFactory jf = createJooqFactory();
+		JooqFactory jf = getMappingJooqFactory();
 		Record r = jf.selectByFieldQuery(TAXONOMY.NAME, name).fetchOne();
 		Taxonomy t = jf.fromRecord(r);
 		return t;
 	}
 	
-	public void insert(Taxonomy t) {
-		TaxonomyJooqFactory jf = createJooqFactory();
-		jf.insertQuery(t).execute();
-	}
-	
-	public void update(Taxonomy t) {
-		TaxonomyJooqFactory jf = createJooqFactory();
-		jf.updateQuery(t).execute();
-	}
-
-	public void delete(int id) {
-		TaxonomyJooqFactory jf = createJooqFactory();
-		jf.deleteQuery(id).execute();
-	}
-
-	public class TaxonomyJooqFactory extends MappingJooqFactory<Taxonomy> {
+	static class JooqFactory extends MappingJooqFactory<Taxonomy> {
 
 		private static final long serialVersionUID = 1L;
 
-		public TaxonomyJooqFactory(Connection conn) {
-			super(conn, TAXONOMY.ID, TAXONOMY_ID_SEQ, Taxonomy.class);
+		public JooqFactory(Connection connection) {
+			super(connection, TAXONOMY.ID, TAXONOMY_ID_SEQ, Taxonomy.class);
 		}
 
 		@Override
@@ -75,6 +53,11 @@ public class TaxonomyDAO extends CollectDAO {
 		@Override
 		protected void setId(Taxonomy taxonomy, int id) {
 			taxonomy.setId(id);
+		}
+
+		@Override
+		protected int getId(Taxonomy t) {
+			return t.getId();
 		}
 	}
 }
