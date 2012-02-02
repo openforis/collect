@@ -38,7 +38,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @RunWith( SpringJUnit4ClassRunner.class )
 @ContextConfiguration( locations = {"classpath:test-context.xml"} )
-@TransactionConfiguration(defaultRollback=false)
+@TransactionConfiguration(defaultRollback=true)
 @Transactional
 public class ModelDAOIntegrationTest {
 	private final Log log = LogFactory.getLog(ModelDAOIntegrationTest.class);
