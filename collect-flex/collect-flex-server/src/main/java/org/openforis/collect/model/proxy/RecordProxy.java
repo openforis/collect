@@ -92,12 +92,20 @@ public class RecordProxy implements Proxy {
 
 	@ExternalizedProperty
 	public EntityProxy getRootEntity() {
-		return new EntityProxy(record.getRootEntity());
+		if(record.getRootEntity() != null) {
+			return new EntityProxy(record.getRootEntity());
+		} else {
+			return null;
+		}
 	}
 
 	@ExternalizedProperty
 	public ModelVersionProxy getVersion() {
-		return new ModelVersionProxy(record.getVersion());
+		if(record.getVersion() != null) {
+			return new ModelVersionProxy(record.getVersion());
+		} else {
+			return null;
+		}
 	}
 
 	@ExternalizedProperty
@@ -109,11 +117,5 @@ public class RecordProxy implements Proxy {
 	public List<Integer> getEntityCounts() {
 		return record.getEntityCounts();
 	}
-
-	
-	
-	// public Node<? extends NodeDefinition> getNodeById(int id) {
-	// return record.getNodeById(id);
-	// }
 
 }
