@@ -8,6 +8,7 @@ import java.sql.Connection;
 import org.jooq.Record;
 import org.jooq.UpdatableRecord;
 import org.openforis.collect.model.species.Taxonomy;
+import org.openforis.collect.persistence.jooq.MappingJooqFactory;
 
 /**
  * @author G. Miceli

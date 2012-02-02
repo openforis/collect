@@ -1,4 +1,4 @@
-package org.openforis.collect.persistence;
+package org.openforis.collect.persistence.jooq;
 
 import java.sql.Connection;
 
@@ -11,7 +11,6 @@ import org.jooq.TableField;
 import org.jooq.UpdatableRecord;
 import org.jooq.UpdatableTable;
 import org.jooq.UpdateQuery;
-import org.openforis.collect.persistence.jooq.CollectJooqFactory;
 
 /**
  * @author G. Miceli
@@ -94,7 +93,7 @@ public abstract class MappingJooqFactory<E> extends CollectJooqFactory {
 		return entity;
 	}
 	
-	@SuppressWarnings("rawtypes")
+	@SuppressWarnings({"rawtypes", "unchecked"})
 	public UpdatableRecord<?> toRecord(E entity) {
 		UpdatableRecord record = (UpdatableRecord) newRecord((UpdatableTable) getTable());
 		toRecord(entity, record);

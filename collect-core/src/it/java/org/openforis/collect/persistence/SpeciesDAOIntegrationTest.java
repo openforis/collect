@@ -29,8 +29,12 @@ public class SpeciesDAOIntegrationTest {
 		Taxonomy t = new Taxonomy();
 		t.setName("trees");
 		taxonomyDao.insert(t);
+		
+		taxonomyDao.load(id);
+		
 		t.setName("bamboo");
 		taxonomyDao.update(t);
+		
 	}
 
 	private void insertTaxon() throws Exception {
