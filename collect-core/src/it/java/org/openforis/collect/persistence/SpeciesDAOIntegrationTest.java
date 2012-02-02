@@ -1,10 +1,15 @@
 package org.openforis.collect.persistence;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
+import java.util.Stack;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openforis.collect.model.species.Taxon;
+import org.openforis.collect.model.species.TaxonVernacularName;
 import org.openforis.collect.model.species.Taxonomy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -23,11 +28,14 @@ public class SpeciesDAOIntegrationTest {
 //	private final Log log = LogFactory.getLog(ModelDAOIntegrationTest.class);
 
 	@Autowired
-	protected TaxonomyDAO taxonomyDao;
+	private TaxonomyDAO taxonomyDao;
 
 	@Autowired
-	protected TaxonDAO taxonDao;
+	private TaxonDAO taxonDao;
 
+	@Autowired
+	private TaxonVernacularNameDAO taxonVernacularNameDAO;
+	
 	@Test
 	public void testCRUD() throws Exception  {
 		// Create taxonomy
@@ -35,15 +43,32 @@ public class SpeciesDAOIntegrationTest {
 		testUpdateAndLoadTaxonomy(taxonomy1, "it_trees");
 		
 		// Create taxa
-		Taxon taxon1 = testInsertAndLoadTaxon(taxonomy1, "Juglandaceaex", "familyx", null);
-		Taxon taxon2 = testInsertAndLoadTaxon(taxonomy1, "sJuglans sp.", "sadgenus", null);
-		taxon2 = testUpdateAndLoadTaxon(taxon2, "Juglans sp.", "family", taxon1.getId());
-		Taxon taxon3 = testInsertAndLoadTaxon(taxonomy1, "Juglans regia", "species", taxon2.getId());
+		Stack<Taxon> taxa = new Stack<Taxon>();
+		taxa.push(testInsertAndLoadTaxon(taxonomy1, "Juglandaceaex", "familyx", 9, null));
+		taxa.push(testInsertAndLoadTaxon(taxonomy1, "sJuglans sp.", "sadgenus", 0, null));
+		taxa.push(testUpdateAndLoadTaxon(taxa.pop(), "Juglans sp.", "family", 9, taxa.get(0).getId()));
+		taxa.push(testInsertAndLoadTaxon(taxonomy1, "Juglans regia", "species", 9, taxa.get(1).getId()));
+		
+		// Create vernacular names
+		Stack<TaxonVernacularName> names = new Stack<TaxonVernacularName>();
+		names.push(testInsertAndLoadVernacularName(taxa.get(0), "Walnut family", "eng", "", 9));
+		names.push(testInsertAndLoadVernacularName(taxa.get(0), "Walnuts", "en", "Cockney", 0));
+		names.push(testUpdateAndLoadVernacularName(names.pop(), taxa.get(1), "Walnut", "eng", "", 9));
+		names.push(testInsertAndLoadVernacularName(taxa.get(1), "Noce", "ita", "", 9));
+		names.push(testInsertAndLoadVernacularName(taxa.get(2), "Persian walnut", "eng", "", 9));
+		names.push(testInsertAndLoadVernacularName(taxa.get(2), "English walnut", "eng", "", 9));
+		names.push(testInsertAndLoadVernacularName(taxa.get(2), "Noce bianco", "ita", "", 9));
+		names.push(testInsertAndLoadVernacularName(taxa.get(2), "Орех грецкий", "rus", "", 9));
+
+		// Remove names
+		while (!names.isEmpty()) {
+			testDeleteAndLoadVernacularName(names.pop());
+		}
 		
 		// Remove taxa
-		testDeleteAndLoadTaxon(taxon3);
-		testDeleteAndLoadTaxon(taxon2);
-		testDeleteAndLoadTaxon(taxon1);
+		while (!taxa.isEmpty()) {
+			testDeleteAndLoadTaxon(taxa.pop());
+		}
 
 		// Remove taxonomy
 		testDeleteAndLoadTaxonomy(taxonomy1);
@@ -72,12 +97,12 @@ public class SpeciesDAOIntegrationTest {
 		assertEquals(newName, t.getName());
 	}
 	
-	private Taxon testInsertAndLoadTaxon(Taxonomy taxonomy, String scientificName, String rank, Integer parentId) {
+	private Taxon testInsertAndLoadTaxon(Taxonomy taxonomy, String scientificName, String rank, int step, Integer parentId) {
 		// Insert
 		Taxon t = new Taxon();
 		t.setScientificName(scientificName);
 		t.setTaxonomicRank(rank);
-		t.setStep(9);
+		t.setStep(step);
 		t.setTaxonomyId(taxonomy.getId());
 		t.setParentId(parentId);
 		taxonDao.insert(t);
@@ -88,17 +113,17 @@ public class SpeciesDAOIntegrationTest {
 		assertEquals(scientificName, t.getScientificName());
 		assertEquals(rank, t.getTaxonomicRank());
 		assertEquals(taxonomy.getId(), t.getTaxonomyId());
-		assertEquals(9, t.getStep());
+		assertEquals(step, t.getStep());
 		assertEquals(parentId, t.getParentId());
 		return t;
 	}
 
 	
-	private Taxon testUpdateAndLoadTaxon(Taxon t, String scientificName, String rank, Integer parentId) {
+	private Taxon testUpdateAndLoadTaxon(Taxon t, String scientificName, String rank, int step, Integer parentId) {
 		// Insert
 		t.setScientificName(scientificName);
 		t.setTaxonomicRank(rank);
-		t.setStep(9);
+		t.setStep(step);
 		t.setParentId(parentId);
 		taxonDao.update(t);
 		
@@ -107,10 +132,64 @@ public class SpeciesDAOIntegrationTest {
 		assertNotNull(t);
 		assertEquals(scientificName, t.getScientificName());
 		assertEquals(rank, t.getTaxonomicRank());
-		assertEquals(9, t.getStep());
+		assertEquals(step, t.getStep());
 		assertEquals(parentId, t.getParentId());
 		return t;
 	}
+
+	private TaxonVernacularName testInsertAndLoadVernacularName(Taxon taxon1, String name, String lang, String variety, int step) {
+		// Insert
+		TaxonVernacularName tvn = new TaxonVernacularName();
+		tvn.setVernacularName(name);
+		tvn.setLanguageCode(lang);
+		tvn.setLanguageVariety(variety);
+		tvn.setTaxonId(taxon1.getId());
+		tvn.setStep(step);
+		taxonVernacularNameDAO.insert(tvn);
+		
+		// Confirm saved
+		tvn = taxonVernacularNameDAO.load(tvn.getId());
+		assertNotNull(tvn);
+		assertEquals(taxon1.getId(), tvn.getTaxonId());
+		assertEquals(name, tvn.getVernacularName());
+		assertEquals(lang, tvn.getLanguageCode());
+		assertEquals(variety, tvn.getLanguageVariety());
+		assertEquals(step, tvn.getStep());
+		return tvn;
+	}
+
+	private TaxonVernacularName testUpdateAndLoadVernacularName(TaxonVernacularName tvn, Taxon taxon1, String name, String lang, String variety, int step) {
+		// Insert
+		Integer id = tvn.getId();
+		tvn.setVernacularName(name);
+		tvn.setLanguageCode(lang);
+		tvn.setLanguageVariety(variety);
+		tvn.setTaxonId(taxon1.getId());
+		tvn.setStep(step);
+		taxonVernacularNameDAO.update(tvn);
+		
+		// Confirm saved
+		tvn = taxonVernacularNameDAO.load(id);
+		assertNotNull(tvn);
+		assertEquals(id, tvn.getId());
+		assertEquals(taxon1.getId(), tvn.getTaxonId());
+		assertEquals(name, tvn.getVernacularName());
+		assertEquals(lang, tvn.getLanguageCode());
+		assertEquals(variety, tvn.getLanguageVariety());
+		assertEquals(step, tvn.getStep());
+		
+		return tvn;
+	}
+
+	private void testDeleteAndLoadVernacularName(TaxonVernacularName t) {
+		// Delete
+		taxonVernacularNameDAO.delete(t.getId());
+		
+		// Confirm deleted
+		t = taxonVernacularNameDAO.load(t.getId());
+		assertNull(t);
+	}
+
 
 	private void testDeleteAndLoadTaxon(Taxon t) {
 		// Delete

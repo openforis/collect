@@ -16,7 +16,7 @@ GO
 DROP SEQUENCE "collect"."taxon_id_seq" 
 GO
 
-DROP SEQUENCE "collect"."taxon_name_id_seq" 
+DROP SEQUENCE "collect"."taxon_vernacular_name_id_seq" 
 GO
 
 DROP SEQUENCE "collect"."user_id_seq"	 

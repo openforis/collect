@@ -3,9 +3,9 @@ package org.openforis.collect.model.species;
 /**
  * @author G. Miceli
  */
-public class TaxonName {
+public class TaxonVernacularName {
 	private Integer id;
-	private String name;
+	private String vernacularName;
 	private String languageCode;
 	private String languageVariety;
 	private Integer taxonId;
@@ -19,12 +19,12 @@ public class TaxonName {
 		this.id = id;
 	}
 
-	public String getName() {
-		return name;
+	public String getVernacularName() {
+		return vernacularName;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public void setVernacularName(String name) {
+		this.vernacularName = name;
 	}
 
 	public String getLanguageCode() {

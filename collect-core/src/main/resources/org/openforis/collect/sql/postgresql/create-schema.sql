@@ -19,7 +19,7 @@ GO
 CREATE SEQUENCE "collect"."taxon_id_seq"
 GO
 
-CREATE SEQUENCE "collect"."taxon_name_id_seq"
+CREATE SEQUENCE "collect"."taxon_vernacular_name_id_seq"
 GO
 
 CREATE SEQUENCE "collect"."user_id_seq"	
@@ -111,7 +111,7 @@ GO
 CREATE TABLE "collect"."taxon_vernacular_name"  ( 
 	"id"              	integer NOT NULL,
 	"vernacular_name" 	varchar(255) NULL,
-	"language_code"   	char(3) NOT NULL,
+	"language_code"   	varchar(3) NOT NULL,
 	"language_variety"	varchar(255) NULL,
 	"taxon_id"        	integer NULL,
 	"step"            	integer NOT NULL,
