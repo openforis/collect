@@ -28,7 +28,10 @@ GO
 CREATE SEQUENCE "collect"."user_role_id_seq"
 GO
 
---- BEGIN GENERATED CREATE TABLES ---
+----------------------------
+--- BEGIN GENERATED CODE ---
+----------------------------
+
 CREATE TABLE "collect"."data"  ( 
 	"id"           	integer NOT NULL,
 	"record_id"    	integer NOT NULL,
@@ -105,9 +108,9 @@ CREATE TABLE "collect"."taxon"  (
 	PRIMARY KEY("id")
 )
 GO
-CREATE TABLE "collect"."taxon_name"  ( 
+CREATE TABLE "collect"."taxon_vernacular_name"  ( 
 	"id"              	integer NOT NULL,
-	"name"            	varchar(255) NULL,
+	"vernacular_name" 	varchar(255) NULL,
 	"language_code"   	char(3) NOT NULL,
 	"language_variety"	varchar(255) NULL,
 	"taxon_id"        	integer NULL,
@@ -115,7 +118,7 @@ CREATE TABLE "collect"."taxon_name"  (
 	PRIMARY KEY("id")
 )
 GO
-COMMENT ON COLUMN "collect"."taxon_name"."language_variety" IS 'Dialect, lect, sublanguage or other'
+COMMENT ON COLUMN "collect"."taxon_vernacular_name"."language_variety" IS 'Dialect, lect, sublanguage or other'
 GO
 CREATE TABLE "collect"."taxonomy"  ( 
 	"id"      	integer NOT NULL,
@@ -176,8 +179,8 @@ ALTER TABLE "collect"."schema_definition"
 	FOREIGN KEY("survey_id")
 	REFERENCES "collect"."survey"("id")
 GO
-ALTER TABLE "collect"."taxon_name"
-	ADD CONSTRAINT "FK_taxon_name_taxon"
+ALTER TABLE "collect"."taxon_vernacular_name"
+	ADD CONSTRAINT "FK_taxon_vernacular_name_taxon"
 	FOREIGN KEY("taxon_id")
 	REFERENCES "collect"."taxon"("id")
 GO
@@ -217,4 +220,6 @@ ALTER TABLE "collect"."record"
 	REFERENCES "collect"."user_account"("id")
 GO
 
---- END GENERATED CREATE TABLES ---
+--------------------------
+--- END GENERATED CODE ---
+--------------------------

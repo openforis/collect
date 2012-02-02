@@ -6,7 +6,6 @@ import java.util.Date;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openforis.collect.persistence.jooq.DialectAwareJooqFactory;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
 
 /**

@@ -3,6 +3,7 @@ package org.openforis.collect.persistence;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -60,8 +61,10 @@ public class ModelDAOIntegrationTest {
 			survey = importModel();
 		}
 		
+		testLoadAllSurveys("archenland1");
+
 		// SAVE NEW
-		CollectRecord record = createRecord(survey);
+		CollectRecord record = createTestRecord(survey);
 		recordDao.saveOrUpdate(record);
 		
 		String saved = record.toString();
@@ -83,6 +86,17 @@ public class ModelDAOIntegrationTest {
 //		} catch (DataAccessException ex){
 //			ex.getCause().getCause().getCause().printStackTrace();
 //		}
+	}
+
+	private void testLoadAllSurveys(String surveyName) {
+		List<Survey> list = this.surveyDao.loadAll();
+		assertNotNull(list);
+		for (Survey survey : list) {
+			if ( survey.getName().equals(surveyName) ) {
+				return;
+			}
+		}
+		fail(surveyName+" not loaded by surveyDao.loadAll()");
 	}
 	
 	@Test
@@ -107,13 +121,28 @@ public class ModelDAOIntegrationTest {
 		return survey;
 	}
 
-	private CollectRecord createRecord(Survey survey) {
+	private CollectRecord createTestRecord(Survey survey) {
 		CollectRecord record = new CollectRecord(survey, "cluster", "2.0");
 		record.setCreationDate(new GregorianCalendar(2011, 12, 31, 23, 59).getTime());
 		//record.setCreatedBy("ModelDAOIntegrationTest");
 		record.setStep(Step.ENTRY);
 		Entity cluster = record.getRootEntity();
 		String id = "123_456";
+		
+		addTestValues(cluster, id);
+			
+		//set counts
+		EntityDefinition plotDef = (EntityDefinition) cluster.getDefinition().getChildDefinition("plot");
+		record.getCounts().put(plotDef.getPath(), 2);
+		
+		//set keys
+		NodeDefinition idDef = cluster.getDefinition().getChildDefinition("id");
+		record.getKeys().put(idDef.getPath(), id);
+		
+		return record;
+	}
+
+	private void addTestValues(Entity cluster, String id) {
 		cluster.addValue("id", new Code(id));
 		cluster.addValue("gps_realtime", Boolean.TRUE);
 		cluster.addValue("region", new Code("001"));
@@ -160,25 +189,9 @@ public class ModelDAOIntegrationTest {
 			tree2.addValue("dbh", 85.8);
 			tree2.addValue("total_height", 4.0);
 		}
-		//set counts
-		EntityDefinition plotDef = (EntityDefinition) cluster.getDefinition().getChildDefinition("plot");
-		record.getCounts().put(plotDef.getPath(), 2);
-		//set keys
-		NodeDefinition idDef = cluster.getDefinition().getChildDefinition("id");
-		record.getKeys().put(idDef.getPath(), id);
-		//System.err.println(record);
-		return record;
 	}
 
-	@Test
-	public void testLoadAllSurvey(){
-		List<Survey> list = this.surveyDao.loadAll();
-		assertNotNull(list);
-		assertEquals(1, list.size());
-		
-	}
-	
-	@Test
+//	@Test
 	public void testLoadRecordSummaries() {
 		Survey survey = surveyDao.load("archenland1");
 		//get the first root entity

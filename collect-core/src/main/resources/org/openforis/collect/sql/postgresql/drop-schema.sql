@@ -25,7 +25,9 @@ GO
 DROP SEQUENCE "collect"."user_role_id_seq" 
 GO
 
--- START GENERATED --
+----------------------------
+--- BEGIN GENERATED CODE ---
+----------------------------
 
 ALTER TABLE "collect"."data"
 	DROP CONSTRAINT "FK_data_parent" CASCADE 
@@ -42,8 +44,8 @@ GO
 ALTER TABLE "collect"."schema_definition"
 	DROP CONSTRAINT "FK_schema_definition_survey" CASCADE 
 GO
-ALTER TABLE "collect"."taxon_name"
-	DROP CONSTRAINT "FK_taxon_name_taxon" CASCADE 
+ALTER TABLE "collect"."taxon_vernacular_name"
+	DROP CONSTRAINT "FK_taxon_vernacular_name_taxon" CASCADE 
 GO
 ALTER TABLE "collect"."data"
 	DROP CONSTRAINT "FK_data_taxon" CASCADE 
@@ -87,7 +89,7 @@ DROP TABLE IF EXISTS "collect"."survey"
 GO
 DROP TABLE IF EXISTS "collect"."taxon"
 GO
-DROP TABLE IF EXISTS "collect"."taxon_name"
+DROP TABLE IF EXISTS "collect"."taxon_vernacular_name"
 GO
 DROP TABLE IF EXISTS "collect"."taxonomy"
 GO
@@ -96,7 +98,9 @@ GO
 DROP TABLE IF EXISTS "collect"."user_role"
 GO
 
--- END GENERATED --
+--------------------------
+--- END GENERATED CODE ---
+--------------------------
 
 DROP SCHEMA "collect"
 GO
