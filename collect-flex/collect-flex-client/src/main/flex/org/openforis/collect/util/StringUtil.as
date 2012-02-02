@@ -68,18 +68,24 @@ package org.openforis.collect.util
 		 * Only not null and not blank values are included in the final string.
 		 * 
 		 * @param separator Separator to use in the concat
-		 * @param args Strings to concat
+		 * @param args Strings to concat or Array of String items
 		 * @return concatenated values
 		 * 
 		 **/
 		public static function concat(separator:String, ... args):String {
-			var parts:Array = [];
-			for each(var value:String in args) {
+			var parts:Array;
+			if(args != null && args.length == 1 && args[0] is Array) {
+				parts = args[0];
+			} else {
+				parts = args;
+			}
+			var resultParts:Array = [];
+			for each(var value:String in parts) {
 				if(isNotBlank(value)) {
-					parts.push(value);
+					resultParts.push(value);
 				}
 			}
-			return parts.join(separator);
+			return resultParts.join(separator);
 		}
 		
 		public static function concatEvenNulls(separator:String, ... args):String {
