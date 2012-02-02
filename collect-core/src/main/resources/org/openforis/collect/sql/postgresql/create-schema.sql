@@ -69,9 +69,9 @@ CREATE TABLE "collect"."record"  (
 	"missing"       	integer NULL,
 	"errors"        	integer NULL,
 	"warnings"      	integer NULL,
-	"key1"     			varchar(2048) NULL,
-	"key2"     			varchar(2048) NULL,
-	"key3"     			varchar(2048) NULL,
+	"key1"          	varchar(2048) NULL,
+	"key2"          	varchar(2048) NULL,
+	"key3"          	varchar(2048) NULL,
 	"count1"        	integer NULL,
 	"count2"        	integer NULL,
 	"count3"        	integer NULL,
@@ -146,6 +146,10 @@ GO
 ALTER TABLE "collect"."survey"
 	ADD CONSTRAINT "UK_survey_uri"
 	UNIQUE ("uri")
+GO
+ALTER TABLE "collect"."taxonomy"
+	ADD CONSTRAINT "UK_taxonomy_name"
+	UNIQUE ("name")
 GO
 ALTER TABLE "collect"."data"
 	ADD CONSTRAINT "FK_data_parent"

@@ -1,8 +1,9 @@
 package org.openforis.collect.persistence;
 
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.openforis.collect.model.species.Taxon;
 import org.openforis.collect.model.species.Taxonomy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -10,6 +11,9 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.transaction.TransactionConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * @author G. Miceli
+ */
 @RunWith( SpringJUnit4ClassRunner.class )
 @ContextConfiguration( locations = {"classpath:test-context.xml"} )
 @TransactionConfiguration(defaultRollback=false)
@@ -22,27 +26,29 @@ public class SpeciesDAOIntegrationTest {
 
 	@Test
 	public void testCRUD() throws Exception  {
-		insertTaxonomy();
+		Taxonomy t = testInsertAndLoad();
+		
+		testUpdateAndLoad(t);
+		
+		taxonomyDao.delete(t.getId());
+		
 	}
-
-	private void insertTaxonomy() throws Exception {
+	
+	private Taxonomy testInsertAndLoad() {
 		Taxonomy t = new Taxonomy();
 		t.setName("trees");
 		taxonomyDao.insert(t);
-		
-		taxonomyDao.load(id);
-		
-		t.setName("bamboo");
-		taxonomyDao.update(t);
-		
+
+		t = taxonomyDao.load("trees");
+		assertEquals("trees", t.getName());
+		return t;
 	}
 
-	private void insertTaxon() throws Exception {
-		Taxon t = new Taxon();
-		t.setScientificName("Juglandaceae");
-		t.setTaxonomicRank("family");
-		t.setStep(9);
+	private void testUpdateAndLoad(Taxonomy t) {
+		t.setName("bamboo");
+		taxonomyDao.update(t);
+
+		t = taxonomyDao.load("bamboo");
+		assertEquals("bamboo", t.getName());
 	}
-	
-	
 }

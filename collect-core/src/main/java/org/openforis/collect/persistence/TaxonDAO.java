@@ -5,14 +5,19 @@ import static org.openforis.collect.persistence.jooq.tables.Taxon.TAXON;
 import org.jooq.Record;
 import org.jooq.UpdatableRecord;
 import org.openforis.collect.model.species.Taxon;
+import org.openforis.collect.persistence.jooq.CollectJooqFactory;
+import org.openforis.collect.persistence.jooq.JooqDaoSupport;
 
 /**
  * @author G. Miceli
  */
-public class TaxonDAO extends CollectDAO {
+
+public class TaxonDAO extends JooqDaoSupport {
+	public TaxonDAO() {
+	}
 
 	public Taxon load(int id) {
-		Record record =  getJooqFactory()
+		Record record = getJooqFactory()
 				.select()
 				.where(TAXON.ID.equal(id))
 				.fetchOne();

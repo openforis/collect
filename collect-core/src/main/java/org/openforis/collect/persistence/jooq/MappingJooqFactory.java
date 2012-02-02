@@ -30,6 +30,8 @@ public abstract class MappingJooqFactory<E> extends CollectJooqFactory {
 	}
 	
 	protected abstract void setId(E entity, int id);
+
+	protected abstract int getId(E entity);
 	
 	protected abstract void fromRecord(Record r, E entity);
 	
@@ -84,6 +86,8 @@ public abstract class MappingJooqFactory<E> extends CollectJooqFactory {
 		
 		UpdateQuery update = updateQuery(getTable());
 		update.setRecord(record);
+		int id = getId(entity);
+		update.addConditions(idField.equal(id));
 		return update;
 	}
 

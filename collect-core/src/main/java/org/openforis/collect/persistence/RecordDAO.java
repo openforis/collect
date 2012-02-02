@@ -22,6 +22,7 @@ import org.openforis.collect.model.RecordSummary;
 import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.jooq.DataLoader;
 import org.openforis.collect.persistence.jooq.DataPersister;
+import org.openforis.collect.persistence.jooq.JooqDaoSupport;
 import org.openforis.collect.persistence.jooq.tables.records.RecordRecord;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -36,14 +37,11 @@ import org.springframework.transaction.annotation.Transactional;
  * @author G. Miceli
  * @author M. Togna
  */
-public class RecordDAO extends CollectDAO {
+public class RecordDAO extends JooqDaoSupport {
 	
 	public static final String ORDER_BY_DATE_CREATED = "creationDate";
 	public static final String ORDER_BY_DATE_MODIFIED = "modifiedDate";
 	
-	public RecordDAO() {
-	}
-
 	@Transactional
 	public CollectRecord load(Survey survey, int recordId) throws DataInconsistencyException, NonexistentIdException {
 		CollectRecord record = loadRecord(survey, recordId);

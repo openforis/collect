@@ -26,6 +26,7 @@ DROP SEQUENCE "collect"."user_role_id_seq"
 GO
 
 -- START GENERATED --
+
 ALTER TABLE "collect"."data"
 	DROP CONSTRAINT "FK_data_parent" CASCADE 
 GO
@@ -71,6 +72,9 @@ GO
 ALTER TABLE "collect"."survey"
 	DROP CONSTRAINT "UK_survey_uri" CASCADE 
 GO
+ALTER TABLE "collect"."taxonomy"
+	DROP CONSTRAINT "UK_taxonomy_name" CASCADE 
+GO
 DROP TABLE IF EXISTS "collect"."data"
 GO
 DROP TABLE IF EXISTS "collect"."logo"
@@ -91,6 +95,7 @@ DROP TABLE IF EXISTS "collect"."user_account"
 GO
 DROP TABLE IF EXISTS "collect"."user_role"
 GO
+
 -- END GENERATED --
 
 DROP SCHEMA "collect"
