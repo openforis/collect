@@ -7,7 +7,6 @@ import static org.junit.Assert.assertNull;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.Arrays;
 import java.util.GregorianCalendar;
 import java.util.List;
 
@@ -21,7 +20,6 @@ import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.RecordSummary;
 import org.openforis.collect.persistence.xml.CollectIdmlBindingContext;
 import org.openforis.idm.metamodel.EntityDefinition;
-import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.xml.InvalidIdmlException;
 import org.openforis.idm.metamodel.xml.SurveyUnmarshaller;
@@ -161,11 +159,9 @@ public class ModelDAOIntegrationTest {
 			tree2.addValue("total_height", 4.0);
 		}
 		//set counts
-		EntityDefinition plotDef = (EntityDefinition) cluster.getDefinition().getChildDefinition("plot");
-		record.getCounts().put(plotDef.getPath(), 2);
+		record.getCounts().add(2);
 		//set keys
-		NodeDefinition idDef = cluster.getDefinition().getChildDefinition("id");
-		record.getKeys().put(idDef.getPath(), id);
+		record.getKeys().add(id);
 		//System.err.println(record);
 		return record;
 	}
@@ -188,8 +184,7 @@ public class ModelDAOIntegrationTest {
 		int maxNumberOfRecords = 1;
 		String orderByFieldName = "key_id";
 		String filter = null;
-		EntityDefinition plotDefn = (EntityDefinition) rootEntity.getChildDefinition("plot");
-		List<RecordSummary> list = this.recordDao.loadSummaries(survey, rootEntityName, Arrays.asList(plotDefn), offset, maxNumberOfRecords, orderByFieldName, filter);
+		List<RecordSummary> list = this.recordDao.loadSummaries(survey, rootEntityName, offset, maxNumberOfRecords, orderByFieldName, filter);
 		assertNotNull(list);
 		assertEquals(1, list.size());
 		

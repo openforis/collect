@@ -1,9 +1,8 @@
 package org.openforis.collect.model;
 
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.List;
 
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.model.Record;
@@ -39,16 +38,16 @@ public class CollectRecord extends Record {
 	private Integer errors;
 	private Integer warnings;
 	
-	private Map<String, String> keys;
-	private Map<String, Integer> counts;
+	private List<String> keys;
+	private List<Integer> counts;
 	
 	public CollectRecord(Survey survey, String rootEntity, String versionName) {
 		super(survey, rootEntity, versionName);
 		this.step = Step.ENTRY;
 		this.submitted = false;
 		//use LinkedHashMale to preserve the order of the keys in the maps
-		keys = new LinkedHashMap<String, String>();
-		counts = new LinkedHashMap<String, Integer>();
+		keys = new ArrayList<String>();
+		counts = new ArrayList<Integer>();
 	}
 
 	public void setSubmitted(boolean submitted) {
@@ -131,19 +130,19 @@ public class CollectRecord extends Record {
 		this.warnings = warnings;
 	}
 	
-	public Map<String, String> getKeys() {
+	public List<String> getKeys() {
 		return keys;
 	}
 	
-	public void setKeys(Map<String, String> keys) {
+	public void setKeys(List<String> keys) {
 		this.keys = keys;
 	}
 	
-	public Map<String, Integer> getCounts() {
+	public List<Integer> getCounts() {
 		return counts;
 	}
 	
-	public void setCounts(Map<String, Integer> counts) {
+	public void setCounts(List<Integer> counts) {
 		this.counts = counts;
 	}
 	

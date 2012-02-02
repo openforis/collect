@@ -5,9 +5,7 @@ package org.openforis.collect.manager;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.xml.namespace.QName;
 
@@ -27,7 +25,6 @@ import org.openforis.collect.persistence.RecordLockedException;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
-import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.model.Code;
 import org.openforis.idm.model.CodeAttribute;
@@ -88,16 +85,18 @@ public class RecordManager {
 
 	@Transactional
 	public List<RecordSummary> getSummaries(Survey survey, String rootEntity, int offset, int maxNumberOfRecords, String orderByFieldName, String filter) {
+		/*
 		Schema schema = survey.getSchema();
 		EntityDefinition rootEntityDefinition = schema.getRootEntityDefinition(rootEntity);
 		List<EntityDefinition> countableInList = getCountableInList(rootEntityDefinition);
-		List<RecordSummary> recordsSummary = recordDAO.loadSummaries(survey, rootEntity, countableInList, offset, maxNumberOfRecords, orderByFieldName, filter);
+		*/
+		List<RecordSummary> recordsSummary = recordDAO.loadSummaries(survey, rootEntity, offset, maxNumberOfRecords, orderByFieldName, filter);
 		return recordsSummary;
 	}
 
 	@Transactional
 	public int getCountRecords(EntityDefinition rootEntityDefinition) {
-		int count = recordDAO.getCountRecords(rootEntityDefinition);
+		int count = recordDAO.getRecordCount(rootEntityDefinition);
 		return count;
 	}
 
@@ -170,11 +169,11 @@ public class RecordManager {
 		List<EntityDefinition> countableDefns = getCountableInList(rootEntityDef);
 		
 		//set counts
-		Map<String, Integer> counts = new HashMap<String, Integer>();
+		List<Integer> counts = new ArrayList<Integer>();
 		for (EntityDefinition def : countableDefns) {
 			String path = def.getPath();
 			int count = rootEntity.getCount(path);
-			counts.put(path, count);
+			counts.add(count);
 		}
 		record.setCounts(counts);
 	}
@@ -184,9 +183,8 @@ public class RecordManager {
 		EntityDefinition rootEntityDef = rootEntity.getDefinition();
 		List<AttributeDefinition> keyDefns = rootEntityDef.getKeyAttributeDefinitions();
 		//set keys
-		Map<String, String> keys = new HashMap<String, String>();
+		List<String> keys = new ArrayList<String>();
 		for (AttributeDefinition def: keyDefns) {
-			String path = def.getPath();
 			String name = def.getName();
 			Object value = null;
 			String textValue = null;
@@ -202,7 +200,7 @@ public class RecordManager {
 					textValue = value.toString();
 				}
 			}
-			keys.put(path, textValue);
+			keys.add(textValue);
 		}
 		record.setKeys(keys);
 	}

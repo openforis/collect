@@ -4,89 +4,35 @@
 package org.openforis.collect.model;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
+
+import org.openforis.idm.metamodel.NodeDefinition;
+import org.openforis.idm.metamodel.Survey;
+import org.openforis.idm.model.Entity;
+import org.openforis.idm.model.Node;
 
 /**
  * @author M. Togna
+ * @author S. Ricci
  * 
  */
-public class RecordSummary {
+public class RecordSummary extends CollectRecord {
 
-	private Integer id;
-	private String createdBy;
-	private Date creationDate;
-	private Integer errors;
-	private Integer missing;
-	private String modifiedBy;
-	private Date modifiedDate;
-	private Integer skipped;
-	private Integer warnings;
-	private int step;
-	private Map<String, String> rootEntityKeys;
-	private Map<String, Integer> entityCounts;
-
-	public RecordSummary(Integer id, Map<String, String> rootEntityKeys,  Map<String, Integer> entityCounts, String createdBy, Date creationDate, String modifiedBy, Date modifiedDate, int step, 
-			Integer skippedCount, Integer missing, Integer errors, Integer warnings) {
-		this.id = id;
-		this.rootEntityKeys = rootEntityKeys;
-		this.entityCounts = entityCounts;
-		this.createdBy = createdBy;
-		this.creationDate = creationDate;
-		this.modifiedBy = modifiedBy;
-		this.modifiedDate = modifiedDate;
-		this.step = step;
-		this.skipped = skippedCount;
-		this.missing = missing;
-		this.errors = errors;
-		this.warnings = warnings;
+	public RecordSummary(Survey survey, String rootEntity, String versionName) {
+		super(survey, rootEntity, versionName);
 	}
 
-	public String getCreatedBy() {
-		return this.createdBy;
+	@Override
+	public Entity getRootEntity() {
+		throw new RuntimeException("Method not supported in Summary class");
 	}
 
-	public Date getCreationDate() {
-		return this.creationDate;
+	@Override
+	public Node<? extends NodeDefinition> getNodeById(int id) {
+		throw new RuntimeException("Method not supported in Summary class");
 	}
-
-	public Integer getErrors() {
-		return this.errors;
-	}
-
-	public Integer getId() {
-		return this.id;
-	}
-
-	public String getModifiedBy() {
-		return this.modifiedBy;
-	}
-
-	public Date getModifiedDate() {
-		return this.modifiedDate;
-	}
-
-	public Integer getWarnings() {
-		return this.warnings;
-	}
-
-	public int getStep() {
-		return step;
-	}
-
-	public Map<String, String> getRootEntityKeys() {
-		return rootEntityKeys;
-	}
-
-	public Map<String, Integer> getEntityCounts() {
-		return entityCounts;
-	}
-
-	public Integer getMissing() {
-		return missing;
-	}
-
-	public Integer getSkipped() {
-		return skipped;
-	}
-
+	
+	
+	
 }
