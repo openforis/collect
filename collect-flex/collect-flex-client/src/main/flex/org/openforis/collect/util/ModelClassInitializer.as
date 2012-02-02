@@ -34,7 +34,6 @@ package org.openforis.collect.util {
 	import org.openforis.collect.metamodel.proxy.TextAttributeDefinitionProxy$Type;
 	import org.openforis.collect.metamodel.proxy.TimeAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.UnitProxy;
-	import org.openforis.collect.model.RecordSummary;
 	import org.openforis.collect.model.SurveySummary;
 	import org.openforis.collect.model.UIConfiguration;
 	import org.openforis.collect.model.UITab;
@@ -45,6 +44,7 @@ package org.openforis.collect.util {
 	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.model.proxy.IntegerRangeProxy;
 	import org.openforis.collect.model.proxy.RealRangeProxy;
+	import org.openforis.collect.model.proxy.RecordProxy;
 	import org.openforis.collect.model.proxy.TaxonProxy;
 	import org.openforis.collect.model.proxy.TimeProxy;
 
@@ -87,7 +87,7 @@ package org.openforis.collect.util {
 				PromptProxy$Type,
 				RangeAttributeDefinitionProxy,
 				RealRangeProxy,
-				RecordSummary,
+				RecordProxy,
 				SchemaProxy,
 				SpatialReferenceSystemProxy,
 				SurveyProxy,

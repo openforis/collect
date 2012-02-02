@@ -9,6 +9,7 @@ import java.util.List;
 import org.jooq.Record;
 import org.jooq.Result;
 import org.jooq.impl.Factory;
+import org.openforis.collect.persistence.jooq.JooqDaoSupport;
 import org.openforis.collect.persistence.jooq.tables.UserRole;
 import org.openforis.collect.persistence.jooq.tables.records.UserAccountRecord;
 import org.openforis.collect.persistence.jooq.tables.records.UserRoleRecord;
@@ -24,7 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author M. Togna
  * 
  */
-public class UserDAO extends CollectDAO implements UserDetailsService {
+public class UserDAO extends JooqDaoSupport implements UserDetailsService {
 
 	@Override
 	@Transactional

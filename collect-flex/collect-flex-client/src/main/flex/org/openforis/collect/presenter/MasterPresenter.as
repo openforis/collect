@@ -11,7 +11,6 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.client.DataClient;
 	import org.openforis.collect.event.UIEvent;
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
-	import org.openforis.collect.model.RecordSummary;
 	import org.openforis.collect.model.proxy.RecordProxy;
 	import org.openforis.collect.ui.view.MasterView;
 
@@ -50,7 +49,7 @@ package org.openforis.collect.presenter {
 		 * RecordSummary selected from list page
 		 * */
 		internal function recordSelectedHandler(uiEvent:UIEvent):void {
-			var record:RecordSummary = uiEvent.obj as RecordSummary;
+			var record:RecordProxy = uiEvent.obj as RecordProxy;
 			var id:Number = record.id;
 			//var entityName:String = Application.activeRootEntity.name;
 			_dataClient.loadRecord(new AsyncResponder(loadRecordResultHandler, faultHandler, record), id);
@@ -69,8 +68,8 @@ package org.openforis.collect.presenter {
 		 * */
 		protected function loadRecordResultHandler(event:ResultEvent, token:Object = null):void {
 			var record:RecordProxy = RecordProxy(event.result);
-			var summary:RecordSummary = token as RecordSummary;
-			record.rootEntityKeys = summary.rootEntityKeys;
+			//var summary:RecordSummaryProxy = token as RecordSummaryProxy;
+			//record.rootEntityKeys = summary.rootEntityKeys;
 			
 			setActiveRecord(record);
 		}

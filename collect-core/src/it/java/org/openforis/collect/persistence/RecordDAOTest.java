@@ -7,17 +7,14 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openforis.collect.model.CollectAttributeMetadata;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
-import org.openforis.collect.model.RecordSummary;
 import org.openforis.collect.persistence.xml.CollectIdmlBindingContext;
 import org.openforis.idm.metamodel.EntityDefinition;
-import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.xml.InvalidIdmlException;
 import org.openforis.idm.model.Code;
@@ -95,25 +92,25 @@ public class RecordDAOTest {
 		List<EntityDefinition> countInSummaryListEntityDefinitions = new ArrayList<EntityDefinition>();
 		EntityDefinition plotEntity = (EntityDefinition) rootEntity.getChildDefinition("plot");
 		countInSummaryListEntityDefinitions.add(plotEntity);
-		List<RecordSummary> list = this.recordDao.loadSummaries(survey, rootEntityName, countInSummaryListEntityDefinitions, offset, maxNumberOfRecords, orderByFieldName, filter);
+		List<CollectRecord> list = this.recordDao.loadSummaries(survey, rootEntityName, offset, maxNumberOfRecords, orderByFieldName, filter);
 
 		assertNotNull(list);
 		assertEquals(maxNumberOfRecords, list.size());
 		
 		//test first record of the page
-		RecordSummary sampleRecordSummary;
-		Map<String, String> rootEntityKeys;
+		CollectRecord sampleRecordSummary;
+		List<String> rootEntityKeys;
 		
 		sampleRecordSummary = list.get(0);
 		rootEntityKeys = sampleRecordSummary.getRootEntityKeys();
 		
-		assertEquals("1", rootEntityKeys.get("id"));
+		assertEquals("1", rootEntityKeys.get(0));
 		
 		//test last record of the page
 		sampleRecordSummary = list.get(4);
 		rootEntityKeys = sampleRecordSummary.getRootEntityKeys();
 		
-		assertEquals("5", rootEntityKeys.get("id"));
+		assertEquals("5", rootEntityKeys.get(0));
 	}
 
 	//@Test
@@ -126,27 +123,24 @@ public class RecordDAOTest {
 		String orderByFieldName = "count_plot";
 		String filter = null;
 		
-		List<EntityDefinition> countInSummaryListEntityDefinitions = new ArrayList<EntityDefinition>();
-		EntityDefinition plotEntity = (EntityDefinition) rootEntity.getChildDefinition("plot");
-		countInSummaryListEntityDefinitions.add(plotEntity);
-		List<RecordSummary> list = this.recordDao.loadSummaries(survey, rootEntityName, countInSummaryListEntityDefinitions, offset, maxNumberOfRecords, orderByFieldName, filter);
+		List<CollectRecord> list = this.recordDao.loadSummaries(survey, rootEntityName, offset, maxNumberOfRecords, orderByFieldName, filter);
 		
 		assertNotNull(list);
 		assertEquals(maxNumberOfRecords, list.size());
 
 		//test first record of the page
 		{
-			RecordSummary sampleRecordSummary = list.get(0);
-			Map<String, Integer> entityCounts = sampleRecordSummary.getEntityCounts();
+			CollectRecord sampleRecordSummary = list.get(0);
+			List<Integer> entityCounts = sampleRecordSummary.getEntityCounts();
 			
-			assertEquals(new Integer(1), entityCounts.get("plot"));
+			assertEquals(new Integer(1), entityCounts.get(0));
 		}
 		//test last record of the page
 		{
-			RecordSummary sampleRecordSummary = list.get(4);
-			Map<String, Integer> entityCounts = sampleRecordSummary.getEntityCounts();
+			CollectRecord sampleRecordSummary = list.get(4);
+			List<Integer> entityCounts = sampleRecordSummary.getEntityCounts();
 		
-			assertEquals(new Integer(5), entityCounts.get("plot"));
+			assertEquals(new Integer(5), entityCounts.get(0));
 		}
 	}
 
@@ -158,7 +152,7 @@ public class RecordDAOTest {
 		int numberOfPlots = new Double(Math.ceil((double) (Math.random() * 20))).intValue();
 		int numberOfTrees = new Double(Math.ceil((double) (Math.random() * 30))).intValue();;
 		
-		CollectRecord record = new CollectRecord(survey, "cluster", "2.0");
+		CollectRecord record = new CollectRecord(survey, "2.0");
 		record.setCreationDate(new GregorianCalendar(2011, 0, sequenceNumber, 8, 30).getTime());
 		//record.setCreatedBy("ModelDAOIntegrationTest");
 		record.setStep(Step.ENTRY);
@@ -167,7 +161,7 @@ public class RecordDAOTest {
 		record.setMissing(missingCount);
 		record.setErrors(errorsCount);
 		record.setWarnings(warningsCount);
-		Entity cluster = record.getRootEntity();
+		Entity cluster = record.createRootEntity("cluster");
 		String keyId = Integer.toString(sequenceNumber);
 		cluster.addValue("id", new Code(keyId));
 		cluster.addValue("gps_realtime", Boolean.TRUE);
@@ -199,11 +193,9 @@ public class RecordDAOTest {
 			}
 		}
 		//set counts
-		EntityDefinition plotDef = (EntityDefinition) cluster.getDefinition().getChildDefinition("plot");
-		record.getCounts().put(plotDef.getPath(), numberOfPlots);
+		record.getEntityCounts().add(numberOfPlots);
 		//set keys
-		NodeDefinition idDef = cluster.getDefinition().getChildDefinition("id");
-		record.getKeys().put(idDef.getPath(), keyId);
+		record.getRootEntityKeys().add(keyId);
 		
 		return record;
 	}

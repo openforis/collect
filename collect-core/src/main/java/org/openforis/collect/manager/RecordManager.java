@@ -5,9 +5,7 @@ package org.openforis.collect.manager;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.xml.namespace.QName;
 
@@ -15,7 +13,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
-import org.openforis.collect.model.RecordSummary;
 import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.AccessDeniedException;
 import org.openforis.collect.persistence.DuplicateIdException;
@@ -27,7 +24,6 @@ import org.openforis.collect.persistence.RecordLockedException;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
-import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.model.Code;
 import org.openforis.idm.model.CodeAttribute;
@@ -87,17 +83,19 @@ public class RecordManager {
 	}
 
 	@Transactional
-	public List<RecordSummary> getSummaries(Survey survey, String rootEntity, int offset, int maxNumberOfRecords, String orderByFieldName, String filter) {
+	public List<CollectRecord> getSummaries(Survey survey, String rootEntity, int offset, int maxNumberOfRecords, String orderByFieldName, String filter) {
+		/*
 		Schema schema = survey.getSchema();
 		EntityDefinition rootEntityDefinition = schema.getRootEntityDefinition(rootEntity);
 		List<EntityDefinition> countableInList = getCountableInList(rootEntityDefinition);
-		List<RecordSummary> recordsSummary = recordDAO.loadSummaries(survey, rootEntity, countableInList, offset, maxNumberOfRecords, orderByFieldName, filter);
+		*/
+		List<CollectRecord> recordsSummary = recordDAO.loadSummaries(survey, rootEntity, offset, maxNumberOfRecords, orderByFieldName, filter);
 		return recordsSummary;
 	}
 
 	@Transactional
 	public int getCountRecords(EntityDefinition rootEntityDefinition) {
-		int count = recordDAO.getCountRecords(rootEntityDefinition);
+		int count = recordDAO.getRecordCount(rootEntityDefinition);
 		return count;
 	}
 
@@ -105,7 +103,9 @@ public class RecordManager {
 	public CollectRecord create(Survey survey, EntityDefinition rootEntityDefinition, User user, String modelVersionName) throws MultipleEditException, AccessDeniedException, RecordLockedException {
 		recordDAO.checkLock(user);
 		
-		CollectRecord record = new CollectRecord(survey, rootEntityDefinition.getName(), modelVersionName);
+		CollectRecord record = new CollectRecord(survey, modelVersionName);
+		record.createRootEntity(rootEntityDefinition.getName());
+		
 		record.setCreationDate(new Date());
 		//record.setCreatedBy(user.getId());
 		record.setStep(Step.ENTRY);
@@ -170,13 +170,13 @@ public class RecordManager {
 		List<EntityDefinition> countableDefns = getCountableInList(rootEntityDef);
 		
 		//set counts
-		Map<String, Integer> counts = new HashMap<String, Integer>();
+		List<Integer> counts = new ArrayList<Integer>();
 		for (EntityDefinition def : countableDefns) {
 			String path = def.getPath();
 			int count = rootEntity.getCount(path);
-			counts.put(path, count);
+			counts.add(count);
 		}
-		record.setCounts(counts);
+		record.setEntityCounts(counts);
 	}
 	
 	private void updateKeys(CollectRecord record) {
@@ -184,9 +184,8 @@ public class RecordManager {
 		EntityDefinition rootEntityDef = rootEntity.getDefinition();
 		List<AttributeDefinition> keyDefns = rootEntityDef.getKeyAttributeDefinitions();
 		//set keys
-		Map<String, String> keys = new HashMap<String, String>();
+		List<String> keys = new ArrayList<String>();
 		for (AttributeDefinition def: keyDefns) {
-			String path = def.getPath();
 			String name = def.getName();
 			Object value = null;
 			String textValue = null;
@@ -202,7 +201,7 @@ public class RecordManager {
 					textValue = value.toString();
 				}
 			}
-			keys.put(path, textValue);
+			keys.add(textValue);
 		}
 		record.setKeys(keys);
 	}

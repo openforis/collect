@@ -1,9 +1,8 @@
 package org.openforis.collect.model;
 
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.List;
 
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.model.Record;
@@ -25,6 +24,16 @@ public class CollectRecord extends Record {
 		public int getStepNumber() {
 			return stepNumber;
 		}
+		
+		public static Step valueOf(int stepNumber) {
+			Step[] values = Step.values();
+			for (Step step : values) {
+				if(step.getStepNumber() == stepNumber) {
+					return step;
+				}
+			}
+			return null;
+		}
 	}
 
 	private Step step;
@@ -39,16 +48,17 @@ public class CollectRecord extends Record {
 	private Integer errors;
 	private Integer warnings;
 	
-	private Map<String, String> keys;
-	private Map<String, Integer> counts;
+	private List<String> rootEntityKeys;
+	private List<Integer> entityCounts;
 	
-	public CollectRecord(Survey survey, String rootEntity, String versionName) {
-		super(survey, rootEntity, versionName);
+	public CollectRecord(Survey survey, String versionName) {
+		super(survey, versionName);
 		this.step = Step.ENTRY;
 		this.submitted = false;
-		//use LinkedHashMale to preserve the order of the keys in the maps
-		keys = new LinkedHashMap<String, String>();
-		counts = new LinkedHashMap<String, Integer>();
+
+		//use List to preserve the order of the keys and counts
+		rootEntityKeys = new ArrayList<String>();
+		entityCounts = new ArrayList<Integer>();
 	}
 
 	public void setSubmitted(boolean submitted) {
@@ -131,20 +141,20 @@ public class CollectRecord extends Record {
 		this.warnings = warnings;
 	}
 	
-	public Map<String, String> getKeys() {
-		return keys;
+	public List<String> getRootEntityKeys() {
+		return rootEntityKeys;
 	}
 	
-	public void setKeys(Map<String, String> keys) {
-		this.keys = keys;
+	public void setKeys(List<String> keys) {
+		this.rootEntityKeys = keys;
 	}
 	
-	public Map<String, Integer> getCounts() {
-		return counts;
+	public List<Integer> getEntityCounts() {
+		return entityCounts;
 	}
 	
-	public void setCounts(Map<String, Integer> counts) {
-		this.counts = counts;
+	public void setEntityCounts(List<Integer> counts) {
+		this.entityCounts = counts;
 	}
 	
 }

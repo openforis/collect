@@ -8,7 +8,6 @@ import static org.junit.Assert.fail;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.Arrays;
 import java.util.GregorianCalendar;
 import java.util.List;
 
@@ -19,10 +18,8 @@ import org.junit.runner.RunWith;
 import org.openforis.collect.model.CollectAttributeMetadata;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
-import org.openforis.collect.model.RecordSummary;
 import org.openforis.collect.persistence.xml.CollectIdmlBindingContext;
 import org.openforis.idm.metamodel.EntityDefinition;
-import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.xml.InvalidIdmlException;
 import org.openforis.idm.metamodel.xml.SurveyUnmarshaller;
@@ -122,22 +119,20 @@ public class ModelDAOIntegrationTest {
 	}
 
 	private CollectRecord createTestRecord(Survey survey) {
-		CollectRecord record = new CollectRecord(survey, "cluster", "2.0");
+		CollectRecord record = new CollectRecord(survey, "2.0");
+		Entity cluster = record.createRootEntity("cluster");
 		record.setCreationDate(new GregorianCalendar(2011, 12, 31, 23, 59).getTime());
 		//record.setCreatedBy("ModelDAOIntegrationTest");
 		record.setStep(Step.ENTRY);
-		Entity cluster = record.getRootEntity();
 		String id = "123_456";
 		
 		addTestValues(cluster, id);
 			
 		//set counts
-		EntityDefinition plotDef = (EntityDefinition) cluster.getDefinition().getChildDefinition("plot");
-		record.getCounts().put(plotDef.getPath(), 2);
+		record.getEntityCounts().add(2);
 		
 		//set keys
-		NodeDefinition idDef = cluster.getDefinition().getChildDefinition("id");
-		record.getKeys().put(idDef.getPath(), id);
+		record.getRootEntityKeys().add(id);
 		
 		return record;
 	}
@@ -201,12 +196,11 @@ public class ModelDAOIntegrationTest {
 		int maxNumberOfRecords = 1;
 		String orderByFieldName = "key_id";
 		String filter = null;
-		EntityDefinition plotDefn = (EntityDefinition) rootEntity.getChildDefinition("plot");
-		List<RecordSummary> list = this.recordDao.loadSummaries(survey, rootEntityName, Arrays.asList(plotDefn), offset, maxNumberOfRecords, orderByFieldName, filter);
+		List<CollectRecord> list = this.recordDao.loadSummaries(survey, rootEntityName, offset, maxNumberOfRecords, orderByFieldName, filter);
 		assertNotNull(list);
 		assertEquals(1, list.size());
 		
-		RecordSummary summary = list.get(0);
-		assertEquals(1, summary.getStep());
+		CollectRecord summary = list.get(0);
+		assertEquals(Step.ENTRY, summary.getStep());
 	}
 }

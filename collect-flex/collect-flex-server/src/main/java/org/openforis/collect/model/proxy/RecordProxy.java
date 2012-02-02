@@ -4,6 +4,7 @@
 package org.openforis.collect.model.proxy;
 
 import java.util.Date;
+import java.util.List;
 
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.collect.Proxy;
@@ -91,16 +92,30 @@ public class RecordProxy implements Proxy {
 
 	@ExternalizedProperty
 	public EntityProxy getRootEntity() {
-		return new EntityProxy(record.getRootEntity());
+		if(record.getRootEntity() != null) {
+			return new EntityProxy(record.getRootEntity());
+		} else {
+			return null;
+		}
 	}
 
 	@ExternalizedProperty
 	public ModelVersionProxy getVersion() {
-		return new ModelVersionProxy(record.getVersion());
+		if(record.getVersion() != null) {
+			return new ModelVersionProxy(record.getVersion());
+		} else {
+			return null;
+		}
 	}
 
-	// public Node<? extends NodeDefinition> getNodeById(int id) {
-	// return record.getNodeById(id);
-	// }
+	@ExternalizedProperty
+	public List<String> getRootEntityKeys() {
+		return record.getRootEntityKeys();
+	}
+
+	@ExternalizedProperty
+	public List<Integer> getEntityCounts() {
+		return record.getEntityCounts();
+	}
 
 }

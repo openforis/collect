@@ -118,26 +118,30 @@ package org.openforis.collect.ui {
 			var columns:IList = new ArrayList();
 			var column:GridColumn;
 			//key attributes columns
+			var position:int = 1;
 			var keyAttributeDefs:IList = rootEntity.keyAttributeDefinitions;
 			for each(var keyAttributeDef:AttributeDefinitionProxy in keyAttributeDefs) {
 				column = new GridColumn();
 				column.headerText = keyAttributeDef.getLabelText();
 				column.labelFunction = RecordSummaryDataGrid.recordSummariesKeyLabelFunction;
-				column.dataField = "key_" + keyAttributeDef.name;
+				column.dataField = "key" + position;
 				columns.addItem(column);
+				position ++;
 			}
 			//count entity columns
 			var firstLevelDefs:IList = rootEntity.childDefinitions;
+			position = 1;
 			for each(var nodeDef:NodeDefinitionProxy in firstLevelDefs) {
 				if(nodeDef is EntityDefinitionProxy) {
 					var entityDef:EntityDefinitionProxy = EntityDefinitionProxy(nodeDef);
 					if(entityDef.countInSummaryList) {
 						column = new GridColumn();
 						column.headerText = Message.get("list.headerCount", [entityDef.getLabelText()]);
-						column.dataField = "count_" +entityDef.name;
+						column.dataField = "count" + position;
 						column.labelFunction = RecordSummaryDataGrid.recordSummariesCountEntityLabelFunction;
 						column.width = 150;
 						columns.addItem(column);
+						position ++;
 					}
 				}
 			}

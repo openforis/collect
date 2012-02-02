@@ -6,21 +6,13 @@
  */
 
 package org.openforis.collect.model.proxy {
+	import mx.collections.IList;
+	
 	import org.granite.collections.IMap;
 
     [Bindable]
     [RemoteClass(alias="org.openforis.collect.model.proxy.RecordProxy")]
     public class RecordProxy extends RecordProxyBase {
 		
-		private var _rootEntityKeys:IMap;
-		
-		public function get rootEntityKeys():IMap {
-			return _rootEntityKeys;
-		}
-
-		public function set rootEntityKeys(value:IMap):void {
-			_rootEntityKeys = value;
-		}
-
     }
 }

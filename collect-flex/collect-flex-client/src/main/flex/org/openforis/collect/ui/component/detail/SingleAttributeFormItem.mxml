@@ -9,6 +9,7 @@
 			import mx.binding.utils.BindingUtils;
 			
 			import org.openforis.collect.ui.UIBuilder;
+			import org.openforis.collect.ui.component.input.CodeInputField;
 			import org.openforis.collect.ui.component.input.InputField;
 			
 			override protected function createChildren():void {
@@ -19,6 +20,11 @@
 					
 					//bind input field attribute to the same instance of this
 					BindingUtils.bindProperty(inputField, "attribute", this, "attribute");
+					
+					if(attributeDefinition != null && attributeDefinition.multiple && 
+						inputField is CodeInputField) {
+						BindingUtils.bindProperty(inputField, "attributes", this, "attributes");
+					}
 					
 					addElement(inputField);
 					childrenAdded = true;

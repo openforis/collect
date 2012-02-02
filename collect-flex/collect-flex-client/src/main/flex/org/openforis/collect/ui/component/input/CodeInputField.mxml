@@ -6,13 +6,25 @@
 				  >
 	<fx:Script>
 		<![CDATA[
+			import mx.collections.IList;
+			
 			import org.openforis.collect.presenter.CodeInputFieldPresenter;
 			import org.openforis.collect.ui.Images;
 
+			private var _attributes:IList;
+			
 			override protected function initPresenter():void {
 				this.presenter = new CodeInputFieldPresenter(this);
 			}
-
+			
+			[Bindable]
+			public function get attributes():IList {
+				return _attributes;
+			}
+			
+			public function set attributes(value:IList):void {
+				_attributes = value;
+			}
 		]]>
 	</fx:Script>
 	

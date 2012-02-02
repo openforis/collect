@@ -6,8 +6,6 @@ package org.openforis.collect.presenter {
 	import flash.events.Event;
 	import flash.events.MouseEvent;
 	
-	import mx.collections.IList;
-	import mx.events.IndexChangedEvent;
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.events.ResultEvent;
 	
@@ -15,13 +13,13 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.client.DataClient;
 	import org.openforis.collect.event.UIEvent;
-	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
 	import org.openforis.collect.model.proxy.RecordProxy;
 	import org.openforis.collect.ui.UIBuilder;
 	import org.openforis.collect.ui.component.detail.FormContainer;
 	import org.openforis.collect.ui.view.DetailView;
+	import org.openforis.collect.util.StringUtil;
 
 	public class DetailPresenter extends AbstractPresenter {
 	
@@ -47,11 +45,8 @@ package org.openforis.collect.presenter {
 			var activeRecord:RecordProxy = Application.activeRecord;
 			var activeRootEntity:EntityDefinitionProxy = Application.activeRootEntity;
 			
-			var keyValues:String = "";
-			var keyAttributeDefinitions:IList = activeRootEntity.keyAttributeDefinitions;
-			for each (var k:AttributeDefinitionProxy in keyAttributeDefinitions) {
-				keyValues += activeRecord.rootEntityKeys.get(k.name);
-			}
+			var keys:Array = activeRecord.rootEntityKeys.toArray();
+			var keyValues:String = StringUtil.concat(", ", keys);
 			
 			var version:ModelVersionProxy = activeRecord.version;
 			_view.keyAttributeValuesText.text = keyValues;

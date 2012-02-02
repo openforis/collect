@@ -4,8 +4,7 @@ package org.openforis.collect.ui.component.datagrid
 	import mx.collections.IList;
 	import mx.core.ClassFactory;
 	
-	import org.granite.collections.IMap;
-	import org.openforis.collect.model.RecordSummary;
+	import org.openforis.collect.model.proxy.RecordProxy;
 	
 	import spark.components.DataGrid;
 	import spark.components.gridClasses.GridColumn;
@@ -48,11 +47,11 @@ package org.openforis.collect.ui.component.datagrid
 		}
 		
 		public static function recordSummariesKeyLabelFunction(item:Object, gridColumn:GridColumn):String {
-			return mapFieldLabelFunction(item, gridColumn, "rootEntityKeys", "key_");
+			return listFieldLabelFunction(item, gridColumn, "rootEntityKeys", "key");
 		}
 		
 		public static function recordSummariesCountEntityLabelFunction(item:Object, gridColumn:GridColumn):String {
-			return mapFieldLabelFunction(item, gridColumn, "entityCounts", "count_");
+			return listFieldLabelFunction(item, gridColumn, "entityCounts", "count");
 		}
 		
 		public static function numberLabelFunction(item:Object, gridColumn:GridColumn):String {
@@ -66,15 +65,18 @@ package org.openforis.collect.ui.component.datagrid
 			return "";
 		}
 		
-		private static function mapFieldLabelFunction(item:Object, gridColumn:GridColumn, mapFieldName:String, dataFieldPrefix:String):String {
-			var recordSummary:RecordSummary = item as RecordSummary;
-			var map:IMap = recordSummary[mapFieldName];
+		private static function listFieldLabelFunction(item:Object, gridColumn:GridColumn, listFieldName:String, dataFieldPrefix:String):String {
+			var recordSummary:RecordProxy = item as RecordProxy;
+			var list:IList = recordSummary[listFieldName];
 			var dataField:String = gridColumn.dataField;
 			if(dataField.indexOf(dataFieldPrefix) == 0) {
-				var key:String = dataField.substring(dataFieldPrefix.length);
-				var value:Object = map.get(key);
-				if((value is Number && !isNaN(Number(value))) || value != null) {
-					return String(value);
+				var posText:String = dataField.substring(dataFieldPrefix.length);
+				var position:int = int(posText);
+				if(position < list.length) {
+					var value:Object = list.getItemAt(position - 1);
+					if((value is Number && !isNaN(Number(value))) || value != null) {
+						return String(value);
+					}
 				}
 			}
 			return "";
