@@ -25,8 +25,11 @@ public class TaxonomyDAO extends MappingJooqDaoSupport<Taxonomy, TaxonomyDAO.Joo
 	public Taxonomy load(String name) {
 		JooqFactory jf = getMappingJooqFactory();
 		Record r = jf.selectByFieldQuery(TAXONOMY.NAME, name).fetchOne();
-		Taxonomy t = jf.fromRecord(r);
-		return t;
+		if ( r == null ) {
+			return null;
+		} else {
+			return jf.fromRecord(r);
+		}
 	}
 	
 	protected static class JooqFactory extends MappingJooqFactory<Taxonomy> {

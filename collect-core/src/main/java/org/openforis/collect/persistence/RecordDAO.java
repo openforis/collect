@@ -18,7 +18,6 @@ import org.jooq.UpdateSetMoreStep;
 import org.jooq.impl.Factory;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
-import org.openforis.collect.model.RecordSummary;
 import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.jooq.DataLoader;
 import org.openforis.collect.persistence.jooq.DataPersister;
@@ -152,7 +151,8 @@ public class RecordDAO extends JooqDaoSupport {
 		}
 		String rootEntityName = rootEntityDefn.getName();
 
-		CollectRecord record = new CollectRecord(survey, rootEntityName, version);
+		CollectRecord record = new CollectRecord(survey, version);
+		record.createRootEntity(rootEntityName);
 		
 		mapRecordToCollectRecord(r, record);
 		
@@ -160,7 +160,7 @@ public class RecordDAO extends JooqDaoSupport {
 	}
 
 	@Transactional
-	public List<RecordSummary> loadSummaries(Survey survey, String rootEntity, int offset, int maxRecords, String orderByField, String filter) {
+	public List<CollectRecord> loadSummaries(Survey survey, String rootEntity, int offset, int maxRecords, String orderByField, String filter) {
 		Factory jf = getJooqFactory();
 		org.openforis.collect.persistence.jooq.tables.Record r = RECORD.as("r");
 		
@@ -222,24 +222,25 @@ public class RecordDAO extends JooqDaoSupport {
 		//fetch results
 		Result<Record> records = q.fetch();
 		
-		List<RecordSummary> result = mapRecordsToSummaries(records, survey, rootEntity);
+		List<CollectRecord> result = mapRecordsToSummaries(records, survey, rootEntity);
 		return result;
 	}
 	
-	private List<RecordSummary> mapRecordsToSummaries(List<Record> records, Survey survey, String rootEntity) {
-		List<RecordSummary> result = new ArrayList<RecordSummary>();
+	private List<CollectRecord> mapRecordsToSummaries(List<Record> records, Survey survey, String rootEntity) {
+		List<CollectRecord> result = new ArrayList<CollectRecord>();
 		
 		for (Record r : records) {
 			String versionName = r.getValue(RECORD.MODEL_VERSION);
 			
-			RecordSummary summary = new RecordSummary(survey, rootEntity, versionName);
+			CollectRecord record = new CollectRecord(survey, versionName);
 			
-			mapRecordToCollectRecord(r, summary);
+			mapRecordToCollectRecord(r, record);
 			
-			result.add(summary);
+			result.add(record);
 		}
 		return result;
 	}
+	
 	private void loadData(CollectRecord record) throws DataInconsistencyException {
 		DataLoader loader = new DataLoader(getJooqFactory());
 		loader.load(record);
@@ -269,27 +270,27 @@ public class RecordDAO extends JooqDaoSupport {
 				.set(RECORD.WARNINGS, record.getWarnings())
 				;
 		//set keys
-		switch(record.getKeys().size()) {
+		switch(record.getRootEntityKeys().size()) {
 			case 3:
-				setStep.set(RECORD.KEY3, record.getKeys().get(2));
+				setStep.set(RECORD.KEY3, record.getRootEntityKeys().get(2));
 			case 2:
-				setStep.set(RECORD.KEY3, record.getKeys().get(1));
+				setStep.set(RECORD.KEY3, record.getRootEntityKeys().get(1));
 			case 1:
-				setStep.set(RECORD.KEY1, record.getKeys().get(0));
+				setStep.set(RECORD.KEY1, record.getRootEntityKeys().get(0));
 				break;
 		}
 		//set counts
-		switch(record.getCounts().size()) {
+		switch(record.getEntityCounts().size()) {
 			case 5:
-				setStep.set(RECORD.COUNT5, record.getCounts().get(4));
+				setStep.set(RECORD.COUNT5, record.getEntityCounts().get(4));
 			case 4:
-				setStep.set(RECORD.COUNT4, record.getCounts().get(3));
+				setStep.set(RECORD.COUNT4, record.getEntityCounts().get(3));
 			case 3:
-				setStep.set(RECORD.COUNT3, record.getCounts().get(2));
+				setStep.set(RECORD.COUNT3, record.getEntityCounts().get(2));
 			case 2:
-				setStep.set(RECORD.COUNT2, record.getCounts().get(1));
+				setStep.set(RECORD.COUNT2, record.getEntityCounts().get(1));
 			case 1:
-				setStep.set(RECORD.COUNT1, record.getCounts().get(0));
+				setStep.set(RECORD.COUNT1, record.getEntityCounts().get(0));
 				break;
 		}
 		setStep.execute();
@@ -322,27 +323,27 @@ public class RecordDAO extends JooqDaoSupport {
 				.set(RECORD.WARNINGS, record.getWarnings())
 				;
 		//set keys
-		switch(record.getKeys().size()) {
+		switch(record.getRootEntityKeys().size()) {
 			case 3:
-				setStep.set(RECORD.KEY3, record.getKeys().get(2));
+				setStep.set(RECORD.KEY3, record.getRootEntityKeys().get(2));
 			case 2:
-				setStep.set(RECORD.KEY3, record.getKeys().get(1));
+				setStep.set(RECORD.KEY3, record.getRootEntityKeys().get(1));
 			case 1:
-				setStep.set(RECORD.KEY1, record.getKeys().get(0));
+				setStep.set(RECORD.KEY1, record.getRootEntityKeys().get(0));
 				break;
 		}
 		//set counts
-		switch(record.getCounts().size()) {
+		switch(record.getEntityCounts().size()) {
 			case 5:
-				setStep.set(RECORD.COUNT5, record.getCounts().get(4));
+				setStep.set(RECORD.COUNT5, record.getEntityCounts().get(4));
 			case 4:
-				setStep.set(RECORD.COUNT4, record.getCounts().get(3));
+				setStep.set(RECORD.COUNT4, record.getEntityCounts().get(3));
 			case 3:
-				setStep.set(RECORD.COUNT3, record.getCounts().get(2));
+				setStep.set(RECORD.COUNT3, record.getEntityCounts().get(2));
 			case 2:
-				setStep.set(RECORD.COUNT2, record.getCounts().get(1));
+				setStep.set(RECORD.COUNT2, record.getEntityCounts().get(1));
 			case 1:
-				setStep.set(RECORD.COUNT1, record.getCounts().get(0));
+				setStep.set(RECORD.COUNT1, record.getEntityCounts().get(0));
 				break;
 		}
 		setStep.where(RECORD.ID.equal(recordId))
@@ -375,6 +376,7 @@ public class RecordDAO extends JooqDaoSupport {
 		});
 	}
 	
+	//TODO move to a Mapper class
 	private void mapRecordToCollectRecord(Record r, CollectRecord collectRecord) {
 		collectRecord.setId(r.getValue(RECORD.ID));
 		collectRecord.setCreationDate(r.getValue(RECORD.DATE_CREATED));
@@ -389,7 +391,7 @@ public class RecordDAO extends JooqDaoSupport {
 		
 		Integer step = r.getValue(RECORD.STEP);
 		if(step != null) {
-			collectRecord.setStep(Step.valueOf(step.toString()));
+			collectRecord.setStep(Step.valueOf(step));
 		}
 		
 		//create list of entity counts
@@ -406,7 +408,7 @@ public class RecordDAO extends JooqDaoSupport {
 		count = r.getValue(RECORD.COUNT5);
 		counts.add(count);
 		
-		collectRecord.setCounts(counts);
+		collectRecord.setEntityCounts(counts);
 		
 		//create list of keys
 		List<String> keys = new ArrayList<String>();

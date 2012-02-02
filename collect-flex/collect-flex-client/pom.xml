@@ -80,7 +80,6 @@
 <!-- 								<includeClass>org.openforis.collect.model.**</includeClass> -->
 <!-- 								<includeClass>org.openforis.idm.model.**</includeClass> -->
 								<includeClass>org.openforis.collect.model.SurveySummary</includeClass>
-								<includeClass>org.openforis.collect.model.RecordSummary</includeClass>
 								<includeClass>org.openforis.collect.model.UITab</includeClass>
 								<includeClass>org.openforis.collect.model.UIConfiguration</includeClass>
 								<includeClass>org.openforis.collect.metamodel.proxy.*</includeClass>

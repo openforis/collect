@@ -30,8 +30,11 @@ public class MappingJooqDaoSupport<E, J extends MappingJooqFactory<E>> extends J
 	public E load(int id) {
 		J jf = getMappingJooqFactory();
 		Record r = jf.selectByIdQuery(id).fetchOne();
-		E t = jf.fromRecord(r);
-		return t;
+		if ( r == null ) {
+			return null;
+		} else {
+			return jf.fromRecord(r);
+		}
 	}
 	
 	@Transactional

@@ -10,13 +10,13 @@ import org.jooq.impl.Factory;
 /**
  * @author G. Miceli
  */
-public class CollectJooqFactory extends Factory {
+public class DialectAwareJooqFactory extends Factory {
 	
 	private static final long serialVersionUID = 1L;
 	private static final String POSTGRESQL_DBNAME = "PostgreSQL";
 	private static final String APACHE_DERBY_DBNAME = "Apache Derby";
 
-	public CollectJooqFactory(Connection connection) {
+	public DialectAwareJooqFactory(Connection connection) {
 		super(connection, getDialect(connection));
 	}
 

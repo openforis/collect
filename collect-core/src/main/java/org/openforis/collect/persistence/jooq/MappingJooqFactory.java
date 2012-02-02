@@ -15,7 +15,7 @@ import org.jooq.UpdateQuery;
 /**
  * @author G. Miceli
  */
-public abstract class MappingJooqFactory<E> extends CollectJooqFactory {
+public abstract class MappingJooqFactory<E> extends DialectAwareJooqFactory {
 	private static final long serialVersionUID = 1L;
 	
 	private TableField<?,Integer> idField;

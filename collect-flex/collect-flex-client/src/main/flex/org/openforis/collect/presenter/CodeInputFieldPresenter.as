@@ -9,13 +9,15 @@ package org.openforis.collect.presenter {
 	import mx.events.CloseEvent;
 	import mx.managers.PopUpManager;
 	import mx.rpc.events.ResultEvent;
-	import mx.utils.StringUtil;
 	
+	import org.openforis.collect.metamodel.proxy.CodeAttributeDefinitionProxy;
 	import org.openforis.collect.model.proxy.AttributeProxy;
 	import org.openforis.collect.model.proxy.CodeProxy;
 	import org.openforis.collect.ui.component.input.CodeInputField;
 	import org.openforis.collect.ui.component.input.CodeListItem;
 	import org.openforis.collect.ui.component.input.TextInput;
+	import org.openforis.collect.util.StringUtil;
+	import org.openforis.collect.metamodel.proxy.CodeListProxy;
 	
 	/**
 	 * 
@@ -60,15 +62,22 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function loadCodes():void {
-			_view.popup.currentState = "loading";
+			//_view.popup.currentState = "loading";
 			
 			//call service method
-			setTimeout(loadListDialogDataResultHandler, 1000);
+			//setTimeout(loadListDialogDataResultHandler, 1000);
+			
+			var codeAttributeDef:CodeAttributeDefinitionProxy = _view.attributeDefinition as CodeAttributeDefinitionProxy;
+			var list:CodeListProxy = codeAttributeDef.list;
+			var parentExpression:String = codeAttributeDef.parentExpression;
+			trace(parentExpression);
+			
 		}
 		
 		protected function loadListDialogDataResultHandler(event:ResultEvent = null):void {
 			//var data:ArrayCollection = event.result as ArrayCollection
 			//test data
+			/*
 			var data:ArrayCollection = new ArrayCollection();
 			for(var index:int = 0; index < 9; index ++) {
 				data.addItem(new CodeListItem(
@@ -79,6 +88,7 @@ package org.openforis.collect.presenter {
 			}
 			data.addItem(new CodeListItem("999", "Other", true, true, "Test"));
 			_view.popup.dataGroup.dataProvider = data;
+			*/
 			_view.popup.currentState = "default";
 		}
 
@@ -95,13 +105,24 @@ package org.openforis.collect.presenter {
 		override protected function get textValue():String {
 			if(_view.attributeDefinition != null) {
 				if(_view.attributeDefinition.multiple) {
-					//todo
+					if(_view.attributes) {
+						var parts:Array = new Array();
+						for each (var attribute:AttributeProxy in _view.attributes) {
+							var value:CodeProxy = _view.attribute.value as CodeProxy;
+							if(value != null) {
+								var part:String = value.toString();
+								parts.push(part);
+							}
+						}
+						var result:String = org.openforis.collect.util.StringUtil.concat(", ", parts);
+						return result;
+					}
 				} else {
 					if(_view.attribute != null) {
 						var value:CodeProxy = _view.attribute.value as CodeProxy;
 						if(value != null) {
-							var code:String = value.code;
-							return code;
+							var text:String = value.toString();
+							return text;
 						}
 					}
 				}

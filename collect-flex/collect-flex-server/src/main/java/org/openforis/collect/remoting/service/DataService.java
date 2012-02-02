@@ -11,7 +11,6 @@ import java.util.Map;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.model.CollectRecord;
-import org.openforis.collect.model.RecordSummary;
 import org.openforis.collect.model.User;
 import org.openforis.collect.model.proxy.RecordProxy;
 import org.openforis.collect.persistence.AccessDeniedException;
@@ -24,7 +23,6 @@ import org.openforis.collect.remoting.service.UpdateRequest.Method;
 import org.openforis.collect.session.SessionState;
 import org.openforis.collect.session.SessionState.RecordState;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
-import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.ModelVersion;
@@ -32,7 +30,8 @@ import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.model.Attribute;
-import org.openforis.idm.model.Code;
+import org.openforis.idm.model.CodeAttribute;
+import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.Record;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,9 +78,13 @@ public class DataService {
 		EntityDefinition rootEntityDefinition = schema.getRootEntityDefinition(rootEntityName);
 		String rootEntityDefinitionName = rootEntityDefinition.getName();
 		int count = recordManager.getCountRecords(rootEntityDefinition);
-		List<RecordSummary> list = recordManager.getSummaries(activeSurvey, rootEntityDefinitionName, offset, maxNumberOfRows, orderByFieldName, filter);
+		List<CollectRecord> summaries = recordManager.getSummaries(activeSurvey, rootEntityDefinitionName, offset, maxNumberOfRows, orderByFieldName, filter);
+		List<RecordProxy> proxies = new ArrayList<RecordProxy>();
+		for (CollectRecord summary : summaries) {
+			proxies.add(new RecordProxy(summary));
+		}
 		result.put("count", count);
-		result.put("records", list);
+		result.put("records", proxies);
 		return result;
 	}
 
@@ -200,7 +203,11 @@ public class DataService {
 	 */
 	public List<CodeListItem> findCodeListItemsById(Integer id, String ids) {
 		@SuppressWarnings("unchecked")
-		Attribute<? extends CodeAttributeDefinition, ? extends Code> code = (Attribute<? extends CodeAttributeDefinition, ? extends Code>) this.getActiveRecord().getNodeById(id);
+		CodeAttribute code = (CodeAttribute) this.getActiveRecord().getNodeById(id);
+		List<CodeListItem> codeList = findCodeList(id);
+		for (CodeListItem item : codeList) {
+			//TODO
+		}
 		return null;
 	}
 
@@ -227,6 +234,18 @@ public class DataService {
 		return items;
 	}
 
+	public List<CodeListItem> findCodeList(Integer parentId, String attributeName) {
+		List<CodeListItem> items = new ArrayList<CodeListItem>();
+		CollectRecord activeRecord = this.getActiveRecord();
+		Entity parentEntity = (Entity) activeRecord.getNodeById(parentId);
+		CodeListItem parent = findCodeListParent(parentEntity, attributeName);
+		List<CodeListItem> children = parent.getChildItems();
+		for (CodeListItem item : children) {
+			//TODO
+		}
+		return items;
+	}
+	
 	/**
 	 * Returns the code list item parent (see chooser popup of code list )
 	 * 
@@ -240,12 +259,26 @@ public class DataService {
 		}
 		return null;
 	}
-
-	private CodeListItem getCodeListItem(CodeList codeList, Object value) {
-		List<CodeListItem> items = codeList.getItems();
+	
+	public CodeListItem findCodeListParent(Entity parentEntity, String attributeName) {
+		EntityDefinition parentEntityDef = parentEntity.getDefinition();
+		NodeDefinition attributeDef = parentEntityDef.getChildDefinition(attributeName);
+		if(attributeDef instanceof CodeAttributeDefinition) {
+			CodeAttributeDefinition code = (CodeAttributeDefinition) attributeDef;
+			String parentExpression = code.getParentExpression();
+			//TODO apply expression and get parent CodeAttribute
+			Node<NodeDefinition> parentNode = null;
+			
+			CodeListItem parent = null;
+			return parent;
+		}
+		return null;
+	}
+	
+	private CodeListItem getCodeListItem(List<CodeListItem> items, String code) {
 		for (CodeListItem codeListItem : items) {
-			String code = codeListItem.getCode();
-			if (code.equals(value.toString())) {
+			String itemCode = codeListItem.getCode();
+			if (itemCode.equals(code)) {
 				return codeListItem;
 			}
 		}

@@ -3,6 +3,7 @@ package org.openforis.collect.persistence;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,7 +18,6 @@ import org.junit.runner.RunWith;
 import org.openforis.collect.model.CollectAttributeMetadata;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
-import org.openforis.collect.model.RecordSummary;
 import org.openforis.collect.persistence.xml.CollectIdmlBindingContext;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.Survey;
@@ -36,7 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @RunWith( SpringJUnit4ClassRunner.class )
 @ContextConfiguration( locations = {"classpath:test-context.xml"} )
-@TransactionConfiguration(defaultRollback=false)
+@TransactionConfiguration(defaultRollback=true)
 @Transactional
 public class ModelDAOIntegrationTest {
 	private final Log log = LogFactory.getLog(ModelDAOIntegrationTest.class);
@@ -58,8 +58,10 @@ public class ModelDAOIntegrationTest {
 			survey = importModel();
 		}
 		
+		testLoadAllSurveys("archenland1");
+
 		// SAVE NEW
-		CollectRecord record = createRecord(survey);
+		CollectRecord record = createTestRecord(survey);
 		recordDao.saveOrUpdate(record);
 		
 		String saved = record.toString();
@@ -81,6 +83,17 @@ public class ModelDAOIntegrationTest {
 //		} catch (DataAccessException ex){
 //			ex.getCause().getCause().getCause().printStackTrace();
 //		}
+	}
+
+	private void testLoadAllSurveys(String surveyName) {
+		List<Survey> list = this.surveyDao.loadAll();
+		assertNotNull(list);
+		for (Survey survey : list) {
+			if ( survey.getName().equals(surveyName) ) {
+				return;
+			}
+		}
+		fail(surveyName+" not loaded by surveyDao.loadAll()");
 	}
 	
 	@Test
@@ -105,13 +118,26 @@ public class ModelDAOIntegrationTest {
 		return survey;
 	}
 
-	private CollectRecord createRecord(Survey survey) {
-		CollectRecord record = new CollectRecord(survey, "cluster", "2.0");
+	private CollectRecord createTestRecord(Survey survey) {
+		CollectRecord record = new CollectRecord(survey, "2.0");
+		Entity cluster = record.createRootEntity("cluster");
 		record.setCreationDate(new GregorianCalendar(2011, 12, 31, 23, 59).getTime());
 		//record.setCreatedBy("ModelDAOIntegrationTest");
 		record.setStep(Step.ENTRY);
-		Entity cluster = record.getRootEntity();
 		String id = "123_456";
+		
+		addTestValues(cluster, id);
+			
+		//set counts
+		record.getEntityCounts().add(2);
+		
+		//set keys
+		record.getRootEntityKeys().add(id);
+		
+		return record;
+	}
+
+	private void addTestValues(Entity cluster, String id) {
 		cluster.addValue("id", new Code(id));
 		cluster.addValue("gps_realtime", Boolean.TRUE);
 		cluster.addValue("region", new Code("001"));
@@ -158,23 +184,9 @@ public class ModelDAOIntegrationTest {
 			tree2.addValue("dbh", 85.8);
 			tree2.addValue("total_height", 4.0);
 		}
-		//set counts
-		record.getEntityCounts().add(2);
-		//set keys
-		record.getRootEntityKeys().add(id);
-		//System.err.println(record);
-		return record;
 	}
 
-	@Test
-	public void testLoadAllSurvey(){
-		List<Survey> list = this.surveyDao.loadAll();
-		assertNotNull(list);
-		assertEquals(1, list.size());
-		
-	}
-	
-	@Test
+//	@Test
 	public void testLoadRecordSummaries() {
 		Survey survey = surveyDao.load("archenland1");
 		//get the first root entity
@@ -184,11 +196,11 @@ public class ModelDAOIntegrationTest {
 		int maxNumberOfRecords = 1;
 		String orderByFieldName = "key_id";
 		String filter = null;
-		List<RecordSummary> list = this.recordDao.loadSummaries(survey, rootEntityName, offset, maxNumberOfRecords, orderByFieldName, filter);
+		List<CollectRecord> list = this.recordDao.loadSummaries(survey, rootEntityName, offset, maxNumberOfRecords, orderByFieldName, filter);
 		assertNotNull(list);
 		assertEquals(1, list.size());
 		
-		RecordSummary summary = list.get(0);
+		CollectRecord summary = list.get(0);
 		assertEquals(Step.ENTRY, summary.getStep());
 	}
 }

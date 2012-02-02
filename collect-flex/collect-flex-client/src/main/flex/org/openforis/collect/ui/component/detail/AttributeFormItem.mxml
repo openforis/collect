@@ -11,6 +11,7 @@
 	
 	<fx:Script>
 		<![CDATA[
+			import mx.collections.IList;
 			import mx.core.IVisualElementContainer;
 			
 			import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
@@ -22,6 +23,8 @@
 			private var _attributeDefinition:AttributeDefinitionProxy;
 
 			private var _attribute:AttributeProxy;
+			
+			private var _attributes:IList;
 			
 			private var _childrenAdded:Boolean = false;
 			
@@ -70,7 +73,10 @@
 				_parentEntity = value;
 				
 				if(value != null && attributeDefinition != null) {
-					if(! attributeDefinition.multiple) {
+					if(attributeDefinition.multiple) {
+						var attributes:IList = _parentEntity.getChildren(attributeDefinition.name);
+						this.attributes = attributes;
+					} else {
 						var attribute:AttributeProxy = _parentEntity.getSingleAttribute(attributeDefinition.name);
 						this.attribute = attribute;
 					}
@@ -84,6 +90,15 @@
 
 			public function set attribute(value:AttributeProxy):void {
 				_attribute = value;
+			}
+
+			[Bindable]
+			public function get attributes():IList {
+				return _attributes;
+			}
+
+			public function set attributes(value:IList):void {
+				_attributes = value;
 			}
 
 

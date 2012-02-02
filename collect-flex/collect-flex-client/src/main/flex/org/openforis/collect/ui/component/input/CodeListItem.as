@@ -9,8 +9,7 @@ package org.openforis.collect.ui.component.input
 		public var qualifiable:Boolean;
 		public var qualifier:String;
 		
-		public function CodeListItem(code:String = null, label:String = null, selected:Boolean = false, qualifiable:Boolean = false, qualifier:String = null)
-		{
+		public function CodeListItem(code:String = null, label:String = null, selected:Boolean = false, qualifiable:Boolean = false, qualifier:String = null) {
 			this.code = code;
 			this.label = label;
 			this.selected = selected;

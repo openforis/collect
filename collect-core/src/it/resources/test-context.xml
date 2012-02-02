@@ -18,7 +18,7 @@
     <context:annotation-config/>
     
     <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-		<property name="location" value="file://${user.dir}/dev.properties"/>
+		<property name="location" value="file:${user.dir}/dev.properties"/>
     </bean>
      
 	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">

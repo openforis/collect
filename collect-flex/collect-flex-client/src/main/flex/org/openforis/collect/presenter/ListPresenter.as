@@ -19,7 +19,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.client.DataClient;
 	import org.openforis.collect.event.UIEvent;
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
-	import org.openforis.collect.model.RecordSummary;
+	import org.openforis.collect.model.proxy.RecordProxy;
 	import org.openforis.collect.ui.UIBuilder;
 	import org.openforis.collect.ui.component.AddRecordPopUp;
 	import org.openforis.collect.ui.component.datagrid.PaginationBar;
@@ -100,7 +100,7 @@ package org.openforis.collect.presenter {
 		 * Edit Button clicked 
 		 * */
 		protected function editButtonClickHandler(event:MouseEvent):void {
-			var selectedRecord:RecordSummary = _view.dataGrid.selectedItem as RecordSummary;
+			var selectedRecord:RecordProxy = _view.dataGrid.selectedItem as RecordProxy;
 			if(selectedRecord != null) {
 				var uiEvent:UIEvent = new UIEvent(UIEvent.RECORD_SELECTED);
 				uiEvent.obj = selectedRecord;
@@ -114,7 +114,7 @@ package org.openforis.collect.presenter {
 		 * Delete Button clicked 
 		 * */
 		protected function deleteButtonClickHandler(event:MouseEvent):void {
-			var selectedRecord:RecordSummary = _view.dataGrid.selectedItem as RecordSummary;
+			var selectedRecord:RecordProxy = _view.dataGrid.selectedItem as RecordProxy;
 			if(selectedRecord != null) {
 				AlertUtil.showConfirm("list.delete.confirm", "list.delete.confirmTitle", executeDelete);
 				
@@ -160,6 +160,8 @@ package org.openforis.collect.presenter {
 			totalPages = Math.ceil(totalRecords / MAX_RECORDS_PER_PAGE);
 			
 			_view.dataGrid.dataProvider = records;
+			
+			_view.currentState = ListView.DEFAULT_STATE;
 			
 			updatePaginationBar();
 		}

@@ -17,7 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @RunWith( SpringJUnit4ClassRunner.class )
 @ContextConfiguration( locations = {"classpath:test-context.xml"} )
-@TransactionConfiguration(defaultRollback=false)
+@TransactionConfiguration(defaultRollback=true)
 @Transactional
 public class SpeciesDAOIntegrationTest {
 //	private final Log log = LogFactory.getLog(ModelDAOIntegrationTest.class);
@@ -31,16 +31,22 @@ public class SpeciesDAOIntegrationTest {
 	@Test
 	public void testCRUD() throws Exception  {
 		// Create taxonomy
-		Taxonomy taxonomy1 = testInsertAndLoadTaxonomy("bamboo");
-		testUpdateAndLoadTaxonomy(taxonomy1, "trees");
+		Taxonomy taxonomy1 = testInsertAndLoadTaxonomy("it_bamboo");
+		testUpdateAndLoadTaxonomy(taxonomy1, "it_trees");
 		
 		// Create taxa
-		Taxon taxon1 = testInsertAndLoadTaxon(taxonomy1, "Juglandaceae", "family", null);
-		Taxon taxon2 = testInsertAndLoadTaxon(taxonomy1, "Juglans sp.", "genus", taxon1.getId());
+		Taxon taxon1 = testInsertAndLoadTaxon(taxonomy1, "Juglandaceaex", "familyx", null);
+		Taxon taxon2 = testInsertAndLoadTaxon(taxonomy1, "sJuglans sp.", "sadgenus", null);
+		taxon2 = testUpdateAndLoadTaxon(taxon2, "Juglans sp.", "family", taxon1.getId());
 		Taxon taxon3 = testInsertAndLoadTaxon(taxonomy1, "Juglans regia", "species", taxon2.getId());
 		
+		// Remove taxa
+		testDeleteAndLoadTaxon(taxon3);
+		testDeleteAndLoadTaxon(taxon2);
+		testDeleteAndLoadTaxon(taxon1);
+
 		// Remove taxonomy
-//		testDeleteAndLoadTaxonomy(taxonomy1);
+		testDeleteAndLoadTaxonomy(taxonomy1);
 	}
 
 	private Taxonomy testInsertAndLoadTaxonomy(String name) {
@@ -78,12 +84,41 @@ public class SpeciesDAOIntegrationTest {
 		
 		// Confirm saved
 		t = taxonDao.load(t.getId());
+		assertNotNull(t);
 		assertEquals(scientificName, t.getScientificName());
 		assertEquals(rank, t.getTaxonomicRank());
 		assertEquals(taxonomy.getId(), t.getTaxonomyId());
 		assertEquals(9, t.getStep());
 		assertEquals(parentId, t.getParentId());
 		return t;
+	}
+
+	
+	private Taxon testUpdateAndLoadTaxon(Taxon t, String scientificName, String rank, Integer parentId) {
+		// Insert
+		t.setScientificName(scientificName);
+		t.setTaxonomicRank(rank);
+		t.setStep(9);
+		t.setParentId(parentId);
+		taxonDao.update(t);
+		
+		// Confirm saved
+		t = taxonDao.load(t.getId());
+		assertNotNull(t);
+		assertEquals(scientificName, t.getScientificName());
+		assertEquals(rank, t.getTaxonomicRank());
+		assertEquals(9, t.getStep());
+		assertEquals(parentId, t.getParentId());
+		return t;
+	}
+
+	private void testDeleteAndLoadTaxon(Taxon t) {
+		// Delete
+		taxonDao.delete(t.getId());
+		
+		// Confirm deleted
+		t = taxonDao.load(t.getId());
+		assertNull(t);
 	}
 
 	private void testDeleteAndLoadTaxonomy(Taxonomy t) {

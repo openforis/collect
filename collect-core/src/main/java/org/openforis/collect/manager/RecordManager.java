@@ -13,7 +13,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
-import org.openforis.collect.model.RecordSummary;
 import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.AccessDeniedException;
 import org.openforis.collect.persistence.DuplicateIdException;
@@ -84,13 +83,13 @@ public class RecordManager {
 	}
 
 	@Transactional
-	public List<RecordSummary> getSummaries(Survey survey, String rootEntity, int offset, int maxNumberOfRecords, String orderByFieldName, String filter) {
+	public List<CollectRecord> getSummaries(Survey survey, String rootEntity, int offset, int maxNumberOfRecords, String orderByFieldName, String filter) {
 		/*
 		Schema schema = survey.getSchema();
 		EntityDefinition rootEntityDefinition = schema.getRootEntityDefinition(rootEntity);
 		List<EntityDefinition> countableInList = getCountableInList(rootEntityDefinition);
 		*/
-		List<RecordSummary> recordsSummary = recordDAO.loadSummaries(survey, rootEntity, offset, maxNumberOfRecords, orderByFieldName, filter);
+		List<CollectRecord> recordsSummary = recordDAO.loadSummaries(survey, rootEntity, offset, maxNumberOfRecords, orderByFieldName, filter);
 		return recordsSummary;
 	}
 
@@ -104,7 +103,9 @@ public class RecordManager {
 	public CollectRecord create(Survey survey, EntityDefinition rootEntityDefinition, User user, String modelVersionName) throws MultipleEditException, AccessDeniedException, RecordLockedException {
 		recordDAO.checkLock(user);
 		
-		CollectRecord record = new CollectRecord(survey, rootEntityDefinition.getName(), modelVersionName);
+		CollectRecord record = new CollectRecord(survey, modelVersionName);
+		record.createRootEntity(rootEntityDefinition.getName());
+		
 		record.setCreationDate(new Date());
 		//record.setCreatedBy(user.getId());
 		record.setStep(Step.ENTRY);
@@ -175,7 +176,7 @@ public class RecordManager {
 			int count = rootEntity.getCount(path);
 			counts.add(count);
 		}
-		record.setCounts(counts);
+		record.setEntityCounts(counts);
 	}
 	
 	private void updateKeys(CollectRecord record) {
