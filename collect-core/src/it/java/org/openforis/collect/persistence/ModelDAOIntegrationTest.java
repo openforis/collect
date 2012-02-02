@@ -159,9 +159,9 @@ public class ModelDAOIntegrationTest {
 			tree2.addValue("total_height", 4.0);
 		}
 		//set counts
-		record.getCounts().add(2);
+		record.getEntityCounts().add(2);
 		//set keys
-		record.getKeys().add(id);
+		record.getRootEntityKeys().add(id);
 		//System.err.println(record);
 		return record;
 	}
@@ -189,6 +189,6 @@ public class ModelDAOIntegrationTest {
 		assertEquals(1, list.size());
 		
 		RecordSummary summary = list.get(0);
-		assertEquals(1, summary.getStep());
+		assertEquals(Step.ENTRY, summary.getStep());
 	}
 }
