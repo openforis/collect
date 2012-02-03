@@ -5,9 +5,8 @@
 	
 	<fx:Script>
 		<![CDATA[
+			import org.openforis.collect.Application;
 			import org.openforis.collect.i18n.Message;
-			
-			private const version:String = CONFIG::version;
 		]]>
 	</fx:Script>
 	
@@ -20,6 +19,6 @@
 	
 	<s:HGroup height="100%" width="100%" horizontalAlign="right">
 		<s:Label styleName="appVersionLabel" text="{Message.get('footer.versionLabel')}" />
-		<s:Label styleName="appVersionText" text="{version}" />
+		<s:Label styleName="appVersionText" text="{Application.VERSION}" />
 	</s:HGroup>
 </s:Group>

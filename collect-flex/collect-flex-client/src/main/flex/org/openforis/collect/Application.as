@@ -21,6 +21,10 @@ package org.openforis.collect {
 	 * */
 	public class Application {
 		
+		//compiler constants
+		public static const DEBUGGING:Boolean = CONFIG::debugging;
+		public static const VERSION:String = CONFIG::version;
+		
 		public static var SESSION_ID:String;
 
 		private static var _surveySummaries:IList;
