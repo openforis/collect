@@ -93,7 +93,7 @@
 			</s:layout> 
 			<s:itemRenderer>
 				<fx:Component>
-					<s:ItemRenderer>
+					<s:ItemRenderer autoDrawBackground="false">
 						<s:layout>
 							<s:HorizontalLayout gap="2"/>
 						</s:layout>

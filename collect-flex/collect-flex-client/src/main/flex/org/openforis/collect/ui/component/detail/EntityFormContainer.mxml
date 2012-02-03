@@ -51,6 +51,7 @@
 					var children:IList = _parentEntity.getChildren(_entityDefinition.name);
 					if(_entityDefinition.multiple) {
 						dropDownDataProvider = children;
+						internalContainer.visible = false;
 					}
 				}
 			}

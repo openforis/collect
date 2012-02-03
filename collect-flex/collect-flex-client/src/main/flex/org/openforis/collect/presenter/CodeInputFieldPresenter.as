@@ -4,6 +4,7 @@ package org.openforis.collect.presenter {
 	import flash.events.MouseEvent;
 	import flash.utils.setTimeout;
 	
+	import mx.binding.utils.ChangeWatcher;
 	import mx.collections.ArrayCollection;
 	import mx.core.FlexGlobals;
 	import mx.events.CloseEvent;
@@ -11,13 +12,13 @@ package org.openforis.collect.presenter {
 	import mx.rpc.events.ResultEvent;
 	
 	import org.openforis.collect.metamodel.proxy.CodeAttributeDefinitionProxy;
+	import org.openforis.collect.metamodel.proxy.CodeListProxy;
 	import org.openforis.collect.model.proxy.AttributeProxy;
 	import org.openforis.collect.model.proxy.CodeProxy;
 	import org.openforis.collect.ui.component.input.CodeInputField;
 	import org.openforis.collect.ui.component.input.CodeListItem;
 	import org.openforis.collect.ui.component.input.TextInput;
 	import org.openforis.collect.util.StringUtil;
-	import org.openforis.collect.metamodel.proxy.CodeListProxy;
 	
 	/**
 	 * 
@@ -42,6 +43,8 @@ package org.openforis.collect.presenter {
 			_view.popup.addEventListener(CloseEvent.CLOSE, closePopupHandler);
 			_view.popup.cancelButton.addEventListener(MouseEvent.CLICK, cancelButtonClickHandelr);
 			_view.popup.applyButton.addEventListener(MouseEvent.CLICK, applyButtonClickHandelr);
+			
+			ChangeWatcher.watch(_view, "attributes", attributeChangeHandler);
 		}
 		
 		/**
@@ -108,7 +111,7 @@ package org.openforis.collect.presenter {
 					if(_view.attributes) {
 						var parts:Array = new Array();
 						for each (var attribute:AttributeProxy in _view.attributes) {
-							var value:CodeProxy = _view.attribute.value as CodeProxy;
+							var value:CodeProxy = attribute.value as CodeProxy;
 							if(value != null) {
 								var part:String = value.toString();
 								parts.push(part);

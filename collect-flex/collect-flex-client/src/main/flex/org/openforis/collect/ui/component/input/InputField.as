@@ -138,10 +138,6 @@ package org.openforis.collect.ui.component.input {
 		
 		public function set attribute(value:AttributeProxy):void {
 			this._attribute = value;
-			
-			if(_presenter != null) {
-				_presenter.updateView();
-			}
 		}
 		
 		[Bindable]

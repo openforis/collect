@@ -29,6 +29,7 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.ui.component.datagrid.RecordSummaryDataGrid;
 	import org.openforis.collect.ui.component.datagroup.DataGroupItemRenderer;
 	import org.openforis.collect.ui.component.detail.AttributeFormItem;
+	import org.openforis.collect.ui.component.detail.CodeAttributeFormItem;
 	import org.openforis.collect.ui.component.detail.CollectFormItem;
 	import org.openforis.collect.ui.component.detail.CoordinateAttributeFormItem;
 	import org.openforis.collect.ui.component.detail.EntityFormContainer;
@@ -248,7 +249,9 @@ package org.openforis.collect.ui {
 		public static function getAttributeFormItem(definition:AttributeDefinitionProxy, isInDataGroup:Boolean = false):AttributeFormItem {
 			var formItem:AttributeFormItem = null;
 			
-			if(definition is CoordinateAttributeDefinitionProxy){
+			if(definition is CodeAttributeDefinitionProxy) {
+				formItem = new CodeAttributeFormItem();
+			} else if(definition is CoordinateAttributeDefinitionProxy){
 				//todo multiple
 				formItem = new CoordinateAttributeFormItem();
 			} else if(definition is TaxonAttributeDefinitionProxy){

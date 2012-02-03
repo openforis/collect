@@ -4,6 +4,7 @@ package org.openforis.collect.presenter {
 	import flash.events.FocusEvent;
 	import flash.events.MouseEvent;
 	
+	import mx.binding.utils.ChangeWatcher;
 	import mx.collections.ArrayList;
 	import mx.collections.IList;
 	import mx.core.UIComponent;
@@ -59,6 +60,12 @@ package org.openforis.collect.presenter {
 				_view.textInput.addEventListener(FocusEvent.FOCUS_OUT, focusOutHandler);
 				_view.textInput.addEventListener(FocusEvent.FOCUS_IN, focusInHandler);
 			}
+			
+			ChangeWatcher.watch(_view, "attribute", attributeChangeHandler);
+		}
+		
+		protected function attributeChangeHandler(event:Event):void {
+			updateView();
 		}
 		
 		protected function changeHandler(event:Event):void {
