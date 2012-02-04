@@ -18,6 +18,9 @@ public class CodeListItemProxy implements Proxy {
 
 	private transient CodeListItem codeListItem;
 
+	private Boolean selected;
+	private String qualifier;
+	
 	public CodeListItemProxy(CodeListItem codeListItem) {
 		super();
 		this.codeListItem = codeListItem;
@@ -33,34 +36,6 @@ public class CodeListItemProxy implements Proxy {
 		return proxies;
 	}
 	
-	@ExternalizedProperty
-	public String getSinceVersionName() {
-		return codeListItem.getSinceVersionName();
-	}
-
-	@ExternalizedProperty
-	public String getDeprecatedVersionName() {
-		return codeListItem.getDeprecatedVersionName();
-	}
-
-	@ExternalizedProperty
-	public ModelVersionProxy getSinceVersion() {
-		if(codeListItem.getSinceVersion() != null) {
-			return new ModelVersionProxy(codeListItem.getSinceVersion());
-		} else {
-			return null;
-		}
-	}
-
-	@ExternalizedProperty
-	public ModelVersionProxy getDeprecatedVersion() {
-		if(codeListItem.getDeprecatedVersion() != null) {
-			return new ModelVersionProxy(codeListItem.getDeprecatedVersion());
-		} else {
-			return null;
-		}
-	}
-
 	@ExternalizedProperty
 	public boolean isQualifiable() {
 		return codeListItem.isQualifiable();
@@ -81,10 +56,19 @@ public class CodeListItemProxy implements Proxy {
 		return LanguageSpecificTextProxy.fromList(codeListItem.getDescriptions());
 	}
 
-	@ExternalizedProperty
-	public List<CodeListItemProxy> getChildItems() {
-		return CodeListItemProxy.fromList(codeListItem.getChildItems());
+	public Boolean getSelected() {
+		return selected;
+	}
+	public void setSelected(Boolean selected) {
+		this.selected = selected;
 	}
 
+	public String getQualifier() {
+		return qualifier;
+	}
+
+	public void setQualifier(String qualifier) {
+		this.qualifier = qualifier;
+	}
 	
 }

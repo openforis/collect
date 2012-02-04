@@ -20,10 +20,11 @@ package org.openforis.collect.client {
 		private var _updateOperation:Operation;
 		private var _createNewRecordOperation:Operation;
 		private var _deleteRecordOperation:Operation;
-		private var _getCountRecordsOperation:Operation;
+		private var _getRecordCountOperation:Operation;
 		private var _getRecordSummariesOperation:Operation;
 		private var _loadRecordOperation:Operation;
 		private var _clearActiveRecordOperation:Operation;
+		private var _findCodeListOperation:Operation;
 		
 		public function DataClient() {
 			super("dataService");
@@ -32,14 +33,15 @@ package org.openforis.collect.client {
 			this._updateOperation = getOperation("update");
 			this._createNewRecordOperation = getOperation("createNewRecord");
 			this._deleteRecordOperation = getOperation("deleteRecord");
-			this._getCountRecordsOperation = getOperation("getCountRecords");
+			this._getRecordCountOperation = getOperation("getRecordCount");
 			this._getRecordSummariesOperation = getOperation("getRecordSummaries");
 			this._loadRecordOperation = getOperation("loadRecord");
-			this._clearActiveRecordOperation = getOperation("clearActiveRecord");	
+			this._clearActiveRecordOperation = getOperation("clearActiveRecord");
+			this._findCodeListOperation = getOperation("findCodeList");
 		}
 		
-		public function getCountRecords(responder:IResponder):void {
-			var token:AsyncToken = this._getCountRecordsOperation.send();
+		public function getRecordCount(responder:IResponder):void {
+			var token:AsyncToken = this._getRecordCountOperation.send();
 			token.addResponder(responder);
 		}
 		
@@ -70,6 +72,11 @@ package org.openforis.collect.client {
 		
 		public function update(responder:IResponder, request:UpdateRequest):void {
 			this._updateQueueProcessor.appendOperation(responder, this._updateOperation, request);
+		}
+		
+		public function findCodeList(responder:IResponder, parentEntityId:int, attribute:String):void {
+			var token:AsyncToken = this._findCodeListOperation.send(parentEntityId, attribute);
+			token.addResponder(responder);
 		}
 		
 		protected function faultHandler(event:FaultEvent):void {

@@ -33,8 +33,9 @@
 			<s:ItemRenderer width="100%" autoDrawBackground="false">
 				<fx:Script>
 					<![CDATA[
+						import org.openforis.collect.metamodel.proxy.CodeListItemProxy;
 						
-						private function txtInputChangeHandler(event:Event):void {
+						private function textInputChangeHandler(event:Event):void {
 							
 						}
 						
@@ -42,6 +43,13 @@
 							data.selected = checkBox.selected;
 							
 							outerDocument.checkSelection(data);
+						}
+						
+						[Bindable(event="dataChange")]
+						override public function get label():String {
+							var code:CodeListItemProxy = CodeListItemProxy(data);
+							var label:String = code.code + " - " + code.getLabelText();
+							return label;
 						}
 						
 					]]>
@@ -53,11 +61,17 @@
 										paddingBottom="0" paddingRight="0" paddingLeft="0" paddingTop="0" />
 				</s:layout>
 
-				<s:CheckBox id="checkBox" selected="{data.selected}" change="checkBoxChangeHandler(event)" label="{data.label}" />
+				<s:CheckBox id="checkBox" 
+							selected="{data.selected}" 
+							label="{label}" 
+							change="checkBoxChangeHandler(event)" 
+							/>
 				
-				<mx:TextInput height="20" id="txtInput" visible="{data.qualifiable}" includeInLayout="{data.qualifiable}"
+				<mx:TextInput height="20" id="textInput" 
+							  visible="{data.qualifiable}" 
+							  includeInLayout="{data.qualifiable}"
 							  text="{data.qualifier}"
-							  change="txtInputChangeHandler(event)"/>
+							  change="textInputChangeHandler(event)"/>
 			</s:ItemRenderer>
 		</fx:Component>
 	</s:itemRenderer>

@@ -8,8 +8,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SessionManager;
+import org.openforis.collect.metamodel.proxy.CodeListItemProxy;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.User;
 import org.openforis.collect.model.proxy.RecordProxy;
@@ -234,16 +236,35 @@ public class DataService {
 		return items;
 	}
 
-	public List<CodeListItem> findCodeList(Integer parentId, String attributeName) {
+	public List<CodeListItemProxy> findCodeList(int parentId, String attributeName) {
 		List<CodeListItem> items = new ArrayList<CodeListItem>();
 		CollectRecord activeRecord = this.getActiveRecord();
 		Entity parentEntity = (Entity) activeRecord.getNodeById(parentId);
-		CodeListItem parent = findCodeListParent(parentEntity, attributeName);
-		List<CodeListItem> children = parent.getChildItems();
-		for (CodeListItem item : children) {
-			//TODO
+		EntityDefinition parentEntityDef = parentEntity.getDefinition();
+		NodeDefinition attributeDef = parentEntityDef.getChildDefinition(attributeName);
+		if(attributeDef instanceof CodeAttributeDefinition) {
+			CodeAttributeDefinition codeAttributeDef = (CodeAttributeDefinition) attributeDef;
+			if(StringUtils.isBlank(codeAttributeDef.getParentExpression())) {
+				//get root code list items
+				items = codeAttributeDef.getList().getItems();
+			} else {
+				//get children items of the parent code
+				CodeListItem parent = findCodeListParent(parentEntity, codeAttributeDef);
+				if(parent != null) {
+					List<CodeListItem> children = parent.getChildItems();
+					for (CodeListItem item : children) {
+						//TODO
+					}
+				} else {
+					//TODO throw exception parent code not specified
+				}
+			}
 		}
-		return items;
+		List<CodeListItemProxy> proxies = new ArrayList<CodeListItemProxy>(items.size());
+		for (CodeListItem item : items) {
+			proxies.add(new CodeListItemProxy(item));
+		}
+		return proxies;
 	}
 	
 	/**
@@ -260,19 +281,13 @@ public class DataService {
 		return null;
 	}
 	
-	public CodeListItem findCodeListParent(Entity parentEntity, String attributeName) {
-		EntityDefinition parentEntityDef = parentEntity.getDefinition();
-		NodeDefinition attributeDef = parentEntityDef.getChildDefinition(attributeName);
-		if(attributeDef instanceof CodeAttributeDefinition) {
-			CodeAttributeDefinition code = (CodeAttributeDefinition) attributeDef;
-			String parentExpression = code.getParentExpression();
-			//TODO apply expression and get parent CodeAttribute
-			Node<NodeDefinition> parentNode = null;
-			
-			CodeListItem parent = null;
-			return parent;
-		}
-		return null;
+	public CodeListItem findCodeListParent(Entity parentEntity, CodeAttributeDefinition codeDef) {
+		String parentExpression = codeDef.getParentExpression();
+		//TODO apply expression and get parent CodeAttribute
+		Node<NodeDefinition> parentNode = null;
+		
+		CodeListItem parent = null;
+		return parent;
 	}
 	
 	private CodeListItem getCodeListItem(List<CodeListItem> items, String code) {

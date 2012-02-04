@@ -21,7 +21,7 @@
 					
 					var inputField:InputField = UIBuilder.getInputField(attributeDefinition);
 					
-					//bind input field attribute to the same instance of this
+					BindingUtils.bindProperty(inputField, "parentEntity", this, "parentEntity");
 					BindingUtils.bindProperty(inputField, "attribute", this, "attribute");
 					
 					if(attributeDefinition != null && attributeDefinition.multiple && inputField is CodeInputField) {
