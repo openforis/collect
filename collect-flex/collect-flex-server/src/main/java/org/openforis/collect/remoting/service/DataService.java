@@ -244,6 +244,7 @@ public class DataService {
 		NodeDefinition attributeDef = parentEntityDef.getChildDefinition(attributeName);
 		if(attributeDef instanceof CodeAttributeDefinition) {
 			CodeAttributeDefinition codeAttributeDef = (CodeAttributeDefinition) attributeDef;
+			List<Node<? extends NodeDefinition>> attributes = parentEntity.getAll(attributeName);
 			if(StringUtils.isBlank(codeAttributeDef.getParentExpression())) {
 				//get root code list items
 				items = codeAttributeDef.getList().getItems();
@@ -256,15 +257,15 @@ public class DataService {
 						//TODO
 					}
 				} else {
-					//TODO throw exception parent code not specified
+					//TODO define CodeListException
+					throw new RuntimeException("parent code list item not specified");
 				}
 			}
+			List<CodeListItemProxy> proxies = CodeListItemProxy.fromList(items, attributes);
+			return proxies;
+		} else {
+			throw new RuntimeException("CodeAttribute expected");
 		}
-		List<CodeListItemProxy> proxies = new ArrayList<CodeListItemProxy>(items.size());
-		for (CodeListItem item : items) {
-			proxies.add(new CodeListItemProxy(item));
-		}
-		return proxies;
 	}
 	
 	/**

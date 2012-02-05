@@ -55,11 +55,6 @@ public class SurveyProxy implements Proxy {
 	}
 
 	@ExternalizedProperty
-	public List<CodeListProxy> getCodeLists() {
-		return CodeListProxy.fromList(survey.getCodeLists());
-	}
-
-	@ExternalizedProperty
 	public List<UnitProxy> getUnits() {
 		return UnitProxy.fromList(survey.getUnits());
 	}

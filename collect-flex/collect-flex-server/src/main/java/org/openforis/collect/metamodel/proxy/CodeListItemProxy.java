@@ -9,6 +9,10 @@ import java.util.List;
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.collect.Proxy;
 import org.openforis.idm.metamodel.CodeListItem;
+import org.openforis.idm.metamodel.NodeDefinition;
+import org.openforis.idm.model.Code;
+import org.openforis.idm.model.CodeAttribute;
+import org.openforis.idm.model.Node;
 
 /**
  * @author S. Ricci
@@ -26,11 +30,28 @@ public class CodeListItemProxy implements Proxy {
 		this.codeListItem = codeListItem;
 	}
 
-	static List<CodeListItemProxy> fromList(List<CodeListItem> list) {
+	public static List<CodeListItemProxy> fromList(List<CodeListItem> list) {
+		return fromList(list, null);
+	}
+	
+	public static List<CodeListItemProxy> fromList(List<CodeListItem> list, List<Node<? extends NodeDefinition>> codes) {
 		List<CodeListItemProxy> proxies = new ArrayList<CodeListItemProxy>();
 		if (list != null) {
-			for (CodeListItem v : list) {
-				proxies.add(new CodeListItemProxy(v));
+			for (CodeListItem item : list) {
+				CodeListItemProxy proxy = new CodeListItemProxy(item);
+				if(codes != null) {
+					//if code in attributes, set selected and qualifier in proxy
+					for (Node<? extends NodeDefinition> node : codes) {
+						CodeAttribute code = (CodeAttribute) node;
+						Code value = code.getValue();
+						if(item.getCode().equals(value.getCode())) {
+							proxy.setSelected(Boolean.TRUE);
+							proxy.setQualifier(value.getQualifier());
+							break;
+						}
+					}
+				}
+				proxies.add(proxy);
 			}
 		}
 		return proxies;
