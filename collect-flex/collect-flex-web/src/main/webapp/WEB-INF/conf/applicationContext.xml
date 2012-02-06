@@ -58,6 +58,11 @@
 	
 	<bean id="unlockController" class="org.openforis.collect.web.controller.UnlockController">
 	</bean>
+
+	<!-- Expression Factory -->
+	<bean id="expressionFactory" class="org.openforis.idm.model.expression.ExpressionFactory">
+	</bean>
+
 	
 	<!-- TODO -->
 	<!-- <bean id="contextApplicationContextProvider" -->

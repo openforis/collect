@@ -14,6 +14,9 @@ import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.metamodel.proxy.CodeListItemProxy;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.User;
+import org.openforis.collect.model.proxy.CodeProxy;
+import org.openforis.collect.model.proxy.DateProxy;
+import org.openforis.collect.model.proxy.NodeProxy;
 import org.openforis.collect.model.proxy.RecordProxy;
 import org.openforis.collect.persistence.AccessDeniedException;
 import org.openforis.collect.persistence.DuplicateIdException;
@@ -24,18 +27,25 @@ import org.openforis.collect.persistence.RecordLockedException;
 import org.openforis.collect.remoting.service.UpdateRequest.Method;
 import org.openforis.collect.session.SessionState;
 import org.openforis.collect.session.SessionState.RecordState;
+import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
+import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
+import org.openforis.idm.metamodel.DateAttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.model.Attribute;
+import org.openforis.idm.model.Code;
 import org.openforis.idm.model.CodeAttribute;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.Record;
+import org.openforis.idm.model.expression.ExpressionFactory;
+import org.openforis.idm.model.expression.InvalidPathException;
+import org.openforis.idm.model.expression.ModelPathExpression;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -49,6 +59,9 @@ public class DataService {
 
 	@Autowired
 	private RecordManager recordManager;
+
+	@Autowired
+	private ExpressionFactory expressionFactory;
 
 	@Transactional
 	public RecordProxy loadRecord(int id) throws RecordLockedException, MultipleEditException, NonexistentIdException, AccessDeniedException {
@@ -133,32 +146,71 @@ public class DataService {
 	public void updateRootEntityKey(String recordId, String newRootEntityKey) throws DuplicateIdException, InvalidIdException, NonexistentIdException, AccessDeniedException, RecordLockedException {
 	}
 
-	public List<Node<? extends NodeDefinition>> updateActiveRecord(UpdateRequest request) {
+	public List<NodeProxy> updateActiveRecord(UpdateRequest request) {
+		List<NodeProxy> result = new ArrayList<NodeProxy>();
 		SessionState sessionState = sessionManager.getSessionState();
 		CollectRecord record = sessionState.getActiveRecord();
-		Method method = request.getMethod();
-		
-		switch (method) {
+		int parentNodeId = request.getParentNodeId();
+		Node<? extends NodeDefinition> parentNode = record.getNodeById(parentNodeId);
+		NodeDefinition parentDef = parentNode.getDefinition();
+		if(parentDef instanceof EntityDefinition) {
+			String nodeName = request.getNodeName();
+			String value = request.getValue();
+			NodeDefinition nodeDef = ((EntityDefinition) parentDef).getChildDefinition(nodeName);
+			Entity parentEntity = (Entity) parentNode;
+			
+			Method method = request.getMethod();
+			switch (method) {
 			case ADD:
-				if(request.getNodeId() == null) {
-					int parentNodeId = request.getParentNodeId();
-					Node<? extends NodeDefinition> parentNode = record.getNodeById(parentNodeId);
-					NodeDefinition parentDef = parentNode.getDefinition();
-					if(parentDef instanceof EntityDefinition) {
-						
-					} else {
-						//todo error
-					}
+				if(nodeDef instanceof AttributeDefinition) {
+					Attribute node = add(parentEntity, (AttributeDefinition) nodeDef, value);
+					NodeProxy proxy = new NodeProxy(node);
+					result.add(proxy);
+				} else {
+					Node<EntityDefinition> node = parentEntity.addEntity(nodeName);
+					NodeProxy proxy = new NodeProxy(node);
+					result.add(proxy);
 				}
 				break;
 			case UPDATE:
-
+				Integer nodeId = request.getNodeId();
+				Node<? extends NodeDefinition> node = record.getNodeById(nodeId);
+				if(node instanceof Attribute) {
+					update((Attribute) node, value);
+				}
 				break;
 			case DELETE:
-
 				break;
+			}
+			return null;
+		} else {
+			throw new RuntimeException("Parent node is not an entity");
 		}
-		return null;
+	}
+	
+	private Attribute add(Entity parentEntity, AttributeDefinition attribute, Object value) {
+		@SuppressWarnings("rawtypes")
+		Attribute result = null;
+		String name = attribute.getName();
+		if(attribute instanceof CodeAttributeDefinition) {
+			CodeProxy proxy = (CodeProxy) value;
+			Code code = new Code(proxy.getCode(), proxy.getQualifier());
+			result = parentEntity.addValue(name, code);
+		} else if(attribute instanceof DateAttributeDefinition) {
+			DateProxy proxy = (DateProxy) value;
+		}
+		return result;
+	}
+	
+	private void update(Attribute attribute, Object proxyValue) {
+		Object value = null;
+		if(proxyValue instanceof Boolean) {
+			value = proxyValue;
+		} else if(proxyValue instanceof CodeProxy) {
+			CodeProxy proxy = (CodeProxy) proxyValue;
+			value = new Code(proxy.getCode(), proxy.getQualifier());
+		}
+		attribute.setValue(value);
 	}
 
 	@Transactional
@@ -204,95 +256,102 @@ public class DataService {
 	 * @return
 	 */
 	public List<CodeListItem> findCodeListItemsById(Integer id, String ids) {
+		/*
 		@SuppressWarnings("unchecked")
 		CodeAttribute code = (CodeAttribute) this.getActiveRecord().getNodeById(id);
-		List<CodeListItem> codeList = findCodeList(id);
+		List<CodeListItem> codeList = findCodeList(code);
 		for (CodeListItem item : codeList) {
 			//TODO
 		}
+		*/
 		return null;
 	}
 
-	public List<CodeListItem> findCodeList(Integer id) {
+	public List<CodeListItemProxy> findCodeList(int parentEntityId, String attributeName) {
 		CollectRecord activeRecord = this.getActiveRecord();
-		@SuppressWarnings("unchecked")
-		Attribute<CodeAttributeDefinition, ?> code = (Attribute<CodeAttributeDefinition, ?>) activeRecord.getNodeById(id);
-
-		List<CodeListItem> items = new ArrayList<CodeListItem>();
-		CodeListItem parent = findCodeListParent(code);
-		List<CodeListItem> children = parent.getChildItems();
-
+		Entity parentEntity = (Entity) activeRecord.getNodeById(parentEntityId);
+		EntityDefinition parentEntityDef = parentEntity.getDefinition();
+		NodeDefinition childDefinition = parentEntityDef.getChildDefinition(attributeName);
+		if(childDefinition instanceof CodeAttributeDefinition) {
+			CodeAttributeDefinition codeDef = (CodeAttributeDefinition) childDefinition;
+			List<CodeListItem> items = findCodeList(parentEntity, codeDef );
+			List<CodeListItemProxy> proxies = CodeListItemProxy.fromList(items);
+			List<Node<? extends NodeDefinition>> codes = parentEntity.getAll(attributeName);
+			if(codes != null) {
+				CodeListItemProxy.setSelectedItems(proxies, codes);
+			}
+			return proxies;
+		} else {
+			throw new RuntimeException("CodeAttributeDefinition expected");
+		}
+	}
+	
+	private List<CodeListItem> findCodeList(Entity parentEntity, CodeAttributeDefinition def) {
+		CodeAttribute parent = findParent(parentEntity, def);
+		List<CodeListItem> items;
+		if(parent == null) {
+			//node is root
+			CodeList list = def.getList();
+			items = list.getItems();
+		} else {
+			Entity ancestorEntity = parent.getParent();
+			CodeAttributeDefinition parentDefinition = parent.getDefinition();
+			List<CodeListItem> codeList = findCodeList(ancestorEntity, parentDefinition);
+			Code parentCode = parent.getValue();
+			String parentCodeValue = parentCode.getCode();
+			CodeListItem parentItem = getCodeListItem(codeList, parentCodeValue);
+			items = parentItem.getChildItems();
+		}
+		CollectRecord activeRecord = this.getActiveRecord();
 		ModelVersion recordVersion = activeRecord.getVersion();
+		List<CodeListItem> itemsInVersion = new ArrayList<CodeListItem>();
+		/*
 		if (recordVersion != null) {
-			for (CodeListItem codeListItem : children) {
+			for (CodeListItem codeListItem : items) {
 				// TODO
 				// if (VersioningUtils.hasValidVersion(codeListItem, recordVersion)) {
-				// items.add(codeListItem);
+				// itemsInVersion.add(codeListItem);
 				// }
 			}
 		} else {
-			items.addAll(children);
+			itemsInVersion.addAll(items);
 		}
-		return items;
+		*/
+		itemsInVersion.addAll(items);
+		
+		return itemsInVersion;
 	}
-
-	public List<CodeListItemProxy> findCodeList(int parentId, String attributeName) {
-		List<CodeListItem> items = new ArrayList<CodeListItem>();
-		CollectRecord activeRecord = this.getActiveRecord();
-		Entity parentEntity = (Entity) activeRecord.getNodeById(parentId);
-		EntityDefinition parentEntityDef = parentEntity.getDefinition();
-		NodeDefinition attributeDef = parentEntityDef.getChildDefinition(attributeName);
-		if(attributeDef instanceof CodeAttributeDefinition) {
-			CodeAttributeDefinition codeAttributeDef = (CodeAttributeDefinition) attributeDef;
-			List<Node<? extends NodeDefinition>> attributes = parentEntity.getAll(attributeName);
-			if(StringUtils.isBlank(codeAttributeDef.getParentExpression())) {
-				//get root code list items
-				items = codeAttributeDef.getList().getItems();
-			} else {
-				//get children items of the parent code
-				CodeListItem parent = findCodeListParent(parentEntity, codeAttributeDef);
-				if(parent != null) {
-					List<CodeListItem> children = parent.getChildItems();
-					for (CodeListItem item : children) {
-						//TODO
-					}
-				} else {
-					//TODO define CodeListException
-					throw new RuntimeException("parent code list item not specified");
-				}
-			}
-			List<CodeListItemProxy> proxies = CodeListItemProxy.fromList(items, attributes);
-			return proxies;
-		} else {
-			throw new RuntimeException("CodeAttribute expected");
-		}
-	}
+	
 	
 	/**
-	 * Returns the code list item parent (see chooser popup of code list )
+	 * Apply the parentExpression in the attribute definition to the parentEntity specified
 	 * 
-	 * @param contextPath
+	 * @param parentEntity
+	 * @param def
 	 * @return
 	 */
-	public CodeListItem findCodeListParent(Node<? extends NodeDefinition> node) {
-		// Node<? extends NodeDefinition> node = record.getNodeById(id);
-		if (node != null && node instanceof Attribute) {
-			// TODO
+	private CodeAttribute findParent(Entity parentEntity, CodeAttributeDefinition def) {
+		String parentExpression = def.getParentExpression();
+		if(StringUtils.isNotBlank(parentExpression)) {
+			ModelPathExpression expression = expressionFactory.createModelPathExpression(parentExpression);
+			Object result;
+			try {
+				result = expression.evaluate(parentEntity);
+				if(result instanceof CodeAttribute) {
+					return (CodeAttribute) result;
+				} else {
+					throw new RuntimeException("Result is not a code attribute");
+				}
+			} catch (InvalidPathException e) {
+				throw new RuntimeException("error while retrieving parent code list item");
+			}
+		} else {
+			return null;
 		}
-		return null;
 	}
 	
-	public CodeListItem findCodeListParent(Entity parentEntity, CodeAttributeDefinition codeDef) {
-		String parentExpression = codeDef.getParentExpression();
-		//TODO apply expression and get parent CodeAttribute
-		Node<NodeDefinition> parentNode = null;
-		
-		CodeListItem parent = null;
-		return parent;
-	}
-	
-	private CodeListItem getCodeListItem(List<CodeListItem> items, String code) {
-		for (CodeListItem codeListItem : items) {
+	private CodeListItem getCodeListItem(List<CodeListItem> siblings, String code) {
+		for (CodeListItem codeListItem : siblings) {
 			String itemCode = codeListItem.getCode();
 			if (itemCode.equals(code)) {
 				return codeListItem;

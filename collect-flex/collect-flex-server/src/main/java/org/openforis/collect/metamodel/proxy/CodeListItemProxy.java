@@ -31,30 +31,29 @@ public class CodeListItemProxy implements Proxy {
 	}
 
 	public static List<CodeListItemProxy> fromList(List<CodeListItem> list) {
-		return fromList(list, null);
-	}
-	
-	public static List<CodeListItemProxy> fromList(List<CodeListItem> list, List<Node<? extends NodeDefinition>> codes) {
 		List<CodeListItemProxy> proxies = new ArrayList<CodeListItemProxy>();
 		if (list != null) {
 			for (CodeListItem item : list) {
 				CodeListItemProxy proxy = new CodeListItemProxy(item);
-				if(codes != null) {
-					//if code in attributes, set selected and qualifier in proxy
-					for (Node<? extends NodeDefinition> node : codes) {
-						CodeAttribute code = (CodeAttribute) node;
-						Code value = code.getValue();
-						if(item.getCode().equals(value.getCode())) {
-							proxy.setSelected(Boolean.TRUE);
-							proxy.setQualifier(value.getQualifier());
-							break;
-						}
-					}
-				}
 				proxies.add(proxy);
 			}
 		}
 		return proxies;
+	}
+	
+	public static void setSelectedItems(List<CodeListItemProxy> proxies, List<Node<? extends NodeDefinition>> codes) {
+		for (CodeListItemProxy proxy : proxies) {
+			//if code in attributes, set selected and qualifier in proxy
+			for (Node<? extends NodeDefinition> node : codes) {
+				CodeAttribute code = (CodeAttribute) node;
+				Code value = code.getValue();
+				if(proxy.getCode().equals(value.getCode())) {
+					proxy.setSelected(Boolean.TRUE);
+					proxy.setQualifier(value.getQualifier());
+					break;
+				}
+			}
+		}
 	}
 	
 	@ExternalizedProperty
