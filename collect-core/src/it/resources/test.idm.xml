@@ -115,7 +115,7 @@
         <list name="admin_unit">
             <label type="item">Administrative unit</label>
             <label type="list">Administrative Units</label>
-            <codingScheme scope="local" type="numeric"/>
+            <codingScheme scope="local"/>
             <hierarchy>
                 <level name="region">
                     <label>Region</label>
@@ -2945,7 +2945,7 @@
         </list>
         <list name="sampling_design" lookup="sampling_design">
             <label type="item">Sample Ids</label>
-            <codingScheme scope="local" type="alphanumeric"/>
+            <codingScheme scope="local"/>
             <hierarchy>
                 <level name="cluster">
                     <label>Cluster Id</label>
