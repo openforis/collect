@@ -15,7 +15,7 @@ public class UpdateRequest implements Proxy {
 	}
 
 	private Integer parentNodeId;
-	private String attributeName;
+	private String nodeName;
 	private Integer nodeId;
 	private String value;
 	private Method method;
@@ -56,12 +56,12 @@ public class UpdateRequest implements Proxy {
 		this.parentNodeId = parentNodeId;
 	}
 
-	public String getAttributeName() {
-		return attributeName;
+	public String getNodeName() {
+		return nodeName;
 	}
 
-	public void setAttributeName(String attributeName) {
-		this.attributeName = attributeName;
+	public void setNodeName(String nodeName) {
+		this.nodeName = nodeName;
 	}
 
 }

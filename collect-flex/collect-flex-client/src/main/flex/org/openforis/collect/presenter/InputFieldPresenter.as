@@ -117,7 +117,7 @@ package org.openforis.collect.presenter {
 				var def:AttributeDefinitionProxy = _view.attributeDefinition;
 				var value:Object = createValue();
 				var req:UpdateRequest = new UpdateRequest();
-				req.attributeName = def.name;
+				req.nodeName = def.name;
 				req.method = UpdateRequest$Method.ADD;
 				req.value = String(value);
 				var responder:AsyncResponder = new AsyncResponder(updateResultHandler, updateFaultHandler);
