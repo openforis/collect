@@ -10,7 +10,6 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openforis.collect.model.CollectAttributeMetadata;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.persistence.xml.CollectIdmlBindingContext;
@@ -21,6 +20,7 @@ import org.openforis.idm.model.Code;
 import org.openforis.idm.model.Coordinate;
 import org.openforis.idm.model.Date;
 import org.openforis.idm.model.Entity;
+import org.openforis.idm.model.RealAttribute;
 import org.openforis.idm.model.Time;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -29,8 +29,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 //@TransactionConfiguration(defaultRollback=false)
 //@Transactional
 public class RecordDAOTest {
+	@SuppressWarnings("unused")
 	private final Log log = LogFactory.getLog(RecordDAOTest.class);
 	
+	@SuppressWarnings("unused")
 	private CollectIdmlBindingContext idmlBindingContext;
 	
 	@Autowired
@@ -189,7 +191,11 @@ public class RecordDAOTest {
 				Entity tree = plot.addEntity("tree");
 				tree.addValue("dbh", 54.2);
 				tree.addValue("total_height", 2.0);
-				tree.addValue("bole_height", (Double) null).setMetadata(new CollectAttributeMetadata('*',null,"No value specified"));
+				
+				RealAttribute boleHeight = tree.addValue("bole_height", (Double) null);
+				boleHeight.setSymbol("*");
+				boleHeight.setRemarks("No value specified");
+				//.setMetadata(new CollectAttributeMetadata('*',null,"No value specified"));
 			}
 		}
 		//set counts

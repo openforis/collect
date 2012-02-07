@@ -62,16 +62,18 @@ public class DataPersister {
 		NodeDefinition defn = node.getDefinition();
 		Class<? extends NodeDefinition> defnClass = defn.getClass();
 		
-		if ( node instanceof Attribute ) {
+		if (node instanceof Attribute) {
 			Attribute<?, ?> attr = (Attribute<?, ?>) node;
+			if (attr.getRemarks() != null) {
+				insert.set(DATA.REMARKS, attr.getRemarks());
+			}
+			if (attr.getSymbol() != null) {
+				insert.set(DATA.SYMBOL, attr.getSymbol());
+			}
 			CollectAttributeMetadata metadata = (CollectAttributeMetadata) attr.getMetadata();
-			if ( metadata != null ) {
-				insert.set(DATA.REMARKS, metadata.getRemarks());
-				if ( metadata.getSymbol() != null ) {
-					  insert.set(DATA.SYMBOL, metadata.getSymbol().toString());
-				}
-				if ( metadata.getState() != null ) {
-					  insert.set(DATA.STATE, metadata.getState().toString());
+			if (metadata != null) {
+				if (metadata.getState() != null) {
+					insert.set(DATA.STATE, metadata.getState().toString());
 				}
 			}
 		}
