@@ -1,5 +1,6 @@
 package org.openforis.collect.model;
 
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,4 +50,15 @@ public class User {
 		this.id = id;
 	}
 
+	@Override
+	public String toString() {
+		StringWriter sw = new StringWriter();
+		sw.append("User: '");
+		sw.append(getName());
+		sw.append("' ");
+		sw.append(" roles:");
+		sw.append(getRoles().toString());
+		return sw.toString();
+	}
+	
 }
