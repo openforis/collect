@@ -34,6 +34,7 @@ package org.openforis.collect.presenter {
 		
 		override internal function initEventListeners():void {
 			_view.backToListButton.addEventListener(MouseEvent.CLICK, backToListButtonClickHandler);
+			_view.saveButton.addEventListener(MouseEvent.CLICK, saveButtonClickHandler);
 			
 			eventDispatcher.addEventListener(UIEvent.ACTIVE_RECORD_CHANGED, activeRecordChangedListener);
 		}
@@ -76,10 +77,18 @@ package org.openforis.collect.presenter {
 			_dataClient.clearActiveRecord(new AsyncResponder(clearActiveRecordHandler, faultHandler));
 		}
 		
+		protected function saveButtonClickHandler(event:MouseEvent):void {
+			_dataClient.saveActiveRecord(new AsyncResponder(saveActiveRecordResultHandler, faultHandler));
+		}
+		
 		internal function clearActiveRecordHandler(event:ResultEvent, token:Object = null):void {
 			Application.activeRecord = null;
 			var uiEvent:UIEvent = new UIEvent(UIEvent.BACK_TO_LIST);
 			eventDispatcher.dispatchEvent(uiEvent);
+		}
+		
+		internal function saveActiveRecordResultHandler(event:ResultEvent, token:Object = null):void {
+			
 		}
 		
 	}

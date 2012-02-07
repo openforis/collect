@@ -172,8 +172,8 @@ public class RecordManager {
 		//set counts
 		List<Integer> counts = new ArrayList<Integer>();
 		for (EntityDefinition def : countableDefns) {
-			String path = def.getPath();
-			int count = rootEntity.getCount(path);
+			String name = def.getName();
+			int count = rootEntity.getCount(name);
 			counts.add(count);
 		}
 		record.setEntityCounts(counts);
