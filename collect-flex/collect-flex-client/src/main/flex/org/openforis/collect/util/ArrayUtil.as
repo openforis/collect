@@ -29,17 +29,11 @@ package org.openforis.collect.util
 			} else return null;
 		}
 		
-		public static function isEmpty(array:Object):Boolean {
-			if(array == null)
-				return true;
-			if(array is Array)
-				return (array as Array).length == 0;
-			if(array is ICollectionView)
-				return (array as ICollectionView).length == 0;
-			else return true;
+		public static function isEmpty(array:Array):Boolean {
+			return array == null || array.length == 0;
 		}
 		
-		public static function isNotEmpty(array:Object):Boolean {
+		public static function isNotEmpty(array:Array):Boolean {
 			return ! isEmpty(array);
 		}
 		

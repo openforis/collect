@@ -13,48 +13,25 @@
 	
 	<fx:Script>
 		<![CDATA[
-			import mx.collections.ArrayCollection;
-			import mx.collections.IList;
-			import mx.collections.ListCollectionView;
-			import mx.core.IVisualElement;
 			import mx.events.FlexEvent;
 			
 			import org.openforis.collect.Application;
-			import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 			import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
-			import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
 			import org.openforis.collect.model.proxy.EntityProxy;
+			import org.openforis.collect.presenter.MultipleEntityPresenter;
 			import org.openforis.collect.ui.Images;
 			import org.openforis.collect.ui.UIBuilder;
-			import org.openforis.collect.util.UIUtil;
 			
 			import spark.components.HGroup;
 			
+			private var _presenter:MultipleEntityPresenter;
+			
 			protected function creationCompleteHandler(event:FlexEvent):void {
-				updateDataGroup();
+				_presenter = new MultipleEntityPresenter(this);
 			}
 			
 			override public function set parentEntity(value:EntityProxy):void {
 				super.parentEntity = value;
-				
-				updateDataGroup();
-			}
-			
-			protected function updateDataGroup():void {
-				if(dataGroup != null) {
-					if(parentEntity != null) {
-						var name:String = entityDefinition.name
-						var entities:IList = parentEntity.getChildren(name);
-						if(entities != null && entities.length > 0) {
-							dataGroup.dataProvider = entities;
-							return;
-						}
-					}
-					//empty row
-					var c:ArrayCollection = new ArrayCollection();
-					c.addItem(new Object());
-					dataGroup.dataProvider = c;
-				}
 			}
 			
 			override protected function createChildren():void {
@@ -76,14 +53,8 @@
 					super.childrenAdded = true;
 				}
 			}
-			
-			protected function addClickHandler(event:MouseEvent):void {
-				
-			}
-		
-			
-			
 		]]>
+			
 	</fx:Script>
 	
 	<fx:Declarations>
@@ -143,8 +114,6 @@
 					id="addButton"
 					label="Add" 
 					buttonMode="true" 
-					click="addClickHandler(event)" 
-					focusIn="UIUtil.ensureElementIsVisible(event.target as IVisualElement)"
 					icon="{Images.ADD}" 
 					labelPlacement="left" 
 					useHandCursor="true"

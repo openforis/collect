@@ -17,7 +17,7 @@ package org.openforis.collect.client {
 		
 		private var _updateQueueProcessor:RemoteCallQueueProcessor;
 
-		private var _updateOperation:Operation;
+		private var _updateActiveRecordOperation:Operation;
 		private var _createNewRecordOperation:Operation;
 		private var _deleteRecordOperation:Operation;
 		private var _getRecordCountOperation:Operation;
@@ -30,7 +30,7 @@ package org.openforis.collect.client {
 			super("dataService");
 			
 			this._updateQueueProcessor = new RemoteCallQueueProcessor(3, faultHandler);
-			this._updateOperation = getOperation("update");
+			this._updateActiveRecordOperation = getOperation("updateActiveRecord");
 			this._createNewRecordOperation = getOperation("createNewRecord");
 			this._deleteRecordOperation = getOperation("deleteRecord");
 			this._getRecordCountOperation = getOperation("getRecordCount");
@@ -70,8 +70,8 @@ package org.openforis.collect.client {
 			token.addResponder(responder);
 		}
 		
-		public function update(responder:IResponder, request:UpdateRequest):void {
-			this._updateQueueProcessor.appendOperation(responder, this._updateOperation, request);
+		public function updateActiveRecord(responder:IResponder, request:UpdateRequest):void {
+			this._updateQueueProcessor.appendOperation(responder, this._updateActiveRecordOperation, request);
 		}
 		
 		public function findCodeList(responder:IResponder, parentEntityId:int, attribute:String):void {

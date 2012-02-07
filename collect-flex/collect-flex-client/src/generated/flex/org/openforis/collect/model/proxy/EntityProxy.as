@@ -6,6 +6,7 @@
  */
 
 package org.openforis.collect.model.proxy {
+	import mx.collections.ArrayList;
 	import mx.collections.IList;
 
     [Bindable]
@@ -38,6 +39,16 @@ package org.openforis.collect.model.proxy {
 			} else {
 				return null;
 			}
+		}
+		
+		public function addChild(node:NodeProxy):void {
+			var name:String = node.name;
+			var children:IList = childrenByName.get(name);
+			if(children == null) {
+				children = new ArrayList();
+				childrenByName.put(name, children);
+			}
+			children.addItem(node);
 		}
     }
 }

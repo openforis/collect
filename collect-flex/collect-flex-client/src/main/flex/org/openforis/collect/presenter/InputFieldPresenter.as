@@ -10,6 +10,7 @@ package org.openforis.collect.presenter {
 	import mx.core.UIComponent;
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.events.FaultEvent;
+	import mx.rpc.events.ResultEvent;
 	
 	import org.granite.collections.IMap;
 	import org.openforis.collect.Application;
@@ -69,7 +70,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function changeHandler(event:Event):void {
-			//if autocomplete enabled show autocomplete popup...
+			//TODO if autocomplete enabled show autocomplete popup...
 			_changed = true;
 		}
 		
@@ -101,43 +102,43 @@ package org.openforis.collect.presenter {
 			}
 		}
 
-		protected function applyChanges(newAttributeValue:* = null):void {
-			//prepare request
-			if(newAttributeValue == null) {
-				newAttributeValue = createValue();
+		protected function applyChanges(value:* = null):void {
+			if(_view.parentEntity == null) {
+				throw new Error("Missing parent entity for this attribute");
 			}
-			//send request to server and wait for the answer...
+			if(value == null) {
+				value = createValue();
+			}
+			var req:UpdateRequest = new UpdateRequest();
+			var def:AttributeDefinitionProxy = _view.attributeDefinition;
+			req.parentNodeId = _view.parentEntity.id;
+			req.nodeName = def.name;
+			req.value = String(value);
+			
 			if(_view.attribute != null) {
-				//use attribute 
+				req.nodeId = _view.attribute.id;
+				req.method = UpdateRequest$Method.UPDATE;
 			} else {
-				//create attribute in record...
-				if(_view.parentEntity == null) {
-					_view.parentEntity = Application.activeRecord.rootEntity;
-				}
-				var def:AttributeDefinitionProxy = _view.attributeDefinition;
-				var value:Object = createValue();
-				var req:UpdateRequest = new UpdateRequest();
-				req.nodeName = def.name;
 				req.method = UpdateRequest$Method.ADD;
-				req.value = String(value);
-				var responder:AsyncResponder = new AsyncResponder(updateResultHandler, updateFaultHandler);
-				ClientFactory.dataClient.update(responder, req);
 			}
+			var responder:AsyncResponder = new AsyncResponder(updateResultHandler, updateFaultHandler);
+			ClientFactory.dataClient.updateActiveRecord(responder, req);
 		}
 		
 		protected function focusInHandler(event:FocusEvent):void {
 			UIUtil.ensureElementIsVisible(event.target);
 		}
 		
-		protected function updateResultHandler(event:Event):void {
-			//if event.path == this.path (or what else)
-			//update input field
-			
-			_view.currentState = InputField.STATE_SAVE_COMPLETE;
+		protected function updateResultHandler(event:ResultEvent, token:Object = null):void {
+			var result:IList = event.result as IList;
+			var attribute:AttributeProxy = result.getItemAt(0) as AttributeProxy;
+			_view.attribute = attribute;
+			//_view.currentState = InputField.STATE_SAVE_COMPLETE;
 		}
 
 		protected function updateFaultHandler(event:FaultEvent, token:Object = null):void {
-			_view.currentState = InputField.STATE_ERROR_SAVING;
+			//_view.currentState = InputField.STATE_ERROR_SAVING;
+			faultHandler(event, token);
 		}
 		
 		protected function get textValue():String {
@@ -152,7 +153,7 @@ package org.openforis.collect.presenter {
 		}
 
 		public function createValue():* {
-			var result:* = null;
+			var result:* = _view.text;
 			return result;
 			/*
 			var newAttributeValue:* = new AbstractValue();

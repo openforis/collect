@@ -14,8 +14,8 @@ import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.metamodel.proxy.CodeListItemProxy;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.User;
-import org.openforis.collect.model.proxy.CodeProxy;
-import org.openforis.collect.model.proxy.DateProxy;
+import org.openforis.collect.model.proxy.AttributeProxy;
+import org.openforis.collect.model.proxy.EntityProxy;
 import org.openforis.collect.model.proxy.NodeProxy;
 import org.openforis.collect.model.proxy.RecordProxy;
 import org.openforis.collect.persistence.AccessDeniedException;
@@ -31,18 +31,27 @@ import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
+import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
 import org.openforis.idm.metamodel.DateAttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.NodeDefinition;
+import org.openforis.idm.metamodel.NumberAttributeDefinition;
+import org.openforis.idm.metamodel.NumericAttributeDefinition;
+import org.openforis.idm.metamodel.NumericAttributeDefinition.Type;
 import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.Survey;
+import org.openforis.idm.metamodel.TextAttributeDefinition;
+import org.openforis.idm.metamodel.TimeAttributeDefinition;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Code;
 import org.openforis.idm.model.CodeAttribute;
+import org.openforis.idm.model.Coordinate;
+import org.openforis.idm.model.Date;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.Record;
+import org.openforis.idm.model.Time;
 import org.openforis.idm.model.expression.ExpressionFactory;
 import org.openforis.idm.model.expression.InvalidPathException;
 import org.openforis.idm.model.expression.ModelPathExpression;
@@ -146,6 +155,7 @@ public class DataService {
 	public void updateRootEntityKey(String recordId, String newRootEntityKey) throws DuplicateIdException, InvalidIdException, NonexistentIdException, AccessDeniedException, RecordLockedException {
 	}
 
+	@SuppressWarnings("unchecked")
 	public List<NodeProxy> updateActiveRecord(UpdateRequest request) {
 		List<NodeProxy> result = new ArrayList<NodeProxy>();
 		SessionState sessionState = sessionManager.getSessionState();
@@ -163,12 +173,12 @@ public class DataService {
 			switch (method) {
 			case ADD:
 				if(nodeDef instanceof AttributeDefinition) {
-					Attribute node = add(parentEntity, (AttributeDefinition) nodeDef, value);
-					NodeProxy proxy = new NodeProxy(node);
+					Attribute<?, ?> attribute = add(parentEntity, (AttributeDefinition) nodeDef, value);
+					AttributeProxy proxy = new AttributeProxy(attribute);
 					result.add(proxy);
 				} else {
-					Node<EntityDefinition> node = parentEntity.addEntity(nodeName);
-					NodeProxy proxy = new NodeProxy(node);
+					Entity node = parentEntity.addEntity(nodeName);
+					EntityProxy proxy = new EntityProxy(node);
 					result.add(proxy);
 				}
 				break;
@@ -176,41 +186,90 @@ public class DataService {
 				Integer nodeId = request.getNodeId();
 				Node<? extends NodeDefinition> node = record.getNodeById(nodeId);
 				if(node instanceof Attribute) {
-					update((Attribute) node, value);
+					update((Attribute<?, Object>) node, value);
 				}
+				@SuppressWarnings("rawtypes")
+				AttributeProxy proxy = new AttributeProxy((Attribute) node);
+				result.add(proxy);
 				break;
 			case DELETE:
 				break;
 			}
-			return null;
+			return result;
 		} else {
 			throw new RuntimeException("Parent node is not an entity");
 		}
 	}
 	
-	private Attribute add(Entity parentEntity, AttributeDefinition attribute, Object value) {
+	private Attribute<?, ?> add(Entity parentEntity, AttributeDefinition def, String value) {
 		@SuppressWarnings("rawtypes")
 		Attribute result = null;
-		String name = attribute.getName();
-		if(attribute instanceof CodeAttributeDefinition) {
-			CodeProxy proxy = (CodeProxy) value;
-			Code code = new Code(proxy.getCode(), proxy.getQualifier());
-			result = parentEntity.addValue(name, code);
-		} else if(attribute instanceof DateAttributeDefinition) {
-			DateProxy proxy = (DateProxy) value;
+		String name = def.getName();
+		Object val = getValue(def, value);
+		if(val instanceof Boolean) {
+			result = parentEntity.addValue(name, (Boolean) val);
+		} else if(val instanceof Code) {
+			result = parentEntity.addValue(name, (Code) val);
+		} else if(val instanceof Coordinate) {
+			result = parentEntity.addValue(name, (Coordinate) val);
+		} else if(val instanceof Date) {
+			result = parentEntity.addValue(name, (Date) val);
+		} else if(val instanceof Double) {
+			result = parentEntity.addValue(name, (Double) val);
+		} else if(val instanceof Integer) {
+			result = parentEntity.addValue(name, (Integer) val);
+		} else if(val instanceof String) {
+			result = parentEntity.addValue(name, (String) val);
+		} else if(val instanceof Time) {
+			result = parentEntity.addValue(name, (Time) val);
 		}
 		return result;
 	}
 	
-	private void update(Attribute attribute, Object proxyValue) {
-		Object value = null;
-		if(proxyValue instanceof Boolean) {
-			value = proxyValue;
-		} else if(proxyValue instanceof CodeProxy) {
-			CodeProxy proxy = (CodeProxy) proxyValue;
-			value = new Code(proxy.getCode(), proxy.getQualifier());
+	private void update(Attribute<?, Object> attribute, String value) {
+		AttributeDefinition def = (AttributeDefinition) attribute.getDefinition();
+		Object val = getValue(def, value);
+		attribute.setValue(val);
+	}
+
+	private Object getValue(AttributeDefinition def, String value) {
+		Object result = null;
+		if(def instanceof TextAttributeDefinition) {
+			result = value;
+		} else if(def instanceof CodeAttributeDefinition) {
+			Code code = new Code(value);
+			result = code;
+		} else if(def instanceof CoordinateAttributeDefinition) {
+			//TODO
+			result = null;
+		} else if(def instanceof NumericAttributeDefinition) {
+			NumberAttributeDefinition numberDef = (NumberAttributeDefinition) def;
+			Type type = numberDef.getType();
+			switch(type) {
+				case INTEGER:
+					result = Integer.parseInt(value);
+					break;
+				case REAL:
+					result = Double.parseDouble(value);
+					break;
+			}
+		} else if(def instanceof DateAttributeDefinition) {
+			//parse date string
+			String[] parts = value.split("/");
+			if(parts.length == 3) {
+				String date = parts[0];
+				String month = parts[1];
+				String year = parts[2];
+				result = new Date(Integer.parseInt(year), Integer.parseInt(month), Integer.parseInt(date));
+			} else {
+				throw new RuntimeException("invalid date format");
+			}
+		} else if(def instanceof TimeAttributeDefinition) {
+			//TODO
+		} else {
+			result = value;
 		}
-		attribute.setValue(value);
+		return result;
 	}
 
 	@Transactional
