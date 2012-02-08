@@ -32,7 +32,7 @@ public class CoordinateAttributeMapper extends NodeMapper {
 		if (value != null) {
 			insert.set(DATA.NUMBER1, toNumeric(value.getX()));
 			insert.set(DATA.NUMBER2, toNumeric(value.getY()));
-			insert.set(DATA.NUMBER3, toNumeric(value.getZ()));
+			//insert.set(DATA.NUMBER3, toNumeric(value.getZ()));
 			insert.set(DATA.TEXT1, value.getSrsId());
 		}
 	}
@@ -41,9 +41,9 @@ public class CoordinateAttributeMapper extends NodeMapper {
 	Node<?> addNode(NodeDefinition defn, Record r, Entity parent) {
 		Long x = r.getValueAsLong(DATA.NUMBER1);
 		Long y = r.getValueAsLong(DATA.NUMBER2);
-		Long z = r.getValueAsLong(DATA.NUMBER3);
+//		Long z = r.getValueAsLong(DATA.NUMBER3);
 		String srsId = r.getValueAsString(DATA.TEXT1);
-		Coordinate c = new Coordinate(x, y, z, srsId);
+		Coordinate c = new Coordinate(x, y, srsId);
 		return parent.addValue(defn.getName(), c);
 	}
 

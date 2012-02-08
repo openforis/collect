@@ -68,7 +68,7 @@ public class DataPersister {
 				insert.set(DATA.REMARKS, attr.getRemarks());
 			}
 			if (attr.getSymbol() != null) {
-				insert.set(DATA.SYMBOL, attr.getSymbol());
+				insert.set(DATA.SYMBOL, attr.getSymbol().toString());
 			}
 			CollectAttributeMetadata metadata = (CollectAttributeMetadata) attr.getMetadata();
 			if (metadata != null) {

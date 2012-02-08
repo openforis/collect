@@ -16,7 +16,6 @@ import org.apache.commons.logging.LogFactory;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openforis.collect.manager.RecordManager;
-import org.openforis.collect.model.CollectAttributeMetadata;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.persistence.xml.CollectIdmlBindingContext;
@@ -173,7 +172,7 @@ public class ModelDAOIntegrationTest {
 			tree1.addValue("total_height", 2.0);
 //			tree1.addValue("bole_height", (Double) null).setMetadata(new CollectAttributeMetadata('*',null,"No value specified"));
 			RealAttribute boleHeight = tree1.addValue("bole_height", (Double) null);
-			boleHeight.setSymbol("*");
+			boleHeight.setSymbol('*');
 			boleHeight.setRemarks("No value specified");
 			Entity tree2 = plot.addEntity("tree");
 			tree2.addValue("tree_no", 2);

@@ -34,12 +34,5 @@ public class CoordinateProxy implements Proxy {
 	public Long getY() {
 		return coordinate.getY();
 	}
-
-	@ExternalizedProperty
-	public Long getZ() {
-		return coordinate.getZ();
-	}
-
-	
 	
 }
