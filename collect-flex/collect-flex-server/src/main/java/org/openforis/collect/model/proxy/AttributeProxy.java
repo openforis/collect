@@ -29,24 +29,23 @@ public class AttributeProxy extends NodeProxy {
 	@ExternalizedProperty
 	public Object getValue(){
 		Object val = attribute.getValue();
-		if(val instanceof Code) {
-			return new CodeProxy((Code) val);
-		} else if(val instanceof Coordinate) {
-			return new CoordinateProxy((Coordinate) val);
-		} else if(val instanceof Date) {
-			return new DateProxy((Date) val);
-		} else if(val instanceof Taxon) {
-			return new TaxonProxy((Taxon) val);
-		} else if(val instanceof Time) {
-			return new TimeProxy((Time) val);
-		} else{
-			return val;
+		if(val != null) {
+			if(val instanceof Code) {
+				return new CodeProxy((Code) val);
+			} else if(val instanceof Coordinate) {
+				return new CoordinateProxy((Coordinate) val);
+			} else if(val instanceof Date) {
+				return new DateProxy((Date) val);
+			} else if(val instanceof Taxon) {
+				return new TaxonProxy((Taxon) val);
+			} else if(val instanceof Time) {
+				return new TimeProxy((Time) val);
+			} else{
+				return val;
+			}
+		} else {
+			return null;
 		}
 	}
 	
-	
-
-	
-	
-
 }
