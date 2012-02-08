@@ -124,8 +124,8 @@ package org.openforis.collect.presenter {
 				var date:DateProxy = _view.attribute.value as DateProxy;
 				if(date != null) {
 					_view.year.text = StringUtil.nullToBlank(date.year);
-					_view.year.text = StringUtil.nullToBlank(date.month);
-					_view.year.text = StringUtil.nullToBlank(date.day);
+					_view.month.text = StringUtil.nullToBlank(date.month);
+					_view.day.text = StringUtil.nullToBlank(date.day);
 				} else {
 					_view.year.text = _view.month.text = _view.day.text = "";
 				}
