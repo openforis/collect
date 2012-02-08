@@ -25,8 +25,10 @@ class CodeAttributeMapper extends NodeMapper {
 	@Override
 	void setFields(Node<?> node, InsertSetStep<?> insert) {
 		Code value = ((CodeAttribute) node).getValue();
-		insert.set(DATA.TEXT1, value.getCode());
-		insert.set(DATA.TEXT2, value.getQualifier());	
+		if ( value != null ) {
+			insert.set(DATA.TEXT1, value.getCode());
+			insert.set(DATA.TEXT2, value.getQualifier());
+		}
 	}
 
 	@Override
