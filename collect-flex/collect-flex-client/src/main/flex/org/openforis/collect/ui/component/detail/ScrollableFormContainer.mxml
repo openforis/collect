@@ -41,11 +41,7 @@
 	<s:BorderContainer
 			 width="100%" 
 			 height="100%"
-			 
-			 borderColor="#CCCCCC" 
-			 borderAlpha="0.8" 
-			 borderStyle="solid" 
-			 borderWeight="1"
+			 styleName="entityForm"
 			 id="borderContainer"
 			 >
 		<s:layout>
