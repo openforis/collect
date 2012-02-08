@@ -18,9 +18,12 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.util.CollectionUtil;
 	import org.openforis.collect.util.UIUtil;
 
+	/**
+	 * 
+	 * @author S. Ricci
+	 *  
+	 */
 	public class MultipleEntityPresenter extends AbstractPresenter {
-		
-		public static const EMPTY_ENTITY:Object = new Object();
 		
 		protected var _view:MultipleEntityFormItem;
 		
@@ -50,15 +53,8 @@ package org.openforis.collect.presenter
 				if(_view.parentEntity != null) {
 					var name:String = _view.entityDefinition.name
 					var entities:IList = _view.parentEntity.getChildren(name);
-					if(entities != null && entities.length > 0) {
-						_view.dataGroup.dataProvider = entities;
-						return;
-					}
+					_view.dataGroup.dataProvider = entities;
 				}
-				//add empty entity
-				var c:ArrayCollection = new ArrayCollection();
-				c.addItem(EMPTY_ENTITY);
-				_view.dataGroup.dataProvider = c;
 			}
 		}
 
@@ -67,15 +63,6 @@ package org.openforis.collect.presenter
 		}
 		
 		protected function addButtonClickHandler(event:MouseEvent):void {
-			var entities:IList = _view.parentEntity.getChildren(_view.entityDefinition.name);
-			if(CollectionUtil.isEmpty(entities)) {
-				//add another entity because the first one was a fake, empty entity
-				addNewEntity();
-			}
-			addNewEntity();
-		}
-		
-		protected function addNewEntity():void {
 			var req:UpdateRequest = new UpdateRequest();
 			req.method = UpdateRequest$Method.ADD;
 			req.parentNodeId = _view.parentEntity.id;

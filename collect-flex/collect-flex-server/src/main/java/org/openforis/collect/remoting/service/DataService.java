@@ -28,6 +28,7 @@ import org.openforis.collect.remoting.service.UpdateRequest.Method;
 import org.openforis.collect.session.SessionState;
 import org.openforis.collect.session.SessionState.RecordState;
 import org.openforis.idm.metamodel.AttributeDefinition;
+import org.openforis.idm.metamodel.BooleanAttributeDefinition;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
@@ -121,6 +122,8 @@ public class DataService {
 		Schema schema = activeSurvey.getSchema();
 		EntityDefinition rootEntityDefinition = schema.getRootEntityDefinition(rootEntityName);
 		CollectRecord record = recordManager.create(activeSurvey, rootEntityDefinition, user, version.getName());
+		Entity rootEntity = record.getRootEntity();
+		addEmptyAttributes(rootEntity);
 		sessionState.setActiveRecord((CollectRecord) record);
 		sessionState.setActiveRecordState(RecordState.NEW);
 		RecordProxy recordProxy = new RecordProxy(record);
@@ -173,11 +176,14 @@ public class DataService {
 			switch (method) {
 			case ADD:
 				if(nodeDef instanceof AttributeDefinition) {
-					Attribute<?, ?> attribute = add(parentEntity, (AttributeDefinition) nodeDef, value);
+					AttributeDefinition attributeDef = (AttributeDefinition) nodeDef;
+					Object val = parseValue(attributeDef, value);
+					Attribute<?, ?> attribute = addAttribute(parentEntity, (AttributeDefinition) nodeDef, val);
 					AttributeProxy proxy = new AttributeProxy(attribute);
 					result.add(proxy);
 				} else {
 					Entity node = parentEntity.addEntity(nodeName);
+					addEmptyAttributes(node);
 					EntityProxy proxy = new EntityProxy(node);
 					result.add(proxy);
 				}
@@ -201,47 +207,64 @@ public class DataService {
 		}
 	}
 	
-	private Attribute<?, ?> add(Entity parentEntity, AttributeDefinition def, String value) {
-		@SuppressWarnings("rawtypes")
-		Attribute result = null;
+	@SuppressWarnings("rawtypes")
+	private Attribute addAttribute(Entity parentEntity, AttributeDefinition def, Object value) {
 		String name = def.getName();
-		Object val = getValue(def, value);
-		if(val instanceof Boolean) {
-			result = parentEntity.addValue(name, (Boolean) val);
-		} else if(val instanceof Code) {
-			result = parentEntity.addValue(name, (Code) val);
-		} else if(val instanceof Coordinate) {
-			result = parentEntity.addValue(name, (Coordinate) val);
-		} else if(val instanceof Date) {
-			result = parentEntity.addValue(name, (Date) val);
-		} else if(val instanceof Double) {
-			result = parentEntity.addValue(name, (Double) val);
-		} else if(val instanceof Integer) {
-			result = parentEntity.addValue(name, (Integer) val);
-		} else if(val instanceof String) {
-			result = parentEntity.addValue(name, (String) val);
-		} else if(val instanceof Time) {
-			result = parentEntity.addValue(name, (Time) val);
+		Attribute result = null;
+		if(def instanceof BooleanAttributeDefinition) {
+			result = parentEntity.addValue(name, (Boolean) value);
+		} else if(def instanceof CodeAttributeDefinition) {
+			result = parentEntity.addValue(name, (Code) value);
+		} else if(def instanceof CoordinateAttributeDefinition) {
+			result = parentEntity.addValue(name, (Coordinate) value);
+		} else if(def instanceof DateAttributeDefinition) {
+			result = parentEntity.addValue(name, (Date) value);
+		} else if(def instanceof NumericAttributeDefinition) {
+			Type type = ((NumericAttributeDefinition) def).getType();
+			switch(type) {
+				case INTEGER:
+					result = parentEntity.addValue(name, (Integer) value);
+					break;
+				case REAL:
+					result = parentEntity.addValue(name, (Double) value);
+					break;
+			}
+		} else if(def instanceof TextAttributeDefinition) {
+			result = parentEntity.addValue(name, (String) value);
+		} else if(def instanceof TimeAttributeDefinition) {
+			result = parentEntity.addValue(name, (Time) value);
 		}
 		return result;
 	}
 	
 	private void update(Attribute<?, Object> attribute, String value) {
 		AttributeDefinition def = (AttributeDefinition) attribute.getDefinition();
-		Object val = getValue(def, value);
+		Object val = parseValue(def, value);
 		attribute.setValue(val);
 	}
 
-	private Object getValue(AttributeDefinition def, String value) {
+	private Object parseValue(AttributeDefinition def, String value) {
 		Object result = null;
-		if(def instanceof TextAttributeDefinition) {
-			result = value;
+		if(def instanceof BooleanAttributeDefinition) {
+			result = Boolean.parseBoolean(value);
 		} else if(def instanceof CodeAttributeDefinition) {
 			Code code = new Code(value);
 			result = code;
 		} else if(def instanceof CoordinateAttributeDefinition) {
 			//TODO
 			result = null;
+		} else if(def instanceof DateAttributeDefinition) {
+			//parse date string
+			String[] parts = value.split("/");
+			if(parts.length == 3) {
+				String date = parts[0];
+				String month = parts[1];
+				String year = parts[2];
+				result = new Date(Integer.parseInt(year), Integer.parseInt(month), Integer.parseInt(date));
+			} else {
+				//TODO error parsing date
+				throw new RuntimeException("invalid date format");
+			}
 		} else if(def instanceof NumericAttributeDefinition) {
 			NumberAttributeDefinition numberDef = (NumberAttributeDefinition) def;
 			Type type = numberDef.getType();
@@ -253,23 +276,34 @@ public class DataService {
 					result = Double.parseDouble(value);
 					break;
 			}
-		} else if(def instanceof DateAttributeDefinition) {
+		} else if(def instanceof TimeAttributeDefinition) {
 			//parse date string
-			String[] parts = value.split("/");
-			if(parts.length == 3) {
-				String date = parts[0];
-				String month = parts[1];
-				String year = parts[2];
-				result = new Date(Integer.parseInt(year), Integer.parseInt(month), Integer.parseInt(date));
+			String[] parts = value.split(":");
+			if(parts.length == 2) {
+				String hours = parts[0];
+				String minutes = parts[1];
+				result = new Time(Integer.parseInt(hours), Integer.parseInt(minutes));
 			} else {
+				//TODO error parsing time
 				throw new RuntimeException("invalid date format");
 			}
-		} else if(def instanceof TimeAttributeDefinition) {
-			//TODO
+		} else if(def instanceof TextAttributeDefinition) {
+			result = value;
 		} else {
 			result = value;
 		}
 		return result;
+	}
+	
+	private void addEmptyAttributes(Entity entity) {
+		EntityDefinition entityDef = entity.getDefinition();
+		List<NodeDefinition> childDefinitions = entityDef.getChildDefinitions();
+		for (NodeDefinition nodeDef : childDefinitions) {
+			if(nodeDef instanceof AttributeDefinition) {
+				//TODO verify if is in version
+				addAttribute(entity, (AttributeDefinition) nodeDef, null);
+			}
+		}
 	}
 
 	@Transactional
@@ -361,10 +395,10 @@ public class DataService {
 			CodeListItem parentItem = getCodeListItem(codeList, parentCodeValue);
 			items = parentItem.getChildItems();
 		}
-		CollectRecord activeRecord = this.getActiveRecord();
-		ModelVersion recordVersion = activeRecord.getVersion();
 		List<CodeListItem> itemsInVersion = new ArrayList<CodeListItem>();
 		/*
+		CollectRecord activeRecord = this.getActiveRecord();
+		ModelVersion recordVersion = activeRecord.getVersion();
 		if (recordVersion != null) {
 			for (CodeListItem codeListItem : items) {
 				// TODO
