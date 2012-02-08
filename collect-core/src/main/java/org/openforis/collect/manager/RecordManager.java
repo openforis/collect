@@ -9,8 +9,6 @@ import java.util.List;
 
 import javax.xml.namespace.QName;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.User;
@@ -31,7 +29,9 @@ import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.NumberAttribute;
 import org.openforis.idm.model.Record;
+import org.openforis.idm.model.RecordContext;
 import org.openforis.idm.model.TextAttribute;
+import org.openforis.idm.model.expression.ExpressionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,18 +39,26 @@ import org.springframework.transaction.annotation.Transactional;
  * @author M. Togna
  * @author S. Ricci
  */
-public class RecordManager {
-	private final Log log = LogFactory.getLog(RecordManager.class);
+public class RecordManager implements RecordContext {
+	//private final Log log = LogFactory.getLog(RecordManager.class);
 	
 	private static final QName COUNT_ANNOTATION = new QName("http://www.openforis.org/collect/3.0/collect", "count");
 
 	@Autowired
 	private RecordDAO recordDAO;
 
+	@Autowired
+	private ExpressionFactory expressionFactory;
+	
 	protected void init() {
 		unlockAll();
 	}
-
+	
+	@Override
+	public ExpressionFactory getExpressionFactory() {
+		return expressionFactory;
+	}
+	
 	@Transactional
 	public void save(CollectRecord record) {
 		updateCounts(record);
@@ -77,7 +85,7 @@ public class RecordManager {
 	 */
 	@Transactional
 	public CollectRecord checkout(Survey survey, User user, int recordId) throws RecordLockedException, NonexistentIdException, AccessDeniedException, MultipleEditException {
-		CollectRecord record = recordDAO.load(survey, recordId);
+		CollectRecord record = recordDAO.load(survey, this, recordId);
 		recordDAO.lock(recordId, user);
 		return record;
 	}
@@ -89,7 +97,7 @@ public class RecordManager {
 		EntityDefinition rootEntityDefinition = schema.getRootEntityDefinition(rootEntity);
 		List<EntityDefinition> countableInList = getCountableInList(rootEntityDefinition);
 		*/
-		List<CollectRecord> recordsSummary = recordDAO.loadSummaries(survey, rootEntity, offset, maxNumberOfRecords, orderByFieldName, filter);
+		List<CollectRecord> recordsSummary = recordDAO.loadSummaries(survey, this, rootEntity, offset, maxNumberOfRecords, orderByFieldName, filter);
 		return recordsSummary;
 	}
 
@@ -103,7 +111,7 @@ public class RecordManager {
 	public CollectRecord create(Survey survey, EntityDefinition rootEntityDefinition, User user, String modelVersionName) throws MultipleEditException, AccessDeniedException, RecordLockedException {
 		recordDAO.checkLock(user);
 		
-		CollectRecord record = new CollectRecord(survey, modelVersionName);
+		CollectRecord record = new CollectRecord(this, survey, modelVersionName);
 		record.createRootEntity(rootEntityDefinition.getName());
 		
 		record.setCreationDate(new Date());
@@ -205,4 +213,5 @@ public class RecordManager {
 		}
 		record.setKeys(keys);
 	}
+	
 }

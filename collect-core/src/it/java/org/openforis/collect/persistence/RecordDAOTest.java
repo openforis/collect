@@ -10,6 +10,7 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.persistence.xml.CollectIdmlBindingContext;
@@ -40,6 +41,9 @@ public class RecordDAOTest {
 	
 	@Autowired
 	protected RecordDAO recordDao;
+	
+	@Autowired
+	protected RecordManager recordManager;
 	
 	private Survey survey;
 	
@@ -94,7 +98,7 @@ public class RecordDAOTest {
 		List<EntityDefinition> countInSummaryListEntityDefinitions = new ArrayList<EntityDefinition>();
 		EntityDefinition plotEntity = (EntityDefinition) rootEntity.getChildDefinition("plot");
 		countInSummaryListEntityDefinitions.add(plotEntity);
-		List<CollectRecord> list = this.recordDao.loadSummaries(survey, rootEntityName, offset, maxNumberOfRecords, orderByFieldName, filter);
+		List<CollectRecord> list = this.recordDao.loadSummaries(survey, recordManager, rootEntityName, offset, maxNumberOfRecords, orderByFieldName, filter);
 
 		assertNotNull(list);
 		assertEquals(maxNumberOfRecords, list.size());
@@ -125,7 +129,7 @@ public class RecordDAOTest {
 		String orderByFieldName = "count_plot";
 		String filter = null;
 		
-		List<CollectRecord> list = this.recordDao.loadSummaries(survey, rootEntityName, offset, maxNumberOfRecords, orderByFieldName, filter);
+		List<CollectRecord> list = this.recordDao.loadSummaries(survey, recordManager, rootEntityName, offset, maxNumberOfRecords, orderByFieldName, filter);
 		
 		assertNotNull(list);
 		assertEquals(maxNumberOfRecords, list.size());
@@ -154,7 +158,7 @@ public class RecordDAOTest {
 		int numberOfPlots = new Double(Math.ceil((double) (Math.random() * 20))).intValue();
 		int numberOfTrees = new Double(Math.ceil((double) (Math.random() * 30))).intValue();;
 		
-		CollectRecord record = new CollectRecord(survey, "2.0");
+		CollectRecord record = new CollectRecord(recordManager, survey, "2.0");
 		record.setCreationDate(new GregorianCalendar(2011, 0, sequenceNumber, 8, 30).getTime());
 		//record.setCreatedBy("ModelDAOIntegrationTest");
 		record.setStep(Step.ENTRY);

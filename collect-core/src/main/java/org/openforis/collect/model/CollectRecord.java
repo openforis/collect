@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.model.Record;
+import org.openforis.idm.model.RecordContext;
 
 /**
  * @author G. Miceli
@@ -51,8 +52,8 @@ public class CollectRecord extends Record {
 	private List<String> rootEntityKeys;
 	private List<Integer> entityCounts;
 	
-	public CollectRecord(Survey survey, String versionName) {
-		super(survey, versionName);
+	public CollectRecord(RecordContext context, Survey survey, String versionName) {
+		super(context, survey, versionName);
 		this.step = Step.ENTRY;
 		this.submitted = false;
 
