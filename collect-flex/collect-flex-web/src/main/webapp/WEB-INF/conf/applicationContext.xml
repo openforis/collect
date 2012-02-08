@@ -69,7 +69,7 @@
 	<!-- class="org.fao.openforis.web.context.ApplicationContextAwareImpl"></bean> -->
 
 	<!-- ===================================== -->
-	<!-- BlazeDs services -->
+	<!-- GraniteDs services -->
 	<!-- ===================================== -->
 	<bean id="sessionService" class="org.openforis.collect.remoting.service.SessionService" autowire="byName">
 	</bean>

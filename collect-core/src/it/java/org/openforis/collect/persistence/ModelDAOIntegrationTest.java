@@ -15,7 +15,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.openforis.collect.model.CollectAttributeMetadata;
+import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.persistence.xml.CollectIdmlBindingContext;
@@ -47,7 +47,10 @@ public class ModelDAOIntegrationTest {
 	
 	@Autowired
 	protected RecordDAO recordDao;
-
+	
+	@Autowired
+	protected RecordManager recordManager;
+	
 	@Test
 	public void testCRUD() throws Exception  {
 //		try {
@@ -69,7 +72,7 @@ public class ModelDAOIntegrationTest {
 		log.debug("Saving record:\n"+saved);
 		
 		// RELOAD
-		record = recordDao.load(survey, record.getId());
+		record = recordDao.load(survey, recordManager, record.getId());
 		String reloaded = record.toString();
 		log.debug("Reloaded as:\n"+reloaded);
 		
@@ -120,7 +123,7 @@ public class ModelDAOIntegrationTest {
 	}
 
 	private CollectRecord createTestRecord(Survey survey) {
-		CollectRecord record = new CollectRecord(survey, "2.0");
+		CollectRecord record = new CollectRecord(recordManager, survey, "2.0");
 		Entity cluster = record.createRootEntity("cluster");
 		record.setCreationDate(new GregorianCalendar(2011, 12, 31, 23, 59).getTime());
 		//record.setCreatedBy("ModelDAOIntegrationTest");
@@ -169,7 +172,7 @@ public class ModelDAOIntegrationTest {
 			tree1.addValue("total_height", 2.0);
 //			tree1.addValue("bole_height", (Double) null).setMetadata(new CollectAttributeMetadata('*',null,"No value specified"));
 			RealAttribute boleHeight = tree1.addValue("bole_height", (Double) null);
-			boleHeight.setSymbol("*");
+			boleHeight.setSymbol('*');
 			boleHeight.setRemarks("No value specified");
 			Entity tree2 = plot.addEntity("tree");
 			tree2.addValue("tree_no", 2);
@@ -200,7 +203,7 @@ public class ModelDAOIntegrationTest {
 		int maxNumberOfRecords = 1;
 		String orderByFieldName = "key_id";
 		String filter = null;
-		List<CollectRecord> list = this.recordDao.loadSummaries(survey, rootEntityName, offset, maxNumberOfRecords, orderByFieldName, filter);
+		List<CollectRecord> list = this.recordDao.loadSummaries(survey, recordManager, rootEntityName, offset, maxNumberOfRecords, orderByFieldName, filter);
 		assertNotNull(list);
 		assertEquals(1, list.size());
 		

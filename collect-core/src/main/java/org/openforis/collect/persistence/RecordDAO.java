@@ -30,6 +30,7 @@ import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.NodeVisitor;
+import org.openforis.idm.model.RecordContext;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -42,8 +43,8 @@ public class RecordDAO extends JooqDaoSupport {
 	public static final String ORDER_BY_DATE_MODIFIED = "modifiedDate";
 	
 	@Transactional
-	public CollectRecord load(Survey survey, int recordId) throws DataInconsistencyException, NonexistentIdException {
-		CollectRecord record = loadRecord(survey, recordId);
+	public CollectRecord load(Survey survey, RecordContext recordContext, int recordId) throws DataInconsistencyException, NonexistentIdException {
+		CollectRecord record = loadRecord(survey, recordContext, recordId);
 		loadData(record);
 
 		return record;
@@ -134,7 +135,7 @@ public class RecordDAO extends JooqDaoSupport {
 		jf.update(RECORD).set(RECORD.LOCKED_BY_ID, (Integer)null).execute();
 	}
 
-	private CollectRecord loadRecord(Survey survey, int recordId) throws NonexistentIdException {
+	private CollectRecord loadRecord(Survey survey, RecordContext recordContext, int recordId) throws NonexistentIdException {
 		Factory jf = getJooqFactory();
 		Record r = jf.select().from(RECORD).where(RECORD.ID.equal(recordId)).fetchOne();
 		int rootEntityId = r.getValueAsInteger(RECORD.ROOT_ENTITY_ID);
@@ -151,7 +152,7 @@ public class RecordDAO extends JooqDaoSupport {
 		}
 		String rootEntityName = rootEntityDefn.getName();
 
-		CollectRecord record = new CollectRecord(survey, version);
+		CollectRecord record = new CollectRecord(recordContext, survey, version);
 		record.createRootEntity(rootEntityName);
 		
 		mapRecordToCollectRecord(r, record);
@@ -160,7 +161,7 @@ public class RecordDAO extends JooqDaoSupport {
 	}
 
 	@Transactional
-	public List<CollectRecord> loadSummaries(Survey survey, String rootEntity, int offset, int maxRecords, String orderByField, String filter) {
+	public List<CollectRecord> loadSummaries(Survey survey, RecordContext recordContext, String rootEntity, int offset, int maxRecords, String orderByField, String filter) {
 		Factory jf = getJooqFactory();
 		org.openforis.collect.persistence.jooq.tables.Record r = RECORD.as("r");
 		
@@ -222,17 +223,17 @@ public class RecordDAO extends JooqDaoSupport {
 		//fetch results
 		Result<Record> records = q.fetch();
 		
-		List<CollectRecord> result = mapRecordsToSummaries(records, survey, rootEntity);
+		List<CollectRecord> result = mapRecordsToSummaries(recordContext, records, survey, rootEntity);
 		return result;
 	}
 	
-	private List<CollectRecord> mapRecordsToSummaries(List<Record> records, Survey survey, String rootEntity) {
+	private List<CollectRecord> mapRecordsToSummaries(RecordContext recordContext, List<Record> records, Survey survey, String rootEntity) {
 		List<CollectRecord> result = new ArrayList<CollectRecord>();
 		
 		for (Record r : records) {
 			String versionName = r.getValue(RECORD.MODEL_VERSION);
 			
-			CollectRecord record = new CollectRecord(survey, versionName);
+			CollectRecord record = new CollectRecord(recordContext, survey, versionName);
 			
 			mapRecordToCollectRecord(r, record);
 			
