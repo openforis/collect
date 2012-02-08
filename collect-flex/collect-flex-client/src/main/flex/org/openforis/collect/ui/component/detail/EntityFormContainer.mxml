@@ -3,7 +3,7 @@
 					xmlns:s="library://ns.adobe.com/flex/spark" 
 					xmlns:mx="library://ns.adobe.com/flex/mx" 
 					width="100%" height="100%"
-					
+					creationComplete="creationCompleteHandler(event)"
 					creationPolicy="all"
 					label="{entityDefinition.getLabelText()}">
 	
@@ -16,6 +16,7 @@
 			import mx.collections.IList;
 			import mx.collections.ListCollectionView;
 			import mx.core.IVisualElement;
+			import mx.events.FlexEvent;
 			
 			import org.openforis.collect.i18n.Message;
 			import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
@@ -25,10 +26,10 @@
 			import org.openforis.collect.model.proxy.CodeProxy;
 			import org.openforis.collect.model.proxy.CoordinateProxy;
 			import org.openforis.collect.model.proxy.EntityProxy;
+			import org.openforis.collect.presenter.EntityFormPresenter;
 			import org.openforis.collect.util.StringUtil;
 			
 			import spark.components.FormItem;
-			import spark.events.IndexChangeEvent;
 		
 			private var _parentEntity:EntityProxy;
 			private var _entity:EntityProxy;
@@ -36,8 +37,11 @@
 			private var _uiTabs:ListCollectionView;	
 			private var _forms:Array = new Array();
 			
-			[Bindable]
-			private var dropDownDataProvider:IList;
+			private var _presenter:EntityFormPresenter;
+			
+			protected function creationCompleteHandler(event:FlexEvent):void {
+				_presenter = new EntityFormPresenter(this);
+			}
 			
 			[Bindable]
 			public function get parentEntity():EntityProxy {
@@ -46,14 +50,6 @@
 
 			public function set parentEntity(value:EntityProxy):void {
 				_parentEntity = value;
-				
-				if(_parentEntity != null && _entityDefinition != null) {
-					var children:IList = _parentEntity.getChildren(_entityDefinition.name);
-					if(_entityDefinition.multiple) {
-						dropDownDataProvider = children;
-						internalContainer.visible = false;
-					}
-				}
 			}
 			
 			[Bindable]
@@ -157,7 +153,7 @@
 					var keyParts:Array = new Array();
 					for each (var def:AttributeDefinitionProxy in keyDefs) {
 						var key:AttributeProxy = entity.getSingleAttribute(def.name);
-						if(key != null) {
+						if(key != null && key.value != null) {
 							var keyValue:Object = key.value;
 							var keyPart:String = null;
 							if(keyValue is CodeProxy) {
@@ -174,19 +170,6 @@
 					return StringUtil.concat(" - ", keyParts);
 				} else {
 					return "";
-				}
-			}
-												   
-
-			protected function dropDownListChangeHandler(event:IndexChangeEvent):void {
-				entity = dropDownList.selectedItem as EntityProxy;
-				if(internalContainer.visible) {
-					//internal container already visible, call programmatically the showEffect
-					showFormEffect.play([internalContainer]);
-					
-					//todo reset entity form scrollers, set first tab
-				} else {
-					internalContainer.visible = true;
 				}
 			}
 			
@@ -218,10 +201,9 @@
 				<s:HorizontalLayout paddingTop="5" horizontalAlign="left" paddingLeft="10" gap="12" verticalAlign="middle" />
 			</s:layout>
 			<s:Label text="{entityDefinition.getLabelText()}" styleName="bold" />
-			<s:DropDownList prompt="{Message.get('global.dropDownPrompt')}" width="150" id="dropDownList" dataProvider="{dropDownDataProvider}" labelFunction="dropDownLabelFunction"
-							change="dropDownListChangeHandler(event)"/>
-			<s:Button styleName="addButton" buttonMode="true" useHandCursor="true" />
-			<s:Button styleName="deleteButton" buttonMode="true" useHandCursor="true" />
+			<s:DropDownList prompt="{Message.get('global.dropDownPrompt')}" width="150" id="dropDownList" labelFunction="dropDownLabelFunction" />
+			<s:Button id="addButton" styleName="addButton" buttonMode="true" useHandCursor="true" />
+			<s:Button id="deleteButton" styleName="deleteButton" buttonMode="true" useHandCursor="true" />
 		</s:Group>
 		
 		<s:Group id="internalContainer" height="100%" width="100%" showEffect="{showFormEffect}" hideEffect="{hideFormEffect}" />

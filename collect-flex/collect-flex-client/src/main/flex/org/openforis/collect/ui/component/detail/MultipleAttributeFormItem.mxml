@@ -3,7 +3,9 @@
 		 xmlns:s="library://ns.adobe.com/flex/spark" 
 		 xmlns:mx="library://ns.adobe.com/flex/mx"
 		 xmlns:detail="org.openforis.collect.ui.component.detail.*"
-		 xmlns:input="org.openforis.collect.ui.component.input.*" >
+		 xmlns:input="org.openforis.collect.ui.component.input.*"
+		 creationComplete="creationCompleteHandler(event)"
+		 >
 
 	<detail:layout>
 		<s:VerticalLayout gap="2" />
@@ -13,39 +15,28 @@
 		<![CDATA[
 			import mx.collections.ArrayList;
 			import mx.collections.IList;
+			import mx.events.FlexEvent;
+			import mx.rpc.AsyncResponder;
 			
+			import org.openforis.collect.client.ClientFactory;
 			import org.openforis.collect.i18n.Message;
 			import org.openforis.collect.model.proxy.EntityProxy;
+			import org.openforis.collect.presenter.MultipleAttributePresenter;
+			import org.openforis.collect.remoting.service.UpdateRequest;
 			import org.openforis.collect.ui.Images;
 			import org.openforis.collect.ui.component.input.InputField;
+			import org.openforis.collect.util.CollectionUtil;
 			
-			[Bindable]
-			private var dataGroupDataProvider:IList;
+			private var presenter:MultipleAttributePresenter;
 			
-			protected function addButtonClickHandler(event:MouseEvent):void {
-				//TODO
-			}
-			
-			override public function set parentEntity(value:EntityProxy):void {
-				super.parentEntity = value;
-				
-				if(attributeDefinition != null && parentEntity != null) {
-					var attributes:IList = parentEntity.getChildren(attributeDefinition.name);
-					if(attributes != null && attributes.length > 0) {
-						dataGroupDataProvider = attributes;
-						return;
-					}
-				}
-				//add empty row if dataGroupDataProvider has not been set
-				var temp:IList = new ArrayList();
-				temp.addItem(new Object());
-				dataGroupDataProvider = temp;
+			protected function creationCompleteHandler(event:FlexEvent):void {
+				presenter = new MultipleAttributePresenter(this);
 			}
 			
 		]]>
 	</fx:Script>
 	
-	<s:DataGroup id="dataGroup" dataProvider="{dataGroupDataProvider}">
+	<s:DataGroup id="dataGroup">
 		<s:layout>
 			<s:VerticalLayout gap="2" />
 		</s:layout>
@@ -83,7 +74,7 @@
 	<s:Button 
 				icon="{Images.ADD}" 
 				label="{Message.get('global.add')}" 
-			  	id="addButton" click="addButtonClickHandler(event)" 
+			  	id="addButton"
 				height="24"  
 				useHandCursor="true"
 				buttonMode="true"
