@@ -21,16 +21,16 @@
 			import org.openforis.collect.client.ClientFactory;
 			import org.openforis.collect.i18n.Message;
 			import org.openforis.collect.model.proxy.EntityProxy;
-			import org.openforis.collect.presenter.MultipleAttributePresenter;
+			import org.openforis.collect.presenter.MultipleAttributeFormItemPresenter;
 			import org.openforis.collect.remoting.service.UpdateRequest;
 			import org.openforis.collect.ui.Images;
 			import org.openforis.collect.ui.component.input.InputField;
 			import org.openforis.collect.util.CollectionUtil;
 			
-			private var presenter:MultipleAttributePresenter;
+			private var presenter:MultipleAttributeFormItemPresenter;
 			
 			protected function creationCompleteHandler(event:FlexEvent):void {
-				presenter = new MultipleAttributePresenter(this);
+				presenter = new MultipleAttributeFormItemPresenter(this);
 			}
 			
 		]]>

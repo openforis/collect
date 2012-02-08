@@ -18,16 +18,16 @@
 			import org.openforis.collect.Application;
 			import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 			import org.openforis.collect.model.proxy.EntityProxy;
-			import org.openforis.collect.presenter.MultipleEntityPresenter;
+			import org.openforis.collect.presenter.MultipleEntityFormItemPresenter;
 			import org.openforis.collect.ui.Images;
 			import org.openforis.collect.ui.UIBuilder;
 			
 			import spark.components.HGroup;
 			
-			private var _presenter:MultipleEntityPresenter;
+			private var _presenter:MultipleEntityFormItemPresenter;
 			
 			protected function creationCompleteHandler(event:FlexEvent):void {
-				_presenter = new MultipleEntityPresenter(this);
+				_presenter = new MultipleEntityFormItemPresenter(this);
 			}
 			
 			override public function set parentEntity(value:EntityProxy):void {

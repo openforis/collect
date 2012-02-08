@@ -11,11 +11,10 @@ package org.openforis.collect.presenter
 	import mx.rpc.events.ResultEvent;
 	
 	import org.openforis.collect.client.ClientFactory;
-	import org.openforis.collect.model.proxy.AttributeProxy;
 	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.remoting.service.UpdateRequest;
 	import org.openforis.collect.remoting.service.UpdateRequest$Method;
-	import org.openforis.collect.ui.component.detail.MultipleAttributeFormItem;
+	import org.openforis.collect.ui.component.detail.MultipleEntityFormItem;
 	import org.openforis.collect.util.CollectionUtil;
 	import org.openforis.collect.util.UIUtil;
 
@@ -24,11 +23,11 @@ package org.openforis.collect.presenter
 	 * @author S. Ricci
 	 *  
 	 */
-	public class MultipleAttributePresenter extends AbstractPresenter {
+	public class MultipleEntityFormItemPresenter extends AbstractPresenter {
 		
-		protected var _view:MultipleAttributeFormItem;
+		protected var _view:MultipleEntityFormItem;
 		
-		public function MultipleAttributePresenter(view:MultipleAttributeFormItem) {
+		public function MultipleEntityFormItemPresenter(view:MultipleEntityFormItem) {
 			_view = view;
 			
 			super();
@@ -52,9 +51,9 @@ package org.openforis.collect.presenter
 		protected function updateView():void {
 			if(_view.dataGroup != null) {
 				if(_view.parentEntity != null) {
-					var name:String = _view.attributeDefinition.name
-					var attributes:IList = _view.parentEntity.getChildren(name);
-					_view.dataGroup.dataProvider = attributes;
+					var name:String = _view.entityDefinition.name
+					var entities:IList = _view.parentEntity.getChildren(name);
+					_view.dataGroup.dataProvider = entities;
 				}
 			}
 		}
@@ -67,14 +66,14 @@ package org.openforis.collect.presenter
 			var req:UpdateRequest = new UpdateRequest();
 			req.method = UpdateRequest$Method.ADD;
 			req.parentNodeId = _view.parentEntity.id;
-			req.nodeName = _view.attributeDefinition.name;
+			req.nodeName = _view.entityDefinition.name;
 			ClientFactory.dataClient.updateActiveRecord(new AsyncResponder(addResultHandler, faultHandler, null), req);
 		}
 		
 		protected function addResultHandler(event:ResultEvent, token:Object = null):void {
 			var result:IList = event.result as IList;
-			var newAttribute:AttributeProxy = result.getItemAt(0) as AttributeProxy;
-			_view.parentEntity.addChild(newAttribute);
+			var newEntity:EntityProxy = result.getItemAt(0) as EntityProxy;
+			_view.parentEntity.addChild(newEntity);
 			updateView();
 		}
 		
