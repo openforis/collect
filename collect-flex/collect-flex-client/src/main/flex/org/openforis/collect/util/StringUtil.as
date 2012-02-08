@@ -57,10 +57,12 @@ package org.openforis.collect.util
 			return value != null && value != "";
 		}
 		
-		public static function nullToBlank(value:String):String {
-			if(value == null)
+		public static function nullToBlank(value:Object):String {
+			if(value == null || (value is Number && isNaN(value as Number))) {
 				return "";
-			else return value;
+			} else {
+				return value.toString();
+			}
 		}
 		
 		/**

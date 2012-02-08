@@ -36,13 +36,19 @@ package org.openforis.collect.presenter {
 		
 		override internal function initEventListeners():void {
 			super.initEventListeners();
-			
+			//year
 			_view.year.addEventListener(FocusEvent.FOCUS_IN, focusInHandler);
 			_view.year.addEventListener(FocusEvent.FOCUS_OUT, focusOutHandler);
+			_view.year.addEventListener(Event.CHANGE, changeHandler);
+			//month
 			_view.month.addEventListener(FocusEvent.FOCUS_IN, focusInHandler);
 			_view.month.addEventListener(FocusEvent.FOCUS_OUT, focusOutHandler);
+			_view.month.addEventListener(Event.CHANGE, changeHandler);
+			//day
 			_view.day.addEventListener(FocusEvent.FOCUS_IN, focusInHandler);
 			_view.day.addEventListener(FocusEvent.FOCUS_OUT, focusOutHandler);
+			_view.day.addEventListener(Event.CHANGE, changeHandler);
+			//dateField (calendar button)
 			_view.dateField.addEventListener(CalendarLayoutChangeEvent.CHANGE, dateFieldChangeHandler);
 			_view.dateField.addEventListener(DropdownEvent.OPEN, dateFieldOpenHandler);
 		}
@@ -59,7 +65,7 @@ package org.openforis.collect.presenter {
 		}
 		*/
 		override public function createValue():* {
-			var result:* = null;
+			var result:String = StringUtil.concat(separator, _view.day.text, _view.month.text, _view.year.text);
 			return result;
 			/*
 			var newAttributeValue:AbstractValue = new AbstractValue();
@@ -117,9 +123,9 @@ package org.openforis.collect.presenter {
 			if(_view.attribute != null) {
 				var date:DateProxy = _view.attribute.value as DateProxy;
 				if(date != null) {
-					_view.year.text = String(date.year);
-					_view.month.text = String(date.month);
-					_view.day.text = String(date.day);
+					_view.year.text = StringUtil.nullToBlank(date.year);
+					_view.year.text = StringUtil.nullToBlank(date.month);
+					_view.year.text = StringUtil.nullToBlank(date.day);
 				} else {
 					_view.year.text = _view.month.text = _view.day.text = "";
 				}
