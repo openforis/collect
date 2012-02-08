@@ -66,7 +66,6 @@ package org.openforis.collect.ui {
 	 * */
 	public class UIBuilder {
 		
-		//TODO: use entityDescriptor
 		public static function buildForm(entity:EntityDefinitionProxy, version:ModelVersionProxy):FormContainer {
 				var formContainer:FormContainer = new FormContainer();
 				formContainer.initialize();
@@ -283,7 +282,23 @@ package org.openforis.collect.ui {
 		}
 		
 		public static function getInputFieldWidth(def:AttributeDefinitionProxy, isInDataGroup:Boolean = false):int {
-			if(def is TextAttributeDefinitionProxy) {
+			if(def is BooleanAttributeDefinitionProxy) {
+				return 20;
+			} else if(def is CodeAttributeDefinitionProxy) {
+				return 100;
+			} else if(def is CoordinateAttributeDefinitionProxy) {
+				return 100;
+			} else if(def is DateAttributeDefinitionProxy) {
+				return 150;
+			} else if(def is FileAttributeDefinitionProxy) {
+				return 300;
+			} else if(def is NumericAttributeDefinitionProxy) {
+				return 100;
+			} else if(def is RangeAttributeDefinitionProxy) {
+				return 120;
+			} else if(def is TaxonAttributeDefinitionProxy) {
+				return 400;
+			} else if(def is TextAttributeDefinitionProxy) {
 				var textAttributeDef:TextAttributeDefinitionProxy = TextAttributeDefinitionProxy(def);
 				var type:TextAttributeDefinitionProxy$Type = textAttributeDef.type;
 				switch(type) {
@@ -293,28 +308,21 @@ package org.openforis.collect.ui {
 					default:
 						return 100;
 				}
-			} else if(def is DateAttributeDefinitionProxy) {
-				return 150;
 			} else if(def is TimeAttributeDefinitionProxy) {
 				return 80;
-			} else if(def is CodeAttributeDefinitionProxy) {
-				return 100;
-			} else if(def is NumericAttributeDefinitionProxy) {
-				return 100;
-			} else if(def is RangeAttributeDefinitionProxy) {
-				return 120;
-			} else if(def is BooleanAttributeDefinitionProxy) {
-				return 100;
-			} else if(def is CoordinateAttributeDefinitionProxy) {
-				return 100;
-			} else if(def is TaxonAttributeDefinitionProxy) {
-				return 400;
-			} else if(def is FileAttributeDefinitionProxy) {
-				return 300;
 			} else {
 				return 100;
 			}
 		}
+		
+		public static function getAttributeDataGroupHeaderWidth(def:AttributeDefinitionProxy):int {
+			if(def is BooleanAttributeDefinitionProxy) {
+				return 100;
+			} else {
+				return getInputFieldWidth(def, true);
+			}
+		}
+			
 		
 		public static function getInputField(def:AttributeDefinitionProxy, isInDataGroup:Boolean = false):InputField {
 			var inputField:InputField = null;
@@ -473,7 +481,7 @@ package org.openforis.collect.ui {
 				v.addElement(h);
 				return v;
 			}else {
-				var width:int = getInputFieldWidth(defn, true);
+				var width:int = getAttributeDataGroupHeaderWidth(defn);
 				
 				v = new VGroup();
 				v.width = width;
