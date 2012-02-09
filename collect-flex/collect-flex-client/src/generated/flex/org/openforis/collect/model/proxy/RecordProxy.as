@@ -14,5 +14,31 @@ package org.openforis.collect.model.proxy {
     [RemoteClass(alias="org.openforis.collect.model.proxy.RecordProxy")]
     public class RecordProxy extends RecordProxyBase {
 		
+		public function getNode(id:int):NodeProxy {
+			return rootEntity.getNode(id);
+		}
+		
+		public function update(nodes:IList):void {
+			for each (var node:NodeProxy in nodes) {
+				var parent:NodeProxy = getNode(node.parentId);
+				if(parent is EntityProxy) {
+					var parentEntity:EntityProxy = EntityProxy(parent);
+					var oldNode:NodeProxy = parentEntity.getChildById(node.id);
+					if(oldNode == null) {
+						//add node
+						parentEntity.addChild(node);
+					} else {
+						//update node
+						var children:IList = parentEntity.getChildren(node.name);
+						var index:int = children.getItemIndex(oldNode);
+						children.removeItemAt(index);
+						children.addItemAt(node, index);
+					}
+				} else {
+					throw new Error("Entity expected");
+				}
+			}
+			
+		}
     }
 }

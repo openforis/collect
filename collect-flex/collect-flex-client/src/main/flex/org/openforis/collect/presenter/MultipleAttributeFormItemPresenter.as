@@ -24,37 +24,29 @@ package org.openforis.collect.presenter
 	 * @author S. Ricci
 	 *  
 	 */
-	public class MultipleAttributeFormItemPresenter extends AbstractPresenter {
-		
-		protected var _view:MultipleAttributeFormItem;
+	public class MultipleAttributeFormItemPresenter extends AttributeFormItemPresenter {
 		
 		public function MultipleAttributeFormItemPresenter(view:MultipleAttributeFormItem) {
-			_view = view;
-			
-			super();
-			
-			updateView();
+			super(view);
 		}
 		
 		override internal function initEventListeners():void {
 			super.initEventListeners();
 			
-			ChangeWatcher.watch(_view, "parentEntity", parentEntityChangeHandler);
-			
-			_view.addButton.addEventListener(MouseEvent.CLICK, addButtonClickHandler);
-			_view.addButton.addEventListener(FocusEvent.FOCUS_IN, addButtonFocusInHandler);
+			MultipleAttributeFormItem(_view).addButton.addEventListener(MouseEvent.CLICK, addButtonClickHandler);
+			MultipleAttributeFormItem(_view).addButton.addEventListener(FocusEvent.FOCUS_IN, addButtonFocusInHandler);
 		}
 		
-		protected function parentEntityChangeHandler(event:Event):void {
-			updateView();
+		private function get view():MultipleAttributeFormItem {
+			return MultipleAttributeFormItem(_view);
 		}
 		
-		protected function updateView():void {
-			if(_view.dataGroup != null) {
-				if(_view.parentEntity != null) {
-					var name:String = _view.attributeDefinition.name
-					var attributes:IList = _view.parentEntity.getChildren(name);
-					_view.dataGroup.dataProvider = attributes;
+		override protected function updateView():void {
+			if(view.dataGroup != null) {
+				if(view.parentEntity != null) {
+					var name:String = view.attributeDefinition.name
+					var attributes:IList = view.parentEntity.getChildren(name);
+					view.dataGroup.dataProvider = attributes;
 				}
 			}
 		}

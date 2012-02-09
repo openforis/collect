@@ -10,6 +10,7 @@ package org.openforis.collect.presenter
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.events.ResultEvent;
 	
+	import org.openforis.collect.Application;
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.remoting.service.UpdateRequest;
@@ -72,9 +73,9 @@ package org.openforis.collect.presenter
 		
 		protected function addResultHandler(event:ResultEvent, token:Object = null):void {
 			var result:IList = event.result as IList;
-			var newEntity:EntityProxy = result.getItemAt(0) as EntityProxy;
-			_view.parentEntity.addChild(newEntity);
-			updateView();
+			Application.activeRecord.update(result);
+			 
+			UIUtil.ensureElementIsVisible(_view.addButton);
 		}
 		
 	}

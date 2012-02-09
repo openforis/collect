@@ -18,53 +18,47 @@ package org.openforis.collect.presenter {
 	 * 
 	 * @author S. Ricci
 	 * */
-	public class CoordinateAttributeFormItemPresenter extends AbstractPresenter {
-		
-		private var _view:CoordinateAttributeFormItem;
+	public class CoordinateAttributeFormItemPresenter extends AttributeFormItemPresenter {
 		
 		public function CoordinateAttributeFormItemPresenter(view:CoordinateAttributeFormItem = null) {
-			_view = view;
+			super(view);
 
-			super();
-
-			_view.srsDropDownList.labelFunction = srsDropDownLabelFunction;
-			_view.srsDropDownList.dataProvider = Application.activeSurvey.spatialReferenceSystems;
+			view.srsDropDownList.labelFunction = srsDropDownLabelFunction;
+			view.srsDropDownList.dataProvider = Application.activeSurvey.spatialReferenceSystems;
 			updateView();
+		}
+		
+		private function get view():CoordinateAttributeFormItem {
+			return CoordinateAttributeFormItem(_view);
 		}
 		
 		override internal function initEventListeners():void {
 			super.initEventListeners();
 			
-			ChangeWatcher.watch(_view, "attribute", attributeChangeHandler);
-			
-			_view.xTextInput.addEventListener(FocusEvent.FOCUS_IN, focusInHandler);
-			_view.xTextInput.addEventListener(FocusEvent.FOCUS_OUT, focusOutHandler);
-			_view.yTextInput.addEventListener(FocusEvent.FOCUS_IN, focusInHandler);
-			_view.yTextInput.addEventListener(FocusEvent.FOCUS_OUT, focusOutHandler);
-			_view.srsDropDownList.addEventListener(Event.CHANGE, srsDropDownChangeHandler);
-			_view.srsDropDownList.addEventListener(DropdownEvent.CLOSE, srsDropDownCloseHandler);
+			view.xTextInput.addEventListener(FocusEvent.FOCUS_IN, focusInHandler);
+			view.xTextInput.addEventListener(FocusEvent.FOCUS_OUT, focusOutHandler);
+			view.yTextInput.addEventListener(FocusEvent.FOCUS_IN, focusInHandler);
+			view.yTextInput.addEventListener(FocusEvent.FOCUS_OUT, focusOutHandler);
+			view.srsDropDownList.addEventListener(Event.CHANGE, srsDropDownChangeHandler);
+			view.srsDropDownList.addEventListener(DropdownEvent.CLOSE, srsDropDownCloseHandler);
 		}
 		
-		protected function attributeChangeHandler(event:Event):void {
-			updateView();
-		}
-		
-		public function updateView():void {
+		override protected function updateView():void {
 			var attribute:AttributeProxy = this._view.attribute;
 			
 			//reset view
-			this._view.srsDropDownList.selectedItem = null;
-			this._view.xTextInput.text = null;
-			this._view.yTextInput.text = null;
+			this.view.srsDropDownList.selectedItem = null;
+			this.view.xTextInput.text = null;
+			this.view.yTextInput.text = null;
 			
 			if(attribute != null) {
 				var value:Object = attribute.value;
 				if(value is CoordinateProxy) {
 					var coordinate:CoordinateProxy = CoordinateProxy(value);
 					var srs:Object = null;
-					this._view.srsDropDownList.selectedItem = srs;
-					this._view.xTextInput.text = String(coordinate.x);
-					this._view.yTextInput.text = String(coordinate.y);
+					this.view.srsDropDownList.selectedItem = srs;
+					this.view.xTextInput.text = String(coordinate.x);
+					this.view.yTextInput.text = String(coordinate.y);
 				}
 			}
 		}

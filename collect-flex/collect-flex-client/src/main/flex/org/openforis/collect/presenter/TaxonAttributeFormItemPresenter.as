@@ -30,7 +30,7 @@ package org.openforis.collect.presenter {
 	 * 
 	 * @author S. Ricci
 	 * */
-	public class TaxonAttributeFormItemPresenter extends AbstractPresenter {
+	public class TaxonAttributeFormItemPresenter extends AttributeFormItemPresenter {
 		
 		protected static var autoCompletePopUp:TaxonAutoCompletePopUp;
 		protected static var autoCompletePopUpOpen:Boolean = false;
@@ -41,11 +41,8 @@ package org.openforis.collect.presenter {
 		
 		public var minCharsToStartAutoComplete:int = 2;
 		
-		private var _view:TaxonAttributeFormItem;
-		
 		public function TaxonAttributeFormItemPresenter(view:TaxonAttributeFormItem = null) {
-			_view = view;
-			super();
+			super(view);
 			
 			updateView();
 		}
@@ -53,24 +50,26 @@ package org.openforis.collect.presenter {
 		override internal function initEventListeners():void {
 			super.initEventListeners();
 			
-			ChangeWatcher.watch(_view, "attribute", attributeChangeHandler);
-			
 			//id text input
-			_view.codeTextInput.addEventListener(Event.CHANGE, textInputChangeHandler);
-			_view.codeTextInput.addEventListener(FocusEvent.FOCUS_IN, focusInHandler);
-			_view.codeTextInput.addEventListener(FocusEvent.FOCUS_OUT, focusOutHandler);
+			view.codeTextInput.addEventListener(Event.CHANGE, textInputChangeHandler);
+			view.codeTextInput.addEventListener(FocusEvent.FOCUS_IN, focusInHandler);
+			view.codeTextInput.addEventListener(FocusEvent.FOCUS_OUT, focusOutHandler);
 			//scientific name text input
-			_view.scientificNameTextInput.addEventListener(Event.CHANGE, textInputChangeHandler);
-			_view.scientificNameTextInput.addEventListener(FocusEvent.FOCUS_IN, focusInHandler);
-			_view.scientificNameTextInput.addEventListener(FocusEvent.FOCUS_OUT, focusOutHandler);
+			view.scientificNameTextInput.addEventListener(Event.CHANGE, textInputChangeHandler);
+			view.scientificNameTextInput.addEventListener(FocusEvent.FOCUS_IN, focusInHandler);
+			view.scientificNameTextInput.addEventListener(FocusEvent.FOCUS_OUT, focusOutHandler);
 			//vernacular name text input
-			_view.vernacularNameTextInput.addEventListener(Event.CHANGE, textInputChangeHandler);
-			_view.vernacularNameTextInput.addEventListener(FocusEvent.FOCUS_IN, focusInHandler);
-			_view.vernacularNameTextInput.addEventListener(FocusEvent.FOCUS_OUT, focusOutHandler);
+			view.vernacularNameTextInput.addEventListener(Event.CHANGE, textInputChangeHandler);
+			view.vernacularNameTextInput.addEventListener(FocusEvent.FOCUS_IN, focusInHandler);
+			view.vernacularNameTextInput.addEventListener(FocusEvent.FOCUS_OUT, focusOutHandler);
 			//vernacular lang text input
-			_view.vernacularLangTextInput.addEventListener(Event.CHANGE, textInputChangeHandler);
-			_view.vernacularLangTextInput.addEventListener(FocusEvent.FOCUS_IN, focusInHandler);
-			_view.vernacularLangTextInput.addEventListener(FocusEvent.FOCUS_OUT, focusOutHandler);
+			view.vernacularLangTextInput.addEventListener(Event.CHANGE, textInputChangeHandler);
+			view.vernacularLangTextInput.addEventListener(FocusEvent.FOCUS_IN, focusInHandler);
+			view.vernacularLangTextInput.addEventListener(FocusEvent.FOCUS_OUT, focusOutHandler);
+		}
+		
+		private function get view():TaxonAttributeFormItem {
+			return TaxonAttributeFormItem(_view);
 		}
 		
 		protected function focusInHandler(event:FocusEvent):void {
@@ -80,28 +79,24 @@ package org.openforis.collect.presenter {
 		protected function focusOutHandler(event:FocusEvent):void {
 		}
 		
-		protected function attributeChangeHandler(event:Event):void {
-			updateView();
-		}
-		
-		public function updateView():void {
-			var attribute:AttributeProxy = this._view.attribute;
+		override protected function updateView():void {
+			var attribute:AttributeProxy = this.view.attribute;
 			
 			//reset view
-			_view.codeTextInput.text = null;
-			_view.scientificNameTextInput.text = null;
-			_view.vernacularNameTextInput.text = null;
-			_view.vernacularLangTextInput.text = null;
+			view.codeTextInput.text = null;
+			view.scientificNameTextInput.text = null;
+			view.vernacularNameTextInput.text = null;
+			view.vernacularLangTextInput.text = null;
 			
 			if(attribute != null) {
 				var value:Object = attribute.value;
 				if(value is TaxonProxy) {
 					var taxon:TaxonProxy = TaxonProxy(value);
 					var srs:Object = null;
-					_view.codeTextInput.text = String(taxon.code)
-					_view.scientificNameTextInput.text = String(taxon.scientificName);
-					_view.vernacularNameTextInput.text = String(taxon.vernacularName);
-					_view.vernacularLangTextInput.text = String(taxon.languageVariant);
+					view.codeTextInput.text = String(taxon.code)
+					view.scientificNameTextInput.text = String(taxon.scientificName);
+					view.vernacularNameTextInput.text = String(taxon.vernacularName);
+					view.vernacularLangTextInput.text = String(taxon.languageVariant);
 				}
 			}
 		}
@@ -122,13 +117,13 @@ package org.openforis.collect.presenter {
 		protected function getSubElementName(textInput:TextInput):String {
 			var subElementName:String = "id";
 			switch(textInput) {
-				case _view.codeTextInput:
+				case view.codeTextInput:
 					break;
-				case _view.scientificNameTextInput:
+				case view.scientificNameTextInput:
 					break;
-				case _view.vernacularNameTextInput:
+				case view.vernacularNameTextInput:
 					break;
-				case _view.vernacularLangTextInput:
+				case view.vernacularLangTextInput:
 					break;
 			}
 			return subElementName;

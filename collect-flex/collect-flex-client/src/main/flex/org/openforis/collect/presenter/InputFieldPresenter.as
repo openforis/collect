@@ -15,6 +15,7 @@ package org.openforis.collect.presenter {
 	import org.granite.collections.IMap;
 	import org.openforis.collect.Application;
 	import org.openforis.collect.client.ClientFactory;
+	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.event.InputFieldEvent;
 	import org.openforis.collect.event.UIEvent;
 	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
@@ -53,6 +54,8 @@ package org.openforis.collect.presenter {
 		override internal function initEventListeners():void {
 			super.initEventListeners();
 			
+			eventDispatcher.addEventListener(ApplicationEvent.MODEL_CHANGED, modelChangedHandler);
+			
 			_view.addEventListener(MouseEvent.MOUSE_OVER, mouseOverHandler);
 			_view.addEventListener(MouseEvent.MOUSE_OUT, mouseOutHandler);
 			
@@ -63,6 +66,16 @@ package org.openforis.collect.presenter {
 			}
 			
 			ChangeWatcher.watch(_view, "attribute", attributeChangeHandler);
+		}
+		
+		protected function modelChangedHandler(event:Event):void {
+			if(_view.attribute != null) {
+				var newAttribute:AttributeProxy = Application.activeRecord.getNode(_view.attribute.id) as AttributeProxy;
+				if(newAttribute != _view.attribute) {
+					//attribute changed
+					_view.attribute = newAttribute;
+				}
+			}
 		}
 		
 		protected function attributeChangeHandler(event:Event):void {
@@ -131,8 +144,8 @@ package org.openforis.collect.presenter {
 		
 		protected function updateResultHandler(event:ResultEvent, token:Object = null):void {
 			var result:IList = event.result as IList;
-			var attribute:AttributeProxy = result.getItemAt(0) as AttributeProxy;
-			_view.attribute = attribute;
+			Application.activeRecord.update(result);
+			eventDispatcher.dispatchEvent(new ApplicationEvent(ApplicationEvent.MODEL_CHANGED));
 			//_view.currentState = InputField.STATE_SAVE_COMPLETE;
 		}
 

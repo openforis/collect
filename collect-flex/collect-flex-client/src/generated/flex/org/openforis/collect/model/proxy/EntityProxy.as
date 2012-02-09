@@ -6,12 +6,16 @@
  */
 
 package org.openforis.collect.model.proxy {
+	import mx.collections.ArrayCollection;
 	import mx.collections.ArrayList;
 	import mx.collections.IList;
+	
+	import org.openforis.collect.util.CollectionUtil;
 
     [Bindable]
     [RemoteClass(alias="org.openforis.collect.model.proxy.EntityProxy")]
     public class EntityProxy extends EntityProxyBase {
+    	public var children:Object;
 		
 		public function getSingleAttribute(attributeName:String):AttributeProxy {
 			var attributes:IList = childrenByName.get(attributeName);
@@ -27,8 +31,17 @@ package org.openforis.collect.model.proxy {
 			}
 		}
 		
-		public function getChildren(nodeName:String):IList {
-			var children:IList = childrenByName.get(nodeName);
+		public function getChildren(nodeName:String = null):IList {
+			var children:IList; 
+			if(name == null) {
+				children = new ArrayList();
+				var values:ArrayCollection = childrenByName.values;
+				for each (var childList:IList in values) {
+					CollectionUtil.addAll(children, childList);
+				}
+			} else {
+				children = childrenByName.get(nodeName);
+			}
 			return children;
 		}
 
@@ -39,6 +52,48 @@ package org.openforis.collect.model.proxy {
 			} else {
 				return null;
 			}
+		}
+		
+		public function getChildById(id:int):NodeProxy {
+			var values:ArrayCollection = childrenByName.values;
+			for each (var childList:IList in values) {
+				for each (var child:NodeProxy in childList) {
+					if(child.id == id) {
+						return child;
+					}
+				}
+			}
+			return null;
+		}
+		
+		public function getNode(id:int):NodeProxy {
+			var child:NodeProxy = getChildById(id);
+			if(child != null) {
+				return child;
+			} else {
+				//search in child entities
+				var entities:IList = getChildEntities();
+				for each (var e:EntityProxy in entities) {
+					child = e.getNode(id);
+					if(child != null) {
+						return child;
+					}
+				}
+			}
+			return null;
+		}
+		
+		public function getChildEntities():IList {
+			var entities:IList = new ArrayCollection();
+			var values:IList = childrenByName.values;
+			for each (var childList:IList in values) {
+				for each (var child:NodeProxy in childList) {
+					if(child is EntityProxy) {
+						entities.addItem(child);
+					}
+				}
+			}
+			return entities;
 		}
 		
 		public function addChild(node:NodeProxy):void {

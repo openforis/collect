@@ -13,34 +13,34 @@ package org.openforis.collect.presenter {
 	 * 
 	 * */
 
-	public class MultipleAttributeDataGroupPresenter extends AbstractPresenter {
-		
-		private var _view:MultipleAttributeDataGroupFormItem;
+	public class MultipleAttributeDataGroupPresenter extends AttributeFormItemPresenter {
 		
 		public function MultipleAttributeDataGroupPresenter(view:MultipleAttributeDataGroupFormItem) {
-			this._view = view;
-			
-			super();
+			super(view);
+		}
+		
+		private function get view():MultipleAttributeDataGroupFormItem {
+			return MultipleAttributeDataGroupFormItem(_view);
 		}
 		
 		override internal function initEventListeners():void {
-			_view.openPopupImage.addEventListener(MouseEvent.CLICK, openPopupImageClickHandler);
-			_view.popup.addEventListener(CloseEvent.CLOSE, closePopupHandler);
+			view.openPopupImage.addEventListener(MouseEvent.CLICK, openPopupImageClickHandler);
+			view.popup.addEventListener(CloseEvent.CLOSE, closePopupHandler);
 		}
 		
 		/**
 		 * Open popup for editing the attribute values
 		 * */
 		internal function openPopupImageClickHandler(event:MouseEvent):void {
-			PopUpManager.addPopUp(_view.popup, FlexGlobals.topLevelApplication as DisplayObject, true);
-			PopUpManager.centerPopUp(_view.popup);
+			PopUpManager.addPopUp(view.popup, FlexGlobals.topLevelApplication as DisplayObject, true);
+			PopUpManager.centerPopUp(view.popup);
 		}
 		
 		/**
 		 * Close the popup
 		 * */
 		internal function closePopupHandler(event:CloseEvent):void {
-			PopUpManager.removePopUp(_view.popup);
+			PopUpManager.removePopUp(view.popup);
 		}
 	}
 }
