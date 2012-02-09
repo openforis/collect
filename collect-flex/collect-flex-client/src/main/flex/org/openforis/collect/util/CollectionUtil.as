@@ -17,6 +17,11 @@ package org.openforis.collect.util
 			return ! isEmpty(list);
 		}
 		
+		public static function addAll(list:IList, addList:IList):void {
+			for each(var item:Object in addList) {
+				list.addItem(item);
+			}
+		}
 		
 	}
 }
