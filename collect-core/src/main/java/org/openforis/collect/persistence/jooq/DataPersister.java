@@ -8,7 +8,6 @@ import java.util.Map;
 
 import org.jooq.InsertSetMoreStep;
 import org.jooq.impl.Factory;
-import org.openforis.collect.model.CollectAttributeMetadata;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.model.Attribute;
@@ -69,12 +68,6 @@ public class DataPersister {
 			}
 			if (attr.getSymbol() != null) {
 				insert.set(DATA.SYMBOL, attr.getSymbol().toString());
-			}
-			CollectAttributeMetadata metadata = (CollectAttributeMetadata) attr.getMetadata();
-			if (metadata != null) {
-				if (metadata.getState() != null) {
-					insert.set(DATA.STATE, metadata.getState().toString());
-				}
 			}
 		}
 		

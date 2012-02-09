@@ -3160,7 +3160,7 @@
                 <code name="no" list="sampling_design" parent="parent()/id" ui:tab="plot_det" strict="false" key="true">
                     <label>No.</label>
                 </code>
-                <text name="subplot" ui:tab="plot_det" required="share &lt; 100" key="true">
+                <text name="subplot" ui:tab="plot_det" requiredIf="share &lt; 100" key="true">
                     <label>Subplot</label>
                     <default value="A"/>
                     <pattern regex="[A-Z]" flag="error">
@@ -3393,7 +3393,7 @@
                 <text type="memo" name="remarks" ui:tab="plot_det">
                     <label>Remarks</label>                        
                 </text>
-                <boolean name="slope_correction_applied" since="1.1" ui:tab="plot_det" relevant="accessibility = 0" required="slope &gt;= 5">
+                <boolean name="slope_correction_applied" since="1.1" ui:tab="plot_det" relevant="accessibility = 0" requiredIf="slope &gt;= 5">
                     <label>Slope correction applied</label>
                 </boolean>
                 <entity name="shrubs" ui:tab="shrubs_regen" relevant="accessibility = 0 and vegetation_type &gt;= 101 and vegetation_type &lt;= 306">
@@ -3404,7 +3404,7 @@
                         <label>Coverage class</label>
                         <default value="0"/>
                     </code>
-                    <number type="real" name="avg_height" required="coverage &gt; 0">
+                    <number type="real" name="avg_height" requiredIf="coverage &gt; 0">
                         <label>Mean height</label>
                         <precision decimalDigits="2" unit="m"/>
                         <compare gte="0" lte="10" flag="error"/>
