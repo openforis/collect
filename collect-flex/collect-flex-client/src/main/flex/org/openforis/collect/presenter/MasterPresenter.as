@@ -103,7 +103,7 @@ package org.openforis.collect.presenter {
 		internal function backToListHandler(event:UIEvent):void {
 			//reload record summaries 
 			_view.currentState = MasterView.LIST_STATE;
-			var uiEvent:UIEvent = new UIEvent(UIEvent.LOAD_RECORD_SUMMARIES);
+			var uiEvent:UIEvent = new UIEvent(UIEvent.RELOAD_RECORD_SUMMARIES);
 			eventDispatcher.dispatchEvent(uiEvent);
 		}
 		

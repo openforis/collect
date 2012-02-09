@@ -19,6 +19,7 @@ package org.openforis.collect.event {
 		
 		//List events		
 		public static const LOAD_RECORD_SUMMARIES:String = "loadRecordSummaries"; 
+		public static const RELOAD_RECORD_SUMMARIES:String = "reloadRecordSummaries"; 
 		
 		//Edit events
 		public static const ACTIVE_RECORD_CHANGED:String = "activeRecordChanged";

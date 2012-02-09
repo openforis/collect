@@ -20,13 +20,7 @@
 			public static const SELECTION_STATE:String = "selection";
 			
 			private var _presenter:ListPresenter;
-			/* 
-			override public function initialize():void {
-				super.initialize();
-				_presenter = new ListPresenter(this);
-			}
-			 */
-			
+
 			override protected function initializationComplete():void {
 				super.initializationComplete();
 				_presenter = new ListPresenter(this);
@@ -46,7 +40,7 @@
 	
 	<datagrid:RecordSummaryDataGrid id="dataGrid" width="100%" horizontalScrollPolicy="off" selectionMode="singleRow" doubleClickEnabled="true" verticalScrollPolicy="off" />
 	
-	<datagrid:PaginationBar id="paginationBar" height="16" currentState.inactive="{PaginationBar.LOADING_STATE}" />
+	<datagrid:PaginationBar id="paginationBar" height="16" />
 	
 	<s:HGroup id="controlsBar" width="100%" horizontalAlign="center" verticalAlign="bottom" height="30">
 		<s:Button id="addButton" label="{Message.get('list.add')}" 

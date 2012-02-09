@@ -70,6 +70,7 @@ package org.openforis.collect.presenter {
 
 		override internal function initEventListeners():void {
 			eventDispatcher.addEventListener(UIEvent.LOAD_RECORD_SUMMARIES, loadRecordSummariesHandler);
+			eventDispatcher.addEventListener(UIEvent.RELOAD_RECORD_SUMMARIES, reloadRecordSummariesHandler);
 
 			this._view.addButton.addEventListener(MouseEvent.CLICK, addButtonClickHandler);
 			this._view.editButton.addEventListener(MouseEvent.CLICK, editButtonClickHandler);
@@ -135,6 +136,10 @@ package org.openforis.collect.presenter {
 			loadRecordSummariesCurrentPage();
 		}
 		
+		protected function reloadRecordSummariesHandler(event:UIEvent):void {
+			loadRecordSummariesCurrentPage();
+		}
+		
 		protected function updateDataGrid():void {
 			var rootEntity:EntityDefinitionProxy = Application.activeRootEntity;
 			var columns:IList = UIBuilder.getRecordSummaryListColumns(rootEntity);
@@ -145,6 +150,7 @@ package org.openforis.collect.presenter {
 			_view.paginationBar.currentPageText.text = new String(currentPage);
 			
 			_view.currentState = ListView.INACTIVE_STATE;
+			_view.paginationBar.currentState = PaginationBar.LOADING_STATE;
 			
 			//offset starts from 0
 			var offset:int = (currentPage - 1) * MAX_RECORDS_PER_PAGE;
