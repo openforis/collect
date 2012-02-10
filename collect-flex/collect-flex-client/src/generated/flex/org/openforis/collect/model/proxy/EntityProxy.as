@@ -23,12 +23,11 @@ package org.openforis.collect.model.proxy {
 				if(attributes.length == 1) {
 					var attribute:AttributeProxy = attributes.getItemAt(0) as AttributeProxy;
 					return attribute;
-				} else {
+				} else if (attributes.length > 1) {
 					throw new Error("Single attribute expected");
 				}
-			} else {
-				return null;
 			}
+			return null;
 		}
 		
 		public function getChildren(nodeName:String = null):IList {
