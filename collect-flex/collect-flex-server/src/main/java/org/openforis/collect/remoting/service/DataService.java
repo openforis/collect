@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.manager.RecordManager;
@@ -158,7 +159,7 @@ public class DataService {
 	public void updateRootEntityKey(String recordId, String newRootEntityKey) throws DuplicateIdException, InvalidIdException, NonexistentIdException, AccessDeniedException, RecordLockedException {
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public List<NodeProxy> updateActiveRecord(UpdateRequest request) {
 		List<NodeProxy> result = new ArrayList<NodeProxy>();
 		SessionState sessionState = sessionManager.getSessionState();
@@ -176,11 +177,12 @@ public class DataService {
 			switch (method) {
 			case ADD:
 				if(nodeDef instanceof AttributeDefinition) {
-					AttributeDefinition attributeDef = (AttributeDefinition) nodeDef;
-					Object val = parseValue(attributeDef, value);
-					Attribute<?, ?> attribute = addAttribute(parentEntity, (AttributeDefinition) nodeDef, val);
-					AttributeProxy proxy = new AttributeProxy(attribute);
-					result.add(proxy);
+					AttributeDefinition def = (AttributeDefinition) nodeDef;
+					List<Attribute> attributes = addAttributes(parentEntity, (AttributeDefinition) def, value);
+					for (Attribute attribute : attributes) {
+						AttributeProxy proxy = new AttributeProxy(attribute);
+						result.add(proxy);
+					}
 				} else {
 					Entity node = parentEntity.addEntity(nodeName);
 					addEmptyAttributes(node);
@@ -192,11 +194,26 @@ public class DataService {
 				Integer nodeId = request.getNodeId();
 				Node<? extends NodeDefinition> node = record.getNodeById(nodeId);
 				if(node instanceof Attribute) {
-					update((Attribute<?, Object>) node, value);
+					if(node instanceof CodeAttribute && node.getDefinition().isMultiple()) {
+						NodeDefinition def = node.getDefinition();
+						String name = def.getName();
+						//remove old attributes
+						int count = parentEntity.getCount(def.getName());
+						for (int i = count - 1; i >= 0; i--) {
+							parentEntity.remove(name, i);
+						}
+						//add new attributes
+						List<Attribute> attributes = addAttributes(parentEntity, (AttributeDefinition) def, value);
+						for (Attribute attribute : attributes) {
+							AttributeProxy proxy = new AttributeProxy(attribute);
+							result.add(proxy);
+						}
+					} else {
+						update(parentEntity, (Attribute<?, Object>) node, value);
+						AttributeProxy proxy = new AttributeProxy((Attribute) node);
+						result.add(proxy);
+					}
 				}
-				@SuppressWarnings("rawtypes")
-				AttributeProxy proxy = new AttributeProxy((Attribute) node);
-				result.add(proxy);
 				break;
 			case DELETE:
 				break;
@@ -205,6 +222,23 @@ public class DataService {
 		} else {
 			throw new RuntimeException("Parent node is not an entity");
 		}
+	}
+	
+	@SuppressWarnings("rawtypes")
+	private List<Attribute> addAttributes(Entity parentEntity, AttributeDefinition def, String value) {
+		List<Attribute> result = new ArrayList<Attribute>();
+		Object val = parseValue(parentEntity, (AttributeDefinition) def, value);
+		if(val instanceof List) {
+			List values = (List) val;
+			for (Object v : values) {
+				Attribute<?, ?> attribute = addAttribute(parentEntity, def, v);
+				result.add(attribute);
+			}
+		} else {
+			Attribute<?, ?> attribute = addAttribute(parentEntity,  def, val);
+			result.add(attribute);
+		}
+		return result;
 	}
 	
 	@SuppressWarnings("rawtypes")
@@ -237,19 +271,34 @@ public class DataService {
 		return result;
 	}
 	
-	private void update(Attribute<?, Object> attribute, String value) {
+	private void update(Entity parentEntity, Attribute<?, Object> attribute, String value) {
 		AttributeDefinition def = (AttributeDefinition) attribute.getDefinition();
-		Object val = parseValue(def, value);
+		Object val = parseValue(parentEntity, def, value);
 		attribute.setValue(val);
 	}
 
-	private Object parseValue(AttributeDefinition def, String value) {
+	private Object parseValue(Entity parentEntity, AttributeDefinition def, String value) {
 		Object result = null;
 		if(def instanceof BooleanAttributeDefinition) {
 			result = Boolean.parseBoolean(value);
 		} else if(def instanceof CodeAttributeDefinition) {
-			Code code = new Code(value);
-			result = code;
+			List<CodeListItem> codeList = findCodeList(parentEntity, (CodeAttributeDefinition) def);
+			StringTokenizer st = new StringTokenizer(value, ",");
+			List<Code> codes = new ArrayList<Code>();
+			while (st.hasMoreTokens()) {
+				String token = st.nextToken();
+				Code code = parseCode(codeList, token);
+				if(code != null) {
+					codes.add(code);
+				} else {
+					//TODO throw exception
+				}
+			}
+			if(codes.size() > 1) {
+				result = codes;
+			} else if(codes.size() == 1) {
+				result = codes.get(0);
+			}
 		} else if(def instanceof CoordinateAttributeDefinition) {
 			//TODO
 			result = null;
@@ -293,6 +342,23 @@ public class DataService {
 			result = value;
 		}
 		return result;
+	}
+	
+	private Code parseCode(List<CodeListItem> codeList, String value) {
+		String[] strings = value.split(":");
+		String codeStr = strings[0].trim();
+		String qualifier = null;
+		if(strings.length == 2) {
+			qualifier = strings[1].trim();
+		}
+		CodeListItem codeListItem = getCodeListItem(codeList, codeStr);
+		if(codeListItem != null) {
+			Code code = new Code(codeListItem.getCode(), qualifier);
+			return code;
+		} else {
+			//TODO throw error
+			return null;
+		}
 	}
 	
 	private void addEmptyAttributes(Entity entity) {
@@ -340,7 +406,7 @@ public class DataService {
 		}
 		this.sessionManager.clearActiveRecord();
 	}
-
+	
 	/**
 	 * Returns all code list items that matches the comma separated ids
 	 * 
@@ -444,10 +510,17 @@ public class DataService {
 	}
 	
 	private CodeListItem getCodeListItem(List<CodeListItem> siblings, String code) {
-		for (CodeListItem codeListItem : siblings) {
-			String itemCode = codeListItem.getCode();
-			if (itemCode.equals(code)) {
-				return codeListItem;
+		for (CodeListItem item : siblings) {
+			String itemCode = item.getCode();
+			String paddedCode;
+			if(itemCode.length() - code.length() > 0) {
+				//try to left pad the code with '0'
+				paddedCode = StringUtils.leftPad(code, itemCode.length(), '0');
+			} else {
+				paddedCode = code;
+			}
+			if (itemCode.equals(paddedCode)) {
+				return item;
 			}
 		}
 		return null;

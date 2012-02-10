@@ -12,10 +12,16 @@ package org.openforis.collect.presenter {
 	import mx.rpc.events.ResultEvent;
 	
 	import org.openforis.collect.client.ClientFactory;
+	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.CodeAttributeDefinitionProxy;
+	import org.openforis.collect.metamodel.proxy.CodeListItemProxy;
 	import org.openforis.collect.model.proxy.AttributeProxy;
 	import org.openforis.collect.model.proxy.CodeProxy;
+	import org.openforis.collect.remoting.service.UpdateRequest;
+	import org.openforis.collect.remoting.service.UpdateRequest$Method;
 	import org.openforis.collect.ui.component.input.CodeInputField;
+	import org.openforis.collect.ui.component.input.TextInput;
+	import org.openforis.collect.util.CollectionUtil;
 	import org.openforis.collect.util.StringUtil;
 	
 	/**
@@ -39,7 +45,7 @@ package org.openforis.collect.presenter {
 			_view.openImage.addEventListener(MouseEvent.CLICK, openImageClickHandler);
 			
 			_view.popup.addEventListener(CloseEvent.CLOSE, closePopupHandler);
-			_view.popup.cancelButton.addEventListener(MouseEvent.CLICK, cancelButtonClickHandelr);
+			_view.popup.cancelButton.addEventListener(MouseEvent.CLICK, cancelButtonClickHandler);
 			_view.popup.applyButton.addEventListener(MouseEvent.CLICK, applyButtonClickHandelr);
 			
 			ChangeWatcher.watch(_view, "attributes", attributeChangeHandler);
@@ -80,12 +86,21 @@ package org.openforis.collect.presenter {
 		}
 
 		protected function applyButtonClickHandelr(event:MouseEvent):void {
-			//var data:ArrayCollection = _view.popup.dataGroup.dataProvider;
-			
-			//call service method
+			var items:IList = _view.popup.dataGroup.dataProvider;
+			var parts:Array = new Array();
+			for each (var item:CodeListItemProxy in items) { 
+				if(item.selected) {
+					var codeStr:String = StringUtil.concat(": ", item.code, item.qualifier);
+					parts.push(codeStr);
+				}
+			}
+			var codesStr:String = StringUtil.concat(", ", parts);
+			TextInput(_view.textInput).text = codesStr;
+			PopUpManager.removePopUp(_view.popup);
+			applyChanges();
 		}
 		
-		protected function cancelButtonClickHandelr(event:MouseEvent):void {
+		protected function cancelButtonClickHandler(event:MouseEvent):void {
 			PopUpManager.removePopUp(_view.popup);
 		}
 
@@ -119,8 +134,36 @@ package org.openforis.collect.presenter {
 			return "";
 		}
 		
-		override public function updateView():void {
+		override protected function updateView():void {
 			super.updateView();
+		}
+		
+		override protected function applyChanges(value:*=null):void {
+			if(_view.parentEntity == null) {
+				throw new Error("Missing parent entity for this attribute");
+			}
+			if(value == null) {
+				value = createValue();
+			}
+			var req:UpdateRequest = new UpdateRequest();
+			var def:AttributeDefinitionProxy = _view.attributeDefinition;
+			req.parentNodeId = _view.parentEntity.id;
+			req.nodeName = def.name;
+			req.value = String(value);
+			
+			if(_view.attribute != null || (CollectionUtil.isNotEmpty(_view.attributes))) {
+				if(def.multiple) {
+					var firstAttr:Object = _view.attributes.getItemAt(0);
+					req.nodeId = firstAttr.id;
+				} else {
+					req.nodeId = _view.attribute.id;
+				}
+				req.method = UpdateRequest$Method.UPDATE;
+			} else {
+				req.method = UpdateRequest$Method.ADD;
+			}
+			var responder:AsyncResponder = new AsyncResponder(updateResultHandler, updateFaultHandler);
+			ClientFactory.dataClient.updateActiveRecord(responder, req);
 		}
 		
 	}

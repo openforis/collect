@@ -36,7 +36,7 @@
 						import org.openforis.collect.metamodel.proxy.CodeListItemProxy;
 						
 						private function textInputChangeHandler(event:Event):void {
-							
+							data.qualifier = textInput.text;
 						}
 						
 						private function checkBoxChangeHandler(event:Event):void {
