@@ -15,6 +15,8 @@
 		<![CDATA[
 			import mx.collections.IList;
 			import mx.collections.ListCollectionView;
+			import mx.containers.GridItem;
+			import mx.containers.GridRow;
 			import mx.core.IVisualElement;
 			import mx.events.FlexEvent;
 			
@@ -36,6 +38,7 @@
 			private var _entityDefinition:EntityDefinitionProxy;
 			private var _uiTabs:ListCollectionView;	
 			private var _forms:Array = new Array();
+			private var _mainDefinitions:IList;
 			
 			private var _presenter:EntityFormPresenter;
 			
@@ -59,6 +62,15 @@
 			
 			public function set entity(value:EntityProxy):void {
 				_entity = value;
+			}
+			
+			[Bindable]
+			public function get mainDefinitions():IList {
+				return _mainDefinitions;
+			}
+			
+			public function set mainDefinitions(value:IList):void {
+				_mainDefinitions = value;
 			}
 			
 			override protected function createChildren():void {
@@ -86,7 +98,8 @@
 			
 			public function addFormItem(formItem:IVisualElement, tabName:String = null):void {
 				if(tabName == null || tabName == ''){
-					form.addElement(formItem);
+					//form.addElement(formItem);
+					form.addChild(formItem as DisplayObject);
 				} else {
 					var f:ScrollableFormContainer = (_forms[tabName] as ScrollableFormContainer);
 					f.addToForm(formItem);
@@ -103,16 +116,36 @@
 			} 
 			
 			public function addEntityFormItem(entityFormItem:EntityFormItem, tabName:String = null):void {
-				var formItem:FormItem = new FormItem();
+				/* var formItem:FormItem = new FormItem();
 				formItem.label = entityFormItem.entityDefinition.getLabelText();
+				 */
+				var formItem:GridRow = new GridRow();
+				var labelCol:GridItem = new GridItem();
+				var label:Label = new Label();
+				label.text = entityFormItem.entityDefinition.getLabelText();
+				labelCol.addChild(label);
+				formItem.addChild(labelCol);
 				
 				if(tabName == null || tabName == '') {
-					form.addElement(formItem);
-					form.addElement(entityFormItem);
+					/* form.addElement(formItem);
+					form.addElement(entityFormItem); */
+					form.addChild(formItem);
+					formItem = new GridRow();
+					var attrCol:GridItem = new GridItem();
+					attrCol.colSpan = 2;
+					attrCol.addChild(entityFormItem as DisplayObject);
+					formItem.addChild(attrCol);
+					form.addChild(formItem);
 				} else {
 					var f:ScrollableFormContainer = (_forms[tabName] as ScrollableFormContainer);
 					f.addToForm(formItem);
 					f.addToForm(entityFormItem);
+					formItem = new GridRow();
+					var attrCol:GridItem = new GridItem();
+					attrCol.colSpan = 2;
+					attrCol.addChild(entityFormItem as DisplayObject);
+					formItem.addChild(attrCol);
+					f.addToForm(formItem);
 				}
 			}
 			
@@ -210,11 +243,57 @@
 		
 		<s:Scroller height="100%" width="100%" id="scroller">
 			<s:Group width="100%" id="group">
-				<s:Form height="100%" width="100%" id="form">
+				<!--<s:DataGroup id="dataGroup" dataProvider="{mainDefinitions}" height="100%" width="100%">
+					<s:layout>
+						<s:VerticalLayout />
+					</s:layout>
+					<s:itemRenderer>
+						<fx:Component>
+							<s:ItemRenderer dataChange="dataChangeHandler(event)">
+								<fx:Script>
+									<![CDATA[
+										import mx.binding.utils.BindingUtils;
+										import mx.events.FlexEvent;
+										
+										import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
+										import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
+										import org.openforis.collect.ui.UIBuilder;
+										
+										override protected function createChildren():void {
+											super.createChildren();
+											if(data is AttributeDefinitionProxy) {
+												var attrFormItem:AttributeFormItem = UIBuilder.getAttributeFormItem(AttributeDefinitionProxy(data));
+												addElement(attrFormItem);
+												
+												//bind parentEntity of each attrFormItem to the "entity" of the form 
+												BindingUtils.bindProperty(attrFormItem, "parentEntity", outerDocument, "entity");
+											} else if(data is EntityDefinitionProxy) {
+												var entityFormItem:EntityFormItem = UIBuilder.getEntityFormItem(EntityDefinitionProxy(data));
+												addElement(entityFormItem);
+											}
+											
+										}
+										
+										protected function dataChangeHandler(event:FlexEvent):void {
+											invalidateDisplayList();
+										}
+										
+									]]>
+								</fx:Script>
+							</s:ItemRenderer>
+						</fx:Component>
+					</s:itemRenderer>
+				</s:DataGroup>-->
+				<mx:Grid id="form" width="100%" height="100%">
+					
+				</mx:Grid>
+				<!--<s:VGroup height="100%" width="100%" id="form">
+				</s:VGroup>-->
+				<!--<s:Form height="100%" width="100%" id="form">
 					<s:layout>
 						<s:FormLayout gap="-15" paddingLeft="0" paddingRight="10" />
 					</s:layout>
-				</s:Form>
+				</s:Form>-->
 			</s:Group>
 		</s:Scroller>
 		
