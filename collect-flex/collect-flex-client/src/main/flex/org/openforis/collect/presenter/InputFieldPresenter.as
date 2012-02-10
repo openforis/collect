@@ -145,6 +145,7 @@ package org.openforis.collect.presenter {
 			var result:IList = event.result as IList;
 			Application.activeRecord.update(result);
 			eventDispatcher.dispatchEvent(new ApplicationEvent(ApplicationEvent.MODEL_CHANGED));
+			_changed = false;
 			//_view.currentState = InputField.STATE_SAVE_COMPLETE;
 		}
 

@@ -25,7 +25,7 @@ package org.openforis.collect.presenter
 	 * @author S. Ricci
 	 *  
 	 */
-	public class MultipleEntityFormItemPresenter extends FormItemPresenter {
+	public class MultipleEntityFormItemPresenter extends EntityFormItemPresenter {
 		
 		public function MultipleEntityFormItemPresenter(view:MultipleEntityFormItem) {
 			super(view);
