@@ -1,22 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+<detail:FormItem xmlns:fx="http://ns.adobe.com/mxml/2009" 
 			xmlns:s="library://ns.adobe.com/flex/spark" 
 			xmlns:mx="library://ns.adobe.com/flex/mx"
 			width="100%"
-			implements="org.openforis.collect.ui.component.detail.CollectFormItem">
-	
-	<s:layout>
+			xmlns:detail="org.openforis.collect.ui.component.detail.*"
+			>
+	<detail:layout>
 		<s:VerticalLayout gap="8" />
-	</s:layout>
+	</detail:layout>
 	
 	<fx:Script>
 		<![CDATA[
 			import mx.collections.IList;
+			import mx.containers.Grid;
+			import mx.containers.GridItem;
+			import mx.containers.GridRow;
 			import mx.core.IVisualElementContainer;
+			import mx.events.FlexEvent;
+			import mx.messaging.management.Attribute;
 			
 			import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 			import org.openforis.collect.model.proxy.AttributeProxy;
 			import org.openforis.collect.model.proxy.EntityProxy;
+			import org.openforis.collect.presenter.FormItemPresenter;
 			
 			private var _parentEntity:EntityProxy;
 			
@@ -28,11 +34,8 @@
 			
 			private var _childrenAdded:Boolean = false;
 			
-			private var _isInDataGroup:Boolean = false;
-			
 			override protected function createChildren():void {
 				super.createChildren();
-				//this.label = attributeDefinition.getLabelText();
 			}
 			
 			[Bindable]
@@ -44,45 +47,6 @@
 				_attributeDefinition = value;
 			}
 			
-			internal function get childrenAdded():Boolean {
-				return _childrenAdded;
-			}
-			
-			internal function set childrenAdded(value:Boolean):void {
-				_childrenAdded = value;
-			}
-			
-			public function addTo(parent:IVisualElementContainer):void {
-				parent.addElement(this);
-			}
-
-			public function get isInDataGroup():Boolean {
-				return _isInDataGroup;
-			}
-
-			public function set isInDataGroup(value:Boolean):void {
-				_isInDataGroup = value;
-			}
-
-			[Bindable]
-			public function get parentEntity():EntityProxy {
-				return _parentEntity;
-			}
-
-			public function set parentEntity(value:EntityProxy):void {
-				_parentEntity = value;
-				
-				if(value != null && attributeDefinition != null) {
-					if(attributeDefinition.multiple) {
-						var attributes:IList = _parentEntity.getChildren(attributeDefinition.name);
-						this.attributes = attributes;
-					} else {
-						var attribute:AttributeProxy = _parentEntity.getSingleAttribute(attributeDefinition.name);
-						this.attribute = attribute;
-					}
-				}
-			}
-
 			[Bindable]
 			public function get attribute():AttributeProxy {
 				return _attribute;
@@ -101,8 +65,7 @@
 				_attributes = value;
 			}
 
-
 		]]>
 	</fx:Script>
-	
-</s:Group>
+
+</detail:FormItem>

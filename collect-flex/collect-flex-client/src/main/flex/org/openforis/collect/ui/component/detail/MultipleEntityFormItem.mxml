@@ -4,7 +4,6 @@
 					   xmlns:mx="library://ns.adobe.com/flex/mx"
 					   xmlns:datagroup="org.openforis.collect.ui.component.datagroup.*"
 					   xmlns:detail="org.openforis.collect.ui.component.detail.*"
-					   creationComplete="creationCompleteHandler(event)"
 					   >
 	
 	<detail:layout>
@@ -24,14 +23,8 @@
 			
 			import spark.components.HGroup;
 			
-			private var _presenter:MultipleEntityFormItemPresenter;
-			
-			protected function creationCompleteHandler(event:FlexEvent):void {
-				_presenter = new MultipleEntityFormItemPresenter(this);
-			}
-			
-			override public function set parentEntity(value:EntityProxy):void {
-				super.parentEntity = value;
+			override protected function initPresenter():void {
+				presenter = new MultipleEntityFormItemPresenter(this);
 			}
 			
 			override protected function createChildren():void {

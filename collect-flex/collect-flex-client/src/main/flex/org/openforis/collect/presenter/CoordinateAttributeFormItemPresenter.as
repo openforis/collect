@@ -2,7 +2,6 @@ package org.openforis.collect.presenter {
 	import flash.events.Event;
 	import flash.events.FocusEvent;
 	
-	import mx.binding.utils.ChangeWatcher;
 	import mx.events.DropdownEvent;
 	
 	import org.openforis.collect.Application;
@@ -10,8 +9,6 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.model.proxy.AttributeProxy;
 	import org.openforis.collect.model.proxy.CoordinateProxy;
 	import org.openforis.collect.ui.component.detail.CoordinateAttributeFormItem;
-	import org.openforis.collect.ui.component.input.CoordinateInputField;
-	import org.openforis.collect.ui.component.input.InputField;
 	import org.openforis.collect.util.UIUtil;
 	
 	/**
@@ -20,12 +17,11 @@ package org.openforis.collect.presenter {
 	 * */
 	public class CoordinateAttributeFormItemPresenter extends AttributeFormItemPresenter {
 		
-		public function CoordinateAttributeFormItemPresenter(view:CoordinateAttributeFormItem = null) {
+		public function CoordinateAttributeFormItemPresenter(view:CoordinateAttributeFormItem) {
 			super(view);
 
 			view.srsDropDownList.labelFunction = srsDropDownLabelFunction;
 			view.srsDropDownList.dataProvider = Application.activeSurvey.spatialReferenceSystems;
-			updateView();
 		}
 		
 		private function get view():CoordinateAttributeFormItem {
@@ -44,21 +40,21 @@ package org.openforis.collect.presenter {
 		}
 		
 		override protected function updateView():void {
-			var attribute:AttributeProxy = this._view.attribute;
+			var attribute:AttributeProxy = this.view.attribute;
 			
 			//reset view
-			this.view.srsDropDownList.selectedItem = null;
-			this.view.xTextInput.text = null;
-			this.view.yTextInput.text = null;
+			view.srsDropDownList.selectedItem = null;
+			view.xTextInput.text = null;
+			view.yTextInput.text = null;
 			
 			if(attribute != null) {
 				var value:Object = attribute.value;
 				if(value is CoordinateProxy) {
 					var coordinate:CoordinateProxy = CoordinateProxy(value);
 					var srs:Object = null;
-					this.view.srsDropDownList.selectedItem = srs;
-					this.view.xTextInput.text = String(coordinate.x);
-					this.view.yTextInput.text = String(coordinate.y);
+					view.srsDropDownList.selectedItem = srs;
+					view.xTextInput.text = String(coordinate.x);
+					view.yTextInput.text = String(coordinate.y);
 				}
 			}
 		}

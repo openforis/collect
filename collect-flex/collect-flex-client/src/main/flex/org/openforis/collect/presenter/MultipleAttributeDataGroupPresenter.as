@@ -13,7 +13,7 @@ package org.openforis.collect.presenter {
 	 * 
 	 * */
 
-	public class MultipleAttributeDataGroupPresenter extends AttributeFormItemPresenter {
+	public class MultipleAttributeDataGroupPresenter extends FormItemPresenter {
 		
 		public function MultipleAttributeDataGroupPresenter(view:MultipleAttributeDataGroupFormItem) {
 			super(view);

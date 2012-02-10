@@ -8,6 +8,10 @@
 	
 	<fx:Script>
 		<![CDATA[
+			import mx.containers.Grid;
+			import mx.containers.GridItem;
+			import mx.containers.GridRow;
+			import mx.core.IVisualElement;
 			import mx.core.IVisualElementContainer;
 			import mx.events.FlexEvent;
 			
@@ -16,11 +20,11 @@
 			import org.openforis.collect.metamodel.proxy.SpatialReferenceSystemProxy;
 			import org.openforis.collect.presenter.CoordinateAttributeFormItemPresenter;
 			
+			import spark.components.Form;
 			import spark.components.FormItem;
+			import spark.components.Label;
 			
 			private static const INDENTED_FORM_ITEM_STYLE_NAME:String = "indent";
-			
-			private var _presenter:CoordinateAttributeFormItemPresenter;
 			
 			override public function addTo(parent:IVisualElementContainer):void {
 				if(this.isInDataGroup) {
@@ -28,30 +32,39 @@
 					parent.addElement(xTextInput);
 					parent.addElement(yTextInput);
 				} else {
-					var formItem:FormItem;
-					//srs
-					formItem = new FormItem();
-					formItem.styleName = INDENTED_FORM_ITEM_STYLE_NAME
-					formItem.label = Message.get('edit.coordinate.srs');
-					formItem.addElement(srsDropDownList);
-					parent.addElement(formItem);
-					//x
-					formItem = new FormItem();
-					formItem.styleName = INDENTED_FORM_ITEM_STYLE_NAME;
-					formItem.label = Message.get('edit.coordinate.x');
-					formItem.addElement(xTextInput);
-					parent.addElement(formItem);
-					//y
-					formItem = new FormItem();
-					formItem.styleName = INDENTED_FORM_ITEM_STYLE_NAME;
-					formItem.label = Message.get('edit.coordinate.y');
-					formItem.addElement(yTextInput);
-					parent.addElement(formItem);
+					addFormItem(parent, Message.get('edit.coordinate.srs'), srsDropDownList);
+					addFormItem(parent, Message.get('edit.coordinate.x'), xTextInput);
+					addFormItem(parent, Message.get('edit.coordinate.y'), yTextInput);
 				}
-				//init presenter
-				_presenter = new CoordinateAttributeFormItemPresenter(this);
+				initPresenter();
 			}
 			
+			protected function addFormItem(parent:IVisualElementContainer, label:String, inputField:IVisualElement):void {
+				if(parent is Form) {
+					var formItem:spark.components.FormItem = new spark.components.FormItem();
+					formItem.styleName = INDENTED_FORM_ITEM_STYLE_NAME;
+					formItem.label = label;
+					formItem.addElement(inputField);
+					parent.addElement(formItem);
+				} else if(parent is Grid) {
+					var row:GridRow = new GridRow();
+					var labelCol:GridItem = new GridItem();
+					var l:Label = new Label();
+					l.text = label;
+					l.styleName = INDENTED_FORM_ITEM_STYLE_NAME;
+					labelCol.addChild(l);
+					row.addChild(labelCol);
+					var attrCol:GridItem = new GridItem();
+					attrCol.addChild(inputField as DisplayObject);
+					row.addChild(attrCol);
+					Grid(parent).addChild(row);
+				}
+			}
+			
+			override protected function initPresenter():void {
+				presenter = new CoordinateAttributeFormItemPresenter(this);
+			}
+
 		]]>
 	</fx:Script>
 	

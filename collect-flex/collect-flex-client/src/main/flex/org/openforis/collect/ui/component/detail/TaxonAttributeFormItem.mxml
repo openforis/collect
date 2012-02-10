@@ -7,14 +7,20 @@
 	
 	<fx:Script>
 		<![CDATA[
+			import mx.containers.Grid;
+			import mx.containers.GridItem;
+			import mx.containers.GridRow;
+			import mx.core.IVisualElement;
 			import mx.core.IVisualElementContainer;
 			
 			import org.openforis.collect.i18n.Message;
 			import org.openforis.collect.presenter.TaxonAttributeFormItemPresenter;
 			
+			import spark.components.Form;
 			import spark.components.FormItem;
+			import spark.components.Label;
 			
-			private var _presenter:TaxonAttributeFormItemPresenter;
+			private static const INDENTED_FORM_ITEM_STYLE_NAME:String = "indent";
 			
 			override public function addTo(parent:IVisualElementContainer):void {
 				if(this.isInDataGroup) {
@@ -23,31 +29,41 @@
 					parent.addElement(vernacularNameTextInput);
 					parent.addElement(vernacularLangTextInput);
 				} else {
-					var formItem:FormItem;
-					//code
-					formItem = new FormItem();
-					formItem.label = Message.get('edit.taxon.code');
-					formItem.addElement(codeTextInput);
-					parent.addElement(formItem);
-					//scientific name
-					formItem = new FormItem();
-					formItem.label = Message.get('edit.taxon.scientificName');
-					formItem.addElement(scientificNameTextInput);
-					parent.addElement(formItem);
-					//vernacular name
-					formItem = new FormItem();
-					formItem.label = Message.get('edit.taxon.vernacularName');
-					formItem.addElement(vernacularNameTextInput);
-					parent.addElement(formItem);
-					//vernacular lang
-					formItem = new FormItem();
-					formItem.label = Message.get('edit.taxon.vernacularLang');
-					formItem.addElement(vernacularLangTextInput);
-					parent.addElement(formItem);
+					var formItem:spark.components.FormItem;
+					addFormItem(parent, Message.get('edit.taxon.code'), codeTextInput);
+					addFormItem(parent, Message.get('edit.taxon.scientificName'), scientificNameTextInput);
+					addFormItem(parent, Message.get('edit.taxon.vernacularName'), vernacularNameTextInput);
+					addFormItem(parent, Message.get('edit.taxon.vernacularLang'), vernacularLangTextInput);
 				}
-				//init presenter
-				_presenter = new TaxonAttributeFormItemPresenter(this);
+				initPresenter();
 			}
+			
+			protected function addFormItem(parent:IVisualElementContainer, label:String, inputField:IVisualElement):void {
+				if(parent is Form) {
+					var formItem:spark.components.FormItem = new spark.components.FormItem();
+					formItem.styleName = INDENTED_FORM_ITEM_STYLE_NAME;
+					formItem.label = label;
+					formItem.addElement(inputField);
+					parent.addElement(formItem);
+				} else if(parent is Grid) {
+					var row:GridRow = new GridRow();
+					var labelCol:GridItem = new GridItem();
+					var l:Label = new Label();
+					l.text = label;
+					l.styleName = INDENTED_FORM_ITEM_STYLE_NAME;
+					labelCol.addChild(l);
+					row.addChild(labelCol);
+					var attrCol:GridItem = new GridItem();
+					attrCol.addChild(inputField as DisplayObject);
+					row.addChild(attrCol);
+					Grid(parent).addChild(row);
+				}
+			}
+			
+			override protected function initPresenter():void {
+				presenter = new TaxonAttributeFormItemPresenter(this);
+			}
+			
 		]]>
 	</fx:Script>
 	

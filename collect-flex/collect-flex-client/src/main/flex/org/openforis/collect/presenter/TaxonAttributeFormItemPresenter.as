@@ -30,7 +30,7 @@ package org.openforis.collect.presenter {
 	 * 
 	 * @author S. Ricci
 	 * */
-	public class TaxonAttributeFormItemPresenter extends AttributeFormItemPresenter {
+	public class TaxonAttributeFormItemPresenter extends FormItemPresenter {
 		
 		protected static var autoCompletePopUp:TaxonAutoCompletePopUp;
 		protected static var autoCompletePopUpOpen:Boolean = false;

@@ -10,7 +10,9 @@ package org.openforis.collect.presenter
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.events.ResultEvent;
 	
+	import org.openforis.collect.Application;
 	import org.openforis.collect.client.ClientFactory;
+	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.model.proxy.AttributeProxy;
 	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.remoting.service.UpdateRequest;
@@ -24,7 +26,7 @@ package org.openforis.collect.presenter
 	 * @author S. Ricci
 	 *  
 	 */
-	public class MultipleAttributeFormItemPresenter extends AttributeFormItemPresenter {
+	public class MultipleAttributeFormItemPresenter extends FormItemPresenter {
 		
 		public function MultipleAttributeFormItemPresenter(view:MultipleAttributeFormItem) {
 			super(view);
@@ -41,13 +43,17 @@ package org.openforis.collect.presenter
 			return MultipleAttributeFormItem(_view);
 		}
 		
+		override protected function modelChangedHandler(event:ApplicationEvent):void {
+			if(view.dataGroup.dataProvider == null) {
+				updateView();
+			}
+		}
+		
 		override protected function updateView():void {
-			if(view.dataGroup != null) {
-				if(view.parentEntity != null) {
-					var name:String = view.attributeDefinition.name
-					var attributes:IList = view.parentEntity.getChildren(name);
-					view.dataGroup.dataProvider = attributes;
-				}
+			if(view.dataGroup != null && view.parentEntity != null) {
+				var name:String = view.attributeDefinition.name;
+				var attributes:IList = view.parentEntity.getChildren(name);
+				view.dataGroup.dataProvider = attributes;
 			}
 		}
 
@@ -58,16 +64,20 @@ package org.openforis.collect.presenter
 		protected function addButtonClickHandler(event:MouseEvent):void {
 			var req:UpdateRequest = new UpdateRequest();
 			req.method = UpdateRequest$Method.ADD;
-			req.parentNodeId = _view.parentEntity.id;
-			req.nodeName = _view.attributeDefinition.name;
+			req.parentNodeId = view.parentEntity.id;
+			req.nodeName = view.attributeDefinition.name;
 			ClientFactory.dataClient.updateActiveRecord(new AsyncResponder(addResultHandler, faultHandler, null), req);
 		}
 		
 		protected function addResultHandler(event:ResultEvent, token:Object = null):void {
 			var result:IList = event.result as IList;
-			var newAttribute:AttributeProxy = result.getItemAt(0) as AttributeProxy;
-			_view.parentEntity.addChild(newAttribute);
-			updateView();
+			Application.activeRecord.update(result);
+			eventDispatcher.dispatchEvent(new ApplicationEvent(ApplicationEvent.MODEL_CHANGED));
+			
+			view.callLater(function():void {
+				UIUtil.ensureElementIsVisible(view.addButton);
+			});
+
 		}
 		
 	}

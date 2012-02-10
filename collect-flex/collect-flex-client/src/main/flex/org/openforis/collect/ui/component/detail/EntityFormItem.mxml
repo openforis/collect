@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+<detail:FormItem xmlns:fx="http://ns.adobe.com/mxml/2009" 
 		 xmlns:s="library://ns.adobe.com/flex/spark" 
 		 xmlns:mx="library://ns.adobe.com/flex/mx"
 		 width="100%"
-		 implements="org.openforis.collect.ui.component.detail.CollectFormItem">
+		 xmlns:detail="org.openforis.collect.ui.component.detail.*"
+		 >
 
-	<s:layout>
+	<detail:layout>
 		<s:VerticalLayout  />
-	</s:layout>
+	</detail:layout>
 	
 	<fx:Script>
 		<![CDATA[
@@ -18,27 +19,14 @@
 			
 			import spark.components.FormItem;
 			
-			private var _parentEntity:EntityProxy;
-			
 			private var _entity:EntityProxy;
 			
 			private var _entityDefinition:EntityDefinitionProxy;
-			
-			private var _childrenAdded:Boolean = false;
 			
 			override protected function createChildren():void {
 				super.createChildren();
 			}
 			
-			[Bindable]
-			public function get parentEntity():EntityProxy {
-				return _parentEntity;
-			}
-
-			public function set parentEntity(value:EntityProxy):void {
-				_parentEntity = value;
-			}
-
 			[Bindable]
 			public function get entity():EntityProxy {
 				return _entity;
@@ -57,21 +45,7 @@
 				_entityDefinition = value;
 			}
 
-			internal function get childrenAdded():Boolean {
-				return _childrenAdded;
-			}
-			
-			internal function set childrenAdded(value:Boolean):void {
-				_childrenAdded = value;
-			}
-			
-			public function addTo(parent:IVisualElementContainer):void {
-				parent.addElement(this);
-			}
-
-			
 
 		]]>
 	</fx:Script>
-	
-</s:Group>
+</detail:FormItem>

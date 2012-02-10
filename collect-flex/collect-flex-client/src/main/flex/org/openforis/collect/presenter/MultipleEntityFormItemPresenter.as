@@ -12,6 +12,7 @@ package org.openforis.collect.presenter
 	
 	import org.openforis.collect.Application;
 	import org.openforis.collect.client.ClientFactory;
+	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.remoting.service.UpdateRequest;
 	import org.openforis.collect.remoting.service.UpdateRequest$Method;
@@ -24,38 +25,34 @@ package org.openforis.collect.presenter
 	 * @author S. Ricci
 	 *  
 	 */
-	public class MultipleEntityFormItemPresenter extends AbstractPresenter {
-		
-		protected var _view:MultipleEntityFormItem;
+	public class MultipleEntityFormItemPresenter extends FormItemPresenter {
 		
 		public function MultipleEntityFormItemPresenter(view:MultipleEntityFormItem) {
-			_view = view;
-			
-			super();
-			
-			updateView();
+			super(view);
 		}
 		
 		override internal function initEventListeners():void {
 			super.initEventListeners();
 			
-			ChangeWatcher.watch(_view, "parentEntity", parentEntityChangeHandler);
-			
-			_view.addButton.addEventListener(MouseEvent.CLICK, addButtonClickHandler);
-			_view.addButton.addEventListener(FocusEvent.FOCUS_IN, addButtonFocusInHandler);
+			view.addButton.addEventListener(MouseEvent.CLICK, addButtonClickHandler);
+			view.addButton.addEventListener(FocusEvent.FOCUS_IN, addButtonFocusInHandler);
 		}
 		
-		protected function parentEntityChangeHandler(event:Event):void {
-			updateView();
+		private function get view():MultipleEntityFormItem {
+			return MultipleEntityFormItem(_view);
 		}
 		
-		protected function updateView():void {
-			if(_view.dataGroup != null) {
-				if(_view.parentEntity != null) {
-					var name:String = _view.entityDefinition.name
-					var entities:IList = _view.parentEntity.getChildren(name);
-					_view.dataGroup.dataProvider = entities;
-				}
+		override protected function modelChangedHandler(event:ApplicationEvent):void {
+			if(view.dataGroup.dataProvider == null) {
+				updateView();
+			}
+		}
+		
+		override protected function updateView():void {
+			if(view.dataGroup != null && view.parentEntity != null) {
+				var name:String = view.entityDefinition.name;
+				var entities:IList = view.parentEntity.getChildren(name);
+				view.dataGroup.dataProvider = entities;
 			}
 		}
 
@@ -66,16 +63,19 @@ package org.openforis.collect.presenter
 		protected function addButtonClickHandler(event:MouseEvent):void {
 			var req:UpdateRequest = new UpdateRequest();
 			req.method = UpdateRequest$Method.ADD;
-			req.parentNodeId = _view.parentEntity.id;
-			req.nodeName = _view.entityDefinition.name;
+			req.parentNodeId = view.parentEntity.id;
+			req.nodeName = view.entityDefinition.name;
 			ClientFactory.dataClient.updateActiveRecord(new AsyncResponder(addResultHandler, faultHandler, null), req);
 		}
 		
 		protected function addResultHandler(event:ResultEvent, token:Object = null):void {
 			var result:IList = event.result as IList;
 			Application.activeRecord.update(result);
-			 
-			UIUtil.ensureElementIsVisible(_view.addButton);
+			eventDispatcher.dispatchEvent(new ApplicationEvent(ApplicationEvent.MODEL_CHANGED));
+			
+			view.callLater(function():void {
+				UIUtil.ensureElementIsVisible(view.addButton);
+			});
 		}
 		
 	}

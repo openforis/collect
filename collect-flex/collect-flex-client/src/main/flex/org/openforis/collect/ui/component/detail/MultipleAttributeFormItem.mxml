@@ -4,7 +4,6 @@
 		 xmlns:mx="library://ns.adobe.com/flex/mx"
 		 xmlns:detail="org.openforis.collect.ui.component.detail.*"
 		 xmlns:input="org.openforis.collect.ui.component.input.*"
-		 creationComplete="creationCompleteHandler(event)"
 		 >
 
 	<detail:layout>
@@ -27,9 +26,7 @@
 			import org.openforis.collect.ui.component.input.InputField;
 			import org.openforis.collect.util.CollectionUtil;
 			
-			private var presenter:MultipleAttributeFormItemPresenter;
-			
-			protected function creationCompleteHandler(event:FlexEvent):void {
+			override protected function initPresenter():void {
 				presenter = new MultipleAttributeFormItemPresenter(this);
 			}
 			
