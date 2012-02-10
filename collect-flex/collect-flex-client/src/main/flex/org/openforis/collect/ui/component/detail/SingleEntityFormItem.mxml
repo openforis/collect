@@ -72,15 +72,6 @@
 				}
 			}
 			
-			override public function set parentEntity(value:EntityProxy):void {
-				super.parentEntity = value;
-				
-				var child:EntityProxy = null;
-				if(value != null) {
-					child = value.getChild(entityDefinition.name, 0) as EntityProxy;
-				}
-				entity = child;
-			}
 		]]>
 	</fx:Script>
 	

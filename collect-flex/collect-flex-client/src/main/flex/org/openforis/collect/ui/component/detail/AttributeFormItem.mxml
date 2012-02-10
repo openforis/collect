@@ -25,22 +25,14 @@
 			import org.openforis.collect.presenter.AttributeFormItemPresenter;
 			import org.openforis.collect.presenter.FormItemPresenter;
 			
-			private var _parentEntity:EntityProxy;
-			
 			private var _attributeDefinition:AttributeDefinitionProxy;
 
 			private var _attribute:AttributeProxy;
 			
 			private var _attributes:IList;
 			
-			private var _childrenAdded:Boolean = false;
-			
 			override protected function initPresenter():void {
 				presenter = new AttributeFormItemPresenter(this);
-			}
-			
-			override protected function createChildren():void {
-				super.createChildren();
 			}
 			
 			[Bindable]

@@ -8,8 +8,8 @@ package org.openforis.collect.ui.component.detail
 	
 	import spark.components.Group;
 
-	public class FormItem extends Group implements CollectFormItem
-	{
+	public class FormItem extends Group implements CollectFormItem {
+		
 		private var _parentEntity:EntityProxy;
 		
 		private var _childrenAdded:Boolean = false;
