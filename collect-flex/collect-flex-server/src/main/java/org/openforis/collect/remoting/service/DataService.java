@@ -124,7 +124,7 @@ public class DataService {
 		EntityDefinition rootEntityDefinition = schema.getRootEntityDefinition(rootEntityName);
 		CollectRecord record = recordManager.create(activeSurvey, rootEntityDefinition, user, version.getName());
 		Entity rootEntity = record.getRootEntity();
-		addEmptyAttributes(rootEntity);
+		addEmptyAttributes(record, rootEntity);
 		sessionState.setActiveRecord((CollectRecord) record);
 		sessionState.setActiveRecordState(RecordState.NEW);
 		RecordProxy recordProxy = new RecordProxy(record);
@@ -185,7 +185,7 @@ public class DataService {
 					}
 				} else {
 					Entity node = parentEntity.addEntity(nodeName);
-					addEmptyAttributes(node);
+					addEmptyAttributes(record, node);
 					EntityProxy proxy = new EntityProxy(node);
 					result.add(proxy);
 				}
@@ -361,13 +361,15 @@ public class DataService {
 		}
 	}
 	
-	private void addEmptyAttributes(Entity entity) {
+	private void addEmptyAttributes(CollectRecord record, Entity entity) {
+		ModelVersion version = record.getVersion();
 		EntityDefinition entityDef = entity.getDefinition();
 		List<NodeDefinition> childDefinitions = entityDef.getChildDefinitions();
 		for (NodeDefinition nodeDef : childDefinitions) {
 			if(nodeDef instanceof AttributeDefinition) {
-				//TODO verify if is in version
-				addAttribute(entity, (AttributeDefinition) nodeDef, null);
+				if(ModelVersionUtil.isInVersion(nodeDef, version)) {
+					addAttribute(entity, (AttributeDefinition) nodeDef, null);
+				}
 			}
 		}
 	}
@@ -462,22 +464,13 @@ public class DataService {
 			items = parentItem.getChildItems();
 		}
 		List<CodeListItem> itemsInVersion = new ArrayList<CodeListItem>();
-		/*
 		CollectRecord activeRecord = this.getActiveRecord();
-		ModelVersion recordVersion = activeRecord.getVersion();
-		if (recordVersion != null) {
-			for (CodeListItem codeListItem : items) {
-				// TODO
-				// if (VersioningUtils.hasValidVersion(codeListItem, recordVersion)) {
-				// itemsInVersion.add(codeListItem);
-				// }
+		ModelVersion version = activeRecord.getVersion();
+		for (CodeListItem codeListItem : items) {
+			if (ModelVersionUtil.isInVersion(codeListItem, version)) {
+				itemsInVersion.add(codeListItem);
 			}
-		} else {
-			itemsInVersion.addAll(items);
 		}
-		*/
-		itemsInVersion.addAll(items);
-		
 		return itemsInVersion;
 	}
 	
