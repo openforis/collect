@@ -16,6 +16,7 @@
 			
 			import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 			import org.openforis.collect.model.proxy.EntityProxy;
+			import org.openforis.collect.presenter.EntityFormItemPresenter;
 			
 			import spark.components.FormItem;
 			
@@ -23,8 +24,8 @@
 			
 			private var _entityDefinition:EntityDefinitionProxy;
 			
-			override protected function createChildren():void {
-				super.createChildren();
+			override protected function initPresenter():void {
+				presenter = new EntityFormItemPresenter(this);
 			}
 			
 			[Bindable]
