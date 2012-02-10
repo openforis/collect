@@ -1,8 +1,11 @@
 package org.openforis.collect.ui {
 	import mx.binding.utils.BindingUtils;
+	import mx.collections.ArrayCollection;
 	import mx.collections.ArrayList;
 	import mx.collections.IList;
 	import mx.collections.ListCollectionView;
+	import mx.containers.GridItem;
+	import mx.containers.GridRow;
 	import mx.core.IVisualElement;
 	import mx.core.IVisualElementContainer;
 	
@@ -53,6 +56,8 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.ui.component.input.StringInputField;
 	import org.openforis.collect.ui.component.input.TaxonInputField;
 	import org.openforis.collect.ui.component.input.TimeInputField;
+	import org.openforis.collect.util.CollectionUtil;
+	import org.openforis.collect.util.StringUtil;
 	
 	import spark.components.FormItem;
 	import spark.components.HGroup;
@@ -67,50 +72,71 @@ package org.openforis.collect.ui {
 	public class UIBuilder {
 		
 		public static function buildForm(entity:EntityDefinitionProxy, version:ModelVersionProxy):FormContainer {
-				var formContainer:FormContainer = new FormContainer();
-				formContainer.initialize();
-				
-				var form:EntityFormContainer = new EntityFormContainer();
-				form.entityDefinition = entity;
-				
-				var uiConfig:UIConfiguration = Application.activeSurvey.uiConfiguration;
-				var tabs:ListCollectionView = null;
-				var uiTab:UITab = null;
-				if(uiConfig != null) {
-						tabs = uiConfig.tabs;
-						if(tabs != null){
-							for each (var tab:UITab in tabs) {
-								if(tab.name == entity.name) {
-									uiTab = tab;
-									break;
-								}
+			var formContainer:FormContainer = new FormContainer();
+			formContainer.initialize();
+			
+			var form:EntityFormContainer = new EntityFormContainer();
+			form.entityDefinition = entity;
+			
+			var uiConfig:UIConfiguration = Application.activeSurvey.uiConfiguration;
+			var tabs:ListCollectionView = null;
+			var uiTab:UITab = null;
+			if(uiConfig != null) {
+				tabs = uiConfig.tabs;
+				if(tabs != null){
+					for each (var tab:UITab in tabs) {
+						if(tab.name == entity.name) {
+							uiTab = tab;
+							break;
+						}
+					}
+				} 
+			}
+			//addFormItems(form, entity, version, uiTab);
+			var mainDefinitions:ArrayCollection = new ArrayCollection();
+			var defns:ListCollectionView = entity.childDefinitions;
+			form.uiTabs = uiTab.tabs;
+			if(CollectionUtil.isNotEmpty(defns)){
+				for each (var defn:NodeDefinitionProxy in defns) {
+					if(isInVersion(defn, version)) {
+						if(defn is AttributeDefinitionProxy) {
+							if(StringUtil.isBlank(defn.uiTabName)) {
+								mainDefinitions.addItem(defn);
 							}
-						} 
-				}
-				addFormItems(form, entity, version, uiTab);
-				formContainer.addEntityFormContainer(form);
-				/*
-					in this case the parentEntity of the formContainer will be null and 
-					the "entity" will be record's "rootEntity"
-				*/
-				BindingUtils.bindProperty(form, "entity", formContainer, ["record", "rootEntity"]);
-
-				if(tabs != null) {
-					for each (tab in tabs) {
-						var childForm:EntityFormContainer = new EntityFormContainer();
-						var child:NodeDefinitionProxy = entity.getChildDefinition(tab.name);
-						if(child is EntityDefinitionProxy) {
-							var edp:EntityDefinitionProxy = child as EntityDefinitionProxy;
-							childForm.entityDefinition = edp;														
-							addFormItems(childForm, edp, version, tab);			
-							formContainer.addEntityFormContainer(childForm);
-							/*
-								in this case the parentEntity will be the record's rootEntity
-							*/
-							BindingUtils.bindProperty(childForm, "parentEntity", formContainer, ["record", "rootEntity"]);
+						} else if(defn is EntityDefinitionProxy) {
+							var proxy:EntityDefinitionProxy = EntityDefinitionProxy(defn);
+							if(proxy.uiTabName == null || uiTab.hasChildTab(defn.uiTabName)) {
+								mainDefinitions.addItem(defn);
+							}
 						}
 					}
 				}
+			}
+			form.mainDefinitions = mainDefinitions;
+			
+			formContainer.addEntityFormContainer(form);
+			/*
+			in this case the parentEntity of the formContainer will be null and 
+			the "entity" will be record's "rootEntity"
+			*/
+			BindingUtils.bindProperty(form, "entity", formContainer, ["record", "rootEntity"]);
+			
+			if(tabs != null) {
+				for each (tab in tabs) {
+					var childForm:EntityFormContainer = new EntityFormContainer();
+					var child:NodeDefinitionProxy = entity.getChildDefinition(tab.name);
+					if(child is EntityDefinitionProxy) {
+						var edp:EntityDefinitionProxy = child as EntityDefinitionProxy;
+						childForm.entityDefinition = edp;														
+						addFormItems(childForm, edp, version, tab);			
+						formContainer.addEntityFormContainer(childForm);
+						/*
+						in this case the parentEntity will be the record's rootEntity
+						*/
+						BindingUtils.bindProperty(childForm, "parentEntity", formContainer, ["record", "rootEntity"]);
+					}
+				}
+			}
 			return formContainer;
 		}
 		
@@ -199,14 +225,31 @@ package org.openforis.collect.ui {
 					if(isInVersion(defn, version)) {
 						if(defn is AttributeDefinitionProxy) {
 							var attrFormItem:AttributeFormItem = getAttributeFormItem(AttributeDefinitionProxy(defn));
+							/*
 							var formItem:FormItem = new FormItem();
 							formItem.label = defn.getLabelText();
+							*/
+							/*
+							var formItem:HGroup = new HGroup();
+							formItem.addElement(label);
+							*/
+							var formItem:GridRow = new GridRow();
+							var labelCol:GridItem = new GridItem();
+							var label:Label = new Label();
+							label.text = defn.getLabelText();
+							labelCol.addChild(label);
+							formItem.addChild(labelCol);
+							
 							if(defn is CoordinateAttributeDefinitionProxy || defn is TaxonAttributeDefinitionProxy){
 								form.addFormItem(formItem, defn.uiTabName);
 								form.addAttributeFormItem(attrFormItem, defn.uiTabName);
 							} else {
-								formItem.addElement(attrFormItem);
-								form.addFormItem(formItem, defn.uiTabName);
+								/*formItem.addElement(attrFormItem);
+								form.addFormItem(formItem, defn.uiTabName);*/
+								var attrCol:GridItem = new GridItem();
+								attrCol.addChild(attrFormItem);
+								formItem.addChild(attrCol);
+								form.addFormItem(formItem);
 							}
 							//bind parentEntity of each attrFormItem to the "entity" of the form 
 							BindingUtils.bindProperty(attrFormItem, "parentEntity", form, "entity");

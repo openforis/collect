@@ -32,7 +32,8 @@
 				if(!borderContainer.initialized) {
 					borderContainer.initialize();
 				}
-				form.addElement(component);
+				//form.addElement(component);
+				form.addChild(component as DisplayObject);
 			}
 			
 		]]>
@@ -50,11 +51,16 @@
 	
 		<s:Scroller height="100%" width="100%" visible="true" id="scroller">
 			<s:Group width="100%" id="group">
-				<s:Form height="100%" width="100%" id="form">
+				<mx:Grid height="100%" width="100%" id="form">
+					
+				</mx:Grid>
+				<!--<s:VGroup height="100%" width="100%" id="form">
+				</s:VGroup>-->
+				<!--<s:Form height="100%" width="100%" id="form">
 					<s:layout>
 						<s:FormLayout gap="-15" paddingLeft="0"  paddingRight="20" />
 					</s:layout>
-				</s:Form>
+				</s:Form>-->
 			</s:Group>
 		</s:Scroller>
 	
