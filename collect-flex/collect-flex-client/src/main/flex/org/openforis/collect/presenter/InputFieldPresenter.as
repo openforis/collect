@@ -40,7 +40,6 @@ package org.openforis.collect.presenter {
 	 * */
 	public class InputFieldPresenter extends AbstractPresenter {
 		
-		protected var _path:String;
 		private var _view:InputField;
 		protected var _changed:Boolean = false;
 		
@@ -165,7 +164,7 @@ package org.openforis.collect.presenter {
 			return "";
 		}
 
-		public function createValue():* {
+		protected function createValue():* {
 			var result:* = _view.text;
 			return result;
 			/*
@@ -177,14 +176,6 @@ package org.openforis.collect.presenter {
 			}
 			return newAttributeValue;
 			*/
-		}
-		
-		public function get path():String {
-			return _path;
-		}
-
-		public function set path(value:String):void {
-			_path = value;
 		}
 		
 		public function changeReasonBlank(symbol:*):void {
@@ -200,7 +191,7 @@ package org.openforis.collect.presenter {
 		}
 
 
-		public function updateView():void {
+		protected function updateView():void {
 			//update textInput in view (generic text value)
 			if(_view.attributeDefinition != null) {
 				var textInput:TextInput = _view.textInput as TextInput;

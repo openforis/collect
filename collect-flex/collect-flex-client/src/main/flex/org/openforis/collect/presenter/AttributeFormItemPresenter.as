@@ -30,6 +30,8 @@ package org.openforis.collect.presenter
 		
 		public function AttributeFormItemPresenter(view:AttributeFormItem) {
 			super(view);
+			
+			assignAttribute();
 		}
 		
 		override internal function initEventListeners():void {

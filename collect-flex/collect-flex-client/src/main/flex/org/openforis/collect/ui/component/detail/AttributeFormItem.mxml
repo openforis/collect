@@ -22,6 +22,7 @@
 			import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 			import org.openforis.collect.model.proxy.AttributeProxy;
 			import org.openforis.collect.model.proxy.EntityProxy;
+			import org.openforis.collect.presenter.AttributeFormItemPresenter;
 			import org.openforis.collect.presenter.FormItemPresenter;
 			
 			private var _parentEntity:EntityProxy;
@@ -33,6 +34,10 @@
 			private var _attributes:IList;
 			
 			private var _childrenAdded:Boolean = false;
+			
+			override protected function initPresenter():void {
+				presenter = new AttributeFormItemPresenter(this);
+			}
 			
 			override protected function createChildren():void {
 				super.createChildren();

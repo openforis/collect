@@ -64,7 +64,7 @@ package org.openforis.collect.presenter {
 			this._inputField.approved = value.approved;
 		}
 		*/
-		override public function createValue():* {
+		override protected function createValue():* {
 			var result:String = StringUtil.concat(separator, _view.day.text, _view.month.text, _view.year.text);
 			return result;
 			/*
@@ -119,7 +119,7 @@ package org.openforis.collect.presenter {
 			return null;
 		}
 		
-		override public function updateView():void {
+		override protected function updateView():void {
 			if(_view.attribute != null) {
 				var date:DateProxy = _view.attribute.value as DateProxy;
 				if(date != null) {

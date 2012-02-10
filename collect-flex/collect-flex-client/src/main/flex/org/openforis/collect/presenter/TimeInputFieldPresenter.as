@@ -30,7 +30,7 @@ package org.openforis.collect.presenter {
 			_view.minutesTextInput.addEventListener(FocusEvent.FOCUS_OUT, focusOutHandler);
 		}
 
-		override public function createValue():* {
+		override protected function createValue():* {
 			var result:* = null;
 			return result;
 			/*
@@ -54,7 +54,7 @@ package org.openforis.collect.presenter {
 			return null;
 		}
 		
-		override public function updateView():void {
+		override protected function updateView():void {
 			if(_view.attribute != null) {
 				var time:TimeProxy = _view.attribute.value as TimeProxy;
 				if(time != null) {

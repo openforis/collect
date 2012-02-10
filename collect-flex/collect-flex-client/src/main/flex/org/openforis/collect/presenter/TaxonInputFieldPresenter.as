@@ -79,7 +79,7 @@ package org.openforis.collect.presenter {
 			this._view.approved = value.approved;
 		}
 		*/
-		override public function createValue():* {
+		override protected function createValue():* {
 			var result:* = null;
 			return result;
 			/*

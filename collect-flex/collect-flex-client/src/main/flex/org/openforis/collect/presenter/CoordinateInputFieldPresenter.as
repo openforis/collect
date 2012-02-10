@@ -33,7 +33,7 @@ package org.openforis.collect.presenter {
 			_view.srsDropDown.addEventListener(DropdownEvent.CLOSE, srsDropDownCloseHandler);
 		}
 		
-		override public function updateView():void {
+		override protected function updateView():void {
 			//this._inputField.attribute = attribute;
 			/*
 			this._view.srsDropDown.selectedItem = value.text1;
@@ -44,7 +44,7 @@ package org.openforis.collect.presenter {
 			*/
 		}
 		
-		override public function createValue():* {
+		override protected function createValue():* {
 			var newAttributeValue:Object = new Object();
 			newAttributeValue.text1 = srsDropDownLabelFunction(_view.srsDropDown.selectedItem);
 			newAttributeValue.text2 = _view.xTextInput.text;

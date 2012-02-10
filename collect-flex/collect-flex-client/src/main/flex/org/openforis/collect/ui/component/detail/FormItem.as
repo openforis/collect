@@ -19,6 +19,7 @@ package org.openforis.collect.ui.component.detail
 		protected var _presenter:FormItemPresenter;
 		
 		public function FormItem() {
+			super();
 			this.addEventListener(FlexEvent.CREATION_COMPLETE, creationCompleteHandler);
 		}
 		
@@ -51,19 +52,19 @@ package org.openforis.collect.ui.component.detail
 			_isInDataGroup = value;
 		}
 		
-		internal function get childrenAdded():Boolean {
+		protected function get childrenAdded():Boolean {
 			return _childrenAdded;
 		}
 		
-		internal function set childrenAdded(value:Boolean):void {
+		protected function set childrenAdded(value:Boolean):void {
 			_childrenAdded = value;
 		}
 		
-		internal function get presenter():FormItemPresenter {
+		protected function get presenter():FormItemPresenter {
 			return _presenter;
 		}
 		
-		internal function set presenter(value:FormItemPresenter):void {
+		protected function set presenter(value:FormItemPresenter):void {
 			_presenter = value;
 		}
 		
