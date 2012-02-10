@@ -15,7 +15,11 @@ package org.openforis.collect.model.proxy {
     public class RecordProxy extends RecordProxyBase {
 		
 		public function getNode(id:int):NodeProxy {
-			return rootEntity.getNode(id);
+			if(id == rootEntity.id) {
+				return rootEntity;
+			} else {
+				return rootEntity.getNode(id);
+			}
 		}
 		
 		public function update(nodes:IList):void {
