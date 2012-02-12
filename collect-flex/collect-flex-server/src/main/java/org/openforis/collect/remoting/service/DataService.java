@@ -215,7 +215,8 @@ public class DataService {
 		case DELETE:
 			Node<? extends NodeDefinition> nodeToDel = record.getNodeById(nodeId);
 			if(nodeToDel instanceof Entity) {
-				String name = nodeDef.getName();
+				EntityDefinition entityDef = ((Entity) nodeToDel).getDefinition();
+				String name = entityDef.getName();
 				List<Node<? extends NodeDefinition>> children = parentEntity.getAll(name);
 				int index = children.indexOf(nodeToDel);
 				Node<? extends NodeDefinition> deleted = parentEntity.remove(name, index);

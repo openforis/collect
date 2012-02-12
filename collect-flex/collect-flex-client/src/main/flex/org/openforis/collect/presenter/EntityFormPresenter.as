@@ -99,6 +99,7 @@ package org.openforis.collect.presenter
 			var result:IList = event.result as IList;
 			Application.activeRecord.update(result);
 			eventDispatcher.dispatchEvent(new ApplicationEvent(ApplicationEvent.MODEL_CHANGED));
+			//select the inserted entity
 			_view.callLater(function():void {
 				var entities:IList = getEntities();
 				var lastEntity:EntityProxy = entities.getItemAt(entities.length -1) as EntityProxy; 
