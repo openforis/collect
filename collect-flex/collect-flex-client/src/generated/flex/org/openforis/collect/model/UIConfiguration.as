@@ -10,5 +10,14 @@ package org.openforis.collect.model {
     [Bindable]
     [RemoteClass(alias="org.openforis.collect.model.UIConfiguration")]
     public class UIConfiguration extends UIConfigurationBase {
+		
+		public function getTab(name:String):UITab {
+			for each(var tab:UITab in tabs) {
+				if(tab.name == name) {
+					return tab;
+				}
+			}
+			return null;
+		}
     }
 }
