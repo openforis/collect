@@ -164,63 +164,69 @@ public class DataService {
 		List<NodeProxy> result = new ArrayList<NodeProxy>();
 		SessionState sessionState = sessionManager.getSessionState();
 		CollectRecord record = sessionState.getActiveRecord();
-		int parentNodeId = request.getParentNodeId();
-		Node<? extends NodeDefinition> parentNode = record.getNodeById(parentNodeId);
-		NodeDefinition parentDef = parentNode.getDefinition();
-		if(parentDef instanceof EntityDefinition) {
-			String nodeName = request.getNodeName();
-			String value = request.getValue();
-			NodeDefinition nodeDef = ((EntityDefinition) parentDef).getChildDefinition(nodeName);
-			Entity parentEntity = (Entity) parentNode;
-			
-			Method method = request.getMethod();
-			switch (method) {
-			case ADD:
-				if(nodeDef instanceof AttributeDefinition) {
-					AttributeDefinition def = (AttributeDefinition) nodeDef;
+		Integer parentNodeId = request.getParentNodeId();
+		Integer nodeId = request.getNodeId();
+		Entity parentEntity = (Entity) record.getNodeById(parentNodeId);
+		EntityDefinition parentDef = parentEntity.getDefinition();
+		String nodeName = request.getNodeName();
+		String value = request.getValue();
+		NodeDefinition nodeDef = ((EntityDefinition) parentDef).getChildDefinition(nodeName);
+		
+		Method method = request.getMethod();
+		switch (method) {
+		case ADD:
+			if(nodeDef instanceof AttributeDefinition) {
+				AttributeDefinition def = (AttributeDefinition) nodeDef;
+				List<Attribute> attributes = addAttributes(parentEntity, (AttributeDefinition) def, value);
+				for (Attribute attribute : attributes) {
+					AttributeProxy proxy = new AttributeProxy(attribute);
+					result.add(proxy);
+				}
+			} else {
+				Entity node = addEntity(parentEntity, nodeName, record.getVersion());
+				EntityProxy proxy = new EntityProxy(node);
+				result.add(proxy);
+			}
+			break;
+		case UPDATE:
+			Node<? extends NodeDefinition> node = record.getNodeById(nodeId);
+			if(node instanceof Attribute) {
+				if(node instanceof CodeAttribute && node.getDefinition().isMultiple()) {
+					NodeDefinition def = node.getDefinition();
+					String name = def.getName();
+					//remove old attributes
+					int count = parentEntity.getCount(def.getName());
+					for (int i = count - 1; i >= 0; i--) {
+						parentEntity.remove(name, i);
+					}
+					//add new attributes
 					List<Attribute> attributes = addAttributes(parentEntity, (AttributeDefinition) def, value);
 					for (Attribute attribute : attributes) {
 						AttributeProxy proxy = new AttributeProxy(attribute);
 						result.add(proxy);
 					}
 				} else {
-					Entity node = addEntity(parentEntity, nodeName, record.getVersion());
-					EntityProxy proxy = new EntityProxy(node);
+					update(parentEntity, (Attribute<?, Object>) node, value);
+					AttributeProxy proxy = new AttributeProxy((Attribute) node);
 					result.add(proxy);
 				}
-				break;
-			case UPDATE:
-				Integer nodeId = request.getNodeId();
-				Node<? extends NodeDefinition> node = record.getNodeById(nodeId);
-				if(node instanceof Attribute) {
-					if(node instanceof CodeAttribute && node.getDefinition().isMultiple()) {
-						NodeDefinition def = node.getDefinition();
-						String name = def.getName();
-						//remove old attributes
-						int count = parentEntity.getCount(def.getName());
-						for (int i = count - 1; i >= 0; i--) {
-							parentEntity.remove(name, i);
-						}
-						//add new attributes
-						List<Attribute> attributes = addAttributes(parentEntity, (AttributeDefinition) def, value);
-						for (Attribute attribute : attributes) {
-							AttributeProxy proxy = new AttributeProxy(attribute);
-							result.add(proxy);
-						}
-					} else {
-						update(parentEntity, (Attribute<?, Object>) node, value);
-						AttributeProxy proxy = new AttributeProxy((Attribute) node);
-						result.add(proxy);
-					}
-				}
-				break;
-			case DELETE:
-				break;
 			}
-			return result;
-		} else {
-			throw new RuntimeException("Parent node is not an entity");
+			break;
+		case DELETE:
+			Node<? extends NodeDefinition> nodeToDel = record.getNodeById(nodeId);
+			if(nodeToDel instanceof Entity) {
+				String name = nodeDef.getName();
+				List<Node<? extends NodeDefinition>> children = parentEntity.getAll(name);
+				int index = children.indexOf(nodeToDel);
+				Node<? extends NodeDefinition> deleted = parentEntity.remove(name, index);
+				EntityProxy proxy = new EntityProxy((Entity) deleted);
+				result.add(proxy);
+			} else {
+				//TODO delete attribute
+			}
+			break;
 		}
+		return result;
 	}
 	
 	private Entity addEntity(Entity parentEntity, String nodeName, ModelVersion version) {

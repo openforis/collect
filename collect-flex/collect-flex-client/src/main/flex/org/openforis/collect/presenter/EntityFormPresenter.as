@@ -9,11 +9,14 @@ package org.openforis.collect.presenter
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.events.ResultEvent;
 	
+	import org.openforis.collect.Application;
 	import org.openforis.collect.client.ClientFactory;
+	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.remoting.service.UpdateRequest;
 	import org.openforis.collect.remoting.service.UpdateRequest$Method;
 	import org.openforis.collect.ui.component.detail.EntityFormContainer;
+	import org.openforis.collect.util.AlertUtil;
 	import org.openforis.collect.util.UIUtil;
 	
 	import spark.events.IndexChangeEvent;
@@ -52,15 +55,21 @@ package org.openforis.collect.presenter
 		}
 		
 		protected function updateView():void {
-			if(_view.parentEntity != null && _view.entityDefinition != null) {
-				var children:IList = _view.parentEntity.getChildren(_view.entityDefinition.name);
-				if(_view.entityDefinition.multiple) {
-					_view.dropDownList.dataProvider = children;
-					_view.internalContainer.visible = false;
-				}
+			if(_view.entityDefinition != null && _view.entityDefinition.multiple) {
+				var entities:IList = getEntities();
+				_view.dropDownList.dataProvider = entities;
+				_view.internalContainer.visible = false;
 			}
 		}
-
+		
+		protected function getEntities():IList {
+			var entities:IList = null;
+			if(_view.parentEntity != null && _view.entityDefinition != null) {
+				entities = _view.parentEntity.getChildren(_view.entityDefinition.name);
+			}
+			return entities;
+		}
+		
 		protected function buttonFocusInHandler(event:FocusEvent):void {
 			UIUtil.ensureElementIsVisible(event.target);
 		}
@@ -74,15 +83,33 @@ package org.openforis.collect.presenter
 		}
 		
 		protected function deleteButtonClickHandler(event:MouseEvent):void {
-			//TODO
+			AlertUtil.showConfirm("global.confirmDeletion", [_view.entityDefinition.getLabelText()], 
+				"global.confirmAlertTitle", performDeletion);
+		}
+		
+		protected function performDeletion():void {
+			var req:UpdateRequest = new UpdateRequest();
+			req.method = UpdateRequest$Method.DELETE;
+			req.parentNodeId = _view.parentEntity.id;
+			req.nodeId = _view.entity.id;
+			ClientFactory.dataClient.updateActiveRecord(new AsyncResponder(deleteResultHandler, faultHandler, null), req);
 		}
 		
 		protected function addResultHandler(event:ResultEvent, token:Object = null):void {
 			var result:IList = event.result as IList;
-			var newEntity:EntityProxy = result.getItemAt(0) as EntityProxy;
-			_view.parentEntity.addChild(newEntity);
-
-			selectEntity(newEntity);
+			Application.activeRecord.update(result);
+			eventDispatcher.dispatchEvent(new ApplicationEvent(ApplicationEvent.MODEL_CHANGED));
+			_view.callLater(function():void {
+				var entities:IList = getEntities();
+				var lastEntity:EntityProxy = entities.getItemAt(entities.length -1) as EntityProxy; 
+				selectEntity(lastEntity);
+			});
+		}
+		
+		protected function deleteResultHandler(event:ResultEvent, token:Object = null):void {
+			var result:IList = event.result as IList;
+			Application.activeRecord.update(result);
+			eventDispatcher.dispatchEvent(new ApplicationEvent(ApplicationEvent.MODEL_CHANGED));
 		}
 		
 		protected function dropDownListChangeHandler(event:IndexChangeEvent):void {
