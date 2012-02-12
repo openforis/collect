@@ -28,8 +28,8 @@ package org.openforis.collect.util
 			Alert.show(message, title);
 		}
 		
-		public static function showConfirm(messageResource:String, titleResource:String, yesHandler:Function, noHandler:Function = null):void {
-			var message:String = Message.get(messageResource);
+		public static function showConfirm(messageResource:String, parameters:Array, titleResource:String, yesHandler:Function, noHandler:Function = null):void {
+			var message:String = Message.get(messageResource, parameters);
 			var title:String = Message.get(titleResource);
 			
 			Alert.show(message, title, Alert.YES|Alert.NO, null, closeHandler);

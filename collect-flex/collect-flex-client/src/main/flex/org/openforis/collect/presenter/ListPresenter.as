@@ -117,7 +117,7 @@ package org.openforis.collect.presenter {
 		protected function deleteButtonClickHandler(event:MouseEvent):void {
 			var selectedRecord:RecordProxy = _view.dataGrid.selectedItem as RecordProxy;
 			if(selectedRecord != null) {
-				AlertUtil.showConfirm("list.delete.confirm", "list.delete.confirmTitle", executeDelete);
+				AlertUtil.showConfirm("list.delete.confirm", null, "list.delete.confirmTitle", executeDelete);
 				
 				function executeDelete():void {
 					_dataClient.deleteRecord(new AsyncResponder(deleteRecordResultHandler, faultHandler), selectedRecord.id);
