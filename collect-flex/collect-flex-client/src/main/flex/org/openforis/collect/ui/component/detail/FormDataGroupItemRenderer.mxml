@@ -23,6 +23,7 @@
 			private var _entity:EntityProxy;
 			private var _modelVersion:ModelVersionProxy;
 			private var _isInDataGroup:Boolean = false;
+			private var _labelWidth:Number = 150;
 			
 			override protected function createChildren():void {
 				super.createChildren();
@@ -38,7 +39,7 @@
 							var hGroup:HGroup = new HGroup();
 							var label:Label = new Label();
 							label.styleName = "bold";
-							label.width = 150;
+							label.width = labelWidth;
 							label.text = data.getLabelText();
 							hGroup.addElement(label);
 							hGroup.addElement(formItem);
@@ -86,6 +87,14 @@
 				_modelVersion = value;
 			}
 			
+			[Bindable]
+			public function get labelWidth():Number {
+				return _labelWidth;
+			}
+			
+			public function set labelWidth(value:Number):void {
+				_labelWidth = value;
+			}
 		]]>
 	</fx:Script>
 </s:ItemRenderer>

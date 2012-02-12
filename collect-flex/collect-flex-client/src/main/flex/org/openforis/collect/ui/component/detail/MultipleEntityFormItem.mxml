@@ -7,7 +7,7 @@
 					   >
 	
 	<detail:layout>
-		<s:VerticalLayout paddingLeft="30" paddingTop="15" />
+		<s:VerticalLayout paddingTop="15" />
 	</detail:layout>
 	
 	<fx:Script>
@@ -33,7 +33,9 @@
 					super.createChildren();
 					
 					var headers:HGroup = UIBuilder.buildDataGroupHeaders(this.entityDefinition, modelVersion);					
+					headers.paddingLeft = 30;
 					
+					addElement(headerLabel);
 					addElement(headers);
 					addElement(dataGroup);
 					addElement(addButton);
@@ -47,9 +49,12 @@
 	</fx:Script>
 	
 	<fx:Declarations>
+		
+		<s:Label id="headerLabel" text="{entityDefinition.getLabelText()}" styleName="bold" />
+		
 		<s:DataGroup width="100%" id="dataGroup">
 			<s:layout>
-				<s:VerticalLayout gap="2"/>
+				<s:VerticalLayout gap="2" paddingLeft="30" />
 			</s:layout> 
 			<s:itemRenderer>
 				<fx:Component>
@@ -69,6 +74,7 @@
 					icon="{Images.ADD}" 
 					labelPlacement="left" 
 					useHandCursor="true"
+					paddingLeft="30"
 					/>
 	</fx:Declarations>
 	
