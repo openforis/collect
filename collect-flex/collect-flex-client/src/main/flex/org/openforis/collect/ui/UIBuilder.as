@@ -4,14 +4,10 @@ package org.openforis.collect.ui {
 	import mx.collections.ArrayList;
 	import mx.collections.IList;
 	import mx.collections.ListCollectionView;
-	import mx.containers.GridItem;
-	import mx.containers.GridRow;
 	import mx.core.IVisualElement;
-	import mx.core.IVisualElementContainer;
 	
 	import org.openforis.collect.Application;
 	import org.openforis.collect.i18n.Message;
-	import org.openforis.collect.metamodel.proxy.AttributeDefaultProxy;
 	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.BooleanAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.CodeAttributeDefinitionProxy;
@@ -30,15 +26,12 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.model.UIConfiguration;
 	import org.openforis.collect.model.UITab;
 	import org.openforis.collect.ui.component.datagrid.RecordSummaryDataGrid;
-	import org.openforis.collect.ui.component.datagroup.DataGroupItemRenderer;
 	import org.openforis.collect.ui.component.detail.AttributeFormItem;
 	import org.openforis.collect.ui.component.detail.CodeAttributeFormItem;
-	import org.openforis.collect.ui.component.detail.CollectFormItem;
 	import org.openforis.collect.ui.component.detail.CoordinateAttributeFormItem;
 	import org.openforis.collect.ui.component.detail.EntityFormContainer;
 	import org.openforis.collect.ui.component.detail.EntityFormItem;
 	import org.openforis.collect.ui.component.detail.FormContainer;
-	import org.openforis.collect.ui.component.detail.FormsContainer;
 	import org.openforis.collect.ui.component.detail.MultipleAttributeDataGroupFormItem;
 	import org.openforis.collect.ui.component.detail.MultipleAttributeFormItem;
 	import org.openforis.collect.ui.component.detail.MultipleEntityFormItem;
@@ -56,63 +49,35 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.ui.component.input.StringInputField;
 	import org.openforis.collect.ui.component.input.TaxonInputField;
 	import org.openforis.collect.ui.component.input.TimeInputField;
-	import org.openforis.collect.util.CollectionUtil;
-	import org.openforis.collect.util.StringUtil;
 	
-	import spark.components.FormItem;
 	import spark.components.HGroup;
 	import spark.components.Label;
 	import spark.components.VGroup;
 	import spark.components.gridClasses.GridColumn;
-	import spark.components.supportClasses.Range;
 	
 	/**
 	 * @author Mino Togna
 	 * */
 	public class UIBuilder {
 		
-		public static function buildForm(entity:EntityDefinitionProxy, version:ModelVersionProxy):FormContainer {
+		public static function buildForm(rootEntity:EntityDefinitionProxy, version:ModelVersionProxy):FormContainer {
 			var formContainer:FormContainer = new FormContainer();
 			formContainer.initialize();
 			
 			var form:EntityFormContainer = new EntityFormContainer();
-			form.entityDefinition = entity;
+			form.entityDefinition = rootEntity;
+			form.modelVersion = version;
 			
 			var uiConfig:UIConfiguration = Application.activeSurvey.uiConfiguration;
 			var tabs:ListCollectionView = null;
 			var uiTab:UITab = null;
 			if(uiConfig != null) {
 				tabs = uiConfig.tabs;
-				if(tabs != null){
-					for each (var tab:UITab in tabs) {
-						if(tab.name == entity.name) {
-							uiTab = tab;
-							break;
-						}
-					}
-				} 
+				uiTab = uiConfig.getTab(rootEntity.name);
 			}
 			//addFormItems(form, entity, version, uiTab);
-			var mainDefinitions:ArrayCollection = new ArrayCollection();
-			var defns:ListCollectionView = entity.childDefinitions;
 			form.uiTabs = uiTab.tabs;
-			if(CollectionUtil.isNotEmpty(defns)){
-				for each (var defn:NodeDefinitionProxy in defns) {
-					if(isInVersion(defn, version)) {
-						if(defn is AttributeDefinitionProxy) {
-							if(StringUtil.isBlank(defn.uiTabName)) {
-								mainDefinitions.addItem(defn);
-							}
-						} else if(defn is EntityDefinitionProxy) {
-							var proxy:EntityDefinitionProxy = EntityDefinitionProxy(defn);
-							if(proxy.uiTabName == null || uiTab.hasChildTab(defn.uiTabName)) {
-								mainDefinitions.addItem(defn);
-							}
-						}
-					}
-				}
-			}
-			form.mainDefinitions = mainDefinitions;
+			form.build();
 			
 			formContainer.addEntityFormContainer(form);
 			/*
@@ -122,13 +87,15 @@ package org.openforis.collect.ui {
 			BindingUtils.bindProperty(form, "entity", formContainer, ["record", "rootEntity"]);
 			
 			if(tabs != null) {
-				for each (tab in tabs) {
+				for each (var tab:UITab in tabs) {
 					var childForm:EntityFormContainer = new EntityFormContainer();
-					var child:NodeDefinitionProxy = entity.getChildDefinition(tab.name);
+					var child:NodeDefinitionProxy = rootEntity.getChildDefinition(tab.name);
 					if(child is EntityDefinitionProxy) {
 						var edp:EntityDefinitionProxy = child as EntityDefinitionProxy;
-						childForm.entityDefinition = edp;														
-						addFormItems(childForm, edp, version, tab);			
+						childForm.entityDefinition = edp;
+						childForm.modelVersion = version;
+						childForm.uiTabs = tab.tabs;
+						childForm.build();
 						formContainer.addEntityFormContainer(childForm);
 						/*
 						in this case the parentEntity will be the record's rootEntity
@@ -147,10 +114,8 @@ package org.openforis.collect.ui {
 			var position:int = 1;
 			var keyAttributeDefs:IList = rootEntity.keyAttributeDefinitions;
 			for each(var keyAttributeDef:AttributeDefinitionProxy in keyAttributeDefs) {
-				column = new GridColumn();
-				column.headerText = keyAttributeDef.getLabelText();
-				column.labelFunction = RecordSummaryDataGrid.recordSummariesKeyLabelFunction;
-				column.dataField = "key" + position;
+				column = getGridColumn(keyAttributeDef.getLabelText(), "key" + position, NaN, 
+					RecordSummaryDataGrid.recordSummariesKeyLabelFunction);
 				columns.addItem(column);
 				position ++;
 			}
@@ -161,11 +126,8 @@ package org.openforis.collect.ui {
 				if(nodeDef is EntityDefinitionProxy) {
 					var entityDef:EntityDefinitionProxy = EntityDefinitionProxy(nodeDef);
 					if(entityDef.countInSummaryList) {
-						column = new GridColumn();
-						column.headerText = Message.get("list.headerCount", [entityDef.getLabelText()]);
-						column.dataField = "count" + position;
-						column.labelFunction = RecordSummaryDataGrid.recordSummariesCountEntityLabelFunction;
-						column.width = 150;
+						column = getGridColumn(Message.get("list.headerCount", [entityDef.getLabelText()]), "count" + position, 150, 
+							RecordSummaryDataGrid.recordSummariesCountEntityLabelFunction);
 						columns.addItem(column);
 						position ++;
 					}
@@ -173,119 +135,24 @@ package org.openforis.collect.ui {
 			}
 			
 			//skipped count column
-			column = new GridColumn();
-			column.headerText = Message.get("list.skipped");
-			column.dataField = "skipped";
-			column.labelFunction = RecordSummaryDataGrid.numberLabelFunction;
-			column.width = 100;
+			column = getGridColumn(Message.get("list.skipped"), "skipped", 100, RecordSummaryDataGrid.numberLabelFunction);
 			columns.addItem(column);
 			//missing count column
-			column = new GridColumn();
-			column.headerText = Message.get("list.missing");
-			column.dataField = "missing";
-			column.labelFunction = RecordSummaryDataGrid.numberLabelFunction;
-			column.width = 100;
+			column = getGridColumn(Message.get("list.missing"), "missing", 100, RecordSummaryDataGrid.numberLabelFunction);
 			columns.addItem(column);
 			//errors count column
-			column = new GridColumn();
-			column.headerText = Message.get("list.errors");
-			column.dataField = "errors";
-			column.labelFunction = RecordSummaryDataGrid.numberLabelFunction;
-			column.width = 100;
+			column = getGridColumn(Message.get("list.errors"), "errors", 100, RecordSummaryDataGrid.numberLabelFunction);
 			columns.addItem(column);
 			//warnings count column
-			column = new GridColumn();
-			column.headerText = Message.get("list.warnings");
-			column.dataField = "warnings";
-			column.labelFunction = RecordSummaryDataGrid.numberLabelFunction;
-			column.width = 100;
+			column = getGridColumn(Message.get("list.warnings"), "warnings", 100, RecordSummaryDataGrid.numberLabelFunction);
 			columns.addItem(column);
 			//creation date column
-			column = new GridColumn();
-			column.headerText = Message.get("list.creationDate");
-			column.dataField = "creationDate";
-			column.labelFunction = RecordSummaryDataGrid.dateLabelFunction;
-			column.width = 150;
+			column = getGridColumn(Message.get("list.creationDate"), "creationDate", 150, RecordSummaryDataGrid.dateLabelFunction);
 			columns.addItem(column);
 			//date modified column
-			column = new GridColumn();
-			column.headerText = Message.get("list.modifiedDate");
-			column.dataField = "modifiedDate";
-			column.labelFunction = RecordSummaryDataGrid.dateLabelFunction;
-			column.width = 150;
+			column = getGridColumn(Message.get("list.modifiedDate"), "modifiedDate", 150, RecordSummaryDataGrid.dateLabelFunction);
 			columns.addItem(column);
 			return columns;
-		}
-		
-		private static function addFormItems(form:EntityFormContainer, entity:EntityDefinitionProxy, version:ModelVersionProxy, uiTab:UITab):void {
-			var defns:ListCollectionView = entity.childDefinitions;
-			form.uiTabs = uiTab.tabs;
-			if(defns != null && defns.length >0){
-				for each (var defn:NodeDefinitionProxy in defns) {
-					if(isInVersion(defn, version)) {
-						if(defn is AttributeDefinitionProxy) {
-							var attrFormItem:AttributeFormItem = getAttributeFormItem(AttributeDefinitionProxy(defn));
-							/*
-							var formItem:FormItem = new FormItem();
-							formItem.label = defn.getLabelText();
-							*/
-							/*
-							var formItem:HGroup = new HGroup();
-							formItem.addElement(label);
-							*/
-							var formItem:GridRow = new GridRow();
-							var labelCol:GridItem = new GridItem();
-							var label:Label = new Label();
-							label.text = defn.getLabelText();
-							labelCol.addChild(label);
-							formItem.addChild(labelCol);
-							
-							if(defn is CoordinateAttributeDefinitionProxy || defn is TaxonAttributeDefinitionProxy){
-								form.addFormItem(formItem, defn.uiTabName);
-								form.addAttributeFormItem(attrFormItem, defn.uiTabName);
-							} else {
-								/*formItem.addElement(attrFormItem);
-								form.addFormItem(formItem, defn.uiTabName);*/
-								var attrCol:GridItem = new GridItem();
-								attrCol.addChild(attrFormItem);
-								formItem.addChild(attrCol);
-								form.addFormItem(formItem);
-							}
-							//bind parentEntity of each attrFormItem to the "entity" of the form 
-							BindingUtils.bindProperty(attrFormItem, "parentEntity", form, "entity");
-						} else if(defn is EntityDefinitionProxy) {
-							var proxy:EntityDefinitionProxy = EntityDefinitionProxy(defn);
-							if(proxy.uiTabName == null || uiTab.hasChildTab(defn.uiTabName)) {
-								var entityFormItem:EntityFormItem = getEntityFormItem(proxy);
-								form.addEntityFormItem(entityFormItem, defn.uiTabName);
-								//bind parentEntity of each attrFormItem to the "entity" of the form 
-								BindingUtils.bindProperty(entityFormItem, "parentEntity", form, "entity");
-							}
-						}
-					}
-				}
-			} 
-		}
-		
-		public static function buildDataGroupItemRendererRow(entity:EntityDefinitionProxy, version:ModelVersionProxy, component:IVisualElementContainer):void {
-			var children:ListCollectionView = entity.childDefinitions;
-			for each (var defn:NodeDefinitionProxy in children) {
-				if(isInVersion(defn, version)){
-					if(defn is AttributeDefinitionProxy) {
-						var formItem:AttributeFormItem = getAttributeFormItem(defn as AttributeDefinitionProxy, true);
-						formItem.addTo(component);
-						
-						BindingUtils.bindProperty(formItem, "parentEntity", component, "entity");
-					} else if(defn is EntityDefinitionProxy) {
-						var edp:EntityDefinitionProxy = EntityDefinitionProxy(defn);
-						if(edp.multiple) {
-							//TODO
-						} else {
-							buildDataGroupItemRendererRow(edp, version ,component);
-						}
-					}
-				}
-			}
 		}
 		
 		public static function getAttributeFormItem(definition:AttributeDefinitionProxy, isInDataGroup:Boolean = false):AttributeFormItem {
@@ -365,7 +232,6 @@ package org.openforis.collect.ui {
 				return getInputFieldWidth(def, true);
 			}
 		}
-			
 		
 		public static function getInputField(def:AttributeDefinitionProxy, isInDataGroup:Boolean = false):InputField {
 			var inputField:InputField = null;
@@ -407,16 +273,14 @@ package org.openforis.collect.ui {
 			return inputField;
 		}
 	
-		//TODO check ifisinversion
-		public static function buildDataGroupHeaders(defn:EntityDefinitionProxy):HGroup {
+		public static function buildDataGroupHeaders(defn:EntityDefinitionProxy, modelVersion:ModelVersionProxy):HGroup {
 			var h:HGroup = new HGroup();
 			h.gap = 2;
-			var childDefn:ListCollectionView = defn.childDefinitions;
+			var childDefn:IList = getDefinitionsInVersion(defn.childDefinitions, modelVersion);
 			for each (var childDef:NodeDefinitionProxy in childDefn) {
 				var elem:IVisualElement = getDataGroupHeader(childDef);
 				h.addElement(elem);
 			}
-			
 			return h;
 		}
 		
@@ -464,32 +328,18 @@ package org.openforis.collect.ui {
 				v.percentHeight = 100;
 				v.verticalAlign = "bottom";
 				//attribute label
-				l = new Label();
-				l.width = 100;
-				l.styleName = "bold";
-				l.text = defn.getLabelText();
+				l = getLabel(defn.getLabelText(), 100, "bold");
 				v.addElement(l);
 				//subheader
 				h = new HGroup();
-				l = new Label();
-				l.width = 100;
-				l.styleName = "bold";
-				l.text = Message.get('edit.taxon.code');
+				h.gap = 2;
+				l = getLabel(Message.get('edit.taxon.code'), 100, "bold");
 				h.addElement(l);
-				l = new Label();
-				l.width = 100;
-				l.styleName = "bold";
-				l.text = Message.get('edit.taxon.scientificName');
+				l = getLabel(Message.get('edit.taxon.scientificName'), 100, "bold");
 				h.addElement(l);
-				l = new Label();
-				l.width = 100;
-				l.styleName = "bold";
-				l.text = Message.get('edit.taxon.vernacularName');
+				l = getLabel(Message.get('edit.taxon.vernacularName'), 100, "bold");
 				h.addElement(l);
-				l = new Label();
-				l.width = 100;
-				l.styleName = "bold";
-				l.text = Message.get('edit.taxon.vernacularLang');
+				l = getLabel(Message.get('edit.taxon.vernacularLang'), 100, "bold");
 				h.addElement(l);
 				v.addElement(h);
 				return v;
@@ -499,27 +349,16 @@ package org.openforis.collect.ui {
 				v.percentHeight = 100;
 				v.verticalAlign = "bottom";
 				//attribute label
-				l = new Label();
-				l.width = 100;
-				l.styleName = "bold";
-				l.text = defn.getLabelText();
+				l = getLabel(defn.getLabelText(), 100, "bold");
 				v.addElement(l);
 				//subheader
 				h = new HGroup();
-				l = new Label();
-				l.width = 100;
-				l.styleName = "bold";
-				l.text = Message.get('edit.coordinate.srs');
+				h.gap = 2;
+				l = getLabel(Message.get('edit.coordinate.srs'), 100, "bold");
 				h.addElement(l);
-				l = new Label();
-				l.width = 100;
-				l.styleName = "bold";
-				l.text = Message.get('edit.coordinate.x');
+				l = getLabel(Message.get('edit.coordinate.x'), 100, "bold");
 				h.addElement(l);
-				l = new Label();
-				l.width = 100;
-				l.styleName = "bold";
-				l.text = Message.get('edit.coordinate.y');
+				l = getLabel(Message.get('edit.coordinate.y'), 100, "bold");
 				h.addElement(l);
 				v.addElement(h);
 				return v;
@@ -531,16 +370,30 @@ package org.openforis.collect.ui {
 				v.percentHeight = 100;
 				v.verticalAlign = "bottom";
 				
-				l = new Label();
-				l.width = width;
-				l.styleName = "bold";
-				l.text = defn.getLabelText();
+				l = getLabel(defn.getLabelText(), width, "bold");
 				v.addElement(l);
 				
 				return v;
 			}
 		}
 		
+		public static function getGridColumn(headerText:String, dataField:String, width:Number, labelFunction:Function = null):GridColumn {
+			var c:GridColumn = new GridColumn();
+			c.headerText = headerText;
+			c.dataField = dataField;
+			c.labelFunction = labelFunction;
+			c.width = width;
+			return c;
+		}
+
+		public static function getLabel(text:String, width:Number = NaN, styleName:String = null):Label {
+			var l:Label = new Label();
+			l.text = text;
+			l.width = width;
+			l.styleName = styleName;
+			return l;
+		}
+
 		public static function isInVersion(node:NodeDefinitionProxy, currentVersion:ModelVersionProxy):Boolean {
 			var since:ModelVersionProxy = node.sinceVersion;
 			var deprecated:ModelVersionProxy = node.deprecatedVersion;
@@ -557,5 +410,14 @@ package org.openforis.collect.ui {
 			return result;
 		}
 		
+		public static function getDefinitionsInVersion(defs:IList, currentVersion:ModelVersionProxy):IList {
+			var result:IList = new ArrayCollection();
+			for each (var defn:NodeDefinitionProxy in defs) {
+				if(isInVersion(defn, currentVersion)){
+					result.addItem(defn);
+				}
+			}
+			return result;
+		}
 	}
 }

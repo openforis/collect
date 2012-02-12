@@ -2,6 +2,7 @@ package org.openforis.collect.presenter {
 	import flash.events.Event;
 	import flash.events.FocusEvent;
 	
+	import mx.binding.utils.ChangeWatcher;
 	import mx.events.DropdownEvent;
 	
 	import org.openforis.collect.Application;

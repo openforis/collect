@@ -23,58 +23,70 @@
 			import spark.components.Form;
 			import spark.components.FormItem;
 			import spark.components.Label;
+
+			public static const STATE_HORIZONTAL:String = "horizontal";
+			public static const STATE_VERTICAL:String = "vertical";
 			
 			private static const INDENTED_FORM_ITEM_STYLE_NAME:String = "indent";
 			
-			override public function addTo(parent:IVisualElementContainer):void {
-				if(this.isInDataGroup) {
-					parent.addElement(srsDropDownList);
-					parent.addElement(xTextInput);
-					parent.addElement(yTextInput);
-				} else {
-					addFormItem(parent, Message.get('edit.coordinate.srs'), srsDropDownList);
-					addFormItem(parent, Message.get('edit.coordinate.x'), xTextInput);
-					addFormItem(parent, Message.get('edit.coordinate.y'), yTextInput);
-				}
-				initPresenter();
-			}
-			
-			protected function addFormItem(parent:IVisualElementContainer, label:String, inputField:IVisualElement):void {
-				if(parent is Form) {
-					var formItem:spark.components.FormItem = new spark.components.FormItem();
-					formItem.styleName = INDENTED_FORM_ITEM_STYLE_NAME;
-					formItem.label = label;
-					formItem.addElement(inputField);
-					parent.addElement(formItem);
-				} else if(parent is Grid) {
-					var row:GridRow = new GridRow();
-					var labelCol:GridItem = new GridItem();
-					var l:Label = new Label();
-					l.text = label;
-					l.styleName = INDENTED_FORM_ITEM_STYLE_NAME;
-					labelCol.addChild(l);
-					row.addChild(labelCol);
-					var attrCol:GridItem = new GridItem();
-					attrCol.addChild(inputField as DisplayObject);
-					row.addChild(attrCol);
-					Grid(parent).addChild(row);
-				}
-			}
+			private var _labelWidth:int = 130;
 			
 			override protected function initPresenter():void {
 				presenter = new CoordinateAttributeFormItemPresenter(this);
 			}
 
+			[Bindable]
+			public function get labelWidth():int {
+				return _labelWidth;
+			}
+			
+			public function set labelWidth(value:int):void {
+				_labelWidth = value;
+			}
+			
+			override public function set isInDataGroup(value:Boolean):void {
+				super.isInDataGroup = value;
+				if(value) {
+					currentState = CoordinateAttributeFormItem.STATE_HORIZONTAL;
+				} else {
+					currentState = CoordinateAttributeFormItem.STATE_VERTICAL;
+				}
+			}
+			
 		]]>
 	</fx:Script>
 	
-	<fx:Declarations>
+	<detail:states>
+		<s:State name="horizontal" />
+		<s:State name="vertical" />
+	</detail:states>
+	
+	<s:HGroup includeIn="horizontal" gap="2">
 		<s:DropDownList id="srsDropDownList" 
 						width="150" 
 						prompt="{Message.get('global.dropDownPrompt')}" 
+						includeIn="horizontal" itemCreationPolicy="immediate"
 						/>
-		<input:TextInput id="xTextInput" />
-		<input:TextInput id="yTextInput" />
-	</fx:Declarations>
+		<input:TextInput id="xTextInput" includeIn="horizontal" itemCreationPolicy="immediate" />
+		<input:TextInput id="yTextInput" includeIn="horizontal" itemCreationPolicy="immediate" />
+	</s:HGroup>
+	
+	<s:VGroup includeIn="vertical">
+		<s:Label styleName="bold" text="{attributeDefinition.getLabelText()}" />
+		<s:VGroup paddingLeft="20">
+			<s:HGroup>
+				<s:Label width="{labelWidth}" styleName="bold" text="{Message.get('edit.coordinate.srs')}"/>
+				<fx:Reparent target="srsDropDownList" includeIn="vertical" />
+			</s:HGroup>
+			<s:HGroup>
+				<s:Label width="{labelWidth}" styleName="bold" text="{Message.get('edit.coordinate.x')}"/>
+				<fx:Reparent target="xTextInput" includeIn="vertical" />
+			</s:HGroup>
+			<s:HGroup>
+				<s:Label width="{labelWidth}" styleName="bold" text="{Message.get('edit.coordinate.y')}"/>
+				<fx:Reparent target="yTextInput" includeIn="vertical" />
+			</s:HGroup>
+		</s:VGroup>
+	</s:VGroup>
 	
 </detail:AttributeFormItem>

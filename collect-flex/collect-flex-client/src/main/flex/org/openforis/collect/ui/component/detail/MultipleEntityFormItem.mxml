@@ -14,6 +14,7 @@
 		<![CDATA[
 			import mx.events.FlexEvent;
 			
+			import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
 			import org.openforis.collect.Application;
 			import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 			import org.openforis.collect.model.proxy.EntityProxy;
@@ -31,21 +32,16 @@
 				if(!childrenAdded) {
 					super.createChildren();
 					
-					var headers:HGroup = UIBuilder.buildDataGroupHeaders(this.entityDefinition);					
+					var headers:HGroup = UIBuilder.buildDataGroupHeaders(this.entityDefinition, modelVersion);					
 					
 					addElement(headers);
 					addElement(dataGroup);
 					addElement(addButton);
-					
-					//TEST data
-					/*
-					var c:ArrayCollection = new ArrayCollection();
-					c.addItem(new Object());
-					dataGroup.dataProvider = c;
-					*/
+
 					super.childrenAdded = true;
 				}
 			}
+			
 		]]>
 			
 	</fx:Script>
@@ -57,48 +53,11 @@
 			</s:layout> 
 			<s:itemRenderer>
 				<fx:Component>
-					<s:ItemRenderer autoDrawBackground="false">
-						<s:layout>
-							<s:HorizontalLayout gap="2"/>
-						</s:layout>
-						<fx:Script>
-							<![CDATA[
-								import mx.collections.ListCollectionView;
-								
-								import org.openforis.collect.Application;
-								import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
-								import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
-								import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
-								import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
-								import org.openforis.collect.model.proxy.EntityProxy;
-								import org.openforis.collect.ui.UIBuilder;
-								import org.openforis.collect.ui.component.input.InputField;
-								
-								private var _entity:EntityProxy;
-								
-								[Bindable(event="entityChange")]
-								public function get entity():EntityProxy {
-									return _entity;
-								}
-								
-								override public function set data(value:Object):void {
-									super.data = value;
-									this._entity = value as EntityProxy;
-									dispatchEvent(new Event("entityChange"));
-								}
-								
-								override protected function createChildren():void {
-									super.createChildren();
-									var version:ModelVersionProxy = Application.activeRecord.version;
-									var edp:EntityDefinitionProxy = outerDocument.entityDefinition;
-									if(UIBuilder.isInVersion(edp, version)) {
-										UIBuilder.buildDataGroupItemRendererRow(edp, version, this);
-									}
-									
-								}
-							]]>
-						</fx:Script>
-					</s:ItemRenderer>
+					<detail:EntityDataGroupItemRenderer
+						entity="{data as EntityProxy}"
+						modelVersion="{outerDocument.modelVersion}"
+						nodeDefinitions="{outerDocument.nodeDefinitions}"
+						/>
 				</fx:Component>
 			</s:itemRenderer>
 		</s:DataGroup>

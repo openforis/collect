@@ -13,31 +13,43 @@
 			
 			import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 			import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
+			import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
+			import org.openforis.collect.model.proxy.EntityProxy;
 			import org.openforis.collect.ui.UIBuilder;
 			
 			import spark.components.HGroup;
 			import spark.components.Label;
 			
+			private var _entity:EntityProxy;
+			private var _modelVersion:ModelVersionProxy;
+			private var _isInDataGroup:Boolean = false;
+			
 			override protected function createChildren():void {
 				super.createChildren();
 				if(data != null) {
+					var formItem:CollectFormItem;
 					if(data is AttributeDefinitionProxy) {
-						var hGroup:HGroup = new HGroup();
-						var label:Label = new Label();
-						label.width = 150;
-						label.text = data.getLabelText();
-						hGroup.addElement(label);
-						var attrFormItem:AttributeFormItem = UIBuilder.getAttributeFormItem(AttributeDefinitionProxy(data));
-						hGroup.addElement(attrFormItem);
-						addElement(hGroup);
-						//bind parentEntity of each attrFormItem to the "entity" of the form 
-						BindingUtils.bindProperty(attrFormItem, "parentEntity", parentDocument, "entity");
+						formItem = UIBuilder.getAttributeFormItem(AttributeDefinitionProxy(data), isInDataGroup);
+						if(isInDataGroup || 
+							formItem is CoordinateAttributeFormItem ||
+							formItem is TaxonAttributeFormItem) {
+							addElement(formItem);
+						} else {
+							var hGroup:HGroup = new HGroup();
+							var label:Label = new Label();
+							label.styleName = "bold";
+							label.width = 150;
+							label.text = data.getLabelText();
+							hGroup.addElement(label);
+							hGroup.addElement(formItem);
+							addElement(hGroup);
+						}
 					} else if(data is EntityDefinitionProxy) {
-						var entityFormItem:EntityFormItem = UIBuilder.getEntityFormItem(EntityDefinitionProxy(data));
-						addElement(entityFormItem);
-						
-						BindingUtils.bindProperty(entityFormItem, "parentEntity", parentDocument, "entity");
+						formItem = UIBuilder.getEntityFormItem(EntityDefinitionProxy(data));
+						addElement(formItem);
+						BindingUtils.bindProperty(formItem, "modelVersion", this, "modelVersion");
 					}
+					BindingUtils.bindProperty(formItem, "parentEntity", this, "entity");
 				}
 			}
 			
@@ -47,6 +59,32 @@
 				initialize();
 			}
 			
+			[Bindable]
+			public function get isInDataGroup():Boolean {
+				return _isInDataGroup;
+			}
+			
+			public function set isInDataGroup(value:Boolean):void {
+				_isInDataGroup = value;
+			}
+			
+			[Bindable]
+			public function get entity():EntityProxy {
+				return _entity;
+			}
+			
+			public function set entity(value:EntityProxy):void {
+				_entity = value;
+			}
+			
+			[Bindable]
+			public function get modelVersion():ModelVersionProxy {
+				return _modelVersion;
+			}
+			
+			public function set modelVersion(value:ModelVersionProxy):void {
+				_modelVersion = value;
+			}
 			
 		]]>
 	</fx:Script>

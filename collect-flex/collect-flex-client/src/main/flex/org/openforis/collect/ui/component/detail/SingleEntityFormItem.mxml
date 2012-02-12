@@ -13,6 +13,7 @@
 	<fx:Script>
 		<![CDATA[
 			import mx.binding.utils.BindingUtils;
+			import mx.collections.IList;
 			import mx.collections.ListCollectionView;
 			import mx.containers.GridItem;
 			import mx.containers.GridRow;
@@ -27,6 +28,7 @@
 			import spark.components.FormItem;
 			import spark.components.Label;
 			
+			/*
 			override protected function createChildren():void {
 				if(!childrenAdded){
 					super.createChildren();
@@ -37,13 +39,15 @@
 						if(UIBuilder.isInVersion(entityDefinition, Application.activeRecord.version)) {
 							if(def is AttributeDefinitionProxy){
 								var ad:AttributeDefinitionProxy = AttributeDefinitionProxy(def);
-								/*
+								
+			
 								var formItem:FormItem = new FormItem();
 								formItem.label = ad.getLabelText();
 								var attrFormItem:AttributeFormItem = UIBuilder.getAttributeFormItem(ad);
 								attrFormItem.addTo(formItem);
 								form.addElement(formItem);
-								*/
+								
+			
 								var row:GridRow = new GridRow();
 								var labelCol:GridItem = new GridItem();
 								var label:Label = new Label();
@@ -71,14 +75,15 @@
 					childrenAdded = true;
 				}
 			}
+			*/
 			
 		]]>
 	</fx:Script>
 	
 	<fx:Declarations>
-		<mx:Grid height="100%" width="100%" id="form">
+		<!--<mx:Grid height="100%" width="100%" id="form">
 			
-		</mx:Grid>
+		</mx:Grid>-->
 		<!--<s:Form height="100%" width="100%" id="form">
 			<s:layout>
 				<s:FormLayout gap="-15" paddingLeft="10" />
@@ -86,5 +91,18 @@
 		</s:Form>-->
 		
 	</fx:Declarations>
+	
+	<s:DataGroup dataProvider="{nodeDefinitions}">
+		<s:layout>
+			<s:HorizontalLayout gap="2" />
+		</s:layout>
+		<s:itemRenderer>
+			<fx:Component>
+				<detail:FormDataGroupItemRenderer
+					
+					/>
+			</fx:Component>
+		</s:itemRenderer>
+	</s:DataGroup>
 	
 </detail:EntityFormItem>

@@ -1,15 +1,11 @@
 package org.openforis.collect.presenter
 {
-	import flash.display.DisplayObject;
 	import flash.events.Event;
 	
 	import mx.binding.utils.ChangeWatcher;
-	import mx.collections.IList;
 	
 	import org.openforis.collect.event.ApplicationEvent;
-	import org.openforis.collect.model.proxy.AttributeProxy;
-	import org.openforis.collect.ui.component.detail.AttributeFormItem;
-	import org.openforis.collect.ui.component.detail.FormItem;
+	import org.openforis.collect.ui.component.detail.CollectFormItem;
 
 	/**
 	 * 
@@ -18,9 +14,9 @@ package org.openforis.collect.presenter
 	 */
 	public class FormItemPresenter extends AbstractPresenter {
 		
-		protected var _view:FormItem;
+		protected var _view:CollectFormItem;
 		
-		public function FormItemPresenter(view:FormItem) {
+		public function FormItemPresenter(view:CollectFormItem) {
 			_view = view;
 			
 			super();
