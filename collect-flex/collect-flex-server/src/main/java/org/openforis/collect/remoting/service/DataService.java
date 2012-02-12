@@ -28,6 +28,7 @@ import org.openforis.collect.persistence.RecordLockedException;
 import org.openforis.collect.remoting.service.UpdateRequest.Method;
 import org.openforis.collect.session.SessionState;
 import org.openforis.collect.session.SessionState.RecordState;
+import org.openforis.idm.geotools.IdmInterpretationError;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.BooleanAttributeDefinition;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
@@ -495,7 +496,7 @@ public class DataService {
 					throw new RuntimeException("Result is not a code attribute");
 				}
 			} catch (InvalidPathException e) {
-				throw new RuntimeException("error while retrieving parent code list item");
+				throw new IdmInterpretationError("Error retrieving parent code", e);
 			}
 		} else {
 			return null;
@@ -506,7 +507,7 @@ public class DataService {
 		for (CodeListItem item : siblings) {
 			String itemCode = item.getCode();
 			String paddedCode;
-			if(itemCode.length() - code.length() > 0) {
+			if (itemCode.length() > code.length()) {
 				//try to left pad the code with '0'
 				paddedCode = StringUtils.leftPad(code, itemCode.length(), '0');
 			} else {
