@@ -23,5 +23,14 @@ package org.openforis.collect.util
 			}
 		}
 		
+		public static function getItem(list:IList, propertyName:String, value:Object):Object {
+			for each(var item:Object in list) {
+				if(ObjectUtil.getValue(item, propertyName) == value) {
+					return item;
+				}
+			}
+			return null;
+		}
+		
 	}
 }
