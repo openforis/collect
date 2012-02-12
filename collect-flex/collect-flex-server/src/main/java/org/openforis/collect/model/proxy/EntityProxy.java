@@ -3,9 +3,7 @@
  */
 package org.openforis.collect.model.proxy;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,8 +12,6 @@ import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedPro
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.model.Attribute;
-import org.openforis.idm.model.CodeAttribute;
-import org.openforis.idm.model.DateAttribute;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Node;
 

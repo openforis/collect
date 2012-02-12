@@ -4,7 +4,6 @@
 package org.openforis.collect.metamodel.proxy;
 
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
-import org.openforis.collect.Proxy;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 
 /**
