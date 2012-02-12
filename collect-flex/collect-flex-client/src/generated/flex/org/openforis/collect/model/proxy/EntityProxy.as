@@ -10,7 +10,10 @@ package org.openforis.collect.model.proxy {
 	import mx.collections.ArrayList;
 	import mx.collections.IList;
 	
+	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
+	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 	import org.openforis.collect.util.CollectionUtil;
+	import org.openforis.collect.util.StringUtil;
 
     [Bindable]
     [RemoteClass(alias="org.openforis.collect.model.proxy.EntityProxy")]
@@ -103,6 +106,28 @@ package org.openforis.collect.model.proxy {
 				childrenByName.put(name, children);
 			}
 			children.addItem(node);
+		}
+		
+		public function getKeyLabel(entityDefinition:EntityDefinitionProxy):String {
+			var keyDefs:IList = entityDefinition.keyAttributeDefinitions;
+			var keyParts:Array = new Array();
+			for each (var def:AttributeDefinitionProxy in keyDefs) {
+				var key:AttributeProxy = getSingleAttribute(def.name);
+				if(key != null && key.value != null) {
+					var keyValue:Object = key.value;
+					var keyPart:String = null;
+					if(keyValue is CodeProxy) {
+						keyPart = CodeProxy(keyValue).toString();
+					} else if(keyValue is CoordinateProxy) {
+						//todo
+						keyPart = CoordinateProxy(keyValue).toString();
+					} else {
+						keyPart = String(keyValue);
+					}
+					keyParts.push(keyPart);
+				}
+			}
+			return StringUtil.concat(" - ", keyParts);
 		}
     }
 }
