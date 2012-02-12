@@ -124,7 +124,7 @@ public class DataService {
 		EntityDefinition rootEntityDefinition = schema.getRootEntityDefinition(rootEntityName);
 		CollectRecord record = recordManager.create(activeSurvey, rootEntityDefinition, user, version.getName());
 		Entity rootEntity = record.getRootEntity();
-		addEmptyAttributes(record, rootEntity);
+		addEmptyAttributes(rootEntity, version);
 		sessionState.setActiveRecord((CollectRecord) record);
 		sessionState.setActiveRecordState(RecordState.NEW);
 		RecordProxy recordProxy = new RecordProxy(record);
@@ -184,8 +184,7 @@ public class DataService {
 						result.add(proxy);
 					}
 				} else {
-					Entity node = parentEntity.addEntity(nodeName);
-					addEmptyAttributes(record, node);
+					Entity node = addEntity(parentEntity, nodeName, record.getVersion());
 					EntityProxy proxy = new EntityProxy(node);
 					result.add(proxy);
 				}
@@ -222,6 +221,12 @@ public class DataService {
 		} else {
 			throw new RuntimeException("Parent node is not an entity");
 		}
+	}
+	
+	private Entity addEntity(Entity parentEntity, String nodeName, ModelVersion version) {
+		Entity node = parentEntity.addEntity(nodeName);
+		addEmptyAttributes(node, version);
+		return node;
 	}
 	
 	@SuppressWarnings("rawtypes")
@@ -361,14 +366,15 @@ public class DataService {
 		}
 	}
 	
-	private void addEmptyAttributes(CollectRecord record, Entity entity) {
-		ModelVersion version = record.getVersion();
+	private void addEmptyAttributes(Entity entity, ModelVersion version) {
 		EntityDefinition entityDef = entity.getDefinition();
 		List<NodeDefinition> childDefinitions = entityDef.getChildDefinitions();
 		for (NodeDefinition nodeDef : childDefinitions) {
-			if(nodeDef instanceof AttributeDefinition) {
-				if(ModelVersionUtil.isInVersion(nodeDef, version)) {
+			if(ModelVersionUtil.isInVersion(nodeDef, version)) {
+				if(nodeDef instanceof AttributeDefinition) {
 					addAttribute(entity, (AttributeDefinition) nodeDef, null);
+				} else if(nodeDef instanceof EntityDefinition && ! nodeDef.isMultiple()) {
+					addEntity(entity, nodeDef.getName(), version);
 				}
 			}
 		}
