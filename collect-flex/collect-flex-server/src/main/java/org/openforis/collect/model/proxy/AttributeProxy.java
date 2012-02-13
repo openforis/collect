@@ -47,5 +47,25 @@ public class AttributeProxy extends NodeProxy {
 			return null;
 		}
 	}
-	
+
+	@ExternalizedProperty
+	public boolean isRelevant() {
+		return attribute.isRelevant();
+	}
+
+	@ExternalizedProperty
+	public boolean isRequired() {
+		return attribute.isRequired();
+	}
+
+	@ExternalizedProperty
+	public String getRemarks() {
+		return attribute.getRemarks();
+	}
+
+	@ExternalizedProperty
+	public AttributeSymbol getSymbol() {
+		return AttributeSymbol.valueOf(attribute.getSymbol());
+	}
+
 }
