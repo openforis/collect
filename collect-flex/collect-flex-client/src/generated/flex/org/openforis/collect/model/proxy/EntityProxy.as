@@ -108,6 +108,15 @@ package org.openforis.collect.model.proxy {
 			children.addItem(node);
 		}
 		
+		public function removeChild(node:NodeProxy):void {
+			var name:String = node.name;
+			var children:IList = childrenByName.get(name);
+			var index:int = children.getItemIndex(node);
+			if(index >= 0) {
+				children.removeItemAt(index);
+			}
+		}
+		
 		public function getKeyLabel(entityDefinition:EntityDefinitionProxy):String {
 			var keyDefs:IList = entityDefinition.keyAttributeDefinitions;
 			var keyParts:Array = new Array();
