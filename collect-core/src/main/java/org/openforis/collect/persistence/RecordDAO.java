@@ -253,7 +253,6 @@ public class RecordDAO extends JooqDaoSupport {
 		if (rootEntityId == null) {
 			throw new IllegalArgumentException("Null schema object definition id");
 		}
-		// Insert into SURVEY table
 		Factory jf = getJooqFactory();
 		int recordId = jf.nextval(RECORD_ID_SEQ).intValue();
 		InsertSetMoreStep<RecordRecord> setStep = jf.insertInto(RECORD)
@@ -271,27 +270,29 @@ public class RecordDAO extends JooqDaoSupport {
 				.set(RECORD.WARNINGS, record.getWarnings())
 				;
 		//set keys
-		switch(record.getRootEntityKeys().size()) {
+		List<String> keys = record.getRootEntityKeys();
+		switch(keys.size()) {
 			case 3:
-				setStep.set(RECORD.KEY3, record.getRootEntityKeys().get(2));
+				setStep.set(RECORD.KEY3, keys.get(2));
 			case 2:
-				setStep.set(RECORD.KEY3, record.getRootEntityKeys().get(1));
+				setStep.set(RECORD.KEY2, keys.get(1));
 			case 1:
-				setStep.set(RECORD.KEY1, record.getRootEntityKeys().get(0));
+				setStep.set(RECORD.KEY1, keys.get(0));
 				break;
 		}
 		//set counts
-		switch(record.getEntityCounts().size()) {
+		List<Integer> counts = record.getEntityCounts();
+		switch(counts.size()) {
 			case 5:
-				setStep.set(RECORD.COUNT5, record.getEntityCounts().get(4));
+				setStep.set(RECORD.COUNT5, counts.get(4));
 			case 4:
-				setStep.set(RECORD.COUNT4, record.getEntityCounts().get(3));
+				setStep.set(RECORD.COUNT4, counts.get(3));
 			case 3:
-				setStep.set(RECORD.COUNT3, record.getEntityCounts().get(2));
+				setStep.set(RECORD.COUNT3, counts.get(2));
 			case 2:
-				setStep.set(RECORD.COUNT2, record.getEntityCounts().get(1));
+				setStep.set(RECORD.COUNT2, counts.get(1));
 			case 1:
-				setStep.set(RECORD.COUNT1, record.getEntityCounts().get(0));
+				setStep.set(RECORD.COUNT1, counts.get(0));
 				break;
 		}
 		setStep.execute();
@@ -308,7 +309,6 @@ public class RecordDAO extends JooqDaoSupport {
 		if (rootEntityId == null) {
 			throw new IllegalArgumentException("Null schema object definition id");
 		}
-		// Insert into SURVEY table
 		Factory jf = getJooqFactory();
 		UpdateSetMoreStep<RecordRecord> setStep = jf.update(RECORD)
 				.set(RECORD.ROOT_ENTITY_ID, rootEntityId)
@@ -324,27 +324,29 @@ public class RecordDAO extends JooqDaoSupport {
 				.set(RECORD.WARNINGS, record.getWarnings())
 				;
 		//set keys
-		switch(record.getRootEntityKeys().size()) {
+		List<String> keys = record.getRootEntityKeys();
+		switch(keys.size()) {
 			case 3:
-				setStep.set(RECORD.KEY3, record.getRootEntityKeys().get(2));
+				setStep.set(RECORD.KEY3, keys.get(2));
 			case 2:
-				setStep.set(RECORD.KEY3, record.getRootEntityKeys().get(1));
+				setStep.set(RECORD.KEY2, keys.get(1));
 			case 1:
-				setStep.set(RECORD.KEY1, record.getRootEntityKeys().get(0));
+				setStep.set(RECORD.KEY1, keys.get(0));
 				break;
 		}
 		//set counts
-		switch(record.getEntityCounts().size()) {
+		List<Integer> counts = record.getEntityCounts();
+		switch(counts.size()) {
 			case 5:
-				setStep.set(RECORD.COUNT5, record.getEntityCounts().get(4));
+				setStep.set(RECORD.COUNT5, counts.get(4));
 			case 4:
-				setStep.set(RECORD.COUNT4, record.getEntityCounts().get(3));
+				setStep.set(RECORD.COUNT4, counts.get(3));
 			case 3:
-				setStep.set(RECORD.COUNT3, record.getEntityCounts().get(2));
+				setStep.set(RECORD.COUNT3, counts.get(2));
 			case 2:
-				setStep.set(RECORD.COUNT2, record.getEntityCounts().get(1));
+				setStep.set(RECORD.COUNT2, counts.get(1));
 			case 1:
-				setStep.set(RECORD.COUNT1, record.getEntityCounts().get(0));
+				setStep.set(RECORD.COUNT1, counts.get(0));
 				break;
 		}
 		setStep.where(RECORD.ID.equal(recordId))

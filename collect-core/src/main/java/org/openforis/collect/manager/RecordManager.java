@@ -200,7 +200,9 @@ public class RecordManager implements RecordContext {
 			Node<? extends NodeDefinition> node = rootEntity.get(name, 0);
 			if(node instanceof CodeAttribute) {
 				Code code = ((CodeAttribute) node).getValue();
-				textValue = code.getCode();
+				if(code != null) {
+					textValue = code.getCode();
+				}
 			} else if(node instanceof TextAttribute) {
 				textValue = ((TextAttribute) node).getValue();
 			} else if(node instanceof NumberAttribute<?>) {
