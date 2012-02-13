@@ -30,7 +30,7 @@ package org.openforis.collect.client {
 		public function DataClient() {
 			super("dataService");
 			
-			this._updateQueueProcessor = new RemoteCallQueueProcessor(3, faultHandler);
+			this._updateQueueProcessor = new RemoteCallQueueProcessor(1);
 			this._updateActiveRecordOperation = getOperation("updateActiveRecord");
 			this._saveActiveRecordOperation = getOperation("saveActiveRecord");
 			this._createNewRecordOperation = getOperation("createNewRecord");
