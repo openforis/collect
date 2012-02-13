@@ -104,31 +104,43 @@ package org.openforis.collect.presenter {
 			PopUpManager.removePopUp(_view.popup);
 		}
 
-		override protected function get textValue():String {
+		override protected function getTextValue():String {
 			if(_view.attributeDefinition != null) {
 				if(_view.attributeDefinition.multiple) {
-					if(_view.attributes) {
+					if(CollectionUtil.isNotEmpty(_view.attributes)) {
+						var firstAttribute:AttributeProxy = _view.attributes.getItemAt(0) as AttributeProxy;
+						if(firstAttribute.symbol != null) {
+							var shortKey:String = InputFieldPresenter.getReasonBlankShortKey(attribute.symbol);
+							if(shortKey != null) {
+								return shortKey;
+							}
+						}
 						var parts:Array = new Array();
 						for each (var attribute:AttributeProxy in _view.attributes) {
-							var part:String = getText(attribute);
+							var part:String = codeAttributeToText(attribute);
 							parts.push(part);
 						}
 						var result:String = org.openforis.collect.util.StringUtil.concat(", ", parts);
 						return result;
 					}
 				} else {
-					return getText(_view.attribute);
+					return codeAttributeToText(_view.attribute);
 				}
 			}
 			return "";
 		}
 		
-		protected function getText(attribute:AttributeProxy):String {
+		protected function codeAttributeToText(attribute:AttributeProxy):String {
 			if(attribute != null) {
-				var value:CodeProxy = attribute.value as CodeProxy;
-				if(value != null) {
-					var text:String = value.toString();
-					return text;
+				if(attribute.symbol != null) {
+					var shortKey:String = InputFieldPresenter.getReasonBlankShortKey(attribute.symbol);
+					return shortKey;
+				} else {
+					var value:CodeProxy = attribute.value as CodeProxy;
+					if(value != null) {
+						var text:String = value.toString();
+						return text;
+					}
 				}
 			}
 			return "";
@@ -147,7 +159,7 @@ package org.openforis.collect.presenter {
 			}
 			var req:UpdateRequest = new UpdateRequest();
 			var def:AttributeDefinitionProxy = _view.attributeDefinition;
-			req.parentNodeId = _view.parentEntity.id;
+			req.parentEntityId = _view.parentEntity.id;
 			req.nodeName = def.name;
 			req.value = String(value);
 			

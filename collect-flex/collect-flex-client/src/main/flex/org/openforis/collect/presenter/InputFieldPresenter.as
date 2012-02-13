@@ -20,6 +20,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.event.UIEvent;
 	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 	import org.openforis.collect.model.proxy.AttributeProxy;
+	import org.openforis.collect.model.proxy.AttributeSymbol;
 	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.remoting.service.UpdateRequest;
 	import org.openforis.collect.remoting.service.UpdateRequest$Method;
@@ -29,6 +30,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.ui.component.detail.MultipleEntityFormItem;
 	import org.openforis.collect.ui.component.input.InputField;
 	import org.openforis.collect.ui.component.input.TextInput;
+	import org.openforis.collect.util.StringUtil;
 	import org.openforis.collect.util.UIUtil;
 	
 	import spark.components.supportClasses.ItemRenderer;
@@ -87,12 +89,10 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function focusOutHandler(event:FocusEvent):void {
-			//TODO
 			if(_changed) {
 				applyChanges();
 			} else {
 				//TODO perform validation only
-				
 			}
 		}
 		
@@ -123,13 +123,14 @@ package org.openforis.collect.presenter {
 			}
 			var req:UpdateRequest = new UpdateRequest();
 			var def:AttributeDefinitionProxy = _view.attributeDefinition;
-			req.parentNodeId = _view.parentEntity.id;
+			req.parentEntityId = _view.parentEntity.id;
 			req.nodeName = def.name;
 			req.value = String(value);
 			
 			if(_view.attribute != null) {
 				req.nodeId = _view.attribute.id;
 				req.method = UpdateRequest$Method.UPDATE;
+				req.remarks = _view.attribute.remarks;
 			} else {
 				req.method = UpdateRequest$Method.ADD;
 			}
@@ -154,12 +155,17 @@ package org.openforis.collect.presenter {
 			faultHandler(event, token);
 		}
 		
-		protected function get textValue():String {
+		protected function getTextValue():String {
 			var attribute:AttributeProxy = _view.attribute;
 			if(attribute != null) {
 				var value:Object = attribute.value;
-				if(value != null) {
+				if(value != null && StringUtil.isNotBlank(value.toString())) {
 					return value.toString();
+				} else if(attribute.symbol != null) {
+					var shortKey:String = getReasonBlankShortKey(attribute.symbol);
+					if(shortKey != null) {
+						return shortKey;
+					}
 				}
 			}
 			return "";
@@ -179,16 +185,21 @@ package org.openforis.collect.presenter {
 			*/
 		}
 		
-		public function changeReasonBlank(symbol:*):void {
-			/*
-			var newAttributeValue:AbstractValue = new AbstractValue();
-			newAttributeValue.symbol = symbol;
-			if(_attributeValue != null) {
-				//copy old value infos
-				newAttributeValue.remarks = _attributeValue.remarks;
+		public function changeSymbol(symbol:AttributeSymbol, remarks:String = null):void {
+			var req:UpdateRequest = new UpdateRequest();
+			var def:AttributeDefinitionProxy = _view.attributeDefinition;
+			req.parentEntityId = _view.parentEntity.id;
+			req.nodeName = def.name;
+			req.symbol = symbol;
+			req.remarks = remarks;
+			if(_view.attribute != null) {
+				req.nodeId = _view.attribute.id;
+				req.method = UpdateRequest$Method.UPDATE;
+			} else {
+				req.method = UpdateRequest$Method.ADD;
 			}
-			applyChanges(newAttributeValue);
-			*/
+			var responder:AsyncResponder = new AsyncResponder(updateResultHandler, updateFaultHandler);
+			ClientFactory.dataClient.updateActiveRecord(responder, req);
 		}
 
 
@@ -197,21 +208,31 @@ package org.openforis.collect.presenter {
 			if(_view.attributeDefinition != null) {
 				var textInput:TextInput = _view.textInput as TextInput;
 				if(textInput != null) {
-					var text:String = this.textValue;
+					var text:String = getTextValue();
 					textInput.text = text;
+					
+					if(_view.attribute != null) {
+						var a:AttributeProxy = _view.attribute;
+						if(StringUtil.isNotBlank(a.remarks)) {
+							
+						}
+					}
 				}
 			}
-			/*
-			if(_attributeValue != null && _attributeValue.path == this._path) {
-			//this._inputField.attribute = attribute;
-			this._inputField.error = _attributeValue.error;
-			this._inputField.warning = _attributeValue.warning;
-			this._inputField.approved = _attributeValue.approved;
-			this._inputField.remarks = _attributeValue.remarks;
-			}
-			*/
 		}
 		
-		
+		public static function getReasonBlankShortKey(symbol:AttributeSymbol):String {
+			if(symbol != null) {
+				switch(symbol) {
+					case AttributeSymbol.BLANK_ON_FORM:
+						return '*';
+					case AttributeSymbol.DASH_ON_FORM:
+						return '-';
+					case AttributeSymbol.ILLEGIBLE:
+						return '?';
+				}
+			}
+			return null;
+		}
 	}
 }

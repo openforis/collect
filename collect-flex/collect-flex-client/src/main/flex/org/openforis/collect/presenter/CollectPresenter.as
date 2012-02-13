@@ -65,8 +65,8 @@ package org.openforis.collect.presenter {
 			
 			CONFIG::debugging {
 				view.addEventListener(KeyboardEvent.KEY_DOWN, function(event:KeyboardEvent):void {
-					//open FlexSpy popup pressing CTRL+SHIFT+S
-					if(event.ctrlKey && event.shiftKey && event.charCode == 83)
+					//open FlexSpy popup pressing CTRL+i
+					if(event.ctrlKey && event.charCode == 105)
 						FlexSpy.show();
 				});
 			}

@@ -13,6 +13,7 @@ package org.openforis.collect.ui.component.input {
 	import org.openforis.collect.event.UIEvent;
 	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 	import org.openforis.collect.model.proxy.AttributeProxy;
+	import org.openforis.collect.model.proxy.AttributeSymbol;
 	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.presenter.InputFieldPresenter;
 	import org.openforis.collect.util.StringUtil;
@@ -60,10 +61,16 @@ package org.openforis.collect.ui.component.input {
 			this._presenter = new InputFieldPresenter(this);
 		}
 		
-		protected function createAttributeValue():Object {
-			var attributeValue:Object = new Object();
-			attributeValue.string1 = text;
-			return attributeValue;
+		public function changeSymbol(symbol:AttributeSymbol, remarks:String = null):void {
+			presenter.changeSymbol(symbol, remarks);
+		}
+		
+		/**
+		 * returns trus if there is not an attribute associated to the field or
+		 * the attribute's value is null
+		 */
+		public function isEmpty():Boolean {
+			return attribute == null || attribute.value == null;
 		}
 		
 		public function set relevant(value:Boolean):void {

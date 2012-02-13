@@ -1,6 +1,7 @@
 package org.openforis.collect.remoting.service;
 
 import org.openforis.collect.Proxy;
+import org.openforis.collect.model.proxy.AttributeSymbol;
 
 /**
  * 
@@ -14,11 +15,13 @@ public class UpdateRequest implements Proxy {
 		UPDATE, ADD, DELETE;
 	}
 
-	private Integer parentNodeId;
+	private Integer parentEntityId;
 	private String nodeName;
 	private Integer nodeId;
 	private String value;
 	private Method method;
+	private String remarks;
+	private AttributeSymbol symbol;
 	
 	public UpdateRequest(){
 		
@@ -48,12 +51,12 @@ public class UpdateRequest implements Proxy {
 		this.value = value;
 	}
 
-	public Integer getParentNodeId() {
-		return parentNodeId;
+	public Integer getParentEntityId() {
+		return parentEntityId;
 	}
 
-	public void setParentNodeId(Integer parentNodeId) {
-		this.parentNodeId = parentNodeId;
+	public void setParentEntityId(Integer parentEntityId) {
+		this.parentEntityId = parentEntityId;
 	}
 
 	public String getNodeName() {
@@ -62,6 +65,22 @@ public class UpdateRequest implements Proxy {
 
 	public void setNodeName(String nodeName) {
 		this.nodeName = nodeName;
+	}
+
+	public String getRemarks() {
+		return remarks;
+	}
+
+	public void setRemarks(String remarks) {
+		this.remarks = remarks;
+	}
+
+	public AttributeSymbol getSymbol() {
+		return symbol;
+	}
+
+	public void setSymbol(AttributeSymbol symbol) {
+		this.symbol = symbol;
 	}
 
 }

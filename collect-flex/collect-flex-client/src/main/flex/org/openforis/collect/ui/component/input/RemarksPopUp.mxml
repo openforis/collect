@@ -2,83 +2,26 @@
 <s:SkinnableContainer xmlns:fx="http://ns.adobe.com/mxml/2009" 
 		  xmlns:s="library://ns.adobe.com/flex/spark" 
 		  xmlns:mx="library://ns.adobe.com/flex/mx"
-		  creationComplete="creationCompleteHandler(event)" xmlns:component="org.fao.openforis.flex.component.*"
+		  xmlns:component="org.fao.openforis.flex.component.*"
+		  creationComplete="creationCompleteHandler(event)" 
 		  creationPolicy="all"
 		  alpha="1"
 		  >
-	<fx:Metadata> 
-		[Event(name="save", type="org.openforis.collect.event.RemarksPopUpEvent")] 
-		[Event(name="cancel", type="org.openforis.collect.event.RemarksPopUpEvent")] 
-	</fx:Metadata> 
 	
 	<fx:Script>
 		<![CDATA[
 			import mx.events.FlexEvent;
 			
 			import org.openforis.collect.i18n.Message;
+			import org.openforis.collect.model.proxy.AttributeProxy;
+			import org.openforis.collect.model.proxy.AttributeSymbol;
 			
-			[Bindable]
-			private var _showReasonBlank:Boolean = true;
-			[Bindable]
-			private var _abstractValue:*;
+			public static const STATE_DEFAULT:String = "default";
+			public static const STATE_CAN_SPECIFY_REASON_BLANK:String = "canSpecifyReasonBlank";
 			
 			protected function creationCompleteHandler(event:FlexEvent):void {
 			}
 			
-			public function reset():void {
-				//lastSelectedRadioButton = null;
-				//_fieldExtraInfo = null;
-			}
-			/*
-			protected function mouseDownOutsideHandler(event:FlexMouseEvent):void {
-				save();
-			}
-			*/
-			public function updateCurrentState():void {
-				this.currentState = calculateCurrentState();
-			}
-			
-			//getters and setters
-			
-			public function get showReasonBlank():Boolean {
-				return _showReasonBlank;
-			}
-			
-			public function set showReasonBlank(value:Boolean):void {
-				_showReasonBlank = value;
-				updateCurrentState();
-			}
-			
-			
-			protected function remarksTextAreaKeyDownHandler(event:KeyboardEvent):void {
-				switch(event.keyCode) {
-					case Keyboard.TAB:
-						//save();
-						break;
-					case Keyboard.ESCAPE:
-						close();
-						break;
-				}
-			}
-			
-			protected function calculateCurrentState():String {
-				if(_showReasonBlank) {
-					return "canSpecifyReasonBlank";
-				} else {
-					return "default";
-				}
-			}
-			
-			
-			
-			public function close():void {
-				//dispatchEvent(new DialogEvent(DialogEvent.CANCEL));
-			}
-
-
-			
-			
-
 		]]>
 	</fx:Script>
 	<fx:Declarations>
@@ -94,18 +37,17 @@
 	<s:VGroup id="reasonBlankGroup" visible="false" includeInLayout="false" 
 			  visible.canSpecifyReasonBlank="true" includeInLayout.canSpecifyReasonBlank="true">
 		<s:Label text="Reason left blank:" />
-		<s:RadioButton id="blankOnFormRadioButton" value="{'*'}" group="{radioButtonGroup}" 
+		<s:RadioButton id="blankOnFormRadioButton" value="{AttributeSymbol.BLANK_ON_FORM}" group="{radioButtonGroup}" 
 					   label="{Message.get('edit.contextMenu.blankOnForm')}" />
-		<s:RadioButton id="dashOnFormRadioButton" value="{'-'}" group="{radioButtonGroup}" 
+		<s:RadioButton id="dashOnFormRadioButton" value="{AttributeSymbol.DASH_ON_FORM}" group="{radioButtonGroup}" 
 					   label="{Message.get('edit.contextMenu.dashOnForm')}" />
-		<s:RadioButton id="illegibleRadioButton" value="{'?'}" group="{radioButtonGroup}" 
-					   label="{Message.get('edit.contextMenu.illegible')" />
+		<s:RadioButton id="illegibleRadioButton" value="{AttributeSymbol.ILLEGIBLE}" group="{radioButtonGroup}" 
+					   label="{Message.get('edit.contextMenu.illegible')}" />
 	</s:VGroup>
 	
 	<s:VGroup id="remarksGroup">
 		<s:Label text="Remarks:" />
-		<s:TextArea id="remarksTextArea" heightInLines="4" textAlign="left" keyDown="remarksTextAreaKeyDownHandler(event)"
-					text="{_abstractValue.remarks}" />	
+		<s:TextArea id="remarksTextArea" heightInLines="4" textAlign="left" />	
 	</s:VGroup>
 	
 	<s:HGroup width="100%" horizontalAlign="center">

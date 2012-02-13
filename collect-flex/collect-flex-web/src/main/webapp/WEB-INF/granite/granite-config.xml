@@ -28,7 +28,8 @@
 	<amf3-deserializer-securizer param="
 	    org\.granite\..* |
 	    flex\.messaging\..* |
-	    org\.openforis\.collect\.remoting\..*
+	    org\.openforis\.collect\.remoting\..* |
+	    org\.openforis\.collect\.model\.proxy\..*
 	  "/>
     
 	<externalizers>

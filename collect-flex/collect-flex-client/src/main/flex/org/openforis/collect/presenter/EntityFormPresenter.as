@@ -77,7 +77,7 @@ package org.openforis.collect.presenter
 		protected function addButtonClickHandler(event:MouseEvent):void {
 			var req:UpdateRequest = new UpdateRequest();
 			req.method = UpdateRequest$Method.ADD;
-			req.parentNodeId = _view.parentEntity.id;
+			req.parentEntityId = _view.parentEntity.id;
 			req.nodeName = _view.entityDefinition.name;
 			ClientFactory.dataClient.updateActiveRecord(new AsyncResponder(addResultHandler, faultHandler, null), req);
 		}
@@ -90,7 +90,7 @@ package org.openforis.collect.presenter
 		protected function performDeletion():void {
 			var req:UpdateRequest = new UpdateRequest();
 			req.method = UpdateRequest$Method.DELETE;
-			req.parentNodeId = _view.parentEntity.id;
+			req.parentEntityId = _view.parentEntity.id;
 			req.nodeId = _view.entity.id;
 			ClientFactory.dataClient.updateActiveRecord(new AsyncResponder(deleteResultHandler, faultHandler, null), req);
 		}

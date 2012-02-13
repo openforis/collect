@@ -11,7 +11,9 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.event.InputFieldEvent;
 	import org.openforis.collect.i18n.Message;
 	import org.openforis.collect.model.Phase;
+	import org.openforis.collect.model.proxy.AttributeSymbol;
 	import org.openforis.collect.ui.component.datagroup.DataGroupItemRenderer;
+	import org.openforis.collect.ui.component.detail.EntityDataGroupItemRenderer;
 	import org.openforis.collect.ui.component.input.InputField;
 	import org.openforis.collect.util.ArrayUtil;
 	import org.openforis.collect.util.PopUpUtil;
@@ -43,11 +45,11 @@ package org.openforis.collect.presenter
 		
 		public static var lastMouseOverInputField:InputField;
 		
-		public static var lastMouseOverDataGroupRow:DataGroupItemRenderer;
+		public static var lastMouseOverDataGroupRow:EntityDataGroupItemRenderer;
 		
 		private static var contextInputField:InputField;
 		
-		private static var contextDataGroupRow:DataGroupItemRenderer;
+		private static var contextDataGroupRow:EntityDataGroupItemRenderer;
 		
 		private static var contextMouseClickGlobalPoint:Point;
 		
@@ -91,8 +93,7 @@ package org.openforis.collect.presenter
 			var currentPhase:Phase = Phase.DATA_ENTRY;
 			if(lastMouseOverInputField) {
 				//add items related to blank infos (if the field is empty)
-				//if(currentPhase == Phase.DATA_ENTRY && lastMouseOverInputField.isEmpty()) {
-				if(currentPhase == Phase.DATA_ENTRY) {
+				if(currentPhase == Phase.DATA_ENTRY && lastMouseOverInputField.isEmpty()) {
 					menuDataProvider.push(BLANK_ON_FORM_MENU_ITEM);
 					menuDataProvider.push(DASH_ON_FORM_MENU_ITEM);
 					menuDataProvider.push(ILLEGIBLE_MENU_ITEM);
@@ -180,17 +181,15 @@ package org.openforis.collect.presenter
 		
 		private function contextMenuItemClickHandler(event:MenuEvent):void {
 			switch(event.item) {
-				/*
 				case BLANK_ON_FORM_MENU_ITEM:
-					contextInputField.changeReasonBlankInfo(FieldExtraInfo.BLANK_ON_FORM_CODE);
+					contextInputField.changeSymbol(AttributeSymbol.BLANK_ON_FORM);
 					break;
 				case DASH_ON_FORM_MENU_ITEM:
-					contextInputField.changeReasonBlankInfo(FieldExtraInfo.DASH_CODE);
+					contextInputField.changeSymbol(AttributeSymbol.DASH_ON_FORM);
 					break;
 				case ILLEGIBLE_MENU_ITEM:
-					contextInputField.changeReasonBlankInfo(FieldExtraInfo.ILLEGIBLE_CODE);
+					contextInputField.changeSymbol(AttributeSymbol.ILLEGIBLE);
 					break;
-				*/
 				case EDIT_REMARKS_MENU_ITEM:
 					_remarksPopUpPresenter.openPopUp(contextInputField, false, contextMouseClickGlobalPoint);
 					break;

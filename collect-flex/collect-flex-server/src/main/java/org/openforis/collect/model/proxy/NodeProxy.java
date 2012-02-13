@@ -14,6 +14,7 @@ import org.openforis.idm.model.Node;
 public class NodeProxy implements Proxy {
 
 	private transient Node<?> node;
+	protected boolean deleted = false;
 
 	public NodeProxy(Node<?> node) {
 		super();
@@ -47,5 +48,14 @@ public class NodeProxy implements Proxy {
 			return null;
 		}
 	}
+	
+	public boolean isDeleted() {
+		return deleted;
+	}
+
+	public void setDeleted(boolean deleted) {
+		this.deleted = deleted;
+	}
+	
 	
 }

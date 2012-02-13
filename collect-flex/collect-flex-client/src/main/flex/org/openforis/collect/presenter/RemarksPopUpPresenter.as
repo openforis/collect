@@ -7,12 +7,15 @@ package org.openforis.collect.presenter
 	import flash.ui.Keyboard;
 	
 	import mx.events.FlexEvent;
+	import mx.events.FlexMouseEvent;
 	import mx.managers.PopUpManager;
 	
 	import org.openforis.collect.event.RemarksPopUpEvent;
+	import org.openforis.collect.model.proxy.AttributeSymbol;
 	import org.openforis.collect.ui.component.input.InputField;
 	import org.openforis.collect.ui.component.input.RemarksPopUp;
 	import org.openforis.collect.util.PopUpUtil;
+	import org.openforis.collect.util.StringUtil;
 	
 	import spark.components.RadioButton;
 	
@@ -21,29 +24,28 @@ package org.openforis.collect.presenter
 		private var lastSelectedRadioButton:RadioButton = null;
 		private var popUpOpened:Boolean = false;
 		
-		private var popUp:RemarksPopUp;
-
+		private var view:RemarksPopUp;
+		private var _inputField:InputField;
+		
 		[Bindable]
 		private var _showReasonBlank:Boolean = true;
 		
-		public function RemarksPopUpPresenter(popUp:RemarksPopUp = null) {
-			this.popUp = popUp;
+		public function RemarksPopUpPresenter() {
 		}
 		
 		protected function initPopUp():void {
-			if(this.popUp != null) {
-				popUp.reasonBlankGroup.addEventListener(FlexEvent.CREATION_COMPLETE, reasonBlankGroupCreationCompleteHandler);
-				
-				popUp.blankOnFormRadioButton.addEventListener(MouseEvent.CLICK, radioButtonClickHandler);
-				popUp.dashOnFormRadioButton.addEventListener(MouseEvent.CLICK, radioButtonClickHandler);
-				popUp.illegibleRadioButton.addEventListener(MouseEvent.CLICK, radioButtonClickHandler);
-				popUp.blankOnFormRadioButton.addEventListener(KeyboardEvent.KEY_DOWN, radioButtonsKeyDownHandler);
-				popUp.dashOnFormRadioButton.addEventListener(KeyboardEvent.KEY_DOWN, radioButtonsKeyDownHandler);
-				popUp.illegibleRadioButton.addEventListener(KeyboardEvent.KEY_DOWN, radioButtonsKeyDownHandler);
-				
-				popUp.addEventListener(RemarksPopUpEvent.SAVE, saveHandler);
-				popUp.addEventListener(RemarksPopUpEvent.CANCEL, cancelHandler);
-			}
+			//init event listeners
+			view.reasonBlankGroup.addEventListener(FlexEvent.CREATION_COMPLETE, reasonBlankGroupCreationCompleteHandler);
+			
+			view.blankOnFormRadioButton.addEventListener(MouseEvent.CLICK, radioButtonClickHandler);
+			view.dashOnFormRadioButton.addEventListener(MouseEvent.CLICK, radioButtonClickHandler);
+			view.illegibleRadioButton.addEventListener(MouseEvent.CLICK, radioButtonClickHandler);
+			view.blankOnFormRadioButton.addEventListener(KeyboardEvent.KEY_DOWN, radioButtonsKeyDownHandler);
+			view.dashOnFormRadioButton.addEventListener(KeyboardEvent.KEY_DOWN, radioButtonsKeyDownHandler);
+			view.illegibleRadioButton.addEventListener(KeyboardEvent.KEY_DOWN, radioButtonsKeyDownHandler);
+			view.remarksTextArea.addEventListener(KeyboardEvent.KEY_DOWN, remarksTextAreaKeyDownHandler);
+			view.okButton.addEventListener(MouseEvent.CLICK, okButtonClickHandler);
+			view.addEventListener(FlexMouseEvent.MOUSE_DOWN_OUTSIDE, mouseDownOutsideHandler);
 		}
 		
 		protected function radioButtonClickHandler(event:MouseEvent):void {
@@ -57,44 +59,95 @@ package org.openforis.collect.presenter
 			}
 		}
 		
+		protected function remarksTextAreaKeyDownHandler(event:KeyboardEvent):void {
+			switch(event.keyCode) {
+				case Keyboard.TAB:
+					//save();
+					break;
+				case Keyboard.ESCAPE:
+					hidePopUp();
+					break;
+			}
+		}
+		
+		protected function mouseDownOutsideHandler(event:FlexMouseEvent):void {
+			okButtonClickHandler();
+		}
+		
+		protected function updateView():void {
+			view.currentState = calculateCurrentState();
+		}
+		
+		protected function calculateCurrentState():String {
+			if(_showReasonBlank) {
+				return "canSpecifyReasonBlank";
+			} else {
+				return "default";
+			}
+		}
+		
 		public function openPopUp(inputField:InputField, alignToField:Boolean = false, alignmentPoint:Point = null):void {
-			var firstOpen:Boolean = popUp == null;
+			var firstOpen:Boolean = (view == null);
 			if(firstOpen) {
-				popUp = new RemarksPopUp();
+				view = new RemarksPopUp();
 			}
 			//popUp.showReasonBlank = inputField.canShowReasonBlankOnPopUp() && PhaseUtil.currentPhaseCode == PhaseUtil.DATA_ENTRY_CODE;
 			
 			if(! popUpOpened) {
-				PopUpManager.addPopUp(popUp, inputField);
+				this._inputField = inputField;
+				PopUpManager.addPopUp(view, inputField);
 				
 				if(firstOpen) {
 					//init popup only after rendering to avoid null pointer exception accessing null objects
 					initPopUp();
 				}
 			}
-			popUp.reset();
+			setValuesInView();
 
 			var alignmentPoint:Point;
 			if(alignToField) {
-				PopUpUtil.alignPopUpToField(popUp, inputField, PopUpUtil.POSITION_RIGHT, PopUpUtil.VERTICAL_ALIGN_BOTTOM);
+				PopUpUtil.alignPopUpToField(view, inputField, PopUpUtil.POSITION_RIGHT, PopUpUtil.VERTICAL_ALIGN_BOTTOM);
 			} else if(alignmentPoint) {
-				PopUpUtil.alignPop(popUp, alignmentPoint);
+				PopUpUtil.alignPop(view, alignmentPoint);
 			} else {
 				//align popup to mouse pointer
-				PopUpUtil.alignPopUpToMousePoint(popUp, -10, -10);
+				PopUpUtil.alignPopUpToMousePoint(view, -10, -10);
 			}
 			
 			popUpOpened = true;
 		}
 		
+		protected function setValuesInView():void {
+			var remarks:String = null;
+			var symbolToSelect:AttributeSymbol = null;
+			if(_inputField != null && _inputField.attribute != null) {
+				remarks = _inputField.attribute.remarks;
+				var symbol:AttributeSymbol = _inputField.attribute.symbol;
+				if(symbol != null) {
+					switch(symbol) {
+						case AttributeSymbol.BLANK_ON_FORM:
+						case AttributeSymbol.DASH_ON_FORM:
+						case AttributeSymbol.ILLEGIBLE:
+							symbolToSelect = symbol;
+							break;
+					}
+				}
+			}
+			view.currentState = _inputField != null && _inputField.isEmpty() ? 
+				RemarksPopUp.STATE_CAN_SPECIFY_REASON_BLANK: RemarksPopUp.STATE_DEFAULT;
+			view.remarksTextArea.text = remarks;
+			view.radioButtonGroup.selectedValue = symbolToSelect;
+		}
+		
 		public function hidePopUp():void {
-			PopUpManager.removePopUp(popUp);
+			PopUpManager.removePopUp(view);
 			popUpOpened = false;
 		}
 		
-		protected function saveHandler(event:Event = null):void {
-			//TODO get data and store it...
-			
+		protected function okButtonClickHandler(event:Event = null):void {
+			var symbol:AttributeSymbol = view.radioButtonGroup.selectedValue as AttributeSymbol;
+			var remarks:String = StringUtil.trim(view.remarksTextArea.text);
+			_inputField.changeSymbol(symbol, remarks);
 			hidePopUp();
 		}
 		
@@ -105,7 +158,7 @@ package org.openforis.collect.presenter
 		protected function radioButtonsKeyDownHandler(event:KeyboardEvent):void {
 			switch(event.keyCode) {
 				case Keyboard.ENTER:
-					saveHandler();
+					okButtonClickHandler();
 					break;
 				case Keyboard.ESCAPE:
 					cancelHandler(null);
@@ -138,12 +191,12 @@ package org.openforis.collect.presenter
 		
 		public function setFocusOnFirstField():void {
 			if(_showReasonBlank) {
-				if(popUp.blankOnFormRadioButton) {
-					popUp.blankOnFormRadioButton.setFocus();
+				if(view.blankOnFormRadioButton) {
+					view.blankOnFormRadioButton.setFocus();
 				}
 			} else {
-				if(popUp.remarksGroup) {
-					popUp.remarksTextArea.setFocus();
+				if(view.remarksGroup) {
+					view.remarksTextArea.setFocus();
 				}
 			}
 		}
