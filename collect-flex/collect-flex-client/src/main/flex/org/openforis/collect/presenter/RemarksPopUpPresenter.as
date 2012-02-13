@@ -10,7 +10,6 @@ package org.openforis.collect.presenter
 	import mx.events.FlexMouseEvent;
 	import mx.managers.PopUpManager;
 	
-	import org.openforis.collect.event.RemarksPopUpEvent;
 	import org.openforis.collect.model.proxy.AttributeSymbol;
 	import org.openforis.collect.ui.component.input.InputField;
 	import org.openforis.collect.ui.component.input.RemarksPopUp;

@@ -221,18 +221,19 @@ public class DataService {
 			break;
 		case DELETE:
 			Node<? extends NodeDefinition> nodeToDel = record.getNodeById(nodeId);
+			NodeDefinition def = nodeToDel.getDefinition();
+			String name = def.getName();
+			List<Node<?>> children = parentEntity.getAll(name);
+			int index = children.indexOf(nodeToDel);
+			Node<?> deleted = parentEntity.remove(name, index);
+			NodeProxy proxy;
 			if(nodeToDel instanceof Entity) {
-				EntityDefinition entityDef = ((Entity) nodeToDel).getDefinition();
-				String name = entityDef.getName();
-				List<Node<? extends NodeDefinition>> children = parentEntity.getAll(name);
-				int index = children.indexOf(nodeToDel);
-				Node<? extends NodeDefinition> deleted = parentEntity.remove(name, index);
-				EntityProxy proxy = new EntityProxy((Entity) deleted);
-				proxy.setDeleted(true);
-				result.add(proxy);
+				proxy = new EntityProxy((Entity) deleted);
 			} else {
-				//TODO delete attribute
+				proxy = new AttributeProxy((Attribute<?, ?>) deleted);
 			}
+			proxy.setDeleted(true);
+			result.add(proxy);
 			break;
 		}
 		return result;

@@ -3,18 +3,32 @@ package org.openforis.collect.presenter
 	import flash.external.ExternalInterface;
 	import flash.geom.Point;
 	
+	import mx.collections.IList;
 	import mx.controls.Menu;
 	import mx.core.FlexGlobals;
 	import mx.events.MenuEvent;
+	import mx.events.Request;
 	import mx.resources.ResourceManager;
+	import mx.rpc.AsyncResponder;
+	import mx.rpc.events.FaultEvent;
+	import mx.rpc.events.ResultEvent;
 	
+	import org.openforis.collect.Application;
+	import org.openforis.collect.client.ClientFactory;
+	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.event.InputFieldEvent;
+	import org.openforis.collect.event.UIEvent;
 	import org.openforis.collect.i18n.Message;
+	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 	import org.openforis.collect.model.Phase;
 	import org.openforis.collect.model.proxy.AttributeSymbol;
+	import org.openforis.collect.remoting.service.UpdateRequest;
+	import org.openforis.collect.remoting.service.UpdateRequest$Method;
 	import org.openforis.collect.ui.component.datagroup.DataGroupItemRenderer;
 	import org.openforis.collect.ui.component.detail.EntityDataGroupItemRenderer;
+	import org.openforis.collect.ui.component.detail.MultipleAttributeFormItem;
 	import org.openforis.collect.ui.component.input.InputField;
+	import org.openforis.collect.util.AlertUtil;
 	import org.openforis.collect.util.ArrayUtil;
 	import org.openforis.collect.util.PopUpUtil;
 
@@ -35,7 +49,9 @@ package org.openforis.collect.presenter
 		
 		private static const REPLACE_BLANKS_WITH_STAR_MENU_ITEM:Object = {label: Message.get("edit.contextMenu.replaceBlanksWithStar"), action: "replaceBlanksWithStar"};
 		
-		private static const DELETE_ROW_MENU_ITEM:Object = {label: Message.get("edit.contextMenu.deleteRow"), action: "deleteRow"};
+		private static const DELETE_ATTRIBUTE_MENU_ITEM:Object = {label: Message.get("edit.contextMenu.deleteAttribute"), action: "deleteAttribute"};
+		
+		private static const DELETE_ENTITY_MENU_ITEM:Object = {label: Message.get("edit.contextMenu.deleteEntity"), action: "deleteEntity"};
 		
 		private static const APPROVE_ERROR_MENU_ITEM:Object = {label: Message.get("edit.contextMenu.approveError"), action: "approveError"};
 		
@@ -75,6 +91,10 @@ package org.openforis.collect.presenter
 			
 			eventDispatcher.addEventListener(InputFieldEvent.INPUT_FIELD_MOUSE_OVER, inputFieldMouseOverHandler);
 			eventDispatcher.addEventListener(InputFieldEvent.INPUT_FIELD_MOUSE_OUT, inputFieldMouseOutHandler);
+			
+			eventDispatcher.addEventListener(UIEvent.ENTITY_MOUSE_OVER, entityMouseOverHandler);
+			eventDispatcher.addEventListener(UIEvent.ENTITY_MOUSE_OUT, entityMouseOutHandler);
+			
 		}
 		
 		private function initExternalInterface():void {
@@ -99,6 +119,12 @@ package org.openforis.collect.presenter
 					menuDataProvider.push(ILLEGIBLE_MENU_ITEM);
 				}
 				menuDataProvider.push(EDIT_REMARKS_MENU_ITEM);
+				
+				if(lastMouseOverInputField.attributeDefinition != null && lastMouseOverInputField.attributeDefinition.multiple) {
+					menuDataProvider.push({type: "separator"});
+					menuDataProvider.push(DELETE_ATTRIBUTE_MENU_ITEM);
+				}
+				
 				//save a link to the last mouse over item before variable is updated on mouse out
 				contextInputField = lastMouseOverInputField;
 				
@@ -139,14 +165,9 @@ package org.openforis.collect.presenter
 					menuDataProvider.push(REPLACE_BLANKS_WITH_STAR_MENU_ITEM);
 				}
 				
-				//add delete row menu item only if can delete row and dataGroup contains more than 1 row
-				var dataGroup:Object = lastMouseOverDataGroupRow.parent as Object;
-				if(lastMouseOverDataGroupRow["canDelete"] 
-					//&& dataGroup != null && dataGroup.dataProvider != null && dataGroup.dataProvider.length > 1
-				) {
-					menuDataProvider.push({type: "separator"});
-					menuDataProvider.push(DELETE_ROW_MENU_ITEM);
-				}
+				menuDataProvider.push({type: "separator"});
+				menuDataProvider.push(DELETE_ENTITY_MENU_ITEM);
+
 				//save a link to the last mouse over item before variable is updated on mouse out
 				contextDataGroupRow = lastMouseOverDataGroupRow;
 			}
@@ -179,6 +200,14 @@ package org.openforis.collect.presenter
 			lastMouseOverInputField = null;
 		}
 		
+		protected function entityMouseOverHandler(event:InputFieldEvent):void {
+			lastMouseOverDataGroupRow = event.obj as EntityDataGroupItemRenderer;
+		}
+		
+		protected function entityMouseOutHandler(event:InputFieldEvent):void {
+			lastMouseOverDataGroupRow = null;
+		}
+		
 		private function contextMenuItemClickHandler(event:MenuEvent):void {
 			switch(event.item) {
 				case BLANK_ON_FORM_MENU_ITEM:
@@ -193,6 +222,9 @@ package org.openforis.collect.presenter
 				case EDIT_REMARKS_MENU_ITEM:
 					_remarksPopUpPresenter.openPopUp(contextInputField, false, contextMouseClickGlobalPoint);
 					break;
+				case DELETE_ATTRIBUTE_MENU_ITEM:
+					AlertUtil.showConfirm("edit.confirmDeleteAttribute", null, null, performDeleteAttribute);
+					break;
 				/*
 				case APPROVE_ERROR_MENU_ITEM:
 					contextInputField.approveError();
@@ -202,11 +234,6 @@ package org.openforis.collect.presenter
 					break;
 				case APPROVE_MISSING_VALUES_IN_ROW_MENU_ITEM:
 					contextInputField.approveMissingValue();
-					break;
-				case DELETE_ROW_MENU_ITEM:
-					//var message:String = isLastRemainingRowSelected() ? "Delete the last row?": "Delete this row?";
-					var message:String = "Delete this row?";
-					ConfirmUtil.showConfirm(message, "Confirm", doDeleteRow);
 					break;
 				case REPLACE_BLANKS_WITH_STAR_MENU_ITEM:
 					if(contextDataGroupRow) {
@@ -220,15 +247,29 @@ package org.openforis.collect.presenter
 					break;
 				*/
 			}
-			/*
-			function doDeleteRow():void {
-				if(contextDataGroupRow) {
-					(contextDataGroupRow.parent as OpenForisDataGroup).deleteItemAt(contextDataGroupRow.itemIndex);
-				}
-			}
-			*/
+			
 		}
 		
+		protected function performDeleteAttribute():void {
+			if(contextInputField) {
+				var name:String = contextInputField.attributeDefinition.name;
+				var req:UpdateRequest = new UpdateRequest();
+				var def:AttributeDefinitionProxy = contextInputField.attributeDefinition;
+				req.parentEntityId = contextInputField.parentEntity.id;
+				req.nodeName = def.name;
+				req.nodeId = contextInputField.attribute.id;
+				req.method = UpdateRequest$Method.DELETE;
+				
+				var responder:AsyncResponder = new AsyncResponder(deleteAttributeResultHandler, faultHandler);
+				ClientFactory.dataClient.updateActiveRecord(responder, req);
+			}
+		}
+		
+		protected function deleteAttributeResultHandler(event:ResultEvent, token:Object = null):void {
+			var result:IList = event.result as IList;
+			Application.activeRecord.update(result);
+			eventDispatcher.dispatchEvent(new ApplicationEvent(ApplicationEvent.MODEL_CHANGED));
+		}
 		
 	}
 }

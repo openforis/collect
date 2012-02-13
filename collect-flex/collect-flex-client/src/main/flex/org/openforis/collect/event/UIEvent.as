@@ -25,6 +25,9 @@ package org.openforis.collect.event {
 		public static const ACTIVE_RECORD_CHANGED:String = "activeRecordChanged";
 		public static const BUILD_FORM:String = "buildForm";
 		
+		public static const ENTITY_MOUSE_OVER:String = "entityMouseOver";
+		public static const ENTITY_MOUSE_OUT:String = "entityMouseOut";
+		
 		private var _obj:Object;
 		
 		public function UIEvent(type:String, bubbles:Boolean=false, cancelable:Boolean=false) {

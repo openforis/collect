@@ -3,13 +3,16 @@
 				xmlns:s="library://ns.adobe.com/flex/spark" 
 				xmlns:mx="library://ns.adobe.com/flex/mx"
 				autoDrawBackground="false" xmlns:detail="org.openforis.collect.ui.component.detail.*"
+				creationComplete="creationCompleteHandler(event)"
 				>
 	<fx:Script>
 		<![CDATA[
 			import mx.collections.ArrayCollection;
 			import mx.collections.IList;
 			import mx.collections.ListCollectionView;
+			import mx.events.FlexEvent;
 			
+			import org.openforis.collect.event.UIEvent;
 			import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 			import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 			import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
@@ -21,6 +24,22 @@
 			private var _nodeDefinitions:IList;
 			private var _modelVersion:ModelVersionProxy;
 			private var _entity:EntityProxy;
+			
+			protected function creationCompleteHandler(event:FlexEvent):void {
+				addEventListener(MouseEvent.MOUSE_OVER, mouseOverHandler);
+				addEventListener(MouseEvent.MOUSE_OUT, mouseOutHandler);
+			}
+
+			protected function mouseOverHandler(event:MouseEvent):void {
+				var evt:UIEvent = new UIEvent(UIEvent.ENTITY_MOUSE_OVER);
+				evt.obj = this;
+				dispatchEvent(evt);
+			}
+			
+			protected function mouseOutHandler(event:MouseEvent):void {
+				var evt:UIEvent = new UIEvent(UIEvent.ENTITY_MOUSE_OUT);
+				dispatchEvent(evt);
+			}
 			
 			[Bindable]
 			public function get entityDefinition():EntityDefinitionProxy {
