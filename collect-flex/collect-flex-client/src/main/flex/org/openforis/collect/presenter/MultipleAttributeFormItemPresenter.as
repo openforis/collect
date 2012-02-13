@@ -18,6 +18,7 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.remoting.service.UpdateRequest;
 	import org.openforis.collect.remoting.service.UpdateRequest$Method;
 	import org.openforis.collect.ui.component.detail.MultipleAttributeFormItem;
+	import org.openforis.collect.util.AlertUtil;
 	import org.openforis.collect.util.CollectionUtil;
 	import org.openforis.collect.util.UIUtil;
 
@@ -51,22 +52,34 @@ package org.openforis.collect.presenter
 		
 		override protected function updateView():void {
 			if(view.dataGroup != null && view.parentEntity != null) {
-				var name:String = view.attributeDefinition.name;
-				var attributes:IList = view.parentEntity.getChildren(name);
+				var attributes:IList = getAttributes();
 				view.dataGroup.dataProvider = attributes;
 			}
 		}
 
+		protected function getAttributes():IList {
+			var name:String = view.attributeDefinition.name;
+			var attributes:IList = view.parentEntity.getChildren(name);
+			return attributes;
+		}
+		
 		protected function addButtonFocusInHandler(event:FocusEvent):void {
 			UIUtil.ensureElementIsVisible(event.target);
 		}
 		
 		protected function addButtonClickHandler(event:MouseEvent):void {
-			var req:UpdateRequest = new UpdateRequest();
-			req.method = UpdateRequest$Method.ADD;
-			req.parentNodeId = view.parentEntity.id;
-			req.nodeName = view.attributeDefinition.name;
-			ClientFactory.dataClient.updateActiveRecord(new AsyncResponder(addResultHandler, faultHandler, null), req);
+			var attributes:IList = getAttributes();
+			var maxCount:Number = view.attributeDefinition.maxCount
+			if(isNaN(maxCount) || CollectionUtil.isEmpty(attributes) || attributes.length < maxCount) {
+				var req:UpdateRequest = new UpdateRequest();
+				req.method = UpdateRequest$Method.ADD;
+				req.parentEntityId = view.parentEntity.id;
+				req.nodeName = view.attributeDefinition.name;
+				ClientFactory.dataClient.updateActiveRecord(new AsyncResponder(addResultHandler, faultHandler, null), req);
+			} else {
+				var labelText:String = view.attributeDefinition.getLabelText();
+				AlertUtil.showError("edit.maxCountExceed", [maxCount, labelText]);
+			}	
 		}
 		
 		protected function addResultHandler(event:ResultEvent, token:Object = null):void {
@@ -77,7 +90,6 @@ package org.openforis.collect.presenter
 			view.callLater(function():void {
 				UIUtil.ensureElementIsVisible(view.addButton);
 			});
-
 		}
 		
 	}

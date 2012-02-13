@@ -17,6 +17,7 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.remoting.service.UpdateRequest;
 	import org.openforis.collect.remoting.service.UpdateRequest$Method;
 	import org.openforis.collect.ui.component.detail.MultipleEntityFormItem;
+	import org.openforis.collect.util.AlertUtil;
 	import org.openforis.collect.util.CollectionUtil;
 	import org.openforis.collect.util.UIUtil;
 
@@ -50,10 +51,15 @@ package org.openforis.collect.presenter
 		
 		override protected function updateView():void {
 			if(view.dataGroup != null && view.parentEntity != null) {
-				var name:String = view.entityDefinition.name;
-				var entities:IList = view.parentEntity.getChildren(name);
+				var entities:IList = getEntities();
 				view.dataGroup.dataProvider = entities;
 			}
+		}
+		
+		protected function getEntities():IList {
+			var name:String = view.entityDefinition.name;
+			var entities:IList = view.parentEntity.getChildren(name);
+			return entities;
 		}
 
 		protected function addButtonFocusInHandler(event:FocusEvent):void {
@@ -61,11 +67,18 @@ package org.openforis.collect.presenter
 		}
 		
 		protected function addButtonClickHandler(event:MouseEvent):void {
-			var req:UpdateRequest = new UpdateRequest();
-			req.method = UpdateRequest$Method.ADD;
-			req.parentNodeId = view.parentEntity.id;
-			req.nodeName = view.entityDefinition.name;
-			ClientFactory.dataClient.updateActiveRecord(new AsyncResponder(addResultHandler, faultHandler, null), req);
+			var entities:IList = getEntities();
+			var maxCount:Number = view.entityDefinition.maxCount
+			if(isNaN(maxCount) || CollectionUtil.isEmpty(entities) || entities.length < maxCount) {
+				var req:UpdateRequest = new UpdateRequest();
+				req.method = UpdateRequest$Method.ADD;
+				req.parentEntityId = view.parentEntity.id;
+				req.nodeName = view.entityDefinition.name;
+				ClientFactory.dataClient.updateActiveRecord(new AsyncResponder(addResultHandler, faultHandler, null), req);
+			} else {
+				var labelText:String = view.entityDefinition.getLabelText();
+				AlertUtil.showError("edit.maxCountExceed", [maxCount, labelText]);
+			}
 		}
 		
 		protected function addResultHandler(event:ResultEvent, token:Object = null):void {
