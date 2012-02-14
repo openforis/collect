@@ -6,9 +6,16 @@
  */
 
 package org.openforis.collect.model.proxy {
+	import org.openforis.collect.util.StringUtil;
 
     [Bindable]
     [RemoteClass(alias="org.openforis.collect.model.proxy.AttributeProxy")]
     public class AttributeProxy extends AttributeProxyBase {
+		
+		public function get empty():Boolean {
+			var result:Boolean = (value == null || StringUtil.isBlank(value.toString())) && symbol == null;
+			return result;
+		}
+		
     }
 }

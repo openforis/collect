@@ -6,9 +6,16 @@
  */
 
 package org.openforis.collect.model.proxy {
+	import org.openforis.collect.util.StringUtil;
 
     [Bindable]
     [RemoteClass(alias="org.openforis.collect.model.proxy.DateProxy")]
     public class DateProxy extends DateProxyBase {
-    }
+		
+		public function toString():String {
+			var result:String = StringUtil.concat("/", day, month, year);
+			return result;
+		}
+		
+	}
 }

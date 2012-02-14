@@ -18,7 +18,6 @@ package org.openforis.collect.model.proxy {
     [Bindable]
     [RemoteClass(alias="org.openforis.collect.model.proxy.EntityProxy")]
     public class EntityProxy extends EntityProxyBase {
-    	public var children:Object;
 		
 		public function getSingleAttribute(attributeName:String):AttributeProxy {
 			var attributes:IList = childrenByName.get(attributeName);
@@ -35,8 +34,8 @@ package org.openforis.collect.model.proxy {
 		
 		public function getChildren(nodeName:String = null):IList {
 			var children:IList; 
-			if(name == null) {
-				children = new ArrayList();
+			if(nodeName == null) {
+				children = new ArrayCollection();
 				var values:ArrayCollection = childrenByName.values;
 				for each (var childList:IList in values) {
 					CollectionUtil.addAll(children, childList);
