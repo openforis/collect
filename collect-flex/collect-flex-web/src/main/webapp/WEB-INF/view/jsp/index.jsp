@@ -33,7 +33,7 @@
             	lang: 'en_US'
             };
             var params = {};
-            params.wmode = "opaque";
+           // params.wmode = "opaque";
             params.quality = "high";
             params.bgcolor = "#ffffff";
             params.allowscriptaccess = "sameDomain";

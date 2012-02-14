@@ -14,12 +14,14 @@ var OPENFORIS = {
 		window.onunload = OPENFORIS.onUnloadFun;
 
 		//init mouse down handler
+		/*
 		if(navigator.appName == "Netscape") {
 			document.captureEvents(Event.MOUSEDOWN);
 			document.addEventListener("mousedown", OPENFORIS.onNsRightClick, true);
 		} else {
 			document.onmousedown = OPENFORIS.onIeRightClick;
 		}
+		*/
 	},
 
 	getFlexApp: function() {
