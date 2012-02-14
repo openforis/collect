@@ -8,17 +8,14 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.StringTokenizer;
 
-import org.apache.commons.lang3.StringUtils;
+import org.openforis.collect.manager.CodeListManager;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.metamodel.proxy.CodeListItemProxy;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.User;
-import org.openforis.collect.model.proxy.AttributeProxy;
 import org.openforis.collect.model.proxy.AttributeSymbol;
-import org.openforis.collect.model.proxy.EntityProxy;
 import org.openforis.collect.model.proxy.NodeProxy;
 import org.openforis.collect.model.proxy.RecordProxy;
 import org.openforis.collect.persistence.AccessDeniedException;
@@ -33,12 +30,10 @@ import org.openforis.collect.session.SessionState.RecordState;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.BooleanAttributeDefinition;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
-import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
 import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
 import org.openforis.idm.metamodel.DateAttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
-import org.openforis.idm.metamodel.IdmInterpretationError;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NumberAttributeDefinition;
@@ -50,21 +45,18 @@ import org.openforis.idm.metamodel.TextAttributeDefinition;
 import org.openforis.idm.metamodel.TimeAttributeDefinition;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Code;
-import org.openforis.idm.model.CodeAttribute;
-import org.openforis.idm.model.Coordinate;
 import org.openforis.idm.model.Date;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.Record;
 import org.openforis.idm.model.Time;
-import org.openforis.idm.model.expression.ExpressionFactory;
-import org.openforis.idm.model.expression.InvalidPathException;
-import org.openforis.idm.model.expression.ModelPathExpression;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author M. Togna
+ * @author S. Ricci
+ * 
  */
 public class DataService {
 	
@@ -75,7 +67,8 @@ public class DataService {
 	private RecordManager recordManager;
 
 	@Autowired
-	private ExpressionFactory expressionFactory;
+	private CodeListManager codeListManager;
+
 
 	@Transactional
 	public RecordProxy loadRecord(int id) throws RecordLockedException, MultipleEditException, NonexistentIdException, AccessDeniedException {
@@ -127,7 +120,7 @@ public class DataService {
 		EntityDefinition rootEntityDefinition = schema.getRootEntityDefinition(rootEntityName);
 		CollectRecord record = recordManager.create(activeSurvey, rootEntityDefinition, user, version.getName());
 		Entity rootEntity = record.getRootEntity();
-		addEmptyAttributes(rootEntity, version);
+		recordManager.addEmptyAttributes(rootEntity, version);
 		sessionState.setActiveRecord((CollectRecord) record);
 		sessionState.setActiveRecordState(RecordState.NEW);
 		RecordProxy recordProxy = new RecordProxy(record);
@@ -162,185 +155,97 @@ public class DataService {
 	public void updateRootEntityKey(String recordId, String newRootEntityKey) throws DuplicateIdException, InvalidIdException, NonexistentIdException, AccessDeniedException, RecordLockedException {
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<NodeProxy> updateActiveRecord(UpdateRequest request) {
-		List<NodeProxy> result = new ArrayList<NodeProxy>();
+		List<Node<?>> updatedNodes = new ArrayList<Node<?>>();
 		SessionState sessionState = sessionManager.getSessionState();
 		CollectRecord record = sessionState.getActiveRecord();
-		Integer parentNodeId = request.getParentEntityId();
-		Integer nodeId = request.getNodeId();
-		Entity parentEntity = (Entity) record.getNodeById(parentNodeId);
+		ModelVersion version = record.getVersion();
+		Integer parentEntityId = request.getParentEntityId();
+		Entity parentEntity = (Entity) record.getNodeById(parentEntityId);
 		EntityDefinition parentDef = parentEntity.getDefinition();
+		Integer nodeId = request.getNodeId();
 		String nodeName = request.getNodeName();
-		String value = request.getValue();
-		String remarks = request.getRemarks();
-		AttributeSymbol symbol = request.getSymbol();
+		Node<?> node = null;
+		if(nodeId != null) {
+			node = record.getNodeById(nodeId);
+		}
 		NodeDefinition nodeDef = ((EntityDefinition) parentDef).getChildDefinition(nodeName);
+		String requestValue = request.getValue();
+		String remarks = request.getRemarks();
+		//parse request value into a model value (for example Code, Date, Time...)
+		Object value = null;
+		if(nodeDef instanceof AttributeDefinition) {
+			value = parseValue(parentEntity, (AttributeDefinition) nodeDef, requestValue);
+		}
+		AttributeSymbol symbol = request.getSymbol();
+		if(symbol == null && AttributeSymbol.isShortKeyForBlank(requestValue)) {
+			 symbol = AttributeSymbol.fromShortKey(requestValue);
+		}
+		Character symbolChar = symbol != null ? symbol.getCode(): null;
 		
 		Method method = request.getMethod();
 		switch (method) {
-		case ADD:
-			if(nodeDef instanceof AttributeDefinition) {
-				AttributeDefinition def = (AttributeDefinition) nodeDef;
-				List<Attribute<?, ?>> attributes = addAttributes(parentEntity, (AttributeDefinition) def, value, symbol, remarks);
-				for (Attribute<?, ?> attribute : attributes) {
-					NodeProxy proxy = new AttributeProxy(attribute);
-					result.add(proxy);
-				}
-			} else {
-				Entity node = addEntity(parentEntity, nodeName, record.getVersion());
-				EntityProxy proxy = new EntityProxy(node);
-				result.add(proxy);
-			}
-			break;
-		case UPDATE:
-			Node<? extends NodeDefinition> node = record.getNodeById(nodeId);
-			//update attribute value
-			if(node instanceof Attribute) {
-				Attribute<?, ?> attribute = (Attribute<?, ?>) node;
-				if(node instanceof CodeAttribute && node.getDefinition().isMultiple()) {
-					AttributeDefinition def = attribute.getDefinition();
-					String name = def.getName();
-					//remove old attributes
-					int count = parentEntity.getCount(def.getName());
-					for (int i = count - 1; i >= 0; i--) {
-						parentEntity.remove(name, i);
-					}
-					//add new attributes
-					List<Attribute<?, ?>> attributes = addAttributes(parentEntity, def, value, symbol, remarks);
-					for (Attribute<?, ?> a : attributes) {
-						NodeProxy proxy = new AttributeProxy(a);
-						result.add(proxy);
-					}
+			case ADD: 
+			{
+				if(nodeDef instanceof AttributeDefinition) {
+					AttributeDefinition def = (AttributeDefinition) nodeDef;
+					List<Attribute<?, ?>> attributes = recordManager.addAttributes(parentEntity, def, value, symbolChar, remarks);
+					updatedNodes.addAll(attributes);
 				} else {
-					update(parentEntity, (Attribute<?, Object>) attribute, value, symbol, remarks);
-					NodeProxy proxy = new AttributeProxy(attribute);
-					result.add(proxy);
+					Entity e = recordManager.addEntity(parentEntity, nodeName, version);
+					updatedNodes.add(e);
 				}
+				break;
 			}
-			break;
-		case DELETE:
-			Node<? extends NodeDefinition> nodeToDel = record.getNodeById(nodeId);
-			NodeDefinition def = nodeToDel.getDefinition();
-			String name = def.getName();
-			List<Node<?>> children = parentEntity.getAll(name);
-			int index = children.indexOf(nodeToDel);
-			Node<?> deleted = parentEntity.remove(name, index);
-			NodeProxy proxy;
-			if(nodeToDel instanceof Entity) {
-				proxy = new EntityProxy((Entity) deleted);
-			} else {
-				proxy = new AttributeProxy((Attribute<?, ?>) deleted);
+			case UPDATE:
+			{
+				//update attribute value
+				if(node instanceof Attribute) {
+					List<Attribute<?, ?>> attributes = recordManager.updateAttributes(parentEntity, (Attribute<?, ?>) node, value, symbolChar, remarks);
+					updatedNodes.addAll(attributes);
+				} else if(node instanceof Entity) {
+					//update symbol in entity's attributes
+					Entity entity = (Entity) node;
+					recordManager.addEmptyAttributes(entity, version);
+					EntityDefinition entityDef = (EntityDefinition) nodeDef;
+					List<NodeDefinition> childDefinitions = entityDef.getChildDefinitions();
+					for (NodeDefinition def : childDefinitions) {
+						if(def instanceof AttributeDefinition) {
+							String name = def.getName();
+							Attribute<?, ?> attribute = (Attribute<?, ?>) entity.get(name, 0);
+							List<Attribute<?,?>> attributes = recordManager.updateAttributes(parentEntity, attribute, value, symbolChar, remarks);
+							updatedNodes.addAll(attributes);
+						}
+					}
+				}
+				break;
 			}
-			proxy.setDeleted(true);
-			result.add(proxy);
-			break;
+			case DELETE: 
+			{
+				Node<?> deleted = recordManager.deleteNode(parentEntity, node);
+				updatedNodes.add(deleted);
+				break;
+			}
+		}
+		//convert nodes to proxies
+		List<NodeProxy> result = NodeProxy.fromList((List<Node<?>>) updatedNodes);
+		if(method == Method.DELETE) {
+			for (NodeProxy nodeProxy : result) {
+				nodeProxy.setDeleted(true);
+			}
 		}
 		return result;
-	}
-	
-	private Entity addEntity(Entity parentEntity, String nodeName, ModelVersion version) {
-		Entity node = parentEntity.addEntity(nodeName);
-		addEmptyAttributes(node, version);
-		return node;
-	}
-	
-	private List<Attribute<?, ?>> addAttributes(Entity parentEntity, AttributeDefinition def, String value, AttributeSymbol symbol, String remarks) {
-		List<Attribute<?, ?>> result = new ArrayList<Attribute<?, ?>>();
-		if(symbol == null && AttributeSymbol.isShortKeyForBlank(value)) {
-			 symbol = AttributeSymbol.fromShortKey(value);
-		}
-		Object val = null;
-		if(symbol == null || !symbol.isReasonBlank()) {
-			val = parseValue(parentEntity, (AttributeDefinition) def, value);
-		}
-		if(val instanceof List) {
-			List<?> values = (List<?>) val;
-			for (Object v : values) {
-				Attribute<?, ?> attribute = addAttribute(parentEntity, def, v, symbol, remarks);
-				result.add(attribute);
-			}
-		} else {
-			Attribute<?, ?> attribute = addAttribute(parentEntity,  def, val, symbol, remarks);
-			result.add(attribute);
-		}
-		return result;
-	}
-	
-	private Attribute<?, ?> addAttribute(Entity parentEntity, AttributeDefinition def, Object value, AttributeSymbol symbol, String remarks) {
-		String name = def.getName();
-		Attribute<?, ?> result = null;
-		if(def instanceof BooleanAttributeDefinition) {
-			result = parentEntity.addValue(name, (Boolean) value);
-		} else if(def instanceof CodeAttributeDefinition) {
-			result = parentEntity.addValue(name, (Code) value);
-		} else if(def instanceof CoordinateAttributeDefinition) {
-			result = parentEntity.addValue(name, (Coordinate) value);
-		} else if(def instanceof DateAttributeDefinition) {
-			result = parentEntity.addValue(name, (Date) value);
-		} else if(def instanceof NumericAttributeDefinition) {
-			Type type = ((NumericAttributeDefinition) def).getType();
-			switch(type) {
-				case INTEGER:
-					result = parentEntity.addValue(name, (Integer) value);
-					break;
-				case REAL:
-					result = parentEntity.addValue(name, (Double) value);
-					break;
-			}
-		} else if(def instanceof TextAttributeDefinition) {
-			result = parentEntity.addValue(name, (String) value);
-		} else if(def instanceof TimeAttributeDefinition) {
-			result = parentEntity.addValue(name, (Time) value);
-		}
-		if(symbol != null) {
-			result.setSymbol(symbol.getCode());
-		} else {
-			result.setSymbol(null);
-		}
-		result.setRemarks(remarks);
-		return result;
-	}
-	
-	private Attribute<?, ?> update(Entity parentEntity, Attribute<?, Object> attribute, String value, AttributeSymbol symbol, String remarks) {
-		if(value != null && AttributeSymbol.isShortKeyForBlank(value)) {
-			symbol = AttributeSymbol.fromShortKey(value);
-		}
-		Object val = null;
-		if(symbol != null) {
-			attribute.setSymbol(symbol.getCode());
-		} else {
-			attribute.setSymbol(null);
-		}
-		if(symbol == null || ! symbol.isReasonBlank()) {
-			AttributeDefinition def = (AttributeDefinition) attribute.getDefinition();
-			val = parseValue(parentEntity, def, value);
-		}
-		attribute.setRemarks(remarks);
-		attribute.setValue(val);
-		return attribute;
 	}
 
 	private Object parseValue(Entity parentEntity, AttributeDefinition def, String value) {
+		CollectRecord activeRecord = getActiveRecord();
+		ModelVersion version = activeRecord.getVersion();
+		
 		Object result = null;
 		if(def instanceof BooleanAttributeDefinition) {
 			result = Boolean.parseBoolean(value);
 		} else if(def instanceof CodeAttributeDefinition) {
-			StringTokenizer st = new StringTokenizer(value, ",");
-			List<Code> codes = new ArrayList<Code>();
-			while (st.hasMoreTokens()) {
-				String token = st.nextToken();
-				List<CodeListItem> codeList = null;
-				if(((CodeAttributeDefinition) def).getList() != null) {
-					codeList = findCodeList(parentEntity, (CodeAttributeDefinition) def);
-				}
-				Code code = parseCode(token, codeList);
-				if(code != null) {
-					codes.add(code);
-				} else {
-					//TODO throw exception
-				}
-			}
+			List<Code> codes = codeListManager.parseCodes(parentEntity, (CodeAttributeDefinition) def, value, version);
 			if(codes.size() > 1) {
 				result = codes;
 			} else if(codes.size() == 1) {
@@ -391,41 +296,6 @@ public class DataService {
 		return result;
 	}
 	
-	private Code parseCode(String value, List<CodeListItem> codeList) {
-		Code code = null;
-		String[] strings = value.split(":");
-		String codeStr = strings[0].trim();
-		String qualifier = null;
-		if(strings.length == 2) {
-			qualifier = strings[1].trim();
-		}
-		if(codeList != null) {
-			CodeListItem codeListItem = getCodeListItem(codeList, codeStr);
-			if(codeListItem != null) {
-				code = new Code(codeListItem.getCode(), qualifier);
-				return code;
-			}
-		}
-		if (code == null) {
-			code = new Code(codeStr, qualifier);
-		}
-		return code;
-	}
-	
-	private void addEmptyAttributes(Entity entity, ModelVersion version) {
-		EntityDefinition entityDef = entity.getDefinition();
-		List<NodeDefinition> childDefinitions = entityDef.getChildDefinitions();
-		for (NodeDefinition nodeDef : childDefinitions) {
-			if(ModelVersionUtil.isInVersion(nodeDef, version)) {
-				if(nodeDef instanceof AttributeDefinition) {
-					addAttribute(entity, (AttributeDefinition) nodeDef, null, null, null);
-				} else if(nodeDef instanceof EntityDefinition && ! nodeDef.isMultiple()) {
-					addEntity(entity, nodeDef.getName(), version);
-				}
-			}
-		}
-	}
-
 	@Transactional
 	public void promote(String recordId) throws InvalidIdException, MultipleEditException, NonexistentIdException, AccessDeniedException, RecordLockedException {
 		this.recordManager.promote(recordId);
@@ -488,13 +358,14 @@ public class DataService {
 	 * @return
 	 */
 	public List<CodeListItemProxy> findCodeList(int parentEntityId, String attributeName) {
-		CollectRecord activeRecord = this.getActiveRecord();
+		CollectRecord activeRecord = getActiveRecord();
+		ModelVersion version = activeRecord.getVersion();
 		Entity parentEntity = (Entity) activeRecord.getNodeById(parentEntityId);
 		EntityDefinition parentEntityDef = parentEntity.getDefinition();
 		NodeDefinition childDefinition = parentEntityDef.getChildDefinition(attributeName);
 		if(childDefinition instanceof CodeAttributeDefinition) {
 			CodeAttributeDefinition codeDef = (CodeAttributeDefinition) childDefinition;
-			List<CodeListItem> items = findCodeList(parentEntity, codeDef );
+			List<CodeListItem> items = codeListManager.findCodeList(parentEntity, codeDef, version);
 			List<CodeListItemProxy> proxies = CodeListItemProxy.fromList(items);
 			List<Node<?>> codes = parentEntity.getAll(attributeName);
 			if(codes != null) {
@@ -506,78 +377,7 @@ public class DataService {
 		}
 	}
 	
-	private List<CodeListItem> findCodeList(Entity parentEntity, CodeAttributeDefinition def) {
-		CodeAttribute parent = findParent(parentEntity, def);
-		List<CodeListItem> items;
-		if(parent == null) {
-			//node is root
-			CodeList list = def.getList();
-			items = list.getItems();
-		} else {
-			Entity ancestorEntity = parent.getParent();
-			CodeAttributeDefinition parentDefinition = parent.getDefinition();
-			List<CodeListItem> codeList = findCodeList(ancestorEntity, parentDefinition);
-			Code parentCode = parent.getValue();
-			String parentCodeValue = parentCode.getCode();
-			CodeListItem parentItem = getCodeListItem(codeList, parentCodeValue);
-			items = parentItem.getChildItems();
-		}
-		List<CodeListItem> itemsInVersion = new ArrayList<CodeListItem>();
-		CollectRecord activeRecord = this.getActiveRecord();
-		ModelVersion version = activeRecord.getVersion();
-		for (CodeListItem codeListItem : items) {
-			if (ModelVersionUtil.isInVersion(codeListItem, version)) {
-				itemsInVersion.add(codeListItem);
-			}
-		}
-		return itemsInVersion;
-	}
 	
-	
-	/**
-	 * Apply the parentExpression in the attribute definition to the parentEntity specified
-	 * 
-	 * @param parentEntity
-	 * @param def
-	 * @return
-	 */
-	private CodeAttribute findParent(Entity parentEntity, CodeAttributeDefinition def) {
-		String parentExpression = def.getParentExpression();
-		if(StringUtils.isNotBlank(parentExpression)) {
-			ModelPathExpression expression = expressionFactory.createModelPathExpression(parentExpression);
-			Object result;
-			try {
-				result = expression.evaluate(parentEntity);
-				if(result instanceof CodeAttribute) {
-					return (CodeAttribute) result;
-				} else {
-					throw new IdmInterpretationError("CodeAttribute exptected");
-				}
-			} catch (InvalidPathException e) {
-				throw new IdmInterpretationError("Error retrieving parent code", e);
-			}
-		} else {
-			return null;
-		}
-	}
-	
-	private CodeListItem getCodeListItem(List<CodeListItem> siblings, String code) {
-		for (CodeListItem item : siblings) {
-			String itemCode = item.getCode();
-			String paddedCode;
-			if (itemCode.length() > code.length()) {
-				//try to left pad the code with '0'
-				paddedCode = StringUtils.leftPad(code, itemCode.length(), '0');
-			} else {
-				paddedCode = code;
-			}
-			if (itemCode.equalsIgnoreCase(paddedCode)) {
-				return item;
-			}
-		}
-		return null;
-	}
-
 	private User getUserInSession() {
 		SessionState sessionState = getSessionManager().getSessionState();
 		User user = sessionState.getUser();
