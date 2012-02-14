@@ -14,8 +14,8 @@ public class BooleanAttributeDefinitionProxy extends AttributeDefinitionProxy {
 
 	private transient BooleanAttributeDefinition attributeDefinition;
 	
-	public BooleanAttributeDefinitionProxy(BooleanAttributeDefinition attributeDefinition) {
-		super(attributeDefinition);
+	public BooleanAttributeDefinitionProxy(EntityDefinitionProxy parent, BooleanAttributeDefinition attributeDefinition) {
+		super(parent, attributeDefinition);
 		this.attributeDefinition = attributeDefinition;
 	}
 

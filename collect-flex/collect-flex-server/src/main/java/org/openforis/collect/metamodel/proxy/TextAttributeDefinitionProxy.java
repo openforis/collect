@@ -18,8 +18,8 @@ public class TextAttributeDefinitionProxy extends AttributeDefinitionProxy {
 		SHORT, MEMO
 	}
 
-	public TextAttributeDefinitionProxy(TextAttributeDefinition attributeDefinition) {
-		super(attributeDefinition);
+	public TextAttributeDefinitionProxy(EntityDefinitionProxy parent, TextAttributeDefinition attributeDefinition) {
+		super(parent, attributeDefinition);
 		this.attributeDefinition = attributeDefinition;
 	}
 

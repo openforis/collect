@@ -14,8 +14,8 @@ public class CodeAttributeDefinitionProxy extends AttributeDefinitionProxy {
 
 	private transient CodeAttributeDefinition attributeDefinition;
 
-	public CodeAttributeDefinitionProxy(CodeAttributeDefinition attributeDefinition) {
-		super(attributeDefinition);
+	public CodeAttributeDefinitionProxy(EntityDefinitionProxy parent, CodeAttributeDefinition attributeDefinition) {
+		super(parent, attributeDefinition);
 		this.attributeDefinition = attributeDefinition;
 	}
 

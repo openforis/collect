@@ -18,8 +18,8 @@ public abstract class AttributeDefinitionProxy extends NodeDefinitionProxy imple
 
 	private transient AttributeDefinition attributeDefinition;
 
-	public AttributeDefinitionProxy(AttributeDefinition attributeDefinition) {
-		super(attributeDefinition);
+	public AttributeDefinitionProxy(EntityDefinitionProxy parent, AttributeDefinition attributeDefinition) {
+		super(parent, attributeDefinition);
 		this.attributeDefinition = attributeDefinition;
 	}
 

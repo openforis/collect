@@ -14,8 +14,8 @@ public class FileAttributeDefinitionProxy extends AttributeDefinitionProxy {
 
 	private transient FileAttributeDefinition attributeDefinition;
 
-	public FileAttributeDefinitionProxy(FileAttributeDefinition attributeDefinition) {
-		super(attributeDefinition);
+	public FileAttributeDefinitionProxy(EntityDefinitionProxy parent, FileAttributeDefinition attributeDefinition) {
+		super(parent, attributeDefinition);
 		this.attributeDefinition = attributeDefinition;
 	}
 

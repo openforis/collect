@@ -24,7 +24,7 @@ public class SchemaProxy implements Proxy {
 
 	@ExternalizedProperty
 	public List<EntityDefinitionProxy> getRootEntityDefinitions() {
-		return EntityDefinitionProxy.fromList(schema.getRootEntityDefinitions());
+		return EntityDefinitionProxy.fromList(null, schema.getRootEntityDefinitions());
 	}
 
 }

@@ -13,8 +13,8 @@ public class RangeAttributeDefinitionProxy extends NumericAttributeDefinitionPro
 	
 	private transient RangeAttributeDefinition attributeDefinition;
 
-	public RangeAttributeDefinitionProxy(RangeAttributeDefinition attributeDefinition) {
-		super(attributeDefinition);
+	public RangeAttributeDefinitionProxy(EntityDefinitionProxy parent, RangeAttributeDefinition attributeDefinition) {
+		super(parent, attributeDefinition);
 		this.attributeDefinition = attributeDefinition;
 	}
 	

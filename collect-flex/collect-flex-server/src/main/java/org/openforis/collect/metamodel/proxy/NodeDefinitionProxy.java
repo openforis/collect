@@ -32,43 +32,45 @@ import org.openforis.idm.metamodel.TimeAttributeDefinition;
 public class NodeDefinitionProxy implements Proxy {
 
 	private transient NodeDefinition nodeDefinition;
-
-	public NodeDefinitionProxy(NodeDefinition nodeDefinition) {
+	private EntityDefinitionProxy parent;
+	
+	public NodeDefinitionProxy(EntityDefinitionProxy parent, NodeDefinition nodeDefinition) {
 		super();
+		this.parent = parent;
 		this.nodeDefinition = nodeDefinition;
 	}
 
-	static List<NodeDefinitionProxy> fromList(List<NodeDefinition> list) {
+	static List<NodeDefinitionProxy> fromList(EntityDefinitionProxy parent, List<NodeDefinition> list) {
 		List<NodeDefinitionProxy> proxies = new ArrayList<NodeDefinitionProxy>();
 		if (list != null) {
 			for (NodeDefinition n : list) {
 				NodeDefinitionProxy p = null;
 				if (n instanceof AttributeDefinition) {
 					if (n instanceof BooleanAttributeDefinition) {
-						p = new BooleanAttributeDefinitionProxy((BooleanAttributeDefinition) n);
+						p = new BooleanAttributeDefinitionProxy(parent, (BooleanAttributeDefinition) n);
 					} else if (n instanceof CodeAttributeDefinition) {
-						p = new CodeAttributeDefinitionProxy((CodeAttributeDefinition) n);
+						p = new CodeAttributeDefinitionProxy(parent, (CodeAttributeDefinition) n);
 					} else if (n instanceof CoordinateAttributeDefinition) {
-						p = new CoordinateAttributeDefinitionProxy((CoordinateAttributeDefinition) n);
+						p = new CoordinateAttributeDefinitionProxy(parent, (CoordinateAttributeDefinition) n);
 					} else if (n instanceof DateAttributeDefinition) {
-						p = new DateAttributeDefinitionProxy((DateAttributeDefinition) n);
+						p = new DateAttributeDefinitionProxy(parent, (DateAttributeDefinition) n);
 					} else if (n instanceof FileAttributeDefinition) {
-						p = new FileAttributeDefinitionProxy((FileAttributeDefinition) n);
+						p = new FileAttributeDefinitionProxy(parent, (FileAttributeDefinition) n);
 					} else if (n instanceof NumericAttributeDefinition) {
-						p = new NumericAttributeDefinitionProxy((NumericAttributeDefinition) n);
+						p = new NumericAttributeDefinitionProxy(parent, (NumericAttributeDefinition) n);
 					} else if (n instanceof RangeAttributeDefinition) {
-						p = new RangeAttributeDefinitionProxy((RangeAttributeDefinition) n);
+						p = new RangeAttributeDefinitionProxy(parent, (RangeAttributeDefinition) n);
 					} else if (n instanceof TaxonAttributeDefinition) {
-						p = new TaxonAttributeDefinitionProxy((TaxonAttributeDefinition) n);
+						p = new TaxonAttributeDefinitionProxy(parent, (TaxonAttributeDefinition) n);
 					} else if (n instanceof TextAttributeDefinition) {
-						p = new TextAttributeDefinitionProxy((TextAttributeDefinition) n);
+						p = new TextAttributeDefinitionProxy(parent, (TextAttributeDefinition) n);
 					} else if (n instanceof TimeAttributeDefinition) {
-						p = new TimeAttributeDefinitionProxy((TimeAttributeDefinition) n);
+						p = new TimeAttributeDefinitionProxy(parent, (TimeAttributeDefinition) n);
 					} else {
 						throw new RuntimeException("AttributeDefinition not supported: " + n.getClass().getSimpleName());
 					}
 				} else if (n instanceof EntityDefinition) {
-					p = new EntityDefinitionProxy((EntityDefinition) n);
+					p = new EntityDefinitionProxy(parent, (EntityDefinition) n);
 				}
 				proxies.add(p);
 			}
@@ -155,6 +157,10 @@ public class NodeDefinitionProxy implements Proxy {
 		QName qname = new QName(namespaceURI, "tab");
 		String string = nodeDefinition.getAnnotation(qname);
 		return string;
+	}
+
+	public EntityDefinitionProxy getParent() {
+		return parent;
 	}
 
 	// TODO do we need the parent definition in flex-ui?

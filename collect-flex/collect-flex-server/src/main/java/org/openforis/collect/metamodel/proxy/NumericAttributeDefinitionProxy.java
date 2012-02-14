@@ -20,8 +20,8 @@ public class NumericAttributeDefinitionProxy extends AttributeDefinitionProxy {
 		INTEGER, REAL
 	}
 	
-	public NumericAttributeDefinitionProxy(NumericAttributeDefinition attributeDefinition) {
-		super(attributeDefinition);
+	public NumericAttributeDefinitionProxy(EntityDefinitionProxy parent, NumericAttributeDefinition attributeDefinition) {
+		super(parent, attributeDefinition);
 		this.attributeDefinition = attributeDefinition;
 	}
 	

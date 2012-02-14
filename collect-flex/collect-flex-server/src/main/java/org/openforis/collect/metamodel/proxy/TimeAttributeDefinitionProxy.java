@@ -10,8 +10,8 @@ public class TimeAttributeDefinitionProxy extends AttributeDefinitionProxy {
 	
 	private transient TimeAttributeDefinition attributeDefinition;
 	
-	public TimeAttributeDefinitionProxy(TimeAttributeDefinition attributeDefinition) {
-		super(attributeDefinition);
+	public TimeAttributeDefinitionProxy(EntityDefinitionProxy parent, TimeAttributeDefinition attributeDefinition) {
+		super(parent, attributeDefinition);
 		this.attributeDefinition = attributeDefinition;
 	}
 	

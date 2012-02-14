@@ -19,16 +19,16 @@ public class EntityDefinitionProxy extends NodeDefinitionProxy {
 
 	private transient EntityDefinition entityDefinition;
 
-	public EntityDefinitionProxy(EntityDefinition entityDefinition) {
-		super(entityDefinition);
+	public EntityDefinitionProxy(EntityDefinitionProxy parent, EntityDefinition entityDefinition) {
+		super(parent, entityDefinition);
 		this.entityDefinition = entityDefinition;
 	}
 
-	static List<EntityDefinitionProxy> fromList(List<EntityDefinition> list) {
+	static List<EntityDefinitionProxy> fromList(EntityDefinitionProxy parent, List<EntityDefinition> list) {
 		List<EntityDefinitionProxy> proxies = new ArrayList<EntityDefinitionProxy>();
 		if (list != null) {
 			for (EntityDefinition e : list) {
-				proxies.add(new EntityDefinitionProxy(e));
+				proxies.add(new EntityDefinitionProxy(parent, e));
 			}
 		}
 		return proxies;
@@ -36,7 +36,7 @@ public class EntityDefinitionProxy extends NodeDefinitionProxy {
 
 	@ExternalizedProperty
 	public List<NodeDefinitionProxy> getChildDefinitions() {
-		return NodeDefinitionProxy.fromList(entityDefinition.getChildDefinitions());
+		return NodeDefinitionProxy.fromList(this, entityDefinition.getChildDefinitions());
 	}
 
 	@ExternalizedProperty
