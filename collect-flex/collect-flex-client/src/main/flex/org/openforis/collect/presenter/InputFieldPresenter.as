@@ -24,6 +24,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.remoting.service.UpdateRequest;
 	import org.openforis.collect.remoting.service.UpdateRequest$Method;
+	import org.openforis.collect.ui.ContextMenuBuilder;
 	import org.openforis.collect.ui.component.detail.AttributeFormItem;
 	import org.openforis.collect.ui.component.detail.EntityFormItem;
 	import org.openforis.collect.ui.component.detail.MultipleAttributeFormItem;
@@ -218,6 +219,7 @@ package org.openforis.collect.presenter {
 						}
 					}
 				}
+				_view.contextMenu = ContextMenuBuilder.buildContextMenu(_view);
 			}
 		}
 		

@@ -6,6 +6,7 @@ package org.openforis.collect.presenter {
 	import mx.events.CalendarLayoutChangeEvent;
 	import mx.events.DropdownEvent;
 	
+	import org.openforis.collect.model.proxy.AttributeSymbol;
 	import org.openforis.collect.model.proxy.DateProxy;
 	import org.openforis.collect.ui.component.input.DateInputField;
 	import org.openforis.collect.ui.component.input.InputField;
@@ -120,14 +121,15 @@ package org.openforis.collect.presenter {
 		}
 		
 		override protected function updateView():void {
+			_view.year.text = _view.month.text = _view.day.text = "";
 			if(_view.attribute != null) {
 				var date:DateProxy = _view.attribute.value as DateProxy;
 				if(date != null) {
 					_view.year.text = StringUtil.nullToBlank(date.year);
 					_view.month.text = StringUtil.nullToBlank(date.month);
 					_view.day.text = StringUtil.nullToBlank(date.day);
-				} else {
-					_view.year.text = _view.month.text = _view.day.text = "";
+				} else if(_view.attribute.symbol != null && getReasonBlankShortKey(_view.attribute.symbol) != null) {
+					_view.day.text = getReasonBlankShortKey(_view.attribute.symbol);
 				}
 			}
 		}

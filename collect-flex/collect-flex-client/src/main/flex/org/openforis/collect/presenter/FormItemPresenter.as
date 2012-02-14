@@ -1,10 +1,13 @@
 package org.openforis.collect.presenter
 {
 	import flash.events.Event;
+	import flash.events.MouseEvent;
 	
 	import mx.binding.utils.ChangeWatcher;
+	import mx.core.UIComponent;
 	
 	import org.openforis.collect.event.ApplicationEvent;
+	import org.openforis.collect.event.FormItemEvent;
 	import org.openforis.collect.ui.component.detail.CollectFormItem;
 
 	/**
@@ -29,6 +32,9 @@ package org.openforis.collect.presenter
 			
 			eventDispatcher.addEventListener(ApplicationEvent.MODEL_CHANGED, modelChangedHandler);
 			ChangeWatcher.watch(_view, "parentEntity", parentEntityChangeHandler);
+			
+			_view.addEventListener(MouseEvent.MOUSE_OVER, mouseOverHandler);
+			_view.addEventListener(MouseEvent.MOUSE_OUT, mouseOutHandler);
 		}
 		
 		protected function parentEntityChangeHandler(event:Event):void {
@@ -40,6 +46,24 @@ package org.openforis.collect.presenter
 		
 		protected function updateView():void {
 			
+		}
+		
+		protected function mouseOverHandler(event:MouseEvent):void {
+			var target:UIComponent = event.currentTarget as UIComponent;
+			if(target != null && target.document != null) {
+				var evt:FormItemEvent = new FormItemEvent(FormItemEvent.FORM_ITEM_MOUSE_OVER);
+				evt.formItem = _view;
+				eventDispatcher.dispatchEvent(evt);
+			}
+		}
+		
+		protected function mouseOutHandler(event:MouseEvent):void {
+			var target:UIComponent = event.currentTarget as UIComponent;
+			if(target != null && target.document != null) {
+				var evt:FormItemEvent = new FormItemEvent(FormItemEvent.FORM_ITEM_MOUSE_OUT);
+				evt.formItem = _view;
+				eventDispatcher.dispatchEvent(evt);
+			}
 		}
 		
 	}

@@ -70,7 +70,7 @@ package org.openforis.collect.ui.component.input {
 		 * the attribute's value is null
 		 */
 		public function isEmpty():Boolean {
-			return attribute == null || attribute.value == null;
+			return attribute == null || (attribute.value == null && attribute.symbol == null);
 		}
 		
 		public function set relevant(value:Boolean):void {
