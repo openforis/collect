@@ -551,7 +551,7 @@ public class DataService {
 				if(result instanceof CodeAttribute) {
 					return (CodeAttribute) result;
 				} else {
-					throw new RuntimeException("Result is not a code attribute");
+					throw new IdmInterpretationError("CodeAttribute exptected");
 				}
 			} catch (InvalidPathException e) {
 				throw new IdmInterpretationError("Error retrieving parent code", e);
