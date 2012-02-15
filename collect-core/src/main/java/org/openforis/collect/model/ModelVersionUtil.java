@@ -15,9 +15,18 @@ public class ModelVersionUtil {
 		ModelVersion since = versionable.getSinceVersion();
 		ModelVersion deprecated = versionable.getDeprecatedVersion();
 		String currentDate = currentVersion.getDate();
-		int compareToSince = since != null ? currentDate.compareTo(since.getDate()): 1;
-		int compareToDeprecated = deprecated != null ? currentDate.compareTo(deprecated.getDate()): -1;
-		
+		int compareToSince; 
+		if(since == null) {
+			compareToSince = 1;
+		} else {
+			compareToSince = currentDate.compareTo(since.getDate());
+		}
+		int compareToDeprecated;
+		if(deprecated == null) {
+			compareToDeprecated = -1;
+		} else {
+			compareToDeprecated = currentDate.compareTo(deprecated.getDate());
+		}
 		result = compareToSince >= 0 && compareToDeprecated <=0;
 		return result;
 	}
