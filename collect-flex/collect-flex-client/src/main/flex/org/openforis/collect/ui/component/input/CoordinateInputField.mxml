@@ -8,41 +8,66 @@
 			import org.openforis.collect.i18n.Message;
 			import org.openforis.collect.presenter.CoordinateInputFieldPresenter;
 			
+			public static const STATE_HORIZONTAL:String = "horizontal";
+			public static const STATE_VERTICAL:String = "vertical";
+			
+			private var _subLabelWidth:Number = 130;
+			
+			
 			override protected function initPresenter():void {
 				this.presenter = new CoordinateInputFieldPresenter(this);
 			}
+			
+			public function get subLabelWidth():Number {
+				return _subLabelWidth;
+			}
+			
+			public function set subLabelWidth(value:Number):void {
+				_subLabelWidth = value;
+			}
+
+			
 		]]>
 	</fx:Script>
 
+	<input:states>
+		<s:State name="horizontal" />
+		<s:State name="vertical" />
+	</input:states>
+	
 	<s:BorderContainer 
 		id="inputBox"
 		minHeight="0"
 		styleName="noError"
 		tabEnabled="false">
-		<s:layout>
-			<s:VerticalLayout>
-				<s:verticalAlign>middle</s:verticalAlign>
-				<s:horizontalAlign>left</s:horizontalAlign>
-				<s:gap>0</s:gap>
-				<s:paddingLeft>0</s:paddingLeft>
-			</s:VerticalLayout>
-		</s:layout>
-	
-		
-		<s:HGroup>
-			<s:Label width="100" textAlign="right" text="{Message.get('edit.coordinate.srs')}" />
-			<s:DropDownList id="srsDropDown" width="150" />
+			
+		<s:HGroup includeIn="horizontal" gap="2">
+			<s:DropDownList id="srsDropDownList" 
+							width="150" 
+							prompt="{Message.get('global.dropDownPrompt')}" 
+							includeIn="horizontal" itemCreationPolicy="immediate"
+							/>
+			<input:TextInput id="xTextInput" includeIn="horizontal" itemCreationPolicy="immediate" />
+			<input:TextInput id="yTextInput" includeIn="horizontal" itemCreationPolicy="immediate" />
 		</s:HGroup>
 		
-		<s:HGroup>
-			<s:Label width="100" textAlign="right" text="{Message.get('edit.coordinate.x')}" />
-			<input:TextInput id="xTextInput" width="100" />
-		</s:HGroup>
-		
-		<s:HGroup>
-			<s:Label width="100" textAlign="right" text="{Message.get('edit.coordinate.y')}" />
-			<input:TextInput id="yTextInput" width="100" />
-		</s:HGroup>
+		<s:VGroup includeIn="vertical" gap="2">
+			<s:Label styleName="bold" text="{attributeDefinition.getLabelText()}" />
+			<s:VGroup paddingLeft="20">
+				<s:HGroup>
+					<s:Label width="{subLabelWidth}" styleName="bold" text="{Message.get('edit.coordinate.srs')}"/>
+					<fx:Reparent target="srsDropDownList" includeIn="vertical" />
+				</s:HGroup>
+				<s:HGroup>
+					<s:Label width="{subLabelWidth}" styleName="bold" text="{Message.get('edit.coordinate.x')}"/>
+					<fx:Reparent target="xTextInput" includeIn="vertical" />
+				</s:HGroup>
+				<s:HGroup>
+					<s:Label width="{subLabelWidth}" styleName="bold" text="{Message.get('edit.coordinate.y')}"/>
+					<fx:Reparent target="yTextInput" includeIn="vertical" />
+				</s:HGroup>
+			</s:VGroup>
+		</s:VGroup>
 		
 	</s:BorderContainer>
 	

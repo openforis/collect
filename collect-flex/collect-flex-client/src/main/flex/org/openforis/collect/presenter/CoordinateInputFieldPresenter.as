@@ -4,6 +4,8 @@ package org.openforis.collect.presenter {
 	
 	import mx.events.DropdownEvent;
 	
+	import org.openforis.collect.Application;
+	import org.openforis.collect.metamodel.proxy.SpatialReferenceSystemProxy;
 	import org.openforis.collect.ui.component.input.CoordinateInputField;
 	import org.openforis.collect.ui.component.input.InputField;
 	
@@ -17,9 +19,11 @@ package org.openforis.collect.presenter {
 		
 		public function CoordinateInputFieldPresenter(inputField:CoordinateInputField = null) {
 			_view = inputField;
-			_view.srsDropDown.labelFunction = srsDropDownLabelFunction;
-			
 			super(inputField);
+
+			_view.srsDropDownList.labelFunction = srsDropDownLabelFunction;
+			//TODO binding
+			_view.srsDropDownList.dataProvider = Application.activeSurvey.spatialReferenceSystems;
 		}
 		
 		override internal function initEventListeners():void {
@@ -29,8 +33,8 @@ package org.openforis.collect.presenter {
 			_view.xTextInput.addEventListener(FocusEvent.FOCUS_OUT, focusOutHandler);
 			_view.yTextInput.addEventListener(FocusEvent.FOCUS_IN, focusInHandler);
 			_view.yTextInput.addEventListener(FocusEvent.FOCUS_OUT, focusOutHandler);
-			_view.srsDropDown.addEventListener(Event.CHANGE, srsDropDownChangeHandler);
-			_view.srsDropDown.addEventListener(DropdownEvent.CLOSE, srsDropDownCloseHandler);
+			_view.srsDropDownList.addEventListener(Event.CHANGE, srsDropDownChangeHandler);
+			_view.srsDropDownList.addEventListener(DropdownEvent.CLOSE, srsDropDownCloseHandler);
 		}
 		
 		override protected function updateView():void {
@@ -44,18 +48,17 @@ package org.openforis.collect.presenter {
 			*/
 		}
 		
-		override protected function createValue():* {
-			var newAttributeValue:Object = new Object();
-			newAttributeValue.text1 = srsDropDownLabelFunction(_view.srsDropDown.selectedItem);
-			newAttributeValue.text2 = _view.xTextInput.text;
-			newAttributeValue.text3 = _view.yTextInput.text;
-			/*
-			if(value != null) {
-				//copy old informations
-				newAttributeValue.remarks = value.remarks;
+		protected function createValue():* {
+			var srs:SpatialReferenceSystemProxy = _view.srsDropDownList.selectedItem as SpatialReferenceSystemProxy;
+			var srsId:String = "";
+			if(srs != null) {
+				srsId = srs.id;
 			}
-			*/
-			return newAttributeValue;
+			var x:String = _view.xTextInput.text;
+			var y:String = _view.yTextInput.text;
+			
+			var result:String = "SRID=" + srsId + ";POINT(" + x + " " + y + ")";
+			return result;
 		}
 		
 		protected function srsDropDownLabelFunction(item:Object):String {

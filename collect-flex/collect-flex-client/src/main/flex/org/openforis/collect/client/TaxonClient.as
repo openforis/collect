@@ -11,19 +11,32 @@ package org.openforis.collect.client {
 	 * */
 	public class TaxonClient extends AbstractClient {
 		
-		private var _getSurveysOperation:Operation;
+		private var _searchByCodeOperation:Operation;
+		private var _searchByScientificNameOperation:Operation;
+		private var _searchByVernacularNameOperation:Operation;
 		
 		public function TaxonClient() {
 			super("taxonService");
 			
-			//this._getSurveysOperation = getOperation("getSurveySummaries");
+			_searchByCodeOperation = getOperation("searchByCode");
+			_searchByScientificNameOperation = getOperation("searchByScientificName");
+			_searchByVernacularNameOperation = getOperation("searchByVernacularName");
 		}
-		/*
-		public function getSurveySummaries(responder:IResponder):void {
-			var token:AsyncToken = this._getSurveysOperation.send();
+		
+		public function serachByCode(responder:IResponder, value:String):void {
+			var token:AsyncToken = this._searchByCodeOperation.send(value);
 			token.addResponder(responder);
 		}
 		
-		*/
+		public function serachByScientificName(responder:IResponder, value:String):void {
+			var token:AsyncToken = this._searchByScientificNameOperation.send(value);
+			token.addResponder(responder);
+		}
+		
+		public function serachByVernacularName(responder:IResponder, value:String):void {
+			var token:AsyncToken = this._searchByVernacularNameOperation.send(value);
+			token.addResponder(responder);
+		}
+
 	}
 }

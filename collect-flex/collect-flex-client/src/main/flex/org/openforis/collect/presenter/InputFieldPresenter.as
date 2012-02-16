@@ -9,6 +9,7 @@ package org.openforis.collect.presenter {
 	import mx.collections.IList;
 	import mx.core.UIComponent;
 	import mx.rpc.AsyncResponder;
+	import mx.rpc.IResponder;
 	import mx.rpc.events.FaultEvent;
 	import mx.rpc.events.ResultEvent;
 	
@@ -45,10 +46,13 @@ package org.openforis.collect.presenter {
 		
 		private var _view:InputField;
 		protected var _changed:Boolean = false;
+		protected var _updateResponder:IResponder;
 		
 		public function InputFieldPresenter(inputField:InputField = null) {
 			_view = inputField;
 			super();
+			
+			_updateResponder = new AsyncResponder(updateResultHandler, updateFaultHandler);
 			
 			updateView();
 		}
@@ -135,8 +139,7 @@ package org.openforis.collect.presenter {
 			} else {
 				req.method = UpdateRequest$Method.ADD;
 			}
-			var responder:AsyncResponder = new AsyncResponder(updateResultHandler, updateFaultHandler);
-			ClientFactory.dataClient.updateActiveRecord(responder, req);
+			ClientFactory.dataClient.updateActiveRecord(_updateResponder, req);
 		}
 		
 		protected function focusInHandler(event:FocusEvent):void {
@@ -199,8 +202,7 @@ package org.openforis.collect.presenter {
 			} else {
 				req.method = UpdateRequest$Method.ADD;
 			}
-			var responder:AsyncResponder = new AsyncResponder(updateResultHandler, updateFaultHandler);
-			ClientFactory.dataClient.updateActiveRecord(responder, req);
+			ClientFactory.dataClient.updateActiveRecord(_updateResponder, req);
 		}
 
 
