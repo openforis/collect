@@ -11,7 +11,9 @@ import org.jooq.Result;
 import org.jooq.impl.Factory;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.persistence.DataInconsistencyException;
+import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
+import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Node;
 
@@ -70,6 +72,18 @@ public class DataLoader {
 			}
 			NodeMapper mapper = NodeMapper.getInstance(defn.getClass());
 			Node<?> o1 = mapper.addNode(defn, row, (Entity) parent);
+			
+			if(defn instanceof AttributeDefinition) {
+				String remarks = row.getValue(DATA.REMARKS);
+				String s = row.getValueAsString(DATA.SYMBOL);
+				Character symbol = null;
+				if(s != null && s.length() == 1) {
+					symbol = s.charAt(0);
+				}
+				Attribute<?, ?> attribute = (Attribute<?, ?>) o1;
+				attribute.setRemarks(remarks);
+				attribute.setSymbol(symbol);
+			}
 			o = o1;
 		}
 		objectsById.put(id, o);
