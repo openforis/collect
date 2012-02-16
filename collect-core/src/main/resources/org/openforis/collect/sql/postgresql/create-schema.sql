@@ -32,6 +32,74 @@ GO
 --- BEGIN GENERATED CODE ---
 ----------------------------
 
+ALTER TABLE "collect"."data"
+	DROP CONSTRAINT "FK_data_parent" CASCADE 
+GO
+ALTER TABLE "collect"."data"
+	DROP CONSTRAINT "FK_data_record" CASCADE 
+GO
+ALTER TABLE "collect"."data"
+	DROP CONSTRAINT "FK_data_schema_definition" CASCADE 
+GO
+ALTER TABLE "collect"."record"
+	DROP CONSTRAINT "FK_record_root_entity" CASCADE 
+GO
+ALTER TABLE "collect"."schema_definition"
+	DROP CONSTRAINT "FK_schema_definition_survey" CASCADE 
+GO
+ALTER TABLE "collect"."taxon_vernacular_name"
+	DROP CONSTRAINT "FK_taxon_vernacular_name_taxon" CASCADE 
+GO
+ALTER TABLE "collect"."data"
+	DROP CONSTRAINT "FK_data_taxon" CASCADE 
+GO
+ALTER TABLE "collect"."taxon"
+	DROP CONSTRAINT "FK_taxon_parent" CASCADE 
+GO
+ALTER TABLE "collect"."taxon"
+	DROP CONSTRAINT "FK_taxon_taxonomy" CASCADE 
+GO
+ALTER TABLE "collect"."user_role"
+	DROP CONSTRAINT "FK_user_user_role" CASCADE 
+GO
+ALTER TABLE "collect"."record"
+	DROP CONSTRAINT "FK_record_locked_by_user" CASCADE 
+GO
+ALTER TABLE "collect"."record"
+	DROP CONSTRAINT "FK_record_created_by_user" CASCADE 
+GO
+ALTER TABLE "collect"."record"
+	DROP CONSTRAINT "FK_record_modified_by_user" CASCADE 
+GO
+ALTER TABLE "collect"."survey"
+	DROP CONSTRAINT "UK_survey_name" CASCADE 
+GO
+ALTER TABLE "collect"."survey"
+	DROP CONSTRAINT "UK_survey_uri" CASCADE 
+GO
+ALTER TABLE "collect"."taxonomy"
+	DROP CONSTRAINT "UK_taxonomy_name" CASCADE 
+GO
+DROP TABLE "collect"."data"
+GO
+DROP TABLE "collect"."logo"
+GO
+DROP TABLE "collect"."record"
+GO
+DROP TABLE "collect"."schema_definition"
+GO
+DROP TABLE "collect"."survey"
+GO
+DROP TABLE "collect"."taxon"
+GO
+DROP TABLE "collect"."taxon_vernacular_name"
+GO
+DROP TABLE "collect"."taxonomy"
+GO
+DROP TABLE "collect"."user_account"
+GO
+DROP TABLE "collect"."user_role"
+GO
 CREATE TABLE "collect"."data"  ( 
 	"id"           	integer NOT NULL,
 	"record_id"    	integer NOT NULL,
@@ -100,6 +168,7 @@ CREATE TABLE "collect"."survey"  (
 GO
 CREATE TABLE "collect"."taxon"  ( 
 	"id"             	integer NOT NULL,
+	"code"           	varchar(32) NOT NULL,
 	"scientific_name"	varchar(255) NOT NULL,
 	"taxon_rank"     	varchar(128) NOT NULL,
 	"taxonomy_id"    	integer NOT NULL,
@@ -219,7 +288,3 @@ ALTER TABLE "collect"."record"
 	FOREIGN KEY("modified_by_id")
 	REFERENCES "collect"."user_account"("id")
 GO
-
---------------------------
---- END GENERATED CODE ---
---------------------------

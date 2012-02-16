@@ -8,9 +8,9 @@ import java.util.Stack;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.openforis.collect.model.species.Taxon;
-import org.openforis.collect.model.species.TaxonVernacularName;
-import org.openforis.collect.model.species.Taxonomy;
+import org.openforis.idm.model.species.Taxon;
+import org.openforis.idm.model.species.TaxonVernacularName;
+import org.openforis.idm.model.species.Taxonomy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -44,10 +44,10 @@ public class SpeciesDAOIntegrationTest {
 		
 		// Create taxa
 		Stack<Taxon> taxa = new Stack<Taxon>();
-		taxa.push(testInsertAndLoadTaxon(taxonomy1, "Juglandaceaex", "familyx", 9, null));
-		taxa.push(testInsertAndLoadTaxon(taxonomy1, "sJuglans sp.", "sadgenus", 0, null));
+		taxa.push(testInsertAndLoadTaxon(taxonomy1, "JUG","Juglandaceaex", "familyx", 9, null));
+		taxa.push(testInsertAndLoadTaxon(taxonomy1,"JUG2", "sJuglans sp.", "sadgenus", 0, null));
 		taxa.push(testUpdateAndLoadTaxon(taxa.pop(), "Juglans sp.", "family", 9, taxa.get(0).getId()));
-		taxa.push(testInsertAndLoadTaxon(taxonomy1, "Juglans regia", "species", 9, taxa.get(1).getId()));
+		taxa.push(testInsertAndLoadTaxon(taxonomy1,"JUG3", "Juglans regia", "species", 9, taxa.get(1).getId()));
 		
 		// Create vernacular names
 		Stack<TaxonVernacularName> names = new Stack<TaxonVernacularName>();
@@ -97,9 +97,10 @@ public class SpeciesDAOIntegrationTest {
 		assertEquals(newName, t.getName());
 	}
 	
-	private Taxon testInsertAndLoadTaxon(Taxonomy taxonomy, String scientificName, String rank, int step, Integer parentId) {
+	private Taxon testInsertAndLoadTaxon(Taxonomy taxonomy, String code, String scientificName, String rank, int step, Integer parentId) {
 		// Insert
 		Taxon t = new Taxon();
+		t.setCode(code);
 		t.setScientificName(scientificName);
 		t.setTaxonomicRank(rank);
 		t.setStep(step);

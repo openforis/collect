@@ -3,7 +3,7 @@
  */
 package org.openforis.collect.model;
 
-import org.openforis.idm.model.Taxon;
+import org.openforis.idm.model.TaxonOccurence;
 
 /**
  * @author M. Togna
@@ -25,7 +25,7 @@ public class TaxonImpl extends AbstractValue implements Taxon {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.openforis.idm.model.Taxon#getCode()
+	 * @see org.openforis.idm.model.TaxonOccurence#getCode()
 	 */
 	@Override
 	public String getCode() {
@@ -35,7 +35,7 @@ public class TaxonImpl extends AbstractValue implements Taxon {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.openforis.idm.model.Taxon#getScientificName()
+	 * @see org.openforis.idm.model.TaxonOccurence#getScientificName()
 	 */
 	@Override
 	public String getScientificName() {
@@ -46,7 +46,7 @@ public class TaxonImpl extends AbstractValue implements Taxon {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.openforis.idm.model.Taxon#getVernacularName()
+	 * @see org.openforis.idm.model.TaxonOccurence#getVernacularName()
 	 */
 	@Override
 	public String getVernacularName() {
@@ -57,7 +57,7 @@ public class TaxonImpl extends AbstractValue implements Taxon {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.openforis.idm.model.Taxon#getLanguageCode()
+	 * @see org.openforis.idm.model.TaxonOccurence#getLanguageCode()
 	 */
 	@Override
 	public String getLanguageCode() {
@@ -68,7 +68,7 @@ public class TaxonImpl extends AbstractValue implements Taxon {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.openforis.idm.model.Taxon#getLanguageVariant()
+	 * @see org.openforis.idm.model.TaxonOccurence#getLanguageVariant()
 	 */
 	@Override
 	public String getLanguageVariant() {

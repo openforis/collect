@@ -8,6 +8,7 @@ import org.openforis.idm.metamodel.Versionable;
  * @author S. Ricci
  *
  */
+@Deprecated
 public class ModelVersionUtil {
 	
 	public static boolean isInVersion(Versionable versionable, ModelVersion currentVersion) {

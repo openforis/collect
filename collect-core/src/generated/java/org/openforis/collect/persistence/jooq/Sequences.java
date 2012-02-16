@@ -23,6 +23,11 @@ public final class Sequences {
 	public static final org.jooq.Sequence<java.lang.Long> RECORD_ID_SEQ = new org.jooq.impl.SequenceImpl<java.lang.Long>("record_id_seq", org.openforis.collect.persistence.jooq.Collect.COLLECT, org.jooq.impl.SQLDataType.BIGINT);
 
 	/**
+	 * The sequence collect.collect.sampling_design_id_seq
+	 */
+	public static final org.jooq.Sequence<java.lang.Long> SAMPLING_DESIGN_ID_SEQ = new org.jooq.impl.SequenceImpl<java.lang.Long>("sampling_design_id_seq", org.openforis.collect.persistence.jooq.Collect.COLLECT, org.jooq.impl.SQLDataType.BIGINT);
+
+	/**
 	 * The sequence collect.collect.schema_definition_id_seq
 	 */
 	public static final org.jooq.Sequence<java.lang.Long> SCHEMA_DEFINITION_ID_SEQ = new org.jooq.impl.SequenceImpl<java.lang.Long>("schema_definition_id_seq", org.openforis.collect.persistence.jooq.Collect.COLLECT, org.jooq.impl.SQLDataType.BIGINT);
@@ -36,11 +41,6 @@ public final class Sequences {
 	 * The sequence collect.collect.taxon_id_seq
 	 */
 	public static final org.jooq.Sequence<java.lang.Long> TAXON_ID_SEQ = new org.jooq.impl.SequenceImpl<java.lang.Long>("taxon_id_seq", org.openforis.collect.persistence.jooq.Collect.COLLECT, org.jooq.impl.SQLDataType.BIGINT);
-
-	/**
-	 * The sequence collect.collect.taxon_name_id_seq
-	 */
-	public static final org.jooq.Sequence<java.lang.Long> TAXON_NAME_ID_SEQ = new org.jooq.impl.SequenceImpl<java.lang.Long>("taxon_name_id_seq", org.openforis.collect.persistence.jooq.Collect.COLLECT, org.jooq.impl.SQLDataType.BIGINT);
 
 	/**
 	 * The sequence collect.collect.taxonomy_id_seq

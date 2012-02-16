@@ -2,7 +2,7 @@ package org.openforis.collect.model.proxy;
 
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.collect.Proxy;
-import org.openforis.idm.model.Taxon;
+import org.openforis.idm.model.TaxonOccurence;
 
 /**
  * 
@@ -11,9 +11,9 @@ import org.openforis.idm.model.Taxon;
  */
 public class TaxonProxy implements Proxy {
 
-	private transient Taxon taxon;
+	private transient TaxonOccurence taxon;
 
-	public TaxonProxy(Taxon taxon) {
+	public TaxonProxy(TaxonOccurence taxon) {
 		super();
 		this.taxon = taxon;
 	}

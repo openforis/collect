@@ -28,6 +28,11 @@ public final class Tables {
 	public static org.openforis.collect.persistence.jooq.tables.Record RECORD = org.openforis.collect.persistence.jooq.tables.Record.RECORD;
 
 	/**
+	 * The table collect.sampling_design
+	 */
+	public static org.openforis.collect.persistence.jooq.tables.SamplingDesign SAMPLING_DESIGN = org.openforis.collect.persistence.jooq.tables.SamplingDesign.SAMPLING_DESIGN;
+
+	/**
 	 * The table collect.schema_definition
 	 */
 	public static org.openforis.collect.persistence.jooq.tables.SchemaDefinition SCHEMA_DEFINITION = org.openforis.collect.persistence.jooq.tables.SchemaDefinition.SCHEMA_DEFINITION;

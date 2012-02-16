@@ -7,9 +7,9 @@ import java.sql.Connection;
 
 import org.jooq.Record;
 import org.jooq.UpdatableRecord;
-import org.openforis.collect.model.species.Taxon;
 import org.openforis.collect.persistence.jooq.MappingJooqDaoSupport;
 import org.openforis.collect.persistence.jooq.MappingJooqFactory;
+import org.openforis.idm.model.species.Taxon;
 
 /**
  * @author G. Miceli
@@ -31,6 +31,7 @@ public class TaxonDAO extends MappingJooqDaoSupport<Taxon, TaxonDAO.JooqFactory>
 		public void fromRecord(Record r, Taxon t) {
 			t.setId(r.getValue(TAXON.ID));
 			t.setParentId(r.getValue(TAXON.PARENT_ID));
+			t.setCode(r.getValueAsString(TAXON.CODE));
 			t.setScientificName(r.getValue(TAXON.SCIENTIFIC_NAME));
 			t.setTaxonomicRank(r.getValue(TAXON.TAXON_RANK));
 			t.setTaxonomyId(r.getValue(TAXON.TAXONOMY_ID));
@@ -39,8 +40,9 @@ public class TaxonDAO extends MappingJooqDaoSupport<Taxon, TaxonDAO.JooqFactory>
 		
 		@Override
 		public void toRecord(Taxon t, UpdatableRecord<?> r) {
-			r.setValue(TAXON.ID, t.getId());
+			r.setValue(TAXON.ID, t.getId());			
 			r.setValue(TAXON.PARENT_ID, t.getParentId());
+			r.setValue(TAXON.CODE, t.getCode());
 			r.setValue(TAXON.SCIENTIFIC_NAME, t.getScientificName());
 			r.setValue(TAXON.TAXON_RANK, t.getTaxonomicRank());
 			r.setValue(TAXON.TAXONOMY_ID, t.getTaxonomyId());

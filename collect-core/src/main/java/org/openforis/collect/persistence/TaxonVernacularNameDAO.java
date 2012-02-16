@@ -7,9 +7,9 @@ import java.sql.Connection;
 
 import org.jooq.Record;
 import org.jooq.UpdatableRecord;
-import org.openforis.collect.model.species.TaxonVernacularName;
 import org.openforis.collect.persistence.jooq.MappingJooqDaoSupport;
 import org.openforis.collect.persistence.jooq.MappingJooqFactory;
+import org.openforis.idm.model.species.TaxonVernacularName;
 
 /**
  * @author G. Miceli
