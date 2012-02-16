@@ -1,5 +1,6 @@
 package org.openforis.collect.client {
 	
+	import mx.rpc.mxml.Concurrency;
 	import mx.rpc.remoting.Operation;
 	import mx.rpc.remoting.RemoteObject;
 	 
@@ -9,8 +10,9 @@ package org.openforis.collect.client {
 	 * */
 	public class AbstractClient {
 
-		internal static const CONCURRENCY_MULTIPLE:String = "multiple";
-		internal static const CONCURRENCY_SINGLE:String = "single";
+		internal static const CONCURRENCY_MULTIPLE:String = Concurrency.MULTIPLE;
+		internal static const CONCURRENCY_SINGLE:String = Concurrency.SINGLE;
+		internal static const CONCURRENCY_LAST:String = Concurrency.LAST;
 		
 		internal var _remoteObject:RemoteObject;
 		

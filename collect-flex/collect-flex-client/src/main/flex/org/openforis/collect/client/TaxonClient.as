@@ -18,9 +18,9 @@ package org.openforis.collect.client {
 		public function TaxonClient() {
 			super("taxonService");
 			
-			_findByCodeOperation = getOperation("findByCode");
-			_findByScientificNameOperation = getOperation("findByScientificName");
-			_findByVernacularNameOperation = getOperation("findByVernacularName");
+			_findByCodeOperation = getOperation("findByCode", CONCURRENCY_LAST);
+			_findByScientificNameOperation = getOperation("findByScientificName", CONCURRENCY_LAST);
+			_findByVernacularNameOperation = getOperation("findByVernacularName", CONCURRENCY_LAST);
 		}
 		
 		public function findByCode(responder:IResponder, value:String, maxResults:int):void {
