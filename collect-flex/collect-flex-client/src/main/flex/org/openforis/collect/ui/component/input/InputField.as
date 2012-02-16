@@ -85,6 +85,10 @@ package org.openforis.collect.ui.component.input {
 			return _textInput["text"];
 		}
 		
+		public function set text(value:String):void {
+			_textInput["text"] = value;
+		}
+		
 		public function get textInput():UIComponent {
 			return _textInput;
 		}

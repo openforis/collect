@@ -4,12 +4,14 @@
 package org.openforis.collect.remoting.service;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import org.openforis.collect.manager.CodeListManager;
+import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.metamodel.proxy.CodeListItemProxy;
@@ -41,15 +43,18 @@ import org.openforis.idm.metamodel.NumericAttributeDefinition;
 import org.openforis.idm.metamodel.NumericAttributeDefinition.Type;
 import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.Survey;
-import org.openforis.idm.metamodel.TextAttributeDefinition;
 import org.openforis.idm.metamodel.TimeAttributeDefinition;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Code;
+import org.openforis.idm.model.CodeAttribute;
+import org.openforis.idm.model.Coordinate;
 import org.openforis.idm.model.Date;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.Record;
 import org.openforis.idm.model.Time;
+import org.openforis.idm.model.expression.ExpressionFactory;
+import org.openforis.idm.model.expression.ModelPathExpression;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -65,10 +70,6 @@ public class DataService {
 
 	@Autowired
 	private RecordManager recordManager;
-
-	@Autowired
-	private CodeListManager codeListManager;
-
 
 	@Transactional
 	public RecordProxy loadRecord(int id) throws RecordLockedException, MultipleEditException, NonexistentIdException, AccessDeniedException {
@@ -121,6 +122,7 @@ public class DataService {
 		CollectRecord record = recordManager.create(activeSurvey, rootEntityDefinition, user, version.getName());
 		Entity rootEntity = record.getRootEntity();
 		recordManager.addEmptyAttributes(rootEntity, version);
+		recordManager.addEmptyEnumeratedEntities(rootEntity, version);
 		sessionState.setActiveRecord((CollectRecord) record);
 		sessionState.setActiveRecordState(RecordState.NEW);
 		RecordProxy recordProxy = new RecordProxy(record);
@@ -173,9 +175,9 @@ public class DataService {
 		String requestValue = request.getValue();
 		String remarks = request.getRemarks();
 		//parse request value into a model value (for example Code, Date, Time...)
-		Object value = null;
-		if(nodeDef instanceof AttributeDefinition) {
-			value = parseValue(parentEntity, (AttributeDefinition) nodeDef, requestValue);
+		List<?> values = null;
+		if(requestValue != null && nodeDef instanceof AttributeDefinition) {
+			values = parseValues(parentEntity, (AttributeDefinition) nodeDef, requestValue);
 		}
 		AttributeSymbol symbol = request.getSymbol();
 		if(symbol == null && AttributeSymbol.isShortKeyForBlank(requestValue)) {
@@ -185,26 +187,37 @@ public class DataService {
 		
 		Method method = request.getMethod();
 		switch (method) {
-			case ADD: 
-			{
+			case ADD:
 				if(nodeDef instanceof AttributeDefinition) {
 					AttributeDefinition def = (AttributeDefinition) nodeDef;
-					List<Attribute<?, ?>> attributes = recordManager.addAttributes(parentEntity, def, value, symbolChar, remarks);
+					List<Attribute<?, ?>> attributes = recordManager.addAttributes(parentEntity, def, values, symbolChar, remarks);
 					updatedNodes.addAll(attributes);
 				} else {
 					Entity e = recordManager.addEntity(parentEntity, nodeName, version);
 					updatedNodes.add(e);
 				}
 				break;
-			}
-			case UPDATE:
-			{
+			case UPDATE: 
 				//update attribute value
 				if(node instanceof Attribute) {
-					List<Attribute<?, ?>> attributes = recordManager.updateAttributes(parentEntity, (Attribute<?, ?>) node, value, symbolChar, remarks);
-					updatedNodes.addAll(attributes);
+					@SuppressWarnings("unchecked")
+					Attribute<?, Object> attribute = (Attribute<?, Object>) node;
+					AttributeDefinition def = attribute.getDefinition();
+					if(def.isMultiple()) {
+						List<Attribute<?, ?>> attributes = recordManager.updateAttributes(parentEntity, def, values, symbolChar, remarks);
+						updatedNodes.addAll(attributes);
+					} else {
+						Object val = null;
+						if(values != null && values.size() == 1) {
+							val = values.get(0);
+						}
+						attribute.setRemarks(remarks);
+						attribute.setValue(val);
+						attribute.setSymbol(symbolChar);
+						updatedNodes.add(attribute);
+					}
 				} else if(node instanceof Entity) {
-					//update symbol in entity's attributes
+					//update only the symbol in entity's attributes
 					Entity entity = (Entity) node;
 					recordManager.addEmptyAttributes(entity, version);
 					EntityDefinition entityDef = (EntityDefinition) nodeDef;
@@ -213,19 +226,17 @@ public class DataService {
 						if(def instanceof AttributeDefinition) {
 							String name = def.getName();
 							Attribute<?, ?> attribute = (Attribute<?, ?>) entity.get(name, 0);
-							List<Attribute<?,?>> attributes = recordManager.updateAttributes(parentEntity, attribute, value, symbolChar, remarks);
-							updatedNodes.addAll(attributes);
+							attribute.setSymbol(symbolChar);
+							updatedNodes.add(attribute);
 						}
 					}
 				}
 				break;
-			}
 			case DELETE: 
-			{
 				Node<?> deleted = recordManager.deleteNode(parentEntity, node);
 				updatedNodes.add(deleted);
 				break;
-			}
+			
 		}
 		//convert nodes to proxies
 		List<NodeProxy> result = NodeProxy.fromList((List<Node<?>>) updatedNodes);
@@ -237,61 +248,45 @@ public class DataService {
 		return result;
 	}
 
-	private Object parseValue(Entity parentEntity, AttributeDefinition def, String value) {
+	@SuppressWarnings("unchecked")
+	private List<?> parseValues(Entity parentEntity, AttributeDefinition def, String value) {
+		List<Object> result = new ArrayList<Object>();
 		CollectRecord activeRecord = getActiveRecord();
 		ModelVersion version = activeRecord.getVersion();
 		
-		Object result = null;
 		if(def instanceof BooleanAttributeDefinition) {
-			result = Boolean.parseBoolean(value);
+			result.add(Boolean.parseBoolean(value));
 		} else if(def instanceof CodeAttributeDefinition) {
-			List<Code> codes = codeListManager.parseCodes(parentEntity, (CodeAttributeDefinition) def, value, version);
-			if(codes.size() > 1) {
-				result = codes;
-			} else if(codes.size() == 1) {
-				result = codes.get(0);
+			List<?> codes = parseCodes(parentEntity, (CodeAttributeDefinition) def, value, version);
+			if(codes.size() > 0) {
+				result = (List<Object>) codes;
 			}
 		} else if(def instanceof CoordinateAttributeDefinition) {
-			//TODO
-			result = null;
+			Coordinate coordinate = Coordinate.parseCoordinate(value);
+			result.add(coordinate);
 		} else if(def instanceof DateAttributeDefinition) {
-			//parse date string
-			String[] parts = value.split("/");
-			if(parts.length == 3) {
-				String date = parts[0];
-				String month = parts[1];
-				String year = parts[2];
-				result = new Date(Integer.parseInt(year), Integer.parseInt(month), Integer.parseInt(date));
-			} else {
-				//TODO error parsing date
-				throw new RuntimeException("Error parsing date");
-			}
+			Date date = Date.parseDate(value);
+			result.add(date);
 		} else if(def instanceof NumericAttributeDefinition) {
 			NumberAttributeDefinition numberDef = (NumberAttributeDefinition) def;
 			Type type = numberDef.getType();
+			Number number = null;
 			switch(type) {
 				case INTEGER:
-					result = Integer.parseInt(value);
+					number = Integer.parseInt(value);
 					break;
 				case REAL:
-					result = Double.parseDouble(value);
+					number = Double.parseDouble(value);
 					break;
 			}
-		} else if(def instanceof TimeAttributeDefinition) {
-			//parse date string
-			String[] parts = value.split(":");
-			if(parts.length == 2) {
-				String hours = parts[0];
-				String minutes = parts[1];
-				result = new Time(Integer.parseInt(hours), Integer.parseInt(minutes));
-			} else {
-				//TODO error parsing time
-				throw new RuntimeException("Error parsing time");
+			if(number != null) {
+				result.add(number);
 			}
-		} else if(def instanceof TextAttributeDefinition) {
-			result = value;
+		} else if(def instanceof TimeAttributeDefinition) {
+			Time time = Time.parseTime(value);
+			result.add(time);
 		} else {
-			result = value;
+			result.add(value);
 		}
 		return result;
 	}
@@ -332,51 +327,46 @@ public class DataService {
 	}
 	
 	/**
-	 * Returns all code list items that matches the comma separated ids
+	 * Gets the code list items assignable to the specified attribute.
 	 * 
-	 * @param context
-	 * @param ids
+	 * @param parentEntityId
+	 * @param attrName
 	 * @return
 	 */
-	public List<CodeListItem> findCodeListItemsById(Integer id, String ids) {
-		/*
-		@SuppressWarnings("unchecked")
-		CodeAttribute code = (CodeAttribute) this.getActiveRecord().getNodeById(id);
-		List<CodeListItem> codeList = findCodeList(code);
-		for (CodeListItem item : codeList) {
-			//TODO
-		}
-		*/
-		return null;
-	}
+	public List<CodeListItemProxy> getAssignableCodeListItems(int parentEntityId, String attrName){
+		CollectRecord record = getActiveRecord();
+		Entity parent = (Entity) record.getNodeById(parentEntityId);
+		CodeAttributeDefinition def = (CodeAttributeDefinition) parent.getDefinition().getChildDefinition(attrName);
+		List<CodeListItem> assignableCodeListItems = getAssignableCodeListItems(parent, def);
+		List<CodeListItemProxy> result = CodeListItemProxy.fromList(assignableCodeListItems);
+		List<Node<?>> selectedCodes = parent.getAll(attrName);
+		CodeListItemProxy.setSelectedItems(result, selectedCodes);
+		return result;
+	} 
 	
 	/**
-	 * Called from client.
+	 * Finds a list of code list items assignable to the specified attribute and matching the passed codes
 	 * 
 	 * @param parentEntityId
 	 * @param attributeName
+	 * @param codes
 	 * @return
 	 */
-	public List<CodeListItemProxy> findCodeList(int parentEntityId, String attributeName) {
-		CollectRecord activeRecord = getActiveRecord();
-		ModelVersion version = activeRecord.getVersion();
-		Entity parentEntity = (Entity) activeRecord.getNodeById(parentEntityId);
-		EntityDefinition parentEntityDef = parentEntity.getDefinition();
-		NodeDefinition childDefinition = parentEntityDef.getChildDefinition(attributeName);
-		if(childDefinition instanceof CodeAttributeDefinition) {
-			CodeAttributeDefinition codeDef = (CodeAttributeDefinition) childDefinition;
-			List<CodeListItem> items = codeListManager.findCodeList(parentEntity, codeDef, version);
-			List<CodeListItemProxy> proxies = CodeListItemProxy.fromList(items);
-			List<Node<?>> codes = parentEntity.getAll(attributeName);
-			if(codes != null) {
-				CodeListItemProxy.setSelectedItems(proxies, codes);
+	public List<CodeListItemProxy> findAssignableCodeListItems(int parentEntityId, String attributeName, String[] codes) {
+		CollectRecord record = getActiveRecord();
+		Entity parent = (Entity) record.getNodeById(parentEntityId);
+		CodeAttributeDefinition def = (CodeAttributeDefinition) parent.getDefinition().getChildDefinition(attributeName);
+		List<CodeListItem> items = getAssignableCodeListItems(parent, def);
+		List<CodeListItemProxy> result = new ArrayList<CodeListItemProxy>();
+		for (String code : codes) {
+			CodeListItem item = getCodeListItem(items, code);
+			if(item != null) {
+				CodeListItemProxy proxy = new CodeListItemProxy(item);
+				result.add(proxy);
 			}
-			return proxies;
-		} else {
-			return Collections.emptyList();
 		}
+		return result;
 	}
-	
 	
 	private User getUserInSession() {
 		SessionState sessionState = getSessionManager().getSessionState();
@@ -404,4 +394,101 @@ public class DataService {
 		return recordManager;
 	}
 
+	/**
+	 * Start of CodeList utility methods
+	 * 
+	 * TODO move them to a better location
+	 */
+	private List<CodeListItem> getAssignableCodeListItems(Entity parent, CodeAttributeDefinition def) {
+		CollectRecord record = getActiveRecord();
+		ModelVersion version = record.getVersion();
+		
+		List<CodeListItem> items = null;
+		if(StringUtils.isEmpty(def.getParentExpression())){
+			items = def.getList().getItems();
+		} else {
+			CodeAttribute parentCodeAttribute = getCodeParent(parent, def);
+			if(parentCodeAttribute!=null){
+				CodeListItem parentCodeListItem = parentCodeAttribute.getCodeListItem();
+				items = parentCodeListItem.getChildItems(); 
+			}
+		}
+		List<CodeListItem> result = new ArrayList<CodeListItem>();
+		if(items != null) {
+			for (CodeListItem item : items) {
+				if(version.isApplicable(item)) {
+					result.add(item);
+				}
+			}
+		}
+		return result;
+	}
+	
+	private CodeAttribute getCodeParent(Entity context, CodeAttributeDefinition def) {
+		try {
+			String parentExpr = def.getParentExpression();
+			ExpressionFactory expressionFactory = context.getRecord().getContext().getExpressionFactory();
+			ModelPathExpression expression = expressionFactory.createModelPathExpression(parentExpr);
+			Node<?> parentNode = expression.evaluate(context, null);
+			if (parentNode != null && parentNode instanceof CodeAttribute) {
+				return (CodeAttribute) parentNode;
+			}
+		} catch (Exception e) {
+			// return null;
+		}
+		return null;
+	}
+
+	private CodeListItem getCodeListItem(List<CodeListItem> siblings, String code) {
+		for (CodeListItem item : siblings) {
+			String itemCode = item.getCode();
+			String quotedCode = Pattern.quote(code);
+			Pattern pattern = Pattern.compile("^[0]*" + quotedCode + "$");
+			Matcher matcher = pattern.matcher(itemCode);
+			if(matcher.find()) {
+				return item;
+			}
+		}
+		return null;
+	}
+	
+	private Code parseCode(String value, List<CodeListItem> codeList, ModelVersion version) {
+		Code code = null;
+		String[] strings = value.split(":");
+		String codeStr = null;
+		String qualifier = null;
+		switch(strings.length) {
+			case 2:
+				qualifier = strings[1].trim();
+			case 1:
+				codeStr = strings[0].trim();
+				break;
+			default:
+				//TODO throw error: invalid parameter
+		}
+		CodeListItem codeListItem = getCodeListItem(codeList, codeStr);
+		if(codeListItem != null) {
+			code = new Code(codeListItem.getCode(), qualifier);
+		}
+		if (code == null) {
+			code = new Code(codeStr, qualifier);
+		}
+		return code;
+	}
+	
+	public List<Code> parseCodes(Entity parent, CodeAttributeDefinition def, String value, ModelVersion version) {
+		List<Code> result = new ArrayList<Code>();
+		List<CodeListItem> items = getAssignableCodeListItems(parent, def);
+		StringTokenizer st = new StringTokenizer(value, ",");
+		while (st.hasMoreTokens()) {
+			String token = st.nextToken();
+			Code code = parseCode(token, items, version);
+			if(code != null) {
+				result.add(code);
+			} else {
+				//TODO throw exception
+			}
+		}
+		return result;
+	}
 }

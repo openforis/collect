@@ -100,6 +100,9 @@ package org.openforis.collect.ui
 						REPLACE_BLANKS_WITH_DASH_MENU_ITEM, 
 						REPLACE_BLANKS_WITH_STAR_MENU_ITEM
 					);
+					if( !entityDef.enumerated) {
+						items.push(DELETE_ENTITY_MENU_ITEM);
+					}
 				}
 			}
 			cm.customItems = items;
@@ -135,14 +138,16 @@ package org.openforis.collect.ui
 					case DELETE_ATTRIBUTE_MENU_ITEM:
 						AlertUtil.showConfirm("edit.confirmDeleteAttribute", null, null, performDeleteAttribute);
 						break;
+					case DELETE_ENTITY_MENU_ITEM:
+						AlertUtil.showConfirm("edit.confirmDeleteEntity", null, null, performDeleteEntity);
+						break;
 				}
 			}
 		}
 		
 		protected static function performDeleteAttribute():void {
-			var name:String = currentInputField.attributeDefinition.name;
-			var req:UpdateRequest = new UpdateRequest();
 			var def:AttributeDefinitionProxy = currentInputField.attributeDefinition;
+			var req:UpdateRequest = new UpdateRequest();
 			req.parentEntityId = currentInputField.parentEntity.id;
 			req.nodeName = def.name;
 			req.nodeId = currentInputField.attribute.id;
@@ -152,16 +157,28 @@ package org.openforis.collect.ui
 			ClientFactory.dataClient.updateActiveRecord(responder, req);
 		}
 		
+		protected static function performDeleteEntity():void {
+			var def:AttributeDefinitionProxy = currentInputField.attributeDefinition;
+			var name:String = def.parent.name;
+			var req:UpdateRequest = new UpdateRequest();
+			req.parentEntityId = currentInputField.parentEntity.parentId;
+			req.nodeName = name;
+			req.nodeId = currentInputField.attribute.parentId;
+			req.method = UpdateRequest$Method.DELETE;
+			
+			var responder:AsyncResponder = new AsyncResponder(updateFieldResultHandler, null);
+			ClientFactory.dataClient.updateActiveRecord(responder, req);
+		}
+		
 		public static function setReasonBlankInChildren(entity:EntityProxy, symbol:AttributeSymbol):void {
-			var children:ArrayCollection = entity.getChildren() as ArrayCollection;
-			for each (var child:NodeProxy in children) {
-				if(child is AttributeProxy) {
-					var a:AttributeProxy = AttributeProxy(child);
-					if(a.empty) {
-						changeSymbol(entity, a.id, a.name, symbol);
-					}
-				}
-			}
+			var req:UpdateRequest = new UpdateRequest();
+			req.parentEntityId = entity.parentId;
+			req.nodeName = entity.name;
+			req.symbol = symbol;
+			req.nodeId = entity.id;
+			req.method = UpdateRequest$Method.UPDATE;
+			var responder:AsyncResponder = new AsyncResponder(updateFieldResultHandler, null);
+			ClientFactory.dataClient.updateActiveRecord(responder, req);
 		}
 		
 		public static function changeSymbol(parentEntity:EntityProxy, attributeId:Number, attributeName:String, symbol:AttributeSymbol, remarks:String = null):void {

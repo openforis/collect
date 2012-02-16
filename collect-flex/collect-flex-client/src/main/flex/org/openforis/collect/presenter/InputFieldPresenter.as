@@ -207,16 +207,13 @@ package org.openforis.collect.presenter {
 		protected function updateView():void {
 			//update textInput in view (generic text value)
 			if(_view.attributeDefinition != null) {
-				var textInput:TextInput = _view.textInput as TextInput;
-				if(textInput != null) {
-					var text:String = getTextValue();
-					textInput.text = text;
-					
-					if(_view.attribute != null) {
-						var a:AttributeProxy = _view.attribute;
-						if(StringUtil.isNotBlank(a.remarks)) {
-							
-						}
+				var text:String = getTextValue();
+				_view.text = text;
+				if(_view.attribute != null) {
+					var a:AttributeProxy = _view.attribute;
+					//TODO remarks
+					if(StringUtil.isNotBlank(a.remarks)) {
+						
 					}
 				}
 				_view.contextMenu = ContextMenuBuilder.buildContextMenu(_view);

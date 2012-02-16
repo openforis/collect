@@ -56,7 +56,7 @@
 							
 							override protected function createChildren():void {
 								super.createChildren();
-								var inputField:InputField = UIBuilder.getInputField(outerDocument.attributeDefinition);
+								var inputField:InputField = UIBuilder.getInputField(outerDocument.attributeDefinition, true);
 								BindingUtils.bindProperty(inputField, "parentEntity", outerDocument, "parentEntity");
 								BindingUtils.bindProperty(inputField, "attribute", this, "attribute");
 								addElement(inputField);

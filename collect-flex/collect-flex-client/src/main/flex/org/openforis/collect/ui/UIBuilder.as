@@ -42,6 +42,7 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.ui.component.input.CodeInputField;
 	import org.openforis.collect.ui.component.input.CoordinateInputField;
 	import org.openforis.collect.ui.component.input.DateInputField;
+	import org.openforis.collect.ui.component.input.FixedCodeInputField;
 	import org.openforis.collect.ui.component.input.InputField;
 	import org.openforis.collect.ui.component.input.MemoInputField;
 	import org.openforis.collect.ui.component.input.NumericInputField;
@@ -147,10 +148,10 @@ package org.openforis.collect.ui {
 			column = getGridColumn(Message.get("list.warnings"), "warnings", 100, RecordSummaryDataGrid.numberLabelFunction);
 			columns.addItem(column);
 			//creation date column
-			column = getGridColumn(Message.get("list.creationDate"), "creationDate", 150, RecordSummaryDataGrid.dateLabelFunction);
+			column = getGridColumn(Message.get("list.creationDate"), "creationDate", 150, RecordSummaryDataGrid.dateTimeLabelFunction);
 			columns.addItem(column);
 			//date modified column
-			column = getGridColumn(Message.get("list.modifiedDate"), "modifiedDate", 150, RecordSummaryDataGrid.dateLabelFunction);
+			column = getGridColumn(Message.get("list.modifiedDate"), "modifiedDate", 150, RecordSummaryDataGrid.dateTimeLabelFunction);
 			columns.addItem(column);
 			return columns;
 		}
@@ -252,7 +253,12 @@ package org.openforis.collect.ui {
 			} else if(def is TimeAttributeDefinitionProxy) {
 				inputField = new TimeInputField();
 			} else if(def is CodeAttributeDefinitionProxy) {
-				inputField = new CodeInputField();
+				var codeDef:CodeAttributeDefinitionProxy = CodeAttributeDefinitionProxy(def);
+				if(isInDataGroup && codeDef.parent.enumerated && codeDef.key) {
+					inputField = new FixedCodeInputField();
+				} else {
+					inputField = new CodeInputField();
+				}
 			} else if(def is NumericAttributeDefinitionProxy) {
 				inputField = new NumericInputField();
 			} else if(def is RangeAttributeDefinitionProxy) {

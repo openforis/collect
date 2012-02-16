@@ -11,7 +11,6 @@ import javax.xml.namespace.QName;
 
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
-import org.openforis.collect.model.ModelVersionUtil;
 import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.AccessDeniedException;
 import org.openforis.collect.persistence.DuplicateIdException;
@@ -23,6 +22,8 @@ import org.openforis.collect.persistence.RecordLockedException;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.BooleanAttributeDefinition;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
+import org.openforis.idm.metamodel.CodeList;
+import org.openforis.idm.metamodel.CodeListItem;
 import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
 import org.openforis.idm.metamodel.DateAttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
@@ -202,12 +203,9 @@ public class RecordManager implements RecordContext {
 	
 	
 	
-	@SuppressWarnings("unchecked")
-	public List<Attribute<?, ?>> updateAttributes(Entity parentEntity, Attribute<?, ?> node, Object value, Character symbol, String remarks) {
+	public List<Attribute<?, ?>> updateAttributes(Entity parentEntity, AttributeDefinition def, List<?> values, Character symbol, String remarks) {
 		List<Attribute<?, ?>> result;
-		Attribute<?, ?> attribute = (Attribute<?, ?>) node;
-		AttributeDefinition def = (AttributeDefinition) attribute.getDefinition();
-		if(attribute instanceof CodeAttribute && def.isMultiple()) {
+		if(def.isMultiple()) {
 			String name = def.getName();
 			//remove old attributes
 			int count = parentEntity.getCount(def.getName());
@@ -215,48 +213,39 @@ public class RecordManager implements RecordContext {
 				parentEntity.remove(name, i);
 			}
 			//add new attributes
-			result = addAttributes(parentEntity, def, value, symbol, remarks);
+			result = addAttributes(parentEntity, def, values, symbol, remarks);
 		} else {
-			updateAttribute(parentEntity, (Attribute<?, Object>) attribute, value, symbol, remarks);
-			result = new ArrayList<Attribute<?,?>>();
-			result.add(attribute);
+			throw new RuntimeException("Multiple attribute expected");
 		}
 		return result;
 	}
 
-	public List<Attribute<?, ?>> addAttributes(Entity parentEntity, AttributeDefinition def, Object value, Character symbol, String remarks) {
+	public List<Attribute<?, ?>> addAttributes(Entity parentEntity, AttributeDefinition def, List<?> values, Character symbol, String remarks) {
 		List<Attribute<?, ?>> result = new ArrayList<Attribute<?,?>>();
-		if(value instanceof List) {
-			List<?> values = (List<?>) value;
+		if(values != null) {
 			for (Object v : values) {
 				Attribute<?, ?> attribute = addAttribute(parentEntity, def, v, symbol, remarks);
 				result.add(attribute);
 			}
 		} else {
-			Attribute<?, ?> attribute = addAttribute(parentEntity,  def, value, symbol, remarks);
+			Attribute<?, ?> attribute = addAttribute(parentEntity, def, null, symbol, remarks);
 			result.add(attribute);
 		}
 		return result;
 	}
 	
-	private Attribute<?, ?> updateAttribute(Entity parentEntity, Attribute<?, Object> attribute, Object value, Character symbol, String remarks) {
-		attribute.setSymbol(symbol);
-		attribute.setRemarks(remarks);
-		attribute.setValue(value);
-		return attribute;
-	}
-	
 	public Entity addEntity(Entity parentEntity, String nodeName, ModelVersion version) {
-		Entity node = parentEntity.addEntity(nodeName);
-		addEmptyAttributes(node, version);
-		return node;
+		Entity entity = parentEntity.addEntity(nodeName);
+		addEmptyAttributes(entity, version);
+		addEmptyEnumeratedEntities(entity, version);
+		return entity;
 	}
 	
 	public void addEmptyAttributes(Entity entity, ModelVersion version) {
 		EntityDefinition entityDef = entity.getDefinition();
 		List<NodeDefinition> childDefinitions = entityDef.getChildDefinitions();
 		for (NodeDefinition nodeDef : childDefinitions) {
-			if(ModelVersionUtil.isInVersion(nodeDef, version)) {
+			if(version.isApplicable(nodeDef)) {
 				String name = nodeDef.getName();
 				if(entity.getCount(name) == 0) {
 					if(nodeDef instanceof AttributeDefinition) {
@@ -268,8 +257,67 @@ public class RecordManager implements RecordContext {
 			}
 		}
 	}
-
 	
+	public void addEmptyEnumeratedEntities(Entity entity, ModelVersion version) {
+		EntityDefinition entityDef = entity.getDefinition();
+		List<NodeDefinition> childDefinitions = entityDef.getChildDefinitions();
+		for (NodeDefinition childDef : childDefinitions) {
+			if(childDef instanceof EntityDefinition && version.isApplicable(childDef)) {
+				EntityDefinition childEntityDef = (EntityDefinition) childDef;
+				CodeAttributeDefinition codeDef = getEnumeratingAttribute(childEntityDef, version);
+				if(codeDef != null) {
+					CodeList list = codeDef.getList();
+					List<CodeListItem> items = list.getItems();
+					for (CodeListItem item : items) {
+						if(version.isApplicable(item)) {
+							String code = item.getCode();
+							if(! hasEnumeratedEntity(entity, childEntityDef, codeDef, code)) {
+								Entity addedEntity = addEntity(entity, childEntityDef.getName(), version);
+								//there will be an empty CodeAttribute after the adding of the new entity
+								//set the value into this node
+								CodeAttribute addedCode = (CodeAttribute) addedEntity.get(codeDef.getName(), 0);
+								addedCode.setValue(new Code(code));
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	private CodeAttributeDefinition getEnumeratingAttribute(EntityDefinition entity, ModelVersion version) {
+		List<NodeDefinition> childDefinitions = entity.getChildDefinitions();
+		for (NodeDefinition nodeDef : childDefinitions) {
+			if(nodeDef instanceof CodeAttributeDefinition && version.isApplicable(nodeDef)) {
+				CodeAttributeDefinition codeDef = (CodeAttributeDefinition) nodeDef;
+				if(codeDef.isKey() && codeDef.getList() != null) {
+					return codeDef;
+				}
+			}
+		}
+		return null;
+	}
+	
+	private boolean hasEnumeratedEntity(Entity parentEntity, EntityDefinition entity, CodeAttributeDefinition code, String value) {
+		List<Node<?>> children = parentEntity.getAll(entity.getName());
+		for (Node<?> node : children) {
+			Entity child = (Entity) node;
+			Code fixedValue = getFixedCode(child, code);
+			if(fixedValue != null && fixedValue.getCode().equals(value)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	private Code getFixedCode(Entity entity, CodeAttributeDefinition def) {
+		Node<?> node = entity.get(def.getName(), 0);
+		if(node != null) {
+			return ((CodeAttribute)node).getValue();
+		} else {
+			return null;
+		}
+	}
 	
 	/**
 	 * Returns first level entity definitions of the passed root entity that have the attribute countInSummaryList set to true

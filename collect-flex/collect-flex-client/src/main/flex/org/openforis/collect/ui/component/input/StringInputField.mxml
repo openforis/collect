@@ -5,12 +5,6 @@
 				  xmlns:input="org.openforis.collect.ui.component.input.*" 
 				  >
 	
-	<fx:Declarations>
-		<!-- Place non-visual elements (e.g., services, value objects) here -->
-	</fx:Declarations>
-	
-	<input:TextInput 
-				id="textInput" 
-				width="100%" />
+	<input:TextInput  id="textInput" width="100%" />
 	
 </input:InputField>

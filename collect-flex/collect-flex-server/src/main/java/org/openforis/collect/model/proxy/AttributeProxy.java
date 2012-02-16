@@ -37,7 +37,7 @@ public class AttributeProxy extends NodeProxy {
 			} else if(val instanceof Date) {
 				return new DateProxy((Date) val);
 			} else if(val instanceof TaxonOccurence) {
-				return new TaxonProxy((TaxonOccurence) val);
+				return new TaxonOccurrenceProxy((TaxonOccurence) val);
 			} else if(val instanceof Time) {
 				return new TimeProxy((Time) val);
 			} else{

@@ -25,7 +25,8 @@ package org.openforis.collect.client {
 		private var _getRecordSummariesOperation:Operation;
 		private var _loadRecordOperation:Operation;
 		private var _clearActiveRecordOperation:Operation;
-		private var _findCodeListOperation:Operation;
+		private var _getAssignableCodeListItemsOperation:Operation;
+		private var _findAssignableCodeListItemsOperation:Operation;
 		
 		public function DataClient() {
 			super("dataService");
@@ -39,7 +40,8 @@ package org.openforis.collect.client {
 			this._getRecordSummariesOperation = getOperation("getRecordSummaries");
 			this._loadRecordOperation = getOperation("loadRecord");
 			this._clearActiveRecordOperation = getOperation("clearActiveRecord");
-			this._findCodeListOperation = getOperation("findCodeList");
+			this._getAssignableCodeListItemsOperation = getOperation("getAssignableCodeListItems");
+			this._findAssignableCodeListItemsOperation = getOperation("findAssignableCodeListItems", CONCURRENCY_MULTIPLE);
 		}
 		
 		public function getRecordCount(responder:IResponder):void {
@@ -81,8 +83,13 @@ package org.openforis.collect.client {
 			this._updateQueueProcessor.appendOperation(responder, this._updateActiveRecordOperation, request);
 		}
 		
-		public function findCodeList(responder:IResponder, parentEntityId:int, attribute:String):void {
-			var token:AsyncToken = this._findCodeListOperation.send(parentEntityId, attribute);
+		public function getAssignableCodeListItems(responder:IResponder, parentEntityId:int, attribute:String):void {
+			var token:AsyncToken = this._getAssignableCodeListItemsOperation.send(parentEntityId, attribute);
+			token.addResponder(responder);
+		}
+		
+		public function findAssignableCodeListItems(responder:IResponder, parentEntityId:int, attribute:String, codes:Array):void {
+			var token:AsyncToken = this._findAssignableCodeListItemsOperation.send(parentEntityId, attribute, codes);
 			token.addResponder(responder);
 		}
 		

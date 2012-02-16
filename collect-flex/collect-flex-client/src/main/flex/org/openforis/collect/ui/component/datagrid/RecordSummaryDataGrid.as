@@ -35,11 +35,11 @@ package org.openforis.collect.ui.component.datagrid
 			selectedByCheckBox.addAll(dataProvider);
 		}
 		
-		public static function dateLabelFunction(item:Object,column:GridColumn):String {
+		public static function dateTimeLabelFunction(item:Object,column:GridColumn):String {
 			if(item.hasOwnProperty(column.dataField)) {
 				var date:Date = item[column.dataField];
 				var dateFormatter:DateTimeFormatter = new DateTimeFormatter();
-				dateFormatter.dateTimePattern = "dd-MM-yyyy hh:mm:ss";
+				dateFormatter.dateTimePattern = "dd-MM-yyyy HH:mm:ss";
 				return dateFormatter.format(date);
 			} else {
 				return null;

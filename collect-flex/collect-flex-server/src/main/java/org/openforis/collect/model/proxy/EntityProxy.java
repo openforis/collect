@@ -4,6 +4,7 @@
 package org.openforis.collect.model.proxy;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,7 +29,6 @@ public class EntityProxy extends NodeProxy {
 		this.entity = entity;
 	}
 	
-	@SuppressWarnings("rawtypes")
 	@ExternalizedProperty
 	public Map<String, List<NodeProxy>> getChildrenByName() {
 		Map<String, List<NodeProxy>> result = new HashMap<String, List<NodeProxy>>();
@@ -36,12 +36,12 @@ public class EntityProxy extends NodeProxy {
 		List<NodeDefinition> childDefinitions = definition.getChildDefinitions();
 		for (NodeDefinition childDefinition : childDefinitions) {
 			String name = childDefinition.getName();
-			List<Node<? extends NodeDefinition>> childrenByName = this.entity.getAll(name);
+			List<Node<?>> childrenByName = this.entity.getAll(name);
 			if(childrenByName != null) {
 				List<NodeProxy> childrenByNameProxies = new ArrayList<NodeProxy>();
-				for (Node<? extends NodeDefinition> childNode : childrenByName) {
+				for (Node<?> childNode : childrenByName) {
 					if(childNode instanceof Attribute) {
-						NodeProxy attributeProxy = new AttributeProxy((Attribute) childNode);
+						NodeProxy attributeProxy = new AttributeProxy((Attribute<?, ?>) childNode);
 						childrenByNameProxies.add(attributeProxy);
 					} else if(childNode instanceof Entity) {
 						EntityProxy entityProxy = new EntityProxy((Entity) childNode);
@@ -54,5 +54,14 @@ public class EntityProxy extends NodeProxy {
 		return result;
 	}
 	
+	@ExternalizedProperty
+	public List<NodeProxy> getChildren() {
+		List<NodeProxy> result = new ArrayList<NodeProxy>();
+		Collection<List<NodeProxy>> values = getChildrenByName().values();
+		for (List<NodeProxy> list : values) {
+			result.addAll(list);
+		}
+		return result;
+	}
 	
 }

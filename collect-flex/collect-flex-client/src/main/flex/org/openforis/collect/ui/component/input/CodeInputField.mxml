@@ -11,7 +11,11 @@
 			import org.openforis.collect.presenter.CodeInputFieldPresenter;
 			import org.openforis.collect.ui.Images;
 
+			public static const STATE_DEFAULT:String = "default";
+			public static const STATE_DESCRIPTION_VISIBLE:String = "descriptionVisible";
+			
 			private var _attributes:IList;
+			private var _description:String;
 			
 			override protected function initPresenter():void {
 				this.presenter = new CodeInputFieldPresenter(this);
@@ -25,6 +29,17 @@
 			public function set attributes(value:IList):void {
 				_attributes = value;
 			}
+			
+			[Bindable]
+			public function get description():String {
+				return _description;
+			}
+			
+			public function set description(value:String):void {
+				_description = value;
+			}
+			
+			
 		]]>
 	</fx:Script>
 	
@@ -44,7 +59,7 @@
 		
 		<s:Image id="openImage" source="{Images.EDIT}" useHandCursor="true" buttonMode="true" />
 		
-		<s:Label id="descriptionLabel" includeIn="descriptionVisible" />
+		<s:Label id="descriptionLabel" includeIn="descriptionVisible" text="{description}" />
 	</s:HGroup>
 	
 </input:InputField>

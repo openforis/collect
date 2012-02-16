@@ -15,14 +15,19 @@ package org.openforis.collect.presenter {
 	import mx.rpc.events.ResultEvent;
 	import mx.utils.StringUtil;
 	
+	import org.openforis.collect.Application;
 	import org.openforis.collect.event.TaxonInputFieldEvent;
+	import org.openforis.collect.metamodel.proxy.SpatialReferenceSystemProxy;
 	import org.openforis.collect.model.proxy.AttributeProxy;
+	import org.openforis.collect.model.proxy.TaxonOccurrenceProxy;
 	import org.openforis.collect.model.proxy.TaxonProxy;
+	import org.openforis.collect.model.proxy.TaxonVernacularNameProxy;
 	import org.openforis.collect.ui.component.detail.TaxonAttributeFormItem;
 	import org.openforis.collect.ui.component.input.InputField;
 	import org.openforis.collect.ui.component.input.TaxonAutoCompletePopUp;
 	import org.openforis.collect.ui.component.input.TaxonInputField;
 	import org.openforis.collect.ui.component.input.TaxonSearchPopUp;
+	import org.openforis.collect.util.CollectionUtil;
 	import org.openforis.collect.util.PopUpUtil;
 	import org.openforis.collect.util.UIUtil;
 	
@@ -91,12 +96,17 @@ package org.openforis.collect.presenter {
 			if(attribute != null) {
 				var value:Object = attribute.value;
 				if(value is TaxonProxy) {
-					var taxon:TaxonProxy = TaxonProxy(value);
-					var srs:Object = null;
-					view.codeTextInput.text = String(taxon.code)
-					view.scientificNameTextInput.text = String(taxon.scientificName);
-					view.vernacularNameTextInput.text = String(taxon.vernacularName);
-					view.vernacularLangTextInput.text = String(taxon.languageVariant);
+					var occurrence:TaxonOccurrenceProxy = TaxonOccurrenceProxy(value);
+					var taxon:TaxonProxy = occurrence.taxon;
+					var vernacularName:TaxonVernacularNameProxy = occurrence.vernacularName;
+					if(taxon != null) {
+						view.codeTextInput.text = taxon.code;
+						view.scientificNameTextInput.text = taxon.scientificName;
+					}
+					if(vernacularName != null) {
+						view.vernacularNameTextInput.text = vernacularName.vernacularName;
+						view.vernacularLangTextInput.text = vernacularName.languageVariety;
+					}
 				}
 			}
 		}

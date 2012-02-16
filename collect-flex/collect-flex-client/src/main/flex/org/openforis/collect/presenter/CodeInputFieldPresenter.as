@@ -8,7 +8,9 @@ package org.openforis.collect.presenter {
 	import mx.core.FlexGlobals;
 	import mx.events.CloseEvent;
 	import mx.managers.PopUpManager;
+	import mx.messaging.management.Attribute;
 	import mx.rpc.AsyncResponder;
+	import mx.rpc.IResponder;
 	import mx.rpc.events.ResultEvent;
 	
 	import org.openforis.collect.client.ClientFactory;
@@ -21,6 +23,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.remoting.service.UpdateRequest$Method;
 	import org.openforis.collect.ui.component.input.CodeInputField;
 	import org.openforis.collect.ui.component.input.TextInput;
+	import org.openforis.collect.util.ArrayUtil;
 	import org.openforis.collect.util.CollectionUtil;
 	import org.openforis.collect.util.StringUtil;
 	
@@ -32,6 +35,7 @@ package org.openforis.collect.presenter {
 	public class CodeInputFieldPresenter extends InputFieldPresenter {
 		
 		private var _view:CodeInputField;
+		private var _items:IList;
 		
 		public function CodeInputFieldPresenter(inputField:CodeInputField) {
 			this._view = inputField;
@@ -76,7 +80,7 @@ package org.openforis.collect.presenter {
 			var codeAttributeDef:CodeAttributeDefinitionProxy = _view.attributeDefinition as CodeAttributeDefinitionProxy;
 			var attribute:String = codeAttributeDef.name;
 			var parentEntityId:int = _view.parentEntity.id;
-			ClientFactory.dataClient.findCodeList(new AsyncResponder(loadListDialogDataResultHandler, faultHandler), parentEntityId, attribute);
+			ClientFactory.dataClient.getAssignableCodeListItems(new AsyncResponder(loadListDialogDataResultHandler, faultHandler), parentEntityId, attribute);
 		}
 		
 		protected function loadListDialogDataResultHandler(event:ResultEvent, token:Object = null):void {
@@ -178,5 +182,48 @@ package org.openforis.collect.presenter {
 			ClientFactory.dataClient.updateActiveRecord(responder, req);
 		}
 		
+		protected function updateDescription():void {
+			if(_view.attribute != null || _view.attributes != null) {
+				var codes:Array = [];
+				var attribute:AttributeProxy;
+				if(_view.attributeDefinition.multiple) {
+					for each(attribute in _view.attributes) {
+						if( attribute.value != null && StringUtil.isNotBlank(attribute.value.code)) {
+							codes.push(attribute.value.code);
+						}
+					}
+				} else {
+					attribute = _view.attribute;
+					if(attribute != null && attribute.value != null && StringUtil.isNotBlank(attribute.value.code)) {
+						codes.push(attribute.value.code);
+					}
+				}
+				if(ArrayUtil.isNotEmpty(codes)) {
+					var parentEntityId:int = _view.parentEntity.id;
+					var name:String = _view.attributeDefinition.name;
+					var code:String = (_view.attribute.value as CodeProxy).code;
+					var responder:IResponder = new AsyncResponder(findItemsResultHandler, faultHandler);
+					
+					ClientFactory.dataClient.findAssignableCodeListItems(responder, parentEntityId, name, codes);
+				}
+			}
+		}
+		
+		protected function findItemsResultHandler(event:ResultEvent, token:Object = null):void {
+			_items = event.result as IList;
+			_view.description = getDescription();
+		}
+		
+		protected function getDescription():String {
+			var description:String = null;
+			if(CollectionUtil.isNotEmpty(_items)) {
+				var parts:Array = new Array();
+				for each (var item:CodeListItemProxy in _items) {
+					parts.push(item.getLabelText());
+				}
+				description = StringUtil.concat("\n", parts);
+			}
+			return description;
+		}
 	}
 }

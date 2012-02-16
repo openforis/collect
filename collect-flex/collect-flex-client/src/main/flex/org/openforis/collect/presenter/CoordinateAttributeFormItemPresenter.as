@@ -10,6 +10,8 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.model.proxy.AttributeProxy;
 	import org.openforis.collect.model.proxy.CoordinateProxy;
 	import org.openforis.collect.ui.component.detail.CoordinateAttributeFormItem;
+	import org.openforis.collect.util.CollectionUtil;
+	import org.openforis.collect.util.StringUtil;
 	import org.openforis.collect.util.UIUtil;
 	
 	/**
@@ -52,10 +54,10 @@ package org.openforis.collect.presenter {
 				var value:Object = attribute.value;
 				if(value is CoordinateProxy) {
 					var coordinate:CoordinateProxy = CoordinateProxy(value);
-					var srs:Object = null;
+					var srs:Object = CollectionUtil.getItem(Application.activeSurvey.spatialReferenceSystems, "id", coordinate.srsId);
 					view.srsDropDownList.selectedItem = srs;
-					view.xTextInput.text = String(coordinate.x);
-					view.yTextInput.text = String(coordinate.y);
+					view.xTextInput.text = StringUtil.nullToBlank(coordinate.x);
+					view.yTextInput.text = StringUtil.nullToBlank(coordinate.y);
 				}
 			}
 		}

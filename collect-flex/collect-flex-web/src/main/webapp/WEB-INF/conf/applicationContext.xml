@@ -102,8 +102,6 @@
 
 	<bean id="recordManager" class="org.openforis.collect.manager.RecordManager" init-method="init" />
 
-	<bean id="codeListManager" class="org.openforis.collect.manager.CodeListManager" />
-
 	<bean id="userManager" class="org.openforis.collect.manager.UserManager" />
 	
 	

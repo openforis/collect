@@ -9,7 +9,9 @@ import java.util.List;
 import javax.xml.namespace.QName;
 
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
+import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
+import org.openforis.idm.metamodel.NodeDefinition;
 
 /**
  * @author M. Togna
@@ -46,4 +48,21 @@ public class EntityDefinitionProxy extends NodeDefinitionProxy {
 		return annotation != null && Boolean.parseBoolean(annotation);
 	}
 
+	@ExternalizedProperty
+	public boolean isEnumerated() {
+		return entityDefinition.isMultiple() && hasEnumeratingCodeListAttribute();
+	}
+	
+	private boolean hasEnumeratingCodeListAttribute() {
+		List<NodeDefinition> childDefinitions = entityDefinition.getChildDefinitions();
+		for (NodeDefinition nodeDef : childDefinitions) {
+			if(nodeDef instanceof CodeAttributeDefinition) {
+				CodeAttributeDefinition codeDef = (CodeAttributeDefinition) nodeDef;
+				if(codeDef.isKey() && codeDef.getList() != null) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
 }
