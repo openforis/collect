@@ -6,9 +6,15 @@
  */
 
 package org.openforis.collect.model.proxy {
+	import org.openforis.collect.util.StringUtil;
 
     [Bindable]
     [RemoteClass(alias="org.openforis.collect.model.proxy.TimeProxy")]
     public class TimeProxy extends TimeProxyBase {
-    }
+		
+		public function toString():String {
+			return StringUtil.concat(":", hour, minute);
+		}
+		
+	}
 }
