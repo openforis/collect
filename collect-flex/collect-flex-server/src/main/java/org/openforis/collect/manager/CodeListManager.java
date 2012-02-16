@@ -9,33 +9,34 @@ import org.openforis.collect.model.ModelVersionUtil;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
-import org.openforis.idm.metamodel.IdmInterpretationError;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.model.Code;
 import org.openforis.idm.model.CodeAttribute;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.expression.ExpressionFactory;
-import org.openforis.idm.model.expression.InvalidPathException;
-import org.openforis.idm.model.expression.ModelPathExpression;
 import org.springframework.beans.factory.annotation.Autowired;
-
+/**
+ * 
+ * @author S. Ricci
+ *
+ */
+@Deprecated
 public class CodeListManager {
 	
 	@Autowired
 	private ExpressionFactory expressionFactory;
 	
-	public List<CodeListItem> findCodeList(Entity parentEntity, CodeAttributeDefinition def, ModelVersion version) {
-		CodeAttribute parent = findParent(parentEntity, def);
+	public List<CodeListItem> findCodeList(Entity context, CodeAttributeDefinition def, ModelVersion version) {
+		CodeAttribute codeParent = findParent(context, def);
 		List<CodeListItem> items;
-		if(parent == null) {
+		if(codeParent == null) {
 			//node is root
 			CodeList list = def.getList();
 			items = list.getItems();
 		} else {
-			Entity ancestorEntity = parent.getParent();
-			CodeAttributeDefinition parentDefinition = parent.getDefinition();
-			List<CodeListItem> codeList = findCodeList(ancestorEntity, parentDefinition, version);
-			Code parentCode = parent.getValue();
+			CodeAttributeDefinition parentDefinition = codeParent.getDefinition();
+			List<CodeListItem> codeList = findCodeList(codeParent.getParent(), parentDefinition, version);
+			Code parentCode = codeParent.getValue();
 			String parentCodeValue = parentCode.getCode();
 			CodeListItem parentItem = getCodeListItem(codeList, parentCodeValue);
 			items = parentItem.getChildItems();
@@ -58,23 +59,24 @@ public class CodeListManager {
 	 * @return
 	 */
 	private CodeAttribute findParent(Entity parentEntity, CodeAttributeDefinition def) {
-		String parentExpression = def.getParentExpression();
-		if(StringUtils.isNotBlank(parentExpression)) {
-			ModelPathExpression expression = expressionFactory.createModelPathExpression(parentExpression);
-			Object result;
-			try {
-				result = expression.evaluate(parentEntity);
-				if(result instanceof CodeAttribute) {
-					return (CodeAttribute) result;
-				} else {
-					throw new IdmInterpretationError("CodeAttribute exptected");
-				}
-			} catch (InvalidPathException e) {
-				throw new IdmInterpretationError("Error retrieving parent code", e);
-			}
-		} else {
-			return null;
-		}
+//		String parentExpression = def.getParentExpression();
+//		if(StringUtils.isNotBlank(parentExpression)) {
+//			ModelPathExpression expression = expressionFactory.createModelPathExpression(parentExpression);
+//			Object result;
+//			try {
+//				result = expression.evaluate(parentEntity);
+//				if(result instanceof CodeAttribute) {
+//					return (CodeAttribute) result;
+//				} else {
+//					throw new IdmInterpretationError("CodeAttribute exptected");
+//				}
+//			} catch (InvalidPathException e) {
+//				throw new IdmInterpretationError("Error retrieving parent code", e);
+//			}
+//		} else {
+//			return null;
+//		}
+		throw new UnsupportedOperationException();
 	}
 	
 	private CodeListItem getCodeListItem(List<CodeListItem> siblings, String code) {
