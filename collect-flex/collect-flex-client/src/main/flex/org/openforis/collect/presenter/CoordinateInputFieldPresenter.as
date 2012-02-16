@@ -48,7 +48,7 @@ package org.openforis.collect.presenter {
 			*/
 		}
 		
-		protected function createValue():* {
+		override protected function createValue():* {
 			var srs:SpatialReferenceSystemProxy = _view.srsDropDownList.selectedItem as SpatialReferenceSystemProxy;
 			var srsId:String = "";
 			if(srs != null) {
