@@ -19,7 +19,7 @@
 				if(!childrenAdded) {
 					super.createChildren();
 					
-					var inputField:InputField = UIBuilder.getInputField(attributeDefinition);
+					var inputField:InputField = UIBuilder.getInputField(attributeDefinition, isInDataGroup);
 					
 					BindingUtils.bindProperty(inputField, "parentEntity", this, "parentEntity");
 					BindingUtils.bindProperty(inputField, "attribute", this, "attribute");
@@ -29,6 +29,10 @@
 					}
 					
 					addElement(inputField);
+					if(inputField is CodeInputField) {
+						inputField.currentState = isInDataGroup ? CodeInputField.STATE_DEFAULT: CodeInputField.STATE_DESCRIPTION_VISIBLE;
+					}
+					
 					childrenAdded = true;
 				}
 			}

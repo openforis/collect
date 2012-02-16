@@ -38,7 +38,10 @@
 					addElement(headerLabel);
 					addElement(headers);
 					addElement(dataGroup);
-					addElement(addButton);
+					
+					if ( !entityDefinition.enumerated) {
+						addElement(addButton);
+					}
 
 					super.childrenAdded = true;
 				}
