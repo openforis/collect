@@ -33,17 +33,13 @@ package org.openforis.collect.model.proxy {
 		}
 		
 		public function getChildren(nodeName:String = null):IList {
-			var children:IList; 
+			var result:IList; 
 			if(nodeName == null) {
-				children = new ArrayCollection();
-				var values:ArrayCollection = childrenByName.values;
-				for each (var childList:IList in values) {
-					CollectionUtil.addAll(children, childList);
-				}
+				result = children;
 			} else {
-				children = childrenByName.get(nodeName);
+				result = childrenByName.get(nodeName);
 			}
-			return children;
+			return result;
 		}
 
 		public function getChild(nodeName:String, index:int):NodeProxy {
@@ -114,6 +110,13 @@ package org.openforis.collect.model.proxy {
 			if(index >= 0) {
 				children.removeItemAt(index);
 			}
+		}
+		
+		public function replaceChild(oldNode:NodeProxy, newNode:NodeProxy):void {
+			var name:String = oldNode.name;
+			var children:ArrayCollection = childrenByName.get(name);
+			var index:int = children.getItemIndex(oldNode);
+			children.setItemAt(newNode, index);
 		}
 		
 		public function getKeyLabel(entityDefinition:EntityDefinitionProxy):String {

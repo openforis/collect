@@ -32,17 +32,16 @@ package org.openforis.collect.model.proxy {
 						//add node
 						parentEntity.addChild(node);
 					} else {
-						//update node
-						var children:IList = parentEntity.getChildren(node.name);
-						var index:int = children.getItemIndex(oldNode);
-						children.removeItemAt(index);
-						children.addItemAt(node, index);
+						if(node.deleted) {
+							parentEntity.removeChild(oldNode);
+						} else {
+							parentEntity.replaceChild(oldNode, node);
+						}
 					}
 				} else {
 					throw new Error("Entity expected");
 				}
 			}
-			
 		}
     }
 }
