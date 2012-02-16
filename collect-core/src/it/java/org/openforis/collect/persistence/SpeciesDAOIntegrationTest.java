@@ -206,19 +206,6 @@ public class SpeciesDAOIntegrationTest {
 		return t2;
 	}
 
-	private void assertTaxonomyInserted(Taxonomy t) {
-		Taxonomy t2 = taxonomyDao.load(t.getId());
-		assertEquals(t.getId(), t2.getId());
-		assertEquals(t.getName(), t2.getName());
-	}
-
-	private Taxonomy insertTaxonomy(String name) {
-		Taxonomy t = new Taxonomy();
-		t.setName(name);
-		taxonomyDao.insert(t);
-		return t;
-	}
-
 	private void testUpdateAndLoadTaxonomy(Taxonomy t, String newName) {
 		// Update
 		Integer id = t.getId();
