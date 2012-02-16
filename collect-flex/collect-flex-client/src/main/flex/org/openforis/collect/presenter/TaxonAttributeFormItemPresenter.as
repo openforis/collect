@@ -12,12 +12,14 @@ package org.openforis.collect.presenter {
 	import mx.events.FlexMouseEvent;
 	import mx.managers.PopUpManager;
 	import mx.rpc.AsyncResponder;
+	import mx.rpc.IResponder;
 	import mx.rpc.events.FaultEvent;
 	import mx.rpc.events.ResultEvent;
 	import mx.utils.StringUtil;
 	
 	import org.openforis.collect.Application;
 	import org.openforis.collect.client.ClientFactory;
+	import org.openforis.collect.client.TaxonClient;
 	import org.openforis.collect.event.TaxonInputFieldEvent;
 	import org.openforis.collect.metamodel.proxy.SpatialReferenceSystemProxy;
 	import org.openforis.collect.model.proxy.AttributeProxy;
@@ -39,6 +41,10 @@ package org.openforis.collect.presenter {
 	 * */
 	public class TaxonAttributeFormItemPresenter extends AttributeFormItemPresenter {
 		
+		private static const MAX_RESULTS:int = 20;
+		private static const BY_CODE:String = "byCode";
+		private static const BY_SCIENTIFIC_NAME:String = "byScientificName";
+		
 		protected static var autoCompletePopUp:TaxonAutoCompletePopUp;
 		protected static var autoCompletePopUpOpen:Boolean = false;
 		protected static var searchPopUp:TaxonSearchPopUp;
@@ -50,7 +56,6 @@ package org.openforis.collect.presenter {
 		
 		public function TaxonAttributeFormItemPresenter(view:TaxonAttributeFormItem = null) {
 			super(view);
-			
 			updateView();
 		}
 		
@@ -115,23 +120,16 @@ package org.openforis.collect.presenter {
 			if(text.length < minCharsToStartAutoComplete) {
 				return;
 			}
-			var subElementName:String = getSubElementName(textInput);
-			showAutoCompletePopUp(subElementName, textInput);
-		}
-		
-		protected function getSubElementName(textInput:TextInput):String {
-			var subElementName:String = "id";
+			var searchType:String;
 			switch(textInput) {
 				case view.codeTextInput:
+					searchType = BY_CODE;
 					break;
 				case view.scientificNameTextInput:
-					break;
-				case view.vernacularNameTextInput:
-					break;
-				case view.vernacularLangTextInput:
+					searchType = BY_SCIENTIFIC_NAME;
 					break;
 			}
-			return subElementName;
+			showAutoCompletePopUp(searchType, textInput);
 		}
 		
 		protected function searchImageClickHandler(event:Event):void {
@@ -139,7 +137,7 @@ package org.openforis.collect.presenter {
 			showSearchPopUp();
 		}
 		
-		protected static function showAutoCompletePopUp(subElementName:String, textInput:TextInput, searchType:String = "contains"):void {
+		protected static function showAutoCompletePopUp(searchType:String, textInput:TextInput):void {
 			if(autoCompletePopUp == null) {
 				autoCompletePopUp = new TaxonAutoCompletePopUp();
 				autoCompletePopUp.addEventListener(FlexMouseEvent.MOUSE_DOWN_OUTSIDE, autoCompleteMouseDownOutsideHandler);
@@ -159,13 +157,17 @@ package org.openforis.collect.presenter {
 				autoCompletePopUpOpen = true;
 			}
 			
-			//ClientFactory.taxonClient
-			/*
-			var taxonomy:String = inputField.attribute.taxonomy;
-			var query:String = inputField.text;
-			search(taxonomy, query, subElementName, searchType);
-			*/
-			autoCompleteSearchResultHandler(null, null);
+			var client:TaxonClient = ClientFactory.taxonClient;
+			var searchText:String = textInput.text;
+			switch(searchType) {
+				case BY_CODE:
+					client.findByCode(autoCompleteSearchResponder, searchText, MAX_RESULTS);
+					break;
+				case BY_SCIENTIFIC_NAME:
+					client.findByScientificName(autoCompleteSearchResponder, searchText, MAX_RESULTS);
+					break;
+				default:
+			}
 		}
 		
 		protected static function showSearchPopUp():void {

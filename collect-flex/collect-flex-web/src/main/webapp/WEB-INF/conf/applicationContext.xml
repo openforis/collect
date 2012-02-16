@@ -140,6 +140,10 @@
     	<property name="dataSource" ref="dataSource"/>
 	</bean>
 	
+	<bean id="taxonDao" class="org.openforis.collect.persistence.TaxonDAO">
+    	<property name="dataSource" ref="dataSource"/>
+	</bean>
+	
 	<!-- <bean id="applicationDao" class="org.fao.openforis.collect.dao.xml.ApplicationDaoImpl"> -->
 	<!-- <property name="recordDao" ref="recordDao" /> -->
 	<!-- <property name="versionDao" ref="versionDao" /> -->

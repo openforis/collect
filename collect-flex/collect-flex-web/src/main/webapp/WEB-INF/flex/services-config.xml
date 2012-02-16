@@ -42,6 +42,14 @@
 		            <scope>application</scope>
 		        </properties>
 			</destination>
+			
+			<destination id="taxonService">
+		        <properties>
+		        	<factory>springFactory</factory>
+		            <source>taxonService</source>
+		            <scope>application</scope>
+		        </properties>
+			</destination>
         </service>
 
         <default-channels>

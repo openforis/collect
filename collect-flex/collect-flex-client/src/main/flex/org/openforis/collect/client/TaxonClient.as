@@ -11,30 +11,30 @@ package org.openforis.collect.client {
 	 * */
 	public class TaxonClient extends AbstractClient {
 		
-		private var _searchByCodeOperation:Operation;
-		private var _searchByScientificNameOperation:Operation;
-		private var _searchByVernacularNameOperation:Operation;
+		private var _findByCodeOperation:Operation;
+		private var _findByScientificNameOperation:Operation;
+		private var _findByVernacularNameOperation:Operation;
 		
 		public function TaxonClient() {
 			super("taxonService");
 			
-			_searchByCodeOperation = getOperation("searchByCode");
-			_searchByScientificNameOperation = getOperation("searchByScientificName");
-			_searchByVernacularNameOperation = getOperation("searchByVernacularName");
+			_findByCodeOperation = getOperation("findByCode");
+			_findByScientificNameOperation = getOperation("findByScientificName");
+			_findByVernacularNameOperation = getOperation("findByVernacularName");
 		}
 		
-		public function serachByCode(responder:IResponder, value:String):void {
-			var token:AsyncToken = this._searchByCodeOperation.send(value);
+		public function findByCode(responder:IResponder, value:String, maxResults:int):void {
+			var token:AsyncToken = this._findByCodeOperation.send(value, maxResults);
 			token.addResponder(responder);
 		}
 		
-		public function serachByScientificName(responder:IResponder, value:String):void {
-			var token:AsyncToken = this._searchByScientificNameOperation.send(value);
+		public function findByScientificName(responder:IResponder, value:String, maxResults:int):void {
+			var token:AsyncToken = this._findByScientificNameOperation.send(value, maxResults);
 			token.addResponder(responder);
 		}
 		
-		public function serachByVernacularName(responder:IResponder, value:String):void {
-			var token:AsyncToken = this._searchByVernacularNameOperation.send(value);
+		public function findByVernacularName(responder:IResponder, value:String, maxResults:int):void {
+			var token:AsyncToken = this._findByVernacularNameOperation.send(value, maxResults);
 			token.addResponder(responder);
 		}
 
