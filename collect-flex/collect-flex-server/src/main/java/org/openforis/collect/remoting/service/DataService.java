@@ -442,6 +442,9 @@ public class DataService {
 	private CodeListItem getCodeListItem(List<CodeListItem> siblings, String code) {
 		for (CodeListItem item : siblings) {
 			String itemCode = item.getCode();
+			code = code.trim();
+			//remove initial zeros
+			code = code.replaceFirst("^0+", "");
 			String quotedCode = Pattern.quote(code);
 			Pattern pattern = Pattern.compile("^[0]*" + quotedCode + "$");
 			Matcher matcher = pattern.matcher(itemCode);
