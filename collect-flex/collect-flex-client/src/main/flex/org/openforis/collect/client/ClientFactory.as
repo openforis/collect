@@ -9,6 +9,7 @@ package org.openforis.collect.client {
 		private static var _modelClient:ModelClient;
 		private static var _sessionClient:SessionClient;
 		private static var _dataClient:DataClient;
+		private static var _taxonClient:TaxonClient;
 		
 		public function ClientFactory() {
 		}
@@ -32,6 +33,13 @@ package org.openforis.collect.client {
 				_modelClient = new ModelClient();
 			}
 			return _modelClient;
+		}
+		
+		public static function get taxonClient():TaxonClient{
+			if(_taxonClient == null){
+				_taxonClient = new TaxonClient();
+			}
+			return _taxonClient;
 		}
 		
 	}
