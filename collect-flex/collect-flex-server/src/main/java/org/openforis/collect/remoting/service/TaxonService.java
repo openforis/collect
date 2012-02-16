@@ -18,7 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class TaxonService {
 
 	@Autowired
-	private TaxonDAO taxonDao;
+	private TaxonDAO taxonDAO;
 	
 	private enum SearchType {
 		BY_CODE,
@@ -47,10 +47,10 @@ public class TaxonService {
 		List<Taxon> list = null;
 		switch(type) {
 			case BY_CODE:
-				list = taxonDao.findByCode(searchString, maxResults);
+				list = taxonDAO.findByCode(searchString, maxResults);
 				break;
 			case BY_SCIENTIFIC_NAME:
-				list = taxonDao.findByScientificName(searchString, maxResults);
+				list = taxonDAO.findByScientificName(searchString, maxResults);
 				break;
 		}
 		List<TaxonOccurrenceProxy> result = new ArrayList<TaxonOccurrenceProxy>();
