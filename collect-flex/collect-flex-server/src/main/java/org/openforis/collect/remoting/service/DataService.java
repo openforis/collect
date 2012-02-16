@@ -112,7 +112,7 @@ public class DataService {
 	}
 
 	@Transactional
-	public RecordProxy createNewRecord(String rootEntityName, String versionName) throws MultipleEditException, AccessDeniedException, RecordLockedException {
+	public RecordProxy createRecord(String rootEntityName, String versionName) throws MultipleEditException, AccessDeniedException, RecordLockedException {
 		SessionState sessionState = sessionManager.getSessionState();
 		User user = sessionState.getUser();
 		Survey activeSurvey = sessionState.getActiveSurvey();
@@ -141,6 +141,8 @@ public class DataService {
 	public void saveActiveRecord() {
 		SessionState sessionState = sessionManager.getSessionState();
 		CollectRecord record = sessionState.getActiveRecord();
+		record.setModifiedDate(new java.util.Date());
+		record.setModifiedBy(sessionState.getUser());
 		recordManager.save(record);
 		sessionState.setActiveRecordState(RecordState.SAVED);
 	}
