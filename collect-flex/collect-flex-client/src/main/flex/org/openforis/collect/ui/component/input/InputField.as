@@ -70,7 +70,8 @@ package org.openforis.collect.ui.component.input {
 		 * the attribute's value is null
 		 */
 		public function isEmpty():Boolean {
-			return attribute == null || (attribute.value == null && attribute.symbol == null);
+			return attribute == null || attribute.value == null || 
+				(StringUtil.isBlank(attribute.value.toString()) && attribute.symbol == null);
 		}
 		
 		public function set relevant(value:Boolean):void {
@@ -86,7 +87,9 @@ package org.openforis.collect.ui.component.input {
 		}
 		
 		public function set text(value:String):void {
-			_textInput["text"] = value;
+			if(_textInput != null && _textInput.hasOwnProperty("text")) {
+				_textInput["text"] = value;
+			}
 		}
 		
 		public function get textInput():UIComponent {

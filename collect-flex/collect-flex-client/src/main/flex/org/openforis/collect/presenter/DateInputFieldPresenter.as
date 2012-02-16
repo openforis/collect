@@ -121,15 +121,16 @@ package org.openforis.collect.presenter {
 		}
 		
 		override protected function updateView():void {
+			super.updateView();
 			_view.year.text = _view.month.text = _view.day.text = "";
 			if(_view.attribute != null) {
 				var date:DateProxy = _view.attribute.value as DateProxy;
-				if(date != null) {
+				if(_view.attribute.symbol != null && getReasonBlankShortKey(_view.attribute.symbol) != null) {
+					_view.day.text = getReasonBlankShortKey(_view.attribute.symbol);
+				} else if(date != null) {
 					_view.year.text = StringUtil.nullToBlank(date.year);
 					_view.month.text = StringUtil.nullToBlank(date.month);
 					_view.day.text = StringUtil.nullToBlank(date.day);
-				} else if(_view.attribute.symbol != null && getReasonBlankShortKey(_view.attribute.symbol) != null) {
-					_view.day.text = getReasonBlankShortKey(_view.attribute.symbol);
 				}
 			}
 		}

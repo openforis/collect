@@ -46,10 +46,10 @@ public class CodeListItemProxy implements Proxy {
 			//if code in attributes, set selected and qualifier in proxy
 			for (Node<? extends NodeDefinition> node : codes) {
 				CodeAttribute code = (CodeAttribute) node;
-				Code value = code.getValue();
-				if(value != null && value.getCode().equals(proxy.getCode())) {
+				Code codeVal = code.getValue();
+				if(codeVal != null && codeVal.getCode() != null && codeVal.getCode().equals(proxy.getCode())) {
 					proxy.setSelected(Boolean.TRUE);
-					proxy.setQualifier(value.getQualifier());
+					proxy.setQualifier(codeVal.getQualifier());
 				}
 			}
 		}

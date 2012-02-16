@@ -9,6 +9,7 @@ package org.openforis.collect.presenter {
 	import mx.collections.IList;
 	import mx.controls.TextInput;
 	import mx.core.FlexGlobals;
+	import mx.events.FlexMouseEvent;
 	import mx.managers.PopUpManager;
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.events.FaultEvent;
@@ -16,6 +17,7 @@ package org.openforis.collect.presenter {
 	import mx.utils.StringUtil;
 	
 	import org.openforis.collect.Application;
+	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.event.TaxonInputFieldEvent;
 	import org.openforis.collect.metamodel.proxy.SpatialReferenceSystemProxy;
 	import org.openforis.collect.model.proxy.AttributeProxy;
@@ -35,7 +37,7 @@ package org.openforis.collect.presenter {
 	 * 
 	 * @author S. Ricci
 	 * */
-	public class TaxonAttributeFormItemPresenter extends FormItemPresenter {
+	public class TaxonAttributeFormItemPresenter extends AttributeFormItemPresenter {
 		
 		protected static var autoCompletePopUp:TaxonAutoCompletePopUp;
 		protected static var autoCompletePopUpOpen:Boolean = false;
@@ -75,13 +77,6 @@ package org.openforis.collect.presenter {
 		
 		private function get view():TaxonAttributeFormItem {
 			return TaxonAttributeFormItem(_view);
-		}
-		
-		protected function focusInHandler(event:FocusEvent):void {
-			UIUtil.ensureElementIsVisible(event.target);
-		}
-		
-		protected function focusOutHandler(event:FocusEvent):void {
 		}
 		
 		override protected function updateView():void {
@@ -147,7 +142,7 @@ package org.openforis.collect.presenter {
 		protected static function showAutoCompletePopUp(subElementName:String, textInput:TextInput, searchType:String = "contains"):void {
 			if(autoCompletePopUp == null) {
 				autoCompletePopUp = new TaxonAutoCompletePopUp();
-				autoCompletePopUp.addEventListener(TaxonInputFieldEvent.TAXON_SEARCH_POPUP_CLOSE, autoCompletePopUpCloseHandler);
+				autoCompletePopUp.addEventListener(FlexMouseEvent.MOUSE_DOWN_OUTSIDE, autoCompleteMouseDownOutsideHandler);
 				autoCompletePopUp.addEventListener(TaxonInputFieldEvent.TAXON_SELECT, taxonSelectHandler);
 				autoCompleteSearchResponder = new AsyncResponder(autoCompleteSearchResultHandler, searchFaultHandler);
 			}
@@ -163,6 +158,8 @@ package org.openforis.collect.presenter {
 				
 				autoCompletePopUpOpen = true;
 			}
+			
+			//ClientFactory.taxonClient
 			/*
 			var taxonomy:String = inputField.attribute.taxonomy;
 			var query:String = inputField.text;
@@ -193,7 +190,11 @@ package org.openforis.collect.presenter {
 			searchPopUpOpen = false;
 		}
 		
-		protected static function autoCompletePopUpCloseHandler(event:Event):void {
+		protected static function autoCompleteMouseDownOutsideHandler(event:FlexMouseEvent):void {
+			closeAutoCompletePopUp();
+		}
+		
+		protected static function closeAutoCompletePopUp():void {
 			PopUpManager.removePopUp(autoCompletePopUp);
 			autoCompletePopUpOpen = false;
 		}
@@ -223,17 +224,8 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected static function autoCompleteSearchResultHandler(event:ResultEvent, token:Object):void {
-			//test data
-			var data:ArrayCollection = new ArrayCollection();
-			for(var index:int = 0; index < 9; index ++) {
-				data.addItem({
-					code: mx.utils.StringUtil.substitute("00{0}", index + 1),
-					scientificName: mx.utils.StringUtil.substitute("Plant n. 00{0}", index + 1),
-					vernacularName: mx.utils.StringUtil.substitute("Vernacular Name for 00{0}", index + 1),
-					vernacularLang: mx.utils.StringUtil.substitute("Vernacular Lang for 00{0}", index + 1)
-				});
-			}
-			autoCompletePopUp.dataProvider = data;
+			var data:IList = event.result as IList;
+			autoCompletePopUp.dataGrid.dataProvider = data;
 		}
 		
 		protected static function searchFaultHandler(event:FaultEvent):void {

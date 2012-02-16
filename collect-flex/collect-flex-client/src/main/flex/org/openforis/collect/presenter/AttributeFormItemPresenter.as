@@ -40,6 +40,13 @@ package org.openforis.collect.presenter
 			ChangeWatcher.watch(_view, "attribute", attributeChangeHandler);
 		}
 		
+		protected function focusInHandler(event:FocusEvent):void {
+			UIUtil.ensureElementIsVisible(event.target);
+		}
+		
+		protected function focusOutHandler(event:FocusEvent):void {
+		}
+		
 		override protected function parentEntityChangeHandler(event:Event):void {
 			assignAttribute();
 		}

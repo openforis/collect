@@ -74,11 +74,5 @@ package org.openforis.collect.presenter {
 		protected function srsDropDownCloseHandler(event:Event):void {
 		}
 		
-		protected function focusInHandler(event:FocusEvent):void {
-			UIUtil.ensureElementIsVisible(event.target);
-		}
-		
-		protected function focusOutHandler(event:FocusEvent):void {
-		}
 	}
 }

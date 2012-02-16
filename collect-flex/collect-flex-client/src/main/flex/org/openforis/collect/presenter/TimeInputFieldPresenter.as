@@ -31,19 +31,8 @@ package org.openforis.collect.presenter {
 		}
 
 		override protected function createValue():* {
-			var result:* = null;
+			var result:* = StringUtil.concat(":", _view.hoursTextInput.text, _view.minutesTextInput);
 			return result;
-			/*
-			var newAttributeValue:AbstractValue = new AbstractValue();
-			newAttributeValue.text1 = _timeInputField.hoursTextInput.text;
-			newAttributeValue.text2 = _timeInputField.minutesTextInput.text;
-			
-			if(value != null) {
-				//copy old informations
-				newAttributeValue.remarks = value.remarks;
-			}
-			return newAttributeValue;
-			*/
 		}
 		
 		protected function getTimeFromFields():TimeProxy {
@@ -55,13 +44,17 @@ package org.openforis.collect.presenter {
 		}
 		
 		override protected function updateView():void {
+			super.updateView();
+			_view.hoursTextInput.text =_view.minutesTextInput.text = "";
 			if(_view.attribute != null) {
-				var time:TimeProxy = _view.attribute.value as TimeProxy;
-				if(time != null) {
-					_view.hoursTextInput.text = String(time.hour);
-					_view.minutesTextInput.text = String(time.minute);
+				if(_view.attribute.symbol != null && getReasonBlankShortKey(_view.attribute.symbol)) {
+					_view.hoursTextInput.text = getReasonBlankShortKey(_view.attribute.symbol);
 				} else {
-					_view.hoursTextInput.text =_view.minutesTextInput.text = "";
+					var time:TimeProxy = _view.attribute.value as TimeProxy;
+					if(time != null) {
+						_view.hoursTextInput.text = StringUtil.nullToBlank(time.hour);
+						_view.minutesTextInput.text = StringUtil.nullToBlank(time.minute);
+					}
 				}
 			}
 		}
