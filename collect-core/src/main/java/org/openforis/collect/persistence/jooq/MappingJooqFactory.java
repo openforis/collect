@@ -1,10 +1,13 @@
 package org.openforis.collect.persistence.jooq;
 
 import java.sql.Connection;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.jooq.DeleteQuery;
 import org.jooq.InsertQuery;
 import org.jooq.Record;
+import org.jooq.Result;
 import org.jooq.Sequence;
 import org.jooq.SimpleSelectQuery;
 import org.jooq.TableField;
@@ -49,6 +52,25 @@ public abstract class MappingJooqFactory<E> extends DialectAwareJooqFactory {
 		return select;
 	}
 
+	public <T> SimpleSelectQuery<?> selectStartsWithQuery(TableField<?,String> field, String searchString) {
+		if ( searchString == null || searchString.isEmpty() ) {
+			throw new IllegalArgumentException("Search string required");
+		}
+		SimpleSelectQuery<?> select = selectQuery(getTable());
+		searchString = searchString.toUpperCase() + "%";
+		select.addConditions(upper(field).like(searchString));
+		return select;
+	}
+
+	public <T> SimpleSelectQuery<?> selectContainsQuery(TableField<?,String> field, String searchString) {
+		if ( searchString == null || searchString.isEmpty() ) {
+			throw new IllegalArgumentException("Search string required");
+		}
+		SimpleSelectQuery<?> select = selectQuery(getTable());
+		searchString = "%" + searchString.toUpperCase() + "%";
+		select.addConditions(upper(field).like(searchString));
+		return select;
+	}
 	
 	public DeleteQuery<?> deleteQuery(int id) {
 		DeleteQuery<?> delete = deleteQuery(getTable());
@@ -95,6 +117,15 @@ public abstract class MappingJooqFactory<E> extends DialectAwareJooqFactory {
 		E entity = newEntity();
 		fromRecord(record, entity);
 		return entity;
+	}
+	
+	public List<E> fromResult(Result<?> records) {
+		List<E> entities = new ArrayList<E>(records.size());
+		for (Record record : records) {
+			E result = fromRecord(record);
+			entities.add(result);
+		}
+		return entities;
 	}
 	
 	@SuppressWarnings({"rawtypes", "unchecked"})

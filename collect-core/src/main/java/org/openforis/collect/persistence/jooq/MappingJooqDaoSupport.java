@@ -1,8 +1,13 @@
 package org.openforis.collect.persistence.jooq;
 
 import java.sql.Connection;
+import java.util.List;
 
 import org.jooq.Record;
+import org.jooq.Result;
+import org.jooq.ResultQuery;
+import org.jooq.SimpleSelectQuery;
+import org.jooq.TableField;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -26,10 +31,33 @@ public class MappingJooqDaoSupport<E, J extends MappingJooqFactory<E>> extends J
 		}
 	}
 	
+	protected List<E> findStartingWith(TableField<?,String> field, String searchString, int maxResults) {
+		J jf = getMappingJooqFactory();
+		SimpleSelectQuery<?> query = jf.selectStartsWithQuery(field, searchString);
+		query.addLimit(maxResults);
+		query.execute();
+		Result<?> result = query.getResult();
+		List<E> entities = jf.fromResult(result);
+		return entities;
+
+	}
+	
+	protected List<E> findContaining(TableField<?,String> field, String searchString, int maxResults) {
+		J jf = getMappingJooqFactory();
+		SimpleSelectQuery<?> query = jf.selectContainsQuery(field, searchString);
+		query.addLimit(maxResults);
+		query.execute();
+		Result<?> result = query.getResult();
+		List<E> entities = jf.fromResult(result);
+		return entities;
+
+	}
+	
 	@Transactional
 	public E load(int id) {
 		J jf = getMappingJooqFactory();
-		Record r = jf.selectByIdQuery(id).fetchOne();
+		ResultQuery<?> selectQuery = jf.selectByIdQuery(id);
+		Record r = selectQuery.fetchOne();
 		if ( r == null ) {
 			return null;
 		} else {

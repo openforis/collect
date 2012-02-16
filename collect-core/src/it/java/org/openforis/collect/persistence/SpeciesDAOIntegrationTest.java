@@ -3,7 +3,9 @@ package org.openforis.collect.persistence;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
+import java.util.List;
 import java.util.Stack;
 
 import org.junit.Test;
@@ -34,8 +36,124 @@ public class SpeciesDAOIntegrationTest {
 	private TaxonDAO taxonDao;
 
 	@Autowired
-	private TaxonVernacularNameDAO taxonVernacularNameDAO;
+	private TaxonVernacularNameDAO taxonVernacularNameDao;
+
+	private void testFindCode(String match, int maxResults, int expectedResults) {
+		// Create taxonomy
+		Taxonomy taxonomy1 = testInsertAndLoadTaxonomy("it_bamboo");
+		testUpdateAndLoadTaxonomy(taxonomy1, "it_trees");
+		Taxon family1 = testInsertAndLoadTaxon(taxonomy1, "JUGLANDACAE","Juglandaceae", "family", 9, null);
+		Taxon genus1 = testInsertAndLoadTaxon(taxonomy1, "JUG", "Juglans sp.", "genus", 9, family1);
+		testInsertAndLoadTaxon(taxonomy1,"JUG/REG", "Juglans regia", "species", 9, genus1);
+
+		List<Taxon> results = taxonDao.findByCode(match, maxResults);
+		assertEquals(expectedResults, results.size());
+		match = match.toUpperCase();
+		for (Taxon taxon : results) {
+			String code = taxon.getCode();
+			code = (code == null) ? "" : code.toUpperCase();
+			assertTrue(code.startsWith(match));
+		}
+	}
 	
+	@Test
+	public void testFindCode() throws Exception {
+		testFindCode("JUG", 100, 3);
+	}
+	
+	@Test
+	public void testFindUnknownCode() throws Exception {
+		testFindCode("XXX", 100, 0);
+	}
+
+	@Test
+	public void testFindCodeCaseInsensitive() throws Exception {
+		testFindCode("jug", 100, 3);
+	}
+
+	@Test
+	public void testFindCodeMaxRecords() throws Exception {
+		testFindCode("jug", 1, 1);
+	}
+
+	@Test
+	public void testFindSpecificCode() throws Exception {
+		testFindCode("jug/reg", 100, 1);
+	}
+	
+	private void testFindScientificName(String match, int maxResults, int expectedResults) {
+		// Create taxonomy
+		Taxonomy taxonomy1 = testInsertAndLoadTaxonomy("it_bamboo");
+		testUpdateAndLoadTaxonomy(taxonomy1, "it_trees");
+		Taxon family1 = testInsertAndLoadTaxon(taxonomy1, "JUGLANDACAE","Juglandaceae", "family", 9, null);
+		Taxon genus1 = testInsertAndLoadTaxon(taxonomy1, "JUG", "Juglans sp.", "genus", 9, family1);
+		testInsertAndLoadTaxon(taxonomy1,"JUG/REG", "Juglans regia", "species", 9, genus1);
+		
+		List<Taxon> results = taxonDao.findByScientificName(match, maxResults);
+		assertEquals(expectedResults, results.size());
+		match = match.toUpperCase();
+		for (Taxon taxon : results) {
+			String name = taxon.getScientificName();
+			name = name.toUpperCase();
+			assertTrue(name.startsWith(match));
+		}
+	}
+
+	@Test
+	public void testFindScientificName() throws Exception {
+		testFindScientificName("jugl", 100, 3);
+	}
+
+	@Test
+	public void testFindSpecificScientificName() throws Exception {
+		testFindScientificName("juglans regia", 100, 1);
+	}
+
+
+	private void testFindVernacularName(String match, int maxResults, int expectedResults) {
+		// Create taxonomy
+		Taxonomy taxonomy1 = testInsertAndLoadTaxonomy("it_bamboo");
+		testUpdateAndLoadTaxonomy(taxonomy1, "it_trees");
+		Taxon family1 = testInsertAndLoadTaxon(taxonomy1, "JUGLANDACAE","Juglandaceae", "family", 9, null);
+		Taxon genus1 = testInsertAndLoadTaxon(taxonomy1, "JUG", "Juglans sp.", "genus", 9, family1);
+		Taxon species1 = testInsertAndLoadTaxon(taxonomy1,"JUG/REG", "Juglans regia", "species", 9, genus1);
+		testInsertAndLoadVernacularName(family1, "Walnut family", "eng", "", 9);
+		testInsertAndLoadVernacularName(genus1, "Walnut", "eng", "", 0);
+		testInsertAndLoadVernacularName(genus1, "Noce", "ita", "", 9);
+		testInsertAndLoadVernacularName(species1, "Noce bianco", "ita", "", 9);
+		testInsertAndLoadVernacularName(species1, "Persian walnut", "eng", "", 9);
+		testInsertAndLoadVernacularName(species1, "Орех грецкий", "rus", "", 9);
+		
+		List<TaxonVernacularName> results = taxonVernacularNameDao.findByVernacularName(match, maxResults);
+		assertEquals(expectedResults, results.size());
+		match = match.toUpperCase();
+		for (TaxonVernacularName tvn : results) {
+			String name = tvn.getVernacularName();
+			name = name.toUpperCase();
+			assertTrue(name.contains(match));
+		}
+	}
+
+	@Test
+	public void testFindVernacularName() throws Exception {
+		testFindVernacularName("walnut", 100, 3);
+	}
+
+	@Test
+	public void testFindVernacularNameMaxResults() throws Exception {
+		testFindVernacularName("walnut", 3, 3);
+	}
+
+	@Test
+	public void testFindUnicode() throws Exception {
+		testFindVernacularName("Орех", 100, 1);
+	}
+
+	@Test
+	public void testFindUnicodeCaseInsensitive() throws Exception {
+		testFindVernacularName("орех", 100, 1);
+	}
+
 	@Test
 	public void testCRUD() throws Exception  {
 		// Create taxonomy
@@ -46,8 +164,8 @@ public class SpeciesDAOIntegrationTest {
 		Stack<Taxon> taxa = new Stack<Taxon>();
 		taxa.push(testInsertAndLoadTaxon(taxonomy1, "JUG","Juglandaceaex", "familyx", 9, null));
 		taxa.push(testInsertAndLoadTaxon(taxonomy1,"JUG2", "sJuglans sp.", "sadgenus", 0, null));
-		taxa.push(testUpdateAndLoadTaxon(taxa.pop(), "Juglans sp.", "family", 9, taxa.get(0).getId()));
-		taxa.push(testInsertAndLoadTaxon(taxonomy1,"JUG3", "Juglans regia", "species", 9, taxa.get(1).getId()));
+		taxa.push(testUpdateAndLoadTaxon(taxa.pop(), "Juglans sp.", "genus", 9, taxa.get(0)));
+		taxa.push(testInsertAndLoadTaxon(taxonomy1,"JUG3", "Juglans regia", "species", 9, taxa.get(1)));
 		
 		// Create vernacular names
 		Stack<TaxonVernacularName> names = new Stack<TaxonVernacularName>();
@@ -76,13 +194,28 @@ public class SpeciesDAOIntegrationTest {
 
 	private Taxonomy testInsertAndLoadTaxonomy(String name) {
 		// Insert
+		Taxonomy t1 = new Taxonomy();
+		t1.setName(name);
+		taxonomyDao.insert(t1);
+		Taxonomy t = t1;
+
+		// Confirm saved
+		Taxonomy t2 = taxonomyDao.load(t.getId());
+		assertEquals(t.getId(), t2.getId());
+		assertEquals(t.getName(), t2.getName());
+		return t2;
+	}
+
+	private void assertTaxonomyInserted(Taxonomy t) {
+		Taxonomy t2 = taxonomyDao.load(t.getId());
+		assertEquals(t.getId(), t2.getId());
+		assertEquals(t.getName(), t2.getName());
+	}
+
+	private Taxonomy insertTaxonomy(String name) {
 		Taxonomy t = new Taxonomy();
 		t.setName(name);
 		taxonomyDao.insert(t);
-
-		// Confirm saved
-		t = taxonomyDao.load(t.getId());
-		assertEquals(name, t.getName());
 		return t;
 	}
 
@@ -97,7 +230,9 @@ public class SpeciesDAOIntegrationTest {
 		assertEquals(newName, t.getName());
 	}
 	
-	private Taxon testInsertAndLoadTaxon(Taxonomy taxonomy, String code, String scientificName, String rank, int step, Integer parentId) {
+	private Taxon testInsertAndLoadTaxon(Taxonomy taxonomy, String code, String scientificName, String rank, int step, Taxon parent) {
+		Integer parentId = parent == null ? null : parent.getId();
+		
 		// Insert
 		Taxon t = new Taxon();
 		t.setCode(code);
@@ -120,7 +255,9 @@ public class SpeciesDAOIntegrationTest {
 	}
 
 	
-	private Taxon testUpdateAndLoadTaxon(Taxon t, String scientificName, String rank, int step, Integer parentId) {
+	private Taxon testUpdateAndLoadTaxon(Taxon t, String scientificName, String rank, int step, Taxon parent) {
+		Integer parentId = parent == null ? null : parent.getId();
+		
 		// Insert
 		t.setScientificName(scientificName);
 		t.setTaxonomicRank(rank);
@@ -146,10 +283,10 @@ public class SpeciesDAOIntegrationTest {
 		tvn.setLanguageVariety(variety);
 		tvn.setTaxonId(taxon1.getId());
 		tvn.setStep(step);
-		taxonVernacularNameDAO.insert(tvn);
+		taxonVernacularNameDao.insert(tvn);
 		
 		// Confirm saved
-		tvn = taxonVernacularNameDAO.load(tvn.getId());
+		tvn = taxonVernacularNameDao.load(tvn.getId());
 		assertNotNull(tvn);
 		assertEquals(taxon1.getId(), tvn.getTaxonId());
 		assertEquals(name, tvn.getVernacularName());
@@ -167,10 +304,10 @@ public class SpeciesDAOIntegrationTest {
 		tvn.setLanguageVariety(variety);
 		tvn.setTaxonId(taxon1.getId());
 		tvn.setStep(step);
-		taxonVernacularNameDAO.update(tvn);
+		taxonVernacularNameDao.update(tvn);
 		
 		// Confirm saved
-		tvn = taxonVernacularNameDAO.load(id);
+		tvn = taxonVernacularNameDao.load(id);
 		assertNotNull(tvn);
 		assertEquals(id, tvn.getId());
 		assertEquals(taxon1.getId(), tvn.getTaxonId());
@@ -184,10 +321,10 @@ public class SpeciesDAOIntegrationTest {
 
 	private void testDeleteAndLoadVernacularName(TaxonVernacularName t) {
 		// Delete
-		taxonVernacularNameDAO.delete(t.getId());
+		taxonVernacularNameDao.delete(t.getId());
 		
 		// Confirm deleted
-		t = taxonVernacularNameDAO.load(t.getId());
+		t = taxonVernacularNameDao.load(t.getId());
 		assertNull(t);
 	}
 

@@ -4,6 +4,7 @@ import static org.openforis.collect.persistence.jooq.Sequences.TAXON_VERNACULAR_
 import static org.openforis.collect.persistence.jooq.tables.TaxonVernacularName.TAXON_VERNACULAR_NAME;
 
 import java.sql.Connection;
+import java.util.List;
 
 import org.jooq.Record;
 import org.jooq.UpdatableRecord;
@@ -17,6 +18,10 @@ import org.openforis.idm.model.species.TaxonVernacularName;
 public class TaxonVernacularNameDAO extends MappingJooqDaoSupport<TaxonVernacularName, TaxonVernacularNameDAO.JooqFactory> {
 	public TaxonVernacularNameDAO() {
 		super(TaxonVernacularNameDAO.JooqFactory.class);
+	}
+
+	public List<TaxonVernacularName> findByVernacularName(String searchString, int maxResults) {
+		return findContaining(TAXON_VERNACULAR_NAME.VERNACULAR_NAME, searchString, maxResults);
 	}
 
 	protected static class JooqFactory extends MappingJooqFactory<TaxonVernacularName> {

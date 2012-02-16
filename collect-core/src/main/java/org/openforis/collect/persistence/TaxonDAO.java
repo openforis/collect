@@ -4,6 +4,7 @@ import static org.openforis.collect.persistence.jooq.Sequences.TAXON_ID_SEQ;
 import static org.openforis.collect.persistence.jooq.tables.Taxon.TAXON;
 
 import java.sql.Connection;
+import java.util.List;
 
 import org.jooq.Record;
 import org.jooq.UpdatableRecord;
@@ -19,6 +20,14 @@ public class TaxonDAO extends MappingJooqDaoSupport<Taxon, TaxonDAO.JooqFactory>
 		super(TaxonDAO.JooqFactory.class);
 	}
 
+	public List<Taxon> findByCode(String searchString, int maxResults) {
+		return findStartingWith(TAXON.CODE, searchString, maxResults);
+	}
+
+	public List<Taxon> findByScientificName(String searchString, int maxResults) {
+		return findStartingWith(TAXON.SCIENTIFIC_NAME, searchString, maxResults);
+	}
+	
 	protected static class JooqFactory extends MappingJooqFactory<Taxon> {
 
 		private static final long serialVersionUID = 1L;
