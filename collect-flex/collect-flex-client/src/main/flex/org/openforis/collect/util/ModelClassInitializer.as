@@ -45,7 +45,9 @@ package org.openforis.collect.util {
 	import org.openforis.collect.model.proxy.IntegerRangeProxy;
 	import org.openforis.collect.model.proxy.RealRangeProxy;
 	import org.openforis.collect.model.proxy.RecordProxy;
+	import org.openforis.collect.model.proxy.TaxonOccurrenceProxy;
 	import org.openforis.collect.model.proxy.TaxonProxy;
+	import org.openforis.collect.model.proxy.TaxonVernacularNameProxy;
 	import org.openforis.collect.model.proxy.TimeProxy;
 
 	public class ModelClassInitializer {
@@ -93,7 +95,9 @@ package org.openforis.collect.util {
 				SurveyProxy,
 				SurveySummary,
 				TaxonAttributeDefinitionProxy,
+				TaxonOccurrenceProxy,
 				TaxonProxy,
+				TaxonVernacularNameProxy,
 				TextAttributeDefinitionProxy,
 				TextAttributeDefinitionProxy$Type,
 				TimeAttributeDefinitionProxy,

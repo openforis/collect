@@ -230,8 +230,8 @@ package org.openforis.collect.presenter {
 			autoCompletePopUp.dataGrid.dataProvider = data;
 		}
 		
-		protected static function searchFaultHandler(event:FaultEvent):void {
-			//TO DO
+		protected static function searchFaultHandler(event:FaultEvent, token:Object = null):void {
+			faultHandler(event, token);
 		}
 	}
 }
