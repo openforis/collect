@@ -37,7 +37,7 @@ package org.openforis.collect.util
 			return value.substr(0, i + 1);
 		}  
 
-		public static function replaceAll(string:String, regExp:RegExp, replace:String=""):String{
+		public static function replaceAll(string:String, regExp:RegExp, replace:String=""):String {
 			var newString:String = new String(string);
 			while(newString.search(regExp)>0){
 				newString = newString.replace(regExp,replace);

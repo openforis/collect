@@ -86,7 +86,6 @@
 	<bean id="recordManager" 					class="org.openforis.collect.manager.RecordManager" init-method="init" />
 	<bean id="taxonManager" 					class="org.openforis.collect.manager.TaxonManager" />
 	<bean id="userManager" 						class="org.openforis.collect.manager.UserManager" />
-	<bean id="externalLookupProvider" 	class="org.openforis.collect.manager.ExternalLookupProviderManager" />
 		
 	<!-- ===================================== -->
 	<!-- Data Source -->
@@ -135,16 +134,16 @@
     	<property name="dataSource" ref="dataSource"/>
 	</bean>
 	
-	<bean id="externalLookupProviderDAO" class="org.openforis.collect.persistence.ExternalLookupProviderDAO">
+	<bean id="externalLookupProviderDAO" class="org.openforis.collect.persistence.LookupProviderDAO">
     	<property name="dataSource" ref="dataSource"/>
 	</bean>
 
 	<!-- Expression Factory -->
 	<bean id="expressionFactory" class="org.openforis.idm.model.expression.ExpressionFactory">
-		<property name="externalLookupProvider" ref="externalLookupProvider" />
+		<property name="lookupProvider" ref="lookupProvider" />
 	</bean>
 	
-	
+	<bean id="lookupProvider" 	class="org.openforis.collect.persistence.DatabaseLookupProvider" />
 	
 	<!-- Controllers -->
 	<!-- <bean id="multipartResolver" -->
