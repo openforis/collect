@@ -16,6 +16,7 @@ package org.openforis.collect.ui.component.input {
 	import org.openforis.collect.model.proxy.AttributeSymbol;
 	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.presenter.InputFieldPresenter;
+	import org.openforis.collect.util.ObjectUtil;
 	import org.openforis.collect.util.StringUtil;
 	import org.openforis.collect.util.UIUtil;
 	
@@ -47,6 +48,8 @@ package org.openforis.collect.ui.component.input {
 		private var _attribute:AttributeProxy; 
 		
 		private var _parentEntity:EntityProxy;
+		
+		private var _isInDataGroup:Boolean = false;
 		
 		public function InputField() {
 			super();
@@ -83,7 +86,7 @@ package org.openforis.collect.ui.component.input {
 		}
 		
 		public function get text():String {
-			return _textInput["text"];
+			return ObjectUtil.getValue(_textInput, "text");
 		}
 		
 		public function set text(value:String):void {
@@ -163,6 +166,7 @@ package org.openforis.collect.ui.component.input {
 			_attributeDefinition = value;
 		}
 
+		[Bindable]
 		public function get parentEntity():EntityProxy {
 			return _parentEntity;
 		}
@@ -171,6 +175,15 @@ package org.openforis.collect.ui.component.input {
 			_parentEntity = value;
 		}
 
+		[Bindable]
+		public function get isInDataGroup():Boolean {
+			return _isInDataGroup;
+		}
+		
+		public function set isInDataGroup(value:Boolean):void {
+			_isInDataGroup = value;
+		}
+		
 
 	}
 }

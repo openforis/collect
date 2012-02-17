@@ -6,58 +6,42 @@
 				  >
 	<fx:Script>
 		<![CDATA[
-			import flash.utils.getQualifiedClassName;
-			
-			import mx.core.FlexGlobals;
-			import mx.core.UIComponent;
-			
+			import org.openforis.collect.i18n.Message;
 			import org.openforis.collect.presenter.TaxonInputFieldPresenter;
-			import org.openforis.collect.ui.Images;
 			
-			import spark.components.Group;
+			public static const STATE_HORIZONTAL:String = "horizontal";
+			public static const STATE_VERTICAL:String = "vertical";
 			
-			// Define a static variable.
-			private static var defaultStylesInited:Boolean = initDefaultStyles();
+			private var _labelWidth:int = 130;
 			
 			override protected function initPresenter():void {
 				this.presenter = new TaxonInputFieldPresenter(this);
 			}
 			
-			// Define a static method.
-			private static function initDefaultStyles():Boolean {
-				if (!FlexGlobals.topLevelApplication.styleManager.getStyleDeclaration("org.openforis.collect.ui.component.input.TaxonInputField"))
-				{
-					// If there is no CSS definition for StyledRectangle, 
-					// then create one and set the default value.
-					var myStyles:CSSStyleDeclaration = new CSSStyleDeclaration();
-					myStyles.defaultFactory = function():void
-					{
-						this.searchIconVisible = true;
-					}
-					FlexGlobals.topLevelApplication.styleManager.setStyleDeclaration("org.openforis.collect.ui.component.input.TaxonInputField", myStyles, true);
-				}
-				return true;
+			[Bindable]
+			public function get labelWidth():int {
+				return _labelWidth;
 			}
 			
-			override protected function updateDisplayList(unscaledWidth:Number, unscaledHeight:Number):void {
-				super.updateDisplayList(unscaledWidth, unscaledHeight);
-				
-				var searchIconVisibleStyle:String = getStyle("searchIconVisible");
-				var searchIconVisible:Boolean = Boolean(searchIconVisibleStyle);
-				
-				//hide or show search icons
-				idSearchImg.includeInLayout = idSearchImg.visible = 
-					scientificNameSearchImg.includeInLayout = scientificNameSearchImg.visible =
-					vernacularNameSearchImg.includeInLayout = vernacularNameSearchImg.visible =
-					vernacularLangSearchImg.includeInLayout = vernacularLangSearchImg.visible =
-					searchIconVisible;
+			public function set labelWidth(value:int):void {
+				_labelWidth = value;
+			}
+			
+			override public function set isInDataGroup(value:Boolean):void {
+				super.isInDataGroup = value;
+				if(value) {
+					currentState = STATE_HORIZONTAL;
+				} else {
+					currentState = STATE_VERTICAL;
+				}
 			}
 		]]>
 	</fx:Script>
 	
-	<fx:Metadata>
-		[Style(name="searchIconVisible",type="Boolean",inherit="yes")]
-	</fx:Metadata>
+	<input:states>
+		<s:State name="horizontal" />
+		<s:State name="vertical" />
+	</input:states>
 	
 	<s:BorderContainer 
 		id="inputBox"
@@ -65,34 +49,35 @@
 		width="100%"
 		styleName="noError"
 		tabEnabled="false">
-		<s:layout>
-			<s:HorizontalLayout>
-				<s:verticalAlign>middle</s:verticalAlign>
-				<s:horizontalAlign>left</s:horizontalAlign>
-				<s:gap>0</s:gap>
-				<s:paddingLeft>0</s:paddingLeft>
-			</s:HorizontalLayout>
-		</s:layout>
-		<input:TextInput id="idTextInput"
-						 width="100%" />
-		<mx:Image source="{Images.MAGNIFIER}" 
-				  id="idSearchImg"
-				  useHandCursor="true" buttonMode="true"/>
-		<input:TextInput id="scientificNameTextInput"
-						 width="100%" />
-		<mx:Image source="{Images.MAGNIFIER}" 
-				  id="scientificNameSearchImg"
-				  useHandCursor="true" buttonMode="true"/>
-		<input:TextInput id="vernacularNameTextInput"
-						 width="100%" />
-		<mx:Image source="{Images.MAGNIFIER}" 
-				  id="vernacularNameSearchImg"
-				  useHandCursor="true" buttonMode="true"/>
-		<input:TextInput id="vernacularLangTextInput"
-						 width="100%" />
-		<mx:Image source="{Images.MAGNIFIER}" 
-				  id="vernacularLangSearchImg"
-				  useHandCursor="true" buttonMode="true"/>
+		
+		<s:HGroup includeIn="horizontal" gap="2">
+			<input:TextInput id="codeTextInput" width="100" includeIn="horizontal" />
+			<input:TextInput id="scientificNameTextInput" width="100" includeIn="horizontal" />
+			<input:TextInput id="vernacularNameTextInput" width="100" includeIn="horizontal" />
+			<input:TextInput id="vernacularLangTextInput" width="100" includeIn="horizontal" />
+		</s:HGroup>
+		
+		<s:VGroup includeIn="vertical">
+			<s:Label styleName="bold" text="{attributeDefinition.getLabelText()}" />
+			<s:VGroup paddingLeft="20">
+				<s:HGroup>
+					<s:Label width="{labelWidth}" styleName="bold" text="{Message.get('edit.taxon.code')}"/>
+					<fx:Reparent target="codeTextInput" includeIn="vertical" />
+				</s:HGroup>
+				<s:HGroup>
+					<s:Label width="{labelWidth}" styleName="bold" text="{Message.get('edit.taxon.scientificName')}"/>
+					<fx:Reparent target="scientificNameTextInput" includeIn="vertical" />
+				</s:HGroup>
+				<s:HGroup>
+					<s:Label width="{labelWidth}" styleName="bold" text="{Message.get('edit.taxon.vernacularName')}"/>
+					<fx:Reparent target="vernacularNameTextInput" includeIn="vertical" />
+				</s:HGroup>
+				<s:HGroup>
+					<s:Label width="{labelWidth}" styleName="bold" text="{Message.get('edit.taxon.vernacularLang')}"/>
+					<fx:Reparent target="vernacularLangTextInput" includeIn="vertical" />
+				</s:HGroup>
+			</s:VGroup>
+		</s:VGroup>
 		
 	</s:BorderContainer>
 	

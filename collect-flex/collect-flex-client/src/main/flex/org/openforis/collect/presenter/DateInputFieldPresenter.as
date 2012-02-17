@@ -25,7 +25,7 @@ package org.openforis.collect.presenter {
 
 		private var _view:DateInputField;
 		
-		public function DateInputFieldPresenter(inputField:DateInputField = null) {
+		public function DateInputFieldPresenter(inputField:DateInputField) {
 			_view = inputField;
 			_view.separator1.text = separator;
 			_view.separator2.text = separator;

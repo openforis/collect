@@ -28,7 +28,6 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.ui.component.datagrid.RecordSummaryDataGrid;
 	import org.openforis.collect.ui.component.detail.AttributeFormItem;
 	import org.openforis.collect.ui.component.detail.CodeAttributeFormItem;
-	import org.openforis.collect.ui.component.detail.CoordinateAttributeFormItem;
 	import org.openforis.collect.ui.component.detail.EntityFormContainer;
 	import org.openforis.collect.ui.component.detail.EntityFormItem;
 	import org.openforis.collect.ui.component.detail.FormContainer;
@@ -37,7 +36,6 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.ui.component.detail.MultipleEntityFormItem;
 	import org.openforis.collect.ui.component.detail.SingleAttributeFormItem;
 	import org.openforis.collect.ui.component.detail.SingleEntityFormItem;
-	import org.openforis.collect.ui.component.detail.TaxonAttributeFormItem;
 	import org.openforis.collect.ui.component.input.BooleanInputField;
 	import org.openforis.collect.ui.component.input.CodeInputField;
 	import org.openforis.collect.ui.component.input.CoordinateInputField;
@@ -161,11 +159,6 @@ package org.openforis.collect.ui {
 			
 			if(definition is CodeAttributeDefinitionProxy) {
 				formItem = new CodeAttributeFormItem();
-			} else if(definition is CoordinateAttributeDefinitionProxy){
-				//todo multiple
-				formItem = new CoordinateAttributeFormItem();
-			} else if(definition is TaxonAttributeDefinitionProxy){
-				formItem = new TaxonAttributeFormItem();
 			} else if(definition.multiple) {
 				if(isInDataGroup){
 					formItem = new MultipleAttributeDataGroupFormItem();
@@ -208,7 +201,7 @@ package org.openforis.collect.ui {
 			} else if(def is RangeAttributeDefinitionProxy) {
 				return 120;
 			} else if(def is TaxonAttributeDefinitionProxy) {
-				return 400;
+				return 404;
 			} else if(def is TextAttributeDefinitionProxy) {
 				var textAttributeDef:TextAttributeDefinitionProxy = TextAttributeDefinitionProxy(def);
 				var type:TextAttributeDefinitionProxy$Type = textAttributeDef.type;
@@ -276,6 +269,7 @@ package org.openforis.collect.ui {
 			}
 			inputField.width = getInputFieldWidth(def, isInDataGroup);
 			inputField.attributeDefinition = def;
+			inputField.isInDataGroup = isInDataGroup;
 			return inputField;
 		}
 	

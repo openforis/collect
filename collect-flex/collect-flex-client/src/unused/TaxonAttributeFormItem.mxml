@@ -33,9 +33,9 @@
 			override public function set isInDataGroup(value:Boolean):void {
 				super.isInDataGroup = value;
 				if(value) {
-					currentState = CoordinateAttributeFormItem.STATE_HORIZONTAL;
+					currentState = STATE_HORIZONTAL;
 				} else {
-					currentState = CoordinateAttributeFormItem.STATE_VERTICAL;
+					currentState = STATE_VERTICAL;
 				}
 			}
 		]]>

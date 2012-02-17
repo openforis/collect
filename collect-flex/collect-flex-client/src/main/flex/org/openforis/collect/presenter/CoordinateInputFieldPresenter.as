@@ -6,8 +6,12 @@ package org.openforis.collect.presenter {
 	
 	import org.openforis.collect.Application;
 	import org.openforis.collect.metamodel.proxy.SpatialReferenceSystemProxy;
+	import org.openforis.collect.model.proxy.AttributeProxy;
+	import org.openforis.collect.model.proxy.CoordinateProxy;
 	import org.openforis.collect.ui.component.input.CoordinateInputField;
 	import org.openforis.collect.ui.component.input.InputField;
+	import org.openforis.collect.util.CollectionUtil;
+	import org.openforis.collect.util.StringUtil;
 	
 	/**
 	 * 
@@ -17,7 +21,7 @@ package org.openforis.collect.presenter {
 		
 		private var _view:CoordinateInputField;
 		
-		public function CoordinateInputFieldPresenter(inputField:CoordinateInputField = null) {
+		public function CoordinateInputFieldPresenter(inputField:CoordinateInputField) {
 			_view = inputField;
 			super(inputField);
 
@@ -38,14 +42,25 @@ package org.openforis.collect.presenter {
 		}
 		
 		override protected function updateView():void {
-			//this._inputField.attribute = attribute;
-			/*
-			this._view.srsDropDown.selectedItem = value.text1;
-			this._view.xTextInput.text = value.text2;
-			this._view.yTextInput.text = value.text3;
-			this._view.remarks = value.remarks;
-			this._view.approved = value.approved;
-			*/
+			super.updateView();
+			
+			var attribute:AttributeProxy = _view.attribute;
+			
+			//reset view
+			_view.srsDropDownList.selectedItem = null;
+			_view.xTextInput.text = null;
+			_view.yTextInput.text = null;
+			
+			if(attribute != null) {
+				var value:Object = attribute.value;
+				if(value != null && value is CoordinateProxy) {
+					var coordinate:CoordinateProxy = CoordinateProxy(value);
+					var srs:Object = CollectionUtil.getItem(Application.activeSurvey.spatialReferenceSystems, "id", coordinate.srsId);
+					_view.srsDropDownList.selectedItem = srs;
+					_view.xTextInput.text = StringUtil.nullToBlank(coordinate.x);
+					_view.yTextInput.text = StringUtil.nullToBlank(coordinate.y);
+				}
+			}
 		}
 		
 		override protected function createValue():* {
@@ -54,19 +69,17 @@ package org.openforis.collect.presenter {
 			if(srs != null) {
 				srsId = srs.id;
 			}
-			var x:String = _view.xTextInput.text;
-			var y:String = _view.yTextInput.text;
+			var x:String = StringUtil.nullToBlank(_view.xTextInput.text);
+			var y:String = StringUtil.nullToBlank(_view.yTextInput.text);
 			
 			var result:String = "SRID=" + srsId + ";POINT(" + x + " " + y + ")";
 			return result;
 		}
 		
+		
 		protected function srsDropDownLabelFunction(item:Object):String {
-			if(item != null) {
-				return item.label;
-			} else {
-				return null;
-			}	
+			var srs:SpatialReferenceSystemProxy = SpatialReferenceSystemProxy(item);
+			return srs.getLabelText();
 		}
 		
 		protected function srsDropDownChangeHandler(event:Event):void {

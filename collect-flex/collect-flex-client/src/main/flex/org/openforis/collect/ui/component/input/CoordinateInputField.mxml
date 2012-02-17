@@ -26,7 +26,15 @@
 			public function set subLabelWidth(value:Number):void {
 				_subLabelWidth = value;
 			}
-
+			
+			override public function set isInDataGroup(value:Boolean):void {
+				super.isInDataGroup = value;
+				if(value) {
+					currentState = STATE_HORIZONTAL;
+				} else {
+					currentState = STATE_VERTICAL;
+				}
+			}
 			
 		]]>
 	</fx:Script>
@@ -53,7 +61,6 @@
 		</s:HGroup>
 		
 		<s:VGroup includeIn="vertical" gap="2">
-			<s:Label styleName="bold" text="{attributeDefinition.getLabelText()}" />
 			<s:VGroup paddingLeft="20">
 				<s:HGroup>
 					<s:Label width="{subLabelWidth}" styleName="bold" text="{Message.get('edit.coordinate.srs')}"/>

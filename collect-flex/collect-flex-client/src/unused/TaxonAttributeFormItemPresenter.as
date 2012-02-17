@@ -2,13 +2,16 @@ package org.openforis.collect.presenter {
 	import flash.display.DisplayObject;
 	import flash.events.Event;
 	import flash.events.FocusEvent;
+	import flash.events.KeyboardEvent;
 	import flash.events.MouseEvent;
+	import flash.ui.Keyboard;
 	
 	import mx.binding.utils.ChangeWatcher;
 	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
 	import mx.controls.TextInput;
 	import mx.core.FlexGlobals;
+	import mx.core.UIComponent;
 	import mx.events.FlexMouseEvent;
 	import mx.managers.PopUpManager;
 	import mx.rpc.AsyncResponder;
@@ -41,19 +44,17 @@ package org.openforis.collect.presenter {
 	 * */
 	public class TaxonAttributeFormItemPresenter extends AttributeFormItemPresenter {
 		
-		private static const MAX_RESULTS:int = 20;
-		private static const SERACH_BY_CODE:String = "byCode";
+		private static const MAX_RESULTS:int = 10;
+		private static const SEARCH_BY_CODE:String = "byCode";
 		private static const SEARCH_BY_SCIENTIFIC_NAME:String = "byScientificName";
 		private static const SEARCH_BY_VERNACULAR_NAME:String = "byVernacularName";
 		
 		protected static var autoCompletePopUp:TaxonAutoCompletePopUp;
 		protected static var autoCompletePopUpOpen:Boolean = false;
-		protected static var searchPopUp:TaxonSearchPopUp;
-		protected static var searchPopUpOpen:Boolean = false;
 		protected static var autoCompleteSearchResponder:AsyncResponder;
-		protected static var searchResponder:AsyncResponder;
+		protected static var autoCompleteLastSearchTextInput:TextInput;
 		
-		public var minCharsToStartAutoComplete:int = 2;
+		private var minCharsToStartAutoComplete:int = 2;
 		
 		public function TaxonAttributeFormItemPresenter(view:TaxonAttributeFormItem = null) {
 			super(view);
@@ -124,31 +125,34 @@ package org.openforis.collect.presenter {
 			var searchType:String;
 			switch(textInput) {
 				case view.codeTextInput:
-					searchType = SERACH_BY_CODE;
+					searchType = SEARCH_BY_CODE;
 					break;
 				case view.scientificNameTextInput:
 					searchType = SEARCH_BY_SCIENTIFIC_NAME;
 					break;
+				case view.vernacularNameTextInput:
+					searchType = SEARCH_BY_VERNACULAR_NAME;
+					break;
+				default:
 			}
-			showAutoCompletePopUp(searchType, textInput);
+			if(searchType != null) {
+				showAutoCompletePopUp(searchType, textInput, view.codeTextInput);
+			}
 		}
 		
-		protected function searchImageClickHandler(event:Event):void {
-			//TODO fill searchTextInput with inserted text
-			showSearchPopUp();
-		}
-		
-		protected static function showAutoCompletePopUp(searchType:String, textInput:TextInput):void {
+		protected static function showAutoCompletePopUp(searchType:String, textInput:TextInput, alignField:DisplayObject):void {
 			if(autoCompletePopUp == null) {
 				autoCompletePopUp = new TaxonAutoCompletePopUp();
+				autoCompletePopUp.addEventListener(KeyboardEvent.KEY_DOWN, autoCompleteKeyDownHandler);
 				autoCompletePopUp.addEventListener(FlexMouseEvent.MOUSE_DOWN_OUTSIDE, autoCompleteMouseDownOutsideHandler);
 				autoCompletePopUp.addEventListener(TaxonInputFieldEvent.TAXON_SELECT, taxonSelectHandler);
 				autoCompleteSearchResponder = new AsyncResponder(autoCompleteSearchResultHandler, searchFaultHandler);
 			}
-			
+			autoCompleteLastSearchTextInput = textInput;
+			loadAutoCompleteData(searchType, textInput);
+
 			if(! autoCompletePopUpOpen) {
 				PopUpManager.addPopUp(autoCompletePopUp, FlexGlobals.topLevelApplication as DisplayObject, false);
-				var alignField:DisplayObject = textInput;
 
 				PopUpUtil.alignPopUpToField(autoCompletePopUp, alignField, 
 					PopUpUtil.POSITION_BOTTOM, 
@@ -157,11 +161,14 @@ package org.openforis.collect.presenter {
 				
 				autoCompletePopUpOpen = true;
 			}
-			
+		}
+		
+		protected static function loadAutoCompleteData(searchType:String, textInput:TextInput):void {
+			autoCompletePopUp.dataGrid.dataProvider = null;
 			var client:TaxonClient = ClientFactory.taxonClient;
 			var searchText:String = textInput.text;
 			switch(searchType) {
-				case SERACH_BY_CODE:
+				case SEARCH_BY_CODE:
 					client.findByCode(autoCompleteSearchResponder, searchText, MAX_RESULTS);
 					break;
 				case SEARCH_BY_SCIENTIFIC_NAME:
@@ -174,26 +181,17 @@ package org.openforis.collect.presenter {
 			}
 		}
 		
-		protected static function showSearchPopUp():void {
-			if(searchPopUp == null) {
-				searchPopUp = new TaxonSearchPopUp();
-				searchPopUp.addEventListener(TaxonInputFieldEvent.TAXON_SEARCH_POPUP_CLOSE, searchPopUpCloseHandler);
-				searchPopUp.addEventListener(TaxonInputFieldEvent.TAXON_SELECT, taxonSelectHandler);
-				searchPopUp.addEventListener(TaxonInputFieldEvent.TAXON_SEARCH_POPUP_SEARCH_TEXT_CHANGE, searchTextInputChangeHandler);
-				searchResponder = new AsyncResponder(searchResultHandler, searchFaultHandler);
+		protected static function autoCompleteKeyDownHandler(event:KeyboardEvent):void {
+			var keyCode:uint = event.keyCode;
+			switch(keyCode) {
+				case Keyboard.ENTER:
+					//TODO select taxon
+					break;
+				case Keyboard.ESCAPE:
+					closeAutoCompletePopUp();
+					autoCompleteLastSearchTextInput.setFocus();
+					break;
 			}
-			
-			if(! searchPopUpOpen) {
-				PopUpManager.addPopUp(searchPopUp, FlexGlobals.topLevelApplication as DisplayObject, false);
-				PopUpManager.centerPopUp(searchPopUp);
-				
-				searchPopUpOpen = true;
-			}
-		}
-		
-		protected static function searchPopUpCloseHandler(event:Event):void {
-			PopUpManager.removePopUp(searchPopUp);
-			searchPopUpOpen = false;
 		}
 		
 		protected static function autoCompleteMouseDownOutsideHandler(event:FlexMouseEvent):void {
@@ -201,32 +199,15 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected static function closeAutoCompletePopUp():void {
-			PopUpManager.removePopUp(autoCompletePopUp);
-			autoCompletePopUpOpen = false;
+			if(autoCompletePopUpOpen) {
+				PopUpManager.removePopUp(autoCompletePopUp);
+				autoCompletePopUpOpen = false;
+			}
 		}
 		
 		protected static function taxonSelectHandler(event:Event):void {
 			//TODO apply changes to db...
-			
-			if(autoCompletePopUpOpen) {
-				PopUpManager.removePopUp(autoCompletePopUp);
-				autoCompletePopUpOpen = false;
-			} else if(searchPopUpOpen) {
-				PopUpManager.removePopUp(searchPopUp);
-				searchPopUpOpen = false;
-			}
-		}
-		
-		protected static function searchTextInputChangeHandler(event:TaxonInputFieldEvent):void {
-			var searchText:String = searchPopUp.searchTextInput.text;
-			if(searchText.length > 2) {
-				//TO DO start search
-			}
-		}
-		
-		protected static function searchResultHandler(event:ResultEvent, token:Object):void {
-			var data:IList = IList(event.result);
-			searchPopUp.speciesDataGrid.dataProvider = data;
+			closeAutoCompletePopUp();
 		}
 		
 		protected static function autoCompleteSearchResultHandler(event:ResultEvent, token:Object):void {
