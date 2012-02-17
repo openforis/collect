@@ -206,7 +206,7 @@ package org.openforis.collect.ui {
 				return 120;
 			} else if(def is TaxonAttributeDefinitionProxy) {
 				if(isInDataGroup) {
-					return 356;
+					return 358;
 				} else {
 					return 100;
 				}

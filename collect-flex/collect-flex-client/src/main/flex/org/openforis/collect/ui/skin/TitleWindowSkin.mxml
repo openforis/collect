@@ -24,7 +24,10 @@
 		
 		private static const closeButtonStyleName:String = "closeButton";
 		private static const headerLabelStyleName:String = "dialogHeaderStyle";
-			
+		
+		[Bindable]
+		private var showCloseButton:Boolean = true;	
+		
 		/**
 		 * @private
 		 */
@@ -55,6 +58,9 @@
          */
         override protected function updateDisplayList(unscaledWidth:Number, unscaledHeight:Number):void
         {
+			var showCloseButtonString:String = getStyle("showCloseButton");
+			showCloseButton = showCloseButtonString == "true";
+			
 			var borderWeight:Number = getStyle('borderWeight');
 			if(isNaN(borderWeight)) {
 				borderWeight = 1;
@@ -256,7 +262,7 @@
         </s:Group>
 		
 		<!--- @copy spark.components.TitleWindow#closeButton -->
-		<s:Button id="closeButton" styleName="{closeButtonStyleName}"
+		<s:Button id="closeButton" styleName="{closeButtonStyleName}" visible="{showCloseButton}"
 		  		right="-10" top="-10" />
     </s:Group>
 </s:SparkSkin>
