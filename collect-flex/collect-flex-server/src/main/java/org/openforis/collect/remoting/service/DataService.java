@@ -445,6 +445,7 @@ public class DataService {
 		for (CodeListItem item : siblings) {
 			String itemCode = item.getCode();
 			code = code.trim();
+			code = code.toUpperCase();
 			//remove initial zeros
 			code = code.replaceFirst("^0+", "");
 			String quotedCode = Pattern.quote(code);
