@@ -6,23 +6,24 @@ package org.openforis.collect.remoting.service;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.openforis.collect.manager.TaxonManager;
 import org.openforis.collect.model.proxy.TaxonOccurrenceProxy;
-import org.openforis.collect.persistence.TaxonDAO;
 import org.openforis.idm.model.TaxonOccurence;
-import org.openforis.idm.model.species.Taxon;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author M. Togna
+ * @author S. Ricci
  */
 public class TaxonService {
 
 	@Autowired
-	private TaxonDAO taxonDAO;
+	private TaxonManager taxonManager;
 	
 	private enum SearchType {
 		BY_CODE,
-		BY_SCIENTIFIC_NAME
+		BY_SCIENTIFIC_NAME,
+		BY_VERNACULAR_NAME
 	}
 	
 	/**
@@ -42,22 +43,42 @@ public class TaxonService {
 	public List<TaxonOccurrenceProxy> findByScientificName(String searchString, int maxResults) {
 		return find(SearchType.BY_SCIENTIFIC_NAME, searchString, maxResults);
 	}
+	
+	/**
+	 * 
+	 * @param searchString
+	 * @param maxResults
+	 * @return
+	 */
+	public List<TaxonOccurrenceProxy> findByVernacularName(String searchString, int maxResults) {
+		return find(SearchType.BY_VERNACULAR_NAME, searchString, maxResults);
+	}
 
+	/**
+	 * Generic find method that uses SearchType enum
+	 * 
+	 * @param type
+	 * @param searchString
+	 * @param maxResults
+	 * @return
+	 */
 	private List<TaxonOccurrenceProxy> find(SearchType type, String searchString, int maxResults) {
-		List<Taxon> list = null;
+		List<TaxonOccurence> list = null;
 		switch(type) {
 			case BY_CODE:
-				list = taxonDAO.findByCode(searchString, maxResults);
+				list = taxonManager.findByCode(searchString, maxResults);
 				break;
 			case BY_SCIENTIFIC_NAME:
-				list = taxonDAO.findByScientificName(searchString, maxResults);
+				list = taxonManager.findByScientificName(searchString, maxResults);
+				break;
+			case BY_VERNACULAR_NAME:
+				list = taxonManager.findByVernacularName(searchString, maxResults);
 				break;
 		}
 		List<TaxonOccurrenceProxy> result = new ArrayList<TaxonOccurrenceProxy>();
 		if(list != null) {
-			for (Taxon taxon : list) {
-				TaxonOccurence occurrence = new TaxonOccurence(taxon);
-				TaxonOccurrenceProxy proxy = new TaxonOccurrenceProxy(occurrence);
+			for (TaxonOccurence o : list) {
+				TaxonOccurrenceProxy proxy = new TaxonOccurrenceProxy(o);
 				result.add(proxy);
 			}
 		}
