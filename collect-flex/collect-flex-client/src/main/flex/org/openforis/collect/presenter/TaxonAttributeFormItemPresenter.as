@@ -44,7 +44,7 @@ package org.openforis.collect.presenter {
 		private static const MAX_RESULTS:int = 20;
 		private static const SERACH_BY_CODE:String = "byCode";
 		private static const SEARCH_BY_SCIENTIFIC_NAME:String = "byScientificName";
-		private static const SEARCH_BY_VERNACULAR_NAME:String = "byScientificName";
+		private static const SEARCH_BY_VERNACULAR_NAME:String = "byVernacularName";
 		
 		protected static var autoCompletePopUp:TaxonAutoCompletePopUp;
 		protected static var autoCompletePopUpOpen:Boolean = false;
