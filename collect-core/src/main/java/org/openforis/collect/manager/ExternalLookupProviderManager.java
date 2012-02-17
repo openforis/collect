@@ -3,27 +3,25 @@
  */
 package org.openforis.collect.manager;
 
+import org.openforis.collect.persistence.ExternalLookupProviderDAO;
 import org.openforis.idm.metamodel.validation.ExternalLookupProvider;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author M. Togna
- *
+ * 
  */
 public class ExternalLookupProviderManager implements ExternalLookupProvider {
 
-	/**
-	 * 
-	 */
+	@Autowired
+	private ExternalLookupProviderDAO externalLookupProviderDAO;
+
 	public ExternalLookupProviderManager() {
 	}
 
-	/* (non-Javadoc)
-	 * @see org.openforis.idm.metamodel.validation.ExternalLookupProvider#lookup(java.lang.String, java.lang.String, java.lang.Object[])
-	 */
 	@Override
 	public Object lookup(String name, String attribute, Object... keys) {
-		// TODO Auto-generated method stub
-		return null;
+		return externalLookupProviderDAO.load(name, attribute, keys);
 	}
 
 }
