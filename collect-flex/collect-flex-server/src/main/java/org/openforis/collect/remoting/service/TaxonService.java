@@ -8,7 +8,7 @@ import java.util.List;
 
 import org.openforis.collect.model.proxy.TaxonOccurrenceProxy;
 import org.openforis.collect.persistence.TaxonDAO;
-import org.openforis.idm.model.TaxonOccurence;
+import org.openforis.idm.model.TaxonOccurrence;
 import org.openforis.idm.model.species.Taxon;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -56,7 +56,7 @@ public class TaxonService {
 		List<TaxonOccurrenceProxy> result = new ArrayList<TaxonOccurrenceProxy>();
 		if(list != null) {
 			for (Taxon taxon : list) {
-				TaxonOccurence occurrence = new TaxonOccurence(taxon);
+				TaxonOccurrence occurrence = new TaxonOccurrence(taxon);
 				TaxonOccurrenceProxy proxy = new TaxonOccurrenceProxy(occurrence);
 				result.add(proxy);
 			}
@@ -64,7 +64,7 @@ public class TaxonService {
 		return result;	
 	}
 	
-	public void suggest(TaxonOccurence taxon) {
+	public void suggest(TaxonOccurrence taxon) {
 
 	}
 

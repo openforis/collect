@@ -9,7 +9,7 @@ import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Code;
 import org.openforis.idm.model.Coordinate;
 import org.openforis.idm.model.Date;
-import org.openforis.idm.model.TaxonOccurence;
+import org.openforis.idm.model.TaxonOccurrence;
 import org.openforis.idm.model.Time;
 
 /**
@@ -36,8 +36,8 @@ public class AttributeProxy extends NodeProxy {
 				return new CoordinateProxy((Coordinate) val);
 			} else if(val instanceof Date) {
 				return new DateProxy((Date) val);
-			} else if(val instanceof TaxonOccurence) {
-				return new TaxonOccurrenceProxy((TaxonOccurence) val);
+			} else if(val instanceof TaxonOccurrence) {
+				return new TaxonOccurrenceProxy((TaxonOccurrence) val);
 			} else if(val instanceof Time) {
 				return new TimeProxy((Time) val);
 			} else{
