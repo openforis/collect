@@ -156,24 +156,18 @@ public class DataService {
 		sessionManager.clearActiveRecord();
 	}
 
-	public void updateRootEntityKey(String recordId, String newRootEntityKey) throws DuplicateIdException, InvalidIdException, NonexistentIdException, AccessDeniedException, RecordLockedException {
-	}
-
 	public List<NodeProxy> updateActiveRecord(UpdateRequest request) {
 		List<Node<?>> updatedNodes = new ArrayList<Node<?>>();
 		SessionState sessionState = sessionManager.getSessionState();
 		CollectRecord record = sessionState.getActiveRecord();
 		ModelVersion version = record.getVersion();
-		Integer parentEntityId = request.getParentEntityId();
-		Entity parentEntity = (Entity) record.getNodeById(parentEntityId);
-		EntityDefinition parentDef = parentEntity.getDefinition();
-		Integer nodeId = request.getNodeId();
+		Entity parentEntity = (Entity) record.getNodeById(request.getParentEntityId());
 		String nodeName = request.getNodeName();
 		Node<?> node = null;
-		if(nodeId != null) {
-			node = record.getNodeById(nodeId);
+		if(request.getNodeId() != null) {
+			node = record.getNodeById(request.getNodeId());
 		}
-		NodeDefinition nodeDef = ((EntityDefinition) parentDef).getChildDefinition(nodeName);
+		NodeDefinition nodeDef = ((EntityDefinition) parentEntity.getDefinition()).getChildDefinition(nodeName);
 		String requestValue = request.getValue();
 		String remarks = request.getRemarks();
 		//parse request value into a model value (for example Code, Date, Time...)
@@ -469,16 +463,6 @@ public class DataService {
 		return null;
 	}
 
-	private CodeListItem getCodeListItem(List<CodeListItem> siblings, String code) {
-		for (CodeListItem item : siblings) {
-			String itemCode = item.getCode();
-			if(itemCode.equals(code)) {
-				return item;
-			}
-		}
-		return null;
-	}
-	
 	private CodeListItem findCodeListItem(List<CodeListItem> siblings, String code) {
 		String adaptedCode = code.trim();
 		adaptedCode = adaptedCode.toUpperCase();
