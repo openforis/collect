@@ -18,6 +18,7 @@
 				this.presenter = new CoordinateInputFieldPresenter(this);
 			}
 			
+			[Bindable]
 			public function get subLabelWidth():Number {
 				return _subLabelWidth;
 			}
