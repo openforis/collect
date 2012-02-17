@@ -45,17 +45,30 @@
 				 >
 		<s:columns>
 			<s:ArrayList>
-				<s:GridColumn headerText="Code" dataField="taxon.code" width="100" />
-				<s:GridColumn editable="true" headerText="Scientific name" width="168" dataField="taxon.scientificName" />
-				<s:GridColumn headerText="Vernacular name" width="168" dataField="vernacularName.vernacularName" />
+				<s:GridColumn headerText="Code" dataField="taxon.code" width="50" />
+				<s:GridColumn headerText="Scientific name" width="100" dataField="taxon.scientificName" />
+				<s:GridColumn headerText="Vernacular name" width="100" dataField="vernacularName.vernacularName" />
 				<s:GridColumn headerText="Language/dialect" width="100" dataField="vernacularName.languageVariety" />
 			</s:ArrayList>
 		</s:columns>
-		<!--<s:itemRenderer>
+		<s:itemRenderer>
 			<fx:Component>
-				<s:GridItemRenderer height="20" doubleClickEnabled="true" doubleClick="outerDocument.doubleClickHandler(event)" />
+				<s:GridItemRenderer height="20" doubleClickEnabled="true" doubleClick="outerDocument.doubleClickHandler(event)">
+					
+					<s:Label id="labelDisplay" 
+							 minHeight="20" 
+							 height="100%" 
+							 width="100%"
+							 top="5" 
+							 left="3" 
+							 paddingLeft="5" 
+							 textAlign="left" 
+							 verticalAlign="middle" 
+							 />
+					
+				</s:GridItemRenderer>
 			</fx:Component>
-		</s:itemRenderer>-->
+		</s:itemRenderer>
 	</s:DataGrid>
 	
 </s:SkinnableContainer>

@@ -51,7 +51,7 @@
 		tabEnabled="false">
 		
 		<s:HGroup includeIn="horizontal" gap="2">
-			<input:TextInput id="codeTextInput" width="100" includeIn="horizontal" />
+			<input:TextInput id="codeTextInput" width="50" maxChars="4" includeIn="horizontal" />
 			<input:TextInput id="scientificNameTextInput" width="100" includeIn="horizontal" />
 			<input:TextInput id="vernacularNameTextInput" width="100" includeIn="horizontal" />
 			<input:TextInput id="vernacularLangTextInput" width="100" includeIn="horizontal" />
@@ -59,7 +59,7 @@
 		
 		<s:VGroup includeIn="vertical">
 			<s:Label styleName="bold" text="{attributeDefinition.getLabelText()}" />
-			<s:VGroup paddingLeft="20">
+			<s:VGroup>
 				<s:HGroup>
 					<s:Label width="{labelWidth}" styleName="bold" text="{Message.get('edit.taxon.code')}"/>
 					<fx:Reparent target="codeTextInput" includeIn="vertical" />

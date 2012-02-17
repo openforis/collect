@@ -61,16 +61,16 @@
 		</s:HGroup>
 		
 		<s:VGroup includeIn="vertical" gap="2">
-			<s:VGroup paddingLeft="20">
-				<s:HGroup>
+			<s:VGroup>
+				<s:HGroup gap="0">
 					<s:Label width="{subLabelWidth}" styleName="bold" text="{Message.get('edit.coordinate.srs')}"/>
 					<fx:Reparent target="srsDropDownList" includeIn="vertical" />
 				</s:HGroup>
-				<s:HGroup>
+				<s:HGroup gap="0">
 					<s:Label width="{subLabelWidth}" styleName="bold" text="{Message.get('edit.coordinate.x')}"/>
 					<fx:Reparent target="xTextInput" includeIn="vertical" />
 				</s:HGroup>
-				<s:HGroup>
+				<s:HGroup gap="0">
 					<s:Label width="{subLabelWidth}" styleName="bold" text="{Message.get('edit.coordinate.y')}"/>
 					<fx:Reparent target="yTextInput" includeIn="vertical" />
 				</s:HGroup>

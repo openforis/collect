@@ -9,6 +9,7 @@
 	<fx:Script>
 		<![CDATA[
 			import mx.binding.utils.BindingUtils;
+			import mx.controls.Spacer;
 			import mx.events.FlexEvent;
 			
 			import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
@@ -45,10 +46,17 @@
 							if(data is CoordinateAttributeDefinitionProxy || data is TaxonAttributeDefinitionProxy) {
 								var vGroup:VGroup = new VGroup();
 								vGroup.addElement(label);
-								vGroup.addElement(formItem);
+								var internalGroup:HGroup = new HGroup();
+								internalGroup.gap = 0;
+								var spacer:Spacer = new Spacer();
+								spacer.width = 20;
+								internalGroup.addElement(spacer);
+								internalGroup.addElement(formItem);
+								vGroup.addElement(internalGroup);
 								addElement(vGroup);
 							} else {
 								var hGroup:HGroup = new HGroup();
+								hGroup.gap = 0;
 								hGroup.addElement(label);
 								hGroup.addElement(formItem);
 								addElement(hGroup);

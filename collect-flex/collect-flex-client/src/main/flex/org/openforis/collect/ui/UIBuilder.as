@@ -191,7 +191,11 @@ package org.openforis.collect.ui {
 			} else if(def is CodeAttributeDefinitionProxy) {
 				return 100;
 			} else if(def is CoordinateAttributeDefinitionProxy) {
-				return 100;
+				if(isInDataGroup) {
+					return 300;
+				} else {
+					return 100;
+				}
 			} else if(def is DateAttributeDefinitionProxy) {
 				return 150;
 			} else if(def is FileAttributeDefinitionProxy) {
@@ -201,7 +205,11 @@ package org.openforis.collect.ui {
 			} else if(def is RangeAttributeDefinitionProxy) {
 				return 120;
 			} else if(def is TaxonAttributeDefinitionProxy) {
-				return 404;
+				if(isInDataGroup) {
+					return 356;
+				} else {
+					return 100;
+				}
 			} else if(def is TextAttributeDefinitionProxy) {
 				var textAttributeDef:TextAttributeDefinitionProxy = TextAttributeDefinitionProxy(def);
 				var type:TextAttributeDefinitionProxy$Type = textAttributeDef.type;
@@ -333,7 +341,7 @@ package org.openforis.collect.ui {
 				//subheader
 				h = new HGroup();
 				h.gap = 2;
-				l = getLabel(Message.get('edit.taxon.code'), 100, "bold");
+				l = getLabel(Message.get('edit.taxon.code'), 50, "bold");
 				h.addElement(l);
 				l = getLabel(Message.get('edit.taxon.scientificName'), 100, "bold");
 				h.addElement(l);
