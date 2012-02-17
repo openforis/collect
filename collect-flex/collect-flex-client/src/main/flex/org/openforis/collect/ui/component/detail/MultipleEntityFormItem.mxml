@@ -7,7 +7,7 @@
 					   >
 	
 	<detail:layout>
-		<s:VerticalLayout paddingTop="15" />
+		<s:VerticalLayout />
 	</detail:layout>
 	
 	<fx:Script>

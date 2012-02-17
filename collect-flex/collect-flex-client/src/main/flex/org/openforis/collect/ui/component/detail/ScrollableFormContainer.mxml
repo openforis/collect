@@ -69,16 +69,12 @@
 			 styleName="entityForm"
 			 id="borderContainer"
 			 >
-		<s:layout>
-			<s:VerticalLayout gap="10" />
-		</s:layout>
-	
 		<s:Scroller height="100%" width="100%" visible="true" id="scroller">
 			<s:DataGroup id="formDataGroup" height="100%" width="100%"
 						 dataProvider="{nodeDefinitions}"
 						 >
 				<s:layout>
-					<s:VerticalLayout gap="4" />
+					<s:VerticalLayout gap="10" paddingBottom="10" paddingLeft="10" paddingRight="10" paddingTop="10" />
 				</s:layout>
 				<s:itemRenderer>
 					<fx:Component>

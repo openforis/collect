@@ -9,10 +9,6 @@
 					label="{entityDefinition.getLabelText()}" 
 					>
 	
-	<s:layout>
-		<s:VerticalLayout gap="15" />
-	</s:layout>
-	
 	<fx:Script>
 		<![CDATA[
 			import mx.collections.ArrayCollection;
@@ -173,7 +169,7 @@
 	
 	<s:BorderContainer width="100%" height="100%" id="externalContainer" styleName="entityForm">
 		<s:layout>
-			<s:VerticalLayout/>
+			<s:VerticalLayout />
 		</s:layout>
 		<s:Group width="100%" id="addSection" 
 				 includeInLayout="{entityDefinition.multiple}" 
@@ -203,7 +199,7 @@
 								 width="100%" 
 								 >
 						<s:layout>
-							<s:VerticalLayout />
+							<s:VerticalLayout paddingBottom="10" paddingLeft="10" paddingRight="10" paddingTop="10" />
 						</s:layout>
 						<s:itemRenderer>
 							<fx:Component>
