@@ -53,17 +53,9 @@
 
 
 	<!-- Controllers -->
-	<bean id="fileNameViewController" class="org.springframework.web.servlet.mvc.UrlFilenameViewController">
-	</bean>
-	
-	<bean id="unlockController" class="org.openforis.collect.web.controller.UnlockController">
-	</bean>
+	<bean id="fileNameViewController" class="org.springframework.web.servlet.mvc.UrlFilenameViewController" />
+	<bean id="unlockController" class="org.openforis.collect.web.controller.UnlockController" />
 
-	<!-- Expression Factory -->
-	<bean id="expressionFactory" class="org.openforis.idm.model.expression.ExpressionFactory">
-	</bean>
-
-	
 	<!-- TODO -->
 	<!-- <bean id="contextApplicationContextProvider" -->
 	<!-- class="org.fao.openforis.web.context.ApplicationContextAwareImpl"></bean> -->
@@ -71,17 +63,10 @@
 	<!-- ===================================== -->
 	<!-- GraniteDs services -->
 	<!-- ===================================== -->
-	<bean id="sessionService" class="org.openforis.collect.remoting.service.SessionService" autowire="byName">
-	</bean>
-
-	<bean id="taxonService" class="org.openforis.collect.remoting.service.TaxonService" autowire="byName">
-	</bean>
-
-	<bean id="modelService" class="org.openforis.collect.remoting.service.ModelService" autowire="byName">
-	</bean>
-
-	<bean id="dataService" class="org.openforis.collect.remoting.service.DataService" autowire="byName">
-	</bean>
+	<bean id="sessionService" 	class="org.openforis.collect.remoting.service.SessionService" autowire="byName" />
+	<bean id="taxonService" 		class="org.openforis.collect.remoting.service.TaxonService" autowire="byName" />
+	<bean id="modelService"		class="org.openforis.collect.remoting.service.ModelService" autowire="byName" />
+	<bean id="dataService" 			class="org.openforis.collect.remoting.service.DataService" autowire="byName"/>
 
 	<!-- <bean id="backupService" class="org.fao.openforis.web.service.BackupService"> -->
 	<!-- <property name="backupDirectory" value="backup" /> -->
@@ -96,16 +81,12 @@
 	<!-- ===================================== -->
 	<!-- Managers -->
 	<!-- ===================================== -->
-	<bean id="sessionManager" class="org.openforis.collect.manager.SessionManager" />
-
-	<bean id="surveyManager" class="org.openforis.collect.manager.SurveyManager" init-method="init" />
-
-	<bean id="recordManager" class="org.openforis.collect.manager.RecordManager" init-method="init" />
-
-	<bean id="taxonManager" class="org.openforis.collect.manager.TaxonManager" />
-	
-	<bean id="userManager" class="org.openforis.collect.manager.UserManager" />
-	
+	<bean id="sessionManager" 				class="org.openforis.collect.manager.SessionManager" />
+	<bean id="surveyManager"	 				class="org.openforis.collect.manager.SurveyManager" init-method="init" />
+	<bean id="recordManager" 					class="org.openforis.collect.manager.RecordManager" init-method="init" />
+	<bean id="taxonManager" 					class="org.openforis.collect.manager.TaxonManager" />
+	<bean id="userManager" 						class="org.openforis.collect.manager.UserManager" />
+		
 	<!-- ===================================== -->
 	<!-- Data Source -->
 	<!-- ===================================== -->
@@ -153,33 +134,17 @@
     	<property name="dataSource" ref="dataSource"/>
 	</bean>
 	
-	<!-- <bean id="applicationDao" class="org.fao.openforis.collect.dao.xml.ApplicationDaoImpl"> -->
-	<!-- <property name="recordDao" ref="recordDao" /> -->
-	<!-- <property name="versionDao" ref="versionDao" /> -->
-	<!-- <property name="taxonDao" ref="taxonDao" /> -->
-	<!-- <property name="validationResultDao" ref="validationResultDao" /> -->
-	<!-- </bean> -->
+	<bean id="externalLookupProviderDAO" class="org.openforis.collect.persistence.LookupProviderDAO">
+    	<property name="dataSource" ref="dataSource"/>
+	</bean>
 
-	<!-- <bean id="recordDao" class="org.fao.openforis.collect.dao.xml.XmlRecordDao"> -->
-	<!-- <property name="applicationDao" ref="applicationDao" /> -->
-	<!-- </bean> -->
-
-	<!-- <bean id="versionDao" class="org.fao.openforis.collect.dao.xml.XmlVersionDao"> -->
-	<!-- <property name="applicationDao" ref="applicationDao" /> -->
-	<!-- </bean> -->
-
-	<!-- <bean id="taxonDao" class="org.fao.openforis.collect.dao.xml.XmlTaxonDao"> -->
-	<!-- <property name="applicationDao" ref="applicationDao" /> -->
-	<!-- </bean> -->
-
-	<!-- <bean id="validationResultDao" -->
-	<!-- class="org.fao.openforis.collect.dao.xml.XmlValidationResultDao"> -->
-	<!-- <property name="applicationDao" ref="applicationDao" /> -->
-	<!-- </bean> -->
-
-
-
-
+	<!-- Expression Factory -->
+	<bean id="expressionFactory" class="org.openforis.idm.model.expression.ExpressionFactory">
+		<property name="lookupProvider" ref="lookupProvider" />
+	</bean>
+	
+	<bean id="lookupProvider" 	class="org.openforis.collect.persistence.DatabaseLookupProvider" />
+	
 	<!-- Controllers -->
 	<!-- <bean id="multipartResolver" -->
 	<!-- class="org.springframework.web.multipart.commons.CommonsMultipartResolver" /> -->
