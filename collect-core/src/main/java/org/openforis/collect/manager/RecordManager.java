@@ -126,7 +126,7 @@ public class RecordManager implements RecordContext {
 		record.createRootEntity(rootEntityDefinition.getName());
 		
 		record.setCreationDate(new Date());
-		//record.setCreatedBy(user.getId());
+		record.setCreatedBy(user);
 		record.setStep(Step.ENTRY);
 		recordDAO.saveOrUpdate(record);
 		Integer recordId = record.getId();
