@@ -30,7 +30,7 @@ package org.openforis.collect.presenter
 		override internal function initEventListeners():void {
 			super.initEventListeners();
 			
-			eventDispatcher.addEventListener(ApplicationEvent.MODEL_CHANGED, modelChangedHandler);
+			eventDispatcher.addEventListener(ApplicationEvent.UPDATE_RESPONSE_RECEIVED, modelChangedHandler);
 			ChangeWatcher.watch(_view, "parentEntity", parentEntityChangeHandler);
 			
 			_view.addEventListener(MouseEvent.MOUSE_OVER, mouseOverHandler);

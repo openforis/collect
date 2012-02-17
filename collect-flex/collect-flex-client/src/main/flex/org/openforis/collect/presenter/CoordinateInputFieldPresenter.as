@@ -3,6 +3,7 @@ package org.openforis.collect.presenter {
 	import flash.events.FocusEvent;
 	
 	import mx.events.DropdownEvent;
+	import mx.managers.IFocusManagerComponent;
 	
 	import org.openforis.collect.Application;
 	import org.openforis.collect.metamodel.proxy.SpatialReferenceSystemProxy;
@@ -39,6 +40,17 @@ package org.openforis.collect.presenter {
 			_view.yTextInput.addEventListener(FocusEvent.FOCUS_OUT, focusOutHandler);
 			_view.srsDropDownList.addEventListener(Event.CHANGE, srsDropDownChangeHandler);
 			_view.srsDropDownList.addEventListener(DropdownEvent.CLOSE, srsDropDownCloseHandler);
+		}
+		
+		override protected function focusOutHandler(event:FocusEvent):void {
+			var focussedField:IFocusManagerComponent = _view.focusManager.getFocus();
+			if(_changed 
+				&& focussedField != _view.xTextInput 
+				&& focussedField != _view.yTextInput 
+				&& focussedField != _view.srsDropDownList 
+			) {
+				applyChanges();
+			}
 		}
 		
 		override protected function updateView():void {

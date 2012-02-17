@@ -16,6 +16,7 @@ package org.openforis.collect.presenter {
 	import org.granite.collections.IMap;
 	import org.openforis.collect.Application;
 	import org.openforis.collect.client.ClientFactory;
+	import org.openforis.collect.client.DataClient;
 	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.event.InputFieldEvent;
 	import org.openforis.collect.event.UIEvent;
@@ -47,9 +48,11 @@ package org.openforis.collect.presenter {
 		private var _view:InputField;
 		protected var _changed:Boolean = false;
 		protected var _updateResponder:IResponder;
+		private var _dataClient:DataClient;
 		
 		public function InputFieldPresenter(inputField:InputField = null) {
 			_view = inputField;
+			_dataClient = ClientFactory.dataClient;
 			super();
 			
 			_updateResponder = new AsyncResponder(updateResultHandler, updateFaultHandler);
@@ -60,7 +63,7 @@ package org.openforis.collect.presenter {
 		override internal function initEventListeners():void {
 			super.initEventListeners();
 			
-			eventDispatcher.addEventListener(ApplicationEvent.MODEL_CHANGED, modelChangedHandler);
+			eventDispatcher.addEventListener(ApplicationEvent.UPDATE_RESPONSE_RECEIVED, modelChangedHandler);
 			
 			_view.addEventListener(MouseEvent.MOUSE_OVER, mouseOverHandler);
 			_view.addEventListener(MouseEvent.MOUSE_OUT, mouseOutHandler);
@@ -139,7 +142,7 @@ package org.openforis.collect.presenter {
 			} else {
 				req.method = UpdateRequest$Method.ADD;
 			}
-			ClientFactory.dataClient.updateActiveRecord(_updateResponder, req);
+			dataClient.updateActiveRecord(_updateResponder, req);
 		}
 		
 		protected function focusInHandler(event:FocusEvent):void {
@@ -149,7 +152,7 @@ package org.openforis.collect.presenter {
 		protected function updateResultHandler(event:ResultEvent, token:Object = null):void {
 			var result:IList = event.result as IList;
 			Application.activeRecord.update(result);
-			eventDispatcher.dispatchEvent(new ApplicationEvent(ApplicationEvent.MODEL_CHANGED));
+			eventDispatcher.dispatchEvent(new ApplicationEvent(ApplicationEvent.UPDATE_RESPONSE_RECEIVED));
 			_changed = false;
 			//_view.currentState = InputField.STATE_SAVE_COMPLETE;
 		}
@@ -202,7 +205,7 @@ package org.openforis.collect.presenter {
 			} else {
 				req.method = UpdateRequest$Method.ADD;
 			}
-			ClientFactory.dataClient.updateActiveRecord(_updateResponder, req);
+			dataClient.updateActiveRecord(_updateResponder, req);
 		}
 
 
@@ -234,6 +237,10 @@ package org.openforis.collect.presenter {
 				}
 			}
 			return null;
+		}
+		
+		protected function get dataClient():DataClient {
+			return _dataClient;
 		}
 	}
 }

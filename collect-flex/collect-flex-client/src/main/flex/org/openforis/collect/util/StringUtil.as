@@ -49,12 +49,20 @@ package org.openforis.collect.util
 			return value == " ";
 		}
 		
-		public static function isBlank(value:String, trim:Boolean = false):Boolean {
-			return value == null || value == "" || (trim && mx.utils.StringUtil.trim(value) == "");
+		public static function isEmpty(value:String):Boolean {
+			return value == null || value == "";
+		}
+		
+		public static function isBlank(value:String):Boolean {
+			return mx.utils.StringUtil.trim(value) == "";
 		}
 		
 		public static function isNotBlank(value:String):Boolean {
-			return value != null && value != "";
+			return ! isBlank(value);
+		}
+		
+		public static function isNotEmpty(value:String):Boolean {
+			return ! isEmpty(value);
 		}
 		
 		public static function nullToBlank(value:Object):String {
@@ -104,6 +112,22 @@ package org.openforis.collect.util
 		
 		public static function startsWith(string:String, startsWith:String):Boolean {
 			return string != null && string.indexOf(startsWith) == 0;
+		}
+		
+		public static function pad(str:String, length:int, pad:String):String {
+			var result:String = str;
+			while ( result.length < length ) {
+				result = pad + result;
+			}
+			return result;
+		}
+		
+		public static function zeroPad(number:Number, length:int = 2):String {
+			if(! isNaN(number)) {
+				return pad(number.toString(), length, "0");
+			} else {
+				return "";
+			}
 		}
 	}
 }

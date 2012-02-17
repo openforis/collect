@@ -200,7 +200,7 @@ package org.openforis.collect.ui
 		protected static function updateFieldResultHandler(event:ResultEvent, token:Object = null):void {
 			var result:IList = event.result as IList;
 			Application.activeRecord.update(result);
-			EventDispatcherFactory.getEventDispatcher().dispatchEvent(new ApplicationEvent(ApplicationEvent.MODEL_CHANGED));
+			EventDispatcherFactory.getEventDispatcher().dispatchEvent(new ApplicationEvent(ApplicationEvent.UPDATE_RESPONSE_RECEIVED));
 		}
 		
 

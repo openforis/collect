@@ -5,6 +5,7 @@ package org.openforis.collect.presenter {
 	import mx.controls.DateField;
 	import mx.events.CalendarLayoutChangeEvent;
 	import mx.events.DropdownEvent;
+	import mx.managers.IFocusManagerComponent;
 	
 	import org.openforis.collect.model.proxy.AttributeSymbol;
 	import org.openforis.collect.model.proxy.DateProxy;
@@ -54,32 +55,19 @@ package org.openforis.collect.presenter {
 			_view.dateField.addEventListener(DropdownEvent.OPEN, dateFieldOpenHandler);
 		}
 
-		/*
-		override protected function set value(value:Object):void {
-			_attributeValue = value;
-			//this._inputField.attribute = attribute;
-			this._dateInputField.year.text = value.text1;
-			this._dateInputField.month.text = value.text2;
-			this._dateInputField.day.text = value.text3;
-			this._inputField.remarks = value.remarks;
-			this._inputField.approved = value.approved;
-		}
-		*/
-		override protected function createValue():* {
-			var result:String = StringUtil.concat(separator, _view.day.text, _view.month.text, _view.year.text);
-			return result;
-			/*
-			var newAttributeValue:AbstractValue = new AbstractValue();
-			newAttributeValue.text1 = _dateInputField.year.text;
-			newAttributeValue.text2 = _dateInputField.month.text;
-			newAttributeValue.text3 = _dateInputField.day.text;
-			
-			if(value != null) {
-				//copy old informations
-				newAttributeValue.remarks = value.remarks;
+		override protected function focusOutHandler(event:FocusEvent):void {
+			var focussedField:IFocusManagerComponent = _view.focusManager.getFocus();
+			if(_changed && focussedField != _view.year 
+				&& focussedField != _view.month 
+				&& focussedField != _view.day 
+				) {
+				applyChanges();
 			}
-			return newAttributeValue;
-			*/
+		}
+		
+		override protected function createValue():* {
+			var result:String = StringUtil.concat("-", _view.year.text, _view.month.text, _view.day.text);
+			return result;
 		}
 		
 		protected function dateFieldOpenHandler(event:Event):void {
@@ -91,15 +79,15 @@ package org.openforis.collect.presenter {
 		
 		protected function dateFieldChangeHandler(event:Event):void {
 			var date:Date = (event.target as DateField).selectedDate;
-			setDateOnFields(date);
+			setDateOnFields(date.fullYear, date.month, date.date);
 			
 			applyChanges();
 		}
 		
-		protected function setDateOnFields(date:Date):void {
-			_view.year.text = String(date.fullYear);
-			_view.month.text = String(date.month);
-			_view.day.text = String(date.date);
+		protected function setDateOnFields(year:Number, month:Number, day:Number):void {
+			_view.year.text = StringUtil.zeroPad(year, 2);
+			_view.month.text = StringUtil.zeroPad(month, 2);
+			_view.day.text = StringUtil.zeroPad(day, 2);
 		}
 		
 		
@@ -128,9 +116,7 @@ package org.openforis.collect.presenter {
 				if(_view.attribute.symbol != null && getReasonBlankShortKey(_view.attribute.symbol) != null) {
 					_view.day.text = getReasonBlankShortKey(_view.attribute.symbol);
 				} else if(date != null) {
-					_view.year.text = StringUtil.nullToBlank(date.year);
-					_view.month.text = StringUtil.nullToBlank(date.month);
-					_view.day.text = StringUtil.nullToBlank(date.day);
+					setDateOnFields(date.year, date.month, date.day);
 				}
 			}
 		}

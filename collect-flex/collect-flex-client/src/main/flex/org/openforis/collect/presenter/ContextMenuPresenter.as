@@ -268,7 +268,7 @@ package org.openforis.collect.presenter
 		protected function deleteAttributeResultHandler(event:ResultEvent, token:Object = null):void {
 			var result:IList = event.result as IList;
 			Application.activeRecord.update(result);
-			eventDispatcher.dispatchEvent(new ApplicationEvent(ApplicationEvent.MODEL_CHANGED));
+			eventDispatcher.dispatchEvent(new ApplicationEvent(ApplicationEvent.UPDATE_RESPONSE_RECEIVED));
 		}
 		
 	}
