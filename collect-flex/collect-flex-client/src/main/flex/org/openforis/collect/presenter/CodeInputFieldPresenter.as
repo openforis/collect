@@ -22,6 +22,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.remoting.service.UpdateRequest;
 	import org.openforis.collect.remoting.service.UpdateRequest$Method;
 	import org.openforis.collect.ui.component.input.CodeInputField;
+	import org.openforis.collect.ui.component.input.CodeListDialog;
 	import org.openforis.collect.ui.component.input.TextInput;
 	import org.openforis.collect.util.ArrayUtil;
 	import org.openforis.collect.util.CollectionUtil;
@@ -34,6 +35,7 @@ package org.openforis.collect.presenter {
 	 * */
 	public class CodeInputFieldPresenter extends InputFieldPresenter {
 		
+		private static var _popUp:CodeListDialog;
 		private var _view:CodeInputField;
 		private var _items:IList;
 		
@@ -48,34 +50,38 @@ package org.openforis.collect.presenter {
 			
 			_view.openImage.addEventListener(MouseEvent.CLICK, openImageClickHandler);
 			
-			_view.popup.addEventListener(CloseEvent.CLOSE, closePopupHandler);
-			_view.popup.cancelButton.addEventListener(MouseEvent.CLICK, cancelButtonClickHandler);
-			_view.popup.applyButton.addEventListener(MouseEvent.CLICK, applyButtonClickHandelr);
-			
 			ChangeWatcher.watch(_view, "attributes", attributeChangeHandler);
 		}
 		
 		/**
 		 * Close the popup
 		 * */
-		internal function closePopupHandler(event:CloseEvent):void {
-			PopUpManager.removePopUp(_view.popup);
+		internal static function closePopupHandler(event:Event = null):void {
+			PopUpManager.removePopUp(_popUp);
 		}
 		
 		/**
 		 * Open the popup
 		 * */
 		protected function openImageClickHandler(event:Event):void {
-			PopUpManager.addPopUp(_view.popup, FlexGlobals.topLevelApplication as DisplayObject, true);
-			PopUpManager.centerPopUp(_view.popup);
+			if(_popUp == null) {
+				_popUp = new CodeListDialog();
+				_popUp.addEventListener(CloseEvent.CLOSE, closePopupHandler);
+				_popUp.cancelButton.addEventListener(MouseEvent.CLICK, closePopupHandler);
+				_popUp.applyButton.addEventListener(MouseEvent.CLICK, applyButtonClickHandler);
+			}
+			PopUpManager.addPopUp(_popUp, FlexGlobals.topLevelApplication as DisplayObject, true);
+			PopUpManager.centerPopUp(_popUp);
+			_popUp.multiple = _view.attributeDefinition.multiple;
+			_popUp.maxSpecified = _view.attributeDefinition.maxCount;
+			_popUp.title = _view.attributeDefinition.getLabelText();
+			_popUp.codeInputField = _view;
 			
 			loadCodes();
 		}
 		
 		protected function loadCodes():void {
-			_view.popup.currentState = "loading";
-			
-			//call service method
+			_popUp.currentState = "loading";
 			
 			var codeAttributeDef:CodeAttributeDefinitionProxy = _view.attributeDefinition as CodeAttributeDefinitionProxy;
 			var attribute:String = codeAttributeDef.name;
@@ -85,12 +91,12 @@ package org.openforis.collect.presenter {
 		
 		protected function loadListDialogDataResultHandler(event:ResultEvent, token:Object = null):void {
 			var data:IList = event.result as IList;
-			_view.popup.dataGroup.dataProvider = data;
-			_view.popup.currentState = "default";
+			_popUp.dataGroup.dataProvider = data;
+			_popUp.currentState = "default";
 		}
 
-		protected function applyButtonClickHandelr(event:MouseEvent):void {
-			var items:IList = _view.popup.dataGroup.dataProvider;
+		protected static function applyButtonClickHandler(event:MouseEvent):void {
+			var items:IList = _popUp.dataGroup.dataProvider;
 			var parts:Array = new Array();
 			for each (var item:CodeListItemProxy in items) { 
 				if(item.selected) {
@@ -99,15 +105,11 @@ package org.openforis.collect.presenter {
 				}
 			}
 			var codesStr:String = StringUtil.concat(", ", parts);
-			TextInput(_view.textInput).text = codesStr;
-			PopUpManager.removePopUp(_view.popup);
-			applyChanges();
+			TextInput(_popUp.codeInputField.textInput).text = codesStr;
+			_popUp.codeInputField.presenter.applyChanges();
+			closePopupHandler();
 		}
 		
-		protected function cancelButtonClickHandler(event:MouseEvent):void {
-			PopUpManager.removePopUp(_view.popup);
-		}
-
 		override protected function getTextValue():String {
 			if(_view.attributeDefinition != null) {
 				if(_view.attributeDefinition.multiple) {
@@ -154,7 +156,7 @@ package org.openforis.collect.presenter {
 			super.updateView();
 		}
 		
-		override protected function applyChanges(value:*=null):void {
+		override public function applyChanges(value:*=null):void {
 			if(_view.parentEntity == null) {
 				throw new Error("Missing parent entity for this attribute");
 			}
@@ -168,10 +170,7 @@ package org.openforis.collect.presenter {
 			req.value = String(value);
 			
 			if(_view.attribute != null || (CollectionUtil.isNotEmpty(_view.attributes))) {
-				if(def.multiple) {
-					var firstAttr:Object = _view.attributes.getItemAt(0);
-					req.nodeId = firstAttr.id;
-				} else {
+				if(! def.multiple) {
 					req.nodeId = _view.attribute.id;
 				}
 				req.method = UpdateRequest$Method.UPDATE;

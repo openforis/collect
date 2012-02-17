@@ -119,7 +119,7 @@ package org.openforis.collect.presenter {
 			}
 		}
 
-		protected function applyChanges(value:* = null):void {
+		public function applyChanges(value:* = null):void {
 			if(_view.parentEntity == null) {
 				throw new Error("Missing parent entity for this attribute");
 			}

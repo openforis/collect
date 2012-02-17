@@ -12,6 +12,7 @@
 			
 			private var _maxSpecified:int = 1;
 			private var _multiple:Boolean = false;
+			private var _codeInputField:CodeInputField;
 			
 			[Bindable]
 			public function get multiple():Boolean {
@@ -30,6 +31,16 @@
 			public function set maxSpecified(value:int):void {
 				_maxSpecified = value;
 			}
+			
+			[Bindable]
+			public function get codeInputField():CodeInputField {
+				return _codeInputField;
+			}
+			
+			public function set codeInputField(value:CodeInputField):void {
+				_codeInputField = value;
+			}
+
 
 		]]>
 	</fx:Script>

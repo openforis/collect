@@ -42,13 +42,7 @@
 			
 		]]>
 	</fx:Script>
-	
-	<fx:Declarations>
-		<input:CodeListDialog id="popup" 
-							  title="{attributeDefinition.getLabelText()}" 
-							  multiple="{attributeDefinition.multiple}" />
-	</fx:Declarations>
-	
+
 	<input:states>
 		<s:State name="default" />
 		<s:State name="descriptionVisible" />
