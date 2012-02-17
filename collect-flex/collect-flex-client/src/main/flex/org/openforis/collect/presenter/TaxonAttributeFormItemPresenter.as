@@ -42,8 +42,9 @@ package org.openforis.collect.presenter {
 	public class TaxonAttributeFormItemPresenter extends AttributeFormItemPresenter {
 		
 		private static const MAX_RESULTS:int = 20;
-		private static const BY_CODE:String = "byCode";
-		private static const BY_SCIENTIFIC_NAME:String = "byScientificName";
+		private static const SERACH_BY_CODE:String = "byCode";
+		private static const SEARCH_BY_SCIENTIFIC_NAME:String = "byScientificName";
+		private static const SEARCH_BY_VERNACULAR_NAME:String = "byScientificName";
 		
 		protected static var autoCompletePopUp:TaxonAutoCompletePopUp;
 		protected static var autoCompletePopUpOpen:Boolean = false;
@@ -123,10 +124,10 @@ package org.openforis.collect.presenter {
 			var searchType:String;
 			switch(textInput) {
 				case view.codeTextInput:
-					searchType = BY_CODE;
+					searchType = SERACH_BY_CODE;
 					break;
 				case view.scientificNameTextInput:
-					searchType = BY_SCIENTIFIC_NAME;
+					searchType = SEARCH_BY_SCIENTIFIC_NAME;
 					break;
 			}
 			showAutoCompletePopUp(searchType, textInput);
@@ -160,11 +161,14 @@ package org.openforis.collect.presenter {
 			var client:TaxonClient = ClientFactory.taxonClient;
 			var searchText:String = textInput.text;
 			switch(searchType) {
-				case BY_CODE:
+				case SERACH_BY_CODE:
 					client.findByCode(autoCompleteSearchResponder, searchText, MAX_RESULTS);
 					break;
-				case BY_SCIENTIFIC_NAME:
+				case SEARCH_BY_SCIENTIFIC_NAME:
 					client.findByScientificName(autoCompleteSearchResponder, searchText, MAX_RESULTS);
+					break;
+				case SEARCH_BY_VERNACULAR_NAME:
+					client.findByVernacularName(autoCompleteSearchResponder, searchText, MAX_RESULTS);
 					break;
 				default:
 			}

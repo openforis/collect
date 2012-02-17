@@ -86,7 +86,7 @@ package org.openforis.collect.presenter {
 			var codeAttributeDef:CodeAttributeDefinitionProxy = _view.attributeDefinition as CodeAttributeDefinitionProxy;
 			var attribute:String = codeAttributeDef.name;
 			var parentEntityId:int = _view.parentEntity.id;
-			ClientFactory.dataClient.getAssignableCodeListItems(new AsyncResponder(loadListDialogDataResultHandler, faultHandler), parentEntityId, attribute);
+			ClientFactory.dataClient.findAssignableCodeListItems(new AsyncResponder(loadListDialogDataResultHandler, faultHandler), parentEntityId, attribute);
 		}
 		
 		protected function loadListDialogDataResultHandler(event:ResultEvent, token:Object = null):void {
@@ -200,10 +200,9 @@ package org.openforis.collect.presenter {
 				if(ArrayUtil.isNotEmpty(codes)) {
 					var parentEntityId:int = _view.parentEntity.id;
 					var name:String = _view.attributeDefinition.name;
-					var code:String = (_view.attribute.value as CodeProxy).code;
 					var responder:IResponder = new AsyncResponder(findItemsResultHandler, faultHandler);
 					
-					ClientFactory.dataClient.findAssignableCodeListItems(responder, parentEntityId, name, codes);
+					ClientFactory.dataClient.getCodeListItems(responder, parentEntityId, name, codes);
 				}
 			}
 		}

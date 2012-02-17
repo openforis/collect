@@ -102,8 +102,9 @@
 
 	<bean id="recordManager" class="org.openforis.collect.manager.RecordManager" init-method="init" />
 
-	<bean id="userManager" class="org.openforis.collect.manager.UserManager" />
+	<bean id="taxonManager" class="org.openforis.collect.manager.TaxonManager" />
 	
+	<bean id="userManager" class="org.openforis.collect.manager.UserManager" />
 	
 	<!-- ===================================== -->
 	<!-- Data Source -->
@@ -141,6 +142,14 @@
 	</bean>
 	
 	<bean id="taxonDao" class="org.openforis.collect.persistence.TaxonDAO">
+    	<property name="dataSource" ref="dataSource"/>
+	</bean>
+	
+	<bean id="taxonVernacularNameDao" class="org.openforis.collect.persistence.TaxonVernacularNameDAO">
+    	<property name="dataSource" ref="dataSource"/>
+	</bean>
+	
+	<bean id="taxonomyDao" class="org.openforis.collect.persistence.TaxonomyDAO">
     	<property name="dataSource" ref="dataSource"/>
 	</bean>
 	

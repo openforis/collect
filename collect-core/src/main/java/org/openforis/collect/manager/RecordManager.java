@@ -32,6 +32,7 @@ import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NumericAttributeDefinition;
 import org.openforis.idm.metamodel.NumericAttributeDefinition.Type;
 import org.openforis.idm.metamodel.Survey;
+import org.openforis.idm.metamodel.TaxonAttributeDefinition;
 import org.openforis.idm.metamodel.TextAttributeDefinition;
 import org.openforis.idm.metamodel.TimeAttributeDefinition;
 import org.openforis.idm.model.Attribute;
@@ -43,6 +44,7 @@ import org.openforis.idm.model.Node;
 import org.openforis.idm.model.NumberAttribute;
 import org.openforis.idm.model.Record;
 import org.openforis.idm.model.RecordContext;
+import org.openforis.idm.model.TaxonOccurrence;
 import org.openforis.idm.model.TextAttribute;
 import org.openforis.idm.model.Time;
 import org.openforis.idm.model.expression.ExpressionFactory;
@@ -191,11 +193,14 @@ public class RecordManager implements RecordContext {
 					result = parentEntity.addValue(name, (Double) value);
 					break;
 			}
+		} else if(def instanceof TaxonAttributeDefinition) {
+			result = parentEntity.addValue(name, (TaxonOccurrence) value);
 		} else if(def instanceof TextAttributeDefinition) {
 			result = parentEntity.addValue(name, (String) value);
 		} else if(def instanceof TimeAttributeDefinition) {
 			result = parentEntity.addValue(name, (Time) value);
 		}
+		
 		result.setSymbol(symbol);
 		result.setRemarks(remarks);
 		return result;

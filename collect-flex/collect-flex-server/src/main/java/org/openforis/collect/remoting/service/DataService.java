@@ -329,22 +329,50 @@ public class DataService {
 	}
 	
 	/**
+	 * Gets the code list items assignable to the specified attribute and matching the specified codes.
+	 * 
+	 * @param parentEntityId
+	 * @param attrName
+	 * @param codes
+	 * @return
+	 */
+	public List<CodeListItemProxy> getCodeListItems(int parentEntityId, String attrName, String[] codes){
+		CollectRecord record = getActiveRecord();
+		Entity parent = (Entity) record.getNodeById(parentEntityId);
+		CodeAttributeDefinition def = (CodeAttributeDefinition) parent.getDefinition().getChildDefinition(attrName);
+		List<CodeListItem> items = getAssignableCodeListItems(parent, def);
+		List<CodeListItem> filteredItems = new ArrayList<CodeListItem>();
+		if(codes != null && codes.length > 0) {
+			//filter by specified codes
+			for (CodeListItem item : items) {
+				for (String code : codes) {
+					if(item.getCode().equals(code)) {
+						filteredItems.add(item);
+					}
+				}
+			}
+		}
+		List<CodeListItemProxy> result = CodeListItemProxy.fromList(filteredItems);
+		return result;
+	} 
+	
+	/**
 	 * Gets the code list items assignable to the specified attribute.
 	 * 
 	 * @param parentEntityId
 	 * @param attrName
 	 * @return
 	 */
-	public List<CodeListItemProxy> getAssignableCodeListItems(int parentEntityId, String attrName){
+	public List<CodeListItemProxy> findAssignableCodeListItems(int parentEntityId, String attrName){
 		CollectRecord record = getActiveRecord();
 		Entity parent = (Entity) record.getNodeById(parentEntityId);
 		CodeAttributeDefinition def = (CodeAttributeDefinition) parent.getDefinition().getChildDefinition(attrName);
-		List<CodeListItem> assignableCodeListItems = getAssignableCodeListItems(parent, def);
-		List<CodeListItemProxy> result = CodeListItemProxy.fromList(assignableCodeListItems);
+		List<CodeListItem> items = getAssignableCodeListItems(parent, def);
+		List<CodeListItemProxy> result = CodeListItemProxy.fromList(items);
 		List<Node<?>> selectedCodes = parent.getAll(attrName);
 		CodeListItemProxy.setSelectedItems(result, selectedCodes);
 		return result;
-	} 
+	}
 	
 	/**
 	 * Finds a list of code list items assignable to the specified attribute and matching the passed codes
@@ -361,7 +389,7 @@ public class DataService {
 		List<CodeListItem> items = getAssignableCodeListItems(parent, def);
 		List<CodeListItemProxy> result = new ArrayList<CodeListItemProxy>();
 		for (String code : codes) {
-			CodeListItem item = getCodeListItem(items, code);
+			CodeListItem item = findCodeListItem(items, code);
 			if(item != null) {
 				CodeListItemProxy proxy = new CodeListItemProxy(item);
 				result.add(proxy);
@@ -444,12 +472,23 @@ public class DataService {
 	private CodeListItem getCodeListItem(List<CodeListItem> siblings, String code) {
 		for (CodeListItem item : siblings) {
 			String itemCode = item.getCode();
-			code = code.trim();
-			code = code.toUpperCase();
-			//remove initial zeros
-			code = code.replaceFirst("^0+", "");
-			String quotedCode = Pattern.quote(code);
-			Pattern pattern = Pattern.compile("^[0]*" + quotedCode + "$");
+			if(itemCode.equals(code)) {
+				return item;
+			}
+		}
+		return null;
+	}
+	
+	private CodeListItem findCodeListItem(List<CodeListItem> siblings, String code) {
+		String adaptedCode = code.trim();
+		adaptedCode = adaptedCode.toUpperCase();
+		//remove initial zeros
+		adaptedCode = adaptedCode.replaceFirst("^0+", "");
+		adaptedCode = Pattern.quote(adaptedCode);
+
+		for (CodeListItem item : siblings) {
+			String itemCode = item.getCode();
+			Pattern pattern = Pattern.compile("^[0]*" + adaptedCode + "$");
 			Matcher matcher = pattern.matcher(itemCode);
 			if(matcher.find()) {
 				return item;
@@ -472,7 +511,7 @@ public class DataService {
 			default:
 				//TODO throw error: invalid parameter
 		}
-		CodeListItem codeListItem = getCodeListItem(codeList, codeStr);
+		CodeListItem codeListItem = findCodeListItem(codeList, codeStr);
 		if(codeListItem != null) {
 			code = new Code(codeListItem.getCode(), qualifier);
 		}

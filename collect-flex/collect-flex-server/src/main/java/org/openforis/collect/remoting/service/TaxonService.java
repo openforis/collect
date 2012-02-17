@@ -8,7 +8,7 @@ import java.util.List;
 
 import org.openforis.collect.manager.TaxonManager;
 import org.openforis.collect.model.proxy.TaxonOccurrenceProxy;
-import org.openforis.idm.model.TaxonOccurence;
+import org.openforis.idm.model.TaxonOccurrence;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -63,7 +63,7 @@ public class TaxonService {
 	 * @return
 	 */
 	private List<TaxonOccurrenceProxy> find(SearchType type, String searchString, int maxResults) {
-		List<TaxonOccurence> list = null;
+		List<TaxonOccurrence> list = null;
 		switch(type) {
 			case BY_CODE:
 				list = taxonManager.findByCode(searchString, maxResults);
@@ -77,7 +77,7 @@ public class TaxonService {
 		}
 		List<TaxonOccurrenceProxy> result = new ArrayList<TaxonOccurrenceProxy>();
 		if(list != null) {
-			for (TaxonOccurence o : list) {
+			for (TaxonOccurrence o : list) {
 				TaxonOccurrenceProxy proxy = new TaxonOccurrenceProxy(o);
 				result.add(proxy);
 			}
@@ -85,7 +85,7 @@ public class TaxonService {
 		return result;	
 	}
 	
-	public void suggest(TaxonOccurence taxon) {
+	public void suggest(TaxonOccurrence taxon) {
 
 	}
 
