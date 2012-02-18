@@ -21,7 +21,6 @@ import org.openforis.collect.model.proxy.AttributeSymbol;
 import org.openforis.collect.model.proxy.NodeProxy;
 import org.openforis.collect.model.proxy.RecordProxy;
 import org.openforis.collect.persistence.AccessDeniedException;
-import org.openforis.collect.persistence.DuplicateIdException;
 import org.openforis.collect.persistence.InvalidIdException;
 import org.openforis.collect.persistence.MultipleEditException;
 import org.openforis.collect.persistence.NonexistentIdException;
@@ -173,7 +172,9 @@ public class DataService {
 		//parse request value into a model value (for example Code, Date, Time...)
 		List<?> values = null;
 		if(requestValue != null && nodeDef instanceof AttributeDefinition) {
-			values = parseValues(parentEntity, (AttributeDefinition) nodeDef, requestValue);
+			if(StringUtils.isNotBlank(requestValue)) {
+				values = parseValues(parentEntity, (AttributeDefinition) nodeDef, requestValue);
+			}
 		}
 		AttributeSymbol symbol = request.getSymbol();
 		if(symbol == null && AttributeSymbol.isShortKeyForBlank(requestValue)) {
