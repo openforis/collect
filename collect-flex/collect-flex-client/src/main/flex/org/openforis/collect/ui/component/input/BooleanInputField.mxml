@@ -3,7 +3,17 @@
 				  xmlns:s="library://ns.adobe.com/flex/spark" 
 				  xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:input="org.openforis.collect.ui.component.input.*" 
 				  width="20">
-	
+	<fx:Script>
+		<![CDATA[
+			import org.openforis.collect.presenter.BooleanInputFieldPresenter;
+			
+			override protected function initPresenter():void {
+				this.presenter = new BooleanInputFieldPresenter(this);
+			}
+			
+		]]>
+	</fx:Script>
+
 	<input:TextInput id="textInput" width="100%" maxChars="1" />
 	
 </input:InputField>
