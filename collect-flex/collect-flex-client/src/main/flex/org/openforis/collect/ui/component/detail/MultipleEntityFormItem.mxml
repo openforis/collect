@@ -5,11 +5,6 @@
 					   xmlns:datagroup="org.openforis.collect.ui.component.datagroup.*"
 					   xmlns:detail="org.openforis.collect.ui.component.detail.*"
 					   >
-	
-	<detail:layout>
-		<s:VerticalLayout />
-	</detail:layout>
-	
 	<fx:Script>
 		<![CDATA[
 			import mx.events.FlexEvent;
@@ -28,36 +23,23 @@
 				presenter = new MultipleEntityFormItemPresenter(this);
 			}
 			
-			override protected function createChildren():void {
-				if(!childrenAdded) {
-					super.createChildren();
-					
-					var headers:HGroup = UIBuilder.buildDataGroupHeaders(this.entityDefinition, modelVersion);					
-					headers.paddingLeft = 30;
-					
-					addElement(headerLabel);
-					addElement(headers);
-					addElement(dataGroup);
-					
-					if ( !entityDefinition.enumerated) {
-						addElement(addButton);
-					}
-
-					super.childrenAdded = true;
-				}
-			}
-			
 		]]>
 			
 	</fx:Script>
 	
-	<fx:Declarations>
-		
-		<s:Label id="headerLabel" text="{entityDefinition.getLabelText()}" styleName="bold" />
+	<detail:layout>
+		<s:VerticalLayout />
+	</detail:layout>
+	
+	<s:Label id="headerLabel" text="{entityDefinition.getLabelText()}" styleName="bold" />
+	
+	<s:VGroup paddingLeft="30">
+		<datagroup:DataGroupHeader id="header" 
+				nodeDefinitions="{nodeDefinitions}" />
 		
 		<s:DataGroup width="100%" id="dataGroup">
 			<s:layout>
-				<s:VerticalLayout gap="2" paddingLeft="30" />
+				<s:VerticalLayout gap="2" />
 			</s:layout> 
 			<s:itemRenderer>
 				<fx:Component>
@@ -69,16 +51,17 @@
 				</fx:Component>
 			</s:itemRenderer>
 		</s:DataGroup>
-		
-		<mx:LinkButton
-					id="addButton"
-					label="Add" 
-					buttonMode="true" 
-					icon="{Images.ADD}" 
-					labelPlacement="left" 
-					useHandCursor="true"
-					paddingLeft="30"
-					/>
-	</fx:Declarations>
+	</s:VGroup>
 	
+	<mx:LinkButton
+		id="addButton"
+		label="Add" 
+		buttonMode="true" 
+		icon="{Images.ADD}" 
+		labelPlacement="left" 
+		useHandCursor="true"
+		paddingLeft="30"
+		visible="{! entityDefinition.enumerated}"
+		includeInLayout="{! entityDefinition.enumerated}"
+		/>
 </detail:EntityFormItem>
