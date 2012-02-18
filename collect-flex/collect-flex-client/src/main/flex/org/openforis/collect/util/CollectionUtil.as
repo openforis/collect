@@ -31,6 +31,16 @@ package org.openforis.collect.util
 			}
 			return null;
 		}
-		
+
+		public static function getItemIndex(list:IList, propertyName:String, value:Object):int {
+			for(var index:int = 0; index < list.length; index ++) {
+				var item:Object = list.getItemAt(index);
+				if(ObjectUtil.getValue(item, propertyName) == value) {
+					return index;
+				}
+			}
+			return -1;
+		}
+
 	}
 }
