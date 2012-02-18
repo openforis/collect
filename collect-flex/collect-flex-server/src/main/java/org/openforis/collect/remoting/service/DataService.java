@@ -213,18 +213,35 @@ public class DataService {
 						attribute.setSymbol(symbolChar);
 						updatedNodes.add(attribute);
 					}
+				}
+				break;
+			case UPDATE_SYMBOL:
+				//update attribute value
+				if(nodeDef instanceof AttributeDefinition) {
+					List<Node<?>> nodes = parentEntity.getAll(nodeName);
+					if(nodes != null) {
+						for (Node<?> n : nodes) {
+							Attribute<?, ?> a = (Attribute<?, ?>) n;
+							a.setRemarks(remarks);
+							if(! symbol.isReasonBlank() || a.isEmpty()) {
+								a.setSymbol(symbolChar);
+							}
+							updatedNodes.add(a);
+						}
+					}
 				} else if(node instanceof Entity) {
 					//update only the symbol in entity's attributes
 					Entity entity = (Entity) node;
 					recordManager.addEmptyAttributes(entity, version);
-					EntityDefinition entityDef = (EntityDefinition) nodeDef;
-					List<NodeDefinition> childDefinitions = entityDef.getChildDefinitions();
+					List<NodeDefinition> childDefinitions = ((EntityDefinition) nodeDef).getChildDefinitions();
 					for (NodeDefinition def : childDefinitions) {
 						if(def instanceof AttributeDefinition) {
 							String name = def.getName();
-							Attribute<?, ?> attribute = (Attribute<?, ?>) entity.get(name, 0);
-							attribute.setSymbol(symbolChar);
-							updatedNodes.add(attribute);
+							Attribute<?, ?> a = (Attribute<?, ?>) entity.get(name, 0);
+							if(! symbol.isReasonBlank() || a.isEmpty()) {
+								a.setSymbol(symbolChar);
+							}
+							updatedNodes.add(a);
 						}
 					}
 				}

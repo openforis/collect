@@ -24,11 +24,13 @@ package org.openforis.collect.ui
 	import org.openforis.collect.model.proxy.AttributeSymbol;
 	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.model.proxy.NodeProxy;
+	import org.openforis.collect.presenter.RemarksPopUpPresenter;
 	import org.openforis.collect.remoting.service.UpdateRequest;
 	import org.openforis.collect.remoting.service.UpdateRequest$Method;
 	import org.openforis.collect.ui.component.detail.CollectFormItem;
 	import org.openforis.collect.ui.component.detail.EntityDataGroupItemRenderer;
 	import org.openforis.collect.ui.component.input.InputField;
+	import org.openforis.collect.ui.component.input.RemarksPopUp;
 	import org.openforis.collect.util.AlertUtil;
 
 	public class ContextMenuBuilder {
@@ -68,16 +70,23 @@ package org.openforis.collect.ui
 			APPROVE_MISSING_VALUE_MENU_ITEM
 		];
 		
-		{
-			//init context menu items' event listener
-			private static var item:ContextMenuItem;
-			for each (item in all)  {
-				item.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, menuItemSelectHandler);
-			}
-		}
+		private static var remarksPopUpPresenter:RemarksPopUpPresenter;
 		
 		private static var currentInputField:InputField;
 
+		{
+			initStatics();
+		}
+
+		private static function initStatics():void {
+			//init context menu items' event listener
+			var item:ContextMenuItem;
+			for each (item in all)  {
+				item.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, menuItemSelectHandler);
+			}
+			//init remarks popup presenter
+			remarksPopUpPresenter = new RemarksPopUpPresenter();
+		}
 		
 		public static function buildContextMenu(inputField:InputField):ContextMenu {
 			var cm:ContextMenu = new ContextMenu();
@@ -89,6 +98,8 @@ package org.openforis.collect.ui
 					ILLEGIBLE_MENU_ITEM
 				);
 			}
+			items.push(EDIT_REMARKS_MENU_ITEM);
+			
 			var def:AttributeDefinitionProxy = inputField.attributeDefinition;
 			if(def != null) {
 				if(def.multiple) {
@@ -127,7 +138,7 @@ package org.openforis.collect.ui
 						field.changeSymbol(AttributeSymbol.ILLEGIBLE);
 						break;
 					case EDIT_REMARKS_MENU_ITEM:
-						//_remarksPopUpPresenter.openPopUp(field, false, contextMouseClickGlobalPoint);
+						remarksPopUpPresenter.openPopUp(field, true);
 						break;
 					case REPLACE_BLANKS_WITH_DASH_MENU_ITEM:
 						setReasonBlankInChildren(parentEntity, AttributeSymbol.DASH_ON_FORM);
@@ -136,10 +147,10 @@ package org.openforis.collect.ui
 						setReasonBlankInChildren(parentEntity, AttributeSymbol.BLANK_ON_FORM);
 						break;
 					case DELETE_ATTRIBUTE_MENU_ITEM:
-						AlertUtil.showConfirm("edit.confirmDeleteAttribute", null, null, performDeleteAttribute);
+						AlertUtil.showConfirm("edit.confirmDeleteAttribute", null, "global.confirmDeletion", performDeleteAttribute);
 						break;
 					case DELETE_ENTITY_MENU_ITEM:
-						AlertUtil.showConfirm("edit.confirmDeleteEntity", null, null, performDeleteEntity);
+						AlertUtil.showConfirm("edit.confirmDeleteEntity", null, "global.confirmDeletion", performDeleteEntity);
 						break;
 				}
 			}
@@ -176,7 +187,7 @@ package org.openforis.collect.ui
 			req.nodeName = entity.name;
 			req.symbol = symbol;
 			req.nodeId = entity.id;
-			req.method = UpdateRequest$Method.UPDATE;
+			req.method = UpdateRequest$Method.UPDATE_SYMBOL;
 			var responder:AsyncResponder = new AsyncResponder(updateFieldResultHandler, null);
 			ClientFactory.dataClient.updateActiveRecord(responder, req);
 		}
@@ -189,7 +200,7 @@ package org.openforis.collect.ui
 			req.remarks = remarks;
 			if(! isNaN(attributeId)) {
 				req.nodeId = attributeId;
-				req.method = UpdateRequest$Method.UPDATE;
+				req.method = UpdateRequest$Method.UPDATE_SYMBOL;
 			} else {
 				req.method = UpdateRequest$Method.ADD;
 			}
@@ -200,7 +211,9 @@ package org.openforis.collect.ui
 		protected static function updateFieldResultHandler(event:ResultEvent, token:Object = null):void {
 			var result:IList = event.result as IList;
 			Application.activeRecord.update(result);
-			EventDispatcherFactory.getEventDispatcher().dispatchEvent(new ApplicationEvent(ApplicationEvent.UPDATE_RESPONSE_RECEIVED));
+			var appEvt:ApplicationEvent = new ApplicationEvent(ApplicationEvent.UPDATE_RESPONSE_RECEIVED);
+			appEvt.result = result;
+			EventDispatcherFactory.getEventDispatcher().dispatchEvent(appEvt);
 		}
 		
 

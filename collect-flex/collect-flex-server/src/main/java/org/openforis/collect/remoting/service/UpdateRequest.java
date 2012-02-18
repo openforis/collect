@@ -12,7 +12,7 @@ import org.openforis.collect.model.proxy.AttributeSymbol;
 public class UpdateRequest implements Proxy {
 
 	public enum Method {
-		UPDATE, ADD, DELETE;
+		UPDATE, ADD, DELETE, UPDATE_SYMBOL;
 	}
 
 	private Integer parentEntityId;
