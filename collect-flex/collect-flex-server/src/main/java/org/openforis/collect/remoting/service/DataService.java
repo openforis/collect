@@ -42,6 +42,7 @@ import org.openforis.idm.metamodel.NumericAttributeDefinition;
 import org.openforis.idm.metamodel.NumericAttributeDefinition.Type;
 import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.Survey;
+import org.openforis.idm.metamodel.TaxonAttributeDefinition;
 import org.openforis.idm.metamodel.TimeAttributeDefinition;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Code;
@@ -51,9 +52,12 @@ import org.openforis.idm.model.Date;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.Record;
+import org.openforis.idm.model.TaxonAttribute;
+import org.openforis.idm.model.TaxonOccurrence;
 import org.openforis.idm.model.Time;
 import org.openforis.idm.model.expression.ExpressionFactory;
 import org.openforis.idm.model.expression.ModelPathExpression;
+import org.openforis.idm.model.species.Taxon;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -167,18 +171,16 @@ public class DataService {
 			node = record.getNodeById(request.getNodeId());
 		}
 		NodeDefinition nodeDef = ((EntityDefinition) parentEntity.getDefinition()).getChildDefinition(nodeName);
-		String requestValue = request.getValue();
+		String[] reqValues = request.getValues();
 		String remarks = request.getRemarks();
-		//parse request value into a model value (for example Code, Date, Time...)
+		//parse request values into a list of attribute value objects (for example Code, Date, Time...)
 		List<?> values = null;
-		if(requestValue != null && nodeDef instanceof AttributeDefinition) {
-			if(StringUtils.isNotBlank(requestValue)) {
-				values = parseValues(parentEntity, (AttributeDefinition) nodeDef, requestValue);
-			}
+		if(reqValues != null && reqValues.length > 0 && nodeDef instanceof AttributeDefinition) {
+			values = parseValues(parentEntity, (AttributeDefinition) nodeDef, reqValues);
 		}
 		AttributeSymbol symbol = request.getSymbol();
-		if(symbol == null && AttributeSymbol.isShortKeyForBlank(requestValue)) {
-			 symbol = AttributeSymbol.fromShortKey(requestValue);
+		if(symbol == null && AttributeSymbol.isShortKeyForBlank(reqValues)) {
+			 symbol = AttributeSymbol.fromShortKey(reqValues[0]);
 		}
 		Character symbolChar = symbol != null ? symbol.getCode(): null;
 		
@@ -200,8 +202,8 @@ public class DataService {
 					@SuppressWarnings("unchecked")
 					Attribute<?, Object> attribute = (Attribute<?, Object>) node;
 					AttributeDefinition def = attribute.getDefinition();
-					if(def.isMultiple()) {
-						List<Attribute<?, ?>> attributes = recordManager.updateAttributes(parentEntity, def, values, symbolChar, remarks);
+					if(def.isMultiple() && def instanceof CodeAttributeDefinition) {
+						List<Attribute<?, ?>> attributes = recordManager.replaceAttributes(parentEntity, def, values, remarks);
 						updatedNodes.addAll(attributes);
 					} else {
 						Object val = null;
@@ -210,7 +212,6 @@ public class DataService {
 						}
 						attribute.setRemarks(remarks);
 						attribute.setValue(val);
-						attribute.setSymbol(symbolChar);
 						updatedNodes.add(attribute);
 					}
 				}
@@ -263,44 +264,65 @@ public class DataService {
 	}
 
 	@SuppressWarnings("unchecked")
-	private List<?> parseValues(Entity parentEntity, AttributeDefinition def, String value) {
+	private List<?> parseValues(Entity parentEntity, AttributeDefinition def, String[] values) {
 		List<Object> result = new ArrayList<Object>();
 		CollectRecord activeRecord = getActiveRecord();
 		ModelVersion version = activeRecord.getVersion();
 		
 		if(def instanceof BooleanAttributeDefinition) {
-			result.add(Boolean.parseBoolean(value));
+			result.add(Boolean.parseBoolean(values[0]));
 		} else if(def instanceof CodeAttributeDefinition) {
-			List<?> codes = parseCodes(parentEntity, (CodeAttributeDefinition) def, value, version);
+			List<?> codes = parseCodes(parentEntity, (CodeAttributeDefinition) def, values[0], version);
 			if(codes.size() > 0) {
 				result = (List<Object>) codes;
 			}
 		} else if(def instanceof CoordinateAttributeDefinition) {
-			Coordinate coordinate = Coordinate.parseCoordinate(value);
-			result.add(coordinate);
+			if(values.length == 3) {
+				String x = values[0];
+				String y = values[1];
+				String srsId = values[2];
+				Coordinate coordinate = Coordinate.parseCoordinate(x, y, srsId);
+				result.add(coordinate);
+			} else {
+				//TODO error
+			}
 		} else if(def instanceof DateAttributeDefinition) {
-			Date date = Date.parseDate(value);
-			result.add(date);
+			if(values.length == 3) {
+				String year = values[0];
+				String month = values[1];
+				String day = values[2];
+				Date date = Date.parseDate(year, month, day);
+				result.add(date);
+			} else {
+				//TODO error
+			}
 		} else if(def instanceof NumericAttributeDefinition) {
 			NumberAttributeDefinition numberDef = (NumberAttributeDefinition) def;
 			Type type = numberDef.getType();
 			Number number = null;
 			switch(type) {
 				case INTEGER:
-					number = Integer.parseInt(value);
+					number = Integer.parseInt(values[0]);
 					break;
 				case REAL:
-					number = Double.parseDouble(value);
+					number = Double.parseDouble(values[0]);
 					break;
 			}
 			if(number != null) {
 				result.add(number);
 			}
+		} else if(def instanceof TaxonAttributeDefinition) {
+			int taxonId = Integer.parseInt(values[0]);
+			int vernacularNameId = Integer.parseInt(values[1]);
+			
+			//result.add(o);
 		} else if(def instanceof TimeAttributeDefinition) {
-			Time time = Time.parseTime(value);
+			String hour = values[0];
+			String minute = values[1];
+			Time time = Time.parseTime(hour, minute);
 			result.add(time);
 		} else {
-			result.add(value);
+			result.add(values[0]);
 		}
 		return result;
 	}

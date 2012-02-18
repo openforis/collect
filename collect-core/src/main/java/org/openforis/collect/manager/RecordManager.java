@@ -208,7 +208,7 @@ public class RecordManager implements RecordContext {
 	
 	
 	
-	public List<Attribute<?, ?>> updateAttributes(Entity parentEntity, AttributeDefinition def, List<?> values, Character symbol, String remarks) {
+	public List<Attribute<?, ?>> replaceAttributes(Entity parentEntity, AttributeDefinition def, List<?> values, String remarks) {
 		List<Attribute<?, ?>> result;
 		if(def.isMultiple()) {
 			String name = def.getName();
@@ -218,7 +218,7 @@ public class RecordManager implements RecordContext {
 				parentEntity.remove(name, i);
 			}
 			//add new attributes
-			result = addAttributes(parentEntity, def, values, symbol, remarks);
+			result = addAttributes(parentEntity, def, values, null, remarks);
 		} else {
 			throw new RuntimeException("Multiple attribute expected");
 		}
