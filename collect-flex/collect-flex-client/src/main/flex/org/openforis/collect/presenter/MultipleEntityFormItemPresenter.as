@@ -56,12 +56,13 @@ package org.openforis.collect.presenter
 		}
 		
 		override protected function updateView():void {
-			if(view.dataGroup.dataProvider == null 
-					&& view.entityDefinition != null 
+			if(view.entityDefinition != null 
 					&& view.parentEntity != null 
 					&& view.modelVersion != null) {
 				var entities:IList = getEntities();
 				view.dataGroup.dataProvider = entities;
+			} else {
+				view.dataGroup.dataProvider = null;
 			}
 		}
 		

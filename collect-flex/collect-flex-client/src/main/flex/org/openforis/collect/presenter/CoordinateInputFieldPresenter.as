@@ -79,7 +79,7 @@ package org.openforis.collect.presenter {
 			}
 		}
 		
-		override protected function createValue():* {
+		override protected function createRequestValues():Array {
 			var srs:SpatialReferenceSystemProxy = _view.srsDropDownList.selectedItem as SpatialReferenceSystemProxy;
 			var srsId:String = "";
 			if(srs != null) {
@@ -87,8 +87,7 @@ package org.openforis.collect.presenter {
 			}
 			var x:String = StringUtil.nullToBlank(_view.xTextInput.text);
 			var y:String = StringUtil.nullToBlank(_view.yTextInput.text);
-			
-			var result:String = "SRID=" + srsId + ";POINT(" + x + " " + y + ")";
+			var result:Array = [x, y, srsId];
 			return result;
 		}
 		

@@ -66,8 +66,11 @@ package org.openforis.collect.presenter {
 			}
 		}
 		
-		override protected function createValue():* {
-			var result:String = StringUtil.concat("-", _view.year.text, _view.month.text, _view.day.text);
+		override protected function createRequestValues():Array {
+			var result:Array = new Array(3);
+			result[0] = StringUtil.trim(_view.year.text);
+			result[1] = StringUtil.trim(_view.month.text);
+			result[2] = StringUtil.trim(_view.day.text);
 			return result;
 		}
 		

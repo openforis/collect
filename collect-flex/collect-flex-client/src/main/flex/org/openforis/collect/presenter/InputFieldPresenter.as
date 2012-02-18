@@ -126,19 +126,12 @@ package org.openforis.collect.presenter {
 			}
 		}
 
-		public function applyChanges(value:* = null):void {
-			if(_view.parentEntity == null) {
-				throw new Error("Missing parent entity for this attribute");
-			}
-			if(value == null) {
-				value = createValue();
-			}
+		public function applyChanges():void {
 			var req:UpdateRequest = new UpdateRequest();
 			var def:AttributeDefinitionProxy = _view.attributeDefinition;
 			req.parentEntityId = _view.parentEntity.id;
 			req.nodeName = def.name;
-			req.value = String(value);
-			
+			req.values = createRequestValues();
 			if(_view.attribute != null) {
 				req.nodeId = _view.attribute.id;
 				req.method = UpdateRequest$Method.UPDATE;
@@ -186,8 +179,12 @@ package org.openforis.collect.presenter {
 			return "";
 		}
 
-		protected function createValue():* {
-			var result:* = _view.text;
+		protected function createRequestValues():Array {
+			var result:Array = null;
+			var text:String = _view.text;
+			if(StringUtil.isNotBlank(text)) {
+				result = [text];
+			}
 			return result;
 			/*
 			var newAttributeValue:* = new AbstractValue();

@@ -8,7 +8,6 @@ package org.openforis.collect.presenter {
 	import mx.core.FlexGlobals;
 	import mx.events.CloseEvent;
 	import mx.managers.PopUpManager;
-	import mx.messaging.management.Attribute;
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.IResponder;
 	import mx.rpc.events.ResultEvent;
@@ -156,18 +155,12 @@ package org.openforis.collect.presenter {
 			super.updateView();
 		}
 		
-		override public function applyChanges(value:*=null):void {
-			if(_view.parentEntity == null) {
-				throw new Error("Missing parent entity for this attribute");
-			}
-			if(value == null) {
-				value = createValue();
-			}
+		override public function applyChanges():void {
 			var req:UpdateRequest = new UpdateRequest();
 			var def:AttributeDefinitionProxy = _view.attributeDefinition;
 			req.parentEntityId = _view.parentEntity.id;
 			req.nodeName = def.name;
-			req.value = String(value);
+			req.values = createRequestValues();
 			
 			if(_view.attribute != null || (CollectionUtil.isNotEmpty(_view.attributes))) {
 				if(! def.multiple) {

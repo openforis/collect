@@ -69,6 +69,13 @@ public enum AttributeSymbol {
 		return false;
 	}
 	
+	public static boolean isShortKeyForBlank(String[] values) {
+		if(values != null && values.length == 1) {
+			return isShortKeyForBlank(values[0]);
+		}
+		return false;
+	}
+	
 	public boolean isReasonBlank() {
 		return this == BLANK_ON_FORM || this == DASH_ON_FORM || this == ILLEGIBLE;
 	}

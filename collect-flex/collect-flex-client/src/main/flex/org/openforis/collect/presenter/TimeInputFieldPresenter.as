@@ -2,11 +2,12 @@ package org.openforis.collect.presenter {
 	import flash.events.Event;
 	import flash.events.FocusEvent;
 	
+	import mx.managers.IFocusManagerComponent;
+	
 	import org.openforis.collect.model.proxy.TimeProxy;
 	import org.openforis.collect.ui.component.input.InputField;
 	import org.openforis.collect.ui.component.input.TimeInputField;
 	import org.openforis.collect.util.StringUtil;
-	import mx.managers.IFocusManagerComponent;
 	
 	/**
 	 * 
@@ -40,16 +41,10 @@ package org.openforis.collect.presenter {
 			}
 		}
 		
-		override protected function createValue():* {
-			var hours:String = StringUtil.trim(_view.hoursTextInput.text);
-			if(hours.length == 0) {
-				hours = " ";
-			}
-			var minutes:String = StringUtil.trim(_view.minutesTextInput.text);
-			if(minutes.length == 0) {
-				hours = " ";
-			}
-			var result:* = StringUtil.concatEvenNulls(":", hours, minutes);
+		override protected function createRequestValues():Array {
+			var result:Array = new Array(2);
+			result[0] = StringUtil.trim(_view.hoursTextInput.text);
+			result[1] = StringUtil.trim(_view.minutesTextInput.text);
 			return result;
 		}
 		

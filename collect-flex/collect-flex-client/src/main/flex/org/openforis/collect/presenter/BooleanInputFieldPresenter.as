@@ -36,20 +36,24 @@ package org.openforis.collect.presenter {
 			super(inputField);
 		}
 		
-		override protected function createValue():* {
-			var result:* = null;
-			var text:String = _view.text;
+		override protected function createRequestValues():Array {
+			var value:String = null;
+			var text:String = StringUtil.trim(_view.text);
 			switch(text) {
 				case TRUE:
 				case TRUE.toLowerCase():
-					result = true;
+					value = "true";
 					break;
 				case FALSE:
 				case FALSE.toLowerCase():
-					result = false;
+					value = "false";
 					break;
 				default:
-					result = text;
+					value = text;
+			}
+			var result:Array = null;
+			if(StringUtil.isNotBlank(value)) {
+				result = [value];
 			}
 			return result;
 		}

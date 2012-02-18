@@ -15,22 +15,11 @@
 			
 			public function doubleClickHandler(event:MouseEvent=null):void {
 				if(dataGrid.selectedItem!=null) {
-					selectItem(dataGrid.selectedItem);
+					var taxonEvent:TaxonInputFieldEvent = new TaxonInputFieldEvent(TaxonInputFieldEvent.TAXON_SELECT);
+					taxonEvent.taxon = dataGrid.selectedItem as TaxonOccurrenceProxy;
+					dispatchEvent(taxonEvent);
 				}
 			}
-			
-			protected function selectItem(value:Object):void {
-				var taxonEvent:TaxonInputFieldEvent = new TaxonInputFieldEvent(TaxonInputFieldEvent.TAXON_SELECT);
-				taxonEvent.taxon = value;
-				dispatchEvent(taxonEvent);
-			}
-			
-			/*
-			protected function languageVarietyLabelFunction(item:Object, column:GridColumn):String {
-				var value:String = ObjectUtil.getValue(column.dataField) as String;
-				return value;
-			}
-			*/
 		]]>
 	</fx:Script>
 	
