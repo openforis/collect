@@ -98,7 +98,9 @@ package org.openforis.collect.presenter
 		protected function addResultHandler(event:ResultEvent, token:Object = null):void {
 			var result:IList = event.result as IList;
 			Application.activeRecord.update(result);
-			eventDispatcher.dispatchEvent(new ApplicationEvent(ApplicationEvent.UPDATE_RESPONSE_RECEIVED));
+			var appEvt:ApplicationEvent = new ApplicationEvent(ApplicationEvent.UPDATE_RESPONSE_RECEIVED);
+			appEvt.result = result;
+			eventDispatcher.dispatchEvent(appEvt);
 			//select the inserted entity
 			_view.callLater(function():void {
 				var entities:IList = getEntities();
@@ -110,7 +112,9 @@ package org.openforis.collect.presenter
 		protected function deleteResultHandler(event:ResultEvent, token:Object = null):void {
 			var result:IList = event.result as IList;
 			Application.activeRecord.update(result);
-			eventDispatcher.dispatchEvent(new ApplicationEvent(ApplicationEvent.UPDATE_RESPONSE_RECEIVED));
+			var appEvt:ApplicationEvent = new ApplicationEvent(ApplicationEvent.UPDATE_RESPONSE_RECEIVED);
+			appEvt.result = result;
+			eventDispatcher.dispatchEvent(appEvt);
 		}
 		
 		protected function dropDownListChangeHandler(event:IndexChangeEvent):void {

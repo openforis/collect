@@ -14,6 +14,7 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.model.proxy.EntityProxy;
+	import org.openforis.collect.model.proxy.NodeProxy;
 	import org.openforis.collect.remoting.service.UpdateRequest;
 	import org.openforis.collect.remoting.service.UpdateRequest$Method;
 	import org.openforis.collect.ui.component.detail.MultipleEntityFormItem;
@@ -44,11 +45,19 @@ package org.openforis.collect.presenter
 		}
 		
 		override protected function updateResponseReceivedHandler(event:ApplicationEvent):void {
-			updateView();
+			var list:IList = event.result as IList;
+			for each(var node:NodeProxy in list) {
+				if(view.parentEntity != null && view.entityDefinition != null 
+					&& node.parentId == view.parentEntity.id 
+					&& view.entityDefinition.name == node.name) {
+					updateView();
+				}
+			}
 		}
 		
 		override protected function updateView():void {
-			if(view.entityDefinition != null 
+			if(view.dataGroup.dataProvider == null 
+					&& view.entityDefinition != null 
 					&& view.parentEntity != null 
 					&& view.modelVersion != null) {
 				var entities:IList = getEntities();
@@ -84,8 +93,10 @@ package org.openforis.collect.presenter
 		protected function addResultHandler(event:ResultEvent, token:Object = null):void {
 			var result:IList = event.result as IList;
 			Application.activeRecord.update(result);
-			eventDispatcher.dispatchEvent(new ApplicationEvent(ApplicationEvent.UPDATE_RESPONSE_RECEIVED));
-
+			var appEvt:ApplicationEvent = new ApplicationEvent(ApplicationEvent.UPDATE_RESPONSE_RECEIVED);
+			appEvt.result = result;
+			eventDispatcher.dispatchEvent(appEvt);
+			
 			view.callLater(function():void {
 				UIUtil.ensureElementIsVisible(view.addButton);
 			});

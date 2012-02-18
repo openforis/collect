@@ -33,6 +33,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.ui.component.detail.MultipleEntityFormItem;
 	import org.openforis.collect.ui.component.input.InputField;
 	import org.openforis.collect.ui.component.input.TextInput;
+	import org.openforis.collect.util.CollectionUtil;
 	import org.openforis.collect.util.StringUtil;
 	import org.openforis.collect.util.UIUtil;
 	
@@ -63,7 +64,7 @@ package org.openforis.collect.presenter {
 		override internal function initEventListeners():void {
 			super.initEventListeners();
 			
-			eventDispatcher.addEventListener(ApplicationEvent.UPDATE_RESPONSE_RECEIVED, modelChangedHandler);
+			eventDispatcher.addEventListener(ApplicationEvent.UPDATE_RESPONSE_RECEIVED, updateResponseReceivedHandler);
 			
 			_view.addEventListener(MouseEvent.MOUSE_OVER, mouseOverHandler);
 			_view.addEventListener(MouseEvent.MOUSE_OUT, mouseOutHandler);
@@ -77,12 +78,15 @@ package org.openforis.collect.presenter {
 			ChangeWatcher.watch(_view, "attribute", attributeChangeHandler);
 		}
 		
-		protected function modelChangedHandler(event:Event):void {
+		protected function updateResponseReceivedHandler(event:ApplicationEvent):void {
 			if(_view.attribute != null) {
-				var newAttribute:AttributeProxy = Application.activeRecord.getNode(_view.attribute.id) as AttributeProxy;
-				if(newAttribute != _view.attribute) {
-					//attribute changed
-					_view.attribute = newAttribute;
+				var result:IList = event.result as IList;
+				if(result != null) {
+					var newAttribute:AttributeProxy = CollectionUtil.getItem(result, "id", _view.attribute.id) as AttributeProxy;
+					if(newAttribute != null && newAttribute != _view.attribute) {
+						//attribute changed
+						_view.attribute = newAttribute;
+					}
 				}
 			}
 		}
@@ -152,7 +156,9 @@ package org.openforis.collect.presenter {
 		protected function updateResultHandler(event:ResultEvent, token:Object = null):void {
 			var result:IList = event.result as IList;
 			Application.activeRecord.update(result);
-			eventDispatcher.dispatchEvent(new ApplicationEvent(ApplicationEvent.UPDATE_RESPONSE_RECEIVED));
+			var appEvt:ApplicationEvent = new ApplicationEvent(ApplicationEvent.UPDATE_RESPONSE_RECEIVED);
+			appEvt.result = result;
+			eventDispatcher.dispatchEvent(appEvt);
 			_changed = false;
 			//_view.currentState = InputField.STATE_SAVE_COMPLETE;
 		}
@@ -203,7 +209,7 @@ package org.openforis.collect.presenter {
 			req.remarks = remarks;
 			if(_view.attribute != null) {
 				req.nodeId = _view.attribute.id;
-				req.method = UpdateRequest$Method.UPDATE;
+				req.method = UpdateRequest$Method.UPDATE_SYMBOL;
 			} else {
 				req.method = UpdateRequest$Method.ADD;
 			}
