@@ -46,7 +46,7 @@ package org.openforis.collect.presenter {
 	public class InputFieldPresenter extends AbstractPresenter {
 		
 		private var _view:InputField;
-		protected var _changed:Boolean = false;
+		private var _changed:Boolean = false;
 		protected var _updateResponder:IResponder;
 		private var _dataClient:DataClient;
 		
@@ -165,13 +165,15 @@ package org.openforis.collect.presenter {
 		protected function getTextValue():String {
 			var attribute:AttributeProxy = _view.attribute;
 			if(attribute != null) {
-				var value:Object = attribute.value;
-				if(value != null && StringUtil.isNotBlank(value.toString())) {
-					return value.toString();
-				} else if(attribute.symbol != null) {
+				if(attribute.symbol != null) {
 					var shortKey:String = getReasonBlankShortKey(attribute.symbol);
 					if(shortKey != null) {
 						return shortKey;
+					}
+				} else {
+					var value:Object = attribute.value;
+					if(value != null && StringUtil.isNotBlank(value.toString())) {
+						return value.toString();
 					}
 				}
 			}
@@ -242,5 +244,14 @@ package org.openforis.collect.presenter {
 		protected function get dataClient():DataClient {
 			return _dataClient;
 		}
-	}
+
+		[Bindable]
+		public function get changed():Boolean {
+			return _changed;
+		}
+		
+		public function set changed(value:Boolean):void {
+			_changed = value;
+		}
+}
 }

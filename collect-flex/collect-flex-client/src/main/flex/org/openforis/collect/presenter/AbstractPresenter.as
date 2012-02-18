@@ -56,7 +56,10 @@ package org.openforis.collect.presenter {
 					Application.serverOffline = true;
 					break;
 				default:
-					Alert.show(Message.get("global.faultHandlerMsg")+"\n\n"+ event.toString());
+					Alert.show(Message.get("global.faultHandlerMsg")
+						+"\n\n"+ event.fault.faultCode
+						+"\n\n"+ event.fault.faultString
+					);
 			}
 		}
 		

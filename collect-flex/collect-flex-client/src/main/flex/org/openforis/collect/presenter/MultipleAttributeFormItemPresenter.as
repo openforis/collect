@@ -44,7 +44,7 @@ package org.openforis.collect.presenter
 			return MultipleAttributeFormItem(_view);
 		}
 		
-		override protected function modelChangedHandler(event:ApplicationEvent):void {
+		override protected function updateResponseReceivedHandler(event:ApplicationEvent):void {
 			if(view.dataGroup.dataProvider == null) {
 				updateView();
 			}

@@ -55,33 +55,37 @@
 			public function build():void {
 				initDefinitionsPerTab();
 			}
-			
+			/**
+			 * Creates the list of node definitions per each tab
+			 * In the first position there will be the node definitions
+			 * with uiTabName blank or null
+			 */
 			private function initDefinitionsPerTab():void {
-				var map:Dictionary = new Dictionary();
+				var totalTabs:int = 1 + (uiTabs != null ? uiTabs.length: 0);
+				var temp:Array = new Array(totalTabs);
 				var childDefns:IList = UIBuilder.getDefinitionsInVersion(entityDefinition.childDefinitions, modelVersion);
+				temp[0] = new ArrayCollection();
 				for each (var defn:NodeDefinitionProxy in childDefns) {
 					var tabName:String = defn.uiTabName;
-					var tab:Object;
+					var index:int = -1;
 					if(StringUtil.isBlank(tabName)) {
-						tab = MAIN_TAB;
-					} else {
-						tab = CollectionUtil.getItem(uiTabs, "name", tabName);
+						index = 0;
+					} else if(uiTabs != null) {
+						var tabIndex:int = CollectionUtil.getItemIndex(uiTabs, "name", tabName);
+						if(tabIndex >= 0) {
+							index = tabIndex + 1;
+						}
 					}
-					var nodeDefs:IList = map[tab];
-					if(nodeDefs == null) {
-						nodeDefs = new ArrayCollection();
-						map[tab] = nodeDefs;
+					if(index >= 0) {
+						var nodeDefs:IList = temp[index];
+						if(nodeDefs == null) {
+							nodeDefs = new ArrayCollection();
+							temp[index] = nodeDefs;
+						}
+						nodeDefs.addItem(defn);
 					}
-					nodeDefs.addItem(defn);
 				}
-				var temp:IList = new ArrayCollection();
-				var mainDefs:IList = map[MAIN_TAB];
-				temp.addItem(mainDefs);
-				for each (var t:UITab in uiTabs) {
-					var defs:IList = map[t];
-					temp.addItem(defs);
-				}
-				this.definitionsPerTab = temp;
+				this.definitionsPerTab = new ArrayCollection(temp);
 			}
 			
 			private function dropDownLabelFunction(item:Object):String {

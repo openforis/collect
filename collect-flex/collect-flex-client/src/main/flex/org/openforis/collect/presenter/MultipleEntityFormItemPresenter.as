@@ -43,14 +43,14 @@ package org.openforis.collect.presenter
 			return MultipleEntityFormItem(_view);
 		}
 		
-		override protected function modelChangedHandler(event:ApplicationEvent):void {
-			if(view.dataGroup.dataProvider == null) {
-				updateView();
-			}
+		override protected function updateResponseReceivedHandler(event:ApplicationEvent):void {
+			updateView();
 		}
 		
 		override protected function updateView():void {
-			if(view.dataGroup != null && view.parentEntity != null) {
+			if(view.entityDefinition != null 
+					&& view.parentEntity != null 
+					&& view.modelVersion != null) {
 				var entities:IList = getEntities();
 				view.dataGroup.dataProvider = entities;
 			}

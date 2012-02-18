@@ -33,18 +33,22 @@ package org.openforis.collect.presenter {
 		
 		override internal function initEventListeners():void {
 			super.initEventListeners();
-			
+			_view.addEventListener(FocusEvent.FOCUS_OUT, focusOutHandler);
+			//X
 			_view.xTextInput.addEventListener(FocusEvent.FOCUS_IN, focusInHandler);
-			_view.xTextInput.addEventListener(FocusEvent.FOCUS_OUT, focusOutHandler);
+			_view.xTextInput.addEventListener(Event.CHANGE, changeHandler);
+			//Y
 			_view.yTextInput.addEventListener(FocusEvent.FOCUS_IN, focusInHandler);
-			_view.yTextInput.addEventListener(FocusEvent.FOCUS_OUT, focusOutHandler);
+			_view.yTextInput.addEventListener(Event.CHANGE, changeHandler);
+			//SRS
+			_view.srsDropDownList.addEventListener(FocusEvent.FOCUS_IN, focusInHandler);
 			_view.srsDropDownList.addEventListener(Event.CHANGE, srsDropDownChangeHandler);
-			_view.srsDropDownList.addEventListener(DropdownEvent.CLOSE, srsDropDownCloseHandler);
+			//_view.srsDropDownList.addEventListener(DropdownEvent.CLOSE, srsDropDownCloseHandler);
 		}
 		
 		override protected function focusOutHandler(event:FocusEvent):void {
 			var focussedField:IFocusManagerComponent = _view.focusManager.getFocus();
-			if(_changed 
+			if(changed 
 				&& focussedField != _view.xTextInput 
 				&& focussedField != _view.yTextInput 
 				&& focussedField != _view.srsDropDownList 
@@ -95,7 +99,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function srsDropDownChangeHandler(event:Event):void {
-			applyChanges();
+			changed = true;
 		}
 		
 		protected function srsDropDownCloseHandler(event:Event):void {

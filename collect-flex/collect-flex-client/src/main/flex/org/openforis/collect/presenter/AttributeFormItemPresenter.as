@@ -55,7 +55,7 @@ package org.openforis.collect.presenter
 			updateView();
 		}
 		
-		override protected function modelChangedHandler(event:ApplicationEvent):void {
+		override protected function updateResponseReceivedHandler(event:ApplicationEvent):void {
 			if(view.attributes == null && view.attribute == null) {
 				assignAttribute();
 			}

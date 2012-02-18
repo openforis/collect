@@ -24,8 +24,18 @@ package org.openforis.collect.presenter
 		override internal function initEventListeners():void {
 			super.initEventListeners();
 			
-			ChangeWatcher.watch(view, "entityDefinition", initNodeDefinitions);
-			ChangeWatcher.watch(view, "modelVersion", initNodeDefinitions);
+			ChangeWatcher.watch(view, "entityDefinition", entityDefinitionChangeHandler);
+		}
+		
+		protected function entityDefinitionChangeHandler(event:Event):void {
+			initNodeDefinitions();
+			updateView();
+		}
+		
+		override protected function modelVersionChangeHandler(event:Event):void {
+			initNodeDefinitions();
+			updateView();
+			super.modelVersionChangeHandler(event);
 		}
 		
 		private function get view():EntityFormItem {
@@ -41,11 +51,12 @@ package org.openforis.collect.presenter
 		}
 		
 		override protected function updateView():void {
+			var entity:EntityProxy = null;
 			if(view.parentEntity != null && view.entityDefinition != null) {
 				//assign entity
-				var entity:EntityProxy = view.parentEntity.getChild(view.entityDefinition.name, 0) as EntityProxy;
-				view.entity = entity;
+				entity = view.parentEntity.getChild(view.entityDefinition.name, 0) as EntityProxy;
 			}
+			view.entity = entity;
 		}
 	}
 }

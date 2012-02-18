@@ -25,11 +25,9 @@ package org.openforis.collect.presenter {
 			super.initEventListeners();
 			//hours
 			_view.hoursTextInput.addEventListener(FocusEvent.FOCUS_IN, focusInHandler);
-			//_view.hoursTextInput.addEventListener(FocusEvent.FOCUS_OUT, focusOutHandler);
 			_view.hoursTextInput.addEventListener(Event.CHANGE, changeHandler);
 			//minutes
 			_view.minutesTextInput.addEventListener(FocusEvent.FOCUS_IN, focusInHandler);
-			//_view.minutesTextInput.addEventListener(FocusEvent.FOCUS_OUT, focusOutHandler);
 			_view.minutesTextInput.addEventListener(Event.CHANGE, changeHandler);
 			
 			_view.addEventListener(FocusEvent.FOCUS_OUT, focusOutHandler);
@@ -37,7 +35,7 @@ package org.openforis.collect.presenter {
 
 		override protected function focusOutHandler(event:FocusEvent):void {
 			var focussedField:IFocusManagerComponent = _view.focusManager.getFocus();
-			if(_changed && focussedField != _view.hoursTextInput && focussedField != _view.minutesTextInput) {
+			if(changed && focussedField != _view.hoursTextInput && focussedField != _view.minutesTextInput) {
 				applyChanges();
 			}
 		}
@@ -72,8 +70,8 @@ package org.openforis.collect.presenter {
 				} else {
 					var time:TimeProxy = _view.attribute.value as TimeProxy;
 					if(time != null) {
-						_view.hoursTextInput.text = StringUtil.nullToBlank(time.hour);
-						_view.minutesTextInput.text = StringUtil.nullToBlank(time.minute);
+						_view.hoursTextInput.text = StringUtil.zeroPad(time.hour);
+						_view.minutesTextInput.text = StringUtil.zeroPad(time.minute);
 					}
 				}
 			}

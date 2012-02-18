@@ -38,17 +38,17 @@ package org.openforis.collect.presenter {
 		
 		override internal function initEventListeners():void {
 			super.initEventListeners();
+
+			_view.addEventListener(FocusEvent.FOCUS_OUT, focusOutHandler);
+			
 			//year
 			_view.year.addEventListener(FocusEvent.FOCUS_IN, focusInHandler);
-			_view.year.addEventListener(FocusEvent.FOCUS_OUT, focusOutHandler);
 			_view.year.addEventListener(Event.CHANGE, changeHandler);
 			//month
 			_view.month.addEventListener(FocusEvent.FOCUS_IN, focusInHandler);
-			_view.month.addEventListener(FocusEvent.FOCUS_OUT, focusOutHandler);
 			_view.month.addEventListener(Event.CHANGE, changeHandler);
 			//day
 			_view.day.addEventListener(FocusEvent.FOCUS_IN, focusInHandler);
-			_view.day.addEventListener(FocusEvent.FOCUS_OUT, focusOutHandler);
 			_view.day.addEventListener(Event.CHANGE, changeHandler);
 			//dateField (calendar button)
 			_view.dateField.addEventListener(CalendarLayoutChangeEvent.CHANGE, dateFieldChangeHandler);
@@ -57,7 +57,8 @@ package org.openforis.collect.presenter {
 
 		override protected function focusOutHandler(event:FocusEvent):void {
 			var focussedField:IFocusManagerComponent = _view.focusManager.getFocus();
-			if(_changed && focussedField != _view.year 
+			if(changed 
+				&& focussedField != _view.year 
 				&& focussedField != _view.month 
 				&& focussedField != _view.day 
 				) {
@@ -97,13 +98,7 @@ package org.openforis.collect.presenter {
 				StringUtil.isNotBlank(_view.month.text) && 
 				StringUtil.isNotBlank(_view.year.text)) {
 				var tempDate:Date = new Date(_view.year.text, _view.month.text, _view.day.text);
-				//check that the generated date is valid
-				if(String(tempDate.fullYear) == _view.year.text &&
-					String(tempDate.month) == _view.month.text &&
-					String(tempDate.day) == _view.day.text
-				) {
-					return tempDate;
-				}
+				return tempDate;
 			}
 			return null;
 		}
