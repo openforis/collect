@@ -3,6 +3,7 @@ package org.openforis.collect.presenter
 	import flash.events.Event;
 	
 	import mx.binding.utils.ChangeWatcher;
+	import mx.collections.ArrayList;
 	import mx.collections.IList;
 	
 	import org.openforis.collect.model.proxy.EntityProxy;

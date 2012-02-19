@@ -74,7 +74,7 @@ package org.openforis.collect.ui {
 				tabs = uiConfig.tabs;
 				uiTab = uiConfig.getTab(rootEntity.name);
 			}
-			form.uiTabs = uiTab.tabs;
+			form.uiTabs = uiTab != null ? uiTab.tabs: null;
 			form.build();
 			
 			formContainer.addEntityFormContainer(form);
