@@ -186,15 +186,6 @@ package org.openforis.collect.presenter {
 				result = [text];
 			}
 			return result;
-			/*
-			var newAttributeValue:* = new AbstractValue();
-			newAttributeValue.text1 = _inputField.text;
-			if(value != null) {
-				//copy old informations
-				newAttributeValue.remarks = value.remarks;
-			}
-			return newAttributeValue;
-			*/
 		}
 		
 		public function changeSymbol(symbol:AttributeSymbol, remarks:String = null):void {
