@@ -24,7 +24,7 @@ public class TaxonVernacularNameDAO extends MappingJooqDaoSupport<TaxonVernacula
 		return findContaining(TAXON_VERNACULAR_NAME.VERNACULAR_NAME, searchString, maxResults);
 	}
 
-	protected static class JooqFactory extends MappingJooqFactory<TaxonVernacularName> {
+	static class JooqFactory extends MappingJooqFactory<TaxonVernacularName> {
 
 		private static final long serialVersionUID = 1L;
 

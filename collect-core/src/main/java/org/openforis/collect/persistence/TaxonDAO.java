@@ -28,7 +28,7 @@ public class TaxonDAO extends MappingJooqDaoSupport<Taxon, TaxonDAO.JooqFactory>
 		return findStartingWith(TAXON.SCIENTIFIC_NAME, searchString, maxResults);
 	}
 	
-	protected static class JooqFactory extends MappingJooqFactory<Taxon> {
+	static class JooqFactory extends MappingJooqFactory<Taxon> {
 
 		private static final long serialVersionUID = 1L;
 
