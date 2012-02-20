@@ -28,7 +28,6 @@ GO
 ----------------------------
 --- BEGIN GENERATED CODE ---
 ----------------------------
-
 ALTER TABLE "collect"."data"
 	DROP CONSTRAINT "FK_data_parent" CASCADE 
 GO
@@ -47,9 +46,6 @@ GO
 ALTER TABLE "collect"."taxon_vernacular_name"
 	DROP CONSTRAINT "FK_taxon_vernacular_name_taxon" CASCADE 
 GO
-ALTER TABLE "collect"."data"
-	DROP CONSTRAINT "FK_data_taxon" CASCADE 
-GO
 ALTER TABLE "collect"."taxon"
 	DROP CONSTRAINT "FK_taxon_parent" CASCADE 
 GO
@@ -67,6 +63,9 @@ ALTER TABLE "collect"."record"
 GO
 ALTER TABLE "collect"."record"
 	DROP CONSTRAINT "FK_record_modified_by_user" CASCADE 
+GO
+ALTER TABLE "collect"."data"
+	DROP CONSTRAINT "UK_data_node" CASCADE 
 GO
 ALTER TABLE "collect"."survey"
 	DROP CONSTRAINT "UK_survey_name" CASCADE 
