@@ -16,24 +16,26 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author S. Ricci
- *
+ * @author M. Togna
+ * 
  */
 public class TaxonManager {
 
 	@Autowired
 	private TaxonDAO taxonDao;
-	
+
 	@Autowired
 	private TaxonVernacularNameDAO taxonVernacularNameDao;
-	
+
+	@SuppressWarnings("unused")
 	@Autowired
 	private TaxonomyDAO taxonomyDao;
-	
+
 	public List<TaxonOccurrence> findByCode(String searchString, int maxResults) {
 		List<Taxon> list = taxonDao.findByCode(searchString, maxResults);
 		List<TaxonOccurrence> result = new ArrayList<TaxonOccurrence>();
 		for (Taxon taxon : list) {
-			TaxonOccurrence o = new TaxonOccurrence(taxon);
+			TaxonOccurrence o = new TaxonOccurrence(taxon.getCode(), taxon.getScientificName());
 			result.add(o);
 		}
 		return result;
@@ -43,22 +45,23 @@ public class TaxonManager {
 		List<Taxon> list = taxonDao.findByScientificName(searchString, maxResults);
 		List<TaxonOccurrence> result = new ArrayList<TaxonOccurrence>();
 		for (Taxon taxon : list) {
-			TaxonOccurrence o = new TaxonOccurrence(taxon);
+			TaxonOccurrence o = new TaxonOccurrence(taxon.getCode(), taxon.getScientificName());
 			result.add(o);
 		}
 		return result;
 	}
-	
+
 	public List<TaxonOccurrence> findByVernacularName(String searchString, int maxResults) {
 		List<TaxonVernacularName> list = taxonVernacularNameDao.findByVernacularName(searchString, maxResults);
 		List<TaxonOccurrence> result = new ArrayList<TaxonOccurrence>();
 		for (TaxonVernacularName taxonVernacularName : list) {
 			Integer taxonId = taxonVernacularName.getTaxonId();
 			Taxon taxon = taxonDao.load(taxonId);
-			TaxonOccurrence o = new TaxonOccurrence(taxon, taxonVernacularName);
+			TaxonOccurrence o = new TaxonOccurrence(taxon.getCode(), taxon.getScientificName(), taxonVernacularName.getVernacularName(), taxonVernacularName.getLanguageCode(),
+					taxonVernacularName.getLanguageVariety());
 			result.add(o);
 		}
 		return result;
 	}
-	
+
 }
