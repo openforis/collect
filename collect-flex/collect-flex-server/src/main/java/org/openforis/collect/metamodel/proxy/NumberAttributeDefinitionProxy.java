@@ -6,21 +6,21 @@ package org.openforis.collect.metamodel.proxy;
 import java.util.List;
 
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
-import org.openforis.idm.metamodel.NumericAttributeDefinition;
+import org.openforis.idm.metamodel.NumberAttributeDefinition;
 
 /**
  * @author S. Ricci
  *
  */
-public class NumericAttributeDefinitionProxy extends AttributeDefinitionProxy {
+public class NumberAttributeDefinitionProxy extends AttributeDefinitionProxy {
 
-	private transient NumericAttributeDefinition attributeDefinition;
+	private transient NumberAttributeDefinition attributeDefinition;
 
 	public enum Type {
 		INTEGER, REAL
 	}
 	
-	public NumericAttributeDefinitionProxy(EntityDefinitionProxy parent, NumericAttributeDefinition attributeDefinition) {
+	public NumberAttributeDefinitionProxy(EntityDefinitionProxy parent, NumberAttributeDefinition attributeDefinition) {
 		super(parent, attributeDefinition);
 		this.attributeDefinition = attributeDefinition;
 	}

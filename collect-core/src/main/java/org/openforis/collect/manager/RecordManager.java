@@ -29,8 +29,9 @@ import org.openforis.idm.metamodel.DateAttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.NodeDefinition;
-import org.openforis.idm.metamodel.NumericAttributeDefinition;
-import org.openforis.idm.metamodel.NumericAttributeDefinition.Type;
+import org.openforis.idm.metamodel.NumberAttributeDefinition;
+import org.openforis.idm.metamodel.NumberAttributeDefinition.Type;
+import org.openforis.idm.metamodel.RangeAttributeDefinition;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.TaxonAttributeDefinition;
 import org.openforis.idm.metamodel.TextAttributeDefinition;
@@ -40,8 +41,10 @@ import org.openforis.idm.model.Code;
 import org.openforis.idm.model.CodeAttribute;
 import org.openforis.idm.model.Coordinate;
 import org.openforis.idm.model.Entity;
+import org.openforis.idm.model.IntegerRange;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.NumberAttribute;
+import org.openforis.idm.model.RealRange;
 import org.openforis.idm.model.Record;
 import org.openforis.idm.model.RecordContext;
 import org.openforis.idm.model.TaxonOccurrence;
@@ -183,14 +186,24 @@ public class RecordManager implements RecordContext {
 			result = parentEntity.addValue(name, (Coordinate) value);
 		} else if(def instanceof DateAttributeDefinition) {
 			result = parentEntity.addValue(name, (org.openforis.idm.model.Date) value);
-		} else if(def instanceof NumericAttributeDefinition) {
-			Type type = ((NumericAttributeDefinition) def).getType();
+		} else if(def instanceof NumberAttributeDefinition) {
+			Type type = ((NumberAttributeDefinition) def).getType();
 			switch(type) {
 				case INTEGER:
 					result = parentEntity.addValue(name, (Integer) value);
 					break;
 				case REAL:
 					result = parentEntity.addValue(name, (Double) value);
+					break;
+			}
+		} else if(def instanceof RangeAttributeDefinition) {
+			org.openforis.idm.metamodel.RangeAttributeDefinition.Type type = ((RangeAttributeDefinition) def).getType();
+			switch(type) {
+				case INTEGER:
+					result = parentEntity.addValue(name, (IntegerRange) value);
+					break;
+				case REAL:
+					result = parentEntity.addValue(name, (RealRange) value);
 					break;
 			}
 		} else if(def instanceof TaxonAttributeDefinition) {
@@ -200,9 +213,9 @@ public class RecordManager implements RecordContext {
 		} else if(def instanceof TimeAttributeDefinition) {
 			result = parentEntity.addValue(name, (Time) value);
 		}
-		
-		result.setSymbol(symbol);
-		result.setRemarks(remarks);
+		//TODO set symbol and remarks in all fields
+//		result.setSymbol(symbol);
+//		result.setRemarks(remarks);
 		return result;
 	}
 	

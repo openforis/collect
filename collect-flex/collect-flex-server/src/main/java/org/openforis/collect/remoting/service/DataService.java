@@ -39,20 +39,18 @@ import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NumberAttributeDefinition;
-import org.openforis.idm.metamodel.NumericAttributeDefinition;
-import org.openforis.idm.metamodel.NumericAttributeDefinition.Type;
+import org.openforis.idm.metamodel.NumberAttributeDefinition.Type;
+import org.openforis.idm.metamodel.RangeAttributeDefinition;
 import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.TimeAttributeDefinition;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Code;
 import org.openforis.idm.model.CodeAttribute;
-import org.openforis.idm.model.Coordinate;
-import org.openforis.idm.model.Date;
 import org.openforis.idm.model.Entity;
+import org.openforis.idm.model.Field;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.Record;
-import org.openforis.idm.model.Time;
 import org.openforis.idm.model.expression.ExpressionFactory;
 import org.openforis.idm.model.expression.ModelPathExpression;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -159,6 +157,7 @@ public class DataService {
 	public void updateRootEntityKey(String recordId, String newRootEntityKey) throws DuplicateIdException, InvalidIdException, NonexistentIdException, AccessDeniedException, RecordLockedException {
 	}
 
+	@SuppressWarnings("unchecked")
 	public List<NodeProxy> updateActiveRecord(UpdateRequest request) {
 		List<Node<?>> updatedNodes = new ArrayList<Node<?>>();
 		SessionState sessionState = sessionManager.getSessionState();
@@ -168,7 +167,9 @@ public class DataService {
 		Entity parentEntity = (Entity) record.getNodeById(parentEntityId);
 		EntityDefinition parentDef = parentEntity.getDefinition();
 		Integer nodeId = request.getNodeId();
+		Integer fieldIndex = request.getFieldIndex();
 		String nodeName = request.getNodeName();
+		Object fieldVal = null;
 		Node<?> node = null;
 		if(nodeId != null) {
 			node = record.getNodeById(nodeId);
@@ -179,7 +180,7 @@ public class DataService {
 		//parse request value into a model value (for example Code, Date, Time...)
 		List<?> values = null;
 		if(requestValue != null && nodeDef instanceof AttributeDefinition) {
-			values = parseValues(parentEntity, (AttributeDefinition) nodeDef, requestValue);
+			values = parseValues(parentEntity, (AttributeDefinition) nodeDef, requestValue, fieldIndex);
 		}
 		AttributeSymbol symbol = request.getSymbol();
 		if(symbol == null && AttributeSymbol.isShortKeyForBlank(requestValue)) {
@@ -213,9 +214,15 @@ public class DataService {
 						if(values != null && values.size() == 1) {
 							val = values.get(0);
 						}
-						attribute.setRemarks(remarks);
-						attribute.setValue(val);
-						attribute.setSymbol(symbolChar);
+						if(fieldIndex != null) {
+							@SuppressWarnings("rawtypes")
+							Field field = attribute.getField(fieldIndex);
+							field.setRemarks(remarks);
+							field.setSymbol(symbolChar);
+							field.setValue(fieldVal);
+						} else {
+							attribute.setValue(val);
+						}
 						updatedNodes.add(attribute);
 					}
 				} else if(node instanceof Entity) {
@@ -228,7 +235,7 @@ public class DataService {
 						if(def instanceof AttributeDefinition) {
 							String name = def.getName();
 							Attribute<?, ?> attribute = (Attribute<?, ?>) entity.get(name, 0);
-							attribute.setSymbol(symbolChar);
+							//TODO attribute.setSymbol(symbolChar);
 							updatedNodes.add(attribute);
 						}
 					}
@@ -251,7 +258,7 @@ public class DataService {
 	}
 
 	@SuppressWarnings("unchecked")
-	private List<?> parseValues(Entity parentEntity, AttributeDefinition def, String value) {
+	private List<?> parseValues(Entity parentEntity, AttributeDefinition def, String value, int fieldIndex) {
 		List<Object> result = new ArrayList<Object>();
 		CollectRecord activeRecord = getActiveRecord();
 		ModelVersion version = activeRecord.getVersion();
@@ -264,12 +271,17 @@ public class DataService {
 				result = (List<Object>) codes;
 			}
 		} else if(def instanceof CoordinateAttributeDefinition) {
-			Coordinate coordinate = Coordinate.parseCoordinate(value);
-			result.add(coordinate);
+			Object val = null;
+			if(fieldIndex == 0 || fieldIndex == 1) {
+				val = Long.parseLong(value);
+			} else {
+				val = value;
+			}
+			result.add(val);
 		} else if(def instanceof DateAttributeDefinition) {
-			Date date = Date.parseDate(value);
-			result.add(date);
-		} else if(def instanceof NumericAttributeDefinition) {
+			int val = Integer.parseInt(value);
+			result.add(val);
+		} else if(def instanceof NumberAttributeDefinition) {
 			NumberAttributeDefinition numberDef = (NumberAttributeDefinition) def;
 			Type type = numberDef.getType();
 			Number number = null;
@@ -284,9 +296,23 @@ public class DataService {
 			if(number != null) {
 				result.add(number);
 			}
+		} else if(def instanceof RangeAttributeDefinition) {
+			org.openforis.idm.metamodel.RangeAttributeDefinition.Type type = ((RangeAttributeDefinition) def).getType();
+			Number number = null;
+			switch(type) {
+				case INTEGER:
+					number = Integer.parseInt(value);
+					break;
+				case REAL:
+					number =  Double.parseDouble(value);
+					break;
+			}
+			if(number != null) {
+				result.add(number);
+			}
 		} else if(def instanceof TimeAttributeDefinition) {
-			Time time = Time.parseTime(value);
-			result.add(time);
+			int val = Integer.parseInt(value);
+			result.add(val);
 		} else {
 			result.add(value);
 		}

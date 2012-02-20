@@ -3,14 +3,22 @@
  */
 package org.openforis.collect.model.proxy;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Code;
 import org.openforis.idm.model.Coordinate;
+import org.openforis.idm.model.CoordinateAttribute;
 import org.openforis.idm.model.Date;
+import org.openforis.idm.model.DateAttribute;
+import org.openforis.idm.model.Field;
+import org.openforis.idm.model.TaxonAttribute;
 import org.openforis.idm.model.TaxonOccurrence;
 import org.openforis.idm.model.Time;
+import org.openforis.idm.model.TimeAttribute;
 
 /**
  * @author M. Togna
@@ -57,15 +65,26 @@ public class AttributeProxy extends NodeProxy {
 	public boolean isRequired() {
 		return attribute.isRequired();
 	}
-
 	@ExternalizedProperty
-	public String getRemarks() {
-		return attribute.getRemarks();
+	public List<FieldProxy> getFields() {
+		int numFields;
+		if(attribute instanceof TaxonAttribute) {
+			numFields = 5;
+		} else if(attribute instanceof CoordinateAttribute || attribute instanceof DateAttribute) {
+			numFields = 3;
+		} else if(attribute instanceof TimeAttribute) {
+			numFields = 2;
+		} else {
+			numFields = 1;
+		}
+		List<FieldProxy> result = new ArrayList<FieldProxy>(numFields);
+		for (int i = 0; i < numFields; i++) {
+			Field<?> field = attribute.getField(i);
+			result.set(i, new FieldProxy(field));
+		}
+		return result;
 	}
 
-	@ExternalizedProperty
-	public AttributeSymbol getSymbol() {
-		return AttributeSymbol.valueOf(attribute.getSymbol());
-	}
 
+	
 }

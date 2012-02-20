@@ -18,6 +18,7 @@ public class UpdateRequest implements Proxy {
 	private Integer parentEntityId;
 	private String nodeName;
 	private Integer nodeId;
+	private Integer fieldIndex;
 	private String value;
 	private Method method;
 	private String remarks;
@@ -81,6 +82,14 @@ public class UpdateRequest implements Proxy {
 
 	public void setSymbol(AttributeSymbol symbol) {
 		this.symbol = symbol;
+	}
+
+	public Integer getFieldIndex() {
+		return fieldIndex;
+	}
+
+	public void setFieldIndex(Integer fieldIndex) {
+		this.fieldIndex = fieldIndex;
 	}
 
 }

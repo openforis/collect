@@ -21,23 +21,28 @@ public class TaxonOccurrenceProxy implements Proxy {
 	}
 
 	@ExternalizedProperty
-	public TaxonProxy getTaxon() {
-		if(occurrence.getTaxon() != null) {
-			return new TaxonProxy(occurrence.getTaxon());
-		} else {
-			return null;
-		}
+	public String getCode() {
+		return occurrence.getCode();
 	}
 
 	@ExternalizedProperty
-	public TaxonVernacularNameProxy getVernacularName() {
-		if(occurrence.getVernacularName() != null) {
-			return new TaxonVernacularNameProxy(occurrence.getVernacularName());
-		} else {
-			return null;
-		}
+	public String getScientificName() {
+		return occurrence.getScientificName();
 	}
-	
-	
+
+	@ExternalizedProperty
+	public String getVernacularName() {
+		return occurrence.getVernacularName();
+	}
+
+	@ExternalizedProperty
+	public String getLanguageCode() {
+		return occurrence.getLanguageCode();
+	}
+
+	@ExternalizedProperty
+	public String getLanguageVariety() {
+		return occurrence.getLanguageVariety();
+	}
 	
 }
