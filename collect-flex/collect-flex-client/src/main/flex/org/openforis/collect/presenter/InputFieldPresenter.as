@@ -33,6 +33,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.ui.component.detail.MultipleEntityFormItem;
 	import org.openforis.collect.ui.component.input.InputField;
 	import org.openforis.collect.ui.component.input.TextInput;
+	import org.openforis.collect.util.CollectionUtil;
 	import org.openforis.collect.util.StringUtil;
 	import org.openforis.collect.util.UIUtil;
 	
@@ -46,7 +47,7 @@ package org.openforis.collect.presenter {
 	public class InputFieldPresenter extends AbstractPresenter {
 		
 		private var _view:InputField;
-		protected var _changed:Boolean = false;
+		private var _changed:Boolean = false;
 		protected var _updateResponder:IResponder;
 		private var _dataClient:DataClient;
 		
@@ -63,7 +64,7 @@ package org.openforis.collect.presenter {
 		override internal function initEventListeners():void {
 			super.initEventListeners();
 			
-			eventDispatcher.addEventListener(ApplicationEvent.UPDATE_RESPONSE_RECEIVED, modelChangedHandler);
+			eventDispatcher.addEventListener(ApplicationEvent.UPDATE_RESPONSE_RECEIVED, updateResponseReceivedHandler);
 			
 			_view.addEventListener(MouseEvent.MOUSE_OVER, mouseOverHandler);
 			_view.addEventListener(MouseEvent.MOUSE_OUT, mouseOutHandler);
@@ -77,12 +78,15 @@ package org.openforis.collect.presenter {
 			ChangeWatcher.watch(_view, "attribute", attributeChangeHandler);
 		}
 		
-		protected function modelChangedHandler(event:Event):void {
+		protected function updateResponseReceivedHandler(event:ApplicationEvent):void {
 			if(_view.attribute != null) {
-				var newAttribute:AttributeProxy = Application.activeRecord.getNode(_view.attribute.id) as AttributeProxy;
-				if(newAttribute != _view.attribute) {
-					//attribute changed
-					_view.attribute = newAttribute;
+				var result:IList = event.result as IList;
+				if(result != null) {
+					var newAttribute:AttributeProxy = CollectionUtil.getItem(result, "id", _view.attribute.id) as AttributeProxy;
+					if(newAttribute != null && newAttribute != _view.attribute) {
+						//attribute changed
+						_view.attribute = newAttribute;
+					}
 				}
 			}
 		}
@@ -122,19 +126,12 @@ package org.openforis.collect.presenter {
 			}
 		}
 
-		public function applyChanges(value:* = null):void {
-			if(_view.parentEntity == null) {
-				throw new Error("Missing parent entity for this attribute");
-			}
-			if(value == null) {
-				value = createValue();
-			}
+		public function applyChanges():void {
 			var req:UpdateRequest = new UpdateRequest();
 			var def:AttributeDefinitionProxy = _view.attributeDefinition;
 			req.parentEntityId = _view.parentEntity.id;
 			req.nodeName = def.name;
-			req.value = String(value);
-			
+			req.values = createRequestValues();
 			if(_view.attribute != null) {
 				req.nodeId = _view.attribute.id;
 				req.method = UpdateRequest$Method.UPDATE;
@@ -152,7 +149,9 @@ package org.openforis.collect.presenter {
 		protected function updateResultHandler(event:ResultEvent, token:Object = null):void {
 			var result:IList = event.result as IList;
 			Application.activeRecord.update(result);
-			eventDispatcher.dispatchEvent(new ApplicationEvent(ApplicationEvent.UPDATE_RESPONSE_RECEIVED));
+			var appEvt:ApplicationEvent = new ApplicationEvent(ApplicationEvent.UPDATE_RESPONSE_RECEIVED);
+			appEvt.result = result;
+			eventDispatcher.dispatchEvent(appEvt);
 			_changed = false;
 			//_view.currentState = InputField.STATE_SAVE_COMPLETE;
 		}
@@ -165,31 +164,28 @@ package org.openforis.collect.presenter {
 		protected function getTextValue():String {
 			var attribute:AttributeProxy = _view.attribute;
 			if(attribute != null) {
-				var value:Object = attribute.value;
-				if(value != null && StringUtil.isNotBlank(value.toString())) {
-					return value.toString();
-				} else if(attribute.symbol != null) {
+				if(attribute.symbol != null) {
 					var shortKey:String = getReasonBlankShortKey(attribute.symbol);
 					if(shortKey != null) {
 						return shortKey;
+					}
+				} else {
+					var value:Object = attribute.value;
+					if(value != null && StringUtil.isNotBlank(value.toString())) {
+						return value.toString();
 					}
 				}
 			}
 			return "";
 		}
 
-		protected function createValue():* {
-			var result:* = _view.text;
-			return result;
-			/*
-			var newAttributeValue:* = new AbstractValue();
-			newAttributeValue.text1 = _inputField.text;
-			if(value != null) {
-				//copy old informations
-				newAttributeValue.remarks = value.remarks;
+		protected function createRequestValues():Array {
+			var result:Array = null;
+			var text:String = _view.text;
+			if(StringUtil.isNotBlank(text)) {
+				result = [text];
 			}
-			return newAttributeValue;
-			*/
+			return result;
 		}
 		
 		public function changeSymbol(symbol:AttributeSymbol, remarks:String = null):void {
@@ -201,7 +197,7 @@ package org.openforis.collect.presenter {
 			req.remarks = remarks;
 			if(_view.attribute != null) {
 				req.nodeId = _view.attribute.id;
-				req.method = UpdateRequest$Method.UPDATE;
+				req.method = UpdateRequest$Method.UPDATE_SYMBOL;
 			} else {
 				req.method = UpdateRequest$Method.ADD;
 			}
@@ -242,5 +238,14 @@ package org.openforis.collect.presenter {
 		protected function get dataClient():DataClient {
 			return _dataClient;
 		}
-	}
+
+		[Bindable]
+		public function get changed():Boolean {
+			return _changed;
+		}
+		
+		public function set changed(value:Boolean):void {
+			_changed = value;
+		}
+}
 }

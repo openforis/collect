@@ -2,11 +2,12 @@ package org.openforis.collect.presenter {
 	import flash.events.Event;
 	import flash.events.FocusEvent;
 	
+	import mx.managers.IFocusManagerComponent;
+	
 	import org.openforis.collect.model.proxy.TimeProxy;
 	import org.openforis.collect.ui.component.input.InputField;
 	import org.openforis.collect.ui.component.input.TimeInputField;
 	import org.openforis.collect.util.StringUtil;
-	import mx.managers.IFocusManagerComponent;
 	
 	/**
 	 * 
@@ -25,11 +26,9 @@ package org.openforis.collect.presenter {
 			super.initEventListeners();
 			//hours
 			_view.hoursTextInput.addEventListener(FocusEvent.FOCUS_IN, focusInHandler);
-			//_view.hoursTextInput.addEventListener(FocusEvent.FOCUS_OUT, focusOutHandler);
 			_view.hoursTextInput.addEventListener(Event.CHANGE, changeHandler);
 			//minutes
 			_view.minutesTextInput.addEventListener(FocusEvent.FOCUS_IN, focusInHandler);
-			//_view.minutesTextInput.addEventListener(FocusEvent.FOCUS_OUT, focusOutHandler);
 			_view.minutesTextInput.addEventListener(Event.CHANGE, changeHandler);
 			
 			_view.addEventListener(FocusEvent.FOCUS_OUT, focusOutHandler);
@@ -37,21 +36,15 @@ package org.openforis.collect.presenter {
 
 		override protected function focusOutHandler(event:FocusEvent):void {
 			var focussedField:IFocusManagerComponent = _view.focusManager.getFocus();
-			if(_changed && focussedField != _view.hoursTextInput && focussedField != _view.minutesTextInput) {
+			if(changed && focussedField != _view.hoursTextInput && focussedField != _view.minutesTextInput) {
 				applyChanges();
 			}
 		}
 		
-		override protected function createValue():* {
-			var hours:String = StringUtil.trim(_view.hoursTextInput.text);
-			if(hours.length == 0) {
-				hours = " ";
-			}
-			var minutes:String = StringUtil.trim(_view.minutesTextInput.text);
-			if(minutes.length == 0) {
-				hours = " ";
-			}
-			var result:* = StringUtil.concatEvenNulls(":", hours, minutes);
+		override protected function createRequestValues():Array {
+			var result:Array = new Array(2);
+			result[0] = StringUtil.trim(_view.hoursTextInput.text);
+			result[1] = StringUtil.trim(_view.minutesTextInput.text);
 			return result;
 		}
 		
@@ -72,8 +65,8 @@ package org.openforis.collect.presenter {
 				} else {
 					var time:TimeProxy = _view.attribute.value as TimeProxy;
 					if(time != null) {
-						_view.hoursTextInput.text = StringUtil.nullToBlank(time.hour);
-						_view.minutesTextInput.text = StringUtil.nullToBlank(time.minute);
+						_view.hoursTextInput.text = StringUtil.zeroPad(time.hour);
+						_view.minutesTextInput.text = StringUtil.zeroPad(time.minute);
 					}
 				}
 			}

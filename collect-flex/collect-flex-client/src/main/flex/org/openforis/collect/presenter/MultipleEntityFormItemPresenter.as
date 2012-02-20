@@ -14,6 +14,7 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.model.proxy.EntityProxy;
+	import org.openforis.collect.model.proxy.NodeProxy;
 	import org.openforis.collect.remoting.service.UpdateRequest;
 	import org.openforis.collect.remoting.service.UpdateRequest$Method;
 	import org.openforis.collect.ui.component.detail.MultipleEntityFormItem;
@@ -43,16 +44,25 @@ package org.openforis.collect.presenter
 			return MultipleEntityFormItem(_view);
 		}
 		
-		override protected function modelChangedHandler(event:ApplicationEvent):void {
-			if(view.dataGroup.dataProvider == null) {
-				updateView();
+		override protected function updateResponseReceivedHandler(event:ApplicationEvent):void {
+			var list:IList = event.result as IList;
+			for each(var node:NodeProxy in list) {
+				if(view.parentEntity != null && view.entityDefinition != null 
+					&& node.parentId == view.parentEntity.id 
+					&& view.entityDefinition.name == node.name) {
+					updateView();
+				}
 			}
 		}
 		
 		override protected function updateView():void {
-			if(view.dataGroup != null && view.parentEntity != null) {
+			if(view.entityDefinition != null 
+					&& view.parentEntity != null 
+					&& view.modelVersion != null) {
 				var entities:IList = getEntities();
 				view.dataGroup.dataProvider = entities;
+			} else {
+				view.dataGroup.dataProvider = null;
 			}
 		}
 		
@@ -84,8 +94,10 @@ package org.openforis.collect.presenter
 		protected function addResultHandler(event:ResultEvent, token:Object = null):void {
 			var result:IList = event.result as IList;
 			Application.activeRecord.update(result);
-			eventDispatcher.dispatchEvent(new ApplicationEvent(ApplicationEvent.UPDATE_RESPONSE_RECEIVED));
-
+			var appEvt:ApplicationEvent = new ApplicationEvent(ApplicationEvent.UPDATE_RESPONSE_RECEIVED);
+			appEvt.result = result;
+			eventDispatcher.dispatchEvent(appEvt);
+			
 			view.callLater(function():void {
 				UIUtil.ensureElementIsVisible(view.addButton);
 			});

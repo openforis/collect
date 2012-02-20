@@ -74,8 +74,7 @@ package org.openforis.collect.ui {
 				tabs = uiConfig.tabs;
 				uiTab = uiConfig.getTab(rootEntity.name);
 			}
-			//addFormItems(form, entity, version, uiTab);
-			form.uiTabs = uiTab.tabs;
+			form.uiTabs = uiTab != null ? uiTab.tabs: null;
 			form.build();
 			
 			formContainer.addEntityFormContainer(form);
@@ -281,18 +280,7 @@ package org.openforis.collect.ui {
 			return inputField;
 		}
 	
-		public static function buildDataGroupHeaders(defn:EntityDefinitionProxy, modelVersion:ModelVersionProxy):HGroup {
-			var h:HGroup = new HGroup();
-			h.gap = 2;
-			var childDefn:IList = getDefinitionsInVersion(defn.childDefinitions, modelVersion);
-			for each (var childDef:NodeDefinitionProxy in childDefn) {
-				var elem:IVisualElement = getDataGroupHeader(childDef);
-				h.addElement(elem);
-			}
-			return h;
-		}
-		
-		private static function getDataGroupHeader(defn:NodeDefinitionProxy):IVisualElement {
+		public static function getDataGroupHeader(defn:NodeDefinitionProxy):IVisualElement {
 			var elem:IVisualElement = null;
 			if(defn is AttributeDefinitionProxy){
 				elem = getAttributeDataGroupHeader(defn as AttributeDefinitionProxy);							
@@ -332,7 +320,7 @@ package org.openforis.collect.ui {
 			var l:Label;
 			if(defn is TaxonAttributeDefinitionProxy) {
 				v = new VGroup();
-				v.width = 406;
+				v.width = 356;
 				v.percentHeight = 100;
 				v.verticalAlign = "bottom";
 				//attribute label
@@ -402,26 +390,10 @@ package org.openforis.collect.ui {
 			return l;
 		}
 
-		public static function isInVersion(node:NodeDefinitionProxy, currentVersion:ModelVersionProxy):Boolean {
-			var since:ModelVersionProxy = node.sinceVersion;
-			var deprecated:ModelVersionProxy = node.deprecatedVersion;
-			var result:Boolean;
-			if(since == null && deprecated == null){
-				result = true;
-			} else if(since != null && deprecated != null){
-				result = currentVersion.compare(since) >= 0 && currentVersion.compare(deprecated) < 0;
-			} else if(since != null){
-				result = currentVersion.compare(since) >= 0;
-			} else if(deprecated != null){
-				result = currentVersion.compare(deprecated) < 0;
-			}
-			return result;
-		}
-		
 		public static function getDefinitionsInVersion(defs:IList, currentVersion:ModelVersionProxy):IList {
 			var result:IList = new ArrayCollection();
 			for each (var defn:NodeDefinitionProxy in defs) {
-				if(isInVersion(defn, currentVersion)){
+				if(currentVersion.isApplicable(defn)){
 					result.addItem(defn);
 				}
 			}

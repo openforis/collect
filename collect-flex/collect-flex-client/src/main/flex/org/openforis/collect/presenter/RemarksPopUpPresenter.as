@@ -132,8 +132,11 @@ package org.openforis.collect.presenter
 					}
 				}
 			}
-			view.currentState = _inputField != null && _inputField.isEmpty() ? 
-				RemarksPopUp.STATE_CAN_SPECIFY_REASON_BLANK: RemarksPopUp.STATE_DEFAULT;
+			if(_inputField != null && (_inputField.isEmpty() ||	_inputField.hasBlankReasonSpecified()) ) {
+				view.currentState = RemarksPopUp.STATE_CAN_SPECIFY_REASON_BLANK;
+			} else {
+				view.currentState = RemarksPopUp.STATE_DEFAULT;
+			}
 			view.remarksTextArea.text = remarks;
 			view.radioButtonGroup.selectedValue = symbolToSelect;
 		}

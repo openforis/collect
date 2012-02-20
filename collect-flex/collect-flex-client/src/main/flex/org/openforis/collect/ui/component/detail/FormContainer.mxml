@@ -2,55 +2,38 @@
 <s:NavigatorContent xmlns:fx="http://ns.adobe.com/mxml/2009" 
 					xmlns:s="library://ns.adobe.com/flex/spark" 
 					xmlns:mx="library://ns.adobe.com/flex/mx" 
-					width="100%" height="100%" creationPolicy="all">
+					xmlns:detail="org.openforis.collect.ui.component.detail.*"
+					width="100%" height="100%" 
+					creationPolicy="all" 
+					>
 	
 	<fx:Script>
 		<![CDATA[
 			import org.openforis.collect.model.proxy.RecordProxy;
 			
-			//private var _rootFormContainer:EntityFormContainer;
 			private var _record:RecordProxy;
-			
-			[Bindable]
-			public function get record():RecordProxy {
-				return _record;
-			}
-
-			public function set record(value:RecordProxy):void {
-				_record = value;
-			}
-
-	/* 		public function get rootFormContainer():EntityFormContainer {
-				return _rootFormContainer;
-			}
-			
-			public function set rootFormContainer(value:EntityFormContainer):void {
-				_rootFormContainer = value;
-				this.viewStack.addElement(_rootFormContainer);
-			} */
 			
 			public function addEntityFormContainer(form:EntityFormContainer):void {
 				this.viewStack.addElement(form);
 			}
+
+			[Bindable]
+			public function get record():RecordProxy {
+				return _record;
+			}
+			
+			public function set record(value:RecordProxy):void {
+				_record = value;
+			}
+
 		]]>
 	</fx:Script>
-	<fx:Declarations>
-		<!-- Place non-visual elements (e.g., services, value objects) here -->
-	</fx:Declarations>
-	
+
 	<s:layout>
 		<s:VerticalLayout gap="0" />
 	</s:layout>
 	
-	<!--
-	<s:Group width="100%">
-		<s:TabBar id="buttonBar" dataProvider="{viewStack}" />
-		<s:Label id="formVersionLabel" text="{record.version.getLabelText()}" right="0" verticalCenter="0" />
-	</s:Group>
-	-->
 	<s:ButtonBar dataProvider="{viewStack}"/>
-	<mx:ViewStack width="100%" height="100%" id="viewStack">
-		<!-- view stack for all entity forms-->
-	</mx:ViewStack>
+	<mx:ViewStack width="100%" height="100%" id="viewStack" />
 	
 </s:NavigatorContent>

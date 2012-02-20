@@ -14,37 +14,31 @@
 			import mx.collections.ArrayCollection;
 			import mx.collections.IList;
 			import mx.collections.ListCollectionView;
-			import mx.containers.GridItem;
-			import mx.containers.GridRow;
-			import mx.core.IVisualElement;
 			import mx.events.FlexEvent;
 			
 			import org.openforis.collect.i18n.Message;
-			import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 			import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 			import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
 			import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
-			import org.openforis.collect.model.UITab;
-			import org.openforis.collect.model.proxy.AttributeProxy;
-			import org.openforis.collect.model.proxy.CodeProxy;
-			import org.openforis.collect.model.proxy.CoordinateProxy;
 			import org.openforis.collect.model.proxy.EntityProxy;
 			import org.openforis.collect.presenter.EntityFormPresenter;
 			import org.openforis.collect.ui.UIBuilder;
 			import org.openforis.collect.util.CollectionUtil;
 			import org.openforis.collect.util.StringUtil;
 			
-			import spark.components.FormItem;
+			public static const STATE_WITH_TABS:String = "withTabs";
+			public static const STATE_WITHOUT_TABS:String = "withoutTabs";
 			
 			private const MAIN_TAB:Object = new Object();
 		
+			private var _modelVersion:ModelVersionProxy;
+			private var _entityDefinition:EntityDefinitionProxy;
+			private var _uiTabs:ListCollectionView;	
+			private var _definitionsPerTab:IList;
 			private var _parentEntity:EntityProxy;
 			private var _entity:EntityProxy;
-			private var _entityDefinition:EntityDefinitionProxy;
-			private var _modelVersion:ModelVersionProxy;
-			private var _uiTabs:ListCollectionView;	
+			private var _entities:IList;
 			private var _forms:Array = new Array();
-			private var _definitionsPerTab:IList;
 			
 			private var _presenter:EntityFormPresenter;
 			
@@ -53,35 +47,44 @@
 			}
 			
 			public function build():void {
+				if(uiTabs == null) {
+					this.currentState = STATE_WITHOUT_TABS;
+				} else {
+					this.currentState = STATE_WITH_TABS;
+				}
 				initDefinitionsPerTab();
 			}
-			
+			/**
+			 * Creates the list of node definitions per each tab
+			 * In the first position there will be the node definitions
+			 * with uiTabName blank or null
+			 */
 			private function initDefinitionsPerTab():void {
-				var map:Dictionary = new Dictionary();
+				var totalTabs:int = 1 + (uiTabs != null ? uiTabs.length: 0);
+				var temp:Array = new Array(totalTabs);
 				var childDefns:IList = UIBuilder.getDefinitionsInVersion(entityDefinition.childDefinitions, modelVersion);
+				temp[0] = new ArrayCollection();
 				for each (var defn:NodeDefinitionProxy in childDefns) {
 					var tabName:String = defn.uiTabName;
-					var tab:Object;
+					var index:int = -1;
 					if(StringUtil.isBlank(tabName)) {
-						tab = MAIN_TAB;
-					} else {
-						tab = CollectionUtil.getItem(uiTabs, "name", tabName);
+						index = 0;
+					} else if(uiTabs != null) {
+						var tabIndex:int = CollectionUtil.getItemIndex(uiTabs, "name", tabName);
+						if(tabIndex >= 0) {
+							index = tabIndex + 1;
+						}
 					}
-					var nodeDefs:IList = map[tab];
-					if(nodeDefs == null) {
-						nodeDefs = new ArrayCollection();
-						map[tab] = nodeDefs;
+					if(index >= 0) {
+						var nodeDefs:IList = temp[index];
+						if(nodeDefs == null) {
+							nodeDefs = new ArrayCollection();
+							temp[index] = nodeDefs;
+						}
+						nodeDefs.addItem(defn);
 					}
-					nodeDefs.addItem(defn);
 				}
-				var temp:IList = new ArrayCollection();
-				var mainDefs:IList = map[MAIN_TAB];
-				temp.addItem(mainDefs);
-				for each (var t:UITab in uiTabs) {
-					var defs:IList = map[t];
-					temp.addItem(defs);
-				}
-				this.definitionsPerTab = temp;
+				this.definitionsPerTab = new ArrayCollection(temp);
 			}
 			
 			private function dropDownLabelFunction(item:Object):String {
@@ -147,6 +150,15 @@
 			public function set definitionsPerTab(value:IList):void {
 				_definitionsPerTab = value;
 			}
+
+			[Bindable]
+			public function get entities():IList {
+				return _entities;
+			}
+
+			public function set entities(value:IList):void {
+				_entities = value;
+			}
 			
 		]]>
 	</fx:Script>
@@ -167,71 +179,72 @@
 		
 	</fx:Declarations>
 	
-	<s:BorderContainer width="100%" height="100%" id="externalContainer" styleName="entityForm">
-		<s:layout>
-			<s:VerticalLayout />
-		</s:layout>
-		<s:Group width="100%" id="addSection" 
-				 includeInLayout="{entityDefinition.multiple}" 
-				 visible="{entityDefinition.multiple}">
-			<s:layout>
-				<s:HorizontalLayout paddingTop="5" horizontalAlign="left" paddingLeft="10" gap="12" verticalAlign="middle" />
-			</s:layout>
-			<s:Label text="{entityDefinition.getLabelText()}" styleName="bold" />
-			<s:DropDownList id="dropDownList"
-							prompt="{Message.get('global.dropDownPrompt')}" 
-							width="150" 
-							labelFunction="dropDownLabelFunction"
-							/>
-			<s:Button id="addButton" styleName="addButton" buttonMode="true" useHandCursor="true" />
-			<s:Button id="deleteButton" styleName="deleteButton" buttonMode="true" useHandCursor="true"
-					  visible="{dropDownList.selectedIndex >= 0}" includeInLayout="{dropDownList.selectedIndex >= 0}"
-					  />
-		</s:Group>
-		<s:Group id="internalContainer" height="100%" width="100%" showEffect="{showFormEffect}" hideEffect="{hideFormEffect}">
-			<s:Scroller height="100%" width="100%" id="scroller" 
-						includeInLayout="{uiTabs == null}"
-						visible="{uiTabs == null}">
-				<s:Group width="100%" id="group">
-					<s:DataGroup id="dataGroup" 
-								 dataProvider="{definitionsPerTab.getItemAt(0) as IList}" 
-								 height="100%" 
-								 width="100%" 
-								 >
-						<s:layout>
-							<s:VerticalLayout paddingBottom="10" paddingLeft="10" paddingRight="10" paddingTop="10" />
-						</s:layout>
-						<s:itemRenderer>
-							<fx:Component>
-								<detail:FormDataGroupItemRenderer
-									isInDataGroup="false"
-									entity="{outerDocument.entity}"
-									modelVersion="{outerDocument.modelVersion}"
+	<s:states>
+		<s:State name="withoutTabs" />
+		<s:State name="withTabs" />
+	</s:states>
+	
+	<s:BorderContainer styleName="entityForm"
+			width="100%" height="100%">
+
+		<detail:ScrollableFormContainer 
+			modelVersion="{modelVersion}"
+			entityDefinition="{entityDefinition}"
+			nodeDefinitions="{IList(definitionsPerTab.getItemAt(0))}"
+			entity="{entity}"
+			includeIn="withoutTabs"
+			/>
+	
+		<s:VGroup id="containerWithTabs" width="100%" height="100%"
+				  includeIn="withTabs">
+			<s:Group id="addSection" 
+					 includeInLayout="{entityDefinition.multiple}" 
+					 visible="{entityDefinition.multiple}">
+				<s:layout>
+					<s:HorizontalLayout paddingTop="5" horizontalAlign="left" paddingLeft="10" gap="12" verticalAlign="middle" />
+				</s:layout>
+				<s:Label text="{entityDefinition.getLabelText()}" styleName="bold" />
+				<s:DropDownList id="dropDownList"
+								prompt="{Message.get('global.dropDownPrompt')}" 
+								width="150" 
+								labelFunction="dropDownLabelFunction"
+								dataProvider="{entities}"
+								/>
+				<s:Button id="addButton" styleName="addButton" buttonMode="true" useHandCursor="true" />
+				<s:Button id="deleteButton" styleName="deleteButton" buttonMode="true" useHandCursor="true"
+						  visible="{dropDownList.selectedIndex >= 0}" includeInLayout="{dropDownList.selectedIndex >= 0}"
+						  />
+			</s:Group>
+			<s:Group id="internalContainer" 
+					 showEffect="{showFormEffect}" hideEffect="{hideFormEffect}"
+					 visible="{dropDownList.selectedItem != null}"
+					 height="100%" width="100%">
+				<s:VGroup id="scrollableForms" 
+						  width="100%" height="100%" 
+						  gap="0" 
+						  >
+					<s:ButtonBar id="buttonBar" dataProvider="{viewStack}" />
+					<s:BorderContainer
+						width="100%" 
+						height="100%"
+						styleName="entityForm"
+						>
+						<mx:ViewStack id="viewStack" width="100%" height="100%" 
+									  verticalGap="0"
+									  creationPolicy="auto">
+							<mx:Repeater id="tabsRP" dataProvider="{uiTabs}">
+								<detail:ScrollableFormContainer 
+									modelVersion="{modelVersion}"
+									entityDefinition="{entityDefinition}"
+									nodeDefinitions="{IList(definitionsPerTab.getItemAt(tabsRP.currentIndex + 1))}"
+									entity="{entity}"
+									label="{tabsRP.currentItem.label}"
 									/>
-							</fx:Component>
-						</s:itemRenderer>
-					</s:DataGroup>
-				</s:Group>
-			</s:Scroller>
-			
-			<s:VGroup id="scrollableForms" width="100%" height="100%" gap="0" 
-					  includeInLayout="{uiTabs != null}"
-					  visible="{uiTabs != null}">
-				<s:ButtonBar id="buttonBar" dataProvider="{viewStack}" />
-				<mx:ViewStack id="viewStack" width="100%" height="100%" 
-							  verticalGap="0"
-							  creationPolicy="auto">
-					<mx:Repeater id="tabsRP" dataProvider="{uiTabs}">
-						<detail:ScrollableFormContainer 
-							entityDefinition="{entityDefinition}"
-							nodeDefinitions="{definitionsPerTab.getItemAt(tabsRP.currentIndex + 1) as IList}"
-							modelVersion="{modelVersion}"
-							label="{tabsRP.currentItem.label}"
-							entity="{entity}"
-							/>
-					</mx:Repeater>
-				</mx:ViewStack>
-			</s:VGroup>
-		</s:Group>			
+							</mx:Repeater>
+						</mx:ViewStack>
+					</s:BorderContainer>
+				</s:VGroup>
+			</s:Group>			
+		</s:VGroup>
 	</s:BorderContainer>
 </s:NavigatorContent>

@@ -12,13 +12,13 @@ import org.openforis.collect.model.proxy.AttributeSymbol;
 public class UpdateRequest implements Proxy {
 
 	public enum Method {
-		UPDATE, ADD, DELETE;
+		UPDATE, ADD, DELETE, UPDATE_SYMBOL;
 	}
 
 	private Integer parentEntityId;
 	private String nodeName;
 	private Integer nodeId;
-	private String value;
+	private String[] values;
 	private Method method;
 	private String remarks;
 	private AttributeSymbol symbol;
@@ -41,14 +41,6 @@ public class UpdateRequest implements Proxy {
 
 	public void setNodeId(Integer nodeId) {
 		this.nodeId = nodeId;
-	}
-
-	public String getValue() {
-		return value;
-	}
-
-	public void setValue(String value) {
-		this.value = value;
 	}
 
 	public Integer getParentEntityId() {
@@ -81,6 +73,14 @@ public class UpdateRequest implements Proxy {
 
 	public void setSymbol(AttributeSymbol symbol) {
 		this.symbol = symbol;
+	}
+
+	public String[] getValues() {
+		return values;
+	}
+
+	public void setValues(String[] values) {
+		this.values = values;
 	}
 
 }

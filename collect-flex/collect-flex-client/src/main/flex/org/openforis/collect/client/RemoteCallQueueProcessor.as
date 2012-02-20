@@ -54,13 +54,14 @@ package org.openforis.collect.client {
 		
 		protected function responderFaultHandler(event:FaultEvent, token:Object = null):void {
 			//after it fails 3 times, the system has to be stopped.
-			var remoteCall:RemoteCallWrapper = getHeadElement();
-			if(remoteCall.attempts >= _maxAttempts){
+			var call:RemoteCallWrapper = getHeadElement();
+			if(call.attempts >= _maxAttempts){
 				if(_faultHandler != null) {
 					_faultHandler(event);
-				}				
+				}
+				_queue.pop();
 			} else {
-				remoteCall.reset();
+				call.reset();
 				sendHeadRemoteCall();
 			}
 		}
