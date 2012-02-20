@@ -1,20 +1,9 @@
 package org.openforis.collect.presenter {
-	import flash.events.Event;
-	import flash.events.FocusEvent;
-	
-	import mx.controls.DateField;
 	import mx.controls.TextInput;
-	import mx.events.CalendarLayoutChangeEvent;
-	import mx.events.DropdownEvent;
-	import mx.managers.IFocusManagerComponent;
 	
 	import org.openforis.collect.i18n.Message;
 	import org.openforis.collect.model.proxy.AttributeProxy;
-	import org.openforis.collect.model.proxy.AttributeSymbol;
-	import org.openforis.collect.model.proxy.DateProxy;
 	import org.openforis.collect.ui.component.input.BooleanInputField;
-	import org.openforis.collect.ui.component.input.DateInputField;
-	import org.openforis.collect.ui.component.input.InputField;
 	import org.openforis.collect.util.StringUtil;
 	
 	/**
@@ -67,7 +56,8 @@ package org.openforis.collect.presenter {
 					if(shortKey != null) {
 						return shortKey;
 					}
-				} else if(value != null) {
+				}
+				if(value != null) {
 					var textVal:String = value.toString();
 					if(textVal == "true") {
 						return TRUE;

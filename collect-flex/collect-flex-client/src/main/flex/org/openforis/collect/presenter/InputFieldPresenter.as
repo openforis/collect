@@ -169,11 +169,10 @@ package org.openforis.collect.presenter {
 					if(shortKey != null) {
 						return shortKey;
 					}
-				} else {
-					var value:Object = attribute.value;
-					if(value != null && StringUtil.isNotBlank(value.toString())) {
-						return value.toString();
-					}
+				}
+				var value:Object = attribute.value;
+				if(value != null && StringUtil.isNotBlank(value.toString())) {
+					return value.toString();
 				}
 			}
 			return "";

@@ -52,12 +52,9 @@ import org.openforis.idm.model.Date;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.Record;
-import org.openforis.idm.model.TaxonAttribute;
-import org.openforis.idm.model.TaxonOccurrence;
 import org.openforis.idm.model.Time;
 import org.openforis.idm.model.expression.ExpressionFactory;
 import org.openforis.idm.model.expression.ModelPathExpression;
-import org.openforis.idm.model.species.Taxon;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -210,6 +207,7 @@ public class DataService {
 						if(values != null && values.size() == 1) {
 							val = values.get(0);
 						}
+						attribute.setSymbol(null);
 						attribute.setRemarks(remarks);
 						attribute.setValue(val);
 						updatedNodes.add(attribute);
@@ -224,7 +222,7 @@ public class DataService {
 						for (Node<?> n : nodes) {
 							Attribute<?, ?> a = (Attribute<?, ?>) n;
 							a.setRemarks(remarks);
-							if(! symbol.isReasonBlank() || a.isEmpty()) {
+							if((symbol != null && ! symbol.isReasonBlank()) || a.isEmpty()) {
 								a.setSymbol(symbolChar);
 							}
 							updatedNodes.add(a);
