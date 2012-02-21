@@ -37,8 +37,8 @@ CREATE TABLE "collect"."data"  (
 	"record_id"    	integer NOT NULL,
 	"parent_id"    	integer NULL,
 	"definition_id"	integer NOT NULL,
-	"field"        	integer NOT NULL,
 	"position"     	integer NOT NULL,
+	"field"        	integer NOT NULL,
 	"value"        	varchar(2048) NULL,
 	"remarks"      	varchar(2048) NULL,
 	"symbol"       	char(1) NULL,
@@ -140,7 +140,7 @@ CREATE TABLE "collect"."user_role"  (
 GO
 ALTER TABLE "collect"."data"
 	ADD CONSTRAINT "UK_data_node"
-	UNIQUE ("record_id", "parent_id", "definition_id", "field")
+	UNIQUE ("record_id", "parent_id", "definition_id", "position", "field")
 GO
 ALTER TABLE "collect"."survey"
 	ADD CONSTRAINT "UK_survey_name"

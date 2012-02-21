@@ -29,10 +29,10 @@ public class DataPersister {
 	public void persist(Node<? extends NodeDefinition> node, int idx) {
 		CollectRecord record = (CollectRecord) node.getRecord();
 		// Get database ID of parent
-		Integer internalId = node.getId();
+		Integer internalId = node.getInternalId();
 		Integer parentDataId = null;
 		if ( node.getParent() != null ) {
-			Integer parentId = node.getParent().getId();
+			Integer parentId = node.getParent().getInternalId();
 			if ( parentId == null ) {
 				throw new NullPointerException("Parent id not set ");
 			}

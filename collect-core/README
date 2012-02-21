@@ -6,12 +6,13 @@ Run unit tests with:
 
 	mvn package
 
-Run integration tests with*:
+Run integration tests with:
 
 	mvn verify
    
 Regenerate jOOQ stub classes*: 
 
-	mvn jooq-codegen:generate
+	cd collect-core
+	mvn properties:read-properties jooq-codegen:generate
 	 
 * Must be run from collect-core directory.  Requires dev database settings in dev.properties.   See http://km.fao.org/OFwiki/index.php/Open_Foris_Collect_Development_Environment for more info.  

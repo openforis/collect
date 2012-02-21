@@ -197,8 +197,8 @@ public class RecordDAOTest {
 				tree.addValue("total_height", 2.0);
 				
 				RealAttribute boleHeight = tree.addValue("bole_height", (Double) null);
-				boleHeight.setSymbol('*');
-				boleHeight.setRemarks("No value specified");
+				boleHeight.getField().setSymbol('*');
+				boleHeight.getField().setRemarks("No value specified");
 				//.setMetadata(new CollectAttributeMetadata('*',null,"No value specified"));
 			}
 		}

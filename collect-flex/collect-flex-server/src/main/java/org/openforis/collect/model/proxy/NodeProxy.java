@@ -44,7 +44,7 @@ public class NodeProxy implements Proxy {
 	
 	@ExternalizedProperty
 	public Integer getId() {
-		return node.getId();
+		return node.getInternalId();
 	}
 
 	@ExternalizedProperty
@@ -64,7 +64,7 @@ public class NodeProxy implements Proxy {
 	@ExternalizedProperty
 	public Integer getParentId() {
 		if(node.getParent() != null) {
-			return node.getParent().getId();
+			return node.getParent().getInternalId();
 		} else {
 			return null;
 		}

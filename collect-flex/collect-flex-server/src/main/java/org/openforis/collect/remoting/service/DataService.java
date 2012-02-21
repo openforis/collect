@@ -164,7 +164,7 @@ public class DataService {
 		CollectRecord record = sessionState.getActiveRecord();
 		ModelVersion version = record.getVersion();
 		Integer parentEntityId = request.getParentEntityId();
-		Entity parentEntity = (Entity) record.getNodeById(parentEntityId);
+		Entity parentEntity = (Entity) record.getNodeByInternalId(parentEntityId);
 		EntityDefinition parentDef = parentEntity.getDefinition();
 		Integer nodeId = request.getNodeId();
 		Integer fieldIndex = request.getFieldIndex();
@@ -172,7 +172,7 @@ public class DataService {
 		Object fieldVal = null;
 		Node<?> node = null;
 		if(nodeId != null) {
-			node = record.getNodeById(nodeId);
+			node = record.getNodeByInternalId(nodeId);
 		}
 		NodeDefinition nodeDef = ((EntityDefinition) parentDef).getChildDefinition(nodeName);
 		String requestValue = request.getValue();
@@ -364,7 +364,7 @@ public class DataService {
 	 */
 	public List<CodeListItemProxy> getCodeListItems(int parentEntityId, String attrName, String[] codes){
 		CollectRecord record = getActiveRecord();
-		Entity parent = (Entity) record.getNodeById(parentEntityId);
+		Entity parent = (Entity) record.getNodeByInternalId(parentEntityId);
 		CodeAttributeDefinition def = (CodeAttributeDefinition) parent.getDefinition().getChildDefinition(attrName);
 		List<CodeListItem> items = getAssignableCodeListItems(parent, def);
 		List<CodeListItem> filteredItems = new ArrayList<CodeListItem>();
@@ -391,7 +391,7 @@ public class DataService {
 	 */
 	public List<CodeListItemProxy> findAssignableCodeListItems(int parentEntityId, String attrName){
 		CollectRecord record = getActiveRecord();
-		Entity parent = (Entity) record.getNodeById(parentEntityId);
+		Entity parent = (Entity) record.getNodeByInternalId(parentEntityId);
 		CodeAttributeDefinition def = (CodeAttributeDefinition) parent.getDefinition().getChildDefinition(attrName);
 		List<CodeListItem> items = getAssignableCodeListItems(parent, def);
 		List<CodeListItemProxy> result = CodeListItemProxy.fromList(items);
@@ -410,7 +410,7 @@ public class DataService {
 	 */
 	public List<CodeListItemProxy> findAssignableCodeListItems(int parentEntityId, String attributeName, String[] codes) {
 		CollectRecord record = getActiveRecord();
-		Entity parent = (Entity) record.getNodeById(parentEntityId);
+		Entity parent = (Entity) record.getNodeByInternalId(parentEntityId);
 		CodeAttributeDefinition def = (CodeAttributeDefinition) parent.getDefinition().getChildDefinition(attributeName);
 		List<CodeListItem> items = getAssignableCodeListItems(parent, def);
 		List<CodeListItemProxy> result = new ArrayList<CodeListItemProxy>();
