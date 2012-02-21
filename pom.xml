@@ -17,11 +17,12 @@
 	<properties>
 		<spring-security.version>3.1.0.RELEASE</spring-security.version>
 		<spring.version>3.1.0.RELEASE</spring.version>
-		<flexmojos.version>4.1-beta</flexmojos.version>		
+		<flexmojos.version>4.2-beta</flexmojos.version>		
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 	</properties>
-	
+
+		
 	<build>
 		<plugins>
 			<!--  Set Eclipse project text encoding to UTF-8 -->
@@ -43,6 +44,11 @@
 		</plugins>
 		<pluginManagement>
 			<plugins>
+				<plugin>
+					<groupId>org.sonatype.flexmojos</groupId>
+					<artifactId>flexmojos-maven-plugin</artifactId>
+					<version>${flexmojos.version}</version>
+				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
@@ -197,11 +203,6 @@
 				<groupId>org.springframework.security</groupId>
 				<artifactId>spring-security-cas-client</artifactId>
 				<version>${spring-security.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.sonatype.flexmojos</groupId>
-				<artifactId>flexmojos-maven-plugin</artifactId>
-				<version>${flexmojos.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>com.sun.xml.bind</groupId>
