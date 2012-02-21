@@ -39,7 +39,7 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.ui.component.detail.SingleEntityFormItem;
 	import org.openforis.collect.ui.component.input.BooleanInputField;
 	import org.openforis.collect.ui.component.input.CodeInputField;
-	import org.openforis.collect.ui.component.input.CoordinateItemRenderer;
+	import org.openforis.collect.ui.component.input.CoordinateAttributeRenderer;
 	import org.openforis.collect.ui.component.input.DateAttributeRenderer;
 	import org.openforis.collect.ui.component.input.FixedCodeInputField;
 	import org.openforis.collect.ui.component.input.InputField;
@@ -270,7 +270,7 @@ package org.openforis.collect.ui {
 		public static function getAttributeItemRenderer(def:AttributeDefinitionProxy, isInDataGroup:Boolean = false):AttributeItemRenderer {
 			var renderer:AttributeItemRenderer;
 			if(def is CoordinateAttributeDefinitionProxy) {
-				renderer = new CoordinateItemRenderer();
+				renderer = new CoordinateAttributeRenderer();
 			} else if(def is DateAttributeDefinitionProxy) {
 				renderer = new DateAttributeRenderer();
 			} else if(def is TaxonAttributeDefinitionProxy) {

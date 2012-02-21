@@ -7,7 +7,13 @@
 	
 	<fx:Script>
 		<![CDATA[
+			import org.openforis.collect.presenter.DateAttributePresenter;
+			
 			private var _separator:String = "/";
+			
+			override protected function initPresenter():void {
+				presenter = new DateAttributePresenter(this);
+			}
 			
 			[Bindable]
 			public function get separator():String {

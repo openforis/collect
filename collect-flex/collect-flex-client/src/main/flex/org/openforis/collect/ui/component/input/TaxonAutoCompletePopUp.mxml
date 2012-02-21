@@ -34,10 +34,10 @@
 				 >
 		<s:columns>
 			<s:ArrayList>
-				<s:GridColumn headerText="Code" dataField="taxon.code" width="50" />
-				<s:GridColumn headerText="Scientific name" width="100" dataField="taxon.scientificName" />
-				<s:GridColumn headerText="Vernacular name" width="100" dataField="vernacularName.vernacularName" />
-				<s:GridColumn headerText="Language/dialect" width="100" dataField="vernacularName.languageVariety" />
+				<s:GridColumn headerText="Code" dataField="code" width="50" />
+				<s:GridColumn headerText="Scientific name" width="100" dataField="scientificName" />
+				<s:GridColumn headerText="Vernacular name" width="100" dataField="vernacularName" />
+				<s:GridColumn headerText="Language/dialect" width="100" dataField="languageVariety" />
 			</s:ArrayList>
 		</s:columns>
 		<s:itemRenderer>

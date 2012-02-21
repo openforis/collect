@@ -7,8 +7,9 @@
 				>
 	<fx:Script>
 		<![CDATA[
+			import org.openforis.collect.Application;
 			import org.openforis.collect.i18n.Message;
-			import org.openforis.collect.presenter.CoordinateInputFieldPresenter;
+			import org.openforis.collect.metamodel.proxy.SpatialReferenceSystemProxy;
 			
 			/*
 			override protected function initPresenter():void {
@@ -16,7 +17,10 @@
 			}
 			*/
 			
-			
+			protected function srsLabelFunction(item:Object):String {
+				var srs:SpatialReferenceSystemProxy = SpatialReferenceSystemProxy(item);
+				return srs.getLabelText();
+			}
 		]]>
 	</fx:Script>
 
@@ -32,22 +36,30 @@
 		tabEnabled="false">
 			
 		<s:HGroup includeIn="horizontal" gap="2">
-			<s:DropDownList id="srsDropDownList" 
-							width="150" 
-							prompt="{Message.get('global.dropDownPrompt')}" 
-							includeIn="horizontal" itemCreationPolicy="immediate"
-							/>
+			<input:DropDownInputField id="srsDropDownList" 
+									  attributeDefinition="{attributeDefinition}"
+									  parentEntity="{parentEntity}"
+									  attribute="{attribute}"
+									  fieldIndex="2"
+									  width="150" 
+									  dataField="id"
+									  prompt="{Message.get('global.dropDownPrompt')}" 
+									  includeIn="horizontal" 
+									  itemCreationPolicy="immediate"
+									  labelFunction="{srsLabelFunction}"
+									  dataProvider="{Application.activeSurvey.spatialReferenceSystems}"
+									  />
 			<input:NumericInputField id="xTextInput" includeIn="horizontal" itemCreationPolicy="immediate"
 									 attributeDefinition="{attributeDefinition}"
 									 parentEntity="{parentEntity}"
 									 attribute="{attribute}"
-									 fieldIndex="1"
+									 fieldIndex="0"
 									 />
 			<input:NumericInputField id="yTextInput" includeIn="horizontal" itemCreationPolicy="immediate" 
 									 attributeDefinition="{attributeDefinition}"
 									 parentEntity="{parentEntity}"
 									 attribute="{attribute}"
-									 fieldIndex="2"
+									 fieldIndex="1"
 									 />
 		</s:HGroup>
 		
