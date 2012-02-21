@@ -56,10 +56,10 @@
 							
 							override protected function createChildren():void {
 								super.createChildren();
-								var inputField:InputField = UIBuilder.getInputField(outerDocument.attributeDefinition, true);
-								BindingUtils.bindProperty(inputField, "parentEntity", outerDocument, "parentEntity");
-								BindingUtils.bindProperty(inputField, "attribute", this, "attribute");
-								addElement(inputField);
+								var renderer:AttributeItemRenderer = UIBuilder.getAttributeItemRenderer(outerDocument.attributeDefinition, true);
+								BindingUtils.bindProperty(renderer, "parentEntity", this, "parentEntity");
+								BindingUtils.bindProperty(renderer, "attribute", this, "attribute");
+								addElement(renderer);
 							}
 						]]>
 					</fx:Script>

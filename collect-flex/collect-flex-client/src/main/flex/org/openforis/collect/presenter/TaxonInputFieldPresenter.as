@@ -135,7 +135,7 @@ package org.openforis.collect.presenter {
 			}
 		}
 		
-		override protected function createRequestValues():Array {
+		override protected function createRequestValue():Array {
 			var result:Array = null;
 			if(_lastSelectedTaxon != null) {
 				var taxon:TaxonProxy = _lastSelectedTaxon.taxon;

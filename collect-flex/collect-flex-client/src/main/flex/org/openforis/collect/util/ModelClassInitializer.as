@@ -20,8 +20,6 @@ package org.openforis.collect.util {
 	import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
 	import org.openforis.collect.metamodel.proxy.NodeLabelProxy;
 	import org.openforis.collect.metamodel.proxy.NodeLabelProxy$Type;
-	import org.openforis.collect.metamodel.proxy.NumericAttributeDefinitionProxy;
-	import org.openforis.collect.metamodel.proxy.NumericAttributeDefinitionProxy$Type;
 	import org.openforis.collect.metamodel.proxy.PrecisionProxy;
 	import org.openforis.collect.metamodel.proxy.PromptProxy;
 	import org.openforis.collect.metamodel.proxy.PromptProxy$Type;
@@ -42,6 +40,7 @@ package org.openforis.collect.util {
 	import org.openforis.collect.model.proxy.CoordinateProxy;
 	import org.openforis.collect.model.proxy.DateProxy;
 	import org.openforis.collect.model.proxy.EntityProxy;
+	import org.openforis.collect.model.proxy.FieldProxy;
 	import org.openforis.collect.model.proxy.IntegerRangeProxy;
 	import org.openforis.collect.model.proxy.RealRangeProxy;
 	import org.openforis.collect.model.proxy.RecordProxy;
@@ -76,14 +75,13 @@ package org.openforis.collect.util {
 				DateProxy,
 				EntityDefinitionProxy,
 				EntityProxy,
+				FieldProxy,
 				FileAttributeDefinitionProxy,
 				IntegerRangeProxy,
 				LanguageSpecificTextProxy,
 				ModelVersionProxy,
 				NodeLabelProxy,
 				NodeLabelProxy$Type,
-				NumericAttributeDefinitionProxy,
-				NumericAttributeDefinitionProxy$Type,
 				PrecisionProxy,
 				PromptProxy,
 				PromptProxy$Type,

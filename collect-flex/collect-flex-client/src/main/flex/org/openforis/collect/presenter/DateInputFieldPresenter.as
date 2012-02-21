@@ -66,7 +66,7 @@ package org.openforis.collect.presenter {
 			}
 		}
 		
-		override protected function createRequestValues():Array {
+		override protected function createRequestValue():Array {
 			var result:Array = new Array(3);
 			result[0] = StringUtil.trim(_view.year.text);
 			result[1] = StringUtil.trim(_view.month.text);

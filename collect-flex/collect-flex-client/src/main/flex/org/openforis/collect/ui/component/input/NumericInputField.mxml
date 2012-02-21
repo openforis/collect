@@ -3,7 +3,25 @@
 				  xmlns:s="library://ns.adobe.com/flex/spark" 
 				  xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:input="org.openforis.collect.ui.component.input.*"
 				  width="100">
+	
+	<fx:Script>
+		<![CDATA[
+			
+			private var _maxChars:int;
+			
+			
+			[Bindable]
+			public function get maxChars():int {
+				return _maxChars;
+			}
 
-	<input:TextInput id="textInput" width="100%" />
+			public function set maxChars(value:int):void {
+				_maxChars = value;
+			}
+
+		]]>
+	</fx:Script>
+	
+	<input:TextInput id="textInput" width="100%" maxChars="{maxChars}" />
 	
 </input:InputField>

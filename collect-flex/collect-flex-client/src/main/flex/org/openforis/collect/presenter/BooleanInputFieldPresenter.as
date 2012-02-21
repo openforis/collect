@@ -3,6 +3,7 @@ package org.openforis.collect.presenter {
 	
 	import org.openforis.collect.i18n.Message;
 	import org.openforis.collect.model.proxy.AttributeProxy;
+	import org.openforis.collect.model.proxy.FieldProxy;
 	import org.openforis.collect.ui.component.input.BooleanInputField;
 	import org.openforis.collect.util.StringUtil;
 	
@@ -25,7 +26,7 @@ package org.openforis.collect.presenter {
 			super(inputField);
 		}
 		
-		override protected function createRequestValues():Array {
+		override protected function createRequestValue():String {
 			var value:String = null;
 			var text:String = StringUtil.trim(_view.text);
 			switch(text) {
@@ -40,19 +41,16 @@ package org.openforis.collect.presenter {
 				default:
 					value = text;
 			}
-			var result:Array = null;
-			if(StringUtil.isNotBlank(value)) {
-				result = [value];
-			}
-			return result;
+			return value;
 		}
 		
 		override protected function getTextValue():String {
 			var attribute:AttributeProxy = _view.attribute;
 			if(attribute != null) {
-				var value:Object = attribute.value;
-				if(attribute.symbol != null) {
-					var shortKey:String = getReasonBlankShortKey(attribute.symbol);
+				var field:FieldProxy = attribute.getField(0);
+				var value:Object = field.value;
+				if(field.symbol != null) {
+					var shortKey:String = getReasonBlankShortKey(field.symbol);
 					if(shortKey != null) {
 						return shortKey;
 					}

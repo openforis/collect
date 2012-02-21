@@ -41,7 +41,7 @@ package org.openforis.collect.presenter {
 			}
 		}
 		
-		override protected function createRequestValues():Array {
+		override protected function createRequestValue():Array {
 			var result:Array = new Array(2);
 			result[0] = StringUtil.trim(_view.hoursTextInput.text);
 			result[1] = StringUtil.trim(_view.minutesTextInput.text);

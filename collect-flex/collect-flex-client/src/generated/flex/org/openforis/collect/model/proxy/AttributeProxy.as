@@ -12,9 +12,8 @@ package org.openforis.collect.model.proxy {
     [RemoteClass(alias="org.openforis.collect.model.proxy.AttributeProxy")]
     public class AttributeProxy extends AttributeProxyBase {
 		
-		public function get empty():Boolean {
-			var result:Boolean = (value == null || StringUtil.isBlank(value.toString())) && symbol == null;
-			return result;
+		public function getField(index:int):FieldProxy {
+			return fields.getItemAt(index) as FieldProxy;
 		}
 		
     }
