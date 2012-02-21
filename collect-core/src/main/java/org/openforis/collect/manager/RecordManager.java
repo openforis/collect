@@ -59,8 +59,8 @@ import org.springframework.transaction.annotation.Transactional;
  * @author S. Ricci
  */
 public class RecordManager implements RecordContext {
-	//private final Log log = LogFactory.getLog(RecordManager.class);
-	
+	// private final Log log = LogFactory.getLog(RecordManager.class);
+
 	private static final QName COUNT_ANNOTATION = new QName("http://www.openforis.org/collect/3.0/collect", "count");
 
 	@Autowired
@@ -68,22 +68,25 @@ public class RecordManager implements RecordContext {
 
 	@Autowired
 	private ExpressionFactory expressionFactory;
-	
+
+	public RecordManager() {
+	}
+
 	protected void init() {
 		unlockAll();
 	}
-	
+
 	@Override
 	public ExpressionFactory getExpressionFactory() {
 		return expressionFactory;
 	}
-	
+
 	@Transactional
 	public void save(CollectRecord record) {
 		updateCounts(record);
-		
+
 		updateKeys(record);
-		
+
 		recordDAO.saveOrUpdate(record);
 	}
 
@@ -100,7 +103,7 @@ public class RecordManager implements RecordContext {
 	 * @param user
 	 * @param recordId
 	 * @return
-	 * @throws MultipleEditException 
+	 * @throws MultipleEditException
 	 */
 	@Transactional
 	public CollectRecord checkout(Survey survey, User user, int recordId) throws RecordLockedException, NonexistentIdException, AccessDeniedException, MultipleEditException {
@@ -116,7 +119,7 @@ public class RecordManager implements RecordContext {
 	}
 
 	@Transactional
-	public int getCountRecords(EntityDefinition rootEntityDefinition) {
+	public int getRecordCount(EntityDefinition rootEntityDefinition) {
 		int count = recordDAO.getRecordCount(rootEntityDefinition);
 		return count;
 	}
@@ -124,10 +127,10 @@ public class RecordManager implements RecordContext {
 	@Transactional
 	public CollectRecord create(Survey survey, EntityDefinition rootEntityDefinition, User user, String modelVersionName) throws MultipleEditException, AccessDeniedException, RecordLockedException {
 		recordDAO.checkLock(user);
-		
+
 		CollectRecord record = new CollectRecord(this, survey, modelVersionName);
 		record.createRootEntity(rootEntityDefinition.getName());
-		
+
 		record.setCreationDate(new Date());
 		record.setCreatedBy(user);
 		record.setStep(Step.ENTRY);
@@ -165,7 +168,6 @@ public class RecordManager implements RecordContext {
 	public void demote(String recordId) throws InvalidIdException, MultipleEditException, NonexistentIdException, AccessDeniedException, RecordLockedException {
 	}
 
-	
 	public Node<?> deleteNode(Entity parentEntity, Node<?> node) {
 		NodeDefinition def = node.getDefinition();
 		String name = def.getName();
@@ -174,21 +176,21 @@ public class RecordManager implements RecordContext {
 		Node<?> deleted = parentEntity.remove(name, index);
 		return deleted;
 	}
-	
+
 	public Attribute<?, ?> addAttribute(Entity parentEntity, AttributeDefinition def, Object value, Character symbol, String remarks) {
 		String name = def.getName();
 		Attribute<?, ?> result = null;
-		if(def instanceof BooleanAttributeDefinition) {
+		if (def instanceof BooleanAttributeDefinition) {
 			result = parentEntity.addValue(name, (Boolean) value);
-		} else if(def instanceof CodeAttributeDefinition) {
+		} else if (def instanceof CodeAttributeDefinition) {
 			result = parentEntity.addValue(name, (Code) value);
-		} else if(def instanceof CoordinateAttributeDefinition) {
+		} else if (def instanceof CoordinateAttributeDefinition) {
 			result = parentEntity.addValue(name, (Coordinate) value);
-		} else if(def instanceof DateAttributeDefinition) {
+		} else if (def instanceof DateAttributeDefinition) {
 			result = parentEntity.addValue(name, (org.openforis.idm.model.Date) value);
-		} else if(def instanceof NumberAttributeDefinition) {
+		} else if (def instanceof NumberAttributeDefinition) {
 			Type type = ((NumberAttributeDefinition) def).getType();
-			switch(type) {
+			switch (type) {
 				case INTEGER:
 					result = parentEntity.addValue(name, (Integer) value);
 					break;
@@ -196,9 +198,9 @@ public class RecordManager implements RecordContext {
 					result = parentEntity.addValue(name, (Double) value);
 					break;
 			}
-		} else if(def instanceof RangeAttributeDefinition) {
+		} else if (def instanceof RangeAttributeDefinition) {
 			org.openforis.idm.metamodel.RangeAttributeDefinition.Type type = ((RangeAttributeDefinition) def).getType();
-			switch(type) {
+			switch (type) {
 				case INTEGER:
 					result = parentEntity.addValue(name, (IntegerRange) value);
 					break;
@@ -206,31 +208,29 @@ public class RecordManager implements RecordContext {
 					result = parentEntity.addValue(name, (RealRange) value);
 					break;
 			}
-		} else if(def instanceof TaxonAttributeDefinition) {
+		} else if (def instanceof TaxonAttributeDefinition) {
 			result = parentEntity.addValue(name, (TaxonOccurrence) value);
-		} else if(def instanceof TextAttributeDefinition) {
+		} else if (def instanceof TextAttributeDefinition) {
 			result = parentEntity.addValue(name, (String) value);
-		} else if(def instanceof TimeAttributeDefinition) {
+		} else if (def instanceof TimeAttributeDefinition) {
 			result = parentEntity.addValue(name, (Time) value);
 		}
-		//TODO set symbol and remarks in all fields
-//		result.setSymbol(symbol);
-//		result.setRemarks(remarks);
+		// TODO set symbol and remarks in all fields
+		// result.setSymbol(symbol);
+		// result.setRemarks(remarks);
 		return result;
 	}
-	
-	
-	
+
 	public List<Attribute<?, ?>> replaceAttributes(Entity parentEntity, AttributeDefinition def, List<?> values, String remarks) {
 		List<Attribute<?, ?>> result;
-		if(def.isMultiple()) {
+		if (def.isMultiple()) {
 			String name = def.getName();
-			//remove old attributes
+			// remove old attributes
 			int count = parentEntity.getCount(def.getName());
 			for (int i = count - 1; i >= 0; i--) {
 				parentEntity.remove(name, i);
 			}
-			//add new attributes
+			// add new attributes
 			result = addAttributes(parentEntity, def, values, null, remarks);
 		} else {
 			throw new RuntimeException("Multiple attribute expected");
@@ -239,8 +239,8 @@ public class RecordManager implements RecordContext {
 	}
 
 	public List<Attribute<?, ?>> addAttributes(Entity parentEntity, AttributeDefinition def, List<?> values, Character symbol, String remarks) {
-		List<Attribute<?, ?>> result = new ArrayList<Attribute<?,?>>();
-		if(values != null) {
+		List<Attribute<?, ?>> result = new ArrayList<Attribute<?, ?>>();
+		if (values != null) {
 			for (Object v : values) {
 				Attribute<?, ?> attribute = addAttribute(parentEntity, def, v, symbol, remarks);
 				result.add(attribute);
@@ -251,49 +251,56 @@ public class RecordManager implements RecordContext {
 		}
 		return result;
 	}
-	
+
 	public Entity addEntity(Entity parentEntity, String nodeName, ModelVersion version) {
 		Entity entity = parentEntity.addEntity(nodeName);
 		addEmptyAttributes(entity, version);
 		addEmptyEnumeratedEntities(entity, version);
 		return entity;
 	}
-	
+
 	public void addEmptyAttributes(Entity entity, ModelVersion version) {
 		EntityDefinition entityDef = entity.getDefinition();
 		List<NodeDefinition> childDefinitions = entityDef.getChildDefinitions();
 		for (NodeDefinition nodeDef : childDefinitions) {
-			if(version.isApplicable(nodeDef)) {
+			if (version.isApplicable(nodeDef)) {
 				String name = nodeDef.getName();
-				if(entity.getCount(name) == 0) {
-					if(nodeDef instanceof AttributeDefinition) {
+				if (entity.getCount(name) == 0) {
+					if (nodeDef instanceof AttributeDefinition) {
 						addAttribute(entity, (AttributeDefinition) nodeDef, null, null, null);
-					} else if(nodeDef instanceof EntityDefinition && ! nodeDef.isMultiple()) {
+					} else if (nodeDef instanceof EntityDefinition && !nodeDef.isMultiple()) {
 						addEntity(entity, nodeDef.getName(), version);
 					}
 				}
 			}
 		}
 	}
-	
+
 	public void addEmptyEnumeratedEntities(Entity entity, ModelVersion version) {
 		EntityDefinition entityDef = entity.getDefinition();
 		List<NodeDefinition> childDefinitions = entityDef.getChildDefinitions();
 		for (NodeDefinition childDef : childDefinitions) {
-			if(childDef instanceof EntityDefinition && version.isApplicable(childDef)) {
+			if (childDef instanceof EntityDefinition && version.isApplicable(childDef)) {
 				EntityDefinition childEntityDef = (EntityDefinition) childDef;
-				CodeAttributeDefinition codeDef = getEnumeratingAttribute(childEntityDef, version);
-				if(codeDef != null) {
+				CodeAttributeDefinition codeDef = getCodeKeyAttribute(childEntityDef, version);
+				if (codeDef != null) {
 					CodeList list = codeDef.getList();
 					List<CodeListItem> items = list.getItems();
 					for (CodeListItem item : items) {
-						if(version.isApplicable(item)) {
+						if (version.isApplicable(item)) {
 							String code = item.getCode();
-							if(! hasEnumeratedEntity(entity, childEntityDef, codeDef, code)) {
-								Entity addedEntity = addEntity(entity, childEntityDef.getName(), version);
-								//there will be an empty CodeAttribute after the adding of the new entity
-								//set the value into this node
-								CodeAttribute addedCode = (CodeAttribute) addedEntity.get(codeDef.getName(), 0);
+							String entityName = childEntityDef.getName();
+							if (!isEnumerated(entity, entityName, codeDef, code)) {
+								// TODO
+								// List<Entity> entities = entity.getAll(entityName);
+								// Entity enumeratedEntity = (Entity) entity.get(entityName,);
+								// if(enumeratedEntity == null){
+								Entity enumeratedEntity = addEntity(entity, entityName, version);
+								// }
+
+								// there will be an empty CodeAttribute after adding the entity
+								// set the value into this node
+								CodeAttribute addedCode = (CodeAttribute) enumeratedEntity.get(codeDef.getName(), 0);
 								addedCode.setValue(new Code(code));
 							}
 						}
@@ -303,67 +310,67 @@ public class RecordManager implements RecordContext {
 		}
 	}
 
-	private CodeAttributeDefinition getEnumeratingAttribute(EntityDefinition entity, ModelVersion version) {
+	private CodeAttributeDefinition getCodeKeyAttribute(EntityDefinition entity, ModelVersion version) {
 		List<NodeDefinition> childDefinitions = entity.getChildDefinitions();
 		for (NodeDefinition nodeDef : childDefinitions) {
-			if(nodeDef instanceof CodeAttributeDefinition && version.isApplicable(nodeDef)) {
+			if (nodeDef instanceof CodeAttributeDefinition && version.isApplicable(nodeDef)) {
 				CodeAttributeDefinition codeDef = (CodeAttributeDefinition) nodeDef;
-				if(codeDef.isKey() && codeDef.getList() != null) {
+				if (codeDef.isKey() && codeDef.getList() != null) {
 					return codeDef;
 				}
 			}
 		}
 		return null;
 	}
-	
-	private boolean hasEnumeratedEntity(Entity parentEntity, EntityDefinition entity, CodeAttributeDefinition code, String value) {
-		List<Node<?>> children = parentEntity.getAll(entity.getName());
+
+	private boolean isEnumerated(Entity parentEntity, String name, CodeAttributeDefinition code, String value) {
+		List<Node<?>> children = parentEntity.getAll(name);
 		for (Node<?> node : children) {
 			Entity child = (Entity) node;
-			Code fixedValue = getFixedCode(child, code);
-			if(fixedValue != null && fixedValue.getCode().equals(value)) {
+			Code codeValue = getCodeValue(child, code);
+			if (value.equals(codeValue.getCode())) {
 				return true;
 			}
 		}
 		return false;
 	}
-	
-	private Code getFixedCode(Entity entity, CodeAttributeDefinition def) {
+
+	private Code getCodeValue(Entity entity, CodeAttributeDefinition def) {
 		Node<?> node = entity.get(def.getName(), 0);
-		if(node != null) {
-			return ((CodeAttribute)node).getValue();
+		if (node != null) {
+			return ((CodeAttribute) node).getValue();
 		} else {
 			return null;
 		}
 	}
-	
+
 	/**
 	 * Returns first level entity definitions of the passed root entity that have the attribute countInSummaryList set to true
 	 * 
 	 * @param rootEntityDefinition
-	 * @return 
+	 * @return
 	 */
 	private List<EntityDefinition> getCountableInList(EntityDefinition rootEntityDefinition) {
 		List<EntityDefinition> result = new ArrayList<EntityDefinition>();
 		List<NodeDefinition> childDefinitions = rootEntityDefinition.getChildDefinitions();
 		for (NodeDefinition childDefinition : childDefinitions) {
-			if(childDefinition instanceof EntityDefinition) {
+			if (childDefinition instanceof EntityDefinition) {
 				EntityDefinition entityDefinition = (EntityDefinition) childDefinition;
 				String annotation = childDefinition.getAnnotation(COUNT_ANNOTATION);
-				if(annotation != null && Boolean.parseBoolean(annotation)) {
+				if (annotation != null && Boolean.parseBoolean(annotation)) {
 					result.add(entityDefinition);
 				}
 			}
 		}
 		return result;
 	}
-	
+
 	private void updateCounts(CollectRecord record) {
 		Entity rootEntity = record.getRootEntity();
 		EntityDefinition rootEntityDef = rootEntity.getDefinition();
 		List<EntityDefinition> countableDefns = getCountableInList(rootEntityDef);
-		
-		//set counts
+
+		// set counts
 		List<Integer> counts = new ArrayList<Integer>();
 		for (EntityDefinition def : countableDefns) {
 			String name = def.getName();
@@ -372,28 +379,28 @@ public class RecordManager implements RecordContext {
 		}
 		record.setEntityCounts(counts);
 	}
-	
+
 	private void updateKeys(CollectRecord record) {
 		Entity rootEntity = record.getRootEntity();
 		EntityDefinition rootEntityDef = rootEntity.getDefinition();
 		List<AttributeDefinition> keyDefns = rootEntityDef.getKeyAttributeDefinitions();
-		//set keys
+		// set keys
 		List<String> keys = new ArrayList<String>();
-		for (AttributeDefinition def: keyDefns) {
+		for (AttributeDefinition def : keyDefns) {
 			String name = def.getName();
 			Object value = null;
 			String textValue = null;
 			Node<? extends NodeDefinition> node = rootEntity.get(name, 0);
-			if(node instanceof CodeAttribute) {
+			if (node instanceof CodeAttribute) {
 				Code code = ((CodeAttribute) node).getValue();
-				if(code != null) {
+				if (code != null) {
 					textValue = code.getCode();
 				}
-			} else if(node instanceof TextAttribute) {
+			} else if (node instanceof TextAttribute) {
 				textValue = ((TextAttribute) node).getValue();
-			} else if(node instanceof NumberAttribute<?>) {
+			} else if (node instanceof NumberAttribute<?>) {
 				value = ((NumberAttribute<?>) node).getValue();
-				if(value != null) {
+				if (value != null) {
 					textValue = value.toString();
 				}
 			}
@@ -401,5 +408,5 @@ public class RecordManager implements RecordContext {
 		}
 		record.setKeys(keys);
 	}
-	
+
 }
