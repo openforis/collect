@@ -43,11 +43,13 @@ package org.openforis.collect.presenter
 			
 			ChangeWatcher.watch(_view, "parentEntity", parentEntityChangeHandler);
 			
-			_view.addButton.addEventListener(MouseEvent.CLICK, addButtonClickHandler);
-			_view.addButton.addEventListener(FocusEvent.FOCUS_IN, buttonFocusInHandler);
-			_view.deleteButton.addEventListener(MouseEvent.CLICK, deleteButtonClickHandler);
-			_view.deleteButton.addEventListener(FocusEvent.FOCUS_IN, buttonFocusInHandler);
-			_view.dropDownList.addEventListener(IndexChangeEvent.CHANGE, dropDownListChangeHandler);
+			if(_view.currentState == EntityFormContainer.STATE_WITH_TABS) {
+				_view.addButton.addEventListener(MouseEvent.CLICK, addButtonClickHandler);
+				_view.addButton.addEventListener(FocusEvent.FOCUS_IN, buttonFocusInHandler);
+				_view.deleteButton.addEventListener(MouseEvent.CLICK, deleteButtonClickHandler);
+				_view.deleteButton.addEventListener(FocusEvent.FOCUS_IN, buttonFocusInHandler);
+				_view.dropDownList.addEventListener(IndexChangeEvent.CHANGE, dropDownListChangeHandler);
+			}
 		}
 		
 		protected function parentEntityChangeHandler(event:Event):void {
@@ -57,8 +59,7 @@ package org.openforis.collect.presenter
 		protected function updateView():void {
 			if(_view.entityDefinition != null && _view.entityDefinition.multiple) {
 				var entities:IList = getEntities();
-				_view.dropDownList.dataProvider = entities;
-				_view.internalContainer.visible = false;
+				_view.entities = entities;
 			}
 		}
 		
@@ -83,7 +84,7 @@ package org.openforis.collect.presenter
 		}
 		
 		protected function deleteButtonClickHandler(event:MouseEvent):void {
-			AlertUtil.showConfirm("global.confirmDeletion", [_view.entityDefinition.getLabelText()], 
+			AlertUtil.showConfirm("global.confirmDelete", [_view.entityDefinition.getLabelText()], 
 				"global.confirmAlertTitle", performDeletion);
 		}
 		
@@ -98,7 +99,9 @@ package org.openforis.collect.presenter
 		protected function addResultHandler(event:ResultEvent, token:Object = null):void {
 			var result:IList = event.result as IList;
 			Application.activeRecord.update(result);
-			eventDispatcher.dispatchEvent(new ApplicationEvent(ApplicationEvent.MODEL_CHANGED));
+			var appEvt:ApplicationEvent = new ApplicationEvent(ApplicationEvent.UPDATE_RESPONSE_RECEIVED);
+			appEvt.result = result;
+			eventDispatcher.dispatchEvent(appEvt);
 			//select the inserted entity
 			_view.callLater(function():void {
 				var entities:IList = getEntities();
@@ -110,7 +113,9 @@ package org.openforis.collect.presenter
 		protected function deleteResultHandler(event:ResultEvent, token:Object = null):void {
 			var result:IList = event.result as IList;
 			Application.activeRecord.update(result);
-			eventDispatcher.dispatchEvent(new ApplicationEvent(ApplicationEvent.MODEL_CHANGED));
+			var appEvt:ApplicationEvent = new ApplicationEvent(ApplicationEvent.UPDATE_RESPONSE_RECEIVED);
+			appEvt.result = result;
+			eventDispatcher.dispatchEvent(appEvt);
 		}
 		
 		protected function dropDownListChangeHandler(event:IndexChangeEvent):void {

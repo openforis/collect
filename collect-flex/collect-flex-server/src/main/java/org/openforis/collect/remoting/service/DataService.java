@@ -21,7 +21,6 @@ import org.openforis.collect.model.proxy.AttributeSymbol;
 import org.openforis.collect.model.proxy.NodeProxy;
 import org.openforis.collect.model.proxy.RecordProxy;
 import org.openforis.collect.persistence.AccessDeniedException;
-import org.openforis.collect.persistence.DuplicateIdException;
 import org.openforis.collect.persistence.InvalidIdException;
 import org.openforis.collect.persistence.MultipleEditException;
 import org.openforis.collect.persistence.NonexistentIdException;
@@ -43,6 +42,7 @@ import org.openforis.idm.metamodel.NumberAttributeDefinition.Type;
 import org.openforis.idm.metamodel.RangeAttributeDefinition;
 import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.Survey;
+import org.openforis.idm.metamodel.TaxonAttributeDefinition;
 import org.openforis.idm.metamodel.TimeAttributeDefinition;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Code;
@@ -154,10 +154,6 @@ public class DataService {
 		sessionManager.clearActiveRecord();
 	}
 
-	public void updateRootEntityKey(String recordId, String newRootEntityKey) throws DuplicateIdException, InvalidIdException, NonexistentIdException, AccessDeniedException, RecordLockedException {
-	}
-
-	@SuppressWarnings("unchecked")
 	public List<NodeProxy> updateActiveRecord(UpdateRequest request) {
 		List<Node<?>> updatedNodes = new ArrayList<Node<?>>();
 		SessionState sessionState = sessionManager.getSessionState();
@@ -174,10 +170,10 @@ public class DataService {
 		if(nodeId != null) {
 			node = record.getNodeByInternalId(nodeId);
 		}
-		NodeDefinition nodeDef = ((EntityDefinition) parentDef).getChildDefinition(nodeName);
+		NodeDefinition nodeDef = ((EntityDefinition) parentEntity.getDefinition()).getChildDefinition(nodeName);
 		String requestValue = request.getValue();
 		String remarks = request.getRemarks();
-		//parse request value into a model value (for example Code, Date, Time...)
+		//parse request values into a list of attribute value objects (for example Code, Date, Time...)
 		List<?> values = null;
 		if(requestValue != null && nodeDef instanceof AttributeDefinition) {
 			values = parseValues(parentEntity, (AttributeDefinition) nodeDef, requestValue, fieldIndex);
@@ -206,8 +202,8 @@ public class DataService {
 					@SuppressWarnings("unchecked")
 					Attribute<?, Object> attribute = (Attribute<?, Object>) node;
 					AttributeDefinition def = attribute.getDefinition();
-					if(def.isMultiple()) {
-						List<Attribute<?, ?>> attributes = recordManager.updateAttributes(parentEntity, def, values, symbolChar, remarks);
+					if(def.isMultiple() && def instanceof CodeAttributeDefinition) {
+						List<Attribute<?, ?>> attributes = recordManager.replaceAttributes(parentEntity, def, values, remarks);
 						updatedNodes.addAll(attributes);
 					} else {
 						Object val = null;
@@ -225,18 +221,35 @@ public class DataService {
 						}
 						updatedNodes.add(attribute);
 					}
+				}
+				break;
+			case UPDATE_SYMBOL:
+				//update attribute value
+				if(nodeDef instanceof AttributeDefinition) {
+					List<Node<?>> nodes = parentEntity.getAll(nodeName);
+					if(nodes != null) {
+						for (Node<?> n : nodes) {
+							Attribute<?, ?> a = (Attribute<?, ?>) n;
+							//a.setRemarks(remarks);
+							if((symbol != null && ! symbol.isReasonBlank()) || a.isEmpty()) {
+								//a.setSymbol(symbolChar);
+							}
+							updatedNodes.add(a);
+						}
+					}
 				} else if(node instanceof Entity) {
 					//update only the symbol in entity's attributes
 					Entity entity = (Entity) node;
 					recordManager.addEmptyAttributes(entity, version);
-					EntityDefinition entityDef = (EntityDefinition) nodeDef;
-					List<NodeDefinition> childDefinitions = entityDef.getChildDefinitions();
+					List<NodeDefinition> childDefinitions = ((EntityDefinition) nodeDef).getChildDefinitions();
 					for (NodeDefinition def : childDefinitions) {
 						if(def instanceof AttributeDefinition) {
 							String name = def.getName();
-							Attribute<?, ?> attribute = (Attribute<?, ?>) entity.get(name, 0);
-							//TODO attribute.setSymbol(symbolChar);
-							updatedNodes.add(attribute);
+							Attribute<?, ?> a = (Attribute<?, ?>) entity.get(name, 0);
+							if(! symbol.isReasonBlank() || a.isEmpty()) {
+								//a.setSymbol(symbolChar);
+							}
+							updatedNodes.add(a);
 						}
 					}
 				}
@@ -271,6 +284,8 @@ public class DataService {
 				result = (List<Object>) codes;
 			}
 		} else if(def instanceof CoordinateAttributeDefinition) {
+			//TODO
+			/*
 			Object val = null;
 			if(fieldIndex == 0 || fieldIndex == 1) {
 				val = Long.parseLong(value);
@@ -278,6 +293,7 @@ public class DataService {
 				val = value;
 			}
 			result.add(val);
+			*/
 		} else if(def instanceof DateAttributeDefinition) {
 			int val = Integer.parseInt(value);
 			result.add(val);
@@ -310,6 +326,12 @@ public class DataService {
 			if(number != null) {
 				result.add(number);
 			}
+		} else if(def instanceof TaxonAttributeDefinition) {
+			/*
+			int taxonId = Integer.parseInt(value);
+			int vernacularNameId = Integer.parseInt(value);
+			*/
+			//result.add(o);
 		} else if(def instanceof TimeAttributeDefinition) {
 			int val = Integer.parseInt(value);
 			result.add(val);
@@ -495,16 +517,6 @@ public class DataService {
 		return null;
 	}
 
-	private CodeListItem getCodeListItem(List<CodeListItem> siblings, String code) {
-		for (CodeListItem item : siblings) {
-			String itemCode = item.getCode();
-			if(itemCode.equals(code)) {
-				return item;
-			}
-		}
-		return null;
-	}
-	
 	private CodeListItem findCodeListItem(List<CodeListItem> siblings, String code) {
 		String adaptedCode = code.trim();
 		adaptedCode = adaptedCode.toUpperCase();

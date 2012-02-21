@@ -12,7 +12,7 @@ package org.openforis.collect.event {
 		public static const SURVEYS_LOADED:String = "surveysLoaded";
 		public static const SESSION_STATE_LOADED:String = "sessionStateLoaded";
 		public static const APPLICATION_INITIALIZED:String = "applicationInitialized";
-		public static const MODEL_CHANGED:String = "modelChanged";
+		public static const UPDATE_RESPONSE_RECEIVED:String = "updateResponseReceived";
 		
 		public var result:Object;
 		

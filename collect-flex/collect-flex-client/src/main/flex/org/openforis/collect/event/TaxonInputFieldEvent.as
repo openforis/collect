@@ -1,5 +1,6 @@
 package org.openforis.collect.event
 {
+	import org.openforis.collect.model.proxy.TaxonOccurrenceProxy;
 	
 	public class TaxonInputFieldEvent extends InputFieldEvent
 	{
@@ -8,7 +9,7 @@ package org.openforis.collect.event
 		public static const TAXON_AUTOCOMPLETE_POPUP_CLOSE:String = "taxonAutocompletePopUpClose";
 		public static const TAXON_SELECT:String = "taxonSelect";
 		
-		public var taxon:Object;
+		public var taxon:TaxonOccurrenceProxy;
 		
 		public function TaxonInputFieldEvent(type:String, bubbles:Boolean=false, cancelable:Boolean=false)
 		{

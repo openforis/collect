@@ -6,8 +6,7 @@
  */
 
 package org.openforis.collect.metamodel.proxy {
-	import mx.collections.IList;
-
+	
     [Bindable]
     [RemoteClass(alias="org.openforis.collect.metamodel.proxy.ModelVersionProxy")]
     public class ModelVersionProxy extends ModelVersionProxyBase {
@@ -38,6 +37,23 @@ package org.openforis.collect.metamodel.proxy {
 			return 0;
 		}
 		
+		public function isApplicable(versionable:NodeDefinitionProxy):Boolean {
+			var since:ModelVersionProxy = versionable.sinceVersion;
+			var deprecated:ModelVersionProxy = versionable.deprecatedVersion;
+			if (since == null && deprecated == null) {
+				return true;
+			} else {
+				var sinceResult:int = 1;
+				var deprecatedResult:int = -1;
+				if (since != null) {
+					sinceResult = date.localeCompare(since.date);
+				}
+				if (deprecated != null) {
+					deprecatedResult = date.localeCompare(deprecated.date);
+				}
+				return sinceResult >= 0 && deprecatedResult < 0;
+			}
+		}
 		
     }
 }

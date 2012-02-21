@@ -30,8 +30,9 @@ package org.openforis.collect.presenter
 		override internal function initEventListeners():void {
 			super.initEventListeners();
 			
-			eventDispatcher.addEventListener(ApplicationEvent.MODEL_CHANGED, modelChangedHandler);
+			eventDispatcher.addEventListener(ApplicationEvent.UPDATE_RESPONSE_RECEIVED, updateResponseReceivedHandler);
 			ChangeWatcher.watch(_view, "parentEntity", parentEntityChangeHandler);
+			ChangeWatcher.watch(_view, "modelVersion", modelVersionChangeHandler);
 			
 			_view.addEventListener(MouseEvent.MOUSE_OVER, mouseOverHandler);
 			_view.addEventListener(MouseEvent.MOUSE_OUT, mouseOutHandler);
@@ -41,7 +42,10 @@ package org.openforis.collect.presenter
 			updateView();
 		}
 		
-		protected function modelChangedHandler(event:ApplicationEvent):void {
+		protected function modelVersionChangeHandler(event:Event):void {
+		}
+		
+		protected function updateResponseReceivedHandler(event:ApplicationEvent):void {
 		}
 		
 		protected function updateView():void {

@@ -5,12 +5,25 @@ package org.openforis.collect.util
 	 */
 	public class ObjectUtil
 	{
+		
+		/**
+		 * returns the value of a property (even if it is nested)
+		 */
 		public static function getValue(item:Object, propertyName:String):* {
-			if(item.hasOwnProperty(propertyName)) {
-				return item[propertyName];
-			} else {
-				return null;
+			if(item != null) {
+				var indexOfDot:int = propertyName.indexOf(".");
+				if(indexOfDot > 0) {
+					var mainProp:String = propertyName.substr(0, indexOfDot);
+					if(item.hasOwnProperty(mainProp)) {
+						var mainObj:Object = item[mainProp];
+						var subProp:String = propertyName.substr(indexOfDot + 1);
+						return getValue(mainObj, subProp);
+					}
+				} else if(item.hasOwnProperty(propertyName)) {
+					return item[propertyName];
+				}
 			}
+			return null;
 		}
 	}
 }

@@ -6,6 +6,8 @@
  */
 
 package org.openforis.collect.model.proxy {
+	import flash.utils.Dictionary;
+	
 	import mx.collections.ArrayCollection;
 	import mx.collections.ArrayList;
 	import mx.collections.IList;
@@ -18,6 +20,8 @@ package org.openforis.collect.model.proxy {
     [Bindable]
     [RemoteClass(alias="org.openforis.collect.model.proxy.EntityProxy")]
     public class EntityProxy extends EntityProxyBase {
+		
+		private var nodesMap:Dictionary;
 		
 		public function getSingleAttribute(attributeName:String):AttributeProxy {
 			var attributes:IList = childrenByName.get(attributeName);
@@ -52,11 +56,20 @@ package org.openforis.collect.model.proxy {
 		}
 		
 		public function getChildById(id:int):NodeProxy {
-			var values:ArrayCollection = childrenByName.values;
-			for each (var childList:IList in values) {
-				for each (var child:NodeProxy in childList) {
-					if(child.id == id) {
-						return child;
+			if(nodesMap == null) {
+				nodesMap = new Dictionary();
+			}
+			var child:NodeProxy = nodesMap[id];
+			if(child != null) {
+				return child;
+			} else {
+				var values:ArrayCollection = childrenByName.values;
+				for each (var childList:IList in values) {
+					for each (child in childList) {
+						if(child.id == id) {
+							nodesMap[id] = child;
+							return child;
+						}
 					}
 				}
 			}
@@ -101,6 +114,9 @@ package org.openforis.collect.model.proxy {
 				childrenByName.put(name, children);
 			}
 			children.addItem(node);
+			if(nodesMap != null) {
+				nodesMap[node.id] = node;
+			}
 		}
 		
 		public function removeChild(node:NodeProxy):void {
@@ -109,6 +125,9 @@ package org.openforis.collect.model.proxy {
 			var index:int = children.getItemIndex(node);
 			if(index >= 0) {
 				children.removeItemAt(index);
+				if(nodesMap != null) {
+					nodesMap[node.id] = null;
+				}
 			}
 		}
 		
@@ -117,6 +136,9 @@ package org.openforis.collect.model.proxy {
 			var children:ArrayCollection = childrenByName.get(name);
 			var index:int = children.getItemIndex(oldNode);
 			children.setItemAt(newNode, index);
+			if(nodesMap != null) {
+				nodesMap[oldNode.id] = newNode;
+			}
 		}
 		
 		public function getKeyLabel(entityDefinition:EntityDefinitionProxy):String {

@@ -3,6 +3,7 @@ package org.openforis.collect.presenter {
 	import flash.events.FocusEvent;
 	
 	import mx.events.DropdownEvent;
+	import mx.managers.IFocusManagerComponent;
 	
 	import org.openforis.collect.Application;
 	import org.openforis.collect.metamodel.proxy.SpatialReferenceSystemProxy;
@@ -32,13 +33,28 @@ package org.openforis.collect.presenter {
 		
 		override internal function initEventListeners():void {
 			super.initEventListeners();
-			
+			_view.addEventListener(FocusEvent.FOCUS_OUT, focusOutHandler);
+			//X
 			_view.xTextInput.addEventListener(FocusEvent.FOCUS_IN, focusInHandler);
-			_view.xTextInput.addEventListener(FocusEvent.FOCUS_OUT, focusOutHandler);
+			_view.xTextInput.addEventListener(Event.CHANGE, changeHandler);
+			//Y
 			_view.yTextInput.addEventListener(FocusEvent.FOCUS_IN, focusInHandler);
-			_view.yTextInput.addEventListener(FocusEvent.FOCUS_OUT, focusOutHandler);
+			_view.yTextInput.addEventListener(Event.CHANGE, changeHandler);
+			//SRS
+			_view.srsDropDownList.addEventListener(FocusEvent.FOCUS_IN, focusInHandler);
 			_view.srsDropDownList.addEventListener(Event.CHANGE, srsDropDownChangeHandler);
-			_view.srsDropDownList.addEventListener(DropdownEvent.CLOSE, srsDropDownCloseHandler);
+			//_view.srsDropDownList.addEventListener(DropdownEvent.CLOSE, srsDropDownCloseHandler);
+		}
+		
+		override protected function focusOutHandler(event:FocusEvent):void {
+			var focussedField:IFocusManagerComponent = _view.focusManager.getFocus();
+			if(changed 
+				&& focussedField != _view.xTextInput 
+				&& focussedField != _view.yTextInput 
+				&& focussedField != _view.srsDropDownList 
+			) {
+				applyChanges();
+			}
 		}
 		
 		override protected function updateView():void {
@@ -63,7 +79,7 @@ package org.openforis.collect.presenter {
 			}
 		}
 		
-		override protected function createValue():* {
+		override protected function createRequestValues():Array {
 			var srs:SpatialReferenceSystemProxy = _view.srsDropDownList.selectedItem as SpatialReferenceSystemProxy;
 			var srsId:String = "";
 			if(srs != null) {
@@ -71,8 +87,7 @@ package org.openforis.collect.presenter {
 			}
 			var x:String = StringUtil.nullToBlank(_view.xTextInput.text);
 			var y:String = StringUtil.nullToBlank(_view.yTextInput.text);
-			
-			var result:String = "SRID=" + srsId + ";POINT(" + x + " " + y + ")";
+			var result:Array = [x, y, srsId];
 			return result;
 		}
 		
@@ -83,7 +98,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function srsDropDownChangeHandler(event:Event):void {
-			applyChanges();
+			changed = true;
 		}
 		
 		protected function srsDropDownCloseHandler(event:Event):void {

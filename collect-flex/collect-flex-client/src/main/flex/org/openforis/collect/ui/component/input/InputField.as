@@ -77,6 +77,13 @@ package org.openforis.collect.ui.component.input {
 				(StringUtil.isBlank(attribute.value.toString()) && attribute.symbol == null);
 		}
 		
+		public function hasBlankReasonSpecified():Boolean {
+			return attribute != null && ( 
+				attribute.symbol == AttributeSymbol.BLANK_ON_FORM
+				|| attribute.symbol == AttributeSymbol.DASH_ON_FORM
+				|| attribute.symbol == AttributeSymbol.ILLEGIBLE);
+		}
+		
 		public function set relevant(value:Boolean):void {
 			if(value) {
 				UIUtil.removeStyleName(validationListener, NOT_RELEVANT_STYLE);
