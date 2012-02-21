@@ -238,9 +238,8 @@ public class DataService {
 			Attribute<?, Object> attribute = (Attribute<?, Object>) node;
 			CollectRecord activeRecord = getActiveRecord();
 			ModelVersion version = activeRecord.getVersion();
-			AttributeDefinition definition = attribute.getDefinition();
 			AttributeDefinition def = attribute.getDefinition();
-			if(definition.isMultiple() && definition instanceof CodeAttributeDefinition) {
+			if(def.isMultiple() && def instanceof CodeAttributeDefinition) {
 				CodeAttributeDefinition codeDef = (CodeAttributeDefinition) def;
 				String codesString = value != null ? value.toString(): null;
 				List<?> codes = parseCodes(parentEntity, codeDef, codesString, version);
