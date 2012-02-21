@@ -318,7 +318,7 @@ public class DataService {
 			result = value;
 		} else if(def instanceof CoordinateAttributeDefinition) {
 			if(fieldIndex != null) {
-				if(fieldIndex == 0) {
+				if(fieldIndex == 2) {
 					//srsId
 					result = value;
 				} else {
