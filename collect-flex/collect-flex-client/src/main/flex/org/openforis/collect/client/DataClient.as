@@ -7,8 +7,6 @@ package org.openforis.collect.client {
 	
 	import org.openforis.collect.remoting.service.UpdateRequest;
 	
-/*	import org.openforis.collect.model.UpdateRequest;*/
-	
 	/**
 	 * 
 	 * @author S. Ricci

@@ -181,11 +181,29 @@ public class RecordManager implements RecordContext {
 		if(def instanceof BooleanAttributeDefinition) {
 			result = parentEntity.addValue(name, (Boolean) value);
 		} else if(def instanceof CodeAttributeDefinition) {
-			result = parentEntity.addValue(name, (Code) value);
+			Code code;
+			if(value == null) {
+				code = new Code(null);
+			} else {
+				code = (Code) value;
+			}
+			result = parentEntity.addValue(name, code);
 		} else if(def instanceof CoordinateAttributeDefinition) {
-			result = parentEntity.addValue(name, (Coordinate) value);
+			Coordinate coordinate;
+			if(value == null) {
+				coordinate = new Coordinate(null, null, null);
+			} else {
+				coordinate = (Coordinate) value;
+			}
+			result = parentEntity.addValue(name, coordinate);
 		} else if(def instanceof DateAttributeDefinition) {
-			result = parentEntity.addValue(name, (org.openforis.idm.model.Date) value);
+			org.openforis.idm.model.Date date;
+			if(value == null) {
+				date = new org.openforis.idm.model.Date(null, null, null);
+			} else {
+				date = (org.openforis.idm.model.Date) value;
+			}
+			result = parentEntity.addValue(name, date);
 		} else if(def instanceof NumberAttributeDefinition) {
 			Type type = ((NumberAttributeDefinition) def).getType();
 			switch(type) {
