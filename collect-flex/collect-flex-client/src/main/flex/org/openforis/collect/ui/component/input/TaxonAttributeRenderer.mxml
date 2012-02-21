@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<input:CompositeAttributeRenderer xmlns:fx="http://ns.adobe.com/mxml/2009" 
+				  xmlns:s="library://ns.adobe.com/flex/spark" 
+				  xmlns:mx="library://ns.adobe.com/flex/mx" 
+				  xmlns:input="org.openforis.collect.ui.component.input.*"
+				  >
+	<fx:Script>
+		<![CDATA[
+			import org.openforis.collect.i18n.Message;
+			
+			/*
+			override protected function initPresenter():void {
+				this.presenter = new TaxonInputFieldPresenter(this);
+			}
+			*/
+			
+		]]>
+	</fx:Script>
+	
+	<input:states>
+		<s:State name="horizontal" />
+		<s:State name="vertical" />
+	</input:states>
+	
+	<s:BorderContainer 
+		id="inputBox"
+		minHeight="0"
+		width="100%"
+		styleName="noError"
+		tabEnabled="false">
+		
+		<s:HGroup includeIn="horizontal" gap="2">
+			<input:StringInputField id="codeTextInput" width="50" maxChars="4" includeIn="horizontal" />
+			<input:StringInputField id="scientificNameTextInput" width="100" includeIn="horizontal" />
+			<input:StringInputField id="vernacularNameTextInput" width="100" includeIn="horizontal" />
+			<input:StringInputField id="vernacularLangTextInput" width="100" includeIn="horizontal" />
+		</s:HGroup>
+		
+		<s:VGroup includeIn="vertical">
+			<s:Label styleName="bold" text="{attributeDefinition.getLabelText()}" />
+			<s:VGroup>
+				<s:HGroup>
+					<s:Label width="{labelWidth}" styleName="bold" text="{Message.get('edit.taxon.code')}"/>
+					<fx:Reparent target="codeTextInput" includeIn="vertical" />
+				</s:HGroup>
+				<s:HGroup>
+					<s:Label width="{labelWidth}" styleName="bold" text="{Message.get('edit.taxon.scientificName')}"/>
+					<fx:Reparent target="scientificNameTextInput" includeIn="vertical" />
+				</s:HGroup>
+				<s:HGroup>
+					<s:Label width="{labelWidth}" styleName="bold" text="{Message.get('edit.taxon.vernacularName')}"/>
+					<fx:Reparent target="vernacularNameTextInput" includeIn="vertical" />
+				</s:HGroup>
+				<s:HGroup>
+					<s:Label width="{labelWidth}" styleName="bold" text="{Message.get('edit.taxon.vernacularLang')}"/>
+					<fx:Reparent target="vernacularLangTextInput" includeIn="vertical" />
+				</s:HGroup>
+			</s:VGroup>
+		</s:VGroup>
+		
+	</s:BorderContainer>
+	
+</input:InputField>

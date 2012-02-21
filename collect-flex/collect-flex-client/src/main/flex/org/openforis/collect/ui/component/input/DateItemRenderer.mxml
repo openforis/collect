@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<input:CompositeAttributeRenderer xmlns:fx="http://ns.adobe.com/mxml/2009" 
+				  xmlns:s="library://ns.adobe.com/flex/spark" 
+				  xmlns:mx="library://ns.adobe.com/flex/mx" 
+				  xmlns:input="org.openforis.collect.ui.component.input.*"
+				  >
+	
+	<fx:Script>
+		<![CDATA[
+			private var _separator:String = "/";
+			
+			[Bindable]
+			public function get separator():String {
+				return _separator;
+			}
+
+			public function set separator(value:String):void {
+				_separator = value;
+			}
+
+		]]>
+	</fx:Script>
+	
+	<s:HGroup 
+			verticalAlign="middle"
+			gap="2">
+		<input:NumericInputField width="25" maxChars="2" id="day" />
+		<s:Label id="separator1" text="{separator}" />
+		<input:NumericInputField width="25 " maxChars="2" id="month" />
+		<s:Label id="separator2" text="{separator}" />
+		<input:NumericInputField width="40" maxChars="4" id="year" />
+		<s:Spacer width="8" />
+		<input:DateField tabEnabled="false" tabFocusEnabled="false"
+						 id="dateField" width="16" editable="false"/>
+	</s:HGroup>
+	
+</input:CompositeAttributeRenderer>
