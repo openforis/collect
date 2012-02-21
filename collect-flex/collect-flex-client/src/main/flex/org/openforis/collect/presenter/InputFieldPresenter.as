@@ -67,9 +67,6 @@ package org.openforis.collect.presenter {
 			
 			eventDispatcher.addEventListener(ApplicationEvent.UPDATE_RESPONSE_RECEIVED, updateResponseReceivedHandler);
 			
-			_view.addEventListener(MouseEvent.MOUSE_OVER, mouseOverHandler);
-			_view.addEventListener(MouseEvent.MOUSE_OUT, mouseOutHandler);
-			
 			if(_view.textInput != null) {
 				_view.textInput.addEventListener(Event.CHANGE, changeHandler);
 				_view.textInput.addEventListener(FocusEvent.FOCUS_OUT, focusOutHandler);
@@ -99,45 +96,31 @@ package org.openforis.collect.presenter {
 		protected function changeHandler(event:Event):void {
 			//TODO if autocomplete enabled show autocomplete popup...
 			_changed = true;
+			var inputFieldEvent:InputFieldEvent = new InputFieldEvent(InputFieldEvent.CHANGING);
+			_view.dispatchEvent(inputFieldEvent);
 		}
 		
 		protected function focusOutHandler(event:FocusEvent):void {
-			if(_changed) {
+			if(_view.applyChangesOnFocusOut && _changed) {
 				applyChanges();
 			} else {
 				//TODO perform validation only
 			}
 		}
 		
-		protected function mouseOverHandler(event:MouseEvent):void {
-			var target:UIComponent = event.currentTarget as UIComponent;
-			if(target != null && target.document != null) {
-				var inputFieldEvent:InputFieldEvent = new InputFieldEvent(InputFieldEvent.INPUT_FIELD_MOUSE_OVER);
-				inputFieldEvent.inputField = target.document as InputField;
-				eventDispatcher.dispatchEvent(inputFieldEvent);
-			}
-		}
-		
-		protected function mouseOutHandler(event:MouseEvent):void {
-			var target:UIComponent = event.currentTarget as UIComponent;
-			if(target != null && target.document != null) {
-				var inputFieldEvent:InputFieldEvent = new InputFieldEvent(InputFieldEvent.INPUT_FIELD_MOUSE_OUT);
-				inputFieldEvent.inputField = target.document as InputField;
-				eventDispatcher.dispatchEvent(inputFieldEvent);
-			}
-		}
-
 		public function applyChanges():void {
 			var req:UpdateRequest = new UpdateRequest();
 			var def:AttributeDefinitionProxy = _view.attributeDefinition;
 			req.parentEntityId = _view.parentEntity.id;
 			req.nodeName = def.name;
 			req.value = createRequestValue();
+			req.fieldIndex = _view.fieldIndex;
 			if(_view.attribute != null) {
 				var a:AttributeProxy = _view.attribute;
 				var field:FieldProxy = a.getField(_view.fieldIndex);
 				req.nodeId = a.id;
 				req.method = UpdateRequest$Method.UPDATE;
+				//preserve remarks
 				req.remarks = field.remarks;
 			} else {
 				req.method = UpdateRequest$Method.ADD;
@@ -198,6 +181,7 @@ package org.openforis.collect.presenter {
 			req.nodeName = def.name;
 			req.symbol = symbol;
 			req.remarks = remarks;
+			req.fieldIndex = _view.fieldIndex;
 			if(_view.attribute != null) {
 				req.nodeId = _view.attribute.id;
 				req.method = UpdateRequest$Method.UPDATE_SYMBOL;

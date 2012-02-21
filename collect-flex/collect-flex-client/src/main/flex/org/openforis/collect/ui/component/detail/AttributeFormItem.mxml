@@ -2,7 +2,6 @@
 <detail:CollectFormItem xmlns:fx="http://ns.adobe.com/mxml/2009" 
 			xmlns:s="library://ns.adobe.com/flex/spark" 
 			xmlns:mx="library://ns.adobe.com/flex/mx"
-			width="100%"
 			xmlns:detail="org.openforis.collect.ui.component.detail.*"
 			>
 	<detail:layout>
@@ -12,18 +11,10 @@
 	<fx:Script>
 		<![CDATA[
 			import mx.collections.IList;
-			import mx.containers.Grid;
-			import mx.containers.GridItem;
-			import mx.containers.GridRow;
-			import mx.core.IVisualElementContainer;
-			import mx.events.FlexEvent;
-			import mx.messaging.management.Attribute;
 			
 			import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 			import org.openforis.collect.model.proxy.AttributeProxy;
-			import org.openforis.collect.model.proxy.EntityProxy;
 			import org.openforis.collect.presenter.AttributeFormItemPresenter;
-			import org.openforis.collect.presenter.FormItemPresenter;
 			
 			private var _attributeDefinition:AttributeDefinitionProxy;
 

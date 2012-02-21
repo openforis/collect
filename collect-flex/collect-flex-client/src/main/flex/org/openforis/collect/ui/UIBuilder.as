@@ -39,20 +39,15 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.ui.component.detail.SingleEntityFormItem;
 	import org.openforis.collect.ui.component.input.BooleanInputField;
 	import org.openforis.collect.ui.component.input.CodeInputField;
-	import org.openforis.collect.ui.component.input.CoordinateInputField;
 	import org.openforis.collect.ui.component.input.CoordinateItemRenderer;
-	import org.openforis.collect.ui.component.input.DateInputField;
-	import org.openforis.collect.ui.component.input.DateItemRenderer;
+	import org.openforis.collect.ui.component.input.DateAttributeRenderer;
 	import org.openforis.collect.ui.component.input.FixedCodeInputField;
 	import org.openforis.collect.ui.component.input.InputField;
 	import org.openforis.collect.ui.component.input.MemoInputField;
 	import org.openforis.collect.ui.component.input.NumericInputField;
-	import org.openforis.collect.ui.component.input.RangeInputField;
 	import org.openforis.collect.ui.component.input.StringInputField;
 	import org.openforis.collect.ui.component.input.TaxonAttributeRenderer;
-	import org.openforis.collect.ui.component.input.TaxonInputField;
-	import org.openforis.collect.ui.component.input.TimeInputField;
-	import org.openforis.collect.ui.component.input.TimeItemRenderer;
+	import org.openforis.collect.ui.component.input.TimeAttributeRenderer;
 	
 	import spark.components.HGroup;
 	import spark.components.Label;
@@ -251,10 +246,6 @@ package org.openforis.collect.ui {
 						inputField = new StringInputField();
 						break;
 				}
-			//} else if(def is DateAttributeDefinitionProxy) {
-			//	inputField = new DateInputField();
-			//} else if(def is TimeAttributeDefinitionProxy) {
-			//	inputField = new TimeInputField();
 			} else if(def is CodeAttributeDefinitionProxy) {
 				var codeDef:CodeAttributeDefinitionProxy = CodeAttributeDefinitionProxy(def);
 				if(isInDataGroup && codeDef.parent.enumerated && codeDef.key) {
@@ -264,14 +255,8 @@ package org.openforis.collect.ui {
 				}
 			} else if(def is NumberAttributeDefinitionProxy) {
 				inputField = new NumericInputField();
-			//} else if(def is RangeAttributeDefinitionProxy) {
-			//	inputField = new RangeInputField();
 			} else if(def is BooleanAttributeDefinitionProxy) {
 				inputField = new BooleanInputField();
-			//} else if(def is CoordinateAttributeDefinitionProxy) {
-			//	inputField = new CoordinateInputField();
-			//} else if(def is TaxonAttributeDefinitionProxy) {
-			//	inputField = new TaxonInputField();
 			} else if(def is FileAttributeDefinitionProxy) {
 				//inputField = new FileInputField();
 			} else {
@@ -279,7 +264,6 @@ package org.openforis.collect.ui {
 			}
 			inputField.width = getInputFieldWidth(def, isInDataGroup);
 			inputField.attributeDefinition = def;
-			inputField.isInDataGroup = isInDataGroup;
 			return inputField;
 		}
 		
@@ -288,11 +272,11 @@ package org.openforis.collect.ui {
 			if(def is CoordinateAttributeDefinitionProxy) {
 				renderer = new CoordinateItemRenderer();
 			} else if(def is DateAttributeDefinitionProxy) {
-				renderer = new DateItemRenderer();
+				renderer = new DateAttributeRenderer();
 			} else if(def is TaxonAttributeDefinitionProxy) {
-				//renderer = new TaxonAttributeRenderer();
+				renderer = new TaxonAttributeRenderer();
 			} else if(def is TimeAttributeDefinitionProxy) {
-				renderer = new TimeItemRenderer();
+				renderer = new TimeAttributeRenderer();
 			} else {
 				renderer = new AttributeItemRenderer();
 				var inputField:InputField = getInputField(def, isInDataGroup);
