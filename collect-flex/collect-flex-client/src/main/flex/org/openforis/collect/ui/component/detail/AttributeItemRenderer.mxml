@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:ItemRenderer xmlns:fx="http://ns.adobe.com/mxml/2009" 
+				xmlns:s="library://ns.adobe.com/flex/spark" 
+				xmlns:mx="library://ns.adobe.com/flex/mx"
+				autoDrawBackground="false"
+				>
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.binding.utils.BindingUtils;
+			import mx.collections.IList;
+			import mx.events.FlexEvent;
+			
+			import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
+			import org.openforis.collect.metamodel.proxy.CoordinateAttributeDefinitionProxy;
+			import org.openforis.collect.metamodel.proxy.DateAttributeDefinitionProxy;
+			import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
+			import org.openforis.collect.metamodel.proxy.TaxonAttributeDefinitionProxy;
+			import org.openforis.collect.metamodel.proxy.TextAttributeDefinitionProxy;
+			import org.openforis.collect.metamodel.proxy.TimeAttributeDefinitionProxy;
+			import org.openforis.collect.model.proxy.AttributeProxy;
+			import org.openforis.collect.model.proxy.EntityProxy;
+			import org.openforis.collect.ui.UIBuilder;
+			import org.openforis.collect.ui.component.input.CoordinateItemRenderer;
+			import org.openforis.collect.ui.component.input.DateItemRenderer;
+			import org.openforis.collect.ui.component.input.InputField;
+			import org.openforis.collect.ui.component.input.MemoInputField;
+			import org.openforis.collect.ui.component.input.StringInputField;
+			
+			private var _direction:String;
+			private var _attributeDefinition:AttributeDefinitionProxy;
+			private var _modelVersion:ModelVersionProxy;
+			private var _parentEntity:EntityProxy;
+			private var _attribute:AttributeProxy;
+			private var _attributes:IList;
+			private var _isInDataGroup:Boolean = false;
+			private var _internalLabelWidth:Number = 130;
+			
+			[Bindable]
+			public function get direction():String {
+				return _direction;
+			}
+
+			public function set direction(value:String):void {
+				_direction = value;
+			}
+			
+			[Bindable]
+			public function get isInDataGroup():Boolean {
+				return _isInDataGroup;
+			}
+			
+			public function set isInDataGroup(value:Boolean):void {
+				_isInDataGroup = value;
+			}
+			
+			[Bindable]
+			public function get modelVersion():ModelVersionProxy {
+				return _modelVersion;
+			}
+			
+			public function set modelVersion(value:ModelVersionProxy):void {
+				_modelVersion = value;
+			}
+			
+			[Bindable]
+			public function get attributeDefinition():AttributeDefinitionProxy {
+				return _attributeDefinition;
+			}
+			
+			public function set attributeDefinition(value:AttributeDefinitionProxy):void {
+				_attributeDefinition = value;
+			}
+			
+			[Bindable]
+			public function get parentEntity():EntityProxy {
+				return _parentEntity;
+			}
+			
+			public function set parentEntity(value:EntityProxy):void {
+				_parentEntity = value;
+			}
+			
+			[Bindable]
+			public function get attribute():AttributeProxy {
+				return _attribute;
+			}
+			
+			public function set attribute(value:AttributeProxy):void {
+				_attribute = value;
+			}
+
+			
+		]]>
+	</fx:Script>
+	
+	
+</s:ItemRenderer>

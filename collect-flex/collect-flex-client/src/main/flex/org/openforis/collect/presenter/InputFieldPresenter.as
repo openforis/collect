@@ -24,6 +24,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.model.proxy.AttributeProxy;
 	import org.openforis.collect.model.proxy.AttributeSymbol;
 	import org.openforis.collect.model.proxy.EntityProxy;
+	import org.openforis.collect.model.proxy.FieldProxy;
 	import org.openforis.collect.remoting.service.UpdateRequest;
 	import org.openforis.collect.remoting.service.UpdateRequest$Method;
 	import org.openforis.collect.ui.ContextMenuBuilder;
@@ -131,11 +132,13 @@ package org.openforis.collect.presenter {
 			var def:AttributeDefinitionProxy = _view.attributeDefinition;
 			req.parentEntityId = _view.parentEntity.id;
 			req.nodeName = def.name;
-			req.values = createRequestValues();
+			req.value = createRequestValue();
 			if(_view.attribute != null) {
-				req.nodeId = _view.attribute.id;
+				var a:AttributeProxy = _view.attribute;
+				var field:FieldProxy = a.getField(_view.fieldIndex);
+				req.nodeId = a.id;
 				req.method = UpdateRequest$Method.UPDATE;
-				req.remarks = _view.attribute.remarks;
+				req.remarks = field.remarks;
 			} else {
 				req.method = UpdateRequest$Method.ADD;
 			}
@@ -164,13 +167,14 @@ package org.openforis.collect.presenter {
 		protected function getTextValue():String {
 			var attribute:AttributeProxy = _view.attribute;
 			if(attribute != null) {
-				if(attribute.symbol != null) {
-					var shortKey:String = getReasonBlankShortKey(attribute.symbol);
+				var field:FieldProxy = _view.attribute.getField(_view.fieldIndex);
+				if(field.symbol != null) {
+					var shortKey:String = getReasonBlankShortKey(field.symbol);
 					if(shortKey != null) {
 						return shortKey;
 					}
 				}
-				var value:Object = attribute.value;
+				var value:Object = field.value;
 				if(value != null && StringUtil.isNotBlank(value.toString())) {
 					return value.toString();
 				}
@@ -178,11 +182,11 @@ package org.openforis.collect.presenter {
 			return "";
 		}
 
-		protected function createRequestValues():Array {
-			var result:Array = null;
+		protected function createRequestValue():String {
+			var result:String = null;
 			var text:String = _view.text;
 			if(StringUtil.isNotBlank(text)) {
-				result = [text];
+				result = text;
 			}
 			return result;
 		}
@@ -212,7 +216,8 @@ package org.openforis.collect.presenter {
 				if(_view.attribute != null) {
 					var a:AttributeProxy = _view.attribute;
 					//TODO remarks
-					if(StringUtil.isNotBlank(a.remarks)) {
+					var field:FieldProxy = _view.attribute.getField(_view.fieldIndex);
+					if(StringUtil.isNotBlank(field.remarks)) {
 						
 					}
 				}

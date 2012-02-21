@@ -8,20 +8,26 @@
 		<![CDATA[
 			import mx.binding.utils.BindingUtils;
 			
+			import org.openforis.collect.metamodel.proxy.CoordinateAttributeDefinitionProxy;
+			import org.openforis.collect.metamodel.proxy.DateAttributeDefinitionProxy;
+			import org.openforis.collect.metamodel.proxy.TaxonAttributeDefinitionProxy;
+			import org.openforis.collect.metamodel.proxy.TextAttributeDefinitionProxy;
+			import org.openforis.collect.metamodel.proxy.TimeAttributeDefinitionProxy;
 			import org.openforis.collect.ui.UIBuilder;
 			import org.openforis.collect.ui.component.input.CodeInputField;
+			import org.openforis.collect.ui.component.input.CoordinateItemRenderer;
+			import org.openforis.collect.ui.component.input.DateItemRenderer;
 			import org.openforis.collect.ui.component.input.InputField;
+			import org.openforis.collect.ui.component.input.MemoInputField;
+			import org.openforis.collect.ui.component.input.StringInputField;
 			
 			override protected function createChildren():void {
 				if(!childrenAdded) {
 					super.createChildren();
-				
-					var inputField:InputField = UIBuilder.getInputField(attributeDefinition, isInDataGroup);
-
-					BindingUtils.bindProperty(inputField, "parentEntity", this, "parentEntity");
-					BindingUtils.bindProperty(inputField, "attribute", this, "attribute");
-					
-					addElement(inputField);
+					var renderer:AttributeItemRenderer = UIBuilder.getAttributeItemRenderer(attributeDefinition, isInDataGroup);
+					BindingUtils.bindProperty(renderer, "parentEntity", this, "parentEntity");
+					BindingUtils.bindProperty(renderer, "attribute", this, "attribute");
+					addElement(renderer);
 					childrenAdded = true;
 				}
 			}

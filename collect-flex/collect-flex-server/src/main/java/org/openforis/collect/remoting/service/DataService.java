@@ -161,11 +161,10 @@ public class DataService {
 		ModelVersion version = record.getVersion();
 		Integer parentEntityId = request.getParentEntityId();
 		Entity parentEntity = (Entity) record.getNodeByInternalId(parentEntityId);
-		EntityDefinition parentDef = parentEntity.getDefinition();
 		Integer nodeId = request.getNodeId();
 		Integer fieldIndex = request.getFieldIndex();
 		String nodeName = request.getNodeName();
-		Object fieldVal = null;
+		
 		Node<?> node = null;
 		if(nodeId != null) {
 			node = record.getNodeByInternalId(nodeId);
@@ -174,9 +173,9 @@ public class DataService {
 		String requestValue = request.getValue();
 		String remarks = request.getRemarks();
 		//parse request values into a list of attribute value objects (for example Code, Date, Time...)
-		List<?> values = null;
+		Object value = null;
 		if(requestValue != null && nodeDef instanceof AttributeDefinition) {
-			values = parseValues(parentEntity, (AttributeDefinition) nodeDef, requestValue, fieldIndex);
+			value = parseValue(parentEntity, (AttributeDefinition) nodeDef, requestValue, fieldIndex);
 		}
 		AttributeSymbol symbol = request.getSymbol();
 		if(symbol == null && AttributeSymbol.isShortKeyForBlank(requestValue)) {
@@ -187,56 +186,19 @@ public class DataService {
 		Method method = request.getMethod();
 		switch (method) {
 			case ADD:
-				if(nodeDef instanceof AttributeDefinition) {
-					AttributeDefinition def = (AttributeDefinition) nodeDef;
-					List<Attribute<?, ?>> attributes = recordManager.addAttributes(parentEntity, def, values, symbolChar, remarks);
-					updatedNodes.addAll(attributes);
-				} else {
-					Entity e = recordManager.addEntity(parentEntity, nodeName, version);
-					updatedNodes.add(e);
-				}
+				updatedNodes = addNode(version, parentEntity, nodeDef, value, fieldIndex, symbolChar, remarks);
 				break;
 			case UPDATE: 
-				//update attribute value
-				if(node instanceof Attribute) {
-					@SuppressWarnings("unchecked")
-					Attribute<?, Object> attribute = (Attribute<?, Object>) node;
-					AttributeDefinition def = attribute.getDefinition();
-					if(def.isMultiple() && def instanceof CodeAttributeDefinition) {
-						List<Attribute<?, ?>> attributes = recordManager.replaceAttributes(parentEntity, def, values, remarks);
-						updatedNodes.addAll(attributes);
-					} else {
-						Object val = null;
-						if(values != null && values.size() == 1) {
-							val = values.get(0);
-						}
-						if(fieldIndex != null) {
-							@SuppressWarnings("rawtypes")
-							Field field = attribute.getField(fieldIndex);
-							field.setRemarks(remarks);
-							field.setSymbol(symbolChar);
-							field.setValue(fieldVal);
-						} else {
-							attribute.setValue(val);
-						}
-						updatedNodes.add(attribute);
-					}
-				}
+				updatedNodes = updateNode(parentEntity, node, fieldIndex, value, symbolChar, remarks);
 				break;
 			case UPDATE_SYMBOL:
 				//update attribute value
 				if(nodeDef instanceof AttributeDefinition) {
-					List<Node<?>> nodes = parentEntity.getAll(nodeName);
-					if(nodes != null) {
-						for (Node<?> n : nodes) {
-							Attribute<?, ?> a = (Attribute<?, ?>) n;
-							//a.setRemarks(remarks);
-							if((symbol != null && ! symbol.isReasonBlank()) || a.isEmpty()) {
-								//a.setSymbol(symbolChar);
-							}
-							updatedNodes.add(a);
-						}
-					}
+					Attribute<?, ?> a = (Attribute<?, ?>) node;
+					Field<?> field = a.getField(fieldIndex);
+					field.setSymbol(symbolChar);
+					field.setRemarks(remarks);
+					updatedNodes.add(a);
 				} else if(node instanceof Entity) {
 					//update only the symbol in entity's attributes
 					Entity entity = (Entity) node;
@@ -246,9 +208,7 @@ public class DataService {
 						if(def instanceof AttributeDefinition) {
 							String name = def.getName();
 							Attribute<?, ?> a = (Attribute<?, ?>) entity.get(name, 0);
-							if(! symbol.isReasonBlank() || a.isEmpty()) {
-								//a.setSymbol(symbolChar);
-							}
+							setSymbolInAllFields(a, symbol);
 							updatedNodes.add(a);
 						}
 					}
@@ -271,32 +231,102 @@ public class DataService {
 	}
 
 	@SuppressWarnings("unchecked")
-	private List<?> parseValues(Entity parentEntity, AttributeDefinition def, String value, int fieldIndex) {
-		List<Object> result = new ArrayList<Object>();
-		CollectRecord activeRecord = getActiveRecord();
-		ModelVersion version = activeRecord.getVersion();
-		
-		if(def instanceof BooleanAttributeDefinition) {
-			result.add(Boolean.parseBoolean(value));
-		} else if(def instanceof CodeAttributeDefinition) {
-			List<?> codes = parseCodes(parentEntity, (CodeAttributeDefinition) def, value, version);
-			if(codes.size() > 0) {
-				result = (List<Object>) codes;
-			}
-		} else if(def instanceof CoordinateAttributeDefinition) {
-			//TODO
-			/*
-			Object val = null;
-			if(fieldIndex == 0 || fieldIndex == 1) {
-				val = Long.parseLong(value);
+	private List<Node<?>> updateNode(Entity parentEntity, Node<?> node, Integer fieldIndex, 
+			Object value, Character symbolChar,	String remarks) {
+		if(node instanceof Attribute) {
+			List<Node<?>> updatedNodes = new ArrayList<Node<?>>();
+			Attribute<?, Object> attribute = (Attribute<?, Object>) node;
+			CollectRecord activeRecord = getActiveRecord();
+			ModelVersion version = activeRecord.getVersion();
+			AttributeDefinition definition = attribute.getDefinition();
+			AttributeDefinition def = attribute.getDefinition();
+			if(definition.isMultiple() && definition instanceof CodeAttributeDefinition) {
+				CodeAttributeDefinition codeDef = (CodeAttributeDefinition) def;
+				String codesString = value != null ? value.toString(): null;
+				List<?> codes = parseCodes(parentEntity, codeDef, codesString, version);
+				List<Attribute<?, ?>> attributes = recordManager.replaceAttributes(parentEntity, def, codes, remarks);
+				updatedNodes.addAll(attributes);
 			} else {
-				val = value;
+				if(fieldIndex != null) {
+					@SuppressWarnings("rawtypes")
+					Field field = attribute.getField(fieldIndex);
+					field.setRemarks(remarks);
+					field.setSymbol(symbolChar);
+					field.setValue(value);
+				} else {
+					attribute.setValue(value);
+				}
+				updatedNodes.add(attribute);
 			}
-			result.add(val);
-			*/
+			return updatedNodes;
+		} else {
+			throw new UnsupportedOperationException("Cannot update an entity");
+		}
+	}
+
+	private List<Node<?>> addNode(ModelVersion version, Entity parentEntity, NodeDefinition nodeDef, Object value, Integer fieldIndex, Character symbol, String remarks) {
+		List<Node<?>> addedNodes = new ArrayList<Node<?>>();
+		if(nodeDef instanceof AttributeDefinition) {
+			AttributeDefinition attributeDef = (AttributeDefinition) nodeDef;
+			if(attributeDef.isMultiple()) {
+				List<?> values;
+				if(attributeDef instanceof CodeAttributeDefinition && attributeDef.isMultiple()) {
+					String codesString = value != null ? value.toString(): null;
+					List<?> codes = parseCodes(parentEntity, (CodeAttributeDefinition) nodeDef, codesString, version);
+					values = codes;
+					AttributeDefinition def = (AttributeDefinition) nodeDef;
+					List<Attribute<?, ?>> attributes = recordManager.addAttributes(parentEntity, def, values, null, null);
+					addedNodes.addAll(attributes);
+				}
+			} else {
+				Attribute<?,?> attribute = recordManager.addAttribute(parentEntity, attributeDef, value, null, null);
+				if(fieldIndex != null) {
+					Field<?> field = attribute.getField(fieldIndex);
+					field.setRemarks(remarks);
+					field.setSymbol(symbol);
+				}
+				addedNodes.add(attribute);
+			}
+		} else {
+			Entity e = recordManager.addEntity(parentEntity, nodeDef.getName(), version);
+			addedNodes.add(e);
+		}
+		return addedNodes;
+	}
+	
+	private void setSymbolInAllFields(Attribute<?, ?> attribute, AttributeSymbol symbol) {
+		Character s = symbol != null ? symbol.getCode(): null;
+		int count = attribute.getFieldCount();
+		for (int i = 0; i < count; i++) {
+			Field<?> field = attribute.getField(i);
+			if(s == null || (symbol.isReasonBlank() && field.isEmpty())) {
+				field.setSymbol(s);
+			}
+		}
+	}
+
+	private Object parseValue(Entity parentEntity, AttributeDefinition def, String value, Integer fieldIndex) {
+		Object result = null;
+		if(StringUtils.isBlank(value)) {
+			return null;
+		}
+		if(def instanceof BooleanAttributeDefinition) {
+			result = Boolean.parseBoolean(value);
+		} else if(def instanceof CodeAttributeDefinition) {
+			result = value;
+		} else if(def instanceof CoordinateAttributeDefinition) {
+			if(fieldIndex != null) {
+				if(fieldIndex == 0) {
+					//srsId
+					result = value;
+				} else {
+					int val = Integer.parseInt(value);
+					result = val;
+				}
+			}
 		} else if(def instanceof DateAttributeDefinition) {
 			int val = Integer.parseInt(value);
-			result.add(val);
+			result = val;
 		} else if(def instanceof NumberAttributeDefinition) {
 			NumberAttributeDefinition numberDef = (NumberAttributeDefinition) def;
 			Type type = numberDef.getType();
@@ -310,7 +340,7 @@ public class DataService {
 					break;
 			}
 			if(number != null) {
-				result.add(number);
+				result = number;
 			}
 		} else if(def instanceof RangeAttributeDefinition) {
 			org.openforis.idm.metamodel.RangeAttributeDefinition.Type type = ((RangeAttributeDefinition) def).getType();
@@ -324,7 +354,7 @@ public class DataService {
 					break;
 			}
 			if(number != null) {
-				result.add(number);
+				result = number;
 			}
 		} else if(def instanceof TaxonAttributeDefinition) {
 			/*
@@ -334,9 +364,9 @@ public class DataService {
 			//result.add(o);
 		} else if(def instanceof TimeAttributeDefinition) {
 			int val = Integer.parseInt(value);
-			result.add(val);
+			result = val;
 		} else {
-			result.add(value);
+			result = value;
 		}
 		return result;
 	}

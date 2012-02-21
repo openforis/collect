@@ -17,6 +17,7 @@ package org.openforis.collect.ui.component.input {
 		
 		public function TextInput() {
 			super();
+			minWidth = 0;
 		}
 		
 		public function selectAll():void {
