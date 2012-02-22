@@ -7,7 +7,34 @@
 	<fx:Script>
 		<![CDATA[
 			
+			public static const STATE_HORIZONTAL:String = "horizontal";
+			public static const STATE_VERTICAL:String = "vertical";
+			
+			private var _subLabelWidth:Number = 130;
+			
+			[Bindable]
+			public function get subLabelWidth():Number {
+				return _subLabelWidth;
+			}
+			
+			public function set subLabelWidth(value:Number):void {
+				_subLabelWidth = value;
+			}
+			
+			override public function set isInDataGroup(value:Boolean):void {
+				if(value) {
+					currentState = STATE_HORIZONTAL;
+				} else {
+					currentState = STATE_VERTICAL;
+				}
+			}
+			
 		]]>
 	</fx:Script>
+	
+	<detail:states>
+		<s:State name="horizontal" />
+		<s:State name="vertical" />
+	</detail:states>
 	
 </detail:AttributeItemRenderer>

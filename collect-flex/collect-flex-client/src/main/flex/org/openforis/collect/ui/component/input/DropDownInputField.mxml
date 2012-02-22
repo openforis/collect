@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<input:InputField xmlns:fx="http://ns.adobe.com/mxml/2009" 
+				  xmlns:s="library://ns.adobe.com/flex/spark" 
+				  xmlns:mx="library://ns.adobe.com/flex/mx" 
+				  xmlns:input="org.openforis.collect.ui.component.input.*" 
+				  >
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.collections.IList;
+			
+			import org.openforis.collect.presenter.DropDownInputFieldPresenter;
+			
+			private var _dataProvider:IList;
+			private var _labelFunction:Function;
+			private var _dataField:String;
+			private var _prompt:String;
+			
+			override protected function initPresenter():void {
+				presenter = new DropDownInputFieldPresenter(this);
+			}
+			
+			[Bindable]
+			public function get dataProvider():IList {
+				return _dataProvider;
+			}
+
+			public function set dataProvider(value:IList):void {
+				_dataProvider = value;
+			}
+
+			[Bindable]
+			public function get labelFunction():Function {
+				return _labelFunction;
+			}
+
+			public function set labelFunction(value:Function):void {
+				_labelFunction = value;
+			}
+
+			[Bindable]
+			public function get dataField():String {
+				return _dataField;
+			}
+
+			public function set dataField(value:String):void {
+				_dataField = value;
+			}
+
+			[Bindable]
+			public function get prompt():String {
+				return _prompt;
+			}
+
+			public function set prompt(value:String):void {
+				_prompt = value;
+			}
+
+
+		]]>
+	</fx:Script>
+	
+	<s:DropDownList id="dropDownList" width="100%" 
+					dataProvider="{dataProvider}" 
+					labelFunction="{labelFunction}"
+					prompt="{prompt}"
+					/>
+	
+</input:InputField>

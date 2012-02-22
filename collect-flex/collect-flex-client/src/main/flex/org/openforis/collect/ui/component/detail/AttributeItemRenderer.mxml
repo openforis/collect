@@ -3,29 +3,18 @@
 				xmlns:s="library://ns.adobe.com/flex/spark" 
 				xmlns:mx="library://ns.adobe.com/flex/mx"
 				autoDrawBackground="false"
+				creationComplete="creationCompleteHandler(event)"
 				>
 	
 	<fx:Script>
 		<![CDATA[
-			import mx.binding.utils.BindingUtils;
 			import mx.collections.IList;
 			import mx.events.FlexEvent;
 			
 			import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
-			import org.openforis.collect.metamodel.proxy.CoordinateAttributeDefinitionProxy;
-			import org.openforis.collect.metamodel.proxy.DateAttributeDefinitionProxy;
 			import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
-			import org.openforis.collect.metamodel.proxy.TaxonAttributeDefinitionProxy;
-			import org.openforis.collect.metamodel.proxy.TextAttributeDefinitionProxy;
-			import org.openforis.collect.metamodel.proxy.TimeAttributeDefinitionProxy;
 			import org.openforis.collect.model.proxy.AttributeProxy;
 			import org.openforis.collect.model.proxy.EntityProxy;
-			import org.openforis.collect.ui.UIBuilder;
-			import org.openforis.collect.ui.component.input.CoordinateItemRenderer;
-			import org.openforis.collect.ui.component.input.DateItemRenderer;
-			import org.openforis.collect.ui.component.input.InputField;
-			import org.openforis.collect.ui.component.input.MemoInputField;
-			import org.openforis.collect.ui.component.input.StringInputField;
 			
 			private var _direction:String;
 			private var _attributeDefinition:AttributeDefinitionProxy;
@@ -35,6 +24,14 @@
 			private var _attributes:IList;
 			private var _isInDataGroup:Boolean = false;
 			private var _internalLabelWidth:Number = 130;
+			private var _presenter:*;
+				
+			protected function creationCompleteHandler(event:FlexEvent):void {
+				initPresenter();
+			}
+
+			protected function initPresenter():void {
+			}
 			
 			[Bindable]
 			public function get direction():String {
@@ -88,6 +85,14 @@
 			
 			public function set attribute(value:AttributeProxy):void {
 				_attribute = value;
+			}
+
+			public function get presenter():* {
+				return _presenter;
+			}
+
+			public function set presenter(value:*):void {
+				_presenter = value;
 			}
 
 			

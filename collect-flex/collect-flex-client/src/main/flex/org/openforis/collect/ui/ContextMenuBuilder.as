@@ -193,22 +193,6 @@ package org.openforis.collect.ui
 			ClientFactory.dataClient.updateActiveRecord(responder, req);
 		}
 		
-		public static function changeSymbol(parentEntity:EntityProxy, attributeId:Number, attributeName:String, symbol:AttributeSymbol, remarks:String = null):void {
-			var req:UpdateRequest = new UpdateRequest();
-			req.parentEntityId = parentEntity.id;
-			req.nodeName = attributeName;
-			req.symbol = symbol;
-			req.remarks = remarks;
-			if(! isNaN(attributeId)) {
-				req.nodeId = attributeId;
-				req.method = UpdateRequest$Method.UPDATE_SYMBOL;
-			} else {
-				req.method = UpdateRequest$Method.ADD;
-			}
-			var responder:AsyncResponder = new AsyncResponder(updateFieldResultHandler, null);
-			ClientFactory.dataClient.updateActiveRecord(responder, req);
-		}
-
 		protected static function updateFieldResultHandler(event:ResultEvent, token:Object = null):void {
 			var result:IList = event.result as IList;
 			Application.activeRecord.update(result);

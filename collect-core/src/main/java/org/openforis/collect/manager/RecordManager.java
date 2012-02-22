@@ -176,12 +176,18 @@ public class RecordManager implements RecordContext {
 		Node<?> deleted = parentEntity.remove(name, index);
 		return deleted;
 	}
+<<<<<<< HEAD
 
 	public Attribute<?, ?> addAttribute(Entity parentEntity, AttributeDefinition def, Object value, Character symbol, String remarks) {
+=======
+	
+	public Attribute<?, ?> addAttribute(Entity parentEntity, AttributeDefinition def, Object value) {
+>>>>>>> b085a5dafb0cd06d256c98b058dece68e3947317
 		String name = def.getName();
 		Attribute<?, ?> result = null;
 		if (def instanceof BooleanAttributeDefinition) {
 			result = parentEntity.addValue(name, (Boolean) value);
+<<<<<<< HEAD
 		} else if (def instanceof CodeAttributeDefinition) {
 			result = parentEntity.addValue(name, (Code) value);
 		} else if (def instanceof CoordinateAttributeDefinition) {
@@ -189,6 +195,33 @@ public class RecordManager implements RecordContext {
 		} else if (def instanceof DateAttributeDefinition) {
 			result = parentEntity.addValue(name, (org.openforis.idm.model.Date) value);
 		} else if (def instanceof NumberAttributeDefinition) {
+=======
+		} else if(def instanceof CodeAttributeDefinition) {
+			Code code;
+			if(value == null) {
+				code = new Code(null);
+			} else {
+				code = (Code) value;
+			}
+			result = parentEntity.addValue(name, code);
+		} else if(def instanceof CoordinateAttributeDefinition) {
+			Coordinate coordinate;
+			if(value == null) {
+				coordinate = new Coordinate(null, null, null);
+			} else {
+				coordinate = (Coordinate) value;
+			}
+			result = parentEntity.addValue(name, coordinate);
+		} else if(def instanceof DateAttributeDefinition) {
+			org.openforis.idm.model.Date date;
+			if(value == null) {
+				date = new org.openforis.idm.model.Date(null, null, null);
+			} else {
+				date = (org.openforis.idm.model.Date) value;
+			}
+			result = parentEntity.addValue(name, date);
+		} else if(def instanceof NumberAttributeDefinition) {
+>>>>>>> b085a5dafb0cd06d256c98b058dece68e3947317
 			Type type = ((NumberAttributeDefinition) def).getType();
 			switch (type) {
 				case INTEGER:
@@ -202,12 +235,25 @@ public class RecordManager implements RecordContext {
 			org.openforis.idm.metamodel.RangeAttributeDefinition.Type type = ((RangeAttributeDefinition) def).getType();
 			switch (type) {
 				case INTEGER:
-					result = parentEntity.addValue(name, (IntegerRange) value);
+					IntegerRange integerRange;
+					if(value == null) {
+						integerRange = new IntegerRange(null);
+					} else {
+						integerRange = (IntegerRange) value;
+					}
+					result = parentEntity.addValue(name, integerRange);
 					break;
 				case REAL:
-					result = parentEntity.addValue(name, (RealRange) value);
+					RealRange realRange;
+					if(value == null) {
+						realRange = new RealRange(null);
+					} else {
+						realRange = (RealRange) value;
+					}
+					result = parentEntity.addValue(name, realRange);
 					break;
 			}
+<<<<<<< HEAD
 		} else if (def instanceof TaxonAttributeDefinition) {
 			result = parentEntity.addValue(name, (TaxonOccurrence) value);
 		} else if (def instanceof TextAttributeDefinition) {
@@ -224,20 +270,58 @@ public class RecordManager implements RecordContext {
 	public List<Attribute<?, ?>> replaceAttributes(Entity parentEntity, AttributeDefinition def, List<?> values, String remarks) {
 		List<Attribute<?, ?>> result;
 		if (def.isMultiple()) {
+=======
+		} else if(def instanceof TaxonAttributeDefinition) {
+			TaxonOccurrence taxonOccurrence;
+			if(value == null) {
+				taxonOccurrence = new TaxonOccurrence();
+			} else {
+				taxonOccurrence = (TaxonOccurrence) value;
+			}
+			result = parentEntity.addValue(name, taxonOccurrence);
+		} else if(def instanceof TextAttributeDefinition) {
+			result = parentEntity.addValue(name, (String) value);
+		} else if(def instanceof TimeAttributeDefinition) {
+			Time time;
+			if(value == null) {
+				time = new Time(null, null);
+			} else {
+				time = (Time) value;
+			}
+			result = parentEntity.addValue(name, time);
+		}
+		return result;
+	}
+	
+	public List<Attribute<?, ?>> replaceAttributes(Entity parentEntity, AttributeDefinition def, List<?> values) {
+		List<Attribute<?, ?>> result = new ArrayList<Attribute<?,?>>();
+		if(def.isMultiple()) {
+>>>>>>> b085a5dafb0cd06d256c98b058dece68e3947317
 			String name = def.getName();
 			// remove old attributes
 			int count = parentEntity.getCount(def.getName());
 			for (int i = count - 1; i >= 0; i--) {
 				parentEntity.remove(name, i);
 			}
+<<<<<<< HEAD
 			// add new attributes
 			result = addAttributes(parentEntity, def, values, null, remarks);
+=======
+			//add new attributes
+			if(values != null) {
+				for (Object v : values) {
+					Attribute<?, ?> attribute = addAttribute(parentEntity, def, v);
+					result.add(attribute);
+				}
+			}
+>>>>>>> b085a5dafb0cd06d256c98b058dece68e3947317
 		} else {
 			throw new RuntimeException("Multiple attribute expected");
 		}
 		return result;
 	}
 
+<<<<<<< HEAD
 	public List<Attribute<?, ?>> addAttributes(Entity parentEntity, AttributeDefinition def, List<?> values, Character symbol, String remarks) {
 		List<Attribute<?, ?>> result = new ArrayList<Attribute<?, ?>>();
 		if (values != null) {
@@ -252,6 +336,8 @@ public class RecordManager implements RecordContext {
 		return result;
 	}
 
+=======
+>>>>>>> b085a5dafb0cd06d256c98b058dece68e3947317
 	public Entity addEntity(Entity parentEntity, String nodeName, ModelVersion version) {
 		Entity entity = parentEntity.addEntity(nodeName);
 		addEmptyAttributes(entity, version);
@@ -265,10 +351,17 @@ public class RecordManager implements RecordContext {
 		for (NodeDefinition nodeDef : childDefinitions) {
 			if (version.isApplicable(nodeDef)) {
 				String name = nodeDef.getName();
+<<<<<<< HEAD
 				if (entity.getCount(name) == 0) {
 					if (nodeDef instanceof AttributeDefinition) {
 						addAttribute(entity, (AttributeDefinition) nodeDef, null, null, null);
 					} else if (nodeDef instanceof EntityDefinition && !nodeDef.isMultiple()) {
+=======
+				if(entity.getCount(name) == 0) {
+					if(nodeDef instanceof AttributeDefinition) {
+						addAttribute(entity, (AttributeDefinition) nodeDef, null);
+					} else if(nodeDef instanceof EntityDefinition && ! nodeDef.isMultiple()) {
+>>>>>>> b085a5dafb0cd06d256c98b058dece68e3947317
 						addEntity(entity, nodeDef.getName(), version);
 					}
 				}

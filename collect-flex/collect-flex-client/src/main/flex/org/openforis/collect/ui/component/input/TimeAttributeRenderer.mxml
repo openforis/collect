@@ -7,7 +7,7 @@
 	
 	<fx:Script>
 		<![CDATA[
-			private var _separator:String = "/";
+			private var _separator:String = ":";
 			
 			[Bindable]
 			public function get separator():String {
@@ -24,14 +24,22 @@
 	<s:HGroup 
 			verticalAlign="middle"
 			gap="2">
-		<input:NumericInputField width="25" maxChars="2" id="day" />
-		<s:Label id="separator1" text="{separator}" />
-		<input:NumericInputField width="25 " maxChars="2" id="month" />
-		<s:Label id="separator2" text="{separator}" />
-		<input:NumericInputField width="40" maxChars="4" id="year" />
-		<s:Spacer width="8" />
-		<input:DateField tabEnabled="false" tabFocusEnabled="false"
-						 id="dateField" width="16" editable="false"/>
+		<input:NumericInputField id="hour"
+								 width="25" 
+								 maxChars="2"
+								 attributeDefinition="{attributeDefinition}"
+								 parentEntity="{parentEntity}"
+								 attribute="{attribute}"
+								 fieldIndex="0"
+								 />
+		<s:Label id="separatorLabel" text="{separator}" />
+		<input:NumericInputField id="minute"
+								 width="25" 
+								 maxChars="2"
+								 attributeDefinition="{attributeDefinition}"
+								 parentEntity="{parentEntity}"
+								 attribute="{attribute}"
+								 fieldIndex="1" />
 	</s:HGroup>
 	
 </input:CompositeAttributeRenderer>

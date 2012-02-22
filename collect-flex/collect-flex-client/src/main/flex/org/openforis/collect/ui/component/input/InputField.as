@@ -37,6 +37,7 @@ package org.openforis.collect.ui.component.input {
 		private var _fieldIndex:int = 0;
 		private var _presenter:InputFieldPresenter;
 		private var _isInDataGroup:Boolean = false;
+		private var _applyChangesOnFocusOut:Boolean = true;
 		protected var _textInput:UIComponent;
 		
 		public function InputField() {
@@ -64,6 +65,10 @@ package org.openforis.collect.ui.component.input {
 		public function isEmpty():Boolean {
 			return attribute == null || 
 				(attribute.empty && attribute.getField(fieldIndex).symbol == null);
+		}
+		
+		public function applyChanges():void {
+			presenter.applyChanges();
 		}
 		
 		public function hasBlankReasonSpecified():Boolean {
@@ -172,21 +177,20 @@ package org.openforis.collect.ui.component.input {
 		}
 
 		[Bindable]
-		public function get isInDataGroup():Boolean {
-			return _isInDataGroup;
-		}
-		
-		public function set isInDataGroup(value:Boolean):void {
-			_isInDataGroup = value;
-		}
-		
-		[Bindable]
 		public function get fieldIndex():int {
 			return _fieldIndex;
 		}
 		
 		public function set fieldIndex(value:int):void {
 			_fieldIndex = value;
+		}
+
+		public function get applyChangesOnFocusOut():Boolean {
+			return _applyChangesOnFocusOut;
+		}
+
+		public function set applyChangesOnFocusOut(value:Boolean):void {
+			_applyChangesOnFocusOut = value;
 		}
 		
 		

@@ -7,12 +7,14 @@
 	<fx:Script>
 		<![CDATA[
 			import org.openforis.collect.i18n.Message;
+			import org.openforis.collect.presenter.TaxonAttributePresenter;
 			
-			/*
+			private var _presenter:TaxonAttributePresenter;
+			
 			override protected function initPresenter():void {
-				this.presenter = new TaxonInputFieldPresenter(this);
+				_presenter = new TaxonAttributePresenter(this);
 			}
-			*/
+			
 			
 		]]>
 	</fx:Script>
@@ -30,29 +32,58 @@
 		tabEnabled="false">
 		
 		<s:HGroup includeIn="horizontal" gap="2">
-			<input:StringInputField id="codeTextInput" width="50" maxChars="4" includeIn="horizontal" />
-			<input:StringInputField id="scientificNameTextInput" width="100" includeIn="horizontal" />
-			<input:StringInputField id="vernacularNameTextInput" width="100" includeIn="horizontal" />
-			<input:StringInputField id="vernacularLangTextInput" width="100" includeIn="horizontal" />
+			<input:StringInputField id="codeTextInput" 
+									includeIn="horizontal"
+									attributeDefinition="{attributeDefinition}"
+									parentEntity="{parentEntity}"
+									attribute="{attribute}"
+									fieldIndex="0"
+									width="50" 
+									maxChars="4" 
+									/>
+			<input:StringInputField id="scientificNameTextInput" 
+									includeIn="horizontal"
+									attributeDefinition="{attributeDefinition}"
+									parentEntity="{parentEntity}"
+									attribute="{attribute}"
+									fieldIndex="1"
+									width="100" 
+									/>
+			<input:StringInputField id="vernacularNameTextInput" 
+									includeIn="horizontal"
+									attributeDefinition="{attributeDefinition}"
+									parentEntity="{parentEntity}"
+									attribute="{attribute}"
+									fieldIndex="2"
+									width="100" 
+									/>
+			<input:StringInputField id="vernacularLangTextInput" 
+									includeIn="horizontal"
+									attributeDefinition="{attributeDefinition}"
+									parentEntity="{parentEntity}"
+									attribute="{attribute}"
+									fieldIndex="3"
+									width="100" 
+									/>
 		</s:HGroup>
 		
 		<s:VGroup includeIn="vertical">
 			<s:Label styleName="bold" text="{attributeDefinition.getLabelText()}" />
 			<s:VGroup>
 				<s:HGroup>
-					<s:Label width="{labelWidth}" styleName="bold" text="{Message.get('edit.taxon.code')}"/>
+					<s:Label width="{subLabelWidth}" styleName="bold" text="{Message.get('edit.taxon.code')}"/>
 					<fx:Reparent target="codeTextInput" includeIn="vertical" />
 				</s:HGroup>
 				<s:HGroup>
-					<s:Label width="{labelWidth}" styleName="bold" text="{Message.get('edit.taxon.scientificName')}"/>
+					<s:Label width="{subLabelWidth}" styleName="bold" text="{Message.get('edit.taxon.scientificName')}"/>
 					<fx:Reparent target="scientificNameTextInput" includeIn="vertical" />
 				</s:HGroup>
 				<s:HGroup>
-					<s:Label width="{labelWidth}" styleName="bold" text="{Message.get('edit.taxon.vernacularName')}"/>
+					<s:Label width="{subLabelWidth}" styleName="bold" text="{Message.get('edit.taxon.vernacularName')}"/>
 					<fx:Reparent target="vernacularNameTextInput" includeIn="vertical" />
 				</s:HGroup>
 				<s:HGroup>
-					<s:Label width="{labelWidth}" styleName="bold" text="{Message.get('edit.taxon.vernacularLang')}"/>
+					<s:Label width="{subLabelWidth}" styleName="bold" text="{Message.get('edit.taxon.vernacularLang')}"/>
 					<fx:Reparent target="vernacularLangTextInput" includeIn="vertical" />
 				</s:HGroup>
 			</s:VGroup>
@@ -60,4 +91,4 @@
 		
 	</s:BorderContainer>
 	
-</input:InputField>
+</input:CompositeAttributeRenderer>

@@ -238,13 +238,13 @@ public class DataService {
 			Attribute<?, Object> attribute = (Attribute<?, Object>) node;
 			CollectRecord activeRecord = getActiveRecord();
 			ModelVersion version = activeRecord.getVersion();
-			AttributeDefinition definition = attribute.getDefinition();
 			AttributeDefinition def = attribute.getDefinition();
-			if(definition.isMultiple() && definition instanceof CodeAttributeDefinition) {
+			if(def instanceof CodeAttributeDefinition) {
 				CodeAttributeDefinition codeDef = (CodeAttributeDefinition) def;
 				String codesString = value != null ? value.toString(): null;
 				List<?> codes = parseCodes(parentEntity, codeDef, codesString, version);
-				List<Attribute<?, ?>> attributes = recordManager.replaceAttributes(parentEntity, def, codes, remarks);
+				//TODO set remarks
+				List<Attribute<?, ?>> attributes = recordManager.replaceAttributes(parentEntity, def, codes);
 				updatedNodes.addAll(attributes);
 			} else {
 				if(fieldIndex != null) {
@@ -268,18 +268,20 @@ public class DataService {
 		List<Node<?>> addedNodes = new ArrayList<Node<?>>();
 		if(nodeDef instanceof AttributeDefinition) {
 			AttributeDefinition attributeDef = (AttributeDefinition) nodeDef;
-			if(attributeDef.isMultiple()) {
+			if(attributeDef.isMultiple() && attributeDef instanceof CodeAttributeDefinition) {
 				List<?> values;
-				if(attributeDef instanceof CodeAttributeDefinition && attributeDef.isMultiple()) {
-					String codesString = value != null ? value.toString(): null;
-					List<?> codes = parseCodes(parentEntity, (CodeAttributeDefinition) nodeDef, codesString, version);
-					values = codes;
-					AttributeDefinition def = (AttributeDefinition) nodeDef;
-					List<Attribute<?, ?>> attributes = recordManager.addAttributes(parentEntity, def, values, null, null);
-					addedNodes.addAll(attributes);
+				String codesString = value != null ? value.toString(): null;
+				List<?> codes = parseCodes(parentEntity, (CodeAttributeDefinition) nodeDef, codesString, version);
+				values = codes;
+				AttributeDefinition def = (AttributeDefinition) nodeDef;
+				if(values != null) {
+					for (Object v : values) {
+						Attribute<?, ?> attribute = recordManager.addAttribute(parentEntity, def, v);
+						addedNodes.add(attribute);
+					}
 				}
 			} else {
-				Attribute<?,?> attribute = recordManager.addAttribute(parentEntity, attributeDef, value, null, null);
+				Attribute<?,?> attribute = recordManager.addAttribute(parentEntity, attributeDef, value);
 				if(fieldIndex != null) {
 					Field<?> field = attribute.getField(fieldIndex);
 					field.setRemarks(remarks);
@@ -316,7 +318,7 @@ public class DataService {
 			result = value;
 		} else if(def instanceof CoordinateAttributeDefinition) {
 			if(fieldIndex != null) {
-				if(fieldIndex == 0) {
+				if(fieldIndex == 2) {
 					//srsId
 					result = value;
 				} else {
