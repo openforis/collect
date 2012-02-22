@@ -61,9 +61,13 @@
 			 */
 			private function initDefinitionsPerTab():void {
 				var totalTabs:int = 1 + (uiTabs != null ? uiTabs.length: 0);
+				//init an empty list for each tab
 				var temp:Array = new Array(totalTabs);
+				for(var i:int = 0; i < totalTabs; i ++) {
+					temp[i] = new ArrayCollection();
+				}
+				//put each definition in the corresponding list per tab
 				var childDefns:IList = UIBuilder.getDefinitionsInVersion(entityDefinition.childDefinitions, modelVersion);
-				temp[0] = new ArrayCollection();
 				for each (var defn:NodeDefinitionProxy in childDefns) {
 					var tabName:String = defn.uiTabName;
 					var index:int = -1;
@@ -77,10 +81,6 @@
 					}
 					if(index >= 0) {
 						var nodeDefs:IList = temp[index];
-						if(nodeDefs == null) {
-							nodeDefs = new ArrayCollection();
-							temp[index] = nodeDefs;
-						}
 						nodeDefs.addItem(defn);
 					}
 				}
