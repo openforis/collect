@@ -78,6 +78,10 @@ package org.openforis.collect.ui.component.input {
 			return attribute != null && (ArrayUtil.isIn(reasonBlankSymbols, attribute.getField(fieldIndex).symbol));  
 		}
 		
+		public function undo():void {
+			presenter.undoLastChange();
+		}
+		
 		public function set relevant(value:Boolean):void {
 			if(value) {
 				UIUtil.removeStyleName(validationListener, NOT_RELEVANT_STYLE);
