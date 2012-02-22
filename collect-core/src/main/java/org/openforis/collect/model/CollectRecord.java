@@ -2,7 +2,9 @@ package org.openforis.collect.model;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.model.Record;
@@ -38,8 +40,10 @@ public class CollectRecord extends Record {
 	}
 
 	private Step step;
+	private Map<Integer, NodeState> nodeStateMap;
 	// TODO Replace submitted flag with state enum
 	private boolean submitted;
+	
 	private Date creationDate;
 	private User createdBy;
 	private Date modifiedDate;
@@ -60,12 +64,25 @@ public class CollectRecord extends Record {
 		//use List to preserve the order of the keys and counts
 		rootEntityKeys = new ArrayList<String>();
 		entityCounts = new ArrayList<Integer>();
+		nodeStateMap = new HashMap<Integer, NodeState>();
 	}
 
 	public void setSubmitted(boolean submitted) {
 		this.submitted = submitted;
 	}
 
+	public NodeState getNodeState(int nodeId){
+		return nodeStateMap.get(nodeId);
+	}
+	
+	public void setNodeState(int nodeId, NodeState nodeState){
+		nodeStateMap.put(nodeId, nodeState);
+	}
+	
+	public NodeState clearNodeState(int nodeId){
+		return nodeStateMap.remove(nodeId);
+	}
+	
 	public boolean isSubmitted() {
 		return submitted;
 	}
