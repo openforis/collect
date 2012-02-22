@@ -36,7 +36,7 @@ public class SessionManager {
 			setSessionAttribute(SessionState.SESSION_ATTRIBUTE_NAME, sessionState);
 		}
 
-		User user = this.getLoggedInUser();
+		User user = getLoggedInUser();
 		sessionState.setUser(user);
 
 		return sessionState;
@@ -87,7 +87,7 @@ public class SessionManager {
 				user = new User(userId, name);
 				Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
 				for (GrantedAuthority grantedAuthority : authorities) {
-					user.addAuthority(grantedAuthority.getAuthority());
+					user.addRole(grantedAuthority.getAuthority());
 				}
 			}
 			return user;

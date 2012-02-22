@@ -17,6 +17,7 @@ import org.openforis.collect.model.SurveyDependencies;
 import org.openforis.collect.persistence.xml.CollectIdmlBindingContext;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
+import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.xml.InvalidIdmlException;
 import org.openforis.idm.metamodel.xml.SurveyUnmarshaller;
@@ -38,7 +39,8 @@ public class SurveyManagerIntegrationTest {
 	private static final String SURVEY_NAME = "archenland1";
 
 	protected Survey survey;
-
+	protected EntityDefinition clusterEntityDefinition;
+	
 	@Autowired
 	private SurveyManager surveyManager;
 
@@ -47,12 +49,15 @@ public class SurveyManagerIntegrationTest {
 		if (survey == null) {
 			survey = importModel();
 		}
+		Schema schema = survey.getSchema();
+		clusterEntityDefinition = schema.getRootEntityDefinition("cluster");
 	}
 
 	@Test
 	public void testEmptyDependencies() {
 		SurveyDependencies dependencies = surveyManager.getSurveyDependencies(SURVEY_NAME);
-		NodeDefinition endTimeDefn = ((EntityDefinition) survey.getSchema().getRootEntityDefinition("cluster").getChildDefinition("time_study")).getChildDefinition("end_time");
+		EntityDefinition timeStudy = (EntityDefinition) clusterEntityDefinition.getChildDefinition("time_study");
+		NodeDefinition endTimeDefn = timeStudy.getChildDefinition("end_time");
 		Set<String> paths = dependencies.getDependantPaths(endTimeDefn);
 		Assert.assertTrue(paths.isEmpty());
 	}
@@ -60,7 +65,7 @@ public class SurveyManagerIntegrationTest {
 	@Test
 	public void testNonEmptyStartTime() {
 		SurveyDependencies dependencies = surveyManager.getSurveyDependencies(SURVEY_NAME);
-		NodeDefinition endTimeDefn = ((EntityDefinition) survey.getSchema().getRootEntityDefinition("cluster").getChildDefinition("time_study")).getChildDefinition("start_time");
+		NodeDefinition endTimeDefn = ((EntityDefinition) clusterEntityDefinition.getChildDefinition("time_study")).getChildDefinition("start_time");
 		Set<String> paths = dependencies.getDependantPaths(endTimeDefn);
 		Assert.assertFalse(paths.isEmpty());
 		Assert.assertEquals(1, paths.size());
@@ -71,7 +76,7 @@ public class SurveyManagerIntegrationTest {
 	@Test
 	public void testRequiredDependency() {
 		SurveyDependencies dependencies = surveyManager.getSurveyDependencies(SURVEY_NAME);
-		NodeDefinition definition = ((EntityDefinition) survey.getSchema().getRootEntityDefinition("cluster").getChildDefinition("plot")).getChildDefinition("share");
+		NodeDefinition definition = ((EntityDefinition) clusterEntityDefinition.getChildDefinition("plot")).getChildDefinition("share");
 		Set<String> paths = dependencies.getDependantPaths(definition);
 		Assert.assertFalse(paths.isEmpty());
 		Assert.assertEquals(1, paths.size());
@@ -82,7 +87,7 @@ public class SurveyManagerIntegrationTest {
 	@Test
 	public void testRelevantDependency() {
 		SurveyDependencies dependencies = surveyManager.getSurveyDependencies(SURVEY_NAME);
-		NodeDefinition definition = ((EntityDefinition) survey.getSchema().getRootEntityDefinition("cluster").getChildDefinition("plot")).getChildDefinition("vegetation_type");
+		NodeDefinition definition = ((EntityDefinition) clusterEntityDefinition.getChildDefinition("plot")).getChildDefinition("vegetation_type");
 		Set<String> paths = dependencies.getDependantPaths(definition);
 		Assert.assertFalse(paths.isEmpty());
 		Assert.assertEquals(15, paths.size());
