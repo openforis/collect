@@ -188,7 +188,11 @@ package org.openforis.collect.ui {
 			if(def is BooleanAttributeDefinitionProxy) {
 				return 20;
 			} else if(def is CodeAttributeDefinitionProxy) {
-				return 100;
+				if(isInDataGroup) {
+					return 100;
+				} else {
+					return 200;
+				}
 			} else if(def is CoordinateAttributeDefinitionProxy) {
 				if(isInDataGroup) {
 					return 300;
@@ -203,7 +207,7 @@ package org.openforis.collect.ui {
 				return 120;
 			} else if(def is TaxonAttributeDefinitionProxy) {
 				if(isInDataGroup) {
-					return 358;
+					return 460;
 				} else {
 					return 100;
 				}
@@ -329,7 +333,7 @@ package org.openforis.collect.ui {
 			var l:Label;
 			if(defn is TaxonAttributeDefinitionProxy) {
 				v = new VGroup();
-				v.width = 356;
+				v.width = 460;
 				v.percentHeight = 100;
 				v.verticalAlign = "bottom";
 				//attribute label
@@ -344,7 +348,9 @@ package org.openforis.collect.ui {
 				h.addElement(l);
 				l = getLabel(Message.get('edit.taxon.vernacularName'), 100, "bold");
 				h.addElement(l);
-				l = getLabel(Message.get('edit.taxon.vernacularLang'), 100, "bold");
+				l = getLabel(Message.get('edit.taxon.languageCode'), 100, "bold");
+				h.addElement(l);
+				l = getLabel(Message.get('edit.taxon.languageVariety'), 100, "bold");
 				h.addElement(l);
 				v.addElement(h);
 				return v;

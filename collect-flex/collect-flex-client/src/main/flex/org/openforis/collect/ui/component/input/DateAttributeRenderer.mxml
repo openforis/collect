@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<input:CompositeAttributeRenderer xmlns:fx="http://ns.adobe.com/mxml/2009" 
+<detail:CompositeAttributeRenderer xmlns:fx="http://ns.adobe.com/mxml/2009" 
 				  xmlns:s="library://ns.adobe.com/flex/spark" 
 				  xmlns:mx="library://ns.adobe.com/flex/mx" 
-				  xmlns:input="org.openforis.collect.ui.component.input.*"
+				  xmlns:input="org.openforis.collect.ui.component.input.*" xmlns:detail="org.openforis.collect.ui.component.detail.*"
 				  >
 	
 	<fx:Script>
@@ -29,7 +29,7 @@
 	
 	<s:HGroup 
 			verticalAlign="middle"
-			gap="4">
+			gap="2">
 		<input:NumericInputField id="day"
 								 attributeDefinition="{attributeDefinition}"
 								 parentEntity="{parentEntity}"
@@ -55,9 +55,8 @@
 								 fieldIndex="0"
 								 width="40" 
 								 maxChars="4" />
-		<s:Spacer width="4" />
 		<input:DateField tabEnabled="false" tabFocusEnabled="false"
 						 id="dateField" width="16" editable="false"/>
 	</s:HGroup>
 	
-</input:CompositeAttributeRenderer>
+</detail:CompositeAttributeRenderer>

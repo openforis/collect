@@ -61,8 +61,10 @@ package org.openforis.collect.presenter {
 			_view.scientificNameTextInput.addEventListener(InputFieldEvent.CHANGING, inputFieldChangingHandler);
 			//vernacular name text input
 			_view.vernacularNameTextInput.addEventListener(InputFieldEvent.CHANGING, inputFieldChangingHandler);
-			//vernacular lang text input
-			_view.vernacularLangTextInput.addEventListener(InputFieldEvent.CHANGING, inputFieldChangingHandler);
+			//language code text input
+			_view.languageCodeTextInput.addEventListener(InputFieldEvent.CHANGING, inputFieldChangingHandler);
+			//language variety text input
+			_view.languageVarietyTextInput.addEventListener(InputFieldEvent.CHANGING, inputFieldChangingHandler);
 		}
 		
 		private function get view():TaxonAttributeRenderer {
@@ -141,18 +143,16 @@ package org.openforis.collect.presenter {
 			var keyCode:uint = event.keyCode;
 			switch(keyCode) {
 				case Keyboard.ENTER:
-					//TODO select taxon
+					taxonSelectHandler();
 					break;
 				case Keyboard.ESCAPE:
-					closeAutoCompletePopUp();
-					var textInput:TextInput = autoCompleteLastInputField.textInput as TextInput;
-					textInput.setFocus();
+					cancelAutoComplete();
 					break;
 			}
 		}
 		
 		protected static function autoCompleteMouseDownOutsideHandler(event:FlexMouseEvent):void {
-			closeAutoCompletePopUp();
+			cancelAutoComplete();
 		}
 		
 		protected static function closeAutoCompletePopUp():void {
@@ -163,6 +163,13 @@ package org.openforis.collect.presenter {
 			}
 		}
 		
+		protected static function cancelAutoComplete():void {
+			var textInput:TextInput = autoCompleteLastInputField.textInput as TextInput;
+			textInput.setFocus();
+			autoCompleteLastInputField.undo();
+			closeAutoCompletePopUp();
+		}
+		
 		protected static function taxonSelectHandler(event:TaxonInputFieldEvent = null):void {
 			var taxon:TaxonOccurrenceProxy;
 			if(event != null) {
@@ -171,7 +178,7 @@ package org.openforis.collect.presenter {
 				taxon = autoCompletePopUp.dataGrid.selectedItem as TaxonOccurrenceProxy;
 			}
 			if(taxon != null) {
-				var renderer:TaxonAttributeRenderer = autoCompleteLastInputField.parent as TaxonAttributeRenderer;
+				var renderer:TaxonAttributeRenderer = autoCompleteLastInputField.parentDocument as TaxonAttributeRenderer;
 				var presenter:TaxonAttributePresenter = renderer.presenter as TaxonAttributePresenter;
 				presenter.performSelectTaxon(taxon);
 			}
@@ -189,8 +196,11 @@ package org.openforis.collect.presenter {
 			view.vernacularNameTextInput.text = taxonOccurrence.vernacularName;
 			view.vernacularNameTextInput.applyChanges();
 			
-			view.vernacularLangTextInput.text = taxonOccurrence.languageVariety;
-			view.vernacularLangTextInput.applyChanges();
+			view.languageCodeTextInput.text = taxonOccurrence.languageCode;
+			view.languageCodeTextInput.applyChanges();
+
+			view.languageVarietyTextInput.text = taxonOccurrence.languageVariety;
+			view.languageVarietyTextInput.applyChanges();
 		}
 		
 		protected static function autoCompleteSearchResultHandler(event:ResultEvent, token:Object):void {

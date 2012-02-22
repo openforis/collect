@@ -68,18 +68,16 @@ package org.openforis.collect.presenter
 				var parentId:Number = view.parentEntity.id;
 				for each (var item:NodeProxy in result) {
 					if((item.id == parentId && item.deleted) ||
-						(view.attribute != null && view.attribute.id == item.id) ||
-						(view.attribute == null && ! view.attributeDefinition.multiple && item.parentId == parentId && item.name == view.attributeDefinition.name)
+						(item.parentId == parentId && item.name == view.attributeDefinition.name &&
+							(view.attribute != null && view.attribute.id == item.id) ||
+							(! view.attributeDefinition.multiple) ||
+							(view.attributes == null)
+						)
 					) {
 						assignAttribute();
 						return;
 					}
 				}
-			}
-			
-			
-			if(view.attributes == null && view.attribute == null) {
-				assignAttribute();
 			}
 		}
 		

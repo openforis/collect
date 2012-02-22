@@ -50,7 +50,7 @@ package org.openforis.collect.presenter {
 			var item:Object = null;
 			var attribute:AttributeProxy = _view.attribute;
 			if(attribute != null) {
-				var field:FieldProxy = attribute.getField(0);
+				var field:FieldProxy = attribute.getField(_view.fieldIndex);
 				var value:Object = field.value;
 				if(field.symbol != null) {
 				}
@@ -61,7 +61,8 @@ package org.openforis.collect.presenter {
 		
 		protected function getItem(value:*):Object {
 			var dataProvider:IList = _view.dropDownList.dataProvider;
-			var item:Object = CollectionUtil.getItem(dataProvider, "code", value);
+			var dataField:String = _view.dataField;
+			var item:Object = CollectionUtil.getItem(dataProvider, dataField, value);
 			return item;
 		}
 		

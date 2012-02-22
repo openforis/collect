@@ -49,11 +49,20 @@
 	</input:states>
 	
 	<s:HGroup width="100%">
-		<input:TextInput id="textInput" width="100%" height="100%" />
+		<input:TextInput id="textInput" 
+						 width="100%" 
+						 height="100%" />
 		
-		<s:Image id="openImage" source="{Images.EDIT}" useHandCursor="true" buttonMode="true" />
+		<s:Image id="openImage" 
+				 source="{Images.EDIT}" 
+				 useHandCursor="true" 
+				 buttonMode="true" />
 		
-		<s:Label id="descriptionLabel" includeIn="descriptionVisible" text="{description}" />
+		<s:Label id="descriptionLabel" 
+				 includeIn="descriptionVisible" 
+				 text="{description}"
+				 width="100"
+				 />
 	</s:HGroup>
 	
 </input:InputField>
