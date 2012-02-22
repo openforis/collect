@@ -66,7 +66,7 @@
 					 dataProvider="{nodeDefinitions}"
 					 >
 			<s:layout>
-				<s:VerticalLayout gap="10" paddingBottom="10" paddingLeft="10" paddingRight="10" paddingTop="10" />
+				<s:VerticalLayout gap="5" paddingBottom="10" paddingLeft="10" paddingRight="10" paddingTop="10" />
 			</s:layout>
 			<s:itemRenderer>
 				<fx:Component>

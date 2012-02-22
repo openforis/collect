@@ -2,7 +2,9 @@ package org.openforis.collect.presenter {
 	import flash.display.DisplayObjectContainer;
 	import flash.events.Event;
 	import flash.events.FocusEvent;
+	import flash.events.KeyboardEvent;
 	import flash.events.MouseEvent;
+	import flash.ui.Keyboard;
 	
 	import mx.binding.utils.ChangeWatcher;
 	import mx.collections.ArrayList;
@@ -68,6 +70,7 @@ package org.openforis.collect.presenter {
 			eventDispatcher.addEventListener(ApplicationEvent.UPDATE_RESPONSE_RECEIVED, updateResponseReceivedHandler);
 			
 			if(_view.textInput != null) {
+				_view.textInput.addEventListener(KeyboardEvent.KEY_DOWN, keyDownHandler);
 				_view.textInput.addEventListener(Event.CHANGE, changeHandler);
 				_view.textInput.addEventListener(FocusEvent.FOCUS_OUT, focusOutHandler);
 				_view.textInput.addEventListener(FocusEvent.FOCUS_IN, focusInHandler);
@@ -108,6 +111,15 @@ package org.openforis.collect.presenter {
 			}
 		}
 		
+		protected function keyDownHandler(event:KeyboardEvent):void {
+			var keyCode:uint = event.keyCode;
+			switch(keyCode) {
+				case Keyboard.ESCAPE:
+					undoLastChange();
+					break;
+			}
+		}
+		
 		public function applyChanges():void {
 			var req:UpdateRequest = new UpdateRequest();
 			var def:AttributeDefinitionProxy = _view.attributeDefinition;
@@ -126,6 +138,11 @@ package org.openforis.collect.presenter {
 				req.method = UpdateRequest$Method.ADD;
 			}
 			dataClient.updateActiveRecord(_updateResponder, req);
+		}
+		
+		public function undoLastChange():void {
+			_changed = false;
+			updateView();
 		}
 		
 		protected function focusInHandler(event:FocusEvent):void {
@@ -190,8 +207,7 @@ package org.openforis.collect.presenter {
 			}
 			dataClient.updateActiveRecord(_updateResponder, req);
 		}
-
-
+		
 		protected function updateView():void {
 			//update textInput in view (generic text value)
 			if(_view.attributeDefinition != null) {

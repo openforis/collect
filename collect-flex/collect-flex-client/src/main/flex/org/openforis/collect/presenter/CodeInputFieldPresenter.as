@@ -156,6 +156,7 @@ package org.openforis.collect.presenter {
 		
 		override protected function updateView():void {
 			super.updateView();
+			updateDescription();
 		}
 		
 		override public function applyChanges():void {
@@ -200,6 +201,8 @@ package org.openforis.collect.presenter {
 					
 					ClientFactory.dataClient.getCodeListItems(responder, parentEntityId, name, codes);
 				}
+			} else {
+				_view.description = "";
 			}
 		}
 		

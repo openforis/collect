@@ -54,14 +54,4 @@ public class EntityProxy extends NodeProxy {
 		return result;
 	}
 	
-	@ExternalizedProperty
-	public List<NodeProxy> getChildren() {
-		List<NodeProxy> result = new ArrayList<NodeProxy>();
-		Collection<List<NodeProxy>> values = getChildrenByName().values();
-		for (List<NodeProxy> list : values) {
-			result.addAll(list);
-		}
-		return result;
-	}
-	
 }
