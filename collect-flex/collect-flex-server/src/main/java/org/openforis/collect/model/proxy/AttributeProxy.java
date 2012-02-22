@@ -11,14 +11,10 @@ import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Code;
 import org.openforis.idm.model.Coordinate;
-import org.openforis.idm.model.CoordinateAttribute;
 import org.openforis.idm.model.Date;
-import org.openforis.idm.model.DateAttribute;
 import org.openforis.idm.model.Field;
-import org.openforis.idm.model.TaxonAttribute;
 import org.openforis.idm.model.TaxonOccurrence;
 import org.openforis.idm.model.Time;
-import org.openforis.idm.model.TimeAttribute;
 
 /**
  * @author M. Togna
