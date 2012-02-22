@@ -35,14 +35,19 @@ GO
 CREATE TABLE "collect"."data"  ( 
 	"id"           	integer NOT NULL,
 	"record_id"    	integer NOT NULL,
-	"parent_id"    	integer NULL,
 	"definition_id"	integer NOT NULL,
-	"field"        	integer NOT NULL,
-	"position"     	integer NOT NULL,
-	"value"        	varchar(2048) NULL,
+	"number1"      	numeric(15,5) NULL,
+	"number2"      	numeric(15,5) NULL,
+	"number3"      	numeric(15,5) NULL,
+	"text1"        	varchar(2048) NULL,
+	"text2"        	varchar(2048) NULL,
+	"text3"        	varchar(2048) NULL,
+	"taxon_id"     	integer NULL,
 	"remarks"      	varchar(2048) NULL,
 	"symbol"       	char(1) NULL,
 	"state"        	char(1) NULL,
+	"parent_id"    	integer NULL,
+	"idx"          	integer NOT NULL,
 	PRIMARY KEY("id")
 )
 GO
@@ -138,10 +143,6 @@ CREATE TABLE "collect"."user_role"  (
 	PRIMARY KEY("id")
 )
 GO
-ALTER TABLE "collect"."data"
-	ADD CONSTRAINT "UK_data_node"
-	UNIQUE ("record_id", "parent_id", "definition_id", "field")
-GO
 ALTER TABLE "collect"."survey"
 	ADD CONSTRAINT "UK_survey_name"
 	UNIQUE ("name")
@@ -184,6 +185,11 @@ ALTER TABLE "collect"."taxon_vernacular_name"
 	FOREIGN KEY("taxon_id")
 	REFERENCES "collect"."taxon"("id")
 GO
+ALTER TABLE "collect"."data"
+	ADD CONSTRAINT "FK_data_taxon"
+	FOREIGN KEY("taxon_id")
+	REFERENCES "collect"."taxon"("id")
+GO
 ALTER TABLE "collect"."taxon"
 	ADD CONSTRAINT "FK_taxon_parent"
 	FOREIGN KEY("parent_id")
@@ -214,7 +220,3 @@ ALTER TABLE "collect"."record"
 	FOREIGN KEY("modified_by_id")
 	REFERENCES "collect"."user_account"("id")
 GO
-
---------------------------
---- END GENERATED CODE ---
---------------------------
