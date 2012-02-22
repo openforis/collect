@@ -8,9 +8,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.openforis.collect.model.StateDependencyMap;
 import org.openforis.collect.model.SurveyDependencies;
 import org.openforis.collect.model.SurveySummary;
 import org.openforis.collect.persistence.SurveyDAO;
+import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.idm.metamodel.LanguageSpecificText;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.model.expression.ExpressionFactory;
@@ -49,7 +51,13 @@ public class SurveyManager {
 		Survey survey = surveysByName.get(name);
 		return survey;
 	}
-
+	
+	@Transactional
+	public void importModel(Survey survey) throws SurveyImportException {
+		surveyDAO.importModel(survey);
+		initSurvey(survey);
+	}
+	
 	@Transactional
 	public List<SurveySummary> getSurveySummaries(String lang) {
 		List<SurveySummary> summaries = new ArrayList<SurveySummary>();
@@ -63,6 +71,11 @@ public class SurveyManager {
 		return summaries;
 	}
 
+	public SurveyDependencies getSurveyDependencies(String surveyName){
+		SurveyDependencies dependencies = surveyDependenciesMap.get(surveyName);
+		return dependencies;
+	}
+	
 	private String getProjectName(Survey survey, String lang) {
 		List<LanguageSpecificText> names = survey.getProjectNames();
 		if (names == null || names.size() == 0) {
@@ -83,13 +96,17 @@ public class SurveyManager {
 	protected void init() {
 		surveys = surveyDAO.loadAll();
 		for (Survey survey : surveys) {
-			surveysById.put(survey.getId(), survey);
-			surveysByName.put(survey.getName(), survey);
-
-			SurveyDependencies surveyDependencies = new SurveyDependencies(expressionFactory);
-			surveyDependencies.register(survey);
-			surveyDependenciesMap.put(survey.getName(), surveyDependencies);
+			initSurvey(survey);
 		}
+	}
+
+	private void initSurvey(Survey survey) {
+		surveysById.put(survey.getId(), survey);
+		surveysByName.put(survey.getName(), survey);
+
+		SurveyDependencies surveyDependencies = new SurveyDependencies(expressionFactory);
+		surveyDependencies.register(survey);
+		surveyDependenciesMap.put(survey.getName(), surveyDependencies);
 	}
 
 }
