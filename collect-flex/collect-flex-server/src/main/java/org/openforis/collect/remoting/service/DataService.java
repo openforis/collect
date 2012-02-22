@@ -192,10 +192,12 @@ public class DataService {
 				updatedNodes = addNode(version, parentEntity, nodeDef, value, fieldIndex, symbol, remarks);
 				break;
 			case UPDATE: 
-				if(node instanceof CodeAttribute) {
+				if(nodeDef instanceof CodeAttributeDefinition) {
 					removedNodes = removeNodes(parentEntity, nodeName);
+					updatedNodes = addNode(version, parentEntity, nodeDef, value, fieldIndex, symbol, remarks);
+				} else {
+					updatedNodes = updateNode(parentEntity, node, fieldIndex, value, symbol, remarks);
 				}
-				updatedNodes = updateNode(parentEntity, node, fieldIndex, value, symbol, remarks);
 				break;
 			case UPDATE_SYMBOL:
 				//update attribute value
