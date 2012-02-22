@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.openforis.collect.model.StateDependencyMap;
 import org.openforis.collect.model.SurveyDependencies;
 import org.openforis.collect.model.SurveySummary;
 import org.openforis.collect.persistence.SurveyDAO;

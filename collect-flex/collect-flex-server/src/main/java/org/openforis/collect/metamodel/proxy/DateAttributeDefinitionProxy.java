@@ -9,11 +9,8 @@ import org.openforis.idm.metamodel.DateAttributeDefinition;
  */
 public class DateAttributeDefinitionProxy extends AttributeDefinitionProxy {
 
-	private transient DateAttributeDefinition attributeDefinition;
-
 	public DateAttributeDefinitionProxy(EntityDefinitionProxy parent, DateAttributeDefinition attributeDefinition) {
 		super(parent, attributeDefinition);
-		this.attributeDefinition = attributeDefinition;
 	}
 	
 }
