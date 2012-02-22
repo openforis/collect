@@ -1,4 +1,6 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" 
+		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
@@ -17,10 +19,11 @@
 <!-- 		<flex.framework.version>4.5.0.18623</flex.framework.version> -->
 <!-- 		<flex.framework.version>4.1.0.16076</flex.framework.version> -->
 	</properties>
-	
+
 	<build>
 		<sourceDirectory>src/main/flex</sourceDirectory>
 		<testSourceDirectory>src/test/flex</testSourceDirectory>
+		<finalName>collect</finalName>
 		<resources>
             <resource>
             	<directory>${basedir}/src/main/flex/assets</directory>
@@ -66,6 +69,7 @@
 				<groupId>org.sonatype.flexmojos</groupId>
 				<artifactId>flexmojos-maven-plugin</artifactId>
 				<extensions>true</extensions>
+				<!-- Docs here: https://docs.sonatype.org/display/FLEXMOJOS/Home -->
 				<executions>
 					<execution>
 						<id>generate-as-sources</id>
@@ -96,9 +100,6 @@
 						<goals>
 							<goal>compile-swf</goal>
 						</goals>
-						<configuration>
-							<output>${project.build.directory}/</output>
-						</configuration>
 					</execution>
 				</executions>
 				<configuration>
@@ -144,8 +145,8 @@
 						</goals>
 						<configuration>
 							<sources>
-								  	<source>${basedir}/src/generated/flex</source>
-					   				<source>${project.build.directory}/generated-sources/flexmojos</source>
+							  	<source>${basedir}/src/generated/flex</source>
+				   				<source>${project.build.directory}/generated-sources/flexmojos</source>
 							</sources>
 						</configuration>
 					</execution>
@@ -154,6 +155,7 @@
 			<plugin>
 			    <groupId>org.apache.maven.plugins</groupId>
 			    <artifactId>maven-dependency-plugin</artifactId>
+			    <version>2.4</version>
 			    <executions>
 			        <execution>
 			            <id>copy-theme-file</id>
@@ -169,10 +171,10 @@
 			    </executions>
 			</plugin>
 		</plugins>
-		<finalName>collect</finalName>
 		<pluginManagement>
 			<plugins>
-				<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+				<!--This plugin's configuration is used to store Eclipse m2e settings 
+					only. It has no influence on the Maven build itself. -->
 				<plugin>
 					<groupId>org.eclipse.m2e</groupId>
 					<artifactId>lifecycle-mapping</artifactId>
@@ -182,21 +184,29 @@
 							<pluginExecutions>
 								<pluginExecution>
 									<pluginExecutionFilter>
-										<groupId>
-											com.google.code.maven-replacer-plugin
-										</groupId>
-										<artifactId>
-											maven-replacer-plugin
-										</artifactId>
-										<versionRange>
-											[1.4.0,)
-										</versionRange>
+										<groupId>com.google.code.maven-replacer-plugin</groupId>
+										<artifactId>maven-replacer-plugin</artifactId>
+										<versionRange>[1.4.0,)</versionRange>
 										<goals>
 											<goal>replace</goal>
 										</goals>
 									</pluginExecutionFilter>
 									<action>
 										<ignore></ignore>
+									</action>
+								</pluginExecution>
+								<!-- copy-dependency plugin -->
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>org.apache.maven.plugins</groupId>
+										<artifactId>maven-dependency-plugin</artifactId>
+										<versionRange>[1.0.0,)</versionRange>
+										<goals>
+											<goal>copy-dependencies</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore />
 									</action>
 								</pluginExecution>
 							</pluginExecutions>

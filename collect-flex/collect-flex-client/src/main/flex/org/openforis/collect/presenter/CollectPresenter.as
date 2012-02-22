@@ -39,7 +39,7 @@ package org.openforis.collect.presenter {
 		private var _view:collect;
 		private var _modelClient:ModelClient;
 		private var _sessionClient:SessionClient;
-		private var _contextMenuPresenter:ContextMenuPresenter;
+		//private var _contextMenuPresenter:ContextMenuPresenter;
 		
 		private var _keepAliveTimer:Timer;
 		
@@ -55,7 +55,7 @@ package org.openforis.collect.presenter {
 			_keepAliveTimer.start();
 
 			//init context menu presenter
-			this._contextMenuPresenter = new ContextMenuPresenter(view);
+			//this._contextMenuPresenter = new ContextMenuPresenter(view);
 			
 			//set language in session
 			var localeString:String = FlexGlobals.topLevelApplication.parameters.lang as String;

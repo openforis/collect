@@ -70,7 +70,6 @@
 					BindingUtils.bindProperty(formItem, "parentEntity", this, "entity");
 				}
 			}
-			
 			protected function dataChangeHandler(event:FlexEvent):void {
 				removeAllElements();
 				initialized = false;
@@ -114,4 +113,5 @@
 			}
 		]]>
 	</fx:Script>
+
 </s:ItemRenderer>

@@ -1,93 +1,61 @@
 <?xml version="1.0" encoding="utf-8"?>
 <s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
 		 xmlns:s="library://ns.adobe.com/flex/spark" 
-		 xmlns:mx="library://ns.adobe.com/flex/mx" width="400" height="300">
-	<fx:Declarations>
-		<!-- Place non-visual elements (e.g., services, value objects) here -->
-	</fx:Declarations>
+		 xmlns:mx="library://ns.adobe.com/flex/mx">
 	
 	<fx:Script>
 		<![CDATA[
 			import mx.collections.ArrayCollection;
+			import mx.collections.IList;
 			
-			import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
-			import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
-			
-			[Bindable]
-			private var _modelVersion:ModelVersionProxy;
-			[Bindable]
-			private var _entityDefinition:EntityDefinitionProxy;
-			[Bindable]
-			private var childDefinitionsInVersion:ArrayCollection;
+			private var _nodeDefinitions:IList;
 			
 			[Bindable]
-			public function get entityDefinition():EntityDefinitionProxy {
-				return _entityDefinition;
+			public function get nodeDefinitions():IList {
+				return _nodeDefinitions;
 			}
 			
-			public function set entityDefinition(value:EntityDefinitionProxy):void {
-				_entityDefinition = value;
+			public function set nodeDefinitions(value:IList):void {
+				_nodeDefinitions = value;
 			}
 			
-			[Bindable]
-			public function get modelVersion():ModelVersion {
-				return _modelVersion;
-			}
-			
-			public function set modelVersion(value:ModelVersion):void {
-				_modelVersion = value;
-			}
-			/*
-			[Bindable]
-			private var _dataProvider:Object;
-			
-			public function get dataProvider():Object {
-			return _dataProvider;
-			}
-			
-			public function set dataProvider(value:Object):void {
-			_dataProvider = value;
-			}
-			*/
 		]]>
 	</fx:Script>
 	
-	<s:layout>
-		<s:HorizontalLayout />
-	</s:layout>
-	
-	<s:DataGroup dataProvider="{childDefinitionsInVersion}">
+	<s:DataGroup dataProvider="{nodeDefinitions}">
+		<s:layout>
+			<s:HorizontalLayout 
+								gap="4" 
+								verticalAlign="bottom" />
+		</s:layout>
 		<s:itemRenderer>
 			<fx:Component>
-				<fx:Script>
-					<![CDATA[
-						import mx.messaging.management.Attribute;
-						
-						import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
-						import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
-
-						[Bindable]
-						private var headerText:String;
-						[Bindable]
-						private var headerTextWidth:Number;
-						[Bindable]
-						private var isInVersion:Boolean;
-						
-						override public function set data(value:NodeDefinitionProxy):void {
-							super.data = value;
+				<s:ItemRenderer dataChange="dataChangeHandler(event)"
+								autoDrawBackground="false">
+					<fx:Script>
+						<![CDATA[
+							import mx.core.IVisualElement;
+							import mx.events.FlexEvent;
 							
-							if(value.labels != null && value.labels.length > 0) {
-								headerText = value.labels.getItemAt(0);
-								
-								//TODO set headerTextWidth
-								if(value instanceof AttributeDefinitionProxy) {
+							import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
+							import org.openforis.collect.ui.UIBuilder;
+							
+							override protected function createChildren():void {
+								super.createChildren();
+								if(data != null) {
+									var elem:IVisualElement = UIBuilder.getDataGroupHeader(data as NodeDefinitionProxy);
+									addElement(elem);
 								}
 							}
-						}
-					]]>
-				</fx:Script>
-				
-				<s:Label text="{headerText}" width="{headerTextWidth}" />
+							
+							protected function dataChangeHandler(event:FlexEvent):void {
+								removeAllElements();
+								initialized = false;
+								initialize();
+							}
+						]]>
+					</fx:Script>
+				</s:ItemRenderer>
 			</fx:Component>
 		</s:itemRenderer>
 	</s:DataGroup>

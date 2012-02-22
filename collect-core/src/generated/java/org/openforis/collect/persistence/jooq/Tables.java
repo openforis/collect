@@ -28,11 +28,6 @@ public final class Tables {
 	public static org.openforis.collect.persistence.jooq.tables.Record RECORD = org.openforis.collect.persistence.jooq.tables.Record.RECORD;
 
 	/**
-	 * The table collect.sampling_design
-	 */
-	public static org.openforis.collect.persistence.jooq.tables.SamplingDesign SAMPLING_DESIGN = org.openforis.collect.persistence.jooq.tables.SamplingDesign.SAMPLING_DESIGN;
-
-	/**
 	 * The table collect.schema_definition
 	 */
 	public static org.openforis.collect.persistence.jooq.tables.SchemaDefinition SCHEMA_DEFINITION = org.openforis.collect.persistence.jooq.tables.SchemaDefinition.SCHEMA_DEFINITION;
@@ -48,14 +43,14 @@ public final class Tables {
 	public static org.openforis.collect.persistence.jooq.tables.Taxon TAXON = org.openforis.collect.persistence.jooq.tables.Taxon.TAXON;
 
 	/**
-	 * The table collect.taxonomy
-	 */
-	public static org.openforis.collect.persistence.jooq.tables.Taxonomy TAXONOMY = org.openforis.collect.persistence.jooq.tables.Taxonomy.TAXONOMY;
-
-	/**
 	 * The table collect.taxon_vernacular_name
 	 */
 	public static org.openforis.collect.persistence.jooq.tables.TaxonVernacularName TAXON_VERNACULAR_NAME = org.openforis.collect.persistence.jooq.tables.TaxonVernacularName.TAXON_VERNACULAR_NAME;
+
+	/**
+	 * The table collect.taxonomy
+	 */
+	public static org.openforis.collect.persistence.jooq.tables.Taxonomy TAXONOMY = org.openforis.collect.persistence.jooq.tables.Taxonomy.TAXONOMY;
 
 	/**
 	 * The table collect.user_account

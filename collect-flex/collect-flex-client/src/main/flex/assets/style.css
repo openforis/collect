@@ -4,6 +4,7 @@
 @namespace detail "org.openforis.collect.ui.component.detail.*";
 @namespace input "org.openforis.collect.ui.component.input.*";
 @namespace view "org.openforis.collect.ui.view.*";
+@namespace component "org.openforis.collect.ui.component.*";
 
 view|Footer {
 	padding-bottom: 5;
@@ -38,6 +39,10 @@ s|TitleWindow {
 	corner-radius: 3;
 	background-color: #FFFFFF;
 	background-alpha: 0.8;
+}
+
+component|BlockingMessagePopUp {
+	showCloseButton: false;
 }
 
 s|BorderContainer.noError {

@@ -8,7 +8,7 @@
 package org.openforis.collect.metamodel.proxy {
 
     [Bindable]
-    [RemoteClass(alias="org.openforis.collect.metamodel.proxy.NumericAttributeDefinitionProxy")]
-    public class NumericAttributeDefinitionProxy extends NumericAttributeDefinitionProxyBase {
+    [RemoteClass(alias="org.openforis.collect.metamodel.proxy.NumberAttributeDefinitionProxy")]
+    public class NumberAttributeDefinitionProxy extends NumberAttributeDefinitionProxyBase {
     }
 }

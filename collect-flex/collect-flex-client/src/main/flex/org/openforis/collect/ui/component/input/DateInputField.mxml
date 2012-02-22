@@ -29,11 +29,11 @@
 			</s:HorizontalLayout>
 		</s:layout>
 
-		<input:TextInput tabEnabled="true" width="25" maxChars="2" id="day" />
+		<input:TextInput tabEnabled="true" width="25" maxChars="2" id="day" restrict="[0-9\*\-\?]" />
 		<s:Label id="separator1" paddingLeft="1" />
-		<input:TextInput width="25 " maxChars="2" id="month" />
+		<input:TextInput width="25 " maxChars="2" id="month" restrict="[0-9]" />
 		<s:Label id="separator2" paddingLeft="1" />
-		<input:TextInput width="40" maxChars="4" id="year" />
+		<input:TextInput width="40" maxChars="4" id="year" restrict="[0-9]" />
 		<s:Spacer width="8" />
 		<input:DateField tabEnabled="false" tabFocusEnabled="false"
 						 id="dateField" width="16" editable="false"/>

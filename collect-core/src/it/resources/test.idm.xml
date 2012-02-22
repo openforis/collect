@@ -3745,7 +3745,7 @@
                     <label type="heading">End purpose(s)</label>
                 </code>
             </entity>
-            <boolean name="alt_energy_sources_available" ui:tab="hs_assets">
+           <boolean name="alt_energy_source_available" ui:tab="hs_assets">
                 <label type="number">3a</label>
                 <label>Alt. energy sources</label>
                 <prompt type="interview">Are there any alternatives to firewood/charcoal that are available here but not used?</prompt>
@@ -4140,7 +4140,7 @@
                 <boolean name="org_na" affirmativeOnly="true">
                     <label>N/A</label>
                 </boolean>
-                <entity name="org" relevant="org_na!">
+                <entity name="org" relevant="org_na">
                     <label type="number">1</label>
                     <label>Organization</label>
                     <prompt type="interview">Which organizations do you consider to be the most important for your participation in forest-related activities? (if the respondent perceives no organization to be important, please mark ‘NA’ above table)</prompt>
@@ -4191,7 +4191,7 @@
                             neighbours experienced any disputes or conflict related to the use of
                             land, water, forests or any other local natural resource? </prompt>
                     </boolean>
-                    <boolean name="resolution_attempted" relevant="conflicts_experienced">
+                    <boolean name="resolution_attempted" relevant="conflict_experienced">
                         <label type="number">5</label>
                         <label>Resolution attempted</label>
                         <prompt type="interview">If yes, have you attempted to solve the conflict?</prompt>

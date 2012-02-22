@@ -6,7 +6,7 @@ package org.openforis.collect.remoting.service;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.openforis.collect.manager.TaxonManager;
+import org.openforis.collect.manager.SpeciesManager;
 import org.openforis.collect.model.proxy.TaxonOccurrenceProxy;
 import org.openforis.idm.model.TaxonOccurrence;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,10 +15,10 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author M. Togna
  * @author S. Ricci
  */
-public class TaxonService {
+public class SpeciesService {
 
 	@Autowired
-	private TaxonManager taxonManager;
+	private SpeciesManager taxonManager;
 	
 	private enum SearchType {
 		BY_CODE,

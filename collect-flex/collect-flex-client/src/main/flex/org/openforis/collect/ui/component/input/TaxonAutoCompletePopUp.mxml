@@ -15,22 +15,11 @@
 			
 			public function doubleClickHandler(event:MouseEvent=null):void {
 				if(dataGrid.selectedItem!=null) {
-					selectItem(dataGrid.selectedItem);
+					var taxonEvent:TaxonInputFieldEvent = new TaxonInputFieldEvent(TaxonInputFieldEvent.TAXON_SELECT);
+					taxonEvent.taxon = dataGrid.selectedItem as TaxonOccurrenceProxy;
+					dispatchEvent(taxonEvent);
 				}
 			}
-			
-			protected function selectItem(value:Object):void {
-				var taxonEvent:TaxonInputFieldEvent = new TaxonInputFieldEvent(TaxonInputFieldEvent.TAXON_SELECT);
-				taxonEvent.taxon = value;
-				dispatchEvent(taxonEvent);
-			}
-			
-			/*
-			protected function languageVarietyLabelFunction(item:Object, column:GridColumn):String {
-				var value:String = ObjectUtil.getValue(column.dataField) as String;
-				return value;
-			}
-			*/
 		]]>
 	</fx:Script>
 	
@@ -45,10 +34,10 @@
 				 >
 		<s:columns>
 			<s:ArrayList>
-				<s:GridColumn headerText="Code" dataField="taxon.code" width="50" />
-				<s:GridColumn headerText="Scientific name" width="100" dataField="taxon.scientificName" />
-				<s:GridColumn headerText="Vernacular name" width="100" dataField="vernacularName.vernacularName" />
-				<s:GridColumn headerText="Language/dialect" width="100" dataField="vernacularName.languageVariety" />
+				<s:GridColumn headerText="Code" dataField="code" width="50" />
+				<s:GridColumn headerText="Scientific name" width="100" dataField="scientificName" />
+				<s:GridColumn headerText="Vernacular name" width="100" dataField="vernacularName" />
+				<s:GridColumn headerText="Language/dialect" width="100" dataField="languageVariety" />
 			</s:ArrayList>
 		</s:columns>
 		<s:itemRenderer>

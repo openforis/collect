@@ -67,8 +67,12 @@ public class FieldProxy implements Proxy {
 	}
 
 	@ExternalizedProperty
-	public Character getSymbol() {
-		return field.getSymbol();
+	public AttributeSymbol getSymbol() {
+		if(field.getSymbol() != null) {
+			return AttributeSymbol.valueOf(field.getSymbol());
+		} else {
+			return null;
+		}
 	}
 	
 	

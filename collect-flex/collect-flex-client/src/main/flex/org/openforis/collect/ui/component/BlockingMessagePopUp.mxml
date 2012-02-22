@@ -1,12 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
+<s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
 			   xmlns:s="library://ns.adobe.com/flex/spark" 
 			   xmlns:mx="library://ns.adobe.com/flex/mx"
-			   showCloseButton="false"
 			   >
-	<fx:Declarations>
-		<!-- Place non-visual elements (e.g., services, value objects) here -->
-	</fx:Declarations>
 	
 	<fx:Script>
 		<![CDATA[
@@ -32,20 +28,20 @@
 		]]>
 	</fx:Script>
 	
-	<mx:states>
+	<s:states>
 		<s:State name="default">
 			
 		</s:State>
 		<s:State name="messageIconVisible">
 			
 		</s:State>
-	</mx:states>
+	</s:states>
 	
-	<mx:HBox>
-		<mx:Box includeIn="messageIconVisible" styleName="imageWrapper">
+	<s:HGroup>
+		<s:Group includeIn="messageIconVisible" styleName="imageWrapper">
 			<s:Image source="{messageIconClass}" />
-		</mx:Box>
-		<mx:Text text="{message}" styleName="blockingMessageText" />
-	</mx:HBox>
+		</s:Group>
+		<s:Label text="{message}" styleName="blockingMessageText" />
+	</s:HGroup>
 	
-</mx:TitleWindow>
+</s:TitleWindow>

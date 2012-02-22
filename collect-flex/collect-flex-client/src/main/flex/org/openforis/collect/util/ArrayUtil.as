@@ -162,9 +162,8 @@ package org.openforis.collect.util
 			}
 		}
 		
-		public static function getItem(array:Object, value:*, propertyName:String = null):* {
-			var arr:Array = getArray(array);
-			for each(var item:* in arr) {
+		public static function getItem(array:Array, value:*, propertyName:String = null):* {
+			for each(var item:* in array) {
 				if(propertyName != null) {
 					if(ObjectUtil.getValue(item, propertyName) == value) {
 						return item;
@@ -174,6 +173,18 @@ package org.openforis.collect.util
 				}
 			}
 			return null;
+		}
+		
+		public static function isIn(array:Array, value:*):Boolean {
+			if(value == null) {
+				return false;
+			}
+			for each(var item:* in array) {
+				if(item == value) {
+					return true;
+				}
+			}
+			return false;
 		}
 	}
 }

@@ -17,7 +17,7 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.metamodel.proxy.FileAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
 	import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
-	import org.openforis.collect.metamodel.proxy.NumericAttributeDefinitionProxy;
+	import org.openforis.collect.metamodel.proxy.NumberAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.RangeAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.TaxonAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.TextAttributeDefinitionProxy;
@@ -27,6 +27,7 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.model.UITab;
 	import org.openforis.collect.ui.component.datagrid.RecordSummaryDataGrid;
 	import org.openforis.collect.ui.component.detail.AttributeFormItem;
+	import org.openforis.collect.ui.component.detail.AttributeItemRenderer;
 	import org.openforis.collect.ui.component.detail.CodeAttributeFormItem;
 	import org.openforis.collect.ui.component.detail.EntityFormContainer;
 	import org.openforis.collect.ui.component.detail.EntityFormItem;
@@ -38,16 +39,15 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.ui.component.detail.SingleEntityFormItem;
 	import org.openforis.collect.ui.component.input.BooleanInputField;
 	import org.openforis.collect.ui.component.input.CodeInputField;
-	import org.openforis.collect.ui.component.input.CoordinateInputField;
-	import org.openforis.collect.ui.component.input.DateInputField;
+	import org.openforis.collect.ui.component.input.CoordinateAttributeRenderer;
+	import org.openforis.collect.ui.component.input.DateAttributeRenderer;
 	import org.openforis.collect.ui.component.input.FixedCodeInputField;
 	import org.openforis.collect.ui.component.input.InputField;
 	import org.openforis.collect.ui.component.input.MemoInputField;
 	import org.openforis.collect.ui.component.input.NumericInputField;
-	import org.openforis.collect.ui.component.input.RangeInputField;
 	import org.openforis.collect.ui.component.input.StringInputField;
-	import org.openforis.collect.ui.component.input.TaxonInputField;
-	import org.openforis.collect.ui.component.input.TimeInputField;
+	import org.openforis.collect.ui.component.input.TaxonAttributeRenderer;
+	import org.openforis.collect.ui.component.input.TimeAttributeRenderer;
 	
 	import spark.components.HGroup;
 	import spark.components.Label;
@@ -74,8 +74,7 @@ package org.openforis.collect.ui {
 				tabs = uiConfig.tabs;
 				uiTab = uiConfig.getTab(rootEntity.name);
 			}
-			//addFormItems(form, entity, version, uiTab);
-			form.uiTabs = uiTab.tabs;
+			form.uiTabs = uiTab != null ? uiTab.tabs: null;
 			form.build();
 			
 			formContainer.addEntityFormContainer(form);
@@ -200,13 +199,11 @@ package org.openforis.collect.ui {
 				return 150;
 			} else if(def is FileAttributeDefinitionProxy) {
 				return 300;
-			} else if(def is NumericAttributeDefinitionProxy) {
-				return 100;
 			} else if(def is RangeAttributeDefinitionProxy) {
 				return 120;
 			} else if(def is TaxonAttributeDefinitionProxy) {
 				if(isInDataGroup) {
-					return 356;
+					return 358;
 				} else {
 					return 100;
 				}
@@ -249,10 +246,6 @@ package org.openforis.collect.ui {
 						inputField = new StringInputField();
 						break;
 				}
-			} else if(def is DateAttributeDefinitionProxy) {
-				inputField = new DateInputField();
-			} else if(def is TimeAttributeDefinitionProxy) {
-				inputField = new TimeInputField();
 			} else if(def is CodeAttributeDefinitionProxy) {
 				var codeDef:CodeAttributeDefinitionProxy = CodeAttributeDefinitionProxy(def);
 				if(isInDataGroup && codeDef.parent.enumerated && codeDef.key) {
@@ -260,16 +253,10 @@ package org.openforis.collect.ui {
 				} else {
 					inputField = new CodeInputField();
 				}
-			} else if(def is NumericAttributeDefinitionProxy) {
+			} else if(def is NumberAttributeDefinitionProxy) {
 				inputField = new NumericInputField();
-			} else if(def is RangeAttributeDefinitionProxy) {
-				inputField = new RangeInputField();
 			} else if(def is BooleanAttributeDefinitionProxy) {
 				inputField = new BooleanInputField();
-			} else if(def is CoordinateAttributeDefinitionProxy) {
-				inputField = new CoordinateInputField();
-			} else if(def is TaxonAttributeDefinitionProxy) {
-				inputField = new TaxonInputField();
 			} else if(def is FileAttributeDefinitionProxy) {
 				//inputField = new FileInputField();
 			} else {
@@ -277,22 +264,32 @@ package org.openforis.collect.ui {
 			}
 			inputField.width = getInputFieldWidth(def, isInDataGroup);
 			inputField.attributeDefinition = def;
-			inputField.isInDataGroup = isInDataGroup;
 			return inputField;
 		}
-	
-		public static function buildDataGroupHeaders(defn:EntityDefinitionProxy, modelVersion:ModelVersionProxy):HGroup {
-			var h:HGroup = new HGroup();
-			h.gap = 2;
-			var childDefn:IList = getDefinitionsInVersion(defn.childDefinitions, modelVersion);
-			for each (var childDef:NodeDefinitionProxy in childDefn) {
-				var elem:IVisualElement = getDataGroupHeader(childDef);
-				h.addElement(elem);
+		
+		public static function getAttributeItemRenderer(def:AttributeDefinitionProxy, isInDataGroup:Boolean = false):AttributeItemRenderer {
+			var renderer:AttributeItemRenderer;
+			if(def is CoordinateAttributeDefinitionProxy) {
+				renderer = new CoordinateAttributeRenderer();
+			} else if(def is DateAttributeDefinitionProxy) {
+				renderer = new DateAttributeRenderer();
+			} else if(def is TaxonAttributeDefinitionProxy) {
+				renderer = new TaxonAttributeRenderer();
+			} else if(def is TimeAttributeDefinitionProxy) {
+				renderer = new TimeAttributeRenderer();
+			} else {
+				renderer = new AttributeItemRenderer();
+				var inputField:InputField = getInputField(def, isInDataGroup);
+				inputField.fieldIndex = 0;
+				renderer.addElement(inputField);
+				BindingUtils.bindProperty(inputField, "parentEntity", renderer, "parentEntity");
+				BindingUtils.bindProperty(inputField, "attribute", renderer, "attribute");
 			}
-			return h;
+			renderer.isInDataGroup = isInDataGroup;
+			return renderer;
 		}
 		
-		private static function getDataGroupHeader(defn:NodeDefinitionProxy):IVisualElement {
+		public static function getDataGroupHeader(defn:NodeDefinitionProxy):IVisualElement {
 			var elem:IVisualElement = null;
 			if(defn is AttributeDefinitionProxy){
 				elem = getAttributeDataGroupHeader(defn as AttributeDefinitionProxy);							
@@ -332,7 +329,7 @@ package org.openforis.collect.ui {
 			var l:Label;
 			if(defn is TaxonAttributeDefinitionProxy) {
 				v = new VGroup();
-				v.width = 406;
+				v.width = 356;
 				v.percentHeight = 100;
 				v.verticalAlign = "bottom";
 				//attribute label
@@ -402,26 +399,10 @@ package org.openforis.collect.ui {
 			return l;
 		}
 
-		public static function isInVersion(node:NodeDefinitionProxy, currentVersion:ModelVersionProxy):Boolean {
-			var since:ModelVersionProxy = node.sinceVersion;
-			var deprecated:ModelVersionProxy = node.deprecatedVersion;
-			var result:Boolean;
-			if(since == null && deprecated == null){
-				result = true;
-			} else if(since != null && deprecated != null){
-				result = currentVersion.compare(since) >= 0 && currentVersion.compare(deprecated) < 0;
-			} else if(since != null){
-				result = currentVersion.compare(since) >= 0;
-			} else if(deprecated != null){
-				result = currentVersion.compare(deprecated) < 0;
-			}
-			return result;
-		}
-		
 		public static function getDefinitionsInVersion(defs:IList, currentVersion:ModelVersionProxy):IList {
 			var result:IList = new ArrayCollection();
 			for each (var defn:NodeDefinitionProxy in defs) {
-				if(isInVersion(defn, currentVersion)){
+				if(currentVersion.isApplicable(defn)){
 					result.addItem(defn);
 				}
 			}

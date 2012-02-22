@@ -19,8 +19,6 @@ import org.jooq.impl.Factory;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.User;
-import org.openforis.collect.persistence.jooq.DataLoader;
-import org.openforis.collect.persistence.jooq.DataPersister;
 import org.openforis.collect.persistence.jooq.JooqDaoSupport;
 import org.openforis.collect.persistence.jooq.tables.records.RecordRecord;
 import org.openforis.idm.metamodel.EntityDefinition;
@@ -31,16 +29,21 @@ import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.NodeVisitor;
 import org.openforis.idm.model.RecordContext;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author G. Miceli
  * @author M. Togna
+ * @author S. Ricci
  */
 public class RecordDAO extends JooqDaoSupport {
 	
 	public static final String ORDER_BY_DATE_CREATED = "creationDate";
 	public static final String ORDER_BY_DATE_MODIFIED = "modifiedDate";
+	
+	@Autowired
+	private DataDao dataDao;
 	
 	@Transactional
 	public CollectRecord load(Survey survey, RecordContext recordContext, int recordId) throws DataInconsistencyException, NonexistentIdException {
@@ -150,10 +153,8 @@ public class RecordDAO extends JooqDaoSupport {
 		if (rootEntityDefn == null) {
 			throw new NullPointerException("Unknown root entity id " + rootEntityId);
 		}
-		String rootEntityName = rootEntityDefn.getName();
 
 		CollectRecord record = new CollectRecord(recordContext, survey, version);
-		record.createRootEntity(rootEntityName);
 		
 		mapRecordToCollectRecord(r, record);
 		
@@ -243,8 +244,7 @@ public class RecordDAO extends JooqDaoSupport {
 	}
 	
 	private void loadData(CollectRecord record) throws DataInconsistencyException {
-		DataLoader loader = new DataLoader(getJooqFactory());
-		loader.load(record);
+		dataDao.load(record);
 	}
 
 	private void insertRecord(CollectRecord record) {
@@ -370,11 +370,9 @@ public class RecordDAO extends JooqDaoSupport {
 		// N.B.: traversal order matters; dfs so that parent id's are assigned before children
 		Entity root = record.getRootEntity();
 		root.traverse(new NodeVisitor() {
-			DataPersister persister = new DataPersister(getJooqFactory());
-
 			@Override
 			public void visit(Node<? extends NodeDefinition> node, int idx) {
-				persister.persist(node, idx);
+				dataDao.insert(node, idx);
 			}
 		});
 	}

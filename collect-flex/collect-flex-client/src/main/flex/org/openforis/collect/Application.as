@@ -105,7 +105,7 @@ package org.openforis.collect {
 			return list;
 		}
 		
-		
+		[Bindable]
 		public static function get activeSurvey():SurveyProxy {
 			return _activeSurvey;
 		}
@@ -114,6 +114,7 @@ package org.openforis.collect {
 			_activeSurvey = value;
 		}
 
+		[Bindable]
 		public static function get activeRootEntity():EntityDefinitionProxy {
 			return _activeRootEntity;
 		}
@@ -122,6 +123,7 @@ package org.openforis.collect {
 			_activeRootEntity = value;
 		}
 
+		[Bindable]
 		public static function get activeRecord():RecordProxy {
 			return _activeRecord;
 		}
@@ -139,6 +141,7 @@ package org.openforis.collect {
 			_activePhase = value;
 		}
 
+		[Bindable]
 		public static function get serverOffline():Boolean {
 			return _serverOffline;
 		}

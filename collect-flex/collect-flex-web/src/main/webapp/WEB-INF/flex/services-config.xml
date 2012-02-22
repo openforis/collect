@@ -43,10 +43,10 @@
 		        </properties>
 			</destination>
 			
-			<destination id="taxonService">
+			<destination id="speciesService">
 		        <properties>
 		        	<factory>springFactory</factory>
-		            <source>taxonService</source>
+		            <source>speciesService</source>
 		            <scope>application</scope>
 		        </properties>
 			</destination>

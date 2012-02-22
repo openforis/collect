@@ -2,6 +2,7 @@ package org.openforis.collect.model;
 
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -10,43 +11,53 @@ import java.util.List;
  */
 public class User {
 
-	private int id;
+	private Integer id;
 	private List<String> roles;
 	private String name;
 
-	public User(int id, String name) {
-		this.id = id;
+	public User() {
+		roles = new ArrayList<String>();
+	}
+
+	public User(String name) {
+		this();
 		this.name = name;
 	}
 
-	public void addAuthority(String authority) {
-		this.getRoles().add(authority);
+	public User(Integer id, String name) {
+		this(name);
+		this.id = id;
 	}
 
+	public void addRole(String role) {
+		roles.add(role);
+	}
+
+	/**
+	 * Returns an unmodifiable list of user roles
+	 * @return
+	 */
 	public List<String> getRoles() {
-		if (this.roles == null) {
-			this.roles = new ArrayList<String>();
-		}
-		return this.roles;
+		return Collections.unmodifiableList(roles);
 	}
 
 	public String getName() {
-		return this.name;
+		return name;
 	}
 
-	public void setRoles(List<String> authorities) {
-		this.roles = authorities;
+	public void setRoles(List<String> roles) {
+		this.roles = roles;
 	}
 
 	public void setName(String name) {
 		this.name = name;
 	}
 
-	public int getId() {
+	public Integer getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(Integer id) {
 		this.id = id;
 	}
 
@@ -60,5 +71,5 @@ public class User {
 		sw.append(getRoles().toString());
 		return sw.toString();
 	}
-	
+
 }

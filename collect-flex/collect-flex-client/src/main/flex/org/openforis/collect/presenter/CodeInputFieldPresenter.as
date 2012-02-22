@@ -8,7 +8,6 @@ package org.openforis.collect.presenter {
 	import mx.core.FlexGlobals;
 	import mx.events.CloseEvent;
 	import mx.managers.PopUpManager;
-	import mx.messaging.management.Attribute;
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.IResponder;
 	import mx.rpc.events.ResultEvent;
@@ -19,6 +18,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.metamodel.proxy.CodeListItemProxy;
 	import org.openforis.collect.model.proxy.AttributeProxy;
 	import org.openforis.collect.model.proxy.CodeProxy;
+	import org.openforis.collect.model.proxy.FieldProxy;
 	import org.openforis.collect.remoting.service.UpdateRequest;
 	import org.openforis.collect.remoting.service.UpdateRequest$Method;
 	import org.openforis.collect.ui.component.input.CodeInputField;
@@ -115,8 +115,9 @@ package org.openforis.collect.presenter {
 				if(_view.attributeDefinition.multiple) {
 					if(CollectionUtil.isNotEmpty(_view.attributes)) {
 						var firstAttribute:AttributeProxy = _view.attributes.getItemAt(0) as AttributeProxy;
-						if(firstAttribute.symbol != null) {
-							var shortKey:String = InputFieldPresenter.getReasonBlankShortKey(attribute.symbol);
+						var field:FieldProxy = firstAttribute.getField(0);
+						if(field.symbol != null) {
+							var shortKey:String = InputFieldPresenter.getReasonBlankShortKey(field.symbol);
 							if(shortKey != null) {
 								return shortKey;
 							}
@@ -138,8 +139,9 @@ package org.openforis.collect.presenter {
 		
 		protected function codeAttributeToText(attribute:AttributeProxy):String {
 			if(attribute != null) {
-				if(attribute.symbol != null) {
-					var shortKey:String = InputFieldPresenter.getReasonBlankShortKey(attribute.symbol);
+				var field:FieldProxy = attribute.getField(0);
+				if(field.symbol != null) {
+					var shortKey:String = InputFieldPresenter.getReasonBlankShortKey(field.symbol);
 					return shortKey;
 				} else {
 					var value:CodeProxy = attribute.value as CodeProxy;
@@ -156,19 +158,13 @@ package org.openforis.collect.presenter {
 			super.updateView();
 		}
 		
-		override public function applyChanges(value:*=null):void {
-			if(_view.parentEntity == null) {
-				throw new Error("Missing parent entity for this attribute");
-			}
-			if(value == null) {
-				value = createValue();
-			}
+		override public function applyChanges():void {
 			var req:UpdateRequest = new UpdateRequest();
 			var def:AttributeDefinitionProxy = _view.attributeDefinition;
 			req.parentEntityId = _view.parentEntity.id;
 			req.nodeName = def.name;
-			req.value = String(value);
-			
+			req.value = createRequestValue();
+			req.fieldIndex = NaN; //ignore field index, update the entire code or list of codes
 			if(_view.attribute != null || (CollectionUtil.isNotEmpty(_view.attributes))) {
 				if(! def.multiple) {
 					req.nodeId = _view.attribute.id;

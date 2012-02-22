@@ -11,6 +11,7 @@ package org.openforis.collect.presenter
 	import mx.managers.PopUpManager;
 	
 	import org.openforis.collect.model.proxy.AttributeSymbol;
+	import org.openforis.collect.model.proxy.FieldProxy;
 	import org.openforis.collect.ui.component.input.InputField;
 	import org.openforis.collect.ui.component.input.RemarksPopUp;
 	import org.openforis.collect.util.PopUpUtil;
@@ -120,8 +121,9 @@ package org.openforis.collect.presenter
 			var remarks:String = null;
 			var symbolToSelect:AttributeSymbol = null;
 			if(_inputField != null && _inputField.attribute != null) {
-				remarks = _inputField.attribute.remarks;
-				var symbol:AttributeSymbol = _inputField.attribute.symbol;
+				var field:FieldProxy = _inputField.attribute.getField(_inputField.fieldIndex);
+				remarks = field.remarks;
+				var symbol:AttributeSymbol = field.symbol;
 				if(symbol != null) {
 					switch(symbol) {
 						case AttributeSymbol.BLANK_ON_FORM:
@@ -132,8 +134,11 @@ package org.openforis.collect.presenter
 					}
 				}
 			}
-			view.currentState = _inputField != null && _inputField.isEmpty() ? 
-				RemarksPopUp.STATE_CAN_SPECIFY_REASON_BLANK: RemarksPopUp.STATE_DEFAULT;
+			if(_inputField != null && (_inputField.isEmpty() ||	_inputField.hasBlankReasonSpecified()) ) {
+				view.currentState = RemarksPopUp.STATE_CAN_SPECIFY_REASON_BLANK;
+			} else {
+				view.currentState = RemarksPopUp.STATE_DEFAULT;
+			}
 			view.remarksTextArea.text = remarks;
 			view.radioButtonGroup.selectedValue = symbolToSelect;
 		}

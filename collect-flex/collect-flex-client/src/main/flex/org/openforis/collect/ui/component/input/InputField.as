@@ -1,27 +1,19 @@
 package org.openforis.collect.ui.component.input {
-	import flash.events.Event;
-	
-	import mx.collections.ArrayList;
-	import mx.collections.IList;
-	import mx.core.ClassFactory;
-	import mx.core.IFactory;
 	import mx.core.UIComponent;
 	import mx.events.FlexEvent;
 	
-	import org.openforis.collect.event.EventDispatcherFactory;
-	import org.openforis.collect.event.InputFieldEvent;
-	import org.openforis.collect.event.UIEvent;
 	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 	import org.openforis.collect.model.proxy.AttributeProxy;
 	import org.openforis.collect.model.proxy.AttributeSymbol;
 	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.presenter.InputFieldPresenter;
+	import org.openforis.collect.util.ArrayUtil;
 	import org.openforis.collect.util.ObjectUtil;
 	import org.openforis.collect.util.StringUtil;
 	import org.openforis.collect.util.UIUtil;
 	
-	import spark.components.DataGrid;
 	import spark.components.Group;
+	import spark.layouts.HorizontalLayout;
 
 	/**
 	 * 
@@ -39,20 +31,18 @@ package org.openforis.collect.ui.component.input {
 		public static const STATE_SAVE_COMPLETE:String = "saveComplete";
 		public static const STATE_ERROR_SAVING:String = "errorSaving";
 		
-		private var _presenter:InputFieldPresenter;
-		
-		protected var _textInput:UIComponent;
-		
 		private var _attributeDefinition:AttributeDefinitionProxy;
-
-		private var _attribute:AttributeProxy; 
-		
 		private var _parentEntity:EntityProxy;
-		
+		private var _attribute:AttributeProxy;
+		private var _fieldIndex:int = 0;
+		private var _presenter:InputFieldPresenter;
 		private var _isInDataGroup:Boolean = false;
+		private var _applyChangesOnFocusOut:Boolean = true;
+		protected var _textInput:UIComponent;
 		
 		public function InputField() {
 			super();
+			layout = new HorizontalLayout();
 			this.addEventListener(FlexEvent.CREATION_COMPLETE, creationCompleteHandler);
 		}
 		
@@ -73,8 +63,19 @@ package org.openforis.collect.ui.component.input {
 		 * the attribute's value is null
 		 */
 		public function isEmpty():Boolean {
-			return attribute == null || attribute.value == null || 
-				(StringUtil.isBlank(attribute.value.toString()) && attribute.symbol == null);
+			return attribute == null || 
+				(attribute.empty && attribute.getField(fieldIndex).symbol == null);
+		}
+		
+		public function applyChanges():void {
+			presenter.applyChanges();
+		}
+		
+		public function hasBlankReasonSpecified():Boolean {
+			var reasonBlankSymbols:Array = [AttributeSymbol.BLANK_ON_FORM, 
+				AttributeSymbol.DASH_ON_FORM, 
+				AttributeSymbol.ILLEGIBLE];
+			return attribute != null && (ArrayUtil.isIn(reasonBlankSymbols, attribute.getField(fieldIndex).symbol));  
 		}
 		
 		public function set relevant(value:Boolean):void {
@@ -176,13 +177,22 @@ package org.openforis.collect.ui.component.input {
 		}
 
 		[Bindable]
-		public function get isInDataGroup():Boolean {
-			return _isInDataGroup;
+		public function get fieldIndex():int {
+			return _fieldIndex;
 		}
 		
-		public function set isInDataGroup(value:Boolean):void {
-			_isInDataGroup = value;
+		public function set fieldIndex(value:int):void {
+			_fieldIndex = value;
 		}
+
+		public function get applyChangesOnFocusOut():Boolean {
+			return _applyChangesOnFocusOut;
+		}
+
+		public function set applyChangesOnFocusOut(value:Boolean):void {
+			_applyChangesOnFocusOut = value;
+		}
+		
 		
 
 	}

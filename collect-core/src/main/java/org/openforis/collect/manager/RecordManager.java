@@ -175,17 +175,35 @@ public class RecordManager implements RecordContext {
 		return deleted;
 	}
 	
-	public Attribute<?, ?> addAttribute(Entity parentEntity, AttributeDefinition def, Object value, Character symbol, String remarks) {
+	public Attribute<?, ?> addAttribute(Entity parentEntity, AttributeDefinition def, Object value) {
 		String name = def.getName();
 		Attribute<?, ?> result = null;
 		if(def instanceof BooleanAttributeDefinition) {
 			result = parentEntity.addValue(name, (Boolean) value);
 		} else if(def instanceof CodeAttributeDefinition) {
-			result = parentEntity.addValue(name, (Code) value);
+			Code code;
+			if(value == null) {
+				code = new Code(null);
+			} else {
+				code = (Code) value;
+			}
+			result = parentEntity.addValue(name, code);
 		} else if(def instanceof CoordinateAttributeDefinition) {
-			result = parentEntity.addValue(name, (Coordinate) value);
+			Coordinate coordinate;
+			if(value == null) {
+				coordinate = new Coordinate(null, null, null);
+			} else {
+				coordinate = (Coordinate) value;
+			}
+			result = parentEntity.addValue(name, coordinate);
 		} else if(def instanceof DateAttributeDefinition) {
-			result = parentEntity.addValue(name, (org.openforis.idm.model.Date) value);
+			org.openforis.idm.model.Date date;
+			if(value == null) {
+				date = new org.openforis.idm.model.Date(null, null, null);
+			} else {
+				date = (org.openforis.idm.model.Date) value;
+			}
+			result = parentEntity.addValue(name, date);
 		} else if(def instanceof NumberAttributeDefinition) {
 			Type type = ((NumberAttributeDefinition) def).getType();
 			switch(type) {
@@ -200,29 +218,48 @@ public class RecordManager implements RecordContext {
 			org.openforis.idm.metamodel.RangeAttributeDefinition.Type type = ((RangeAttributeDefinition) def).getType();
 			switch(type) {
 				case INTEGER:
-					result = parentEntity.addValue(name, (IntegerRange) value);
+					IntegerRange integerRange;
+					if(value == null) {
+						integerRange = new IntegerRange(null);
+					} else {
+						integerRange = (IntegerRange) value;
+					}
+					result = parentEntity.addValue(name, integerRange);
 					break;
 				case REAL:
-					result = parentEntity.addValue(name, (RealRange) value);
+					RealRange realRange;
+					if(value == null) {
+						realRange = new RealRange(null);
+					} else {
+						realRange = (RealRange) value;
+					}
+					result = parentEntity.addValue(name, realRange);
 					break;
 			}
 		} else if(def instanceof TaxonAttributeDefinition) {
-			result = parentEntity.addValue(name, (TaxonOccurrence) value);
+			TaxonOccurrence taxonOccurrence;
+			if(value == null) {
+				taxonOccurrence = new TaxonOccurrence();
+			} else {
+				taxonOccurrence = (TaxonOccurrence) value;
+			}
+			result = parentEntity.addValue(name, taxonOccurrence);
 		} else if(def instanceof TextAttributeDefinition) {
 			result = parentEntity.addValue(name, (String) value);
 		} else if(def instanceof TimeAttributeDefinition) {
-			result = parentEntity.addValue(name, (Time) value);
+			Time time;
+			if(value == null) {
+				time = new Time(null, null);
+			} else {
+				time = (Time) value;
+			}
+			result = parentEntity.addValue(name, time);
 		}
-		//TODO set symbol and remarks in all fields
-//		result.setSymbol(symbol);
-//		result.setRemarks(remarks);
 		return result;
 	}
 	
-	
-	
-	public List<Attribute<?, ?>> updateAttributes(Entity parentEntity, AttributeDefinition def, List<?> values, Character symbol, String remarks) {
-		List<Attribute<?, ?>> result;
+	public List<Attribute<?, ?>> replaceAttributes(Entity parentEntity, AttributeDefinition def, List<?> values) {
+		List<Attribute<?, ?>> result = new ArrayList<Attribute<?,?>>();
 		if(def.isMultiple()) {
 			String name = def.getName();
 			//remove old attributes
@@ -231,27 +268,18 @@ public class RecordManager implements RecordContext {
 				parentEntity.remove(name, i);
 			}
 			//add new attributes
-			result = addAttributes(parentEntity, def, values, symbol, remarks);
+			if(values != null) {
+				for (Object v : values) {
+					Attribute<?, ?> attribute = addAttribute(parentEntity, def, v);
+					result.add(attribute);
+				}
+			}
 		} else {
 			throw new RuntimeException("Multiple attribute expected");
 		}
 		return result;
 	}
 
-	public List<Attribute<?, ?>> addAttributes(Entity parentEntity, AttributeDefinition def, List<?> values, Character symbol, String remarks) {
-		List<Attribute<?, ?>> result = new ArrayList<Attribute<?,?>>();
-		if(values != null) {
-			for (Object v : values) {
-				Attribute<?, ?> attribute = addAttribute(parentEntity, def, v, symbol, remarks);
-				result.add(attribute);
-			}
-		} else {
-			Attribute<?, ?> attribute = addAttribute(parentEntity, def, null, symbol, remarks);
-			result.add(attribute);
-		}
-		return result;
-	}
-	
 	public Entity addEntity(Entity parentEntity, String nodeName, ModelVersion version) {
 		Entity entity = parentEntity.addEntity(nodeName);
 		addEmptyAttributes(entity, version);
@@ -267,7 +295,7 @@ public class RecordManager implements RecordContext {
 				String name = nodeDef.getName();
 				if(entity.getCount(name) == 0) {
 					if(nodeDef instanceof AttributeDefinition) {
-						addAttribute(entity, (AttributeDefinition) nodeDef, null, null, null);
+						addAttribute(entity, (AttributeDefinition) nodeDef, null);
 					} else if(nodeDef instanceof EntityDefinition && ! nodeDef.isMultiple()) {
 						addEntity(entity, nodeDef.getName(), version);
 					}

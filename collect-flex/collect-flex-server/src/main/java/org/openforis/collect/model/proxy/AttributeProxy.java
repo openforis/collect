@@ -57,6 +57,11 @@ public class AttributeProxy extends NodeProxy {
 	}
 
 	@ExternalizedProperty
+	public boolean isEmpty() {
+		return attribute.isEmpty();
+	}
+	
+	@ExternalizedProperty
 	public boolean isRelevant() {
 		return attribute.isRelevant();
 	}
@@ -65,6 +70,7 @@ public class AttributeProxy extends NodeProxy {
 	public boolean isRequired() {
 		return attribute.isRequired();
 	}
+	
 	@ExternalizedProperty
 	public List<FieldProxy> getFields() {
 		int numFields;
@@ -80,7 +86,7 @@ public class AttributeProxy extends NodeProxy {
 		List<FieldProxy> result = new ArrayList<FieldProxy>(numFields);
 		for (int i = 0; i < numFields; i++) {
 			Field<?> field = attribute.getField(i);
-			result.set(i, new FieldProxy(field));
+			result.add(i, new FieldProxy(field));
 		}
 		return result;
 	}

@@ -18,7 +18,7 @@ package org.openforis.collect.presenter {
 	import mx.utils.StringUtil;
 	
 	import org.openforis.collect.client.ClientFactory;
-	import org.openforis.collect.client.TaxonClient;
+	import org.openforis.collect.client.SpeciesClient;
 	import org.openforis.collect.event.TaxonInputFieldEvent;
 	import org.openforis.collect.model.proxy.AttributeProxy;
 	import org.openforis.collect.model.proxy.TaxonOccurrenceProxy;
@@ -45,10 +45,12 @@ package org.openforis.collect.presenter {
 		protected static var autoCompletePopUpOpen:Boolean = false;
 		protected static var autoCompleteSearchResponder:AsyncResponder;
 		protected static var autoCompleteLastSearchTextInput:TextInput;
+		protected static var autoCompleteLastInputField:TaxonInputField;
 		
 		private var minCharsToStartAutoComplete:int = 2;
 		
 		private var _view:TaxonInputField;
+		private var _lastSelectedTaxon:TaxonOccurrenceProxy;
 		
 		public function TaxonInputFieldPresenter(view:TaxonInputField) {
 			_view = view;
@@ -129,11 +131,25 @@ package org.openforis.collect.presenter {
 				default:
 			}
 			if(searchType != null) {
-				showAutoCompletePopUp(searchType, textInput, _view.codeTextInput);
+				showAutoCompletePopUp(_view, searchType, textInput, _view.codeTextInput);
 			}
 		}
 		
-		protected static function showAutoCompletePopUp(searchType:String, textInput:TextInput, alignField:DisplayObject):void {
+		override protected function createRequestValue():Array {
+			var result:Array = null;
+			if(_lastSelectedTaxon != null) {
+				var taxon:TaxonProxy = _lastSelectedTaxon.taxon;
+				if(_lastSelectedTaxon.taxon != null) {
+					result[0] = _lastSelectedTaxon.taxon.id;
+				}
+				if(_lastSelectedTaxon.vernacularName != null) {
+					result[1] = _lastSelectedTaxon.vernacularName.id;
+				}
+			}
+			return result;
+		}
+		
+		protected static function showAutoCompletePopUp(inputField:TaxonInputField, searchType:String, textInput:TextInput, alignField:DisplayObject):void {
 			if(autoCompletePopUp == null) {
 				autoCompletePopUp = new TaxonAutoCompletePopUp();
 				autoCompletePopUp.addEventListener(KeyboardEvent.KEY_DOWN, autoCompleteKeyDownHandler);
@@ -152,12 +168,13 @@ package org.openforis.collect.presenter {
 				autoCompletePopUpOpen = true;
 			}
 			autoCompleteLastSearchTextInput = textInput;
+			autoCompleteLastInputField = inputField;
 			loadAutoCompleteData(searchType, textInput);
 		}
 		
 		protected static function loadAutoCompleteData(searchType:String, textInput:TextInput):void {
 			autoCompletePopUp.dataGrid.dataProvider = null;
-			var client:TaxonClient = ClientFactory.taxonClient;
+			var client:SpeciesClient = ClientFactory.speciesClient;
 			var searchText:String = textInput.text;
 			switch(searchType) {
 				case SEARCH_BY_CODE:
@@ -197,9 +214,22 @@ package org.openforis.collect.presenter {
 			}
 		}
 		
-		protected static function taxonSelectHandler(event:Event):void {
-			//TODO apply changes to db...
+		protected static function taxonSelectHandler(event:TaxonInputFieldEvent = null):void {
+			var taxon:TaxonOccurrenceProxy;
+			if(event != null) {
+				taxon = event.taxon;
+			} else {
+				taxon = autoCompletePopUp.dataGrid.selectedItem as TaxonOccurrenceProxy;
+			}
+			if(taxon != null) {
+				TaxonInputFieldPresenter(autoCompleteLastInputField.presenter).performSelectTaxon(taxon);
+			}
 			closeAutoCompletePopUp();
+		}
+		
+		public function performSelectTaxon(taxon:TaxonOccurrenceProxy):void {
+			_lastSelectedTaxon = taxon;
+			applyChanges();
 		}
 		
 		protected static function autoCompleteSearchResultHandler(event:ResultEvent, token:Object):void {

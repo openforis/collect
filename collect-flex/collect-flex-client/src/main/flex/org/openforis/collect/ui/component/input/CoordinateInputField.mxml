@@ -56,8 +56,8 @@
 							prompt="{Message.get('global.dropDownPrompt')}" 
 							includeIn="horizontal" itemCreationPolicy="immediate"
 							/>
-			<input:TextInput id="xTextInput" includeIn="horizontal" itemCreationPolicy="immediate" />
-			<input:TextInput id="yTextInput" includeIn="horizontal" itemCreationPolicy="immediate" />
+			<input:TextInput id="xTextInput" includeIn="horizontal" itemCreationPolicy="immediate" restrict="[0-9]" />
+			<input:TextInput id="yTextInput" includeIn="horizontal" itemCreationPolicy="immediate" restrict="[0-9]" />
 		</s:HGroup>
 		
 		<s:VGroup includeIn="vertical" gap="2">

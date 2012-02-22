@@ -13,13 +13,14 @@ import org.openforis.idm.model.TaxonOccurrence;
 import org.openforis.idm.model.species.Taxon;
 import org.openforis.idm.model.species.TaxonVernacularName;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author S. Ricci
  * @author M. Togna
  * 
  */
-public class TaxonManager {
+public class SpeciesManager {
 
 	@Autowired
 	private TaxonDAO taxonDao;
@@ -31,6 +32,7 @@ public class TaxonManager {
 	@Autowired
 	private TaxonomyDAO taxonomyDao;
 
+	@Transactional
 	public List<TaxonOccurrence> findByCode(String searchString, int maxResults) {
 		List<Taxon> list = taxonDao.findByCode(searchString, maxResults);
 		List<TaxonOccurrence> result = new ArrayList<TaxonOccurrence>();
@@ -41,6 +43,7 @@ public class TaxonManager {
 		return result;
 	}
 
+	@Transactional
 	public List<TaxonOccurrence> findByScientificName(String searchString, int maxResults) {
 		List<Taxon> list = taxonDao.findByScientificName(searchString, maxResults);
 		List<TaxonOccurrence> result = new ArrayList<TaxonOccurrence>();
@@ -51,6 +54,7 @@ public class TaxonManager {
 		return result;
 	}
 
+	@Transactional
 	public List<TaxonOccurrence> findByVernacularName(String searchString, int maxResults) {
 		List<TaxonVernacularName> list = taxonVernacularNameDao.findByVernacularName(searchString, maxResults);
 		List<TaxonOccurrence> result = new ArrayList<TaxonOccurrence>();

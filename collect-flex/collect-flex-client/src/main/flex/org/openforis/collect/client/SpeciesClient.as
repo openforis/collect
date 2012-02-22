@@ -9,14 +9,14 @@ package org.openforis.collect.client {
 	 * 
 	 * @author S. Ricci
 	 * */
-	public class TaxonClient extends AbstractClient {
+	public class SpeciesClient extends AbstractClient {
 		
 		private var _findByCodeOperation:Operation;
 		private var _findByScientificNameOperation:Operation;
 		private var _findByVernacularNameOperation:Operation;
 		
-		public function TaxonClient() {
-			super("taxonService");
+		public function SpeciesClient() {
+			super("speciesService");
 			
 			_findByCodeOperation = getOperation("findByCode", CONCURRENCY_LAST);
 			_findByScientificNameOperation = getOperation("findByScientificName", CONCURRENCY_LAST);

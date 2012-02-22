@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<input:CompositeAttributeRenderer xmlns:fx="http://ns.adobe.com/mxml/2009" 
+				  xmlns:s="library://ns.adobe.com/flex/spark" 
+				  xmlns:mx="library://ns.adobe.com/flex/mx" 
+				  xmlns:input="org.openforis.collect.ui.component.input.*"
+				  >
+	
+	<fx:Script>
+		<![CDATA[
+			import org.openforis.collect.presenter.DateAttributePresenter;
+			
+			private var _separator:String = "/";
+			
+			override protected function initPresenter():void {
+				presenter = new DateAttributePresenter(this);
+			}
+			
+			[Bindable]
+			public function get separator():String {
+				return _separator;
+			}
+
+			public function set separator(value:String):void {
+				_separator = value;
+			}
+
+		]]>
+	</fx:Script>
+	
+	<s:HGroup 
+			verticalAlign="middle"
+			gap="4">
+		<input:NumericInputField id="day"
+								 attributeDefinition="{attributeDefinition}"
+								 parentEntity="{parentEntity}"
+								 attribute="{attribute}"
+								 fieldIndex="2"
+								 width="25" 
+								 maxChars="2"
+								 />
+		<s:Label id="separator1" text="{separator}" />
+		<input:NumericInputField id="month"
+								 attributeDefinition="{attributeDefinition}"
+								 parentEntity="{parentEntity}"
+								 attribute="{attribute}"
+								 fieldIndex="1"
+								 width="25 " 
+								 maxChars="2"
+								 />
+		<s:Label id="separator2" text="{separator}" />
+		<input:NumericInputField id="year"
+								 attributeDefinition="{attributeDefinition}"
+								 parentEntity="{parentEntity}"
+								 attribute="{attribute}"
+								 fieldIndex="0"
+								 width="40" 
+								 maxChars="4" />
+		<s:Spacer width="4" />
+		<input:DateField tabEnabled="false" tabFocusEnabled="false"
+						 id="dateField" width="16" editable="false"/>
+	</s:HGroup>
+	
+</input:CompositeAttributeRenderer>

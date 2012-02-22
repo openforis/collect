@@ -14,11 +14,8 @@ package org.openforis.collect.ui.component.detail {
 	public class CollectFormItem extends Group {
 		
 		private var _parentEntity:EntityProxy;
-		
 		private var _childrenAdded:Boolean = false;
-		
 		private var _isInDataGroup:Boolean = false;
-		
 		protected var _presenter:FormItemPresenter;
 		
 		public function CollectFormItem() {

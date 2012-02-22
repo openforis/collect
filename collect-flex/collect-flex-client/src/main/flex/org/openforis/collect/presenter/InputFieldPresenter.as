@@ -16,6 +16,7 @@ package org.openforis.collect.presenter {
 	import org.granite.collections.IMap;
 	import org.openforis.collect.Application;
 	import org.openforis.collect.client.ClientFactory;
+	import org.openforis.collect.client.DataClient;
 	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.event.InputFieldEvent;
 	import org.openforis.collect.event.UIEvent;
@@ -23,6 +24,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.model.proxy.AttributeProxy;
 	import org.openforis.collect.model.proxy.AttributeSymbol;
 	import org.openforis.collect.model.proxy.EntityProxy;
+	import org.openforis.collect.model.proxy.FieldProxy;
 	import org.openforis.collect.remoting.service.UpdateRequest;
 	import org.openforis.collect.remoting.service.UpdateRequest$Method;
 	import org.openforis.collect.ui.ContextMenuBuilder;
@@ -32,6 +34,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.ui.component.detail.MultipleEntityFormItem;
 	import org.openforis.collect.ui.component.input.InputField;
 	import org.openforis.collect.ui.component.input.TextInput;
+	import org.openforis.collect.util.CollectionUtil;
 	import org.openforis.collect.util.StringUtil;
 	import org.openforis.collect.util.UIUtil;
 	
@@ -45,11 +48,13 @@ package org.openforis.collect.presenter {
 	public class InputFieldPresenter extends AbstractPresenter {
 		
 		private var _view:InputField;
-		protected var _changed:Boolean = false;
+		private var _changed:Boolean = false;
 		protected var _updateResponder:IResponder;
+		private var _dataClient:DataClient;
 		
 		public function InputFieldPresenter(inputField:InputField = null) {
 			_view = inputField;
+			_dataClient = ClientFactory.dataClient;
 			super();
 			
 			_updateResponder = new AsyncResponder(updateResultHandler, updateFaultHandler);
@@ -60,10 +65,7 @@ package org.openforis.collect.presenter {
 		override internal function initEventListeners():void {
 			super.initEventListeners();
 			
-			eventDispatcher.addEventListener(ApplicationEvent.MODEL_CHANGED, modelChangedHandler);
-			
-			_view.addEventListener(MouseEvent.MOUSE_OVER, mouseOverHandler);
-			_view.addEventListener(MouseEvent.MOUSE_OUT, mouseOutHandler);
+			eventDispatcher.addEventListener(ApplicationEvent.UPDATE_RESPONSE_RECEIVED, updateResponseReceivedHandler);
 			
 			if(_view.textInput != null) {
 				_view.textInput.addEventListener(Event.CHANGE, changeHandler);
@@ -74,12 +76,15 @@ package org.openforis.collect.presenter {
 			ChangeWatcher.watch(_view, "attribute", attributeChangeHandler);
 		}
 		
-		protected function modelChangedHandler(event:Event):void {
+		protected function updateResponseReceivedHandler(event:ApplicationEvent):void {
 			if(_view.attribute != null) {
-				var newAttribute:AttributeProxy = Application.activeRecord.getNode(_view.attribute.id) as AttributeProxy;
-				if(newAttribute != _view.attribute) {
-					//attribute changed
-					_view.attribute = newAttribute;
+				var result:IList = event.result as IList;
+				if(result != null) {
+					var newAttribute:AttributeProxy = CollectionUtil.getItem(result, "id", _view.attribute.id) as AttributeProxy;
+					if(newAttribute != null && newAttribute != _view.attribute) {
+						//attribute changed
+						_view.attribute = newAttribute;
+					}
 				}
 			}
 		}
@@ -91,55 +96,36 @@ package org.openforis.collect.presenter {
 		protected function changeHandler(event:Event):void {
 			//TODO if autocomplete enabled show autocomplete popup...
 			_changed = true;
+			var inputFieldEvent:InputFieldEvent = new InputFieldEvent(InputFieldEvent.CHANGING);
+			_view.dispatchEvent(inputFieldEvent);
 		}
 		
 		protected function focusOutHandler(event:FocusEvent):void {
-			if(_changed) {
+			if(_view.applyChangesOnFocusOut && _changed) {
 				applyChanges();
 			} else {
 				//TODO perform validation only
 			}
 		}
 		
-		protected function mouseOverHandler(event:MouseEvent):void {
-			var target:UIComponent = event.currentTarget as UIComponent;
-			if(target != null && target.document != null) {
-				var inputFieldEvent:InputFieldEvent = new InputFieldEvent(InputFieldEvent.INPUT_FIELD_MOUSE_OVER);
-				inputFieldEvent.inputField = target.document as InputField;
-				eventDispatcher.dispatchEvent(inputFieldEvent);
-			}
-		}
-		
-		protected function mouseOutHandler(event:MouseEvent):void {
-			var target:UIComponent = event.currentTarget as UIComponent;
-			if(target != null && target.document != null) {
-				var inputFieldEvent:InputFieldEvent = new InputFieldEvent(InputFieldEvent.INPUT_FIELD_MOUSE_OUT);
-				inputFieldEvent.inputField = target.document as InputField;
-				eventDispatcher.dispatchEvent(inputFieldEvent);
-			}
-		}
-
-		public function applyChanges(value:* = null):void {
-			if(_view.parentEntity == null) {
-				throw new Error("Missing parent entity for this attribute");
-			}
-			if(value == null) {
-				value = createValue();
-			}
+		public function applyChanges():void {
 			var req:UpdateRequest = new UpdateRequest();
 			var def:AttributeDefinitionProxy = _view.attributeDefinition;
 			req.parentEntityId = _view.parentEntity.id;
 			req.nodeName = def.name;
-			req.value = String(value);
-			
+			req.value = createRequestValue();
+			req.fieldIndex = _view.fieldIndex;
 			if(_view.attribute != null) {
-				req.nodeId = _view.attribute.id;
+				var a:AttributeProxy = _view.attribute;
+				var field:FieldProxy = a.getField(_view.fieldIndex);
+				req.nodeId = a.id;
 				req.method = UpdateRequest$Method.UPDATE;
-				req.remarks = _view.attribute.remarks;
+				//preserve remarks
+				req.remarks = field.remarks;
 			} else {
 				req.method = UpdateRequest$Method.ADD;
 			}
-			ClientFactory.dataClient.updateActiveRecord(_updateResponder, req);
+			dataClient.updateActiveRecord(_updateResponder, req);
 		}
 		
 		protected function focusInHandler(event:FocusEvent):void {
@@ -149,7 +135,9 @@ package org.openforis.collect.presenter {
 		protected function updateResultHandler(event:ResultEvent, token:Object = null):void {
 			var result:IList = event.result as IList;
 			Application.activeRecord.update(result);
-			eventDispatcher.dispatchEvent(new ApplicationEvent(ApplicationEvent.MODEL_CHANGED));
+			var appEvt:ApplicationEvent = new ApplicationEvent(ApplicationEvent.UPDATE_RESPONSE_RECEIVED);
+			appEvt.result = result;
+			eventDispatcher.dispatchEvent(appEvt);
 			_changed = false;
 			//_view.currentState = InputField.STATE_SAVE_COMPLETE;
 		}
@@ -162,31 +150,28 @@ package org.openforis.collect.presenter {
 		protected function getTextValue():String {
 			var attribute:AttributeProxy = _view.attribute;
 			if(attribute != null) {
-				var value:Object = attribute.value;
-				if(value != null && StringUtil.isNotBlank(value.toString())) {
-					return value.toString();
-				} else if(attribute.symbol != null) {
-					var shortKey:String = getReasonBlankShortKey(attribute.symbol);
+				var field:FieldProxy = _view.attribute.getField(_view.fieldIndex);
+				if(field.symbol != null) {
+					var shortKey:String = getReasonBlankShortKey(field.symbol);
 					if(shortKey != null) {
 						return shortKey;
 					}
+				}
+				var value:Object = field.value;
+				if(value != null && StringUtil.isNotBlank(value.toString())) {
+					return value.toString();
 				}
 			}
 			return "";
 		}
 
-		protected function createValue():* {
-			var result:* = _view.text;
-			return result;
-			/*
-			var newAttributeValue:* = new AbstractValue();
-			newAttributeValue.text1 = _inputField.text;
-			if(value != null) {
-				//copy old informations
-				newAttributeValue.remarks = value.remarks;
+		protected function createRequestValue():String {
+			var result:String = null;
+			var text:String = _view.text;
+			if(StringUtil.isNotBlank(text)) {
+				result = text;
 			}
-			return newAttributeValue;
-			*/
+			return result;
 		}
 		
 		public function changeSymbol(symbol:AttributeSymbol, remarks:String = null):void {
@@ -196,13 +181,14 @@ package org.openforis.collect.presenter {
 			req.nodeName = def.name;
 			req.symbol = symbol;
 			req.remarks = remarks;
+			req.fieldIndex = _view.fieldIndex;
 			if(_view.attribute != null) {
 				req.nodeId = _view.attribute.id;
-				req.method = UpdateRequest$Method.UPDATE;
+				req.method = UpdateRequest$Method.UPDATE_SYMBOL;
 			} else {
 				req.method = UpdateRequest$Method.ADD;
 			}
-			ClientFactory.dataClient.updateActiveRecord(_updateResponder, req);
+			dataClient.updateActiveRecord(_updateResponder, req);
 		}
 
 
@@ -214,7 +200,8 @@ package org.openforis.collect.presenter {
 				if(_view.attribute != null) {
 					var a:AttributeProxy = _view.attribute;
 					//TODO remarks
-					if(StringUtil.isNotBlank(a.remarks)) {
+					var field:FieldProxy = _view.attribute.getField(_view.fieldIndex);
+					if(StringUtil.isNotBlank(field.remarks)) {
 						
 					}
 				}
@@ -235,5 +222,18 @@ package org.openforis.collect.presenter {
 			}
 			return null;
 		}
-	}
+		
+		protected function get dataClient():DataClient {
+			return _dataClient;
+		}
+
+		[Bindable]
+		public function get changed():Boolean {
+			return _changed;
+		}
+		
+		public function set changed(value:Boolean):void {
+			_changed = value;
+		}
+}
 }

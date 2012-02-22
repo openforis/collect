@@ -21,7 +21,6 @@ import org.openforis.collect.model.proxy.AttributeSymbol;
 import org.openforis.collect.model.proxy.NodeProxy;
 import org.openforis.collect.model.proxy.RecordProxy;
 import org.openforis.collect.persistence.AccessDeniedException;
-import org.openforis.collect.persistence.DuplicateIdException;
 import org.openforis.collect.persistence.InvalidIdException;
 import org.openforis.collect.persistence.MultipleEditException;
 import org.openforis.collect.persistence.NonexistentIdException;
@@ -43,6 +42,7 @@ import org.openforis.idm.metamodel.NumberAttributeDefinition.Type;
 import org.openforis.idm.metamodel.RangeAttributeDefinition;
 import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.Survey;
+import org.openforis.idm.metamodel.TaxonAttributeDefinition;
 import org.openforis.idm.metamodel.TimeAttributeDefinition;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Code;
@@ -74,8 +74,12 @@ public class DataService {
 		Survey survey = getActiveSurvey();
 		User user = getUserInSession();
 		CollectRecord record = recordManager.checkout(survey, user, id);
+		Entity rootEntity = record.getRootEntity();
+		ModelVersion version = record.getVersion();
+		recordManager.addEmptyAttributes(rootEntity, version);
+		recordManager.addEmptyEnumeratedEntities(rootEntity, version);
 		SessionState sessionState = sessionManager.getSessionState();
-		sessionState.setActiveRecord((CollectRecord) record);
+		sessionState.setActiveRecord(record);
 		sessionState.setActiveRecordState(RecordState.SAVED);
 		return new RecordProxy(record);
 	}
@@ -154,33 +158,28 @@ public class DataService {
 		sessionManager.clearActiveRecord();
 	}
 
-	public void updateRootEntityKey(String recordId, String newRootEntityKey) throws DuplicateIdException, InvalidIdException, NonexistentIdException, AccessDeniedException, RecordLockedException {
-	}
-
-	@SuppressWarnings("unchecked")
 	public List<NodeProxy> updateActiveRecord(UpdateRequest request) {
 		List<Node<?>> updatedNodes = new ArrayList<Node<?>>();
 		SessionState sessionState = sessionManager.getSessionState();
 		CollectRecord record = sessionState.getActiveRecord();
 		ModelVersion version = record.getVersion();
 		Integer parentEntityId = request.getParentEntityId();
-		Entity parentEntity = (Entity) record.getNodeById(parentEntityId);
-		EntityDefinition parentDef = parentEntity.getDefinition();
+		Entity parentEntity = (Entity) record.getNodeByInternalId(parentEntityId);
 		Integer nodeId = request.getNodeId();
 		Integer fieldIndex = request.getFieldIndex();
 		String nodeName = request.getNodeName();
-		Object fieldVal = null;
+		
 		Node<?> node = null;
 		if(nodeId != null) {
-			node = record.getNodeById(nodeId);
+			node = record.getNodeByInternalId(nodeId);
 		}
-		NodeDefinition nodeDef = ((EntityDefinition) parentDef).getChildDefinition(nodeName);
+		NodeDefinition nodeDef = ((EntityDefinition) parentEntity.getDefinition()).getChildDefinition(nodeName);
 		String requestValue = request.getValue();
 		String remarks = request.getRemarks();
-		//parse request value into a model value (for example Code, Date, Time...)
-		List<?> values = null;
+		//parse request values into a list of attribute value objects (for example Code, Date, Time...)
+		Object value = null;
 		if(requestValue != null && nodeDef instanceof AttributeDefinition) {
-			values = parseValues(parentEntity, (AttributeDefinition) nodeDef, requestValue, fieldIndex);
+			value = parseValue(parentEntity, (AttributeDefinition) nodeDef, requestValue, fieldIndex);
 		}
 		AttributeSymbol symbol = request.getSymbol();
 		if(symbol == null && AttributeSymbol.isShortKeyForBlank(requestValue)) {
@@ -191,52 +190,30 @@ public class DataService {
 		Method method = request.getMethod();
 		switch (method) {
 			case ADD:
-				if(nodeDef instanceof AttributeDefinition) {
-					AttributeDefinition def = (AttributeDefinition) nodeDef;
-					List<Attribute<?, ?>> attributes = recordManager.addAttributes(parentEntity, def, values, symbolChar, remarks);
-					updatedNodes.addAll(attributes);
-				} else {
-					Entity e = recordManager.addEntity(parentEntity, nodeName, version);
-					updatedNodes.add(e);
-				}
+				updatedNodes = addNode(version, parentEntity, nodeDef, value, fieldIndex, symbol, remarks);
 				break;
 			case UPDATE: 
+				updatedNodes = updateNode(parentEntity, node, fieldIndex, value, symbol, remarks);
+				break;
+			case UPDATE_SYMBOL:
 				//update attribute value
-				if(node instanceof Attribute) {
-					@SuppressWarnings("unchecked")
-					Attribute<?, Object> attribute = (Attribute<?, Object>) node;
-					AttributeDefinition def = attribute.getDefinition();
-					if(def.isMultiple()) {
-						List<Attribute<?, ?>> attributes = recordManager.updateAttributes(parentEntity, def, values, symbolChar, remarks);
-						updatedNodes.addAll(attributes);
-					} else {
-						Object val = null;
-						if(values != null && values.size() == 1) {
-							val = values.get(0);
-						}
-						if(fieldIndex != null) {
-							@SuppressWarnings("rawtypes")
-							Field field = attribute.getField(fieldIndex);
-							field.setRemarks(remarks);
-							field.setSymbol(symbolChar);
-							field.setValue(fieldVal);
-						} else {
-							attribute.setValue(val);
-						}
-						updatedNodes.add(attribute);
-					}
+				if(nodeDef instanceof AttributeDefinition) {
+					Attribute<?, ?> a = (Attribute<?, ?>) node;
+					Field<?> field = a.getField(fieldIndex);
+					field.setSymbol(symbolChar);
+					field.setRemarks(remarks);
+					updatedNodes.add(a);
 				} else if(node instanceof Entity) {
 					//update only the symbol in entity's attributes
 					Entity entity = (Entity) node;
 					recordManager.addEmptyAttributes(entity, version);
-					EntityDefinition entityDef = (EntityDefinition) nodeDef;
-					List<NodeDefinition> childDefinitions = entityDef.getChildDefinitions();
+					List<NodeDefinition> childDefinitions = ((EntityDefinition) nodeDef).getChildDefinitions();
 					for (NodeDefinition def : childDefinitions) {
 						if(def instanceof AttributeDefinition) {
 							String name = def.getName();
-							Attribute<?, ?> attribute = (Attribute<?, ?>) entity.get(name, 0);
-							//TODO attribute.setSymbol(symbolChar);
-							updatedNodes.add(attribute);
+							Attribute<?, ?> a = (Attribute<?, ?>) entity.get(name, 0);
+							setSymbolInAllFields(a, symbol);
+							updatedNodes.add(a);
 						}
 					}
 				}
@@ -258,29 +235,127 @@ public class DataService {
 	}
 
 	@SuppressWarnings("unchecked")
-	private List<?> parseValues(Entity parentEntity, AttributeDefinition def, String value, int fieldIndex) {
-		List<Object> result = new ArrayList<Object>();
-		CollectRecord activeRecord = getActiveRecord();
-		ModelVersion version = activeRecord.getVersion();
-		
-		if(def instanceof BooleanAttributeDefinition) {
-			result.add(Boolean.parseBoolean(value));
-		} else if(def instanceof CodeAttributeDefinition) {
-			List<?> codes = parseCodes(parentEntity, (CodeAttributeDefinition) def, value, version);
-			if(codes.size() > 0) {
-				result = (List<Object>) codes;
-			}
-		} else if(def instanceof CoordinateAttributeDefinition) {
-			Object val = null;
-			if(fieldIndex == 0 || fieldIndex == 1) {
-				val = Long.parseLong(value);
+	private List<Node<?>> updateNode(Entity parentEntity, Node<?> node, Integer fieldIndex, 
+			Object value, AttributeSymbol symbol,	String remarks) {
+		if(node instanceof Attribute) {
+			List<Node<?>> updatedNodes = new ArrayList<Node<?>>();
+			Attribute<?, Object> attribute = (Attribute<?, Object>) node;
+			CollectRecord activeRecord = getActiveRecord();
+			ModelVersion version = activeRecord.getVersion();
+			AttributeDefinition def = attribute.getDefinition();
+			if(def instanceof CodeAttributeDefinition) {
+				CodeAttributeDefinition codeDef = (CodeAttributeDefinition) def;
+				String codesString = value != null ? value.toString(): null;
+				List<Node<?>> list = updateCodeAttribute(version, parentEntity, codeDef, codesString, symbol, remarks);
+				updatedNodes.addAll(list);
 			} else {
-				val = value;
+				if(fieldIndex != null) {
+					@SuppressWarnings("rawtypes")
+					Field field = attribute.getField(fieldIndex);
+					field.setRemarks(remarks);
+					field.setSymbol(symbol != null ? symbol.getCode(): null);
+					field.setValue(value);
+				} else {
+					attribute.setValue(value);
+				}
+				updatedNodes.add(attribute);
 			}
-			result.add(val);
+			return updatedNodes;
+		} else {
+			throw new UnsupportedOperationException("Cannot update an entity");
+		}
+	}
+
+	private List<Node<?>> addNode(ModelVersion version, Entity parentEntity, NodeDefinition nodeDef, Object value, Integer fieldIndex, 
+			AttributeSymbol symbol, String remarks) {
+		List<Node<?>> addedNodes = new ArrayList<Node<?>>();
+		if(nodeDef instanceof AttributeDefinition) {
+			AttributeDefinition def = (AttributeDefinition) nodeDef;
+			if(def instanceof CodeAttributeDefinition) {
+				CodeAttributeDefinition codeDef = (CodeAttributeDefinition) def;
+				String codesString = value != null ? value.toString(): null;
+				List<Node<?>> list = updateCodeAttribute(version, parentEntity, codeDef, codesString, symbol, remarks);
+				addedNodes.addAll(list);
+			} else {
+				Attribute<?,?> attribute = recordManager.addAttribute(parentEntity, def, value);
+				if(fieldIndex != null) {
+					Field<?> field = attribute.getField(fieldIndex);
+					field.setRemarks(remarks);
+					field.setSymbol(symbol != null ? symbol.getCode(): null);
+				}
+				addedNodes.add(attribute);
+			}
+		} else {
+			Entity e = recordManager.addEntity(parentEntity, nodeDef.getName(), version);
+			addedNodes.add(e);
+		}
+		return addedNodes;
+	}
+	
+	private List<Node<?>> updateCodeAttribute(ModelVersion version, Entity parentEntity, CodeAttributeDefinition def, String codesString, 
+			AttributeSymbol symbol, String remarks) {
+		List<Node<?>> updatedNodes = new ArrayList<Node<?>>();
+		String name = def.getName();
+		//remove old attributes
+		int count = parentEntity.getCount(def.getName());
+		for (int i = count - 1; i >= 0; i--) {
+			parentEntity.remove(name, i);
+		}
+		List<Code> codes = codesString != null ? parseCodes(parentEntity, def, codesString, version): null;
+		if(codes != null) {
+			for (Code v : codes) {
+				Attribute<?, ?> attribute = recordManager.addAttribute(parentEntity, def, v);
+				//set symbol and remarks in first field
+				Field<?> field = attribute.getField(0);
+				if(symbol != null) {
+					field.setSymbol(symbol.getCode());
+				}
+				field.setRemarks(remarks);
+				updatedNodes.add(attribute);
+			}
+		} else {
+			Attribute<?,?> attribute = recordManager.addAttribute(parentEntity, def, null);
+			Field<?> field = attribute.getField(0);
+			field.setRemarks(remarks);
+			field.setSymbol(symbol != null ? symbol.getCode(): null);
+			updatedNodes.add(attribute);
+		}
+		return updatedNodes;
+	}
+	
+	private void setSymbolInAllFields(Attribute<?, ?> attribute, AttributeSymbol symbol) {
+		Character s = symbol != null ? symbol.getCode(): null;
+		int count = attribute.getFieldCount();
+		for (int i = 0; i < count; i++) {
+			Field<?> field = attribute.getField(i);
+			if(s == null || (symbol.isReasonBlank() && field.isEmpty())) {
+				field.setSymbol(s);
+			}
+		}
+	}
+
+	private Object parseValue(Entity parentEntity, AttributeDefinition def, String value, Integer fieldIndex) {
+		Object result = null;
+		if(StringUtils.isBlank(value)) {
+			return null;
+		}
+		if(def instanceof BooleanAttributeDefinition) {
+			result = Boolean.parseBoolean(value);
+		} else if(def instanceof CodeAttributeDefinition) {
+			result = value;
+		} else if(def instanceof CoordinateAttributeDefinition) {
+			if(fieldIndex != null) {
+				if(fieldIndex == 2) {
+					//srsId
+					result = value;
+				} else {
+					double val = Double.parseDouble(value);
+					result = val;
+				}
+			}
 		} else if(def instanceof DateAttributeDefinition) {
 			int val = Integer.parseInt(value);
-			result.add(val);
+			result = val;
 		} else if(def instanceof NumberAttributeDefinition) {
 			NumberAttributeDefinition numberDef = (NumberAttributeDefinition) def;
 			Type type = numberDef.getType();
@@ -294,7 +369,7 @@ public class DataService {
 					break;
 			}
 			if(number != null) {
-				result.add(number);
+				result = number;
 			}
 		} else if(def instanceof RangeAttributeDefinition) {
 			org.openforis.idm.metamodel.RangeAttributeDefinition.Type type = ((RangeAttributeDefinition) def).getType();
@@ -308,13 +383,19 @@ public class DataService {
 					break;
 			}
 			if(number != null) {
-				result.add(number);
+				result = number;
 			}
+		} else if(def instanceof TaxonAttributeDefinition) {
+			/*
+			int taxonId = Integer.parseInt(value);
+			int vernacularNameId = Integer.parseInt(value);
+			*/
+			//result.add(o);
 		} else if(def instanceof TimeAttributeDefinition) {
 			int val = Integer.parseInt(value);
-			result.add(val);
+			result = val;
 		} else {
-			result.add(value);
+			result = value;
 		}
 		return result;
 	}
@@ -364,7 +445,7 @@ public class DataService {
 	 */
 	public List<CodeListItemProxy> getCodeListItems(int parentEntityId, String attrName, String[] codes){
 		CollectRecord record = getActiveRecord();
-		Entity parent = (Entity) record.getNodeById(parentEntityId);
+		Entity parent = (Entity) record.getNodeByInternalId(parentEntityId);
 		CodeAttributeDefinition def = (CodeAttributeDefinition) parent.getDefinition().getChildDefinition(attrName);
 		List<CodeListItem> items = getAssignableCodeListItems(parent, def);
 		List<CodeListItem> filteredItems = new ArrayList<CodeListItem>();
@@ -391,7 +472,7 @@ public class DataService {
 	 */
 	public List<CodeListItemProxy> findAssignableCodeListItems(int parentEntityId, String attrName){
 		CollectRecord record = getActiveRecord();
-		Entity parent = (Entity) record.getNodeById(parentEntityId);
+		Entity parent = (Entity) record.getNodeByInternalId(parentEntityId);
 		CodeAttributeDefinition def = (CodeAttributeDefinition) parent.getDefinition().getChildDefinition(attrName);
 		List<CodeListItem> items = getAssignableCodeListItems(parent, def);
 		List<CodeListItemProxy> result = CodeListItemProxy.fromList(items);
@@ -410,7 +491,7 @@ public class DataService {
 	 */
 	public List<CodeListItemProxy> findAssignableCodeListItems(int parentEntityId, String attributeName, String[] codes) {
 		CollectRecord record = getActiveRecord();
-		Entity parent = (Entity) record.getNodeById(parentEntityId);
+		Entity parent = (Entity) record.getNodeByInternalId(parentEntityId);
 		CodeAttributeDefinition def = (CodeAttributeDefinition) parent.getDefinition().getChildDefinition(attributeName);
 		List<CodeListItem> items = getAssignableCodeListItems(parent, def);
 		List<CodeListItemProxy> result = new ArrayList<CodeListItemProxy>();
@@ -495,16 +576,6 @@ public class DataService {
 		return null;
 	}
 
-	private CodeListItem getCodeListItem(List<CodeListItem> siblings, String code) {
-		for (CodeListItem item : siblings) {
-			String itemCode = item.getCode();
-			if(itemCode.equals(code)) {
-				return item;
-			}
-		}
-		return null;
-	}
-	
 	private CodeListItem findCodeListItem(List<CodeListItem> siblings, String code) {
 		String adaptedCode = code.trim();
 		adaptedCode = adaptedCode.toUpperCase();
