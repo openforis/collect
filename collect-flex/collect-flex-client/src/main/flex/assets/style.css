@@ -78,6 +78,10 @@ input|RemarksPopUp {
 	skin-class: ClassReference("org.openforis.collect.ui.skin.RemarksPopUpSkin");
 }
 
+input|TaxonAutoCompletePopUp {
+	skin-class: ClassReference("org.openforis.collect.ui.skin.TaxonAutoCompletePopUpSkin");
+}
+
 s|Label.bold {
 	fontWeight: bold;
 }
