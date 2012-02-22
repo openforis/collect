@@ -73,18 +73,9 @@ public class AttributeProxy extends NodeProxy {
 	
 	@ExternalizedProperty
 	public List<FieldProxy> getFields() {
-		int numFields;
-		if(attribute instanceof TaxonAttribute) {
-			numFields = 5;
-		} else if(attribute instanceof CoordinateAttribute || attribute instanceof DateAttribute) {
-			numFields = 3;
-		} else if(attribute instanceof TimeAttribute) {
-			numFields = 2;
-		} else {
-			numFields = 1;
-		}
-		List<FieldProxy> result = new ArrayList<FieldProxy>(numFields);
-		for (int i = 0; i < numFields; i++) {
+		int fieldCount = attribute.getFieldCount();
+		List<FieldProxy> result = new ArrayList<FieldProxy>(fieldCount);
+		for (int i = 0; i < fieldCount; i++) {
 			Field<?> field = attribute.getField(i);
 			result.add(i, new FieldProxy(field));
 		}

@@ -551,8 +551,10 @@ public class DataService {
 			CodeAttribute parentCodeAttribute = getCodeParent(parent, def);
 			if(parentCodeAttribute!=null){
 				CodeListItem parentCodeListItem = parentCodeAttribute.getCodeListItem();
-				//TODO exception if parent not specified
-				items = parentCodeListItem.getChildItems(); 
+				if(parentCodeListItem != null) {
+					//TODO exception if parent not specified
+					items = parentCodeListItem.getChildItems();
+				}
 			}
 		}
 		List<CodeListItem> result = new ArrayList<CodeListItem>();
