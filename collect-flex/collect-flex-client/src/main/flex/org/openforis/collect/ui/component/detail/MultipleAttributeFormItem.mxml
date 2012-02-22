@@ -12,19 +12,9 @@
 	
 	<fx:Script>
 		<![CDATA[
-			import mx.collections.ArrayList;
-			import mx.collections.IList;
-			import mx.events.FlexEvent;
-			import mx.rpc.AsyncResponder;
-			
-			import org.openforis.collect.client.ClientFactory;
 			import org.openforis.collect.i18n.Message;
-			import org.openforis.collect.model.proxy.EntityProxy;
 			import org.openforis.collect.presenter.MultipleAttributeFormItemPresenter;
-			import org.openforis.collect.remoting.service.UpdateRequest;
 			import org.openforis.collect.ui.Images;
-			import org.openforis.collect.ui.component.input.InputField;
-			import org.openforis.collect.util.CollectionUtil;
 			
 			override protected function initPresenter():void {
 				presenter = new MultipleAttributeFormItemPresenter(this);
@@ -57,7 +47,7 @@
 							override protected function createChildren():void {
 								super.createChildren();
 								var renderer:AttributeItemRenderer = UIBuilder.getAttributeItemRenderer(outerDocument.attributeDefinition, true);
-								BindingUtils.bindProperty(renderer, "parentEntity", this, "parentEntity");
+								BindingUtils.bindProperty(renderer, "parentEntity", outerDocument, "parentEntity");
 								BindingUtils.bindProperty(renderer, "attribute", this, "attribute");
 								addElement(renderer);
 							}

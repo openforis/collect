@@ -17,9 +17,7 @@
 			import org.openforis.collect.presenter.AttributeFormItemPresenter;
 			
 			private var _attributeDefinition:AttributeDefinitionProxy;
-
 			private var _attribute:AttributeProxy;
-			
 			private var _attributes:IList;
 			
 			override protected function initPresenter():void {
