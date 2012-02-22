@@ -36,10 +36,14 @@ package org.openforis.collect.model.proxy {
 			return null;
 		}
 		
-		public function getChildren(nodeName:String = null):IList {
-			var result:IList; 
+		public function getChildren(nodeName:String):IList {
+			var result:ArrayCollection; 
 			if(nodeName == null) {
-				result = children;
+				result = new ArrayCollection();
+				var listOfChildren:ArrayCollection = childrenByName.values;
+				for each (var nodes:IList in listOfChildren) {
+					result.addAll(nodes);
+				}
 			} else {
 				result = childrenByName.get(nodeName);
 			}
