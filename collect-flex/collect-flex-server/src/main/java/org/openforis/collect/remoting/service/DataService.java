@@ -77,7 +77,6 @@ public class DataService {
 		Entity rootEntity = record.getRootEntity();
 		ModelVersion version = record.getVersion();
 		recordManager.addEmptyAttributes(rootEntity, version);
-		recordManager.addEmptyEnumeratedEntities(rootEntity, version);
 		SessionState sessionState = sessionManager.getSessionState();
 		sessionState.setActiveRecord(record);
 		sessionState.setActiveRecordState(RecordState.SAVED);
@@ -124,7 +123,6 @@ public class DataService {
 		CollectRecord record = recordManager.create(activeSurvey, rootEntityDefinition, user, version.getName());
 		Entity rootEntity = record.getRootEntity();
 		recordManager.addEmptyAttributes(rootEntity, version);
-		recordManager.addEmptyEnumeratedEntities(rootEntity, version);
 		sessionState.setActiveRecord((CollectRecord) record);
 		sessionState.setActiveRecordState(RecordState.NEW);
 		RecordProxy recordProxy = new RecordProxy(record);
@@ -160,6 +158,7 @@ public class DataService {
 
 	public List<NodeProxy> updateActiveRecord(UpdateRequest request) {
 		List<Node<?>> updatedNodes = new ArrayList<Node<?>>();
+		List<Node<?>> removedNodes = new ArrayList<Node<?>>();
 		SessionState sessionState = sessionManager.getSessionState();
 		CollectRecord record = sessionState.getActiveRecord();
 		ModelVersion version = record.getVersion();
@@ -179,7 +178,7 @@ public class DataService {
 		//parse request values into a list of attribute value objects (for example Code, Date, Time...)
 		Object value = null;
 		if(requestValue != null && nodeDef instanceof AttributeDefinition) {
-			value = parseValue(parentEntity, (AttributeDefinition) nodeDef, requestValue, fieldIndex);
+			value = parseFieldValue(parentEntity, (AttributeDefinition) nodeDef, requestValue, fieldIndex);
 		}
 		AttributeSymbol symbol = request.getSymbol();
 		if(symbol == null && AttributeSymbol.isShortKeyForBlank(requestValue)) {
@@ -193,6 +192,9 @@ public class DataService {
 				updatedNodes = addNode(version, parentEntity, nodeDef, value, fieldIndex, symbol, remarks);
 				break;
 			case UPDATE: 
+				if(node instanceof CodeAttribute) {
+					removedNodes = removeNodes(parentEntity, nodeName);
+				}
 				updatedNodes = updateNode(parentEntity, node, fieldIndex, value, symbol, remarks);
 				break;
 			case UPDATE_SYMBOL:
@@ -220,17 +222,17 @@ public class DataService {
 				break;
 			case DELETE: 
 				Node<?> deleted = recordManager.deleteNode(parentEntity, node);
-				updatedNodes.add(deleted);
+				removedNodes.add(deleted);
 				break;
 			
 		}
 		//convert nodes to proxies
 		List<NodeProxy> result = NodeProxy.fromList((List<Node<?>>) updatedNodes);
-		if(method == Method.DELETE) {
-			for (NodeProxy nodeProxy : result) {
-				nodeProxy.setDeleted(true);
-			}
+		List<NodeProxy> removed = NodeProxy.fromList((List<Node<?>>) removedNodes);
+		for (NodeProxy nodeProxy : removed) {
+			nodeProxy.setDeleted(true);
 		}
+		result.addAll(removed);
 		return result;
 	}
 
@@ -246,7 +248,7 @@ public class DataService {
 			if(def instanceof CodeAttributeDefinition) {
 				CodeAttributeDefinition codeDef = (CodeAttributeDefinition) def;
 				String codesString = value != null ? value.toString(): null;
-				List<Node<?>> list = updateCodeAttribute(version, parentEntity, codeDef, codesString, symbol, remarks);
+				List<Node<?>> list = insertCodeAttributes(version, parentEntity, codeDef, codesString, symbol, remarks);
 				updatedNodes.addAll(list);
 			} else {
 				if(fieldIndex != null) {
@@ -274,14 +276,16 @@ public class DataService {
 			if(def instanceof CodeAttributeDefinition) {
 				CodeAttributeDefinition codeDef = (CodeAttributeDefinition) def;
 				String codesString = value != null ? value.toString(): null;
-				List<Node<?>> list = updateCodeAttribute(version, parentEntity, codeDef, codesString, symbol, remarks);
+				List<Node<?>> list = insertCodeAttributes(version, parentEntity, codeDef, codesString, symbol, remarks);
 				addedNodes.addAll(list);
 			} else {
-				Attribute<?,?> attribute = recordManager.addAttribute(parentEntity, def, value);
+				Attribute<?,?> attribute = recordManager.addAttribute(parentEntity, def, null);
 				if(fieldIndex != null) {
-					Field<?> field = attribute.getField(fieldIndex);
+					@SuppressWarnings("unchecked")
+					Field<Object> field = (Field<Object>) attribute.getField(fieldIndex);
 					field.setRemarks(remarks);
 					field.setSymbol(symbol != null ? symbol.getCode(): null);
+					field.setValue(value);
 				}
 				addedNodes.add(attribute);
 			}
@@ -292,35 +296,39 @@ public class DataService {
 		return addedNodes;
 	}
 	
-	private List<Node<?>> updateCodeAttribute(ModelVersion version, Entity parentEntity, CodeAttributeDefinition def, String codesString, 
+	private List<Node<?>> insertCodeAttributes(ModelVersion version, Entity parentEntity, CodeAttributeDefinition def, String codesString, 
 			AttributeSymbol symbol, String remarks) {
-		List<Node<?>> updatedNodes = new ArrayList<Node<?>>();
-		String name = def.getName();
-		//remove old attributes
-		int count = parentEntity.getCount(def.getName());
-		for (int i = count - 1; i >= 0; i--) {
-			parentEntity.remove(name, i);
-		}
+		List<Node<?>> addedNodes = new ArrayList<Node<?>>();
 		List<Code> codes = codesString != null ? parseCodes(parentEntity, def, codesString, version): null;
 		if(codes != null) {
-			for (Code v : codes) {
-				Attribute<?, ?> attribute = recordManager.addAttribute(parentEntity, def, v);
+			for (Code c : codes) {
+				Attribute<?, ?> attribute = recordManager.addAttribute(parentEntity, def, c);
 				//set symbol and remarks in first field
 				Field<?> field = attribute.getField(0);
 				if(symbol != null) {
 					field.setSymbol(symbol.getCode());
 				}
 				field.setRemarks(remarks);
-				updatedNodes.add(attribute);
+				addedNodes.add(attribute);
 			}
 		} else {
 			Attribute<?,?> attribute = recordManager.addAttribute(parentEntity, def, null);
 			Field<?> field = attribute.getField(0);
 			field.setRemarks(remarks);
 			field.setSymbol(symbol != null ? symbol.getCode(): null);
-			updatedNodes.add(attribute);
+			addedNodes.add(attribute);
 		}
-		return updatedNodes;
+		return addedNodes;
+	}
+	
+	private List<Node<?>> removeNodes(Entity parentEntity, String nodeName) {
+		List<Node<?>> deletedNodes = new ArrayList<Node<?>>();
+		int count = parentEntity.getCount(nodeName);
+		for (int i = count - 1; i >= 0; i--) {
+			Node<?> removed = parentEntity.remove(nodeName, i);
+			deletedNodes.add(removed);
+		}
+		return deletedNodes;
 	}
 	
 	private void setSymbolInAllFields(Attribute<?, ?> attribute, AttributeSymbol symbol) {
@@ -334,7 +342,7 @@ public class DataService {
 		}
 	}
 
-	private Object parseValue(Entity parentEntity, AttributeDefinition def, String value, Integer fieldIndex) {
+	private Object parseFieldValue(Entity parentEntity, AttributeDefinition def, String value, Integer fieldIndex) {
 		Object result = null;
 		if(StringUtils.isBlank(value)) {
 			return null;
@@ -349,12 +357,12 @@ public class DataService {
 					//srsId
 					result = value;
 				} else {
-					double val = Double.parseDouble(value);
+					Long val = Long.valueOf(value);
 					result = val;
 				}
 			}
 		} else if(def instanceof DateAttributeDefinition) {
-			int val = Integer.parseInt(value);
+			Integer val = Integer.valueOf(value);
 			result = val;
 		} else if(def instanceof NumberAttributeDefinition) {
 			NumberAttributeDefinition numberDef = (NumberAttributeDefinition) def;
@@ -362,10 +370,10 @@ public class DataService {
 			Number number = null;
 			switch(type) {
 				case INTEGER:
-					number = Integer.parseInt(value);
+					number = Integer.valueOf(value);
 					break;
 				case REAL:
-					number = Double.parseDouble(value);
+					number = Double.valueOf(value);
 					break;
 			}
 			if(number != null) {
@@ -376,23 +384,19 @@ public class DataService {
 			Number number = null;
 			switch(type) {
 				case INTEGER:
-					number = Integer.parseInt(value);
+					number = Integer.valueOf(value);
 					break;
 				case REAL:
-					number =  Double.parseDouble(value);
+					number = Double.valueOf(value);
 					break;
 			}
 			if(number != null) {
 				result = number;
 			}
 		} else if(def instanceof TaxonAttributeDefinition) {
-			/*
-			int taxonId = Integer.parseInt(value);
-			int vernacularNameId = Integer.parseInt(value);
-			*/
-			//result.add(o);
+			result = value;
 		} else if(def instanceof TimeAttributeDefinition) {
-			int val = Integer.parseInt(value);
+			Integer val = Integer.valueOf(value);
 			result = val;
 		} else {
 			result = value;
@@ -547,6 +551,7 @@ public class DataService {
 			CodeAttribute parentCodeAttribute = getCodeParent(parent, def);
 			if(parentCodeAttribute!=null){
 				CodeListItem parentCodeListItem = parentCodeAttribute.getCodeListItem();
+				//TODO exception if parent not specified
 				items = parentCodeListItem.getChildItems(); 
 			}
 		}
