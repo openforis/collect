@@ -74,8 +74,12 @@ public class DataService {
 		Survey survey = getActiveSurvey();
 		User user = getUserInSession();
 		CollectRecord record = recordManager.checkout(survey, user, id);
+		Entity rootEntity = record.getRootEntity();
+		ModelVersion version = record.getVersion();
+		recordManager.addEmptyAttributes(rootEntity, version);
+		recordManager.addEmptyEnumeratedEntities(rootEntity, version);
 		SessionState sessionState = sessionManager.getSessionState();
-		sessionState.setActiveRecord((CollectRecord) record);
+		sessionState.setActiveRecord(record);
 		sessionState.setActiveRecordState(RecordState.SAVED);
 		return new RecordProxy(record);
 	}
@@ -186,10 +190,10 @@ public class DataService {
 		Method method = request.getMethod();
 		switch (method) {
 			case ADD:
-				updatedNodes = addNode(version, parentEntity, nodeDef, value, fieldIndex, symbolChar, remarks);
+				updatedNodes = addNode(version, parentEntity, nodeDef, value, fieldIndex, symbol, remarks);
 				break;
 			case UPDATE: 
-				updatedNodes = updateNode(parentEntity, node, fieldIndex, value, symbolChar, remarks);
+				updatedNodes = updateNode(parentEntity, node, fieldIndex, value, symbol, remarks);
 				break;
 			case UPDATE_SYMBOL:
 				//update attribute value
@@ -232,7 +236,7 @@ public class DataService {
 
 	@SuppressWarnings("unchecked")
 	private List<Node<?>> updateNode(Entity parentEntity, Node<?> node, Integer fieldIndex, 
-			Object value, Character symbolChar,	String remarks) {
+			Object value, AttributeSymbol symbol,	String remarks) {
 		if(node instanceof Attribute) {
 			List<Node<?>> updatedNodes = new ArrayList<Node<?>>();
 			Attribute<?, Object> attribute = (Attribute<?, Object>) node;
@@ -242,16 +246,14 @@ public class DataService {
 			if(def instanceof CodeAttributeDefinition) {
 				CodeAttributeDefinition codeDef = (CodeAttributeDefinition) def;
 				String codesString = value != null ? value.toString(): null;
-				List<?> codes = parseCodes(parentEntity, codeDef, codesString, version);
-				//TODO set remarks
-				List<Attribute<?, ?>> attributes = recordManager.replaceAttributes(parentEntity, def, codes);
-				updatedNodes.addAll(attributes);
+				List<Node<?>> list = updateCodeAttribute(version, parentEntity, codeDef, codesString, symbol, remarks);
+				updatedNodes.addAll(list);
 			} else {
 				if(fieldIndex != null) {
 					@SuppressWarnings("rawtypes")
 					Field field = attribute.getField(fieldIndex);
 					field.setRemarks(remarks);
-					field.setSymbol(symbolChar);
+					field.setSymbol(symbol != null ? symbol.getCode(): null);
 					field.setValue(value);
 				} else {
 					attribute.setValue(value);
@@ -264,28 +266,22 @@ public class DataService {
 		}
 	}
 
-	private List<Node<?>> addNode(ModelVersion version, Entity parentEntity, NodeDefinition nodeDef, Object value, Integer fieldIndex, Character symbol, String remarks) {
+	private List<Node<?>> addNode(ModelVersion version, Entity parentEntity, NodeDefinition nodeDef, Object value, Integer fieldIndex, 
+			AttributeSymbol symbol, String remarks) {
 		List<Node<?>> addedNodes = new ArrayList<Node<?>>();
 		if(nodeDef instanceof AttributeDefinition) {
-			AttributeDefinition attributeDef = (AttributeDefinition) nodeDef;
-			if(attributeDef.isMultiple() && attributeDef instanceof CodeAttributeDefinition) {
-				List<?> values;
+			AttributeDefinition def = (AttributeDefinition) nodeDef;
+			if(def instanceof CodeAttributeDefinition) {
+				CodeAttributeDefinition codeDef = (CodeAttributeDefinition) def;
 				String codesString = value != null ? value.toString(): null;
-				List<?> codes = parseCodes(parentEntity, (CodeAttributeDefinition) nodeDef, codesString, version);
-				values = codes;
-				AttributeDefinition def = (AttributeDefinition) nodeDef;
-				if(values != null) {
-					for (Object v : values) {
-						Attribute<?, ?> attribute = recordManager.addAttribute(parentEntity, def, v);
-						addedNodes.add(attribute);
-					}
-				}
+				List<Node<?>> list = updateCodeAttribute(version, parentEntity, codeDef, codesString, symbol, remarks);
+				addedNodes.addAll(list);
 			} else {
-				Attribute<?,?> attribute = recordManager.addAttribute(parentEntity, attributeDef, value);
+				Attribute<?,?> attribute = recordManager.addAttribute(parentEntity, def, value);
 				if(fieldIndex != null) {
 					Field<?> field = attribute.getField(fieldIndex);
 					field.setRemarks(remarks);
-					field.setSymbol(symbol);
+					field.setSymbol(symbol != null ? symbol.getCode(): null);
 				}
 				addedNodes.add(attribute);
 			}
@@ -294,6 +290,37 @@ public class DataService {
 			addedNodes.add(e);
 		}
 		return addedNodes;
+	}
+	
+	private List<Node<?>> updateCodeAttribute(ModelVersion version, Entity parentEntity, CodeAttributeDefinition def, String codesString, 
+			AttributeSymbol symbol, String remarks) {
+		List<Node<?>> updatedNodes = new ArrayList<Node<?>>();
+		String name = def.getName();
+		//remove old attributes
+		int count = parentEntity.getCount(def.getName());
+		for (int i = count - 1; i >= 0; i--) {
+			parentEntity.remove(name, i);
+		}
+		List<Code> codes = codesString != null ? parseCodes(parentEntity, def, codesString, version): null;
+		if(codes != null) {
+			for (Code v : codes) {
+				Attribute<?, ?> attribute = recordManager.addAttribute(parentEntity, def, v);
+				//set symbol and remarks in first field
+				Field<?> field = attribute.getField(0);
+				if(symbol != null) {
+					field.setSymbol(symbol.getCode());
+				}
+				field.setRemarks(remarks);
+				updatedNodes.add(attribute);
+			}
+		} else {
+			Attribute<?,?> attribute = recordManager.addAttribute(parentEntity, def, null);
+			Field<?> field = attribute.getField(0);
+			field.setRemarks(remarks);
+			field.setSymbol(symbol != null ? symbol.getCode(): null);
+			updatedNodes.add(attribute);
+		}
+		return updatedNodes;
 	}
 	
 	private void setSymbolInAllFields(Attribute<?, ?> attribute, AttributeSymbol symbol) {
@@ -322,7 +349,7 @@ public class DataService {
 					//srsId
 					result = value;
 				} else {
-					int val = Integer.parseInt(value);
+					double val = Double.parseDouble(value);
 					result = val;
 				}
 			}

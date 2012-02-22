@@ -58,7 +58,7 @@
 	</fx:Script>
 	<s:DataGroup dataProvider="{nodeDefinitions}">
 		<s:layout>
-			<s:HorizontalLayout gap="2" />
+			<s:HorizontalLayout gap="4" />
 		</s:layout>
 		<s:itemRenderer>
 			<fx:Component>
