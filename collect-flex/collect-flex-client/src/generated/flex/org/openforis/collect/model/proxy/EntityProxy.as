@@ -37,17 +37,7 @@ package org.openforis.collect.model.proxy {
 		}
 		
 		public function getChildren(nodeName:String):IList {
-			var result:ArrayCollection; 
-			if(nodeName == null) {
-				result = new ArrayCollection();
-				var listOfChildren:ArrayCollection = childrenByName.values;
-				for each (var nodes:IList in listOfChildren) {
-					result.addAll(nodes);
-				}
-			} else {
-				result = childrenByName.get(nodeName);
-			}
-			return result;
+			return childrenByName.get(nodeName);
 		}
 
 		public function getChild(nodeName:String, index:int):NodeProxy {
