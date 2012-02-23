@@ -61,7 +61,7 @@ public class RecordDAO extends JooqDaoSupport {
 			updateRecord(record);
 			deleteData(record.getId());
 		}
-		insertData(record);
+		dataDao.insertData(record);
 	}
 
 	@Transactional
@@ -366,17 +366,6 @@ public class RecordDAO extends JooqDaoSupport {
 		jf.delete(DATA).where(DATA.RECORD_ID.equal(recordId)).execute();
 	}
 
-	private void insertData(final CollectRecord record) {
-		// N.B.: traversal order matters; dfs so that parent id's are assigned before children
-		Entity root = record.getRootEntity();
-		root.traverse(new NodeVisitor() {
-			@Override
-			public void visit(Node<? extends NodeDefinition> node, int idx) {
-				dataDao.insert(node, idx);
-			}
-		});
-	}
-	
 	//TODO move to a Mapper class
 	private void mapRecordToCollectRecord(Record r, CollectRecord collectRecord) {
 		collectRecord.setId(r.getValue(RECORD.ID));
