@@ -29,9 +29,6 @@ GO
 --- BEGIN GENERATED CODE ---
 ----------------------------
 ALTER TABLE "collect"."data"
-	DROP CONSTRAINT "FK_data_parent" CASCADE 
-GO
-ALTER TABLE "collect"."data"
 	DROP CONSTRAINT "FK_data_record" CASCADE 
 GO
 ALTER TABLE "collect"."data"

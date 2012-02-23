@@ -155,11 +155,6 @@ ALTER TABLE "collect"."taxonomy"
 	UNIQUE ("name")
 GO
 ALTER TABLE "collect"."data"
-	ADD CONSTRAINT "FK_data_parent"
-	FOREIGN KEY("parent_id")
-	REFERENCES "collect"."data"("id")
-GO
-ALTER TABLE "collect"."data"
 	ADD CONSTRAINT "FK_data_record"
 	FOREIGN KEY("record_id")
 	REFERENCES "collect"."record"("id")
