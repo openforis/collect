@@ -11,6 +11,7 @@ import javax.xml.namespace.QName;
 
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
+import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.AccessDeniedException;
 import org.openforis.collect.persistence.DuplicateIdException;
@@ -32,10 +33,10 @@ import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NumberAttributeDefinition;
 import org.openforis.idm.metamodel.NumberAttributeDefinition.Type;
 import org.openforis.idm.metamodel.RangeAttributeDefinition;
-import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.TaxonAttributeDefinition;
 import org.openforis.idm.metamodel.TextAttributeDefinition;
 import org.openforis.idm.metamodel.TimeAttributeDefinition;
+import org.openforis.idm.metamodel.validation.Validator;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Code;
 import org.openforis.idm.model.CodeAttribute;
@@ -69,6 +70,9 @@ public class RecordManager implements RecordContext {
 	@Autowired
 	private ExpressionFactory expressionFactory;
 	
+	@Autowired
+	private Validator validator;
+	
 	protected void init() {
 		unlockAll();
 	}
@@ -76,6 +80,11 @@ public class RecordManager implements RecordContext {
 	@Override
 	public ExpressionFactory getExpressionFactory() {
 		return expressionFactory;
+	}
+	
+	@Override
+	public Validator getValidator() {
+		return validator;
 	}
 	
 	@Transactional
@@ -103,14 +112,14 @@ public class RecordManager implements RecordContext {
 	 * @throws MultipleEditException 
 	 */
 	@Transactional
-	public CollectRecord checkout(Survey survey, User user, int recordId) throws RecordLockedException, NonexistentIdException, AccessDeniedException, MultipleEditException {
+	public CollectRecord checkout(CollectSurvey survey, User user, int recordId) throws RecordLockedException, NonexistentIdException, AccessDeniedException, MultipleEditException {
 		CollectRecord record = recordDAO.load(survey, this, recordId);
 		recordDAO.lock(recordId, user);
 		return record;
 	}
 
 	@Transactional
-	public List<CollectRecord> getSummaries(Survey survey, String rootEntity, int offset, int maxNumberOfRecords, String orderByFieldName, String filter) {
+	public List<CollectRecord> getSummaries(CollectSurvey survey, String rootEntity, int offset, int maxNumberOfRecords, String orderByFieldName, String filter) {
 		List<CollectRecord> recordsSummary = recordDAO.loadSummaries(survey, this, rootEntity, offset, maxNumberOfRecords, orderByFieldName, filter);
 		return recordsSummary;
 	}
@@ -122,7 +131,7 @@ public class RecordManager implements RecordContext {
 	}
 
 	@Transactional
-	public CollectRecord create(Survey survey, EntityDefinition rootEntityDefinition, User user, String modelVersionName) throws MultipleEditException, AccessDeniedException, RecordLockedException {
+	public CollectRecord create(CollectSurvey survey, EntityDefinition rootEntityDefinition, User user, String modelVersionName) throws MultipleEditException, AccessDeniedException, RecordLockedException {
 		recordDAO.checkLock(user);
 		
 		CollectRecord record = new CollectRecord(this, survey, modelVersionName);

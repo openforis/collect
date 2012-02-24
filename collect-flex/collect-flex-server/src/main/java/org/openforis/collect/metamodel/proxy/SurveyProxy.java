@@ -4,15 +4,15 @@ import java.util.List;
 
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.collect.Proxy;
+import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.UIConfiguration;
 import org.openforis.idm.metamodel.Configuration;
-import org.openforis.idm.metamodel.Survey;
 
 public class SurveyProxy implements Proxy {
 
-	private transient Survey survey;
+	private transient CollectSurvey survey;
 
-	public SurveyProxy(Survey survey) {
+	public SurveyProxy(CollectSurvey survey) {
 		this.survey = survey;
 	}
 

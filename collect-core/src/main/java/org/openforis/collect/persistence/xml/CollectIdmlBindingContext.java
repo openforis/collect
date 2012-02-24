@@ -1,5 +1,8 @@
 package org.openforis.collect.persistence.xml;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
+import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.UIConfiguration.UIConfigurationAdapter;
 import org.openforis.idm.metamodel.Configuration;
 import org.openforis.idm.metamodel.xml.ConfigurationAdapter;
@@ -8,9 +11,10 @@ import org.openforis.idm.metamodel.xml.IdmlBindingContext;
 /**
  * @author G. Miceli
  */
+@XmlRootElement(name = "survey")
 public class CollectIdmlBindingContext extends IdmlBindingContext {
 	public CollectIdmlBindingContext() {
-		super();
+		super(CollectSurvey.class);
 		UIConfigurationAdapter configurationAdapter = new UIConfigurationAdapter();
 		super.setConfigurationAdapter(configurationAdapter);
 	}
@@ -19,4 +23,5 @@ public class CollectIdmlBindingContext extends IdmlBindingContext {
 	public void setConfigurationAdapter(ConfigurationAdapter<? extends Configuration> configurationAdapter) {
 		throw new UnsupportedOperationException();
 	}
+
 }

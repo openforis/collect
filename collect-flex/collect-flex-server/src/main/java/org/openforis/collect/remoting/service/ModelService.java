@@ -7,11 +7,11 @@ import java.util.Locale;
 import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.metamodel.proxy.SurveyProxy;
+import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SurveySummary;
 import org.openforis.collect.session.SessionState;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.SpatialReferenceSystem;
-import org.openforis.idm.metamodel.Survey;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,7 +42,7 @@ public class ModelService {
 	
 	@Transactional
 	public SurveyProxy setActiveSurvey(String name) {
-		Survey survey = surveyManager.get(name);
+		CollectSurvey survey = surveyManager.get(name);
 		SessionState sessionState = sessionManager.getSessionState();
 		sessionState.setActiveSurvey(survey);
 		SurveyProxy proxy = new SurveyProxy(survey);
