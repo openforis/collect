@@ -87,6 +87,16 @@
 				this.definitionsPerTab = new ArrayCollection(temp);
 			}
 			
+			public function resetScrollbars():void {
+				if(currentState == STATE_WITH_TABS) {
+					for each(var form:ScrollableFormContainer in formContainers) {
+						form.resetScrollBars();
+					}
+				} else {
+					formContainer.resetScrollBars();
+				}
+			}
+			
 			private function dropDownLabelFunction(item:Object):String {
 				var result:String;
 				if(item is EntityProxy) {
@@ -96,7 +106,7 @@
 				}
 				return result;
 			}
-
+			
 			[Bindable]
 			public function get entityDefinition():EntityDefinitionProxy {
 				return _entityDefinition;
@@ -188,6 +198,7 @@
 			width="100%" height="100%">
 
 		<detail:ScrollableFormContainer 
+			id="formContainer"
 			modelVersion="{modelVersion}"
 			entityDefinition="{entityDefinition}"
 			nodeDefinitions="{IList(definitionsPerTab.getItemAt(0))}"
@@ -234,6 +245,7 @@
 									  creationPolicy="auto">
 							<mx:Repeater id="tabsRP" dataProvider="{uiTabs}">
 								<detail:ScrollableFormContainer 
+									id="formContainers"
 									modelVersion="{modelVersion}"
 									entityDefinition="{entityDefinition}"
 									nodeDefinitions="{IList(definitionsPerTab.getItemAt(tabsRP.currentIndex + 1))}"
