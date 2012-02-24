@@ -55,7 +55,6 @@ public class DataDao extends JooqDaoSupport {
 					DATA.REMARKS,
 					DATA.SYMBOL
 				)
-				//.values("?", "?", "?", "?", "?", "?", "?", "?", "?");
 				.values(null, null, null, null, null, null, null, null, null);
 			batch = jf.batch(query);
 		}
@@ -104,18 +103,6 @@ public class DataDao extends JooqDaoSupport {
 			Factory jf = getJooqFactory();
 			Integer id = jf.nextval(DATA_ID_SEQ).intValue();
 			batch.bind(id, defnId, recordId, idx, parentId, field, value, remarks, symbol);
-			/*
-			query.addValue(DATA.ID, id);
-			query.addValue(DATA.DEFINITION_ID, defnId);
-			query.addValue(DATA.RECORD_ID, recordId);
-			query.addValue(DATA.POSITION, idx);
-			query.addValue(DATA.PARENT_ID, parentId);
-			query.addValue(DATA.FIELD, field);
-			query.addValue(DATA.VALUE, value);
-			query.addValue(DATA.REMARKS, remarks);
-			query.addValue(DATA.SYMBOL, symbol);
-			query.newRecord();
-			*/
 			return id;
 		}
 		
