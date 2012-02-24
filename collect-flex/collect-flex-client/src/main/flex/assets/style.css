@@ -45,7 +45,35 @@ component|BlockingMessagePopUp {
 	showCloseButton: false;
 }
 
-s|BorderContainer.noError {
+/* validation tooltips */
+mx|ToolTip.error, mx|ToolTip.warning, mx|ToolTip.missing {
+	color: #FFFFFF;
+	fontSize: 9;
+	fontWeight: "bold";	
+	shadowColor: #000000;
+	borderStyle: "errorTipRight";
+	paddingBottom: 4;
+	paddingLeft: 4;
+	paddingRight: 4;
+	paddingTop: 4;
+}
+
+mx|ToolTip.error {
+	borderColor: #CE2929;
+}
+
+mx|ToolTip.warning {
+	borderColor: #FF8800;
+}
+
+input|TextInput.error {
+	borderColor: #FF0000;
+	borderStyle: solid;
+	borderWeight: 2;
+	borderThickness: 2;
+}
+
+input|TextInput.noError {
 	border-color: #FFFFFF;
 }
 
