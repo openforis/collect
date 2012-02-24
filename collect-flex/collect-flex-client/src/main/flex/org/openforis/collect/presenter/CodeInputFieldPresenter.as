@@ -39,10 +39,9 @@ package org.openforis.collect.presenter {
 		private var _view:CodeInputField;
 		private var _items:IList;
 		
-		public function CodeInputFieldPresenter(inputField:CodeInputField) {
-			this._view = inputField;
-			
-			super(inputField);
+		public function CodeInputFieldPresenter(view:CodeInputField) {
+			_view = view;
+			super(view);
 		}
 		
 		override internal function initEventListeners():void {
@@ -117,7 +116,7 @@ package org.openforis.collect.presenter {
 						var firstAttribute:AttributeProxy = _view.attributes.getItemAt(0) as AttributeProxy;
 						var field:FieldProxy = firstAttribute.getField(0);
 						if(field.symbol != null) {
-							var shortKey:String = InputFieldPresenter.getReasonBlankShortKey(field.symbol);
+							var shortKey:String = InputFieldPresenter.getReasonBlankShortCut(field.symbol);
 							if(shortKey != null) {
 								return shortKey;
 							}
@@ -141,7 +140,7 @@ package org.openforis.collect.presenter {
 			if(attribute != null) {
 				var field:FieldProxy = attribute.getField(0);
 				if(field.symbol != null) {
-					var shortKey:String = InputFieldPresenter.getReasonBlankShortKey(field.symbol);
+					var shortKey:String = InputFieldPresenter.getReasonBlankShortCut(field.symbol);
 					return shortKey;
 				} else {
 					var value:CodeProxy = attribute.value as CodeProxy;

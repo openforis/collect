@@ -41,6 +41,26 @@ package org.openforis.collect.util
 			}
 			return -1;
 		}
-
+	
+		public static function removeItem(list:IList, item:Object):int {
+			var index:int = list.getItemIndex(item);
+			if(index >= 0) {
+				list.removeItemAt(index);
+			}
+			return index;
+		}
+		
+		public static function moveItem(list:IList, item:Object, newIndex:int):void {
+			var oldIndex:int = removeItem(list, item);
+			var index:int;
+			if(oldIndex > newIndex) {
+				index = newIndex;
+			} else if(newIndex > 0) {
+				index = newIndex - 1;
+			} else {
+				index = 0;
+			}
+			list.addItemAt(item, index);
+		}
 	}
 }

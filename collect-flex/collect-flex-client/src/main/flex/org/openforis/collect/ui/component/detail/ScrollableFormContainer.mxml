@@ -24,7 +24,9 @@
 			private var _entity:EntityProxy;
 			
 			public function resetScrollBars():void {
-				UIUtil.resetScrollBarsOnScroller(scroller);
+				if(scroller != null) {
+					UIUtil.resetScrollBars(scroller);
+				}
 			}
 			
 			[Bindable]

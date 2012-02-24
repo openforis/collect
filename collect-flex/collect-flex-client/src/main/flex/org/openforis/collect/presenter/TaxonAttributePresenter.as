@@ -109,8 +109,8 @@ package org.openforis.collect.presenter {
 			if(! autoCompletePopUpOpen) {
 				PopUpManager.addPopUp(autoCompletePopUp, FlexGlobals.topLevelApplication as DisplayObject, false);
 				
-				PopUpUtil.alignPopUpToField(autoCompletePopUp, alignField, 
-					PopUpUtil.POSITION_BOTTOM, 
+				PopUpUtil.alignToField(autoCompletePopUp, alignField, 
+					PopUpUtil.POSITION_BELOW, 
 					PopUpUtil.VERTICAL_ALIGN_MIDDLE, 
 					PopUpUtil.HORIZONTAL_ALIGN_LEFT);
 				

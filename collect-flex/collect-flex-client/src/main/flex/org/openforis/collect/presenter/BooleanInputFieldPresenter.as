@@ -50,7 +50,7 @@ package org.openforis.collect.presenter {
 				var field:FieldProxy = attribute.getField(0);
 				var value:Object = field.value;
 				if(field.symbol != null) {
-					var shortKey:String = getReasonBlankShortKey(field.symbol);
+					var shortKey:String = getReasonBlankShortCut(field.symbol);
 					if(shortKey != null) {
 						return shortKey;
 					}

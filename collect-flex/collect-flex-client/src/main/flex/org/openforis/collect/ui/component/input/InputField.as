@@ -1,4 +1,6 @@
 package org.openforis.collect.ui.component.input {
+	import flash.display.DisplayObject;
+	
 	import mx.core.UIComponent;
 	import mx.events.FlexEvent;
 	
@@ -141,7 +143,6 @@ package org.openforis.collect.ui.component.input {
 		}
 
 		public function get validationListener():UIComponent {
-			//return validation result listener
 			return _textInput;
 		}
 		
@@ -196,8 +197,14 @@ package org.openforis.collect.ui.component.input {
 		public function set applyChangesOnFocusOut(value:Boolean):void {
 			_applyChangesOnFocusOut = value;
 		}
-		
-		
+
+		public function get isInDataGroup():Boolean {
+			return _isInDataGroup;
+		}
+
+		public function set isInDataGroup(value:Boolean):void {
+			_isInDataGroup = value;
+		}
 
 	}
 }

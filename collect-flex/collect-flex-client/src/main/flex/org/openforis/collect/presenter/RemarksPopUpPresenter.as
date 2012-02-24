@@ -106,12 +106,12 @@ package org.openforis.collect.presenter
 
 			var alignmentPoint:Point;
 			if(alignToField) {
-				PopUpUtil.alignPopUpToField(view, inputField, PopUpUtil.POSITION_RIGHT, PopUpUtil.VERTICAL_ALIGN_BOTTOM);
+				PopUpUtil.alignToField(view, inputField, PopUpUtil.POSITION_RIGHT, PopUpUtil.VERTICAL_ALIGN_BOTTOM);
 			} else if(alignmentPoint) {
-				PopUpUtil.alignPop(view, alignmentPoint);
+				PopUpUtil.alignToPoint(view, alignmentPoint);
 			} else {
 				//align popup to mouse pointer
-				PopUpUtil.alignPopUpToMousePoint(view, -10, -10);
+				PopUpUtil.alignToMousePoint(view, -10, -10);
 			}
 			
 			popUpOpened = true;
