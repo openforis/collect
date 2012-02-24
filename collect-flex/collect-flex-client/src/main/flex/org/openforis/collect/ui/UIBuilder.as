@@ -200,7 +200,7 @@ package org.openforis.collect.ui {
 					return 100;
 				}
 			} else if(def is DateAttributeDefinitionProxy) {
-				return 150;
+				return 130;
 			} else if(def is FileAttributeDefinitionProxy) {
 				return 300;
 			} else if(def is RangeAttributeDefinitionProxy) {
@@ -222,7 +222,7 @@ package org.openforis.collect.ui {
 						return 100;
 				}
 			} else if(def is TimeAttributeDefinitionProxy) {
-				return 80;
+				return 60;
 			} else {
 				return 100;
 			}
