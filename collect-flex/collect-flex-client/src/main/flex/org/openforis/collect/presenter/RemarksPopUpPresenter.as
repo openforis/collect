@@ -91,10 +91,10 @@ package org.openforis.collect.presenter
 			if(firstOpen) {
 				view = new RemarksPopUp();
 			}
-			//popUp.showReasonBlank = inputField.canShowReasonBlankOnPopUp() && PhaseUtil.currentPhaseCode == PhaseUtil.DATA_ENTRY_CODE;
-			
+			_showReasonBlank = _inputField != null && (_inputField.isEmpty() ||	_inputField.hasBlankReasonSpecified());
+			_inputField = inputField;
+
 			if(! popUpOpened) {
-				this._inputField = inputField;
 				PopUpManager.addPopUp(view, inputField);
 				
 				if(firstOpen) {
@@ -134,7 +134,6 @@ package org.openforis.collect.presenter
 					}
 				}
 			}
-			_showReasonBlank = _inputField != null && (_inputField.isEmpty() ||	_inputField.hasBlankReasonSpecified());
 			if(_showReasonBlank) {
 				view.currentState = RemarksPopUp.STATE_CAN_SPECIFY_REASON_BLANK;
 			} else {
