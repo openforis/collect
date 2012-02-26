@@ -11,14 +11,10 @@ import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Code;
 import org.openforis.idm.model.Coordinate;
-import org.openforis.idm.model.CoordinateAttribute;
 import org.openforis.idm.model.Date;
-import org.openforis.idm.model.DateAttribute;
 import org.openforis.idm.model.Field;
-import org.openforis.idm.model.TaxonAttribute;
 import org.openforis.idm.model.TaxonOccurrence;
 import org.openforis.idm.model.Time;
-import org.openforis.idm.model.TimeAttribute;
 
 /**
  * @author M. Togna
@@ -28,27 +24,27 @@ public class AttributeProxy extends NodeProxy {
 
 	private transient Attribute<? extends AttributeDefinition, ?> attribute;
 
-	@SuppressWarnings("unchecked")
-	public AttributeProxy(@SuppressWarnings("rawtypes") Attribute attribute) {
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public AttributeProxy(Attribute attribute) {
 		super(attribute);
 		this.attribute = attribute;
 	}
 
 	@ExternalizedProperty
-	public Object getValue(){
+	public Object getValue() {
 		Object val = attribute.getValue();
-		if(val != null) {
-			if(val instanceof Code) {
+		if (val != null) {
+			if (val instanceof Code) {
 				return new CodeProxy((Code) val);
-			} else if(val instanceof Coordinate) {
+			} else if (val instanceof Coordinate) {
 				return new CoordinateProxy((Coordinate) val);
-			} else if(val instanceof Date) {
+			} else if (val instanceof Date) {
 				return new DateProxy((Date) val);
-			} else if(val instanceof TaxonOccurrence) {
+			} else if (val instanceof TaxonOccurrence) {
 				return new TaxonOccurrenceProxy((TaxonOccurrence) val);
-			} else if(val instanceof Time) {
+			} else if (val instanceof Time) {
 				return new TimeProxy((Time) val);
-			} else{
+			} else {
 				return val;
 			}
 		} else {
@@ -60,17 +56,17 @@ public class AttributeProxy extends NodeProxy {
 	public boolean isEmpty() {
 		return attribute.isEmpty();
 	}
-	
-	@ExternalizedProperty
-	public boolean isRelevant() {
-		return attribute.isRelevant();
-	}
 
-	@ExternalizedProperty
-	public boolean isRequired() {
-		return attribute.isRequired();
-	}
-	
+	// @ExternalizedProperty
+	// public boolean isRelevant() {
+	// return attribute.isRelevant();
+	// }
+	//
+	// @ExternalizedProperty
+	// public boolean isRequired() {
+	// return attribute.isRequired();
+	// }
+
 	@ExternalizedProperty
 	public List<FieldProxy> getFields() {
 		int fieldCount = attribute.getFieldCount();
@@ -82,6 +78,4 @@ public class AttributeProxy extends NodeProxy {
 		return result;
 	}
 
-
-	
 }

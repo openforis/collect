@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+<s:SkinnableContainer 
+				xmlns:fx="http://ns.adobe.com/mxml/2009" 
 				xmlns:s="library://ns.adobe.com/flex/spark" 
 				xmlns:mx="library://ns.adobe.com/flex/mx"
 				creationComplete="creationCompleteHandler(event)"
@@ -14,7 +15,16 @@
 			import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
 			import org.openforis.collect.model.proxy.AttributeProxy;
 			import org.openforis.collect.model.proxy.EntityProxy;
+			import org.openforis.collect.presenter.AttributePresenter;
 			
+			import spark.components.BorderContainer;
+			
+			public static const STYLE_NAME_NORMAL:String = "normal";
+			public static const STYLE_NAME_DISABLED:String = "disabled";
+			public static const STYLE_NAME_NOT_RELEVANT:String = "notRelevant";
+			public static const STYLE_NAME_ERROR:String = "error"; 
+			public static const STYLE_NAME_WARNING:String = "warning";
+
 			private var _direction:String;
 			private var _attributeDefinition:AttributeDefinitionProxy;
 			private var _modelVersion:ModelVersionProxy;
@@ -24,14 +34,22 @@
 			private var _isInDataGroup:Boolean = false;
 			private var _internalLabelWidth:Number = 130;
 			private var _presenter:*;
-				
+			
 			protected function creationCompleteHandler(event:FlexEvent):void {
 				initPresenter();
 			}
 
-			protected function initPresenter():void {
+			override protected function getCurrentSkinState():String {
+				return super.getCurrentSkinState();
 			}
 			
+			protected function initPresenter():void {
+				presenter = new AttributePresenter(this);
+			}
+			
+			/**
+			 * Getters and setters
+			 */
 			[Bindable]
 			public function get direction():String {
 				return _direction;
@@ -86,6 +104,15 @@
 				_attribute = value;
 			}
 
+			[Bindable]
+			public function get attributes():IList {
+				return _attributes;
+			}
+			
+			public function set attributes(value:IList):void {
+				_attributes = value;
+			}
+			
 			public function get presenter():* {
 				return _presenter;
 			}
@@ -99,4 +126,4 @@
 	</fx:Script>
 	
 	
-</s:Group>
+</s:SkinnableContainer>

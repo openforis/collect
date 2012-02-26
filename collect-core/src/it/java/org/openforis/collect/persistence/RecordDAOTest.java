@@ -13,9 +13,9 @@ import org.apache.commons.logging.LogFactory;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
+import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.persistence.xml.CollectIdmlBindingContext;
 import org.openforis.idm.metamodel.EntityDefinition;
-import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.xml.InvalidIdmlException;
 import org.openforis.idm.model.Code;
 import org.openforis.idm.model.Coordinate;
@@ -45,7 +45,7 @@ public class RecordDAOTest {
 	@Autowired
 	protected RecordManager recordManager;
 	
-	private Survey survey;
+	private CollectSurvey survey;
 	
 	private List<CollectRecord> sampleRecords;
 	
@@ -150,7 +150,7 @@ public class RecordDAOTest {
 		}
 	}
 
-	private CollectRecord createRecord(Survey survey, int sequenceNumber) {
+	private CollectRecord createRecord(CollectSurvey survey, int sequenceNumber) {
 		int skippedCount = new Double(Math.ceil((double) (Math.random() * 40))).intValue();
 		int missingCount = new Double(Math.ceil((double) (Math.random() * 50))).intValue();
 		int errorsCount = new Double(Math.ceil((double) (Math.random() * 10))).intValue();

@@ -45,8 +45,53 @@ component|BlockingMessagePopUp {
 	showCloseButton: false;
 }
 
-s|BorderContainer.noError {
-	border-color: #FFFFFF;
+/* validation tooltips */
+mx|ToolTip.error, mx|ToolTip.warning, mx|ToolTip.missing {
+	color: #FFFFFF;
+	fontSize: 9;
+	fontWeight: "bold";	
+	shadowColor: #000000;
+	borderStyle: "errorTipRight";
+	paddingBottom: 4;
+	paddingLeft: 4;
+	paddingRight: 4;
+	paddingTop: 4;
+}
+
+mx|ToolTip.error {
+	borderColor: #CE2929;
+}
+
+mx|ToolTip.warning {
+	borderColor: #FF8800;
+}
+
+detail|AttributeItemRenderer {
+	skinClass: ClassReference("org.openforis.collect.ui.skin.AttributeRendererSkin");
+	borderColor: #FFFFFF;
+	borderWeight: 1;
+}
+
+detail|AttributeItemRenderer.error {
+	borderColor: #FF0000;
+}
+
+detail|AttributeItemRenderer.warning {
+	borderColor: #FF8800;
+}
+
+input|TextInput.error, input|TextInput.warning {
+	borderStyle: solid;
+	borderWeight: 1;
+	borderThickness: 1;
+}
+
+input|TextInput.error {
+	borderColor: #FF0000;
+}
+
+input|TextInput.warning {
+	borderColor: #FF8800;
 }
 
 s|BorderContainer.entityForm {
@@ -76,6 +121,10 @@ s|Button.deleteButton {
 
 input|RemarksPopUp {
 	skin-class: ClassReference("org.openforis.collect.ui.skin.RemarksPopUpSkin");
+}
+
+input|TaxonAutoCompletePopUp {
+	skin-class: ClassReference("org.openforis.collect.ui.skin.TaxonAutoCompletePopUpSkin");
 }
 
 s|Label.bold {

@@ -3,12 +3,17 @@ package org.openforis.collect.model;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
-import org.openforis.idm.metamodel.Survey;
+import org.openforis.idm.metamodel.validation.Validator;
+import org.openforis.idm.model.Node;
 import org.openforis.idm.model.Record;
 import org.openforis.idm.model.RecordContext;
+import org.openforis.idm.model.state.ModelDependencies;
+import org.openforis.idm.model.state.NodeState;
 
 /**
  * @author G. Miceli
@@ -17,21 +22,21 @@ public class CollectRecord extends Record {
 
 	public enum Step {
 		ENTRY(1), CLEANSING(2), ANALYSIS(3);
-		
+
 		private int stepNumber;
-		
+
 		private Step(int stepNumber) {
 			this.stepNumber = stepNumber;
 		}
-		
+
 		public int getStepNumber() {
 			return stepNumber;
 		}
-		
+
 		public static Step valueOf(int stepNumber) {
 			Step[] values = Step.values();
 			for (Step step : values) {
-				if(step.getStepNumber() == stepNumber) {
+				if (step.getStepNumber() == stepNumber) {
 					return step;
 				}
 			}
@@ -40,10 +45,9 @@ public class CollectRecord extends Record {
 	}
 
 	private Step step;
-	private Map<Integer, NodeState> nodeStateMap;
 	// TODO Replace submitted flag with state enum
 	private boolean submitted;
-	
+
 	private Date creationDate;
 	private User createdBy;
 	private Date modifiedDate;
@@ -52,41 +56,78 @@ public class CollectRecord extends Record {
 	private Integer skipped;
 	private Integer errors;
 	private Integer warnings;
-	
+
 	private List<String> rootEntityKeys;
 	private List<Integer> entityCounts;
-	
-	public CollectRecord(RecordContext context, Survey survey, String versionName) {
+	private Map<Integer, NodeState> nodeStateMap;
+	private CollectSurvey collectSurvey;
+
+	public CollectRecord(RecordContext context, CollectSurvey survey, String versionName) {
 		super(context, survey, versionName);
+		this.collectSurvey = survey;
 		this.step = Step.ENTRY;
 		this.submitted = false;
 
-		//use List to preserve the order of the keys and counts
+		// use List to preserve the order of the keys and counts
 		rootEntityKeys = new ArrayList<String>();
 		entityCounts = new ArrayList<Integer>();
 		nodeStateMap = new HashMap<Integer, NodeState>();
+
+	}
+
+	public NodeState getNodeState(int nodeItenralId) {
+		return nodeStateMap.get(nodeItenralId);
+	}
+
+	public List<NodeState> updateNodeState(Node<?> node) {
+		List<NodeState> nodeStates = new ArrayList<NodeState>();
+		Set<Integer> ids = new HashSet<Integer>();
+		internalRefreshState(node, ids, nodeStates);
+		return nodeStates;
+	}
+
+	public List<NodeState> deleteNodeState(Node<?> node) {
+		List<NodeState> nodeStates = new ArrayList<NodeState>();
+		Set<Integer> ids = new HashSet<Integer>();
+		refreshDependentNodesState(node, ids, nodeStates);
+		return nodeStates;
+	}
+
+	private void refreshDependentNodesState(Node<?> node, Set<Integer> updatedNodeIds, List<NodeState> nodeStates) {
+		ModelDependencies dependencies = collectSurvey.getModelDependencies();
+		Set<Node<?>> dependentNodes = dependencies.getDependantNodes(node);
+		for (Node<?> dependentNode : dependentNodes) {
+			internalRefreshState(dependentNode, updatedNodeIds, nodeStates);
+		}
+	}
+
+	private void internalRefreshState(Node<?> node, Set<Integer> updatedNodeIds, List<NodeState> nodeStates) {
+		Integer nodeId = node.getInternalId();
+		if (!updatedNodeIds.contains(nodeId)) {
+			NodeState nodeState = new NodeState(node);
+			nodeState.update(getValidator());
+			nodeStateMap.put(nodeId, nodeState);
+			nodeStates.add(nodeState);
+			updatedNodeIds.add(nodeId);
+
+			refreshDependentNodesState(node, updatedNodeIds, nodeStates);
+		}
+	}
+
+	private Validator getValidator() {
+		RecordContext context = getContext();
+		Validator validator = context.getValidator();
+		return validator;
 	}
 
 	public void setSubmitted(boolean submitted) {
 		this.submitted = submitted;
 	}
 
-	public NodeState getNodeState(int nodeId){
-		return nodeStateMap.get(nodeId);
-	}
-	
-	public void setNodeState(int nodeId, NodeState nodeState){
-		nodeStateMap.put(nodeId, nodeState);
-	}
-	
-	public NodeState clearNodeState(int nodeId){
-		return nodeStateMap.remove(nodeId);
-	}
-	
 	public boolean isSubmitted() {
 		return submitted;
 	}
-	
+
 	public Step getStep() {
 		return step;
 	}
@@ -126,54 +167,53 @@ public class CollectRecord extends Record {
 	public void setModifiedBy(User modifiedBy) {
 		this.modifiedBy = modifiedBy;
 	}
-	
+
 	public Integer getSkipped() {
 		return skipped;
 	}
-	
+
 	public void setSkipped(Integer skipped) {
 		this.skipped = skipped;
 	}
-	
+
 	public Integer getMissing() {
 		return missing;
 	}
-	
+
 	public void setMissing(Integer missing) {
 		this.missing = missing;
 	}
-	
+
 	public Integer getErrors() {
 		return errors;
 	}
-	
+
 	public void setErrors(Integer errors) {
 		this.errors = errors;
 	}
-	
+
 	public Integer getWarnings() {
 		return warnings;
 	}
-	
+
 	public void setWarnings(Integer warnings) {
 		this.warnings = warnings;
 	}
-	
+
 	public List<String> getRootEntityKeys() {
 		return rootEntityKeys;
 	}
-	
+
 	public void setKeys(List<String> keys) {
 		this.rootEntityKeys = keys;
 	}
-	
+
 	public List<Integer> getEntityCounts() {
 		return entityCounts;
 	}
-	
+
 	public void setEntityCounts(List<Integer> counts) {
 		this.entityCounts = counts;
 	}
-	
-}
 
+}

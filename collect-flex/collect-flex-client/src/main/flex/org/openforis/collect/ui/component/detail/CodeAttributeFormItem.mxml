@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<detail:AttributeFormItem xmlns:fx="http://ns.adobe.com/mxml/2009" 
+<detail:SingleAttributeFormItem xmlns:fx="http://ns.adobe.com/mxml/2009" 
 						  xmlns:s="library://ns.adobe.com/flex/spark" 
 						  xmlns:mx="library://ns.adobe.com/flex/mx" 
 						  xmlns:detail="org.openforis.collect.ui.component.detail.*" 
@@ -9,35 +9,22 @@
 	<fx:Script>
 		<![CDATA[
 			import mx.binding.utils.BindingUtils;
-			import mx.events.FlexEvent;
 			
+			import org.openforis.collect.metamodel.proxy.CodeAttributeDefinitionProxy;
 			import org.openforis.collect.ui.UIBuilder;
-			import org.openforis.collect.ui.component.input.CodeInputField;
-			import org.openforis.collect.ui.component.input.InputField;
 			
 			override protected function createChildren():void {
 				if(!childrenAdded) {
 					super.createChildren();
-					
-					var inputField:InputField = UIBuilder.getInputField(attributeDefinition, isInDataGroup);
-					
-					BindingUtils.bindProperty(inputField, "parentEntity", this, "parentEntity");
-					BindingUtils.bindProperty(inputField, "attribute", this, "attribute");
-					
-					if(attributeDefinition != null && attributeDefinition.multiple && inputField is CodeInputField) {
-						BindingUtils.bindProperty(inputField, "attributes", this, "attributes");
+					if(attributeDefinition != null && 
+						attributeDefinition.multiple && 
+						attributeDefinition is CodeAttributeDefinitionProxy) {
+						BindingUtils.bindProperty(renderer, "attributes", this, "attributes");
 					}
-					
-					addElement(inputField);
-					if(inputField is CodeInputField) {
-						inputField.currentState = isInDataGroup ? CodeInputField.STATE_DEFAULT: CodeInputField.STATE_DESCRIPTION_VISIBLE;
-					}
-					
-					childrenAdded = true;
 				}
 			}
 			
 		]]>
 	</fx:Script>
 
-</detail:AttributeFormItem>
+</detail:SingleAttributeFormItem>

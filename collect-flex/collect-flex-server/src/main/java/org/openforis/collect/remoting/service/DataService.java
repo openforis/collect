@@ -16,6 +16,7 @@ import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.metamodel.proxy.CodeListItemProxy;
 import org.openforis.collect.model.CollectRecord;
+import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.User;
 import org.openforis.collect.model.proxy.AttributeSymbol;
 import org.openforis.collect.model.proxy.NodeProxy;
@@ -41,7 +42,6 @@ import org.openforis.idm.metamodel.NumberAttributeDefinition;
 import org.openforis.idm.metamodel.NumberAttributeDefinition.Type;
 import org.openforis.idm.metamodel.RangeAttributeDefinition;
 import org.openforis.idm.metamodel.Schema;
-import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.TaxonAttributeDefinition;
 import org.openforis.idm.metamodel.TimeAttributeDefinition;
 import org.openforis.idm.model.Attribute;
@@ -71,7 +71,7 @@ public class DataService {
 
 	@Transactional
 	public RecordProxy loadRecord(int id) throws RecordLockedException, MultipleEditException, NonexistentIdException, AccessDeniedException {
-		Survey survey = getActiveSurvey();
+		CollectSurvey survey = getActiveSurvey();
 		User user = getUserInSession();
 		CollectRecord record = recordManager.checkout(survey, user, id);
 		Entity rootEntity = record.getRootEntity();
@@ -97,7 +97,7 @@ public class DataService {
 	public Map<String, Object> getRecordSummaries(String rootEntityName, int offset, int maxNumberOfRows, String orderByFieldName, String filter) {
 		Map<String, Object> result = new HashMap<String, Object>();
 		SessionState sessionState = sessionManager.getSessionState();
-		Survey activeSurvey = sessionState.getActiveSurvey();
+		CollectSurvey activeSurvey = sessionState.getActiveSurvey();
 		Schema schema = activeSurvey.getSchema();
 		EntityDefinition rootEntityDefinition = schema.getRootEntityDefinition(rootEntityName);
 		String rootEntityDefinitionName = rootEntityDefinition.getName();
@@ -116,7 +116,7 @@ public class DataService {
 	public RecordProxy createRecord(String rootEntityName, String versionName) throws MultipleEditException, AccessDeniedException, RecordLockedException {
 		SessionState sessionState = sessionManager.getSessionState();
 		User user = sessionState.getUser();
-		Survey activeSurvey = sessionState.getActiveSurvey();
+		CollectSurvey activeSurvey = sessionState.getActiveSurvey();
 		ModelVersion version = activeSurvey.getVersion(versionName);
 		Schema schema = activeSurvey.getSchema();
 		EntityDefinition rootEntityDefinition = schema.getRootEntityDefinition(rootEntityName);
@@ -192,10 +192,12 @@ public class DataService {
 				updatedNodes = addNode(version, parentEntity, nodeDef, value, fieldIndex, symbol, remarks);
 				break;
 			case UPDATE: 
-				if(node instanceof CodeAttribute) {
+				if(nodeDef instanceof CodeAttributeDefinition) {
 					removedNodes = removeNodes(parentEntity, nodeName);
+					updatedNodes = addNode(version, parentEntity, nodeDef, value, fieldIndex, symbol, remarks);
+				} else {
+					updatedNodes = updateNode(parentEntity, node, fieldIndex, value, symbol, remarks);
 				}
-				updatedNodes = updateNode(parentEntity, node, fieldIndex, value, symbol, remarks);
 				break;
 			case UPDATE_SYMBOL:
 				//update attribute value
@@ -515,9 +517,9 @@ public class DataService {
 		return user;
 	}
 
-	private Survey getActiveSurvey() {
+	private CollectSurvey getActiveSurvey() {
 		SessionState sessionState = getSessionManager().getSessionState();
-		Survey activeSurvey = sessionState.getActiveSurvey();
+		CollectSurvey activeSurvey = sessionState.getActiveSurvey();
 		return activeSurvey;
 	}
 

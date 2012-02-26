@@ -14,22 +14,18 @@ package org.openforis.collect.presenter {
 	 * 
 	 * @author S. Ricci
 	 * */
-	public class DateAttributePresenter extends AbstractPresenter {
-		
-		private var _view:DateAttributeRenderer;
+	public class DateAttributePresenter extends AttributePresenter {
 		
 		public function DateAttributePresenter(view:DateAttributeRenderer) {
-			_view = view;
-			
-			super();
+			super(view);
 		}
 		
 		override internal function initEventListeners():void {
 			super.initEventListeners();
 			
 			//dateField (calendar button)
-			_view.dateField.addEventListener(CalendarLayoutChangeEvent.CHANGE, dateFieldChangeHandler);
-			_view.dateField.addEventListener(DropDownEvent.OPEN, dateFieldOpenHandler);
+			view.dateField.addEventListener(CalendarLayoutChangeEvent.CHANGE, dateFieldChangeHandler);
+			view.dateField.addEventListener(DropDownEvent.OPEN, dateFieldOpenHandler);
 		}
 		
 		private function get view():DateAttributeRenderer {
@@ -39,7 +35,7 @@ package org.openforis.collect.presenter {
 		protected function dateFieldOpenHandler(event:Event):void {
 			var date:Date = getDateFromFields();
 			if(date != null){
-				_view.dateField.selectedDate = date;
+				view.dateField.selectedDate = date;
 			}
 		}
 		
@@ -49,9 +45,9 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function setDateOnFields(year:Number, month:Number, day:Number):void {
-			_view.year.text = StringUtil.zeroPad(year, 2);
-			_view.month.text = StringUtil.zeroPad(month, 2);
-			_view.day.text = StringUtil.zeroPad(day, 2);
+			view.year.text = StringUtil.zeroPad(year, 2);
+			view.month.text = StringUtil.zeroPad(month, 2);
+			view.day.text = StringUtil.zeroPad(day, 2);
 			view.year.applyChanges();
 			view.month.applyChanges();
 			view.day.applyChanges();
@@ -59,10 +55,10 @@ package org.openforis.collect.presenter {
 		
 		protected function getDateFromFields():Date {
 			//check if input text is valid
-			if(StringUtil.isNotBlank(_view.day.text) && 
-				StringUtil.isNotBlank(_view.month.text) && 
-				StringUtil.isNotBlank(_view.year.text)) {
-				var tempDate:Date = new Date(_view.year.text, int(_view.month.text) - 1, _view.day.text);
+			if(StringUtil.isNotBlank(view.day.text) && 
+				StringUtil.isNotBlank(view.month.text) && 
+				StringUtil.isNotBlank(view.year.text)) {
+				var tempDate:Date = new Date(view.year.text, int(view.month.text) - 1, view.day.text);
 				return tempDate;
 			}
 			return null;

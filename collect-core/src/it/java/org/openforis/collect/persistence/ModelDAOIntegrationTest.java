@@ -18,6 +18,7 @@ import org.junit.runner.RunWith;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
+import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.persistence.xml.CollectIdmlBindingContext;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.Survey;
@@ -55,7 +56,7 @@ public class ModelDAOIntegrationTest {
 	public void testCRUD() throws Exception  {
 //		try {
 		// LOAD MODEL
-		Survey survey = surveyDao.load("archenland1");
+		CollectSurvey survey = surveyDao.load("archenland1");
 
 		if ( survey == null ) {
 			// IMPORT MODEL
@@ -90,7 +91,7 @@ public class ModelDAOIntegrationTest {
 	}
 
 	private void testLoadAllSurveys(String surveyName) {
-		List<Survey> list = this.surveyDao.loadAll();
+		List<CollectSurvey> list = this.surveyDao.loadAll();
 		assertNotNull(list);
 		for (Survey survey : list) {
 			if ( survey.getName().equals(surveyName) ) {
@@ -112,17 +113,17 @@ public class ModelDAOIntegrationTest {
 		assertNull(survey);
 	}
 
-	private Survey importModel() throws IOException, SurveyImportException, InvalidIdmlException {
+	private CollectSurvey importModel() throws IOException, SurveyImportException, InvalidIdmlException {
 		URL idm = ClassLoader.getSystemResource("test.idm.xml");
 		InputStream is = idm.openStream();
 		CollectIdmlBindingContext idmlBindingContext = new CollectIdmlBindingContext();
 		SurveyUnmarshaller surveyUnmarshaller = idmlBindingContext.createSurveyUnmarshaller();
-		Survey survey = surveyUnmarshaller.unmarshal(is);
+		CollectSurvey survey = (CollectSurvey) surveyUnmarshaller.unmarshal(is);
 		surveyDao.importModel(survey);
 		return survey;
 	}
 
-	private CollectRecord createTestRecord(Survey survey) {
+	private CollectRecord createTestRecord(CollectSurvey survey) {
 		CollectRecord record = new CollectRecord(recordManager, survey, "2.0");
 		Entity cluster = record.createRootEntity("cluster");
 		record.setCreationDate(new GregorianCalendar(2011, 12, 31, 23, 59).getTime());
@@ -195,7 +196,7 @@ public class ModelDAOIntegrationTest {
 
 //	@Test
 	public void testLoadRecordSummaries() {
-		Survey survey = surveyDao.load("archenland1");
+		CollectSurvey survey = surveyDao.load("archenland1");
 		//get the first root entity
 		EntityDefinition rootEntity = survey.getSchema().getRootEntityDefinitions().get(0);
 		String rootEntityName = rootEntity.getName();

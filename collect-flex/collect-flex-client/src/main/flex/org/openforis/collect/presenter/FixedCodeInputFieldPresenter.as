@@ -58,7 +58,7 @@ package org.openforis.collect.presenter {
 			super.updateView();
 		}
 		
-		override protected function getTextValue():String {
+		override protected function valueToText():String {
 			if(_items == null) {
 				updateDescription();
 			}

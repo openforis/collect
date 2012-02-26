@@ -1,5 +1,4 @@
 package org.openforis.collect.presenter {
-	import flash.display.DisplayObjectContainer;
 	import flash.events.Event;
 	import flash.events.FocusEvent;
 	import flash.events.KeyboardEvent;
@@ -7,40 +6,33 @@ package org.openforis.collect.presenter {
 	import flash.ui.Keyboard;
 	
 	import mx.binding.utils.ChangeWatcher;
-	import mx.collections.ArrayList;
 	import mx.collections.IList;
-	import mx.core.UIComponent;
+	import mx.core.IToolTip;
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.IResponder;
 	import mx.rpc.events.FaultEvent;
 	import mx.rpc.events.ResultEvent;
 	
-	import org.granite.collections.IMap;
 	import org.openforis.collect.Application;
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.client.DataClient;
 	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.event.InputFieldEvent;
-	import org.openforis.collect.event.UIEvent;
 	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 	import org.openforis.collect.model.proxy.AttributeProxy;
 	import org.openforis.collect.model.proxy.AttributeSymbol;
-	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.model.proxy.FieldProxy;
+	import org.openforis.collect.model.proxy.ValidationResultsProxy;
 	import org.openforis.collect.remoting.service.UpdateRequest;
 	import org.openforis.collect.remoting.service.UpdateRequest$Method;
 	import org.openforis.collect.ui.ContextMenuBuilder;
-	import org.openforis.collect.ui.component.detail.AttributeFormItem;
-	import org.openforis.collect.ui.component.detail.EntityFormItem;
-	import org.openforis.collect.ui.component.detail.MultipleAttributeFormItem;
-	import org.openforis.collect.ui.component.detail.MultipleEntityFormItem;
 	import org.openforis.collect.ui.component.input.InputField;
-	import org.openforis.collect.ui.component.input.TextInput;
+	import org.openforis.collect.util.ArrayUtil;
 	import org.openforis.collect.util.CollectionUtil;
+	import org.openforis.collect.util.ReasonBlankUtil;
 	import org.openforis.collect.util.StringUtil;
+	import org.openforis.collect.util.ToolTipUtil;
 	import org.openforis.collect.util.UIUtil;
-	
-	import spark.components.supportClasses.ItemRenderer;
 	
 	/**
 	 * 
@@ -57,10 +49,10 @@ package org.openforis.collect.presenter {
 		public function InputFieldPresenter(inputField:InputField = null) {
 			_view = inputField;
 			_dataClient = ClientFactory.dataClient;
-			super();
 			
 			_updateResponder = new AsyncResponder(updateResultHandler, updateFaultHandler);
 			
+			super();
 			updateView();
 		}
 		
@@ -121,23 +113,28 @@ package org.openforis.collect.presenter {
 		}
 		
 		public function applyChanges():void {
-			var req:UpdateRequest = new UpdateRequest();
-			var def:AttributeDefinitionProxy = _view.attributeDefinition;
-			req.parentEntityId = _view.parentEntity.id;
-			req.nodeName = def.name;
-			req.value = createRequestValue();
-			req.fieldIndex = _view.fieldIndex;
-			if(_view.attribute != null) {
-				var a:AttributeProxy = _view.attribute;
-				var field:FieldProxy = a.getField(_view.fieldIndex);
-				req.nodeId = a.id;
-				req.method = UpdateRequest$Method.UPDATE;
-				//preserve remarks
-				req.remarks = field.remarks;
+			if(ReasonBlankUtil.isShortCut(_view.text)) {
+				var symbol:AttributeSymbol = ReasonBlankUtil.parseShortCut(_view.text);
+				changeSymbol(symbol);
 			} else {
-				req.method = UpdateRequest$Method.ADD;
+				var req:UpdateRequest = new UpdateRequest();
+				var def:AttributeDefinitionProxy = _view.attributeDefinition;
+				req.parentEntityId = _view.parentEntity.id;
+				req.nodeName = def.name;
+				req.value = textToRequestValue();
+				req.fieldIndex = _view.fieldIndex;
+				if(_view.attribute != null) {
+					var a:AttributeProxy = _view.attribute;
+					var field:FieldProxy = a.getField(_view.fieldIndex);
+					req.nodeId = a.id;
+					req.method = UpdateRequest$Method.UPDATE;
+					//preserve remarks
+					req.remarks = field.remarks;
+				} else {
+					req.method = UpdateRequest$Method.ADD;
+				}
+				dataClient.updateActiveRecord(_updateResponder, req);
 			}
-			dataClient.updateActiveRecord(_updateResponder, req);
 		}
 		
 		public function undoLastChange():void {
@@ -164,12 +161,12 @@ package org.openforis.collect.presenter {
 			faultHandler(event, token);
 		}
 		
-		protected function getTextValue():String {
+		protected function valueToText():String {
 			var attribute:AttributeProxy = _view.attribute;
 			if(attribute != null) {
 				var field:FieldProxy = _view.attribute.getField(_view.fieldIndex);
 				if(field.symbol != null) {
-					var shortKey:String = getReasonBlankShortKey(field.symbol);
+					var shortKey:String = ReasonBlankUtil.getShortCut(field.symbol);
 					if(shortKey != null) {
 						return shortKey;
 					}
@@ -182,7 +179,7 @@ package org.openforis.collect.presenter {
 			return "";
 		}
 
-		protected function createRequestValue():String {
+		protected function textToRequestValue():String {
 			var result:String = null;
 			var text:String = _view.text;
 			if(StringUtil.isNotBlank(text)) {
@@ -209,15 +206,16 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function updateView():void {
-			//update textInput in view (generic text value)
+			//update view according to attribute (generic text value)
+			
 			if(_view.attributeDefinition != null) {
-				var text:String = getTextValue();
+				var text:String = valueToText();
 				_view.text = text;
 				if(_view.attribute != null) {
 					var a:AttributeProxy = _view.attribute;
-					//TODO remarks
-					var field:FieldProxy = _view.attribute.getField(_view.fieldIndex);
-					if(StringUtil.isNotBlank(field.remarks)) {
+					//TODO show remarks icon on field
+					var f:FieldProxy = field;
+					if(StringUtil.isNotBlank(f.remarks)) {
 						
 					}
 				}
@@ -225,16 +223,9 @@ package org.openforis.collect.presenter {
 			}
 		}
 		
-		public static function getReasonBlankShortKey(symbol:AttributeSymbol):String {
-			if(symbol != null) {
-				switch(symbol) {
-					case AttributeSymbol.BLANK_ON_FORM:
-						return '*';
-					case AttributeSymbol.DASH_ON_FORM:
-						return '-';
-					case AttributeSymbol.ILLEGIBLE:
-						return '?';
-				}
+		protected function get field():FieldProxy {
+			if(_view.attribute != null && _view.fieldIndex >= 0) {
+				return _view.attribute.getField(_view.fieldIndex);
 			}
 			return null;
 		}
@@ -251,5 +242,5 @@ package org.openforis.collect.presenter {
 		public function set changed(value:Boolean):void {
 			_changed = value;
 		}
-}
+	}
 }

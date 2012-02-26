@@ -6,8 +6,8 @@ package org.openforis.collect.session;
 import java.util.Locale;
 
 import org.openforis.collect.model.CollectRecord;
+import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.User;
-import org.openforis.idm.metamodel.Survey;
 
 /**
  * @author M. Togna
@@ -16,15 +16,15 @@ import org.openforis.idm.metamodel.Survey;
 public class SessionState {
 
 	public static String SESSION_ATTRIBUTE_NAME = "sessionState";
-	
+
 	public enum RecordState {
 		NEW, SAVED
 	}
-	
+
 	private User user;
 	private String sessionId;
 	private CollectRecord activeRecord;
-	private Survey activeSurvey;
+	private CollectSurvey activeSurvey;
 	private Locale locale;
 	private RecordState activeRecordState;
 
@@ -52,11 +52,11 @@ public class SessionState {
 		this.activeRecord = activeRecord;
 	}
 
-	public Survey getActiveSurvey() {
+	public CollectSurvey getActiveSurvey() {
 		return activeSurvey;
 	}
 
-	public void setActiveSurvey(Survey activeSurvey) {
+	public void setActiveSurvey(CollectSurvey activeSurvey) {
 		this.activeSurvey = activeSurvey;
 	}
 

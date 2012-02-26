@@ -10,10 +10,12 @@
 			
 			import org.openforis.collect.ui.UIBuilder;
 			
+			protected var renderer:AttributeItemRenderer;
+			
 			override protected function createChildren():void {
 				if(!childrenAdded) {
 					super.createChildren();
-					var renderer:AttributeItemRenderer = UIBuilder.getAttributeItemRenderer(attributeDefinition, isInDataGroup);
+					renderer = UIBuilder.getAttributeItemRenderer(attributeDefinition, isInDataGroup);
 					BindingUtils.bindProperty(renderer, "attributeDefinition", this, "attributeDefinition");
 					BindingUtils.bindProperty(renderer, "parentEntity", this, "parentEntity");
 					BindingUtils.bindProperty(renderer, "attribute", this, "attribute");

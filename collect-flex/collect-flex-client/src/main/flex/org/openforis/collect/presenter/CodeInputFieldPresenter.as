@@ -17,6 +17,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.metamodel.proxy.CodeAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.CodeListItemProxy;
 	import org.openforis.collect.model.proxy.AttributeProxy;
+	import org.openforis.collect.model.proxy.AttributeSymbol;
 	import org.openforis.collect.model.proxy.CodeProxy;
 	import org.openforis.collect.model.proxy.FieldProxy;
 	import org.openforis.collect.remoting.service.UpdateRequest;
@@ -26,6 +27,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.ui.component.input.TextInput;
 	import org.openforis.collect.util.ArrayUtil;
 	import org.openforis.collect.util.CollectionUtil;
+	import org.openforis.collect.util.ReasonBlankUtil;
 	import org.openforis.collect.util.StringUtil;
 	
 	/**
@@ -39,10 +41,9 @@ package org.openforis.collect.presenter {
 		private var _view:CodeInputField;
 		private var _items:IList;
 		
-		public function CodeInputFieldPresenter(inputField:CodeInputField) {
-			this._view = inputField;
-			
-			super(inputField);
+		public function CodeInputFieldPresenter(view:CodeInputField) {
+			_view = view;
+			super(view);
 		}
 		
 		override internal function initEventListeners():void {
@@ -106,20 +107,20 @@ package org.openforis.collect.presenter {
 			}
 			var codesStr:String = StringUtil.concat(", ", parts);
 			TextInput(_popUp.codeInputField.textInput).text = codesStr;
-			_popUp.codeInputField.presenter.applyChanges();
+			_popUp.codeInputField.applyChanges();
 			closePopupHandler();
 		}
 		
-		override protected function getTextValue():String {
+		override protected function valueToText():String {
 			if(_view.attributeDefinition != null) {
 				if(_view.attributeDefinition.multiple) {
 					if(CollectionUtil.isNotEmpty(_view.attributes)) {
 						var firstAttribute:AttributeProxy = _view.attributes.getItemAt(0) as AttributeProxy;
 						var field:FieldProxy = firstAttribute.getField(0);
 						if(field.symbol != null) {
-							var shortKey:String = InputFieldPresenter.getReasonBlankShortKey(field.symbol);
-							if(shortKey != null) {
-								return shortKey;
+							var shortCut:String = ReasonBlankUtil.getShortCut(field.symbol);
+							if(shortCut != null) {
+								return shortCut;
 							}
 						}
 						var parts:Array = new Array();
@@ -141,14 +142,15 @@ package org.openforis.collect.presenter {
 			if(attribute != null) {
 				var field:FieldProxy = attribute.getField(0);
 				if(field.symbol != null) {
-					var shortKey:String = InputFieldPresenter.getReasonBlankShortKey(field.symbol);
-					return shortKey;
-				} else {
-					var value:CodeProxy = attribute.value as CodeProxy;
-					if(value != null) {
-						var text:String = value.toString();
-						return text;
+					var shortCut:String = ReasonBlankUtil.getShortCut(field.symbol);
+					if(shortCut != null) {
+						return shortCut;
 					}
+				}
+				var value:CodeProxy = attribute.value as CodeProxy;
+				if(value != null) {
+					var text:String = value.toString();
+					return text;
 				}
 			}
 			return "";
@@ -160,22 +162,27 @@ package org.openforis.collect.presenter {
 		}
 		
 		override public function applyChanges():void {
-			var req:UpdateRequest = new UpdateRequest();
-			var def:AttributeDefinitionProxy = _view.attributeDefinition;
-			req.parentEntityId = _view.parentEntity.id;
-			req.nodeName = def.name;
-			req.value = createRequestValue();
-			req.fieldIndex = NaN; //ignore field index, update the entire code or list of codes
-			if(_view.attribute != null || (CollectionUtil.isNotEmpty(_view.attributes))) {
-				if(! def.multiple) {
-					req.nodeId = _view.attribute.id;
-				}
-				req.method = UpdateRequest$Method.UPDATE;
+			if(ReasonBlankUtil.isShortCut(_view.text)) {
+				var symbol:AttributeSymbol = ReasonBlankUtil.parseShortCut(_view.text);
+				changeSymbol(symbol);
 			} else {
-				req.method = UpdateRequest$Method.ADD;
+				var req:UpdateRequest = new UpdateRequest();
+				var def:AttributeDefinitionProxy = _view.attributeDefinition;
+				req.parentEntityId = _view.parentEntity.id;
+				req.nodeName = def.name;
+				req.value = textToRequestValue();
+				req.fieldIndex = NaN; //ignore field index, update the entire code or list of codes
+				if(_view.attribute != null || (CollectionUtil.isNotEmpty(_view.attributes))) {
+					if(! def.multiple) {
+						req.nodeId = _view.attribute.id;
+					}
+					req.method = UpdateRequest$Method.UPDATE;
+				} else {
+					req.method = UpdateRequest$Method.ADD;
+				}
+				var responder:AsyncResponder = new AsyncResponder(updateResultHandler, updateFaultHandler);
+				ClientFactory.dataClient.updateActiveRecord(responder, req);
 			}
-			var responder:AsyncResponder = new AsyncResponder(updateResultHandler, updateFaultHandler);
-			ClientFactory.dataClient.updateActiveRecord(responder, req);
 		}
 		
 		protected function updateDescription():void {

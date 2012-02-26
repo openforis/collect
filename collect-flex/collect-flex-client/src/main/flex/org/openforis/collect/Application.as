@@ -12,12 +12,13 @@ package org.openforis.collect {
 	import org.openforis.collect.i18n.Message;
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.SurveyProxy;
-	import org.openforis.collect.model.Phase;
 	import org.openforis.collect.model.proxy.RecordProxy;
+	import org.openforis.collect.model.proxy.RecordProxy$Step;
 	import org.openforis.collect.util.ModelClassInitializer;
 
 	/**
-	 * @author Mino Togna
+	 * @author M. Togna
+	 * @author S. Ricci
 	 * */
 	public class Application {
 		
@@ -32,7 +33,7 @@ package org.openforis.collect {
 		private static var _activeSurvey:SurveyProxy;
 		private static var _activeRecord:RecordProxy;
 		private static var _activeRootEntity:EntityDefinitionProxy;
-		private static var _activePhase:Phase;
+		private static var _activeStep:RecordProxy$Step;
 		private static var _serverOffline:Boolean;
 		
 		private static var initialized:Boolean = false;
@@ -133,12 +134,12 @@ package org.openforis.collect {
 		}
 		
 		[Bindable]
-		public static function get activePhase():Phase {
-			return _activePhase;
+		public static function get activeStep():RecordProxy$Step {
+			return _activeStep;
 		}
 		
-		public static function set activePhase(value:Phase):void {
-			_activePhase = value;
+		public static function set activeStep(value:RecordProxy$Step):void {
+			_activeStep = value;
 		}
 
 		[Bindable]

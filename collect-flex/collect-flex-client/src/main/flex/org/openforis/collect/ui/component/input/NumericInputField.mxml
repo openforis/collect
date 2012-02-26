@@ -1,6 +1,7 @@
 <input:InputField xmlns:fx="http://ns.adobe.com/mxml/2009" 
 				  xmlns:s="library://ns.adobe.com/flex/spark" 
-				  xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:input="org.openforis.collect.ui.component.input.*"
+				  xmlns:mx="library://ns.adobe.com/flex/mx" 
+				  xmlns:input="org.openforis.collect.ui.component.input.*"
 				  width="100">
 	
 	<fx:Script>
@@ -20,6 +21,6 @@
 		]]>
 	</fx:Script>
 	
-	<input:TextInput id="textInput" width="100%" maxChars="{maxChars}" />
+	<input:TextInput id="textInput" width="100%" maxChars="{maxChars}" restrict="[0-9\.\*\-\?]" />
 	
 </input:InputField>

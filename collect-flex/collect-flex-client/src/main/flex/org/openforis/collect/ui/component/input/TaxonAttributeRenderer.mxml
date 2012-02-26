@@ -2,7 +2,8 @@
 <detail:CompositeAttributeRenderer xmlns:fx="http://ns.adobe.com/mxml/2009" 
 				  xmlns:s="library://ns.adobe.com/flex/spark" 
 				  xmlns:mx="library://ns.adobe.com/flex/mx" 
-				  xmlns:input="org.openforis.collect.ui.component.input.*" xmlns:detail="org.openforis.collect.ui.component.detail.*"
+				  xmlns:input="org.openforis.collect.ui.component.input.*" 
+				  xmlns:detail="org.openforis.collect.ui.component.detail.*"
 				  >
 	<fx:Script>
 		<![CDATA[
@@ -12,8 +13,6 @@
 			override protected function initPresenter():void {
 				presenter = new TaxonAttributePresenter(this);
 			}
-			
-			
 		]]>
 	</fx:Script>
 	

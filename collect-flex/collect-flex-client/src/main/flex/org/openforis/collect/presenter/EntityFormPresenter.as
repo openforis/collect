@@ -60,6 +60,7 @@ package org.openforis.collect.presenter
 			if(_view.entityDefinition != null && _view.entityDefinition.multiple) {
 				var entities:IList = getEntities();
 				_view.entities = entities;
+				selectFirstTab();
 			}
 		}
 		
@@ -129,13 +130,17 @@ package org.openforis.collect.presenter
 			if(_view.internalContainer.visible) {
 				//internal container already visible, call programmatically the showEffect
 				_view.showFormEffect.play([_view.internalContainer]);
-				
-				//todo reset entity form scrollers, set first tab
 			} else {
 				_view.internalContainer.visible = true;
 			}
+			selectFirstTab();
 		}
 		
-		
+		protected function selectFirstTab():void {
+			_view.resetScrollbars();
+			if(_view.buttonBar != null) {
+				_view.buttonBar.selectedIndex = 0;
+			}
+		}
 	}
 }

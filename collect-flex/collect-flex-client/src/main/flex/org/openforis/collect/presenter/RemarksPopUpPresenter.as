@@ -91,10 +91,10 @@ package org.openforis.collect.presenter
 			if(firstOpen) {
 				view = new RemarksPopUp();
 			}
-			//popUp.showReasonBlank = inputField.canShowReasonBlankOnPopUp() && PhaseUtil.currentPhaseCode == PhaseUtil.DATA_ENTRY_CODE;
-			
+			_showReasonBlank = _inputField != null && (_inputField.isEmpty() ||	_inputField.hasBlankReasonSpecified());
+			_inputField = inputField;
+
 			if(! popUpOpened) {
-				this._inputField = inputField;
 				PopUpManager.addPopUp(view, inputField);
 				
 				if(firstOpen) {
@@ -106,12 +106,12 @@ package org.openforis.collect.presenter
 
 			var alignmentPoint:Point;
 			if(alignToField) {
-				PopUpUtil.alignPopUpToField(view, inputField, PopUpUtil.POSITION_RIGHT, PopUpUtil.VERTICAL_ALIGN_BOTTOM);
+				PopUpUtil.alignToField(view, inputField.validationStateDisplay, PopUpUtil.POSITION_RIGHT, PopUpUtil.VERTICAL_ALIGN_BOTTOM);
 			} else if(alignmentPoint) {
-				PopUpUtil.alignPop(view, alignmentPoint);
+				PopUpUtil.alignToPoint(view, alignmentPoint);
 			} else {
 				//align popup to mouse pointer
-				PopUpUtil.alignPopUpToMousePoint(view, -10, -10);
+				PopUpUtil.alignToMousePoint(view, -10, -10);
 			}
 			
 			popUpOpened = true;
@@ -134,18 +134,22 @@ package org.openforis.collect.presenter
 					}
 				}
 			}
-			if(_inputField != null && (_inputField.isEmpty() ||	_inputField.hasBlankReasonSpecified()) ) {
+			if(_showReasonBlank) {
 				view.currentState = RemarksPopUp.STATE_CAN_SPECIFY_REASON_BLANK;
 			} else {
 				view.currentState = RemarksPopUp.STATE_DEFAULT;
 			}
 			view.remarksTextArea.text = remarks;
 			view.radioButtonGroup.selectedValue = symbolToSelect;
+			setFocusOnFirstField();
 		}
 		
 		public function hidePopUp():void {
 			PopUpManager.removePopUp(view);
 			popUpOpened = false;
+			if(_inputField.textInput != null) {
+				_inputField.textInput.setFocus();
+			}
 		}
 		
 		protected function okButtonClickHandler(event:Event = null):void {
@@ -194,14 +198,10 @@ package org.openforis.collect.presenter
 		}
 		
 		public function setFocusOnFirstField():void {
-			if(_showReasonBlank) {
-				if(view.blankOnFormRadioButton) {
-					view.blankOnFormRadioButton.setFocus();
-				}
-			} else {
-				if(view.remarksGroup) {
-					view.remarksTextArea.setFocus();
-				}
+			if(_showReasonBlank && view.blankOnFormRadioButton != null) {
+				view.blankOnFormRadioButton.setFocus();
+			} else if(view.remarksGroup != null) {
+				view.remarksTextArea.setFocus();
 			}
 		}
 	}

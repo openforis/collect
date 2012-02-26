@@ -58,6 +58,7 @@
 	
 	<!-- Expression Factory -->
 	<bean id="expressionFactory" class="org.openforis.idm.model.expression.ExpressionFactory" />
+	<bean id="validator" 					class="org.openforis.idm.metamodel.validation.Validator" />
 	
 	<bean id="taxonVernacularNameDao" class="org.openforis.collect.persistence.TaxonVernacularNameDAO">
     	<property name="dataSource" ref="dataSource"/>

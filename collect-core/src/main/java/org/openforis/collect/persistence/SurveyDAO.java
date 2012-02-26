@@ -16,6 +16,7 @@ import org.jooq.Record;
 import org.jooq.Result;
 import org.jooq.impl.Factory;
 import org.jooq.impl.SQLDataType;
+import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.persistence.jooq.JooqDaoSupport;
 import org.openforis.collect.persistence.xml.CollectIdmlBindingContext;
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -82,13 +83,13 @@ public class SurveyDAO extends JooqDaoSupport {
 		return survey;
 	}
 
-	public Survey load(String name) {
+	public CollectSurvey load(String name) {
 		Factory jf = getJooqFactory();
 		Record record = jf.select()
 				.from(SURVEY)
 				.where(SURVEY.NAME.equal(name))
 				.fetchOne();
-		Survey survey = processSurveyRow(record);
+		CollectSurvey survey = processSurveyRow(record);
 		if ( survey != null ) {
 			loadNodeDefinitions(survey);
 		}
@@ -96,12 +97,12 @@ public class SurveyDAO extends JooqDaoSupport {
 	}
 
 	@Transactional
-	public List<Survey> loadAll() {
+	public List<CollectSurvey> loadAll() {
 		Factory jf = getJooqFactory();
-		List<Survey> surveys = new ArrayList<Survey>();
+		List<CollectSurvey> surveys = new ArrayList<CollectSurvey>();
 		Result<Record> results = jf.select().from(SURVEY).fetch();
 		for (Record row : results) {
-			Survey survey = processSurveyRow(row);
+			CollectSurvey survey = processSurveyRow(row);
 			if (survey != null) {
 				loadNodeDefinitions(survey);
 				surveys.add(survey);
@@ -110,13 +111,13 @@ public class SurveyDAO extends JooqDaoSupport {
 		return surveys;
 	}
 
-	private Survey processSurveyRow(Record row) {
+	private CollectSurvey processSurveyRow(Record row) {
 		try {
 			if (row == null) {
 				return null;
 			}
 			String idml = row.getValueAsString(SURVEY.IDML);
-			Survey survey = unmarshalIdml(idml);
+			CollectSurvey survey = (CollectSurvey) unmarshalIdml(idml);
 			survey.setId(row.getValueAsInteger(SURVEY.ID));
 			return survey;
 		} catch (IOException e) {
@@ -128,9 +129,9 @@ public class SurveyDAO extends JooqDaoSupport {
 		byte[] bytes = idml.getBytes("UTF-8");
 		ByteArrayInputStream is = new ByteArrayInputStream(bytes);
 		SurveyUnmarshaller su = bindingContext.createSurveyUnmarshaller();
-		Survey survey;
+		CollectSurvey survey;
 		try {
-			survey = su.unmarshal(is);
+			survey = (CollectSurvey) su.unmarshal(is);
 		} catch (InvalidIdmlException e) {
 			throw new DataInconsistencyException("Invalid idm");
 		}

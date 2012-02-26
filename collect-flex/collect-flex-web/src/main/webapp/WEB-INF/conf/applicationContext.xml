@@ -147,6 +147,8 @@
 		<property name="lookupProvider" ref="lookupProvider" />
 	</bean>
 	
+	<bean id="validator" 					class="org.openforis.idm.metamodel.validation.Validator" />
+	
 	<bean id="lookupProvider" 	class="org.openforis.collect.persistence.DatabaseLookupProvider" />
 	
 	<!-- Controllers -->

@@ -29,7 +29,7 @@
 		</s:layout>
 		<s:itemRenderer>
 			<fx:Component>
-				<s:ItemRenderer>
+				<s:ItemRenderer autoDrawBackground="false">
 					<fx:Script>
 						<![CDATA[
 							import mx.binding.utils.BindingUtils;
