@@ -83,6 +83,9 @@ package org.openforis.collect.util
 							y = componentBounds.y;
 							break;
 					}
+					var adjustedPosition:Point = getAdjustedPositionVertically(popUp, new Point(x, y));
+					x = adjustedPosition.x;
+					y = adjustedPosition.y;
 					break;
 				case POSITION_LEFT:
 					x = componentBounds.x - popUp.width;
@@ -97,6 +100,9 @@ package org.openforis.collect.util
 							y = componentBounds.y;
 							break;
 					}
+					var adjustedPosition:Point = getAdjustedPositionVertically(popUp, new Point(x, y));
+					x = adjustedPosition.x;
+					y = adjustedPosition.y;
 					break;
 				case POSITION_BELOW:
 					switch(horizontalAlign) {
@@ -111,6 +117,9 @@ package org.openforis.collect.util
 							break;
 					}
 					y = componentBounds.y + inputField.height;
+					var adjustedPosition:Point = getAdjustedPositionHorizontally(popUp, new Point(x, y));
+					x = adjustedPosition.x;
+					y = adjustedPosition.y;
 					break;
 				case POSITION_ABOVE:
 					switch(horizontalAlign) {
@@ -124,7 +133,10 @@ package org.openforis.collect.util
 							x = componentBounds.x + (inputField.width - popUp.width) / 2;
 							break;
 					}
-					y = componentBounds.y - (inputField.height + popUp.height);
+					y = componentBounds.y - popUp.height;
+					var adjustedPosition:Point = getAdjustedPositionHorizontally(popUp, new Point(x, y));
+					x = adjustedPosition.x;
+					y = adjustedPosition.y;
 					break;
 			}
 			popUp.x = x;
@@ -155,20 +167,38 @@ package org.openforis.collect.util
 		}
 
 		public static function ensureVisibility(popUp:DisplayObject):void {
-			var adjustedCoordinates:Point = getAdjustedCoordinatesInScreen(popUp);
+			var adjustedCoordinates:Point = getAdjustedPosition(popUp);
 			
 			popUp.x = adjustedCoordinates.x;
 			popUp.y = adjustedCoordinates.y;
 		}
 		
-		public static function getAdjustedCoordinatesInScreen(popUp:DisplayObject, startingPoint:Point = null):Point {
+		private static function ensureVisibilityVertically(popUp:DisplayObject):void {
+			var adjustedCoordinates:Point = getAdjustedPositionVertically(popUp);
+			
+			popUp.x = adjustedCoordinates.x;
+			popUp.y = adjustedCoordinates.y;
+		}
+		
+		private static function ensureVisibilityHorizontally(popUp:DisplayObject):void {
+			var adjustedCoordinates:Point = getAdjustedPositionVertically(popUp);
+			
+			popUp.x = adjustedCoordinates.x;
+			popUp.y = adjustedCoordinates.y;
+		}
+		
+		public static function getAdjustedPosition(popUp:DisplayObject, startingPoint:Point = null):Point {
+			var adjustedVertically:Point = getAdjustedPositionVertically(popUp, startingPoint);
+			var adjustedHorizontally:Point = getAdjustedPositionHorizontally(popUp, adjustedVertically);
+			return adjustedHorizontally;
+		}
+		
+		private static function getAdjustedPositionHorizontally(popUp:DisplayObject, startingPoint:Point = null):Point {
 			if(startingPoint == null) {
 				startingPoint = new Point(popUp.x, popUp.y);
 			}
 			var x:Number = startingPoint.x;
-			var y:Number = startingPoint.y;
 			
-			var screenHeight:Number = FlexGlobals.topLevelApplication.screen.height;
 			var screenWidth:Number = FlexGlobals.topLevelApplication.screen.width;
 			
 			if(x + popUp.width > screenWidth) {
@@ -176,13 +206,23 @@ package org.openforis.collect.util
 			} else if(x < 0) {
 				x = 0;
 			}
+			return new Point(x, startingPoint.y);
+		}
+		
+		private static function getAdjustedPositionVertically(popUp:DisplayObject, startingPoint:Point = null):Point {
+			if(startingPoint == null) {
+				startingPoint = new Point(popUp.x, popUp.y);
+			}
+			var y:Number = startingPoint.y;
+			
+			var screenHeight:Number = FlexGlobals.topLevelApplication.screen.height;
+			
 			if(y + popUp.height > screenHeight) {
 				y = screenHeight - popUp.height;
 			} else if(y < 0) {
 				y = 0;
 			}
-			
-			return new Point(x, y);
+			return new Point(startingPoint.x, y);
 		}
 		
 		public static function exceedViewport(popUp:DisplayObject):Boolean {

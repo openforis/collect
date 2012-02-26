@@ -232,7 +232,7 @@ package org.openforis.collect.ui {
 			if(def is BooleanAttributeDefinitionProxy) {
 				return 100;
 			} else {
-				return getInputFieldWidth(def, true);
+				return getInputFieldWidth(def, true) + 2;
 			}
 		}
 		

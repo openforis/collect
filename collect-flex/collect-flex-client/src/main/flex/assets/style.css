@@ -66,15 +66,32 @@ mx|ToolTip.warning {
 	borderColor: #FF8800;
 }
 
-input|TextInput.error {
-	borderColor: #FF0000;
-	borderStyle: solid;
-	borderWeight: 2;
-	borderThickness: 2;
+detail|AttributeItemRenderer {
+	skinClass: ClassReference("org.openforis.collect.ui.skin.AttributeRendererSkin");
+	borderColor: #FFFFFF;
+	borderWeight: 1;
 }
 
-input|TextInput.noError {
-	border-color: #FFFFFF;
+detail|AttributeItemRenderer.error {
+	borderColor: #FF0000;
+}
+
+detail|AttributeItemRenderer.warning {
+	borderColor: #FF8800;
+}
+
+input|TextInput.error, input|TextInput.warning {
+	borderStyle: solid;
+	borderWeight: 1;
+	borderThickness: 1;
+}
+
+input|TextInput.error {
+	borderColor: #FF0000;
+}
+
+input|TextInput.warning {
+	borderColor: #FF8800;
 }
 
 s|BorderContainer.entityForm {
