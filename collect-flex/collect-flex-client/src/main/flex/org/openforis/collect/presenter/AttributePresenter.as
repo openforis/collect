@@ -1,5 +1,4 @@
 package org.openforis.collect.presenter {
-	import flash.display.DisplayObject;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
 	
@@ -20,15 +19,16 @@ package org.openforis.collect.presenter {
 	public class AttributePresenter extends AbstractPresenter {
 		
 		protected var _view:AttributeItemRenderer;
-		private var _validationListener:UIComponent;
+		private var _validationStateDisplay:UIComponent;
+		private var _validationToolTipTrigger:UIComponent;
 		private var _validationToolTip:IToolTip;
 		
 		public function AttributePresenter(view:AttributeItemRenderer) {
 			_view = view;
 			
 			var inputField:InputField = _view.getElementAt(0) as InputField;
-			_validationListener = inputField != null ? inputField.validationListener: view;
-			
+			_validationStateDisplay = inputField != null ? inputField.validationStateDisplay: view;
+			_validationToolTipTrigger = _validationStateDisplay;
 			super();
 		}
 		
@@ -45,21 +45,22 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function initValidationResultHandler():void {
-			_validationListener.removeEventListener(MouseEvent.ROLL_OVER, mouseRollOverHandler);
-			_validationListener.removeEventListener(MouseEvent.ROLL_OUT, mouseRollOutHandler);
-			_validationListener.styleName = "noError";
+			_validationToolTipTrigger.removeEventListener(MouseEvent.ROLL_OVER, mouseRollOverHandler);
+			_validationToolTipTrigger.removeEventListener(MouseEvent.ROLL_OUT, mouseRollOutHandler);
+			_validationStateDisplay.styleName = null;
 			var a:AttributeProxy = _view.attribute;
 			if(a != null && a.state != null) {
 				var validationResults:ValidationResultsProxy = a.state.validationResults;
-				var invalidAttribute:Boolean = a.state.hasErrors() || a.state.hasWarnings();
+				var hasErrors:Boolean = a.state.hasErrors();
+				var hasWarnings:Boolean = a.state.hasWarnings();
 				
-				if(invalidAttribute) {
-					if(! _validationListener.hasEventListener(MouseEvent.ROLL_OVER)) {
-						_validationListener.addEventListener(MouseEvent.ROLL_OVER, mouseRollOverHandler);
-						_validationListener.addEventListener(MouseEvent.ROLL_OUT, mouseRollOutHandler);
+				if(hasErrors || hasWarnings) {
+					if(! _validationToolTipTrigger.hasEventListener(MouseEvent.ROLL_OVER)) {
+						_validationToolTipTrigger.addEventListener(MouseEvent.ROLL_OVER, mouseRollOverHandler);
+						_validationToolTipTrigger.addEventListener(MouseEvent.ROLL_OUT, mouseRollOutHandler);
 					}
+					_validationStateDisplay.styleName = hasErrors ? AttributeItemRenderer.STYLE_NAME_ERROR: AttributeItemRenderer.STYLE_NAME_WARNING;
 				}
-				_validationListener.styleName = "error";
 			}
 		}
 		
@@ -69,9 +70,11 @@ package org.openforis.collect.presenter {
 			}
 			var a:AttributeProxy = _view.attribute;
 			if(a != null && a.state != null) {
-				var styleName:String = "error";
+				var hasErrors:Boolean = a.state.hasErrors();
+				var hasWarnings:Boolean = a.state.hasWarnings();
+				var styleName:String = hasErrors ? ToolTipUtil.STYLE_NAME_ERROR: ToolTipUtil.STYLE_NAME_WARNING;
 				var message:String = a.state.validationMessage;
-				_validationToolTip = ToolTipUtil.create(_validationListener, message, styleName);
+				_validationToolTip = ToolTipUtil.create(_validationStateDisplay, message, styleName);
 			}
 		}
 		

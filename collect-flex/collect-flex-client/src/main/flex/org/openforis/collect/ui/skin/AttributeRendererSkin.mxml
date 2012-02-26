@@ -45,20 +45,29 @@
                     bgFill.color = getStyle("backgroundColor");
                     bgFill.alpha = getStyle("backgroundAlpha");
                 }
-                
+				//border color
+				var borderColor:Number = getStyle("borderColor");
+                if(isNaN(borderColor)) {
+					borderColor = 0xFFFFFF;
+				}
+				borderStroke.color = borderColor;
+				
+				var borderWeight:Number = getStyle("borderWeight");
+				if(isNaN(borderWeight)) {
+					borderWeight = 1;
+				}
+				borderStroke.weight = borderWeight;
+				
                 super.updateDisplayList(unscaledWidth, unscaledHeight);
             }
         ]]>        
     </fx:Script>
     
-    <s:states>
-        <s:State name="normal" />
-        <s:State name="disabled" />
-		<s:State name="notRelevant" />
-		<s:State name="error" stateGroups="withBorder" />
-		<s:State name="warning" stateGroups="withBorder" />
-    </s:states>
-    
+	<s:states>
+		<s:State name="normal" />
+		<s:State name="disabled" />
+	</s:states>
+	
     <!--- Defines the appearance of the SkinnableContainer class's background. -->
     <s:Rect id="background" left="0" right="0" top="0" bottom="0">
         <s:fill>
@@ -70,9 +79,9 @@
 	<s:Rect id="border" left="0" right="0" top="0" bottom="0">
 		<s:stroke>
 			<s:SolidColorStroke 
+				id="borderStroke"
 				weight="2"
-				includeIn="withBorder"
-				color.error="#FF0000"
+				color="#FFFFFF"
 				/>
 		</s:stroke>
 	</s:Rect>
@@ -83,7 +92,7 @@
     -->
     <!--- @copy spark.components.SkinnableContainer#contentGroup -->
 	<s:Group id="contentGroup" 
-			 left="2" right="2" top="2" bottom="2" 
+			 left="1" right="1" top="1" bottom="1" 
 			 minWidth="0" minHeight="0"
 			 >
 		<s:layout>

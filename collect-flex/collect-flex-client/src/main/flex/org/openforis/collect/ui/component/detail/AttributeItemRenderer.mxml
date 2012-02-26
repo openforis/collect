@@ -4,16 +4,7 @@
 				xmlns:s="library://ns.adobe.com/flex/spark" 
 				xmlns:mx="library://ns.adobe.com/flex/mx"
 				creationComplete="creationCompleteHandler(event)"
-				skinClass="org.openforis.collect.ui.skin.AttributeRendererSkin"
 				>
-	
-	<fx:Metadata>
-		[SkinState("normal")]
-		[SkinState("disabled")]
-		[SkinState("notRelevant")]
-		[SkinState("error")]
-		[SkinState("warning")]
-	</fx:Metadata>
 	
 	<fx:Script>
 		<![CDATA[
@@ -28,12 +19,12 @@
 			
 			import spark.components.BorderContainer;
 			
-			public static const STATE_NORMAL:String = "normal";
-			public static const STATE_DISABLED:String = "disabled";
-			public static const STATE_NOT_RELEVANT:String = "notRelevant";
-			public static const STATE_ERROR:String = "error"; 
-			public static const STATE_WARNING:String = "warning";
-			
+			public static const STYLE_NAME_NORMAL:String = "normal";
+			public static const STYLE_NAME_DISABLED:String = "disabled";
+			public static const STYLE_NAME_NOT_RELEVANT:String = "notRelevant";
+			public static const STYLE_NAME_ERROR:String = "error"; 
+			public static const STYLE_NAME_WARNING:String = "warning";
+
 			private var _direction:String;
 			private var _attributeDefinition:AttributeDefinitionProxy;
 			private var _modelVersion:ModelVersionProxy;
