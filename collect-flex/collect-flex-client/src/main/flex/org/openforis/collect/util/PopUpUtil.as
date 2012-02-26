@@ -69,6 +69,7 @@ package org.openforis.collect.util
 			var componentBounds:Rectangle = inputField.getBounds(inputField.stage);
 			
 			var x:Number, y:Number;
+			var adjustedPosition:Point;
 			switch(position) {
 				case POSITION_RIGHT:
 					x = componentBounds.x + inputField.width;
@@ -83,7 +84,7 @@ package org.openforis.collect.util
 							y = componentBounds.y;
 							break;
 					}
-					var adjustedPosition:Point = getAdjustedPositionVertically(popUp, new Point(x, y));
+					adjustedPosition = getAdjustedPositionVertically(popUp, new Point(x, y));
 					x = adjustedPosition.x;
 					y = adjustedPosition.y;
 					break;
@@ -100,7 +101,7 @@ package org.openforis.collect.util
 							y = componentBounds.y;
 							break;
 					}
-					var adjustedPosition:Point = getAdjustedPositionVertically(popUp, new Point(x, y));
+					adjustedPosition = getAdjustedPositionVertically(popUp, new Point(x, y));
 					x = adjustedPosition.x;
 					y = adjustedPosition.y;
 					break;
@@ -117,7 +118,7 @@ package org.openforis.collect.util
 							break;
 					}
 					y = componentBounds.y + inputField.height;
-					var adjustedPosition:Point = getAdjustedPositionHorizontally(popUp, new Point(x, y));
+					adjustedPosition = getAdjustedPositionHorizontally(popUp, new Point(x, y));
 					x = adjustedPosition.x;
 					y = adjustedPosition.y;
 					break;
@@ -134,7 +135,7 @@ package org.openforis.collect.util
 							break;
 					}
 					y = componentBounds.y - popUp.height;
-					var adjustedPosition:Point = getAdjustedPositionHorizontally(popUp, new Point(x, y));
+					adjustedPosition = getAdjustedPositionHorizontally(popUp, new Point(x, y));
 					x = adjustedPosition.x;
 					y = adjustedPosition.y;
 					break;
