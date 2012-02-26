@@ -27,7 +27,9 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.remoting.service.UpdateRequest$Method;
 	import org.openforis.collect.ui.ContextMenuBuilder;
 	import org.openforis.collect.ui.component.input.InputField;
+	import org.openforis.collect.util.ArrayUtil;
 	import org.openforis.collect.util.CollectionUtil;
+	import org.openforis.collect.util.ReasonBlankUtil;
 	import org.openforis.collect.util.StringUtil;
 	import org.openforis.collect.util.ToolTipUtil;
 	import org.openforis.collect.util.UIUtil;
@@ -111,23 +113,28 @@ package org.openforis.collect.presenter {
 		}
 		
 		public function applyChanges():void {
-			var req:UpdateRequest = new UpdateRequest();
-			var def:AttributeDefinitionProxy = _view.attributeDefinition;
-			req.parentEntityId = _view.parentEntity.id;
-			req.nodeName = def.name;
-			req.value = createRequestValue();
-			req.fieldIndex = _view.fieldIndex;
-			if(_view.attribute != null) {
-				var a:AttributeProxy = _view.attribute;
-				var field:FieldProxy = a.getField(_view.fieldIndex);
-				req.nodeId = a.id;
-				req.method = UpdateRequest$Method.UPDATE;
-				//preserve remarks
-				req.remarks = field.remarks;
+			if(ReasonBlankUtil.isShortCut(_view.text)) {
+				var symbol:AttributeSymbol = ReasonBlankUtil.parseShortCut(_view.text);
+				changeSymbol(symbol);
 			} else {
-				req.method = UpdateRequest$Method.ADD;
+				var req:UpdateRequest = new UpdateRequest();
+				var def:AttributeDefinitionProxy = _view.attributeDefinition;
+				req.parentEntityId = _view.parentEntity.id;
+				req.nodeName = def.name;
+				req.value = textToRequestValue();
+				req.fieldIndex = _view.fieldIndex;
+				if(_view.attribute != null) {
+					var a:AttributeProxy = _view.attribute;
+					var field:FieldProxy = a.getField(_view.fieldIndex);
+					req.nodeId = a.id;
+					req.method = UpdateRequest$Method.UPDATE;
+					//preserve remarks
+					req.remarks = field.remarks;
+				} else {
+					req.method = UpdateRequest$Method.ADD;
+				}
+				dataClient.updateActiveRecord(_updateResponder, req);
 			}
-			dataClient.updateActiveRecord(_updateResponder, req);
 		}
 		
 		public function undoLastChange():void {
@@ -154,12 +161,12 @@ package org.openforis.collect.presenter {
 			faultHandler(event, token);
 		}
 		
-		protected function getTextValue():String {
+		protected function valueToText():String {
 			var attribute:AttributeProxy = _view.attribute;
 			if(attribute != null) {
 				var field:FieldProxy = _view.attribute.getField(_view.fieldIndex);
 				if(field.symbol != null) {
-					var shortKey:String = getReasonBlankShortCut(field.symbol);
+					var shortKey:String = ReasonBlankUtil.getShortCut(field.symbol);
 					if(shortKey != null) {
 						return shortKey;
 					}
@@ -172,7 +179,7 @@ package org.openforis.collect.presenter {
 			return "";
 		}
 
-		protected function createRequestValue():String {
+		protected function textToRequestValue():String {
 			var result:String = null;
 			var text:String = _view.text;
 			if(StringUtil.isNotBlank(text)) {
@@ -202,7 +209,7 @@ package org.openforis.collect.presenter {
 			//update view according to attribute (generic text value)
 			
 			if(_view.attributeDefinition != null) {
-				var text:String = getTextValue();
+				var text:String = valueToText();
 				_view.text = text;
 				if(_view.attribute != null) {
 					var a:AttributeProxy = _view.attribute;
@@ -214,20 +221,6 @@ package org.openforis.collect.presenter {
 				}
 				_view.contextMenu = ContextMenuBuilder.buildContextMenu(_view);
 			}
-		}
-		
-		public static function getReasonBlankShortCut(symbol:AttributeSymbol):String {
-			if(symbol != null) {
-				switch(symbol) {
-					case AttributeSymbol.BLANK_ON_FORM:
-						return '*';
-					case AttributeSymbol.DASH_ON_FORM:
-						return '-';
-					case AttributeSymbol.ILLEGIBLE:
-						return '?';
-				}
-			}
-			return null;
 		}
 		
 		protected function get field():FieldProxy {

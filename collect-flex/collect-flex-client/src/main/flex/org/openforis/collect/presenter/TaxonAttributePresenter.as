@@ -29,7 +29,7 @@ package org.openforis.collect.presenter {
 	 * 
 	 * @author S. Ricci
 	 * */
-	public class TaxonAttributePresenter extends AbstractPresenter {
+	public class TaxonAttributePresenter extends AttributePresenter {
 		
 		private static const MAX_RESULTS:int = 10;
 		private static const SEARCH_BY_CODE:String = "byCode";
@@ -43,28 +43,25 @@ package org.openforis.collect.presenter {
 		
 		private var minCharsToStartAutoComplete:int = 2;
 		
-		private var _view:TaxonAttributeRenderer;
 		private var _lastSelectedTaxon:TaxonOccurrenceProxy;
 		
 		public function TaxonAttributePresenter(view:TaxonAttributeRenderer) {
-			_view = view;
-			
-			super();
+			super(view);
 		}
 		
 		override internal function initEventListeners():void {
 			super.initEventListeners();
 			
 			//id text input
-			_view.codeTextInput.addEventListener(InputFieldEvent.CHANGING, inputFieldChangingHandler);
+			view.codeTextInput.addEventListener(InputFieldEvent.CHANGING, inputFieldChangingHandler);
 			//scientific name text input
-			_view.scientificNameTextInput.addEventListener(InputFieldEvent.CHANGING, inputFieldChangingHandler);
+			view.scientificNameTextInput.addEventListener(InputFieldEvent.CHANGING, inputFieldChangingHandler);
 			//vernacular name text input
-			_view.vernacularNameTextInput.addEventListener(InputFieldEvent.CHANGING, inputFieldChangingHandler);
+			view.vernacularNameTextInput.addEventListener(InputFieldEvent.CHANGING, inputFieldChangingHandler);
 			//language code text input
-			_view.languageCodeTextInput.addEventListener(InputFieldEvent.CHANGING, inputFieldChangingHandler);
+			view.languageCodeTextInput.addEventListener(InputFieldEvent.CHANGING, inputFieldChangingHandler);
 			//language variety text input
-			_view.languageVarietyTextInput.addEventListener(InputFieldEvent.CHANGING, inputFieldChangingHandler);
+			view.languageVarietyTextInput.addEventListener(InputFieldEvent.CHANGING, inputFieldChangingHandler);
 		}
 		
 		private function get view():TaxonAttributeRenderer {
@@ -82,19 +79,19 @@ package org.openforis.collect.presenter {
 			}
 			var searchType:String;
 			switch(inputField) {
-				case _view.codeTextInput:
+				case view.codeTextInput:
 					searchType = SEARCH_BY_CODE;
 					break;
-				case _view.scientificNameTextInput:
+				case view.scientificNameTextInput:
 					searchType = SEARCH_BY_SCIENTIFIC_NAME;
 					break;
-				case _view.vernacularNameTextInput:
+				case view.vernacularNameTextInput:
 					searchType = SEARCH_BY_VERNACULAR_NAME;
 					break;
 				default:
 			}
 			if(searchType != null) {
-				showAutoCompletePopUp(searchType, inputField, _view.codeTextInput);
+				showAutoCompletePopUp(searchType, inputField, view.codeTextInput);
 			}
 		}
 		

@@ -86,9 +86,9 @@ package org.openforis.collect.ui.component.input {
 		
 		public function set relevant(value:Boolean):void {
 			if(value) {
-				UIUtil.removeStyleName(validationListener, NOT_RELEVANT_STYLE);
+				UIUtil.removeStyleName(validationStateDisplay, NOT_RELEVANT_STYLE);
 			} else {
-				UIUtil.addStyleName(validationListener, NOT_RELEVANT_STYLE);
+				UIUtil.addStyleName(validationStateDisplay, NOT_RELEVANT_STYLE);
 			}
 		}
 		
@@ -112,37 +112,37 @@ package org.openforis.collect.ui.component.input {
 		
 		public function set error(value:String):void {
 			if(StringUtil.isBlank(value)) {
-				UIUtil.removeStyleName(validationListener, ERROR_STYLE);
+				UIUtil.removeStyleName(validationStateDisplay, ERROR_STYLE);
 			} else {
-				UIUtil.addStyleName(validationListener, ERROR_STYLE);
+				UIUtil.addStyleName(validationStateDisplay, ERROR_STYLE);
 			}
 		}
 		
 		public function set warning(value:String):void {
 			if(StringUtil.isBlank(value)) {
-				UIUtil.removeStyleName(validationListener, WARN_STYLE);
+				UIUtil.removeStyleName(validationStateDisplay, WARN_STYLE);
 			} else {
-				UIUtil.addStyleName(validationListener, WARN_STYLE);
+				UIUtil.addStyleName(validationStateDisplay, WARN_STYLE);
 			}
 		}
 		
 		public function set approved(value:Boolean):void {
 			if(value) {
-				UIUtil.addStyleName(validationListener, APPROVED_STYLE);
+				UIUtil.addStyleName(validationStateDisplay, APPROVED_STYLE);
 			} else {
-				UIUtil.removeStyleName(validationListener, APPROVED_STYLE);
+				UIUtil.removeStyleName(validationStateDisplay, APPROVED_STYLE);
 			}
 		}
 
 		public function set remarks(value:String):void {
 			if(StringUtil.isBlank(value)) {
-				UIUtil.removeStyleName(validationListener, REMARKS_PRESENT_STYLE);
+				UIUtil.removeStyleName(validationStateDisplay, REMARKS_PRESENT_STYLE);
 			} else {
-				UIUtil.addStyleName(validationListener, REMARKS_PRESENT_STYLE);
+				UIUtil.addStyleName(validationStateDisplay, REMARKS_PRESENT_STYLE);
 			}
 		}
 
-		public function get validationListener():UIComponent {
+		public function get validationStateDisplay():UIComponent {
 			return _textInput;
 		}
 		
