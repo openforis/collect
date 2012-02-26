@@ -36,7 +36,6 @@ import org.openforis.idm.metamodel.RangeAttributeDefinition;
 import org.openforis.idm.metamodel.TaxonAttributeDefinition;
 import org.openforis.idm.metamodel.TextAttributeDefinition;
 import org.openforis.idm.metamodel.TimeAttributeDefinition;
-import org.openforis.idm.metamodel.validation.Validator;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Code;
 import org.openforis.idm.model.CodeAttribute;
@@ -51,7 +50,6 @@ import org.openforis.idm.model.RecordContext;
 import org.openforis.idm.model.TaxonOccurrence;
 import org.openforis.idm.model.TextAttribute;
 import org.openforis.idm.model.Time;
-import org.openforis.idm.model.expression.ExpressionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -59,32 +57,19 @@ import org.springframework.transaction.annotation.Transactional;
  * @author M. Togna
  * @author S. Ricci
  */
-public class RecordManager implements RecordContext {
+public class RecordManager {
 	//private final Log log = LogFactory.getLog(RecordManager.class);
 	
 	private static final QName COUNT_ANNOTATION = new QName("http://www.openforis.org/collect/3.0/collect", "count");
 
 	@Autowired
 	private RecordDAO recordDAO;
-
-	@Autowired
-	private ExpressionFactory expressionFactory;
 	
-	@Autowired
-	private Validator validator;
+	@Autowired 
+	private RecordContext recordContext;
 	
 	protected void init() {
 		unlockAll();
-	}
-	
-	@Override
-	public ExpressionFactory getExpressionFactory() {
-		return expressionFactory;
-	}
-	
-	@Override
-	public Validator getValidator() {
-		return validator;
 	}
 	
 	@Transactional
@@ -113,14 +98,14 @@ public class RecordManager implements RecordContext {
 	 */
 	@Transactional
 	public CollectRecord checkout(CollectSurvey survey, User user, int recordId) throws RecordLockedException, NonexistentIdException, AccessDeniedException, MultipleEditException {
-		CollectRecord record = recordDAO.load(survey, this, recordId);
+		CollectRecord record = recordDAO.load(survey, recordContext, recordId);
 		recordDAO.lock(recordId, user);
 		return record;
 	}
 
 	@Transactional
 	public List<CollectRecord> getSummaries(CollectSurvey survey, String rootEntity, int offset, int maxNumberOfRecords, String orderByFieldName, String filter) {
-		List<CollectRecord> recordsSummary = recordDAO.loadSummaries(survey, this, rootEntity, offset, maxNumberOfRecords, orderByFieldName, filter);
+		List<CollectRecord> recordsSummary = recordDAO.loadSummaries(survey, recordContext, rootEntity, offset, maxNumberOfRecords, orderByFieldName, filter);
 		return recordsSummary;
 	}
 
@@ -134,7 +119,7 @@ public class RecordManager implements RecordContext {
 	public CollectRecord create(CollectSurvey survey, EntityDefinition rootEntityDefinition, User user, String modelVersionName) throws MultipleEditException, AccessDeniedException, RecordLockedException {
 		recordDAO.checkLock(user);
 		
-		CollectRecord record = new CollectRecord(this, survey, modelVersionName);
+		CollectRecord record = new CollectRecord(recordContext, survey, modelVersionName);
 		record.createRootEntity(rootEntityDefinition.getName());
 		
 		record.setCreationDate(new Date());
@@ -445,5 +430,12 @@ public class RecordManager implements RecordContext {
 		}
 		record.setKeys(keys);
 	}
-	
+
+	public RecordContext getRecordContext() {
+		return recordContext;
+	}
+
+	public void setRecordContext(RecordContext recordContext) {
+		this.recordContext = recordContext;
+	}
 }

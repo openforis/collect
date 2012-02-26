@@ -15,7 +15,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
@@ -29,6 +28,7 @@ import org.openforis.idm.model.Coordinate;
 import org.openforis.idm.model.Date;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.RealAttribute;
+import org.openforis.idm.model.RecordContext;
 import org.openforis.idm.model.Time;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -50,7 +50,7 @@ public class ModelDAOIntegrationTest {
 	protected RecordDAO recordDao;
 	
 	@Autowired
-	protected RecordManager recordManager;
+	protected RecordContext recordContext;
 	
 	@Test
 	public void testCRUD() throws Exception  {
@@ -73,7 +73,7 @@ public class ModelDAOIntegrationTest {
 		log.debug("Saving record:\n"+saved);
 		
 		// RELOAD
-		record = recordDao.load(survey, recordManager, record.getId());
+		record = recordDao.load(survey, recordContext, record.getId());
 		String reloaded = record.toString();
 		log.debug("Reloaded as:\n"+reloaded);
 		
@@ -124,7 +124,7 @@ public class ModelDAOIntegrationTest {
 	}
 
 	private CollectRecord createTestRecord(CollectSurvey survey) {
-		CollectRecord record = new CollectRecord(recordManager, survey, "2.0");
+		CollectRecord record = new CollectRecord(recordContext, survey, "2.0");
 		Entity cluster = record.createRootEntity("cluster");
 		record.setCreationDate(new GregorianCalendar(2011, 12, 31, 23, 59).getTime());
 		//record.setCreatedBy("ModelDAOIntegrationTest");
@@ -204,7 +204,7 @@ public class ModelDAOIntegrationTest {
 		int maxNumberOfRecords = 1;
 		String orderByFieldName = "key_id";
 		String filter = null;
-		List<CollectRecord> list = this.recordDao.loadSummaries(survey, recordManager, rootEntityName, offset, maxNumberOfRecords, orderByFieldName, filter);
+		List<CollectRecord> list = this.recordDao.loadSummaries(survey, recordContext, rootEntityName, offset, maxNumberOfRecords, orderByFieldName, filter);
 		assertNotNull(list);
 		assertEquals(1, list.size());
 		

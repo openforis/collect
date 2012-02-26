@@ -25,6 +25,10 @@ import org.w3c.dom.Element;
 @XmlType(name = "", propOrder = { "tabs" })
 @XmlRootElement(name = "flex")
 
+/**
+ * @author M. Togna
+ *
+ */
 public class UIConfiguration implements Configuration {
 
 	@XmlElementWrapper(name = "tabs")
@@ -57,7 +61,7 @@ public class UIConfiguration implements Configuration {
 				UIConfiguration configuration = (UIConfiguration) unmarshaller.unmarshal(elem);
 				return configuration;
 			} catch (JAXBException e) {
-				throw new RuntimeException("Unable to unmarshal the UI configuration", e);
+				throw new RuntimeException("Unable to marshal the UI configuration: "+ e.getMessage(), e);
 			}
 		}
 
@@ -71,7 +75,7 @@ public class UIConfiguration implements Configuration {
 				Element documentElement = document.getDocumentElement();
 				return documentElement;
 			} catch (JAXBException e) {
-				throw new RuntimeException("Unable to marshal the UI configuration", e);
+				throw new RuntimeException("Unable to marshal the UI configuration: "+ e.getMessage(), e);
 			}
 		}
 
