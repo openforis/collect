@@ -157,6 +157,7 @@ public class RecordManager {
 				break;
 			case CLEANSING:
 				nextStep = Step.ANALYSIS;
+				recordDAO.unlock(recordId, user);
 				record.setStep(nextStep);
 				recordDAO.update(record);
 				break;
