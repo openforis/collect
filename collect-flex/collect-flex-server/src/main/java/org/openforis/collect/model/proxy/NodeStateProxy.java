@@ -20,7 +20,7 @@ public class NodeStateProxy implements Proxy {
 	}
 
 	@ExternalizedProperty
-	public int getNodeId() {
+	public Integer getNodeId() {
 		return nodeState.getNode().getId();
 	}
 

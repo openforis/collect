@@ -438,4 +438,5 @@ public class RecordManager {
 	public void setRecordContext(RecordContext recordContext) {
 		this.recordContext = recordContext;
 	}
+
 }
