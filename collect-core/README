@@ -13,6 +13,6 @@ Run integration tests with:
 Regenerate jOOQ stub classes*: 
 
 	cd collect-core
-	mvn properties:read-properties jooq-codegen:generate
+	mvn properties:read-project-properties jooq-codegen:generate
 	 
 * Must be run from collect-core directory.  Requires dev database settings in dev.properties.   See http://km.fao.org/OFwiki/index.php/Open_Foris_Collect_Development_Environment for more info.  
