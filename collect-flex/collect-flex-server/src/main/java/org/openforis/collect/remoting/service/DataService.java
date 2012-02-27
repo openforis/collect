@@ -74,6 +74,8 @@ public class DataService {
 		CollectSurvey survey = getActiveSurvey();
 		User user = getUserInSession();
 		CollectRecord record = recordManager.checkout(survey, user, id);
+		record.updateNodeStates();
+		
 		Entity rootEntity = record.getRootEntity();
 		ModelVersion version = record.getVersion();
 		recordManager.addEmptyNodes(rootEntity, version);

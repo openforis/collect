@@ -8,7 +8,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.openforis.idm.metamodel.EntityDefinition;
+import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.validation.Validator;
+import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.Record;
 import org.openforis.idm.model.RecordContext;
@@ -17,6 +20,7 @@ import org.openforis.idm.model.state.NodeState;
 
 /**
  * @author G. Miceli
+ * @author M. Togna
  */
 public class CollectRecord extends Record {
 
@@ -76,11 +80,89 @@ public class CollectRecord extends Record {
 
 	}
 
+	public void updateNodeStates() {
+		Entity entity = getRootEntity();
+		updateAllRelevanceStates(entity);
+		updateAllRequiredStates(entity);
+		updateAllValidationStates(entity);
+	}
+
+	private void updateAllRelevanceStates(Node<?> node) {
+		NodeState nodeState = getNodeStateInternal(node);
+		nodeState.updateRelevance();
+
+		if (node instanceof Entity) {
+			Entity entity = (Entity) node;
+			EntityDefinition definition = entity .getDefinition();
+			List<NodeDefinition> childDefinitions = definition.getChildDefinitions();
+			for (NodeDefinition childDefinition : childDefinitions) {
+				String childName = childDefinition.getName();
+				List<Node<? extends NodeDefinition>> children = entity.getAll(childName);
+				for (Node<? extends NodeDefinition> child : children) {
+					updateAllRelevanceStates(child);
+				}
+			}
+		}
+	}
+
+	private void updateAllRequiredStates(Node<?> node) {
+		NodeState nodeState = getNodeStateInternal(node);
+		nodeState.updateRequired();
+
+		if (node instanceof Entity) {
+			Entity entity = (Entity) node;
+			EntityDefinition definition = entity .getDefinition();
+			List<NodeDefinition> childDefinitions = definition.getChildDefinitions();
+			for (NodeDefinition childDefinition : childDefinitions) {
+				String childName = childDefinition.getName();
+				List<Node<? extends NodeDefinition>> children = entity.getAll(childName);
+				for (Node<? extends NodeDefinition> child : children) {
+					updateAllRequiredStates(child);
+				}
+			}
+		}
+	}
+	
+	private void updateAllValidationStates(Node<?> node) {
+		NodeState nodeState = getNodeStateInternal(node);
+		nodeState.updateValidation(getValidator());
+
+		if (node instanceof Entity) {
+			Entity entity = (Entity) node;
+			EntityDefinition definition = entity .getDefinition();
+			List<NodeDefinition> childDefinitions = definition.getChildDefinitions();
+			for (NodeDefinition childDefinition : childDefinitions) {
+				String childName = childDefinition.getName();
+				List<Node<? extends NodeDefinition>> children = entity.getAll(childName);
+				for (Node<? extends NodeDefinition> child : children) {
+					updateAllValidationStates(child);
+				}
+			}
+		}
+	}
+	
+	private NodeState getNodeStateInternal(Node<?> child) {
+		Integer internalId = child.getInternalId();
+		NodeState nodeState = nodeStateMap.get(internalId);
+		if (nodeState == null) {
+			nodeState = new NodeState(child);
+			nodeStateMap.put(internalId, nodeState);
+		}
+		return nodeState;
+	}
+
+	/**
+	 * Returns a node states for the given node. It gets created if it doesn't exist.
+	 * 
+	 * @param node
+	 * @return
+	 */
 	public NodeState getNodeState(Node<?> node) {
 		int nodeInternalId = node.getInternalId();
 		NodeState nodeState = nodeStateMap.get(nodeInternalId);
-		if(nodeState == null){
-			nodeState = updateNodeStateInternal(node);
+		if (nodeState == null) {
+			nodeState = updateNodeStates(node);
+			nodeStateMap.put(nodeInternalId, nodeState);
 		}
 		return nodeState;
 	}
@@ -97,39 +179,126 @@ public class CollectRecord extends Record {
 	 * @return
 	 */
 	public List<NodeState> updateNodeState(Node<?> node) {
-		List<NodeState> nodeStates = new ArrayList<NodeState>();
-		Set<Integer> ids = new HashSet<Integer>();
-		updateNodeStateInternal(node, ids, nodeStates);
+		Set<Node<?>> nodesToRevalidate = new HashSet<Node<?>>();
+
+		updateRelevanceAndDessendants(node, nodesToRevalidate);
+		updateDependantRelevantNodes(node, nodesToRevalidate);
+		
+		Set<Node<?>> relevantNodes = new HashSet<Node<?>>();
+		relevantNodes.addAll(nodesToRevalidate);
+		for (Node<?> relNode : relevantNodes) {
+			updateRequiredState(relNode, false, nodesToRevalidate);
+		}
+		updateRequiredState(node, true, nodesToRevalidate);
+
+		List<NodeState> nodeStates = validate(nodesToRevalidate);
+
 		return nodeStates;
+	}
+
+	private void updateDependantRelevantNodes(Node<?> node, Set<Node<?>> set) {
+		ModelDependencies modelDependencies = collectSurvey.getModelDependencies();
+		Set<Node<?>> relevanceDependantNodes = modelDependencies.getRelevanceDependantNodes(node);
+		for (Node<?> dependantNode : relevanceDependantNodes) {
+			updateRelevanceAndDessendants(dependantNode, set);
+		}
+	}
+
+	private List<NodeState> validate(Set<Node<?>> nodesToRevalidate) {
+		List<NodeState> nodeStates = new ArrayList<NodeState>();
+		for (Node<?> node : nodesToRevalidate) {
+			NodeState nodeState = getNodeState(node);
+			nodeState.updateValidation(getValidator());
+			nodeStates.add(nodeState);
+		}
+		return nodeStates;
+	}
+
+	/**
+	 * Update the relevance of a node and all its descendants Returns the set of the updated descendants
+	 * 
+	 * @param node
+	 */
+	private void updateRelevanceAndDessendants(Node<?> node, Set<Node<?>> set) {
+		NodeState nodeState = getNodeState(node);
+		nodeState.updateRelevance();
+		set.add(node);
+
+		if (node instanceof Entity) {
+			Entity entity = (Entity) node;
+			EntityDefinition entityDefinition = entity.getDefinition();
+			List<NodeDefinition> childDefinitions = entityDefinition.getChildDefinitions();
+			for (NodeDefinition childDefinition : childDefinitions) {
+				String childName = childDefinition.getName();
+				List<Node<?>> children = entity.getAll(childName);
+				for (Node<?> childNode : children) {
+					updateRelevanceAndDessendants(childNode, set);
+				}
+			}
+		}
+	}
+
+	/**
+	 * @param node
+	 */
+	private void updateRequiredState(Node<?> node, boolean updateDependants, Set<Node<?>> set) {
+		NodeState nodeState = getNodeState(node);
+		nodeState.updateRequired();
+		set.add(node);
+
+		if (updateDependants) {
+			ModelDependencies dependencies = collectSurvey.getModelDependencies();
+			Set<Node<?>> nodes = dependencies.getRequiredDependantNodes(node);
+			for (Node<?> dependantNode : nodes) {
+				updateRequiredState(dependantNode, updateDependants, set);
+			}
+		}
 	}
 
 	public List<NodeState> deleteNodeState(Node<?> node) {
-		List<NodeState> nodeStates = new ArrayList<NodeState>();
-		Set<Integer> ids = new HashSet<Integer>();
-		refreshDependentNodesState(node, ids, nodeStates);
+		Set<Node<?>> nodesToRevalidate = new HashSet<Node<?>>();
+
+//		updateRelevanceAndDessendants(node, nodesToRevalidate);
+		updateDependantRelevantNodes(node, nodesToRevalidate);
+		
+		Set<Node<?>> relevantNodes = new HashSet<Node<?>>();
+		relevantNodes.addAll(nodesToRevalidate);
+		for (Node<?> relNode : relevantNodes) {
+			updateRequiredState(relNode, false, nodesToRevalidate);
+		}
+		updateRequiredState(node, true, nodesToRevalidate);
+
+		List<NodeState> nodeStates = validate(nodesToRevalidate);
+
 		return nodeStates;
 	}
 
-	private void refreshDependentNodesState(Node<?> node, Set<Integer> updatedNodeIds, List<NodeState> nodeStates) {
-		ModelDependencies dependencies = collectSurvey.getModelDependencies();
-		Set<Node<?>> dependentNodes = dependencies.getDependantNodes(node);
-		for (Node<?> dependentNode : dependentNodes) {
-			updateNodeStateInternal(dependentNode, updatedNodeIds, nodeStates);
-		}
-	}
+//	private void refreshDependentNodesState(Node<?> node, Set<Integer> updatedNodeIds, List<NodeState> nodeStates) {
+//		ModelDependencies dependencies = collectSurvey.getModelDependencies();
+//		Set<Node<?>> dependentNodes = dependencies.getDependantNodes(node);
+//		for (Node<?> dependentNode : dependentNodes) {
+//			updateNodeStateInternal(dependentNode, updatedNodeIds, nodeStates);
+//		}
+//	}
 
-	private void updateNodeStateInternal(Node<?> node, Set<Integer> updatedNodeIds, List<NodeState> nodeStates) {
-		Integer nodeId = node.getInternalId();
-		if (!updatedNodeIds.contains(nodeId)) {
-			NodeState nodeState = updateNodeStateInternal(node);
-			nodeStates.add(nodeState);
-			updatedNodeIds.add(nodeId);
+//	private void updateNodeStateInternal(Node<?> node, Set<Integer> updatedNodeIds, List<NodeState> nodeStates) {
+//		Integer nodeId = node.getInternalId();
+//		if (!updatedNodeIds.contains(nodeId)) {
+//			NodeState nodeState = updateNodeStates(node);
+//			nodeStates.add(nodeState);
+//			updatedNodeIds.add(nodeId);
+//
+//			refreshDependentNodesState(node, updatedNodeIds, nodeStates);
+//		}
+//	}
 
-			refreshDependentNodesState(node, updatedNodeIds, nodeStates);
-		}
-	}
-
-	private NodeState updateNodeStateInternal(Node<?> node) {
+	/**
+	 * Update all states of a node
+	 * 
+	 * @param node
+	 * @return
+	 */
+	private NodeState updateNodeStates(Node<?> node) {
 		NodeState nodeState = new NodeState(node);
 		nodeState.update(getValidator());
 		nodeStateMap.put(node.getInternalId(), nodeState);
@@ -237,7 +406,7 @@ public class CollectRecord extends Record {
 	public void setEntityCounts(List<Integer> counts) {
 		this.entityCounts = counts;
 	}
-	
+
 	public Integer getSubmittedId() {
 		return submittedId;
 	}
@@ -245,5 +414,5 @@ public class CollectRecord extends Record {
 	public void setSubmittedId(Integer submittedId) {
 		this.submittedId = submittedId;
 	}
-
+	
 }
