@@ -188,7 +188,8 @@ public class RecordDAO extends JooqDaoSupport {
 				r.COUNT2,
 				r.COUNT3,
 				r.COUNT4,
-				r.COUNT5
+				r.COUNT5,
+				r.SUBMITTED_ID
 				);
 		
 		//add order by condition
@@ -265,6 +266,7 @@ public class RecordDAO extends JooqDaoSupport {
 				.set(RECORD.MISSING, record.getMissing())
 				.set(RECORD.ERRORS, record.getErrors())
 				.set(RECORD.WARNINGS, record.getWarnings())
+				.set(RECORD.SUBMITTED_ID, record.getSubmittedId())
 				;
 		//set keys
 		List<String> keys = record.getRootEntityKeys();
@@ -319,6 +321,7 @@ public class RecordDAO extends JooqDaoSupport {
 				.set(RECORD.MISSING, record.getMissing())
 				.set(RECORD.ERRORS, record.getErrors())
 				.set(RECORD.WARNINGS, record.getWarnings())
+				.set(RECORD.SUBMITTED_ID, record.getSubmittedId())
 				;
 		//set keys
 		List<String> keys = record.getRootEntityKeys();
@@ -375,6 +378,7 @@ public class RecordDAO extends JooqDaoSupport {
 		collectRecord.setErrors(r.getValue(RECORD.ERRORS));
 		collectRecord.setSkipped(r.getValue(RECORD.SKIPPED));
 		collectRecord.setMissing(r.getValue(RECORD.MISSING));
+		collectRecord.setSubmittedId(r.getValue(RECORD.SUBMITTED_ID));
 		
 		Integer step = r.getValue(RECORD.STEP);
 		if(step != null) {

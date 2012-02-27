@@ -31,6 +31,9 @@ GO
 ALTER TABLE "collect"."data"
 	DROP CONSTRAINT "FK_data_record" CASCADE 
 GO
+ALTER TABLE "collect"."record"
+	DROP CONSTRAINT "FK_record_submitted_record" CASCADE 
+GO
 ALTER TABLE "collect"."data"
 	DROP CONSTRAINT "FK_data_schema_definition" CASCADE 
 GO

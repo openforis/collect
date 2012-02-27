@@ -56,7 +56,8 @@ public class CollectRecord extends Record {
 	private Integer skipped;
 	private Integer errors;
 	private Integer warnings;
-
+	private Integer submittedId;
+	
 	private List<String> rootEntityKeys;
 	private List<Integer> entityCounts;
 	private Map<Integer, NodeState> nodeStateMap;
@@ -235,6 +236,14 @@ public class CollectRecord extends Record {
 
 	public void setEntityCounts(List<Integer> counts) {
 		this.entityCounts = counts;
+	}
+	
+	public Integer getSubmittedId() {
+		return submittedId;
+	}
+	
+	public void setSubmittedId(Integer submittedId) {
+		this.submittedId = submittedId;
 	}
 
 }

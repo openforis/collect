@@ -49,98 +49,106 @@
 <Column id="40" name="count3" type="integer" length="25" nulls="true"/>
 <Column id="41" name="count4" type="integer" length="25" nulls="true"/>
 <Column id="42" name="count5" type="integer" length="25" nulls="true"/>
+<Column id="43" name="submitted_id" type="integer" length="25" nulls="true"/>
 <Storage name="TempTable" value="false"/>
 </Table>
-<Table id="43" name="taxon" schema="collect" database="" background="16777165">
-<Column id="44" name="id" type="integer" length="25" nulls="false"/>
-<Column id="45" name="code" type="varchar" length="32" nulls="false"/>
-<Column id="46" name="scientific_name" type="varchar" length="255" nulls="false"/>
-<Column id="47" name="taxon_rank" type="varchar" length="128" nulls="false"/>
-<Column id="48" name="taxonomy_id" type="integer" length="25" nulls="false"/>
-<Column id="49" name="step" type="integer" length="25" nulls="false"/>
-<Column id="50" name="parent_id" type="integer" length="25" nulls="true"/>
+<Table id="44" name="taxon" schema="collect" database="" background="16777165">
+<Column id="45" name="id" type="integer" length="25" nulls="false"/>
+<Column id="46" name="code" type="varchar" length="32" nulls="false"/>
+<Column id="47" name="scientific_name" type="varchar" length="255" nulls="false"/>
+<Column id="48" name="taxon_rank" type="varchar" length="128" nulls="false"/>
+<Column id="49" name="taxonomy_id" type="integer" length="25" nulls="false"/>
+<Column id="50" name="step" type="integer" length="25" nulls="false"/>
+<Column id="51" name="parent_id" type="integer" length="25" nulls="true"/>
 <Storage name="TempTable" value="false"/>
 </Table>
-<Table id="51" name="taxon_vernacular_name" schema="collect" database="" background="16777165">
-<Column id="52" name="id" type="integer" length="25" nulls="false"/>
-<Column id="53" name="vernacular_name" type="varchar" length="255" nulls="true"/>
-<Column id="54" name="language_code" type="varchar" length="3" nulls="false"/>
-<Column id="55" name="language_variety" type="varchar" length="255" nulls="true">
+<Table id="52" name="taxon_vernacular_name" schema="collect" database="" background="16777165">
+<Column id="53" name="id" type="integer" length="25" nulls="false"/>
+<Column id="54" name="vernacular_name" type="varchar" length="255" nulls="true"/>
+<Column id="55" name="language_code" type="varchar" length="3" nulls="false"/>
+<Column id="56" name="language_variety" type="varchar" length="255" nulls="true">
 <CP name="COMMENTS">Dialect, lect, sublanguage or other</CP>
 </Column>
-<Column id="56" name="taxon_id" type="integer" length="25" nulls="true"/>
-<Column id="57" name="step" type="integer" length="25" nulls="false"/>
+<Column id="57" name="taxon_id" type="integer" length="25" nulls="true"/>
+<Column id="58" name="step" type="integer" length="25" nulls="false"/>
 <Storage name="TempTable" value="false"/>
 </Table>
-<Table id="58" name="taxonomy" schema="collect" database="" background="16777165">
-<Column id="59" name="id" type="integer" length="25" nulls="false"/>
-<Column id="60" name="name" type="varchar" length="255" nulls="false"/>
-<Column id="61" name="metadata" type="text" length="25" nulls="false"/>
+<Table id="59" name="taxonomy" schema="collect" database="" background="16777165">
+<Column id="60" name="id" type="integer" length="25" nulls="false"/>
+<Column id="61" name="name" type="varchar" length="255" nulls="false"/>
+<Column id="62" name="metadata" type="text" length="25" nulls="false"/>
 <Storage name="TempTable" value="false"/>
 </Table>
-<Table id="62" name="user_account" schema="collect" database="" background="16777165">
-<Column id="63" name="id" type="integer" length="25" nulls="false"/>
-<Column id="64" name="username" type="varchar" length="255" nulls="false"/>
-<Column id="65" name="password" type="varchar" length="255" nulls="false"/>
-<Column id="66" name="enabled" type="char" length="1" nulls="false">
+<Table id="63" name="user_account" schema="collect" database="" background="16777165">
+<Column id="64" name="id" type="integer" length="25" nulls="false"/>
+<Column id="65" name="username" type="varchar" length="255" nulls="false"/>
+<Column id="66" name="password" type="varchar" length="255" nulls="false"/>
+<Column id="67" name="enabled" type="char" length="1" nulls="false">
 <CP name="DEFAULT_VALUE">'Y'</CP>
 </Column>
 <Storage name="TempTable" value="false"/>
 </Table>
-<Table id="67" name="user_role" schema="collect" database="" background="16777165">
-<Column id="68" name="id" type="integer" length="25" nulls="false"/>
-<Column id="69" name="user_id" type="integer" length="25" nulls="false"/>
-<Column id="70" name="role" type="varchar" length="256" nulls="true"/>
+<Table id="68" name="user_role" schema="collect" database="" background="16777165">
+<Column id="69" name="id" type="integer" length="25" nulls="false"/>
+<Column id="70" name="user_id" type="integer" length="25" nulls="false"/>
+<Column id="71" name="role" type="varchar" length="256" nulls="true"/>
 <Storage name="TempTable" value="false"/>
 </Table>
-<Table id="71" name="logo" schema="collect" database="" background="16777165">
-<Column id="72" name="pos" type="integer" length="25" nulls="false"/>
-<Column id="73" name="image" type="bytea" length="25" nulls="false"/>
+<Table id="72" name="logo" schema="collect" database="" background="16777165">
+<Column id="73" name="pos" type="integer" length="25" nulls="false"/>
+<Column id="74" name="image" type="bytea" length="25" nulls="false"/>
 <Storage name="TempTable" value="false"/>
 </Table>
-<Relation id="74" name="FK_data_schema_definition" cardinality="-2" identifying="false" nulls="false">
+<Relation id="75" name="FK_data_schema_definition" cardinality="-2" identifying="false" nulls="false">
 <FK>1</FK>
 <PK>8</PK>
 </Relation>
-<Relation id="75" name="FK_schema_definition_survey" cardinality="-2" identifying="false" nulls="false">
+<Relation id="76" name="FK_schema_definition_survey" cardinality="-2" identifying="false" nulls="false">
 <FK>16</FK>
 <PK>2</PK>
 </Relation>
-<Relation id="76" name="FK_record_root_entity" cardinality="-2" identifying="false" nulls="false">
+<Relation id="77" name="FK_record_root_entity" cardinality="-2" identifying="false" nulls="false">
 <FK>1</FK>
 <PK>22</PK>
 </Relation>
-<Relation id="77" name="FK_data_record" cardinality="-2" identifying="false" nulls="false">
+<Relation id="78" name="FK_data_record" cardinality="-2" identifying="false" nulls="false">
 <FK>21</FK>
 <PK>6</PK>
 </Relation>
-<Relation id="78" name="FK_taxon_vernacular_name_taxon" cardinality="-2" identifying="true" nulls="false">
-<FK>44</FK>
-<PK>56</PK>
+<Relation id="79" name="FK_taxon_vernacular_name_taxon" cardinality="-2" identifying="true" nulls="false">
+<FK>45</FK>
+<PK>57</PK>
 </Relation>
-<Relation id="79" name="FK_taxon_taxonomy" cardinality="-2" identifying="false" nulls="false">
-<FK>59</FK>
-<PK>48</PK>
+<Relation id="80" name="FK_taxon_taxonomy" cardinality="-2" identifying="false" nulls="false">
+<FK>60</FK>
+<PK>49</PK>
 </Relation>
-<Relation id="80" name="FK_user_user_role" cardinality="-2" identifying="true" nulls="false">
-<FK>63</FK>
-<PK>69</PK>
+<Relation id="81" name="FK_user_user_role" cardinality="-2" identifying="true" nulls="false">
+<FK>64</FK>
+<PK>70</PK>
 </Relation>
-<Relation id="81" name="FK_record_locked_by_user" cardinality="-3" identifying="false" nulls="false">
-<FK>63</FK>
+<Relation id="82" name="FK_record_locked_by_user" cardinality="-3" identifying="false" nulls="false">
+<FK>64</FK>
 <PK>30</PK>
 </Relation>
-<Relation id="82" name="FK_record_created_by_user" cardinality="-2" identifying="false" nulls="false">
-<FK>63</FK>
+<Relation id="83" name="FK_record_created_by_user" cardinality="-2" identifying="false" nulls="false">
+<FK>64</FK>
 <PK>24</PK>
 </Relation>
-<Relation id="83" name="FK_record_modified_by_user" cardinality="-1" identifying="false" nulls="false">
-<FK>63</FK>
+<Relation id="84" name="FK_record_modified_by_user" cardinality="-1" identifying="false" nulls="false">
+<FK>64</FK>
 <PK>26</PK>
 </Relation>
-<Relation id="84" name="FK_taxon_parent" cardinality="-2" identifying="false" nulls="true">
-<FK>44</FK>
-<PK>50</PK>
+<Relation id="85" name="FK_taxon_parent" cardinality="-2" identifying="false" nulls="true">
+<FK>45</FK>
+<PK>51</PK>
+</Relation>
+<Relation id="86" name="FK_record_submitted_record" cardinality="-3" identifying="true" nulls="false">
+<Option name="onDelete" class="String" value="NO ACTION"/>
+<Option name="onUpdate" class="String" value="NO ACTION"/>
+<FK>21</FK>
+<PK>43</PK>
+<Text/>
 </Relation>
 <Constraint table="0" name="PK_schema_definition" type="PrimKey">
 <ConstraintColumn id="1"/>
@@ -167,51 +175,52 @@
 <Constraint table="20" name="PK_record" type="PrimKey">
 <ConstraintColumn id="21"/>
 </Constraint>
-<Constraint table="43" name="PK_taxon" type="PrimKey">
-<ConstraintColumn id="44"/>
+<Constraint table="44" name="PK_taxon" type="PrimKey">
+<ConstraintColumn id="45"/>
 </Constraint>
-<Constraint table="51" name="PK_taxon_name" type="PrimKey">
-<ConstraintColumn id="52"/>
+<Constraint table="52" name="PK_taxon_name" type="PrimKey">
+<ConstraintColumn id="53"/>
 </Constraint>
-<Constraint table="58" name="PK_taxonomy" type="PrimKey">
-<ConstraintColumn id="59"/>
-</Constraint>
-<Constraint table="58" name="UK_taxonomy_name" type="Unique">
+<Constraint table="59" name="PK_taxonomy" type="PrimKey">
 <ConstraintColumn id="60"/>
 </Constraint>
-<Constraint table="62" name="PK_user" type="PrimKey">
-<ConstraintColumn id="63"/>
+<Constraint table="59" name="UK_taxonomy_name" type="Unique">
+<ConstraintColumn id="61"/>
 </Constraint>
-<Constraint table="67" name="PK_user_role" type="PrimKey">
-<ConstraintColumn id="68"/>
+<Constraint table="63" name="PK_user" type="PrimKey">
+<ConstraintColumn id="64"/>
 </Constraint>
-<Constraint table="71" name="PK_logo" type="PrimKey">
-<ConstraintColumn id="72"/>
+<Constraint table="68" name="PK_user_role" type="PrimKey">
+<ConstraintColumn id="69"/>
 </Constraint>
-<Sheet name="Main" id="85" disp_at="true" disp_ph="true" disp_co="true">
-<Place id="20" visible="true">35,415,216,456</Place>
-<Place id="62" visible="true">40,200,191,101</Place>
-<Place id="77" visible="true" options="35.0,415.0,216.0,456.0,803.0,452.0,190.0,190.0,5,251.0,630.0,251.0,610.0,791.5,610.0,791.5,600.0,803.0,600.0">500,0,0,0</Place>
-<Place id="71" visible="true">799,110,120,60</Place>
-<Place id="67" visible="true">40,40,211,91</Place>
-<Place id="76" visible="true" options="498.0,188.0,200.0,83.0,35.0,415.0,216.0,456.0,5,560.0,271.0,560.0,440.0,462.0,440.0,462.0,570.0,251.0,570.0">706,-27,0,0</Place>
-<Place id="81" visible="true" options="40.0,200.0,191.0,101.0,35.0,415.0,216.0,456.0,4,100.0,301.0,105.0,301.0,105.0,415.0,110.0,415.0">500,0,0,0</Place>
-<Place id="4" visible="true">803,452,190,190</Place>
-<Place id="0" visible="true">498,188,200,83</Place>
-<Place id="75" visible="true" options="499.0,17.0,191.0,92.0,498.0,188.0,200.0,83.0,2,600.0,109.0,600.0,188.0">500,0,0,0</Place>
-<Place id="83" visible="true" options="40.0,200.0,191.0,101.0,35.0,415.0,216.0,456.0,2,180.0,301.0,180.0,415.0">500,0,0,0</Place>
-<Place id="74" visible="true">500,0,0,0</Place>
+<Constraint table="72" name="PK_logo" type="PrimKey">
+<ConstraintColumn id="73"/>
+</Constraint>
+<Sheet name="Main" id="87" disp_at="true" disp_ph="true" disp_co="true">
+<Place id="72" visible="true">799,110,120,60</Place>
+<Place id="78" visible="true" options="35.0,415.0,216.0,436.0,803.0,452.0,190.0,190.0,4,251.0,610.0,791.5,610.0,791.5,600.0,803.0,600.0">500,0,0,0</Place>
 <Place id="15" visible="true">499,17,191,92</Place>
-<Place id="80" visible="true" options="40.0,200.0,191.0,101.0,40.0,40.0,211.0,91.0,2,140.0,200.0,140.0,131.0">434,33,0,0</Place>
-<Place id="82" visible="true" options="40.0,200.0,191.0,101.0,35.0,415.0,216.0,456.0,2,140.0,301.0,140.0,415.0">500,0,0,0</Place>
+<Place id="82" visible="true" options="40.0,200.0,191.0,101.0,35.0,415.0,216.0,436.0,4,100.0,301.0,105.0,301.0,105.0,415.0,100.0,415.0">500,0,0,0</Place>
+<Place id="0" visible="true">498,188,200,83</Place>
+<Place id="68" visible="true">40,40,211,91</Place>
+<Place id="81" visible="true" options="40.0,200.0,191.0,101.0,40.0,40.0,211.0,91.0,2,140.0,200.0,140.0,131.0">434,33,0,0</Place>
+<Place id="75" visible="true">500,0,0,0</Place>
+<Place id="86" visible="true">500,0,0,0</Place>
+<Place id="4" visible="true">803,452,190,190</Place>
+<Place id="20" visible="true">35,415,216,436</Place>
+<Place id="83" visible="true" options="40.0,200.0,191.0,101.0,35.0,415.0,216.0,436.0,2,140.0,301.0,140.0,415.0">500,0,0,0</Place>
+<Place id="63" visible="true">40,200,191,101</Place>
+<Place id="77" visible="true" options="498.0,188.0,200.0,83.0,35.0,415.0,216.0,436.0,5,560.0,271.0,560.0,440.0,462.0,440.0,462.0,610.0,251.0,610.0">706,-27,0,0</Place>
+<Place id="76" visible="true" options="499.0,17.0,191.0,92.0,498.0,188.0,200.0,83.0,2,600.0,109.0,600.0,188.0">500,0,0,0</Place>
+<Place id="84" visible="true" options="40.0,200.0,191.0,101.0,35.0,415.0,216.0,436.0,4,180.0,301.0,175.0,301.0,175.0,415.0,170.0,415.0">500,0,0,0</Place>
 </Sheet>
-<Sheet name="Species" id="86" disp_at="true" disp_ph="true" disp_co="true" disp_rn="true">
-<Place id="51" visible="true">270,549,240,130</Place>
-<Place id="79" visible="true" options="300.0,108.0,170.0,80.0,278.0,280.0,230.0,161.0,2,390.0,188.0,390.0,280.0">500,0,0,0</Place>
-<Place id="78" visible="true" options="278.0,280.0,230.0,161.0,270.0,549.0,240.0,130.0,5,400.0,441.0,400.0,440.5,395.0,440.5,395.0,549.0,390.0,549.0">500,0,0,0</Place>
-<Place id="43" visible="true">278,280,230,161</Place>
-<Place id="58" visible="true">300,108,170,80</Place>
-<Place id="84" visible="true">500,0,0,0</Place>
+<Sheet name="Species" id="88" disp_at="true" disp_ph="true" disp_co="true" disp_rn="true">
+<Place id="52" visible="true">270,549,240,130</Place>
+<Place id="85" visible="true">500,0,0,0</Place>
+<Place id="44" visible="true">278,280,230,161</Place>
+<Place id="80" visible="true" options="300.0,108.0,170.0,80.0,278.0,280.0,230.0,161.0,2,390.0,188.0,390.0,280.0">500,0,0,0</Place>
+<Place id="59" visible="true">300,108,170,80</Place>
+<Place id="79" visible="true" options="278.0,280.0,230.0,161.0,270.0,549.0,240.0,130.0,5,400.0,441.0,400.0,440.5,395.0,440.5,395.0,549.0,390.0,549.0">500,0,0,0</Place>
 </Sheet>
-<Settings sheet="85" zoom="0.8408964152537146"/>
+<Settings sheet="87" zoom="0.7071067811865477"/>
 </Diagram>

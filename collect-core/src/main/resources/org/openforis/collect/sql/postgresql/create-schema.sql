@@ -75,6 +75,7 @@ CREATE TABLE "collect"."record"  (
 	"count3"        	integer NULL,
 	"count4"        	integer NULL,
 	"count5"        	integer NULL,
+	"submitted_id"  	integer NULL,
 	PRIMARY KEY("id")
 )
 GO
@@ -157,6 +158,11 @@ GO
 ALTER TABLE "collect"."data"
 	ADD CONSTRAINT "FK_data_record"
 	FOREIGN KEY("record_id")
+	REFERENCES "collect"."record"("id")
+GO
+ALTER TABLE "collect"."record"
+	ADD CONSTRAINT "FK_record_submitted_record"
+	FOREIGN KEY("submitted_id")
 	REFERENCES "collect"."record"("id")
 GO
 ALTER TABLE "collect"."data"
