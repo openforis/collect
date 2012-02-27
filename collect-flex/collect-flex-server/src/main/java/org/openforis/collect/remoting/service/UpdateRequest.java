@@ -1,7 +1,7 @@
 package org.openforis.collect.remoting.service;
 
 import org.openforis.collect.Proxy;
-import org.openforis.collect.model.proxy.AttributeSymbol;
+import org.openforis.collect.model.FieldSymbol;
 
 /**
  * 
@@ -22,7 +22,7 @@ public class UpdateRequest implements Proxy {
 	private String value;
 	private Method method;
 	private String remarks;
-	private AttributeSymbol symbol;
+	private FieldSymbol symbol;
 	
 	public UpdateRequest(){
 		
@@ -68,11 +68,11 @@ public class UpdateRequest implements Proxy {
 		this.remarks = remarks;
 	}
 
-	public AttributeSymbol getSymbol() {
+	public FieldSymbol getSymbol() {
 		return symbol;
 	}
 
-	public void setSymbol(AttributeSymbol symbol) {
+	public void setSymbol(FieldSymbol symbol) {
 		this.symbol = symbol;
 	}
 

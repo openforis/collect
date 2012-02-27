@@ -75,14 +75,30 @@ public class CollectRecord extends Record {
 
 	}
 
-	public NodeState getNodeState(int nodeItenralId) {
-		return nodeStateMap.get(nodeItenralId);
+	public NodeState getNodeState(Node<?> node) {
+		int nodeInternalId = node.getInternalId();
+		NodeState nodeState = nodeStateMap.get(nodeInternalId);
+		if(nodeState == null){
+			nodeState = updateNodeStateInternal(node);
+		}
+		return nodeState;
 	}
 
+	/**
+	 * <ol>
+	 * <li>Change value of attribute x</li>
+	 * <li>Update relevance states of all nodes R which depend on x for relevance and their descendants</li>
+	 * <li>Update required states of all nodes R, of all nodes V which depend on value of x</li>
+	 * <li>Revalidate all nodes R, V and x</li>
+	 * </ol>
+	 * 
+	 * @param node
+	 * @return
+	 */
 	public List<NodeState> updateNodeState(Node<?> node) {
 		List<NodeState> nodeStates = new ArrayList<NodeState>();
 		Set<Integer> ids = new HashSet<Integer>();
-		internalRefreshState(node, ids, nodeStates);
+		updateNodeStateInternal(node, ids, nodeStates);
 		return nodeStates;
 	}
 
@@ -97,21 +113,26 @@ public class CollectRecord extends Record {
 		ModelDependencies dependencies = collectSurvey.getModelDependencies();
 		Set<Node<?>> dependentNodes = dependencies.getDependantNodes(node);
 		for (Node<?> dependentNode : dependentNodes) {
-			internalRefreshState(dependentNode, updatedNodeIds, nodeStates);
+			updateNodeStateInternal(dependentNode, updatedNodeIds, nodeStates);
 		}
 	}
 
-	private void internalRefreshState(Node<?> node, Set<Integer> updatedNodeIds, List<NodeState> nodeStates) {
+	private void updateNodeStateInternal(Node<?> node, Set<Integer> updatedNodeIds, List<NodeState> nodeStates) {
 		Integer nodeId = node.getInternalId();
 		if (!updatedNodeIds.contains(nodeId)) {
-			NodeState nodeState = new NodeState(node);
-			nodeState.update(getValidator());
-			nodeStateMap.put(nodeId, nodeState);
+			NodeState nodeState = updateNodeStateInternal(node);
 			nodeStates.add(nodeState);
 			updatedNodeIds.add(nodeId);
 
 			refreshDependentNodesState(node, updatedNodeIds, nodeStates);
 		}
+	}
+
+	private NodeState updateNodeStateInternal(Node<?> node) {
+		NodeState nodeState = new NodeState(node);
+		nodeState.update(getValidator());
+		nodeStateMap.put(node.getInternalId(), nodeState);
+		return nodeState;
 	}
 
 	private Validator getValidator() {

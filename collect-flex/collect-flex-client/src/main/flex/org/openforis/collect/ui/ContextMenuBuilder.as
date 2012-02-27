@@ -20,8 +20,8 @@ package org.openforis.collect.ui
 	import org.openforis.collect.i18n.Message;
 	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
+	import org.openforis.collect.model.FieldSymbol;
 	import org.openforis.collect.model.proxy.AttributeProxy;
-	import org.openforis.collect.model.proxy.AttributeSymbol;
 	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.model.proxy.NodeProxy;
 	import org.openforis.collect.presenter.RemarksPopUpPresenter;
@@ -129,22 +129,22 @@ package org.openforis.collect.ui
 				currentInputField = field;
 				switch(event.target) {
 					case BLANK_ON_FORM_MENU_ITEM:
-						field.changeSymbol(AttributeSymbol.BLANK_ON_FORM);
+						field.changeSymbol(FieldSymbol.BLANK_ON_FORM);
 						break;
 					case DASH_ON_FORM_MENU_ITEM:
-						field.changeSymbol(AttributeSymbol.DASH_ON_FORM);
+						field.changeSymbol(FieldSymbol.DASH_ON_FORM);
 						break;
 					case ILLEGIBLE_MENU_ITEM:
-						field.changeSymbol(AttributeSymbol.ILLEGIBLE);
+						field.changeSymbol(FieldSymbol.ILLEGIBLE);
 						break;
 					case EDIT_REMARKS_MENU_ITEM:
 						remarksPopUpPresenter.openPopUp(field, true);
 						break;
 					case REPLACE_BLANKS_WITH_DASH_MENU_ITEM:
-						setReasonBlankInChildren(parentEntity, AttributeSymbol.DASH_ON_FORM);
+						setReasonBlankInChildren(parentEntity, FieldSymbol.DASH_ON_FORM);
 						break;
 					case REPLACE_BLANKS_WITH_STAR_MENU_ITEM:
-						setReasonBlankInChildren(parentEntity, AttributeSymbol.BLANK_ON_FORM);
+						setReasonBlankInChildren(parentEntity, FieldSymbol.BLANK_ON_FORM);
 						break;
 					case DELETE_ATTRIBUTE_MENU_ITEM:
 						AlertUtil.showConfirm("global.confirmDelete", [field.attributeDefinition.getLabelText()], "global.confirmAlertTitle", performDeleteAttribute);
@@ -182,7 +182,7 @@ package org.openforis.collect.ui
 			ClientFactory.dataClient.updateActiveRecord(responder, req);
 		}
 		
-		public static function setReasonBlankInChildren(entity:EntityProxy, symbol:AttributeSymbol):void {
+		public static function setReasonBlankInChildren(entity:EntityProxy, symbol:FieldSymbol):void {
 			var req:UpdateRequest = new UpdateRequest();
 			req.parentEntityId = entity.parentId;
 			req.nodeName = entity.name;

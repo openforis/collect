@@ -13,8 +13,8 @@
 			import mx.events.FlexEvent;
 			
 			import org.openforis.collect.i18n.Message;
+			import org.openforis.collect.model.FieldSymbol;
 			import org.openforis.collect.model.proxy.AttributeProxy;
-			import org.openforis.collect.model.proxy.AttributeSymbol;
 			
 			public static const STATE_DEFAULT:String = "default";
 			public static const STATE_CAN_SPECIFY_REASON_BLANK:String = "canSpecifyReasonBlank";
@@ -37,11 +37,11 @@
 	<s:VGroup id="reasonBlankGroup" visible="false" includeInLayout="false" 
 			  visible.canSpecifyReasonBlank="true" includeInLayout.canSpecifyReasonBlank="true">
 		<s:Label text="Reason left blank:" />
-		<s:RadioButton id="blankOnFormRadioButton" value="{AttributeSymbol.BLANK_ON_FORM}" group="{radioButtonGroup}" 
+		<s:RadioButton id="blankOnFormRadioButton" value="{FieldSymbol.BLANK_ON_FORM}" group="{radioButtonGroup}" 
 					   label="{Message.get('edit.contextMenu.blankOnForm')}" />
-		<s:RadioButton id="dashOnFormRadioButton" value="{AttributeSymbol.DASH_ON_FORM}" group="{radioButtonGroup}" 
+		<s:RadioButton id="dashOnFormRadioButton" value="{FieldSymbol.DASH_ON_FORM}" group="{radioButtonGroup}" 
 					   label="{Message.get('edit.contextMenu.dashOnForm')}" />
-		<s:RadioButton id="illegibleRadioButton" value="{AttributeSymbol.ILLEGIBLE}" group="{radioButtonGroup}" 
+		<s:RadioButton id="illegibleRadioButton" value="{FieldSymbol.ILLEGIBLE}" group="{radioButtonGroup}" 
 					   label="{Message.get('edit.contextMenu.illegible')}" />
 	</s:VGroup>
 	

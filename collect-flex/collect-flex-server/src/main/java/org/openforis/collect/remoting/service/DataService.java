@@ -17,8 +17,8 @@ import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.metamodel.proxy.CodeListItemProxy;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.FieldSymbol;
 import org.openforis.collect.model.User;
-import org.openforis.collect.model.proxy.AttributeSymbol;
 import org.openforis.collect.model.proxy.NodeProxy;
 import org.openforis.collect.model.proxy.RecordProxy;
 import org.openforis.collect.persistence.AccessDeniedException;
@@ -179,7 +179,7 @@ public class DataService {
 		if(requestValue != null && nodeDef instanceof AttributeDefinition) {
 			value = parseFieldValue(parentEntity, (AttributeDefinition) nodeDef, requestValue, fieldIndex);
 		}
-		AttributeSymbol symbol = request.getSymbol();
+		FieldSymbol symbol = request.getSymbol();
 		Method method = request.getMethod();
 		switch (method) {
 			case ADD:
@@ -213,7 +213,7 @@ public class DataService {
 		return result;
 	}
 
-	private List<Node<?>> updateSymbol(Node<?> node, Integer fieldIndex, String remarks, AttributeSymbol symbol, ModelVersion version) {
+	private List<Node<?>> updateSymbol(Node<?> node, Integer fieldIndex, String remarks, FieldSymbol symbol, ModelVersion version) {
 		List<Node<?>> updatedNodes = new ArrayList<Node<?>>();
 		Character symbolChar = null;
 		if(symbol != null) {
@@ -248,7 +248,7 @@ public class DataService {
 
 	@SuppressWarnings("unchecked")
 	private List<Node<?>> updateNode(Entity parentEntity, Node<?> node, Integer fieldIndex, 
-			Object value, AttributeSymbol symbol,	String remarks) {
+			Object value, FieldSymbol symbol,	String remarks) {
 		if(node instanceof Attribute) {
 			List<Node<?>> updatedNodes = new ArrayList<Node<?>>();
 			Attribute<?, Object> attribute = (Attribute<?, Object>) node;
@@ -269,7 +269,7 @@ public class DataService {
 	}
 
 	private List<Node<?>> addNode(ModelVersion version, Entity parentEntity, NodeDefinition nodeDef, Object value, Integer fieldIndex, 
-			AttributeSymbol symbol, String remarks) {
+			FieldSymbol symbol, String remarks) {
 		List<Node<?>> addedNodes = new ArrayList<Node<?>>();
 		if(nodeDef instanceof AttributeDefinition) {
 			AttributeDefinition def = (AttributeDefinition) nodeDef;
@@ -298,7 +298,7 @@ public class DataService {
 	}
 	
 	private List<Node<?>> insertCodeAttributes(ModelVersion version, Entity parentEntity, CodeAttributeDefinition def, String codesString, 
-			AttributeSymbol symbol, String remarks) {
+			FieldSymbol symbol, String remarks) {
 		List<Node<?>> addedNodes = new ArrayList<Node<?>>();
 		List<Code> codes = codesString != null ? parseCodes(parentEntity, def, codesString, version): null;
 		if(codes != null) {
@@ -333,7 +333,7 @@ public class DataService {
 		return deletedNodes;
 	}
 	
-	private void setSymbolInAllFields(Attribute<?, ?> attribute, AttributeSymbol symbol) {
+	private void setSymbolInAllFields(Attribute<?, ?> attribute, FieldSymbol symbol) {
 		Character s = symbol != null ? symbol.getCode(): null;
 		int count = attribute.getFieldCount();
 		for (int i = 0; i < count; i++) {

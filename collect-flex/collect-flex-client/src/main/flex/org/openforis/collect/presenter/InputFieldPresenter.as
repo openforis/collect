@@ -19,8 +19,8 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.event.InputFieldEvent;
 	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
+	import org.openforis.collect.model.FieldSymbol;
 	import org.openforis.collect.model.proxy.AttributeProxy;
-	import org.openforis.collect.model.proxy.AttributeSymbol;
 	import org.openforis.collect.model.proxy.FieldProxy;
 	import org.openforis.collect.model.proxy.ValidationResultsProxy;
 	import org.openforis.collect.remoting.service.UpdateRequest;
@@ -114,7 +114,7 @@ package org.openforis.collect.presenter {
 		
 		public function applyChanges():void {
 			if(ReasonBlankUtil.isShortCut(_view.text)) {
-				var symbol:AttributeSymbol = ReasonBlankUtil.parseShortCut(_view.text);
+				var symbol:FieldSymbol = ReasonBlankUtil.parseShortCut(_view.text);
 				changeSymbol(symbol);
 			} else {
 				var req:UpdateRequest = new UpdateRequest();
@@ -188,7 +188,7 @@ package org.openforis.collect.presenter {
 			return result;
 		}
 		
-		public function changeSymbol(symbol:AttributeSymbol, remarks:String = null):void {
+		public function changeSymbol(symbol:FieldSymbol, remarks:String = null):void {
 			var req:UpdateRequest = new UpdateRequest();
 			var def:AttributeDefinitionProxy = _view.attributeDefinition;
 			req.parentEntityId = _view.parentEntity.id;
