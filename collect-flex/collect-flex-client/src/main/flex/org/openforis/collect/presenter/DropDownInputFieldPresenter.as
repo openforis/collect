@@ -37,7 +37,7 @@ package org.openforis.collect.presenter {
 			applyChanges();
 		}
 		
-		override protected function createRequestValue():String {
+		override protected function textToRequestValue():String {
 			var value:String = null;
 			var selectedItem:* = _view.dropDownList.selectedItem;
 			if(selectedItem != null) {

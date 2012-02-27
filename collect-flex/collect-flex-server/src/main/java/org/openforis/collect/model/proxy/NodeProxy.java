@@ -74,7 +74,7 @@ public class NodeProxy implements Proxy {
 	}
 	
 	@ExternalizedProperty
-	public NodeStateProxy getNodeStateProxy() {
+	public NodeStateProxy getState() {
 		CollectRecord record = (CollectRecord) node.getRecord();
 		NodeState nodeState = record.getNodeState(node);
 		if (nodeState != null) {

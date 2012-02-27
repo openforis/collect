@@ -11,10 +11,9 @@
 	<artifactId>collect-flex-web</artifactId>
 	<packaging>war</packaging>
 
-
 	<build>
+		<finalName>collect</finalName>
 		<plugins>
-
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -39,7 +38,6 @@
 					</dependency>
 				</dependencies>
 			</plugin>
-
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-war-plugin</artifactId>
@@ -49,12 +47,13 @@
 					<failOnMissingWebXml>false</failOnMissingWebXml>
 				</configuration>
 			</plugin>
-
 			<plugin>
 				<groupId>org.sonatype.flexmojos</groupId>
 				<artifactId>flexmojos-maven-plugin</artifactId>
 				<executions>
 					<execution>
+						<id>copy-flex-resources</id>
+						<phase>prepare-package</phase>
 						<goals>
 							<goal>copy-flex-resources</goal>
 						</goals>
@@ -64,8 +63,6 @@
 				</configuration>
 			</plugin>
 		</plugins>
-
-		<finalName>collect</finalName>
 	</build>
 
 	<dependencies>
@@ -92,7 +89,6 @@
 			<artifactId>standard</artifactId>
 			<version>1.1.2</version>
 		</dependency>
-
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>servlet-api</artifactId>

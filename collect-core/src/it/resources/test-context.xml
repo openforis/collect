@@ -55,6 +55,8 @@
 	<!--  Managers -->
 	<bean id="recordManager" 					class="org.openforis.collect.manager.RecordManager" init-method="init" />	
 	<bean id="surveyManager"	 				class="org.openforis.collect.manager.SurveyManager" init-method="init" />
+
+	<bean id="recordContext" class="org.openforis.collect.model.CollectRecordContext" />	
 	
 	<!-- Expression Factory -->
 	<bean id="expressionFactory" class="org.openforis.idm.model.expression.ExpressionFactory" />

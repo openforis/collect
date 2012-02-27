@@ -6,9 +6,46 @@
  */
 
 package org.openforis.collect.model.proxy {
+	import mx.collections.IList;
+	
+	import org.openforis.collect.util.CollectionUtil;
+	import org.openforis.collect.util.StringUtil;
 
+	/**
+	 * @author S. Ricci
+	 */
     [Bindable]
     [RemoteClass(alias="org.openforis.collect.model.proxy.NodeStateProxy")]
     public class NodeStateProxy extends NodeStateProxyBase {
+		
+		public function get validationMessage():String {
+			var results:IList = null;
+			if(hasErrors()) {
+				results = validationResults.errors;
+			} else if(hasWarnings()) {
+				results = validationResults.warnings;
+			}
+			if(results != null) {
+				var parts:Array = new Array();
+				for each (var r:ValidationResultProxy in results) {
+					if(! r.valid) {
+						parts.push("Error");
+					}
+				}
+				if(parts.length > 0) {
+					return StringUtil.concat(";\n", parts);
+				}
+			}
+			return null;
+		}
+		
+		public function hasErrors():Boolean {
+			return validationResults != null && CollectionUtil.isNotEmpty(validationResults.errors);
+		}
+
+		public function hasWarnings():Boolean {
+			return validationResults != null && CollectionUtil.isNotEmpty(validationResults.warnings);
+		}
+
     }
 }

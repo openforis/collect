@@ -4,7 +4,7 @@
 				  xmlns:mx="library://ns.adobe.com/flex/mx" 
 				  xmlns:input="org.openforis.collect.ui.component.input.*" 
 				  xmlns:detail="org.openforis.collect.ui.component.detail.*"
-				  width="60"
+				  width="64"
 				  >
 	
 	<fx:Script>

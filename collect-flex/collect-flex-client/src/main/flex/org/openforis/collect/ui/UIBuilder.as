@@ -200,7 +200,7 @@ package org.openforis.collect.ui {
 					return 100;
 				}
 			} else if(def is DateAttributeDefinitionProxy) {
-				return 130;
+				return 132;
 			} else if(def is FileAttributeDefinitionProxy) {
 				return 300;
 			} else if(def is RangeAttributeDefinitionProxy) {
@@ -222,7 +222,7 @@ package org.openforis.collect.ui {
 						return 100;
 				}
 			} else if(def is TimeAttributeDefinitionProxy) {
-				return 60;
+				return 64;
 			} else {
 				return 100;
 			}
@@ -232,7 +232,7 @@ package org.openforis.collect.ui {
 			if(def is BooleanAttributeDefinitionProxy) {
 				return 100;
 			} else {
-				return getInputFieldWidth(def, true);
+				return getInputFieldWidth(def, true) + 2;
 			}
 		}
 		
@@ -268,6 +268,7 @@ package org.openforis.collect.ui {
 			}
 			inputField.width = getInputFieldWidth(def, isInDataGroup);
 			inputField.attributeDefinition = def;
+			inputField.isInDataGroup = isInDataGroup;
 			return inputField;
 		}
 		

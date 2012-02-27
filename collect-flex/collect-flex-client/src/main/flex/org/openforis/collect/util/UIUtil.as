@@ -16,25 +16,26 @@ package org.openforis.collect.util
 	{
 		public static function resetScrollBars(uiComponent:UIComponent):void {
 			if(uiComponent is Scroller) {
-				resetScrollBarsOnScroller(uiComponent as Scroller);
+				var scroller:Scroller = Scroller(uiComponent);
+				if(scroller.verticalScrollBar) {
+					scroller.verticalScrollBar.value = 0;
+				}
+				if(scroller.horizontalScrollBar) {
+					scroller.horizontalScrollBar.value = 0;
+				}
 			} else if(uiComponent is ViewStack) {
-				for each (var child:UIComponent in (uiComponent as ViewStack).getChildren()) 
-				{
+				for each (var child:UIComponent in (uiComponent as ViewStack).getChildren())  {
 					if(child is Container) {
-						resetScrolBarsOnContainer(child as Container);
+						resetScrollBars(child);
 					} else if(child is NavigatorContent && (child as NavigatorContent).numElements > 0 && 
 							(child as NavigatorContent).getElementAt(0) is Scroller) {
-						resetScrollBarsOnScroller((child as NavigatorContent).getElementAt(0) as Scroller);
+						resetScrollBars((child as NavigatorContent).getElementAt(0) as Scroller);
 					}
 				}
 			} else if(uiComponent is Container) {
-				resetScrolBarsOnContainer(uiComponent as Container);
+				Container(uiComponent).verticalScrollPosition = 0;
+				Container(uiComponent).horizontalScrollPosition = 0;
 			}
-		}
-		
-		public static function resetScrolBarsOnContainer(container:Container):void {
-			container.verticalScrollPosition = 0;
-			container.horizontalScrollPosition = 0;
 		}
 		
 		public static function resetScrollBarsOnScroller(scroller:Scroller):void {
