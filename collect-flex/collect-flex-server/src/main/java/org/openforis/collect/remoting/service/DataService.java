@@ -262,9 +262,9 @@ public class DataService {
 			if(fieldIndex != null) {
 				@SuppressWarnings("rawtypes")
 				Field field = attribute.getField(fieldIndex);
-				field.setRemarks(remarks);
-				field.setSymbol(symbol != null ? symbol.getCode(): null);
 				field.setValue(value);
+				field.setRemarks(remarks);
+				field.setSymbol(null);
 			} else {
 				attribute.setValue(value);
 			}
