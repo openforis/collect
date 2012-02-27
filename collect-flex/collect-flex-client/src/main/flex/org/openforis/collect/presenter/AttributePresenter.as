@@ -41,12 +41,13 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function attributeChangeHandler(event:Event):void {
+			hideToolTip();
 			initValidationResultHandler();
 		}
 		
 		protected function initValidationResultHandler():void {
-			_validationToolTipTrigger.removeEventListener(MouseEvent.ROLL_OVER, mouseRollOverHandler);
-			_validationToolTipTrigger.removeEventListener(MouseEvent.ROLL_OUT, mouseRollOutHandler);
+			_validationToolTipTrigger.removeEventListener(MouseEvent.ROLL_OVER, showToolTip);
+			_validationToolTipTrigger.removeEventListener(MouseEvent.ROLL_OUT, hideToolTip);
 			_validationStateDisplay.styleName = null;
 			var a:AttributeProxy = _view.attribute;
 			if(a != null && a.state != null) {
@@ -56,15 +57,15 @@ package org.openforis.collect.presenter {
 				
 				if(hasErrors || hasWarnings) {
 					if(! _validationToolTipTrigger.hasEventListener(MouseEvent.ROLL_OVER)) {
-						_validationToolTipTrigger.addEventListener(MouseEvent.ROLL_OVER, mouseRollOverHandler);
-						_validationToolTipTrigger.addEventListener(MouseEvent.ROLL_OUT, mouseRollOutHandler);
+						_validationToolTipTrigger.addEventListener(MouseEvent.ROLL_OVER, showToolTip);
+						_validationToolTipTrigger.addEventListener(MouseEvent.ROLL_OUT, hideToolTip);
 					}
 					_validationStateDisplay.styleName = hasErrors ? AttributeItemRenderer.STYLE_NAME_ERROR: AttributeItemRenderer.STYLE_NAME_WARNING;
 				}
 			}
 		}
 		
-		protected function mouseRollOverHandler(event:MouseEvent = null):void {
+		protected function showToolTip(event:MouseEvent = null):void {
 			if(_validationToolTip != null){
 				ToolTipUtil.destroy(_validationToolTip);
 			}
@@ -78,7 +79,7 @@ package org.openforis.collect.presenter {
 			}
 		}
 		
-		public function mouseRollOutHandler(event:MouseEvent=null):void {
+		public function hideToolTip(event:MouseEvent=null):void {
 			ToolTipUtil.destroy(_validationToolTip);
 			_validationToolTip = null;
 		}
