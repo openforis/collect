@@ -27,7 +27,6 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.ui.component.input.TextInput;
 	import org.openforis.collect.util.ArrayUtil;
 	import org.openforis.collect.util.CollectionUtil;
-	import org.openforis.collect.util.ReasonBlankUtil;
 	import org.openforis.collect.util.StringUtil;
 	
 	/**
@@ -118,7 +117,7 @@ package org.openforis.collect.presenter {
 						var firstAttribute:AttributeProxy = _view.attributes.getItemAt(0) as AttributeProxy;
 						var field:FieldProxy = firstAttribute.getField(0);
 						if(field.symbol != null) {
-							var shortCut:String = ReasonBlankUtil.getShortCut(field.symbol);
+							var shortCut:String = getShortCutForReasonBlank(field.symbol);
 							if(shortCut != null) {
 								return shortCut;
 							}
@@ -142,7 +141,7 @@ package org.openforis.collect.presenter {
 			if(attribute != null) {
 				var field:FieldProxy = attribute.getField(0);
 				if(field.symbol != null) {
-					var shortCut:String = ReasonBlankUtil.getShortCut(field.symbol);
+					var shortCut:String = getShortCutForReasonBlank(field.symbol);
 					if(shortCut != null) {
 						return shortCut;
 					}
@@ -161,28 +160,36 @@ package org.openforis.collect.presenter {
 			updateDescription();
 		}
 		
-		override public function applyChanges():void {
-			if(ReasonBlankUtil.isShortCut(_view.text)) {
-				var symbol:FieldSymbol = ReasonBlankUtil.parseShortCut(_view.text);
-				changeSymbol(symbol);
-			} else {
-				var req:UpdateRequest = new UpdateRequest();
-				var def:AttributeDefinitionProxy = _view.attributeDefinition;
-				req.parentEntityId = _view.parentEntity.id;
-				req.nodeName = def.name;
-				req.value = textToRequestValue();
-				req.fieldIndex = NaN; //ignore field index, update the entire code or list of codes
-				if(_view.attribute != null || (CollectionUtil.isNotEmpty(_view.attributes))) {
-					if(! def.multiple) {
-						req.nodeId = _view.attribute.id;
-					}
-					req.method = UpdateRequest$Method.UPDATE;
-				} else {
-					req.method = UpdateRequest$Method.ADD;
-				}
-				var responder:AsyncResponder = new AsyncResponder(updateResultHandler, updateFaultHandler);
-				ClientFactory.dataClient.updateActiveRecord(responder, req);
+		override public function applyChanges(symbol:FieldSymbol = null, remarks:String = null):void {
+			if(symbol == null && isShortCutForReasonBlank(_view.text)) {
+				symbol = parseShortCutForReasonBlank(_view.text);
 			}
+			var req:UpdateRequest = new UpdateRequest();
+			var def:AttributeDefinitionProxy = _view.attributeDefinition;
+			req.parentEntityId = _view.parentEntity.id;
+			req.nodeName = def.name;
+			req.fieldIndex = NaN; //ignore field index, update the entire code or list of codes
+			req.remarks = remarks;
+			if(symbol == null) {
+				req.value = textToRequestValue();
+			} else {
+				req.symbol = symbol;
+			}
+			if(_view.attribute != null || (CollectionUtil.isNotEmpty(_view.attributes))) {
+				if(! def.multiple) {
+					req.nodeId = _view.attribute.id;
+				}
+				if(symbol != null) {
+					req.method = UpdateRequest$Method.UPDATE_SYMBOL;
+				} else {
+					req.method = UpdateRequest$Method.UPDATE;
+					//todo preserve old remarks
+				}
+			} else {
+				req.method = UpdateRequest$Method.ADD;
+			}
+			var responder:AsyncResponder = new AsyncResponder(updateResultHandler, updateFaultHandler);
+			ClientFactory.dataClient.updateActiveRecord(responder, req);
 		}
 		
 		protected function updateDescription():void {

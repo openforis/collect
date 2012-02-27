@@ -5,7 +5,6 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.model.proxy.AttributeProxy;
 	import org.openforis.collect.model.proxy.FieldProxy;
 	import org.openforis.collect.ui.component.input.BooleanInputField;
-	import org.openforis.collect.util.ReasonBlankUtil;
 	import org.openforis.collect.util.StringUtil;
 	
 	/**
@@ -51,7 +50,7 @@ package org.openforis.collect.presenter {
 				var field:FieldProxy = attribute.getField(0);
 				var value:Object = field.value;
 				if(field.symbol != null) {
-					var shortCut:String = ReasonBlankUtil.getShortCut(field.symbol);
+					var shortCut:String = getShortCutForReasonBlank(field.symbol);
 					if(shortCut != null) {
 						return shortCut;
 					}

@@ -15,9 +15,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.metamodel.proxy.CodeListItemProxy;
-import org.openforis.collect.model.FieldSymbol;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.FieldSymbol;
 import org.openforis.collect.model.User;
 import org.openforis.collect.model.proxy.NodeProxy;
 import org.openforis.collect.model.proxy.RecordProxy;
@@ -78,7 +78,7 @@ public class DataService {
 		
 		Entity rootEntity = record.getRootEntity();
 		ModelVersion version = record.getVersion();
-		recordManager.addEmptyAttributes(rootEntity, version);
+		recordManager.addEmptyNodes(rootEntity, version);
 		SessionState sessionState = sessionManager.getSessionState();
 		sessionState.setActiveRecord(record);
 		sessionState.setActiveRecordState(RecordState.SAVED);
@@ -124,7 +124,7 @@ public class DataService {
 		EntityDefinition rootEntityDefinition = schema.getRootEntityDefinition(rootEntityName);
 		CollectRecord record = recordManager.create(activeSurvey, rootEntityDefinition, user, version.getName());
 		Entity rootEntity = record.getRootEntity();
-		recordManager.addEmptyAttributes(rootEntity, version);
+		recordManager.addEmptyNodes(rootEntity, version);
 		sessionState.setActiveRecord((CollectRecord) record);
 		sessionState.setActiveRecordState(RecordState.NEW);
 		RecordProxy recordProxy = new RecordProxy(record);
@@ -177,17 +177,11 @@ public class DataService {
 		NodeDefinition nodeDef = ((EntityDefinition) parentEntity.getDefinition()).getChildDefinition(nodeName);
 		String requestValue = request.getValue();
 		String remarks = request.getRemarks();
-		//parse request values into a list of attribute value objects (for example Code, Date, Time...)
 		Object value = null;
 		if(requestValue != null && nodeDef instanceof AttributeDefinition) {
 			value = parseFieldValue(parentEntity, (AttributeDefinition) nodeDef, requestValue, fieldIndex);
 		}
 		FieldSymbol symbol = request.getSymbol();
-		if(symbol == null && FieldSymbol.isShortKeyForBlank(requestValue)) {
-			 symbol = FieldSymbol.fromCharacterSymbol(requestValue);
-		}
-		Character symbolChar = symbol != null ? symbol.getCode(): null;
-		
 		Method method = request.getMethod();
 		switch (method) {
 			case ADD:
@@ -202,26 +196,12 @@ public class DataService {
 				}
 				break;
 			case UPDATE_SYMBOL:
-				//update attribute value
-				if(nodeDef instanceof AttributeDefinition) {
-					Attribute<?, ?> a = (Attribute<?, ?>) node;
-					Field<?> field = a.getField(fieldIndex);
-					field.setSymbol(symbolChar);
-					field.setRemarks(remarks);
-					updatedNodes.add(a);
-				} else if(node instanceof Entity) {
-					//update only the symbol in entity's attributes
-					Entity entity = (Entity) node;
-					recordManager.addEmptyAttributes(entity, version);
-					List<NodeDefinition> childDefinitions = ((EntityDefinition) nodeDef).getChildDefinitions();
-					for (NodeDefinition def : childDefinitions) {
-						if(def instanceof AttributeDefinition) {
-							String name = def.getName();
-							Attribute<?, ?> a = (Attribute<?, ?>) entity.get(name, 0);
-							setSymbolInAllFields(a, symbol);
-							updatedNodes.add(a);
-						}
-					}
+				if(nodeDef instanceof CodeAttributeDefinition) {
+					removedNodes = removeNodes(parentEntity, nodeName);
+					updatedNodes = addNode(version, parentEntity, nodeDef, value, fieldIndex, symbol, remarks);
+				} else {
+					List<Node<?>> updated = updateSymbol(node, fieldIndex, remarks, symbol, version);
+					updatedNodes.addAll(updated);
 				}
 				break;
 			case DELETE: 
@@ -240,32 +220,55 @@ public class DataService {
 		return result;
 	}
 
+	private List<Node<?>> updateSymbol(Node<?> node, Integer fieldIndex, String remarks, FieldSymbol symbol, ModelVersion version) {
+		List<Node<?>> updatedNodes = new ArrayList<Node<?>>();
+		Character symbolChar = null;
+		if(symbol != null) {
+			symbolChar = symbol.getCode();
+		}
+		NodeDefinition nodeDefn = node.getDefinition();
+		if(nodeDefn instanceof AttributeDefinition) {
+			Attribute<?, ?> a = (Attribute<?, ?>) node;
+			Field<?> field = a.getField(fieldIndex);
+			field.setSymbol(symbolChar);
+			field.setRemarks(remarks);
+			if(symbol != null && symbol.isReasonBlank()) {
+				field.setValue(null);
+			}
+			updatedNodes.add(a);
+		} else if(node instanceof Entity) {
+			//update only the symbol in entity's attributes
+			Entity entity = (Entity) node;
+			recordManager.addEmptyNodes(entity, version);
+			List<NodeDefinition> childDefinitions = ((EntityDefinition) nodeDefn).getChildDefinitions();
+			for (NodeDefinition def : childDefinitions) {
+				if(def instanceof AttributeDefinition) {
+					String name = def.getName();
+					Attribute<?, ?> a = (Attribute<?, ?>) entity.get(name, 0);
+					setSymbolInAllFields(a, symbol);
+					updatedNodes.add(a);
+				}
+			}
+		}
+		return updatedNodes;
+	}
+
 	@SuppressWarnings("unchecked")
 	private List<Node<?>> updateNode(Entity parentEntity, Node<?> node, Integer fieldIndex, 
 			Object value, FieldSymbol symbol,	String remarks) {
 		if(node instanceof Attribute) {
 			List<Node<?>> updatedNodes = new ArrayList<Node<?>>();
 			Attribute<?, Object> attribute = (Attribute<?, Object>) node;
-			CollectRecord activeRecord = getActiveRecord();
-			ModelVersion version = activeRecord.getVersion();
-			AttributeDefinition def = attribute.getDefinition();
-			if(def instanceof CodeAttributeDefinition) {
-				CodeAttributeDefinition codeDef = (CodeAttributeDefinition) def;
-				String codesString = value != null ? value.toString(): null;
-				List<Node<?>> list = insertCodeAttributes(version, parentEntity, codeDef, codesString, symbol, remarks);
-				updatedNodes.addAll(list);
+			if(fieldIndex != null) {
+				@SuppressWarnings("rawtypes")
+				Field field = attribute.getField(fieldIndex);
+				field.setRemarks(remarks);
+				field.setSymbol(symbol != null ? symbol.getCode(): null);
+				field.setValue(value);
 			} else {
-				if(fieldIndex != null) {
-					@SuppressWarnings("rawtypes")
-					Field field = attribute.getField(fieldIndex);
-					field.setRemarks(remarks);
-					field.setSymbol(symbol != null ? symbol.getCode(): null);
-					field.setValue(value);
-				} else {
-					attribute.setValue(value);
-				}
-				updatedNodes.add(attribute);
+				attribute.setValue(value);
 			}
+			updatedNodes.add(attribute);
 			return updatedNodes;
 		} else {
 			throw new UnsupportedOperationException("Cannot update an entity");
@@ -283,7 +286,8 @@ public class DataService {
 				List<Node<?>> list = insertCodeAttributes(version, parentEntity, codeDef, codesString, symbol, remarks);
 				addedNodes.addAll(list);
 			} else {
-				Attribute<?,?> attribute = recordManager.addAttribute(parentEntity, def, null);
+				Attribute<?, ?> attribute = (Attribute<?, ?>) def.createNode();
+				parentEntity.add(attribute);
 				if(fieldIndex != null) {
 					@SuppressWarnings("unchecked")
 					Field<Object> field = (Field<Object>) attribute.getField(fieldIndex);
@@ -306,7 +310,7 @@ public class DataService {
 		List<Code> codes = codesString != null ? parseCodes(parentEntity, def, codesString, version): null;
 		if(codes != null) {
 			for (Code c : codes) {
-				Attribute<?, ?> attribute = recordManager.addAttribute(parentEntity, def, c);
+				CodeAttribute attribute = parentEntity.addValue(def.getName(), c);
 				//set symbol and remarks in first field
 				Field<?> field = attribute.getField(0);
 				if(symbol != null) {
@@ -316,7 +320,8 @@ public class DataService {
 				addedNodes.add(attribute);
 			}
 		} else {
-			Attribute<?,?> attribute = recordManager.addAttribute(parentEntity, def, null);
+			Attribute<?, ?> attribute = (Attribute<?, ?>) def.createNode();
+			parentEntity.add(attribute);
 			Field<?> field = attribute.getField(0);
 			field.setRemarks(remarks);
 			field.setSymbol(symbol != null ? symbol.getCode(): null);

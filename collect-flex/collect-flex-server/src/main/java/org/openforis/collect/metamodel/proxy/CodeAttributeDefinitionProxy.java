@@ -20,15 +20,6 @@ public class CodeAttributeDefinitionProxy extends AttributeDefinitionProxy {
 	}
 
 	@ExternalizedProperty
-	public CodeListProxy getList() {
-		if(attributeDefinition.getList() != null) {
-			return new CodeListProxy(attributeDefinition.getList());
-		} else {
-			return null;
-		}
-	}
-
-	@ExternalizedProperty
 	public String getListName() {
 		return attributeDefinition.getListName();
 	}
@@ -43,9 +34,4 @@ public class CodeAttributeDefinitionProxy extends AttributeDefinitionProxy {
 		return attributeDefinition.isAllowUnlisted();
 	}
 
-	@ExternalizedProperty
-	public String getParentExpression() {
-		return attributeDefinition.getParentExpression();
-	}
-	
 }

@@ -20,6 +20,7 @@ import org.openforis.idm.model.state.NodeState;
 
 /**
  * @author G. Miceli
+ * @author M. Togna
  */
 public class CollectRecord extends Record {
 
