@@ -194,8 +194,13 @@ public class DataService {
 				}
 				break;
 			case UPDATE_SYMBOL:
-				List<Node<?>> updated = updateSymbol(node, fieldIndex, remarks, symbol, version);
-				updatedNodes.addAll(updated);
+				if(nodeDef instanceof CodeAttributeDefinition) {
+					removedNodes = removeNodes(parentEntity, nodeName);
+					updatedNodes = addNode(version, parentEntity, nodeDef, value, fieldIndex, symbol, remarks);
+				} else {
+					List<Node<?>> updated = updateSymbol(node, fieldIndex, remarks, symbol, version);
+					updatedNodes.addAll(updated);
+				}
 				break;
 			case DELETE: 
 				Node<?> deleted = recordManager.deleteNode(parentEntity, node);
