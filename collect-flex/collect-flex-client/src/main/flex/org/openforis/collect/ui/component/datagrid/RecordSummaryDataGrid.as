@@ -70,7 +70,7 @@ package org.openforis.collect.ui.component.datagrid
 			var r:RecordProxy = item as RecordProxy;
 			switch(r.step) {
 				case RecordProxy$Step.ENTRY:
-					return "X";
+					return "X"
 				case RecordProxy$Step.CLEANSING:
 				case RecordProxy$Step.ANALYSIS:
 				default:
@@ -83,7 +83,7 @@ package org.openforis.collect.ui.component.datagrid
 			switch(r.step) {
 				case RecordProxy$Step.ENTRY:
 				case RecordProxy$Step.CLEANSING:
-					return "X";
+					return "X"
 				case RecordProxy$Step.ANALYSIS:
 				default:
 					return "Y";

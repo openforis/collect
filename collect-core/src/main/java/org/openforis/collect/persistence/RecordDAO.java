@@ -207,7 +207,7 @@ public class RecordDAO extends JooqDaoSupport {
 				);
 		
 		//add condition on submitted_id: always find records not yet submitted
-		Condition notExistsPromoted = Factory.notExists(jf.select(RECORD.ID).from(RECORD).where(RECORD.ID.equal(r.SUBMITTED_ID)));
+		Condition notExistsPromoted = Factory.notExists(jf.select(RECORD.ID).from(RECORD).where(RECORD.SUBMITTED_ID.equal(r.ID)));
 		q.addConditions(notExistsPromoted);
 		
 		//add order by condition
