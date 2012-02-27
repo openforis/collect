@@ -3,8 +3,10 @@
  */
 package org.openforis.collect.metamodel.proxy;
 
+import org.apache.commons.lang3.StringUtils;
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
+import org.openforis.idm.metamodel.CodeList;
 
 /**
  * @author S. Ricci
@@ -34,4 +36,9 @@ public class CodeAttributeDefinitionProxy extends AttributeDefinitionProxy {
 		return attributeDefinition.isAllowUnlisted();
 	}
 
+	@ExternalizedProperty
+	public boolean isExternal() {
+		CodeList list = attributeDefinition.getList();
+		return list != null && StringUtils.isNotBlank(list.getLookupTable());
+	}
 }

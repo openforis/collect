@@ -9,6 +9,7 @@
 		<![CDATA[
 			import mx.collections.IList;
 			
+			import org.openforis.collect.metamodel.proxy.CodeAttributeDefinitionProxy;
 			import org.openforis.collect.presenter.CodeInputFieldPresenter;
 			import org.openforis.collect.ui.Images;
 
@@ -65,7 +66,10 @@
 		<s:Image id="openImage" 
 				 source="{Images.EDIT}" 
 				 useHandCursor="true" 
-				 buttonMode="true" />
+				 buttonMode="true"
+				 visible="{! CodeAttributeDefinitionProxy(attributeDefinition).external}"
+				 includeInLayout="{! CodeAttributeDefinitionProxy(attributeDefinition).external}"
+				 />
 		
 		<s:Label id="descriptionLabel" 
 				 includeIn="descriptionVisible" 
