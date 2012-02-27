@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.collect.Proxy;
+import org.openforis.collect.model.FieldSymbol;
 import org.openforis.idm.model.Code;
 import org.openforis.idm.model.Coordinate;
 import org.openforis.idm.model.Date;
@@ -67,9 +68,9 @@ public class FieldProxy implements Proxy {
 	}
 
 	@ExternalizedProperty
-	public AttributeSymbol getSymbol() {
+	public FieldSymbol getSymbol() {
 		if(field.getSymbol() != null) {
-			return AttributeSymbol.valueOf(field.getSymbol());
+			return FieldSymbol.valueOf(field.getSymbol());
 		} else {
 			return null;
 		}
