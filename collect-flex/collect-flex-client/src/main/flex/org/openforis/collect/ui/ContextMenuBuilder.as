@@ -129,13 +129,13 @@ package org.openforis.collect.ui
 				currentInputField = field;
 				switch(event.target) {
 					case BLANK_ON_FORM_MENU_ITEM:
-						field.changeSymbol(FieldSymbol.BLANK_ON_FORM);
+						field.applyChanges(FieldSymbol.BLANK_ON_FORM);
 						break;
 					case DASH_ON_FORM_MENU_ITEM:
-						field.changeSymbol(FieldSymbol.DASH_ON_FORM);
+						field.applyChanges(FieldSymbol.DASH_ON_FORM);
 						break;
 					case ILLEGIBLE_MENU_ITEM:
-						field.changeSymbol(FieldSymbol.ILLEGIBLE);
+						field.applyChanges(FieldSymbol.ILLEGIBLE);
 						break;
 					case EDIT_REMARKS_MENU_ITEM:
 						remarksPopUpPresenter.openPopUp(field, true);

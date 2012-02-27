@@ -18,6 +18,10 @@ package org.openforis.collect.presenter {
 	
 	import spark.components.RadioButton;
 	
+	/**
+	 * 
+	 * @author S. Ricci
+	 * */
 	public class RemarksPopUpPresenter {
 		
 		private var lastSelectedRadioButton:RadioButton = null;
@@ -154,7 +158,7 @@ package org.openforis.collect.presenter {
 		protected function okButtonClickHandler(event:Event = null):void {
 			var symbol:FieldSymbol = view.radioButtonGroup.selectedValue as FieldSymbol;
 			var remarks:String = StringUtil.trim(view.remarksTextArea.text);
-			_inputField.changeSymbol(symbol, remarks);
+			_inputField.applyChanges(symbol, remarks);
 			hidePopUp();
 		}
 		

@@ -1,6 +1,8 @@
 package org.openforis.collect.event
 {
-	
+	/**
+	 * @author S. Ricci
+	 */
 	public class DateInputFieldEvent extends InputFieldEvent
 	{
 		public static const DATE_FIELD_OPEN:String = "dateFieldOpen";

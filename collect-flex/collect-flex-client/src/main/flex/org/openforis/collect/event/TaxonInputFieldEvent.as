@@ -2,6 +2,9 @@ package org.openforis.collect.event
 {
 	import org.openforis.collect.model.proxy.TaxonOccurrenceProxy;
 	
+	/**
+	 * @author S. Ricci
+	 */
 	public class TaxonInputFieldEvent extends InputFieldEvent
 	{
 		public static const TAXON_SEARCH_POPUP_CLOSE:String = "taxonSearchPopUpClose";

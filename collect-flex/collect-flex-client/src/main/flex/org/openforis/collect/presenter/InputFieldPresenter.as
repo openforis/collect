@@ -2,12 +2,10 @@ package org.openforis.collect.presenter {
 	import flash.events.Event;
 	import flash.events.FocusEvent;
 	import flash.events.KeyboardEvent;
-	import flash.events.MouseEvent;
 	import flash.ui.Keyboard;
 	
 	import mx.binding.utils.ChangeWatcher;
 	import mx.collections.IList;
-	import mx.core.IToolTip;
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.IResponder;
 	import mx.rpc.events.FaultEvent;
@@ -22,16 +20,13 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.model.FieldSymbol;
 	import org.openforis.collect.model.proxy.AttributeProxy;
 	import org.openforis.collect.model.proxy.FieldProxy;
-	import org.openforis.collect.model.proxy.ValidationResultsProxy;
 	import org.openforis.collect.remoting.service.UpdateRequest;
 	import org.openforis.collect.remoting.service.UpdateRequest$Method;
 	import org.openforis.collect.ui.ContextMenuBuilder;
 	import org.openforis.collect.ui.component.input.InputField;
 	import org.openforis.collect.util.ArrayUtil;
 	import org.openforis.collect.util.CollectionUtil;
-	import org.openforis.collect.util.ReasonBlankUtil;
 	import org.openforis.collect.util.StringUtil;
-	import org.openforis.collect.util.ToolTipUtil;
 	import org.openforis.collect.util.UIUtil;
 	
 	/**
@@ -40,6 +35,10 @@ package org.openforis.collect.presenter {
 	 * @author S. Ricci
 	 * */
 	public class InputFieldPresenter extends AbstractPresenter {
+		
+		public static const SHORTCUT_BLANK_ON_FORM:String = "*";
+		public static const SHORTCUT_DASH_ON_FORM:String = "-";
+		public static const SHORTCUT_ILLEGIBLE:String = "?";
 		
 		private var _view:InputField;
 		private var _changed:Boolean = false;
@@ -112,29 +111,37 @@ package org.openforis.collect.presenter {
 			}
 		}
 		
-		public function applyChanges():void {
-			if(ReasonBlankUtil.isShortCut(_view.text)) {
-				var symbol:FieldSymbol = ReasonBlankUtil.parseShortCut(_view.text);
-				changeSymbol(symbol);
-			} else {
-				var req:UpdateRequest = new UpdateRequest();
-				var def:AttributeDefinitionProxy = _view.attributeDefinition;
-				req.parentEntityId = _view.parentEntity.id;
-				req.nodeName = def.name;
+		public function applyChanges(symbol:FieldSymbol = null, remarks:String = null):void {
+			if(symbol == null && isShortCutForReasonBlank(_view.text)) {
+				symbol = parseShortCutForReasonBlank(_view.text);
+			}
+			var req:UpdateRequest = new UpdateRequest();
+			var def:AttributeDefinitionProxy = _view.attributeDefinition;
+			req.parentEntityId = _view.parentEntity.id;
+			req.nodeName = def.name;
+			req.fieldIndex = _view.fieldIndex;
+			req.symbol = symbol;
+			req.remarks = remarks;
+			if(symbol == null) {
 				req.value = textToRequestValue();
-				req.fieldIndex = _view.fieldIndex;
-				if(_view.attribute != null) {
-					var a:AttributeProxy = _view.attribute;
-					var field:FieldProxy = a.getField(_view.fieldIndex);
-					req.nodeId = a.id;
+			} else {
+				req.symbol = symbol;
+			}
+			if(_view.attribute != null) {
+				var a:AttributeProxy = _view.attribute;
+				var field:FieldProxy = a.getField(_view.fieldIndex);
+				req.nodeId = a.id;
+				if(symbol != null) {
+					req.method = UpdateRequest$Method.UPDATE_SYMBOL;
+				} else {
 					req.method = UpdateRequest$Method.UPDATE;
 					//preserve remarks
 					req.remarks = field.remarks;
-				} else {
-					req.method = UpdateRequest$Method.ADD;
 				}
-				dataClient.updateActiveRecord(_updateResponder, req);
+			} else {
+				req.method = UpdateRequest$Method.ADD;
 			}
+			dataClient.updateActiveRecord(_updateResponder, req);
 		}
 		
 		public function undoLastChange():void {
@@ -166,7 +173,7 @@ package org.openforis.collect.presenter {
 			if(attribute != null) {
 				var field:FieldProxy = _view.attribute.getField(_view.fieldIndex);
 				if(field.symbol != null) {
-					var shortKey:String = ReasonBlankUtil.getShortCut(field.symbol);
+					var shortKey:String = getShortCutForReasonBlank(field.symbol);
 					if(shortKey != null) {
 						return shortKey;
 					}
@@ -186,23 +193,6 @@ package org.openforis.collect.presenter {
 				result = text;
 			}
 			return result;
-		}
-		
-		public function changeSymbol(symbol:FieldSymbol, remarks:String = null):void {
-			var req:UpdateRequest = new UpdateRequest();
-			var def:AttributeDefinitionProxy = _view.attributeDefinition;
-			req.parentEntityId = _view.parentEntity.id;
-			req.nodeName = def.name;
-			req.symbol = symbol;
-			req.remarks = remarks;
-			req.fieldIndex = _view.fieldIndex;
-			if(_view.attribute != null) {
-				req.nodeId = _view.attribute.id;
-				req.method = UpdateRequest$Method.UPDATE_SYMBOL;
-			} else {
-				req.method = UpdateRequest$Method.ADD;
-			}
-			dataClient.updateActiveRecord(_updateResponder, req);
 		}
 		
 		protected function updateView():void {
@@ -230,17 +220,49 @@ package org.openforis.collect.presenter {
 			return null;
 		}
 		
+		public static function getShortCutForReasonBlank(symbol:FieldSymbol):String {
+			switch(symbol) {
+				case FieldSymbol.BLANK_ON_FORM:
+					return SHORTCUT_BLANK_ON_FORM;
+				case FieldSymbol.DASH_ON_FORM:
+					return SHORTCUT_DASH_ON_FORM;
+				case FieldSymbol.ILLEGIBLE:
+					return SHORTCUT_ILLEGIBLE;
+				default:
+					return null;
+			}
+		}
+		
+		public static function parseShortCutForReasonBlank(text:String):FieldSymbol {
+			switch(text) {
+				case SHORTCUT_BLANK_ON_FORM:
+					return FieldSymbol.BLANK_ON_FORM;
+				case SHORTCUT_DASH_ON_FORM:
+					return FieldSymbol.DASH_ON_FORM;
+				case SHORTCUT_ILLEGIBLE:
+					return FieldSymbol.ILLEGIBLE;
+				default:
+					return null;
+			}
+		}
+		
+		public static function isShortCutForReasonBlank(text:String):Boolean {
+			return ArrayUtil.isIn([SHORTCUT_BLANK_ON_FORM, SHORTCUT_DASH_ON_FORM, SHORTCUT_ILLEGIBLE], text);
+		}
+		
 		protected function get dataClient():DataClient {
 			return _dataClient;
 		}
 
 		[Bindable]
-		public function get changed():Boolean {
+		protected function get changed():Boolean {
 			return _changed;
 		}
 		
-		public function set changed(value:Boolean):void {
+		protected function set changed(value:Boolean):void {
 			_changed = value;
 		}
+		
+		
 	}
 }

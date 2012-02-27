@@ -57,10 +57,6 @@ package org.openforis.collect.ui.component.input {
 			this._presenter = new InputFieldPresenter(this);
 		}
 		
-		public function changeSymbol(symbol:FieldSymbol, remarks:String = null):void {
-			presenter.changeSymbol(symbol, remarks);
-		}
-		
 		/**
 		 * returns trus if there is not an attribute associated to the field or
 		 * the attribute's value is null
@@ -70,8 +66,8 @@ package org.openforis.collect.ui.component.input {
 				(attribute.empty && attribute.getField(fieldIndex).symbol == null);
 		}
 		
-		public function applyChanges():void {
-			presenter.applyChanges();
+		public function applyChanges(symbol:FieldSymbol = null, remarks:String = null):void {
+			presenter.applyChanges(symbol, remarks);
 		}
 		
 		public function hasBlankReasonSpecified():Boolean {
