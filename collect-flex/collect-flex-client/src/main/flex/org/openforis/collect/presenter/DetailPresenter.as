@@ -16,9 +16,11 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
 	import org.openforis.collect.model.proxy.RecordProxy;
+	import org.openforis.collect.model.proxy.RecordProxy$Step;
 	import org.openforis.collect.ui.UIBuilder;
 	import org.openforis.collect.ui.component.detail.FormContainer;
 	import org.openforis.collect.ui.view.DetailView;
+	import org.openforis.collect.util.AlertUtil;
 	import org.openforis.collect.util.StringUtil;
 
 	public class DetailPresenter extends AbstractPresenter {
@@ -35,7 +37,8 @@ package org.openforis.collect.presenter {
 		override internal function initEventListeners():void {
 			_view.backToListButton.addEventListener(MouseEvent.CLICK, backToListButtonClickHandler);
 			_view.saveButton.addEventListener(MouseEvent.CLICK, saveButtonClickHandler);
-			
+			_view.promoteButton.addEventListener(MouseEvent.CLICK, promoteButtonClickHandler);
+				
 			eventDispatcher.addEventListener(UIEvent.ACTIVE_RECORD_CHANGED, activeRecordChangedListener);
 		}
 		
@@ -53,6 +56,9 @@ package org.openforis.collect.presenter {
 			_view.keyAttributeValuesText.text = keyValues;
 			_view.rootEntityDefinitionText.text = activeRootEntity.getLabelText();
 			_view.formVersionText.text = version.getLabelText();
+			var promoteButtonVisible:Boolean = activeRecord.step == RecordProxy$Step.ENTRY || 
+				activeRecord.step == RecordProxy$Step.CLEANSING;
+			_view.promoteButton.visible = _view.promoteButton.includeInLayout = promoteButtonVisible;
 			
 			var form:FormContainer = null;
 			if (_view.formsContainer.contatinsForm(version,activeRootEntity)){
@@ -81,6 +87,15 @@ package org.openforis.collect.presenter {
 			_dataClient.saveActiveRecord(new AsyncResponder(saveActiveRecordResultHandler, faultHandler));
 		}
 		
+		protected function promoteButtonClickHandler(event:MouseEvent):void {
+			AlertUtil.showConfirm("edit.confirmPromote", null, null, performPromote);
+		}
+		
+		protected function performPromote():void {
+			_dataClient.promoteRecord(new AsyncResponder(promoteRecordResultHandler, faultHandler), 
+				Application.activeRecord.id);
+		}
+		
 		internal function clearActiveRecordHandler(event:ResultEvent, token:Object = null):void {
 			Application.activeRecord = null;
 			var uiEvent:UIEvent = new UIEvent(UIEvent.BACK_TO_LIST);
@@ -91,5 +106,18 @@ package org.openforis.collect.presenter {
 			
 		}
 		
+		internal function promoteRecordResultHandler(event:ResultEvent, token:Object = null):void {
+			var r:RecordProxy = Application.activeRecord;
+			var keyLabel:String = r.rootEntity.getKeyLabel(Application.activeRootEntity);
+			var nextStep:RecordProxy$Step;
+			if(r.step == RecordProxy$Step.ENTRY) {
+				nextStep = RecordProxy$Step.CLEANSING;
+			} else {
+				nextStep = RecordProxy$Step.ANALYSIS;
+			}
+			AlertUtil.showMessage("edit.recordPromoted", [keyLabel, nextStep]);
+			var uiEvent:UIEvent = new UIEvent(UIEvent.BACK_TO_LIST);
+			eventDispatcher.dispatchEvent(uiEvent);
+		}
 	}
 }

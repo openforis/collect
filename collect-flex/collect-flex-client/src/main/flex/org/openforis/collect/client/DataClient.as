@@ -19,9 +19,10 @@ package org.openforis.collect.client {
 		private var _saveActiveRecordOperation:Operation;
 		private var _createRecordOperation:Operation;
 		private var _deleteRecordOperation:Operation;
-		private var _getRecordCountOperation:Operation;
 		private var _getRecordSummariesOperation:Operation;
 		private var _loadRecordOperation:Operation;
+		private var _promoteRecordOperation:Operation;
+		private var _demoteRecordOperation:Operation;
 		private var _clearActiveRecordOperation:Operation;
 		private var _getCodeListItemsOperation:Operation;
 		private var _findAssignableCodeListItemsOperation:Operation;
@@ -34,17 +35,13 @@ package org.openforis.collect.client {
 			this._saveActiveRecordOperation = getOperation("saveActiveRecord");
 			this._createRecordOperation = getOperation("createRecord");
 			this._deleteRecordOperation = getOperation("deleteRecord");
-			this._getRecordCountOperation = getOperation("getRecordCount");
 			this._getRecordSummariesOperation = getOperation("getRecordSummaries");
 			this._loadRecordOperation = getOperation("loadRecord");
+			this._promoteRecordOperation = getOperation("promoteRecord");
+			this._demoteRecordOperation = getOperation("demoteRecord");
 			this._clearActiveRecordOperation = getOperation("clearActiveRecord");
 			this._getCodeListItemsOperation = getOperation("getCodeListItems", CONCURRENCY_MULTIPLE);
 			this._findAssignableCodeListItemsOperation = getOperation("findAssignableCodeListItems", CONCURRENCY_MULTIPLE);
-		}
-		
-		public function getRecordCount(responder:IResponder):void {
-			var token:AsyncToken = this._getRecordCountOperation.send();
-			token.addResponder(responder);
 		}
 		
 		public function createNewRecord(responder:IResponder, rootEntityName:String, versionName:String):void {
@@ -81,6 +78,16 @@ package org.openforis.collect.client {
 			this._updateQueueProcessor.appendOperation(responder, this._updateActiveRecordOperation, request);
 		}
 		
+		public function promoteRecord(responder:IResponder, id:int):void {
+			var token:AsyncToken = this._promoteRecordOperation.send(id);
+			token.addResponder(responder);
+		}
+		
+		public function demoteRecord(responder:IResponder, id:int):void {
+			var token:AsyncToken = this._demoteRecordOperation.send(id);
+			token.addResponder(responder);
+		}
+
 		public function findAssignableCodeListItems(responder:IResponder, parentEntityId:int, attribute:String):void {
 			var token:AsyncToken = this._findAssignableCodeListItemsOperation.send(parentEntityId, attribute);
 			token.addResponder(responder);

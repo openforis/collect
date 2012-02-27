@@ -150,6 +150,12 @@ package org.openforis.collect.ui {
 			//date modified column
 			column = getGridColumn(Message.get("list.modifiedDate"), "modifiedDate", 150, RecordSummaryDataGrid.dateTimeLabelFunction);
 			columns.addItem(column);
+			//entry completed column
+			column = getGridColumn(Message.get("list.entryCompleted"), "entryCompleted", 50, RecordSummaryDataGrid.entryCompletedLabelFunction);
+			columns.addItem(column);
+			//cleansing completed column
+			column = getGridColumn(Message.get("list.cleansingCompleted"), "cleansingCompleted", 50, RecordSummaryDataGrid.cleansingCompletedLabelFunction);
+			columns.addItem(column);
 			return columns;
 		}
 		

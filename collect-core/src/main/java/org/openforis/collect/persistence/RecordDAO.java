@@ -9,6 +9,7 @@ import static org.openforis.collect.persistence.jooq.tables.UserAccount.USER_ACC
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.InsertSetMoreStep;
 import org.jooq.Record;
@@ -51,6 +52,19 @@ public class RecordDAO extends JooqDaoSupport {
 	}
 
 	@Transactional
+	public void insert(CollectRecord record) {
+		insertRecord(record);
+		dataDao.insertData(record);
+	}
+	
+	@Transactional
+	public void update(CollectRecord record) {
+		updateRecord(record);
+		deleteData(record.getId());
+		dataDao.insertData(record);
+	}
+	
+	@Transactional
 	public void saveOrUpdate(CollectRecord record) {
 		if (record.getId() == null) {
 			insertRecord(record);
@@ -60,7 +74,7 @@ public class RecordDAO extends JooqDaoSupport {
 		}
 		dataDao.insertData(record);
 	}
-
+	
 	@Transactional
 	public void delete(CollectRecord record) {
 		Integer id = record.getId();
@@ -191,6 +205,10 @@ public class RecordDAO extends JooqDaoSupport {
 				r.COUNT5,
 				r.SUBMITTED_ID
 				);
+		
+		//add condition on submitted_id: always find records not yet submitted
+		Condition notExistsPromoted = Factory.notExists(jf.select(RECORD.ID).from(RECORD).where(RECORD.ID.equal(r.SUBMITTED_ID)));
+		q.addConditions(notExistsPromoted);
 		
 		//add order by condition
 		Field<?> orderBy = null;

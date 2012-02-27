@@ -11,7 +11,9 @@
 		<![CDATA[
 			import mx.collections.ArrayCollection;
 			
+			import org.openforis.collect.Application;
 			import org.openforis.collect.i18n.Message;
+			import org.openforis.collect.model.proxy.RecordProxy$Step;
 			import org.openforis.collect.presenter.DetailPresenter;
 			import org.openforis.collect.ui.Images;
 			
@@ -26,8 +28,6 @@
 				_presenter = new DetailPresenter(this);
 				_forms = new ArrayCollection();
 			}
-			
-			
 			
 		]]>
 	</fx:Script>
@@ -63,9 +63,16 @@
 	<component:LoadingContent width="100%" height="100%" includeIn="loading" itemCreationPolicy="immediate" />
 	<detail:FormsContainer id="formsContainer" height="100%" width="100%" includeIn="edit" itemCreationPolicy="immediate" verticalGap="0" />
 	
-	<s:HGroup width="100%" id="buttonBar" horizontalAlign="center" verticalAlign="middle" gap="30">
+	<s:Group width="100%" id="buttonBar">
 		<!-- Buttons: save, etc...-->
-		<s:Button useHandCursor="true" buttonMode="true" id="saveButton" label="{Message.get('edit.save')}" />
-	</s:HGroup>
+		<s:Button id="saveButton" label="{Message.get('edit.save')}"
+				  horizontalCenter="0"
+				  useHandCursor="true" buttonMode="true" />
+		
+		<s:Button id="promoteButton" label="{Message.get('edit.promote')}"
+				  right="0"
+				  useHandCursor="true" buttonMode="true"
+				  />
+	</s:Group>
 	
 </s:Group>

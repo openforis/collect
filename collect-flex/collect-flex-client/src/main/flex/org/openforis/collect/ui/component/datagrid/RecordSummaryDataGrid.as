@@ -5,6 +5,7 @@ package org.openforis.collect.ui.component.datagrid
 	import mx.core.ClassFactory;
 	
 	import org.openforis.collect.model.proxy.RecordProxy;
+	import org.openforis.collect.model.proxy.RecordProxy$Step;
 	
 	import spark.components.DataGrid;
 	import spark.components.gridClasses.GridColumn;
@@ -63,6 +64,30 @@ package org.openforis.collect.ui.component.datagrid
 				}
 			}
 			return "";
+		}
+		
+		public static function entryCompletedLabelFunction(item:Object, gridColumn:GridColumn):String {
+			var r:RecordProxy = item as RecordProxy;
+			switch(r.step) {
+				case RecordProxy$Step.ENTRY:
+					return "X";
+				case RecordProxy$Step.CLEANSING:
+				case RecordProxy$Step.ANALYSIS:
+				default:
+					return "Y";
+			}
+		}
+		
+		public static function cleansingCompletedLabelFunction(item:Object, gridColumn:GridColumn):String {
+			var r:RecordProxy = item as RecordProxy;
+			switch(r.step) {
+				case RecordProxy$Step.ENTRY:
+				case RecordProxy$Step.CLEANSING:
+					return "X";
+				case RecordProxy$Step.ANALYSIS:
+				default:
+					return "Y";
+			}
 		}
 		
 		private static function listFieldLabelFunction(item:Object, gridColumn:GridColumn, listFieldName:String, dataFieldPrefix:String):String {

@@ -137,7 +137,29 @@ public class RecordManager {
 	}
 
 	@Transactional
-	public void promote(String recordId) throws InvalidIdException, MultipleEditException, NonexistentIdException, AccessDeniedException, RecordLockedException {
+	public int promote(CollectSurvey survey, int recordId, User user) throws InvalidIdException, MultipleEditException, NonexistentIdException, AccessDeniedException, RecordLockedException {
+		CollectRecord record = recordDAO.load(survey, recordContext, recordId);
+		Step nextStep;
+		switch(record.getStep()) {
+			case ENTRY:
+				nextStep = Step.CLEANSING;
+				break;
+			case CLEANSING:
+				nextStep = Step.ANALYSIS;
+				break;
+			default:
+				throw new IllegalArgumentException("This record cannot be promoted.");
+		}
+		Date now = new Date();
+		record.setId(null);
+		record.setSubmittedId(recordId);
+		record.setModifiedBy(user);
+		record.setModifiedDate(now);
+		record.setCreatedBy(user);
+		record.setCreationDate(now);
+		record.setStep(nextStep);
+		recordDAO.insert(record);
+		return record.getId();
 	}
 
 	@Transactional
