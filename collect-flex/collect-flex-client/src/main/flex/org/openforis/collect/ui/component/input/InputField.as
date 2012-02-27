@@ -5,8 +5,8 @@ package org.openforis.collect.ui.component.input {
 	import mx.events.FlexEvent;
 	
 	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
+	import org.openforis.collect.model.FieldSymbol;
 	import org.openforis.collect.model.proxy.AttributeProxy;
-	import org.openforis.collect.model.proxy.AttributeSymbol;
 	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.presenter.InputFieldPresenter;
 	import org.openforis.collect.util.ArrayUtil;
@@ -19,7 +19,8 @@ package org.openforis.collect.ui.component.input {
 
 	/**
 	 * 
-	 * @author Mino Togna
+	 * @author M. Togna
+	 * @author S. Ricci
 	 * */
 	public class InputField extends Group {
 		
@@ -56,7 +57,7 @@ package org.openforis.collect.ui.component.input {
 			this._presenter = new InputFieldPresenter(this);
 		}
 		
-		public function changeSymbol(symbol:AttributeSymbol, remarks:String = null):void {
+		public function changeSymbol(symbol:FieldSymbol, remarks:String = null):void {
 			presenter.changeSymbol(symbol, remarks);
 		}
 		
@@ -74,9 +75,9 @@ package org.openforis.collect.ui.component.input {
 		}
 		
 		public function hasBlankReasonSpecified():Boolean {
-			var reasonBlankSymbols:Array = [AttributeSymbol.BLANK_ON_FORM, 
-				AttributeSymbol.DASH_ON_FORM, 
-				AttributeSymbol.ILLEGIBLE];
+			var reasonBlankSymbols:Array = [FieldSymbol.BLANK_ON_FORM, 
+				FieldSymbol.DASH_ON_FORM, 
+				FieldSymbol.ILLEGIBLE];
 			return attribute != null && (ArrayUtil.isIn(reasonBlankSymbols, attribute.getField(fieldIndex).symbol));  
 		}
 		

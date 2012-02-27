@@ -16,8 +16,8 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.CodeAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.CodeListItemProxy;
+	import org.openforis.collect.model.FieldSymbol;
 	import org.openforis.collect.model.proxy.AttributeProxy;
-	import org.openforis.collect.model.proxy.AttributeSymbol;
 	import org.openforis.collect.model.proxy.CodeProxy;
 	import org.openforis.collect.model.proxy.FieldProxy;
 	import org.openforis.collect.remoting.service.UpdateRequest;
@@ -163,7 +163,7 @@ package org.openforis.collect.presenter {
 		
 		override public function applyChanges():void {
 			if(ReasonBlankUtil.isShortCut(_view.text)) {
-				var symbol:AttributeSymbol = ReasonBlankUtil.parseShortCut(_view.text);
+				var symbol:FieldSymbol = ReasonBlankUtil.parseShortCut(_view.text);
 				changeSymbol(symbol);
 			} else {
 				var req:UpdateRequest = new UpdateRequest();

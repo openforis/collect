@@ -1,5 +1,4 @@
-package org.openforis.collect.presenter
-{
+package org.openforis.collect.presenter {
 	import flash.events.Event;
 	import flash.events.KeyboardEvent;
 	import flash.events.MouseEvent;
@@ -10,7 +9,7 @@ package org.openforis.collect.presenter
 	import mx.events.FlexMouseEvent;
 	import mx.managers.PopUpManager;
 	
-	import org.openforis.collect.model.proxy.AttributeSymbol;
+	import org.openforis.collect.model.FieldSymbol;
 	import org.openforis.collect.model.proxy.FieldProxy;
 	import org.openforis.collect.ui.component.input.InputField;
 	import org.openforis.collect.ui.component.input.RemarksPopUp;
@@ -119,16 +118,16 @@ package org.openforis.collect.presenter
 		
 		protected function setValuesInView():void {
 			var remarks:String = null;
-			var symbolToSelect:AttributeSymbol = null;
+			var symbolToSelect:FieldSymbol = null;
 			if(_inputField != null && _inputField.attribute != null) {
 				var field:FieldProxy = _inputField.attribute.getField(_inputField.fieldIndex);
 				remarks = field.remarks;
-				var symbol:AttributeSymbol = field.symbol;
+				var symbol:FieldSymbol = field.symbol;
 				if(symbol != null) {
 					switch(symbol) {
-						case AttributeSymbol.BLANK_ON_FORM:
-						case AttributeSymbol.DASH_ON_FORM:
-						case AttributeSymbol.ILLEGIBLE:
+						case FieldSymbol.BLANK_ON_FORM:
+						case FieldSymbol.DASH_ON_FORM:
+						case FieldSymbol.ILLEGIBLE:
 							symbolToSelect = symbol;
 							break;
 					}
@@ -153,7 +152,7 @@ package org.openforis.collect.presenter
 		}
 		
 		protected function okButtonClickHandler(event:Event = null):void {
-			var symbol:AttributeSymbol = view.radioButtonGroup.selectedValue as AttributeSymbol;
+			var symbol:FieldSymbol = view.radioButtonGroup.selectedValue as FieldSymbol;
 			var remarks:String = StringUtil.trim(view.remarksTextArea.text);
 			_inputField.changeSymbol(symbol, remarks);
 			hidePopUp();

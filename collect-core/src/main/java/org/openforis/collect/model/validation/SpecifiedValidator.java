@@ -17,16 +17,15 @@ public class SpecifiedValidator extends Check {
 
 	private static final long serialVersionUID = 1L;
 
-	private NodeState nodeState;
 	private Flag flag;
 
-	public SpecifiedValidator(NodeState nodeState) {
-		this.nodeState = nodeState;
+	public SpecifiedValidator() {
 		flag = Flag.ERROR;
 	}
 
 	@Override
-	public boolean evaluate(Attribute<?, ?> attribute) {
+	public boolean evaluate(NodeState nodeState) {
+		Attribute<?, ?> attribute = (Attribute<?, ?>) nodeState.getNode();
 		CollectRecord record = (CollectRecord) attribute.getRecord();
 		Step step = record.getStep();
 
