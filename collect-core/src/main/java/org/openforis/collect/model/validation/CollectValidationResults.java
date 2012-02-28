@@ -57,7 +57,7 @@ public class CollectValidationResults extends ValidationResults {
 		}
 	}
 
-	void addErrors(List<ValidationResults> errors){
+	void addErrors(List<ValidationResult> errors){
 		errors.addAll(errors);
 	}
 	

@@ -89,6 +89,11 @@ public class RecordManager {
 	}
 
 	@Transactional
+	public List<CollectRecord> getSummaries(CollectSurvey survey, String rootEntity, String... keys) {
+		return recordDAO.loadSummaries(survey, recordContext, rootEntity, keys);
+	}
+	
+	@Transactional
 	public List<CollectRecord> getSummaries(CollectSurvey survey, String rootEntity, int offset, int maxNumberOfRecords, String orderByFieldName, String filter) {
 		List<CollectRecord> recordsSummary = recordDAO.loadSummaries(survey, recordContext, rootEntity, offset, maxNumberOfRecords, orderByFieldName, filter);
 		return recordsSummary;
