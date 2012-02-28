@@ -116,6 +116,7 @@ package org.openforis.collect.presenter {
 				nextStep = RecordProxy$Step.ANALYSIS;
 			}
 			AlertUtil.showMessage("edit.recordPromoted", [keyLabel, nextStep]);
+			Application.activeRecord = null;
 			var uiEvent:UIEvent = new UIEvent(UIEvent.BACK_TO_LIST);
 			eventDispatcher.dispatchEvent(uiEvent);
 		}

@@ -415,10 +415,11 @@ public class DataService {
 	
 	@Transactional
 	public int promoteRecord(int recordId) throws InvalidIdException, MultipleEditException, NonexistentIdException, AccessDeniedException, RecordLockedException {
-		SessionState sessionState = getSessionManager().getSessionState();
+		SessionState sessionState = sessionManager.getSessionState();
 		CollectSurvey survey = sessionState.getActiveSurvey();
 		User user = sessionState.getUser();
 		int promotedId = this.recordManager.promote(survey, recordId, user);
+		sessionManager.clearActiveRecord();
 		return promotedId;
 	}
 
