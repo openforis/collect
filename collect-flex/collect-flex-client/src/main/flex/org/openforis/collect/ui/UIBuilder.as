@@ -124,7 +124,7 @@ package org.openforis.collect.ui {
 				if(nodeDef is EntityDefinitionProxy) {
 					var entityDef:EntityDefinitionProxy = EntityDefinitionProxy(nodeDef);
 					if(entityDef.countInSummaryList) {
-						column = getGridColumn(Message.get("list.headerCount", [entityDef.getLabelText()]), "count" + position, 150, 
+						column = getGridColumn(Message.get("list.headerCount", [entityDef.getLabelText()]), "count" + position, 80, 
 							RecordSummaryDataGrid.recordSummariesCountEntityLabelFunction);
 						columns.addItem(column);
 						position ++;

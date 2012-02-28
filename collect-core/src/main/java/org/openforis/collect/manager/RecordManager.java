@@ -148,22 +148,27 @@ public class RecordManager {
 		switch(record.getStep()) {
 			case ENTRY:
 				nextStep = Step.CLEANSING;
+				//clone record and save a copy with the new step
+				recordDAO.unlock(recordId, user);
+				record.setId(null);
+				Date now = new Date();
+				record.setSubmittedId(recordId);
+				record.setModifiedBy(user);
+				record.setModifiedDate(now);
+				record.setCreatedBy(user);
+				record.setCreationDate(now);
+				record.setStep(nextStep);
+				recordDAO.insert(record);
 				break;
 			case CLEANSING:
 				nextStep = Step.ANALYSIS;
+				recordDAO.unlock(recordId, user);
+				record.setStep(nextStep);
+				recordDAO.update(record);
 				break;
 			default:
 				throw new IllegalArgumentException("This record cannot be promoted.");
 		}
-		Date now = new Date();
-		record.setId(null);
-		record.setSubmittedId(recordId);
-		record.setModifiedBy(user);
-		record.setModifiedDate(now);
-		record.setCreatedBy(user);
-		record.setCreationDate(now);
-		record.setStep(nextStep);
-		recordDAO.insert(record);
 		return record.getId();
 	}
 

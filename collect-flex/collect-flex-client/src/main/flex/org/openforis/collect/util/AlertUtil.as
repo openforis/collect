@@ -21,20 +21,23 @@ package org.openforis.collect.util
 			showMsg(Images.ERROR, messageResource, messageParameters, titleResource, titleParameters);
 		}
 		
-		public static function showMessage(messageResource:String, messageParameters:Array = null, titleResource:String = null, titleParameters:Array = null):void {
+		public static function showMessage(messageResource:String, messageParameters:Array = null, 
+										   titleResource:String = null, titleParameters:Array = null):void {
 			if(titleResource == null) {
 				titleResource = INFO_TITLE_RESOURCE;
 			}
 			showMsg(null, messageResource, messageParameters, titleResource, titleParameters);
 		}
 		
-		private static function showMsg(icon:Class, messageResource:String, messageParameters:Array = null, titleResource:String = null, titleParameters:Array = null) {
+		private static function showMsg(icon:Class, messageResource:String, messageParameters:Array = null, 
+										titleResource:String = null, titleParameters:Array = null):void {
 			var message:String = Message.get(messageResource, messageParameters);
 			var title:String = Message.get(titleResource, titleParameters);
 			Alert.show(message, title, Alert.OK, null, null, icon);
 		}
 		
-		public static function showConfirm(messageResource:String, parameters:Array, titleResource:String, yesHandler:Function, noHandler:Function = null):void {
+		public static function showConfirm(messageResource:String, parameters:Array, titleResource:String, 
+										   yesHandler:Function, noHandler:Function = null):void {
 			var message:String = Message.get(messageResource, parameters);
 			var title:String = Message.get(titleResource);
 			

@@ -170,11 +170,8 @@ package org.openforis.collect.presenter {
 			req.nodeName = def.name;
 			req.fieldIndex = NaN; //ignore field index, update the entire code or list of codes
 			req.remarks = remarks;
-			if(symbol == null) {
-				req.value = textToRequestValue();
-			} else {
-				req.symbol = symbol;
-			}
+			req.value = textToRequestValue();
+			req.symbol = symbol;
 			if(_view.attribute != null || (CollectionUtil.isNotEmpty(_view.attributes))) {
 				if(! def.multiple) {
 					req.nodeId = _view.attribute.id;
