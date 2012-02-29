@@ -16,6 +16,7 @@ import org.jooq.InsertSetMoreStep;
 import org.jooq.Record;
 import org.jooq.Result;
 import org.jooq.SelectQuery;
+import org.jooq.TableField;
 import org.jooq.UpdateSetMoreStep;
 import org.jooq.impl.Factory;
 import org.openforis.collect.model.CollectRecord;
@@ -173,7 +174,34 @@ public class RecordDAO extends JooqDaoSupport {
 		
 		return record;
 	}
-
+	
+	/**
+	 * Load a list of record summaries that match the primary keys
+	 * 
+	 * @param survey
+	 * @param recordContext
+	 * @param rootEntity
+	 * @param keys
+	 * @return
+	 */
+	@Transactional
+	public List<CollectRecord> loadSummaries(CollectSurvey survey, RecordContext recordContext, String rootEntity, String... keys) {
+		Factory jf = getJooqFactory();
+		SelectQuery q = jf.selectQuery();
+		q.addFrom(RECORD);
+		q.addSelect(RECORD.getFields());
+		int i = 0;
+		for (String key : keys) {
+			String keyColumnName = "key" + (++i);
+			@SuppressWarnings("unchecked")
+			Field<String> keyField = (Field<String>) RECORD.getField(keyColumnName);
+			q.addConditions(keyField.equal(key));
+		}
+		Result<Record> records = q.fetch();
+		List<CollectRecord> recordSummaries = mapRecordsToSummaries(recordContext, records, survey, rootEntity);
+		return recordSummaries;
+	}
+	
 	@Transactional
 	public List<CollectRecord> loadSummaries(CollectSurvey survey, RecordContext recordContext, String rootEntity, int offset, int maxRecords, String orderByField, String filter) {
 		Factory jf = getJooqFactory();

@@ -19,11 +19,15 @@ package org.openforis.collect.ui
 	import org.openforis.collect.event.EventDispatcherFactory;
 	import org.openforis.collect.i18n.Message;
 	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
+	import org.openforis.collect.metamodel.proxy.CodeAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 	import org.openforis.collect.model.FieldSymbol;
 	import org.openforis.collect.model.proxy.AttributeProxy;
 	import org.openforis.collect.model.proxy.EntityProxy;
+	import org.openforis.collect.model.proxy.FieldProxy;
 	import org.openforis.collect.model.proxy.NodeProxy;
+	import org.openforis.collect.model.proxy.NodeStateProxy;
+	import org.openforis.collect.model.proxy.RecordProxy$Step;
 	import org.openforis.collect.presenter.RemarksPopUpPresenter;
 	import org.openforis.collect.remoting.service.UpdateRequest;
 	import org.openforis.collect.remoting.service.UpdateRequest$Method;
@@ -89,36 +93,59 @@ package org.openforis.collect.ui
 		}
 		
 		public static function buildContextMenu(inputField:InputField):ContextMenu {
+			var step:RecordProxy$Step = Application.activeRecord.step;
 			var cm:ContextMenu = new ContextMenu();
 			var items:Array = new Array();
+			
+			addValueItems(items, step, inputField);
+			
+			addRowItems(items, step, inputField);
+			
+			addApproveValueItems(items, step, inputField);
+			
+			cm.customItems = items;
+			cm.hideBuiltInItems();
+			return cm;
+		}
+		
+		private static function addValueItems(currentItems:Array, step:RecordProxy$Step, inputField:InputField):void {
 			if(inputField.isEmpty()) {
-				items.push(
+				currentItems.push(
 					BLANK_ON_FORM_MENU_ITEM,
 					DASH_ON_FORM_MENU_ITEM,
 					ILLEGIBLE_MENU_ITEM
 				);
 			}
-			items.push(EDIT_REMARKS_MENU_ITEM);
-			
+			currentItems.push(EDIT_REMARKS_MENU_ITEM);
+		}
+		
+		private static function addRowItems(currentItems:Array, step:RecordProxy$Step, inputField:InputField):void {
 			var def:AttributeDefinitionProxy = inputField.attributeDefinition;
-			if(def != null) {
-				if(def.multiple) {
-					items.push(DELETE_ATTRIBUTE_MENU_ITEM);
+			if(def != null && inputField.isInDataGroup) {
+				if(def.multiple && ! (def is CodeAttributeDefinitionProxy)) {
+					currentItems.push(DELETE_ATTRIBUTE_MENU_ITEM);
 				}
 				var entityDef:EntityDefinitionProxy = def.parent;
 				if(entityDef != null && entityDef.multiple) {
-					items.push(
+					currentItems.push(
 						REPLACE_BLANKS_WITH_DASH_MENU_ITEM, 
 						REPLACE_BLANKS_WITH_STAR_MENU_ITEM
 					);
 					if( !entityDef.enumerated) {
-						items.push(DELETE_ENTITY_MENU_ITEM);
+						currentItems.push(DELETE_ENTITY_MENU_ITEM);
 					}
 				}
+			}			
+		}
+		
+		private static function addApproveValueItems(currentItems:Array, step:RecordProxy$Step, inputField:InputField):void {
+			var attribute:AttributeProxy = inputField.attribute;
+			if(attribute != null) {
+				var state:NodeStateProxy = attribute.state;
+				if(step == RecordProxy$Step.ENTRY && state != null && state.hasErrors()) {
+					currentItems.push(APPROVE_ERROR_MENU_ITEM);
+				}
 			}
-			cm.customItems = items;
-			cm.hideBuiltInItems();
-			return cm;
 		}
 		
 		public static function menuItemSelectHandler(event:ContextMenuEvent):void {
@@ -152,6 +179,9 @@ package org.openforis.collect.ui
 					case DELETE_ENTITY_MENU_ITEM:
 						AlertUtil.showConfirm("edit.confirmDeleteEntity", null, "global.confirmAlertTitle", performDeleteEntity);
 						break;
+					case APPROVE_ERROR_MENU_ITEM:
+						field.applyChanges(FieldSymbol.CONFIRMED);
+						break
 				}
 			}
 		}
