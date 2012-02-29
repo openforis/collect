@@ -22,11 +22,20 @@ import org.openforis.idm.model.state.NodeState;
 public class NodeProxy implements Proxy {
 
 	private transient Node<?> node;
-	protected boolean deleted = false;
-
+	
+	private NodeStateProxy state;
+	
 	public NodeProxy(Node<?> node) {
 		super();
 		this.node = node;
+		
+		/*
+		CollectRecord record = (CollectRecord) this.node.getRecord();
+		NodeState nodeState = record.getNodeState(node);
+		if (nodeState != null) {
+			state = new NodeStateProxy(nodeState);
+		}
+		*/
 	}
 
 	public static List<NodeProxy> fromList(List<Node<?>> list) {
@@ -73,24 +82,12 @@ public class NodeProxy implements Proxy {
 		}
 	}
 	
-	@ExternalizedProperty
 	public NodeStateProxy getState() {
-		CollectRecord record = (CollectRecord) node.getRecord();
-		NodeState nodeState = record.getNodeState(node);
-		if (nodeState != null) {
-			return new NodeStateProxy(nodeState);
-		} else {
-			return null;
-		}
+		return state;
 	}
 	
-	public boolean isDeleted() {
-		return deleted;
+	public void setState(NodeStateProxy state) {
+		this.state = state;
 	}
-
-	public void setDeleted(boolean deleted) {
-		this.deleted = deleted;
-	}
-	
 	
 }

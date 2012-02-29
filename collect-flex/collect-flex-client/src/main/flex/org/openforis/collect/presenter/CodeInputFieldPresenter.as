@@ -12,7 +12,6 @@ package org.openforis.collect.presenter {
 	import mx.rpc.IResponder;
 	import mx.rpc.events.ResultEvent;
 	
-	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.CodeAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.CodeListItemProxy;
@@ -42,6 +41,7 @@ package org.openforis.collect.presenter {
 		
 		public function CodeInputFieldPresenter(view:CodeInputField) {
 			_view = view;
+			_view.fieldIndex = -1;
 			super(view);
 		}
 		
@@ -86,7 +86,7 @@ package org.openforis.collect.presenter {
 			var codeAttributeDef:CodeAttributeDefinitionProxy = _view.attributeDefinition as CodeAttributeDefinitionProxy;
 			var attribute:String = codeAttributeDef.name;
 			var parentEntityId:int = _view.parentEntity.id;
-			ClientFactory.dataClient.findAssignableCodeListItems(new AsyncResponder(loadListDialogDataResultHandler, faultHandler), parentEntityId, attribute);
+			dataClient.findAssignableCodeListItems(new AsyncResponder(loadListDialogDataResultHandler, faultHandler), parentEntityId, attribute);
 		}
 		
 		protected function loadListDialogDataResultHandler(event:ResultEvent, token:Object = null):void {
@@ -106,7 +106,7 @@ package org.openforis.collect.presenter {
 			}
 			var codesStr:String = StringUtil.concat(", ", parts);
 			TextInput(_popUp.codeInputField.textInput).text = codesStr;
-			_popUp.codeInputField.applyChanges();
+			_popUp.codeInputField.applyValue();
 			closePopupHandler();
 		}
 		
@@ -160,6 +160,44 @@ package org.openforis.collect.presenter {
 			updateDescription();
 		}
 		
+		override public function applyValue():void {
+			if(_view.attributeDefinition.multiple) {
+				var text:String = textToRequestValue();
+				for each (var a:AttributeProxy in _view.attributes) {
+					sendDeleteAttributeRequest(a);
+				}
+				var parts:Array = text.split(",");
+				if(parts.length == 1) {
+					if(isShortCutForReasonBlank(text)) {
+						var symbol:FieldSymbol = parseShortCutForReasonBlank(text);
+						sendAddAttributeRequest(null, symbol, remarks);
+					}
+				} else {
+					for each (var part:String in parts) {
+						var trimmedPart:String = StringUtil.trim(part);
+						if(StringUtil.isNotBlank(trimmedPart)) {
+							sendAddAttributeRequest(trimmedPart, null, remarks);
+						}
+					}
+				}
+			} else {
+				super.applyValue();
+			}
+		}
+		
+		override protected function get remarks():String {
+			if(_view.attributeDefinition.multiple) {
+				if(CollectionUtil.isNotEmpty(_view.attributes)) {
+					var a:AttributeProxy = AttributeProxy(_view.attributes.getItemAt(0));
+					var field:FieldProxy = FieldProxy(a.fields[0]);
+					return field.remarks;
+				}
+			} else {
+				return super.remarks;
+			}
+			return null;
+		}
+		/*
 		override public function applyChanges(symbol:FieldSymbol = null, remarks:String = null):void {
 			if(symbol == null && isShortCutForReasonBlank(_view.text)) {
 				symbol = parseShortCutForReasonBlank(_view.text);
@@ -168,10 +206,10 @@ package org.openforis.collect.presenter {
 			var def:AttributeDefinitionProxy = _view.attributeDefinition;
 			req.parentEntityId = _view.parentEntity.id;
 			req.nodeName = def.name;
-			req.fieldIndex = NaN; //ignore field index, update the entire code or list of codes
 			req.remarks = remarks;
 			req.value = textToRequestValue();
 			req.symbol = symbol;
+			req.replaceAttributes = true;
 			if(_view.attribute != null || (CollectionUtil.isNotEmpty(_view.attributes))) {
 				if(! def.multiple) {
 					req.nodeId = _view.attribute.id;
@@ -179,14 +217,35 @@ package org.openforis.collect.presenter {
 				if(symbol != null) {
 					req.method = UpdateRequest$Method.UPDATE_SYMBOL;
 				} else {
-					req.method = UpdateRequest$Method.UPDATE;
+					req.method = UpdateRequest$Method.UPDATE_ATTRIBUTE_VALUE;
 					//todo preserve old remarks
 				}
 			} else {
 				req.method = UpdateRequest$Method.ADD;
 			}
 			var responder:AsyncResponder = new AsyncResponder(updateResultHandler, updateFaultHandler);
-			ClientFactory.dataClient.updateActiveRecord(responder, req);
+			dataClient.updateActiveRecord(responder, req);
+		}
+		*/
+		protected function sendDeleteAttributeRequest(attribute:AttributeProxy):void {
+			var req:UpdateRequest = new UpdateRequest();
+			var def:AttributeDefinitionProxy = _view.attributeDefinition;
+			req.parentEntityId = _view.parentEntity.id;
+			req.nodeName = def.name;
+			req.nodeId = attribute.id;
+			req.method = UpdateRequest$Method.DELETE;
+			dataClient.updateActiveRecord(updateResponder, req);
+		}
+		
+		protected function sendAddAttributeRequest(value:String, symbol:FieldSymbol, remarks:String):void {
+			var req:UpdateRequest = new UpdateRequest();
+			var def:AttributeDefinitionProxy = _view.attributeDefinition;
+			req.parentEntityId = _view.parentEntity.id;
+			req.nodeName = def.name;
+			req.method = UpdateRequest$Method.ADD;
+			req.value = value;
+			req.remarks = remarks;
+			dataClient.updateActiveRecord(updateResponder, req);
 		}
 		
 		protected function updateDescription():void {
@@ -210,7 +269,7 @@ package org.openforis.collect.presenter {
 					var name:String = _view.attributeDefinition.name;
 					var responder:IResponder = new AsyncResponder(findItemsResultHandler, faultHandler);
 					
-					ClientFactory.dataClient.getCodeListItems(responder, parentEntityId, name, codes);
+					dataClient.getCodeListItems(responder, parentEntityId, name, codes);
 				}
 			} else {
 				_view.description = "";

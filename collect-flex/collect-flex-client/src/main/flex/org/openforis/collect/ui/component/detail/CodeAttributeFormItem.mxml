@@ -9,9 +9,11 @@
 	<fx:Script>
 		<![CDATA[
 			import mx.binding.utils.BindingUtils;
+			import mx.core.IVisualElement;
 			
 			import org.openforis.collect.metamodel.proxy.CodeAttributeDefinitionProxy;
 			import org.openforis.collect.ui.UIBuilder;
+			import org.openforis.collect.ui.component.input.CodeInputField;
 			
 			override protected function createChildren():void {
 				if(!childrenAdded) {
@@ -20,6 +22,8 @@
 						attributeDefinition.multiple && 
 						attributeDefinition is CodeAttributeDefinitionProxy) {
 						BindingUtils.bindProperty(renderer, "attributes", this, "attributes");
+						var codeInputField:IVisualElement = renderer.getElementAt(0) as CodeInputField;
+						BindingUtils.bindProperty(codeInputField, "attributes", renderer, "attributes");
 					}
 				}
 			}

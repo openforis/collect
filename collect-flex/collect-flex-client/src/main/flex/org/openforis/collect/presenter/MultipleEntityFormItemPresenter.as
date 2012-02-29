@@ -17,6 +17,7 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.model.proxy.NodeProxy;
 	import org.openforis.collect.remoting.service.UpdateRequest;
 	import org.openforis.collect.remoting.service.UpdateRequest$Method;
+	import org.openforis.collect.remoting.service.UpdateResponse;
 	import org.openforis.collect.ui.component.detail.MultipleEntityFormItem;
 	import org.openforis.collect.util.AlertUtil;
 	import org.openforis.collect.util.CollectionUtil;
@@ -45,8 +46,8 @@ package org.openforis.collect.presenter
 		}
 		
 		override protected function updateResponseReceivedHandler(event:ApplicationEvent):void {
-			var list:IList = event.result as IList;
-			for each(var node:NodeProxy in list) {
+			var response:UpdateResponse = UpdateResponse(event.result);
+			for each(var node:NodeProxy in response.addedNodes) {
 				if(view.parentEntity != null && view.entityDefinition != null 
 					&& node.parentId == view.parentEntity.id 
 					&& view.entityDefinition.name == node.name) {
@@ -92,7 +93,7 @@ package org.openforis.collect.presenter
 		}
 		
 		protected function addResultHandler(event:ResultEvent, token:Object = null):void {
-			var result:IList = event.result as IList;
+			var result:UpdateResponse = UpdateResponse(event.result);
 			Application.activeRecord.update(result);
 			var appEvt:ApplicationEvent = new ApplicationEvent(ApplicationEvent.UPDATE_RESPONSE_RECEIVED);
 			appEvt.result = result;

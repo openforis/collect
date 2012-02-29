@@ -48,9 +48,9 @@ package org.openforis.collect.presenter {
 			view.year.text = StringUtil.zeroPad(year, 2);
 			view.month.text = StringUtil.zeroPad(month, 2);
 			view.day.text = StringUtil.zeroPad(day, 2);
-			view.year.applyChanges();
-			view.month.applyChanges();
-			view.day.applyChanges();
+			view.year.applyValue();
+			view.month.applyValue();
+			view.day.applyValue();
 		}
 		
 		protected function getDateFromFields():Date {

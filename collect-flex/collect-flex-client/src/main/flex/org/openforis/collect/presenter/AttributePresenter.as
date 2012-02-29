@@ -11,6 +11,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.ui.component.detail.AttributeItemRenderer;
 	import org.openforis.collect.ui.component.input.InputField;
 	import org.openforis.collect.util.ToolTipUtil;
+	import org.openforis.collect.util.UIUtil;
 	
 	/**
 	 * 
@@ -48,19 +49,29 @@ package org.openforis.collect.presenter {
 		protected function initValidationResultHandler():void {
 			_validationToolTipTrigger.removeEventListener(MouseEvent.ROLL_OVER, showToolTip);
 			_validationToolTipTrigger.removeEventListener(MouseEvent.ROLL_OUT, hideToolTip);
-			_validationStateDisplay.styleName = null;
+			UIUtil.removeStyleNames(_validationStateDisplay, [
+				AttributeItemRenderer.STYLE_NAME_ERROR, 
+				AttributeItemRenderer.STYLE_NAME_WARNING, 
+				AttributeItemRenderer.STYLE_NOT_RELEVANT
+			]);
 			var a:AttributeProxy = _view.attribute;
 			if(a != null && a.state != null) {
 				var validationResults:ValidationResultsProxy = a.state.validationResults;
 				var hasErrors:Boolean = a.state.hasErrors();
 				var hasWarnings:Boolean = a.state.hasWarnings();
 				
-				if(hasErrors || hasWarnings) {
+				var styleName:String = null;
+				if(! a.state.relevant) {
+					styleName = AttributeItemRenderer.STYLE_NOT_RELEVANT;
+				} else if(hasErrors || hasWarnings) {
 					if(! _validationToolTipTrigger.hasEventListener(MouseEvent.ROLL_OVER)) {
 						_validationToolTipTrigger.addEventListener(MouseEvent.ROLL_OVER, showToolTip);
 						_validationToolTipTrigger.addEventListener(MouseEvent.ROLL_OUT, hideToolTip);
 					}
-					_validationStateDisplay.styleName = hasErrors ? AttributeItemRenderer.STYLE_NAME_ERROR: AttributeItemRenderer.STYLE_NAME_WARNING;
+					styleName = hasErrors ? AttributeItemRenderer.STYLE_NAME_ERROR: AttributeItemRenderer.STYLE_NAME_WARNING;
+				}
+				if(styleName != null) {
+					UIUtil.addStyleName(_validationStateDisplay, styleName);
 				}
 			}
 		}

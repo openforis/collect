@@ -6,6 +6,16 @@
 				  width="100"
 				  >
 	
+	<fx:Script>
+		<![CDATA[
+			import org.openforis.collect.presenter.RangeInputFieldPresenter;
+			
+			override protected function initPresenter():void {
+				presenter = new RangeInputFieldPresenter(this);
+			}
+		]]>
+	</fx:Script>
+	
 	<input:TextInput id="textInput" 
 					 width="100%" />
 	

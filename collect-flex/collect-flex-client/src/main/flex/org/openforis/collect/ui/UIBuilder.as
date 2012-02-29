@@ -4,6 +4,7 @@ package org.openforis.collect.ui {
 	import mx.collections.ArrayList;
 	import mx.collections.IList;
 	import mx.collections.ListCollectionView;
+	import mx.core.ClassFactory;
 	import mx.core.IVisualElement;
 	
 	import org.openforis.collect.Application;
@@ -26,6 +27,7 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.model.UIConfiguration;
 	import org.openforis.collect.model.UITab;
 	import org.openforis.collect.ui.component.datagrid.RecordSummaryDataGrid;
+	import org.openforis.collect.ui.component.datagroup.DataGridHeaderRenderer;
 	import org.openforis.collect.ui.component.detail.AttributeFormItem;
 	import org.openforis.collect.ui.component.detail.AttributeItemRenderer;
 	import org.openforis.collect.ui.component.detail.CodeAttributeFormItem;
@@ -45,6 +47,7 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.ui.component.input.InputField;
 	import org.openforis.collect.ui.component.input.MemoInputField;
 	import org.openforis.collect.ui.component.input.NumericInputField;
+	import org.openforis.collect.ui.component.input.RangeInputField;
 	import org.openforis.collect.ui.component.input.StringInputField;
 	import org.openforis.collect.ui.component.input.TaxonAttributeRenderer;
 	import org.openforis.collect.ui.component.input.TimeAttributeRenderer;
@@ -111,9 +114,13 @@ package org.openforis.collect.ui {
 			//key attributes columns
 			var position:int = 1;
 			var keyAttributeDefs:IList = rootEntity.keyAttributeDefinitions;
+			var headerText:String, dataField:String, width:Number, labelFunction:Function;
 			for each(var keyAttributeDef:AttributeDefinitionProxy in keyAttributeDefs) {
-				column = getGridColumn(keyAttributeDef.getLabelText(), "key" + position, NaN, 
-					RecordSummaryDataGrid.recordSummariesKeyLabelFunction);
+				headerText = keyAttributeDef.getLabelText();
+				dataField = "key" + position;
+				width = NaN;
+				labelFunction = RecordSummaryDataGrid.recordSummariesKeyLabelFunction;
+				column = getGridColumn(headerText, dataField, width, labelFunction);
 				columns.addItem(column);
 				position ++;
 			}
@@ -124,8 +131,11 @@ package org.openforis.collect.ui {
 				if(nodeDef is EntityDefinitionProxy) {
 					var entityDef:EntityDefinitionProxy = EntityDefinitionProxy(nodeDef);
 					if(entityDef.countInSummaryList) {
-						column = getGridColumn(Message.get("list.headerCount", [entityDef.getLabelText()]), "count" + position, 80, 
-							RecordSummaryDataGrid.recordSummariesCountEntityLabelFunction);
+						headerText = Message.get("list.headerCount", [entityDef.getLabelText()]);
+						dataField = "count" + position;
+						width = 70;
+						labelFunction = RecordSummaryDataGrid.recordSummariesCountEntityLabelFunction;
+						column = getGridColumn(headerText, dataField, width, labelFunction);
 						columns.addItem(column);
 						position ++;
 					}
@@ -133,16 +143,16 @@ package org.openforis.collect.ui {
 			}
 			
 			//skipped count column
-			column = getGridColumn(Message.get("list.skipped"), "skipped", 100, RecordSummaryDataGrid.numberLabelFunction);
+			column = getGridColumn(Message.get("list.skipped"), "skipped", 80, RecordSummaryDataGrid.numberLabelFunction);
 			columns.addItem(column);
 			//missing count column
-			column = getGridColumn(Message.get("list.missing"), "missing", 100, RecordSummaryDataGrid.numberLabelFunction);
+			column = getGridColumn(Message.get("list.missing"), "missing", 80, RecordSummaryDataGrid.numberLabelFunction);
 			columns.addItem(column);
 			//errors count column
-			column = getGridColumn(Message.get("list.errors"), "errors", 100, RecordSummaryDataGrid.numberLabelFunction);
+			column = getGridColumn(Message.get("list.errors"), "errors", 80, RecordSummaryDataGrid.numberLabelFunction);
 			columns.addItem(column);
 			//warnings count column
-			column = getGridColumn(Message.get("list.warnings"), "warnings", 100, RecordSummaryDataGrid.numberLabelFunction);
+			column = getGridColumn(Message.get("list.warnings"), "warnings", 80, RecordSummaryDataGrid.numberLabelFunction);
 			columns.addItem(column);
 			//creation date column
 			column = getGridColumn(Message.get("list.creationDate"), "creationDate", 150, RecordSummaryDataGrid.dateTimeLabelFunction);
@@ -151,10 +161,10 @@ package org.openforis.collect.ui {
 			column = getGridColumn(Message.get("list.modifiedDate"), "modifiedDate", 150, RecordSummaryDataGrid.dateTimeLabelFunction);
 			columns.addItem(column);
 			//entry completed column
-			column = getGridColumn(Message.get("list.entryCompleted"), "entryCompleted", 50, RecordSummaryDataGrid.entryCompletedLabelFunction);
+			column = getGridColumn(Message.get("list.entryComplete"), "entryComplete", 70, RecordSummaryDataGrid.entryCompletedLabelFunction, true);
 			columns.addItem(column);
 			//cleansing completed column
-			column = getGridColumn(Message.get("list.cleansingCompleted"), "cleansingCompleted", 50, RecordSummaryDataGrid.cleansingCompletedLabelFunction);
+			column = getGridColumn(Message.get("list.cleansingComplete"), "cleansingComplete", 70, RecordSummaryDataGrid.cleansingCompletedLabelFunction, true);
 			columns.addItem(column);
 			return columns;
 		}
@@ -244,7 +254,22 @@ package org.openforis.collect.ui {
 		
 		public static function getInputField(def:AttributeDefinitionProxy, isInDataGroup:Boolean = false):InputField {
 			var inputField:InputField = null;
-			if(def is TextAttributeDefinitionProxy) {
+			if(def is BooleanAttributeDefinitionProxy) {
+				inputField = new BooleanInputField();
+			} else if(def is CodeAttributeDefinitionProxy) {
+				var codeDef:CodeAttributeDefinitionProxy = CodeAttributeDefinitionProxy(def);
+				if(isInDataGroup && codeDef.parent.enumerated && codeDef.key) {
+					inputField = new FixedCodeInputField();
+				} else {
+					inputField = new CodeInputField();
+				}
+			} else if(def is FileAttributeDefinitionProxy) {
+				//inputField = new FileInputField();
+			} else if(def is NumberAttributeDefinitionProxy) {
+				inputField = new NumericInputField();
+			} else if(def is RangeAttributeDefinitionProxy) {
+				inputField = new RangeInputField();
+			} else if(def is TextAttributeDefinitionProxy) {
 				var textAttributeDef:TextAttributeDefinitionProxy = TextAttributeDefinitionProxy(def);
 				var type:TextAttributeDefinitionProxy$Type = textAttributeDef.type;
 				switch(type) {
@@ -256,19 +281,6 @@ package org.openforis.collect.ui {
 						inputField = new StringInputField();
 						break;
 				}
-			} else if(def is CodeAttributeDefinitionProxy) {
-				var codeDef:CodeAttributeDefinitionProxy = CodeAttributeDefinitionProxy(def);
-				if(isInDataGroup && codeDef.parent.enumerated && codeDef.key) {
-					inputField = new FixedCodeInputField();
-				} else {
-					inputField = new CodeInputField();
-				}
-			} else if(def is NumberAttributeDefinitionProxy) {
-				inputField = new NumericInputField();
-			} else if(def is BooleanAttributeDefinitionProxy) {
-				inputField = new BooleanInputField();
-			} else if(def is FileAttributeDefinitionProxy) {
-				//inputField = new FileInputField();
 			} else {
 				inputField = new StringInputField();
 			}
@@ -395,12 +407,16 @@ package org.openforis.collect.ui {
 			}
 		}
 		
-		public static function getGridColumn(headerText:String, dataField:String, width:Number, labelFunction:Function = null):GridColumn {
+		public static function getGridColumn(headerText:String, dataField:String, width:Number, 
+											 labelFunction:Function = null, headerTextWrap:Boolean = false):GridColumn {
 			var c:GridColumn = new GridColumn();
 			c.headerText = headerText;
 			c.dataField = dataField;
 			c.labelFunction = labelFunction;
 			c.width = width;
+			if(headerTextWrap) {
+				c.headerRenderer = new ClassFactory(DataGridHeaderRenderer);
+			}
 			return c;
 		}
 

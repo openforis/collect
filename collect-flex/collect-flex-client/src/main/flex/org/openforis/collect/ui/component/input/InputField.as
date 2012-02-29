@@ -24,11 +24,11 @@ package org.openforis.collect.ui.component.input {
 	 * */
 	public class InputField extends Group {
 		
-		protected static const WARN_STYLE:String = "warn";
-		protected static const ERROR_STYLE:String = "error";
-		protected static const APPROVED_STYLE:String = "approved";
-		protected static const NOT_RELEVANT_STYLE:String = "notRelevant";
-		protected static const REMARKS_PRESENT_STYLE:String = "remarksPresent";
+		public static const WARN_STYLE:String = "warn";
+		public static const ERROR_STYLE:String = "error";
+		public static const APPROVED_STYLE:String = "approved";
+		public static const NOT_RELEVANT_STYLE:String = "notRelevant";
+		public static const REMARKS_PRESENT_STYLE:String = "remarksPresent";
 		
 		public static const STATE_SAVING:String = "saving";
 		public static const STATE_SAVE_COMPLETE:String = "saveComplete";
@@ -61,13 +61,22 @@ package org.openforis.collect.ui.component.input {
 		 * returns trus if there is not an attribute associated to the field or
 		 * the attribute's value is null
 		 */
-		public function isEmpty():Boolean {
+		public function canApplyReasonBlank():Boolean {
 			return attribute == null || 
-				(attribute.empty && attribute.getField(fieldIndex).symbol == null);
+				(attribute.empty && isNaN(fieldIndex) || fieldIndex < 0 || 
+					attribute.getField(fieldIndex).symbol == null);
 		}
 		
-		public function applyChanges(symbol:FieldSymbol = null, remarks:String = null):void {
-			presenter.applyChanges(symbol, remarks);
+		public function applyValue():void {
+			presenter.applyValue();
+		}
+		
+		public function applySymbol(symbol:FieldSymbol):void {
+			presenter.applySymbol(symbol);
+		}
+		
+		public function applySymbolAndRemarks(symbol:FieldSymbol, remarks:String):void {
+			presenter.applySymbolAndRemarks(symbol, remarks);
 		}
 		
 		public function hasBlankReasonSpecified():Boolean {
@@ -131,11 +140,11 @@ package org.openforis.collect.ui.component.input {
 			}
 		}
 
-		public function set remarks(value:String):void {
-			if(StringUtil.isBlank(value)) {
-				UIUtil.removeStyleName(validationStateDisplay, REMARKS_PRESENT_STYLE);
-			} else {
+		public function set remarksPresent(value:Boolean):void {
+			if(value) {
 				UIUtil.addStyleName(validationStateDisplay, REMARKS_PRESENT_STYLE);
+			} else {
+				UIUtil.removeStyleName(validationStateDisplay, REMARKS_PRESENT_STYLE);
 			}
 		}
 

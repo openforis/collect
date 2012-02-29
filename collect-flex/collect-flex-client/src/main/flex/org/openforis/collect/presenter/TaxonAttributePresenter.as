@@ -185,19 +185,19 @@ package org.openforis.collect.presenter {
 		public function performSelectTaxon(taxonOccurrence:TaxonOccurrenceProxy):void {
 			_lastSelectedTaxon = taxonOccurrence;
 			view.codeTextInput.text = taxonOccurrence.code;
-			view.codeTextInput.applyChanges();
+			view.codeTextInput.applyValue();
 			
 			view.scientificNameTextInput.text = taxonOccurrence.scientificName;
-			view.scientificNameTextInput.applyChanges();
+			view.scientificNameTextInput.applyValue();
 			
 			view.vernacularNameTextInput.text = taxonOccurrence.vernacularName;
-			view.vernacularNameTextInput.applyChanges();
+			view.vernacularNameTextInput.applyValue();
 			
 			view.languageCodeTextInput.text = taxonOccurrence.languageCode;
-			view.languageCodeTextInput.applyChanges();
+			view.languageCodeTextInput.applyValue();
 
 			view.languageVarietyTextInput.text = taxonOccurrence.languageVariety;
-			view.languageVarietyTextInput.applyChanges();
+			view.languageVarietyTextInput.applyValue();
 		}
 		
 		protected static function autoCompleteSearchResultHandler(event:ResultEvent, token:Object):void {

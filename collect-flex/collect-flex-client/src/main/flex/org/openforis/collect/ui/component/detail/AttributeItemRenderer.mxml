@@ -24,6 +24,7 @@
 			public static const STYLE_NAME_NOT_RELEVANT:String = "notRelevant";
 			public static const STYLE_NAME_ERROR:String = "error"; 
 			public static const STYLE_NAME_WARNING:String = "warning";
+			public static const STYLE_NOT_RELEVANT:String = "notRelevant";
 
 			private var _direction:String;
 			private var _attributeDefinition:AttributeDefinitionProxy;
