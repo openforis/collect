@@ -57,7 +57,9 @@ package org.openforis.collect.presenter
 		}
 		
 		override protected function updateView():void {
-			if(view.entityDefinition != null 
+			super.updateView();
+			if(view.entityDefinition != null
+					&& view.entityDefinition.multiple
 					&& view.parentEntity != null 
 					&& view.modelVersion != null) {
 				var entities:IList = getEntities();
