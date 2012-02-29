@@ -1,11 +1,11 @@
 package org.openforis.collect.persistence;
 
 
-import static org.openforis.collect.persistence.jooq.tables.OfcRecord.OFC_RECORD;
-import static org.openforis.collect.persistence.jooq.tables.OfcUser.OFC_USER;
+import static org.openforis.collect.persistence.jooq.Sequences.OFC_RECORD_ID_SEQ;
 import static org.openforis.collect.persistence.jooq.tables.OfcAttributeValue.OFC_ATTRIBUTE_VALUE;
 import static org.openforis.collect.persistence.jooq.tables.OfcEntity.OFC_ENTITY;
-import static org.openforis.collect.persistence.jooq.Sequences.OFC_RECORD_ID_SEQ;
+import static org.openforis.collect.persistence.jooq.tables.OfcRecord.OFC_RECORD;
+import static org.openforis.collect.persistence.jooq.tables.OfcUser.OFC_USER;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +16,6 @@ import org.jooq.InsertSetMoreStep;
 import org.jooq.Record;
 import org.jooq.Result;
 import org.jooq.SelectQuery;
-import org.jooq.TableField;
 import org.jooq.UpdateSetMoreStep;
 import org.jooq.impl.Factory;
 import org.openforis.collect.model.CollectRecord;
@@ -188,13 +187,13 @@ public class RecordDAO extends JooqDaoSupport {
 	public List<CollectRecord> loadSummaries(CollectSurvey survey, RecordContext recordContext, String rootEntity, String... keys) {
 		Factory jf = getJooqFactory();
 		SelectQuery q = jf.selectQuery();
-		q.addFrom(RECORD);
-		q.addSelect(RECORD.getFields());
+		q.addFrom(OFC_RECORD);
+		q.addSelect(OFC_RECORD.getFields());
 		int i = 0;
 		for (String key : keys) {
 			String keyColumnName = "key" + (++i);
 			@SuppressWarnings("unchecked")
-			Field<String> keyField = (Field<String>) RECORD.getField(keyColumnName);
+			Field<String> keyField = (Field<String>) OFC_RECORD.getField(keyColumnName);
 			q.addConditions(keyField.equal(key));
 		}
 		Result<Record> records = q.fetch();

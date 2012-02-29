@@ -26,12 +26,12 @@ public class CoordinateProxy implements Proxy {
 	}
 	
 	@ExternalizedProperty
-	public Long getX() {
+	public Double getX() {
 		return coordinate.getX();
 	}
 
 	@ExternalizedProperty
-	public Long getY() {
+	public Double getY() {
 		return coordinate.getY();
 	}
 	

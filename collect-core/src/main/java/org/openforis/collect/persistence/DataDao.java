@@ -1,7 +1,9 @@
 package org.openforis.collect.persistence;
 
-import static org.openforis.collect.persistence.jooq.Sequences.*;
-import static org.openforis.collect.persistence.jooq.Tables.*;
+import static org.openforis.collect.persistence.jooq.Sequences.OFC_ATTRIBUTE_VALUE_ID_SEQ;
+import static org.openforis.collect.persistence.jooq.Sequences.OFC_ENTITY_ID_SEQ;
+import static org.openforis.collect.persistence.jooq.Tables.OFC_ATTRIBUTE_VALUE;
+import static org.openforis.collect.persistence.jooq.Tables.OFC_ENTITY;
 
 import java.util.HashMap;
 
@@ -12,7 +14,6 @@ import org.jooq.Result;
 import org.jooq.impl.Factory;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.persistence.jooq.JooqDaoSupport;
-
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;

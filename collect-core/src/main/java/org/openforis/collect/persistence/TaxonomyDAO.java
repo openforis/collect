@@ -1,7 +1,7 @@
 package org.openforis.collect.persistence;
 
-import static org.openforis.collect.persistence.jooq.tables.OfcTaxonomy.OFC_TAXONOMY;
 import static org.openforis.collect.persistence.jooq.Sequences.OFC_TAXONOMY_ID_SEQ;
+import static org.openforis.collect.persistence.jooq.tables.OfcTaxonomy.OFC_TAXONOMY;
 
 import java.sql.Connection;
 
