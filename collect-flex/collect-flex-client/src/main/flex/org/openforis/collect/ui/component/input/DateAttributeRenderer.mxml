@@ -38,6 +38,7 @@
 								 attributeDefinition="{attributeDefinition}"
 								 parentEntity="{parentEntity}"
 								 attribute="{attribute}"
+								 isInDataGroup="{isInDataGroup}"
 								 fieldIndex="2"
 								 width="25" 
 								 maxChars="2"
@@ -47,6 +48,7 @@
 								 attributeDefinition="{attributeDefinition}"
 								 parentEntity="{parentEntity}"
 								 attribute="{attribute}"
+								 isInDataGroup="{isInDataGroup}"
 								 fieldIndex="1"
 								 width="25 " 
 								 maxChars="2"
@@ -56,6 +58,7 @@
 								 attributeDefinition="{attributeDefinition}"
 								 parentEntity="{parentEntity}"
 								 attribute="{attribute}"
+								 isInDataGroup="{isInDataGroup}"
 								 fieldIndex="0"
 								 width="40" 
 								 maxChars="4" />
