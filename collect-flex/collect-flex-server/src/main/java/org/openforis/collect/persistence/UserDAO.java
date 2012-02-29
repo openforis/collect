@@ -1,6 +1,6 @@
 package org.openforis.collect.persistence;
 
-import static org.openforis.collect.persistence.jooq.tables.UserAccount.USER_ACCOUNT;
+import static org.openforis.collect.persistence.jooq.tables.OfcUserAccount.USER_ACCOUNT;
 
 import java.util.ArrayList;
 import java.util.Collection;

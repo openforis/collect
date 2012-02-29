@@ -3,7 +3,7 @@
  */
 package org.openforis.collect.persistence.jooq;
 
-import static org.openforis.collect.persistence.jooq.tables.Data.DATA;
+import static org.openforis.collect.persistence.jooq.tables.OfcData.DATA;
 
 import org.jooq.InsertSetStep;
 import org.jooq.Record;

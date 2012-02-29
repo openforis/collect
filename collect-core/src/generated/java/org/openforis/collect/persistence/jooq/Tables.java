@@ -13,54 +13,59 @@ package org.openforis.collect.persistence.jooq;
 public final class Tables {
 
 	/**
-	 * The table collect.data
+	 * The table collect.ofc_attribute_value
 	 */
-	public static org.openforis.collect.persistence.jooq.tables.Data DATA = org.openforis.collect.persistence.jooq.tables.Data.DATA;
+	public static org.openforis.collect.persistence.jooq.tables.OfcAttributeValue OFC_ATTRIBUTE_VALUE = org.openforis.collect.persistence.jooq.tables.OfcAttributeValue.OFC_ATTRIBUTE_VALUE;
 
 	/**
-	 * The table collect.logo
+	 * The table collect.ofc_entity
 	 */
-	public static org.openforis.collect.persistence.jooq.tables.Logo LOGO = org.openforis.collect.persistence.jooq.tables.Logo.LOGO;
+	public static org.openforis.collect.persistence.jooq.tables.OfcEntity OFC_ENTITY = org.openforis.collect.persistence.jooq.tables.OfcEntity.OFC_ENTITY;
 
 	/**
-	 * The table collect.record
+	 * The table collect.ofc_logo
 	 */
-	public static org.openforis.collect.persistence.jooq.tables.Record RECORD = org.openforis.collect.persistence.jooq.tables.Record.RECORD;
+	public static org.openforis.collect.persistence.jooq.tables.OfcLogo OFC_LOGO = org.openforis.collect.persistence.jooq.tables.OfcLogo.OFC_LOGO;
 
 	/**
-	 * The table collect.schema_definition
+	 * The table collect.ofc_record
 	 */
-	public static org.openforis.collect.persistence.jooq.tables.SchemaDefinition SCHEMA_DEFINITION = org.openforis.collect.persistence.jooq.tables.SchemaDefinition.SCHEMA_DEFINITION;
+	public static org.openforis.collect.persistence.jooq.tables.OfcRecord OFC_RECORD = org.openforis.collect.persistence.jooq.tables.OfcRecord.OFC_RECORD;
 
 	/**
-	 * The table collect.survey
+	 * The table collect.ofc_schema_definition
 	 */
-	public static org.openforis.collect.persistence.jooq.tables.Survey SURVEY = org.openforis.collect.persistence.jooq.tables.Survey.SURVEY;
+	public static org.openforis.collect.persistence.jooq.tables.OfcSchemaDefinition OFC_SCHEMA_DEFINITION = org.openforis.collect.persistence.jooq.tables.OfcSchemaDefinition.OFC_SCHEMA_DEFINITION;
 
 	/**
-	 * The table collect.taxon
+	 * The table collect.ofc_survey
 	 */
-	public static org.openforis.collect.persistence.jooq.tables.Taxon TAXON = org.openforis.collect.persistence.jooq.tables.Taxon.TAXON;
+	public static org.openforis.collect.persistence.jooq.tables.OfcSurvey OFC_SURVEY = org.openforis.collect.persistence.jooq.tables.OfcSurvey.OFC_SURVEY;
 
 	/**
-	 * The table collect.taxon_vernacular_name
+	 * The table collect.ofc_taxon
 	 */
-	public static org.openforis.collect.persistence.jooq.tables.TaxonVernacularName TAXON_VERNACULAR_NAME = org.openforis.collect.persistence.jooq.tables.TaxonVernacularName.TAXON_VERNACULAR_NAME;
+	public static org.openforis.collect.persistence.jooq.tables.OfcTaxon OFC_TAXON = org.openforis.collect.persistence.jooq.tables.OfcTaxon.OFC_TAXON;
 
 	/**
-	 * The table collect.taxonomy
+	 * The table collect.ofc_taxonomy
 	 */
-	public static org.openforis.collect.persistence.jooq.tables.Taxonomy TAXONOMY = org.openforis.collect.persistence.jooq.tables.Taxonomy.TAXONOMY;
+	public static org.openforis.collect.persistence.jooq.tables.OfcTaxonomy OFC_TAXONOMY = org.openforis.collect.persistence.jooq.tables.OfcTaxonomy.OFC_TAXONOMY;
 
 	/**
-	 * The table collect.user_account
+	 * The table collect.ofc_taxon_vernacular_name
 	 */
-	public static org.openforis.collect.persistence.jooq.tables.UserAccount USER_ACCOUNT = org.openforis.collect.persistence.jooq.tables.UserAccount.USER_ACCOUNT;
+	public static org.openforis.collect.persistence.jooq.tables.OfcTaxonVernacularName OFC_TAXON_VERNACULAR_NAME = org.openforis.collect.persistence.jooq.tables.OfcTaxonVernacularName.OFC_TAXON_VERNACULAR_NAME;
 
 	/**
-	 * The table collect.user_role
+	 * The table collect.ofc_user
 	 */
-	public static org.openforis.collect.persistence.jooq.tables.UserRole USER_ROLE = org.openforis.collect.persistence.jooq.tables.UserRole.USER_ROLE;
+	public static org.openforis.collect.persistence.jooq.tables.OfcUser OFC_USER = org.openforis.collect.persistence.jooq.tables.OfcUser.OFC_USER;
+
+	/**
+	 * The table collect.ofc_user_role
+	 */
+	public static org.openforis.collect.persistence.jooq.tables.OfcUserRole OFC_USER_ROLE = org.openforis.collect.persistence.jooq.tables.OfcUserRole.OFC_USER_ROLE;
 
 	/**
 	 * No instances
