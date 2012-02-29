@@ -410,8 +410,8 @@ public class RecordDAO extends JooqDaoSupport {
 	
 	private void deleteData(int recordId) {
 		Factory jf = getJooqFactory();
-		jf.delete(OFC_ENTITY).where(OFC_ENTITY.RECORD_ID.equal(recordId)).execute();
 		jf.delete(OFC_ATTRIBUTE_VALUE).where(OFC_ATTRIBUTE_VALUE.RECORD_ID.equal(recordId)).execute();
+		jf.delete(OFC_ENTITY).where(OFC_ENTITY.RECORD_ID.equal(recordId)).execute();
 	}
 
 	//TODO move to a Mapper class
