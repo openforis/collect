@@ -1,6 +1,6 @@
 package org.openforis.collect.persistence;
 
-import static org.openforis.collect.persistence.jooq.tables.Record.RECORD;
+import static org.openforis.collect.persistence.jooq.tables.OfcRecord.RECORD;
 
 import java.sql.Date;
 import java.util.ArrayList;
