@@ -3,7 +3,6 @@ package org.openforis.collect.persistence;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -78,27 +77,11 @@ public class ModelDAOIntegrationTest {
 		log.debug("Reloaded as:\n"+reloaded);
 		
 		assertEquals(saved, reloaded);
-		
-		// UPDATE
-//		updateRecord(record);
-		
-//		assertEquals(1, cluster.getCount("time_study"));
-
-//		recordDao.saveOrUpdate(record);
-//		} catch (DataAccessException ex){
-//			ex.getCause().getCause().getCause().printStackTrace();
-//		}
 	}
 
 	private void testLoadAllSurveys(String surveyName) {
 		List<CollectSurvey> list = this.surveyDao.loadAll();
 		assertNotNull(list);
-		for (Survey survey : list) {
-			if ( survey.getName().equals(surveyName) ) {
-				return;
-			}
-		}
-		fail(surveyName+" not loaded by surveyDao.loadAll()");
 	}
 	
 	@Test
@@ -119,6 +102,7 @@ public class ModelDAOIntegrationTest {
 		CollectIdmlBindingContext idmlBindingContext = new CollectIdmlBindingContext();
 		SurveyUnmarshaller surveyUnmarshaller = idmlBindingContext.createSurveyUnmarshaller();
 		CollectSurvey survey = (CollectSurvey) surveyUnmarshaller.unmarshal(is);
+		survey.setName("archenland1");
 		surveyDao.importModel(survey);
 		return survey;
 	}
@@ -150,7 +134,7 @@ public class ModelDAOIntegrationTest {
 		cluster.addValue("crew_no", 10);
 		cluster.addValue("map_sheet", "value 1");
 		cluster.addValue("map_sheet", "value 2");
-		cluster.addValue("vehicle_location", new Coordinate(432423423l, 4324324l,"srs"));
+		cluster.addValue("vehicle_location", new Coordinate((double)432423423l, (double)4324324l, "srs"));
 		cluster.addValue("gps_model", "TomTom 1.232");
 		{
 			Entity ts = cluster.addEntity("time_study");

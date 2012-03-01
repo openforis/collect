@@ -3,6 +3,9 @@
  */
 package org.openforis.collect.model.proxy;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.collect.Proxy;
 import org.openforis.idm.model.state.NodeState;
@@ -19,6 +22,17 @@ public class NodeStateProxy implements Proxy {
 		this.nodeState = nodeState;
 	}
 
+	public static List<NodeStateProxy> fromList(List<NodeState> list) {
+		List<NodeStateProxy> result = new ArrayList<NodeStateProxy>();
+		if(list != null) {
+			for (NodeState nodeState : list) {
+				NodeStateProxy proxy = new NodeStateProxy(nodeState);
+				result.add(proxy);
+			}
+		}
+		return result;
+	}
+	
 	@ExternalizedProperty
 	public Integer getNodeId() {
 		return nodeState.getNode().getId();

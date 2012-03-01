@@ -1,41 +1,43 @@
 CREATE SCHEMA "collect"
 GO
 
-CREATE SEQUENCE "collect"."data_id_seq"
+CREATE SEQUENCE "collect"."ofc_entity_id_seq"
 GO
 
-CREATE SEQUENCE "collect"."record_id_seq"
+CREATE SEQUENCE "collect"."ofc_attribute_value_id_seq"
 GO
 
-CREATE SEQUENCE "collect"."schema_definition_id_seq"
+CREATE SEQUENCE "collect"."ofc_record_id_seq"
 GO
 
-CREATE SEQUENCE "collect"."survey_id_seq"
+CREATE SEQUENCE "collect"."ofc_schema_definition_id_seq"
 GO
 
-CREATE SEQUENCE "collect"."taxonomy_id_seq"
+CREATE SEQUENCE "collect"."ofc_survey_id_seq"
 GO
 
-CREATE SEQUENCE "collect"."taxon_id_seq"
+CREATE SEQUENCE "collect"."ofc_taxonomy_id_seq"
 GO
 
-CREATE SEQUENCE "collect"."taxon_vernacular_name_id_seq"
+CREATE SEQUENCE "collect"."ofc_taxon_id_seq"
 GO
 
-CREATE SEQUENCE "collect"."user_id_seq"	
+CREATE SEQUENCE "collect"."ofc_taxon_vernacular_name_id_seq"
 GO
 
-CREATE SEQUENCE "collect"."user_role_id_seq"
+CREATE SEQUENCE "collect"."ofc_user_id_seq"	
+GO
+
+CREATE SEQUENCE "collect"."ofc_user_role_id_seq"
 GO
 
 ----------------------------
 --- BEGIN GENERATED CODE ---
 ----------------------------
-
-CREATE TABLE "collect"."data"  ( 
+CREATE TABLE "collect"."ofc_attribute_value"  ( 
 	"id"           	integer NOT NULL,
 	"record_id"    	integer NOT NULL,
-	"parent_id"    	integer NULL,
+	"entity_id"    	integer NULL,
 	"definition_id"	integer NOT NULL,
 	"position"     	integer NOT NULL,
 	"field"        	integer NOT NULL,
@@ -46,13 +48,22 @@ CREATE TABLE "collect"."data"  (
 	PRIMARY KEY("id")
 )
 GO
-CREATE TABLE "collect"."logo"  ( 
+CREATE TABLE "collect"."ofc_entity"  ( 
+	"id"           	integer NOT NULL,
+	"record_id"    	integer NOT NULL,
+	"parent_id"    	integer NULL,
+	"definition_id"	integer NOT NULL,
+	"position"     	integer NOT NULL,
+	PRIMARY KEY("id")
+)
+GO
+CREATE TABLE "collect"."ofc_logo"  ( 
 	"pos"  	integer NOT NULL,
 	"image"	bytea NOT NULL,
 	PRIMARY KEY("pos")
 )
 GO
-CREATE TABLE "collect"."record"  ( 
+CREATE TABLE "collect"."ofc_record"  ( 
 	"id"            	integer NOT NULL,
 	"root_entity_id"	integer NOT NULL,
 	"date_created"  	timestamp NULL,
@@ -79,14 +90,14 @@ CREATE TABLE "collect"."record"  (
 	PRIMARY KEY("id")
 )
 GO
-CREATE TABLE "collect"."schema_definition"  ( 
+CREATE TABLE "collect"."ofc_schema_definition"  ( 
 	"id"       	integer NOT NULL,
 	"survey_id"	integer NOT NULL,
-	"path"     	varchar(255) NOT NULL,
+	"path"     	varchar(255) NULL,
 	PRIMARY KEY("id")
 )
 GO
-CREATE TABLE "collect"."survey"  ( 
+CREATE TABLE "collect"."ofc_survey"  ( 
 	"id"  	integer NOT NULL,
 	"name"	varchar(255) NOT NULL,
 	"uri" 	varchar(255) NULL,
@@ -94,7 +105,7 @@ CREATE TABLE "collect"."survey"  (
 	PRIMARY KEY("id")
 )
 GO
-CREATE TABLE "collect"."taxon"  ( 
+CREATE TABLE "collect"."ofc_taxon"  ( 
 	"id"             	integer NOT NULL,
 	"code"           	varchar(32) NOT NULL,
 	"scientific_name"	varchar(255) NOT NULL,
@@ -105,7 +116,7 @@ CREATE TABLE "collect"."taxon"  (
 	PRIMARY KEY("id")
 )
 GO
-CREATE TABLE "collect"."taxon_vernacular_name"  ( 
+CREATE TABLE "collect"."ofc_taxon_vernacular_name"  ( 
 	"id"              	integer NOT NULL,
 	"vernacular_name" 	varchar(255) NULL,
 	"language_code"   	varchar(3) NOT NULL,
@@ -115,16 +126,16 @@ CREATE TABLE "collect"."taxon_vernacular_name"  (
 	PRIMARY KEY("id")
 )
 GO
-COMMENT ON COLUMN "collect"."taxon_vernacular_name"."language_variety" IS 'Dialect, lect, sublanguage or other'
+COMMENT ON COLUMN "collect"."ofc_taxon_vernacular_name"."language_variety" IS 'Dialect, lect, sublanguage or other'
 GO
-CREATE TABLE "collect"."taxonomy"  ( 
+CREATE TABLE "collect"."ofc_taxonomy"  ( 
 	"id"      	integer NOT NULL,
 	"name"    	varchar(255) NOT NULL,
 	"metadata"	text NOT NULL,
 	PRIMARY KEY("id")
 )
 GO
-CREATE TABLE "collect"."user_account"  ( 
+CREATE TABLE "collect"."ofc_user"  ( 
 	"id"      	integer NOT NULL,
 	"username"	varchar(255) NOT NULL,
 	"password"	varchar(255) NOT NULL,
@@ -132,90 +143,134 @@ CREATE TABLE "collect"."user_account"  (
 	PRIMARY KEY("id")
 )
 GO
-CREATE TABLE "collect"."user_role"  ( 
+CREATE TABLE "collect"."ofc_user_role"  ( 
 	"id"     	integer NOT NULL,
 	"user_id"	integer NOT NULL,
 	"role"   	varchar(256) NULL,
 	PRIMARY KEY("id")
 )
 GO
-ALTER TABLE "collect"."data"
-	ADD CONSTRAINT "UK_data_node"
-	UNIQUE ("record_id", "parent_id", "definition_id", "position", "field")
-GO
-ALTER TABLE "collect"."survey"
-	ADD CONSTRAINT "UK_survey_name"
+ALTER TABLE "collect"."ofc_survey"
+	ADD CONSTRAINT "ofc_survey_name_key"
 	UNIQUE ("name")
 GO
-ALTER TABLE "collect"."survey"
-	ADD CONSTRAINT "UK_survey_uri"
+ALTER TABLE "collect"."ofc_survey"
+	ADD CONSTRAINT "ofc_survey_uri_key"
 	UNIQUE ("uri")
 GO
-ALTER TABLE "collect"."taxonomy"
-	ADD CONSTRAINT "UK_taxonomy_name"
+ALTER TABLE "collect"."ofc_taxonomy"
+	ADD CONSTRAINT "ofc_taxonomy_name_key"
 	UNIQUE ("name")
 GO
-ALTER TABLE "collect"."data"
-	ADD CONSTRAINT "FK_data_record"
-	FOREIGN KEY("record_id")
-	REFERENCES "collect"."record"("id")
+ALTER TABLE "collect"."ofc_attribute_value"
+	ADD CONSTRAINT "ofc_attribute_value_entity_fkey"
+	FOREIGN KEY("entity_id")
+	REFERENCES "collect"."ofc_entity"("id")
+	ON DELETE NO ACTION 
+	ON UPDATE NO ACTION 
 GO
-ALTER TABLE "collect"."record"
-	ADD CONSTRAINT "FK_record_submitted_record"
+ALTER TABLE "collect"."ofc_record"
+	ADD CONSTRAINT "record_submitted_record_fkey"
 	FOREIGN KEY("submitted_id")
-	REFERENCES "collect"."record"("id")
+	REFERENCES "collect"."ofc_record"("id")
+	ON DELETE NO ACTION 
+	ON UPDATE NO ACTION 
 GO
-ALTER TABLE "collect"."data"
-	ADD CONSTRAINT "FK_data_schema_definition"
-	FOREIGN KEY("definition_id")
-	REFERENCES "collect"."schema_definition"("id")
+ALTER TABLE "collect"."ofc_attribute_value"
+	ADD CONSTRAINT "ofc_attribute_value_record_fkey"
+	FOREIGN KEY("record_id")
+	REFERENCES "collect"."ofc_record"("id")
+	ON DELETE NO ACTION 
+	ON UPDATE NO ACTION 
 GO
-ALTER TABLE "collect"."record"
-	ADD CONSTRAINT "FK_record_root_entity"
+ALTER TABLE "collect"."ofc_entity"
+	ADD CONSTRAINT "ofc_entity_record_fkey"
+	FOREIGN KEY("record_id")
+	REFERENCES "collect"."ofc_record"("id")
+	ON DELETE NO ACTION 
+	ON UPDATE NO ACTION 
+GO
+ALTER TABLE "collect"."ofc_record"
+	ADD CONSTRAINT "record_root_entity_fkey"
 	FOREIGN KEY("root_entity_id")
-	REFERENCES "collect"."schema_definition"("id")
+	REFERENCES "collect"."ofc_schema_definition"("id")
 GO
-ALTER TABLE "collect"."schema_definition"
-	ADD CONSTRAINT "FK_schema_definition_survey"
+ALTER TABLE "collect"."ofc_entity"
+	ADD CONSTRAINT "ofc_entity_definition_fkey"
+	FOREIGN KEY("definition_id")
+	REFERENCES "collect"."ofc_schema_definition"("id")
+	ON DELETE NO ACTION 
+	ON UPDATE NO ACTION 
+GO
+ALTER TABLE "collect"."ofc_attribute_value"
+	ADD CONSTRAINT "ofc_attribute_value_schema_definition_fkey"
+	FOREIGN KEY("definition_id")
+	REFERENCES "collect"."ofc_schema_definition"("id")
+	ON DELETE NO ACTION 
+	ON UPDATE NO ACTION 
+GO
+ALTER TABLE "collect"."ofc_schema_definition"
+	ADD CONSTRAINT "schema_definition_survey_fkey"
 	FOREIGN KEY("survey_id")
-	REFERENCES "collect"."survey"("id")
+	REFERENCES "collect"."ofc_survey"("id")
 GO
-ALTER TABLE "collect"."taxon_vernacular_name"
-	ADD CONSTRAINT "FK_taxon_vernacular_name_taxon"
-	FOREIGN KEY("taxon_id")
-	REFERENCES "collect"."taxon"("id")
-GO
-ALTER TABLE "collect"."taxon"
-	ADD CONSTRAINT "FK_taxon_parent"
+ALTER TABLE "collect"."ofc_taxon"
+	ADD CONSTRAINT "ofc_taxon_parent_fkey"
 	FOREIGN KEY("parent_id")
-	REFERENCES "collect"."taxon"("id")
+	REFERENCES "collect"."ofc_taxon"("id")
+	ON DELETE NO ACTION 
+	ON UPDATE NO ACTION 
 GO
-ALTER TABLE "collect"."taxon"
-	ADD CONSTRAINT "FK_taxon_taxonomy"
+ALTER TABLE "collect"."ofc_taxon_vernacular_name"
+	ADD CONSTRAINT "ofc_taxon_vernacular_name_taxon_fkey"
+	FOREIGN KEY("taxon_id")
+	REFERENCES "collect"."ofc_taxon"("id")
+	ON DELETE NO ACTION 
+	ON UPDATE NO ACTION 
+GO
+ALTER TABLE "collect"."ofc_taxon"
+	ADD CONSTRAINT "ofc_taxon_taxonomy_fkey"
 	FOREIGN KEY("taxonomy_id")
-	REFERENCES "collect"."taxonomy"("id")
+	REFERENCES "collect"."ofc_taxonomy"("id")
+	ON DELETE NO ACTION 
+	ON UPDATE NO ACTION 
 GO
-ALTER TABLE "collect"."user_role"
-	ADD CONSTRAINT "FK_user_user_role"
-	FOREIGN KEY("user_id")
-	REFERENCES "collect"."user_account"("id")
-GO
-ALTER TABLE "collect"."record"
-	ADD CONSTRAINT "FK_record_locked_by_user"
-	FOREIGN KEY("locked_by_id")
-	REFERENCES "collect"."user_account"("id")
-GO
-ALTER TABLE "collect"."record"
-	ADD CONSTRAINT "FK_record_created_by_user"
+ALTER TABLE "collect"."ofc_record"
+	ADD CONSTRAINT "ofc_record_created_by_user_fkey"
 	FOREIGN KEY("created_by_id")
-	REFERENCES "collect"."user_account"("id")
+	REFERENCES "collect"."ofc_user"("id")
+	ON DELETE NO ACTION 
+	ON UPDATE NO ACTION 
 GO
-ALTER TABLE "collect"."record"
-	ADD CONSTRAINT "FK_record_modified_by_user"
+ALTER TABLE "collect"."ofc_record"
+	ADD CONSTRAINT "ofc_record_locked_by_user_fkey"
+	FOREIGN KEY("locked_by_id")
+	REFERENCES "collect"."ofc_user"("id")
+	ON DELETE NO ACTION 
+	ON UPDATE NO ACTION 
+GO
+ALTER TABLE "collect"."ofc_record"
+	ADD CONSTRAINT "ofc_record_modified_by_user_fkey"
 	FOREIGN KEY("modified_by_id")
-	REFERENCES "collect"."user_account"("id")
+	REFERENCES "collect"."ofc_user"("id")
+	ON DELETE NO ACTION 
+	ON UPDATE NO ACTION 
+GO
+ALTER TABLE "collect"."ofc_user_role"
+	ADD CONSTRAINT "ofc_user_user_role_fkey"
+	FOREIGN KEY("user_id")
+	REFERENCES "collect"."ofc_user"("id")
+	ON DELETE NO ACTION 
+	ON UPDATE NO ACTION 
+GO
+CREATE INDEX "ofc_attribute_value_record_idx"
+	ON "collect"."ofc_attribute_value"("record_id")
+GO
+CREATE INDEX "ofc_entity_record_idx"
+	ON "collect"."ofc_entity"("record_id")
 GO
 
 --------------------------
 --- END GENERATED CODE ---
 --------------------------
+GO

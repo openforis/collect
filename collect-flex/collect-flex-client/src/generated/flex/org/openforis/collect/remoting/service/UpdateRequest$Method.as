@@ -13,13 +13,12 @@ package org.openforis.collect.remoting.service {
     [RemoteClass(alias="org.openforis.collect.remoting.service.UpdateRequest$Method")]
     public class UpdateRequest$Method extends Enum {
 
-        public static const UPDATE:UpdateRequest$Method = new UpdateRequest$Method("UPDATE", _);
         public static const ADD:UpdateRequest$Method = new UpdateRequest$Method("ADD", _);
+        public static const UPDATE:UpdateRequest$Method = new UpdateRequest$Method("UPDATE", _);
         public static const DELETE:UpdateRequest$Method = new UpdateRequest$Method("DELETE", _);
-        public static const UPDATE_SYMBOL:UpdateRequest$Method = new UpdateRequest$Method("UPDATE_SYMBOL", _);
 
         function UpdateRequest$Method(value:String = null, restrictor:* = null) {
-            super((value || UPDATE.name), restrictor);
+            super((value || ADD.name), restrictor);
         }
 
         protected override function getConstants():Array {
@@ -27,11 +26,11 @@ package org.openforis.collect.remoting.service {
         }
 
         public static function get constants():Array {
-            return [UPDATE, ADD, DELETE, UPDATE_SYMBOL];
+            return [ADD, UPDATE, DELETE];
         }
 
         public static function valueOf(name:String):UpdateRequest$Method {
-            return UpdateRequest$Method(UPDATE.constantOf(name));
+            return UpdateRequest$Method(ADD.constantOf(name));
         }
     }
 }

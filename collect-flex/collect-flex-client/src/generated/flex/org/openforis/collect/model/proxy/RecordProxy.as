@@ -9,6 +9,7 @@ package org.openforis.collect.model.proxy {
 	import mx.collections.IList;
 	
 	import org.granite.collections.IMap;
+	import org.openforis.collect.remoting.service.UpdateResponse;
 
     [Bindable]
     [RemoteClass(alias="org.openforis.collect.model.proxy.RecordProxy")]
@@ -22,25 +23,25 @@ package org.openforis.collect.model.proxy {
 			}
 		}
 		
-		public function update(nodes:IList):void {
-			for each (var node:NodeProxy in nodes) {
-				var parent:NodeProxy = getNode(node.parentId);
-				if(parent is EntityProxy) {
-					var parentEntity:EntityProxy = EntityProxy(parent);
-					var oldNode:NodeProxy = parentEntity.getChildById(node.id);
-					if(oldNode == null) {
-						//add node
-						parentEntity.addChild(node);
-					} else {
-						if(node.deleted) {
-							parentEntity.removeChild(oldNode);
-						} else {
-							parentEntity.replaceChild(oldNode, node);
-						}
-					}
-				} else {
-					throw new Error("Entity expected");
-				}
+		public function update(response:UpdateResponse):void {
+			var node:NodeProxy, oldNode:NodeProxy, parent:NodeProxy, parentEntity:EntityProxy;
+			//remove nodes
+			for each (node in response.deletedNodes) {
+				parent = getNode(node.parentId);
+				parentEntity = EntityProxy(parent);
+				oldNode = parentEntity.getChildById(node.id);
+				parentEntity.removeChild(oldNode);
+			}
+			//added new nodes
+			for each (node in response.addedNodes) {
+				parent = getNode(node.parentId);
+				parentEntity = EntityProxy(parent);
+				parentEntity.addChild(node);
+			}
+			//update node state
+			for each (var state:NodeStateProxy in response.states) {
+				node = getNode(state.nodeId);
+				node.state = state;
 			}
 		}
     }

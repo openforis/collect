@@ -1,7 +1,7 @@
 package org.openforis.collect.persistence.jooq;
 
-import static org.openforis.collect.persistence.jooq.tables.Data.DATA;
-import static org.openforis.collect.persistence.jooq.tables.Record.RECORD;
+import static org.openforis.collect.persistence.jooq.tables.OfcData.DATA;
+import static org.openforis.collect.persistence.jooq.tables.OfcRecord.RECORD;
 
 import java.util.HashMap;
 import java.util.Map;

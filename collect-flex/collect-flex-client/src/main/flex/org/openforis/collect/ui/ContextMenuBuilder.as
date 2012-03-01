@@ -31,6 +31,7 @@ package org.openforis.collect.ui
 	import org.openforis.collect.presenter.RemarksPopUpPresenter;
 	import org.openforis.collect.remoting.service.UpdateRequest;
 	import org.openforis.collect.remoting.service.UpdateRequest$Method;
+	import org.openforis.collect.remoting.service.UpdateResponse;
 	import org.openforis.collect.ui.component.detail.CollectFormItem;
 	import org.openforis.collect.ui.component.detail.EntityDataGroupItemRenderer;
 	import org.openforis.collect.ui.component.input.InputField;
@@ -109,7 +110,7 @@ package org.openforis.collect.ui
 		}
 		
 		private static function addValueItems(currentItems:Array, step:RecordProxy$Step, inputField:InputField):void {
-			if(inputField.isEmpty()) {
+			if(inputField.canApplyReasonBlank()) {
 				currentItems.push(
 					BLANK_ON_FORM_MENU_ITEM,
 					DASH_ON_FORM_MENU_ITEM,
@@ -156,13 +157,13 @@ package org.openforis.collect.ui
 				currentInputField = field;
 				switch(event.target) {
 					case BLANK_ON_FORM_MENU_ITEM:
-						field.applyChanges(FieldSymbol.BLANK_ON_FORM);
+						field.applySymbol(FieldSymbol.BLANK_ON_FORM);
 						break;
 					case DASH_ON_FORM_MENU_ITEM:
-						field.applyChanges(FieldSymbol.DASH_ON_FORM);
+						field.applySymbol(FieldSymbol.DASH_ON_FORM);
 						break;
 					case ILLEGIBLE_MENU_ITEM:
-						field.applyChanges(FieldSymbol.ILLEGIBLE);
+						field.applySymbol(FieldSymbol.ILLEGIBLE);
 						break;
 					case EDIT_REMARKS_MENU_ITEM:
 						remarksPopUpPresenter.openPopUp(field, true);
@@ -180,7 +181,7 @@ package org.openforis.collect.ui
 						AlertUtil.showConfirm("edit.confirmDeleteEntity", null, "global.confirmAlertTitle", performDeleteEntity);
 						break;
 					case APPROVE_ERROR_MENU_ITEM:
-						field.applyChanges(FieldSymbol.CONFIRMED);
+						field.applySymbol(FieldSymbol.CONFIRMED);
 						break
 				}
 			}
@@ -211,7 +212,7 @@ package org.openforis.collect.ui
 			var responder:AsyncResponder = new AsyncResponder(updateFieldResultHandler, null);
 			ClientFactory.dataClient.updateActiveRecord(responder, req);
 		}
-		
+		/*
 		public static function setReasonBlankInChildren(entity:EntityProxy, symbol:FieldSymbol):void {
 			var req:UpdateRequest = new UpdateRequest();
 			req.parentEntityId = entity.parentId;
@@ -222,9 +223,34 @@ package org.openforis.collect.ui
 			var responder:AsyncResponder = new AsyncResponder(updateFieldResultHandler, null);
 			ClientFactory.dataClient.updateActiveRecord(responder, req);
 		}
+		*/
+		public static function setReasonBlankInChildren(entity:EntityProxy, symbol:FieldSymbol):void {
+			var children:IList = entity.getChildren();
+			for each (var child:NodeProxy in children) {
+				if(child is AttributeProxy) {
+					var a:AttributeProxy = AttributeProxy(child);
+					for(var index:int = 0; index < a.fields.length; index ++) {
+						var field:FieldProxy = a.fields[index];
+						if(field.value == null && field.symbol == null) {
+							var req:UpdateRequest = new UpdateRequest();
+							req.parentEntityId = entity.id;
+							req.nodeName = child.name;
+							req.nodeId = child.id;
+							req.fieldIndex = index;
+							req.remarks = field.remarks;
+							req.value = field.value != null ? field.value.toString(): null;
+							req.symbol = symbol;
+							req.method = UpdateRequest$Method.UPDATE;
+							var responder:AsyncResponder = new AsyncResponder(updateFieldResultHandler, null);
+							ClientFactory.dataClient.updateActiveRecord(responder, req);
+						}
+					}
+				}
+			}
+		}
 		
 		protected static function updateFieldResultHandler(event:ResultEvent, token:Object = null):void {
-			var result:IList = event.result as IList;
+			var result:UpdateResponse = UpdateResponse(event.result);
 			Application.activeRecord.update(result);
 			var appEvt:ApplicationEvent = new ApplicationEvent(ApplicationEvent.UPDATE_RESPONSE_RECEIVED);
 			appEvt.result = result;

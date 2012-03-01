@@ -12,7 +12,7 @@ import org.openforis.collect.model.FieldSymbol;
 public class UpdateRequest implements Proxy {
 
 	public enum Method {
-		UPDATE, ADD, DELETE, UPDATE_SYMBOL;
+		ADD, UPDATE, DELETE;
 	}
 
 	private Integer parentEntityId;
@@ -91,5 +91,6 @@ public class UpdateRequest implements Proxy {
 	public void setValue(String value) {
 		this.value = value;
 	}
+
 
 }

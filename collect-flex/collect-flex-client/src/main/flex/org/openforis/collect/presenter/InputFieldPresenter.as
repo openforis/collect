@@ -20,8 +20,10 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.model.FieldSymbol;
 	import org.openforis.collect.model.proxy.AttributeProxy;
 	import org.openforis.collect.model.proxy.FieldProxy;
+	import org.openforis.collect.model.proxy.NodeStateProxy;
 	import org.openforis.collect.remoting.service.UpdateRequest;
 	import org.openforis.collect.remoting.service.UpdateRequest$Method;
+	import org.openforis.collect.remoting.service.UpdateResponse;
 	import org.openforis.collect.ui.ContextMenuBuilder;
 	import org.openforis.collect.ui.component.input.InputField;
 	import org.openforis.collect.util.ArrayUtil;
@@ -72,12 +74,13 @@ package org.openforis.collect.presenter {
 		
 		protected function updateResponseReceivedHandler(event:ApplicationEvent):void {
 			if(_view.attribute != null) {
-				var result:IList = event.result as IList;
-				if(result != null) {
-					var newAttribute:AttributeProxy = CollectionUtil.getItem(result, "id", _view.attribute.id) as AttributeProxy;
-					if(newAttribute != null && newAttribute != _view.attribute) {
-						//attribute changed
-						_view.attribute = newAttribute;
+				var response:UpdateResponse = UpdateResponse(event.result);
+				if(response != null) {
+					for each (var nodeState:NodeStateProxy in response.states) {
+						if(nodeState.nodeId == _view.attribute.id) {
+							updateView();
+							return;
+						}
 					}
 				}
 			}
@@ -96,7 +99,7 @@ package org.openforis.collect.presenter {
 		
 		protected function focusOutHandler(event:FocusEvent):void {
 			if(_view.applyChangesOnFocusOut && _changed) {
-				applyChanges();
+				applyValue();
 			} else {
 				//TODO perform validation only
 			}
@@ -111,10 +114,30 @@ package org.openforis.collect.presenter {
 			}
 		}
 		
-		public function applyChanges(symbol:FieldSymbol = null, remarks:String = null):void {
-			if(symbol == null && isShortCutForReasonBlank(_view.text)) {
-				symbol = parseShortCutForReasonBlank(_view.text);
+		public function applyValue():void {
+			var symbol:FieldSymbol = null;
+			var value:String = null;
+			var text:String = textToRequestValue();
+			if(isShortCutForReasonBlank(text)) {
+				symbol = parseShortCutForReasonBlank(text);
+			} else {
+				value = text;
 			}
+			var remarks:String = remarks; //preserve old remarks
+			sendUpdateRequest(value, symbol, remarks);
+		}
+		
+		public function applySymbol(symbol:FieldSymbol):void {
+			var value:String = textToRequestValue();
+			var remarks:String = remarks;
+			sendUpdateRequest(value, symbol, remarks);
+		}
+		
+		public function applySymbolAndRemarks(symbol:FieldSymbol, remarks:String):void {
+			sendUpdateRequest(null, symbol, remarks);
+		}
+		
+		protected function sendUpdateRequest(value:String, symbol:FieldSymbol = null, remarks:String = null):void {
 			var req:UpdateRequest = new UpdateRequest();
 			var def:AttributeDefinitionProxy = _view.attributeDefinition;
 			req.parentEntityId = _view.parentEntity.id;
@@ -122,22 +145,11 @@ package org.openforis.collect.presenter {
 			req.fieldIndex = _view.fieldIndex;
 			req.symbol = symbol;
 			req.remarks = remarks;
-			if(symbol == null) {
-				req.value = textToRequestValue();
-			} else {
-				req.symbol = symbol;
-			}
+			req.value = value;
 			if(_view.attribute != null) {
 				var a:AttributeProxy = _view.attribute;
-				var field:FieldProxy = a.getField(_view.fieldIndex);
 				req.nodeId = a.id;
-				if(symbol != null) {
-					req.method = UpdateRequest$Method.UPDATE_SYMBOL;
-				} else {
-					req.method = UpdateRequest$Method.UPDATE;
-					//preserve remarks
-					req.remarks = field.remarks;
-				}
+				req.method = UpdateRequest$Method.UPDATE;
 			} else {
 				req.method = UpdateRequest$Method.ADD;
 			}
@@ -154,10 +166,10 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function updateResultHandler(event:ResultEvent, token:Object = null):void {
-			var result:IList = event.result as IList;
-			Application.activeRecord.update(result);
+			var response:UpdateResponse = UpdateResponse(event.result);
+			Application.activeRecord.update(response);
 			var appEvt:ApplicationEvent = new ApplicationEvent(ApplicationEvent.UPDATE_RESPONSE_RECEIVED);
-			appEvt.result = result;
+			appEvt.result = response;
 			eventDispatcher.dispatchEvent(appEvt);
 			_changed = false;
 			//_view.currentState = InputField.STATE_SAVE_COMPLETE;
@@ -165,6 +177,7 @@ package org.openforis.collect.presenter {
 
 		protected function updateFaultHandler(event:FaultEvent, token:Object = null):void {
 			//_view.currentState = InputField.STATE_ERROR_SAVING;
+			undoLastChange();
 			faultHandler(event, token);
 		}
 		
@@ -190,33 +203,41 @@ package org.openforis.collect.presenter {
 			var result:String = null;
 			var text:String = _view.text;
 			if(StringUtil.isNotBlank(text)) {
-				result = text;
+				result = StringUtil.trim(text);
 			}
 			return result;
 		}
 		
 		protected function updateView():void {
 			//update view according to attribute (generic text value)
-			
+			var remarksPresent:Boolean = false;
 			if(_view.attributeDefinition != null) {
 				var text:String = valueToText();
 				_view.text = text;
 				if(_view.attribute != null) {
-					var a:AttributeProxy = _view.attribute;
-					//TODO show remarks icon on field
-					var f:FieldProxy = field;
-					if(StringUtil.isNotBlank(f.remarks)) {
-						
-					}
+					remarksPresent = StringUtil.isNotBlank(remarks);
 				}
 				_view.contextMenu = ContextMenuBuilder.buildContextMenu(_view);
 			}
+			_view.remarksPresent = remarksPresent;
 		}
 		
 		protected function get field():FieldProxy {
-			if(_view.attribute != null && _view.fieldIndex >= 0) {
-				return _view.attribute.getField(_view.fieldIndex);
+			if(_view.attribute != null) {
+				var fieldIndex:int = 0;
+				if(_view.fieldIndex >= 0) {
+					fieldIndex = _view.fieldIndex;
+				}
+				return _view.attribute.getField(fieldIndex);
 			}
+			return null;
+		}
+		
+		protected function get remarks():String {
+			var f:FieldProxy = field;
+			if(f != null) {
+				return f.remarks;
+			} 
 			return null;
 		}
 		
@@ -262,6 +283,16 @@ package org.openforis.collect.presenter {
 		protected function set changed(value:Boolean):void {
 			_changed = value;
 		}
+		
+		[Bindable]
+		protected function get updateResponder():IResponder {
+			return _updateResponder;
+		}
+		
+		protected function set updateResponder(value:IResponder):void {
+			_updateResponder = value;
+		}
+		
 		
 		
 	}

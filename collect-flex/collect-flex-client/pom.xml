@@ -92,6 +92,7 @@
 								<includeClass>org.openforis.collect.model.FieldSymbol</includeClass>
 								<includeClass>org.openforis.collect.remoting.service.UpdateRequest</includeClass>
 								<includeClass>org.openforis.collect.remoting.service.UpdateRequest$Method</includeClass>
+								<includeClass>org.openforis.collect.remoting.service.UpdateResponse</includeClass>
 							</includeJavaClasses>
 						</configuration>
 					</execution>

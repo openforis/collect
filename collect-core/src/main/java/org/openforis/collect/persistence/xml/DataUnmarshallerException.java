@@ -2,6 +2,8 @@ package org.openforis.collect.persistence.xml;
 
 import java.util.List;
 
+import org.openforis.idm.util.CollectionUtil;
+
 /**
  * 
  * @author G. Miceli
@@ -32,17 +34,20 @@ public class DataUnmarshallerException extends Exception {
 		this.messages = messages;
 	}
 	
-	@Override
-	public String getMessage() {
-		StringBuilder sb = new StringBuilder();
-		sb.append("Could not load data file.  ");
-		for (int i = 0; i < messages.size(); i++) {
-			String msg = messages.get(i);
-			if ( i > 0 ) {
-				sb.append(", ");
-			}
-			sb.append(msg);
-		}
-		return sb.toString();
+	public List<String> getMessages() {
+		return CollectionUtil.unmodifiableList(messages);
+//		StringBuilder sb = new StringBuilder();
+//		if ( messages == null ) {
+//			sb.append(getCause().getMessage());
+//		} else {
+//			for (int i = 0; i < messages.size(); i++) {
+//				String msg = messages.get(i);
+//				if ( i > 0 ) {
+//					sb.append(", ");
+//				}
+//				sb.append(msg);
+//			}
+//		}
+//		return sb.toString();
 	}
 }

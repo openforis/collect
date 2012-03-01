@@ -3,21 +3,26 @@ package org.openforis.collect.presenter
 	import flash.events.Event;
 	
 	import mx.binding.utils.ChangeWatcher;
-	import mx.collections.ArrayList;
 	import mx.collections.IList;
 	
 	import org.openforis.collect.model.proxy.EntityProxy;
+	import org.openforis.collect.model.proxy.NodeStateProxy;
 	import org.openforis.collect.ui.UIBuilder;
 	import org.openforis.collect.ui.component.detail.EntityFormItem;
+	import org.openforis.collect.ui.component.detail.ValidationDisplayManager;
 	
 	/**
 	 * 
 	 * @author S. Ricci
 	 * 
 	 */
-	public class EntityFormItemPresenter extends FormItemPresenter
-	{
+	public class EntityFormItemPresenter extends FormItemPresenter {
+		
+		private var _validationDisplayManager:ValidationDisplayManager;
+		
 		public function EntityFormItemPresenter(view:EntityFormItem) {
+			var state:NodeStateProxy = view.entity != null ? view.entity.state: null;
+			_validationDisplayManager = new ValidationDisplayManager(view, view, state);
 			super(view);
 			initNodeDefinitions();
 		}
@@ -53,11 +58,14 @@ package org.openforis.collect.presenter
 		
 		override protected function updateView():void {
 			var entity:EntityProxy = null;
-			if(view.parentEntity != null && view.entityDefinition != null) {
+			if(view.parentEntity != null && view.entityDefinition != null && ! view.entityDefinition.multiple) {
 				//assign entity
 				entity = view.parentEntity.getChild(view.entityDefinition.name, 0) as EntityProxy;
 			}
 			view.entity = entity;
+			var state:NodeStateProxy = entity != null ? entity.state: null;
+			_validationDisplayManager.state = state;
 		}
+		
 	}
 }

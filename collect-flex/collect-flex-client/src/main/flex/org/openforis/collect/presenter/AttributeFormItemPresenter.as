@@ -17,6 +17,7 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.model.proxy.NodeProxy;
 	import org.openforis.collect.remoting.service.UpdateRequest;
 	import org.openforis.collect.remoting.service.UpdateRequest$Method;
+	import org.openforis.collect.remoting.service.UpdateResponse;
 	import org.openforis.collect.ui.component.detail.AttributeFormItem;
 	import org.openforis.collect.ui.component.detail.MultipleAttributeFormItem;
 	import org.openforis.collect.util.CollectionUtil;
@@ -64,8 +65,16 @@ package org.openforis.collect.presenter
 				(not necessary for multiple attributes because of the data binding to the collection of attributes)
 			*/
 			if(view.parentEntity != null && view.attributeDefinition != null) {
-				var result:IList = event.result as IList;
+				var response:UpdateResponse = event.result as UpdateResponse;
 				var parentId:Number = view.parentEntity.id;
+				for each (var item:NodeProxy in response.addedNodes) {
+					if(item.parentId == parentId && item.name == view.attributeDefinition.name &&
+						! view.attributeDefinition.multiple || view.attributes == null
+						) {
+						assignAttribute();
+					}
+				}
+				/*
 				for each (var item:NodeProxy in result) {
 					if((item.id == parentId && item.deleted) ||
 						(item.parentId == parentId && item.name == view.attributeDefinition.name &&
@@ -78,6 +87,7 @@ package org.openforis.collect.presenter
 						return;
 					}
 				}
+				*/
 			}
 		}
 		

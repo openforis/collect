@@ -94,7 +94,7 @@ package org.openforis.collect.presenter {
 			if(firstOpen) {
 				view = new RemarksPopUp();
 			}
-			_showReasonBlank = _inputField != null && (_inputField.isEmpty() ||	_inputField.hasBlankReasonSpecified());
+			_showReasonBlank = _inputField != null && (_inputField.canApplyReasonBlank() ||	_inputField.hasBlankReasonSpecified());
 			_inputField = inputField;
 
 			if(! popUpOpened) {
@@ -124,7 +124,11 @@ package org.openforis.collect.presenter {
 			var remarks:String = null;
 			var symbolToSelect:FieldSymbol = null;
 			if(_inputField != null && _inputField.attribute != null) {
-				var field:FieldProxy = _inputField.attribute.getField(_inputField.fieldIndex);
+				var fieldIndex:int = 0;
+				if(_inputField.fieldIndex > 0) {
+					fieldIndex = _inputField.fieldIndex;
+				}
+				var field:FieldProxy = _inputField.attribute.getField(fieldIndex);
 				remarks = field.remarks;
 				var symbol:FieldSymbol = field.symbol;
 				if(symbol != null) {
@@ -158,7 +162,7 @@ package org.openforis.collect.presenter {
 		protected function okButtonClickHandler(event:Event = null):void {
 			var symbol:FieldSymbol = view.radioButtonGroup.selectedValue as FieldSymbol;
 			var remarks:String = StringUtil.trim(view.remarksTextArea.text);
-			_inputField.applyChanges(symbol, remarks);
+			_inputField.applySymbolAndRemarks(symbol, remarks);
 			hidePopUp();
 		}
 		

@@ -79,6 +79,14 @@ detail|AttributeItemRenderer.error {
 detail|AttributeItemRenderer.warning {
 	borderColor: #FF8800;
 }
+/*
+input|TextInput.notRelevant, detail|AttributeItemRenderer.notRelevant input|TextInput {
+	backgroundColor: #CCCCCC;
+}
+*/
+input|TextInput {
+	borderSkin: ClassReference("org.openforis.collect.ui.skin.TextInputBorderSkin");
+}
 
 input|TextInput.error, input|TextInput.warning {
 	borderStyle: solid;
@@ -92,6 +100,10 @@ input|TextInput.error {
 
 input|TextInput.warning {
 	borderColor: #FF8800;
+}
+
+input|TextInput.remarksPresent {
+	remarksPresentIconVisible: true;
 }
 
 s|BorderContainer.entityForm {

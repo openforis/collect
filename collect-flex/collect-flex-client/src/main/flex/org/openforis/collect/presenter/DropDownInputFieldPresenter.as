@@ -34,7 +34,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		override protected function changeHandler(event:Event):void {
-			applyChanges();
+			applyValue();
 		}
 		
 		override protected function textToRequestValue():String {

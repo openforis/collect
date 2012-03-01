@@ -4,10 +4,10 @@
 package org.openforis.collect.remoting.service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -20,6 +20,7 @@ import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.FieldSymbol;
 import org.openforis.collect.model.User;
 import org.openforis.collect.model.proxy.NodeProxy;
+import org.openforis.collect.model.proxy.NodeStateProxy;
 import org.openforis.collect.model.proxy.RecordProxy;
 import org.openforis.collect.persistence.AccessDeniedException;
 import org.openforis.collect.persistence.InvalidIdException;
@@ -49,10 +50,14 @@ import org.openforis.idm.model.Code;
 import org.openforis.idm.model.CodeAttribute;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Field;
+import org.openforis.idm.model.IntegerRange;
 import org.openforis.idm.model.Node;
+import org.openforis.idm.model.NumericRange;
+import org.openforis.idm.model.RealRange;
 import org.openforis.idm.model.Record;
 import org.openforis.idm.model.expression.ExpressionFactory;
 import org.openforis.idm.model.expression.ModelPathExpression;
+import org.openforis.idm.model.state.NodeState;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -74,7 +79,7 @@ public class DataService {
 		CollectSurvey survey = getActiveSurvey();
 		User user = getUserInSession();
 		CollectRecord record = recordManager.checkout(survey, user, id);
-		record.updateNodeStates();
+		//record.updateNodeStates();
 		
 		Entity rootEntity = record.getRootEntity();
 		ModelVersion version = record.getVersion();
@@ -158,9 +163,11 @@ public class DataService {
 		sessionManager.clearActiveRecord();
 	}
 
-	public List<NodeProxy> updateActiveRecord(UpdateRequest request) {
-		List<Node<?>> updatedNodes = new ArrayList<Node<?>>();
-		List<Node<?>> removedNodes = new ArrayList<Node<?>>();
+	@SuppressWarnings("unchecked")
+	public UpdateResponse updateActiveRecord(UpdateRequest request) {
+		List<Node<?>> addedNodes = null;
+		List<?> deletedNodes = null;
+		List<NodeState> nodeStates = null; 
 		SessionState sessionState = sessionManager.getSessionState();
 		CollectRecord record = sessionState.getActiveRecord();
 		ModelVersion version = record.getVersion();
@@ -177,180 +184,96 @@ public class DataService {
 		NodeDefinition nodeDef = ((EntityDefinition) parentEntity.getDefinition()).getChildDefinition(nodeName);
 		String requestValue = request.getValue();
 		String remarks = request.getRemarks();
-		Object value = null;
-		if(requestValue != null && nodeDef instanceof AttributeDefinition) {
-			value = parseFieldValue(parentEntity, (NodeDefinition) nodeDef, requestValue, fieldIndex);
-		}
 		FieldSymbol symbol = request.getSymbol();
 		Method method = request.getMethod();
 		switch (method) {
 			case ADD:
-				updatedNodes = addNode(version, parentEntity, nodeDef, value, fieldIndex, symbol, remarks);
+				Node<?> addedNode = addNode(version, parentEntity, nodeDef, requestValue, symbol, remarks);
+				//nodeStates = record.updateNodeState(addedNode);
+				addedNodes = new ArrayList<Node<?>>();
+				addedNodes.add(addedNode);
 				break;
-			case UPDATE: 
-				if(nodeDef instanceof CodeAttributeDefinition) {
-					removedNodes = removeNodes(parentEntity, nodeName);
-					updatedNodes = addNode(version, parentEntity, nodeDef, value, fieldIndex, symbol, remarks);
-				} else {
-					updatedNodes = updateNode(parentEntity, node, fieldIndex, value, symbol, remarks);
-				}
-				break;
-			case UPDATE_SYMBOL:
-				if(nodeDef instanceof CodeAttributeDefinition) {
-					removedNodes = removeNodes(parentEntity, nodeName);
-					updatedNodes = addNode(version, parentEntity, nodeDef, value, fieldIndex, symbol, remarks);
-				} else {
-					List<Node<?>> updated = updateSymbol(node, fieldIndex, remarks, symbol, version);
-					updatedNodes.addAll(updated);
-				}
+			case UPDATE:
+				updateAttribute(record, parentEntity, (Attribute<AttributeDefinition, ?>) node, fieldIndex, requestValue, symbol, remarks);
+				//nodeStates = record.updateNodeState(node);
 				break;
 			case DELETE: 
-				Node<?> deleted = recordManager.deleteNode(parentEntity, node);
-				removedNodes.add(deleted);
+				Node<?> deletedNode = recordManager.deleteNode(parentEntity, node);
+				deletedNodes = Arrays.asList(deletedNode);
 				break;
-			
 		}
+		
 		//convert nodes to proxies
-		List<NodeProxy> result = NodeProxy.fromList((List<Node<?>>) updatedNodes);
-		List<NodeProxy> removed = NodeProxy.fromList((List<Node<?>>) removedNodes);
-		for (NodeProxy nodeProxy : removed) {
-			nodeProxy.setDeleted(true);
+		List<NodeStateProxy> nodeStateProxies = NodeStateProxy.fromList(nodeStates);
+		UpdateResponse response = new UpdateResponse(nodeStateProxies);
+		if(addedNodes != null) {
+			response.setAddedNodes(NodeProxy.fromList((List<Node<?>>) addedNodes));
 		}
-		result.addAll(removed);
-		return result;
-	}
 
-	private List<Node<?>> updateSymbol(Node<?> node, Integer fieldIndex, String remarks, FieldSymbol symbol, ModelVersion version) {
-		List<Node<?>> updatedNodes = new ArrayList<Node<?>>();
-		Character symbolChar = null;
-		if (symbol != null) {
-			symbolChar = symbol.getCode();
+		if(deletedNodes != null) {
+			response.setDeletedNodes(NodeProxy.fromList((List<Node<?>>) deletedNodes));
 		}
-		NodeDefinition nodeDefn = node.getDefinition();
-		if (nodeDefn instanceof AttributeDefinition) {
-			Attribute<?, ?> a = (Attribute<?, ?>) node;
-			Field<?> field = a.getField(fieldIndex);
-			field.setSymbol(symbolChar);
-			field.setRemarks(remarks);
-			if (symbol != null && symbol.isReasonBlank()) {
-				field.setValue(null);
-			}
-			updatedNodes.add(a);
-		} else if (node instanceof Entity) {
-			// update only the symbol in entity's attributes
-			Entity entity = (Entity) node;
-			recordManager.addEmptyNodes(entity, version);
-			List<NodeDefinition> childDefinitions = ((EntityDefinition) nodeDefn).getChildDefinitions();
-			for (NodeDefinition def : childDefinitions) {
-				if (def instanceof AttributeDefinition) {
-					String name = def.getName();
-					Attribute<?, ?> a = (Attribute<?, ?>) entity.get(name, 0);
-					setSymbolInAllFields(a, symbol);
-					updatedNodes.add(a);
-				}
-			}
-		}
-		return updatedNodes;
+		return response;
 	}
 
 	@SuppressWarnings("unchecked")
-	private List<Node<?>> updateNode(Entity parentEntity, Node<?> node, Integer fieldIndex, Object value, FieldSymbol symbol, String remarks) {
-		if (node instanceof Attribute) {
-			List<Node<?>> updatedNodes = new ArrayList<Node<?>>();
-			Attribute<?, Object> attribute = (Attribute<?, Object>) node;
-			if (fieldIndex != null) {
-				@SuppressWarnings("rawtypes")
-				Field field = attribute.getField(fieldIndex);
-				field.setValue(value);
-				field.setRemarks(remarks);
-				field.setSymbol(null);
-			} else {
-				attribute.setValue(value);
-			}
-			updatedNodes.add(attribute);
-			return updatedNodes;
-		} else {
-			throw new UnsupportedOperationException("Cannot update an entity");
-		}
-	}
-
-	private List<Node<?>> addNode(ModelVersion version, Entity parentEntity, NodeDefinition nodeDef, Object value, Integer fieldIndex, 
-			FieldSymbol symbol, String remarks) {
-		List<Node<?>> addedNodes = new ArrayList<Node<?>>();
+	private Node<?> addNode(ModelVersion version, Entity parentEntity, NodeDefinition nodeDef, String requestValue, FieldSymbol symbol, String remarks) {
 		if(nodeDef instanceof AttributeDefinition) {
-			NodeDefinition def = (NodeDefinition) nodeDef;
-			if(def instanceof CodeAttributeDefinition) {
-				CodeAttributeDefinition codeDef = (CodeAttributeDefinition) def;
-				String codesString = value != null ? value.toString(): null;
-				List<Node<?>> list = insertCodeAttributes(version, parentEntity, codeDef, codesString, symbol, remarks);
-				addedNodes.addAll(list);
-			} else {
-				Attribute<?, ?> attribute = (Attribute<?, ?>) def.createNode();
-				parentEntity.add(attribute);
-				if(fieldIndex != null) {
-					@SuppressWarnings("unchecked")
-					Field<Object> field = (Field<Object>) attribute.getField(fieldIndex);
-					field.setRemarks(remarks);
-					field.setSymbol(symbol != null ? symbol.getCode(): null);
-					field.setValue(value);
-				}
-				addedNodes.add(attribute);
+			AttributeDefinition def = (AttributeDefinition) nodeDef;
+			Attribute<?, ?> attribute = (Attribute<?, ?>) def.createNode();
+			if(StringUtils.isNotBlank(requestValue)) {
+				Object value = parseValue(parentEntity, (AttributeDefinition) nodeDef, requestValue, version);
+				((Attribute<?, Object>) attribute).setValue(value);
 			}
+			if(symbol != null || remarks != null) {
+				Character symbolChar = null;
+				if(symbol != null) {
+					symbolChar = symbol.getCode();
+				}
+				Field<?> firstField = attribute.getField(0);
+				firstField.setSymbol(symbolChar);
+				firstField.setRemarks(remarks);
+			}
+			parentEntity.add(attribute);
+			return attribute;
 		} else {
 			Entity e = recordManager.addEntity(parentEntity, nodeDef.getName(), version);
-			addedNodes.add(e);
+			return e;
 		}
-		return addedNodes;
 	}
 	
-	private List<Node<?>> insertCodeAttributes(ModelVersion version, Entity parentEntity, CodeAttributeDefinition def, String codesString, 
-			FieldSymbol symbol, String remarks) {
-		List<Node<?>> addedNodes = new ArrayList<Node<?>>();
-		List<Code> codes = codesString != null ? parseCodes(parentEntity, def, codesString, version): null;
-		if(codes != null) {
-			for (Code c : codes) {
-				CodeAttribute attribute = parentEntity.addValue(def.getName(), c);
-				//set symbol and remarks in first field
-				Field<?> field = attribute.getField(0);
-				if(symbol != null) {
-					field.setSymbol(symbol.getCode());
-				}
-				field.setRemarks(remarks);
-				addedNodes.add(attribute);
+	@SuppressWarnings("unchecked")
+	private void updateAttribute(CollectRecord record, Entity parentEntity, Attribute<AttributeDefinition, ?> attribute,
+			Integer fieldIndex, String requestValue, FieldSymbol symbol, String remarks) {
+		ModelVersion version = record.getVersion();
+		AttributeDefinition defn = attribute.getDefinition();
+		if(fieldIndex >= 0) {
+			Object fieldValue = null;
+			if(StringUtils.isNotBlank(requestValue)) {
+				fieldValue = parseFieldValue(parentEntity, defn, requestValue, fieldIndex);
 			}
-		} else {
-			Attribute<?, ?> attribute = (Attribute<?, ?>) def.createNode();
-			parentEntity.add(attribute);
-			Field<?> field = attribute.getField(0);
+			@SuppressWarnings("rawtypes")
+			Field field = attribute.getField(fieldIndex);
+			field.setValue(fieldValue);
 			field.setRemarks(remarks);
-			field.setSymbol(symbol != null ? symbol.getCode(): null);
-			addedNodes.add(attribute);
-		}
-		return addedNodes;
-	}
-	
-	private List<Node<?>> removeNodes(Entity parentEntity, String nodeName) {
-		List<Node<?>> deletedNodes = new ArrayList<Node<?>>();
-		int count = parentEntity.getCount(nodeName);
-		for (int i = count - 1; i >= 0; i--) {
-			Node<?> removed = parentEntity.remove(nodeName, i);
-			deletedNodes.add(removed);
-		}
-		return deletedNodes;
-	}
-	
-	private void setSymbolInAllFields(Attribute<?, ?> attribute, FieldSymbol symbol) {
-		Character s = symbol != null ? symbol.getCode(): null;
-		int count = attribute.getFieldCount();
-		for (int i = 0; i < count; i++) {
-			Field<?> field = attribute.getField(i);
-			if(s == null || (symbol.isReasonBlank() && field.isEmpty())) {
-				field.setSymbol(s);
+			field.setSymbol(null);
+		} else {
+			Object value = null;
+			if((symbol == null || ! symbol.isReasonBlank()) && StringUtils.isNotBlank(requestValue)) {
+				value = parseValue(parentEntity, defn, requestValue, version);
 			}
+			((Attribute<AttributeDefinition, Object>) attribute).setValue(value);
+			Field<?> firstField = attribute.getField(0);
+			firstField.setRemarks(remarks);
+			Character symbolChar = null;
+			if(symbol != null) {
+				symbolChar = symbol.getCode();
+			}
+			firstField.setSymbol(symbolChar);
 		}
 	}
-
-	private Object parseFieldValue(Entity parentEntity, NodeDefinition def, String value, Integer fieldIndex) {
+	
+	private Object parseFieldValue(Entity parentEntity, AttributeDefinition def, String value, Integer fieldIndex) {
 		Object result = null;
 		if(StringUtils.isBlank(value)) {
 			return null;
@@ -365,7 +288,7 @@ public class DataService {
 					//srsId
 					result = value;
 				} else {
-					Long val = Long.valueOf(value);
+					Double val = Double.valueOf(value);
 					result = val;
 				}
 			}
@@ -412,12 +335,38 @@ public class DataService {
 		return result;
 	}
 	
+	private Object parseValue(Entity parentEntity, AttributeDefinition def, String value, ModelVersion version) {
+		Object result;
+		if(def instanceof CodeAttributeDefinition) {
+			result = parseCode(parentEntity, (CodeAttributeDefinition) def, value, version);
+		} else if(def instanceof RangeAttributeDefinition) {
+			RangeAttributeDefinition rangeDef = (RangeAttributeDefinition) def;
+			org.openforis.idm.metamodel.RangeAttributeDefinition.Type type = rangeDef.getType();
+			NumericRange<?> range = null;
+			switch(type) {
+				case INTEGER:
+					range = IntegerRange.parseIntegerRange(value);
+					break;
+				case REAL:
+					range = RealRange.parseRealRange(value);
+					break;
+			}
+			result = range;
+		} else {
+			throw new IllegalArgumentException("Invalid AttributeDefinition: expected CodeAttributeDefinition or RangeAttributeDefinition");
+		}
+		return result;
+	}
+	
+	
+	
 	@Transactional
 	public int promoteRecord(int recordId) throws InvalidIdException, MultipleEditException, NonexistentIdException, AccessDeniedException, RecordLockedException {
-		SessionState sessionState = getSessionManager().getSessionState();
+		SessionState sessionState = sessionManager.getSessionState();
 		CollectSurvey survey = sessionState.getActiveSurvey();
 		User user = sessionState.getUser();
 		int promotedId = this.recordManager.promote(survey, recordId, user);
+		sessionManager.clearActiveRecord();
 		return promotedId;
 	}
 
@@ -613,6 +562,12 @@ public class DataService {
 		return null;
 	}
 	
+	private Code parseCode(Entity parent, CodeAttributeDefinition def, String value, ModelVersion version) {
+		List<CodeListItem> items = getAssignableCodeListItems(parent, def);
+		Code code = parseCode(value, items, version);
+		return code;
+	}
+	
 	private Code parseCode(String value, List<CodeListItem> codeList, ModelVersion version) {
 		Code code = null;
 		String[] strings = value.split(":");
@@ -637,19 +592,4 @@ public class DataService {
 		return code;
 	}
 	
-	public List<Code> parseCodes(Entity parent, CodeAttributeDefinition def, String value, ModelVersion version) {
-		List<Code> result = new ArrayList<Code>();
-		List<CodeListItem> items = getAssignableCodeListItems(parent, def);
-		StringTokenizer st = new StringTokenizer(value, ",");
-		while (st.hasMoreTokens()) {
-			String token = st.nextToken();
-			Code code = parseCode(token, items, version);
-			if(code != null) {
-				result.add(code);
-			} else {
-				//TODO throw exception
-			}
-		}
-		return result;
-	}
 }

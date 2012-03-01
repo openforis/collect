@@ -3,10 +3,10 @@
  */
 package org.openforis.collect.persistence.jooq;
 
-import static org.openforis.collect.persistence.jooq.tables.Data.DATA;
-import static org.openforis.collect.persistence.jooq.tables.NodeCountView.NODE_COUNT_VIEW;
-import static org.openforis.collect.persistence.jooq.tables.Record.RECORD;
-import static org.openforis.collect.persistence.jooq.tables.UserAccount.USER_ACCOUNT;
+import static org.openforis.collect.persistence.jooq.tables.OfcData.DATA;
+import static org.openforis.collect.persistence.jooq.tables.OfcNodeCountView.NODE_COUNT_VIEW;
+import static org.openforis.collect.persistence.jooq.tables.OfcRecord.RECORD;
+import static org.openforis.collect.persistence.jooq.tables.OfcUserAccount.USER_ACCOUNT;
 
 import java.util.List;
 
