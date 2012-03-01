@@ -15,44 +15,54 @@
 			}
 			
 		]]>
-			
 	</fx:Script>
 	
 	<detail:layout>
 		<s:VerticalLayout />
 	</detail:layout>
 	
-	<s:Label id="headerLabel" text="{entityDefinition.getLabelText()}" styleName="bold" />
-	
-	<s:VGroup paddingLeft="30">
-		<datagroup:DataGroupHeader id="header" 
-				nodeDefinitions="{nodeDefinitions}" />
+	<!--<s:BorderContainer id="border" 
+					   height="100%" 
+					   width="100%"
+					   minHeight="0"
+					   minWidth="0">
+		<s:layout>
+			<s:VerticalLayout />
+		</s:layout>
+	-->
+		<s:Label id="headerLabel" text="{entityDefinition.getLabelText()}" styleName="bold" />
 		
-		<s:DataGroup width="100%" id="dataGroup">
-			<s:layout>
-				<s:VerticalLayout gap="2" />
-			</s:layout> 
-			<s:itemRenderer>
-				<fx:Component>
-					<detail:EntityDataGroupItemRenderer
-						entity="{data as EntityProxy}"
-						modelVersion="{outerDocument.modelVersion}"
-						nodeDefinitions="{outerDocument.nodeDefinitions}"
-						/>
-				</fx:Component>
-			</s:itemRenderer>
-		</s:DataGroup>
-	</s:VGroup>
+		<s:VGroup paddingLeft="30">
+			<datagroup:DataGroupHeader id="header" 
+									   nodeDefinitions="{nodeDefinitions}" />
+			
+			<s:DataGroup width="100%" id="dataGroup">
+				<s:layout>
+					<s:VerticalLayout gap="2" />
+				</s:layout> 
+				<s:itemRenderer>
+					<fx:Component>
+						<detail:EntityDataGroupItemRenderer
+							entity="{data as EntityProxy}"
+							modelVersion="{outerDocument.modelVersion}"
+							nodeDefinitions="{outerDocument.nodeDefinitions}"
+							/>
+					</fx:Component>
+				</s:itemRenderer>
+			</s:DataGroup>
+		</s:VGroup>
+		
+		<mx:LinkButton
+			id="addButton"
+			label="Add" 
+			buttonMode="true" 
+			icon="{Images.ADD}" 
+			labelPlacement="left" 
+			useHandCursor="true"
+			paddingLeft="30"
+			visible="{! entityDefinition.enumerated}"
+			includeInLayout="{! entityDefinition.enumerated}"
+			/>
+	<!--</s:BorderContainer>-->
 	
-	<mx:LinkButton
-		id="addButton"
-		label="Add" 
-		buttonMode="true" 
-		icon="{Images.ADD}" 
-		labelPlacement="left" 
-		useHandCursor="true"
-		paddingLeft="30"
-		visible="{! entityDefinition.enumerated}"
-		includeInLayout="{! entityDefinition.enumerated}"
-		/>
 </detail:EntityFormItem>

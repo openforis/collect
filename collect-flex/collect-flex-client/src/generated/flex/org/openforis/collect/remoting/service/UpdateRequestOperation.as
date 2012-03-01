@@ -8,8 +8,7 @@
 package org.openforis.collect.remoting.service {
 
     [Bindable]
-    [RemoteClass(alias="org.openforis.collect.remoting.service.UpdateResponse")]
-    public class UpdateResponse extends UpdateResponseBase {
-		
+    [RemoteClass(alias="org.openforis.collect.remoting.service.UpdateRequestOperation")]
+    public class UpdateRequestOperation extends UpdateRequestOperationBase {
     }
 }

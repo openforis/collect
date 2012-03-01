@@ -1,11 +1,8 @@
 package org.openforis.collect.presenter
 {
-	import flash.events.Event;
 	import flash.events.FocusEvent;
 	import flash.events.MouseEvent;
 	
-	import mx.binding.utils.ChangeWatcher;
-	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.events.ResultEvent;
@@ -13,12 +10,13 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.Application;
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.event.ApplicationEvent;
-	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.model.proxy.NodeProxy;
 	import org.openforis.collect.remoting.service.UpdateRequest;
-	import org.openforis.collect.remoting.service.UpdateRequest$Method;
+	import org.openforis.collect.remoting.service.UpdateRequestOperation;
+	import org.openforis.collect.remoting.service.UpdateRequestOperation$Method;
 	import org.openforis.collect.remoting.service.UpdateResponse;
 	import org.openforis.collect.ui.component.detail.MultipleEntityFormItem;
+	import org.openforis.collect.ui.component.detail.ValidationDisplayManager;
 	import org.openforis.collect.util.AlertUtil;
 	import org.openforis.collect.util.CollectionUtil;
 	import org.openforis.collect.util.UIUtil;
@@ -30,7 +28,10 @@ package org.openforis.collect.presenter
 	 */
 	public class MultipleEntityFormItemPresenter extends EntityFormItemPresenter {
 		
+		private var _validationDisplayManager:ValidationDisplayManager;
+		
 		public function MultipleEntityFormItemPresenter(view:MultipleEntityFormItem) {
+			_validationDisplayManager = new ValidationDisplayManager(view, view);
 			super(view);
 		}
 		
@@ -50,7 +51,7 @@ package org.openforis.collect.presenter
 			for each(var node:NodeProxy in response.addedNodes) {
 				if(view.parentEntity != null && view.entityDefinition != null 
 					&& node.parentId == view.parentEntity.id 
-					&& view.entityDefinition.name == node.name) {
+					&& node.name == view.entityDefinition.name) {
 					updateView();
 				}
 			}
@@ -67,6 +68,13 @@ package org.openforis.collect.presenter
 			} else {
 				view.dataGroup.dataProvider = null;
 			}
+			/*
+			//TODO if parent has min count validation errors for this element, init validationDisplayManager
+			_validationDisplayManager.displayStyleName = ValidationDisplayManager.STYLE_NAME_ERROR;
+			_validationDisplayManager.toolTipMessage = "Error";
+			_validationDisplayManager.toolTipStyleName = ToolTipUtil.STYLE_NAME_ERROR;
+			_validationDisplayManager.init();
+			*/
 		}
 		
 		protected function getEntities():IList {
@@ -83,10 +91,11 @@ package org.openforis.collect.presenter
 			var entities:IList = getEntities();
 			var maxCount:Number = view.entityDefinition.maxCount
 			if(isNaN(maxCount) || CollectionUtil.isEmpty(entities) || entities.length < maxCount) {
-				var req:UpdateRequest = new UpdateRequest();
-				req.method = UpdateRequest$Method.ADD;
-				req.parentEntityId = view.parentEntity.id;
-				req.nodeName = view.entityDefinition.name;
+				var o:UpdateRequestOperation = new UpdateRequestOperation();
+				o.method = UpdateRequestOperation$Method.ADD;
+				o.parentEntityId = view.parentEntity.id;
+				o.nodeName = view.entityDefinition.name;
+				var req:UpdateRequest = new UpdateRequest(o);
 				ClientFactory.dataClient.updateActiveRecord(new AsyncResponder(addResultHandler, faultHandler, null), req);
 			} else {
 				var labelText:String = view.entityDefinition.getLabelText();

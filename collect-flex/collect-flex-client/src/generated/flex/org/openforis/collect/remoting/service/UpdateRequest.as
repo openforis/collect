@@ -6,9 +6,19 @@
  */
 
 package org.openforis.collect.remoting.service {
+	import mx.collections.ArrayCollection;
 
     [Bindable]
     [RemoteClass(alias="org.openforis.collect.remoting.service.UpdateRequest")]
     public class UpdateRequest extends UpdateRequestBase {
+		
+		
+		public function UpdateRequest(operation:UpdateRequestOperation = null) {
+			super();
+			operations = new ArrayCollection();
+			if(operation != null) {
+				operations.addItem(operation);
+			}
+		}
     }
 }

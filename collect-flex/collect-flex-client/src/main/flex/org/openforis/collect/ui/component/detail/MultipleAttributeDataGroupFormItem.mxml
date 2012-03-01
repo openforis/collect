@@ -61,7 +61,7 @@
 	<s:Image
 		useHandCursor="true"
 		buttonMode="true"
-		source="{Images.EDIT}" 
+		source="{Images.OPEN_POPUP}" 
 		id="openPopupImage" 
 		/>
 	

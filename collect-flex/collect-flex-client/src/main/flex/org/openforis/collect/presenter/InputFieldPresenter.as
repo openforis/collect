@@ -5,7 +5,7 @@ package org.openforis.collect.presenter {
 	import flash.ui.Keyboard;
 	
 	import mx.binding.utils.ChangeWatcher;
-	import mx.collections.IList;
+	import mx.collections.ArrayList;
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.IResponder;
 	import mx.rpc.events.FaultEvent;
@@ -20,14 +20,13 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.model.FieldSymbol;
 	import org.openforis.collect.model.proxy.AttributeProxy;
 	import org.openforis.collect.model.proxy.FieldProxy;
-	import org.openforis.collect.model.proxy.NodeStateProxy;
 	import org.openforis.collect.remoting.service.UpdateRequest;
-	import org.openforis.collect.remoting.service.UpdateRequest$Method;
+	import org.openforis.collect.remoting.service.UpdateRequestOperation;
+	import org.openforis.collect.remoting.service.UpdateRequestOperation$Method;
 	import org.openforis.collect.remoting.service.UpdateResponse;
 	import org.openforis.collect.ui.ContextMenuBuilder;
 	import org.openforis.collect.ui.component.input.InputField;
 	import org.openforis.collect.util.ArrayUtil;
-	import org.openforis.collect.util.CollectionUtil;
 	import org.openforis.collect.util.StringUtil;
 	import org.openforis.collect.util.UIUtil;
 	
@@ -76,12 +75,14 @@ package org.openforis.collect.presenter {
 			if(_view.attribute != null) {
 				var response:UpdateResponse = UpdateResponse(event.result);
 				if(response != null) {
+					/*
 					for each (var nodeState:NodeStateProxy in response.states) {
 						if(nodeState.nodeId == _view.attribute.id) {
 							updateView();
 							return;
 						}
 					}
+					*/
 				}
 			}
 		}
@@ -124,36 +125,40 @@ package org.openforis.collect.presenter {
 				value = text;
 			}
 			var remarks:String = remarks; //preserve old remarks
-			sendUpdateRequest(value, symbol, remarks);
+			sendUpdate(value, symbol, remarks);
 		}
 		
 		public function applySymbol(symbol:FieldSymbol):void {
 			var value:String = textToRequestValue();
-			var remarks:String = remarks;
-			sendUpdateRequest(value, symbol, remarks);
+			var remarks:String = remarks; //preserve old remarks
+			sendUpdate(value, symbol, remarks);
 		}
 		
 		public function applySymbolAndRemarks(symbol:FieldSymbol, remarks:String):void {
-			sendUpdateRequest(null, symbol, remarks);
+			var value:String = textToRequestValue();
+			sendUpdate(value, symbol, remarks);
 		}
 		
-		protected function sendUpdateRequest(value:String, symbol:FieldSymbol = null, remarks:String = null):void {
-			var req:UpdateRequest = new UpdateRequest();
-			var def:AttributeDefinitionProxy = _view.attributeDefinition;
-			req.parentEntityId = _view.parentEntity.id;
-			req.nodeName = def.name;
-			req.fieldIndex = _view.fieldIndex;
-			req.symbol = symbol;
-			req.remarks = remarks;
-			req.value = value;
-			if(_view.attribute != null) {
-				var a:AttributeProxy = _view.attribute;
-				req.nodeId = a.id;
-				req.method = UpdateRequest$Method.UPDATE;
-			} else {
-				req.method = UpdateRequest$Method.ADD;
-			}
+		protected function sendUpdate(value:String, symbol:FieldSymbol = null, remarks:String = null):void {
+			var nodeId:Number = _view.attribute != null ? _view.attribute.id: NaN;
+			var o:UpdateRequestOperation = getUpdateRequestOperation(UpdateRequestOperation$Method.UPDATE, nodeId, value, symbol, remarks);
+			var req:UpdateRequest = new UpdateRequest(o);
 			dataClient.updateActiveRecord(_updateResponder, req);
+		}
+		
+		protected function getUpdateRequestOperation(method:UpdateRequestOperation$Method, nodeId:Number, 
+								 value:String = null, symbol:FieldSymbol = null, remarks:String = null):UpdateRequestOperation {
+			var o:UpdateRequestOperation = new UpdateRequestOperation();
+			var def:AttributeDefinitionProxy = _view.attributeDefinition;
+			o.method = method;
+			o.parentEntityId = _view.parentEntity.id;
+			o.nodeName = def.name;
+			o.nodeId = nodeId;
+			o.fieldIndex = _view.fieldIndex;
+			o.value = value;
+			o.symbol = symbol;
+			o.remarks = remarks;
+			return o;
 		}
 		
 		public function undoLastChange():void {

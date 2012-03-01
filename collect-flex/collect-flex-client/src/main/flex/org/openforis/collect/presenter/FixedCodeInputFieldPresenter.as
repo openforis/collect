@@ -1,33 +1,18 @@
 package org.openforis.collect.presenter {
-	import flash.display.DisplayObject;
 	import flash.events.Event;
-	import flash.events.MouseEvent;
 	
-	import mx.binding.utils.ChangeWatcher;
 	import mx.collections.IList;
-	import mx.core.FlexGlobals;
-	import mx.events.CloseEvent;
-	import mx.managers.PopUpManager;
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.IResponder;
 	import mx.rpc.events.ResultEvent;
 	
 	import org.openforis.collect.client.ClientFactory;
-	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
-	import org.openforis.collect.metamodel.proxy.CodeAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.CodeListItemProxy;
 	import org.openforis.collect.model.proxy.AttributeProxy;
-	import org.openforis.collect.model.proxy.CodeProxy;
-	import org.openforis.collect.remoting.service.UpdateRequest;
-	import org.openforis.collect.remoting.service.UpdateRequest$Method;
-	import org.openforis.collect.ui.component.input.CodeInputField;
 	import org.openforis.collect.ui.component.input.FixedCodeInputField;
-	import org.openforis.collect.ui.component.input.TextInput;
 	import org.openforis.collect.util.ArrayUtil;
 	import org.openforis.collect.util.CollectionUtil;
 	import org.openforis.collect.util.StringUtil;
-	
-	import spark.components.Label;
 	
 	/**
 	 * 

@@ -6,10 +6,8 @@ package org.openforis.collect.presenter
 	import mx.collections.IList;
 	
 	import org.openforis.collect.model.proxy.EntityProxy;
-	import org.openforis.collect.model.proxy.NodeStateProxy;
 	import org.openforis.collect.ui.UIBuilder;
 	import org.openforis.collect.ui.component.detail.EntityFormItem;
-	import org.openforis.collect.ui.component.detail.ValidationDisplayManager;
 	
 	/**
 	 * 
@@ -18,11 +16,7 @@ package org.openforis.collect.presenter
 	 */
 	public class EntityFormItemPresenter extends FormItemPresenter {
 		
-		private var _validationDisplayManager:ValidationDisplayManager;
-		
 		public function EntityFormItemPresenter(view:EntityFormItem) {
-			var state:NodeStateProxy = view.entity != null ? view.entity.state: null;
-			_validationDisplayManager = new ValidationDisplayManager(view, view, state);
 			super(view);
 			initNodeDefinitions();
 		}
@@ -63,8 +57,6 @@ package org.openforis.collect.presenter
 				entity = view.parentEntity.getChild(view.entityDefinition.name, 0) as EntityProxy;
 			}
 			view.entity = entity;
-			var state:NodeStateProxy = entity != null ? entity.state: null;
-			_validationDisplayManager.state = state;
 		}
 		
 	}

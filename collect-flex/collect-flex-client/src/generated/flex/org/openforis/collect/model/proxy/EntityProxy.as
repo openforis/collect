@@ -111,9 +111,9 @@ package org.openforis.collect.model.proxy {
 		
 		public function addChild(node:NodeProxy):void {
 			var name:String = node.name;
-			var children:IList = childrenByName.get(name);
+			var children:ArrayCollection = childrenByName.get(name);
 			if(children == null) {
-				children = new ArrayList();
+				children = new ArrayCollection();
 				childrenByName.put(name, children);
 			}
 			children.addItem(node);

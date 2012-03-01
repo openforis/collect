@@ -118,4 +118,27 @@ public class RecordProxy implements Proxy {
 		return record.getEntityCounts();
 	}
 
+	@ExternalizedProperty
+	public boolean isEntryComplete() {
+		if(record.getStep() != null) {
+			switch(record.getStep()) {
+				case CLEANSING:
+				case ANALYSIS:
+					return true;
+			}
+		}
+		return false;
+	}
+	
+	@ExternalizedProperty
+	public boolean isCleansingComplete() {
+		if(record.getStep() != null) {
+			switch(record.getStep()) {
+				case ANALYSIS:
+					return true;
+			}
+		}
+		return false;
+	}
+
 }

@@ -4,7 +4,6 @@
 package org.openforis.collect.remoting.service;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,14 +19,13 @@ import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.FieldSymbol;
 import org.openforis.collect.model.User;
 import org.openforis.collect.model.proxy.NodeProxy;
-import org.openforis.collect.model.proxy.NodeStateProxy;
 import org.openforis.collect.model.proxy.RecordProxy;
 import org.openforis.collect.persistence.AccessDeniedException;
 import org.openforis.collect.persistence.InvalidIdException;
 import org.openforis.collect.persistence.MultipleEditException;
 import org.openforis.collect.persistence.NonexistentIdException;
 import org.openforis.collect.persistence.RecordLockedException;
-import org.openforis.collect.remoting.service.UpdateRequest.Method;
+import org.openforis.collect.remoting.service.UpdateRequestOperation.Method;
 import org.openforis.collect.session.SessionState;
 import org.openforis.collect.session.SessionState.RecordState;
 import org.openforis.idm.metamodel.AttributeDefinition;
@@ -57,7 +55,6 @@ import org.openforis.idm.model.RealRange;
 import org.openforis.idm.model.Record;
 import org.openforis.idm.model.expression.ExpressionFactory;
 import org.openforis.idm.model.expression.ModelPathExpression;
-import org.openforis.idm.model.state.NodeState;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -163,57 +160,60 @@ public class DataService {
 		sessionManager.clearActiveRecord();
 	}
 
-	@SuppressWarnings("unchecked")
 	public UpdateResponse updateActiveRecord(UpdateRequest request) {
-		List<Node<?>> addedNodes = null;
-		List<?> deletedNodes = null;
-		List<NodeState> nodeStates = null; 
+		List<Node<?>> addedNodes = new ArrayList<Node<?>>();;
+		List<Node<?>> updatedNodes = new ArrayList<Node<?>>();;
+		List<Integer> deletedNodeIds = new ArrayList<Integer>();
+		List<UpdateRequestOperation> operations = request.getOperations();
+		for (UpdateRequestOperation operation : operations) {
+			processOperation(operation, addedNodes, updatedNodes, deletedNodeIds);
+		}
+		//convert nodes to proxies
+		UpdateResponse response = new UpdateResponse();
+		response.setAddedNodes(NodeProxy.fromList((List<Node<?>>) addedNodes));
+		response.setUpdatedNodes(NodeProxy.fromList((List<Node<?>>) updatedNodes));
+		response.setDeletedNodeIds(deletedNodeIds.toArray(new Integer[0]));
+		return response;
+	}
+		
+	
+	@SuppressWarnings("unchecked")
+	private void processOperation(UpdateRequestOperation operation, List<Node<?>> addedNodes, List<Node<?>> updatedNodes, List<Integer> deletedNodeIds) {
 		SessionState sessionState = sessionManager.getSessionState();
 		CollectRecord record = sessionState.getActiveRecord();
 		ModelVersion version = record.getVersion();
-		Integer parentEntityId = request.getParentEntityId();
+		Integer parentEntityId = operation.getParentEntityId();
 		Entity parentEntity = (Entity) record.getNodeByInternalId(parentEntityId);
-		Integer nodeId = request.getNodeId();
-		Integer fieldIndex = request.getFieldIndex();
-		String nodeName = request.getNodeName();
+		Integer nodeId = operation.getNodeId();
+		Integer fieldIndex = operation.getFieldIndex();
+		String nodeName = operation.getNodeName();
 		
 		Node<?> node = null;
 		if(nodeId != null) {
 			node = record.getNodeByInternalId(nodeId);
 		}
 		NodeDefinition nodeDef = ((EntityDefinition) parentEntity.getDefinition()).getChildDefinition(nodeName);
-		String requestValue = request.getValue();
-		String remarks = request.getRemarks();
+		String requestValue = operation.getValue();
+		String remarks = operation.getRemarks();
 		
-		FieldSymbol symbol = request.getSymbol();
-		Method method = request.getMethod();
+		FieldSymbol symbol = operation.getSymbol();
+		Method method = operation.getMethod();
 		switch (method) {
 			case ADD:
 				Node<?> addedNode = addNode(version, parentEntity, nodeDef, requestValue, symbol, remarks);
 				//nodeStates = record.updateNodeState(addedNode);
-				addedNodes = new ArrayList<Node<?>>();
 				addedNodes.add(addedNode);
 				break;
 			case UPDATE:
 				updateAttribute(record, parentEntity, (Attribute<AttributeDefinition, ?>) node, fieldIndex, requestValue, symbol, remarks);
 				//nodeStates = record.updateNodeState(node);
+				updatedNodes.add(node);
 				break;
 			case DELETE: 
 				Node<?> deletedNode = recordManager.deleteNode(parentEntity, node);
-				deletedNodes = Arrays.asList(deletedNode);
+				deletedNodeIds.add(deletedNode.getInternalId());
 				break;
 		}
-		
-		//convert nodes to proxies
-		List<NodeStateProxy> nodeStateProxies = NodeStateProxy.fromList(nodeStates);
-		UpdateResponse response = new UpdateResponse(nodeStateProxies);
-		if(addedNodes != null) {
-			response.setAddedNodes(NodeProxy.fromList((List<Node<?>>) addedNodes));
-		}
-		if(deletedNodes != null) {
-			response.setDeletedNodes(NodeProxy.fromList((List<Node<?>>) deletedNodes));
-		}
-		return response;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -247,30 +247,29 @@ public class DataService {
 			Integer fieldIndex, String requestValue, FieldSymbol symbol, String remarks) {
 		ModelVersion version = record.getVersion();
 		AttributeDefinition defn = attribute.getDefinition();
+		@SuppressWarnings("rawtypes")
+		Field field;
 		if(fieldIndex >= 0) {
 			Object fieldValue = null;
 			if(StringUtils.isNotBlank(requestValue)) {
 				fieldValue = parseFieldValue(parentEntity, defn, requestValue, fieldIndex);
 			}
-			@SuppressWarnings("rawtypes")
-			Field field = attribute.getField(fieldIndex);
+			field = attribute.getField(fieldIndex);
 			field.setValue(fieldValue);
-			field.setRemarks(remarks);
-			field.setSymbol(null);
 		} else {
 			Object value = null;
 			if((symbol == null || ! symbol.isReasonBlank()) && StringUtils.isNotBlank(requestValue)) {
 				value = parseValue(parentEntity, defn, requestValue, version);
 			}
 			((Attribute<AttributeDefinition, Object>) attribute).setValue(value);
-			Field<?> firstField = attribute.getField(0);
-			firstField.setRemarks(remarks);
-			Character symbolChar = null;
-			if(symbol != null) {
-				symbolChar = symbol.getCode();
-			}
-			firstField.setSymbol(symbolChar);
+			field = attribute.getField(0);
 		}
+		field.setRemarks(remarks);
+		Character symbolChar = null;
+		if(symbol != null) {
+			symbolChar = symbol.getCode();
+		}
+		field.setSymbol(symbolChar);
 	}
 	
 	private Object parseFieldValue(Entity parentEntity, AttributeDefinition def, String value, Integer fieldIndex) {

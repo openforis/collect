@@ -1,11 +1,8 @@
 package org.openforis.collect.presenter
 {
-	import flash.events.Event;
 	import flash.events.FocusEvent;
 	import flash.events.MouseEvent;
 	
-	import mx.binding.utils.ChangeWatcher;
-	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.events.ResultEvent;
@@ -13,10 +10,9 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.Application;
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.event.ApplicationEvent;
-	import org.openforis.collect.model.proxy.AttributeProxy;
-	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.remoting.service.UpdateRequest;
-	import org.openforis.collect.remoting.service.UpdateRequest$Method;
+	import org.openforis.collect.remoting.service.UpdateRequestOperation;
+	import org.openforis.collect.remoting.service.UpdateRequestOperation$Method;
 	import org.openforis.collect.remoting.service.UpdateResponse;
 	import org.openforis.collect.ui.component.detail.MultipleAttributeFormItem;
 	import org.openforis.collect.util.AlertUtil;
@@ -72,10 +68,11 @@ package org.openforis.collect.presenter
 			var attributes:IList = getAttributes();
 			var maxCount:Number = view.attributeDefinition.maxCount
 			if(isNaN(maxCount) || CollectionUtil.isEmpty(attributes) || attributes.length < maxCount) {
-				var req:UpdateRequest = new UpdateRequest();
-				req.method = UpdateRequest$Method.ADD;
-				req.parentEntityId = view.parentEntity.id;
-				req.nodeName = view.attributeDefinition.name;
+				var o:UpdateRequestOperation = new UpdateRequestOperation();
+				o.method = UpdateRequestOperation$Method.ADD;
+				o.parentEntityId = view.parentEntity.id;
+				o.nodeName = view.attributeDefinition.name;
+				var req:UpdateRequest = new UpdateRequest(o);
 				ClientFactory.dataClient.updateActiveRecord(new AsyncResponder(addResultHandler, faultHandler, null), req);
 			} else {
 				var labelText:String = view.attributeDefinition.getLabelText();

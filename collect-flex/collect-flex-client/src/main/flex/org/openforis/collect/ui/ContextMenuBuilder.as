@@ -1,6 +1,5 @@
 package org.openforis.collect.ui
 {
-	import flash.display.DisplayObjectContainer;
 	import flash.display.InteractiveObject;
 	import flash.events.ContextMenuEvent;
 	import flash.ui.ContextMenu;
@@ -8,8 +7,6 @@ package org.openforis.collect.ui
 	
 	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
-	import mx.controls.Alert;
-	import mx.messaging.management.Attribute;
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.events.ResultEvent;
 	
@@ -26,17 +23,15 @@ package org.openforis.collect.ui
 	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.model.proxy.FieldProxy;
 	import org.openforis.collect.model.proxy.NodeProxy;
-	import org.openforis.collect.model.proxy.NodeStateProxy;
 	import org.openforis.collect.model.proxy.RecordProxy$Step;
 	import org.openforis.collect.presenter.RemarksPopUpPresenter;
 	import org.openforis.collect.remoting.service.UpdateRequest;
-	import org.openforis.collect.remoting.service.UpdateRequest$Method;
+	import org.openforis.collect.remoting.service.UpdateRequestOperation;
+	import org.openforis.collect.remoting.service.UpdateRequestOperation$Method;
 	import org.openforis.collect.remoting.service.UpdateResponse;
-	import org.openforis.collect.ui.component.detail.CollectFormItem;
-	import org.openforis.collect.ui.component.detail.EntityDataGroupItemRenderer;
 	import org.openforis.collect.ui.component.input.InputField;
-	import org.openforis.collect.ui.component.input.RemarksPopUp;
 	import org.openforis.collect.util.AlertUtil;
+	import org.openforis.collect.util.CollectionUtil;
 
 	public class ContextMenuBuilder {
 		
@@ -142,10 +137,12 @@ package org.openforis.collect.ui
 		private static function addApproveValueItems(currentItems:Array, step:RecordProxy$Step, inputField:InputField):void {
 			var attribute:AttributeProxy = inputField.attribute;
 			if(attribute != null) {
+				/*
 				var state:NodeStateProxy = attribute.state;
 				if(step == RecordProxy$Step.ENTRY && state != null && state.hasErrors()) {
 					currentItems.push(APPROVE_ERROR_MENU_ITEM);
 				}
+				*/
 			}
 		}
 		
@@ -189,14 +186,14 @@ package org.openforis.collect.ui
 		
 		protected static function performDeleteAttribute():void {
 			var def:AttributeDefinitionProxy = currentInputField.attributeDefinition;
-			var req:UpdateRequest = new UpdateRequest();
-			req.parentEntityId = currentInputField.parentEntity.id;
-			req.nodeName = def.name;
+			var o:UpdateRequestOperation = new UpdateRequestOperation();
+			o.parentEntityId = currentInputField.parentEntity.id;
+			o.nodeName = def.name;
 			if(currentInputField.attribute != null) {
-				req.nodeId = currentInputField.attribute.id;
+				o.nodeId = currentInputField.attribute.id;
 			}
-			req.method = UpdateRequest$Method.DELETE;
-			
+			o.method = UpdateRequestOperation$Method.DELETE;
+			var req:UpdateRequest = new UpdateRequest(o);
 			var responder:AsyncResponder = new AsyncResponder(updateFieldResultHandler, null);
 			ClientFactory.dataClient.updateActiveRecord(responder, req);
 		}
@@ -204,11 +201,13 @@ package org.openforis.collect.ui
 		protected static function performDeleteEntity():void {
 			var entity:EntityProxy = currentInputField.parentEntity;
 			var req:UpdateRequest = new UpdateRequest();
-			req.nodeName = entity.name;
-			req.nodeId = entity.id;
-			req.parentEntityId = entity.parentId;
-			req.method = UpdateRequest$Method.DELETE;
-			
+			req.operations = new ArrayCollection();
+			var o:UpdateRequestOperation = new UpdateRequestOperation();
+			o.method = UpdateRequestOperation$Method.DELETE;
+			o.parentEntityId = entity.parentId;
+			o.nodeName = entity.name;
+			o.nodeId = entity.id;
+			req.operations.addItem(o);
 			var responder:AsyncResponder = new AsyncResponder(updateFieldResultHandler, null);
 			ClientFactory.dataClient.updateActiveRecord(responder, req);
 		}
@@ -226,26 +225,31 @@ package org.openforis.collect.ui
 		*/
 		public static function setReasonBlankInChildren(entity:EntityProxy, symbol:FieldSymbol):void {
 			var children:IList = entity.getChildren();
+			var req:UpdateRequest = new UpdateRequest();
+			req.operations = new ArrayCollection();
 			for each (var child:NodeProxy in children) {
 				if(child is AttributeProxy) {
 					var a:AttributeProxy = AttributeProxy(child);
 					for(var index:int = 0; index < a.fields.length; index ++) {
 						var field:FieldProxy = a.fields[index];
 						if(field.value == null && field.symbol == null) {
-							var req:UpdateRequest = new UpdateRequest();
-							req.parentEntityId = entity.id;
-							req.nodeName = child.name;
-							req.nodeId = child.id;
-							req.fieldIndex = index;
-							req.remarks = field.remarks;
-							req.value = field.value != null ? field.value.toString(): null;
-							req.symbol = symbol;
-							req.method = UpdateRequest$Method.UPDATE;
-							var responder:AsyncResponder = new AsyncResponder(updateFieldResultHandler, null);
-							ClientFactory.dataClient.updateActiveRecord(responder, req);
+							var o:UpdateRequestOperation = new UpdateRequestOperation();
+							o.method = UpdateRequestOperation$Method.UPDATE;
+							o.parentEntityId = entity.id;
+							o.nodeName = child.name;
+							o.nodeId = child.id;
+							o.fieldIndex = index;
+							o.remarks = field.remarks;
+							o.value = field.value != null ? field.value.toString(): null;
+							o.symbol = symbol;
+							req.operations.addItem(o);
 						}
 					}
 				}
+			}
+			if(CollectionUtil.isNotEmpty(req.operations)) {
+				var responder:AsyncResponder = new AsyncResponder(updateFieldResultHandler, null);
+				ClientFactory.dataClient.updateActiveRecord(responder, req);
 			}
 		}
 		
