@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * 
  * @author G. Miceli
  */
+@Deprecated
 public class CollectRecordContext implements SurveyContext {
 
 	@Autowired

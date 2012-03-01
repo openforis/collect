@@ -27,7 +27,6 @@ import org.openforis.idm.metamodel.CodeListItem;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.NodeDefinition;
-import org.openforis.idm.metamodel.SurveyContext;
 import org.openforis.idm.model.Code;
 import org.openforis.idm.model.CodeAttribute;
 import org.openforis.idm.model.Entity;
@@ -50,8 +49,8 @@ public class RecordManager {
 	@Autowired
 	private RecordDAO recordDAO;
 	
-	@Autowired 
-	private SurveyContext recordContext;
+//	@Autowired 
+//	private SurveyContext recordContext;
 	
 	protected void init() {
 		unlockAll();
@@ -83,19 +82,19 @@ public class RecordManager {
 	 */
 	@Transactional
 	public CollectRecord checkout(CollectSurvey survey, User user, int recordId) throws RecordLockedException, NonexistentIdException, AccessDeniedException, MultipleEditException {
-		CollectRecord record = recordDAO.load(survey, recordContext, recordId);
+		CollectRecord record = recordDAO.load(survey, recordId);
 		recordDAO.lock(recordId, user);
 		return record;
 	}
 
 	@Transactional
 	public List<CollectRecord> getSummaries(CollectSurvey survey, String rootEntity, String... keys) {
-		return recordDAO.loadSummaries(survey, recordContext, rootEntity, keys);
+		return recordDAO.loadSummaries(survey, rootEntity, keys);
 	}
 	
 	@Transactional
 	public List<CollectRecord> getSummaries(CollectSurvey survey, String rootEntity, int offset, int maxNumberOfRecords, String orderByFieldName, String filter) {
-		List<CollectRecord> recordsSummary = recordDAO.loadSummaries(survey, recordContext, rootEntity, offset, maxNumberOfRecords, orderByFieldName, filter);
+		List<CollectRecord> recordsSummary = recordDAO.loadSummaries(survey, rootEntity, offset, maxNumberOfRecords, orderByFieldName, filter);
 		return recordsSummary;
 	}
 
@@ -109,7 +108,7 @@ public class RecordManager {
 	public CollectRecord create(CollectSurvey survey, EntityDefinition rootEntityDefinition, User user, String modelVersionName) throws MultipleEditException, AccessDeniedException, RecordLockedException {
 		recordDAO.checkLock(user);
 		
-		CollectRecord record = new CollectRecord(recordContext, survey, modelVersionName);
+		CollectRecord record = new CollectRecord(survey, modelVersionName);
 		record.createRootEntity(rootEntityDefinition.getName());
 		
 		record.setCreationDate(new Date());
@@ -143,7 +142,7 @@ public class RecordManager {
 
 	@Transactional
 	public int promote(CollectSurvey survey, int recordId, User user) throws InvalidIdException, MultipleEditException, NonexistentIdException, AccessDeniedException, RecordLockedException {
-		CollectRecord record = recordDAO.load(survey, recordContext, recordId);
+		CollectRecord record = recordDAO.load(survey, recordId);
 		Step nextStep;
 		switch(record.getStep()) {
 			case ENTRY:
@@ -343,14 +342,6 @@ public class RecordManager {
 			keys.add(textValue);
 		}
 		record.setKeys(keys);
-	}
-
-	public SurveyContext getRecordContext() {
-		return recordContext;
-	}
-
-	public void setRecordContext(SurveyContext recordContext) {
-		this.recordContext = recordContext;
 	}
 
 }
