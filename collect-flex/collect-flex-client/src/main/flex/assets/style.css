@@ -72,18 +72,22 @@ detail|AttributeItemRenderer {
 	borderWeight: 1;
 }
 
-detail|AttributeItemRenderer.error {
+detail|MultipleEntityFormItem.error s|BorderContainer {
+	borderWeight: 1;
+}
+
+detail|AttributeItemRenderer.error, detail|MultipleEntityFormItem.error s|BorderContainer {
 	borderColor: #FF0000;
 }
 
-detail|AttributeItemRenderer.warning {
+detail|AttributeItemRenderer.warning, detail|MultipleEntityFormItem.error s|BorderContainer {
 	borderColor: #FF8800;
 }
-/*
+
 input|TextInput.notRelevant, detail|AttributeItemRenderer.notRelevant input|TextInput {
-	backgroundColor: #CCCCCC;
+	contentBackgroundColor: #DDDDDD;
 }
-*/
+
 input|TextInput {
 	borderSkin: ClassReference("org.openforis.collect.ui.skin.TextInputBorderSkin");
 }
