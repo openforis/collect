@@ -27,13 +27,13 @@ import org.openforis.idm.metamodel.CodeListItem;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.NodeDefinition;
+import org.openforis.idm.metamodel.SurveyContext;
 import org.openforis.idm.model.Code;
 import org.openforis.idm.model.CodeAttribute;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.NumberAttribute;
 import org.openforis.idm.model.Record;
-import org.openforis.idm.model.RecordContext;
 import org.openforis.idm.model.TextAttribute;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,7 +51,7 @@ public class RecordManager {
 	private RecordDAO recordDAO;
 	
 	@Autowired 
-	private RecordContext recordContext;
+	private SurveyContext recordContext;
 	
 	protected void init() {
 		unlockAll();
@@ -322,7 +322,7 @@ public class RecordManager {
 		List<AttributeDefinition> keyDefns = rootEntityDefn.getKeyAttributeDefinitions();
 		//set keys
 		List<String> keys = new ArrayList<String>();
-		for (AttributeDefinition def: keyDefns) {
+		for (NodeDefinition def: keyDefns) {
 			String name = def.getName();
 			Object value = null;
 			String textValue = null;
@@ -345,11 +345,11 @@ public class RecordManager {
 		record.setKeys(keys);
 	}
 
-	public RecordContext getRecordContext() {
+	public SurveyContext getRecordContext() {
 		return recordContext;
 	}
 
-	public void setRecordContext(RecordContext recordContext) {
+	public void setRecordContext(SurveyContext recordContext) {
 		this.recordContext = recordContext;
 	}
 

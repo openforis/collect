@@ -21,6 +21,7 @@ import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.persistence.xml.CollectIdmlBindingContext;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.Survey;
+import org.openforis.idm.metamodel.SurveyContext;
 import org.openforis.idm.metamodel.xml.InvalidIdmlException;
 import org.openforis.idm.metamodel.xml.SurveyUnmarshaller;
 import org.openforis.idm.model.Code;
@@ -28,7 +29,6 @@ import org.openforis.idm.model.Coordinate;
 import org.openforis.idm.model.Date;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.RealAttribute;
-import org.openforis.idm.model.RecordContext;
 import org.openforis.idm.model.Time;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -50,7 +50,7 @@ public class ModelDAOIntegrationTest {
 	protected RecordDAO recordDao;
 	
 	@Autowired
-	protected RecordContext recordContext;
+	protected SurveyContext recordContext;
 	
 	@Test
 	public void testCRUD() throws Exception  {

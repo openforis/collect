@@ -35,7 +35,6 @@ public class SurveyManager {
 	private Map<Integer, CollectSurvey> surveysById;
 	private List<CollectSurvey> surveys;
 
-
 	public SurveyManager() {
 		surveysById = new HashMap<Integer, CollectSurvey>();
 		surveysByName = new HashMap<String, CollectSurvey>();
@@ -97,9 +96,9 @@ public class SurveyManager {
 	private void initSurvey(CollectSurvey survey) {
 		surveysById.put(survey.getId(), survey);
 		surveysByName.put(survey.getName(), survey);
-		
+
 		ModelDependencies modelDependencies = new ModelDependencies(expressionFactory);
-		survey.setModelDependencies(modelDependencies );
+		survey.setModelDependencies(modelDependencies);
 	}
 
 }

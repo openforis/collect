@@ -10,11 +10,11 @@ import java.util.Set;
 
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
+import org.openforis.idm.metamodel.SurveyContext;
 import org.openforis.idm.metamodel.validation.Validator;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.Record;
-import org.openforis.idm.model.RecordContext;
 import org.openforis.idm.model.state.ModelDependencies;
 import org.openforis.idm.model.state.NodeState;
 
@@ -67,7 +67,7 @@ public class CollectRecord extends Record {
 	private Map<Integer, NodeState> nodeStateMap;
 	private CollectSurvey collectSurvey;
 
-	public CollectRecord(RecordContext context, CollectSurvey survey, String versionName) {
+	public CollectRecord(SurveyContext context, CollectSurvey survey, String versionName) {
 		super(context, survey, versionName);
 		this.collectSurvey = survey;
 		this.step = Step.ENTRY;
@@ -272,6 +272,10 @@ public class CollectRecord extends Record {
 
 		return nodeStates;
 	}
+	
+	private void deleteNodeState() {
+		
+	}
 
 //	private void refreshDependentNodesState(Node<?> node, Set<Integer> updatedNodeIds, List<NodeState> nodeStates) {
 //		ModelDependencies dependencies = collectSurvey.getModelDependencies();
@@ -306,7 +310,7 @@ public class CollectRecord extends Record {
 	}
 
 	private Validator getValidator() {
-		RecordContext context = getContext();
+		SurveyContext context = getSurveyContext();
 		Validator validator = context.getValidator();
 		return validator;
 	}

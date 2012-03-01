@@ -46,7 +46,7 @@ public class CollectValidationResults extends ValidationResults {
 		return failed;
 	}
 
-	void addFailed(ValidationResult result, Flag flag) {
+	void addFailure(ValidationResult result, Flag flag) {
 		switch (flag) {
 			case ERROR:
 				errors.add(result);
@@ -58,14 +58,14 @@ public class CollectValidationResults extends ValidationResults {
 	}
 
 	void addErrors(List<ValidationResult> errors){
-		errors.addAll(errors);
+		this.errors.addAll(errors);
 	}
 	
 	void addWarnings(List<ValidationResult> warnings){
-		warnings.addAll(warnings);
+		this.warnings.addAll(warnings);
 	}
 	
 	void addPassed(List<ValidationResult> list) {
-		passed.addAll(list);
+		this.passed.addAll(list);
 	}
 }

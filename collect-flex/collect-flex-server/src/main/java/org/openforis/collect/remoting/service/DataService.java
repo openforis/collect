@@ -179,7 +179,7 @@ public class DataService {
 		String remarks = request.getRemarks();
 		Object value = null;
 		if(requestValue != null && nodeDef instanceof AttributeDefinition) {
-			value = parseFieldValue(parentEntity, (AttributeDefinition) nodeDef, requestValue, fieldIndex);
+			value = parseFieldValue(parentEntity, (NodeDefinition) nodeDef, requestValue, fieldIndex);
 		}
 		FieldSymbol symbol = request.getSymbol();
 		Method method = request.getMethod();
@@ -223,26 +223,26 @@ public class DataService {
 	private List<Node<?>> updateSymbol(Node<?> node, Integer fieldIndex, String remarks, FieldSymbol symbol, ModelVersion version) {
 		List<Node<?>> updatedNodes = new ArrayList<Node<?>>();
 		Character symbolChar = null;
-		if(symbol != null) {
+		if (symbol != null) {
 			symbolChar = symbol.getCode();
 		}
 		NodeDefinition nodeDefn = node.getDefinition();
-		if(nodeDefn instanceof AttributeDefinition) {
+		if (nodeDefn instanceof AttributeDefinition) {
 			Attribute<?, ?> a = (Attribute<?, ?>) node;
 			Field<?> field = a.getField(fieldIndex);
 			field.setSymbol(symbolChar);
 			field.setRemarks(remarks);
-			if(symbol != null && symbol.isReasonBlank()) {
+			if (symbol != null && symbol.isReasonBlank()) {
 				field.setValue(null);
 			}
 			updatedNodes.add(a);
-		} else if(node instanceof Entity) {
-			//update only the symbol in entity's attributes
+		} else if (node instanceof Entity) {
+			// update only the symbol in entity's attributes
 			Entity entity = (Entity) node;
 			recordManager.addEmptyNodes(entity, version);
 			List<NodeDefinition> childDefinitions = ((EntityDefinition) nodeDefn).getChildDefinitions();
 			for (NodeDefinition def : childDefinitions) {
-				if(def instanceof AttributeDefinition) {
+				if (def instanceof AttributeDefinition) {
 					String name = def.getName();
 					Attribute<?, ?> a = (Attribute<?, ?>) entity.get(name, 0);
 					setSymbolInAllFields(a, symbol);
@@ -254,12 +254,11 @@ public class DataService {
 	}
 
 	@SuppressWarnings("unchecked")
-	private List<Node<?>> updateNode(Entity parentEntity, Node<?> node, Integer fieldIndex, 
-			Object value, FieldSymbol symbol,	String remarks) {
-		if(node instanceof Attribute) {
+	private List<Node<?>> updateNode(Entity parentEntity, Node<?> node, Integer fieldIndex, Object value, FieldSymbol symbol, String remarks) {
+		if (node instanceof Attribute) {
 			List<Node<?>> updatedNodes = new ArrayList<Node<?>>();
 			Attribute<?, Object> attribute = (Attribute<?, Object>) node;
-			if(fieldIndex != null) {
+			if (fieldIndex != null) {
 				@SuppressWarnings("rawtypes")
 				Field field = attribute.getField(fieldIndex);
 				field.setValue(value);
@@ -279,7 +278,7 @@ public class DataService {
 			FieldSymbol symbol, String remarks) {
 		List<Node<?>> addedNodes = new ArrayList<Node<?>>();
 		if(nodeDef instanceof AttributeDefinition) {
-			AttributeDefinition def = (AttributeDefinition) nodeDef;
+			NodeDefinition def = (NodeDefinition) nodeDef;
 			if(def instanceof CodeAttributeDefinition) {
 				CodeAttributeDefinition codeDef = (CodeAttributeDefinition) def;
 				String codesString = value != null ? value.toString(): null;
@@ -351,7 +350,7 @@ public class DataService {
 		}
 	}
 
-	private Object parseFieldValue(Entity parentEntity, AttributeDefinition def, String value, Integer fieldIndex) {
+	private Object parseFieldValue(Entity parentEntity, NodeDefinition def, String value, Integer fieldIndex) {
 		Object result = null;
 		if(StringUtils.isBlank(value)) {
 			return null;
@@ -584,7 +583,7 @@ public class DataService {
 	private CodeAttribute getCodeParent(Entity context, CodeAttributeDefinition def) {
 		try {
 			String parentExpr = def.getParentExpression();
-			ExpressionFactory expressionFactory = context.getRecord().getContext().getExpressionFactory();
+			ExpressionFactory expressionFactory = context.getRecord().getSurveyContext().getExpressionFactory();
 			ModelPathExpression expression = expressionFactory.createModelPathExpression(parentExpr);
 			Node<?> parentNode = expression.evaluate(context, null);
 			if (parentNode != null && parentNode instanceof CodeAttribute) {
