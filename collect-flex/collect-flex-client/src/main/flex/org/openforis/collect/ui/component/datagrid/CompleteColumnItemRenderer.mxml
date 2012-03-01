@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:GridItemRenderer xmlns:fx="http://ns.adobe.com/mxml/2009" 
+						  xmlns:s="library://ns.adobe.com/flex/spark" 
+						  xmlns:mx="library://ns.adobe.com/flex/mx" 
+						  width="100%">
+	<fx:Script>
+		<![CDATA[
+			import org.openforis.collect.model.proxy.RecordProxy;
+			import org.openforis.collect.ui.Images;
+			
+			override public function set data(value:Object): void {
+				super.data = value;
+				var record:RecordProxy = value as RecordProxy;
+				var complete:Boolean = false;
+				if(record != null) {
+					var dataField:String = super.column.dataField;
+					complete = record[dataField];
+				}
+				image.visible = complete;
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<s:Image id="image" 
+			 horizontalCenter="0" 
+			 verticalCenter="0" 
+			 source="{Images.COMPLETE}" />
+	
+</s:GridItemRenderer>

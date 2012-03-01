@@ -15,9 +15,8 @@ package org.openforis.collect.ui {
 		[Embed("/assets/images/add.png")]
 		public static const ADD:Class;
 		
-		//[Embed("/assets/images/edit.gif")]
 		[Embed("/assets/images/popup.gif")]
-		public static const EDIT:Class;
+		public static const OPEN_POPUP:Class;
 
 		[Embed("/assets/images/magnifier.png")]
 		public static const MAGNIFIER:Class;
@@ -55,7 +54,11 @@ package org.openforis.collect.ui {
 		[Embed("/assets/images/back.png")]
 		public static const BACK:Class;
 		
+		[Embed("/assets/images/complete.png")]
+		public static const COMPLETE:Class;
+		
 		[Embed("/assets/images/footer.jpg")]
 		public static const FOOTER:Class;
+		
 	}
 }
