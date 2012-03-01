@@ -178,17 +178,19 @@ package org.openforis.collect.presenter {
 					o = getUpdateRequestOperation(UpdateRequestOperation$Method.DELETE, a.id);
 					operations.addItem(o);
 				}
-				var parts:Array = text.split(",");
-				if(parts.length == 1 && isShortCutForReasonBlank(text)) {
-					var symbol:FieldSymbol = parseShortCutForReasonBlank(text);
-					o = getUpdateRequestOperation(UpdateRequestOperation$Method.ADD, NaN, null, symbol, remarks);
-					operations.addItem(o);
-				} else {
-					for each (var part:String in parts) {
-						var trimmedPart:String = StringUtil.trim(part);
-						if(StringUtil.isNotBlank(trimmedPart)) {
-							o = getUpdateRequestOperation(UpdateRequestOperation$Method.ADD, NaN, trimmedPart, null, remarks);
-							operations.addItem(o);
+				if(text != null) {
+					var parts:Array = text.split(",");
+					if(parts.length == 1 && isShortCutForReasonBlank(text)) {
+						var symbol:FieldSymbol = parseShortCutForReasonBlank(text);
+						o = getUpdateRequestOperation(UpdateRequestOperation$Method.ADD, NaN, null, symbol, remarks);
+						operations.addItem(o);
+					} else {
+						for each (var part:String in parts) {
+							var trimmedPart:String = StringUtil.trim(part);
+							if(StringUtil.isNotBlank(trimmedPart)) {
+								o = getUpdateRequestOperation(UpdateRequestOperation$Method.ADD, NaN, trimmedPart, null, remarks);
+								operations.addItem(o);
+							}
 						}
 					}
 				}

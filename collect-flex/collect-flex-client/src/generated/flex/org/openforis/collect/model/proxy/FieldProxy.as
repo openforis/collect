@@ -6,9 +6,26 @@
  */
 
 package org.openforis.collect.model.proxy {
+	import org.openforis.collect.model.FieldSymbol;
+	import org.openforis.collect.util.ArrayUtil;
 
+	
+	/**
+	 * @author S. Ricci
+	 */
     [Bindable]
     [RemoteClass(alias="org.openforis.collect.model.proxy.FieldProxy")]
     public class FieldProxy extends FieldProxyBase {
+		
+		public function hasReasonBlankSpecified():Boolean {
+			var reasonBlankSymbols:Array = [
+				FieldSymbol.BLANK_ON_FORM, 
+				FieldSymbol.DASH_ON_FORM, 
+				FieldSymbol.ILLEGIBLE];
+			
+			var result:Boolean = ArrayUtil.isIn(reasonBlankSymbols, symbol);
+			return result;
+		}
+		
     }
 }

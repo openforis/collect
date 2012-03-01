@@ -5,14 +5,18 @@ package org.openforis.collect.presenter {
 	import flash.geom.Point;
 	import flash.ui.Keyboard;
 	
+	import mx.collections.IList;
 	import mx.events.FlexEvent;
 	import mx.events.FlexMouseEvent;
 	import mx.managers.PopUpManager;
 	
 	import org.openforis.collect.model.FieldSymbol;
+	import org.openforis.collect.model.proxy.AttributeProxy;
 	import org.openforis.collect.model.proxy.FieldProxy;
 	import org.openforis.collect.ui.component.input.InputField;
 	import org.openforis.collect.ui.component.input.RemarksPopUp;
+	import org.openforis.collect.util.CollectionUtil;
+	import org.openforis.collect.util.ObjectUtil;
 	import org.openforis.collect.util.PopUpUtil;
 	import org.openforis.collect.util.StringUtil;
 	
@@ -94,8 +98,13 @@ package org.openforis.collect.presenter {
 			if(firstOpen) {
 				view = new RemarksPopUp();
 			}
-			_showReasonBlank = _inputField != null && (_inputField.canApplyReasonBlank() ||	_inputField.hasBlankReasonSpecified());
 			_inputField = inputField;
+			_showReasonBlank = false;
+			if(_inputField != null) {
+				var canApplyReasonBlank:Boolean = _inputField.canApplyReasonBlank();
+				var hasReasonBlankSpecified:Boolean = _inputField.hasReasonBlankSpecified()
+				_showReasonBlank = canApplyReasonBlank || hasReasonBlankSpecified;
+			}
 
 			if(! popUpOpened) {
 				PopUpManager.addPopUp(view, inputField);
@@ -123,12 +132,10 @@ package org.openforis.collect.presenter {
 		protected function setValuesInView():void {
 			var remarks:String = null;
 			var symbolToSelect:FieldSymbol = null;
-			if(_inputField != null && _inputField.attribute != null) {
-				var fieldIndex:int = 0;
-				if(_inputField.fieldIndex > 0) {
-					fieldIndex = _inputField.fieldIndex;
-				}
-				var field:FieldProxy = _inputField.attribute.getField(fieldIndex);
+			var attributes:IList = ObjectUtil.getValue(_inputField, "attributes") as IList;
+			if(_inputField != null && (_inputField.attribute != null || CollectionUtil.isNotEmpty(attributes))) {
+				var a:AttributeProxy = _inputField.attribute != null ? _inputField.attribute: attributes.getItemAt(0) as AttributeProxy;
+				var field:FieldProxy = a.getField(_inputField.fieldIndex);
 				remarks = field.remarks;
 				var symbol:FieldSymbol = field.symbol;
 				if(symbol != null) {

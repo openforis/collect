@@ -13,6 +13,9 @@ package org.openforis.collect.model.proxy {
     public class AttributeProxy extends AttributeProxyBase {
 		
 		public function getField(index:int):FieldProxy {
+			if(index < 0) {
+				index = 0;
+			}
 			return fields.getItemAt(index) as FieldProxy;
 		}
 		
