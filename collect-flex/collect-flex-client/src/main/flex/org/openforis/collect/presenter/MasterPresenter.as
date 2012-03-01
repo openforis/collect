@@ -12,7 +12,9 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.event.UIEvent;
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 	import org.openforis.collect.model.proxy.RecordProxy;
+	import org.openforis.collect.model.proxy.RecordProxy$Step;
 	import org.openforis.collect.ui.view.MasterView;
+	import org.openforis.collect.util.AlertUtil;
 
 	public class MasterPresenter extends AbstractPresenter {
 		
@@ -50,9 +52,12 @@ package org.openforis.collect.presenter {
 		 * */
 		internal function recordSelectedHandler(uiEvent:UIEvent):void {
 			var record:RecordProxy = uiEvent.obj as RecordProxy;
-			var id:Number = record.id;
-			//var entityName:String = Application.activeRootEntity.name;
-			_dataClient.loadRecord(new AsyncResponder(loadRecordResultHandler, faultHandler, record), id);
+			if(record.step != RecordProxy$Step.ANALYSIS) {
+				var id:Number = record.id;
+				_dataClient.loadRecord(new AsyncResponder(loadRecordResultHandler, faultHandler, record), id);
+			} else {
+				AlertUtil.showMessage("list.error.cannotEdit.recordPromotedToAnalysis");
+			}
 		}
 		
 		/**
