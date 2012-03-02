@@ -5,7 +5,6 @@ package org.openforis.collect.presenter {
 	import flash.ui.Keyboard;
 	
 	import mx.binding.utils.ChangeWatcher;
-	import mx.collections.ArrayList;
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.IResponder;
 	import mx.rpc.events.FaultEvent;
@@ -40,6 +39,8 @@ package org.openforis.collect.presenter {
 		public static const SHORTCUT_BLANK_ON_FORM:String = "*";
 		public static const SHORTCUT_DASH_ON_FORM:String = "-";
 		public static const SHORTCUT_ILLEGIBLE:String = "?";
+		
+		public static const REASON_BLANK_SYMBOLS:Array = [SHORTCUT_BLANK_ON_FORM, SHORTCUT_DASH_ON_FORM, SHORTCUT_ILLEGIBLE];
 		
 		private var _view:InputField;
 		private var _changed:Boolean = false;
@@ -124,18 +125,24 @@ package org.openforis.collect.presenter {
 			} else {
 				value = text;
 			}
-			var remarks:String = remarks; //preserve old remarks
+			var remarks:String = getRemarks(); //preserve old remarks
 			sendUpdate(value, symbol, remarks);
 		}
 		
 		public function applySymbol(symbol:FieldSymbol):void {
-			var value:String = textToRequestValue();
+			var value:String = null;
+			if(ArrayUtil.isNotIn(REASON_BLANK_SYMBOLS, symbol)) {
+				value = textToRequestValue();
+			}
 			var remarks:String = remarks; //preserve old remarks
 			sendUpdate(value, symbol, remarks);
 		}
 		
 		public function applySymbolAndRemarks(symbol:FieldSymbol, remarks:String):void {
-			var value:String = textToRequestValue();
+			var value:String = null;
+			if(ArrayUtil.isNotIn(REASON_BLANK_SYMBOLS, symbol)) {
+				value = textToRequestValue();
+			}
 			sendUpdate(value, symbol, remarks);
 		}
 		
@@ -215,19 +222,19 @@ package org.openforis.collect.presenter {
 		
 		protected function updateView():void {
 			//update view according to attribute (generic text value)
-			var remarksPresent:Boolean = false;
+			var hasRemarks:Boolean = false;
 			if(_view.attributeDefinition != null) {
 				var text:String = valueToText();
 				_view.text = text;
 				if(_view.attribute != null) {
-					remarksPresent = StringUtil.isNotBlank(remarks);
+					hasRemarks = StringUtil.isNotBlank(getRemarks());
 				}
 				_view.contextMenu = ContextMenuBuilder.buildContextMenu(_view);
 			}
-			_view.remarksPresent = remarksPresent;
+			_view.hasRemarks = hasRemarks;
 		}
 		
-		protected function get field():FieldProxy {
+		protected function getField():FieldProxy {
 			if(_view.attribute != null) {
 				var fieldIndex:int = 0;
 				if(_view.fieldIndex >= 0) {
@@ -238,8 +245,8 @@ package org.openforis.collect.presenter {
 			return null;
 		}
 		
-		protected function get remarks():String {
-			var f:FieldProxy = field;
+		protected function getRemarks():String {
+			var f:FieldProxy = getField();
 			if(f != null) {
 				return f.remarks;
 			} 
@@ -273,7 +280,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		public static function isShortCutForReasonBlank(text:String):Boolean {
-			return ArrayUtil.isIn([SHORTCUT_BLANK_ON_FORM, SHORTCUT_DASH_ON_FORM, SHORTCUT_ILLEGIBLE], text);
+			return ArrayUtil.isIn(REASON_BLANK_SYMBOLS, text);
 		}
 		
 		protected function get dataClient():DataClient {

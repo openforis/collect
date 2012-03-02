@@ -154,7 +154,7 @@ package org.openforis.collect.ui.component.input {
 			}
 		}
 
-		public function set remarksPresent(value:Boolean):void {
+		public function set hasRemarks(value:Boolean):void {
 			if(value) {
 				UIUtil.addStyleName(validationStateDisplay, REMARKS_PRESENT_STYLE);
 			} else {

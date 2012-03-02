@@ -186,5 +186,9 @@ package org.openforis.collect.util
 			}
 			return false;
 		}
+		
+		public static function isNotIn(array:Array, value:*):Boolean {
+			return ! isIn(array, value);
+		}
 	}
 }

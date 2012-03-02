@@ -31,9 +31,13 @@
 			override public function canApplyReasonBlank():Boolean {
 				if(attributeDefinition != null && attributeDefinition.multiple) {
 					if(CollectionUtil.isNotEmpty(attributes)) {
-						var a:AttributeProxy = attributes.getItemAt(0) as AttributeProxy;
-						var f:FieldProxy = a.getField(fieldIndex);
-						return a.empty && f.symbol == null;
+						if(attributes.length == 1) {
+							var a:AttributeProxy = attributes.getItemAt(0) as AttributeProxy;
+							var f:FieldProxy = a.getField(fieldIndex);
+							return a.empty && f.symbol == null;
+						} else {
+							return false;
+						}
 					} else {
 						return true;
 					}
@@ -44,7 +48,7 @@
 			
 			override public function hasReasonBlankSpecified():Boolean {
 				if(attributeDefinition != null && attributeDefinition.multiple) {
-					if(CollectionUtil.isNotEmpty(attributes)) {
+					if(CollectionUtil.isNotEmpty(attributes) && attributes.length == 1) {
 						var a:AttributeProxy = attributes.getItemAt(0) as AttributeProxy;
 						var f:FieldProxy = a.getField(fieldIndex);
 						return f.hasReasonBlankSpecified();
@@ -56,6 +60,15 @@
 				}
 			}
 
+			protected function getFirstAttribute():AttributeProxy {
+				if(CollectionUtil.isNotEmpty(attributes)) {
+					var a:AttributeProxy = attributes.getItemAt(0) as AttributeProxy;
+					return a;
+				} else {
+					return null;
+				}
+			}
+			
 			[Bindable]
 			public function get attributes():IList {
 				return _attributes;
