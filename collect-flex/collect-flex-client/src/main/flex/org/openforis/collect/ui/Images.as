@@ -54,7 +54,7 @@ package org.openforis.collect.ui {
 		[Embed("/assets/images/back.png")]
 		public static const BACK:Class;
 		
-		[Embed("/assets/images/complete.png")]
+		[Embed("/assets/images/tick.png")]
 		public static const COMPLETE:Class;
 		
 		[Embed("/assets/images/footer.jpg")]
