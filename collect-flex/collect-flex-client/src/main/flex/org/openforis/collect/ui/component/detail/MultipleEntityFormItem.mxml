@@ -4,16 +4,43 @@
 					   xmlns:mx="library://ns.adobe.com/flex/mx"
 					   xmlns:datagroup="org.openforis.collect.ui.component.datagroup.*"
 					   xmlns:detail="org.openforis.collect.ui.component.detail.*"
+					   maxHeight="400"
+					   maxWidth="950"
 					   >
 	<fx:Script>
 		<![CDATA[
+			import mx.binding.utils.BindingUtils;
+			import mx.events.FlexEvent;
+			
 			import org.openforis.collect.presenter.MultipleEntityFormItemPresenter;
 			import org.openforis.collect.ui.Images;
+			
+			import spark.layouts.ConstraintLayout;
+			
+			//private var _constraintLayout:ConstraintLayout;
+			
+			override protected function creationCompleteHandler(event:FlexEvent):void {
+				super.creationCompleteHandler(event);
+				//bind the position of horizontal scrollbars of header and content
+				//so that the header is always aligned with the content
+				BindingUtils.bindProperty(
+					headerScroller.horizontalScrollBar, "value", 
+					scroller, ["horizontalScrollBar", "value"]);
+			}
 			
 			override protected function initPresenter():void {
 				presenter = new MultipleEntityFormItemPresenter(this);
 			}
+			/*
+			[Bindable]
+			public function get constraintLayout():ConstraintLayout {
+				return _constraintLayout;
+			}
 			
+			public function set constraintLayout(value:ConstraintLayout):void {
+				_constraintLayout = value;
+			}
+			*/
 		]]>
 	</fx:Script>
 	
@@ -32,24 +59,34 @@
 	-->
 		<s:Label id="headerLabel" text="{entityDefinition.getLabelText()}" styleName="bold" />
 		
-		<s:VGroup paddingLeft="30">
-			<datagroup:DataGroupHeader id="header" 
-									   nodeDefinitions="{nodeDefinitions}" />
-			
-			<s:DataGroup width="100%" id="dataGroup">
-				<s:layout>
-					<s:VerticalLayout gap="2" />
-				</s:layout> 
-				<s:itemRenderer>
-					<fx:Component>
-						<detail:EntityDataGroupItemRenderer
-							entity="{data as EntityProxy}"
-							modelVersion="{outerDocument.modelVersion}"
-							nodeDefinitions="{outerDocument.nodeDefinitions}"
-							/>
-					</fx:Component>
-				</s:itemRenderer>
-			</s:DataGroup>
+		<s:VGroup paddingLeft="30" 
+				  height="100%" 
+				  width="100%">
+			<s:Scroller id="headerScroller" horizontalScrollPolicy="off" verticalScrollPolicy="off" width="100%">
+				<datagroup:DataGroupHeader id="header" 
+										   nodeDefinitions="{nodeDefinitions}"
+										   />
+			</s:Scroller>
+				
+			<s:Scroller id="scroller" 
+						height="100%" 
+						width="100%"
+						>
+				<s:DataGroup id="dataGroup">
+					<s:layout>
+						<s:VerticalLayout gap="2" />
+					</s:layout> 
+					<s:itemRenderer>
+						<fx:Component>
+							<detail:EntityDataGroupItemRenderer
+								entity="{data as EntityProxy}"
+								modelVersion="{outerDocument.modelVersion}"
+								nodeDefinitions="{outerDocument.nodeDefinitions}"
+								/>
+						</fx:Component>
+					</s:itemRenderer>
+				</s:DataGroup>
+			</s:Scroller>
 		</s:VGroup>
 		
 		<mx:LinkButton

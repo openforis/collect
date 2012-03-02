@@ -16,6 +16,9 @@
 			import org.openforis.collect.metamodel.proxy.CoordinateAttributeDefinitionProxy;
 			import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 			import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
+			import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
+			import org.openforis.collect.metamodel.proxy.NodeLabelProxy;
+			import org.openforis.collect.metamodel.proxy.NodeLabelProxy$Type;
 			import org.openforis.collect.metamodel.proxy.TaxonAttributeDefinitionProxy;
 			import org.openforis.collect.model.proxy.EntityProxy;
 			import org.openforis.collect.ui.UIBuilder;
@@ -34,18 +37,29 @@
 				if(data != null) {
 					var formItem:CollectFormItem;
 					if(data is AttributeDefinitionProxy) {
-						formItem = UIBuilder.getAttributeFormItem(AttributeDefinitionProxy(data), isInDataGroup);
+						var attributeDefn:AttributeDefinitionProxy = AttributeDefinitionProxy(data);
+						formItem = UIBuilder.getAttributeFormItem(attributeDefn, isInDataGroup);
 						if(isInDataGroup) {
 							addElement(formItem);
 						} else {
+							var labelGroup:HGroup = new HGroup();
+							var numberLabelProxy:NodeLabelProxy = attributeDefn.getLabel(NodeLabelProxy$Type.NUMBER);
+							if(numberLabelProxy != null) {
+								var numberLabel:Label = new Label();
+								numberLabel.styleName = "bold";
+								numberLabel.text = numberLabelProxy.text + ".";
+								numberLabel.width = 30;
+								labelGroup.addElement(numberLabel);
+							}
 							var label:Label = new Label();
 							label.styleName = "bold";
 							label.width = labelWidth;
-							label.text = data.getLabelText();
+							label.text = attributeDefn.getLabelText();
+							labelGroup.addElement(label);
 							
-							if(data is CoordinateAttributeDefinitionProxy || data is TaxonAttributeDefinitionProxy) {
+							if(attributeDefn is CoordinateAttributeDefinitionProxy || attributeDefn is TaxonAttributeDefinitionProxy) {
 								var vGroup:VGroup = new VGroup();
-								vGroup.addElement(label);
+								vGroup.addElement(labelGroup);
 								var internalGroup:HGroup = new HGroup();
 								internalGroup.gap = 0;
 								var spacer:Spacer = new Spacer();
@@ -57,7 +71,7 @@
 							} else {
 								var hGroup:HGroup = new HGroup();
 								hGroup.gap = 0;
-								hGroup.addElement(label);
+								hGroup.addElement(labelGroup);
 								hGroup.addElement(formItem);
 								addElement(hGroup);
 							}

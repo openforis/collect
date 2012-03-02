@@ -204,12 +204,17 @@ package org.openforis.collect.ui {
 			return entityFormItem;
 		}
 		
-		public static function getInputFieldWidth(def:AttributeDefinitionProxy, isInDataGroup:Boolean = false):int {
+		public static function getInputFieldWidth(def:AttributeDefinitionProxy, isInDataGroup:Boolean = false):Number {
 			if(def is BooleanAttributeDefinitionProxy) {
-				return 20;
+				return 100;
 			} else if(def is CodeAttributeDefinitionProxy) {
 				if(isInDataGroup) {
-					return 100;
+					if(def.key && def.parent.enumerated) {
+						//return NaN;
+						return 150;
+					} else {
+						return 100;
+					}
 				} else {
 					return 200;
 				}
@@ -248,11 +253,12 @@ package org.openforis.collect.ui {
 			}
 		}
 		
-		public static function getAttributeDataGroupHeaderWidth(def:AttributeDefinitionProxy):int {
-			if(def is BooleanAttributeDefinitionProxy) {
-				return 100;
+		public static function getAttributeDataGroupHeaderWidth(def:AttributeDefinitionProxy):Number {
+			var inputFieldWidth:Number = getInputFieldWidth(def, true);
+			if(!isNaN(inputFieldWidth)) {
+				return inputFieldWidth + 2; //consider validation display border container
 			} else {
-				return getInputFieldWidth(def, true) + 2;
+				return NaN;
 			}
 		}
 		
@@ -356,7 +362,7 @@ package org.openforis.collect.ui {
 			var l:Label;
 			if(defn is TaxonAttributeDefinitionProxy) {
 				v = new VGroup();
-				v.width = 460;
+				v.width = 466;
 				v.percentHeight = 100;
 				v.verticalAlign = "bottom";
 				//attribute label
@@ -364,7 +370,7 @@ package org.openforis.collect.ui {
 				v.addElement(l);
 				//subheader
 				h = new HGroup();
-				h.gap = 2;
+				h.gap = 4;
 				l = getLabel(Message.get('edit.taxon.code'), 50, "bold");
 				h.addElement(l);
 				l = getLabel(Message.get('edit.taxon.scientificName'), 100, "bold");
@@ -379,7 +385,7 @@ package org.openforis.collect.ui {
 				return v;
 			} else if(defn is CoordinateAttributeDefinitionProxy) {
 				v = new VGroup();
-				v.width = 302;
+				v.width = 308;
 				v.percentHeight = 100;
 				v.verticalAlign = "bottom";
 				//attribute label
@@ -387,7 +393,7 @@ package org.openforis.collect.ui {
 				v.addElement(l);
 				//subheader
 				h = new HGroup();
-				h.gap = 2;
+				h.gap = 4;
 				l = getLabel(Message.get('edit.coordinate.srs'), 100, "bold");
 				h.addElement(l);
 				l = getLabel(Message.get('edit.coordinate.x'), 100, "bold");
@@ -397,7 +403,7 @@ package org.openforis.collect.ui {
 				v.addElement(h);
 				return v;
 			}else {
-				var width:int = getAttributeDataGroupHeaderWidth(defn);
+				var width:Number = getAttributeDataGroupHeaderWidth(defn);
 				
 				v = new VGroup();
 				v.width = width;
