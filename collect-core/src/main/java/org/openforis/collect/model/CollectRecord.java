@@ -24,6 +24,8 @@ import org.openforis.idm.model.state.NodeState;
  */
 public class CollectRecord extends Record {
 
+	private static final long serialVersionUID = 1L;
+
 	public enum Step {
 		ENTRY(1), CLEANSING(2), ANALYSIS(3);
 
@@ -48,25 +50,30 @@ public class CollectRecord extends Record {
 		}
 	}
 
-	private Step step;
-	// TODO Replace submitted flag with state enum
-	private boolean submitted;
-
-	private Date creationDate;
-	private User createdBy;
-	private Date modifiedDate;
-	private User modifiedBy;
-	private Integer missing;
-	private Integer skipped;
-	private Integer errors;
-	private Integer warnings;
-	private Integer submittedId;
+	private transient CollectSurvey collectSurvey;
 	
-	private List<String> rootEntityKeys;
-	private List<Integer> entityCounts;
-	private Map<Integer, NodeState> nodeStateMap;
-	private CollectSurvey collectSurvey;
+	private transient Step step;
+	// TODO Replace submitted flag with state enum
+	private transient boolean submitted;
 
+	private transient Date creationDate;
+	private transient User createdBy;
+	private transient Date modifiedDate;
+	private transient User modifiedBy;
+	private transient Integer missing;
+	private transient Integer skipped;
+	private transient Integer errors;
+	private transient Integer warnings;
+	private transient Integer submittedId;
+	
+	private transient List<String> rootEntityKeys;
+	private transient List<Integer> entityCounts;
+	private transient Map<Integer, NodeState> nodeStateMap;
+
+	CollectRecord() {
+		super();
+	}
+	
 	public CollectRecord(RecordContext context, CollectSurvey survey, String versionName) {
 		super(context, survey, versionName);
 		this.collectSurvey = survey;

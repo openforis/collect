@@ -2,8 +2,6 @@ package org.openforis.collect.persistence;
 
 
 import static org.openforis.collect.persistence.jooq.Sequences.OFC_RECORD_ID_SEQ;
-import static org.openforis.collect.persistence.jooq.tables.OfcAttributeValue.OFC_ATTRIBUTE_VALUE;
-import static org.openforis.collect.persistence.jooq.tables.OfcEntity.OFC_ENTITY;
 import static org.openforis.collect.persistence.jooq.tables.OfcRecord.OFC_RECORD;
 import static org.openforis.collect.persistence.jooq.tables.OfcUser.OFC_USER;
 
@@ -409,9 +407,9 @@ public class RecordDAO extends JooqDaoSupport {
 	}
 	
 	private void deleteData(int recordId) {
-		Factory jf = getJooqFactory();
-		jf.delete(OFC_ENTITY).where(OFC_ENTITY.RECORD_ID.equal(recordId)).execute();
-		jf.delete(OFC_ATTRIBUTE_VALUE).where(OFC_ATTRIBUTE_VALUE.RECORD_ID.equal(recordId)).execute();
+//		Factory jf = getJooqFactory();
+//		jf.delete(OFC_ENTITY).where(OFC_ENTITY.RECORD_ID.equal(recordId)).execute();
+//		jf.delete(OFC_ATTRIBUTE_VALUE).where(OFC_ATTRIBUTE_VALUE.RECORD_ID.equal(recordId)).execute();
 	}
 
 	//TODO move to a Mapper class

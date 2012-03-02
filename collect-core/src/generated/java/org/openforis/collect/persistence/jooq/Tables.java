@@ -13,16 +13,6 @@ package org.openforis.collect.persistence.jooq;
 public final class Tables {
 
 	/**
-	 * The table collect.ofc_attribute_value
-	 */
-	public static org.openforis.collect.persistence.jooq.tables.OfcAttributeValue OFC_ATTRIBUTE_VALUE = org.openforis.collect.persistence.jooq.tables.OfcAttributeValue.OFC_ATTRIBUTE_VALUE;
-
-	/**
-	 * The table collect.ofc_entity
-	 */
-	public static org.openforis.collect.persistence.jooq.tables.OfcEntity OFC_ENTITY = org.openforis.collect.persistence.jooq.tables.OfcEntity.OFC_ENTITY;
-
-	/**
 	 * The table collect.ofc_logo
 	 */
 	public static org.openforis.collect.persistence.jooq.tables.OfcLogo OFC_LOGO = org.openforis.collect.persistence.jooq.tables.OfcLogo.OFC_LOGO;

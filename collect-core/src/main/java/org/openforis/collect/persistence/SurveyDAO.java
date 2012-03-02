@@ -62,7 +62,7 @@ public class SurveyDAO extends JooqDaoSupport {
 
 		// Insert SCHEMA_DEFINITIONs
 		Schema schema = survey.getSchema();
-		Collection<NodeDefinition> definitions = schema.getDefinitions();
+		Collection<NodeDefinition> definitions = schema.getAllDefinitions();
 		for (NodeDefinition definition : definitions) {
 			int definitionId = jf.nextval(OFC_SCHEMA_DEFINITION_ID_SEQ).intValue();
 			String path = definition.getPath();

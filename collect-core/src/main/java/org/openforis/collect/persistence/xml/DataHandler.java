@@ -14,7 +14,7 @@ import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.CodeAttribute;
 import org.openforis.idm.model.CoordinateAttribute;
 import org.openforis.idm.model.Entity;
-import org.openforis.idm.model.Field;
+import org.openforis.idm.model.AttributeField;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.NumericRangeAttribute;
 import org.openforis.idm.model.RecordContext;
@@ -275,7 +275,7 @@ public class DataHandler extends DefaultHandler {
 		return node;
 	}
 	
-	protected void setField(Field<?> fld) {
+	protected void setField(AttributeField<?> fld) {
 		String xmlValue = getXmlValue();
 		fld.setValueFromString(xmlValue);
 	}

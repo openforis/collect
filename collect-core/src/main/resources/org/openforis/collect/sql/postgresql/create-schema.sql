@@ -1,12 +1,6 @@
 CREATE SCHEMA "collect"
 GO
 
-CREATE SEQUENCE "collect"."ofc_entity_id_seq"
-GO
-
-CREATE SEQUENCE "collect"."ofc_attribute_value_id_seq"
-GO
-
 CREATE SEQUENCE "collect"."ofc_record_id_seq"
 GO
 
@@ -34,29 +28,8 @@ GO
 ----------------------------
 --- BEGIN GENERATED CODE ---
 ----------------------------
-CREATE TABLE "collect"."ofc_attribute_value"  ( 
-	"id"           	integer NOT NULL,
-	"record_id"    	integer NOT NULL,
-	"entity_id"    	integer NULL,
-	"definition_id"	integer NOT NULL,
-	"position"     	integer NOT NULL,
-	"field"        	integer NOT NULL,
-	"value"        	varchar(2048) NULL,
-	"remarks"      	varchar(2048) NULL,
-	"symbol"       	char(1) NULL,
-	"state"        	char(1) NULL,
-	PRIMARY KEY("id")
-)
-GO
-CREATE TABLE "collect"."ofc_entity"  ( 
-	"id"           	integer NOT NULL,
-	"record_id"    	integer NOT NULL,
-	"parent_id"    	integer NULL,
-	"definition_id"	integer NOT NULL,
-	"position"     	integer NOT NULL,
-	PRIMARY KEY("id")
-)
-GO
+
+
 CREATE TABLE "collect"."ofc_logo"  ( 
 	"pos"  	integer NOT NULL,
 	"image"	bytea NOT NULL,
@@ -87,6 +60,7 @@ CREATE TABLE "collect"."ofc_record"  (
 	"count4"        	integer NULL,
 	"count5"        	integer NULL,
 	"submitted_id"  	integer NULL,
+	"data"          	bytea NULL,
 	PRIMARY KEY("id")
 )
 GO
@@ -162,30 +136,9 @@ ALTER TABLE "collect"."ofc_taxonomy"
 	ADD CONSTRAINT "ofc_taxonomy_name_key"
 	UNIQUE ("name")
 GO
-ALTER TABLE "collect"."ofc_attribute_value"
-	ADD CONSTRAINT "ofc_attribute_value_entity_fkey"
-	FOREIGN KEY("entity_id")
-	REFERENCES "collect"."ofc_entity"("id")
-	ON DELETE NO ACTION 
-	ON UPDATE NO ACTION 
-GO
 ALTER TABLE "collect"."ofc_record"
 	ADD CONSTRAINT "record_submitted_record_fkey"
 	FOREIGN KEY("submitted_id")
-	REFERENCES "collect"."ofc_record"("id")
-	ON DELETE NO ACTION 
-	ON UPDATE NO ACTION 
-GO
-ALTER TABLE "collect"."ofc_attribute_value"
-	ADD CONSTRAINT "ofc_attribute_value_record_fkey"
-	FOREIGN KEY("record_id")
-	REFERENCES "collect"."ofc_record"("id")
-	ON DELETE NO ACTION 
-	ON UPDATE NO ACTION 
-GO
-ALTER TABLE "collect"."ofc_entity"
-	ADD CONSTRAINT "ofc_entity_record_fkey"
-	FOREIGN KEY("record_id")
 	REFERENCES "collect"."ofc_record"("id")
 	ON DELETE NO ACTION 
 	ON UPDATE NO ACTION 
@@ -195,80 +148,47 @@ ALTER TABLE "collect"."ofc_record"
 	FOREIGN KEY("root_entity_id")
 	REFERENCES "collect"."ofc_schema_definition"("id")
 GO
-ALTER TABLE "collect"."ofc_entity"
-	ADD CONSTRAINT "ofc_entity_definition_fkey"
-	FOREIGN KEY("definition_id")
-	REFERENCES "collect"."ofc_schema_definition"("id")
-	ON DELETE NO ACTION 
-	ON UPDATE NO ACTION 
-GO
-ALTER TABLE "collect"."ofc_attribute_value"
-	ADD CONSTRAINT "ofc_attribute_value_schema_definition_fkey"
-	FOREIGN KEY("definition_id")
-	REFERENCES "collect"."ofc_schema_definition"("id")
-	ON DELETE NO ACTION 
-	ON UPDATE NO ACTION 
-GO
 ALTER TABLE "collect"."ofc_schema_definition"
 	ADD CONSTRAINT "schema_definition_survey_fkey"
 	FOREIGN KEY("survey_id")
 	REFERENCES "collect"."ofc_survey"("id")
 GO
-ALTER TABLE "collect"."ofc_taxon"
-	ADD CONSTRAINT "ofc_taxon_parent_fkey"
-	FOREIGN KEY("parent_id")
-	REFERENCES "collect"."ofc_taxon"("id")
-	ON DELETE NO ACTION 
-	ON UPDATE NO ACTION 
-GO
 ALTER TABLE "collect"."ofc_taxon_vernacular_name"
 	ADD CONSTRAINT "ofc_taxon_vernacular_name_taxon_fkey"
 	FOREIGN KEY("taxon_id")
 	REFERENCES "collect"."ofc_taxon"("id")
-	ON DELETE NO ACTION 
-	ON UPDATE NO ACTION 
+GO
+ALTER TABLE "collect"."ofc_taxon"
+	ADD CONSTRAINT "ofc_taxon_parent_fkey"
+	FOREIGN KEY("parent_id")
+	REFERENCES "collect"."ofc_taxon"("id")
 GO
 ALTER TABLE "collect"."ofc_taxon"
 	ADD CONSTRAINT "ofc_taxon_taxonomy_fkey"
 	FOREIGN KEY("taxonomy_id")
 	REFERENCES "collect"."ofc_taxonomy"("id")
-	ON DELETE NO ACTION 
-	ON UPDATE NO ACTION 
-GO
-ALTER TABLE "collect"."ofc_record"
-	ADD CONSTRAINT "ofc_record_created_by_user_fkey"
-	FOREIGN KEY("created_by_id")
-	REFERENCES "collect"."ofc_user"("id")
-	ON DELETE NO ACTION 
-	ON UPDATE NO ACTION 
-GO
-ALTER TABLE "collect"."ofc_record"
-	ADD CONSTRAINT "ofc_record_locked_by_user_fkey"
-	FOREIGN KEY("locked_by_id")
-	REFERENCES "collect"."ofc_user"("id")
-	ON DELETE NO ACTION 
-	ON UPDATE NO ACTION 
-GO
-ALTER TABLE "collect"."ofc_record"
-	ADD CONSTRAINT "ofc_record_modified_by_user_fkey"
-	FOREIGN KEY("modified_by_id")
-	REFERENCES "collect"."ofc_user"("id")
-	ON DELETE NO ACTION 
-	ON UPDATE NO ACTION 
 GO
 ALTER TABLE "collect"."ofc_user_role"
 	ADD CONSTRAINT "ofc_user_user_role_fkey"
 	FOREIGN KEY("user_id")
 	REFERENCES "collect"."ofc_user"("id")
-	ON DELETE NO ACTION 
-	ON UPDATE NO ACTION 
 GO
-CREATE INDEX "ofc_attribute_value_record_idx"
-	ON "collect"."ofc_attribute_value"("record_id")
+ALTER TABLE "collect"."ofc_record"
+	ADD CONSTRAINT "ofc_record_locked_by_user_fkey"
+	FOREIGN KEY("locked_by_id")
+	REFERENCES "collect"."ofc_user"("id")
 GO
-CREATE INDEX "ofc_entity_record_idx"
-	ON "collect"."ofc_entity"("record_id")
+ALTER TABLE "collect"."ofc_record"
+	ADD CONSTRAINT "ofc_record_created_by_user_fkey"
+	FOREIGN KEY("created_by_id")
+	REFERENCES "collect"."ofc_user"("id")
 GO
+ALTER TABLE "collect"."ofc_record"
+	ADD CONSTRAINT "ofc_record_modified_by_user_fkey"
+	FOREIGN KEY("modified_by_id")
+	REFERENCES "collect"."ofc_user"("id")
+GO
+
 
 --------------------------
 --- END GENERATED CODE ---

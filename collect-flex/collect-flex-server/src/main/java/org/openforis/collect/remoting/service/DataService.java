@@ -48,7 +48,7 @@ import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Code;
 import org.openforis.idm.model.CodeAttribute;
 import org.openforis.idm.model.Entity;
-import org.openforis.idm.model.Field;
+import org.openforis.idm.model.AttributeField;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.Record;
 import org.openforis.idm.model.expression.ExpressionFactory;
@@ -229,7 +229,7 @@ public class DataService {
 		NodeDefinition nodeDefn = node.getDefinition();
 		if(nodeDefn instanceof AttributeDefinition) {
 			Attribute<?, ?> a = (Attribute<?, ?>) node;
-			Field<?> field = a.getField(fieldIndex);
+			AttributeField<?> field = a.getField(fieldIndex);
 			field.setSymbol(symbolChar);
 			field.setRemarks(remarks);
 			if(symbol != null && symbol.isReasonBlank()) {
@@ -261,10 +261,10 @@ public class DataService {
 			Attribute<?, Object> attribute = (Attribute<?, Object>) node;
 			if(fieldIndex != null) {
 				@SuppressWarnings("rawtypes")
-				Field field = attribute.getField(fieldIndex);
-				field.setValue(value);
-				field.setRemarks(remarks);
-				field.setSymbol(null);
+				AttributeField attributeField = attribute.getField(fieldIndex);
+				attributeField.setValue(value);
+				attributeField.setRemarks(remarks);
+				attributeField.setSymbol(null);
 			} else {
 				attribute.setValue(value);
 			}
@@ -290,7 +290,7 @@ public class DataService {
 				parentEntity.add(attribute);
 				if(fieldIndex != null) {
 					@SuppressWarnings("unchecked")
-					Field<Object> field = (Field<Object>) attribute.getField(fieldIndex);
+					AttributeField<Object> field = (AttributeField<Object>) attribute.getField(fieldIndex);
 					field.setRemarks(remarks);
 					field.setSymbol(symbol != null ? symbol.getCode(): null);
 					field.setValue(value);
@@ -312,7 +312,7 @@ public class DataService {
 			for (Code c : codes) {
 				CodeAttribute attribute = parentEntity.addValue(def.getName(), c);
 				//set symbol and remarks in first field
-				Field<?> field = attribute.getField(0);
+				AttributeField<?> field = attribute.getField(0);
 				if(symbol != null) {
 					field.setSymbol(symbol.getCode());
 				}
@@ -322,7 +322,7 @@ public class DataService {
 		} else {
 			Attribute<?, ?> attribute = (Attribute<?, ?>) def.createNode();
 			parentEntity.add(attribute);
-			Field<?> field = attribute.getField(0);
+			AttributeField<?> field = attribute.getField(0);
 			field.setRemarks(remarks);
 			field.setSymbol(symbol != null ? symbol.getCode(): null);
 			addedNodes.add(attribute);
@@ -344,7 +344,7 @@ public class DataService {
 		Character s = symbol != null ? symbol.getCode(): null;
 		int count = attribute.getFieldCount();
 		for (int i = 0; i < count; i++) {
-			Field<?> field = attribute.getField(i);
+			AttributeField<?> field = attribute.getField(i);
 			if(s == null || (symbol.isReasonBlank() && field.isEmpty())) {
 				field.setSymbol(s);
 			}

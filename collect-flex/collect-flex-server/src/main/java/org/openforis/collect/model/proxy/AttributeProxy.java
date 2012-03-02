@@ -12,7 +12,7 @@ import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Code;
 import org.openforis.idm.model.Coordinate;
 import org.openforis.idm.model.Date;
-import org.openforis.idm.model.Field;
+import org.openforis.idm.model.AttributeField;
 import org.openforis.idm.model.TaxonOccurrence;
 import org.openforis.idm.model.Time;
 
@@ -72,7 +72,7 @@ public class AttributeProxy extends NodeProxy {
 		int fieldCount = attribute.getFieldCount();
 		List<FieldProxy> result = new ArrayList<FieldProxy>(fieldCount);
 		for (int i = 0; i < fieldCount; i++) {
-			Field<?> field = attribute.getField(i);
+			AttributeField<?> field = attribute.getField(i);
 			result.add(i, new FieldProxy(field));
 		}
 		return result;

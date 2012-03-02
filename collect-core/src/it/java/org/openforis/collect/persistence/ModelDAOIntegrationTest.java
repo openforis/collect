@@ -50,10 +50,9 @@ public class ModelDAOIntegrationTest {
 	
 	@Autowired
 	protected RecordContext recordContext;
-	
+
 	@Test
 	public void testCRUD() throws Exception  {
-//		try {
 		// LOAD MODEL
 		CollectSurvey survey = surveyDao.load("archenland1");
 

@@ -12,7 +12,7 @@ import org.openforis.collect.model.FieldSymbol;
 import org.openforis.idm.model.Code;
 import org.openforis.idm.model.Coordinate;
 import org.openforis.idm.model.Date;
-import org.openforis.idm.model.Field;
+import org.openforis.idm.model.AttributeField;
 import org.openforis.idm.model.TaxonOccurrence;
 import org.openforis.idm.model.Time;
 
@@ -22,18 +22,18 @@ import org.openforis.idm.model.Time;
  */
 public class FieldProxy implements Proxy {
 
-	private transient Field<?> field;
+	private transient AttributeField<?> attributeField;
 
-	public FieldProxy(Field<?> field) {
+	public FieldProxy(AttributeField<?> field) {
 		super();
-		this.field = field;
+		this.attributeField = field;
 	}
 
 
-	public static List<FieldProxy> fromList(List<Field<?>> list) {
+	public static List<FieldProxy> fromList(List<AttributeField<?>> list) {
 		List<FieldProxy> proxies = new ArrayList<FieldProxy>();
 		if (list != null) {
-			for (Field<?> item : list) {
+			for (AttributeField<?> item : list) {
 				FieldProxy proxy = new FieldProxy(item);
 				proxies.add(proxy);
 			}
@@ -42,7 +42,7 @@ public class FieldProxy implements Proxy {
 	}
 	@ExternalizedProperty
 	public Object getValue(){
-		Object val = field.getValue();
+		Object val = attributeField.getValue();
 		if(val != null) {
 			if(val instanceof Code) {
 				return new CodeProxy((Code) val);
@@ -64,13 +64,13 @@ public class FieldProxy implements Proxy {
 	
 	@ExternalizedProperty
 	public String getRemarks() {
-		return field.getRemarks();
+		return attributeField.getRemarks();
 	}
 
 	@ExternalizedProperty
 	public FieldSymbol getSymbol() {
-		if(field.getSymbol() != null) {
-			return FieldSymbol.valueOf(field.getSymbol());
+		if(attributeField.getSymbol() != null) {
+			return FieldSymbol.valueOf(attributeField.getSymbol());
 		} else {
 			return null;
 		}
