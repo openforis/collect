@@ -14,7 +14,8 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.remoting.service.UpdateRequest;
-	import org.openforis.collect.remoting.service.UpdateRequest$Method;
+	import org.openforis.collect.remoting.service.UpdateRequestOperation;
+	import org.openforis.collect.remoting.service.UpdateRequestOperation$Method;
 	import org.openforis.collect.remoting.service.UpdateResponse;
 	import org.openforis.collect.ui.component.detail.EntityFormContainer;
 	import org.openforis.collect.util.AlertUtil;
@@ -78,10 +79,11 @@ package org.openforis.collect.presenter
 		}
 		
 		protected function addButtonClickHandler(event:MouseEvent):void {
-			var req:UpdateRequest = new UpdateRequest();
-			req.method = UpdateRequest$Method.ADD;
-			req.parentEntityId = _view.parentEntity.id;
-			req.nodeName = _view.entityDefinition.name;
+			var o:UpdateRequestOperation = new UpdateRequestOperation();
+			o.method = UpdateRequestOperation$Method.ADD;
+			o.parentEntityId = _view.parentEntity.id;
+			o.nodeName = _view.entityDefinition.name;
+			var req:UpdateRequest = new UpdateRequest(o);
 			ClientFactory.dataClient.updateActiveRecord(new AsyncResponder(addResultHandler, faultHandler, null), req);
 		}
 		
@@ -91,10 +93,11 @@ package org.openforis.collect.presenter
 		}
 		
 		protected function performDeletion():void {
-			var req:UpdateRequest = new UpdateRequest();
-			req.method = UpdateRequest$Method.DELETE;
-			req.parentEntityId = _view.parentEntity.id;
-			req.nodeId = _view.entity.id;
+			var o:UpdateRequestOperation = new UpdateRequestOperation();
+			o.method = UpdateRequestOperation$Method.DELETE;
+			o.parentEntityId = _view.parentEntity.id;
+			o.nodeId = _view.entity.id;
+			var req:UpdateRequest = new UpdateRequest(o);
 			ClientFactory.dataClient.updateActiveRecord(new AsyncResponder(deleteResultHandler, faultHandler, null), req);
 		}
 		

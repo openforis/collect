@@ -5,6 +5,7 @@ package org.openforis.collect.ui {
 	import mx.collections.IList;
 	import mx.collections.ListCollectionView;
 	import mx.core.ClassFactory;
+	import mx.core.IFactory;
 	import mx.core.IVisualElement;
 	
 	import org.openforis.collect.Application;
@@ -26,6 +27,7 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.metamodel.proxy.TimeAttributeDefinitionProxy;
 	import org.openforis.collect.model.UIConfiguration;
 	import org.openforis.collect.model.UITab;
+	import org.openforis.collect.ui.component.datagrid.CompleteColumnItemRenderer;
 	import org.openforis.collect.ui.component.datagrid.RecordSummaryDataGrid;
 	import org.openforis.collect.ui.component.datagroup.DataGridHeaderRenderer;
 	import org.openforis.collect.ui.component.detail.AttributeFormItem;
@@ -161,10 +163,12 @@ package org.openforis.collect.ui {
 			column = getGridColumn(Message.get("list.modifiedDate"), "modifiedDate", 150, RecordSummaryDataGrid.dateTimeLabelFunction);
 			columns.addItem(column);
 			//entry completed column
-			column = getGridColumn(Message.get("list.entryComplete"), "entryComplete", 70, RecordSummaryDataGrid.entryCompletedLabelFunction, true);
+			column = getGridColumn(Message.get("list.entryComplete"), "entryComplete", 70, 
+				null, true, new ClassFactory(CompleteColumnItemRenderer));
 			columns.addItem(column);
 			//cleansing completed column
-			column = getGridColumn(Message.get("list.cleansingComplete"), "cleansingComplete", 70, RecordSummaryDataGrid.cleansingCompletedLabelFunction, true);
+			column = getGridColumn(Message.get("list.cleansingComplete"), "cleansingComplete", 70, 
+				null, true, new ClassFactory(CompleteColumnItemRenderer));
 			columns.addItem(column);
 			return columns;
 		}
@@ -408,7 +412,9 @@ package org.openforis.collect.ui {
 		}
 		
 		public static function getGridColumn(headerText:String, dataField:String, width:Number, 
-											 labelFunction:Function = null, headerTextWrap:Boolean = false):GridColumn {
+											 labelFunction:Function = null, headerTextWrap:Boolean = false,
+											 itemRenderer:IFactory = null
+											):GridColumn {
 			var c:GridColumn = new GridColumn();
 			c.headerText = headerText;
 			c.dataField = dataField;
@@ -416,6 +422,9 @@ package org.openforis.collect.ui {
 			c.width = width;
 			if(headerTextWrap) {
 				c.headerRenderer = new ClassFactory(DataGridHeaderRenderer);
+			}
+			if(itemRenderer != null) {
+				c.itemRenderer = itemRenderer;
 			}
 			return c;
 		}

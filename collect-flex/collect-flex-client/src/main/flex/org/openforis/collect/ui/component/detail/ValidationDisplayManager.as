@@ -18,6 +18,10 @@ package org.openforis.collect.ui.component.detail
 	 */
 	public class ValidationDisplayManager {
 		
+		public static const STYLE_NAME_NOT_RELEVANT:String = "notRelevant";
+		public static const STYLE_NAME_ERROR:String = "error"; 
+		public static const STYLE_NAME_WARNING:String = "warning";
+
 		/**
 		 * Display of the error (stylename "error" or "warning" will be set on this component)
 		 */
@@ -27,59 +31,67 @@ package org.openforis.collect.ui.component.detail
 		 */
 		private var _toolTipTrigger:UIComponent;
 		
-		private var _state:NodeStateProxy;
 		/**
 		 * Current instance of the tooltip
 		 */
 		private var _toolTip:IToolTip;
 		
-		public function ValidationDisplayManager(toolTipTrigger:UIComponent, display:UIComponent, state:NodeStateProxy = null) {
+		private var _toolTipStyleName:String;
+		
+		private var _toolTipMessage:String;
+		
+		private var _displayStyleName:String;
+		
+		public function ValidationDisplayManager(toolTipTrigger:UIComponent, display:UIComponent) {
 			_toolTipTrigger = toolTipTrigger;
 			_display = display;
-			_state = state;
-			init();
 		}
 		
-		protected function init():void {
+		public function init():void {
 			hideToolTip();
 			_toolTipTrigger.removeEventListener(MouseEvent.ROLL_OVER, showToolTip);
 			_toolTipTrigger.removeEventListener(MouseEvent.ROLL_OUT, hideToolTip);
 			UIUtil.removeStyleNames(_display, [
-				AttributeItemRenderer.STYLE_NAME_ERROR, 
-				AttributeItemRenderer.STYLE_NAME_WARNING, 
-				AttributeItemRenderer.STYLE_NOT_RELEVANT
+				STYLE_NAME_ERROR, 
+				STYLE_NAME_WARNING, 
+				STYLE_NAME_NOT_RELEVANT
 			]);
-			if(_state != null) {
-				var validationResults:ValidationResultsProxy = _state.validationResults;
-				var hasErrors:Boolean = _state.hasErrors();
-				var hasWarnings:Boolean = _state.hasWarnings();
-				
-				var styleName:String = null;
-				if(! _state.relevant) {
-					styleName = AttributeItemRenderer.STYLE_NOT_RELEVANT;
-				} else if(hasErrors || hasWarnings) {
-					if(! _toolTipTrigger.hasEventListener(MouseEvent.ROLL_OVER)) {
-						_toolTipTrigger.addEventListener(MouseEvent.ROLL_OVER, showToolTip);
-						_toolTipTrigger.addEventListener(MouseEvent.ROLL_OUT, hideToolTip);
-					}
-					styleName = hasErrors ? AttributeItemRenderer.STYLE_NAME_ERROR: AttributeItemRenderer.STYLE_NAME_WARNING;
-				}
-				if(styleName != null) {
-					UIUtil.addStyleName(_display, styleName);
+			if(_toolTipStyleName != null) {
+				if(! _toolTipTrigger.hasEventListener(MouseEvent.ROLL_OVER)) {
+					_toolTipTrigger.addEventListener(MouseEvent.ROLL_OVER, showToolTip);
+					_toolTipTrigger.addEventListener(MouseEvent.ROLL_OUT, hideToolTip);
 				}
 			}
+			if(_displayStyleName != null) {
+				UIUtil.addStyleName(_display, _displayStyleName);
+			}
+		}
+		
+		public function initByState(state:NodeStateProxy):void {
+			_displayStyleName = null;
+			_toolTipStyleName = null;
+			_toolTipMessage = null;
+			if(state != null) {
+				var hasErrors:Boolean = state.hasErrors();
+				var hasWarnings:Boolean = state.hasWarnings();
+				
+				if(! state.relevant) {
+					_displayStyleName = STYLE_NAME_NOT_RELEVANT;
+				} else if(hasErrors || hasWarnings) {
+					_toolTipStyleName = hasErrors ? ToolTipUtil.STYLE_NAME_ERROR: ToolTipUtil.STYLE_NAME_WARNING;
+					_toolTipMessage = state.validationMessage;
+					_displayStyleName = hasErrors ? STYLE_NAME_ERROR: STYLE_NAME_WARNING;
+				}
+			}
+			init();
 		}
 		
 		protected function showToolTip(event:MouseEvent = null):void {
 			if(_toolTip != null){
 				ToolTipUtil.destroy(_toolTip);
 			}
-			if(_state != null) {
-				var hasErrors:Boolean = _state.hasErrors();
-				var hasWarnings:Boolean = _state.hasWarnings();
-				var styleName:String = hasErrors ? ToolTipUtil.STYLE_NAME_ERROR: ToolTipUtil.STYLE_NAME_WARNING;
-				var message:String = _state.validationMessage;
-				_toolTip = ToolTipUtil.create(_display, message, styleName);
+			if(_toolTipStyleName != null) {
+				_toolTip = ToolTipUtil.create(_display, _toolTipMessage, _toolTipStyleName);
 			}
 		}
 		
@@ -88,18 +100,29 @@ package org.openforis.collect.ui.component.detail
 			_toolTip = null;
 		}
 
-		/**
-		 * State of the node used to get the validation message and the type of error
-		 */
-		public function get state():NodeStateProxy {
-			return _state;
+		public function get toolTipStyleName():String {
+			return _toolTipStyleName;
 		}
 
-		public function set state(value:NodeStateProxy):void {
-			_state = value;
-			init();
+		public function set toolTipStyleName(value:String):void {
+			_toolTipStyleName = value;
 		}
-		
+
+		public function get toolTipMessage():String {
+			return _toolTipMessage;
+		}
+
+		public function set toolTipMessage(value:String):void {
+			_toolTipMessage = value;
+		}
+
+		public function get displayStyleName():String {
+			return _displayStyleName;
+		}
+
+		public function set displayStyleName(value:String):void {
+			_displayStyleName = value;
+		}
 		
 	}
 }

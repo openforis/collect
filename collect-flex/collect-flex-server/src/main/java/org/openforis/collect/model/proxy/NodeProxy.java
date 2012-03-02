@@ -8,11 +8,9 @@ import java.util.List;
 
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.collect.Proxy;
-import org.openforis.collect.model.CollectRecord;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Node;
-import org.openforis.idm.model.state.NodeState;
 
 /**
  * @author S. Ricci
@@ -23,19 +21,9 @@ public class NodeProxy implements Proxy {
 
 	private transient Node<?> node;
 	
-	private NodeStateProxy state;
-	
 	public NodeProxy(Node<?> node) {
 		super();
 		this.node = node;
-		
-		/*
-		CollectRecord record = (CollectRecord) this.node.getRecord();
-		NodeState nodeState = record.getNodeState(node);
-		if (nodeState != null) {
-			state = new NodeStateProxy(nodeState);
-		}
-		*/
 	}
 
 	public static List<NodeProxy> fromList(List<Node<?>> list) {
@@ -80,14 +68,6 @@ public class NodeProxy implements Proxy {
 		} else {
 			return null;
 		}
-	}
-	
-	public NodeStateProxy getState() {
-		return state;
-	}
-	
-	public void setState(NodeStateProxy state) {
-		this.state = state;
 	}
 	
 }

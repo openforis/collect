@@ -4,15 +4,16 @@ package org.openforis.collect.presenter {
 	import flash.events.MouseEvent;
 	
 	import mx.binding.utils.ChangeWatcher;
+	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
 	import mx.core.FlexGlobals;
 	import mx.events.CloseEvent;
+	import mx.events.CollectionEvent;
 	import mx.managers.PopUpManager;
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.IResponder;
 	import mx.rpc.events.ResultEvent;
 	
-	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.CodeAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.CodeListItemProxy;
 	import org.openforis.collect.model.FieldSymbol;
@@ -20,7 +21,8 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.model.proxy.CodeProxy;
 	import org.openforis.collect.model.proxy.FieldProxy;
 	import org.openforis.collect.remoting.service.UpdateRequest;
-	import org.openforis.collect.remoting.service.UpdateRequest$Method;
+	import org.openforis.collect.remoting.service.UpdateRequestOperation;
+	import org.openforis.collect.remoting.service.UpdateRequestOperation$Method;
 	import org.openforis.collect.ui.component.input.CodeInputField;
 	import org.openforis.collect.ui.component.input.CodeListDialog;
 	import org.openforis.collect.ui.component.input.TextInput;
@@ -50,7 +52,14 @@ package org.openforis.collect.presenter {
 			
 			_view.openImage.addEventListener(MouseEvent.CLICK, openImageClickHandler);
 			
-			ChangeWatcher.watch(_view, "attributes", attributeChangeHandler);
+			ChangeWatcher.watch(_view, "attributes", attributesChangeHandler);
+		}
+		
+		protected function attributesChangeHandler(event:Event):void {
+			if(! (event is CollectionEvent) && _view.attributes != null) {
+				_view.attributes.addEventListener(CollectionEvent.COLLECTION_CHANGE, attributesChangeHandler);
+			}
+			updateView();
 		}
 		
 		/**
@@ -163,25 +172,65 @@ package org.openforis.collect.presenter {
 		override public function applyValue():void {
 			if(_view.attributeDefinition.multiple) {
 				var text:String = textToRequestValue();
+				var operations:ArrayCollection = new ArrayCollection();
+				var o:UpdateRequestOperation;
 				for each (var a:AttributeProxy in _view.attributes) {
-					sendDeleteAttributeRequest(a);
+					o = getUpdateRequestOperation(UpdateRequestOperation$Method.DELETE, a.id);
+					operations.addItem(o);
 				}
-				var parts:Array = text.split(",");
-				if(parts.length == 1) {
-					if(isShortCutForReasonBlank(text)) {
+				if(text != null) {
+					var parts:Array = text.split(",");
+					if(parts.length == 1 && isShortCutForReasonBlank(text)) {
 						var symbol:FieldSymbol = parseShortCutForReasonBlank(text);
-						sendAddAttributeRequest(null, symbol, remarks);
-					}
-				} else {
-					for each (var part:String in parts) {
-						var trimmedPart:String = StringUtil.trim(part);
-						if(StringUtil.isNotBlank(trimmedPart)) {
-							sendAddAttributeRequest(trimmedPart, null, remarks);
+						o = getUpdateRequestOperation(UpdateRequestOperation$Method.ADD, NaN, null, symbol, remarks);
+						operations.addItem(o);
+					} else {
+						for each (var part:String in parts) {
+							var trimmedPart:String = StringUtil.trim(part);
+							if(StringUtil.isNotBlank(trimmedPart)) {
+								o = getUpdateRequestOperation(UpdateRequestOperation$Method.ADD, NaN, trimmedPart, null, remarks);
+								operations.addItem(o);
+							}
 						}
 					}
 				}
+				var req:UpdateRequest = new UpdateRequest();
+				req.operations = operations;
+				dataClient.updateActiveRecord(updateResponder, req);
 			} else {
 				super.applyValue();
+			}
+		}
+		
+		override public function applySymbolAndRemarks(symbol:FieldSymbol, remarks:String):void {
+			if(_view.attributeDefinition.multiple) {
+				var operations:ArrayCollection = new ArrayCollection();
+				for each (var a:AttributeProxy in _view.attributes) {
+					var value:String = codeAttributeToText(a);
+					var o:UpdateRequestOperation = getUpdateRequestOperation(UpdateRequestOperation$Method.UPDATE, a.id, value, symbol, remarks);
+					operations.addItem(o);
+				}
+				var req:UpdateRequest = new UpdateRequest();
+				req.operations = operations;
+				dataClient.updateActiveRecord(updateResponder, req);
+			} else {
+				super.applySymbolAndRemarks(symbol, remarks);
+			}
+		}
+		
+		override public function applySymbol(symbol:FieldSymbol):void {
+			if(_view.attributeDefinition.multiple) {
+				var operations:ArrayCollection = new ArrayCollection();
+				for each (var a:AttributeProxy in _view.attributes) {
+					var value:String = codeAttributeToText(a);
+					var o:UpdateRequestOperation = getUpdateRequestOperation(UpdateRequestOperation$Method.UPDATE, a.id, value, symbol, remarks);
+					operations.addItem(o);
+				}
+				var req:UpdateRequest = new UpdateRequest();
+				req.operations = operations;
+				dataClient.updateActiveRecord(updateResponder, req);
+			} else {
+				super.applySymbol(symbol);
 			}
 		}
 		
@@ -197,58 +246,9 @@ package org.openforis.collect.presenter {
 			}
 			return null;
 		}
-		/*
-		override public function applyChanges(symbol:FieldSymbol = null, remarks:String = null):void {
-			if(symbol == null && isShortCutForReasonBlank(_view.text)) {
-				symbol = parseShortCutForReasonBlank(_view.text);
-			}
-			var req:UpdateRequest = new UpdateRequest();
-			var def:AttributeDefinitionProxy = _view.attributeDefinition;
-			req.parentEntityId = _view.parentEntity.id;
-			req.nodeName = def.name;
-			req.remarks = remarks;
-			req.value = textToRequestValue();
-			req.symbol = symbol;
-			req.replaceAttributes = true;
-			if(_view.attribute != null || (CollectionUtil.isNotEmpty(_view.attributes))) {
-				if(! def.multiple) {
-					req.nodeId = _view.attribute.id;
-				}
-				if(symbol != null) {
-					req.method = UpdateRequest$Method.UPDATE_SYMBOL;
-				} else {
-					req.method = UpdateRequest$Method.UPDATE_ATTRIBUTE_VALUE;
-					//todo preserve old remarks
-				}
-			} else {
-				req.method = UpdateRequest$Method.ADD;
-			}
-			var responder:AsyncResponder = new AsyncResponder(updateResultHandler, updateFaultHandler);
-			dataClient.updateActiveRecord(responder, req);
-		}
-		*/
-		protected function sendDeleteAttributeRequest(attribute:AttributeProxy):void {
-			var req:UpdateRequest = new UpdateRequest();
-			var def:AttributeDefinitionProxy = _view.attributeDefinition;
-			req.parentEntityId = _view.parentEntity.id;
-			req.nodeName = def.name;
-			req.nodeId = attribute.id;
-			req.method = UpdateRequest$Method.DELETE;
-			dataClient.updateActiveRecord(updateResponder, req);
-		}
-		
-		protected function sendAddAttributeRequest(value:String, symbol:FieldSymbol, remarks:String):void {
-			var req:UpdateRequest = new UpdateRequest();
-			var def:AttributeDefinitionProxy = _view.attributeDefinition;
-			req.parentEntityId = _view.parentEntity.id;
-			req.nodeName = def.name;
-			req.method = UpdateRequest$Method.ADD;
-			req.value = value;
-			req.remarks = remarks;
-			dataClient.updateActiveRecord(updateResponder, req);
-		}
 		
 		protected function updateDescription():void {
+			_view.description = "";
 			if(_view.attribute != null || _view.attributes != null) {
 				var codes:Array = [];
 				var attribute:AttributeProxy;
@@ -271,8 +271,6 @@ package org.openforis.collect.presenter {
 					
 					dataClient.getCodeListItems(responder, parentEntityId, name, codes);
 				}
-			} else {
-				_view.description = "";
 			}
 		}
 		

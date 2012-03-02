@@ -2,25 +2,15 @@ package org.openforis.collect.presenter
 {
 	import flash.events.Event;
 	import flash.events.FocusEvent;
-	import flash.events.MouseEvent;
 	
 	import mx.binding.utils.ChangeWatcher;
-	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
-	import mx.rpc.AsyncResponder;
-	import mx.rpc.events.ResultEvent;
 	
-	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.model.proxy.AttributeProxy;
-	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.model.proxy.NodeProxy;
-	import org.openforis.collect.remoting.service.UpdateRequest;
-	import org.openforis.collect.remoting.service.UpdateRequest$Method;
 	import org.openforis.collect.remoting.service.UpdateResponse;
 	import org.openforis.collect.ui.component.detail.AttributeFormItem;
-	import org.openforis.collect.ui.component.detail.MultipleAttributeFormItem;
-	import org.openforis.collect.util.CollectionUtil;
 	import org.openforis.collect.util.UIUtil;
 
 	/**
@@ -67,11 +57,22 @@ package org.openforis.collect.presenter
 			if(view.parentEntity != null && view.attributeDefinition != null) {
 				var response:UpdateResponse = event.result as UpdateResponse;
 				var parentId:Number = view.parentEntity.id;
-				for each (var item:NodeProxy in response.addedNodes) {
-					if(item.parentId == parentId && item.name == view.attributeDefinition.name &&
+				var node:NodeProxy;
+				for each (node in response.addedNodes) {
+					if(node.parentId == parentId && node.name == view.attributeDefinition.name &&
 						! view.attributeDefinition.multiple || view.attributes == null
 						) {
 						assignAttribute();
+						return;
+					}
+				}
+				if(!view.attributeDefinition.multiple && view.attribute != null) {
+					var attributeId:Number = view.attribute.id;
+					for each (node in response.updatedNodes) {
+						if(node.id == attributeId) {
+							view.attribute = node as AttributeProxy;
+							break;
+						}
 					}
 				}
 				/*

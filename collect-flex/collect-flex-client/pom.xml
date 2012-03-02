@@ -91,7 +91,8 @@
 								<includeClass>org.openforis.collect.Proxy</includeClass>
 								<includeClass>org.openforis.collect.model.FieldSymbol</includeClass>
 								<includeClass>org.openforis.collect.remoting.service.UpdateRequest</includeClass>
-								<includeClass>org.openforis.collect.remoting.service.UpdateRequest$Method</includeClass>
+								<includeClass>org.openforis.collect.remoting.service.UpdateRequestOperation</includeClass>
+								<includeClass>org.openforis.collect.remoting.service.UpdateRequestOperation$Method</includeClass>
 								<includeClass>org.openforis.collect.remoting.service.UpdateResponse</includeClass>
 							</includeJavaClasses>
 						</configuration>

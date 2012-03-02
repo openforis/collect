@@ -8,6 +8,7 @@ package org.openforis.collect.ui.component.input {
 	import org.openforis.collect.model.FieldSymbol;
 	import org.openforis.collect.model.proxy.AttributeProxy;
 	import org.openforis.collect.model.proxy.EntityProxy;
+	import org.openforis.collect.model.proxy.FieldProxy;
 	import org.openforis.collect.presenter.InputFieldPresenter;
 	import org.openforis.collect.util.ArrayUtil;
 	import org.openforis.collect.util.ObjectUtil;
@@ -57,16 +58,6 @@ package org.openforis.collect.ui.component.input {
 			this._presenter = new InputFieldPresenter(this);
 		}
 		
-		/**
-		 * returns trus if there is not an attribute associated to the field or
-		 * the attribute's value is null
-		 */
-		public function canApplyReasonBlank():Boolean {
-			return attribute == null || 
-				(attribute.empty && isNaN(fieldIndex) || fieldIndex < 0 || 
-					attribute.getField(fieldIndex).symbol == null);
-		}
-		
 		public function applyValue():void {
 			presenter.applyValue();
 		}
@@ -79,11 +70,34 @@ package org.openforis.collect.ui.component.input {
 			presenter.applySymbolAndRemarks(symbol, remarks);
 		}
 		
-		public function hasBlankReasonSpecified():Boolean {
-			var reasonBlankSymbols:Array = [FieldSymbol.BLANK_ON_FORM, 
-				FieldSymbol.DASH_ON_FORM, 
-				FieldSymbol.ILLEGIBLE];
-			return attribute != null && (ArrayUtil.isIn(reasonBlankSymbols, attribute.getField(fieldIndex).symbol));  
+		/**
+		 * returns true if there is not an attribute associated to the field or
+		 * the attribute's value is null and there is not a symbol specified
+		 */
+		public function canApplyReasonBlank():Boolean {
+			if(attribute == null) {
+				return true;
+			} else if(attribute.empty) {
+				var f:FieldProxy = getField();
+				var symbol:FieldSymbol = f.symbol;
+				return symbol == null;
+			} else {
+				return false;
+			}
+		}
+		
+		public function hasReasonBlankSpecified():Boolean {
+			var f:FieldProxy = getField();
+			return f != null && f.hasReasonBlankSpecified();
+		}
+		
+		public function getField():FieldProxy {
+			if(attribute != null) {
+				var f:FieldProxy = attribute.getField(fieldIndex);
+				return f;
+			} else {
+				return null;
+			}
 		}
 		
 		public function undo():void {

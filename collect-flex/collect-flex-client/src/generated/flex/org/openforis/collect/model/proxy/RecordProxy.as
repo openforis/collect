@@ -6,9 +6,6 @@
  */
 
 package org.openforis.collect.model.proxy {
-	import mx.collections.IList;
-	
-	import org.granite.collections.IMap;
 	import org.openforis.collect.remoting.service.UpdateResponse;
 
     [Bindable]
@@ -24,25 +21,38 @@ package org.openforis.collect.model.proxy {
 		}
 		
 		public function update(response:UpdateResponse):void {
-			var node:NodeProxy, oldNode:NodeProxy, parent:NodeProxy, parentEntity:EntityProxy;
+			var node:NodeProxy, oldNode:NodeProxy, parent:EntityProxy;
 			//remove nodes
-			for each (node in response.deletedNodes) {
-				parent = getNode(node.parentId);
-				parentEntity = EntityProxy(parent);
-				oldNode = parentEntity.getChildById(node.id);
-				parentEntity.removeChild(oldNode);
+			for each (var id:int in response.deletedNodeIds) {
+				oldNode = getNode(id);
+				if(oldNode != null) {
+					parent = EntityProxy(getNode(oldNode.parentId));
+					if(parent != null) {
+						oldNode = parent.getChildById(id);
+						parent.removeChild(oldNode);
+					}
+				}
 			}
-			//added new nodes
+			//add new nodes
 			for each (node in response.addedNodes) {
-				parent = getNode(node.parentId);
-				parentEntity = EntityProxy(parent);
-				parentEntity.addChild(node);
+				parent = EntityProxy(getNode(node.parentId));
+				parent.addChild(node);
 			}
+			
+			//replace updated nodes
+			for each (node in response.updatedNodes) {
+				oldNode = getNode(node.id);
+				parent = EntityProxy(getNode(oldNode.parentId));
+				parent.replaceChild(oldNode, node);
+			}
+			
 			//update node state
+			/*
 			for each (var state:NodeStateProxy in response.states) {
 				node = getNode(state.nodeId);
 				node.state = state;
 			}
+			*/
 		}
     }
 }
