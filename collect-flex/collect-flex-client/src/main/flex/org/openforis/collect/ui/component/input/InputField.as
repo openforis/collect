@@ -66,8 +66,8 @@ package org.openforis.collect.ui.component.input {
 			presenter.applySymbol(symbol);
 		}
 		
-		public function applySymbolAndRemarks(symbol:FieldSymbol, remarks:String):void {
-			presenter.applySymbolAndRemarks(symbol, remarks);
+		public function applyRemarks(remarks:String):void {
+			presenter.applyRemarks(remarks);
 		}
 		
 		/**
