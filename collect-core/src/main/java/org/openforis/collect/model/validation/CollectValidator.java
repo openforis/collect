@@ -18,7 +18,6 @@ import org.openforis.idm.metamodel.validation.Validator;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Field;
 import org.openforis.idm.model.Record;
-import org.openforis.idm.model.state.NodeState;
 
 /**
  * @author M. Togna
@@ -27,19 +26,18 @@ import org.openforis.idm.model.state.NodeState;
 public class CollectValidator extends Validator {
 
 	@Override
-	protected ValidationResults validateAttribute(NodeState nodeState) {
-		Attribute<?, ?> attribute = (Attribute<?, ?>) nodeState.getNode();
+	public ValidationResults validate(Attribute<?, ?> attribute) {
 
 		CollectValidationResults results = new CollectValidationResults();
 		SpecifiedValidator specifiedValidator = new SpecifiedValidator();
-		boolean specified = specifiedValidator.evaluate(nodeState);
+		boolean specified = specifiedValidator.evaluate(attribute);
 		results.addResult(attribute, specifiedValidator, specified);
 
 		if (specified || specifiedValidator.getFlag().equals(Flag.WARN)) {
 			boolean isKey = isRecordKey(attribute);
-			if (isKey && !isUnique(nodeState, results)) {
+			if (isKey && !isUnique(attribute, results)) {
 			} else {
-				ValidationResults idmResults = super.validateAttribute(nodeState);
+				ValidationResults idmResults = super.validate(attribute);
 				boolean confirmed = isConfirmedValue(attribute);
 				List<ValidationResult> errors = idmResults.getErrors();
 				for (ValidationResult error : errors) {
@@ -54,10 +52,10 @@ public class CollectValidator extends Validator {
 
 	}
 
-	private boolean isUnique(NodeState nodeState, CollectValidationResults results) {
+	private boolean isUnique(Attribute<?, ?> attribute, CollectValidationResults results) {
 		RecordKeyUniquenessValidator keyValidator = new RecordKeyUniquenessValidator();
-		boolean unique = keyValidator.evaluate(nodeState);
-		results.addResult(nodeState.getNode(), keyValidator, unique);
+		boolean unique = keyValidator.evaluate(attribute);
+		results.addResult(attribute, keyValidator, unique);
 		return unique;
 	}
 

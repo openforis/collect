@@ -142,11 +142,13 @@
     	<property name="dataSource" ref="dataSource"/>
 	</bean>
 
+
 	<!-- Expression Factory -->
 	<bean id="expressionFactory" class="org.openforis.idm.model.expression.ExpressionFactory">
 		<property name="lookupProvider" ref="lookupProvider" />
 	</bean>
 	
+	<!--  Survey Context -->
 	<bean id="validator" 					class="org.openforis.collect.model.validation.CollectValidator" />
 	
 	<bean id="lookupProvider" 	class="org.openforis.collect.persistence.DatabaseLookupProvider" />
