@@ -14,8 +14,6 @@ import org.openforis.collect.persistence.SurveyDAO;
 import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.idm.metamodel.LanguageSpecificText;
 import org.openforis.idm.metamodel.Survey;
-import org.openforis.idm.model.expression.ExpressionFactory;
-import org.openforis.idm.model.state.ModelDependencies;
 import org.openforis.idm.util.CollectionUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,13 +26,10 @@ public class SurveyManager {
 
 	@Autowired
 	private SurveyDAO surveyDAO;
-	@Autowired
-	private ExpressionFactory expressionFactory;
-
+	
 	private Map<String, CollectSurvey> surveysByName;
 	private Map<Integer, CollectSurvey> surveysById;
 	private List<CollectSurvey> surveys;
-
 
 	public SurveyManager() {
 		surveysById = new HashMap<Integer, CollectSurvey>();
@@ -97,9 +92,6 @@ public class SurveyManager {
 	private void initSurvey(CollectSurvey survey) {
 		surveysById.put(survey.getId(), survey);
 		surveysByName.put(survey.getName(), survey);
-		
-		ModelDependencies modelDependencies = new ModelDependencies(expressionFactory);
-		survey.setModelDependencies(modelDependencies );
 	}
 
 }

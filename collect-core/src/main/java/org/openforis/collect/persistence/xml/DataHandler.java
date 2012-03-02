@@ -17,7 +17,6 @@ import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Field;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.NumericRangeAttribute;
-import org.openforis.idm.model.RecordContext;
 import org.openforis.idm.model.TaxonAttribute;
 import org.openforis.idm.util.CollectionUtil;
 import org.xml.sax.Attributes;
@@ -38,11 +37,9 @@ public class DataHandler extends DefaultHandler {
 	private StringBuilder content;
 	private Attributes attributes;
 	private CollectSurvey survey;
-	private RecordContext recordContext;
 	private int ignoreLevels;
 	
-	public DataHandler(RecordContext recordContext, CollectSurvey survey) {
-		this.recordContext = recordContext;
+	public DataHandler(CollectSurvey survey) {
 		this.survey = survey;
 	}
 
@@ -108,7 +105,7 @@ public class DataHandler extends DefaultHandler {
 			if ( StringUtils.isBlank(version) ) {
 				fail("Missing version number");
 			} else {
-				this.record = new CollectRecord(recordContext, survey, version);
+				this.record = new CollectRecord(survey, version);
 				this.node = record.createRootEntity(localName);
 			}
 		}

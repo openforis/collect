@@ -27,6 +27,8 @@
 
 	<context:property-placeholder location="classpath:/app.properties" />
 
+<!-- 	<bean id="applicationContextProvider" class="org.openforis.collect.context.ApplicationContextAwareImpl" /> -->
+
 	<bean class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping" />
 	<bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter" />
 	<bean class="org.openforis.collect.spring.handler.UrlFilenameHandlerAdapter" autowire="byName" />
@@ -56,10 +58,6 @@
 	<bean id="fileNameViewController" class="org.springframework.web.servlet.mvc.UrlFilenameViewController" />
 	<bean id="unlockController" class="org.openforis.collect.web.controller.UnlockController" />
 
-	<!-- TODO -->
-	<!-- <bean id="contextApplicationContextProvider" -->
-	<!-- class="org.fao.openforis.web.context.ApplicationContextAwareImpl"></bean> -->
-
 	<!-- ===================================== -->
 	<!-- GraniteDs services -->
 	<!-- ===================================== -->
@@ -87,7 +85,7 @@
 	<bean id="speciesManager"	class="org.openforis.collect.manager.SpeciesManager" />
 	<bean id="userManager"		class="org.openforis.collect.manager.UserManager" />
 		
-	<bean id="recordContext" class="org.openforis.collect.model.CollectRecordContext" />
+<!-- 	<bean id="recordContext" class="org.openforis.collect.model.CollectRecordContext" /> -->
 	
 	<!-- ===================================== -->
 	<!-- Data Source -->
@@ -112,7 +110,7 @@
     <!-- ===================================== -->
 	<!-- DAOs -->
 	<!-- ===================================== -->
-	<bean id="surveyDao" class="org.openforis.collect.persistence.SurveyDAO">
+	<bean id="surveyDao" class="org.openforis.collect.persistence.SurveyDAO" init-method="init">
     	<property name="dataSource" ref="dataSource"/>
 	</bean>
 
@@ -144,12 +142,14 @@
     	<property name="dataSource" ref="dataSource"/>
 	</bean>
 
+
 	<!-- Expression Factory -->
 	<bean id="expressionFactory" class="org.openforis.idm.model.expression.ExpressionFactory">
 		<property name="lookupProvider" ref="lookupProvider" />
 	</bean>
 	
-	<bean id="validator" 					class="org.openforis.idm.metamodel.validation.Validator" />
+	<!--  Survey Context -->
+	<bean id="validator" 					class="org.openforis.collect.model.validation.CollectValidator" />
 	
 	<bean id="lookupProvider" 	class="org.openforis.collect.persistence.DatabaseLookupProvider" />
 	

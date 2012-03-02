@@ -18,14 +18,18 @@ import org.jooq.Result;
 import org.jooq.impl.Factory;
 import org.jooq.impl.SQLDataType;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.CollectSurveyContext;
 import org.openforis.collect.persistence.jooq.JooqDaoSupport;
 import org.openforis.collect.persistence.xml.CollectIdmlBindingContext;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.Survey;
+import org.openforis.idm.metamodel.validation.Validator;
 import org.openforis.idm.metamodel.xml.InvalidIdmlException;
 import org.openforis.idm.metamodel.xml.SurveyMarshaller;
 import org.openforis.idm.metamodel.xml.SurveyUnmarshaller;
+import org.openforis.idm.model.expression.ExpressionFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -37,9 +41,18 @@ public class SurveyDAO extends JooqDaoSupport {
 	
 	private CollectIdmlBindingContext bindingContext;
 
+	@Autowired
+	private ExpressionFactory expressionFactory;
+	@Autowired
+	private Validator validator;
+	
 	public SurveyDAO() {
-		bindingContext = new CollectIdmlBindingContext();
 	}
+	
+	public void init(){
+		bindingContext = new CollectIdmlBindingContext(new CollectSurveyContext(expressionFactory, validator));
+	}
+	
 	@Transactional
 	public void importModel(Survey survey) throws SurveyImportException {
 		String name = survey.getName();

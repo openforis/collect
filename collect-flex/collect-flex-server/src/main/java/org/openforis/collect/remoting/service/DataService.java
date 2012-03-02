@@ -161,12 +161,12 @@ public class DataService {
 	}
 
 	public UpdateResponse updateActiveRecord(UpdateRequest request) {
-		List<Node<?>> addedNodes = new ArrayList<Node<?>>();;
-		List<Node<?>> updatedNodes = new ArrayList<Node<?>>();;
+		List<Node<?>> addedNodes = new ArrayList<Node<?>>();
+		List<Node<?>> updatedNodes = new ArrayList<Node<?>>();
 		List<Integer> deletedNodeIds = new ArrayList<Integer>();
 		List<UpdateRequestOperation> operations = request.getOperations();
 		for (UpdateRequestOperation operation : operations) {
-			processOperation(operation, addedNodes, updatedNodes, deletedNodeIds);
+			processUpdateRequestOperation(operation, addedNodes, updatedNodes, deletedNodeIds);
 		}
 		//convert nodes to proxies
 		UpdateResponse response = new UpdateResponse();
@@ -178,7 +178,7 @@ public class DataService {
 		
 	
 	@SuppressWarnings("unchecked")
-	private void processOperation(UpdateRequestOperation operation, List<Node<?>> addedNodes, List<Node<?>> updatedNodes, List<Integer> deletedNodeIds) {
+	private void processUpdateRequestOperation(UpdateRequestOperation operation, List<Node<?>> addedNodes, List<Node<?>> updatedNodes, List<Integer> deletedNodeIds) {
 		SessionState sessionState = sessionManager.getSessionState();
 		CollectRecord record = sessionState.getActiveRecord();
 		ModelVersion version = record.getVersion();
@@ -531,7 +531,7 @@ public class DataService {
 	private CodeAttribute getCodeParent(Entity context, CodeAttributeDefinition def) {
 		try {
 			String parentExpr = def.getParentExpression();
-			ExpressionFactory expressionFactory = context.getRecord().getContext().getExpressionFactory();
+			ExpressionFactory expressionFactory = context.getRecord().getSurveyContext().getExpressionFactory();
 			ModelPathExpression expression = expressionFactory.createModelPathExpression(parentExpr);
 			Node<?> parentNode = expression.evaluate(context, null);
 			if (parentNode != null && parentNode instanceof CodeAttribute) {

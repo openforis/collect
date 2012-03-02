@@ -9,10 +9,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.xerces.parsers.SAXParser;
 import org.openforis.collect.model.CollectRecord;
-import org.openforis.collect.model.CollectRecordContext;
-import org.openforis.collect.model.CollectSurvey;
-import org.openforis.idm.metamodel.xml.InvalidIdmlException;
-import org.openforis.idm.metamodel.xml.SurveyUnmarshaller;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -82,29 +78,27 @@ public class DataUnmarshaller {
 		return parse(is);
 	}
 
-	public static void main(String[] args) {
-		try {
-			
-			// Load IDML
-			CollectIdmlBindingContext idmlBindingContext = new CollectIdmlBindingContext();
-			SurveyUnmarshaller surveyUnmarshaller = idmlBindingContext.createSurveyUnmarshaller();
-			CollectSurvey survey = (CollectSurvey) surveyUnmarshaller.unmarshal("/home/gino/workspace/faofin/tz/naforma-idm/tanzania-naforma.idm.xml");
-			
-			// Load record
-			long start = System.currentTimeMillis();
-			CollectRecordContext recordContext = new CollectRecordContext();
-			DataHandler handler = new DataHandler(recordContext, survey);
-			DataUnmarshaller dataUnmarshaller = new DataUnmarshaller(handler);
-			CollectRecord record = dataUnmarshaller.parse("/home/gino/workspace/temp/tzdata/data/3/143_169/data.xml");
-			long end = System.currentTimeMillis();
-			System.out.println(record);
-			System.out.println("Loaded in "+(end-start)+"ms");
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (InvalidIdmlException e) {
-			e.printStackTrace();
-		} catch (DataUnmarshallerException e) {
-			e.printStackTrace();
-		}
-	}
+//	public static void main(String[] args) {
+//		try {
+//			
+//			// Load IDML
+//			CollectIdmlBindingContext idmlBindingContext = new CollectIdmlBindingContext();
+//			SurveyUnmarshaller surveyUnmarshaller = idmlBindingContext.createSurveyUnmarshaller();
+//			CollectSurvey survey = (CollectSurvey) surveyUnmarshaller.unmarshal("/home/gino/workspace/faofin/tz/naforma-idm/tanzania-naforma.idm.xml");
+//			// Load record
+//			long start = System.currentTimeMillis();
+//			DataHandler handler = new DataHandler(survey);
+//			DataUnmarshaller dataUnmarshaller = new DataUnmarshaller(handler);
+//			CollectRecord record = dataUnmarshaller.parse("/home/gino/workspace/temp/tzdata/data/3/143_169/data.xml");
+//			long end = System.currentTimeMillis();
+//			System.out.println(record);
+//			System.out.println("Loaded in "+(end-start)+"ms");
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		} catch (InvalidIdmlException e) {
+//			e.printStackTrace();
+//		} catch (DataUnmarshallerException e) {
+//			e.printStackTrace();
+//		}
+//	}
 }

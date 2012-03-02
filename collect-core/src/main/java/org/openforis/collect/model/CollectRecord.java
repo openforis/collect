@@ -10,11 +10,11 @@ import java.util.Set;
 
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
+import org.openforis.idm.metamodel.SurveyContext;
 import org.openforis.idm.metamodel.validation.Validator;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.Record;
-import org.openforis.idm.model.RecordContext;
 import org.openforis.idm.model.state.ModelDependencies;
 import org.openforis.idm.model.state.NodeState;
 
@@ -64,12 +64,12 @@ public class CollectRecord extends Record {
 	
 	private List<String> rootEntityKeys;
 	private List<Integer> entityCounts;
+	@Deprecated
 	private Map<Integer, NodeState> nodeStateMap;
-	private CollectSurvey collectSurvey;
 
-	public CollectRecord(RecordContext context, CollectSurvey survey, String versionName) {
-		super(context, survey, versionName);
-		this.collectSurvey = survey;
+	public CollectRecord(CollectSurvey survey, String versionName) {
+		super(survey, versionName);
+		//this.collectSurvey = survey;
 		this.step = Step.ENTRY;
 		this.submitted = false;
 
@@ -79,14 +79,14 @@ public class CollectRecord extends Record {
 		nodeStateMap = new HashMap<Integer, NodeState>();
 
 	}
-
+	@Deprecated
 	public void updateNodeStates() {
 		Entity entity = getRootEntity();
 		updateAllRelevanceStates(entity);
 		updateAllRequiredStates(entity);
 		updateAllValidationStates(entity);
 	}
-
+	@Deprecated
 	private void updateAllRelevanceStates(Node<?> node) {
 		NodeState nodeState = getNodeStateInternal(node);
 		nodeState.updateRelevance();
@@ -104,7 +104,7 @@ public class CollectRecord extends Record {
 			}
 		}
 	}
-
+	@Deprecated
 	private void updateAllRequiredStates(Node<?> node) {
 		NodeState nodeState = getNodeStateInternal(node);
 		nodeState.updateRequired();
@@ -123,6 +123,7 @@ public class CollectRecord extends Record {
 		}
 	}
 	
+	@Deprecated
 	private void updateAllValidationStates(Node<?> node) {
 		NodeState nodeState = getNodeStateInternal(node);
 		nodeState.updateValidation(getValidator());
@@ -141,6 +142,7 @@ public class CollectRecord extends Record {
 		}
 	}
 	
+	@Deprecated
 	private NodeState getNodeStateInternal(Node<?> child) {
 		Integer internalId = child.getInternalId();
 		NodeState nodeState = nodeStateMap.get(internalId);
@@ -157,6 +159,7 @@ public class CollectRecord extends Record {
 	 * @param node
 	 * @return
 	 */
+	@Deprecated
 	public NodeState getNodeState(Node<?> node) {
 		int nodeInternalId = node.getInternalId();
 		NodeState nodeState = nodeStateMap.get(nodeInternalId);
@@ -167,17 +170,7 @@ public class CollectRecord extends Record {
 		return nodeState;
 	}
 
-	/**
-	 * <ol>
-	 * <li>Change value of attribute x</li>
-	 * <li>Update relevance states of all nodes R which depend on x for relevance and their descendants</li>
-	 * <li>Update required states of all nodes R, of all nodes V which depend on value of x</li>
-	 * <li>Revalidate all nodes R, V and x</li>
-	 * </ol>
-	 * 
-	 * @param node
-	 * @return
-	 */
+	@Deprecated
 	public List<NodeState> updateNodeState(Node<?> node) {
 		Set<Node<?>> nodesToRevalidate = new HashSet<Node<?>>();
 
@@ -195,15 +188,17 @@ public class CollectRecord extends Record {
 
 		return nodeStates;
 	}
-
+	
+	@Deprecated
 	private void updateDependantRelevantNodes(Node<?> node, Set<Node<?>> set) {
-		ModelDependencies modelDependencies = collectSurvey.getModelDependencies();
+		ModelDependencies modelDependencies = null; //collectSurvey.getModelDependencies();
 		Set<Node<?>> relevanceDependantNodes = modelDependencies.getRelevanceDependantNodes(node);
 		for (Node<?> dependantNode : relevanceDependantNodes) {
 			updateRelevanceAndDessendants(dependantNode, set);
 		}
 	}
-
+	
+	@Deprecated
 	private List<NodeState> validate(Set<Node<?>> nodesToRevalidate) {
 		List<NodeState> nodeStates = new ArrayList<NodeState>();
 		for (Node<?> node : nodesToRevalidate) {
@@ -219,6 +214,7 @@ public class CollectRecord extends Record {
 	 * 
 	 * @param node
 	 */
+	@Deprecated
 	private void updateRelevanceAndDessendants(Node<?> node, Set<Node<?>> set) {
 		NodeState nodeState = getNodeState(node);
 		nodeState.updateRelevance();
@@ -241,20 +237,22 @@ public class CollectRecord extends Record {
 	/**
 	 * @param node
 	 */
+	@Deprecated
 	private void updateRequiredState(Node<?> node, boolean updateDependants, Set<Node<?>> set) {
 		NodeState nodeState = getNodeState(node);
 		nodeState.updateRequired();
 		set.add(node);
 
 		if (updateDependants) {
-			ModelDependencies dependencies = collectSurvey.getModelDependencies();
+			ModelDependencies dependencies = null;//collectSurvey.getModelDependencies();
 			Set<Node<?>> nodes = dependencies.getRequiredDependantNodes(node);
 			for (Node<?> dependantNode : nodes) {
 				updateRequiredState(dependantNode, updateDependants, set);
 			}
 		}
 	}
-
+	
+	@Deprecated
 	public List<NodeState> deleteNodeState(Node<?> node) {
 		Set<Node<?>> nodesToRevalidate = new HashSet<Node<?>>();
 
@@ -271,6 +269,10 @@ public class CollectRecord extends Record {
 		List<NodeState> nodeStates = validate(nodesToRevalidate);
 
 		return nodeStates;
+	}
+	@Deprecated
+	private void deleteNodeState() {
+		
 	}
 
 //	private void refreshDependentNodesState(Node<?> node, Set<Integer> updatedNodeIds, List<NodeState> nodeStates) {
@@ -298,6 +300,7 @@ public class CollectRecord extends Record {
 	 * @param node
 	 * @return
 	 */
+	@Deprecated
 	private NodeState updateNodeStates(Node<?> node) {
 		NodeState nodeState = new NodeState(node);
 		nodeState.update(getValidator());
@@ -306,7 +309,7 @@ public class CollectRecord extends Record {
 	}
 
 	private Validator getValidator() {
-		RecordContext context = getContext();
+		SurveyContext context = getSurveyContext();
 		Validator validator = context.getValidator();
 		return validator;
 	}

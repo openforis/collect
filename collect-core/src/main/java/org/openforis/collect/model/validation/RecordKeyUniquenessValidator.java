@@ -17,22 +17,20 @@ import org.openforis.idm.metamodel.validation.ValidationRule;
 import org.openforis.idm.model.AtomicAttribute;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Entity;
-import org.openforis.idm.model.state.NodeState;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author M. Togna
  * 
  */
-public class RecordKeyUniquenessValidator implements ValidationRule {
+public class RecordKeyUniquenessValidator implements ValidationRule<Attribute<?, ?>> {
 
 	@Autowired
 	private RecordManager recordManager;
 
 	@Override
-	public boolean evaluate(NodeState nodeState) {
-		Attribute<?, ?> attr = (Attribute<?, ?>) nodeState.getNode();
-		Entity rootEntity = attr.getParent();
+	public boolean evaluate(Attribute<?, ?> node) {
+		Entity rootEntity = node.getParent();
 		CollectRecord record = (CollectRecord) rootEntity.getRecord();
 		CollectSurvey survey = (CollectSurvey) record.getSurvey();
 		String[] keys = getKeys(rootEntity);
@@ -54,7 +52,7 @@ public class RecordKeyUniquenessValidator implements ValidationRule {
 	private String[] getKeys(Entity entity) {
 		List<String> keys = new ArrayList<String>();
 		List<AttributeDefinition> keyAttributeDefinitions = getKeyAttributeDefinitions(entity);
-		for (AttributeDefinition keyAttributeDefinition : keyAttributeDefinitions) {
+		for (NodeDefinition keyAttributeDefinition : keyAttributeDefinitions) {
 			String keyName = keyAttributeDefinition.getName();
 			AtomicAttribute<?, ?> attribute = (AtomicAttribute<?, ?>) entity.get(keyName, 0);
 			Object object = attribute.getValue();

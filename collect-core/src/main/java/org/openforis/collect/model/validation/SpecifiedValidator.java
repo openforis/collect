@@ -7,13 +7,13 @@ import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.idm.metamodel.validation.Check;
 import org.openforis.idm.model.Attribute;
-import org.openforis.idm.model.state.NodeState;
+import org.openforis.idm.model.Entity;
 
 /**
  * @author M. Togna
  * 
  */
-public class SpecifiedValidator extends Check {
+public class SpecifiedValidator extends Check<Attribute<?, ?>> {
 
 	private static final long serialVersionUID = 1L;
 
@@ -24,16 +24,14 @@ public class SpecifiedValidator extends Check {
 	}
 
 	@Override
-	public boolean evaluate(NodeState nodeState) {
-		Attribute<?, ?> attribute = (Attribute<?, ?>) nodeState.getNode();
+	public boolean evaluate(Attribute<?, ?> attribute) {
 		CollectRecord record = (CollectRecord) attribute.getRecord();
 		Step step = record.getStep();
-
-		if (nodeState.isRelevant() && attribute.isEmpty()) {
+		if (isRelevant(attribute) && attribute.isEmpty()) {
 			if (Step.ENTRY.equals(step)) {
 				if (CollectValidator.notReasonBlankSpecified(attribute)) {
 					flag = Flag.ERROR;
-				} else if (nodeState.isRequired()) {
+				} else if (isRequired(attribute)) {
 					flag = Flag.WARN;
 				}
 			} else {
@@ -42,6 +40,16 @@ public class SpecifiedValidator extends Check {
 			return false;
 		}
 		return true;
+	}
+
+	private boolean isRequired(Attribute<?, ?> attribute) {
+		Entity parent = attribute.getParent();
+		return parent.isRequired(attribute.getName());
+	}
+
+	private boolean isRelevant(Attribute<?, ?> attribute) {
+		Entity parent = attribute.getParent();
+		return parent.isRelevant(attribute.getName());
 	}
 
 	@Override

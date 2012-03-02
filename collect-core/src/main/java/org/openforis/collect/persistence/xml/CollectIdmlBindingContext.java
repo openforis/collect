@@ -5,6 +5,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.UIConfiguration.UIConfigurationAdapter;
 import org.openforis.idm.metamodel.Configuration;
+import org.openforis.idm.metamodel.SurveyContext;
 import org.openforis.idm.metamodel.xml.ConfigurationAdapter;
 import org.openforis.idm.metamodel.xml.IdmlBindingContext;
 
@@ -13,8 +14,9 @@ import org.openforis.idm.metamodel.xml.IdmlBindingContext;
  */
 @XmlRootElement(name = "survey")
 public class CollectIdmlBindingContext extends IdmlBindingContext {
-	public CollectIdmlBindingContext() {
-		super(CollectSurvey.class);
+	
+	public CollectIdmlBindingContext(SurveyContext surveyContext) {
+		super(CollectSurvey.class, surveyContext);
 		UIConfigurationAdapter configurationAdapter = new UIConfigurationAdapter();
 		super.setConfigurationAdapter(configurationAdapter);
 	}

@@ -28,7 +28,6 @@ import org.openforis.collect.persistence.jooq.tables.records.OfcRecordRecord;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Schema;
-import org.openforis.idm.model.RecordContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,8 +45,8 @@ public class RecordDAO extends JooqDaoSupport {
 	private DataDao dataDao;
 	
 	@Transactional
-	public CollectRecord load(CollectSurvey survey, RecordContext recordContext, int recordId) throws DataInconsistencyException, NonexistentIdException {
-		CollectRecord record = loadRecord(survey, recordContext, recordId);
+	public CollectRecord load(CollectSurvey survey, int recordId) throws DataInconsistencyException, NonexistentIdException {
+		CollectRecord record = loadRecord(survey, recordId);
 		loadData(record);
 
 		return record;
@@ -151,7 +150,7 @@ public class RecordDAO extends JooqDaoSupport {
 		jf.update(OFC_RECORD).set(OFC_RECORD.LOCKED_BY_ID, (Integer)null).execute();
 	}
 
-	private CollectRecord loadRecord(CollectSurvey survey, RecordContext recordContext, int recordId) throws NonexistentIdException {
+	private CollectRecord loadRecord(CollectSurvey survey, int recordId) throws NonexistentIdException {
 		Factory jf = getJooqFactory();
 		Record r = jf.select().from(OFC_RECORD).where(OFC_RECORD.ID.equal(recordId)).fetchOne();
 		int rootEntityId = r.getValueAsInteger(OFC_RECORD.ROOT_ENTITY_ID);
@@ -167,7 +166,7 @@ public class RecordDAO extends JooqDaoSupport {
 			throw new NullPointerException("Unknown root entity id " + rootEntityId);
 		}
 
-		CollectRecord record = new CollectRecord(recordContext, survey, version);
+		CollectRecord record = new CollectRecord(survey, version);
 		
 		mapRecordToCollectRecord(r, record);
 		
@@ -178,13 +177,12 @@ public class RecordDAO extends JooqDaoSupport {
 	 * Load a list of record summaries that match the primary keys
 	 * 
 	 * @param survey
-	 * @param recordContext
 	 * @param rootEntity
 	 * @param keys
 	 * @return
 	 */
 	@Transactional
-	public List<CollectRecord> loadSummaries(CollectSurvey survey, RecordContext recordContext, String rootEntity, String... keys) {
+	public List<CollectRecord> loadSummaries(CollectSurvey survey, String rootEntity, String... keys) {
 		Factory jf = getJooqFactory();
 		SelectQuery q = jf.selectQuery();
 		q.addFrom(OFC_RECORD);
@@ -197,12 +195,12 @@ public class RecordDAO extends JooqDaoSupport {
 			q.addConditions(keyField.equal(key));
 		}
 		Result<Record> records = q.fetch();
-		List<CollectRecord> recordSummaries = mapRecordsToSummaries(recordContext, records, survey, rootEntity);
+		List<CollectRecord> recordSummaries = mapRecordsToSummaries(records, survey, rootEntity);
 		return recordSummaries;
 	}
 	
 	@Transactional
-	public List<CollectRecord> loadSummaries(CollectSurvey survey, RecordContext recordContext, String rootEntity, int offset, int maxRecords, String orderByField, String filter) {
+	public List<CollectRecord> loadSummaries(CollectSurvey survey, String rootEntity, int offset, int maxRecords, String orderByField, String filter) {
 		Factory jf = getJooqFactory();
 		OfcRecord r = OFC_RECORD.as("r");
 		
@@ -269,17 +267,17 @@ public class RecordDAO extends JooqDaoSupport {
 		//fetch results
 		Result<Record> records = q.fetch();
 		
-		List<CollectRecord> result = mapRecordsToSummaries(recordContext, records, survey, rootEntity);
+		List<CollectRecord> result = mapRecordsToSummaries(records, survey, rootEntity);
 		return result;
 	}
 	
-	private List<CollectRecord> mapRecordsToSummaries(RecordContext recordContext, List<Record> records, CollectSurvey survey, String rootEntity) {
+	private List<CollectRecord> mapRecordsToSummaries(List<Record> records, CollectSurvey survey, String rootEntity) {
 		List<CollectRecord> result = new ArrayList<CollectRecord>();
 		
 		for (Record r : records) {
 			String versionName = r.getValue(OFC_RECORD.MODEL_VERSION);
 			
-			CollectRecord record = new CollectRecord(recordContext, survey, versionName);
+			CollectRecord record = new CollectRecord(survey, versionName);
 			
 			mapRecordToCollectRecord(r, record);
 			
