@@ -2,51 +2,18 @@
 <s:SkinnableContainer xmlns:fx="http://ns.adobe.com/mxml/2009" 
 		  xmlns:s="library://ns.adobe.com/flex/spark" 
 		  xmlns:mx="library://ns.adobe.com/flex/mx"
-		  xmlns:component="org.fao.openforis.flex.component.*"
-		  creationComplete="creationCompleteHandler(event)" 
 		  creationPolicy="all"
 		  alpha="1"
 		  >
 	
 	<fx:Script>
 		<![CDATA[
-			import mx.events.FlexEvent;
-			
 			import org.openforis.collect.i18n.Message;
-			import org.openforis.collect.model.FieldSymbol;
-			import org.openforis.collect.model.proxy.AttributeProxy;
-			
-			public static const STATE_DEFAULT:String = "default";
-			public static const STATE_CAN_SPECIFY_REASON_BLANK:String = "canSpecifyReasonBlank";
-			
-			protected function creationCompleteHandler(event:FlexEvent):void {
-			}
-			
 		]]>
 	</fx:Script>
-	<fx:Declarations>
-		<!-- Place non-visual elements (e.g., services, value objects) here -->
-		<s:RadioButtonGroup id="radioButtonGroup" />
-	</fx:Declarations>
-	
-	<s:states>
-		<s:State name="default" />
-		<s:State name="canSpecifyReasonBlank" />
-	</s:states>
-	
-	<s:VGroup id="reasonBlankGroup" visible="false" includeInLayout="false" 
-			  visible.canSpecifyReasonBlank="true" includeInLayout.canSpecifyReasonBlank="true">
-		<s:Label text="Reason left blank:" />
-		<s:RadioButton id="blankOnFormRadioButton" value="{FieldSymbol.BLANK_ON_FORM}" group="{radioButtonGroup}" 
-					   label="{Message.get('edit.contextMenu.blankOnForm')}" />
-		<s:RadioButton id="dashOnFormRadioButton" value="{FieldSymbol.DASH_ON_FORM}" group="{radioButtonGroup}" 
-					   label="{Message.get('edit.contextMenu.dashOnForm')}" />
-		<s:RadioButton id="illegibleRadioButton" value="{FieldSymbol.ILLEGIBLE}" group="{radioButtonGroup}" 
-					   label="{Message.get('edit.contextMenu.illegible')}" />
-	</s:VGroup>
 	
 	<s:VGroup id="remarksGroup">
-		<s:Label text="Remarks:" />
+		<s:Label text="{Message.get('edit.remarksLabel')}" />
 		<s:TextArea id="remarksTextArea" heightInLines="4" textAlign="left" />	
 	</s:VGroup>
 	

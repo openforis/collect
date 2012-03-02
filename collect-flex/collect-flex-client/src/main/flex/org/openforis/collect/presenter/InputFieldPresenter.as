@@ -138,11 +138,12 @@ package org.openforis.collect.presenter {
 			sendUpdate(value, symbol, remarks);
 		}
 		
-		public function applySymbolAndRemarks(symbol:FieldSymbol, remarks:String):void {
+		public function applyRemarks(remarks:String):void {
 			var value:String = null;
 			if(ArrayUtil.isNotIn(REASON_BLANK_SYMBOLS, symbol)) {
 				value = textToRequestValue();
 			}
+			var symbol:FieldSymbol = getSymbol();
 			sendUpdate(value, symbol, remarks);
 		}
 		
@@ -249,6 +250,14 @@ package org.openforis.collect.presenter {
 			var f:FieldProxy = getField();
 			if(f != null) {
 				return f.remarks;
+			} 
+			return null;
+		}
+		
+		protected function getSymbol():FieldSymbol {
+			var f:FieldProxy = getField();
+			if(f != null) {
+				return f.symbol;
 			} 
 			return null;
 		}
