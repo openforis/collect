@@ -38,7 +38,14 @@
 		<s:State name="selection" />
 	</s:states>
 	
-	<datagrid:RecordSummaryDataGrid id="dataGrid" width="100%" horizontalScrollPolicy="off" selectionMode="singleRow" doubleClickEnabled="true" verticalScrollPolicy="off" />
+	<datagrid:RecordSummaryDataGrid id="dataGrid" 
+									width="100%"
+									rowHeight="22"
+									doubleClickEnabled="true" 
+									selectionMode="singleRow" 
+									horizontalScrollPolicy="off" 
+									verticalScrollPolicy="off" 
+									/>
 	
 	<datagrid:PaginationBar id="paginationBar" height="16" />
 	
