@@ -7,28 +7,49 @@
 
 package org.openforis.collect.metamodel.proxy {
 	import mx.collections.IList;
-
+	
+	import org.openforis.collect.util.CollectionUtil;
+	import org.openforis.collect.util.StringUtil;
+	
+	/**
+	 * @author M. Togna
+	 * @author S. Ricci
+	 */
     [Bindable]
     [RemoteClass(alias="org.openforis.collect.metamodel.proxy.NodeDefinitionProxy")]
     public class NodeDefinitionProxy extends NodeDefinitionProxyBase {
 		
-		public function getLabelText(language:String = "en"):String {
-			return getLabel(this.labels, NodeLabelProxy$Type.INSTANCE, language);
+		public function getLabelText(language:String = null, firstIfNotFound:Boolean = true):String {
+			var labelTypes:Array = [NodeLabelProxy$Type.INSTANCE, NodeLabelProxy$Type.HEADING, null];
+			var label:NodeLabelProxy = null;
+			for each (var type:NodeLabelProxy$Type in labelTypes) {
+				label = getLabel(type, language, false);
+				if(label != null) {
+					break;
+				}
+			}
+			if(label == null && firstIfNotFound) {
+				label = getLabel(null, language, true);
+			}
+			if(label != null) {
+				return label.text;
+			} else {
+				return null;
+			}
 		}
 		
-		public static function getLabel(labels:IList, type:NodeLabelProxy$Type, language:String = "en"):String {
-			if(labels == null || labels.length <= 0) {
-				return null;
-			} else if(labels.length == 1) {
-				return NodeLabelProxy(labels.getItemAt(0)).text;
-			} else {
+		public function getLabel(type:NodeLabelProxy$Type = null, language:String = null, firstIfNotFound:Boolean = false):NodeLabelProxy {
+			if(CollectionUtil.isNotEmpty(labels)) {
 				for each(var label:NodeLabelProxy in labels) {
-					if(label.type == type && label.language == language) {
-						return label.text;
+					if(label.type == type && (language == null || label.language == language)) {
+						return label;
 					}
-				} 
-				return (labels.getItemAt(0) as NodeLabelProxy).text;
+				}
+				if(firstIfNotFound) {
+					return (labels.getItemAt(0) as NodeLabelProxy);
+				}
 			}
+			return null;
 		}
 		
     }
