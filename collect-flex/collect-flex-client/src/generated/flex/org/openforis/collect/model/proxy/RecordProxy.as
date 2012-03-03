@@ -6,6 +6,7 @@
  */
 
 package org.openforis.collect.model.proxy {
+	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
 	
 	import org.granite.collections.IMap;
@@ -34,7 +35,13 @@ package org.openforis.collect.model.proxy {
 		
 		private function processResponse(response:UpdateResponse):void {
 			var node:NodeProxy, oldNode:NodeProxy, parent:EntityProxy;
-			if(response.deletedINodeId > 0) {
+			if(response.createdNode != null) {
+				node = response.createdNode;
+				parent = getNode(node.parentId) as EntityProxy;
+				parent.addChild(node);
+			}
+			if(response.deletedNodeId > 0) {
+				node = getNode(response.deletedNodeId);
 				parent = getNode(node.parentId) as EntityProxy;
 				parent.removeChild(node);
 			} else {
@@ -43,6 +50,13 @@ package org.openforis.collect.model.proxy {
 					var a:AttributeProxy = AttributeProxy(node);
 					if(response.validationResults != null) {
 						a.validationResults = response.validationResults;
+					}
+					if(response.updatedFieldValues != null) {
+						var fieldIdxs:ArrayCollection = response.updatedFieldValues.keySet;
+						for each (var i:int in fieldIdxs) {
+							var f:FieldProxy = a.getField(i);
+							f.value = response.updatedFieldValues.get(i);
+						}
 					}
 				} else if(node is EntityProxy) {
 					var e:EntityProxy = EntityProxy(node);
