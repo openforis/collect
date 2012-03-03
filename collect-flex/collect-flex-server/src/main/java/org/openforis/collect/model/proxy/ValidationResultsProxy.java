@@ -31,14 +31,14 @@ public class ValidationResultsProxy implements Proxy {
 		return ValidationResultProxy.fromList(validationResults.getWarnings());
 	}
 
-	@ExternalizedProperty
-	public List<ValidationResultProxy> getPassed() {
-		return ValidationResultProxy.fromList(validationResults.getPassed());
-	}
+//	@ExternalizedProperty
+//	public List<ValidationResultProxy> getPassed() {
+//		return ValidationResultProxy.fromList(validationResults.getPassed());
+//	}
 
-	@ExternalizedProperty
-	public List<ValidationResultProxy> getFailed() {
-		return ValidationResultProxy.fromList(validationResults.getFailed());
-	}
+//	@ExternalizedProperty
+//	public List<ValidationResultProxy> getFailed() {
+//		return ValidationResultProxy.fromList(validationResults.getFailed());
+//	}
 
 }

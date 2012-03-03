@@ -57,15 +57,15 @@ public class AttributeProxy extends NodeProxy {
 		return attribute.isEmpty();
 	}
 
-	// @ExternalizedProperty
-	// public boolean isRelevant() {
-	// return attribute.isRelevant();
-	// }
-	//
-	// @ExternalizedProperty
-	// public boolean isRequired() {
-	// return attribute.isRequired();
-	// }
+//	 @ExternalizedProperty
+//	 public boolean isRelevant() {
+//	 return attribute.isRelevant();
+//	 }
+//	
+//	 @ExternalizedProperty
+//	 public boolean isRequired() {
+//	 return attribute.isRequired();
+//	 }
 
 	@ExternalizedProperty
 	public List<FieldProxy> getFields() {
@@ -77,5 +77,7 @@ public class AttributeProxy extends NodeProxy {
 		}
 		return result;
 	}
+	
+	
 
 }
