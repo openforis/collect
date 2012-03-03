@@ -207,7 +207,9 @@ public class DataService {
 			case UPDATE:
 				updateAttribute(record, parentEntity, (Attribute<AttributeDefinition, ?>) node, fieldIndex, requestValue, symbol, remarks);
 				//nodeStates = record.updateNodeState(node);
-				updatedNodes.add(node);
+				if(! updatedNodes.contains(node)) {
+					updatedNodes.add(node);
+				}
 				break;
 			case DELETE: 
 				Node<?> deletedNode = recordManager.deleteNode(parentEntity, node);
