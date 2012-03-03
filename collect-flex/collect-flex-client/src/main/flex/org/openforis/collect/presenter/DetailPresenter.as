@@ -12,6 +12,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.Application;
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.client.DataClient;
+	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.event.UIEvent;
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
@@ -39,7 +40,8 @@ package org.openforis.collect.presenter {
 			_view.saveButton.addEventListener(MouseEvent.CLICK, saveButtonClickHandler);
 			_view.submitButton.addEventListener(MouseEvent.CLICK, submitButtonClickHandler);
 			_view.rejectButton.addEventListener(MouseEvent.CLICK, rejectButtonClickHandler);
-				
+			eventDispatcher.addEventListener(ApplicationEvent.UPDATE_RESPONSE_RECEIVED, updateResponseReceivedHandler);
+			
 			eventDispatcher.addEventListener(UIEvent.ACTIVE_RECORD_CHANGED, activeRecordChangedListener);
 		}
 		
@@ -150,6 +152,10 @@ package org.openforis.collect.presenter {
 			Application.activeRecord = null;
 			var uiEvent:UIEvent = new UIEvent(UIEvent.BACK_TO_LIST);
 			eventDispatcher.dispatchEvent(uiEvent);
+		}
+		
+		protected function updateResponseReceivedHandler(event:ApplicationEvent):void {
+			//update 
 		}
 	}
 }

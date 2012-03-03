@@ -50,7 +50,7 @@
 					<s:SolidColorStroke color="gray" alpha="0.8"/>
 				</s:stroke>
 			</s:Line>
-			<s:HGroup>
+			<s:HGroup gap="2">
 				<s:Label id="rootEntityDefinitionText" styleName="title2" />
 				<s:Label id="keyAttributeValuesText" styleName="title2" />
 			</s:HGroup>
