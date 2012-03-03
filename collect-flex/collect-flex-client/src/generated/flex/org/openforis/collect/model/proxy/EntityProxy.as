@@ -149,18 +149,14 @@ package org.openforis.collect.model.proxy {
 			var keyParts:Array = new Array();
 			for each (var def:AttributeDefinitionProxy in keyDefs) {
 				var key:AttributeProxy = getSingleAttribute(def.name);
-				if(key != null && key.value != null) {
-					var keyValue:Object = key.value;
-					var keyPart:String = null;
-					if(keyValue is CodeProxy) {
-						keyPart = CodeProxy(keyValue).toString();
-					} else if(keyValue is CoordinateProxy) {
-						//todo
-						keyPart = CoordinateProxy(keyValue).toString();
-					} else {
-						keyPart = String(keyValue);
+				if(key != null) {
+					var value:Object = key.getField(0).value;
+					if(value != null) {
+						var keyPart:String = value.toString();
+						if(StringUtil.isNotBlank(keyPart)) {
+							keyParts.push(keyPart);
+						}
 					}
-					keyParts.push(keyPart);
 				}
 			}
 			return StringUtil.concat(" - ", keyParts);
