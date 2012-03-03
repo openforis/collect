@@ -17,15 +17,15 @@ import org.openforis.idm.metamodel.validation.ValidationResults;
  */
 public class UpdateResponse implements Proxy {
 
-	private transient int nodeId;
+	private transient Integer internalNodeId;
 	private transient Map<String, Object> relevantMap;
 	private transient Map<String, Object> requiredMap;
-	private transient ValidationResults validationResults;
+	private transient ValidationResults attributeValidationResults;
 	private transient Map<String, Object> minCountValidMap;
 	private transient Map<String, Object> maxCountValidMap;
 
 	public UpdateResponse(int nodeId) {
-		this.nodeId = nodeId;
+		this.internalNodeId = nodeId;
 		relevantMap = new HashMap<String, Object>();
 		requiredMap = new HashMap<String, Object>();
 		minCountValidMap = new HashMap<String, Object>();
@@ -34,17 +34,12 @@ public class UpdateResponse implements Proxy {
 
 	@ExternalizedProperty
 	public Integer getNodeId() {
-		return nodeId;
-	}
-
-	public void setNodeId(int nodeId) {
-		this.nodeId = nodeId;
+		return internalNodeId;
 	}
 
 	@ExternalizedProperty
 	public Map<String, Object> getRelevant() {
-//		return relevantMap;
-		return null;
+		return relevantMap;
 	}
 
 	public void setRelevant(String childName, Object relevant) {
@@ -53,30 +48,27 @@ public class UpdateResponse implements Proxy {
 
 	@ExternalizedProperty
 	public Map<String, Object> getRequired() {
-//		return requiredMap;
-		return null;
+		return requiredMap;
 	}
 
 	public void setRequired(String childName, Object required) {
 		requiredMap.put(childName, required);
 	}
 
-	@ExternalizedProperty
 	public ValidationResultsProxy getValidationResults() {
-//		if (validationResults != null) {
-//			return new ValidationResultsProxy(validationResults);
-//		}
+		if (attributeValidationResults != null) {
+			return new ValidationResultsProxy(attributeValidationResults);
+		}
 		return null;
 	}
 
-	public void setValidationResults(ValidationResults validationResults) {
-		this.validationResults = validationResults;
+	public void setAttributeValidationResults(ValidationResults validationResults) {
+		this.attributeValidationResults = validationResults;
 	}
 
 	@ExternalizedProperty
-	public Map<String, Object> getMinCountValid() {
-//		return minCountValidMap;
-		return null;
+	public Map<String, Object> getMinCountValidation() {
+		return minCountValidMap;
 	}
 
 	public void setMinCountValid(String childName, Object minCountValid) {
@@ -84,9 +76,8 @@ public class UpdateResponse implements Proxy {
 	}
 
 	@ExternalizedProperty
-	public Map<String, Object> getMaxCountValid() {
-//		return maxCountValidMap;
-		return null;
+	public Map<String, Object> getMaxCountValidation() {
+		return maxCountValidMap;
 	}
 
 	public void setMaxCountValid(String childName, Object maxCountValid) {
@@ -95,7 +86,7 @@ public class UpdateResponse implements Proxy {
 
 	@Override
 	public int hashCode() {
-		return new HashCodeBuilder().append(nodeId).toHashCode();
+		return new HashCodeBuilder().append(internalNodeId).toHashCode();
 	}
 
 	@Override
@@ -107,7 +98,7 @@ public class UpdateResponse implements Proxy {
 		if (getClass() != obj.getClass())
 			return false;
 		UpdateResponse other = (UpdateResponse) obj;
-		return new EqualsBuilder().append(nodeId, other.nodeId).isEquals();
+		return new EqualsBuilder().append(internalNodeId, other.internalNodeId).isEquals();
 	}
 
 }
