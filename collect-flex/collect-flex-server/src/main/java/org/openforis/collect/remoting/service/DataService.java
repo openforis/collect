@@ -172,7 +172,7 @@ public class DataService {
 			processUpdateRequestOperation(operation, addedNodes, updatedNodes, deletedNodeIds);
 		}
 		//convert nodes to proxies
-		UpdateResponse response = new UpdateResponse(1);
+		UpdateResponse response = new UpdateResponse(55);
 //		response.setAddedNodes(NodeProxy.fromList((List<Node<?>>) addedNodes));
 //		response.setUpdatedNodes(NodeProxy.fromList((List<Node<?>>) updatedNodes));
 //		response.setDeletedNodeIds(deletedNodeIds.toArray(new Integer[0]));
@@ -264,7 +264,7 @@ public class DataService {
 			checkDepAttr.clearValidationResults();
 			ValidationResults results = checkDepAttr.validateValue();
 			UpdateResponse response = getUpdateResponse(responseMap, checkDepAttr.getInternalId());
-			response.setValidationResults(results);
+			response.setAttributeValidationResults(results);
 		}
 	}
 
