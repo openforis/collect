@@ -195,7 +195,7 @@ public class DataService {
 		Method method = operation.getMethod();
 		Map<Integer, UpdateResponse> responseMap = new HashMap<Integer, UpdateResponse>();
 		Set<NodePointer> relReqDependencies = null;
-		Set<Attribute<?,?>> checkDependensies = null;
+		Set<Attribute<?,?>> checkDependencies = null;
 		List<Entity> ancestors = null;
 		Attribute<? extends AttributeDefinition, ?> attribute = null;
 		switch (method) {
@@ -206,8 +206,8 @@ public class DataService {
 				relReqDependencies = recordManager. clearRelevanceRequiredStates(createdNode);
 				if(createdNode instanceof Attribute){
 					attribute = (Attribute<? extends AttributeDefinition, ?>) createdNode;
-					checkDependensies = recordManager.clearValidationResults(attribute);
-					checkDependensies.add(attribute);
+					checkDependencies = recordManager.clearValidationResults(attribute);
+					checkDependencies.add(attribute);
 				}
 				relReqDependencies.add(new NodePointer(createdNode.getParent(), createdNode.getName()));
 				ancestors = createdNode.getAncestors();
@@ -235,29 +235,29 @@ public class DataService {
 					response.getUpdatedFieldValues().put(fieldIndex, attribute.getField(fieldIndex).getValue());
 				}
 				relReqDependencies = recordManager. clearRelevanceRequiredStates(attribute);
-				checkDependensies = recordManager.clearValidationResults(attribute);
+				checkDependencies = recordManager.clearValidationResults(attribute);
 				relReqDependencies.add(new NodePointer(attribute.getParent(), attribute.getName()));
-				checkDependensies.add(attribute);
+				checkDependencies.add(attribute);
 				break;
 			case DELETE:
 				attribute  = (Attribute<AttributeDefinition, ?>) node;
 				ancestors = attribute.getAncestors();
 				Set<NodePointer> relevantDependencies = attribute.getRelevantDependencies();
 				Set<NodePointer> requiredDependencies = attribute.getRequiredDependencies();
-				checkDependensies = attribute.getCheckDependencies();
+				checkDependencies = attribute.getCheckDependencies();
 				
 				UpdateResponse resp = getUpdateResponse(responseMap, node.getInternalId());
 				resp.setDeletedNodeId(node.getInternalId());
 				recordManager.deleteNode(node);
 				recordManager.clearRelevantDependencies(relevantDependencies);
 				recordManager.clearRequiredDependencies(requiredDependencies);
-				recordManager.clearValidationResults(checkDependensies);
+				recordManager.clearValidationResults(checkDependencies);
 				
 				relReqDependencies = relevantDependencies;
 				relReqDependencies.addAll(requiredDependencies);
 				break;
 		}
-		prepareUpdateResponse(responseMap, relReqDependencies, checkDependensies, ancestors);
+		prepareUpdateResponse(responseMap, relReqDependencies, checkDependencies, ancestors);
 		return responseMap.values();
 	}
 
