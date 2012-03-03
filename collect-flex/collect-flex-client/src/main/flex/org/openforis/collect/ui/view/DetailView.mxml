@@ -50,8 +50,10 @@
 					<s:SolidColorStroke color="gray" alpha="0.8"/>
 				</s:stroke>
 			</s:Line>
-			<mx:Text id="rootEntityDefinitionText" fontSize="13" fontWeight="bold" />
-			<mx:Text id="keyAttributeValuesText" fontSize="13" fontWeight="bold" />
+			<s:HGroup>
+				<s:Label id="rootEntityDefinitionText" styleName="title2" />
+				<s:Label id="keyAttributeValuesText" styleName="title2" />
+			</s:HGroup>
 		</s:HGroup>
 		<s:HGroup width="50%" horizontalAlign="right" verticalAlign="middle" paddingRight="5" gap="5">
 				<mx:Text fontSize="10" fontWeight="bold" text="{Message.get('edit.formVersion')}"/>
@@ -61,7 +63,32 @@
 	
 	<!--<s:Group id="formWrapper" width="100%" height="100%" />-->
 	<component:LoadingContent width="100%" height="100%" includeIn="loading" itemCreationPolicy="immediate" />
-	<detail:FormsContainer id="formsContainer" height="100%" width="100%" includeIn="edit" itemCreationPolicy="immediate" verticalGap="0" />
+	
+	<s:Group height="100%" width="100%">
+		<detail:FormsContainer id="formsContainer" height="100%" width="100%" includeIn="edit" itemCreationPolicy="immediate" verticalGap="0" />
+		<!-- overlap the buttons to the forms container -->
+		<s:HGroup right="0">
+			<s:Button 
+				id="rejectButton"
+				icon="{Images.REJECT}" 
+				label="{Message.get('edit.reject')}" 
+				height="20"  
+				useHandCursor="true"
+				buttonMode="true"
+				styleName="roundCorners"
+				/>
+			
+			<s:Button 
+				id="submitButton"
+				icon="{Images.SUBMIT}" 
+				label="{Message.get('edit.submit')}" 
+				height="20"  
+				useHandCursor="true"
+				buttonMode="true"
+				styleName="roundCorners"
+				/>
+		</s:HGroup>
+	</s:Group>
 	
 	<s:Group width="100%" id="buttonBar">
 		<!-- Buttons: save, etc...-->
@@ -69,10 +96,6 @@
 				  horizontalCenter="0"
 				  useHandCursor="true" buttonMode="true" />
 		
-		<s:Button id="promoteButton" label="{Message.get('edit.promote')}"
-				  right="0"
-				  useHandCursor="true" buttonMode="true"
-				  />
 	</s:Group>
 	
 </s:Group>
