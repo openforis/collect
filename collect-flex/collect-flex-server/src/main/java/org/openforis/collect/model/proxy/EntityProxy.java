@@ -52,5 +52,34 @@ public class EntityProxy extends NodeProxy {
 		}
 		return result;
 	}
+
+	@ExternalizedProperty
+	public Map<String, Boolean> getChildrenRelevanceMap(){
+		List<NodeDefinition> childDefinitions = getChildDefinitions();
+		Map<String, Boolean> map = new HashMap<String, Boolean>();
+		for (NodeDefinition childDefinition : childDefinitions) {
+			String childName = childDefinition.getName();
+			boolean relevant = entity.isRelevant(childName );
+			map.put(childName, relevant);
+		}
+		return map;
+	}
+
+	@ExternalizedProperty
+	public Map<String, Boolean> getChildrenRequiredMap(){
+		List<NodeDefinition> childDefinitions = getChildDefinitions();
+		Map<String, Boolean> map = new HashMap<String, Boolean>();
+		for (NodeDefinition childDefinition : childDefinitions) {
+			String childName = childDefinition.getName();
+			boolean required = entity.isRequired(childName );
+			map.put(childName, required);
+		}
+		return map;
+	}
+	
+	private List<NodeDefinition> getChildDefinitions() {
+		EntityDefinition definition = entity.getDefinition();
+		return definition.getChildDefinitions();
+	}
 	
 }

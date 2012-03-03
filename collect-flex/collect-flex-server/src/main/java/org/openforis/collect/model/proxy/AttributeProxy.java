@@ -57,6 +57,11 @@ public class AttributeProxy extends NodeProxy {
 		return attribute.isEmpty();
 	}
 
+	@ExternalizedProperty
+	public ValidationResultsProxy getValidationResultsProxy(){
+		return new ValidationResultsProxy(attribute.validateValue());
+	}
+	
 //	 @ExternalizedProperty
 //	 public boolean isRelevant() {
 //	 return attribute.isRelevant();
