@@ -43,7 +43,7 @@ package org.openforis.collect.presenter {
 			super.updateView();
 		}
 		
-		override protected function valueToText():String {
+		override protected function getTextFromValue():String {
 			if(_items == null) {
 				updateDescription();
 			}
@@ -53,17 +53,20 @@ package org.openforis.collect.presenter {
 		protected function updateDescription():void {
 			if(_view.attribute != null || _view.attributes != null) {
 				var codes:Array = [];
+				var code:String;
 				var attribute:AttributeProxy;
 				if(_view.attributeDefinition.multiple) {
 					for each(attribute in _view.attributes) {
-						if( attribute.value != null && StringUtil.isNotBlank(attribute.value.code)) {
-							codes.push(attribute.value.code);
+						code = attribute.getField(0).value as String;
+						if( StringUtil.isNotBlank(code)) {
+							codes.push(code);
 						}
 					}
 				} else {
 					attribute = _view.attribute;
-					if(attribute != null && attribute.value != null && StringUtil.isNotBlank(attribute.value.code)) {
-						codes.push(attribute.value.code);
+					code = attribute.getField(0).value as String;
+					if( StringUtil.isNotBlank(code)) {
+						codes.push(code);
 					}
 				}
 				if(ArrayUtil.isNotEmpty(codes)) {

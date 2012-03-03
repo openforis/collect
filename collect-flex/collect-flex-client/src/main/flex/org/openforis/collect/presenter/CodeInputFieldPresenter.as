@@ -119,7 +119,7 @@ package org.openforis.collect.presenter {
 			closePopupHandler();
 		}
 		
-		override protected function valueToText():String {
+		override protected function getTextFromValue():String {
 			if(_view.attributeDefinition != null) {
 				if(_view.attributeDefinition.multiple) {
 					if(CollectionUtil.isNotEmpty(_view.attributes)) {
@@ -155,11 +155,9 @@ package org.openforis.collect.presenter {
 						return shortCut;
 					}
 				}
-				var value:CodeProxy = attribute.value as CodeProxy;
-				if(value != null) {
-					var text:String = value.toString();
-					return text;
-				}
+				var code:String = field.value as String;
+				var qualifier:String = attribute.getField(1) as String;
+				return StringUtil.concat(": ", code, qualifier);
 			}
 			return "";
 		}
@@ -179,10 +177,11 @@ package org.openforis.collect.presenter {
 					operations.addItem(o);
 				}
 				var remarks:String = getRemarks();
+				var symbol:FieldSymbol = null;
 				if(text != null) {
 					var parts:Array = text.split(",");
 					if(parts.length == 1 && isShortCutForReasonBlank(text)) {
-						var symbol:FieldSymbol = parseShortCutForReasonBlank(text);
+						symbol = parseShortCutForReasonBlank(text);
 						o = getUpdateRequestOperation(UpdateRequestOperation$Method.ADD, NaN, null, symbol, remarks);
 						operations.addItem(o);
 					} else {
@@ -200,7 +199,8 @@ package org.openforis.collect.presenter {
 				}
 				var req:UpdateRequest = new UpdateRequest();
 				req.operations = operations;
-				dataClient.updateActiveRecord(updateResponder, req);
+				var responder:IResponder = new AsyncResponder(applyValueResultHandler, updateFaultHandler, {symbol: symbol});
+				dataClient.updateActiveRecord(responder, req);
 			} else {
 				super.applyValue();
 			}
@@ -218,7 +218,8 @@ package org.openforis.collect.presenter {
 				}
 				var req:UpdateRequest = new UpdateRequest();
 				req.operations = operations;
-				dataClient.updateActiveRecord(updateResponder, req);
+				var responder:IResponder = new AsyncResponder(applyRemarksResultHandler, updateFaultHandler, {remarks: remarks});
+				dataClient.updateActiveRecord(responder, req);
 			} else {
 				super.applyRemarks(remarks);
 			}
@@ -236,12 +237,62 @@ package org.openforis.collect.presenter {
 				}
 				var req:UpdateRequest = new UpdateRequest();
 				req.operations = operations;
-				dataClient.updateActiveRecord(updateResponder, req);
+				var responder:IResponder = new AsyncResponder(applyRemarksResultHandler, updateFaultHandler, {symbol: symbol});
+				dataClient.updateActiveRecord(responder, req);
 			} else {
 				super.applySymbol(symbol);
 			}
 		}
 		
+		override protected function applyValueResultHandler(event:ResultEvent, token:Object=null):void {
+			if(! _view.attributeDefinition.multiple) {
+				super.applyValueResultHandler(event, token);
+			} else {
+				var symbol:FieldSymbol = token.symbol;
+				for each (var a:AttributeProxy in _view.attributes) {
+					for each (var f:FieldProxy in a.fields) {
+						f.symbol = symbol;
+					}
+				}
+				dispatchUpdateResultReceivedEvent(event, token);
+			}
+		}
+		
+		override protected function applyRemarksResultHandler(event:ResultEvent, token:Object=null):void {
+			if(! _view.attributeDefinition.multiple) {
+				super.applyRemarksResultHandler(event, token);
+			} else {
+				var remarks:String = token.remarks;
+				for each (var a:AttributeProxy in _view.attributes) {
+					for each (var f:FieldProxy in a.fields) {
+						f.remarks = remarks;
+					}
+				}
+				dispatchUpdateResultReceivedEvent(event, token);
+			}
+		}
+
+		override protected function applySymbolResultHandler(event:ResultEvent, token:Object=null):void {
+			if(_view.attributeDefinition.multiple) {
+				var symbol:FieldSymbol = token.symbol;
+				for each (var a:AttributeProxy in _view.attributes) {
+					a.getField(0).symbol = symbol;
+				}
+				dispatchUpdateResultReceivedEvent(event, token);
+			} else {
+				super.applySymbolResultHandler(event, token);
+			}
+		}
+/*
+		var responses:IList = IList(event.result);
+		for each (var resp:UpdateResponse in responses)	{
+			if(!isNaN(resp.updatedFieldIndex)) {
+				if(resp.nodeId == _view.attribute.id) {
+					f.value = resp.updateFieldValue;
+				}
+			}
+		}
+		*/
 		override protected function getRemarks():String {
 			if(_view.attributeDefinition.multiple) {
 				if(CollectionUtil.isNotEmpty(_view.attributes)) {
@@ -259,17 +310,20 @@ package org.openforis.collect.presenter {
 			_view.description = "";
 			if(_view.attribute != null || _view.attributes != null) {
 				var codes:Array = [];
+				var code:String;
 				var attribute:AttributeProxy;
 				if(_view.attributeDefinition.multiple) {
 					for each(attribute in _view.attributes) {
-						if( attribute.value != null && StringUtil.isNotBlank(attribute.value.code)) {
-							codes.push(attribute.value.code);
+						code = attribute.getField(0).value as String;
+						if( StringUtil.isNotBlank(code)) {
+							codes.push(code);
 						}
 					}
 				} else {
 					attribute = _view.attribute;
-					if(attribute != null && attribute.value != null && StringUtil.isNotBlank(attribute.value.code)) {
-						codes.push(attribute.value.code);
+					code = attribute.getField(0).value as String;
+					if( StringUtil.isNotBlank(code)) {
+						codes.push(code);
 					}
 				}
 				if(ArrayUtil.isNotEmpty(codes)) {

@@ -215,12 +215,24 @@ public class DataService {
 			case UPDATE:
 				attribute  = (Attribute<AttributeDefinition, ?>) node;
 				ancestors = attribute.getAncestors();
+				response = getUpdateResponse(responseMap, attribute.getInternalId());
+				response.setUpdatedFieldValues(new HashMap<Integer, Object>());
 				if(fieldIndex < 0){
-					Object value = parseCompositeAttributeValue(parentEntity, attribute.getDefinition(), requestValue);
+					Object value = null;
+					if(requestValue != null) {
+						value = parseCompositeAttributeValue(parentEntity, attribute.getDefinition(), requestValue);
+					}
 					recordManager.setAttributeValue(attribute, value, remarks);
+					for (int idx = 0; idx < attribute.getFieldCount(); idx ++) {
+						Field<?> field = attribute.getField(idx);
+						Object fieldValue = field.getValue();
+						response.getUpdatedFieldValues().put(idx, fieldValue);
+						recordManager.setFieldValue(attribute, fieldValue, remarks, symbol, idx);
+					}
 				} else {
 					Object value = parseFieldValue(parentEntity, attribute.getDefinition(), requestValue, fieldIndex);
 					recordManager.setFieldValue(attribute, value, remarks, symbol, fieldIndex);
+					response.getUpdatedFieldValues().put(fieldIndex, attribute.getField(fieldIndex).getValue());
 				}
 				relReqDependencies = recordManager. clearRelevanceRequiredStates(attribute);
 				checkDependensies = recordManager.clearValidationResults(attribute);
@@ -235,7 +247,7 @@ public class DataService {
 				checkDependensies = attribute.getCheckDependencies();
 				
 				UpdateResponse resp = getUpdateResponse(responseMap, node.getInternalId());
-				resp.setDeletedINodeInternalId(node.getInternalId());
+				resp.setDeletedNodeId(node.getInternalId());
 				recordManager.deleteNode(node);
 				recordManager.clearRelevantDependencies(relevantDependencies);
 				recordManager.clearRequiredDependencies(requiredDependencies);

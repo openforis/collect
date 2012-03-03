@@ -44,7 +44,7 @@ package org.openforis.collect.presenter {
 			return value;
 		}
 		
-		override protected function valueToText():String {
+		override protected function getTextFromValue():String {
 			var attribute:AttributeProxy = _view.attribute;
 			if(attribute != null) {
 				var field:FieldProxy = attribute.getField(0);

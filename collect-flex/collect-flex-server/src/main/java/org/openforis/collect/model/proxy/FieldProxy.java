@@ -6,15 +6,9 @@ package org.openforis.collect.model.proxy;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.collect.Proxy;
 import org.openforis.collect.model.FieldSymbol;
-import org.openforis.idm.model.Code;
-import org.openforis.idm.model.Coordinate;
-import org.openforis.idm.model.Date;
 import org.openforis.idm.model.Field;
-import org.openforis.idm.model.TaxonOccurrence;
-import org.openforis.idm.model.Time;
 
 /**
  * @author S. Ricci
@@ -22,11 +16,18 @@ import org.openforis.idm.model.Time;
  */
 public class FieldProxy implements Proxy {
 
-	private transient Field<?> field;
+	private Object value;
+	private FieldSymbol symbol;
+	private String remarks;
 
 	public FieldProxy(Field<?> field) {
 		super();
-		this.field = field;
+		
+		value = field.getValue();
+		if(field.getSymbol() != null) {
+			symbol = FieldSymbol.valueOf(field.getSymbol());
+		}
+		remarks = field.getRemarks();
 	}
 
 
@@ -40,42 +41,29 @@ public class FieldProxy implements Proxy {
 		}
 		return proxies;
 	}
-	@ExternalizedProperty
-	public Object getValue(){
-		Object val = field.getValue();
-		if(val != null) {
-			if(val instanceof Code) {
-				return new CodeProxy((Code) val);
-			} else if(val instanceof Coordinate) {
-				return new CoordinateProxy((Coordinate) val);
-			} else if(val instanceof Date) {
-				return new DateProxy((Date) val);
-			} else if(val instanceof TaxonOccurrence) {
-				return new TaxonOccurrenceProxy((TaxonOccurrence) val);
-			} else if(val instanceof Time) {
-				return new TimeProxy((Time) val);
-			} else{
-				return val;
-			}
-		} else {
-			return null;
-		}
+	
+	public Object getValue() {
+		return value;
 	}
 	
-	@ExternalizedProperty
-	public String getRemarks() {
-		return field.getRemarks();
+	public void setValue(Object value) {
+		this.value = value;
 	}
 
-	@ExternalizedProperty
+	public String getRemarks() {
+		return remarks;
+	}
+
 	public FieldSymbol getSymbol() {
-		if(field.getSymbol() != null) {
-			return FieldSymbol.valueOf(field.getSymbol());
-		} else {
-			return null;
-		}
+		return symbol;
 	}
 	
+	public void setSymbol(FieldSymbol symbol) {
+		this.symbol = symbol;
+	}
 	
-	
+	public void setRemarks(String remarks) {
+		this.remarks = remarks;
+	}
+
 }

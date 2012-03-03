@@ -19,26 +19,26 @@ import org.openforis.idm.model.Node;
  */
 public class UpdateResponse implements Proxy {
 
-	private transient Integer internalNodeId;
+	private Integer nodeId;
 	private transient Map<String, Object> relevantMap;
 	private transient Map<String, Object> requiredMap;
 	private transient ValidationResults attributeValidationResults;
 	private transient Map<String, Object> minCountValidMap;
 	private transient Map<String, Object> maxCountValidMap;
 	private transient Node<?> creatednode;
-	private transient Integer deletedINodeInternalId;
+	private Integer deletedNodeId;
+	private Map<Integer, Object> updatedFieldValues;
 	
 	public UpdateResponse(int nodeId) {
-		this.internalNodeId = nodeId;
+		this.nodeId = nodeId;
 		relevantMap = new HashMap<String, Object>();
 		requiredMap = new HashMap<String, Object>();
 		minCountValidMap = new HashMap<String, Object>();
 		maxCountValidMap = new HashMap<String, Object>();
 	}
 
-	@ExternalizedProperty
 	public Integer getNodeId() {
-		return internalNodeId;
+		return nodeId;
 	}
 
 	@ExternalizedProperty
@@ -97,22 +97,29 @@ public class UpdateResponse implements Proxy {
 		return null;
 	}
 	
-	@ExternalizedProperty
-	public Integer getDeletedINodeId() {
-		return deletedINodeInternalId;
-	}
-	
-	public void setDeletedINodeInternalId(Integer deletedINodeInternalId) {
-		this.deletedINodeInternalId = deletedINodeInternalId;
-	}
-	
 	public void setCreatedNode(Node<?> creatednode) {
 		this.creatednode = creatednode;
 	}
 	
+	public Integer getDeletedNodeId() {
+		return deletedNodeId;
+	}
+
+	public void setDeletedNodeId(Integer deletedNodeId) {
+		this.deletedNodeId = deletedNodeId;
+	}
+
+	public Map<Integer, Object> getUpdatedFieldValues() {
+		return updatedFieldValues;
+	}
+
+	public void setUpdatedFieldValues(Map<Integer, Object> updatedFieldValues) {
+		this.updatedFieldValues = updatedFieldValues;
+	}
+
 	@Override
 	public int hashCode() {
-		return new HashCodeBuilder().append(internalNodeId).toHashCode();
+		return new HashCodeBuilder().append(nodeId).toHashCode();
 	}
 
 	@Override
@@ -124,7 +131,7 @@ public class UpdateResponse implements Proxy {
 		if (getClass() != obj.getClass())
 			return false;
 		UpdateResponse other = (UpdateResponse) obj;
-		return new EqualsBuilder().append(internalNodeId, other.internalNodeId).isEquals();
+		return new EqualsBuilder().append(nodeId, other.nodeId).isEquals();
 	}
 
 }

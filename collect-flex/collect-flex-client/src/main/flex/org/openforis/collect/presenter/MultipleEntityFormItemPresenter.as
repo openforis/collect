@@ -49,11 +49,13 @@ package org.openforis.collect.presenter
 		override protected function updateResponseReceivedHandler(event:ApplicationEvent):void {
 			var responses:IList = IList(event.result);
 			for each(var response:UpdateResponse in responses) {
-				var node:NodeProxy = Application.activeRecord.getNode(response.nodeId);
-				if(view.parentEntity != null && view.entityDefinition != null 
-					&& node.parentId == view.parentEntity.id 
-					&& node.name == view.entityDefinition.name) {
-					updateView();
+				if(!isNaN(response.nodeId) && isNaN(response.deletedNodeId)) {
+					var node:NodeProxy = Application.activeRecord.getNode(response.nodeId);
+					if(node != null && view.parentEntity != null && view.entityDefinition != null 
+						&& node.parentId == view.parentEntity.id 
+						&& node.name == view.entityDefinition.name) {
+						updateView();
+					}
 				}
 			}
 		}
