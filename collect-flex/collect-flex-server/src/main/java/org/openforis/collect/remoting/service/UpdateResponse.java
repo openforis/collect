@@ -59,6 +59,7 @@ public class UpdateResponse implements Proxy {
 		requiredMap.put(childName, required);
 	}
 
+	@ExternalizedProperty
 	public ValidationResultsProxy getValidationResults() {
 		if (attributeValidationResults != null) {
 			return new ValidationResultsProxy(attributeValidationResults);

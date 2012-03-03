@@ -254,10 +254,10 @@ package org.openforis.collect.ui
 		}
 		
 		protected static function updateFieldResultHandler(event:ResultEvent, token:Object = null):void {
-			var result:UpdateResponse = UpdateResponse(event.result);
-			Application.activeRecord.update(result);
+			var responses:IList = IList(event.result);
+			Application.activeRecord.update(responses);
 			var appEvt:ApplicationEvent = new ApplicationEvent(ApplicationEvent.UPDATE_RESPONSE_RECEIVED);
-			appEvt.result = result;
+			appEvt.result = responses;
 			EventDispatcherFactory.getEventDispatcher().dispatchEvent(appEvt);
 		}
 		

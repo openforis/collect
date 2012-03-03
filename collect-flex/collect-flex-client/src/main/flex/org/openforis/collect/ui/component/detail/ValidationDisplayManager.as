@@ -6,6 +6,7 @@ package org.openforis.collect.ui.component.detail
 	import mx.core.IToolTip;
 	import mx.core.UIComponent;
 	
+	import org.openforis.collect.model.proxy.AttributeProxy;
 	import org.openforis.collect.model.proxy.NodeStateProxy;
 	import org.openforis.collect.model.proxy.ValidationResultsProxy;
 	import org.openforis.collect.util.ToolTipUtil;
@@ -80,6 +81,26 @@ package org.openforis.collect.ui.component.detail
 				} else if(hasErrors || hasWarnings) {
 					_toolTipStyleName = hasErrors ? ToolTipUtil.STYLE_NAME_ERROR: ToolTipUtil.STYLE_NAME_WARNING;
 					_toolTipMessage = state.validationMessage;
+					_displayStyleName = hasErrors ? STYLE_NAME_ERROR: STYLE_NAME_WARNING;
+				}
+			}
+			init();
+		}
+		
+		public function initByAttribute(a:AttributeProxy):void {
+			_displayStyleName = null;
+			_toolTipStyleName = null;
+			_toolTipMessage = null;
+			if(a != null) {
+				var hasErrors:Boolean = a.hasErrors();
+				var hasWarnings:Boolean = a.hasWarnings();
+				
+				/*if(! state.relevant) {
+					_displayStyleName = STYLE_NAME_NOT_RELEVANT;
+				} else */
+				if(hasErrors || hasWarnings) {
+					_toolTipStyleName = hasErrors ? ToolTipUtil.STYLE_NAME_ERROR: ToolTipUtil.STYLE_NAME_WARNING;
+					_toolTipMessage = a.validationMessage;
 					_displayStyleName = hasErrors ? STYLE_NAME_ERROR: STYLE_NAME_WARNING;
 				}
 			}

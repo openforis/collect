@@ -2,6 +2,7 @@ package org.openforis.collect.presenter {
 	import flash.events.Event;
 	
 	import mx.collections.ArrayCollection;
+	import mx.collections.IList;
 	import mx.collections.ListCollectionView;
 	import mx.events.CalendarLayoutChangeEvent;
 	import mx.rpc.AsyncResponder;
@@ -15,7 +16,6 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.remoting.service.UpdateRequest;
 	import org.openforis.collect.remoting.service.UpdateRequestOperation;
-	import org.openforis.collect.remoting.service.UpdateResponse;
 	import org.openforis.collect.ui.component.input.DateAttributeRenderer;
 	import org.openforis.collect.ui.component.input.DateField;
 	import org.openforis.collect.ui.component.input.InputField;
@@ -91,10 +91,10 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function updateResultHandler(event:ResultEvent, token:Object = null):void {
-			var response:UpdateResponse = UpdateResponse(event.result);
-			Application.activeRecord.update(response);
+			var responses:IList = IList(event.result);
+			Application.activeRecord.update(responses);
 			var appEvt:ApplicationEvent = new ApplicationEvent(ApplicationEvent.UPDATE_RESPONSE_RECEIVED);
-			appEvt.result = response;
+			appEvt.result = responses;
 			eventDispatcher.dispatchEvent(appEvt);
 		}
 		

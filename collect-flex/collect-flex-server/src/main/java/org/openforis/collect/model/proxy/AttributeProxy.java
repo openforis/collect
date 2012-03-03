@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.idm.metamodel.AttributeDefinition;
+import org.openforis.idm.metamodel.validation.ValidationResults;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Code;
 import org.openforis.idm.model.Coordinate;
@@ -23,11 +24,13 @@ import org.openforis.idm.model.Time;
 public class AttributeProxy extends NodeProxy {
 
 	private transient Attribute<? extends AttributeDefinition, ?> attribute;
-
+	private ValidationResultsProxy validationResults;
+	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public AttributeProxy(Attribute attribute) {
 		super(attribute);
 		this.attribute = attribute;
+		validationResults = new ValidationResultsProxy(attribute.validateValue());
 	}
 
 	@ExternalizedProperty
@@ -58,10 +61,14 @@ public class AttributeProxy extends NodeProxy {
 	}
 
 	@ExternalizedProperty
-	public ValidationResultsProxy getValidationResultsProxy(){
-		return new ValidationResultsProxy(attribute.validateValue());
+	public ValidationResultsProxy getValidationResults(){
+		return validationResults;
 	}
-	
+
+	public void setValidationResults(ValidationResultsProxy value) {
+		validationResults = value;
+	}
+
 //	 @ExternalizedProperty
 //	 public boolean isRelevant() {
 //	 return attribute.isRelevant();

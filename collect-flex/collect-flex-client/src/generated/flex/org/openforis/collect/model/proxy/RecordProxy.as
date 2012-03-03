@@ -6,11 +6,16 @@
  */
 
 package org.openforis.collect.model.proxy {
+	import mx.collections.IList;
+	
+	import org.granite.collections.IMap;
 	import org.openforis.collect.remoting.service.UpdateResponse;
 
     [Bindable]
     [RemoteClass(alias="org.openforis.collect.model.proxy.RecordProxy")]
     public class RecordProxy extends RecordProxyBase {
+		
+		private var validationResults:ValidationResultsProxy;
 		
 		public function getNode(id:int):NodeProxy {
 			if(id == rootEntity.id) {
@@ -20,8 +25,43 @@ package org.openforis.collect.model.proxy {
 			}
 		}
 		
-		public function update(response:UpdateResponse):void {
+		public function update(responses:IList):void {
+			for each (var response:UpdateResponse in responses)	{
+				processResponse(response);
+			}
+			
+		}
+		
+		private function processResponse(response:UpdateResponse):void {
 			var node:NodeProxy, oldNode:NodeProxy, parent:EntityProxy;
+			if(response.deletedINodeId > 0) {
+				parent = getNode(node.parentId) as EntityProxy;
+				parent.removeChild(node);
+			} else {
+				node = getNode(response.nodeId);
+				if(node is AttributeProxy) {
+					var a:AttributeProxy = AttributeProxy(node);
+					if(response.validationResults != null) {
+						a.validationResults = response.validationResults;
+					}
+				} else if(node is EntityProxy) {
+					var e:EntityProxy = EntityProxy(node);
+					if(response.maxCountValidation) {
+						
+					}
+					if(response.minCountValidation != null) {
+						
+					}
+					if(response.relevant != null) {
+						
+					}
+					if(response.required != null) {
+						
+					}
+				}
+			}
+			
+			
 			//remove nodes
 			/*for each (var id:int in response.deletedNodeIds) {
 				oldNode = getNode(id);
@@ -53,6 +93,9 @@ package org.openforis.collect.model.proxy {
 				node.state = state;
 			}
 			*/
+		}
+		
+		private function updateMaxCountValidations(value:ValidationResultsProxy):void {
 		}
     }
 }

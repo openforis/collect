@@ -13,7 +13,6 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.remoting.service.UpdateRequest;
 	import org.openforis.collect.remoting.service.UpdateRequestOperation;
 	import org.openforis.collect.remoting.service.UpdateRequestOperation$Method;
-	import org.openforis.collect.remoting.service.UpdateResponse;
 	import org.openforis.collect.ui.component.detail.MultipleAttributeFormItem;
 	import org.openforis.collect.util.AlertUtil;
 	import org.openforis.collect.util.CollectionUtil;
@@ -81,10 +80,10 @@ package org.openforis.collect.presenter
 		}
 		
 		protected function addResultHandler(event:ResultEvent, token:Object = null):void {
-			var response:UpdateResponse = UpdateResponse(event.result);
-			Application.activeRecord.update(response);
+			var responses:IList = IList(event.result);
+			Application.activeRecord.update(responses);
 			var appEvt:ApplicationEvent = new ApplicationEvent(ApplicationEvent.UPDATE_RESPONSE_RECEIVED);
-			appEvt.result = response;
+			appEvt.result = responses;
 			eventDispatcher.dispatchEvent(appEvt);
 			
 			view.callLater(function():void {

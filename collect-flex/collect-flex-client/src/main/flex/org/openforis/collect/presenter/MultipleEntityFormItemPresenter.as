@@ -47,14 +47,15 @@ package org.openforis.collect.presenter
 		}
 		
 		override protected function updateResponseReceivedHandler(event:ApplicationEvent):void {
-			var response:UpdateResponse = UpdateResponse(event.result);
-			/*for each(var node:NodeProxy in response.addedNodes) {
+			var responses:IList = IList(event.result);
+			for each(var response:UpdateResponse in responses) {
+				var node:NodeProxy = Application.activeRecord.getNode(response.nodeId);
 				if(view.parentEntity != null && view.entityDefinition != null 
 					&& node.parentId == view.parentEntity.id 
 					&& node.name == view.entityDefinition.name) {
 					updateView();
 				}
-			}*/
+			}
 		}
 		
 		override protected function updateView():void {
@@ -104,10 +105,10 @@ package org.openforis.collect.presenter
 		}
 		
 		protected function addResultHandler(event:ResultEvent, token:Object = null):void {
-			var result:UpdateResponse = UpdateResponse(event.result);
-			Application.activeRecord.update(result);
+			var responses:IList = IList(event.result);
+			Application.activeRecord.update(responses);
 			var appEvt:ApplicationEvent = new ApplicationEvent(ApplicationEvent.UPDATE_RESPONSE_RECEIVED);
-			appEvt.result = result;
+			appEvt.result = responses;
 			eventDispatcher.dispatchEvent(appEvt);
 			
 			view.callLater(function():void {

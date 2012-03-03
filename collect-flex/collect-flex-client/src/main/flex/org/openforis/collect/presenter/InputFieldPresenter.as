@@ -5,6 +5,7 @@ package org.openforis.collect.presenter {
 	import flash.ui.Keyboard;
 	
 	import mx.binding.utils.ChangeWatcher;
+	import mx.collections.IList;
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.IResponder;
 	import mx.rpc.events.FaultEvent;
@@ -73,16 +74,11 @@ package org.openforis.collect.presenter {
 		
 		protected function updateResponseReceivedHandler(event:ApplicationEvent):void {
 			if(_view.attribute != null) {
-				var response:UpdateResponse = UpdateResponse(event.result);
-				if(response != null) {
-					/*
-					for each (var nodeState:NodeStateProxy in response.states) {
-						if(nodeState.nodeId == _view.attribute.id) {
-							updateView();
-							return;
-						}
+				var responses:IList = IList(event.result);
+				for each (var response:UpdateResponse in responses) {
+					if(response.nodeId == _view.attribute.id) {
+						updateView();
 					}
-					*/
 				}
 			}
 		}
@@ -200,10 +196,13 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function updateResultHandler(event:ResultEvent, token:Object = null):void {
-			var response:UpdateResponse = UpdateResponse(event.result);
-			Application.activeRecord.update(response);
+			if(_view.attribute != null) {
+				_view.attribute.validationResults = null;
+			}
+			var responses:IList = IList(event.result);
+			Application.activeRecord.update(responses);
 			var appEvt:ApplicationEvent = new ApplicationEvent(ApplicationEvent.UPDATE_RESPONSE_RECEIVED);
-			appEvt.result = response;
+			appEvt.result = responses;
 			eventDispatcher.dispatchEvent(appEvt);
 			_changed = false;
 			//_view.currentState = InputField.STATE_SAVE_COMPLETE;
