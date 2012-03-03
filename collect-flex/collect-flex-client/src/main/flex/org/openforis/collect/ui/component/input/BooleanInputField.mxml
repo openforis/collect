@@ -20,7 +20,7 @@
 	</input:layout>
 	
 	<input:TextInput id="textInput" width="20" 
-					 horizontalCenter="0" 
+					 horizontalCenter="{isInDataGroup ? 0: NaN}" 
 					 maxChars="1" 
 					 minWidth="0" />
 	
