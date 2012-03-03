@@ -196,6 +196,7 @@ public class DataService {
 		Map<Integer, UpdateResponse> responseMap = new HashMap<Integer, UpdateResponse>();
 		Set<NodePointer> relReqDependencies = null;
 		Set<Attribute<?,?>> checkDependensies = null;
+		List<Entity> ancestors = null;
 		Attribute<? extends AttributeDefinition, ?> attribute = null;
 		switch (method) {
 			case ADD :
@@ -209,9 +210,11 @@ public class DataService {
 					checkDependensies.add(attribute);
 				}
 				relReqDependencies.add(new NodePointer(createdNode.getParent(), createdNode.getName()));
+				ancestors = createdNode.getAncestors();
 				break;
 			case UPDATE:
 				attribute  = (Attribute<AttributeDefinition, ?>) node;
+				ancestors = attribute.getAncestors();
 				if(fieldIndex < 0){
 					Object value = parseCompositeAttributeValue(parentEntity, attribute.getDefinition(), requestValue);
 					recordManager.setAttributeValue(attribute, value, remarks);
@@ -226,6 +229,7 @@ public class DataService {
 				break;
 			case DELETE:
 				attribute  = (Attribute<AttributeDefinition, ?>) node;
+				ancestors = attribute.getAncestors();
 				Set<NodePointer> relevantDependencies = attribute.getRelevantDependencies();
 				Set<NodePointer> requiredDependencies = attribute.getRequiredDependencies();
 				checkDependensies = attribute.getCheckDependencies();
@@ -241,7 +245,6 @@ public class DataService {
 				relReqDependencies.addAll(requiredDependencies);
 				break;
 		}
-		List<Entity> ancestors = attribute.getAncestors();
 		prepareUpdateResponse(responseMap, relReqDependencies, checkDependensies, ancestors);
 		return responseMap.values();
 	}
