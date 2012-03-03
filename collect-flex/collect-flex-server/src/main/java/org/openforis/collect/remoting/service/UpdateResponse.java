@@ -7,8 +7,10 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.collect.Proxy;
+import org.openforis.collect.model.proxy.NodeProxy;
 import org.openforis.collect.model.proxy.ValidationResultsProxy;
 import org.openforis.idm.metamodel.validation.ValidationResults;
+import org.openforis.idm.model.Node;
 
 /**
  * 
@@ -23,7 +25,9 @@ public class UpdateResponse implements Proxy {
 	private transient ValidationResults attributeValidationResults;
 	private transient Map<String, Object> minCountValidMap;
 	private transient Map<String, Object> maxCountValidMap;
-
+	private transient Node<?> creatednode;
+	private transient Integer deletedINodeInternalId;
+	
 	public UpdateResponse(int nodeId) {
 		this.internalNodeId = nodeId;
 		relevantMap = new HashMap<String, Object>();
@@ -84,6 +88,27 @@ public class UpdateResponse implements Proxy {
 		maxCountValidMap.put(childName, maxCountValid);
 	}
 
+	@ExternalizedProperty
+	public NodeProxy getCreatedNode() {
+		if(creatednode != null){
+			return new NodeProxy(creatednode);
+		}
+		return null;
+	}
+	
+	@ExternalizedProperty
+	public Integer getDeletedINodeId() {
+		return deletedINodeInternalId;
+	}
+	
+	public void setDeletedINodeInternalId(Integer deletedINodeInternalId) {
+		this.deletedINodeInternalId = deletedINodeInternalId;
+	}
+	
+	public void setCreatedNode(Node<?> creatednode) {
+		this.creatednode = creatednode;
+	}
+	
 	@Override
 	public int hashCode() {
 		return new HashCodeBuilder().append(internalNodeId).toHashCode();

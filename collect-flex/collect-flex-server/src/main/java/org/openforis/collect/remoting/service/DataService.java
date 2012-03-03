@@ -20,7 +20,6 @@ import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.FieldSymbol;
 import org.openforis.collect.model.User;
-import org.openforis.collect.model.proxy.NodeProxy;
 import org.openforis.collect.model.proxy.RecordProxy;
 import org.openforis.collect.persistence.AccessDeniedException;
 import org.openforis.collect.persistence.InvalidIdException;
@@ -43,7 +42,6 @@ import org.openforis.idm.metamodel.NumberAttributeDefinition;
 import org.openforis.idm.metamodel.NumberAttributeDefinition.Type;
 import org.openforis.idm.metamodel.RangeAttributeDefinition;
 import org.openforis.idm.metamodel.Schema;
-import org.openforis.idm.metamodel.TaxonAttributeDefinition;
 import org.openforis.idm.metamodel.TimeAttributeDefinition;
 import org.openforis.idm.metamodel.validation.ValidationResults;
 import org.openforis.idm.model.Attribute;
@@ -178,7 +176,7 @@ public class DataService {
 	private Collection<UpdateResponse> processUpdateRequestOperation(UpdateRequestOperation operation) {
 		SessionState sessionState = sessionManager.getSessionState();
 		CollectRecord record = sessionState.getActiveRecord();
-		ModelVersion version = record.getVersion();
+
 		Integer parentEntityId = operation.getParentEntityId();
 		Entity parentEntity = (Entity) record.getNodeByInternalId(parentEntityId);
 		Integer nodeId = operation.getNodeId();
@@ -201,14 +199,16 @@ public class DataService {
 		Attribute<? extends AttributeDefinition, ?> attribute = null;
 		switch (method) {
 			case ADD :
-				Node<?> addedNode = addNode(parentEntity, nodeDef, requestValue, symbol, remarks);
-				relReqDependencies = recordManager. clearRelevanceRequiredStates(addedNode);
-				if(addedNode instanceof Attribute){
-					attribute = (Attribute<? extends AttributeDefinition, ?>) addedNode;
+				Node<?> createdNode = addNode(parentEntity, nodeDef, requestValue, symbol, remarks);
+				UpdateResponse response = getUpdateResponse(responseMap, createdNode.getInternalId());
+				response.setCreatedNode(createdNode);
+				relReqDependencies = recordManager. clearRelevanceRequiredStates(createdNode);
+				if(createdNode instanceof Attribute){
+					attribute = (Attribute<? extends AttributeDefinition, ?>) createdNode;
 					checkDependensies = recordManager.clearValidationResults(attribute);
+					checkDependensies.add(attribute);
 				}
-				relReqDependencies.add(new NodePointer(addedNode.getParent(), addedNode.getName()));
-				checkDependensies.add(attribute);
+				relReqDependencies.add(new NodePointer(createdNode.getParent(), createdNode.getName()));
 				break;
 			case UPDATE:
 				attribute  = (Attribute<AttributeDefinition, ?>) node;
@@ -225,10 +225,13 @@ public class DataService {
 				checkDependensies.add(attribute);
 				break;
 			case DELETE:
+				attribute  = (Attribute<AttributeDefinition, ?>) node;
 				Set<NodePointer> relevantDependencies = attribute.getRelevantDependencies();
 				Set<NodePointer> requiredDependencies = attribute.getRequiredDependencies();
 				checkDependensies = attribute.getCheckDependencies();
 				
+				UpdateResponse resp = getUpdateResponse(responseMap, node.getInternalId());
+				resp.setDeletedINodeInternalId(node.getInternalId());
 				recordManager.deleteNode(node);
 				recordManager.clearRelevantDependencies(relevantDependencies);
 				recordManager.clearRequiredDependencies(requiredDependencies);
