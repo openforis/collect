@@ -26,6 +26,8 @@ import org.openforis.collect.persistence.jooq.tables.records.OfcRecordRecord;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Schema;
+import org.openforis.idm.model.Entity;
+import org.openforis.idm.model.ModelSerializer;
 import org.openforis.idm.model.RecordContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,6 +44,11 @@ public class RecordDAO extends JooqDaoSupport {
 	
 	@Autowired
 	private DataDao dataDao;
+	private ModelSerializer modelSerializer;
+
+	public RecordDAO() {
+		this.modelSerializer = new ModelSerializer(150000);
+	}
 	
 	@Transactional
 	public CollectRecord load(CollectSurvey survey, RecordContext recordContext, int recordId) throws DataInconsistencyException, NonexistentIdException {
@@ -54,7 +61,7 @@ public class RecordDAO extends JooqDaoSupport {
 	@Transactional
 	public void insert(CollectRecord record) {
 		insertRecord(record);
-		dataDao.insertData(record);
+//		dataDao.insertData(record);
 	}
 	
 	@Transactional
@@ -291,11 +298,15 @@ public class RecordDAO extends JooqDaoSupport {
 	}
 
 	private void insertRecord(CollectRecord record) {
-		EntityDefinition rootEntityDefinition = record.getRootEntity().getDefinition();
+		Entity rootEntity = record.getRootEntity();
+		EntityDefinition rootEntityDefinition = rootEntity.getDefinition();
 		Integer rootEntityId = rootEntityDefinition.getId();
 		if (rootEntityId == null) {
 			throw new IllegalArgumentException("Null schema object definition id");
 		}
+		
+		byte[] data = modelSerializer.toByteArray(rootEntity);
+		
 		Factory jf = getJooqFactory();
 		int recordId = jf.nextval(OFC_RECORD_ID_SEQ).intValue();
 		InsertSetMoreStep<OfcRecordRecord> setStep = jf.insertInto(OFC_RECORD)
@@ -312,6 +323,7 @@ public class RecordDAO extends JooqDaoSupport {
 				.set(OFC_RECORD.ERRORS, record.getErrors())
 				.set(OFC_RECORD.WARNINGS, record.getWarnings())
 				.set(OFC_RECORD.SUBMITTED_ID, record.getSubmittedId())
+				.set(OFC_RECORD.DATA, data)
 				;
 		//set keys
 		List<String> keys = record.getRootEntityKeys();
