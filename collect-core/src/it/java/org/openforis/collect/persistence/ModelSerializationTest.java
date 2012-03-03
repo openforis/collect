@@ -31,8 +31,8 @@ import org.openforis.idm.model.RealAttribute;
 import org.openforis.idm.model.RecordContext;
 import org.openforis.idm.model.Time;
 
-public class RecordSerializationTest {
-//	private final Log log = LogFactory.getLog(RecordSerializationTest.class);
+public class ModelSerializationTest {
+//	private final Log log = LogFactory.getLog(ModelSerializationTest.class);
 	
 	@Test
 	public void testProto() throws Exception {
