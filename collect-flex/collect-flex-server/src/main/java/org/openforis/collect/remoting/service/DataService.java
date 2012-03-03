@@ -4,6 +4,7 @@
 package org.openforis.collect.remoting.service;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -163,25 +164,19 @@ public class DataService {
 		sessionManager.clearActiveRecord();
 	}
 
-	public UpdateResponse updateActiveRecord(UpdateRequest request) {
-		List<Node<?>> addedNodes = new ArrayList<Node<?>>();
-		List<Node<?>> updatedNodes = new ArrayList<Node<?>>();
-		List<Integer> deletedNodeIds = new ArrayList<Integer>();
+	public List<UpdateResponse> updateActiveRecord(UpdateRequest request) {
 		List<UpdateRequestOperation> operations = request.getOperations();
+		List<UpdateResponse> updateResponses = new ArrayList<UpdateResponse>();
 		for (UpdateRequestOperation operation : operations) {
-			processUpdateRequestOperation(operation, addedNodes, updatedNodes, deletedNodeIds);
+			Collection<UpdateResponse> responses = processUpdateRequestOperation(operation);
+			updateResponses.addAll(responses);
 		}
-		//convert nodes to proxies
-		UpdateResponse response = new UpdateResponse(55);
-//		response.setAddedNodes(NodeProxy.fromList((List<Node<?>>) addedNodes));
-//		response.setUpdatedNodes(NodeProxy.fromList((List<Node<?>>) updatedNodes));
-//		response.setDeletedNodeIds(deletedNodeIds.toArray(new Integer[0]));
-		return response;
+		return updateResponses;
 	}
 		
 	
 	@SuppressWarnings("unchecked")
-	private void processUpdateRequestOperation(UpdateRequestOperation operation, List<Node<?>> addedNodes, List<Node<?>> updatedNodes, List<Integer> deletedNodeIds) {
+	private Collection<UpdateResponse> processUpdateRequestOperation(UpdateRequestOperation operation) {
 		SessionState sessionState = sessionManager.getSessionState();
 		CollectRecord record = sessionState.getActiveRecord();
 		ModelVersion version = record.getVersion();
@@ -201,15 +196,14 @@ public class DataService {
 		
 		FieldSymbol symbol = operation.getSymbol();
 		Method method = operation.getMethod();
+		Map<Integer, UpdateResponse> responseMap = new HashMap<Integer, UpdateResponse>();
 		switch (method) {
 			case ADD :
 				Node<?> addedNode = addNode(version, parentEntity, nodeDef, requestValue, symbol, remarks);
 				//nodeStates = record.updateNodeState(addedNode);
-				addedNodes.add(addedNode);
+//				addedNodes.add(addedNode);
 				break;
 			case UPDATE:
-				Map<Integer, UpdateResponse> responseMap = new HashMap<Integer, UpdateResponse>();
-				
 				Attribute<? extends AttributeDefinition, ?> attribute = (Attribute<AttributeDefinition, ?>) node;
 				if(fieldIndex < 0){
 					Object value = parseAttributeValue(parentEntity, attribute.getDefinition(), requestValue);
@@ -226,16 +220,17 @@ public class DataService {
 				relReqDependencies.add(new NodePointer(attribute.getParent(), attribute.getName()));
 				clearedValidtionResults.add(attribute);
 				prepareUpdateResponse(responseMap, relReqDependencies, clearedValidtionResults, ancestors);
-				updatedNodes.add(node);
-				if(! updatedNodes.contains(node)) {
-					updatedNodes.add(node);
-				}
+//				updatedNodes.add(node);
+//				if(! updatedNodes.contains(node)) {
+//					updatedNodes.add(node);
+//				}
 				break;
 			case DELETE: 
 				Node<?> deletedNode = recordManager.deleteNode(parentEntity, node);
-				deletedNodeIds.add(deletedNode.getInternalId());
+//				deletedNodeIds.add(deletedNode.getInternalId());
 				break;
 		}
+		return responseMap.values();
 	}
 
 	private void prepareUpdateResponse(Map<Integer, UpdateResponse> responseMap, Set<NodePointer> relevanceReqquiredDependencies, Set<Attribute<?, ?>> validtionResultsDependencies, List<Entity> ancestors) {
