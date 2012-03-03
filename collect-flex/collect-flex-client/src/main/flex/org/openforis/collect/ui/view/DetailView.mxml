@@ -11,9 +11,7 @@
 		<![CDATA[
 			import mx.collections.ArrayCollection;
 			
-			import org.openforis.collect.Application;
 			import org.openforis.collect.i18n.Message;
-			import org.openforis.collect.model.proxy.RecordProxy$Step;
 			import org.openforis.collect.presenter.DetailPresenter;
 			import org.openforis.collect.ui.Images;
 			

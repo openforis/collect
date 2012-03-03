@@ -41,7 +41,6 @@
 	</s:layout>
 	
 	<s:TabBar id="tabBar" dataProvider="{viewStack}"/>
-	<!--<s:ButtonBar id="buttonBar" dataProvider="{viewStack}"/>-->
 	<mx:ViewStack width="100%" height="100%" id="viewStack" />
 	
 </s:NavigatorContent>
