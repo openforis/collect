@@ -116,6 +116,9 @@ package org.openforis.collect.presenter
 			eventDispatcher.dispatchEvent(appEvt);
 			
 			view.callLater(function():void {
+				if(view.scroller != null && view.scroller.verticalScrollBar != null) {
+					view.scroller.verticalScrollBar.value = view.scroller.verticalScrollBar.maximum;
+				}
 				UIUtil.ensureElementIsVisible(view.addButton);
 			});
 		}

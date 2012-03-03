@@ -4,7 +4,7 @@
 					   xmlns:mx="library://ns.adobe.com/flex/mx"
 					   xmlns:datagroup="org.openforis.collect.ui.component.datagroup.*"
 					   xmlns:detail="org.openforis.collect.ui.component.detail.*"
-					   maxHeight="400"
+					   maxHeight="350"
 					   maxWidth="950"
 					   >
 	<fx:Script>
