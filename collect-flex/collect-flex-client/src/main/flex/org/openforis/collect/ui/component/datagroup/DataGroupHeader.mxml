@@ -8,7 +8,11 @@
 			import mx.collections.ArrayCollection;
 			import mx.collections.IList;
 			
+			import spark.layouts.ConstraintLayout;
+			
 			private var _nodeDefinitions:IList;
+			
+			//private var _constraintLayout:ConstraintLayout;
 			
 			[Bindable]
 			public function get nodeDefinitions():IList {
@@ -18,6 +22,16 @@
 			public function set nodeDefinitions(value:IList):void {
 				_nodeDefinitions = value;
 			}
+			/*
+			[Bindable]
+			public function get constraintLayout():ConstraintLayout {
+				return _constraintLayout;
+			}
+			
+			public function set constraintLayout(value:ConstraintLayout):void {
+				_constraintLayout = value;
+			}
+			*/
 			
 		]]>
 	</fx:Script>
@@ -34,6 +48,7 @@
 								autoDrawBackground="false">
 					<fx:Script>
 						<![CDATA[
+							import mx.containers.utilityClasses.ConstraintColumn;
 							import mx.core.IVisualElement;
 							import mx.events.FlexEvent;
 							
@@ -45,6 +60,11 @@
 								if(data != null) {
 									var elem:IVisualElement = UIBuilder.getDataGroupHeader(data as NodeDefinitionProxy);
 									addElement(elem);
+									/*
+									var constraintColumns:Vector.<ConstraintColumn> = outerDocument.constraintLayout.constraintColumns;
+									var constraintColumn:ConstraintColumn = constraintColumns[super.itemIndex];
+									elem.x = constraintColumn.x;
+									*/
 								}
 							}
 							

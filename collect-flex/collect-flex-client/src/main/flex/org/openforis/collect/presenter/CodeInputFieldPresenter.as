@@ -178,6 +178,7 @@ package org.openforis.collect.presenter {
 					o = getUpdateRequestOperation(UpdateRequestOperation$Method.DELETE, a.id);
 					operations.addItem(o);
 				}
+				var remarks:String = getRemarks();
 				if(text != null) {
 					var parts:Array = text.split(",");
 					if(parts.length == 1 && isShortCutForReasonBlank(text)) {
@@ -193,6 +194,9 @@ package org.openforis.collect.presenter {
 							}
 						}
 					}
+				} else if(StringUtil.isNotBlank(remarks)) {
+					o = getUpdateRequestOperation(UpdateRequestOperation$Method.ADD, NaN, null, null, remarks);
+					operations.addItem(o);
 				}
 				var req:UpdateRequest = new UpdateRequest();
 				req.operations = operations;
@@ -202,28 +206,32 @@ package org.openforis.collect.presenter {
 			}
 		}
 		
-		override public function applySymbolAndRemarks(symbol:FieldSymbol, remarks:String):void {
+		override public function applyRemarks(remarks:String):void {
 			if(_view.attributeDefinition.multiple) {
 				var operations:ArrayCollection = new ArrayCollection();
 				for each (var a:AttributeProxy in _view.attributes) {
 					var value:String = codeAttributeToText(a);
-					var o:UpdateRequestOperation = getUpdateRequestOperation(UpdateRequestOperation$Method.UPDATE, a.id, value, symbol, remarks);
+					var symbol:FieldSymbol = a.getField(0).symbol;
+					var o:UpdateRequestOperation = getUpdateRequestOperation(UpdateRequestOperation$Method.UPDATE, 
+						a.id, value, symbol, remarks);
 					operations.addItem(o);
 				}
 				var req:UpdateRequest = new UpdateRequest();
 				req.operations = operations;
 				dataClient.updateActiveRecord(updateResponder, req);
 			} else {
-				super.applySymbolAndRemarks(symbol, remarks);
+				super.applyRemarks(remarks);
 			}
 		}
 		
 		override public function applySymbol(symbol:FieldSymbol):void {
 			if(_view.attributeDefinition.multiple) {
 				var operations:ArrayCollection = new ArrayCollection();
+				var remarks:String = getRemarks();
 				for each (var a:AttributeProxy in _view.attributes) {
 					var value:String = codeAttributeToText(a);
-					var o:UpdateRequestOperation = getUpdateRequestOperation(UpdateRequestOperation$Method.UPDATE, a.id, value, symbol, remarks);
+					var o:UpdateRequestOperation = getUpdateRequestOperation(UpdateRequestOperation$Method.UPDATE, 
+						a.id, value, symbol, remarks);
 					operations.addItem(o);
 				}
 				var req:UpdateRequest = new UpdateRequest();
@@ -234,7 +242,7 @@ package org.openforis.collect.presenter {
 			}
 		}
 		
-		override protected function get remarks():String {
+		override protected function getRemarks():String {
 			if(_view.attributeDefinition.multiple) {
 				if(CollectionUtil.isNotEmpty(_view.attributes)) {
 					var a:AttributeProxy = AttributeProxy(_view.attributes.getItemAt(0));
@@ -242,7 +250,7 @@ package org.openforis.collect.presenter {
 					return field.remarks;
 				}
 			} else {
-				return super.remarks;
+				return super.getRemarks();
 			}
 			return null;
 		}

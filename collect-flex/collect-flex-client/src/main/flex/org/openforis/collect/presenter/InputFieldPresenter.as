@@ -5,7 +5,6 @@ package org.openforis.collect.presenter {
 	import flash.ui.Keyboard;
 	
 	import mx.binding.utils.ChangeWatcher;
-	import mx.collections.ArrayList;
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.IResponder;
 	import mx.rpc.events.FaultEvent;
@@ -41,6 +40,8 @@ package org.openforis.collect.presenter {
 		public static const SHORTCUT_DASH_ON_FORM:String = "-";
 		public static const SHORTCUT_ILLEGIBLE:String = "?";
 		
+		public static const REASON_BLANK_SYMBOLS:Array = [SHORTCUT_BLANK_ON_FORM, SHORTCUT_DASH_ON_FORM, SHORTCUT_ILLEGIBLE];
+		
 		private var _view:InputField;
 		private var _changed:Boolean = false;
 		protected var _updateResponder:IResponder;
@@ -49,7 +50,6 @@ package org.openforis.collect.presenter {
 		public function InputFieldPresenter(inputField:InputField = null) {
 			_view = inputField;
 			_dataClient = ClientFactory.dataClient;
-			
 			_updateResponder = new AsyncResponder(updateResultHandler, updateFaultHandler);
 			
 			super();
@@ -116,6 +116,21 @@ package org.openforis.collect.presenter {
 		}
 		
 		public function applyValue():void {
+			var o:UpdateRequestOperation = getApplyValueOperation();
+			sendRequestOperation(o);
+		}
+		
+		public function applySymbol(symbol:FieldSymbol):void {
+			var o:UpdateRequestOperation = getApplySymbolOperation(symbol);
+			sendRequestOperation(o);
+		}
+		
+		public function applyRemarks(remarks:String):void {
+			var o:UpdateRequestOperation = getApplyRemarksOperation(remarks);
+			sendRequestOperation(o);
+		}
+		
+		public function getApplyValueOperation():UpdateRequestOperation {
 			var symbol:FieldSymbol = null;
 			var value:String = null;
 			var text:String = textToRequestValue();
@@ -124,24 +139,38 @@ package org.openforis.collect.presenter {
 			} else {
 				value = text;
 			}
-			var remarks:String = remarks; //preserve old remarks
-			sendUpdate(value, symbol, remarks);
+			var remarks:String = getRemarks(); //preserve old remarks
+			var o:UpdateRequestOperation = getUpdateFieldOperation(value, symbol, remarks);
+			return o;
 		}
 		
-		public function applySymbol(symbol:FieldSymbol):void {
-			var value:String = textToRequestValue();
-			var remarks:String = remarks; //preserve old remarks
-			sendUpdate(value, symbol, remarks);
+		public function getApplySymbolOperation(symbol:FieldSymbol):UpdateRequestOperation {
+			var value:String = null;
+			if(ArrayUtil.isNotIn(REASON_BLANK_SYMBOLS, symbol)) {
+				value = textToRequestValue(); //preserve old value
+			}
+			var remarks:String = getRemarks(); //preserve old remarks
+			var o:UpdateRequestOperation = getUpdateFieldOperation(value, symbol, remarks);
+			return o;
 		}
 		
-		public function applySymbolAndRemarks(symbol:FieldSymbol, remarks:String):void {
-			var value:String = textToRequestValue();
-			sendUpdate(value, symbol, remarks);
+		public function getApplyRemarksOperation(remarks:String):UpdateRequestOperation {
+			var value:String = null;
+			if(ArrayUtil.isNotIn(REASON_BLANK_SYMBOLS, symbol)) {
+				value = textToRequestValue(); //preserve old value
+			}
+			var symbol:FieldSymbol = getSymbol(); //preserve old symbol
+			var o:UpdateRequestOperation = getUpdateFieldOperation(value, symbol, remarks);
+			return o;
 		}
 		
-		protected function sendUpdate(value:String, symbol:FieldSymbol = null, remarks:String = null):void {
+		protected function getUpdateFieldOperation(value:String, symbol:FieldSymbol = null, remarks:String = null):UpdateRequestOperation {
 			var nodeId:Number = _view.attribute != null ? _view.attribute.id: NaN;
 			var o:UpdateRequestOperation = getUpdateRequestOperation(UpdateRequestOperation$Method.UPDATE, nodeId, value, symbol, remarks);
+			return o;
+		}
+		
+		protected function sendRequestOperation(o:UpdateRequestOperation):void {
 			var req:UpdateRequest = new UpdateRequest(o);
 			dataClient.updateActiveRecord(_updateResponder, req);
 		}
@@ -215,19 +244,19 @@ package org.openforis.collect.presenter {
 		
 		protected function updateView():void {
 			//update view according to attribute (generic text value)
-			var remarksPresent:Boolean = false;
+			var hasRemarks:Boolean = false;
 			if(_view.attributeDefinition != null) {
 				var text:String = valueToText();
 				_view.text = text;
 				if(_view.attribute != null) {
-					remarksPresent = StringUtil.isNotBlank(remarks);
+					hasRemarks = StringUtil.isNotBlank(getRemarks());
 				}
 				_view.contextMenu = ContextMenuBuilder.buildContextMenu(_view);
 			}
-			_view.remarksPresent = remarksPresent;
+			_view.hasRemarks = hasRemarks;
 		}
 		
-		protected function get field():FieldProxy {
+		protected function getField():FieldProxy {
 			if(_view.attribute != null) {
 				var fieldIndex:int = 0;
 				if(_view.fieldIndex >= 0) {
@@ -238,10 +267,18 @@ package org.openforis.collect.presenter {
 			return null;
 		}
 		
-		protected function get remarks():String {
-			var f:FieldProxy = field;
+		protected function getRemarks():String {
+			var f:FieldProxy = getField();
 			if(f != null) {
 				return f.remarks;
+			} 
+			return null;
+		}
+		
+		protected function getSymbol():FieldSymbol {
+			var f:FieldProxy = getField();
+			if(f != null) {
+				return f.symbol;
 			} 
 			return null;
 		}
@@ -273,7 +310,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		public static function isShortCutForReasonBlank(text:String):Boolean {
-			return ArrayUtil.isIn([SHORTCUT_BLANK_ON_FORM, SHORTCUT_DASH_ON_FORM, SHORTCUT_ILLEGIBLE], text);
+			return ArrayUtil.isIn(REASON_BLANK_SYMBOLS, text);
 		}
 		
 		protected function get dataClient():DataClient {

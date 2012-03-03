@@ -105,7 +105,7 @@ package org.openforis.collect.ui
 		}
 		
 		private static function addValueItems(currentItems:Array, step:RecordProxy$Step, inputField:InputField):void {
-			if(inputField.canApplyReasonBlank()) {
+			if(inputField.isEmpty()) {
 				currentItems.push(
 					BLANK_ON_FORM_MENU_ITEM,
 					DASH_ON_FORM_MENU_ITEM,

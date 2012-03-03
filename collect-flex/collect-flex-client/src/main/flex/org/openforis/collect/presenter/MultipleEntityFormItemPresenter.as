@@ -48,13 +48,13 @@ package org.openforis.collect.presenter
 		
 		override protected function updateResponseReceivedHandler(event:ApplicationEvent):void {
 			var response:UpdateResponse = UpdateResponse(event.result);
-			for each(var node:NodeProxy in response.addedNodes) {
+			/*for each(var node:NodeProxy in response.addedNodes) {
 				if(view.parentEntity != null && view.entityDefinition != null 
 					&& node.parentId == view.parentEntity.id 
 					&& node.name == view.entityDefinition.name) {
 					updateView();
 				}
-			}
+			}*/
 		}
 		
 		override protected function updateView():void {
@@ -111,9 +111,31 @@ package org.openforis.collect.presenter
 			eventDispatcher.dispatchEvent(appEvt);
 			
 			view.callLater(function():void {
+				if(view.scroller != null && view.scroller.verticalScrollBar != null) {
+					view.scroller.verticalScrollBar.value = view.scroller.verticalScrollBar.maximum;
+				}
 				UIUtil.ensureElementIsVisible(view.addButton);
 			});
 		}
+		/*
+		override protected function initNodeDefinitions(event:Event=null):void {
+			super.initNodeDefinitions(event);
+			initConstraintLayout(event);
+		}
 		
+		protected function initConstraintLayout(event:Event = null):void {
+			var constraintLayout:ConstraintLayout = new ConstraintLayout();
+			var constraintColumns:Vector.<ConstraintColumn> = new Vector.<ConstraintColumn>();
+			if(CollectionUtil.isNotEmpty(view.nodeDefinitions)) {
+				for(var index:int = 0; index < view.nodeDefinitions.length; index ++) {
+					var defn:NodeDefinitionProxy = view.nodeDefinitions[index] as NodeDefinitionProxy; 
+					var constraintColumn:ConstraintColumn = new ConstraintColumn();
+					constraintColumns.push(constraintColumn);
+				}
+			}
+			constraintLayout.constraintColumns = constraintColumns;
+			view.constraintLayout = constraintLayout;
+		}
+		*/
 	}
 }

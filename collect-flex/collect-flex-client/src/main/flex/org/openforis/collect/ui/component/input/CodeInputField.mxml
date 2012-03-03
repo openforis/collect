@@ -7,16 +7,11 @@
 				  >
 	<fx:Script>
 		<![CDATA[
-			import flash.sampler.getInvocationCount;
-			
 			import mx.collections.IList;
 			
 			import org.openforis.collect.metamodel.proxy.CodeAttributeDefinitionProxy;
-			import org.openforis.collect.model.proxy.AttributeProxy;
-			import org.openforis.collect.model.proxy.FieldProxy;
 			import org.openforis.collect.presenter.CodeInputFieldPresenter;
 			import org.openforis.collect.ui.Images;
-			import org.openforis.collect.util.CollectionUtil;
 
 			public static const STATE_DEFAULT:String = "default";
 			public static const STATE_DESCRIPTION_VISIBLE:String = "descriptionVisible";
@@ -28,34 +23,6 @@
 				this.presenter = new CodeInputFieldPresenter(this);
 			}
 			
-			override public function canApplyReasonBlank():Boolean {
-				if(attributeDefinition != null && attributeDefinition.multiple) {
-					if(CollectionUtil.isNotEmpty(attributes)) {
-						var a:AttributeProxy = attributes.getItemAt(0) as AttributeProxy;
-						var f:FieldProxy = a.getField(fieldIndex);
-						return a.empty && f.symbol == null;
-					} else {
-						return true;
-					}
-				} else {
-					return super.canApplyReasonBlank();
-				}
-			}
-			
-			override public function hasReasonBlankSpecified():Boolean {
-				if(attributeDefinition != null && attributeDefinition.multiple) {
-					if(CollectionUtil.isNotEmpty(attributes)) {
-						var a:AttributeProxy = attributes.getItemAt(0) as AttributeProxy;
-						var f:FieldProxy = a.getField(fieldIndex);
-						return f.hasReasonBlankSpecified();
-					} else {
-						return false;
-					}
-				} else {
-					return super.hasReasonBlankSpecified();
-				}
-			}
-
 			[Bindable]
 			public function get attributes():IList {
 				return _attributes;

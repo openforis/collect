@@ -42,12 +42,16 @@ package org.openforis.collect.util {
 	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.model.proxy.FieldProxy;
 	import org.openforis.collect.model.proxy.IntegerRangeProxy;
+	import org.openforis.collect.model.proxy.NodeProxy;
 	import org.openforis.collect.model.proxy.RealRangeProxy;
 	import org.openforis.collect.model.proxy.RecordProxy;
 	import org.openforis.collect.model.proxy.TaxonOccurrenceProxy;
 	import org.openforis.collect.model.proxy.TaxonProxy;
 	import org.openforis.collect.model.proxy.TaxonVernacularNameProxy;
 	import org.openforis.collect.model.proxy.TimeProxy;
+	import org.openforis.collect.model.proxy.ValidationResultProxy;
+	import org.openforis.collect.model.proxy.ValidationResultsProxy;
+	import org.openforis.collect.remoting.service.UpdateResponse;
 
 	public class ModelClassInitializer {
 		
@@ -103,7 +107,12 @@ package org.openforis.collect.util {
 				UnitProxy,
 				
 				UIConfiguration,
-				UITab
+				UITab,
+				
+				ValidationResultsProxy,
+				ValidationResultProxy,
+				UpdateResponse,
+				NodeProxy
 				
 			];
 		}

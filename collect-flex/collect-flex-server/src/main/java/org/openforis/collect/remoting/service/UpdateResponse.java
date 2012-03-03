@@ -33,7 +33,7 @@ public class UpdateResponse implements Proxy {
 	}
 
 	@ExternalizedProperty
-	public int getNodeId() {
+	public Integer getNodeId() {
 		return nodeId;
 	}
 
@@ -43,7 +43,8 @@ public class UpdateResponse implements Proxy {
 
 	@ExternalizedProperty
 	public Map<String, Object> getRelevant() {
-		return relevantMap;
+//		return relevantMap;
+		return null;
 	}
 
 	public void setRelevant(String childName, Object relevant) {
@@ -52,7 +53,8 @@ public class UpdateResponse implements Proxy {
 
 	@ExternalizedProperty
 	public Map<String, Object> getRequired() {
-		return requiredMap;
+//		return requiredMap;
+		return null;
 	}
 
 	public void setRequired(String childName, Object required) {
@@ -61,9 +63,9 @@ public class UpdateResponse implements Proxy {
 
 	@ExternalizedProperty
 	public ValidationResultsProxy getValidationResults() {
-		if (validationResults != null) {
-			return new ValidationResultsProxy(validationResults);
-		}
+//		if (validationResults != null) {
+//			return new ValidationResultsProxy(validationResults);
+//		}
 		return null;
 	}
 
@@ -73,7 +75,8 @@ public class UpdateResponse implements Proxy {
 
 	@ExternalizedProperty
 	public Map<String, Object> getMinCountValid() {
-		return minCountValidMap;
+//		return minCountValidMap;
+		return null;
 	}
 
 	public void setMinCountValid(String childName, Object minCountValid) {
@@ -82,7 +85,8 @@ public class UpdateResponse implements Proxy {
 
 	@ExternalizedProperty
 	public Map<String, Object> getMaxCountValid() {
-		return maxCountValidMap;
+//		return maxCountValidMap;
+		return null;
 	}
 
 	public void setMaxCountValid(String childName, Object maxCountValid) {
@@ -105,38 +109,5 @@ public class UpdateResponse implements Proxy {
 		UpdateResponse other = (UpdateResponse) obj;
 		return new EqualsBuilder().append(nodeId, other.nodeId).isEquals();
 	}
-
-	//
-	// private List<NodeProxy> addedNodes;
-	// private List<NodeProxy> updatedNodes;
-	// private Integer[] deletedNodeIds;
-	//
-	// public UpdateResponse() {
-	// super();
-	// }
-	//
-	// public List<NodeProxy> getUpdatedNodes() {
-	// return updatedNodes;
-	// }
-	//
-	// public void setUpdatedNodes(List<NodeProxy> addedNodes) {
-	// this.updatedNodes = addedNodes;
-	// }
-	//
-	// public Integer[] getDeletedNodeIds() {
-	// return deletedNodeIds;
-	// }
-	//
-	// public void setDeletedNodeIds(Integer[] deletedNodeIds) {
-	// this.deletedNodeIds = deletedNodeIds;
-	// }
-	//
-	// public List<NodeProxy> getAddedNodes() {
-	// return addedNodes;
-	// }
-	//
-	// public void setAddedNodes(List<NodeProxy> addedNodes) {
-	// this.addedNodes = addedNodes;
-	// }
 
 }

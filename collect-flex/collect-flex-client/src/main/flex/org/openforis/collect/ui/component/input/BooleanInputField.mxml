@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <input:InputField xmlns:fx="http://ns.adobe.com/mxml/2009" 
 				  xmlns:s="library://ns.adobe.com/flex/spark" 
-				  xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:input="org.openforis.collect.ui.component.input.*" 
+				  xmlns:mx="library://ns.adobe.com/flex/mx" 
+				  xmlns:input="org.openforis.collect.ui.component.input.*" 
 				  width="20">
 	<fx:Script>
 		<![CDATA[
@@ -14,6 +15,13 @@
 		]]>
 	</fx:Script>
 
-	<input:TextInput id="textInput" width="100%" maxChars="1" minWidth="0" />
+	<input:layout>
+		<s:BasicLayout />
+	</input:layout>
+	
+	<input:TextInput id="textInput" width="20" 
+					 horizontalCenter="{isInDataGroup ? 0: NaN}" 
+					 maxChars="1" 
+					 minWidth="0" />
 	
 </input:InputField>

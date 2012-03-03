@@ -37,6 +37,6 @@
 		]]>
 	</fx:Script>
 	
-	<s:Label id="textInput" width="100%" />
+	<s:Label id="textInput" />
 	
 </input:InputField>

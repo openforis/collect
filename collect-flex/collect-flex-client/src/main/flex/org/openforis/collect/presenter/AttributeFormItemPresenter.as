@@ -58,7 +58,7 @@ package org.openforis.collect.presenter
 				var response:UpdateResponse = event.result as UpdateResponse;
 				var parentId:Number = view.parentEntity.id;
 				var node:NodeProxy;
-				for each (node in response.addedNodes) {
+				/*for each (node in response.addedNodes) {
 					if(node.parentId == parentId && node.name == view.attributeDefinition.name &&
 						! view.attributeDefinition.multiple || view.attributes == null
 						) {
@@ -74,7 +74,7 @@ package org.openforis.collect.presenter
 							break;
 						}
 					}
-				}
+				}*/
 				/*
 				for each (var item:NodeProxy in result) {
 					if((item.id == parentId && item.deleted) ||

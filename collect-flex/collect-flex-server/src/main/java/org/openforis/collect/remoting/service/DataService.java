@@ -211,38 +211,60 @@ public class DataService {
 				Map<Integer, UpdateResponse> responseMap = new HashMap<Integer, UpdateResponse>();
 				
 				Attribute<? extends AttributeDefinition, ?> attribute = (Attribute<AttributeDefinition, ?>) node;
-				updateAttribute(record, parentEntity, attribute, fieldIndex, requestValue, symbol, remarks);
+				if(fieldIndex < 0){
+					Object value = parseAttributeValue(parentEntity, attribute.getDefinition(), requestValue);
+					recordManager.setAttributeValue(attribute, value, remarks);
+				} else {
+					Object value = parseFieldValue(parentEntity, attribute.getDefinition(), requestValue, fieldIndex);
+					recordManager.setFieldValue(attribute, value, remarks, symbol, fieldIndex);
+				}
+//				setValue(attribute, fieldIndex, requestValue, symbol, remarks);
 				//nodeStates = record.updateNodeState(node);
-				Set<NodePointer> relevantDependencies = attribute.getRelevantDependencies();
-				clearRelevantDependencies(relevantDependencies);
-				Set<NodePointer> requiredDependencies = attribute.getRequiredDependencies();
-				requiredDependencies.addAll(relevantDependencies);
-				clearRequiredDependencies(requiredDependencies);
-				
-				for (NodePointer nodePointer : requiredDependencies) {
-					Entity entity = nodePointer.getEntity();
-					String childName = nodePointer.getChildName();
-					List<Node<? extends NodeDefinition>> list = entity.getAll(childName);
-		
-					UpdateResponse response = getUpdateResponse(responseMap, entity.getInternalId());
-					response.setRelevant(childName, entity.isRelevant(childName));
-					response.setRequired(childName, entity.isRequired(childName));
-					response.setMinCountValid(childName, entity.validateMinCount(childName));
-				}
-				
-				Set<Attribute<?,?>> checkDependencies = attribute.getCheckDependencies();
-				for (Attribute<?, ?> checkDepAttr : checkDependencies) {
-					checkDepAttr.clearValidationResults();
-					ValidationResults results = checkDepAttr.validateValue();
-					UpdateResponse response = getUpdateResponse(responseMap, checkDepAttr.getInternalId());
-					response.setValidationResults(results);
-				}
+				Set<NodePointer> relReqDependencies = recordManager. clearRelevanceRequiredStates(attribute);
+				Set<Attribute<?,?>> clearedValidtionResults = recordManager.clearValidtionResults(attribute);
+				List<Entity> ancestors = attribute.getAncestors();
+				relReqDependencies.add(new NodePointer(attribute.getParent(), attribute.getName()));
+				clearedValidtionResults.add(attribute);
+				prepareUpdateResponse(responseMap, relReqDependencies, clearedValidtionResults, ancestors);
 				updatedNodes.add(node);
+				if(! updatedNodes.contains(node)) {
+					updatedNodes.add(node);
+				}
 				break;
 			case DELETE: 
 				Node<?> deletedNode = recordManager.deleteNode(parentEntity, node);
 				deletedNodeIds.add(deletedNode.getInternalId());
 				break;
+		}
+	}
+
+	private void prepareUpdateResponse(Map<Integer, UpdateResponse> responseMap, Set<NodePointer> relevanceReqquiredDependencies, Set<Attribute<?, ?>> validtionResultsDependencies, List<Entity> ancestors) {
+		for (Entity entity : ancestors) {
+			//entity could be root definition
+			Entity parent = entity.getParent();
+			if(parent != null){
+				UpdateResponse response = getUpdateResponse(responseMap, parent.getInternalId());
+				String childName = entity.getName();
+				response.setMinCountValid(childName , parent.validateMinCount(childName));
+				response.setRelevant(childName, parent.isRelevant(childName));
+				response.setRequired(childName, parent.isRequired(childName));
+			}
+		}
+		
+		for (NodePointer nodePointer : relevanceReqquiredDependencies) {
+			Entity entity = nodePointer.getEntity();
+			String childName = nodePointer.getChildName();
+			UpdateResponse response = getUpdateResponse(responseMap, entity.getInternalId());
+			response.setRelevant(childName, entity.isRelevant(childName));
+			response.setRequired(childName, entity.isRequired(childName));
+			response.setMinCountValid(childName, entity.validateMinCount(childName));
+		}
+		
+		for (Attribute<?, ?> checkDepAttr : validtionResultsDependencies) {
+			checkDepAttr.clearValidationResults();
+			ValidationResults results = checkDepAttr.validateValue();
+			UpdateResponse response = getUpdateResponse(responseMap, checkDepAttr.getInternalId());
+			response.setValidationResults(results);
 		}
 	}
 
@@ -255,27 +277,13 @@ public class DataService {
 		return response;
 	}
 	
-	private void clearRelevantDependencies(Set<NodePointer> nodePointers) {
-		for (NodePointer nodePointer : nodePointers) {
-			Entity entity = nodePointer.getEntity();
-			entity.clearRelevanceState(nodePointer.getChildName());
-		}
-	}
-	
-	private void clearRequiredDependencies(Set<NodePointer> nodePointers) {
-		for (NodePointer nodePointer : nodePointers) {
-			Entity entity = nodePointer.getEntity();
-			entity.clearRequiredState(nodePointer.getChildName());
-		}
-	}
-	
 	@SuppressWarnings("unchecked")
 	private Node<?> addNode(ModelVersion version, Entity parentEntity, NodeDefinition nodeDef, String requestValue, FieldSymbol symbol, String remarks) {
 		if(nodeDef instanceof AttributeDefinition) {
 			AttributeDefinition def = (AttributeDefinition) nodeDef;
 			Attribute<?, ?> attribute = (Attribute<?, ?>) def.createNode();
 			if(StringUtils.isNotBlank(requestValue)) {
-				Object value = parseValue(parentEntity, (AttributeDefinition) nodeDef, requestValue, version);
+				Object value = parseAttributeValue(parentEntity, (AttributeDefinition) nodeDef, requestValue);
 				((Attribute<?, Object>) attribute).setValue(value);
 			}
 			if(symbol != null || remarks != null) {
@@ -296,22 +304,24 @@ public class DataService {
 	}
 	
 	@SuppressWarnings("unchecked")
-	private void updateAttribute(CollectRecord record, Entity parentEntity, Attribute<? extends AttributeDefinition, ?> attribute, Integer fieldIndex, String requestValue, FieldSymbol symbol, String remarks) {
+	@Deprecated
+	private void setValue(Attribute<?, ?> attribute, Integer fieldIndex, String requestValue, FieldSymbol symbol, String remarks) {
+		Record record = attribute.getRecord();
 		ModelVersion version = record.getVersion();
-		AttributeDefinition defn = attribute.getDefinition();
 		@SuppressWarnings("rawtypes")
 		Field field;
+		Entity parentEntity = attribute.getParent();
 		if (fieldIndex >= 0) {
 			Object fieldValue = null;
 			if (StringUtils.isNotBlank(requestValue)) {
-				fieldValue = parseFieldValue(parentEntity, defn, requestValue, fieldIndex);
+				fieldValue = parseFieldValue(parentEntity, attribute.getDefinition(), requestValue, fieldIndex);
 			}
 			field = attribute.getField(fieldIndex);
 			field.setValue(fieldValue);
 		} else {
 			Object value = null;
 			if ((symbol == null || !symbol.isReasonBlank()) && StringUtils.isNotBlank(requestValue)) {
-				value = parseValue(parentEntity, defn, requestValue, version);
+				value = parseAttributeValue(parentEntity, attribute.getDefinition(), requestValue);
 			}
 			((Attribute<AttributeDefinition, Object>) attribute).setValue(value);
 			field = attribute.getField(0);
@@ -386,12 +396,14 @@ public class DataService {
 		return result;
 	}
 	
-	private Object parseValue(Entity parentEntity, AttributeDefinition def, String value, ModelVersion version) {
+	private Object parseAttributeValue(Entity parentEntity, AttributeDefinition defn, String value) {
 		Object result;
-		if(def instanceof CodeAttributeDefinition) {
-			result = parseCode(parentEntity, (CodeAttributeDefinition) def, value, version);
-		} else if(def instanceof RangeAttributeDefinition) {
-			RangeAttributeDefinition rangeDef = (RangeAttributeDefinition) def;
+		if(defn instanceof CodeAttributeDefinition) {
+			Record record = parentEntity.getRecord();
+			ModelVersion version = record .getVersion();
+			result = parseCode(parentEntity, (CodeAttributeDefinition) defn, value, version );
+		} else if(defn instanceof RangeAttributeDefinition) {
+			RangeAttributeDefinition rangeDef = (RangeAttributeDefinition) defn;
 			org.openforis.idm.metamodel.RangeAttributeDefinition.Type type = rangeDef.getType();
 			NumericRange<?> range = null;
 			switch(type) {
