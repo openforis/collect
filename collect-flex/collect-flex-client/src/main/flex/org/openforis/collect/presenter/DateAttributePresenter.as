@@ -1,11 +1,24 @@
 package org.openforis.collect.presenter {
 	import flash.events.Event;
 	
+	import mx.collections.ArrayCollection;
+	import mx.collections.ListCollectionView;
 	import mx.events.CalendarLayoutChangeEvent;
+	import mx.rpc.AsyncResponder;
+	import mx.rpc.IResponder;
+	import mx.rpc.events.FaultEvent;
+	import mx.rpc.events.ResultEvent;
 	
+	import org.openforis.collect.Application;
+	import org.openforis.collect.client.ClientFactory;
+	import org.openforis.collect.client.DataClient;
+	import org.openforis.collect.event.ApplicationEvent;
+	import org.openforis.collect.remoting.service.UpdateRequest;
+	import org.openforis.collect.remoting.service.UpdateRequestOperation;
+	import org.openforis.collect.remoting.service.UpdateResponse;
 	import org.openforis.collect.ui.component.input.DateAttributeRenderer;
 	import org.openforis.collect.ui.component.input.DateField;
-	import org.openforis.collect.ui.component.input.TaxonAttributeRenderer;
+	import org.openforis.collect.ui.component.input.InputField;
 	import org.openforis.collect.util.StringUtil;
 	
 	import spark.events.DropDownEvent;
@@ -16,7 +29,13 @@ package org.openforis.collect.presenter {
 	 * */
 	public class DateAttributePresenter extends AttributePresenter {
 		
+		protected var _updateResponder:IResponder;
+		private var _dataClient:DataClient;
+		
 		public function DateAttributePresenter(view:DateAttributeRenderer) {
+			_dataClient = ClientFactory.dataClient;
+			_updateResponder = new AsyncResponder(updateResultHandler, updateFaultHandler);
+			
 			super(view);
 		}
 		
@@ -45,12 +64,19 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function setDateOnFields(year:Number, month:Number, day:Number):void {
-			view.year.text = StringUtil.zeroPad(year, 2);
+			view.year.text = StringUtil.zeroPad(year, 4);
 			view.month.text = StringUtil.zeroPad(month, 2);
 			view.day.text = StringUtil.zeroPad(day, 2);
-			view.year.applyValue();
-			view.month.applyValue();
-			view.day.applyValue();
+			
+			var fields:Array = [view.year, view.month, view.day];
+			var operations:ListCollectionView = new ArrayCollection();
+			for each (var field:InputField in fields) {
+				var o:UpdateRequestOperation = field.presenter.getApplyValueOperation();
+				operations.addItem(o);
+			}
+			var req:UpdateRequest = new UpdateRequest();
+			req.operations = operations;
+			dataClient.updateActiveRecord(_updateResponder, req);
 		}
 		
 		protected function getDateFromFields():Date {
@@ -64,6 +90,22 @@ package org.openforis.collect.presenter {
 			return null;
 		}
 		
+		protected function updateResultHandler(event:ResultEvent, token:Object = null):void {
+			var response:UpdateResponse = UpdateResponse(event.result);
+			Application.activeRecord.update(response);
+			var appEvt:ApplicationEvent = new ApplicationEvent(ApplicationEvent.UPDATE_RESPONSE_RECEIVED);
+			appEvt.result = response;
+			eventDispatcher.dispatchEvent(appEvt);
+		}
+		
+		protected function updateFaultHandler(event:FaultEvent, token:Object = null):void {
+			//undoLastChange();
+			faultHandler(event, token);
+		}
+		
+		protected function get dataClient():DataClient {
+			return _dataClient;
+		}
 
 	}
 }

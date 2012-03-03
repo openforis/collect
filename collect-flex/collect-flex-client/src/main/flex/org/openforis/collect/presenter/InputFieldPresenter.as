@@ -50,7 +50,6 @@ package org.openforis.collect.presenter {
 		public function InputFieldPresenter(inputField:InputField = null) {
 			_view = inputField;
 			_dataClient = ClientFactory.dataClient;
-			
 			_updateResponder = new AsyncResponder(updateResultHandler, updateFaultHandler);
 			
 			super();
@@ -117,6 +116,21 @@ package org.openforis.collect.presenter {
 		}
 		
 		public function applyValue():void {
+			var o:UpdateRequestOperation = getApplyValueOperation();
+			sendRequestOperation(o);
+		}
+		
+		public function applySymbol(symbol:FieldSymbol):void {
+			var o:UpdateRequestOperation = getApplySymbolOperation(symbol);
+			sendRequestOperation(o);
+		}
+		
+		public function applyRemarks(remarks:String):void {
+			var o:UpdateRequestOperation = getApplyRemarksOperation(remarks);
+			sendRequestOperation(o);
+		}
+		
+		public function getApplyValueOperation():UpdateRequestOperation {
 			var symbol:FieldSymbol = null;
 			var value:String = null;
 			var text:String = textToRequestValue();
@@ -126,30 +140,37 @@ package org.openforis.collect.presenter {
 				value = text;
 			}
 			var remarks:String = getRemarks(); //preserve old remarks
-			sendUpdate(value, symbol, remarks);
+			var o:UpdateRequestOperation = getUpdateFieldOperation(value, symbol, remarks);
+			return o;
 		}
 		
-		public function applySymbol(symbol:FieldSymbol):void {
+		public function getApplySymbolOperation(symbol:FieldSymbol):UpdateRequestOperation {
 			var value:String = null;
 			if(ArrayUtil.isNotIn(REASON_BLANK_SYMBOLS, symbol)) {
-				value = textToRequestValue();
+				value = textToRequestValue(); //preserve old value
 			}
-			var remarks:String = remarks; //preserve old remarks
-			sendUpdate(value, symbol, remarks);
+			var remarks:String = getRemarks(); //preserve old remarks
+			var o:UpdateRequestOperation = getUpdateFieldOperation(value, symbol, remarks);
+			return o;
 		}
 		
-		public function applyRemarks(remarks:String):void {
+		public function getApplyRemarksOperation(remarks:String):UpdateRequestOperation {
 			var value:String = null;
 			if(ArrayUtil.isNotIn(REASON_BLANK_SYMBOLS, symbol)) {
-				value = textToRequestValue();
+				value = textToRequestValue(); //preserve old value
 			}
-			var symbol:FieldSymbol = getSymbol();
-			sendUpdate(value, symbol, remarks);
+			var symbol:FieldSymbol = getSymbol(); //preserve old symbol
+			var o:UpdateRequestOperation = getUpdateFieldOperation(value, symbol, remarks);
+			return o;
 		}
 		
-		protected function sendUpdate(value:String, symbol:FieldSymbol = null, remarks:String = null):void {
+		protected function getUpdateFieldOperation(value:String, symbol:FieldSymbol = null, remarks:String = null):UpdateRequestOperation {
 			var nodeId:Number = _view.attribute != null ? _view.attribute.id: NaN;
 			var o:UpdateRequestOperation = getUpdateRequestOperation(UpdateRequestOperation$Method.UPDATE, nodeId, value, symbol, remarks);
+			return o;
+		}
+		
+		protected function sendRequestOperation(o:UpdateRequestOperation):void {
 			var req:UpdateRequest = new UpdateRequest(o);
 			dataClient.updateActiveRecord(_updateResponder, req);
 		}
