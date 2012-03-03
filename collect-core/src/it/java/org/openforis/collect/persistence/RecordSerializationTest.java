@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
-import java.util.Collection;
 import java.util.GregorianCalendar;
 import java.util.List;
 
@@ -27,88 +26,39 @@ import org.openforis.idm.model.Code;
 import org.openforis.idm.model.Coordinate;
 import org.openforis.idm.model.Date;
 import org.openforis.idm.model.Entity;
-import org.openforis.idm.model.EntitySchema;
+import org.openforis.idm.model.ModelSerializer;
 import org.openforis.idm.model.RealAttribute;
 import org.openforis.idm.model.RecordContext;
-import org.openforis.idm.model.RecordSerializer;
 import org.openforis.idm.model.Time;
-
-import com.dyuproject.protostuff.LinkedBuffer;
-import com.dyuproject.protostuff.ProtostuffIOUtil;
-import com.dyuproject.protostuff.runtime.RuntimeEnv;
-import com.dyuproject.protostuff.runtime.RuntimeFieldFactory;
-import com.dyuproject.protostuff.runtime.RuntimeSchema;
-
 
 public class RecordSerializationTest {
 //	private final Log log = LogFactory.getLog(RecordSerializationTest.class);
 	
 	@Test
 	public void testProto() throws Exception {
-		OutputStream os = new FileOutputStream("test.bin");
-
+		// Create
 		CollectSurvey survey = loadSurvey();
 		CollectRecord record = createTestRecord(survey);
-		Entity root = record.getRootEntity();
-//		AttributeField<Integer> msg = AttributeField.newInstance(Integer.class);
-//		msg.setValue(123);
-//		AttributeFieldSchema protoSchema = new AttributeFieldSchema();
-//		AttributeField msg2 = protoSchema.newMessage();
-//		EntitySchema protoSchema = new EntitySchema();
-		RuntimeSchema<Entity> protoSchema = (RuntimeSchema<Entity>) RuntimeSchema.getSchema(Entity.class);
-		InputStream is = new FileInputStream("test.bin");
-		
-//		CollectSurvey survey = loadSurvey();
-//		Schema schema = survey.getSchema();
-//		TextAttributeDefinition txtDefn = (TextAttributeDefinition) schema.getByPath("/cluster/map_sheet");
-//		TextAttribute msg = new TextAttribute(txtDefn);
-//		msg.setValue("Test text");
-//		TextASchema protoSchema = new TestSchema();
-//		com.dyuproject.protostuff.Schema<TextAttribute> protoSchema = (RuntimeSchema<TextAttribute>) RuntimeSchema.getSchema(TextAttribute.class);
-//		RuntimeSchema.register(AttributeField.class, new FieldSchema());
-//		RuntimeSchema.register(Object.class, new TestSchema());
-//		protoSchema = new CSchema<TextAttribute>(protoSchema);
-//		TextAttribute msg2 = protoSchema.newMessage();
-//		TextAttribute msg2 = (TextAttribute) txtDefn.createNode();
-
 		RecordContext recordContext = record.getContext();
+		Entity entity = record.getRootEntity();
+
+		// Save
+		ModelSerializer ms = new ModelSerializer(3000);
 		CollectRecord record2 = new CollectRecord(recordContext, survey, "2.0");
-		Entity root2 = record2.createRootEntity("cluster");
-		LinkedBuffer lb = LinkedBuffer.allocate(250000);
-		int size = ProtostuffIOUtil.writeTo(os, root, protoSchema, lb);
-		// you can prefix the message with the size (delimited message)
+		Entity reloadedEntity = record2.createRootEntity("cluster");
+		OutputStream os = new FileOutputStream("target/test/test.bin");
+		ms.writeTo(os, entity);
 		os.flush();
 		os.close();
-		lb.clear();
 			
-		ProtostuffIOUtil.mergeFrom(is, root2, protoSchema);
-		lb.clear();
+		// Load
+		InputStream is = new FileInputStream("target/test/test.bin");
+		ms.mergeFrom(is, reloadedEntity);
+		ms.clearBuffer();
 		
-	}
-
-//	@Test
-	public void testSerialization() throws Exception {
-		CollectSurvey survey = loadSurvey();
-		Schema schema = survey.getSchema();
-		assignFakeNodeDefinitionIds(schema);
-		CollectRecord record = createTestRecord(survey);
-		String r1 = record.getRootEntity().toString();
-		RecordSerializer serializer = new RecordSerializer(CollectRecord.class, 300000);		
-//		RecordDeserializer deserializer = new RecordDeserializer(record.getContext(), survey);
-		
-		String filename = "cluster.bin";
-		serializer.serialize(record, filename);
-		CollectRecord record2 = (CollectRecord) serializer.deserialize(record.getContext(), survey, filename);
-		String r2 = record2.getRootEntity().toString();
-		Assert.assertEquals(r1, r2);
-	}
-
-	private void assignFakeNodeDefinitionIds(Schema schema) {
-		Collection<NodeDefinition> defns = schema.getAllDefinitions();
-		int defnId = 1;
-		for (NodeDefinition defn : defns) {
-			defn.setId(defnId++);
-		}
+		String text = entity.toString();
+		String reloadedText = reloadedEntity.toString();
+		Assert.assertEquals(text, reloadedText);
 	}
 	
 	private CollectSurvey loadSurvey() throws IOException, SurveyImportException, InvalidIdmlException {
