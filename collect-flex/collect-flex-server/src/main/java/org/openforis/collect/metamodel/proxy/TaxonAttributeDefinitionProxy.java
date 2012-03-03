@@ -12,7 +12,7 @@ import org.openforis.idm.metamodel.TaxonAttributeDefinition;
 public class TaxonAttributeDefinitionProxy extends AttributeDefinitionProxy {
 
 	public TaxonAttributeDefinitionProxy(EntityDefinitionProxy parent, TaxonAttributeDefinition attributeDefinition) {
-		super(null, attributeDefinition);
+		super(parent, attributeDefinition);
 	}
 	
 }
