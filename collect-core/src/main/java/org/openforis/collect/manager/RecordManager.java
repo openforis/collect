@@ -5,13 +5,16 @@ package org.openforis.collect.manager;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.xml.namespace.QName;
 
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.FieldSymbol;
 import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.AccessDeniedException;
 import org.openforis.collect.persistence.DuplicateIdException;
@@ -27,10 +30,13 @@ import org.openforis.idm.metamodel.CodeListItem;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.NodeDefinition;
+import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Code;
 import org.openforis.idm.model.CodeAttribute;
 import org.openforis.idm.model.Entity;
+import org.openforis.idm.model.Field;
 import org.openforis.idm.model.Node;
+import org.openforis.idm.model.NodePointer;
 import org.openforis.idm.model.NumberAttribute;
 import org.openforis.idm.model.Record;
 import org.openforis.idm.model.TextAttribute;
@@ -215,6 +221,63 @@ public class RecordManager {
 					}
 				}
 			}
+		}
+	}
+	
+	@SuppressWarnings("unchecked")
+	public <V> void setFieldValue(Attribute<?,?> attribute, Object value, String remarks, FieldSymbol symbol, int fieldIdx){
+		if(fieldIdx < 0){
+			fieldIdx = 0;
+		}
+		Field<V> field = (Field<V>) attribute.getField(fieldIdx);
+		field.setValue((V)value);
+		field.setRemarks(remarks);
+		Character symbolChar = null;
+		if (symbol != null) {
+			symbolChar = symbol.getCode();
+		}
+		field.setSymbol(symbolChar);
+	}
+	
+	@SuppressWarnings("unchecked")
+	public <V> void setAttributeValue(Attribute<?,V> attribute, Object value, String remarks){
+		attribute.setValue((V)value);
+		Field<V> field = (Field<V>) attribute.getField(0);
+		field.setRemarks(remarks);
+		field.setSymbol(null);
+	}
+	
+	public Set<Attribute<?, ?>> clearValidtionResults(Attribute<?,?> attribute){
+		Set<Attribute<?,?>> checkDependencies = attribute.getCheckDependencies();
+		Set<Attribute<?,?>> updatedAttributes = new HashSet<Attribute<?,?>>();
+//		updatedAttributes.add(attribute);
+		updatedAttributes.addAll(checkDependencies);
+		for (Attribute<?, ?> attr : updatedAttributes) {
+			attr.clearValidationResults();
+		}
+		return updatedAttributes;
+	}
+	
+	public Set<NodePointer> clearRelevanceRequiredStates(Attribute<?,?> attribute){
+		Set<NodePointer> relevantDependencies = attribute.getRelevantDependencies();
+		clearRelevantDependencies(relevantDependencies);
+		Set<NodePointer> requiredDependencies = attribute.getRequiredDependencies();
+		requiredDependencies.addAll(relevantDependencies);
+		clearRequiredDependencies(requiredDependencies);
+		return requiredDependencies;
+	}
+	
+	private void clearRelevantDependencies(Set<NodePointer> nodePointers) {
+		for (NodePointer nodePointer : nodePointers) {
+			Entity entity = nodePointer.getEntity();
+			entity.clearRelevanceState(nodePointer.getChildName());
+		}
+	}
+	
+	private void clearRequiredDependencies(Set<NodePointer> nodePointers) {
+		for (NodePointer nodePointer : nodePointers) {
+			Entity entity = nodePointer.getEntity();
+			entity.clearRequiredState(nodePointer.getChildName());
 		}
 	}
 	

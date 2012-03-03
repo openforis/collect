@@ -48,13 +48,13 @@ package org.openforis.collect.presenter
 		
 		override protected function updateResponseReceivedHandler(event:ApplicationEvent):void {
 			var response:UpdateResponse = UpdateResponse(event.result);
-			for each(var node:NodeProxy in response.addedNodes) {
+			/*for each(var node:NodeProxy in response.addedNodes) {
 				if(view.parentEntity != null && view.entityDefinition != null 
 					&& node.parentId == view.parentEntity.id 
 					&& node.name == view.entityDefinition.name) {
 					updateView();
 				}
-			}
+			}*/
 		}
 		
 		override protected function updateView():void {

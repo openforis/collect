@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -43,6 +44,7 @@ import org.openforis.idm.metamodel.RangeAttributeDefinition;
 import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.TaxonAttributeDefinition;
 import org.openforis.idm.metamodel.TimeAttributeDefinition;
+import org.openforis.idm.metamodel.validation.ValidationResults;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Code;
 import org.openforis.idm.model.CodeAttribute;
@@ -50,6 +52,7 @@ import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Field;
 import org.openforis.idm.model.IntegerRange;
 import org.openforis.idm.model.Node;
+import org.openforis.idm.model.NodePointer;
 import org.openforis.idm.model.NumericRange;
 import org.openforis.idm.model.RealRange;
 import org.openforis.idm.model.Record;
@@ -169,10 +172,10 @@ public class DataService {
 			processUpdateRequestOperation(operation, addedNodes, updatedNodes, deletedNodeIds);
 		}
 		//convert nodes to proxies
-		UpdateResponse response = new UpdateResponse();
-		response.setAddedNodes(NodeProxy.fromList((List<Node<?>>) addedNodes));
-		response.setUpdatedNodes(NodeProxy.fromList((List<Node<?>>) updatedNodes));
-		response.setDeletedNodeIds(deletedNodeIds.toArray(new Integer[0]));
+		UpdateResponse response = new UpdateResponse(1);
+//		response.setAddedNodes(NodeProxy.fromList((List<Node<?>>) addedNodes));
+//		response.setUpdatedNodes(NodeProxy.fromList((List<Node<?>>) updatedNodes));
+//		response.setDeletedNodeIds(deletedNodeIds.toArray(new Integer[0]));
 		return response;
 	}
 		
@@ -199,14 +202,31 @@ public class DataService {
 		FieldSymbol symbol = operation.getSymbol();
 		Method method = operation.getMethod();
 		switch (method) {
-			case ADD:
+			case ADD :
 				Node<?> addedNode = addNode(version, parentEntity, nodeDef, requestValue, symbol, remarks);
 				//nodeStates = record.updateNodeState(addedNode);
 				addedNodes.add(addedNode);
 				break;
 			case UPDATE:
-				updateAttribute(record, parentEntity, (Attribute<AttributeDefinition, ?>) node, fieldIndex, requestValue, symbol, remarks);
+				Map<Integer, UpdateResponse> responseMap = new HashMap<Integer, UpdateResponse>();
+				
+				Attribute<? extends AttributeDefinition, ?> attribute = (Attribute<AttributeDefinition, ?>) node;
+				if(fieldIndex < 0){
+					Object value = parseAttributeValue(parentEntity, attribute.getDefinition(), requestValue);
+					recordManager.setAttributeValue(attribute, value, remarks);
+				} else {
+					Object value = parseFieldValue(parentEntity, attribute.getDefinition(), requestValue, fieldIndex);
+					recordManager.setFieldValue(attribute, value, remarks, symbol, fieldIndex);
+				}
+//				setValue(attribute, fieldIndex, requestValue, symbol, remarks);
 				//nodeStates = record.updateNodeState(node);
+				Set<NodePointer> relReqDependencies = recordManager. clearRelevanceRequiredStates(attribute);
+				Set<Attribute<?,?>> clearedValidtionResults = recordManager.clearValidtionResults(attribute);
+				List<Entity> ancestors = attribute.getAncestors();
+				relReqDependencies.add(new NodePointer(attribute.getParent(), attribute.getName()));
+				clearedValidtionResults.add(attribute);
+				prepareUpdateResponse(responseMap, relReqDependencies, clearedValidtionResults, ancestors);
+				updatedNodes.add(node);
 				if(! updatedNodes.contains(node)) {
 					updatedNodes.add(node);
 				}
@@ -218,13 +238,52 @@ public class DataService {
 		}
 	}
 
+	private void prepareUpdateResponse(Map<Integer, UpdateResponse> responseMap, Set<NodePointer> relevanceReqquiredDependencies, Set<Attribute<?, ?>> validtionResultsDependencies, List<Entity> ancestors) {
+		for (Entity entity : ancestors) {
+			//entity could be root definition
+			Entity parent = entity.getParent();
+			if(parent != null){
+				UpdateResponse response = getUpdateResponse(responseMap, parent.getInternalId());
+				String childName = entity.getName();
+				response.setMinCountValid(childName , parent.validateMinCount(childName));
+				response.setRelevant(childName, parent.isRelevant(childName));
+				response.setRequired(childName, parent.isRequired(childName));
+			}
+		}
+		
+		for (NodePointer nodePointer : relevanceReqquiredDependencies) {
+			Entity entity = nodePointer.getEntity();
+			String childName = nodePointer.getChildName();
+			UpdateResponse response = getUpdateResponse(responseMap, entity.getInternalId());
+			response.setRelevant(childName, entity.isRelevant(childName));
+			response.setRequired(childName, entity.isRequired(childName));
+			response.setMinCountValid(childName, entity.validateMinCount(childName));
+		}
+		
+		for (Attribute<?, ?> checkDepAttr : validtionResultsDependencies) {
+			checkDepAttr.clearValidationResults();
+			ValidationResults results = checkDepAttr.validateValue();
+			UpdateResponse response = getUpdateResponse(responseMap, checkDepAttr.getInternalId());
+			response.setValidationResults(results);
+		}
+	}
+
+	private UpdateResponse getUpdateResponse(Map<Integer, UpdateResponse> responseMap, int nodeId){
+		UpdateResponse response = responseMap.get(nodeId);
+		if(response == null){
+			response = new UpdateResponse(nodeId);
+			responseMap.put(nodeId, response);
+		}
+		return response;
+	}
+	
 	@SuppressWarnings("unchecked")
 	private Node<?> addNode(ModelVersion version, Entity parentEntity, NodeDefinition nodeDef, String requestValue, FieldSymbol symbol, String remarks) {
 		if(nodeDef instanceof AttributeDefinition) {
 			AttributeDefinition def = (AttributeDefinition) nodeDef;
 			Attribute<?, ?> attribute = (Attribute<?, ?>) def.createNode();
 			if(StringUtils.isNotBlank(requestValue)) {
-				Object value = parseValue(parentEntity, (AttributeDefinition) nodeDef, requestValue, version);
+				Object value = parseAttributeValue(parentEntity, (AttributeDefinition) nodeDef, requestValue);
 				((Attribute<?, Object>) attribute).setValue(value);
 			}
 			if(symbol != null || remarks != null) {
@@ -245,30 +304,31 @@ public class DataService {
 	}
 	
 	@SuppressWarnings("unchecked")
-	private void updateAttribute(CollectRecord record, Entity parentEntity, Attribute<AttributeDefinition, ?> attribute,
-			Integer fieldIndex, String requestValue, FieldSymbol symbol, String remarks) {
+	@Deprecated
+	private void setValue(Attribute<?, ?> attribute, Integer fieldIndex, String requestValue, FieldSymbol symbol, String remarks) {
+		Record record = attribute.getRecord();
 		ModelVersion version = record.getVersion();
-		AttributeDefinition defn = attribute.getDefinition();
 		@SuppressWarnings("rawtypes")
 		Field field;
-		if(fieldIndex >= 0) {
+		Entity parentEntity = attribute.getParent();
+		if (fieldIndex >= 0) {
 			Object fieldValue = null;
-			if(StringUtils.isNotBlank(requestValue)) {
-				fieldValue = parseFieldValue(parentEntity, defn, requestValue, fieldIndex);
+			if (StringUtils.isNotBlank(requestValue)) {
+				fieldValue = parseFieldValue(parentEntity, attribute.getDefinition(), requestValue, fieldIndex);
 			}
 			field = attribute.getField(fieldIndex);
 			field.setValue(fieldValue);
 		} else {
 			Object value = null;
-			if((symbol == null || ! symbol.isReasonBlank()) && StringUtils.isNotBlank(requestValue)) {
-				value = parseValue(parentEntity, defn, requestValue, version);
+			if ((symbol == null || !symbol.isReasonBlank()) && StringUtils.isNotBlank(requestValue)) {
+				value = parseAttributeValue(parentEntity, attribute.getDefinition(), requestValue);
 			}
 			((Attribute<AttributeDefinition, Object>) attribute).setValue(value);
 			field = attribute.getField(0);
 		}
 		field.setRemarks(remarks);
 		Character symbolChar = null;
-		if(symbol != null) {
+		if (symbol != null) {
 			symbolChar = symbol.getCode();
 		}
 		field.setSymbol(symbolChar);
@@ -336,12 +396,14 @@ public class DataService {
 		return result;
 	}
 	
-	private Object parseValue(Entity parentEntity, AttributeDefinition def, String value, ModelVersion version) {
+	private Object parseAttributeValue(Entity parentEntity, AttributeDefinition defn, String value) {
 		Object result;
-		if(def instanceof CodeAttributeDefinition) {
-			result = parseCode(parentEntity, (CodeAttributeDefinition) def, value, version);
-		} else if(def instanceof RangeAttributeDefinition) {
-			RangeAttributeDefinition rangeDef = (RangeAttributeDefinition) def;
+		if(defn instanceof CodeAttributeDefinition) {
+			Record record = parentEntity.getRecord();
+			ModelVersion version = record .getVersion();
+			result = parseCode(parentEntity, (CodeAttributeDefinition) defn, value, version );
+		} else if(defn instanceof RangeAttributeDefinition) {
+			RangeAttributeDefinition rangeDef = (RangeAttributeDefinition) defn;
 			org.openforis.idm.metamodel.RangeAttributeDefinition.Type type = rangeDef.getType();
 			NumericRange<?> range = null;
 			switch(type) {

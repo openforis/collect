@@ -59,13 +59,13 @@
   </head>
 
   <body onload="document.f.j_username.focus();">
-    <table width="100%">
-    	<tr>
+    <table width="100%"  height="100%">
+    	<tr height="102">
     		<td colspan="3" align="center">
     			<img alt="Open Foris Collect" src="images/banner.jpg">
     		</td>
     	</tr>
-    	<tr>
+    	<tr height="50">
     		<td colspan="3" align="center">
 <!-- 			    <h3>OpenForis Collect</h3> -->
 			    <%-- this form-login-page form is also used as the
@@ -79,13 +79,15 @@
 			    </c:if>
     		</td>
     	</tr>
-    	<tr>
+    	<tr height="30%">
     		<td width="33%">&nbsp;</td>
-    		<td width="33%">
+    		<td width="33%" style="vertical-align: middle;">
+    		<div style="margin-left:auto; margin-right:auto; width: 100%">
+					      <table class="login"  width="100%" align="center" style="vertical-align: top; height: 100">
     			<form name="f" action="<c:url value='j_spring_security_check'/>" method="POST">
-	    			<fieldset>
-						<legend>Please Log In</legend>
-					      <table class="login" >
+					      <tr>
+					      	<td colspan="2" align="center"><strong style="font-size: 13px; ">Please Log In</strong></td>
+					      </tr>
 					        <tr>
 					        	<td width="50%" align="right">User:</td>
 					        	<td width="50%" align="left"><input type='text' name='j_username' value='<c:if test="${not empty param.login_error}"><c:out value="${SPRING_SECURITY_LAST_USERNAME}"/></c:if>'/></td>
@@ -102,11 +104,16 @@
 					        		<input name="reset" type="reset" class="button" value="Reset"/>
 				        		</td>
 			        		</tr>
-					      </table>
-					</fieldset>
 			    </form>
+					      </table>
+			    </div>
     		</td>
     		<td width="33%">&nbsp;</td>
+    	</tr>
+    	<tr>
+    		<td colspan="3" align="center">
+    			<img  src="images/footer.jpg">
+    		</td>
     	</tr>
     </table>
   </body>

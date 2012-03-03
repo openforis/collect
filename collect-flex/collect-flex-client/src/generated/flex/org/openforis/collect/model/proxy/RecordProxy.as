@@ -23,7 +23,7 @@ package org.openforis.collect.model.proxy {
 		public function update(response:UpdateResponse):void {
 			var node:NodeProxy, oldNode:NodeProxy, parent:EntityProxy;
 			//remove nodes
-			for each (var id:int in response.deletedNodeIds) {
+			/*for each (var id:int in response.deletedNodeIds) {
 				oldNode = getNode(id);
 				if(oldNode != null) {
 					parent = EntityProxy(getNode(oldNode.parentId));
@@ -32,19 +32,19 @@ package org.openforis.collect.model.proxy {
 						parent.removeChild(oldNode);
 					}
 				}
-			}
+			}*/
 			//add new nodes
-			for each (node in response.addedNodes) {
+			/*for each (node in response.addedNodes) {
 				parent = EntityProxy(getNode(node.parentId));
 				parent.addChild(node);
-			}
+			}*/
 			
 			//replace updated nodes
-			for each (node in response.updatedNodes) {
+			/*for each (node in response.updatedNodes) {
 				oldNode = getNode(node.id);
 				parent = EntityProxy(getNode(oldNode.parentId));
 				parent.replaceChild(oldNode, node);
-			}
+			}*/
 			
 			//update node state
 			/*
