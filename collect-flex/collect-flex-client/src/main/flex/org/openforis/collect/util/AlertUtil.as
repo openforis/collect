@@ -13,6 +13,7 @@ package org.openforis.collect.util
 	{
 		private static const ERROR_TITLE_RESOURCE:String = "global.errorAlertTitle";
 		private static const INFO_TITLE_RESOURCE:String = "global.infoAlertTitle";
+		private static const CONFIRM_TITLE_RESOURCE:String = "global.confirmAlertTitle";
 
 		public static function showError(messageResource:String, messageParameters:Array = null, titleResource:String = null, titleParameters:Array = null):void {
 			if(titleResource == null) {
@@ -38,6 +39,9 @@ package org.openforis.collect.util
 		
 		public static function showConfirm(messageResource:String, parameters:Array, titleResource:String, 
 										   yesHandler:Function, noHandler:Function = null):void {
+			if(titleResource == null) {
+				titleResource = CONFIRM_TITLE_RESOURCE;
+			}
 			var message:String = Message.get(messageResource, parameters);
 			var title:String = Message.get(titleResource);
 			

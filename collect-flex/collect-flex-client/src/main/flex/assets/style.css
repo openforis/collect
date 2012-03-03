@@ -58,6 +58,16 @@ mx|ToolTip.error, mx|ToolTip.warning, mx|ToolTip.missing {
 	paddingTop: 4;
 }
 
+.title1 {
+	fontSize: 16;
+	fontWeight: bold;
+}
+
+.title2 {
+	fontSize: 13;
+	fontWeight: bold;
+}
+
 mx|ToolTip.error {
 	borderColor: #CE2929;
 }

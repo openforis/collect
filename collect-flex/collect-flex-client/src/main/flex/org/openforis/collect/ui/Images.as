@@ -54,8 +54,14 @@ package org.openforis.collect.ui {
 		[Embed("/assets/images/back.png")]
 		public static const BACK:Class;
 		
-		[Embed("/assets/images/tick.png")]
+		[Embed("/assets/images/complete.png")]
 		public static const COMPLETE:Class;
+		
+		[Embed("/assets/images/submit.png")]
+		public static const SUBMIT:Class;
+		
+		[Embed("/assets/images/reject.png")]
+		public static const REJECT:Class;
 		
 		[Embed("/assets/images/footer.jpg")]
 		public static const FOOTER:Class;

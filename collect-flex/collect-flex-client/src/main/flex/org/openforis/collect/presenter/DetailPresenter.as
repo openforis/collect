@@ -12,6 +12,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.Application;
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.client.DataClient;
+	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.event.UIEvent;
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
@@ -37,8 +38,10 @@ package org.openforis.collect.presenter {
 		override internal function initEventListeners():void {
 			_view.backToListButton.addEventListener(MouseEvent.CLICK, backToListButtonClickHandler);
 			_view.saveButton.addEventListener(MouseEvent.CLICK, saveButtonClickHandler);
-			_view.promoteButton.addEventListener(MouseEvent.CLICK, promoteButtonClickHandler);
-				
+			_view.submitButton.addEventListener(MouseEvent.CLICK, submitButtonClickHandler);
+			_view.rejectButton.addEventListener(MouseEvent.CLICK, rejectButtonClickHandler);
+			eventDispatcher.addEventListener(ApplicationEvent.UPDATE_RESPONSE_RECEIVED, updateResponseReceivedHandler);
+			
 			eventDispatcher.addEventListener(UIEvent.ACTIVE_RECORD_CHANGED, activeRecordChangedListener);
 		}
 		
@@ -56,9 +59,13 @@ package org.openforis.collect.presenter {
 			_view.keyAttributeValuesText.text = keyValues;
 			_view.rootEntityDefinitionText.text = activeRootEntity.getLabelText();
 			_view.formVersionText.text = version.getLabelText();
-			var promoteButtonVisible:Boolean = activeRecord.step == RecordProxy$Step.ENTRY || 
+			var submitButtonVisible:Boolean = activeRecord.step == RecordProxy$Step.ENTRY || 
 				activeRecord.step == RecordProxy$Step.CLEANSING;
-			_view.promoteButton.visible = _view.promoteButton.includeInLayout = promoteButtonVisible;
+			_view.submitButton.visible = _view.submitButton.includeInLayout = submitButtonVisible;
+			
+			var rejectButtonVisible:Boolean = activeRecord.step == RecordProxy$Step.CLEANSING || 
+				activeRecord.step == RecordProxy$Step.ANALYSIS;
+			_view.rejectButton.visible = _view.rejectButton.includeInLayout = rejectButtonVisible;
 			
 			var form:FormContainer = null;
 			if (_view.formsContainer.contatinsForm(version,activeRootEntity)){
@@ -87,12 +94,35 @@ package org.openforis.collect.presenter {
 			_dataClient.saveActiveRecord(new AsyncResponder(saveActiveRecordResultHandler, faultHandler));
 		}
 		
-		protected function promoteButtonClickHandler(event:MouseEvent):void {
-			AlertUtil.showConfirm("edit.confirmPromote", null, null, performPromote);
+		protected function submitButtonClickHandler(event:MouseEvent):void {
+			var messageResource:String;
+			var r:RecordProxy = Application.activeRecord;
+			if(r.step == RecordProxy$Step.ENTRY) {
+				messageResource = "edit.confirmSubmitDataCleansing";
+			} else if(r.step == RecordProxy$Step.CLEANSING) {
+				messageResource = "edit.confirmSubmitDataAnalysis";
+			}
+			AlertUtil.showConfirm(messageResource, null, null, performSubmit);
 		}
 		
-		protected function performPromote():void {
-			_dataClient.promoteRecord(new AsyncResponder(promoteRecordResultHandler, faultHandler), 
+		protected function rejectButtonClickHandler(event:MouseEvent):void {
+			var messageResource:String;
+			var r:RecordProxy = Application.activeRecord;
+			if(r.step == RecordProxy$Step.CLEANSING) {
+				messageResource = "edit.confirmRejectDataCleansing";
+			} else if(r.step == RecordProxy$Step.ANALYSIS) {
+				messageResource = "edit.confirmRejectDataAnalysis";
+			}
+			AlertUtil.showConfirm(messageResource, null, null, performReject);
+		}
+		
+		protected function performSubmit():void {
+			_dataClient.submitRecord(new AsyncResponder(promoteRecordResultHandler, faultHandler), 
+				Application.activeRecord.id);
+		}
+		
+		protected function performReject():void {
+			_dataClient.rejectRecord(new AsyncResponder(rejectRecordResultHandler, faultHandler), 
 				Application.activeRecord.id);
 		}
 		
@@ -109,16 +139,23 @@ package org.openforis.collect.presenter {
 		internal function promoteRecordResultHandler(event:ResultEvent, token:Object = null):void {
 			var r:RecordProxy = Application.activeRecord;
 			var keyLabel:String = r.rootEntity.getKeyLabel(Application.activeRootEntity);
-			var nextStep:RecordProxy$Step;
-			if(r.step == RecordProxy$Step.ENTRY) {
-				nextStep = RecordProxy$Step.CLEANSING;
-			} else {
-				nextStep = RecordProxy$Step.ANALYSIS;
-			}
-			AlertUtil.showMessage("edit.recordPromoted", [keyLabel, nextStep]);
+			AlertUtil.showMessage("edit.recordSubmitted", [keyLabel]);
 			Application.activeRecord = null;
 			var uiEvent:UIEvent = new UIEvent(UIEvent.BACK_TO_LIST);
 			eventDispatcher.dispatchEvent(uiEvent);
+		}
+		
+		internal function rejectRecordResultHandler(event:ResultEvent, token:Object = null):void {
+			var r:RecordProxy = Application.activeRecord;
+			var keyLabel:String = r.rootEntity.getKeyLabel(Application.activeRootEntity);
+			AlertUtil.showMessage("edit.recordRejected", [keyLabel]);
+			Application.activeRecord = null;
+			var uiEvent:UIEvent = new UIEvent(UIEvent.BACK_TO_LIST);
+			eventDispatcher.dispatchEvent(uiEvent);
+		}
+		
+		protected function updateResponseReceivedHandler(event:ApplicationEvent):void {
+			//update 
 		}
 	}
 }

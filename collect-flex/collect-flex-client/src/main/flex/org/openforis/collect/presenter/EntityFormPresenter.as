@@ -142,8 +142,8 @@ package org.openforis.collect.presenter
 		
 		protected function selectFirstTab():void {
 			_view.resetScrollbars();
-			if(_view.buttonBar != null) {
-				_view.buttonBar.selectedIndex = 0;
+			if(_view.tabBar != null) {
+				_view.tabBar.selectedIndex = 0;
 			}
 		}
 	}
