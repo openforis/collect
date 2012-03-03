@@ -1,6 +1,4 @@
 package org.openforis.collect.ui.component.input {
-	import flash.display.DisplayObject;
-	
 	import mx.core.UIComponent;
 	import mx.events.FlexEvent;
 	
@@ -10,7 +8,6 @@ package org.openforis.collect.ui.component.input {
 	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.model.proxy.FieldProxy;
 	import org.openforis.collect.presenter.InputFieldPresenter;
-	import org.openforis.collect.util.ArrayUtil;
 	import org.openforis.collect.util.ObjectUtil;
 	import org.openforis.collect.util.StringUtil;
 	import org.openforis.collect.util.UIUtil;
@@ -42,6 +39,7 @@ package org.openforis.collect.ui.component.input {
 		private var _presenter:InputFieldPresenter;
 		private var _isInDataGroup:Boolean = false;
 		private var _applyChangesOnFocusOut:Boolean = true;
+		private var _formatFunction:Function;
 		protected var _textInput:UIComponent;
 		
 		public function InputField() {
@@ -71,24 +69,10 @@ package org.openforis.collect.ui.component.input {
 		}
 		
 		/**
-		 * returns true if there is not an attribute associated to the field or
-		 * the attribute's value is null and there is not a symbol specified
+		 * returns true if the field is not filled
 		 */
-		public function canApplyReasonBlank():Boolean {
-			if(attribute == null) {
-				return true;
-			} else if(attribute.empty) {
-				var f:FieldProxy = getField();
-				var symbol:FieldSymbol = f.symbol;
-				return symbol == null;
-			} else {
-				return false;
-			}
-		}
-		
-		public function hasReasonBlankSpecified():Boolean {
-			var f:FieldProxy = getField();
-			return f != null && f.hasReasonBlankSpecified();
+		public function isEmpty():Boolean {
+			return StringUtil.isBlank(text);
 		}
 		
 		public function getField():FieldProxy {
@@ -118,7 +102,13 @@ package org.openforis.collect.ui.component.input {
 		
 		public function set text(value:String):void {
 			if(_textInput != null && _textInput.hasOwnProperty("text")) {
-				_textInput["text"] = value;
+				var text:String;
+				if(textFormatFunction != null) {
+					text = textFormatFunction(value);
+				} else {
+					text = value;
+				}
+				_textInput["text"] = text;
 			}
 		}
 		
@@ -218,6 +208,7 @@ package org.openforis.collect.ui.component.input {
 			_applyChangesOnFocusOut = value;
 		}
 
+		[Bindable]
 		public function get isInDataGroup():Boolean {
 			return _isInDataGroup;
 		}
@@ -225,6 +216,15 @@ package org.openforis.collect.ui.component.input {
 		public function set isInDataGroup(value:Boolean):void {
 			_isInDataGroup = value;
 		}
+
+		public function get textFormatFunction():Function {
+			return _formatFunction;
+		}
+
+		public function set textFormatFunction(value:Function):void {
+			_formatFunction = value;
+		}
+
 
 	}
 }

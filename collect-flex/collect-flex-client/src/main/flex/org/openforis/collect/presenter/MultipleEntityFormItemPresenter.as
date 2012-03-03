@@ -1,18 +1,15 @@
 package org.openforis.collect.presenter
 {
-	import flash.events.Event;
 	import flash.events.FocusEvent;
 	import flash.events.MouseEvent;
 	
 	import mx.collections.IList;
-	import mx.containers.utilityClasses.ConstraintColumn;
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.events.ResultEvent;
 	
 	import org.openforis.collect.Application;
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.event.ApplicationEvent;
-	import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
 	import org.openforis.collect.model.proxy.NodeProxy;
 	import org.openforis.collect.remoting.service.UpdateRequest;
 	import org.openforis.collect.remoting.service.UpdateRequestOperation;
@@ -23,8 +20,6 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.util.AlertUtil;
 	import org.openforis.collect.util.CollectionUtil;
 	import org.openforis.collect.util.UIUtil;
-	
-	import spark.layouts.ConstraintLayout;
 
 	/**
 	 * 
