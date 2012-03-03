@@ -182,23 +182,24 @@ public class RecordManager {
 	}
 
 	
-	public Node<?> deleteNode(Entity parentEntity, Node<?> node) {
-		NodeDefinition defn = node.getDefinition();
-		String name = defn.getName();
-		List<Node<?>> children = parentEntity.getAll(name);
-		int index = children.indexOf(node);
-		Node<?> deleted = parentEntity.remove(name, index);
-		return deleted;
+	public Node<?> deleteNode(Node<?> node) {
+		Entity parentEntity = node.getParent();
+		int index = node.getIndex();
+		Node<?> deletedNode = parentEntity.remove(node.getName(), index);
+		return deletedNode;
 	}
 	
-	public Entity addEntity(Entity parentEntity, String nodeName, ModelVersion version) {
+	public Entity addEntity(Entity parentEntity, String nodeName) {
 		Entity entity = parentEntity.addEntity(nodeName);
-		addEmptyNodes(entity, version);
+		addEmptyNodes(entity);
 		return entity;
 	}
 	
-	public void addEmptyNodes(Entity entity, ModelVersion version) {
-		addEmptyEnumeratedEntities(entity, version);
+	public void addEmptyNodes(Entity entity) {
+		Record record = entity.getRecord();
+		ModelVersion version = record.getVersion();
+		
+		addEmptyEnumeratedEntities(entity);
 		EntityDefinition entityDefn = entity.getDefinition();
 		List<NodeDefinition> childDefinitions = entityDefn.getChildDefinitions();
 		for (NodeDefinition nodeDefn : childDefinitions) {
@@ -209,14 +210,14 @@ public class RecordManager {
 						Node<?> createNode = nodeDefn.createNode();
 						entity.add(createNode);
 					} else if(nodeDefn instanceof EntityDefinition && ! nodeDefn.isMultiple()) {
-						addEntity(entity, nodeDefn.getName(), version);
+						addEntity(entity, nodeDefn.getName());
 					}
 				} else {
 					List<Node<?>> all = entity.getAll(name);
 					for (Node<?> node : all) {
 						if(node instanceof Entity) {
-							addEmptyNodes((Entity) node, version);
-							addEmptyEnumeratedEntities((Entity) node, version);
+							addEmptyNodes((Entity) node);
+							addEmptyEnumeratedEntities((Entity) node);
 						}
 					}
 				}
@@ -247,41 +248,45 @@ public class RecordManager {
 		field.setSymbol(null);
 	}
 	
-	public Set<Attribute<?, ?>> clearValidtionResults(Attribute<?,?> attribute){
+	public Set<Attribute<?, ?>> clearValidationResults(Attribute<?,?> attribute){
 		Set<Attribute<?,?>> checkDependencies = attribute.getCheckDependencies();
-		Set<Attribute<?,?>> updatedAttributes = new HashSet<Attribute<?,?>>();
 //		updatedAttributes.add(attribute);
-		updatedAttributes.addAll(checkDependencies);
-		for (Attribute<?, ?> attr : updatedAttributes) {
+		clearValidationResults(checkDependencies);
+		return checkDependencies;
+	}
+
+	public void clearValidationResults(Set<Attribute<?, ?>> checkDependencies) {
+		for (Attribute<?, ?> attr : checkDependencies) {
 			attr.clearValidationResults();
 		}
-		return updatedAttributes;
 	}
 	
-	public Set<NodePointer> clearRelevanceRequiredStates(Attribute<?,?> attribute){
-		Set<NodePointer> relevantDependencies = attribute.getRelevantDependencies();
+	public Set<NodePointer> clearRelevanceRequiredStates(Node<?> node){
+		Set<NodePointer> relevantDependencies = node.getRelevantDependencies();
 		clearRelevantDependencies(relevantDependencies);
-		Set<NodePointer> requiredDependencies = attribute.getRequiredDependencies();
+		Set<NodePointer> requiredDependencies = node.getRequiredDependencies();
 		requiredDependencies.addAll(relevantDependencies);
 		clearRequiredDependencies(requiredDependencies);
 		return requiredDependencies;
 	}
 	
-	private void clearRelevantDependencies(Set<NodePointer> nodePointers) {
+	public void clearRelevantDependencies(Set<NodePointer> nodePointers) {
 		for (NodePointer nodePointer : nodePointers) {
 			Entity entity = nodePointer.getEntity();
 			entity.clearRelevanceState(nodePointer.getChildName());
 		}
 	}
 	
-	private void clearRequiredDependencies(Set<NodePointer> nodePointers) {
+	public void clearRequiredDependencies(Set<NodePointer> nodePointers) {
 		for (NodePointer nodePointer : nodePointers) {
 			Entity entity = nodePointer.getEntity();
 			entity.clearRequiredState(nodePointer.getChildName());
 		}
 	}
 	
-	private void addEmptyEnumeratedEntities(Entity entity, ModelVersion version) {
+	private void addEmptyEnumeratedEntities(Entity entity) {
+		Record record = entity.getRecord();
+		ModelVersion version = record.getVersion();
 		EntityDefinition entityDefn = entity.getDefinition();
 		List<NodeDefinition> childDefinitions = entityDefn.getChildDefinitions();
 		for (NodeDefinition childDefn : childDefinitions) {
@@ -295,7 +300,7 @@ public class RecordManager {
 						if(version.isApplicable(item)) {
 							String code = item.getCode();
 							if(! hasEnumeratedEntity(entity, childEntityDefn, codeDefn, code)) {
-								Entity addedEntity = addEntity(entity, childEntityDefn.getName(), version);
+								Entity addedEntity = addEntity(entity, childEntityDefn.getName());
 								//there will be an empty CodeAttribute after the adding of the new entity
 								//set the value into this node
 								CodeAttribute addedCode = (CodeAttribute) addedEntity.get(codeDefn.getName(), 0);
