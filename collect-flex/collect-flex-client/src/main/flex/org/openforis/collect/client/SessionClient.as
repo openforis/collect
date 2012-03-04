@@ -13,11 +13,6 @@ package org.openforis.collect.client {
 		private var _keepAliveOperation:Operation;
 		private var _setLocaleOperation:Operation;
 		
-		
-		private var _testGetValueOperation:Operation;
-		private var remoteCallQueueProcessor:RemoteCallQueueProcessor = new RemoteCallQueueProcessor();
-		
-		
 		public function SessionClient() {
 			super("sessionService");
 			
@@ -39,16 +34,6 @@ package org.openforis.collect.client {
 		public function setLocale(responder:IResponder, localeString:String):void {
 			var token:AsyncToken = this._setLocaleOperation.send(localeString);
 			token.addResponder(responder);
-		}
-		
-		// TEST
-		public function testGetValue(responder:IResponder):void {
-			/*
-			var token:AsyncToken = this._testGetValue.send();
-			token.addResponder(responder);
-			*/
-			
-			remoteCallQueueProcessor.appendOperation(responder, this._testGetValueOperation);
 		}
 		
 	}
