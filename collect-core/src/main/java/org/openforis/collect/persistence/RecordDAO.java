@@ -1,8 +1,8 @@
 package org.openforis.collect.persistence;
 
 
-import static org.openforis.collect.persistence.jooq.tables.OfcRecord.OFC_RECORD;
 import static org.openforis.collect.persistence.jooq.Sequences.OFC_RECORD_ID_SEQ;
+import static org.openforis.collect.persistence.jooq.tables.OfcRecord.OFC_RECORD;
 import static org.openforis.collect.persistence.jooq.tables.OfcUser.OFC_USER;
 
 import java.util.ArrayList;
@@ -10,7 +10,6 @@ import java.util.List;
 
 import org.jooq.Condition;
 import org.jooq.Field;
-import org.jooq.InsertQuery;
 import org.jooq.InsertSetMoreStep;
 import org.jooq.Record;
 import org.jooq.Result;
@@ -30,7 +29,6 @@ import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.ModelSerializer;
 import org.openforis.idm.model.RecordContext;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -43,8 +41,6 @@ public class RecordDAO extends JooqDaoSupport {
 	public static final String ORDER_BY_DATE_CREATED = "creationDate";
 	public static final String ORDER_BY_DATE_MODIFIED = "modifiedDate";
 	
-	@Autowired
-	private DataDao dataDao;
 	private ModelSerializer modelSerializer;
 
 	public RecordDAO() {
@@ -54,8 +50,6 @@ public class RecordDAO extends JooqDaoSupport {
 	@Transactional
 	public CollectRecord load(CollectSurvey survey, RecordContext recordContext, int recordId) throws DataInconsistencyException, NonexistentIdException {
 		CollectRecord record = loadRecord(survey, recordContext, recordId);
-		loadData(record);
-
 		return record;
 	}
 
@@ -68,19 +62,15 @@ public class RecordDAO extends JooqDaoSupport {
 	@Transactional
 	public void update(CollectRecord record) {
 		updateRecord(record);
-		deleteData(record.getId());
-		dataDao.insertData(record);
 	}
-	
+
 	@Transactional
 	public void saveOrUpdate(CollectRecord record) {
-		if (record.getId() == null) {
-			insertRecord(record);
+		if (record.getId() == null ) {
+			insert(record);
 		} else {
-			updateRecord(record);
-			deleteData(record.getId());
+			update(record);
 		}
-		dataDao.insertData(record);
 	}
 	
 	@Transactional
@@ -91,7 +81,7 @@ public class RecordDAO extends JooqDaoSupport {
 	
 	@Transactional
 	public void delete(Integer id) {
-		deleteData(id);
+//		deleteData(id);
 		deleteRecord(id);
 	}
 	
@@ -294,10 +284,6 @@ public class RecordDAO extends JooqDaoSupport {
 		return result;
 	}
 	
-	private void loadData(CollectRecord record) throws DataInconsistencyException {
-		dataDao.load(record);
-	}
-
 	private void insertRecord(CollectRecord record) {
 		Entity rootEntity = record.getRootEntity();
 		EntityDefinition rootEntityDefinition = rootEntity.getDefinition();
@@ -306,14 +292,10 @@ public class RecordDAO extends JooqDaoSupport {
 			throw new IllegalArgumentException("Null schema object definition id");
 		}
 		
-		 modelSerializer.writeTo(output, entity)
+		byte[] data = modelSerializer.toByteArray(rootEntity);
 		
 		Factory jf = getJooqFactory();
-		int recordId = jf.nextval(OFC_RECORD_ID_SEQ).intValue();
-		jf.insertInto(OFC_RECORD, OFC_RECORD.ID, OFC_RECORD.ROOT_ENTITY_ID, OFC_RECORD.DATA)
-		  .values(recordId, rootEntityId, "?")
-		  .bind(1, value);
-		
+		int recordId = record.getId() == null ? jf.nextval(OFC_RECORD_ID_SEQ).intValue() : record.getId();
 		InsertSetMoreStep<OfcRecordRecord> setStep = jf.insertInto(OFC_RECORD)
 				.set(OFC_RECORD.ID, recordId)
 				.set(OFC_RECORD.ROOT_ENTITY_ID, rootEntityId)
@@ -361,10 +343,11 @@ public class RecordDAO extends JooqDaoSupport {
 	}
 
 	private void updateRecord(CollectRecord record) {
-		EntityDefinition rootEntityDefinition = record.getRootEntity().getDefinition();
+		Entity rootEntity = record.getRootEntity();
+		EntityDefinition rootEntityDefinition = rootEntity.getDefinition();
 		Integer recordId = record.getId();
 		if (recordId == null) {
-			throw new IllegalArgumentException("Cannot update unsaved record");
+			throw new IllegalArgumentException("Record id required to update");
 		}
 		Integer rootEntityId = rootEntityDefinition.getId();
 		if (rootEntityId == null) {
@@ -411,6 +394,9 @@ public class RecordDAO extends JooqDaoSupport {
 				setStep.set(OFC_RECORD.COUNT1, counts.get(0));
 				break;
 		}
+		
+		byte[] data = modelSerializer.toByteArray(rootEntity);
+		setStep.set(OFC_RECORD.DATA, data);
 		setStep.where(OFC_RECORD.ID.equal(recordId))
 			.execute();
 	}
@@ -423,11 +409,11 @@ public class RecordDAO extends JooqDaoSupport {
 		jf.delete(OFC_RECORD).where(OFC_RECORD.ID.equal(recordId)).execute();
 	}
 	
-	private void deleteData(int recordId) {
+//	private void deleteData(int recordId) {
 //		Factory jf = getJooqFactory();
-//		jf.delete(OFC_ENTITY).where(OFC_ENTITY.RECORD_ID.equal(recordId)).execute();
 //		jf.delete(OFC_ATTRIBUTE_VALUE).where(OFC_ATTRIBUTE_VALUE.RECORD_ID.equal(recordId)).execute();
-	}
+//		jf.delete(OFC_ENTITY).where(OFC_ENTITY.RECORD_ID.equal(recordId)).execute();
+//	}
 
 	//TODO move to a Mapper class
 	private void mapRecordToCollectRecord(Record r, CollectRecord collectRecord) {
@@ -475,13 +461,11 @@ public class RecordDAO extends JooqDaoSupport {
 		keys.add(key);
 		
 		collectRecord.setKeys(keys);
-	}
-
-	public DataDao getDataDao() {
-		return dataDao;
-	}
-
-	public void setDataDao(DataDao dataDao) {
-		this.dataDao = dataDao;
+		
+		
+		int rootEntityId = r.getValue(OFC_RECORD.ROOT_ENTITY_ID);
+		byte[] data = r.getValue(OFC_RECORD.DATA);
+		Entity rootEntity = collectRecord.createRootEntity(rootEntityId);
+		modelSerializer.mergeFrom(data, rootEntity);
 	}
 }

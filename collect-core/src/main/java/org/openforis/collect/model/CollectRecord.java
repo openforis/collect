@@ -421,5 +421,4 @@ public class CollectRecord extends Record {
 	public void setSubmittedId(Integer submittedId) {
 		this.submittedId = submittedId;
 	}
-	
 }
