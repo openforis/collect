@@ -60,11 +60,11 @@ package org.openforis.collect.model.proxy {
 					}
 				} else if(node is EntityProxy) {
 					var e:EntityProxy = EntityProxy(node);
-					if(response.maxCountValidation) {
-						
+					if(response.maxCountValidation != null && response.maxCountValidation.length > 0) {
+						e.updateChildrenMaxCountValidityMap(response.maxCountValidation);
 					}
-					if(response.minCountValidation != null) {
-						
+					if(response.minCountValidation != null && response.minCountValidation.length > 0) {
+						e.updateChildrenMinCountValidityMap(response.minCountValidation);
 					}
 					if(response.relevant != null && response.relevant.length > 0) {
 						e.updateChildrenRelevanceMap(response.relevant);
