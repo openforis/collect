@@ -10,6 +10,10 @@
 	<fx:Script>
 		<![CDATA[
 			private var _separator:String = ":";
+
+			protected function twoCharsZeroPaddingFormatFunction(value:String):String {
+				return InputField.zeroPaddingFormatFunction(value, 2);
+			}
 			
 			[Bindable]
 			public function get separator():String {
@@ -33,6 +37,7 @@
 								 parentEntity="{parentEntity}"
 								 attribute="{attribute}"
 								 fieldIndex="0"
+								 textFormatFunction="{twoCharsZeroPaddingFormatFunction}"
 								 />
 		<s:Label id="separatorLabel" text="{separator}" />
 		<input:NumericInputField id="minute"
@@ -41,7 +46,9 @@
 								 attributeDefinition="{attributeDefinition}"
 								 parentEntity="{parentEntity}"
 								 attribute="{attribute}"
-								 fieldIndex="1" />
+								 fieldIndex="1" 
+								 textFormatFunction="{twoCharsZeroPaddingFormatFunction}"
+								 />
 	</s:HGroup>
 	
 </detail:CompositeAttributeRenderer>

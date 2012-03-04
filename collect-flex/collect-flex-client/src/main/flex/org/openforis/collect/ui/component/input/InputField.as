@@ -56,6 +56,19 @@ package org.openforis.collect.ui.component.input {
 			this._presenter = new InputFieldPresenter(this);
 		}
 		
+		public static function zeroPaddingFormatFunction(value:String, length:int):String {
+			if(StringUtil.isNotBlank(value)) {
+				var number:Number = Number(value);
+				if(!isNaN(number)) {
+					return StringUtil.zeroPad(number, length);
+				} else {
+					return value;
+				}
+			} else {
+				return "";
+			}
+		}
+		
 		public function applyValue():void {
 			presenter.applyValue();
 		}

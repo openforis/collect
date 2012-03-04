@@ -10,7 +10,6 @@
 	<fx:Script>
 		<![CDATA[
 			import org.openforis.collect.presenter.DateAttributePresenter;
-			import org.openforis.collect.util.StringUtil;
 			
 			private var _separator:String = "/";
 			
@@ -28,25 +27,13 @@
 			}
 			
 			protected function twoCharsZeroPaddingFormatFunction(value:String):String {
-				return zeroPaddingFormatFunction(value, 2);
+				return InputField.zeroPaddingFormatFunction(value, 2);
 			}
 
 			protected function fourCharsZeroPaddingFormatFunction(value:String):String {
-				return zeroPaddingFormatFunction(value, 4);
+				return InputField.zeroPaddingFormatFunction(value, 4);
 			}
 			
-			protected function zeroPaddingFormatFunction(value:String, length:int):String {
-				if(StringUtil.isNotBlank(value)) {
-					var number:Number = Number(value);
-					if(!isNaN(number)) {
-						return StringUtil.zeroPad(number, length);
-					} else {
-						return value;
-					}
-				} else {
-					return "";
-				}
-			}
 		]]>
 	</fx:Script>
 	
