@@ -48,48 +48,7 @@ package org.openforis.collect.presenter
 		}
 		
 		override protected function updateResponseReceivedHandler(event:ApplicationEvent):void {
-			/*
-				re-assign the attribute to the form item if the parent entity of the attribute has been deleted
-				or the attribute has just been created
-				or the already assigned attribute has been updated
-				(not necessary for multiple attributes because of the data binding to the collection of attributes)
-			*/
-			if(view.parentEntity != null && view.attributeDefinition != null) {
-				var response:UpdateResponse = event.result as UpdateResponse;
-				var parentId:Number = view.parentEntity.id;
-				var node:NodeProxy;
-				/*for each (node in response.addedNodes) {
-					if(node.parentId == parentId && node.name == view.attributeDefinition.name &&
-						! view.attributeDefinition.multiple || view.attributes == null
-						) {
-						assignAttribute();
-						return;
-					}
-				}
-				if(!view.attributeDefinition.multiple && view.attribute != null) {
-					var attributeId:Number = view.attribute.id;
-					for each (node in response.updatedNodes) {
-						if(node.id == attributeId) {
-							view.attribute = node as AttributeProxy;
-							break;
-						}
-					}
-				}*/
-				/*
-				for each (var item:NodeProxy in result) {
-					if((item.id == parentId && item.deleted) ||
-						(item.parentId == parentId && item.name == view.attributeDefinition.name &&
-							(view.attribute != null && view.attribute.id == item.id) ||
-							(! view.attributeDefinition.multiple) ||
-							(view.attributes == null)
-						)
-					) {
-						assignAttribute();
-						return;
-					}
-				}
-				*/
-			}
+			super.updateResponseReceivedHandler(event);
 		}
 		
 		private function get view():AttributeFormItem {

@@ -10,6 +10,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.ui.component.detail.AttributeItemRenderer;
 	import org.openforis.collect.ui.component.detail.ValidationDisplayManager;
 	import org.openforis.collect.ui.component.input.InputField;
+	import org.openforis.collect.util.UIUtil;
 	
 	/**
 	 * 
@@ -19,11 +20,15 @@ package org.openforis.collect.presenter {
 		
 		protected var _view:AttributeItemRenderer;
 		private var _validationDisplayManager:ValidationDisplayManager;
+		private var _validationStateDisplay:UIComponent;
 		
 		public function AttributePresenter(view:AttributeItemRenderer) {
 			_view = view;
 			
 			initValidationDisplayManager();
+			if(_view.parentEntity != null) {
+				updateRelevance();
+			}
 			super();
 		}
 		
@@ -35,19 +40,17 @@ package org.openforis.collect.presenter {
 		
 		protected function initValidationDisplayManager():void {
 			var inputField:InputField = _view.getElementAt(0) as InputField;
-			var validationStateDisplay:UIComponent = inputField != null ? inputField.validationStateDisplay: _view;
-			var validationToolTipTrigger:UIComponent = validationStateDisplay;
-			_validationDisplayManager = new ValidationDisplayManager(validationToolTipTrigger, validationStateDisplay);
+			_validationStateDisplay = inputField != null ? inputField.validationStateDisplay: _view;
+			var validationToolTipTrigger:UIComponent = _validationStateDisplay;
+			_validationDisplayManager = new ValidationDisplayManager(validationToolTipTrigger, _validationStateDisplay);
 			if(_view.attribute != null) {
-				//_validationDisplayManager.initByState(_view.attribute.state);
 				_validationDisplayManager.initByAttribute(_view.attribute);
 			}
 		}
 		
 		protected function attributeChangeHandler(event:Event):void {
 			_validationDisplayManager.initByAttribute(_view.attribute);
-			//var nodeState:NodeStateProxy = _view.attribute != null ? _view.attribute.state: null;
-			//_validationDisplayManager.initByState(nodeState);
+			updateRelevance();
 		}
 		
 		protected function updateResponseReceivedHandler(event:ApplicationEvent):void {
@@ -56,10 +59,20 @@ package org.openforis.collect.presenter {
 				for each (var response:UpdateResponse in responses) {
 					if(response.nodeId == _view.attribute.id) {
 						_validationDisplayManager.initByAttribute(_view.attribute);
+					} else if(response.nodeId == _view.parentEntity.id) {
+						updateRelevance();
 					}
 				}
 			}
 		}
-
+		
+		protected function updateRelevance():void {
+			var relevant:Boolean = _view.parentEntity.childrenRelevanceMap.get(_view.attributeDefinition.name);
+			if(relevant) {
+				UIUtil.removeStyleName(_view, ValidationDisplayManager.STYLE_NAME_NOT_RELEVANT);
+			} else {
+				UIUtil.addStyleName(_view, ValidationDisplayManager.STYLE_NAME_NOT_RELEVANT);
+			}
+		}
 	}
 }

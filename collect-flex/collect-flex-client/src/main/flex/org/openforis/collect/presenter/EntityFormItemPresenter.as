@@ -5,9 +5,13 @@ package org.openforis.collect.presenter
 	import mx.binding.utils.ChangeWatcher;
 	import mx.collections.IList;
 	
+	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.model.proxy.EntityProxy;
+	import org.openforis.collect.remoting.service.UpdateResponse;
 	import org.openforis.collect.ui.UIBuilder;
 	import org.openforis.collect.ui.component.detail.EntityFormItem;
+	import org.openforis.collect.ui.component.detail.ValidationDisplayManager;
+	import org.openforis.collect.util.UIUtil;
 	
 	/**
 	 * 
@@ -50,6 +54,18 @@ package org.openforis.collect.presenter
 			view.nodeDefinitions = temp;
 		}
 		
+		override protected function updateResponseReceivedHandler(event:ApplicationEvent):void {
+			if(_view.parentEntity != null) {
+				var responses:IList = IList(event.result);
+				for each (var response:UpdateResponse in responses) {
+					if(response.nodeId == _view.parentEntity.id) {
+						updateRelevance();
+						break;
+					}
+				}
+			}
+		}
+		
 		override protected function updateView():void {
 			var entity:EntityProxy = null;
 			if(view.parentEntity != null && view.entityDefinition != null && ! view.entityDefinition.multiple) {
@@ -57,6 +73,18 @@ package org.openforis.collect.presenter
 				entity = view.parentEntity.getChild(view.entityDefinition.name, 0) as EntityProxy;
 			}
 			view.entity = entity;
+			updateRelevance();
+		}
+
+		protected function updateRelevance():void {
+			if(view.parentEntity != null) {
+				var relevant:Boolean = view.parentEntity.childrenRelevanceMap.get(view.entityDefinition.name);
+				if(relevant) {
+					UIUtil.removeStyleName(_view, ValidationDisplayManager.STYLE_NAME_NOT_RELEVANT);
+				} else {
+					UIUtil.addStyleName(_view, ValidationDisplayManager.STYLE_NAME_NOT_RELEVANT);
+				}
+			}
 		}
 		
 	}

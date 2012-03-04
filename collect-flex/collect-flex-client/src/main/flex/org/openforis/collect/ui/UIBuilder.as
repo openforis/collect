@@ -319,6 +319,7 @@ package org.openforis.collect.ui {
 				BindingUtils.bindProperty(inputField, "attribute", renderer, "attribute");
 			}
 			renderer.isInDataGroup = isInDataGroup;
+			renderer.attributeDefinition = def;
 			return renderer;
 		}
 		
