@@ -29,18 +29,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 //@ContextConfiguration( locations = {"classpath:test-context.xml"} )
 //@TransactionConfiguration(defaultRollback=false)
 //@Transactional
-public class RecordDAOTest {
+public class RecordDaoTest {
 	@SuppressWarnings("unused")
-	private final Log log = LogFactory.getLog(RecordDAOTest.class);
+	private final Log log = LogFactory.getLog(RecordDaoTest.class);
 	
 	@SuppressWarnings("unused")
 	private CollectIdmlBindingContext idmlBindingContext;
 	
 	@Autowired
-	protected SurveyDAO surveyDao;
+	protected SurveyDao surveyDao;
 	
 	@Autowired
-	protected RecordDAO recordDao;
+	protected RecordDao recordDao;
 	
 	@Autowired
 	protected RecordManager recordManager;
@@ -160,7 +160,7 @@ public class RecordDAOTest {
 		
 		CollectRecord record = new CollectRecord(recordManager, survey, "2.0");
 		record.setCreationDate(new GregorianCalendar(2011, 0, sequenceNumber, 8, 30).getTime());
-		//record.setCreatedBy("ModelDAOIntegrationTest");
+		//record.setCreatedBy("ModelDaoIntegrationTest");
 		record.setStep(Step.ENTRY);
 		record.setModifiedDate(new GregorianCalendar(2011, 1, sequenceNumber, 8, 30).getTime());
 		record.setSkipped(skippedCount);

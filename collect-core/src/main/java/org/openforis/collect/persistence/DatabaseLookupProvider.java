@@ -13,14 +13,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class DatabaseLookupProvider implements LookupProvider {
 
 	@Autowired
-	private LookupProviderDAO lookupProviderDAO;
+	private LookupProviderDao lookupProviderDao;
 
 	public DatabaseLookupProvider() {
 	}
 
 	@Override
 	public Object lookup(String name, String attribute, Object... keys) {
-		return lookupProviderDAO.load(name, attribute, keys);
+		return lookupProviderDao.load(name, attribute, keys);
 	}
 
 }

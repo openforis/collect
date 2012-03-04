@@ -15,9 +15,9 @@ import org.openforis.idm.model.species.TaxonVernacularName;
 /**
  * @author G. Miceli
  */
-public class TaxonVernacularNameDAO extends MappingJooqDaoSupport<TaxonVernacularName, TaxonVernacularNameDAO.JooqFactory> {
-	public TaxonVernacularNameDAO() {
-		super(TaxonVernacularNameDAO.JooqFactory.class);
+public class TaxonVernacularNameDao extends MappingJooqDaoSupport<TaxonVernacularName, TaxonVernacularNameDao.JooqFactory> {
+	public TaxonVernacularNameDao() {
+		super(TaxonVernacularNameDao.JooqFactory.class);
 	}
 
 	public List<TaxonVernacularName> findByVernacularName(String searchString, int maxResults) {

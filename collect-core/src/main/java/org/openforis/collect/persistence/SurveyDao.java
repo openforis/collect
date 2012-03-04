@@ -36,8 +36,8 @@ import org.springframework.transaction.annotation.Transactional;
  * @author G. Miceli
  * @author M. Togna
  */
-public class SurveyDAO extends JooqDaoSupport {
-//	private final Log LOG = LogFactory.getLog(SurveyDAO.class);
+public class SurveyDao extends JooqDaoSupport {
+//	private final Log LOG = LogFactory.getLog(SurveyDao.class);
 	
 	private CollectIdmlBindingContext bindingContext;
 
@@ -46,7 +46,7 @@ public class SurveyDAO extends JooqDaoSupport {
 	@Autowired
 	private Validator validator;
 	
-	public SurveyDAO() {
+	public SurveyDao() {
 	}
 	
 	public void init(){

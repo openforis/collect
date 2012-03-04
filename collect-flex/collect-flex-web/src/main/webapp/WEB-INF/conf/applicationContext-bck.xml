@@ -98,7 +98,7 @@
 <!-- 		<property name="applicationDao" ref="applicationDao" /> -->
 <!-- 	</bean> -->
 
-	<!-- DAO's -->
+	<!-- Dao's -->
 <!-- 	<bean id="applicationDao" class="org.fao.openforis.collect.dao.xml.ApplicationDaoImpl"> -->
 <!-- 		<property name="recordDao" ref="recordDao" /> -->
 <!-- 		<property name="versionDao" ref="versionDao" /> -->

@@ -23,7 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author M. Togna
  * 
  */
-public class UserDAO extends JooqDaoSupport implements UserDetailsService {
+public class UserDao extends JooqDaoSupport implements UserDetailsService {
 
 	@Override
 	@Transactional

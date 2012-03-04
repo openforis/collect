@@ -35,14 +35,14 @@ import org.springframework.transaction.annotation.Transactional;
  * @author M. Togna
  * @author S. Ricci
  */
-public class RecordDAO extends JooqDaoSupport {
+public class RecordDao extends JooqDaoSupport {
 	
 	public static final String ORDER_BY_DATE_CREATED = "creationDate";
 	public static final String ORDER_BY_DATE_MODIFIED = "modifiedDate";
 	
 	private ModelSerializer modelSerializer;
 
-	public RecordDAO() {
+	public RecordDao() {
 		this.modelSerializer = new ModelSerializer(150000);
 	}
 	

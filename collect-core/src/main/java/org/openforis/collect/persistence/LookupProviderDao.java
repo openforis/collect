@@ -15,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author M. Togna
  * 
  */
-public class LookupProviderDAO extends JooqDaoSupport {
+public class LookupProviderDao extends JooqDaoSupport {
 
 	@Transactional
 	public Coordinate load(String table, String column, Object... keys) {

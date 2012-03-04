@@ -10,7 +10,7 @@ import java.util.Map;
 
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SurveySummary;
-import org.openforis.collect.persistence.SurveyDAO;
+import org.openforis.collect.persistence.SurveyDao;
 import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.idm.metamodel.LanguageSpecificText;
 import org.openforis.idm.metamodel.Survey;
@@ -25,7 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class SurveyManager {
 
 	@Autowired
-	private SurveyDAO surveyDAO;
+	private SurveyDao surveyDao;
 	
 	private Map<String, CollectSurvey> surveysByName;
 	private Map<Integer, CollectSurvey> surveysById;
@@ -48,7 +48,7 @@ public class SurveyManager {
 
 	@Transactional
 	public void importModel(CollectSurvey survey) throws SurveyImportException {
-		surveyDAO.importModel(survey);
+		surveyDao.importModel(survey);
 		initSurvey(survey);
 	}
 
@@ -83,7 +83,7 @@ public class SurveyManager {
 
 	@Transactional
 	protected void init() {
-		surveys = surveyDAO.loadAll();
+		surveys = surveyDao.loadAll();
 		for (CollectSurvey survey : surveys) {
 			initSurvey(survey);
 		}

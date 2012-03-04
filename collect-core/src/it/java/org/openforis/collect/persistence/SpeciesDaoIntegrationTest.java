@@ -26,17 +26,17 @@ import org.springframework.transaction.annotation.Transactional;
 @ContextConfiguration( locations = {"classpath:test-context.xml"} )
 @TransactionConfiguration(defaultRollback=true)
 @Transactional
-public class SpeciesDAOIntegrationTest {
-//	private final Log log = LogFactory.getLog(ModelDAOIntegrationTest.class);
+public class SpeciesDaoIntegrationTest {
+//	private final Log log = LogFactory.getLog(ModelDaoIntegrationTest.class);
 
 	@Autowired
-	private TaxonomyDAO taxonomyDao;
+	private TaxonomyDao taxonomyDao;
 
 	@Autowired
-	private TaxonDAO taxonDao;
+	private TaxonDao taxonDao;
 
 	@Autowired
-	private TaxonVernacularNameDAO taxonVernacularNameDao;
+	private TaxonVernacularNameDao taxonVernacularNameDao;
 
 	private void testFindCode(String match, int maxResults, int expectedResults) {
 		// Create taxonomy

@@ -86,7 +86,6 @@ public class ModelSerializationTest {
 		CollectRecord record = new CollectRecord(survey, "2.0");
 		Entity cluster = record.createRootEntity("cluster");
 		record.setCreationDate(new GregorianCalendar(2011, 12, 31, 23, 59).getTime());
-		//record.setCreatedBy("ModelDAOIntegrationTest");
 		record.setStep(Step.ENTRY);
 		String id = "123_456";
 		

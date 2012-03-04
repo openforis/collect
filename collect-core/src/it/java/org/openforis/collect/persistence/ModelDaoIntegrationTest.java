@@ -41,14 +41,14 @@ import org.springframework.transaction.annotation.Transactional;
 @ContextConfiguration( locations = {"classpath:test-context.xml"} )
 @TransactionConfiguration(defaultRollback=true)
 @Transactional
-public class ModelDAOIntegrationTest {
-	private final Log log = LogFactory.getLog(ModelDAOIntegrationTest.class);
+public class ModelDaoIntegrationTest {
+	private final Log log = LogFactory.getLog(ModelDaoIntegrationTest.class);
 	
 	@Autowired
-	protected SurveyDAO surveyDao;
+	protected SurveyDao surveyDao;
 	
 	@Autowired
-	protected RecordDAO recordDao;
+	protected RecordDao recordDao;
 	@Autowired
 	private ExpressionFactory expressionFactory;
 	
@@ -115,7 +115,7 @@ public class ModelDAOIntegrationTest {
 		CollectRecord record = new CollectRecord(survey, "2.0");
 		Entity cluster = record.createRootEntity("cluster");
 		record.setCreationDate(new GregorianCalendar(2011, 12, 31, 23, 59).getTime());
-		//record.setCreatedBy("ModelDAOIntegrationTest");
+		//record.setCreatedBy("ModelDaoIntegrationTest");
 		record.setStep(Step.ENTRY);
 		String id = "123_456";
 		

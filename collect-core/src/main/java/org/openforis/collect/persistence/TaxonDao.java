@@ -15,9 +15,9 @@ import org.openforis.idm.model.species.Taxon;
 /**
  * @author G. Miceli
  */
-public class TaxonDAO extends MappingJooqDaoSupport<Taxon, TaxonDAO.JooqFactory> {
-	public TaxonDAO() {
-		super(TaxonDAO.JooqFactory.class);
+public class TaxonDao extends MappingJooqDaoSupport<Taxon, TaxonDao.JooqFactory> {
+	public TaxonDao() {
+		super(TaxonDao.JooqFactory.class);
 	}
 
 	public List<Taxon> findByCode(String searchString, int maxResults) {

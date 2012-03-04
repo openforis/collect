@@ -14,7 +14,7 @@ import org.jooq.impl.Factory;
  * @author G. Miceli
  * @author M. Togna
  */
-public abstract class CollectDAO {
+public abstract class CollectDao {
 	private final Log log = LogFactory.getLog(getClass());
 
 	private DataSource dataSource;

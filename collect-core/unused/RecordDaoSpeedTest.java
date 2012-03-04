@@ -29,10 +29,10 @@ public class RecordDaoSpeedTest {
 	private final Log log = LogFactory.getLog(RecordDaoSpeedTest.class);
 	
 	@Autowired
-	protected SurveyDAO surveyDao;
+	protected SurveyDao surveyDao;
 	
 	@Autowired
-	protected RecordDAO recordDao;
+	protected RecordDao recordDao;
 
 	@Autowired
 	private ExpressionFactory expressionFactory;

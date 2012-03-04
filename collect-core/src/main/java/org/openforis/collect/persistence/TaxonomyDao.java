@@ -15,10 +15,10 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * @author G. Miceli
  */
-public class TaxonomyDAO extends MappingJooqDaoSupport<Taxonomy, TaxonomyDAO.JooqFactory> {
+public class TaxonomyDao extends MappingJooqDaoSupport<Taxonomy, TaxonomyDao.JooqFactory> {
 
-	public TaxonomyDAO() {
-		super(TaxonomyDAO.JooqFactory.class);
+	public TaxonomyDao() {
+		super(TaxonomyDao.JooqFactory.class);
 	}
 	
 	@Transactional

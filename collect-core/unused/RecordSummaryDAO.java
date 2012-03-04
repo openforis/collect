@@ -23,7 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author S. Ricci
  *
  */
-public class RecordSummaryDAO extends CollectDAO {
+public class RecordSummaryDao extends CollectDao {
 	
 	public static final String DATE_CREATED_ALIAS = "creationDate";
 	public static final String DATE_MODIFIED_ALIAS = "modifiedDate";
@@ -31,7 +31,7 @@ public class RecordSummaryDAO extends CollectDAO {
 	public static final String KEY_ALIAS_PREFIX = "key_";
 	public static final String COUNT_ALIAS_PREFIX = "count_";
 	
-	public RecordSummaryDAO() {
+	public RecordSummaryDao() {
 	}
 
 	
@@ -66,7 +66,7 @@ public class RecordSummaryDAO extends CollectDAO {
 			int position = 1;
 			for (AttributeDefinition def : keyDefs) {
 				String alias = KEY_ALIAS_PREFIX + def.getName();
-				Field<?> field = RecordDAOUtil.getKeyField(r, def, position).as(alias);
+				Field<?> field = RecordDaoUtil.getKeyField(r, def, position).as(alias);
 				q.addSelect(field);
 				position ++;
 			}
@@ -76,7 +76,7 @@ public class RecordSummaryDAO extends CollectDAO {
 			int position = 1;
 			for (EntityDefinition def : countable) {
 				String alias = COUNT_ALIAS_PREFIX + def.getName();
-				Field<?> field = RecordDAOUtil.getCountField(r, position).as(alias);
+				Field<?> field = RecordDaoUtil.getCountField(r, position).as(alias);
 				q.addSelect(field);
 				position ++;
 			}

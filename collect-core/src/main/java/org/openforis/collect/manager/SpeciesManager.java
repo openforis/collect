@@ -6,9 +6,9 @@ package org.openforis.collect.manager;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.openforis.collect.persistence.TaxonDAO;
-import org.openforis.collect.persistence.TaxonVernacularNameDAO;
-import org.openforis.collect.persistence.TaxonomyDAO;
+import org.openforis.collect.persistence.TaxonDao;
+import org.openforis.collect.persistence.TaxonVernacularNameDao;
+import org.openforis.collect.persistence.TaxonomyDao;
 import org.openforis.idm.model.TaxonOccurrence;
 import org.openforis.idm.model.species.Taxon;
 import org.openforis.idm.model.species.TaxonVernacularName;
@@ -23,14 +23,14 @@ import org.springframework.transaction.annotation.Transactional;
 public class SpeciesManager {
 
 	@Autowired
-	private TaxonDAO taxonDao;
+	private TaxonDao taxonDao;
 
 	@Autowired
-	private TaxonVernacularNameDAO taxonVernacularNameDao;
+	private TaxonVernacularNameDao taxonVernacularNameDao;
 
 	@SuppressWarnings("unused")
 	@Autowired
-	private TaxonomyDAO taxonomyDao;
+	private TaxonomyDao taxonomyDao;
 
 	@Transactional
 	public List<TaxonOccurrence> findByCode(String searchString, int maxResults) {

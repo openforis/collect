@@ -20,7 +20,7 @@ import org.openforis.collect.persistence.DuplicateIdException;
 import org.openforis.collect.persistence.InvalidIdException;
 import org.openforis.collect.persistence.MultipleEditException;
 import org.openforis.collect.persistence.NonexistentIdException;
-import org.openforis.collect.persistence.RecordDAO;
+import org.openforis.collect.persistence.RecordDao;
 import org.openforis.collect.persistence.RecordLockedException;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
@@ -52,7 +52,7 @@ public class RecordManager {
 	private static final QName COUNT_ANNOTATION = new QName("http://www.openforis.org/collect/3.0/collect", "count");
 
 	@Autowired
-	private RecordDAO recordDAO;
+	private RecordDao recordDao;
 	
 //	@Autowired 
 //	private SurveyContext recordContext;
@@ -67,13 +67,13 @@ public class RecordManager {
 		
 		updateKeys(record);
 		
-		recordDAO.saveOrUpdate(record);
+		recordDao.saveOrUpdate(record);
 	}
 
 	@Transactional
 	public void delete(int recordId, User user) throws RecordLockedException, AccessDeniedException, MultipleEditException {
-		recordDAO.lock(recordId, user);
-		recordDAO.delete(recordId);
+		recordDao.lock(recordId, user);
+		recordDao.delete(recordId);
 	}
 
 	/**
@@ -87,31 +87,31 @@ public class RecordManager {
 	 */
 	@Transactional
 	public CollectRecord checkout(CollectSurvey survey, User user, int recordId) throws RecordLockedException, NonexistentIdException, AccessDeniedException, MultipleEditException {
-		CollectRecord record = recordDAO.load(survey, recordId);
-		recordDAO.lock(recordId, user);
+		CollectRecord record = recordDao.load(survey, recordId);
+		recordDao.lock(recordId, user);
 		return record;
 	}
 
 	@Transactional
 	public List<CollectRecord> getSummaries(CollectSurvey survey, String rootEntity, String... keys) {
-		return recordDAO.loadSummaries(survey, rootEntity, keys);
+		return recordDao.loadSummaries(survey, rootEntity, keys);
 	}
 	
 	@Transactional
 	public List<CollectRecord> getSummaries(CollectSurvey survey, String rootEntity, int offset, int maxNumberOfRecords, String orderByFieldName, String filter) {
-		List<CollectRecord> recordsSummary = recordDAO.loadSummaries(survey, rootEntity, offset, maxNumberOfRecords, orderByFieldName, filter);
+		List<CollectRecord> recordsSummary = recordDao.loadSummaries(survey, rootEntity, offset, maxNumberOfRecords, orderByFieldName, filter);
 		return recordsSummary;
 	}
 
 	@Transactional
 	public int getCountRecords(EntityDefinition rootEntityDefinition) {
-		int count = recordDAO.getRecordCount(rootEntityDefinition);
+		int count = recordDao.getRecordCount(rootEntityDefinition);
 		return count;
 	}
 
 	@Transactional
 	public CollectRecord create(CollectSurvey survey, EntityDefinition rootEntityDefinition, User user, String modelVersionName) throws MultipleEditException, AccessDeniedException, RecordLockedException {
-		recordDAO.checkLock(user);
+		recordDao.checkLock(user);
 		
 		CollectRecord record = new CollectRecord(survey, modelVersionName);
 		record.createRootEntity(rootEntityDefinition.getName());
@@ -119,9 +119,9 @@ public class RecordManager {
 		record.setCreationDate(new Date());
 		record.setCreatedBy(user);
 		record.setStep(Step.ENTRY);
-		recordDAO.saveOrUpdate(record);
+		recordDao.saveOrUpdate(record);
 		Integer recordId = record.getId();
-		recordDAO.lock(recordId, user);
+		recordDao.lock(recordId, user);
 		return record;
 	}
 
@@ -132,12 +132,12 @@ public class RecordManager {
 
 	@Transactional
 	public void unlock(Record record, User user) throws RecordLockedException {
-		recordDAO.unlock(record.getId(), user);
+		recordDao.unlock(record.getId(), user);
 	}
 
 	@Transactional
 	public void unlockAll() {
-		recordDAO.unlockAll();
+		recordDao.unlockAll();
 	}
 
 	@Transactional
@@ -147,13 +147,13 @@ public class RecordManager {
 
 	@Transactional
 	public int promote(CollectSurvey survey, int recordId, User user) throws InvalidIdException, MultipleEditException, NonexistentIdException, AccessDeniedException, RecordLockedException {
-		CollectRecord record = recordDAO.load(survey, recordId);
+		CollectRecord record = recordDao.load(survey, recordId);
 		Step nextStep;
 		switch(record.getStep()) {
 			case ENTRY:
 				nextStep = Step.CLEANSING;
 				//clone record and save a copy with the new step
-				recordDAO.unlock(recordId, user);
+				recordDao.unlock(recordId, user);
 				record.setId(null);
 				Date now = new Date();
 				record.setSubmittedId(recordId);
@@ -162,13 +162,13 @@ public class RecordManager {
 				record.setCreatedBy(user);
 				record.setCreationDate(now);
 				record.setStep(nextStep);
-				recordDAO.insert(record);
+				recordDao.insert(record);
 				break;
 			case CLEANSING:
 				nextStep = Step.ANALYSIS;
-				recordDAO.unlock(recordId, user);
+				recordDao.unlock(recordId, user);
 				record.setStep(nextStep);
-				recordDAO.update(record);
+				recordDao.update(record);
 				break;
 			default:
 				throw new IllegalArgumentException("This record cannot be promoted.");
