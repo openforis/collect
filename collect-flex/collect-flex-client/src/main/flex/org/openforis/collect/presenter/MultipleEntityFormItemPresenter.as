@@ -4,7 +4,6 @@ package org.openforis.collect.presenter
 	import flash.events.MouseEvent;
 	
 	import mx.collections.IList;
-	import mx.rpc.AsyncResponder;
 	import mx.rpc.events.ResultEvent;
 	
 	import org.openforis.collect.Application;
@@ -99,7 +98,7 @@ package org.openforis.collect.presenter
 				o.parentEntityId = view.parentEntity.id;
 				o.nodeName = view.entityDefinition.name;
 				var req:UpdateRequest = new UpdateRequest(o);
-				ClientFactory.dataClient.updateActiveRecord(new AsyncResponder(addResultHandler, faultHandler, null), req);
+				ClientFactory.dataClient.updateActiveRecord(req, addResultHandler, faultHandler);
 			} else {
 				var labelText:String = view.entityDefinition.getLabelText();
 				AlertUtil.showError("edit.maxCountExceed", [maxCount, labelText]);
@@ -107,12 +106,6 @@ package org.openforis.collect.presenter
 		}
 		
 		protected function addResultHandler(event:ResultEvent, token:Object = null):void {
-			var responses:IList = IList(event.result);
-			Application.activeRecord.update(responses);
-			var appEvt:ApplicationEvent = new ApplicationEvent(ApplicationEvent.UPDATE_RESPONSE_RECEIVED);
-			appEvt.result = responses;
-			eventDispatcher.dispatchEvent(appEvt);
-			
 			view.callLater(function():void {
 				if(view.scroller != null && view.scroller.verticalScrollBar != null) {
 					view.scroller.verticalScrollBar.value = view.scroller.verticalScrollBar.maximum;

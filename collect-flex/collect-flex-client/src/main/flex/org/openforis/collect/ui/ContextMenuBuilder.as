@@ -8,10 +8,12 @@ package org.openforis.collect.ui
 	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
 	import mx.rpc.AsyncResponder;
+	import mx.rpc.events.FaultEvent;
 	import mx.rpc.events.ResultEvent;
 	
 	import org.openforis.collect.Application;
 	import org.openforis.collect.client.ClientFactory;
+	import org.openforis.collect.client.UpdateRequestToken;
 	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.event.EventDispatcherFactory;
 	import org.openforis.collect.i18n.Message;
@@ -194,8 +196,7 @@ package org.openforis.collect.ui
 			}
 			o.method = UpdateRequestOperation$Method.DELETE;
 			var req:UpdateRequest = new UpdateRequest(o);
-			var responder:AsyncResponder = new AsyncResponder(updateFieldResultHandler, null);
-			ClientFactory.dataClient.updateActiveRecord(responder, req);
+			ClientFactory.dataClient.updateActiveRecord(req, updateFieldResultHandler, updateFieldFaultHandler);
 		}
 		
 		protected static function performDeleteEntity():void {
@@ -208,25 +209,14 @@ package org.openforis.collect.ui
 			o.nodeName = entity.name;
 			o.nodeId = entity.id;
 			req.operations.addItem(o);
-			var responder:AsyncResponder = new AsyncResponder(updateFieldResultHandler, null);
-			ClientFactory.dataClient.updateActiveRecord(responder, req);
+			ClientFactory.dataClient.updateActiveRecord(req, updateFieldResultHandler, updateFieldFaultHandler);
 		}
-		/*
-		public static function setReasonBlankInChildren(entity:EntityProxy, symbol:FieldSymbol):void {
-			var req:UpdateRequest = new UpdateRequest();
-			req.parentEntityId = entity.parentId;
-			req.nodeName = entity.name;
-			req.symbol = symbol;
-			req.nodeId = entity.id;
-			req.method = UpdateRequest$Method.UPDATE_SYMBOL;
-			var responder:AsyncResponder = new AsyncResponder(updateFieldResultHandler, null);
-			ClientFactory.dataClient.updateActiveRecord(responder, req);
-		}
-		*/
-		public static function setReasonBlankInChildren(entity:EntityProxy, symbol:FieldSymbol):void {
+
+		protected static function setReasonBlankInChildren(entity:EntityProxy, symbol:FieldSymbol):void {
 			var children:IList = entity.getChildren();
 			var req:UpdateRequest = new UpdateRequest();
 			req.operations = new ArrayCollection();
+			var updatedFields:ArrayCollection = new ArrayCollection();
 			for each (var child:NodeProxy in children) {
 				if(child is AttributeProxy) {
 					var a:AttributeProxy = AttributeProxy(child);
@@ -243,22 +233,36 @@ package org.openforis.collect.ui
 							o.value = field.value != null ? field.value.toString(): null;
 							o.symbol = symbol;
 							req.operations.addItem(o);
+							updatedFields.addItem(field);
 						}
 					}
 				}
 			}
 			if(CollectionUtil.isNotEmpty(req.operations)) {
-				var responder:AsyncResponder = new AsyncResponder(updateFieldResultHandler, null);
-				ClientFactory.dataClient.updateActiveRecord(responder, req);
+				var token:UpdateRequestToken = new UpdateRequestToken(UpdateRequestToken.TYPE_UPDATE_SYMBOL);
+				token.updatedFields = updatedFields;
+				token.symbol = symbol;
+				ClientFactory.dataClient.updateActiveRecord(req, updateFieldResultHandler, updateFieldFaultHandler, token);
 			}
 		}
 		
-		protected static function updateFieldResultHandler(event:ResultEvent, token:Object = null):void {
+		protected static function updateFieldResultHandler(event:ResultEvent, token:UpdateRequestToken = null):void {
+			/*
+			if(token != null && token.updatedFields != null) {
+				for each (var field:FieldProxy in token.updatedFields) {
+					field.symbol = token.symbol;
+				}
+			}
 			var responses:IList = IList(event.result);
 			Application.activeRecord.update(responses);
 			var appEvt:ApplicationEvent = new ApplicationEvent(ApplicationEvent.UPDATE_RESPONSE_RECEIVED);
 			appEvt.result = responses;
 			EventDispatcherFactory.getEventDispatcher().dispatchEvent(appEvt);
+			*/
+		}
+		
+		protected static function updateFieldFaultHandler(event:FaultEvent, token:UpdateRequestToken = null):void {
+			
 		}
 		
 

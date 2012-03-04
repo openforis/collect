@@ -16,7 +16,6 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.remoting.service.UpdateRequest;
 	import org.openforis.collect.remoting.service.UpdateRequestOperation;
 	import org.openforis.collect.remoting.service.UpdateRequestOperation$Method;
-	import org.openforis.collect.remoting.service.UpdateResponse;
 	import org.openforis.collect.ui.component.detail.EntityFormContainer;
 	import org.openforis.collect.util.AlertUtil;
 	import org.openforis.collect.util.UIUtil;
@@ -84,7 +83,7 @@ package org.openforis.collect.presenter
 			o.parentEntityId = _view.parentEntity.id;
 			o.nodeName = _view.entityDefinition.name;
 			var req:UpdateRequest = new UpdateRequest(o);
-			ClientFactory.dataClient.updateActiveRecord(new AsyncResponder(addResultHandler, faultHandler, null), req);
+			ClientFactory.dataClient.updateActiveRecord(req, addResultHandler);
 		}
 		
 		protected function deleteButtonClickHandler(event:MouseEvent):void {
@@ -98,15 +97,10 @@ package org.openforis.collect.presenter
 			o.parentEntityId = _view.parentEntity.id;
 			o.nodeId = _view.entity.id;
 			var req:UpdateRequest = new UpdateRequest(o);
-			ClientFactory.dataClient.updateActiveRecord(new AsyncResponder(deleteResultHandler, faultHandler, null), req);
+			ClientFactory.dataClient.updateActiveRecord(req, deleteResultHandler);
 		}
 		
 		protected function addResultHandler(event:ResultEvent, token:Object = null):void {
-			var responses:IList = IList(event.result);
-			Application.activeRecord.update(responses);
-			var appEvt:ApplicationEvent = new ApplicationEvent(ApplicationEvent.UPDATE_RESPONSE_RECEIVED);
-			appEvt.result = responses;
-			eventDispatcher.dispatchEvent(appEvt);
 			//select the inserted entity
 			_view.callLater(function():void {
 				var entities:IList = getEntities();
@@ -131,13 +125,17 @@ package org.openforis.collect.presenter
 		protected function selectEntity(entity:EntityProxy):void {
 			_view.dropDownList.selectedItem = entity;
 			_view.entity = entity;
-			if(_view.internalContainer.visible) {
-				//internal container already visible, call programmatically the showEffect
-				_view.showFormEffect.play([_view.internalContainer]);
+			if(entity != null) {
+				if(_view.internalContainer.visible) {
+					//internal container already visible, call programmatically the showEffect
+					_view.showFormEffect.play([_view.internalContainer]);
+				} else {
+					_view.internalContainer.visible = true;
+					selectFirstTab();
+				}
 			} else {
-				_view.internalContainer.visible = true;
+				_view.internalContainer.visible = false;
 			}
-			selectFirstTab();
 		}
 		
 		protected function selectFirstTab():void {

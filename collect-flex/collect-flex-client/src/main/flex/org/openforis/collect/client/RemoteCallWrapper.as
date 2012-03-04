@@ -9,14 +9,15 @@ package org.openforis.collect.client {
 	 **/
 	public class RemoteCallWrapper {
 		
-		private var _responder:IResponder;
 		private var _operation:AbstractOperation;
 		private var _args:Array;
 		private var _attempts:int;
 		private var _active:Boolean;
+		private var _resultHandler:Function;
+		private var _faultHandler:Function;
+		private var _token:Object;
 		
-		public function RemoteCallWrapper(responder:IResponder, operation:AbstractOperation, ... args:Array) {
-			this._responder = responder;
+		public function RemoteCallWrapper(operation:AbstractOperation, ... args:Array) {
 			this._operation = operation;
 			this._args = args[0]; //args is an array of array
 			this._active = false;
@@ -25,7 +26,7 @@ package org.openforis.collect.client {
 		
 		public function send():AsyncToken {
 			var token:AsyncToken = this._operation.send.apply(null, this._args) as AsyncToken; 
-			token.addResponder(this._responder);
+			//token.addResponder(this._responder);
 			this._active = true;
 			this._attempts ++;
 			return token;
@@ -42,10 +43,30 @@ package org.openforis.collect.client {
 		public function get attempts():int {
 			return _attempts;
 		}
+		
+		public function get resultHandler():Function {
+			return _resultHandler;
+		}
 
-		/*public function set attempts(value:int):void {
-			_attempts = value;
-		}*/
+		public function set resultHandler(value:Function):void {
+			_resultHandler = value;
+		}
+		
+		public function get faultHandler():Function {
+			return _faultHandler;
+		}
+
+		public function set faultHandler(value:Function):void {
+			_faultHandler = value;
+		}
+
+		public function get token():Object {
+			return _token;
+		}
+
+		public function set token(value:Object):void {
+			_token = value;
+		}
 
 	}
 }

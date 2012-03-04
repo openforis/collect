@@ -20,7 +20,6 @@ package org.openforis.collect.presenter {
 		
 		protected var _view:AttributeItemRenderer;
 		private var _validationDisplayManager:ValidationDisplayManager;
-		private var _validationStateDisplay:UIComponent;
 		
 		public function AttributePresenter(view:AttributeItemRenderer) {
 			_view = view;
@@ -40,9 +39,9 @@ package org.openforis.collect.presenter {
 		
 		protected function initValidationDisplayManager():void {
 			var inputField:InputField = _view.getElementAt(0) as InputField;
-			_validationStateDisplay = inputField != null ? inputField.validationStateDisplay: _view;
-			var validationToolTipTrigger:UIComponent = _validationStateDisplay;
-			_validationDisplayManager = new ValidationDisplayManager(validationToolTipTrigger, _validationStateDisplay);
+			var validationStateDisplay:UIComponent = inputField != null ? inputField.validationStateDisplay: _view;
+			var validationToolTipTrigger:UIComponent = validationStateDisplay;
+			_validationDisplayManager = new ValidationDisplayManager(validationToolTipTrigger, validationStateDisplay);
 			if(_view.attribute != null) {
 				_validationDisplayManager.initByAttribute(_view.attribute);
 			}
@@ -67,11 +66,13 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function updateRelevance():void {
-			var relevant:Boolean = _view.parentEntity.childrenRelevanceMap.get(_view.attributeDefinition.name);
-			if(relevant) {
-				UIUtil.removeStyleName(_view, ValidationDisplayManager.STYLE_NAME_NOT_RELEVANT);
-			} else {
-				UIUtil.addStyleName(_view, ValidationDisplayManager.STYLE_NAME_NOT_RELEVANT);
+			if(_view.parentEntity != null && _view.attributeDefinition != null) {
+				var relevant:Boolean = _view.parentEntity.childrenRelevanceMap.get(_view.attributeDefinition.name);
+				if(relevant) {
+					UIUtil.removeStyleName(_view, ValidationDisplayManager.STYLE_NAME_NOT_RELEVANT);
+				} else {
+					UIUtil.addStyleName(_view, ValidationDisplayManager.STYLE_NAME_NOT_RELEVANT);
+				}
 			}
 		}
 	}

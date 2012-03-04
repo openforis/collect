@@ -2,18 +2,13 @@ package org.openforis.collect.presenter {
 	import flash.events.Event;
 	
 	import mx.collections.ArrayCollection;
-	import mx.collections.IList;
 	import mx.collections.ListCollectionView;
 	import mx.events.CalendarLayoutChangeEvent;
-	import mx.rpc.AsyncResponder;
-	import mx.rpc.IResponder;
 	import mx.rpc.events.FaultEvent;
 	import mx.rpc.events.ResultEvent;
 	
-	import org.openforis.collect.Application;
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.client.DataClient;
-	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.remoting.service.UpdateRequest;
 	import org.openforis.collect.remoting.service.UpdateRequestOperation;
 	import org.openforis.collect.ui.component.input.DateAttributeRenderer;
@@ -29,12 +24,10 @@ package org.openforis.collect.presenter {
 	 * */
 	public class DateAttributePresenter extends AttributePresenter {
 		
-		protected var _updateResponder:IResponder;
 		private var _dataClient:DataClient;
 		
 		public function DateAttributePresenter(view:DateAttributeRenderer) {
 			_dataClient = ClientFactory.dataClient;
-			_updateResponder = new AsyncResponder(updateResultHandler, updateFaultHandler);
 			
 			super(view);
 		}
@@ -60,7 +53,9 @@ package org.openforis.collect.presenter {
 		
 		protected function dateFieldChangeHandler(event:Event):void {
 			var date:Date = (event.target as DateField).selectedDate;
-			setDateOnFields(date.fullYear, date.month + 1, date.date);
+			if(date != null) {
+				setDateOnFields(date.fullYear, date.month + 1, date.date);
+			}
 		}
 		
 		protected function setDateOnFields(year:Number, month:Number, day:Number):void {
@@ -76,7 +71,7 @@ package org.openforis.collect.presenter {
 			}
 			var req:UpdateRequest = new UpdateRequest();
 			req.operations = operations;
-			dataClient.updateActiveRecord(_updateResponder, req);
+			dataClient.updateActiveRecord(req, updateResultHandler, updateFaultHandler);
 		}
 		
 		protected function getDateFromFields():Date {
@@ -91,11 +86,13 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function updateResultHandler(event:ResultEvent, token:Object = null):void {
+			/*
 			var responses:IList = IList(event.result);
 			Application.activeRecord.update(responses);
 			var appEvt:ApplicationEvent = new ApplicationEvent(ApplicationEvent.UPDATE_RESPONSE_RECEIVED);
 			appEvt.result = responses;
 			eventDispatcher.dispatchEvent(appEvt);
+			*/
 		}
 		
 		protected function updateFaultHandler(event:FaultEvent, token:Object = null):void {

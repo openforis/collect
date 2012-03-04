@@ -72,7 +72,7 @@ package org.openforis.collect.presenter
 				o.parentEntityId = view.parentEntity.id;
 				o.nodeName = view.attributeDefinition.name;
 				var req:UpdateRequest = new UpdateRequest(o);
-				ClientFactory.dataClient.updateActiveRecord(new AsyncResponder(addResultHandler, faultHandler, null), req);
+				ClientFactory.dataClient.updateActiveRecord(req, addResultHandler, faultHandler);
 			} else {
 				var labelText:String = view.attributeDefinition.getLabelText();
 				AlertUtil.showError("edit.maxCountExceed", [maxCount, labelText]);
@@ -80,12 +80,13 @@ package org.openforis.collect.presenter
 		}
 		
 		protected function addResultHandler(event:ResultEvent, token:Object = null):void {
+			/*
 			var responses:IList = IList(event.result);
 			Application.activeRecord.update(responses);
 			var appEvt:ApplicationEvent = new ApplicationEvent(ApplicationEvent.UPDATE_RESPONSE_RECEIVED);
 			appEvt.result = responses;
 			eventDispatcher.dispatchEvent(appEvt);
-			
+			*/
 			view.callLater(function():void {
 				UIUtil.ensureElementIsVisible(view.addButton);
 			});

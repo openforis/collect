@@ -1,10 +1,17 @@
 package org.openforis.collect.client {
+	import mx.collections.IList;
 	import mx.controls.Alert;
 	import mx.rpc.AsyncToken;
 	import mx.rpc.IResponder;
 	import mx.rpc.events.FaultEvent;
+	import mx.rpc.events.ResultEvent;
 	import mx.rpc.remoting.Operation;
 	
+	import org.openforis.collect.Application;
+	import org.openforis.collect.event.ApplicationEvent;
+	import org.openforis.collect.event.EventDispatcherFactory;
+	import org.openforis.collect.i18n.Message;
+	import org.openforis.collect.model.proxy.FieldProxy;
 	import org.openforis.collect.remoting.service.UpdateRequest;
 	
 	/**
@@ -30,7 +37,7 @@ package org.openforis.collect.client {
 		public function DataClient() {
 			super("dataService");
 			
-			this._updateQueueProcessor = new RemoteCallQueueProcessor(1);
+			this._updateQueueProcessor = new RemoteCallQueueProcessor(1, updateResultHandler, updateFaultHandler);
 			this._updateActiveRecordOperation = getOperation("updateActiveRecord");
 			this._saveActiveRecordOperation = getOperation("saveActiveRecord");
 			this._createRecordOperation = getOperation("createRecord");
@@ -74,8 +81,8 @@ package org.openforis.collect.client {
 			token.addResponder(responder);
 		}
 		
-		public function updateActiveRecord(responder:IResponder, request:UpdateRequest):void {
-			this._updateQueueProcessor.appendOperation(responder, this._updateActiveRecordOperation, request);
+		public function updateActiveRecord(request:UpdateRequest, resultHandler:Function = null, faultHandler:Function = null, token:Object = null):void {
+			this._updateQueueProcessor.appendOperation(resultHandler, faultHandler, token, this._updateActiveRecordOperation, request);
 		}
 		
 		public function submitRecord(responder:IResponder, id:int):void {
@@ -98,9 +105,37 @@ package org.openforis.collect.client {
 			token.addResponder(responder);
 		}
 		
-		protected function faultHandler(event:FaultEvent):void {
-			Alert.show("Error\n\n" + event.fault.message);
+		protected function updateFaultHandler(event:FaultEvent):void {
+			Alert.show(Message.get("global.faultHandlerMsg")
+				+"\n\n"+ event.fault.faultCode
+				+"\n\n"+ event.fault.faultString
+			);
 		}
 		
+		protected function updateResultHandler(event:ResultEvent, token:UpdateRequestToken):void {
+			var field:FieldProxy;
+			if(token != null) {
+				switch(token.type) {
+					case UpdateRequestToken.TYPE_UPDATE_VALUE:
+						//do not break, apply symbol to field
+					case UpdateRequestToken.TYPE_UPDATE_SYMBOL:
+						for each (field in token.updatedFields) {
+							field.symbol = token.symbol;
+						}
+						break;
+					case UpdateRequestToken.TYPE_UPDATE_REMARKS:
+						for each (field in token.updatedFields) {
+						field.remarks = token.remarks;
+					}
+						break;
+				}
+			}
+			var responses:IList = IList(event.result);
+			Application.activeRecord.update(responses);
+			var appEvt:ApplicationEvent = new ApplicationEvent(ApplicationEvent.UPDATE_RESPONSE_RECEIVED);
+			appEvt.result = responses;
+			EventDispatcherFactory.getEventDispatcher().dispatchEvent(appEvt);
+		}
+
 	}
 }

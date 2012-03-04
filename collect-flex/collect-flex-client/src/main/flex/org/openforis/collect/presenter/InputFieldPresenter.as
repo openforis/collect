@@ -5,6 +5,7 @@ package org.openforis.collect.presenter {
 	import flash.ui.Keyboard;
 	
 	import mx.binding.utils.ChangeWatcher;
+	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.IResponder;
@@ -14,6 +15,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.Application;
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.client.DataClient;
+	import org.openforis.collect.client.UpdateRequestToken;
 	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.event.EventDispatcherFactory;
 	import org.openforis.collect.event.InputFieldEvent;
@@ -129,20 +131,26 @@ package org.openforis.collect.presenter {
 			} else {
 				value = text;
 			}
-			var responder:IResponder = new AsyncResponder(applyValueResultHandler, updateFaultHandler, {value: value, symbol: symbol});
-			sendRequestOperation(o, responder);
+			var token:UpdateRequestToken = new UpdateRequestToken(UpdateRequestToken.TYPE_UPDATE_VALUE, _view);
+			token.updatedFields = new ArrayCollection([getField()]);
+			token.symbol = symbol;
+			sendRequestOperation(o, token);
 		}
 		
 		public function applySymbol(symbol:FieldSymbol):void {
 			var o:UpdateRequestOperation = getApplySymbolOperation(symbol);
-			var responder:IResponder = new AsyncResponder(applySymbolResultHandler, updateFaultHandler, {symbol: symbol});
-			sendRequestOperation(o, responder);
+			var token:UpdateRequestToken = new UpdateRequestToken(UpdateRequestToken.TYPE_UPDATE_SYMBOL, _view);
+			token.updatedFields = new ArrayCollection([getField()]);
+			token.symbol = symbol;
+			sendRequestOperation(o, token);
 		}
 		
 		public function applyRemarks(remarks:String):void {
 			var o:UpdateRequestOperation = getApplyRemarksOperation(remarks);
-			var responder:IResponder = new AsyncResponder(applyRemarksResultHandler, updateFaultHandler, {remarks: remarks});
-			sendRequestOperation(o, responder);
+			var token:UpdateRequestToken = new UpdateRequestToken(UpdateRequestToken.TYPE_UPDATE_REMARKS, _view);
+			token.updatedFields = new ArrayCollection([getField()]);
+			token.remarks = remarks;
+			sendRequestOperation(o, token);
 		}
 		
 		public function getApplyValueOperation():UpdateRequestOperation {
@@ -185,9 +193,9 @@ package org.openforis.collect.presenter {
 			return o;
 		}
 		
-		protected function sendRequestOperation(o:UpdateRequestOperation, responder:IResponder):void {
+		protected function sendRequestOperation(o:UpdateRequestOperation, token:Object):void {
 			var req:UpdateRequest = new UpdateRequest(o);
-			dataClient.updateActiveRecord(responder, req);
+			dataClient.updateActiveRecord(req, updateResultHandler, updateFaultHandler, token);
 		}
 		
 		protected function getUpdateRequestOperation(method:UpdateRequestOperation$Method, nodeId:Number, 
@@ -205,37 +213,14 @@ package org.openforis.collect.presenter {
 			return o;
 		}
 		
-		protected static function dispatchUpdateResultReceivedEvent(event:ResultEvent, token:Object = null):void {
-			var responses:IList = IList(event.result);
-			Application.activeRecord.update(responses);
-			var appEvt:ApplicationEvent = new ApplicationEvent(ApplicationEvent.UPDATE_RESPONSE_RECEIVED);
-			appEvt.result = responses;
-			EventDispatcherFactory.getEventDispatcher().dispatchEvent(appEvt);
-		}
-		
-		protected function applyValueResultHandler(event:ResultEvent, token:Object = null):void {
+		protected function updateResultHandler(event:ResultEvent, token:UpdateRequestToken):void {
 			if(_view.attribute != null) {
-				_view.attribute.validationResults = null;
+			_view.attribute.validationResults = null;
 			}
-			var symbol:FieldSymbol = token.symbol;
-			getField().symbol = symbol;
 			_changed = false;
-			dispatchUpdateResultReceivedEvent(event, token);
 			//_view.currentState = InputField.STATE_SAVE_COMPLETE;
 		}
-
-		protected function applySymbolResultHandler(event:ResultEvent, token:Object = null):void {
-			var f:FieldProxy = getField();
-			f.symbol = token.symbol;
-			dispatchUpdateResultReceivedEvent(event, token);
-		}
-
-		protected function applyRemarksResultHandler(event:ResultEvent, token:Object = null):void {
-			var f:FieldProxy = getField();
-			f.remarks = token.remarks;
-			dispatchUpdateResultReceivedEvent(event, token);
-		}
-
+		
 		protected function updateFaultHandler(event:FaultEvent, token:Object = null):void {
 			//_view.currentState = InputField.STATE_ERROR_SAVING;
 			undoLastChange();

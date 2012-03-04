@@ -14,6 +14,7 @@ package org.openforis.collect.presenter {
 	import mx.rpc.IResponder;
 	import mx.rpc.events.ResultEvent;
 	
+	import org.openforis.collect.client.UpdateRequestToken;
 	import org.openforis.collect.metamodel.proxy.CodeAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.CodeListItemProxy;
 	import org.openforis.collect.model.FieldSymbol;
@@ -199,8 +200,10 @@ package org.openforis.collect.presenter {
 				}
 				var req:UpdateRequest = new UpdateRequest();
 				req.operations = operations;
-				var responder:IResponder = new AsyncResponder(applyValueResultHandler, updateFaultHandler, {symbol: symbol});
-				dataClient.updateActiveRecord(responder, req);
+				var token:UpdateRequestToken = new UpdateRequestToken(UpdateRequestToken.TYPE_UPDATE_VALUE, _view);
+				token.symbol = symbol;
+				token.remarks = remarks;
+				dataClient.updateActiveRecord(req, updateResultHandler, updateFaultHandler, token);
 			} else {
 				super.applyValue();
 			}
@@ -208,18 +211,23 @@ package org.openforis.collect.presenter {
 		
 		override public function applyRemarks(remarks:String):void {
 			if(_view.attributeDefinition.multiple) {
+				var updatedFields:ArrayCollection = new ArrayCollection();
 				var operations:ArrayCollection = new ArrayCollection();
 				for each (var a:AttributeProxy in _view.attributes) {
 					var value:String = codeAttributeToText(a);
-					var symbol:FieldSymbol = a.getField(0).symbol;
+					var field:FieldProxy = a.getField(0);
+					var symbol:FieldSymbol = field.symbol;
 					var o:UpdateRequestOperation = getUpdateRequestOperation(UpdateRequestOperation$Method.UPDATE, 
 						a.id, value, symbol, remarks);
 					operations.addItem(o);
+					updatedFields.addAll(a.fields);
 				}
 				var req:UpdateRequest = new UpdateRequest();
 				req.operations = operations;
-				var responder:IResponder = new AsyncResponder(applyRemarksResultHandler, updateFaultHandler, {remarks: remarks});
-				dataClient.updateActiveRecord(responder, req);
+				var token:UpdateRequestToken = new UpdateRequestToken(UpdateRequestToken.TYPE_UPDATE_REMARKS, _view);
+				token.remarks = remarks;
+				token.updatedFields = updatedFields;
+				dataClient.updateActiveRecord(req, updateResultHandler, updateFaultHandler, token);
 			} else {
 				super.applyRemarks(remarks);
 			}
@@ -227,6 +235,7 @@ package org.openforis.collect.presenter {
 		
 		override public function applySymbol(symbol:FieldSymbol):void {
 			if(_view.attributeDefinition.multiple) {
+				var updatedFields:ArrayCollection = new ArrayCollection();
 				var operations:ArrayCollection = new ArrayCollection();
 				var remarks:String = getRemarks();
 				for each (var a:AttributeProxy in _view.attributes) {
@@ -234,65 +243,19 @@ package org.openforis.collect.presenter {
 					var o:UpdateRequestOperation = getUpdateRequestOperation(UpdateRequestOperation$Method.UPDATE, 
 						a.id, value, symbol, remarks);
 					operations.addItem(o);
+					updatedFields.addAll(a.fields);
 				}
 				var req:UpdateRequest = new UpdateRequest();
 				req.operations = operations;
-				var responder:IResponder = new AsyncResponder(applyRemarksResultHandler, updateFaultHandler, {symbol: symbol});
-				dataClient.updateActiveRecord(responder, req);
+				var token:UpdateRequestToken = new UpdateRequestToken(UpdateRequestToken.TYPE_UPDATE_SYMBOL, _view);
+				token.updatedFields = updatedFields;
+				token.symbol = symbol;
+				dataClient.updateActiveRecord(req, updateResultHandler, updateFaultHandler, token);
 			} else {
 				super.applySymbol(symbol);
 			}
 		}
 		
-		override protected function applyValueResultHandler(event:ResultEvent, token:Object=null):void {
-			if(! _view.attributeDefinition.multiple) {
-				super.applyValueResultHandler(event, token);
-			} else {
-				var symbol:FieldSymbol = token.symbol;
-				for each (var a:AttributeProxy in _view.attributes) {
-					for each (var f:FieldProxy in a.fields) {
-						f.symbol = symbol;
-					}
-				}
-				dispatchUpdateResultReceivedEvent(event, token);
-			}
-		}
-		
-		override protected function applyRemarksResultHandler(event:ResultEvent, token:Object=null):void {
-			if(! _view.attributeDefinition.multiple) {
-				super.applyRemarksResultHandler(event, token);
-			} else {
-				var remarks:String = token.remarks;
-				for each (var a:AttributeProxy in _view.attributes) {
-					for each (var f:FieldProxy in a.fields) {
-						f.remarks = remarks;
-					}
-				}
-				dispatchUpdateResultReceivedEvent(event, token);
-			}
-		}
-
-		override protected function applySymbolResultHandler(event:ResultEvent, token:Object=null):void {
-			if(_view.attributeDefinition.multiple) {
-				var symbol:FieldSymbol = token.symbol;
-				for each (var a:AttributeProxy in _view.attributes) {
-					a.getField(0).symbol = symbol;
-				}
-				dispatchUpdateResultReceivedEvent(event, token);
-			} else {
-				super.applySymbolResultHandler(event, token);
-			}
-		}
-/*
-		var responses:IList = IList(event.result);
-		for each (var resp:UpdateResponse in responses)	{
-			if(!isNaN(resp.updatedFieldIndex)) {
-				if(resp.nodeId == _view.attribute.id) {
-					f.value = resp.updateFieldValue;
-				}
-			}
-		}
-		*/
 		override protected function getRemarks():String {
 			if(_view.attributeDefinition.multiple) {
 				if(CollectionUtil.isNotEmpty(_view.attributes)) {
