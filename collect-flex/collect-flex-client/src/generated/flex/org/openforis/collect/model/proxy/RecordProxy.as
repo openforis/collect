@@ -66,50 +66,19 @@ package org.openforis.collect.model.proxy {
 					if(response.minCountValidation != null) {
 						
 					}
-					if(response.relevant != null) {
-						
+					if(response.relevant != null && response.relevant.length > 0) {
+						e.updateChildrenRelevanceMap(response.relevant);
 					}
-					if(response.required != null) {
-						
+					if(response.required != null && response.required.length > 0) {
+						e.updateChildrenRequiredMap(response.required);
 					}
 				}
 			}
-			
-			
-			//remove nodes
-			/*for each (var id:int in response.deletedNodeIds) {
-				oldNode = getNode(id);
-				if(oldNode != null) {
-					parent = EntityProxy(getNode(oldNode.parentId));
-					if(parent != null) {
-						oldNode = parent.getChildById(id);
-						parent.removeChild(oldNode);
-					}
-				}
-			}*/
-			//add new nodes
-			/*for each (node in response.addedNodes) {
-				parent = EntityProxy(getNode(node.parentId));
-				parent.addChild(node);
-			}*/
-			
-			//replace updated nodes
-			/*for each (node in response.updatedNodes) {
-				oldNode = getNode(node.id);
-				parent = EntityProxy(getNode(oldNode.parentId));
-				parent.replaceChild(oldNode, node);
-			}*/
-			
-			//update node state
-			/*
-			for each (var state:NodeStateProxy in response.states) {
-				node = getNode(state.nodeId);
-				node.state = state;
-			}
-			*/
 		}
 		
 		private function updateMaxCountValidations(value:ValidationResultsProxy):void {
 		}
+		
+		
     }
 }

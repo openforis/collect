@@ -12,6 +12,7 @@ package org.openforis.collect.model.proxy {
 	import mx.collections.ArrayList;
 	import mx.collections.IList;
 	
+	import org.granite.collections.IMap;
 	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 	import org.openforis.collect.util.CollectionUtil;
@@ -161,5 +162,21 @@ package org.openforis.collect.model.proxy {
 			}
 			return StringUtil.concat(" - ", keyParts);
 		}
-    }
+		
+		public function updateChildrenRelevanceMap(relevanceMap:IMap):void {
+			var nodeNames:ArrayCollection = relevanceMap.keySet;
+			for each (var name:String in nodeNames)	{
+				var relevant:* = relevanceMap.get(name);
+				this.childrenRelevanceMap.put(name, relevant);
+			}
+		}
+
+		public function updateChildrenRequiredMap(requiredMap:IMap):void {
+			var nodeNames:ArrayCollection = requiredMap.keySet;
+			for each (var name:String in nodeNames)	{
+				var required:* = requiredMap.get(name);
+				this.childrenRequiredMap.put(name, required);
+			}
+		}
+	}
 }
