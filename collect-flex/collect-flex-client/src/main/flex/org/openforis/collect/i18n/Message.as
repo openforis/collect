@@ -3,6 +3,7 @@ package org.openforis.collect.i18n {
 
 	/**
 	 * @author Mino Togna
+	 * @author S. Ricci
 	 * */
 	public class Message {
 		
@@ -10,7 +11,12 @@ package org.openforis.collect.i18n {
 		}
 		
 		public static function get(resource:String, parameters:Array=null, bundle:String="messages"):String {
-			return ResourceManager.getInstance().getString(bundle, resource, parameters);
+			var message:String = ResourceManager.getInstance().getString(bundle, resource, parameters);
+			if(message != null) {
+				return message;
+			} else {
+				return resource;
+			}
 		} 
 	}
 }
