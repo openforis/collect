@@ -13,6 +13,8 @@ package org.openforis.collect.client {
 	import org.openforis.collect.i18n.Message;
 	import org.openforis.collect.model.proxy.FieldProxy;
 	import org.openforis.collect.remoting.service.UpdateRequest;
+	import org.openforis.collect.ui.component.input.InputField;
+	import org.openforis.collect.util.AlertUtil;
 	
 	/**
 	 * 
@@ -81,8 +83,9 @@ package org.openforis.collect.client {
 			token.addResponder(responder);
 		}
 		
-		public function updateActiveRecord(request:UpdateRequest, resultHandler:Function = null, faultHandler:Function = null, token:Object = null):void {
-			this._updateQueueProcessor.appendOperation(resultHandler, faultHandler, token, this._updateActiveRecordOperation, request);
+		public function updateActiveRecord(request:UpdateRequest, token:UpdateRequestToken = null, 
+										   resultHandler:Function = null, faultHandler:Function = null):void {
+			this._updateQueueProcessor.appendOperation(token, resultHandler, faultHandler, _updateActiveRecordOperation, request);
 		}
 		
 		public function submitRecord(responder:IResponder, id:int):void {
@@ -103,13 +106,6 @@ package org.openforis.collect.client {
 		public function getCodeListItems(responder:IResponder, parentEntityId:int, attribute:String, codes:Array):void {
 			var token:AsyncToken = this._getCodeListItemsOperation.send(parentEntityId, attribute, codes);
 			token.addResponder(responder);
-		}
-		
-		protected function updateFaultHandler(event:FaultEvent):void {
-			Alert.show(Message.get("global.faultHandlerMsg")
-				+"\n\n"+ event.fault.faultCode
-				+"\n\n"+ event.fault.faultString
-			);
 		}
 		
 		protected function updateResultHandler(event:ResultEvent, token:UpdateRequestToken):void {
@@ -137,5 +133,29 @@ package org.openforis.collect.client {
 			EventDispatcherFactory.getEventDispatcher().dispatchEvent(appEvt);
 		}
 
+		protected function updateFaultHandler(event:FaultEvent):void {
+			AlertUtil.showConfirm("global.confirmRetryUpdate", 
+				[event.fault.faultCode, event.fault.faultString], null, 
+				retryUpdateHandler, doNotRetryUpdateHandler);
+		}
+		
+		protected function retryUpdateHandler():void {
+			_updateQueueProcessor.sendHeadRemoteCall();
+		}
+		
+		protected function doNotRetryUpdateHandler():void {
+			var call:RemoteCallWrapper = _updateQueueProcessor.removeHeadOperation();
+			if(call != null && call.token != null && call.token is UpdateRequestToken) {
+				var token:UpdateRequestToken = UpdateRequestToken(call.token);
+				var inputField:InputField = token.inputField;
+				if(inputField != null) {
+					inputField.undo();
+					if(inputField.textInput != null) {
+						inputField.textInput.setFocus();
+					}
+				}
+			}
+		}
+		
 	}
 }

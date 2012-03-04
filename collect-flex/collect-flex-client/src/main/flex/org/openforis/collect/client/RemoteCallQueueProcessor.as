@@ -31,16 +31,24 @@ package org.openforis.collect.client {
 			return this._queue.isEmpty();
 		}
 		
-		public function appendOperation(resultHandler:Function, faultHandler:Function, token:Object, operation:AbstractOperation, ... args:Array):void {
+		public function appendOperation(token:Object, resultHandler:Function, faultHandler:Function, operation:AbstractOperation, ... args:Array):void {
 			var queueItem:RemoteCallWrapper = new RemoteCallWrapper(operation, args);
+			queueItem.token = token;
 			queueItem.resultHandler = resultHandler;
 			queueItem.faultHandler = faultHandler;
-			queueItem.token = token;
 			_queue.push(queueItem);
 			sendHeadRemoteCall();
 		}
 		
-		protected function sendHeadRemoteCall():void {
+		public function removeHeadOperation():RemoteCallWrapper {
+			if(_queue.isEmpty()) {
+				return null;
+			}
+			var call:RemoteCallWrapper = RemoteCallWrapper(_queue.pop());
+			return call;
+		}
+		
+		public function sendHeadRemoteCall():void {
 			if(_queue.isEmpty()) {
 				return;
 			}
@@ -65,13 +73,13 @@ package org.openforis.collect.client {
 			//after it fails 3 times, the system has to be stopped.
 			var call:RemoteCallWrapper = getHeadElement();
 			if(call.attempts >= _maxAttempts){
+				call.reset();
 				if(_faultHandler != null) {
 					_faultHandler(event);
 					if(call.faultHandler != null) {
 						call.faultHandler(event, token);
 					}
 				}
-				_queue.pop();
 			} else {
 				call.reset();
 				sendHeadRemoteCall();
