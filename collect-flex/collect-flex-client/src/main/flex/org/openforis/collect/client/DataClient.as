@@ -133,9 +133,11 @@ package org.openforis.collect.client {
 			EventDispatcherFactory.getEventDispatcher().dispatchEvent(appEvt);
 		}
 
-		protected function updateFaultHandler(event:FaultEvent):void {
+		protected function updateFaultHandler(event:FaultEvent, token:UpdateRequestToken):void {
+			var inputField:InputField = token != null ? token.inputField: null;
+			var fieldLabel:String = inputField != null ? inputField.attributeDefinition.getLabelText(): "";
 			AlertUtil.showConfirm("global.confirmRetryUpdate", 
-				[event.fault.faultCode, event.fault.faultString], null, 
+				[fieldLabel, event.fault.faultCode, event.fault.faultString], null, 
 				retryUpdateHandler, doNotRetryUpdateHandler);
 		}
 		

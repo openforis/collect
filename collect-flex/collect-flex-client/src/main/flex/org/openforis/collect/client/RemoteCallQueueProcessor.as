@@ -75,7 +75,7 @@ package org.openforis.collect.client {
 			if(call.attempts >= _maxAttempts){
 				call.reset();
 				if(_faultHandler != null) {
-					_faultHandler(event);
+					_faultHandler(event, token);
 					if(call.faultHandler != null) {
 						call.faultHandler(event, token);
 					}
