@@ -20,7 +20,10 @@ package org.openforis.collect.presenter
 	 */
 	public class EntityFormItemPresenter extends FormItemPresenter {
 		
+		protected var _validationDisplayManager:ValidationDisplayManager;
+		
 		public function EntityFormItemPresenter(view:EntityFormItem) {
+			_validationDisplayManager = new ValidationDisplayManager(view, view);
 			super(view);
 			initNodeDefinitions();
 		}
@@ -59,7 +62,7 @@ package org.openforis.collect.presenter
 				var responses:IList = IList(event.result);
 				for each (var response:UpdateResponse in responses) {
 					if(response.nodeId == _view.parentEntity.id) {
-						updateRelevance();
+						_validationDisplayManager.initByNode(view.parentEntity, view.entityDefinition);
 						break;
 					}
 				}
@@ -73,19 +76,10 @@ package org.openforis.collect.presenter
 				entity = view.parentEntity.getChild(view.entityDefinition.name, 0) as EntityProxy;
 			}
 			view.entity = entity;
-			updateRelevance();
-		}
-
-		protected function updateRelevance():void {
 			if(view.parentEntity != null) {
-				var relevant:Boolean = view.parentEntity.childrenRelevanceMap.get(view.entityDefinition.name);
-				if(relevant) {
-					UIUtil.removeStyleName(_view, ValidationDisplayManager.STYLE_NAME_NOT_RELEVANT);
-				} else {
-					UIUtil.addStyleName(_view, ValidationDisplayManager.STYLE_NAME_NOT_RELEVANT);
-				}
+				_validationDisplayManager.initByNode(view.parentEntity, view.entityDefinition);
 			}
 		}
-		
+
 	}
 }

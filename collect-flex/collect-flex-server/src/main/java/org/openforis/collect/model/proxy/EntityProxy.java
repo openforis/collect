@@ -77,6 +77,30 @@ public class EntityProxy extends NodeProxy {
 		return map;
 	}
 	
+	@ExternalizedProperty
+	public Map<String, Boolean> getChildrenMinCountValidityMap(){
+		List<NodeDefinition> childDefinitions = getChildDefinitions();
+		Map<String, Boolean> map = new HashMap<String, Boolean>();
+		for (NodeDefinition childDefinition : childDefinitions) {
+			String childName = childDefinition.getName();
+			boolean valid = entity.validateMinCount(childName);
+			map.put(childName, valid);
+		}
+		return map;
+	}
+
+	@ExternalizedProperty
+	public Map<String, Boolean> getChildrenMaxCountValidityMap(){
+		List<NodeDefinition> childDefinitions = getChildDefinitions();
+		Map<String, Boolean> map = new HashMap<String, Boolean>();
+		for (NodeDefinition childDefinition : childDefinitions) {
+			String childName = childDefinition.getName();
+			boolean valid = entity.validateMaxCount(childName);
+			map.put(childName, valid);
+		}
+		return map;
+	}
+
 	private List<NodeDefinition> getChildDefinitions() {
 		EntityDefinition definition = entity.getDefinition();
 		return definition.getChildDefinitions();

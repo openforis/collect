@@ -18,6 +18,7 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.ui.component.detail.ValidationDisplayManager;
 	import org.openforis.collect.util.AlertUtil;
 	import org.openforis.collect.util.CollectionUtil;
+	import org.openforis.collect.util.ToolTipUtil;
 	import org.openforis.collect.util.UIUtil;
 
 	/**
@@ -27,10 +28,7 @@ package org.openforis.collect.presenter
 	 */
 	public class MultipleEntityFormItemPresenter extends EntityFormItemPresenter {
 		
-		private var _validationDisplayManager:ValidationDisplayManager;
-		
 		public function MultipleEntityFormItemPresenter(view:MultipleEntityFormItem) {
-			_validationDisplayManager = new ValidationDisplayManager(view, view);
 			super(view);
 		}
 		
@@ -70,13 +68,9 @@ package org.openforis.collect.presenter
 			} else {
 				view.dataGroup.dataProvider = null;
 			}
-			/*
-			//TODO if parent has min count validation errors for this element, init validationDisplayManager
-			_validationDisplayManager.displayStyleName = ValidationDisplayManager.STYLE_NAME_ERROR;
-			_validationDisplayManager.toolTipMessage = "Error";
-			_validationDisplayManager.toolTipStyleName = ToolTipUtil.STYLE_NAME_ERROR;
-			_validationDisplayManager.init();
-			*/
+			if(view.parentEntity != null) {
+				_validationDisplayManager.initByNode(view.parentEntity, view.entityDefinition);
+			}
 		}
 		
 		protected function getEntities():IList {

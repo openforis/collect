@@ -78,23 +78,32 @@ mx|ToolTip.warning {
 
 detail|AttributeItemRenderer {
 	skinClass: ClassReference("org.openforis.collect.ui.skin.AttributeRendererSkin");
+}
+
+detail|AttributeItemRenderer, 
+	detail|MultipleAttributeFormItem s|BorderContainer, 
+	detail|SingleEntityFormItem s|BorderContainer,
+	detail|MultipleEntityFormItem s|BorderContainer  {
 	borderColor: #FFFFFF;
 	borderWeight: 1;
 }
 
-detail|MultipleEntityFormItem.error s|BorderContainer {
-	borderWeight: 1;
-}
-
-detail|AttributeItemRenderer.error, detail|MultipleEntityFormItem.error s|BorderContainer {
+detail|AttributeItemRenderer.error, 
+	detail|MultipleAttributeFormItem.error s|BorderContainer,
+	detail|SingleEntityFormItem.error s|BorderContainer,
+	detail|MultipleEntityFormItem.error s|BorderContainer {
 	borderColor: #FF0000;
 }
 
-detail|AttributeItemRenderer.warning, detail|MultipleEntityFormItem.error s|BorderContainer {
+detail|AttributeItemRenderer.warning, 
+	detail|MultipleAttributeFormItem.warning s|BorderContainer,
+	detail|SingleEntityFormItem.warning s|BorderContainer,
+	detail|MultipleEntityFormItem.warning s|BorderContainer {
 	borderColor: #FF8800;
 }
 
-input|TextInput.notRelevant, detail|AttributeItemRenderer.notRelevant input|TextInput {
+input|TextInput.notRelevant, 
+	detail|AttributeItemRenderer.notRelevant input|TextInput {
 	contentBackgroundColor: #DDDDDD;
 }
 

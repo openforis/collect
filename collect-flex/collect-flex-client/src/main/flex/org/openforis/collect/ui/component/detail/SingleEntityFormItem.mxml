@@ -5,23 +5,34 @@
 		xmlns:mx="library://ns.adobe.com/flex/mx"
 		xmlns:detail="org.openforis.collect.ui.component.detail.*"
 		>
-
-	<s:Label text="{entityDefinition.getLabelText()}" styleName="bold" />
 	
-	<s:DataGroup dataProvider="{nodeDefinitions}">
+	<s:BorderContainer id="border" 
+					   height="100%" 
+					   width="100%"
+					   minHeight="0"
+					   minWidth="0">
 		<s:layout>
-			<s:VerticalLayout gap="2" paddingLeft="20" />
+			<s:VerticalLayout />
 		</s:layout>
-		<s:itemRenderer>
-			<fx:Component>
-				<detail:FormDataGroupItemRenderer
-					modelVersion="{outerDocument.modelVersion}"
-					entity="{outerDocument.entity}"
-					isInDataGroup="false"
-					labelWidth="130"
-					/>
-			</fx:Component>
-		</s:itemRenderer>
-	</s:DataGroup>
+
+		<s:Label text="{entityDefinition.getLabelText()}" styleName="bold" />
+	
+		<s:DataGroup dataProvider="{nodeDefinitions}">
+			<s:layout>
+				<s:VerticalLayout gap="2" paddingLeft="20" />
+			</s:layout>
+			<s:itemRenderer>
+				<fx:Component>
+					<detail:FormDataGroupItemRenderer
+						modelVersion="{outerDocument.modelVersion}"
+						entity="{outerDocument.entity}"
+						isInDataGroup="false"
+						labelWidth="130"
+						/>
+				</fx:Component>
+			</s:itemRenderer>
+		</s:DataGroup>
+		
+	</s:BorderContainer>
 	
 </detail:EntityFormItem>

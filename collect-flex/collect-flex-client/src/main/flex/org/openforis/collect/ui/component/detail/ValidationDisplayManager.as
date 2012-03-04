@@ -1,14 +1,16 @@
 package org.openforis.collect.ui.component.detail
 {
-	import flash.display.DisplayObject;
 	import flash.events.MouseEvent;
 	
 	import mx.core.IToolTip;
 	import mx.core.UIComponent;
 	
+	import org.openforis.collect.i18n.Message;
+	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
+	import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
 	import org.openforis.collect.model.proxy.AttributeProxy;
+	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.model.proxy.NodeStateProxy;
-	import org.openforis.collect.model.proxy.ValidationResultsProxy;
 	import org.openforis.collect.util.ToolTipUtil;
 	import org.openforis.collect.util.UIUtil;
 
@@ -49,14 +51,7 @@ package org.openforis.collect.ui.component.detail
 		}
 		
 		public function init():void {
-			hideToolTip();
-			_toolTipTrigger.removeEventListener(MouseEvent.ROLL_OVER, showToolTip);
-			_toolTipTrigger.removeEventListener(MouseEvent.ROLL_OUT, hideToolTip);
-			UIUtil.removeStyleNames(_display, [
-				STYLE_NAME_ERROR, 
-				STYLE_NAME_WARNING, 
-				STYLE_NAME_NOT_RELEVANT
-			]);
+			reset();
 			if(_toolTipStyleName != null) {
 				if(! _toolTipTrigger.hasEventListener(MouseEvent.ROLL_OVER)) {
 					_toolTipTrigger.addEventListener(MouseEvent.ROLL_OVER, showToolTip);
@@ -68,44 +63,50 @@ package org.openforis.collect.ui.component.detail
 			}
 		}
 		
-		public function initByState(state:NodeStateProxy):void {
+		public function reset():void {
+			hideToolTip();
+			_toolTipTrigger.removeEventListener(MouseEvent.ROLL_OVER, showToolTip);
+			_toolTipTrigger.removeEventListener(MouseEvent.ROLL_OUT, hideToolTip);
+			UIUtil.removeStyleNames(_display, [
+				STYLE_NAME_ERROR, 
+				STYLE_NAME_WARNING, 
+				STYLE_NAME_NOT_RELEVANT
+			]);
+		}
+		
+		public function initByNode(parentEntity:EntityProxy, defn:NodeDefinitionProxy, attribute:AttributeProxy = null):void {
 			_displayStyleName = null;
 			_toolTipStyleName = null;
 			_toolTipMessage = null;
-			if(state != null) {
-				var hasErrors:Boolean = state.hasErrors();
-				var hasWarnings:Boolean = state.hasWarnings();
-				
-				if(! state.relevant) {
-					_displayStyleName = STYLE_NAME_NOT_RELEVANT;
-				} else if(hasErrors || hasWarnings) {
-					_toolTipStyleName = hasErrors ? ToolTipUtil.STYLE_NAME_ERROR: ToolTipUtil.STYLE_NAME_WARNING;
-					_toolTipMessage = state.validationMessage;
-					_displayStyleName = hasErrors ? STYLE_NAME_ERROR: STYLE_NAME_WARNING;
+			if(parentEntity != null && defn != null) {
+				var hasErrors:Boolean = attribute != null ? attribute.hasErrors(): false;
+				var hasWarnings:Boolean = attribute != null ? attribute.hasWarnings(): false;
+				var name:String = defn.name;
+				var minCountValid:Boolean = parentEntity.childrenMinCountValidityMap.get(name);
+				var maxCountValid:Boolean = parentEntity.childrenMaxCountValidityMap.get(name);
+				var relevant:Boolean = parentEntity.childrenRelevanceMap.get(name);
+				var required:Boolean = parentEntity.childrenRequiredMap.get(name);
+				if(hasErrors || hasWarnings) {
+					_toolTipStyleName = hasWarnings ? ToolTipUtil.STYLE_NAME_WARNING: ToolTipUtil.STYLE_NAME_ERROR;
+					_displayStyleName = hasWarnings ? STYLE_NAME_WARNING: STYLE_NAME_ERROR;
+					_toolTipMessage = attribute.validationMessage;
+				} else if(!minCountValid || !maxCountValid) {
+					_toolTipStyleName = ToolTipUtil.STYLE_NAME_ERROR;
+					_displayStyleName = STYLE_NAME_ERROR;
+					if(!minCountValid) {
+						_toolTipMessage = Message.get("edit.validation.minCount", [defn.minCount]);
+					} else {
+						_toolTipMessage = Message.get("edit.validation.maxCount", [defn.maxCount]);
+					}
+				}
+				if(! relevant) {
+					_displayStyleName += " " + ValidationDisplayManager.STYLE_NAME_NOT_RELEVANT;
 				}
 			}
 			init();
 		}
 		
-		public function initByAttribute(a:AttributeProxy):void {
-			_displayStyleName = null;
-			_toolTipStyleName = null;
-			_toolTipMessage = null;
-			if(a != null) {
-				var hasErrors:Boolean = a.hasErrors();
-				var hasWarnings:Boolean = a.hasWarnings();
-				
-				/*if(! state.relevant) {
-					_displayStyleName = STYLE_NAME_NOT_RELEVANT;
-				} else */
-				if(hasErrors || hasWarnings) {
-					_toolTipStyleName = hasErrors ? ToolTipUtil.STYLE_NAME_ERROR: ToolTipUtil.STYLE_NAME_WARNING;
-					_toolTipMessage = a.validationMessage;
-					_displayStyleName = hasErrors ? STYLE_NAME_ERROR: STYLE_NAME_WARNING;
-				}
-			}
-			init();
-		}
+		
 		
 		protected function showToolTip(event:MouseEvent = null):void {
 			if(_toolTip != null){

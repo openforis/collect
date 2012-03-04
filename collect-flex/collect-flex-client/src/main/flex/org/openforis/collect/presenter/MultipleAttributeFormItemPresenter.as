@@ -66,27 +66,20 @@ package org.openforis.collect.presenter
 		protected function addButtonClickHandler(event:MouseEvent):void {
 			var attributes:IList = getAttributes();
 			var maxCount:Number = view.attributeDefinition.maxCount
-			if(isNaN(maxCount) || CollectionUtil.isEmpty(attributes) || attributes.length < maxCount) {
+			//if(isNaN(maxCount) || CollectionUtil.isEmpty(attributes) || attributes.length < maxCount) {
 				var o:UpdateRequestOperation = new UpdateRequestOperation();
 				o.method = UpdateRequestOperation$Method.ADD;
 				o.parentEntityId = view.parentEntity.id;
 				o.nodeName = view.attributeDefinition.name;
 				var req:UpdateRequest = new UpdateRequest(o);
 				ClientFactory.dataClient.updateActiveRecord(req, null, addResultHandler);
-			} else {
+			/*} else {
 				var labelText:String = view.attributeDefinition.getLabelText();
 				AlertUtil.showError("edit.maxCountExceed", [maxCount, labelText]);
-			}	
+			}*/	
 		}
 		
 		protected function addResultHandler(event:ResultEvent, token:Object = null):void {
-			/*
-			var responses:IList = IList(event.result);
-			Application.activeRecord.update(responses);
-			var appEvt:ApplicationEvent = new ApplicationEvent(ApplicationEvent.UPDATE_RESPONSE_RECEIVED);
-			appEvt.result = responses;
-			eventDispatcher.dispatchEvent(appEvt);
-			*/
 			view.callLater(function():void {
 				UIUtil.ensureElementIsVisible(view.addButton);
 			});

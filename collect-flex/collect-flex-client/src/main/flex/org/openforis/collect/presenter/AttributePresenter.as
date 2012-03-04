@@ -25,9 +25,6 @@ package org.openforis.collect.presenter {
 			_view = view;
 			
 			initValidationDisplayManager();
-			if(_view.parentEntity != null) {
-				updateRelevance();
-			}
 			super();
 		}
 		
@@ -43,37 +40,29 @@ package org.openforis.collect.presenter {
 			var validationToolTipTrigger:UIComponent = validationStateDisplay;
 			_validationDisplayManager = new ValidationDisplayManager(validationToolTipTrigger, validationStateDisplay);
 			if(_view.attribute != null) {
-				_validationDisplayManager.initByAttribute(_view.attribute);
+				updateValidationDisplayManager();
 			}
 		}
 		
 		protected function attributeChangeHandler(event:Event):void {
-			_validationDisplayManager.initByAttribute(_view.attribute);
-			updateRelevance();
+			updateValidationDisplayManager();
 		}
 		
 		protected function updateResponseReceivedHandler(event:ApplicationEvent):void {
 			if(_view.attribute != null) {
 				var responses:IList = IList(event.result);
 				for each (var response:UpdateResponse in responses) {
-					if(response.nodeId == _view.attribute.id) {
-						_validationDisplayManager.initByAttribute(_view.attribute);
-					} else if(response.nodeId == _view.parentEntity.id) {
-						updateRelevance();
+					if(response.nodeId == _view.attribute.id ||
+						response.nodeId == _view.parentEntity.id) {
+						updateValidationDisplayManager();
+						break;
 					}
 				}
 			}
 		}
 		
-		protected function updateRelevance():void {
-			if(_view.parentEntity != null && _view.attributeDefinition != null) {
-				var relevant:Boolean = _view.parentEntity.childrenRelevanceMap.get(_view.attributeDefinition.name);
-				if(relevant) {
-					UIUtil.removeStyleName(_view, ValidationDisplayManager.STYLE_NAME_NOT_RELEVANT);
-				} else {
-					UIUtil.addStyleName(_view, ValidationDisplayManager.STYLE_NAME_NOT_RELEVANT);
-				}
-			}
+		protected function updateValidationDisplayManager():void {
+			_validationDisplayManager.initByNode(_view.parentEntity, _view.attributeDefinition, _view.attribute);
 		}
 	}
 }
