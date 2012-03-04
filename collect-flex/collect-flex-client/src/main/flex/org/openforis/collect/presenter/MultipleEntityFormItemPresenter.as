@@ -98,7 +98,7 @@ package org.openforis.collect.presenter
 				o.parentEntityId = view.parentEntity.id;
 				o.nodeName = view.entityDefinition.name;
 				var req:UpdateRequest = new UpdateRequest(o);
-				ClientFactory.dataClient.updateActiveRecord(req, addResultHandler, faultHandler);
+				ClientFactory.dataClient.updateActiveRecord(req, null, addResultHandler);
 			} else {
 				var labelText:String = view.entityDefinition.getLabelText();
 				AlertUtil.showError("edit.maxCountExceed", [maxCount, labelText]);

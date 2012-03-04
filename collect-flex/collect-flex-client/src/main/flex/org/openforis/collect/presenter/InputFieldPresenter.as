@@ -193,9 +193,9 @@ package org.openforis.collect.presenter {
 			return o;
 		}
 		
-		protected function sendRequestOperation(o:UpdateRequestOperation, token:Object):void {
+		protected function sendRequestOperation(o:UpdateRequestOperation, token:UpdateRequestToken):void {
 			var req:UpdateRequest = new UpdateRequest(o);
-			dataClient.updateActiveRecord(req, updateResultHandler, updateFaultHandler, token);
+			dataClient.updateActiveRecord(req, token, updateResultHandler);
 		}
 		
 		protected function getUpdateRequestOperation(method:UpdateRequestOperation$Method, nodeId:Number, 
@@ -214,17 +214,8 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function updateResultHandler(event:ResultEvent, token:UpdateRequestToken):void {
-			if(_view.attribute != null) {
-			_view.attribute.validationResults = null;
-			}
 			_changed = false;
 			//_view.currentState = InputField.STATE_SAVE_COMPLETE;
-		}
-		
-		protected function updateFaultHandler(event:FaultEvent, token:Object = null):void {
-			//_view.currentState = InputField.STATE_ERROR_SAVING;
-			undoLastChange();
-			faultHandler(event, token);
 		}
 		
 		protected function getTextFromValue():String {

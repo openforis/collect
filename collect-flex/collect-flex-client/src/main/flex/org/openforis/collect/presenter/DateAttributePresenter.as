@@ -71,7 +71,7 @@ package org.openforis.collect.presenter {
 			}
 			var req:UpdateRequest = new UpdateRequest();
 			req.operations = operations;
-			dataClient.updateActiveRecord(req, updateResultHandler, updateFaultHandler);
+			dataClient.updateActiveRecord(req);
 		}
 		
 		protected function getDateFromFields():Date {
@@ -83,21 +83,6 @@ package org.openforis.collect.presenter {
 				return tempDate;
 			}
 			return null;
-		}
-		
-		protected function updateResultHandler(event:ResultEvent, token:Object = null):void {
-			/*
-			var responses:IList = IList(event.result);
-			Application.activeRecord.update(responses);
-			var appEvt:ApplicationEvent = new ApplicationEvent(ApplicationEvent.UPDATE_RESPONSE_RECEIVED);
-			appEvt.result = responses;
-			eventDispatcher.dispatchEvent(appEvt);
-			*/
-		}
-		
-		protected function updateFaultHandler(event:FaultEvent, token:Object = null):void {
-			//undoLastChange();
-			faultHandler(event, token);
 		}
 		
 		protected function get dataClient():DataClient {

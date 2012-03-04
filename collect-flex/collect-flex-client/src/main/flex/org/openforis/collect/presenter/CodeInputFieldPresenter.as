@@ -203,7 +203,7 @@ package org.openforis.collect.presenter {
 				var token:UpdateRequestToken = new UpdateRequestToken(UpdateRequestToken.TYPE_UPDATE_VALUE, _view);
 				token.symbol = symbol;
 				token.remarks = remarks;
-				dataClient.updateActiveRecord(req, updateResultHandler, updateFaultHandler, token);
+				dataClient.updateActiveRecord(req, token, updateResultHandler);
 			} else {
 				super.applyValue();
 			}
@@ -227,7 +227,7 @@ package org.openforis.collect.presenter {
 				var token:UpdateRequestToken = new UpdateRequestToken(UpdateRequestToken.TYPE_UPDATE_REMARKS, _view);
 				token.remarks = remarks;
 				token.updatedFields = updatedFields;
-				dataClient.updateActiveRecord(req, updateResultHandler, updateFaultHandler, token);
+				dataClient.updateActiveRecord(req, token, updateResultHandler);
 			} else {
 				super.applyRemarks(remarks);
 			}
@@ -250,7 +250,7 @@ package org.openforis.collect.presenter {
 				var token:UpdateRequestToken = new UpdateRequestToken(UpdateRequestToken.TYPE_UPDATE_SYMBOL, _view);
 				token.updatedFields = updatedFields;
 				token.symbol = symbol;
-				dataClient.updateActiveRecord(req, updateResultHandler, updateFaultHandler, token);
+				dataClient.updateActiveRecord(req, token, updateResultHandler);
 			} else {
 				super.applySymbol(symbol);
 			}

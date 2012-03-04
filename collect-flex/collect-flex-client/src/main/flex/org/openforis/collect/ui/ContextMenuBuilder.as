@@ -196,7 +196,7 @@ package org.openforis.collect.ui
 			}
 			o.method = UpdateRequestOperation$Method.DELETE;
 			var req:UpdateRequest = new UpdateRequest(o);
-			ClientFactory.dataClient.updateActiveRecord(req, updateFieldResultHandler, updateFieldFaultHandler);
+			ClientFactory.dataClient.updateActiveRecord(req);
 		}
 		
 		protected static function performDeleteEntity():void {
@@ -209,7 +209,7 @@ package org.openforis.collect.ui
 			o.nodeName = entity.name;
 			o.nodeId = entity.id;
 			req.operations.addItem(o);
-			ClientFactory.dataClient.updateActiveRecord(req, updateFieldResultHandler, updateFieldFaultHandler);
+			ClientFactory.dataClient.updateActiveRecord(req);
 		}
 
 		protected static function setReasonBlankInChildren(entity:EntityProxy, symbol:FieldSymbol):void {
@@ -242,29 +242,9 @@ package org.openforis.collect.ui
 				var token:UpdateRequestToken = new UpdateRequestToken(UpdateRequestToken.TYPE_UPDATE_SYMBOL);
 				token.updatedFields = updatedFields;
 				token.symbol = symbol;
-				ClientFactory.dataClient.updateActiveRecord(req, updateFieldResultHandler, updateFieldFaultHandler, token);
+				ClientFactory.dataClient.updateActiveRecord(req, token);
 			}
 		}
 		
-		protected static function updateFieldResultHandler(event:ResultEvent, token:UpdateRequestToken = null):void {
-			/*
-			if(token != null && token.updatedFields != null) {
-				for each (var field:FieldProxy in token.updatedFields) {
-					field.symbol = token.symbol;
-				}
-			}
-			var responses:IList = IList(event.result);
-			Application.activeRecord.update(responses);
-			var appEvt:ApplicationEvent = new ApplicationEvent(ApplicationEvent.UPDATE_RESPONSE_RECEIVED);
-			appEvt.result = responses;
-			EventDispatcherFactory.getEventDispatcher().dispatchEvent(appEvt);
-			*/
-		}
-		
-		protected static function updateFieldFaultHandler(event:FaultEvent, token:UpdateRequestToken = null):void {
-			
-		}
-		
-
 	}
 }
