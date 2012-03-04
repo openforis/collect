@@ -1,9 +1,3 @@
-DROP SEQUENCE "collect"."ofc_entity_id_seq" 
-GO
-
-DROP SEQUENCE "collect"."ofc_attribute_value_id_seq" 
-GO
-
 DROP SEQUENCE "collect"."ofc_record_id_seq" 
 GO
 
@@ -32,54 +26,35 @@ GO
 --- BEGIN GENERATED CODE ---
 ----------------------------
 
-DROP INDEX "collect"."ofc_attribute_value_record_idx"
-GO
-DROP INDEX "collect"."ofc_entity_record_idx"
-GO
-ALTER TABLE "collect"."ofc_attribute_value"
-	DROP CONSTRAINT "ofc_attribute_value_entity_fkey" CASCADE 
-GO
 ALTER TABLE "collect"."ofc_record"
 	DROP CONSTRAINT "record_submitted_record_fkey" CASCADE 
-GO
-ALTER TABLE "collect"."ofc_attribute_value"
-	DROP CONSTRAINT "ofc_attribute_value_record_fkey" CASCADE 
-GO
-ALTER TABLE "collect"."ofc_entity"
-	DROP CONSTRAINT "ofc_entity_record_fkey" CASCADE 
 GO
 ALTER TABLE "collect"."ofc_record"
 	DROP CONSTRAINT "record_root_entity_fkey" CASCADE 
 GO
-ALTER TABLE "collect"."ofc_entity"
-	DROP CONSTRAINT "ofc_entity_definition_fkey" CASCADE 
-GO
-ALTER TABLE "collect"."ofc_attribute_value"
-	DROP CONSTRAINT "ofc_attribute_value_schema_definition_fkey" CASCADE 
-GO
 ALTER TABLE "collect"."ofc_schema_definition"
 	DROP CONSTRAINT "schema_definition_survey_fkey" CASCADE 
-GO
-ALTER TABLE "collect"."ofc_taxon"
-	DROP CONSTRAINT "ofc_taxon_parent_fkey" CASCADE 
 GO
 ALTER TABLE "collect"."ofc_taxon_vernacular_name"
 	DROP CONSTRAINT "ofc_taxon_vernacular_name_taxon_fkey" CASCADE 
 GO
 ALTER TABLE "collect"."ofc_taxon"
+	DROP CONSTRAINT "ofc_taxon_parent_fkey" CASCADE 
+GO
+ALTER TABLE "collect"."ofc_taxon"
 	DROP CONSTRAINT "ofc_taxon_taxonomy_fkey" CASCADE 
 GO
-ALTER TABLE "collect"."ofc_record"
-	DROP CONSTRAINT "ofc_record_created_by_user_fkey" CASCADE 
+ALTER TABLE "collect"."ofc_user_role"
+	DROP CONSTRAINT "ofc_user_user_role_fkey" CASCADE 
 GO
 ALTER TABLE "collect"."ofc_record"
 	DROP CONSTRAINT "ofc_record_locked_by_user_fkey" CASCADE 
 GO
 ALTER TABLE "collect"."ofc_record"
-	DROP CONSTRAINT "ofc_record_modified_by_user_fkey" CASCADE 
+	DROP CONSTRAINT "ofc_record_created_by_user_fkey" CASCADE 
 GO
-ALTER TABLE "collect"."ofc_user_role"
-	DROP CONSTRAINT "ofc_user_user_role_fkey" CASCADE 
+ALTER TABLE "collect"."ofc_record"
+	DROP CONSTRAINT "ofc_record_modified_by_user_fkey" CASCADE 
 GO
 ALTER TABLE "collect"."ofc_survey"
 	DROP CONSTRAINT "ofc_survey_name_key" CASCADE 
@@ -89,10 +64,6 @@ ALTER TABLE "collect"."ofc_survey"
 GO
 ALTER TABLE "collect"."ofc_taxonomy"
 	DROP CONSTRAINT "ofc_taxonomy_name_key" CASCADE 
-GO
-DROP TABLE IF EXISTS "collect"."ofc_attribute_value"
-GO
-DROP TABLE IF EXISTS "collect"."ofc_entity"
 GO
 DROP TABLE IF EXISTS "collect"."ofc_logo"
 GO

@@ -65,5 +65,4 @@ public class FieldProxy implements Proxy {
 	public void setRemarks(String remarks) {
 		this.remarks = remarks;
 	}
-
 }
