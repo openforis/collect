@@ -1,8 +1,8 @@
 package org.openforis.collect.persistence;
 
 
-import static org.openforis.collect.persistence.jooq.Sequences.OFC_RECORD_ID_SEQ;
 import static org.openforis.collect.persistence.jooq.tables.OfcRecord.OFC_RECORD;
+import static org.openforis.collect.persistence.jooq.Sequences.OFC_RECORD_ID_SEQ;
 import static org.openforis.collect.persistence.jooq.tables.OfcUser.OFC_USER;
 
 import java.util.ArrayList;
@@ -10,6 +10,7 @@ import java.util.List;
 
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.InsertQuery;
 import org.jooq.InsertSetMoreStep;
 import org.jooq.Record;
 import org.jooq.Result;
@@ -305,10 +306,14 @@ public class RecordDAO extends JooqDaoSupport {
 			throw new IllegalArgumentException("Null schema object definition id");
 		}
 		
-		byte[] data = modelSerializer.toByteArray(rootEntity);
+		 modelSerializer.writeTo(output, entity)
 		
 		Factory jf = getJooqFactory();
 		int recordId = jf.nextval(OFC_RECORD_ID_SEQ).intValue();
+		jf.insertInto(OFC_RECORD, OFC_RECORD.ID, OFC_RECORD.ROOT_ENTITY_ID, OFC_RECORD.DATA)
+		  .values(recordId, rootEntityId, "?")
+		  .bind(1, value);
+		
 		InsertSetMoreStep<OfcRecordRecord> setStep = jf.insertInto(OFC_RECORD)
 				.set(OFC_RECORD.ID, recordId)
 				.set(OFC_RECORD.ROOT_ENTITY_ID, rootEntityId)

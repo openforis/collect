@@ -17,7 +17,7 @@ import org.openforis.idm.metamodel.validation.ValidationResults;
 import org.openforis.idm.metamodel.validation.Validator;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Entity;
-import org.openforis.idm.model.AttributeField;
+import org.openforis.idm.model.Field;
 import org.openforis.idm.model.Record;
 import org.openforis.idm.model.state.NodeState;
 
@@ -120,7 +120,7 @@ public class CollectValidator extends Validator {
 	static boolean notReasonBlankSpecified(Attribute<?, ?> attribute) {
 		int fieldCount = attribute.getFieldCount();
 		for (int i = 0; i < fieldCount; i++) {
-			AttributeField<?> field = attribute.getField(i);
+			Field<?> field = attribute.getField(i);
 			Character symbol = field.getSymbol();
 
 			if (!(ILLEGIBLE.getSymbol().equals(symbol) || BLANK_ON_FORM.getSymbol().equals(symbol) || DASH_ON_FORM.getSymbol().equals(symbol))) {
@@ -133,7 +133,7 @@ public class CollectValidator extends Validator {
 	static boolean isConfirmedValue(Attribute<?, ?> attribute) {
 		int fieldCount = attribute.getFieldCount();
 		for (int i = 0; i < fieldCount; i++) {
-			AttributeField<?> field = attribute.getField(i);
+			Field<?> field = attribute.getField(i);
 			Character symbol = field.getSymbol();
 
 			if (!CONFIRMED.getSymbol().equals(symbol)) {

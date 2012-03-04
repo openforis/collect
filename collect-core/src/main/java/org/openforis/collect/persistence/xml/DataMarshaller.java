@@ -9,7 +9,7 @@ import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Entity;
-import org.openforis.idm.model.AttributeField;
+import org.openforis.idm.model.Field;
 import org.openforis.idm.model.Node;
 
 /**
@@ -44,7 +44,7 @@ public class DataMarshaller {
 				if (i > 0) {
 					out.write(",");
 				}
-				AttributeField<?> fld = attr.getField(i);
+				Field<?> fld = attr.getField(i);
 				write(fld, out);
 			}
 			out.write("]");
@@ -85,7 +85,7 @@ public class DataMarshaller {
 		out.write("}}");
 	}
 
-	private void write(AttributeField<?> field, Writer out) throws IOException {
+	private void write(Field<?> field, Writer out) throws IOException {
 		out.flush();
 		Object val = field.getValue();
 		if (val == null) {

@@ -12,7 +12,7 @@ import org.openforis.collect.model.FieldSymbol;
 import org.openforis.idm.model.Code;
 import org.openforis.idm.model.Coordinate;
 import org.openforis.idm.model.Date;
-import org.openforis.idm.model.AttributeField;
+import org.openforis.idm.model.Field;
 import org.openforis.idm.model.TaxonOccurrence;
 import org.openforis.idm.model.Time;
 
@@ -22,18 +22,18 @@ import org.openforis.idm.model.Time;
  */
 public class FieldProxy implements Proxy {
 
-	private transient AttributeField<?> attributeField;
+	private transient Field<?> attributeField;
 
-	public FieldProxy(AttributeField<?> field) {
+	public FieldProxy(Field<?> field) {
 		super();
 		this.attributeField = field;
 	}
 
 
-	public static List<FieldProxy> fromList(List<AttributeField<?>> list) {
+	public static List<FieldProxy> fromList(List<Field<?>> list) {
 		List<FieldProxy> proxies = new ArrayList<FieldProxy>();
 		if (list != null) {
-			for (AttributeField<?> item : list) {
+			for (Field<?> item : list) {
 				FieldProxy proxy = new FieldProxy(item);
 				proxies.add(proxy);
 			}
