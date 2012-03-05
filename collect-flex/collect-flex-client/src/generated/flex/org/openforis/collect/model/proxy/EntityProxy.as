@@ -164,19 +164,31 @@ package org.openforis.collect.model.proxy {
 		}
 		
 		public function updateChildrenMinCountValiditationMap(map:IMap):void {
-			CollectionUtil.updateMap(childrenMinCountValidationMap, map);
+			updateMap(childrenMinCountValidationMap, map);
 		}
 		
 		public function updateChildrenMaxCountValiditationMap(map:IMap):void {
-			CollectionUtil.updateMap(childrenMaxCountValidationMap, map);
+			updateMap(childrenMaxCountValidationMap, map);
 		}
 
 		public function updateChildrenRelevanceMap(map:IMap):void {
-			CollectionUtil.updateMap(childrenRelevanceMap, map);
+			updateMap(childrenRelevanceMap, map);
 		}
 
 		public function updateChildrenRequiredMap(map:IMap):void {
-			CollectionUtil.updateMap(childrenRequiredMap, map);
+			updateMap(childrenRequiredMap, map);
+		}
+		
+		protected function updateMap(map:IMap, newMap:IMap):void {
+			if(map != null && newMap != null) {
+				var newKeys:ArrayCollection = newMap.keySet;
+				for each (var key:* in newKeys) {
+					var value:* = newMap.get(key);
+					if(value != null) {
+						map.put(key, value);
+					}
+				}
+			}
 		}
 	}
 }

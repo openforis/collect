@@ -66,14 +66,5 @@ package org.openforis.collect.util
 			list.addItemAt(item, index);
 		}
 		
-		public static function updateMap(map:IMap, newMap:IMap):void {
-			if(map != null && newMap != null) {
-				var newKeys:ArrayCollection = newMap.keySet;
-				for each (var key:* in newKeys) {
-					var value:* = newMap.get(key);
-					map.put(key, value);
-				}
-			}
-		}
 	}
 }
