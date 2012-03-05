@@ -4,9 +4,11 @@ package org.openforis.collect.presenter
 	import flash.events.MouseEvent;
 	
 	import mx.binding.utils.ChangeWatcher;
+	import mx.collections.IList;
 	import mx.core.UIComponent;
 	
 	import org.openforis.collect.event.ApplicationEvent;
+	import org.openforis.collect.remoting.service.UpdateResponse;
 	import org.openforis.collect.ui.component.detail.CollectFormItem;
 	import org.openforis.collect.ui.component.detail.RelevanceDisplayManager;
 	import org.openforis.collect.ui.component.detail.ValidationDisplayManager;
@@ -42,6 +44,16 @@ package org.openforis.collect.presenter
 		}
 		
 		protected function updateResponseReceivedHandler(event:ApplicationEvent):void {
+			if(_view.parentEntity != null) {
+				var responses:IList = IList(event.result);
+				for each (var response:UpdateResponse in responses) {
+					if(response.nodeId == _view.parentEntity.id) {
+						updateValidationDisplayManager();
+						updateRelevanceDisplayManager();
+						break;
+					}
+				}
+			}
 		}
 		
 		protected function recordSavedHandler(event:ApplicationEvent):void {

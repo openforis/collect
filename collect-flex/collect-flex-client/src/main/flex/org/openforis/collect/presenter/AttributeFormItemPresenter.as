@@ -63,6 +63,11 @@ package org.openforis.collect.presenter
 			super.updateRelevanceDisplayManager();
 			relevanceDisplayManager.displayNodeRelevance(view.parentEntity, view.attributeDefinition);
 		}
+		
+		override protected function updateValidationDisplayManager(forceActivation:Boolean=false):void {
+			//validation display managed by AttributePresenter
+			return;
+		}
 
 		/**
 		 * get the attribute (or attributes) from the parentEntity

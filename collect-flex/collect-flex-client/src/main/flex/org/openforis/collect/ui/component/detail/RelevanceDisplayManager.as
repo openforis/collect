@@ -19,22 +19,16 @@ package org.openforis.collect.ui.component.detail
 		 */
 		private var _display:UIComponent;
 		
-		private var _displayStyleName:String;
-		
 		public function RelevanceDisplayManager(display:UIComponent) {
 			this._display = display;
 		}
 		
 		public function displayNodeRelevance(parentEntity:EntityProxy, defn:NodeDefinitionProxy):void {
-			_displayStyleName = "";
 			if(parentEntity != null && defn != null) {
 				var name:String = defn.name;
 				var relevant:Boolean = parentEntity.childrenRelevanceMap.get(name);
-				if(! relevant) {
-					_displayStyleName += " " + STYLE_NAME_NOT_RELEVANT;
-				}
+				apply(relevant);
 			}
-			apply();
 		}
 		
 		public function reset():void {
@@ -43,10 +37,11 @@ package org.openforis.collect.ui.component.detail
 			]);
 		}
 		
-		protected function apply():void {
-			reset();
-			if(_displayStyleName != null) {
-				UIUtil.addStyleName(_display, _displayStyleName);
+		public function apply(relevant:Boolean):void {
+			if(relevant) {
+				UIUtil.removeStyleName(_display, STYLE_NAME_NOT_RELEVANT);
+			} else {
+				UIUtil.addStyleName(_display, STYLE_NAME_NOT_RELEVANT);
 			}
 		}
 		

@@ -54,16 +54,6 @@ package org.openforis.collect.presenter
 		
 		override protected function updateResponseReceivedHandler(event:ApplicationEvent):void {
 			super.updateResponseReceivedHandler(event);
-			if(_view.parentEntity != null) {
-				var responses:IList = IList(event.result);
-				for each (var response:UpdateResponse in responses) {
-					if(response.nodeId == _view.parentEntity.id) {
-						updateValidationDisplayManager();
-						updateRelevanceDisplayManager();
-						break;
-					}
-				}
-			}
 		}
 		
 		override protected function updateView():void {

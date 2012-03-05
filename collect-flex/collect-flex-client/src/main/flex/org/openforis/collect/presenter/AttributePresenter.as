@@ -73,6 +73,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function attributeChangeHandler(event:Event):void {
+			_view.visited = false;
 			updateValidationDisplayManager();
 		}
 		
