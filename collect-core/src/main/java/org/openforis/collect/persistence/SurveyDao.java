@@ -36,6 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author G. Miceli
  * @author M. Togna
  */
+@Transactional
 public class SurveyDao extends JooqDaoSupport {
 //	private final Log LOG = LogFactory.getLog(SurveyDao.class);
 	

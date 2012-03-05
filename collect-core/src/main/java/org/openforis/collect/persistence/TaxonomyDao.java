@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * @author G. Miceli
  */
+@Transactional
 public class TaxonomyDao extends MappingJooqDaoSupport<Taxonomy, TaxonomyDao.JooqFactory> {
 
 	public TaxonomyDao() {

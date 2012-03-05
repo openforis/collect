@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author M. Togna
  * 
  */
+@Transactional
 public class UserDao extends MappingJooqDaoSupport<User, JooqFactory> {
 
 	public UserDao() {
