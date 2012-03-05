@@ -36,8 +36,8 @@ public class EntityProxy extends NodeProxy {
 		for (NodeDefinition childDefinition : childDefinitions) {
 			String name = childDefinition.getName();
 			List<Node<?>> childrenByName = this.entity.getAll(name);
+			List<NodeProxy> childrenByNameProxies = new ArrayList<NodeProxy>();
 			if(childrenByName != null) {
-				List<NodeProxy> childrenByNameProxies = new ArrayList<NodeProxy>();
 				for (Node<?> childNode : childrenByName) {
 					if(childNode instanceof Attribute) {
 						NodeProxy attributeProxy = new AttributeProxy((Attribute<?, ?>) childNode);
@@ -47,8 +47,8 @@ public class EntityProxy extends NodeProxy {
 						childrenByNameProxies.add(entityProxy);
 					}
 				}
-				result.put(name, childrenByNameProxies);
 			}
+			result.put(name, childrenByNameProxies);
 		}
 		return result;
 	}

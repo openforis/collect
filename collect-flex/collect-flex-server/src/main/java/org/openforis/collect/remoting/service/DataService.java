@@ -26,6 +26,7 @@ import org.openforis.collect.persistence.InvalidIdException;
 import org.openforis.collect.persistence.MultipleEditException;
 import org.openforis.collect.persistence.NonexistentIdException;
 import org.openforis.collect.persistence.RecordLockedException;
+import org.openforis.collect.persistence.RecordPersistenceException;
 import org.openforis.collect.remoting.service.UpdateRequestOperation.Method;
 import org.openforis.collect.session.SessionState;
 import org.openforis.collect.session.SessionState.RecordState;
@@ -74,10 +75,10 @@ public class DataService {
 	private RecordManager recordManager;
 
 	@Transactional
-	public RecordProxy loadRecord(int id) throws RecordLockedException, MultipleEditException, NonexistentIdException, AccessDeniedException {
+	public RecordProxy loadRecord(int id, int step) throws RecordPersistenceException {
 		CollectSurvey survey = getActiveSurvey();
 		User user = getUserInSession();
-		CollectRecord record = recordManager.checkout(survey, user, id);
+		CollectRecord record = recordManager.checkout(survey, user, id, step);
 		//record.updateNodeStates();
 		
 		Entity rootEntity = record.getRootEntity();
@@ -118,7 +119,7 @@ public class DataService {
 	}
 
 	@Transactional
-	public RecordProxy createRecord(String rootEntityName, String versionName) throws MultipleEditException, AccessDeniedException, RecordLockedException {
+	public RecordProxy createRecord(String rootEntityName, String versionName) throws RecordPersistenceException {
 		SessionState sessionState = sessionManager.getSessionState();
 		User user = sessionState.getUser();
 		CollectSurvey activeSurvey = sessionState.getActiveSurvey();
@@ -135,7 +136,7 @@ public class DataService {
 	}
 	
 	@Transactional
-	public void deleteRecord(int id) throws RecordLockedException, AccessDeniedException, MultipleEditException {
+	public void deleteRecord(int id) throws RecordPersistenceException {
 		SessionState sessionState = sessionManager.getSessionState();
 		User user = sessionState.getUser();
 		recordManager.delete(id, user);
@@ -148,12 +149,17 @@ public class DataService {
 		CollectRecord record = sessionState.getActiveRecord();
 		record.setModifiedDate(new java.util.Date());
 		record.setModifiedBy(sessionState.getUser());
-		recordManager.save(record);
+		try {
+			recordManager.save(record);
+		} catch (RecordPersistenceException e) {
+			//it should never be thrown
+			throw new IllegalArgumentException(e);
+		}
 		sessionState.setActiveRecordState(RecordState.SAVED);
 	}
 
 	@Transactional
-	public void deleteActiveRecord() throws RecordLockedException, AccessDeniedException, MultipleEditException {
+	public void deleteActiveRecord() throws RecordPersistenceException {
 		SessionState sessionState = sessionManager.getSessionState();
 		User user = sessionState.getUser();
 		Record record = sessionState.getActiveRecord();
@@ -441,7 +447,7 @@ public class DataService {
 	 * @throws AccessDeniedException 
 	 * @throws MultipleEditException 
 	 */
-	public void clearActiveRecord() throws RecordLockedException, AccessDeniedException, MultipleEditException {
+	public void clearActiveRecord() throws RecordPersistenceException {
 		CollectRecord activeRecord = getActiveRecord();
 		User user = getUserInSession();
 		this.recordManager.unlock(activeRecord, user);
