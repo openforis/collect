@@ -59,7 +59,6 @@ public class AttributeProxy extends NodeProxy {
 		return attribute.isEmpty();
 	}
 
-	@ExternalizedProperty
 	public ValidationResultsProxy getValidationResults(){
 		return validationResults;
 	}
@@ -67,16 +66,6 @@ public class AttributeProxy extends NodeProxy {
 	public void setValidationResults(ValidationResultsProxy value) {
 		validationResults = value;
 	}
-
-//	 @ExternalizedProperty
-//	 public boolean isRelevant() {
-//	 return attribute.isRelevant();
-//	 }
-//	
-//	 @ExternalizedProperty
-//	 public boolean isRequired() {
-//	 return attribute.isRequired();
-//	 }
 
 	@ExternalizedProperty
 	public List<FieldProxy> getFields() {
@@ -88,7 +77,5 @@ public class AttributeProxy extends NodeProxy {
 		}
 		return result;
 	}
-	
-	
 
 }

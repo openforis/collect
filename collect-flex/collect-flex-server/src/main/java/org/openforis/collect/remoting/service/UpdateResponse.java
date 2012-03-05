@@ -101,7 +101,6 @@ public class UpdateResponse implements Proxy {
 			} else if(creatednode instanceof Entity) {
 				return new EntityProxy((Entity) creatednode);
 			}
-
 		}
 		return null;
 	}
