@@ -85,6 +85,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function attributeChangeHandler(event:Event):void {
+			_view.visited = false;
 			updateView();
 		}
 		
@@ -105,6 +106,7 @@ package org.openforis.collect.presenter {
 			} else {
 				//TODO perform validation only
 			}
+			_view.visited = true;
 		}
 		
 		protected function keyDownHandler(event:KeyboardEvent):void {

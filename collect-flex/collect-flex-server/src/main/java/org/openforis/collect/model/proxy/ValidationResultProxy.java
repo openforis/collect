@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.collect.Proxy;
 import org.openforis.idm.metamodel.validation.Check;
 import org.openforis.idm.metamodel.validation.ValidationResult;
@@ -36,10 +37,12 @@ public class ValidationResultProxy implements Proxy {
 		}
 	}
 
+	@ExternalizedProperty
 	public String getRuleName() {
 		return validationResult.getValidator().getClass().getSimpleName();
 	}
 	
+	@ExternalizedProperty
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public String getLocalizedMessage() {
 		ValidationRule<?> v = validationResult.getValidator();
@@ -55,9 +58,4 @@ public class ValidationResultProxy implements Proxy {
 		}
 	}
 	
-	@Deprecated
-	public boolean isValid() {
-		return false;
-	}
-
 }

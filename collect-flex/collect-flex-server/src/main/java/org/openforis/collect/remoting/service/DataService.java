@@ -11,6 +11,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -28,6 +29,7 @@ import org.openforis.collect.persistence.InvalidIdException;
 import org.openforis.collect.persistence.MultipleEditException;
 import org.openforis.collect.persistence.NonexistentIdException;
 import org.openforis.collect.persistence.RecordLockedException;
+import org.openforis.collect.persistence.RecordPersistenceException;
 import org.openforis.collect.remoting.service.UpdateRequestOperation.Method;
 import org.openforis.collect.session.SessionState;
 import org.openforis.collect.session.SessionState.RecordState;
@@ -76,10 +78,10 @@ public class DataService {
 	private RecordManager recordManager;
 
 	@Transactional
-	public RecordProxy loadRecord(int id) throws RecordLockedException, MultipleEditException, NonexistentIdException, AccessDeniedException {
+	public RecordProxy loadRecord(int id, int step) throws RecordPersistenceException {
 		CollectSurvey survey = getActiveSurvey();
 		User user = getUserInSession();
-		CollectRecord record = recordManager.checkout(survey, user, id);
+		CollectRecord record = recordManager.checkout(survey, user, id, step);
 		//record.updateNodeStates();
 		
 		Entity rootEntity = record.getRootEntity();
@@ -120,7 +122,7 @@ public class DataService {
 	}
 
 	@Transactional
-	public RecordProxy createRecord(String rootEntityName, String versionName) throws MultipleEditException, AccessDeniedException, RecordLockedException {
+	public RecordProxy createRecord(String rootEntityName, String versionName) throws RecordPersistenceException {
 		SessionState sessionState = sessionManager.getSessionState();
 		User user = sessionState.getUser();
 		CollectSurvey activeSurvey = sessionState.getActiveSurvey();
@@ -137,7 +139,7 @@ public class DataService {
 	}
 	
 	@Transactional
-	public void deleteRecord(int id) throws RecordLockedException, AccessDeniedException, MultipleEditException {
+	public void deleteRecord(int id) throws RecordPersistenceException {
 		SessionState sessionState = sessionManager.getSessionState();
 		User user = sessionState.getUser();
 		recordManager.delete(id, user);
@@ -150,12 +152,17 @@ public class DataService {
 		CollectRecord record = sessionState.getActiveRecord();
 		record.setModifiedDate(new Date());
 		record.setModifiedBy(sessionState.getUser());
-		recordManager.save(record);
+		try {
+			recordManager.save(record);
+		} catch (RecordPersistenceException e) {
+			//it should never be thrown
+			throw new IllegalArgumentException(e);
+		}
 		sessionState.setActiveRecordState(RecordState.SAVED);
 	}
 
 	@Transactional
-	public void deleteActiveRecord() throws RecordLockedException, AccessDeniedException, MultipleEditException {
+	public void deleteActiveRecord() throws RecordPersistenceException {
 		SessionState sessionState = sessionManager.getSessionState();
 		User user = sessionState.getUser();
 		Record record = sessionState.getActiveRecord();
@@ -242,70 +249,64 @@ public class DataService {
 				checkDependencies.add(attribute);
 				break;
 			case DELETE:
-				
 				relReqDependencies = new HashSet<NodePointer>();
 				checkDependencies = new HashSet<Attribute<?,?>>();
 				deleteNode(node, relReqDependencies, checkDependencies, responseMap);
-//				attribute  = (Attribute<AttributeDefinition, ?>) node;
-//				ancestors = attribute.getAncestors();
-//				Set<NodePointer> relevantDependencies = attribute.getRelevantDependencies();
-//				Set<NodePointer> requiredDependencies = attribute.getRequiredDependencies();
-//				checkDependencies = attribute.getCheckDependencies();
-//				
-//				UpdateResponse resp = getUpdateResponse(responseMap, node.getInternalId());
-//				resp.setDeletedNodeId(node.getInternalId());
-//				
-//				recordManager.deleteNode(node);
-//				recordManager.clearRelevantDependencies(relevantDependencies);
-//				recordManager.clearRequiredDependencies(requiredDependencies);
-//				recordManager.clearValidationResults(checkDependencies);
-//				
-//				relReqDependencies = relevantDependencies;
-//				relReqDependencies.addAll(requiredDependencies);
 				break;
 		}
 		prepareUpdateResponse(responseMap, relReqDependencies, checkDependencies, ancestors);
 		return responseMap.values();
 	}
 
-	private void deleteNode(Node<?> node,Set<NodePointer> relevanceReqquiredDependencies, Set<Attribute<?,?>> checkDependencies, Map<Integer, UpdateResponse> responseMap){
-		Set<NodePointer> relevantDependencies = node.getRelevantDependencies();
-		Set<NodePointer> requiredDependencies = node.getRequiredDependencies();
-		Set<Attribute<?,?>> nodeCheckDependencies = (node instanceof Attribute) ? ((Attribute<?,?>)node).getCheckDependencies() : null;
-		UpdateResponse resp = getUpdateResponse(responseMap, node.getInternalId());
-		resp.setDeletedNodeId(node.getInternalId());
+	private void deleteNode(Node<?> node,Set<NodePointer> relevanceRequiredDependencies, Set<Attribute<?,?>> checkDependencies, Map<Integer, UpdateResponse> responseMap){
+		Stack<Node<?>> dependenciesStack = new Stack<Node<?>>();
+		Stack<Node<?>> nodesToRemove = new Stack<Node<?>>();
+		dependenciesStack.push(node);
 		
-		recordManager.deleteNode(node);
-
-		recordManager.clearRelevantDependencies(relevantDependencies);
-		requiredDependencies.addAll(relevantDependencies);
-		recordManager.clearRequiredDependencies(requiredDependencies);
-		if(nodeCheckDependencies != null){
-			recordManager.clearValidationResults(nodeCheckDependencies);
-			checkDependencies.addAll(nodeCheckDependencies);
-		}
-		
-		relevanceReqquiredDependencies.addAll(requiredDependencies);
-		if(node instanceof Entity){
-			Entity entity = (Entity) node;
-			List<Node<? extends NodeDefinition>> children = entity.getChildren();
-			for (Node<? extends NodeDefinition> child : children) {
-				deleteNode(child, relevanceReqquiredDependencies, checkDependencies, responseMap);
+		Set<NodePointer> relevantDependencies = new HashSet<NodePointer>();
+		Set<NodePointer> requiredDependencies = new HashSet<NodePointer>();
+		while(!dependenciesStack.isEmpty()){
+			Node<?> n = dependenciesStack.pop();
+			nodesToRemove.push(n);
+			
+			relevantDependencies.addAll(n.getRelevantDependencies());
+			requiredDependencies.addAll(n.getRequiredDependencies());
+			if(n instanceof Entity){
+				Entity entity = (Entity) n;
+				List<Node<? extends NodeDefinition>> children = entity.getChildren();
+				for (Node<? extends NodeDefinition> child : children) {
+					dependenciesStack.push(child);
+				}
+			} else {
+				Attribute<?,?> attr = (Attribute<?, ?>) n;
+				checkDependencies.addAll(attr.getCheckDependencies());
 			}
 		}
 		
+		while(!nodesToRemove.isEmpty()){
+			Node<?> n = nodesToRemove.pop();
+			recordManager.deleteNode(n);
+			
+			UpdateResponse resp = getUpdateResponse(responseMap, node.getInternalId());
+			resp.setDeletedNodeId(node.getInternalId());
+		}
+		
+		//clear dependencies
+		recordManager.clearRelevantDependencies(relevantDependencies);
+		requiredDependencies.addAll(relevantDependencies);
+		recordManager.clearRequiredDependencies(requiredDependencies);
+		recordManager.clearValidationResults(checkDependencies);
+		
+		relevanceRequiredDependencies.addAll(requiredDependencies);
 	}
 	
-	private void deleteAttribute(){
-		
-	}
 	
 	private void prepareUpdateResponse(Map<Integer, UpdateResponse> responseMap, Set<NodePointer> relevanceReqquiredDependencies, Set<Attribute<?, ?>> validtionResultsDependencies, List<Entity> ancestors) {
 		if (ancestors != null) {
 			for (Entity entity : ancestors) {
 				// entity could be root definition
 				Entity parent = entity.getParent();
-				if (parent != null) {
+				if (parent != null && !parent.isDetached()) {
 					UpdateResponse response = getUpdateResponse(responseMap, parent.getInternalId());
 					String childName = entity.getName();
 					response.setMinCountValid(childName, parent.validateMinCount(childName));
@@ -317,19 +318,23 @@ public class DataService {
 		if (relevanceReqquiredDependencies != null) {
 			for (NodePointer nodePointer : relevanceReqquiredDependencies) {
 				Entity entity = nodePointer.getEntity();
-				String childName = nodePointer.getChildName();
-				UpdateResponse response = getUpdateResponse(responseMap, entity.getInternalId());
-				response.setRelevant(childName, entity.isRelevant(childName));
-				response.setRequired(childName, entity.isRequired(childName));
-				response.setMinCountValid(childName, entity.validateMinCount(childName));
+				if (!entity.isDetached()) {
+					String childName = nodePointer.getChildName();
+					UpdateResponse response = getUpdateResponse(responseMap, entity.getInternalId());
+					response.setRelevant(childName, entity.isRelevant(childName));
+					response.setRequired(childName, entity.isRequired(childName));
+					response.setMinCountValid(childName, entity.validateMinCount(childName));
+				}
 			}
 		}
 		if (validtionResultsDependencies != null) {
 			for (Attribute<?, ?> checkDepAttr : validtionResultsDependencies) {
-				checkDepAttr.clearValidationResults();
-				ValidationResults results = checkDepAttr.validateValue();
-				UpdateResponse response = getUpdateResponse(responseMap, checkDepAttr.getInternalId());
-				response.setAttributeValidationResults(results);
+				if (!checkDepAttr.isDetached()) {
+					checkDepAttr.clearValidationResults();
+					ValidationResults results = checkDepAttr.validateValue();
+					UpdateResponse response = getUpdateResponse(responseMap, checkDepAttr.getInternalId());
+					response.setAttributeValidationResults(results);
+				}
 			}
 		}
 	}
@@ -480,7 +485,7 @@ public class DataService {
 	 * @throws AccessDeniedException 
 	 * @throws MultipleEditException 
 	 */
-	public void clearActiveRecord() throws RecordLockedException, AccessDeniedException, MultipleEditException {
+	public void clearActiveRecord() throws RecordPersistenceException {
 		CollectRecord activeRecord = getActiveRecord();
 		User user = getUserInSession();
 		this.recordManager.unlock(activeRecord, user);

@@ -4,18 +4,17 @@ package org.openforis.collect.presenter
 	import flash.events.MouseEvent;
 	
 	import mx.collections.IList;
-	import mx.rpc.AsyncResponder;
+	import mx.core.UIComponent;
 	import mx.rpc.events.ResultEvent;
 	
-	import org.openforis.collect.Application;
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.remoting.service.UpdateRequest;
 	import org.openforis.collect.remoting.service.UpdateRequestOperation;
 	import org.openforis.collect.remoting.service.UpdateRequestOperation$Method;
+	import org.openforis.collect.remoting.service.UpdateResponse;
 	import org.openforis.collect.ui.component.detail.MultipleAttributeFormItem;
-	import org.openforis.collect.util.AlertUtil;
-	import org.openforis.collect.util.CollectionUtil;
+	import org.openforis.collect.ui.component.detail.ValidationDisplayManager;
 	import org.openforis.collect.util.UIUtil;
 
 	/**
@@ -41,8 +40,16 @@ package org.openforis.collect.presenter
 		}
 		
 		override protected function updateResponseReceivedHandler(event:ApplicationEvent):void {
-			if(view.dataGroup.dataProvider == null) {
-				updateView();
+			super.updateResponseReceivedHandler(event);
+			if(_view.parentEntity != null) {
+				var responses:IList = IList(event.result);
+				for each (var response:UpdateResponse in responses) {
+					if(response.nodeId == _view.parentEntity.id) {
+						updateValidationDisplayManager();
+						updateRelevanceDisplayManager();
+						break;
+					}
+				}
 			}
 		}
 		
@@ -65,7 +72,7 @@ package org.openforis.collect.presenter
 		
 		protected function addButtonClickHandler(event:MouseEvent):void {
 			var attributes:IList = getAttributes();
-			var maxCount:Number = view.attributeDefinition.maxCount
+			//var maxCount:Number = view.attributeDefinition.maxCount
 			//if(isNaN(maxCount) || CollectionUtil.isEmpty(attributes) || attributes.length < maxCount) {
 				var o:UpdateRequestOperation = new UpdateRequestOperation();
 				o.method = UpdateRequestOperation$Method.ADD;
@@ -85,5 +92,25 @@ package org.openforis.collect.presenter
 			});
 		}
 		
+		override protected function initValidationDisplayManager():void {
+			var validationStateDisplay:UIComponent = _view;
+			var validationToolTipTrigger:UIComponent = validationStateDisplay;
+			_validationDisplayManager = new ValidationDisplayManager(validationToolTipTrigger, validationStateDisplay);
+			if(view.attributeDefinition != null) {
+				updateValidationDisplayManager();
+			}
+		}
+		
+		override protected function updateRelevanceDisplayManager():void {
+			_relevanceDisplayManager.displayNodeRelevance(view.parentEntity, view.attributeDefinition);
+		}
+			
+		override protected function updateValidationDisplayManager(forceActivation:Boolean = false):void {
+			super.updateValidationDisplayManager(forceActivation);
+			if(view.parentEntity != null) {
+				_validationDisplayManager.displayNodeValidation(view.parentEntity, view.attributeDefinition);
+			}
+		}
+
 	}
 }

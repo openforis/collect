@@ -12,6 +12,7 @@ package org.openforis.collect.client {
 	import org.openforis.collect.event.EventDispatcherFactory;
 	import org.openforis.collect.i18n.Message;
 	import org.openforis.collect.model.proxy.FieldProxy;
+	import org.openforis.collect.model.proxy.RecordProxy$Step;
 	import org.openforis.collect.remoting.service.UpdateRequest;
 	import org.openforis.collect.ui.component.input.InputField;
 	import org.openforis.collect.util.AlertUtil;
@@ -58,9 +59,12 @@ package org.openforis.collect.client {
 			token.addResponder(responder);
 		}
 		
-		public function saveActiveRecord(responder:IResponder):void {
+		public function saveActiveRecord(resultHandler:Function = null, faultHandler:Function = null, token:Object = null):void {
+			this._updateQueueProcessor.appendOperation(token, resultHandler, faultHandler, _saveActiveRecordOperation);
+			/*
 			var token:AsyncToken = this._saveActiveRecordOperation.send();
 			token.addResponder(responder);
+			*/
 		}
 		
 		public function deleteRecord(responder:IResponder, id:int):void {
@@ -73,8 +77,8 @@ package org.openforis.collect.client {
 			token.addResponder(responder);
 		}
 		
-		public function loadRecord(responder:IResponder, id:int):void {
-			var token:AsyncToken = this._loadRecordOperation.send(id);
+		public function loadRecord(responder:IResponder, id:int, step:int):void {
+			var token:AsyncToken = this._loadRecordOperation.send(id, step);
 			token.addResponder(responder);
 		}
 		
@@ -108,10 +112,10 @@ package org.openforis.collect.client {
 			token.addResponder(responder);
 		}
 		
-		protected function updateResultHandler(event:ResultEvent, token:UpdateRequestToken):void {
+		protected function updateResultHandler(event:ResultEvent, token:Object = null):void {
 			var field:FieldProxy;
-			if(token != null) {
-				switch(token.type) {
+			if(token != null && token is UpdateRequestToken) {
+				switch(UpdateRequestToken(token).type) {
 					case UpdateRequestToken.TYPE_UPDATE_VALUE:
 						//do not break, apply symbol to field
 					case UpdateRequestToken.TYPE_UPDATE_SYMBOL:
@@ -133,12 +137,20 @@ package org.openforis.collect.client {
 			EventDispatcherFactory.getEventDispatcher().dispatchEvent(appEvt);
 		}
 
-		protected function updateFaultHandler(event:FaultEvent, token:UpdateRequestToken):void {
-			var inputField:InputField = token != null ? token.inputField: null;
-			var fieldLabel:String = inputField != null ? inputField.attributeDefinition.getLabelText(): "";
-			AlertUtil.showConfirm("global.confirmRetryUpdate", 
-				[fieldLabel, event.fault.faultCode, event.fault.faultString], null, 
-				retryUpdateHandler, doNotRetryUpdateHandler);
+		protected function updateFaultHandler(event:FaultEvent, token:Object = null):void {
+			if(token != null && token is UpdateRequestToken) {
+				var updateRequestToken:UpdateRequestToken = UpdateRequestToken(token);
+				var inputField:InputField = token != null ? token.inputField: null;
+				var fieldLabel:String = inputField != null ? inputField.attributeDefinition.getLabelText(): "";
+				AlertUtil.showConfirm("global.confirmRetryUpdate", 
+					[fieldLabel, event.fault.faultCode, event.fault.faultString], null, 
+					retryUpdateHandler, doNotRetryUpdateHandler);
+			} else {
+				var operation:String = "";
+				AlertUtil.showConfirm("global.confirmRetryOperation", 
+					[operation, event.fault.faultCode, event.fault.faultString], null, 
+					retryUpdateHandler, doNotRetryUpdateHandler);
+			}
 		}
 		
 		protected function retryUpdateHandler():void {

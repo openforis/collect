@@ -58,6 +58,11 @@ package org.openforis.collect.presenter
 		override protected function updateView():void {
 			super.updateView();
 		}
+		
+		override protected function updateRelevanceDisplayManager():void {
+			super.updateRelevanceDisplayManager();
+			relevanceDisplayManager.displayNodeRelevance(view.parentEntity, view.attributeDefinition);
+		}
 
 		/**
 		 * get the attribute (or attributes) from the parentEntity

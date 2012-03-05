@@ -16,6 +16,8 @@ package org.openforis.collect.model.proxy {
     [RemoteClass(alias="org.openforis.collect.model.proxy.RecordProxy")]
     public class RecordProxy extends RecordProxyBase {
 		
+		private var _updated:Boolean = false;
+		
 		private var validationResults:ValidationResultsProxy;
 		
 		public function getNode(id:int):NodeProxy {
@@ -30,7 +32,7 @@ package org.openforis.collect.model.proxy {
 			for each (var response:UpdateResponse in responses)	{
 				processResponse(response);
 			}
-			
+			_updated = true;
 		}
 		
 		private function processResponse(response:UpdateResponse):void {
@@ -76,9 +78,9 @@ package org.openforis.collect.model.proxy {
 			}
 		}
 		
-		private function updateMaxCountValidations(value:ValidationResultsProxy):void {
+		public function get updated():Boolean {
+			return _updated;
 		}
-		
-		
+
     }
 }

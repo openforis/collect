@@ -6,11 +6,17 @@
 	
 	<fx:Script>
 		<![CDATA[
+			import org.openforis.collect.presenter.CompositeAttributePresenter;
 			
 			public static const STATE_HORIZONTAL:String = "horizontal";
 			public static const STATE_VERTICAL:String = "vertical";
 			
 			private var _subLabelWidth:Number = 130;
+			private var _inputFields:Array;
+			
+			override protected function initPresenter():void {
+				presenter = new CompositeAttributePresenter(this);
+			}
 			
 			[Bindable]
 			public function get subLabelWidth():Number {
@@ -28,6 +34,14 @@
 				} else {
 					currentState = STATE_VERTICAL;
 				}
+			}
+
+			public function get inputFields():Array {
+				return _inputFields;
+			}
+
+			public function set inputFields(value:Array):void {
+				_inputFields = value;
 			}
 			
 		]]>

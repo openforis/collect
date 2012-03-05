@@ -10,8 +10,6 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.remoting.service.UpdateResponse;
 	import org.openforis.collect.ui.UIBuilder;
 	import org.openforis.collect.ui.component.detail.EntityFormItem;
-	import org.openforis.collect.ui.component.detail.ValidationDisplayManager;
-	import org.openforis.collect.util.UIUtil;
 	
 	/**
 	 * 
@@ -20,10 +18,7 @@ package org.openforis.collect.presenter
 	 */
 	public class EntityFormItemPresenter extends FormItemPresenter {
 		
-		protected var _validationDisplayManager:ValidationDisplayManager;
-		
 		public function EntityFormItemPresenter(view:EntityFormItem) {
-			_validationDisplayManager = new ValidationDisplayManager(view, view);
 			super(view);
 			initNodeDefinitions();
 		}
@@ -58,11 +53,13 @@ package org.openforis.collect.presenter
 		}
 		
 		override protected function updateResponseReceivedHandler(event:ApplicationEvent):void {
+			super.updateResponseReceivedHandler(event);
 			if(_view.parentEntity != null) {
 				var responses:IList = IList(event.result);
 				for each (var response:UpdateResponse in responses) {
 					if(response.nodeId == _view.parentEntity.id) {
-						_validationDisplayManager.initByNode(view.parentEntity, view.entityDefinition);
+						updateValidationDisplayManager();
+						updateRelevanceDisplayManager();
 						break;
 					}
 				}
@@ -76,10 +73,19 @@ package org.openforis.collect.presenter
 				entity = view.parentEntity.getChild(view.entityDefinition.name, 0) as EntityProxy;
 			}
 			view.entity = entity;
-			if(view.parentEntity != null) {
-				_validationDisplayManager.initByNode(view.parentEntity, view.entityDefinition);
+			updateValidationDisplayManager();
+		}
+		
+		override protected function updateValidationDisplayManager(forceActivation:Boolean = false):void {
+			super.updateValidationDisplayManager(forceActivation);
+			if(view.parentEntity != null && view.entityDefinition != null) {
+				validationDisplayManager.displayNodeValidation(view.parentEntity, view.entityDefinition);
 			}
 		}
-
+		
+		override protected function updateRelevanceDisplayManager():void {
+			super.updateRelevanceDisplayManager();
+			relevanceDisplayManager.displayNodeRelevance(view.parentEntity, view.entityDefinition);
+		}
 	}
 }

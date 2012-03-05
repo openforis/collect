@@ -7,7 +7,7 @@ package org.openforis.collect.persistence;
  * @author M. Togna
  * 
  */
-public class MultipleEditException extends Exception {
+public class MultipleEditException extends RecordPersistenceException {
 
 	private static final long serialVersionUID = 1L;
 

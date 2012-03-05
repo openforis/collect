@@ -1,11 +1,9 @@
 package org.openforis.collect.presenter {
 	import flash.display.DisplayObject;
-	import flash.events.Event;
 	import flash.events.KeyboardEvent;
 	import flash.ui.Keyboard;
 	
 	import mx.collections.IList;
-	import mx.controls.Text;
 	import mx.controls.TextInput;
 	import mx.core.FlexGlobals;
 	import mx.events.FlexMouseEvent;
@@ -29,7 +27,7 @@ package org.openforis.collect.presenter {
 	 * 
 	 * @author S. Ricci
 	 * */
-	public class TaxonAttributePresenter extends AttributePresenter {
+	public class TaxonAttributePresenter extends CompositeAttributePresenter {
 		
 		private static const MAX_RESULTS:int = 10;
 		private static const SEARCH_BY_CODE:String = "byCode";

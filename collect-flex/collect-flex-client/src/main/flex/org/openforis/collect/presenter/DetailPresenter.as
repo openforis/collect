@@ -91,7 +91,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function saveButtonClickHandler(event:MouseEvent):void {
-			_dataClient.saveActiveRecord(new AsyncResponder(saveActiveRecordResultHandler, faultHandler));
+			_dataClient.saveActiveRecord(saveActiveRecordResultHandler, faultHandler);
 		}
 		
 		protected function submitButtonClickHandler(event:MouseEvent):void {
@@ -133,7 +133,8 @@ package org.openforis.collect.presenter {
 		}
 		
 		internal function saveActiveRecordResultHandler(event:ResultEvent, token:Object = null):void {
-			
+			var applicationEvent:ApplicationEvent = new ApplicationEvent(ApplicationEvent.RECORD_SAVED);
+			eventDispatcher.dispatchEvent(applicationEvent);
 		}
 		
 		internal function promoteRecordResultHandler(event:ResultEvent, token:Object = null):void {

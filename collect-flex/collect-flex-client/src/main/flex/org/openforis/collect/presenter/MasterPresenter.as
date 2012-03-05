@@ -52,12 +52,17 @@ package org.openforis.collect.presenter {
 		 * */
 		internal function recordSelectedHandler(uiEvent:UIEvent):void {
 			var record:RecordProxy = uiEvent.obj as RecordProxy;
-			if(record.step != RecordProxy$Step.ANALYSIS) {
-				var id:Number = record.id;
-				_dataClient.loadRecord(new AsyncResponder(loadRecordResultHandler, faultHandler, record), id);
-			} else {
+			var id:Number = record.id;
+			var step:int;
+			if(record.step == RecordProxy$Step.ANALYSIS) {
 				AlertUtil.showMessage("list.error.cannotEdit.recordPromotedToAnalysis");
+				return;
+			} else if(record.step == RecordProxy$Step.ENTRY) {
+				step = 1;
+			} else if(record.step == RecordProxy$Step.CLEANSING) {
+				step = 2;
 			}
+			_dataClient.loadRecord(new AsyncResponder(loadRecordResultHandler, faultHandler, record), id, step);
 		}
 		
 		/**

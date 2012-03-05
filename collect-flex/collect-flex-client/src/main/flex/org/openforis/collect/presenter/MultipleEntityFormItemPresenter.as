@@ -6,19 +6,14 @@ package org.openforis.collect.presenter
 	import mx.collections.IList;
 	import mx.rpc.events.ResultEvent;
 	
-	import org.openforis.collect.Application;
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.event.ApplicationEvent;
-	import org.openforis.collect.model.proxy.NodeProxy;
 	import org.openforis.collect.remoting.service.UpdateRequest;
 	import org.openforis.collect.remoting.service.UpdateRequestOperation;
 	import org.openforis.collect.remoting.service.UpdateRequestOperation$Method;
-	import org.openforis.collect.remoting.service.UpdateResponse;
 	import org.openforis.collect.ui.component.detail.MultipleEntityFormItem;
-	import org.openforis.collect.ui.component.detail.ValidationDisplayManager;
 	import org.openforis.collect.util.AlertUtil;
 	import org.openforis.collect.util.CollectionUtil;
-	import org.openforis.collect.util.ToolTipUtil;
 	import org.openforis.collect.util.UIUtil;
 
 	/**
@@ -44,17 +39,7 @@ package org.openforis.collect.presenter
 		}
 		
 		override protected function updateResponseReceivedHandler(event:ApplicationEvent):void {
-			var responses:IList = IList(event.result);
-			for each(var response:UpdateResponse in responses) {
-				if(!isNaN(response.nodeId) && isNaN(response.deletedNodeId)) {
-					var node:NodeProxy = Application.activeRecord.getNode(response.nodeId);
-					if(node != null && view.parentEntity != null && view.entityDefinition != null 
-						&& node.parentId == view.parentEntity.id 
-						&& node.name == view.entityDefinition.name) {
-						updateView();
-					}
-				}
-			}
+			super.updateResponseReceivedHandler(event);
 		}
 		
 		override protected function updateView():void {
@@ -67,9 +52,6 @@ package org.openforis.collect.presenter
 				view.dataGroup.dataProvider = entities;
 			} else {
 				view.dataGroup.dataProvider = null;
-			}
-			if(view.parentEntity != null) {
-				_validationDisplayManager.initByNode(view.parentEntity, view.entityDefinition);
 			}
 		}
 		
