@@ -6,10 +6,6 @@
 		 xmlns:input="org.openforis.collect.ui.component.input.*"
 		 >
 
-	<detail:layout>
-		<s:VerticalLayout gap="2" />
-	</detail:layout>
-	
 	<fx:Script>
 		<![CDATA[
 			import org.openforis.collect.i18n.Message;
@@ -23,59 +19,70 @@
 		]]>
 	</fx:Script>
 	
-	<s:DataGroup id="dataGroup">
+	<s:BorderContainer id="border" 
+					   height="100%" 
+					   width="100%"
+					   minHeight="0"
+					   minWidth="0">
 		<s:layout>
 			<s:VerticalLayout gap="2" />
 		</s:layout>
-		<s:itemRenderer>
-			<fx:Component>
-				<s:ItemRenderer autoDrawBackground="false">
-					<fx:Script>
-						<![CDATA[
-							import mx.binding.utils.BindingUtils;
-							import mx.events.FlexEvent;
-							
-							import org.openforis.collect.model.proxy.AttributeProxy;
-							import org.openforis.collect.ui.UIBuilder;
-							import org.openforis.collect.ui.component.input.InputField;
-							
-							[Bindable(event="dataChange")]
-							public function get attribute():AttributeProxy {
-								return super.data as AttributeProxy;
-							}
-							
-							override protected function createChildren():void {
-								super.createChildren();
-								var renderer:AttributeItemRenderer = UIBuilder.getAttributeItemRenderer(outerDocument.attributeDefinition, true);
-								BindingUtils.bindProperty(renderer, "parentEntity", outerDocument, "parentEntity");
-								BindingUtils.bindProperty(renderer, "attribute", this, "attribute");
-								addElement(renderer);
-							}
-						]]>
-					</fx:Script>
-				</s:ItemRenderer>
-			</fx:Component>
-		</s:itemRenderer>
-	</s:DataGroup>
-	
-	<s:Button 
-				icon="{Images.ADD}" 
-				label="{Message.get('global.add')}" 
-			  	id="addButton"
-				height="24"  
-				useHandCursor="true"
-				buttonMode="true"
-				styleName="roundCorners"
-				/>
-	
-	<!--<mx:LinkButton 
-			icon="{Images.ADD}" 
-			width="16" 
-			height="16" 
-			styleName="roundCorners" 
-			useHandCursor="true" 
+		
+		<s:DataGroup id="dataGroup">
+			<s:layout>
+				<s:VerticalLayout gap="2" />
+			</s:layout>
+			<s:itemRenderer>
+				<fx:Component>
+					<s:ItemRenderer autoDrawBackground="false">
+						<fx:Script>
+							<![CDATA[
+								import mx.binding.utils.BindingUtils;
+								import mx.events.FlexEvent;
+								
+								import org.openforis.collect.model.proxy.AttributeProxy;
+								import org.openforis.collect.ui.UIBuilder;
+								import org.openforis.collect.ui.component.input.InputField;
+								
+								[Bindable(event="dataChange")]
+								public function get attribute():AttributeProxy {
+									return super.data as AttributeProxy;
+								}
+								
+								override protected function createChildren():void {
+									super.createChildren();
+									var renderer:AttributeItemRenderer = UIBuilder.getAttributeItemRenderer(outerDocument.attributeDefinition, true);
+									BindingUtils.bindProperty(renderer, "parentEntity", outerDocument, "parentEntity");
+									BindingUtils.bindProperty(renderer, "attribute", this, "attribute");
+									addElement(renderer);
+								}
+							]]>
+						</fx:Script>
+					</s:ItemRenderer>
+				</fx:Component>
+			</s:itemRenderer>
+		</s:DataGroup>
+		<!--
+		<s:Button 
+					icon="{Images.ADD}" 
+					label="{Message.get('global.add')}" 
+				  	id="addButton"
+					height="24"  
+					useHandCursor="true"
+					buttonMode="true"
+					styleName="roundCorners"
+					/>
+		-->
+		<mx:LinkButton
+			id="addButton"
+			label="{Message.get('global.add')}" 
 			buttonMode="true" 
-			label="{Message.get('global.add')}" />
-	-->
+			icon="{Images.ADD}" 
+			labelPlacement="left" 
+			useHandCursor="true"
+			paddingLeft="30"
+			/>
+	
+	</s:BorderContainer>
 	
 </detail:AttributeFormItem>

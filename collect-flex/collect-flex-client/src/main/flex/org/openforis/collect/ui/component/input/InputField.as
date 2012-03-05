@@ -38,6 +38,7 @@ package org.openforis.collect.ui.component.input {
 		private var _fieldIndex:int = 0;
 		private var _presenter:InputFieldPresenter;
 		private var _isInDataGroup:Boolean = false;
+		private var _visited:Boolean = false;
 		private var _applyChangesOnFocusOut:Boolean = true;
 		private var _formatFunction:Function;
 		protected var _textInput:UIComponent;
@@ -236,6 +237,15 @@ package org.openforis.collect.ui.component.input {
 
 		public function set textFormatFunction(value:Function):void {
 			_formatFunction = value;
+		}
+
+		[Bindable]
+		public function get visited():Boolean {
+			return _visited;
+		}
+
+		public function set visited(value:Boolean):void {
+			_visited = value;
 		}
 
 

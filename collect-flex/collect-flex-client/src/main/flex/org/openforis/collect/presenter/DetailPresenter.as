@@ -91,7 +91,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function saveButtonClickHandler(event:MouseEvent):void {
-			_dataClient.saveActiveRecord(new AsyncResponder(saveActiveRecordResultHandler, faultHandler));
+			_dataClient.saveActiveRecord(saveActiveRecordResultHandler, faultHandler);
 		}
 		
 		protected function submitButtonClickHandler(event:MouseEvent):void {

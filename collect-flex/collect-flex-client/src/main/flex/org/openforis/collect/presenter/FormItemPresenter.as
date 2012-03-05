@@ -8,6 +8,7 @@ package org.openforis.collect.presenter
 	
 	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.ui.component.detail.CollectFormItem;
+	import org.openforis.collect.ui.component.detail.ValidationDisplayManager;
 
 	/**
 	 * 
@@ -17,9 +18,11 @@ package org.openforis.collect.presenter
 	public class FormItemPresenter extends AbstractPresenter {
 		
 		protected var _view:CollectFormItem;
+		protected var _validationDisplayManager:ValidationDisplayManager;
 		
 		public function FormItemPresenter(view:CollectFormItem) {
 			_view = view;
+			_validationDisplayManager = new ValidationDisplayManager(view, view);
 			
 			super();
 			
@@ -48,5 +51,14 @@ package org.openforis.collect.presenter
 			
 		}
 		
+		protected function initValidationDisplayManager():void {
+		}
+		
+		protected function updateValidationDisplayManager():void {
+		}
+		
+		protected function get validationDisplayManager():ValidationDisplayManager {
+			return _validationDisplayManager;
+		}
 	}
 }

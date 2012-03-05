@@ -12,10 +12,9 @@
 			import mx.binding.utils.BindingUtils;
 			import mx.events.FlexEvent;
 			
+			import org.openforis.collect.i18n.Message;
 			import org.openforis.collect.presenter.MultipleEntityFormItemPresenter;
 			import org.openforis.collect.ui.Images;
-			
-			import spark.layouts.ConstraintLayout;
 			
 			//private var _constraintLayout:ConstraintLayout;
 			
@@ -91,7 +90,7 @@
 		
 		<mx:LinkButton
 			id="addButton"
-			label="Add" 
+			label="{Message.get('global.add')}" 
 			buttonMode="true" 
 			icon="{Images.ADD}" 
 			labelPlacement="left" 

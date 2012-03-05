@@ -5,6 +5,7 @@ package org.openforis.collect.ui.component.detail
 	import mx.core.IToolTip;
 	import mx.core.UIComponent;
 	
+	import org.openforis.collect.Application;
 	import org.openforis.collect.i18n.Message;
 	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
@@ -25,6 +26,8 @@ package org.openforis.collect.ui.component.detail
 		public static const STYLE_NAME_ERROR:String = "error"; 
 		public static const STYLE_NAME_WARNING:String = "warning";
 
+		private var _active:Boolean = false;
+		
 		/**
 		 * Display of the error (stylename "error" or "warning" will be set on this component)
 		 */
@@ -52,14 +55,16 @@ package org.openforis.collect.ui.component.detail
 		
 		public function init():void {
 			reset();
-			if(_toolTipStyleName != null) {
-				if(! _toolTipTrigger.hasEventListener(MouseEvent.ROLL_OVER)) {
-					_toolTipTrigger.addEventListener(MouseEvent.ROLL_OVER, showToolTip);
-					_toolTipTrigger.addEventListener(MouseEvent.ROLL_OUT, hideToolTip);
+			if(_active) {
+				if(_toolTipStyleName != null) {
+					if(! _toolTipTrigger.hasEventListener(MouseEvent.ROLL_OVER)) {
+						_toolTipTrigger.addEventListener(MouseEvent.ROLL_OVER, showToolTip);
+						_toolTipTrigger.addEventListener(MouseEvent.ROLL_OUT, hideToolTip);
+					}
 				}
-			}
-			if(_displayStyleName != null) {
-				UIUtil.addStyleName(_display, _displayStyleName);
+				if(_displayStyleName != null) {
+					UIUtil.addStyleName(_display, _displayStyleName);
+				}
 			}
 		}
 		
@@ -144,6 +149,14 @@ package org.openforis.collect.ui.component.detail
 
 		public function set displayStyleName(value:String):void {
 			_displayStyleName = value;
+		}
+
+		public function get active():Boolean {
+			return _active;
+		}
+
+		public function set active(value:Boolean):void {
+			_active = value;
 		}
 		
 	}
