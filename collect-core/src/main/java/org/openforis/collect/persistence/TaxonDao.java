@@ -11,10 +11,12 @@ import org.jooq.UpdatableRecord;
 import org.openforis.collect.persistence.jooq.MappingJooqDaoSupport;
 import org.openforis.collect.persistence.jooq.MappingJooqFactory;
 import org.openforis.idm.model.species.Taxon;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author G. Miceli
  */
+@Transactional
 public class TaxonDao extends MappingJooqDaoSupport<Taxon, TaxonDao.JooqFactory> {
 	public TaxonDao() {
 		super(TaxonDao.JooqFactory.class);

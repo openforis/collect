@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author M. Togna
  * 
  */
+@Transactional
 public class LookupProviderDao extends JooqDaoSupport {
 
 	@Transactional

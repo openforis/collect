@@ -38,6 +38,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author S. Ricci
  */
 @SuppressWarnings("rawtypes")
+@Transactional
 public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory> {
 	
 	public static final String ORDER_BY_DATE_CREATED = "creationDate";
