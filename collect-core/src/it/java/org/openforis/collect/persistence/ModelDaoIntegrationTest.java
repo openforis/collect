@@ -10,6 +10,8 @@ import java.net.URL;
 import java.util.GregorianCalendar;
 import java.util.List;
 
+import junit.framework.Assert;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Test;
@@ -20,6 +22,7 @@ import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.CollectSurveyContext;
 import org.openforis.collect.persistence.xml.CollectIdmlBindingContext;
 import org.openforis.idm.metamodel.EntityDefinition;
+import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.validation.Validator;
 import org.openforis.idm.metamodel.xml.InvalidIdmlException;
@@ -68,19 +71,46 @@ public class ModelDaoIntegrationTest {
 		testLoadAllSurveys("archenland1");
 
 		// SAVE NEW
-		CollectRecord record = createTestRecord(survey);
+		CollectRecord record = createTestRecord(survey, "123_456");
 		recordDao.saveOrUpdate(record);
 		
 		String saved = record.toString();
 		log.debug("Saving record:\n"+saved);
 		
 		// RELOAD
-		record = recordDao.load(survey, record.getId());
+		record = recordDao.load(survey, record.getId(), 1);
 		String reloaded = record.toString();
 		log.debug("Reloaded as:\n"+reloaded);
 		
 		assertEquals(saved, reloaded);
 	}
+	
+	@Test
+	public void testLoadSummariesByKey() throws Exception  {
+		// LOAD MODEL
+		CollectSurvey survey = surveyDao.load("archenland1");
+
+		if ( survey == null ) {
+			// IMPORT MODEL
+			survey = importModel();
+		}
+		
+		// SAVE NEW
+		CollectRecord record = createTestRecord(survey, "123_456");
+		recordDao.saveOrUpdate(record);
+		
+		String saved = record.toString();
+		log.debug("Saving record:\n"+saved);
+		
+		Schema schema = survey.getSchema();
+		
+		// RELOAD
+		List<CollectRecord> summaries = recordDao.loadSummaries(survey, "cluster", "123_456");
+		Assert.assertEquals(1, summaries.size());
+		CollectRecord record1 = summaries.get(0);
+		System.out.println("test");
+	}
+
 
 	private void testLoadAllSurveys(String surveyName) {
 		List<CollectSurvey> list = this.surveyDao.loadAll();
@@ -111,14 +141,13 @@ public class ModelDaoIntegrationTest {
 		return survey;
 	}
 
-	private CollectRecord createTestRecord(CollectSurvey survey) {
+	private CollectRecord createTestRecord(CollectSurvey survey, String id) {
 		CollectRecord record = new CollectRecord(survey, "2.0");
 		Entity cluster = record.createRootEntity("cluster");
 		record.setCreationDate(new GregorianCalendar(2011, 12, 31, 23, 59).getTime());
 		//record.setCreatedBy("ModelDaoIntegrationTest");
 		record.setStep(Step.ENTRY);
-		String id = "123_456";
-		
+
 		addTestValues(cluster, id);
 			
 		//set counts

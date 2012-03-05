@@ -50,11 +50,6 @@ public class RecordProxy implements Proxy {
 	}
 
 	@ExternalizedProperty
-	public boolean isSubmitted() {
-		return record.isSubmitted();
-	}
-
-	@ExternalizedProperty
 	public Step getStep() {
 		return Step.valueOf(record.getStep().getStepNumber());
 	}

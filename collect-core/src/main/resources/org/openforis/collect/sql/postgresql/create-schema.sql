@@ -29,7 +29,6 @@ GO
 --- BEGIN GENERATED CODE ---
 ----------------------------
 
-
 CREATE TABLE "collect"."ofc_logo"  ( 
 	"pos"  	integer NOT NULL,
 	"image"	bytea NOT NULL,
@@ -59,8 +58,8 @@ CREATE TABLE "collect"."ofc_record"  (
 	"count3"        	integer NULL,
 	"count4"        	integer NULL,
 	"count5"        	integer NULL,
-	"submitted_id"  	integer NULL,
-	"data"          	bytea NULL,
+	"data1"         	bytea NULL,
+	"data2"         	bytea NULL,
 	PRIMARY KEY("id")
 )
 GO
@@ -137,13 +136,6 @@ ALTER TABLE "collect"."ofc_taxonomy"
 	UNIQUE ("name")
 GO
 ALTER TABLE "collect"."ofc_record"
-	ADD CONSTRAINT "record_submitted_record_fkey"
-	FOREIGN KEY("submitted_id")
-	REFERENCES "collect"."ofc_record"("id")
-	ON DELETE NO ACTION 
-	ON UPDATE NO ACTION 
-GO
-ALTER TABLE "collect"."ofc_record"
 	ADD CONSTRAINT "record_root_entity_fkey"
 	FOREIGN KEY("root_entity_id")
 	REFERENCES "collect"."ofc_schema_definition"("id")
@@ -188,7 +180,6 @@ ALTER TABLE "collect"."ofc_record"
 	FOREIGN KEY("modified_by_id")
 	REFERENCES "collect"."ofc_user"("id")
 GO
-
 
 --------------------------
 --- END GENERATED CODE ---

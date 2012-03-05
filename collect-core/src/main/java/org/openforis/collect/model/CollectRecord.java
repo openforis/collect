@@ -48,11 +48,7 @@ public class CollectRecord extends Record {
 		}
 	}
 
-	private transient CollectSurvey collectSurvey;
-	
 	private transient Step step;
-	// TODO Replace submitted flag with state enum
-	private transient boolean submitted;
 
 	private transient Date creationDate;
 	private transient User createdBy;
@@ -62,7 +58,6 @@ public class CollectRecord extends Record {
 	private transient Integer skipped;
 	private transient Integer errors;
 	private transient Integer warnings;
-	private transient Integer submittedId;
 	
 	private List<String> rootEntityKeys;
 	private List<Integer> entityCounts;
@@ -72,8 +67,7 @@ public class CollectRecord extends Record {
 	public CollectRecord(CollectSurvey survey, String versionName) {
 		super(survey, versionName);
 		this.step = Step.ENTRY;
-		this.submitted = false;
-
+		
 		// use List to preserve the order of the keys and counts
 		rootEntityKeys = new ArrayList<String>();
 		entityCounts = new ArrayList<Integer>();
@@ -315,14 +309,6 @@ public class CollectRecord extends Record {
 		return validator;
 	}
 
-	public void setSubmitted(boolean submitted) {
-		this.submitted = submitted;
-	}
-
-	public boolean isSubmitted() {
-		return submitted;
-	}
-
 	public Step getStep() {
 		return step;
 	}
@@ -411,11 +397,4 @@ public class CollectRecord extends Record {
 		this.entityCounts = counts;
 	}
 
-	public Integer getSubmittedId() {
-		return submittedId;
-	}
-	
-	public void setSubmittedId(Integer submittedId) {
-		this.submittedId = submittedId;
-	}
 }

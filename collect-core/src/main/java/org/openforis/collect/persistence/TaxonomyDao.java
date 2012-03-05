@@ -32,6 +32,26 @@ public class TaxonomyDao extends MappingJooqDaoSupport<Taxonomy, TaxonomyDao.Joo
 		}
 	}
 	
+	@Override
+	public Taxonomy load(int id) {
+		return super.load(id);
+	}
+
+	@Override
+	public void insert(Taxonomy entity) {
+		super.insert(entity);
+	}
+
+	@Override
+	public void update(Taxonomy entity) {
+		super.update(entity);
+	}
+
+	@Override
+	public void delete(int id) {
+		super.delete(id);
+	}
+
 	protected static class JooqFactory extends MappingJooqFactory<Taxonomy> {
 
 		private static final long serialVersionUID = 1L;
@@ -59,7 +79,7 @@ public class TaxonomyDao extends MappingJooqDaoSupport<Taxonomy, TaxonomyDao.Joo
 		}
 
 		@Override
-		protected int getId(Taxonomy t) {
+		protected Integer getId(Taxonomy t) {
 			return t.getId();
 		}
 	}

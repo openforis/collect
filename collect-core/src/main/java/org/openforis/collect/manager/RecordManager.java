@@ -87,7 +87,7 @@ public class RecordManager {
 	 */
 	@Transactional
 	public CollectRecord checkout(CollectSurvey survey, User user, int recordId) throws RecordLockedException, NonexistentIdException, AccessDeniedException, MultipleEditException {
-		CollectRecord record = recordDao.load(survey, recordId);
+		CollectRecord record = recordDao.load(survey, recordId, 1);
 		recordDao.lock(recordId, user);
 		return record;
 	}
@@ -147,7 +147,7 @@ public class RecordManager {
 
 	@Transactional
 	public int promote(CollectSurvey survey, int recordId, User user) throws InvalidIdException, MultipleEditException, NonexistentIdException, AccessDeniedException, RecordLockedException {
-		CollectRecord record = recordDao.load(survey, recordId);
+		CollectRecord record = recordDao.load(survey, recordId, 1);
 		Step nextStep;
 		switch(record.getStep()) {
 			case ENTRY:
@@ -156,7 +156,6 @@ public class RecordManager {
 				recordDao.unlock(recordId, user);
 				record.setId(null);
 				Date now = new Date();
-				record.setSubmittedId(recordId);
 				record.setModifiedBy(user);
 				record.setModifiedDate(now);
 				record.setCreatedBy(user);

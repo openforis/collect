@@ -54,7 +54,7 @@ public class MappingJooqDaoSupport<E, J extends MappingJooqFactory<E>> extends J
 	}
 	
 	@Transactional
-	public E load(int id) {
+	protected E load(int id) {
 		J jf = getMappingJooqFactory();
 		ResultQuery<?> selectQuery = jf.selectByIdQuery(id);
 		Record r = selectQuery.fetchOne();
@@ -66,19 +66,19 @@ public class MappingJooqDaoSupport<E, J extends MappingJooqFactory<E>> extends J
 	}
 	
 	@Transactional
-	public void insert(E entity) {
+	protected void insert(E entity) {
 		J jf = getMappingJooqFactory();
 		jf.insertQuery(entity).execute();
 	}
 	
 	@Transactional
-	public void update(E entity) {
+	protected void update(E entity) {
 		J jf = getMappingJooqFactory();
 		jf.updateQuery(entity).execute();
 	}
 
 	@Transactional
-	public void delete(int id) {
+	protected void delete(int id) {
 		J jf = getMappingJooqFactory();
 		jf.deleteQuery(id).execute();
 	}

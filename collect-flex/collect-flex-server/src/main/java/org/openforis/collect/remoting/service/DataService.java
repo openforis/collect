@@ -295,33 +295,11 @@ public class DataService {
 		}
 	}
 
-<<<<<<< HEAD
 	private UpdateResponse getUpdateResponse(Map<Integer, UpdateResponse> responseMap, int nodeId){
 		UpdateResponse response = responseMap.get(nodeId);
 		if(response == null){
 			response = new UpdateResponse(nodeId);
 			responseMap.put(nodeId, response);
-=======
-	@SuppressWarnings("unchecked")
-	private List<Node<?>> updateNode(Entity parentEntity, Node<?> node, Integer fieldIndex, 
-			Object value, FieldSymbol symbol,	String remarks) {
-		if(node instanceof Attribute) {
-			List<Node<?>> updatedNodes = new ArrayList<Node<?>>();
-			Attribute<?, Object> attribute = (Attribute<?, Object>) node;
-			if(fieldIndex != null) {
-				@SuppressWarnings("rawtypes")
-				Field attributeField = attribute.getField(fieldIndex);
-				attributeField.setValue(value);
-				attributeField.setRemarks(remarks);
-				attributeField.setSymbol(null);
-			} else {
-				attribute.setValue(value);
-			}
-			updatedNodes.add(attribute);
-			return updatedNodes;
-		} else {
-			throw new UnsupportedOperationException("Cannot update an entity");
->>>>>>> blob
 		}
 		return response;
 	}

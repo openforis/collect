@@ -20,6 +20,26 @@ public class TaxonDao extends MappingJooqDaoSupport<Taxon, TaxonDao.JooqFactory>
 		super(TaxonDao.JooqFactory.class);
 	}
 
+	@Override
+	public Taxon load(int id) {
+		return super.load(id);
+	}
+	
+	@Override
+	public void insert(Taxon entity) {
+		super.insert(entity);
+	}
+
+	@Override
+	public void update(Taxon entity) {
+		super.update(entity);
+	}
+
+	@Override
+	public void delete(int id) {
+		super.delete(id);
+	}
+
 	public List<Taxon> findByCode(String searchString, int maxResults) {
 		return findStartingWith(OFC_TAXON.CODE, searchString, maxResults);
 	}
@@ -64,7 +84,7 @@ public class TaxonDao extends MappingJooqDaoSupport<Taxon, TaxonDao.JooqFactory>
 		}
 
 		@Override
-		protected int getId(Taxon t) {
+		protected Integer getId(Taxon t) {
 			return t.getId();
 		}
 	}

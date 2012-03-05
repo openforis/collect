@@ -8,12 +8,14 @@ import org.jooq.DeleteQuery;
 import org.jooq.InsertQuery;
 import org.jooq.Record;
 import org.jooq.Result;
+import org.jooq.SelectQuery;
 import org.jooq.Sequence;
 import org.jooq.SimpleSelectQuery;
 import org.jooq.TableField;
 import org.jooq.UpdatableRecord;
 import org.jooq.UpdatableTable;
 import org.jooq.UpdateQuery;
+import org.jooq.impl.Factory;
 
 /**
  * @author G. Miceli
@@ -34,7 +36,7 @@ public abstract class MappingJooqFactory<E> extends DialectAwareJooqFactory {
 	
 	protected abstract void setId(E entity, int id);
 
-	protected abstract int getId(E entity);
+	protected abstract Integer getId(E entity);
 	
 	protected abstract void fromRecord(Record r, E entity);
 	
@@ -49,6 +51,13 @@ public abstract class MappingJooqFactory<E> extends DialectAwareJooqFactory {
 	public <T> SimpleSelectQuery<?> selectByFieldQuery(TableField<?,T> field, T value) {
 		SimpleSelectQuery<?> select = selectQuery(getTable());
 		select.addConditions(field.equal(value));
+		return select;
+	}
+
+	public SelectQuery selectCountQuery() {
+		SelectQuery select = selectQuery();
+		select.addSelect(Factory.count());
+		select.addFrom(getTable());
 		return select;
 	}
 
@@ -92,11 +101,13 @@ public abstract class MappingJooqFactory<E> extends DialectAwareJooqFactory {
 	
 	@SuppressWarnings({"rawtypes", "unchecked"})
 	public InsertQuery insertQuery(E entity) {
-		int nextId = nextId();
-		setId(entity, nextId);
+		Integer id = getId(entity);
+		if ( id == null ) {
+			int nextId = nextId();
+			setId(entity, nextId);
+		}
 		
 		UpdatableRecord record = toRecord(entity);
-		
 		InsertQuery insert = insertQuery(getTable());
 		insert.setRecord(record);
 		return insert;
@@ -108,7 +119,10 @@ public abstract class MappingJooqFactory<E> extends DialectAwareJooqFactory {
 		
 		UpdateQuery update = updateQuery(getTable());
 		update.setRecord(record);
-		int id = getId(entity);
+		Integer id = getId(entity);
+		if ( id == null ) {
+			throw new IllegalArgumentException("Cannot update with null id");
+		}
 		update.addConditions(idField.equal(id));
 		return update;
 	}

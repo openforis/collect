@@ -24,6 +24,26 @@ public class TaxonVernacularNameDao extends MappingJooqDaoSupport<TaxonVernacula
 		return findContaining(OFC_TAXON_VERNACULAR_NAME.VERNACULAR_NAME, searchString, maxResults);
 	}
 
+	@Override
+	public TaxonVernacularName load(int id) {
+		return super.load(id);
+	}
+
+	@Override
+	public void insert(TaxonVernacularName entity) {
+		super.insert(entity);
+	}
+
+	@Override
+	public void update(TaxonVernacularName entity) {
+		super.update(entity);
+	}
+
+	@Override
+	public void delete(int id) {
+		super.delete(id);
+	}
+
 	protected static class JooqFactory extends MappingJooqFactory<TaxonVernacularName> {
 
 		private static final long serialVersionUID = 1L;
@@ -58,7 +78,7 @@ public class TaxonVernacularNameDao extends MappingJooqDaoSupport<TaxonVernacula
 		}
 
 		@Override
-		protected int getId(TaxonVernacularName t) {
+		protected Integer getId(TaxonVernacularName t) {
 			return t.getId();
 		}
 	}
