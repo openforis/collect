@@ -23,7 +23,6 @@ package org.openforis.collect.ui.component.detail
 	 */
 	public class ValidationDisplayManager {
 		
-		public static const STYLE_NAME_NOT_RELEVANT:String = "notRelevant";
 		public static const STYLE_NAME_ERROR:String = "error"; 
 		public static const STYLE_NAME_WARNING:String = "warning";
 
@@ -54,33 +53,7 @@ package org.openforis.collect.ui.component.detail
 			_display = display;
 		}
 		
-		public function init():void {
-			reset();
-			if(_active) {
-				if(_toolTipStyleName != null) {
-					if(! _toolTipTrigger.hasEventListener(MouseEvent.ROLL_OVER)) {
-						_toolTipTrigger.addEventListener(MouseEvent.ROLL_OVER, showToolTip);
-						_toolTipTrigger.addEventListener(MouseEvent.ROLL_OUT, hideToolTip);
-					}
-				}
-				if(_displayStyleName != null) {
-					UIUtil.addStyleName(_display, _displayStyleName);
-				}
-			}
-		}
-		
-		public function reset():void {
-			hideToolTip();
-			_toolTipTrigger.removeEventListener(MouseEvent.ROLL_OVER, showToolTip);
-			_toolTipTrigger.removeEventListener(MouseEvent.ROLL_OUT, hideToolTip);
-			UIUtil.removeStyleNames(_display, [
-				STYLE_NAME_ERROR, 
-				STYLE_NAME_WARNING, 
-				STYLE_NAME_NOT_RELEVANT
-			]);
-		}
-		
-		public function initByNode(parentEntity:EntityProxy, defn:NodeDefinitionProxy, attribute:AttributeProxy = null):void {
+		public function displayNodeValidation(parentEntity:EntityProxy, defn:NodeDefinitionProxy, attribute:AttributeProxy = null):void {
 			_displayStyleName = "";
 			_toolTipStyleName = null;
 			_toolTipMessage = null;
@@ -88,7 +61,6 @@ package org.openforis.collect.ui.component.detail
 				var hasErrors:Boolean = attribute != null ? attribute.hasErrors(): false;
 				var hasWarnings:Boolean = attribute != null ? attribute.hasWarnings(): false;
 				var name:String = defn.name;
-				var relevant:Boolean = parentEntity.childrenRelevanceMap.get(name);
 				var required:Boolean = parentEntity.childrenRequiredMap.get(name);
 				if(hasErrors || hasWarnings) {
 					_toolTipStyleName = hasWarnings ? ToolTipUtil.STYLE_NAME_WARNING: ToolTipUtil.STYLE_NAME_ERROR;
@@ -115,14 +87,34 @@ package org.openforis.collect.ui.component.detail
 						}
 					}
 				}
-				if(! relevant) {
-					_displayStyleName += " " + ValidationDisplayManager.STYLE_NAME_NOT_RELEVANT;
+			}
+			apply();
+		}
+
+		protected function apply():void {
+			reset();
+			if(_active) {
+				if(_toolTipStyleName != null) {
+					if(! _toolTipTrigger.hasEventListener(MouseEvent.ROLL_OVER)) {
+						_toolTipTrigger.addEventListener(MouseEvent.ROLL_OVER, showToolTip);
+						_toolTipTrigger.addEventListener(MouseEvent.ROLL_OUT, hideToolTip);
+					}
+				}
+				if(_displayStyleName != null) {
+					UIUtil.addStyleName(_display, _displayStyleName);
 				}
 			}
-			init();
 		}
 		
-		
+		public function reset():void {
+			hideToolTip();
+			_toolTipTrigger.removeEventListener(MouseEvent.ROLL_OVER, showToolTip);
+			_toolTipTrigger.removeEventListener(MouseEvent.ROLL_OUT, hideToolTip);
+			UIUtil.removeStyleNames(_display, [
+				STYLE_NAME_ERROR, 
+				STYLE_NAME_WARNING
+			]);
+		}
 		
 		protected function showToolTip(event:MouseEvent = null):void {
 			if(_toolTip != null){

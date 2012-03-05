@@ -8,6 +8,7 @@
 package org.openforis.collect.model.proxy {
 	import mx.collections.IList;
 	
+	import org.openforis.collect.i18n.Message;
 	import org.openforis.collect.util.CollectionUtil;
 	import org.openforis.collect.util.StringUtil;
 
@@ -33,6 +34,15 @@ package org.openforis.collect.model.proxy {
 				var parts:Array = new Array();
 				for each (var r:ValidationResultProxy in results) {
 					var message:String = r.localizedMessage;
+					if(StringUtil.isBlank(message)) {
+						switch(r.ruleName) {
+							case "SpecifiedValidator":
+								message = Message.get("edit.validation.specifiedError");
+								break;
+							default:
+								message = r.ruleName;
+						}
+					}
 					parts.push(message);
 				}
 				if(parts.length > 0) {

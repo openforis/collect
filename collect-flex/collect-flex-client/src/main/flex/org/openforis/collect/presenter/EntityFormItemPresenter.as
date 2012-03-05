@@ -10,8 +10,6 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.remoting.service.UpdateResponse;
 	import org.openforis.collect.ui.UIBuilder;
 	import org.openforis.collect.ui.component.detail.EntityFormItem;
-	import org.openforis.collect.ui.component.detail.ValidationDisplayManager;
-	import org.openforis.collect.util.UIUtil;
 	
 	/**
 	 * 
@@ -61,6 +59,7 @@ package org.openforis.collect.presenter
 				for each (var response:UpdateResponse in responses) {
 					if(response.nodeId == _view.parentEntity.id) {
 						updateValidationDisplayManager();
+						updateRelevanceDisplayManager();
 						break;
 					}
 				}
@@ -77,10 +76,16 @@ package org.openforis.collect.presenter
 			updateValidationDisplayManager();
 		}
 		
-		override protected function updateValidationDisplayManager():void {
-			if(view.parentEntity != null) {
-				validationDisplayManager.initByNode(view.parentEntity, view.entityDefinition);
+		override protected function updateValidationDisplayManager(forceActivation:Boolean = false):void {
+			super.updateValidationDisplayManager(forceActivation);
+			if(view.parentEntity != null && view.entityDefinition != null) {
+				validationDisplayManager.displayNodeValidation(view.parentEntity, view.entityDefinition);
 			}
+		}
+		
+		override protected function updateRelevanceDisplayManager():void {
+			super.updateRelevanceDisplayManager();
+			relevanceDisplayManager.displayNodeRelevance(view.parentEntity, view.entityDefinition);
 		}
 	}
 }

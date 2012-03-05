@@ -4,8 +4,6 @@ package org.openforis.collect.presenter {
 	import mx.collections.ArrayCollection;
 	import mx.collections.ListCollectionView;
 	import mx.events.CalendarLayoutChangeEvent;
-	import mx.rpc.events.FaultEvent;
-	import mx.rpc.events.ResultEvent;
 	
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.client.DataClient;
@@ -22,7 +20,7 @@ package org.openforis.collect.presenter {
 	 * 
 	 * @author S. Ricci
 	 * */
-	public class DateAttributePresenter extends AttributePresenter {
+	public class DateAttributePresenter extends CompositeAttributePresenter {
 		
 		private var _dataClient:DataClient;
 		

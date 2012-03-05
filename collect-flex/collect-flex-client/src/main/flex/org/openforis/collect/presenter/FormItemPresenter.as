@@ -8,6 +8,7 @@ package org.openforis.collect.presenter
 	
 	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.ui.component.detail.CollectFormItem;
+	import org.openforis.collect.ui.component.detail.RelevanceDisplayManager;
 	import org.openforis.collect.ui.component.detail.ValidationDisplayManager;
 
 	/**
@@ -19,11 +20,13 @@ package org.openforis.collect.presenter
 		
 		protected var _view:CollectFormItem;
 		protected var _validationDisplayManager:ValidationDisplayManager;
+		protected var _relevanceDisplayManager:RelevanceDisplayManager;
 		
 		public function FormItemPresenter(view:CollectFormItem) {
 			_view = view;
-			_validationDisplayManager = new ValidationDisplayManager(view, view);
-			
+			_relevanceDisplayManager = new RelevanceDisplayManager(view);
+			updateRelevanceDisplayManager();
+
 			super();
 			
 			updateView();
@@ -33,8 +36,16 @@ package org.openforis.collect.presenter
 			super.initEventListeners();
 			
 			eventDispatcher.addEventListener(ApplicationEvent.UPDATE_RESPONSE_RECEIVED, updateResponseReceivedHandler);
+			eventDispatcher.addEventListener(ApplicationEvent.RECORD_SAVED, recordSavedHandler);
 			ChangeWatcher.watch(_view, "parentEntity", parentEntityChangeHandler);
 			ChangeWatcher.watch(_view, "modelVersion", modelVersionChangeHandler);
+		}
+		
+		protected function updateResponseReceivedHandler(event:ApplicationEvent):void {
+		}
+		
+		protected function recordSavedHandler(event:ApplicationEvent):void {
+			updateValidationDisplayManager(true);
 		}
 		
 		protected function parentEntityChangeHandler(event:Event):void {
@@ -44,21 +55,30 @@ package org.openforis.collect.presenter
 		protected function modelVersionChangeHandler(event:Event):void {
 		}
 		
-		protected function updateResponseReceivedHandler(event:ApplicationEvent):void {
-		}
-		
 		protected function updateView():void {
-			
+			updateRelevanceDisplayManager();
 		}
 		
 		protected function initValidationDisplayManager():void {
+			_validationDisplayManager = new ValidationDisplayManager(_view, _view);
 		}
 		
-		protected function updateValidationDisplayManager():void {
+		protected function updateRelevanceDisplayManager():void {
+			
+		}
+		
+		protected function updateValidationDisplayManager(forceActivation:Boolean = false):void {
+			if(_validationDisplayManager == null) {
+				initValidationDisplayManager();
+			}
 		}
 		
 		protected function get validationDisplayManager():ValidationDisplayManager {
 			return _validationDisplayManager;
+		}
+		
+		protected function get relevanceDisplayManager():RelevanceDisplayManager {
+			return _relevanceDisplayManager;
 		}
 	}
 }

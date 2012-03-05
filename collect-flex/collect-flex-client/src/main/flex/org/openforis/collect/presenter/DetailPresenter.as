@@ -133,7 +133,8 @@ package org.openforis.collect.presenter {
 		}
 		
 		internal function saveActiveRecordResultHandler(event:ResultEvent, token:Object = null):void {
-			
+			var applicationEvent:ApplicationEvent = new ApplicationEvent(ApplicationEvent.RECORD_SAVED);
+			eventDispatcher.dispatchEvent(applicationEvent);
 		}
 		
 		internal function promoteRecordResultHandler(event:ResultEvent, token:Object = null):void {

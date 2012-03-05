@@ -46,6 +46,7 @@ package org.openforis.collect.presenter
 				for each (var response:UpdateResponse in responses) {
 					if(response.nodeId == _view.parentEntity.id) {
 						updateValidationDisplayManager();
+						updateRelevanceDisplayManager();
 						break;
 					}
 				}
@@ -100,9 +101,14 @@ package org.openforis.collect.presenter
 			}
 		}
 		
-		override protected function updateValidationDisplayManager():void {
+		override protected function updateRelevanceDisplayManager():void {
+			_relevanceDisplayManager.displayNodeRelevance(view.parentEntity, view.attributeDefinition);
+		}
+			
+		override protected function updateValidationDisplayManager(forceActivation:Boolean = false):void {
+			super.updateValidationDisplayManager(forceActivation);
 			if(view.parentEntity != null) {
-				_validationDisplayManager.initByNode(view.parentEntity, view.attributeDefinition);
+				_validationDisplayManager.displayNodeValidation(view.parentEntity, view.attributeDefinition);
 			}
 		}
 

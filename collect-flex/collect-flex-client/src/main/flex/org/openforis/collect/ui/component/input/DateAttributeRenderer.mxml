@@ -5,6 +5,7 @@
 				  xmlns:input="org.openforis.collect.ui.component.input.*" 
 				  xmlns:detail="org.openforis.collect.ui.component.detail.*"
 				  width="130"
+				  inputFields="{[year, month, day]}"
 				  >
 	
 	<fx:Script>

@@ -13,7 +13,8 @@ package org.openforis.collect.event {
 		public static const SESSION_STATE_LOADED:String = "sessionStateLoaded";
 		public static const APPLICATION_INITIALIZED:String = "applicationInitialized";
 		public static const UPDATE_RESPONSE_RECEIVED:String = "updateResponseReceived";
-		
+		public static const RECORD_SAVED:String = "recordSaved";
+			
 		public var result:Object;
 		
 		public function ApplicationEvent(type:String, bubbles:Boolean=false, cancelable:Boolean=false) {
