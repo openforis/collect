@@ -12,6 +12,7 @@ import static org.openforis.idm.metamodel.validation.ValidationResultFlag.WARNIN
 
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
+import org.openforis.collect.model.FieldSymbol;
 import org.openforis.idm.metamodel.validation.ValidationResultFlag;
 import org.openforis.idm.metamodel.validation.ValidationRule;
 import org.openforis.idm.model.Attribute;
@@ -21,6 +22,7 @@ import org.openforis.idm.model.Field;
 /**
  * @author M. Togna
  * @author G. Miceli
+ * @author S. Ricci
  */
 public class SpecifiedValidator implements ValidationRule<Attribute<?,?>> {
 
@@ -51,9 +53,9 @@ public class SpecifiedValidator implements ValidationRule<Attribute<?,?>> {
 		int fieldCount = attribute.getFieldCount();
 		for (int i = 0; i < fieldCount; i++) {
 			Field<?> field = attribute.getField(i);
-			Character symbol = field.getSymbol();
-
-			if (!(ILLEGIBLE.getSymbol().equals(symbol) || BLANK_ON_FORM.getSymbol().equals(symbol) || DASH_ON_FORM.getSymbol().equals(symbol))) {
+			Character symbolCode = field.getSymbol();
+			FieldSymbol symbol = FieldSymbol.valueOf(symbolCode);
+			if ( !(symbol == BLANK_ON_FORM || symbol == DASH_ON_FORM || symbol == ILLEGIBLE) ) {
 				return false;
 			}
 		}
