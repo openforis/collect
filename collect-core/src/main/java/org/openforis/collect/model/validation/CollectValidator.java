@@ -7,6 +7,7 @@ import static org.openforis.collect.model.FieldSymbol.CONFIRMED;
 
 import java.util.List;
 
+import org.openforis.collect.manager.RecordManager;
 import org.openforis.idm.metamodel.KeyAttributeDefinition;
 import org.openforis.idm.metamodel.validation.ValidationResult;
 import org.openforis.idm.metamodel.validation.ValidationResultFlag;
@@ -15,12 +16,15 @@ import org.openforis.idm.metamodel.validation.Validator;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Field;
 import org.openforis.idm.model.Record;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author M. Togna
  * 
  */
 public class CollectValidator extends Validator {
+	@Autowired
+	private RecordManager recordManager;
 
 	@Override
 	public ValidationResults validate(Attribute<?, ?> attribute) {
@@ -53,7 +57,7 @@ public class CollectValidator extends Validator {
 	}
 
 	private ValidationResultFlag validateUniqueness(Attribute<?, ?> attribute, ValidationResults results) {
-		RecordKeyUniquenessValidator keyValidator = new RecordKeyUniquenessValidator();
+		RecordKeyUniquenessValidator keyValidator = new RecordKeyUniquenessValidator(recordManager);
 		ValidationResultFlag unique = keyValidator.evaluate(attribute);
 		results.addResult(keyValidator, unique);
 		return unique;

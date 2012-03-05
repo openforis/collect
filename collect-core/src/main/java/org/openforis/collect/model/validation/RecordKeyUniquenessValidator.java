@@ -15,9 +15,9 @@ import org.openforis.idm.metamodel.KeyAttributeDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.validation.ValidationResultFlag;
 import org.openforis.idm.metamodel.validation.ValidationRule;
-import org.openforis.idm.model.AtomicAttribute;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Entity;
+import org.openforis.idm.model.Field;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -26,8 +26,11 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class RecordKeyUniquenessValidator implements ValidationRule<Attribute<?, ?>> {
 
-	@Autowired
 	private RecordManager recordManager;
+	
+	public RecordKeyUniquenessValidator(RecordManager recordManager) {
+		this.recordManager = recordManager;
+	}
 
 	@Override
 	public ValidationResultFlag evaluate(Attribute<?, ?> node) {
@@ -56,9 +59,13 @@ public class RecordKeyUniquenessValidator implements ValidationRule<Attribute<?,
 		List<AttributeDefinition> keyAttributeDefinitions = getKeyAttributeDefinitions(entity);
 		for (NodeDefinition keyAttributeDefinition : keyAttributeDefinitions) {
 			String keyName = keyAttributeDefinition.getName();
-			AtomicAttribute<?, ?> attribute = (AtomicAttribute<?, ?>) entity.get(keyName, 0);
-			Object object = attribute.getValue();
-			keys.add(object.toString());
+			Attribute<?, ?> attribute = (Attribute<?, ?>) entity.get(keyName, 0);
+			Field<?> field = attribute.getField(0);
+			String value = "";
+			if(field.getValue() != null){
+				value = field.getValue().toString();
+			}
+			keys.add(value);
 		}
 		return keys.toArray(new String[] {});
 	}
@@ -74,5 +81,5 @@ public class RecordKeyUniquenessValidator implements ValidationRule<Attribute<?,
 		}
 		return keyAttributeDefinitions;
 	}
-
+	
 }
