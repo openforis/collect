@@ -118,10 +118,6 @@
     	<property name="dataSource" ref="dataSource"/>
 	</bean>
 
-	<bean id="dataDao" class="org.openforis.collect.persistence.DataDao">
-    	<property name="dataSource" ref="dataSource"/>
-	</bean>
-	
 	<bean id="userDao" class="org.openforis.collect.persistence.UserDao">
     	<property name="dataSource" ref="dataSource"/>
 	</bean>
@@ -152,6 +148,16 @@
 	<bean id="validator" 					class="org.openforis.collect.model.validation.CollectValidator" />
 	
 	<bean id="lookupProvider" 	class="org.openforis.collect.persistence.DatabaseLookupProvider" />
+	
+	
+	<!-- ===================================== -->
+	<!-- Security -->
+	<!-- ===================================== -->
+	<bean id="userDetailsService"	class="org.openforis.collect.security.CollectUserDetailsService" />
+	
+	
+	
+	
 	
 	<!-- Controllers -->
 	<!-- <bean id="multipartResolver" -->

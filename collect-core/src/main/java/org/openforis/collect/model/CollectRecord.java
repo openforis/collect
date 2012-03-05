@@ -54,6 +54,7 @@ public class CollectRecord extends Record {
 	private transient User createdBy;
 	private transient Date modifiedDate;
 	private transient User modifiedBy;
+	private transient User lockedBy;
 	private transient Integer missing;
 	private transient Integer skipped;
 	private transient Integer errors;
@@ -397,4 +398,11 @@ public class CollectRecord extends Record {
 		this.entityCounts = counts;
 	}
 
+	public User getLockedBy() {
+		return lockedBy;
+	}
+	
+	public void setLockedBy(User lockedBy) {
+		this.lockedBy = lockedBy;
+	}
 }

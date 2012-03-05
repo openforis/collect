@@ -26,7 +26,7 @@
 	</http>
 
 	<authentication-manager alias="authManager">
-		<authentication-provider user-service-ref="userDao">
+		<authentication-provider user-service-ref="userDetailsService">
 			<password-encoder hash="md5" />
 		</authentication-provider>
 	</authentication-manager>

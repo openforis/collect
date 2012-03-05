@@ -54,9 +54,6 @@ public class RecordManager {
 	@Autowired
 	private RecordDao recordDao;
 	
-//	@Autowired 
-//	private SurveyContext recordContext;
-	
 	protected void init() {
 		unlockAll();
 	}
@@ -89,6 +86,7 @@ public class RecordManager {
 	public CollectRecord checkout(CollectSurvey survey, User user, int recordId) throws RecordLockedException, NonexistentIdException, AccessDeniedException, MultipleEditException {
 		CollectRecord record = recordDao.load(survey, recordId, 1);
 		recordDao.lock(recordId, user);
+		record.setLockedBy(user);
 		return record;
 	}
 
@@ -131,8 +129,9 @@ public class RecordManager {
 	}
 
 	@Transactional
-	public void unlock(Record record, User user) throws RecordLockedException {
+	public void unlock(CollectRecord record, User user) throws RecordLockedException {
 		recordDao.unlock(record.getId(), user);
+		record.setLockedBy(null);
 	}
 
 	@Transactional
