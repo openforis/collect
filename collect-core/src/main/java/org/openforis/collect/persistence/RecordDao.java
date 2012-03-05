@@ -194,7 +194,7 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 		Result<Record> result = q.fetch();
 		return jf.fromResult(result);
 	}
-
+	
 	@Transactional
 	public List<CollectRecord> loadSummaries(CollectSurvey survey, String rootEntity, int offset, int maxRecords, String orderByField, String filter) {
 		JooqFactory jf = getMappingJooqFactory(survey);

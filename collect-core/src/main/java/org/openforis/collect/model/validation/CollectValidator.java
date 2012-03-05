@@ -3,16 +3,13 @@
  */
 package org.openforis.collect.model.validation;
 
-import static org.openforis.collect.model.FieldSymbol.BLANK_ON_FORM;
 import static org.openforis.collect.model.FieldSymbol.CONFIRMED;
-import static org.openforis.collect.model.FieldSymbol.DASH_ON_FORM;
-import static org.openforis.collect.model.FieldSymbol.ILLEGIBLE;
 
 import java.util.List;
 
 import org.openforis.idm.metamodel.KeyAttributeDefinition;
-import org.openforis.idm.metamodel.validation.Check.Flag;
 import org.openforis.idm.metamodel.validation.ValidationResult;
+import org.openforis.idm.metamodel.validation.ValidationResultFlag;
 import org.openforis.idm.metamodel.validation.ValidationResults;
 import org.openforis.idm.metamodel.validation.Validator;
 import org.openforis.idm.model.Attribute;
@@ -28,34 +25,37 @@ public class CollectValidator extends Validator {
 	@Override
 	public ValidationResults validate(Attribute<?, ?> attribute) {
 
-		CollectValidationResults results = new CollectValidationResults();
+		ValidationResults results = new ValidationResults();
 		SpecifiedValidator specifiedValidator = new SpecifiedValidator();
-		boolean specified = specifiedValidator.evaluate(attribute);
-		results.addResult(attribute, specifiedValidator, specified);
+		ValidationResultFlag specified = specifiedValidator.evaluate(attribute);
+		results.addResult(specifiedValidator, specified);
 
-		if (specified || specifiedValidator.getFlag().equals(Flag.WARN)) {
+		if ( !specified.isError() ) {
 			boolean isKey = isRecordKey(attribute);
-			if (isKey && !isUnique(attribute, results)) {
+			ValidationResultFlag uniqueness = validateUniqueness(attribute, results);
+			if (isKey && uniqueness.isError()) {
+				// TODO
 			} else {
+				// TODO only do in phase 1
+				// Lower error level of confirmed error values				
 				ValidationResults idmResults = super.validate(attribute);
-				boolean confirmed = isConfirmedValue(attribute);
+				boolean confirmed = isValueConfirmed(attribute);
 				List<ValidationResult> errors = idmResults.getErrors();
 				for (ValidationResult error : errors) {
-					Flag flag = confirmed ? Flag.WARN : Flag.ERROR;
-					results.addFailure(error, flag);
+					ValidationResultFlag newFlag = confirmed ? ValidationResultFlag.WARNING : ValidationResultFlag.ERROR;
+					results.addResult(error.getValidator(), newFlag);
 				}
-				results.addWarnings(idmResults.getWarnings());
-				results.addPassed(idmResults.getPassed());
+				results.addResults(idmResults.getWarnings());
 			}
 		}
 		return results;
 
 	}
 
-	private boolean isUnique(Attribute<?, ?> attribute, CollectValidationResults results) {
+	private ValidationResultFlag validateUniqueness(Attribute<?, ?> attribute, ValidationResults results) {
 		RecordKeyUniquenessValidator keyValidator = new RecordKeyUniquenessValidator();
-		boolean unique = keyValidator.evaluate(attribute);
-		results.addResult(attribute, keyValidator, unique);
+		ValidationResultFlag unique = keyValidator.evaluate(attribute);
+		results.addResult(keyValidator, unique);
 		return unique;
 	}
 
@@ -64,20 +64,7 @@ public class CollectValidator extends Validator {
 		return attribute instanceof KeyAttributeDefinition && record.getRootEntity().equals(attribute.getParent());
 	}
 
-	static boolean notReasonBlankSpecified(Attribute<?, ?> attribute) {
-		int fieldCount = attribute.getFieldCount();
-		for (int i = 0; i < fieldCount; i++) {
-			Field<?> field = attribute.getField(i);
-			Character symbol = field.getSymbol();
-
-			if (!(ILLEGIBLE.getSymbol().equals(symbol) || BLANK_ON_FORM.getSymbol().equals(symbol) || DASH_ON_FORM.getSymbol().equals(symbol))) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	static boolean isConfirmedValue(Attribute<?, ?> attribute) {
+	private boolean isValueConfirmed(Attribute<?, ?> attribute) {
 		int fieldCount = attribute.getFieldCount();
 		for (int i = 0; i < fieldCount; i++) {
 			Field<?> field = attribute.getField(i);

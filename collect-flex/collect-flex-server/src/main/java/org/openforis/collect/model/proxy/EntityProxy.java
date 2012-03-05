@@ -11,6 +11,7 @@ import java.util.Map;
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
+import org.openforis.idm.metamodel.validation.ValidationResultFlag;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Node;
@@ -78,24 +79,24 @@ public class EntityProxy extends NodeProxy {
 	}
 	
 	@ExternalizedProperty
-	public Map<String, Boolean> getChildrenMinCountValidityMap(){
+	public Map<String, ValidationResultFlag> getChildrenMinCountValidityMap(){
 		List<NodeDefinition> childDefinitions = getChildDefinitions();
-		Map<String, Boolean> map = new HashMap<String, Boolean>();
+		Map<String, ValidationResultFlag> map = new HashMap<String, ValidationResultFlag>();
 		for (NodeDefinition childDefinition : childDefinitions) {
 			String childName = childDefinition.getName();
-			boolean valid = entity.validateMinCount(childName);
+			ValidationResultFlag valid = entity.validateMinCount(childName);
 			map.put(childName, valid);
 		}
 		return map;
 	}
 
 	@ExternalizedProperty
-	public Map<String, Boolean> getChildrenMaxCountValidityMap(){
+	public Map<String, ValidationResultFlag> getChildrenMaxCountValidityMap(){
 		List<NodeDefinition> childDefinitions = getChildDefinitions();
-		Map<String, Boolean> map = new HashMap<String, Boolean>();
+		Map<String, ValidationResultFlag> map = new HashMap<String, ValidationResultFlag>();
 		for (NodeDefinition childDefinition : childDefinitions) {
 			String childName = childDefinition.getName();
-			boolean valid = entity.validateMaxCount(childName);
+			ValidationResultFlag valid = entity.validateMaxCount(childName);
 			map.put(childName, valid);
 		}
 		return map;
