@@ -7,7 +7,7 @@ package org.openforis.collect.persistence;
  * @author M. Togna
  * 
  */
-public class NonexistentIdException extends Exception {
+public class NonexistentIdException extends RecordPersistenceException {
 
 	/**
 	 * 

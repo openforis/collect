@@ -37,6 +37,9 @@
 		]]>
 	</fx:Script>
 	
-	<s:Label id="textInput" />
+	<s:Label id="textInput" 
+			 width="100%" 
+			 maxDisplayedLines="1" 
+			 showTruncationTip="true" />
 	
 </input:InputField>

@@ -5,7 +5,9 @@ package org.openforis.collect.presenter {
 	import mx.collections.IList;
 	import mx.core.UIComponent;
 	
+	import org.openforis.collect.Application;
 	import org.openforis.collect.event.ApplicationEvent;
+	import org.openforis.collect.model.proxy.RecordProxy;
 	import org.openforis.collect.remoting.service.UpdateResponse;
 	import org.openforis.collect.ui.component.detail.AttributeItemRenderer;
 	import org.openforis.collect.ui.component.detail.ValidationDisplayManager;
@@ -23,7 +25,10 @@ package org.openforis.collect.presenter {
 		
 		public function AttributePresenter(view:AttributeItemRenderer) {
 			_view = view;
-			
+			var inputField:InputField = _view.getElementAt(0) as InputField;
+			if(inputField != null) {
+				ChangeWatcher.watch(inputField, "visited", fieldVisitedHandler);
+			}
 			initValidationDisplayManager();
 			super();
 		}
@@ -44,6 +49,11 @@ package org.openforis.collect.presenter {
 			}
 		}
 		
+		protected function fieldVisitedHandler(event:Event):void {
+			_view.visited = true;
+			updateValidationDisplayManager();
+		}
+		
 		protected function attributeChangeHandler(event:Event):void {
 			updateValidationDisplayManager();
 		}
@@ -62,7 +72,15 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function updateValidationDisplayManager():void {
-			_validationDisplayManager.initByNode(_view.parentEntity, _view.attributeDefinition, _view.attribute);
+			var record:RecordProxy = Application.activeRecord;
+			var active:Boolean = !isNaN(record.id) || _view.visited;
+			if(active) {
+				_validationDisplayManager.active = true;
+				_validationDisplayManager.initByNode(_view.parentEntity, _view.attributeDefinition, _view.attribute);
+			} else {
+				_validationDisplayManager.active = false;
+				_validationDisplayManager.init();
+			}
 		}
 	}
 }

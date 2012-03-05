@@ -13,6 +13,7 @@ import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.KeyAttributeDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
+import org.openforis.idm.metamodel.validation.ValidationResultFlag;
 import org.openforis.idm.metamodel.validation.ValidationRule;
 import org.openforis.idm.model.AtomicAttribute;
 import org.openforis.idm.model.Attribute;
@@ -29,14 +30,15 @@ public class RecordKeyUniquenessValidator implements ValidationRule<Attribute<?,
 	private RecordManager recordManager;
 
 	@Override
-	public boolean evaluate(Attribute<?, ?> node) {
+	public ValidationResultFlag evaluate(Attribute<?, ?> node) {
 		Entity rootEntity = node.getParent();
 		CollectRecord record = (CollectRecord) rootEntity.getRecord();
 		CollectSurvey survey = (CollectSurvey) record.getSurvey();
 		String[] keys = getKeys(rootEntity);
 
 		List<CollectRecord> records = recordManager.getSummaries(survey, rootEntity.getName(), keys);
-		return checkUniqueness(records, record);
+		boolean unique = checkUniqueness(records, record);
+		return ValidationResultFlag.valueOf(unique);
 	}
 
 	private boolean checkUniqueness(List<CollectRecord> records, CollectRecord record) {

@@ -32,9 +32,8 @@ package org.openforis.collect.model.proxy {
 			if(results != null) {
 				var parts:Array = new Array();
 				for each (var r:ValidationResultProxy in results) {
-					if(! r.valid) {
-						parts.push("Error");
-					}
+					var message:String = r.localizedMessage;
+					parts.push(message);
 				}
 				if(parts.length > 0) {
 					return StringUtil.concat(";\n", parts);

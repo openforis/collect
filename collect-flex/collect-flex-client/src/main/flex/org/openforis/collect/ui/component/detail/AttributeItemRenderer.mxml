@@ -30,16 +30,13 @@
 			private var _attributes:IList;
 			private var _isInDataGroup:Boolean = false;
 			private var _internalLabelWidth:Number = 130;
-			private var _presenter:*;
+			private var _presenter:AttributePresenter;
+			private var _visited:Boolean;
 			
 			protected function creationCompleteHandler(event:FlexEvent):void {
 				initPresenter();
 			}
 
-			override protected function getCurrentSkinState():String {
-				return super.getCurrentSkinState();
-			}
-			
 			protected function initPresenter():void {
 				presenter = new AttributePresenter(this);
 			}
@@ -110,12 +107,20 @@
 				_attributes = value;
 			}
 			
-			public function get presenter():* {
+			public function get presenter():AttributePresenter {
 				return _presenter;
 			}
 
-			public function set presenter(value:*):void {
+			public function set presenter(value:AttributePresenter):void {
 				_presenter = value;
+			}
+
+			public function get visited():Boolean {
+				return _visited;
+			}
+
+			public function set visited(value:Boolean):void {
+				_visited = value;
 			}
 
 			

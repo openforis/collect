@@ -103,7 +103,7 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 	}
 
 	@Transactional
-	public void lock(Integer recordId, User user) throws RecordLockedException, AccessDeniedException, MultipleEditException {
+	public void lock(Integer recordId, User user) throws RecordPersistenceException {
 		Factory jf = getJooqFactory();
 		//check if user has already locked another record
 		checkLock(user);
@@ -196,7 +196,7 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 		Result<Record> result = q.fetch();
 		return jf.fromResult(result);
 	}
-
+	
 	@Transactional
 	public List<CollectRecord> loadSummaries(CollectSurvey survey, String rootEntity, int offset, int maxRecords, String orderByField, String filter) {
 		JooqFactory jf = getMappingJooqFactory(survey);

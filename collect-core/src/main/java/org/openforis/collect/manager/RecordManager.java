@@ -22,6 +22,7 @@ import org.openforis.collect.persistence.MultipleEditException;
 import org.openforis.collect.persistence.NonexistentIdException;
 import org.openforis.collect.persistence.RecordDao;
 import org.openforis.collect.persistence.RecordLockedException;
+import org.openforis.collect.persistence.RecordPersistenceException;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
@@ -59,16 +60,22 @@ public class RecordManager {
 	}
 	
 	@Transactional
-	public void save(CollectRecord record) {
+	public void save(CollectRecord record) throws RecordPersistenceException {
 		updateCounts(record);
-		
 		updateKeys(record);
-		
-		recordDao.saveOrUpdate(record);
+		Integer id = record.getId();
+		if(id == null) {
+			recordDao.insert(record);
+			User user = record.getModifiedBy();
+			id = record.getId();
+			recordDao.lock(id, user);
+		} else {
+			recordDao.update(record);
+		}
 	}
 
 	@Transactional
-	public void delete(int recordId, User user) throws RecordLockedException, AccessDeniedException, MultipleEditException {
+	public void delete(int recordId, User user) throws RecordPersistenceException {
 		recordDao.lock(recordId, user);
 		recordDao.delete(recordId);
 	}
@@ -83,8 +90,8 @@ public class RecordManager {
 	 * @throws MultipleEditException 
 	 */
 	@Transactional
-	public CollectRecord checkout(CollectSurvey survey, User user, int recordId) throws RecordLockedException, NonexistentIdException, AccessDeniedException, MultipleEditException {
-		CollectRecord record = recordDao.load(survey, recordId, 1);
+	public CollectRecord checkout(CollectSurvey survey, User user, int recordId, int step) throws RecordPersistenceException {
+		CollectRecord record = recordDao.load(survey, recordId, step);
 		recordDao.lock(recordId, user);
 		record.setLockedBy(user);
 		return record;
@@ -103,7 +110,7 @@ public class RecordManager {
 
 	@Transactional
 	public int getCountRecords(EntityDefinition rootEntityDefinition) {
-		int count = recordDao.getRecordCount(rootEntityDefinition);
+		int count = recordDao.countRecords(rootEntityDefinition.getId());
 		return count;
 	}
 
@@ -117,9 +124,6 @@ public class RecordManager {
 		record.setCreationDate(new Date());
 		record.setCreatedBy(user);
 		record.setStep(Step.ENTRY);
-		recordDao.saveOrUpdate(record);
-		Integer recordId = record.getId();
-		recordDao.lock(recordId, user);
 		return record;
 	}
 
@@ -214,7 +218,6 @@ public class RecordManager {
 					for (Node<?> node : all) {
 						if(node instanceof Entity) {
 							addEmptyNodes((Entity) node);
-							addEmptyEnumeratedEntities((Entity) node);
 						}
 					}
 				}
@@ -247,7 +250,6 @@ public class RecordManager {
 	
 	public Set<Attribute<?, ?>> clearValidationResults(Attribute<?,?> attribute){
 		Set<Attribute<?,?>> checkDependencies = attribute.getCheckDependencies();
-//		updatedAttributes.add(attribute);
 		clearValidationResults(checkDependencies);
 		return checkDependencies;
 	}

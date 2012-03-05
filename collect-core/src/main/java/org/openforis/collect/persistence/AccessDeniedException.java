@@ -7,7 +7,7 @@ package org.openforis.collect.persistence;
  * @author M. Togna
  * 
  */
-public class AccessDeniedException extends Exception {
+public class AccessDeniedException extends RecordPersistenceException {
 
 	private static final long serialVersionUID = 1L;
 

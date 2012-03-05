@@ -11,6 +11,7 @@ import java.util.Map;
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
+import org.openforis.idm.metamodel.validation.ValidationResultFlag;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Node;
@@ -36,8 +37,8 @@ public class EntityProxy extends NodeProxy {
 		for (NodeDefinition childDefinition : childDefinitions) {
 			String name = childDefinition.getName();
 			List<Node<?>> childrenByName = this.entity.getAll(name);
+			List<NodeProxy> childrenByNameProxies = new ArrayList<NodeProxy>();
 			if(childrenByName != null) {
-				List<NodeProxy> childrenByNameProxies = new ArrayList<NodeProxy>();
 				for (Node<?> childNode : childrenByName) {
 					if(childNode instanceof Attribute) {
 						NodeProxy attributeProxy = new AttributeProxy((Attribute<?, ?>) childNode);
@@ -47,8 +48,8 @@ public class EntityProxy extends NodeProxy {
 						childrenByNameProxies.add(entityProxy);
 					}
 				}
-				result.put(name, childrenByNameProxies);
 			}
+			result.put(name, childrenByNameProxies);
 		}
 		return result;
 	}
@@ -78,24 +79,24 @@ public class EntityProxy extends NodeProxy {
 	}
 	
 	@ExternalizedProperty
-	public Map<String, Boolean> getChildrenMinCountValiditationMap(){
+	public Map<String, ValidationResultFlag> getChildrenMinCountValidationMap(){
 		List<NodeDefinition> childDefinitions = getChildDefinitions();
-		Map<String, Boolean> map = new HashMap<String, Boolean>();
+		Map<String, ValidationResultFlag> map = new HashMap<String, ValidationResultFlag>();
 		for (NodeDefinition childDefinition : childDefinitions) {
 			String childName = childDefinition.getName();
-			boolean valid = entity.validateMinCount(childName);
+			ValidationResultFlag valid = entity.validateMinCount(childName);
 			map.put(childName, valid);
 		}
 		return map;
 	}
 
 	@ExternalizedProperty
-	public Map<String, Boolean> getChildrenMaxCountValiditionMap(){
+	public Map<String, ValidationResultFlag> getChildrenMaxCountValidationMap(){
 		List<NodeDefinition> childDefinitions = getChildDefinitions();
-		Map<String, Boolean> map = new HashMap<String, Boolean>();
+		Map<String, ValidationResultFlag> map = new HashMap<String, ValidationResultFlag>();
 		for (NodeDefinition childDefinition : childDefinitions) {
 			String childName = childDefinition.getName();
-			boolean valid = entity.validateMaxCount(childName);
+			ValidationResultFlag valid = entity.validateMaxCount(childName);
 			map.put(childName, valid);
 		}
 		return map;

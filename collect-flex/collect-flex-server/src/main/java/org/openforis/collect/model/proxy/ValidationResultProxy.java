@@ -9,7 +9,9 @@ import java.util.List;
 
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.collect.Proxy;
+import org.openforis.idm.metamodel.validation.Check;
 import org.openforis.idm.metamodel.validation.ValidationResult;
+import org.openforis.idm.metamodel.validation.ValidationRule;
 
 /**
  * @author M. Togna
@@ -36,8 +38,24 @@ public class ValidationResultProxy implements Proxy {
 	}
 
 	@ExternalizedProperty
-	public boolean isValid() {
-		return validationResult.isValid();
+	public String getRuleName() {
+		return validationResult.getValidator().getClass().getSimpleName();
 	}
-
+	
+	@ExternalizedProperty
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public String getLocalizedMessage() {
+		ValidationRule<?> v = validationResult.getValidator();
+		if ( v instanceof Check ) {
+			List<String> m = ((Check) v).getMessages();
+			if ( m.isEmpty() ) {
+				return null;
+			} else {
+				return m.get(0);
+			}
+		} else {
+			return null;
+		}
+	}
+	
 }
