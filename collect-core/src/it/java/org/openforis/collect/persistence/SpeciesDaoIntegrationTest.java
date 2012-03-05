@@ -200,7 +200,7 @@ public class SpeciesDaoIntegrationTest {
 		Taxonomy t = t1;
 
 		// Confirm saved
-		Taxonomy t2 = taxonomyDao.load(t.getId());
+		Taxonomy t2 = taxonomyDao.loadById(t.getId());
 		assertEquals(t.getId(), t2.getId());
 		assertEquals(t.getName(), t2.getName());
 		return t2;
@@ -213,7 +213,7 @@ public class SpeciesDaoIntegrationTest {
 		taxonomyDao.update(t);
 		
 		// Confirm saved
-		t = taxonomyDao.load(id);
+		t = taxonomyDao.loadById(id);
 		assertEquals(newName, t.getName());
 	}
 	
@@ -231,7 +231,7 @@ public class SpeciesDaoIntegrationTest {
 		taxonDao.insert(t);
 		
 		// Confirm saved
-		t = taxonDao.load(t.getId());
+		t = taxonDao.loadById(t.getId());
 		assertNotNull(t);
 		assertEquals(scientificName, t.getScientificName());
 		assertEquals(rank, t.getTaxonomicRank());
@@ -253,7 +253,7 @@ public class SpeciesDaoIntegrationTest {
 		taxonDao.update(t);
 		
 		// Confirm saved
-		t = taxonDao.load(t.getId());
+		t = taxonDao.loadById(t.getId());
 		assertNotNull(t);
 		assertEquals(scientificName, t.getScientificName());
 		assertEquals(rank, t.getTaxonomicRank());
@@ -273,7 +273,7 @@ public class SpeciesDaoIntegrationTest {
 		taxonVernacularNameDao.insert(tvn);
 		
 		// Confirm saved
-		tvn = taxonVernacularNameDao.load(tvn.getId());
+		tvn = taxonVernacularNameDao.loadById(tvn.getId());
 		assertNotNull(tvn);
 		assertEquals(taxon1.getId(), tvn.getTaxonId());
 		assertEquals(name, tvn.getVernacularName());
@@ -294,7 +294,7 @@ public class SpeciesDaoIntegrationTest {
 		taxonVernacularNameDao.update(tvn);
 		
 		// Confirm saved
-		tvn = taxonVernacularNameDao.load(id);
+		tvn = taxonVernacularNameDao.loadById(id);
 		assertNotNull(tvn);
 		assertEquals(id, tvn.getId());
 		assertEquals(taxon1.getId(), tvn.getTaxonId());
@@ -311,7 +311,7 @@ public class SpeciesDaoIntegrationTest {
 		taxonVernacularNameDao.delete(t.getId());
 		
 		// Confirm deleted
-		t = taxonVernacularNameDao.load(t.getId());
+		t = taxonVernacularNameDao.loadById(t.getId());
 		assertNull(t);
 	}
 
@@ -321,7 +321,7 @@ public class SpeciesDaoIntegrationTest {
 		taxonDao.delete(t.getId());
 		
 		// Confirm deleted
-		t = taxonDao.load(t.getId());
+		t = taxonDao.loadById(t.getId());
 		assertNull(t);
 	}
 
@@ -330,7 +330,7 @@ public class SpeciesDaoIntegrationTest {
 		taxonomyDao.delete(t.getId());
 		
 		// Confirm deleted
-		t = taxonomyDao.load(t.getId());
+		t = taxonomyDao.loadById(t.getId());
 		assertNull(t);
 	}
 }

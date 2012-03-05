@@ -33,8 +33,8 @@ public class TaxonomyDao extends MappingJooqDaoSupport<Taxonomy, TaxonomyDao.Joo
 	}
 	
 	@Override
-	public Taxonomy load(int id) {
-		return super.load(id);
+	public Taxonomy loadById(int id) {
+		return super.loadById(id);
 	}
 
 	@Override

@@ -13,6 +13,7 @@ import org.jooq.Field;
 import org.jooq.Record;
 import org.jooq.Result;
 import org.jooq.SelectQuery;
+import org.jooq.SimpleSelectQuery;
 import org.jooq.TableField;
 import org.jooq.UpdatableRecord;
 import org.jooq.impl.Factory;
@@ -23,6 +24,7 @@ import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.RecordDao.JooqFactory;
 import org.openforis.collect.persistence.jooq.MappingJooqDaoSupport;
 import org.openforis.collect.persistence.jooq.MappingJooqFactory;
+import org.openforis.collect.persistence.jooq.tables.records.OfcUserRecord;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Schema;
@@ -46,7 +48,7 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 	private static final TableField[] COUNT_FIELDS = 
 		{OFC_RECORD.COUNT1, OFC_RECORD.COUNT2, OFC_RECORD.COUNT3, OFC_RECORD.COUNT4, OFC_RECORD.COUNT5};
 	private static final TableField[] SUMMARY_FIELDS = 
-		{OFC_RECORD.DATE_CREATED, OFC_RECORD.DATE_MODIFIED, OFC_RECORD.ERRORS, OFC_RECORD.ID, 
+		{OFC_RECORD.DATE_CREATED, OFC_RECORD.CREATED_BY_ID, OFC_RECORD.DATE_MODIFIED, OFC_RECORD.ERRORS, OFC_RECORD.ID, 
 	     OFC_RECORD.LOCKED_BY_ID, OFC_RECORD.MISSING, OFC_RECORD.MODEL_VERSION, OFC_RECORD.MODIFIED_BY_ID, 
 	     OFC_RECORD.ROOT_ENTITY_ID,	OFC_RECORD.SKIPPED,	OFC_RECORD.STATE, OFC_RECORD.STEP,
 	     OFC_RECORD.WARNINGS, OFC_RECORD.KEY1, OFC_RECORD.KEY2, OFC_RECORD.KEY3, OFC_RECORD.COUNT1,
@@ -142,7 +144,7 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 	}
 
 	@Transactional
-	public void unlock(Integer recordId, User user) throws RecordLockedException {
+	public void unlock(int recordId, User user) throws RecordLockedException {
 		Factory jf = getJooqFactory();
 		Record selectResult = jf
 				.select(OFC_RECORD.LOCKED_BY_ID, OFC_USER.USERNAME)
@@ -194,7 +196,7 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 		Result<Record> result = q.fetch();
 		return jf.fromResult(result);
 	}
-
+	
 	@Transactional
 	public List<CollectRecord> loadSummaries(CollectSurvey survey, String rootEntity, int offset, int maxRecords, String orderByField, String filter) {
 		JooqFactory jf = getMappingJooqFactory(survey);
@@ -315,7 +317,24 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 			// record.setCreatedBy(r.getValueAsString(OFC_RECORD.CREATED_BY));
 			c.setModifiedDate(r.getValue(OFC_RECORD.DATE_MODIFIED));
 			// record.setModifiedBy(r.getValueAsString(OFC_RECORD.MODIFIED_BY));
-
+			
+			Integer createdById = r.getValue(OFC_RECORD.CREATED_BY_ID);
+			if(createdById !=null){
+				User user = loadUser(createdById);
+				c.setCreatedBy(user);
+			}
+			Integer modifiedById = r.getValue(OFC_RECORD.MODIFIED_BY_ID);
+			if(modifiedById !=null){
+				User user = loadUser(modifiedById);
+				c.setModifiedBy(user);
+			}
+			Integer lockedById = r.getValue(OFC_RECORD.LOCKED_BY_ID);
+			if(lockedById !=null){
+				User user = loadUser(lockedById);
+				c.setLockedBy(user);
+			}
+			
+			
 			c.setWarnings(r.getValue(OFC_RECORD.WARNINGS));
 			c.setErrors(r.getValue(OFC_RECORD.ERRORS));
 			c.setSkipped(r.getValue(OFC_RECORD.SKIPPED));
@@ -363,6 +382,17 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 			}
 		}
 
+		private User loadUser(int userId) {
+			SimpleSelectQuery<OfcUserRecord> userSelect = selectQuery(OFC_USER);
+			userSelect.addConditions(OFC_USER.ID.equal(userId));
+			OfcUserRecord userRecord = userSelect.fetchOne();
+			User user = new User();
+			user.setId(userRecord.getId());
+			user.setName(userRecord.getUsername());
+			user.setPassword(userRecord.getPassword());
+			return user;
+		}
+
 		@SuppressWarnings({"unchecked"})
 		@Override
 		protected void toRecord(CollectRecord record, UpdatableRecord<?> r) {
@@ -379,10 +409,12 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 			if (record.getCreatedBy() != null) {
 				r.setValue(OFC_RECORD.CREATED_BY_ID, record.getCreatedBy().getId());
 			}
-			r.setValue(OFC_RECORD.DATE_MODIFIED,
-					toTimestamp(record.getModifiedDate()));
+			r.setValue(OFC_RECORD.DATE_MODIFIED, toTimestamp(record.getModifiedDate()));
 			if (record.getModifiedBy() != null) {
 				r.setValue(OFC_RECORD.MODIFIED_BY_ID, record.getModifiedBy().getId());
+			}
+			if (record.getLockedBy() != null) {
+				r.setValue(OFC_RECORD.LOCKED_BY_ID, record.getLockedBy().getId());
 			}
 			r.setValue(OFC_RECORD.MODEL_VERSION, record.getVersion().getName());
 			r.setValue(OFC_RECORD.STEP, record.getStep().getStepNumber());

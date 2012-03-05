@@ -87,8 +87,8 @@ package org.openforis.collect.ui.component.detail
 				var hasErrors:Boolean = attribute != null ? attribute.hasErrors(): false;
 				var hasWarnings:Boolean = attribute != null ? attribute.hasWarnings(): false;
 				var name:String = defn.name;
-				var minCountValid:Boolean = parentEntity.childrenMinCountValidityMap.get(name);
-				var maxCountValid:Boolean = parentEntity.childrenMaxCountValidityMap.get(name);
+				var minCountValid:Boolean = parentEntity.childrenMinCountValiditationMap.get(name);
+				var maxCountValid:Boolean = parentEntity.childrenMaxCountValiditionMap.get(name);
 				var relevant:Boolean = parentEntity.childrenRelevanceMap.get(name);
 				var required:Boolean = parentEntity.childrenRequiredMap.get(name);
 				if(hasErrors || hasWarnings) {

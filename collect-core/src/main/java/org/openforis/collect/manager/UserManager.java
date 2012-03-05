@@ -3,6 +3,7 @@
  */
 package org.openforis.collect.manager;
 
+import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.UserDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,4 +22,12 @@ public class UserManager {
 		return userDao.getUserId(username);
 	}
 	
+	@Transactional
+	public User loadById(int userId){
+		return userDao.loadById(userId);
+	}
+	
+	public User loadByUserName(String userName){
+		return userDao.loadByUserName(userName);
+	}
 }

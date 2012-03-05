@@ -21,8 +21,8 @@ public class TaxonDao extends MappingJooqDaoSupport<Taxon, TaxonDao.JooqFactory>
 	}
 
 	@Override
-	public Taxon load(int id) {
-		return super.load(id);
+	public Taxon loadById(int id) {
+		return super.loadById(id);
 	}
 	
 	@Override

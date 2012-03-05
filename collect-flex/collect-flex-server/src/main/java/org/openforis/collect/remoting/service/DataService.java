@@ -5,7 +5,9 @@ package org.openforis.collect.remoting.service;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -147,7 +149,7 @@ public class DataService {
 	public void saveActiveRecord() {
 		SessionState sessionState = sessionManager.getSessionState();
 		CollectRecord record = sessionState.getActiveRecord();
-		record.setModifiedDate(new java.util.Date());
+		record.setModifiedDate(new Date());
 		record.setModifiedBy(sessionState.getUser());
 		try {
 			recordManager.save(record);
@@ -246,27 +248,64 @@ public class DataService {
 				checkDependencies.add(attribute);
 				break;
 			case DELETE:
-				attribute  = (Attribute<AttributeDefinition, ?>) node;
-				ancestors = attribute.getAncestors();
-				Set<NodePointer> relevantDependencies = attribute.getRelevantDependencies();
-				Set<NodePointer> requiredDependencies = attribute.getRequiredDependencies();
-				checkDependencies = attribute.getCheckDependencies();
 				
-				UpdateResponse resp = getUpdateResponse(responseMap, node.getInternalId());
-				resp.setDeletedNodeId(node.getInternalId());
-				recordManager.deleteNode(node);
-				recordManager.clearRelevantDependencies(relevantDependencies);
-				recordManager.clearRequiredDependencies(requiredDependencies);
-				recordManager.clearValidationResults(checkDependencies);
-				
-				relReqDependencies = relevantDependencies;
-				relReqDependencies.addAll(requiredDependencies);
+				relReqDependencies = new HashSet<NodePointer>();
+				checkDependencies = new HashSet<Attribute<?,?>>();
+				deleteNode(node, relReqDependencies, checkDependencies, responseMap);
+//				attribute  = (Attribute<AttributeDefinition, ?>) node;
+//				ancestors = attribute.getAncestors();
+//				Set<NodePointer> relevantDependencies = attribute.getRelevantDependencies();
+//				Set<NodePointer> requiredDependencies = attribute.getRequiredDependencies();
+//				checkDependencies = attribute.getCheckDependencies();
+//				
+//				UpdateResponse resp = getUpdateResponse(responseMap, node.getInternalId());
+//				resp.setDeletedNodeId(node.getInternalId());
+//				
+//				recordManager.deleteNode(node);
+//				recordManager.clearRelevantDependencies(relevantDependencies);
+//				recordManager.clearRequiredDependencies(requiredDependencies);
+//				recordManager.clearValidationResults(checkDependencies);
+//				
+//				relReqDependencies = relevantDependencies;
+//				relReqDependencies.addAll(requiredDependencies);
 				break;
 		}
 		prepareUpdateResponse(responseMap, relReqDependencies, checkDependencies, ancestors);
 		return responseMap.values();
 	}
 
+	private void deleteNode(Node<?> node,Set<NodePointer> relevanceReqquiredDependencies, Set<Attribute<?,?>> checkDependencies, Map<Integer, UpdateResponse> responseMap){
+		Set<NodePointer> relevantDependencies = node.getRelevantDependencies();
+		Set<NodePointer> requiredDependencies = node.getRequiredDependencies();
+		Set<Attribute<?,?>> nodeCheckDependencies = (node instanceof Attribute) ? ((Attribute<?,?>)node).getCheckDependencies() : null;
+		UpdateResponse resp = getUpdateResponse(responseMap, node.getInternalId());
+		resp.setDeletedNodeId(node.getInternalId());
+		
+		recordManager.deleteNode(node);
+
+		recordManager.clearRelevantDependencies(relevantDependencies);
+		requiredDependencies.addAll(relevantDependencies);
+		recordManager.clearRequiredDependencies(requiredDependencies);
+		if(nodeCheckDependencies != null){
+			recordManager.clearValidationResults(nodeCheckDependencies);
+			checkDependencies.addAll(nodeCheckDependencies);
+		}
+		
+		relevanceReqquiredDependencies.addAll(requiredDependencies);
+		if(node instanceof Entity){
+			Entity entity = (Entity) node;
+			List<Node<? extends NodeDefinition>> children = entity.getChildren();
+			for (Node<? extends NodeDefinition> child : children) {
+				deleteNode(child, relevanceReqquiredDependencies, checkDependencies, responseMap);
+			}
+		}
+		
+	}
+	
+	private void deleteAttribute(){
+		
+	}
+	
 	private void prepareUpdateResponse(Map<Integer, UpdateResponse> responseMap, Set<NodePointer> relevanceReqquiredDependencies, Set<Attribute<?, ?>> validtionResultsDependencies, List<Entity> ancestors) {
 		if (ancestors != null) {
 			for (Entity entity : ancestors) {

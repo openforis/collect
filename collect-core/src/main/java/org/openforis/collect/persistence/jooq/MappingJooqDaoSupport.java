@@ -54,7 +54,7 @@ public class MappingJooqDaoSupport<E, J extends MappingJooqFactory<E>> extends J
 	}
 	
 	@Transactional
-	protected E load(int id) {
+	protected E loadById(int id) {
 		J jf = getMappingJooqFactory();
 		ResultQuery<?> selectQuery = jf.selectByIdQuery(id);
 		Record r = selectQuery.fetchOne();

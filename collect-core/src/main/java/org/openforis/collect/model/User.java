@@ -14,7 +14,8 @@ public class User {
 	private Integer id;
 	private List<String> roles;
 	private String name;
-
+	private String password;
+	
 	public User() {
 		roles = new ArrayList<String>();
 	}
@@ -59,6 +60,14 @@ public class User {
 
 	public void setId(Integer id) {
 		this.id = id;
+	}
+	
+	public String getPassword() {
+		return password;
+	}
+	
+	public void setPassword(String password) {
+		this.password = password;
 	}
 
 	@Override
