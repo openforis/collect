@@ -77,37 +77,45 @@ package org.openforis.collect.util
 			}
 		}
 		
-		public static function addStyleName(component:UIComponent, styleName:String):void {
+		public static function addStyleName(component:UIComponent, styleName:String, applyImmediately:Boolean = true):String {
+			var componentStyleName:String = component.styleName as String;
 			if(!hasStyleName(component, styleName)) {
-				var componentStyleName:String = component.styleName as String;
 				if(StringUtil.isBlank(componentStyleName)){
 					componentStyleName = "";
 				} else {
 					componentStyleName += " ";
 				}
 				componentStyleName += styleName;
-				component.styleName = componentStyleName;
+				if(applyImmediately) {
+					component.styleName = componentStyleName;
+				}
 			}
+			return componentStyleName;
 		}
 			
-		public static function addStyleNames(component:UIComponent, styleNames:Array):void {
+		public static function addStyleNames(component:UIComponent, styleNames:Array, applyImmediately:Boolean = true):String {
 			for each(var styleName:String in styleNames) {
-				addStyleName(component, styleName);
+				addStyleName(component, styleName, applyImmediately);
 			}
+			return component.styleName as String;
 		}
 		
-		public static function removeStyleName(component:UIComponent, styleName:String):void {
+		public static function removeStyleName(component:UIComponent, styleName:String, applyImmediately:Boolean = true):String {
+			var componentStyleName:String = component.styleName as String;
 			if(hasStyleName(component, styleName)) {
-				var componentStyleName:String = component.styleName as String;
 				componentStyleName = componentStyleName.replace(styleName, "");
-				component.styleName = componentStyleName;
+				if(applyImmediately) {
+					component.styleName = componentStyleName;
+				}
 			}
+			return componentStyleName;
 		}
 		
-		public static function removeStyleNames(component:UIComponent, styleNames:Array):void {
+		public static function removeStyleNames(component:UIComponent, styleNames:Array, applyImmediately:Boolean = true):String {
 			for each(var styleName:String in styleNames) {
-				removeStyleName(component, styleName);
+				removeStyleName(component, styleName, applyImmediately);
 			}
+			return component.styleName as String;
 		}
 		
 		public static function hasStyleName(component:UIComponent, styleName:String):Boolean {
@@ -117,6 +125,16 @@ package org.openforis.collect.util
 			}
 			return false;
 		}
-			
+		
+		public static function replaceStyleNames(component:UIComponent, newStyles:Array, oldStyles:Array, applyImmediately:Boolean = true):String {
+			var cleanedStyle:String = removeStyleNames(component, oldStyles);
+			var newStylesConcat:String = StringUtil.concat(" ", newStyles);
+			var result:String = cleanedStyle + " " + newStylesConcat;
+			if(applyImmediately) {
+				component.styleName = result;
+			}
+			return result;
+		}
+		
 	}
 }
