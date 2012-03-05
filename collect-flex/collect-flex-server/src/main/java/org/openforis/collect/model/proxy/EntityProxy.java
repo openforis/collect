@@ -79,7 +79,7 @@ public class EntityProxy extends NodeProxy {
 	}
 	
 	@ExternalizedProperty
-	public Map<String, ValidationResultFlag> getChildrenMinCountValidityMap(){
+	public Map<String, ValidationResultFlag> getChildrenMinCountValidationMap(){
 		List<NodeDefinition> childDefinitions = getChildDefinitions();
 		Map<String, ValidationResultFlag> map = new HashMap<String, ValidationResultFlag>();
 		for (NodeDefinition childDefinition : childDefinitions) {
@@ -91,7 +91,7 @@ public class EntityProxy extends NodeProxy {
 	}
 
 	@ExternalizedProperty
-	public Map<String, ValidationResultFlag> getChildrenMaxCountValidityMap(){
+	public Map<String, ValidationResultFlag> getChildrenMaxCountValidationMap(){
 		List<NodeDefinition> childDefinitions = getChildDefinitions();
 		Map<String, ValidationResultFlag> map = new HashMap<String, ValidationResultFlag>();
 		for (NodeDefinition childDefinition : childDefinitions) {

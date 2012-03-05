@@ -52,17 +52,17 @@ package org.openforis.collect.util {
 	import org.openforis.collect.model.proxy.ValidationResultProxy;
 	import org.openforis.collect.model.proxy.ValidationResultsProxy;
 	import org.openforis.collect.remoting.service.UpdateResponse;
+	import org.openforis.idm.metamodel.validation.ValidationResultFlag;
 
 	public class ModelClassInitializer {
 		
 
 		public static function init():void {
 			var array:Array = [
-				BasicMap, 
-				
 				AttributeDefaultProxy,
 				AttributeDefinitionProxy,
 				AttributeProxy,
+				BasicMap, 
 				BooleanAttributeDefinitionProxy,
 				CodeAttributeDefinitionProxy,
 				CodeListItemProxy,
@@ -86,6 +86,7 @@ package org.openforis.collect.util {
 				ModelVersionProxy,
 				NodeLabelProxy,
 				NodeLabelProxy$Type,
+				NodeProxy,
 				PrecisionProxy,
 				PromptProxy,
 				PromptProxy$Type,
@@ -104,16 +105,13 @@ package org.openforis.collect.util {
 				TextAttributeDefinitionProxy$Type,
 				TimeAttributeDefinitionProxy,
 				TimeProxy,
-				UnitProxy,
-				
 				UIConfiguration,
 				UITab,
-				
+				UnitProxy,
+				UpdateResponse,
 				ValidationResultsProxy,
 				ValidationResultProxy,
-				UpdateResponse,
-				NodeProxy
-				
+				ValidationResultFlag
 			];
 		}
 		

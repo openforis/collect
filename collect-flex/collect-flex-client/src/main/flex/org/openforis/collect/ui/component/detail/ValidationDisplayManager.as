@@ -14,6 +14,7 @@ package org.openforis.collect.ui.component.detail
 	import org.openforis.collect.model.proxy.NodeStateProxy;
 	import org.openforis.collect.util.ToolTipUtil;
 	import org.openforis.collect.util.UIUtil;
+	import org.openforis.idm.metamodel.validation.ValidationResultFlag;
 
 	/**
 	 * 
@@ -80,28 +81,38 @@ package org.openforis.collect.ui.component.detail
 		}
 		
 		public function initByNode(parentEntity:EntityProxy, defn:NodeDefinitionProxy, attribute:AttributeProxy = null):void {
-			_displayStyleName = null;
+			_displayStyleName = "";
 			_toolTipStyleName = null;
 			_toolTipMessage = null;
 			if(parentEntity != null && defn != null) {
 				var hasErrors:Boolean = attribute != null ? attribute.hasErrors(): false;
 				var hasWarnings:Boolean = attribute != null ? attribute.hasWarnings(): false;
 				var name:String = defn.name;
-				var minCountValid:Boolean = parentEntity.childrenMinCountValiditationMap.get(name);
-				var maxCountValid:Boolean = parentEntity.childrenMaxCountValiditionMap.get(name);
 				var relevant:Boolean = parentEntity.childrenRelevanceMap.get(name);
 				var required:Boolean = parentEntity.childrenRequiredMap.get(name);
 				if(hasErrors || hasWarnings) {
 					_toolTipStyleName = hasWarnings ? ToolTipUtil.STYLE_NAME_WARNING: ToolTipUtil.STYLE_NAME_ERROR;
 					_displayStyleName = hasWarnings ? STYLE_NAME_WARNING: STYLE_NAME_ERROR;
 					_toolTipMessage = attribute.validationMessage;
-				} else if(!minCountValid || !maxCountValid) {
-					_toolTipStyleName = ToolTipUtil.STYLE_NAME_ERROR;
-					_displayStyleName = STYLE_NAME_ERROR;
-					if(!minCountValid) {
-						_toolTipMessage = Message.get("edit.validation.minCount", [defn.minCount]);
-					} else {
-						_toolTipMessage = Message.get("edit.validation.maxCount", [defn.maxCount]);
+				} else {
+					var minCountValid:ValidationResultFlag = parentEntity.childrenMinCountValidationMap.get(name);
+					var maxCountValid:ValidationResultFlag = parentEntity.childrenMaxCountValidationMap.get(name);
+					if(minCountValid != ValidationResultFlag.OK || maxCountValid != ValidationResultFlag.OK) {
+						var countValid:ValidationResultFlag;
+						if(minCountValid != ValidationResultFlag.OK) {
+							countValid = minCountValid;
+							_toolTipMessage = Message.get("edit.validation.minCount", [defn.minCount]);
+						} else {
+							countValid = maxCountValid;
+							_toolTipMessage = Message.get("edit.validation.maxCount", [defn.maxCount]);
+						}
+						if(countValid == ValidationResultFlag.ERROR) {
+							_toolTipStyleName = ToolTipUtil.STYLE_NAME_ERROR;
+							_displayStyleName = STYLE_NAME_ERROR;
+						} else {
+							_toolTipStyleName = ToolTipUtil.STYLE_NAME_WARNING;
+							_displayStyleName = STYLE_NAME_WARNING;
+						}
 					}
 				}
 				if(! relevant) {
