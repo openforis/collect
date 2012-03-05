@@ -150,15 +150,16 @@ public class DataService {
 	public void saveActiveRecord() {
 		SessionState sessionState = sessionManager.getSessionState();
 		CollectRecord record = sessionState.getActiveRecord();
+		User user = sessionState.getUser();
 		record.setModifiedDate(new Date());
-		record.setModifiedBy(sessionState.getUser());
+		record.setModifiedBy(user);
 		try {
 			recordManager.save(record);
+			sessionState.setActiveRecordState(RecordState.SAVED);
 		} catch (RecordPersistenceException e) {
 			//it should never be thrown
-			throw new IllegalArgumentException(e);
+			throw new RuntimeException("Unexpected error saving record");
 		}
-		sessionState.setActiveRecordState(RecordState.SAVED);
 	}
 
 	@Transactional
@@ -481,18 +482,14 @@ public class DataService {
 
 	/**
 	 * remove the active record from the current session
-	 * @throws RecordLockedException 
-	 * @throws AccessDeniedException 
-	 * @throws MultipleEditException 
+	 * @throws RecordPersistenceException 
 	 */
 	public void clearActiveRecord() throws RecordPersistenceException {
-		CollectRecord activeRecord = getActiveRecord();
-		User user = getUserInSession();
-		this.recordManager.unlock(activeRecord, user);
-		Integer recordId = activeRecord.getId();
 		SessionState sessionState = this.sessionManager.getSessionState();
-		if(RecordState.NEW == sessionState.getActiveRecordState()) {
-			this.recordManager.delete(recordId, user);
+		CollectRecord activeRecord = sessionState.getActiveRecord();
+		User user = sessionState.getUser();
+		if(RecordState.SAVED == sessionState.getActiveRecordState()) {
+			this.recordManager.unlock(activeRecord, user);
 		}
 		this.sessionManager.clearActiveRecord();
 	}
