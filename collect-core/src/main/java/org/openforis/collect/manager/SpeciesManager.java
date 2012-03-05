@@ -60,7 +60,7 @@ public class SpeciesManager {
 		List<TaxonOccurrence> result = new ArrayList<TaxonOccurrence>();
 		for (TaxonVernacularName taxonVernacularName : list) {
 			Integer taxonId = taxonVernacularName.getTaxonId();
-			Taxon taxon = taxonDao.load(taxonId);
+			Taxon taxon = taxonDao.loadById(taxonId);
 			TaxonOccurrence o = new TaxonOccurrence(taxon.getCode(), taxon.getScientificName(), taxonVernacularName.getVernacularName(), taxonVernacularName.getLanguageCode(),
 					taxonVernacularName.getLanguageVariety());
 			result.add(o);

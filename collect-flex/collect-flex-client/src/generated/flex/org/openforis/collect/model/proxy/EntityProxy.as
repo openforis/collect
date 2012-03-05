@@ -163,12 +163,12 @@ package org.openforis.collect.model.proxy {
 			return StringUtil.concat(" - ", keyParts);
 		}
 		
-		public function updateChildrenMinCountValidityMap(map:IMap):void {
-			CollectionUtil.updateMap(childrenMinCountValidityMap, map);
+		public function updateChildrenMinCountValiditationMap(map:IMap):void {
+			CollectionUtil.updateMap(childrenMinCountValiditationMap, map);
 		}
 		
-		public function updateChildrenMaxCountValidityMap(map:IMap):void {
-			CollectionUtil.updateMap(childrenMaxCountValidityMap, map);
+		public function updateChildrenMaxCountValiditationMap(map:IMap):void {
+			CollectionUtil.updateMap(childrenMaxCountValiditionMap, map);
 		}
 
 		public function updateChildrenRelevanceMap(map:IMap):void {

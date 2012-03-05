@@ -25,8 +25,8 @@ public class TaxonVernacularNameDao extends MappingJooqDaoSupport<TaxonVernacula
 	}
 
 	@Override
-	public TaxonVernacularName load(int id) {
-		return super.load(id);
+	public TaxonVernacularName loadById(int id) {
+		return super.loadById(id);
 	}
 
 	@Override
