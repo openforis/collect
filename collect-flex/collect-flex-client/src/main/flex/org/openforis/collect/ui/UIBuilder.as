@@ -83,9 +83,9 @@ package org.openforis.collect.ui {
 			form.build();
 			
 			if(uiTab !=null){
-				formContainer.label = uiTab.label;
+				form.label = uiTab.label;
 			} else {
-				formContainer.label = rootEntity.getLabelText();
+				form.label = rootEntity.getLabelText();
 			}
 			formContainer.addEntityFormContainer(form);
 			/*
