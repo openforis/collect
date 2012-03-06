@@ -82,6 +82,11 @@ package org.openforis.collect.ui {
 			form.uiTabs = uiTab != null ? uiTab.tabs: null;
 			form.build();
 			
+			if(uiTab !=null){
+				form.label = uiTab.label;
+			} else {
+				form.label = rootEntity.getLabelText();
+			}
 			formContainer.addEntityFormContainer(form);
 			/*
 			in this case the parentEntity of the formContainer will be null and 
@@ -92,7 +97,7 @@ package org.openforis.collect.ui {
 			if(tabs != null) {
 				for each (var tab:UITab in tabs) {
 					var childForm:EntityFormContainer = new EntityFormContainer();
-					
+					childForm.label = tab.label;
 					var child:NodeDefinitionProxy = rootEntity.getChildDefinitionByTabName(tab.name);
 					if(child is EntityDefinitionProxy) {
 						var edp:EntityDefinitionProxy = child as EntityDefinitionProxy;
