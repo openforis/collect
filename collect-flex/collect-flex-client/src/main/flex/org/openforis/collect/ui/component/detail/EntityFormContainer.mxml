@@ -206,7 +206,7 @@
 			includeIn="withoutTabs"
 			/>
 	
-		<s:VGroup id="containerWithTabs" width="100%" height="100%"
+		<s:VGroup id="tabbedContainer" width="100%" height="100%"
 				  includeIn="withTabs">
 			<s:Group id="addSection" 
 					 includeInLayout="{entityDefinition.multiple}" 

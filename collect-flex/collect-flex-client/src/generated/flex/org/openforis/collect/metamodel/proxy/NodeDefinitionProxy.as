@@ -34,7 +34,7 @@ package org.openforis.collect.metamodel.proxy {
 			if(label != null) {
 				return label.text;
 			} else {
-				return null;
+				return name;
 			}
 		}
 		
