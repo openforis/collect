@@ -53,11 +53,11 @@
 	<s:Group id="loadingContainer" height="100%" width="100%" includeIn="loading" itemCreationPolicy="immediate">
 		<component:LoadingContent />
 		<s:Button 
+				id="cancelLoading" 
 				bottom="0" 
 				horizontalCenter="0" 
 				useHandCursor="true" 
 				buttonMode="true" 
-				id="cancelLoading" 
 				label="{Message.get('global.cancel')}" 
 				/>
 	</s:Group>
@@ -65,10 +65,11 @@
 	<s:VGroup id="dataContainer" height="100%" width="100%" includeIn="default"  itemCreationPolicy="immediate">
 		<s:Scroller height="100%" width="100%">
 			<input:CodeListDialogDataGroup
-					width="100%" 
 					id="dataGroup" 
 					multiple="{multiple}" 
-					maxSpecified="{maxSpecified}" />
+					maxSpecified="{maxSpecified}"
+					width="100%" 
+					/>
 		</s:Scroller>
 		
 		<s:HGroup width="100%" horizontalAlign="center" verticalAlign="middle" gap="30">
