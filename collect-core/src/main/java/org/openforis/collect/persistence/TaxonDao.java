@@ -7,7 +7,7 @@ import java.sql.Connection;
 import java.util.List;
 
 import org.jooq.Record;
-import org.jooq.UpdatableRecord;
+import org.jooq.StoreQuery;
 import org.openforis.collect.persistence.jooq.MappingJooqDaoSupport;
 import org.openforis.collect.persistence.jooq.MappingJooqFactory;
 import org.openforis.idm.model.species.Taxon;
@@ -70,14 +70,14 @@ public class TaxonDao extends MappingJooqDaoSupport<Taxon, TaxonDao.JooqFactory>
 		}
 		
 		@Override
-		public void toRecord(Taxon t, UpdatableRecord<?> r) {
-			r.setValue(OFC_TAXON.ID, t.getId());			
-			r.setValue(OFC_TAXON.PARENT_ID, t.getParentId());
-			r.setValue(OFC_TAXON.CODE, t.getCode());
-			r.setValue(OFC_TAXON.SCIENTIFIC_NAME, t.getScientificName());
-			r.setValue(OFC_TAXON.TAXON_RANK, t.getTaxonomicRank());
-			r.setValue(OFC_TAXON.TAXONOMY_ID, t.getTaxonomyId());
-			r.setValue(OFC_TAXON.STEP, t.getStep());
+		public void fromObject(Taxon t, StoreQuery<?> q) {
+			q.addValue(OFC_TAXON.ID, t.getId());			
+			q.addValue(OFC_TAXON.PARENT_ID, t.getParentId());
+			q.addValue(OFC_TAXON.CODE, t.getCode());
+			q.addValue(OFC_TAXON.SCIENTIFIC_NAME, t.getScientificName());
+			q.addValue(OFC_TAXON.TAXON_RANK, t.getTaxonomicRank());
+			q.addValue(OFC_TAXON.TAXONOMY_ID, t.getTaxonomyId());
+			q.addValue(OFC_TAXON.STEP, t.getStep());
 		}
 
 		@Override
