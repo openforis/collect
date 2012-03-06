@@ -22,6 +22,15 @@ package org.openforis.collect.metamodel.proxy {
 			return null;
 		}
 		
+		public function getChildDefinitionByTabName(name:String):NodeDefinitionProxy {
+			for each(var nodeDef:NodeDefinitionProxy in childDefinitions) {
+				if(nodeDef.uiTabName == name){
+					return nodeDef;
+				}
+			}
+			return null;
+		}
+		
 		public function get keyAttributeDefinitions():IList {
 			var list:ArrayCollection = new ArrayCollection();
 			for each(var nodeDef:NodeDefinitionProxy in childDefinitions) {

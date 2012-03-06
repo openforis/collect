@@ -92,7 +92,8 @@ package org.openforis.collect.ui {
 			if(tabs != null) {
 				for each (var tab:UITab in tabs) {
 					var childForm:EntityFormContainer = new EntityFormContainer();
-					var child:NodeDefinitionProxy = rootEntity.getChildDefinition(tab.name);
+					
+					var child:NodeDefinitionProxy = rootEntity.getChildDefinitionByTabName(tab.name);
 					if(child is EntityDefinitionProxy) {
 						var edp:EntityDefinitionProxy = child as EntityDefinitionProxy;
 						childForm.entityDefinition = edp;
