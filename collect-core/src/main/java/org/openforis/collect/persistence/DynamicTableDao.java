@@ -8,7 +8,6 @@ import org.jooq.SelectJoinStep;
 import org.openforis.collect.persistence.jooq.DialectAwareJooqFactory;
 import org.openforis.collect.persistence.jooq.JooqDaoSupport;
 import org.openforis.collect.persistence.jooq.tables.Lookup;
-import org.openforis.idm.model.Coordinate;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -16,23 +15,25 @@ import org.springframework.transaction.annotation.Transactional;
  * 
  */
 @Transactional
-public class LookupProviderDao extends JooqDaoSupport {
+public class DynamicTableDao extends JooqDaoSupport {
 
 	@Transactional
-	public Coordinate load(String table, String column, Object... keys) {
+	public Object load(String table, String column, Object... keys) {
+		if (keys.length % 2 == 1) {
+			throw new IllegalArgumentException("Invalid columns " + keys);
+		}
 		DialectAwareJooqFactory factory = getJooqFactory();
 		Lookup lookupTable = Lookup.getInstance(table);
 		SelectJoinStep select = factory.select(lookupTable.getFieldByName(column)).from(lookupTable);
-		int i = 0;
-		for (Object object : keys) {
-			String keyColumn = "key" + (++i);
-			select.where(lookupTable.getFieldByName(keyColumn).equal(object.toString()));
+		for (int i = 0; i < keys.length;) {
+			String colName = keys[i++].toString();
+			String colValue = keys[i++].toString();
+			select.where(lookupTable.getFieldByName(colName).equal(colValue));
 		}
 		Record record = select.fetchOne();
 		if (record != null) {
 			String field = record.getValueAsString(column);
-			Coordinate coordinate = Coordinate.parseCoordinate(field);
-			return coordinate;
+			return field;
 		}
 		return null;
 	}

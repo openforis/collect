@@ -132,7 +132,7 @@ public class ModelDaoIntegrationTest {
 	private CollectSurvey importModel() throws IOException, SurveyImportException, InvalidIdmlException {
 		URL idm = ClassLoader.getSystemResource("test.idm.xml");
 		InputStream is = idm.openStream();
-		CollectSurveyContext surveyContext = new CollectSurveyContext(expressionFactory, validator);
+		CollectSurveyContext surveyContext = new CollectSurveyContext(expressionFactory, validator, null);
 		CollectIdmlBindingContext idmlBindingContext = new CollectIdmlBindingContext(surveyContext);
 		SurveyUnmarshaller surveyUnmarshaller = idmlBindingContext.createSurveyUnmarshaller();
 		CollectSurvey survey = (CollectSurvey) surveyUnmarshaller.unmarshal(is);
