@@ -134,7 +134,7 @@
     	<property name="dataSource" ref="dataSource"/>
 	</bean>
 	
-	<bean id="externalLookupProviderDao" class="org.openforis.collect.persistence.LookupProviderDao">
+	<bean id="dynamicTableDao" class="org.openforis.collect.persistence.DynamicTableDao">
     	<property name="dataSource" ref="dataSource"/>
 	</bean>
 
@@ -146,17 +146,13 @@
 	
 	<!--  Survey Context -->
 	<bean id="validator" 					class="org.openforis.collect.model.validation.CollectValidator" />
-	
 	<bean id="lookupProvider" 	class="org.openforis.collect.persistence.DatabaseLookupProvider" />
-	
+	<bean id="externalCodeListProvider" 	class="org.openforis.collect.persistence.DatabaseExternalCodeListProvider" />
 	
 	<!-- ===================================== -->
 	<!-- Security -->
 	<!-- ===================================== -->
 	<bean id="userDetailsService"	class="org.openforis.collect.security.CollectUserDetailsService" />
-	
-	
-	
 	
 	
 	<!-- Controllers -->

@@ -55,7 +55,7 @@ public class ModelSerializationTest {
 	private CollectSurvey loadSurvey() throws IOException, SurveyImportException, InvalidIdmlException {
 		URL idm = ClassLoader.getSystemResource("test.idm.xml");
 		InputStream is = idm.openStream();
-		CollectSurveyContext context = new CollectSurveyContext(new ExpressionFactory(), null);
+		CollectSurveyContext context = new CollectSurveyContext(new ExpressionFactory(), null, null);
 		CollectIdmlBindingContext idmlBindingContext = new CollectIdmlBindingContext(context);
 		SurveyUnmarshaller surveyUnmarshaller = idmlBindingContext.createSurveyUnmarshaller();
 		CollectSurvey survey = (CollectSurvey) surveyUnmarshaller.unmarshal(is);

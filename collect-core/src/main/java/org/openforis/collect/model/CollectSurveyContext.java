@@ -3,6 +3,7 @@
  */
 package org.openforis.collect.model;
 
+import org.openforis.idm.metamodel.ExternalCodeListProvider;
 import org.openforis.idm.metamodel.SurveyContext;
 import org.openforis.idm.metamodel.validation.Validator;
 import org.openforis.idm.model.expression.ExpressionFactory;
@@ -15,10 +16,12 @@ public class CollectSurveyContext implements SurveyContext {
 
 	private ExpressionFactory expressionFactory;
 	private Validator validator;
-	
-	public CollectSurveyContext(ExpressionFactory expressionFactory, Validator validator) {
+	private ExternalCodeListProvider externalCodeListProvider;
+
+	public CollectSurveyContext(ExpressionFactory expressionFactory, Validator validator, ExternalCodeListProvider externalCodeListProvider) {
 		this.expressionFactory = expressionFactory;
 		this.validator = validator;
+		this.externalCodeListProvider = externalCodeListProvider;
 	}
 
 	public ExpressionFactory getExpressionFactory() {
@@ -35,6 +38,15 @@ public class CollectSurveyContext implements SurveyContext {
 
 	public void setValidator(Validator validator) {
 		this.validator = validator;
+	}
+
+	@Override
+	public ExternalCodeListProvider getExternalCodeListProvider() {
+		return externalCodeListProvider;
+	}
+
+	public void setExternalCodeListProvider(ExternalCodeListProvider externalCodeListProvider) {
+		this.externalCodeListProvider = externalCodeListProvider;
 	}
 
 }
