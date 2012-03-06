@@ -46,9 +46,56 @@ public class CollectRecord extends Record {
 			}
 			return null;
 		}
+		
+		public Step getNext() {
+			switch(this) {
+				case ENTRY:
+					return Step.CLEANSING;
+				case CLEANSING:
+					return Step.ANALYSIS;
+				default:
+					throw new IllegalArgumentException("This record cannot be promoted.");
+			}
+		}
+		
+		public Step getPrevious() {
+			switch(this) {
+				case CLEANSING:
+					return Step.ENTRY;
+				case ANALYSIS:
+					return Step.CLEANSING;
+				default:
+					throw new IllegalArgumentException("This record cannot be promoted.");
+			}
+		}
 	}
 
+	public enum State {
+		REJECTED('R');
+		
+		private char code;
+
+		private State(char code) {
+			this.code = code;
+		}
+		
+		public char getCode() {
+			return code;
+		}
+		
+		public static State valueOf(char code) {
+			State[] values = State.values();
+			for (State state : values) {
+				if (state.getCode() == code) {
+					return state;
+				}
+			}
+			return null;
+		}
+	}
+	
 	private transient Step step;
+	private transient State state;
 
 	private transient Date creationDate;
 	private transient User createdBy;
@@ -317,7 +364,15 @@ public class CollectRecord extends Record {
 	public void setStep(Step step) {
 		this.step = step;
 	}
-
+	
+	public State getState() {
+		return state;
+	}
+	
+	public void setState(State state) {
+		this.state = state;
+	}
+	
 	public Date getCreationDate() {
 		return this.creationDate;
 	}

@@ -1,6 +1,5 @@
 package org.openforis.collect.client {
 	import mx.collections.IList;
-	import mx.controls.Alert;
 	import mx.rpc.AsyncToken;
 	import mx.rpc.IResponder;
 	import mx.rpc.events.FaultEvent;
@@ -10,9 +9,8 @@ package org.openforis.collect.client {
 	import org.openforis.collect.Application;
 	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.event.EventDispatcherFactory;
-	import org.openforis.collect.i18n.Message;
+	import org.openforis.collect.model.CollectRecord$Step;
 	import org.openforis.collect.model.proxy.FieldProxy;
-	import org.openforis.collect.model.proxy.RecordProxy$Step;
 	import org.openforis.collect.remoting.service.UpdateRequest;
 	import org.openforis.collect.ui.component.input.InputField;
 	import org.openforis.collect.util.AlertUtil;
@@ -77,8 +75,9 @@ package org.openforis.collect.client {
 			token.addResponder(responder);
 		}
 		
-		public function loadRecord(responder:IResponder, id:int, step:int):void {
-			var token:AsyncToken = this._loadRecordOperation.send(id, step);
+		public function loadRecord(responder:IResponder, id:int, step:CollectRecord$Step):void {
+			var stepNumber:int = getRecordStepNumber(step);
+			var token:AsyncToken = this._loadRecordOperation.send(id, stepNumber);
 			token.addResponder(responder);
 		}
 		
@@ -92,19 +91,22 @@ package org.openforis.collect.client {
 			this._updateQueueProcessor.appendOperation(token, resultHandler, faultHandler, _updateActiveRecordOperation, request);
 		}
 		
-		public function submitRecord(responder:IResponder, id:int):void {
-			var token:AsyncToken = this._submitRecordOperation.send(id);
+		public function submitRecord(responder:IResponder, id:int, step:CollectRecord$Step):void {
+			var stepNumber:int = getRecordStepNumber(step);
+			var token:AsyncToken = this._submitRecordOperation.send(id, stepNumber);
 			token.addResponder(responder);
 		}
 		
-		public function rejectRecord(responder:IResponder, id:int):void {
-			var token:AsyncToken = this._rejectRecordOperation.send(id);
+		public function rejectRecord(responder:IResponder, id:int, step:CollectRecord$Step):void {
+			var stepNumber:int = getRecordStepNumber(step);
+			var token:AsyncToken = this._rejectRecordOperation.send(id, stepNumber);
 			token.addResponder(responder);
 		}
 		
-		public function findAssignableCodeListItems(responder:IResponder, parentEntityId:int, attribute:String):void {
+		public function findAssignableCodeListItems(responder:IResponder, parentEntityId:int, attribute:String):AsyncToken {
 			var token:AsyncToken = this._findAssignableCodeListItemsOperation.send(parentEntityId, attribute);
 			token.addResponder(responder);
+			return token;
 		}
 		
 		public function getCodeListItems(responder:IResponder, parentEntityId:int, attribute:String, codes:Array):void {
@@ -168,6 +170,19 @@ package org.openforis.collect.client {
 						inputField.textInput.setFocus();
 					}
 				}
+			}
+		}
+		
+		private function getRecordStepNumber(step:CollectRecord$Step):int {
+			switch(step) {
+				case CollectRecord$Step.ENTRY:
+					return 1;
+				case CollectRecord$Step.CLEANSING:
+					return 2;
+				case CollectRecord$Step.ANALYSIS:
+					return 3;
+				default:
+					return -1;
 			}
 		}
 		

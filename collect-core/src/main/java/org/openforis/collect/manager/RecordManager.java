@@ -11,15 +11,12 @@ import java.util.Set;
 import javax.xml.namespace.QName;
 
 import org.openforis.collect.model.CollectRecord;
+import org.openforis.collect.model.CollectRecord.State;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.FieldSymbol;
 import org.openforis.collect.model.User;
-import org.openforis.collect.persistence.AccessDeniedException;
-import org.openforis.collect.persistence.DuplicateIdException;
-import org.openforis.collect.persistence.InvalidIdException;
 import org.openforis.collect.persistence.MultipleEditException;
-import org.openforis.collect.persistence.NonexistentIdException;
 import org.openforis.collect.persistence.RecordDao;
 import org.openforis.collect.persistence.RecordLockedException;
 import org.openforis.collect.persistence.RecordPersistenceException;
@@ -115,7 +112,7 @@ public class RecordManager {
 	}
 
 	@Transactional
-	public CollectRecord create(CollectSurvey survey, EntityDefinition rootEntityDefinition, User user, String modelVersionName) throws MultipleEditException, AccessDeniedException, RecordLockedException {
+	public CollectRecord create(CollectSurvey survey, EntityDefinition rootEntityDefinition, User user, String modelVersionName) throws RecordPersistenceException {
 		recordDao.checkLock(user);
 		
 		CollectRecord record = new CollectRecord(survey, modelVersionName);
@@ -125,11 +122,6 @@ public class RecordManager {
 		record.setCreatedBy(user);
 		record.setStep(Step.ENTRY);
 		return record;
-	}
-
-	@Transactional
-	public void lock(Record record) {
-
 	}
 
 	@Transactional
@@ -144,42 +136,34 @@ public class RecordManager {
 	}
 
 	@Transactional
-	public void updateRootEntityKey(String recordId, String newRootEntityKey) throws DuplicateIdException, InvalidIdException, NonexistentIdException, AccessDeniedException, RecordLockedException {
-
+	public void promote(CollectSurvey survey, int recordId, int step, User user) throws RecordPersistenceException {
+		CollectRecord record = recordDao.load(survey, recordId, step);
+		Step currentStep = record.getStep();
+		Step nextStep = currentStep.getNext();
+		Date now = new Date();
+		record.setModifiedBy(user);
+		record.setModifiedDate(now);
+		//save changes on current step
+		recordDao.update(record); 
+		//change step and update newly the record
+		record.setStep(nextStep);
+		record.setState(null);
+		recordDao.update(record);
+		recordDao.unlock(recordId, user);
 	}
 
 	@Transactional
-	public int promote(CollectSurvey survey, int recordId, User user) throws InvalidIdException, MultipleEditException, NonexistentIdException, AccessDeniedException, RecordLockedException {
-		CollectRecord record = recordDao.load(survey, recordId, 1);
-		Step nextStep;
-		switch(record.getStep()) {
-			case ENTRY:
-				nextStep = Step.CLEANSING;
-				//clone record and save a copy with the new step
-				recordDao.unlock(recordId, user);
-				record.setId(null);
-				Date now = new Date();
-				record.setModifiedBy(user);
-				record.setModifiedDate(now);
-				record.setCreatedBy(user);
-				record.setCreationDate(now);
-				record.setStep(nextStep);
-				recordDao.insert(record);
-				break;
-			case CLEANSING:
-				nextStep = Step.ANALYSIS;
-				recordDao.unlock(recordId, user);
-				record.setStep(nextStep);
-				recordDao.update(record);
-				break;
-			default:
-				throw new IllegalArgumentException("This record cannot be promoted.");
-		}
-		return record.getId();
-	}
-
-	@Transactional
-	public void demote(String recordId) throws InvalidIdException, MultipleEditException, NonexistentIdException, AccessDeniedException, RecordLockedException {
+	public void demote(CollectSurvey survey, int recordId, int stepNumber, User user) throws RecordPersistenceException {
+		Step step = Step.valueOf(stepNumber);
+		Step prevStep = step.getPrevious();
+		CollectRecord record = recordDao.load(survey, recordId, prevStep.getStepNumber());
+		Date now = new Date();
+		record.setModifiedBy(user);
+		record.setModifiedDate(now);
+		record.setStep(prevStep);
+		record.setState(State.REJECTED);
+		recordDao.update(record);
+		recordDao.unlock(recordId, user);
 	}
 
 	

@@ -20,15 +20,11 @@ import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.metamodel.proxy.CodeListItemProxy;
 import org.openforis.collect.model.CollectRecord;
+import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.FieldSymbol;
 import org.openforis.collect.model.User;
 import org.openforis.collect.model.proxy.RecordProxy;
-import org.openforis.collect.persistence.AccessDeniedException;
-import org.openforis.collect.persistence.InvalidIdException;
-import org.openforis.collect.persistence.MultipleEditException;
-import org.openforis.collect.persistence.NonexistentIdException;
-import org.openforis.collect.persistence.RecordLockedException;
 import org.openforis.collect.persistence.RecordPersistenceException;
 import org.openforis.collect.remoting.service.UpdateRequestOperation.Method;
 import org.openforis.collect.session.SessionState;
@@ -459,18 +455,20 @@ public class DataService {
 	
 	
 	@Transactional
-	public int promoteRecord(int recordId) throws InvalidIdException, MultipleEditException, NonexistentIdException, AccessDeniedException, RecordLockedException {
+	public void promoteRecord(int recordId, int step) throws RecordPersistenceException  {
 		SessionState sessionState = sessionManager.getSessionState();
 		CollectSurvey survey = sessionState.getActiveSurvey();
 		User user = sessionState.getUser();
-		int promotedId = this.recordManager.promote(survey, recordId, user);
+		recordManager.promote(survey, recordId, step, user);
 		sessionManager.clearActiveRecord();
-		return promotedId;
 	}
 
 	@Transactional
-	public void demoteRecord(String recordId) throws InvalidIdException, MultipleEditException, NonexistentIdException, AccessDeniedException, RecordLockedException {
-		this.recordManager.demote(recordId);
+	public void demoteRecord(int recordId, int step) throws RecordPersistenceException {
+		SessionState sessionState = sessionManager.getSessionState();
+		CollectSurvey survey = sessionState.getActiveSurvey();
+		User user = sessionState.getUser();
+		this.recordManager.demote(survey, recordId, step, user);
 	}
 
 	public void updateNodeHierarchy(Node<? extends NodeDefinition> node, int newPosition) {
