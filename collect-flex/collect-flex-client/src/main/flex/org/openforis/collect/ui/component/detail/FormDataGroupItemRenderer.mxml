@@ -76,7 +76,7 @@
 							}
 						}
 					} else if(data is EntityDefinitionProxy) {
-						formItem = UIBuilder.getEntityFormItem(EntityDefinitionProxy(data));
+						formItem = CollectFormItem(UIBuilder.getEntityFormItem(EntityDefinitionProxy(data)));
 						addElement(formItem);
 						BindingUtils.bindProperty(formItem, "modelVersion", this, "modelVersion");
 					}

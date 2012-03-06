@@ -53,6 +53,11 @@
 				}
 				initDefinitionsPerTab();
 			}
+			
+			override public function set label(value:String):void {
+				super.label = value;
+			}
+			
 			/**
 			 * Creates the list of node definitions per each tab
 			 * In the first position there will be the node definitions

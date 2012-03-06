@@ -7,30 +7,24 @@ package org.openforis.collect.ui
 	
 	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
-	import mx.rpc.AsyncResponder;
-	import mx.rpc.events.FaultEvent;
-	import mx.rpc.events.ResultEvent;
 	
 	import org.openforis.collect.Application;
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.client.UpdateRequestToken;
-	import org.openforis.collect.event.ApplicationEvent;
-	import org.openforis.collect.event.EventDispatcherFactory;
 	import org.openforis.collect.i18n.Message;
 	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.CodeAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
+	import org.openforis.collect.model.CollectRecord$Step;
 	import org.openforis.collect.model.FieldSymbol;
 	import org.openforis.collect.model.proxy.AttributeProxy;
 	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.model.proxy.FieldProxy;
 	import org.openforis.collect.model.proxy.NodeProxy;
-	import org.openforis.collect.model.proxy.RecordProxy$Step;
 	import org.openforis.collect.presenter.RemarksPopUpPresenter;
 	import org.openforis.collect.remoting.service.UpdateRequest;
 	import org.openforis.collect.remoting.service.UpdateRequestOperation;
 	import org.openforis.collect.remoting.service.UpdateRequestOperation$Method;
-	import org.openforis.collect.remoting.service.UpdateResponse;
 	import org.openforis.collect.ui.component.input.InputField;
 	import org.openforis.collect.util.AlertUtil;
 	import org.openforis.collect.util.CollectionUtil;
@@ -91,7 +85,7 @@ package org.openforis.collect.ui
 		}
 		
 		public static function buildContextMenu(inputField:InputField):ContextMenu {
-			var step:RecordProxy$Step = Application.activeRecord.step;
+			var step:CollectRecord$Step = Application.activeRecord.step;
 			var cm:ContextMenu = new ContextMenu();
 			var items:Array = new Array();
 			
@@ -106,7 +100,7 @@ package org.openforis.collect.ui
 			return cm;
 		}
 		
-		private static function addValueItems(currentItems:Array, step:RecordProxy$Step, inputField:InputField):void {
+		private static function addValueItems(currentItems:Array, step:CollectRecord$Step, inputField:InputField):void {
 			if(inputField.isEmpty()) {
 				currentItems.push(
 					BLANK_ON_FORM_MENU_ITEM,
@@ -117,7 +111,7 @@ package org.openforis.collect.ui
 			currentItems.push(EDIT_REMARKS_MENU_ITEM);
 		}
 		
-		private static function addRowItems(currentItems:Array, step:RecordProxy$Step, inputField:InputField):void {
+		private static function addRowItems(currentItems:Array, step:CollectRecord$Step, inputField:InputField):void {
 			var def:AttributeDefinitionProxy = inputField.attributeDefinition;
 			if(def != null && inputField.isInDataGroup) {
 				if(def.multiple && ! (def is CodeAttributeDefinitionProxy)) {
@@ -136,7 +130,7 @@ package org.openforis.collect.ui
 			}			
 		}
 		
-		private static function addApproveValueItems(currentItems:Array, step:RecordProxy$Step, inputField:InputField):void {
+		private static function addApproveValueItems(currentItems:Array, step:CollectRecord$Step, inputField:InputField):void {
 			var attribute:AttributeProxy = inputField.attribute;
 			if(attribute != null) {
 				/*

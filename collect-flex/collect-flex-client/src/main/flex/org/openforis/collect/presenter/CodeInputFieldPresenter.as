@@ -11,6 +11,7 @@ package org.openforis.collect.presenter {
 	import mx.events.CollectionEvent;
 	import mx.managers.PopUpManager;
 	import mx.rpc.AsyncResponder;
+	import mx.rpc.AsyncToken;
 	import mx.rpc.IResponder;
 	import mx.rpc.events.ResultEvent;
 	
@@ -39,8 +40,10 @@ package org.openforis.collect.presenter {
 	public class CodeInputFieldPresenter extends InputFieldPresenter {
 		
 		private static var _popUp:CodeListDialog;
+		private static var _lastLoadCodesAsyncToken:AsyncToken;
 		private var _view:CodeInputField;
 		private var _items:IList;
+		
 		
 		public function CodeInputFieldPresenter(view:CodeInputField) {
 			_view = view;
@@ -70,6 +73,13 @@ package org.openforis.collect.presenter {
 			PopUpManager.removePopUp(_popUp);
 		}
 		
+		internal static function cancelLoadingHandler(event:Event):void {
+			if(_lastLoadCodesAsyncToken != null) {
+				//_lastLoadCodesAsyncToken;
+			}
+			closePopupHandler();
+		}
+		
 		/**
 		 * Open the popup
 		 * */
@@ -77,6 +87,7 @@ package org.openforis.collect.presenter {
 			if(_popUp == null) {
 				_popUp = new CodeListDialog();
 				_popUp.addEventListener(CloseEvent.CLOSE, closePopupHandler);
+				_popUp.cancelLoading.addEventListener(MouseEvent.CLICK, cancelLoadingHandler);
 				_popUp.cancelButton.addEventListener(MouseEvent.CLICK, closePopupHandler);
 				_popUp.applyButton.addEventListener(MouseEvent.CLICK, applyButtonClickHandler);
 			}
@@ -96,7 +107,8 @@ package org.openforis.collect.presenter {
 			var codeAttributeDef:CodeAttributeDefinitionProxy = _view.attributeDefinition as CodeAttributeDefinitionProxy;
 			var attribute:String = codeAttributeDef.name;
 			var parentEntityId:int = _view.parentEntity.id;
-			dataClient.findAssignableCodeListItems(new AsyncResponder(loadListDialogDataResultHandler, faultHandler), parentEntityId, attribute);
+			var responder:IResponder = new AsyncResponder(loadListDialogDataResultHandler, faultHandler);
+			_lastLoadCodesAsyncToken = dataClient.findAssignableCodeListItems(responder, parentEntityId, attribute);
 		}
 		
 		protected function loadListDialogDataResultHandler(event:ResultEvent, token:Object = null):void {

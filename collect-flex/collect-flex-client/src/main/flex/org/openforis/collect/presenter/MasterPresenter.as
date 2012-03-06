@@ -11,8 +11,8 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.client.DataClient;
 	import org.openforis.collect.event.UIEvent;
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
+	import org.openforis.collect.model.CollectRecord$Step;
 	import org.openforis.collect.model.proxy.RecordProxy;
-	import org.openforis.collect.model.proxy.RecordProxy$Step;
 	import org.openforis.collect.ui.view.MasterView;
 	import org.openforis.collect.util.AlertUtil;
 
@@ -54,15 +54,11 @@ package org.openforis.collect.presenter {
 			var record:RecordProxy = uiEvent.obj as RecordProxy;
 			var id:Number = record.id;
 			var step:int;
-			if(record.step == RecordProxy$Step.ANALYSIS) {
+			if(record.step == CollectRecord$Step.ANALYSIS) {
 				AlertUtil.showMessage("list.error.cannotEdit.recordPromotedToAnalysis");
 				return;
-			} else if(record.step == RecordProxy$Step.ENTRY) {
-				step = 1;
-			} else if(record.step == RecordProxy$Step.CLEANSING) {
-				step = 2;
 			}
-			_dataClient.loadRecord(new AsyncResponder(loadRecordResultHandler, faultHandler, record), id, step);
+			_dataClient.loadRecord(new AsyncResponder(loadRecordResultHandler, faultHandler, record), id, record.step);
 		}
 		
 		/**
