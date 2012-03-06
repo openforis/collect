@@ -27,6 +27,10 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.metamodel.proxy.SurveyProxy;
 	import org.openforis.collect.model.SurveySummary;
 	import org.openforis.collect.ui.view.ListView;
+	import mx.rpc.events.FaultEvent;
+	import org.openforis.collect.ui.component.BlockingMessagePopUp;
+	import org.openforis.collect.i18n.Message;
+	import org.openforis.collect.ui.Images;
 	
 	/**
 	 * 
@@ -139,16 +143,22 @@ package org.openforis.collect.presenter {
 		}
 		
 		internal function sendKeepAliveMessage(event:TimerEvent):void {
-			if(! Application.serverOffline) {
-				this._sessionClient.keepAlive(new ItemResponder(keepAliveResult, faultHandler));
-			} else {
-				_keepAliveTimer.stop();
-			}
+			this._sessionClient.keepAlive(new ItemResponder(keepAliveResult, keepAliveFaultHandler));
 		}
 		
 		internal function keepAliveResult(event:ResultEvent, token:Object = null):void {
 			//keep alive succesfully sent
 			//trace("[Keep Alive response received] " + event);
+		}
+		
+		internal function keepAliveFaultHandler(event:FaultEvent, token:Object = null):void {
+			//server offline
+			if(! Application.serverOffline) {
+				var message:String = Message.get("global.serverOffLineMsg");
+				BlockingMessagePopUp.show(Message.get("global.serverOffLine"), message, Images.ERROR);
+			}
+			Application.serverOffline = true;
+			_keepAliveTimer.stop();
 		}
 	}
 }
