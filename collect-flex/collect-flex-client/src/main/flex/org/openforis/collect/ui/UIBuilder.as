@@ -22,6 +22,7 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.metamodel.proxy.NumberAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.NumberAttributeDefinitionProxy$Type;
 	import org.openforis.collect.metamodel.proxy.RangeAttributeDefinitionProxy;
+	import org.openforis.collect.metamodel.proxy.RangeAttributeDefinitionProxy$Type;
 	import org.openforis.collect.metamodel.proxy.TaxonAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.TextAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.TextAttributeDefinitionProxy$Type;
@@ -49,6 +50,7 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.ui.component.input.FixedCodeInputField;
 	import org.openforis.collect.ui.component.input.InputField;
 	import org.openforis.collect.ui.component.input.IntegerInputField;
+	import org.openforis.collect.ui.component.input.IntegerRangeInputField;
 	import org.openforis.collect.ui.component.input.MemoInputField;
 	import org.openforis.collect.ui.component.input.MultipleCodeInputField;
 	import org.openforis.collect.ui.component.input.NumericInputField;
@@ -294,7 +296,12 @@ package org.openforis.collect.ui {
 					inputField = new NumericInputField();
 				}
 			} else if(def is RangeAttributeDefinitionProxy) {
-				inputField = new RangeInputField();
+				var rangeDef:RangeAttributeDefinitionProxy = RangeAttributeDefinitionProxy(def);
+				if(rangeDef.type == RangeAttributeDefinitionProxy$Type.INTEGER) {
+					inputField = new IntegerRangeInputField();
+				} else { 
+					inputField = new RangeInputField();
+				}
 			} else if(def is TextAttributeDefinitionProxy) {
 				var textAttributeDef:TextAttributeDefinitionProxy = TextAttributeDefinitionProxy(def);
 				var type:TextAttributeDefinitionProxy$Type = textAttributeDef.type;
