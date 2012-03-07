@@ -1,5 +1,6 @@
 package org.openforis.collect.presenter
 {
+	import org.openforis.collect.model.proxy.AttributeProxy;
 	import org.openforis.collect.ui.component.input.RangeInputField;
 	
 	/**
@@ -7,12 +8,30 @@ package org.openforis.collect.presenter
 	 */
 	public class RangeInputFieldPresenter extends InputFieldPresenter {
 		
+		protected static const SEPARATOR:String = "-";
+
 		private var _view:RangeInputField;
 		
 		public function RangeInputFieldPresenter(inputField:RangeInputField) {
 			_view = inputField;
 			_view.fieldIndex = -1;
 			super(inputField);
+		}
+		
+		override protected function getTextFromValue():String {
+			var attribute:AttributeProxy = _view.attribute;
+			if(attribute != null) {
+				var start:Object = attribute.getField(0).value;
+				var end:Object = attribute.getField(1).value;
+				if(start != null && !isNaN(Number(start))) {
+					var result:String = start.toString();
+					if(end != null && !isNaN(Number(end)) && start != end) {
+						result += SEPARATOR + end.toString();
+					}
+				}
+				return result;
+			}
+			return "";
 		}
 		
 	}
