@@ -28,8 +28,8 @@ package org.openforis.collect.presenter
 					if(end != null && !isNaN(Number(end)) && start != end) {
 						result += SEPARATOR + end.toString();
 					}
+					return result;
 				}
-				return result;
 			}
 			return "";
 		}
