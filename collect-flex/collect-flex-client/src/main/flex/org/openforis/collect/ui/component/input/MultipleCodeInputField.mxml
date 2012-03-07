@@ -3,7 +3,7 @@
 					  xmlns:s="library://ns.adobe.com/flex/spark" 
 					  xmlns:mx="library://ns.adobe.com/flex/mx" 
 					  xmlns:input="org.openforis.collect.ui.component.input.*"
-					  restrict="^(\*|\-|\?|(\w+(:.*)?(, ?)?)*)$"
+					  restrict="^(\*|-|\?|(\w+(:(\w|\s)*)?(, ?)?)*)$"
 					  >
 	
 	<fx:Script>
@@ -14,10 +14,6 @@
 			import org.openforis.collect.presenter.MultipleCodeInputFieldPresenter;
 			
 			private var _attributes:IList;
-			
-			override protected function creationCompleteHandler(event:FlexEvent):void {
-				super.creationCompleteHandler(event);
-			}
 			
 			override protected function initPresenter():void {
 				this.presenter = new MultipleCodeInputFieldPresenter(this);
