@@ -20,6 +20,7 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
 	import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.NumberAttributeDefinitionProxy;
+	import org.openforis.collect.metamodel.proxy.NumberAttributeDefinitionProxy$Type;
 	import org.openforis.collect.metamodel.proxy.RangeAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.TaxonAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.TextAttributeDefinitionProxy;
@@ -47,7 +48,9 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.ui.component.input.DateAttributeRenderer;
 	import org.openforis.collect.ui.component.input.FixedCodeInputField;
 	import org.openforis.collect.ui.component.input.InputField;
+	import org.openforis.collect.ui.component.input.IntegerInputField;
 	import org.openforis.collect.ui.component.input.MemoInputField;
+	import org.openforis.collect.ui.component.input.MultipleCodeInputField;
 	import org.openforis.collect.ui.component.input.NumericInputField;
 	import org.openforis.collect.ui.component.input.RangeInputField;
 	import org.openforis.collect.ui.component.input.StringInputField;
@@ -276,13 +279,20 @@ package org.openforis.collect.ui {
 				var codeDef:CodeAttributeDefinitionProxy = CodeAttributeDefinitionProxy(def);
 				if(isInDataGroup && codeDef.parent.enumerated && codeDef.key) {
 					inputField = new FixedCodeInputField();
+				} else if(def.multiple) {
+					inputField = new MultipleCodeInputField();
 				} else {
 					inputField = new CodeInputField();
 				}
 			} else if(def is FileAttributeDefinitionProxy) {
 				//inputField = new FileInputField();
 			} else if(def is NumberAttributeDefinitionProxy) {
-				inputField = new NumericInputField();
+				var numberDefn:NumberAttributeDefinitionProxy = NumberAttributeDefinitionProxy(def);
+				if(numberDefn.type == NumberAttributeDefinitionProxy$Type.INTEGER) {
+					inputField = new IntegerInputField();
+				} else {
+					inputField = new NumericInputField();
+				}
 			} else if(def is RangeAttributeDefinitionProxy) {
 				inputField = new RangeInputField();
 			} else if(def is TextAttributeDefinitionProxy) {

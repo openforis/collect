@@ -4,10 +4,11 @@
 				  xmlns:mx="library://ns.adobe.com/flex/mx" 
 				  xmlns:input="org.openforis.collect.ui.component.input.*"
 				  currentState="descriptionVisible"
+				  restrict="^(\w+(: ?(\w|\s)*)?)$"
 				  >
 	<fx:Script>
 		<![CDATA[
-			import mx.collections.IList;
+			
 			
 			import org.openforis.collect.metamodel.proxy.CodeAttributeDefinitionProxy;
 			import org.openforis.collect.presenter.CodeInputFieldPresenter;
@@ -16,20 +17,10 @@
 			public static const STATE_DEFAULT:String = "default";
 			public static const STATE_DESCRIPTION_VISIBLE:String = "descriptionVisible";
 			
-			private var _attributes:IList;
 			private var _description:String;
 			
 			override protected function initPresenter():void {
 				this.presenter = new CodeInputFieldPresenter(this);
-			}
-			
-			[Bindable]
-			public function get attributes():IList {
-				return _attributes;
-			}
-			
-			public function set attributes(value:IList):void {
-				_attributes = value;
 			}
 			
 			[Bindable]
@@ -44,9 +35,9 @@
 			override public function set isInDataGroup(value:Boolean):void {
 				super.isInDataGroup = value;
 				if(value) {
-					currentState = CodeInputField.STATE_DEFAULT;
+					this.currentState = STATE_DEFAULT;
 				} else {
-					currentState = CodeInputField.STATE_DESCRIPTION_VISIBLE;
+					this.currentState = STATE_DESCRIPTION_VISIBLE;
 				}
 			}
 			
