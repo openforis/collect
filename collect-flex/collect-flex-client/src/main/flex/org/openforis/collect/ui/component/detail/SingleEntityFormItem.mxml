@@ -5,34 +5,72 @@
 		xmlns:mx="library://ns.adobe.com/flex/mx"
 		xmlns:detail="org.openforis.collect.ui.component.detail.*"
 		>
+	<fx:Declarations>
+		<s:VerticalLayout id="verticalLayout" 
+						  gap="2" 
+						  paddingLeft="20" 
+						  />
+		<s:HorizontalLayout id="horizontalLayout" 
+							gap="2" />
+	</fx:Declarations>
 	
-	<s:BorderContainer id="border" 
+	<fx:Script>
+		<![CDATA[
+			import mx.binding.utils.ChangeWatcher;
+			import mx.events.FlexEvent;
+			
+			private static const STATE_HORIZONTAL:String = "horizontal";
+			private static const STATE_VERTICAL:String = "vertical";
+
+			override protected function creationCompleteHandler(event:FlexEvent):void {
+				super.creationCompleteHandler(event);
+				checkState();
+				ChangeWatcher.watch(this, "isInDataGroup", checkState);
+			}
+
+			protected function checkState(event:Event = null):void {
+				if(isInDataGroup) {
+					currentState = STATE_HORIZONTAL;
+				} else {
+					currentState = STATE_VERTICAL;
+				}
+			}
+			
+		]]>
+	</fx:Script>
+	
+	
+	<detail:states>
+		<s:State name="horizontal" />
+		<s:State name="vertical" />
+	</detail:states>
+	
+	<detail:layout>
+		<s:VerticalLayout />
+	</detail:layout>
+
+	<!--<s:BorderContainer id="border" 
 					   height="100%" 
 					   width="100%"
 					   minHeight="0"
 					   minWidth="0">
-		<s:layout>
-			<s:VerticalLayout />
-		</s:layout>
+	-->		
+	<s:Label text="{entityDefinition.getLabelText()}" styleName="bold" includeIn="vertical" />
 
-		<s:Label text="{entityDefinition.getLabelText()}" styleName="bold" />
-	
-		<s:DataGroup dataProvider="{nodeDefinitions}">
-			<s:layout>
-				<s:VerticalLayout gap="2" paddingLeft="20" />
-			</s:layout>
-			<s:itemRenderer>
-				<fx:Component>
-					<detail:FormDataGroupItemRenderer
-						modelVersion="{outerDocument.modelVersion}"
-						entity="{outerDocument.entity}"
-						isInDataGroup="false"
-						labelWidth="130"
-						/>
-				</fx:Component>
-			</s:itemRenderer>
-		</s:DataGroup>
-		
-	</s:BorderContainer>
+	<s:DataGroup 
+		dataProvider="{nodeDefinitions}" 
+		layout.horizontal="{horizontalLayout}" 
+		layout.vertical="{verticalLayout}">
+		<s:itemRenderer>
+			<fx:Component>
+				<detail:FormDataGroupItemRenderer
+					modelVersion="{outerDocument.modelVersion}"
+					entity="{outerDocument.entity}"
+					isInDataGroup="{outerDocument.isInDataGroup}"
+					labelWidth="130"
+					/>
+			</fx:Component>
+		</s:itemRenderer>
+	</s:DataGroup>
 	
 </detail:EntityFormItem>

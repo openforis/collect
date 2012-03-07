@@ -212,6 +212,7 @@ package org.openforis.collect.ui {
 				entityFormItem = new SingleEntityFormItem();
 			}
 			entityFormItem.entityDefinition = definition;
+			entityFormItem.isInDataGroup = isInDataGroup;
 			return entityFormItem;
 		}
 		
@@ -365,16 +366,17 @@ package org.openforis.collect.ui {
 			l.text = defn.getLabelText();
 			v.addElement(l);
 			
-			var hGroup:HGroup = new HGroup();
-			hGroup.percentHeight = 100;
-			hGroup.verticalAlign = "bottom";
+			var childDefinitionsContainer:HGroup = new HGroup();
+			childDefinitionsContainer.percentHeight = 100;
+			childDefinitionsContainer.verticalAlign = "bottom";
 			var childDefn:ListCollectionView = defn.childDefinitions;
 			var width:int = 0;
 			for each (var childDef:NodeDefinitionProxy in childDefn) {
 				var elem:IVisualElement = getDataGroupHeader(childDef);
 				width += elem.width;
-				hGroup.addElement(elem);
+				childDefinitionsContainer.addElement(elem);
 			}
+			v.addElement(childDefinitionsContainer);
 			v.width = width;
 			
 			return v;

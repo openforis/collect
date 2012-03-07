@@ -81,6 +81,7 @@
 								entity="{data as EntityProxy}"
 								modelVersion="{outerDocument.modelVersion}"
 								nodeDefinitions="{outerDocument.nodeDefinitions}"
+								isInDataGroup="true"
 								/>
 						</fx:Component>
 					</s:itemRenderer>

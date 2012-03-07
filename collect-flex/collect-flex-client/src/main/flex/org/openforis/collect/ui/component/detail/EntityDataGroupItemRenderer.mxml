@@ -17,6 +17,7 @@
 			private var _nodeDefinitions:IList;
 			private var _modelVersion:ModelVersionProxy;
 			private var _entity:EntityProxy;
+			private var _isInDataGroup:Boolean = false;
 			
 			[Bindable]
 			public function get entityDefinition():EntityDefinitionProxy {
@@ -52,6 +53,15 @@
 			
 			public function set entity(value:EntityProxy):void {
 				_entity = value;
+			}
+			
+			[Bindable]
+			public function get isInDataGroup():Boolean {
+				return _isInDataGroup;
+			}
+			
+			public function set isInDataGroup(value:Boolean):void {
+				_isInDataGroup = value;
 			}
 			
 		]]>
