@@ -14,6 +14,7 @@ package org.openforis.collect.client {
 	import org.openforis.collect.remoting.service.UpdateRequest;
 	import org.openforis.collect.ui.component.input.InputField;
 	import org.openforis.collect.util.AlertUtil;
+	import org.openforis.collect.util.UIUtil;
 	
 	/**
 	 * 
@@ -165,10 +166,10 @@ package org.openforis.collect.client {
 				var token:UpdateRequestToken = UpdateRequestToken(call.token);
 				var inputField:InputField = token.inputField;
 				if(inputField != null) {
-					inputField.undo();
 					if(inputField.textInput != null) {
 						inputField.textInput.setFocus();
 					}
+					UIUtil.ensureElementIsVisible(inputField);
 				}
 			}
 		}
