@@ -2,3 +2,4 @@
 target
 !.gitignore
 dev.properties
+/collect-flex/collect-flex-web/src/main/resources/app.properties
