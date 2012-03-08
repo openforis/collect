@@ -6,7 +6,7 @@ import static org.openforis.collect.persistence.jooq.tables.OfcLogo.OFC_LOGO;
 import java.sql.Connection;
 
 import org.jooq.Record;
-import org.jooq.UpdatableRecord;
+import org.jooq.StoreQuery;
 import org.openforis.collect.model.Logo;
 import org.openforis.collect.persistence.jooq.MappingJooqDaoSupport;
 import org.openforis.collect.persistence.jooq.MappingJooqFactory;
@@ -56,9 +56,9 @@ public class LogoDao extends MappingJooqDaoSupport<Logo, LogoDao.JooqFactory> {
 		}
 		
 		@Override
-		public void toRecord(Logo l, UpdatableRecord<?> r) {
-			r.setValue(OFC_LOGO.POS, l.getPosition());			
-			r.setValue(OFC_LOGO.IMAGE, l.getImage());
+		protected void fromObject(Logo l, StoreQuery<?> q) {
+			q.addValue(OFC_LOGO.POS, l.getPosition());			
+			q.addValue(OFC_LOGO.IMAGE, l.getImage());
 		}
 
 		@Override

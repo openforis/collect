@@ -118,12 +118,12 @@ package org.openforis.collect.presenter {
 		
 		protected function performSubmit():void {
 			var responder:AsyncResponder = new AsyncResponder(promoteRecordResultHandler, faultHandler);
-			_dataClient.submitRecord(responder, Application.activeRecord.id, Application.activeRecord.step);
+			_dataClient.promoteActiveRecord(responder);
 		}
 		
 		protected function performReject():void {
 			var responder:AsyncResponder = new AsyncResponder(rejectRecordResultHandler, faultHandler);
-			_dataClient.rejectRecord(responder, Application.activeRecord.id, Application.activeRecord.step);
+			_dataClient.demoteActiveRecord(responder);
 		}
 		
 		internal function clearActiveRecordHandler(event:ResultEvent, token:Object = null):void {
