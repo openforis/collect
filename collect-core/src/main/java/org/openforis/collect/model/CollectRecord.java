@@ -71,22 +71,22 @@ public class CollectRecord extends Record {
 	}
 
 	public enum State {
-		REJECTED('R');
+		REJECTED("R");
 		
-		private char code;
+		private String code;
 
-		private State(char code) {
+		private State(String code) {
 			this.code = code;
 		}
 		
-		public char getCode() {
+		public String getCode() {
 			return code;
 		}
 		
-		public static State valueOf(char code) {
+		public static State fromCode(String code) {
 			State[] values = State.values();
 			for (State state : values) {
-				if (state.getCode() == code) {
+				if (state.getCode().equals(code)) {
 					return state;
 				}
 			}
