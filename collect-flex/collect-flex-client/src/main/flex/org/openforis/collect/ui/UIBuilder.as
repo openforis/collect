@@ -20,7 +20,9 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
 	import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.NumberAttributeDefinitionProxy;
+	import org.openforis.collect.metamodel.proxy.NumberAttributeDefinitionProxy$Type;
 	import org.openforis.collect.metamodel.proxy.RangeAttributeDefinitionProxy;
+	import org.openforis.collect.metamodel.proxy.RangeAttributeDefinitionProxy$Type;
 	import org.openforis.collect.metamodel.proxy.TaxonAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.TextAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.TextAttributeDefinitionProxy$Type;
@@ -47,7 +49,10 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.ui.component.input.DateAttributeRenderer;
 	import org.openforis.collect.ui.component.input.FixedCodeInputField;
 	import org.openforis.collect.ui.component.input.InputField;
+	import org.openforis.collect.ui.component.input.IntegerInputField;
+	import org.openforis.collect.ui.component.input.IntegerRangeInputField;
 	import org.openforis.collect.ui.component.input.MemoInputField;
+	import org.openforis.collect.ui.component.input.MultipleCodeInputField;
 	import org.openforis.collect.ui.component.input.NumericInputField;
 	import org.openforis.collect.ui.component.input.RangeInputField;
 	import org.openforis.collect.ui.component.input.StringInputField;
@@ -207,6 +212,7 @@ package org.openforis.collect.ui {
 				entityFormItem = new SingleEntityFormItem();
 			}
 			entityFormItem.entityDefinition = definition;
+			entityFormItem.isInDataGroup = isInDataGroup;
 			return entityFormItem;
 		}
 		
@@ -276,15 +282,27 @@ package org.openforis.collect.ui {
 				var codeDef:CodeAttributeDefinitionProxy = CodeAttributeDefinitionProxy(def);
 				if(isInDataGroup && codeDef.parent.enumerated && codeDef.key) {
 					inputField = new FixedCodeInputField();
+				} else if(def.multiple) {
+					inputField = new MultipleCodeInputField();
 				} else {
 					inputField = new CodeInputField();
 				}
 			} else if(def is FileAttributeDefinitionProxy) {
 				//inputField = new FileInputField();
 			} else if(def is NumberAttributeDefinitionProxy) {
-				inputField = new NumericInputField();
+				var numberDefn:NumberAttributeDefinitionProxy = NumberAttributeDefinitionProxy(def);
+				if(numberDefn.type == NumberAttributeDefinitionProxy$Type.INTEGER) {
+					inputField = new IntegerInputField();
+				} else {
+					inputField = new NumericInputField();
+				}
 			} else if(def is RangeAttributeDefinitionProxy) {
-				inputField = new RangeInputField();
+				var rangeDef:RangeAttributeDefinitionProxy = RangeAttributeDefinitionProxy(def);
+				if(rangeDef.type == RangeAttributeDefinitionProxy$Type.INTEGER) {
+					inputField = new IntegerRangeInputField();
+				} else { 
+					inputField = new RangeInputField();
+				}
 			} else if(def is TextAttributeDefinitionProxy) {
 				var textAttributeDef:TextAttributeDefinitionProxy = TextAttributeDefinitionProxy(def);
 				var type:TextAttributeDefinitionProxy$Type = textAttributeDef.type;
@@ -348,16 +366,17 @@ package org.openforis.collect.ui {
 			l.text = defn.getLabelText();
 			v.addElement(l);
 			
-			var hGroup:HGroup = new HGroup();
-			hGroup.percentHeight = 100;
-			hGroup.verticalAlign = "bottom";
+			var childDefinitionsContainer:HGroup = new HGroup();
+			childDefinitionsContainer.percentHeight = 100;
+			childDefinitionsContainer.verticalAlign = "bottom";
 			var childDefn:ListCollectionView = defn.childDefinitions;
 			var width:int = 0;
 			for each (var childDef:NodeDefinitionProxy in childDefn) {
 				var elem:IVisualElement = getDataGroupHeader(childDef);
 				width += elem.width;
-				hGroup.addElement(elem);
+				childDefinitionsContainer.addElement(elem);
 			}
+			v.addElement(childDefinitionsContainer);
 			v.width = width;
 			
 			return v;

@@ -5,7 +5,6 @@ package org.openforis.collect.ui.component.datagrid
 	import mx.core.ClassFactory;
 	
 	import org.openforis.collect.model.proxy.RecordProxy;
-	import org.openforis.collect.model.proxy.RecordProxy$Step;
 	
 	import spark.components.DataGrid;
 	import spark.components.gridClasses.GridColumn;

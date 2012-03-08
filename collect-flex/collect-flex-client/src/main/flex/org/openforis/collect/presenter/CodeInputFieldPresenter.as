@@ -3,27 +3,19 @@ package org.openforis.collect.presenter {
 	import flash.events.Event;
 	import flash.events.MouseEvent;
 	
-	import mx.binding.utils.ChangeWatcher;
-	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
 	import mx.core.FlexGlobals;
 	import mx.events.CloseEvent;
-	import mx.events.CollectionEvent;
 	import mx.managers.PopUpManager;
 	import mx.rpc.AsyncResponder;
+	import mx.rpc.AsyncToken;
 	import mx.rpc.IResponder;
 	import mx.rpc.events.ResultEvent;
 	
-	import org.openforis.collect.client.UpdateRequestToken;
 	import org.openforis.collect.metamodel.proxy.CodeAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.CodeListItemProxy;
-	import org.openforis.collect.model.FieldSymbol;
 	import org.openforis.collect.model.proxy.AttributeProxy;
-	import org.openforis.collect.model.proxy.CodeProxy;
 	import org.openforis.collect.model.proxy.FieldProxy;
-	import org.openforis.collect.remoting.service.UpdateRequest;
-	import org.openforis.collect.remoting.service.UpdateRequestOperation;
-	import org.openforis.collect.remoting.service.UpdateRequestOperation$Method;
 	import org.openforis.collect.ui.component.input.CodeInputField;
 	import org.openforis.collect.ui.component.input.CodeListDialog;
 	import org.openforis.collect.ui.component.input.TextInput;
@@ -39,8 +31,10 @@ package org.openforis.collect.presenter {
 	public class CodeInputFieldPresenter extends InputFieldPresenter {
 		
 		private static var _popUp:CodeListDialog;
+		private static var _lastLoadCodesAsyncToken:AsyncToken;
 		private var _view:CodeInputField;
 		private var _items:IList;
+		
 		
 		public function CodeInputFieldPresenter(view:CodeInputField) {
 			_view = view;
@@ -52,15 +46,6 @@ package org.openforis.collect.presenter {
 			super.initEventListeners();
 			
 			_view.openImage.addEventListener(MouseEvent.CLICK, openImageClickHandler);
-			
-			ChangeWatcher.watch(_view, "attributes", attributesChangeHandler);
-		}
-		
-		protected function attributesChangeHandler(event:Event):void {
-			if(! (event is CollectionEvent) && _view.attributes != null) {
-				_view.attributes.addEventListener(CollectionEvent.COLLECTION_CHANGE, attributesChangeHandler);
-			}
-			updateView();
 		}
 		
 		/**
@@ -70,6 +55,13 @@ package org.openforis.collect.presenter {
 			PopUpManager.removePopUp(_popUp);
 		}
 		
+		internal static function cancelLoadingHandler(event:Event):void {
+			if(_lastLoadCodesAsyncToken != null) {
+				//_lastLoadCodesAsyncToken;
+			}
+			closePopupHandler();
+		}
+		
 		/**
 		 * Open the popup
 		 * */
@@ -77,6 +69,7 @@ package org.openforis.collect.presenter {
 			if(_popUp == null) {
 				_popUp = new CodeListDialog();
 				_popUp.addEventListener(CloseEvent.CLOSE, closePopupHandler);
+				_popUp.cancelLoading.addEventListener(MouseEvent.CLICK, cancelLoadingHandler);
 				_popUp.cancelButton.addEventListener(MouseEvent.CLICK, closePopupHandler);
 				_popUp.applyButton.addEventListener(MouseEvent.CLICK, applyButtonClickHandler);
 			}
@@ -96,7 +89,8 @@ package org.openforis.collect.presenter {
 			var codeAttributeDef:CodeAttributeDefinitionProxy = _view.attributeDefinition as CodeAttributeDefinitionProxy;
 			var attribute:String = codeAttributeDef.name;
 			var parentEntityId:int = _view.parentEntity.id;
-			dataClient.findAssignableCodeListItems(new AsyncResponder(loadListDialogDataResultHandler, faultHandler), parentEntityId, attribute);
+			var responder:IResponder = new AsyncResponder(loadListDialogDataResultHandler, faultHandler);
+			_lastLoadCodesAsyncToken = dataClient.findAssignableCodeListItems(responder, parentEntityId, attribute);
 		}
 		
 		protected function loadListDialogDataResultHandler(event:ResultEvent, token:Object = null):void {
@@ -122,27 +116,7 @@ package org.openforis.collect.presenter {
 		
 		override protected function getTextFromValue():String {
 			if(_view.attributeDefinition != null) {
-				if(_view.attributeDefinition.multiple) {
-					if(CollectionUtil.isNotEmpty(_view.attributes)) {
-						var firstAttribute:AttributeProxy = _view.attributes.getItemAt(0) as AttributeProxy;
-						var field:FieldProxy = firstAttribute.getField(0);
-						if(field.symbol != null) {
-							var shortCut:String = getShortCutForReasonBlank(field.symbol);
-							if(shortCut != null) {
-								return shortCut;
-							}
-						}
-						var parts:Array = new Array();
-						for each (var attribute:AttributeProxy in _view.attributes) {
-							var part:String = codeAttributeToText(attribute);
-							parts.push(part);
-						}
-						var result:String = org.openforis.collect.util.StringUtil.concat(", ", parts);
-						return result;
-					}
-				} else {
-					return codeAttributeToText(_view.attribute);
-				}
+				return codeAttributeToText(_view.attribute);
 			}
 			return "";
 		}
@@ -168,126 +142,16 @@ package org.openforis.collect.presenter {
 			updateDescription();
 		}
 		
-		override public function applyValue():void {
-			if(_view.attributeDefinition.multiple) {
-				var text:String = textToRequestValue();
-				var operations:ArrayCollection = new ArrayCollection();
-				var o:UpdateRequestOperation;
-				for each (var a:AttributeProxy in _view.attributes) {
-					o = getUpdateRequestOperation(UpdateRequestOperation$Method.DELETE, a.id);
-					operations.addItem(o);
-				}
-				var remarks:String = getRemarks();
-				var symbol:FieldSymbol = null;
-				if(text != null) {
-					var parts:Array = text.split(",");
-					if(parts.length == 1 && isShortCutForReasonBlank(text)) {
-						symbol = parseShortCutForReasonBlank(text);
-						o = getUpdateRequestOperation(UpdateRequestOperation$Method.ADD, NaN, null, symbol, remarks);
-						operations.addItem(o);
-					} else {
-						for each (var part:String in parts) {
-							var trimmedPart:String = StringUtil.trim(part);
-							if(StringUtil.isNotBlank(trimmedPart)) {
-								o = getUpdateRequestOperation(UpdateRequestOperation$Method.ADD, NaN, trimmedPart, null, remarks);
-								operations.addItem(o);
-							}
-						}
-					}
-				} else if(StringUtil.isNotBlank(remarks)) {
-					o = getUpdateRequestOperation(UpdateRequestOperation$Method.ADD, NaN, null, null, remarks);
-					operations.addItem(o);
-				}
-				var req:UpdateRequest = new UpdateRequest();
-				req.operations = operations;
-				var token:UpdateRequestToken = new UpdateRequestToken(UpdateRequestToken.TYPE_UPDATE_VALUE, _view);
-				token.symbol = symbol;
-				token.remarks = remarks;
-				dataClient.updateActiveRecord(req, token, updateResultHandler);
-			} else {
-				super.applyValue();
-			}
-		}
-		
-		override public function applyRemarks(remarks:String):void {
-			if(_view.attributeDefinition.multiple) {
-				var updatedFields:ArrayCollection = new ArrayCollection();
-				var operations:ArrayCollection = new ArrayCollection();
-				for each (var a:AttributeProxy in _view.attributes) {
-					var value:String = codeAttributeToText(a);
-					var field:FieldProxy = a.getField(0);
-					var symbol:FieldSymbol = field.symbol;
-					var o:UpdateRequestOperation = getUpdateRequestOperation(UpdateRequestOperation$Method.UPDATE, 
-						a.id, value, symbol, remarks);
-					operations.addItem(o);
-					updatedFields.addAll(a.fields);
-				}
-				var req:UpdateRequest = new UpdateRequest();
-				req.operations = operations;
-				var token:UpdateRequestToken = new UpdateRequestToken(UpdateRequestToken.TYPE_UPDATE_REMARKS, _view);
-				token.remarks = remarks;
-				token.updatedFields = updatedFields;
-				dataClient.updateActiveRecord(req, token, updateResultHandler);
-			} else {
-				super.applyRemarks(remarks);
-			}
-		}
-		
-		override public function applySymbol(symbol:FieldSymbol):void {
-			if(_view.attributeDefinition.multiple) {
-				var updatedFields:ArrayCollection = new ArrayCollection();
-				var operations:ArrayCollection = new ArrayCollection();
-				var remarks:String = getRemarks();
-				for each (var a:AttributeProxy in _view.attributes) {
-					var value:String = codeAttributeToText(a);
-					var o:UpdateRequestOperation = getUpdateRequestOperation(UpdateRequestOperation$Method.UPDATE, 
-						a.id, value, symbol, remarks);
-					operations.addItem(o);
-					updatedFields.addAll(a.fields);
-				}
-				var req:UpdateRequest = new UpdateRequest();
-				req.operations = operations;
-				var token:UpdateRequestToken = new UpdateRequestToken(UpdateRequestToken.TYPE_UPDATE_SYMBOL, _view);
-				token.updatedFields = updatedFields;
-				token.symbol = symbol;
-				dataClient.updateActiveRecord(req, token, updateResultHandler);
-			} else {
-				super.applySymbol(symbol);
-			}
-		}
-		
-		override protected function getRemarks():String {
-			if(_view.attributeDefinition.multiple) {
-				if(CollectionUtil.isNotEmpty(_view.attributes)) {
-					var a:AttributeProxy = AttributeProxy(_view.attributes.getItemAt(0));
-					var field:FieldProxy = FieldProxy(a.fields[0]);
-					return field.remarks;
-				}
-			} else {
-				return super.getRemarks();
-			}
-			return null;
-		}
-		
 		protected function updateDescription():void {
 			_view.description = "";
-			if(_view.attribute != null || _view.attributes != null) {
+			if(_view.attribute != null) {
 				var codes:Array = [];
 				var code:String;
 				var attribute:AttributeProxy;
-				if(_view.attributeDefinition.multiple) {
-					for each(attribute in _view.attributes) {
-						code = attribute.getField(0).value as String;
-						if( StringUtil.isNotBlank(code)) {
-							codes.push(code);
-						}
-					}
-				} else {
-					attribute = _view.attribute;
-					code = attribute.getField(0).value as String;
-					if( StringUtil.isNotBlank(code)) {
-						codes.push(code);
-					}
+				attribute = _view.attribute;
+				code = attribute.getField(0).value as String;
+				if( StringUtil.isNotBlank(code)) {
+					codes.push(code);
 				}
 				if(ArrayUtil.isNotEmpty(codes)) {
 					var parentEntityId:int = _view.parentEntity.id;

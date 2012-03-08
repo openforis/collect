@@ -31,7 +31,7 @@
 	<s:HGroup 
 			verticalAlign="middle"
 			gap="2">
-		<input:NumericInputField id="hour"
+		<input:IntegerInputField id="hour"
 								 width="25" 
 								 maxChars="2"
 								 attributeDefinition="{attributeDefinition}"
@@ -41,7 +41,7 @@
 								 textFormatFunction="{twoCharsZeroPaddingFormatFunction}"
 								 />
 		<s:Label id="separatorLabel" text="{separator}" />
-		<input:NumericInputField id="minute"
+		<input:IntegerInputField id="minute"
 								 width="25" 
 								 maxChars="2"
 								 attributeDefinition="{attributeDefinition}"

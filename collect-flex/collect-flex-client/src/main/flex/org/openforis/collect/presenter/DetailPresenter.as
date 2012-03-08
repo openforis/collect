@@ -16,8 +16,8 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.event.UIEvent;
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
+	import org.openforis.collect.model.CollectRecord$Step;
 	import org.openforis.collect.model.proxy.RecordProxy;
-	import org.openforis.collect.model.proxy.RecordProxy$Step;
 	import org.openforis.collect.ui.UIBuilder;
 	import org.openforis.collect.ui.component.detail.FormContainer;
 	import org.openforis.collect.ui.view.DetailView;
@@ -59,12 +59,12 @@ package org.openforis.collect.presenter {
 			_view.keyAttributeValuesText.text = keyValues;
 			_view.rootEntityDefinitionText.text = activeRootEntity.getLabelText();
 			_view.formVersionText.text = version.getLabelText();
-			var submitButtonVisible:Boolean = activeRecord.step == RecordProxy$Step.ENTRY || 
-				activeRecord.step == RecordProxy$Step.CLEANSING;
+			var submitButtonVisible:Boolean = activeRecord.step == CollectRecord$Step.ENTRY || 
+				activeRecord.step == CollectRecord$Step.CLEANSING;
 			_view.submitButton.visible = _view.submitButton.includeInLayout = submitButtonVisible;
 			
-			var rejectButtonVisible:Boolean = activeRecord.step == RecordProxy$Step.CLEANSING || 
-				activeRecord.step == RecordProxy$Step.ANALYSIS;
+			var rejectButtonVisible:Boolean = activeRecord.step == CollectRecord$Step.CLEANSING || 
+				activeRecord.step == CollectRecord$Step.ANALYSIS;
 			_view.rejectButton.visible = _view.rejectButton.includeInLayout = rejectButtonVisible;
 			
 			var form:FormContainer = null;
@@ -97,9 +97,9 @@ package org.openforis.collect.presenter {
 		protected function submitButtonClickHandler(event:MouseEvent):void {
 			var messageResource:String;
 			var r:RecordProxy = Application.activeRecord;
-			if(r.step == RecordProxy$Step.ENTRY) {
+			if(r.step == CollectRecord$Step.ENTRY) {
 				messageResource = "edit.confirmSubmitDataCleansing";
-			} else if(r.step == RecordProxy$Step.CLEANSING) {
+			} else if(r.step == CollectRecord$Step.CLEANSING) {
 				messageResource = "edit.confirmSubmitDataAnalysis";
 			}
 			AlertUtil.showConfirm(messageResource, null, null, performSubmit);
@@ -108,22 +108,22 @@ package org.openforis.collect.presenter {
 		protected function rejectButtonClickHandler(event:MouseEvent):void {
 			var messageResource:String;
 			var r:RecordProxy = Application.activeRecord;
-			if(r.step == RecordProxy$Step.CLEANSING) {
+			if(r.step == CollectRecord$Step.CLEANSING) {
 				messageResource = "edit.confirmRejectDataCleansing";
-			} else if(r.step == RecordProxy$Step.ANALYSIS) {
+			} else if(r.step == CollectRecord$Step.ANALYSIS) {
 				messageResource = "edit.confirmRejectDataAnalysis";
 			}
 			AlertUtil.showConfirm(messageResource, null, null, performReject);
 		}
 		
 		protected function performSubmit():void {
-			_dataClient.submitRecord(new AsyncResponder(promoteRecordResultHandler, faultHandler), 
-				Application.activeRecord.id);
+			var responder:AsyncResponder = new AsyncResponder(promoteRecordResultHandler, faultHandler);
+			_dataClient.submitRecord(responder, Application.activeRecord.id, Application.activeRecord.step);
 		}
 		
 		protected function performReject():void {
-			_dataClient.rejectRecord(new AsyncResponder(rejectRecordResultHandler, faultHandler), 
-				Application.activeRecord.id);
+			var responder:AsyncResponder = new AsyncResponder(rejectRecordResultHandler, faultHandler);
+			_dataClient.rejectRecord(responder, Application.activeRecord.id, Application.activeRecord.step);
 		}
 		
 		internal function clearActiveRecordHandler(event:ResultEvent, token:Object = null):void {

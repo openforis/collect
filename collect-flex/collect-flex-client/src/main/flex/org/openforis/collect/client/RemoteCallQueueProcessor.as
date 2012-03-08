@@ -74,10 +74,11 @@ package org.openforis.collect.client {
 			var call:RemoteCallWrapper = getHeadElement();
 			if(call.attempts >= _maxAttempts){
 				call.reset();
+				var callToken:Object = call.token;
 				if(_faultHandler != null) {
-					_faultHandler(event, token);
+					_faultHandler(event, callToken);
 					if(call.faultHandler != null) {
-						call.faultHandler(event, token);
+						call.faultHandler(event, callToken);
 					}
 				}
 			} else {

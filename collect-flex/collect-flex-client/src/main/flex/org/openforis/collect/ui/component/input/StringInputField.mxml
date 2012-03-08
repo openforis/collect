@@ -5,22 +5,6 @@
 				  xmlns:input="org.openforis.collect.ui.component.input.*" 
 				  >
 	
-	<fx:Script>
-		<![CDATA[
-			
-			private var _maxChars:int;
-			
-			[Bindable]
-			public function get maxChars():int {
-				return _maxChars;
-			}
-			
-			public function set maxChars(value:int):void {
-				_maxChars = value;
-			}
-		]]>
-	</fx:Script>
-	
-	<input:TextInput  id="textInput" width="100%" maxChars="{maxChars}" />
+	<input:TextInput id="textInput" width="100%" />
 	
 </input:InputField>

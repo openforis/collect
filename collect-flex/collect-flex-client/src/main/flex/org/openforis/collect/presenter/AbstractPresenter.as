@@ -23,13 +23,6 @@ package org.openforis.collect.presenter {
 			initEventListeners();
 		}
 		
-		internal static function get serverOffLineMessage():String {
-			if(_serverOffLineMessage == null) {
-				_serverOffLineMessage = Message.get("global.serverOffLineMsg");
-			}
-			return _serverOffLineMessage;
-		}
-		
 		internal function get eventDispatcher():EventDispatcher {
 			return EventDispatcherFactory.getEventDispatcher();
 		}
@@ -49,12 +42,6 @@ package org.openforis.collect.presenter {
 				case "Channel.Call.Failed":
 					"Client.Error.MessageSend"
 					"Client.Error.DeliveryInDoubt"
-					//server offline
-					if(! Application.serverOffline) {
-						BlockingMessagePopUp.show(Message.get("global.serverOffLine"), serverOffLineMessage, Images.ERROR);
-					}
-					Application.serverOffline = true;
-					break;
 				default:
 					Alert.show(Message.get("global.faultHandlerMsg")
 						+"\n\n"+ event.fault.faultCode

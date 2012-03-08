@@ -30,7 +30,6 @@
 	    flex\.messaging\..* |
 	    org\.openforis\.collect\.remoting\..* |
 	    org\.openforis\.collect\.model\.proxy\..* |
-	    org\.openforis\.collect\.model\.proxy\..* |
 	    org\.openforis\.collect\.model\.FieldSymbol
 	  "/>
     
