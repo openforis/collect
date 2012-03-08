@@ -105,7 +105,7 @@ public class DataService {
 		Schema schema = activeSurvey.getSchema();
 		EntityDefinition rootEntityDefinition = schema.getRootEntityDefinition(rootEntityName);
 		String rootEntityDefinitionName = rootEntityDefinition.getName();
-		int count = recordManager.getCountRecords(rootEntityDefinition);
+		int count = recordManager.getCountRecords(activeSurvey, rootEntityDefinitionName);
 		List<CollectRecord> summaries = recordManager.getSummaries(activeSurvey, rootEntityDefinitionName, offset, maxNumberOfRows, orderByFieldName, filter);
 		List<RecordProxy> proxies = new ArrayList<RecordProxy>();
 		for (CollectRecord summary : summaries) {
@@ -451,23 +451,25 @@ public class DataService {
 		return result;
 	}
 	
-	
-	
 	@Transactional
-	public void promoteRecord(int recordId, int step) throws RecordPersistenceException  {
+	public void promoteActiveRecord() throws RecordPersistenceException  {
 		SessionState sessionState = sessionManager.getSessionState();
-		CollectSurvey survey = sessionState.getActiveSurvey();
+		CollectRecord record = sessionState.getActiveRecord();
 		User user = sessionState.getUser();
-		recordManager.promote(survey, recordId, step, user);
+		recordManager.save(record);
+		recordManager.promote(record, user);
+		recordManager.unlock(record, user);
 		sessionManager.clearActiveRecord();
 	}
-
+	
 	@Transactional
-	public void demoteRecord(int recordId, int step) throws RecordPersistenceException {
+	public void demoteActiveRecord() throws RecordPersistenceException {
 		SessionState sessionState = sessionManager.getSessionState();
-		CollectSurvey survey = sessionState.getActiveSurvey();
+		CollectRecord record = sessionState.getActiveRecord();
 		User user = sessionState.getUser();
-		this.recordManager.demote(survey, recordId, step, user);
+		recordManager.demote(record, user);
+		recordManager.unlock(record, user);
+		sessionManager.clearActiveRecord();
 	}
 
 	public void updateNodeHierarchy(Node<? extends NodeDefinition> node, int newPosition) {

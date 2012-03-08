@@ -27,6 +27,7 @@ import org.openforis.idm.metamodel.CodeListItem;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.NodeDefinition;
+import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Code;
 import org.openforis.idm.model.CodeAttribute;
@@ -106,7 +107,9 @@ public class RecordManager {
 	}
 
 	@Transactional
-	public int getCountRecords(EntityDefinition rootEntityDefinition) {
+	public int getCountRecords(CollectSurvey survey, String rootEntity) {
+		Schema schema = survey.getSchema();
+		EntityDefinition rootEntityDefinition = schema.getRootEntityDefinition(rootEntity);
 		int count = recordDao.countRecords(rootEntityDefinition.getId());
 		return count;
 	}
@@ -136,8 +139,7 @@ public class RecordManager {
 	}
 
 	@Transactional
-	public void promote(CollectSurvey survey, int recordId, int step, User user) throws RecordPersistenceException {
-		CollectRecord record = recordDao.load(survey, recordId, step);
+	public void promote(CollectRecord record, User user) throws RecordPersistenceException {
 		Step currentStep = record.getStep();
 		Step nextStep = currentStep.getNext();
 		Date now = new Date();
@@ -149,21 +151,18 @@ public class RecordManager {
 		record.setStep(nextStep);
 		record.setState(null);
 		recordDao.update(record);
-		recordDao.unlock(recordId, user);
 	}
 
 	@Transactional
-	public void demote(CollectSurvey survey, int recordId, int stepNumber, User user) throws RecordPersistenceException {
-		Step step = Step.valueOf(stepNumber);
+	public void demote(CollectRecord record, User user) throws RecordPersistenceException {
+		Step step = record.getStep();
 		Step prevStep = step.getPrevious();
-		CollectRecord record = recordDao.load(survey, recordId, prevStep.getStepNumber());
 		Date now = new Date();
 		record.setModifiedBy(user);
 		record.setModifiedDate(now);
 		record.setStep(prevStep);
 		record.setState(State.REJECTED);
 		recordDao.update(record);
-		recordDao.unlock(recordId, user);
 	}
 
 	
