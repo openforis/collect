@@ -18,7 +18,7 @@ public class LanguageSpecificTextProxy implements Proxy {
 
 	private transient LanguageSpecificText languageSpecificText;
 
-	static List<LanguageSpecificTextProxy> fromList(List<LanguageSpecificText> list) {
+	public static List<LanguageSpecificTextProxy> fromList(List<LanguageSpecificText> list) {
 		List<LanguageSpecificTextProxy> proxies = new ArrayList<LanguageSpecificTextProxy>();
 		if (list != null) {
 			for (LanguageSpecificText text : list) {
