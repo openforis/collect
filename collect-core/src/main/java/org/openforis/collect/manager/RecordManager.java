@@ -141,7 +141,12 @@ public class RecordManager {
 	@Transactional
 	public void promote(CollectRecord record, User user) throws RecordPersistenceException {
 		//save changes on current step
-		recordDao.update(record); 
+		Integer id = record.getId();
+		if(id == null) {
+			recordDao.insert(record);
+		} else {
+			recordDao.update(record);
+		}
 		//change step and update the record
 		Step currentStep = record.getStep();
 		Step nextStep = currentStep.getNext();
@@ -194,7 +199,7 @@ public class RecordManager {
 						Node<?> createNode = nodeDefn.createNode();
 						entity.add(createNode);
 					} else if(nodeDefn instanceof EntityDefinition && ! nodeDefn.isMultiple()) {
-						addEntity(entity, nodeDefn.getName());
+						addEntity(entity, name);
 					}
 				} else {
 					List<Node<?>> all = entity.getAll(name);
