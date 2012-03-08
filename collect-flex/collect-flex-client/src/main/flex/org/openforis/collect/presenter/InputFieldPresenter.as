@@ -44,7 +44,8 @@ package org.openforis.collect.presenter {
 		public static const SHORTCUT_DASH_ON_FORM:String = "-";
 		public static const SHORTCUT_ILLEGIBLE:String = "?";
 		
-		public static const REASON_BLANK_SYMBOLS:Array = [SHORTCUT_BLANK_ON_FORM, SHORTCUT_DASH_ON_FORM, SHORTCUT_ILLEGIBLE];
+		public static const REASON_BLANK_SHORTCUTS:Array = [SHORTCUT_BLANK_ON_FORM, SHORTCUT_DASH_ON_FORM, SHORTCUT_ILLEGIBLE];
+		public static const REASON_BLANK_SYMBOLS:Array = [FieldSymbol.BLANK_ON_FORM, FieldSymbol.DASH_ON_FORM, FieldSymbol.ILLEGIBLE];
 		
 		private var _view:InputField;
 		private var _changed:Boolean = false;
@@ -171,7 +172,7 @@ package org.openforis.collect.presenter {
 		
 		public function getApplySymbolOperation(symbol:FieldSymbol):UpdateRequestOperation {
 			var value:String = null;
-			if(ArrayUtil.isNotIn(REASON_BLANK_SYMBOLS, symbol)) {
+			if(! isReasonBlankSymbol(symbol)) {
 				value = textToRequestValue(); //preserve old value
 			}
 			var remarks:String = getRemarks(); //preserve old remarks
@@ -181,10 +182,10 @@ package org.openforis.collect.presenter {
 		
 		public function getApplyRemarksOperation(remarks:String):UpdateRequestOperation {
 			var value:String = null;
-			if(ArrayUtil.isNotIn(REASON_BLANK_SYMBOLS, symbol)) {
+			var symbol:FieldSymbol = getSymbol(); //preserve old symbol
+			if(! isReasonBlankSymbol(symbol)) {
 				value = textToRequestValue(); //preserve old value
 			}
-			var symbol:FieldSymbol = getSymbol(); //preserve old symbol
 			var o:UpdateRequestOperation = getUpdateFieldOperation(value, symbol, remarks);
 			return o;
 		}
@@ -315,7 +316,11 @@ package org.openforis.collect.presenter {
 		}
 		
 		public static function isShortCutForReasonBlank(text:String):Boolean {
-			return ArrayUtil.isIn(REASON_BLANK_SYMBOLS, text);
+			return ArrayUtil.isIn(REASON_BLANK_SHORTCUTS, text);
+		}
+		
+		public static function isReasonBlankSymbol(symbol:FieldSymbol):Boolean {
+			return ArrayUtil.isIn(REASON_BLANK_SYMBOLS, symbol);
 		}
 		
 		protected function get dataClient():DataClient {
