@@ -7,7 +7,7 @@ import java.sql.Connection;
 import java.util.List;
 
 import org.jooq.Record;
-import org.jooq.UpdatableRecord;
+import org.jooq.StoreQuery;
 import org.openforis.collect.persistence.jooq.MappingJooqDaoSupport;
 import org.openforis.collect.persistence.jooq.MappingJooqFactory;
 import org.openforis.idm.model.species.TaxonVernacularName;
@@ -63,13 +63,13 @@ public class TaxonVernacularNameDao extends MappingJooqDaoSupport<TaxonVernacula
 		}
 		
 		@Override
-		public void toRecord(TaxonVernacularName t, UpdatableRecord<?> r) {
-			r.setValue(OFC_TAXON_VERNACULAR_NAME.ID, t.getId());
-			r.setValue(OFC_TAXON_VERNACULAR_NAME.VERNACULAR_NAME, t.getVernacularName());
-			r.setValue(OFC_TAXON_VERNACULAR_NAME.LANGUAGE_CODE, t.getLanguageCode());
-			r.setValue(OFC_TAXON_VERNACULAR_NAME.LANGUAGE_VARIETY, t.getLanguageVariety());
-			r.setValue(OFC_TAXON_VERNACULAR_NAME.TAXON_ID, t.getTaxonId());			
-			r.setValue(OFC_TAXON_VERNACULAR_NAME.STEP, t.getStep());
+		public void fromObject(TaxonVernacularName t, StoreQuery<?> q) {
+			q.addValue(OFC_TAXON_VERNACULAR_NAME.ID, t.getId());
+			q.addValue(OFC_TAXON_VERNACULAR_NAME.VERNACULAR_NAME, t.getVernacularName());
+			q.addValue(OFC_TAXON_VERNACULAR_NAME.LANGUAGE_CODE, t.getLanguageCode());
+			q.addValue(OFC_TAXON_VERNACULAR_NAME.LANGUAGE_VARIETY, t.getLanguageVariety());
+			q.addValue(OFC_TAXON_VERNACULAR_NAME.TAXON_ID, t.getTaxonId());			
+			q.addValue(OFC_TAXON_VERNACULAR_NAME.STEP, t.getStep());
 		}
 
 		@Override
