@@ -10,6 +10,7 @@ import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedPro
 import org.openforis.collect.Proxy;
 import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
 import org.openforis.collect.model.CollectRecord;
+import org.openforis.collect.model.CollectRecord.State;
 import org.openforis.collect.model.CollectRecord.Step;
 
 /**
@@ -27,8 +28,12 @@ public class RecordProxy implements Proxy {
 
 	@ExternalizedProperty
 	public Step getStep() {
-		//return Step.valueOf(record.getStep().getStepNumber());
 		return record.getStep();
+	}
+
+	@ExternalizedProperty
+	public State getState() {
+		return record.getState();
 	}
 
 	@ExternalizedProperty
