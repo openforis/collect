@@ -147,11 +147,15 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 				.where(OFC_RECORD.ID.equal(recordId))
 				.fetchOne();
 		Integer lockedById = selectResult.getValueAsInteger(OFC_RECORD.LOCKED_BY_ID);
-		if (lockedById != null && lockedById.equals(user.getId())) {
-			jf.update(OFC_RECORD).set(OFC_RECORD.LOCKED_BY_ID, (Integer)null).where(OFC_RECORD.ID.equal(recordId)).execute();
+		if (lockedById != null) {
+			if(lockedById.equals(user.getId())) {
+				jf.update(OFC_RECORD).set(OFC_RECORD.LOCKED_BY_ID, (Integer)null).where(OFC_RECORD.ID.equal(recordId)).execute();
+			} else {
+				String userName = selectResult.getValueAsString(OFC_USER.USERNAME);
+				throw new RecordLockedException("Record locked by another user", userName);
+			}
 		} else {
-			String userName = selectResult.getValueAsString(OFC_USER.USERNAME);
-			throw new RecordLockedException("Record locked by another user", userName);
+			//no action
 		}
 	}
 
