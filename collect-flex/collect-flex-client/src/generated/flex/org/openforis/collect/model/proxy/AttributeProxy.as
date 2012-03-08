@@ -9,6 +9,7 @@ package org.openforis.collect.model.proxy {
 	import mx.collections.IList;
 	
 	import org.openforis.collect.i18n.Message;
+	import org.openforis.collect.metamodel.proxy.LanguageSpecificTextProxy;
 	import org.openforis.collect.util.CollectionUtil;
 	import org.openforis.collect.util.StringUtil;
 
@@ -33,7 +34,7 @@ package org.openforis.collect.model.proxy {
 			if(results != null) {
 				var parts:Array = new Array();
 				for each (var r:ValidationResultProxy in results) {
-					var message:String = r.localizedMessage;
+					var message:String = LanguageSpecificTextProxy.getLocalizedText(r.messages);
 					if(StringUtil.isBlank(message)) {
 						switch(r.ruleName) {
 							case "SpecifiedValidator":
@@ -42,8 +43,8 @@ package org.openforis.collect.model.proxy {
 							default:
 								message = r.ruleName;
 						}
+						parts.push(message);
 					}
-					parts.push(message);
 				}
 				if(parts.length > 0) {
 					return StringUtil.concat(";\n", parts);
