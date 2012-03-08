@@ -82,8 +82,8 @@ package org.openforis.collect.presenter {
 				initValidationDisplayManager();
 			}
 			var record:RecordProxy = Application.activeRecord;
-			var active:Boolean = !isNaN(record.id) || _view.visited;
-			if(forceActivation || active) {
+			var active:Boolean = _validationDisplayManager.active || forceActivation || !isNaN(record.id) || _view.visited;
+			if(active) {
 				_validationDisplayManager.active = true;
 				_validationDisplayManager.displayNodeValidation(_view.parentEntity, _view.attributeDefinition, _view.attribute);
 			} else {
