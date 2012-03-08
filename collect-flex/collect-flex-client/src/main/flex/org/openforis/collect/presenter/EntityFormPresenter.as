@@ -18,6 +18,7 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.remoting.service.UpdateRequestOperation$Method;
 	import org.openforis.collect.ui.component.detail.EntityFormContainer;
 	import org.openforis.collect.util.AlertUtil;
+	import org.openforis.collect.util.CollectionUtil;
 	import org.openforis.collect.util.UIUtil;
 	
 	import spark.events.IndexChangeEvent;
@@ -58,10 +59,14 @@ package org.openforis.collect.presenter
 		}
 		
 		protected function updateView():void {
-			if(_view.entityDefinition != null && _view.entityDefinition.multiple) {
+			if(_view.entityDefinition != null) {
 				var entities:IList = getEntities();
-				_view.entities = entities;
-				selectFirstTab();
+				if(_view.entityDefinition.multiple) {
+					_view.entities = entities;
+					selectFirstTab();
+				} else if(CollectionUtil.isNotEmpty(entities)) {
+					_view.entity = entities.getItemAt(0) as EntityProxy;
+				}
 			}
 		}
 		
