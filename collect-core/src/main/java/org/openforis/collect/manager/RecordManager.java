@@ -140,14 +140,14 @@ public class RecordManager {
 
 	@Transactional
 	public void promote(CollectRecord record, User user) throws RecordPersistenceException {
+		//save changes on current step
+		recordDao.update(record); 
+		//change step and update the record
 		Step currentStep = record.getStep();
 		Step nextStep = currentStep.getNext();
 		Date now = new Date();
 		record.setModifiedBy(user);
 		record.setModifiedDate(now);
-		//save changes on current step
-		recordDao.update(record); 
-		//change step and update newly the record
 		record.setStep(nextStep);
 		record.setState(null);
 		recordDao.update(record);
