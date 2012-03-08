@@ -58,6 +58,11 @@ mx|ToolTip.error, mx|ToolTip.warning, mx|ToolTip.missing {
 	paddingTop: 4;
 }
 
+.listTitle {
+	fontSize: 13;
+	fontWeight: bold;
+}
+
 .title1 {
 	fontSize: 16;
 	fontWeight: bold;
