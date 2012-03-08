@@ -97,6 +97,7 @@ package org.openforis.collect.ui {
 			in this case the parentEntity of the formContainer will be null and 
 			the "entity" will be record's "rootEntity"
 			*/
+			form.parentEntity = null;
 			BindingUtils.bindProperty(form, "entity", formContainer, ["record", "rootEntity"]);
 			
 			if(tabs != null) {
