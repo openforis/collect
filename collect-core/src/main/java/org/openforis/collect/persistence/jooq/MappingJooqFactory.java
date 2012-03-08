@@ -11,8 +11,8 @@ import org.jooq.Result;
 import org.jooq.SelectQuery;
 import org.jooq.Sequence;
 import org.jooq.SimpleSelectQuery;
+import org.jooq.StoreQuery;
 import org.jooq.TableField;
-import org.jooq.UpdatableRecord;
 import org.jooq.UpdatableTable;
 import org.jooq.UpdateQuery;
 import org.jooq.impl.Factory;
@@ -38,9 +38,9 @@ public abstract class MappingJooqFactory<E> extends DialectAwareJooqFactory {
 
 	protected abstract Integer getId(E entity);
 	
-	protected abstract void fromRecord(Record r, E entity);
+	protected abstract void fromRecord(Record r, E object);
 	
-	protected abstract void toRecord(E entity, UpdatableRecord<?> r);
+	protected abstract void fromObject(E object, StoreQuery<?> q);
 
 	public SimpleSelectQuery<?> selectByIdQuery(int id) {
 		SimpleSelectQuery<?> select = selectQuery(getTable());
@@ -99,27 +99,24 @@ public abstract class MappingJooqFactory<E> extends DialectAwareJooqFactory {
 		return (UpdatableTable<?>) idField.getTable();
 	}
 	
-	@SuppressWarnings({"rawtypes", "unchecked"})
-	public InsertQuery insertQuery(E entity) {
-		Integer id = getId(entity);
+	@SuppressWarnings({"rawtypes"})
+	public InsertQuery insertQuery(E object) {
+		Integer id = getId(object);
 		if ( id == null ) {
 			int nextId = nextId();
-			setId(entity, nextId);
+			setId(object, nextId);
 		}
-		
-		UpdatableRecord record = toRecord(entity);
 		InsertQuery insert = insertQuery(getTable());
-		insert.setRecord(record);
+		fromObject(object, insert);
 		return insert;
 	}
 	
-	@SuppressWarnings({"rawtypes", "unchecked"})
-	public UpdateQuery updateQuery(E entity) {
-		UpdatableRecord record = toRecord( entity);
+	@SuppressWarnings({"rawtypes"})
+	public UpdateQuery updateQuery(E object) {
 		
 		UpdateQuery update = updateQuery(getTable());
-		update.setRecord(record);
-		Integer id = getId(entity);
+		fromObject(object, update);
+		Integer id = getId(object);
 		if ( id == null ) {
 			throw new IllegalArgumentException("Cannot update with null id");
 		}
@@ -141,14 +138,7 @@ public abstract class MappingJooqFactory<E> extends DialectAwareJooqFactory {
 		}
 		return entities;
 	}
-	
-	@SuppressWarnings({"rawtypes", "unchecked"})
-	public UpdatableRecord<?> toRecord(E entity) {
-		UpdatableRecord record = (UpdatableRecord) newRecord((UpdatableTable) getTable());
-		toRecord(entity, record);
-		return record;
-	}
-	
+
 	private int nextId() {
 		return nextval(idSequence).intValue();
 	}

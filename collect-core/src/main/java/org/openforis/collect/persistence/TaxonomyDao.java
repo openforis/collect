@@ -6,7 +6,7 @@ import static org.openforis.collect.persistence.jooq.tables.OfcTaxonomy.OFC_TAXO
 import java.sql.Connection;
 
 import org.jooq.Record;
-import org.jooq.UpdatableRecord;
+import org.jooq.StoreQuery;
 import org.openforis.collect.persistence.jooq.MappingJooqDaoSupport;
 import org.openforis.collect.persistence.jooq.MappingJooqFactory;
 import org.openforis.idm.model.species.Taxonomy;
@@ -68,10 +68,10 @@ public class TaxonomyDao extends MappingJooqDaoSupport<Taxonomy, TaxonomyDao.Joo
 		}
 		
 		@Override
-		public void toRecord(Taxonomy t, UpdatableRecord<?> r) {
-			r.setValue(OFC_TAXONOMY.ID, t.getId());
-			r.setValue(OFC_TAXONOMY.NAME, t.getName());
-			r.setValue(OFC_TAXONOMY.METADATA, " ");
+		public void fromObject(Taxonomy t, StoreQuery<?> q) {
+			q.addValue(OFC_TAXONOMY.ID, t.getId());
+			q.addValue(OFC_TAXONOMY.NAME, t.getName());
+			q.addValue(OFC_TAXONOMY.METADATA, " ");
 		}
 
 		@Override

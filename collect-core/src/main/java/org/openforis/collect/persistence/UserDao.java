@@ -11,7 +11,7 @@ import java.util.List;
 import org.jooq.Record;
 import org.jooq.Result;
 import org.jooq.SimpleSelectQuery;
-import org.jooq.UpdatableRecord;
+import org.jooq.StoreQuery;
 import org.jooq.impl.Factory;
 import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.UserDao.JooqFactory;
@@ -94,10 +94,10 @@ public class UserDao extends MappingJooqDaoSupport<User, JooqFactory> {
 		}
 
 		@Override
-		protected void toRecord(User entity, UpdatableRecord<?> r) {
-			r.setValue(OFC_USER.ID, entity.getId());
-			r.setValue(OFC_USER.USERNAME, entity.getName());
-			r.setValue(OFC_USER.PASSWORD, entity.getPassword());
+		protected void fromObject(User user, StoreQuery<?> q) {
+			q.addValue(OFC_USER.ID, user.getId());
+			q.addValue(OFC_USER.USERNAME, user.getName());
+			q.addValue(OFC_USER.PASSWORD, user.getPassword());
 		}
 		
 		protected void loadRoles(User user) {
