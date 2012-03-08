@@ -73,7 +73,6 @@
 				height="20"  
 				useHandCursor="true"
 				buttonMode="true"
-				styleName="roundCorners"
 				/>
 			
 			<s:Button 
@@ -83,7 +82,6 @@
 				height="20"  
 				useHandCursor="true"
 				buttonMode="true"
-				styleName="roundCorners"
 				/>
 		</s:HGroup>
 	</s:Group>

@@ -9,6 +9,9 @@
 	<fx:Script>
 		<![CDATA[
 			import mx.binding.utils.BindingUtils;
+			
+			import org.openforis.collect.ui.component.input.MultipleCodeInputField;
+			
 			import mx.core.IVisualElement;
 			
 			import org.openforis.collect.metamodel.proxy.CodeAttributeDefinitionProxy;
@@ -22,7 +25,7 @@
 						attributeDefinition.multiple && 
 						attributeDefinition is CodeAttributeDefinitionProxy) {
 						BindingUtils.bindProperty(renderer, "attributes", this, "attributes");
-						var codeInputField:IVisualElement = renderer.getElementAt(0) as CodeInputField;
+						var codeInputField:MultipleCodeInputField = renderer.getElementAt(0) as MultipleCodeInputField;
 						BindingUtils.bindProperty(codeInputField, "attributes", renderer, "attributes");
 					}
 				}

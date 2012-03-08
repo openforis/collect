@@ -38,6 +38,10 @@
     	<property name="dataSource" ref="dataSource"/>
 	</bean>
 
+	<bean id="logoDao" class="org.openforis.collect.persistence.LogoDao">
+    	<property name="dataSource" ref="dataSource"/>
+	</bean>
+	
 	<bean id="recordDao" class="org.openforis.collect.persistence.RecordDao">
     	<property name="dataSource" ref="dataSource"/>
 	</bean>
@@ -50,6 +54,10 @@
     	<property name="dataSource" ref="dataSource"/>
 	</bean>
 	
+	<bean id="dynamicTableDao" class="org.openforis.collect.persistence.DynamicTableDao">
+    	<property name="dataSource" ref="dataSource"/>
+	</bean>
+	
 	<!--  Managers -->
 	<bean id="recordManager" 					class="org.openforis.collect.manager.RecordManager" init-method="init" />	
 	<bean id="surveyManager"	 				class="org.openforis.collect.manager.SurveyManager" init-method="init" />
@@ -57,6 +65,7 @@
 	<!-- Expression Factory -->
 	<bean id="expressionFactory" class="org.openforis.idm.model.expression.ExpressionFactory" />
 	<bean id="validator" 					class="org.openforis.idm.metamodel.validation.Validator" />
+	<bean id="externalCodeListProvider" 	class="org.openforis.collect.persistence.DatabaseExternalCodeListProvider" />
 	
 	<bean id="taxonVernacularNameDao" class="org.openforis.collect.persistence.TaxonVernacularNameDao">
     	<property name="dataSource" ref="dataSource"/>

@@ -7,33 +7,28 @@ package org.openforis.collect.ui
 	
 	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
-	import mx.rpc.AsyncResponder;
-	import mx.rpc.events.FaultEvent;
-	import mx.rpc.events.ResultEvent;
 	
 	import org.openforis.collect.Application;
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.client.UpdateRequestToken;
-	import org.openforis.collect.event.ApplicationEvent;
-	import org.openforis.collect.event.EventDispatcherFactory;
 	import org.openforis.collect.i18n.Message;
 	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.CodeAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
+	import org.openforis.collect.model.CollectRecord$Step;
 	import org.openforis.collect.model.FieldSymbol;
 	import org.openforis.collect.model.proxy.AttributeProxy;
 	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.model.proxy.FieldProxy;
 	import org.openforis.collect.model.proxy.NodeProxy;
-	import org.openforis.collect.model.proxy.RecordProxy$Step;
 	import org.openforis.collect.presenter.RemarksPopUpPresenter;
 	import org.openforis.collect.remoting.service.UpdateRequest;
 	import org.openforis.collect.remoting.service.UpdateRequestOperation;
 	import org.openforis.collect.remoting.service.UpdateRequestOperation$Method;
-	import org.openforis.collect.remoting.service.UpdateResponse;
 	import org.openforis.collect.ui.component.input.InputField;
 	import org.openforis.collect.util.AlertUtil;
 	import org.openforis.collect.util.CollectionUtil;
+	import org.openforis.collect.util.ObjectUtil;
 
 	public class ContextMenuBuilder {
 		
@@ -91,7 +86,7 @@ package org.openforis.collect.ui
 		}
 		
 		public static function buildContextMenu(inputField:InputField):ContextMenu {
-			var step:RecordProxy$Step = Application.activeRecord.step;
+			var step:CollectRecord$Step = Application.activeRecord.step;
 			var cm:ContextMenu = new ContextMenu();
 			var items:Array = new Array();
 			
@@ -106,18 +101,65 @@ package org.openforis.collect.ui
 			return cm;
 		}
 		
-		private static function addValueItems(currentItems:Array, step:RecordProxy$Step, inputField:InputField):void {
+		private static function addValueItems(currentItems:Array, step:CollectRecord$Step, inputField:InputField):void {
 			if(inputField.isEmpty()) {
-				currentItems.push(
-					BLANK_ON_FORM_MENU_ITEM,
-					DASH_ON_FORM_MENU_ITEM,
-					ILLEGIBLE_MENU_ITEM
-				);
+				switch(step) {
+					case CollectRecord$Step.ENTRY:
+						currentItems.push(
+							BLANK_ON_FORM_MENU_ITEM,
+							DASH_ON_FORM_MENU_ITEM,
+							ILLEGIBLE_MENU_ITEM
+						);
+						break;
+					case CollectRecord$Step.CLEANSING:
+						currentItems.push(APPROVE_MISSING_VALUE_MENU_ITEM);
+						break;
+				}
+			} else {
+				if(step == CollectRecord$Step.ENTRY && hasErrors(inputField) && !hasConfirmedError(inputField)) {
+					currentItems.push(APPROVE_ERROR_MENU_ITEM);
+				}
 			}
 			currentItems.push(EDIT_REMARKS_MENU_ITEM);
 		}
 		
-		private static function addRowItems(currentItems:Array, step:RecordProxy$Step, inputField:InputField):void {
+		private static function hasErrors(inputField:InputField):Boolean {
+			if(inputField.attributeDefinition.multiple) {
+				var attributes:IList = ObjectUtil.getValue(inputField, "attributes") as IList;
+				for each (var a:AttributeProxy in attributes) {
+					if(a.hasErrors()) {
+						return true;
+					}
+				}
+			} else if(inputField.attribute != null && inputField.attribute.hasErrors()) {
+				return true;
+			}
+			return false;
+		}
+		
+		private static function hasConfirmedError(inputField:InputField):Boolean {
+			var result:Boolean = false;
+			var field:FieldProxy;
+			if(inputField.attributeDefinition.multiple) {
+				var attributes:IList = ObjectUtil.getValue(inputField, "attributes") as IList;
+				for each (var a:AttributeProxy in attributes) {
+					for each (var f:FieldProxy in a.fields) {
+						if(field.symbol != FieldSymbol.CONFIRMED) {
+							return false;
+						}
+					}
+				}
+				return true;
+			} else if(inputField.attribute != null && inputField.attribute.hasErrors()) {
+				field = inputField.attribute.getField(inputField.fieldIndex);
+				if(field.symbol == FieldSymbol.CONFIRMED) {
+					return true;
+				}
+			}
+			return false;
+		}
+		
+		private static function addRowItems(currentItems:Array, step:CollectRecord$Step, inputField:InputField):void {
 			var def:AttributeDefinitionProxy = inputField.attributeDefinition;
 			if(def != null && inputField.isInDataGroup) {
 				if(def.multiple && ! (def is CodeAttributeDefinitionProxy)) {
@@ -125,10 +167,16 @@ package org.openforis.collect.ui
 				}
 				var entityDef:EntityDefinitionProxy = def.parent;
 				if(entityDef != null && entityDef.multiple) {
-					currentItems.push(
-						REPLACE_BLANKS_WITH_DASH_MENU_ITEM, 
-						REPLACE_BLANKS_WITH_STAR_MENU_ITEM
-					);
+					switch(step) {
+						case CollectRecord$Step.ENTRY:
+							currentItems.push(
+								REPLACE_BLANKS_WITH_DASH_MENU_ITEM, 
+								REPLACE_BLANKS_WITH_STAR_MENU_ITEM
+							);
+							break;
+						case CollectRecord$Step.CLEANSING:
+							currentItems.push(APPROVE_MISSING_VALUES_IN_ROW_MENU_ITEM);
+					}
 					if( !entityDef.enumerated) {
 						currentItems.push(DELETE_ENTITY_MENU_ITEM);
 					}
@@ -136,7 +184,7 @@ package org.openforis.collect.ui
 			}			
 		}
 		
-		private static function addApproveValueItems(currentItems:Array, step:RecordProxy$Step, inputField:InputField):void {
+		private static function addApproveValueItems(currentItems:Array, step:CollectRecord$Step, inputField:InputField):void {
 			var attribute:AttributeProxy = inputField.attribute;
 			if(attribute != null) {
 				/*
@@ -168,10 +216,10 @@ package org.openforis.collect.ui
 						remarksPopUpPresenter.openPopUp(field, true);
 						break;
 					case REPLACE_BLANKS_WITH_DASH_MENU_ITEM:
-						setReasonBlankInChildren(parentEntity, FieldSymbol.DASH_ON_FORM);
+						setSymbolInBlankChildren(parentEntity, FieldSymbol.DASH_ON_FORM);
 						break;
 					case REPLACE_BLANKS_WITH_STAR_MENU_ITEM:
-						setReasonBlankInChildren(parentEntity, FieldSymbol.BLANK_ON_FORM);
+						setSymbolInBlankChildren(parentEntity, FieldSymbol.BLANK_ON_FORM);
 						break;
 					case DELETE_ATTRIBUTE_MENU_ITEM:
 						AlertUtil.showConfirm("global.confirmDelete", [field.attributeDefinition.getLabelText()], "global.confirmAlertTitle", performDeleteAttribute);
@@ -182,6 +230,12 @@ package org.openforis.collect.ui
 					case APPROVE_ERROR_MENU_ITEM:
 						field.applySymbol(FieldSymbol.CONFIRMED);
 						break
+					case APPROVE_MISSING_VALUE_MENU_ITEM:
+						field.applySymbol(FieldSymbol.CONFIRMED);
+						break
+					case APPROVE_MISSING_VALUES_IN_ROW_MENU_ITEM:
+						setSymbolInBlankChildren(parentEntity, FieldSymbol.CONFIRMED);
+						break;
 				}
 			}
 		}
@@ -212,7 +266,7 @@ package org.openforis.collect.ui
 			ClientFactory.dataClient.updateActiveRecord(req);
 		}
 
-		protected static function setReasonBlankInChildren(entity:EntityProxy, symbol:FieldSymbol):void {
+		protected static function setSymbolInBlankChildren(entity:EntityProxy, symbol:FieldSymbol):void {
 			var children:IList = entity.getChildren();
 			var req:UpdateRequest = new UpdateRequest();
 			req.operations = new ArrayCollection();

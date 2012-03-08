@@ -21,6 +21,7 @@ import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.CollectSurveyContext;
 import org.openforis.collect.persistence.jooq.JooqDaoSupport;
 import org.openforis.collect.persistence.xml.CollectIdmlBindingContext;
+import org.openforis.idm.metamodel.ExternalCodeListProvider;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.Survey;
@@ -46,12 +47,14 @@ public class SurveyDao extends JooqDaoSupport {
 	private ExpressionFactory expressionFactory;
 	@Autowired
 	private Validator validator;
+	@Autowired
+	private ExternalCodeListProvider externalCodeListProvider;
 	
 	public SurveyDao() {
 	}
 	
 	public void init(){
-		bindingContext = new CollectIdmlBindingContext(new CollectSurveyContext(expressionFactory, validator));
+		bindingContext = new CollectIdmlBindingContext(new CollectSurveyContext(expressionFactory, validator, externalCodeListProvider));
 	}
 	
 	@Transactional

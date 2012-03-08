@@ -39,6 +39,7 @@ package org.openforis.collect.ui.component.detail {
 			_parentEntity = value;
 		}
 		
+		[Bindable]
 		public function get isInDataGroup():Boolean {
 			return _isInDataGroup;
 		}

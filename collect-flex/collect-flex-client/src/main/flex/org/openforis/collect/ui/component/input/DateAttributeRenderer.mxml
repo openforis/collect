@@ -43,7 +43,7 @@
 			width="100%"
 			horizontalAlign="center"
 			gap="2">
-		<input:NumericInputField id="day"
+		<input:IntegerInputField id="day"
 								 attributeDefinition="{attributeDefinition}"
 								 parentEntity="{parentEntity}"
 								 attribute="{attribute}"
@@ -54,7 +54,7 @@
 								 textFormatFunction="{twoCharsZeroPaddingFormatFunction}"
 								 />
 		<s:Label id="separator1" text="{separator}" />
-		<input:NumericInputField id="month"
+		<input:IntegerInputField id="month"
 								 attributeDefinition="{attributeDefinition}"
 								 parentEntity="{parentEntity}"
 								 attribute="{attribute}"
@@ -65,7 +65,7 @@
 								 textFormatFunction="{twoCharsZeroPaddingFormatFunction}"
 								 />
 		<s:Label id="separator2" text="{separator}" />
-		<input:NumericInputField id="year"
+		<input:IntegerInputField id="year"
 								 attributeDefinition="{attributeDefinition}"
 								 parentEntity="{parentEntity}"
 								 attribute="{attribute}"

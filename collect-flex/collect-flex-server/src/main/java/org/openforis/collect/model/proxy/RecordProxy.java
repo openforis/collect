@@ -10,38 +10,14 @@ import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedPro
 import org.openforis.collect.Proxy;
 import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
 import org.openforis.collect.model.CollectRecord;
+import org.openforis.collect.model.CollectRecord.Step;
 
 /**
  * @author M. Togna
+ * @author S. Ricci
  * 
  */
 public class RecordProxy implements Proxy {
-	public enum Step {
-		ENTRY(1), CLEANSING(2), ANALYSIS(3);
-
-		private int stepNumber;
-
-		private Step(int stepNumber) {
-			this.stepNumber = stepNumber;
-		}
-
-		public int getStepNumber() {
-			return stepNumber;
-		}
-
-		public static Step valueOf(int stepNumber) {
-			switch (stepNumber) {
-				case 1:
-					return ENTRY;
-				case 2:
-					return CLEANSING;
-				case 3:
-					return ANALYSIS;
-				default:
-					throw new IllegalArgumentException("Invalid step number");
-			}
-		}
-	}
 
 	private transient CollectRecord record;
 
@@ -51,7 +27,8 @@ public class RecordProxy implements Proxy {
 
 	@ExternalizedProperty
 	public Step getStep() {
-		return Step.valueOf(record.getStep().getStepNumber());
+		//return Step.valueOf(record.getStep().getStepNumber());
+		return record.getStep();
 	}
 
 	@ExternalizedProperty

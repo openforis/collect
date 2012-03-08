@@ -1,4 +1,6 @@
 package org.openforis.collect.ui.component.input {
+	import mx.binding.utils.BindingUtils;
+	import mx.controls.TextInput;
 	import mx.core.UIComponent;
 	import mx.events.FlexEvent;
 	
@@ -41,8 +43,10 @@ package org.openforis.collect.ui.component.input {
 		private var _visited:Boolean = false;
 		private var _applyChangesOnFocusOut:Boolean = true;
 		private var _formatFunction:Function;
+		private var _maxChars:int;
+		private var _restrict:String;
 		protected var _textInput:UIComponent;
-		
+
 		public function InputField() {
 			super();
 			layout = new HorizontalLayout();
@@ -51,6 +55,10 @@ package org.openforis.collect.ui.component.input {
 		
 		protected function creationCompleteHandler(event:FlexEvent):void {
 			initPresenter();
+			if(_textInput != null && _textInput is mx.controls.TextInput) {
+				BindingUtils.bindProperty(_textInput, "restrictPattern", this, "restrict");
+				BindingUtils.bindProperty(_textInput, "maxChars", this, "maxChars");
+			}
 		}
 		
 		protected function initPresenter():void {
@@ -248,6 +256,23 @@ package org.openforis.collect.ui.component.input {
 			_visited = value;
 		}
 
+		[Bindable]
+		public function get maxChars():int {
+			return _maxChars;
+		}
+		
+		public function set maxChars(value:int):void {
+			_maxChars = value;
+		}
 
+		[Bindable]
+		public function get restrict():String {
+			return _restrict;
+		}
+		
+		public function set restrict(value:String):void {
+			_restrict = value;
+		}
+		
 	}
 }
