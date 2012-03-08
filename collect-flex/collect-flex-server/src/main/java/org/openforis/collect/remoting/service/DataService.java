@@ -456,7 +456,6 @@ public class DataService {
 		SessionState sessionState = sessionManager.getSessionState();
 		CollectRecord record = sessionState.getActiveRecord();
 		User user = sessionState.getUser();
-		recordManager.save(record);
 		recordManager.promote(record, user);
 		recordManager.unlock(record, user);
 		sessionManager.clearActiveRecord();
