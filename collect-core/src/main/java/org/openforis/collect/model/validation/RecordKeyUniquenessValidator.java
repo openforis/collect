@@ -18,7 +18,6 @@ import org.openforis.idm.metamodel.validation.ValidationRule;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Field;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author M. Togna

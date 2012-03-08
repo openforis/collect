@@ -350,6 +350,7 @@ public class DataService {
 		if(nodeDef instanceof AttributeDefinition) {
 			AttributeDefinition def = (AttributeDefinition) nodeDef;
 			Attribute<?, ?> attribute = (Attribute<?, ?>) def.createNode();
+			parentEntity.add(attribute);
 			if(StringUtils.isNotBlank(requestValue)) {
 				Object value = parseCompositeAttributeValue(parentEntity, (AttributeDefinition) nodeDef, requestValue);
 				((Attribute<?, Object>) attribute).setValue(value);

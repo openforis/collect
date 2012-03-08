@@ -36,36 +36,31 @@ public class CollectValidator extends Validator {
 
 		if ( !specified.isError() ) {
 			boolean isKey = isRecordKey(attribute);
-			ValidationResultFlag uniqueness = validateUniqueness(attribute, results);
-			if (isKey && uniqueness.isError()) {
-				// TODO
-			} else {
-				// TODO only do in phase 1
-				// Lower error level of confirmed error values				
-				ValidationResults idmResults = super.validate(attribute);
-				boolean confirmed = isValueConfirmed(attribute);
-				List<ValidationResult> errors = idmResults.getErrors();
-				for (ValidationResult error : errors) {
-					ValidationResultFlag newFlag = confirmed ? ValidationResultFlag.WARNING : ValidationResultFlag.ERROR;
-					results.addResult(error.getValidator(), newFlag);
+			if (isKey) {
+				RecordKeyUniquenessValidator keyValidator = new RecordKeyUniquenessValidator(recordManager);
+				ValidationResultFlag res = keyValidator.evaluate(attribute);
+				if(res == ValidationResultFlag.ERROR){
+					results.addResult(keyValidator, ValidationResultFlag.ERROR);
 				}
-				results.addResults(idmResults.getWarnings());
 			}
+			// TODO only do in phase 1
+			// Lower error level of confirmed error values				
+			ValidationResults idmResults = super.validate(attribute);
+			boolean confirmed = isValueConfirmed(attribute);
+			List<ValidationResult> errors = idmResults.getErrors();
+			for (ValidationResult error : errors) {
+				ValidationResultFlag newFlag = confirmed ? ValidationResultFlag.WARNING : ValidationResultFlag.ERROR;
+				results.addResult(error.getValidator(), newFlag);
+			}
+			results.addResults(idmResults.getWarnings());
 		}
 		return results;
 
 	}
 
-	private ValidationResultFlag validateUniqueness(Attribute<?, ?> attribute, ValidationResults results) {
-		RecordKeyUniquenessValidator keyValidator = new RecordKeyUniquenessValidator(recordManager);
-		ValidationResultFlag unique = keyValidator.evaluate(attribute);
-		results.addResult(keyValidator, unique);
-		return unique;
-	}
-
 	private boolean isRecordKey(Attribute<?, ?> attribute) {
 		Record record = attribute.getRecord();
-		return attribute instanceof KeyAttributeDefinition && record.getRootEntity().equals(attribute.getParent());
+		return attribute.getDefinition() instanceof KeyAttributeDefinition && record.getRootEntity().equals(attribute.getParent());
 	}
 
 	private boolean isValueConfirmed(Attribute<?, ?> attribute) {

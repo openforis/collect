@@ -14,6 +14,7 @@ import org.openforis.idm.model.state.NodeState;
  * @author M. Togna
  * 
  */
+@Deprecated
 public class NodeStateProxy implements Proxy {
 
 	private transient NodeState nodeState;
