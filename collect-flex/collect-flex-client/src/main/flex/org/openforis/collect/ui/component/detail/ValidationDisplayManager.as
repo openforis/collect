@@ -107,10 +107,13 @@ package org.openforis.collect.ui.component.detail
 					_displayStyleName = newStyleName;
 					UIUtil.replaceStyleNames(_display, [_displayStyleName], [STYLE_NAME_ERROR, STYLE_NAME_WARNING]);
 				}
+			} else {
+				reset();
 			}
 		}
 		
 		public function reset():void {
+			_displayStyleName = null;
 			removeToolTip();
 			UIUtil.removeStyleNames(_display, [
 				STYLE_NAME_ERROR, 
@@ -120,6 +123,8 @@ package org.openforis.collect.ui.component.detail
 		
 		protected function removeToolTip():void {
 			hideToolTip();
+			_toolTipMessage = null;
+			_toolTipStyleName = null;
 			_toolTipTrigger.removeEventListener(MouseEvent.ROLL_OVER, showToolTip);
 			_toolTipTrigger.removeEventListener(MouseEvent.ROLL_OUT, hideToolTip);
 		}

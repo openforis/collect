@@ -18,6 +18,7 @@ import org.jooq.StoreQuery;
 import org.jooq.TableField;
 import org.jooq.impl.Factory;
 import org.openforis.collect.model.CollectRecord;
+import org.openforis.collect.model.CollectRecord.State;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.User;
@@ -95,14 +96,6 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 		return r.getValueAsInteger(0);
 	}
 
-	@Deprecated
-	@Transactional
-	public int getRecordCount(EntityDefinition rootEntityDefinition) {
-		Factory jf = getJooqFactory();
-		Record r = jf.select(Factory.count()).from(OFC_RECORD).where(OFC_RECORD.ROOT_ENTITY_ID.equal(rootEntityDefinition.getId())).fetchOne();
-		return r.getValueAsInteger(0);
-	}
-
 	@Transactional
 	public void lock(Integer recordId, User user) throws RecordPersistenceException {
 		Factory jf = getJooqFactory();
@@ -154,11 +147,15 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 				.where(OFC_RECORD.ID.equal(recordId))
 				.fetchOne();
 		Integer lockedById = selectResult.getValueAsInteger(OFC_RECORD.LOCKED_BY_ID);
-		if (lockedById != null && lockedById.equals(user.getId())) {
-			jf.update(OFC_RECORD).set(OFC_RECORD.LOCKED_BY_ID, (Integer)null).where(OFC_RECORD.ID.equal(recordId)).execute();
+		if (lockedById != null) {
+			if(lockedById.equals(user.getId())) {
+				jf.update(OFC_RECORD).set(OFC_RECORD.LOCKED_BY_ID, (Integer)null).where(OFC_RECORD.ID.equal(recordId)).execute();
+			} else {
+				String userName = selectResult.getValueAsString(OFC_USER.USERNAME);
+				throw new RecordLockedException("Record locked by another user", userName);
+			}
 		} else {
-			String userName = selectResult.getValueAsString(OFC_USER.USERNAME);
-			throw new RecordLockedException("Record locked by another user", userName);
+			//no action
 		}
 	}
 
@@ -315,9 +312,7 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 		protected void fromRecord(Record r, CollectRecord c) {
 			c.setId(r.getValue(OFC_RECORD.ID));
 			c.setCreationDate(r.getValue(OFC_RECORD.DATE_CREATED));
-			// record.setCreatedBy(r.getValueAsString(OFC_RECORD.CREATED_BY));
 			c.setModifiedDate(r.getValue(OFC_RECORD.DATE_MODIFIED));
-			// record.setModifiedBy(r.getValueAsString(OFC_RECORD.MODIFIED_BY));
 			
 			Integer createdById = r.getValue(OFC_RECORD.CREATED_BY_ID);
 			if(createdById !=null){
@@ -334,8 +329,6 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 				User user = loadUser(lockedById);
 				c.setLockedBy(user);
 			}
-			
-			
 			c.setWarnings(r.getValue(OFC_RECORD.WARNINGS));
 			c.setErrors(r.getValue(OFC_RECORD.ERRORS));
 			c.setSkipped(r.getValue(OFC_RECORD.SKIPPED));
@@ -345,32 +338,23 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 			if (step != null) {
 				c.setStep(Step.valueOf(step));
 			}
-
+			String state = r.getValue(OFC_RECORD.STATE);
+			if (state != null) {
+				c.setState(State.fromCode(state));
+			}
+			
 			// create list of entity counts
-			// TODO
-			List<Integer> counts = new ArrayList<Integer>();
-			Integer count;
-			count = r.getValue(OFC_RECORD.COUNT1);
-			counts.add(count);
-			count = r.getValue(OFC_RECORD.COUNT2);
-			counts.add(count);
-			count = r.getValue(OFC_RECORD.COUNT3);
-			counts.add(count);
-			count = r.getValue(OFC_RECORD.COUNT4);
-			counts.add(count);
-			count = r.getValue(OFC_RECORD.COUNT5);
-			counts.add(count);
+			List<Integer> counts = new ArrayList<Integer>(COUNT_FIELDS.length);
+			for (TableField tableField : COUNT_FIELDS) {
+				counts.add(r.getValueAsInteger(tableField));
+			}
 			c.setEntityCounts(counts);
 
 			// create list of keys
-			List<String> keys = new ArrayList<String>();
-			String key;
-			key = r.getValue(OFC_RECORD.KEY1);
-			keys.add(key);
-			key = r.getValue(OFC_RECORD.KEY2);
-			keys.add(key);
-			key = r.getValue(OFC_RECORD.KEY3);
-			keys.add(key);
+			List<String> keys = new ArrayList<String>(KEY_FIELDS.length);
+			for (TableField tableField : KEY_FIELDS) {
+				keys.add(r.getValueAsString(tableField));
+			}
 			c.setKeys(keys);
 
 			int rootEntityId = r.getValue(OFC_RECORD.ROOT_ENTITY_ID);
@@ -419,6 +403,7 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 			}
 			q.addValue(OFC_RECORD.MODEL_VERSION, record.getVersion().getName());
 			q.addValue(OFC_RECORD.STEP, record.getStep().getStepNumber());
+			q.addValue(OFC_RECORD.STATE, record.getState() != null ? record.getState().getCode(): null);
 			q.addValue(OFC_RECORD.SKIPPED, record.getSkipped());
 			q.addValue(OFC_RECORD.MISSING, record.getMissing());
 			q.addValue(OFC_RECORD.ERRORS, record.getErrors());

@@ -6,9 +6,26 @@
  */
 
 package org.openforis.collect.metamodel.proxy {
-
+	
+	/**
+	 * @author S. Ricci
+	 */
     [Bindable]
     [RemoteClass(alias="org.openforis.collect.metamodel.proxy.SurveyProxy")]
     public class SurveyProxy extends SurveyProxyBase {
+		
+		public function getProjectName(lang:String = "en", firstIfNotFound:Boolean = true):String {
+			for each (var p:LanguageSpecificTextProxy in projectNames) {
+				if(p.language == lang) {
+					return p.text;
+				}
+			}
+			if(firstIfNotFound && projectNames.length > 0) {
+				var langText:LanguageSpecificTextProxy = LanguageSpecificTextProxy(projectNames.getItemAt(0));
+				return langText.text;
+			} else {
+				return name;
+			}
+		}
     }
 }

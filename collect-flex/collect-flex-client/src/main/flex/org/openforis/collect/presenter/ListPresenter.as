@@ -18,6 +18,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.client.DataClient;
 	import org.openforis.collect.event.UIEvent;
+	import org.openforis.collect.i18n.Message;
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 	import org.openforis.collect.model.proxy.RecordProxy;
 	import org.openforis.collect.ui.UIBuilder;
@@ -131,6 +132,10 @@ package org.openforis.collect.presenter {
 		 * Loads records summaries for active root entity
 		 * */
 		protected function loadRecordSummariesHandler(event:UIEvent):void {
+			var surveyProjectName:String = Application.activeSurvey.getProjectName();
+			var rootEntityLabel:String = Application.activeRootEntity.getLabelText();
+			_view.surveyNameLabel.text = surveyProjectName;
+			_view.titleLabel.text = Message.get("list.title", [rootEntityLabel]);
 			updateDataGrid();
 			currentPage = 1;
 			loadRecordSummariesCurrentPage();

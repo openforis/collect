@@ -44,8 +44,10 @@ package org.openforis.collect.model.proxy {
 			}
 			if(response.deletedNodeId > 0) {
 				node = getNode(response.deletedNodeId);
-				parent = getNode(node.parentId) as EntityProxy;
-				parent.removeChild(node);
+				if(node != null) {
+					parent = getNode(node.parentId) as EntityProxy;
+					parent.removeChild(node);
+				}
 			} else {
 				node = getNode(response.nodeId);
 				if(node is AttributeProxy) {

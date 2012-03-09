@@ -45,7 +45,7 @@ package org.openforis.collect.presenter
 			
 			ChangeWatcher.watch(_view, "parentEntity", parentEntityChangeHandler);
 			
-			if(_view.currentState == EntityFormContainer.STATE_WITH_TABS) {
+			if(_view.entityDefinition != null && _view.entityDefinition.multiple) {
 				_view.addButton.addEventListener(MouseEvent.CLICK, addButtonClickHandler);
 				_view.addButton.addEventListener(FocusEvent.FOCUS_IN, buttonFocusInHandler);
 				_view.deleteButton.addEventListener(MouseEvent.CLICK, deleteButtonClickHandler);
@@ -55,6 +55,7 @@ package org.openforis.collect.presenter
 		}
 		
 		protected function parentEntityChangeHandler(event:Event):void {
+			_view.internalContainer.visible = false;
 			updateView();
 		}
 		
