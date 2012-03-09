@@ -17,6 +17,7 @@ package org.openforis.collect.model.proxy {
     public class RecordProxy extends RecordProxyBase {
 		
 		private var _updated:Boolean = false;
+		private var _saved:Boolean = false;
 		
 		private var validationResults:ValidationResultsProxy;
 		
@@ -44,8 +45,10 @@ package org.openforis.collect.model.proxy {
 			}
 			if(response.deletedNodeId > 0) {
 				node = getNode(response.deletedNodeId);
-				parent = getNode(node.parentId) as EntityProxy;
-				parent.removeChild(node);
+				if(node != null) {
+					parent = getNode(node.parentId) as EntityProxy;
+					parent.removeChild(node);
+				}
 			} else {
 				node = getNode(response.nodeId);
 				if(node is AttributeProxy) {
@@ -81,6 +84,15 @@ package org.openforis.collect.model.proxy {
 		public function get updated():Boolean {
 			return _updated;
 		}
+		
+		public function get saved():Boolean {
+			return _saved;
+		}
+		
+		public function set saved(value:Boolean):void {
+			_saved = value;
+		}
+		
 
     }
 }

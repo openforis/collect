@@ -51,7 +51,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function recordSavedHandler(event:ApplicationEvent):void {
-			updateValidationDisplayManager(true);
+			activateValidationManager();
 		}
 		
 		protected function updateResponseReceivedHandler(event:ApplicationEvent):void {
@@ -77,18 +77,28 @@ package org.openforis.collect.presenter {
 			updateValidationDisplayManager();
 		}
 		
-		protected function updateValidationDisplayManager(forceActivation:Boolean = false):void {
+		protected function updateValidationDisplayManager():void {
 			if(_validationDisplayManager == null) {
 				initValidationDisplayManager();
 			}
 			var record:RecordProxy = Application.activeRecord;
-			var active:Boolean = !isNaN(record.id) || _view.visited;
-			if(forceActivation || active) {
+			var active:Boolean = !isNaN(record.id) || record.saved || _view.visited;
+			if(active) {
 				_validationDisplayManager.active = true;
 				_validationDisplayManager.displayNodeValidation(_view.parentEntity, _view.attributeDefinition, _view.attribute);
 			} else {
 				_validationDisplayManager.active = false;
 				_validationDisplayManager.reset();
+			}
+		}
+		
+		protected function activateValidationManager():void {
+			if(_validationDisplayManager == null) {
+				initValidationDisplayManager();
+			}
+			if(! _validationDisplayManager.active) {
+				_validationDisplayManager.active = true;
+				updateValidationDisplayManager();
 			}
 		}
 	}

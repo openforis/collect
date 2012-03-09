@@ -45,7 +45,7 @@ package org.openforis.collect.presenter
 			
 			ChangeWatcher.watch(_view, "parentEntity", parentEntityChangeHandler);
 			
-			if(_view.currentState == EntityFormContainer.STATE_WITH_TABS) {
+			if(_view.entityDefinition != null && _view.entityDefinition.multiple) {
 				_view.addButton.addEventListener(MouseEvent.CLICK, addButtonClickHandler);
 				_view.addButton.addEventListener(FocusEvent.FOCUS_IN, buttonFocusInHandler);
 				_view.deleteButton.addEventListener(MouseEvent.CLICK, deleteButtonClickHandler);
@@ -63,6 +63,7 @@ package org.openforis.collect.presenter
 				var entities:IList = getEntities();
 				if(_view.entityDefinition.multiple) {
 					_view.entities = entities;
+					selectEntity(null);
 					selectFirstTab();
 				} else if(CollectionUtil.isNotEmpty(entities)) {
 					_view.entity = entities.getItemAt(0) as EntityProxy;
@@ -138,7 +139,7 @@ package org.openforis.collect.presenter
 					_view.internalContainer.visible = true;
 					selectFirstTab();
 				}
-			} else {
+			} else if(_view.entityDefinition == null || _view.entityDefinition.multiple) {
 				_view.internalContainer.visible = false;
 			}
 		}

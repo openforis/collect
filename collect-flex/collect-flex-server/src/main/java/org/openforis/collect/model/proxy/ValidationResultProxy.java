@@ -9,6 +9,8 @@ import java.util.List;
 
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.collect.Proxy;
+import org.openforis.collect.metamodel.proxy.LanguageSpecificTextProxy;
+import org.openforis.idm.metamodel.LanguageSpecificText;
 import org.openforis.idm.metamodel.validation.Check;
 import org.openforis.idm.metamodel.validation.ValidationResult;
 import org.openforis.idm.metamodel.validation.ValidationRule;
@@ -44,17 +46,14 @@ public class ValidationResultProxy implements Proxy {
 	
 	@ExternalizedProperty
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public String getLocalizedMessage() {
+	public List<LanguageSpecificTextProxy> getMessages() {
 		ValidationRule<?> v = validationResult.getValidator();
 		if ( v instanceof Check ) {
-			List<String> m = ((Check) v).getMessages();
-			if ( m.isEmpty() ) {
-				return null;
-			} else {
-				return m.get(0);
-			}
+			List<LanguageSpecificText> m = ((Check) v).getMessages();
+			List<LanguageSpecificTextProxy> proxies = LanguageSpecificTextProxy.fromList(m);
+			return proxies;
 		} else {
-			return null;
+			return Collections.emptyList();
 		}
 	}
 	
