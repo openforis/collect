@@ -12,7 +12,7 @@ package org.openforis.collect.metamodel.proxy {
     [RemoteClass(alias="org.openforis.collect.metamodel.proxy.LanguageSpecificTextProxy")]
     public class LanguageSpecificTextProxy extends LanguageSpecificTextProxyBase {
 		
-		public static function getLocalizedText(list:IList, language = "en"):String {
+		public static function getLocalizedText(list:IList, language:String = "en"):String {
 			for each (var item:LanguageSpecificTextProxy in list) {
 				if(item.language == language) {
 					return item.text;
