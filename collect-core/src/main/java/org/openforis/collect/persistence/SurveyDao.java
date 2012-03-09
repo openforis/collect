@@ -2,6 +2,7 @@ package org.openforis.collect.persistence;
 
 import static org.openforis.collect.persistence.jooq.Sequences.OFC_SCHEMA_DEFINITION_ID_SEQ;
 import static org.openforis.collect.persistence.jooq.Sequences.OFC_SURVEY_ID_SEQ;
+import static org.openforis.collect.persistence.jooq.tables.OfcRecord.OFC_RECORD;
 import static org.openforis.collect.persistence.jooq.tables.OfcSchemaDefinition.OFC_SCHEMA_DEFINITION;
 import static org.openforis.collect.persistence.jooq.tables.OfcSurvey.OFC_SURVEY;
 
@@ -185,5 +186,15 @@ public class SurveyDao extends JooqDaoSupport {
 			throw new SurveyImportException("Error unmarshalling survey", e);
 		} 
 	}
-
+	
+	public void clearModel() {
+		Factory jf = getJooqFactory();
+		jf.delete(OFC_RECORD).execute();
+		jf.delete(OFC_SCHEMA_DEFINITION).execute();
+		jf.delete(OFC_SURVEY).execute();
+	}
+	
+	public CollectIdmlBindingContext getBindingContext() {
+		return bindingContext;
+	}
 }
