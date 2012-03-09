@@ -165,6 +165,7 @@ package org.openforis.collect.client {
 						BlockingMessagePopUp.show(Message.get("global.errorAlertTitle"), message, Images.ERROR);
 					}
 					Application.serverOffline = true;
+					Application.activeRecord = null;
 			}
 		}
 		
