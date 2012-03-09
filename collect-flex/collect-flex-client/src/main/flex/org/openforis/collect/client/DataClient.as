@@ -22,7 +22,7 @@ package org.openforis.collect.client {
 	 * */
 	public class DataClient extends AbstractClient {
 		
-		private var _updateQueueProcessor:RemoteCallQueueProcessor;
+		private var _queueProcessor:RemoteCallQueueProcessor;
 
 		private var _updateActiveRecordOperation:Operation;
 		private var _saveActiveRecordOperation:Operation;
@@ -39,7 +39,7 @@ package org.openforis.collect.client {
 		public function DataClient() {
 			super("dataService");
 			
-			this._updateQueueProcessor = new RemoteCallQueueProcessor(1, updateResultHandler, updateFaultHandler);
+			this._queueProcessor = new RemoteCallQueueProcessor(1, queueResultHandler, queueFaultHandler);
 			this._updateActiveRecordOperation = getOperation("updateActiveRecord");
 			this._saveActiveRecordOperation = getOperation("saveActiveRecord");
 			this._createRecordOperation = getOperation("createRecord");
@@ -59,11 +59,7 @@ package org.openforis.collect.client {
 		}
 		
 		public function saveActiveRecord(resultHandler:Function = null, faultHandler:Function = null, token:Object = null):void {
-			this._updateQueueProcessor.appendOperation(token, resultHandler, faultHandler, _saveActiveRecordOperation);
-			/*
-			var token:AsyncToken = this._saveActiveRecordOperation.send();
-			token.addResponder(responder);
-			*/
+			this._queueProcessor.appendOperation(token, resultHandler, faultHandler, _saveActiveRecordOperation);
 		}
 		
 		public function deleteRecord(responder:IResponder, id:int):void {
@@ -89,7 +85,7 @@ package org.openforis.collect.client {
 		
 		public function updateActiveRecord(request:UpdateRequest, token:UpdateRequestToken = null, 
 										   resultHandler:Function = null, faultHandler:Function = null):void {
-			this._updateQueueProcessor.appendOperation(token, resultHandler, faultHandler, _updateActiveRecordOperation, request);
+			this._queueProcessor.appendOperation(token, resultHandler, faultHandler, _updateActiveRecordOperation, request);
 		}
 		
 		public function promoteActiveRecord(responder:IResponder):void {
@@ -113,7 +109,18 @@ package org.openforis.collect.client {
 			token.addResponder(responder);
 		}
 		
-		protected function updateResultHandler(event:ResultEvent, token:Object = null):void {
+		protected function queueResultHandler(event:ResultEvent, token:Object = null):void {
+			var lastCall:RemoteCallWrapper = _queueProcessor.lastCall;
+			if(lastCall != null) {
+				switch(lastCall.operation) {
+					case _updateActiveRecordOperation:
+						updateActiveRecordResultHandler(event, token as UpdateRequestToken);
+						break;
+				}
+			}
+		}
+			
+		protected function updateActiveRecordResultHandler(event:ResultEvent, token:UpdateRequestToken):void {
 			var field:FieldProxy;
 			if(token != null && token is UpdateRequestToken) {
 				switch(UpdateRequestToken(token).type) {
@@ -121,8 +128,8 @@ package org.openforis.collect.client {
 						//do not break, apply symbol to field
 					case UpdateRequestToken.TYPE_UPDATE_SYMBOL:
 						for each (field in token.updatedFields) {
-							field.symbol = token.symbol;
-						}
+						field.symbol = token.symbol;
+					}
 						break;
 					case UpdateRequestToken.TYPE_UPDATE_REMARKS:
 						for each (field in token.updatedFields) {
@@ -138,7 +145,7 @@ package org.openforis.collect.client {
 			EventDispatcherFactory.getEventDispatcher().dispatchEvent(appEvt);
 		}
 
-		protected function updateFaultHandler(event:FaultEvent, token:Object = null):void {
+		protected function queueFaultHandler(event:FaultEvent, token:Object = null):void {
 			if(token != null && token is UpdateRequestToken) {
 				var updateRequestToken:UpdateRequestToken = UpdateRequestToken(token);
 				var inputField:InputField = token != null ? token.inputField: null;
@@ -155,11 +162,11 @@ package org.openforis.collect.client {
 		}
 		
 		protected function retryUpdateHandler():void {
-			_updateQueueProcessor.sendHeadRemoteCall();
+			_queueProcessor.sendHeadRemoteCall();
 		}
 		
 		protected function doNotRetryUpdateHandler():void {
-			var call:RemoteCallWrapper = _updateQueueProcessor.removeHeadOperation();
+			var call:RemoteCallWrapper = _queueProcessor.removeHeadOperation();
 			if(call != null && call.token != null && call.token is UpdateRequestToken) {
 				var token:UpdateRequestToken = UpdateRequestToken(call.token);
 				var inputField:InputField = token.inputField;
