@@ -17,6 +17,8 @@ package org.openforis.collect.model.proxy {
     [RemoteClass(alias="org.openforis.collect.model.proxy.AttributeProxy")]
     public class AttributeProxy extends AttributeProxyBase {
 		
+		private var _visited:Boolean = false;
+		
 		public function getField(index:int):FieldProxy {
 			if(index < 0) {
 				index = 0;
@@ -61,6 +63,12 @@ package org.openforis.collect.model.proxy {
 			return validationResults != null && CollectionUtil.isNotEmpty(validationResults.warnings);
 		}
 		
-
+		public function get visited():Boolean {
+			return _visited;
+		}
+		
+		public function set visited(value:Boolean):void {
+			_visited = value;
+		}
     }
 }

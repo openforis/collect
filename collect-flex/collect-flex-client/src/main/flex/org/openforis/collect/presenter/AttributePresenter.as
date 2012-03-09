@@ -4,6 +4,7 @@ package org.openforis.collect.presenter {
 	import mx.binding.utils.ChangeWatcher;
 	import mx.collections.IList;
 	import mx.core.UIComponent;
+	import mx.events.PropertyChangeEvent;
 	
 	import org.openforis.collect.Application;
 	import org.openforis.collect.event.ApplicationEvent;
@@ -68,7 +69,10 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function fieldVisitedHandler(event:Event):void {
-			_view.visited = true;
+			var propertyChangeEvent:PropertyChangeEvent = event as PropertyChangeEvent;
+			if(propertyChangeEvent != null && propertyChangeEvent.newValue == true && _view.attribute != null) {
+				_view.attribute.visited = true;
+			}
 			updateValidationDisplayManager();
 		}
 		
@@ -82,7 +86,7 @@ package org.openforis.collect.presenter {
 				initValidationDisplayManager();
 			}
 			var record:RecordProxy = Application.activeRecord;
-			var active:Boolean = !isNaN(record.id) || record.saved || _view.visited;
+			var active:Boolean = !isNaN(record.id) || record.saved || (_view.attribute != null && _view.attribute.visited);
 			if(active) {
 				_validationDisplayManager.active = true;
 				_validationDisplayManager.displayNodeValidation(_view.parentEntity, _view.attributeDefinition, _view.attribute);
