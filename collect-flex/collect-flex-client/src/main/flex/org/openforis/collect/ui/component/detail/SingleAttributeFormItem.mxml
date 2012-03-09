@@ -15,7 +15,7 @@
 			override protected function createChildren():void {
 				if(!childrenAdded) {
 					super.createChildren();
-					renderer = UIBuilder.getAttributeItemRenderer(attributeDefinition, isInDataGroup);
+					renderer = UIBuilder.getAttributeItemRenderer(attributeDefinition);
 					BindingUtils.bindProperty(renderer, "attributeDefinition", this, "attributeDefinition");
 					BindingUtils.bindProperty(renderer, "parentEntity", this, "parentEntity");
 					BindingUtils.bindProperty(renderer, "attribute", this, "attribute");

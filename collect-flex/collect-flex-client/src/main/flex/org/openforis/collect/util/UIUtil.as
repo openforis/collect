@@ -12,8 +12,11 @@ package org.openforis.collect.util
 	/**
 	 * @author S. Ricci
 	 */
-	public class UIUtil
-	{
+	public class UIUtil {
+		
+		public static const LAYOUT_FORM:String = "form";
+		public static const LAYOUT_TABLE:String = "table";
+		
 		public static function resetScrollBars(uiComponent:UIComponent):void {
 			if(uiComponent is Scroller) {
 				var scroller:Scroller = Scroller(uiComponent);

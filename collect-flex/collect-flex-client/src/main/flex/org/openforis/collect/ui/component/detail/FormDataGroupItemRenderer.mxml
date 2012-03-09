@@ -21,6 +21,7 @@
 			import org.openforis.collect.metamodel.proxy.TaxonAttributeDefinitionProxy;
 			import org.openforis.collect.model.proxy.EntityProxy;
 			import org.openforis.collect.ui.UIBuilder;
+			import org.openforis.collect.util.UIUtil;
 			
 			import spark.components.HGroup;
 			import spark.components.Label;
@@ -28,7 +29,6 @@
 			
 			private var _entity:EntityProxy;
 			private var _modelVersion:ModelVersionProxy;
-			private var _isInDataGroup:Boolean = false;
 			private var _labelWidth:Number = 150;
 			
 			override protected function createChildren():void {
@@ -37,46 +37,50 @@
 					var formItem:CollectFormItem;
 					if(data is AttributeDefinitionProxy) {
 						var attributeDefn:AttributeDefinitionProxy = AttributeDefinitionProxy(data);
-						formItem = UIBuilder.getAttributeFormItem(attributeDefn, isInDataGroup);
-						if(isInDataGroup) {
-							addElement(formItem);
-						} else {
-							var labelGroup:HGroup = new HGroup();
-							var numberLabelProxy:NodeLabelProxy = attributeDefn.getLabel(NodeLabelProxy$Type.NUMBER);
-							if(numberLabelProxy != null) {
-								var numberLabel:Label = new Label();
-								numberLabel.styleName = "bold";
-								numberLabel.text = numberLabelProxy.text + ".";
-								numberLabel.width = 30;
-								labelGroup.addElement(numberLabel);
-							}
-							var label:Label = new Label();
-							label.styleName = "bold";
-							label.width = labelWidth;
-							label.text = attributeDefn.getLabelText();
-							labelGroup.addElement(label);
-							
-							if(attributeDefn is CoordinateAttributeDefinitionProxy || attributeDefn is TaxonAttributeDefinitionProxy) {
-								var vGroup:VGroup = new VGroup();
-								vGroup.addElement(labelGroup);
-								var internalGroup:HGroup = new HGroup();
-								internalGroup.gap = 0;
-								var spacer:Spacer = new Spacer();
-								spacer.width = 20;
-								internalGroup.addElement(spacer);
-								internalGroup.addElement(formItem);
-								vGroup.addElement(internalGroup);
-								addElement(vGroup);
-							} else {
-								var hGroup:HGroup = new HGroup();
-								hGroup.gap = 0;
-								hGroup.addElement(labelGroup);
-								hGroup.addElement(formItem);
-								addElement(hGroup);
-							}
+						formItem = UIBuilder.getAttributeFormItem(attributeDefn);
+						switch(attributeDefn.parentLayout) {
+							case UIUtil.LAYOUT_TABLE:
+								addElement(formItem);
+								break;
+							case UIUtil.LAYOUT_FORM:
+							default:
+								var labelGroup:HGroup = new HGroup();
+								var numberLabelProxy:NodeLabelProxy = attributeDefn.getLabel(NodeLabelProxy$Type.NUMBER);
+								if(numberLabelProxy != null) {
+									var numberLabel:Label = new Label();
+									numberLabel.styleName = "bold";
+									numberLabel.text = numberLabelProxy.text + ".";
+									numberLabel.width = 30;
+									labelGroup.addElement(numberLabel);
+								}
+								var label:Label = new Label();
+								label.styleName = "bold";
+								label.width = labelWidth;
+								label.text = attributeDefn.getLabelText();
+								labelGroup.addElement(label);
+								
+								if(attributeDefn is CoordinateAttributeDefinitionProxy || attributeDefn is TaxonAttributeDefinitionProxy) {
+									var vGroup:VGroup = new VGroup();
+									vGroup.addElement(labelGroup);
+									var internalGroup:HGroup = new HGroup();
+									internalGroup.gap = 0;
+									var spacer:Spacer = new Spacer();
+									spacer.width = 20;
+									internalGroup.addElement(spacer);
+									internalGroup.addElement(formItem);
+									vGroup.addElement(internalGroup);
+									addElement(vGroup);
+								} else {
+									var hGroup:HGroup = new HGroup();
+									hGroup.gap = 0;
+									hGroup.addElement(labelGroup);
+									hGroup.addElement(formItem);
+									addElement(hGroup);
+								}
+								break;
 						}
 					} else if(data is EntityDefinitionProxy) {
-						formItem = CollectFormItem(UIBuilder.getEntityFormItem(EntityDefinitionProxy(data), isInDataGroup));
+						formItem = CollectFormItem(UIBuilder.getEntityFormItem(EntityDefinitionProxy(data)));
 						addElement(formItem);
 						BindingUtils.bindProperty(formItem, "modelVersion", this, "modelVersion");
 					}
@@ -87,15 +91,6 @@
 				removeAllElements();
 				initialized = false;
 				initialize();
-			}
-			
-			[Bindable]
-			public function get isInDataGroup():Boolean {
-				return _isInDataGroup;
-			}
-			
-			public function set isInDataGroup(value:Boolean):void {
-				_isInDataGroup = value;
 			}
 			
 			[Bindable]

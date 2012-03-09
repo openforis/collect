@@ -22,6 +22,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.util.ArrayUtil;
 	import org.openforis.collect.util.CollectionUtil;
 	import org.openforis.collect.util.StringUtil;
+	import org.openforis.collect.util.UIUtil;
 	
 	/**
 	 * 
@@ -39,6 +40,7 @@ package org.openforis.collect.presenter {
 		public function CodeInputFieldPresenter(view:CodeInputField) {
 			_view = view;
 			_view.fieldIndex = -1;
+			initViewState();
 			super(view);
 		}
 		
@@ -46,6 +48,14 @@ package org.openforis.collect.presenter {
 			super.initEventListeners();
 			
 			_view.openImage.addEventListener(MouseEvent.CLICK, openImageClickHandler);
+		}
+		
+		protected function initViewState():void {
+			if(_view.attributeDefinition.parentLayout == UIUtil.LAYOUT_TABLE) {
+				_view.currentState = CodeInputField.STATE_DEFAULT;
+			} else {
+				_view.currentState = CodeInputField.STATE_DESCRIPTION_VISIBLE;
+			}
 		}
 		
 		/**

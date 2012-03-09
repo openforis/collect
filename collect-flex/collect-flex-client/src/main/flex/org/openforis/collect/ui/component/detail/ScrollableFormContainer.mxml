@@ -80,7 +80,6 @@
 					<detail:FormDataGroupItemRenderer
 						entity="{parentDocument.entity}"
 						modelVersion="{parentDocument.modelVersion}"
-						isInDataGroup="false"
 						/>
 				</fx:Component>
 			</s:itemRenderer>

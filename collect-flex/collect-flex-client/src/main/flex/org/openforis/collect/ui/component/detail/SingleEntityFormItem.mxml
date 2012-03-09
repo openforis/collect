@@ -16,8 +16,9 @@
 	
 	<fx:Script>
 		<![CDATA[
-			import mx.binding.utils.ChangeWatcher;
 			import mx.events.FlexEvent;
+			
+			import org.openforis.collect.util.UIUtil;
 			
 			private static const STATE_HORIZONTAL:String = "horizontal";
 			private static const STATE_VERTICAL:String = "vertical";
@@ -25,11 +26,10 @@
 			override protected function creationCompleteHandler(event:FlexEvent):void {
 				super.creationCompleteHandler(event);
 				checkState();
-				ChangeWatcher.watch(this, "isInDataGroup", checkState);
 			}
 
 			protected function checkState(event:Event = null):void {
-				if(isInDataGroup) {
+				if(entityDefinition.parentLayout == UIUtil.LAYOUT_TABLE) {
 					currentState = STATE_HORIZONTAL;
 				} else {
 					currentState = STATE_VERTICAL;
@@ -66,7 +66,6 @@
 				<detail:FormDataGroupItemRenderer
 					modelVersion="{outerDocument.modelVersion}"
 					entity="{outerDocument.entity}"
-					isInDataGroup="{outerDocument.isInDataGroup}"
 					labelWidth="130"
 					/>
 			</fx:Component>

@@ -8,6 +8,7 @@ import java.util.List;
 
 import javax.xml.namespace.QName;
 
+import org.apache.commons.lang3.StringUtils;
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
@@ -15,9 +16,13 @@ import org.openforis.idm.metamodel.NodeDefinition;
 
 /**
  * @author M. Togna
+ * @author S. Ricci
  * 
  */
 public class EntityDefinitionProxy extends NodeDefinitionProxy {
+
+	private static QName countInSummaryListAnnotation = new QName("http://www.openforis.org/collect/3.0/collect", "count");
+	private static QName layoutAnnotation = new QName("http://www.openforis.org/collect/3.0/ui", "layout");
 
 	private transient EntityDefinition entityDefinition;
 
@@ -43,7 +48,6 @@ public class EntityDefinitionProxy extends NodeDefinitionProxy {
 
 	@ExternalizedProperty
 	public boolean isCountInSummaryList() {
-		QName countInSummaryListAnnotation = new QName("http://www.openforis.org/collect/3.0/collect", "count");
 		String annotation = entityDefinition.getAnnotation(countInSummaryListAnnotation);
 		return annotation != null && Boolean.parseBoolean(annotation);
 	}
@@ -52,7 +56,19 @@ public class EntityDefinitionProxy extends NodeDefinitionProxy {
 	public boolean isEnumerated() {
 		return entityDefinition.isMultiple() && hasEnumeratingCodeListAttribute();
 	}
-	
+
+	@ExternalizedProperty
+	public String getLayout() {
+		String result = entityDefinition.getAnnotation(layoutAnnotation);
+		if(StringUtils.isNotBlank(result)) {
+			return result;
+		} else if(isMultiple()) {
+			return "table";
+		} else {
+			return "form";
+		}
+	}
+
 	private boolean hasEnumeratingCodeListAttribute() {
 		List<NodeDefinition> childDefinitions = entityDefinition.getChildDefinitions();
 		for (NodeDefinition nodeDef : childDefinitions) {

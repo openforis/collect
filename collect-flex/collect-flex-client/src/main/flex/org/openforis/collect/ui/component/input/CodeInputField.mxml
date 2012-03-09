@@ -32,15 +32,6 @@
 				_description = value;
 			}
 			
-			override public function set isInDataGroup(value:Boolean):void {
-				super.isInDataGroup = value;
-				if(value) {
-					this.currentState = STATE_DEFAULT;
-				} else {
-					this.currentState = STATE_DESCRIPTION_VISIBLE;
-				}
-			}
-			
 		]]>
 	</fx:Script>
 

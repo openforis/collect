@@ -24,6 +24,7 @@
 			import org.openforis.collect.ui.UIBuilder;
 			import org.openforis.collect.util.CollectionUtil;
 			import org.openforis.collect.util.StringUtil;
+			import org.openforis.collect.util.UIUtil;
 			
 			public static const STATE_WITH_TABS:String = "withTabs";
 			public static const STATE_WITHOUT_TABS:String = "withoutTabs";
