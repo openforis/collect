@@ -9,7 +9,7 @@ import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.metamodel.proxy.SurveyProxy;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SurveySummary;
-import org.openforis.collect.session.SessionState;
+import org.openforis.collect.web.session.SessionState;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.SpatialReferenceSystem;
 import org.springframework.beans.factory.annotation.Autowired;

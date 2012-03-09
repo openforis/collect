@@ -54,6 +54,12 @@
 			font-size: 0.8em;
 			color: red;
 		}
+		
+		div.warn {
+			font-weight: bold;
+			font-size: 0.8em;
+			color: blue;
+		}
 	</style>
     <title>OpenForis Collect</title>
   </head>
@@ -71,6 +77,11 @@
 			    <%-- this form-login-page form is also used as the
 			         form-error-page to ask for a login again.
 			         --%>
+		         <c:if test="${not empty param.session_expired}">
+			      <div class="warn">
+			        Your session has expired.<br/>
+			      </div>
+			    </c:if>
 			    <c:if test="${not empty param.login_error}">
 			      <div class="error">
 			        Your login attempt was not successful, try again.<br/><br/>
