@@ -38,10 +38,9 @@
 		<s:State name="selection" />
 	</s:states>
 	
-	<s:Group width="100%">
-		<s:Label id="surveyNameLabel" styleName="listTitle" left="0" />
-		<s:Label id="titleLabel" styleName="listTitle" horizontalCenter="0" />
-	</s:Group>
+	<s:VGroup width="100%" horizontalAlign="center" verticalAlign="middle" height="30">
+		<s:Label id="titleLabel" styleName="listTitle" />
+	</s:VGroup>
 	
 	<datagrid:RecordSummaryDataGrid id="dataGrid" 
 									width="100%"

@@ -134,8 +134,7 @@ package org.openforis.collect.presenter {
 		protected function loadRecordSummariesHandler(event:UIEvent):void {
 			var surveyProjectName:String = Application.activeSurvey.getProjectName();
 			var rootEntityLabel:String = Application.activeRootEntity.getLabelText();
-			_view.surveyNameLabel.text = surveyProjectName;
-			_view.titleLabel.text = Message.get("list.title", [rootEntityLabel]);
+			_view.titleLabel.text = Message.get("list.title", [surveyProjectName, rootEntityLabel]);
 			updateDataGrid();
 			currentPage = 1;
 			loadRecordSummariesCurrentPage();
