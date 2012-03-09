@@ -55,7 +55,6 @@ package org.openforis.collect.presenter
 		}
 		
 		protected function parentEntityChangeHandler(event:Event):void {
-			_view.internalContainer.visible = false;
 			updateView();
 		}
 		
@@ -64,6 +63,7 @@ package org.openforis.collect.presenter
 				var entities:IList = getEntities();
 				if(_view.entityDefinition.multiple) {
 					_view.entities = entities;
+					selectEntity(null);
 					selectFirstTab();
 				} else if(CollectionUtil.isNotEmpty(entities)) {
 					_view.entity = entities.getItemAt(0) as EntityProxy;
@@ -139,7 +139,7 @@ package org.openforis.collect.presenter
 					_view.internalContainer.visible = true;
 					selectFirstTab();
 				}
-			} else {
+			} else if(_view.entityDefinition == null || _view.entityDefinition.multiple) {
 				_view.internalContainer.visible = false;
 			}
 		}
