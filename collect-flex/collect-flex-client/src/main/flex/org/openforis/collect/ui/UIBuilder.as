@@ -236,7 +236,7 @@ package org.openforis.collect.ui {
 				}
 			} else if(def is CoordinateAttributeDefinitionProxy) {
 				if(parentLayout == UIUtil.LAYOUT_TABLE) {
-					return 300;
+					return 310;
 				} else {
 					return 100;
 				}
@@ -248,7 +248,7 @@ package org.openforis.collect.ui {
 				return 120;
 			} else if(def is TaxonAttributeDefinitionProxy) {
 				if(parentLayout == UIUtil.LAYOUT_TABLE) {
-					return 460;
+					return 474;
 				} else {
 					return 100;
 				}
@@ -386,20 +386,21 @@ package org.openforis.collect.ui {
 		}
 		
 		private static function getAttributeDataGroupHeader(defn:AttributeDefinitionProxy):IVisualElement {
-			var v:VGroup;
+			var result:VGroup = new VGroup();
+			var width:Number = getAttributeDataGroupHeaderWidth(defn);
+			result.paddingLeft = 1;
+			result.width = width;
+			result.percentHeight = 100;
+			result.verticalAlign = "bottom";
 			var h:HGroup;
 			var l:Label;
 			if(defn is TaxonAttributeDefinitionProxy) {
-				v = new VGroup();
-				v.width = 466;
-				v.percentHeight = 100;
-				v.verticalAlign = "bottom";
 				//attribute label
 				l = getLabel(defn.getLabelText(), 100, "bold");
-				v.addElement(l);
+				result.addElement(l);
 				//subheader
 				h = new HGroup();
-				h.gap = 4;
+				h.gap = 6;
 				l = getLabel(Message.get('edit.taxon.code'), 50, "bold");
 				h.addElement(l);
 				l = getLabel(Message.get('edit.taxon.scientificName'), 100, "bold");
@@ -410,40 +411,26 @@ package org.openforis.collect.ui {
 				h.addElement(l);
 				l = getLabel(Message.get('edit.taxon.languageVariety'), 100, "bold");
 				h.addElement(l);
-				v.addElement(h);
-				return v;
+				result.addElement(h);
 			} else if(defn is CoordinateAttributeDefinitionProxy) {
-				v = new VGroup();
-				v.width = 308;
-				v.percentHeight = 100;
-				v.verticalAlign = "bottom";
 				//attribute label
 				l = getLabel(defn.getLabelText(), 100, "bold");
-				v.addElement(l);
+				result.addElement(l);
 				//subheader
 				h = new HGroup();
-				h.gap = 4;
+				h.gap = 6;
 				l = getLabel(Message.get('edit.coordinate.srs'), 100, "bold");
 				h.addElement(l);
 				l = getLabel(Message.get('edit.coordinate.x'), 100, "bold");
 				h.addElement(l);
 				l = getLabel(Message.get('edit.coordinate.y'), 100, "bold");
 				h.addElement(l);
-				v.addElement(h);
-				return v;
-			}else {
-				var width:Number = getAttributeDataGroupHeaderWidth(defn);
-				
-				v = new VGroup();
-				v.width = width;
-				v.percentHeight = 100;
-				v.verticalAlign = "bottom";
-				
+				result.addElement(h);
+			} else {
 				l = getLabel(defn.getLabelText(), width, "bold");
-				v.addElement(l);
-				
-				return v;
+				result.addElement(l);
 			}
+			return result;
 		}
 		
 		public static function getGridColumn(headerText:String, dataField:String, width:Number, 
