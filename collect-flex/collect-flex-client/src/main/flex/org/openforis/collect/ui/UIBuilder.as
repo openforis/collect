@@ -139,7 +139,7 @@ package org.openforis.collect.ui {
 				dataField = "key" + position;
 				width = NaN;
 				labelFunction = RecordSummaryDataGrid.recordSummariesKeyLabelFunction;
-				column = getGridColumn(headerText, dataField, width, labelFunction);
+				column = getGridColumn(headerText, dataField, width, labelFunction, true);
 				columns.addItem(column);
 				position ++;
 			}
@@ -154,7 +154,7 @@ package org.openforis.collect.ui {
 						dataField = "count" + position;
 						width = 70;
 						labelFunction = RecordSummaryDataGrid.recordSummariesCountEntityLabelFunction;
-						column = getGridColumn(headerText, dataField, width, labelFunction);
+						column = getGridColumn(headerText, dataField, width, labelFunction, true);
 						columns.addItem(column);
 						position ++;
 					}
@@ -225,7 +225,7 @@ package org.openforis.collect.ui {
 				return 100;
 			} else if(def is CodeAttributeDefinitionProxy) {
 				if(parentLayout == UIUtil.LAYOUT_TABLE) {
-					if(def.key && def.parent.enumerated) {
+					if(def.key && def.parent.enumerable) {
 						//return NaN;
 						return 150;
 					} else {
@@ -285,7 +285,7 @@ package org.openforis.collect.ui {
 				inputField = new BooleanInputField();
 			} else if(def is CodeAttributeDefinitionProxy) {
 				var codeDef:CodeAttributeDefinitionProxy = CodeAttributeDefinitionProxy(def);
-				if(parentLayout == UIUtil.LAYOUT_TABLE && codeDef.parent.enumerated && codeDef.key) {
+				if(parentLayout == UIUtil.LAYOUT_TABLE && codeDef.parent.enumerable && codeDef.key) {
 					inputField = new FixedCodeInputField();
 				} else if(def.multiple) {
 					inputField = new MultipleCodeInputField();

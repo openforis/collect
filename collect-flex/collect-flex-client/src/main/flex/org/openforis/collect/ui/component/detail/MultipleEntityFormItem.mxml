@@ -96,8 +96,8 @@
 			labelPlacement="left" 
 			useHandCursor="true"
 			paddingLeft="30"
-			visible="{! entityDefinition.enumerated}"
-			includeInLayout="{! entityDefinition.enumerated}"
+			visible="{! entityDefinition.enumerable}"
+			includeInLayout="{! entityDefinition.enumerable}"
 			/>
 	</s:BorderContainer>
 	

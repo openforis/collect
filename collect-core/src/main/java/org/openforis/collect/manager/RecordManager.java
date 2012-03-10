@@ -279,33 +279,41 @@ public class RecordManager {
 		for (NodeDefinition childDefn : childDefinitions) {
 			if(childDefn instanceof EntityDefinition && version.isApplicable(childDefn)) {
 				EntityDefinition childEntityDefn = (EntityDefinition) childDefn;
-				CodeAttributeDefinition codeDefn = getCodeKeyAttribute(childEntityDefn, version);
-				if(codeDefn != null) {
-					CodeList list = codeDefn.getList();
-					List<CodeListItem> items = list.getItems();
-					for (CodeListItem item : items) {
-						if(version.isApplicable(item)) {
-							String code = item.getCode();
-							if(! hasEnumeratedEntity(entity, childEntityDefn, codeDefn, code)) {
-								Entity addedEntity = addEntity(entity, childEntityDefn.getName());
-								//there will be an empty CodeAttribute after the adding of the new entity
-								//set the value into this node
-								CodeAttribute addedCode = (CodeAttribute) addedEntity.get(codeDefn.getName(), 0);
-								addedCode.setValue(new Code(code));
-							}
-						}
+				if(childEntityDefn.isMultiple() && childEntityDefn.isEnumerable()) {
+					addEmptyEnumeratedEntities(entity, childEntityDefn);
+				}
+			}
+		}
+	}
+
+	private void addEmptyEnumeratedEntities(Entity entity, EntityDefinition enumeratedEntityDefn) {
+		Record record = entity.getRecord();
+		ModelVersion version = record.getVersion();
+		CodeAttributeDefinition enumeratingCodeDefn = getEnumeratingKeyCodeAttribute(enumeratedEntityDefn, version);
+		if(enumeratingCodeDefn != null) {
+			CodeList list = enumeratingCodeDefn.getList();
+			List<CodeListItem> items = list.getItems();
+			for (CodeListItem item : items) {
+				if(version.isApplicable(item)) {
+					String code = item.getCode();
+					if(! hasEnumeratedEntity(entity, enumeratedEntityDefn, enumeratingCodeDefn, code)) {
+						Entity addedEntity = addEntity(entity, enumeratedEntityDefn.getName());
+						//there will be an empty CodeAttribute after the adding of the new entity
+						//set the value into this node
+						CodeAttribute addedCode = (CodeAttribute) addedEntity.get(enumeratingCodeDefn.getName(), 0);
+						addedCode.setValue(new Code(code));
 					}
 				}
 			}
 		}
 	}
 
-	private CodeAttributeDefinition getCodeKeyAttribute(EntityDefinition entity, ModelVersion version) {
-		List<NodeDefinition> childDefinitions = entity.getChildDefinitions();
-		for (NodeDefinition nodeDefn : childDefinitions) {
-			if(nodeDefn instanceof CodeAttributeDefinition && version.isApplicable(nodeDefn)) {
-				CodeAttributeDefinition codeDefn = (CodeAttributeDefinition) nodeDefn;
-				if(codeDefn.isKey()) {
+	private CodeAttributeDefinition getEnumeratingKeyCodeAttribute(EntityDefinition entity, ModelVersion version) {
+		List<AttributeDefinition> keys = entity.getKeyAttributeDefinitions();
+		for (AttributeDefinition key: keys) {
+			if(key instanceof CodeAttributeDefinition && version.isApplicable(key)) {
+				CodeAttributeDefinition codeDefn = (CodeAttributeDefinition) key;
+				if(codeDefn.getList().getLookupTable() == null) {
 					return codeDefn;
 				}
 			}
@@ -313,11 +321,12 @@ public class RecordManager {
 		return null;
 	}
 	
-	private boolean hasEnumeratedEntity(Entity parentEntity, EntityDefinition childEntityDefn, CodeAttributeDefinition codeAttributeDef, String value) {
+	private boolean hasEnumeratedEntity(Entity parentEntity, EntityDefinition childEntityDefn, 
+			CodeAttributeDefinition enumeratingCodeAttributeDef, String value) {
 		List<Node<?>> children = parentEntity.getAll(childEntityDefn.getName());
 		for (Node<?> node : children) {
 			Entity child = (Entity) node;
-			Code code = getCodeAttributeValue(child, codeAttributeDef);
+			Code code = getCodeAttributeValue(child, enumeratingCodeAttributeDef);
 			if(code != null && value.equals(code.getCode())) {
 				return true;
 			}

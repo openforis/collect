@@ -178,7 +178,7 @@ package org.openforis.collect.ui
 						case CollectRecord$Step.CLEANSING:
 							currentItems.push(APPROVE_MISSING_VALUES_IN_ROW_MENU_ITEM);
 					}
-					if( !entityDef.enumerated) {
+					if( !entityDef.enumerable) {
 						currentItems.push(DELETE_ENTITY_MENU_ITEM);
 					}
 				}
