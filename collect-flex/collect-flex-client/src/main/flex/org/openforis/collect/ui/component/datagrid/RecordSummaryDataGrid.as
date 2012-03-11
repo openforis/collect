@@ -72,7 +72,7 @@ package org.openforis.collect.ui.component.datagrid
 			if(dataField.indexOf(dataFieldPrefix) == 0) {
 				var posText:String = dataField.substring(dataFieldPrefix.length);
 				var position:int = int(posText);
-				if(position < list.length) {
+				if(position <= list.length) {
 					var value:Object = list.getItemAt(position - 1);
 					if((value is Number && !isNaN(Number(value))) || value != null) {
 						return String(value);
