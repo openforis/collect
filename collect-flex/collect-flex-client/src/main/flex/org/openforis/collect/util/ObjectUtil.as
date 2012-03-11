@@ -33,5 +33,5 @@ package org.openforis.collect.util
 		public static function isNotNull(item:Object):Boolean {
 			return ! isNull(item);
 		}
-}
+	}
 }
