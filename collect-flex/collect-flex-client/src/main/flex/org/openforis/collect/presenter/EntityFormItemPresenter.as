@@ -66,8 +66,8 @@ package org.openforis.collect.presenter
 			updateValidationDisplayManager();
 		}
 		
-		override protected function updateValidationDisplayManager(forceActivation:Boolean = false):void {
-			super.updateValidationDisplayManager(forceActivation);
+		override protected function updateValidationDisplayManager():void {
+			super.updateValidationDisplayManager();
 			if(view.parentEntity != null && view.entityDefinition != null) {
 				validationDisplayManager.displayNodeValidation(view.parentEntity, view.entityDefinition);
 			}

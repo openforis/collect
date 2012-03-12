@@ -105,8 +105,8 @@ package org.openforis.collect.presenter
 			_relevanceDisplayManager.displayNodeRelevance(view.parentEntity, view.attributeDefinition);
 		}
 			
-		override protected function updateValidationDisplayManager(forceActivation:Boolean = false):void {
-			super.updateValidationDisplayManager(forceActivation);
+		override protected function updateValidationDisplayManager():void {
+			super.updateValidationDisplayManager();
 			if(view.parentEntity != null) {
 				_validationDisplayManager.displayNodeValidation(view.parentEntity, view.attributeDefinition);
 			}

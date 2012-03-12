@@ -12,6 +12,7 @@ package org.openforis.collect.event
 		public static const FOCUS_IN:String = "inputFieldFocusIn";
 		public static const CHANGING:String = "inputFieldChanging";
 		public static const VALUE_CHANGE:String = "inputFieldValueChange";
+		public static const VISITED:String = "visited";
 		
 		private var _inputField:InputField;
 		

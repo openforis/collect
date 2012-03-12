@@ -152,8 +152,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		internal function saveActiveRecordResultHandler(event:ResultEvent, token:Object = null):void {
-			Application.activeRecord.saved = true;
-			Application.activeRecord.setChildrenAsAttached();
+			Application.activeRecord.detached = false;
 			var applicationEvent:ApplicationEvent = new ApplicationEvent(ApplicationEvent.RECORD_SAVED);
 			eventDispatcher.dispatchEvent(applicationEvent);
 		}

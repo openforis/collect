@@ -39,8 +39,8 @@ package org.openforis.collect.ui.component.input {
 		private var _attribute:AttributeProxy;
 		private var _fieldIndex:int = 0;
 		private var _presenter:InputFieldPresenter;
+		private var _updating:Boolean = false;
 		private var _visited:Boolean = false;
-		private var _updating:Boolean = false; 
 		private var _applyChangesOnFocusOut:Boolean = true;
 		private var _formatFunction:Function;
 		private var _maxChars:int;
@@ -239,21 +239,21 @@ package org.openforis.collect.ui.component.input {
 		}
 
 		[Bindable]
-		public function get visited():Boolean {
-			return _visited;
-		}
-
-		public function set visited(value:Boolean):void {
-			_visited = value;
-		}
-
-		[Bindable]
 		public function get updating():Boolean {
 			return _updating;
 		}
 		
 		public function set updating(value:Boolean):void {
 			_updating = value;
+		}
+		
+		[Bindable]
+		public function get visited():Boolean {
+			return _visited;
+		}
+		
+		public function set visited(value:Boolean):void {
+			_visited = value;
 		}
 		
 		[Bindable]

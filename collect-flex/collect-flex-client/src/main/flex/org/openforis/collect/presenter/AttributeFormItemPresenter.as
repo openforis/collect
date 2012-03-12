@@ -64,7 +64,7 @@ package org.openforis.collect.presenter
 			relevanceDisplayManager.displayNodeRelevance(view.parentEntity, view.attributeDefinition);
 		}
 		
-		override protected function updateValidationDisplayManager(forceActivation:Boolean=false):void {
+		override protected function updateValidationDisplayManager():void {
 			//validation display managed by AttributePresenter
 			return;
 		}

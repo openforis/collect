@@ -8,12 +8,14 @@ package org.openforis.collect.presenter {
 	
 	import org.openforis.collect.Application;
 	import org.openforis.collect.event.ApplicationEvent;
+	import org.openforis.collect.model.proxy.AttributeProxy;
 	import org.openforis.collect.model.proxy.RecordProxy;
 	import org.openforis.collect.remoting.service.UpdateResponse;
 	import org.openforis.collect.ui.component.detail.AttributeItemRenderer;
 	import org.openforis.collect.ui.component.detail.RelevanceDisplayManager;
 	import org.openforis.collect.ui.component.detail.ValidationDisplayManager;
 	import org.openforis.collect.ui.component.input.InputField;
+	import org.openforis.collect.util.ObjectUtil;
 	import org.openforis.collect.util.UIUtil;
 	
 	/**
@@ -71,8 +73,15 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function fieldVisitedHandler(event:PropertyChangeEvent):void {
-			if(event.newValue == true && _view.attribute != null) {
-				_view.attribute.visited = true;
+			if(event.newValue == true && (_view.attribute != null || _view.attributeDefinition.multiple && _view.attributes != null)) {
+				if(_view.attribute != null) {
+					_view.attribute.visited = true;
+				} else {
+					for each (var a:AttributeProxy in _view.attributes) {
+						a.visited = true;
+					}
+				}
+				_view.parentEntity.visited = true;
 			}
 			updateValidationDisplayManager();
 		}
@@ -91,7 +100,6 @@ package org.openforis.collect.presenter {
 			if(_validationDisplayManager == null) {
 				initValidationDisplayManager();
 			}
-			var record:RecordProxy = Application.activeRecord;
 			var active:Boolean = !_updating && (_view.attribute != null && (_view.attribute.visited || ! _view.attribute.detached));
 			if(active) {
 				_validationDisplayManager.active = true;
