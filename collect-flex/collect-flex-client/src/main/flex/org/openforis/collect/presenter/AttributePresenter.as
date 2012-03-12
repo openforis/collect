@@ -92,8 +92,7 @@ package org.openforis.collect.presenter {
 				initValidationDisplayManager();
 			}
 			var record:RecordProxy = Application.activeRecord;
-			//to do - set visited=true to all attributes when record is saved
-			var active:Boolean = !_updating && (!isNaN(record.id) || record.saved || (_view.attribute != null && _view.attribute.visited));
+			var active:Boolean = !_updating && (_view.attribute != null && (_view.attribute.visited || ! _view.attribute.detached));
 			if(active) {
 				_validationDisplayManager.active = true;
 				_validationDisplayManager.displayNodeValidation(_view.parentEntity, _view.attributeDefinition, _view.attribute);

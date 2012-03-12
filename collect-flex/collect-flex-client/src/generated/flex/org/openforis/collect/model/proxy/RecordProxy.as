@@ -42,6 +42,12 @@ package org.openforis.collect.model.proxy {
 				node = response.createdNode;
 				parent = getNode(node.parentId) as EntityProxy;
 				parent.addChild(node);
+				
+				if(node is AttributeProxy) {
+					AttributeProxy(node).detached = true;
+				} else {
+					EntityProxy(node).setChildrenDetachmentStatus(true);
+				}
 			}
 			if(response.deletedNodeId > 0) {
 				node = getNode(response.deletedNodeId);
@@ -81,6 +87,10 @@ package org.openforis.collect.model.proxy {
 					}
 				}
 			}
+		}
+		
+		public function setChildrenAsAttached():void {
+			rootEntity.setChildrenDetachmentStatus(false);
 		}
 		
 		public function get updated():Boolean {

@@ -169,6 +169,17 @@ package org.openforis.collect.model.proxy {
 			}
 		}
 		
+		public function setChildrenDetachmentStatus(value:Boolean):void {
+			var children:IList = getChildren();
+			for each (var child:NodeProxy in children) {
+				if(child is AttributeProxy) {
+					AttributeProxy(child).detached = value;
+				} else {
+					EntityProxy(child).setChildrenDetachmentStatus(value);
+				}
+			}
+		}
+		
 		private function getKeyLabelPart(attributeDefn:AttributeDefinitionProxy, attribute:AttributeProxy):String {
 			var result:String = null;
 			var f:FieldProxy = attribute.getField(0);
