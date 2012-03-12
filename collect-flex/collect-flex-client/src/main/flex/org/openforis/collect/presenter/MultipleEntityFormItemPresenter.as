@@ -9,16 +9,13 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.event.InputFieldEvent;
-	import org.openforis.collect.event.UIEvent;
 	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.remoting.service.UpdateRequest;
 	import org.openforis.collect.remoting.service.UpdateRequestOperation;
 	import org.openforis.collect.remoting.service.UpdateRequestOperation$Method;
 	import org.openforis.collect.ui.component.detail.MultipleEntityFormItem;
-	import org.openforis.collect.util.AlertUtil;
-	import org.openforis.collect.util.CollectionUtil;
-	import org.openforis.collect.util.UIUtil;
 	import org.openforis.collect.ui.component.input.InputField;
+	import org.openforis.collect.util.UIUtil;
 
 	/**
 	 * 
@@ -106,7 +103,6 @@ package org.openforis.collect.presenter
 		
 		override protected function updateValidationDisplayManager():void {
 			super.updateValidationDisplayManager();
-			var entities:IList = getEntities();
 			var visited:Boolean = isVisited();
 			var detached:Boolean = isDetached();
 			var active:Boolean = visited || ! detached;
@@ -138,5 +134,5 @@ package org.openforis.collect.presenter
 			}
 			return true;
 		}
-}
+	}
 }

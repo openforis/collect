@@ -95,8 +95,6 @@ package org.openforis.collect.ui
 			
 			addRowItems(items, step, inputField);
 			
-			addApproveValueItems(items, step, inputField);
-			
 			cm.customItems = items;
 			cm.hideBuiltInItems();
 			return cm;
@@ -117,8 +115,14 @@ package org.openforis.collect.ui
 						break;
 				}
 			} else {
-				if(step == CollectRecord$Step.ENTRY && hasErrors(inputField) && !hasConfirmedError(inputField)) {
-					currentItems.push(APPROVE_ERROR_MENU_ITEM);
+				if(step == CollectRecord$Step.ENTRY) {
+					var hasErrors:Boolean = hasErrors(inputField);
+					if(hasErrors) {
+						var hasConfirmedError:Boolean = hasConfirmedError(inputField)
+						if(! hasConfirmedError) {
+							currentItems.push(APPROVE_ERROR_MENU_ITEM);
+						}
+					}
 				}
 			}
 			currentItems.push(EDIT_REMARKS_MENU_ITEM);
@@ -162,10 +166,9 @@ package org.openforis.collect.ui
 		
 		private static function addRowItems(currentItems:Array, step:CollectRecord$Step, inputField:InputField):void {
 			var def:AttributeDefinitionProxy = inputField.attributeDefinition;
-			if(def != null && def.parentLayout == UIUtil.LAYOUT_TABLE) {
-				if(def.multiple && ! (def is CodeAttributeDefinitionProxy)) {
-					currentItems.push(DELETE_ATTRIBUTE_MENU_ITEM);
-				}
+			if(def.multiple && ! (def is CodeAttributeDefinitionProxy)) {
+				currentItems.push(DELETE_ATTRIBUTE_MENU_ITEM);
+			} else if(def.parentLayout == UIUtil.LAYOUT_TABLE) {
 				var entityDef:EntityDefinitionProxy = def.parent;
 				if(entityDef != null && entityDef.multiple) {
 					switch(step) {
@@ -183,18 +186,6 @@ package org.openforis.collect.ui
 					}
 				}
 			}			
-		}
-		
-		private static function addApproveValueItems(currentItems:Array, step:CollectRecord$Step, inputField:InputField):void {
-			var attribute:AttributeProxy = inputField.attribute;
-			if(attribute != null) {
-				/*
-				var state:NodeStateProxy = attribute.state;
-				if(step == RecordProxy$Step.ENTRY && state != null && state.hasErrors()) {
-					currentItems.push(APPROVE_ERROR_MENU_ITEM);
-				}
-				*/
-			}
 		}
 		
 		public static function menuItemSelectHandler(event:ContextMenuEvent):void {
