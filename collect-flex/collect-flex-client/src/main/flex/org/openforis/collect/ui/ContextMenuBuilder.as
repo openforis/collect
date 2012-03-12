@@ -145,7 +145,7 @@ package org.openforis.collect.ui
 				var attributes:IList = ObjectUtil.getValue(inputField, "attributes") as IList;
 				for each (var a:AttributeProxy in attributes) {
 					for each (var f:FieldProxy in a.fields) {
-						if(field.symbol != FieldSymbol.CONFIRMED) {
+						if(f.symbol != FieldSymbol.CONFIRMED) {
 							return false;
 						}
 					}
