@@ -1,4 +1,7 @@
 package org.openforis.collect.client {
+	import flash.net.URLRequest;
+	import flash.net.navigateToURL;
+	
 	import mx.collections.IList;
 	import mx.rpc.AsyncToken;
 	import mx.rpc.IResponder;
@@ -9,9 +12,12 @@ package org.openforis.collect.client {
 	import org.openforis.collect.Application;
 	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.event.EventDispatcherFactory;
+	import org.openforis.collect.i18n.Message;
 	import org.openforis.collect.model.CollectRecord$Step;
 	import org.openforis.collect.model.proxy.FieldProxy;
 	import org.openforis.collect.remoting.service.UpdateRequest;
+	import org.openforis.collect.ui.Images;
+	import org.openforis.collect.ui.component.BlockingMessagePopUp;
 	import org.openforis.collect.ui.component.input.InputField;
 	import org.openforis.collect.util.AlertUtil;
 	import org.openforis.collect.util.UIUtil;
@@ -146,36 +152,20 @@ package org.openforis.collect.client {
 		}
 
 		protected function queueFaultHandler(event:FaultEvent, token:Object = null):void {
-			if(token != null && token is UpdateRequestToken) {
-				var updateRequestToken:UpdateRequestToken = UpdateRequestToken(token);
-				var inputField:InputField = token != null ? token.inputField: null;
-				var fieldLabel:String = inputField != null ? inputField.attributeDefinition.getLabelText(): "";
-				AlertUtil.showConfirm("global.confirmRetryUpdate", 
-					[fieldLabel, event.fault.faultCode, event.fault.faultString], null, 
-					retryUpdateHandler, doNotRetryUpdateHandler);
-			} else {
-				var operation:String = "";
-				AlertUtil.showConfirm("global.confirmRetryOperation", 
-					[operation, event.fault.faultCode, event.fault.faultString], null, 
-					retryUpdateHandler, doNotRetryUpdateHandler);
-			}
-		}
-		
-		protected function retryUpdateHandler():void {
-			_queueProcessor.sendHeadRemoteCall();
-		}
-		
-		protected function doNotRetryUpdateHandler():void {
-			var call:RemoteCallWrapper = _queueProcessor.removeHeadOperation();
-			if(call != null && call.token != null && call.token is UpdateRequestToken) {
-				var token:UpdateRequestToken = UpdateRequestToken(call.token);
-				var inputField:InputField = token.inputField;
-				if(inputField != null) {
-					if(inputField.textInput != null) {
-						inputField.textInput.setFocus();
+			var faultCode:String = event.fault.faultCode;
+			switch(faultCode) {
+				case "org.openforis.collect.web.session.InvalidSessionException":
+					var u:URLRequest = new URLRequest(Application.URL +"login.htm?session_expired=1");
+					Application.activeRecord = null;
+					navigateToURL(u,"_self");
+					break;
+				default:
+					if(! Application.serverOffline) {
+						var message:String = Message.get("global.faultHandlerMsg", [faultCode, event.fault.faultString]);
+						BlockingMessagePopUp.show(Message.get("global.errorAlertTitle"), message, Images.ERROR);
 					}
-					UIUtil.ensureElementIsVisible(inputField);
-				}
+					Application.serverOffline = true;
+					Application.activeRecord = null;
 			}
 		}
 		

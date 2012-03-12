@@ -29,6 +29,7 @@ package org.openforis.collect.ui
 	import org.openforis.collect.util.AlertUtil;
 	import org.openforis.collect.util.CollectionUtil;
 	import org.openforis.collect.util.ObjectUtil;
+	import org.openforis.collect.util.UIUtil;
 
 	public class ContextMenuBuilder {
 		
@@ -161,7 +162,7 @@ package org.openforis.collect.ui
 		
 		private static function addRowItems(currentItems:Array, step:CollectRecord$Step, inputField:InputField):void {
 			var def:AttributeDefinitionProxy = inputField.attributeDefinition;
-			if(def != null && inputField.isInDataGroup) {
+			if(def != null && def.parentLayout == UIUtil.LAYOUT_TABLE) {
 				if(def.multiple && ! (def is CodeAttributeDefinitionProxy)) {
 					currentItems.push(DELETE_ATTRIBUTE_MENU_ITEM);
 				}
@@ -177,7 +178,7 @@ package org.openforis.collect.ui
 						case CollectRecord$Step.CLEANSING:
 							currentItems.push(APPROVE_MISSING_VALUES_IN_ROW_MENU_ITEM);
 					}
-					if( !entityDef.enumerated) {
+					if( !entityDef.enumerable) {
 						currentItems.push(DELETE_ENTITY_MENU_ITEM);
 					}
 				}

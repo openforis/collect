@@ -104,8 +104,6 @@ package org.openforis.collect.presenter {
 		protected function focusOutHandler(event:FocusEvent):void {
 			if(_view.applyChangesOnFocusOut && _changed) {
 				applyValue();
-			} else {
-				//TODO perform validation only
 			}
 			_view.visited = true;
 		}
@@ -199,6 +197,7 @@ package org.openforis.collect.presenter {
 		protected function sendRequestOperation(o:UpdateRequestOperation, token:UpdateRequestToken):void {
 			var req:UpdateRequest = new UpdateRequest(o);
 			dataClient.updateActiveRecord(req, token, updateResultHandler);
+			_view.updating = true;
 		}
 		
 		protected function getUpdateRequestOperation(method:UpdateRequestOperation$Method, nodeId:Number, 
@@ -218,6 +217,7 @@ package org.openforis.collect.presenter {
 		
 		protected function updateResultHandler(event:ResultEvent, token:UpdateRequestToken):void {
 			_changed = false;
+			_view.updating = false;
 			//_view.currentState = InputField.STATE_SAVE_COMPLETE;
 		}
 		

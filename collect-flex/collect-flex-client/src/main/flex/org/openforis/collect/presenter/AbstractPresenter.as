@@ -50,10 +50,12 @@ package org.openforis.collect.presenter {
 					"Client.Error.MessageSend"
 					"Client.Error.DeliveryInDoubt"
 				default:
-					Alert.show(Message.get("global.faultHandlerMsg")
-						+"\n\n"+ event.fault.faultCode
-						+"\n\n"+ event.fault.faultString
-					);
+					if(! Application.serverOffline) {
+						var message:String = Message.get("global.faultHandlerMsg", [faultCode, event.fault.faultString]);
+						BlockingMessagePopUp.show(Message.get("global.errorAlertTitle"), message, Images.ERROR);
+					}
+					Application.serverOffline = true;
+					Application.activeRecord = null;
 			}
 		}
 		

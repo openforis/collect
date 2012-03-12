@@ -51,7 +51,7 @@
 								
 								override protected function createChildren():void {
 									super.createChildren();
-									var renderer:AttributeItemRenderer = UIBuilder.getAttributeItemRenderer(outerDocument.attributeDefinition, true);
+									var renderer:AttributeItemRenderer = UIBuilder.getAttributeItemRenderer(outerDocument.attributeDefinition);
 									BindingUtils.bindProperty(renderer, "parentEntity", outerDocument, "parentEntity");
 									BindingUtils.bindProperty(renderer, "attribute", this, "attribute");
 									addElement(renderer);

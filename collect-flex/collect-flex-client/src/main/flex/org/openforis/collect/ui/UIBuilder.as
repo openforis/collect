@@ -58,11 +58,13 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.ui.component.input.StringInputField;
 	import org.openforis.collect.ui.component.input.TaxonAttributeRenderer;
 	import org.openforis.collect.ui.component.input.TimeAttributeRenderer;
+	import org.openforis.collect.util.UIUtil;
 	
 	import spark.components.HGroup;
 	import spark.components.Label;
 	import spark.components.VGroup;
 	import spark.components.gridClasses.GridColumn;
+	import org.openforis.collect.model.UITabDefinition;
 	
 	/**
 	 * @author Mino Togna
@@ -81,8 +83,11 @@ package org.openforis.collect.ui {
 			var tabs:ListCollectionView = null;
 			var uiTab:UITab = null;
 			if(uiConfig != null) {
-				tabs = uiConfig.tabs;
-				uiTab = uiConfig.getTab(rootEntity.name);
+				var tabDef:UITabDefinition = uiConfig.getTabDefinition(rootEntity.name);
+				if(tabDef != null) {
+					tabs = tabDef.tabs;
+					uiTab = tabDef.getTab(rootEntity.name);
+				}
 			}
 			form.uiTabs = uiTab != null ? uiTab.tabs: null;
 			form.build();
@@ -134,7 +139,7 @@ package org.openforis.collect.ui {
 				dataField = "key" + position;
 				width = NaN;
 				labelFunction = RecordSummaryDataGrid.recordSummariesKeyLabelFunction;
-				column = getGridColumn(headerText, dataField, width, labelFunction);
+				column = getGridColumn(headerText, dataField, width, labelFunction, true);
 				columns.addItem(column);
 				position ++;
 			}
@@ -149,7 +154,7 @@ package org.openforis.collect.ui {
 						dataField = "count" + position;
 						width = 70;
 						labelFunction = RecordSummaryDataGrid.recordSummariesCountEntityLabelFunction;
-						column = getGridColumn(headerText, dataField, width, labelFunction);
+						column = getGridColumn(headerText, dataField, width, labelFunction, true);
 						columns.addItem(column);
 						position ++;
 					}
@@ -185,13 +190,13 @@ package org.openforis.collect.ui {
 			return columns;
 		}
 		
-		public static function getAttributeFormItem(definition:AttributeDefinitionProxy, isInDataGroup:Boolean = false):AttributeFormItem {
+		public static function getAttributeFormItem(def:AttributeDefinitionProxy):AttributeFormItem {
+			var parentLayout:String = def.parentLayout;
 			var formItem:AttributeFormItem = null;
-			
-			if(definition is CodeAttributeDefinitionProxy) {
+			if(def is CodeAttributeDefinitionProxy) {
 				formItem = new CodeAttributeFormItem();
-			} else if(definition.multiple) {
-				if(isInDataGroup){
+			} else if(def.multiple) {
+				if(parentLayout == UIUtil.LAYOUT_TABLE){
 					formItem = new MultipleAttributeDataGroupFormItem();
 				} else {
 					formItem = new MultipleAttributeFormItem();
@@ -199,13 +204,11 @@ package org.openforis.collect.ui {
 			} else {
 				formItem = new SingleAttributeFormItem();
 			}
-			
-			formItem.attributeDefinition = definition;
-			formItem.isInDataGroup = isInDataGroup;
+			formItem.attributeDefinition = def;
 			return formItem;
 		}
 		
-		public static function getEntityFormItem(definition:EntityDefinitionProxy, isInDataGroup:Boolean = false):EntityFormItem {
+		public static function getEntityFormItem(definition:EntityDefinitionProxy):EntityFormItem {
 			var entityFormItem:EntityFormItem = null;
 			if(definition.multiple) {
 				entityFormItem = new MultipleEntityFormItem();
@@ -213,16 +216,16 @@ package org.openforis.collect.ui {
 				entityFormItem = new SingleEntityFormItem();
 			}
 			entityFormItem.entityDefinition = definition;
-			entityFormItem.isInDataGroup = isInDataGroup;
 			return entityFormItem;
 		}
 		
-		public static function getInputFieldWidth(def:AttributeDefinitionProxy, isInDataGroup:Boolean = false):Number {
+		public static function getInputFieldWidth(def:AttributeDefinitionProxy):Number {
+			var parentLayout:String = def.parentLayout;
 			if(def is BooleanAttributeDefinitionProxy) {
 				return 100;
 			} else if(def is CodeAttributeDefinitionProxy) {
-				if(isInDataGroup) {
-					if(def.key && def.parent.enumerated) {
+				if(parentLayout == UIUtil.LAYOUT_TABLE) {
+					if(def.key && def.parent.enumerable) {
 						//return NaN;
 						return 150;
 					} else {
@@ -232,8 +235,8 @@ package org.openforis.collect.ui {
 					return 200;
 				}
 			} else if(def is CoordinateAttributeDefinitionProxy) {
-				if(isInDataGroup) {
-					return 300;
+				if(parentLayout == UIUtil.LAYOUT_TABLE) {
+					return 310;
 				} else {
 					return 100;
 				}
@@ -244,8 +247,8 @@ package org.openforis.collect.ui {
 			} else if(def is RangeAttributeDefinitionProxy) {
 				return 120;
 			} else if(def is TaxonAttributeDefinitionProxy) {
-				if(isInDataGroup) {
-					return 460;
+				if(parentLayout == UIUtil.LAYOUT_TABLE) {
+					return 474;
 				} else {
 					return 100;
 				}
@@ -267,7 +270,7 @@ package org.openforis.collect.ui {
 		}
 		
 		public static function getAttributeDataGroupHeaderWidth(def:AttributeDefinitionProxy):Number {
-			var inputFieldWidth:Number = getInputFieldWidth(def, true);
+			var inputFieldWidth:Number = getInputFieldWidth(def);
 			if(!isNaN(inputFieldWidth)) {
 				return inputFieldWidth + 2; //consider validation display border container
 			} else {
@@ -275,13 +278,14 @@ package org.openforis.collect.ui {
 			}
 		}
 		
-		public static function getInputField(def:AttributeDefinitionProxy, isInDataGroup:Boolean = false):InputField {
+		public static function getInputField(def:AttributeDefinitionProxy):InputField {
+			var parentLayout:String = def.parentLayout;
 			var inputField:InputField = null;
 			if(def is BooleanAttributeDefinitionProxy) {
 				inputField = new BooleanInputField();
 			} else if(def is CodeAttributeDefinitionProxy) {
 				var codeDef:CodeAttributeDefinitionProxy = CodeAttributeDefinitionProxy(def);
-				if(isInDataGroup && codeDef.parent.enumerated && codeDef.key) {
+				if(parentLayout == UIUtil.LAYOUT_TABLE && codeDef.parent.enumerable && codeDef.key) {
 					inputField = new FixedCodeInputField();
 				} else if(def.multiple) {
 					inputField = new MultipleCodeInputField();
@@ -319,13 +323,12 @@ package org.openforis.collect.ui {
 			} else {
 				inputField = new StringInputField();
 			}
-			inputField.width = getInputFieldWidth(def, isInDataGroup);
+			inputField.width = getInputFieldWidth(def);
 			inputField.attributeDefinition = def;
-			inputField.isInDataGroup = isInDataGroup;
 			return inputField;
 		}
 		
-		public static function getAttributeItemRenderer(def:AttributeDefinitionProxy, isInDataGroup:Boolean = false):AttributeItemRenderer {
+		public static function getAttributeItemRenderer(def:AttributeDefinitionProxy):AttributeItemRenderer {
 			var renderer:AttributeItemRenderer;
 			if(def is CoordinateAttributeDefinitionProxy) {
 				renderer = new CoordinateAttributeRenderer();
@@ -337,13 +340,12 @@ package org.openforis.collect.ui {
 				renderer = new TimeAttributeRenderer();
 			} else {
 				renderer = new AttributeItemRenderer();
-				var inputField:InputField = getInputField(def, isInDataGroup);
+				var inputField:InputField = getInputField(def);
 				inputField.fieldIndex = 0;
 				renderer.addElement(inputField);
 				BindingUtils.bindProperty(inputField, "parentEntity", renderer, "parentEntity");
 				BindingUtils.bindProperty(inputField, "attribute", renderer, "attribute");
 			}
-			renderer.isInDataGroup = isInDataGroup;
 			renderer.attributeDefinition = def;
 			return renderer;
 		}
@@ -384,20 +386,21 @@ package org.openforis.collect.ui {
 		}
 		
 		private static function getAttributeDataGroupHeader(defn:AttributeDefinitionProxy):IVisualElement {
-			var v:VGroup;
+			var result:VGroup = new VGroup();
+			var width:Number = getAttributeDataGroupHeaderWidth(defn);
+			result.paddingLeft = 1;
+			result.width = width;
+			result.percentHeight = 100;
+			result.verticalAlign = "bottom";
 			var h:HGroup;
 			var l:Label;
 			if(defn is TaxonAttributeDefinitionProxy) {
-				v = new VGroup();
-				v.width = 466;
-				v.percentHeight = 100;
-				v.verticalAlign = "bottom";
 				//attribute label
 				l = getLabel(defn.getLabelText(), 100, "bold");
-				v.addElement(l);
+				result.addElement(l);
 				//subheader
 				h = new HGroup();
-				h.gap = 4;
+				h.gap = 6;
 				l = getLabel(Message.get('edit.taxon.code'), 50, "bold");
 				h.addElement(l);
 				l = getLabel(Message.get('edit.taxon.scientificName'), 100, "bold");
@@ -408,40 +411,26 @@ package org.openforis.collect.ui {
 				h.addElement(l);
 				l = getLabel(Message.get('edit.taxon.languageVariety'), 100, "bold");
 				h.addElement(l);
-				v.addElement(h);
-				return v;
+				result.addElement(h);
 			} else if(defn is CoordinateAttributeDefinitionProxy) {
-				v = new VGroup();
-				v.width = 308;
-				v.percentHeight = 100;
-				v.verticalAlign = "bottom";
 				//attribute label
 				l = getLabel(defn.getLabelText(), 100, "bold");
-				v.addElement(l);
+				result.addElement(l);
 				//subheader
 				h = new HGroup();
-				h.gap = 4;
+				h.gap = 6;
 				l = getLabel(Message.get('edit.coordinate.srs'), 100, "bold");
 				h.addElement(l);
 				l = getLabel(Message.get('edit.coordinate.x'), 100, "bold");
 				h.addElement(l);
 				l = getLabel(Message.get('edit.coordinate.y'), 100, "bold");
 				h.addElement(l);
-				v.addElement(h);
-				return v;
-			}else {
-				var width:Number = getAttributeDataGroupHeaderWidth(defn);
-				
-				v = new VGroup();
-				v.width = width;
-				v.percentHeight = 100;
-				v.verticalAlign = "bottom";
-				
+				result.addElement(h);
+			} else {
 				l = getLabel(defn.getLabelText(), width, "bold");
-				v.addElement(l);
-				
-				return v;
+				result.addElement(l);
 			}
+			return result;
 		}
 		
 		public static function getGridColumn(headerText:String, dataField:String, width:Number, 
@@ -479,5 +468,6 @@ package org.openforis.collect.ui {
 			}
 			return result;
 		}
+		
 	}
 }

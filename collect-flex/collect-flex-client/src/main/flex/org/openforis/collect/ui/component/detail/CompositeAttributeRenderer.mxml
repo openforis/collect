@@ -27,15 +27,6 @@
 				_subLabelWidth = value;
 			}
 			
-			override public function set isInDataGroup(value:Boolean):void {
-				super.isInDataGroup = value;
-				if(value) {
-					currentState = STATE_HORIZONTAL;
-				} else {
-					currentState = STATE_VERTICAL;
-				}
-			}
-
 			public function get inputFields():Array {
 				return _inputFields;
 			}

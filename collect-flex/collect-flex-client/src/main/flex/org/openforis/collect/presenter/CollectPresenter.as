@@ -152,13 +152,10 @@ package org.openforis.collect.presenter {
 		}
 		
 		internal function keepAliveFaultHandler(event:FaultEvent, token:Object = null):void {
-			//server offline
-			if(! Application.serverOffline) {
-				var message:String = Message.get("global.serverOffLineMsg");
-				BlockingMessagePopUp.show(Message.get("global.serverOffLine"), message, Images.ERROR);
+			faultHandler(event, token);
+			if(Application.serverOffline) {
+				_keepAliveTimer.stop();
 			}
-			Application.serverOffline = true;
-			_keepAliveTimer.stop();
 		}
 	}
 }

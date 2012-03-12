@@ -39,14 +39,14 @@ package org.openforis.collect.ui.component.input {
 		private var _attribute:AttributeProxy;
 		private var _fieldIndex:int = 0;
 		private var _presenter:InputFieldPresenter;
-		private var _isInDataGroup:Boolean = false;
 		private var _visited:Boolean = false;
+		private var _updating:Boolean = false; 
 		private var _applyChangesOnFocusOut:Boolean = true;
 		private var _formatFunction:Function;
 		private var _maxChars:int;
 		private var _restrict:String;
 		protected var _textInput:UIComponent;
-
+		
 		public function InputField() {
 			super();
 			layout = new HorizontalLayout();
@@ -230,15 +230,6 @@ package org.openforis.collect.ui.component.input {
 			_applyChangesOnFocusOut = value;
 		}
 
-		[Bindable]
-		public function get isInDataGroup():Boolean {
-			return _isInDataGroup;
-		}
-
-		public function set isInDataGroup(value:Boolean):void {
-			_isInDataGroup = value;
-		}
-
 		public function get textFormatFunction():Function {
 			return _formatFunction;
 		}
@@ -256,6 +247,15 @@ package org.openforis.collect.ui.component.input {
 			_visited = value;
 		}
 
+		[Bindable]
+		public function get updating():Boolean {
+			return _updating;
+		}
+		
+		public function set updating(value:Boolean):void {
+			_updating = value;
+		}
+		
 		[Bindable]
 		public function get maxChars():int {
 			return _maxChars;

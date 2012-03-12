@@ -6,10 +6,8 @@
  */
 
 package org.openforis.collect.metamodel.proxy {
-	import mx.collections.IList;
-	
 	import org.openforis.collect.util.CollectionUtil;
-	import org.openforis.collect.util.StringUtil;
+	import org.openforis.collect.util.UIUtil;
 	
 	/**
 	 * @author M. Togna
@@ -52,5 +50,12 @@ package org.openforis.collect.metamodel.proxy {
 			return null;
 		}
 		
+		public function get parentLayout():String {
+			if(parent != null) {
+				return parent.layout;
+			} else {
+				return UIUtil.LAYOUT_FORM;
+			}
+		}
     }
 }

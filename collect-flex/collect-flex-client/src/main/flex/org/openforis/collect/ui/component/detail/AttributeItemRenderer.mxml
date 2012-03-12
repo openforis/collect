@@ -28,7 +28,6 @@
 			private var _parentEntity:EntityProxy;
 			private var _attribute:AttributeProxy;
 			private var _attributes:IList;
-			private var _isInDataGroup:Boolean = false;
 			private var _internalLabelWidth:Number = 130;
 			private var _presenter:AttributePresenter;
 			private var _visited:Boolean;
@@ -51,15 +50,6 @@
 
 			public function set direction(value:String):void {
 				_direction = value;
-			}
-			
-			[Bindable]
-			public function get isInDataGroup():Boolean {
-				return _isInDataGroup;
-			}
-			
-			public function set isInDataGroup(value:Boolean):void {
-				_isInDataGroup = value;
 			}
 			
 			[Bindable]

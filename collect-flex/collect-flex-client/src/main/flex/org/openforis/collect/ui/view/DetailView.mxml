@@ -11,6 +11,7 @@
 		<![CDATA[
 			import mx.collections.ArrayCollection;
 			
+			import org.openforis.collect.Application;
 			import org.openforis.collect.i18n.Message;
 			import org.openforis.collect.presenter.DetailPresenter;
 			import org.openforis.collect.ui.Images;
@@ -48,14 +49,23 @@
 					<s:SolidColorStroke color="gray" alpha="0.8"/>
 				</s:stroke>
 			</s:Line>
-			<s:HGroup gap="2">
-				<s:Label id="rootEntityDefinitionText" styleName="title2" />
-				<s:Label id="keyAttributeValuesText" styleName="title2" />
+			<s:HGroup gap="4">
+				<s:Label id="recordKeyLabel" 
+						 styleName="title2"
+						 />
 			</s:HGroup>
 		</s:HGroup>
-		<s:HGroup width="50%" horizontalAlign="right" verticalAlign="middle" paddingRight="5" gap="5">
-				<mx:Text fontSize="10" fontWeight="bold" text="{Message.get('edit.formVersion')}"/>
-				<mx:Text id="formVersionText" fontSize="10" fontWeight="bold" />
+		<s:HGroup width="50%" 
+				  horizontalAlign="right" 
+				  verticalAlign="middle" 
+				  paddingRight="5" 
+				  gap="5">
+			<s:Label fontSize="10" 
+					 fontWeight="bold" 
+					 text="{Message.get('edit.formVersion')}"/>
+			<s:Label id="formVersionText" 
+					 fontSize="10" 
+					 fontWeight="bold" />
 		</s:HGroup>
 	</s:HGroup>
 	
