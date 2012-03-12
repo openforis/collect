@@ -11,7 +11,7 @@
 						  paddingLeft="20" 
 						  />
 		<s:HorizontalLayout id="horizontalLayout" 
-							gap="2" />
+							gap="4" />
 	</fx:Declarations>
 	
 	<fx:Script>

@@ -372,15 +372,16 @@ package org.openforis.collect.ui {
 			var childDefinitionsContainer:HGroup = new HGroup();
 			childDefinitionsContainer.percentHeight = 100;
 			childDefinitionsContainer.verticalAlign = "bottom";
+			childDefinitionsContainer.gap = 4;
 			var childDefn:ListCollectionView = defn.childDefinitions;
-			var width:int = 0;
+			//var width:int = 0;
 			for each (var childDef:NodeDefinitionProxy in childDefn) {
 				var elem:IVisualElement = getDataGroupHeader(childDef);
-				width += elem.width;
+				//width += elem.width;
 				childDefinitionsContainer.addElement(elem);
 			}
 			v.addElement(childDefinitionsContainer);
-			v.width = width;
+			//v.width = width;
 			
 			return v;
 		}
