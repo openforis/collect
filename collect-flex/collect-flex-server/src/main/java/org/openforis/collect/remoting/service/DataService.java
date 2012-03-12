@@ -369,7 +369,6 @@ public class DataService {
 				firstField.setSymbol(symbolChar);
 				firstField.setRemarks(remarks);
 			}
-			parentEntity.add(attribute);
 			return attribute;
 		} else {
 			Entity e = recordManager.addEntity(parentEntity, nodeDef.getName());
