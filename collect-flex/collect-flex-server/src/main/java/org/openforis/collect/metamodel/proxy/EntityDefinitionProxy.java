@@ -10,9 +10,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.commons.lang3.StringUtils;
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
-import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
-import org.openforis.idm.metamodel.NodeDefinition;
 
 /**
  * @author M. Togna
@@ -65,20 +63,12 @@ public class EntityDefinitionProxy extends NodeDefinitionProxy {
 		} else if(isMultiple()) {
 			return "table";
 		} else {
-			return "form";
-		}
-	}
-
-	private boolean hasEnumeratingCodeListAttribute() {
-		List<NodeDefinition> childDefinitions = entityDefinition.getChildDefinitions();
-		for (NodeDefinition nodeDef : childDefinitions) {
-			if(nodeDef instanceof CodeAttributeDefinition) {
-				CodeAttributeDefinition codeDef = (CodeAttributeDefinition) nodeDef;
-				if(codeDef.isKey() && codeDef.getList() != null) {
-					return true;
-				}
+			if(parent != null) {
+				return parent.getLayout();
+			} else {
+				return "form";
 			}
 		}
-		return false;
 	}
+	
 }
