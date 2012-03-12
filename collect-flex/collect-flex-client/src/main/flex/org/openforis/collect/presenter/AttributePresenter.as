@@ -54,7 +54,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function recordSavedHandler(event:ApplicationEvent):void {
-			activateValidationManager();
+			updateValidationDisplayManager();
 		}
 		
 		protected function updateResponseReceivedHandler(event:ApplicationEvent):void {
@@ -79,9 +79,7 @@ package org.openforis.collect.presenter {
 		
 		protected function fieldUpdatingChangeHandler(event:PropertyChangeEvent):void {
 			_updating = event.newValue;
-			if(_updating) {
-				updateValidationDisplayManager();
-			}
+			updateValidationDisplayManager();
 		}
 		
 		protected function attributeChangeHandler(event:Event):void {
@@ -94,6 +92,7 @@ package org.openforis.collect.presenter {
 				initValidationDisplayManager();
 			}
 			var record:RecordProxy = Application.activeRecord;
+			//to do - set visited=true to all attributes when record is saved
 			var active:Boolean = !_updating && (!isNaN(record.id) || record.saved || (_view.attribute != null && _view.attribute.visited));
 			if(active) {
 				_validationDisplayManager.active = true;
@@ -104,14 +103,5 @@ package org.openforis.collect.presenter {
 			}
 		}
 		
-		protected function activateValidationManager():void {
-			if(_validationDisplayManager == null) {
-				initValidationDisplayManager();
-			}
-			if(! _validationDisplayManager.active) {
-				_validationDisplayManager.active = true;
-				updateValidationDisplayManager();
-			}
-		}
 	}
 }

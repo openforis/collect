@@ -5,6 +5,7 @@ package org.openforis.collect.ui.component.datagrid
 	import mx.core.ClassFactory;
 	
 	import org.openforis.collect.model.proxy.RecordProxy;
+	import org.openforis.collect.util.ObjectUtil;
 	
 	import spark.components.DataGrid;
 	import spark.components.gridClasses.GridColumn;
@@ -72,9 +73,9 @@ package org.openforis.collect.ui.component.datagrid
 			if(dataField.indexOf(dataFieldPrefix) == 0) {
 				var posText:String = dataField.substring(dataFieldPrefix.length);
 				var position:int = int(posText);
-				if(position < list.length) {
+				if(position <= list.length) {
 					var value:Object = list.getItemAt(position - 1);
-					if((value is Number && !isNaN(Number(value))) || value != null) {
+					if(ObjectUtil.isNotNull(value)) {
 						return String(value);
 					}
 				}

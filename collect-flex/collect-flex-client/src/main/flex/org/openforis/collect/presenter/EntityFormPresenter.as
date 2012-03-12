@@ -75,6 +75,10 @@ package org.openforis.collect.presenter
 			var entities:IList = null;
 			if(_view.parentEntity != null && _view.entityDefinition != null) {
 				entities = _view.parentEntity.getChildren(_view.entityDefinition.name);
+				for each (var entity:EntityProxy in entities) {
+					entity.definition = _view.entityDefinition;
+					entity.updateKeyText();
+				}
 			}
 			return entities;
 		}

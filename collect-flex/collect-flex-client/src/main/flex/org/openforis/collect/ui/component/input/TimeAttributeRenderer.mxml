@@ -38,6 +38,7 @@
 								 parentEntity="{parentEntity}"
 								 attribute="{attribute}"
 								 fieldIndex="0"
+								 positive="true"
 								 textFormatFunction="{twoCharsZeroPaddingFormatFunction}"
 								 />
 		<s:Label id="separatorLabel" text="{separator}" />
@@ -48,6 +49,7 @@
 								 parentEntity="{parentEntity}"
 								 attribute="{attribute}"
 								 fieldIndex="1" 
+								 positive="true"
 								 textFormatFunction="{twoCharsZeroPaddingFormatFunction}"
 								 />
 	</s:HGroup>

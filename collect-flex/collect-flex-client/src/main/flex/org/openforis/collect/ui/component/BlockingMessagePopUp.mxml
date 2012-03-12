@@ -41,7 +41,7 @@
 		<s:Group includeIn="messageIconVisible" styleName="imageWrapper">
 			<s:Image source="{messageIconClass}" />
 		</s:Group>
-		<s:Label text="{message}" styleName="blockingMessageText" />
+		<s:Label text="{message}" styleName="blockingMessageText" maxWidth="400" />
 	</s:HGroup>
 	
 </s:TitleWindow>

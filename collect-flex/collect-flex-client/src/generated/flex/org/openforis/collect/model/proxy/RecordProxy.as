@@ -62,6 +62,8 @@ package org.openforis.collect.model.proxy {
 							var f:FieldProxy = a.getField(i);
 							f.value = response.updatedFieldValues.get(i);
 						}
+						parent = getNode(node.parentId) as EntityProxy;
+						parent.updateKeyText();
 					}
 				} else if(node is EntityProxy) {
 					var e:EntityProxy = EntityProxy(node);

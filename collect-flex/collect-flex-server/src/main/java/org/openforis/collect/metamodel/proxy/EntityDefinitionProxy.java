@@ -53,8 +53,8 @@ public class EntityDefinitionProxy extends NodeDefinitionProxy {
 	}
 
 	@ExternalizedProperty
-	public boolean isEnumerated() {
-		return entityDefinition.isMultiple() && hasEnumeratingCodeListAttribute();
+	public boolean isEnumerable() {
+		return entityDefinition.isMultiple() && entityDefinition.isEnumerable();
 	}
 
 	@ExternalizedProperty

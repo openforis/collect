@@ -102,16 +102,6 @@
 				}
 			}
 			
-			private function dropDownLabelFunction(item:Object):String {
-				var result:String;
-				if(item is EntityProxy) {
-					result = EntityProxy(item).getKeyLabel(entityDefinition);
-				} else {
-					result = "";
-				}
-				return result;
-			}
-			
 			[Bindable]
 			public function get entityDefinition():EntityDefinitionProxy {
 				return _entityDefinition;
@@ -214,7 +204,7 @@
 			<s:DropDownList id="dropDownList"
 							prompt="{Message.get('global.dropDownPrompt')}" 
 							width="150" 
-							labelFunction="dropDownLabelFunction"
+							labelField="keyText"
 							dataProvider="{entities}"
 							/>
 			<s:Button id="addButton" styleName="addButton" buttonMode="true" useHandCursor="true" />

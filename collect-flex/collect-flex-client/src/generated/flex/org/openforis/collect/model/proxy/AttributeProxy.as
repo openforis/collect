@@ -45,8 +45,8 @@ package org.openforis.collect.model.proxy {
 							default:
 								message = r.ruleName;
 						}
-						parts.push(message);
 					}
+					parts.push(message);
 				}
 				if(parts.length > 0) {
 					return StringUtil.concat(";\n", parts);
