@@ -300,22 +300,23 @@ public class DataService {
 	}
 	
 	
-	private void prepareUpdateResponse(Map<Integer, UpdateResponse> responseMap, Set<NodePointer> relevanceReqquiredDependencies, Set<Attribute<?, ?>> validtionResultsDependencies, List<Entity> ancestors) {
+	private void prepareUpdateResponse(Map<Integer, UpdateResponse> responseMap, Set<NodePointer> relevanceRequiredDependencies, Set<Attribute<?, ?>> validtionResultsDependencies, List<Entity> ancestors) {
 		if (ancestors != null) {
 			for (Entity entity : ancestors) {
 				// entity could be root definition
 				Entity parent = entity.getParent();
 				if (parent != null && !parent.isDetached()) {
-					UpdateResponse response = getUpdateResponse(responseMap, parent.getInternalId());
 					String childName = entity.getName();
-					response.setMinCountValid(childName, parent.validateMinCount(childName));
+					UpdateResponse response = getUpdateResponse(responseMap, parent.getInternalId());
 					response.setRelevant(childName, parent.isRelevant(childName));
 					response.setRequired(childName, parent.isRequired(childName));
+					response.setMinCountValid(childName, parent.validateMinCount(childName));
+					response.setMaxCountValid(childName, parent.validateMaxCount(childName));
 				}
 			}
 		}
-		if (relevanceReqquiredDependencies != null) {
-			for (NodePointer nodePointer : relevanceReqquiredDependencies) {
+		if (relevanceRequiredDependencies != null) {
+			for (NodePointer nodePointer : relevanceRequiredDependencies) {
 				Entity entity = nodePointer.getEntity();
 				if (!entity.isDetached()) {
 					String childName = nodePointer.getChildName();
@@ -323,6 +324,7 @@ public class DataService {
 					response.setRelevant(childName, entity.isRelevant(childName));
 					response.setRequired(childName, entity.isRequired(childName));
 					response.setMinCountValid(childName, entity.validateMinCount(childName));
+					response.setMaxCountValid(childName, entity.validateMaxCount(childName));
 				}
 			}
 		}
