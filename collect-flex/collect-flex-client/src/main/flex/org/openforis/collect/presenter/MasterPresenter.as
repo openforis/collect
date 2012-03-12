@@ -52,13 +52,7 @@ package org.openforis.collect.presenter {
 		 * */
 		internal function recordSelectedHandler(uiEvent:UIEvent):void {
 			var record:RecordProxy = uiEvent.obj as RecordProxy;
-			var id:Number = record.id;
-			var step:int;
-			if(record.step == CollectRecord$Step.ANALYSIS) {
-				AlertUtil.showMessage("list.error.cannotEdit.recordPromotedToAnalysis");
-				return;
-			}
-			_dataClient.loadRecord(new AsyncResponder(loadRecordResultHandler, faultHandler, record), id, record.step);
+			_dataClient.loadRecord(new AsyncResponder(loadRecordResultHandler, faultHandler, record), record.id, record.step);
 		}
 		
 		/**
@@ -74,9 +68,6 @@ package org.openforis.collect.presenter {
 		 * */
 		protected function loadRecordResultHandler(event:ResultEvent, token:Object = null):void {
 			var record:RecordProxy = RecordProxy(event.result);
-			//var summary:RecordSummaryProxy = token as RecordSummaryProxy;
-			//record.rootEntityKeys = summary.rootEntityKeys;
-			
 			setActiveRecord(record);
 		}
 		
