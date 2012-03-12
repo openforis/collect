@@ -6,6 +6,7 @@ package org.openforis.collect.presenter {
 	import flash.events.Event;
 	import flash.events.MouseEvent;
 	
+	import mx.binding.utils.ChangeWatcher;
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.events.ResultEvent;
 	
@@ -14,9 +15,11 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.client.DataClient;
 	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.event.UIEvent;
+	import org.openforis.collect.i18n.Message;
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
 	import org.openforis.collect.model.CollectRecord$Step;
+	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.model.proxy.RecordProxy;
 	import org.openforis.collect.ui.UIBuilder;
 	import org.openforis.collect.ui.component.detail.FormContainer;
@@ -50,37 +53,50 @@ package org.openforis.collect.presenter {
 		 * */
 		internal function activeRecordChangedListener(event:UIEvent):void {
 			var activeRecord:RecordProxy = Application.activeRecord;
-			var activeRootEntity:EntityDefinitionProxy = Application.activeRootEntity;
-			
-			var keys:Array = activeRecord.rootEntityKeys.toArray();
-			var keyValues:String = StringUtil.concat(", ", keys);
-			
 			var version:ModelVersionProxy = activeRecord.version;
-			_view.keyAttributeValuesText.text = keyValues;
-			_view.rootEntityDefinitionText.text = activeRootEntity.getLabelText();
-			_view.formVersionText.text = version.getLabelText();
-			var submitButtonVisible:Boolean = activeRecord.step == CollectRecord$Step.ENTRY || 
-				activeRecord.step == CollectRecord$Step.CLEANSING;
-			_view.submitButton.visible = _view.submitButton.includeInLayout = submitButtonVisible;
+			var rootEntityDefn:EntityDefinitionProxy = Application.activeRootEntity;
+			var rootEntity:EntityProxy = activeRecord.rootEntity;
+			rootEntity.definition = rootEntityDefn;
+			rootEntity.updateKeyText();
+			updateRecordKeyLabel();
+			ChangeWatcher.watch(rootEntity, "keyText", updateRecordKeyLabel);
 			
-			var rejectButtonVisible:Boolean = activeRecord.step == CollectRecord$Step.CLEANSING || 
+			_view.formVersionText.text = version.getLabelText();
+			
+			var canSubmit:Boolean = activeRecord.step == CollectRecord$Step.ENTRY || 
+				activeRecord.step == CollectRecord$Step.CLEANSING;
+			_view.submitButton.visible = _view.submitButton.includeInLayout = canSubmit;
+			
+			var canReject:Boolean = activeRecord.step == CollectRecord$Step.CLEANSING || 
 				activeRecord.step == CollectRecord$Step.ANALYSIS;
-			_view.rejectButton.visible = _view.rejectButton.includeInLayout = rejectButtonVisible;
+			_view.rejectButton.visible = _view.rejectButton.includeInLayout = canReject;
 			
 			var form:FormContainer = null;
-			if (_view.formsContainer.contatinsForm(version,activeRootEntity)){
+			if (_view.formsContainer.contatinsForm(version,rootEntityDefn)){
 				_view.currentState = DetailView.EDIT_STATE;
-				form = _view.formsContainer.getForm(version, activeRootEntity);
+				form = _view.formsContainer.getForm(version, rootEntityDefn);
 			} else {
 				//build form 
 				_view.currentState = DetailView.LOADING_STATE;
-				form = UIBuilder.buildForm(activeRootEntity, version);
-				_view.formsContainer.addForm(form, version, activeRootEntity);
+				form = UIBuilder.buildForm(rootEntityDefn, version);
+				_view.formsContainer.addForm(form, version, rootEntityDefn);
 				_view.currentState = DetailView.EDIT_STATE;
 			}
 			
-			form = _view.formsContainer.setActiveForm(version, activeRootEntity);
+			form = _view.formsContainer.setActiveForm(version, rootEntityDefn);
 			form.record = activeRecord;
+		}
+		
+		protected function updateRecordKeyLabel(event:Event = null):void {
+			var result:String;
+			var rootEntityLabel:String = Application.activeRootEntity.getLabelText();
+			var keyText:String = Application.activeRecord.rootEntity.keyText;
+			if(StringUtil.isBlank(keyText) && isNaN(Application.activeRecord.id)) {
+				result = Message.get('edit.newRecordKeyLabel', [rootEntityLabel]);
+			} else {
+				result = StringUtil.concat("  ", rootEntityLabel, keyText);
+			}
+			_view.recordKeyLabel.text = result;
 		}
 		
 		/**
@@ -133,13 +149,14 @@ package org.openforis.collect.presenter {
 		}
 		
 		internal function saveActiveRecordResultHandler(event:ResultEvent, token:Object = null):void {
+			Application.activeRecord.saved = true;
 			var applicationEvent:ApplicationEvent = new ApplicationEvent(ApplicationEvent.RECORD_SAVED);
 			eventDispatcher.dispatchEvent(applicationEvent);
 		}
 		
 		internal function promoteRecordResultHandler(event:ResultEvent, token:Object = null):void {
 			var r:RecordProxy = Application.activeRecord;
-			var keyLabel:String = r.rootEntity.getKeyLabel(Application.activeRootEntity);
+			var keyLabel:String = r.rootEntity.keyText;
 			AlertUtil.showMessage("edit.recordSubmitted", [keyLabel]);
 			Application.activeRecord = null;
 			var uiEvent:UIEvent = new UIEvent(UIEvent.BACK_TO_LIST);
@@ -148,7 +165,7 @@ package org.openforis.collect.presenter {
 		
 		internal function rejectRecordResultHandler(event:ResultEvent, token:Object = null):void {
 			var r:RecordProxy = Application.activeRecord;
-			var keyLabel:String = r.rootEntity.getKeyLabel(Application.activeRootEntity);
+			var keyLabel:String = r.rootEntity.keyText;
 			AlertUtil.showMessage("edit.recordRejected", [keyLabel]);
 			Application.activeRecord = null;
 			var uiEvent:UIEvent = new UIEvent(UIEvent.BACK_TO_LIST);

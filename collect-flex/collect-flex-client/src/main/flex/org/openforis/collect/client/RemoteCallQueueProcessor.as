@@ -15,6 +15,7 @@ package org.openforis.collect.client {
 	public class RemoteCallQueueProcessor {
 		private var _queue:Queue; //queue of ProcessableItem objects
 		private var _responder:IResponder;
+		private var _lastCall:RemoteCallWrapper;
 		private var _resultHandler:Function;
 		private var _faultHandler:Function;
 		private var _maxAttempts:int;
@@ -62,6 +63,7 @@ package org.openforis.collect.client {
 		protected function callResultHandler(event:ResultEvent, token:Object = null):void {
 			var call:RemoteCallWrapper = RemoteCallWrapper(_queue.pop()); //removes the first element
 			call.reset();
+			_lastCall = call;
 			_resultHandler(event, call.token);
 			if(call.resultHandler != null) {
 				call.resultHandler(event, token);
@@ -90,6 +92,10 @@ package org.openforis.collect.client {
 		private function getHeadElement():RemoteCallWrapper {
 			var call:RemoteCallWrapper = RemoteCallWrapper(_queue.element);
 			return call;
+		}
+		
+		public function get lastCall():RemoteCallWrapper {
+			return _lastCall;
 		}
 
 	}

@@ -25,7 +25,7 @@ package org.openforis.collect.client {
 		}
 		
 		public function send():AsyncToken {
-			var token:AsyncToken = this._operation.send.apply(null, this._args) as AsyncToken; 
+			var token:AsyncToken = _operation.send.apply(null, this._args) as AsyncToken; 
 			//token.addResponder(this._responder);
 			this._active = true;
 			this._attempts ++;
@@ -67,6 +67,9 @@ package org.openforis.collect.client {
 		public function set token(value:Object):void {
 			_token = value;
 		}
-
+		
+		public function get operation():AbstractOperation {
+			return _operation;
+		}
 	}
 }

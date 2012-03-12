@@ -4,8 +4,9 @@
 package org.openforis.collect.remoting.service;
 
 import org.openforis.collect.manager.SessionManager;
-import org.openforis.collect.session.SessionState;
+import org.openforis.collect.web.session.SessionState;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.annotation.Secured;
 
 /**
  * @author M. Togna
@@ -21,7 +22,7 @@ public class SessionService {
 	/**
 	 * Method used to keep the session alive
 	 */
-	//@RemotingInclude
+//	@Secured("isAuthenticated()")
 	public void keepAlive() {
 		this.sessionManager.keepSessionAlive();
 	}
@@ -30,7 +31,6 @@ public class SessionService {
 	 * Return the session state of the active httpsession
 	 * 
 	 */
-	//@RemotingInclude
 	public SessionState getSessionState() {
 		return this.sessionManager.getSessionState();
 	}

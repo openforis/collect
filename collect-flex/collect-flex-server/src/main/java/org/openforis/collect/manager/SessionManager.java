@@ -10,7 +10,8 @@ import org.apache.commons.logging.LogFactory;
 import org.granite.context.GraniteContext;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.User;
-import org.openforis.collect.session.SessionState;
+import org.openforis.collect.web.session.InvalidSessionException;
+import org.openforis.collect.web.session.SessionState;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -32,8 +33,7 @@ public class SessionManager {
 	public SessionState getSessionState() {
 		SessionState sessionState = (SessionState) getSessionAttribute(SessionState.SESSION_ATTRIBUTE_NAME);
 		if (sessionState == null) {
-			sessionState = new SessionState();
-			setSessionAttribute(SessionState.SESSION_ATTRIBUTE_NAME, sessionState);
+			throw new InvalidSessionException();
 		}
 
 		User user = getLoggedInUser();

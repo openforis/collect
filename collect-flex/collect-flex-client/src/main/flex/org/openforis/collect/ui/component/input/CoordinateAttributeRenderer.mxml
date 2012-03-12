@@ -31,7 +31,7 @@
 		<s:State name="vertical" />
 	</detail:states>
 	
-	<s:HGroup includeIn="horizontal" gap="4">
+	<s:HGroup includeIn="horizontal" gap="6">
 		<input:DropDownInputField id="srsDropDownList" 
 								  attributeDefinition="{attributeDefinition}"
 								  parentEntity="{parentEntity}"

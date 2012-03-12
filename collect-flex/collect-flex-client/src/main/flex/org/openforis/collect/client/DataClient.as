@@ -1,4 +1,7 @@
 package org.openforis.collect.client {
+	import flash.net.URLRequest;
+	import flash.net.navigateToURL;
+	
 	import mx.collections.IList;
 	import mx.rpc.AsyncToken;
 	import mx.rpc.IResponder;
@@ -9,9 +12,12 @@ package org.openforis.collect.client {
 	import org.openforis.collect.Application;
 	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.event.EventDispatcherFactory;
+	import org.openforis.collect.i18n.Message;
 	import org.openforis.collect.model.CollectRecord$Step;
 	import org.openforis.collect.model.proxy.FieldProxy;
 	import org.openforis.collect.remoting.service.UpdateRequest;
+	import org.openforis.collect.ui.Images;
+	import org.openforis.collect.ui.component.BlockingMessagePopUp;
 	import org.openforis.collect.ui.component.input.InputField;
 	import org.openforis.collect.util.AlertUtil;
 	import org.openforis.collect.util.UIUtil;
@@ -22,7 +28,7 @@ package org.openforis.collect.client {
 	 * */
 	public class DataClient extends AbstractClient {
 		
-		private var _updateQueueProcessor:RemoteCallQueueProcessor;
+		private var _queueProcessor:RemoteCallQueueProcessor;
 
 		private var _updateActiveRecordOperation:Operation;
 		private var _saveActiveRecordOperation:Operation;
@@ -39,7 +45,7 @@ package org.openforis.collect.client {
 		public function DataClient() {
 			super("dataService");
 			
-			this._updateQueueProcessor = new RemoteCallQueueProcessor(1, updateResultHandler, updateFaultHandler);
+			this._queueProcessor = new RemoteCallQueueProcessor(1, queueResultHandler, queueFaultHandler);
 			this._updateActiveRecordOperation = getOperation("updateActiveRecord");
 			this._saveActiveRecordOperation = getOperation("saveActiveRecord");
 			this._createRecordOperation = getOperation("createRecord");
@@ -59,11 +65,7 @@ package org.openforis.collect.client {
 		}
 		
 		public function saveActiveRecord(resultHandler:Function = null, faultHandler:Function = null, token:Object = null):void {
-			this._updateQueueProcessor.appendOperation(token, resultHandler, faultHandler, _saveActiveRecordOperation);
-			/*
-			var token:AsyncToken = this._saveActiveRecordOperation.send();
-			token.addResponder(responder);
-			*/
+			this._queueProcessor.appendOperation(token, resultHandler, faultHandler, _saveActiveRecordOperation);
 		}
 		
 		public function deleteRecord(responder:IResponder, id:int):void {
@@ -89,7 +91,7 @@ package org.openforis.collect.client {
 		
 		public function updateActiveRecord(request:UpdateRequest, token:UpdateRequestToken = null, 
 										   resultHandler:Function = null, faultHandler:Function = null):void {
-			this._updateQueueProcessor.appendOperation(token, resultHandler, faultHandler, _updateActiveRecordOperation, request);
+			this._queueProcessor.appendOperation(token, resultHandler, faultHandler, _updateActiveRecordOperation, request);
 		}
 		
 		public function promoteActiveRecord(responder:IResponder):void {
@@ -113,7 +115,18 @@ package org.openforis.collect.client {
 			token.addResponder(responder);
 		}
 		
-		protected function updateResultHandler(event:ResultEvent, token:Object = null):void {
+		protected function queueResultHandler(event:ResultEvent, token:Object = null):void {
+			var lastCall:RemoteCallWrapper = _queueProcessor.lastCall;
+			if(lastCall != null) {
+				switch(lastCall.operation) {
+					case _updateActiveRecordOperation:
+						updateActiveRecordResultHandler(event, token as UpdateRequestToken);
+						break;
+				}
+			}
+		}
+			
+		protected function updateActiveRecordResultHandler(event:ResultEvent, token:UpdateRequestToken):void {
 			var field:FieldProxy;
 			if(token != null && token is UpdateRequestToken) {
 				switch(UpdateRequestToken(token).type) {
@@ -121,8 +134,8 @@ package org.openforis.collect.client {
 						//do not break, apply symbol to field
 					case UpdateRequestToken.TYPE_UPDATE_SYMBOL:
 						for each (field in token.updatedFields) {
-							field.symbol = token.symbol;
-						}
+						field.symbol = token.symbol;
+					}
 						break;
 					case UpdateRequestToken.TYPE_UPDATE_REMARKS:
 						for each (field in token.updatedFields) {
@@ -138,37 +151,21 @@ package org.openforis.collect.client {
 			EventDispatcherFactory.getEventDispatcher().dispatchEvent(appEvt);
 		}
 
-		protected function updateFaultHandler(event:FaultEvent, token:Object = null):void {
-			if(token != null && token is UpdateRequestToken) {
-				var updateRequestToken:UpdateRequestToken = UpdateRequestToken(token);
-				var inputField:InputField = token != null ? token.inputField: null;
-				var fieldLabel:String = inputField != null ? inputField.attributeDefinition.getLabelText(): "";
-				AlertUtil.showConfirm("global.confirmRetryUpdate", 
-					[fieldLabel, event.fault.faultCode, event.fault.faultString], null, 
-					retryUpdateHandler, doNotRetryUpdateHandler);
-			} else {
-				var operation:String = "";
-				AlertUtil.showConfirm("global.confirmRetryOperation", 
-					[operation, event.fault.faultCode, event.fault.faultString], null, 
-					retryUpdateHandler, doNotRetryUpdateHandler);
-			}
-		}
-		
-		protected function retryUpdateHandler():void {
-			_updateQueueProcessor.sendHeadRemoteCall();
-		}
-		
-		protected function doNotRetryUpdateHandler():void {
-			var call:RemoteCallWrapper = _updateQueueProcessor.removeHeadOperation();
-			if(call != null && call.token != null && call.token is UpdateRequestToken) {
-				var token:UpdateRequestToken = UpdateRequestToken(call.token);
-				var inputField:InputField = token.inputField;
-				if(inputField != null) {
-					if(inputField.textInput != null) {
-						inputField.textInput.setFocus();
+		protected function queueFaultHandler(event:FaultEvent, token:Object = null):void {
+			var faultCode:String = event.fault.faultCode;
+			switch(faultCode) {
+				case "org.openforis.collect.web.session.InvalidSessionException":
+					var u:URLRequest = new URLRequest(Application.URL +"login.htm?session_expired=1");
+					Application.activeRecord = null;
+					navigateToURL(u,"_self");
+					break;
+				default:
+					if(! Application.serverOffline) {
+						var message:String = Message.get("global.faultHandlerMsg", [faultCode, event.fault.faultString]);
+						BlockingMessagePopUp.show(Message.get("global.errorAlertTitle"), message, Images.ERROR);
 					}
-					UIUtil.ensureElementIsVisible(inputField);
-				}
+					Application.serverOffline = true;
+					Application.activeRecord = null;
 			}
 		}
 		

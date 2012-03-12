@@ -1,6 +1,8 @@
 package org.openforis.collect.presenter {
 	
 	import flash.events.EventDispatcher;
+	import flash.net.URLRequest;
+	import flash.net.navigateToURL;
 	
 	import mx.controls.Alert;
 	import mx.rpc.events.FaultEvent;
@@ -30,6 +32,11 @@ package org.openforis.collect.presenter {
 		public static function faultHandler(event:FaultEvent, token:Object=null):void {
 			var faultCode:String = event.fault.faultCode;
 			switch(faultCode) {
+				case "org.openforis.collect.web.session.InvalidSessionException":
+					var u:URLRequest = new URLRequest(Application.URL +"login.htm?session_expired=1");
+					Application.activeRecord = null;
+					navigateToURL(u,"_self");
+					break;
 				case "org.openforis.collect.persistence.AccessDeniedException":
 					AlertUtil.showError('error.accessDenied');
 					break;
@@ -43,10 +50,12 @@ package org.openforis.collect.presenter {
 					"Client.Error.MessageSend"
 					"Client.Error.DeliveryInDoubt"
 				default:
-					Alert.show(Message.get("global.faultHandlerMsg")
-						+"\n\n"+ event.fault.faultCode
-						+"\n\n"+ event.fault.faultString
-					);
+					if(! Application.serverOffline) {
+						var message:String = Message.get("global.faultHandlerMsg", [faultCode, event.fault.faultString]);
+						BlockingMessagePopUp.show(Message.get("global.errorAlertTitle"), message, Images.ERROR);
+					}
+					Application.serverOffline = true;
+					Application.activeRecord = null;
 			}
 		}
 		

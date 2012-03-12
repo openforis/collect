@@ -35,6 +35,7 @@ package org.openforis.collect.util {
 	import org.openforis.collect.model.SurveySummary;
 	import org.openforis.collect.model.UIConfiguration;
 	import org.openforis.collect.model.UITab;
+	import org.openforis.collect.model.UITabDefinition;
 	import org.openforis.collect.model.proxy.AttributeProxy;
 	import org.openforis.collect.model.proxy.CodeProxy;
 	import org.openforis.collect.model.proxy.CoordinateProxy;
@@ -106,6 +107,7 @@ package org.openforis.collect.util {
 				TimeAttributeDefinitionProxy,
 				TimeProxy,
 				UIConfiguration,
+				UITabDefinition,
 				UITab,
 				UnitProxy,
 				UpdateResponse,

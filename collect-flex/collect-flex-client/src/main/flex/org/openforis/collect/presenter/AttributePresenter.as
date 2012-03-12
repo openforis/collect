@@ -4,6 +4,7 @@ package org.openforis.collect.presenter {
 	import mx.binding.utils.ChangeWatcher;
 	import mx.collections.IList;
 	import mx.core.UIComponent;
+	import mx.events.PropertyChangeEvent;
 	
 	import org.openforis.collect.Application;
 	import org.openforis.collect.event.ApplicationEvent;
@@ -23,12 +24,14 @@ package org.openforis.collect.presenter {
 		
 		protected var _view:AttributeItemRenderer;
 		private var _validationDisplayManager:ValidationDisplayManager;
+		private var _updating:Boolean = false;
 		
 		public function AttributePresenter(view:AttributeItemRenderer) {
 			_view = view;
 			var inputField:InputField = _view.getElementAt(0) as InputField;
 			if(inputField != null) {
 				ChangeWatcher.watch(inputField, "visited", fieldVisitedHandler);
+				ChangeWatcher.watch(inputField, "updating", fieldUpdatingChangeHandler);
 			}
 			super();
 		}
@@ -51,7 +54,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function recordSavedHandler(event:ApplicationEvent):void {
-			updateValidationDisplayManager(true);
+			updateValidationDisplayManager();
 		}
 		
 		protected function updateResponseReceivedHandler(event:ApplicationEvent):void {
@@ -67,8 +70,15 @@ package org.openforis.collect.presenter {
 			}
 		}
 		
-		protected function fieldVisitedHandler(event:Event):void {
-			_view.visited = true;
+		protected function fieldVisitedHandler(event:PropertyChangeEvent):void {
+			if(event.newValue == true && _view.attribute != null) {
+				_view.attribute.visited = true;
+			}
+			updateValidationDisplayManager();
+		}
+		
+		protected function fieldUpdatingChangeHandler(event:PropertyChangeEvent):void {
+			_updating = event.newValue;
 			updateValidationDisplayManager();
 		}
 		
@@ -77,12 +87,13 @@ package org.openforis.collect.presenter {
 			updateValidationDisplayManager();
 		}
 		
-		protected function updateValidationDisplayManager(forceActivation:Boolean = false):void {
+		protected function updateValidationDisplayManager():void {
 			if(_validationDisplayManager == null) {
 				initValidationDisplayManager();
 			}
 			var record:RecordProxy = Application.activeRecord;
-			var active:Boolean = _validationDisplayManager.active || forceActivation || !isNaN(record.id) || _view.visited;
+			//to do - set visited=true to all attributes when record is saved
+			var active:Boolean = !_updating && (!isNaN(record.id) || record.saved || (_view.attribute != null && _view.attribute.visited));
 			if(active) {
 				_validationDisplayManager.active = true;
 				_validationDisplayManager.displayNodeValidation(_view.parentEntity, _view.attributeDefinition, _view.attribute);
@@ -91,5 +102,6 @@ package org.openforis.collect.presenter {
 				_validationDisplayManager.reset();
 			}
 		}
+		
 	}
 }

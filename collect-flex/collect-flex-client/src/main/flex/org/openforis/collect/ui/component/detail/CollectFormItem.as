@@ -15,7 +15,6 @@ package org.openforis.collect.ui.component.detail {
 		
 		private var _parentEntity:EntityProxy;
 		private var _childrenAdded:Boolean = false;
-		private var _isInDataGroup:Boolean = false;
 		protected var _presenter:FormItemPresenter;
 		
 		public function CollectFormItem() {
@@ -40,14 +39,6 @@ package org.openforis.collect.ui.component.detail {
 		}
 		
 		[Bindable]
-		public function get isInDataGroup():Boolean {
-			return _isInDataGroup;
-		}
-		
-		public function set isInDataGroup(value:Boolean):void {
-			_isInDataGroup = value;
-		}
-		
 		protected function get childrenAdded():Boolean {
 			return _childrenAdded;
 		}

@@ -9,20 +9,25 @@ package org.openforis.collect.model.proxy {
 	import flash.utils.Dictionary;
 	
 	import mx.collections.ArrayCollection;
-	import mx.collections.ArrayList;
 	import mx.collections.IList;
 	
 	import org.granite.collections.IMap;
 	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
-	import org.openforis.collect.util.CollectionUtil;
+	import org.openforis.collect.metamodel.proxy.NumberAttributeDefinitionProxy;
+	import org.openforis.collect.metamodel.proxy.NumberAttributeDefinitionProxy$Type;
+	import org.openforis.collect.util.ObjectUtil;
 	import org.openforis.collect.util.StringUtil;
 
     [Bindable]
     [RemoteClass(alias="org.openforis.collect.model.proxy.EntityProxy")]
     public class EntityProxy extends EntityProxyBase {
 		
+		private static const KEY_LABEL_SEPARATOR:String = "-";
+		
 		private var nodesMap:Dictionary;
+		private var _keyText:String;
+		private var _definition:EntityDefinitionProxy;
 		
 		public function getSingleAttribute(attributeName:String):AttributeProxy {
 			var attributes:IList = childrenByName.get(attributeName);
@@ -145,22 +150,45 @@ package org.openforis.collect.model.proxy {
 			}
 		}
 		
-		public function getKeyLabel(entityDefinition:EntityDefinitionProxy):String {
-			var keyDefs:IList = entityDefinition.keyAttributeDefinitions;
-			var keyParts:Array = new Array();
-			for each (var def:AttributeDefinitionProxy in keyDefs) {
-				var key:AttributeProxy = getSingleAttribute(def.name);
-				if(key != null) {
-					var value:Object = key.getField(0).value;
-					if(value != null) {
-						var keyPart:String = value.toString();
+		public function updateKeyText():void {
+			if(_definition != null) {
+				var keyDefs:IList = _definition.keyAttributeDefinitions;
+				var keyParts:Array = new Array();
+				for each (var def:AttributeDefinitionProxy in keyDefs) {
+					var key:AttributeProxy = getSingleAttribute(def.name);
+					if(key != null) {
+						var keyPart:String = getKeyLabelPart(def, key);
 						if(StringUtil.isNotBlank(keyPart)) {
 							keyParts.push(keyPart);
 						}
 					}
 				}
+				keyText = StringUtil.concat(KEY_LABEL_SEPARATOR, keyParts);
+			} else {
+				keyText = "";
 			}
-			return StringUtil.concat(" - ", keyParts);
+		}
+		
+		private function getKeyLabelPart(attributeDefn:AttributeDefinitionProxy, attribute:AttributeProxy):String {
+			var result:String = null;
+			var f:FieldProxy = attribute.getField(0);
+			var value:Object = f.value;
+			if(ObjectUtil.isNotNull(value)) {
+				if(attributeDefn is NumberAttributeDefinitionProxy) {
+					var numberDefn:NumberAttributeDefinitionProxy = NumberAttributeDefinitionProxy(attributeDefn);
+					switch(numberDefn.type) {
+						case NumberAttributeDefinitionProxy$Type.INTEGER:
+							result = int(value).toString();
+							break;
+						case NumberAttributeDefinitionProxy$Type.REAL:
+						default:
+							result = Number(value).toString();
+					}
+				} else {
+					result = value.toString();
+				}
+			}
+			return result;
 		}
 		
 		public function updateChildrenMinCountValiditationMap(map:IMap):void {
@@ -190,5 +218,22 @@ package org.openforis.collect.model.proxy {
 				}
 			}
 		}
+
+		public function get keyText():String {
+			return _keyText;
+		}
+		
+		public function set keyText(value:String):void {
+			_keyText = value;
+		}
+		
+		public function get definition():EntityDefinitionProxy {
+			return _definition;
+		}
+		
+		public function set definition(value:EntityDefinitionProxy):void {
+			_definition = value;
+		}
+		
 	}
 }

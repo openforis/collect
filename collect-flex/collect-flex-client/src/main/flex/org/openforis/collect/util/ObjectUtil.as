@@ -25,5 +25,13 @@ package org.openforis.collect.util
 			}
 			return null;
 		}
+		
+		public static function isNull(item:Object):Boolean {
+			return (item is Number && isNaN(Number(item))) || item == null;
+		}
+
+		public static function isNotNull(item:Object):Boolean {
+			return ! isNull(item);
+		}
 	}
 }

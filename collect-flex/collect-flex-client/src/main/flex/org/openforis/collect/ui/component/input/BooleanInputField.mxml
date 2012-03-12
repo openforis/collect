@@ -7,6 +7,7 @@
 	<fx:Script>
 		<![CDATA[
 			import org.openforis.collect.presenter.BooleanInputFieldPresenter;
+			import org.openforis.collect.util.UIUtil;
 			
 			override protected function initPresenter():void {
 				this.presenter = new BooleanInputFieldPresenter(this);
@@ -20,7 +21,7 @@
 	</input:layout>
 	
 	<input:TextInput id="textInput" width="20" 
-					 horizontalCenter="{isInDataGroup ? 0: NaN}" 
+					 horizontalCenter="{attributeDefinition.parentLayout == UIUtil.LAYOUT_TABLE ? 0: NaN}" 
 					 maxChars="1" 
 					 minWidth="0" />
 	

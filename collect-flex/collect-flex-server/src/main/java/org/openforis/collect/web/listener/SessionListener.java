@@ -14,7 +14,8 @@ import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.RecordLockedException;
-import org.openforis.collect.session.SessionState;
+import org.openforis.collect.web.session.SessionState;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -28,6 +29,13 @@ public class SessionListener implements HttpSessionListener {
 
 	@Override
 	public void sessionCreated(HttpSessionEvent se) {
+		HttpSession session = se.getSession();
+		String sessionId = session.getId();
+		SessionState sessionState = new SessionState(sessionId);
+		session.setAttribute(SessionState.SESSION_ATTRIBUTE_NAME, sessionState);
+		
+		//remove user from security conxtext holder
+		SecurityContextHolder.getContext().setAuthentication(null);
 	}
 
 	@Override

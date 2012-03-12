@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.openforis.collect.session;
+package org.openforis.collect.web.session;
 
 import java.util.Locale;
 
@@ -27,6 +27,10 @@ public class SessionState {
 	private CollectSurvey activeSurvey;
 	private Locale locale;
 	private RecordState activeRecordState;
+
+	public SessionState(String sessionId) {
+		this.sessionId = sessionId;
+	}
 
 	public User getUser() {
 		return this.user;

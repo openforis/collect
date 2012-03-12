@@ -138,7 +138,7 @@ package org.openforis.collect.ui.component.detail
 			}
 		}
 		
-		public function hideToolTip(event:MouseEvent=null):void {
+		public function hideToolTip(event:MouseEvent = null):void {
 			ToolTipUtil.destroy(_toolTip);
 			_toolTip = null;
 		}
