@@ -232,7 +232,7 @@ package org.openforis.collect.ui {
 						return 100;
 					}
 				} else {
-					return 200;
+					return NaN;
 				}
 			} else if(def is CoordinateAttributeDefinitionProxy) {
 				if(parentLayout == UIUtil.LAYOUT_TABLE) {
@@ -244,6 +244,8 @@ package org.openforis.collect.ui {
 				return 132;
 			} else if(def is FileAttributeDefinitionProxy) {
 				return 300;
+			} else if(def is NumberAttributeDefinitionProxy) {
+				return 70;
 			} else if(def is RangeAttributeDefinitionProxy) {
 				return 120;
 			} else if(def is TaxonAttributeDefinitionProxy) {
@@ -259,8 +261,9 @@ package org.openforis.collect.ui {
 					case TextAttributeDefinitionProxy$Type.MEMO:
 						return 300;
 					case TextAttributeDefinitionProxy$Type.SHORT:
-					default:
 						return 100;
+					default:
+						return 150;
 				}
 			} else if(def is TimeAttributeDefinitionProxy) {
 				return 64;
