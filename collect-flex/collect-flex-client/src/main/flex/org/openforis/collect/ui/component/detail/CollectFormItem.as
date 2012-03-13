@@ -15,6 +15,7 @@ package org.openforis.collect.ui.component.detail {
 		
 		private var _parentEntity:EntityProxy;
 		private var _childrenAdded:Boolean = false;
+		private var _occupyEntirePage:Boolean = false;
 		protected var _presenter:FormItemPresenter;
 		
 		public function CollectFormItem() {
@@ -54,6 +55,16 @@ package org.openforis.collect.ui.component.detail {
 		protected function set presenter(value:FormItemPresenter):void {
 			_presenter = value;
 		}
+		
+		[Bindable]
+		public function get occupyEntirePage():Boolean {
+			return _occupyEntirePage;
+		}
+		
+		public function set occupyEntirePage(value:Boolean):void {
+			_occupyEntirePage = value;
+		}
+		
 		
 	}
 }

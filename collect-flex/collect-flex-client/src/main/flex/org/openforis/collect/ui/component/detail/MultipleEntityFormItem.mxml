@@ -7,6 +7,7 @@
 					   maxHeight="{entityDefinition.enumerable ? NaN: 350}"
 					   maxWidth="950"
 					   >
+	
 	<fx:Script>
 		<![CDATA[
 			import mx.binding.utils.BindingUtils;
@@ -22,14 +23,25 @@
 				super.creationCompleteHandler(event);
 				//bind the position of horizontal scrollbars of header and content
 				//so that the header is always aligned with the content
+				
 				BindingUtils.bindProperty(
 					headerScroller.horizontalScrollBar, "value", 
 					scroller, ["horizontalScrollBar", "value"]);
+				/*
+				BindingUtils.bindSetter(horizzontalScrollbarValueSetter,
+					headerScroller.horizontalScrollBar, "value");
+				*/
 			}
 			
 			override protected function initPresenter():void {
 				presenter = new MultipleEntityFormItemPresenter(this);
 			}
+			/*
+			protected function horizzontalScrollbarValueSetter(value:Number):void {
+				
+				headerScroller.horizontalScrollBar
+			}
+			*/
 			/*
 			[Bindable]
 			public function get constraintLayout():ConstraintLayout {
@@ -56,20 +68,32 @@
 			<s:VerticalLayout />
 		</s:layout>
 
-		<s:Label id="headerLabel" text="{entityDefinition.getLabelText()}" styleName="bold" />
-		
+		<s:Label id="headerLabel" 
+				 text="{entityDefinition.getLabelText()}" 
+				 styleName="bold" />
+	
 		<s:VGroup paddingLeft="30" 
 				  height="100%" 
 				  width="100%">
-			<s:Scroller id="headerScroller" horizontalScrollPolicy="off" verticalScrollPolicy="off" width="100%">
-				<datagroup:DataGroupHeader id="header" 
-										   nodeDefinitions="{nodeDefinitions}"
-										   />
+			<s:Scroller id="headerScroller" 
+						horizontalScrollPolicy="off" 
+						verticalScrollPolicy="off"
+						width="100%"
+						>
+				<s:HGroup gap="0">
+					<datagroup:DataGroupHeader id="header" 
+											   nodeDefinitions="{nodeDefinitions}"
+											   />
+					<!-- spacer to ensure correct alignment of the headerScroller with the dataGroup scroller -->
+					<s:Spacer 
+						includeInLayout="{scroller.verticalScrollBar != null}" 
+						width="{scroller.verticalScrollBar.width}" />
+				</s:HGroup>
 			</s:Scroller>
 				
 			<s:Scroller id="scroller" 
-						height="100%" 
 						width="100%"
+						height="100%"
 						>
 				<s:DataGroup id="dataGroup">
 					<s:layout>
