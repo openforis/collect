@@ -1,10 +1,12 @@
 package org.openforis.collect.presenter
 {
+	import flash.events.Event;
 	import flash.events.FocusEvent;
 	import flash.events.MouseEvent;
 	
 	import mx.collections.IList;
 	import mx.core.UIComponent;
+	import mx.events.CollectionEvent;
 	import mx.rpc.events.ResultEvent;
 	
 	import org.openforis.collect.client.ClientFactory;
@@ -18,6 +20,7 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.ui.component.detail.MultipleAttributeFormItem;
 	import org.openforis.collect.ui.component.detail.ValidationDisplayManager;
 	import org.openforis.collect.ui.component.input.InputField;
+	import org.openforis.collect.util.CollectionUtil;
 	import org.openforis.collect.util.UIUtil;
 
 	/**
@@ -65,6 +68,7 @@ package org.openforis.collect.presenter
 		}
 		
 		override protected function updateView():void {
+			super.updateView();
 			if(view.dataGroup != null && view.parentEntity != null) {
 				var attributes:IList = getAttributes();
 				view.dataGroup.dataProvider = attributes;
@@ -148,6 +152,14 @@ package org.openforis.collect.presenter
 				}
 			}
 			return true;
+		}
+		
+		protected function markLastAttributeAsVisited():void {
+			var attributes:IList = getAttributes();
+			if(CollectionUtil.isNotEmpty(attributes)) {
+				var lastAttribute:Object = attributes.getItemAt(attributes.length - 1);
+				lastAttribute.visited = true;
+			}
 		}
 
 	}

@@ -57,10 +57,10 @@
 			<s:VerticalLayout />
 		</s:layout>
 
-		<s:Label id="headerLabel" 
-				 text="{entityDefinition.getLabelText()}" 
-				 styleName="bold" />
-	
+		<detail:NodeLabel id="nodeLabel"
+						  nodeDefinition="{entityDefinition}" 
+						  />
+
 		<s:VGroup paddingLeft="30" 
 				  height="100%" 
 				  width="100%">
@@ -99,19 +99,20 @@
 					</s:itemRenderer>
 				</s:DataGroup>
 			</s:Scroller>
+			
+			<mx:LinkButton
+				id="addButton"
+				label="{Message.get('global.add')}" 
+				buttonMode="true" 
+				icon="{Images.ADD}" 
+				labelPlacement="left" 
+				useHandCursor="true"
+				visible="{! entityDefinition.enumerable}"
+				includeInLayout="{! entityDefinition.enumerable}"
+				/>
 		</s:VGroup>
 		
-		<mx:LinkButton
-			id="addButton"
-			label="{Message.get('global.add')}" 
-			buttonMode="true" 
-			icon="{Images.ADD}" 
-			labelPlacement="left" 
-			useHandCursor="true"
-			paddingLeft="30"
-			visible="{! entityDefinition.enumerable}"
-			includeInLayout="{! entityDefinition.enumerable}"
-			/>
+			
 	</s:BorderContainer>
 	
 </detail:EntityFormItem>

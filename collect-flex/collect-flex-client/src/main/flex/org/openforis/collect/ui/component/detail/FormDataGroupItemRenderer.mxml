@@ -45,26 +45,13 @@
 								break;
 							case UIUtil.LAYOUT_FORM:
 							default:
-								var labelGroup:HGroup = new HGroup();
-								labelGroup.gap = 2;
-								labelGroup.width = labelWidth;
-								var numberLabelProxy:NodeLabelProxy = attributeDefn.getLabel(NodeLabelProxy$Type.NUMBER);
-								if(numberLabelProxy != null) {
-									var numberLabel:Label = new Label();
-									numberLabel.styleName = "bold";
-									numberLabel.text = numberLabelProxy.text + ".";
-									numberLabel.width = 30;
-									labelGroup.addElement(numberLabel);
-								}
-								var label:Label = new Label();
-								label.styleName = "bold";
-								label.percentWidth = 100;
-								label.text = attributeDefn.getLabelText();
-								labelGroup.addElement(label);
+								var nodeLabel:NodeLabel = new NodeLabel();
+								nodeLabel.nodeDefinition = attributeDefn;
+								nodeLabel.width = labelWidth;
 								
 								if(attributeDefn is CoordinateAttributeDefinitionProxy || attributeDefn is TaxonAttributeDefinitionProxy) {
 									var vGroup:VGroup = new VGroup();
-									vGroup.addElement(labelGroup);
+									vGroup.addElement(nodeLabel);
 									var internalGroup:HGroup = new HGroup();
 									internalGroup.gap = 0;
 									var spacer:Spacer = new Spacer();
@@ -76,7 +63,7 @@
 								} else {
 									var hGroup:HGroup = new HGroup();
 									hGroup.gap = 0;
-									hGroup.addElement(labelGroup);
+									hGroup.addElement(nodeLabel);
 									hGroup.addElement(formItem);
 									addElement(hGroup);
 								}

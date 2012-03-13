@@ -81,6 +81,9 @@ package org.openforis.collect.presenter
 		
 		protected function addResultHandler(event:ResultEvent, token:Object = null):void {
 			view.callLater(function():void {
+				markAllEntitiesAsVisited();
+				updateValidationDisplayManager();
+				
 				if(view.scroller != null && view.scroller.verticalScrollBar != null) {
 					view.scroller.verticalScrollBar.value = view.scroller.verticalScrollBar.maximum;
 				}
@@ -115,6 +118,7 @@ package org.openforis.collect.presenter
 			}
 		}
 		
+		
 		protected function isVisited():Boolean {
 			var entities:IList = getEntities();
 			for each (var e:EntityProxy in entities) {
@@ -134,5 +138,13 @@ package org.openforis.collect.presenter
 			}
 			return true;
 		}
+		
+		protected function markAllEntitiesAsVisited():void {
+			var entities:IList = getEntities();
+			for each (var e:EntityProxy in entities) {
+				e.visited = true;
+			}
+		}
+		
 	}
 }
