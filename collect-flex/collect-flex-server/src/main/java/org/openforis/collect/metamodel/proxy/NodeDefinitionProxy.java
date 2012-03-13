@@ -32,7 +32,7 @@ import org.openforis.idm.metamodel.TimeAttributeDefinition;
 public class NodeDefinitionProxy implements Proxy {
 
 	private transient NodeDefinition nodeDefinition;
-	private EntityDefinitionProxy parent;
+	protected EntityDefinitionProxy parent;
 	
 	public NodeDefinitionProxy(EntityDefinitionProxy parent, NodeDefinition nodeDefinition) {
 		super();

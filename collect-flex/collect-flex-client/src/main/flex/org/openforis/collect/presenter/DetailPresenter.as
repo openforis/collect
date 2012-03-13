@@ -71,6 +71,9 @@ package org.openforis.collect.presenter {
 				activeRecord.step == CollectRecord$Step.ANALYSIS;
 			_view.rejectButton.visible = _view.rejectButton.includeInLayout = canReject;
 			
+			var canSave:Boolean = activeRecord.step != CollectRecord$Step.ANALYSIS;
+			_view.saveButton.visible = canSave;
+			
 			var form:FormContainer = null;
 			if (_view.formsContainer.contatinsForm(version,rootEntityDefn)){
 				_view.currentState = DetailView.EDIT_STATE;
@@ -149,7 +152,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		internal function saveActiveRecordResultHandler(event:ResultEvent, token:Object = null):void {
-			Application.activeRecord.saved = true;
+			Application.activeRecord.detached = false;
 			var applicationEvent:ApplicationEvent = new ApplicationEvent(ApplicationEvent.RECORD_SAVED);
 			eventDispatcher.dispatchEvent(applicationEvent);
 		}

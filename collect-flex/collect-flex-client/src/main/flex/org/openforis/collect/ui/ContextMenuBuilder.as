@@ -95,8 +95,6 @@ package org.openforis.collect.ui
 			
 			addRowItems(items, step, inputField);
 			
-			addApproveValueItems(items, step, inputField);
-			
 			cm.customItems = items;
 			cm.hideBuiltInItems();
 			return cm;
@@ -117,8 +115,14 @@ package org.openforis.collect.ui
 						break;
 				}
 			} else {
-				if(step == CollectRecord$Step.ENTRY && hasErrors(inputField) && !hasConfirmedError(inputField)) {
-					currentItems.push(APPROVE_ERROR_MENU_ITEM);
+				if(step == CollectRecord$Step.ENTRY) {
+					var hasErrors:Boolean = hasErrors(inputField);
+					if(hasErrors) {
+						var hasConfirmedError:Boolean = hasConfirmedError(inputField)
+						if(! hasConfirmedError) {
+							currentItems.push(APPROVE_ERROR_MENU_ITEM);
+						}
+					}
 				}
 			}
 			currentItems.push(EDIT_REMARKS_MENU_ITEM);
@@ -145,7 +149,7 @@ package org.openforis.collect.ui
 				var attributes:IList = ObjectUtil.getValue(inputField, "attributes") as IList;
 				for each (var a:AttributeProxy in attributes) {
 					for each (var f:FieldProxy in a.fields) {
-						if(field.symbol != FieldSymbol.CONFIRMED) {
+						if(f.symbol != FieldSymbol.CONFIRMED) {
 							return false;
 						}
 					}
@@ -162,10 +166,9 @@ package org.openforis.collect.ui
 		
 		private static function addRowItems(currentItems:Array, step:CollectRecord$Step, inputField:InputField):void {
 			var def:AttributeDefinitionProxy = inputField.attributeDefinition;
-			if(def != null && def.parentLayout == UIUtil.LAYOUT_TABLE) {
-				if(def.multiple && ! (def is CodeAttributeDefinitionProxy)) {
-					currentItems.push(DELETE_ATTRIBUTE_MENU_ITEM);
-				}
+			if(def.multiple && ! (def is CodeAttributeDefinitionProxy)) {
+				currentItems.push(DELETE_ATTRIBUTE_MENU_ITEM);
+			} else if(def.parentLayout == UIUtil.LAYOUT_TABLE) {
 				var entityDef:EntityDefinitionProxy = def.parent;
 				if(entityDef != null && entityDef.multiple) {
 					switch(step) {
@@ -185,23 +188,13 @@ package org.openforis.collect.ui
 			}			
 		}
 		
-		private static function addApproveValueItems(currentItems:Array, step:CollectRecord$Step, inputField:InputField):void {
-			var attribute:AttributeProxy = inputField.attribute;
-			if(attribute != null) {
-				/*
-				var state:NodeStateProxy = attribute.state;
-				if(step == RecordProxy$Step.ENTRY && state != null && state.hasErrors()) {
-					currentItems.push(APPROVE_ERROR_MENU_ITEM);
-				}
-				*/
-			}
-		}
-		
 		public static function menuItemSelectHandler(event:ContextMenuEvent):void {
 			var owner:InteractiveObject = event.contextMenuOwner;
 			if(owner is InputField) {
 				var field:InputField = InputField(owner);
+				var attrDefn:AttributeDefinitionProxy = field.attributeDefinition;
 				var parentEntity:EntityProxy = field.parentEntity;
+				var parentEntityDefn:EntityDefinitionProxy = attrDefn.parent;
 				currentInputField = field;
 				switch(event.target) {
 					case BLANK_ON_FORM_MENU_ITEM:
@@ -217,10 +210,10 @@ package org.openforis.collect.ui
 						remarksPopUpPresenter.openPopUp(field, true);
 						break;
 					case REPLACE_BLANKS_WITH_DASH_MENU_ITEM:
-						setSymbolInBlankChildren(parentEntity, FieldSymbol.DASH_ON_FORM);
+						setSymbolInBlankChildren(parentEntity, parentEntityDefn, FieldSymbol.DASH_ON_FORM);
 						break;
 					case REPLACE_BLANKS_WITH_STAR_MENU_ITEM:
-						setSymbolInBlankChildren(parentEntity, FieldSymbol.BLANK_ON_FORM);
+						setSymbolInBlankChildren(parentEntity, parentEntityDefn, FieldSymbol.BLANK_ON_FORM);
 						break;
 					case DELETE_ATTRIBUTE_MENU_ITEM:
 						AlertUtil.showConfirm("global.confirmDelete", [field.attributeDefinition.getLabelText()], "global.confirmAlertTitle", performDeleteAttribute);
@@ -235,7 +228,7 @@ package org.openforis.collect.ui
 						field.applySymbol(FieldSymbol.CONFIRMED);
 						break
 					case APPROVE_MISSING_VALUES_IN_ROW_MENU_ITEM:
-						setSymbolInBlankChildren(parentEntity, FieldSymbol.CONFIRMED);
+						setSymbolInBlankChildren(parentEntity, parentEntityDefn, FieldSymbol.CONFIRMED);
 						break;
 				}
 			}
@@ -267,11 +260,23 @@ package org.openforis.collect.ui
 			ClientFactory.dataClient.updateActiveRecord(req);
 		}
 
-		protected static function setSymbolInBlankChildren(entity:EntityProxy, symbol:FieldSymbol):void {
-			var children:IList = entity.getChildren();
+		protected static function setSymbolInBlankChildren(entity:EntityProxy, entityDefn:EntityDefinitionProxy, symbol:FieldSymbol):void {
+			var operations:ArrayCollection = new ArrayCollection();
 			var req:UpdateRequest = new UpdateRequest();
-			req.operations = new ArrayCollection();
 			var updatedFields:ArrayCollection = new ArrayCollection();
+			appendApplySymbolInChildrenOperations(operations, updatedFields, entity, entityDefn, symbol);
+			req.operations = operations;
+			if(CollectionUtil.isNotEmpty(req.operations)) {
+				var token:UpdateRequestToken = new UpdateRequestToken(UpdateRequestToken.TYPE_UPDATE_SYMBOL);
+				token.updatedFields = updatedFields;
+				token.symbol = symbol;
+				ClientFactory.dataClient.updateActiveRecord(req, token);
+			}
+		}
+		
+		protected static function appendApplySymbolInChildrenOperations(operations:ArrayCollection, updatedFields:ArrayCollection, 
+								entity:EntityProxy, entityDefn:EntityDefinitionProxy, symbol:FieldSymbol):void {
+			var children:IList = entity.getChildren();
 			for each (var child:NodeProxy in children) {
 				if(child is AttributeProxy) {
 					var a:AttributeProxy = AttributeProxy(child);
@@ -287,19 +292,18 @@ package org.openforis.collect.ui
 							o.remarks = field.remarks;
 							o.value = field.value != null ? field.value.toString(): null;
 							o.symbol = symbol;
-							req.operations.addItem(o);
+							operations.addItem(o);
 							updatedFields.addItem(field);
 						}
 					}
+				} else if(child is EntityProxy) {
+					var childEntiy:EntityProxy = EntityProxy(child);
+					var childEntiyDefn:EntityDefinitionProxy = EntityDefinitionProxy(entityDefn.getChildDefinition(child.name));
+					if(! childEntiyDefn.multiple) {
+						appendApplySymbolInChildrenOperations(operations, updatedFields, childEntiy, childEntiyDefn, symbol);
+					}
 				}
 			}
-			if(CollectionUtil.isNotEmpty(req.operations)) {
-				var token:UpdateRequestToken = new UpdateRequestToken(UpdateRequestToken.TYPE_UPDATE_SYMBOL);
-				token.updatedFields = updatedFields;
-				token.symbol = symbol;
-				ClientFactory.dataClient.updateActiveRecord(req, token);
-			}
 		}
-		
 	}
 }

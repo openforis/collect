@@ -219,6 +219,14 @@ package org.openforis.collect.model.proxy {
 			}
 		}
 
+		override public function set detached(value:Boolean):void {
+			super.detached = value;
+			var children:IList = getChildren();
+			for each (var child:NodeProxy in children) {
+				child.detached = value;
+			}
+		}
+		
 		public function get keyText():String {
 			return _keyText;
 		}

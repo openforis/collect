@@ -12,12 +12,11 @@ package org.openforis.collect.model.proxy {
 	import org.openforis.collect.metamodel.proxy.LanguageSpecificTextProxy;
 	import org.openforis.collect.util.CollectionUtil;
 	import org.openforis.collect.util.StringUtil;
+	import org.openforis.idm.metamodel.validation.ValidationResultFlag;
 
     [Bindable]
     [RemoteClass(alias="org.openforis.collect.model.proxy.AttributeProxy")]
     public class AttributeProxy extends AttributeProxyBase {
-		
-		private var _visited:Boolean = false;
 		
 		public function getField(index:int):FieldProxy {
 			if(index < 0) {
@@ -28,10 +27,13 @@ package org.openforis.collect.model.proxy {
 
 		public function get validationMessage():String {
 			var results:IList = null;
+			var flag:ValidationResultFlag;
 			if(hasErrors()) {
 				results = validationResults.errors;
+				flag = ValidationResultFlag.ERROR;
 			} else if(hasWarnings()) {
 				results = validationResults.warnings;
+				flag = ValidationResultFlag.WARNING;
 			}
 			if(results != null) {
 				var parts:Array = new Array();
@@ -40,7 +42,11 @@ package org.openforis.collect.model.proxy {
 					if(StringUtil.isBlank(message)) {
 						switch(r.ruleName) {
 							case "SpecifiedValidator":
-								message = Message.get("edit.validation.specifiedError");
+								if(flag == ValidationResultFlag.ERROR) {
+									message = Message.get("edit.validation.specifiedError");
+								} else {
+									message = Message.get("edit.validation.requiredWarning");
+								}
 								break;
 							default:
 								message = r.ruleName;
@@ -63,12 +69,5 @@ package org.openforis.collect.model.proxy {
 			return validationResults != null && CollectionUtil.isNotEmpty(validationResults.warnings);
 		}
 		
-		public function get visited():Boolean {
-			return _visited;
-		}
-		
-		public function set visited(value:Boolean):void {
-			_visited = value;
-		}
     }
 }

@@ -45,12 +45,12 @@ package org.openforis.collect.presenter {
 		
 		override protected function getTextFromValue():String {
 			if(_items == null) {
-				updateDescription();
+				updateLabel();
 			}
-			return getDescription();
+			return getLabel();
 		}
 		
-		protected function updateDescription():void {
+		protected function updateLabel():void {
 			if(_view.attribute != null || _view.attributes != null) {
 				var codes:Array = [];
 				var code:String;
@@ -87,16 +87,17 @@ package org.openforis.collect.presenter {
 				
 		}
 		
-		protected function getDescription():String {
-			var description:String = null;
+		protected function getLabel():String {
+			var result:String = null;
 			if(CollectionUtil.isNotEmpty(_items)) {
 				var parts:Array = new Array();
 				for each (var item:CodeListItemProxy in _items) {
-					parts.push(item.getLabelText());
+					var part:String = item.getLabelText();
+					parts.push(part);
 				}
-				description = StringUtil.concat("\n", parts);
+				result = StringUtil.concat("\n", parts);
 			}
-			return description;
+			return result;
 		}
 	}
 }
