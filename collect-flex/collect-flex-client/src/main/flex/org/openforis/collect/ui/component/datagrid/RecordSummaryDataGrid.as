@@ -15,6 +15,14 @@ package org.openforis.collect.ui.component.datagrid
 	 * @author S. Ricci
 	 */
 	public class RecordSummaryDataGrid extends spark.components.DataGrid {
+		
+		protected static var _dataTimeFormatter:DateTimeFormatter;
+		
+		{
+			_dataTimeFormatter = new DateTimeFormatter();
+			_dataTimeFormatter.dateTimePattern = "dd-MM-yyyy HH:mm";
+		}
+		
 		/**
 		 * list of items selected using checkboxes (see SelectRecordColumnHeaderRenderer and SelectRecordColumnItemRenderer) 
 		 */ 
@@ -39,9 +47,8 @@ package org.openforis.collect.ui.component.datagrid
 		public static function dateTimeLabelFunction(item:Object,column:GridColumn):String {
 			if(item.hasOwnProperty(column.dataField)) {
 				var date:Date = item[column.dataField];
-				var dateFormatter:DateTimeFormatter = new DateTimeFormatter();
-				dateFormatter.dateTimePattern = "dd-MM-yyyy HH:mm:ss";
-				return dateFormatter.format(date);
+				var result:String = _dataTimeFormatter.format(date);
+				return result;
 			} else {
 				return null;
 			}

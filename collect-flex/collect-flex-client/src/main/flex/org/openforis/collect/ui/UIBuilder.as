@@ -174,17 +174,17 @@ package org.openforis.collect.ui {
 			column = getGridColumn(Message.get("list.warnings"), "warnings", 80, RecordSummaryDataGrid.numberLabelFunction);
 			columns.addItem(column);
 			//creation date column
-			column = getGridColumn(Message.get("list.creationDate"), "creationDate", 150, RecordSummaryDataGrid.dateTimeLabelFunction);
+			column = getGridColumn(Message.get("list.creationDate"), "creationDate", 120, RecordSummaryDataGrid.dateTimeLabelFunction);
 			columns.addItem(column);
 			//date modified column
-			column = getGridColumn(Message.get("list.modifiedDate"), "modifiedDate", 150, RecordSummaryDataGrid.dateTimeLabelFunction);
+			column = getGridColumn(Message.get("list.modifiedDate"), "modifiedDate", 120, RecordSummaryDataGrid.dateTimeLabelFunction);
 			columns.addItem(column);
 			//entry completed column
-			column = getGridColumn(Message.get("list.entryComplete"), "entryComplete", 70, 
+			column = getGridColumn(Message.get("list.entryComplete"), "entryComplete", 60, 
 				null, true, new ClassFactory(CompleteColumnItemRenderer));
 			columns.addItem(column);
 			//cleansing completed column
-			column = getGridColumn(Message.get("list.cleansingComplete"), "cleansingComplete", 70, 
+			column = getGridColumn(Message.get("list.cleansingComplete"), "cleansingComplete", 60, 
 				null, true, new ClassFactory(CompleteColumnItemRenderer));
 			columns.addItem(column);
 			return columns;
