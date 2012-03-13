@@ -23,25 +23,14 @@
 				super.creationCompleteHandler(event);
 				//bind the position of horizontal scrollbars of header and content
 				//so that the header is always aligned with the content
-				
 				BindingUtils.bindProperty(
 					headerScroller.horizontalScrollBar, "value", 
 					scroller, ["horizontalScrollBar", "value"]);
-				/*
-				BindingUtils.bindSetter(horizzontalScrollbarValueSetter,
-					headerScroller.horizontalScrollBar, "value");
-				*/
 			}
 			
 			override protected function initPresenter():void {
 				presenter = new MultipleEntityFormItemPresenter(this);
 			}
-			/*
-			protected function horizzontalScrollbarValueSetter(value:Number):void {
-				
-				headerScroller.horizontalScrollBar
-			}
-			*/
 			/*
 			[Bindable]
 			public function get constraintLayout():ConstraintLayout {
