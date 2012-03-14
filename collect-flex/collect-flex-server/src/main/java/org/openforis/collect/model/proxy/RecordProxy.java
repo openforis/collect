@@ -87,7 +87,7 @@ public class RecordProxy implements Proxy {
 
 	@ExternalizedProperty
 	public List<String> getRootEntityKeys() {
-		return record.getRootEntityKeys();
+		return record.getRootEntityKeyValues();
 	}
 
 	@ExternalizedProperty

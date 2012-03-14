@@ -8,13 +8,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
+import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.SurveyContext;
 import org.openforis.idm.metamodel.validation.Validator;
+import org.openforis.idm.model.Attribute;
+import org.openforis.idm.model.Code;
+import org.openforis.idm.model.CodeAttribute;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Node;
+import org.openforis.idm.model.NumberAttribute;
 import org.openforis.idm.model.Record;
+import org.openforis.idm.model.TextAttribute;
 import org.openforis.idm.model.state.ModelDependencies;
 import org.openforis.idm.model.state.NodeState;
 
@@ -107,7 +114,7 @@ public class CollectRecord extends Record {
 	private transient Integer errors;
 	private transient Integer warnings;
 	
-	private List<String> rootEntityKeys;
+	private List<String> rootEntityKeyValues;
 	private List<Integer> entityCounts;
 	@Deprecated
 	private Map<Integer, NodeState> nodeStateMap;
@@ -117,7 +124,7 @@ public class CollectRecord extends Record {
 		this.step = Step.ENTRY;
 		
 		// use List to preserve the order of the keys and counts
-		rootEntityKeys = new ArrayList<String>();
+		rootEntityKeyValues = new ArrayList<String>();
 		entityCounts = new ArrayList<Integer>();
 		nodeStateMap = new HashMap<Integer, NodeState>();
 
@@ -356,7 +363,7 @@ public class CollectRecord extends Record {
 		Validator validator = context.getValidator();
 		return validator;
 	}
-
+	
 	public Step getStep() {
 		return step;
 	}
@@ -437,12 +444,41 @@ public class CollectRecord extends Record {
 		this.warnings = warnings;
 	}
 
-	public List<String> getRootEntityKeys() {
-		return rootEntityKeys;
+	public List<String> getRootEntityKeyValues() {
+		return rootEntityKeyValues;
+	}
+	
+	public void updateRootEntityKeyValues(){
+		Entity rootEntity = getRootEntity();
+		if(rootEntity != null) {
+			rootEntityKeyValues = new ArrayList<String>();
+			EntityDefinition rootEntityDefn = rootEntity.getDefinition();
+			List<AttributeDefinition> keyDefns = rootEntityDefn.getKeyAttributeDefinitions();
+			String keyValue = null;
+			for (AttributeDefinition keyDefn : keyDefns) {
+				Node<?> keyNode = rootEntity.get(keyDefn.getName(), 0);
+				if(keyNode instanceof CodeAttribute) {
+					Code code = ((CodeAttribute) keyNode).getValue();
+					if(code != null) {
+						keyValue = code.getCode();
+					}
+				} else if(keyNode instanceof TextAttribute) {
+					keyValue = ((TextAttribute) keyNode).getValue();
+				} else if(keyNode instanceof NumberAttribute<?>) {
+					Object obj = ((NumberAttribute<?>) keyNode).getValue();
+					if(obj != null) {
+						keyValue = obj.toString();
+					}
+				}
+				if(StringUtils.isNotEmpty(keyValue)){
+					rootEntityKeyValues.add(keyValue);
+				}
+			}
+		}
 	}
 
-	public void setKeys(List<String> keys) {
-		this.rootEntityKeys = keys;
+	public void setRootEntityKeyValues(List<String> keys) {
+		this.rootEntityKeyValues = keys;
 	}
 
 	public List<Integer> getEntityCounts() {

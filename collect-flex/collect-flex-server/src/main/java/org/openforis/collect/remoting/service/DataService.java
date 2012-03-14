@@ -143,19 +143,15 @@ public class DataService {
 	}
 	
 	@Transactional
-	public void saveActiveRecord() {
+	public void saveActiveRecord() throws RecordPersistenceException {
 		SessionState sessionState = sessionManager.getSessionState();
 		CollectRecord record = sessionState.getActiveRecord();
 		User user = sessionState.getUser();
 		record.setModifiedDate(new Date());
 		record.setModifiedBy(user);
-		try {
-			recordManager.save(record);
-			sessionState.setActiveRecordState(RecordState.SAVED);
-		} catch (RecordPersistenceException e) {
-			//it should never be thrown
-			throw new RuntimeException("Unexpected error saving record");
-		}
+
+		recordManager.save(record);
+		sessionState.setActiveRecordState(RecordState.SAVED);
 	}
 
 	@Transactional

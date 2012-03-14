@@ -355,7 +355,7 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 			for (TableField tableField : KEY_FIELDS) {
 				keys.add(r.getValueAsString(tableField));
 			}
-			c.setKeys(keys);
+			c.setRootEntityKeyValues(keys);
 
 			int rootEntityId = r.getValue(OFC_RECORD.ROOT_ENTITY_ID);
 
@@ -410,7 +410,7 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 			q.addValue(OFC_RECORD.WARNINGS, record.getWarnings());
 
 			// set keys
-			List<String> keys = record.getRootEntityKeys();
+			List<String> keys = record.getRootEntityKeyValues();
 			for (int i = 0; i < keys.size(); i++) {
 				q.addValue(KEY_FIELDS[i], keys.get(i));
 			}

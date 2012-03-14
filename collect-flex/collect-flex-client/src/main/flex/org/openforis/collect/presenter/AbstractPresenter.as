@@ -49,6 +49,9 @@ package org.openforis.collect.presenter {
 				case "org.openforis.collect.manager.RecordPromoteException" :
 					AlertUtil.showError('error.promoteException');
 					break;
+				case "org.openforis.collect.persistence.MissingRecordKeyException":
+					AlertUtil.showError("error.missingRootEntityKeys");
+					break;
 				case "Channel.Call.Failed":
 					"Client.Error.MessageSend"
 					"Client.Error.DeliveryInDoubt"
