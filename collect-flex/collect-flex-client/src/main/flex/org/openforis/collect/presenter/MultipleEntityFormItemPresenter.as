@@ -8,12 +8,13 @@ package org.openforis.collect.presenter
 	
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.event.ApplicationEvent;
+	import org.openforis.collect.event.InputFieldEvent;
+	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.remoting.service.UpdateRequest;
 	import org.openforis.collect.remoting.service.UpdateRequestOperation;
 	import org.openforis.collect.remoting.service.UpdateRequestOperation$Method;
 	import org.openforis.collect.ui.component.detail.MultipleEntityFormItem;
-	import org.openforis.collect.util.AlertUtil;
-	import org.openforis.collect.util.CollectionUtil;
+	import org.openforis.collect.ui.component.input.InputField;
 	import org.openforis.collect.util.UIUtil;
 
 	/**
@@ -32,6 +33,7 @@ package org.openforis.collect.presenter
 			
 			view.addButton.addEventListener(MouseEvent.CLICK, addButtonClickHandler);
 			view.addButton.addEventListener(FocusEvent.FOCUS_IN, addButtonFocusInHandler);
+			eventDispatcher.addEventListener(InputFieldEvent.VISITED, inputFieldVisitedHandler);
 		}
 		
 		private function get view():MultipleEntityFormItem {
@@ -57,7 +59,10 @@ package org.openforis.collect.presenter
 		
 		protected function getEntities():IList {
 			var name:String = view.entityDefinition.name;
-			var entities:IList = view.parentEntity.getChildren(name);
+			var entities:IList = null;
+			if(view.parentEntity != null) {
+				entities = view.parentEntity.getChildren(name);
+			}
 			return entities;
 		}
 
@@ -66,48 +71,80 @@ package org.openforis.collect.presenter
 		}
 		
 		protected function addButtonClickHandler(event:MouseEvent):void {
-			var entities:IList = getEntities();
-			var maxCount:Number = view.entityDefinition.maxCount
-			if(isNaN(maxCount) || CollectionUtil.isEmpty(entities) || entities.length < maxCount) {
-				var o:UpdateRequestOperation = new UpdateRequestOperation();
-				o.method = UpdateRequestOperation$Method.ADD;
-				o.parentEntityId = view.parentEntity.id;
-				o.nodeName = view.entityDefinition.name;
-				var req:UpdateRequest = new UpdateRequest(o);
-				ClientFactory.dataClient.updateActiveRecord(req, null, addResultHandler);
-			} else {
-				var labelText:String = view.entityDefinition.getLabelText();
-				AlertUtil.showError("edit.maxCountExceed", [maxCount, labelText]);
-			}
+			var o:UpdateRequestOperation = new UpdateRequestOperation();
+			o.method = UpdateRequestOperation$Method.ADD;
+			o.parentEntityId = view.parentEntity.id;
+			o.nodeName = view.entityDefinition.name;
+			var req:UpdateRequest = new UpdateRequest(o);
+			ClientFactory.dataClient.updateActiveRecord(req, null, addResultHandler);
 		}
 		
 		protected function addResultHandler(event:ResultEvent, token:Object = null):void {
 			view.callLater(function():void {
+				markAllEntitiesAsVisited();
+				updateValidationDisplayManager();
+				
 				if(view.scroller != null && view.scroller.verticalScrollBar != null) {
 					view.scroller.verticalScrollBar.value = view.scroller.verticalScrollBar.maximum;
 				}
 				UIUtil.ensureElementIsVisible(view.addButton);
 			});
 		}
-		/*
-		override protected function initNodeDefinitions(event:Event=null):void {
-			super.initNodeDefinitions(event);
-			initConstraintLayout(event);
-		}
 		
-		protected function initConstraintLayout(event:Event = null):void {
-			var constraintLayout:ConstraintLayout = new ConstraintLayout();
-			var constraintColumns:Vector.<ConstraintColumn> = new Vector.<ConstraintColumn>();
-			if(CollectionUtil.isNotEmpty(view.nodeDefinitions)) {
-				for(var index:int = 0; index < view.nodeDefinitions.length; index ++) {
-					var defn:NodeDefinitionProxy = view.nodeDefinitions[index] as NodeDefinitionProxy; 
-					var constraintColumn:ConstraintColumn = new ConstraintColumn();
-					constraintColumns.push(constraintColumn);
+		protected function inputFieldVisitedHandler(event:InputFieldEvent):void {
+			var inputField:InputField = event.inputField;
+			if(inputField != null && inputField.parentEntity != null) {
+				var entities:IList = getEntities();
+				for each (var e:EntityProxy in entities) {
+					if(e == inputField.parentEntity) {
+						updateValidationDisplayManager();
+						break;
+					}
 				}
 			}
-			constraintLayout.constraintColumns = constraintColumns;
-			view.constraintLayout = constraintLayout;
 		}
-		*/
+		
+		override protected function updateValidationDisplayManager():void {
+			super.updateValidationDisplayManager();
+			var visited:Boolean = isVisited();
+			var detached:Boolean = isDetached();
+			var active:Boolean = visited || ! detached;
+			if(active) {
+				_validationDisplayManager.active = true;
+				_validationDisplayManager.displayNodeValidation(view.parentEntity, view.entityDefinition);
+			} else {
+				_validationDisplayManager.active = false;
+				_validationDisplayManager.reset();
+			}
+		}
+		
+		
+		protected function isVisited():Boolean {
+			var entities:IList = getEntities();
+			for each (var e:EntityProxy in entities) {
+				if(e.visited) {
+					return true;
+				}
+			}
+			return false;
+		}
+
+		protected function isDetached():Boolean {
+			var entities:IList = getEntities();
+			for each (var e:EntityProxy in entities) {
+				if(! e.detached) {
+					return false;
+				}
+			}
+			return true;
+		}
+		
+		protected function markAllEntitiesAsVisited():void {
+			var entities:IList = getEntities();
+			for each (var e:EntityProxy in entities) {
+				e.visited = true;
+			}
+		}
+		
 	}
 }

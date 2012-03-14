@@ -30,6 +30,7 @@
 			private var _entity:EntityProxy;
 			private var _modelVersion:ModelVersionProxy;
 			private var _labelWidth:Number = 150;
+			private var _occupyEntirePage:Boolean = false;
 			
 			override protected function createChildren():void {
 				super.createChildren();
@@ -44,24 +45,13 @@
 								break;
 							case UIUtil.LAYOUT_FORM:
 							default:
-								var labelGroup:HGroup = new HGroup();
-								var numberLabelProxy:NodeLabelProxy = attributeDefn.getLabel(NodeLabelProxy$Type.NUMBER);
-								if(numberLabelProxy != null) {
-									var numberLabel:Label = new Label();
-									numberLabel.styleName = "bold";
-									numberLabel.text = numberLabelProxy.text + ".";
-									numberLabel.width = 30;
-									labelGroup.addElement(numberLabel);
-								}
-								var label:Label = new Label();
-								label.styleName = "bold";
-								label.width = labelWidth;
-								label.text = attributeDefn.getLabelText();
-								labelGroup.addElement(label);
+								var nodeLabel:NodeLabel = new NodeLabel();
+								nodeLabel.nodeDefinition = attributeDefn;
+								nodeLabel.width = labelWidth;
 								
 								if(attributeDefn is CoordinateAttributeDefinitionProxy || attributeDefn is TaxonAttributeDefinitionProxy) {
 									var vGroup:VGroup = new VGroup();
-									vGroup.addElement(labelGroup);
+									vGroup.addElement(nodeLabel);
 									var internalGroup:HGroup = new HGroup();
 									internalGroup.gap = 0;
 									var spacer:Spacer = new Spacer();
@@ -73,7 +63,7 @@
 								} else {
 									var hGroup:HGroup = new HGroup();
 									hGroup.gap = 0;
-									hGroup.addElement(labelGroup);
+									hGroup.addElement(nodeLabel);
 									hGroup.addElement(formItem);
 									addElement(hGroup);
 								}
@@ -85,6 +75,11 @@
 						BindingUtils.bindProperty(formItem, "modelVersion", this, "modelVersion");
 					}
 					BindingUtils.bindProperty(formItem, "parentEntity", this, "entity");
+					formItem.occupyEntirePage = this.occupyEntirePage;
+					/* if(occupyEntirePage) {
+						formItem.percentHeight = 100;
+						formItem.percentWidth = 100;
+					} */
 				}
 			}
 			protected function dataChangeHandler(event:FlexEvent):void {
@@ -119,6 +114,16 @@
 			public function set labelWidth(value:Number):void {
 				_labelWidth = value;
 			}
+
+			[Bindable]
+			public function get occupyEntirePage():Boolean {
+				return _occupyEntirePage;
+			}
+
+			public function set occupyEntirePage(value:Boolean):void {
+				_occupyEntirePage = value;
+			}
+			
 		]]>
 	</fx:Script>
 

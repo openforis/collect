@@ -9,7 +9,6 @@ package org.openforis.collect.model.proxy {
 	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
 	
-	import org.granite.collections.IMap;
 	import org.openforis.collect.remoting.service.UpdateResponse;
 
     [Bindable]
@@ -17,7 +16,7 @@ package org.openforis.collect.model.proxy {
     public class RecordProxy extends RecordProxyBase {
 		
 		private var _updated:Boolean = false;
-		private var _saved:Boolean = false;
+		private var _detached:Boolean = false;
 		
 		private var validationResults:ValidationResultsProxy;
 		
@@ -42,6 +41,7 @@ package org.openforis.collect.model.proxy {
 				node = response.createdNode;
 				parent = getNode(node.parentId) as EntityProxy;
 				parent.addChild(node);
+				node.detached = true;
 			}
 			if(response.deletedNodeId > 0) {
 				node = getNode(response.deletedNodeId);
@@ -87,14 +87,14 @@ package org.openforis.collect.model.proxy {
 			return _updated;
 		}
 		
-		public function get saved():Boolean {
-			return _saved;
+		public function get detached():Boolean {
+			return _detached;
 		}
 		
-		public function set saved(value:Boolean):void {
-			_saved = value;
+		public function set detached(value:Boolean):void {
+			_detached = value;
+			rootEntity.detached = value;
 		}
 		
-
     }
 }

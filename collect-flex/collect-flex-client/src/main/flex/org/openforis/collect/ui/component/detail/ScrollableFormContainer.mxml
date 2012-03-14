@@ -7,11 +7,15 @@
 					
 					width="100%" 
 				   	height="100%" 
+					
+					creationComplete="creationCompleteHandler(event)"
 				   >
 	
 	<fx:Script>
 		<![CDATA[
+			import mx.binding.utils.ChangeWatcher;
 			import mx.collections.IList;
+			import mx.events.FlexEvent;
 			
 			import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 			import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
@@ -22,6 +26,25 @@
 			private var _modelVersion:ModelVersionProxy;
 			private var _nodeDefinitions:IList;
 			private var _entity:EntityProxy;
+			
+			protected function creationCompleteHandler(event:FlexEvent):void {
+				ChangeWatcher.watch(this, "nodeDefinitions", updateCurrentState);
+				updateCurrentState();
+			}
+			
+			protected function updateCurrentState(event:Event = null):void {
+				var state:String = "default";
+				if(nodeDefinitions != null && nodeDefinitions.length == 1) {
+					var firstNode:Object = nodeDefinitions.getItemAt(0);
+					if(firstNode is EntityDefinitionProxy) {
+						var entity:EntityDefinitionProxy = EntityDefinitionProxy(firstNode);
+						if(entity.multiple && entity.layout == UIUtil.LAYOUT_TABLE) {
+							state = "multipleEntity";
+						}
+					}
+				}
+				currentState = state;
+			}
 			
 			public function resetScrollBars():void {
 				if(scroller != null) {
@@ -68,22 +91,42 @@
 		]]>
 	</fx:Script>
  	
-	<s:Scroller height="100%" width="100%" visible="true" id="scroller">
-		<s:DataGroup id="formDataGroup" height="100%" width="100%"
-					 dataProvider="{nodeDefinitions}"
-					 >
-			<s:layout>
-				<s:VerticalLayout gap="5" paddingBottom="10" paddingLeft="10" paddingRight="10" paddingTop="10" />
-			</s:layout>
-			<s:itemRenderer>
-				<fx:Component>
-					<detail:FormDataGroupItemRenderer
-						entity="{parentDocument.entity}"
-						modelVersion="{parentDocument.modelVersion}"
-						/>
-				</fx:Component>
-			</s:itemRenderer>
-		</s:DataGroup>
+	<s:states>
+		<s:State name="default" />
+		<s:State name="multipleEntity" />
+	</s:states>
+	
+	<s:DataGroup id="formDataGroup" 
+				 height="100%" 
+				 width="100%"
+				 dataProvider="{nodeDefinitions}" 
+				 excludeFrom="default"
+				 >
+		<s:layout>
+			<s:VerticalLayout gap="5" paddingBottom="10" paddingLeft="10" paddingRight="10" paddingTop="10" />
+		</s:layout>
+		<s:itemRenderer>
+			<fx:Component>
+				<detail:FormDataGroupItemRenderer
+					entity="{parentDocument.entity}"
+					modelVersion="{parentDocument.modelVersion}"
+					occupyEntirePage="{parentDocument.currentState == 'multipleEntity'}"
+					width="{parentDocument.currentState == 'multipleEntity' ? parentDocument.width: NaN}"
+					height="{parentDocument.currentState == 'multipleEntity' ? parentDocument.height: NaN}"
+					/>
+<!--					occupyEntirePage.multipleEntity="true"-->
+			</fx:Component>
+		</s:itemRenderer>
+	</s:DataGroup>
+	
+	<s:Scroller id="scroller"
+				height="100%" 
+				width="100%" 
+				includeIn="default">
+		<s:Group>
+		<fx:Reparent target="formDataGroup" includeIn="default" />
+			
+		</s:Group>
 	</s:Scroller>
 
 </s:NavigatorContent>

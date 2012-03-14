@@ -1,20 +1,26 @@
 package org.openforis.collect.presenter
 {
+	import flash.events.Event;
 	import flash.events.FocusEvent;
 	import flash.events.MouseEvent;
 	
 	import mx.collections.IList;
 	import mx.core.UIComponent;
+	import mx.events.CollectionEvent;
 	import mx.rpc.events.ResultEvent;
 	
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.event.ApplicationEvent;
+	import org.openforis.collect.event.InputFieldEvent;
+	import org.openforis.collect.model.proxy.AttributeProxy;
 	import org.openforis.collect.remoting.service.UpdateRequest;
 	import org.openforis.collect.remoting.service.UpdateRequestOperation;
 	import org.openforis.collect.remoting.service.UpdateRequestOperation$Method;
 	import org.openforis.collect.remoting.service.UpdateResponse;
 	import org.openforis.collect.ui.component.detail.MultipleAttributeFormItem;
 	import org.openforis.collect.ui.component.detail.ValidationDisplayManager;
+	import org.openforis.collect.ui.component.input.InputField;
+	import org.openforis.collect.util.CollectionUtil;
 	import org.openforis.collect.util.UIUtil;
 
 	/**
@@ -31,8 +37,9 @@ package org.openforis.collect.presenter
 		override internal function initEventListeners():void {
 			super.initEventListeners();
 			
-			MultipleAttributeFormItem(_view).addButton.addEventListener(MouseEvent.CLICK, addButtonClickHandler);
-			MultipleAttributeFormItem(_view).addButton.addEventListener(FocusEvent.FOCUS_IN, addButtonFocusInHandler);
+			view.addButton.addEventListener(MouseEvent.CLICK, addButtonClickHandler);
+			view.addButton.addEventListener(FocusEvent.FOCUS_IN, addButtonFocusInHandler);
+			eventDispatcher.addEventListener(InputFieldEvent.VISITED, inputFieldVisitedHandler);
 		}
 		
 		private function get view():MultipleAttributeFormItem {
@@ -53,7 +60,15 @@ package org.openforis.collect.presenter
 			}
 		}
 		
+		protected function inputFieldVisitedHandler(event:InputFieldEvent):void {
+			var inputField:InputField = event.inputField;
+			if(inputField != null && inputField.parentEntity != null && inputField.attributeDefinition == view.attributeDefinition) {
+				updateValidationDisplayManager();
+			}
+		}
+		
 		override protected function updateView():void {
+			super.updateView();
 			if(view.dataGroup != null && view.parentEntity != null) {
 				var attributes:IList = getAttributes();
 				view.dataGroup.dataProvider = attributes;
@@ -104,11 +119,46 @@ package org.openforis.collect.presenter
 		override protected function updateRelevanceDisplayManager():void {
 			_relevanceDisplayManager.displayNodeRelevance(view.parentEntity, view.attributeDefinition);
 		}
-			
-		override protected function updateValidationDisplayManager(forceActivation:Boolean = false):void {
-			super.updateValidationDisplayManager(forceActivation);
-			if(view.parentEntity != null) {
+		
+		override protected function updateValidationDisplayManager():void {
+			super.updateValidationDisplayManager();
+			var visited:Boolean = isVisited();
+			var detached:Boolean = isDetached();
+			var active:Boolean = visited || ! detached;
+			if(active) {
+				_validationDisplayManager.active = true;
 				_validationDisplayManager.displayNodeValidation(view.parentEntity, view.attributeDefinition);
+			} else {
+				_validationDisplayManager.active = false;
+				_validationDisplayManager.reset();
+			}
+		}
+		
+		protected function isVisited():Boolean {
+			var attributes:IList = getAttributes();
+			for each (var a:AttributeProxy in attributes) {
+				if(a.visited) {
+					return true;
+				}
+			}
+			return false;
+		}
+		
+		protected function isDetached():Boolean {
+			var attributes:IList = getAttributes();
+			for each (var a:AttributeProxy in attributes) {
+				if(! a.detached) {
+					return false;
+				}
+			}
+			return true;
+		}
+		
+		protected function markLastAttributeAsVisited():void {
+			var attributes:IList = getAttributes();
+			if(CollectionUtil.isNotEmpty(attributes)) {
+				var lastAttribute:Object = attributes.getItemAt(attributes.length - 1);
+				lastAttribute.visited = true;
 			}
 		}
 

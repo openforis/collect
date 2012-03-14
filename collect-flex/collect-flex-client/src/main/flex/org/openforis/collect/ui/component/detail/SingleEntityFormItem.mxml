@@ -11,7 +11,7 @@
 						  paddingLeft="20" 
 						  />
 		<s:HorizontalLayout id="horizontalLayout" 
-							gap="2" />
+							gap="4" />
 	</fx:Declarations>
 	
 	<fx:Script>
@@ -55,7 +55,10 @@
 					   minHeight="0"
 					   minWidth="0">
 	-->		
-	<s:Label text="{entityDefinition.getLabelText()}" styleName="bold" includeIn="vertical" />
+	
+	<detail:NodeLabel id="nodeLabel" 
+					  nodeDefinition="{entityDefinition}" 
+					  includeIn="vertical" />
 
 	<s:DataGroup 
 		dataProvider="{nodeDefinitions}" 

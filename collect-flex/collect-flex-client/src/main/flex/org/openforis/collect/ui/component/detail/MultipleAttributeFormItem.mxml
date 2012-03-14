@@ -80,7 +80,6 @@
 			icon="{Images.ADD}" 
 			labelPlacement="left" 
 			useHandCursor="true"
-			paddingLeft="30"
 			/>
 	
 	</s:BorderContainer>

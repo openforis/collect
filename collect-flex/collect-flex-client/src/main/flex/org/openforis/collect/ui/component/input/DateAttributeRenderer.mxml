@@ -41,7 +41,6 @@
 	<s:HGroup 
 			verticalAlign="middle"
 			width="100%"
-			horizontalAlign="center"
 			gap="2">
 		<input:IntegerInputField id="day"
 								 attributeDefinition="{attributeDefinition}"

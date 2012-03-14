@@ -7,17 +7,12 @@ package org.openforis.collect.presenter {
 	import mx.binding.utils.ChangeWatcher;
 	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
-	import mx.rpc.AsyncResponder;
-	import mx.rpc.IResponder;
-	import mx.rpc.events.FaultEvent;
 	import mx.rpc.events.ResultEvent;
 	
-	import org.openforis.collect.Application;
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.client.DataClient;
 	import org.openforis.collect.client.UpdateRequestToken;
 	import org.openforis.collect.event.ApplicationEvent;
-	import org.openforis.collect.event.EventDispatcherFactory;
 	import org.openforis.collect.event.InputFieldEvent;
 	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 	import org.openforis.collect.model.FieldSymbol;
@@ -106,6 +101,9 @@ package org.openforis.collect.presenter {
 				applyValue();
 			}
 			_view.visited = true;
+			var inputFieldEvent:InputFieldEvent = new InputFieldEvent(InputFieldEvent.VISITED);
+			inputFieldEvent.inputField = _view;
+			eventDispatcher.dispatchEvent(inputFieldEvent);
 		}
 		
 		protected function keyDownHandler(event:KeyboardEvent):void {

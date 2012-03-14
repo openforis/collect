@@ -174,17 +174,17 @@ package org.openforis.collect.ui {
 			column = getGridColumn(Message.get("list.warnings"), "warnings", 80, RecordSummaryDataGrid.numberLabelFunction);
 			columns.addItem(column);
 			//creation date column
-			column = getGridColumn(Message.get("list.creationDate"), "creationDate", 150, RecordSummaryDataGrid.dateTimeLabelFunction);
+			column = getGridColumn(Message.get("list.creationDate"), "creationDate", 120, RecordSummaryDataGrid.dateTimeLabelFunction);
 			columns.addItem(column);
 			//date modified column
-			column = getGridColumn(Message.get("list.modifiedDate"), "modifiedDate", 150, RecordSummaryDataGrid.dateTimeLabelFunction);
+			column = getGridColumn(Message.get("list.modifiedDate"), "modifiedDate", 120, RecordSummaryDataGrid.dateTimeLabelFunction);
 			columns.addItem(column);
 			//entry completed column
-			column = getGridColumn(Message.get("list.entryComplete"), "entryComplete", 70, 
+			column = getGridColumn(Message.get("list.entryComplete"), "entryComplete", 60, 
 				null, true, new ClassFactory(CompleteColumnItemRenderer));
 			columns.addItem(column);
 			//cleansing completed column
-			column = getGridColumn(Message.get("list.cleansingComplete"), "cleansingComplete", 70, 
+			column = getGridColumn(Message.get("list.cleansingComplete"), "cleansingComplete", 60, 
 				null, true, new ClassFactory(CompleteColumnItemRenderer));
 			columns.addItem(column);
 			return columns;
@@ -232,7 +232,7 @@ package org.openforis.collect.ui {
 						return 100;
 					}
 				} else {
-					return 200;
+					return NaN;
 				}
 			} else if(def is CoordinateAttributeDefinitionProxy) {
 				if(parentLayout == UIUtil.LAYOUT_TABLE) {
@@ -244,6 +244,8 @@ package org.openforis.collect.ui {
 				return 132;
 			} else if(def is FileAttributeDefinitionProxy) {
 				return 300;
+			} else if(def is NumberAttributeDefinitionProxy) {
+				return 70;
 			} else if(def is RangeAttributeDefinitionProxy) {
 				return 120;
 			} else if(def is TaxonAttributeDefinitionProxy) {
@@ -259,8 +261,9 @@ package org.openforis.collect.ui {
 					case TextAttributeDefinitionProxy$Type.MEMO:
 						return 300;
 					case TextAttributeDefinitionProxy$Type.SHORT:
-					default:
 						return 100;
+					default:
+						return 150;
 				}
 			} else if(def is TimeAttributeDefinitionProxy) {
 				return 64;
@@ -372,15 +375,16 @@ package org.openforis.collect.ui {
 			var childDefinitionsContainer:HGroup = new HGroup();
 			childDefinitionsContainer.percentHeight = 100;
 			childDefinitionsContainer.verticalAlign = "bottom";
+			childDefinitionsContainer.gap = 4;
 			var childDefn:ListCollectionView = defn.childDefinitions;
-			var width:int = 0;
+			//var width:int = 0;
 			for each (var childDef:NodeDefinitionProxy in childDefn) {
 				var elem:IVisualElement = getDataGroupHeader(childDef);
-				width += elem.width;
+				//width += elem.width;
 				childDefinitionsContainer.addElement(elem);
 			}
 			v.addElement(childDefinitionsContainer);
-			v.width = width;
+			//v.width = width;
 			
 			return v;
 		}

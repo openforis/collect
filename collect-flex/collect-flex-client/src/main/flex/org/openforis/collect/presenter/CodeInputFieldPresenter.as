@@ -183,7 +183,8 @@ package org.openforis.collect.presenter {
 			if(CollectionUtil.isNotEmpty(_items)) {
 				var parts:Array = new Array();
 				for each (var item:CodeListItemProxy in _items) {
-					parts.push(item.getLabelText());
+					var part:String = item.getLabelText();
+					parts.push(part);
 				}
 				description = StringUtil.concat("\n", parts);
 			}

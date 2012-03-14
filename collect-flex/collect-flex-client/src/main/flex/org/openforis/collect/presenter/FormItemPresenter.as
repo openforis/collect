@@ -57,7 +57,7 @@ package org.openforis.collect.presenter
 		}
 		
 		protected function recordSavedHandler(event:ApplicationEvent):void {
-			updateValidationDisplayManager(true);
+			updateValidationDisplayManager();
 		}
 		
 		protected function parentEntityChangeHandler(event:Event):void {
@@ -79,7 +79,7 @@ package org.openforis.collect.presenter
 			
 		}
 		
-		protected function updateValidationDisplayManager(forceActivation:Boolean = false):void {
+		protected function updateValidationDisplayManager():void {
 			if(_validationDisplayManager == null) {
 				initValidationDisplayManager();
 			}

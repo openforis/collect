@@ -10,5 +10,25 @@ package org.openforis.collect.model.proxy {
     [Bindable]
     [RemoteClass(alias="org.openforis.collect.model.proxy.NodeProxy")]
     public class NodeProxy extends NodeProxyBase {
+		
+		private var _visited:Boolean = false;
+		private var _detached:Boolean = false;
+		
+		public function get visited():Boolean {
+			return _visited;
+		}
+		
+		public function set visited(value:Boolean):void {
+			_visited = value;
+		}
+		
+		public function get detached():Boolean {
+			return _detached;
+		}
+		
+		public function set detached(value:Boolean):void {
+			_detached = value;
+		}
+		
     }
 }
