@@ -76,9 +76,13 @@ package org.openforis.collect.presenter
 		}
 
 		protected function getAttributes():IList {
-			var name:String = view.attributeDefinition.name;
-			var attributes:IList = view.parentEntity.getChildren(name);
-			return attributes;
+			if(view.dataGroup != null && view.parentEntity != null) {
+				var name:String = view.attributeDefinition.name;
+				var attributes:IList = view.parentEntity.getChildren(name);
+				return attributes;
+			} else {
+				return null;
+			}
 		}
 		
 		protected function addButtonFocusInHandler(event:FocusEvent):void {
