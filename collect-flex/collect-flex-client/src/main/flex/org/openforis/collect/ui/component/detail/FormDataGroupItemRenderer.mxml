@@ -4,33 +4,39 @@
 				xmlns:mx="library://ns.adobe.com/flex/mx"
 				dataChange="dataChangeHandler(event)" 
 				autoDrawBackground="false"
+				
+				creationComplete="creationCompleteHandler(event)"
 				>
 	
 	<fx:Script>
 		<![CDATA[
 			import mx.binding.utils.BindingUtils;
 			import mx.controls.Spacer;
+			import mx.core.IVisualElement;
+			import mx.core.UIComponent;
 			import mx.events.FlexEvent;
 			
 			import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 			import org.openforis.collect.metamodel.proxy.CoordinateAttributeDefinitionProxy;
 			import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 			import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
-			import org.openforis.collect.metamodel.proxy.NodeLabelProxy;
-			import org.openforis.collect.metamodel.proxy.NodeLabelProxy$Type;
 			import org.openforis.collect.metamodel.proxy.TaxonAttributeDefinitionProxy;
 			import org.openforis.collect.model.proxy.EntityProxy;
 			import org.openforis.collect.ui.UIBuilder;
 			import org.openforis.collect.util.UIUtil;
 			
 			import spark.components.HGroup;
-			import spark.components.Label;
 			import spark.components.VGroup;
 			
 			private var _entity:EntityProxy;
 			private var _modelVersion:ModelVersionProxy;
 			private var _labelWidth:Number = 150;
 			private var _occupyEntirePage:Boolean = false;
+			
+			protected function creationCompleteHandler(event:FlexEvent):void {
+				BindingUtils.bindSetter(updateMultipleEntitiesMaxHeight, this, "height");
+				BindingUtils.bindSetter(updateMultipleEntitiesMaxWidth, this, "width");
+			}
 			
 			override protected function createChildren():void {
 				super.createChildren();
@@ -75,19 +81,41 @@
 						BindingUtils.bindProperty(formItem, "modelVersion", this, "modelVersion");
 					}
 					BindingUtils.bindProperty(formItem, "parentEntity", this, "entity");
-					formItem.occupyEntirePage = this.occupyEntirePage;
-					/* if(occupyEntirePage) {
-						formItem.percentHeight = 100;
-						formItem.percentWidth = 100;
-					} */
 				}
 			}
+			
 			protected function dataChangeHandler(event:FlexEvent):void {
 				removeAllElements();
 				initialized = false;
 				initialize();
 			}
 			
+			protected function updateMultipleEntitiesMaxHeight(value:Number):void {
+				var maxAvailableHeight:Number = UIUtil.getMaxAvailableHeight(UIComponent(parentDocument));
+				if(!isNaN(maxAvailableHeight)) {
+					maxAvailableHeight -= 10; //padding difficult to extimate...
+					for(var i:int = 0; i < numElements; i++) {
+						var el:IVisualElement = getElementAt(i);
+						if(el is MultipleEntityFormItem) {
+							MultipleEntityFormItem(el).maxHeight = maxAvailableHeight;
+						}
+					}
+				}
+			}
+			
+			protected function updateMultipleEntitiesMaxWidth(value:Number):void {
+				var maxAvailableWidth:Number = UIUtil.getMaxAvailableWidth(UIComponent(parentDocument));
+				if(!isNaN(maxAvailableWidth)) {
+					maxAvailableWidth -= 10; //padding difficult to extimate...
+					for(var i:int = 0; i < numElements; i++) {
+						var el:IVisualElement = getElementAt(i);
+						if(el is MultipleEntityFormItem) {
+							MultipleEntityFormItem(el).maxWidth = maxAvailableWidth;
+						}
+					}
+				}
+			}
+
 			[Bindable]
 			public function get entity():EntityProxy {
 				return _entity;
