@@ -50,9 +50,9 @@ public class CollectRecord extends Record {
 		public Step getNext() {
 			switch(this) {
 				case ENTRY:
-					return Step.CLEANSING;
+					return CLEANSING;
 				case CLEANSING:
-					return Step.ANALYSIS;
+					return ANALYSIS;
 				default:
 					throw new IllegalArgumentException("This record cannot be promoted.");
 			}

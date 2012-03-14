@@ -17,6 +17,7 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.manager.RecordManager;
+import org.openforis.collect.manager.RecordPromoteException;
 import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.metamodel.proxy.CodeListItemProxy;
 import org.openforis.collect.model.CollectRecord;
@@ -457,7 +458,7 @@ public class DataService {
 	}
 	
 	@Transactional
-	public void promoteActiveRecord() throws RecordPersistenceException  {
+	public void promoteActiveRecord() throws RecordPersistenceException, RecordPromoteException  {
 		SessionState sessionState = sessionManager.getSessionState();
 		CollectRecord record = sessionState.getActiveRecord();
 		User user = sessionState.getUser();

@@ -46,6 +46,9 @@ package org.openforis.collect.presenter {
 				case "org.openforis.collect.persistence.RecordLockedException":
 					AlertUtil.showError('error.recordLocked');
 					break;
+				case "org.openforis.collect.manager.RecordPromoteException" :
+					AlertUtil.showError('error.promoteException');
+					break;
 				case "Channel.Call.Failed":
 					"Client.Error.MessageSend"
 					"Client.Error.DeliveryInDoubt"
