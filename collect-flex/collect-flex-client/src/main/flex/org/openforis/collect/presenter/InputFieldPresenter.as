@@ -194,7 +194,7 @@ package org.openforis.collect.presenter {
 		
 		protected function sendRequestOperation(o:UpdateRequestOperation, token:UpdateRequestToken):void {
 			var req:UpdateRequest = new UpdateRequest(o);
-			dataClient.updateActiveRecord(req, token, updateResultHandler);
+			dataClient.updateActiveRecord(req, token, updateResultHandler, faultHandler);
 			_view.updating = true;
 		}
 		

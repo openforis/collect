@@ -82,7 +82,7 @@ package org.openforis.collect.model.proxy {
 		}
 		
 		public function markNodesAsVisited():void {
-			rootEntity.markChildrenAsVisited();
+			rootEntity.markDescendantsAsVisited();
 		}
 		
 		public function get updated():Boolean {

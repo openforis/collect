@@ -76,13 +76,11 @@ package org.openforis.collect.presenter
 			o.parentEntityId = view.parentEntity.id;
 			o.nodeName = view.entityDefinition.name;
 			var req:UpdateRequest = new UpdateRequest(o);
-			ClientFactory.dataClient.updateActiveRecord(req, null, addResultHandler);
+			ClientFactory.dataClient.updateActiveRecord(req, null, addResultHandler, faultHandler);
 		}
 		
 		protected function addResultHandler(event:ResultEvent, token:Object = null):void {
 			view.callLater(function():void {
-				var entityName:String = view.entityDefinition.name;
-				view.parentEntity.markChildAsVisited(entityName);
 				updateValidationDisplayManager();
 				
 				if(view.scroller != null && view.scroller.verticalScrollBar != null) {
