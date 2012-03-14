@@ -47,7 +47,7 @@ public class SessionListener implements HttpSessionListener {
 			SessionState sessionState = (SessionState) object;
 			CollectRecord record = sessionState.getActiveRecord();
 			User user = sessionState.getUser();
-			if (record != null && user != null) {
+			if (record != null && record.getId() != null && user != null) {
 				WebApplicationContext applicationContext = WebApplicationContextUtils.getWebApplicationContext(servletContext);
 				RecordManager recordManager = (RecordManager) applicationContext.getBean("recordManager");
 				try {
