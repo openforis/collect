@@ -118,17 +118,17 @@ input|TextInput {
 	borderSkin: ClassReference("org.openforis.collect.ui.skin.TextInputBorderSkin");
 }
 
-input|TextInput.error, input|TextInput.warning {
+input|TextInput.error, input|TextInput.warning, mx|TextArea.error, mx|TextArea.warning {
 	borderStyle: solid;
 	borderWeight: 1;
 	borderThickness: 1;
 }
 
-input|TextInput.error {
+input|TextInput.error, mx|TextArea.error {
 	borderColor: #FF0000;
 }
 
-input|TextInput.warning {
+input|TextInput.warning, mx|TextArea.warning {
 	borderColor: #FFAA00;
 }
 
