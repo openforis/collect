@@ -135,8 +135,6 @@ package org.openforis.collect.presenter {
 		
 		protected function createRecordResultHandler(event:ResultEvent, token:Object = null):void {
 			var record:RecordProxy = event.result as RecordProxy;
-			record.detached = true;
-			//record.rootEntityKeys = new ArrayList();
 			var uiEvent:UIEvent = new UIEvent(UIEvent.RECORD_CREATED);
 			uiEvent.obj = record;
 			eventDispatcher.dispatchEvent(uiEvent);
@@ -150,6 +148,7 @@ package org.openforis.collect.presenter {
 		protected function editButtonClickHandler(event:MouseEvent):void {
 			var selectedRecord:RecordProxy = _view.dataGrid.selectedItem as RecordProxy;
 			if(selectedRecord != null) {
+				selectedRecord.markNodesAsVisited(); //to make validation errors visible
 				var uiEvent:UIEvent = new UIEvent(UIEvent.RECORD_SELECTED);
 				uiEvent.obj = selectedRecord;
 				eventDispatcher.dispatchEvent(uiEvent);

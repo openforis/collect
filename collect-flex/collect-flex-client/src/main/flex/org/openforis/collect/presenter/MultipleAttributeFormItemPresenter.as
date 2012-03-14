@@ -107,6 +107,8 @@ package org.openforis.collect.presenter
 		
 		protected function addResultHandler(event:ResultEvent, token:Object = null):void {
 			view.callLater(function():void {
+				var attributeName:String = view.attributeDefinition.name;
+				_view.parentEntity.markChildAsVisited(attributeName)
 				UIUtil.ensureElementIsVisible(view.addButton);
 			});
 		}
@@ -126,43 +128,17 @@ package org.openforis.collect.presenter
 		
 		override protected function updateValidationDisplayManager():void {
 			super.updateValidationDisplayManager();
-			var visited:Boolean = isVisited();
-			var detached:Boolean = isDetached();
-			var active:Boolean = visited || ! detached;
-			if(active) {
-				_validationDisplayManager.active = true;
-				_validationDisplayManager.displayNodeValidation(view.parentEntity, view.attributeDefinition);
-			} else {
-				_validationDisplayManager.active = false;
-				_validationDisplayManager.reset();
-			}
-		}
-		
-		protected function isVisited():Boolean {
-			var attributes:IList = getAttributes();
-			for each (var a:AttributeProxy in attributes) {
-				if(a.visited) {
-					return true;
+			if(_view.parentEntity != null) {
+				var attributeName:String = view.attributeDefinition.name;
+				var visited:Boolean = _view.parentEntity.isChildVisited(attributeName);
+				var active:Boolean = visited;
+				if(active) {
+					_validationDisplayManager.active = true;
+					_validationDisplayManager.displayNodeValidation(view.parentEntity, view.attributeDefinition);
+				} else {
+					_validationDisplayManager.active = false;
+					_validationDisplayManager.reset();
 				}
-			}
-			return false;
-		}
-		
-		protected function isDetached():Boolean {
-			var attributes:IList = getAttributes();
-			for each (var a:AttributeProxy in attributes) {
-				if(! a.detached) {
-					return false;
-				}
-			}
-			return true;
-		}
-		
-		protected function markLastAttributeAsVisited():void {
-			var attributes:IList = getAttributes();
-			if(CollectionUtil.isNotEmpty(attributes)) {
-				var lastAttribute:Object = attributes.getItemAt(attributes.length - 1);
-				lastAttribute.visited = true;
 			}
 		}
 

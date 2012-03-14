@@ -28,6 +28,7 @@ package org.openforis.collect.model.proxy {
 		private var nodesMap:Dictionary;
 		private var _keyText:String;
 		private var _definition:EntityDefinitionProxy;
+		private var _childrenVisitMap:Array;
 		
 		public function getSingleAttribute(attributeName:String):AttributeProxy {
 			var attributes:IList = childrenByName.get(attributeName);
@@ -219,13 +220,34 @@ package org.openforis.collect.model.proxy {
 			}
 		}
 
-		override public function set detached(value:Boolean):void {
-			super.detached = value;
+		public function markChildAsVisited(name:String):void {
+			if(_childrenVisitMap == null) {
+				_childrenVisitMap = new Array();
+			}
+			_childrenVisitMap[name] = true;
+		}
+		
+		public function isChildVisited(name:String):Boolean {
+			if(_childrenVisitMap == null) {
+				return false;
+			}
+			var result:Boolean = _childrenVisitMap[name];
+			return result;
+		}
+		
+		public function markChildrenAsVisited():void {
+			if(_childrenVisitMap == null) {
+				_childrenVisitMap = new Array();
+			}
 			var children:IList = getChildren();
 			for each (var child:NodeProxy in children) {
-				child.detached = value;
+				markChildAsVisited(child.name);
+				if(child is EntityProxy) {
+					EntityProxy(child).markChildrenAsVisited();
+				}
 			}
 		}
+			
 		
 		public function get keyText():String {
 			return _keyText;

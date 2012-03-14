@@ -81,7 +81,8 @@ package org.openforis.collect.presenter
 		
 		protected function addResultHandler(event:ResultEvent, token:Object = null):void {
 			view.callLater(function():void {
-				markAllEntitiesAsVisited();
+				var entityName:String = view.entityDefinition.name;
+				view.parentEntity.markChildAsVisited(entityName);
 				updateValidationDisplayManager();
 				
 				if(view.scroller != null && view.scroller.verticalScrollBar != null) {
@@ -106,43 +107,17 @@ package org.openforis.collect.presenter
 		
 		override protected function updateValidationDisplayManager():void {
 			super.updateValidationDisplayManager();
-			var visited:Boolean = isVisited();
-			var detached:Boolean = isDetached();
-			var active:Boolean = visited || ! detached;
-			if(active) {
-				_validationDisplayManager.active = true;
-				_validationDisplayManager.displayNodeValidation(view.parentEntity, view.entityDefinition);
-			} else {
-				_validationDisplayManager.active = false;
-				_validationDisplayManager.reset();
-			}
-		}
-		
-		
-		protected function isVisited():Boolean {
-			var entities:IList = getEntities();
-			for each (var e:EntityProxy in entities) {
-				if(e.visited) {
-					return true;
+			if(view.parentEntity != null) {
+				var name:String = view.entityDefinition.name;
+				var visited:Boolean = view.parentEntity.isChildVisited(name);
+				var active:Boolean = visited;
+				if(active) {
+					_validationDisplayManager.active = true;
+					_validationDisplayManager.displayNodeValidation(view.parentEntity, view.entityDefinition);
+				} else {
+					_validationDisplayManager.active = false;
+					_validationDisplayManager.reset();
 				}
-			}
-			return false;
-		}
-
-		protected function isDetached():Boolean {
-			var entities:IList = getEntities();
-			for each (var e:EntityProxy in entities) {
-				if(! e.detached) {
-					return false;
-				}
-			}
-			return true;
-		}
-		
-		protected function markAllEntitiesAsVisited():void {
-			var entities:IList = getEntities();
-			for each (var e:EntityProxy in entities) {
-				e.visited = true;
 			}
 		}
 		
