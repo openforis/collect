@@ -8,6 +8,8 @@ import static org.openforis.collect.model.FieldSymbol.CONFIRMED;
 import java.util.List;
 
 import org.openforis.collect.manager.RecordManager;
+import org.openforis.collect.model.CollectRecord;
+import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.idm.metamodel.KeyAttributeDefinition;
 import org.openforis.idm.metamodel.validation.ValidationResult;
 import org.openforis.idm.metamodel.validation.ValidationResultFlag;
@@ -23,30 +25,29 @@ import org.springframework.beans.factory.annotation.Autowired;
  * 
  */
 public class CollectValidator extends Validator {
+	
 	@Autowired
 	private RecordManager recordManager;
 
 	@Override
 	public ValidationResults validate(Attribute<?, ?> attribute) {
-
 		ValidationResults results = new ValidationResults();
+		
 		SpecifiedValidator specifiedValidator = new SpecifiedValidator();
-		ValidationResultFlag specified = specifiedValidator.evaluate(attribute);
-		results.addResult(specifiedValidator, specified);
+		ValidationResultFlag specifiedResultFlag = specifiedValidator.evaluate(attribute);
+		results.addResult(specifiedValidator, specifiedResultFlag);
 
-		if ( !specified.isError() ) {
-			boolean isKey = isRecordKey(attribute);
-			if (isKey) {
-				RecordKeyUniquenessValidator keyValidator = new RecordKeyUniquenessValidator(recordManager);
-				ValidationResultFlag res = keyValidator.evaluate(attribute);
-				if(res == ValidationResultFlag.ERROR){
-					results.addResult(keyValidator, ValidationResultFlag.ERROR);
-				}
+		if ( !specifiedResultFlag.isError() ) {
+			if ( isRootEntityKey(attribute) ) {
+				validateRootEntityKey(attribute, results);
 			}
-			// TODO only do in phase 1
-			// Lower error level of confirmed error values				
+			
+			CollectRecord record = (CollectRecord) attribute.getRecord();
+			Step step = record.getStep();
+			
 			ValidationResults idmResults = super.validate(attribute);
-			boolean confirmed = isValueConfirmed(attribute);
+			
+			boolean confirmed = ( step == Step.ENTRY ) ? isValueConfirmed(attribute) : false;
 			List<ValidationResult> errors = idmResults.getErrors();
 			for (ValidationResult error : errors) {
 				ValidationResultFlag newFlag = confirmed ? ValidationResultFlag.WARNING : ValidationResultFlag.ERROR;
@@ -58,12 +59,20 @@ public class CollectValidator extends Validator {
 
 	}
 
-	private boolean isRecordKey(Attribute<?, ?> attribute) {
+	private void validateRootEntityKey(Attribute<?, ?> attribute, ValidationResults results) {
+		RecordKeyUniquenessValidator keyValidator = new RecordKeyUniquenessValidator(recordManager);
+		ValidationResultFlag res = keyValidator.evaluate(attribute);
+		if(res == ValidationResultFlag.ERROR){
+			results.addResult(keyValidator, ValidationResultFlag.ERROR);
+		}
+	}
+
+	private boolean isRootEntityKey(Attribute<?, ?> attribute) {
 		Record record = attribute.getRecord();
 		return attribute.getDefinition() instanceof KeyAttributeDefinition && record.getRootEntity().equals(attribute.getParent());
 	}
 
-	private boolean isValueConfirmed(Attribute<?, ?> attribute) {
+	static boolean isValueConfirmed(Attribute<?, ?> attribute) {
 		int fieldCount = attribute.getFieldCount();
 		for (int i = 0; i < fieldCount; i++) {
 			Field<?> field = attribute.getField(i);
@@ -75,4 +84,5 @@ public class CollectValidator extends Validator {
 		}
 		return true;
 	}
+	
 }
