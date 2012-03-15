@@ -1,10 +1,9 @@
 package org.openforis.collect.presenter {
-	import mx.controls.TextInput;
-	
 	import org.openforis.collect.i18n.Message;
 	import org.openforis.collect.model.proxy.AttributeProxy;
 	import org.openforis.collect.model.proxy.FieldProxy;
 	import org.openforis.collect.ui.component.input.BooleanInputField;
+	import org.openforis.collect.ui.component.input.TextInput;
 	import org.openforis.collect.util.StringUtil;
 	
 	/**
@@ -15,14 +14,13 @@ package org.openforis.collect.presenter {
 		
 		private static const TRUE:String = Message.get("edit.booleanValue.true");
 		private static const FALSE:String = Message.get("edit.booleanValue.false");
-		private static const RESTRICT_PATTERN:String = "[" + TRUE + FALSE + TRUE.toLowerCase() + FALSE.toLowerCase() + "\*\-\?]";
+		private static const RESTRICT_PATTERN:String = "^(\\*|-|\\?|" + TRUE + "|" + TRUE.toLowerCase() + "|" + FALSE + "|" + FALSE.toLowerCase() + ")$";
 		
 		private var _view:BooleanInputField;
 		
 		public function BooleanInputFieldPresenter(inputField:BooleanInputField) {
 			_view = inputField;
-			
-			(inputField.textInput as TextInput).restrict = RESTRICT_PATTERN;
+			_view.restrict = RESTRICT_PATTERN;
 			super(inputField);
 		}
 		
