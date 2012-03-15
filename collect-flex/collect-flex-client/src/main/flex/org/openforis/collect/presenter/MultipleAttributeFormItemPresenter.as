@@ -20,6 +20,7 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.ui.component.detail.MultipleAttributeFormItem;
 	import org.openforis.collect.ui.component.detail.ValidationDisplayManager;
 	import org.openforis.collect.ui.component.input.InputField;
+	import org.openforis.collect.util.AlertUtil;
 	import org.openforis.collect.util.CollectionUtil;
 	import org.openforis.collect.util.UIUtil;
 
@@ -91,18 +92,18 @@ package org.openforis.collect.presenter
 		
 		protected function addButtonClickHandler(event:MouseEvent):void {
 			var attributes:IList = getAttributes();
-			//var maxCount:Number = view.attributeDefinition.maxCount
-			//if(isNaN(maxCount) || CollectionUtil.isEmpty(attributes) || attributes.length < maxCount) {
+			var maxCount:Number = view.attributeDefinition.maxCount
+			if(isNaN(maxCount) || CollectionUtil.isEmpty(attributes) || attributes.length < maxCount) {
 				var o:UpdateRequestOperation = new UpdateRequestOperation();
 				o.method = UpdateRequestOperation$Method.ADD;
 				o.parentEntityId = view.parentEntity.id;
 				o.nodeName = view.attributeDefinition.name;
 				var req:UpdateRequest = new UpdateRequest(o);
 				ClientFactory.dataClient.updateActiveRecord(req, null, addResultHandler, faultHandler);
-			/*} else {
+			} else {
 				var labelText:String = view.attributeDefinition.getLabelText();
 				AlertUtil.showError("edit.maxCountExceed", [maxCount, labelText]);
-			}*/	
+			}	
 		}
 		
 		protected function addResultHandler(event:ResultEvent, token:Object = null):void {
