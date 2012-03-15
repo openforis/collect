@@ -14,7 +14,7 @@ package org.openforis.collect.presenter {
 		
 		private static const TRUE:String = Message.get("edit.booleanValue.true");
 		private static const FALSE:String = Message.get("edit.booleanValue.false");
-		private static const RESTRICT_PATTERN:String = "^(\\*|-|\\?|" + TRUE + "|" + TRUE.toLowerCase() + "|" + FALSE + "|" + FALSE.toLowerCase() + ")$";
+		private static const RESTRICT_PATTERN:String = "^(\\*|-|\\?|" + TRUE + "|" + FALSE + ")$";
 		
 		private var _view:BooleanInputField;
 		
