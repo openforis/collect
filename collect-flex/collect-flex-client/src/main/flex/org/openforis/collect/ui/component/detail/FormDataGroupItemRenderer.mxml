@@ -45,36 +45,8 @@
 					if(data is AttributeDefinitionProxy) {
 						var attributeDefn:AttributeDefinitionProxy = AttributeDefinitionProxy(data);
 						formItem = UIBuilder.getAttributeFormItem(attributeDefn);
-						switch(attributeDefn.parentLayout) {
-							case UIUtil.LAYOUT_TABLE:
-								addElement(formItem);
-								break;
-							case UIUtil.LAYOUT_FORM:
-							default:
-								var nodeLabel:NodeLabel = new NodeLabel();
-								nodeLabel.nodeDefinition = attributeDefn;
-								nodeLabel.width = labelWidth;
-								
-								if(attributeDefn is CoordinateAttributeDefinitionProxy || attributeDefn is TaxonAttributeDefinitionProxy) {
-									var vGroup:VGroup = new VGroup();
-									vGroup.addElement(nodeLabel);
-									var internalGroup:HGroup = new HGroup();
-									internalGroup.gap = 0;
-									var spacer:Spacer = new Spacer();
-									spacer.width = 20;
-									internalGroup.addElement(spacer);
-									internalGroup.addElement(formItem);
-									vGroup.addElement(internalGroup);
-									addElement(vGroup);
-								} else {
-									var hGroup:HGroup = new HGroup();
-									hGroup.gap = 0;
-									hGroup.addElement(nodeLabel);
-									hGroup.addElement(formItem);
-									addElement(hGroup);
-								}
-								break;
-						}
+						formItem.labelWidth = labelWidth;
+						addElement(formItem);
 					} else if(data is EntityDefinitionProxy) {
 						formItem = CollectFormItem(UIBuilder.getEntityFormItem(EntityDefinitionProxy(data)));
 						addElement(formItem);
