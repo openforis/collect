@@ -42,13 +42,9 @@ public class UnlockController {
 				SessionState sessionState = (SessionState) session.getAttribute(SessionState.SESSION_ATTRIBUTE_NAME);
 				if(sessionState != null) {
 					CollectRecord activeRecord = sessionState.getActiveRecord();
-					if(activeRecord != null) {
-						Integer id = activeRecord.getId();
+					if(activeRecord != null && activeRecord.getId() != null) {
 						User user = sessionState.getUser();
 						recordManager.unlock(activeRecord, user);
-						if(RecordState.NEW == sessionState.getActiveRecordState()) {
-							this.recordManager.delete(id, user);
-						}
 						//clear session state
 						sessionState.setActiveRecord(null);
 						sessionState.setActiveRecordState(null);

@@ -56,9 +56,9 @@
 					   minWidth="0">
 	-->		
 	
-	<detail:NodeLabel id="nodeLabel" 
-					  nodeDefinition="{entityDefinition}" 
-					  includeIn="vertical" />
+	<detail:FormItemLabel id="formItemLabel"
+		  				  nodeDefinition="{entityDefinition}" 
+						  includeIn="vertical" />
 
 	<s:DataGroup 
 		dataProvider="{nodeDefinitions}" 

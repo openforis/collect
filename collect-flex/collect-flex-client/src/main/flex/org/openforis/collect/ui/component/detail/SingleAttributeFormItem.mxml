@@ -32,8 +32,8 @@
 		<s:HorizontalLayout gap="0" />
 	</detail:layout>
 	
-	<detail:NodeLabel id="formItemLabel" 
-					  nodeDefinition="{attributeDefinition}"
+	<detail:FormItemLabel id="formItemLabel"
+	  				  nodeDefinition="{attributeDefinition}"
 					  width="{labelWidth}"
 					  includeInLayout="{attributeDefinition.parent.layout == UIUtil.LAYOUT_FORM}"
 					  visible="{attributeDefinition.parent.layout == UIUtil.LAYOUT_FORM}"

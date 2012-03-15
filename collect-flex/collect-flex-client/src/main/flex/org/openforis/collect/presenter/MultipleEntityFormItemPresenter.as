@@ -15,6 +15,8 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.remoting.service.UpdateRequestOperation$Method;
 	import org.openforis.collect.ui.component.detail.MultipleEntityFormItem;
 	import org.openforis.collect.ui.component.input.InputField;
+	import org.openforis.collect.util.AlertUtil;
+	import org.openforis.collect.util.CollectionUtil;
 	import org.openforis.collect.util.UIUtil;
 
 	/**
@@ -44,6 +46,11 @@ package org.openforis.collect.presenter
 			super.updateResponseReceivedHandler(event);
 		}
 		
+		override protected function initValidationDisplayManager():void {
+			super.initValidationDisplayManager();
+			_validationDisplayManager.showMinMaxCountErrors = true;
+		}
+		
 		override protected function updateView():void {
 			super.updateView();
 			if(view.entityDefinition != null
@@ -71,12 +78,19 @@ package org.openforis.collect.presenter
 		}
 		
 		protected function addButtonClickHandler(event:MouseEvent):void {
-			var o:UpdateRequestOperation = new UpdateRequestOperation();
-			o.method = UpdateRequestOperation$Method.ADD;
-			o.parentEntityId = view.parentEntity.id;
-			o.nodeName = view.entityDefinition.name;
-			var req:UpdateRequest = new UpdateRequest(o);
-			ClientFactory.dataClient.updateActiveRecord(req, null, addResultHandler, faultHandler);
+			var entities:IList = getEntities();
+			var maxCount:Number = view.entityDefinition.maxCount
+			if(isNaN(maxCount) || CollectionUtil.isEmpty(entities) || entities.length < maxCount) {
+				var o:UpdateRequestOperation = new UpdateRequestOperation();
+				o.method = UpdateRequestOperation$Method.ADD;
+				o.parentEntityId = view.parentEntity.id;
+				o.nodeName = view.entityDefinition.name;
+				var req:UpdateRequest = new UpdateRequest(o);
+				ClientFactory.dataClient.updateActiveRecord(req, null, addResultHandler, faultHandler);
+			} else {
+				var labelText:String = view.entityDefinition.getLabelText();
+				AlertUtil.showError("edit.maxCountExceed", [maxCount, labelText]);
+			}
 		}
 		
 		protected function addResultHandler(event:ResultEvent, token:Object = null):void {

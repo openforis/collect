@@ -20,8 +20,12 @@
 			*/
 			
 			protected function srsLabelFunction(item:Object):String {
-				var srs:SpatialReferenceSystemProxy = SpatialReferenceSystemProxy(item);
-				return srs.getLabelText();
+				if(item != DropDownInputField.EMPTY_SELECTION) {
+					var srs:SpatialReferenceSystemProxy = SpatialReferenceSystemProxy(item);
+					return srs.getLabelText();
+				} else {
+					return item.label;
+				}
 			}
 		]]>
 	</fx:Script>
@@ -39,7 +43,6 @@
 								  fieldIndex="2"
 								  width="150" 
 								  dataField="id"
-								  prompt="{Message.get('global.dropDownPrompt')}" 
 								  includeIn="horizontal" 
 								  itemCreationPolicy="immediate"
 								  labelFunction="{srsLabelFunction}"
