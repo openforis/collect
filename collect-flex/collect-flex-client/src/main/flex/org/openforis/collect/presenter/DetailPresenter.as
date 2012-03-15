@@ -62,6 +62,17 @@ package org.openforis.collect.presenter {
 			ChangeWatcher.watch(rootEntity, "keyText", updateRecordKeyLabel);
 			
 			_view.formVersionText.text = version.getLabelText();
+			switch(activeRecord.step) {
+				case CollectRecord$Step.ENTRY:
+					_view.currentPhaseText.text = Message.get("edit.dataEntry");
+					break;
+				case CollectRecord$Step.CLEANSING:
+					_view.currentPhaseText.text = Message.get("edit.dataCleansing");
+					break;
+				case CollectRecord$Step.ANALYSIS:
+					_view.currentPhaseText.text = Message.get("edit.dataAnalysis");
+					break;
+			}
 			
 			var canSubmit:Boolean = activeRecord.step == CollectRecord$Step.ENTRY || 
 				activeRecord.step == CollectRecord$Step.CLEANSING;
@@ -152,7 +163,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		internal function saveActiveRecordResultHandler(event:ResultEvent, token:Object = null):void {
-			Application.activeRecord.markNodesAsVisited();
+			Application.activeRecord.showErrors();
 			var applicationEvent:ApplicationEvent = new ApplicationEvent(ApplicationEvent.RECORD_SAVED);
 			eventDispatcher.dispatchEvent(applicationEvent);
 		}

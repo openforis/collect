@@ -89,6 +89,13 @@
 				buttonMode="true"
 				/>
 			
+			<s:Label fontSize="10" 
+					 fontWeight="bold" 
+					 text="{Message.get('edit.currentPhaseLabel')}"/>
+			<s:Label id="currentPhaseText" 
+					 fontSize="10" 
+					 fontWeight="bold" />
+			
 			<s:Button 
 				id="submitButton"
 				icon="{Images.SUBMIT}" 
