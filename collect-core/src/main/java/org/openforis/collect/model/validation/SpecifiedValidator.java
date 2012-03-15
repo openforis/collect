@@ -30,10 +30,11 @@ public class SpecifiedValidator implements ValidationRule<Attribute<?,?>> {
 	public ValidationResultFlag evaluate(Attribute<?, ?> attribute) {
 		CollectRecord record = (CollectRecord) attribute.getRecord();
 		Step step = record.getStep();
+		
 		if ( Step.ENTRY == step ) {
 			if ( isRelevant(attribute) && attribute.isEmpty() ) {
 				if ( isReasonBlankAlwaysSpecified(attribute) ) {
-					if (isRequired(attribute)) {
+					if ( isRequired(attribute) ) {
 						return WARNING;
 					} else {
 						return OK;
@@ -44,9 +45,9 @@ public class SpecifiedValidator implements ValidationRule<Attribute<?,?>> {
 			} else {
 				return OK;
 			}
-		} else {
-			return OK;
 		}
+		
+		return OK;
 	}
 
 	private boolean isReasonBlankAlwaysSpecified(Attribute<?, ?> attribute) {

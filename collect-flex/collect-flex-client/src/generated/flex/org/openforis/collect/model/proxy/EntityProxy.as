@@ -10,24 +10,35 @@ package org.openforis.collect.model.proxy {
 	
 	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
+	import mx.collections.ListCollectionView;
 	
 	import org.granite.collections.IMap;
 	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
+	import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.NumberAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.NumberAttributeDefinitionProxy$Type;
 	import org.openforis.collect.util.ObjectUtil;
 	import org.openforis.collect.util.StringUtil;
 
+	/**
+	 * @author S. Ricci
+	 */
     [Bindable]
     [RemoteClass(alias="org.openforis.collect.model.proxy.EntityProxy")]
     public class EntityProxy extends EntityProxyBase {
 		
 		private static const KEY_LABEL_SEPARATOR:String = "-";
 		
-		private var nodesMap:Dictionary;
+		private var _nodesMap:Dictionary;
 		private var _keyText:String;
 		private var _definition:EntityDefinitionProxy;
+		private var _childrenVisitMap:Array;
+		
+		public function EntityProxy():void {
+			_nodesMap = new Dictionary();
+			_childrenVisitMap = new Array();
+		}
 		
 		public function getSingleAttribute(attributeName:String):AttributeProxy {
 			var attributes:IList = childrenByName.get(attributeName);
@@ -65,10 +76,7 @@ package org.openforis.collect.model.proxy {
 		}
 		
 		public function getChildById(id:int):NodeProxy {
-			if(nodesMap == null) {
-				nodesMap = new Dictionary();
-			}
-			var child:NodeProxy = nodesMap[id];
+			var child:NodeProxy = _nodesMap[id];
 			if(child != null) {
 				return child;
 			} else {
@@ -76,7 +84,7 @@ package org.openforis.collect.model.proxy {
 				for each (var childList:IList in values) {
 					for each (child in childList) {
 						if(child.id == id) {
-							nodesMap[id] = child;
+							_nodesMap[id] = child;
 							return child;
 						}
 					}
@@ -123,9 +131,10 @@ package org.openforis.collect.model.proxy {
 				childrenByName.put(name, children);
 			}
 			children.addItem(node);
-			if(nodesMap != null) {
-				nodesMap[node.id] = node;
+			if(_nodesMap != null) {
+				_nodesMap[node.id] = node;
 			}
+			markChildAsVisited(name);
 		}
 		
 		public function removeChild(node:NodeProxy):void {
@@ -134,10 +143,11 @@ package org.openforis.collect.model.proxy {
 			var index:int = children.getItemIndex(node);
 			if(index >= 0) {
 				children.removeItemAt(index);
-				if(nodesMap != null) {
-					nodesMap[node.id] = null;
+				if(_nodesMap != null) {
+					_nodesMap[node.id] = null;
 				}
 			}
+			markChildAsVisited(name);
 		}
 		
 		public function replaceChild(oldNode:NodeProxy, newNode:NodeProxy):void {
@@ -145,8 +155,8 @@ package org.openforis.collect.model.proxy {
 			var children:ArrayCollection = childrenByName.get(name);
 			var index:int = children.getItemIndex(oldNode);
 			children.setItemAt(newNode, index);
-			if(nodesMap != null) {
-				nodesMap[oldNode.id] = newNode;
+			if(_nodesMap != null) {
+				_nodesMap[oldNode.id] = newNode;
 			}
 		}
 		
@@ -219,13 +229,33 @@ package org.openforis.collect.model.proxy {
 			}
 		}
 
-		override public function set detached(value:Boolean):void {
-			super.detached = value;
+		public function markChildAsVisited(name:String):void {
+			_childrenVisitMap[name] = true;
+		}
+		
+		public function isChildVisited(name:String):Boolean {
+			var result:Boolean = _childrenVisitMap[name];
+			return result;
+		}
+		
+		public function markDescendantsAsVisited():void {
+			if(_definition != null) {
+				var childDefinitions:ListCollectionView = _definition.childDefinitions;
+				for each (var defn:NodeDefinitionProxy in childDefinitions) {
+					var name:String = defn.name;
+					_childrenVisitMap[name] = true;
+				}
+			}
+			//todo get definition from schema and mark as visited only entities
 			var children:IList = getChildren();
 			for each (var child:NodeProxy in children) {
-				child.detached = value;
+				_childrenVisitMap[child.name] = true;
+				if(child is EntityProxy) {
+					EntityProxy(child).markDescendantsAsVisited();
+				}
 			}
 		}
+			
 		
 		public function get keyText():String {
 			return _keyText;

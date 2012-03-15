@@ -20,7 +20,7 @@ package org.openforis.collect.client {
 		private var _faultHandler:Function;
 		private var _maxAttempts:int;
 		
-		public function RemoteCallQueueProcessor(maxAttempts:int, resultHandler:Function, faultHandler:Function) {
+		public function RemoteCallQueueProcessor(maxAttempts:int, resultHandler:Function, faultHandler:Function = null) {
 			this._queue = new Queue();
 			this._maxAttempts = maxAttempts;
 			this._resultHandler = resultHandler;
@@ -72,20 +72,11 @@ package org.openforis.collect.client {
 		}
 		
 		protected function callFaultHandler(event:FaultEvent, token:Object = null):void {
-			//after it fails 3 times, the system has to be stopped.
-			var call:RemoteCallWrapper = getHeadElement();
-			if(call.attempts >= _maxAttempts){
-				call.reset();
-				var callToken:Object = call.token;
-				if(_faultHandler != null) {
-					_faultHandler(event, callToken);
-					if(call.faultHandler != null) {
-						call.faultHandler(event, callToken);
-					}
-				}
-			} else {
-				call.reset();
-				sendHeadRemoteCall();
+			//remove the failed call from  the queue
+			var call:RemoteCallWrapper = _queue.pop() as RemoteCallWrapper;
+
+			if(call.faultHandler != null) {
+				call.faultHandler(event, call.token);
 			}
 		}
 		

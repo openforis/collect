@@ -1,7 +1,6 @@
 package org.openforis.collect.util
 {
 	import mx.containers.ViewStack;
-	import mx.controls.TextInput;
 	import mx.core.Container;
 	import mx.core.IVisualElement;
 	import mx.core.UIComponent;
@@ -135,6 +134,36 @@ package org.openforis.collect.util
 			var result:String = cleanedStyle + " " + newStylesConcat;
 			if(applyImmediately) {
 				component.styleName = result;
+			}
+			return result;
+		}
+		
+		public static function getMaxAvailableHeight(component:UIComponent):Number {
+			var paddingTop:Number = component.getStyle("paddingBottom");
+			var paddingBottom:Number = component.getStyle("paddingBottom");
+			var result:Number = component.height;
+			if(!isNaN(result)) {
+				if(!isNaN(paddingTop)) {
+					result -= paddingTop;
+				}
+				if(!isNaN(paddingBottom)) {
+					result -= paddingBottom;
+				}
+			}
+			return result;
+		}
+
+		public static function getMaxAvailableWidth(component:UIComponent):Number {
+			var paddingLeft:Number = component.getStyle("paddingLeft");
+			var paddingRight:Number = component.getStyle("paddingRight");
+			var result:Number = component.width;
+			if(!isNaN(result)) {
+				if(!isNaN(paddingLeft)) {
+					result -= paddingLeft;
+				}
+				if(!isNaN(paddingRight)) {
+					result -= paddingRight;
+				}
 			}
 			return result;
 		}

@@ -73,7 +73,6 @@ package org.openforis.collect.presenter {
 		
 		protected function setActiveRecord(record:RecordProxy):void {
 			Application.activeRecord = record;
-			
 			_view.currentState = MasterView.DETAIL_STATE;
 			
 			var uiEvent:UIEvent = new UIEvent(UIEvent.ACTIVE_RECORD_CHANGED);

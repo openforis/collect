@@ -69,7 +69,7 @@ package org.openforis.collect.presenter {
 			}
 			var req:UpdateRequest = new UpdateRequest();
 			req.operations = operations;
-			dataClient.updateActiveRecord(req);
+			dataClient.updateActiveRecord(req, null, null, faultHandler);
 		}
 		
 		protected function getDateFromFields():Date {

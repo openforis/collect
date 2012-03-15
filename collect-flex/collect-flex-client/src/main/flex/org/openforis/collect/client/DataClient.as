@@ -45,7 +45,7 @@ package org.openforis.collect.client {
 		public function DataClient() {
 			super("dataService");
 			
-			this._queueProcessor = new RemoteCallQueueProcessor(1, queueResultHandler, queueFaultHandler);
+			this._queueProcessor = new RemoteCallQueueProcessor(1, queueResultHandler);
 			this._updateActiveRecordOperation = getOperation("updateActiveRecord");
 			this._saveActiveRecordOperation = getOperation("saveActiveRecord");
 			this._createRecordOperation = getOperation("createRecord");
@@ -151,24 +151,6 @@ package org.openforis.collect.client {
 			EventDispatcherFactory.getEventDispatcher().dispatchEvent(appEvt);
 		}
 
-		protected function queueFaultHandler(event:FaultEvent, token:Object = null):void {
-			var faultCode:String = event.fault.faultCode;
-			switch(faultCode) {
-				case "org.openforis.collect.web.session.InvalidSessionException":
-					var u:URLRequest = new URLRequest(Application.URL +"login.htm?session_expired=1");
-					Application.activeRecord = null;
-					navigateToURL(u,"_self");
-					break;
-				default:
-					if(! Application.serverOffline) {
-						var message:String = Message.get("global.faultHandlerMsg", [faultCode, event.fault.faultString]);
-						BlockingMessagePopUp.show(Message.get("global.errorAlertTitle"), message, Images.ERROR);
-					}
-					Application.serverOffline = true;
-					Application.activeRecord = null;
-			}
-		}
-		
 		private function getRecordStepNumber(step:CollectRecord$Step):int {
 			switch(step) {
 				case CollectRecord$Step.ENTRY:

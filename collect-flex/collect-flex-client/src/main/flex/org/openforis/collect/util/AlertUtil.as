@@ -19,7 +19,8 @@ package org.openforis.collect.util
 			if(titleResource == null) {
 				titleResource = ERROR_TITLE_RESOURCE;
 			}
-			showMsg(Images.ERROR, messageResource, messageParameters, titleResource, titleParameters);
+			var alert:Alert = showMsg(Images.ERROR, messageResource, messageParameters, titleResource, titleParameters);
+			alert.styleName = "error";
 		}
 		
 		public static function showMessage(messageResource:String, messageParameters:Array = null, 
@@ -31,10 +32,11 @@ package org.openforis.collect.util
 		}
 		
 		private static function showMsg(icon:Class, messageResource:String, messageParameters:Array = null, 
-										titleResource:String = null, titleParameters:Array = null):void {
+										titleResource:String = null, titleParameters:Array = null):Alert {
 			var message:String = Message.get(messageResource, messageParameters);
 			var title:String = Message.get(titleResource, titleParameters);
-			Alert.show(message, title, Alert.OK, null, null, icon);
+			var alert:Alert = Alert.show(message, title, Alert.OK, null, null, icon);
+			return alert;
 		}
 		
 		public static function showConfirm(messageResource:String, parameters:Array, titleResource:String, 
