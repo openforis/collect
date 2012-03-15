@@ -259,11 +259,12 @@ public class DataService {
 		List<NodePointer> nodePointers = new ArrayList<NodePointer>();
 		
 		Entity parent = node.getParent();
+		String childName = node.getName();
 		while(parent != null){
-			String childName = node.getName();
 			NodePointer nodePointer = new NodePointer(parent, childName );
 			nodePointers.add(nodePointer);
 			
+			childName = parent.getName();
 			parent = parent.getParent();
 		}
 		return nodePointers;
