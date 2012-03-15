@@ -174,8 +174,8 @@ package org.openforis.collect.ui
 					switch(step) {
 						case CollectRecord$Step.ENTRY:
 							currentItems.push(
-								REPLACE_BLANKS_WITH_DASH_MENU_ITEM, 
-								REPLACE_BLANKS_WITH_STAR_MENU_ITEM
+								REPLACE_BLANKS_WITH_STAR_MENU_ITEM,
+								REPLACE_BLANKS_WITH_DASH_MENU_ITEM 
 							);
 							break;
 						case CollectRecord$Step.CLEANSING:
