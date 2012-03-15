@@ -28,7 +28,7 @@
 			<s:HorizontalLayout gap="0" />
 		</s:layout>
 		
-		<detail:NodeLabel id="nodeLabel"
+		<detail:FormItemLabel id="formItemLabel"
 						  nodeDefinition="{attributeDefinition}" 
 						  width="{labelWidth}"
 						  />

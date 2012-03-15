@@ -55,9 +55,9 @@
 			<s:VerticalLayout />
 		</s:layout>
 
-		<detail:NodeLabel id="nodeLabel"
-						  nodeDefinition="{entityDefinition}"
-						  />
+		<detail:FormItemLabel id="formItemLabel"
+			  				  nodeDefinition="{entityDefinition}"
+							  />
 
 		<s:VGroup paddingLeft="30" 
 				  height="100%" 
