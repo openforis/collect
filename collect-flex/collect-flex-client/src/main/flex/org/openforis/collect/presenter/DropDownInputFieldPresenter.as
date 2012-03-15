@@ -56,7 +56,11 @@ package org.openforis.collect.presenter {
 				}
 				item = getItem(value);
 			}
-			_view.dropDownList.selectedItem = item;
+			if(item != null) {
+				_view.dropDownList.selectedItem = item;
+			} else {
+				_view.dropDownList.selectedItem = DropDownInputField.EMPTY_SELECTION;
+			}
 		}
 		
 		protected function getItem(value:*):Object {
