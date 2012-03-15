@@ -46,6 +46,11 @@ package org.openforis.collect.presenter
 			super.updateResponseReceivedHandler(event);
 		}
 		
+		override protected function initValidationDisplayManager():void {
+			super.initValidationDisplayManager();
+			_validationDisplayManager.showMinMaxCountErrors = true;
+		}
+		
 		override protected function updateView():void {
 			super.updateView();
 			if(view.entityDefinition != null
