@@ -75,7 +75,7 @@ package org.openforis.collect.presenter {
 		protected function fieldVisitedHandler(event:PropertyChangeEvent):void {
 			if(event.newValue == true && (_view.attribute != null || _view.attributeDefinition.multiple && _view.attributes != null)) {
 				var attributeName:String = _view.attributeDefinition.name;
-				_view.parentEntity.markChildAsVisited(attributeName);
+				_view.parentEntity.showErrorsOnChild(attributeName);
 			}
 			updateValidationDisplayManager();
 		}
@@ -96,7 +96,7 @@ package org.openforis.collect.presenter {
 					initValidationDisplayManager();
 				}
 				var attributeName:String = _view.attributeDefinition.name;
-				var visited:Boolean = _view.parentEntity.isChildVisited(attributeName);
+				var visited:Boolean = _view.parentEntity.isErrorOnChildVisible(attributeName);
 				var active:Boolean = !_updating && _view.attribute != null && visited;
 				if(active) {
 					_validationDisplayManager.active = true;

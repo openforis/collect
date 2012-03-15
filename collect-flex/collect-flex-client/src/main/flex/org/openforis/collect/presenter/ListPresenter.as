@@ -148,7 +148,7 @@ package org.openforis.collect.presenter {
 		protected function editButtonClickHandler(event:MouseEvent):void {
 			var selectedRecord:RecordProxy = _view.dataGrid.selectedItem as RecordProxy;
 			if(selectedRecord != null) {
-				selectedRecord.markNodesAsVisited(); //to make validation errors visible
+				selectedRecord.showErrors(); //to make validation errors visible
 				var uiEvent:UIEvent = new UIEvent(UIEvent.RECORD_SELECTED);
 				uiEvent.obj = selectedRecord;
 				eventDispatcher.dispatchEvent(uiEvent);

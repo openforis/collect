@@ -128,7 +128,7 @@ package org.openforis.collect.presenter
 			super.updateValidationDisplayManager();
 			if(_view.parentEntity != null) {
 				var attributeName:String = view.attributeDefinition.name;
-				var visited:Boolean = _view.parentEntity.isChildVisited(attributeName);
+				var visited:Boolean = _view.parentEntity.isErrorOnChildVisible(attributeName);
 				var active:Boolean = visited;
 				if(active) {
 					_validationDisplayManager.active = true;

@@ -88,6 +88,17 @@ public class EntityProxy extends NodeProxy {
 		return map;
 	}
 
+	@ExternalizedProperty
+	public Map<String, Boolean> getShowChildrenErrorsMap() {
+		List<NodeDefinition> childDefinitions = getChildDefinitions();
+		Map<String, Boolean> map = new HashMap<String, Boolean>();
+		for (NodeDefinition childDefinition : childDefinitions) {
+			String childName = childDefinition.getName();
+			map.put(childName, Boolean.FALSE);
+		}
+		return map;
+	}
+	
 	private List<NodeDefinition> getChildDefinitions() {
 		EntityDefinition definition = entity.getDefinition();
 		return definition.getChildDefinitions();

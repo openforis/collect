@@ -33,11 +33,9 @@ package org.openforis.collect.model.proxy {
 		private var _nodesMap:Dictionary;
 		private var _keyText:String;
 		private var _definition:EntityDefinitionProxy;
-		private var _childrenVisitMap:Array;
 		
 		public function EntityProxy():void {
 			_nodesMap = new Dictionary();
-			_childrenVisitMap = new Array();
 		}
 		
 		public function getSingleAttribute(attributeName:String):AttributeProxy {
@@ -134,7 +132,7 @@ package org.openforis.collect.model.proxy {
 			if(_nodesMap != null) {
 				_nodesMap[node.id] = node;
 			}
-			markChildAsVisited(name);
+			showErrorsOnChild(name);
 		}
 		
 		public function removeChild(node:NodeProxy):void {
@@ -147,7 +145,7 @@ package org.openforis.collect.model.proxy {
 					_nodesMap[node.id] = null;
 				}
 			}
-			markChildAsVisited(name);
+			showErrorsOnChild(name);
 		}
 		
 		public function replaceChild(oldNode:NodeProxy, newNode:NodeProxy):void {
@@ -229,29 +227,24 @@ package org.openforis.collect.model.proxy {
 			}
 		}
 
-		public function markChildAsVisited(name:String):void {
-			_childrenVisitMap[name] = true;
+		public function showErrorsOnChild(name:String):void {
+			showChildrenErrorsMap.put(name, true);
 		}
 		
-		public function isChildVisited(name:String):Boolean {
-			var result:Boolean = _childrenVisitMap[name];
+		public function isErrorOnChildVisible(name:String):Boolean {
+			var result:Boolean = showChildrenErrorsMap.get(name);
 			return result;
 		}
 		
-		public function markDescendantsAsVisited():void {
-			if(_definition != null) {
-				var childDefinitions:ListCollectionView = _definition.childDefinitions;
-				for each (var defn:NodeDefinitionProxy in childDefinitions) {
-					var name:String = defn.name;
-					_childrenVisitMap[name] = true;
-				}
-			}
-			//todo get definition from schema and mark as visited only entities
-			var children:IList = getChildren();
-			for each (var child:NodeProxy in children) {
-				_childrenVisitMap[child.name] = true;
-				if(child is EntityProxy) {
-					EntityProxy(child).markDescendantsAsVisited();
+		public function showErrorsOnDescendants():void {
+			var childNodeNames:ArrayCollection = showChildrenErrorsMap.keySet;
+			for each (var name:String in childNodeNames) {
+				showChildrenErrorsMap.put(name, true);
+				var children:IList = getChildren(name);
+				for each (var child:NodeProxy in children) {
+					if(child is EntityProxy) {
+						EntityProxy(child).showErrorsOnDescendants();
+					}
 				}
 			}
 		}

@@ -52,7 +52,6 @@ package org.openforis.collect.presenter
 		}
 		
 		override protected function updateView():void {
-			super.updateView();
 			if(view.entityDefinition != null
 					&& view.entityDefinition.multiple
 					&& view.parentEntity != null 
@@ -62,6 +61,7 @@ package org.openforis.collect.presenter
 			} else {
 				view.dataGroup.dataProvider = null;
 			}
+			updateValidationDisplayManager();
 		}
 		
 		protected function getEntities():IList {
@@ -121,7 +121,7 @@ package org.openforis.collect.presenter
 			super.updateValidationDisplayManager();
 			if(view.parentEntity != null) {
 				var name:String = view.entityDefinition.name;
-				var visited:Boolean = view.parentEntity.isChildVisited(name);
+				var visited:Boolean = view.parentEntity.isErrorOnChildVisible(name);
 				var active:Boolean = visited;
 				if(active) {
 					_validationDisplayManager.active = true;

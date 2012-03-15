@@ -96,16 +96,20 @@ package org.openforis.collect.presenter
 		}
 		
 		public function build():void {
-			var step:CollectRecord$Step = Application.activeRecord.step;
-			var items:Array = new Array();
-			
-			addValueItems(items, step);
-			
-			addRowItems(items, step);
-			var contextMenu:ContextMenu = new ContextMenu();
-			contextMenu.customItems = items;
-			contextMenu.hideBuiltInItems();
-			_inputField.contextMenu = contextMenu;
+			if(Application.activeRecord != null) {
+				var step:CollectRecord$Step = Application.activeRecord.step;
+				var items:Array = new Array();
+				
+				addValueItems(items, step);
+				
+				addRowItems(items, step);
+				var contextMenu:ContextMenu = new ContextMenu();
+				contextMenu.customItems = items;
+				contextMenu.hideBuiltInItems();
+				_inputField.contextMenu = contextMenu;
+			} else {
+				_inputField.contextMenu = null;
+			}
 		}
 		
 		private function addValueItems(currentItems:Array, step:CollectRecord$Step):void {
