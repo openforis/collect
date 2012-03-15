@@ -113,9 +113,8 @@ package org.openforis.collect.presenter
 		}
 		
 		override protected function initValidationDisplayManager():void {
-			var validationStateDisplay:UIComponent = _view;
-			var validationToolTipTrigger:UIComponent = validationStateDisplay;
-			_validationDisplayManager = new ValidationDisplayManager(validationToolTipTrigger, validationStateDisplay);
+			super.initValidationDisplayManager();
+			_validationDisplayManager.showMinMaxCountErrors = true;
 			if(view.attributeDefinition != null) {
 				updateValidationDisplayManager();
 			}
