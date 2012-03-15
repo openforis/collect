@@ -16,12 +16,15 @@
 	<detail:NodeLabel id="formItemLabel" 
 					  nodeDefinition="{attributeDefinition}"
 					  width="{labelWidth}"
-					  includeInLayout="{attributeDefinition.parent.layout == UIUtil.LAYOUT_FORM}"
-					  visible="{attributeDefinition.parent.layout == UIUtil.LAYOUT_FORM}"
+					  includeInLayout="{attributeDefinition.parentLayout == UIUtil.LAYOUT_FORM}"
+					  visible="{attributeDefinition.parentLayout == UIUtil.LAYOUT_FORM}"
 					  />
 	
 	<s:HGroup gap="0">
-		<s:Spacer width="20" />
+		<s:Spacer width="20"
+				  includeInLayout="{attributeDefinition.parentLayout == UIUtil.LAYOUT_FORM}"
+				  visible="{attributeDefinition.parentLayout == UIUtil.LAYOUT_FORM}"
+				  />
 		<s:Group id="contentGroup" />
 	</s:HGroup>
 	
