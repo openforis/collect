@@ -56,7 +56,7 @@
 		</s:layout>
 
 		<detail:NodeLabel id="nodeLabel"
-						  nodeDefinition="{entityDefinition}" 
+						  nodeDefinition="{entityDefinition}"
 						  />
 
 		<s:VGroup paddingLeft="30" 
@@ -66,6 +66,8 @@
 						horizontalScrollPolicy="off" 
 						verticalScrollPolicy="off"
 						width="100%"
+						includeInLayout="{dataGroup.dataProvider.length > 0}"
+						visible="{dataGroup.dataProvider.length > 0}"
 						>
 				<s:HGroup gap="0">
 					<datagroup:DataGroupHeader id="header" 
