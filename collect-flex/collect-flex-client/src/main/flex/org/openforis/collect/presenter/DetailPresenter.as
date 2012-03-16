@@ -172,6 +172,7 @@ package org.openforis.collect.presenter {
 		
 		internal function saveActiveRecordResultHandler(event:ResultEvent, token:Object = null):void {
 			Application.activeRecord.showErrors();
+			Application.activeRecord.updated = false;
 			var applicationEvent:ApplicationEvent = new ApplicationEvent(ApplicationEvent.RECORD_SAVED);
 			eventDispatcher.dispatchEvent(applicationEvent);
 		}

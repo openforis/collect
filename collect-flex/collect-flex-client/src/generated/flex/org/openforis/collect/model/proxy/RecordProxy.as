@@ -89,5 +89,8 @@ package org.openforis.collect.model.proxy {
 			return _updated;
 		}
 		
+		public function set updated(value:Boolean):void {
+			 _updated = value;
+		}
     }
 }
