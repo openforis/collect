@@ -21,6 +21,9 @@ package org.openforis.collect.ui {
 		[Embed("/assets/images/magnifier.png")]
 		public static const MAGNIFIER:Class;
 		
+		[Embed("/assets/images/info.png")]
+		public static const INFO:Class;
+
 		[Embed("/assets/images/error.png")]
 		public static const ERROR:Class;
 		

@@ -21,7 +21,7 @@ package org.openforis.collect.metamodel.proxy {
 			if(firstIfNotFound && list != null && list.length > 0) {
 				return LanguageSpecificTextProxy(list.getItemAt(0)).text;
 			} else {
-				return "";
+				return null;
 			}
 		}
 		

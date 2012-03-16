@@ -10,6 +10,7 @@
 			import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
 			import org.openforis.collect.metamodel.proxy.NodeLabelProxy;
 			import org.openforis.collect.metamodel.proxy.NodeLabelProxy$Type;
+			import org.openforis.collect.ui.Images;
 			
 			protected static const NUMBER_SUFFIX:String = ".";
 			
@@ -19,6 +20,8 @@
 			protected var _numberLabelText:String;
 			[Bindable]
 			protected var _instanceLabelText:String;
+			[Bindable]
+			protected var _description:String;
 			
 			protected function init():void {
 				if(_nodeDefinition != null) {
@@ -29,9 +32,11 @@
 					} else {
 						_instanceLabelText = _nodeDefinition.getLabelText(null, true);
 					}
+					_description = _nodeDefinition.getDescription();
 				} else {
 					_numberLabelText = null;
 					_instanceLabelText = null;
+					_description = null;
 				}
 			}
 			
@@ -61,5 +66,18 @@
 			 width="100%"
 			 text="{_instanceLabelText}"
 			 />
+	
+	<s:Group id="descriptionIconContainer"
+			 width="20"
+			 visible="{_description != null}"
+			 includeInLayout="{_description != null}"
+			 >
+		<s:Image id="descriptionIcon"
+				 source="{Images.INFO}"
+				 toolTip="{_description}"
+				 horizontalCenter="0"
+				 verticalCenter="0"
+				 />
+	</s:Group>
 	
 </s:HGroup>
