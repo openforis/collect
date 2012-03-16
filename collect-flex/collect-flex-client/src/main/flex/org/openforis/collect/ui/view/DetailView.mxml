@@ -11,6 +11,7 @@
 		<![CDATA[
 			import mx.collections.ArrayCollection;
 			
+			import org.openforis.collect.Application;
 			import org.openforis.collect.i18n.Message;
 			import org.openforis.collect.presenter.DetailPresenter;
 			import org.openforis.collect.ui.Images;
@@ -52,9 +53,13 @@
 					<s:SolidColorStroke color="gray" alpha="0.8"/>
 				</s:stroke>
 			</s:Line>
+			<!-- current phase label -->
+			<s:Label id="currentPhaseText" 
+					 styleName="currentPhase"
+					 />
 			<s:HGroup gap="4">
 				<s:Label id="recordKeyLabel" 
-						 styleName="title2"
+						 styleName="recordKey"
 						 />
 			</s:HGroup>
 		</s:HGroup>
@@ -68,17 +73,6 @@
 		<s:HGroup right="0"
 				  verticalAlign="middle"
 				  horizontalAlign="right">
-			<!-- form version label -->
-			<s:HGroup 
-					  horizontalAlign="right" 
-					  gap="5">
-				<s:Label fontSize="10" 
-						 fontWeight="bold" 
-						 text="{Message.get('edit.formVersion')}"/>
-				<s:Label id="formVersionText" 
-						 fontSize="10" 
-						 fontWeight="bold" />
-			</s:HGroup>
 
 			<s:Button 
 				id="rejectButton"
@@ -88,13 +82,6 @@
 				useHandCursor="true"
 				buttonMode="true"
 				/>
-			
-			<s:Label fontSize="10" 
-					 fontWeight="bold" 
-					 text="{Message.get('edit.currentPhaseLabel')}"/>
-			<s:Label id="currentPhaseText" 
-					 fontSize="10" 
-					 fontWeight="bold" />
 			
 			<s:Button 
 				id="submitButton"
@@ -118,12 +105,24 @@
 						   verticalGap="0" />
 	
 	<s:Group width="100%" id="buttonBar">
+		<s:HGroup gap="5" left="0" verticalCenter="0">
+			<!-- form version label -->
+			<s:Label styleName="formVersionLabel"
+					 text="{Message.get('edit.formVersion')}"/>
+			<s:Label id="formVersionText" 
+					 styleName="formVersionText" />
+		</s:HGroup>
 		<!-- Buttons: save, etc...-->
 		<s:Button id="saveButton" label="{Message.get('edit.save')}"
 				  horizontalCenter="0"
+				  verticalCenter="0"
 				  useHandCursor="true" buttonMode="true"
 				  />
 		
+		<s:HGroup right="0" verticalCenter="0">
+			<s:Label styleName="appVersionLabel" text="{Message.get('footer.versionLabel')}" />
+			<s:Label styleName="appVersionText" text="{Application.VERSION}" />
+		</s:HGroup>
 	</s:Group>
 	
 </s:Group>
