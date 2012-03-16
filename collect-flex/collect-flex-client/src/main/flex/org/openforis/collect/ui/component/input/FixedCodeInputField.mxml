@@ -9,31 +9,23 @@
 		<![CDATA[
 			import mx.collections.IList;
 			
+			import org.openforis.collect.metamodel.proxy.CodeAttributeDefinitionProxy;
 			import org.openforis.collect.presenter.FixedCodeInputFieldPresenter;
 			
-			private var _attributes:IList;
-			private var _description:String;
+			private var _qualifiable:Boolean = false;
 			
 			override protected function initPresenter():void {
 				this.presenter = new FixedCodeInputFieldPresenter(this);
 			}
 			
-			public function get attributes():IList {
-				return _attributes;
+			[Bindable]
+			public function get qualifiable():Boolean {
+				return _qualifiable;
 			}
 			
-			public function set attributes(value:IList):void {
-				_attributes = value;
+			public function set qualifiable(value:Boolean):void {
+				_qualifiable = value;
 			}
-			
-			public function get description():String {
-				return _description;
-			}
-			
-			public function set description(value:String):void {
-				_description = value;
-			}
-			
 		]]>
 	</fx:Script>
 	
@@ -41,5 +33,11 @@
 			 width="100%" 
 			 maxDisplayedLines="1" 
 			 showTruncationTip="true" />
+	
+	<input:TextInput id="qualifierTextInput"
+					 visible="{qualifiable}"
+					 includeInLayout="{qualifiable}"
+					 width="50"
+					 />
 	
 </input:InputField>

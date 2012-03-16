@@ -9,6 +9,7 @@ import java.util.List;
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.collect.Proxy;
 import org.openforis.idm.model.Attribute;
+import org.openforis.idm.model.CodeAttribute;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Node;
 
@@ -32,7 +33,11 @@ public class NodeProxy implements Proxy {
 			for (Node<?> node : list) {
 				NodeProxy proxy;
 				if(node instanceof Attribute<?, ?>) {
-					proxy = new AttributeProxy((Attribute<?, ?>) node);
+					if(node instanceof CodeAttribute) {
+						proxy = new CodeAttributeProxy((CodeAttribute) node);
+					} else {
+						proxy = new AttributeProxy((Attribute<?, ?>) node);
+					}
 				} else {
 					proxy = new EntityProxy((Entity) node);
 				}

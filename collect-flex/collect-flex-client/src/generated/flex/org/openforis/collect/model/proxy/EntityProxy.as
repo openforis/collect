@@ -33,6 +33,7 @@ package org.openforis.collect.model.proxy {
 		private var _nodesMap:Dictionary;
 		private var _keyText:String;
 		private var _definition:EntityDefinitionProxy;
+		private var _enumeratedCodeMaxWidth:Number;
 		
 		public function EntityProxy():void {
 			_nodesMap = new Dictionary();
