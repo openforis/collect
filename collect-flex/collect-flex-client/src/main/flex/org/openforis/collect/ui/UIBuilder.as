@@ -232,7 +232,7 @@ package org.openforis.collect.ui {
 						//return NaN;
 						return 150;
 					} else {
-						return 100;
+						return 85;
 					}
 				} else {
 					return NaN;
