@@ -17,8 +17,8 @@
 	
 <!--	<s:Image source="{Images.FOOTER}" />-->
 	
-	<s:HGroup height="100%" width="100%" horizontalAlign="right">
+	<!--<s:HGroup height="100%" width="100%" horizontalAlign="right">
 		<s:Label styleName="appVersionLabel" text="{Message.get('footer.versionLabel')}" />
 		<s:Label styleName="appVersionText" text="{Application.VERSION}" />
-	</s:HGroup>
+	</s:HGroup>-->
 </s:Group>

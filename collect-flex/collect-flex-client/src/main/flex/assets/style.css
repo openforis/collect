@@ -16,7 +16,19 @@ view|Footer {
 	padding-bottom: 5;
 }
 
-.appVersionText {
+.currentPhase {
+	fontSize: 12;
+	fontWeight: bold;
+}
+
+.recordKey {
+	fontSize: 13;
+	fontWeight: bold;
+}
+
+.formVersionLabel, .formVersionText {
+	fontSize: 10;
+	fontWeight: bold;
 }
 
 mx|Alert {
@@ -62,16 +74,6 @@ mx|ToolTip.error, mx|ToolTip.warning, mx|ToolTip.missing {
 }
 
 .listTitle {
-	fontSize: 13;
-	fontWeight: bold;
-}
-
-.title1 {
-	fontSize: 16;
-	fontWeight: bold;
-}
-
-.title2 {
 	fontSize: 13;
 	fontWeight: bold;
 }
