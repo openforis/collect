@@ -3117,8 +3117,8 @@
             </code>
             <coordinate name="vehicle_location" required="true">
                 <label>Vehicle location</label>
-                <distance max="100000" to="idm:lookup('sampling_design', 'plot_centre', 'id', '')" flag="error"/>
-                <distance max="50000" to="idm:lookup('sampling_design', 'plot_centre', 'id', 1)" flag="warn"/>
+                <distance max="100000" to="idm:lookup('sampling_design', 'coordinate', 'cluster', id, 'plot', '')" flag="error"/>
+                <distance max="50000" to="idm:lookup('sampling_design', 'coordinate','cluster', id, 'plot', '')" flag="warn"/>
             </coordinate>
             <text name="gps_model">
                 <label>GPS model</label>
@@ -3223,8 +3223,8 @@
                 </number>
                 <coordinate name="location" ui:tab="plot_det" required="true">
                     <label>GPS reading</label>
-                    <distance max="100" from="lookup('sampling_design', 'plot_centre', parent()/id, id)" to="transform($this , centre/dir, centre/dist)" flag="error"/>
-                    <distance max="10" from="lookup('sampling_design', 'plot_centre', parent()/id, id)" to="transform($this , centre/dir, centre/dist)" flag="warn"/>
+                    <distance max="100" from="idm:lookup('sampling_design', 'centre','cluster', parent()/id, 'plot', no)" to="transform($this , centre/dir, centre/dist)" flag="error"/>
+                    <distance max="10" from="idm:lookup('sampling_design', 'centre','cluster', parent()/id, 'plot', no)" to="transform($this , centre/dir, centre/dist)" flag="warn"/>
                 </coordinate>
                 <entity name="centre" ui:tab="plot_det">
                     <label>Plot centre</label>

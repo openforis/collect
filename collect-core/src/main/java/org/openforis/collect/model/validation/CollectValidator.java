@@ -34,41 +34,49 @@ public class CollectValidator extends Validator {
 	public ValidationResults validate(Attribute<?, ?> attribute) {
 		ValidationResults results = new ValidationResults();
 
+		// check if attribute has been specified
 		SpecifiedValidator specifiedValidator = new SpecifiedValidator();
 		ValidationResultFlag specifiedResultFlag = specifiedValidator.evaluate(attribute);
 		results.addResult(specifiedValidator, specifiedResultFlag);
 
-		if (!specifiedResultFlag.isError()) {
-			if (isRootEntityKey(attribute)) {
-				validateRootEntityKey(attribute, results);
-			}
-
+		if ( !specifiedResultFlag.isError() ) {
 			CollectRecord record = (CollectRecord) attribute.getRecord();
 			Step step = record.getStep();
 
-			ValidationResults idmResults = internalValidate(attribute);
-
-			boolean confirmed = (step == Step.ENTRY) ? isValueConfirmed(attribute) : false;
-			List<ValidationResult> errors = idmResults.getErrors();
-			for (ValidationResult error : errors) {
-				ValidationResultFlag newFlag = confirmed ? ValidationResultFlag.WARNING : ValidationResultFlag.ERROR;
-				results.addResult(error.getValidator(), newFlag);
+			// validate root entity keys
+			if ( isRootEntityKey(attribute) ) {
+				validateRootEntityKey(attribute, results);
 			}
-			results.addResults(idmResults.getWarnings());
+
+			/*
+			 * if the attribute is not empty and 'reason blank' has not been specified than validate it
+			 */
+			if (!(attribute.isEmpty() || isReasonBlankSpecified(attribute))) {
+				validateAttributeValue(attribute, results);
+				if (!results.hasErrors()) {
+					validateAttributeChecks(attribute, results);
+				}
+			}
+
+			if (step == Step.ENTRY) {
+				results = adjustErrorsForEntryPhase(results, attribute);
+			}
 		}
 		return results;
-
 	}
 
-	private ValidationResults internalValidate(Attribute<?, ?> attribute) {
-		ValidationResults results = new ValidationResults();
-		if (!(attribute.isEmpty() || isReasonBlankSpecified(attribute))) {
-			validateAttributeValue(attribute, results);
-			if (!results.hasErrors()) {
-				validateAttributeChecks(attribute, results);
-			}
+	private ValidationResults adjustErrorsForEntryPhase(ValidationResults results, Attribute<?, ?> attribute) {
+		boolean confirmed = isValueConfirmed(attribute);
+		
+		ValidationResults phaseEntryResults = new ValidationResults();
+		List<ValidationResult> errors = results.getErrors();
+		for (ValidationResult error : errors) {
+			ValidationResultFlag newFlag = confirmed ? ValidationResultFlag.WARNING : ValidationResultFlag.ERROR;
+			phaseEntryResults.addResult(error.getValidator(), newFlag);
 		}
-		return results;
+		
+		phaseEntryResults.addResults(results.getWarnings());
+		return phaseEntryResults;
 	}
 
 	private void validateRootEntityKey(Attribute<?, ?> attribute, ValidationResults results) {
