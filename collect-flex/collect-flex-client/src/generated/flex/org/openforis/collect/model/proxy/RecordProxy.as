@@ -81,8 +81,8 @@ package org.openforis.collect.model.proxy {
 			}
 		}
 		
-		public function markNodesAsVisited():void {
-			rootEntity.markDescendantsAsVisited();
+		public function showErrors():void {
+			rootEntity.showErrorsOnDescendants();
 		}
 		
 		public function get updated():Boolean {

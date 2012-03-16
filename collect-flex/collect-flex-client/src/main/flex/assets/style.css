@@ -114,7 +114,7 @@ detail|AttributeItemRenderer.warning,
 	contentBackgroundColor: #DDDDDD;
 }
 
-input|TextInput {
+input|TextInput, mx|TextArea {
 	borderSkin: ClassReference("org.openforis.collect.ui.skin.TextInputBorderSkin");
 }
 
@@ -132,7 +132,7 @@ input|TextInput.warning, mx|TextArea.warning {
 	borderColor: #FFAA00;
 }
 
-input|TextInput.remarksPresent {
+input|TextInput.remarksPresent, mx|TextArea.remarksPresent {
 	remarksPresentIconVisible: true;
 }
 

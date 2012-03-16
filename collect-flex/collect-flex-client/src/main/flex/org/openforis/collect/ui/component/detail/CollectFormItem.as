@@ -16,6 +16,8 @@ package org.openforis.collect.ui.component.detail {
 		private var _parentEntity:EntityProxy;
 		private var _childrenAdded:Boolean = false;
 		private var _occupyEntirePage:Boolean = false;
+		private var _labelWidth:Number = 150;
+		
 		protected var _presenter:FormItemPresenter;
 		
 		public function CollectFormItem() {
@@ -65,6 +67,14 @@ package org.openforis.collect.ui.component.detail {
 			_occupyEntirePage = value;
 		}
 		
+		[Bindable]
+		public function get labelWidth():Number {
+			return _labelWidth;
+		}
+		
+		public function set labelWidth(value:Number):void {
+			_labelWidth = value;
+		}
 		
 	}
 }

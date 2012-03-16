@@ -50,6 +50,7 @@ package org.openforis.collect.metamodel.proxy {
 			return null;
 		}
 		
+		[Bindable]
 		public function get parentLayout():String {
 			if(parent != null) {
 				return parent.layout;

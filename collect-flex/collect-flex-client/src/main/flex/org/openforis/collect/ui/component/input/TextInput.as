@@ -35,7 +35,7 @@ package org.openforis.collect.ui.component.input {
 				var end:String = text.substr(selectionEndIndex);
 				var inserted:String = event.text;
 				var newText:String = begin + inserted + end;
-				var regExp:RegExp = new RegExp(_restrictPattern);
+				var regExp:RegExp = new RegExp(_restrictPattern, "i");
 				var valid:Boolean = regExp.test(newText);
 				if(! valid) {
 					event.preventDefault();

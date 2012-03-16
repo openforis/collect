@@ -29,12 +29,14 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.metamodel.proxy.TimeAttributeDefinitionProxy;
 	import org.openforis.collect.model.UIConfiguration;
 	import org.openforis.collect.model.UITab;
+	import org.openforis.collect.model.UITabDefinition;
 	import org.openforis.collect.ui.component.datagrid.CompleteColumnItemRenderer;
 	import org.openforis.collect.ui.component.datagrid.RecordSummaryDataGrid;
 	import org.openforis.collect.ui.component.datagroup.DataGridHeaderRenderer;
 	import org.openforis.collect.ui.component.detail.AttributeFormItem;
 	import org.openforis.collect.ui.component.detail.AttributeItemRenderer;
 	import org.openforis.collect.ui.component.detail.CodeAttributeFormItem;
+	import org.openforis.collect.ui.component.detail.CompositeAttributeFormItem;
 	import org.openforis.collect.ui.component.detail.EntityFormContainer;
 	import org.openforis.collect.ui.component.detail.EntityFormItem;
 	import org.openforis.collect.ui.component.detail.FormContainer;
@@ -64,7 +66,6 @@ package org.openforis.collect.ui {
 	import spark.components.Label;
 	import spark.components.VGroup;
 	import spark.components.gridClasses.GridColumn;
-	import org.openforis.collect.model.UITabDefinition;
 	
 	/**
 	 * @author Mino Togna
@@ -195,6 +196,8 @@ package org.openforis.collect.ui {
 			var formItem:AttributeFormItem = null;
 			if(def is CodeAttributeDefinitionProxy) {
 				formItem = new CodeAttributeFormItem();
+			} else if(def is CoordinateAttributeDefinitionProxy || def is TaxonAttributeDefinitionProxy) {
+				formItem = new CompositeAttributeFormItem();
 			} else if(def.multiple) {
 				if(parentLayout == UIUtil.LAYOUT_TABLE){
 					formItem = new MultipleAttributeDataGroupFormItem();

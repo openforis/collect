@@ -9,6 +9,7 @@
 			import mx.binding.utils.BindingUtils;
 			
 			import org.openforis.collect.ui.UIBuilder;
+			import org.openforis.collect.util.UIUtil;
 			
 			protected var renderer:AttributeItemRenderer;
 			
@@ -19,12 +20,25 @@
 					BindingUtils.bindProperty(renderer, "attributeDefinition", this, "attributeDefinition");
 					BindingUtils.bindProperty(renderer, "parentEntity", this, "parentEntity");
 					BindingUtils.bindProperty(renderer, "attribute", this, "attribute");
-					addElement(renderer);
+					contentGroup.addElement(renderer);
 					childrenAdded = true;
 				}
 			}
 
 		]]>
 	</fx:Script>
+	
+	<detail:layout>
+		<s:HorizontalLayout gap="0" />
+	</detail:layout>
+	
+	<detail:FormItemLabel id="formItemLabel"
+	  				  nodeDefinition="{attributeDefinition}"
+					  width="{labelWidth}"
+					  includeInLayout="{attributeDefinition.parent.layout == UIUtil.LAYOUT_FORM}"
+					  visible="{attributeDefinition.parent.layout == UIUtil.LAYOUT_FORM}"
+					  />
+	
+	<s:Group id="contentGroup" />
 	
 </detail:AttributeFormItem>

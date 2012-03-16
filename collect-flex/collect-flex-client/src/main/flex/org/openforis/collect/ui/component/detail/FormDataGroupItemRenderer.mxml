@@ -11,22 +11,16 @@
 	<fx:Script>
 		<![CDATA[
 			import mx.binding.utils.BindingUtils;
-			import mx.controls.Spacer;
 			import mx.core.IVisualElement;
 			import mx.core.UIComponent;
 			import mx.events.FlexEvent;
 			
 			import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
-			import org.openforis.collect.metamodel.proxy.CoordinateAttributeDefinitionProxy;
 			import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 			import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
-			import org.openforis.collect.metamodel.proxy.TaxonAttributeDefinitionProxy;
 			import org.openforis.collect.model.proxy.EntityProxy;
 			import org.openforis.collect.ui.UIBuilder;
 			import org.openforis.collect.util.UIUtil;
-			
-			import spark.components.HGroup;
-			import spark.components.VGroup;
 			
 			private var _entity:EntityProxy;
 			private var _modelVersion:ModelVersionProxy;
@@ -43,38 +37,9 @@
 				if(data != null) {
 					var formItem:CollectFormItem;
 					if(data is AttributeDefinitionProxy) {
-						var attributeDefn:AttributeDefinitionProxy = AttributeDefinitionProxy(data);
-						formItem = UIBuilder.getAttributeFormItem(attributeDefn);
-						switch(attributeDefn.parentLayout) {
-							case UIUtil.LAYOUT_TABLE:
-								addElement(formItem);
-								break;
-							case UIUtil.LAYOUT_FORM:
-							default:
-								var nodeLabel:NodeLabel = new NodeLabel();
-								nodeLabel.nodeDefinition = attributeDefn;
-								nodeLabel.width = labelWidth;
-								
-								if(attributeDefn is CoordinateAttributeDefinitionProxy || attributeDefn is TaxonAttributeDefinitionProxy) {
-									var vGroup:VGroup = new VGroup();
-									vGroup.addElement(nodeLabel);
-									var internalGroup:HGroup = new HGroup();
-									internalGroup.gap = 0;
-									var spacer:Spacer = new Spacer();
-									spacer.width = 20;
-									internalGroup.addElement(spacer);
-									internalGroup.addElement(formItem);
-									vGroup.addElement(internalGroup);
-									addElement(vGroup);
-								} else {
-									var hGroup:HGroup = new HGroup();
-									hGroup.gap = 0;
-									hGroup.addElement(nodeLabel);
-									hGroup.addElement(formItem);
-									addElement(hGroup);
-								}
-								break;
-						}
+						formItem = UIBuilder.getAttributeFormItem(AttributeDefinitionProxy(data));
+						formItem.labelWidth = labelWidth;
+						addElement(formItem);
 					} else if(data is EntityDefinitionProxy) {
 						formItem = CollectFormItem(UIBuilder.getEntityFormItem(EntityDefinitionProxy(data)));
 						addElement(formItem);

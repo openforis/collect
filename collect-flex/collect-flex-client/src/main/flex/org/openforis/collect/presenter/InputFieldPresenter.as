@@ -22,7 +22,6 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.remoting.service.UpdateRequestOperation;
 	import org.openforis.collect.remoting.service.UpdateRequestOperation$Method;
 	import org.openforis.collect.remoting.service.UpdateResponse;
-	import org.openforis.collect.ui.ContextMenuBuilder;
 	import org.openforis.collect.ui.component.input.InputField;
 	import org.openforis.collect.util.ArrayUtil;
 	import org.openforis.collect.util.StringUtil;
@@ -45,10 +44,12 @@ package org.openforis.collect.presenter {
 		private var _view:InputField;
 		private var _changed:Boolean = false;
 		private var _dataClient:DataClient;
+		private var _contextMenuPresenter:InputFieldContextMenuPresenter;
 		
 		public function InputFieldPresenter(inputField:InputField = null) {
 			_view = inputField;
 			_dataClient = ClientFactory.dataClient;
+			_contextMenuPresenter = new InputFieldContextMenuPresenter(_view);
 			super();
 			updateView();
 		}
@@ -255,7 +256,7 @@ package org.openforis.collect.presenter {
 				if(_view.attribute != null) {
 					hasRemarks = StringUtil.isNotBlank(getRemarks());
 				}
-				_view.contextMenu = ContextMenuBuilder.buildContextMenu(_view);
+				_contextMenuPresenter.build();
 			}
 			_view.hasRemarks = hasRemarks;
 		}

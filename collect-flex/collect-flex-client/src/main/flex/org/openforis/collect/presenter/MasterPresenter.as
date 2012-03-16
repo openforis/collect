@@ -68,6 +68,7 @@ package org.openforis.collect.presenter {
 		 * */
 		protected function loadRecordResultHandler(event:ResultEvent, token:Object = null):void {
 			var record:RecordProxy = RecordProxy(event.result);
+			record.showErrors();
 			setActiveRecord(record);
 		}
 		

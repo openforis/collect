@@ -7,17 +7,31 @@
 	
 	<fx:Script>
 		<![CDATA[
+			import mx.collections.ArrayCollection;
 			import mx.collections.IList;
 			
+			import org.openforis.collect.i18n.Message;
 			import org.openforis.collect.presenter.DropDownInputFieldPresenter;
 			
+			public static const EMPTY_SELECTION:Object = {label: Message.get('global.dropDownPrompt')};
+			
 			private var _dataProvider:IList;
+			private var _internalDataProvider:IList;
 			private var _labelFunction:Function;
 			private var _dataField:String;
 			private var _prompt:String;
 			
 			override protected function initPresenter():void {
 				presenter = new DropDownInputFieldPresenter(this);
+			}
+			
+			protected function updateInternalDataProvider():void {
+				var temp:ArrayCollection = new ArrayCollection();
+				temp.addItem(EMPTY_SELECTION);
+				if(dataProvider != null) {
+					temp.addAll(dataProvider);
+				}
+				internalDataProvider = temp;
 			}
 			
 			[Bindable]
@@ -27,8 +41,9 @@
 
 			public function set dataProvider(value:IList):void {
 				_dataProvider = value;
+				updateInternalDataProvider();
 			}
-
+			
 			[Bindable]
 			public function get labelFunction():Function {
 				return _labelFunction;
@@ -48,12 +63,12 @@
 			}
 
 			[Bindable]
-			public function get prompt():String {
-				return _prompt;
+			protected function get internalDataProvider():IList {
+				return _internalDataProvider;
 			}
 
-			public function set prompt(value:String):void {
-				_prompt = value;
+			protected function set internalDataProvider(value:IList):void {
+				_internalDataProvider = value;
 			}
 
 
@@ -61,9 +76,8 @@
 	</fx:Script>
 	
 	<s:DropDownList id="dropDownList" width="100%" 
-					dataProvider="{dataProvider}" 
+					dataProvider="{internalDataProvider}" 
 					labelFunction="{labelFunction}"
-					prompt="{prompt}"
 					/>
 	
 </input:InputField>
