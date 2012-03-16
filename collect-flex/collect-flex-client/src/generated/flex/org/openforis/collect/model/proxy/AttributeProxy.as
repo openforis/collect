@@ -42,18 +42,20 @@ package org.openforis.collect.model.proxy {
 					if(StringUtil.isBlank(message)) {
 						var messageResource:String = null;
 						switch(r.ruleName) {
-							case "SpecifiedValidator":
-								if(flag == ValidationResultFlag.ERROR) {
-									messageResource = "edit.validation.specifiedError";
-								} else {
-									messageResource = "edit.validation.requiredWarning";
-								}
-								break;
 							case "CodeValidator":
 								messageResource = "edit.validation.codeError";
 								break;
+							case "ComparisonCheck":
+								messageResource = "edit.validation.comparisonError";
+								break;
+							case "CoordinateValidator":
+								messageResource = "edit.validation.coordinateError";
+								break;
 							case "DateValidator":
 								messageResource = "edit.validation.dateError";
+								break;
+							case "DistanceCheck":
+								messageResource = "edit.validation.distanceError";
 								break;
 							case "ExternalCodeValidator":
 								messageResource = "edit.validation.externalCodeError";
@@ -61,14 +63,27 @@ package org.openforis.collect.model.proxy {
 							case "IntegerRangeValidator":
 								messageResource = "edit.validation.integerRangeError";
 								break;
+							case "PatternCheck":
+								messageResource = "edit.validation.patternError";
+								break;
 							case "RealRangeValidator":
 								messageResource = "edit.validation.realRangeError";
 								break;
 							case "RecordKeyUniquenessValidator":
 								messageResource = "edit.validation.recordKeyUniquenessError";
 								break;
+							case "SpecifiedValidator":
+								if(flag == ValidationResultFlag.ERROR) {
+									messageResource = "edit.validation.specifiedError";
+								} else {
+									messageResource = "edit.validation.requiredWarning";
+								}
+								break;
 							case "TimeValidator":
 								messageResource = "edit.validation.timeError";
+								break;
+							case "UniquenessCheck":
+								messageResource = "edit.validation.uniquenessError";
 								break;
 						}
 						if(messageResource != null) {
