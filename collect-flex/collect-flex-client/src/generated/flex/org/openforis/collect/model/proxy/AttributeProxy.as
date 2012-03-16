@@ -40,16 +40,41 @@ package org.openforis.collect.model.proxy {
 				for each (var r:ValidationResultProxy in results) {
 					var message:String = LanguageSpecificTextProxy.getLocalizedText(r.messages);
 					if(StringUtil.isBlank(message)) {
+						var messageResource:String = null;
 						switch(r.ruleName) {
 							case "SpecifiedValidator":
 								if(flag == ValidationResultFlag.ERROR) {
-									message = Message.get("edit.validation.specifiedError");
+									messageResource = "edit.validation.specifiedError";
 								} else {
-									message = Message.get("edit.validation.requiredWarning");
+									messageResource = "edit.validation.requiredWarning";
 								}
 								break;
-							default:
-								message = r.ruleName;
+							case "CodeValidator":
+								messageResource = "edit.validation.codeError";
+								break;
+							case "DateValidator":
+								messageResource = "edit.validation.dateError";
+								break;
+							case "ExternalCodeValidator":
+								messageResource = "edit.validation.externalCodeError";
+								break;
+							case "IntegerRangeValidator":
+								messageResource = "edit.validation.integerRangeError";
+								break;
+							case "RealRangeValidator":
+								messageResource = "edit.validation.realRangeError";
+								break;
+							case "RecordKeyUniquenessValidator":
+								messageResource = "edit.validation.recordKeyUniquenessError";
+								break;
+							case "TimeValidator":
+								messageResource = "edit.validation.timeError";
+								break;
+						}
+						if(messageResource != null) {
+							message = Message.get(messageResource);
+						} else {
+							message = r.ruleName;
 						}
 					}
 					parts.push(message);
