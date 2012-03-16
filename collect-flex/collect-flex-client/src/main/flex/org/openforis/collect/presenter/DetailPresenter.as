@@ -117,6 +117,14 @@ package org.openforis.collect.presenter {
 		 * Back to list
 		 * */
 		protected function backToListButtonClickHandler(event:Event):void {
+			if(Application.activeRecord.updated) {
+				AlertUtil.showConfirm("edit.confirmBackToList", null, null, performClearActiveRecord);
+			} else {
+				performClearActiveRecord();
+			}
+		}
+		
+		protected function performClearActiveRecord():void {
 			_dataClient.clearActiveRecord(new AsyncResponder(clearActiveRecordHandler, faultHandler));
 		}
 		
