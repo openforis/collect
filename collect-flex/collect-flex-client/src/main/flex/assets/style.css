@@ -31,6 +31,11 @@ view|Footer {
 	fontWeight: bold;
 }
 
+.listTitle {
+	fontSize: 13;
+	fontWeight: bold;
+}
+
 mx|Alert {
 	color: #1B1B1B;
 	border-color:#000000;
@@ -60,10 +65,16 @@ component|BlockingMessagePopUp {
 	showCloseButton: false;
 }
 
+mx|ToolTip { 
+	fontSize: 10; 
+	backgroundColor: #AAD4FF;
+	color: #000000; 
+}
+
 /* validation tooltips */
 mx|ToolTip.error, mx|ToolTip.warning, mx|ToolTip.missing {
 	color: #FFFFFF;
-	fontSize: 9;
+	fontSize: 10;
 	fontWeight: "bold";	
 	shadowColor: #000000;
 	borderStyle: "errorTipRight";
@@ -71,11 +82,6 @@ mx|ToolTip.error, mx|ToolTip.warning, mx|ToolTip.missing {
 	paddingLeft: 4;
 	paddingRight: 4;
 	paddingTop: 4;
-}
-
-.listTitle {
-	fontSize: 13;
-	fontWeight: bold;
 }
 
 mx|ToolTip.error {
