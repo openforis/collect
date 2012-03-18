@@ -2,8 +2,16 @@ package org.openforis.collect.presenter {
 	import flash.events.Event;
 	import flash.events.FocusEvent;
 	
+	import mx.binding.utils.BindingUtils;
+	import mx.binding.utils.ChangeWatcher;
+	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
+	import mx.events.PropertyChangeEvent;
 	
+	import org.openforis.collect.Application;
+	import org.openforis.collect.i18n.Message;
+	import org.openforis.collect.model.CollectRecord$Step;
+	import org.openforis.collect.model.FieldSymbol;
 	import org.openforis.collect.model.proxy.AttributeProxy;
 	import org.openforis.collect.model.proxy.FieldProxy;
 	import org.openforis.collect.ui.component.input.DropDownInputField;
@@ -16,6 +24,11 @@ package org.openforis.collect.presenter {
 	 * */
 	public class DropDownInputFieldPresenter extends InputFieldPresenter {
 		
+		public static const EMPTY_ITEM:Object = {label: Message.get('global.dropDownPrompt'), separator: true};
+		public static const BLANK_ON_FORM_ITEM:Object = {label: Message.get('edit.dropDownList.blankOnForm'), shortCut: "*"};
+		public static const DASH_ON_FORM_ITEM:Object = {label: Message.get('edit.dropDownList.dashOnForm'), shortCut: "-"};
+		public static const ILLEGIBLE_ITEM:Object = {label: Message.get('edit.dropDownList.illegible'), shortCut: "?", separator: true};
+
 		private var _view:DropDownInputField;
 		
 		public function DropDownInputFieldPresenter(inputField:DropDownInputField) {
@@ -27,21 +40,53 @@ package org.openforis.collect.presenter {
 		override internal function initEventListeners():void {
 			super.initEventListeners();
 			
-			//TODO binding
 			_view.dropDownList.addEventListener(FocusEvent.FOCUS_IN, focusInHandler);
 			_view.dropDownList.addEventListener(Event.CHANGE, changeHandler);
 			
+			ChangeWatcher.watch(_view, "dataProvider", dataProviderChangeHandler);
+			BindingUtils.bindSetter(activePhaseSetter, Application, ["activeRecord", "step"]);
 		}
 		
 		override protected function changeHandler(event:Event):void {
 			applyValue();
 		}
 		
+		protected function activePhaseSetter(value:CollectRecord$Step):void {
+			initInternalDataProvider();
+		}
+		
+		protected function dataProviderChangeHandler(event:PropertyChangeEvent):void {
+			initInternalDataProvider();
+		}
+		
+		protected function initInternalDataProvider():void {
+			var temp:ArrayCollection = new ArrayCollection();
+			temp.addItem(EMPTY_ITEM);
+			if(Application.activeRecord.step == CollectRecord$Step.ENTRY) {
+				temp.addItem(BLANK_ON_FORM_ITEM);
+				temp.addItem(DASH_ON_FORM_ITEM);
+				temp.addItem(ILLEGIBLE_ITEM);
+			}
+			if(_view.dataProvider != null) {
+				temp.addAll(_view.dataProvider);
+			}
+			_view.internalDataProvider = temp;
+
+		}
+		
 		override protected function textToRequestValue():String {
 			var value:String = null;
 			var selectedItem:* = _view.dropDownList.selectedItem;
 			if(selectedItem != null) {
-				value = String(ObjectUtil.getValue(selectedItem, _view.dataField));
+				switch(selectedItem) {
+					case BLANK_ON_FORM_ITEM:
+					case DASH_ON_FORM_ITEM:
+					case ILLEGIBLE_ITEM:
+						value = selectedItem.shortCut;
+						break;
+					default:
+						value = String(ObjectUtil.getValue(selectedItem, _view.dataField));
+				}
 			}
 			return value;
 		}
@@ -52,14 +97,26 @@ package org.openforis.collect.presenter {
 			if(attribute != null) {
 				var field:FieldProxy = attribute.getField(_view.fieldIndex);
 				var value:Object = field.value;
-				if(field.symbol != null) {
+				if(field.symbol != null && isReasonBlankSymbol(field.symbol)) {
+					switch(field.symbol) {
+						case FieldSymbol.BLANK_ON_FORM:
+							item = BLANK_ON_FORM_ITEM;
+							break;
+						case FieldSymbol.DASH_ON_FORM:
+							item = DASH_ON_FORM_ITEM;
+							break;1
+						case FieldSymbol.ILLEGIBLE:
+							item = ILLEGIBLE_ITEM;
+							break;
+					}
+				} else {
+					item = getItem(value);
 				}
-				item = getItem(value);
 			}
 			if(item != null) {
 				_view.dropDownList.selectedItem = item;
 			} else {
-				_view.dropDownList.selectedItem = DropDownInputField.EMPTY_SELECTION;
+				_view.dropDownList.selectedItem = EMPTY_ITEM;
 			}
 		}
 		
