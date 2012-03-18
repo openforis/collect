@@ -64,7 +64,10 @@ package org.openforis.collect.model.proxy {
 				node = response.createdNode;
 				parent = getNode(node.parentId) as EntityProxy;
 				parent.addChild(node);
-				_nodesMap[node.id] = node;
+				initNode(node);
+				if(node is EntityProxy) {
+					EntityProxy(node).traverse(initNode);
+				}
 			}
 			if(response.deletedNodeId > 0) {
 				node = getNode(response.deletedNodeId);
