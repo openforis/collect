@@ -37,6 +37,7 @@ package org.openforis.collect.util {
 	import org.openforis.collect.model.UITab;
 	import org.openforis.collect.model.UITabDefinition;
 	import org.openforis.collect.model.proxy.AttributeProxy;
+	import org.openforis.collect.model.proxy.CodeAttributeProxy;
 	import org.openforis.collect.model.proxy.CodeProxy;
 	import org.openforis.collect.model.proxy.CoordinateProxy;
 	import org.openforis.collect.model.proxy.DateProxy;
@@ -66,6 +67,7 @@ package org.openforis.collect.util {
 				BasicMap, 
 				BooleanAttributeDefinitionProxy,
 				CodeAttributeDefinitionProxy,
+				CodeAttributeProxy,
 				CodeListItemProxy,
 				CodeListLabelProxy,
 				CodeListLabelProxy$Type,

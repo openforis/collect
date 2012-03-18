@@ -7,9 +7,6 @@
 
 	<fx:Script>
 		<![CDATA[
-			import mx.collections.IList;
-			
-			import org.openforis.collect.metamodel.proxy.CodeAttributeDefinitionProxy;
 			import org.openforis.collect.presenter.FixedCodeInputFieldPresenter;
 			
 			private var _qualifiable:Boolean = false;
@@ -29,15 +26,19 @@
 		]]>
 	</fx:Script>
 	
+	<input:layout>
+		<s:HorizontalLayout gap="2" />
+	</input:layout>
+	
 	<s:Label id="textInput" 
-			 width="100%" 
+			 styleName="fixedCode"
 			 maxDisplayedLines="1" 
 			 showTruncationTip="true" />
 	
 	<input:TextInput id="qualifierTextInput"
 					 visible="{qualifiable}"
 					 includeInLayout="{qualifiable}"
-					 width="50"
+					 width="100"
 					 />
 	
 </input:InputField>
