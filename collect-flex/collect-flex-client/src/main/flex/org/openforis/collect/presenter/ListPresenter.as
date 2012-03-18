@@ -142,6 +142,7 @@ package org.openforis.collect.presenter {
 		
 		protected function createRecordResultHandler(event:ResultEvent, token:Object = null):void {
 			var record:RecordProxy = event.result as RecordProxy;
+			record.init();
 			var uiEvent:UIEvent = new UIEvent(UIEvent.RECORD_CREATED);
 			uiEvent.obj = record;
 			eventDispatcher.dispatchEvent(uiEvent);

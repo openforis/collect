@@ -6,20 +6,17 @@
  */
 
 package org.openforis.collect.model.proxy {
-	import flash.utils.Dictionary;
-	
 	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
-	import mx.collections.ListCollectionView;
 	
 	import org.granite.collections.IMap;
 	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
-	import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.NumberAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.NumberAttributeDefinitionProxy$Type;
 	import org.openforis.collect.util.ObjectUtil;
 	import org.openforis.collect.util.StringUtil;
+	import org.openforis.collect.util.UIUtil;
 
 	/**
 	 * @author S. Ricci
@@ -30,13 +27,62 @@ package org.openforis.collect.model.proxy {
 		
 		private static const KEY_LABEL_SEPARATOR:String = "-";
 		
-		private var _nodesMap:Dictionary;
 		private var _keyText:String;
 		private var _definition:EntityDefinitionProxy;
-		private var _enumeratedCodeMaxWidth:Number;
+		private var _enumeratedCodeWidth:Number;
+		private var _enumeratedEntitiesCodeWidths:Array;
 		
-		public function EntityProxy():void {
-			_nodesMap = new Dictionary();
+		override public function init():void {
+			super.init();
+			_enumeratedEntitiesCodeWidths = new Array();
+			var entities:IList = getChildEntities();
+			for each (var e:EntityProxy in entities) {
+				if(e.enumerated) {
+					var name:String = e.name;
+					var maxWidth:Number = _enumeratedEntitiesCodeWidths[name];
+					var keyAttribute:CodeAttributeProxy = e.getKeyAttribute();
+					if(keyAttribute != null && keyAttribute.codeListItem != null) {
+						var label:String = keyAttribute.codeListItem.getLabelText();
+						//var width:Number = label.length * 7;
+						var width:Number = UIUtil.measureFixedCodeWidth(label);
+						if(keyAttribute.codeListItem.qualifiable) {
+							width += 104; //space for qualifier text input
+						}
+						if(!isNaN(maxWidth)) {
+							maxWidth = Math.max(maxWidth, width);
+						} else {
+							maxWidth = width;
+						}
+					}
+					_enumeratedEntitiesCodeWidths[name] = maxWidth;
+				}
+			}
+		}
+		
+		protected function getKeyAttribute():CodeAttributeProxy {
+			var children:IList = getChildren();
+			for each (var child:NodeProxy in children) {
+				if(child is CodeAttributeProxy) {
+					var codeAttribute:CodeAttributeProxy = CodeAttributeProxy(child);
+					if(codeAttribute.enumerator) {
+						return codeAttribute;
+					}
+				}
+			}
+			return null;
+		}
+		
+		/**
+		 * Traverse each child and pass it to the argument function
+		 * */
+		public function traverse(fun:Function):void {
+			var children:IList = getChildren();
+			for each (var child:NodeProxy in children) {
+				fun(child);
+				if(child is EntityProxy) {
+					EntityProxy(child).traverse(fun);
+				}
+			}
 		}
 		
 		public function getSingleAttribute(attributeName:String):AttributeProxy {
@@ -74,41 +120,6 @@ package org.openforis.collect.model.proxy {
 			}
 		}
 		
-		public function getChildById(id:int):NodeProxy {
-			var child:NodeProxy = _nodesMap[id];
-			if(child != null) {
-				return child;
-			} else {
-				var values:ArrayCollection = childrenByName.values;
-				for each (var childList:IList in values) {
-					for each (child in childList) {
-						if(child.id == id) {
-							_nodesMap[id] = child;
-							return child;
-						}
-					}
-				}
-			}
-			return null;
-		}
-		
-		public function getNode(id:int):NodeProxy {
-			var child:NodeProxy = getChildById(id);
-			if(child != null) {
-				return child;
-			} else {
-				//search in child entities
-				var entities:IList = getChildEntities();
-				for each (var e:EntityProxy in entities) {
-					child = e.getNode(id);
-					if(child != null) {
-						return child;
-					}
-				}
-			}
-			return null;
-		}
-		
 		public function getChildEntities():IList {
 			var entities:IList = new ArrayCollection();
 			var values:IList = childrenByName.values;
@@ -130,9 +141,7 @@ package org.openforis.collect.model.proxy {
 				childrenByName.put(name, children);
 			}
 			children.addItem(node);
-			if(_nodesMap != null) {
-				_nodesMap[node.id] = node;
-			}
+			node.init();
 			showErrorsOnChild(name);
 		}
 		
@@ -142,9 +151,6 @@ package org.openforis.collect.model.proxy {
 			var index:int = children.getItemIndex(node);
 			if(index >= 0) {
 				children.removeItemAt(index);
-				if(_nodesMap != null) {
-					_nodesMap[node.id] = null;
-				}
 			}
 			showErrorsOnChild(name);
 		}
@@ -154,9 +160,6 @@ package org.openforis.collect.model.proxy {
 			var children:ArrayCollection = childrenByName.get(name);
 			var index:int = children.getItemIndex(oldNode);
 			children.setItemAt(newNode, index);
-			if(_nodesMap != null) {
-				_nodesMap[oldNode.id] = newNode;
-			}
 		}
 		
 		public function updateKeyText():void {
@@ -249,7 +252,11 @@ package org.openforis.collect.model.proxy {
 				}
 			}
 		}
-			
+		
+		public function getEnumeratedCodeWidth(entityName:String):Number {
+			var result:Number = _enumeratedEntitiesCodeWidths[entityName];
+			return result;
+		}
 		
 		public function get keyText():String {
 			return _keyText;
@@ -266,6 +273,25 @@ package org.openforis.collect.model.proxy {
 		public function set definition(value:EntityDefinitionProxy):void {
 			_definition = value;
 		}
+
+		public function get enumeratedCodeWidth():Number {
+			return _enumeratedCodeWidth;
+		}
+
+		public function set enumeratedCodeWidth(value:Number):void {
+			_enumeratedCodeWidth = value;
+		}
+
+		public function get enumeratedEntitiesCodeWidths():Array
+		{
+			return _enumeratedEntitiesCodeWidths;
+		}
+
+		public function set enumeratedEntitiesCodeWidths(value:Array):void
+		{
+			_enumeratedEntitiesCodeWidths = value;
+		}
+
 		
 	}
 }

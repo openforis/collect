@@ -11,10 +11,8 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.client.DataClient;
 	import org.openforis.collect.event.UIEvent;
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
-	import org.openforis.collect.model.CollectRecord$Step;
 	import org.openforis.collect.model.proxy.RecordProxy;
 	import org.openforis.collect.ui.view.MasterView;
-	import org.openforis.collect.util.AlertUtil;
 
 	public class MasterPresenter extends AbstractPresenter {
 		
@@ -68,6 +66,7 @@ package org.openforis.collect.presenter {
 		 * */
 		protected function loadRecordResultHandler(event:ResultEvent, token:Object = null):void {
 			var record:RecordProxy = RecordProxy(event.result);
+			record.init();
 			record.showErrors();
 			setActiveRecord(record);
 		}

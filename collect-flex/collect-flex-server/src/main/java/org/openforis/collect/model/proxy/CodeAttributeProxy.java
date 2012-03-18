@@ -3,9 +3,12 @@
  */
 package org.openforis.collect.model.proxy;
 
+import org.apache.commons.lang3.StringUtils;
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.collect.metamodel.proxy.CodeListItemProxy;
+import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeListItem;
+import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.model.CodeAttribute;
 
 /**
@@ -28,6 +31,18 @@ public class CodeAttributeProxy extends AttributeProxy {
 			return new CodeListItemProxy(codeListItem);
 		} else {
 			return null;
+		}
+	}
+	
+	@ExternalizedProperty
+	public boolean isEnumerator() {
+		CodeAttributeDefinition definition = codeAttribute.getDefinition();
+		EntityDefinition parentDefinition = definition.getParentDefinition();
+		if(parentDefinition.isEnumerable() && definition.isKey() && 
+				definition.getList() != null && StringUtils.isBlank(definition.getList().getLookupTable())) {
+			return true;
+		} else {
+			return false;
 		}
 	}
 	

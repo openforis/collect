@@ -1,10 +1,19 @@
 package org.openforis.collect.util
 {
+	import flash.text.AntiAliasType;
+	import flash.text.GridFitType;
+	import flash.text.TextLineMetrics;
+	
 	import mx.containers.ViewStack;
 	import mx.core.Container;
+	import mx.core.FlexGlobals;
 	import mx.core.IVisualElement;
 	import mx.core.UIComponent;
+	import mx.core.UITextFormat;
+	import mx.styles.CSSStyleDeclaration;
+	import mx.styles.IStyleManager2;
 	
+	import spark.components.Application;
 	import spark.components.NavigatorContent;
 	import spark.components.Scroller;
 	
@@ -15,6 +24,26 @@ package org.openforis.collect.util
 		
 		public static const LAYOUT_FORM:String = "form";
 		public static const LAYOUT_TABLE:String = "table";
+		
+		private static var fixedCodeTextFormat:UITextFormat
+		
+		{
+			initFixedCodeTextFormat();
+		}
+		
+		private static function initFixedCodeTextFormat():void {
+			var application:Application = FlexGlobals.topLevelApplication as Application;
+			var styleManager:IStyleManager2 = application.styleManager;
+			var fixedCodeLabelStyle:CSSStyleDeclaration = styleManager.getMergedStyleDeclaration("spark.components.Label.fixedCode");
+			var fontSize:* = fixedCodeLabelStyle.getStyle("fontSize");
+			var fontWeight:* = fixedCodeLabelStyle.getStyle("fontWeight");
+			var font:* = fixedCodeLabelStyle.getStyle("fontFamily");
+			fixedCodeTextFormat = new UITextFormat(application.systemManager, font, fontSize);
+			fixedCodeTextFormat.bold = fontWeight == "bold";
+			fixedCodeTextFormat.italic = fontWeight == "italic";
+			fixedCodeTextFormat.antiAliasType = AntiAliasType.NORMAL;
+			fixedCodeTextFormat.gridFitType = GridFitType.NONE;
+		}
 		
 		public static function resetScrollBars(uiComponent:UIComponent):void {
 			if(uiComponent is Scroller) {
@@ -168,5 +197,9 @@ package org.openforis.collect.util
 			return result;
 		}
 		
+		public static function measureFixedCodeWidth(text:String):Number {
+			var measure:TextLineMetrics = fixedCodeTextFormat.measureText(text);
+			return measure.width;
+		}
 	}
 }

@@ -2,7 +2,9 @@ package org.openforis.collect.presenter {
 	import flash.events.Event;
 	import flash.events.FocusEvent;
 	
+	import org.openforis.collect.Application;
 	import org.openforis.collect.model.proxy.CodeAttributeProxy;
+	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.model.proxy.FieldProxy;
 	import org.openforis.collect.remoting.service.UpdateRequest;
 	import org.openforis.collect.remoting.service.UpdateRequestOperation;
@@ -50,6 +52,13 @@ package org.openforis.collect.presenter {
 			}
 			_view.qualifiable = qualifiable;
 			_view.qualifierTextInput.text = qualifier;
+			if(_view.parentEntity) {
+				var entityName:String = _view.parentEntity.name;
+				var ancestorEntityId:Number = _view.parentEntity.parentId;
+				var ancestorEntity:EntityProxy = Application.activeRecord.getNode(ancestorEntityId) as EntityProxy;
+				var maxWidth:Number = ancestorEntity.getEnumeratedCodeWidth(entityName);
+				_view.width = maxWidth;
+			}
 		}
 		
 		override protected function getTextFromValue():String {

@@ -6,6 +6,8 @@
  */
 
 package org.openforis.collect.model.proxy {
+	import flash.utils.Dictionary;
+	
 	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
 	
@@ -15,16 +17,38 @@ package org.openforis.collect.model.proxy {
     [RemoteClass(alias="org.openforis.collect.model.proxy.RecordProxy")]
     public class RecordProxy extends RecordProxyBase {
 		
+		private var _nodesMap:Dictionary;
 		private var _updated:Boolean = false;
 		
 		private var validationResults:ValidationResultsProxy;
+
+		public function RecordProxy():void {
+			super();
+		}
+		
+		public function init():void {
+			_nodesMap = new Dictionary();
+			traverse(initNode);
+		}
+		
+		/**
+		 * Traverse all the record's nodes and execute the argument function passing
+		 * the visited node to it
+		 * */
+		public function traverse(fun:Function):void {
+			if(rootEntity != null) {
+				fun(rootEntity);
+				rootEntity.traverse(fun);
+			}
+		}
+		
+		protected function initNode(node:NodeProxy):void {
+			_nodesMap[node.id] = node;
+			node.init();
+		}
 		
 		public function getNode(id:int):NodeProxy {
-			if(id == rootEntity.id) {
-				return rootEntity;
-			} else {
-				return rootEntity.getNode(id);
-			}
+			return _nodesMap[id];
 		}
 		
 		public function update(responses:IList):void {
@@ -40,12 +64,14 @@ package org.openforis.collect.model.proxy {
 				node = response.createdNode;
 				parent = getNode(node.parentId) as EntityProxy;
 				parent.addChild(node);
+				_nodesMap[node.id] = node;
 			}
 			if(response.deletedNodeId > 0) {
 				node = getNode(response.deletedNodeId);
 				if(node != null) {
 					parent = getNode(node.parentId) as EntityProxy;
 					parent.removeChild(node);
+					_nodesMap[node.id] = null;
 				}
 			} else {
 				node = getNode(response.nodeId);
