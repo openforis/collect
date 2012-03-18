@@ -1,6 +1,8 @@
 package org.openforis.collect.presenter {
 	import flash.events.Event;
 	import flash.events.FocusEvent;
+	import flash.events.KeyboardEvent;
+	import flash.ui.Keyboard;
 	
 	import mx.binding.utils.BindingUtils;
 	import mx.binding.utils.ChangeWatcher;
@@ -42,6 +44,7 @@ package org.openforis.collect.presenter {
 			
 			_view.dropDownList.addEventListener(FocusEvent.FOCUS_IN, focusInHandler);
 			_view.dropDownList.addEventListener(Event.CHANGE, changeHandler);
+			_view.dropDownList.addEventListener(KeyboardEvent.KEY_DOWN, keyDownHandler);
 			
 			ChangeWatcher.watch(_view, "dataProvider", dataProviderChangeHandler);
 			BindingUtils.bindSetter(activePhaseSetter, Application, ["activeRecord", "step"]);
@@ -120,6 +123,26 @@ package org.openforis.collect.presenter {
 			}
 		}
 		
+		override protected function keyDownHandler(event:KeyboardEvent):void {
+			var item:Object = null;
+			var char:String = String.fromCharCode(event.charCode);
+			switch(char) {
+				case SHORTCUT_BLANK_ON_FORM:
+					item = BLANK_ON_FORM_ITEM;
+					break;
+				case SHORTCUT_DASH_ON_FORM:
+					item = DASH_ON_FORM_ITEM;
+					break;
+				case SHORTCUT_ILLEGIBLE:
+					item = ILLEGIBLE_ITEM;
+					break;
+			}
+			if(item != null) {
+				_view.dropDownList.selectedItem = item;
+				applyValue();
+			}
+		}
+
 		protected function getItem(value:*):Object {
 			var dataProvider:IList = _view.dropDownList.dataProvider;
 			var dataField:String = _view.dataField;
