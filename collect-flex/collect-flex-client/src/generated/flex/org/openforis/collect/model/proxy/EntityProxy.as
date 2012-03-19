@@ -34,6 +34,11 @@ package org.openforis.collect.model.proxy {
 		
 		override public function init():void {
 			super.init();
+			updateEnumeratedCodeWidths();
+			updateKeyText();
+		}
+		
+		protected function updateEnumeratedCodeWidths():void {
 			_enumeratedEntitiesCodeWidths = new Array();
 			var entities:IList = getChildEntities();
 			for each (var e:EntityProxy in entities) {
@@ -141,6 +146,7 @@ package org.openforis.collect.model.proxy {
 				childrenByName.put(name, children);
 			}
 			children.addItem(node);
+			node.parent = this;
 			node.init();
 			showErrorsOnChild(name);
 		}
@@ -163,6 +169,7 @@ package org.openforis.collect.model.proxy {
 		}
 		
 		public function updateKeyText():void {
+			var result:String = null;
 			if(_definition != null) {
 				var keyDefs:IList = _definition.keyAttributeDefinitions;
 				var keyParts:Array = new Array();
@@ -175,10 +182,18 @@ package org.openforis.collect.model.proxy {
 						}
 					}
 				}
-				keyText = StringUtil.concat(KEY_LABEL_SEPARATOR, keyParts);
-			} else {
-				keyText = "";
+				if(keyParts.length > 0) {
+					result = StringUtil.concat(KEY_LABEL_SEPARATOR, keyParts);
+				}
 			}
+			if(result == null && parent != null) {
+				var siblings:IList = parent.getChildren(name);
+				var itemIndex:int = siblings.getItemIndex(this);
+				result = String(itemIndex + 1);
+			} else {
+				result = "";
+			}
+			keyText = result;
 		}
 		
 		private function getKeyLabelPart(attributeDefn:AttributeDefinitionProxy, attribute:AttributeProxy):String {
