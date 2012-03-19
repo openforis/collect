@@ -87,6 +87,7 @@
 				<s:ItemRenderer>
 					<fx:Script>
 						<![CDATA[
+							import org.openforis.collect.ui.Images;
 							import org.openforis.collect.util.ObjectUtil;
 							
 							[Bindable]
@@ -111,7 +112,7 @@
 					
 					<s:Rect left="0" right="0" top="0" height="1" visible="{separatorVisible}" >
 						<s:fill>
-							<s:BitmapFill source="@Embed('assets/images/dash.png')"
+							<s:BitmapFill source="{Images.DASH}"
 										  fillMode="repeat" />
 						</s:fill>
 					</s:Rect>
