@@ -169,29 +169,26 @@ package org.openforis.collect.model.proxy {
 		}
 		
 		public function updateKeyText():void {
-			var result:String = null;
+			var result:String = "";
 			if(_definition != null) {
 				var keyDefs:IList = _definition.keyAttributeDefinitions;
-				var keyParts:Array = new Array();
-				for each (var def:AttributeDefinitionProxy in keyDefs) {
-					var key:AttributeProxy = getSingleAttribute(def.name);
-					if(key != null) {
-						var keyPart:String = getKeyLabelPart(def, key);
-						if(StringUtil.isNotBlank(keyPart)) {
-							keyParts.push(keyPart);
+				if(keyDefs.length > 0) {
+					var keyParts:Array = new Array();
+					for each (var def:AttributeDefinitionProxy in keyDefs) {
+						var key:AttributeProxy = getSingleAttribute(def.name);
+						if(key != null) {
+							var keyPart:String = getKeyLabelPart(def, key);
+							if(StringUtil.isNotBlank(keyPart)) {
+								keyParts.push(keyPart);
+							}
 						}
 					}
-				}
-				if(keyParts.length > 0) {
 					result = StringUtil.concat(KEY_LABEL_SEPARATOR, keyParts);
+				} else if(parent != null) {
+					var siblings:IList = parent.getChildren(name);
+					var itemIndex:int = siblings.getItemIndex(this);
+					result = String(itemIndex + 1);
 				}
-			}
-			if(result == null && parent != null) {
-				var siblings:IList = parent.getChildren(name);
-				var itemIndex:int = siblings.getItemIndex(this);
-				result = String(itemIndex + 1);
-			} else {
-				result = "";
 			}
 			keyText = result;
 		}
