@@ -20,7 +20,7 @@
 			*/
 			
 			protected function srsLabelFunction(item:Object):String {
-				if(item != DropDownInputField.EMPTY_SELECTION) {
+				if(item is SpatialReferenceSystemProxy) {
 					var srs:SpatialReferenceSystemProxy = SpatialReferenceSystemProxy(item);
 					return srs.getLabelText();
 				} else {

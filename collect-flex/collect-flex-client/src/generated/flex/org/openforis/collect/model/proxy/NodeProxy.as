@@ -11,5 +11,7 @@ package org.openforis.collect.model.proxy {
     [RemoteClass(alias="org.openforis.collect.model.proxy.NodeProxy")]
     public class NodeProxy extends NodeProxyBase {
 		
+		public function init():void {}
+		
     }
 }

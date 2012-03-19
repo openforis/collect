@@ -16,7 +16,24 @@ view|Footer {
 	padding-bottom: 5;
 }
 
-.appVersionText {
+.currentPhase {
+	fontSize: 12;
+	fontWeight: bold;
+}
+
+.recordKey {
+	fontSize: 13;
+	fontWeight: bold;
+}
+
+.formVersionLabel, .formVersionText {
+	fontSize: 10;
+	fontWeight: bold;
+}
+
+.listTitle {
+	fontSize: 13;
+	fontWeight: bold;
 }
 
 mx|Alert {
@@ -48,10 +65,16 @@ component|BlockingMessagePopUp {
 	showCloseButton: false;
 }
 
+mx|ToolTip { 
+	fontSize: 10; 
+	backgroundColor: #AAD4FF;
+	color: #000000; 
+}
+
 /* validation tooltips */
 mx|ToolTip.error, mx|ToolTip.warning, mx|ToolTip.missing {
 	color: #FFFFFF;
-	fontSize: 9;
+	fontSize: 10;
 	fontWeight: "bold";	
 	shadowColor: #000000;
 	borderStyle: "errorTipRight";
@@ -59,21 +82,6 @@ mx|ToolTip.error, mx|ToolTip.warning, mx|ToolTip.missing {
 	paddingLeft: 4;
 	paddingRight: 4;
 	paddingTop: 4;
-}
-
-.listTitle {
-	fontSize: 13;
-	fontWeight: bold;
-}
-
-.title1 {
-	fontSize: 16;
-	fontWeight: bold;
-}
-
-.title2 {
-	fontSize: 13;
-	fontWeight: bold;
 }
 
 mx|ToolTip.error {
@@ -171,6 +179,11 @@ input|TaxonAutoCompletePopUp {
 
 s|Label.bold {
 	fontWeight: bold;
+}
+
+s|Label.fixedCode {
+	fontSize: 10;
+	fontFamily: Verdana;
 }
 
 s|Button.roundCorners {

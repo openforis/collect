@@ -117,6 +117,14 @@ package org.openforis.collect.presenter {
 		 * Back to list
 		 * */
 		protected function backToListButtonClickHandler(event:Event):void {
+			if(Application.activeRecord.updated) {
+				AlertUtil.showConfirm("edit.confirmBackToList", null, null, performClearActiveRecord);
+			} else {
+				performClearActiveRecord();
+			}
+		}
+		
+		protected function performClearActiveRecord():void {
 			_dataClient.clearActiveRecord(new AsyncResponder(clearActiveRecordHandler, faultHandler));
 		}
 		
@@ -164,6 +172,7 @@ package org.openforis.collect.presenter {
 		
 		internal function saveActiveRecordResultHandler(event:ResultEvent, token:Object = null):void {
 			Application.activeRecord.showErrors();
+			Application.activeRecord.updated = false;
 			var applicationEvent:ApplicationEvent = new ApplicationEvent(ApplicationEvent.RECORD_SAVED);
 			eventDispatcher.dispatchEvent(applicationEvent);
 		}

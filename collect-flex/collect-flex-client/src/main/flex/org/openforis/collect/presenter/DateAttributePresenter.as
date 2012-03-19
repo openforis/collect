@@ -7,8 +7,10 @@ package org.openforis.collect.presenter {
 	
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.client.DataClient;
+	import org.openforis.collect.client.UpdateRequestToken;
 	import org.openforis.collect.remoting.service.UpdateRequest;
 	import org.openforis.collect.remoting.service.UpdateRequestOperation;
+	import org.openforis.collect.ui.component.detail.CompositeAttributeRenderer;
 	import org.openforis.collect.ui.component.input.DateAttributeRenderer;
 	import org.openforis.collect.ui.component.input.DateField;
 	import org.openforis.collect.ui.component.input.InputField;
@@ -67,9 +69,12 @@ package org.openforis.collect.presenter {
 				var o:UpdateRequestOperation = field.presenter.getApplyValueOperation();
 				operations.addItem(o);
 			}
+			var token:UpdateRequestToken = new UpdateRequestToken(UpdateRequestToken.TYPE_UPDATE_VALUE);
+			token.updatedFields = _view.attribute.fields;
+			token.symbol = null;
 			var req:UpdateRequest = new UpdateRequest();
 			req.operations = operations;
-			dataClient.updateActiveRecord(req, null, null, faultHandler);
+			dataClient.updateActiveRecord(req, token, null, faultHandler);
 		}
 		
 		protected function getDateFromFields():Date {
@@ -77,8 +82,16 @@ package org.openforis.collect.presenter {
 			if(StringUtil.isNotBlank(view.day.text) && 
 				StringUtil.isNotBlank(view.month.text) && 
 				StringUtil.isNotBlank(view.year.text)) {
-				var tempDate:Date = new Date(view.year.text, int(view.month.text) - 1, view.day.text);
-				return tempDate;
+				var year:Number = Number(view.year.text);
+				var month:Number = Number(view.month.text) - 1;
+				var day:Number = Number(view.day.text);
+				if(!isNaN(year) && !isNaN(month) && !isNaN(day)) {
+					var tempDate:Date = new Date(year, month, day);
+					if(! isNaN(tempDate.valueOf()) && tempDate.fullYear == year && tempDate.month == month && tempDate.date == day) {
+						//valid date
+						return tempDate;
+					}
+				}
 			}
 			return null;
 		}

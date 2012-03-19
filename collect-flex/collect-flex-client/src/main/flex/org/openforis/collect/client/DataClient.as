@@ -134,13 +134,13 @@ package org.openforis.collect.client {
 						//do not break, apply symbol to field
 					case UpdateRequestToken.TYPE_UPDATE_SYMBOL:
 						for each (field in token.updatedFields) {
-						field.symbol = token.symbol;
-					}
+							field.symbol = token.symbol;
+						}
 						break;
 					case UpdateRequestToken.TYPE_UPDATE_REMARKS:
 						for each (field in token.updatedFields) {
-						field.remarks = token.remarks;
-					}
+							field.remarks = token.remarks;
+						}
 						break;
 				}
 			}

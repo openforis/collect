@@ -99,6 +99,12 @@ public class EntityProxy extends NodeProxy {
 		return map;
 	}
 	
+	@ExternalizedProperty
+	public boolean isEnumerated() {
+		EntityDefinition definition = entity.getDefinition();
+		return definition.isEnumerable();
+	}
+	
 	private List<NodeDefinition> getChildDefinitions() {
 		EntityDefinition definition = entity.getDefinition();
 		return definition.getChildDefinitions();
