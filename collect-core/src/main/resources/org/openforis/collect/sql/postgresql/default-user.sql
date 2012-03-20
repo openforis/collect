@@ -47,3 +47,39 @@ INSERT INTO collect.ofc_user_role(id, user_id, role)
 	VALUES(6, 6, 'ROLE_ENTRY')
 GO
 
+
+
+
+
+INSERT INTO collect.ofc_user(id, username, password, enabled) 
+	VALUES(7,'dimas',md5('dimas'),'Y')
+GO
+
+INSERT INTO collect.ofc_user_role(id, user_id, role) 
+	VALUES(7, 7, 'ROLE_ENTRY')
+GO
+
+INSERT INTO collect.ofc_user(id, username, password, enabled) 
+	VALUES(8,'widya',md5('widya'),'Y')
+GO
+
+INSERT INTO collect.ofc_user_role(id, user_id, role) 
+	VALUES(8, 8, 'ROLE_ENTRY')
+GO
+
+
+INSERT INTO collect.ofc_user(id, username, password, enabled) 
+	VALUES(9,'anna',md5('anna'),'Y')
+GO
+
+INSERT INTO collect.ofc_user_role(id, user_id, role) 
+	VALUES(9, 9, 'ROLE_ENTRY')
+GO
+
+INSERT INTO collect.ofc_user(id, username, password, enabled) 
+	VALUES(10,'fanissa',md5('fanissa'),'Y')
+GO
+
+INSERT INTO collect.ofc_user_role(id, user_id, role) 
+	VALUES(10, 10, 'ROLE_ENTRY')
+GO
