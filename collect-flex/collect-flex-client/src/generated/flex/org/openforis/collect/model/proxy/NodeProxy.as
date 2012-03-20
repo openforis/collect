@@ -12,6 +12,6 @@ package org.openforis.collect.model.proxy {
     public class NodeProxy extends NodeProxyBase {
 		
 		public function init():void {}
-		
+
     }
 }

@@ -19,8 +19,8 @@ public class CodeAttributeProxy extends AttributeProxy {
 
 	private transient CodeAttribute codeAttribute;
 	
-	public CodeAttributeProxy(CodeAttribute attribute) {
-		super(attribute);
+	public CodeAttributeProxy(EntityProxy parent, CodeAttribute attribute) {
+		super(parent, attribute);
 		this.codeAttribute = attribute;
 	}
 

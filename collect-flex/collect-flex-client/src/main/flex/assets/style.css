@@ -69,19 +69,20 @@ mx|ToolTip {
 	fontSize: 10; 
 	backgroundColor: #AAD4FF;
 	color: #000000; 
+	paddingBottom: 4;
+	paddingLeft: 4;
+	paddingRight: 4;
+	paddingTop: 4;
 }
 
 /* validation tooltips */
-mx|ToolTip.error, mx|ToolTip.warning, mx|ToolTip.missing {
+mx|ToolTip.error, mx|ToolTip.warning {
+	borderSkin: ClassReference("org.openforis.collect.ui.skin.ToolTipBorder");
 	color: #FFFFFF;
 	fontSize: 10;
 	fontWeight: "bold";	
 	shadowColor: #000000;
 	borderStyle: "errorTipRight";
-	paddingBottom: 4;
-	paddingLeft: 4;
-	paddingRight: 4;
-	paddingTop: 4;
 }
 
 mx|ToolTip.error {

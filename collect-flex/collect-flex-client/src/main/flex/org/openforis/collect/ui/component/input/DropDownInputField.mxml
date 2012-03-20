@@ -9,13 +9,14 @@
 		<![CDATA[
 			import mx.collections.IList;
 			
+			import org.openforis.collect.i18n.Message;
 			import org.openforis.collect.presenter.DropDownInputFieldPresenter;
 			
 			private var _dataProvider:IList;
 			private var _internalDataProvider:IList;
 			private var _labelFunction:Function;
 			private var _dataField:String;
-			private var _prompt:String;
+			private var _prompt:String = Message.get("global.dropDownPrompt");
 			
 			override protected function initPresenter():void {
 				presenter = new DropDownInputFieldPresenter(this);
@@ -57,6 +58,15 @@
 				_internalDataProvider = value;
 			}
 
+			[Bindable]
+			public function get prompt():String {
+				return _prompt;
+			}
+
+			public function set prompt(value:String):void {
+				_prompt = value;
+			}
+
 
 		]]>
 	</fx:Script>
@@ -64,6 +74,7 @@
 	<s:DropDownList id="dropDownList" width="100%" 
 					dataProvider="{internalDataProvider}" 
 					labelFunction="{labelFunction}"
+					prompt="{prompt}"
 					>
 		<s:layout>
 			<s:VerticalLayout gap="0"
@@ -76,6 +87,7 @@
 				<s:ItemRenderer>
 					<fx:Script>
 						<![CDATA[
+							import org.openforis.collect.ui.Images;
 							import org.openforis.collect.util.ObjectUtil;
 							
 							[Bindable]
@@ -98,11 +110,13 @@
 						<s:Label id="labelDisplay" />
 					</s:Group>
 					
-					<s:Line width="100%" bottom="0" visible="{separatorVisible}">
-						<s:stroke>
-							<s:SolidColorStroke weight="1" caps="square"/>
-						</s:stroke>
-					</s:Line>
+					<s:Rect left="0" right="0" top="0" height="1" visible="{separatorVisible}" >
+						<s:fill>
+							<s:BitmapFill source="{Images.DASH}"
+										  fillMode="repeat" />
+						</s:fill>
+					</s:Rect>
+					
 				</s:ItemRenderer>
 			</fx:Component>
 		</s:itemRenderer>

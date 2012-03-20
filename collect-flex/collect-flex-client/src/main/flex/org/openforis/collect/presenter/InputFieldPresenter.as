@@ -82,13 +82,14 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function attributeChangeHandler(event:Event):void {
+			changed = false;
 			_view.visited = false;
 			updateView();
 		}
 		
 		protected function changeHandler(event:Event):void {
 			//TODO if autocomplete enabled show autocomplete popup...
-			_changed = true;
+			changed = true;
 			var inputFieldEvent:InputFieldEvent = new InputFieldEvent(InputFieldEvent.CHANGING);
 			_view.dispatchEvent(inputFieldEvent);
 		}
@@ -98,7 +99,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function focusOutHandler(event:FocusEvent):void {
-			if(_view.applyChangesOnFocusOut && _changed) {
+			if(_view.applyChangesOnFocusOut && changed) {
 				applyValue();
 			}
 			_view.visited = true;
@@ -117,7 +118,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		public function undoLastChange():void {
-			_changed = false;
+			changed = false;
 			updateView();
 		}
 		
@@ -215,7 +216,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function updateResultHandler(event:ResultEvent, token:UpdateRequestToken):void {
-			_changed = false;
+			changed = false;
 			_view.updating = false;
 			//_view.currentState = InputField.STATE_SAVE_COMPLETE;
 		}
