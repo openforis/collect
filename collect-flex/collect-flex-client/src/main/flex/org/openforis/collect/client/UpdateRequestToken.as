@@ -13,17 +13,19 @@ package org.openforis.collect.client
 		public static const TYPE_UPDATE_SYMBOL:String = "symbol";
 		public static const TYPE_UPDATE_REMARKS:String = "remarks";
 		public static const TYPE_UPDATE_VALUE:String = "value";
+		public static const TYPE_CONFIRM_ERROR:String = "value";
 		
 		private var _type:String;
-		private var _inputField:InputField;
+		//private var _inputField:InputField;
 		private var _updatedFields:IList;
 		private var _value:Object;
 		private var _symbol:FieldSymbol;
 		private var _remarks:String;
 		
-		public function UpdateRequestToken(type:String = "value", inputField:InputField = null) {
+		public function UpdateRequestToken(type:String = "value") {
+			//, inputField:InputField = null	
 			_type = type;
-			_inputField = inputField;
+			//_inputField = inputField;
 		}
 		
 		public function get type():String {
@@ -34,13 +36,13 @@ package org.openforis.collect.client
 			_type = value;
 		}
 
-		public function get inputField():InputField {
+		/*public function get inputField():InputField {
 			return _inputField;
 		}
 
 		public function set inputField(value:InputField):void {
 			_inputField = value;
-		}
+		}*/
 
 		public function get value():Object {
 			return _value;

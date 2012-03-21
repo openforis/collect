@@ -203,9 +203,29 @@ public class DataService {
 		
 		Attribute<? extends AttributeDefinition, ?> attribute = null;
 		switch (method) {
+			case CONFIRM_ERROR:
+				attribute = (Attribute<AttributeDefinition, ?>) node;
+				record.setErrorConfirmed(attribute, true);
+				//checkDependencies = recordManager.clearValidationResults(attribute);
+				checkDependencies = new HashSet<Attribute<?,?>>();
+				attribute.clearValidationResults();
+				checkDependencies.add(attribute);
+				
+				UpdateResponse response = getUpdateResponse(responseMap, attribute.getInternalId());
+				break;
+			case APPROVE_MISSING:
+				record.setMissingApproved(parentEntity, node.getName(), true);
+				cardinalityNodePointers = getCardinalityNodePointers(node);
+				break;
+			case UPDATE_REMARKS:
+				attribute = (Attribute<AttributeDefinition, ?>) node;
+				Field<?> fld = attribute.getField(fieldIndex);
+				fld.setRemarks(remarks);
+				getUpdateResponse(responseMap, nodeId);
+				break;
 			case ADD :
 				Node<?> createdNode = addNode(parentEntity, nodeDef, requestValue, symbol, remarks);
-				UpdateResponse response = getUpdateResponse(responseMap, createdNode.getInternalId());
+				response = getUpdateResponse(responseMap, createdNode.getInternalId());
 				response.setCreatedNode(createdNode);
 				relReqDependencies = recordManager. clearRelevanceRequiredStates(createdNode);
 				if(createdNode instanceof Attribute){
@@ -218,6 +238,9 @@ public class DataService {
 				break;
 			case UPDATE:
 				attribute = (Attribute<AttributeDefinition, ?>) node;
+				record.setErrorConfirmed(attribute, false);
+				record.setMissingApproved(parentEntity, node.getName(), false);
+				
 				cardinalityNodePointers = getCardinalityNodePointers(attribute);
 				response = getUpdateResponse(responseMap, attribute.getInternalId());
 				Map<Integer, Object> updatedFieldValues = new HashMap<Integer, Object>();

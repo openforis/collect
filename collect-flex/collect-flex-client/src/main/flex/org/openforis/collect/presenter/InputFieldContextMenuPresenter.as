@@ -32,31 +32,21 @@ package org.openforis.collect.presenter
 	/**
 	 * @author S. Ricci
 	 */
+	[Deprecated]
 	public class InputFieldContextMenuPresenter extends AbstractPresenter {
 		
 		private static const BLANK_ON_FORM_MENU_ITEM:ContextMenuItem = new ContextMenuItem(Message.get("edit.contextMenu.blankOnForm"));
-		
 		private static const DASH_ON_FORM_MENU_ITEM:ContextMenuItem = new ContextMenuItem(Message.get("edit.contextMenu.dashOnForm"));
-		
 		private static const ILLEGIBLE_MENU_ITEM:ContextMenuItem = new ContextMenuItem(Message.get("edit.contextMenu.illegible"));
-		
 		private static const EDIT_REMARKS_MENU_ITEM:ContextMenuItem = new ContextMenuItem(Message.get("edit.contextMenu.editRemarks"), true);
-		
 		private static const REPLACE_BLANKS_WITH_STAR_MENU_ITEM:ContextMenuItem = new ContextMenuItem(Message.get("edit.contextMenu.replaceBlanksWithStar"), true);
-		
 		private static const REPLACE_BLANKS_WITH_DASH_MENU_ITEM:ContextMenuItem = new ContextMenuItem(Message.get("edit.contextMenu.replaceBlanksWithDash"));
-		
 		private static const DELETE_ATTRIBUTE_MENU_ITEM:ContextMenuItem = new ContextMenuItem(Message.get("edit.contextMenu.deleteAttribute"), true);
-		
 		private static const DELETE_ENTITY_MENU_ITEM:ContextMenuItem = new ContextMenuItem(Message.get("edit.contextMenu.deleteEntity"), true);
-		
-		private static const APPROVE_ERROR_MENU_ITEM:ContextMenuItem = new ContextMenuItem(Message.get("edit.contextMenu.approveError"), true);
-		
+		private static const CONFIRM_ERROR_MENU_ITEM:ContextMenuItem = new ContextMenuItem(Message.get("edit.contextMenu.approveError"), true);
 		private static const APPROVE_MISSING_VALUE_MENU_ITEM:ContextMenuItem = new ContextMenuItem(Message.get("edit.contextMenu.approveMissingValue"), true);
-		
 		private static const APPROVE_MISSING_VALUES_IN_ROW_MENU_ITEM:ContextMenuItem = new ContextMenuItem(Message.get("edit.contextMenu.approveMissingValuesInRow"), true);
-		
-		private static const all:Array = [
+		private static const MENU_ITEMS:Array = [
 			BLANK_ON_FORM_MENU_ITEM, 
 			DASH_ON_FORM_MENU_ITEM, 
 			ILLEGIBLE_MENU_ITEM, 
@@ -65,37 +55,34 @@ package org.openforis.collect.presenter
 			REPLACE_BLANKS_WITH_STAR_MENU_ITEM, 
 			DELETE_ATTRIBUTE_MENU_ITEM, 
 			DELETE_ENTITY_MENU_ITEM, 
-			APPROVE_ERROR_MENU_ITEM, 
+			CONFIRM_ERROR_MENU_ITEM, 
 			APPROVE_MISSING_VALUE_MENU_ITEM
 		];
-		
 		private static var remarksPopUpPresenter:RemarksPopUpPresenter;
+		private static var _lastInputField:InputField;
+		private var _inputField:InputField;
 
 		{
 			initStatics();
 		}
 		
-		private static var _lastInputField:InputField;
-		
-		private var _inputField:InputField;
-		
 		public function InputFieldContextMenuPresenter(inputField:InputField) {
 			_inputField = inputField;
 			super();
-			build();
+			initContextMenu();
 		}
 		
 		private static function initStatics():void {
 			//init context menu items' event listener
 			var item:ContextMenuItem;
-			for each (item in all)  {
+			for each (item in MENU_ITEMS)  {
 				item.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, menuItemSelectHandler);
 			}
 			//init remarks popup presenter
 			remarksPopUpPresenter = new RemarksPopUpPresenter();
 		}
 		
-		public function build():void {
+		public function initContextMenu():void {
 			if(Application.activeRecord != null) {
 				var step:CollectRecord$Step = Application.activeRecord.step;
 				var items:Array = new Array();
@@ -132,7 +119,7 @@ package org.openforis.collect.presenter
 					if(hasErrors) {
 						var hasConfirmedError:Boolean = hasConfirmedError()
 						if(! hasConfirmedError) {
-							currentItems.push(APPROVE_ERROR_MENU_ITEM);
+							currentItems.push(CONFIRM_ERROR_MENU_ITEM);
 						}
 					}
 				}
@@ -232,7 +219,7 @@ package org.openforis.collect.presenter
 				case DELETE_ENTITY_MENU_ITEM:
 					AlertUtil.showConfirm("edit.confirmDeleteEntity", null, "global.confirmAlertTitle", performDeleteEntity);
 					break;
-				case APPROVE_ERROR_MENU_ITEM:
+				case CONFIRM_ERROR_MENU_ITEM:
 					inputField.applySymbol(FieldSymbol.CONFIRMED);
 					break
 				case APPROVE_MISSING_VALUE_MENU_ITEM:

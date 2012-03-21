@@ -114,7 +114,7 @@ package org.openforis.collect.presenter {
 			}
 			var req:UpdateRequest = new UpdateRequest();
 			req.operations = operations;
-			var token:UpdateRequestToken = new UpdateRequestToken(UpdateRequestToken.TYPE_UPDATE_VALUE, _view);
+			var token:UpdateRequestToken = new UpdateRequestToken(UpdateRequestToken.TYPE_UPDATE_VALUE);
 			token.symbol = symbol;
 			token.remarks = remarks;
 			dataClient.updateActiveRecord(req, token, updateResultHandler, faultHandler);
@@ -134,7 +134,7 @@ package org.openforis.collect.presenter {
 			}
 			var req:UpdateRequest = new UpdateRequest();
 			req.operations = operations;
-			var token:UpdateRequestToken = new UpdateRequestToken(UpdateRequestToken.TYPE_UPDATE_REMARKS, _view);
+			var token:UpdateRequestToken = new UpdateRequestToken(UpdateRequestToken.TYPE_UPDATE_REMARKS);
 			token.remarks = remarks;
 			token.updatedFields = updatedFields;
 			dataClient.updateActiveRecord(req, token, updateResultHandler, faultHandler);
@@ -153,7 +153,7 @@ package org.openforis.collect.presenter {
 			}
 			var req:UpdateRequest = new UpdateRequest();
 			req.operations = operations;
-			var token:UpdateRequestToken = new UpdateRequestToken(UpdateRequestToken.TYPE_UPDATE_SYMBOL, _view);
+			var token:UpdateRequestToken = new UpdateRequestToken(UpdateRequestToken.TYPE_UPDATE_SYMBOL);
 			token.updatedFields = updatedFields;
 			token.symbol = symbol;
 			dataClient.updateActiveRecord(req, token, updateResultHandler, faultHandler);

@@ -14,15 +14,19 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.client.UpdateRequestToken;
 	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.event.InputFieldEvent;
+	import org.openforis.collect.event.NodeEvent;
 	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 	import org.openforis.collect.model.FieldSymbol;
 	import org.openforis.collect.model.proxy.AttributeProxy;
+	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.model.proxy.FieldProxy;
+	import org.openforis.collect.model.proxy.NodeProxy;
 	import org.openforis.collect.remoting.service.UpdateRequest;
 	import org.openforis.collect.remoting.service.UpdateRequestOperation;
 	import org.openforis.collect.remoting.service.UpdateRequestOperation$Method;
 	import org.openforis.collect.remoting.service.UpdateResponse;
 	import org.openforis.collect.ui.component.input.InputField;
+	import org.openforis.collect.ui.component.input.InputFieldContextMenu;
 	import org.openforis.collect.util.ArrayUtil;
 	import org.openforis.collect.util.StringUtil;
 	import org.openforis.collect.util.UIUtil;
@@ -43,13 +47,25 @@ package org.openforis.collect.presenter {
 		
 		private var _view:InputField;
 		private var _changed:Boolean = false;
-		private var _dataClient:DataClient;
-		private var _contextMenuPresenter:InputFieldContextMenuPresenter;
+		private var _contextMenu:InputFieldContextMenu;
+		
+		private static var _dataClient:DataClient;
+		
+		/*
+			Static initialization
+		*/
+		{
+			_dataClient = ClientFactory.dataClient;
+			eventDispatcher.addEventListener(NodeEvent.CONFIRM_ERROR, confirmErrorHandler);
+			eventDispatcher.addEventListener(NodeEvent.UPDATE_SYMBOL, updateSymbolHandler);
+			eventDispatcher.addEventListener(NodeEvent.APPROVE_MISSING, approveMissingHandler);
+			eventDispatcher.addEventListener(NodeEvent.UPDATE_REMARKS, updateRemarksHandler);
+		}
 		
 		public function InputFieldPresenter(inputField:InputField = null) {
 			_view = inputField;
-			_dataClient = ClientFactory.dataClient;
-			_contextMenuPresenter = new InputFieldContextMenuPresenter(_view);
+			_contextMenu = new InputFieldContextMenu(_view);
+			//_contextMenuPresenter = new InputFieldContextMenuPresenter(_view);
 			super();
 			updateView();
 		}
@@ -67,6 +83,103 @@ package org.openforis.collect.presenter {
 			}
 			
 			ChangeWatcher.watch(_view, "attribute", attributeChangeHandler);
+		}
+		
+		protected static function approveMissingHandler(event:NodeEvent): void {
+			//TODO
+		}
+		
+			
+		protected static function prepareUpdateSymbolRequests(updateRequest:UpdateRequest, nodeProxy:NodeProxy, symbol:FieldSymbol, fieldIdx:Number):ArrayCollection {
+			var updFields:ArrayCollection = new ArrayCollection();
+			
+			if( nodeProxy is EntityProxy ){
+				var entity:EntityProxy = nodeProxy as EntityProxy;
+				var children:IList = entity.getChildren();
+				for each (var child:NodeProxy in children) {
+					updFields.addAll( prepareUpdateSymbolRequests(updateRequest, child, symbol, fieldIdx) );
+				}
+			} else {
+				var attr:AttributeProxy = AttributeProxy(nodeProxy);
+				if(isNaN(fieldIdx)){
+					for(var index:int = 0; index < attr.fields.length; index ++) {
+						var field:FieldProxy = attr.fields[index];
+						if(field.value == null && field.symbol == null) {
+							var operation:UpdateRequestOperation = new UpdateRequestOperation();
+							operation.method = UpdateRequestOperation$Method.UPDATE;
+							operation.parentEntityId = nodeProxy.parentId;
+							operation.nodeName = nodeProxy.name;
+							operation.nodeId = nodeProxy.id;
+							operation.fieldIndex = index;
+							operation.remarks = field.remarks;
+							operation.value = field.value != null ? field.value.toString(): null;
+							operation.symbol = symbol;
+							
+							updateRequest.addOperation(operation);
+							updFields.addItem(field);
+						}
+					}
+				} else {
+					var field:FieldProxy = attr.fields[fieldIdx];
+					if(field.value == null && field.symbol == null) {
+						var operation:UpdateRequestOperation = new UpdateRequestOperation();
+						operation.method = UpdateRequestOperation$Method.UPDATE;
+						operation.parentEntityId = nodeProxy.parentId;
+						operation.nodeName = nodeProxy.name;
+						operation.nodeId = nodeProxy.id;
+						operation.fieldIndex = fieldIdx;
+						operation.remarks = field.remarks;
+						operation.value = field.value != null ? field.value.toString(): null;
+						operation.symbol = symbol;
+						
+						updateRequest.addOperation(operation);
+						updFields.addItem(field);
+					}
+				}
+			}
+			return updFields;
+		}
+		
+		protected static function updateRemarksHandler(event:NodeEvent): void {
+			var operation:UpdateRequestOperation = new UpdateRequestOperation();
+			operation.method = UpdateRequestOperation$Method.UPDATE_REMARKS;
+			operation.remarks = event.remarks;
+			operation.nodeId = event.nodeProxy.id;
+			operation.parentEntityId = event.nodeProxy.parentId;
+			operation.fieldIndex = event.fieldIdx;
+			var updRequest:UpdateRequest = new UpdateRequest(operation);
+			
+			var token:UpdateRequestToken = new UpdateRequestToken(UpdateRequestToken.TYPE_UPDATE_REMARKS);
+			token.remarks = event.remarks;
+			if(event.nodeProxy is AttributeProxy && event.fieldIdx >= 0){
+				var fld:FieldProxy = (event.nodeProxy as AttributeProxy).getField(event.fieldIdx);
+				token.updatedFields = new ArrayCollection([fld]);
+			}
+			
+			_dataClient.updateActiveRecord(updRequest, token, null, faultHandler);
+		}
+		
+		protected static function updateSymbolHandler(event:NodeEvent): void {
+			//event.inputField.presenter.applySymbol(event.symobl);
+			var updRequest:UpdateRequest = new UpdateRequest();
+			
+			var updFields:ArrayCollection = prepareUpdateSymbolRequests(updRequest, event.nodeProxy, event.symbol, event.fieldIdx);
+			var token:UpdateRequestToken = new UpdateRequestToken(UpdateRequestToken.TYPE_UPDATE_SYMBOL);
+			token.updatedFields = updFields;
+			token.symbol = event.symbol;
+			
+			_dataClient.updateActiveRecord(updRequest, token, null, faultHandler);
+		}
+		
+		protected static function confirmErrorHandler(event:NodeEvent): void {
+			var updRequestOp:UpdateRequestOperation = new UpdateRequestOperation();
+			updRequestOp.method = UpdateRequestOperation$Method.CONFIRM_ERROR;
+			updRequestOp.nodeId = event.nodeProxy.id;
+			updRequestOp.parentEntityId = event.nodeProxy.parentId;
+			
+			var updRequest:UpdateRequest = new UpdateRequest(updRequestOp);
+			var token:UpdateRequestToken = new UpdateRequestToken(UpdateRequestToken.TYPE_CONFIRM_ERROR);
+			_dataClient.updateActiveRecord(updRequest, token, null, faultHandler);
 		}
 		
 		protected function updateResponseReceivedHandler(event:ApplicationEvent):void {
@@ -132,26 +245,26 @@ package org.openforis.collect.presenter {
 			} else {
 				value = text;
 			}
-			var token:UpdateRequestToken = new UpdateRequestToken(UpdateRequestToken.TYPE_UPDATE_VALUE, _view);
+			var token:UpdateRequestToken = new UpdateRequestToken(UpdateRequestToken.TYPE_UPDATE_VALUE);
 			token.updatedFields = new ArrayCollection([getField()]);
 			token.symbol = symbol;
-			sendRequestOperation(o, token);
+			sendUpdateRequest(o, token);
 		}
 		
 		public function applySymbol(symbol:FieldSymbol):void {
 			var o:UpdateRequestOperation = getApplySymbolOperation(symbol);
-			var token:UpdateRequestToken = new UpdateRequestToken(UpdateRequestToken.TYPE_UPDATE_SYMBOL, _view);
+			var token:UpdateRequestToken = new UpdateRequestToken(UpdateRequestToken.TYPE_UPDATE_SYMBOL);
 			token.updatedFields = new ArrayCollection([getField()]);
 			token.symbol = symbol;
-			sendRequestOperation(o, token);
+			sendUpdateRequest(o, token);
 		}
 		
 		public function applyRemarks(remarks:String):void {
 			var o:UpdateRequestOperation = getApplyRemarksOperation(remarks);
-			var token:UpdateRequestToken = new UpdateRequestToken(UpdateRequestToken.TYPE_UPDATE_REMARKS, _view);
+			var token:UpdateRequestToken = new UpdateRequestToken(UpdateRequestToken.TYPE_UPDATE_REMARKS);
 			token.updatedFields = new ArrayCollection([getField()]);
 			token.remarks = remarks;
-			sendRequestOperation(o, token);
+			sendUpdateRequest(o, token);
 		}
 		
 		public function getApplyValueOperation():UpdateRequestOperation {
@@ -194,7 +307,7 @@ package org.openforis.collect.presenter {
 			return o;
 		}
 		
-		protected function sendRequestOperation(o:UpdateRequestOperation, token:UpdateRequestToken):void {
+		protected function sendUpdateRequest(o:UpdateRequestOperation, token:UpdateRequestToken):void {
 			var req:UpdateRequest = new UpdateRequest(o);
 			dataClient.updateActiveRecord(req, token, updateResultHandler, faultHandler);
 			_view.updating = true;
@@ -257,7 +370,7 @@ package org.openforis.collect.presenter {
 				if(_view.attribute != null) {
 					hasRemarks = StringUtil.isNotBlank(getRemarks());
 				}
-				_contextMenuPresenter.build();
+				_contextMenu.updateContextMenuItems();
 			}
 			_view.hasRemarks = hasRemarks;
 		}

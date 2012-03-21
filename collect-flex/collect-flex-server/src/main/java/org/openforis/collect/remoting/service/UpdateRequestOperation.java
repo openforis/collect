@@ -11,7 +11,7 @@ import org.openforis.collect.model.FieldSymbol;
 public class UpdateRequestOperation implements Proxy {
 
 	public enum Method {
-		ADD, UPDATE, DELETE;
+		ADD, UPDATE, DELETE, CONFIRM_ERROR, APPROVE_MISSING, UPDATE_REMARKS;
 	}
 
 	private Integer parentEntityId;

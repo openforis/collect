@@ -82,13 +82,13 @@ package org.openforis.collect.ui.component.input {
 			presenter.applyValue();
 		}
 		
-		public function applySymbol(symbol:FieldSymbol):void {
+		/*public function applySymbol(symbol:FieldSymbol):void {
 			presenter.applySymbol(symbol);
-		}
+		}*/
 		
-		public function applyRemarks(remarks:String):void {
+		/*public function applyRemarks(remarks:String):void {
 			presenter.applyRemarks(remarks);
-		}
+		}*/
 		
 		/**
 		 * returns true if the field is not filled
