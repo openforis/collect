@@ -1,17 +1,15 @@
 package org.openforis.collect.presenter {
 	import flash.events.Event;
+	import flash.events.FocusEvent;
 	
-	import mx.collections.IList;
-	import mx.rpc.AsyncResponder;
-	import mx.rpc.IResponder;
-	import mx.rpc.events.ResultEvent;
-	
-	import org.openforis.collect.client.ClientFactory;
-	import org.openforis.collect.metamodel.proxy.CodeListItemProxy;
-	import org.openforis.collect.model.proxy.AttributeProxy;
+	import org.openforis.collect.Application;
+	import org.openforis.collect.model.proxy.CodeAttributeProxy;
+	import org.openforis.collect.model.proxy.EntityProxy;
+	import org.openforis.collect.model.proxy.FieldProxy;
+	import org.openforis.collect.remoting.service.UpdateRequest;
+	import org.openforis.collect.remoting.service.UpdateRequestOperation;
+	import org.openforis.collect.remoting.service.UpdateRequestOperation$Method;
 	import org.openforis.collect.ui.component.input.FixedCodeInputField;
-	import org.openforis.collect.util.ArrayUtil;
-	import org.openforis.collect.util.CollectionUtil;
 	import org.openforis.collect.util.StringUtil;
 	
 	/**
@@ -22,7 +20,6 @@ package org.openforis.collect.presenter {
 	public class FixedCodeInputFieldPresenter extends InputFieldPresenter {
 		
 		private var _view:FixedCodeInputField;
-		private var _items:IList;
 		
 		public function FixedCodeInputFieldPresenter(inputField:FixedCodeInputField) {
 			this._view = inputField;
@@ -32,72 +29,64 @@ package org.openforis.collect.presenter {
 		
 		override internal function initEventListeners():void {
 			super.initEventListeners();
+			_view.qualifierTextInput.addEventListener(FocusEvent.FOCUS_OUT, qualifierFocusOutHandler);
 		}
 		
 		override protected function attributeChangeHandler(event:Event):void {
-			_items = null;
 			super.attributeChangeHandler(event);
 		}
 		
 		override protected function updateView():void {
 			super.updateView();
+			var qualifiable:Boolean = false;
+			var qualifier:String = null;
+			var codeAttribute:CodeAttributeProxy = _view.attribute as CodeAttributeProxy;
+			if(codeAttribute != null && codeAttribute.codeListItem != null) {
+				qualifiable = codeAttribute.codeListItem.qualifiable;
+				if(qualifiable) {
+					var qualifierField:FieldProxy = _view.attribute.getField(1);
+					if(qualifierField.value != null) {
+						qualifier = String(qualifierField.value);
+					}
+				}
+			}
+			_view.qualifiable = qualifiable;
+			_view.qualifierTextInput.text = qualifier;
+			if(_view.parentEntity) {
+				var entityName:String = _view.parentEntity.name;
+				var ancestorEntityId:Number = _view.parentEntity.parentId;
+				var ancestorEntity:EntityProxy = Application.activeRecord.getNode(ancestorEntityId) as EntityProxy;
+				var maxWidth:Number = ancestorEntity.getEnumeratedCodeWidth(entityName);
+				_view.width = maxWidth;
+			}
 		}
 		
 		override protected function getTextFromValue():String {
-			if(_items == null) {
-				updateLabel();
-			}
-			return getLabel();
-		}
-		
-		protected function updateLabel():void {
-			if(_view.attribute != null || _view.attributes != null) {
-				var codes:Array = [];
-				var code:String;
-				var attribute:AttributeProxy;
-				if(_view.attributeDefinition.multiple) {
-					for each(attribute in _view.attributes) {
-						code = attribute.getField(0).value as String;
-						if( StringUtil.isNotBlank(code)) {
-							codes.push(code);
-						}
-					}
-				} else {
-					attribute = _view.attribute;
-					code = attribute.getField(0).value as String;
-					if( StringUtil.isNotBlank(code)) {
-						codes.push(code);
-					}
-				}
-				if(ArrayUtil.isNotEmpty(codes)) {
-					var parentEntityId:int = _view.parentEntity.id;
-					var name:String = _view.attributeDefinition.name;
-					var responder:IResponder = new AsyncResponder(findItemsResultHandler, faultHandler);
-					
-					ClientFactory.dataClient.getCodeListItems(responder, parentEntityId, name, codes);
-				}
-			}
-		}
-		
-		protected function findItemsResultHandler(event:ResultEvent, token:Object = null):void {
-			_items = event.result as IList;
-			if(_items != null) {
-				updateView();
-			}
-				
-		}
-		
-		protected function getLabel():String {
 			var result:String = null;
-			if(CollectionUtil.isNotEmpty(_items)) {
-				var parts:Array = new Array();
-				for each (var item:CodeListItemProxy in _items) {
-					var part:String = item.getLabelText();
-					parts.push(part);
-				}
-				result = StringUtil.concat("\n", parts);
+			var codeAttribute:CodeAttributeProxy = _view.attribute as CodeAttributeProxy;
+			if(codeAttribute != null && codeAttribute.codeListItem != null) {
+				result = codeAttribute.codeListItem.getLabelText();
 			}
 			return result;
 		}
+		
+		protected function qualifierFocusOutHandler(event:FocusEvent):void {
+			var value:String = _view.qualifierTextInput.text;
+			value = StringUtil.trim(value);
+			applyQualifier(value);
+		}
+		
+		protected function applyQualifier(value:String):void {
+			var o:UpdateRequestOperation = new UpdateRequestOperation();
+			o.method = UpdateRequestOperation$Method.UPDATE;
+			o.parentEntityId = _view.parentEntity.id;
+			o.nodeName = _view.attribute.name;
+			o.nodeId = _view.attribute.id;
+			o.fieldIndex = 1;
+			o.value = value;
+			var req:UpdateRequest = new UpdateRequest(o);
+			dataClient.updateActiveRecord(req, null, null, faultHandler);
+		}
+		
 	}
 }

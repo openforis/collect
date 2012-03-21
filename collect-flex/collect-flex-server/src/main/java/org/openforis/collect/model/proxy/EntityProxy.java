@@ -22,8 +22,8 @@ public class EntityProxy extends NodeProxy {
 
 	private transient Entity entity;
 
-	public EntityProxy(Entity entity) {
-		super(entity);
+	public EntityProxy(EntityProxy parent, Entity entity) {
+		super(parent, entity);
 		this.entity = entity;
 	}
 	
@@ -34,7 +34,7 @@ public class EntityProxy extends NodeProxy {
 		for (NodeDefinition childDefinition : childDefinitions) {
 			String name = childDefinition.getName();
 			List<Node<?>> childrenByName = this.entity.getAll(name);
-			List<NodeProxy> proxies = NodeProxy.fromList(childrenByName);
+			List<NodeProxy> proxies = NodeProxy.fromList(this, childrenByName);
 			result.put(name, proxies);
 		}
 		return result;
@@ -88,6 +88,23 @@ public class EntityProxy extends NodeProxy {
 		return map;
 	}
 
+	@ExternalizedProperty
+	public Map<String, Boolean> getShowChildrenErrorsMap() {
+		List<NodeDefinition> childDefinitions = getChildDefinitions();
+		Map<String, Boolean> map = new HashMap<String, Boolean>();
+		for (NodeDefinition childDefinition : childDefinitions) {
+			String childName = childDefinition.getName();
+			map.put(childName, Boolean.FALSE);
+		}
+		return map;
+	}
+	
+	@ExternalizedProperty
+	public boolean isEnumerated() {
+		EntityDefinition definition = entity.getDefinition();
+		return definition.isEnumerable();
+	}
+	
 	private List<NodeDefinition> getChildDefinitions() {
 		EntityDefinition definition = entity.getDefinition();
 		return definition.getChildDefinitions();

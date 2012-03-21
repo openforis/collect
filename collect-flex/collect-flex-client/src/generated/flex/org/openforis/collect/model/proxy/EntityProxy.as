@@ -6,8 +6,6 @@
  */
 
 package org.openforis.collect.model.proxy {
-	import flash.utils.Dictionary;
-	
 	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
 	
@@ -18,16 +16,81 @@ package org.openforis.collect.model.proxy {
 	import org.openforis.collect.metamodel.proxy.NumberAttributeDefinitionProxy$Type;
 	import org.openforis.collect.util.ObjectUtil;
 	import org.openforis.collect.util.StringUtil;
+	import org.openforis.collect.util.UIUtil;
 
+	/**
+	 * @author S. Ricci
+	 */
     [Bindable]
     [RemoteClass(alias="org.openforis.collect.model.proxy.EntityProxy")]
     public class EntityProxy extends EntityProxyBase {
 		
 		private static const KEY_LABEL_SEPARATOR:String = "-";
+		private static const FULL_KEY_LABEL_SEPARATOR:String = " ";
 		
-		private var nodesMap:Dictionary;
 		private var _keyText:String;
+		private var _fullKeyText:String;
+		private var _compactKeyText:String;
 		private var _definition:EntityDefinitionProxy;
+		private var _enumeratedEntitiesCodeWidths:Array;
+		
+		override public function init():void {
+			super.init();
+			updateEnumeratedCodeWidths();
+			updateKeyText();
+		}
+		
+		protected function updateEnumeratedCodeWidths():void {
+			_enumeratedEntitiesCodeWidths = new Array();
+			var entities:IList = getChildEntities();
+			for each (var e:EntityProxy in entities) {
+				if(e.enumerated) {
+					var name:String = e.name;
+					var maxWidth:Number = _enumeratedEntitiesCodeWidths[name];
+					var keyAttribute:CodeAttributeProxy = e.getKeyAttribute();
+					if(keyAttribute != null && keyAttribute.codeListItem != null) {
+						var label:String = keyAttribute.codeListItem.getLabelText();
+						//var width:Number = label.length * 7;
+						var width:Number = UIUtil.measureFixedCodeWidth(label);
+						if(keyAttribute.codeListItem.qualifiable) {
+							width += 104; //space for qualifier text input
+						}
+						if(!isNaN(maxWidth)) {
+							maxWidth = Math.max(maxWidth, width);
+						} else {
+							maxWidth = width;
+						}
+					}
+					_enumeratedEntitiesCodeWidths[name] = maxWidth;
+				}
+			}
+		}
+		
+		protected function getKeyAttribute():CodeAttributeProxy {
+			var children:IList = getChildren();
+			for each (var child:NodeProxy in children) {
+				if(child is CodeAttributeProxy) {
+					var codeAttribute:CodeAttributeProxy = CodeAttributeProxy(child);
+					if(codeAttribute.enumerator) {
+						return codeAttribute;
+					}
+				}
+			}
+			return null;
+		}
+		
+		/**
+		 * Traverse each child and pass it to the argument function
+		 * */
+		public function traverse(fun:Function):void {
+			var children:IList = getChildren();
+			for each (var child:NodeProxy in children) {
+				fun(child);
+				if(child is EntityProxy) {
+					EntityProxy(child).traverse(fun);
+				}
+			}
+		}
 		
 		public function getSingleAttribute(attributeName:String):AttributeProxy {
 			var attributes:IList = childrenByName.get(attributeName);
@@ -64,44 +127,6 @@ package org.openforis.collect.model.proxy {
 			}
 		}
 		
-		public function getChildById(id:int):NodeProxy {
-			if(nodesMap == null) {
-				nodesMap = new Dictionary();
-			}
-			var child:NodeProxy = nodesMap[id];
-			if(child != null) {
-				return child;
-			} else {
-				var values:ArrayCollection = childrenByName.values;
-				for each (var childList:IList in values) {
-					for each (child in childList) {
-						if(child.id == id) {
-							nodesMap[id] = child;
-							return child;
-						}
-					}
-				}
-			}
-			return null;
-		}
-		
-		public function getNode(id:int):NodeProxy {
-			var child:NodeProxy = getChildById(id);
-			if(child != null) {
-				return child;
-			} else {
-				//search in child entities
-				var entities:IList = getChildEntities();
-				for each (var e:EntityProxy in entities) {
-					child = e.getNode(id);
-					if(child != null) {
-						return child;
-					}
-				}
-			}
-			return null;
-		}
-		
 		public function getChildEntities():IList {
 			var entities:IList = new ArrayCollection();
 			var values:IList = childrenByName.values;
@@ -123,9 +148,9 @@ package org.openforis.collect.model.proxy {
 				childrenByName.put(name, children);
 			}
 			children.addItem(node);
-			if(nodesMap != null) {
-				nodesMap[node.id] = node;
-			}
+			node.parent = this;
+			node.init();
+			showErrorsOnChild(name);
 		}
 		
 		public function removeChild(node:NodeProxy):void {
@@ -134,10 +159,8 @@ package org.openforis.collect.model.proxy {
 			var index:int = children.getItemIndex(node);
 			if(index >= 0) {
 				children.removeItemAt(index);
-				if(nodesMap != null) {
-					nodesMap[node.id] = null;
-				}
 			}
+			showErrorsOnChild(name);
 		}
 		
 		public function replaceChild(oldNode:NodeProxy, newNode:NodeProxy):void {
@@ -145,27 +168,37 @@ package org.openforis.collect.model.proxy {
 			var children:ArrayCollection = childrenByName.get(name);
 			var index:int = children.getItemIndex(oldNode);
 			children.setItemAt(newNode, index);
-			if(nodesMap != null) {
-				nodesMap[oldNode.id] = newNode;
-			}
 		}
 		
 		public function updateKeyText():void {
 			if(_definition != null) {
 				var keyDefs:IList = _definition.keyAttributeDefinitions;
-				var keyParts:Array = new Array();
-				for each (var def:AttributeDefinitionProxy in keyDefs) {
-					var key:AttributeProxy = getSingleAttribute(def.name);
-					if(key != null) {
-						var keyPart:String = getKeyLabelPart(def, key);
-						if(StringUtil.isNotBlank(keyPart)) {
-							keyParts.push(keyPart);
+				if(keyDefs.length > 0) {
+					var shortKeyParts:Array = new Array();
+					var fullKeyParts:Array = new Array();
+					for each (var def:AttributeDefinitionProxy in keyDefs) {
+						var key:AttributeProxy = getSingleAttribute(def.name);
+						if(key != null) {
+							var keyPart:String = getKeyLabelPart(def, key);
+							if(StringUtil.isNotBlank(keyPart)) {
+								shortKeyParts.push(keyPart);
+								var label:String = def.getLabelText();
+								var fullKeyPart:String = label + " " + keyPart;
+								fullKeyParts.push(fullKeyPart);
+							}
 						}
 					}
+					keyText = StringUtil.concat(KEY_LABEL_SEPARATOR, shortKeyParts);
+					fullKeyText = StringUtil.concat(FULL_KEY_LABEL_SEPARATOR, fullKeyParts);
+				} else if(parent != null) {
+					var siblings:IList = parent.getChildren(name);
+					var itemIndex:int = siblings.getItemIndex(this);
+					keyText = String(itemIndex + 1);
+					fullKeyText = keyText;
 				}
-				keyText = StringUtil.concat(KEY_LABEL_SEPARATOR, keyParts);
 			} else {
 				keyText = "";
+				fullKeyText = "";
 			}
 		}
 		
@@ -219,12 +252,31 @@ package org.openforis.collect.model.proxy {
 			}
 		}
 
-		override public function set detached(value:Boolean):void {
-			super.detached = value;
-			var children:IList = getChildren();
-			for each (var child:NodeProxy in children) {
-				child.detached = value;
+		public function showErrorsOnChild(name:String):void {
+			showChildrenErrorsMap.put(name, true);
+		}
+		
+		public function isErrorOnChildVisible(name:String):Boolean {
+			var result:Boolean = showChildrenErrorsMap.get(name);
+			return result;
+		}
+		
+		public function showErrorsOnDescendants():void {
+			var childNodeNames:ArrayCollection = showChildrenErrorsMap.keySet;
+			for each (var name:String in childNodeNames) {
+				showChildrenErrorsMap.put(name, true);
+				var children:IList = getChildren(name);
+				for each (var child:NodeProxy in children) {
+					if(child is EntityProxy) {
+						EntityProxy(child).showErrorsOnDescendants();
+					}
+				}
 			}
+		}
+		
+		public function getEnumeratedCodeWidth(entityName:String):Number {
+			var result:Number = _enumeratedEntitiesCodeWidths[entityName];
+			return result;
 		}
 		
 		public function get keyText():String {
@@ -235,6 +287,14 @@ package org.openforis.collect.model.proxy {
 			_keyText = value;
 		}
 		
+		public function get fullKeyText():String {
+			return _fullKeyText;
+		}
+		
+		public function set fullKeyText(value:String):void {
+			_fullKeyText = value;
+		}
+		
 		public function get definition():EntityDefinitionProxy {
 			return _definition;
 		}
@@ -242,6 +302,15 @@ package org.openforis.collect.model.proxy {
 		public function set definition(value:EntityDefinitionProxy):void {
 			_definition = value;
 		}
+
+		public function get enumeratedEntitiesCodeWidths():Array {
+			return _enumeratedEntitiesCodeWidths;
+		}
+
+		public function set enumeratedEntitiesCodeWidths(value:Array):void {
+			_enumeratedEntitiesCodeWidths = value;
+		}
+
 		
 	}
 }

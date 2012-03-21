@@ -7,15 +7,18 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+import java.util.Stack;
 
 import javax.xml.namespace.QName;
 
+import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.State;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.FieldSymbol;
 import org.openforis.collect.model.User;
+import org.openforis.collect.persistence.MissingRecordKeyException;
 import org.openforis.collect.persistence.MultipleEditException;
 import org.openforis.collect.persistence.RecordDao;
 import org.openforis.collect.persistence.RecordLockedException;
@@ -28,6 +31,9 @@ import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Schema;
+import org.openforis.idm.metamodel.validation.ValidationResult;
+import org.openforis.idm.metamodel.validation.ValidationResultFlag;
+import org.openforis.idm.metamodel.validation.ValidationResults;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Code;
 import org.openforis.idm.model.CodeAttribute;
@@ -59,8 +65,9 @@ public class RecordManager {
 	
 	@Transactional
 	public void save(CollectRecord record) throws RecordPersistenceException {
-		updateCounts(record);
 		updateKeys(record);
+		
+		updateCounts(record);
 		Integer id = record.getId();
 		if(id == null) {
 			recordDao.insert(record);
@@ -139,8 +146,12 @@ public class RecordManager {
 	}
 
 	@Transactional
-	public void promote(CollectRecord record, User user) throws RecordPersistenceException {
+	public void promote(CollectRecord record, User user) throws RecordPersistenceException, RecordPromoteException {
 		//save changes on current step
+		if(hasErrors(record)){
+			throw new RecordPromoteException("Record cannot be promoted becuase it contains errors.");
+		}
+		
 		Integer id = record.getId();
 		if(id == null) {
 			recordDao.insert(record);
@@ -156,6 +167,60 @@ public class RecordManager {
 		record.setStep(nextStep);
 		record.setState(null);
 		recordDao.update(record);
+	}
+
+	private boolean hasErrors(CollectRecord record) {
+		Entity rootEntity = record.getRootEntity();
+		Stack<Node<?>> stack = new Stack<Node<?>>();
+		stack.push(rootEntity);
+		
+		while(!stack.isEmpty()){
+			Node<?> node = stack.pop();
+			
+			if(node instanceof Entity){
+				Entity entity = (Entity) node;
+				boolean cardinalityError = hasCardinalityError(entity);
+				if(cardinalityError){
+					return true;
+				} else {
+					List<Node<?>> children = entity.getChildren();
+					for (Node<?> child : children) {
+						stack.push(child);
+					}
+				}
+				
+			}
+			
+			if(node instanceof Attribute){
+				ValidationResults validationResults = ((Attribute<?,?>) node).validateValue();
+				List<ValidationResult> errors = validationResults.getErrors();
+				if(errors.size() > 0){
+					return true;
+				}
+			}
+		}
+		
+		return false;
+	}
+
+	
+	
+	private boolean hasCardinalityError(Entity entity) {
+		EntityDefinition definition = entity.getDefinition();
+		List<NodeDefinition> childDefinitions = definition.getChildDefinitions();
+		for (NodeDefinition childDefinition : childDefinitions) {
+			String childName = childDefinition.getName();
+			ValidationResultFlag minCountFlag = entity.validateMinCount(childName );
+			if(minCountFlag == ValidationResultFlag.ERROR){
+				return true;
+			}
+			
+			ValidationResultFlag maxCountFlag = entity.validateMaxCount(childName);
+			if(maxCountFlag == ValidationResultFlag.ERROR){
+				return true;
+			}
+		}
+		return false;
 	}
 
 	@Transactional
@@ -379,33 +444,18 @@ public class RecordManager {
 		record.setEntityCounts(counts);
 	}
 	
-	private void updateKeys(CollectRecord record) {
+	private void updateKeys(CollectRecord record) throws RecordPersistenceException {
+		record.updateRootEntityKeyValues();
+		
+		//check that all keys have been specified
+		List<String> rootEntityKeyValues = record.getRootEntityKeyValues();
 		Entity rootEntity = record.getRootEntity();
 		EntityDefinition rootEntityDefn = rootEntity.getDefinition();
-		List<AttributeDefinition> keyDefns = rootEntityDefn.getKeyAttributeDefinitions();
-		//set keys
-		List<String> keys = new ArrayList<String>();
-		for (NodeDefinition def: keyDefns) {
-			String name = def.getName();
-			Object value = null;
-			String textValue = null;
-			Node<? extends NodeDefinition> node = rootEntity.get(name, 0);
-			if(node instanceof CodeAttribute) {
-				Code code = ((CodeAttribute) node).getValue();
-				if(code != null) {
-					textValue = code.getCode();
-				}
-			} else if(node instanceof TextAttribute) {
-				textValue = ((TextAttribute) node).getValue();
-			} else if(node instanceof NumberAttribute<?>) {
-				value = ((NumberAttribute<?>) node).getValue();
-				if(value != null) {
-					textValue = value.toString();
-				}
-			}
-			keys.add(textValue);
+		List<AttributeDefinition> keyAttributeDefns = rootEntityDefn.getKeyAttributeDefinitions();
+
+		if (keyAttributeDefns.size() != rootEntityKeyValues.size()) {
+			throw new MissingRecordKeyException();
 		}
-		record.setKeys(keys);
 	}
 
 }

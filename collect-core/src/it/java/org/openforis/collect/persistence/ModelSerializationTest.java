@@ -95,7 +95,7 @@ public class ModelSerializationTest {
 		record.getEntityCounts().add(2);
 		
 		//set keys
-		record.getRootEntityKeys().add(id);
+		record.getRootEntityKeyValues().add(id);
 		
 		return record;
 	}

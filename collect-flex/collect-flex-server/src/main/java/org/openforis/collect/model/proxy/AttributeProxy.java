@@ -26,8 +26,8 @@ public class AttributeProxy extends NodeProxy {
 	private ValidationResultsProxy validationResults;
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public AttributeProxy(Attribute attribute) {
-		super(attribute);
+	public AttributeProxy(EntityProxy parent, Attribute attribute) {
+		super(parent, attribute);
 		this.attribute = attribute;
 		validationResults = new ValidationResultsProxy(attribute.validateValue());
 	}

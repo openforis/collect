@@ -5,6 +5,7 @@ package org.openforis.collect.presenter {
 	 * */
 	import flash.display.DisplayObject;
 	import flash.events.Event;
+	import flash.events.FocusEvent;
 	import flash.events.MouseEvent;
 	
 	import mx.collections.IList;
@@ -30,6 +31,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.ui.view.ListView;
 	import org.openforis.collect.util.AlertUtil;
 	import org.openforis.collect.util.CollectionUtil;
+	import org.openforis.collect.util.StringUtil;
 	
 	import spark.collections.SortField;
 	import spark.events.GridSortEvent;
@@ -52,14 +54,18 @@ package org.openforis.collect.presenter {
 		 */
 		private var totalPages:int;
 		/**
-		 * the current page of the pagination.
+		 * The current page of the pagination.
 		 * It starts from 1 
 		 */
 		private var currentPage:int;
 		/**
-		 * the current orderBy column dataField
+		 * The current orderBy column dataField
 		 */
 		private var currentOrderByFieldName:String;
+		/**
+		 * The current filter applied on root entity key fields. 
+		 * */
+		private var currentFilter:String = null;
 		
 		/**
 		 * Max number of records that can be loaded for a single page.
@@ -81,7 +87,8 @@ package org.openforis.collect.presenter {
 			this._view.addButton.addEventListener(MouseEvent.CLICK, addButtonClickHandler);
 			this._view.editButton.addEventListener(MouseEvent.CLICK, editButtonClickHandler);
 			this._view.deleteButton.addEventListener(MouseEvent.CLICK, deleteButtonClickHandler);
-			
+			//this._view.filterByIdTextInput.addEventListener(FocusEvent.FOCUS_OUT, filterByIdTextInputFocusOutHandler);
+				
 			this._view.dataGrid.addEventListener(GridSortEvent.SORT_CHANGING, dataGridSortChangingHandler);
 			
 			this._view.paginationBar.firstPageButton.addEventListener(MouseEvent.CLICK, firstPageClickHandler);
@@ -135,8 +142,7 @@ package org.openforis.collect.presenter {
 		
 		protected function createRecordResultHandler(event:ResultEvent, token:Object = null):void {
 			var record:RecordProxy = event.result as RecordProxy;
-			record.detached = true;
-			//record.rootEntityKeys = new ArrayList();
+			record.init();
 			var uiEvent:UIEvent = new UIEvent(UIEvent.RECORD_CREATED);
 			uiEvent.obj = record;
 			eventDispatcher.dispatchEvent(uiEvent);
@@ -150,6 +156,7 @@ package org.openforis.collect.presenter {
 		protected function editButtonClickHandler(event:MouseEvent):void {
 			var selectedRecord:RecordProxy = _view.dataGrid.selectedItem as RecordProxy;
 			if(selectedRecord != null) {
+				selectedRecord.showErrors(); //to make validation errors visible
 				var uiEvent:UIEvent = new UIEvent(UIEvent.RECORD_SELECTED);
 				uiEvent.obj = selectedRecord;
 				eventDispatcher.dispatchEvent(uiEvent);
@@ -174,6 +181,17 @@ package org.openforis.collect.presenter {
 			}
 		}
 		
+		/**
+		 * Filter by id text input focussed out
+		 * 
+		protected function filterByIdTextInputFocusOutHandler(event:FocusEvent):void {
+			var query:String = _view.filterByIdTextInput.text;
+			query = StringUtil.trim(query);
+			_view.filterByIdTextInput.text = query;
+			currentFilter = query != "" ? query: null;
+			loadRecordSummariesCurrentPage();
+		}
+		*/
 		/**
 		 * Loads records summaries for active root entity
 		 * */
@@ -206,7 +224,7 @@ package org.openforis.collect.presenter {
 			var offset:int = (currentPage - 1) * MAX_RECORDS_PER_PAGE;
 			
 			_dataClient.getRecordSummaries(new AsyncResponder(getRecordsSummaryResultHandler, faultHandler), Application.activeRootEntity.name, 
-				offset, MAX_RECORDS_PER_PAGE, currentOrderByFieldName);
+				offset, MAX_RECORDS_PER_PAGE, currentOrderByFieldName, currentFilter);
 		}
 		
 		protected function getRecordsSummaryResultHandler(event:ResultEvent, token:Object = null):void {

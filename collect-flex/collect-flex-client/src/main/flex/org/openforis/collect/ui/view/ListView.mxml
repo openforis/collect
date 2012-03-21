@@ -51,7 +51,17 @@
 									verticalScrollPolicy="off" 
 									/>
 	
-	<datagrid:PaginationBar id="paginationBar" height="16" />
+	<s:Group width="100%">
+		<!--
+		<s:Label text="{Message.get('list.filterByIdLabel')}" />
+		<s:TextInput id="filterByIdTextInput" />
+		-->
+		<datagrid:PaginationBar id="paginationBar" 
+								height="16"
+								horizontalCenter="0"
+								/>
+		
+	</s:Group>
 	
 	<s:HGroup id="controlsBar" width="100%" horizontalAlign="center" verticalAlign="bottom" height="30">
 		<s:Button id="addButton" label="{Message.get('list.add')}" 

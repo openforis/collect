@@ -93,7 +93,7 @@ package org.openforis.collect.presenter
 			o.parentEntityId = _view.parentEntity.id;
 			o.nodeName = _view.entityDefinition.name;
 			var req:UpdateRequest = new UpdateRequest(o);
-			ClientFactory.dataClient.updateActiveRecord(req, null, addResultHandler);
+			ClientFactory.dataClient.updateActiveRecord(req, null, addResultHandler, faultHandler);
 		}
 		
 		protected function deleteButtonClickHandler(event:MouseEvent):void {
@@ -107,7 +107,7 @@ package org.openforis.collect.presenter
 			o.parentEntityId = _view.parentEntity.id;
 			o.nodeId = _view.entity.id;
 			var req:UpdateRequest = new UpdateRequest(o);
-			ClientFactory.dataClient.updateActiveRecord(req, null, deleteResultHandler);
+			ClientFactory.dataClient.updateActiveRecord(req, null, deleteResultHandler, faultHandler);
 		}
 		
 		protected function addResultHandler(event:ResultEvent, token:Object = null):void {

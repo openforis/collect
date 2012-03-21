@@ -1,15 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
 		 xmlns:s="library://ns.adobe.com/flex/spark" 
-		 xmlns:mx="library://ns.adobe.com/flex/mx">
+		 xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:datagroup="org.openforis.collect.ui.component.datagroup.*">
 	
 	<fx:Script>
 		<![CDATA[
 			import mx.collections.ArrayCollection;
+			
+			import org.openforis.collect.model.proxy.EntityProxy;
+			
 			import mx.collections.IList;
 			
 			import spark.layouts.ConstraintLayout;
 			
+			private var _parentEntity:EntityProxy;
 			private var _nodeDefinitions:IList;
 			
 			//private var _constraintLayout:ConstraintLayout;
@@ -22,6 +26,16 @@
 			public function set nodeDefinitions(value:IList):void {
 				_nodeDefinitions = value;
 			}
+
+			[Bindable]
+			public function get parentEntity():EntityProxy {
+				return _parentEntity;
+			}
+
+			public function set parentEntity(value:EntityProxy):void {
+				_parentEntity = value;
+			}
+
 			/*
 			[Bindable]
 			public function get constraintLayout():ConstraintLayout {
@@ -44,38 +58,9 @@
 		</s:layout>
 		<s:itemRenderer>
 			<fx:Component>
-				<s:ItemRenderer dataChange="dataChangeHandler(event)"
-								autoDrawBackground="false">
-					<fx:Script>
-						<![CDATA[
-							import mx.containers.utilityClasses.ConstraintColumn;
-							import mx.core.IVisualElement;
-							import mx.events.FlexEvent;
-							
-							import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
-							import org.openforis.collect.ui.UIBuilder;
-							
-							override protected function createChildren():void {
-								super.createChildren();
-								if(data != null) {
-									var elem:IVisualElement = UIBuilder.getDataGroupHeader(data as NodeDefinitionProxy);
-									addElement(elem);
-									/*
-									var constraintColumns:Vector.<ConstraintColumn> = outerDocument.constraintLayout.constraintColumns;
-									var constraintColumn:ConstraintColumn = constraintColumns[super.itemIndex];
-									elem.x = constraintColumn.x;
-									*/
-								}
-							}
-							
-							protected function dataChangeHandler(event:FlexEvent):void {
-								removeAllElements();
-								initialized = false;
-								initialize();
-							}
-						]]>
-					</fx:Script>
-				</s:ItemRenderer>
+				<datagroup:DataGroupItemRenderer
+					parentEntity="{outerDocument.parentEntity}"
+					/>
 			</fx:Component>
 		</s:itemRenderer>
 	</s:DataGroup>

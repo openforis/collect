@@ -29,7 +29,7 @@ package org.openforis.collect.util {
 				errorMsg = Message.get("edit.validationToolTip.warning", [errorMsg]);
 			}
 			var toolTip:ToolTip = ToolTipManager.createToolTip(errorMsg, xPos + object.width, yPos, null, object as IUIComponent) as ToolTip;
-			toolTip.setStyle("styleName", styleName);
+			toolTip.styleName = styleName;
 			
 			var position:String;
 			if(PopUpUtil.exceedViewport(toolTip)) {

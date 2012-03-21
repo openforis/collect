@@ -33,17 +33,17 @@ package org.openforis.collect.ui.component.detail
 		 * Component that triggers the tooltip opening with mouse events
 		 */
 		private var _toolTipTrigger:UIComponent;
-		
+
+		private var _showMinMaxCountErrors:Boolean = false;
 		/**
 		 * Current instance of the tooltip
 		 */
 		private var _toolTip:IToolTip;
-		
 		private var _toolTipStyleName:String;
-		
 		private var _toolTipMessage:String;
-		
 		private var _displayStyleName:String;
+		
+
 		
 		public function ValidationDisplayManager(toolTipTrigger:UIComponent, display:UIComponent) {
 			_toolTipTrigger = toolTipTrigger;
@@ -65,7 +65,7 @@ package org.openforis.collect.ui.component.detail
 						flag = ValidationResultFlag.WARNING;
 					}
 					message = attribute.validationMessage;
-				} else {
+				} else if(showMinMaxCountErrors) {
 					var minCountValid:ValidationResultFlag = parentEntity.childrenMinCountValidationMap.get(name);
 					var maxCountValid:ValidationResultFlag = parentEntity.childrenMaxCountValidationMap.get(name);
 					if(minCountValid != ValidationResultFlag.OK || maxCountValid != ValidationResultFlag.OK) {
@@ -150,6 +150,15 @@ package org.openforis.collect.ui.component.detail
 		public function set active(value:Boolean):void {
 			_active = value;
 		}
+
+		public function get showMinMaxCountErrors():Boolean {
+			return _showMinMaxCountErrors;
+		}
+
+		public function set showMinMaxCountErrors(value:Boolean):void {
+			_showMinMaxCountErrors = value;
+		}
+
 		
 	}
 }

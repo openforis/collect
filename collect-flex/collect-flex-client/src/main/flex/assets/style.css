@@ -16,7 +16,24 @@ view|Footer {
 	padding-bottom: 5;
 }
 
-.appVersionText {
+.currentPhase {
+	fontSize: 12;
+	fontWeight: bold;
+}
+
+.recordKey {
+	fontSize: 13;
+	fontWeight: bold;
+}
+
+.formVersionLabel, .formVersionText {
+	fontSize: 10;
+	fontWeight: bold;
+}
+
+.listTitle {
+	fontSize: 13;
+	fontWeight: bold;
 }
 
 mx|Alert {
@@ -27,8 +44,11 @@ mx|Alert {
 	corner-radius: 3;
 	rounded-bottom-corners:true;
 	background-color: #FFFFFF;
-	background-alpha: 0.8;
+	background-alpha: 0.8;	
 }
+/*mx|Alert.error {
+
+}*/
 
 s|TitleWindow {
 	skin-class: ClassReference("org.openforis.collect.ui.skin.TitleWindowSkin");
@@ -45,32 +65,24 @@ component|BlockingMessagePopUp {
 	showCloseButton: false;
 }
 
-/* validation tooltips */
-mx|ToolTip.error, mx|ToolTip.warning, mx|ToolTip.missing {
-	color: #FFFFFF;
-	fontSize: 9;
-	fontWeight: "bold";	
-	shadowColor: #000000;
-	borderStyle: "errorTipRight";
+mx|ToolTip { 
+	fontSize: 10; 
+	backgroundColor: #AAD4FF;
+	color: #000000; 
 	paddingBottom: 4;
 	paddingLeft: 4;
 	paddingRight: 4;
 	paddingTop: 4;
 }
 
-.listTitle {
-	fontSize: 13;
-	fontWeight: bold;
-}
-
-.title1 {
-	fontSize: 16;
-	fontWeight: bold;
-}
-
-.title2 {
-	fontSize: 13;
-	fontWeight: bold;
+/* validation tooltips */
+mx|ToolTip.error, mx|ToolTip.warning {
+	borderSkin: ClassReference("org.openforis.collect.ui.skin.ToolTipBorder");
+	color: #FFFFFF;
+	fontSize: 10;
+	fontWeight: "bold";	
+	shadowColor: #000000;
+	borderStyle: "errorTipRight";
 }
 
 mx|ToolTip.error {
@@ -111,25 +123,25 @@ detail|AttributeItemRenderer.warning,
 	contentBackgroundColor: #DDDDDD;
 }
 
-input|TextInput {
+input|TextInput, mx|TextArea {
 	borderSkin: ClassReference("org.openforis.collect.ui.skin.TextInputBorderSkin");
 }
 
-input|TextInput.error, input|TextInput.warning {
+input|TextInput.error, input|TextInput.warning, mx|TextArea.error, mx|TextArea.warning {
 	borderStyle: solid;
 	borderWeight: 1;
 	borderThickness: 1;
 }
 
-input|TextInput.error {
+input|TextInput.error, mx|TextArea.error {
 	borderColor: #FF0000;
 }
 
-input|TextInput.warning {
+input|TextInput.warning, mx|TextArea.warning {
 	borderColor: #FFAA00;
 }
 
-input|TextInput.remarksPresent {
+input|TextInput.remarksPresent, mx|TextArea.remarksPresent {
 	remarksPresentIconVisible: true;
 }
 
@@ -168,6 +180,11 @@ input|TaxonAutoCompletePopUp {
 
 s|Label.bold {
 	fontWeight: bold;
+}
+
+s|Label.fixedCode {
+	fontSize: 10;
+	fontFamily: Verdana;
 }
 
 s|Button.roundCorners {

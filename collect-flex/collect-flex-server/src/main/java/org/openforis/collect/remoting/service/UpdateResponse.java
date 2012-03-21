@@ -97,9 +97,9 @@ public class UpdateResponse implements Proxy {
 	public NodeProxy getCreatedNode() {
 		if(creatednode != null){
 			if(creatednode instanceof Attribute<?, ?>) {
-				return new AttributeProxy((Attribute<?, ?>) creatednode);
+				return new AttributeProxy(null, (Attribute<?, ?>) creatednode);
 			} else if(creatednode instanceof Entity) {
-				return new EntityProxy((Entity) creatednode);
+				return new EntityProxy(null, (Entity) creatednode);
 			}
 		}
 		return null;

@@ -1,4 +1,5 @@
 package org.openforis.collect.ui.component.input {
+	import flash.events.Event;
 	import flash.events.TextEvent;
 	
 	import mx.controls.TextInput;
@@ -13,11 +14,13 @@ package org.openforis.collect.ui.component.input {
 	public class TextInput extends mx.controls.TextInput {
 		
 		private var _restrictPattern:String;
+		private var _upperCase:Boolean = true;
 		
 		public function TextInput() {
 			super();
 			minWidth = 0;
 			addEventListener(TextEvent.TEXT_INPUT, textInputHandler);
+			addEventListener(Event.CHANGE, changeHandler);
 		}
 		
 		public function selectAll():void {
@@ -32,11 +35,17 @@ package org.openforis.collect.ui.component.input {
 				var end:String = text.substr(selectionEndIndex);
 				var inserted:String = event.text;
 				var newText:String = begin + inserted + end;
-				var regExp:RegExp = new RegExp(_restrictPattern);
+				var regExp:RegExp = new RegExp(_restrictPattern, "i");
 				var valid:Boolean = regExp.test(newText);
 				if(! valid) {
 					event.preventDefault();
 				}
+			}
+		}
+		
+		protected function changeHandler(event:Event):void {
+			if(upperCase) {
+				text = text.toUpperCase();
 			}
 		}
 		
@@ -46,6 +55,14 @@ package org.openforis.collect.ui.component.input {
 
 		public function set restrictPattern(value:String):void {
 			_restrictPattern = value;
+		}
+
+		public function get upperCase():Boolean {
+			return _upperCase;
+		}
+
+		public function set upperCase(value:Boolean):void {
+			_upperCase = value;
 		}
 		
 		

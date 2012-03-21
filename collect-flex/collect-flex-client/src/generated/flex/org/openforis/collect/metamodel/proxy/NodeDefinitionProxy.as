@@ -50,6 +50,12 @@ package org.openforis.collect.metamodel.proxy {
 			return null;
 		}
 		
+		public function getDescription(language:String = null):String {
+			var result:String = LanguageSpecificTextProxy.getLocalizedText(descriptions, language);
+			return result;
+		}
+		
+		[Bindable]
 		public function get parentLayout():String {
 			if(parent != null) {
 				return parent.layout;

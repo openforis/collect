@@ -1,10 +1,12 @@
 package org.openforis.collect.presenter
 {
+	import flash.events.Event;
 	import flash.events.FocusEvent;
 	import flash.events.MouseEvent;
 	
 	import mx.collections.IList;
 	import mx.core.UIComponent;
+	import mx.events.CollectionEvent;
 	import mx.rpc.events.ResultEvent;
 	
 	import org.openforis.collect.client.ClientFactory;
@@ -18,6 +20,8 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.ui.component.detail.MultipleAttributeFormItem;
 	import org.openforis.collect.ui.component.detail.ValidationDisplayManager;
 	import org.openforis.collect.ui.component.input.InputField;
+	import org.openforis.collect.util.AlertUtil;
+	import org.openforis.collect.util.CollectionUtil;
 	import org.openforis.collect.util.UIUtil;
 
 	/**
@@ -65,6 +69,7 @@ package org.openforis.collect.presenter
 		}
 		
 		override protected function updateView():void {
+			super.updateView();
 			if(view.dataGroup != null && view.parentEntity != null) {
 				var attributes:IList = getAttributes();
 				view.dataGroup.dataProvider = attributes;
@@ -72,9 +77,13 @@ package org.openforis.collect.presenter
 		}
 
 		protected function getAttributes():IList {
-			var name:String = view.attributeDefinition.name;
-			var attributes:IList = view.parentEntity.getChildren(name);
-			return attributes;
+			if(view.dataGroup != null && view.parentEntity != null) {
+				var name:String = view.attributeDefinition.name;
+				var attributes:IList = view.parentEntity.getChildren(name);
+				return attributes;
+			} else {
+				return null;
+			}
 		}
 		
 		protected function addButtonFocusInHandler(event:FocusEvent):void {
@@ -83,18 +92,18 @@ package org.openforis.collect.presenter
 		
 		protected function addButtonClickHandler(event:MouseEvent):void {
 			var attributes:IList = getAttributes();
-			//var maxCount:Number = view.attributeDefinition.maxCount
-			//if(isNaN(maxCount) || CollectionUtil.isEmpty(attributes) || attributes.length < maxCount) {
+			var maxCount:Number = view.attributeDefinition.maxCount
+			if(isNaN(maxCount) || CollectionUtil.isEmpty(attributes) || attributes.length < maxCount) {
 				var o:UpdateRequestOperation = new UpdateRequestOperation();
 				o.method = UpdateRequestOperation$Method.ADD;
 				o.parentEntityId = view.parentEntity.id;
 				o.nodeName = view.attributeDefinition.name;
 				var req:UpdateRequest = new UpdateRequest(o);
-				ClientFactory.dataClient.updateActiveRecord(req, null, addResultHandler);
-			/*} else {
+				ClientFactory.dataClient.updateActiveRecord(req, null, addResultHandler, faultHandler);
+			} else {
 				var labelText:String = view.attributeDefinition.getLabelText();
 				AlertUtil.showError("edit.maxCountExceed", [maxCount, labelText]);
-			}*/	
+			}	
 		}
 		
 		protected function addResultHandler(event:ResultEvent, token:Object = null):void {
@@ -104,9 +113,8 @@ package org.openforis.collect.presenter
 		}
 		
 		override protected function initValidationDisplayManager():void {
-			var validationStateDisplay:UIComponent = _view;
-			var validationToolTipTrigger:UIComponent = validationStateDisplay;
-			_validationDisplayManager = new ValidationDisplayManager(validationToolTipTrigger, validationStateDisplay);
+			super.initValidationDisplayManager();
+			_validationDisplayManager.showMinMaxCountErrors = true;
 			if(view.attributeDefinition != null) {
 				updateValidationDisplayManager();
 			}
@@ -118,36 +126,18 @@ package org.openforis.collect.presenter
 		
 		override protected function updateValidationDisplayManager():void {
 			super.updateValidationDisplayManager();
-			var visited:Boolean = isVisited();
-			var detached:Boolean = isDetached();
-			var active:Boolean = visited || ! detached;
-			if(active) {
-				_validationDisplayManager.active = true;
-				_validationDisplayManager.displayNodeValidation(view.parentEntity, view.attributeDefinition);
-			} else {
-				_validationDisplayManager.active = false;
-				_validationDisplayManager.reset();
-			}
-		}
-		
-		protected function isVisited():Boolean {
-			var attributes:IList = getAttributes();
-			for each (var a:AttributeProxy in attributes) {
-				if(a.visited) {
-					return true;
+			if(_view.parentEntity != null) {
+				var attributeName:String = view.attributeDefinition.name;
+				var visited:Boolean = _view.parentEntity.isErrorOnChildVisible(attributeName);
+				var active:Boolean = visited;
+				if(active) {
+					_validationDisplayManager.active = true;
+					_validationDisplayManager.displayNodeValidation(view.parentEntity, view.attributeDefinition);
+				} else {
+					_validationDisplayManager.active = false;
+					_validationDisplayManager.reset();
 				}
 			}
-			return false;
-		}
-		
-		protected function isDetached():Boolean {
-			var attributes:IList = getAttributes();
-			for each (var a:AttributeProxy in attributes) {
-				if(! a.detached) {
-					return false;
-				}
-			}
-			return true;
 		}
 
 	}

@@ -21,6 +21,9 @@ package org.openforis.collect.ui {
 		[Embed("/assets/images/magnifier.png")]
 		public static const MAGNIFIER:Class;
 		
+		[Embed("/assets/images/info.png")]
+		public static const INFO:Class;
+
 		[Embed("/assets/images/error.png")]
 		public static const ERROR:Class;
 		
@@ -62,6 +65,9 @@ package org.openforis.collect.ui {
 		
 		[Embed("/assets/images/reject.png")]
 		public static const REJECT:Class;
+		
+		[Embed("/assets/images/dash.png")]
+		public static const DASH:Class;
 		
 		[Embed("/assets/images/footer.jpg")]
 		public static const FOOTER:Class;

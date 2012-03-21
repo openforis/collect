@@ -9,6 +9,7 @@ import java.util.List;
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.collect.Proxy;
 import org.openforis.idm.model.Attribute;
+import org.openforis.idm.model.CodeAttribute;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Node;
 
@@ -19,22 +20,29 @@ import org.openforis.idm.model.Node;
  */
 public class NodeProxy implements Proxy {
 
+	private EntityProxy parent;
+	
 	private transient Node<?> node;
 	
-	public NodeProxy(Node<?> node) {
+	public NodeProxy(EntityProxy parent, Node<?> node) {
 		super();
+		this.parent = parent;
 		this.node = node;
 	}
 
-	public static List<NodeProxy> fromList(List<Node<?>> list) {
+	public static List<NodeProxy> fromList(EntityProxy parent, List<Node<?>> list) {
 		List<NodeProxy> result = new ArrayList<NodeProxy>();
 		if(list != null) {
 			for (Node<?> node : list) {
 				NodeProxy proxy;
 				if(node instanceof Attribute<?, ?>) {
-					proxy = new AttributeProxy((Attribute<?, ?>) node);
+					if(node instanceof CodeAttribute) {
+						proxy = new CodeAttributeProxy(parent, (CodeAttribute) node);
+					} else {
+						proxy = new AttributeProxy(parent, (Attribute<?, ?>) node);
+					}
 				} else {
-					proxy = new EntityProxy((Entity) node);
+					proxy = new EntityProxy(parent, (Entity) node);
 				}
 				result.add(proxy);
 			}
@@ -69,5 +77,12 @@ public class NodeProxy implements Proxy {
 			return null;
 		}
 	}
+
+	public EntityProxy getParent() {
+		return parent;
+	}
 	
+	public void setParent(EntityProxy parent) {
+		this.parent = parent;
+	}
 }

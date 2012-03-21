@@ -55,7 +55,10 @@
 					   minHeight="0"
 					   minWidth="0">
 	-->		
-	<s:Label text="{entityDefinition.getLabelText()}" styleName="bold" includeIn="vertical" />
+	
+	<detail:FormItemLabel id="formItemLabel"
+		  				  nodeDefinition="{entityDefinition}" 
+						  includeIn="vertical" />
 
 	<s:DataGroup 
 		dataProvider="{nodeDefinitions}" 

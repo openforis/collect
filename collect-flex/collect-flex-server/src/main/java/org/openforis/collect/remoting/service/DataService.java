@@ -17,6 +17,7 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.manager.RecordManager;
+import org.openforis.collect.manager.RecordPromoteException;
 import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.metamodel.proxy.CodeListItemProxy;
 import org.openforis.collect.model.CollectRecord;
@@ -142,19 +143,15 @@ public class DataService {
 	}
 	
 	@Transactional
-	public void saveActiveRecord() {
+	public void saveActiveRecord() throws RecordPersistenceException {
 		SessionState sessionState = sessionManager.getSessionState();
 		CollectRecord record = sessionState.getActiveRecord();
 		User user = sessionState.getUser();
 		record.setModifiedDate(new Date());
 		record.setModifiedBy(user);
-		try {
-			recordManager.save(record);
-			sessionState.setActiveRecordState(RecordState.SAVED);
-		} catch (RecordPersistenceException e) {
-			//it should never be thrown
-			throw new RuntimeException("Unexpected error saving record");
-		}
+
+		recordManager.save(record);
+		sessionState.setActiveRecordState(RecordState.SAVED);
 	}
 
 	@Transactional
@@ -201,7 +198,8 @@ public class DataService {
 		Map<Integer, UpdateResponse> responseMap = new HashMap<Integer, UpdateResponse>();
 		Set<NodePointer> relReqDependencies = null;
 		Set<Attribute<?,?>> checkDependencies = null;
-		List<Entity> ancestors = null;
+		List<NodePointer> cardinalityNodePointers = null;
+		
 		Attribute<? extends AttributeDefinition, ?> attribute = null;
 		switch (method) {
 			case ADD :
@@ -215,11 +213,11 @@ public class DataService {
 					checkDependencies.add(attribute);
 				}
 				relReqDependencies.add(new NodePointer(createdNode.getParent(), createdNode.getName()));
-				ancestors = createdNode.getAncestors();
+				cardinalityNodePointers = getCardinalityNodePointers(createdNode);
 				break;
 			case UPDATE:
 				attribute = (Attribute<AttributeDefinition, ?>) node;
-				ancestors = attribute.getAncestors();
+				cardinalityNodePointers = getCardinalityNodePointers(attribute);
 				response = getUpdateResponse(responseMap, attribute.getInternalId());
 				Map<Integer, Object> updatedFieldValues = new HashMap<Integer, Object>();
 				if (fieldIndex < 0) {
@@ -235,8 +233,7 @@ public class DataService {
 						recordManager.setFieldValue(attribute, fieldValue, remarks, symbol, idx);
 					}
 				} else {
-					Object value = parseFieldValue(parentEntity,
-							attribute.getDefinition(), requestValue, fieldIndex);
+					Object value = parseFieldValue(parentEntity, attribute.getDefinition(), requestValue, fieldIndex);
 					recordManager.setFieldValue(attribute, value, remarks, symbol, fieldIndex);
 					Field<?> field = attribute.getField(fieldIndex);
 					updatedFieldValues.put(fieldIndex, field.getValue());
@@ -250,11 +247,27 @@ public class DataService {
 			case DELETE:
 				relReqDependencies = new HashSet<NodePointer>();
 				checkDependencies = new HashSet<Attribute<?,?>>();
+				cardinalityNodePointers = getCardinalityNodePointers(node);
 				deleteNode(node, relReqDependencies, checkDependencies, responseMap);
 				break;
 		}
-		prepareUpdateResponse(responseMap, relReqDependencies, checkDependencies, ancestors);
+		prepareUpdateResponse(responseMap, relReqDependencies, checkDependencies, cardinalityNodePointers);
 		return responseMap.values();
+	}
+	
+	private List<NodePointer> getCardinalityNodePointers(Node<?> node){
+		List<NodePointer> nodePointers = new ArrayList<NodePointer>();
+		
+		Entity parent = node.getParent();
+		String childName = node.getName();
+		while(parent != null){
+			NodePointer nodePointer = new NodePointer(parent, childName );
+			nodePointers.add(nodePointer);
+			
+			childName = parent.getName();
+			parent = parent.getParent();
+		}
+		return nodePointers;
 	}
 
 	private void deleteNode(Node<?> node,Set<NodePointer> relevanceRequiredDependencies, Set<Attribute<?,?>> checkDependencies, Map<Integer, UpdateResponse> responseMap){
@@ -300,13 +313,13 @@ public class DataService {
 	}
 	
 	
-	private void prepareUpdateResponse(Map<Integer, UpdateResponse> responseMap, Set<NodePointer> relevanceRequiredDependencies, Set<Attribute<?, ?>> validtionResultsDependencies, List<Entity> ancestors) {
-		if (ancestors != null) {
-			for (Entity entity : ancestors) {
+	private void prepareUpdateResponse(Map<Integer, UpdateResponse> responseMap, Set<NodePointer> relevanceRequiredDependencies, Set<Attribute<?, ?>> validtionResultsDependencies, List<NodePointer> cardinalityNodePointers) {
+		if (cardinalityNodePointers != null) {
+			for (NodePointer nodePointer : cardinalityNodePointers) {
 				// entity could be root definition
-				Entity parent = entity.getParent();
+				Entity parent = nodePointer.getEntity();
 				if (parent != null && !parent.isDetached()) {
-					String childName = entity.getName();
+					String childName = nodePointer.getChildName();
 					UpdateResponse response = getUpdateResponse(responseMap, parent.getInternalId());
 					response.setRelevant(childName, parent.isRelevant(childName));
 					response.setRequired(childName, parent.isRequired(childName));
@@ -457,7 +470,7 @@ public class DataService {
 	}
 	
 	@Transactional
-	public void promoteActiveRecord() throws RecordPersistenceException  {
+	public void promoteActiveRecord() throws RecordPersistenceException, RecordPromoteException  {
 		SessionState sessionState = sessionManager.getSessionState();
 		CollectRecord record = sessionState.getActiveRecord();
 		User user = sessionState.getUser();

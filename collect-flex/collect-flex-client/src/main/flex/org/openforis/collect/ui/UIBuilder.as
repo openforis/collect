@@ -29,12 +29,15 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.metamodel.proxy.TimeAttributeDefinitionProxy;
 	import org.openforis.collect.model.UIConfiguration;
 	import org.openforis.collect.model.UITab;
+	import org.openforis.collect.model.UITabDefinition;
+	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.ui.component.datagrid.CompleteColumnItemRenderer;
 	import org.openforis.collect.ui.component.datagrid.RecordSummaryDataGrid;
 	import org.openforis.collect.ui.component.datagroup.DataGridHeaderRenderer;
 	import org.openforis.collect.ui.component.detail.AttributeFormItem;
 	import org.openforis.collect.ui.component.detail.AttributeItemRenderer;
 	import org.openforis.collect.ui.component.detail.CodeAttributeFormItem;
+	import org.openforis.collect.ui.component.detail.CompositeAttributeFormItem;
 	import org.openforis.collect.ui.component.detail.EntityFormContainer;
 	import org.openforis.collect.ui.component.detail.EntityFormItem;
 	import org.openforis.collect.ui.component.detail.FormContainer;
@@ -64,7 +67,6 @@ package org.openforis.collect.ui {
 	import spark.components.Label;
 	import spark.components.VGroup;
 	import spark.components.gridClasses.GridColumn;
-	import org.openforis.collect.model.UITabDefinition;
 	
 	/**
 	 * @author Mino Togna
@@ -174,17 +176,17 @@ package org.openforis.collect.ui {
 			column = getGridColumn(Message.get("list.warnings"), "warnings", 80, RecordSummaryDataGrid.numberLabelFunction);
 			columns.addItem(column);
 			//creation date column
-			column = getGridColumn(Message.get("list.creationDate"), "creationDate", 150, RecordSummaryDataGrid.dateTimeLabelFunction);
+			column = getGridColumn(Message.get("list.creationDate"), "creationDate", 120, RecordSummaryDataGrid.dateTimeLabelFunction);
 			columns.addItem(column);
 			//date modified column
-			column = getGridColumn(Message.get("list.modifiedDate"), "modifiedDate", 150, RecordSummaryDataGrid.dateTimeLabelFunction);
+			column = getGridColumn(Message.get("list.modifiedDate"), "modifiedDate", 120, RecordSummaryDataGrid.dateTimeLabelFunction);
 			columns.addItem(column);
 			//entry completed column
-			column = getGridColumn(Message.get("list.entryComplete"), "entryComplete", 70, 
+			column = getGridColumn(Message.get("list.entryComplete"), "entryComplete", 60, 
 				null, true, new ClassFactory(CompleteColumnItemRenderer));
 			columns.addItem(column);
 			//cleansing completed column
-			column = getGridColumn(Message.get("list.cleansingComplete"), "cleansingComplete", 70, 
+			column = getGridColumn(Message.get("list.cleansingComplete"), "cleansingComplete", 60, 
 				null, true, new ClassFactory(CompleteColumnItemRenderer));
 			columns.addItem(column);
 			return columns;
@@ -195,6 +197,8 @@ package org.openforis.collect.ui {
 			var formItem:AttributeFormItem = null;
 			if(def is CodeAttributeDefinitionProxy) {
 				formItem = new CodeAttributeFormItem();
+			} else if(def is CoordinateAttributeDefinitionProxy || def is TaxonAttributeDefinitionProxy) {
+				formItem = new CompositeAttributeFormItem();
 			} else if(def.multiple) {
 				if(parentLayout == UIUtil.LAYOUT_TABLE){
 					formItem = new MultipleAttributeDataGroupFormItem();
@@ -229,7 +233,7 @@ package org.openforis.collect.ui {
 						//return NaN;
 						return 150;
 					} else {
-						return 100;
+						return 85;
 					}
 				} else {
 					return NaN;
@@ -272,12 +276,18 @@ package org.openforis.collect.ui {
 			}
 		}
 		
-		public static function getAttributeDataGroupHeaderWidth(def:AttributeDefinitionProxy):Number {
-			var inputFieldWidth:Number = getInputFieldWidth(def);
-			if(!isNaN(inputFieldWidth)) {
-				return inputFieldWidth + 2; //consider validation display border container
+		public static function getAttributeDataGroupHeaderWidth(def:AttributeDefinitionProxy, ancestorEntity:EntityProxy):Number {
+			var parentEntityDefn:EntityDefinitionProxy = def.parent;
+			if(ancestorEntity != null && parentEntityDefn.enumerable && def.key && def is CodeAttributeDefinitionProxy) {
+				var enumeratedCodeWidth:Number = ancestorEntity.getEnumeratedCodeWidth(parentEntityDefn.name);
+				return enumeratedCodeWidth + 2;
 			} else {
-				return NaN;
+				var inputFieldWidth:Number = getInputFieldWidth(def);
+				if(!isNaN(inputFieldWidth)) {
+					return inputFieldWidth + 2; //consider validation display border container
+				} else {
+					return NaN;
+				}
 			}
 		}
 		
@@ -353,17 +363,17 @@ package org.openforis.collect.ui {
 			return renderer;
 		}
 		
-		public static function getDataGroupHeader(defn:NodeDefinitionProxy):IVisualElement {
+		public static function getDataGroupHeader(defn:NodeDefinitionProxy, parentEntity:EntityProxy = null):IVisualElement {
 			var elem:IVisualElement = null;
 			if(defn is AttributeDefinitionProxy){
-				elem = getAttributeDataGroupHeader(defn as AttributeDefinitionProxy);							
+				elem = getAttributeDataGroupHeader(defn as AttributeDefinitionProxy, parentEntity);
 			} else if(defn is EntityDefinitionProxy) {
-				elem = getEntityDataGroupHeader(defn as EntityDefinitionProxy);
+				elem = getEntityDataGroupHeader(defn as EntityDefinitionProxy, parentEntity);
 			}
 			return elem;
 		}
 		
-		private static function getEntityDataGroupHeader(defn:EntityDefinitionProxy):IVisualElement {
+		private static function getEntityDataGroupHeader(defn:EntityDefinitionProxy, parentEntity:EntityProxy = null):IVisualElement {
 			var v:VGroup = new VGroup();
 			v.percentHeight = 100;
 			v.verticalAlign = "bottom";
@@ -379,7 +389,7 @@ package org.openforis.collect.ui {
 			var childDefn:ListCollectionView = defn.childDefinitions;
 			//var width:int = 0;
 			for each (var childDef:NodeDefinitionProxy in childDefn) {
-				var elem:IVisualElement = getDataGroupHeader(childDef);
+				var elem:IVisualElement = getDataGroupHeader(childDef, null);
 				//width += elem.width;
 				childDefinitionsContainer.addElement(elem);
 			}
@@ -389,9 +399,9 @@ package org.openforis.collect.ui {
 			return v;
 		}
 		
-		private static function getAttributeDataGroupHeader(defn:AttributeDefinitionProxy):IVisualElement {
+		private static function getAttributeDataGroupHeader(defn:AttributeDefinitionProxy, parentEntity:EntityProxy = null):IVisualElement {
 			var result:VGroup = new VGroup();
-			var width:Number = getAttributeDataGroupHeaderWidth(defn);
+			var width:Number = getAttributeDataGroupHeaderWidth(defn, parentEntity);
 			result.paddingLeft = 1;
 			result.width = width;
 			result.percentHeight = 100;
