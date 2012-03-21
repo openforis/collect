@@ -16,6 +16,7 @@ package org.openforis.collect.presenter {
 	import mx.rpc.events.ResultEvent;
 	
 	import org.openforis.collect.client.UpdateRequestToken;
+	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.metamodel.proxy.CodeAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.CodeListItemProxy;
 	import org.openforis.collect.model.FieldSymbol;
@@ -25,6 +26,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.remoting.service.UpdateRequest;
 	import org.openforis.collect.remoting.service.UpdateRequestOperation;
 	import org.openforis.collect.remoting.service.UpdateRequestOperation$Method;
+	import org.openforis.collect.remoting.service.UpdateResponse;
 	import org.openforis.collect.ui.component.input.CodeInputField;
 	import org.openforis.collect.ui.component.input.CodeListDialog;
 	import org.openforis.collect.ui.component.input.MultipleCodeInputField;
@@ -58,6 +60,19 @@ package org.openforis.collect.presenter {
 				_view.attributes.addEventListener(CollectionEvent.COLLECTION_CHANGE, attributesChangeHandler);
 			}
 			updateView();
+		}
+		
+		override protected function updateResponseReceivedHandler(event:ApplicationEvent):void {
+			if(_view.attributes != null) {
+				var responses:IList = IList(event.result);
+				for each (var response:UpdateResponse in responses) {
+					var attribute:AttributeProxy = CollectionUtil.getItem(_view.attributes, "id", response.nodeId) as AttributeProxy;
+					if(attribute != null) {
+						updateView();
+						return;
+					}
+				}
+			}
 		}
 		
 		override protected function getTextFromValue():String {
@@ -119,7 +134,7 @@ package org.openforis.collect.presenter {
 			token.remarks = remarks;
 			dataClient.updateActiveRecord(req, token, updateResultHandler, faultHandler);
 		}
-		
+		/*
 		override public function applyRemarks(remarks:String):void {
 			var updatedFields:ArrayCollection = new ArrayCollection();
 			var operations:ArrayCollection = new ArrayCollection();
@@ -158,7 +173,7 @@ package org.openforis.collect.presenter {
 			token.symbol = symbol;
 			dataClient.updateActiveRecord(req, token, updateResultHandler, faultHandler);
 		}
-		
+		*/
 		override protected function getRemarks():String {
 			if(CollectionUtil.isNotEmpty(_view.attributes)) {
 				var a:AttributeProxy = AttributeProxy(_view.attributes.getItemAt(0));

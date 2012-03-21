@@ -128,9 +128,15 @@ package org.openforis.collect.presenter {
 			
 			var nodeEvent:NodeEvent = new NodeEvent(NodeEvent.UPDATE_REMARKS);
 			nodeEvent.remarks = remarks;
-			nodeEvent.nodeProxy = _inputField.attribute;
-			nodeEvent.fieldIdx = _inputField.fieldIndex;
-			
+			nodeEvent.parentEntity = _inputField.parentEntity;
+			nodeEvent.nodeName = _inputField.attributeDefinition.name;
+			if(_inputField.attributeDefinition.multiple) {
+				nodeEvent.nodeName = _inputField.attributeDefinition.name;
+			} else {
+				nodeEvent.nodeId = _inputField.attribute.id;
+				nodeEvent.nodeProxy = _inputField.attribute;
+				nodeEvent.fieldIdx = _inputField.fieldIndex;
+			}
 			EventDispatcherFactory.getEventDispatcher().dispatchEvent(nodeEvent);
 			
 			hidePopUp();

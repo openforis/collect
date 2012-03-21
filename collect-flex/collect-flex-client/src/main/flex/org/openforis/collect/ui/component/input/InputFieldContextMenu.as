@@ -139,42 +139,32 @@ package org.openforis.collect.ui.component.input {
 			var parentEntity:EntityProxy = inputField.parentEntity;
 			var parentEntityDefn:EntityDefinitionProxy = attrDefn.parent;
 			
-			var fieldEvent:UIEvent = null; 
+			var nodeEvent:NodeEvent = null; 
 			switch(event.target) {
 				case BLANK_ON_FORM_MENU_ITEM:
-					fieldEvent = new NodeEvent(NodeEvent.UPDATE_SYMBOL);
-					(fieldEvent as NodeEvent).symbol = FieldSymbol.BLANK_ON_FORM;
-					(fieldEvent as NodeEvent).nodeProxy = inputField.attribute;
-					(fieldEvent as NodeEvent).fieldIdx = inputField.fieldIndex;
+					nodeEvent = createNodeEvent(NodeEvent.UPDATE_SYMBOL, inputField);
+					nodeEvent.symbol = FieldSymbol.BLANK_ON_FORM;
 					break;
 				case DASH_ON_FORM_MENU_ITEM:
-					fieldEvent = new NodeEvent(NodeEvent.UPDATE_SYMBOL);
-					(fieldEvent as NodeEvent).symbol = FieldSymbol.DASH_ON_FORM;
-					(fieldEvent as NodeEvent).nodeProxy = inputField.attribute;
-					(fieldEvent as NodeEvent).fieldIdx = inputField.fieldIndex;
+					nodeEvent = createNodeEvent(NodeEvent.UPDATE_SYMBOL, inputField);
+					nodeEvent.symbol = FieldSymbol.DASH_ON_FORM;
 					break;
 				case ILLEGIBLE_MENU_ITEM:
-					fieldEvent = new NodeEvent(NodeEvent.UPDATE_SYMBOL);
-					(fieldEvent as NodeEvent).symbol = FieldSymbol.ILLEGIBLE;
-					(fieldEvent as NodeEvent).nodeProxy = inputField.attribute;
-					(fieldEvent as NodeEvent).fieldIdx = inputField.fieldIndex;
+					nodeEvent = createNodeEvent(NodeEvent.UPDATE_SYMBOL, inputField);
+					nodeEvent.symbol = FieldSymbol.ILLEGIBLE;
 					break;
 				case EDIT_REMARKS_MENU_ITEM:
 					remarksPopUpPresenter.openPopUp(inputField, true);
 					break;
 				case REPLACE_BLANKS_WITH_DASH_MENU_ITEM:
-					//setSymbolInBlankChildren(parentEntity, parentEntityDefn, FieldSymbol.DASH_ON_FORM);
-					fieldEvent = new NodeEvent(NodeEvent.UPDATE_SYMBOL);
-					(fieldEvent as NodeEvent).symbol = FieldSymbol.DASH_ON_FORM;
-					(fieldEvent as NodeEvent).nodeProxy = parentEntity;
+					nodeEvent = new NodeEvent(NodeEvent.UPDATE_SYMBOL);
+					nodeEvent.symbol = FieldSymbol.DASH_ON_FORM;
+					nodeEvent.nodeProxy = parentEntity;
 					break;
 				case REPLACE_BLANKS_WITH_STAR_MENU_ITEM:
-					//setSymbolInBlankChildren(parentEntity, parentEntityDefn, FieldSymbol.BLANK_ON_FORM);
-					
-					fieldEvent = new NodeEvent(NodeEvent.UPDATE_SYMBOL);
-					(fieldEvent as NodeEvent).symbol = FieldSymbol.BLANK_ON_FORM;
-					(fieldEvent as NodeEvent).nodeProxy = parentEntity;
-					//(fieldEvent as NodeEvent).inputField = inputField;
+					nodeEvent = new NodeEvent(NodeEvent.UPDATE_SYMBOL);
+					nodeEvent.symbol = FieldSymbol.BLANK_ON_FORM;
+					nodeEvent.nodeProxy = parentEntity;
 					break;
 				case DELETE_ATTRIBUTE_MENU_ITEM:
 					//TODO
@@ -188,28 +178,41 @@ package org.openforis.collect.ui.component.input {
 					break;
 				case CONFIRM_ERROR_MENU_ITEM:
 					//inputField.applySymbol(FieldSymbol.CONFIRMED);
-					fieldEvent = new NodeEvent(NodeEvent.CONFIRM_ERROR);
-					(fieldEvent as NodeEvent).nodeProxy = attribute;
+					nodeEvent = new NodeEvent(NodeEvent.CONFIRM_ERROR);
+					(nodeEvent as NodeEvent).nodeProxy = attribute;
 					break;
 				case APPROVE_MISSING_VALUE_MENU_ITEM:
 					//TODO 
-					fieldEvent = new NodeEvent(NodeEvent.APPROVE_MISSING);
-					(fieldEvent as NodeEvent).nodeProxy = attribute;
+					nodeEvent = new NodeEvent(NodeEvent.APPROVE_MISSING);
+					(nodeEvent as NodeEvent).nodeProxy = attribute;
 					//inputField.applySymbol(FieldSymbol.CONFIRMED);
 					break;
 				
 				//TODO in the future
 				case APPROVE_MISSING_VALUES_IN_ROW_MENU_ITEM:
 					//setSymbolInBlankChildren(parentEntity, parentEntityDefn, FieldSymbol.CONFIRMED);
-					fieldEvent = new NodeEvent(NodeEvent.APPROVE_MISSING);
-					(fieldEvent as NodeEvent).nodeProxy = parentEntity;
+					nodeEvent = new NodeEvent(NodeEvent.APPROVE_MISSING);
+					(nodeEvent as NodeEvent).nodeProxy = parentEntity;
 					break;
 			}
 			
-			if(fieldEvent != null) {
-				fieldEvent['inputField'] = inputField;
-				EventDispatcherFactory.getEventDispatcher().dispatchEvent(fieldEvent);
+			if(nodeEvent != null) {
+				nodeEvent['inputField'] = inputField;
+				EventDispatcherFactory.getEventDispatcher().dispatchEvent(nodeEvent);
 			}
+		}
+		
+		public static function createNodeEvent(type:String, inputField:InputField):NodeEvent {
+			var event:NodeEvent = new NodeEvent(type);
+			var attrDefn:AttributeDefinitionProxy = inputField.attributeDefinition;
+			if(attrDefn.multiple) {
+				event.parentEntity = inputField.parentEntity;
+				event.nodeName = attrDefn.name;
+			} else {
+				event.nodeProxy = inputField.attribute;
+				event.fieldIdx = inputField.fieldIndex;
+			}
+			return event;
 		}
 		
 	}
