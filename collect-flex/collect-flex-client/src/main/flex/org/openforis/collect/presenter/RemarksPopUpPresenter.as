@@ -10,6 +10,8 @@ package org.openforis.collect.presenter {
 	import mx.events.FlexMouseEvent;
 	import mx.managers.PopUpManager;
 	
+	import org.openforis.collect.event.EventDispatcherFactory;
+	import org.openforis.collect.event.NodeEvent;
 	import org.openforis.collect.model.FieldSymbol;
 	import org.openforis.collect.model.proxy.AttributeProxy;
 	import org.openforis.collect.model.proxy.FieldProxy;
@@ -122,7 +124,15 @@ package org.openforis.collect.presenter {
 		
 		protected function okButtonClickHandler(event:Event = null):void {
 			var remarks:String = StringUtil.trim(view.remarksTextArea.text);
-			_inputField.applyRemarks(remarks);
+			//_inputField.applyRemarks(remarks);
+			
+			var nodeEvent:NodeEvent = new NodeEvent(NodeEvent.UPDATE_REMARKS);
+			nodeEvent.remarks = remarks;
+			nodeEvent.nodeProxy = _inputField.attribute;
+			nodeEvent.fieldIdx = _inputField.fieldIndex;
+			
+			EventDispatcherFactory.getEventDispatcher().dispatchEvent(nodeEvent);
+			
 			hidePopUp();
 		}
 		

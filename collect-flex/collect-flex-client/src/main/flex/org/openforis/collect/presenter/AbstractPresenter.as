@@ -25,7 +25,7 @@ package org.openforis.collect.presenter {
 			initEventListeners();
 		}
 		
-		internal function get eventDispatcher():EventDispatcher {
+		internal static function get eventDispatcher():EventDispatcher {
 			return EventDispatcherFactory.getEventDispatcher();
 		}
 		

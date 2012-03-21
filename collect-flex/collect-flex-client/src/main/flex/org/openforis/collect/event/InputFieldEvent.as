@@ -1,5 +1,6 @@
 package org.openforis.collect.event
 {
+	import org.openforis.collect.model.FieldSymbol;
 	import org.openforis.collect.ui.component.input.InputField;
 
 	/**
@@ -7,14 +8,15 @@ package org.openforis.collect.event
 	 * @author S. Ricci
 	 * 
 	 */
-	public class InputFieldEvent extends UIEvent
-	{
+	public class InputFieldEvent extends UIEvent {
+		
 		public static const FOCUS_IN:String = "inputFieldFocusIn";
 		public static const CHANGING:String = "inputFieldChanging";
-		public static const VALUE_CHANGE:String = "inputFieldValueChange";
+		public static const OPEN_REMARKS_POPUP:String = "inputFieldOpenRemarksPopup";
 		public static const VISITED:String = "visited";
 		
 		private var _inputField:InputField;
+		private var _symobl:FieldSymbol;
 		
 		public function InputFieldEvent(type:String, bubbles:Boolean=false, cancelable:Boolean=false) {
 			super(type, bubbles, cancelable);

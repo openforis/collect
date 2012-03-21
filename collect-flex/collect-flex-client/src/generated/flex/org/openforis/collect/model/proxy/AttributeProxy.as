@@ -101,7 +101,7 @@ package org.openforis.collect.model.proxy {
 			return null;
 		}
 		
-		public function hasErrors():Boolean {
+		override public function hasErrors():Boolean {
 			return validationResults != null && CollectionUtil.isNotEmpty(validationResults.errors);
 		}
 		

@@ -3,15 +3,15 @@
  */
 package org.openforis.collect.model.validation;
 
-import static org.openforis.collect.model.FieldSymbol.CONFIRMED;
-
 import java.util.List;
 
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.model.CollectRecord;
-import org.openforis.collect.model.FieldSymbol;
 import org.openforis.collect.model.CollectRecord.Step;
+import org.openforis.collect.model.FieldSymbol;
 import org.openforis.idm.metamodel.KeyAttributeDefinition;
+import org.openforis.idm.metamodel.NodeDefinition;
+import org.openforis.idm.metamodel.validation.MinCountValidator;
 import org.openforis.idm.metamodel.validation.ValidationResult;
 import org.openforis.idm.metamodel.validation.ValidationResultFlag;
 import org.openforis.idm.metamodel.validation.ValidationResults;
@@ -65,8 +65,13 @@ public class CollectValidator extends Validator {
 		return results;
 	}
 
+	@Override
+	protected MinCountValidator getMinCountValidator(NodeDefinition defn) {
+		return new CollectMinCountValidator(defn);
+	}
+	
 	private ValidationResults adjustErrorsForEntryPhase(ValidationResults results, Attribute<?, ?> attribute) {
-		boolean confirmed = isValueConfirmed(attribute);
+		boolean confirmed = isErrorConfirmed(attribute);
 		
 		ValidationResults phaseEntryResults = new ValidationResults();
 		List<ValidationResult> errors = results.getErrors();
@@ -92,17 +97,9 @@ public class CollectValidator extends Validator {
 		return attribute.getDefinition() instanceof KeyAttributeDefinition && record.getRootEntity().equals(attribute.getParent());
 	}
 
-	static boolean isValueConfirmed(Attribute<?, ?> attribute) {
-		int fieldCount = attribute.getFieldCount();
-		for (int i = 0; i < fieldCount; i++) {
-			Field<?> field = attribute.getField(i);
-			Character symbol = field.getSymbol();
-
-			if (!CONFIRMED.getSymbol().equals(symbol)) {
-				return false;
-			}
-		}
-		return true;
+	static boolean isErrorConfirmed(Attribute<?, ?> attribute) {
+		CollectRecord record = (CollectRecord) attribute.getRecord();
+		return record.isErrorConfirmed(attribute);
 	}
 
 	static boolean isReasonBlankSpecified(Attribute<?, ?> attribute) {

@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
+import org.openforis.collect.model.CollectRecord;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Code;
@@ -77,5 +78,12 @@ public class AttributeProxy extends NodeProxy {
 		}
 		return result;
 	}
+	
+	@ExternalizedProperty
+	public boolean isErrorConfirmed() {
+		CollectRecord record = (CollectRecord) attribute.getRecord();
+		boolean errorConfirmed = record.isErrorConfirmed(attribute);
+		return errorConfirmed;
+	}	
 
 }

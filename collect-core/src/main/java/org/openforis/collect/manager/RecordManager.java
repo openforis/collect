@@ -11,7 +11,6 @@ import java.util.Stack;
 
 import javax.xml.namespace.QName;
 
-import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.State;
 import org.openforis.collect.model.CollectRecord.Step;
@@ -41,9 +40,7 @@ import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Field;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.NodePointer;
-import org.openforis.idm.model.NumberAttribute;
 import org.openforis.idm.model.Record;
-import org.openforis.idm.model.TextAttribute;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
