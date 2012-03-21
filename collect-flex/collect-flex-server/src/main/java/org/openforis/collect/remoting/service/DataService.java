@@ -23,6 +23,7 @@ import org.openforis.collect.metamodel.proxy.CodeListItemProxy;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.FieldSymbol;
+import org.openforis.collect.model.RecordSummarySortField;
 import org.openforis.collect.model.User;
 import org.openforis.collect.model.proxy.RecordProxy;
 import org.openforis.collect.persistence.RecordPersistenceException;
@@ -99,7 +100,7 @@ public class DataService {
 	 * @return map with "count" and "records" items
 	 */
 	@Transactional
-	public Map<String, Object> getRecordSummaries(String rootEntityName, int offset, int maxNumberOfRows, String orderByFieldName, String filter) {
+	public Map<String, Object> getRecordSummaries(String rootEntityName, int offset, int maxNumberOfRows, List<RecordSummarySortField> sortFields, String filter) {
 		Map<String, Object> result = new HashMap<String, Object>();
 		SessionState sessionState = sessionManager.getSessionState();
 		CollectSurvey activeSurvey = sessionState.getActiveSurvey();
@@ -107,7 +108,7 @@ public class DataService {
 		EntityDefinition rootEntityDefinition = schema.getRootEntityDefinition(rootEntityName);
 		String rootEntityDefinitionName = rootEntityDefinition.getName();
 		int count = recordManager.getCountRecords(activeSurvey, rootEntityDefinitionName);
-		List<CollectRecord> summaries = recordManager.getSummaries(activeSurvey, rootEntityDefinitionName, offset, maxNumberOfRows, orderByFieldName, filter);
+		List<CollectRecord> summaries = recordManager.getSummaries(activeSurvey, rootEntityDefinitionName, offset, maxNumberOfRows, sortFields, filter);
 		List<RecordProxy> proxies = new ArrayList<RecordProxy>();
 		for (CollectRecord summary : summaries) {
 			proxies.add(new RecordProxy(summary));
@@ -482,9 +483,10 @@ public class DataService {
 	@Transactional
 	public void demoteActiveRecord() throws RecordPersistenceException {
 		SessionState sessionState = sessionManager.getSessionState();
+		CollectSurvey survey = sessionState.getActiveSurvey();
 		CollectRecord record = sessionState.getActiveRecord();
 		User user = sessionState.getUser();
-		recordManager.demote(record, user);
+		recordManager.demote(survey, record.getId(), record.getStep(), user);
 		recordManager.unlock(record, user);
 		sessionManager.clearActiveRecord();
 	}

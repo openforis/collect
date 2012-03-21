@@ -11,12 +11,12 @@ import java.util.Stack;
 
 import javax.xml.namespace.QName;
 
-import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.State;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.FieldSymbol;
+import org.openforis.collect.model.RecordSummarySortField;
 import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.MissingRecordKeyException;
 import org.openforis.collect.persistence.MultipleEditException;
@@ -31,6 +31,7 @@ import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Schema;
+import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.validation.ValidationResult;
 import org.openforis.idm.metamodel.validation.ValidationResultFlag;
 import org.openforis.idm.metamodel.validation.ValidationResults;
@@ -41,9 +42,7 @@ import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Field;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.NodePointer;
-import org.openforis.idm.model.NumberAttribute;
 import org.openforis.idm.model.Record;
-import org.openforis.idm.model.TextAttribute;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -108,8 +107,8 @@ public class RecordManager {
 	}
 	
 	@Transactional
-	public List<CollectRecord> getSummaries(CollectSurvey survey, String rootEntity, int offset, int maxNumberOfRecords, String orderByFieldName, String filter) {
-		List<CollectRecord> recordsSummary = recordDao.loadSummaries(survey, rootEntity, offset, maxNumberOfRecords, orderByFieldName, filter);
+	public List<CollectRecord> getSummaries(CollectSurvey survey, String rootEntity, int offset, int maxNumberOfRecords, List<RecordSummarySortField> sortFields, String filter) {
+		List<CollectRecord> recordsSummary = recordDao.loadSummaries(survey, rootEntity, offset, maxNumberOfRecords, sortFields, filter);
 		return recordsSummary;
 	}
 
@@ -224,15 +223,15 @@ public class RecordManager {
 	}
 
 	@Transactional
-	public void demote(CollectRecord record, User user) throws RecordPersistenceException {
-		Step step = record.getStep();
-		Step prevStep = step.getPrevious();
+	public void demote(CollectSurvey survey, int recordId, Step currentStep, User user) throws RecordPersistenceException {
+		Step prevStep = currentStep.getPrevious();
+		CollectRecord prevStepRecord = recordDao.load(survey, recordId, prevStep.getStepNumber());
 		Date now = new Date();
-		record.setModifiedBy(user);
-		record.setModifiedDate(now);
-		record.setStep(prevStep);
-		record.setState(State.REJECTED);
-		recordDao.update(record);
+		prevStepRecord.setModifiedBy(user);
+		prevStepRecord.setModifiedDate(now);
+		prevStepRecord.setStep(prevStep);
+		prevStepRecord.setState(State.REJECTED);
+		recordDao.update(prevStepRecord);
 	}
 
 	

@@ -4,9 +4,14 @@ package org.openforis.collect.ui.component.datagrid
 	import mx.collections.IList;
 	import mx.core.ClassFactory;
 	
+	import org.openforis.collect.model.RecordSummarySortField;
+	import org.openforis.collect.model.RecordSummarySortField$Sortable;
 	import org.openforis.collect.model.proxy.RecordProxy;
+	import org.openforis.collect.util.ArrayUtil;
+	import org.openforis.collect.util.CollectionUtil;
 	import org.openforis.collect.util.ObjectUtil;
 	
+	import spark.collections.SortField;
 	import spark.components.DataGrid;
 	import spark.components.gridClasses.GridColumn;
 	import spark.formatters.DateTimeFormatter;
@@ -16,11 +21,13 @@ package org.openforis.collect.ui.component.datagrid
 	 */
 	public class RecordSummaryDataGrid extends spark.components.DataGrid {
 		
+		protected static const DATE_TIME_PATTERN:String = "dd-MM-yyyy HH:mm";
 		protected static var _dataTimeFormatter:DateTimeFormatter;
 		
+		//init static variables
 		{
 			_dataTimeFormatter = new DateTimeFormatter();
-			_dataTimeFormatter.dateTimePattern = "dd-MM-yyyy HH:mm";
+			_dataTimeFormatter.dateTimePattern = DATE_TIME_PATTERN;
 		}
 		
 		/**
@@ -88,6 +95,90 @@ package org.openforis.collect.ui.component.datagrid
 				}
 			}
 			return "";
+		}
+		
+		public static function createRecordSummarySortFields(newSortFields:Array, oldRecordSummarySortFields:IList = null):IList {
+			var result:IList = new ArrayCollection();
+			for each (var dataGridSortField:SortField in newSortFields) {
+				var name:String = dataGridSortField.name;
+				var sortField:RecordSummarySortField = createRecordSummarySortField(name);
+				var oldSortField:RecordSummarySortField = RecordSummarySortField(CollectionUtil.getItem(oldRecordSummarySortFields, "dataField", name));
+				if(oldSortField != null) {
+					sortField.descending = ! (oldSortField.descending);
+				}
+				result.addItem(sortField);
+			}
+			return result;
+		}
+		
+		private static function createRecordSummarySortField(name:String):RecordSummarySortField {
+			var sortField:RecordSummarySortField = new RecordSummarySortField();
+			sortField.dataField = name;
+			switch(name) {
+				case "key1":
+					sortField.field = RecordSummarySortField$Sortable.KEY1;
+					break;
+				case "key2":
+					sortField.field = RecordSummarySortField$Sortable.KEY2;
+					break;
+				case "key3":
+					sortField.field = RecordSummarySortField$Sortable.KEY3;
+					break;
+				case "count1":
+					sortField.field = RecordSummarySortField$Sortable.COUNT1;
+					break;
+				case "count2":
+					sortField.field = RecordSummarySortField$Sortable.COUNT2;
+					break;
+				case "count3":
+					sortField.field = RecordSummarySortField$Sortable.COUNT3;
+					break;
+				case "skipped":
+					sortField.field = RecordSummarySortField$Sortable.SKIPPED;
+					break;
+				case "missing":
+					sortField.field = RecordSummarySortField$Sortable.MISSING;
+					break;
+				case "warnings":
+					sortField.field = RecordSummarySortField$Sortable.WARNINGS;
+					break;
+				case "errors":
+					sortField.field = RecordSummarySortField$Sortable.ERRORS;
+					break;
+				case "creationDate":
+					sortField.field = RecordSummarySortField$Sortable.DATE_CREATED;
+					break;
+				case "modifiedDate":
+					sortField.field = RecordSummarySortField$Sortable.DATE_MODIFIED;
+					break;
+				case "entryComplete":
+				case "cleansingComplete":
+					sortField.field = RecordSummarySortField$Sortable.STEP;
+					break;
+			}
+			return sortField;
+		}
+		
+		public function getColumn(dataField:String):GridColumn {
+			for(var i:int = 0; i < columns.length; i++) {
+				var column:GridColumn = GridColumn(columns.getItemAt(i));
+				if(column.dataField == dataField) {
+					return column;
+				}
+			}
+			return null;
+		}
+		
+		public function setSortedColumns(recordSummarySortFields:IList):void {
+			var visibleSortIndicatorIndices:Vector.<int> = new Vector.<int>();
+			for each (var sortField:RecordSummarySortField in recordSummarySortFields) {
+				var column:GridColumn = getColumn(sortField.dataField);
+				if(column != null) {
+					column.sortDescending = sortField.descending;
+					visibleSortIndicatorIndices.push(column.columnIndex);
+				}
+			}
+			columnHeaderGroup.visibleSortIndicatorIndices = visibleSortIndicatorIndices;
 		}
 	}
 }
