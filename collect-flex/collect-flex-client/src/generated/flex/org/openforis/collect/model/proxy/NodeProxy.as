@@ -12,11 +12,11 @@ package org.openforis.collect.model.proxy {
     public class NodeProxy extends NodeProxyBase {
 		
 		public function init():void {}
-		
-		
+
 		public function hasErrors():Boolean {
 			return false;
 		}
 		
     }
+
 }

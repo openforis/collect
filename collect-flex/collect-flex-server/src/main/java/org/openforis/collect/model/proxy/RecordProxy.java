@@ -70,7 +70,7 @@ public class RecordProxy implements Proxy {
 	@ExternalizedProperty
 	public EntityProxy getRootEntity() {
 		if(record.getRootEntity() != null) {
-			return new EntityProxy(record.getRootEntity());
+			return new EntityProxy(null, record.getRootEntity());
 		} else {
 			return null;
 		}

@@ -27,14 +27,21 @@ package org.openforis.collect.model.proxy {
     public class EntityProxy extends EntityProxyBase {
 		
 		private static const KEY_LABEL_SEPARATOR:String = "-";
+		private static const FULL_KEY_LABEL_SEPARATOR:String = " ";
 		
 		private var _keyText:String;
+		private var _fullKeyText:String;
+		private var _compactKeyText:String;
 		private var _definition:EntityDefinitionProxy;
-		private var _enumeratedCodeWidth:Number;
 		private var _enumeratedEntitiesCodeWidths:Array;
 		
 		override public function init():void {
 			super.init();
+			updateEnumeratedCodeWidths();
+			updateKeyText();
+		}
+		
+		protected function updateEnumeratedCodeWidths():void {
 			_enumeratedEntitiesCodeWidths = new Array();
 			var entities:IList = getChildEntities();
 			for each (var e:EntityProxy in entities) {
@@ -142,6 +149,7 @@ package org.openforis.collect.model.proxy {
 				childrenByName.put(name, children);
 			}
 			children.addItem(node);
+			node.parent = this;
 			node.init();
 			showErrorsOnChild(name);
 		}
@@ -166,19 +174,32 @@ package org.openforis.collect.model.proxy {
 		public function updateKeyText():void {
 			if(_definition != null) {
 				var keyDefs:IList = _definition.keyAttributeDefinitions;
-				var keyParts:Array = new Array();
-				for each (var def:AttributeDefinitionProxy in keyDefs) {
-					var key:AttributeProxy = getSingleAttribute(def.name);
-					if(key != null) {
-						var keyPart:String = getKeyLabelPart(def, key);
-						if(StringUtil.isNotBlank(keyPart)) {
-							keyParts.push(keyPart);
+				if(keyDefs.length > 0) {
+					var shortKeyParts:Array = new Array();
+					var fullKeyParts:Array = new Array();
+					for each (var def:AttributeDefinitionProxy in keyDefs) {
+						var key:AttributeProxy = getSingleAttribute(def.name);
+						if(key != null) {
+							var keyPart:String = getKeyLabelPart(def, key);
+							if(StringUtil.isNotBlank(keyPart)) {
+								shortKeyParts.push(keyPart);
+								var label:String = def.getLabelText();
+								var fullKeyPart:String = label + " " + keyPart;
+								fullKeyParts.push(fullKeyPart);
+							}
 						}
 					}
+					keyText = StringUtil.concat(KEY_LABEL_SEPARATOR, shortKeyParts);
+					fullKeyText = StringUtil.concat(FULL_KEY_LABEL_SEPARATOR, fullKeyParts);
+				} else if(parent != null) {
+					var siblings:IList = parent.getChildren(name);
+					var itemIndex:int = siblings.getItemIndex(this);
+					keyText = String(itemIndex + 1);
+					fullKeyText = keyText;
 				}
-				keyText = StringUtil.concat(KEY_LABEL_SEPARATOR, keyParts);
 			} else {
 				keyText = "";
+				fullKeyText = "";
 			}
 		}
 		
@@ -302,6 +323,14 @@ package org.openforis.collect.model.proxy {
 			_keyText = value;
 		}
 		
+		public function get fullKeyText():String {
+			return _fullKeyText;
+		}
+		
+		public function set fullKeyText(value:String):void {
+			_fullKeyText = value;
+		}
+		
 		public function get definition():EntityDefinitionProxy {
 			return _definition;
 		}
@@ -310,21 +339,11 @@ package org.openforis.collect.model.proxy {
 			_definition = value;
 		}
 
-		public function get enumeratedCodeWidth():Number {
-			return _enumeratedCodeWidth;
-		}
-
-		public function set enumeratedCodeWidth(value:Number):void {
-			_enumeratedCodeWidth = value;
-		}
-
-		public function get enumeratedEntitiesCodeWidths():Array
-		{
+		public function get enumeratedEntitiesCodeWidths():Array {
 			return _enumeratedEntitiesCodeWidths;
 		}
 
-		public function set enumeratedEntitiesCodeWidths(value:Array):void
-		{
+		public function set enumeratedEntitiesCodeWidths(value:Array):void {
 			_enumeratedEntitiesCodeWidths = value;
 		}
 
