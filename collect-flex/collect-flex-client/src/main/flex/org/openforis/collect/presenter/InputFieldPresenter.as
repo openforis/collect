@@ -87,20 +87,24 @@ package org.openforis.collect.presenter {
 		
 		protected static function approveMissingHandler(event:NodeEvent): void {
 			var updRequest:UpdateRequest = new UpdateRequest();
-			var node:NodeProxy = event.nodeProxy;
-			if(node == null) {
-				var nodes:IList = event.nodes;
-				if(nodes != null && nodes.length == 1) {
-					//approve only first node, if it's a missing value it should be an empty node
-					node = nodes.getItemAt(0) as NodeProxy;
+			if(event.nodeProxy != null || event.nodes != null) {
+				var node:NodeProxy = event.nodeProxy;
+				if(node == null) {
+					var nodes:IList = event.nodes;
+					if(nodes != null && nodes.length == 1) {
+						//approve only first node, if it's a missing value it should be an empty node
+						node = nodes.getItemAt(0) as NodeProxy;
+					}
 				}
+				var updFields:ArrayCollection = prepareApproveMissingRequests(updRequest, node, event.fieldIdx);
+			} else {
+				var operation:UpdateRequestOperation = new UpdateRequestOperation();
+				operation.method = UpdateRequestOperation$Method.APPROVE_MISSING;
+				operation.parentEntityId = event.parentEntity.id;
+				operation.nodeName = event.nodeName;
+				updRequest.addOperation(operation);
 			}
-			var updFields:ArrayCollection = prepareApproveMissingRequests(updRequest, node, event.fieldIdx);
-			var token:UpdateRequestToken = new UpdateRequestToken(UpdateRequestToken.APPROVE_MISSING);
-			token.updatedFields = updFields;
-			token.symbol = event.symbol;
-			
-			_dataClient.updateActiveRecord(updRequest, token, null, faultHandler);
+			_dataClient.updateActiveRecord(updRequest, null, null, faultHandler);
 		}
 		
 		protected static function updateRemarksHandler(event:NodeEvent): void {
@@ -465,7 +469,7 @@ package org.openforis.collect.presenter {
 				var text:String = getTextFromValue();
 				_view.text = text;
 				hasRemarks = StringUtil.isNotBlank(getRemarks());
-				_contextMenu.updateContextMenuItems();
+				_contextMenu.updateItems();
 			}
 			_view.hasRemarks = hasRemarks;
 		}

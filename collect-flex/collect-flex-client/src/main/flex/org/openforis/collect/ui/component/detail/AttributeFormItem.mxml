@@ -13,6 +13,7 @@
 			import mx.collections.IList;
 			
 			import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
+			import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
 			import org.openforis.collect.model.proxy.AttributeProxy;
 			import org.openforis.collect.presenter.AttributeFormItemPresenter;
 			
@@ -31,6 +32,10 @@
 			
 			public function set attributeDefinition(value:AttributeDefinitionProxy):void {
 				_attributeDefinition = value;
+			}
+			
+			override public function get nodeDefinition():NodeDefinitionProxy {
+				return attributeDefinition;
 			}
 			
 			[Bindable]

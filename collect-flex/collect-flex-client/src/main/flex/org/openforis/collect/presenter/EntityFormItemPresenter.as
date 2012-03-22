@@ -63,7 +63,7 @@ package org.openforis.collect.presenter
 				entity = view.parentEntity.getChild(view.entityDefinition.name, 0) as EntityProxy;
 			}
 			view.entity = entity;
-			updateValidationDisplayManager();
+			super.updateView();
 		}
 		
 		override protected function updateValidationDisplayManager():void {

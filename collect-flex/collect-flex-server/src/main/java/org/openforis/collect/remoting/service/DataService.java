@@ -150,7 +150,6 @@ public class DataService {
 		User user = sessionState.getUser();
 		record.setModifiedDate(new Date());
 		record.setModifiedBy(user);
-
 		recordManager.save(record);
 		sessionState.setActiveRecordState(RecordState.SAVED);
 	}
@@ -158,8 +157,8 @@ public class DataService {
 	@Transactional
 	public void deleteActiveRecord() throws RecordPersistenceException {
 		SessionState sessionState = sessionManager.getSessionState();
-		User user = sessionState.getUser();
 		Record record = sessionState.getActiveRecord();
+		User user = sessionState.getUser();
 		recordManager.delete(record.getId(), user);
 		sessionManager.clearActiveRecord();
 	}
@@ -215,7 +214,8 @@ public class DataService {
 				break;
 			case APPROVE_MISSING:
 				record.setMissingApproved(parentEntity, nodeName, true);
-				cardinalityNodePointers = getCardinalityNodePointers(node);
+				cardinalityNodePointers = getCardinalityNodePointers(parentEntity);
+				cardinalityNodePointers.add(new NodePointer(parentEntity, nodeName));
 				break;
 			case UPDATE_REMARKS:
 				attribute = (Attribute<AttributeDefinition, ?>) node;
@@ -225,6 +225,7 @@ public class DataService {
 				break;
 			case ADD :
 				Node<?> createdNode = addNode(parentEntity, nodeDef, requestValue, symbol, remarks);
+				record.setMissingApproved(parentEntity, nodeName, false);
 				response = getUpdateResponse(responseMap, createdNode.getInternalId());
 				response.setCreatedNode(createdNode);
 				relReqDependencies = recordManager. clearRelevanceRequiredStates(createdNode);

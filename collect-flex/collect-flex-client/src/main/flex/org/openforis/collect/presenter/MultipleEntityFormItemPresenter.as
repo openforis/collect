@@ -61,7 +61,7 @@ package org.openforis.collect.presenter
 			} else {
 				view.dataGroup.dataProvider = null;
 			}
-			updateValidationDisplayManager();
+			super.updateView();
 		}
 		
 		protected function getEntities():IList {

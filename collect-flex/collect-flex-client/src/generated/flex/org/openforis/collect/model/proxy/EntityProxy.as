@@ -241,18 +241,6 @@ package org.openforis.collect.model.proxy {
 			updateMap(childrenRequiredMap, map);
 		}
 		
-		protected function updateMap(map:IMap, newMap:IMap):void {
-			if(map != null && newMap != null) {
-				var newKeys:ArrayCollection = newMap.keySet;
-				for each (var key:* in newKeys) {
-					var value:* = newMap.get(key);
-					if(value != null) {
-						map.put(key, value);
-					}
-				}
-			}
-		}
-
 		public function showErrorsOnChild(name:String):void {
 			showChildrenErrorsMap.put(name, true);
 		}
@@ -315,6 +303,11 @@ package org.openforis.collect.model.proxy {
 			return result;
 		}
 		
+		public function getCount(childName:String):int {
+			var children:IList = getChildren(childName);
+			return children.length;
+		}
+		
 		public function get keyText():String {
 			return _keyText;
 		}
@@ -347,6 +340,18 @@ package org.openforis.collect.model.proxy {
 			_enumeratedEntitiesCodeWidths = value;
 		}
 
+		protected function updateMap(map:IMap, newMap:IMap):void {
+			if(map != null && newMap != null) {
+				var newKeys:ArrayCollection = newMap.keySet;
+				for each (var key:* in newKeys) {
+					var value:* = newMap.get(key);
+					if(value != null) {
+						map.put(key, value);
+					}
+				}
+			}
+		}
+		
 		
 	}
 }

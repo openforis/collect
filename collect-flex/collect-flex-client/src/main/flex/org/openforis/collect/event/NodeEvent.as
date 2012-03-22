@@ -22,6 +22,8 @@ package org.openforis.collect.event {
 		public static const DELETE_NODE:String = "nodeEventDeleteNode";
 		
 		private var _inputField:InputField;
+		private var _parentEntity:EntityProxy;
+		private var _nodeName:String;
 		private var _nodeProxy:NodeProxy;
 		private var _fieldIdx:Number;
 		private var _nodes:IList;
@@ -79,6 +81,23 @@ package org.openforis.collect.event {
 		public function set nodes(value:IList):void {
 			_nodes = value;
 		}
+
+		public function get parentEntity():EntityProxy {
+			return _parentEntity;
+		}
+
+		public function set parentEntity(value:EntityProxy):void {
+			_parentEntity = value;
+		}
+
+		public function get nodeName():String {
+			return _nodeName;
+		}
+
+		public function set nodeName(value:String):void {
+			_nodeName = value;
+		}
+
 
 	}
 }

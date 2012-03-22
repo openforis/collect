@@ -5,9 +5,7 @@ package org.openforis.collect.ui.component.input {
 	
 	import org.openforis.collect.Application;
 	import org.openforis.collect.event.EventDispatcherFactory;
-	import org.openforis.collect.event.InputFieldEvent;
 	import org.openforis.collect.event.NodeEvent;
-	import org.openforis.collect.event.UIEvent;
 	import org.openforis.collect.i18n.Message;
 	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.CodeAttributeDefinitionProxy;
@@ -17,7 +15,6 @@ package org.openforis.collect.ui.component.input {
 	import org.openforis.collect.model.proxy.AttributeProxy;
 	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.model.proxy.NodeProxy;
-	import org.openforis.collect.presenter.InputFieldPresenter;
 	import org.openforis.collect.presenter.RemarksPopUpPresenter;
 	import org.openforis.collect.util.AlertUtil;
 	import org.openforis.collect.util.UIUtil;
@@ -62,10 +59,10 @@ package org.openforis.collect.ui.component.input {
 			remarksPopUpPresenter = new RemarksPopUpPresenter();
 		}
 		
-		public function InputFieldContextMenu( inputField:InputField)	{
+		public function InputFieldContextMenu(inputField:InputField) {
 			this._contextMenu = new ContextMenu();
 			this._inputField = inputField;
-			updateContextMenuItems();
+			updateItems();
 			_inputField.contextMenu = _contextMenu;
 		}
 		
@@ -77,16 +74,14 @@ package org.openforis.collect.ui.component.input {
 			}
 		}
 		
-		public function updateContextMenuItems():void {
+		public function updateItems():void {
+			var items:Array = null;
 			if(Application.activeRecord != null) {
 				var step:CollectRecord$Step = Application.activeRecord.step;
-				var items:Array = createMenuItems(step);
-				
-				_contextMenu.customItems = items;
+				items = createMenuItems(step);
 				_contextMenu.hideBuiltInItems();
-			} else {
-				_inputField.contextMenu = null;
 			}
+			_contextMenu.customItems = items;
 		}
 		
 		private function createMenuItems(step:CollectRecord$Step):Array {
@@ -181,7 +176,9 @@ package org.openforis.collect.ui.component.input {
 					nodeEvent.nodeProxy = attribute;
 					break;
 				case APPROVE_MISSING:
-					nodeEvent = createNodeEvent(NodeEvent.APPROVE_MISSING, inputField);
+					nodeEvent = new NodeEvent(NodeEvent.APPROVE_MISSING);
+					nodeEvent.parentEntity = parentEntity;
+					nodeEvent.nodeName = attrDefn.name;
 					break;
 				case APPROVE_MISSING_IN_ROW:
 					nodeEvent = new NodeEvent(NodeEvent.APPROVE_MISSING);
