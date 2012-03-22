@@ -25,6 +25,7 @@ import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.FieldSymbol;
 import org.openforis.collect.model.RecordSummarySortField;
 import org.openforis.collect.model.User;
+import org.openforis.collect.model.proxy.NodeProxy;
 import org.openforis.collect.model.proxy.RecordProxy;
 import org.openforis.collect.persistence.RecordPersistenceException;
 import org.openforis.collect.remoting.service.UpdateRequestOperation.Method;
@@ -226,7 +227,7 @@ public class DataService {
 			case ADD :
 				Node<?> createdNode = addNode(parentEntity, nodeDef, requestValue, symbol, remarks);
 				response = getUpdateResponse(responseMap, createdNode.getInternalId());
-				response.setCreatedNode(createdNode);
+				response.setCreatedNode(NodeProxy.fromNode(createdNode));
 				relReqDependencies = recordManager. clearRelevanceRequiredStates(createdNode);
 				if(createdNode instanceof Attribute){
 					attribute = (Attribute<? extends AttributeDefinition, ?>) createdNode;

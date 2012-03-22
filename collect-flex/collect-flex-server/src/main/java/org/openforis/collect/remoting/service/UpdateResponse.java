@@ -29,7 +29,7 @@ public class UpdateResponse implements Proxy {
 	private transient ValidationResults attributeValidationResults;
 	private transient Map<String, Object> minCountValidMap;
 	private transient Map<String, Object> maxCountValidMap;
-	private transient Node<?> creatednode;
+	private transient NodeProxy creatednode;
 	private Integer deletedNodeId;
 	private Map<Integer, Object> updatedFieldValues;
 	
@@ -95,18 +95,19 @@ public class UpdateResponse implements Proxy {
 
 	@ExternalizedProperty
 	public NodeProxy getCreatedNode() {
-		if(creatednode != null){
-			if(creatednode instanceof Attribute<?, ?>) {
-				return new AttributeProxy(null, (Attribute<?, ?>) creatednode);
-			} else if(creatednode instanceof Entity) {
-				return new EntityProxy(null, (Entity) creatednode);
-			}
-		}
-		return null;
+		return this.creatednode;
+//		if(creatednode != null){
+//			if(creatednode instanceof Attribute<?, ?>) {
+//				return new AttributeProxy(null, (Attribute<?, ?>) creatednode);
+//			} else if(creatednode instanceof Entity) {
+//				return new EntityProxy(null, (Entity) creatednode);
+//			}
+//		}
+//		return null;
 	}
 	
-	public void setCreatedNode(Node<?> creatednode) {
-		this.creatednode = creatednode;
+	public void setCreatedNode(NodeProxy nodeProxy) {
+		this.creatednode = nodeProxy;
 	}
 	
 	public Integer getDeletedNodeId() {
