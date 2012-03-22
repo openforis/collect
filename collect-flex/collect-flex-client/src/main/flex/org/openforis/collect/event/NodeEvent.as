@@ -1,4 +1,6 @@
 package org.openforis.collect.event {
+	import mx.collections.IList;
+	
 	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 	import org.openforis.collect.model.FieldSymbol;
 	import org.openforis.collect.model.proxy.EntityProxy;
@@ -17,13 +19,12 @@ package org.openforis.collect.event {
 		public static const UPDATE_REMARKS:String = "nodeEventUpdateRemarks";
 		public static const CONFIRM_ERROR:String = "nodeEventConfirmError";
 		public static const APPROVE_MISSING:String = "nodeEventApproveMissing";
+		public static const DELETE_NODE:String = "nodeEventDeleteNode";
 		
 		private var _inputField:InputField;
-		private var _parentEntity:EntityProxy;
-		private var _nodeName:String;
-		private var _nodeId:Number;
 		private var _nodeProxy:NodeProxy;
 		private var _fieldIdx:Number;
+		private var _nodes:IList;
 		private var _symbol:FieldSymbol;
 		private var _remarks:String;
 		
@@ -71,30 +72,13 @@ package org.openforis.collect.event {
 			_remarks = value;
 		}
 
-		public function get parentEntity():EntityProxy {
-			return _parentEntity;
+		public function get nodes():IList {
+			return _nodes;
 		}
-
-		public function set parentEntity(value:EntityProxy):void {
-			_parentEntity = value;
+		
+		public function set nodes(value:IList):void {
+			_nodes = value;
 		}
-
-		public function get nodeName():String {
-			return _nodeName;
-		}
-
-		public function set nodeName(value:String):void {
-			_nodeName = value;
-		}
-
-		public function get nodeId():Number {
-			return _nodeId;
-		}
-
-		public function set nodeId(value:Number):void {
-			_nodeId = value;
-		}
-
 
 	}
 }

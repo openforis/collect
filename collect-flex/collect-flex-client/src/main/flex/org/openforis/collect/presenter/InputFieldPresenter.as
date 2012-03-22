@@ -58,6 +58,7 @@ package org.openforis.collect.presenter {
 			_dataClient = ClientFactory.dataClient;
 			eventDispatcher.addEventListener(NodeEvent.UPDATE_SYMBOL, updateSymbolHandler);
 			eventDispatcher.addEventListener(NodeEvent.UPDATE_REMARKS, updateRemarksHandler);
+			eventDispatcher.addEventListener(NodeEvent.DELETE_NODE, deleteNodeHandler);
 			eventDispatcher.addEventListener(NodeEvent.CONFIRM_ERROR, confirmErrorHandler);
 			eventDispatcher.addEventListener(NodeEvent.APPROVE_MISSING, approveMissingHandler);
 		}
@@ -159,7 +160,8 @@ package org.openforis.collect.presenter {
 					}
 				}
 			} else {
-				var attributes:IList = event.parentEntity.getChildren(event.nodeName);
+				//considering nodes as attributes
+				var attributes:IList = event.nodes;
 				for each (attribute in attributes) {
 					for (fieldIdx = 0; fieldIdx < attribute.fields.length; fieldIdx++) {
 						field = prepareUpdateRemarksRequest(updRequest, attribute, event.remarks, fieldIdx);
@@ -201,6 +203,18 @@ package org.openforis.collect.presenter {
 			updRequestOp.method = UpdateRequestOperation$Method.CONFIRM_ERROR;
 			updRequestOp.nodeId = event.nodeProxy.id;
 			updRequestOp.parentEntityId = event.nodeProxy.parentId;
+			
+			var updRequest:UpdateRequest = new UpdateRequest(updRequestOp);
+			var token:UpdateRequestToken = new UpdateRequestToken(UpdateRequestToken.TYPE_CONFIRM_ERROR);
+			_dataClient.updateActiveRecord(updRequest, token, null, faultHandler);
+		}
+		
+		protected static function deleteNodeHandler(event:NodeEvent):void {
+			var node:NodeProxy = event.nodeProxy;
+			var updRequestOp:UpdateRequestOperation = new UpdateRequestOperation();
+			updRequestOp.method = UpdateRequestOperation$Method.DELETE;
+			updRequestOp.parentEntityId = node.parentId;
+			updRequestOp.nodeId = node.id;
 			
 			var updRequest:UpdateRequest = new UpdateRequest(updRequestOp);
 			var token:UpdateRequestToken = new UpdateRequestToken(UpdateRequestToken.TYPE_CONFIRM_ERROR);

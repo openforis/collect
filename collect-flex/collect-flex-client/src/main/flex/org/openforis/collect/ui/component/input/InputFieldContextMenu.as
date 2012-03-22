@@ -16,6 +16,7 @@ package org.openforis.collect.ui.component.input {
 	import org.openforis.collect.model.FieldSymbol;
 	import org.openforis.collect.model.proxy.AttributeProxy;
 	import org.openforis.collect.model.proxy.EntityProxy;
+	import org.openforis.collect.model.proxy.NodeProxy;
 	import org.openforis.collect.presenter.InputFieldPresenter;
 	import org.openforis.collect.presenter.RemarksPopUpPresenter;
 	import org.openforis.collect.util.AlertUtil;
@@ -27,28 +28,28 @@ package org.openforis.collect.ui.component.input {
 	 * */
 	public class InputFieldContextMenu {
 		
-		private static const BLANK_ON_FORM_MENU_ITEM:ContextMenuItem = new ContextMenuItem(Message.get("edit.contextMenu.blankOnForm"));
-		private static const DASH_ON_FORM_MENU_ITEM:ContextMenuItem = new ContextMenuItem(Message.get("edit.contextMenu.dashOnForm"));
-		private static const ILLEGIBLE_MENU_ITEM:ContextMenuItem = new ContextMenuItem(Message.get("edit.contextMenu.illegible"));
+		private static const SET_STAR:ContextMenuItem = new ContextMenuItem(Message.get("edit.contextMenu.blankOnForm"));
+		private static const SET_DASH:ContextMenuItem = new ContextMenuItem(Message.get("edit.contextMenu.dashOnForm"));
+		private static const SET_ILLEGIBLE:ContextMenuItem = new ContextMenuItem(Message.get("edit.contextMenu.illegible"));
 		private static const EDIT_REMARKS_MENU_ITEM:ContextMenuItem = new ContextMenuItem(Message.get("edit.contextMenu.editRemarks"), true);
-		private static const REPLACE_BLANKS_WITH_STAR_MENU_ITEM:ContextMenuItem = new ContextMenuItem(Message.get("edit.contextMenu.replaceBlanksWithStar"), true);
-		private static const REPLACE_BLANKS_WITH_DASH_MENU_ITEM:ContextMenuItem = new ContextMenuItem(Message.get("edit.contextMenu.replaceBlanksWithDash"));
-		private static const DELETE_ATTRIBUTE_MENU_ITEM:ContextMenuItem = new ContextMenuItem(Message.get("edit.contextMenu.deleteAttribute"), true);
-		private static const DELETE_ENTITY_MENU_ITEM:ContextMenuItem = new ContextMenuItem(Message.get("edit.contextMenu.deleteEntity"), true);
-		private static const CONFIRM_ERROR_MENU_ITEM:ContextMenuItem = new ContextMenuItem(Message.get("edit.contextMenu.approveError"), true);
-		private static const APPROVE_MISSING_VALUE_MENU_ITEM:ContextMenuItem = new ContextMenuItem(Message.get("edit.contextMenu.approveMissingValue"), true);
-		private static const APPROVE_MISSING_VALUES_IN_ROW_MENU_ITEM:ContextMenuItem = new ContextMenuItem(Message.get("edit.contextMenu.approveMissingValuesInRow"), true);
+		private static const SET_STAR_IN_ROW:ContextMenuItem = new ContextMenuItem(Message.get("edit.contextMenu.replaceBlanksWithStar"), true);
+		private static const SET_DASH_IN_ROW:ContextMenuItem = new ContextMenuItem(Message.get("edit.contextMenu.replaceBlanksWithDash"));
+		private static const DELETE_ATTRIBUTE:ContextMenuItem = new ContextMenuItem(Message.get("edit.contextMenu.deleteAttribute"), true);
+		private static const DELETE_ENTITY:ContextMenuItem = new ContextMenuItem(Message.get("edit.contextMenu.deleteEntity"), true);
+		private static const CONFIRM_ERROR:ContextMenuItem = new ContextMenuItem(Message.get("edit.contextMenu.approveError"), true);
+		private static const APPROVE_MISSING:ContextMenuItem = new ContextMenuItem(Message.get("edit.contextMenu.approveMissingValue"), true);
+		private static const APPROVE_MISSING_IN_ROW:ContextMenuItem = new ContextMenuItem(Message.get("edit.contextMenu.approveMissingValuesInRow"), true);
 		private static const MENU_ITEMS:Array = [
-			BLANK_ON_FORM_MENU_ITEM, 
-			DASH_ON_FORM_MENU_ITEM, 
-			ILLEGIBLE_MENU_ITEM, 
+			SET_STAR, 
+			SET_DASH, 
+			SET_ILLEGIBLE, 
 			EDIT_REMARKS_MENU_ITEM, 
-			REPLACE_BLANKS_WITH_DASH_MENU_ITEM,
-			REPLACE_BLANKS_WITH_STAR_MENU_ITEM, 
-			DELETE_ATTRIBUTE_MENU_ITEM, 
-			DELETE_ENTITY_MENU_ITEM, 
-			CONFIRM_ERROR_MENU_ITEM, 
-			APPROVE_MISSING_VALUE_MENU_ITEM
+			SET_DASH_IN_ROW,
+			SET_STAR_IN_ROW, 
+			DELETE_ATTRIBUTE, 
+			DELETE_ENTITY, 
+			CONFIRM_ERROR, 
+			APPROVE_MISSING
 		];
 		
 		private static var remarksPopUpPresenter:RemarksPopUpPresenter;
@@ -93,10 +94,10 @@ package org.openforis.collect.ui.component.input {
 			if(_inputField.isEmpty()) {
 				switch(step) {
 					case CollectRecord$Step.ENTRY:
-						items.push( BLANK_ON_FORM_MENU_ITEM, DASH_ON_FORM_MENU_ITEM, ILLEGIBLE_MENU_ITEM );
+						items.push( SET_STAR, SET_DASH, SET_ILLEGIBLE );
 						break;
 					case CollectRecord$Step.CLEANSING:
-						items.push(APPROVE_MISSING_VALUE_MENU_ITEM);
+						items.push(APPROVE_MISSING);
 						break;
 				}
 			} else if(step == CollectRecord$Step.ENTRY) {
@@ -104,7 +105,7 @@ package org.openforis.collect.ui.component.input {
 				if(hasErrors) {
 					var hasConfirmedError:Boolean = _inputField.parentEntity.hasConfirmedError(_inputField.attributeDefinition.name);
 					if(! hasConfirmedError) {
-						items.push(CONFIRM_ERROR_MENU_ITEM);
+						items.push(CONFIRM_ERROR);
 					}
 				}
 			}
@@ -112,19 +113,19 @@ package org.openforis.collect.ui.component.input {
 			
 			var def:AttributeDefinitionProxy = _inputField.attributeDefinition;
 			if(def.multiple && ! (def is CodeAttributeDefinitionProxy)) {
-				items.push(DELETE_ATTRIBUTE_MENU_ITEM);
+				items.push(DELETE_ATTRIBUTE);
 			} else if(def.parentLayout == UIUtil.LAYOUT_TABLE) {
 				var entityDef:EntityDefinitionProxy = def.parent;
 				if(entityDef != null && entityDef.multiple) {
 					switch(step) {
 						case CollectRecord$Step.ENTRY:
-							items.push(REPLACE_BLANKS_WITH_STAR_MENU_ITEM, REPLACE_BLANKS_WITH_DASH_MENU_ITEM );
+							items.push(SET_STAR_IN_ROW, SET_DASH_IN_ROW );
 							break;
 						case CollectRecord$Step.CLEANSING:
-							items.push(APPROVE_MISSING_VALUES_IN_ROW_MENU_ITEM);
+							items.push(APPROVE_MISSING_IN_ROW);
 					}
 					if( !entityDef.enumerable) {
-						items.push(DELETE_ENTITY_MENU_ITEM);
+						items.push(DELETE_ENTITY);
 					}
 				}
 			}
@@ -141,58 +142,55 @@ package org.openforis.collect.ui.component.input {
 			
 			var nodeEvent:NodeEvent = null; 
 			switch(event.target) {
-				case BLANK_ON_FORM_MENU_ITEM:
+				case SET_STAR:
 					nodeEvent = createNodeEvent(NodeEvent.UPDATE_SYMBOL, inputField);
 					nodeEvent.symbol = FieldSymbol.BLANK_ON_FORM;
 					break;
-				case DASH_ON_FORM_MENU_ITEM:
+				case SET_DASH:
 					nodeEvent = createNodeEvent(NodeEvent.UPDATE_SYMBOL, inputField);
 					nodeEvent.symbol = FieldSymbol.DASH_ON_FORM;
 					break;
-				case ILLEGIBLE_MENU_ITEM:
+				case SET_ILLEGIBLE:
 					nodeEvent = createNodeEvent(NodeEvent.UPDATE_SYMBOL, inputField);
 					nodeEvent.symbol = FieldSymbol.ILLEGIBLE;
 					break;
 				case EDIT_REMARKS_MENU_ITEM:
 					remarksPopUpPresenter.openPopUp(inputField, true);
 					break;
-				case REPLACE_BLANKS_WITH_DASH_MENU_ITEM:
+				case SET_DASH_IN_ROW:
 					nodeEvent = new NodeEvent(NodeEvent.UPDATE_SYMBOL);
 					nodeEvent.symbol = FieldSymbol.DASH_ON_FORM;
 					nodeEvent.nodeProxy = parentEntity;
 					break;
-				case REPLACE_BLANKS_WITH_STAR_MENU_ITEM:
+				case SET_STAR_IN_ROW:
 					nodeEvent = new NodeEvent(NodeEvent.UPDATE_SYMBOL);
 					nodeEvent.symbol = FieldSymbol.BLANK_ON_FORM;
 					nodeEvent.nodeProxy = parentEntity;
 					break;
-				case DELETE_ATTRIBUTE_MENU_ITEM:
-					//TODO
-					
-			//		AlertUtil.showConfirm("global.confirmDelete", [inputField.attributeDefinition.getLabelText()], "global.confirmAlertTitle", 
-			//						performDeleteAttribute, [inputField]);
+				case DELETE_ATTRIBUTE:
+					var attrLabel:String = inputField.attributeDefinition.getLabelText();
+					AlertUtil.showConfirm("global.confirmDelete", [attrLabel], "global.confirmAlertTitle", performDeleteNode, [attribute]);
 					break;
-				case DELETE_ENTITY_MENU_ITEM:
-					//TODO
-					//AlertUtil.showConfirm("edit.confirmDeleteEntity", null, "global.confirmAlertTitle", performDeleteEntity);
+				case DELETE_ENTITY:
+					var entityLabel:String = inputField.attributeDefinition.parent.getLabelText();
+					AlertUtil.showConfirm("global.confirmDelete", [entityLabel], "global.confirmAlertTitle", performDeleteNode, [parentEntity]);
 					break;
-				case CONFIRM_ERROR_MENU_ITEM:
-					//inputField.applySymbol(FieldSymbol.CONFIRMED);
+				case CONFIRM_ERROR:
 					nodeEvent = new NodeEvent(NodeEvent.CONFIRM_ERROR);
-					(nodeEvent as NodeEvent).nodeProxy = attribute;
+					nodeEvent.nodeProxy = attribute;
 					break;
-				case APPROVE_MISSING_VALUE_MENU_ITEM:
+				case APPROVE_MISSING:
 					//TODO 
 					nodeEvent = new NodeEvent(NodeEvent.APPROVE_MISSING);
-					(nodeEvent as NodeEvent).nodeProxy = attribute;
+					nodeEvent.nodeProxy = attribute;
 					//inputField.applySymbol(FieldSymbol.CONFIRMED);
 					break;
 				
 				//TODO in the future
-				case APPROVE_MISSING_VALUES_IN_ROW_MENU_ITEM:
+				case APPROVE_MISSING_IN_ROW:
 					//setSymbolInBlankChildren(parentEntity, parentEntityDefn, FieldSymbol.CONFIRMED);
 					nodeEvent = new NodeEvent(NodeEvent.APPROVE_MISSING);
-					(nodeEvent as NodeEvent).nodeProxy = parentEntity;
+					nodeEvent.nodeProxy = parentEntity;
 					break;
 			}
 			
@@ -202,17 +200,22 @@ package org.openforis.collect.ui.component.input {
 			}
 		}
 		
-		public static function createNodeEvent(type:String, inputField:InputField):NodeEvent {
+		private static function createNodeEvent(type:String, inputField:InputField):NodeEvent {
 			var event:NodeEvent = new NodeEvent(type);
 			var attrDefn:AttributeDefinitionProxy = inputField.attributeDefinition;
 			if(attrDefn.multiple) {
-				event.parentEntity = inputField.parentEntity;
-				event.nodeName = attrDefn.name;
+				event.nodes = inputField.parentEntity.getChildren(attrDefn.name);
 			} else {
 				event.nodeProxy = inputField.attribute;
 				event.fieldIdx = inputField.fieldIndex;
 			}
 			return event;
+		}
+		
+		private static function performDeleteNode(node:NodeProxy):void {
+			var event:NodeEvent = new NodeEvent(NodeEvent.DELETE_NODE);
+			event.nodeProxy = node;
+			EventDispatcherFactory.getEventDispatcher().dispatchEvent(event);
 		}
 		
 	}

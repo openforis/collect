@@ -128,12 +128,10 @@ package org.openforis.collect.presenter {
 			
 			var nodeEvent:NodeEvent = new NodeEvent(NodeEvent.UPDATE_REMARKS);
 			nodeEvent.remarks = remarks;
-			nodeEvent.parentEntity = _inputField.parentEntity;
-			nodeEvent.nodeName = _inputField.attributeDefinition.name;
 			if(_inputField.attributeDefinition.multiple) {
-				nodeEvent.nodeName = _inputField.attributeDefinition.name;
+				var attrName:String = _inputField.attributeDefinition.name;
+				nodeEvent.nodes = _inputField.parentEntity.getChildren(attrName);
 			} else {
-				nodeEvent.nodeId = _inputField.attribute.id;
 				nodeEvent.nodeProxy = _inputField.attribute;
 				nodeEvent.fieldIdx = _inputField.fieldIndex;
 			}
