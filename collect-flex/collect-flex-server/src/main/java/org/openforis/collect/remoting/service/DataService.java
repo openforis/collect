@@ -214,7 +214,7 @@ public class DataService {
 				UpdateResponse response = getUpdateResponse(responseMap, attribute.getInternalId());
 				break;
 			case APPROVE_MISSING:
-				record.setMissingApproved(parentEntity, node.getName(), true);
+				record.setMissingApproved(parentEntity, nodeName, true);
 				cardinalityNodePointers = getCardinalityNodePointers(node);
 				break;
 			case UPDATE_REMARKS:
