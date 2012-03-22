@@ -98,7 +98,7 @@ package org.openforis.collect.presenter {
 			return "";
 		}
 		
-		override public function applyValue():void {
+		override public function updateValue():void {
 			var text:String = textToRequestValue();
 			var operations:ArrayCollection = new ArrayCollection();
 			var o:UpdateRequestOperation;
@@ -129,7 +129,7 @@ package org.openforis.collect.presenter {
 			}
 			var req:UpdateRequest = new UpdateRequest();
 			req.operations = operations;
-			var token:UpdateRequestToken = new UpdateRequestToken(UpdateRequestToken.TYPE_UPDATE_VALUE);
+			var token:UpdateRequestToken = new UpdateRequestToken(UpdateRequestToken.UPDATE_VALUE);
 			token.symbol = symbol;
 			token.remarks = remarks;
 			dataClient.updateActiveRecord(req, token, updateResultHandler, faultHandler);

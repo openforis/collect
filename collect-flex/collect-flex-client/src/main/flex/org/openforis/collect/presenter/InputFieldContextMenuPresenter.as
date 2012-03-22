@@ -258,7 +258,7 @@ package org.openforis.collect.presenter
 			appendApplySymbolInChildrenOperations(operations, updatedFields, entity, entityDefn, symbol);
 			req.operations = operations;
 			if(CollectionUtil.isNotEmpty(req.operations)) {
-				var token:UpdateRequestToken = new UpdateRequestToken(UpdateRequestToken.TYPE_UPDATE_SYMBOL);
+				var token:UpdateRequestToken = new UpdateRequestToken(UpdateRequestToken.UPDATE_SYMBOL);
 				token.updatedFields = updatedFields;
 				token.symbol = symbol;
 				ClientFactory.dataClient.updateActiveRecord(req, token, null, faultHandler);

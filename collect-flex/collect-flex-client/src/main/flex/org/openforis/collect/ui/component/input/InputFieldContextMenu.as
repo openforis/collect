@@ -180,15 +180,9 @@ package org.openforis.collect.ui.component.input {
 					nodeEvent.nodeProxy = attribute;
 					break;
 				case APPROVE_MISSING:
-					//TODO 
-					nodeEvent = new NodeEvent(NodeEvent.APPROVE_MISSING);
-					nodeEvent.nodeProxy = attribute;
-					//inputField.applySymbol(FieldSymbol.CONFIRMED);
+					nodeEvent = createNodeEvent(NodeEvent.APPROVE_MISSING, inputField);
 					break;
-				
-				//TODO in the future
 				case APPROVE_MISSING_IN_ROW:
-					//setSymbolInBlankChildren(parentEntity, parentEntityDefn, FieldSymbol.CONFIRMED);
 					nodeEvent = new NodeEvent(NodeEvent.APPROVE_MISSING);
 					nodeEvent.nodeProxy = parentEntity;
 					break;

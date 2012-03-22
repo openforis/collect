@@ -120,14 +120,14 @@ package org.openforis.collect.client {
 			var field:FieldProxy;
 			if(token != null && token is UpdateRequestToken) {
 				switch(UpdateRequestToken(token).type) {
-					case UpdateRequestToken.TYPE_UPDATE_VALUE:
+					case UpdateRequestToken.UPDATE_VALUE:
 						//do not break, apply symbol to field
-					case UpdateRequestToken.TYPE_UPDATE_SYMBOL:
+					case UpdateRequestToken.UPDATE_SYMBOL:
 						for each (field in token.updatedFields) {
 							field.symbol = token.symbol;
 						}
 						break;
-					case UpdateRequestToken.TYPE_UPDATE_REMARKS:
+					case UpdateRequestToken.UPDATE_REMARKS:
 						for each (field in token.updatedFields) {
 							field.remarks = token.remarks;
 						}

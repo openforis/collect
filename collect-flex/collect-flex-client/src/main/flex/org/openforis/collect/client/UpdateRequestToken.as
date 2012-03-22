@@ -10,22 +10,20 @@ package org.openforis.collect.client
 	 */
 	public class UpdateRequestToken
 	{
-		public static const TYPE_UPDATE_SYMBOL:String = "symbol";
-		public static const TYPE_UPDATE_REMARKS:String = "remarks";
-		public static const TYPE_UPDATE_VALUE:String = "value";
-		public static const TYPE_CONFIRM_ERROR:String = "value";
+		public static const UPDATE_SYMBOL:String = "symbol";
+		public static const UPDATE_REMARKS:String = "remarks";
+		public static const UPDATE_VALUE:String = "value";
+		public static const CONFIRM_ERROR:String = "confirmError";
+		public static const APPROVE_MISSING:String = "approveMissing";
 		
 		private var _type:String;
-		//private var _inputField:InputField;
 		private var _updatedFields:IList;
 		private var _value:Object;
 		private var _symbol:FieldSymbol;
 		private var _remarks:String;
 		
 		public function UpdateRequestToken(type:String = "value") {
-			//, inputField:InputField = null	
 			_type = type;
-			//_inputField = inputField;
 		}
 		
 		public function get type():String {
@@ -35,14 +33,6 @@ package org.openforis.collect.client
 		public function set type(value:String):void {
 			_type = value;
 		}
-
-		/*public function get inputField():InputField {
-			return _inputField;
-		}
-
-		public function set inputField(value:InputField):void {
-			_inputField = value;
-		}*/
 
 		public function get value():Object {
 			return _value;

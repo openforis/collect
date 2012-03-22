@@ -54,7 +54,7 @@ package org.openforis.collect.presenter {
 		
 		override protected function changeHandler(event:Event):void {
 			changed = true;
-			applyValue();
+			updateValue();
 		}
 		
 		protected function activeRecordChangeHandler(event:Event):void {
@@ -146,7 +146,7 @@ package org.openforis.collect.presenter {
 			}
 			if(item != null) {
 				_view.dropDownList.selectedItem = item;
-				applyValue();
+				updateValue();
 			}
 		}
 
