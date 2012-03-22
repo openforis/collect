@@ -44,12 +44,13 @@ package org.openforis.collect.ui.component.input {
 			SET_DASH, 
 			SET_ILLEGIBLE, 
 			EDIT_REMARKS_MENU_ITEM, 
-			SET_DASH_IN_ROW,
 			SET_STAR_IN_ROW, 
+			SET_DASH_IN_ROW,
 			DELETE_ATTRIBUTE, 
 			DELETE_ENTITY, 
 			CONFIRM_ERROR, 
-			APPROVE_MISSING
+			APPROVE_MISSING,
+			APPROVE_MISSING_IN_ROW
 		];
 		
 		private static var remarksPopUpPresenter:RemarksPopUpPresenter;
