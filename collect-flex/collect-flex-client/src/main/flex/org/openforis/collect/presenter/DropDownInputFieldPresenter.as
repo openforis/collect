@@ -59,10 +59,12 @@ package org.openforis.collect.presenter {
 		
 		protected function activeRecordChangeHandler(event:Event):void {
 			initInternalDataProvider();
+			updateView();
 		}
 		
 		protected function dataProviderChangeHandler(event:PropertyChangeEvent):void {
 			initInternalDataProvider();
+			updateView();
 		}
 		
 		protected function initInternalDataProvider():void {
