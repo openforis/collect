@@ -195,7 +195,7 @@ package org.openforis.collect.ui.component.input {
 		private static function createNodeEvent(type:String, inputField:InputField):NodeEvent {
 			var event:NodeEvent = new NodeEvent(type);
 			var attrDefn:AttributeDefinitionProxy = inputField.attributeDefinition;
-			if(attrDefn.multiple) {
+			if(attrDefn.multiple && inputField is CodeInputField) {
 				event.nodes = inputField.parentEntity.getChildren(attrDefn.name);
 			} else {
 				event.nodeProxy = inputField.attribute;

@@ -19,8 +19,10 @@ package org.openforis.collect.ui.component.input {
 	public class FormItemContextMenu {
 		
 		private static const APPROVE_MISSING:ContextMenuItem = new ContextMenuItem(Message.get("edit.contextMenu.approveMissingValue"), true);
+		private static const SET_BLANK_ON_FORM:ContextMenuItem = new ContextMenuItem(Message.get("edit.contextMenu.blankOnForm"), true);
 		private static const MENU_ITEMS:Array = [
-			APPROVE_MISSING
+			APPROVE_MISSING,
+			SET_BLANK_ON_FORM
 		];
 		
 		private var _contextMenu:ContextMenu;
@@ -32,6 +34,7 @@ package org.openforis.collect.ui.component.input {
 		
 		public function FormItemContextMenu(formItem:CollectFormItem) {
 			this._contextMenu = new ContextMenu();
+			this._contextMenu.hideBuiltInItems();
 			this._formItem = formItem;
 			updateItems();
 			this._formItem.contextMenu = this._contextMenu;
@@ -50,7 +53,6 @@ package org.openforis.collect.ui.component.input {
 			if(Application.activeRecord != null) {
 				var step:CollectRecord$Step = Application.activeRecord.step;
 				items = createMenuItems(step);
-				_contextMenu.hideBuiltInItems();
 			}
 			_contextMenu.customItems = items;
 		}
@@ -58,11 +60,16 @@ package org.openforis.collect.ui.component.input {
 		private function createMenuItems(step:CollectRecord$Step):Array {
 			var items:Array = new Array();
 			if(_formItem.parentEntity != null) {
-				if(step == CollectRecord$Step.CLEANSING) {
-					var nodeName:String = _formItem.nodeDefinition.name;
-					var count:int = _formItem.parentEntity.getCount(nodeName);
-					if(count == 0) {
-						items.push(APPROVE_MISSING);
+				var nodeName:String = _formItem.nodeDefinition.name;
+				var count:int = _formItem.parentEntity.getCount(nodeName);
+				if(count == 0) {
+					switch(step) {
+						case CollectRecord$Step.ENTRY:
+							items.push(SET_BLANK_ON_FORM);
+							break;
+						case CollectRecord$Step.CLEANSING:
+							items.push(APPROVE_MISSING);
+							break;
 					}
 				}
 			}
@@ -75,6 +82,7 @@ package org.openforis.collect.ui.component.input {
 			var nodeDefinition:NodeDefinitionProxy = formItem.nodeDefinition;
 			var nodeEvent:NodeEvent = null; 
 			switch(event.target) {
+				case SET_BLANK_ON_FORM:
 				case APPROVE_MISSING:
 					nodeEvent = new NodeEvent(NodeEvent.APPROVE_MISSING);
 					nodeEvent.parentEntity = parentEntity;

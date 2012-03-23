@@ -365,43 +365,7 @@ package org.openforis.collect.presenter {
 			var o:UpdateRequestOperation = getUpdateFieldOperation(value, symbol, remarks);
 			return o;
 		}
-		/*
-		public function applySymbol(symbol:FieldSymbol):void {
-			var o:UpdateRequestOperation = getApplySymbolOperation(symbol);
-			var token:UpdateRequestToken = new UpdateRequestToken(UpdateRequestToken.TYPE_UPDATE_SYMBOL);
-			token.updatedFields = new ArrayCollection([getField()]);
-			token.symbol = symbol;
-			sendUpdateRequest(o, token);
-		}
-		
-		public function applyRemarks(remarks:String):void {
-			var o:UpdateRequestOperation = getApplyRemarksOperation(remarks);
-			var token:UpdateRequestToken = new UpdateRequestToken(UpdateRequestToken.TYPE_UPDATE_REMARKS);
-			token.updatedFields = new ArrayCollection([getField()]);
-			token.remarks = remarks;
-			sendUpdateRequest(o, token);
-		}
 
-		public function getApplySymbolOperation(symbol:FieldSymbol):UpdateRequestOperation {
-			var value:String = null;
-			if(! isReasonBlankSymbol(symbol)) {
-				value = textToRequestValue(); //preserve old value
-			}
-			var remarks:String = getRemarks(); //preserve old remarks
-			var o:UpdateRequestOperation = getUpdateFieldOperation(value, symbol, remarks);
-			return o;
-		}
-		
-		public function getApplyRemarksOperation(remarks:String):UpdateRequestOperation {
-			var value:String = null;
-			var symbol:FieldSymbol = getSymbol(); //preserve old symbol
-			if(! isReasonBlankSymbol(symbol)) {
-				value = textToRequestValue(); //preserve old value
-			}
-			var o:UpdateRequestOperation = getUpdateFieldOperation(value, symbol, remarks);
-			return o;
-		}
-		*/
 		protected function getUpdateFieldOperation(value:String, symbol:FieldSymbol = null, remarks:String = null):UpdateRequestOperation {
 			var nodeId:Number = _view.attribute != null ? _view.attribute.id: NaN;
 			var o:UpdateRequestOperation = getUpdateRequestOperation(UpdateRequestOperation$Method.UPDATE, nodeId, value, symbol, remarks);
