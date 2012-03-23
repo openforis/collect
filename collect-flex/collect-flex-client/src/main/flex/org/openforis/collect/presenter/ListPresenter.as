@@ -225,7 +225,10 @@ package org.openforis.collect.presenter {
 			//offset starts from 0
 			var offset:int = (currentPage - 1) * MAX_RECORDS_PER_PAGE;
 			
-			_dataClient.getRecordSummaries(new AsyncResponder(getRecordsSummaryResultHandler, faultHandler), Application.activeRootEntity.name, 
+			var responder:IResponder = new AsyncResponder(getRecordsSummaryResultHandler, faultHandler);
+			var rootEntityName:String = Application.activeRootEntity.name;
+			
+			_dataClient.getRecordSummaries(responder, rootEntityName, 
 				offset, MAX_RECORDS_PER_PAGE, currentSortFields, currentFilter);
 		}
 		
