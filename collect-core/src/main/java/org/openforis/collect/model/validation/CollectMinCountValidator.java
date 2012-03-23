@@ -26,11 +26,13 @@ public class CollectMinCountValidator extends MinCountValidator {
 	@Override
 	public ValidationResultFlag evaluate(Entity entity) {
 		CollectRecord record = (CollectRecord) entity.getRecord();
-		Step step = record.getStep();
 		
 		ValidationResultFlag resultFlag = super.evaluate(entity);
 		
-		if ( step == Step.CLEANSING && resultFlag == ValidationResultFlag.ERROR ) {
+		// you can approve missing values in entry phase as well
+		//	Step step = record.getStep();
+		// step == Step.CLEANSING && 
+		if ( resultFlag == ValidationResultFlag.ERROR ) {
 			String childName = getNodeDefinition().getName();
 			if ( record.isMissingApproved(entity, childName) ){
 				resultFlag = ValidationResultFlag.WARNING;
