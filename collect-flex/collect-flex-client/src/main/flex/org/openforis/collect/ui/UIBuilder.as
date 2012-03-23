@@ -152,7 +152,8 @@ package org.openforis.collect.ui {
 				if(nodeDef is EntityDefinitionProxy) {
 					var entityDef:EntityDefinitionProxy = EntityDefinitionProxy(nodeDef);
 					if(entityDef.countInSummaryList) {
-						headerText = Message.get("list.headerCount", [entityDef.getLabelText()]);
+						//headerText = Message.get("list.headerCount", [entityDef.getLabelText()]);
+						headerText = entityDef.getLabelText();
 						dataField = "count" + position;
 						width = 70;
 						labelFunction = RecordSummaryDataGrid.recordSummariesCountEntityLabelFunction;
