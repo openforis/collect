@@ -182,6 +182,10 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 		q.addSelect(SUMMARY_FIELDS);
 		q.addFrom(OFC_RECORD);
 		// build conditions
+		Schema schema = survey.getSchema();
+		EntityDefinition rootEntityDefn = schema.getRootEntityDefinition(rootEntity);
+		Integer rootEntityDefnId = rootEntityDefn.getId();
+		q.addConditions(OFC_RECORD.ROOT_ENTITY_ID.equal(rootEntityDefnId));
 		int i = 0;
 		for (String key : keys) {
 			String keyColumnName = "key" + (++i);
@@ -199,6 +203,11 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 		SelectQuery q = jf.selectQuery();	
 		q.addFrom(OFC_RECORD);
 		q.addSelect(SUMMARY_FIELDS);
+
+		Schema schema = survey.getSchema();
+		EntityDefinition rootEntityDefn = schema.getRootEntityDefinition(rootEntity);
+		Integer rootEntityDefnId = rootEntityDefn.getId();
+		q.addConditions(OFC_RECORD.ROOT_ENTITY_ID.equal(rootEntityDefnId));
 
 		if(sortFields != null) {
 			for (RecordSummarySortField sortField : sortFields) {
@@ -246,11 +255,14 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 			case DATE_MODIFIED:
 				orderBy = OFC_RECORD.DATE_MODIFIED;
 				break;
-			case ERRORS:
-				orderBy = OFC_RECORD.ERRORS;
+			case SKIPPED:
+				orderBy = OFC_RECORD.SKIPPED;
 				break;
 			case MISSING:
 				orderBy = OFC_RECORD.MISSING;
+				break;
+			case ERRORS:
+				orderBy = OFC_RECORD.ERRORS;
 				break;
 			case WARNINGS:
 				orderBy = OFC_RECORD.WARNINGS;
