@@ -17,6 +17,7 @@ import org.openforis.idm.metamodel.validation.ValidationResultFlag;
 import org.openforis.idm.metamodel.validation.ValidationResults;
 import org.openforis.idm.metamodel.validation.Validator;
 import org.openforis.idm.model.Attribute;
+import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Field;
 import org.openforis.idm.model.Record;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,13 +35,16 @@ public class CollectValidator extends Validator {
 	public ValidationResults validate(Attribute<?, ?> attribute) {
 		ValidationResults results = new ValidationResults();
 
+		CollectRecord record = (CollectRecord) attribute.getRecord();
+
 		// check if attribute has been specified
 		SpecifiedValidator specifiedValidator = new SpecifiedValidator();
 		ValidationResultFlag specifiedResultFlag = specifiedValidator.evaluate(attribute);
 		results.addResult(specifiedValidator, specifiedResultFlag);
 
-		if ( !specifiedResultFlag.isError() ) {
-			CollectRecord record = (CollectRecord) attribute.getRecord();
+		if ( specifiedResultFlag.isError() ) {
+			record.updateSkippedCount(attribute.getInternalId());
+		} else {
 			Step step = record.getStep();
 
 			// validate root entity keys
@@ -61,6 +65,7 @@ public class CollectValidator extends Validator {
 			if (step == Step.ENTRY) {
 				results = adjustErrorsForEntryPhase(results, attribute);
 			}
+			record.updateValidationCounts(attribute.getInternalId(), results);
 		}
 		return results;
 	}
@@ -68,6 +73,22 @@ public class CollectValidator extends Validator {
 	@Override
 	protected MinCountValidator getMinCountValidator(NodeDefinition defn) {
 		return new CollectMinCountValidator(defn);
+	}
+	
+	@Override
+	public ValidationResultFlag validateMinCount(Entity entity, String childName) {
+		ValidationResultFlag flag = super.validateMinCount(entity, childName);
+		CollectRecord record = (CollectRecord) entity.getRecord();
+		record.updateValidationMinCounts(entity.getInternalId(), childName, flag);
+		return flag;
+	}
+	
+	@Override
+	public ValidationResultFlag validateMaxCount(Entity entity, String childName) {
+		ValidationResultFlag flag = super.validateMaxCount(entity, childName);
+		CollectRecord record = (CollectRecord) entity.getRecord();
+		record.updateValidationMaxCounts(entity.getInternalId(), childName, flag);
+		return flag;
 	}
 	
 	private ValidationResults adjustErrorsForEntryPhase(ValidationResults results, Attribute<?, ?> attribute) {

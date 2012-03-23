@@ -1,12 +1,19 @@
 package org.openforis.collect.model;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
+import org.openforis.idm.metamodel.validation.ValidationResultFlag;
+import org.openforis.idm.metamodel.validation.ValidationResults;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Code;
 import org.openforis.idm.model.CodeAttribute;
@@ -112,6 +119,14 @@ public class CollectRecord extends Record {
 	private List<String> rootEntityKeyValues;
 	private List<Integer> entityCounts;
 
+	private Map<Integer, Set<String>> minCountErrorCounts;
+	private Map<Integer, Set<String>> minCountWarningCounts;
+	private Map<Integer, Set<String>> maxCountErrorCounts;
+	private Map<Integer, Set<String>> maxCountWarningCounts;
+	private Map<Integer, Integer> errorCounts;
+	private Map<Integer, Integer> warningCounts;
+	private Set<Integer> skippedNodes;
+	
 	public CollectRecord(CollectSurvey survey, String versionName) {
 		super(survey, versionName);
 		this.step = Step.ENTRY;
@@ -119,8 +134,26 @@ public class CollectRecord extends Record {
 		// use List to preserve the order of the keys and counts
 		rootEntityKeyValues = new ArrayList<String>();
 		entityCounts = new ArrayList<Integer>();
+		minCountErrorCounts = new HashMap<Integer, Set<String>>();
+		minCountWarningCounts = new HashMap<Integer, Set<String>>();
+		maxCountErrorCounts = new HashMap<Integer, Set<String>>();
+		maxCountWarningCounts = new HashMap<Integer, Set<String>>();
+		errorCounts = new HashMap<Integer, Integer>();
+		warningCounts = new HashMap<Integer, Integer>();
+		skippedNodes = new HashSet<Integer>();
 	}
 
+	public Node<?> deleteNode(Node<?> node) {
+		if(node.isDetached()) {
+			throw new IllegalArgumentException("Unable to delete a node already detached");
+		}
+		Entity parentEntity = node.getParent();
+		int index = node.getIndex();
+		Node<?> deletedNode = parentEntity.remove(node.getName(), index);
+		removeValidationCounts(deletedNode.getInternalId());
+		return deletedNode;
+	}
+	
 	public void setErrorConfirmed(Attribute<?,?> attribute, boolean confirmed){
 		int fieldCount = attribute.getFieldCount();
 		
@@ -151,6 +184,74 @@ public class CollectRecord extends Record {
 		return childState.get(APPROVED_MISSING_POSITION);
 	} 
 
+	public void updateValidationMinCounts(Integer entityId, String childName, ValidationResultFlag flag) {
+		Set<String> errors = clearEntityValidationCounts(minCountErrorCounts, entityId, childName);
+		Set<String> warnings = clearEntityValidationCounts(minCountWarningCounts, entityId, childName);
+		switch (flag) {
+			case ERROR:
+				errors.add(childName);
+				break;
+			case WARNING:
+				warnings.add(childName);
+				break;
+		}
+		this.missing = null;
+		this.errors = null;
+		this.warnings = null;
+	}
+
+	public void updateValidationMaxCounts(Integer entityId, String childName, ValidationResultFlag flag) {
+		Set<String> errors = clearEntityValidationCounts(maxCountErrorCounts, entityId, childName);
+		Set<String> warnings = clearEntityValidationCounts(maxCountWarningCounts, entityId, childName);
+		
+		switch(flag) {
+		case ERROR:
+			errors.add(childName);
+			break;
+		case WARNING:
+			warnings.add(childName);
+			break;
+		}
+		this.errors = null;
+		this.warnings = null;
+	}
+	
+	public void updateValidationCounts(Integer attributeId, ValidationResults validationResults) {
+		removeValidationCounts(attributeId);
+		
+		int errorCounts = validationResults.getErrors().size();
+		int warningCounts = validationResults.getWarnings().size();
+		this.errorCounts.put(attributeId, errorCounts);
+		this.warningCounts.put(attributeId, warningCounts);
+		
+		errors = null;
+		warnings = null;
+	}
+	
+	public void updateSkippedCount(Integer attributeId) {
+		removeValidationCounts(attributeId);
+		skippedNodes.add(attributeId);
+		skipped = null;
+	}
+	
+	public void removeValidationCounts(Integer nodeId) {
+		Node<?> node = this.getNodeByInternalId(nodeId);
+		if(node instanceof Attribute<?, ?>) {
+			skippedNodes.remove(nodeId);
+			errorCounts.remove(nodeId);
+			warningCounts.remove(nodeId);
+		} else {
+			minCountErrorCounts.remove(nodeId);
+			maxCountErrorCounts.remove(nodeId);
+			minCountWarningCounts.remove(nodeId);
+			maxCountWarningCounts.remove(nodeId);
+		}
+		skipped = null;
+		missing = null;
+		errors = null;
+		warnings = null;
+	}
+	
 	public Step getStep() {
 		return step;
 	}
@@ -200,6 +301,9 @@ public class CollectRecord extends Record {
 	}
 
 	public Integer getSkipped() {
+		if ( skipped == null ) {
+			skipped = skippedNodes.size();
+		}
 		return skipped;
 	}
 
@@ -208,6 +312,10 @@ public class CollectRecord extends Record {
 	}
 
 	public Integer getMissing() {
+		if ( missing == null ){
+			missing = getEntityValidationCount( minCountErrorCounts );
+			missing += getEntityValidationCount( minCountWarningCounts );
+		}
 		return missing;
 	}
 
@@ -216,6 +324,11 @@ public class CollectRecord extends Record {
 	}
 
 	public Integer getErrors() {
+		if(errors == null) {
+			errors = getEntityValidationCount(minCountErrorCounts);
+			errors += getEntityValidationCount(maxCountErrorCounts);
+			errors += getAttributeValidationCount(errorCounts);
+		}
 		return errors;
 	}
 
@@ -224,6 +337,11 @@ public class CollectRecord extends Record {
 	}
 
 	public Integer getWarnings() {
+		if(warnings == null) {
+			warnings = getEntityValidationCount(minCountWarningCounts);
+			warnings += getEntityValidationCount(maxCountWarningCounts);
+			warnings += getAttributeValidationCount(warningCounts);
+		}
 		return warnings;
 	}
 
@@ -283,4 +401,32 @@ public class CollectRecord extends Record {
 	public void setLockedBy(User lockedBy) {
 		this.lockedBy = lockedBy;
 	}
+	
+	private Set<String> clearEntityValidationCounts(Map<Integer, Set<String>> counts, Integer entityId, String childName) {
+		Set<String> set = counts.get(entityId);
+		if(set == null) {
+			set = new HashSet<String>();
+			counts.put(entityId, set);
+		} else {
+			set.remove(childName);
+		}
+		return set;
+	}
+	
+	private Integer getEntityValidationCount(Map<Integer, Set<String>> map) {
+		int count = 0;
+		for (Set<String> set : map.values()) {
+			count += set.size();
+		}
+		return count;
+	}
+	
+	private Integer getAttributeValidationCount(Map<Integer, Integer> map) {
+		int count = 0;
+		for (Integer i : map.values()) {
+			count += i;
+		}
+		return count;
+	}
+	
 }

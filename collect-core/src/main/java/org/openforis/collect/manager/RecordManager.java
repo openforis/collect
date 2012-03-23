@@ -31,7 +31,6 @@ import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Schema;
-import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.validation.ValidationResult;
 import org.openforis.idm.metamodel.validation.ValidationResultFlag;
 import org.openforis.idm.metamodel.validation.ValidationResults;
@@ -67,6 +66,7 @@ public class RecordManager {
 		updateKeys(record);
 		
 		updateCounts(record);
+		
 		Integer id = record.getId();
 		if(id == null) {
 			recordDao.insert(record);
@@ -187,10 +187,7 @@ public class RecordManager {
 						stack.push(child);
 					}
 				}
-				
-			}
-			
-			if(node instanceof Attribute){
+			} else if(node instanceof Attribute){
 				ValidationResults validationResults = ((Attribute<?,?>) node).validateValue();
 				List<ValidationResult> errors = validationResults.getErrors();
 				if(errors.size() > 0){
@@ -198,12 +195,9 @@ public class RecordManager {
 				}
 			}
 		}
-		
 		return false;
 	}
 
-	
-	
 	private boolean hasCardinalityError(Entity entity) {
 		EntityDefinition definition = entity.getDefinition();
 		List<NodeDefinition> childDefinitions = definition.getChildDefinitions();
@@ -232,14 +226,6 @@ public class RecordManager {
 		prevStepRecord.setStep(prevStep);
 		prevStepRecord.setState(State.REJECTED);
 		recordDao.update(prevStepRecord);
-	}
-
-	
-	public Node<?> deleteNode(Node<?> node) {
-		Entity parentEntity = node.getParent();
-		int index = node.getIndex();
-		Node<?> deletedNode = parentEntity.remove(node.getName(), index);
-		return deletedNode;
 	}
 	
 	public Entity addEntity(Entity parentEntity, String nodeName) {

@@ -296,6 +296,7 @@ public class DataService {
 	}
 
 	private void deleteNode(Node<?> node,Set<NodePointer> relevanceRequiredDependencies, Set<Attribute<?,?>> checkDependencies, Map<Integer, UpdateResponse> responseMap){
+		CollectRecord record = getActiveRecord();
 		Stack<Node<?>> dependenciesStack = new Stack<Node<?>>();
 		Stack<Node<?>> nodesToRemove = new Stack<Node<?>>();
 		dependenciesStack.push(node);
@@ -322,7 +323,7 @@ public class DataService {
 		
 		while(!nodesToRemove.isEmpty()){
 			Node<?> n = nodesToRemove.pop();
-			recordManager.deleteNode(n);
+			record.deleteNode(n);
 			
 			UpdateResponse resp = getUpdateResponse(responseMap, node.getInternalId());
 			resp.setDeletedNodeId(node.getInternalId());
