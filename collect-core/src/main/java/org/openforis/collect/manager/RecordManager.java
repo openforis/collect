@@ -147,25 +147,36 @@ public class RecordManager {
 	@Transactional
 	public void promote(CollectRecord record, User user) throws RecordPersistenceException, RecordPromoteException {
 		//save changes on current step
-		if(hasErrors(record)){
+		if( hasErrors(record) ){
 			throw new RecordPromoteException("Record cannot be promoted becuase it contains errors.");
 		}
 		
 		Integer id = record.getId();
-		if(id == null) {
-			recordDao.insert(record);
+		// before save record in current phase
+		if( id == null ) {
+			recordDao.insert( record );
 		} else {
-			recordDao.update(record);
+			recordDao.update( record );
 		}
+		
 		//change step and update the record
 		Step currentStep = record.getStep();
 		Step nextStep = currentStep.getNext();
 		Date now = new Date();
-		record.setModifiedBy(user);
-		record.setModifiedDate(now);
-		record.setStep(nextStep);
-		record.setState(null);
-		recordDao.update(record);
+		record.setModifiedBy( user );
+		record.setModifiedDate( now );
+		record.setState( null );
+		
+		/**
+		 * 1. clear node states
+		 * 2. update record step
+		 * 3. update all validation states
+		 */
+		record.clearNodeStates();
+		record.setStep( nextStep );
+		record.updateDerivedStates();
+		
+		recordDao.update( record );
 	}
 
 	private boolean hasErrors(CollectRecord record) {
@@ -219,13 +230,13 @@ public class RecordManager {
 	@Transactional
 	public void demote(CollectSurvey survey, int recordId, Step currentStep, User user) throws RecordPersistenceException {
 		Step prevStep = currentStep.getPrevious();
-		CollectRecord prevStepRecord = recordDao.load(survey, recordId, prevStep.getStepNumber());
-		Date now = new Date();
-		prevStepRecord.setModifiedBy(user);
-		prevStepRecord.setModifiedDate(now);
-		prevStepRecord.setStep(prevStep);
-		prevStepRecord.setState(State.REJECTED);
-		recordDao.update(prevStepRecord);
+		CollectRecord record = recordDao.load( survey, recordId, prevStep.getStepNumber() );
+		record.setModifiedBy( user );
+		record.setModifiedDate( new Date() );
+		record.setStep( prevStep );
+		record.setState( State.REJECTED );
+		record.updateDerivedStates();
+		recordDao.update( record );
 	}
 	
 	public Entity addEntity(Entity parentEntity, String nodeName) {
