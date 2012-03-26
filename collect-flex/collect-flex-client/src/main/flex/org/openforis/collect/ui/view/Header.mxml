@@ -17,5 +17,5 @@
 	
 	<!--<s:Image source="/assets/images/{surveyBannerFileName}" />-->
 	
-	<s:Image source="@Embed(source='/assets/images/banner.jpg')" />
+	<s:Image source="@Embed(source='/assets/images/banner.jpg')" horizontalCenter="0"/>
 </s:Group>
