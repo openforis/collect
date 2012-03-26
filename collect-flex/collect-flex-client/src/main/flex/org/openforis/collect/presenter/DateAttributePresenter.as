@@ -66,10 +66,10 @@ package org.openforis.collect.presenter {
 			var fields:Array = [view.year, view.month, view.day];
 			var operations:ListCollectionView = new ArrayCollection();
 			for each (var field:InputField in fields) {
-				var o:UpdateRequestOperation = field.presenter.getApplyValueOperation();
+				var o:UpdateRequestOperation = field.presenter.createUpdateValueOperation();
 				operations.addItem(o);
 			}
-			var token:UpdateRequestToken = new UpdateRequestToken(UpdateRequestToken.TYPE_UPDATE_VALUE);
+			var token:UpdateRequestToken = new UpdateRequestToken(UpdateRequestToken.UPDATE_VALUE);
 			token.updatedFields = _view.attribute.fields;
 			token.symbol = null;
 			var req:UpdateRequest = new UpdateRequest();

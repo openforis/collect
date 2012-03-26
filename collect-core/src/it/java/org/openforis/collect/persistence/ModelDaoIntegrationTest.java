@@ -7,6 +7,7 @@ import static org.junit.Assert.assertNull;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.GregorianCalendar;
 import java.util.List;
 
@@ -20,6 +21,8 @@ import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.CollectSurveyContext;
+import org.openforis.collect.model.RecordSummarySortField;
+import org.openforis.collect.model.RecordSummarySortField.Sortable;
 import org.openforis.collect.persistence.xml.CollectIdmlBindingContext;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.Schema;
@@ -219,9 +222,9 @@ public class ModelDaoIntegrationTest {
 		String rootEntityName = rootEntity.getName();
 		int offset = 0;
 		int maxNumberOfRecords = 1;
-		String orderByFieldName = "key_id";
+		RecordSummarySortField sortField = new RecordSummarySortField(Sortable.KEY1);
 		String filter = null;
-		List<CollectRecord> list = this.recordDao.loadSummaries(survey, rootEntityName, offset, maxNumberOfRecords, orderByFieldName, filter);
+		List<CollectRecord> list = this.recordDao.loadSummaries(survey, rootEntityName, offset, maxNumberOfRecords, Arrays.asList(sortField), filter);
 		assertNotNull(list);
 		assertEquals(1, list.size());
 		

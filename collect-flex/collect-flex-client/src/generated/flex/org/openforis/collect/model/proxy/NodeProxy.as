@@ -13,5 +13,10 @@ package org.openforis.collect.model.proxy {
 		
 		public function init():void {}
 
+		public function hasErrors():Boolean {
+			return false;
+		}
+		
     }
+
 }

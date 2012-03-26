@@ -23,7 +23,9 @@ import org.openforis.collect.metamodel.proxy.CodeListItemProxy;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.FieldSymbol;
+import org.openforis.collect.model.RecordSummarySortField;
 import org.openforis.collect.model.User;
+import org.openforis.collect.model.proxy.NodeProxy;
 import org.openforis.collect.model.proxy.RecordProxy;
 import org.openforis.collect.persistence.RecordPersistenceException;
 import org.openforis.collect.remoting.service.UpdateRequestOperation.Method;
@@ -99,7 +101,7 @@ public class DataService {
 	 * @return map with "count" and "records" items
 	 */
 	@Transactional
-	public Map<String, Object> getRecordSummaries(String rootEntityName, int offset, int maxNumberOfRows, String orderByFieldName, String filter) {
+	public Map<String, Object> getRecordSummaries(String rootEntityName, int offset, int maxNumberOfRows, List<RecordSummarySortField> sortFields, String filter) {
 		Map<String, Object> result = new HashMap<String, Object>();
 		SessionState sessionState = sessionManager.getSessionState();
 		CollectSurvey activeSurvey = sessionState.getActiveSurvey();
@@ -107,7 +109,7 @@ public class DataService {
 		EntityDefinition rootEntityDefinition = schema.getRootEntityDefinition(rootEntityName);
 		String rootEntityDefinitionName = rootEntityDefinition.getName();
 		int count = recordManager.getCountRecords(activeSurvey, rootEntityDefinitionName);
-		List<CollectRecord> summaries = recordManager.getSummaries(activeSurvey, rootEntityDefinitionName, offset, maxNumberOfRows, orderByFieldName, filter);
+		List<CollectRecord> summaries = recordManager.getSummaries(activeSurvey, rootEntityDefinitionName, offset, maxNumberOfRows, sortFields, filter);
 		List<RecordProxy> proxies = new ArrayList<RecordProxy>();
 		for (CollectRecord summary : summaries) {
 			proxies.add(new RecordProxy(summary));
@@ -149,7 +151,6 @@ public class DataService {
 		User user = sessionState.getUser();
 		record.setModifiedDate(new Date());
 		record.setModifiedBy(user);
-
 		recordManager.save(record);
 		sessionState.setActiveRecordState(RecordState.SAVED);
 	}
@@ -157,8 +158,8 @@ public class DataService {
 	@Transactional
 	public void deleteActiveRecord() throws RecordPersistenceException {
 		SessionState sessionState = sessionManager.getSessionState();
-		User user = sessionState.getUser();
 		Record record = sessionState.getActiveRecord();
+		User user = sessionState.getUser();
 		recordManager.delete(record.getId(), user);
 		sessionManager.clearActiveRecord();
 	}
@@ -202,10 +203,32 @@ public class DataService {
 		
 		Attribute<? extends AttributeDefinition, ?> attribute = null;
 		switch (method) {
+			case CONFIRM_ERROR:
+				attribute = (Attribute<AttributeDefinition, ?>) node;
+				record.setErrorConfirmed(attribute, true);
+				//checkDependencies = recordManager.clearValidationResults(attribute);
+				checkDependencies = new HashSet<Attribute<?,?>>();
+				attribute.clearValidationResults();
+				checkDependencies.add(attribute);
+				
+				UpdateResponse response = getUpdateResponse(responseMap, attribute.getInternalId());
+				break;
+			case APPROVE_MISSING:
+				record.setMissingApproved(parentEntity, nodeName, true);
+				cardinalityNodePointers = getCardinalityNodePointers(parentEntity);
+				cardinalityNodePointers.add(new NodePointer(parentEntity, nodeName));
+				break;
+			case UPDATE_REMARKS:
+				attribute = (Attribute<AttributeDefinition, ?>) node;
+				Field<?> fld = attribute.getField(fieldIndex);
+				fld.setRemarks(remarks);
+				getUpdateResponse(responseMap, nodeId);
+				break;
 			case ADD :
 				Node<?> createdNode = addNode(parentEntity, nodeDef, requestValue, symbol, remarks);
-				UpdateResponse response = getUpdateResponse(responseMap, createdNode.getInternalId());
-				response.setCreatedNode(createdNode);
+				record.setMissingApproved(parentEntity, nodeName, false);
+				response = getUpdateResponse(responseMap, createdNode.getInternalId());
+				response.setCreatedNode(NodeProxy.fromNode(createdNode));
 				relReqDependencies = recordManager. clearRelevanceRequiredStates(createdNode);
 				if(createdNode instanceof Attribute){
 					attribute = (Attribute<? extends AttributeDefinition, ?>) createdNode;
@@ -217,6 +240,9 @@ public class DataService {
 				break;
 			case UPDATE:
 				attribute = (Attribute<AttributeDefinition, ?>) node;
+				record.setErrorConfirmed(attribute, false);
+				record.setMissingApproved(parentEntity, node.getName(), false);
+				
 				cardinalityNodePointers = getCardinalityNodePointers(attribute);
 				response = getUpdateResponse(responseMap, attribute.getInternalId());
 				Map<Integer, Object> updatedFieldValues = new HashMap<Integer, Object>();
@@ -271,6 +297,7 @@ public class DataService {
 	}
 
 	private void deleteNode(Node<?> node,Set<NodePointer> relevanceRequiredDependencies, Set<Attribute<?,?>> checkDependencies, Map<Integer, UpdateResponse> responseMap){
+		CollectRecord record = getActiveRecord();
 		Stack<Node<?>> dependenciesStack = new Stack<Node<?>>();
 		Stack<Node<?>> nodesToRemove = new Stack<Node<?>>();
 		dependenciesStack.push(node);
@@ -297,7 +324,7 @@ public class DataService {
 		
 		while(!nodesToRemove.isEmpty()){
 			Node<?> n = nodesToRemove.pop();
-			recordManager.deleteNode(n);
+			record.deleteNode(n);
 			
 			UpdateResponse resp = getUpdateResponse(responseMap, node.getInternalId());
 			resp.setDeletedNodeId(node.getInternalId());
@@ -482,9 +509,10 @@ public class DataService {
 	@Transactional
 	public void demoteActiveRecord() throws RecordPersistenceException {
 		SessionState sessionState = sessionManager.getSessionState();
+		CollectSurvey survey = sessionState.getActiveSurvey();
 		CollectRecord record = sessionState.getActiveRecord();
 		User user = sessionState.getUser();
-		recordManager.demote(record, user);
+		recordManager.demote(survey, record.getId(), record.getStep(), user);
 		recordManager.unlock(record, user);
 		sessionManager.clearActiveRecord();
 	}

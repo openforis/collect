@@ -1,7 +1,6 @@
 package org.openforis.collect.manager;
 
 import java.util.Collection;
-import java.util.Date;
 import java.util.Locale;
 import java.util.StringTokenizer;
 
@@ -25,11 +24,9 @@ public class SessionManager {
 
 	private static Log LOG = LogFactory.getLog(SessionManager.class);
 
-	private static final String KEEP_ALIVE_SESSION_ATTRIBUTE_NAME = "keepAlive";
-
 	@Autowired
 	private UserManager userManager;
-
+	
 	public SessionState getSessionState() {
 		SessionState sessionState = (SessionState) getSessionAttribute(SessionState.SESSION_ATTRIBUTE_NAME);
 		if (sessionState == null) {
@@ -54,7 +51,7 @@ public class SessionManager {
 	}
 
 	public void keepSessionAlive() {
-		setSessionAttribute(KEEP_ALIVE_SESSION_ATTRIBUTE_NAME, new Date());
+		getSessionState();
 		if (LOG.isDebugEnabled()) {
 			LOG.debug("Keep alive request received");
 		}
@@ -105,11 +102,12 @@ public class SessionManager {
 			return null;
 		}
 	}
-
+	/*
 	private void setSessionAttribute(String attributeName, Object value) {
 		GraniteContext graniteContext = GraniteContext.getCurrentInstance();
 		if (graniteContext != null) {
 			graniteContext.getSessionMap().put(attributeName, value);
 		}
 	}
+	*/
 }

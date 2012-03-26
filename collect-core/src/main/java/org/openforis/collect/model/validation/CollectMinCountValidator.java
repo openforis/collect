@@ -1,14 +1,14 @@
-/**
- * 
- */
 package org.openforis.collect.model.validation;
 
 import static org.openforis.collect.model.validation.CollectValidator.isReasonBlankSpecified;
 
 import java.util.List;
 
+import org.openforis.collect.model.CollectRecord;
+import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.validation.MinCountValidator;
+import org.openforis.idm.metamodel.validation.ValidationResultFlag;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Node;
@@ -23,6 +23,25 @@ public class CollectMinCountValidator extends MinCountValidator {
 		super(nodeDefinition);
 	}
 
+	@Override
+	public ValidationResultFlag evaluate(Entity entity) {
+		CollectRecord record = (CollectRecord) entity.getRecord();
+		
+		ValidationResultFlag resultFlag = super.evaluate(entity);
+		
+		// you can approve missing values in entry phase as well
+		//	Step step = record.getStep();
+		// step == Step.CLEANSING && 
+		if ( resultFlag == ValidationResultFlag.ERROR ) {
+			String childName = getNodeDefinition().getName();
+			if ( record.isMissingApproved(entity, childName) ){
+				resultFlag = ValidationResultFlag.WARNING;
+			}
+		}
+		
+		return resultFlag;
+	}
+	
 	@Override
 	protected boolean isEmpty(Node<?> node) {
 		if (node instanceof Entity) {

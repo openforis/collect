@@ -20,5 +20,9 @@ package org.openforis.collect.remoting.service {
 				operations.addItem(operation);
 			}
 		}
+		
+		public function addOperation(operation:UpdateRequestOperation):void {
+			this.operations.addItem(operation);
+		}
     }
 }

@@ -8,6 +8,7 @@ package org.openforis.collect.presenter {
 	
 	import org.openforis.collect.Application;
 	import org.openforis.collect.event.ApplicationEvent;
+	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 	import org.openforis.collect.model.proxy.AttributeProxy;
 	import org.openforis.collect.model.proxy.RecordProxy;
 	import org.openforis.collect.remoting.service.UpdateResponse;
@@ -50,6 +51,8 @@ package org.openforis.collect.presenter {
 			var validationStateDisplay:UIComponent = inputField != null ? inputField.validationStateDisplay: _view;
 			var validationToolTipTrigger:UIComponent = validationStateDisplay;
 			_validationDisplayManager = new ValidationDisplayManager(validationToolTipTrigger, validationStateDisplay);
+			var attrDefn:AttributeDefinitionProxy = _view.attributeDefinition;
+			_validationDisplayManager.showMinMaxCountErrors = ! attrDefn.multiple;
 			if(_view.attribute != null) {
 				updateValidationDisplayManager();
 			}
@@ -107,6 +110,6 @@ package org.openforis.collect.presenter {
 				}
 			}
 		}
-		
+
 	}
 }

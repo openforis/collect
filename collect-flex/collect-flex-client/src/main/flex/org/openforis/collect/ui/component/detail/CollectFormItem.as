@@ -1,6 +1,7 @@
 package org.openforis.collect.ui.component.detail {
 	import mx.events.FlexEvent;
 	
+	import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
 	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.presenter.FormItemPresenter;
 	
@@ -39,6 +40,11 @@ package org.openforis.collect.ui.component.detail {
 		
 		public function set parentEntity(value:EntityProxy):void {
 			_parentEntity = value;
+		}
+		
+		//to be implemented in subclasses
+		public function get nodeDefinition():NodeDefinitionProxy {
+			return null;
 		}
 		
 		[Bindable]

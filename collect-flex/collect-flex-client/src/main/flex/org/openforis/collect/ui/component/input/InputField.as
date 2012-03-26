@@ -78,18 +78,6 @@ package org.openforis.collect.ui.component.input {
 			}
 		}
 		
-		public function applyValue():void {
-			presenter.applyValue();
-		}
-		
-		public function applySymbol(symbol:FieldSymbol):void {
-			presenter.applySymbol(symbol);
-		}
-		
-		public function applyRemarks(remarks:String):void {
-			presenter.applyRemarks(remarks);
-		}
-		
 		/**
 		 * returns true if the field is not filled
 		 */
@@ -104,10 +92,6 @@ package org.openforis.collect.ui.component.input {
 			} else {
 				return null;
 			}
-		}
-		
-		public function undo():void {
-			presenter.undoLastChange();
 		}
 		
 		public function set relevant(value:Boolean):void {

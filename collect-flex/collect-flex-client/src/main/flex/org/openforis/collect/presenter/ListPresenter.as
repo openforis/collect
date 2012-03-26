@@ -5,9 +5,9 @@ package org.openforis.collect.presenter {
 	 * */
 	import flash.display.DisplayObject;
 	import flash.events.Event;
-	import flash.events.FocusEvent;
 	import flash.events.MouseEvent;
 	
+	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
 	import mx.collections.ListCollectionView;
 	import mx.core.FlexGlobals;
@@ -24,15 +24,18 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.i18n.Message;
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
+	import org.openforis.collect.model.RecordSummarySortField;
+	import org.openforis.collect.model.RecordSummarySortField$Sortable;
 	import org.openforis.collect.model.proxy.RecordProxy;
 	import org.openforis.collect.ui.UIBuilder;
 	import org.openforis.collect.ui.component.SelectVersionPopUp;
 	import org.openforis.collect.ui.component.datagrid.PaginationBar;
+	import org.openforis.collect.ui.component.datagrid.RecordSummaryDataGrid;
 	import org.openforis.collect.ui.view.ListView;
 	import org.openforis.collect.util.AlertUtil;
 	import org.openforis.collect.util.CollectionUtil;
-	import org.openforis.collect.util.StringUtil;
 	
+	import spark.collections.Sort;
 	import spark.collections.SortField;
 	import spark.events.GridSortEvent;
 
@@ -59,9 +62,9 @@ package org.openforis.collect.presenter {
 		 */
 		private var currentPage:int;
 		/**
-		 * The current orderBy column dataField
+		 * The current sortField
 		 */
-		private var currentOrderByFieldName:String;
+		private var currentSortFields:IList;
 		/**
 		 * The current filter applied on root entity key fields. 
 		 * */
@@ -156,7 +159,6 @@ package org.openforis.collect.presenter {
 		protected function editButtonClickHandler(event:MouseEvent):void {
 			var selectedRecord:RecordProxy = _view.dataGrid.selectedItem as RecordProxy;
 			if(selectedRecord != null) {
-				selectedRecord.showErrors(); //to make validation errors visible
 				var uiEvent:UIEvent = new UIEvent(UIEvent.RECORD_SELECTED);
 				uiEvent.obj = selectedRecord;
 				eventDispatcher.dispatchEvent(uiEvent);
@@ -223,8 +225,11 @@ package org.openforis.collect.presenter {
 			//offset starts from 0
 			var offset:int = (currentPage - 1) * MAX_RECORDS_PER_PAGE;
 			
-			_dataClient.getRecordSummaries(new AsyncResponder(getRecordsSummaryResultHandler, faultHandler), Application.activeRootEntity.name, 
-				offset, MAX_RECORDS_PER_PAGE, currentOrderByFieldName, currentFilter);
+			var responder:IResponder = new AsyncResponder(getRecordsSummaryResultHandler, faultHandler);
+			var rootEntityName:String = Application.activeRootEntity.name;
+			
+			_dataClient.getRecordSummaries(responder, rootEntityName, 
+				offset, MAX_RECORDS_PER_PAGE, currentSortFields, currentFilter);
 		}
 		
 		protected function getRecordsSummaryResultHandler(event:ResultEvent, token:Object = null):void {
@@ -234,7 +239,7 @@ package org.openforis.collect.presenter {
 			totalPages = Math.ceil(totalRecords / MAX_RECORDS_PER_PAGE);
 			
 			_view.dataGrid.dataProvider = records;
-			
+			_view.dataGrid.setSortedColumns(currentSortFields);
 			_view.currentState = ListView.DEFAULT_STATE;
 			
 			updatePaginationBar();
@@ -302,10 +307,12 @@ package org.openforis.collect.presenter {
 		protected function dataGridSortChangingHandler(event:GridSortEvent):void {
 			//avoid client sorting, perform the sorting by server side
 			event.preventDefault();
-			var newSortFields:Array = event.newSortFields;
-			var sortField:SortField = newSortFields[0];
-			currentOrderByFieldName = sortField.name;
+			var oldSortFields:IList = currentSortFields;
+			currentSortFields = RecordSummaryDataGrid.createRecordSummarySortFields(event.newSortFields, oldSortFields);;
+			
 			loadRecordSummariesCurrentPage();
 		}
+		
+		
 	}
 }

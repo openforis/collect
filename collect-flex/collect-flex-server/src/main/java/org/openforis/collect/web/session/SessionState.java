@@ -79,4 +79,5 @@ public class SessionState {
 	public void setActiveRecordState(RecordState activeRecordState) {
 		this.activeRecordState = activeRecordState;
 	}
+
 }

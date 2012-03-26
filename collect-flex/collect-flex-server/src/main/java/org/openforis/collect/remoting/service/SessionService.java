@@ -6,7 +6,6 @@ package org.openforis.collect.remoting.service;
 import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.web.session.SessionState;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.annotation.Secured;
 
 /**
  * @author M. Togna

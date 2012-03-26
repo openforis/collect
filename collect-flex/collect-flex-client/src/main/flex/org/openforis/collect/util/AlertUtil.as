@@ -40,7 +40,7 @@ package org.openforis.collect.util
 		}
 		
 		public static function showConfirm(messageResource:String, parameters:Array, titleResource:String, 
-										   yesHandler:Function, noHandler:Function = null):void {
+										   yesHandler:Function, yesArgs:Array = null, noHandler:Function = null):void {
 			if(titleResource == null) {
 				titleResource = CONFIRM_TITLE_RESOURCE;
 			}
@@ -51,7 +51,7 @@ package org.openforis.collect.util
 			
 			function closeHandler(event:CloseEvent):void {
 				if(event.detail == Alert.YES) {
-					yesHandler();
+					yesHandler.apply(null, yesArgs);
 				} else if(noHandler != null) {
 					noHandler();
 				}

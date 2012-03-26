@@ -120,7 +120,7 @@ package org.openforis.collect.presenter {
 			}
 			var codesStr:String = StringUtil.concat(", ", parts);
 			TextInput(_popUp.codeInputField.textInput).text = codesStr;
-			_popUp.codeInputField.applyValue();
+			_popUp.codeInputField.presenter.updateValue();
 			closePopupHandler();
 		}
 		

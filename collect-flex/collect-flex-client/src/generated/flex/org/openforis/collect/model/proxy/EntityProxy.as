@@ -8,6 +8,7 @@
 package org.openforis.collect.model.proxy {
 	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
+	import mx.messaging.management.Attribute;
 	
 	import org.granite.collections.IMap;
 	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
@@ -82,12 +83,12 @@ package org.openforis.collect.model.proxy {
 		/**
 		 * Traverse each child and pass it to the argument function
 		 * */
-		public function traverse(fun:Function):void {
+		public function traverse(funct:Function):void {
 			var children:IList = getChildren();
 			for each (var child:NodeProxy in children) {
-				fun(child);
+				funct(child);
 				if(child is EntityProxy) {
-					EntityProxy(child).traverse(fun);
+					EntityProxy(child).traverse(funct);
 				}
 			}
 		}
@@ -240,18 +241,6 @@ package org.openforis.collect.model.proxy {
 			updateMap(childrenRequiredMap, map);
 		}
 		
-		protected function updateMap(map:IMap, newMap:IMap):void {
-			if(map != null && newMap != null) {
-				var newKeys:ArrayCollection = newMap.keySet;
-				for each (var key:* in newKeys) {
-					var value:* = newMap.get(key);
-					if(value != null) {
-						map.put(key, value);
-					}
-				}
-			}
-		}
-
 		public function showErrorsOnChild(name:String):void {
 			showChildrenErrorsMap.put(name, true);
 		}
@@ -274,9 +263,49 @@ package org.openforis.collect.model.proxy {
 			}
 		}
 		
+		override public function hasErrors():Boolean {
+			var children:IList = getChildren();
+			for each(var child:NodeProxy in children){
+				if( child.hasErrors() ) {
+					return true;
+				}
+			}
+			return false;
+		}
+		
+		public function childContainsErrors(childName:String):Boolean {
+			var children:IList = getChildren(childName);
+			for each(var child:NodeProxy in children){
+				if( child.hasErrors() ) {
+					return true;
+				}
+			}
+			return false;
+		}
+		
+		public function hasConfirmedError(childName:String):Boolean {
+			var children:IList = getChildren(childName);
+			for each(var child:NodeProxy in children){
+				if(child is AttributeProxy){
+					var attr:AttributeProxy = child as AttributeProxy;
+					if( !attr.errorConfirmed ){
+						return false;
+					}
+				} else {
+					return false;
+				}
+			}
+			return true;
+		}
+		
 		public function getEnumeratedCodeWidth(entityName:String):Number {
 			var result:Number = _enumeratedEntitiesCodeWidths[entityName];
 			return result;
+		}
+		
+		public function getCount(childName:String):int {
+			var children:IList = getChildren(childName);
+			return children.length;
 		}
 		
 		public function get keyText():String {
@@ -311,6 +340,18 @@ package org.openforis.collect.model.proxy {
 			_enumeratedEntitiesCodeWidths = value;
 		}
 
+		protected function updateMap(map:IMap, newMap:IMap):void {
+			if(map != null && newMap != null) {
+				var newKeys:ArrayCollection = newMap.keySet;
+				for each (var key:* in newKeys) {
+					var value:* = newMap.get(key);
+					if(value != null) {
+						map.put(key, value);
+					}
+				}
+			}
+		}
+		
 		
 	}
 }
