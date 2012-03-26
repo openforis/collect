@@ -65,13 +65,19 @@ package org.openforis.collect.ui {
 	
 	import spark.components.HGroup;
 	import spark.components.Label;
+	import spark.components.SkinnableContainer;
 	import spark.components.VGroup;
 	import spark.components.gridClasses.GridColumn;
+	import spark.layouts.VerticalLayout;
 	
 	/**
 	 * @author Mino Togna
+	 * @author S. Ricci
+	 * 
 	 * */
 	public class UIBuilder {
+		
+		private static const DATA_GROUP_HEADER_STYLE:String = "dataGroupHeader";
 		
 		public static function buildForm(rootEntity:EntityDefinitionProxy, version:ModelVersionProxy):FormContainer {
 			var formContainer:FormContainer = new FormContainer();
@@ -246,7 +252,7 @@ package org.openforis.collect.ui {
 					return 100;
 				}
 			} else if(def is DateAttributeDefinitionProxy) {
-				return 132;
+				return 130;
 			} else if(def is FileAttributeDefinitionProxy) {
 				return 300;
 			} else if(def is NumberAttributeDefinitionProxy) {
@@ -285,7 +291,7 @@ package org.openforis.collect.ui {
 			} else {
 				var inputFieldWidth:Number = getInputFieldWidth(def);
 				if(!isNaN(inputFieldWidth)) {
-					return inputFieldWidth + 2; //consider validation display border container
+					return inputFieldWidth + 2; //consider validation display border container and gap
 				} else {
 					return NaN;
 				}
@@ -375,38 +381,34 @@ package org.openforis.collect.ui {
 		}
 		
 		private static function getEntityDataGroupHeader(defn:EntityDefinitionProxy, parentEntity:EntityProxy = null):IVisualElement {
-			var v:VGroup = new VGroup();
-			v.percentHeight = 100;
-			v.verticalAlign = "bottom";
+			var result:SkinnableContainer = new SkinnableContainer();
+			result.styleName = DATA_GROUP_HEADER_STYLE;
+			result.percentHeight = 100;
 			var l:Label = new Label();
 			l.styleName = "bold";
 			l.text = defn.getLabelText();
-			v.addElement(l);
+			result.addElement(l);
 			
 			var childDefinitionsContainer:HGroup = new HGroup();
 			childDefinitionsContainer.percentHeight = 100;
 			childDefinitionsContainer.verticalAlign = "bottom";
 			childDefinitionsContainer.gap = 4;
 			var childDefn:ListCollectionView = defn.childDefinitions;
-			//var width:int = 0;
 			for each (var childDef:NodeDefinitionProxy in childDefn) {
 				var elem:IVisualElement = getDataGroupHeader(childDef, null);
-				//width += elem.width;
 				childDefinitionsContainer.addElement(elem);
 			}
-			v.addElement(childDefinitionsContainer);
-			//v.width = width;
+			result.addElement(childDefinitionsContainer);
 			
-			return v;
+			return result;
 		}
 		
 		private static function getAttributeDataGroupHeader(defn:AttributeDefinitionProxy, parentEntity:EntityProxy = null):IVisualElement {
-			var result:VGroup = new VGroup();
+			var result:SkinnableContainer = new SkinnableContainer();
+			result.styleName = DATA_GROUP_HEADER_STYLE;
 			var width:Number = getAttributeDataGroupHeaderWidth(defn, parentEntity);
-			result.paddingLeft = 1;
 			result.width = width;
 			result.percentHeight = 100;
-			result.verticalAlign = "bottom";
 			var h:HGroup;
 			var l:Label;
 			if(defn is TaxonAttributeDefinitionProxy) {

@@ -208,4 +208,7 @@ s|Label.indent {
 	font-size: 9;
 }
 
+.dataGroupHeader {
+	skinClass: ClassReference("org.openforis.collect.ui.skin.DataGroupHeaderSkin");
+}
 
