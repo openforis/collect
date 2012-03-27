@@ -11,6 +11,7 @@ import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
+import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.validation.ValidationResultFlag;
 import org.openforis.idm.metamodel.validation.ValidationResults;
 import org.openforis.idm.model.Attribute;
@@ -19,6 +20,7 @@ import org.openforis.idm.model.CodeAttribute;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Field;
 import org.openforis.idm.model.Node;
+import org.openforis.idm.model.NodeVisitor;
 import org.openforis.idm.model.NumberAttribute;
 import org.openforis.idm.model.Record;
 import org.openforis.idm.model.TextAttribute;
@@ -426,6 +428,63 @@ public class CollectRecord extends Record {
 			count += i;
 		}
 		return count;
+	}
+
+	/**
+	 * Clear all node states and all attribute symbols
+	 */
+	public void clearNodeStates() {
+		Entity rootEntity = getRootEntity();
+		rootEntity.traverse( new NodeVisitor() {
+			@Override
+			public void visit(Node<? extends NodeDefinition> node, int idx) {
+				if ( node instanceof Attribute ) {
+					Attribute<?,?> attribute = (Attribute<?, ?>) node;
+					if ( step == Step.ENTRY ) {
+						attribute.clearFieldSymbols();
+					}
+					attribute.clearFieldStates();
+					attribute.clearValidationResults();
+				} else if( node instanceof Entity ) {
+					Entity entity = (Entity) node;
+					entity.clearChildStates();
+					
+					EntityDefinition definition = entity.getDefinition();
+					List<NodeDefinition> childDefinitions = definition.getChildDefinitions();
+					for (NodeDefinition childDefinition : childDefinitions) {
+						String childName = childDefinition.getName();
+						entity.clearRelevanceState(childName);
+						entity.clearRequiredState(childName);
+					}
+				}
+			} 
+		} );
+	}
+	
+	/**
+	 * Update all derived states of all nodes
+	 */
+	public void updateDerivedStates() {
+		Entity rootEntity = getRootEntity();
+		rootEntity.traverse(new NodeVisitor() {
+			@Override
+			public void visit(Node<? extends NodeDefinition> node, int idx) {
+				if ( node instanceof Attribute ) {
+					Attribute<?,?> attribute = (Attribute<?, ?>) node;
+					attribute.validateValue();
+				} else if ( node instanceof Entity ) {
+					Entity entity = (Entity) node;
+					
+					EntityDefinition definition = entity.getDefinition();
+					List<NodeDefinition> childDefinitions = definition.getChildDefinitions();
+					for (NodeDefinition childDefinition : childDefinitions) {
+						String childName = childDefinition.getName();
+						entity.validateMaxCount( childName );
+						entity.validateMinCount( childName );
+					}
+				}
+			}
+		});
 	}
 	
 }
