@@ -8,6 +8,7 @@
 	<fx:Script>
 		<![CDATA[
 			import mx.collections.IList;
+			import mx.core.UIComponent;
 			
 			import org.openforis.collect.i18n.Message;
 			import org.openforis.collect.presenter.DropDownInputFieldPresenter;
@@ -20,6 +21,14 @@
 			
 			override protected function initPresenter():void {
 				presenter = new DropDownInputFieldPresenter(this);
+			}
+			
+			override public function get validationStateDisplay():UIComponent {
+				return this;
+			}
+			
+			override public function isEmpty():Boolean {
+				return dropDownList.selectedItem == null;
 			}
 			
 			[Bindable]
