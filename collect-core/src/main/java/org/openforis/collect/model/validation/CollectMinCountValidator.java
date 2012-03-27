@@ -1,6 +1,6 @@
 package org.openforis.collect.model.validation;
 
-import static org.openforis.collect.model.validation.CollectValidator.isReasonBlankSpecified;
+import static org.openforis.collect.model.validation.CollectValidator.isReasonBlankAlwaysSpecified;
 
 import java.util.List;
 
@@ -62,7 +62,18 @@ public class CollectMinCountValidator extends MinCountValidator {
 	}
 
 	protected boolean isEmpty(Attribute<?, ?> attribute) {
-		return attribute.isEmpty() && !isReasonBlankSpecified(attribute);
+		CollectRecord record = (CollectRecord) attribute.getRecord();
+		Step step = record.getStep();
+
+		if ( isReasonBlankAlwaysSpecified(attribute) ) {
+			if ( step == Step.ENTRY ) {
+				return false;
+			} else {
+				return true;
+			}
+		} else {
+			return attribute.isEmpty();
+		}
 	}
 
 }
