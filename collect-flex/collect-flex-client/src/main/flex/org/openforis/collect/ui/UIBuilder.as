@@ -20,13 +20,12 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
 	import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.NumberAttributeDefinitionProxy;
-	import org.openforis.collect.metamodel.proxy.NumberAttributeDefinitionProxy$Type;
 	import org.openforis.collect.metamodel.proxy.RangeAttributeDefinitionProxy;
-	import org.openforis.collect.metamodel.proxy.RangeAttributeDefinitionProxy$Type;
 	import org.openforis.collect.metamodel.proxy.TaxonAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.TextAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.TextAttributeDefinitionProxy$Type;
 	import org.openforis.collect.metamodel.proxy.TimeAttributeDefinitionProxy;
+	import org.openforis.collect.metamodel.proxy.UnitProxy;
 	import org.openforis.collect.model.UIConfiguration;
 	import org.openforis.collect.model.UITab;
 	import org.openforis.collect.model.UITabDefinition;
@@ -52,11 +51,11 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.ui.component.input.DateAttributeRenderer;
 	import org.openforis.collect.ui.component.input.FixedCodeInputField;
 	import org.openforis.collect.ui.component.input.InputField;
-	import org.openforis.collect.ui.component.input.IntegerInputField;
-	import org.openforis.collect.ui.component.input.IntegerRangeInputField;
 	import org.openforis.collect.ui.component.input.MemoInputField;
 	import org.openforis.collect.ui.component.input.MultipleCodeInputField;
+	import org.openforis.collect.ui.component.input.NumericAttributeRenderer;
 	import org.openforis.collect.ui.component.input.NumericInputField;
+	import org.openforis.collect.ui.component.input.RangeAttributeRenderer;
 	import org.openforis.collect.ui.component.input.RangeInputField;
 	import org.openforis.collect.ui.component.input.StringInputField;
 	import org.openforis.collect.ui.component.input.TaxonAttributeRenderer;
@@ -66,9 +65,7 @@ package org.openforis.collect.ui {
 	import spark.components.HGroup;
 	import spark.components.Label;
 	import spark.components.SkinnableContainer;
-	import spark.components.VGroup;
 	import spark.components.gridClasses.GridColumn;
-	import spark.layouts.VerticalLayout;
 	
 	/**
 	 * @author Mino Togna
@@ -256,9 +253,26 @@ package org.openforis.collect.ui {
 			} else if(def is FileAttributeDefinitionProxy) {
 				return 300;
 			} else if(def is NumberAttributeDefinitionProxy) {
-				return 70;
+				var units:IList = NumberAttributeDefinitionProxy(def).units;
+				if(units.length > 1) {
+					return 192;
+				} else if(units.length == 1) {
+					var unit:UnitProxy = units.getItemAt(0) as UnitProxy;
+					var unitWidth:Number = UIUtil.measureUnitWidth(unit.name);
+					return 70 + 2 + unitWidth;
+				} else {
+					return 70;
+				}
 			} else if(def is RangeAttributeDefinitionProxy) {
-				return 120;
+				var rangeDef:RangeAttributeDefinitionProxy = RangeAttributeDefinitionProxy(def);
+				var rangeUnitsCount:int = rangeDef.units.length;
+				if(rangeUnitsCount > 1) {
+					return 242;
+				} else if(rangeUnitsCount == 1) {
+					return 147;
+				} else {
+					return 120;
+				}
 			} else if(def is TaxonAttributeDefinitionProxy) {
 				if(parentLayout == UIUtil.LAYOUT_TABLE) {
 					return 474;
@@ -315,19 +329,9 @@ package org.openforis.collect.ui {
 			} else if(def is FileAttributeDefinitionProxy) {
 				//inputField = new FileInputField();
 			} else if(def is NumberAttributeDefinitionProxy) {
-				var numberDefn:NumberAttributeDefinitionProxy = NumberAttributeDefinitionProxy(def);
-				if(numberDefn.type == NumberAttributeDefinitionProxy$Type.INTEGER) {
-					inputField = new IntegerInputField();
-				} else {
-					inputField = new NumericInputField();
-				}
+				inputField = new NumericInputField();
 			} else if(def is RangeAttributeDefinitionProxy) {
-				var rangeDef:RangeAttributeDefinitionProxy = RangeAttributeDefinitionProxy(def);
-				if(rangeDef.type == RangeAttributeDefinitionProxy$Type.INTEGER) {
-					inputField = new IntegerRangeInputField();
-				} else { 
-					inputField = new RangeInputField();
-				}
+				inputField = new RangeInputField();
 			} else if(def is TextAttributeDefinitionProxy) {
 				var textAttributeDef:TextAttributeDefinitionProxy = TextAttributeDefinitionProxy(def);
 				var type:TextAttributeDefinitionProxy$Type = textAttributeDef.type;
@@ -354,11 +358,22 @@ package org.openforis.collect.ui {
 				renderer = new CoordinateAttributeRenderer();
 			} else if(def is DateAttributeDefinitionProxy) {
 				renderer = new DateAttributeRenderer();
+			} else if(def is NumberAttributeDefinitionProxy) {
+				var numberAttributeDefn:NumberAttributeDefinitionProxy = NumberAttributeDefinitionProxy(def);
+				if(numberAttributeDefn.precisionDefinitions != null && numberAttributeDefn.units.length >= 1) {
+					renderer = new NumericAttributeRenderer();
+					var width:Number = getInputFieldWidth(def);
+					renderer.width = width;
+				}
+			} else if(def is RangeAttributeDefinitionProxy) {
+				var rangeDef:RangeAttributeDefinitionProxy = RangeAttributeDefinitionProxy(def);
+				renderer = new RangeAttributeRenderer();
 			} else if(def is TaxonAttributeDefinitionProxy) {
 				renderer = new TaxonAttributeRenderer();
 			} else if(def is TimeAttributeDefinitionProxy) {
 				renderer = new TimeAttributeRenderer();
-			} else {
+			}
+			if(renderer == null) {
 				renderer = new AttributeItemRenderer();
 				var inputField:InputField = getInputField(def);
 				inputField.fieldIndex = 0;

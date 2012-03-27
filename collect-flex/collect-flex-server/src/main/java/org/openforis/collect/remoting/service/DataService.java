@@ -436,32 +436,42 @@ public class DataService {
 			fieldValue = val;
 		} else if(def instanceof NumberAttributeDefinition) {
 			NumberAttributeDefinition numberDef = (NumberAttributeDefinition) def;
-			Type type = numberDef.getType();
-			Number number = null;
-			switch(type) {
-				case INTEGER:
-					number = Integer.valueOf(value);
-					break;
-				case REAL:
-					number = Double.valueOf(value);
-					break;
-			}
-			if(number != null) {
-				fieldValue = number;
+			if(fieldIndex != null && fieldIndex == 1) {
+				//unit name
+				fieldValue = value;
+			} else {
+				Type type = numberDef.getType();
+				Number number = null;
+				switch(type) {
+					case INTEGER:
+						number = Integer.valueOf(value);
+						break;
+					case REAL:
+						number = Double.valueOf(value);
+						break;
+				}
+				if(number != null) {
+					fieldValue = number;
+				}
 			}
 		} else if(def instanceof RangeAttributeDefinition) {
-			RangeAttributeDefinition.Type type = ((RangeAttributeDefinition) def).getType();
-			Number number = null;
-			switch(type) {
-				case INTEGER:
-					number = Integer.valueOf(value);
-					break;
-				case REAL:
-					number = Double.valueOf(value);
-					break;
-			}
-			if(number != null) {
-				fieldValue = number;
+			if(fieldIndex != null && fieldIndex == 2) {
+				//unit name
+				fieldValue = value;
+			} else {
+				RangeAttributeDefinition.Type type = ((RangeAttributeDefinition) def).getType();
+				Number number = null;
+				switch(type) {
+					case INTEGER:
+						number = Integer.valueOf(value);
+						break;
+					case REAL:
+						number = Double.valueOf(value);
+						break;
+				}
+				if(number != null) {
+					fieldValue = number;
+				}
 			}
 		} else if(def instanceof TimeAttributeDefinition) {
 			fieldValue = Integer.valueOf(value);

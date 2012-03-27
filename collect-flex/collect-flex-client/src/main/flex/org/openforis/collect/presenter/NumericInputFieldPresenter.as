@@ -1,4 +1,6 @@
 package org.openforis.collect.presenter {
+	import org.openforis.collect.metamodel.proxy.NumberAttributeDefinitionProxy;
+	import org.openforis.collect.metamodel.proxy.NumberAttributeDefinitionProxy$Type;
 	import org.openforis.collect.ui.component.input.NumericInputField;
 	
 	/**
@@ -22,5 +24,6 @@ package org.openforis.collect.presenter {
 				return super.textToRequestValue();
 			}
 		}
+		
 	}
 }

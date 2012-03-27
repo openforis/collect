@@ -187,6 +187,11 @@ s|Label.fixedCode {
 	fontFamily: Verdana;
 }
 
+s|Label.unit {
+	fontSize: 10;
+	fontFamily: Verdana;
+}
+
 s|Button.roundCorners {
 	corner-radius: 3;
 	border-style: none;

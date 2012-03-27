@@ -10,5 +10,10 @@ package org.openforis.collect.metamodel.proxy {
     [Bindable]
     [RemoteClass(alias="org.openforis.collect.metamodel.proxy.UnitProxy")]
     public class UnitProxy extends UnitProxyBase {
+		
+		public function getLabelText(language:String = null):String {
+			return LanguageSpecificTextProxy.getLocalizedText(labels, language);
+		}
+		
     }
 }

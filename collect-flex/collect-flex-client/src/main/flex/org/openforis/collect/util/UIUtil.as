@@ -26,23 +26,25 @@ package org.openforis.collect.util
 		public static const LAYOUT_TABLE:String = "table";
 		
 		private static var fixedCodeTextFormat:UITextFormat
-		
+		private static var unitTextFormat:UITextFormat;
 		{
-			initFixedCodeTextFormat();
+			fixedCodeTextFormat = createUITextFormat("spark.components.Label.fixedCode");
+			unitTextFormat = createUITextFormat("spark.components.Label.unit");
 		}
 		
-		private static function initFixedCodeTextFormat():void {
+		private static function createUITextFormat(styleName:String):UITextFormat {
 			var application:Application = FlexGlobals.topLevelApplication as Application;
 			var styleManager:IStyleManager2 = application.styleManager;
-			var fixedCodeLabelStyle:CSSStyleDeclaration = styleManager.getMergedStyleDeclaration("spark.components.Label.fixedCode");
-			var fontSize:* = fixedCodeLabelStyle.getStyle("fontSize");
-			var fontWeight:* = fixedCodeLabelStyle.getStyle("fontWeight");
-			var font:* = fixedCodeLabelStyle.getStyle("fontFamily");
-			fixedCodeTextFormat = new UITextFormat(application.systemManager, font, fontSize);
-			fixedCodeTextFormat.bold = fontWeight == "bold";
-			fixedCodeTextFormat.italic = fontWeight == "italic";
-			fixedCodeTextFormat.antiAliasType = AntiAliasType.NORMAL;
-			fixedCodeTextFormat.gridFitType = GridFitType.NONE;
+			var styleDeclaration:CSSStyleDeclaration = styleManager.getMergedStyleDeclaration(styleName);
+			var fontSize:* = styleDeclaration.getStyle("fontSize");
+			var fontWeight:* = styleDeclaration.getStyle("fontWeight");
+			var font:* = styleDeclaration.getStyle("fontFamily");
+			var result:UITextFormat = new UITextFormat(application.systemManager, font, fontSize);
+			result.bold = fontWeight == "bold";
+			result.italic = fontWeight == "italic";
+			result.antiAliasType = AntiAliasType.NORMAL;
+			result.gridFitType = GridFitType.NONE;
+			return result;
 		}
 		
 		public static function resetScrollBars(uiComponent:UIComponent):void {
@@ -199,6 +201,11 @@ package org.openforis.collect.util
 		
 		public static function measureFixedCodeWidth(text:String):Number {
 			var measure:TextLineMetrics = fixedCodeTextFormat.measureText(text);
+			return measure.width;
+		}
+		
+		public static function measureUnitWidth(text:String):Number {
+			var measure:TextLineMetrics = unitTextFormat.measureText(text);
 			return measure.width;
 		}
 	}

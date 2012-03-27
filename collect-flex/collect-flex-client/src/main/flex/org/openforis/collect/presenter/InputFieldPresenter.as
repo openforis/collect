@@ -511,6 +511,10 @@ package org.openforis.collect.presenter {
 		protected function set changed(value:Boolean):void {
 			_changed = value;
 		}
-		
+
+		protected function get contextMenu():InputFieldContextMenu {
+			return _contextMenu;
+		}
+
 	}
 }

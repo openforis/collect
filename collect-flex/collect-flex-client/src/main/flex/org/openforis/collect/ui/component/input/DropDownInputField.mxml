@@ -22,6 +22,7 @@
 			private var _internalDataProvider:IList;
 			private var _labelFunction:Function;
 			private var _dataField:String;
+			private var _defaultValue:String;
 			private var _prompt:String = Message.get("global.dropDownPrompt");
 			
 			override protected function initPresenter():void {
@@ -85,6 +86,14 @@
 				_prompt = value;
 			}
 
+			[Bindable]
+			public function get defaultValue():String {
+				return _defaultValue;
+			}
+			
+			public function set defaultValue(value:String):void {
+				_defaultValue = value;
+			}
 
 		]]>
 	</fx:Script>
@@ -143,6 +152,7 @@
 	<graphics:RemarksPresentIcon id="remarksPresentIcon"
 								 top="0"
 								 right="0"
+								 visible="false"
 								 />
 	
 </input:InputField>

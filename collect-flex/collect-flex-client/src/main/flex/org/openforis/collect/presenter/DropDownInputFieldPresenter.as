@@ -112,7 +112,7 @@ package org.openforis.collect.presenter {
 							break;
 						case FieldSymbol.DASH_ON_FORM:
 							item = DASH_ON_FORM_ITEM;
-							break;1
+							break;
 						case FieldSymbol.ILLEGIBLE:
 							item = ILLEGIBLE_ITEM;
 							break;
@@ -120,6 +120,8 @@ package org.openforis.collect.presenter {
 				} else if(value != null) {
 					item = getItem(value);
 				}
+			} else if(_view.defaultValue != null) {
+				item = getItem(_view.defaultValue);
 			}
 			contextMenu.updateItems();
 			_view.dropDownList.selectedItem = item;
