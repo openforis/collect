@@ -3,7 +3,12 @@
 				  xmlns:s="library://ns.adobe.com/flex/spark" 
 				  xmlns:mx="library://ns.adobe.com/flex/mx" 
 				  xmlns:input="org.openforis.collect.ui.component.input.*" 
+				  xmlns:graphics="org.openforis.collect.ui.skin.graphics.*" 
 				  >
+	
+	<input:layout>
+		<s:BasicLayout />
+	</input:layout>
 	
 	<fx:Script>
 		<![CDATA[
@@ -21,6 +26,10 @@
 			
 			override protected function initPresenter():void {
 				presenter = new DropDownInputFieldPresenter(this);
+			}
+			
+			override public function set hasRemarks(value:Boolean):void {
+				remarksPresentIcon.visible = value;
 			}
 			
 			override public function get validationStateDisplay():UIComponent {
@@ -130,5 +139,10 @@
 			</fx:Component>
 		</s:itemRenderer>
 	</s:DropDownList>
+	
+	<graphics:RemarksPresentIcon id="remarksPresentIcon"
+								 top="0"
+								 right="0"
+								 />
 	
 </input:InputField>
