@@ -1,36 +1,23 @@
 package org.openforis.collect.presenter {
-	import flash.display.DisplayObject;
 	import flash.events.Event;
-	import flash.events.MouseEvent;
 	
 	import mx.binding.utils.ChangeWatcher;
 	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
-	import mx.core.FlexGlobals;
-	import mx.events.CloseEvent;
 	import mx.events.CollectionEvent;
-	import mx.managers.PopUpManager;
 	import mx.rpc.AsyncResponder;
-	import mx.rpc.AsyncToken;
 	import mx.rpc.IResponder;
-	import mx.rpc.events.ResultEvent;
 	
 	import org.openforis.collect.client.UpdateRequestToken;
 	import org.openforis.collect.event.ApplicationEvent;
-	import org.openforis.collect.metamodel.proxy.CodeAttributeDefinitionProxy;
-	import org.openforis.collect.metamodel.proxy.CodeListItemProxy;
 	import org.openforis.collect.model.FieldSymbol;
 	import org.openforis.collect.model.proxy.AttributeProxy;
-	import org.openforis.collect.model.proxy.CodeProxy;
 	import org.openforis.collect.model.proxy.FieldProxy;
 	import org.openforis.collect.remoting.service.UpdateRequest;
 	import org.openforis.collect.remoting.service.UpdateRequestOperation;
 	import org.openforis.collect.remoting.service.UpdateRequestOperation$Method;
 	import org.openforis.collect.remoting.service.UpdateResponse;
-	import org.openforis.collect.ui.component.input.CodeInputField;
-	import org.openforis.collect.ui.component.input.CodeListDialog;
 	import org.openforis.collect.ui.component.input.MultipleCodeInputField;
-	import org.openforis.collect.ui.component.input.TextInput;
 	import org.openforis.collect.util.ArrayUtil;
 	import org.openforis.collect.util.CollectionUtil;
 	import org.openforis.collect.util.StringUtil;
@@ -134,46 +121,7 @@ package org.openforis.collect.presenter {
 			token.remarks = remarks;
 			dataClient.updateActiveRecord(req, token, updateResultHandler, faultHandler);
 		}
-		/*
-		override public function applyRemarks(remarks:String):void {
-			var updatedFields:ArrayCollection = new ArrayCollection();
-			var operations:ArrayCollection = new ArrayCollection();
-			for each (var a:AttributeProxy in _view.attributes) {
-				var value:String = codeAttributeToText(a);
-				var field:FieldProxy = a.getField(0);
-				var symbol:FieldSymbol = field.symbol;
-				var o:UpdateRequestOperation = getUpdateRequestOperation(UpdateRequestOperation$Method.UPDATE, 
-					a.id, value, symbol, remarks);
-				operations.addItem(o);
-				updatedFields.addAll(a.fields);
-			}
-			var req:UpdateRequest = new UpdateRequest();
-			req.operations = operations;
-			var token:UpdateRequestToken = new UpdateRequestToken(UpdateRequestToken.TYPE_UPDATE_REMARKS);
-			token.remarks = remarks;
-			token.updatedFields = updatedFields;
-			dataClient.updateActiveRecord(req, token, updateResultHandler, faultHandler);
-		}
 		
-		override public function applySymbol(symbol:FieldSymbol):void {
-			var updatedFields:ArrayCollection = new ArrayCollection();
-			var operations:ArrayCollection = new ArrayCollection();
-			var remarks:String = getRemarks();
-			for each (var a:AttributeProxy in _view.attributes) {
-				var value:String = codeAttributeToText(a);
-				var o:UpdateRequestOperation = getUpdateRequestOperation(UpdateRequestOperation$Method.UPDATE, 
-					a.id, value, symbol, remarks);
-				operations.addItem(o);
-				updatedFields.addAll(a.fields);
-			}
-			var req:UpdateRequest = new UpdateRequest();
-			req.operations = operations;
-			var token:UpdateRequestToken = new UpdateRequestToken(UpdateRequestToken.TYPE_UPDATE_SYMBOL);
-			token.updatedFields = updatedFields;
-			token.symbol = symbol;
-			dataClient.updateActiveRecord(req, token, updateResultHandler, faultHandler);
-		}
-		*/
 		override protected function getRemarks():String {
 			if(CollectionUtil.isNotEmpty(_view.attributes)) {
 				var a:AttributeProxy = AttributeProxy(_view.attributes.getItemAt(0));
