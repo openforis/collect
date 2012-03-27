@@ -440,9 +440,9 @@ public class CollectRecord extends Record {
 			public void visit(Node<? extends NodeDefinition> node, int idx) {
 				if ( node instanceof Attribute ) {
 					Attribute<?,?> attribute = (Attribute<?, ?>) node;
-					if ( step == Step.ENTRY ) {
-						attribute.clearFieldSymbols();
-					}
+//					if ( step == Step.ENTRY ) {
+//						attribute.clearFieldSymbols();
+//					}
 					attribute.clearFieldStates();
 					attribute.clearValidationResults();
 				} else if( node instanceof Entity ) {
