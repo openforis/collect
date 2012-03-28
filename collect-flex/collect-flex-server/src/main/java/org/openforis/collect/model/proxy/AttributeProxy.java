@@ -19,18 +19,22 @@ import org.openforis.idm.model.Time;
 
 /**
  * @author M. Togna
+ * @author S. Ricci
  * 
- */
+ * */
 public class AttributeProxy extends NodeProxy {
 
 	private transient Attribute<? extends AttributeDefinition, ?> attribute;
 	private ValidationResultsProxy validationResults;
+	private boolean errorConfirmed;
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public AttributeProxy(EntityProxy parent, Attribute attribute) {
 		super(parent, attribute);
 		this.attribute = attribute;
 		validationResults = new ValidationResultsProxy(attribute.validateValue());
+		CollectRecord record = (CollectRecord) attribute.getRecord();
+		errorConfirmed = record.isErrorConfirmed(attribute);
 	}
 
 	@ExternalizedProperty
@@ -79,11 +83,12 @@ public class AttributeProxy extends NodeProxy {
 		return result;
 	}
 	
-	@ExternalizedProperty
 	public boolean isErrorConfirmed() {
-		CollectRecord record = (CollectRecord) attribute.getRecord();
-		boolean errorConfirmed = record.isErrorConfirmed(attribute);
 		return errorConfirmed;
-	}	
+	}
+	
+	public void setErrorConfirmed(boolean value) {
+		errorConfirmed = value;
+	}
 
 }

@@ -11,6 +11,9 @@ package org.openforis.collect.model.proxy {
 	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
 	
+	import org.openforis.collect.client.UpdateRequestToken;
+	import org.openforis.collect.event.ApplicationEvent;
+	import org.openforis.collect.event.EventDispatcherFactory;
 	import org.openforis.collect.remoting.service.UpdateResponse;
 
     [Bindable]
@@ -51,11 +54,33 @@ package org.openforis.collect.model.proxy {
 			return _nodesMap[id];
 		}
 		
-		public function update(responses:IList):void {
+		public function update(responses:IList, token:UpdateRequestToken = null):void {
+			var field:FieldProxy;
+			if(token != null && token is UpdateRequestToken) {
+				switch(UpdateRequestToken(token).type) {
+					case UpdateRequestToken.UPDATE_VALUE:
+						//do not break, apply symbol to field
+					case UpdateRequestToken.UPDATE_SYMBOL:
+						for each (field in token.updatedFields) {
+							field.symbol = token.symbol;
+						}
+						break;
+					case UpdateRequestToken.UPDATE_REMARKS:
+						for each (field in token.updatedFields) {
+							field.remarks = token.remarks;
+						}
+						break;
+				}
+			}
+			
 			for each (var response:UpdateResponse in responses)	{
 				processResponse(response);
 			}
 			_updated = true;
+			
+			var appEvt:ApplicationEvent = new ApplicationEvent(ApplicationEvent.UPDATE_RESPONSE_RECEIVED);
+			appEvt.result = responses;
+			EventDispatcherFactory.getEventDispatcher().dispatchEvent(appEvt);
 		}
 		
 		private function processResponse(response:UpdateResponse):void {
@@ -89,6 +114,7 @@ package org.openforis.collect.model.proxy {
 							var f:FieldProxy = a.getField(i);
 							f.value = response.updatedFieldValues.get(i);
 						}
+						a.errorConfirmed = false;
 						parent = getNode(node.parentId) as EntityProxy;
 						parent.updateKeyText();
 					}

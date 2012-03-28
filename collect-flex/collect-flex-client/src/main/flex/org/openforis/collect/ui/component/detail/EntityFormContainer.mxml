@@ -5,7 +5,7 @@
 					xmlns:detail="org.openforis.collect.ui.component.detail.*"
 					width="100%" height="100%"
 					creationComplete="creationCompleteHandler(event)"
-					creationPolicy="all"
+					creationPolicy="all" xmlns:layout="org.openforis.collect.ui.layout.*"
 					>
 	
 	<fx:Script>
@@ -223,7 +223,14 @@
 					  gap="0" 
 					  includeIn="withTabs"
 					  >
-				<s:TabBar id="tabBar" dataProvider="{viewStack}" />
+				<s:TabBar id="tabBar" 
+						  dataProvider="{viewStack}"
+						  width="100%">
+					<s:layout>
+						<layout:FlowLayout />
+					</s:layout>
+				</s:TabBar>
+				
 				<s:BorderContainer
 					width="100%" 
 					height="100%"

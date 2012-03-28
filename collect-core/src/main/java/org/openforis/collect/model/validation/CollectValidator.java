@@ -19,6 +19,8 @@ import org.openforis.idm.metamodel.validation.Validator;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Field;
+import org.openforis.idm.model.NumberAttribute;
+import org.openforis.idm.model.NumericRangeAttribute;
 import org.openforis.idm.model.Record;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -55,7 +57,7 @@ public class CollectValidator extends Validator {
 			/*
 			 * if the attribute is not empty and 'reason blank' has not been specified than validate it
 			 */
-			if (!(attribute.isEmpty() || isReasonBlankSpecified(attribute))) {
+			if (!(attribute.isEmpty() || isReasonBlankAlwaysSpecified(attribute))) {
 				validateAttributeValue(attribute, results);
 				if (!results.hasErrors()) {
 					validateAttributeChecks(attribute, results);
@@ -123,13 +125,22 @@ public class CollectValidator extends Validator {
 		return record.isErrorConfirmed(attribute);
 	}
 
-	static boolean isReasonBlankSpecified(Attribute<?, ?> attribute) {
-		int fieldCount = attribute.getFieldCount();
-		for (int i = 0; i < fieldCount; i++) {
+	static boolean isReasonBlankAlwaysSpecified(Attribute<?, ?> attribute) {
+		int fieldCount = 0;
+		// ignore unit for numeric attributes
+		if ( attribute instanceof NumberAttribute ) {
+			fieldCount = 1;
+		} else if ( attribute instanceof NumericRangeAttribute ) {
+			fieldCount = 2;
+		} else {
+			fieldCount = attribute.getFieldCount();
+		}
+
+		for ( int i = 0 ; i < fieldCount ; i++ ) {
 			Field<?> field = attribute.getField(i);
-			Character character = field.getSymbol();
-			FieldSymbol fieldSymbol = FieldSymbol.valueOf(character);
-			if (fieldSymbol == null || !fieldSymbol.isReasonBlank()) {
+			Character symbolCode = field.getSymbol();
+			FieldSymbol symbol = FieldSymbol.valueOf(symbolCode);
+			if ( symbol == null || !symbol.isReasonBlank() ) {
 				return false;
 			}
 		}

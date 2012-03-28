@@ -7,9 +7,12 @@ package org.openforis.collect.ui.component.input {
 	import org.openforis.collect.event.EventDispatcherFactory;
 	import org.openforis.collect.event.NodeEvent;
 	import org.openforis.collect.i18n.Message;
+	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
+	import org.openforis.collect.metamodel.proxy.CodeAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
 	import org.openforis.collect.model.CollectRecord$Step;
 	import org.openforis.collect.model.proxy.EntityProxy;
+	import org.openforis.collect.ui.component.detail.AttributeFormItem;
 	import org.openforis.collect.ui.component.detail.CollectFormItem;
 
 	/**
@@ -20,8 +23,10 @@ package org.openforis.collect.ui.component.input {
 		
 		private static const APPROVE_MISSING:ContextMenuItem = new ContextMenuItem(Message.get("edit.contextMenu.approveMissingValue"), true);
 		private static const SET_BLANK_ON_FORM:ContextMenuItem = new ContextMenuItem(Message.get("edit.contextMenu.blankOnForm"), true);
+		private static const CONFIRM_ERROR:ContextMenuItem = new ContextMenuItem(Message.get("edit.contextMenu.approveError"), true);
 		private static const MENU_ITEMS:Array = [
 			APPROVE_MISSING,
+			CONFIRM_ERROR,
 			SET_BLANK_ON_FORM
 		];
 		
@@ -72,6 +77,15 @@ package org.openforis.collect.ui.component.input {
 							break;
 					}
 				}
+				if(step == CollectRecord$Step.ENTRY) {
+					var hasErrors:Boolean = _formItem.parentEntity.childContainsErrors(_formItem.nodeDefinition.name);
+					if(hasErrors) {
+						var hasConfirmedError:Boolean = _formItem.parentEntity.hasConfirmedError(_formItem.nodeDefinition.name);
+						if(! hasConfirmedError) {
+							items.push(CONFIRM_ERROR);
+						}
+					}
+				}
 			}
 			return items;
 		}
@@ -87,6 +101,17 @@ package org.openforis.collect.ui.component.input {
 					nodeEvent = new NodeEvent(NodeEvent.APPROVE_MISSING);
 					nodeEvent.parentEntity = parentEntity;
 					nodeEvent.nodeName = nodeDefinition.name;
+					break;
+				case CONFIRM_ERROR:
+					nodeEvent = new NodeEvent(NodeEvent.CONFIRM_ERROR);
+					if(nodeDefinition is AttributeDefinitionProxy) {
+						if(nodeDefinition.multiple && ! (nodeDefinition is CodeAttributeDefinitionProxy)) {
+							nodeEvent.parentEntity = parentEntity;
+							nodeEvent.nodeName = nodeDefinition.name;
+						} else {
+							nodeEvent.nodeProxy = AttributeFormItem(formItem).attribute;
+						}
+					}
 					break;
 			}
 			if(nodeEvent != null) {

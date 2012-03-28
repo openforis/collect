@@ -172,8 +172,7 @@ package org.openforis.collect.ui.component.input {
 					AlertUtil.showConfirm("global.confirmDelete", [entityLabel], "global.confirmAlertTitle", performDeleteNode, [parentEntity]);
 					break;
 				case CONFIRM_ERROR:
-					nodeEvent = new NodeEvent(NodeEvent.CONFIRM_ERROR);
-					nodeEvent.nodeProxy = attribute;
+					nodeEvent = createNodeEvent(NodeEvent.CONFIRM_ERROR, inputField);
 					break;
 				case APPROVE_MISSING:
 					nodeEvent = new NodeEvent(NodeEvent.APPROVE_MISSING);

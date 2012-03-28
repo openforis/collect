@@ -117,28 +117,8 @@ package org.openforis.collect.client {
 		}
 			
 		protected function updateActiveRecordResultHandler(event:ResultEvent, token:UpdateRequestToken):void {
-			var field:FieldProxy;
-			if(token != null && token is UpdateRequestToken) {
-				switch(UpdateRequestToken(token).type) {
-					case UpdateRequestToken.UPDATE_VALUE:
-						//do not break, apply symbol to field
-					case UpdateRequestToken.UPDATE_SYMBOL:
-						for each (field in token.updatedFields) {
-							field.symbol = token.symbol;
-						}
-						break;
-					case UpdateRequestToken.UPDATE_REMARKS:
-						for each (field in token.updatedFields) {
-							field.remarks = token.remarks;
-						}
-						break;
-				}
-			}
 			var responses:IList = IList(event.result);
-			Application.activeRecord.update(responses);
-			var appEvt:ApplicationEvent = new ApplicationEvent(ApplicationEvent.UPDATE_RESPONSE_RECEIVED);
-			appEvt.result = responses;
-			EventDispatcherFactory.getEventDispatcher().dispatchEvent(appEvt);
+			Application.activeRecord.update(responses, token);
 		}
 
 		private function getRecordStepNumber(step:CollectRecord$Step):int {

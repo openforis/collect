@@ -15,11 +15,29 @@ package org.openforis.collect.event {
 		public static const UPDATE_RESPONSE_RECEIVED:String = "updateResponseReceived";
 		public static const RECORD_SAVED:String = "recordSaved";
 			
-		public var result:Object;
+		private var _result:Object;
+		private var _token:Object;
 		
 		public function ApplicationEvent(type:String, bubbles:Boolean=false, cancelable:Boolean=false) {
 			super(type, bubbles, cancelable);
 		}
 		
+		public function get result():Object {
+			return _result;
+		}
+
+		public function set result(value:Object):void {
+			_result = value;
+		}
+
+		public function get token():Object {
+			return _token;
+		}
+
+		public function set token(value:Object):void {
+			_token = value;
+		}
+
+
 	}
 }

@@ -3,11 +3,17 @@
 				  xmlns:s="library://ns.adobe.com/flex/spark" 
 				  xmlns:mx="library://ns.adobe.com/flex/mx" 
 				  xmlns:input="org.openforis.collect.ui.component.input.*" 
+				  xmlns:graphics="org.openforis.collect.ui.skin.graphics.*" 
 				  >
+	
+	<input:layout>
+		<s:BasicLayout />
+	</input:layout>
 	
 	<fx:Script>
 		<![CDATA[
 			import mx.collections.IList;
+			import mx.core.UIComponent;
 			
 			import org.openforis.collect.i18n.Message;
 			import org.openforis.collect.presenter.DropDownInputFieldPresenter;
@@ -16,10 +22,23 @@
 			private var _internalDataProvider:IList;
 			private var _labelFunction:Function;
 			private var _dataField:String;
+			private var _defaultValue:String;
 			private var _prompt:String = Message.get("global.dropDownPrompt");
 			
 			override protected function initPresenter():void {
 				presenter = new DropDownInputFieldPresenter(this);
+			}
+			
+			override public function set hasRemarks(value:Boolean):void {
+				remarksPresentIcon.visible = value;
+			}
+			
+			override public function get validationStateDisplay():UIComponent {
+				return this;
+			}
+			
+			override public function isEmpty():Boolean {
+				return dropDownList.selectedItem == null;
 			}
 			
 			[Bindable]
@@ -67,6 +86,14 @@
 				_prompt = value;
 			}
 
+			[Bindable]
+			public function get defaultValue():String {
+				return _defaultValue;
+			}
+			
+			public function set defaultValue(value:String):void {
+				_defaultValue = value;
+			}
 
 		]]>
 	</fx:Script>
@@ -121,5 +148,11 @@
 			</fx:Component>
 		</s:itemRenderer>
 	</s:DropDownList>
+	
+	<graphics:RemarksPresentIcon id="remarksPresentIcon"
+								 top="0"
+								 right="0"
+								 visible="false"
+								 />
 	
 </input:InputField>
