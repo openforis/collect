@@ -193,8 +193,8 @@ public class ModelDaoIntegrationTest {
 			tree1.addValue("total_height", 2.0);
 //			tree1.addValue("bole_height", (Double) null).setMetadata(new CollectAttributeMetadata('*',null,"No value specified"));
 			RealAttribute boleHeight = tree1.addValue("bole_height", (Double) null);
-			boleHeight.getField().setSymbol('*');
-			boleHeight.getField().setRemarks("No value specified");
+			boleHeight.getField(0).setSymbol('*');
+			boleHeight.getField(0).setRemarks("No value specified");
 			Entity tree2 = plot.addEntity("tree");
 			tree2.addValue("tree_no", 2);
 			tree2.addValue("dbh", 82.8);
