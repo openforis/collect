@@ -287,6 +287,7 @@ package org.openforis.collect.presenter {
 				var responses:IList = IList(event.result);
 				for each (var response:UpdateResponse in responses) {
 					if(response.nodeId == _view.attribute.id) {
+						_view.changed = false
 						updateView();
 						return;
 					}
@@ -295,7 +296,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function attributeChangeHandler(event:Event):void {
-			changed = false;
+			_view.changed = false;
 			_view.visited = false;
 			_view.updating = false;
 			updateView();
@@ -303,7 +304,7 @@ package org.openforis.collect.presenter {
 		
 		protected function changeHandler(event:Event):void {
 			//TODO if autocomplete enabled show autocomplete popup...
-			changed = true;
+			_view.changed = true;
 			var inputFieldEvent:InputFieldEvent = new InputFieldEvent(InputFieldEvent.CHANGING);
 			_view.dispatchEvent(inputFieldEvent);
 		}
@@ -313,7 +314,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function focusOutHandler(event:FocusEvent):void {
-			if(_view.applyChangesOnFocusOut && changed) {
+			if(_view.applyChangesOnFocusOut && _view.changed) {
 				updateValue();
 			}
 			_view.visited = true;
@@ -332,7 +333,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		public function undoLastChange():void {
-			changed = false;
+			_view.changed = false;
 			updateView();
 		}
 		
@@ -394,7 +395,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function updateResultHandler(event:ResultEvent, token:UpdateRequestToken):void {
-			changed = false;
+			_view.changed = false;
 			_view.updating = false;
 			//_view.currentState = InputField.STATE_SAVE_COMPLETE;
 		}
@@ -501,15 +502,6 @@ package org.openforis.collect.presenter {
 		
 		protected function get dataClient():DataClient {
 			return _dataClient;
-		}
-
-		[Bindable]
-		protected function get changed():Boolean {
-			return _changed;
-		}
-		
-		protected function set changed(value:Boolean):void {
-			_changed = value;
 		}
 
 		protected function get contextMenu():InputFieldContextMenu {
