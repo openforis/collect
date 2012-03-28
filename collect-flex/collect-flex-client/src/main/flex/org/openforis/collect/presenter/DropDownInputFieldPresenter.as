@@ -9,8 +9,10 @@ package org.openforis.collect.presenter {
 	import mx.collections.IList;
 	import mx.events.PropertyChangeEvent;
 	
+	import org.openforis.collect.Application;
 	import org.openforis.collect.event.UIEvent;
 	import org.openforis.collect.i18n.Message;
+	import org.openforis.collect.model.CollectRecord$Step;
 	import org.openforis.collect.model.FieldSymbol;
 	import org.openforis.collect.model.proxy.AttributeProxy;
 	import org.openforis.collect.model.proxy.FieldProxy;
@@ -133,6 +135,7 @@ package org.openforis.collect.presenter {
 				item = getItem(_view.defaultValue);
 			}
 			contextMenu.updateItems();
+			_view.editable = Application.activeRecord.step != CollectRecord$Step.ANALYSIS;
 			_view.dropDownList.selectedItem = item;
 			_view.hasRemarks = hasRemarks;
 		}

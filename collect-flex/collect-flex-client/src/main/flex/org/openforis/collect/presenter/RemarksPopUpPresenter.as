@@ -10,8 +10,10 @@ package org.openforis.collect.presenter {
 	import mx.events.FlexMouseEvent;
 	import mx.managers.PopUpManager;
 	
+	import org.openforis.collect.Application;
 	import org.openforis.collect.event.EventDispatcherFactory;
 	import org.openforis.collect.event.NodeEvent;
+	import org.openforis.collect.model.CollectRecord$Step;
 	import org.openforis.collect.model.FieldSymbol;
 	import org.openforis.collect.model.proxy.AttributeProxy;
 	import org.openforis.collect.model.proxy.FieldProxy;
@@ -33,6 +35,7 @@ package org.openforis.collect.presenter {
 		
 		private var lastSelectedRadioButton:RadioButton = null;
 		private var popUpOpened:Boolean = false;
+		private var remarksChanged:Boolean = false;
 		
 		private var view:RemarksPopUp;
 		private var _inputField:InputField;
@@ -42,6 +45,7 @@ package org.openforis.collect.presenter {
 		
 		protected function initPopUp():void {
 			//init event listeners
+			view.remarksTextArea.addEventListener(Event.CHANGE, remarksTextAreaChangeHandler);
 			view.remarksTextArea.addEventListener(KeyboardEvent.KEY_DOWN, remarksTextAreaKeyDownHandler);
 			view.okButton.addEventListener(MouseEvent.CLICK, okButtonClickHandler);
 			view.addEventListener(FlexMouseEvent.MOUSE_DOWN_OUTSIDE, mouseDownOutsideHandler);
@@ -56,6 +60,10 @@ package org.openforis.collect.presenter {
 			} else {
 				lastSelectedRadioButton = radioButton;	
 			}
+		}
+		
+		protected function remarksTextAreaChangeHandler(event:Event):void {
+			remarksChanged = true;
 		}
 		
 		protected function remarksTextAreaKeyDownHandler(event:KeyboardEvent):void {
@@ -74,10 +82,12 @@ package org.openforis.collect.presenter {
 		}
 		
 		public function openPopUp(inputField:InputField, alignToField:Boolean = false, alignmentPoint:Point = null):void {
+			remarksChanged = false;
 			var firstOpen:Boolean = (view == null);
 			if(firstOpen) {
 				view = new RemarksPopUp();
 			}
+			view.editable = Application.activeRecord.step != CollectRecord$Step.ANALYSIS;
 			_inputField = inputField;
 
 			if(! popUpOpened) {
@@ -124,18 +134,19 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function okButtonClickHandler(event:Event = null):void {
-			var remarks:String = StringUtil.trim(view.remarksTextArea.text);
-			var nodeEvent:NodeEvent = new NodeEvent(NodeEvent.UPDATE_REMARKS);
-			nodeEvent.remarks = remarks;
-			if(_inputField.attributeDefinition.multiple && _inputField is CodeInputField) {
-				var attrName:String = _inputField.attributeDefinition.name;
-				nodeEvent.nodes = _inputField.parentEntity.getChildren(attrName);
-			} else {
-				nodeEvent.nodeProxy = _inputField.attribute;
-				nodeEvent.fieldIdx = _inputField.fieldIndex;
+			if(remarksChanged) {
+				var remarks:String = StringUtil.trim(view.remarksTextArea.text);
+				var nodeEvent:NodeEvent = new NodeEvent(NodeEvent.UPDATE_REMARKS);
+				nodeEvent.remarks = remarks;
+				if(_inputField.attributeDefinition.multiple && _inputField is CodeInputField) {
+					var attrName:String = _inputField.attributeDefinition.name;
+					nodeEvent.nodes = _inputField.parentEntity.getChildren(attrName);
+				} else {
+					nodeEvent.nodeProxy = _inputField.attribute;
+					nodeEvent.fieldIdx = _inputField.fieldIndex;
+				}
+				EventDispatcherFactory.getEventDispatcher().dispatchEvent(nodeEvent);
 			}
-			EventDispatcherFactory.getEventDispatcher().dispatchEvent(nodeEvent);
-			
 			hidePopUp();
 		}
 		

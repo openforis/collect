@@ -27,14 +27,6 @@
 				_separator = value;
 			}
 			
-			protected function twoCharsZeroPaddingFormatFunction(value:String):String {
-				return InputField.zeroPaddingFormatFunction(value, 2);
-			}
-
-			protected function fourCharsZeroPaddingFormatFunction(value:String):String {
-				return InputField.zeroPaddingFormatFunction(value, 4);
-			}
-			
 		]]>
 	</fx:Script>
 	
@@ -50,7 +42,6 @@
 								 width="25" 
 								 maxChars="2"
 								 positive="true"
-								 textFormatFunction="{twoCharsZeroPaddingFormatFunction}"
 								 />
 		<s:Label id="separator1" text="{separator}" />
 		<input:IntegerInputField id="month"
@@ -61,7 +52,6 @@
 								 width="25 " 
 								 maxChars="2"
 								 positive="true"
-								 textFormatFunction="{twoCharsZeroPaddingFormatFunction}"
 								 />
 		<s:Label id="separator2" text="{separator}" />
 		<input:IntegerInputField id="year"
@@ -72,10 +62,13 @@
 								 width="40" 
 								 maxChars="4"
 								 positive="true"
-								 textFormatFunction="{fourCharsZeroPaddingFormatFunction}"
 								 />
-		<input:DateField tabEnabled="false" tabFocusEnabled="false"
-						 id="dateField" width="16" editable="false"/>
+		<input:DateField id="dateField" 
+						 tabEnabled="false" 
+						 tabFocusEnabled="false"
+						 width="16" 
+						 editable="false"
+						 />
 	</s:HGroup>
 	
 </detail:CompositeAttributeRenderer>

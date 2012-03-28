@@ -12,8 +12,10 @@ package org.openforis.collect.presenter {
 	import mx.rpc.IResponder;
 	import mx.rpc.events.ResultEvent;
 	
+	import org.openforis.collect.Application;
 	import org.openforis.collect.metamodel.proxy.CodeAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.CodeListItemProxy;
+	import org.openforis.collect.model.CollectRecord$Step;
 	import org.openforis.collect.model.proxy.AttributeProxy;
 	import org.openforis.collect.model.proxy.FieldProxy;
 	import org.openforis.collect.ui.component.input.CodeInputField;
@@ -85,6 +87,7 @@ package org.openforis.collect.presenter {
 			}
 			PopUpManager.addPopUp(_popUp, FlexGlobals.topLevelApplication as DisplayObject, true);
 			PopUpManager.centerPopUp(_popUp);
+			_popUp.editable = Application.activeRecord.step != CollectRecord$Step.ANALYSIS;
 			_popUp.multiple = _view.attributeDefinition.multiple;
 			_popUp.maxSpecified = _view.attributeDefinition.maxCount;
 			_popUp.title = _view.attributeDefinition.getLabelText();

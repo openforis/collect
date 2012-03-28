@@ -46,6 +46,7 @@ package org.openforis.collect.ui.component.input {
 		private var _maxChars:int;
 		private var _restrict:String;
 		private var _changed:Boolean;
+		private var _editable:Boolean = false;
 		protected var _textInput:UIComponent;
 		
 		public function InputField() {
@@ -267,7 +268,16 @@ package org.openforis.collect.ui.component.input {
 		public function set changed(value:Boolean):void {
 			_changed = value;
 		}
-
 		
+		public function get editable():Boolean {
+			return _editable;
+		}
+		
+		public function set editable(value:Boolean):void {
+			_editable = value;
+			if(textInput != null && textInput.hasOwnProperty("editable")) {
+				textInput["editable"] = value;
+			}
+		}
 	}
 }
