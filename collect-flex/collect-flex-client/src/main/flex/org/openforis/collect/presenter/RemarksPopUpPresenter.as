@@ -10,9 +10,12 @@ package org.openforis.collect.presenter {
 	import mx.events.FlexMouseEvent;
 	import mx.managers.PopUpManager;
 	
+	import org.openforis.collect.event.EventDispatcherFactory;
+	import org.openforis.collect.event.NodeEvent;
 	import org.openforis.collect.model.FieldSymbol;
 	import org.openforis.collect.model.proxy.AttributeProxy;
 	import org.openforis.collect.model.proxy.FieldProxy;
+	import org.openforis.collect.ui.component.input.CodeInputField;
 	import org.openforis.collect.ui.component.input.InputField;
 	import org.openforis.collect.ui.component.input.RemarksPopUp;
 	import org.openforis.collect.util.CollectionUtil;
@@ -122,7 +125,17 @@ package org.openforis.collect.presenter {
 		
 		protected function okButtonClickHandler(event:Event = null):void {
 			var remarks:String = StringUtil.trim(view.remarksTextArea.text);
-			_inputField.applyRemarks(remarks);
+			var nodeEvent:NodeEvent = new NodeEvent(NodeEvent.UPDATE_REMARKS);
+			nodeEvent.remarks = remarks;
+			if(_inputField.attributeDefinition.multiple && _inputField is CodeInputField) {
+				var attrName:String = _inputField.attributeDefinition.name;
+				nodeEvent.nodes = _inputField.parentEntity.getChildren(attrName);
+			} else {
+				nodeEvent.nodeProxy = _inputField.attribute;
+				nodeEvent.fieldIdx = _inputField.fieldIndex;
+			}
+			EventDispatcherFactory.getEventDispatcher().dispatchEvent(nodeEvent);
+			
 			hidePopUp();
 		}
 		

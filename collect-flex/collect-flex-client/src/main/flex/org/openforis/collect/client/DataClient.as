@@ -1,26 +1,16 @@
 package org.openforis.collect.client {
-	import flash.net.URLRequest;
-	import flash.net.navigateToURL;
-	
 	import mx.collections.IList;
 	import mx.rpc.AsyncToken;
 	import mx.rpc.IResponder;
-	import mx.rpc.events.FaultEvent;
 	import mx.rpc.events.ResultEvent;
 	import mx.rpc.remoting.Operation;
 	
 	import org.openforis.collect.Application;
 	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.event.EventDispatcherFactory;
-	import org.openforis.collect.i18n.Message;
 	import org.openforis.collect.model.CollectRecord$Step;
 	import org.openforis.collect.model.proxy.FieldProxy;
 	import org.openforis.collect.remoting.service.UpdateRequest;
-	import org.openforis.collect.ui.Images;
-	import org.openforis.collect.ui.component.BlockingMessagePopUp;
-	import org.openforis.collect.ui.component.input.InputField;
-	import org.openforis.collect.util.AlertUtil;
-	import org.openforis.collect.util.UIUtil;
 	
 	/**
 	 * 
@@ -73,8 +63,8 @@ package org.openforis.collect.client {
 			token.addResponder(responder);
 		}
 		
-		public function getRecordSummaries(responder:IResponder, rootEntityName:String, offset:int, maxNumberOfRecords:int, orderByField:String=null, filter:String = null):void {
-			var token:AsyncToken = this._getRecordSummariesOperation.send(rootEntityName, offset, maxNumberOfRecords, orderByField, filter);
+		public function getRecordSummaries(responder:IResponder, rootEntityName:String, offset:int, maxNumberOfRecords:int, sortFields:IList=null, filter:String = null):void {
+			var token:AsyncToken = this._getRecordSummariesOperation.send(rootEntityName, offset, maxNumberOfRecords, sortFields, filter);
 			token.addResponder(responder);
 		}
 		
@@ -127,28 +117,8 @@ package org.openforis.collect.client {
 		}
 			
 		protected function updateActiveRecordResultHandler(event:ResultEvent, token:UpdateRequestToken):void {
-			var field:FieldProxy;
-			if(token != null && token is UpdateRequestToken) {
-				switch(UpdateRequestToken(token).type) {
-					case UpdateRequestToken.TYPE_UPDATE_VALUE:
-						//do not break, apply symbol to field
-					case UpdateRequestToken.TYPE_UPDATE_SYMBOL:
-						for each (field in token.updatedFields) {
-							field.symbol = token.symbol;
-						}
-						break;
-					case UpdateRequestToken.TYPE_UPDATE_REMARKS:
-						for each (field in token.updatedFields) {
-							field.remarks = token.remarks;
-						}
-						break;
-				}
-			}
 			var responses:IList = IList(event.result);
-			Application.activeRecord.update(responses);
-			var appEvt:ApplicationEvent = new ApplicationEvent(ApplicationEvent.UPDATE_RESPONSE_RECEIVED);
-			appEvt.result = responses;
-			EventDispatcherFactory.getEventDispatcher().dispatchEvent(appEvt);
+			Application.activeRecord.update(responses, token);
 		}
 
 		private function getRecordStepNumber(step:CollectRecord$Step):int {

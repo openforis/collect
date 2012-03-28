@@ -1,5 +1,7 @@
 package org.openforis.collect.presenter
 {
+	import org.openforis.collect.metamodel.proxy.RangeAttributeDefinitionProxy;
+	import org.openforis.collect.metamodel.proxy.RangeAttributeDefinitionProxy$Type;
 	import org.openforis.collect.model.proxy.AttributeProxy;
 	import org.openforis.collect.model.proxy.FieldProxy;
 	import org.openforis.collect.ui.component.input.RangeInputField;
@@ -9,6 +11,8 @@ package org.openforis.collect.presenter
 	 */
 	public class RangeInputFieldPresenter extends InputFieldPresenter {
 		
+		protected static const RESTRICT_PATTERN:String = "^(\\*|-|\\?|(\\d*\\.?\\d*)-?\\d*\\.?\\d*)$";
+		protected static const INTEGER_RESTRICT_PATTERN:String = "^(\\*|-|\\?|\\d+-?\\d*)$";
 		protected static const SEPARATOR:String = "-";
 
 		private var _view:RangeInputField;
@@ -17,6 +21,7 @@ package org.openforis.collect.presenter
 			_view = inputField;
 			_view.fieldIndex = -1;
 			super(inputField);
+			setRestriction();
 		}
 		
 		override protected function getTextFromValue():String {
@@ -40,6 +45,17 @@ package org.openforis.collect.presenter
 				}
 			}
 			return "";
+		}
+		
+		protected function setRestriction():void {
+			var type:RangeAttributeDefinitionProxy$Type = RangeAttributeDefinitionProxy(_view.attributeDefinition).type;
+			switch(type) {
+				case RangeAttributeDefinitionProxy$Type.INTEGER:
+					_view.restrict = INTEGER_RESTRICT_PATTERN;
+					break;
+				default:
+					_view.restrict = RESTRICT_PATTERN;
+			}
 		}
 		
 	}

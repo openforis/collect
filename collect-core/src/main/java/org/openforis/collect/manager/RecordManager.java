@@ -11,12 +11,12 @@ import java.util.Stack;
 
 import javax.xml.namespace.QName;
 
-import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.State;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.FieldSymbol;
+import org.openforis.collect.model.RecordSummarySortField;
 import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.MissingRecordKeyException;
 import org.openforis.collect.persistence.MultipleEditException;
@@ -41,9 +41,7 @@ import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Field;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.NodePointer;
-import org.openforis.idm.model.NumberAttribute;
 import org.openforis.idm.model.Record;
-import org.openforis.idm.model.TextAttribute;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -68,6 +66,7 @@ public class RecordManager {
 		updateKeys(record);
 		
 		updateCounts(record);
+		
 		Integer id = record.getId();
 		if(id == null) {
 			recordDao.insert(record);
@@ -108,8 +107,8 @@ public class RecordManager {
 	}
 	
 	@Transactional
-	public List<CollectRecord> getSummaries(CollectSurvey survey, String rootEntity, int offset, int maxNumberOfRecords, String orderByFieldName, String filter) {
-		List<CollectRecord> recordsSummary = recordDao.loadSummaries(survey, rootEntity, offset, maxNumberOfRecords, orderByFieldName, filter);
+	public List<CollectRecord> getSummaries(CollectSurvey survey, String rootEntity, int offset, int maxNumberOfRecords, List<RecordSummarySortField> sortFields, String filter) {
+		List<CollectRecord> recordsSummary = recordDao.loadSummaries(survey, rootEntity, offset, maxNumberOfRecords, sortFields, filter);
 		return recordsSummary;
 	}
 
@@ -148,25 +147,36 @@ public class RecordManager {
 	@Transactional
 	public void promote(CollectRecord record, User user) throws RecordPersistenceException, RecordPromoteException {
 		//save changes on current step
-		if(hasErrors(record)){
+		if( hasErrors(record) ){
 			throw new RecordPromoteException("Record cannot be promoted becuase it contains errors.");
 		}
 		
 		Integer id = record.getId();
-		if(id == null) {
-			recordDao.insert(record);
+		// before save record in current phase
+		if( id == null ) {
+			recordDao.insert( record );
 		} else {
-			recordDao.update(record);
+			recordDao.update( record );
 		}
+		
 		//change step and update the record
 		Step currentStep = record.getStep();
 		Step nextStep = currentStep.getNext();
 		Date now = new Date();
-		record.setModifiedBy(user);
-		record.setModifiedDate(now);
-		record.setStep(nextStep);
-		record.setState(null);
-		recordDao.update(record);
+		record.setModifiedBy( user );
+		record.setModifiedDate( now );
+		record.setState( null );
+		
+		/**
+		 * 1. clear node states
+		 * 2. update record step
+		 * 3. update all validation states
+		 */
+		record.clearNodeStates();
+		record.setStep( nextStep );
+		record.updateDerivedStates();
+		
+		recordDao.update( record );
 	}
 
 	private boolean hasErrors(CollectRecord record) {
@@ -188,10 +198,7 @@ public class RecordManager {
 						stack.push(child);
 					}
 				}
-				
-			}
-			
-			if(node instanceof Attribute){
+			} else if(node instanceof Attribute){
 				ValidationResults validationResults = ((Attribute<?,?>) node).validateValue();
 				List<ValidationResult> errors = validationResults.getErrors();
 				if(errors.size() > 0){
@@ -199,12 +206,9 @@ public class RecordManager {
 				}
 			}
 		}
-		
 		return false;
 	}
 
-	
-	
 	private boolean hasCardinalityError(Entity entity) {
 		EntityDefinition definition = entity.getDefinition();
 		List<NodeDefinition> childDefinitions = definition.getChildDefinitions();
@@ -224,23 +228,15 @@ public class RecordManager {
 	}
 
 	@Transactional
-	public void demote(CollectRecord record, User user) throws RecordPersistenceException {
-		Step step = record.getStep();
-		Step prevStep = step.getPrevious();
-		Date now = new Date();
-		record.setModifiedBy(user);
-		record.setModifiedDate(now);
-		record.setStep(prevStep);
-		record.setState(State.REJECTED);
-		recordDao.update(record);
-	}
-
-	
-	public Node<?> deleteNode(Node<?> node) {
-		Entity parentEntity = node.getParent();
-		int index = node.getIndex();
-		Node<?> deletedNode = parentEntity.remove(node.getName(), index);
-		return deletedNode;
+	public void demote(CollectSurvey survey, int recordId, Step currentStep, User user) throws RecordPersistenceException {
+		Step prevStep = currentStep.getPrevious();
+		CollectRecord record = recordDao.load( survey, recordId, prevStep.getStepNumber() );
+		record.setModifiedBy( user );
+		record.setModifiedDate( new Date() );
+		record.setStep( prevStep );
+		record.setState( State.REJECTED );
+		record.updateDerivedStates();
+		recordDao.update( record );
 	}
 	
 	public Entity addEntity(Entity parentEntity, String nodeName) {

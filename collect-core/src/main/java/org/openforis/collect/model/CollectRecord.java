@@ -12,18 +12,18 @@ import org.apache.commons.lang3.StringUtils;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
-import org.openforis.idm.metamodel.SurveyContext;
-import org.openforis.idm.metamodel.validation.Validator;
+import org.openforis.idm.metamodel.validation.ValidationResultFlag;
+import org.openforis.idm.metamodel.validation.ValidationResults;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Code;
 import org.openforis.idm.model.CodeAttribute;
 import org.openforis.idm.model.Entity;
+import org.openforis.idm.model.Field;
 import org.openforis.idm.model.Node;
+import org.openforis.idm.model.NodeVisitor;
 import org.openforis.idm.model.NumberAttribute;
 import org.openforis.idm.model.Record;
 import org.openforis.idm.model.TextAttribute;
-import org.openforis.idm.model.state.ModelDependencies;
-import org.openforis.idm.model.state.NodeState;
 
 /**
  * @author G. Miceli
@@ -31,6 +31,9 @@ import org.openforis.idm.model.state.NodeState;
  */
 public class CollectRecord extends Record {
 
+	private static final int APPROVED_MISSING_POSITION = 0;
+	private static final int CONFIRMED_ERROR_POSITION = 0;
+	
 	public enum Step {
 		ENTRY(1), CLEANSING(2), ANALYSIS(3);
 
@@ -116,9 +119,15 @@ public class CollectRecord extends Record {
 	
 	private List<String> rootEntityKeyValues;
 	private List<Integer> entityCounts;
-	@Deprecated
-	private Map<Integer, NodeState> nodeStateMap;
 
+	private Map<Integer, Set<String>> minCountErrorCounts;
+	private Map<Integer, Set<String>> minCountWarningCounts;
+	private Map<Integer, Set<String>> maxCountErrorCounts;
+	private Map<Integer, Set<String>> maxCountWarningCounts;
+	private Map<Integer, Integer> errorCounts;
+	private Map<Integer, Integer> warningCounts;
+	private Set<Integer> skippedNodes;
+	
 	public CollectRecord(CollectSurvey survey, String versionName) {
 		super(survey, versionName);
 		this.step = Step.ENTRY;
@@ -126,242 +135,122 @@ public class CollectRecord extends Record {
 		// use List to preserve the order of the keys and counts
 		rootEntityKeyValues = new ArrayList<String>();
 		entityCounts = new ArrayList<Integer>();
-		nodeStateMap = new HashMap<Integer, NodeState>();
-
+		minCountErrorCounts = new HashMap<Integer, Set<String>>();
+		minCountWarningCounts = new HashMap<Integer, Set<String>>();
+		maxCountErrorCounts = new HashMap<Integer, Set<String>>();
+		maxCountWarningCounts = new HashMap<Integer, Set<String>>();
+		errorCounts = new HashMap<Integer, Integer>();
+		warningCounts = new HashMap<Integer, Integer>();
+		skippedNodes = new HashSet<Integer>();
 	}
-	@Deprecated
-	public void updateNodeStates() {
-		Entity entity = getRootEntity();
-		updateAllRelevanceStates(entity);
-		updateAllRequiredStates(entity);
-		updateAllValidationStates(entity);
-	}
-	@Deprecated
-	private void updateAllRelevanceStates(Node<?> node) {
-		NodeState nodeState = getNodeStateInternal(node);
-		nodeState.updateRelevance();
 
-		if (node instanceof Entity) {
-			Entity entity = (Entity) node;
-			EntityDefinition definition = entity .getDefinition();
-			List<NodeDefinition> childDefinitions = definition.getChildDefinitions();
-			for (NodeDefinition childDefinition : childDefinitions) {
-				String childName = childDefinition.getName();
-				List<Node<? extends NodeDefinition>> children = entity.getAll(childName);
-				for (Node<? extends NodeDefinition> child : children) {
-					updateAllRelevanceStates(child);
-				}
-			}
+	public Node<?> deleteNode(Node<?> node) {
+		if(node.isDetached()) {
+			throw new IllegalArgumentException("Unable to delete a node already detached");
 		}
-	}
-	@Deprecated
-	private void updateAllRequiredStates(Node<?> node) {
-		NodeState nodeState = getNodeStateInternal(node);
-		nodeState.updateRequired();
-
-		if (node instanceof Entity) {
-			Entity entity = (Entity) node;
-			EntityDefinition definition = entity .getDefinition();
-			List<NodeDefinition> childDefinitions = definition.getChildDefinitions();
-			for (NodeDefinition childDefinition : childDefinitions) {
-				String childName = childDefinition.getName();
-				List<Node<? extends NodeDefinition>> children = entity.getAll(childName);
-				for (Node<? extends NodeDefinition> child : children) {
-					updateAllRequiredStates(child);
-				}
-			}
-		}
+		Entity parentEntity = node.getParent();
+		int index = node.getIndex();
+		Node<?> deletedNode = parentEntity.remove(node.getName(), index);
+		removeValidationCounts(deletedNode.getInternalId());
+		return deletedNode;
 	}
 	
-	@Deprecated
-	private void updateAllValidationStates(Node<?> node) {
-		NodeState nodeState = getNodeStateInternal(node);
-		nodeState.updateValidation(getValidator());
-
-		if (node instanceof Entity) {
-			Entity entity = (Entity) node;
-			EntityDefinition definition = entity .getDefinition();
-			List<NodeDefinition> childDefinitions = definition.getChildDefinitions();
-			for (NodeDefinition childDefinition : childDefinitions) {
-				String childName = childDefinition.getName();
-				List<Node<? extends NodeDefinition>> children = entity.getAll(childName);
-				for (Node<? extends NodeDefinition> child : children) {
-					updateAllValidationStates(child);
-				}
-			}
-		}
-	}
-	
-	@Deprecated
-	private NodeState getNodeStateInternal(Node<?> child) {
-		Integer internalId = child.getInternalId();
-		NodeState nodeState = nodeStateMap.get(internalId);
-		if (nodeState == null) {
-			nodeState = new NodeState(child);
-			nodeStateMap.put(internalId, nodeState);
-		}
-		return nodeState;
-	}
-
-	/**
-	 * Returns a node states for the given node. It gets created if it doesn't exist.
-	 * 
-	 * @param node
-	 * @return
-	 */
-	@Deprecated
-	public NodeState getNodeState(Node<?> node) {
-		int nodeInternalId = node.getInternalId();
-		NodeState nodeState = nodeStateMap.get(nodeInternalId);
-		if (nodeState == null) {
-			nodeState = updateNodeStates(node);
-			nodeStateMap.put(nodeInternalId, nodeState);
-		}
-		return nodeState;
-	}
-
-	@Deprecated
-	public List<NodeState> updateNodeState(Node<?> node) {
-		Set<Node<?>> nodesToRevalidate = new HashSet<Node<?>>();
-
-		updateRelevanceAndDessendants(node, nodesToRevalidate);
-		updateDependantRelevantNodes(node, nodesToRevalidate);
+	public void setErrorConfirmed(Attribute<?,?> attribute, boolean confirmed){
+		int fieldCount = attribute.getFieldCount();
 		
-		Set<Node<?>> relevantNodes = new HashSet<Node<?>>();
-		relevantNodes.addAll(nodesToRevalidate);
-		for (Node<?> relNode : relevantNodes) {
-			updateRequiredState(relNode, false, nodesToRevalidate);
-		}
-		updateRequiredState(node, true, nodesToRevalidate);
-
-		List<NodeState> nodeStates = validate(nodesToRevalidate);
-
-		return nodeStates;
-	}
-	
-	@Deprecated
-	private void updateDependantRelevantNodes(Node<?> node, Set<Node<?>> set) {
-		ModelDependencies modelDependencies = null; //collectSurvey.getModelDependencies();
-		Set<Node<?>> relevanceDependantNodes = modelDependencies.getRelevanceDependantNodes(node);
-		for (Node<?> dependantNode : relevanceDependantNodes) {
-			updateRelevanceAndDessendants(dependantNode, set);
+		for( int i=0; i <fieldCount; i++ ){
+			Field<?> field = attribute.getField(i);
+			field.getState().set(CONFIRMED_ERROR_POSITION, confirmed);
 		}
 	}
 	
-	@Deprecated
-	private List<NodeState> validate(Set<Node<?>> nodesToRevalidate) {
-		List<NodeState> nodeStates = new ArrayList<NodeState>();
-		for (Node<?> node : nodesToRevalidate) {
-			NodeState nodeState = getNodeState(node);
-			nodeState.updateValidation(getValidator());
-			nodeStates.add(nodeState);
-		}
-		return nodeStates;
-	}
-
-	/**
-	 * Update the relevance of a node and all its descendants Returns the set of the updated descendants
-	 * 
-	 * @param node
-	 */
-	@Deprecated
-	private void updateRelevanceAndDessendants(Node<?> node, Set<Node<?>> set) {
-		NodeState nodeState = getNodeState(node);
-		nodeState.updateRelevance();
-		set.add(node);
-
-		if (node instanceof Entity) {
-			Entity entity = (Entity) node;
-			EntityDefinition entityDefinition = entity.getDefinition();
-			List<NodeDefinition> childDefinitions = entityDefinition.getChildDefinitions();
-			for (NodeDefinition childDefinition : childDefinitions) {
-				String childName = childDefinition.getName();
-				List<Node<?>> children = entity.getAll(childName);
-				for (Node<?> childNode : children) {
-					updateRelevanceAndDessendants(childNode, set);
-				}
+	public boolean isErrorConfirmed(Attribute<?,?> attribute){
+		int fieldCount = attribute.getFieldCount();		
+		for( int i=0; i <fieldCount; i++ ){
+			Field<?> field = attribute.getField(i);
+			if( !field.getState().get(CONFIRMED_ERROR_POSITION) ){
+				return false;
 			}
 		}
-	}
-
-	/**
-	 * @param node
-	 */
-	@Deprecated
-	private void updateRequiredState(Node<?> node, boolean updateDependants, Set<Node<?>> set) {
-		NodeState nodeState = getNodeState(node);
-		nodeState.updateRequired();
-		set.add(node);
-
-		if (updateDependants) {
-			ModelDependencies dependencies = null;//collectSurvey.getModelDependencies();
-			Set<Node<?>> nodes = dependencies.getRequiredDependantNodes(node);
-			for (Node<?> dependantNode : nodes) {
-				updateRequiredState(dependantNode, updateDependants, set);
-			}
-		}
+		return true;
 	}
 	
-	@Deprecated
-	public List<NodeState> deleteNodeState(Node<?> node) {
-		Set<Node<?>> nodesToRevalidate = new HashSet<Node<?>>();
+	public void setMissingApproved(Entity parentEntity, String childName, boolean approved) {
+		org.openforis.idm.model.State childState = parentEntity.getChildState(childName);
+		childState.set(APPROVED_MISSING_POSITION, approved);
+	}
+	
+	public boolean isMissingApproved(Entity parentEntity, String childName){
+		org.openforis.idm.model.State childState = parentEntity.getChildState(childName);
+		return childState.get(APPROVED_MISSING_POSITION);
+	} 
 
-//		updateRelevanceAndDessendants(node, nodesToRevalidate);
-		updateDependantRelevantNodes(node, nodesToRevalidate);
-		
-		Set<Node<?>> relevantNodes = new HashSet<Node<?>>();
-		relevantNodes.addAll(nodesToRevalidate);
-		for (Node<?> relNode : relevantNodes) {
-			updateRequiredState(relNode, false, nodesToRevalidate);
+	public void updateValidationMinCounts(Integer entityId, String childName, ValidationResultFlag flag) {
+		Set<String> errors = clearEntityValidationCounts(minCountErrorCounts, entityId, childName);
+		Set<String> warnings = clearEntityValidationCounts(minCountWarningCounts, entityId, childName);
+		switch (flag) {
+			case ERROR:
+				errors.add(childName);
+				break;
+			case WARNING:
+				warnings.add(childName);
+				break;
 		}
-		updateRequiredState(node, true, nodesToRevalidate);
-
-		List<NodeState> nodeStates = validate(nodesToRevalidate);
-
-		return nodeStates;
+		this.missing = null;
+		this.errors = null;
+		this.warnings = null;
 	}
-	@Deprecated
-	private void deleteNodeState() {
+
+	public void updateValidationMaxCounts(Integer entityId, String childName, ValidationResultFlag flag) {
+		Set<String> errors = clearEntityValidationCounts(maxCountErrorCounts, entityId, childName);
+		Set<String> warnings = clearEntityValidationCounts(maxCountWarningCounts, entityId, childName);
 		
+		switch(flag) {
+		case ERROR:
+			errors.add(childName);
+			break;
+		case WARNING:
+			warnings.add(childName);
+			break;
+		}
+		this.errors = null;
+		this.warnings = null;
 	}
-
-//	private void refreshDependentNodesState(Node<?> node, Set<Integer> updatedNodeIds, List<NodeState> nodeStates) {
-//		ModelDependencies dependencies = collectSurvey.getModelDependencies();
-//		Set<Node<?>> dependentNodes = dependencies.getDependantNodes(node);
-//		for (Node<?> dependentNode : dependentNodes) {
-//			updateNodeStateInternal(dependentNode, updatedNodeIds, nodeStates);
-//		}
-//	}
-
-//	private void updateNodeStateInternal(Node<?> node, Set<Integer> updatedNodeIds, List<NodeState> nodeStates) {
-//		Integer nodeId = node.getInternalId();
-//		if (!updatedNodeIds.contains(nodeId)) {
-//			NodeState nodeState = updateNodeStates(node);
-//			nodeStates.add(nodeState);
-//			updatedNodeIds.add(nodeId);
-//
-//			refreshDependentNodesState(node, updatedNodeIds, nodeStates);
-//		}
-//	}
-
-	/**
-	 * Update all states of a node
-	 * 
-	 * @param node
-	 * @return
-	 */
-	@Deprecated
-	private NodeState updateNodeStates(Node<?> node) {
-		NodeState nodeState = new NodeState(node);
-		nodeState.update(getValidator());
-		nodeStateMap.put(node.getInternalId(), nodeState);
-		return nodeState;
+	
+	public void updateValidationCounts(Integer attributeId, ValidationResults validationResults) {
+		removeValidationCounts(attributeId);
+		
+		int errorCounts = validationResults.getErrors().size();
+		int warningCounts = validationResults.getWarnings().size();
+		this.errorCounts.put(attributeId, errorCounts);
+		this.warningCounts.put(attributeId, warningCounts);
+		
+		errors = null;
+		warnings = null;
 	}
-
-	private Validator getValidator() {
-		SurveyContext context = getSurveyContext();
-		Validator validator = context.getValidator();
-		return validator;
+	
+	public void updateSkippedCount(Integer attributeId) {
+		removeValidationCounts(attributeId);
+		skippedNodes.add(attributeId);
+		skipped = null;
+	}
+	
+	public void removeValidationCounts(Integer nodeId) {
+		Node<?> node = this.getNodeByInternalId(nodeId);
+		if(node instanceof Attribute<?, ?>) {
+			skippedNodes.remove(nodeId);
+			errorCounts.remove(nodeId);
+			warningCounts.remove(nodeId);
+		} else {
+			minCountErrorCounts.remove(nodeId);
+			maxCountErrorCounts.remove(nodeId);
+			minCountWarningCounts.remove(nodeId);
+			maxCountWarningCounts.remove(nodeId);
+		}
+		skipped = null;
+		missing = null;
+		errors = null;
+		warnings = null;
 	}
 	
 	public Step getStep() {
@@ -413,6 +302,9 @@ public class CollectRecord extends Record {
 	}
 
 	public Integer getSkipped() {
+		if ( skipped == null ) {
+			skipped = skippedNodes.size();
+		}
 		return skipped;
 	}
 
@@ -421,6 +313,10 @@ public class CollectRecord extends Record {
 	}
 
 	public Integer getMissing() {
+		if ( missing == null ){
+			missing = getEntityValidationCount( minCountErrorCounts );
+			missing += getEntityValidationCount( minCountWarningCounts );
+		}
 		return missing;
 	}
 
@@ -429,6 +325,11 @@ public class CollectRecord extends Record {
 	}
 
 	public Integer getErrors() {
+		if(errors == null) {
+			errors = getEntityValidationCount(minCountErrorCounts);
+			errors += getEntityValidationCount(maxCountErrorCounts);
+			errors += getAttributeValidationCount(errorCounts);
+		}
 		return errors;
 	}
 
@@ -437,6 +338,11 @@ public class CollectRecord extends Record {
 	}
 
 	public Integer getWarnings() {
+		if(warnings == null) {
+			warnings = getEntityValidationCount(minCountWarningCounts);
+			warnings += getEntityValidationCount(maxCountWarningCounts);
+			warnings += getAttributeValidationCount(warningCounts);
+		}
 		return warnings;
 	}
 
@@ -496,4 +402,89 @@ public class CollectRecord extends Record {
 	public void setLockedBy(User lockedBy) {
 		this.lockedBy = lockedBy;
 	}
+	
+	private Set<String> clearEntityValidationCounts(Map<Integer, Set<String>> counts, Integer entityId, String childName) {
+		Set<String> set = counts.get(entityId);
+		if(set == null) {
+			set = new HashSet<String>();
+			counts.put(entityId, set);
+		} else {
+			set.remove(childName);
+		}
+		return set;
+	}
+	
+	private Integer getEntityValidationCount(Map<Integer, Set<String>> map) {
+		int count = 0;
+		for (Set<String> set : map.values()) {
+			count += set.size();
+		}
+		return count;
+	}
+	
+	private Integer getAttributeValidationCount(Map<Integer, Integer> map) {
+		int count = 0;
+		for (Integer i : map.values()) {
+			count += i;
+		}
+		return count;
+	}
+
+	/**
+	 * Clear all node states and all attribute symbols
+	 */
+	public void clearNodeStates() {
+		Entity rootEntity = getRootEntity();
+		rootEntity.traverse( new NodeVisitor() {
+			@Override
+			public void visit(Node<? extends NodeDefinition> node, int idx) {
+				if ( node instanceof Attribute ) {
+					Attribute<?,?> attribute = (Attribute<?, ?>) node;
+//					if ( step == Step.ENTRY ) {
+//						attribute.clearFieldSymbols();
+//					}
+					attribute.clearFieldStates();
+					attribute.clearValidationResults();
+				} else if( node instanceof Entity ) {
+					Entity entity = (Entity) node;
+					entity.clearChildStates();
+					
+					EntityDefinition definition = entity.getDefinition();
+					List<NodeDefinition> childDefinitions = definition.getChildDefinitions();
+					for (NodeDefinition childDefinition : childDefinitions) {
+						String childName = childDefinition.getName();
+						entity.clearRelevanceState(childName);
+						entity.clearRequiredState(childName);
+					}
+				}
+			} 
+		} );
+	}
+	
+	/**
+	 * Update all derived states of all nodes
+	 */
+	public void updateDerivedStates() {
+		Entity rootEntity = getRootEntity();
+		rootEntity.traverse(new NodeVisitor() {
+			@Override
+			public void visit(Node<? extends NodeDefinition> node, int idx) {
+				if ( node instanceof Attribute ) {
+					Attribute<?,?> attribute = (Attribute<?, ?>) node;
+					attribute.validateValue();
+				} else if ( node instanceof Entity ) {
+					Entity entity = (Entity) node;
+					
+					EntityDefinition definition = entity.getDefinition();
+					List<NodeDefinition> childDefinitions = definition.getChildDefinitions();
+					for (NodeDefinition childDefinition : childDefinitions) {
+						String childName = childDefinition.getName();
+						entity.validateMaxCount( childName );
+						entity.validateMinCount( childName );
+					}
+				}
+			}
+		});
+	}
+	
 }

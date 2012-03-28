@@ -15,9 +15,11 @@ package org.openforis.collect.presenter {
 	
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.client.SpeciesClient;
+	import org.openforis.collect.client.UpdateRequestToken;
 	import org.openforis.collect.event.InputFieldEvent;
 	import org.openforis.collect.event.TaxonInputFieldEvent;
 	import org.openforis.collect.model.proxy.TaxonOccurrenceProxy;
+	import org.openforis.collect.remoting.service.UpdateRequest;
 	import org.openforis.collect.ui.component.input.InputField;
 	import org.openforis.collect.ui.component.input.TaxonAttributeRenderer;
 	import org.openforis.collect.ui.component.input.TaxonAutoCompletePopUp;
@@ -161,7 +163,7 @@ package org.openforis.collect.presenter {
 		protected static function cancelAutoComplete():void {
 			var textInput:TextInput = autoCompleteLastInputField.textInput as TextInput;
 			textInput.setFocus();
-			autoCompleteLastInputField.undo();
+			InputFieldPresenter(autoCompleteLastInputField.presenter).undoLastChange();
 			closeAutoCompletePopUp();
 		}
 		
@@ -182,20 +184,25 @@ package org.openforis.collect.presenter {
 		
 		public function performSelectTaxon(taxonOccurrence:TaxonOccurrenceProxy):void {
 			_lastSelectedTaxon = taxonOccurrence;
+			var req:UpdateRequest = new UpdateRequest();
 			view.codeTextInput.text = taxonOccurrence.code;
-			view.codeTextInput.applyValue();
+			req.addOperation(view.codeTextInput.presenter.createUpdateValueOperation());
 			
 			view.scientificNameTextInput.text = taxonOccurrence.scientificName;
-			view.scientificNameTextInput.applyValue();
+			req.addOperation(view.scientificNameTextInput.presenter.createUpdateValueOperation());
 			
 			view.vernacularNameTextInput.text = taxonOccurrence.vernacularName;
-			view.vernacularNameTextInput.applyValue();
+			req.addOperation(view.vernacularNameTextInput.presenter.createUpdateValueOperation());
 			
 			view.languageCodeTextInput.text = taxonOccurrence.languageCode;
-			view.languageCodeTextInput.applyValue();
+			req.addOperation(view.languageCodeTextInput.presenter.createUpdateValueOperation());
 
 			view.languageVarietyTextInput.text = taxonOccurrence.languageVariety;
-			view.languageVarietyTextInput.applyValue();
+			req.addOperation(view.languageVarietyTextInput.presenter.createUpdateValueOperation());
+			
+			var token:UpdateRequestToken = new UpdateRequestToken(UpdateRequestToken.UPDATE_VALUE);
+			token.updatedFields = _view.attribute.fields;
+			ClientFactory.dataClient.updateActiveRecord(req, token, null, faultHandler);
 		}
 		
 		protected static function autoCompleteSearchResultHandler(event:ResultEvent, token:Object):void {

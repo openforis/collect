@@ -24,6 +24,15 @@ public class NodeProxy implements Proxy {
 	
 	private transient Node<?> node;
 	
+	public static NodeProxy fromNode(Node<?> node) {
+		if (node instanceof Attribute<?, ?>) {
+			return new AttributeProxy(null, (Attribute<?, ?>) node);
+		} else if (node instanceof Entity) {
+			return new EntityProxy(null, (Entity) node);
+		}
+		return null;
+	}
+	
 	public NodeProxy(EntityProxy parent, Node<?> node) {
 		super();
 		this.parent = parent;

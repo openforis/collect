@@ -7,6 +7,7 @@ import static org.junit.Assert.assertNull;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.GregorianCalendar;
 import java.util.List;
 
@@ -20,6 +21,8 @@ import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.CollectSurveyContext;
+import org.openforis.collect.model.RecordSummarySortField;
+import org.openforis.collect.model.RecordSummarySortField.Sortable;
 import org.openforis.collect.persistence.xml.CollectIdmlBindingContext;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.Schema;
@@ -190,8 +193,8 @@ public class ModelDaoIntegrationTest {
 			tree1.addValue("total_height", 2.0);
 //			tree1.addValue("bole_height", (Double) null).setMetadata(new CollectAttributeMetadata('*',null,"No value specified"));
 			RealAttribute boleHeight = tree1.addValue("bole_height", (Double) null);
-			boleHeight.getField().setSymbol('*');
-			boleHeight.getField().setRemarks("No value specified");
+			boleHeight.getField(0).setSymbol('*');
+			boleHeight.getField(0).setRemarks("No value specified");
 			Entity tree2 = plot.addEntity("tree");
 			tree2.addValue("tree_no", 2);
 			tree2.addValue("dbh", 82.8);
@@ -219,9 +222,9 @@ public class ModelDaoIntegrationTest {
 		String rootEntityName = rootEntity.getName();
 		int offset = 0;
 		int maxNumberOfRecords = 1;
-		String orderByFieldName = "key_id";
+		RecordSummarySortField sortField = new RecordSummarySortField(Sortable.KEY1);
 		String filter = null;
-		List<CollectRecord> list = this.recordDao.loadSummaries(survey, rootEntityName, offset, maxNumberOfRecords, orderByFieldName, filter);
+		List<CollectRecord> list = this.recordDao.loadSummaries(survey, rootEntityName, offset, maxNumberOfRecords, Arrays.asList(sortField), filter);
 		assertNotNull(list);
 		assertEquals(1, list.size());
 		

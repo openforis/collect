@@ -15,6 +15,7 @@ public enum FieldSymbol {
 	BLANK_ON_FORM('B', '*'), 
 	DASH_ON_FORM('D', '-'), 
 	ILLEGIBLE('I', '?'),
+	@Deprecated
 	CONFIRMED('C', 'C');
 
 	private final Character code;

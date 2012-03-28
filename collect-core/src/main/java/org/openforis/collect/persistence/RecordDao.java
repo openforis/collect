@@ -21,6 +21,7 @@ import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.State;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.RecordSummarySortField;
 import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.RecordDao.JooqFactory;
 import org.openforis.collect.persistence.jooq.MappingJooqDaoSupport;
@@ -41,9 +42,6 @@ import org.springframework.transaction.annotation.Transactional;
 @SuppressWarnings("rawtypes")
 @Transactional
 public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory> {
-	
-	public static final String ORDER_BY_DATE_CREATED = "creationDate";
-	public static final String ORDER_BY_DATE_MODIFIED = "modifiedDate";
 	
 	private static final TableField[] KEY_FIELDS = 
 		{OFC_RECORD.KEY1, OFC_RECORD.KEY2, OFC_RECORD.KEY3};
@@ -184,6 +182,10 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 		q.addSelect(SUMMARY_FIELDS);
 		q.addFrom(OFC_RECORD);
 		// build conditions
+		Schema schema = survey.getSchema();
+		EntityDefinition rootEntityDefn = schema.getRootEntityDefinition(rootEntity);
+		Integer rootEntityDefnId = rootEntityDefn.getId();
+		q.addConditions(OFC_RECORD.ROOT_ENTITY_ID.equal(rootEntityDefnId));
 		int i = 0;
 		for (String key : keys) {
 			String keyColumnName = "key" + (++i);
@@ -196,32 +198,21 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 	}
 	
 	@Transactional
-	public List<CollectRecord> loadSummaries(CollectSurvey survey, String rootEntity, int offset, int maxRecords, String orderByField, String filter) {
+	public List<CollectRecord> loadSummaries(CollectSurvey survey, String rootEntity, int offset, int maxRecords, List<RecordSummarySortField> sortFields, String filter) {
 		JooqFactory jf = getMappingJooqFactory(survey);
 		SelectQuery q = jf.selectQuery();	
 		q.addFrom(OFC_RECORD);
 		q.addSelect(SUMMARY_FIELDS);
 
-		//add order by condition
-		Field<?> orderBy = null;
-		if(orderByField != null) {
-			if(ORDER_BY_DATE_CREATED.equals(orderByField)) {
-				orderBy = OFC_RECORD.DATE_CREATED;
-			} else if(ORDER_BY_DATE_MODIFIED.equals(orderByField)) {
-				orderBy = OFC_RECORD.DATE_MODIFIED;
-			} else {
-				//try to find a field matching the orderByField passed
-				List<Field<?>> selectFields = q.getSelect();
-				for (Field<?> field : selectFields) {
-					if(orderByField.equals(field.getName())) {
-						orderBy = field;
-						break;
-					}
-				}
+		Schema schema = survey.getSchema();
+		EntityDefinition rootEntityDefn = schema.getRootEntityDefinition(rootEntity);
+		Integer rootEntityDefnId = rootEntityDefn.getId();
+		q.addConditions(OFC_RECORD.ROOT_ENTITY_ID.equal(rootEntityDefnId));
+
+		if(sortFields != null) {
+			for (RecordSummarySortField sortField : sortFields) {
+				addOrderBy(q, sortField);
 			}
-		}
-		if(orderBy != null) {
-			q.addOrderBy(orderBy);
 		}
 		
 		//always order by ID to avoid pagination issues
@@ -234,6 +225,60 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 		Result<Record> result = q.fetch();
 		
 		return jf.fromResult(result);
+	}
+
+	private void addOrderBy(SelectQuery q, RecordSummarySortField sortField) {
+		Field<?> orderBy = null;
+		if(sortField != null) {
+			switch(sortField.getField()) {
+			case KEY1:
+				orderBy = OFC_RECORD.KEY1;
+				break;
+			case KEY2:
+				orderBy = OFC_RECORD.KEY2;
+				break;
+			case KEY3:
+				orderBy = OFC_RECORD.KEY3;
+				break;
+			case COUNT1:
+				orderBy = OFC_RECORD.COUNT1;
+				break;
+			case COUNT2:
+				orderBy = OFC_RECORD.COUNT2;
+				break;
+			case COUNT3:
+				orderBy = OFC_RECORD.COUNT3;
+				break;
+			case DATE_CREATED:
+				orderBy = OFC_RECORD.DATE_CREATED;
+				break;
+			case DATE_MODIFIED:
+				orderBy = OFC_RECORD.DATE_MODIFIED;
+				break;
+			case SKIPPED:
+				orderBy = OFC_RECORD.SKIPPED;
+				break;
+			case MISSING:
+				orderBy = OFC_RECORD.MISSING;
+				break;
+			case ERRORS:
+				orderBy = OFC_RECORD.ERRORS;
+				break;
+			case WARNINGS:
+				orderBy = OFC_RECORD.WARNINGS;
+				break;
+			case STEP:
+				orderBy = OFC_RECORD.STEP;
+				break;
+			}
+		}
+		if(orderBy != null) {
+			if(sortField.isDescending()) {
+				q.addOrderBy(orderBy.desc());
+			} else {
+				q.addOrderBy(orderBy);
+			}
+		}
 	}
 
 	@Override

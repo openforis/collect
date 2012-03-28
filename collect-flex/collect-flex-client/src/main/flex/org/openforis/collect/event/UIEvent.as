@@ -25,6 +25,7 @@ package org.openforis.collect.event {
 		public static const BUILD_FORM:String = "buildForm";
 		
 		private var _obj:Object;
+		private var _params:Array;
 		
 		public function UIEvent(type:String, bubbles:Boolean=false, cancelable:Boolean=false) {
 			super(type, bubbles, cancelable);
@@ -37,5 +38,7 @@ package org.openforis.collect.event {
 		public function set obj(value:Object):void {
 			_obj = value;
 		}
+		
+		
 	}
 }

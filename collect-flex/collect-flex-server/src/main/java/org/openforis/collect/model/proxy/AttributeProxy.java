@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
+import org.openforis.collect.model.CollectRecord;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Code;
@@ -18,18 +19,22 @@ import org.openforis.idm.model.Time;
 
 /**
  * @author M. Togna
+ * @author S. Ricci
  * 
- */
+ * */
 public class AttributeProxy extends NodeProxy {
 
 	private transient Attribute<? extends AttributeDefinition, ?> attribute;
 	private ValidationResultsProxy validationResults;
+	private boolean errorConfirmed;
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public AttributeProxy(EntityProxy parent, Attribute attribute) {
 		super(parent, attribute);
 		this.attribute = attribute;
 		validationResults = new ValidationResultsProxy(attribute.validateValue());
+		CollectRecord record = (CollectRecord) attribute.getRecord();
+		errorConfirmed = record.isErrorConfirmed(attribute);
 	}
 
 	@ExternalizedProperty
@@ -76,6 +81,14 @@ public class AttributeProxy extends NodeProxy {
 			result.add(i, new FieldProxy(field));
 		}
 		return result;
+	}
+	
+	public boolean isErrorConfirmed() {
+		return errorConfirmed;
+	}
+	
+	public void setErrorConfirmed(boolean value) {
+		errorConfirmed = value;
 	}
 
 }

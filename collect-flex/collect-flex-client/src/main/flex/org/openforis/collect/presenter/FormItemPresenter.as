@@ -1,17 +1,16 @@
 package org.openforis.collect.presenter
 {
 	import flash.events.Event;
-	import flash.events.MouseEvent;
 	
 	import mx.binding.utils.ChangeWatcher;
 	import mx.collections.IList;
-	import mx.core.UIComponent;
 	
 	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.remoting.service.UpdateResponse;
 	import org.openforis.collect.ui.component.detail.CollectFormItem;
 	import org.openforis.collect.ui.component.detail.RelevanceDisplayManager;
 	import org.openforis.collect.ui.component.detail.ValidationDisplayManager;
+	import org.openforis.collect.ui.component.input.FormItemContextMenu;
 
 	/**
 	 * 
@@ -23,12 +22,13 @@ package org.openforis.collect.presenter
 		protected var _view:CollectFormItem;
 		protected var _validationDisplayManager:ValidationDisplayManager;
 		protected var _relevanceDisplayManager:RelevanceDisplayManager;
+		private var _contextMenu:FormItemContextMenu;
 		
 		public function FormItemPresenter(view:CollectFormItem) {
 			_view = view;
 			_relevanceDisplayManager = new RelevanceDisplayManager(view);
 			updateRelevanceDisplayManager();
-
+			_contextMenu = new FormItemContextMenu(view);
 			super();
 			
 			updateView();
@@ -50,6 +50,7 @@ package org.openforis.collect.presenter
 					if(response.nodeId == _view.parentEntity.id) {
 						updateValidationDisplayManager();
 						updateRelevanceDisplayManager();
+						_contextMenu.updateItems();
 						break;
 					}
 				}
@@ -69,6 +70,8 @@ package org.openforis.collect.presenter
 		
 		protected function updateView():void {
 			updateRelevanceDisplayManager();
+			updateValidationDisplayManager();
+			_contextMenu.updateItems();
 		}
 		
 		protected function initValidationDisplayManager():void {

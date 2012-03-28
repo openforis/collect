@@ -8,16 +8,15 @@ package org.openforis.collect.presenter {
 	import mx.collections.IList;
 	import mx.events.PropertyChangeEvent;
 	
-	import org.openforis.collect.Application;
 	import org.openforis.collect.event.UIEvent;
 	import org.openforis.collect.i18n.Message;
-	import org.openforis.collect.model.CollectRecord$Step;
 	import org.openforis.collect.model.FieldSymbol;
 	import org.openforis.collect.model.proxy.AttributeProxy;
 	import org.openforis.collect.model.proxy.FieldProxy;
 	import org.openforis.collect.ui.component.input.DropDownInputField;
 	import org.openforis.collect.util.CollectionUtil;
 	import org.openforis.collect.util.ObjectUtil;
+	import org.openforis.collect.util.StringUtil;
 	
 	/**
 	 * 
@@ -54,15 +53,17 @@ package org.openforis.collect.presenter {
 		
 		override protected function changeHandler(event:Event):void {
 			changed = true;
-			applyValue();
+			updateValue();
 		}
 		
 		protected function activeRecordChangeHandler(event:Event):void {
 			initInternalDataProvider();
+			updateView();
 		}
 		
 		protected function dataProviderChangeHandler(event:PropertyChangeEvent):void {
 			initInternalDataProvider();
+			updateView();
 		}
 		
 		protected function initInternalDataProvider():void {
@@ -70,13 +71,9 @@ package org.openforis.collect.presenter {
 			if(_view.dataProvider != null) {
 				temp.addAll(_view.dataProvider);
 			}
-			if(Application.activeRecord != null && Application.activeRecord.step == CollectRecord$Step.ENTRY) {
-				temp.addItem(BLANK_ON_FORM_ITEM);
-				temp.addItem(DASH_ON_FORM_ITEM);
-				temp.addItem(ILLEGIBLE_ITEM);
-			} else {
-				temp.addItem(EMPTY_ITEM);
-			}
+			temp.addItem(BLANK_ON_FORM_ITEM);
+			temp.addItem(DASH_ON_FORM_ITEM);
+			temp.addItem(ILLEGIBLE_ITEM);
 			_view.internalDataProvider = temp;
 		}
 		
@@ -102,9 +99,11 @@ package org.openforis.collect.presenter {
 		
 		override protected function updateView():void {
 			var item:Object = null;
+			var hasRemarks:Boolean = false;
 			var attribute:AttributeProxy = _view.attribute;
 			if(attribute != null) {
 				var field:FieldProxy = attribute.getField(_view.fieldIndex);
+				hasRemarks = StringUtil.isNotBlank(getRemarks());
 				var value:Object = field.value;
 				if(field.symbol != null && isReasonBlankSymbol(field.symbol)) {
 					switch(field.symbol) {
@@ -113,7 +112,7 @@ package org.openforis.collect.presenter {
 							break;
 						case FieldSymbol.DASH_ON_FORM:
 							item = DASH_ON_FORM_ITEM;
-							break;1
+							break;
 						case FieldSymbol.ILLEGIBLE:
 							item = ILLEGIBLE_ITEM;
 							break;
@@ -121,13 +120,12 @@ package org.openforis.collect.presenter {
 				} else if(value != null) {
 					item = getItem(value);
 				}
+			} else if(_view.defaultValue != null) {
+				item = getItem(_view.defaultValue);
 			}
-			if(item == null && Application.activeRecord != null && Application.activeRecord.step != CollectRecord$Step.ENTRY) {
-				if(_view.parentEntity != null && _view.parentEntity.isErrorOnChildVisible(_view.attributeDefinition.name)) {
-					item = EMPTY_ITEM;
-				}
-			}
+			contextMenu.updateItems();
 			_view.dropDownList.selectedItem = item;
+			_view.hasRemarks = hasRemarks;
 		}
 		
 		override protected function keyDownHandler(event:KeyboardEvent):void {
@@ -146,7 +144,7 @@ package org.openforis.collect.presenter {
 			}
 			if(item != null) {
 				_view.dropDownList.selectedItem = item;
-				applyValue();
+				updateValue();
 			}
 		}
 

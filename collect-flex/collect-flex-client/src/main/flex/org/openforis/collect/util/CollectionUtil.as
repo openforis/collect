@@ -66,5 +66,10 @@ package org.openforis.collect.util
 			list.addItemAt(item, index);
 		}
 		
+		public static function contains(list:IList, item:Object):Boolean {
+			var idx:int = list.getItemIndex(item);
+			return idx >= 0;
+		}
+		
 	}
 }

@@ -3,21 +3,24 @@
  */
 package org.openforis.collect.model.validation;
 
-import static org.openforis.collect.model.FieldSymbol.CONFIRMED;
-
 import java.util.List;
 
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.model.CollectRecord;
-import org.openforis.collect.model.FieldSymbol;
 import org.openforis.collect.model.CollectRecord.Step;
+import org.openforis.collect.model.FieldSymbol;
 import org.openforis.idm.metamodel.KeyAttributeDefinition;
+import org.openforis.idm.metamodel.NodeDefinition;
+import org.openforis.idm.metamodel.validation.MinCountValidator;
 import org.openforis.idm.metamodel.validation.ValidationResult;
 import org.openforis.idm.metamodel.validation.ValidationResultFlag;
 import org.openforis.idm.metamodel.validation.ValidationResults;
 import org.openforis.idm.metamodel.validation.Validator;
 import org.openforis.idm.model.Attribute;
+import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Field;
+import org.openforis.idm.model.NumberAttribute;
+import org.openforis.idm.model.NumericRangeAttribute;
 import org.openforis.idm.model.Record;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -34,13 +37,16 @@ public class CollectValidator extends Validator {
 	public ValidationResults validate(Attribute<?, ?> attribute) {
 		ValidationResults results = new ValidationResults();
 
+		CollectRecord record = (CollectRecord) attribute.getRecord();
+
 		// check if attribute has been specified
 		SpecifiedValidator specifiedValidator = new SpecifiedValidator();
 		ValidationResultFlag specifiedResultFlag = specifiedValidator.evaluate(attribute);
 		results.addResult(specifiedValidator, specifiedResultFlag);
 
-		if ( !specifiedResultFlag.isError() ) {
-			CollectRecord record = (CollectRecord) attribute.getRecord();
+		if ( specifiedResultFlag.isError() ) {
+			record.updateSkippedCount(attribute.getInternalId());
+		} else {
 			Step step = record.getStep();
 
 			// validate root entity keys
@@ -51,7 +57,7 @@ public class CollectValidator extends Validator {
 			/*
 			 * if the attribute is not empty and 'reason blank' has not been specified than validate it
 			 */
-			if (!(attribute.isEmpty() || isReasonBlankSpecified(attribute))) {
+			if (!(attribute.isEmpty() || isReasonBlankAlwaysSpecified(attribute))) {
 				validateAttributeValue(attribute, results);
 				if (!results.hasErrors()) {
 					validateAttributeChecks(attribute, results);
@@ -61,12 +67,34 @@ public class CollectValidator extends Validator {
 			if (step == Step.ENTRY) {
 				results = adjustErrorsForEntryPhase(results, attribute);
 			}
+			record.updateValidationCounts(attribute.getInternalId(), results);
 		}
 		return results;
 	}
 
+	@Override
+	protected MinCountValidator getMinCountValidator(NodeDefinition defn) {
+		return new CollectMinCountValidator(defn);
+	}
+	
+	@Override
+	public ValidationResultFlag validateMinCount(Entity entity, String childName) {
+		ValidationResultFlag flag = super.validateMinCount(entity, childName);
+		CollectRecord record = (CollectRecord) entity.getRecord();
+		record.updateValidationMinCounts(entity.getInternalId(), childName, flag);
+		return flag;
+	}
+	
+	@Override
+	public ValidationResultFlag validateMaxCount(Entity entity, String childName) {
+		ValidationResultFlag flag = super.validateMaxCount(entity, childName);
+		CollectRecord record = (CollectRecord) entity.getRecord();
+		record.updateValidationMaxCounts(entity.getInternalId(), childName, flag);
+		return flag;
+	}
+	
 	private ValidationResults adjustErrorsForEntryPhase(ValidationResults results, Attribute<?, ?> attribute) {
-		boolean confirmed = isValueConfirmed(attribute);
+		boolean confirmed = isErrorConfirmed(attribute);
 		
 		ValidationResults phaseEntryResults = new ValidationResults();
 		List<ValidationResult> errors = results.getErrors();
@@ -92,26 +120,27 @@ public class CollectValidator extends Validator {
 		return attribute.getDefinition() instanceof KeyAttributeDefinition && record.getRootEntity().equals(attribute.getParent());
 	}
 
-	static boolean isValueConfirmed(Attribute<?, ?> attribute) {
-		int fieldCount = attribute.getFieldCount();
-		for (int i = 0; i < fieldCount; i++) {
-			Field<?> field = attribute.getField(i);
-			Character symbol = field.getSymbol();
-
-			if (!CONFIRMED.getSymbol().equals(symbol)) {
-				return false;
-			}
-		}
-		return true;
+	static boolean isErrorConfirmed(Attribute<?, ?> attribute) {
+		CollectRecord record = (CollectRecord) attribute.getRecord();
+		return record.isErrorConfirmed(attribute);
 	}
 
-	static boolean isReasonBlankSpecified(Attribute<?, ?> attribute) {
-		int fieldCount = attribute.getFieldCount();
-		for (int i = 0; i < fieldCount; i++) {
+	static boolean isReasonBlankAlwaysSpecified(Attribute<?, ?> attribute) {
+		int fieldCount = 0;
+		// ignore unit for numeric attributes
+		if ( attribute instanceof NumberAttribute ) {
+			fieldCount = 1;
+		} else if ( attribute instanceof NumericRangeAttribute ) {
+			fieldCount = 2;
+		} else {
+			fieldCount = attribute.getFieldCount();
+		}
+
+		for ( int i = 0 ; i < fieldCount ; i++ ) {
 			Field<?> field = attribute.getField(i);
-			Character character = field.getSymbol();
-			FieldSymbol fieldSymbol = FieldSymbol.valueOf(character);
-			if (fieldSymbol == null || !fieldSymbol.isReasonBlank()) {
+			Character symbolCode = field.getSymbol();
+			FieldSymbol symbol = FieldSymbol.valueOf(symbolCode);
+			if ( symbol == null || !symbol.isReasonBlank() ) {
 				return false;
 			}
 		}

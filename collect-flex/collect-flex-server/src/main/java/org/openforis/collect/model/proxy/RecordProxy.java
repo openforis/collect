@@ -118,4 +118,26 @@ public class RecordProxy implements Proxy {
 		return false;
 	}
 
+	@ExternalizedProperty
+	public Integer getSkipped() {
+		return record.getSkipped();
+	}
+
+	@ExternalizedProperty
+	public Integer getMissing() {
+		return record.getMissing();
+	}
+
+	@ExternalizedProperty
+	public Integer getErrors() {
+		return record.getErrors();
+	}
+
+	@ExternalizedProperty
+	public Integer getWarnings() {
+		return record.getWarnings();
+	}
+
+	
+	
 }
