@@ -326,8 +326,7 @@ public class CollectRecord extends Record {
 
 	public Integer getErrors() {
 		if(errors == null) {
-			errors = getEntityValidationCount(minCountErrorCounts);
-			errors += getEntityValidationCount(maxCountErrorCounts);
+			errors = getEntityValidationCount(maxCountErrorCounts);
 			errors += getAttributeValidationCount(errorCounts);
 		}
 		return errors;
