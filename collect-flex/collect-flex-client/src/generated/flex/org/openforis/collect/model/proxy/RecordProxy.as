@@ -89,7 +89,6 @@ package org.openforis.collect.model.proxy {
 							field.remarks = reqOp.remarks;
 						} else {
 							for each (field in attr.fields) {
-								field = attr.getField(reqOp.fieldIndex);
 								field.symbol = reqOp.symbol;
 								field.remarks = reqOp.remarks;
 							}
