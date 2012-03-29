@@ -117,7 +117,10 @@ public class CollectValidator extends Validator {
 
 	private boolean isRootEntityKey(Attribute<?, ?> attribute) {
 		Record record = attribute.getRecord();
-		return attribute.getDefinition() instanceof KeyAttributeDefinition && record.getRootEntity().equals(attribute.getParent());
+		return attribute.getDefinition() instanceof KeyAttributeDefinition &&
+				((KeyAttributeDefinition) attribute.getDefinition()).isKey() &&
+				record.getRootEntity().equals(attribute.getParent()
+				);
 	}
 
 	static boolean isErrorConfirmed(Attribute<?, ?> attribute) {
