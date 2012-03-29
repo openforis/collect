@@ -8,11 +8,9 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.Application;
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.client.DataClient;
-	import org.openforis.collect.client.UpdateRequestToken;
 	import org.openforis.collect.model.CollectRecord$Step;
 	import org.openforis.collect.remoting.service.UpdateRequest;
 	import org.openforis.collect.remoting.service.UpdateRequestOperation;
-	import org.openforis.collect.ui.component.detail.CompositeAttributeRenderer;
 	import org.openforis.collect.ui.component.input.DateAttributeRenderer;
 	import org.openforis.collect.ui.component.input.DateField;
 	import org.openforis.collect.ui.component.input.InputField;
@@ -80,12 +78,9 @@ package org.openforis.collect.presenter {
 				var o:UpdateRequestOperation = field.presenter.createUpdateValueOperation();
 				operations.addItem(o);
 			}
-			var token:UpdateRequestToken = new UpdateRequestToken(UpdateRequestToken.UPDATE_VALUE);
-			token.updatedFields = _view.attribute.fields;
-			token.symbol = null;
 			var req:UpdateRequest = new UpdateRequest();
 			req.operations = operations;
-			_dataClient.updateActiveRecord(req, token, null, faultHandler);
+			_dataClient.updateActiveRecord(req, null, faultHandler);
 		}
 		
 		protected function getDateFromFields():Date {

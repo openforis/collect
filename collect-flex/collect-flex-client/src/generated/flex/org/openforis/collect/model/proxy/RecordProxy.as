@@ -10,10 +10,13 @@ package org.openforis.collect.model.proxy {
 	
 	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
+	import mx.collections.ListCollectionView;
 	
-	import org.openforis.collect.client.UpdateRequestToken;
 	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.event.EventDispatcherFactory;
+	import org.openforis.collect.remoting.service.UpdateRequest;
+	import org.openforis.collect.remoting.service.UpdateRequestOperation;
+	import org.openforis.collect.remoting.service.UpdateRequestOperation$Method;
 	import org.openforis.collect.remoting.service.UpdateResponse;
 
     [Bindable]
@@ -54,24 +57,8 @@ package org.openforis.collect.model.proxy {
 			return _nodesMap[id];
 		}
 		
-		public function update(responses:IList, token:UpdateRequestToken = null):void {
-			var field:FieldProxy;
-			if(token != null && token is UpdateRequestToken) {
-				switch(UpdateRequestToken(token).type) {
-					case UpdateRequestToken.UPDATE_VALUE:
-						//do not break, apply symbol to field
-					case UpdateRequestToken.UPDATE_SYMBOL:
-						for each (field in token.updatedFields) {
-							field.symbol = token.symbol;
-						}
-						break;
-					case UpdateRequestToken.UPDATE_REMARKS:
-						for each (field in token.updatedFields) {
-							field.remarks = token.remarks;
-						}
-						break;
-				}
-			}
+		public function update(responses:IList, req:UpdateRequest = null):void {
+			updateNodes(req);
 			
 			for each (var response:UpdateResponse in responses)	{
 				processResponse(response);
@@ -81,6 +68,35 @@ package org.openforis.collect.model.proxy {
 			var appEvt:ApplicationEvent = new ApplicationEvent(ApplicationEvent.UPDATE_RESPONSE_RECEIVED);
 			appEvt.result = responses;
 			EventDispatcherFactory.getEventDispatcher().dispatchEvent(appEvt);
+		}
+		
+		private function updateNodes(req:UpdateRequest):void {
+			var reqOperations:ListCollectionView = req.operations;
+			var attr:AttributeProxy;
+			var field:FieldProxy;
+			for each (var reqOp:UpdateRequestOperation in reqOperations) {
+				switch(reqOp.method) {
+					case UpdateRequestOperation$Method.UPDATE_REMARKS:
+						attr = getNode(reqOp.nodeId) as AttributeProxy;
+						field = attr.getField(reqOp.fieldIndex);
+						field.remarks = reqOp.remarks;
+						break;
+					case UpdateRequestOperation$Method.UPDATE:
+						attr = getNode(reqOp.nodeId) as AttributeProxy;
+						if(reqOp.fieldIndex >= 0) {
+							field = attr.getField(reqOp.fieldIndex);
+							field.symbol = reqOp.symbol;
+							field.remarks = reqOp.remarks;
+						} else {
+							for each (field in attr.fields) {
+								field = attr.getField(reqOp.fieldIndex);
+								field.symbol = reqOp.symbol;
+								field.remarks = reqOp.remarks;
+							}
+						}
+						break;
+				}
+			}
 		}
 		
 		private function processResponse(response:UpdateResponse):void {

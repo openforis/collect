@@ -79,9 +79,8 @@ package org.openforis.collect.client {
 			token.addResponder(responder);
 		}
 		
-		public function updateActiveRecord(request:UpdateRequest, token:UpdateRequestToken = null, 
-										   resultHandler:Function = null, faultHandler:Function = null):void {
-			this._queueProcessor.appendOperation(token, resultHandler, faultHandler, _updateActiveRecordOperation, request);
+		public function updateActiveRecord(request:UpdateRequest, resultHandler:Function = null, faultHandler:Function = null):void {
+			this._queueProcessor.appendOperation(request, resultHandler, faultHandler, _updateActiveRecordOperation, request);
 		}
 		
 		public function promoteActiveRecord(responder:IResponder):void {
@@ -110,13 +109,13 @@ package org.openforis.collect.client {
 			if(lastCall != null) {
 				switch(lastCall.operation) {
 					case _updateActiveRecordOperation:
-						updateActiveRecordResultHandler(event, token as UpdateRequestToken);
+						updateActiveRecordResultHandler(event, token as UpdateRequest);
 						break;
 				}
 			}
 		}
 			
-		protected function updateActiveRecordResultHandler(event:ResultEvent, token:UpdateRequestToken):void {
+		protected function updateActiveRecordResultHandler(event:ResultEvent, token:UpdateRequest):void {
 			var responses:IList = IList(event.result);
 			Application.activeRecord.update(responses, token);
 		}

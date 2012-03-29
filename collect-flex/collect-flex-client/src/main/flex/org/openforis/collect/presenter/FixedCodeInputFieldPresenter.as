@@ -81,7 +81,7 @@ package org.openforis.collect.presenter {
 			o.fieldIndex = 1;
 			o.value = value;
 			var req:UpdateRequest = new UpdateRequest(o);
-			dataClient.updateActiveRecord(req, null, null, faultHandler);
+			dataClient.updateActiveRecord(req, null, faultHandler);
 		}
 		
 	}
