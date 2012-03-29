@@ -8,7 +8,9 @@
 
 	<fx:Script>
 		<![CDATA[
+			import org.openforis.collect.Application;
 			import org.openforis.collect.i18n.Message;
+			import org.openforis.collect.model.CollectRecord$Step;
 			import org.openforis.collect.presenter.MultipleAttributeFormItemPresenter;
 			import org.openforis.collect.ui.Images;
 			
@@ -76,6 +78,8 @@
 				icon="{Images.ADD}" 
 				labelPlacement="left" 
 				useHandCursor="true"
+				visible="{Application.activeRecord.step != CollectRecord$Step.ANALYSIS}"
+				includeInLayout="{Application.activeRecord.step != CollectRecord$Step.ANALYSIS}"
 				/>
 		</s:VGroup>
 			

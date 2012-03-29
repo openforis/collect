@@ -49,6 +49,8 @@ package org.openforis.collect.metamodel.proxy {
 		public function get defaultUnit():UnitProxy {
 			if(defaultPrecision != null) {
 				return defaultPrecision.unit;
+			} else if(units != null && units.length == 1) {
+				return units.getItemAt(0) as UnitProxy;
 			} else {
 				return null;
 			}

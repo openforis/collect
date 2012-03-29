@@ -5,7 +5,7 @@
 				xmlns:mx="library://ns.adobe.com/flex/mx" 
 				xmlns:input="org.openforis.collect.ui.component.input.*" 
 				xmlns:detail="org.openforis.collect.ui.component.detail.*"
-				inputFields="{[rangeInputField, unitDropDownList]}"
+				inputFields="{[rangeInputField, unitInputField]}"
 				width="120"
 				width.singleUnit="147"
 				width.multipleUnits="242"
@@ -48,7 +48,7 @@
 								 width="120"
 								 />
 		
-		<input:DropDownInputField id="unitDropDownList" 
+		<input:DropDownInputField id="unitInputField" 
 								  includeIn="multipleUnits"
 								  attributeDefinition="{attributeDefinition}"
 								  parentEntity="{parentEntity}"

@@ -5,10 +5,9 @@
 	
 	<fx:Script>
 		<![CDATA[
-			[Bindable]
-			public var maxSpecified:int = 1;
-			[Bindable]
-			public var multiple:Boolean = false;
+			private var _maxSpecified:int = 1;
+			private var _multiple:Boolean = false;
+			private var _editable:Boolean = true;
 			
 			internal function checkSelection(lastSelectedData:Object):void {
 				if(! multiple) {
@@ -20,6 +19,33 @@
 					}
 				}
 			}
+			[Bindable]
+			public function get maxSpecified():int {
+				return _maxSpecified;
+			}
+
+			public function set maxSpecified(value:int):void {
+				_maxSpecified = value;
+			}
+
+			[Bindable]
+			public function get multiple():Boolean {
+				return _multiple;
+			}
+
+			public function set multiple(value:Boolean):void {
+				_multiple = value;
+			}
+
+			[Bindable]
+			public function get editable():Boolean {
+				return _editable;
+			}
+
+			public function set editable(value:Boolean):void {
+				_editable = value;
+			}
+
 			
 		]]>
 	</fx:Script>
@@ -62,6 +88,7 @@
 				</s:layout>
 
 				<s:CheckBox id="checkBox" 
+							enabled="{outerDocument.editable}"
 							selected="{data.selected}" 
 							label="{label}" 
 							change="checkBoxChangeHandler(event)" 

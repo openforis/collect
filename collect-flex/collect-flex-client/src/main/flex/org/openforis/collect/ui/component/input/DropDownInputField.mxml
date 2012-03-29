@@ -94,6 +94,11 @@
 			public function set defaultValue(value:String):void {
 				_defaultValue = value;
 			}
+			
+			override public function set editable(value:Boolean):void {
+				super.editable = value;
+				dropDownList.enabled = value;
+			}
 
 		]]>
 	</fx:Script>

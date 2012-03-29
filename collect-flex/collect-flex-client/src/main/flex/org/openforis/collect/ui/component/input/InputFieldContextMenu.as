@@ -107,21 +107,23 @@ package org.openforis.collect.ui.component.input {
 			}
 			items.push(EDIT_REMARKS_MENU_ITEM);
 			
-			var def:AttributeDefinitionProxy = _inputField.attributeDefinition;
-			if(def.multiple && ! (def is CodeAttributeDefinitionProxy)) {
-				items.push(DELETE_ATTRIBUTE);
-			} else if(def.parentLayout == UIUtil.LAYOUT_TABLE) {
-				var entityDef:EntityDefinitionProxy = def.parent;
-				if(entityDef != null && entityDef.multiple) {
-					switch(step) {
-						case CollectRecord$Step.ENTRY:
-							items.push(SET_STAR_IN_ROW, SET_DASH_IN_ROW );
-							break;
-						case CollectRecord$Step.CLEANSING:
-							items.push(APPROVE_MISSING_IN_ROW);
-					}
-					if( !entityDef.enumerable) {
-						items.push(DELETE_ENTITY);
+			if(step != CollectRecord$Step.ANALYSIS) {
+				var def:AttributeDefinitionProxy = _inputField.attributeDefinition;
+				if(def.multiple && ! (def is CodeAttributeDefinitionProxy)) {
+					items.push(DELETE_ATTRIBUTE);
+				} else if(def.parentLayout == UIUtil.LAYOUT_TABLE) {
+					var entityDef:EntityDefinitionProxy = def.parent;
+					if(entityDef != null && entityDef.multiple) {
+						switch(step) {
+							case CollectRecord$Step.ENTRY:
+								items.push(SET_STAR_IN_ROW, SET_DASH_IN_ROW );
+								break;
+							case CollectRecord$Step.CLEANSING:
+								items.push(APPROVE_MISSING_IN_ROW);
+						}
+						if( !entityDef.enumerable) {
+							items.push(DELETE_ENTITY);
+						}
 					}
 				}
 			}

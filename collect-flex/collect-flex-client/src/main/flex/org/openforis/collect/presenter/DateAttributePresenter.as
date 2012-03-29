@@ -5,9 +5,11 @@ package org.openforis.collect.presenter {
 	import mx.collections.ListCollectionView;
 	import mx.events.CalendarLayoutChangeEvent;
 	
+	import org.openforis.collect.Application;
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.client.DataClient;
 	import org.openforis.collect.client.UpdateRequestToken;
+	import org.openforis.collect.model.CollectRecord$Step;
 	import org.openforis.collect.remoting.service.UpdateRequest;
 	import org.openforis.collect.remoting.service.UpdateRequestOperation;
 	import org.openforis.collect.ui.component.detail.CompositeAttributeRenderer;
@@ -24,12 +26,19 @@ package org.openforis.collect.presenter {
 	 * */
 	public class DateAttributePresenter extends CompositeAttributePresenter {
 		
-		private var _dataClient:DataClient;
+		private static var _dataClient:DataClient;
+		
+		{
+			_dataClient = ClientFactory.dataClient;
+		}
 		
 		public function DateAttributePresenter(view:DateAttributeRenderer) {
-			_dataClient = ClientFactory.dataClient;
 			
 			super(view);
+			
+			view.day.textFormatFunction = twoCharsZeroPaddingFormatFunction;
+			view.month.textFormatFunction = twoCharsZeroPaddingFormatFunction;
+			view.year.textFormatFunction = fourCharsZeroPaddingFormatFunction;
 		}
 		
 		override internal function initEventListeners():void {
@@ -52,9 +61,11 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function dateFieldChangeHandler(event:Event):void {
-			var date:Date = (event.target as DateField).selectedDate;
-			if(date != null) {
-				setDateOnFields(date.fullYear, date.month + 1, date.date);
+			if(Application.activeRecord.step != CollectRecord$Step.ANALYSIS) {
+				var date:Date = (event.target as DateField).selectedDate;
+				if(date != null) {
+					setDateOnFields(date.fullYear, date.month + 1, date.date);
+				}
 			}
 		}
 		
@@ -74,7 +85,7 @@ package org.openforis.collect.presenter {
 			token.symbol = null;
 			var req:UpdateRequest = new UpdateRequest();
 			req.operations = operations;
-			dataClient.updateActiveRecord(req, token, null, faultHandler);
+			_dataClient.updateActiveRecord(req, token, null, faultHandler);
 		}
 		
 		protected function getDateFromFields():Date {
@@ -95,10 +106,14 @@ package org.openforis.collect.presenter {
 			}
 			return null;
 		}
-		
-		protected function get dataClient():DataClient {
-			return _dataClient;
-		}
 
+		protected function twoCharsZeroPaddingFormatFunction(value:String):String {
+			return InputField.zeroPaddingFormatFunction(value, 2);
+		}
+		
+		protected function fourCharsZeroPaddingFormatFunction(value:String):String {
+			return InputField.zeroPaddingFormatFunction(value, 4);
+		}
+		
 	}
 }
