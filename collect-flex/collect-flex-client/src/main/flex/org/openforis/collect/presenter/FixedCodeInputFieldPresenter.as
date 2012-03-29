@@ -32,10 +32,6 @@ package org.openforis.collect.presenter {
 			_view.qualifierTextInput.addEventListener(FocusEvent.FOCUS_OUT, qualifierFocusOutHandler);
 		}
 		
-		override protected function attributeChangeHandler(event:Event):void {
-			super.attributeChangeHandler(event);
-		}
-		
 		override protected function updateView():void {
 			super.updateView();
 			var qualifiable:Boolean = false;

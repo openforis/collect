@@ -3,9 +3,10 @@
 					xmlns:s="library://ns.adobe.com/flex/spark" 
 					xmlns:mx="library://ns.adobe.com/flex/mx" 
 					xmlns:detail="org.openforis.collect.ui.component.detail.*"
+					xmlns:layout="org.openforis.collect.ui.layout.*"
 					width="100%" height="100%"
 					creationComplete="creationCompleteHandler(event)"
-					creationPolicy="all" xmlns:layout="org.openforis.collect.ui.layout.*"
+					creationPolicy="all" 
 					>
 	
 	<fx:Script>
@@ -15,10 +16,12 @@
 			import mx.collections.ListCollectionView;
 			import mx.events.FlexEvent;
 			
+			import org.openforis.collect.Application;
 			import org.openforis.collect.i18n.Message;
 			import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 			import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
 			import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
+			import org.openforis.collect.model.CollectRecord$Step;
 			import org.openforis.collect.model.proxy.EntityProxy;
 			import org.openforis.collect.presenter.EntityFormPresenter;
 			import org.openforis.collect.ui.UIBuilder;
@@ -207,9 +210,19 @@
 							labelField="fullKeyText"
 							dataProvider="{entities}"
 							/>
-			<s:Button id="addButton" styleName="addButton" buttonMode="true" useHandCursor="true" />
-			<s:Button id="deleteButton" styleName="deleteButton" buttonMode="true" useHandCursor="true"
-					  visible="{dropDownList.selectedIndex >= 0}" includeInLayout="{dropDownList.selectedIndex >= 0}"
+			<s:Button id="addButton" 
+					  styleName="addButton" 
+					  buttonMode="true" 
+					  useHandCursor="true"
+					  visible="{Application.activeRecord.step != CollectRecord$Step.ANALYSIS}" 
+					  includeInLayout="{Application.activeRecord.step != CollectRecord$Step.ANALYSIS}" 
+					  />
+			<s:Button id="deleteButton" 
+					  styleName="deleteButton" 
+					  buttonMode="true" 
+					  useHandCursor="true"
+					  visible="{Application.activeRecord.step != CollectRecord$Step.ANALYSIS &amp;&amp; dropDownList.selectedIndex >= 0}" 
+					  includeInLayout="{Application.activeRecord.step != CollectRecord$Step.ANALYSIS &amp;&amp; dropDownList.selectedIndex >= 0}" 
 					  />
 		</s:Group>
 		<s:Group id="internalContainer" 

@@ -4,11 +4,13 @@ package org.openforis.collect.presenter {
 	import flash.events.KeyboardEvent;
 	import flash.ui.Keyboard;
 	
+	import mx.binding.utils.BindingUtils;
 	import mx.binding.utils.ChangeWatcher;
 	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
 	import mx.rpc.events.ResultEvent;
 	
+	import org.openforis.collect.Application;
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.client.DataClient;
 	import org.openforis.collect.client.UpdateRequestToken;
@@ -16,6 +18,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.event.InputFieldEvent;
 	import org.openforis.collect.event.NodeEvent;
 	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
+	import org.openforis.collect.model.CollectRecord$Step;
 	import org.openforis.collect.model.FieldSymbol;
 	import org.openforis.collect.model.proxy.AttributeProxy;
 	import org.openforis.collect.model.proxy.EntityProxy;
@@ -82,7 +85,7 @@ package org.openforis.collect.presenter {
 				_view.textInput.addEventListener(FocusEvent.FOCUS_IN, focusInHandler);
 			}
 			
-			ChangeWatcher.watch(_view, "attribute", attributeChangeHandler);
+			BindingUtils.bindSetter(setAttribute, _view, "attribute");
 		}
 		
 		protected static function approveMissingHandler(event:NodeEvent): void {
@@ -287,6 +290,7 @@ package org.openforis.collect.presenter {
 				var responses:IList = IList(event.result);
 				for each (var response:UpdateResponse in responses) {
 					if(response.nodeId == _view.attribute.id) {
+						_view.changed = false
 						updateView();
 						return;
 					}
@@ -294,8 +298,8 @@ package org.openforis.collect.presenter {
 			}
 		}
 		
-		protected function attributeChangeHandler(event:Event):void {
-			changed = false;
+		protected function setAttribute(value:AttributeProxy):void {
+			_view.changed = false;
 			_view.visited = false;
 			_view.updating = false;
 			updateView();
@@ -303,7 +307,7 @@ package org.openforis.collect.presenter {
 		
 		protected function changeHandler(event:Event):void {
 			//TODO if autocomplete enabled show autocomplete popup...
-			changed = true;
+			_view.changed = true;
 			var inputFieldEvent:InputFieldEvent = new InputFieldEvent(InputFieldEvent.CHANGING);
 			_view.dispatchEvent(inputFieldEvent);
 		}
@@ -313,7 +317,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function focusOutHandler(event:FocusEvent):void {
-			if(_view.applyChangesOnFocusOut && changed) {
+			if(_view.applyChangesOnFocusOut && _view.changed) {
 				updateValue();
 			}
 			_view.visited = true;
@@ -332,7 +336,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		public function undoLastChange():void {
-			changed = false;
+			_view.changed = false;
 			updateView();
 		}
 		
@@ -394,7 +398,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function updateResultHandler(event:ResultEvent, token:UpdateRequestToken):void {
-			changed = false;
+			_view.changed = false;
 			_view.updating = false;
 			//_view.currentState = InputField.STATE_SAVE_COMPLETE;
 		}
@@ -436,6 +440,8 @@ package org.openforis.collect.presenter {
 				_contextMenu.updateItems();
 			}
 			_view.hasRemarks = hasRemarks;
+			
+			_view.editable = Application.activeRecord.step != CollectRecord$Step.ANALYSIS;
 		}
 		
 		protected function getField():FieldProxy {
@@ -501,15 +507,6 @@ package org.openforis.collect.presenter {
 		
 		protected function get dataClient():DataClient {
 			return _dataClient;
-		}
-
-		[Bindable]
-		protected function get changed():Boolean {
-			return _changed;
-		}
-		
-		protected function set changed(value:Boolean):void {
-			_changed = value;
 		}
 
 		protected function get contextMenu():InputFieldContextMenu {

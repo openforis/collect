@@ -5,7 +5,7 @@
 				xmlns:mx="library://ns.adobe.com/flex/mx" 
 				xmlns:input="org.openforis.collect.ui.component.input.*" 
 				xmlns:detail="org.openforis.collect.ui.component.detail.*"
-				inputFields="{[numericInputField, unitDropDownList]}"
+				inputFields="{[numericInputField, unitInputField]}"
 				>
 	<fx:Script>
 		<![CDATA[
@@ -38,7 +38,8 @@
 		<s:State name="multipleUnits" />
 	</detail:states>
 	
-	<s:HGroup gap="6">
+	<s:HGroup gap="2" 
+			  verticalAlign="middle">
 		<input:NumericInputField id="numericInputField" 
 								 attributeDefinition="{attributeDefinition}"
 								 parentEntity="{parentEntity}"
@@ -47,7 +48,7 @@
 								 width="70"
 								 />
 		
-		<input:DropDownInputField id="unitDropDownList" 
+		<input:DropDownInputField id="unitInputField" 
 								  includeIn="multipleUnits"
 								  attributeDefinition="{attributeDefinition}"
 								  parentEntity="{parentEntity}"

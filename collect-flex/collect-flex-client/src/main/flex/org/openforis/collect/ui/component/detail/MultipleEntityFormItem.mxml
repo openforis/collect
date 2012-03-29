@@ -11,7 +11,9 @@
 			import mx.binding.utils.BindingUtils;
 			import mx.events.FlexEvent;
 			
+			import org.openforis.collect.Application;
 			import org.openforis.collect.i18n.Message;
+			import org.openforis.collect.model.CollectRecord$Step;
 			import org.openforis.collect.presenter.MultipleEntityFormItemPresenter;
 			import org.openforis.collect.ui.Images;
 			
@@ -57,9 +59,11 @@
 
 		<detail:FormItemLabel id="formItemLabel"
 			  				  nodeDefinition="{entityDefinition}"
+							  visible="{! occupyEntirePage}"
+							  includeInLayout="{! occupyEntirePage}"
 							  />
 
-		<s:VGroup paddingLeft="30" 
+		<s:VGroup paddingLeft="{occupyEntirePage ? 0: 30}" 
 				  height="100%" 
 				  width="100%">
 			<s:Scroller id="headerScroller" 
@@ -108,8 +112,8 @@
 				icon="{Images.ADD}" 
 				labelPlacement="left" 
 				useHandCursor="true"
-				visible="{! entityDefinition.enumerable}"
-				includeInLayout="{! entityDefinition.enumerable}"
+				visible="{! entityDefinition.enumerable &amp;&amp; Application.activeRecord.step != CollectRecord$Step.ANALYSIS}"
+				includeInLayout="{! entityDefinition.enumerable &amp;&amp; Application.activeRecord.step != CollectRecord$Step.ANALYSIS}"
 				/>
 		</s:VGroup>
 		

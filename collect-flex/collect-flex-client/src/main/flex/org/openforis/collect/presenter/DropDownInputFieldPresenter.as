@@ -3,13 +3,16 @@ package org.openforis.collect.presenter {
 	import flash.events.FocusEvent;
 	import flash.events.KeyboardEvent;
 	
+	import mx.binding.utils.BindingUtils;
 	import mx.binding.utils.ChangeWatcher;
 	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
 	import mx.events.PropertyChangeEvent;
 	
+	import org.openforis.collect.Application;
 	import org.openforis.collect.event.UIEvent;
 	import org.openforis.collect.i18n.Message;
+	import org.openforis.collect.model.CollectRecord$Step;
 	import org.openforis.collect.model.FieldSymbol;
 	import org.openforis.collect.model.proxy.AttributeProxy;
 	import org.openforis.collect.model.proxy.FieldProxy;
@@ -48,12 +51,15 @@ package org.openforis.collect.presenter {
 			_view.dropDownList.addEventListener(KeyboardEvent.KEY_DOWN, keyDownHandler);
 			eventDispatcher.addEventListener(UIEvent.ACTIVE_RECORD_CHANGED, activeRecordChangeHandler);
 			
-			ChangeWatcher.watch(_view, "dataProvider", dataProviderChangeHandler);
+			BindingUtils.bindSetter(setDataProvider, _view, "dataProvider");
+			BindingUtils.bindSetter(setDefaultValue, _view, "defaultValue");
 		}
 		
 		override protected function changeHandler(event:Event):void {
-			changed = true;
-			updateValue();
+			_view.changed = true;
+			if(_view.applyChangesOnFocusOut) {
+				updateValue();
+			}
 		}
 		
 		protected function activeRecordChangeHandler(event:Event):void {
@@ -61,8 +67,12 @@ package org.openforis.collect.presenter {
 			updateView();
 		}
 		
-		protected function dataProviderChangeHandler(event:PropertyChangeEvent):void {
+		protected function setDataProvider(value:IList):void {
 			initInternalDataProvider();
+			updateView();
+		}
+		
+		protected function setDefaultValue(value:String):void {
 			updateView();
 		}
 		
@@ -120,10 +130,12 @@ package org.openforis.collect.presenter {
 				} else if(value != null) {
 					item = getItem(value);
 				}
-			} else if(_view.defaultValue != null) {
+			}
+			if(item == null && _view.defaultValue != null) {
 				item = getItem(_view.defaultValue);
 			}
 			contextMenu.updateItems();
+			_view.editable = Application.activeRecord.step != CollectRecord$Step.ANALYSIS;
 			_view.dropDownList.selectedItem = item;
 			_view.hasRemarks = hasRemarks;
 		}
