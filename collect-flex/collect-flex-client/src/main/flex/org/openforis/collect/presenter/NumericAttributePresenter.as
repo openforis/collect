@@ -23,14 +23,14 @@ package org.openforis.collect.presenter {
 		
 		public function NumericAttributePresenter(view:NumericAttributeRenderer) {
 			_view = view;
+			initRestriction();
 			super(view);
-			initUnits();
 			view.numericInputField.applyChangesOnFocusOut = false;
+			//depends on view.currentState
 			if(view.unitInputField != null) {
 				view.unitInputField.applyChangesOnFocusOut = false;
 				view.unitInputField.dropDownList.addEventListener(Event.CHANGE, unitInputFieldChangeHandler);
 			}
-			initRestriction();
 		}
 		
 		override internal function initEventListeners():void {
@@ -46,30 +46,27 @@ package org.openforis.collect.presenter {
 		
 		protected function unitInputFieldChangeHandler(event:Event):void {
 			if(! view.numericInputField.isEmpty()) {
-				updateUnitField();
+				updateValue();
 			}
 		}
 		
 		protected function updateValue():void {
-			view.numericInputField.presenter.updateValue();
-			updateUnitField();
-		}
-		
-		protected function updateUnitField():void {
-			var reqOp:UpdateRequestOperation = createUpdateUnitOperation();
-			if(view.numericInputField.isEmpty()) {
-				//clear unit
-				reqOp.value = null;
-			}
 			var updReq:UpdateRequest = new UpdateRequest();
-			updReq.addOperation(reqOp);
+			var updateValueOp:UpdateRequestOperation = view.numericInputField.presenter.createUpdateValueOperation();
+			updReq.addOperation(updateValueOp);
+			var updateUnitOp:UpdateRequestOperation = createUpdateUnitOperation();
+			if(updateValueOp.value == null) {
+				//clear unit
+				updateUnitOp.value = null;
+			}
+			updReq.addOperation(updateUnitOp);
 			ClientFactory.dataClient.updateActiveRecord(updReq, null, faultHandler);
 		}
 		
 		protected function createUpdateUnitOperation():UpdateRequestOperation {
 			var numberAttrDefn:NumberAttributeDefinitionProxy = NumberAttributeDefinitionProxy(view.attributeDefinition);
 			var result:UpdateRequestOperation = null;
-			if(view.unitInputField) {
+			if(view.unitInputField != null) {
 				result = view.unitInputField.presenter.createUpdateValueOperation();
 			} else {
 				result = new UpdateRequestOperation();
@@ -96,7 +93,7 @@ package org.openforis.collect.presenter {
 			}
 		}
 		
-		protected function initUnits():void {
+		override protected function initViewState():void {
 			var attrDefn:NumberAttributeDefinitionProxy = NumberAttributeDefinitionProxy(view.attributeDefinition);
 			var units:IList = attrDefn.units;
 			if(units.length > 0) {
