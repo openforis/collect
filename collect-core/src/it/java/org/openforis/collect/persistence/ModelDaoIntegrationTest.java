@@ -25,7 +25,6 @@ import org.openforis.collect.model.RecordSummarySortField;
 import org.openforis.collect.model.RecordSummarySortField.Sortable;
 import org.openforis.collect.persistence.xml.CollectIdmlBindingContext;
 import org.openforis.idm.metamodel.EntityDefinition;
-import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.validation.Validator;
 import org.openforis.idm.metamodel.xml.InvalidIdmlException;
@@ -75,7 +74,7 @@ public class ModelDaoIntegrationTest {
 
 		// SAVE NEW
 		CollectRecord record = createTestRecord(survey, "123_456");
-		recordDao.saveOrUpdate(record);
+		recordDao.insert(record);
 		
 		String saved = record.toString();
 		log.debug("Saving record:\n"+saved);
@@ -99,19 +98,19 @@ public class ModelDaoIntegrationTest {
 		}
 		
 		// SAVE NEW
-		CollectRecord record = createTestRecord(survey, "123_456");
-		recordDao.saveOrUpdate(record);
+		String testKey = "123_456";
+		CollectRecord record = createTestRecord(survey, testKey);
+		recordDao.insert(record);
 		
 		String saved = record.toString();
 		log.debug("Saving record:\n"+saved);
 		
-		Schema schema = survey.getSchema();
-		
 		// RELOAD
-		List<CollectRecord> summaries = recordDao.loadSummaries(survey, "cluster", "123_456");
+		List<CollectRecord> summaries = recordDao.loadSummaries(survey, "cluster", testKey);
 		Assert.assertEquals(1, summaries.size());
 		CollectRecord record1 = summaries.get(0);
-		System.out.println("test");
+		String key = record1.getRootEntityKeyValues().get(0);
+		assertEquals(key, testKey);
 	}
 
 
