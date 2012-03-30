@@ -76,7 +76,7 @@ package org.openforis.collect.ui.component.input {
 		
 		public function updateItems():void {
 			var items:Array = null;
-			if(Application.activeRecord != null) {
+			if(Application.activeRecord != null && _inputField.parentEntity != null) {
 				var step:CollectRecord$Step = Application.activeRecord.step;
 				items = createMenuItems(step);
 				_contextMenu.hideBuiltInItems();
@@ -127,7 +127,6 @@ package org.openforis.collect.ui.component.input {
 					}
 				}
 			}
-			
 			return items;
 		}
 		
