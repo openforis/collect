@@ -2,6 +2,7 @@ package org.openforis.collect.util {
 	import flash.display.DisplayObject;
 	import flash.geom.Rectangle;
 	
+	import mx.collections.IList;
 	import mx.controls.ToolTip;
 	import mx.core.IToolTip;
 	import mx.core.IUIComponent;
@@ -18,17 +19,16 @@ package org.openforis.collect.util {
 		public static const STYLE_NAME_ERROR:String = "error";
 		public static const STYLE_NAME_WARNING:String = "warning";
 		
-		public static function create(object:DisplayObject, errorMsg:String, styleName:String = STYLE_NAME_ERROR):ToolTip {
+		public static function create(object:DisplayObject, messages:Array, styleName:String = STYLE_NAME_ERROR):ToolTip {
 			var pt:Rectangle = object.stage.getBounds(object);
 			var yPos:Number = -(pt.y);
 			var xPos:Number = -(pt.x);
-
-			if(styleName == STYLE_NAME_ERROR) {
-				errorMsg = Message.get("edit.validationToolTip.error", [errorMsg]);
-			} else if(styleName == STYLE_NAME_WARNING) {
-				errorMsg = Message.get("edit.validationToolTip.warning", [errorMsg]);
-			}
-			var toolTip:ToolTip = ToolTipManager.createToolTip(errorMsg, xPos + object.width, yPos, null, object as IUIComponent) as ToolTip;
+			
+			var multipleMessages:Boolean = messages.length > 1;
+			var title:String = getValidationToolTipTitle(styleName, multipleMessages);
+			var content:String = getValidationToolTipContent(title, messages);
+			
+			var toolTip:ToolTip = ToolTipManager.createToolTip(content, xPos + object.width, yPos, null, object as IUIComponent) as ToolTip;
 			toolTip.styleName = styleName;
 			
 			var position:String;
@@ -40,6 +40,36 @@ package org.openforis.collect.util {
 			var borderStyle:String = getBorderStyle(position);
 			toolTip.setStyle("borderStyle", borderStyle);
 			return toolTip;
+		}
+		
+		private static function getValidationToolTipTitle(styleName:String, multipleMessages:Boolean = false):String {
+			var title:String;
+			if(styleName == STYLE_NAME_ERROR) {
+				if(multipleMessages) {
+					title = Message.get("edit.validationToolTipTitle.errors");
+				} else {
+					title = Message.get("edit.validationToolTipTitle.error");
+				}
+			} else if(styleName == STYLE_NAME_WARNING) {
+				if(multipleMessages) {
+					title = Message.get("edit.validationToolTipTitle.warnings");
+				} else {
+					title = Message.get("edit.validationToolTipTitle.warning");
+				}
+			}
+			return title;
+		}
+		
+		private static function getValidationToolTipContent(title:String, messages:Array):String {
+			var content:String = title;
+			if(messages.length == 1) {
+				content += " " + messages[0];
+			} else {
+				for each (var message:String in messages) {
+					content += "\n - " + message;
+				}
+			}
+			return content;
 		}
 		
 		public static function destroy(toolTip:IToolTip):void{

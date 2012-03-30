@@ -6,14 +6,11 @@
  */
 
 package org.openforis.collect.model.proxy {
-	import mx.collections.IList;
-	
-	import org.openforis.collect.i18n.Message;
-	import org.openforis.collect.metamodel.proxy.LanguageSpecificTextProxy;
 	import org.openforis.collect.util.CollectionUtil;
-	import org.openforis.collect.util.StringUtil;
-	import org.openforis.idm.metamodel.validation.ValidationResultFlag;
 
+	/**
+	 * @author S. Ricci
+	 * */
     [Bindable]
     [RemoteClass(alias="org.openforis.collect.model.proxy.AttributeProxy")]
     public class AttributeProxy extends AttributeProxyBase {
@@ -23,82 +20,6 @@ package org.openforis.collect.model.proxy {
 				index = 0;
 			}
 			return fields.getItemAt(index) as FieldProxy;
-		}
-
-		public function get validationMessage():String {
-			var results:IList = null;
-			var flag:ValidationResultFlag;
-			if(hasErrors()) {
-				results = validationResults.errors;
-				flag = ValidationResultFlag.ERROR;
-			} else if(hasWarnings()) {
-				results = validationResults.warnings;
-				flag = ValidationResultFlag.WARNING;
-			}
-			if(results != null) {
-				var parts:Array = new Array();
-				for each (var r:ValidationResultProxy in results) {
-					var message:String = LanguageSpecificTextProxy.getLocalizedText(r.messages);
-					if(StringUtil.isBlank(message)) {
-						var messageResource:String = null;
-						switch(r.ruleName) {
-							case "CodeValidator":
-								messageResource = "edit.validation.codeError";
-								break;
-							case "ComparisonCheck":
-								messageResource = "edit.validation.comparisonError";
-								break;
-							case "CoordinateValidator":
-								messageResource = "edit.validation.coordinateError";
-								break;
-							case "DateValidator":
-								messageResource = "edit.validation.dateError";
-								break;
-							case "DistanceCheck":
-								messageResource = "edit.validation.distanceError";
-								break;
-							case "ExternalCodeValidator":
-								messageResource = "edit.validation.externalCodeError";
-								break;
-							case "IntegerRangeValidator":
-								messageResource = "edit.validation.integerRangeError";
-								break;
-							case "PatternCheck":
-								messageResource = "edit.validation.patternError";
-								break;
-							case "RealRangeValidator":
-								messageResource = "edit.validation.realRangeError";
-								break;
-							case "RecordKeyUniquenessValidator":
-								messageResource = "edit.validation.recordKeyUniquenessError";
-								break;
-							case "SpecifiedValidator":
-								if(flag == ValidationResultFlag.ERROR) {
-									messageResource = "edit.validation.specifiedError";
-								} else {
-									messageResource = "edit.validation.requiredWarning";
-								}
-								break;
-							case "TimeValidator":
-								messageResource = "edit.validation.timeError";
-								break;
-							case "UniquenessCheck":
-								messageResource = "edit.validation.uniquenessError";
-								break;
-						}
-						if(messageResource != null) {
-							message = Message.get(messageResource);
-						} else {
-							message = r.ruleName;
-						}
-					}
-					parts.push(message);
-				}
-				if(parts.length > 0) {
-					return StringUtil.concat(";\n", parts);
-				}
-			}
-			return null;
 		}
 		
 		override public function hasErrors():Boolean {
