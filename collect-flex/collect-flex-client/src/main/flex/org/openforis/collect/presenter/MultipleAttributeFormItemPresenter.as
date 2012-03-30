@@ -1,24 +1,19 @@
 package org.openforis.collect.presenter
 {
-	import flash.events.Event;
 	import flash.events.FocusEvent;
 	import flash.events.MouseEvent;
 	
 	import mx.collections.IList;
-	import mx.core.UIComponent;
-	import mx.events.CollectionEvent;
 	import mx.rpc.events.ResultEvent;
 	
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.event.InputFieldEvent;
-	import org.openforis.collect.model.proxy.AttributeProxy;
 	import org.openforis.collect.remoting.service.UpdateRequest;
 	import org.openforis.collect.remoting.service.UpdateRequestOperation;
 	import org.openforis.collect.remoting.service.UpdateRequestOperation$Method;
 	import org.openforis.collect.remoting.service.UpdateResponse;
 	import org.openforis.collect.ui.component.detail.MultipleAttributeFormItem;
-	import org.openforis.collect.ui.component.detail.ValidationDisplayManager;
 	import org.openforis.collect.ui.component.input.InputField;
 	import org.openforis.collect.util.AlertUtil;
 	import org.openforis.collect.util.CollectionUtil;
@@ -99,7 +94,7 @@ package org.openforis.collect.presenter
 				o.parentEntityId = view.parentEntity.id;
 				o.nodeName = view.attributeDefinition.name;
 				var req:UpdateRequest = new UpdateRequest(o);
-				ClientFactory.dataClient.updateActiveRecord(req, null, addResultHandler, faultHandler);
+				ClientFactory.dataClient.updateActiveRecord(req, addResultHandler, faultHandler);
 			} else {
 				var labelText:String = view.attributeDefinition.getLabelText();
 				AlertUtil.showError("edit.maxCountExceed", [maxCount, labelText]);

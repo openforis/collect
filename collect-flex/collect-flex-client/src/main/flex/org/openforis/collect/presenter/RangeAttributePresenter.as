@@ -2,14 +2,11 @@ package org.openforis.collect.presenter {
 	import flash.events.Event;
 	import flash.events.FocusEvent;
 	
-	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
 	
 	import org.openforis.collect.client.ClientFactory;
-	import org.openforis.collect.client.UpdateRequestToken;
 	import org.openforis.collect.metamodel.proxy.RangeAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.UnitProxy;
-	import org.openforis.collect.model.proxy.FieldProxy;
 	import org.openforis.collect.remoting.service.UpdateRequest;
 	import org.openforis.collect.remoting.service.UpdateRequestOperation;
 	import org.openforis.collect.remoting.service.UpdateRequestOperation$Method;
@@ -64,13 +61,9 @@ package org.openforis.collect.presenter {
 				//clear unit
 				reqOp.value = null;
 			}
-			var token:UpdateRequestToken = new UpdateRequestToken(UpdateRequestToken.UPDATE_VALUE);
-			token.symbol = reqOp.symbol;
-			var field:FieldProxy = view.attribute.fields[2];
-			token.updatedFields = new ArrayCollection([field]);
 			var updReq:UpdateRequest = new UpdateRequest();
 			updReq.addOperation(reqOp);
-			ClientFactory.dataClient.updateActiveRecord(updReq, token, null, faultHandler);
+			ClientFactory.dataClient.updateActiveRecord(updReq, null, faultHandler);
 		}
 		
 		protected function createUpdateUnitOperation():UpdateRequestOperation {
