@@ -365,6 +365,18 @@ public class DataService {
 					response.setRequired(childName, entity.isRequired(childName));
 					response.setMinCountValid(childName, entity.validateMinCount(childName));
 					response.setMaxCountValid(childName, entity.validateMaxCount(childName));
+					
+					List<Node<? extends NodeDefinition>> list = entity.getAll(childName);
+					for ( Node<? extends NodeDefinition> node : list ) {
+						if ( node instanceof Attribute ){
+							Attribute<?, ?> attribute = (Attribute<?, ?>) node;
+							attribute.clearValidationResults();
+							ValidationResults results = attribute.validateValue();
+							UpdateResponse resp = getUpdateResponse(responseMap, attribute.getInternalId());
+							resp.setAttributeValidationResults(results);
+						}
+					}
+					
 				}
 			}
 		}
