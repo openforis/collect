@@ -7,14 +7,9 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.collect.Proxy;
-import org.openforis.collect.model.proxy.AttributeProxy;
-import org.openforis.collect.model.proxy.EntityProxy;
 import org.openforis.collect.model.proxy.NodeProxy;
 import org.openforis.collect.model.proxy.ValidationResultsProxy;
 import org.openforis.idm.metamodel.validation.ValidationResults;
-import org.openforis.idm.model.Attribute;
-import org.openforis.idm.model.Entity;
-import org.openforis.idm.model.Node;
 
 /**
  * 
@@ -96,14 +91,6 @@ public class UpdateResponse implements Proxy {
 	@ExternalizedProperty
 	public NodeProxy getCreatedNode() {
 		return this.creatednode;
-//		if(creatednode != null){
-//			if(creatednode instanceof Attribute<?, ?>) {
-//				return new AttributeProxy(null, (Attribute<?, ?>) creatednode);
-//			} else if(creatednode instanceof Entity) {
-//				return new EntityProxy(null, (Entity) creatednode);
-//			}
-//		}
-//		return null;
 	}
 	
 	public void setCreatedNode(NodeProxy nodeProxy) {
