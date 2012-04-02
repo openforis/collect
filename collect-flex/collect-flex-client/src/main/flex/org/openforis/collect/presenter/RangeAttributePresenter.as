@@ -21,8 +21,8 @@ package org.openforis.collect.presenter {
 		public function RangeAttributePresenter(view:RangeAttributeRenderer) {
 			_view = view;
 			super(view);
-			initUnits();
 			view.rangeInputField.applyChangesOnFocusOut = false;
+			//depends on view.currentState
 			if(view.unitInputField != null) {
 				view.unitInputField.applyChangesOnFocusOut = false;
 				view.unitInputField.dropDownList.addEventListener(Event.CHANGE, unitInputFieldChangeHandler);
@@ -46,26 +46,23 @@ package org.openforis.collect.presenter {
 		
 		protected function unitInputFieldChangeHandler(event:Event):void {
 			if(! view.rangeInputField.isEmpty()) {
-				updateUnitField();
+				updateValue();
 			}
 		}
 		
 		protected function updateValue():void {
-			view.rangeInputField.presenter.updateValue();
-			updateUnitField();
-		}
-		
-		protected function updateUnitField():void {
-			var reqOp:UpdateRequestOperation = createUpdateUnitOperation();
-			if(view.rangeInputField.isEmpty()) {
-				//clear unit
-				reqOp.value = null;
-			}
 			var updReq:UpdateRequest = new UpdateRequest();
-			updReq.addOperation(reqOp);
+			var updateValueOp:UpdateRequestOperation = view.rangeInputField.presenter.createUpdateValueOperation();
+			updReq.addOperation(updateValueOp);
+			var updateUnitOp:UpdateRequestOperation = createUpdateUnitOperation();
+			if(updateValueOp.value == null) {
+				//clear unit
+				updateUnitOp.value = null;
+			}
+			updReq.addOperation(updateUnitOp);
 			ClientFactory.dataClient.updateActiveRecord(updReq, null, faultHandler);
 		}
-		
+
 		protected function createUpdateUnitOperation():UpdateRequestOperation {
 			var attrDefn:RangeAttributeDefinitionProxy = RangeAttributeDefinitionProxy(view.attributeDefinition);
 			var result:UpdateRequestOperation = null;
@@ -83,7 +80,7 @@ package org.openforis.collect.presenter {
 			return result;
 		}
 		
-		protected function initUnits():void {
+		override protected function initViewState():void {
 			var attrDefn:RangeAttributeDefinitionProxy = RangeAttributeDefinitionProxy(view.attributeDefinition);
 			var units:IList = attrDefn.units;
 			if(units.length > 0) {

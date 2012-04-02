@@ -6,9 +6,94 @@
  */
 
 package org.openforis.collect.model.proxy {
+	import mx.collections.IList;
+	
+	import org.openforis.collect.i18n.Message;
+	import org.openforis.collect.metamodel.proxy.LanguageSpecificTextProxy;
+	import org.openforis.collect.util.CollectionUtil;
+	import org.openforis.collect.util.StringUtil;
+	import org.openforis.idm.metamodel.validation.ValidationResultFlag;
 
+	/**
+	 * @author S. Ricci
+	 * */
     [Bindable]
     [RemoteClass(alias="org.openforis.collect.model.proxy.ValidationResultsProxy")]
     public class ValidationResultsProxy extends ValidationResultsProxyBase {
+		
+		public function get validationMessages():Array {
+			var results:IList = null;
+			var flag:ValidationResultFlag;
+			if(CollectionUtil.isNotEmpty(errors)) {
+				results = errors;
+				flag = ValidationResultFlag.ERROR;
+			} else if(CollectionUtil.isNotEmpty(warnings)) {
+				results = warnings;
+				flag = ValidationResultFlag.WARNING;
+			}
+			var messages:Array = null;
+			if(results != null) {
+				messages = new Array();
+				for each (var r:ValidationResultProxy in results) {
+					var message:String = LanguageSpecificTextProxy.getLocalizedText(r.messages);
+					if(StringUtil.isBlank(message)) {
+						var messageResource:String = null;
+						switch(r.ruleName) {
+							case "CodeValidator":
+								messageResource = "edit.validation.codeError";
+								break;
+							case "ComparisonCheck":
+								messageResource = "edit.validation.comparisonError";
+								break;
+							case "CoordinateValidator":
+								messageResource = "edit.validation.coordinateError";
+								break;
+							case "DateValidator":
+								messageResource = "edit.validation.dateError";
+								break;
+							case "DistanceCheck":
+								messageResource = "edit.validation.distanceError";
+								break;
+							case "ExternalCodeValidator":
+								messageResource = "edit.validation.externalCodeError";
+								break;
+							case "IntegerRangeValidator":
+								messageResource = "edit.validation.integerRangeError";
+								break;
+							case "PatternCheck":
+								messageResource = "edit.validation.patternError";
+								break;
+							case "RealRangeValidator":
+								messageResource = "edit.validation.realRangeError";
+								break;
+							case "RecordKeyUniquenessValidator":
+								messageResource = "edit.validation.recordKeyUniquenessError";
+								break;
+							case "SpecifiedValidator":
+								if(flag == ValidationResultFlag.ERROR) {
+									messageResource = "edit.validation.specifiedError";
+								} else {
+									messageResource = "edit.validation.requiredWarning";
+								}
+								break;
+							case "TimeValidator":
+								messageResource = "edit.validation.timeError";
+								break;
+							case "UniquenessCheck":
+								messageResource = "edit.validation.uniquenessError";
+								break;
+						}
+						if(messageResource != null) {
+							message = Message.get(messageResource);
+						} else {
+							message = r.ruleName;
+						}
+					}
+					messages.push(message);
+				}
+			}
+			return messages;
+		}
+
     }
 }

@@ -119,7 +119,7 @@ detail|AttributeItemRenderer.warning,
 	borderColor: #FF8800;
 }
 
-.notRelevant input|TextInput { 
+.notRelevant input|TextInput, .notRelevant mx|TextArea { 
 	contentBackgroundColor: #DDDDDD;
 }
 
