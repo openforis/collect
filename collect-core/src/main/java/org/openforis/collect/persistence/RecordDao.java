@@ -86,10 +86,19 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 		}
 	}
 
-	public int countRecords(int rootDefinitionId) {
+	@Transactional
+	public int countRecords(int rootDefinitionId, String... keyValues) {
 		JooqFactory f = getMappingJooqFactory();
 		SelectQuery q = f.selectCountQuery();
 		q.addConditions(OFC_RECORD.ROOT_ENTITY_ID.equal(rootDefinitionId));
+		if ( keyValues != null ) {
+			for (int i = 0; i < keyValues.length; i++) {
+				String key = keyValues[i];
+				@SuppressWarnings("unchecked")
+				Field<String> keyField = (Field<String>) KEY_FIELDS[i];
+				q.addConditions(keyField.lower().equal(key.toLowerCase()));
+			}
+		}
 		Record r = q.fetchOne();
 		return r.getValueAsInteger(0);
 	}
@@ -198,7 +207,7 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 	}
 	
 	@Transactional
-	public List<CollectRecord> loadSummaries(CollectSurvey survey, String rootEntity, int offset, int maxRecords, List<RecordSummarySortField> sortFields, String filter) {
+	public List<CollectRecord> loadSummaries(CollectSurvey survey, String rootEntity, int offset, int maxRecords, List<RecordSummarySortField> sortFields, String... keyValues) {
 		JooqFactory jf = getMappingJooqFactory(survey);
 		SelectQuery q = jf.selectQuery();	
 		q.addFrom(OFC_RECORD);
@@ -209,7 +218,17 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 		Integer rootEntityDefnId = rootEntityDefn.getId();
 		q.addConditions(OFC_RECORD.ROOT_ENTITY_ID.equal(rootEntityDefnId));
 
-		if(sortFields != null) {
+		//add key columns conditions
+		if ( keyValues != null ) {
+			for (int i = 0; i < keyValues.length && i < KEY_FIELDS.length; i++) {
+				String key = keyValues[i];
+				@SuppressWarnings("unchecked")
+				Field<String> keyField = (Field<String>) KEY_FIELDS[i];
+				q.addConditions(keyField.lower().equal(key.toLowerCase()));
+			}
+		}
+		
+		if ( sortFields != null ) {
 			for (RecordSummarySortField sortField : sortFields) {
 				addOrderBy(q, sortField);
 			}

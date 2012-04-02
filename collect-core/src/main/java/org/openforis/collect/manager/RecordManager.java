@@ -103,16 +103,16 @@ public class RecordManager {
 	}
 	
 	@Transactional
-	public List<CollectRecord> getSummaries(CollectSurvey survey, String rootEntity, int offset, int maxNumberOfRecords, List<RecordSummarySortField> sortFields, String filter) {
-		List<CollectRecord> recordsSummary = recordDao.loadSummaries(survey, rootEntity, offset, maxNumberOfRecords, sortFields, filter);
+	public List<CollectRecord> loadSummaries(CollectSurvey survey, String rootEntity, int offset, int maxNumberOfRecords, List<RecordSummarySortField> sortFields, String... keyValues) {
+		List<CollectRecord> recordsSummary = recordDao.loadSummaries(survey, rootEntity, offset, maxNumberOfRecords, sortFields, keyValues);
 		return recordsSummary;
 	}
 
 	@Transactional
-	public int getCountRecords(CollectSurvey survey, String rootEntity) {
+	public int getCountRecords(CollectSurvey survey, String rootEntity, String... keyValues) {
 		Schema schema = survey.getSchema();
 		EntityDefinition rootEntityDefinition = schema.getRootEntityDefinition(rootEntity);
-		int count = recordDao.countRecords(rootEntityDefinition.getId());
+		int count = recordDao.countRecords(rootEntityDefinition.getId(), keyValues);
 		return count;
 	}
 
