@@ -208,11 +208,20 @@ public class RecordManager {
 			if(version.isApplicable(nodeDefn)) {
 				String name = nodeDefn.getName();
 				if(entity.getCount(name) == 0) {
-					if(nodeDefn instanceof AttributeDefinition) {
-						Node<?> createNode = nodeDefn.createNode();
-						entity.add(createNode);
-					} else if(nodeDefn instanceof EntityDefinition && ! nodeDefn.isMultiple()) {
-						addEntity(entity, name);
+					int count = 0;
+					int toBeInserted = entity.getEffectiveMinCount(name);
+					if ( toBeInserted == 0 && ( nodeDefn instanceof AttributeDefinition || ! nodeDefn.isMultiple() ) ) {
+						//insert at least one attribute or one single entity
+						toBeInserted = 1;
+					}
+					while(count < toBeInserted) {
+						if(nodeDefn instanceof AttributeDefinition) {
+							Node<?> createNode = nodeDefn.createNode();
+							entity.add(createNode);
+						} else if(nodeDefn instanceof EntityDefinition) {
+							addEntity(entity, name);
+						}
+						count ++;
 					}
 				} else {
 					List<Node<?>> all = entity.getAll(name);
