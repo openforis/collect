@@ -231,7 +231,7 @@ package org.openforis.collect.presenter {
 			var responder:IResponder = new AsyncResponder(getRecordsSummaryResultHandler, faultHandler);
 			var rootEntityName:String = Application.activeRootEntity.name;
 			
-			_dataClient.getRecordSummaries(responder, rootEntityName, 
+			_dataClient.loadRecordSummaries(responder, rootEntityName, 
 				offset, MAX_RECORDS_PER_PAGE, currentSortFields, keyValuesFilter);
 		}
 		
