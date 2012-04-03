@@ -6,13 +6,19 @@ package org.openforis.collect.presenter {
 	import flash.display.DisplayObject;
 	import flash.events.Event;
 	import flash.events.FocusEvent;
+	import flash.events.KeyboardEvent;
 	import flash.events.MouseEvent;
 	
+	import mx.binding.utils.BindingUtils;
+	import mx.binding.utils.ChangeWatcher;
 	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
 	import mx.collections.ListCollectionView;
 	import mx.core.FlexGlobals;
 	import mx.events.CloseEvent;
+	import mx.events.FlexEvent;
+	import mx.events.FlexMouseEvent;
+	import mx.events.PropertyChangeEvent;
 	import mx.managers.PopUpManager;
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.IResponder;
@@ -23,18 +29,22 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.client.DataClient;
 	import org.openforis.collect.event.UIEvent;
 	import org.openforis.collect.i18n.Message;
+	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
 	import org.openforis.collect.model.RecordSummarySortField;
 	import org.openforis.collect.model.RecordSummarySortField$Sortable;
 	import org.openforis.collect.model.proxy.RecordProxy;
 	import org.openforis.collect.ui.UIBuilder;
+	import org.openforis.collect.ui.component.RecordFilterPopUp;
 	import org.openforis.collect.ui.component.SelectVersionPopUp;
 	import org.openforis.collect.ui.component.datagrid.PaginationBar;
 	import org.openforis.collect.ui.component.datagrid.RecordSummaryDataGrid;
+	import org.openforis.collect.ui.component.input.TextInput;
 	import org.openforis.collect.ui.view.ListView;
 	import org.openforis.collect.util.AlertUtil;
 	import org.openforis.collect.util.CollectionUtil;
+	import org.openforis.collect.util.PopUpUtil;
 	import org.openforis.collect.util.StringUtil;
 	
 	import spark.collections.Sort;
@@ -49,6 +59,7 @@ package org.openforis.collect.presenter {
 		
 		private var _selectVersionPopUp:SelectVersionPopUp;
 		private var _newRecordResponder:IResponder;
+		private var _filterPopUp:RecordFilterPopUp;
 		
 		/**
 		 * The total number of records.
@@ -70,7 +81,7 @@ package org.openforis.collect.presenter {
 		/**
 		 * The current filter applied on root entity key fields. 
 		 * */
-		private var keyValuesFilter:Array = null;
+		private var currentKeyValuesFilter:Array = null;
 		
 		/**
 		 * Max number of records that can be loaded for a single page.
@@ -92,7 +103,7 @@ package org.openforis.collect.presenter {
 			this._view.addButton.addEventListener(MouseEvent.CLICK, addButtonClickHandler);
 			this._view.editButton.addEventListener(MouseEvent.CLICK, editButtonClickHandler);
 			this._view.deleteButton.addEventListener(MouseEvent.CLICK, deleteButtonClickHandler);
-			this._view.filterButton.addEventListener(MouseEvent.CLICK, filterButtonClickHandler);
+			this._view.openFilterPopUpButton.addEventListener(MouseEvent.CLICK, openFilterPopUpButtonClickHandler);
 			
 			this._view.dataGrid.addEventListener(GridSortEvent.SORT_CHANGING, dataGridSortChangingHandler);
 			
@@ -185,16 +196,54 @@ package org.openforis.collect.presenter {
 			}
 		}
 		
-		/**
-		 * Filter by id text input focussed out
-		 * */
-		protected function filterButtonClickHandler(event:Event):void {
-			var query:String = _view.filterByIdTextInput.text;
-			query = StringUtil.trim(query);
-			_view.filterByIdTextInput.text = query;
-			keyValuesFilter = query != "" ? query.split(" "): null;
+		protected function openFilterPopUpButtonClickHandler(event:Event):void {
+			var application:DisplayObject = DisplayObject(FlexGlobals.topLevelApplication);
+			if(_filterPopUp == null) {
+				_filterPopUp = RecordFilterPopUp(PopUpManager.createPopUp(application, RecordFilterPopUp));
+				_filterPopUp.addEventListener(CloseEvent.CLOSE, filterPopUpCloseHandler);
+				_filterPopUp.cancelButton.addEventListener(MouseEvent.CLICK, filterPopUpCloseHandler);
+				_filterPopUp.applyButton.addEventListener(MouseEvent.CLICK, filterPopUpApplyHandler);
+				_filterPopUp.resetButton.addEventListener(MouseEvent.CLICK, filterPopUpResetHandler);
+				_filterPopUp.addEventListener(FlexMouseEvent.MOUSE_DOWN_OUTSIDE, filterPopUpCloseHandler);
+			}
+			PopUpManager.addPopUp(_filterPopUp, application);
+			var keyAttributeDefinitions:IList = Application.activeRootEntity.keyAttributeDefinitions;
+			_filterPopUp.fieldsRp.dataProvider = keyAttributeDefinitions;
+			for(var index:int = 0; index < _filterPopUp.textInput.length; index ++) {
+				var textInput:TextInput = _filterPopUp.textInput[index];
+				textInput.addEventListener(FlexEvent.ENTER, filterPopUpApplyHandler);
+				if(currentKeyValuesFilter != null && index < currentKeyValuesFilter.length) {
+					textInput.text = currentKeyValuesFilter[index];
+				}
+			}
+			PopUpUtil.alignToField(_filterPopUp, _view.openFilterPopUpButton, 
+				PopUpUtil.POSITION_BELOW, 
+				PopUpUtil.VERTICAL_ALIGN_BOTTOM, 
+				PopUpUtil.HORIZONTAL_ALIGN_RIGHT);
+			//PopUpManager.centerPopUp(_filterPopUp);
+		}
+		
+		protected function filterPopUpCloseHandler(event:Event = null):void {
+			PopUpManager.removePopUp(_filterPopUp);
+		}
+		
+		protected function filterPopUpApplyHandler(event:Event):void {
+			var filter:Array = new Array();
+			for each (var textInput:TextInput in _filterPopUp.textInput) {
+				var key:String = StringUtil.trim(textInput.text.toUpperCase());
+				filter.push(key);
+			}
+			currentKeyValuesFilter = filter;
 			currentPage = 1;
 			loadRecordSummariesCurrentPage();
+			filterPopUpCloseHandler();
+		}
+		
+		protected function filterPopUpResetHandler(event:Event):void {
+			currentKeyValuesFilter = null;
+			currentPage = 1;
+			loadRecordSummariesCurrentPage();
+			filterPopUpCloseHandler();
 		}
 		
 		/**
@@ -232,7 +281,7 @@ package org.openforis.collect.presenter {
 			var rootEntityName:String = Application.activeRootEntity.name;
 			
 			_dataClient.loadRecordSummaries(responder, rootEntityName, 
-				offset, MAX_RECORDS_PER_PAGE, currentSortFields, keyValuesFilter);
+				offset, MAX_RECORDS_PER_PAGE, currentSortFields, currentKeyValuesFilter);
 		}
 		
 		protected function getRecordsSummaryResultHandler(event:ResultEvent, token:Object = null):void {
