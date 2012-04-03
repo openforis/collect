@@ -72,5 +72,13 @@ package org.openforis.collect.ui {
 		[Embed("/assets/images/footer.jpg")]
 		public static const FOOTER:Class;
 		
+		[Embed("/assets/images/collapse.png")]
+		public static const COLLAPSE:Class;
+		
+		[Embed("/assets/images/expand.png")]
+		public static const EXPAND:Class;
+		
+		
+		
 	}
 }
