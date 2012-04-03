@@ -5,6 +5,7 @@ package org.openforis.collect.presenter {
 	 * */
 	import flash.display.DisplayObject;
 	import flash.events.Event;
+	import flash.events.FocusEvent;
 	import flash.events.MouseEvent;
 	
 	import mx.collections.ArrayCollection;
@@ -34,6 +35,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.ui.view.ListView;
 	import org.openforis.collect.util.AlertUtil;
 	import org.openforis.collect.util.CollectionUtil;
+	import org.openforis.collect.util.StringUtil;
 	
 	import spark.collections.Sort;
 	import spark.collections.SortField;
@@ -68,7 +70,7 @@ package org.openforis.collect.presenter {
 		/**
 		 * The current filter applied on root entity key fields. 
 		 * */
-		private var currentFilter:String = null;
+		private var keyValuesFilter:Array = null;
 		
 		/**
 		 * Max number of records that can be loaded for a single page.
@@ -90,8 +92,8 @@ package org.openforis.collect.presenter {
 			this._view.addButton.addEventListener(MouseEvent.CLICK, addButtonClickHandler);
 			this._view.editButton.addEventListener(MouseEvent.CLICK, editButtonClickHandler);
 			this._view.deleteButton.addEventListener(MouseEvent.CLICK, deleteButtonClickHandler);
-			//this._view.filterByIdTextInput.addEventListener(FocusEvent.FOCUS_OUT, filterByIdTextInputFocusOutHandler);
-				
+			this._view.filterButton.addEventListener(MouseEvent.CLICK, filterButtonClickHandler);
+			
 			this._view.dataGrid.addEventListener(GridSortEvent.SORT_CHANGING, dataGridSortChangingHandler);
 			
 			this._view.paginationBar.firstPageButton.addEventListener(MouseEvent.CLICK, firstPageClickHandler);
@@ -185,15 +187,16 @@ package org.openforis.collect.presenter {
 		
 		/**
 		 * Filter by id text input focussed out
-		 * 
-		protected function filterByIdTextInputFocusOutHandler(event:FocusEvent):void {
+		 * */
+		protected function filterButtonClickHandler(event:Event):void {
 			var query:String = _view.filterByIdTextInput.text;
 			query = StringUtil.trim(query);
 			_view.filterByIdTextInput.text = query;
-			currentFilter = query != "" ? query: null;
+			keyValuesFilter = query != "" ? query.split(" "): null;
+			currentPage = 1;
 			loadRecordSummariesCurrentPage();
 		}
-		*/
+		
 		/**
 		 * Loads records summaries for active root entity
 		 * */
@@ -228,8 +231,8 @@ package org.openforis.collect.presenter {
 			var responder:IResponder = new AsyncResponder(getRecordsSummaryResultHandler, faultHandler);
 			var rootEntityName:String = Application.activeRootEntity.name;
 			
-			_dataClient.getRecordSummaries(responder, rootEntityName, 
-				offset, MAX_RECORDS_PER_PAGE, currentSortFields, currentFilter);
+			_dataClient.loadRecordSummaries(responder, rootEntityName, 
+				offset, MAX_RECORDS_PER_PAGE, currentSortFields, keyValuesFilter);
 		}
 		
 		protected function getRecordsSummaryResultHandler(event:ResultEvent, token:Object = null):void {

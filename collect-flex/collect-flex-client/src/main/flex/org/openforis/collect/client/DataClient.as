@@ -24,7 +24,7 @@ package org.openforis.collect.client {
 		private var _saveActiveRecordOperation:Operation;
 		private var _createRecordOperation:Operation;
 		private var _deleteRecordOperation:Operation;
-		private var _getRecordSummariesOperation:Operation;
+		private var _loadRecordSummariesOperation:Operation;
 		private var _loadRecordOperation:Operation;
 		private var _promoteActiveRecordOperation:Operation;
 		private var _demoteActiveRecordOperation:Operation;
@@ -40,7 +40,7 @@ package org.openforis.collect.client {
 			this._saveActiveRecordOperation = getOperation("saveActiveRecord");
 			this._createRecordOperation = getOperation("createRecord");
 			this._deleteRecordOperation = getOperation("deleteRecord");
-			this._getRecordSummariesOperation = getOperation("getRecordSummaries");
+			this._loadRecordSummariesOperation = getOperation("loadRecordSummaries");
 			this._loadRecordOperation = getOperation("loadRecord");
 			this._promoteActiveRecordOperation = getOperation("promoteActiveRecord");
 			this._demoteActiveRecordOperation = getOperation("demoteActiveRecord");
@@ -63,8 +63,8 @@ package org.openforis.collect.client {
 			token.addResponder(responder);
 		}
 		
-		public function getRecordSummaries(responder:IResponder, rootEntityName:String, offset:int, maxNumberOfRecords:int, sortFields:IList=null, filter:String = null):void {
-			var token:AsyncToken = this._getRecordSummariesOperation.send(rootEntityName, offset, maxNumberOfRecords, sortFields, filter);
+		public function loadRecordSummaries(responder:IResponder, rootEntityName:String, offset:int, maxNumberOfRecords:int, sortFields:IList=null, keyValues:Array = null):void {
+			var token:AsyncToken = this._loadRecordSummariesOperation.send(rootEntityName, offset, maxNumberOfRecords, sortFields, keyValues);
 			token.addResponder(responder);
 		}
 		

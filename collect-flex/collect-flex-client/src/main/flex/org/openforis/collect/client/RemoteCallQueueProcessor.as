@@ -66,7 +66,7 @@ package org.openforis.collect.client {
 			_lastCall = call;
 			_resultHandler(event, call.token);
 			if(call.resultHandler != null) {
-				call.resultHandler(event, token);
+				call.resultHandler(event, call.token);
 			}
 			sendHeadRemoteCall();
 		}

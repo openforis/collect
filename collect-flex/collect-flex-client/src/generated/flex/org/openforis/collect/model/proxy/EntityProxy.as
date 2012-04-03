@@ -250,6 +250,11 @@ package org.openforis.collect.model.proxy {
 			return result;
 		}
 		
+		public function isRequired(childName:String):Boolean {
+			var required:Boolean = childrenRequiredMap.get(childName);
+			return required == true;
+		}
+		
 		public function showErrorsOnDescendants():void {
 			var childNodeNames:ArrayCollection = showChildrenErrorsMap.keySet;
 			for each (var name:String in childNodeNames) {

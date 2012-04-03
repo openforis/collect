@@ -57,7 +57,7 @@ package org.openforis.collect.model.proxy {
 			return _nodesMap[id];
 		}
 		
-		public function update(responses:IList, req:UpdateRequest = null):void {
+		public function update(responses:IList, req:UpdateRequest):void {
 			updateNodes(req);
 			
 			for each (var response:UpdateResponse in responses)	{

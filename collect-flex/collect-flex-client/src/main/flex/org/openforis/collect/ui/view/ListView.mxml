@@ -52,10 +52,14 @@
 									/>
 	
 	<s:Group width="100%">
-		<!--
-		<s:Label text="{Message.get('list.filterByIdLabel')}" />
-		<s:TextInput id="filterByIdTextInput" />
-		-->
+		
+		<s:HGroup visible="false">
+			<s:Label text="{Message.get('list.filterByKey')}" />
+			<s:TextInput id="filterByIdTextInput" />
+			<s:Button id="filterButton"
+					  label="{Message.get('list.filter')}" />
+		</s:HGroup>
+		
 		<datagrid:PaginationBar id="paginationBar" 
 								height="16"
 								horizontalCenter="0"

@@ -313,9 +313,9 @@ public class CollectRecord extends Record {
 	}
 
 	public Integer getMissing() {
-		if ( missing == null ){
-			missing = getEntityValidationCount( minCountErrorCounts );
-			missing += getEntityValidationCount( minCountWarningCounts );
+		if ( missing == null ) {
+			missing = getMissingCount( minCountErrorCounts );
+			missing += getMissingCount( minCountWarningCounts );
 		}
 		return missing;
 	}
@@ -326,8 +326,8 @@ public class CollectRecord extends Record {
 
 	public Integer getErrors() {
 		if(errors == null) {
-			errors = getEntityValidationCount(maxCountErrorCounts);
-			errors += getAttributeValidationCount(errorCounts);
+			errors = getAttributeValidationCount(errorCounts);
+			errors += getEntityValidationCount(maxCountErrorCounts);
 		}
 		return errors;
 	}
@@ -338,9 +338,8 @@ public class CollectRecord extends Record {
 
 	public Integer getWarnings() {
 		if(warnings == null) {
-			warnings = getEntityValidationCount(minCountWarningCounts);
+			warnings = getAttributeValidationCount(warningCounts);
 			warnings += getEntityValidationCount(maxCountWarningCounts);
-			warnings += getAttributeValidationCount(warningCounts);
 		}
 		return warnings;
 	}
@@ -419,6 +418,20 @@ public class CollectRecord extends Record {
 			count += set.size();
 		}
 		return count;
+	}
+	
+	private Integer getMissingCount(Map<Integer, Set<String>> minCounts) {
+		int result = 0;
+		Set<Integer> keySet = minCounts.keySet();
+		for (Integer id : keySet) {
+			Entity entity = (Entity) getNodeByInternalId(id);
+			Set<String> set = minCounts.get(id);
+			for (String childName : set) {
+				int missingCount = entity.getMissingCount(childName);
+				result += missingCount;
+			}
+		}
+		return result;
 	}
 	
 	private Integer getAttributeValidationCount(Map<Integer, Integer> map) {
