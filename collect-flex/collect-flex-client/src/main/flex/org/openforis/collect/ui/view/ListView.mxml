@@ -4,7 +4,7 @@
 		 xmlns:mx="library://ns.adobe.com/flex/mx" 
 		 width="100%" height="100%" 
 		 xmlns:input="org.openforis.collect.ui.component.input.*" 
-		 xmlns:datagrid="org.openforis.collect.ui.component.datagrid.*"
+		 xmlns:datagrid="org.openforis.collect.ui.component.datagrid.*" xmlns:container="org.openforis.collect.ui.container.*" xmlns:detail="org.openforis.collect.ui.component.detail.*" xmlns:component="org.openforis.collect.ui.component.*"
 		 >
 	
 	<fx:Script>
@@ -38,24 +38,27 @@
 		<s:State name="selection" />
 	</s:states>
 	
-	<s:VGroup width="100%" horizontalAlign="center" verticalAlign="middle" height="30">
-		<s:Label id="titleLabel" styleName="listTitle" />
-	</s:VGroup>
-	
+	<s:Group width="100%" height="30">
+		<s:Label id="titleLabel" styleName="listTitle" verticalCenter="0" horizontalCenter="0" />
+		
+		<s:Button id="openFilterPopUpButton"
+				  label="{Message.get('list.filter')}"
+				  right="0"
+				  />
+
+	</s:Group>
+
 	<datagrid:RecordSummaryDataGrid id="dataGrid" 
 									width="100%"
 									rowHeight="22"
 									doubleClickEnabled="true" 
 									selectionMode="singleRow" 
 									horizontalScrollPolicy="off" 
-									verticalScrollPolicy="off" 
+									verticalScrollPolicy="off"
 									/>
 	
 	<s:Group width="100%">
-		<!--
-		<s:Label text="{Message.get('list.filterByIdLabel')}" />
-		<s:TextInput id="filterByIdTextInput" />
-		-->
+		
 		<datagrid:PaginationBar id="paginationBar" 
 								height="16"
 								horizontalCenter="0"

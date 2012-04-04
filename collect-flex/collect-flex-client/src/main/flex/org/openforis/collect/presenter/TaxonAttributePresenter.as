@@ -15,7 +15,6 @@ package org.openforis.collect.presenter {
 	
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.client.SpeciesClient;
-	import org.openforis.collect.client.UpdateRequestToken;
 	import org.openforis.collect.event.InputFieldEvent;
 	import org.openforis.collect.event.TaxonInputFieldEvent;
 	import org.openforis.collect.model.proxy.TaxonOccurrenceProxy;
@@ -200,9 +199,7 @@ package org.openforis.collect.presenter {
 			view.languageVarietyTextInput.text = taxonOccurrence.languageVariety;
 			req.addOperation(view.languageVarietyTextInput.presenter.createUpdateValueOperation());
 			
-			var token:UpdateRequestToken = new UpdateRequestToken(UpdateRequestToken.UPDATE_VALUE);
-			token.updatedFields = _view.attribute.fields;
-			ClientFactory.dataClient.updateActiveRecord(req, token, null, faultHandler);
+			ClientFactory.dataClient.updateActiveRecord(req, null, faultHandler);
 		}
 		
 		protected static function autoCompleteSearchResultHandler(event:ResultEvent, token:Object):void {

@@ -46,6 +46,7 @@
 						BindingUtils.bindProperty(formItem, "modelVersion", this, "modelVersion");
 					}
 					BindingUtils.bindProperty(formItem, "parentEntity", this, "entity");
+					BindingUtils.bindProperty(formItem, "occupyEntirePage", this, "occupyEntirePage");
 				}
 			}
 			

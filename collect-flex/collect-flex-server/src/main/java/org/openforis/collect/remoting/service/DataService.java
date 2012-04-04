@@ -101,15 +101,15 @@ public class DataService {
 	 * @return map with "count" and "records" items
 	 */
 	@Transactional
-	public Map<String, Object> getRecordSummaries(String rootEntityName, int offset, int maxNumberOfRows, List<RecordSummarySortField> sortFields, String filter) {
+	public Map<String, Object> loadRecordSummaries(String rootEntityName, int offset, int maxNumberOfRows, List<RecordSummarySortField> sortFields, String[] keyValues) {
 		Map<String, Object> result = new HashMap<String, Object>();
 		SessionState sessionState = sessionManager.getSessionState();
 		CollectSurvey activeSurvey = sessionState.getActiveSurvey();
 		Schema schema = activeSurvey.getSchema();
 		EntityDefinition rootEntityDefinition = schema.getRootEntityDefinition(rootEntityName);
 		String rootEntityDefinitionName = rootEntityDefinition.getName();
-		int count = recordManager.getCountRecords(activeSurvey, rootEntityDefinitionName);
-		List<CollectRecord> summaries = recordManager.getSummaries(activeSurvey, rootEntityDefinitionName, offset, maxNumberOfRows, sortFields, filter);
+		int count = recordManager.getCountRecords(activeSurvey, rootEntityDefinitionName, keyValues);
+		List<CollectRecord> summaries = recordManager.loadSummaries(activeSurvey, rootEntityDefinitionName, offset, maxNumberOfRows, sortFields, keyValues);
 		List<RecordProxy> proxies = new ArrayList<RecordProxy>();
 		for (CollectRecord summary : summaries) {
 			proxies.add(new RecordProxy(summary));
@@ -365,6 +365,18 @@ public class DataService {
 					response.setRequired(childName, entity.isRequired(childName));
 					response.setMinCountValid(childName, entity.validateMinCount(childName));
 					response.setMaxCountValid(childName, entity.validateMaxCount(childName));
+					
+					List<Node<? extends NodeDefinition>> list = entity.getAll(childName);
+					for ( Node<? extends NodeDefinition> node : list ) {
+						if ( node instanceof Attribute ){
+							Attribute<?, ?> attribute = (Attribute<?, ?>) node;
+							attribute.clearValidationResults();
+							ValidationResults results = attribute.validateValue();
+							UpdateResponse resp = getUpdateResponse(responseMap, attribute.getInternalId());
+							resp.setAttributeValidationResults(results);
+						}
+					}
+					
 				}
 			}
 		}

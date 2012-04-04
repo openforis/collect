@@ -10,6 +10,7 @@ package org.openforis.collect.ui.component.input {
 	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.CodeAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
+	import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
 	import org.openforis.collect.model.CollectRecord$Step;
 	import org.openforis.collect.model.FieldSymbol;
 	import org.openforis.collect.model.proxy.AttributeProxy;
@@ -76,7 +77,7 @@ package org.openforis.collect.ui.component.input {
 		
 		public function updateItems():void {
 			var items:Array = null;
-			if(Application.activeRecord != null) {
+			if(Application.activeRecord != null && _inputField.parentEntity != null) {
 				var step:CollectRecord$Step = Application.activeRecord.step;
 				items = createMenuItems(step);
 				_contextMenu.hideBuiltInItems();
@@ -127,7 +128,6 @@ package org.openforis.collect.ui.component.input {
 					}
 				}
 			}
-			
 			return items;
 		}
 		
@@ -166,12 +166,16 @@ package org.openforis.collect.ui.component.input {
 					nodeEvent.nodeProxy = parentEntity;
 					break;
 				case DELETE_ATTRIBUTE:
-					var attrLabel:String = inputField.attributeDefinition.getLabelText();
-					AlertUtil.showConfirm("global.confirmDelete", [attrLabel], "global.confirmAlertTitle", performDeleteNode, [attribute]);
+					if(checkCanDelete(attribute, attrDefn)) {
+						var attrLabel:String = attrDefn.getLabelText();
+						AlertUtil.showConfirm("global.confirmDelete", [attrLabel], "global.confirmAlertTitle", performDeleteNode, [attribute]);
+					}
 					break;
 				case DELETE_ENTITY:
-					var entityLabel:String = inputField.attributeDefinition.parent.getLabelText();
-					AlertUtil.showConfirm("global.confirmDelete", [entityLabel], "global.confirmAlertTitle", performDeleteNode, [parentEntity]);
+					if(checkCanDelete(parentEntity, parentEntityDefn)) {
+						var entityLabel:String = attrDefn.parent.getLabelText();
+						AlertUtil.showConfirm("global.confirmDelete", [entityLabel], "global.confirmAlertTitle", performDeleteNode, [parentEntity]);
+					}
 					break;
 				case CONFIRM_ERROR:
 					nodeEvent = createNodeEvent(NodeEvent.CONFIRM_ERROR, inputField);
@@ -211,6 +215,21 @@ package org.openforis.collect.ui.component.input {
 			EventDispatcherFactory.getEventDispatcher().dispatchEvent(event);
 		}
 		
+		private static function checkCanDelete(node:NodeProxy, nodeDefn:NodeDefinitionProxy):Boolean {
+			var parent:EntityProxy = node.parent;
+			var label:String = nodeDefn.getLabelText();
+			var count:int = parent.getCount(nodeDefn.name);
+			var minCount:Number = nodeDefn.minCount;
+			if((isNaN(minCount) || minCount == 0) && node.parent.isRequired(nodeDefn.name)) {
+				minCount = 1;
+			}
+			if(count == minCount) {
+				AlertUtil.showMessage("global.cannotDelete", [label, minCount], "global.cannotDeleteTitle");
+				return false;
+			} else {
+				return true;
+			}
+		}
 	}
 	
 }

@@ -5,6 +5,27 @@
 @namespace input "org.openforis.collect.ui.component.input.*";
 @namespace view "org.openforis.collect.ui.view.*";
 @namespace component "org.openforis.collect.ui.component.*";
+@namespace container "org.openforis.collect.ui.container.*";
+
+container|CollapsiblePanel {
+	skin-class: ClassReference('org.openforis.collect.ui.skin.CollapsiblePanelSkin');
+}
+
+container|CollapsiblePanel s|Label.title {
+	fontWeight: bold;
+}
+
+s|Button.link {
+	skin-class: ClassReference('org.openforis.collect.ui.skin.LinkButtonSkin');
+}
+
+s|Button.collapse {
+	skin-class: ClassReference('org.openforis.collect.ui.skin.CollapseButtonSkin');
+}
+
+s|Button.expand {
+	skin-class: ClassReference('org.openforis.collect.ui.skin.ExpandButtonSkin');
+}
 
 view|Footer {
 	padding-bottom: 5;
@@ -50,7 +71,7 @@ mx|Alert {
 
 }*/
 
-s|TitleWindow {
+component|BlockingMessagePopUp, component|SelectVersionPopUp, input|CodeListDialog {
 	skin-class: ClassReference("org.openforis.collect.ui.skin.TitleWindowSkin");
 	title-style-name: dialogHeaderStyle;
 	border-color: #000000;
@@ -63,6 +84,10 @@ s|TitleWindow {
 
 component|BlockingMessagePopUp {
 	showCloseButton: false;
+}
+
+component|RecordFilterPopUp {
+	skin-class: ClassReference("org.openforis.collect.ui.skin.RemarksPopUpSkin");
 }
 
 mx|ToolTip { 
@@ -119,7 +144,7 @@ detail|AttributeItemRenderer.warning,
 	borderColor: #FF8800;
 }
 
-.notRelevant input|TextInput { 
+.notRelevant input|TextInput, .notRelevant mx|TextArea { 
 	contentBackgroundColor: #DDDDDD;
 }
 

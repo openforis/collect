@@ -2,6 +2,7 @@ package org.openforis.collect.ui.component.detail
 {
 	import flash.events.MouseEvent;
 	
+	import mx.collections.IList;
 	import mx.core.IToolTip;
 	import mx.core.UIComponent;
 	
@@ -9,6 +10,7 @@ package org.openforis.collect.ui.component.detail
 	import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
 	import org.openforis.collect.model.proxy.AttributeProxy;
 	import org.openforis.collect.model.proxy.EntityProxy;
+	import org.openforis.collect.util.StringUtil;
 	import org.openforis.collect.util.ToolTipUtil;
 	import org.openforis.collect.util.UIUtil;
 	import org.openforis.idm.metamodel.validation.ValidationResultFlag;
@@ -40,7 +42,7 @@ package org.openforis.collect.ui.component.detail
 		 */
 		private var _toolTip:IToolTip;
 		private var _toolTipStyleName:String;
-		private var _toolTipMessage:String;
+		private var _toolTipMessages:Array;
 		private var _displayStyleName:String;
 		
 
@@ -52,7 +54,7 @@ package org.openforis.collect.ui.component.detail
 		
 		public function displayNodeValidation(parentEntity:EntityProxy, defn:NodeDefinitionProxy, attribute:AttributeProxy = null):void {
 			var flag:ValidationResultFlag = null;
-			var message:String = null;
+			var validationMessages:Array = null;
 			if(parentEntity != null && defn != null) {
 				var hasErrors:Boolean = attribute != null ? attribute.hasErrors(): false;
 				var hasWarnings:Boolean = attribute != null ? attribute.hasWarnings(): false;
@@ -64,25 +66,25 @@ package org.openforis.collect.ui.component.detail
 					} else if(hasWarnings) {
 						flag = ValidationResultFlag.WARNING;
 					}
-					message = attribute.validationMessage;
+					validationMessages = attribute.validationResults.validationMessages;
 				} else if(showMinMaxCountErrors) {
 					var minCountValid:ValidationResultFlag = parentEntity.childrenMinCountValidationMap.get(name);
 					var maxCountValid:ValidationResultFlag = parentEntity.childrenMaxCountValidationMap.get(name);
 					if(minCountValid != ValidationResultFlag.OK || maxCountValid != ValidationResultFlag.OK) {
 						if(minCountValid != ValidationResultFlag.OK) {
 							flag = minCountValid;
-							message = Message.get("edit.validation.minCount", [defn.minCount]);
+							validationMessages = [Message.get("edit.validation.minCount", [defn.minCount])];
 						} else {
 							flag = maxCountValid;
-							message = Message.get("edit.validation.maxCount", [defn.maxCount]);
+							validationMessages = [Message.get("edit.validation.maxCount", [defn.maxCount])];
 						}
 					}
 				}
 			}
-			apply(flag, message);
+			apply(flag, validationMessages);
 		}
 
-		protected function apply(flag:ValidationResultFlag, message:String):void {
+		protected function apply(flag:ValidationResultFlag, messages:Array):void {
 			if(_active) {
 				var newStyleName:String;
 				switch(flag) {
@@ -98,7 +100,7 @@ package org.openforis.collect.ui.component.detail
 						reset();
 						return;
 				}
-				_toolTipMessage = message;
+				_toolTipMessages = messages;
 				if(! _toolTipTrigger.hasEventListener(MouseEvent.ROLL_OVER)) {
 					_toolTipTrigger.addEventListener(MouseEvent.ROLL_OVER, showToolTip);
 					_toolTipTrigger.addEventListener(MouseEvent.ROLL_OUT, hideToolTip);
@@ -123,7 +125,7 @@ package org.openforis.collect.ui.component.detail
 		
 		protected function removeToolTip():void {
 			hideToolTip();
-			_toolTipMessage = null;
+			_toolTipMessages = null;
 			_toolTipStyleName = null;
 			_toolTipTrigger.removeEventListener(MouseEvent.ROLL_OVER, showToolTip);
 			_toolTipTrigger.removeEventListener(MouseEvent.ROLL_OUT, hideToolTip);
@@ -134,7 +136,7 @@ package org.openforis.collect.ui.component.detail
 				ToolTipUtil.destroy(_toolTip);
 			}
 			if(_toolTipStyleName != null) {
-				_toolTip = ToolTipUtil.create(_display, _toolTipMessage, _toolTipStyleName);
+				_toolTip = ToolTipUtil.create(_display, _toolTipMessages, _toolTipStyleName);
 			}
 		}
 		

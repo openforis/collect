@@ -8,7 +8,6 @@ package org.openforis.collect.presenter {
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.IResponder;
 	
-	import org.openforis.collect.client.UpdateRequestToken;
 	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.model.FieldSymbol;
 	import org.openforis.collect.model.proxy.AttributeProxy;
@@ -116,10 +115,7 @@ package org.openforis.collect.presenter {
 			}
 			var req:UpdateRequest = new UpdateRequest();
 			req.operations = operations;
-			var token:UpdateRequestToken = new UpdateRequestToken(UpdateRequestToken.UPDATE_VALUE);
-			token.symbol = symbol;
-			token.remarks = remarks;
-			dataClient.updateActiveRecord(req, token, updateResultHandler, faultHandler);
+			dataClient.updateActiveRecord(req, updateResultHandler, faultHandler);
 		}
 		
 		override protected function getRemarks():String {

@@ -2,15 +2,12 @@ package org.openforis.collect.presenter {
 	import flash.events.Event;
 	import flash.events.FocusEvent;
 	
-	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
 	
 	import org.openforis.collect.client.ClientFactory;
-	import org.openforis.collect.client.UpdateRequestToken;
 	import org.openforis.collect.metamodel.proxy.NumberAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.NumberAttributeDefinitionProxy$Type;
 	import org.openforis.collect.metamodel.proxy.UnitProxy;
-	import org.openforis.collect.model.proxy.FieldProxy;
 	import org.openforis.collect.remoting.service.UpdateRequest;
 	import org.openforis.collect.remoting.service.UpdateRequestOperation;
 	import org.openforis.collect.remoting.service.UpdateRequestOperation$Method;
@@ -26,14 +23,14 @@ package org.openforis.collect.presenter {
 		
 		public function NumericAttributePresenter(view:NumericAttributeRenderer) {
 			_view = view;
+			initRestriction();
 			super(view);
-			initUnits();
 			view.numericInputField.applyChangesOnFocusOut = false;
+			//depends on view.currentState
 			if(view.unitInputField != null) {
 				view.unitInputField.applyChangesOnFocusOut = false;
 				view.unitInputField.dropDownList.addEventListener(Event.CHANGE, unitInputFieldChangeHandler);
 			}
-			initRestriction();
 		}
 		
 		override internal function initEventListeners():void {
@@ -49,34 +46,27 @@ package org.openforis.collect.presenter {
 		
 		protected function unitInputFieldChangeHandler(event:Event):void {
 			if(! view.numericInputField.isEmpty()) {
-				updateUnitField();
+				updateValue();
 			}
 		}
 		
 		protected function updateValue():void {
-			view.numericInputField.presenter.updateValue();
-			updateUnitField();
-		}
-		
-		protected function updateUnitField():void {
-			var reqOp:UpdateRequestOperation = createUpdateUnitOperation();
-			if(view.numericInputField.isEmpty()) {
-				//clear unit
-				reqOp.value = null;
-			}
-			var token:UpdateRequestToken = new UpdateRequestToken(UpdateRequestToken.UPDATE_VALUE);
-			token.symbol = reqOp.symbol;
-			var field:FieldProxy = view.attribute.fields[1];
-			token.updatedFields = new ArrayCollection([field]);
 			var updReq:UpdateRequest = new UpdateRequest();
-			updReq.addOperation(reqOp);
-			ClientFactory.dataClient.updateActiveRecord(updReq, token, null, faultHandler);
+			var updateValueOp:UpdateRequestOperation = view.numericInputField.presenter.createUpdateValueOperation();
+			updReq.addOperation(updateValueOp);
+			var updateUnitOp:UpdateRequestOperation = createUpdateUnitOperation();
+			if(updateValueOp.value == null) {
+				//clear unit
+				updateUnitOp.value = null;
+			}
+			updReq.addOperation(updateUnitOp);
+			ClientFactory.dataClient.updateActiveRecord(updReq, null, faultHandler);
 		}
 		
 		protected function createUpdateUnitOperation():UpdateRequestOperation {
 			var numberAttrDefn:NumberAttributeDefinitionProxy = NumberAttributeDefinitionProxy(view.attributeDefinition);
 			var result:UpdateRequestOperation = null;
-			if(view.unitInputField) {
+			if(view.unitInputField != null) {
 				result = view.unitInputField.presenter.createUpdateValueOperation();
 			} else {
 				result = new UpdateRequestOperation();
@@ -103,7 +93,7 @@ package org.openforis.collect.presenter {
 			}
 		}
 		
-		protected function initUnits():void {
+		override protected function initViewState():void {
 			var attrDefn:NumberAttributeDefinitionProxy = NumberAttributeDefinitionProxy(view.attributeDefinition);
 			var units:IList = attrDefn.units;
 			if(units.length > 0) {

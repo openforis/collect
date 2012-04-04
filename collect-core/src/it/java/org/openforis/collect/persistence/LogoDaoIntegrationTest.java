@@ -3,15 +3,11 @@ package org.openforis.collect.persistence;
 import static org.junit.Assert.assertEquals;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Arrays;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openforis.collect.model.Logo;
@@ -26,7 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 @TransactionConfiguration(defaultRollback=true)
 @Transactional
 public class LogoDaoIntegrationTest {
-	private final Log log = LogFactory.getLog(LogoDaoIntegrationTest.class);
+	//private final Log log = LogFactory.getLog(LogoDaoIntegrationTest.class);
 	
 	@Autowired
 	protected LogoDao logoDao;

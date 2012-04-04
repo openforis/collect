@@ -2,14 +2,11 @@ package org.openforis.collect.presenter {
 	import flash.events.Event;
 	import flash.events.FocusEvent;
 	
-	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
 	
 	import org.openforis.collect.client.ClientFactory;
-	import org.openforis.collect.client.UpdateRequestToken;
 	import org.openforis.collect.metamodel.proxy.RangeAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.UnitProxy;
-	import org.openforis.collect.model.proxy.FieldProxy;
 	import org.openforis.collect.remoting.service.UpdateRequest;
 	import org.openforis.collect.remoting.service.UpdateRequestOperation;
 	import org.openforis.collect.remoting.service.UpdateRequestOperation$Method;
@@ -24,8 +21,8 @@ package org.openforis.collect.presenter {
 		public function RangeAttributePresenter(view:RangeAttributeRenderer) {
 			_view = view;
 			super(view);
-			initUnits();
 			view.rangeInputField.applyChangesOnFocusOut = false;
+			//depends on view.currentState
 			if(view.unitInputField != null) {
 				view.unitInputField.applyChangesOnFocusOut = false;
 				view.unitInputField.dropDownList.addEventListener(Event.CHANGE, unitInputFieldChangeHandler);
@@ -49,30 +46,23 @@ package org.openforis.collect.presenter {
 		
 		protected function unitInputFieldChangeHandler(event:Event):void {
 			if(! view.rangeInputField.isEmpty()) {
-				updateUnitField();
+				updateValue();
 			}
 		}
 		
 		protected function updateValue():void {
-			view.rangeInputField.presenter.updateValue();
-			updateUnitField();
-		}
-		
-		protected function updateUnitField():void {
-			var reqOp:UpdateRequestOperation = createUpdateUnitOperation();
-			if(view.rangeInputField.isEmpty()) {
-				//clear unit
-				reqOp.value = null;
-			}
-			var token:UpdateRequestToken = new UpdateRequestToken(UpdateRequestToken.UPDATE_VALUE);
-			token.symbol = reqOp.symbol;
-			var field:FieldProxy = view.attribute.fields[2];
-			token.updatedFields = new ArrayCollection([field]);
 			var updReq:UpdateRequest = new UpdateRequest();
-			updReq.addOperation(reqOp);
-			ClientFactory.dataClient.updateActiveRecord(updReq, token, null, faultHandler);
+			var updateValueOp:UpdateRequestOperation = view.rangeInputField.presenter.createUpdateValueOperation();
+			updReq.addOperation(updateValueOp);
+			var updateUnitOp:UpdateRequestOperation = createUpdateUnitOperation();
+			if(updateValueOp.value == null) {
+				//clear unit
+				updateUnitOp.value = null;
+			}
+			updReq.addOperation(updateUnitOp);
+			ClientFactory.dataClient.updateActiveRecord(updReq, null, faultHandler);
 		}
-		
+
 		protected function createUpdateUnitOperation():UpdateRequestOperation {
 			var attrDefn:RangeAttributeDefinitionProxy = RangeAttributeDefinitionProxy(view.attributeDefinition);
 			var result:UpdateRequestOperation = null;
@@ -90,7 +80,7 @@ package org.openforis.collect.presenter {
 			return result;
 		}
 		
-		protected function initUnits():void {
+		override protected function initViewState():void {
 			var attrDefn:RangeAttributeDefinitionProxy = RangeAttributeDefinitionProxy(view.attributeDefinition);
 			var units:IList = attrDefn.units;
 			if(units.length > 0) {
