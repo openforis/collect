@@ -12,9 +12,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-
-import junit.framework.Assert;
-
 import org.apache.commons.lang3.StringUtils;
 import org.jooq.Record;
 import org.jooq.Result;
@@ -224,8 +221,6 @@ public class SurveyDao extends JooqDaoSupport {
 			Record record = result.get(0);
 			surveyId = record.getValueAsInteger(OFC_SURVEY.ID);
 			survey.setId(surveyId);
-
-			Assert.assertEquals(5, survey.getId().intValue());
 
 			// Update Survey IDM
 			jf.update(OFC_SURVEY)
