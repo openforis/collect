@@ -9,6 +9,7 @@ import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.jooq.Field;
 import org.jooq.Record;
 import org.jooq.Result;
@@ -91,14 +92,7 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 		JooqFactory f = getMappingJooqFactory();
 		SelectQuery q = f.selectCountQuery();
 		q.addConditions(OFC_RECORD.ROOT_ENTITY_ID.equal(rootDefinitionId));
-		if ( keyValues != null ) {
-			for (int i = 0; i < keyValues.length; i++) {
-				String key = keyValues[i];
-				@SuppressWarnings("unchecked")
-				Field<String> keyField = (Field<String>) KEY_FIELDS[i];
-				q.addConditions(keyField.lower().equal(key.toLowerCase()));
-			}
-		}
+		addFilterByKeyConditions(q, keyValues);
 		Record r = q.fetchOne();
 		return r.getValueAsInteger(0);
 	}
@@ -218,15 +212,7 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 		Integer rootEntityDefnId = rootEntityDefn.getId();
 		q.addConditions(OFC_RECORD.ROOT_ENTITY_ID.equal(rootEntityDefnId));
 
-		//add key columns conditions
-		if ( keyValues != null ) {
-			for (int i = 0; i < keyValues.length && i < KEY_FIELDS.length; i++) {
-				String key = keyValues[i];
-				@SuppressWarnings("unchecked")
-				Field<String> keyField = (Field<String>) KEY_FIELDS[i];
-				q.addConditions(keyField.lower().equal(key.toLowerCase()));
-			}
-		}
+		addFilterByKeyConditions(q, keyValues);
 		
 		if ( sortFields != null ) {
 			for (RecordSummarySortField sortField : sortFields) {
@@ -244,6 +230,19 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 		Result<Record> result = q.fetch();
 		
 		return jf.fromResult(result);
+	}
+
+	private void addFilterByKeyConditions(SelectQuery q, String... keyValues) {
+		if ( keyValues != null ) {
+			for (int i = 0; i < keyValues.length && i < KEY_FIELDS.length; i++) {
+				String key = keyValues[i];
+				if(StringUtils.isNotBlank(key)) {
+					@SuppressWarnings("unchecked")
+					Field<String> keyField = (Field<String>) KEY_FIELDS[i];
+					q.addConditions(keyField.upper().equal(key.toUpperCase()));
+				}
+			}
+		}
 	}
 
 	private void addOrderBy(SelectQuery q, RecordSummarySortField sortField) {
