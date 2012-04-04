@@ -9,12 +9,15 @@ import org.apache.commons.logging.LogFactory;
 import org.granite.context.GraniteContext;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.User;
+import org.openforis.collect.persistence.RecordUnlockedException;
 import org.openforis.collect.web.session.InvalidSessionException;
 import org.openforis.collect.web.session.SessionState;
+import org.openforis.idm.model.Record;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 
@@ -27,12 +30,14 @@ public class SessionManager {
 	@Autowired
 	private UserManager userManager;
 	
+	@Autowired
+	protected RecordManager recordManager;
+
 	public SessionState getSessionState() {
 		SessionState sessionState = (SessionState) getSessionAttribute(SessionState.SESSION_ATTRIBUTE_NAME);
 		if (sessionState == null) {
 			throw new InvalidSessionException();
 		}
-
 		User user = getLoggedInUser();
 		sessionState.setUser(user);
 
@@ -42,12 +47,15 @@ public class SessionManager {
 	public void setActiveRecord(CollectRecord record) {
 		SessionState sessionState = getSessionState();
 		sessionState.setActiveRecord(record);
+//		Object clientId = getCurrentClientId();
+//		sessionState.setClientId(clientId);
 	}
 
 	public void clearActiveRecord() {
 		SessionState sessionState = getSessionState();
 		sessionState.setActiveRecord(null);
 		sessionState.setActiveRecordState(null);
+//		sessionState.setClientId(null);
 	}
 
 	public void keepSessionAlive() {
@@ -71,6 +79,32 @@ public class SessionManager {
 		Locale locale = new Locale(language, country);
 		SessionState sessionState = getSessionState();
 		sessionState.setLocale(locale);
+	}
+
+	@Transactional
+	public void checkUserIsLockingActiveRecord() throws RecordUnlockedException {
+		SessionState sessionState = getSessionState();
+		Record record = sessionState.getActiveRecord();
+		User user = sessionState.getUser();
+		if ( record != null && record.getId() != null) {
+			//verify that the record has not been unlocked
+			Integer lockingUserId = recordManager.getLockingUserId(record.getId());
+			/*
+			 	Object currentClientId = getCurrentClientId();
+				Object sessionClientId = sessionState.getClientId();
+			 */
+			if( lockingUserId == null || lockingUserId != user.getId() ) {
+				clearActiveRecord();
+				String lockingUserName = null;
+				if(lockingUserId != null) {
+					User lockingUser = userManager.loadById(lockingUserId);
+					lockingUserName = lockingUser.getName();
+				}
+				throw new RecordUnlockedException(lockingUserName);
+//			} if ( sessionClientId != null && ! currentClientId.equals(sessionClientId) ) {
+//				throw new RecordUnlockedException();
+			}
+		}
 	}
 
 	private User getLoggedInUser() {
@@ -102,6 +136,15 @@ public class SessionManager {
 			return null;
 		}
 	}
+	/* TODO get flex client id
+	public Object getCurrentClientId() {
+		HttpGraniteContext graniteContext = (HttpGraniteContext) GraniteContext.getCurrentInstance();
+		AMFContext amfContext = graniteContext.getAMFContext();
+		Message message = amfContext.getRequest();
+		Object clientId = message.getClientId();
+		return clientId;
+	}
+	*/
 	/*
 	private void setSessionAttribute(String attributeName, Object value) {
 		GraniteContext graniteContext = GraniteContext.getCurrentInstance();

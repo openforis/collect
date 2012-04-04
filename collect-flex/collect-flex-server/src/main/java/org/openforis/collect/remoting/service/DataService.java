@@ -28,6 +28,7 @@ import org.openforis.collect.model.User;
 import org.openforis.collect.model.proxy.NodeProxy;
 import org.openforis.collect.model.proxy.RecordProxy;
 import org.openforis.collect.persistence.RecordPersistenceException;
+import org.openforis.collect.persistence.RecordUnlockedException;
 import org.openforis.collect.remoting.service.UpdateRequestOperation.Method;
 import org.openforis.collect.web.session.SessionState;
 import org.openforis.collect.web.session.SessionState.RecordState;
@@ -76,16 +77,17 @@ public class DataService {
 	private RecordManager recordManager;
 
 	@Transactional
-	public RecordProxy loadRecord(int id, int step) throws RecordPersistenceException {
-		CollectSurvey survey = getActiveSurvey();
-		User user = getUserInSession();
-		CollectRecord record = recordManager.checkout(survey, user, id, step);
+	public RecordProxy loadRecord(int id, int step, boolean forceUnlock) throws RecordPersistenceException {
+		SessionState sessionState = sessionManager.getSessionState();
+		CollectSurvey survey = sessionState.getActiveSurvey();
+		User user = sessionState.getUser();
+		
+		CollectRecord record = recordManager.checkout(survey, user, id, step, forceUnlock);
 		//record.updateNodeStates();
 		
 		Entity rootEntity = record.getRootEntity();
 		recordManager.addEmptyNodes(rootEntity);
-		SessionState sessionState = sessionManager.getSessionState();
-		sessionState.setActiveRecord(record);
+		sessionManager.setActiveRecord(record);
 		sessionState.setActiveRecordState(RecordState.SAVED);
 		return new RecordProxy(record);
 	}
@@ -130,7 +132,7 @@ public class DataService {
 		CollectRecord record = recordManager.create(activeSurvey, rootEntityDefinition, user, version.getName());
 		Entity rootEntity = record.getRootEntity();
 		recordManager.addEmptyNodes(rootEntity);
-		sessionState.setActiveRecord((CollectRecord) record);
+		sessionManager.setActiveRecord((CollectRecord) record);
 		sessionState.setActiveRecordState(RecordState.NEW);
 		RecordProxy recordProxy = new RecordProxy(record);
 		return recordProxy;
@@ -164,7 +166,9 @@ public class DataService {
 		sessionManager.clearActiveRecord();
 	}
 
-	public List<UpdateResponse> updateActiveRecord(UpdateRequest request) {
+	@Transactional
+	public List<UpdateResponse> updateActiveRecord(UpdateRequest request) throws RecordUnlockedException {
+		sessionManager.checkUserIsLockingActiveRecord();
 		List<UpdateRequestOperation> operations = request.getOperations();
 		List<UpdateResponse> updateResponses = new ArrayList<UpdateResponse>();
 		for (UpdateRequestOperation operation : operations) {
@@ -173,7 +177,6 @@ public class DataService {
 		}
 		return updateResponses;
 	}
-		
 	
 	@SuppressWarnings("unchecked")
 	private Collection<UpdateResponse> processUpdateRequestOperation(UpdateRequestOperation operation) {
@@ -630,18 +633,6 @@ public class DataService {
 		return result;
 	}
 	
-	private User getUserInSession() {
-		SessionState sessionState = getSessionManager().getSessionState();
-		User user = sessionState.getUser();
-		return user;
-	}
-
-	private CollectSurvey getActiveSurvey() {
-		SessionState sessionState = getSessionManager().getSessionState();
-		CollectSurvey activeSurvey = sessionState.getActiveSurvey();
-		return activeSurvey;
-	}
-
 	protected CollectRecord getActiveRecord() {
 		SessionState sessionState = getSessionManager().getSessionState();
 		CollectRecord activeRecord = sessionState.getActiveRecord();

@@ -68,7 +68,7 @@ public class RecordManager {
 			recordDao.insert(record);
 			User user = record.getModifiedBy();
 			id = record.getId();
-			recordDao.lock(id, user);
+			recordDao.lock(id, user.getId());
 		} else {
 			recordDao.update(record);
 		}
@@ -76,7 +76,7 @@ public class RecordManager {
 
 	@Transactional
 	public void delete(int recordId, User user) throws RecordPersistenceException {
-		recordDao.lock(recordId, user);
+		recordDao.lock(recordId, user.getId());
 		recordDao.delete(recordId);
 	}
 
@@ -90,13 +90,19 @@ public class RecordManager {
 	 * @throws MultipleEditException 
 	 */
 	@Transactional
-	public CollectRecord checkout(CollectSurvey survey, User user, int recordId, int step) throws RecordPersistenceException {
+	public CollectRecord checkout(CollectSurvey survey, User user, int recordId, int step, boolean forceUnlock) throws RecordPersistenceException {
+		recordDao.lock(recordId, user.getId(), forceUnlock);
 		CollectRecord record = recordDao.load(survey, recordId, step);
-		recordDao.lock(recordId, user);
 		record.setLockedBy(user);
 		return record;
 	}
 
+	@Transactional
+	public Integer getLockingUserId(int recordId) {
+		Integer userId = recordDao.getLockingUserId(recordId);
+		return userId;
+	}
+	
 	@Transactional
 	public List<CollectRecord> getSummaries(CollectSurvey survey, String rootEntity, String... keys) {
 		return recordDao.loadSummaries(survey, rootEntity, keys);
@@ -118,7 +124,7 @@ public class RecordManager {
 
 	@Transactional
 	public CollectRecord create(CollectSurvey survey, EntityDefinition rootEntityDefinition, User user, String modelVersionName) throws RecordPersistenceException {
-		recordDao.checkLock(user);
+		recordDao.checkLock(user.getId());
 		
 		CollectRecord record = new CollectRecord(survey, modelVersionName);
 		record.createRootEntity(rootEntityDefinition.getName());

@@ -147,8 +147,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		internal function keepAliveResult(event:ResultEvent, token:Object = null):void {
-			//keep alive succesfully sent
-			//trace("[Keep Alive response received] " + event);
+			//keep alive heartbeat sent correctly
 		}
 		
 		internal function keepAliveFaultHandler(event:FaultEvent, token:Object = null):void {

@@ -44,7 +44,7 @@ package org.openforis.collect.presenter {
 			_view.submitButton.addEventListener(MouseEvent.CLICK, submitButtonClickHandler);
 			_view.rejectButton.addEventListener(MouseEvent.CLICK, rejectButtonClickHandler);
 			eventDispatcher.addEventListener(ApplicationEvent.UPDATE_RESPONSE_RECEIVED, updateResponseReceivedHandler);
-			
+
 			eventDispatcher.addEventListener(UIEvent.ACTIVE_RECORD_CHANGED, activeRecordChangedListener);
 		}
 		

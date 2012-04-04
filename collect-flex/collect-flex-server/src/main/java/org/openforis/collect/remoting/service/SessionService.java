@@ -4,11 +4,14 @@
 package org.openforis.collect.remoting.service;
 
 import org.openforis.collect.manager.SessionManager;
+import org.openforis.collect.persistence.RecordUnlockedException;
 import org.openforis.collect.web.session.SessionState;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author M. Togna
+ * @author S. Ricci
  * 
  */
 public class SessionService {
@@ -20,12 +23,17 @@ public class SessionService {
 
 	/**
 	 * Method used to keep the session alive
+	 * @throws RecordUnlockedException 
 	 */
 //	@Secured("isAuthenticated()")
-	public void keepAlive() {
+	@Transactional
+	public void keepAlive(Boolean editing) throws RecordUnlockedException {
 		this.sessionManager.keepSessionAlive();
+		if(editing) {
+			sessionManager.checkUserIsLockingActiveRecord();
+		}
 	}
-
+	
 	/**
 	 * Return the session state of the active httpsession
 	 * 

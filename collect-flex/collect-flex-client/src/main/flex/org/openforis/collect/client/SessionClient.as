@@ -3,6 +3,8 @@ package org.openforis.collect.client {
 	import mx.rpc.IResponder;
 	import mx.rpc.remoting.Operation;
 	
+	import org.openforis.collect.Application;
+	
 	/**
 	 * 
 	 * @author Mino Togna
@@ -27,7 +29,8 @@ package org.openforis.collect.client {
 		}
 		
 		public function keepAlive(responder:IResponder):void {
-			var token:AsyncToken = this._keepAliveOperation.send();
+			var editing:Boolean = Application.isEditingRecord();
+			var token:AsyncToken = this._keepAliveOperation.send(editing);
 			token.addResponder(responder);
 		}
 		

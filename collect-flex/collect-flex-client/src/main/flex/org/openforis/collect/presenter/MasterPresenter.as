@@ -4,15 +4,18 @@ package org.openforis.collect.presenter {
 	 * @author Mino Togna
 	 * */
 	import mx.rpc.AsyncResponder;
+	import mx.rpc.events.FaultEvent;
 	import mx.rpc.events.ResultEvent;
 	
 	import org.openforis.collect.Application;
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.client.DataClient;
+	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.event.UIEvent;
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 	import org.openforis.collect.model.proxy.RecordProxy;
 	import org.openforis.collect.ui.view.MasterView;
+	import org.openforis.collect.util.AlertUtil;
 
 	public class MasterPresenter extends AbstractPresenter {
 		
@@ -50,7 +53,8 @@ package org.openforis.collect.presenter {
 		 * */
 		internal function recordSelectedHandler(uiEvent:UIEvent):void {
 			var record:RecordProxy = uiEvent.obj as RecordProxy;
-			_dataClient.loadRecord(new AsyncResponder(loadRecordResultHandler, faultHandler, record), record.id, record.step);
+			var responder:AsyncResponder = new AsyncResponder(loadRecordResultHandler, loadRecordFaultHandler, record);
+			_dataClient.loadRecord(responder, record.id, record.step);
 		}
 		
 		/**
@@ -90,7 +94,6 @@ package org.openforis.collect.presenter {
 			var uiEvent:UIEvent = new UIEvent(UIEvent.LOAD_RECORD_SUMMARIES);
 			eventDispatcher.dispatchEvent(uiEvent);
 		}
-
 		
 		internal function newRecordCreatedHandler(event:UIEvent):void {
 			_view.currentState = MasterView.DETAIL_STATE;
@@ -103,5 +106,26 @@ package org.openforis.collect.presenter {
 			eventDispatcher.dispatchEvent(uiEvent);
 		}
 		
+		protected function loadRecordFaultHandler(event:FaultEvent, token:Object = null):void {
+			var faultCode:String = event.fault.faultCode;
+			switch(faultCode) {
+				case "org.openforis.collect.persistence.RecordAlreadyLockedException":
+					AlertUtil.showConfirm('edit.confirmUnlock', null, null, performUnlock, [token as RecordProxy]);
+					break;
+				/*
+				case "org.openforis.collect.persistence.RecordLockedException":
+					if(ADMIN_ROLE) {
+						AlertUtil.showConfirm('edit.confirmUnlock', null, null, performUnlock);
+					}
+					break;
+				*/
+				default:
+					AbstractPresenter.faultHandler(event, token);
+			}
+		}
+		
+		protected function performUnlock(record:RecordProxy):void {
+			_dataClient.loadRecord(new AsyncResponder(loadRecordResultHandler, loadRecordFaultHandler, record), record.id, record.step, true);
+		}
 	}
 }
