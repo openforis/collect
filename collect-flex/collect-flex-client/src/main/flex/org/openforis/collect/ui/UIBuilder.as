@@ -20,6 +20,7 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
 	import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.NumberAttributeDefinitionProxy;
+	import org.openforis.collect.metamodel.proxy.NumberAttributeDefinitionProxy$Type;
 	import org.openforis.collect.metamodel.proxy.RangeAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.TaxonAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.TextAttributeDefinitionProxy;
@@ -51,6 +52,7 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.ui.component.input.DateAttributeRenderer;
 	import org.openforis.collect.ui.component.input.FixedCodeInputField;
 	import org.openforis.collect.ui.component.input.InputField;
+	import org.openforis.collect.ui.component.input.IntegerInputField;
 	import org.openforis.collect.ui.component.input.MemoInputField;
 	import org.openforis.collect.ui.component.input.MultipleCodeInputField;
 	import org.openforis.collect.ui.component.input.NumericAttributeRenderer;
@@ -329,7 +331,12 @@ package org.openforis.collect.ui {
 			} else if(def is FileAttributeDefinitionProxy) {
 				//inputField = new FileInputField();
 			} else if(def is NumberAttributeDefinitionProxy) {
-				inputField = new NumericInputField();
+				var numberAttributeDefn:NumberAttributeDefinitionProxy = NumberAttributeDefinitionProxy(def);
+				if(numberAttributeDefn.type == NumberAttributeDefinitionProxy$Type.INTEGER) {
+					inputField = new IntegerInputField();
+				} else {
+					inputField = new NumericInputField();
+				}
 			} else if(def is RangeAttributeDefinitionProxy) {
 				inputField = new RangeInputField();
 			} else if(def is TextAttributeDefinitionProxy) {

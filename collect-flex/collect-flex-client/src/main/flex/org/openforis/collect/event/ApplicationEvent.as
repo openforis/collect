@@ -14,6 +14,7 @@ package org.openforis.collect.event {
 		public static const APPLICATION_INITIALIZED:String = "applicationInitialized";
 		public static const UPDATE_RESPONSE_RECEIVED:String = "updateResponseReceived";
 		public static const RECORD_SAVED:String = "recordSaved";
+		public static const RECORD_UNLOCKED:String = "recordUnlocked";
 			
 		private var _result:Object;
 		private var _token:Object;

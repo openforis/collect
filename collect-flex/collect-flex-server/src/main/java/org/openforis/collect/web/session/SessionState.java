@@ -21,8 +21,9 @@ public class SessionState {
 		NEW, SAVED
 	}
 
-	private User user;
 	private String sessionId;
+	private Object clientId;
+	private User user;
 	private CollectRecord activeRecord;
 	private CollectSurvey activeSurvey;
 	private Locale locale;
@@ -78,6 +79,14 @@ public class SessionState {
 
 	public void setActiveRecordState(RecordState activeRecordState) {
 		this.activeRecordState = activeRecordState;
+	}
+
+	public Object getClientId() {
+		return clientId;
+	}
+
+	public void setClientId(Object clientId) {
+		this.clientId = clientId;
 	}
 
 }

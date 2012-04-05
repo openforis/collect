@@ -9,6 +9,7 @@ package org.openforis.collect.presenter {
 	
 	import org.openforis.collect.Application;
 	import org.openforis.collect.event.EventDispatcherFactory;
+	import org.openforis.collect.event.UIEvent;
 	import org.openforis.collect.i18n.Message;
 	import org.openforis.collect.ui.Images;
 	import org.openforis.collect.ui.component.BlockingMessagePopUp;
@@ -45,6 +46,12 @@ package org.openforis.collect.presenter {
 					break;
 				case "org.openforis.collect.persistence.RecordLockedException":
 					AlertUtil.showError('error.recordLocked');
+					break;
+				case "org.openforis.collect.persistence.RecordUnlockedException":
+					AlertUtil.showError("error.recordUnlocked");
+					Application.activeRecord = null;
+					var uiEvent:UIEvent = new UIEvent(UIEvent.BACK_TO_LIST);
+					eventDispatcher.dispatchEvent(uiEvent);
 					break;
 				case "org.openforis.collect.manager.RecordPromoteException" :
 					AlertUtil.showError('error.promoteException');

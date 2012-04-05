@@ -26,6 +26,7 @@ package org.openforis.collect.client {
 		private var _deleteRecordOperation:Operation;
 		private var _loadRecordSummariesOperation:Operation;
 		private var _loadRecordOperation:Operation;
+		private var _isLockingActiveRecordOperation:Operation;
 		private var _promoteActiveRecordOperation:Operation;
 		private var _demoteActiveRecordOperation:Operation;
 		private var _clearActiveRecordOperation:Operation;
@@ -68,9 +69,9 @@ package org.openforis.collect.client {
 			token.addResponder(responder);
 		}
 		
-		public function loadRecord(responder:IResponder, id:int, step:CollectRecord$Step):void {
+		public function loadRecord(responder:IResponder, id:int, step:CollectRecord$Step, forceUnlock:Boolean = false):void {
 			var stepNumber:int = getRecordStepNumber(step);
-			var token:AsyncToken = this._loadRecordOperation.send(id, stepNumber);
+			var token:AsyncToken = this._loadRecordOperation.send(id, stepNumber, forceUnlock);
 			token.addResponder(responder);
 		}
 		
@@ -81,6 +82,11 @@ package org.openforis.collect.client {
 		
 		public function updateActiveRecord(request:UpdateRequest, resultHandler:Function = null, faultHandler:Function = null):void {
 			this._queueProcessor.appendOperation(request, resultHandler, faultHandler, _updateActiveRecordOperation, request);
+		}
+		
+		public function isLockingActiveRecord(responder:IResponder):void {
+			var token:AsyncToken = this._isLockingActiveRecordOperation.send();
+			token.addResponder(responder);
 		}
 		
 		public function promoteActiveRecord(responder:IResponder):void {
