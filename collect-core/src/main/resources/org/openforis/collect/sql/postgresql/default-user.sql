@@ -83,3 +83,11 @@ GO
 INSERT INTO collect.ofc_user_role(id, user_id, role) 
 	VALUES(10, 10, 'ROLE_ENTRY')
 GO
+
+INSERT INTO collect.ofc_user(id, username, password, enabled) 
+	VALUES(11,'khrisna',md5('khrisna'),'Y')
+GO
+
+INSERT INTO collect.ofc_user_role(id, user_id, role) 
+	VALUES(11, 11, 'ROLE_ENTRY')
+GO
