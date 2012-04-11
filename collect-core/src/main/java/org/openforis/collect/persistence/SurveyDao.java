@@ -212,56 +212,68 @@ public class SurveyDao extends JooqDaoSupport {
 
 		// Get OFC_SURVEY table id for name
 		Factory jf = getJooqFactory();
-		int surveyId;
+		int surveyId = 0;
 		SelectConditionStep query = jf.select(OFC_SURVEY.ID).from(OFC_SURVEY)
 				.where(OFC_SURVEY.NAME.equal(name));
 		query.execute();
 		Result<Record> result = query.getResult();
-		if (!result.isEmpty()) {
+
+		if (result.isEmpty()) { // we should insert it now
+			surveyId = jf.nextval(OFC_SURVEY_ID_SEQ).intValue();
+			jf.insertInto(OFC_SURVEY).set(OFC_SURVEY.ID, surveyId)
+					.set(OFC_SURVEY.NAME, name)
+					.set(OFC_SURVEY.IDML, Factory.val(idml, SQLDataType.CLOB))
+					.execute();
+			survey.setId(surveyId);
+		} else {
 			Record record = result.get(0);
 			surveyId = record.getValueAsInteger(OFC_SURVEY.ID);
 			survey.setId(surveyId);
-
 			// Update Survey IDM
 			jf.update(OFC_SURVEY)
 					.set(OFC_SURVEY.IDML, Factory.val(idml, SQLDataType.CLOB))
 					.where(OFC_SURVEY.ID.equal(survey.getId())).execute();
+		}
 
+		// Insert SCHEMA_DEFINITIONs for new Fields only
+		Schema schema = survey.getSchema();
+		Collection<NodeDefinition> definitions = schema.getAllDefinitions();
+		for (NodeDefinition definition : definitions) {
+			int definitionId = jf.nextval(OFC_SCHEMA_DEFINITION_ID_SEQ)
+					.intValue();
+			String path = definition.getPath();
 
-			// Insert SCHEMA_DEFINITIONs for new Fields only
-			Schema schema = survey.getSchema();
-			Collection<NodeDefinition> definitions = schema.getAllDefinitions();
-			for (NodeDefinition definition : definitions) {
-				int definitionId = jf.nextval(OFC_SCHEMA_DEFINITION_ID_SEQ)
-						.intValue();
-				String path = definition.getPath();
-
-				query = jf.select(OFC_SCHEMA_DEFINITION.ID)
-						.from(OFC_SCHEMA_DEFINITION)
-						.where(OFC_SCHEMA_DEFINITION.PATH.equal(path));
-				query.execute();
-				result = query.getResult();
-				if (result.isEmpty()) {
-					jf.insertInto(OFC_SCHEMA_DEFINITION) 
-							.set(OFC_SCHEMA_DEFINITION.ID, definitionId)
-							.set(OFC_SCHEMA_DEFINITION.SURVEY_ID, surveyId)
-							.set(OFC_SCHEMA_DEFINITION.PATH, path).execute();
-					definition.setId(definitionId);
-				}				
-			}
-			
-			//remove non existing path from SCHEMA_DEFINITIONs
-			SelectJoinStep queryJoin = jf.select(OFC_SCHEMA_DEFINITION.PATH).from(OFC_SCHEMA_DEFINITION);
-			queryJoin.execute();
-			result = queryJoin.getResult();
-			
-			for(Record r:result){
-				String path = r.getValueAsString(0);
-				NodeDefinition node = schema.getByPath(path);
-				if(node==null){ 
-					jf.delete(OFC_SCHEMA_DEFINITION).where(OFC_SCHEMA_DEFINITION.PATH.equal(path)).execute();
-				}
+			query = jf.select(OFC_SCHEMA_DEFINITION.ID)
+					.from(OFC_SCHEMA_DEFINITION)
+					.where(OFC_SCHEMA_DEFINITION.PATH.equal(path))
+					.and(OFC_SCHEMA_DEFINITION.SURVEY_ID.equal(surveyId));
+			query.execute();
+			result = query.getResult();
+			if (result.isEmpty()) {
+				jf.insertInto(OFC_SCHEMA_DEFINITION)
+						.set(OFC_SCHEMA_DEFINITION.ID, definitionId)
+						.set(OFC_SCHEMA_DEFINITION.SURVEY_ID, surveyId)
+						.set(OFC_SCHEMA_DEFINITION.PATH, path).execute();
+				definition.setId(definitionId);
 			}
 		}
+
+		// remove non existing path from SCHEMA_DEFINITIONs
+		SelectConditionStep queryJoin = jf.select(OFC_SCHEMA_DEFINITION.PATH)
+				.from(OFC_SCHEMA_DEFINITION)
+				.where(OFC_SCHEMA_DEFINITION.SURVEY_ID.equal(surveyId));
+		queryJoin.execute();
+		result = queryJoin.getResult();
+
+		for (Record r : result) {
+			String path = r.getValueAsString(0);
+			NodeDefinition node = schema.getByPath(path);
+			if (node == null) {
+				jf.delete(OFC_SCHEMA_DEFINITION)
+						.where(OFC_SCHEMA_DEFINITION.PATH.equal(path).and(OFC_SCHEMA_DEFINITION.SURVEY_ID.equal(surveyId)))
+						.execute();
+			}
+		}
+
 	}
 }

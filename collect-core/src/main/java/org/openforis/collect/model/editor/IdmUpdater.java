@@ -21,7 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author Wibowo, Eko
  *
  */
-public class IdmEditor {
+public class IdmUpdater {
 	@Autowired
 	protected SurveyDao surveyDao;
 
@@ -31,32 +31,29 @@ public class IdmEditor {
 	protected ExpressionFactory expressionFactory;
 	@Autowired
 	protected Validator validator;
-	public Survey updateModel() throws IOException, InvalidIdmlException,
+	
+	public Survey updateModel(String idmName, URL idmUrl) throws IOException, InvalidIdmlException,
 			SurveyImportException {
-
-		URL idm = ClassLoader
-				.getSystemResource("MOFOR_WORKING_update.idnfi.idm.xml");// MOFOR_2012_04_03_update.idnfi.idm.xml
-		InputStream is = idm.openStream();
+		InputStream is = idmUrl.openStream();
 		CollectIdmlBindingContext idmlBindingContext = surveyDao
 				.getBindingContext();
 		SurveyUnmarshaller surveyUnmarshaller = idmlBindingContext
 				.createSurveyUnmarshaller();
 		CollectSurvey survey = (CollectSurvey) surveyUnmarshaller.unmarshal(is);
-		survey.setName("idnfi");
+		survey.setName(idmName);
 		surveyDao.updateModel(survey);
 		return survey;
 	}
 
-	public Survey importIdnfi() throws IOException, SurveyImportException,
+	public Survey importIdnfi(String idmName, URL idmUrl) throws IOException, SurveyImportException,
 			InvalidIdmlException {
-		URL idm = ClassLoader.getSystemResource("idnfi.idm.xml");
-		InputStream is = idm.openStream();
+		InputStream is = idmUrl.openStream();
 		CollectIdmlBindingContext idmlBindingContext = surveyDao
 				.getBindingContext();
 		SurveyUnmarshaller surveyUnmarshaller = idmlBindingContext
 				.createSurveyUnmarshaller();
 		CollectSurvey survey = (CollectSurvey) surveyUnmarshaller.unmarshal(is);
-		survey.setName("idnfi");
+		survey.setName(idmName);
 		surveyDao.clearModel();
 		surveyDao.importModel(survey);
 		return survey;
