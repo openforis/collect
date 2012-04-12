@@ -79,7 +79,7 @@ component|BlockingMessagePopUp, component|SelectVersionPopUp, input|CodeListDial
 	border-alpha: 0.5;
 	corner-radius: 3;
 	background-color: #FFFFFF;
-	background-alpha: 0.8;
+	background-alpha: 1.0;
 }
 
 component|BlockingMessagePopUp {
@@ -87,7 +87,6 @@ component|BlockingMessagePopUp {
 }
 
 component|RecordFilterPopUp {
-	skin-class: ClassReference("org.openforis.collect.ui.skin.RemarksPopUpSkin");
 }
 
 mx|ToolTip { 
