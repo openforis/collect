@@ -46,7 +46,7 @@ public class UnlockController {
 						recordManager.unlock(activeRecord, user);
 						//clear session state
 						sessionState.setActiveRecord(null);
-						sessionState.setLockingClientId(null);
+						sessionState.setActiveRecordClientId(null);
 						sessionState.setActiveRecordState(null);
 					} else {
 						//nothing to unlock

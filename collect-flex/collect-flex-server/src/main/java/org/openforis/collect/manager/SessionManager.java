@@ -48,7 +48,7 @@ public class SessionManager {
 		SessionState sessionState = getSessionState();
 		sessionState.setActiveRecord(record);
 //		Object clientId = getCurrentClientId();
-		sessionState.setLockingClientId(clientId);
+		sessionState.setActiveRecordClientId(clientId);
 	}
 
 	public void clearActiveRecord() {
@@ -89,7 +89,7 @@ public class SessionManager {
 		if ( record != null && record.getId() != null) {
 			//verify that the record has not been unlocked
 			Integer lockingUserId = recordManager.getLockingUserId(record.getId());
-			String lockingClientId = sessionState.getLockingClientId();
+			String activeRecordClientId = sessionState.getActiveRecordClientId();
 			if( lockingUserId == null || lockingUserId != user.getId() ) {
 				clearActiveRecord();
 				String lockingUserName = null;
@@ -98,7 +98,7 @@ public class SessionManager {
 					lockingUserName = lockingUser.getName();
 				}
 				throw new RecordUnlockedException(lockingUserName);
-			} else if(! lockingClientId.equals(clientId)) {
+			} else if(! activeRecordClientId.equals(clientId)) {
 				throw new RecordUnlockedException();
 			}
 		}

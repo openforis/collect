@@ -22,7 +22,7 @@ public class SessionState {
 	}
 
 	private String sessionId;
-	private String lockingClientId;
+	private String activeRecordClientId;
 	private User user;
 	private CollectRecord activeRecord;
 	private CollectSurvey activeSurvey;
@@ -81,12 +81,12 @@ public class SessionState {
 		this.activeRecordState = activeRecordState;
 	}
 
-	public String getLockingClientId() {
-		return lockingClientId;
+	public String getActiveRecordClientId() {
+		return activeRecordClientId;
 	}
 
-	public void setLockingClientId(String lockingClientId) {
-		this.lockingClientId = lockingClientId;
+	public void setActiveRecordClientId(String activeRecordClientId) {
+		this.activeRecordClientId = activeRecordClientId;
 	}
 
 	

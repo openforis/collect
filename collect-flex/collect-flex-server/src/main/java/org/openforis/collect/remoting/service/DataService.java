@@ -82,9 +82,9 @@ public class DataService {
 		SessionState sessionState = sessionManager.getSessionState();
 		CollectSurvey survey = sessionState.getActiveSurvey();
 		User user = sessionState.getUser();
-		String lockingClientId = sessionState.getLockingClientId();
+		String activeRecordClientId = sessionState.getActiveRecordClientId();
 		CollectRecord record = recordManager.checkout(survey, user, id, step, forceUnlock);
-		if(forceUnlock || lockingClientId == null || clientId.equals(lockingClientId)) {
+		if(forceUnlock || activeRecordClientId == null || clientId.equals(activeRecordClientId)) {
 			//record.updateNodeStates();
 			
 			Entity rootEntity = record.getRootEntity();
