@@ -6,12 +6,18 @@
  */
 
 package org.openforis.collect.model.proxy {
+	import org.openforis.collect.util.CollectionUtil;
 
     [Bindable]
     [RemoteClass(alias="org.openforis.collect.model.proxy.UserProxy")]
     public class UserProxy extends UserProxyBase {
 		
 		public static const ROLE_ADMIN:String = "ROLE_ADMIN";
+		
+		public function hasRole(role:String):Boolean {
+			var result:Boolean = CollectionUtil.contains(roles, role);
+			return result;
+		}
 		
     }
 }
