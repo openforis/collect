@@ -216,16 +216,23 @@ package org.openforis.collect.presenter {
 				PopUpUtil.VERTICAL_ALIGN_BOTTOM, 
 				PopUpUtil.HORIZONTAL_ALIGN_RIGHT);
 			//PopUpManager.centerPopUp(_filterPopUp);
-
-			currentKeyValuesFilter = null;
 		}
 		
-		protected function filterPopUpCloseHandler(event:Event = null):void {
-			currentPage = 1;
-			loadRecordSummariesCurrentPage();	
+		protected function closeFilterPopUp():void {
 			PopUpManager.removePopUp(_filterPopUp);
 			_filterPopUp.removeEventListener(FlexMouseEvent.MOUSE_DOWN_OUTSIDE, filterPopUpCloseHandler);
 			_filterPopUp = null;
+			
+		}
+		
+		protected function filterPopUpCloseHandler(event:Event = null):void {
+			var oldFilter:Array = currentKeyValuesFilter;
+			currentKeyValuesFilter = null;
+			if(oldFilter != null) {
+				currentPage = 1;
+				loadRecordSummariesCurrentPage();
+			}
+			closeFilterPopUp();
 		}
 		
 		protected function filterPopUpApplyHandler(event:Event):void {
@@ -235,7 +242,9 @@ package org.openforis.collect.presenter {
 				filter.push(key);
 			}
 			currentKeyValuesFilter = filter;
-			filterPopUpCloseHandler();
+			currentPage = 1;
+			loadRecordSummariesCurrentPage();
+			closeFilterPopUp();
 		}
 		
 		/**

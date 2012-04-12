@@ -5,7 +5,7 @@
 			   xmlns:detail="org.openforis.collect.ui.component.detail.*" 
 			   xmlns:input="org.openforis.collect.ui.component.input.*"
 			   creationPolicy="all"
-			   width="270"
+			   width="240"
 			   title="{Message.get('list.filterTitle')}"
 			   >
 	<s:layout>
