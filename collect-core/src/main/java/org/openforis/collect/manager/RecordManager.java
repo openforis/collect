@@ -115,7 +115,7 @@ public class RecordManager {
 	}
 
 	@Transactional
-	public int getRecordsCount(CollectSurvey survey, String rootEntity, String... keyValues) {
+	public int getRecordCount(CollectSurvey survey, String rootEntity, String... keyValues) {
 		Schema schema = survey.getSchema();
 		EntityDefinition rootEntityDefinition = schema.getRootEntityDefinition(rootEntity);
 		int count = recordDao.countRecords(rootEntityDefinition.getId(), keyValues);
