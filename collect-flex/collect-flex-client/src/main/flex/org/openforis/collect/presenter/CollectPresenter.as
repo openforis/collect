@@ -32,6 +32,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.i18n.Message;
 	import org.openforis.collect.ui.Images;
 	import org.openforis.collect.model.proxy.UserProxy;
+	import flash.events.MouseEvent;
 	
 	/**
 	 * 
@@ -81,12 +82,19 @@ package org.openforis.collect.presenter {
 		}
 		
 		override internal function initEventListeners():void {
+			//mouse wheel handler to increment scroll step size
+			FlexGlobals.topLevelApplication.systemManager.addEventListener(MouseEvent.MOUSE_WHEEL, mouseWheelHandler, true);
 			eventDispatcher.addEventListener(UIEvent.SURVEY_SELECTED, surveySelectedHandler);
 		}
 		
 		internal function initSessionResultHandler(event:ResultEvent, token:Object = null):void {
 			Application.user = event.result as UserProxy;
 			getSurveySummaries();
+		}
+		
+		internal function mouseWheelHandler(event:MouseEvent):void {
+			//bump delta
+			event.delta *= 30;
 		}
 		
 		/**

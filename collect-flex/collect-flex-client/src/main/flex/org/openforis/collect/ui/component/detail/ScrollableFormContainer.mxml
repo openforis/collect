@@ -8,7 +8,7 @@
 					width="100%" 
 				   	height="100%" 
 					
-					creationComplete="creationCompleteHandler(event)" xmlns:container="org.openforis.collect.ui.container.*"
+					creationComplete="creationCompleteHandler(event)"
 				   >
 	
 	<fx:Script>
@@ -123,9 +123,9 @@
 				height="100%" 
 				width="100%" 
 				includeIn="default">
-		<container:ControlledScrollGroup stepSize="40">
+		<s:Group>
 			<fx:Reparent target="formDataGroup" includeIn="default" />
-		</container:ControlledScrollGroup>
+		</s:Group>
 	</s:Scroller>
 
 </s:NavigatorContent>
