@@ -10,5 +10,8 @@ package org.openforis.collect.model.proxy {
     [Bindable]
     [RemoteClass(alias="org.openforis.collect.model.proxy.UserProxy")]
     public class UserProxy extends UserProxyBase {
+		
+		public static const ROLE_ADMIN:String = "ROLE_ADMIN";
+		
     }
 }

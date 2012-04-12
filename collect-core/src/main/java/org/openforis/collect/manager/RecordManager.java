@@ -96,7 +96,7 @@ public class RecordManager {
 		record.setLockedBy(user);
 		return record;
 	}
-
+	
 	@Transactional
 	public Integer getLockingUserId(int recordId) {
 		Integer userId = recordDao.getLockingUserId(recordId);
