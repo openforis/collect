@@ -116,7 +116,7 @@ public class DataService {
 		Schema schema = activeSurvey.getSchema();
 		EntityDefinition rootEntityDefinition = schema.getRootEntityDefinition(rootEntityName);
 		String rootEntityDefinitionName = rootEntityDefinition.getName();
-		int count = recordManager.getCountRecords(activeSurvey, rootEntityDefinitionName, keyValues);
+		int count = recordManager.getRecordsCount(activeSurvey, rootEntityDefinitionName, keyValues);
 		List<CollectRecord> summaries = recordManager.loadSummaries(activeSurvey, rootEntityDefinitionName, offset, maxNumberOfRows, sortFields, keyValues);
 		List<RecordProxy> proxies = new ArrayList<RecordProxy>();
 		for (CollectRecord summary : summaries) {
