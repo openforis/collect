@@ -37,56 +37,30 @@ package org.openforis.collect.model.proxy {
 				for each (var r:ValidationResultProxy in results) {
 					var message:String = LanguageSpecificTextProxy.getLocalizedText(r.messages);
 					if(StringUtil.isBlank(message)) {
-						var messageResource:String = null;
-						switch(r.ruleName) {
-							case "CodeValidator":
-								messageResource = "edit.validation.codeError";
-								break;
-							case "ComparisonCheck":
-								messageResource = "edit.validation.comparisonError";
-								break;
-							case "CoordinateValidator":
-								messageResource = "edit.validation.coordinateError";
-								break;
-							case "DateValidator":
-								messageResource = "edit.validation.dateError";
-								break;
-							case "DistanceCheck":
-								messageResource = "edit.validation.distanceError";
-								break;
-							case "ExternalCodeValidator":
-								messageResource = "edit.validation.externalCodeError";
-								break;
-							case "IntegerRangeValidator":
-								messageResource = "edit.validation.integerRangeError";
-								break;
-							case "PatternCheck":
-								messageResource = "edit.validation.patternError";
-								break;
-							case "RealRangeValidator":
-								messageResource = "edit.validation.realRangeError";
-								break;
-							case "RecordKeyUniquenessValidator":
-								messageResource = "edit.validation.recordKeyUniquenessError";
-								break;
-							case "SpecifiedValidator":
-								if(flag == ValidationResultFlag.ERROR) {
-									messageResource = "edit.validation.specifiedError";
-								} else {
-									messageResource = "edit.validation.requiredWarning";
-								}
-								break;
-							case "TimeValidator":
-								messageResource = "edit.validation.timeError";
-								break;
-							case "UniquenessCheck":
-								messageResource = "edit.validation.uniquenessError";
-								break;
-						}
-						if(messageResource != null) {
-							message = Message.get(messageResource);
+						var messageResource:String = r.messageKey;
+						var args:Array = r.messageArgs;
+						if(r.ruleName == "ComparisonCheck") {
+							var nodeLabel:String = args[0];
+							var argsAdapted:Array = [];
+							for (var index:int = 1; index < args.length; index ++) {
+								var arg:String = args[index];
+								var argParts:Array = arg.split(";");
+								var op:String = argParts[0];
+								var value:String = argParts[1];
+								var opMessageKey:String =  "edit.validation.compare." + op;
+								var operator:String = Message.get(opMessageKey);
+								var argAdapted:String = StringUtil.concat(" ", operator, value);
+								argsAdapted.push(argAdapted);
+							}
+							var andOperator:String = " " + Message.get("edit.validation.compare.and") + " ";
+							var argsConcat:String = StringUtil.concat(andOperator, argsAdapted);
+							message = Message.get(messageResource, [nodeLabel, argsConcat]);
 						} else {
-							message = r.ruleName;
+							if(messageResource != null) {
+								message = Message.get(messageResource, args);
+							} else {
+								message = r.ruleName;
+							}
 						}
 					}
 					messages.push(message);
