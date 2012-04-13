@@ -44,6 +44,7 @@ package org.openforis.collect.presenter {
 			_view.submitButton.addEventListener(MouseEvent.CLICK, submitButtonClickHandler);
 			_view.rejectButton.addEventListener(MouseEvent.CLICK, rejectButtonClickHandler);
 			eventDispatcher.addEventListener(ApplicationEvent.UPDATE_RESPONSE_RECEIVED, updateResponseReceivedHandler);
+			eventDispatcher.addEventListener(ApplicationEvent.RECORD_SAVED, recordSavedHandler);
 
 			eventDispatcher.addEventListener(UIEvent.ACTIVE_RECORD_CHANGED, activeRecordChangedListener);
 		}
@@ -99,6 +100,12 @@ package org.openforis.collect.presenter {
 			
 			form = _view.formsContainer.setActiveForm(version, rootEntityDefn);
 			form.record = activeRecord;
+		}
+		
+		protected function recordSavedHandler(event:ApplicationEvent):void {
+			var rootEntityLabel:String = Application.activeRootEntity.getLabelText()
+			_view.recordSavedMessage.text = Message.get("edit.recordSaved", [rootEntityLabel]);
+			_view.recordSavedMessage.show();
 		}
 		
 		protected function updateRecordKeyLabel(event:Event = null):void {
