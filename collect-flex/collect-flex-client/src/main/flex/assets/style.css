@@ -31,6 +31,16 @@ view|Footer {
 	padding-bottom: 5;
 }
 
+detail|RecordSavedMessage {
+	skin-class: ClassReference('org.openforis.collect.ui.skin.RecordSavedMessageSkin');
+	backgroundColor: haloBlue;
+}
+detail|RecordSavedMessage s|Label {
+	color: white;
+	fontSize: 12;
+	fontWeight: bold;
+}
+
 .appVersionLabel, .appVersionText {
 	font-style: italic;
 	font-size: 9;
