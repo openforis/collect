@@ -27,6 +27,7 @@ import org.openforis.collect.model.RecordSummarySortField;
 import org.openforis.collect.model.User;
 import org.openforis.collect.model.proxy.NodeProxy;
 import org.openforis.collect.model.proxy.RecordProxy;
+import org.openforis.collect.persistence.RecordAlreadyLockedException;
 import org.openforis.collect.persistence.RecordPersistenceException;
 import org.openforis.collect.persistence.RecordUnlockedException;
 import org.openforis.collect.remoting.service.UpdateRequestOperation.Method;
@@ -77,19 +78,24 @@ public class DataService {
 	private RecordManager recordManager;
 
 	@Transactional
-	public RecordProxy loadRecord(int id, int step, boolean forceUnlock) throws RecordPersistenceException {
+	public RecordProxy loadRecord(int id, int step, boolean forceUnlock, String clientId) throws RecordPersistenceException {
 		SessionState sessionState = sessionManager.getSessionState();
 		CollectSurvey survey = sessionState.getActiveSurvey();
 		User user = sessionState.getUser();
-		
+		String activeRecordClientId = sessionState.getActiveRecordClientId();
 		CollectRecord record = recordManager.checkout(survey, user, id, step, forceUnlock);
-		//record.updateNodeStates();
-		
-		Entity rootEntity = record.getRootEntity();
-		recordManager.addEmptyNodes(rootEntity);
-		sessionManager.setActiveRecord(record);
-		sessionState.setActiveRecordState(RecordState.SAVED);
-		return new RecordProxy(record);
+		if(forceUnlock || activeRecordClientId == null || clientId.equals(activeRecordClientId)) {
+			//record.updateNodeStates();
+			
+			Entity rootEntity = record.getRootEntity();
+			recordManager.addEmptyNodes(rootEntity);
+			sessionManager.setActiveRecord(record, clientId);
+			sessionState.setActiveRecordState(RecordState.SAVED);
+			return new RecordProxy(record);
+		} else {
+			//record locked by the same user using a different flex client
+			throw new RecordAlreadyLockedException("Record already locked", null);
+		}
 	}
 
 	/**
@@ -110,7 +116,7 @@ public class DataService {
 		Schema schema = activeSurvey.getSchema();
 		EntityDefinition rootEntityDefinition = schema.getRootEntityDefinition(rootEntityName);
 		String rootEntityDefinitionName = rootEntityDefinition.getName();
-		int count = recordManager.getCountRecords(activeSurvey, rootEntityDefinitionName, keyValues);
+		int count = recordManager.getRecordCount(activeSurvey, rootEntityDefinitionName, keyValues);
 		List<CollectRecord> summaries = recordManager.loadSummaries(activeSurvey, rootEntityDefinitionName, offset, maxNumberOfRows, sortFields, keyValues);
 		List<RecordProxy> proxies = new ArrayList<RecordProxy>();
 		for (CollectRecord summary : summaries) {
@@ -122,7 +128,7 @@ public class DataService {
 	}
 
 	@Transactional
-	public RecordProxy createRecord(String rootEntityName, String versionName) throws RecordPersistenceException {
+	public RecordProxy createRecord(String rootEntityName, String versionName, String clientId) throws RecordPersistenceException {
 		SessionState sessionState = sessionManager.getSessionState();
 		User user = sessionState.getUser();
 		CollectSurvey activeSurvey = sessionState.getActiveSurvey();
@@ -132,7 +138,7 @@ public class DataService {
 		CollectRecord record = recordManager.create(activeSurvey, rootEntityDefinition, user, version.getName());
 		Entity rootEntity = record.getRootEntity();
 		recordManager.addEmptyNodes(rootEntity);
-		sessionManager.setActiveRecord((CollectRecord) record);
+		sessionManager.setActiveRecord((CollectRecord) record, clientId);
 		sessionState.setActiveRecordState(RecordState.NEW);
 		RecordProxy recordProxy = new RecordProxy(record);
 		return recordProxy;
@@ -167,8 +173,8 @@ public class DataService {
 	}
 
 	@Transactional
-	public List<UpdateResponse> updateActiveRecord(UpdateRequest request) throws RecordUnlockedException {
-		sessionManager.checkUserIsLockingActiveRecord();
+	public List<UpdateResponse> updateActiveRecord(String clientId, UpdateRequest request) throws RecordUnlockedException {
+		sessionManager.checkUserIsLockingActiveRecord(clientId);
 		List<UpdateRequestOperation> operations = request.getOperations();
 		List<UpdateResponse> updateResponses = new ArrayList<UpdateResponse>();
 		for (UpdateRequestOperation operation : operations) {

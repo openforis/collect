@@ -31,6 +31,8 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.ui.component.BlockingMessagePopUp;
 	import org.openforis.collect.i18n.Message;
 	import org.openforis.collect.ui.Images;
+	import org.openforis.collect.model.proxy.UserProxy;
+	import flash.events.MouseEvent;
 	
 	/**
 	 * 
@@ -50,6 +52,9 @@ package org.openforis.collect.presenter {
 		public function CollectPresenter(view:collect) {
 			super();
 			
+			//generate client id
+			Application.clientId = Math.random().toString();
+			
 			this._view = view;
 			this._modelClient = ClientFactory.modelClient;
 			this._sessionClient = ClientFactory.sessionClient;
@@ -64,7 +69,7 @@ package org.openforis.collect.presenter {
 			//set language in session
 			var localeString:String = FlexGlobals.topLevelApplication.parameters.lang as String;
 			if(localeString != null) {
-				this._sessionClient.setLocale(new AsyncResponder(setLocaleResultHandler, faultHandler), localeString);
+				this._sessionClient.initSession(new AsyncResponder(initSessionResultHandler, faultHandler), localeString);
 			}
 			
 			CONFIG::debugging {
@@ -77,11 +82,19 @@ package org.openforis.collect.presenter {
 		}
 		
 		override internal function initEventListeners():void {
+			//mouse wheel handler to increment scroll step size
+			FlexGlobals.topLevelApplication.systemManager.addEventListener(MouseEvent.MOUSE_WHEEL, mouseWheelHandler, true);
 			eventDispatcher.addEventListener(UIEvent.SURVEY_SELECTED, surveySelectedHandler);
 		}
 		
-		internal function setLocaleResultHandler(event:ResultEvent, token:Object = null):void {
+		internal function initSessionResultHandler(event:ResultEvent, token:Object = null):void {
+			Application.user = event.result as UserProxy;
 			getSurveySummaries();
+		}
+		
+		internal function mouseWheelHandler(event:MouseEvent):void {
+			//bump delta
+			event.delta *= 30;
 		}
 		
 		/**

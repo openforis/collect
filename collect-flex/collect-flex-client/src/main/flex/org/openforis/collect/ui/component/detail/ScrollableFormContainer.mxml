@@ -124,8 +124,7 @@
 				width="100%" 
 				includeIn="default">
 		<s:Group>
-		<fx:Reparent target="formDataGroup" includeIn="default" />
-			
+			<fx:Reparent target="formDataGroup" includeIn="default" />
 		</s:Group>
 	</s:Scroller>
 

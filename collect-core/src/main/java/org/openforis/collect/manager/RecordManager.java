@@ -96,7 +96,7 @@ public class RecordManager {
 		record.setLockedBy(user);
 		return record;
 	}
-
+	
 	@Transactional
 	public Integer getLockingUserId(int recordId) {
 		Integer userId = recordDao.getLockingUserId(recordId);
@@ -115,7 +115,7 @@ public class RecordManager {
 	}
 
 	@Transactional
-	public int getCountRecords(CollectSurvey survey, String rootEntity, String... keyValues) {
+	public int getRecordCount(CollectSurvey survey, String rootEntity, String... keyValues) {
 		Schema schema = survey.getSchema();
 		EntityDefinition rootEntityDefinition = schema.getRootEntityDefinition(rootEntity);
 		int count = recordDao.countRecords(rootEntityDefinition.getId(), keyValues);

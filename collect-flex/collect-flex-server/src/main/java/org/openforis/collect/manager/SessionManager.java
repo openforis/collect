@@ -44,11 +44,11 @@ public class SessionManager {
 		return sessionState;
 	}
 
-	public void setActiveRecord(CollectRecord record) {
+	public void setActiveRecord(CollectRecord record, String clientId) {
 		SessionState sessionState = getSessionState();
 		sessionState.setActiveRecord(record);
 //		Object clientId = getCurrentClientId();
-//		sessionState.setClientId(clientId);
+		sessionState.setActiveRecordClientId(clientId);
 	}
 
 	public void clearActiveRecord() {
@@ -82,17 +82,14 @@ public class SessionManager {
 	}
 
 	@Transactional
-	public void checkUserIsLockingActiveRecord() throws RecordUnlockedException {
+	public void checkUserIsLockingActiveRecord(String clientId) throws RecordUnlockedException {
 		SessionState sessionState = getSessionState();
 		Record record = sessionState.getActiveRecord();
 		User user = sessionState.getUser();
 		if ( record != null && record.getId() != null) {
 			//verify that the record has not been unlocked
 			Integer lockingUserId = recordManager.getLockingUserId(record.getId());
-			/*
-			 	Object currentClientId = getCurrentClientId();
-				Object sessionClientId = sessionState.getClientId();
-			 */
+			String activeRecordClientId = sessionState.getActiveRecordClientId();
 			if( lockingUserId == null || lockingUserId != user.getId() ) {
 				clearActiveRecord();
 				String lockingUserName = null;
@@ -101,8 +98,8 @@ public class SessionManager {
 					lockingUserName = lockingUser.getName();
 				}
 				throw new RecordUnlockedException(lockingUserName);
-//			} if ( sessionClientId != null && ! currentClientId.equals(sessionClientId) ) {
-//				throw new RecordUnlockedException();
+			} else if(! activeRecordClientId.equals(clientId)) {
+				throw new RecordUnlockedException();
 			}
 		}
 	}
@@ -137,14 +134,15 @@ public class SessionManager {
 		}
 	}
 	/* TODO get flex client id
-	public Object getCurrentClientId() {
+	public String getCurrentClientId() {
 		HttpGraniteContext graniteContext = (HttpGraniteContext) GraniteContext.getCurrentInstance();
 		AMFContext amfContext = graniteContext.getAMFContext();
 		Message message = amfContext.getRequest();
 		Object clientId = message.getClientId();
 		return clientId;
 	}
-	*/
+	 */
+	
 	/*
 	private void setSessionAttribute(String attributeName, Object value) {
 		GraniteContext graniteContext = GraniteContext.getCurrentInstance();

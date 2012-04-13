@@ -201,9 +201,7 @@ package org.openforis.collect.presenter {
 			if(_filterPopUp == null) {
 				_filterPopUp = RecordFilterPopUp(PopUpManager.createPopUp(application, RecordFilterPopUp));
 				_filterPopUp.addEventListener(CloseEvent.CLOSE, filterPopUpCloseHandler);
-				_filterPopUp.cancelButton.addEventListener(MouseEvent.CLICK, filterPopUpCloseHandler);
 				_filterPopUp.applyButton.addEventListener(MouseEvent.CLICK, filterPopUpApplyHandler);
-				_filterPopUp.resetButton.addEventListener(MouseEvent.CLICK, filterPopUpResetHandler);
 				_filterPopUp.addEventListener(FlexMouseEvent.MOUSE_DOWN_OUTSIDE, filterPopUpCloseHandler);
 			}
 			PopUpManager.addPopUp(_filterPopUp, application);
@@ -212,9 +210,6 @@ package org.openforis.collect.presenter {
 			for(var index:int = 0; index < _filterPopUp.textInput.length; index ++) {
 				var textInput:TextInput = _filterPopUp.textInput[index];
 				textInput.addEventListener(FlexEvent.ENTER, filterPopUpApplyHandler);
-				if(currentKeyValuesFilter != null && index < currentKeyValuesFilter.length) {
-					textInput.text = currentKeyValuesFilter[index];
-				}
 			}
 			PopUpUtil.alignToField(_filterPopUp, _view.openFilterPopUpButton, 
 				PopUpUtil.POSITION_BELOW, 
@@ -223,8 +218,21 @@ package org.openforis.collect.presenter {
 			//PopUpManager.centerPopUp(_filterPopUp);
 		}
 		
-		protected function filterPopUpCloseHandler(event:Event = null):void {
+		protected function closeFilterPopUp():void {
 			PopUpManager.removePopUp(_filterPopUp);
+			_filterPopUp.removeEventListener(FlexMouseEvent.MOUSE_DOWN_OUTSIDE, filterPopUpCloseHandler);
+			_filterPopUp = null;
+			
+		}
+		
+		protected function filterPopUpCloseHandler(event:Event = null):void {
+			var oldFilter:Array = currentKeyValuesFilter;
+			currentKeyValuesFilter = null;
+			if(oldFilter != null) {
+				currentPage = 1;
+				loadRecordSummariesCurrentPage();
+			}
+			closeFilterPopUp();
 		}
 		
 		protected function filterPopUpApplyHandler(event:Event):void {
@@ -236,14 +244,7 @@ package org.openforis.collect.presenter {
 			currentKeyValuesFilter = filter;
 			currentPage = 1;
 			loadRecordSummariesCurrentPage();
-			filterPopUpCloseHandler();
-		}
-		
-		protected function filterPopUpResetHandler(event:Event):void {
-			currentKeyValuesFilter = null;
-			currentPage = 1;
-			loadRecordSummariesCurrentPage();
-			filterPopUpCloseHandler();
+			closeFilterPopUp();
 		}
 		
 		/**

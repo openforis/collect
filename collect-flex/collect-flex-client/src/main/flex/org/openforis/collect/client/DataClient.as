@@ -51,7 +51,7 @@ package org.openforis.collect.client {
 		}
 		
 		public function createNewRecord(responder:IResponder, rootEntityName:String, versionName:String):void {
-			var token:AsyncToken = this._createRecordOperation.send(rootEntityName, versionName);
+			var token:AsyncToken = this._createRecordOperation.send(rootEntityName, versionName, Application.clientId);
 			token.addResponder(responder);
 		}
 		
@@ -71,7 +71,7 @@ package org.openforis.collect.client {
 		
 		public function loadRecord(responder:IResponder, id:int, step:CollectRecord$Step, forceUnlock:Boolean = false):void {
 			var stepNumber:int = getRecordStepNumber(step);
-			var token:AsyncToken = this._loadRecordOperation.send(id, stepNumber, forceUnlock);
+			var token:AsyncToken = this._loadRecordOperation.send(id, stepNumber, forceUnlock, Application.clientId);
 			token.addResponder(responder);
 		}
 		
@@ -81,7 +81,7 @@ package org.openforis.collect.client {
 		}
 		
 		public function updateActiveRecord(request:UpdateRequest, resultHandler:Function = null, faultHandler:Function = null):void {
-			this._queueProcessor.appendOperation(request, resultHandler, faultHandler, _updateActiveRecordOperation, request);
+			this._queueProcessor.appendOperation(request, resultHandler, faultHandler, _updateActiveRecordOperation, Application.clientId, request);
 		}
 		
 		public function isLockingActiveRecord(responder:IResponder):void {

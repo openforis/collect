@@ -14,6 +14,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.event.UIEvent;
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 	import org.openforis.collect.model.proxy.RecordProxy;
+	import org.openforis.collect.model.proxy.UserProxy;
 	import org.openforis.collect.ui.view.MasterView;
 	import org.openforis.collect.util.AlertUtil;
 
@@ -108,19 +109,11 @@ package org.openforis.collect.presenter {
 		
 		protected function loadRecordFaultHandler(event:FaultEvent, token:Object = null):void {
 			var faultCode:String = event.fault.faultCode;
-			switch(faultCode) {
-				case "org.openforis.collect.persistence.RecordAlreadyLockedException":
+			if(faultCode == "org.openforis.collect.persistence.RecordAlreadyLockedException" ||
+				(faultCode == "org.openforis.collect.persistence.RecordLockedException" && Application.user.hasRole(UserProxy.ROLE_ADMIN))) {
 					AlertUtil.showConfirm('edit.confirmUnlock', null, null, performUnlock, [token as RecordProxy]);
-					break;
-				/*
-				case "org.openforis.collect.persistence.RecordLockedException":
-					if(ADMIN_ROLE) {
-						AlertUtil.showConfirm('edit.confirmUnlock', null, null, performUnlock);
-					}
-					break;
-				*/
-				default:
-					AbstractPresenter.faultHandler(event, token);
+			} else {
+				AbstractPresenter.faultHandler(event, token);
 			}
 		}
 		

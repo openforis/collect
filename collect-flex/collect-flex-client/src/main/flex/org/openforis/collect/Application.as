@@ -14,6 +14,7 @@ package org.openforis.collect {
 	import org.openforis.collect.metamodel.proxy.SurveyProxy;
 	import org.openforis.collect.model.CollectRecord$Step;
 	import org.openforis.collect.model.proxy.RecordProxy;
+	import org.openforis.collect.model.proxy.UserProxy;
 	import org.openforis.collect.util.ModelClassInitializer;
 
 	/**
@@ -27,7 +28,9 @@ package org.openforis.collect {
 		public static const VERSION:String = CONFIG::version;
 		
 		public static var SESSION_ID:String;
-
+		private static var _clientId:String;
+		private static var _user:UserProxy;
+		
 		private static var _surveySummaries:IList;
 		
 		private static var _activeSurvey:SurveyProxy;
@@ -125,6 +128,24 @@ package org.openforis.collect {
 		}
 
 		[Bindable]
+		public static function get clientId():String {
+			return _clientId;
+		}
+		
+		public static function set clientId(value:String):void {
+			_clientId = value;
+		}
+		
+		[Bindable]
+		public static function get user():UserProxy {
+			return _user;
+		}
+		
+		public static function set user(value:UserProxy):void {
+			_user = value;
+		}
+		
+		[Bindable]
 		public static function get activeRecord():RecordProxy {
 			return _activeRecord;
 		}
@@ -199,6 +220,5 @@ package org.openforis.collect {
 			_EXPORT_DATA_URL = _URL + EXPORT_DATA_SERVLET_NAME;
 		}
 
-		
 	}
 }
