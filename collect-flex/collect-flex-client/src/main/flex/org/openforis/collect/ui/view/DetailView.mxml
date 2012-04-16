@@ -65,9 +65,9 @@
 		</s:HGroup>
 		
 		<!-- save message -->
-		<s:Group horizontalCenter="0">
-			<s:Label id="saveMessageLabel" />
-		</s:Group>
+		<detail:RecordSavedMessage id="recordSavedMessage"
+								   horizontalCenter="0"
+								   visible="false" />
 		
 		<!-- submit/reject buttons -->
 		<s:HGroup right="0"

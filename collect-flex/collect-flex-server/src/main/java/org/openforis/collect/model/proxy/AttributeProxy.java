@@ -9,6 +9,7 @@ import java.util.List;
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.idm.metamodel.AttributeDefinition;
+import org.openforis.idm.metamodel.validation.ValidationResults;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Code;
 import org.openforis.idm.model.Coordinate;
@@ -32,7 +33,8 @@ public class AttributeProxy extends NodeProxy {
 	public AttributeProxy(EntityProxy parent, Attribute attribute) {
 		super(parent, attribute);
 		this.attribute = attribute;
-		validationResults = new ValidationResultsProxy(attribute.validateValue());
+		ValidationResults validationRes = attribute.validateValue();
+		validationResults = new ValidationResultsProxy(attribute, validationRes);
 		CollectRecord record = (CollectRecord) attribute.getRecord();
 		errorConfirmed = record.isErrorConfirmed(attribute);
 	}

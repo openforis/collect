@@ -220,7 +220,7 @@ public class DataService {
 				attribute.clearValidationResults();
 				checkDependencies.add(attribute);
 				
-				UpdateResponse response = getUpdateResponse(responseMap, attribute.getInternalId());
+				UpdateResponse response = getUpdateResponse(responseMap, attribute);
 				break;
 			case APPROVE_MISSING:
 				record.setMissingApproved(parentEntity, nodeName, true);
@@ -231,12 +231,12 @@ public class DataService {
 				attribute = (Attribute<AttributeDefinition, ?>) node;
 				Field<?> fld = attribute.getField(fieldIndex);
 				fld.setRemarks(remarks);
-				getUpdateResponse(responseMap, nodeId);
+				getUpdateResponse(responseMap, attribute);
 				break;
 			case ADD :
 				Node<?> createdNode = addNode(parentEntity, nodeDef, requestValue, symbol, remarks);
 				record.setMissingApproved(parentEntity, nodeName, false);
-				response = getUpdateResponse(responseMap, createdNode.getInternalId());
+				response = getUpdateResponse(responseMap, createdNode);
 				response.setCreatedNode(NodeProxy.fromNode(createdNode));
 				relReqDependencies = recordManager. clearRelevanceRequiredStates(createdNode);
 				if(createdNode instanceof Attribute){
@@ -253,7 +253,7 @@ public class DataService {
 				record.setMissingApproved(parentEntity, node.getName(), false);
 				
 				cardinalityNodePointers = getCardinalityNodePointers(attribute);
-				response = getUpdateResponse(responseMap, attribute.getInternalId());
+				response = getUpdateResponse(responseMap, attribute);
 				Map<Integer, Object> updatedFieldValues = new HashMap<Integer, Object>();
 				if (fieldIndex < 0) {
 					Object value = null;
@@ -335,7 +335,7 @@ public class DataService {
 			Node<?> n = nodesToRemove.pop();
 			record.deleteNode(n);
 			
-			UpdateResponse resp = getUpdateResponse(responseMap, node.getInternalId());
+			UpdateResponse resp = getUpdateResponse(responseMap, node);
 			resp.setDeletedNodeId(node.getInternalId());
 		}
 		
@@ -356,7 +356,7 @@ public class DataService {
 				Entity parent = nodePointer.getEntity();
 				if (parent != null && !parent.isDetached()) {
 					String childName = nodePointer.getChildName();
-					UpdateResponse response = getUpdateResponse(responseMap, parent.getInternalId());
+					UpdateResponse response = getUpdateResponse(responseMap, parent);
 					response.setRelevant(childName, parent.isRelevant(childName));
 					response.setRequired(childName, parent.isRequired(childName));
 					response.setMinCountValid(childName, parent.validateMinCount(childName));
@@ -369,7 +369,7 @@ public class DataService {
 				Entity entity = nodePointer.getEntity();
 				if (!entity.isDetached()) {
 					String childName = nodePointer.getChildName();
-					UpdateResponse response = getUpdateResponse(responseMap, entity.getInternalId());
+					UpdateResponse response = getUpdateResponse(responseMap, entity);
 					response.setRelevant(childName, entity.isRelevant(childName));
 					response.setRequired(childName, entity.isRequired(childName));
 					response.setMinCountValid(childName, entity.validateMinCount(childName));
@@ -381,7 +381,7 @@ public class DataService {
 							Attribute<?, ?> attribute = (Attribute<?, ?>) node;
 							attribute.clearValidationResults();
 							ValidationResults results = attribute.validateValue();
-							UpdateResponse resp = getUpdateResponse(responseMap, attribute.getInternalId());
+							UpdateResponse resp = getUpdateResponse(responseMap, attribute);
 							resp.setAttributeValidationResults(results);
 						}
 					}
@@ -394,17 +394,18 @@ public class DataService {
 				if (!checkDepAttr.isDetached()) {
 					checkDepAttr.clearValidationResults();
 					ValidationResults results = checkDepAttr.validateValue();
-					UpdateResponse response = getUpdateResponse(responseMap, checkDepAttr.getInternalId());
+					UpdateResponse response = getUpdateResponse(responseMap, checkDepAttr);
 					response.setAttributeValidationResults(results);
 				}
 			}
 		}
 	}
 
-	private UpdateResponse getUpdateResponse(Map<Integer, UpdateResponse> responseMap, int nodeId){
+	private UpdateResponse getUpdateResponse(Map<Integer, UpdateResponse> responseMap, Node<?> node){
+		Integer nodeId = node.getInternalId();
 		UpdateResponse response = responseMap.get(nodeId);
 		if(response == null){
-			response = new UpdateResponse(nodeId);
+			response = new UpdateResponse(node);
 			responseMap.put(nodeId, response);
 		}
 		return response;

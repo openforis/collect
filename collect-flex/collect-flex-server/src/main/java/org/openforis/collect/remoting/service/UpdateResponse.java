@@ -10,6 +10,8 @@ import org.openforis.collect.Proxy;
 import org.openforis.collect.model.proxy.NodeProxy;
 import org.openforis.collect.model.proxy.ValidationResultsProxy;
 import org.openforis.idm.metamodel.validation.ValidationResults;
+import org.openforis.idm.model.Attribute;
+import org.openforis.idm.model.Node;
 
 /**
  * 
@@ -19,6 +21,7 @@ import org.openforis.idm.metamodel.validation.ValidationResults;
 public class UpdateResponse implements Proxy {
 
 	private Integer nodeId;
+	private transient Node<?> node;
 	private transient Map<String, Object> relevantMap;
 	private transient Map<String, Object> requiredMap;
 	private transient ValidationResults attributeValidationResults;
@@ -28,8 +31,9 @@ public class UpdateResponse implements Proxy {
 	private Integer deletedNodeId;
 	private Map<Integer, Object> updatedFieldValues;
 	
-	public UpdateResponse(int nodeId) {
-		this.nodeId = nodeId;
+	public UpdateResponse(Node<?> node) {
+		this.nodeId = node.getInternalId();
+		this.node = node;
 		relevantMap = new HashMap<String, Object>();
 		requiredMap = new HashMap<String, Object>();
 		minCountValidMap = new HashMap<String, Object>();
@@ -61,7 +65,7 @@ public class UpdateResponse implements Proxy {
 	@ExternalizedProperty
 	public ValidationResultsProxy getValidationResults() {
 		if (attributeValidationResults != null) {
-			return new ValidationResultsProxy(attributeValidationResults);
+			return new ValidationResultsProxy((Attribute<?, ?>) node, attributeValidationResults);
 		}
 		return null;
 	}
