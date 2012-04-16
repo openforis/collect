@@ -36,30 +36,30 @@ CREATE TABLE "collect"."ofc_logo"  (
 )
 GO
 CREATE TABLE "collect"."ofc_record"  ( 
-	"id"            	integer NOT NULL,
-	"root_entity_id"	integer NOT NULL,
-	"date_created"  	timestamp NULL,
-	"created_by_id" 	integer NULL,
-	"date_modified" 	timestamp NULL,
-	"modified_by_id"	integer NULL,
-	"model_version" 	varchar(255) NOT NULL,
-	"step"          	integer NULL,
-	"state"         	char(1) NULL,
-	"locked_by_id"  	integer NULL,
-	"skipped"       	integer NULL,
-	"missing"       	integer NULL,
-	"errors"        	integer NULL,
-	"warnings"      	integer NULL,
-	"key1"          	varchar(2048) NULL,
-	"key2"          	varchar(2048) NULL,
-	"key3"          	varchar(2048) NULL,
-	"count1"        	integer NULL,
-	"count2"        	integer NULL,
-	"count3"        	integer NULL,
-	"count4"        	integer NULL,
-	"count5"        	integer NULL,
-	"data1"         	bytea NULL,
-	"data2"         	bytea NULL,
+	"id"                       	integer NOT NULL,
+	"root_entity_definition_id"	integer NOT NULL,
+	"date_created"             	timestamp NULL,
+	"created_by_id"            	integer NULL,
+	"date_modified"            	timestamp NULL,
+	"modified_by_id"           	integer NULL,
+	"model_version"            	varchar(255) NOT NULL,
+	"step"                     	integer NULL,
+	"state"                    	char(1) NULL,
+	"locked_by_id"             	integer NULL,
+	"skipped"                  	integer NULL,
+	"missing"                  	integer NULL,
+	"errors"                   	integer NULL,
+	"warnings"                 	integer NULL,
+	"key1"                     	varchar(2048) NULL,
+	"key2"                     	varchar(2048) NULL,
+	"key3"                     	varchar(2048) NULL,
+	"count1"                   	integer NULL,
+	"count2"                   	integer NULL,
+	"count3"                   	integer NULL,
+	"count4"                   	integer NULL,
+	"count5"                   	integer NULL,
+	"data1"                    	bytea NULL,
+	"data2"                    	bytea NULL,
 	PRIMARY KEY("id")
 )
 GO
@@ -136,8 +136,8 @@ ALTER TABLE "collect"."ofc_taxonomy"
 	UNIQUE ("name")
 GO
 ALTER TABLE "collect"."ofc_record"
-	ADD CONSTRAINT "record_root_entity_fkey"
-	FOREIGN KEY("root_entity_id")
+	ADD CONSTRAINT "record_root_entity_definition_fkey"
+	FOREIGN KEY("root_entity_definition_id")
 	REFERENCES "collect"."ofc_schema_definition"("id")
 GO
 ALTER TABLE "collect"."ofc_schema_definition"
