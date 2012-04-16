@@ -51,7 +51,7 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 	private static final TableField[] SUMMARY_FIELDS = 
 		{OFC_RECORD.DATE_CREATED, OFC_RECORD.CREATED_BY_ID, OFC_RECORD.DATE_MODIFIED, OFC_RECORD.ERRORS, OFC_RECORD.ID, 
 	     OFC_RECORD.LOCKED_BY_ID, OFC_RECORD.MISSING, OFC_RECORD.MODEL_VERSION, OFC_RECORD.MODIFIED_BY_ID, 
-	     OFC_RECORD.ROOT_ENTITY_ID,	OFC_RECORD.SKIPPED,	OFC_RECORD.STATE, OFC_RECORD.STEP,
+	     OFC_RECORD.ROOT_ENTITY_DEFINITION_ID,	OFC_RECORD.SKIPPED,	OFC_RECORD.STATE, OFC_RECORD.STEP,
 	     OFC_RECORD.WARNINGS, OFC_RECORD.KEY1, OFC_RECORD.KEY2, OFC_RECORD.KEY3, OFC_RECORD.COUNT1,
 	     OFC_RECORD.COUNT2, OFC_RECORD.COUNT3, OFC_RECORD.COUNT4, OFC_RECORD.COUNT5};
 
@@ -91,7 +91,7 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 	public int countRecords(int rootDefinitionId, String... keyValues) {
 		JooqFactory f = getMappingJooqFactory();
 		SelectQuery q = f.selectCountQuery();
-		q.addConditions(OFC_RECORD.ROOT_ENTITY_ID.equal(rootDefinitionId));
+		q.addConditions(OFC_RECORD.ROOT_ENTITY_DEFINITION_ID.equal(rootDefinitionId));
 		addFilterByKeyConditions(q, keyValues);
 		Record r = q.fetchOne();
 		return r.getValueAsInteger(0);
@@ -230,7 +230,7 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 		Schema schema = survey.getSchema();
 		EntityDefinition rootEntityDefn = schema.getRootEntityDefinition(rootEntity);
 		Integer rootEntityDefnId = rootEntityDefn.getId();
-		q.addConditions(OFC_RECORD.ROOT_ENTITY_ID.equal(rootEntityDefnId));
+		q.addConditions(OFC_RECORD.ROOT_ENTITY_DEFINITION_ID.equal(rootEntityDefnId));
 		int i = 0;
 		for (String key : keys) {
 			String keyColumnName = "key" + (++i);
@@ -252,7 +252,7 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 		Schema schema = survey.getSchema();
 		EntityDefinition rootEntityDefn = schema.getRootEntityDefinition(rootEntity);
 		Integer rootEntityDefnId = rootEntityDefn.getId();
-		q.addConditions(OFC_RECORD.ROOT_ENTITY_ID.equal(rootEntityDefnId));
+		q.addConditions(OFC_RECORD.ROOT_ENTITY_DEFINITION_ID.equal(rootEntityDefnId));
 
 		addFilterByKeyConditions(q, keyValues);
 		
@@ -401,7 +401,7 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 
 		@Override
 		public CollectRecord fromRecord(Record r) {
-			int rootEntityId = r.getValueAsInteger(OFC_RECORD.ROOT_ENTITY_ID);
+			int rootEntityId = r.getValueAsInteger(OFC_RECORD.ROOT_ENTITY_DEFINITION_ID);
 			String version = r.getValueAsString(OFC_RECORD.MODEL_VERSION);
 			Schema schema = survey.getSchema();
 			NodeDefinition rootEntityDefn = schema.getById(rootEntityId);
@@ -462,7 +462,7 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 			}
 			c.setRootEntityKeyValues(keys);
 
-			int rootEntityId = r.getValue(OFC_RECORD.ROOT_ENTITY_ID);
+			int rootEntityId = r.getValue(OFC_RECORD.ROOT_ENTITY_DEFINITION_ID);
 
 			if ( dataAlias != null ) {
 				byte[] data = r.getValue(dataAlias);
@@ -489,12 +489,12 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 			int id = record.getId();
 			q.addValue(OFC_RECORD.ID, id);
 			Entity rootEntity = record.getRootEntity();
-			EntityDefinition rootEntityDefinition = rootEntity.getDefinition();
-			Integer rootEntityId = rootEntityDefinition.getId();
-			if (rootEntityId == null) {
+			EntityDefinition rootEntityDefn = rootEntity.getDefinition();
+			Integer rootEntityDefnId = rootEntityDefn.getId();
+			if (rootEntityDefnId == null) {
 				throw new IllegalArgumentException("Null schema object definition id");
 			}
-			q.addValue(OFC_RECORD.ROOT_ENTITY_ID, rootEntityId);
+			q.addValue(OFC_RECORD.ROOT_ENTITY_DEFINITION_ID, rootEntityDefnId);
 			q.addValue(OFC_RECORD.DATE_CREATED, toTimestamp(record.getCreationDate()));
 			if (record.getCreatedBy() != null) {
 				q.addValue(OFC_RECORD.CREATED_BY_ID, record.getCreatedBy().getId());
