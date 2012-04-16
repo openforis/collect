@@ -42,7 +42,7 @@ public class TaxonVernacularNameProxy implements Proxy {
 
 	@ExternalizedProperty
 	public Integer getTaxonId() {
-		return vernacularName.getTaxonId();
+		return vernacularName.getTaxonSystemId();
 	}
 
 	@ExternalizedProperty

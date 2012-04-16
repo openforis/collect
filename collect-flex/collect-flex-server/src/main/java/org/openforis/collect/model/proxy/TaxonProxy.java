@@ -19,13 +19,18 @@ public class TaxonProxy implements Proxy {
 	}
 
 	@ExternalizedProperty
-	public Integer getId() {
-		return taxon.getId();
+	public Integer getSystemId() {
+		return taxon.getSystemId();
 	}
 
 	@ExternalizedProperty
 	public Integer getTaxonomyId() {
 		return taxon.getTaxonomyId();
+	}
+
+	@ExternalizedProperty
+	public Integer getTaxonId() {
+		return taxon.getTaxonId();
 	}
 
 	@ExternalizedProperty
