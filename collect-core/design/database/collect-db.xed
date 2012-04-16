@@ -91,9 +91,10 @@
 <FK>5</FK>
 <PK>2</PK>
 </Relation>
-<Relation id="66" name="record_root_entity_fkey" cardinality="-2" identifying="false" nulls="false">
+<Relation id="66" name="record_root_entity_definition_fkey" cardinality="-2" identifying="false" nulls="false">
 <FK>1</FK>
 <PK>11</PK>
+<Text/>
 </Relation>
 <Relation id="67" name="ofc_taxon_vernacular_name_taxon_fkey" cardinality="-2" identifying="true" nulls="false">
 <FK>35</FK>
