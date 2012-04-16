@@ -58,7 +58,7 @@
 <Column id="47" name="language_variety" type="varchar" length="255" nulls="true">
 <CP name="COMMENTS">Dialect, lect, sublanguage or other</CP>
 </Column>
-<Column id="48" name="taxon_id" type="integer" length="25" nulls="true"/>
+<Column id="48" name="taxon_system_id" type="integer" length="25" nulls="true"/>
 <Column id="49" name="step" type="integer" length="25" nulls="false"/>
 <Storage name="TempTable" value="false"/>
 </Table>
@@ -195,5 +195,5 @@
 <Sheet name="UI" id="78" disp_at="true" disp_ph="true" disp_co="true" disp_rn="true">
 <Place id="63" visible="true">220,130,120,60</Place>
 </Sheet>
-<Settings sheet="76" zoom="1.0"/>
+<Settings sheet="75" zoom="1.0"/>
 </Diagram>
