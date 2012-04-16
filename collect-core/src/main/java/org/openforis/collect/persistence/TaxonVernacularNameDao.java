@@ -11,10 +11,12 @@ import org.jooq.StoreQuery;
 import org.openforis.collect.persistence.jooq.MappingJooqDaoSupport;
 import org.openforis.collect.persistence.jooq.MappingJooqFactory;
 import org.openforis.idm.model.species.TaxonVernacularName;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author G. Miceli
  */
+@Transactional
 public class TaxonVernacularNameDao extends MappingJooqDaoSupport<TaxonVernacularName, TaxonVernacularNameDao.JooqFactory> {
 	public TaxonVernacularNameDao() {
 		super(TaxonVernacularNameDao.JooqFactory.class);
