@@ -41,6 +41,11 @@ detail|RecordSavedMessage s|Label {
 	fontWeight: bold;
 }
 
+.blockingMessageText {
+	fontSize: 12;
+	fontWeight: bold;
+}
+
 .appVersionLabel, .appVersionText {
 	font-style: italic;
 	font-size: 9;

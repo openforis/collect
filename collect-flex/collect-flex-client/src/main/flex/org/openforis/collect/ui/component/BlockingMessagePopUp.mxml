@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
 			   xmlns:s="library://ns.adobe.com/flex/spark" 
-			   xmlns:mx="library://ns.adobe.com/flex/mx"
+			   xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:container="org.openforis.collect.ui.container.*"
 			   >
 	
 	<fx:Script>
@@ -9,15 +9,17 @@
 			import mx.core.FlexGlobals;
 			import mx.managers.PopUpManager;
 			
-			[Bindable]
-			public var message:String;
-			[Bindable]
-			public var messageIconClass:Class;
+			import org.openforis.collect.i18n.Message;
 			
-			public static function show(title:String, message:String, messageIconClass:Class = null):void {
+			private var _message:String;
+			private var _details:String;
+			private var _messageIconClass:Class;
+			
+			public static function show(title:String, message:String, details:String, messageIconClass:Class = null):void {
 				var popUp:BlockingMessagePopUp = new BlockingMessagePopUp();
 				popUp.title = title;
 				popUp.message = message;
+				popUp.details = details;
 				if(messageIconClass != null) {
 					popUp.messageIconClass = messageIconClass;
 					popUp.currentState = "messageIconVisible";
@@ -25,6 +27,35 @@
 				PopUpManager.addPopUp(popUp, FlexGlobals.topLevelApplication as DisplayObject, true);
 				PopUpManager.centerPopUp(popUp);
 			}
+			
+			[Bindable]
+			public function get message():String {
+				return _message;
+			}
+			
+			public function set message(value:String):void {
+				_message = value;
+			}
+
+			[Bindable]
+			public function get details():String {
+				return _details;
+			}
+
+			public function set details(value:String):void {
+				_details = value;
+			}
+
+			[Bindable]
+			public function get messageIconClass():Class {
+				return _messageIconClass;
+			}
+
+			public function set messageIconClass(value:Class):void {
+				_messageIconClass = value;
+			}
+
+
 		]]>
 	</fx:Script>
 	
@@ -41,7 +72,16 @@
 		<s:Group includeIn="messageIconVisible" styleName="imageWrapper">
 			<s:Image source="{messageIconClass}" />
 		</s:Group>
-		<s:Label text="{message}" styleName="blockingMessageText" maxWidth="400" />
+		<s:VGroup>
+			<s:Label text="{message}" styleName="blockingMessageText" maxWidth="400" />
+			<container:CollapsiblePanel title="{Message.get('global.details')}" collapsed="true">
+				<s:TextArea editable="false" 
+							text="{details}" 
+							width="400"
+							maxHeight="200"
+							/>
+			</container:CollapsiblePanel>
+		</s:VGroup>
 	</s:HGroup>
 	
 </s:TitleWindow>
