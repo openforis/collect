@@ -60,7 +60,7 @@ public class TaxonVernacularNameDao extends MappingJooqDaoSupport<TaxonVernacula
 			t.setVernacularName(r.getValue(OFC_TAXON_VERNACULAR_NAME.VERNACULAR_NAME));
 			t.setLanguageCode(r.getValue(OFC_TAXON_VERNACULAR_NAME.LANGUAGE_CODE));
 			t.setLanguageVariety(r.getValue(OFC_TAXON_VERNACULAR_NAME.LANGUAGE_VARIETY));
-			t.setTaxonId(r.getValue(OFC_TAXON_VERNACULAR_NAME.TAXON_ID));
+			t.setTaxonSystemId(r.getValue(OFC_TAXON_VERNACULAR_NAME.TAXON_SYSTEM_ID));
 			t.setStep(r.getValue(OFC_TAXON_VERNACULAR_NAME.STEP));
 		}
 		
@@ -70,7 +70,7 @@ public class TaxonVernacularNameDao extends MappingJooqDaoSupport<TaxonVernacula
 			q.addValue(OFC_TAXON_VERNACULAR_NAME.VERNACULAR_NAME, t.getVernacularName());
 			q.addValue(OFC_TAXON_VERNACULAR_NAME.LANGUAGE_CODE, t.getLanguageCode());
 			q.addValue(OFC_TAXON_VERNACULAR_NAME.LANGUAGE_VARIETY, t.getLanguageVariety());
-			q.addValue(OFC_TAXON_VERNACULAR_NAME.TAXON_ID, t.getTaxonId());			
+			q.addValue(OFC_TAXON_VERNACULAR_NAME.TAXON_SYSTEM_ID, t.getTaxonSystemId());			
 			q.addValue(OFC_TAXON_VERNACULAR_NAME.STEP, t.getStep());
 		}
 
