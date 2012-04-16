@@ -216,8 +216,8 @@ public class RecordManager {
 				if(entity.getCount(name) == 0) {
 					int count = 0;
 					int toBeInserted = entity.getEffectiveMinCount(name);
-					if ( toBeInserted == 0 ) {
-						//insert at least one node
+					if ( toBeInserted == 0 && ( nodeDefn instanceof AttributeDefinition || ! nodeDefn.isMultiple() ) ) {
+						//insert at least one attribute or one single entity
 						toBeInserted = 1;
 					}
 					while(count < toBeInserted) {
