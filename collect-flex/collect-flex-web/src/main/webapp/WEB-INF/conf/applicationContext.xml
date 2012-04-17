@@ -25,7 +25,7 @@
 	<!-- <context:component-scan base-package="org.fao.openforis.service"/> -->
 	<!-- <context:component-scan base-package="org.fao.openforis"/> -->
 
-	<context:property-placeholder location="classpath:/app.properties" />
+<!-- 	<context:property-placeholder location="classpath:/app.properties" /> -->
 
 <!-- 	<bean id="applicationContextProvider" class="org.openforis.collect.context.ApplicationContextAwareImpl" /> -->
 
@@ -62,9 +62,9 @@
 	<!-- GraniteDs services -->
 	<!-- ===================================== -->
 	<bean id="sessionService" 	class="org.openforis.collect.remoting.service.SessionService" autowire="byName" />
-	<bean id="speciesService" 		class="org.openforis.collect.remoting.service.SpeciesService" autowire="byName" />
+	<bean id="speciesService" 	class="org.openforis.collect.remoting.service.SpeciesService" autowire="byName" />
 	<bean id="modelService"		class="org.openforis.collect.remoting.service.ModelService" autowire="byName" />
-	<bean id="dataService" 			class="org.openforis.collect.remoting.service.DataService" autowire="byName"/>
+	<bean id="dataService" 		class="org.openforis.collect.remoting.service.DataService" autowire="byName"/>
 
 	<!-- <bean id="backupService" class="org.fao.openforis.web.service.BackupService"> -->
 	<!-- <property name="backupDirectory" value="backup" /> -->
@@ -79,11 +79,12 @@
 	<!-- ===================================== -->
 	<!-- Managers -->
 	<!-- ===================================== -->
-	<bean id="sessionManager"	class="org.openforis.collect.manager.SessionManager" />
-	<bean id="surveyManager"	class="org.openforis.collect.manager.SurveyManager" init-method="init" />
-	<bean id="recordManager"	class="org.openforis.collect.manager.RecordManager" init-method="init" />
-	<bean id="speciesManager"	class="org.openforis.collect.manager.SpeciesManager" />
-	<bean id="userManager"		class="org.openforis.collect.manager.UserManager" />
+	<bean id="configurationManager" class="org.openforis.collect.manager.ConfigurationManager" init-method="init" />
+	<bean id="sessionManager"		class="org.openforis.collect.manager.SessionManager" />
+	<bean id="surveyManager"		class="org.openforis.collect.manager.SurveyManager" init-method="init" />
+	<bean id="recordManager"		class="org.openforis.collect.manager.RecordManager" init-method="init" />
+	<bean id="speciesManager"		class="org.openforis.collect.manager.SpeciesManager" />
+	<bean id="userManager"			class="org.openforis.collect.manager.UserManager" />
 		
 <!-- 	<bean id="recordContext" class="org.openforis.collect.model.CollectRecordContext" /> -->
 	
@@ -104,6 +105,10 @@
     <!-- ===================================== -->
 	<!-- Daos -->
 	<!-- ===================================== -->
+	<bean id="configurationDao" class="org.openforis.collect.persistence.ConfigurationDao">
+    	<property name="dataSource" ref="dataSource"/>
+	</bean>
+
 	<bean id="surveyDao" class="org.openforis.collect.persistence.SurveyDao" init-method="init">
     	<property name="dataSource" ref="dataSource"/>
 	</bean>
@@ -140,7 +145,7 @@
 	
 	<!--  Survey Context -->
 	<bean id="validator" 					class="org.openforis.collect.model.validation.CollectValidator" />
-	<bean id="lookupProvider" 	class="org.openforis.collect.persistence.DatabaseLookupProvider" />
+	<bean id="lookupProvider" 				class="org.openforis.collect.persistence.DatabaseLookupProvider" />
 	<bean id="externalCodeListProvider" 	class="org.openforis.collect.persistence.DatabaseExternalCodeListProvider" />
 	
 	<!-- ===================================== -->
