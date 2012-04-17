@@ -191,8 +191,16 @@ ALTER TABLE "collect"."ofc_record"
 	FOREIGN KEY("modified_by_id")
 	REFERENCES "collect"."ofc_user"("id")
 GO
-
 --------------------------
 --- END GENERATED CODE ---
 --------------------------
+
+
+----------------------------
+--- BEGIN DEFAULT VALUES ---
+----------------------------
+INSERT INTO "collect"."ofc_config" ("name", "value") VALUES ('upload_path', '/home/openforis/collect-upload')
 GO
+--------------------------
+--- END DEFAULT VALUES ---
+--------------------------
