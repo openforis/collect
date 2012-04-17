@@ -65,6 +65,8 @@ GO
 ALTER TABLE "collect"."ofc_taxonomy"
 	DROP CONSTRAINT "ofc_taxonomy_name_key" CASCADE 
 GO
+DROP TABLE "collect"."ofc_config"
+GO
 DROP TABLE IF EXISTS "collect"."ofc_logo"
 GO
 DROP TABLE IF EXISTS "collect"."ofc_record"

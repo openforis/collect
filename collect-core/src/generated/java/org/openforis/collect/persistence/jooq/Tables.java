@@ -13,6 +13,11 @@ package org.openforis.collect.persistence.jooq;
 public final class Tables {
 
 	/**
+	 * The table collect.ofc_config
+	 */
+	public static org.openforis.collect.persistence.jooq.tables.OfcConfig OFC_CONFIG = org.openforis.collect.persistence.jooq.tables.OfcConfig.OFC_CONFIG;
+
+	/**
 	 * The table collect.ofc_logo
 	 */
 	public static org.openforis.collect.persistence.jooq.tables.OfcLogo OFC_LOGO = org.openforis.collect.persistence.jooq.tables.OfcLogo.OFC_LOGO;

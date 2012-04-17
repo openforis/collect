@@ -16,6 +16,7 @@ public class Keys extends org.jooq.impl.AbstractKeys {
 	// IDENTITY definitions
 
 	// UNIQUE and PRIMARY KEY definitions
+	public static final org.jooq.UniqueKey<org.openforis.collect.persistence.jooq.tables.records.OfcConfigRecord> ofc_config_pkey = createUniqueKey(org.openforis.collect.persistence.jooq.tables.OfcConfig.OFC_CONFIG, org.openforis.collect.persistence.jooq.tables.OfcConfig.OFC_CONFIG.NAME);
 	public static final org.jooq.UniqueKey<org.openforis.collect.persistence.jooq.tables.records.OfcLogoRecord> ofc_logo_pkey = createUniqueKey(org.openforis.collect.persistence.jooq.tables.OfcLogo.OFC_LOGO, org.openforis.collect.persistence.jooq.tables.OfcLogo.OFC_LOGO.POS);
 	public static final org.jooq.UniqueKey<org.openforis.collect.persistence.jooq.tables.records.OfcRecordRecord> ofc_record_pkey = createUniqueKey(org.openforis.collect.persistence.jooq.tables.OfcRecord.OFC_RECORD, org.openforis.collect.persistence.jooq.tables.OfcRecord.OFC_RECORD.ID);
 	public static final org.jooq.UniqueKey<org.openforis.collect.persistence.jooq.tables.records.OfcSchemaDefinitionRecord> ofc_schema_definition_pkey = createUniqueKey(org.openforis.collect.persistence.jooq.tables.OfcSchemaDefinition.OFC_SCHEMA_DEFINITION, org.openforis.collect.persistence.jooq.tables.OfcSchemaDefinition.OFC_SCHEMA_DEFINITION.ID);

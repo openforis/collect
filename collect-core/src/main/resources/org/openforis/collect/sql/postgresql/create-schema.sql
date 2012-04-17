@@ -29,6 +29,12 @@ GO
 --- BEGIN GENERATED CODE ---
 ----------------------------
 
+CREATE TABLE "collect"."ofc_config"  ( 
+	"name" 	varchar(25) NOT NULL,
+	"value"	varchar(255) NOT NULL,
+	PRIMARY KEY("name")
+)
+GO
 CREATE TABLE "collect"."ofc_logo"  ( 
 	"pos"  	integer NOT NULL,
 	"image"	bytea NOT NULL,
