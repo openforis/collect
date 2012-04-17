@@ -214,7 +214,12 @@ input|RemarksPopUp {
 }
 
 input|TaxonAutoCompletePopUp {
-	skin-class: ClassReference("org.openforis.collect.ui.skin.TaxonAutoCompletePopUpSkin");
+	/*skin-class: ClassReference("org.openforis.collect.ui.skin.TaxonAutoCompletePopUpSkin");*/
+}
+
+input|TaxonAutoCompletePopUp s|DataGrid {
+	skin-class: ClassReference("org.openforis.collect.ui.skin.SpeciesDataGridSkin");
+	alternatingRowColors: #FFFFFF, #E9E9E9;
 }
 
 s|Label.bold {

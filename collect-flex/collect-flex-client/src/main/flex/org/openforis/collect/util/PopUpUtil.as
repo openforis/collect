@@ -52,7 +52,7 @@ package org.openforis.collect.util
 			
 			for each (var pos:String in positions) {
 				internalAlignToField(popUp, inputField, pos, verticalAlign, horizontalAlign, false);
-				if(! exceedViewport(popUp)) {
+				if(! (ensureVisibility && exceedViewport(popUp))) {
 					return pos;
 				}
 			}

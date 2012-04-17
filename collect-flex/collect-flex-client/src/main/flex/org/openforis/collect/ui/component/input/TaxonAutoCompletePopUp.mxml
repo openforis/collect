@@ -4,6 +4,9 @@
 		 xmlns:mx="library://ns.adobe.com/flex/mx"
 		 focusEnabled="false"
 		>
+	<s:layout>
+		<s:BasicLayout />
+	</s:layout>
 	
 	<fx:Script>
 		<![CDATA[
@@ -27,34 +30,33 @@
 		[Event(name="taxonSelect", type="org.openforis.collect.event.TaxonInputFieldEvent")] 
 	</fx:Metadata>
 	
-	
-	<s:DataGrid width="100%" 
-				 height="200"
-				 id="dataGrid" 
-				 >
+	<s:DataGrid id="dataGrid"
+				width="100%" 
+				height="200"
+				>
 		<s:columns>
 			<s:ArrayList>
-				<s:GridColumn headerText="Code" dataField="code" width="50" />
-				<s:GridColumn headerText="Scientific name" width="100" dataField="scientificName" />
-				<s:GridColumn headerText="Vernacular name" width="100" dataField="vernacularName" />
-				<s:GridColumn headerText="Language/dialect" width="100" dataField="languageVariety" />
+				<s:GridColumn headerText="Code" dataField="code" width="83" />
+				<s:GridColumn headerText="Scientific name" width="106" dataField="scientificName" />
+				<s:GridColumn headerText="Vernacular name" width="106" dataField="vernacularName" />
+				<s:GridColumn headerText="Language code" width="106" dataField="languageCode" />
+				<s:GridColumn headerText="Language/dialect" width="103" dataField="languageVariety" />
 			</s:ArrayList>
 		</s:columns>
 		<s:itemRenderer>
 			<fx:Component>
 				<s:GridItemRenderer height="20" doubleClickEnabled="true" doubleClick="outerDocument.doubleClickHandler(event)">
-					
 					<s:Label id="labelDisplay" 
 							 minHeight="20" 
 							 height="100%" 
 							 width="100%"
-							 top="5" 
-							 left="3" 
-							 paddingLeft="5" 
+							 top="2" 
+							 left="2" 
 							 textAlign="left" 
 							 verticalAlign="middle" 
+							 maxDisplayedLines="1"
+							 showTruncationTip="true"
 							 />
-					
 				</s:GridItemRenderer>
 			</fx:Component>
 		</s:itemRenderer>

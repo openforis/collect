@@ -107,8 +107,10 @@ package org.openforis.collect.presenter {
 				
 				PopUpUtil.alignToField(autoCompletePopUp, alignField, 
 					PopUpUtil.POSITION_BELOW, 
-					PopUpUtil.VERTICAL_ALIGN_MIDDLE, 
-					PopUpUtil.HORIZONTAL_ALIGN_LEFT);
+					PopUpUtil.VERTICAL_ALIGN_BOTTOM, 
+					PopUpUtil.HORIZONTAL_ALIGN_LEFT,
+					false
+				);
 				
 				autoCompletePopUpOpen = true;
 			}
