@@ -30,7 +30,7 @@ ALTER TABLE "collect"."ofc_record"
 	DROP CONSTRAINT "record_submitted_record_fkey" CASCADE 
 GO
 ALTER TABLE "collect"."ofc_record"
-	DROP CONSTRAINT "record_root_entity_fkey" CASCADE 
+	DROP CONSTRAINT "record_root_entity_definition_fkey" CASCADE 
 GO
 ALTER TABLE "collect"."ofc_schema_definition"
 	DROP CONSTRAINT "schema_definition_survey_fkey" CASCADE 
@@ -64,6 +64,8 @@ ALTER TABLE "collect"."ofc_survey"
 GO
 ALTER TABLE "collect"."ofc_taxonomy"
 	DROP CONSTRAINT "ofc_taxonomy_name_key" CASCADE 
+GO
+DROP TABLE "collect"."ofc_config"
 GO
 DROP TABLE IF EXISTS "collect"."ofc_logo"
 GO

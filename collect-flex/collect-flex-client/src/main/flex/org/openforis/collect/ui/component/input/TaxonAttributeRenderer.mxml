@@ -29,7 +29,7 @@
 								parentEntity="{parentEntity}"
 								attribute="{attribute}"
 								fieldIndex="0"
-								width="50" 
+								width="80" 
 								maxChars="4" 
 								/>
 		<input:StringInputField id="scientificNameTextInput" 

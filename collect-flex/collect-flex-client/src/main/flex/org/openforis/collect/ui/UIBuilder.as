@@ -277,7 +277,7 @@ package org.openforis.collect.ui {
 				}
 			} else if(def is TaxonAttributeDefinitionProxy) {
 				if(parentLayout == UIUtil.LAYOUT_TABLE) {
-					return 474;
+					return 504;
 				} else {
 					return 100;
 				}
@@ -440,7 +440,7 @@ package org.openforis.collect.ui {
 				//subheader
 				h = new HGroup();
 				h.gap = 6;
-				l = getLabel(Message.get('edit.taxon.code'), 50, "bold");
+				l = getLabel(Message.get('edit.taxon.code'), 80, "bold");
 				h.addElement(l);
 				l = getLabel(Message.get('edit.taxon.scientificName'), 100, "bold");
 				h.addElement(l);

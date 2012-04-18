@@ -26,7 +26,7 @@ public class TaxonDao extends MappingJooqDaoSupport<Taxon, TaxonDao.JooqFactory>
 	public Taxon loadById(int id) {
 		return super.loadById(id);
 	}
-	
+
 	@Override
 	public void insert(Taxon entity) {
 		super.insert(entity);
@@ -49,18 +49,19 @@ public class TaxonDao extends MappingJooqDaoSupport<Taxon, TaxonDao.JooqFactory>
 	public List<Taxon> findByScientificName(String searchString, int maxResults) {
 		return findStartingWith(OFC_TAXON.SCIENTIFIC_NAME, searchString, maxResults);
 	}
-	
+
 	protected static class JooqFactory extends MappingJooqFactory<Taxon> {
 
 		private static final long serialVersionUID = 1L;
 
 		public JooqFactory(Connection connection) {
-			super(connection, OFC_TAXON.ID, OFC_TAXON_ID_SEQ, Taxon.class);
+			super(connection, OFC_TAXON.SYSTEM_ID, OFC_TAXON_ID_SEQ, Taxon.class);
 		}
 
 		@Override
 		public void fromRecord(Record r, Taxon t) {
-			t.setId(r.getValue(OFC_TAXON.ID));
+			t.setSystemId(r.getValue(OFC_TAXON.SYSTEM_ID));
+			t.setTaxonId(r.getValue(OFC_TAXON.TAXON_ID));
 			t.setParentId(r.getValue(OFC_TAXON.PARENT_ID));
 			t.setCode(r.getValueAsString(OFC_TAXON.CODE));
 			t.setScientificName(r.getValue(OFC_TAXON.SCIENTIFIC_NAME));
@@ -68,10 +69,11 @@ public class TaxonDao extends MappingJooqDaoSupport<Taxon, TaxonDao.JooqFactory>
 			t.setTaxonomyId(r.getValue(OFC_TAXON.TAXONOMY_ID));
 			t.setStep(r.getValue(OFC_TAXON.STEP));
 		}
-		
+
 		@Override
 		public void fromObject(Taxon t, StoreQuery<?> q) {
-			q.addValue(OFC_TAXON.ID, t.getId());			
+			q.addValue(OFC_TAXON.SYSTEM_ID, t.getSystemId());
+			q.addValue(OFC_TAXON.TAXON_ID, t.getTaxonId());
 			q.addValue(OFC_TAXON.PARENT_ID, t.getParentId());
 			q.addValue(OFC_TAXON.CODE, t.getCode());
 			q.addValue(OFC_TAXON.SCIENTIFIC_NAME, t.getScientificName());
@@ -82,12 +84,13 @@ public class TaxonDao extends MappingJooqDaoSupport<Taxon, TaxonDao.JooqFactory>
 
 		@Override
 		protected void setId(Taxon t, int id) {
-			t.setId(id);
+			t.setSystemId(id);
 		}
 
 		@Override
 		protected Integer getId(Taxon t) {
-			return t.getId();
+			return t.getSystemId();
 		}
 	}
 }
+

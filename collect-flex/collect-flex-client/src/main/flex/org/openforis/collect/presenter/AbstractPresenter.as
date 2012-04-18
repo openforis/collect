@@ -14,6 +14,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.ui.Images;
 	import org.openforis.collect.ui.component.BlockingMessagePopUp;
 	import org.openforis.collect.util.AlertUtil;
+	import org.openforis.collect.util.StringUtil;
 
 	/**
 	 * @author Mino Togna
@@ -64,8 +65,10 @@ package org.openforis.collect.presenter {
 					"Client.Error.DeliveryInDoubt"
 				default:
 					if(! Application.serverOffline) {
-						var message:String = Message.get("global.faultHandlerMsg", [faultCode, event.fault.faultString]);
-						BlockingMessagePopUp.show(Message.get("global.errorAlertTitle"), message, Images.ERROR);
+						var message:String = Message.get("global.faultHandlerMsg");
+						var now:String = new Date().toString();
+						var details:String = StringUtil.concat("\n\n", now, faultCode, event.fault.faultDetail);
+						BlockingMessagePopUp.show(Message.get("global.errorAlertTitle"), message, details, Images.ERROR);
 					}
 					Application.serverOffline = true;
 					Application.activeRecord = null;

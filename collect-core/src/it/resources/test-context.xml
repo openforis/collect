@@ -34,6 +34,10 @@
     	<property name="dataSource" ref="dataSource"/>
     </bean>
     
+	<bean id="configurationDao" class="org.openforis.collect.persistence.ConfigurationDao">
+    	<property name="dataSource" ref="dataSource"/>
+	</bean>
+	
 	<bean id="surveyDao" class="org.openforis.collect.persistence.SurveyDao" init-method="init">
     	<property name="dataSource" ref="dataSource"/>
 	</bean>
