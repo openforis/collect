@@ -13,6 +13,16 @@ package org.openforis.collect.persistence.jooq;
 public final class Sequences {
 
 	/**
+	 * The sequence collect.collect.ofc_attribute_value_id_seq
+	 */
+	public static final org.jooq.Sequence<java.lang.Long> OFC_ATTRIBUTE_VALUE_ID_SEQ = new org.jooq.impl.SequenceImpl<java.lang.Long>("ofc_attribute_value_id_seq", org.openforis.collect.persistence.jooq.Collect.COLLECT, org.jooq.impl.SQLDataType.BIGINT);
+
+	/**
+	 * The sequence collect.collect.ofc_entity_id_seq
+	 */
+	public static final org.jooq.Sequence<java.lang.Long> OFC_ENTITY_ID_SEQ = new org.jooq.impl.SequenceImpl<java.lang.Long>("ofc_entity_id_seq", org.openforis.collect.persistence.jooq.Collect.COLLECT, org.jooq.impl.SQLDataType.BIGINT);
+
+	/**
 	 * The sequence collect.collect.ofc_record_id_seq
 	 */
 	public static final org.jooq.Sequence<java.lang.Long> OFC_RECORD_ID_SEQ = new org.jooq.impl.SequenceImpl<java.lang.Long>("ofc_record_id_seq", org.openforis.collect.persistence.jooq.Collect.COLLECT, org.jooq.impl.SQLDataType.BIGINT);
