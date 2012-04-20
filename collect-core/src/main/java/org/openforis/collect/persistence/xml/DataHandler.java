@@ -1,13 +1,7 @@
 package org.openforis.collect.persistence.xml;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
-
-import javax.xml.bind.DatatypeConverter;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.model.CollectRecord;
@@ -32,6 +26,7 @@ import org.xml.sax.helpers.DefaultHandler;
 /**
  * 
  * @author G. Miceli
+ * @author S. Ricci
  *
  */
 public class DataHandler extends DefaultHandler {
@@ -114,10 +109,6 @@ public class DataHandler extends DefaultHandler {
 			} else {
 				record = new CollectRecord(survey, version);
 				node = record.createRootEntity(localName);
-				Date created = parseDateTime(attributes.getValue("created"));
-				Date modified = parseDateTime(attributes.getValue("modified"));
-				record.setCreationDate(created);
-				record.setModifiedDate(modified);
 			}
 		}
 	}
@@ -303,23 +294,4 @@ public class DataHandler extends DefaultHandler {
 		return record;
 	}
 	
-	private Date parseDateTime(String dateTime) {
-		Date result = null;
-		if(StringUtils.isNotBlank(dateTime)) {
-			try {
-				//try to parse datetime in xml format 
-				Calendar cal = DatatypeConverter.parseDateTime(dateTime);
-				result = cal.getTime();
-			} catch (Exception e) {
-				//try to parse datetime in another format 
-				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
-				try {
-					result = sdf.parse(dateTime);
-				} catch (ParseException e1) {
-					throw new IllegalArgumentException("Invalid format expected for datetime: " + dateTime);
-				}
-			}
-		}
-		return result;
-	}
 }
