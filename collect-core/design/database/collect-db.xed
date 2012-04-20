@@ -41,7 +41,7 @@
 <Storage name="TempTable" value="false"/>
 </Table>
 <Table id="34" name="ofc_taxon" schema="collect" database="" background="16777165">
-<Column id="35" name="system_id" type="integer" length="25" nulls="false"/>
+<Column id="35" name="id" type="integer" length="25" nulls="false"/>
 <Column id="36" name="taxon_id" type="integer" length="25" nulls="false"/>
 <Column id="37" name="code" type="varchar" length="32" nulls="false"/>
 <Column id="38" name="scientific_name" type="varchar" length="255" nulls="false"/>
@@ -58,7 +58,7 @@
 <Column id="47" name="language_variety" type="varchar" length="255" nulls="true">
 <CP name="COMMENTS">Dialect, lect, sublanguage or other</CP>
 </Column>
-<Column id="48" name="taxon_system_id" type="integer" length="25" nulls="true"/>
+<Column id="48" name="taxon_id" type="integer" length="25" nulls="true"/>
 <Column id="49" name="step" type="integer" length="25" nulls="false"/>
 <Storage name="TempTable" value="false"/>
 </Table>
@@ -173,31 +173,31 @@
 <ConstraintColumn id="67"/>
 </Constraint>
 <Sheet name="Data" id="78" disp_at="true" disp_ph="true" disp_co="true">
-<Place id="73" visible="false">434,33,0,0</Place>
-<Place id="70" visible="true" options="50.0,308.0,170.0,80.0,469.0,28.0,201.0,433.0,4,220.0,340.0,449.0,340.0,449.0,310.0,469.0,310.0">706,-27,0,0</Place>
-<Place id="54" visible="false">680,168,191,90</Place>
-<Place id="9" visible="true">469,28,201,433</Place>
-<Place id="63" visible="false">80,99,120,60</Place>
 <Place id="59" visible="false">10,19,211,91</Place>
-<Place id="69" visible="true" options="39.0,20.0,191.0,92.0,50.0,308.0,170.0,80.0,4,140.0,112.0,140.0,210.0,140.0,210.0,140.0,308.0">500,0,0,0</Place>
-<Place id="4" visible="true">39,20,191,92</Place>
-<Place id="75" visible="false">500,0,0,0</Place>
-<Place id="0" visible="true">50,308,170,80</Place>
+<Place id="70" visible="true" options="50.0,308.0,170.0,80.0,469.0,28.0,201.0,433.0,4,220.0,340.0,449.0,340.0,449.0,310.0,469.0,310.0">706,-27,0,0</Place>
 <Place id="74" visible="false">500,0,0,0</Place>
+<Place id="75" visible="false">500,0,0,0</Place>
+<Place id="63" visible="false">80,99,120,60</Place>
+<Place id="9" visible="true">469,28,201,433</Place>
 <Place id="76" visible="false">500,0,0,0</Place>
+<Place id="69" visible="true" options="39.0,20.0,191.0,92.0,50.0,308.0,170.0,80.0,4,140.0,112.0,140.0,210.0,140.0,210.0,140.0,308.0">500,0,0,0</Place>
+<Place id="54" visible="false">680,168,191,90</Place>
+<Place id="4" visible="true">39,20,191,92</Place>
+<Place id="73" visible="false">434,33,0,0</Place>
+<Place id="0" visible="true">50,308,170,80</Place>
 </Sheet>
 <Sheet name="Species" id="79" disp_at="true" disp_ph="true" disp_co="true" disp_rn="true">
-<Place id="34" visible="true">278,280,230,161</Place>
-<Place id="71" visible="true" options="278.0,280.0,230.0,161.0,270.0,549.0,240.0,130.0,5,400.0,441.0,400.0,440.5,395.0,440.5,395.0,549.0,390.0,549.0">500,0,0,0</Place>
-<Place id="43" visible="true">270,549,240,130</Place>
 <Place id="50" visible="true">300,108,170,80</Place>
+<Place id="71" visible="true" options="278.0,280.0,230.0,161.0,270.0,549.0,240.0,130.0,5,400.0,441.0,400.0,440.5,395.0,440.5,395.0,549.0,390.0,549.0">500,0,0,0</Place>
 <Place id="77" visible="true">500,0,0,0</Place>
+<Place id="34" visible="true">278,280,230,161</Place>
+<Place id="43" visible="true">270,549,240,130</Place>
 <Place id="72" visible="true" options="300.0,108.0,170.0,80.0,278.0,280.0,230.0,161.0,2,390.0,188.0,390.0,280.0">500,0,0,0</Place>
 </Sheet>
 <Sheet name="Users" id="80" disp_at="true" disp_ph="true" disp_co="true" disp_rn="true">
-<Place id="73" visible="true">500,0,0,0</Place>
-<Place id="54" visible="true">580,210,200,90</Place>
 <Place id="59" visible="true">180,190,160,80</Place>
+<Place id="54" visible="true">580,210,200,90</Place>
+<Place id="73" visible="true">500,0,0,0</Place>
 </Sheet>
 <Sheet name="UI" id="81" disp_at="true" disp_ph="true" disp_co="true" disp_rn="true">
 <Place id="63" visible="true">220,130,120,60</Place>

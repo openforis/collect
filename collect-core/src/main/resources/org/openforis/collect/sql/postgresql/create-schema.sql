@@ -85,7 +85,7 @@ CREATE TABLE "collect"."ofc_survey"  (
 )
 GO
 CREATE TABLE "collect"."ofc_taxon"  ( 
-	"system_id"      	integer NOT NULL,
+	"id"             	integer NOT NULL,
 	"taxon_id"       	integer NOT NULL,
 	"code"           	varchar(32) NOT NULL,
 	"scientific_name"	varchar(255) NOT NULL,
@@ -93,7 +93,7 @@ CREATE TABLE "collect"."ofc_taxon"  (
 	"taxonomy_id"    	integer NOT NULL,
 	"step"           	integer NOT NULL,
 	"parent_id"      	integer NULL,
-	PRIMARY KEY("system_id")
+	PRIMARY KEY("id")
 )
 GO
 CREATE TABLE "collect"."ofc_taxon_vernacular_name"  ( 
@@ -101,7 +101,7 @@ CREATE TABLE "collect"."ofc_taxon_vernacular_name"  (
 	"vernacular_name" 	varchar(255) NULL,
 	"language_code"   	varchar(3) NOT NULL,
 	"language_variety"	varchar(255) NULL,
-	"taxon_system_id"   integer NULL,
+	"taxon_id"        	integer NULL,
 	"step"            	integer NOT NULL,
 	PRIMARY KEY("id")
 )
@@ -158,13 +158,13 @@ ALTER TABLE "collect"."ofc_schema_definition"
 GO
 ALTER TABLE "collect"."ofc_taxon_vernacular_name"
 	ADD CONSTRAINT "ofc_taxon_vernacular_name_taxon_fkey"
-	FOREIGN KEY("taxon_system_id")
-	REFERENCES "collect"."ofc_taxon"("system_id")
+	FOREIGN KEY("taxon_id")
+	REFERENCES "collect"."ofc_taxon"("id")
 GO
 ALTER TABLE "collect"."ofc_taxon"
 	ADD CONSTRAINT "ofc_taxon_parent_fkey"
 	FOREIGN KEY("parent_id")
-	REFERENCES "collect"."ofc_taxon"("system_id")
+	REFERENCES "collect"."ofc_taxon"("id")
 GO
 ALTER TABLE "collect"."ofc_taxon"
 	ADD CONSTRAINT "ofc_taxon_taxonomy_fkey"
