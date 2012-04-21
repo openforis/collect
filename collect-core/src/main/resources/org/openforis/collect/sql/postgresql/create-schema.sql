@@ -139,7 +139,7 @@ ALTER TABLE "collect"."ofc_survey"
 	UNIQUE ("uri")
 GO
 ALTER TABLE "collect"."ofc_taxon"
-	ADD CONSTRAINT "UNIQUE_ofc_taxon_id"
+	ADD CONSTRAINT "ofc_taxon_id_key"
 	UNIQUE ("taxon_id", "taxonomy_id")
 GO
 ALTER TABLE "collect"."ofc_taxonomy"
@@ -147,12 +147,12 @@ ALTER TABLE "collect"."ofc_taxonomy"
 	UNIQUE ("name")
 GO
 ALTER TABLE "collect"."ofc_record"
-	ADD CONSTRAINT "record_root_entity_definition_fkey"
+	ADD CONSTRAINT "ofc_record_root_entity_definition_fkey"
 	FOREIGN KEY("root_entity_definition_id")
 	REFERENCES "collect"."ofc_schema_definition"("id")
 GO
 ALTER TABLE "collect"."ofc_schema_definition"
-	ADD CONSTRAINT "schema_definition_survey_fkey"
+	ADD CONSTRAINT "ofc_schema_definition_survey_fkey"
 	FOREIGN KEY("survey_id")
 	REFERENCES "collect"."ofc_survey"("id")
 GO
