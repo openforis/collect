@@ -3,7 +3,6 @@
  */
 package org.openforis.collect.metamodel.proxy;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.namespace.QName;
@@ -27,16 +26,6 @@ public class EntityDefinitionProxy extends NodeDefinitionProxy {
 	public EntityDefinitionProxy(EntityDefinitionProxy parent, EntityDefinition entityDefinition) {
 		super(parent, entityDefinition);
 		this.entityDefinition = entityDefinition;
-	}
-
-	static List<EntityDefinitionProxy> fromList(EntityDefinitionProxy parent, List<EntityDefinition> list) {
-		List<EntityDefinitionProxy> proxies = new ArrayList<EntityDefinitionProxy>();
-		if (list != null) {
-			for (EntityDefinition e : list) {
-				proxies.add(new EntityDefinitionProxy(parent, e));
-			}
-		}
-		return proxies;
 	}
 
 	@ExternalizedProperty
