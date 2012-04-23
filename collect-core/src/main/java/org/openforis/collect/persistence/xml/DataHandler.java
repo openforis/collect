@@ -164,6 +164,9 @@ public class DataHandler extends DefaultHandler {
 					endEntityElement();
 				}
 				this.content = null;
+				if ( node == null ) {
+					endRecordElement();
+				}
 			} catch (NullPointerException e) {
 				throw e;
 			} catch (RuntimeException e) {
@@ -176,14 +179,19 @@ public class DataHandler extends DefaultHandler {
 		ignoreLevels--;
 	}
 
-	protected void endEntityElement() {
-		this.node = node.getParent();
-	}
-
 	protected void setNode(Node<?> node) {
 		this.node = node;
 	}
 	
+	protected void endRecordElement() {
+		this.record.updateRootEntityKeyValues();
+		this.record.updateEntityCounts();
+	}
+	
+	protected void endEntityElement() {
+		this.node = node.getParent();
+	}
+
 	@SuppressWarnings("rawtypes")
 	protected void endAttributeElement() {
 		Attribute attr = (Attribute) node;
@@ -210,7 +218,6 @@ public class DataHandler extends DefaultHandler {
 			this.field = null;
 		}
 	}
-		
 
 	protected void setRemarks(Attribute<?,?> attr) {
 		String remarks = attributes.getValue("remarks");
@@ -218,7 +225,7 @@ public class DataHandler extends DefaultHandler {
 			attr.getField(0).setRemarks(remarks);
 		}
 	}
-
+	
 	protected String getXmlValue() {
 		return content == null ? null : content.toString().trim();
 	}
@@ -292,6 +299,10 @@ public class DataHandler extends DefaultHandler {
 	
 	public CollectRecord getRecord() {
 		return record;
+	}
+
+	public Attributes getAttributes() {
+		return attributes;
 	}
 	
 }
