@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.xml.namespace.QName;
+
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
@@ -31,6 +33,8 @@ import org.openforis.idm.model.TextAttribute;
  */
 public class CollectRecord extends Record {
 
+	private static final QName COUNT_ANNOTATION = new QName("http://www.openforis.org/collect/3.0/collect", "count");
+	
 	private static final int APPROVED_MISSING_POSITION = 0;
 	private static final int CONFIRMED_ERROR_POSITION = 0;
 	
@@ -358,8 +362,8 @@ public class CollectRecord extends Record {
 			rootEntityKeyValues = new ArrayList<String>();
 			EntityDefinition rootEntityDefn = rootEntity.getDefinition();
 			List<AttributeDefinition> keyDefns = rootEntityDefn.getKeyAttributeDefinitions();
-			String keyValue = null;
 			for (AttributeDefinition keyDefn : keyDefns) {
+				String keyValue = null;
 				Node<?> keyNode = rootEntity.get(keyDefn.getName(), 0);
 				if(keyNode instanceof CodeAttribute) {
 					Code code = ((CodeAttribute) keyNode).getValue();
@@ -376,11 +380,28 @@ public class CollectRecord extends Record {
 				}
 				if(StringUtils.isNotEmpty(keyValue)){
 					rootEntityKeyValues.add(keyValue);
+				} else {
+					//todo throw error in this case?
+					rootEntityKeyValues.add(null);
 				}
 			}
 		}
 	}
 
+	public void updateEntityCounts() {
+		Entity rootEntity = getRootEntity();
+		List<EntityDefinition> countableDefns = getCountableEntitiesInList();
+		
+		//set counts
+		List<Integer> counts = new ArrayList<Integer>();
+		for (EntityDefinition defn : countableDefns) {
+			String name = defn.getName();
+			int count = rootEntity.getCount(name);
+			counts.add(count);
+		}
+		entityCounts = counts;
+	}
+	
 	public void setRootEntityKeyValues(List<String> keys) {
 		this.rootEntityKeyValues = keys;
 	}
@@ -497,6 +518,28 @@ public class CollectRecord extends Record {
 				}
 			}
 		});
+	}
+	
+	/**
+	 * Returns first level entity definitions that have the attribute countInSummaryList set to true
+	 * 
+	 * @param rootEntityDefinition
+	 * @return 
+	 */
+	private List<EntityDefinition> getCountableEntitiesInList() {
+		List<EntityDefinition> result = new ArrayList<EntityDefinition>();
+		EntityDefinition rootEntityDefinition = getRootEntity().getDefinition();
+		List<NodeDefinition> childDefinitions = rootEntityDefinition .getChildDefinitions();
+		for (NodeDefinition childDefinition : childDefinitions) {
+			if(childDefinition instanceof EntityDefinition) {
+				EntityDefinition entityDefinition = (EntityDefinition) childDefinition;
+				String annotation = childDefinition.getAnnotation(COUNT_ANNOTATION);
+				if(annotation != null && Boolean.parseBoolean(annotation)) {
+					result.add(entityDefinition);
+				}
+			}
+		}
+		return result;
 	}
 	
 }

@@ -3,7 +3,6 @@
  */
 package org.openforis.collect.manager;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -48,7 +47,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class RecordManager {
 	//private final Log log = LogFactory.getLog(RecordManager.class);
 	
-	private static final QName COUNT_ANNOTATION = new QName("http://www.openforis.org/collect/3.0/collect", "count");
 	private static final QName LAYOUT_ANNOTATION = new QName("http://www.openforis.org/collect/3.0/ui", "layout");
 
 	@Autowired
@@ -62,7 +60,7 @@ public class RecordManager {
 	public void save(CollectRecord record) throws RecordPersistenceException {
 		updateKeys(record);
 		
-		updateCounts(record);
+		record.updateEntityCounts();
 		
 		Integer id = record.getId();
 		if(id == null) {
@@ -373,42 +371,6 @@ public class RecordManager {
 		}
 	}
 	
-	/**
-	 * Returns first level entity definitions of the passed root entity that have the attribute countInSummaryList set to true
-	 * 
-	 * @param rootEntityDefinition
-	 * @return 
-	 */
-	private List<EntityDefinition> getCountableInList(EntityDefinition rootEntityDefinition) {
-		List<EntityDefinition> result = new ArrayList<EntityDefinition>();
-		List<NodeDefinition> childDefinitions = rootEntityDefinition.getChildDefinitions();
-		for (NodeDefinition childDefinition : childDefinitions) {
-			if(childDefinition instanceof EntityDefinition) {
-				EntityDefinition entityDefinition = (EntityDefinition) childDefinition;
-				String annotation = childDefinition.getAnnotation(COUNT_ANNOTATION);
-				if(annotation != null && Boolean.parseBoolean(annotation)) {
-					result.add(entityDefinition);
-				}
-			}
-		}
-		return result;
-	}
-	
-	private void updateCounts(CollectRecord record) {
-		Entity rootEntity = record.getRootEntity();
-		EntityDefinition rootEntityDefn = rootEntity.getDefinition();
-		List<EntityDefinition> countableDefns = getCountableInList(rootEntityDefn);
-		
-		//set counts
-		List<Integer> counts = new ArrayList<Integer>();
-		for (EntityDefinition defn : countableDefns) {
-			String name = defn.getName();
-			int count = rootEntity.getCount(name);
-			counts.add(count);
-		}
-		record.setEntityCounts(counts);
-	}
-	
 	private void updateKeys(CollectRecord record) throws RecordPersistenceException {
 		record.updateRootEntityKeyValues();
 		
@@ -422,5 +384,5 @@ public class RecordManager {
 			throw new MissingRecordKeyException();
 		}
 	}
-
+	
 }
