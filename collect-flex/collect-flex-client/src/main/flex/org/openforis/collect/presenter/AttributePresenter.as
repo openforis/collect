@@ -1,23 +1,17 @@
 package org.openforis.collect.presenter {
-	import flash.events.Event;
-	
+	import mx.binding.utils.BindingUtils;
 	import mx.binding.utils.ChangeWatcher;
 	import mx.collections.IList;
 	import mx.core.UIComponent;
 	import mx.events.PropertyChangeEvent;
 	
-	import org.openforis.collect.Application;
 	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 	import org.openforis.collect.model.proxy.AttributeProxy;
-	import org.openforis.collect.model.proxy.RecordProxy;
 	import org.openforis.collect.remoting.service.UpdateResponse;
 	import org.openforis.collect.ui.component.detail.AttributeItemRenderer;
-	import org.openforis.collect.ui.component.detail.RelevanceDisplayManager;
 	import org.openforis.collect.ui.component.detail.ValidationDisplayManager;
 	import org.openforis.collect.ui.component.input.InputField;
-	import org.openforis.collect.util.ObjectUtil;
-	import org.openforis.collect.util.UIUtil;
 	
 	/**
 	 * 
@@ -43,7 +37,7 @@ package org.openforis.collect.presenter {
 			super.initEventListeners();
 			eventDispatcher.addEventListener(ApplicationEvent.RECORD_SAVED, recordSavedHandler);
 			eventDispatcher.addEventListener(ApplicationEvent.UPDATE_RESPONSE_RECEIVED, updateResponseReceivedHandler);
-			ChangeWatcher.watch(_view, "attribute", attributeChangeHandler);
+			BindingUtils.bindSetter(setAttribute, _view, "attribute");
 		}
 		
 		protected function initValidationDisplayManager():void {
@@ -88,7 +82,7 @@ package org.openforis.collect.presenter {
 			updateValidationDisplayManager();
 		}
 		
-		protected function attributeChangeHandler(event:Event):void {
+		protected function setAttribute(attribute:AttributeProxy):void {
 			_view.visited = false;
 			updateValidationDisplayManager();
 		}

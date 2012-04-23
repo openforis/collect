@@ -26,9 +26,11 @@ import org.xml.sax.helpers.DefaultHandler;
 /**
  * 
  * @author G. Miceli
+ * @author S. Ricci
  *
  */
 public class DataHandler extends DefaultHandler {
+	
 	private CollectRecord record;
 	protected Node<?> node;
 	private String field;
@@ -105,8 +107,8 @@ public class DataHandler extends DefaultHandler {
 			if ( StringUtils.isBlank(version) ) {
 				fail("Missing version number");
 			} else {
-				this.record = new CollectRecord(survey, version);
-				this.node = record.createRootEntity(localName);
+				record = new CollectRecord(survey, version);
+				node = record.createRootEntity(localName);
 			}
 		}
 	}
@@ -291,4 +293,5 @@ public class DataHandler extends DefaultHandler {
 	public CollectRecord getRecord() {
 		return record;
 	}
+	
 }

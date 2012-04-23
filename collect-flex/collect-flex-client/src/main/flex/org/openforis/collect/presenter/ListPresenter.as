@@ -296,6 +296,10 @@ package org.openforis.collect.presenter {
 			_view.currentState = ListView.DEFAULT_STATE;
 			
 			updatePaginationBar();
+			
+			if(totalRecords == 0 && currentKeyValuesFilter != null) {
+				AlertUtil.showMessage("list.filter.noRecordsFound");
+			}
 		}
 		
 		protected function deleteRecordResultHandler(event:ResultEvent, token:Object = null):void {

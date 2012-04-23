@@ -40,7 +40,7 @@ public class NodeDefinitionProxy implements Proxy {
 		this.nodeDefinition = nodeDefinition;
 	}
 
-	static List<NodeDefinitionProxy> fromList(EntityDefinitionProxy parent, List<NodeDefinition> list) {
+	static List<NodeDefinitionProxy> fromList(EntityDefinitionProxy parent, List<? extends NodeDefinition> list) {
 		List<NodeDefinitionProxy> proxies = new ArrayList<NodeDefinitionProxy>();
 		if (list != null) {
 			for (NodeDefinition n : list) {

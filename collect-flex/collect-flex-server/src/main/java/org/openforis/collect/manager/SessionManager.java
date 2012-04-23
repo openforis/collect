@@ -55,7 +55,7 @@ public class SessionManager {
 		SessionState sessionState = getSessionState();
 		sessionState.setActiveRecord(null);
 		sessionState.setActiveRecordState(null);
-//		sessionState.setClientId(null);
+		sessionState.setActiveRecordClientId(null);
 	}
 
 	public void keepSessionAlive() {

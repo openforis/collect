@@ -55,12 +55,12 @@ public class TaxonDao extends MappingJooqDaoSupport<Taxon, TaxonDao.JooqFactory>
 		private static final long serialVersionUID = 1L;
 
 		public JooqFactory(Connection connection) {
-			super(connection, OFC_TAXON.SYSTEM_ID, OFC_TAXON_ID_SEQ, Taxon.class);
+			super(connection, OFC_TAXON.ID, OFC_TAXON_ID_SEQ, Taxon.class);
 		}
 
 		@Override
 		public void fromRecord(Record r, Taxon t) {
-			t.setSystemId(r.getValue(OFC_TAXON.SYSTEM_ID));
+			t.setSystemId(r.getValue(OFC_TAXON.ID));
 			t.setTaxonId(r.getValue(OFC_TAXON.TAXON_ID));
 			t.setParentId(r.getValue(OFC_TAXON.PARENT_ID));
 			t.setCode(r.getValueAsString(OFC_TAXON.CODE));
@@ -72,7 +72,7 @@ public class TaxonDao extends MappingJooqDaoSupport<Taxon, TaxonDao.JooqFactory>
 
 		@Override
 		public void fromObject(Taxon t, StoreQuery<?> q) {
-			q.addValue(OFC_TAXON.SYSTEM_ID, t.getSystemId());
+			q.addValue(OFC_TAXON.ID, t.getSystemId());
 			q.addValue(OFC_TAXON.TAXON_ID, t.getTaxonId());
 			q.addValue(OFC_TAXON.PARENT_ID, t.getParentId());
 			q.addValue(OFC_TAXON.CODE, t.getCode());
