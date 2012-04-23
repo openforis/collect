@@ -19,7 +19,7 @@ public abstract class JooqDaoSupport extends JdbcDaoSupport {
 		return log;
 	}
 	
-	protected DialectAwareJooqFactory getJooqFactory() {
+	public DialectAwareJooqFactory getJooqFactory() {
 		Connection connection = getConnection();
 		return new DialectAwareJooqFactory(connection);
 	}
