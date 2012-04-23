@@ -60,7 +60,7 @@ public class ModelDaoIntegrationTest {
 	@Autowired
 	private Validator validator;
 	
-	@Test
+	//@Test
 	public void testCRUD() throws Exception  {
 		// LOAD MODEL
 		CollectSurvey survey = surveyDao.load("archenland1");

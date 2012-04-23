@@ -66,7 +66,10 @@
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>tomcat-maven-plugin</artifactId>
 				<configuration>
-					<warFile>${basedir}/target/collect.war</warFile>					
+					<url>http://localhost:8080/manager/html</url>
+					<warFile>${basedir}/target/collect.war</warFile>	
+					<server>localhost</server>
+					<path>/collect</path>
 				</configuration>
 			</plugin>
 		</plugins>
