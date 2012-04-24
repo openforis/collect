@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx"
+		 xmlns:component="org.openforis.collect.ui.component.*"
+		 width="100%" height="100%" 
+		 >
+	<s:layout>
+		<s:HorizontalLayout />
+	</s:layout>
+	
+	<fx:Script>
+		<![CDATA[
+			import org.openforis.collect.presenter.DataExportPresenter;
+			
+			private var _presenter:DataExportPresenter;
+
+			override protected function initializationComplete():void {
+				super.initializationComplete();
+				_presenter = new DataExportPresenter(this);
+			}
+		]]>
+	</fx:Script>
+	
+	<mx:Tree id="rootTree"
+			 height="100%"
+			 width="40%"
+			 />
+	
+	<component:CheckBoxTree id="attributesTree"
+							height="100%"
+							width="60%"/>
+	
+</s:Group>

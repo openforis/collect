@@ -57,6 +57,7 @@
 	<!-- Controllers -->
 	<bean id="fileNameViewController" class="org.springframework.web.servlet.mvc.UrlFilenameViewController" />
 	<bean id="unlockController" class="org.openforis.collect.web.controller.UnlockController" />
+	<bean id="dataExportController" class="org.openforis.collect.web.controller.DataExportController" />
 
 	<!-- ===================================== -->
 	<!-- GraniteDs services -->
