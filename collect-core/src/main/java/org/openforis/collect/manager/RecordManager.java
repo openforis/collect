@@ -97,6 +97,12 @@ public class RecordManager {
 	}
 	
 	@Transactional
+	public CollectRecord load(CollectSurvey survey, int recordId, int step) throws RecordPersistenceException {
+		CollectRecord record = recordDao.load(survey, recordId, step);
+		return record;
+	}
+	
+	@Transactional
 	public Integer getLockingUserId(int recordId) {
 		Integer userId = recordDao.getLockingUserId(recordId);
 		return userId;

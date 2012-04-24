@@ -43,6 +43,14 @@
 		        </properties>
 			</destination>
 			
+			<destination id="dataExportService">
+		        <properties>
+		        	<factory>springFactory</factory>
+		            <source>dataExportService</source>
+		            <scope>application</scope>
+		        </properties>
+			</destination>
+			
 			<destination id="speciesService">
 		        <properties>
 		        	<factory>springFactory</factory>

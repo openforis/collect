@@ -43,7 +43,7 @@ public class SessionManager {
 
 		return sessionState;
 	}
-
+	
 	public void setActiveRecord(CollectRecord record, String clientId) {
 		SessionState sessionState = getSessionState();
 		sessionState.setActiveRecord(record);
@@ -103,7 +103,7 @@ public class SessionManager {
 			}
 		}
 	}
-
+	
 	private User getLoggedInUser() {
 		SessionState sessionState = (SessionState) getSessionAttribute(SessionState.SESSION_ATTRIBUTE_NAME);
 		if (sessionState != null) {
@@ -130,9 +130,10 @@ public class SessionManager {
 			Object result = graniteContext.getSessionMap().get(attributeName);
 			return result;
 		} else {
-			return null;
+			throw new IllegalStateException("Error getting session info");
 		}
 	}
+	
 	/* TODO get flex client id
 	public String getCurrentClientId() {
 		HttpGraniteContext graniteContext = (HttpGraniteContext) GraniteContext.getCurrentInstance();

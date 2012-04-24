@@ -6,8 +6,40 @@
 		 width="100%" height="100%" 
 		 >
 	<s:layout>
-		<s:HorizontalLayout />
+		<s:VerticalLayout />
 	</s:layout>
+	
+	<fx:Declarations>
+		<s:TitleWindow id="progressPopUp" 
+					   title="{Message.get('export.progressTitle')}"
+					   width="300"
+					   height="200"
+					   creationPolicy="all"
+					   >
+			<s:layout>
+				<s:VerticalLayout horizontalAlign="center" />
+			</s:layout>
+			
+			<s:Group height="100" width="100%">
+				<mx:ProgressBar id="progressBar"
+								horizontalCenter="0"
+								verticalCenter="0"
+								/>
+			</s:Group>
+			<s:Button id="cancelButton"
+					  label="{Message.get('global.cancel')}"
+					  />
+			
+		</s:TitleWindow>
+	</fx:Declarations>
+	
+	
+	
+	<fx:Script>
+		<![CDATA[
+			import org.openforis.collect.i18n.Message;
+		]]>
+	</fx:Script>
 	
 	<fx:Script>
 		<![CDATA[
@@ -22,13 +54,19 @@
 		]]>
 	</fx:Script>
 	
-	<mx:Tree id="rootTree"
-			 height="100%"
-			 width="40%"
-			 />
-	
-	<component:CheckBoxTree id="attributesTree"
-							height="100%"
-							width="60%"/>
-	
+	<s:HGroup width="100%" height="100%">
+		<mx:Tree id="rootTree"
+				 height="100%"
+				 width="40%"
+				 />
+		
+		<component:CheckBoxTree id="attributesTree"
+								height="100%"
+								width="60%"/>
+		
+	</s:HGroup>
+
+	<s:HGroup>
+		<s:Button id="exportButton" label="{Message.get('export.exportLabel')" />
+	</s:HGroup>
 </s:Group>
