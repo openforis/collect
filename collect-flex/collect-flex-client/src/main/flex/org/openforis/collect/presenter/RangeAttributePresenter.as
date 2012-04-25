@@ -55,11 +55,13 @@ package org.openforis.collect.presenter {
 			var updateValueOp:UpdateRequestOperation = view.rangeInputField.presenter.createUpdateValueOperation();
 			updReq.addOperation(updateValueOp);
 			var updateUnitOp:UpdateRequestOperation = createUpdateUnitOperation();
-			if(updateValueOp.value == null) {
-				//clear unit
-				updateUnitOp.value = null;
+			if ( updateUnitOp != null ) {
+				if(updateValueOp.value == null) {
+					//clear unit
+					updateUnitOp.value = null;
+				}
+				updReq.addOperation(updateUnitOp);
 			}
-			updReq.addOperation(updateUnitOp);
 			ClientFactory.dataClient.updateActiveRecord(updReq, null, faultHandler);
 		}
 
@@ -68,7 +70,7 @@ package org.openforis.collect.presenter {
 			var result:UpdateRequestOperation = null;
 			if(view.unitInputField) {
 				result = view.unitInputField.presenter.createUpdateValueOperation();
-			} else {
+			} else if ( attrDefn.defaultUnit != null ) {
 				result = new UpdateRequestOperation();
 				result.method = UpdateRequestOperation$Method.UPDATE;
 				result.parentEntityId = view.attribute.parentId;
