@@ -32,11 +32,9 @@ public class DataMarshaller {
 	@Autowired
 	private XmlSerializerFactory xmlSerializerFactory;
 	
-	private XmlSerializer serializer;
-	
 	public void write(CollectRecord record, Writer out) throws IOException {
 		xmlSerializerFactory.newSerializer();
-		serializer = new org.openforis.collect.persistence.xml.FastXmlSerializer();
+		XmlSerializer serializer = new org.openforis.collect.persistence.xml.FastXmlSerializer();
 		serializer.setOutput(out);
 		serializer.startDocument("UTF-8", true);
         serializer.startTag(null, "record");
@@ -52,49 +50,49 @@ public class DataMarshaller {
         if ( record.getModifiedBy() != null ) {
         	serializer.attribute(null, "modifiedBy", record.getModifiedBy().getName());
         }
-        addDateAttribute("created", record.getCreationDate());
-        addDateAttribute("modified", record.getModifiedDate());
+        addDateAttribute(serializer, "created", record.getCreationDate());
+        addDateAttribute(serializer, "modified", record.getModifiedDate());
         
         Entity rootEntity = record.getRootEntity();
-		write(rootEntity);
+		write(serializer, rootEntity);
 		serializer.endTag(null, "record");
 		serializer.endDocument();
 		serializer.flush();
 	}
 
-	private void write(Node<?> node) throws IOException {
+	private void write(XmlSerializer serializer, Node<?> node) throws IOException {
 		if (node instanceof Entity) {
-			write((Entity) node);
+			write(serializer, (Entity) node);
 		} else if (node instanceof Attribute) {
-			write((Attribute<?,?>) node);
+			write(serializer, (Attribute<?,?>) node);
 		}
 	}
 
-	private void write(Attribute<?,?> attr) throws IOException {
+	private void write(XmlSerializer serializer, Attribute<?,?> attr) throws IOException {
 		String name = attr.getName();
 		serializer.startTag(null, name);
 		int cnt = attr.getFieldCount();
 		for (int i = 0; i < cnt; i++) {
-			writeField(attr, i);
+			writeField(serializer, attr, i);
 		}
 		serializer.endTag(null, name);
 	}
 
-	private void write(Entity entity) throws IOException {
+	private void write(XmlSerializer serializer, Entity entity) throws IOException {
 		String name = entity.getName();
 		serializer.startTag(null, name);
 		
-		writeChildStates(entity);
+		writeChildStates(serializer, entity);
 		
 		//write children
 		List<Node<?>> children = entity.getChildren();
 		for (Node<?> node : children) {
-			write(node);
+			write(serializer, node);
 		}
 		serializer.endTag(null, name);
 	}
 
-	private void writeChildStates(Entity entity) throws IOException {
+	private void writeChildStates(XmlSerializer serializer, Entity entity) throws IOException {
 		serializer.startTag(null, "child_states");
 		EntityDefinition defn = entity.getDefinition();
 		List<NodeDefinition> childDefns = defn.getChildDefinitions();
@@ -113,7 +111,7 @@ public class DataMarshaller {
 		serializer.endTag(null, "child_states");
 	}
 
-	private void writeField(Attribute<?, ?> attr, int fieldIdx) throws IOException {
+	private void writeField(XmlSerializer serializer, Attribute<?, ?> attr, int fieldIdx) throws IOException {
 		AttributeDefinition definition = attr.getDefinition();
 		List<FieldDefinition> fldDefns = definition.getFieldsDefinitions();
 		Field<?> fld = attr.getField(fieldIdx);
@@ -159,7 +157,7 @@ public class DataMarshaller {
 		return result;
 	}
 	
-	private void addDateAttribute(String attributeName, Date date) throws IllegalArgumentException, IllegalStateException, IOException {
+	private void addDateAttribute(XmlSerializer serializer, String attributeName, Date date) throws IllegalArgumentException, IllegalStateException, IOException {
 		String dateString = dateToString(date);
 		if ( dateString != null ) {
 			serializer.attribute(null, attributeName, dateString);
