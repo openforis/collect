@@ -6,6 +6,7 @@ import java.sql.SQLException;
 
 import org.jooq.SQLDialect;
 import org.jooq.impl.Factory;
+import org.openforis.idm.model.species.TaxonVernacularName;
 
 /**
  * @author G. Miceli
@@ -35,5 +36,7 @@ public class DialectAwareJooqFactory extends Factory {
 			throw new RuntimeException("Error getting database name", e);
 		}
 	}
+
+
 
 }

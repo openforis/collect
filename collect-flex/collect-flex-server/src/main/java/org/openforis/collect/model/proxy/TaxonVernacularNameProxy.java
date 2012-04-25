@@ -3,6 +3,8 @@
  */
 package org.openforis.collect.model.proxy;
 
+import java.util.List;
+
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.collect.Proxy;
 import org.openforis.idm.model.species.TaxonVernacularName;
@@ -50,4 +52,9 @@ public class TaxonVernacularNameProxy implements Proxy {
 		return vernacularName.getStep();
 	}
 	
+	@ExternalizedProperty
+	public List<String> getQualifiers()
+	{
+		return vernacularName.getQualifiers();
+	}
 }
