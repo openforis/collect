@@ -386,7 +386,18 @@ public class RecordManager {
 		EntityDefinition rootEntityDefn = rootEntity.getDefinition();
 		List<AttributeDefinition> keyAttributeDefns = rootEntityDefn.getKeyAttributeDefinitions();
 
+		boolean missingKey = false;
 		if (keyAttributeDefns.size() != rootEntityKeyValues.size()) {
+			missingKey = true;
+		} else {
+			for (String key : rootEntityKeyValues) {
+				if ( key == null ) {
+					missingKey = true;
+					break;
+				}
+			}
+		}
+		if ( missingKey ) {
 			throw new MissingRecordKeyException();
 		}
 	}
