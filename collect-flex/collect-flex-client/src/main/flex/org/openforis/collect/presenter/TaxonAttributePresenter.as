@@ -30,7 +30,7 @@ package org.openforis.collect.presenter {
 	 * */
 	public class TaxonAttributePresenter extends CompositeAttributePresenter {
 		
-		private static const MAX_RESULTS:int = 10;
+		private static const MAX_RESULTS:int = 400;
 		private static const SEARCH_BY_CODE:String = "byCode";
 		private static const SEARCH_BY_SCIENTIFIC_NAME:String = "byScientificName";
 		private static const SEARCH_BY_VERNACULAR_NAME:String = "byVernacularName";
