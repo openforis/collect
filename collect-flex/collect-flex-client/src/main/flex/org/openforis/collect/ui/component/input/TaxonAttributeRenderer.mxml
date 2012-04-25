@@ -30,7 +30,7 @@
 								attribute="{attribute}"
 								fieldIndex="0"
 								width="80" 
-								maxChars="4" 
+								maxChars="32" 
 								/>
 		<input:StringInputField id="scientificNameTextInput" 
 								includeIn="horizontal"
@@ -38,6 +38,7 @@
 								parentEntity="{parentEntity}"
 								attribute="{attribute}"
 								fieldIndex="1"
+								maxChars="255"
 								width="100" 
 								/>
 		<input:StringInputField id="vernacularNameTextInput" 
@@ -46,6 +47,7 @@
 								parentEntity="{parentEntity}"
 								attribute="{attribute}"
 								fieldIndex="2"
+								maxChars="255"
 								width="100" 
 								/>
 		<input:StringInputField id="languageCodeTextInput" 
@@ -54,6 +56,7 @@
 								parentEntity="{parentEntity}"
 								attribute="{attribute}"
 								fieldIndex="3"
+								maxChars="3"
 								width="100" 
 								/>
 		<input:StringInputField id="languageVarietyTextInput" 
@@ -62,6 +65,7 @@
 								parentEntity="{parentEntity}"
 								attribute="{attribute}"
 								fieldIndex="4"
+								maxChars="255"
 								width="100" 
 								/>
 	</s:HGroup>
