@@ -16,7 +16,7 @@
 			import org.openforis.collect.model.proxy.TaxonOccurrenceProxy;
 			import org.openforis.collect.util.ObjectUtil;
 			
-			public function doubleClickHandler(event:MouseEvent=null):void {
+			public function itemClickHandler(event:MouseEvent=null):void {
 				if(dataGrid.selectedItem!=null) {
 					var taxonEvent:TaxonInputFieldEvent = new TaxonInputFieldEvent(TaxonInputFieldEvent.TAXON_SELECT);
 					taxonEvent.taxon = dataGrid.selectedItem as TaxonOccurrenceProxy;
@@ -45,7 +45,7 @@
 		</s:columns>
 		<s:itemRenderer>
 			<fx:Component>
-				<s:GridItemRenderer height="20" doubleClickEnabled="true" doubleClick="outerDocument.doubleClickHandler(event)">
+				<s:GridItemRenderer height="20" click="outerDocument.itemClickHandler(event)">
 					<s:Label id="labelDisplay" 
 							 minHeight="20" 
 							 height="100%" 

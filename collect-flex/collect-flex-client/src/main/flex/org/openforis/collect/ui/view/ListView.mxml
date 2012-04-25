@@ -79,5 +79,10 @@
 		<s:Button id="deleteButton" label="{Message.get('list.delete')}" 
 				  useHandCursor="true" buttonMode="true" 
 				  enabled.inactive="false" />
+		<!--
+		<s:Button id="exportButton" label="{Message.get('list.export')}" 
+				  useHandCursor="true" buttonMode="true" 
+				  enabled.inactive="false" />
+		-->
 	</s:HGroup>
 </s:Group>

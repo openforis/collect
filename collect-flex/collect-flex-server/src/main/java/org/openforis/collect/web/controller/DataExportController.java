@@ -1,21 +1,29 @@
 package org.openforis.collect.web.controller;
 
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.Writer;
 import java.util.List;
 
 import javax.activation.MimetypesFileTypeMap;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openforis.collect.manager.SessionManager;
+import org.openforis.collect.manager.ConfigurationManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.Configuration;
 import org.openforis.collect.model.RecordSummarySortField;
+import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.RecordDao;
+import org.openforis.collect.web.session.DataExportState;
 import org.openforis.collect.web.session.SessionState;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.Schema;
@@ -42,88 +50,38 @@ public class DataExportController {
 	private static Log LOG = LogFactory.getLog(DataExportController.class);
 	
 	@Autowired
-	private SessionManager sessionManager;
-	
-	@Autowired
-	private RecordDao recordDao;
+	private ConfigurationManager configurationManager;
 	
 	public DataExportController() {
 		
 	}
 	
-	@RequestMapping(value = "/exportEntity.htm", method = RequestMethod.GET)
-	public @ResponseBody String exportEntity(HttpServletRequest request, HttpServletResponse response, 
-			@RequestParam("rootEntityName") String rootEntityName, 
-			@RequestParam("entityId") Integer entityId,
-			@RequestParam("stepNumber") Integer stepNumber ) {
+	@RequestMapping(value = "/downloadExportedData.htm", method = RequestMethod.GET)
+	public @ResponseBody String downloadExportExportedData(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		try {
-			String outputFileName = "data.csv";
-			String contentType = MimetypesFileTypeMap.getDefaultFileTypeMap().getContentType(outputFileName);
-			
-			response.setContentType(contentType);      
-			response.setHeader("Content-Disposition", "attachment; filename=" + outputFileName);
-
 			SessionState sessionState = getSessionState(request);
-			CollectSurvey survey = sessionState.getActiveSurvey();
-			
-			DataTransformation transform = getTransform(survey, rootEntityName, entityId);
-			extractData(response.getWriter(), transform, survey, rootEntityName, Step.valueOf(stepNumber));
-			return "ok";
-		}
-		catch (Exception e) {
-			LOG.error(e);
-			response.setContentType("text/html");      
-			return "Error during export. See log files.";
-		}
-	}
-	
-	private DataTransformation getTransform(Survey survey, String rootEntityName, Integer entityId) throws InvalidExpressionException {
-		Schema schema = survey.getSchema();
-		EntityDefinition entityDefn = (EntityDefinition) schema.getById(entityId);
-		String axisPath = entityDefn.getPath();
-		EntityDefinition rowDefn = (EntityDefinition) schema.getByPath(axisPath);
-		
-		ColumnProvider provider = new ColumnProviderChain(
-				/*
-				new PivotExpressionColumnProvider("parent()/parent()", 
-						new SingleAttributeColumnProvider("id", "cluster_id"),
-						new SingleAttributeColumnProvider("region", "cluster_region"),
-						new SingleAttributeColumnProvider("district", "cluster_district")),
-				new PivotExpressionColumnProvider("parent()", 
-						new SingleAttributeColumnProvider("no","plot_no"),	
-						new SingleAttributeColumnProvider("subplot", "subplot")),
-				//new TaxonColumnProvider("species"),
-				 */
-				new AutomaticColumnProvider(rowDefn)
-				);
-		return new DataTransformation(axisPath, provider);
-	}
-	
-	private void extractData(Writer output, DataTransformation xform, CollectSurvey survey, String rootEntityName, Step step) throws Exception {
-		ModelCsvWriter writer = null;
-		try {
-			writer = new ModelCsvWriter(output, xform);
-			writer.printColumnHeadings();
-			
-			// Cycle over data files
-			int rowsCount = 0;
-			long read = 0;
-			long start = System.currentTimeMillis();
-			List<CollectRecord> summaries = recordDao.loadSummaries(survey, rootEntityName, 0, Integer.MAX_VALUE, (List<RecordSummarySortField>) null, (String) null);
-			for (CollectRecord s : summaries) {
-				if ( s.getStep().getStepNumber() <= step.getStepNumber() ) {
-					CollectRecord record = recordDao.load(survey, s.getId(), step.getStepNumber());
-					rowsCount += writer.printData(record);
-					read++;
+			DataExportState dataExportState = sessionState.getDataExportState();
+			if ( dataExportState != null && dataExportState.isComplete() ) {
+				User user = sessionState.getUser();
+				String userName = user.getName();
+				Configuration configuration = configurationManager.getConfiguration();
+				String exportPath = configuration.get("export_path");
+				String fileName = "data.zip";
+				String path = exportPath + File.separator + userName + File.separator + fileName;
+				File file = new File(path);
+				if ( file.exists() ) {
+					write(response, file);
+				} else {
+					throw new IOException("Data export file not found");
 				}
+			} else {
+				throw new IllegalStateException("No data export completed");
 			}
-			//System.out.println("Exported "+rowsCount+" rows from "+read+" records in "+(duration/1000)+"s ("+(duration/rowsCount)+"ms/row).");
-		} finally {
-			if ( writer!=null ) {
-				writer.flush();
-				writer.close();
-			}
+		} catch (IOException e) {
+			LOG.error(e);
+			throw e;
 		}
+		return "ok";
 	}
 
 	private SessionState getSessionState(HttpServletRequest request) {
@@ -133,6 +91,35 @@ public class DataExportController {
 			return sessionState;
 		}
 		return null;
+	}
+	
+	private void write(HttpServletResponse response, File file) throws IOException {
+		FileInputStream is = null;
+		BufferedInputStream buf = null;
+		try {
+			String name = file.getName();
+			String contentType = MimetypesFileTypeMap.getDefaultFileTypeMap().getContentType(name);
+			response.setContentType(contentType); 
+			response.setContentLength(new Long(file.length()).intValue());
+			response.setHeader("Content-Disposition", "attachment; filename=" + name);
+			ServletOutputStream outputStream = response.getOutputStream();
+			is = new FileInputStream(file);
+			buf = new BufferedInputStream(is);
+			int readBytes = 0;
+			//read from the file; write to the ServletOutputStream
+			while ((readBytes = buf.read()) != -1) {
+				outputStream.write(readBytes);
+			}
+		} catch (IOException e) {
+			throw e;
+		} finally {
+			if ( buf != null) {
+				buf.close();
+			}
+			if ( is != null ) {
+				is.close();
+			}
+		}
 	}
 	
 }

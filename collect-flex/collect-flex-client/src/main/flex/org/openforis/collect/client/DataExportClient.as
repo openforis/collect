@@ -18,7 +18,7 @@ package org.openforis.collect.client {
 		public function DataExportClient() {
 			super("dataExportService");
 			
-			this._getStateOperation = getOperation("getState");
+			this._getStateOperation = getOperation("getState", CONCURRENCY_LAST, false);
 			this._exportOperation = getOperation("export");
 			this._cancelOperation = getOperation("cancel");
 		}

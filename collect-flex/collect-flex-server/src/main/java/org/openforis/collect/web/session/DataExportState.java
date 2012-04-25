@@ -1,5 +1,7 @@
 package org.openforis.collect.web.session;
 
+import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
+
 /**
  * 
  * @author S. Ricci
@@ -7,20 +9,26 @@ package org.openforis.collect.web.session;
  */
 public class DataExportState {
 
-	private boolean extracting = false;
+	private boolean exporting = false;
 	private boolean compressing = false;
 	private boolean error = false;
 	private boolean cancelled = false;
+	private boolean complete = false;
 
 	private int count;
 	private int total;
 
-	public boolean isExtracting() {
-		return extracting;
+	@ExternalizedProperty
+	public boolean isRunning() {
+		return (! complete && ! error) && (exporting || compressing);
+	}
+	
+	public boolean isExporting() {
+		return exporting;
 	}
 
-	public void setExtracting(boolean extracting) {
-		this.extracting = extracting;
+	public void setExporting(boolean exporting) {
+		this.exporting = exporting;
 	}
 
 	public boolean isCompressing() {
@@ -63,4 +71,14 @@ public class DataExportState {
 		this.total = total;
 	}
 
+	public boolean isComplete() {
+		return complete;
+	}
+
+	public void setComplete(boolean complete) {
+		this.complete = complete;
+	}
+
+	
+	
 }

@@ -4,6 +4,7 @@ package org.openforis.collect.model
 	import mx.collections.IList;
 	import mx.collections.ListCollectionView;
 	
+	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
 
@@ -23,20 +24,23 @@ package org.openforis.collect.model
 		
 		public static function fromNodeDef(nodeDef:NodeDefinitionProxy, 
 										   includeChildren:Boolean = true, 
-										   includeChildrenAttribute:Boolean = true):NodeItem {
+										   includeChildrenAttributes:Boolean = true, 
+										   includeSingleEntities:Boolean = true):NodeItem {
 			var item:NodeItem = new NodeItem();
 			item.id = nodeDef.id;
 			item.label = nodeDef.getLabelText();
 			if(includeChildren) {
-				if(nodeDef is EntityDefinitionProxy) {
-					item.children = new ArrayCollection();
-					var childDefinitions:ListCollectionView = EntityDefinitionProxy(nodeDef).childDefinitions;
-					for each (var childNodeDefn:NodeDefinitionProxy in childDefinitions) {
-						if(childNodeDefn is EntityDefinitionProxy || includeChildrenAttribute) {
-							var child:NodeItem = fromNodeDef(childNodeDefn, includeChildren, includeChildrenAttribute);
-							item.children.addItem(child);
-						}
+				var children:IList = new ArrayCollection();
+				var childDefinitions:ListCollectionView = EntityDefinitionProxy(nodeDef).childDefinitions;
+				for each (var childNodeDefn:NodeDefinitionProxy in childDefinitions) {
+					if ( (childNodeDefn is EntityDefinitionProxy && (childNodeDefn.multiple || includeSingleEntities)) || 
+						(childNodeDefn is AttributeDefinitionProxy && includeChildrenAttributes) ) {
+						var child:NodeItem = fromNodeDef(childNodeDefn, includeChildren, includeChildrenAttributes);
+						children.addItem(child);
 					}
+				}
+				if (children.length > 0) {
+					item.children = children;
 				}
 			}
 			return item;

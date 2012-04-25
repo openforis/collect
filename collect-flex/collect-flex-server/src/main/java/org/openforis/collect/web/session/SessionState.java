@@ -28,7 +28,7 @@ public class SessionState {
 	private CollectSurvey activeSurvey;
 	private Locale locale;
 	private RecordState activeRecordState;
-	private DataExportState dataExtractionState;
+	private DataExportState dataExportState;
 
 	public SessionState(String sessionId) {
 		this.sessionId = sessionId;
@@ -90,13 +90,13 @@ public class SessionState {
 		this.activeRecordClientId = activeRecordClientId;
 	}
 
-	public DataExportState getDataExtractionState() {
-		return dataExtractionState;
+	public DataExportState getDataExportState() {
+		return dataExportState;
 	}
 
-	public void setDataExtractionState(
-			DataExportState dataExtractionState) {
-		this.dataExtractionState = dataExtractionState;
+	public void setDataExportState(
+			DataExportState dataExportState) {
+		this.dataExportState = dataExportState;
 	}
 	
 

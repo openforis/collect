@@ -86,7 +86,7 @@ mx|Alert {
 
 }*/
 
-component|BlockingMessagePopUp, component|SelectVersionPopUp, input|CodeListDialog {
+component|BlockingMessagePopUp, component|SelectVersionPopUp, input|CodeListDialog, component|DataExportPopUp {
 	skin-class: ClassReference("org.openforis.collect.ui.skin.TitleWindowSkin");
 	title-style-name: dialogHeaderStyle;
 	border-color: #000000;
@@ -97,7 +97,7 @@ component|BlockingMessagePopUp, component|SelectVersionPopUp, input|CodeListDial
 	background-alpha: 1.0;
 }
 
-component|BlockingMessagePopUp {
+component|BlockingMessagePopUp, component|SelectVersionPopUp, input|CodeListDialog {
 	showCloseButton: false;
 }
 
