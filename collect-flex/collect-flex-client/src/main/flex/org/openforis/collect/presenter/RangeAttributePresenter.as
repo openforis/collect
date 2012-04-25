@@ -74,7 +74,7 @@ package org.openforis.collect.presenter {
 				result.parentEntityId = view.attribute.parentId;
 				result.nodeName = view.attributeDefinition.name;
 				result.nodeId = view.attribute.id;
-				result.fieldIndex = 1;
+				result.fieldIndex = 2;
 				result.value = attrDefn.defaultUnit.name;
 			}
 			return result;
