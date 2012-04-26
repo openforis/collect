@@ -3,9 +3,12 @@ package org.openforis.collect.client {
 	/**
 	 * 
 	 * @author Mino Togna
+	 * @author Stefano Ricci
+	 * 
 	 * */
 	public class ClientFactory {
 		
+		private static var _backupClient:BackupClient;
 		private static var _modelClient:ModelClient;
 		private static var _sessionClient:SessionClient;
 		private static var _dataClient:DataClient;
@@ -20,6 +23,13 @@ package org.openforis.collect.client {
 				_sessionClient = new SessionClient();
 			}
 			return _sessionClient;
+		}
+		
+		public static function get backupClient():BackupClient {
+			if(_backupClient == null) {
+				_backupClient = new BackupClient();
+			}
+			return _backupClient;
 		}
 		
 		public static function get dataClient():DataClient{

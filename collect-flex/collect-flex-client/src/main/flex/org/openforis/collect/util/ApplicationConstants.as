@@ -21,12 +21,14 @@ package org.openforis.collect.util {
 		public static const FILE_DOWNLOAD_SERVLET_NAME:String = "download";
 		public static const FILE_DELETE_SERVLET_NAME:String = "deleteFile";
 		*/
-		public static const DOWNLOAD_EXPORTED_DATA_SERVLET_NAME:String = "downloadExportedData.htm";
+		public static const DOWNLOAD_EXPORTED_DATA_SERVLET_NAME:String = "downloadDataExport.htm";
+		public static const DOWNLOAD_BACKUP_SERVLET_NAME:String = "downloadBackup.htm";
 		
 		private static var _FILEUPLOAD_URL:String; 
 		private static var _FILEDOWNLOAD_URL:String; 
 		private static var _FILEDELETE_URL:String; 
 		private static var _DOWNLOAD_EXPORTED_DATA_URL:String;
+		private static var _DOWNLOAD_BACKUP_DATA_URL:String;
 		
 		private static var _HOST:String;
 		private static var _PORT:uint;
@@ -55,6 +57,10 @@ package org.openforis.collect.util {
 		
 		public static function get DOWNLOAD_EXPORTED_DATA_URL():String {
 			return _DOWNLOAD_EXPORTED_DATA_URL;
+		}
+		
+		public static function get DOWNLOAD_BACKUP_URL():String {
+			return _DOWNLOAD_BACKUP_DATA_URL;
 		}
 		
 		public static function get HOST():String {
@@ -88,6 +94,7 @@ package org.openforis.collect.util {
 			_FILEDELETE_URL = _URL + FILE_DELETE_SERVLET_NAME;
 			*/
 			_DOWNLOAD_EXPORTED_DATA_URL = _URL + DOWNLOAD_EXPORTED_DATA_SERVLET_NAME;
+			_DOWNLOAD_BACKUP_DATA_URL = _URL + DOWNLOAD_BACKUP_SERVLET_NAME;
 		}
 
 	}

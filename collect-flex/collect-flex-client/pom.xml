@@ -99,7 +99,7 @@
 								<includeClass>org.openforis.collect.remoting.service.UpdateRequestOperation</includeClass>
 								<includeClass>org.openforis.collect.remoting.service.UpdateRequestOperation$Method</includeClass>
 								<includeClass>org.openforis.collect.remoting.service.UpdateResponse</includeClass>
-								<includeClass>org.openforis.collect.web.session.DataExportState</includeClass>
+								<includeClass>org.openforis.collect.remoting.service.export.DataExportState</includeClass>
 							</includeJavaClasses>
 						</configuration>
 					</execution>

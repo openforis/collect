@@ -58,10 +58,12 @@
 	<bean id="fileNameViewController" class="org.springframework.web.servlet.mvc.UrlFilenameViewController" />
 	<bean id="unlockController" class="org.openforis.collect.web.controller.UnlockController" />
 	<bean id="dataExportController" class="org.openforis.collect.web.controller.DataExportController" />
+	<bean id="fileDownloadController" class="org.openforis.collect.web.controller.FileDownloadController" />
 
 	<!-- ===================================== -->
 	<!-- GraniteDs services -->
 	<!-- ===================================== -->
+	<bean id="backupService" 	class="org.openforis.collect.remoting.service.BackupService" autowire="byName" init-method="init" />
 	<bean id="dataService" 		class="org.openforis.collect.remoting.service.DataService" autowire="byName"/>
 	<bean id="dataExportService" class="org.openforis.collect.remoting.service.DataExportService" autowire="byName" init-method="init" />
 	<bean id="modelService"		class="org.openforis.collect.remoting.service.ModelService" autowire="byName" />
@@ -89,6 +91,12 @@
 	<bean id="userManager"			class="org.openforis.collect.manager.UserManager" />
 		
 <!-- 	<bean id="recordContext" class="org.openforis.collect.model.CollectRecordContext" /> -->
+	
+	<!-- XmlSerializerFactory -->
+	<bean id="xmlSerializerFactory" class="org.openforis.collect.persistence.xml.FastXmlSerializerFactory" />
+	
+	<!-- XML DataMarshaller -->
+	<bean id="dataMarshaller" class="org.openforis.collect.persistence.xml.DataMarshaller" lazy-init="false" autowire-candidate="true" autowire="byName" />
 	
 	<!-- ===================================== -->
 	<!-- Data Source -->

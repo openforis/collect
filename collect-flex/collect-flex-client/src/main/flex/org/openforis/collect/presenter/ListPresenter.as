@@ -36,6 +36,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.model.RecordSummarySortField$Sortable;
 	import org.openforis.collect.model.proxy.RecordProxy;
 	import org.openforis.collect.ui.UIBuilder;
+	import org.openforis.collect.ui.component.BackupPopUp;
 	import org.openforis.collect.ui.component.DataExportPopUp;
 	import org.openforis.collect.ui.component.RecordFilterPopUp;
 	import org.openforis.collect.ui.component.SelectVersionPopUp;
@@ -105,7 +106,7 @@ package org.openforis.collect.presenter {
 			this._view.addButton.addEventListener(MouseEvent.CLICK, addButtonClickHandler);
 			this._view.editButton.addEventListener(MouseEvent.CLICK, editButtonClickHandler);
 			this._view.deleteButton.addEventListener(MouseEvent.CLICK, deleteButtonClickHandler);
-			//this._view.exportButton.addEventListener(MouseEvent.CLICK, exportButtonClickHandler);
+			this._view.exportButton.addEventListener(MouseEvent.CLICK, exportButtonClickHandler);
 			this._view.openFilterPopUpButton.addEventListener(MouseEvent.CLICK, openFilterPopUpButtonClickHandler);
 			
 			this._view.dataGrid.addEventListener(GridSortEvent.SORT_CHANGING, dataGridSortChangingHandler);
@@ -200,7 +201,8 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function exportButtonClickHandler(event:MouseEvent):void {
-			var popUp:DataExportPopUp = DataExportPopUp(PopUpManager.createPopUp(FlexGlobals.topLevelApplication as DisplayObject, DataExportPopUp, true));
+			//var popUp:DataExportPopUp = DataExportPopUp(PopUpManager.createPopUp(FlexGlobals.topLevelApplication as DisplayObject, DataExportPopUp, true));
+			var popUp:BackupPopUp = BackupPopUp(PopUpManager.createPopUp(FlexGlobals.topLevelApplication as DisplayObject, BackupPopUp, true));
 			PopUpManager.centerPopUp(popUp);
 		}
 		

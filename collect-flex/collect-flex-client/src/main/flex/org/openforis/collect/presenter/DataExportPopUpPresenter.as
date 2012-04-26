@@ -22,12 +22,16 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.i18n.Message;
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 	import org.openforis.collect.model.NodeItem;
+	import org.openforis.collect.remoting.service.export.DataExportState;
 	import org.openforis.collect.ui.component.DataExportPopUp;
 	import org.openforis.collect.util.AlertUtil;
 	import org.openforis.collect.util.ApplicationConstants;
-	import org.openforis.collect.web.session.DataExportState;
 
-
+	/**
+	 * 
+	 * @author S. Ricci
+	 * 
+	 */
 	public class DataExportPopUpPresenter extends AbstractPresenter {
 		
 		private static const PROGRESS_DELAY:int = 5000;
@@ -132,7 +136,7 @@ package org.openforis.collect.presenter {
 		
 		protected function cancelResultHandler(event:ResultEvent, token:Object = null):void {
 			_state = null;
-			_progressTimer.stop();
+			stopProgressTimer();
 			_view.currentState = DataExportPopUp.STATE_DEFAULT;
 		}
 		

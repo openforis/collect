@@ -54,7 +54,7 @@ package org.openforis.collect.util {
 	import org.openforis.collect.model.proxy.ValidationResultProxy;
 	import org.openforis.collect.model.proxy.ValidationResultsProxy;
 	import org.openforis.collect.remoting.service.UpdateResponse;
-	import org.openforis.collect.web.session.DataExportState;
+	import org.openforis.collect.remoting.service.export.DataExportState;
 	import org.openforis.idm.metamodel.validation.ValidationResultFlag;
 
 	public class ModelClassInitializer {

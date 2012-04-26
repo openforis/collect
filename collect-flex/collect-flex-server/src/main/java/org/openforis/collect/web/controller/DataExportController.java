@@ -23,7 +23,7 @@ import org.openforis.collect.model.Configuration;
 import org.openforis.collect.model.RecordSummarySortField;
 import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.RecordDao;
-import org.openforis.collect.web.session.DataExportState;
+import org.openforis.collect.remoting.service.export.DataExportState;
 import org.openforis.collect.web.session.SessionState;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.Schema;
