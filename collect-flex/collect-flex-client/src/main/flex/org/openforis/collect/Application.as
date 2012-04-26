@@ -23,7 +23,7 @@ package org.openforis.collect {
 	 * @author S. Ricci
 	 * */
 	public class Application {
-		private static var _clientId:String;
+		
 		private static var _user:UserProxy;
 		
 		private static var _surveySummaries:IList;
@@ -36,14 +36,8 @@ package org.openforis.collect {
 		
 		private static var initialized:Boolean = false;
 		
-		public function Application() {
-		}
-		
 		public static function init():void {
 			if ( !initialized ) {
-				//generate client id
-				clientId = Math.random().toString();
-				
 				CursorManager.setBusyCursor();
 				
 				initExternalInterface();
@@ -105,15 +99,6 @@ package org.openforis.collect {
 			_activeRootEntity = value;
 		}
 
-		[Bindable]
-		public static function get clientId():String {
-			return _clientId;
-		}
-		
-		public static function set clientId(value:String):void {
-			_clientId = value;
-		}
-		
 		[Bindable]
 		public static function get user():UserProxy {
 			return _user;

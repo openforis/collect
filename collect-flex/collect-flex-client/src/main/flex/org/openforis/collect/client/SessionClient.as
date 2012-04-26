@@ -4,6 +4,7 @@ package org.openforis.collect.client {
 	import mx.rpc.remoting.Operation;
 	
 	import org.openforis.collect.Application;
+	import org.openforis.collect.model.proxy.RecordProxy;
 	
 	/**
 	 * 
@@ -23,7 +24,12 @@ package org.openforis.collect.client {
 		
 		public function keepAlive(responder:IResponder):void {
 			var editing:Boolean = Application.isEditingRecord();
-			var token:AsyncToken = this._keepAliveOperation.send(Application.clientId, editing);
+			var activeRecord:RecordProxy = Application.activeRecord;
+			var lockId:String = null;
+			if ( activeRecord != null ) {
+				lockId = activeRecord.lockId;
+			}
+			var token:AsyncToken = this._keepAliveOperation.send(editing, lockId);
 			token.addResponder(responder);
 		}
 		

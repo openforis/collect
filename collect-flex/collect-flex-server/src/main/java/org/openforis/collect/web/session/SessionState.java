@@ -18,17 +18,11 @@ public class SessionState {
 
 	public static String SESSION_ATTRIBUTE_NAME = "sessionState";
 
-	public enum RecordState {
-		NEW, SAVED
-	}
-
 	private String sessionId;
-	private String activeRecordClientId;
 	private User user;
 	private CollectRecord activeRecord;
 	private CollectSurvey activeSurvey;
 	private Locale locale;
-	private RecordState activeRecordState;
 	private DataExportState dataExportState;
 
 	public SessionState(String sessionId) {
@@ -73,22 +67,6 @@ public class SessionState {
 
 	public void setLocale(Locale locale) {
 		this.locale = locale;
-	}
-
-	public RecordState getActiveRecordState() {
-		return activeRecordState;
-	}
-
-	public void setActiveRecordState(RecordState activeRecordState) {
-		this.activeRecordState = activeRecordState;
-	}
-
-	public String getActiveRecordClientId() {
-		return activeRecordClientId;
-	}
-
-	public void setActiveRecordClientId(String activeRecordClientId) {
-		this.activeRecordClientId = activeRecordClientId;
 	}
 
 	public DataExportState getDataExportState() {

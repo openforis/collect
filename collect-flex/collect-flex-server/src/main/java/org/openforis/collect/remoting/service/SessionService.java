@@ -29,10 +29,10 @@ public class SessionService {
 	 */
 //	@Secured("isAuthenticated()")
 	@Transactional
-	public void keepAlive(String clientId, Boolean editing) throws RecordUnlockedException {
+	public void keepAlive(Boolean editing, String lockId) throws RecordUnlockedException {
 		this.sessionManager.keepSessionAlive();
 		if(editing) {
-			sessionManager.checkUserIsLockingActiveRecord(clientId);
+			sessionManager.checkUserIsLockingActiveRecord(lockId);
 		}
 	}
 	

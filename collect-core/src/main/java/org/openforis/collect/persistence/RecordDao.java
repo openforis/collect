@@ -8,6 +8,7 @@ import static org.openforis.collect.persistence.jooq.Tables.OFC_USER;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jooq.Field;
@@ -96,64 +97,30 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 		Record r = q.fetchOne();
 		return r.getValueAsInteger(0);
 	}
-
+	
+	/**
+	 * 
+	 * @param recordId
+	 * @param userId
+	 * @return lockId generated using UUID
+	 */
 	@Transactional
-	public void lock(Integer recordId, int userId) throws RecordPersistenceException {
-		lock(recordId, userId, false);
+	public String lock(Integer recordId, int userId) {
+		Factory jf = getJooqFactory();
+		String lockId = UUID.randomUUID().toString();
+		jf.update(OFC_RECORD)
+		  .set(OFC_RECORD.LOCKED_BY_ID, userId)
+		  .set(OFC_RECORD.LOCK_ID, lockId)
+		  .where(OFC_RECORD.ID.equal(recordId))
+		  .execute();
+		return lockId;
 	}
 	
 	@Transactional
-	public void lock(Integer recordId, int userId, boolean forceUnlock) throws RecordPersistenceException {
+	public boolean isLocking(int userId, int recordId, String lockId) {
 		Factory jf = getJooqFactory();
-		if ( ! forceUnlock ) {
-			//check if user has already locked another record
-			checkLock(userId, recordId);
-		}
-		Record result = jf
-				.select(OFC_RECORD.LOCKED_BY_ID, OFC_USER.USERNAME)
-				.from(OFC_RECORD)
-				.leftOuterJoin(OFC_USER).on(OFC_RECORD.LOCKED_BY_ID.equal(OFC_USER.ID))
-				.where(OFC_RECORD.ID.equal(recordId))
-				.fetchOne();
-		Integer lockedById = result.getValueAsInteger(OFC_RECORD.LOCKED_BY_ID);
-		if (lockedById == null || lockedById.equals(userId) || forceUnlock) {
-			jf.update(OFC_RECORD)
-			  .set(OFC_RECORD.LOCKED_BY_ID, userId)
-			  .where(OFC_RECORD.ID.equal(recordId))
-			  .execute();
-		} else {
-			String userName = result.getValueAsString(OFC_USER.USERNAME);
-			throw new RecordLockedException("Record already locked", userName);
-		}
-	}
-
-	@Transactional
-	public void checkLock(int userId) throws MultipleEditException  {
-		Factory jf = getJooqFactory();
-		Integer recordId = getLockedRecordId(jf, userId);
-		if(recordId != null) {
-			throw new MultipleEditException("User has locked another record " + recordId);
-		}
-	}
-	
-	@Transactional
-	public void checkLock(int userId, int recordId) throws MultipleEditException, RecordLockedException  {
-		Factory jf = getJooqFactory();
-		Integer lockedRecordId = getLockedRecordId(jf, userId);
-		if(lockedRecordId != null) {
-			if(lockedRecordId.equals(recordId)) {
-				throw new RecordAlreadyLockedException("Record already locked", null);
-			} else {
-				throw new MultipleEditException("User has locked another record " + recordId);
-			}
-		}
-	}
-	
-	@Transactional
-	public boolean isLocking(int userId, int recordId) {
-		Factory jf = getJooqFactory();
-		Integer lockedRecordId = getLockedRecordId(jf, userId);
-		if ( lockedRecordId != null && lockedRecordId.equals(recordId) ) {
+		Record r = jf.select(OFC_RECORD.ID).from(OFC_RECORD).where(OFC_RECORD.LOCKED_BY_ID.equal(userId).and(OFC_RECORD.LOCK_ID.equal(lockId))).fetchAny();
+		if(r != null){
 			return true;
 		} else {
 			return false;
@@ -171,10 +138,18 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 		}
 	}
 	
+	@Transactional
+	public Integer getLockedRecordId(int userId) {
+		Factory jf = getJooqFactory();
+		Integer id = getLockedRecordId(jf, userId);
+		return id;
+	}
+	
 	private Integer getLockedRecordId(Factory jf, int userId) {
 		Record r = jf.select(OFC_RECORD.ID).from(OFC_RECORD).where(OFC_RECORD.LOCKED_BY_ID.equal(userId)).fetchAny();
 		if(r != null){
-			return r.getValueAsInteger(OFC_RECORD.ID);
+			Integer id = r.getValueAsInteger(OFC_RECORD.ID);
+			return id;
 		} else {
 			return null;
 		}

@@ -19,6 +19,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.RecordPromoteException;
 import org.openforis.collect.manager.SessionManager;
+import org.openforis.collect.manager.UserManager;
 import org.openforis.collect.metamodel.proxy.CodeListItemProxy;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectSurvey;
@@ -27,12 +28,13 @@ import org.openforis.collect.model.RecordSummarySortField;
 import org.openforis.collect.model.User;
 import org.openforis.collect.model.proxy.NodeProxy;
 import org.openforis.collect.model.proxy.RecordProxy;
+import org.openforis.collect.persistence.MultipleEditException;
 import org.openforis.collect.persistence.RecordAlreadyLockedException;
+import org.openforis.collect.persistence.RecordLockedException;
 import org.openforis.collect.persistence.RecordPersistenceException;
 import org.openforis.collect.persistence.RecordUnlockedException;
 import org.openforis.collect.remoting.service.UpdateRequestOperation.Method;
 import org.openforis.collect.web.session.SessionState;
-import org.openforis.collect.web.session.SessionState.RecordState;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.BooleanAttributeDefinition;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
@@ -77,27 +79,23 @@ public class DataService {
 	@Autowired
 	private RecordManager recordManager;
 
+	@Autowired
+	private UserManager userManager;
+
 	@Transactional
-	public RecordProxy loadRecord(int id, int step, boolean forceUnlock, String clientId) throws RecordPersistenceException {
+	public RecordProxy loadRecord(int id, int step, boolean forceUnlock) throws RecordPersistenceException {
 		SessionState sessionState = sessionManager.getSessionState();
 		CollectSurvey survey = sessionState.getActiveSurvey();
 		User user = sessionState.getUser();
-		String activeRecordClientId = sessionState.getActiveRecordClientId();
+		Integer userId = user.getId();
+		checkCanLockRecord(id, userId, forceUnlock);
 		CollectRecord record = recordManager.checkout(survey, user, id, step, forceUnlock);
-		if(forceUnlock || activeRecordClientId == null || clientId.equals(activeRecordClientId)) {
-			//record.updateNodeStates();
-			
-			Entity rootEntity = record.getRootEntity();
-			recordManager.addEmptyNodes(rootEntity);
-			sessionManager.setActiveRecord(record, clientId);
-			sessionState.setActiveRecordState(RecordState.SAVED);
-			return new RecordProxy(record);
-		} else {
-			//record locked by the same user using a different flex client
-			throw new RecordAlreadyLockedException("Record already locked", null);
-		}
+		Entity rootEntity = record.getRootEntity();
+		recordManager.addEmptyNodes(rootEntity);
+		sessionManager.setActiveRecord(record);
+		return new RecordProxy(record);
 	}
-
+	
 	/**
 	 * 
 	 * @param rootEntityName
@@ -128,20 +126,53 @@ public class DataService {
 	}
 
 	@Transactional
-	public RecordProxy createRecord(String rootEntityName, String versionName, String clientId) throws RecordPersistenceException {
+	public RecordProxy createRecord(String rootEntityName, String versionName) throws RecordPersistenceException {
+		checkMultipleEdit();
 		SessionState sessionState = sessionManager.getSessionState();
-		User user = sessionState.getUser();
 		CollectSurvey activeSurvey = sessionState.getActiveSurvey();
+		User user = sessionState.getUser();
 		ModelVersion version = activeSurvey.getVersion(versionName);
 		Schema schema = activeSurvey.getSchema();
 		EntityDefinition rootEntityDefinition = schema.getRootEntityDefinition(rootEntityName);
 		CollectRecord record = recordManager.create(activeSurvey, rootEntityDefinition, user, version.getName());
 		Entity rootEntity = record.getRootEntity();
 		recordManager.addEmptyNodes(rootEntity);
-		sessionManager.setActiveRecord((CollectRecord) record, clientId);
-		sessionState.setActiveRecordState(RecordState.NEW);
+		sessionManager.setActiveRecord(record);
 		RecordProxy recordProxy = new RecordProxy(record);
 		return recordProxy;
+	}
+	
+	private void checkCanLockRecord(int recordId, int userId, boolean forceUnlock) throws RecordLockedException, MultipleEditException {
+		Integer lockedRecordId = recordManager.getLockedRecordId(userId);
+		if ( lockedRecordId != null && lockedRecordId != recordId ) {
+			throw new MultipleEditException("User is editing another record: " + recordId);
+		}
+		Integer lockingUserId = recordManager.getLockingUserId(recordId);
+		if ( lockingUserId != null && ! forceUnlock ) {
+			if ( lockingUserId == userId ) {
+				throw new RecordAlreadyLockedException("Record already locked", null);
+			} else {
+				User lockingUser = userManager.loadById(lockingUserId);
+				String lockingUserName = lockingUser.getName();
+				throw new RecordLockedException("Record locked by another user", lockingUserName);
+			}
+		}
+	}
+	
+	
+	private void checkMultipleEdit() throws MultipleEditException {
+		SessionState sessionState = sessionManager.getSessionState();
+		CollectRecord activeRecord = sessionState.getActiveRecord();
+		if ( activeRecord == null ) {
+			User user = sessionState.getUser();
+			Integer userId = user.getId();
+			Integer lockedRecordId = recordManager.getLockedRecordId(userId);
+			if ( lockedRecordId != null ) {
+				throw new MultipleEditException("User is editing another record: " + lockedRecordId);
+			}
+		} else {
+			throw new MultipleEditException("User is editing another record");
+		}
 	}
 	
 	@Transactional
@@ -160,7 +191,6 @@ public class DataService {
 		record.setModifiedDate(new Date());
 		record.setModifiedBy(user);
 		recordManager.save(record);
-		sessionState.setActiveRecordState(RecordState.SAVED);
 	}
 
 	@Transactional
@@ -173,8 +203,8 @@ public class DataService {
 	}
 
 	@Transactional
-	public List<UpdateResponse> updateActiveRecord(String clientId, UpdateRequest request) throws RecordUnlockedException {
-		sessionManager.checkUserIsLockingActiveRecord(clientId);
+	public List<UpdateResponse> updateActiveRecord(String lockId, UpdateRequest request) throws RecordUnlockedException {
+		sessionManager.checkUserIsLockingActiveRecord(lockId);
 		List<UpdateRequestOperation> operations = request.getOperations();
 		List<UpdateResponse> updateResponses = new ArrayList<UpdateResponse>();
 		for (UpdateRequestOperation operation : operations) {
@@ -564,7 +594,7 @@ public class DataService {
 		SessionState sessionState = this.sessionManager.getSessionState();
 		CollectRecord activeRecord = sessionState.getActiveRecord();
 		User user = sessionState.getUser();
-		if(RecordState.SAVED == sessionState.getActiveRecordState()) {
+		if ( activeRecord != null && activeRecord.getId() != null ) {
 			this.recordManager.unlock(activeRecord, user);
 		}
 		this.sessionManager.clearActiveRecord();

@@ -17,10 +17,10 @@ import org.openforis.collect.model.FieldSymbol;
 import org.openforis.collect.model.RecordSummarySortField;
 import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.MissingRecordKeyException;
-import org.openforis.collect.persistence.MultipleEditException;
 import org.openforis.collect.persistence.RecordDao;
 import org.openforis.collect.persistence.RecordLockedException;
 import org.openforis.collect.persistence.RecordPersistenceException;
+import org.openforis.collect.persistence.UserDao;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
@@ -51,6 +51,9 @@ public class RecordManager {
 
 	@Autowired
 	private RecordDao recordDao;
+	
+	@Autowired
+	private UserDao userDao;
 	
 	protected void init() {
 		unlockAll();
@@ -86,14 +89,28 @@ public class RecordManager {
 	 * @param user
 	 * @param recordId
 	 * @return
-	 * @throws MultipleEditException 
+	 * @throws RecordLockedException 
 	 */
 	@Transactional
-	public CollectRecord checkout(CollectSurvey survey, User user, int recordId, int step, boolean forceUnlock) throws RecordPersistenceException {
-		recordDao.lock(recordId, user.getId(), forceUnlock);
-		CollectRecord record = recordDao.load(survey, recordId, step);
-		record.setLockedBy(user);
-		return record;
+	public CollectRecord checkout(CollectSurvey survey, User user, int recordId, int step, boolean forceUnlock) throws RecordLockedException {
+		Integer lockingUserId = recordDao.getLockingUserId(recordId);
+		Integer userId = user.getId();
+		if ( lockingUserId == null || lockingUserId == userId || forceUnlock ) {
+			String lockId = recordDao.lock(recordId, userId);
+			CollectRecord record = recordDao.load(survey, recordId, step);
+			record.setLockedBy(user);
+			record.setLockId(lockId);
+			return record;
+		} else {
+			User lockingUser = userDao.loadById(lockingUserId);
+			String lockingUserName = lockingUser.getName();
+			throw new RecordLockedException("Record already locked", lockingUserName);
+		}
+	}
+	
+	public boolean isLocking(int userId, int recordId, String lockId) {
+		boolean result = recordDao.isLocking(userId, recordId, lockId);
+		return result;
 	}
 	
 	@Transactional
@@ -106,6 +123,11 @@ public class RecordManager {
 	public Integer getLockingUserId(int recordId) {
 		Integer userId = recordDao.getLockingUserId(recordId);
 		return userId;
+	}
+	
+	public Integer getLockedRecordId(int userId) {
+		Integer id = recordDao.getLockedRecordId(userId);
+		return id;
 	}
 	
 	@Transactional
@@ -129,8 +151,6 @@ public class RecordManager {
 
 	@Transactional
 	public CollectRecord create(CollectSurvey survey, EntityDefinition rootEntityDefinition, User user, String modelVersionName) throws RecordPersistenceException {
-		recordDao.checkLock(user.getId());
-		
 		CollectRecord record = new CollectRecord(survey, modelVersionName);
 		record.createRootEntity(rootEntityDefinition.getName());
 		
