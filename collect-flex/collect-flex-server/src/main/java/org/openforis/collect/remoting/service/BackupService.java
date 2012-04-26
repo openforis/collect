@@ -127,7 +127,7 @@ public class BackupService {
 	private List<CollectRecord> getAllRecordSummaries(String rootEntityName) {
 		SessionState sessionState = sessionManager.getSessionState();
 		CollectSurvey survey = sessionState.getActiveSurvey();
-		List<CollectRecord> summaries = recordManager.loadSummaries(survey, rootEntityName, 0, Integer.MAX_VALUE, null, null);
+		List<CollectRecord> summaries = recordManager.loadSummaries(survey, rootEntityName, 0, Integer.MAX_VALUE, null);
 		return summaries;
 	}
 	
