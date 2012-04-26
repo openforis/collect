@@ -1,7 +1,6 @@
 package org.openforis.collect.remoting.service;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,8 +8,8 @@ import java.util.Map;
 import org.openforis.collect.manager.ConfigurationManager;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SessionManager;
-import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectRecord;
+import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.Configuration;
 import org.openforis.collect.model.User;
