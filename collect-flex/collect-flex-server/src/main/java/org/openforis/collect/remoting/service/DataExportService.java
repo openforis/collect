@@ -2,8 +2,6 @@ package org.openforis.collect.remoting.service;
 
 import java.io.File;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.openforis.collect.manager.ConfigurationManager;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SessionManager;
@@ -15,14 +13,6 @@ import org.openforis.collect.remoting.service.export.DataExportProcess;
 import org.openforis.collect.util.ExecutorServiceUtil;
 import org.openforis.collect.web.session.DataExportState;
 import org.openforis.collect.web.session.SessionState;
-import org.openforis.idm.metamodel.EntityDefinition;
-import org.openforis.idm.metamodel.Schema;
-import org.openforis.idm.metamodel.Survey;
-import org.openforis.idm.model.expression.InvalidExpressionException;
-import org.openforis.idm.transform.AutomaticColumnProvider;
-import org.openforis.idm.transform.ColumnProvider;
-import org.openforis.idm.transform.ColumnProviderChain;
-import org.openforis.idm.transform.DataTransformation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,7 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 public class DataExportService {
 
-	private static Log LOG = LogFactory.getLog(DataExportService.class);
+	//private static Log LOG = LogFactory.getLog(DataExportService.class);
 
 	@Autowired
 	private SessionManager sessionManager;
