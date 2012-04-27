@@ -37,10 +37,6 @@ public class FileDownloadController {
 	@Autowired
 	private ConfigurationManager configurationManager;
 	
-	public FileDownloadController() {
-		
-	}
-	
 	@RequestMapping(value = "/downloadDataExport.htm", method = RequestMethod.GET)
 	public @ResponseBody String downloadDataExport(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		try {
