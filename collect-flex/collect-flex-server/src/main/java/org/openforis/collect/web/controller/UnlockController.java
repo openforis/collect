@@ -41,14 +41,13 @@ public class UnlockController {
 				if(sessionState != null) {
 					CollectRecord activeRecord = sessionState.getActiveRecord();
 					if(activeRecord != null) {
-						recordManager.release(activeRecord);
+						Integer recordId = activeRecord.getId();
+						if ( recordId != null) {
+							recordManager.releaseLock(recordId);
+						}
 						//clear session state
 						sessionState.setActiveRecord(null);
-					} else {
-						//nothing to unlock
 					}
-				} else {
-					//session expired probably
 				}
 			}
 			return "ok";

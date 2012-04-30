@@ -121,9 +121,12 @@ public class DataService {
 	@Transactional
 	public RecordProxy createRecord(String rootEntityName, String versionName) throws RecordPersistenceException {
 		SessionState sessionState = sessionManager.getSessionState();
+		if ( sessionState.getActiveRecord() != null ) {
+			throw new MultipleEditException();
+		}
+		String sessionId = sessionState.getSessionId();
 		CollectSurvey activeSurvey = sessionState.getActiveSurvey();
 		User user = sessionState.getUser();
-		String sessionId = sessionState.getSessionId();
 		ModelVersion version = activeSurvey.getVersion(versionName);
 		Schema schema = activeSurvey.getSchema();
 		EntityDefinition rootEntityDefinition = schema.getRootEntityDefinition(rootEntityName);
@@ -143,6 +146,7 @@ public class DataService {
 	
 	@Transactional
 	public void saveActiveRecord() throws RecordPersistenceException {
+		sessionManager.checkIsLockingActiveRecord();
 		SessionState sessionState = sessionManager.getSessionState();
 		CollectRecord record = sessionState.getActiveRecord();
 		User user = sessionState.getUser();
@@ -153,7 +157,7 @@ public class DataService {
 
 	@Transactional
 	public List<UpdateResponse> updateActiveRecord(UpdateRequest request) throws RecordUnlockedException {
-		sessionManager.checkIsLocking();
+		sessionManager.checkIsLockingActiveRecord();
 		List<UpdateRequestOperation> operations = request.getOperations();
 		List<UpdateResponse> updateResponses = new ArrayList<UpdateResponse>();
 		for (UpdateRequestOperation operation : operations) {
@@ -513,7 +517,7 @@ public class DataService {
 		CollectRecord record = sessionState.getActiveRecord();
 		User user = sessionState.getUser();
 		recordManager.promote(record, user);
-		recordManager.release(record);
+		recordManager.releaseLock(record.getId());
 		sessionManager.clearActiveRecord();
 	}
 	
@@ -523,8 +527,9 @@ public class DataService {
 		CollectSurvey survey = sessionState.getActiveSurvey();
 		CollectRecord record = sessionState.getActiveRecord();
 		User user = sessionState.getUser();
-		recordManager.demote(survey, record.getId(), record.getStep(), user);
-		recordManager.release(record);
+		Integer recordId = record.getId();
+		recordManager.demote(survey, recordId, record.getStep(), user);
+		recordManager.releaseLock(recordId);
 		sessionManager.clearActiveRecord();
 	}
 
@@ -543,7 +548,7 @@ public class DataService {
 		SessionState sessionState = this.sessionManager.getSessionState();
 		CollectRecord activeRecord = sessionState.getActiveRecord();
 		if ( activeRecord != null && activeRecord.getId() != null ) {
-			this.recordManager.release(activeRecord);
+			this.recordManager.releaseLock(activeRecord.getId());
 		}
 		this.sessionManager.clearActiveRecord();
 	}

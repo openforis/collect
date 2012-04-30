@@ -84,11 +84,17 @@
 	<!-- Managers -->
 	<!-- ===================================== -->
 	<bean id="configurationManager" class="org.openforis.collect.manager.ConfigurationManager" init-method="init" />
+	<bean id="recordManager"		class="org.openforis.collect.manager.RecordManager" />
 	<bean id="sessionManager"		class="org.openforis.collect.manager.SessionManager" />
-	<bean id="surveyManager"		class="org.openforis.collect.manager.SurveyManager" init-method="init" />
-	<bean id="recordManager"		class="org.openforis.collect.manager.RecordManager" init-method="init" />
 	<bean id="speciesManager"		class="org.openforis.collect.manager.SpeciesManager" />
+	<bean id="surveyManager"		class="org.openforis.collect.manager.SurveyManager" init-method="init" />
 	<bean id="userManager"			class="org.openforis.collect.manager.UserManager" />
+
+	<!-- RecordLocker -->
+	<bean id="recordLocker"			class="org.openforis.collect.remoting.service.RecordLocker">
+		<property name="timeoutMillis" value="60000" />
+	</bean>
+	
 		
 <!-- 	<bean id="recordContext" class="org.openforis.collect.model.CollectRecordContext" /> -->
 	

@@ -8,15 +8,15 @@ package org.openforis.collect.model;
 public class RecordLock {
 
 	private String id;
-	private CollectRecord record;
+	private int recordId;
 	private User user;
 	private long lastHeartBeatTime;
 	private long timeoutMillis;
 	
-	public RecordLock(String id, CollectRecord record, User user, long timeoutMillis) {
+	public RecordLock(String id, int recordId, User user, long timeoutMillis) {
 		super();
 		this.id = id;
-		this.record = record;
+		this.recordId = recordId;
 		this.user = user;
 		this.timeoutMillis = timeoutMillis;
 		keepAlive();
@@ -36,16 +36,16 @@ public class RecordLock {
 		return id;
 	}
 
-	public CollectRecord getRecord() {
-		return record;
-	}
-
 	public User getUser() {
 		return user;
 	}
 
 	public long getTimeoutMillis() {
 		return timeoutMillis;
+	}
+
+	public int getRecordId() {
+		return recordId;
 	}
 	
 }

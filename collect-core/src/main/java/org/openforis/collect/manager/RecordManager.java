@@ -51,38 +51,38 @@ public class RecordManager {
 	
 	private static final QName LAYOUT_ANNOTATION = new QName("http://www.openforis.org/collect/3.0/ui", "layout");
 
-	private static final long LOCK_TIMEOUT_MILLIS = 70000;
-	
 	@Autowired
 	private RecordDao recordDao;
 	
+	@Autowired
 	private RecordLocker locker;
-	
-	protected void init() {
-		locker = new RecordLocker(LOCK_TIMEOUT_MILLIS);
-	}
 	
 	@Transactional
 	public void save(CollectRecord record, String lockId) throws RecordPersistenceException {
 		User user = record.getModifiedBy();
-		checkIsLocked(record, user, lockId);
-		
 		updateKeys(record);
 		record.updateEntityCounts();
 
 		Integer id = record.getId();
 		if(id == null) {
 			recordDao.insert(record);
-			locker.lock(record, user, lockId);
+			id = record.getId();
+			//todo fix: concurrency problem may occur..
+			if ( locker != null ) {
+				locker.lock(id, user, lockId);
+			}
 		} else {
+			if ( locker != null ) {
+				locker.checkIsLocked(id, user, lockId);
+			}
 			recordDao.update(record);
 		}
 	}
 
 	@Transactional
 	public void delete(int recordId) throws RecordPersistenceException {
-		if ( locker.isLocked(recordId) ) {
-			User lockingUser = locker.getLockingUser(recordId);
+		if ( locker != null && locker.isLocked(recordId) ) {
+			User lockingUser = locker.getLockUser(recordId);
 			throw new RecordLockedException(lockingUser.getName());
 		} else {
 			recordDao.delete(recordId);
@@ -103,9 +103,11 @@ public class RecordManager {
 	 * @throws MultipleEditException
 	 */
 	@Transactional
-	public CollectRecord checkout(CollectSurvey survey, User user, int recordId, int step, String lockId, boolean forceUnlock) throws RecordLockedException, MultipleEditException {
+	public synchronized CollectRecord checkout(CollectSurvey survey, User user, int recordId, int step, String lockId, boolean forceUnlock) throws RecordLockedException, MultipleEditException {
 		CollectRecord record = recordDao.load(survey, recordId, step);
-		locker.lock(record, user, lockId, forceUnlock);
+		if ( locker != null ) {
+			locker.lock(record.getId(), user, lockId, forceUnlock);
+		}
 		return record;
 	}
 	
@@ -141,7 +143,6 @@ public class RecordManager {
 		record.setCreationDate(new Date());
 		record.setCreatedBy(user);
 		record.setStep(Step.ENTRY);
-		locker.lock(record, user, lockId);
 		return record;
 	}
 
@@ -396,28 +397,25 @@ public class RecordManager {
 		}
 	}
 
-	public void release(CollectRecord record) {
-		if ( record != null ) {
-			locker.release(record);
+	public synchronized void releaseLock(int recordId) {
+		if ( locker != null ) {
+			locker.release(recordId);
 		}
 	}
 	
-	public CollectRecord getLockedRecord(String lockId) {
-		return locker.getLockedRecord(lockId);
-	}
-	
-	/**
-	 * Check if the record is locked by the specified and 
-	 * throws an exception it is has been unlocked by another user.
-	 * 
-	 * @param record
-	 * @param userId
-	 * @param lockId
-	 * @throws RecordUnlockedException
-	 */
-	public void checkIsLocked(CollectRecord record, User user, String lockId)
-			throws RecordUnlockedException {
-		locker.checkIsLocked(record, user, lockId);
+	public int getLockRecord(String lockId) {
+		if ( locker != null ) {
+			return locker.getLockRecordId(lockId);
+		} else {
+			throw new IllegalArgumentException("Locker not initialized");
+		}
 	}
 
+	public void checkIsLocked(int recordId, User user, String lockId) throws RecordUnlockedException {
+		if ( locker != null ) {
+			locker.checkIsLocked(recordId, user, lockId);
+		}
+	}
+	
 }
+

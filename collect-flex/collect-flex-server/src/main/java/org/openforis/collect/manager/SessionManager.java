@@ -16,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 
@@ -59,7 +58,7 @@ public class SessionManager {
 			LOG.debug("Keep alive request received");
 		}
 	}
-
+	
 	public void setLocale(String string) {
 		StringTokenizer stringTokenizer = new StringTokenizer(string, "_");
 		int tokens = stringTokenizer.countTokens();
@@ -76,20 +75,23 @@ public class SessionManager {
 		sessionState.setLocale(locale);
 	}
 
-	@Transactional
-	public void checkIsLocking() throws RecordUnlockedException {
+	public void checkIsLockingActiveRecord() throws RecordUnlockedException {
 		SessionState sessionState = getSessionState();
 		CollectRecord record = sessionState.getActiveRecord();
 		User user = sessionState.getUser();
 		String lockId = sessionState.getSessionId();
-		try {
-			recordManager.checkIsLocked(record, user, lockId);
-		} catch (RecordUnlockedException e) {
-			clearActiveRecord();
-			throw e;
+		if ( record == null ) {
+			throw new RecordUnlockedException();
+		} else if ( record.getId() != null ) {
+			try {
+				recordManager.checkIsLocked(record.getId(), user, lockId);
+			} catch (RecordUnlockedException e) {
+				clearActiveRecord();
+				throw e;
+			}
 		}
 	}
-
+	
 	private User getLoggedInUser() {
 		SessionState sessionState = (SessionState) getSessionAttribute(SessionState.SESSION_ATTRIBUTE_NAME);
 		if (sessionState != null) {
