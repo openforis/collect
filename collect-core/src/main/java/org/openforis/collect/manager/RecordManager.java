@@ -399,18 +399,10 @@ public class RecordManager {
 
 	public synchronized void releaseLock(int recordId) {
 		if ( locker != null ) {
-			locker.release(recordId);
+			locker.releaseLock(recordId);
 		}
 	}
 	
-	public int getLockRecord(String lockId) {
-		if ( locker != null ) {
-			return locker.getLockRecordId(lockId);
-		} else {
-			throw new IllegalArgumentException("Locker not initialized");
-		}
-	}
-
 	public void checkIsLocked(int recordId, User user, String lockId) throws RecordUnlockedException {
 		if ( locker != null ) {
 			locker.checkIsLocked(recordId, user, lockId);

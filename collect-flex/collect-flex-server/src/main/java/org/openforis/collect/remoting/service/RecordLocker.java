@@ -57,7 +57,7 @@ public class RecordLocker implements org.openforis.collect.model.RecordLocker {
 	 * @see org.openforis.collect.web.session.RecordLocker#release(org.openforis.collect.model.CollectRecord)
 	 */
 	@Override
-	public synchronized void release(int recordId) {
+	public synchronized void releaseLock(int recordId) {
 		RecordLock lock = getLock(recordId);
 		if ( lock != null ) {
 			locks.remove(recordId);
@@ -143,15 +143,6 @@ public class RecordLocker implements org.openforis.collect.model.RecordLocker {
 	public synchronized User getLockUser(int recordId) {
 		RecordLock lock = getLockByRecordId(recordId);
 		return lock != null ? lock.getUser(): null;
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.openforis.collect.web.session.RecordLocker#getLockRecord(java.lang.String)
-	 */
-	@Override
-	public synchronized int getLockRecordId(String lockId) {
-		RecordLock lock = getLock(lockId);
-		return lock != null ? lock.getRecordId(): null;
 	}
 	
 	private synchronized RecordLock getLock(int recordId) {
