@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 
 import javax.activation.MimetypesFileTypeMap;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -13,13 +14,10 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openforis.collect.manager.ConfigurationManager;
 import org.openforis.collect.model.CollectSurvey;
-import org.openforis.collect.model.Configuration;
 import org.openforis.collect.model.User;
 import org.openforis.collect.remoting.service.export.DataExportState;
 import org.openforis.collect.web.session.SessionState;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -32,10 +30,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
  */
 @Controller
 public class FileDownloadController {
+
+	private static final String BACKUP_PATH = "backup";
+	private static final String EXPORT_PATH = "export";
+
 	private static Log LOG = LogFactory.getLog(FileDownloadController.class);
-	
-	@Autowired
-	private ConfigurationManager configurationManager;
 	
 	@RequestMapping(value = "/downloadDataExport.htm", method = RequestMethod.GET)
 	public @ResponseBody String downloadDataExport(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -78,26 +77,26 @@ public class FileDownloadController {
 	}
 
 	private String buildDataExportFilePath(HttpServletRequest request) {
+		ServletContext context = request.getSession().getServletContext();
+		String exportRealPath = context.getRealPath(EXPORT_PATH);
 		SessionState sessionState = getSessionState(request);
 		User user = sessionState.getUser();
 		String userName = user.getName();
-		Configuration configuration = configurationManager.getConfiguration();
-		String exportPath = configuration.get("export_path");
 		String fileName = "data.zip";
-		String path = exportPath + File.separator + userName + File.separator + fileName;
+		String path = exportRealPath + File.separator + userName + File.separator + fileName;
 		return path;
 	}
 
 	private String buildBackupFilePath(HttpServletRequest request, String rootEntityName) {
+		ServletContext context = request.getSession().getServletContext();
+		String backupRealPath = context.getRealPath(BACKUP_PATH);
 		SessionState sessionState = getSessionState(request);
 		CollectSurvey survey = sessionState.getActiveSurvey();
 		User user = sessionState.getUser();
 		String surveyName = survey.getName();
 		String userName = user.getName();
-		Configuration configuration = configurationManager.getConfiguration();
-		String backupPath = configuration.get("backup_path");
 		String fileName = surveyName +  "_" + rootEntityName + "_" + userName + ".zip";
-		String path = backupPath + File.separator + fileName;
+		String path = backupRealPath + File.separator + fileName;
 		return path;
 	}
 

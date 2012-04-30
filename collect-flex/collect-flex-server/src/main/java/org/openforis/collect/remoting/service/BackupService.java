@@ -5,13 +5,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.openforis.collect.manager.ConfigurationManager;
+import javax.servlet.ServletContext;
+
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
-import org.openforis.collect.model.Configuration;
 import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.xml.DataMarshaller;
 import org.openforis.collect.remoting.service.backup.BackupProcess;
@@ -26,8 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class BackupService {
 
-	@Autowired
-	private ConfigurationManager configurationManager;
+	private static final String BACKUP_PATH = "backup";
 	
 	@Autowired
 	private SessionManager sessionManager;
@@ -38,6 +37,9 @@ public class BackupService {
 	@Autowired
 	private DataMarshaller dataMarshaller;
 	
+	@Autowired 
+	private ServletContext servletContext;
+	
 	private File backupDirectory;
 	
 	private Map<Integer, Map<String, BackupProcess>> backups;
@@ -47,12 +49,13 @@ public class BackupService {
 	}
 	
 	public void init() {
-		Configuration configuration = configurationManager.getConfiguration();
-		String backupPath = configuration.get("backup_path");
-	
-		backupDirectory = new File(backupPath);
-		if ( ! backupDirectory.exists() || ! backupDirectory.canRead() ) {
-			throw new IllegalStateException("Cannot access backup directory. Check the configuration.");
+		String backupRealPath = servletContext.getRealPath(BACKUP_PATH);
+		backupDirectory = new File(backupRealPath);
+		if ( ! backupDirectory.exists() ) {
+			backupDirectory.mkdirs();
+			if (! backupDirectory.canRead() ) {
+				throw new IllegalStateException("Cannot access backup directory. Check the configuration.");
+			}
 		}
 	}
 	

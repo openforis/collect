@@ -4,13 +4,11 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -110,8 +108,8 @@ public class BackupProcess implements Callable<Void> {
 		try {
 			int stepNumber = step.getStepNumber();
 			CollectRecord record = recordManager.load(survey, id, stepNumber);
-			String keys = getKeys(record);
-			ZipEntry entry = new ZipEntry(stepNumber + File.separator + keys + File.separator + "data.xml");
+			String entryFileName = buildEntryFileName(record, stepNumber);
+			ZipEntry entry = new ZipEntry(entryFileName);
 			zipOutputStream.putNextEntry(entry);
 			OutputStreamWriter writer = new OutputStreamWriter(zipOutputStream);
 			dataMarshaller.write(record, writer);
@@ -137,6 +135,10 @@ public class BackupProcess implements Callable<Void> {
 		finish();
 	}
 	
+	private String buildEntryFileName(CollectRecord record, int stepNumber) {
+		return stepNumber + File.separator + record.getId() + ".xml";
+	}
+	
 	private String buildFileName() {
 		String surveyName = survey.getName();
 		String fileName = surveyName +  "_" + rootEntityName + "_" + user.getName() + ".zip";
@@ -146,19 +148,6 @@ public class BackupProcess implements Callable<Void> {
 	private void finish() {
 		this.active = false;
 	}
-	
-	private String getKeys(CollectRecord record) {
-		List<String> keyValues = record.getRootEntityKeyValues();
-		List<String> notEmptyKeyValues = new ArrayList<String>();
-		for (String key : keyValues) {
-			if ( StringUtils.isNotBlank(key)) {
-				notEmptyKeyValues.add(key);
-			}
-		}
-		String keys = StringUtils.join(notEmptyKeyValues, " - ");
-		return keys;
-	}
-	
 	
 	@Override
 	public int hashCode() {
