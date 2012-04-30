@@ -14,13 +14,15 @@ import org.openforis.collect.model.CollectRecord.State;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.FieldSymbol;
+import org.openforis.collect.model.RecordLocker;
 import org.openforis.collect.model.RecordSummarySortField;
 import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.MissingRecordKeyException;
+import org.openforis.collect.persistence.MultipleEditException;
 import org.openforis.collect.persistence.RecordDao;
 import org.openforis.collect.persistence.RecordLockedException;
 import org.openforis.collect.persistence.RecordPersistenceException;
-import org.openforis.collect.persistence.UserDao;
+import org.openforis.collect.persistence.RecordUnlockedException;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
@@ -49,37 +51,42 @@ public class RecordManager {
 	
 	private static final QName LAYOUT_ANNOTATION = new QName("http://www.openforis.org/collect/3.0/ui", "layout");
 
+	private static final long LOCK_TIMEOUT_MILLIS = 70000;
+	
 	@Autowired
 	private RecordDao recordDao;
 	
-	@Autowired
-	private UserDao userDao;
+	private RecordLocker locker;
 	
 	protected void init() {
-		unlockAll();
+		locker = new RecordLocker(LOCK_TIMEOUT_MILLIS);
 	}
 	
 	@Transactional
-	public void save(CollectRecord record) throws RecordPersistenceException {
+	public void save(CollectRecord record, String lockId) throws RecordPersistenceException {
+		User user = record.getModifiedBy();
+		checkIsLocked(record, user, lockId);
+		
 		updateKeys(record);
-		
 		record.updateEntityCounts();
-		
+
 		Integer id = record.getId();
 		if(id == null) {
 			recordDao.insert(record);
-			User user = record.getModifiedBy();
-			id = record.getId();
-			recordDao.lock(id, user.getId());
+			locker.lock(record, user, lockId);
 		} else {
 			recordDao.update(record);
 		}
 	}
 
 	@Transactional
-	public void delete(int recordId, User user) throws RecordPersistenceException {
-		recordDao.lock(recordId, user.getId());
-		recordDao.delete(recordId);
+	public void delete(int recordId) throws RecordPersistenceException {
+		if ( locker.isLocked(recordId) ) {
+			User lockingUser = locker.getLockingUser(recordId);
+			throw new RecordLockedException(lockingUser.getName());
+		} else {
+			recordDao.delete(recordId);
+		}
 	}
 
 	/**
@@ -88,46 +95,24 @@ public class RecordManager {
 	 * @param survey
 	 * @param user
 	 * @param recordId
+	 * @param step
+	 * @param lockId
+	 * @param forceUnlock
 	 * @return
-	 * @throws RecordLockedException 
+	 * @throws RecordLockedException
+	 * @throws MultipleEditException
 	 */
 	@Transactional
-	public CollectRecord checkout(CollectSurvey survey, User user, int recordId, int step, boolean forceUnlock) throws RecordLockedException {
-		Integer lockingUserId = recordDao.getLockingUserId(recordId);
-		Integer userId = user.getId();
-		if ( lockingUserId == null || lockingUserId == userId || forceUnlock ) {
-			String lockId = recordDao.lock(recordId, userId);
-			CollectRecord record = recordDao.load(survey, recordId, step);
-			record.setLockedBy(user);
-			record.setLockId(lockId);
-			return record;
-		} else {
-			User lockingUser = userDao.loadById(lockingUserId);
-			String lockingUserName = lockingUser.getName();
-			throw new RecordLockedException("Record already locked", lockingUserName);
-		}
-	}
-	
-	public boolean isLocking(int userId, int recordId, String lockId) {
-		boolean result = recordDao.isLocking(userId, recordId, lockId);
-		return result;
+	public CollectRecord checkout(CollectSurvey survey, User user, int recordId, int step, String lockId, boolean forceUnlock) throws RecordLockedException, MultipleEditException {
+		CollectRecord record = recordDao.load(survey, recordId, step);
+		locker.lock(record, user, lockId, forceUnlock);
+		return record;
 	}
 	
 	@Transactional
 	public CollectRecord load(CollectSurvey survey, int recordId, int step) throws RecordPersistenceException {
 		CollectRecord record = recordDao.load(survey, recordId, step);
 		return record;
-	}
-	
-	@Transactional
-	public Integer getLockingUserId(int recordId) {
-		Integer userId = recordDao.getLockingUserId(recordId);
-		return userId;
-	}
-	
-	public Integer getLockedRecordId(int userId) {
-		Integer id = recordDao.getLockedRecordId(userId);
-		return id;
 	}
 	
 	@Transactional
@@ -150,25 +135,14 @@ public class RecordManager {
 	}
 
 	@Transactional
-	public CollectRecord create(CollectSurvey survey, EntityDefinition rootEntityDefinition, User user, String modelVersionName) throws RecordPersistenceException {
+	public CollectRecord create(CollectSurvey survey, EntityDefinition rootEntityDefinition, User user, String modelVersionName, String lockId) throws RecordPersistenceException {
 		CollectRecord record = new CollectRecord(survey, modelVersionName);
 		record.createRootEntity(rootEntityDefinition.getName());
-		
 		record.setCreationDate(new Date());
 		record.setCreatedBy(user);
 		record.setStep(Step.ENTRY);
+		locker.lock(record, user, lockId);
 		return record;
-	}
-
-	@Transactional
-	public void unlock(CollectRecord record, User user) throws RecordLockedException {
-		recordDao.unlock(record.getId(), user);
-		record.setLockedBy(null);
-	}
-
-	@Transactional
-	public void unlockAll() {
-		recordDao.unlockAll();
 	}
 
 	@Transactional
@@ -421,5 +395,29 @@ public class RecordManager {
 			throw new MissingRecordKeyException();
 		}
 	}
+
+	public void release(CollectRecord record) {
+		if ( record != null ) {
+			locker.release(record);
+		}
+	}
 	
+	public CollectRecord getLockedRecord(String lockId) {
+		return locker.getLockedRecord(lockId);
+	}
+	
+	/**
+	 * Check if the record is locked by the specified and 
+	 * throws an exception it is has been unlocked by another user.
+	 * 
+	 * @param record
+	 * @param userId
+	 * @param lockId
+	 * @throws RecordUnlockedException
+	 */
+	public void checkIsLocked(CollectRecord record, User user, String lockId)
+			throws RecordUnlockedException {
+		locker.checkIsLocked(record, user, lockId);
+	}
+
 }

@@ -33,6 +33,10 @@ public class User {
 	public void addRole(String role) {
 		roles.add(role);
 	}
+	
+	public boolean hasRole(String role) {
+		return roles.contains(role);
+	}
 
 	/**
 	 * Returns an unmodifiable list of user roles

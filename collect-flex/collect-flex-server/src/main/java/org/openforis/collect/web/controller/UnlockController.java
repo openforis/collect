@@ -7,7 +7,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.model.CollectRecord;
-import org.openforis.collect.model.User;
 import org.openforis.collect.web.session.SessionState;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -41,9 +40,8 @@ public class UnlockController {
 				SessionState sessionState = (SessionState) session.getAttribute(SessionState.SESSION_ATTRIBUTE_NAME);
 				if(sessionState != null) {
 					CollectRecord activeRecord = sessionState.getActiveRecord();
-					if(activeRecord != null && activeRecord.getId() != null) {
-						User user = sessionState.getUser();
-						recordManager.unlock(activeRecord, user);
+					if(activeRecord != null) {
+						recordManager.release(activeRecord);
 						//clear session state
 						sessionState.setActiveRecord(null);
 					} else {

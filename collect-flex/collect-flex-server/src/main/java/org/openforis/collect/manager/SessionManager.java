@@ -77,32 +77,19 @@ public class SessionManager {
 	}
 
 	@Transactional
-	public void checkUserIsLockingActiveRecord(String lockId) throws RecordUnlockedException {
+	public void checkIsLocking() throws RecordUnlockedException {
 		SessionState sessionState = getSessionState();
 		CollectRecord record = sessionState.getActiveRecord();
 		User user = sessionState.getUser();
-		Integer userId = user.getId();
-		if ( record != null && record.getId() != null) {
-			Integer recordId = record.getId();
-			//verify that the record has not been unlocked
-			boolean isLocking = recordManager.isLocking(userId, recordId, lockId);
-			if( ! isLocking ) {
-				Integer lockingUserId = recordManager.getLockingUserId(recordId);
-				if ( lockingUserId != userId ) {
-					clearActiveRecord();
-				}
-				String lockingUserName = null;
-				if(lockingUserId != null) {
-					User lockingUser = userManager.loadById(lockingUserId);
-					lockingUserName = lockingUser.getName();
-					throw new RecordUnlockedException(lockingUserName);
-				} else {
-					throw new RecordUnlockedException();
-				}
-			}
+		String lockId = sessionState.getSessionId();
+		try {
+			recordManager.checkIsLocked(record, user, lockId);
+		} catch (RecordUnlockedException e) {
+			clearActiveRecord();
+			throw e;
 		}
 	}
-	
+
 	private User getLoggedInUser() {
 		SessionState sessionState = (SessionState) getSessionAttribute(SessionState.SESSION_ATTRIBUTE_NAME);
 		if (sessionState != null) {

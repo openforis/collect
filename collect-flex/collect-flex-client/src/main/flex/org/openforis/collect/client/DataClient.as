@@ -82,8 +82,7 @@ package org.openforis.collect.client {
 		}
 		
 		public function updateActiveRecord(request:UpdateRequest, resultHandler:Function = null, faultHandler:Function = null):void {
-			var record:RecordProxy = Application.activeRecord;
-			this._queueProcessor.appendOperation(request, resultHandler, faultHandler, _updateActiveRecordOperation, record.lockId, request);
+			this._queueProcessor.appendOperation(request, resultHandler, faultHandler, _updateActiveRecordOperation, request);
 		}
 		
 		public function isLockingActiveRecord(responder:IResponder):void {

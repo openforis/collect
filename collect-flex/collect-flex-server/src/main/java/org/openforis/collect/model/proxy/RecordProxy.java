@@ -68,11 +68,6 @@ public class RecordProxy implements Proxy {
 	}
 	
 	@ExternalizedProperty
-	public String getLockId() {
-		return record.getLockId();
-	}
-
-	@ExternalizedProperty
 	public EntityProxy getRootEntity() {
 		if(record.getRootEntity() != null) {
 			return new EntityProxy(null, record.getRootEntity());
@@ -143,6 +138,4 @@ public class RecordProxy implements Proxy {
 		return record.getWarnings();
 	}
 
-	
-	
 }

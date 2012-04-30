@@ -8,7 +8,6 @@ import static org.openforis.collect.persistence.jooq.Tables.OFC_USER;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jooq.Field;
@@ -18,7 +17,6 @@ import org.jooq.SelectQuery;
 import org.jooq.SimpleSelectQuery;
 import org.jooq.StoreQuery;
 import org.jooq.TableField;
-import org.jooq.impl.Factory;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.State;
 import org.openforis.collect.model.CollectRecord.Step;
@@ -51,7 +49,7 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 		{OFC_RECORD.COUNT1, OFC_RECORD.COUNT2, OFC_RECORD.COUNT3, OFC_RECORD.COUNT4, OFC_RECORD.COUNT5};
 	private static final TableField[] SUMMARY_FIELDS = 
 		{OFC_RECORD.DATE_CREATED, OFC_RECORD.CREATED_BY_ID, OFC_RECORD.DATE_MODIFIED, OFC_RECORD.ERRORS, OFC_RECORD.ID, 
-	     OFC_RECORD.LOCKED_BY_ID, OFC_RECORD.MISSING, OFC_RECORD.MODEL_VERSION, OFC_RECORD.MODIFIED_BY_ID, 
+	     OFC_RECORD.MISSING, OFC_RECORD.MODEL_VERSION, OFC_RECORD.MODIFIED_BY_ID, 
 	     OFC_RECORD.ROOT_ENTITY_DEFINITION_ID,	OFC_RECORD.SKIPPED,	OFC_RECORD.STATE, OFC_RECORD.STEP,
 	     OFC_RECORD.WARNINGS, OFC_RECORD.KEY1, OFC_RECORD.KEY2, OFC_RECORD.KEY3, OFC_RECORD.COUNT1,
 	     OFC_RECORD.COUNT2, OFC_RECORD.COUNT3, OFC_RECORD.COUNT4, OFC_RECORD.COUNT5};
@@ -97,94 +95,6 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 		Record r = q.fetchOne();
 		return r.getValueAsInteger(0);
 	}
-	
-	/**
-	 * 
-	 * @param recordId
-	 * @param userId
-	 * @return lockId generated using UUID
-	 */
-	@Transactional
-	public String lock(Integer recordId, int userId) {
-		Factory jf = getJooqFactory();
-		String lockId = UUID.randomUUID().toString();
-		jf.update(OFC_RECORD)
-		  .set(OFC_RECORD.LOCKED_BY_ID, userId)
-		  .set(OFC_RECORD.LOCK_ID, lockId)
-		  .where(OFC_RECORD.ID.equal(recordId))
-		  .execute();
-		return lockId;
-	}
-	
-	@Transactional
-	public boolean isLocking(int userId, int recordId, String lockId) {
-		Factory jf = getJooqFactory();
-		Record r = jf.select(OFC_RECORD.ID).from(OFC_RECORD).where(OFC_RECORD.LOCKED_BY_ID.equal(userId).and(OFC_RECORD.LOCK_ID.equal(lockId))).fetchAny();
-		if(r != null){
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	@Transactional
-	public Integer getLockingUserId(int recordId) {
-		Factory jf = getJooqFactory();
-		Record r = jf.select(OFC_RECORD.LOCKED_BY_ID).from(OFC_RECORD).where(OFC_RECORD.ID.equal(recordId)).fetchAny();
-		if(r != null){
-			return r.getValueAsInteger(OFC_RECORD.LOCKED_BY_ID);
-		} else {
-			return null;
-		}
-	}
-	
-	@Transactional
-	public Integer getLockedRecordId(int userId) {
-		Factory jf = getJooqFactory();
-		Integer id = getLockedRecordId(jf, userId);
-		return id;
-	}
-	
-	private Integer getLockedRecordId(Factory jf, int userId) {
-		Record r = jf.select(OFC_RECORD.ID).from(OFC_RECORD).where(OFC_RECORD.LOCKED_BY_ID.equal(userId)).fetchAny();
-		if(r != null){
-			Integer id = r.getValueAsInteger(OFC_RECORD.ID);
-			return id;
-		} else {
-			return null;
-		}
-	}
-
-	@Transactional
-	public void unlock(int recordId, User user) throws RecordLockedException {
-		Factory jf = getJooqFactory();
-		Record selectResult = jf
-				.select(OFC_RECORD.LOCKED_BY_ID, OFC_USER.USERNAME)
-				.from(OFC_RECORD)
-				.leftOuterJoin(OFC_USER).on(OFC_RECORD.LOCKED_BY_ID.equal(OFC_USER.ID))
-				.where(OFC_RECORD.ID.equal(recordId))
-				.fetchOne();
-		Integer lockedById = selectResult.getValueAsInteger(OFC_RECORD.LOCKED_BY_ID);
-		if (lockedById != null) {
-			if(lockedById.equals(user.getId())) {
-				jf.update(OFC_RECORD).set(OFC_RECORD.LOCKED_BY_ID, (Integer)null).where(OFC_RECORD.ID.equal(recordId)).execute();
-			} else {
-				String userName = selectResult.getValueAsString(OFC_USER.USERNAME);
-				throw new RecordLockedException("Record locked by another user", userName);
-			}
-		} else {
-			//no action
-		}
-	}
-
-	@Transactional
-	public void unlockAll() {
-		Factory jf = getJooqFactory();
-		jf.update(OFC_RECORD)
-		  .set(OFC_RECORD.LOCKED_BY_ID, (Integer) null)
-		  .execute();
-	}
-	
 	
 	/**
 	 * Load a list of record summaries that match the primary keys
@@ -404,11 +314,6 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 				User user = loadUser(modifiedById);
 				c.setModifiedBy(user);
 			}
-			Integer lockedById = r.getValue(OFC_RECORD.LOCKED_BY_ID);
-			if(lockedById !=null){
-				User user = loadUser(lockedById);
-				c.setLockedBy(user);
-			}
 			c.setWarnings(r.getValue(OFC_RECORD.WARNINGS));
 			c.setErrors(r.getValue(OFC_RECORD.ERRORS));
 			c.setSkipped(r.getValue(OFC_RECORD.SKIPPED));
@@ -477,9 +382,6 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 			q.addValue(OFC_RECORD.DATE_MODIFIED, toTimestamp(record.getModifiedDate()));
 			if (record.getModifiedBy() != null) {
 				q.addValue(OFC_RECORD.MODIFIED_BY_ID, record.getModifiedBy().getId());
-			}
-			if (record.getLockedBy() != null) {
-				q.addValue(OFC_RECORD.LOCKED_BY_ID, record.getLockedBy().getId());
 			}
 			q.addValue(OFC_RECORD.MODEL_VERSION, record.getVersion().getName());
 			q.addValue(OFC_RECORD.STEP, record.getStep().getStepNumber());
