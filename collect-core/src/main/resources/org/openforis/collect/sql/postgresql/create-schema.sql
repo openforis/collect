@@ -52,6 +52,7 @@ CREATE TABLE "collect"."ofc_record"  (
 	"step"                     	integer NULL,
 	"state"                    	char(1) NULL,
 	"locked_by_id"             	integer NULL,
+	"lock_id"                  	varchar(50) NULL,
 	"skipped"                  	integer NULL,
 	"missing"                  	integer NULL,
 	"errors"                   	integer NULL,

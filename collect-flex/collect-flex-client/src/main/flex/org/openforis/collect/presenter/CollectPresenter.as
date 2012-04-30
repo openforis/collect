@@ -52,9 +52,6 @@ package org.openforis.collect.presenter {
 		public function CollectPresenter(view:collect) {
 			super();
 			
-			//generate client id
-			Application.clientId = Math.random().toString();
-			
 			this._view = view;
 			this._modelClient = ClientFactory.modelClient;
 			this._sessionClient = ClientFactory.sessionClient;

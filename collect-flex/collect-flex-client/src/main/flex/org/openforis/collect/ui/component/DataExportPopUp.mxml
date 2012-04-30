@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx"
+		 xmlns:component="org.openforis.collect.ui.component.*"
+		 width="400" height="300"
+		 title="{Message.get('export.popUp.title')}"
+		 >
+	
+	<fx:Script>
+		<![CDATA[
+			import org.openforis.collect.i18n.Message;
+			
+			public static const STATE_DEFAULT:String = "default";
+			public static const STATE_EXPORTING:String = "exporting";
+			public static const STATE_COMPLETE:String = "complete";
+			
+		]]>
+	</fx:Script>
+	
+	<fx:Script>
+		<![CDATA[
+			import org.openforis.collect.presenter.DataExportPopUpPresenter;
+			
+			private var _presenter:DataExportPopUpPresenter;
+
+			override protected function initializationComplete():void {
+				super.initializationComplete();
+				_presenter = new DataExportPopUpPresenter(this);
+			}
+		]]>
+	</fx:Script>
+	
+	<s:states>
+		<s:State name="default" />
+		<s:State name="exporting" />
+		<s:State name="complete" />
+	</s:states>
+	
+	<s:VGroup includeIn="default" 
+			  itemCreationPolicy="immediate"
+			  width="100%" height="100%"
+			  horizontalAlign="center">
+		
+		<s:VGroup width="100%" height="100%">
+			<s:Label text="{Message.get('export.entitySelectionLabel')}" />
+			
+			<mx:Tree id="rootTree"
+					 height="100%"
+					 width="100%"
+					 />
+		</s:VGroup>
+		
+		<s:HGroup>
+			<s:Button id="exportButton" label="{Message.get('export.exportLabel')}" />
+		</s:HGroup>
+	</s:VGroup>
+		
+	<s:VGroup includeIn="exporting" 
+			  itemCreationPolicy="immediate"
+			  width="100%" height="100%"
+			  horizontalAlign="center"
+			  verticalAlign="middle"
+			  gap="30">
+		<mx:ProgressBar id="progressBar"
+						horizontalCenter="0"
+						verticalCenter="0"
+						mode="manual"
+						label="%3%"
+						labelPlacement="center"
+						width="80%"
+						/>
+		
+		<s:Label id="progressLabel" />
+
+		<s:Button id="cancelButton"
+				  label="{Message.get('global.cancel')}"
+				  />
+	</s:VGroup>
+		
+	<s:VGroup includeIn="complete" itemCreationPolicy="immediate"
+			 height="100%" width="100%"
+			 horizontalAlign="center"
+			 verticalAlign="middle"
+			 gap="20"
+			 >
+		<s:Label text="{Message.get('export.complete')}" />
+		
+		<s:Button id="downloadButton" 
+				  label="{Message.get('global.download')}" />
+	</s:VGroup>
+	
+</s:TitleWindow>

@@ -11,6 +11,7 @@ package org.openforis.collect.client {
 	import org.openforis.collect.model.CollectRecord$Step;
 	import org.openforis.collect.model.proxy.FieldProxy;
 	import org.openforis.collect.remoting.service.UpdateRequest;
+	import org.openforis.collect.model.proxy.RecordProxy;
 	
 	/**
 	 * 
@@ -51,7 +52,7 @@ package org.openforis.collect.client {
 		}
 		
 		public function createNewRecord(responder:IResponder, rootEntityName:String, versionName:String):void {
-			var token:AsyncToken = this._createRecordOperation.send(rootEntityName, versionName, Application.clientId);
+			var token:AsyncToken = this._createRecordOperation.send(rootEntityName, versionName);
 			token.addResponder(responder);
 		}
 		
@@ -71,7 +72,7 @@ package org.openforis.collect.client {
 		
 		public function loadRecord(responder:IResponder, id:int, step:CollectRecord$Step, forceUnlock:Boolean = false):void {
 			var stepNumber:int = getRecordStepNumber(step);
-			var token:AsyncToken = this._loadRecordOperation.send(id, stepNumber, forceUnlock, Application.clientId);
+			var token:AsyncToken = this._loadRecordOperation.send(id, stepNumber, forceUnlock);
 			token.addResponder(responder);
 		}
 		
@@ -81,7 +82,8 @@ package org.openforis.collect.client {
 		}
 		
 		public function updateActiveRecord(request:UpdateRequest, resultHandler:Function = null, faultHandler:Function = null):void {
-			this._queueProcessor.appendOperation(request, resultHandler, faultHandler, _updateActiveRecordOperation, Application.clientId, request);
+			var record:RecordProxy = Application.activeRecord;
+			this._queueProcessor.appendOperation(request, resultHandler, faultHandler, _updateActiveRecordOperation, record.lockId, request);
 		}
 		
 		public function isLockingActiveRecord(responder:IResponder):void {

@@ -60,12 +60,8 @@
 	</fx:Script>
 	
 	<s:states>
-		<s:State name="default">
-			
-		</s:State>
-		<s:State name="messageIconVisible">
-			
-		</s:State>
+		<s:State name="default" />
+		<s:State name="messageIconVisible" />
 	</s:states>
 	
 	<s:HGroup>

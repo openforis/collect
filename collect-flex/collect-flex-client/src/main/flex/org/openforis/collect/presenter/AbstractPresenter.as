@@ -4,7 +4,6 @@ package org.openforis.collect.presenter {
 	import flash.net.URLRequest;
 	import flash.net.navigateToURL;
 	
-	import mx.controls.Alert;
 	import mx.rpc.events.FaultEvent;
 	
 	import org.openforis.collect.Application;
@@ -14,6 +13,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.ui.Images;
 	import org.openforis.collect.ui.component.BlockingMessagePopUp;
 	import org.openforis.collect.util.AlertUtil;
+	import org.openforis.collect.util.ApplicationConstants;
 	import org.openforis.collect.util.StringUtil;
 
 	/**
@@ -35,7 +35,7 @@ package org.openforis.collect.presenter {
 			var faultCode:String = event.fault.faultCode;
 			switch(faultCode) {
 				case "org.openforis.collect.web.session.InvalidSessionException":
-					var u:URLRequest = new URLRequest(Application.URL +"login.htm?session_expired=1");
+					var u:URLRequest = new URLRequest(ApplicationConstants.URL +"login.htm?session_expired=1");
 					Application.activeRecord = null;
 					navigateToURL(u,"_self");
 					break;

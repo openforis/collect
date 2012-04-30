@@ -141,6 +141,7 @@ public class SurveyDao extends JooqDaoSupport {
 			String idml = row.getValueAsString(OFC_SURVEY.IDML);
 			CollectSurvey survey = (CollectSurvey) unmarshalIdml(idml);
 			survey.setId(row.getValueAsInteger(OFC_SURVEY.ID));
+			survey.setName(row.getValue(OFC_SURVEY.NAME));
 			return survey;
 		} catch (IOException e) {
 			throw new RuntimeException(

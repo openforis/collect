@@ -8,6 +8,7 @@ import java.util.Locale;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.User;
+import org.openforis.collect.remoting.service.export.DataExportState;
 
 /**
  * @author M. Togna
@@ -17,17 +18,12 @@ public class SessionState {
 
 	public static String SESSION_ATTRIBUTE_NAME = "sessionState";
 
-	public enum RecordState {
-		NEW, SAVED
-	}
-
 	private String sessionId;
-	private String activeRecordClientId;
 	private User user;
 	private CollectRecord activeRecord;
 	private CollectSurvey activeSurvey;
 	private Locale locale;
-	private RecordState activeRecordState;
+	private DataExportState dataExportState;
 
 	public SessionState(String sessionId) {
 		this.sessionId = sessionId;
@@ -73,22 +69,14 @@ public class SessionState {
 		this.locale = locale;
 	}
 
-	public RecordState getActiveRecordState() {
-		return activeRecordState;
+	public DataExportState getDataExportState() {
+		return dataExportState;
 	}
 
-	public void setActiveRecordState(RecordState activeRecordState) {
-		this.activeRecordState = activeRecordState;
+	public void setDataExportState(
+			DataExportState dataExportState) {
+		this.dataExportState = dataExportState;
 	}
-
-	public String getActiveRecordClientId() {
-		return activeRecordClientId;
-	}
-
-	public void setActiveRecordClientId(String activeRecordClientId) {
-		this.activeRecordClientId = activeRecordClientId;
-	}
-
 	
 
 }

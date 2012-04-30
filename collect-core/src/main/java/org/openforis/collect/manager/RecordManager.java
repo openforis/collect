@@ -3,7 +3,6 @@
  */
 package org.openforis.collect.manager;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -18,10 +17,10 @@ import org.openforis.collect.model.FieldSymbol;
 import org.openforis.collect.model.RecordSummarySortField;
 import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.MissingRecordKeyException;
-import org.openforis.collect.persistence.MultipleEditException;
 import org.openforis.collect.persistence.RecordDao;
 import org.openforis.collect.persistence.RecordLockedException;
 import org.openforis.collect.persistence.RecordPersistenceException;
+import org.openforis.collect.persistence.UserDao;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
@@ -48,11 +47,13 @@ import org.springframework.transaction.annotation.Transactional;
 public class RecordManager {
 	//private final Log log = LogFactory.getLog(RecordManager.class);
 	
-	private static final QName COUNT_ANNOTATION = new QName("http://www.openforis.org/collect/3.0/collect", "count");
 	private static final QName LAYOUT_ANNOTATION = new QName("http://www.openforis.org/collect/3.0/ui", "layout");
 
 	@Autowired
 	private RecordDao recordDao;
+	
+	@Autowired
+	private UserDao userDao;
 	
 	protected void init() {
 		unlockAll();
@@ -62,7 +63,7 @@ public class RecordManager {
 	public void save(CollectRecord record) throws RecordPersistenceException {
 		updateKeys(record);
 		
-		updateCounts(record);
+		record.updateEntityCounts();
 		
 		Integer id = record.getId();
 		if(id == null) {
@@ -88,13 +89,33 @@ public class RecordManager {
 	 * @param user
 	 * @param recordId
 	 * @return
-	 * @throws MultipleEditException 
+	 * @throws RecordLockedException 
 	 */
 	@Transactional
-	public CollectRecord checkout(CollectSurvey survey, User user, int recordId, int step, boolean forceUnlock) throws RecordPersistenceException {
-		recordDao.lock(recordId, user.getId(), forceUnlock);
+	public CollectRecord checkout(CollectSurvey survey, User user, int recordId, int step, boolean forceUnlock) throws RecordLockedException {
+		Integer lockingUserId = recordDao.getLockingUserId(recordId);
+		Integer userId = user.getId();
+		if ( lockingUserId == null || lockingUserId == userId || forceUnlock ) {
+			String lockId = recordDao.lock(recordId, userId);
+			CollectRecord record = recordDao.load(survey, recordId, step);
+			record.setLockedBy(user);
+			record.setLockId(lockId);
+			return record;
+		} else {
+			User lockingUser = userDao.loadById(lockingUserId);
+			String lockingUserName = lockingUser.getName();
+			throw new RecordLockedException("Record already locked", lockingUserName);
+		}
+	}
+	
+	public boolean isLocking(int userId, int recordId, String lockId) {
+		boolean result = recordDao.isLocking(userId, recordId, lockId);
+		return result;
+	}
+	
+	@Transactional
+	public CollectRecord load(CollectSurvey survey, int recordId, int step) throws RecordPersistenceException {
 		CollectRecord record = recordDao.load(survey, recordId, step);
-		record.setLockedBy(user);
 		return record;
 	}
 	
@@ -102,6 +123,11 @@ public class RecordManager {
 	public Integer getLockingUserId(int recordId) {
 		Integer userId = recordDao.getLockingUserId(recordId);
 		return userId;
+	}
+	
+	public Integer getLockedRecordId(int userId) {
+		Integer id = recordDao.getLockedRecordId(userId);
+		return id;
 	}
 	
 	@Transactional
@@ -125,8 +151,6 @@ public class RecordManager {
 
 	@Transactional
 	public CollectRecord create(CollectSurvey survey, EntityDefinition rootEntityDefinition, User user, String modelVersionName) throws RecordPersistenceException {
-		recordDao.checkLock(user.getId());
-		
 		CollectRecord record = new CollectRecord(survey, modelVersionName);
 		record.createRootEntity(rootEntityDefinition.getName());
 		
@@ -373,42 +397,6 @@ public class RecordManager {
 		}
 	}
 	
-	/**
-	 * Returns first level entity definitions of the passed root entity that have the attribute countInSummaryList set to true
-	 * 
-	 * @param rootEntityDefinition
-	 * @return 
-	 */
-	private List<EntityDefinition> getCountableInList(EntityDefinition rootEntityDefinition) {
-		List<EntityDefinition> result = new ArrayList<EntityDefinition>();
-		List<NodeDefinition> childDefinitions = rootEntityDefinition.getChildDefinitions();
-		for (NodeDefinition childDefinition : childDefinitions) {
-			if(childDefinition instanceof EntityDefinition) {
-				EntityDefinition entityDefinition = (EntityDefinition) childDefinition;
-				String annotation = childDefinition.getAnnotation(COUNT_ANNOTATION);
-				if(annotation != null && Boolean.parseBoolean(annotation)) {
-					result.add(entityDefinition);
-				}
-			}
-		}
-		return result;
-	}
-	
-	private void updateCounts(CollectRecord record) {
-		Entity rootEntity = record.getRootEntity();
-		EntityDefinition rootEntityDefn = rootEntity.getDefinition();
-		List<EntityDefinition> countableDefns = getCountableInList(rootEntityDefn);
-		
-		//set counts
-		List<Integer> counts = new ArrayList<Integer>();
-		for (EntityDefinition defn : countableDefns) {
-			String name = defn.getName();
-			int count = rootEntity.getCount(name);
-			counts.add(count);
-		}
-		record.setEntityCounts(counts);
-	}
-	
 	private void updateKeys(CollectRecord record) throws RecordPersistenceException {
 		record.updateRootEntityKeyValues();
 		
@@ -418,9 +406,20 @@ public class RecordManager {
 		EntityDefinition rootEntityDefn = rootEntity.getDefinition();
 		List<AttributeDefinition> keyAttributeDefns = rootEntityDefn.getKeyAttributeDefinitions();
 
+		boolean missingKey = false;
 		if (keyAttributeDefns.size() != rootEntityKeyValues.size()) {
+			missingKey = true;
+		} else {
+			for (String key : rootEntityKeyValues) {
+				if ( key == null ) {
+					missingKey = true;
+					break;
+				}
+			}
+		}
+		if ( missingKey ) {
 			throw new MissingRecordKeyException();
 		}
 	}
-
+	
 }

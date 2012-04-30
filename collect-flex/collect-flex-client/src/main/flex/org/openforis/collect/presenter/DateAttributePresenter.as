@@ -4,6 +4,7 @@ package org.openforis.collect.presenter {
 	import mx.collections.ArrayCollection;
 	import mx.collections.ListCollectionView;
 	import mx.events.CalendarLayoutChangeEvent;
+	import mx.events.DropdownEvent;
 	
 	import org.openforis.collect.Application;
 	import org.openforis.collect.client.ClientFactory;
@@ -43,7 +44,7 @@ package org.openforis.collect.presenter {
 			super.initEventListeners();
 			
 			//dateField (calendar button)
-			view.dateField.addEventListener(CalendarLayoutChangeEvent.CHANGE, dateFieldChangeHandler);
+			view.dateField.addEventListener(DropdownEvent.CLOSE, dateFieldCloseHandler);
 			view.dateField.addEventListener(DropDownEvent.OPEN, dateFieldOpenHandler);
 		}
 		
@@ -58,9 +59,9 @@ package org.openforis.collect.presenter {
 			}
 		}
 		
-		protected function dateFieldChangeHandler(event:Event):void {
+		protected function dateFieldCloseHandler(event:Event):void {
 			if(Application.activeRecord.step != CollectRecord$Step.ANALYSIS) {
-				var date:Date = (event.target as DateField).selectedDate;
+				var date:Date = (event.target as DateField).dropdown.selectedDate;
 				if(date != null) {
 					setDateOnFields(date.fullYear, date.month + 1, date.date);
 				}

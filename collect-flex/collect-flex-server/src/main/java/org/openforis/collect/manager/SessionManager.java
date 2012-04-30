@@ -12,7 +12,6 @@ import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.RecordUnlockedException;
 import org.openforis.collect.web.session.InvalidSessionException;
 import org.openforis.collect.web.session.SessionState;
-import org.openforis.idm.model.Record;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -43,19 +42,15 @@ public class SessionManager {
 
 		return sessionState;
 	}
-
-	public void setActiveRecord(CollectRecord record, String clientId) {
+	
+	public void setActiveRecord(CollectRecord record) {
 		SessionState sessionState = getSessionState();
 		sessionState.setActiveRecord(record);
-//		Object clientId = getCurrentClientId();
-		sessionState.setActiveRecordClientId(clientId);
 	}
 
 	public void clearActiveRecord() {
 		SessionState sessionState = getSessionState();
 		sessionState.setActiveRecord(null);
-		sessionState.setActiveRecordState(null);
-		sessionState.setActiveRecordClientId(null);
 	}
 
 	public void keepSessionAlive() {
@@ -82,28 +77,32 @@ public class SessionManager {
 	}
 
 	@Transactional
-	public void checkUserIsLockingActiveRecord(String clientId) throws RecordUnlockedException {
+	public void checkUserIsLockingActiveRecord(String lockId) throws RecordUnlockedException {
 		SessionState sessionState = getSessionState();
-		Record record = sessionState.getActiveRecord();
+		CollectRecord record = sessionState.getActiveRecord();
 		User user = sessionState.getUser();
+		Integer userId = user.getId();
 		if ( record != null && record.getId() != null) {
+			Integer recordId = record.getId();
 			//verify that the record has not been unlocked
-			Integer lockingUserId = recordManager.getLockingUserId(record.getId());
-			String activeRecordClientId = sessionState.getActiveRecordClientId();
-			if( lockingUserId == null || lockingUserId != user.getId() ) {
-				clearActiveRecord();
+			boolean isLocking = recordManager.isLocking(userId, recordId, lockId);
+			if( ! isLocking ) {
+				Integer lockingUserId = recordManager.getLockingUserId(recordId);
+				if ( lockingUserId != userId ) {
+					clearActiveRecord();
+				}
 				String lockingUserName = null;
 				if(lockingUserId != null) {
 					User lockingUser = userManager.loadById(lockingUserId);
 					lockingUserName = lockingUser.getName();
+					throw new RecordUnlockedException(lockingUserName);
+				} else {
+					throw new RecordUnlockedException();
 				}
-				throw new RecordUnlockedException(lockingUserName);
-			} else if(! activeRecordClientId.equals(clientId)) {
-				throw new RecordUnlockedException();
 			}
 		}
 	}
-
+	
 	private User getLoggedInUser() {
 		SessionState sessionState = (SessionState) getSessionAttribute(SessionState.SESSION_ATTRIBUTE_NAME);
 		if (sessionState != null) {
@@ -130,25 +129,8 @@ public class SessionManager {
 			Object result = graniteContext.getSessionMap().get(attributeName);
 			return result;
 		} else {
-			return null;
+			throw new IllegalStateException("Error getting session info");
 		}
 	}
-	/* TODO get flex client id
-	public String getCurrentClientId() {
-		HttpGraniteContext graniteContext = (HttpGraniteContext) GraniteContext.getCurrentInstance();
-		AMFContext amfContext = graniteContext.getAMFContext();
-		Message message = amfContext.getRequest();
-		Object clientId = message.getClientId();
-		return clientId;
-	}
-	 */
 	
-	/*
-	private void setSessionAttribute(String attributeName, Object value) {
-		GraniteContext graniteContext = GraniteContext.getCurrentInstance();
-		if (graniteContext != null) {
-			graniteContext.getSessionMap().put(attributeName, value);
-		}
-	}
-	*/
 }

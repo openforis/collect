@@ -59,7 +59,7 @@
         override protected function updateDisplayList(unscaledWidth:Number, unscaledHeight:Number):void
         {
 			var showCloseButtonString:String = getStyle("showCloseButton");
-			showCloseButton = showCloseButtonString == "true";
+			showCloseButton = showCloseButtonString == null || showCloseButtonString == "true";
 			
 			var borderWeight:Number = getStyle('borderWeight');
 			if(isNaN(borderWeight)) {

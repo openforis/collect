@@ -58,6 +58,10 @@
     	<property name="dataSource" ref="dataSource"/>
 	</bean>
 	
+	<bean id="taxonVernacularNameDao" class="org.openforis.collect.persistence.TaxonVernacularNameDao">
+    	<property name="dataSource" ref="dataSource"/>
+	</bean>
+
 	<bean id="dynamicTableDao" class="org.openforis.collect.persistence.DynamicTableDao">
     	<property name="dataSource" ref="dataSource"/>
 	</bean>
@@ -70,10 +74,13 @@
 	<bean id="expressionFactory" class="org.openforis.idm.model.expression.ExpressionFactory" />
 	<bean id="validator" 					class="org.openforis.idm.metamodel.validation.Validator" />
 	<bean id="externalCodeListProvider" 	class="org.openforis.collect.persistence.DatabaseExternalCodeListProvider" />
+
+	<!-- XmlSerializer -->
+	<bean id="xmlSerializerFactory" class="org.openforis.collect.persistence.xml.FastXmlSerializerFactory" />
 	
-	<bean id="taxonVernacularNameDao" class="org.openforis.collect.persistence.TaxonVernacularNameDao">
-    	<property name="dataSource" ref="dataSource"/>
-	</bean>
+	<!-- XML DataMarshaller -->
+	<bean id="dataMarshaller" class="org.openforis.collect.persistence.xml.DataMarshaller" lazy-init="false" autowire-candidate="true" autowire="byName" />
+	
 	<!-- enables interpretation of the @Transactional annotations for declarative transaction management-->
 	<tx:annotation-driven transaction-manager="transactionManager" proxy-target-class="true"/>
 </beans>

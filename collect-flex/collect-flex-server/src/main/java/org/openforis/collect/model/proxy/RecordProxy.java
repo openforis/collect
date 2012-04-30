@@ -66,6 +66,11 @@ public class RecordProxy implements Proxy {
 			return null;
 		}
 	}
+	
+	@ExternalizedProperty
+	public String getLockId() {
+		return record.getLockId();
+	}
 
 	@ExternalizedProperty
 	public EntityProxy getRootEntity() {
