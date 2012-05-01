@@ -5,6 +5,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
@@ -276,6 +277,8 @@ public class SpeciesDaoIntegrationTest {
 		tvn.setLanguageVariety(variety);
 		tvn.setTaxonSystemId(taxon1.getSystemId());
 		tvn.setStep(step);
+		List<String> qualifier = new ArrayList<String>();
+		tvn.setQualifiers(qualifier);
 		taxonVernacularNameDao.insert(tvn);
 		
 		// Confirm saved
@@ -297,6 +300,8 @@ public class SpeciesDaoIntegrationTest {
 		tvn.setLanguageVariety(variety);
 		tvn.setTaxonSystemId(taxon1.getSystemId());
 		tvn.setStep(step);
+		List<String> qualifier = new ArrayList<String>();
+		tvn.setQualifiers(qualifier);
 		taxonVernacularNameDao.update(tvn);
 		
 		// Confirm saved
