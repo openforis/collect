@@ -300,8 +300,6 @@ public class SpeciesDaoIntegrationTest {
 		tvn.setLanguageVariety(variety);
 		tvn.setTaxonSystemId(taxon1.getSystemId());
 		tvn.setStep(step);
-		List<String> qualifier = new ArrayList<String>();
-		tvn.setQualifiers(qualifier);
 		taxonVernacularNameDao.update(tvn);
 		
 		// Confirm saved
@@ -343,5 +341,11 @@ public class SpeciesDaoIntegrationTest {
 		// Confirm deleted
 		t = taxonomyDao.loadById(t.getId());
 		assertNull(t);
+	}
+	
+	@Test
+	public void testVernacularNameQualifier()
+	{
+		
 	}
 }

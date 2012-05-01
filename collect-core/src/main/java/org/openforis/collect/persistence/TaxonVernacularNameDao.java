@@ -94,11 +94,14 @@ public class TaxonVernacularNameDao
 			q.addValue(OFC_TAXON_VERNACULAR_NAME.TAXON_ID, t.getTaxonSystemId());
 			q.addValue(OFC_TAXON_VERNACULAR_NAME.STEP, t.getStep());
 			
-			for(int i=0;i<t.getQualifiers().size();i++)
+			if(t.getQualifiers()!=null)
 			{
-				if(i==0) q.addValue(OFC_TAXON_VERNACULAR_NAME.QUALIFIER1, t.getQualifiers().get(0));
-				else if(i==1) q.addValue(OFC_TAXON_VERNACULAR_NAME.QUALIFIER2, t.getQualifiers().get(0));
-				else if(i==2) q.addValue(OFC_TAXON_VERNACULAR_NAME.QUALIFIER3, t.getQualifiers().get(0));
+				for(int i=0;i<t.getQualifiers().size();i++)
+				{
+					if(i==0) q.addValue(OFC_TAXON_VERNACULAR_NAME.QUALIFIER1, t.getQualifiers().get(0));
+					else if(i==1) q.addValue(OFC_TAXON_VERNACULAR_NAME.QUALIFIER2, t.getQualifiers().get(0));
+					else if(i==2) q.addValue(OFC_TAXON_VERNACULAR_NAME.QUALIFIER3, t.getQualifiers().get(0));
+				}
 			}
 		}
 
