@@ -52,14 +52,12 @@ package org.openforis.collect.ui.component.detail
 			_display = display;
 		}
 		
-		public function displayNodeValidation(parentEntity:EntityProxy, defn:NodeDefinitionProxy, attribute:AttributeProxy = null):void {
+		public function displayAttributeValidation(parentEntity:EntityProxy, defn:NodeDefinitionProxy, attribute:AttributeProxy):void {
 			var flag:ValidationResultFlag = null;
 			var validationMessages:Array = null;
 			if(parentEntity != null && defn != null) {
 				var hasErrors:Boolean = attribute != null ? attribute.hasErrors(): false;
 				var hasWarnings:Boolean = attribute != null ? attribute.hasWarnings(): false;
-				var name:String = defn.name;
-				//var required:Boolean = parentEntity.childrenRequiredMap.get(name);
 				if(hasErrors || hasWarnings) {
 					if(hasErrors) {
 						flag = ValidationResultFlag.ERROR;
@@ -67,21 +65,70 @@ package org.openforis.collect.ui.component.detail
 						flag = ValidationResultFlag.WARNING;
 					}
 					validationMessages = attribute.validationResults.validationMessages;
+					apply(flag, validationMessages);
 				} else if(showMinMaxCountErrors) {
-					var minCountValid:ValidationResultFlag = parentEntity.childrenMinCountValidationMap.get(name);
-					var maxCountValid:ValidationResultFlag = parentEntity.childrenMaxCountValidationMap.get(name);
-					if(minCountValid != ValidationResultFlag.OK || maxCountValid != ValidationResultFlag.OK) {
-						if(minCountValid != ValidationResultFlag.OK) {
-							flag = minCountValid;
-							validationMessages = [Message.get("edit.validation.minCount", [defn.minCount])];
-						} else {
-							flag = maxCountValid;
-							validationMessages = [Message.get("edit.validation.maxCount", [defn.maxCount])];
-						}
+					displayMinMaxCountValidationErrors(parentEntity, defn);
+				} else {
+					reset();
+				}
+			} else {
+				reset();
+			}
+		}
+		
+		public function displayAttributesValidation(parentEntity:EntityProxy, defn:NodeDefinitionProxy):void {
+			var flag:ValidationResultFlag = null;
+			var validationMessages:Array = null;
+			if(parentEntity != null && defn != null) {
+				var errorMessages:Array = new Array();
+				var warningMessages:Array = new Array();
+				var attributes:IList = parentEntity.getChildren(defn.name);
+				for each (var a:AttributeProxy in attributes) {
+					if (a.hasErrors()) {
+						errorMessages = errorMessages.concat(a.validationResults.validationMessages);
+					}
+					if (a.hasWarnings()) {
+						warningMessages = warningMessages.concat(a.validationResults.validationMessages);
 					}
 				}
+				var hasErrors:Boolean = errorMessages.length > 0;
+				var hasWarnings:Boolean = warningMessages.length > 0;
+				if(hasErrors || hasWarnings) {
+					if(hasErrors) {
+						flag = ValidationResultFlag.ERROR;
+						validationMessages = errorMessages;
+					} else if(hasWarnings) {
+						flag = ValidationResultFlag.WARNING;
+						validationMessages = warningMessages;
+					}
+					apply(flag, validationMessages);
+				} else if(showMinMaxCountErrors) {
+					displayMinMaxCountValidationErrors(parentEntity, defn);
+				} else {
+					reset();
+				}
+			} else {
+				reset();
 			}
-			apply(flag, validationMessages);
+		}
+		
+		public function displayMinMaxCountValidationErrors(parentEntity:EntityProxy, defn:NodeDefinitionProxy):void {
+			var flag:ValidationResultFlag = null;
+			var validationMessages:Array = null;
+			var name:String = defn.name;
+			var minCountValid:ValidationResultFlag = parentEntity.childrenMinCountValidationMap.get(name);
+			var maxCountValid:ValidationResultFlag = parentEntity.childrenMaxCountValidationMap.get(name);
+			if(minCountValid != ValidationResultFlag.OK || maxCountValid != ValidationResultFlag.OK) {
+				if(minCountValid != ValidationResultFlag.OK) {
+					flag = minCountValid;
+					validationMessages = [Message.get("edit.validation.minCount", [defn.minCount])];
+				} else {
+					flag = maxCountValid;
+					validationMessages = [Message.get("edit.validation.maxCount", [defn.maxCount])];
+				}
+			} else {
+				reset();
+			}
 		}
 
 		protected function apply(flag:ValidationResultFlag, messages:Array):void {
