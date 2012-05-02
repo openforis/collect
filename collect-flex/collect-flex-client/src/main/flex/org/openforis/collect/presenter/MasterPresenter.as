@@ -109,7 +109,7 @@ package org.openforis.collect.presenter {
 		
 		protected function loadRecordFaultHandler(event:FaultEvent, token:Object = null):void {
 			var faultCode:String = event.fault.faultCode;
-			if(faultCode == "org.openforis.collect.persistence.RecordAlreadyLockedException" ||
+			if(faultCode == "org.openforis.collect.persistence.RecordLockedByActiveUserException" ||
 				(faultCode == "org.openforis.collect.persistence.RecordLockedException" && Application.user.hasRole(UserProxy.ROLE_ADMIN))) {
 					AlertUtil.showConfirm('edit.confirmUnlock', null, null, performUnlock, [token as RecordProxy]);
 			} else {

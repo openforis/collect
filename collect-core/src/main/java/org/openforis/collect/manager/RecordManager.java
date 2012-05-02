@@ -24,8 +24,8 @@ import org.openforis.collect.model.RecordSummarySortField;
 import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.MissingRecordKeyException;
 import org.openforis.collect.persistence.MultipleEditException;
-import org.openforis.collect.persistence.RecordAlreadyLockedException;
 import org.openforis.collect.persistence.RecordDao;
+import org.openforis.collect.persistence.RecordLockedByActiveUserException;
 import org.openforis.collect.persistence.RecordLockedException;
 import org.openforis.collect.persistence.RecordPersistenceException;
 import org.openforis.collect.persistence.RecordUnlockedException;
@@ -463,7 +463,7 @@ public class RecordManager {
 		if ( lock == null || ( forceUnlock && isForceUnlockAllowed(user, lock) ) ) {
 			return true;
 		} else if ( lock.getUser().getId().equals(user.getId()) ) {
-			throw new RecordAlreadyLockedException(user.getName());
+			throw new RecordLockedByActiveUserException(user.getName());
 		} else {
 			String lockingUserName = lock.getUser().getName();
 			throw new RecordLockedException("Record already locked", lockingUserName);
