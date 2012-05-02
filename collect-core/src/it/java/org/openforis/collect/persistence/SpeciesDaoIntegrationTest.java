@@ -277,8 +277,6 @@ public class SpeciesDaoIntegrationTest {
 		tvn.setLanguageVariety(variety);
 		tvn.setTaxonSystemId(taxon1.getSystemId());
 		tvn.setStep(step);
-		List<String> qualifier = new ArrayList<String>();
-		tvn.setQualifiers(qualifier);
 		taxonVernacularNameDao.insert(tvn);
 		
 		// Confirm saved
@@ -343,9 +341,77 @@ public class SpeciesDaoIntegrationTest {
 		assertNull(t);
 	}
 	
-	@Test
-	public void testVernacularNameQualifier()
-	{
+	private TaxonVernacularName testInsertAndLoadVernacularNameWithQualifier(TaxonVernacularName tvn, Taxon taxon1, String name, String lang, String variety, int step, String qualifer1) {
+		// Insert
+		Integer id = tvn.getId();
+		tvn.setVernacularName(name);
+		tvn.setLanguageCode(lang);
+		tvn.setLanguageVariety(variety);
+		tvn.setTaxonSystemId(taxon1.getSystemId());
+		tvn.setStep(step);
+		taxonVernacularNameDao.update(tvn);
 		
+		// Confirm saved
+		tvn = taxonVernacularNameDao.loadById(id);
+		assertNotNull(tvn);
+		assertEquals(id, tvn.getId());
+		assertEquals(taxon1.getSystemId(), tvn.getTaxonSystemId());
+		assertEquals(name, tvn.getVernacularName());
+		assertEquals(lang, tvn.getLanguageCode());
+		assertEquals(variety, tvn.getLanguageVariety());
+		assertEquals(step, tvn.getStep());
+		
+		return tvn;
+	}
+
+	private TaxonVernacularName testUpdateAndLoadVernacularNameWithQualifier(TaxonVernacularName tvn, Taxon taxon1, String name, String lang, String variety, int step, String qualifer1) {
+		// Insert
+		Integer id = tvn.getId();
+		tvn.setVernacularName(name);
+		tvn.setLanguageCode(lang);
+		tvn.setLanguageVariety(variety);
+		tvn.setTaxonSystemId(taxon1.getSystemId());
+		tvn.setStep(step);
+		taxonVernacularNameDao.update(tvn);
+		
+		// Confirm saved
+		tvn = taxonVernacularNameDao.loadById(id);
+		assertNotNull(tvn);
+		assertEquals(id, tvn.getId());
+		assertEquals(taxon1.getSystemId(), tvn.getTaxonSystemId());
+		assertEquals(name, tvn.getVernacularName());
+		assertEquals(lang, tvn.getLanguageCode());
+		assertEquals(variety, tvn.getLanguageVariety());
+		assertEquals(step, tvn.getStep());
+		
+		return tvn;
+	}	
+	
+	public void findVernacularNameWithQualifer(String match, int maxResults, int expectedResults)
+	{
+		// Create taxonomy
+		Taxonomy taxonomy1 = testInsertAndLoadTaxonomy("it_bamboo");
+		testUpdateAndLoadTaxonomy(taxonomy1, "it_trees");
+		
+		// From IDNFI NFICODE=604		CODE=0340736052431	FAMILY=Dipterocarpaceae	GENUS=Shorea	SPECIES=S. leprosula Miq.
+		Taxon family1 = testInsertAndLoadTaxon(taxonomy1, 1, "604_fam","Dipterocarpaceae", "family", 9, null);
+		Taxon genus1 = testInsertAndLoadTaxon(taxonomy1, 2, "604_gen", "Shorea.", "genus", 9, family1);
+		Taxon species1 = testInsertAndLoadTaxon(taxonomy1, 3, "604", "S. leprosula Miq.", "species", 9, genus1);
+		
+		testInsertAndLoadVernacularName(species1, "Meranti", "id", "", 9);
+		
+		List<TaxonVernacularName> results = taxonVernacularNameDao.findByVernacularName(match, maxResults);
+		assertEquals(expectedResults, results.size());
+		match = match.toUpperCase();
+		for (TaxonVernacularName tvn : results) {
+			String name = tvn.getVernacularName();
+			name = name.toUpperCase();
+			assertTrue(name.contains(match));
+		}
+	}
+	
+	@Test
+	public void testFindVernacularNameWithQualifer() throws Exception {
+		findVernacularNameWithQualifer("Meranti", 100, 1);
 	}
 }
