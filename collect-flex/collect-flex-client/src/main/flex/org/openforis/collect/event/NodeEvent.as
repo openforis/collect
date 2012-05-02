@@ -29,6 +29,7 @@ package org.openforis.collect.event {
 		private var _nodes:IList;
 		private var _symbol:FieldSymbol;
 		private var _remarks:String;
+		private var _applyToNonEmptyNodes:Boolean = true;
 		
 		public function NodeEvent(type:String, bubbles:Boolean=false, cancelable:Boolean=false) {
 			super(type, bubbles, cancelable);
@@ -96,6 +97,14 @@ package org.openforis.collect.event {
 
 		public function set nodeName(value:String):void {
 			_nodeName = value;
+		}
+
+		public function get applyToNonEmptyNodes():Boolean {
+			return _applyToNonEmptyNodes;
+		}
+
+		public function set applyToNonEmptyNodes(value:Boolean):void {
+			_applyToNonEmptyNodes = value;
 		}
 
 
