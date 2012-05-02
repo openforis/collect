@@ -17,14 +17,30 @@ import org.openforis.collect.remoting.service.export.DataExportState;
 public class SessionState {
 
 	public static String SESSION_ATTRIBUTE_NAME = "sessionState";
-
+	public static final long ACTIVE_RECORD_TIMEOUT = 70000;
+	
 	private String sessionId;
 	private User user;
 	private CollectRecord activeRecord;
+	private long lastHeartBeatTime;
 	private CollectSurvey activeSurvey;
 	private Locale locale;
 	private DataExportState dataExportState;
 
+	public boolean isActiveRecordBeingEdited() {
+		if (activeRecord != null) {
+			long now = System.currentTimeMillis();
+			long diff = now - lastHeartBeatTime;
+			return diff <= ACTIVE_RECORD_TIMEOUT;
+		} else {
+			return false;
+		}
+	}
+	
+	public void keepActiveRecordAlive() {
+		lastHeartBeatTime = System.currentTimeMillis();
+	}
+	
 	public SessionState(String sessionId) {
 		this.sessionId = sessionId;
 	}
