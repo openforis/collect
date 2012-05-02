@@ -59,8 +59,17 @@
 			<s:DropDownList id="stepDropDownList" labelFunction="stepLabelFunction" />
 		</s:FormItem>
 		
-		<s:Button id="backupButton" label="{Message.get('backup.startBackupLabel')}" />
-		
+		<s:HGroup gap="30">
+			<s:Button id="backupButton" 
+					  label="{Message.get('backup.startBackupLabel')}"
+					  useHandCursor="true" 
+					  buttonMode="true" />
+			
+			<s:Button id="cancelButton"
+					  label="{Message.get('global.cancel')}"
+					  useHandCursor="true" 
+					  buttonMode="true" />
+		</s:HGroup>
 	</s:VGroup>
 		
 	<s:VGroup includeIn="running" 
@@ -80,7 +89,7 @@
 		
 		<s:Label id="progressLabel" />
 
-		<s:Button id="cancelButton"
+		<s:Button id="cancelBackupButton"
 				  label="{Message.get('global.cancel')}"
 				  />
 	</s:VGroup>

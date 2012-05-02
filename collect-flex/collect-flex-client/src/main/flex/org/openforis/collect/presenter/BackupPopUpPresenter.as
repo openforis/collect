@@ -3,6 +3,7 @@ package org.openforis.collect.presenter {
 	 * 
 	 * @author S. Ricci
 	 * */
+	import flash.events.Event;
 	import flash.events.MouseEvent;
 	import flash.events.TimerEvent;
 	import flash.net.URLRequest;
@@ -61,11 +62,12 @@ package org.openforis.collect.presenter {
 		override internal function initEventListeners():void {
 			_view.addEventListener(CloseEvent.CLOSE, closeHandler);
 			_view.backupButton.addEventListener(MouseEvent.CLICK, backupButtonClickHandler);
+			_view.cancelButton.addEventListener(MouseEvent.CLICK, closeHandler);
 			_view.downloadButton.addEventListener(MouseEvent.CLICK, downloadButtonClickHandler);
-			_view.cancelButton.addEventListener(MouseEvent.CLICK, cancelButtonClickHandler);
+			_view.cancelBackupButton.addEventListener(MouseEvent.CLICK, cancelButtonClickHandler);
 		}
 		
-		protected function closeHandler(event:CloseEvent):void {
+		protected function closeHandler(event:Event = null):void {
 			if ( _status != null && _status.running ) {
 				AlertUtil.showMessage("backup.cannotClosePopUp");
 			} else {
