@@ -45,6 +45,7 @@ public class SessionManager {
 	public void setActiveRecord(CollectRecord record) {
 		SessionState sessionState = getSessionState();
 		sessionState.setActiveRecord(record);
+		sessionState.keepActiveRecordAlive();
 	}
 
 	public void clearActiveRecord() {
@@ -75,7 +76,7 @@ public class SessionManager {
 		sessionState.setLocale(locale);
 	}
 
-	public void checkIsLockingActiveRecord() throws RecordUnlockedException {
+	public void checkIsActiveRecordLocked() throws RecordUnlockedException {
 		SessionState sessionState = getSessionState();
 		CollectRecord record = sessionState.getActiveRecord();
 		User user = sessionState.getUser();
@@ -85,6 +86,7 @@ public class SessionManager {
 		} else if ( record.getId() != null ) {
 			try {
 				recordManager.checkIsLocked(record.getId(), user, lockId);
+				sessionState.keepActiveRecordAlive();
 			} catch (RecordUnlockedException e) {
 				clearActiveRecord();
 				throw e;
