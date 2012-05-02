@@ -16,6 +16,7 @@ package org.openforis.collect.ui.component.input {
 	import org.openforis.collect.model.proxy.AttributeProxy;
 	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.model.proxy.NodeProxy;
+	import org.openforis.collect.presenter.InputFieldPresenter;
 	import org.openforis.collect.presenter.RemarksPopUpPresenter;
 	import org.openforis.collect.util.AlertUtil;
 	import org.openforis.collect.util.UIUtil;
@@ -87,25 +88,32 @@ package org.openforis.collect.ui.component.input {
 		
 		private function createMenuItems(step:CollectRecord$Step):Array {
 			var items:Array = new Array();
-			
-			if(_inputField.isEmpty()) {
-				switch(step) {
-					case CollectRecord$Step.ENTRY:
+
+			switch(step) {
+				case CollectRecord$Step.ENTRY:
+					// REASON BLANK ITEMS
+					if(_inputField.isEmpty() || InputFieldPresenter.isShortCutForReasonBlank(_inputField.text)) {
 						items.push( SET_STAR, SET_DASH, SET_ILLEGIBLE );
-						break;
-					case CollectRecord$Step.CLEANSING:
-						items.push(APPROVE_MISSING);
-						break;
-				}
-			} else if(step == CollectRecord$Step.ENTRY) {
-				var hasErrors:Boolean = _inputField.parentEntity.childContainsErrors(_inputField.attributeDefinition.name);
-				if(hasErrors) {
-					var hasConfirmedError:Boolean = _inputField.parentEntity.hasConfirmedError(_inputField.attributeDefinition.name);
-					if(! hasConfirmedError) {
-						items.push(CONFIRM_ERROR);
 					}
-				}
+					// CONFIRM ERROR ITEM
+					if( ! _inputField.isEmpty()) {
+						var hasErrors:Boolean = _inputField.parentEntity.childContainsErrors(_inputField.attributeDefinition.name);
+						if(hasErrors) {
+							var hasConfirmedError:Boolean = _inputField.parentEntity.hasConfirmedError(_inputField.attributeDefinition.name);
+							if(! hasConfirmedError) {
+								items.push(CONFIRM_ERROR);
+							}
+						}
+					}
+					break;
+				case CollectRecord$Step.CLEANSING:
+					// APPROVE MISSING VALUE ITEM
+					if(_inputField.isEmpty() || InputFieldPresenter.isShortCutForReasonBlank(_inputField.text)) {
+						items.push(APPROVE_MISSING);
+					}
+					break;
 			}
+			//REMARKS
 			items.push(EDIT_REMARKS_MENU_ITEM);
 			
 			if(step != CollectRecord$Step.ANALYSIS) {
@@ -159,11 +167,13 @@ package org.openforis.collect.ui.component.input {
 					nodeEvent = new NodeEvent(NodeEvent.UPDATE_SYMBOL);
 					nodeEvent.symbol = FieldSymbol.DASH_ON_FORM;
 					nodeEvent.nodeProxy = parentEntity;
+					nodeEvent.applyToNonEmptyNodes = false;
 					break;
 				case SET_STAR_IN_ROW:
 					nodeEvent = new NodeEvent(NodeEvent.UPDATE_SYMBOL);
 					nodeEvent.symbol = FieldSymbol.BLANK_ON_FORM;
 					nodeEvent.nodeProxy = parentEntity;
+					nodeEvent.applyToNonEmptyNodes = false;
 					break;
 				case DELETE_ATTRIBUTE:
 					if(checkCanDelete(attribute, attrDefn)) {
@@ -188,6 +198,7 @@ package org.openforis.collect.ui.component.input {
 				case APPROVE_MISSING_IN_ROW:
 					nodeEvent = new NodeEvent(NodeEvent.APPROVE_MISSING);
 					nodeEvent.nodeProxy = parentEntity;
+					nodeEvent.applyToNonEmptyNodes = false;
 					break;
 			}
 			
