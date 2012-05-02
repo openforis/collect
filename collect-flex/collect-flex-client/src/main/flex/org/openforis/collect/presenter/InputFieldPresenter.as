@@ -96,7 +96,7 @@ package org.openforis.collect.presenter {
 						node = nodes.getItemAt(0) as NodeProxy;
 					}
 				}
-				prepareApproveMissingRequests(updRequest, node, event.fieldIdx);
+				prepareApproveMissingRequests(updRequest, node, event.fieldIdx, event.applyToNonEmptyNodes);
 			} else {
 				var operation:UpdateRequestOperation = new UpdateRequestOperation();
 				operation.method = UpdateRequestOperation$Method.APPROVE_MISSING;
@@ -144,11 +144,11 @@ package org.openforis.collect.presenter {
 		
 		protected static function updateSymbolHandler(event:NodeEvent): void {
 			var updRequest:UpdateRequest = new UpdateRequest();
-			prepareUpdateSymbolRequests(updRequest, event.nodeProxy, event.symbol, event.fieldIdx);
+			prepareUpdateSymbolRequests(updRequest, event.nodeProxy, event.symbol, event.fieldIdx, event.applyToNonEmptyNodes);
 			_dataClient.updateActiveRecord(updRequest, null, faultHandler);
 		}
 		
-		protected static function prepareUpdateSymbolRequests(updateRequest:UpdateRequest, nodeProxy:NodeProxy, symbol:FieldSymbol, fieldIdx:Number):void {
+		protected static function prepareUpdateSymbolRequests(updateRequest:UpdateRequest, nodeProxy:NodeProxy, symbol:FieldSymbol, fieldIdx:Number, applyToNonEmptyNodes:Boolean = false):void {
 			if( nodeProxy is EntityProxy ){
 				var entity:EntityProxy = nodeProxy as EntityProxy;
 				var children:IList = entity.getChildren();
@@ -162,7 +162,7 @@ package org.openforis.collect.presenter {
 				if(isNaN(fieldIdx) || fieldIdx < 0){
 					for(var index:int = 0; index < attr.fields.length; index ++) {
 						field = attr.fields[index];
-						if(field.value == null && field.symbol == null) {
+						if ( applyToNonEmptyNodes || (field.value == null && field.symbol == null)) {
 							operation = new UpdateRequestOperation();
 							operation.method = UpdateRequestOperation$Method.UPDATE;
 							operation.parentEntityId = nodeProxy.parentId;
@@ -170,15 +170,18 @@ package org.openforis.collect.presenter {
 							operation.nodeId = nodeProxy.id;
 							operation.fieldIndex = index;
 							operation.remarks = field.remarks;
-							operation.value = field.value != null ? field.value.toString(): null;
 							operation.symbol = symbol;
-							
+							if (ArrayUtil.contains(REASON_BLANK_SYMBOLS, symbol) ) {
+								operation.value = null;
+							} else {
+								operation.value = field.value != null ? field.value.toString(): null;
+							}
 							updateRequest.addOperation(operation);
 						}
 					}
 				} else {
 					field = attr.fields[fieldIdx];
-					if(field.value == null && field.symbol == null) {
+					if ( applyToNonEmptyNodes || (field.value == null && field.symbol == null)) {
 						operation = new UpdateRequestOperation();
 						operation.method = UpdateRequestOperation$Method.UPDATE;
 						operation.parentEntityId = nodeProxy.parentId;
@@ -186,21 +189,25 @@ package org.openforis.collect.presenter {
 						operation.nodeId = nodeProxy.id;
 						operation.fieldIndex = fieldIdx;
 						operation.remarks = field.remarks;
-						operation.value = field.value != null ? field.value.toString(): null;
 						operation.symbol = symbol;
-						
+						operation.symbol = symbol;
+						if (ArrayUtil.contains(REASON_BLANK_SYMBOLS, symbol) ) {
+							operation.value = null;
+						} else {
+							operation.value = field.value != null ? field.value.toString(): null;
+						}
 						updateRequest.addOperation(operation);
 					}
 				}
 			}
 		}
 
-		protected static function prepareApproveMissingRequests(updateRequest:UpdateRequest, nodeProxy:NodeProxy, fieldIdx:Number):void {
+		protected static function prepareApproveMissingRequests(updateRequest:UpdateRequest, nodeProxy:NodeProxy, fieldIdx:Number, applyToNonEmptyNodes:Boolean = true):void {
 			if( nodeProxy is EntityProxy ){
 				var entity:EntityProxy = nodeProxy as EntityProxy;
 				var children:IList = entity.getChildren();
 				for each (var child:NodeProxy in children) {
-					prepareApproveMissingRequests(updateRequest, child, fieldIdx);
+					prepareApproveMissingRequests(updateRequest, child, fieldIdx, applyToNonEmptyNodes);
 				}
 			} else {
 				var attr:AttributeProxy = AttributeProxy(nodeProxy);
@@ -209,7 +216,7 @@ package org.openforis.collect.presenter {
 				if(isNaN(fieldIdx) || fieldIdx < 0){
 					for(var index:int = 0; index < attr.fields.length; index ++) {
 						field = attr.fields[index];
-						if(field.value == null && field.symbol == null) {
+						if(applyToNonEmptyNodes || (field.value == null && (field.symbol == null || field.hasReasonBlankSpecified()))) {
 							operation = new UpdateRequestOperation();
 							operation.method = UpdateRequestOperation$Method.APPROVE_MISSING;
 							operation.parentEntityId = nodeProxy.parentId;
@@ -221,7 +228,7 @@ package org.openforis.collect.presenter {
 					}
 				} else {
 					field = attr.fields[fieldIdx];
-					if(field.value == null && field.symbol == null) {
+					if(applyToNonEmptyNodes || (field.value == null && (field.symbol == null || field.hasReasonBlankSpecified()))) {
 						operation = new UpdateRequestOperation();
 						operation.method = UpdateRequestOperation$Method.APPROVE_MISSING;
 						operation.parentEntityId = nodeProxy.parentId;
