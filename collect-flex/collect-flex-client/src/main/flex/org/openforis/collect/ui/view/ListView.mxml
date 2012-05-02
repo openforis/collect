@@ -53,11 +53,11 @@
 
 	<datagrid:RecordSummaryDataGrid id="dataGrid" 
 									width="100%"
+									height="100%"
+									maxHeight="465"
 									rowHeight="22"
 									doubleClickEnabled="true" 
 									selectionMode="singleRow" 
-									horizontalScrollPolicy="off" 
-									verticalScrollPolicy="off"
 									/>
 	
 	<s:Group width="100%">
