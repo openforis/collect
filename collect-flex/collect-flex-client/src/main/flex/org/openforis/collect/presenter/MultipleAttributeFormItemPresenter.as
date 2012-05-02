@@ -127,7 +127,7 @@ package org.openforis.collect.presenter
 				var active:Boolean = visited;
 				if(active) {
 					_validationDisplayManager.active = true;
-					_validationDisplayManager.displayNodeValidation(view.parentEntity, view.attributeDefinition);
+					_validationDisplayManager.displayMinMaxCountValidationErrors(view.parentEntity, view.attributeDefinition);
 				} else {
 					_validationDisplayManager.active = false;
 					_validationDisplayManager.reset();

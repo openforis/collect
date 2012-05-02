@@ -42,7 +42,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function attributesChangeHandler(event:Event):void {
-			if(! (event is CollectionEvent) && _view.attributes != null) {
+			if(! (event is CollectionEvent) && _view.attributes != null && !_view.attributes.hasEventListener(CollectionEvent.COLLECTION_CHANGE)) {
 				_view.attributes.addEventListener(CollectionEvent.COLLECTION_CHANGE, attributesChangeHandler);
 			}
 			updateView();
@@ -86,12 +86,15 @@ package org.openforis.collect.presenter {
 		
 		override public function updateValue():void {
 			var text:String = textToRequestValue();
-			var operations:ArrayCollection = new ArrayCollection();
+			var removeAttributesOperations:ArrayCollection = new ArrayCollection();
 			var o:UpdateRequestOperation;
+			//remove old attributes
 			for each (var a:AttributeProxy in _view.attributes) {
 				o = getUpdateRequestOperation(UpdateRequestOperation$Method.DELETE, a.id);
-				operations.addItem(o);
+				removeAttributesOperations.addItem(o);
 			}
+			//add new attributes
+			var addAttributesOperations:ArrayCollection = new ArrayCollection();
 			var remarks:String = getRemarks();
 			var symbol:FieldSymbol = null;
 			if(text != null) {
@@ -99,20 +102,28 @@ package org.openforis.collect.presenter {
 				if(parts.length == 1 && isShortCutForReasonBlank(text)) {
 					symbol = parseShortCutForReasonBlank(text);
 					o = getUpdateRequestOperation(UpdateRequestOperation$Method.ADD, NaN, null, symbol, remarks);
-					operations.addItem(o);
+					addAttributesOperations.addItem(o);
 				} else {
 					for each (var part:String in parts) {
 						var trimmedPart:String = StringUtil.trim(part);
 						if(StringUtil.isNotBlank(trimmedPart)) {
 							o = getUpdateRequestOperation(UpdateRequestOperation$Method.ADD, NaN, trimmedPart, null, remarks);
-							operations.addItem(o);
+							addAttributesOperations.addItem(o);
 						}
 					}
 				}
 			} else if(StringUtil.isNotBlank(remarks)) {
 				o = getUpdateRequestOperation(UpdateRequestOperation$Method.ADD, NaN, null, null, remarks);
-				operations.addItem(o);
+				addAttributesOperations.addItem(o);
 			}
+			if ( addAttributesOperations.length == 0 ) {
+				//add empty attribute
+				o = getUpdateRequestOperation(UpdateRequestOperation$Method.ADD, NaN);
+				addAttributesOperations.addItem(o);
+			}
+			var operations:ArrayCollection = new ArrayCollection();
+			operations.addAll(removeAttributesOperations);
+			operations.addAll(addAttributesOperations);
 			var req:UpdateRequest = new UpdateRequest();
 			req.operations = operations;
 			dataClient.updateActiveRecord(req, updateResultHandler, faultHandler);
@@ -139,13 +150,11 @@ package org.openforis.collect.presenter {
 						codes.push(code);
 					}
 				}
-				if(ArrayUtil.isNotEmpty(codes)) {
-					var parentEntityId:int = _view.parentEntity.id;
-					var name:String = _view.attributeDefinition.name;
-					var responder:IResponder = new AsyncResponder(findItemsResultHandler, faultHandler);
-					
-					dataClient.getCodeListItems(responder, parentEntityId, name, codes);
-				}
+				var parentEntityId:int = _view.parentEntity.id;
+				var name:String = _view.attributeDefinition.name;
+				var responder:IResponder = new AsyncResponder(findItemsResultHandler, faultHandler);
+				
+				dataClient.getCodeListItems(responder, parentEntityId, name, codes);
 			}
 		}
 	}
