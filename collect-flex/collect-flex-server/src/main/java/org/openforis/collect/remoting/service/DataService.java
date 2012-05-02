@@ -516,6 +516,7 @@ public class DataService {
 	
 	@Transactional
 	public void promoteActiveRecord() throws RecordPersistenceException, RecordPromoteException  {
+		sessionManager.checkIsActiveRecordLocked();
 		SessionState sessionState = sessionManager.getSessionState();
 		CollectRecord record = sessionState.getActiveRecord();
 		User user = sessionState.getUser();
@@ -526,6 +527,7 @@ public class DataService {
 	
 	@Transactional
 	public void demoteActiveRecord() throws RecordPersistenceException {
+		sessionManager.checkIsActiveRecordLocked();
 		SessionState sessionState = sessionManager.getSessionState();
 		CollectSurvey survey = sessionState.getActiveSurvey();
 		CollectRecord record = sessionState.getActiveRecord();
@@ -541,6 +543,7 @@ public class DataService {
 	 * @throws RecordPersistenceException 
 	 */
 	public void clearActiveRecord() throws RecordPersistenceException {
+		sessionManager.checkIsActiveRecordLocked();
 		SessionState sessionState = this.sessionManager.getSessionState();
 		CollectRecord activeRecord = sessionState.getActiveRecord();
 		if ( activeRecord != null && activeRecord.getId() != null ) {

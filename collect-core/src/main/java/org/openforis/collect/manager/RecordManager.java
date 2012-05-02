@@ -3,8 +3,13 @@
  */
 package org.openforis.collect.manager;
 
+import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.xml.namespace.QName;
@@ -14,11 +19,12 @@ import org.openforis.collect.model.CollectRecord.State;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.FieldSymbol;
-import org.openforis.collect.model.RecordLocker;
+import org.openforis.collect.model.RecordLock;
 import org.openforis.collect.model.RecordSummarySortField;
 import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.MissingRecordKeyException;
 import org.openforis.collect.persistence.MultipleEditException;
+import org.openforis.collect.persistence.RecordAlreadyLockedException;
 import org.openforis.collect.persistence.RecordDao;
 import org.openforis.collect.persistence.RecordLockedException;
 import org.openforis.collect.persistence.RecordPersistenceException;
@@ -54,11 +60,16 @@ public class RecordManager {
 	@Autowired
 	private RecordDao recordDao;
 	
-	@Autowired
-	private RecordLocker locker;
+	private Map<Integer, RecordLock> locks;
+	
+	private long lockTimeoutMillis = 60000;
+	
+	protected void init() {
+		locks = new HashMap<Integer, RecordLock>();
+	}
 	
 	@Transactional
-	public void save(CollectRecord record, String lockId) throws RecordPersistenceException {
+	public void save(CollectRecord record, String sessionId) throws RecordPersistenceException {
 		User user = record.getModifiedBy();
 		updateKeys(record);
 		record.updateEntityCounts();
@@ -68,22 +79,19 @@ public class RecordManager {
 			recordDao.insert(record);
 			id = record.getId();
 			//todo fix: concurrency problem may occur..
-			if ( locker != null ) {
-				locker.lock(id, user, lockId);
-			}
+			lock(id, user, sessionId);
 		} else {
-			if ( locker != null ) {
-				locker.checkIsLocked(id, user, lockId);
-			}
+			checkIsLocked(id, user, sessionId);
 			recordDao.update(record);
 		}
 	}
 
 	@Transactional
 	public void delete(int recordId) throws RecordPersistenceException {
-		if ( locker != null && locker.isLocked(recordId) ) {
-			User lockingUser = locker.getLockUser(recordId);
-			throw new RecordLockedException(lockingUser.getName());
+		if ( isLocked(recordId) ) {
+			RecordLock lock = getLock(recordId);
+			User lockUser = lock.getUser();
+			throw new RecordLockedException(lockUser.getName());
 		} else {
 			recordDao.delete(recordId);
 		}
@@ -96,18 +104,17 @@ public class RecordManager {
 	 * @param user
 	 * @param recordId
 	 * @param step
-	 * @param lockId
+	 * @param sessionId
 	 * @param forceUnlock
 	 * @return
 	 * @throws RecordLockedException
 	 * @throws MultipleEditException
 	 */
 	@Transactional
-	public synchronized CollectRecord checkout(CollectSurvey survey, User user, int recordId, int step, String lockId, boolean forceUnlock) throws RecordLockedException, MultipleEditException {
+	public synchronized CollectRecord checkout(CollectSurvey survey, User user, int recordId, int step, String sessionId, boolean forceUnlock) throws RecordLockedException, MultipleEditException {
+		isLockAllowed(user, recordId, sessionId, forceUnlock);
 		CollectRecord record = recordDao.load(survey, recordId, step);
-		if ( locker != null ) {
-			locker.lock(record.getId(), user, lockId, forceUnlock);
-		}
+		lock(record.getId(), user, sessionId, forceUnlock);
 		return record;
 	}
 	
@@ -137,7 +144,7 @@ public class RecordManager {
 	}
 
 	@Transactional
-	public CollectRecord create(CollectSurvey survey, EntityDefinition rootEntityDefinition, User user, String modelVersionName, String lockId) throws RecordPersistenceException {
+	public CollectRecord create(CollectSurvey survey, EntityDefinition rootEntityDefinition, User user, String modelVersionName, String sessionId) throws RecordPersistenceException {
 		CollectRecord record = new CollectRecord(survey, modelVersionName);
 		record.createRootEntity(rootEntityDefinition.getName());
 		record.setCreationDate(new Date());
@@ -397,17 +404,117 @@ public class RecordManager {
 		}
 	}
 
+	
+	/* --- START OF LOCKING METHODS --- */
+	
 	public synchronized void releaseLock(int recordId) {
-		if ( locker != null ) {
-			locker.releaseLock(recordId);
+		RecordLock lock = getLock(recordId);
+		if ( lock != null ) {
+			locks.remove(recordId);
 		}
 	}
 	
-	public void checkIsLocked(int recordId, User user, String lockId) throws RecordUnlockedException {
-		if ( locker != null ) {
-			locker.checkIsLocked(recordId, user, lockId);
+	public synchronized boolean checkIsLocked(int recordId, User user, String sessionId) throws RecordUnlockedException {
+		RecordLock lock = getLock(recordId);
+		String lockUserName = null;
+		if ( lock != null) {
+			String lockSessionId = lock.getSessionId();
+			int lockRecordId = lock.getRecordId();
+			User lUser = lock.getUser();
+			if( recordId == lockRecordId  && 
+					( lUser == user || lUser.getId() == user.getId() ) &&  
+					lockSessionId.equals(sessionId) ) {
+				lock.keepAlive();
+				return true;
+			} else {
+				User lockUser = lock.getUser();
+				lockUserName = lockUser.getName();
+			}
+		}
+		throw new RecordUnlockedException(lockUserName);
+	}
+	
+	private synchronized void lock(int recordId, User user, String sessionId) throws RecordLockedException, MultipleEditException {
+		lock(recordId, user, sessionId, false);
+	}
+	
+	private synchronized void lock(int recordId, User user, String sessionId, boolean forceUnlock) throws RecordLockedException, MultipleEditException {
+		RecordLock oldLock = getLock(recordId);
+		if ( oldLock != null ) {
+			locks.remove(recordId);
+		}
+		RecordLock lock = new RecordLock(sessionId, recordId, user, lockTimeoutMillis);
+		locks.put(recordId, lock);
+	}
+
+	private boolean isForceUnlockAllowed(User user, RecordLock lock) {
+		boolean isAdmin = user.hasRole("ROLE_ADMIN");
+		Integer userId = user.getId();
+		User lockUser = lock.getUser();
+		return isAdmin || userId.equals(lockUser.getId());
+	}
+	
+	private synchronized boolean isLockAllowed(User user, int recordId, String sessionId, boolean forceUnlock) throws RecordLockedException, MultipleEditException {
+		RecordLock uLock = getLockBySessionId(sessionId);
+		if ( uLock != null ) {
+			throw new MultipleEditException("User is editing another record: " + uLock.getRecordId());
+		}
+		RecordLock lock = getLock(recordId);
+		if ( lock == null || ( forceUnlock && isForceUnlockAllowed(user, lock) ) ) {
+			return true;
+		} else if ( lock.getUser().getId().equals(user.getId()) ) {
+			throw new RecordAlreadyLockedException(user.getName());
+		} else {
+			String lockingUserName = lock.getUser().getName();
+			throw new RecordLockedException("Record already locked", lockingUserName);
 		}
 	}
 	
+	private synchronized boolean isLocked(int recordId) {
+		RecordLock lock = getLock(recordId);
+		return lock != null;	
+	}
+	
+	private synchronized RecordLock getLock(int recordId) {
+		clearInactiveLocks();
+		RecordLock lock = locks.get(recordId);
+		return lock;
+	}
+	
+	private synchronized RecordLock getLockBySessionId(String sessionId) {
+		clearInactiveLocks();
+		Collection<RecordLock> lcks = locks.values();
+		for (RecordLock l : lcks) {
+			if ( l.getSessionId().equals(sessionId) ) {
+				return l;
+			}
+		}
+		return null;
+	}
+	
+	private synchronized void clearInactiveLocks() {
+		Set<Entry<Integer, RecordLock>> entrySet = locks.entrySet();
+		Iterator<Entry<Integer, RecordLock>> iterator = entrySet.iterator();
+		while (iterator.hasNext()) {
+			Entry<Integer, RecordLock> entry = iterator.next();
+			RecordLock lock = entry.getValue();
+			if( !lock.isActive() ){
+				iterator.remove();
+			}
+		}
+	}
+
+	/* --- END OF LOCKING METHODS --- */
+
+	/**
+	 * GETTERS AND SETTERS
+	 */
+	public long getLockTimeoutMillis() {
+		return lockTimeoutMillis;
+	}
+
+	public void setLockTimeoutMillis(long timeoutMillis) {
+		this.lockTimeoutMillis = timeoutMillis;
+	}
 }
 

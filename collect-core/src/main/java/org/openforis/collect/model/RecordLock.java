@@ -7,15 +7,15 @@ package org.openforis.collect.model;
  */
 public class RecordLock {
 
-	private String id;
+	private String sessionId;
 	private int recordId;
 	private User user;
 	private long lastHeartBeatTime;
 	private long timeoutMillis;
 	
-	public RecordLock(String id, int recordId, User user, long timeoutMillis) {
+	public RecordLock(String sessionId, int recordId, User user, long timeoutMillis) {
 		super();
-		this.id = id;
+		this.sessionId = sessionId;
 		this.recordId = recordId;
 		this.user = user;
 		this.timeoutMillis = timeoutMillis;
@@ -32,8 +32,8 @@ public class RecordLock {
 		return diff <= timeoutMillis;
 	}
 	
-	public String getId() {
-		return id;
+	public String getSessionId() {
+		return sessionId;
 	}
 
 	public User getUser() {
