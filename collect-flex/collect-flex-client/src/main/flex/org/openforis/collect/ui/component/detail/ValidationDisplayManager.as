@@ -126,6 +126,7 @@ package org.openforis.collect.ui.component.detail
 					flag = maxCountValid;
 					validationMessages = [Message.get("edit.validation.maxCount", [defn.maxCount])];
 				}
+				apply(flag, validationMessages);
 			} else {
 				reset();
 			}
