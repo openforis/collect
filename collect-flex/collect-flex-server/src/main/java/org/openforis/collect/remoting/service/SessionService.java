@@ -32,7 +32,7 @@ public class SessionService {
 	public void keepAlive(Boolean editing) throws RecordUnlockedException {
 		this.sessionManager.keepSessionAlive();
 		if(editing) {
-			sessionManager.checkIsLockingActiveRecord();
+			sessionManager.checkIsActiveRecordLocked();
 		}
 	}
 	
