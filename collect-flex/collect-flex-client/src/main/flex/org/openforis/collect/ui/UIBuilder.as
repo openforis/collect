@@ -188,11 +188,11 @@ package org.openforis.collect.ui {
 			column = getGridColumn(Message.get("list.modifiedDate"), "modifiedDate", 120, RecordSummaryDataGrid.dateTimeLabelFunction);
 			columns.addItem(column);
 			//entry completed column
-			column = getGridColumn(Message.get("list.entryComplete"), "entryComplete", 60, 
+			column = getGridColumn(Message.get("list.entryComplete"), "entryComplete", 70, 
 				null, true, new ClassFactory(CompleteColumnItemRenderer));
 			columns.addItem(column);
 			//cleansing completed column
-			column = getGridColumn(Message.get("list.cleansingComplete"), "cleansingComplete", 60, 
+			column = getGridColumn(Message.get("list.cleansingComplete"), "cleansingComplete", 70, 
 				null, true, new ClassFactory(CompleteColumnItemRenderer));
 			columns.addItem(column);
 			return columns;
