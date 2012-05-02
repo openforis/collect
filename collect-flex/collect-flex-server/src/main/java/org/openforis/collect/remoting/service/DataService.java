@@ -80,6 +80,9 @@ public class DataService {
 	@Transactional
 	public RecordProxy loadRecord(int id, int step, boolean forceUnlock) throws RecordPersistenceException {
 		SessionState sessionState = sessionManager.getSessionState();
+		if ( sessionState.isActiveRecordBeingEdited() ) {
+			throw new MultipleEditException();
+		}
 		CollectSurvey survey = sessionState.getActiveSurvey();
 		User user = sessionState.getUser();
 		CollectRecord record = recordManager.checkout(survey, user, id, step, sessionState.getSessionId(), forceUnlock);
@@ -121,7 +124,7 @@ public class DataService {
 	@Transactional
 	public RecordProxy createRecord(String rootEntityName, String versionName) throws RecordPersistenceException {
 		SessionState sessionState = sessionManager.getSessionState();
-		if ( sessionState.getActiveRecord() != null ) {
+		if ( sessionState.isActiveRecordBeingEdited() ) {
 			throw new MultipleEditException();
 		}
 		String sessionId = sessionState.getSessionId();
@@ -146,7 +149,7 @@ public class DataService {
 	
 	@Transactional
 	public void saveActiveRecord() throws RecordPersistenceException {
-		sessionManager.checkIsLockingActiveRecord();
+		sessionManager.checkIsActiveRecordLocked();
 		SessionState sessionState = sessionManager.getSessionState();
 		CollectRecord record = sessionState.getActiveRecord();
 		User user = sessionState.getUser();
@@ -157,7 +160,7 @@ public class DataService {
 
 	@Transactional
 	public List<UpdateResponse> updateActiveRecord(UpdateRequest request) throws RecordUnlockedException {
-		sessionManager.checkIsLockingActiveRecord();
+		sessionManager.checkIsActiveRecordLocked();
 		List<UpdateRequestOperation> operations = request.getOperations();
 		List<UpdateResponse> updateResponses = new ArrayList<UpdateResponse>();
 		for (UpdateRequestOperation operation : operations) {
@@ -533,13 +536,6 @@ public class DataService {
 		sessionManager.clearActiveRecord();
 	}
 
-	public void updateNodeHierarchy(Node<? extends NodeDefinition> node, int newPosition) {
-	}
-
-	public List<String> find(String context, String query) {
-		return null;
-	}
-
 	/**
 	 * remove the active record from the current session
 	 * @throws RecordPersistenceException 
@@ -694,7 +690,7 @@ public class DataService {
 
 		for (CodeListItem item : siblings) {
 			String itemCode = item.getCode();
-			Pattern pattern = Pattern.compile("^[0]*" + adaptedCode + "$");
+			Pattern pattern = Pattern.compile("^[0]*" + adaptedCode + "$", Pattern.CASE_INSENSITIVE);
 			Matcher matcher = pattern.matcher(itemCode);
 			if(matcher.find()) {
 				return item;

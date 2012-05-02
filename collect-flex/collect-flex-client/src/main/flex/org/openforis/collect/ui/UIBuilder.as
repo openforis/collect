@@ -387,6 +387,9 @@ package org.openforis.collect.ui {
 				renderer.addElement(inputField);
 				BindingUtils.bindProperty(inputField, "parentEntity", renderer, "parentEntity");
 				BindingUtils.bindProperty(inputField, "attribute", renderer, "attribute");
+				if ( inputField.hasOwnProperty("attributes") ) {
+					BindingUtils.bindProperty(inputField, "attributes", renderer, "attributes");
+				}
 			}
 			renderer.attributeDefinition = def;
 			return renderer;
