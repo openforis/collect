@@ -113,8 +113,8 @@ public class RecordManager {
 	@Transactional
 	public synchronized CollectRecord checkout(CollectSurvey survey, User user, int recordId, int step, String sessionId, boolean forceUnlock) throws RecordLockedException, MultipleEditException {
 		isLockAllowed(user, recordId, sessionId, forceUnlock);
+		lock(recordId, user, sessionId, forceUnlock);
 		CollectRecord record = recordDao.load(survey, recordId, step);
-		lock(record.getId(), user, sessionId, forceUnlock);
 		return record;
 	}
 	
@@ -158,7 +158,7 @@ public class RecordManager {
 		//save changes on current step
 		Integer errors = record.getErrors();
 		Integer skipped = record.getSkipped();
-		Integer missing = record.getMissing();
+		Integer missing = record.getMissingErrors();
 		int totalErrors = errors + skipped + missing;
 		if( totalErrors > 0 ){
 			throw new RecordPromoteException("Record cannot be promoted becuase it contains errors.");
