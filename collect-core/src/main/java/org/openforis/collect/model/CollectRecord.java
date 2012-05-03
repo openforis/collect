@@ -116,6 +116,8 @@ public class CollectRecord extends Record {
 	private transient Date modifiedDate;
 	private transient User modifiedBy;
 	private transient Integer missing;
+	private transient Integer missingErrors;
+	private transient Integer missingWarnings;
 	private transient Integer skipped;
 	private transient Integer errors;
 	private transient Integer warnings;
@@ -200,6 +202,8 @@ public class CollectRecord extends Record {
 				break;
 		}
 		this.missing = null;
+		this.missingErrors = null;
+		this.missingWarnings = null;
 		this.errors = null;
 		this.warnings = null;
 	}
@@ -252,6 +256,8 @@ public class CollectRecord extends Record {
 		}
 		skipped = null;
 		missing = null;
+		missingErrors = null;
+		missingWarnings = null;
 		errors = null;
 		warnings = null;
 	}
@@ -316,11 +322,26 @@ public class CollectRecord extends Record {
 	}
 
 	public Integer getMissing() {
-		if ( missing == null ) {
-			missing = getMissingCount( minCountErrorCounts );
-			missing += getMissingCount( minCountWarningCounts );
+		if (missing == null) {
+			Integer errors = getMissingErrors();
+			Integer warnings = getMissingWarnings();
+			missing = errors + warnings;
 		}
 		return missing;
+	}
+	
+	public Integer getMissingErrors() {
+		if ( missingErrors == null ) {
+			missingErrors = getMissingCount( minCountErrorCounts );
+		}
+		return missingErrors;
+	}
+	
+	public Integer getMissingWarnings() {
+		if ( missingWarnings == null ) {
+			missingWarnings = getMissingCount( minCountWarningCounts);
+		}
+		return missingWarnings;
 	}
 
 	public void setMissing(Integer missing) {
