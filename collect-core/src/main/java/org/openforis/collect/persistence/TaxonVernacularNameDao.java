@@ -12,8 +12,10 @@ import org.jooq.Record;
 import org.jooq.Result;
 import org.jooq.SimpleSelectQuery;
 import org.jooq.StoreQuery;
+import org.jooq.TableField;
 import org.openforis.collect.persistence.jooq.MappingJooqDaoSupport;
 import org.openforis.collect.persistence.jooq.MappingJooqFactory;
+import org.openforis.collect.persistence.jooq.tables.records.OfcTaxonVernacularNameRecord;
 import org.openforis.collect.persistence.jooq.tables.records.OfcUserRoleRecord;
 import org.openforis.idm.model.species.TaxonVernacularName;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,7 +37,14 @@ public class TaxonVernacularNameDao
 		return findContaining(OFC_TAXON_VERNACULAR_NAME.VERNACULAR_NAME,
 				searchString, maxResults);
 	}
+	
+	public List<TaxonVernacularName> findByVernacularName(String searchString, String qualifier,
+			int maxResults) {
+		return findContaining(OFC_TAXON_VERNACULAR_NAME.VERNACULAR_NAME,searchString, OFC_TAXON_VERNACULAR_NAME.QUALIFIER1, qualifier, maxResults);
+	}
 
+
+	
 	@Override
 	public TaxonVernacularName loadById(int id) {
 		return super.loadById(id);
@@ -55,6 +64,10 @@ public class TaxonVernacularNameDao
 	public void delete(int id) {
 		super.delete(id);
 	}
+	
+	/*public List<TaxonVernacularName> findByQualifier(String qualifier,String searchString, int maxResults) {
+		return findContaining(OFC_TAXON_VERNACULAR_NAME.QUALIFIER1, searchString, maxResults);
+	}*/
 
 	protected static class JooqFactory extends
 			MappingJooqFactory<TaxonVernacularName> {

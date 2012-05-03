@@ -440,4 +440,41 @@ public class SpeciesDaoIntegrationTest {
 	public void testFindVernacularNameWithQualifer() throws Exception {
 		findVernacularNameWithQualifer("Meranti", 100, 1);
 	}
+	
+	public void findVernacularNameBasedOnQualifier1(String match, String qualifier, int maxResults, int expectedResults)
+	{
+		// Create taxonomy
+		Taxonomy taxonomy1 = testInsertAndLoadTaxonomy("it_bamboo");
+		testUpdateAndLoadTaxonomy(taxonomy1, "it_trees");
+		
+		// From IDNFI NFICODE=604		CODE=0340736052431	FAMILY=Dipterocarpaceae	GENUS=Shorea	SPECIES=S. leprosula Miq.
+		Taxon family1 = testInsertAndLoadTaxon(taxonomy1, 1, "DIP","Dipterocarpaceae", "family", 9, null);
+		Taxon genus1 = testInsertAndLoadTaxon(taxonomy1, 2, "SHO", "Shorea.", "genus", 9, family1);
+		Taxon species1 = testInsertAndLoadTaxon(taxonomy1, 3, "LEP", "S. leprosula Miq.", "species", 9, genus1);
+		
+		testInsertAndLoadVernacularNameWithQualifier(species1, "Meranti", "id", "", 9,"21"); // Kalimantan Timur, East Borneo
+		testInsertAndLoadVernacularNameWithQualifier(species1, "Meranti bunga", "id", "", 9,"21"); // Kalimantan Timur, East Borneo
+		testInsertAndLoadVernacularNameWithQualifier(species1, "Meranti putih", "id", "", 9,"21"); // Kalimantan Timur, East Borneo
+		
+		List<TaxonVernacularName> results = taxonVernacularNameDao.findByVernacularName(match, qualifier, maxResults);
+		assertEquals(expectedResults, results.size());
+		match = match.toUpperCase();
+		for (TaxonVernacularName tvn : results) {
+			String name = tvn.getVernacularName();
+			name = name.toUpperCase();
+			assertTrue(name.contains(match));
+		}
+	}
+	
+	@Test
+	public void testFindVernacularNameBasedOnQualifier1_Exist()
+	{
+		findVernacularNameBasedOnQualifier1("Meranti", "21",100, 3);
+	}
+	
+	@Test
+	public void testFindVernacularNameBasedOnQualifier1_NonExist()
+	{
+		findVernacularNameBasedOnQualifier1("Nyatoh", "21",100, 0);
+	}
 }

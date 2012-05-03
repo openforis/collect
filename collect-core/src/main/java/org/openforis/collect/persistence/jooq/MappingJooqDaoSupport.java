@@ -8,6 +8,9 @@ import org.jooq.Result;
 import org.jooq.ResultQuery;
 import org.jooq.SimpleSelectQuery;
 import org.jooq.TableField;
+import org.openforis.collect.persistence.jooq.tables.OfcTaxonVernacularName;
+import org.openforis.collect.persistence.jooq.tables.records.OfcTaxonVernacularNameRecord;
+import org.openforis.idm.model.species.TaxonVernacularName;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -52,6 +55,19 @@ public class MappingJooqDaoSupport<E, J extends MappingJooqFactory<E>> extends J
 		return entities;
 
 	}
+	
+	protected List<E> findContaining(TableField<?,String> field, String searchString,TableField<?,String> field2, String qualifier1, int maxResults) {
+		J jf = getMappingJooqFactory();
+		SimpleSelectQuery<?> query = jf.selectContainsQuery(field, searchString);
+		query.addLimit(maxResults);
+		query.addConditions(field2.equal(qualifier1));
+		query.execute();
+		Result<?> result = query.getResult();
+		List<E> entities = jf.fromResult(result);
+		return entities;
+	}
+
+
 	
 	@Transactional
 	protected E loadById(int id) {
