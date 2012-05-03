@@ -387,6 +387,32 @@ public class SpeciesDaoIntegrationTest {
 		return tvn;
 	}	
 	
+	private TaxonVernacularName testInsertAndLoadVernacularNameWithQualifier(Taxon taxon1, String name, String lang, String variety, int step, String qualifier1) {
+		// Insert
+		TaxonVernacularName tvn = new TaxonVernacularName();
+		tvn.setVernacularName(name);
+		tvn.setLanguageCode(lang);
+		tvn.setLanguageVariety(variety);
+		tvn.setTaxonSystemId(taxon1.getSystemId());
+		tvn.setStep(step);
+		List<String> q = new ArrayList<String>();
+		q.add(qualifier1);
+		tvn.setQualifiers(q);
+		taxonVernacularNameDao.insert(tvn);
+		
+		// Confirm saved
+		tvn = taxonVernacularNameDao.loadById(tvn.getId());
+		assertNotNull(tvn);
+		assertEquals(taxon1.getSystemId(), tvn.getTaxonSystemId());
+		assertEquals(name, tvn.getVernacularName());
+		assertEquals(lang, tvn.getLanguageCode());
+		assertEquals(variety, tvn.getLanguageVariety());
+		assertEquals(1, tvn.getQualifiers().size());		
+		assertEquals("21", tvn.getQualifiers().get(0));
+		assertEquals(step, tvn.getStep());
+		return tvn;
+	}
+	
 	public void findVernacularNameWithQualifer(String match, int maxResults, int expectedResults)
 	{
 		// Create taxonomy
@@ -394,11 +420,11 @@ public class SpeciesDaoIntegrationTest {
 		testUpdateAndLoadTaxonomy(taxonomy1, "it_trees");
 		
 		// From IDNFI NFICODE=604		CODE=0340736052431	FAMILY=Dipterocarpaceae	GENUS=Shorea	SPECIES=S. leprosula Miq.
-		Taxon family1 = testInsertAndLoadTaxon(taxonomy1, 1, "604_fam","Dipterocarpaceae", "family", 9, null);
-		Taxon genus1 = testInsertAndLoadTaxon(taxonomy1, 2, "604_gen", "Shorea.", "genus", 9, family1);
-		Taxon species1 = testInsertAndLoadTaxon(taxonomy1, 3, "604", "S. leprosula Miq.", "species", 9, genus1);
+		Taxon family1 = testInsertAndLoadTaxon(taxonomy1, 1, "DIP","Dipterocarpaceae", "family", 9, null);
+		Taxon genus1 = testInsertAndLoadTaxon(taxonomy1, 2, "SHO", "Shorea.", "genus", 9, family1);
+		Taxon species1 = testInsertAndLoadTaxon(taxonomy1, 3, "LEP", "S. leprosula Miq.", "species", 9, genus1);
 		
-		testInsertAndLoadVernacularName(species1, "Meranti", "id", "", 9);
+		testInsertAndLoadVernacularNameWithQualifier(species1, "Meranti", "id", "", 9,"21"); // Kalimantan Timur, East Borneo
 		
 		List<TaxonVernacularName> results = taxonVernacularNameDao.findByVernacularName(match, maxResults);
 		assertEquals(expectedResults, results.size());

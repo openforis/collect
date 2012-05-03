@@ -77,9 +77,11 @@ public class TaxonVernacularNameDao
 					.getValue(OFC_TAXON_VERNACULAR_NAME.LANGUAGE_VARIETY));
 			t.setTaxonSystemId(r.getValue(OFC_TAXON_VERNACULAR_NAME.TAXON_ID));
 			t.setStep(r.getValue(OFC_TAXON_VERNACULAR_NAME.STEP));
-			if(r.getValue(OFC_TAXON_VERNACULAR_NAME.QUALIFIER1)!=null) t.getQualifiers().add(r.getValue(OFC_TAXON_VERNACULAR_NAME.QUALIFIER1));				
-			if(r.getValue(OFC_TAXON_VERNACULAR_NAME.QUALIFIER2)!=null) t.getQualifiers().add(r.getValue(OFC_TAXON_VERNACULAR_NAME.QUALIFIER2));
-			if(r.getValue(OFC_TAXON_VERNACULAR_NAME.QUALIFIER3)!=null) t.getQualifiers().add(r.getValue(OFC_TAXON_VERNACULAR_NAME.QUALIFIER3));
+			List<String> q = new ArrayList<String>();
+			if(r.getValue(OFC_TAXON_VERNACULAR_NAME.QUALIFIER1)!=null) q.add(r.getValue(OFC_TAXON_VERNACULAR_NAME.QUALIFIER1));				
+			if(r.getValue(OFC_TAXON_VERNACULAR_NAME.QUALIFIER2)!=null) q.add(r.getValue(OFC_TAXON_VERNACULAR_NAME.QUALIFIER2));
+			if(r.getValue(OFC_TAXON_VERNACULAR_NAME.QUALIFIER3)!=null) q.add(r.getValue(OFC_TAXON_VERNACULAR_NAME.QUALIFIER3));
+			t.setQualifiers(q);
 		}
 
 		@Override
