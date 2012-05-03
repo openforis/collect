@@ -14,6 +14,7 @@ package org.openforis.collect.ui.component.input {
 	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.ui.component.detail.AttributeFormItem;
 	import org.openforis.collect.ui.component.detail.CollectFormItem;
+	import org.openforis.idm.metamodel.validation.ValidationResultFlag;
 
 	/**
 	 * @author M. Togna
@@ -67,7 +68,8 @@ package org.openforis.collect.ui.component.input {
 			if(_formItem.parentEntity != null) {
 				var nodeName:String = _formItem.nodeDefinition.name;
 				var count:int = _formItem.parentEntity.getCount(nodeName);
-				if(count == 0) {
+				var minCountValid:ValidationResultFlag = _formItem.parentEntity.childrenMinCountValidationMap.get(nodeName);
+				if(count == 0 || minCountValid == ValidationResultFlag.ERROR) {
 					switch(step) {
 						case CollectRecord$Step.ENTRY:
 							items.push(SET_BLANK_ON_FORM);
