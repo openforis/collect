@@ -12,6 +12,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.model.CollectRecord;
+import org.openforis.collect.model.User;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.FieldDefinition;
@@ -21,7 +22,6 @@ import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Field;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.State;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.xmlpull.v1.XmlSerializer;
 
 /**
@@ -29,33 +29,42 @@ import org.xmlpull.v1.XmlSerializer;
  */
 public class DataMarshaller {
 
-	@Autowired
-	private XmlSerializerFactory xmlSerializerFactory;
+	private static final String RECORD_ELEMENT = "record";
+	private static final String RECORD_VERSION_ATTRIBUTE = "version";
+	private static final String RECORD_STEP_ATTRIBUTE = "step";
+	private static final String RECORD_CREATED_BY_ATTRIBUTE = "createdBy";
+	private static final String RECORD_CREATED_ATTRIBUTE = "created";
+	private static final String RECORD_MODIFIED_BY_ATTRIBUTE = "modifiedBy";
+	private static final String RECORD_MODIFIED_ATTRIBUTE = "modified";
+	private static final String STATE_ATTRIBUTE = "state";
+	private static final String SYMBOL_ATTRIBUTE = "symbol";
+	private static final String REMARKS_ATTRIBUTE = "remarks";
 	
 	public void write(CollectRecord record, Writer out) throws IOException {
-		xmlSerializerFactory.newSerializer();
-		XmlSerializer serializer = new org.openforis.collect.persistence.xml.FastXmlSerializer();
+		XmlSerializer serializer = new FastXmlSerializer();
 		serializer.setOutput(out);
 		serializer.startDocument("UTF-8", true);
-        serializer.startTag(null, "record");
+        serializer.startTag(null, RECORD_ELEMENT);
         
-        serializer.attribute(null, "version", record.getVersion().getName());
-        serializer.attribute(null, "step", Integer.toString(record.getStep().getStepNumber()));
+        serializer.attribute(null, RECORD_VERSION_ATTRIBUTE, record.getVersion().getName());
+        serializer.attribute(null, RECORD_STEP_ATTRIBUTE, Integer.toString(record.getStep().getStepNumber()));
         if ( record.getState() != null ) {
-            serializer.attribute(null, "state", record.getState().getCode());
+            serializer.attribute(null, STATE_ATTRIBUTE, record.getState().getCode());
         }
-        if ( record.getCreatedBy() != null ) {
-        	serializer.attribute(null, "createdBy", record.getCreatedBy().getName());
+        User createdBy = record.getCreatedBy();
+		if ( createdBy != null ) {
+        	serializer.attribute(null, RECORD_CREATED_BY_ATTRIBUTE, createdBy.getName());
         }
-        if ( record.getModifiedBy() != null ) {
-        	serializer.attribute(null, "modifiedBy", record.getModifiedBy().getName());
+        User modifiedBy = record.getModifiedBy();
+		if ( modifiedBy != null ) {
+        	serializer.attribute(null, RECORD_MODIFIED_BY_ATTRIBUTE, modifiedBy.getName());
         }
-        addDateAttribute(serializer, "created", record.getCreationDate());
-        addDateAttribute(serializer, "modified", record.getModifiedDate());
+        addDateAttribute(serializer, RECORD_CREATED_ATTRIBUTE, record.getCreationDate());
+        addDateAttribute(serializer, RECORD_MODIFIED_ATTRIBUTE, record.getModifiedDate());
         
         Entity rootEntity = record.getRootEntity();
 		write(serializer, rootEntity);
-		serializer.endTag(null, "record");
+		serializer.endTag(null, RECORD_ELEMENT);
 		serializer.endDocument();
 		serializer.flush();
 	}
@@ -71,6 +80,9 @@ public class DataMarshaller {
 	private void write(XmlSerializer serializer, Attribute<?,?> attr) throws IOException {
 		String name = attr.getName();
 		serializer.startTag(null, name);
+		
+		writeState(serializer, attr);
+		
 		int cnt = attr.getFieldCount();
 		for (int i = 0; i < cnt; i++) {
 			writeField(serializer, attr, i);
@@ -78,37 +90,56 @@ public class DataMarshaller {
 		serializer.endTag(null, name);
 	}
 
+	private void writeState(XmlSerializer serializer, Node<?> node) throws IOException {
+		Entity parent = node.getParent();
+		if ( parent != null ) {
+			State s = parent.getChildState(node.getName());
+			int state = s.intValue();
+			if (state > 0) {
+				serializer.attribute(null, STATE_ATTRIBUTE, Integer.toString(state));
+			}
+		}
+	}
+
 	private void write(XmlSerializer serializer, Entity entity) throws IOException {
 		String name = entity.getName();
+		
 		serializer.startTag(null, name);
 		
-		writeChildStates(serializer, entity);
+		writeState(serializer, entity);
 		
 		//write children
 		List<Node<?>> children = entity.getChildren();
 		for (Node<?> node : children) {
 			write(serializer, node);
 		}
+		writeEmptyNodes(serializer, entity);
+		
 		serializer.endTag(null, name);
 	}
 
-	private void writeChildStates(XmlSerializer serializer, Entity entity) throws IOException {
-		serializer.startTag(null, "child_states");
+	/**
+	 * Writes empty nodes child of an entity if there is a node state specified.
+	 * 
+	 * @param serializer
+	 * @param entity
+	 * @throws IOException
+	 */
+	private void writeEmptyNodes(XmlSerializer serializer, Entity entity) throws IOException {
 		EntityDefinition defn = entity.getDefinition();
 		List<NodeDefinition> childDefns = defn.getChildDefinitions();
-		for (NodeDefinition nodeDefn : childDefns) {
-			String childName = nodeDefn.getName();
-			State state = entity.getChildState(childName);
-			if ( state != null ) {
-				int stateVal = state.intValue();
-				if ( stateVal > 0 ) {
+		for (NodeDefinition childDefn : childDefns) {
+			String childName = childDefn.getName();
+			if (entity.getCount(childName) == 0 ) {
+				State childState = entity.getChildState(childName);
+				int childStateInt = childState.intValue();
+				if (childStateInt > 0) {
 					serializer.startTag(null, childName);
-					serializer.text(Integer.toString(stateVal));
+					serializer.attribute(null, STATE_ATTRIBUTE, Integer.toString(childStateInt));
 					serializer.endTag(null, childName);
 				}
 			}
 		}
-		serializer.endTag(null, "child_states");
 	}
 
 	private void writeField(XmlSerializer serializer, Attribute<?, ?> attr, int fieldIdx) throws IOException {
@@ -121,16 +152,15 @@ public class DataMarshaller {
 			serializer.startTag(null, name);
 			Object val = fld.getValue();
 			if ( StringUtils.isNotBlank(fld.getRemarks()) ) {
-				serializer.attribute(null, "remarks", fld.getRemarks());
+				serializer.attribute(null, REMARKS_ATTRIBUTE, fld.getRemarks());
 			}
 			if ( fld.getSymbol() != null ) {
-				serializer.attribute(null, "symbol", fld.getSymbol().toString());
+				serializer.attribute(null, SYMBOL_ATTRIBUTE, fld.getSymbol().toString());
 			}
-			if ( fld.getState() != null ) {
-				int state = fld.getState().intValue();
-				if ( state > 0 ) {
-					serializer.attribute(null, "state", Integer.toString(state));
-				}
+			State state = fld.getState();
+			int stateInt = state.intValue();
+			if ( stateInt > 0 ) {
+				serializer.attribute(null, STATE_ATTRIBUTE, Integer.toString(stateInt));
 			}
 			if ( val != null ) {
 				String valStr = val.toString();
