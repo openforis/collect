@@ -29,7 +29,6 @@ import org.xmlpull.v1.XmlSerializer;
  */
 public class DataMarshaller {
 
-	private static final String RECORD_ELEMENT = "record";
 	private static final String RECORD_VERSION_ATTRIBUTE = "version";
 	private static final String RECORD_STEP_ATTRIBUTE = "step";
 	private static final String RECORD_CREATED_BY_ATTRIBUTE = "createdBy";
@@ -44,7 +43,10 @@ public class DataMarshaller {
 		XmlSerializer serializer = new FastXmlSerializer();
 		serializer.setOutput(out);
 		serializer.startDocument("UTF-8", true);
-        serializer.startTag(null, RECORD_ELEMENT);
+		
+		Entity rootEntity = record.getRootEntity();
+		String rootEntityName = rootEntity.getName();
+        serializer.startTag(null, rootEntityName);
         
         serializer.attribute(null, RECORD_VERSION_ATTRIBUTE, record.getVersion().getName());
         serializer.attribute(null, RECORD_STEP_ATTRIBUTE, Integer.toString(record.getStep().getStepNumber()));
@@ -62,11 +64,18 @@ public class DataMarshaller {
         addDateAttribute(serializer, RECORD_CREATED_ATTRIBUTE, record.getCreationDate());
         addDateAttribute(serializer, RECORD_MODIFIED_ATTRIBUTE, record.getModifiedDate());
         
-        Entity rootEntity = record.getRootEntity();
-		write(serializer, rootEntity);
-		serializer.endTag(null, RECORD_ELEMENT);
+        writeEntityChildren(serializer, rootEntity);
+		serializer.endTag(null, rootEntityName);
 		serializer.endDocument();
 		serializer.flush();
+	}
+
+	private void writeEntityChildren(XmlSerializer serializer, Entity rootEntity) throws IOException {
+		List<Node<?>> children = rootEntity.getChildren();
+		for (Node<?> node : children) {
+			write(serializer, node);
+		}
+		writeEmptyNodes(serializer, rootEntity);
 	}
 
 	private void write(XmlSerializer serializer, Node<?> node) throws IOException {
@@ -108,12 +117,7 @@ public class DataMarshaller {
 		
 		writeState(serializer, entity);
 		
-		//write children
-		List<Node<?>> children = entity.getChildren();
-		for (Node<?> node : children) {
-			write(serializer, node);
-		}
-		writeEmptyNodes(serializer, entity);
+		writeEntityChildren(serializer, entity);
 		
 		serializer.endTag(null, name);
 	}
