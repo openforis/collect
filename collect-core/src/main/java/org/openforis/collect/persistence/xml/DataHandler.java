@@ -6,18 +6,15 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.FieldSymbol;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.model.Attribute;
-import org.openforis.idm.model.CodeAttribute;
-import org.openforis.idm.model.CoordinateAttribute;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Field;
 import org.openforis.idm.model.Node;
-import org.openforis.idm.model.NumericRangeAttribute;
-import org.openforis.idm.model.TaxonAttribute;
 import org.openforis.idm.util.CollectionUtil;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -33,11 +30,12 @@ public class DataHandler extends DefaultHandler {
 	
 	private CollectRecord record;
 	protected Node<?> node;
-	private String field;
+	protected String field;
 	private boolean failed;
-	private List<String> messages;
+	private List<String> failures;
+	private List<String> warnings;
 	private StringBuilder content;
-	private Attributes attributes;
+	protected Attributes attributes;
 	private CollectSurvey survey;
 	private int ignoreLevels;
 	
@@ -51,7 +49,8 @@ public class DataHandler extends DefaultHandler {
 		this.node = null;
 		this.failed = false;
 		this.field = null;
-		this.messages = new ArrayList<String>();
+		this.failures = new ArrayList<String>();
+		this.warnings = new ArrayList<String>();
 		this.attributes = null;
 		this.ignoreLevels = 0;
 	}
@@ -126,24 +125,24 @@ public class DataHandler extends DefaultHandler {
 			this.node = newNode;
 		}
 	}
+	
+	protected void startAttributeField(String localName, Attributes attributes) {
+		this.field = localName;
+	}
 
 	protected void pushIgnore() {
 		ignoreLevels++;
 	}
 
 	protected void warn(String msg) {
-		messages.add(msg);
+		warnings.add(msg);
 	}
 
 	protected void fail(String msg) {
-		messages.add(msg);
+		failures.add(msg);
 		failed = true;
 	}
 	
-	protected void startAttributeField(String localName, Attributes attributes) {
-		this.field = localName;
-	}
-
 	@Override
 	public void endElement(String uri, String localName, String qName) throws SAXException {
 		if ( "individually_owned".equals(localName)) {
@@ -192,26 +191,22 @@ public class DataHandler extends DefaultHandler {
 		this.node = node.getParent();
 	}
 
-	@SuppressWarnings("rawtypes")
+	@SuppressWarnings({ "rawtypes" })
 	protected void endAttributeElement() {
 		Attribute attr = (Attribute) node;
 		try {
-			if ( attr instanceof CoordinateAttribute ) {
-				setCoordinateField((CoordinateAttribute) attr);
-			} else if ( attr instanceof NumericRangeAttribute ) {
-				setNumericRangeField((NumericRangeAttribute<?,?>) attr);
-			} else if ( attr instanceof TaxonAttribute ) {
-				setTaxonField((TaxonAttribute) attr); 
-			} else if ( field == null ) {
-				setSingleElementValue(attr);
-			} else {
-				warn("Can't parse field '"+field+"' for "+node.getPath()+" with type "+attr.getClass().getSimpleName());
-				this.node = node.getParent();
+			if (field != null) {
+				Field<?> f = getField(attr, field);
+				if ( f != null ) {
+					fillField(f);
+				} else {
+					warn("Can't parse field '"+field+"' for "+node.getPath()+" with type "+attr.getClass().getSimpleName());
+					this.node = node.getParent();
+				}
 			}
 		} catch (NumberFormatException e) {
 			warn(e+" at "+getPath());
 		}
-		setRemarks(attr);
 		if ( field == null ) {
 			this.node = node.getParent();
 		} else {
@@ -219,19 +214,29 @@ public class DataHandler extends DefaultHandler {
 		}
 	}
 
-	protected void setRemarks(Attribute<?,?> attr) {
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	protected void fillField(Field f) {
+		String value = getXmlValue();
+		Object parsedValue = f.parseValue(value);
+		f.setValue(parsedValue);
 		String remarks = attributes.getValue("remarks");
-		if ( remarks != null ) {
-			attr.getField(0).setRemarks(remarks);
+		f.setRemarks(remarks);
+		String s = attributes.getValue("symbol");
+		if ( StringUtils.isNotBlank(s) ) {
+			char c = s.charAt(0);
+			FieldSymbol fs = FieldSymbol.valueOf(c);
+			if ( fs != null ) {
+				f.setSymbol(fs.getCode());
+			}
 		}
-	}
-	
-	protected String getXmlValue() {
-		return content == null ? null : content.toString().trim();
-	}
-	
-	protected void setXmlValue(String content) {
-		this.content = new StringBuilder(content);
+		String state = attributes.getValue("state");
+		int stateInt = 0;
+		if ( state != null) {
+			stateInt = Integer.parseInt(state);
+			if ( stateInt > 0 ) {
+				f.getState().set(stateInt);
+			}
+		}
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -240,43 +245,21 @@ public class DataHandler extends DefaultHandler {
 		String xmlValue = getXmlValue();
 		Object val = defn.createValue(xmlValue);
 		attr.setValue(val);
-		if ( attr instanceof CodeAttribute ) {
-			String qualifier = attributes.getValue("qualifier");
-			attr.getField(1).setValue(qualifier);
-		}
+	}
+	
+	@SuppressWarnings("rawtypes")
+	private Field<?> getField(Attribute attr, String fieldName) {
+		return attr.getField(fieldName);
 	}
 
-	protected void setTaxonField(TaxonAttribute attr) {
-		if ( "id".equals(field) ) {
-			setField(attr.getField(0));
-		} else if ( "scientific_name".equals(field) ) {
-			setField(attr.getField(1));
-		} else if ( "vernacular_name".equals(field) ) {
-			setField(attr.getField(2));
-		} else if ( "vernacular_lang".equals(field) ) {
-			// TODO Map to language variety and code instead
-			setField(attr.getField(3));
-		}
+	protected String getXmlValue() {
+		return content == null ? null : content.toString().trim();
 	}
-
-	protected void setNumericRangeField(NumericRangeAttribute<?,?> attr) {
-		if ( "from".equals(field) ) {
-			setField(attr.getField(0));
-		} else if ( "to".equals(field) ) {
-			setField(attr.getField(1));
-		}
+	
+	protected void setXmlValue(String content) {
+		this.content = new StringBuilder(content);
 	}
-
-	protected void setCoordinateField(CoordinateAttribute attr) {
-		if ( "x".equals(field) ) {
-			setField(attr.getField(0));						
-		} else if ( "y".equals(field) ) {
-			setField(attr.getField(1));
-		} else if ( "srs".equals(field) ) {
-			setField(attr.getField(2));
-		}
-	}
-
+	
 	protected Node<?> getNode() {
 		return node;
 	}
@@ -293,10 +276,14 @@ public class DataHandler extends DefaultHandler {
 		}
 	}
 	
-	public List<String> getMessages() {
-		return CollectionUtil.unmodifiableList(messages);
+	public List<String> getFailures() {
+		return CollectionUtil.unmodifiableList(failures);
 	}
-	
+
+	public List<String> getWarnings() {
+		return CollectionUtil.unmodifiableList(warnings);
+	}
+
 	public CollectRecord getRecord() {
 		return record;
 	}
