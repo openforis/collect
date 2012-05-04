@@ -83,33 +83,33 @@ public class DataMarshallerTest {
 		assertNotNull(xml);
 		Document doc = parseXml(xml);
 		
-		Object res = evaluateXPathExpression(doc, "record/cluster/id/code");
+		Object res = evaluateXPathExpression(doc, "cluster/id/code");
 		assertEquals("123_456", res);
-		res = evaluateXPathExpression(doc, "record/cluster/time_study[1]/start_time/minute");
+		res = evaluateXPathExpression(doc, "cluster/time_study[1]/start_time/minute");
 		assertEquals("15", res);
-		res = evaluateXPathExpression(doc, "record/cluster/time_study[1]/start_time/minute/@symbol");
+		res = evaluateXPathExpression(doc, "cluster/time_study[1]/start_time/minute/@symbol");
 		assertEquals("", res);
-		res = evaluateXPathExpression(doc, "record/cluster/time_study[2]/start_time/minute");
+		res = evaluateXPathExpression(doc, "cluster/time_study[2]/start_time/minute");
 		assertEquals("32", res);
-		res = evaluateXPathExpression(doc, "record/cluster/plot[1]/tree[1]/bole_height/value/@remarks");
+		res = evaluateXPathExpression(doc, "cluster/plot[1]/tree[1]/bole_height/value/@remarks");
 		assertEquals("No value specified", res);
-		res = evaluateXPathExpression(doc, "record/cluster/plot[1]/tree[1]/bole_height/value/@symbol");
+		res = evaluateXPathExpression(doc, "cluster/plot[1]/tree[1]/bole_height/value/@symbol");
 		assertEquals(Character.toString(FieldSymbol.BLANK_ON_FORM.getCode()), res);
 
 		//test blank values
-		res = evaluateXPathExpression(doc, "record/cluster/id/code/@remarks");
+		res = evaluateXPathExpression(doc, "cluster/id/code/@remarks");
 		assertEquals("", res);
-		res = evaluateXPathExpression(doc, "record/cluster/id/code/@symbol");
+		res = evaluateXPathExpression(doc, "cluster/id/code/@symbol");
 		assertEquals("", res);
 		
 		//test child state (confirmed error)
-		res = evaluateXPathExpression(doc, "record/cluster/district/code/@state");
+		res = evaluateXPathExpression(doc, "cluster/district/code/@state");
 		assertEquals("1", res);
 		//test child state (approved missing value)
-		res = evaluateXPathExpression(doc, "record/cluster/accessibility/@state");
+		res = evaluateXPathExpression(doc, "cluster/accessibility/@state");
 		assertEquals("1", res);
 		//test blank child state
-		res = evaluateXPathExpression(doc, "record/cluster/id/@state");
+		res = evaluateXPathExpression(doc, "cluster/id/@state");
 		assertEquals("", res);
 	}
 	
