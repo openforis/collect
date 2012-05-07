@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.collect.Proxy;
+import org.openforis.idm.metamodel.AttributeDefault;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.KeyAttributeDefinition;
 
@@ -34,6 +35,11 @@ public abstract class AttributeDefinitionProxy extends NodeDefinitionProxy imple
 		} else {
 			return false;
 		}
+	}
+	
+	@ExternalizedProperty
+	public boolean isDefaultValueApplicable() {
+		return ! attributeDefinition.getAttributeDefaults().isEmpty();
 	}
 
 }

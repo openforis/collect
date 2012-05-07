@@ -19,6 +19,7 @@ package org.openforis.collect.remoting.service {
         public static const CONFIRM_ERROR:UpdateRequestOperation$Method = new UpdateRequestOperation$Method("CONFIRM_ERROR", _);
         public static const APPROVE_MISSING:UpdateRequestOperation$Method = new UpdateRequestOperation$Method("APPROVE_MISSING", _);
         public static const UPDATE_REMARKS:UpdateRequestOperation$Method = new UpdateRequestOperation$Method("UPDATE_REMARKS", _);
+        public static const APPLY_DEFAULT_VALUE:UpdateRequestOperation$Method = new UpdateRequestOperation$Method("APPLY_DEFAULT_VALUE", _);
 
         function UpdateRequestOperation$Method(value:String = null, restrictor:* = null) {
             super((value || ADD.name), restrictor);
@@ -29,7 +30,7 @@ package org.openforis.collect.remoting.service {
         }
 
         public static function get constants():Array {
-            return [ADD, UPDATE, DELETE, CONFIRM_ERROR, APPROVE_MISSING, UPDATE_REMARKS];
+            return [ADD, UPDATE, DELETE, CONFIRM_ERROR, APPROVE_MISSING, UPDATE_REMARKS, APPLY_DEFAULT_VALUE];
         }
 
         public static function valueOf(name:String):UpdateRequestOperation$Method {

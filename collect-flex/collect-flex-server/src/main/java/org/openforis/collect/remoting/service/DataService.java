@@ -265,6 +265,27 @@ public class DataService {
 				relReqDependencies.add(new NodePointer(attribute.getParent(), attribute.getName()));
 				checkDependencies.add(attribute);
 				break;
+			case APPLY_DEFAULT_VALUE: 
+				if ( node instanceof Attribute ) {
+					attribute = (Attribute<AttributeDefinition, ?>) node;
+					recordManager.applyDefaultValue(attribute);
+					Map<Integer, Object> fieldValues = new HashMap<Integer, Object>();
+					int fieldCount = attribute.getFieldCount();
+					for (int idx = 0; idx < fieldCount; idx ++) {
+						Field<?> field = attribute.getField(idx);
+						fieldValues.put(idx, field.getValue());
+					}
+					response = getUpdateResponse(responseMap, attribute);
+					response.setUpdatedFieldValues(fieldValues);
+					cardinalityNodePointers = getCardinalityNodePointers(attribute);
+					relReqDependencies = recordManager.clearRelevanceRequiredStates(attribute);
+					checkDependencies = recordManager.clearValidationResults(attribute);
+					relReqDependencies.add(new NodePointer(attribute.getParent(), attribute.getName()));
+					checkDependencies.add(attribute);
+				} else {
+					throw new IllegalArgumentException("This method is applicable only to attributes");
+				}
+				break; 
 			case DELETE:
 				relReqDependencies = new HashSet<NodePointer>();
 				checkDependencies = new HashSet<Attribute<?,?>>();

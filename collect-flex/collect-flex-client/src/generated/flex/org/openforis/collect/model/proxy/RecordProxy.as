@@ -94,6 +94,13 @@ package org.openforis.collect.model.proxy {
 							}
 						}
 						break;
+					case UpdateRequestOperation$Method.APPLY_DEFAULT_VALUE:
+						//nullify the symbol (if any)
+						attr = getNode(reqOp.nodeId) as AttributeProxy;
+						for each (field in attr.fields) {
+							field.symbol = null;
+						}
+						break;
 				}
 			}
 		}

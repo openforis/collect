@@ -121,10 +121,10 @@ package org.openforis.collect.ui.component.detail
 			if(minCountValid != ValidationResultFlag.OK || maxCountValid != ValidationResultFlag.OK) {
 				if(minCountValid != ValidationResultFlag.OK) {
 					flag = minCountValid;
-					validationMessages = [Message.get("edit.validation.minCount", [defn.minCount])];
+					validationMessages = [Message.get("edit.validation.minCount", [defn.minCount > 0 ? defn.minCount: 1])];
 				} else {
 					flag = maxCountValid;
-					validationMessages = [Message.get("edit.validation.maxCount", [defn.maxCount])];
+					validationMessages = [Message.get("edit.validation.maxCount", [defn.maxCount > 0 ? defn.maxCount: 1])];
 				}
 				apply(flag, validationMessages);
 			} else {

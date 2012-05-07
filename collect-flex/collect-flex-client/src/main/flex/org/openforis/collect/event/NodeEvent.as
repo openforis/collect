@@ -20,6 +20,7 @@ package org.openforis.collect.event {
 		public static const CONFIRM_ERROR:String = "nodeEventConfirmError";
 		public static const APPROVE_MISSING:String = "nodeEventApproveMissing";
 		public static const DELETE_NODE:String = "nodeEventDeleteNode";
+		public static const APPLY_DEFAULT_VALUE:String = "nodeEventApplyDefaultValue";
 		
 		private var _inputField:InputField;
 		private var _parentEntity:EntityProxy;

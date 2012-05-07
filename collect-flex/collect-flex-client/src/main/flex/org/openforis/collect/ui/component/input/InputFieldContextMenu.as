@@ -38,6 +38,7 @@ package org.openforis.collect.ui.component.input {
 		private static const CONFIRM_ERROR:ContextMenuItem = new ContextMenuItem(Message.get("edit.contextMenu.approveError"), true);
 		private static const APPROVE_MISSING:ContextMenuItem = new ContextMenuItem(Message.get("edit.contextMenu.approveMissingValue"), true);
 		private static const APPROVE_MISSING_IN_ROW:ContextMenuItem = new ContextMenuItem(Message.get("edit.contextMenu.approveMissingValuesInRow"), true);
+		private static const APPLY_DEFAULT_VALUE:ContextMenuItem = new ContextMenuItem(Message.get("edit.contextMenu.applyDefaultValue"), true);
 		private static const MENU_ITEMS:Array = [
 			SET_STAR, 
 			SET_DASH, 
@@ -49,7 +50,8 @@ package org.openforis.collect.ui.component.input {
 			DELETE_ENTITY, 
 			CONFIRM_ERROR, 
 			APPROVE_MISSING,
-			APPROVE_MISSING_IN_ROW
+			APPROVE_MISSING_IN_ROW,
+			APPLY_DEFAULT_VALUE
 		];
 		
 		private static var remarksPopUpPresenter:RemarksPopUpPresenter;
@@ -107,9 +109,11 @@ package org.openforis.collect.ui.component.input {
 					}
 					break;
 				case CollectRecord$Step.CLEANSING:
-					// APPROVE MISSING VALUE ITEM
 					if(_inputField.isEmpty() || InputFieldPresenter.isShortCutForReasonBlank(_inputField.text)) {
 						items.push(APPROVE_MISSING);
+						if ( _inputField.attributeDefinition.defaultValueApplicable ) {
+							items.push(APPLY_DEFAULT_VALUE);
+						}
 					}
 					break;
 			}
@@ -200,8 +204,10 @@ package org.openforis.collect.ui.component.input {
 					nodeEvent.nodeProxy = parentEntity;
 					nodeEvent.applyToNonEmptyNodes = false;
 					break;
+				case APPLY_DEFAULT_VALUE:
+					nodeEvent = createNodeEvent(NodeEvent.APPLY_DEFAULT_VALUE, inputField);
+					break;
 			}
-			
 			if(nodeEvent != null) {
 				nodeEvent['inputField'] = inputField;
 				EventDispatcherFactory.getEventDispatcher().dispatchEvent(nodeEvent);

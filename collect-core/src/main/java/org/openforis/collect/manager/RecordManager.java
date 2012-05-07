@@ -230,7 +230,7 @@ public class RecordManager {
 		}
 	}
 
-	private <V> void applyDefaultValue(Attribute<?, V> attribute) {
+	public <V> void applyDefaultValue(Attribute<?, V> attribute) {
 		AttributeDefinition attributeDefn = (AttributeDefinition) attribute.getDefinition();
 		List<AttributeDefault> defaults = attributeDefn.getAttributeDefaults();
 		if ( defaults != null && defaults.size() > 0 ) {
