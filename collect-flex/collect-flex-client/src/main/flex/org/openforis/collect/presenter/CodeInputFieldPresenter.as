@@ -22,6 +22,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.model.proxy.FieldProxy;
 	import org.openforis.collect.ui.component.input.CodeInputField;
 	import org.openforis.collect.ui.component.input.CodeListDialog;
+	import org.openforis.collect.ui.component.input.InputField;
 	import org.openforis.collect.ui.component.input.TextInput;
 	import org.openforis.collect.util.ArrayUtil;
 	import org.openforis.collect.util.CollectionUtil;
@@ -66,12 +67,14 @@ package org.openforis.collect.presenter {
 		 * Close the popup
 		 * */
 		internal static function closePopupHandler(event:Event = null):void {
+			var inputField:CodeInputField = _popUp.codeInputField;
 			PopUpManager.removePopUp(_popUp);
+			inputField.textInput.setFocus();
 		}
 		
 		internal static function cancelLoadingHandler(event:Event):void {
 			if(_lastLoadCodesAsyncToken != null) {
-				//_lastLoadCodesAsyncToken;
+				//todo cancel async request
 			}
 			closePopupHandler();
 		}
