@@ -14,6 +14,8 @@ import java.util.Set;
 
 import javax.xml.namespace.QName;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.State;
 import org.openforis.collect.model.CollectRecord.Step;
@@ -29,6 +31,7 @@ import org.openforis.collect.persistence.RecordLockedByActiveUserException;
 import org.openforis.collect.persistence.RecordLockedException;
 import org.openforis.collect.persistence.RecordPersistenceException;
 import org.openforis.collect.persistence.RecordUnlockedException;
+import org.openforis.idm.metamodel.AttributeDefault;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
@@ -45,6 +48,7 @@ import org.openforis.idm.model.Field;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.NodePointer;
 import org.openforis.idm.model.Record;
+import org.openforis.idm.model.expression.InvalidExpressionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -53,7 +57,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author S. Ricci
  */
 public class RecordManager {
-	//private final Log log = LogFactory.getLog(RecordManager.class);
+	private final Log log = LogFactory.getLog(RecordManager.class);
 	
 	private static final QName LAYOUT_ANNOTATION = new QName("http://www.openforis.org/collect/3.0/ui", "layout");
 
@@ -154,8 +158,7 @@ public class RecordManager {
 	}
 
 	@Transactional
-	public void promote(CollectRecord record, User user) throws RecordPersistenceException, RecordPromoteException {
-		//save changes on current step
+	public void promote(CollectRecord record, User user) throws RecordPromoteException {
 		Integer errors = record.getErrors();
 		Integer skipped = record.getSkipped();
 		Integer missing = record.getMissingErrors();
@@ -163,14 +166,16 @@ public class RecordManager {
 		if( totalErrors > 0 ){
 			throw new RecordPromoteException("Record cannot be promoted becuase it contains errors.");
 		}
-		
+
 		Integer id = record.getId();
-		// before save record in current phase
+		// before save record in current step
 		if( id == null ) {
 			recordDao.insert( record );
 		} else {
 			recordDao.update( record );
 		}
+
+		applyDefaultValues(record);
 		
 		//change step and update the record
 		Step currentStep = record.getStep();
@@ -192,6 +197,58 @@ public class RecordManager {
 		recordDao.update( record );
 	}
 
+	/**
+	 * Applies default values on each descendant attribute of a record in which empty nodes have already been added.
+	 * Default values are applied only to "empty" attributes.
+	 * 
+	 * @param record
+	 * @throws InvalidExpressionException 
+	 */
+	protected void applyDefaultValues(CollectRecord record) {
+		Entity rootEntity = record.getRootEntity();
+		applyDefaultValues(rootEntity);
+	}
+
+	/**
+	 * Applies default values on each descendant attribute of an Entity in which empty nodes have already been added.
+	 * Default values are applied only to "empty" attributes.
+	 * 
+	 * @param entity
+	 * @throws InvalidExpressionException 
+	 */
+	protected void applyDefaultValues(Entity entity) {
+		List<Node<?>> children = entity.getChildren();
+		for (Node<?> child: children) {
+			if ( child instanceof Attribute ) {
+				Attribute<?, ?> attribute = (Attribute<?, ?>) child;
+				if ( attribute.isEmpty() ) {
+					applyDefaultValue(attribute);
+				}
+			} else if ( child instanceof Entity ) {
+				applyDefaultValues((Entity) child);
+			}
+		}
+	}
+
+	private <V> void applyDefaultValue(Attribute<?, V> attribute) {
+		AttributeDefinition attributeDefn = (AttributeDefinition) attribute.getDefinition();
+		List<AttributeDefault> defaults = attributeDefn.getAttributeDefaults();
+		if ( defaults != null && defaults.size() > 0 ) {
+			for (AttributeDefault attributeDefault : defaults) {
+				try {
+					V value = attributeDefault.evaluate(attribute);
+					if ( value != null ) {
+						attribute.setValue(value);
+						clearRelevanceRequiredStates(attribute);
+						clearValidationResults(attribute);
+					}
+				} catch (InvalidExpressionException e) {
+					log.warn("Error applying default value for attribute " + attributeDefn.getPath());
+				}
+			}
+		}
+	}
+	
 	@Transactional
 	public void demote(CollectSurvey survey, int recordId, Step currentStep, User user) throws RecordPersistenceException {
 		Step prevStep = currentStep.getPrevious();
