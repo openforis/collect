@@ -164,7 +164,7 @@ package org.openforis.collect.presenter {
 		protected static function cancelAutoComplete():void {
 			var textInput:TextInput = autoCompleteLastInputField.textInput as TextInput;
 			textInput.setFocus();
-			InputFieldPresenter(autoCompleteLastInputField.presenter).undoLastChange();
+			//InputFieldPresenter(autoCompleteLastInputField.presenter).undoLastChange();
 			closeAutoCompletePopUp();
 		}
 		
