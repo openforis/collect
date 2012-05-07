@@ -204,6 +204,7 @@ package org.openforis.collect.presenter {
 			//var popUp:DataExportPopUp = DataExportPopUp(PopUpManager.createPopUp(FlexGlobals.topLevelApplication as DisplayObject, DataExportPopUp, true));
 			var popUp:BackupPopUp = BackupPopUp(PopUpManager.createPopUp(FlexGlobals.topLevelApplication as DisplayObject, BackupPopUp, true));
 			PopUpManager.centerPopUp(popUp);
+			popUp.setFocus();
 		}
 		
 		protected function openFilterPopUpButtonClickHandler(event:Event):void {
