@@ -35,6 +35,7 @@ public class DataMarshaller {
 	private static final String RECORD_CREATED_ATTRIBUTE = "created";
 	private static final String RECORD_MODIFIED_BY_ATTRIBUTE = "modifiedBy";
 	private static final String RECORD_MODIFIED_ATTRIBUTE = "modified";
+	private static final String DEFINITION_ID_ATTRIBUTE = "defnId";
 	private static final String STATE_ATTRIBUTE = "state";
 	private static final String SYMBOL_ATTRIBUTE = "symbol";
 	private static final String REMARKS_ATTRIBUTE = "remarks";
@@ -64,18 +65,10 @@ public class DataMarshaller {
         addDateAttribute(serializer, RECORD_CREATED_ATTRIBUTE, record.getCreationDate());
         addDateAttribute(serializer, RECORD_MODIFIED_ATTRIBUTE, record.getModifiedDate());
         
-        writeEntityChildren(serializer, rootEntity);
+        writeChildren(serializer, rootEntity);
 		serializer.endTag(null, rootEntityName);
 		serializer.endDocument();
 		serializer.flush();
-	}
-
-	private void writeEntityChildren(XmlSerializer serializer, Entity rootEntity) throws IOException {
-		List<Node<?>> children = rootEntity.getChildren();
-		for (Node<?> node : children) {
-			write(serializer, node);
-		}
-		writeEmptyNodes(serializer, rootEntity);
 	}
 
 	private void write(XmlSerializer serializer, Node<?> node) throws IOException {
@@ -90,6 +83,8 @@ public class DataMarshaller {
 		String name = attr.getName();
 		serializer.startTag(null, name);
 		
+		writeDefinitionId(serializer, attr);
+		
 		writeState(serializer, attr);
 		
 		int cnt = attr.getFieldCount();
@@ -97,6 +92,34 @@ public class DataMarshaller {
 			writeField(serializer, attr, i);
 		}
 		serializer.endTag(null, name);
+	}
+
+	private void write(XmlSerializer serializer, Entity entity) throws IOException {
+		String name = entity.getName();
+		
+		serializer.startTag(null, name);
+		
+		writeDefinitionId(serializer, entity);
+		
+		writeState(serializer, entity);
+		
+		writeChildren(serializer, entity);
+		
+		serializer.endTag(null, name);
+	}
+
+	private void writeChildren(XmlSerializer serializer, Entity rootEntity) throws IOException {
+		List<Node<?>> children = rootEntity.getChildren();
+		for (Node<?> node : children) {
+			write(serializer, node);
+		}
+		writeEmptyNodes(serializer, rootEntity);
+	}
+
+	private void writeDefinitionId(XmlSerializer serializer, Node<?> node) throws IOException {
+		NodeDefinition defn = node.getDefinition();
+		Integer defnId = defn.getId();
+		serializer.attribute(null, DEFINITION_ID_ATTRIBUTE, defnId.toString());
 	}
 
 	private void writeState(XmlSerializer serializer, Node<?> node) throws IOException {
@@ -108,18 +131,6 @@ public class DataMarshaller {
 				serializer.attribute(null, STATE_ATTRIBUTE, Integer.toString(state));
 			}
 		}
-	}
-
-	private void write(XmlSerializer serializer, Entity entity) throws IOException {
-		String name = entity.getName();
-		
-		serializer.startTag(null, name);
-		
-		writeState(serializer, entity);
-		
-		writeEntityChildren(serializer, entity);
-		
-		serializer.endTag(null, name);
 	}
 
 	/**

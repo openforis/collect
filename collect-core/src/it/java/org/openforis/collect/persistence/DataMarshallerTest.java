@@ -27,6 +27,8 @@ import org.openforis.collect.model.CollectSurveyContext;
 import org.openforis.collect.model.FieldSymbol;
 import org.openforis.collect.persistence.xml.CollectIdmlBindingContext;
 import org.openforis.collect.persistence.xml.DataMarshaller;
+import org.openforis.idm.metamodel.NodeDefinition;
+import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.validation.Validator;
 import org.openforis.idm.metamodel.xml.InvalidIdmlException;
 import org.openforis.idm.metamodel.xml.SurveyUnmarshaller;
@@ -111,6 +113,13 @@ public class DataMarshallerTest {
 		//test blank child state
 		res = evaluateXPathExpression(doc, "cluster/id/@state");
 		assertEquals("", res);
+		
+		//test definition id
+		res = evaluateXPathExpression(doc, "cluster/id/@defnId");
+		Schema schema = survey.getSchema();
+		NodeDefinition nodeDefn = schema.getByPath("/cluster/id");
+		Integer nodeDefnId = nodeDefn.getId();
+		assertEquals(nodeDefnId.toString(), res);
 	}
 	
 	private CollectRecord createTestRecord(CollectSurvey survey) {
