@@ -46,7 +46,6 @@ package org.openforis.collect.presenter {
 		public static const REASON_BLANK_SYMBOLS:Array = [FieldSymbol.BLANK_ON_FORM, FieldSymbol.DASH_ON_FORM, FieldSymbol.ILLEGIBLE];
 		
 		private var _view:InputField;
-		private var _changed:Boolean = false;
 		private var _contextMenu:InputFieldContextMenu;
 		
 		private static var _dataClient:DataClient;
@@ -61,6 +60,7 @@ package org.openforis.collect.presenter {
 			eventDispatcher.addEventListener(NodeEvent.DELETE_NODE, deleteNodeHandler);
 			eventDispatcher.addEventListener(NodeEvent.CONFIRM_ERROR, confirmErrorHandler);
 			eventDispatcher.addEventListener(NodeEvent.APPROVE_MISSING, approveMissingHandler);
+			eventDispatcher.addEventListener(NodeEvent.APPLY_DEFAULT_VALUE, applyDefaultValueHandler);
 		}
 		
 		public function InputFieldPresenter(inputField:InputField) {
@@ -104,6 +104,16 @@ package org.openforis.collect.presenter {
 				operation.nodeName = event.nodeName;
 				updRequest.addOperation(operation);
 			}
+			_dataClient.updateActiveRecord(updRequest, null, faultHandler);
+		}
+		
+		protected static function applyDefaultValueHandler(event:NodeEvent):void {
+			var updRequestOp:UpdateRequestOperation = new UpdateRequestOperation();
+			updRequestOp.method = UpdateRequestOperation$Method.APPLY_DEFAULT_VALUE;
+			updRequestOp.parentEntityId = event.nodeProxy.parentId;
+			updRequestOp.nodeId = event.nodeProxy.id;
+			
+			var updRequest:UpdateRequest = new UpdateRequest(updRequestOp);
 			_dataClient.updateActiveRecord(updRequest, null, faultHandler);
 		}
 		
@@ -409,7 +419,9 @@ package org.openforis.collect.presenter {
 			var hasRemarks:Boolean = false;
 			if(_view.attributeDefinition != null) {
 				var text:String = getTextFromValue();
-				_view.text = text;
+				if ( ! _view.changed ) {
+					_view.text = text;
+				}
 				hasRemarks = StringUtil.isNotBlank(getRemarks());
 				_contextMenu.updateItems();
 			}
