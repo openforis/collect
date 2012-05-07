@@ -63,6 +63,17 @@ package org.openforis.collect.model.proxy {
 			for each (var response:UpdateResponse in responses)	{
 				processResponse(response);
 			}
+			
+			if ( responses != null && responses.length > 0 ) {
+				var firstResp:UpdateResponse = UpdateResponse(responses.getItemAt(0));
+				this.errors = firstResp.errors;
+				this.skipped = firstResp.skipped;
+				this.missing = firstResp.missing;
+				this.missingErrors = firstResp.missingErrors;
+				this.missingWarnings = firstResp.missingWarnings;
+				this.warnings = firstResp.warnings;
+			}
+			
 			_updated = true;
 			
 			var appEvt:ApplicationEvent = new ApplicationEvent(ApplicationEvent.UPDATE_RESPONSE_RECEIVED);

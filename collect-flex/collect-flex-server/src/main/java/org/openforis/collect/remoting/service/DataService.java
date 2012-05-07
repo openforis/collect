@@ -167,6 +167,16 @@ public class DataService {
 			Collection<UpdateResponse> responses = processUpdateRequestOperation(operation);
 			updateResponses.addAll(responses);
 		}
+		if ( updateResponses.size() > 0 ) {
+			CollectRecord activeRecord = getActiveRecord();
+			UpdateResponse firstResp = updateResponses.get(0);
+			firstResp.setErrors(activeRecord.getErrors());
+			firstResp.setMissing(activeRecord.getMissing());
+			firstResp.setMissingErrors(activeRecord.getMissingErrors());
+			firstResp.setMissingWarnings(activeRecord.getMissingWarnings());
+			firstResp.setSkipped(activeRecord.getSkipped());
+			firstResp.setWarnings(activeRecord.getWarnings());
+		}
 		return updateResponses;
 	}
 	

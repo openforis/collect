@@ -22,8 +22,19 @@ public class RecordProxy implements Proxy {
 
 	private transient CollectRecord record;
 
+	private Integer errors;
+	private Integer skipped;
+	private Integer missing;
+	private Integer missingErrors;
+	private Integer missingWarnings;
+	private Integer warnings;
+	
 	public RecordProxy(CollectRecord record) {
 		this.record = record;
+		errors = record.getErrors();
+		skipped = record.getSkipped();
+		missing = record.getMissing();
+		warnings = record.getWarnings();
 	}
 
 	@ExternalizedProperty
@@ -118,24 +129,52 @@ public class RecordProxy implements Proxy {
 		return false;
 	}
 
-	@ExternalizedProperty
-	public Integer getSkipped() {
-		return record.getSkipped();
-	}
-
-	@ExternalizedProperty
-	public Integer getMissing() {
-		return record.getMissing();
-	}
-
-	@ExternalizedProperty
 	public Integer getErrors() {
-		return record.getErrors();
+		return errors;
 	}
 
-	@ExternalizedProperty
+	public void setErrors(Integer errors) {
+		this.errors = errors;
+	}
+
+	public Integer getSkipped() {
+		return skipped;
+	}
+
+	public void setSkipped(Integer skipped) {
+		this.skipped = skipped;
+	}
+
+	public Integer getMissing() {
+		return missing;
+	}
+
+	public void setMissing(Integer missing) {
+		this.missing = missing;
+	}
+
 	public Integer getWarnings() {
-		return record.getWarnings();
+		return warnings;
+	}
+
+	public void setWarnings(Integer warnings) {
+		this.warnings = warnings;
+	}
+
+	public Integer getMissingErrors() {
+		return missingErrors;
+	}
+
+	public void setMissingErrors(Integer missingErrors) {
+		this.missingErrors = missingErrors;
+	}
+
+	public Integer getMissingWarnings() {
+		return missingWarnings;
+	}
+
+	public void setMissingWarnings(Integer missingWarnings) {
+		this.missingWarnings = missingWarnings;
 	}
 
 }

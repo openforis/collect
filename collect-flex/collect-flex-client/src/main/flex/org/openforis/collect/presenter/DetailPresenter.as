@@ -140,14 +140,19 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function submitButtonClickHandler(event:MouseEvent):void {
-			var messageResource:String;
 			var r:RecordProxy = Application.activeRecord;
-			if(r.step == CollectRecord$Step.ENTRY) {
-				messageResource = "edit.confirmSubmitDataCleansing";
-			} else if(r.step == CollectRecord$Step.CLEANSING) {
-				messageResource = "edit.confirmSubmitDataAnalysis";
+			var totalErrors:int = r.errors + r.missingErrors + r.skipped;
+			if ( totalErrors > 0 ) {
+				AlertUtil.showError("error.promoteException");
+			} else {
+				var messageResource:String;
+				if(r.step == CollectRecord$Step.ENTRY) {
+					messageResource = "edit.confirmSubmitDataCleansing";
+				} else if(r.step == CollectRecord$Step.CLEANSING) {
+					messageResource = "edit.confirmSubmitDataAnalysis";
+				}
+				AlertUtil.showConfirm(messageResource, null, null, performSubmit);
 			}
-			AlertUtil.showConfirm(messageResource, null, null, performSubmit);
 		}
 		
 		protected function rejectButtonClickHandler(event:MouseEvent):void {

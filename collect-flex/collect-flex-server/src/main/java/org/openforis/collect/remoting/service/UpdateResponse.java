@@ -30,6 +30,12 @@ public class UpdateResponse implements Proxy {
 	private transient NodeProxy creatednode;
 	private Integer deletedNodeId;
 	private Map<Integer, Object> updatedFieldValues;
+	private Integer errors;
+	private Integer skipped;
+	private Integer missing;
+	private Integer missingErrors;
+	private Integer missingWarnings;
+	private Integer warnings;
 	
 	public UpdateResponse(Node<?> node) {
 		this.nodeId = node.getInternalId();
@@ -132,6 +138,54 @@ public class UpdateResponse implements Proxy {
 			return false;
 		UpdateResponse other = (UpdateResponse) obj;
 		return new EqualsBuilder().append(nodeId, other.nodeId).isEquals();
+	}
+
+	public Integer getErrors() {
+		return errors;
+	}
+
+	public void setErrors(Integer errors) {
+		this.errors = errors;
+	}
+
+	public Integer getSkipped() {
+		return skipped;
+	}
+
+	public void setSkipped(Integer skipped) {
+		this.skipped = skipped;
+	}
+
+	public Integer getMissing() {
+		return missing;
+	}
+
+	public void setMissing(Integer missing) {
+		this.missing = missing;
+	}
+
+	public Integer getWarnings() {
+		return warnings;
+	}
+
+	public void setWarnings(Integer warnings) {
+		this.warnings = warnings;
+	}
+
+	public Integer getMissingErrors() {
+		return missingErrors;
+	}
+
+	public void setMissingErrors(Integer missingErrors) {
+		this.missingErrors = missingErrors;
+	}
+
+	public Integer getMissingWarnings() {
+		return missingWarnings;
+	}
+
+	public void setMissingWarnings(Integer missingWarnings) {
+		this.missingWarnings = missingWarnings;
 	}
 
 }
