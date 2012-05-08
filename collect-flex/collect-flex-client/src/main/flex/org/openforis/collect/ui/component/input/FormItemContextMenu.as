@@ -105,13 +105,18 @@ package org.openforis.collect.ui.component.input {
 					nodeEvent.nodeName = nodeDefinition.name;
 					break;
 				case CONFIRM_ERROR:
-					nodeEvent = new NodeEvent(NodeEvent.CONFIRM_ERROR);
 					if(nodeDefinition is AttributeDefinitionProxy) {
-						if(nodeDefinition.multiple && ! (nodeDefinition is CodeAttributeDefinitionProxy)) {
+						if ( ! nodeDefinition.multiple || nodeDefinition is CodeAttributeDefinitionProxy) {
+							nodeEvent = new NodeEvent(NodeEvent.CONFIRM_ERROR);
 							nodeEvent.parentEntity = parentEntity;
 							nodeEvent.nodeName = nodeDefinition.name;
-						} else {
-							nodeEvent.nodeProxy = AttributeFormItem(formItem).attribute;
+							
+							if ( ! nodeDefinition.multiple) {
+								nodeEvent.nodeProxy = AttributeFormItem(formItem).attribute;
+							} else {
+								nodeEvent.parentEntity = parentEntity;
+								nodeEvent.nodes = parentEntity.getChildren(nodeDefinition.name);
+							}
 						}
 					}
 					break;
