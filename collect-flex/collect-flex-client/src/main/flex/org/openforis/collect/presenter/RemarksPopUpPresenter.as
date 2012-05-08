@@ -87,7 +87,7 @@ package org.openforis.collect.presenter {
 			if(firstOpen) {
 				view = new RemarksPopUp();
 			}
-			view.editable = Application.activeRecord.step != CollectRecord$Step.ANALYSIS;
+			view.editable = Application.activeRecordEditable;
 			_inputField = inputField;
 
 			if(! popUpOpened) {
