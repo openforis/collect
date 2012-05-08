@@ -71,5 +71,10 @@ package org.openforis.collect.util
 			return idx >= 0;
 		}
 		
+		public static function containsItemWith(list:IList, propertyName:String, value:*):Boolean {
+			var item:Object = getItem(list, propertyName, value);
+			return item != null;
+		}
+		
 	}
 }
