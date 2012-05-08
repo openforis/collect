@@ -7,9 +7,7 @@ package org.openforis.collect.presenter {
 	
 	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
-	import org.openforis.collect.metamodel.proxy.CodeAttributeDefinitionProxy;
 	import org.openforis.collect.model.proxy.AttributeProxy;
-	import org.openforis.collect.remoting.service.UpdateRequest;
 	import org.openforis.collect.remoting.service.UpdateResponse;
 	import org.openforis.collect.ui.component.detail.AttributeItemRenderer;
 	import org.openforis.collect.ui.component.detail.ValidationDisplayManager;
@@ -63,14 +61,31 @@ package org.openforis.collect.presenter {
 		protected function updateResponseReceivedHandler(event:ApplicationEvent):void {
 			if(_view.attribute != null || _view.attributes != null) {
 				var responses:IList = IList(event.result);
-				for each (var response:UpdateResponse in responses) {
-					if ( response.nodeId == _view.parentEntity.id || 
-						_view.attribute != null && _view.attribute.id == response.nodeId ) {
-						updateValidationDisplayManager();
-						break;
-					}
+				if ( nodeUpdated(responses) ) {
+					updateView();
+				} else if ( parentEntityUpdated(responses) ) {
+					updateValidationDisplayManager();
 				}
 			}
+		}
+		
+		protected function nodeUpdated(responses:IList):Boolean {
+			for each (var response:UpdateResponse in responses) {
+				if ( _view.attribute != null && _view.attribute.id == response.nodeId ||
+					 _view.attributes != null && CollectionUtil.containsItemWith(_view.attributes, "id", response.nodeId) ) {
+					return true;
+				}
+			}
+			return false;
+		}
+		
+		protected function parentEntityUpdated(responses:IList):Boolean {
+			for each (var response:UpdateResponse in responses) {
+				if ( response.nodeId == _view.parentEntity.id ) {
+					return true;
+				}
+			}
+			return false;
 		}
 		
 		protected function fieldVisitedHandler(event:PropertyChangeEvent):void {
@@ -88,12 +103,12 @@ package org.openforis.collect.presenter {
 		
 		protected function setAttribute(attribute:AttributeProxy):void {
 			_view.visited = false;
-			updateValidationDisplayManager();
+			updateView();
 		}
 		
 		protected function setAttributes(attributes:IList):void {
 			_view.visited = false;
-			updateValidationDisplayManager();
+			updateView();
 		}
 		
 		protected function updateValidationDisplayManager():void {
@@ -116,6 +131,25 @@ package org.openforis.collect.presenter {
 					_validationDisplayManager.reset();
 				}
 			}
+		}
+		
+		protected function updateView() {
+			var approved:Boolean = false;
+			if ( _view.parentEntity != null ) {
+				if ( _view.attribute != null ) {
+					approved = _view.attribute.errorConfirmed;
+				} else if ( CollectionUtil.isNotEmpty(_view.attributes) ) {
+					for each (var a:AttributeProxy in _view.attributes) {
+						if ( a.errorConfirmed ) {
+							approved = true;
+							break;
+						}
+					}
+				}
+			}
+			_view.approved = approved;
+			
+			updateValidationDisplayManager();
 		}
 
 	}
