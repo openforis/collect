@@ -6,6 +6,7 @@ import static org.openforis.collect.persistence.jooq.tables.OfcTaxonVernacularNa
 
 import java.sql.Connection;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.jooq.Record;
@@ -38,12 +39,10 @@ public class TaxonVernacularNameDao
 				searchString, maxResults);
 	}
 	
-	public List<TaxonVernacularName> findByVernacularName(String searchString, String qualifier,
+	public List<TaxonVernacularName> findByVernacularName(String searchString, HashMap<TableField, String> qualifiers,
 			int maxResults) {
-		return findContaining(OFC_TAXON_VERNACULAR_NAME.VERNACULAR_NAME,searchString, OFC_TAXON_VERNACULAR_NAME.QUALIFIER1, qualifier, maxResults);
+		return findContaining(OFC_TAXON_VERNACULAR_NAME.VERNACULAR_NAME,searchString, qualifiers, maxResults);
 	}
-
-
 	
 	@Override
 	public TaxonVernacularName loadById(int id) {

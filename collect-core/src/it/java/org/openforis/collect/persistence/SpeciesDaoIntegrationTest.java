@@ -5,10 +5,13 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import static org.openforis.collect.persistence.jooq.tables.OfcTaxonVernacularName.OFC_TAXON_VERNACULAR_NAME;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
 
+import org.jooq.TableField;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openforis.collect.persistence.TaxonDao;
@@ -26,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * @author G. Miceli
  * @author S. Ricci
+ * @author E. Wibowo
  */
 @RunWith( SpringJUnit4ClassRunner.class )
 @ContextConfiguration( locations = {"classpath:test-context.xml"} )
@@ -441,7 +445,7 @@ public class SpeciesDaoIntegrationTest {
 		findVernacularNameWithQualifer("Meranti", 100, 1);
 	}
 	
-	public void findVernacularNameBasedOnQualifier1(String match, String qualifier, int maxResults, int expectedResults)
+	public void findVernacularNameBasedOnQualifier1(String match, HashMap<TableField, String> qualifiers, int maxResults, int expectedResults)
 	{
 		// Create taxonomy
 		Taxonomy taxonomy1 = testInsertAndLoadTaxonomy("it_bamboo");
@@ -456,7 +460,7 @@ public class SpeciesDaoIntegrationTest {
 		testInsertAndLoadVernacularNameWithQualifier(species1, "Meranti bunga", "id", "", 9,"21"); // Kalimantan Timur, East Borneo
 		testInsertAndLoadVernacularNameWithQualifier(species1, "Meranti putih", "id", "", 9,"21"); // Kalimantan Timur, East Borneo
 		
-		List<TaxonVernacularName> results = taxonVernacularNameDao.findByVernacularName(match, qualifier, maxResults);
+		List<TaxonVernacularName> results = taxonVernacularNameDao.findByVernacularName(match, qualifiers, maxResults);//already using qualifer1 as the criteria
 		assertEquals(expectedResults, results.size());
 		match = match.toUpperCase();
 		for (TaxonVernacularName tvn : results) {
@@ -469,12 +473,20 @@ public class SpeciesDaoIntegrationTest {
 	@Test
 	public void testFindVernacularNameBasedOnQualifier1_Exist()
 	{
-		findVernacularNameBasedOnQualifier1("Meranti", "21",100, 3);
+		HashMap<TableField,String> qualifiers = new HashMap();
+		qualifiers.put(OFC_TAXON_VERNACULAR_NAME.QUALIFIER1, "21");
+		findVernacularNameBasedOnQualifier1("Meranti", qualifiers,100, 3);
 	}
 	
 	@Test
 	public void testFindVernacularNameBasedOnQualifier1_NonExist()
 	{
-		findVernacularNameBasedOnQualifier1("Nyatoh", "21",100, 0);
+		HashMap<TableField,String> qualifiers = new HashMap();
+		qualifiers.put(OFC_TAXON_VERNACULAR_NAME.QUALIFIER1, "21");
+		findVernacularNameBasedOnQualifier1("Nyatoh", qualifiers,100, 0);
 	}
+	
+	
+
+	
 }
