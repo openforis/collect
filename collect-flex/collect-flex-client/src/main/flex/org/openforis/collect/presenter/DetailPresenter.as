@@ -21,6 +21,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.model.CollectRecord$Step;
 	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.model.proxy.RecordProxy;
+	import org.openforis.collect.model.proxy.UserProxy;
 	import org.openforis.collect.ui.UIBuilder;
 	import org.openforis.collect.ui.component.detail.FormContainer;
 	import org.openforis.collect.ui.view.DetailView;
@@ -54,6 +55,7 @@ package org.openforis.collect.presenter {
 		 * */
 		internal function activeRecordChangedListener(event:UIEvent):void {
 			var activeRecord:RecordProxy = Application.activeRecord;
+			var step:CollectRecord$Step = activeRecord.step;
 			var version:ModelVersionProxy = activeRecord.version;
 			var rootEntityDefn:EntityDefinitionProxy = Application.activeRootEntity;
 			var rootEntity:EntityProxy = activeRecord.rootEntity;
@@ -63,7 +65,7 @@ package org.openforis.collect.presenter {
 			ChangeWatcher.watch(rootEntity, "keyText", updateRecordKeyLabel);
 			
 			_view.formVersionText.text = version.getLabelText();
-			switch(activeRecord.step) {
+			switch(step) {
 				case CollectRecord$Step.ENTRY:
 					_view.currentPhaseText.text = Message.get("edit.dataEntry");
 					break;
@@ -74,16 +76,17 @@ package org.openforis.collect.presenter {
 					_view.currentPhaseText.text = Message.get("edit.dataAnalysis");
 					break;
 			}
+			var editable:Boolean = Application.activeRecordEditable;
 			
-			var canSubmit:Boolean = activeRecord.step == CollectRecord$Step.ENTRY || 
-				activeRecord.step == CollectRecord$Step.CLEANSING;
+			var user:UserProxy = Application.user;
+			var canSubmit:Boolean = user.canSubmit(activeRecord);
 			_view.submitButton.visible = _view.submitButton.includeInLayout = canSubmit;
 			
-			var canReject:Boolean = activeRecord.step == CollectRecord$Step.CLEANSING || 
-				activeRecord.step == CollectRecord$Step.ANALYSIS;
+			var canReject:Boolean = user.canReject(activeRecord);
 			_view.rejectButton.visible = _view.rejectButton.includeInLayout = canReject;
 			
-			var canSave:Boolean = activeRecord.step != CollectRecord$Step.ANALYSIS;
+			var canSave:Boolean = editable;
+			
 			_view.saveButton.visible = canSave;
 			
 			var form:FormContainer = null;
