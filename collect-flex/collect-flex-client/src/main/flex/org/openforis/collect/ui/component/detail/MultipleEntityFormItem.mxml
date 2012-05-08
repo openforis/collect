@@ -112,8 +112,8 @@
 				icon="{Images.ADD}" 
 				labelPlacement="left" 
 				useHandCursor="true"
-				visible="{! entityDefinition.enumerable &amp;&amp; Application.activeRecord.step != CollectRecord$Step.ANALYSIS}"
-				includeInLayout="{! entityDefinition.enumerable &amp;&amp; Application.activeRecord.step != CollectRecord$Step.ANALYSIS}"
+				visible="{Application.activeRecordEditable &amp;&amp; ! entityDefinition.enumerable}"
+				includeInLayout="{Application.activeRecordEditable &amp;&amp; ! entityDefinition.enumerable}"
 				/>
 		</s:VGroup>
 		
