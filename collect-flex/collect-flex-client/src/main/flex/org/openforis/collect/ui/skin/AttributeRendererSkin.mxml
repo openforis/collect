@@ -28,6 +28,7 @@
 
     <fx:Script fb:purpose="styling">
         <![CDATA[         
+			import org.openforis.collect.ui.Images;
             /**
              *  @private
              */
@@ -57,7 +58,10 @@
 					borderWeight = 1;
 				}
 				borderStroke.weight = borderWeight;
-				
+				/* 
+				var approvedIconVisible:Boolean = getStyle("approvedIconVisible");
+				approvedIcon.visible = approvedIconVisible;
+				 */
                 super.updateDisplayList(unscaledWidth, unscaledHeight);
             }
         ]]>        
@@ -85,6 +89,7 @@
 				/>
 		</s:stroke>
 	</s:Rect>
+	
     <!--
         Note: setting the minimum size to 0 here so that changes to the host component's
         size will not be thwarted by this skin part's minimum size.   This is a compromise,
@@ -99,5 +104,8 @@
 			<s:BasicLayout/>
 		</s:layout>
 	</s:Group>
+	
+	<!-- approved icon -->
+	<!--<s:Image id="approvedIcon" source="{Images.APPROVED}" top="-5" right="0" />-->
 	
 </s:Skin>

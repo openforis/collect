@@ -26,7 +26,6 @@ package org.openforis.collect.ui.component.input {
 		
 		public static const WARN_STYLE:String = "warn";
 		public static const ERROR_STYLE:String = "error";
-		public static const APPROVED_STYLE:String = "approved";
 		public static const NOT_RELEVANT_STYLE:String = "notRelevant";
 		public static const REMARKS_PRESENT_STYLE:String = "remarksPresent";
 		
@@ -144,14 +143,6 @@ package org.openforis.collect.ui.component.input {
 			}
 		}
 		
-		public function set approved(value:Boolean):void {
-			if(value) {
-				UIUtil.addStyleName(validationStateDisplay, APPROVED_STYLE);
-			} else {
-				UIUtil.removeStyleName(validationStateDisplay, APPROVED_STYLE);
-			}
-		}
-
 		public function set hasRemarks(value:Boolean):void {
 			if(value) {
 				UIUtil.addStyleName(validationStateDisplay, REMARKS_PRESENT_STYLE);

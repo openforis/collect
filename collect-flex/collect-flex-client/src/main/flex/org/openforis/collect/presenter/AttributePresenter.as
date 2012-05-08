@@ -59,7 +59,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function updateResponseReceivedHandler(event:ApplicationEvent):void {
-			if(_view.attribute != null || _view.attributes != null) {
+			if(_view.parentEntity != null && _view.attribute != null || _view.attributes != null) {
 				var responses:IList = IList(event.result);
 				if ( nodeUpdated(responses) ) {
 					updateView();
@@ -133,21 +133,37 @@ package org.openforis.collect.presenter {
 			}
 		}
 		
-		protected function updateView() {
-			var approved:Boolean = false;
+		protected function isErrorConfirmed():Boolean {
+			var result:Boolean = false;
 			if ( _view.parentEntity != null ) {
 				if ( _view.attribute != null ) {
-					approved = _view.attribute.errorConfirmed;
+					result = _view.attribute.errorConfirmed;
 				} else if ( CollectionUtil.isNotEmpty(_view.attributes) ) {
 					for each (var a:AttributeProxy in _view.attributes) {
 						if ( a.errorConfirmed ) {
-							approved = true;
+							result = true;
 							break;
 						}
 					}
 				}
 			}
-			_view.approved = approved;
+			return result;
+		}
+		
+		/*
+		protected function isMissingValueApproved():Boolean {
+			var result:Boolean = false;
+			if ( _view.parentEntity != null && _view.attributeDefinition != null ) {
+				var attributeName:String = _view.attributeDefinition.name;
+				//to do
+			}
+			return result;
+		}
+		*/
+		
+		protected function updateView():void {
+			var errorConfirmed:Boolean = isErrorConfirmed();
+			_view.approved = errorConfirmed;
 			
 			updateValidationDisplayManager();
 		}

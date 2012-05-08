@@ -16,11 +16,14 @@
 			import org.openforis.collect.model.proxy.AttributeProxy;
 			import org.openforis.collect.model.proxy.EntityProxy;
 			import org.openforis.collect.presenter.AttributePresenter;
+			import org.openforis.collect.util.UIUtil;
 			
 			import spark.components.BorderContainer;
 			
 			public static const STYLE_NAME_NORMAL:String = "normal";
 			public static const STYLE_NAME_DISABLED:String = "disabled";
+			public static const STYLE_NAME_APPROVED:String = "approved";
+			
 
 			private var _direction:String;
 			private var _attributeDefinition:AttributeDefinitionProxy;
@@ -31,6 +34,7 @@
 			private var _internalLabelWidth:Number = 130;
 			private var _presenter:AttributePresenter;
 			private var _visited:Boolean;
+			private var _approved:Boolean;
 			
 			protected function creationCompleteHandler(event:FlexEvent):void {
 				initPresenter();
@@ -112,7 +116,19 @@
 			public function set visited(value:Boolean):void {
 				_visited = value;
 			}
-
+			
+			public function get approved():Boolean {
+				return _approved;
+			}
+			
+			public function set approved(value:Boolean):void {
+				_approved = value;
+				if(value) {
+					UIUtil.addStyleName(this, STYLE_NAME_APPROVED);
+				} else {
+					UIUtil.removeStyleName(this, STYLE_NAME_APPROVED);
+				}
+			}
 			
 		]]>
 	</fx:Script>

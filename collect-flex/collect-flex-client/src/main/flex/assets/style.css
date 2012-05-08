@@ -115,7 +115,7 @@ mx|ToolTip {
 }
 
 /* validation tooltips */
-mx|ToolTip.error, mx|ToolTip.warning {
+mx|ToolTip.error, mx|ToolTip.warning, mx|ToolTip.warningConfirmedError {
 	borderSkin: ClassReference("org.openforis.collect.ui.skin.ToolTipBorder");
 	color: #FFFFFF;
 	fontSize: 10;
@@ -128,7 +128,7 @@ mx|ToolTip.error {
 	borderColor: #CE2929;
 }
 
-mx|ToolTip.warning {
+mx|ToolTip.warning, mx|ToolTip.warningConfirmedError {
 	borderColor: #FF8800;
 }
 
@@ -143,7 +143,11 @@ detail|AttributeItemRenderer,
 	borderColor: #FFFFFF;
 	borderWeight: 1;
 }
-
+/*
+detail|AttributeItemRenderer.approved {
+	approvedIconVisible: true;
+}
+*/
 detail|AttributeItemRenderer.error, 
 	detail|MultipleAttributeFormItem.error s|BorderContainer,
 	detail|SingleEntityFormItem.error s|BorderContainer,

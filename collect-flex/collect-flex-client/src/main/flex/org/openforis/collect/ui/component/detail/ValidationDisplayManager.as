@@ -58,14 +58,18 @@ package org.openforis.collect.ui.component.detail
 			if(parentEntity != null && defn != null) {
 				var hasErrors:Boolean = attribute != null ? attribute.hasErrors(): false;
 				var hasWarnings:Boolean = attribute != null ? attribute.hasWarnings(): false;
+				var confirmedError:Boolean = false;
 				if(hasErrors || hasWarnings) {
 					if(hasErrors) {
 						flag = ValidationResultFlag.ERROR;
 					} else if(hasWarnings) {
 						flag = ValidationResultFlag.WARNING;
+						if ( attribute.errorConfirmed ) {
+							confirmedError = true;
+						}
 					}
 					validationMessages = attribute.validationResults.validationMessages;
-					apply(flag, validationMessages);
+					apply(flag, validationMessages, confirmedError);
 				} else if(showMinMaxCountErrors) {
 					displayMinMaxCountValidationErrors(parentEntity, defn);
 				} else {
@@ -83,12 +87,16 @@ package org.openforis.collect.ui.component.detail
 				var errorMessages:Array = new Array();
 				var warningMessages:Array = new Array();
 				var attributes:IList = parentEntity.getChildren(defn.name);
+				var confirmedError:Boolean = false;
 				for each (var a:AttributeProxy in attributes) {
 					if (a.hasErrors()) {
 						errorMessages = errorMessages.concat(a.validationResults.validationMessages);
 					}
 					if (a.hasWarnings()) {
 						warningMessages = warningMessages.concat(a.validationResults.validationMessages);
+						if ( a.errorConfirmed ) {
+							confirmedError = true;
+						}
 					}
 				}
 				var hasErrors:Boolean = errorMessages.length > 0;
@@ -97,11 +105,11 @@ package org.openforis.collect.ui.component.detail
 					if(hasErrors) {
 						flag = ValidationResultFlag.ERROR;
 						validationMessages = errorMessages;
-					} else if(hasWarnings) {
+					} else {
 						flag = ValidationResultFlag.WARNING;
 						validationMessages = warningMessages;
 					}
-					apply(flag, validationMessages);
+					apply(flag, validationMessages, confirmedError);
 				} else if(showMinMaxCountErrors) {
 					displayMinMaxCountValidationErrors(parentEntity, defn);
 				} else {
@@ -132,7 +140,7 @@ package org.openforis.collect.ui.component.detail
 			}
 		}
 
-		protected function apply(flag:ValidationResultFlag, messages:Array):void {
+		protected function apply(flag:ValidationResultFlag, messages:Array, confirmedError:Boolean = false):void {
 			if(_active) {
 				var newStyleName:String;
 				switch(flag) {
@@ -141,7 +149,11 @@ package org.openforis.collect.ui.component.detail
 						newStyleName = STYLE_NAME_ERROR;
 						break;
 					case ValidationResultFlag.WARNING:
-						_toolTipStyleName = ToolTipUtil.STYLE_NAME_WARNING;
+						if ( confirmedError ) {
+							_toolTipStyleName = ToolTipUtil.STYLE_NAME_WARNING_CONFIRMED_ERROR;
+						} else {
+							_toolTipStyleName = ToolTipUtil.STYLE_NAME_WARNING;
+						}
 						newStyleName = STYLE_NAME_WARNING;
 						break;
 					default:

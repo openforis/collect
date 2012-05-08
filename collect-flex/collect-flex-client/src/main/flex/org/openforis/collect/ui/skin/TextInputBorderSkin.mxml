@@ -8,8 +8,10 @@
     
     <fx:Script>
         <![CDATA[
-        import mx.core.EdgeMetrics;
-        import mx.core.IUIComponent;
+			import mx.core.EdgeMetrics;
+			import mx.core.IUIComponent;
+			
+			import org.openforis.collect.ui.Images;
         
         /* Define the skin elements that should not be colorized. */
         static private const exclusions:Array = ["background"];
@@ -95,9 +97,6 @@
 			var styleRemarksPresentIconVisible:* = getStyle("remarksPresentIconVisible");
 			remarksPresentIcon.visible = styleRemarksPresentIconVisible;
 			
-			//approved icon
-			approvedIcon.visible = getStyle("approvedIconVisible");
-			
             super.updateDisplayList(unscaledWidth, unscaledHeight);
             
             if (parent && parent is IUIComponent && !IUIComponent(parent).enabled)
@@ -136,8 +135,5 @@
 	
 	<!-- remarks present icon -->
 	<graphics:RemarksPresentIcon id="remarksPresentIcon" top="0" right="0" />
-	
-	<!-- approved icon -->
-	<graphics:FieldApprovedIcon id="approvedIcon" top="0" left="0" />
 	
 </local:SparkSkinForHalo>

@@ -18,6 +18,7 @@ package org.openforis.collect.util {
 		
 		public static const STYLE_NAME_ERROR:String = "error";
 		public static const STYLE_NAME_WARNING:String = "warning";
+		public static const STYLE_NAME_WARNING_CONFIRMED_ERROR:String = "warningConfirmedError";
 		
 		public static function create(object:DisplayObject, messages:Array, styleName:String = STYLE_NAME_ERROR):ToolTip {
 			var pt:Rectangle = object.stage.getBounds(object);
@@ -44,18 +45,28 @@ package org.openforis.collect.util {
 		
 		private static function getValidationToolTipTitle(styleName:String, multipleMessages:Boolean = false):String {
 			var title:String;
-			if(styleName == STYLE_NAME_ERROR) {
-				if(multipleMessages) {
-					title = Message.get("edit.validationToolTipTitle.errors");
-				} else {
-					title = Message.get("edit.validationToolTipTitle.error");
-				}
-			} else if(styleName == STYLE_NAME_WARNING) {
-				if(multipleMessages) {
-					title = Message.get("edit.validationToolTipTitle.warnings");
-				} else {
-					title = Message.get("edit.validationToolTipTitle.warning");
-				}
+			switch ( styleName ) {
+				case STYLE_NAME_ERROR:
+					if(multipleMessages) {
+						title = Message.get("edit.validationToolTipTitle.errors");
+					} else {
+						title = Message.get("edit.validationToolTipTitle.error");
+					}
+					break;
+				case STYLE_NAME_WARNING:
+					if(multipleMessages) {
+						title = Message.get("edit.validationToolTipTitle.warnings");
+					} else {
+						title = Message.get("edit.validationToolTipTitle.warning");
+					}
+					break;
+				case STYLE_NAME_WARNING_CONFIRMED_ERROR:
+					if(multipleMessages) {
+						title = Message.get("edit.validationToolTipTitle.warningsConfirmedError");
+					} else {
+						title = Message.get("edit.validationToolTipTitle.warningConfirmedError");
+					}
+					break;
 			}
 			return title;
 		}
