@@ -11,8 +11,8 @@ package org.openforis.collect.presenter
 	 */
 	public class RangeInputFieldPresenter extends InputFieldPresenter {
 		
-		protected static const RESTRICT_PATTERN:String = "^(\\*|-|\\?|((-?\\d*\\.?\\d*)(-?(-?\\d*\\.?\\d*))?))$";
-		protected static const INTEGER_RESTRICT_PATTERN:String = "^(\\*|-|\\?|((-?\\d*)(-?(-?\\d*))?))$";
+		protected static const RESTRICT_PATTERN:String = "^(\\*|-|\\?|((-?\\d*\\.?\\d*)(-(-?\\d*\\.?\\d*))?))$";
+		protected static const INTEGER_RESTRICT_PATTERN:String = "^(\\*|-|\\?|((-?\\d*)(-(-?\\d*))?))$";
 		protected static const SEPARATOR:String = "-";
 
 		private var _view:RangeInputField;
