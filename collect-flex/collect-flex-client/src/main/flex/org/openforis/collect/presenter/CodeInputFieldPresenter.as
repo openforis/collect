@@ -93,7 +93,7 @@ package org.openforis.collect.presenter {
 			}
 			PopUpManager.addPopUp(_popUp, FlexGlobals.topLevelApplication as DisplayObject, true);
 			PopUpManager.centerPopUp(_popUp);
-			_popUp.editable = Application.activeRecord.step != CollectRecord$Step.ANALYSIS;
+			_popUp.editable = Application.activeRecordEditable;
 			_popUp.multiple = _view.attributeDefinition.multiple;
 			_popUp.maxSpecified = _view.attributeDefinition.maxCount;
 			_popUp.title = _view.attributeDefinition.getLabelText();
