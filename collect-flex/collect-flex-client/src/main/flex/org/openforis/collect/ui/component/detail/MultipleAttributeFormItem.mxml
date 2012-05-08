@@ -78,8 +78,8 @@
 				icon="{Images.ADD}" 
 				labelPlacement="left" 
 				useHandCursor="true"
-				visible="{Application.activeRecord.step != CollectRecord$Step.ANALYSIS}"
-				includeInLayout="{Application.activeRecord.step != CollectRecord$Step.ANALYSIS}"
+				visible="{Application.activeRecordEditable}"
+				includeInLayout="{Application.activeRecordEditable}"
 				/>
 		</s:VGroup>
 			
