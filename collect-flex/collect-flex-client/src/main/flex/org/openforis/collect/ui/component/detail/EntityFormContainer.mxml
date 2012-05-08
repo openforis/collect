@@ -214,15 +214,15 @@
 					  styleName="addButton" 
 					  buttonMode="true" 
 					  useHandCursor="true"
-					  visible="{Application.activeRecord.step != CollectRecord$Step.ANALYSIS}" 
-					  includeInLayout="{Application.activeRecord.step != CollectRecord$Step.ANALYSIS}" 
+					  visible="{Application.activeRecordEditable}" 
+					  includeInLayout="{Application.activeRecordEditable}" 
 					  />
 			<s:Button id="deleteButton" 
 					  styleName="deleteButton" 
 					  buttonMode="true" 
 					  useHandCursor="true"
-					  visible="{Application.activeRecord.step != CollectRecord$Step.ANALYSIS &amp;&amp; dropDownList.selectedIndex >= 0}" 
-					  includeInLayout="{Application.activeRecord.step != CollectRecord$Step.ANALYSIS &amp;&amp; dropDownList.selectedIndex >= 0}" 
+					  visible="{Application.activeRecordEditable &amp;&amp; dropDownList.selectedIndex >= 0}" 
+					  includeInLayout="{Application.activeRecordEditable &amp;&amp; dropDownList.selectedIndex >= 0}" 
 					  />
 		</s:Group>
 		<s:Group id="internalContainer" 
