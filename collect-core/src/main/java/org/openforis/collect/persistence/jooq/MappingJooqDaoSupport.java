@@ -59,26 +59,6 @@ public class MappingJooqDaoSupport<E, J extends MappingJooqFactory<E>> extends J
 
 	}
 	
-	protected List<E> findContaining(TableField<?,String> field, String searchString, HashMap<TableField, String> qualifiers, int maxResults) {
-		J jf = getMappingJooqFactory();
-		SimpleSelectQuery<?> query = jf.selectContainsQuery(field, searchString);
-		query.addLimit(maxResults);
-		
-		Enumeration<TableField> e = Collections.enumeration(qualifiers.keySet());
-		while(e.hasMoreElements())
-		{	
-			TableField<?, String> t = e.nextElement();
-			query.addConditions(t.equal(qualifiers.get(t)));//query.addConditions(field2.equal(qualifier1));			
-		}
-		
-		query.execute();
-		Result<?> result = query.getResult();
-		List<E> entities = jf.fromResult(result);
-		return entities;
-	}
-
-
-	
 	@Transactional
 	protected E loadById(int id) {
 		J jf = getMappingJooqFactory();

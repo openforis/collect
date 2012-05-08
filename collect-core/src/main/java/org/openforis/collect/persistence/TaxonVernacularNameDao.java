@@ -6,6 +6,8 @@ import static org.openforis.collect.persistence.jooq.tables.OfcTaxonVernacularNa
 
 import java.sql.Connection;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 
@@ -64,9 +66,24 @@ public class TaxonVernacularNameDao
 		super.delete(id);
 	}
 	
-	/*public List<TaxonVernacularName> findByQualifier(String qualifier,String searchString, int maxResults) {
-		return findContaining(OFC_TAXON_VERNACULAR_NAME.QUALIFIER1, searchString, maxResults);
-	}*/
+	protected List<TaxonVernacularName> findContaining(TableField<?,String> field, String searchString, HashMap<TableField, String> qualifiers,
+			int maxResults) {
+		TaxonVernacularNameDao.JooqFactory jf = getMappingJooqFactory();
+		SimpleSelectQuery<?> query = jf.selectContainsQuery(field, searchString);
+		query.addLimit(maxResults);
+		
+		Enumeration<TableField> e = Collections.enumeration(qualifiers.keySet());
+		while(e.hasMoreElements())
+		{	
+			TableField<?, String> t = e.nextElement();
+			query.addConditions(t.equal(qualifiers.get(t)));//query.addConditions(field2.equal(qualifier1));			
+		}
+		
+		query.execute();
+		Result<?> result = query.getResult();
+		List<TaxonVernacularName> entities = jf.fromResult(result);
+		return entities;
+	}
 
 	protected static class JooqFactory extends
 			MappingJooqFactory<TaxonVernacularName> {
