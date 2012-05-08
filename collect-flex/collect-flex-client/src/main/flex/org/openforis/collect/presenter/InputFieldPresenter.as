@@ -251,14 +251,31 @@ package org.openforis.collect.presenter {
 			}
 		}
 		
-		protected static function confirmErrorHandler(event:NodeEvent): void {
+		protected static function confirmErrorHandler(event:NodeEvent):void {
+			var updRequest:UpdateRequest = new UpdateRequest();
+			var op:UpdateRequestOperation;
+			if ( event.nodeProxy != null ) {
+				op = createConfirmErrorOperation(event.nodeProxy);
+				updRequest.addOperation(op);
+			} else {
+				for each (var node:NodeProxy in event.nodes) {
+					var a:AttributeProxy = AttributeProxy(node);
+					if ( a.hasErrors() && ! a.errorConfirmed ) { 
+						op = createConfirmErrorOperation(node);
+						updRequest.addOperation(op);
+					}
+				}
+			}
+			_dataClient.updateActiveRecord(updRequest, null, faultHandler);
+		}
+		
+		protected static function createConfirmErrorOperation(node:NodeProxy):UpdateRequestOperation {
 			var updRequestOp:UpdateRequestOperation = new UpdateRequestOperation();
 			updRequestOp.method = UpdateRequestOperation$Method.CONFIRM_ERROR;
-			updRequestOp.nodeId = event.nodeProxy.id;
-			updRequestOp.parentEntityId = event.nodeProxy.parentId;
-			
-			var updRequest:UpdateRequest = new UpdateRequest(updRequestOp);
-			_dataClient.updateActiveRecord(updRequest, null, faultHandler);
+			updRequestOp.parentEntityId = node.parentId;
+			updRequestOp.nodeName = node.name;
+			updRequestOp.nodeId = node.id;
+			return updRequestOp;
 		}
 		
 		protected static function deleteNodeHandler(event:NodeEvent):void {
