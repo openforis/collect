@@ -112,6 +112,12 @@ package org.openforis.collect.model.proxy {
 							field.symbol = null;
 						}
 						break;
+					case UpdateRequestOperation$Method.CONFIRM_ERROR:
+						attr = getNode(reqOp.nodeId) as AttributeProxy;
+						if ( attr != null ) {
+							attr.errorConfirmed = true;
+						}
+						break;
 				}
 			}
 		}
