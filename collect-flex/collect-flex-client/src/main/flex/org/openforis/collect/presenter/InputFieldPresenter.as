@@ -444,7 +444,7 @@ package org.openforis.collect.presenter {
 			}
 			_view.hasRemarks = hasRemarks;
 			
-			_view.editable = Application.activeRecord.step != CollectRecord$Step.ANALYSIS;
+			_view.editable = Application.activeRecordEditable;
 		}
 		
 		protected function getField():FieldProxy {
