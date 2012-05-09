@@ -32,9 +32,12 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
+	import org.openforis.collect.model.CollectRecord$State;
+	import org.openforis.collect.model.CollectRecord$Step;
 	import org.openforis.collect.model.RecordSummarySortField;
 	import org.openforis.collect.model.RecordSummarySortField$Sortable;
 	import org.openforis.collect.model.proxy.RecordProxy;
+	import org.openforis.collect.model.proxy.UserProxy;
 	import org.openforis.collect.ui.UIBuilder;
 	import org.openforis.collect.ui.component.BackupPopUp;
 	import org.openforis.collect.ui.component.DataExportPopUp;
@@ -189,15 +192,23 @@ package org.openforis.collect.presenter {
 		 * */
 		protected function deleteButtonClickHandler(event:MouseEvent):void {
 			var selectedRecord:RecordProxy = _view.dataGrid.selectedItem as RecordProxy;
-			if(selectedRecord != null) {
-				AlertUtil.showConfirm("list.delete.confirm", null, "list.delete.confirmTitle", executeDelete);
-				
-				function executeDelete():void {
-					_dataClient.deleteRecord(new AsyncResponder(deleteRecordResultHandler, faultHandler), selectedRecord.id);
+			if(selectedRecord == null) {
+				AlertUtil.showError("list.error.recordNotSelected");
+			} else if ( selectedRecord.step != CollectRecord$Step.ENTRY ) {
+				var rootEntityLabel:String = Application.activeRootEntity.getLabelText();
+				var stepName:String = Message.get("phase." + selectedRecord.step.name);
+				if ( Application.user.canReject(selectedRecord) ) {
+					AlertUtil.showError("list.error.cannotDelete.rejectBeforeDeletePromotedRecord", [rootEntityLabel, stepName]);
+				} else {
+					AlertUtil.showError("list.error.cannoDeletePromotedRecord", [rootEntityLabel, stepName]);
 				}
 			} else {
-				AlertUtil.showError("list.error.recordNotSelected");
+				AlertUtil.showConfirm("list.delete.confirm", null, "list.delete.confirmTitle", executeDelete, [selectedRecord]);
 			}
+		}
+		
+		protected function executeDelete(record:RecordProxy):void {
+			_dataClient.deleteRecord(new AsyncResponder(deleteRecordResultHandler, faultHandler), record.id);
 		}
 		
 		protected function exportButtonClickHandler(event:MouseEvent):void {
