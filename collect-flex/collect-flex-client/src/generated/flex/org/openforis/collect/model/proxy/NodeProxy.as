@@ -7,6 +7,9 @@
 
 package org.openforis.collect.model.proxy {
 
+	/**
+	 * @author S. Ricci
+	 */
     [Bindable]
     [RemoteClass(alias="org.openforis.collect.model.proxy.NodeProxy")]
     public class NodeProxy extends NodeProxyBase {
@@ -17,6 +20,9 @@ package org.openforis.collect.model.proxy {
 			return false;
 		}
 		
+		public function get empty():Boolean {
+			return true;
+		}
     }
 
 }

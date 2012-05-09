@@ -7,8 +7,16 @@
 
 package org.openforis.collect.model.proxy {
 
+	/**
+	 * @author S. Ricci
+	 */
     [Bindable]
     [RemoteClass(alias="org.openforis.collect.model.proxy.CodeAttributeProxy")]
     public class CodeAttributeProxy extends CodeAttributeProxyBase {
+		
+		override public function get filled():Boolean {
+			return FieldProxy(fields[0]).hasValue();
+		}
+		
     }
 }

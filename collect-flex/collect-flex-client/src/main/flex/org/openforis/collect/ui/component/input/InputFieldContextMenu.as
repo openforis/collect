@@ -127,12 +127,16 @@ package org.openforis.collect.ui.component.input {
 				} else if(def.parentLayout == UIUtil.LAYOUT_TABLE) {
 					var entityDef:EntityDefinitionProxy = def.parent;
 					if(entityDef != null && entityDef.multiple) {
+						//var parentEntity:EntityProxy = _inputField.parentEntity;
 						switch(step) {
 							case CollectRecord$Step.ENTRY:
-								items.push(SET_STAR_IN_ROW, SET_DASH_IN_ROW );
+								//if ( parentEntity.hasDescendantWithBlankField() ) {
+									items.push(SET_STAR_IN_ROW, SET_DASH_IN_ROW );
+								//}
 								break;
 							case CollectRecord$Step.CLEANSING:
 								items.push(APPROVE_MISSING_IN_ROW);
+								break;
 						}
 						if( !entityDef.enumerable) {
 							items.push(DELETE_ENTITY);

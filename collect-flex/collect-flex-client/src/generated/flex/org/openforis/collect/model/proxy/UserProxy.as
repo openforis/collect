@@ -18,7 +18,7 @@ package org.openforis.collect.model.proxy {
 		public static const ROLE_ANALYSIS:String = "ROLE_ANALYSIS";
 		public static const ROLE_ADMIN:String = "ROLE_ADMIN";
 		
-		public static const ROLES_HIERARCHY:Array = [ROLE_ENTRY, ROLE_CLEANSING, ROLE_ANALYSIS, ROLE_ADMIN];
+		protected static const ROLES_HIERARCHY:Array = [ROLE_ENTRY, ROLE_CLEANSING, ROLE_ANALYSIS, ROLE_ADMIN];
 		
 		private function calculateHighestRoleIndex():int {
 			var max:int = -1;

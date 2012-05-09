@@ -8,7 +8,6 @@
 package org.openforis.collect.model.proxy {
 	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
-	import mx.messaging.management.Attribute;
 	
 	import org.granite.collections.IMap;
 	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
@@ -313,6 +312,46 @@ package org.openforis.collect.model.proxy {
 			return children.length;
 		}
 		
+		override public function get empty():Boolean {
+			var children:IList = getChildren();
+			for each (var child:NodeProxy in children ) {
+				if ( ! child.empty ) {
+					return false;
+				}
+			}
+			return true;
+		}
+		
+		public function hasDescendantWithBlankField():Boolean {
+			var children:IList = getChildren();
+			var nodes:Array = children.toArray();
+			while ( nodes.length > 0 ) {
+				var node:NodeProxy = NodeProxy(nodes.pop());
+				if ( node is AttributeProxy && AttributeProxy(node).hasBlankField() ) {
+					return true;
+				} else if (node is EntityProxy) {
+					var descendants:IList = EntityProxy(node).getChildren();
+					nodes = nodes.concat(descendants.toArray());
+				}
+			}
+			return false;
+		}
+		
+		protected function updateMap(map:IMap, newMap:IMap):void {
+			if(map != null && newMap != null) {
+				var newKeys:ArrayCollection = newMap.keySet;
+				for each (var key:* in newKeys) {
+					var value:* = newMap.get(key);
+					if(value != null) {
+						map.put(key, value);
+					}
+				}
+			}
+		}
+		
+		/*
+		* GETTERS AND SETTERS
+		*/
 		public function get keyText():String {
 			return _keyText;
 		}
@@ -345,18 +384,6 @@ package org.openforis.collect.model.proxy {
 			_enumeratedEntitiesCodeWidths = value;
 		}
 
-		protected function updateMap(map:IMap, newMap:IMap):void {
-			if(map != null && newMap != null) {
-				var newKeys:ArrayCollection = newMap.keySet;
-				for each (var key:* in newKeys) {
-					var value:* = newMap.get(key);
-					if(value != null) {
-						map.put(key, value);
-					}
-				}
-			}
-		}
-		
 		
 	}
 }

@@ -30,5 +30,38 @@ package org.openforis.collect.model.proxy {
 			return validationResults != null && CollectionUtil.isNotEmpty(validationResults.warnings);
 		}
 		
+		override public function get empty():Boolean {
+			for each (var field:FieldProxy in fields) {
+				if ( field.hasValue() ) {
+					return false;
+				}
+			}
+			return true;
+		}
+		
+		/**
+		 * Returns true if and only if each field contains a value
+		 */
+		public function get filled():Boolean {
+			for each (var field:FieldProxy in fields) {
+				if ( ! field.hasValue() ) {
+					return false;
+				}
+			}
+			return true;
+		}
+		
+		/**
+		 * Returns true if there is a field with no value or reason blank specified.
+		 */
+		public function hasBlankField():Boolean {
+			for each (var field:FieldProxy in fields) {
+				if ( ! ( field.hasValue() || field.hasReasonBlankSpecified() ) ) {
+					return false;
+				}
+			}
+			return true;
+		}
+		
     }
 }
