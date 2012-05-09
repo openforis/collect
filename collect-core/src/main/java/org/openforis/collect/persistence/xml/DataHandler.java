@@ -196,9 +196,9 @@ public class DataHandler extends DefaultHandler {
 		Attribute attr = (Attribute) node;
 		try {
 			if (field != null) {
-				Field<?> f = getField(attr, field);
-				if ( f != null ) {
-					fillField(f);
+				Field<?> fld = attr.getField(field);
+				if ( fld != null ) {
+					setField(fld);
 				} else {
 					warn("Can't parse field '"+field+"' for "+node.getPath()+" with type "+attr.getClass().getSimpleName());
 					this.node = node.getParent();
@@ -215,41 +215,11 @@ public class DataHandler extends DefaultHandler {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	protected void fillField(Field f) {
-		String value = getXmlValue();
-		Object parsedValue = f.parseValue(value);
-		f.setValue(parsedValue);
-		String remarks = attributes.getValue("remarks");
-		f.setRemarks(remarks);
-		String s = attributes.getValue("symbol");
-		if ( StringUtils.isNotBlank(s) ) {
-			char c = s.charAt(0);
-			FieldSymbol fs = FieldSymbol.valueOf(c);
-			if ( fs != null ) {
-				f.setSymbol(fs.getCode());
-			}
-		}
-		String state = attributes.getValue("state");
-		int stateInt = 0;
-		if ( state != null) {
-			stateInt = Integer.parseInt(state);
-			if ( stateInt > 0 ) {
-				f.getState().set(stateInt);
-			}
-		}
-	}
-	
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	protected void setSingleElementValue(Attribute attr) {
 		AttributeDefinition defn = (AttributeDefinition) attr.getDefinition();
 		String xmlValue = getXmlValue();
 		Object val = defn.createValue(xmlValue);
 		attr.setValue(val);
-	}
-	
-	@SuppressWarnings("rawtypes")
-	private Field<?> getField(Attribute attr, String fieldName) {
-		return attr.getField(fieldName);
 	}
 
 	protected String getXmlValue() {
@@ -265,8 +235,26 @@ public class DataHandler extends DefaultHandler {
 	}
 	
 	protected void setField(Field<?> fld) {
-		String xmlValue = getXmlValue();
-		fld.setValueFromString(xmlValue);
+		String value = getXmlValue();
+		fld.setValueFromString(value);
+		String remarks = attributes.getValue("remarks");
+		fld.setRemarks(remarks);
+		String s = attributes.getValue("symbol");
+		if ( StringUtils.isNotBlank(s) ) {
+			char c = s.charAt(0);
+			FieldSymbol fs = FieldSymbol.valueOf(c);
+			if ( fs != null ) {
+				fld.setSymbol(fs.getCode());
+			}
+		}
+		String state = attributes.getValue("state");
+		int stateInt = 0;
+		if ( state != null) {
+			stateInt = Integer.parseInt(state);
+			if ( stateInt > 0 ) {
+				fld.getState().set(stateInt);
+			}
+		}
 	}
 	
 	@Override
