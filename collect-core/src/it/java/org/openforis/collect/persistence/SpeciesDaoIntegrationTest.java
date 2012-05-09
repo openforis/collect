@@ -412,7 +412,7 @@ public class SpeciesDaoIntegrationTest {
 		assertEquals(lang, tvn.getLanguageCode());
 		assertEquals(variety, tvn.getLanguageVariety());
 		assertEquals(1, tvn.getQualifiers().size());		
-		assertEquals("21", tvn.getQualifiers().get(0));
+		assertEquals(qualifier1, tvn.getQualifiers().get(0));
 		assertEquals(step, tvn.getStep());
 		return tvn;
 	}

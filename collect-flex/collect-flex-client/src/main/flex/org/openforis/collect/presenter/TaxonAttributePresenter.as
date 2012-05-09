@@ -23,6 +23,11 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.ui.component.input.TaxonAttributeRenderer;
 	import org.openforis.collect.ui.component.input.TaxonAutoCompletePopUp;
 	import org.openforis.collect.util.PopUpUtil;
+
+	CONFIG::debugging {
+		import org.openforis.collect.util.itrace;
+	}
+
 	
 	/**
 	 * 
@@ -131,7 +136,9 @@ package org.openforis.collect.presenter {
 					client.findByScientificName(autoCompleteSearchResponder, searchText, MAX_RESULTS);
 					break;
 				case SEARCH_BY_VERNACULAR_NAME:
-					client.findByVernacularName(autoCompleteSearchResponder, searchText, MAX_RESULTS);
+					//detect the use of qualifier
+					//client.findByVernacularName(autoCompleteSearchResponder, searchText, MAX_RESULTS);					
+					client.findByVernacularName(autoCompleteSearchResponder, searchText, MAX_RESULTS);					
 					break;
 				default:
 			}
@@ -180,6 +187,9 @@ package org.openforis.collect.presenter {
 				var presenter:TaxonAttributePresenter = renderer.presenter as TaxonAttributePresenter;
 				presenter.performSelectTaxon(taxon);
 			}
+			CONFIG::debugging {
+				itrace.msg(" can not close, right?");
+			} 
 			closeAutoCompletePopUp();
 		}
 		
