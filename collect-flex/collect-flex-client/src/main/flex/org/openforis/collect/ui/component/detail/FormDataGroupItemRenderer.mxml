@@ -73,6 +73,9 @@
 				var maxAvailableWidth:Number = UIUtil.getMaxAvailableWidth(UIComponent(parentDocument));
 				if(!isNaN(maxAvailableWidth)) {
 					maxAvailableWidth -= 10; //padding difficult to extimate...
+					if ( ! occupyEntirePage ) {
+						maxAvailableWidth -= 15;
+					}
 					for(var i:int = 0; i < numElements; i++) {
 						var el:IVisualElement = getElementAt(i);
 						if(el is MultipleEntityFormItem) {

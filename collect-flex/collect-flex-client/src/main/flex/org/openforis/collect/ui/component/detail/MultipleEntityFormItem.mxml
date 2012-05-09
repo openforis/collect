@@ -64,6 +64,7 @@
 							  />
 
 		<s:VGroup paddingLeft="{occupyEntirePage ? 0: 30}" 
+				  paddingRight="0"
 				  height="100%" 
 				  width="100%">
 			<s:Scroller id="headerScroller" 
