@@ -58,11 +58,13 @@ public class RecordKeyUniquenessValidator implements ValidationRule<Attribute<?,
 		List<AttributeDefinition> keyAttributeDefinitions = getKeyAttributeDefinitions(entity);
 		for (NodeDefinition keyAttributeDefinition : keyAttributeDefinitions) {
 			String keyName = keyAttributeDefinition.getName();
-			Attribute<?, ?> attribute = (Attribute<?, ?>) entity.get(keyName, 0);
-			Field<?> field = attribute.getField(0);
 			String value = "";
-			if(field.getValue() != null){
-				value = field.getValue().toString();
+			Attribute<?, ?> attribute = (Attribute<?, ?>) entity.get(keyName, 0);
+			if ( attribute != null ) {
+				Field<?> field = attribute.getField(0);
+				if(field.getValue() != null){
+					value = field.getValue().toString();
+				}
 			}
 			keys.add(value);
 		}
