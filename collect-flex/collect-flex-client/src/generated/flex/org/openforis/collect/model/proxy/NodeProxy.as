@@ -6,6 +6,7 @@
  */
 
 package org.openforis.collect.model.proxy {
+	import mx.collections.IList;
 
 	/**
 	 * @author S. Ricci
@@ -22,6 +23,16 @@ package org.openforis.collect.model.proxy {
 		
 		public function get empty():Boolean {
 			return true;
+		}
+		
+		public function get index():int {
+			if ( parent == null ) {
+				return 0;
+			} else {
+				var children:IList = parent.getChildren(name);
+				var idx:int = children.getItemIndex(this);
+				return idx;
+			}
 		}
     }
 

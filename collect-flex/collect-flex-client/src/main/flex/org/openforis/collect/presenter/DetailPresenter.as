@@ -3,10 +3,13 @@ package org.openforis.collect.presenter {
 	 * 
 	 * @author S. Ricci
 	 * */
+	import flash.display.DisplayObject;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
 	
 	import mx.binding.utils.ChangeWatcher;
+	import mx.core.FlexGlobals;
+	import mx.managers.PopUpManager;
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.events.ResultEvent;
 	
@@ -23,6 +26,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.model.proxy.RecordProxy;
 	import org.openforis.collect.model.proxy.UserProxy;
 	import org.openforis.collect.ui.UIBuilder;
+	import org.openforis.collect.ui.component.ErrorListPopUp;
 	import org.openforis.collect.ui.component.detail.FormContainer;
 	import org.openforis.collect.ui.view.DetailView;
 	import org.openforis.collect.util.AlertUtil;
@@ -65,18 +69,7 @@ package org.openforis.collect.presenter {
 			ChangeWatcher.watch(rootEntity, "keyText", updateRecordKeyLabel);
 			
 			_view.formVersionText.text = version.getLabelText();
-			switch(step) {
-				case CollectRecord$Step.ENTRY:
-					_view.currentPhaseText.text = Message.get("edit.dataEntry");
-					break;
-				case CollectRecord$Step.CLEANSING:
-					_view.currentPhaseText.text = Message.get("edit.dataCleansing");
-					break;
-				case CollectRecord$Step.ANALYSIS:
-					_view.currentPhaseText.text = Message.get("edit.dataAnalysis");
-					break;
-			}
-			var editable:Boolean = Application.activeRecordEditable;
+			_view.currentPhaseText.text = getStepLabel(step);
 			
 			var user:UserProxy = Application.user;
 			var canSubmit:Boolean = user.canSubmit(activeRecord);
@@ -85,9 +78,7 @@ package org.openforis.collect.presenter {
 			var canReject:Boolean = user.canReject(activeRecord);
 			_view.rejectButton.visible = _view.rejectButton.includeInLayout = canReject;
 			
-			var canSave:Boolean = editable;
-			
-			_view.saveButton.visible = canSave;
+			_view.saveButton.visible = Application.activeRecordEditable;
 			
 			var form:FormContainer = null;
 			if (_view.formsContainer.contatinsForm(version,rootEntityDefn)){
@@ -103,6 +94,19 @@ package org.openforis.collect.presenter {
 			
 			form = _view.formsContainer.setActiveForm(version, rootEntityDefn);
 			form.record = activeRecord;
+		}
+		
+		protected function getStepLabel(step:CollectRecord$Step):String {
+			switch(step) {
+				case CollectRecord$Step.ENTRY:
+					return Message.get("edit.dataEntry");
+				case CollectRecord$Step.CLEANSING:
+					return Message.get("edit.dataCleansing");
+				case CollectRecord$Step.ANALYSIS:
+					return Message.get("edit.dataAnalysis");
+				default:
+					return null;
+			}
 		}
 		
 		protected function recordSavedHandler(event:ApplicationEvent):void {
@@ -149,7 +153,8 @@ package org.openforis.collect.presenter {
 			eventDispatcher.dispatchEvent(applicationEvent);
 			var totalErrors:int = r.errors + r.missingErrors + r.skipped;
 			if ( totalErrors > 0 ) {
-				AlertUtil.showError("error.promoteException");
+				//AlertUtil.showError("error.promoteException");
+				openErrorsListPopUp();
 			} else {
 				var messageResource:String;
 				if(r.step == CollectRecord$Step.ENTRY) {
@@ -159,6 +164,11 @@ package org.openforis.collect.presenter {
 				}
 				AlertUtil.showConfirm(messageResource, null, null, performSubmit);
 			}
+		}
+		
+		protected function openErrorsListPopUp():void {
+			var errorsListPopUp:ErrorListPopUp = ErrorListPopUp(PopUpManager.createPopUp(DisplayObject(FlexGlobals.topLevelApplication), ErrorListPopUp, false));
+			PopUpManager.centerPopUp(errorsListPopUp);
 		}
 		
 		protected function rejectButtonClickHandler(event:MouseEvent):void {

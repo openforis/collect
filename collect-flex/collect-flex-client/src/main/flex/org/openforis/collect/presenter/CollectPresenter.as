@@ -131,6 +131,7 @@ package org.openforis.collect.presenter {
 			var survey:SurveyProxy = event.result as SurveyProxy;
 			Application.activeSurvey = survey;
 			var schema:SchemaProxy = survey.schema;
+			schema.init();
 			var rootEntityDefinitions:ListCollectionView = schema.rootEntityDefinitions;
 			if(rootEntityDefinitions.length == 1){
 				var rootEntityDef:EntityDefinitionProxy = rootEntityDefinitions.getItemAt(0) as EntityDefinitionProxy;

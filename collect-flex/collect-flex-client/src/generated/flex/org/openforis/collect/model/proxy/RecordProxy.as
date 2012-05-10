@@ -43,7 +43,6 @@ package org.openforis.collect.model.proxy {
 		 * the visited node to it
 		 * */
 		public function traverse(funct:Function):void {
-			var stack:Array = new Array();
 			if ( rootEntity != null ) {
 				rootEntity.traverse(funct);
 			}
