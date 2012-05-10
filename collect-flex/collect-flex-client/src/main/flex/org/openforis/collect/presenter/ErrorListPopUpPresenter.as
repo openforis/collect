@@ -93,7 +93,7 @@ package org.openforis.collect.presenter
 						messages = [Message.get("edit.validation.maxCount", [childDefn.maxCount > 0 ? childDefn.maxCount: 1])];
 					}
 					var message:String = StringUtil.concat(", ", messages);
-					var label:String = createNodeLabel(entity) + "/" + childDefn.getLabelText();
+					var label:String = (entity.parent != null ? createNodeLabel(entity) + "/": "") + childDefn.getLabelText();
 					var item:Object = {label:label, message: message};
 					result.addItem(item);
 				}
