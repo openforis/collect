@@ -14,6 +14,7 @@ import java.util.Set;
 
 import javax.xml.namespace.QName;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openforis.collect.model.CollectRecord;
@@ -75,7 +76,10 @@ public class RecordManager {
 	@Transactional
 	public void save(CollectRecord record, String sessionId) throws RecordPersistenceException {
 		User user = record.getModifiedBy();
-		updateKeys(record);
+		
+		record.updateRootEntityKeyValues();
+		checkAllKeysSpecified(record);
+		
 		record.updateEntityCounts();
 
 		Integer id = record.getId();
@@ -436,21 +440,17 @@ public class RecordManager {
 		}
 	}
 	
-	private void updateKeys(CollectRecord record) throws RecordPersistenceException {
-		record.updateRootEntityKeyValues();
-		
-		//check that all keys have been specified
+	private void checkAllKeysSpecified(CollectRecord record) throws MissingRecordKeyException {
 		List<String> rootEntityKeyValues = record.getRootEntityKeyValues();
 		Entity rootEntity = record.getRootEntity();
 		EntityDefinition rootEntityDefn = rootEntity.getDefinition();
 		List<AttributeDefinition> keyAttributeDefns = rootEntityDefn.getKeyAttributeDefinitions();
-
 		boolean missingKey = false;
-		if (keyAttributeDefns.size() != rootEntityKeyValues.size()) {
-			missingKey = true;
-		} else {
-			for (String key : rootEntityKeyValues) {
-				if ( key == null ) {
+		for (int i = 0; i < keyAttributeDefns.size(); i++) {
+			AttributeDefinition keyAttrDefn = keyAttributeDefns.get(i);
+			if ( rootEntity.isRequired(keyAttrDefn.getName()) ) {
+				String keyValue = rootEntityKeyValues.get(i);
+				if ( StringUtils.isBlank(keyValue) ) {
 					missingKey = true;
 					break;
 				}
