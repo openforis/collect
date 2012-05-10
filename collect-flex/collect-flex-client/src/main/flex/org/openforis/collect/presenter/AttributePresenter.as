@@ -37,6 +37,7 @@ package org.openforis.collect.presenter {
 		override internal function initEventListeners():void {
 			super.initEventListeners();
 			eventDispatcher.addEventListener(ApplicationEvent.RECORD_SAVED, recordSavedHandler);
+			eventDispatcher.addEventListener(ApplicationEvent.ASK_FOR_SUBMIT, askForSubmitHandler);
 			eventDispatcher.addEventListener(ApplicationEvent.UPDATE_RESPONSE_RECEIVED, updateResponseReceivedHandler);
 			BindingUtils.bindSetter(setAttribute, _view, "attribute");
 			BindingUtils.bindSetter(setAttributes, _view, "attributes");
@@ -55,6 +56,10 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function recordSavedHandler(event:ApplicationEvent):void {
+			updateValidationDisplayManager();
+		}
+		
+		protected function askForSubmitHandler(event:ApplicationEvent):void {
 			updateValidationDisplayManager();
 		}
 		

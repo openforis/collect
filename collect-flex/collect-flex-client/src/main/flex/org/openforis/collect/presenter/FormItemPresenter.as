@@ -39,6 +39,7 @@ package org.openforis.collect.presenter
 			
 			eventDispatcher.addEventListener(ApplicationEvent.UPDATE_RESPONSE_RECEIVED, updateResponseReceivedHandler);
 			eventDispatcher.addEventListener(ApplicationEvent.RECORD_SAVED, recordSavedHandler);
+			eventDispatcher.addEventListener(ApplicationEvent.ASK_FOR_SUBMIT, askForSubmitHandler);
 			ChangeWatcher.watch(_view, "parentEntity", parentEntityChangeHandler);
 			ChangeWatcher.watch(_view, "modelVersion", modelVersionChangeHandler);
 		}
@@ -58,6 +59,10 @@ package org.openforis.collect.presenter
 		}
 		
 		protected function recordSavedHandler(event:ApplicationEvent):void {
+			updateValidationDisplayManager();
+		}
+		
+		protected function askForSubmitHandler(event:ApplicationEvent):void {
 			updateValidationDisplayManager();
 		}
 		
