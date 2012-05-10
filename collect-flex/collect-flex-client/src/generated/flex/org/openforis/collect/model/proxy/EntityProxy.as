@@ -14,6 +14,7 @@ package org.openforis.collect.model.proxy {
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.NumberAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.NumberAttributeDefinitionProxy$Type;
+	import org.openforis.collect.util.ArrayUtil;
 	import org.openforis.collect.util.ObjectUtil;
 	import org.openforis.collect.util.StringUtil;
 	import org.openforis.collect.util.UIUtil;
@@ -83,11 +84,14 @@ package org.openforis.collect.model.proxy {
 		 * Traverse each child and pass it to the argument function
 		 * */
 		public function traverse(funct:Function):void {
-			var children:IList = getChildren();
-			for each (var child:NodeProxy in children) {
-				funct(child);
-				if(child is EntityProxy) {
-					EntityProxy(child).traverse(funct);
+			var stack:Array = new Array();
+			stack.push(this);
+			while ( stack.length > 0 ) {
+				var node:NodeProxy = NodeProxy(stack.pop());
+				funct(node);
+				if ( node is EntityProxy ) {
+					var children:IList = EntityProxy(node).getChildren();
+					ArrayUtil.addAll(stack, children.toArray());
 				}
 			}
 		}
@@ -254,7 +258,7 @@ package org.openforis.collect.model.proxy {
 			return required == true;
 		}
 		
-		public function get childrenDefinitionNames():IList {
+		public function get childDefinitionNames():IList {
 			//taken from showChildrenErrorsMap that is fully populated from the server
 			//with an entry for each child definition
 			var names:ArrayCollection = showChildrenErrorsMap.keySet;
