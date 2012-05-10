@@ -3587,7 +3587,7 @@
                     <label>Date</label>
                 </date>
             </entity>
-            <code name="id" list="sampling_design" strict="false" key="true">
+            <code name="id" list="sampling_design" strict="false" key="true" required="true">
                 <label>Id</label>
             </code>
             <code name="region" list="admin_unit" required="true">
