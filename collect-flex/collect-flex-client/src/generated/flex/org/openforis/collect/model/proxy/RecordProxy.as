@@ -18,6 +18,7 @@ package org.openforis.collect.model.proxy {
 	import org.openforis.collect.remoting.service.UpdateRequestOperation;
 	import org.openforis.collect.remoting.service.UpdateRequestOperation$Method;
 	import org.openforis.collect.remoting.service.UpdateResponse;
+	import org.openforis.collect.util.ArrayUtil;
 
     [Bindable]
     [RemoteClass(alias="org.openforis.collect.model.proxy.RecordProxy")]
@@ -41,10 +42,10 @@ package org.openforis.collect.model.proxy {
 		 * Traverse all the record's nodes and execute the argument function passing
 		 * the visited node to it
 		 * */
-		public function traverse(fun:Function):void {
-			if(rootEntity != null) {
-				fun(rootEntity);
-				rootEntity.traverse(fun);
+		public function traverse(funct:Function):void {
+			var stack:Array = new Array();
+			if ( rootEntity != null ) {
+				rootEntity.traverse(funct);
 			}
 		}
 		
@@ -180,16 +181,12 @@ package org.openforis.collect.model.proxy {
 			stack.push(rootEntity);
 			while ( stack.length > 0 ) {
 				var entity:EntityProxy = stack.pop();
-				var childNodeNames:IList = entity.childrenDefinitionNames;
-				for each (var name:String in childNodeNames) {
+				var childDefinitionNames:IList = entity.childDefinitionNames;
+				for each (var name:String in childDefinitionNames) {
 					entity.showChildrenErrorsMap.put(name, true);
-					var children:IList = entity.getChildren(name);
-					for each (var child:NodeProxy in children) {
-						if(child is EntityProxy) {
-							stack.push(EntityProxy(child));
-						}
-					}
 				}
+				var childrenEntities:IList = entity.getChildEntities();
+				ArrayUtil.addAll(stack, childrenEntities.toArray());
 			}
 		}
 		
