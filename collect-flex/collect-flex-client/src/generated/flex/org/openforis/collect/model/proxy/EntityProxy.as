@@ -254,17 +254,11 @@ package org.openforis.collect.model.proxy {
 			return required == true;
 		}
 		
-		public function showErrorsOnDescendants():void {
-			var childNodeNames:ArrayCollection = showChildrenErrorsMap.keySet;
-			for each (var name:String in childNodeNames) {
-				showChildrenErrorsMap.put(name, true);
-				var children:IList = getChildren(name);
-				for each (var child:NodeProxy in children) {
-					if(child is EntityProxy) {
-						EntityProxy(child).showErrorsOnDescendants();
-					}
-				}
-			}
+		public function get childrenDefinitionNames():IList {
+			//taken from showChildrenErrorsMap that is fully populated from the server
+			//with an entry for each child definition
+			var names:ArrayCollection = showChildrenErrorsMap.keySet;
+			return names;
 		}
 		
 		override public function hasErrors():Boolean {

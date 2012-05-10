@@ -176,7 +176,21 @@ package org.openforis.collect.model.proxy {
 		}
 		
 		public function showErrors():void {
-			rootEntity.showErrorsOnDescendants();
+			var stack:Array = new Array();
+			stack.push(rootEntity);
+			while ( stack.length > 0 ) {
+				var entity:EntityProxy = stack.pop();
+				var childNodeNames:IList = entity.childrenDefinitionNames;
+				for each (var name:String in childNodeNames) {
+					entity.showChildrenErrorsMap.put(name, true);
+					var children:IList = entity.getChildren(name);
+					for each (var child:NodeProxy in children) {
+						if(child is EntityProxy) {
+							stack.push(EntityProxy(child));
+						}
+					}
+				}
+			}
 		}
 		
 		public function get updated():Boolean {
