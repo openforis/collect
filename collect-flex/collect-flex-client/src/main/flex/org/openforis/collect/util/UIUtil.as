@@ -99,13 +99,16 @@ package org.openforis.collect.util
 		
 		public static function ensureElementIsVisible(field:Object):void {
 			var scroller:Scroller = UIUtil.getFirstAncestor(field, Scroller);
-			if(scroller != null) {
+			while ( scroller != null ) {
 				var elementToShow:IVisualElement = field as IVisualElement;
 				if(elementToShow == null) {
 					elementToShow = getFirstAncestor(field, IVisualElement);
 				}
 				if(elementToShow != null) {
 					scroller.ensureElementIsVisible(elementToShow);
+					
+					elementToShow = scroller;
+					scroller = UIUtil.getFirstAncestor(scroller, Scroller);
 				}
 			}
 		}
