@@ -30,6 +30,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.ui.component.detail.FormContainer;
 	import org.openforis.collect.ui.view.DetailView;
 	import org.openforis.collect.util.AlertUtil;
+	import org.openforis.collect.util.PopUpUtil;
 	import org.openforis.collect.util.StringUtil;
 
 	public class DetailPresenter extends AbstractPresenter {
@@ -154,7 +155,7 @@ package org.openforis.collect.presenter {
 			var totalErrors:int = r.errors + r.missingErrors + r.skipped;
 			if ( totalErrors > 0 ) {
 				//AlertUtil.showError("error.promoteException");
-				openErrorsListPopUp();
+				PopUpUtil.createPopUp(ErrorListPopUp, false);
 			} else {
 				var messageResource:String;
 				if(r.step == CollectRecord$Step.ENTRY) {
@@ -164,11 +165,6 @@ package org.openforis.collect.presenter {
 				}
 				AlertUtil.showConfirm(messageResource, null, null, performSubmit);
 			}
-		}
-		
-		protected function openErrorsListPopUp():void {
-			var errorsListPopUp:ErrorListPopUp = ErrorListPopUp(PopUpManager.createPopUp(DisplayObject(FlexGlobals.topLevelApplication), ErrorListPopUp, false));
-			PopUpManager.centerPopUp(errorsListPopUp);
 		}
 		
 		protected function rejectButtonClickHandler(event:MouseEvent):void {
