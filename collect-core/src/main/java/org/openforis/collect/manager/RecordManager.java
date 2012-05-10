@@ -445,19 +445,14 @@ public class RecordManager {
 		Entity rootEntity = record.getRootEntity();
 		EntityDefinition rootEntityDefn = rootEntity.getDefinition();
 		List<AttributeDefinition> keyAttributeDefns = rootEntityDefn.getKeyAttributeDefinitions();
-		boolean missingKey = false;
 		for (int i = 0; i < keyAttributeDefns.size(); i++) {
 			AttributeDefinition keyAttrDefn = keyAttributeDefns.get(i);
 			if ( rootEntity.isRequired(keyAttrDefn.getName()) ) {
 				String keyValue = rootEntityKeyValues.get(i);
 				if ( StringUtils.isBlank(keyValue) ) {
-					missingKey = true;
-					break;
+					throw new MissingRecordKeyException();
 				}
 			}
-		}
-		if ( missingKey ) {
-			throw new MissingRecordKeyException();
 		}
 	}
 
