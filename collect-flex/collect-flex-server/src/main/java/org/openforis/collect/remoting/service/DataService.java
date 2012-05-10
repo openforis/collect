@@ -430,7 +430,6 @@ public class DataService {
 	
 	@SuppressWarnings("unchecked")
 	private Node<?> addNode(Entity parentEntity, NodeDefinition nodeDef, String requestValue, FieldSymbol symbol, String remarks) {
-		
 		if(nodeDef instanceof AttributeDefinition) {
 			AttributeDefinition def = (AttributeDefinition) nodeDef;
 			Attribute<?, ?> attribute = (Attribute<?, ?>) def.createNode();
@@ -444,9 +443,12 @@ public class DataService {
 				if(symbol != null) {
 					symbolChar = symbol.getCode();
 				}
-				Field<?> firstField = attribute.getField(0);
-				firstField.setSymbol(symbolChar);
-				firstField.setRemarks(remarks);
+				int fieldCount = attribute.getFieldCount();
+				for (int idx = 0; idx < fieldCount; idx++) {
+					Field<?> field = attribute.getField(idx);
+					field.setSymbol(symbolChar);
+					field.setRemarks(remarks);
+				}
 			}
 			return attribute;
 		} else {
