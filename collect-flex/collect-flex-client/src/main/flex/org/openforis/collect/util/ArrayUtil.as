@@ -190,5 +190,15 @@ package org.openforis.collect.util
 		public static function isNotIn(array:Array, value:*):Boolean {
 			return ! isIn(array, value);
 		}
+		
+		/**
+		 * Similar to the concat method of array but makes side effect on the source array
+		 */
+		public static function addAll(array:Array, values:Array):void {
+			for each (var value:* in values) {
+				array.push(value);
+			}
+			
+		}
 	}
 }
