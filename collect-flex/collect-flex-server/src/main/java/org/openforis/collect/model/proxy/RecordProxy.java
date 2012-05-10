@@ -34,6 +34,8 @@ public class RecordProxy implements Proxy {
 		errors = record.getErrors();
 		skipped = record.getSkipped();
 		missing = record.getMissing();
+		missingErrors = record.getMissingErrors();
+		missingWarnings = record.getMissingWarnings();
 		warnings = record.getWarnings();
 	}
 
