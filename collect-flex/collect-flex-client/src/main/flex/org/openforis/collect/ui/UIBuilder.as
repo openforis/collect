@@ -231,6 +231,7 @@ package org.openforis.collect.ui {
 		
 		public static function getInputFieldWidth(def:AttributeDefinitionProxy):Number {
 			var parentLayout:String = def.parentLayout;
+			var DOUBLE_BORDER_WEIGHT:int = 2;
 			if(def is BooleanAttributeDefinitionProxy) {
 				return 100;
 			} else if(def is CodeAttributeDefinitionProxy) {
@@ -257,23 +258,23 @@ package org.openforis.collect.ui {
 			} else if(def is NumberAttributeDefinitionProxy) {
 				var units:IList = NumberAttributeDefinitionProxy(def).units;
 				if(units.length > 1) {
-					return 192;
+					return 192 + DOUBLE_BORDER_WEIGHT;
 				} else if(units.length == 1) {
 					var unit:UnitProxy = units.getItemAt(0) as UnitProxy;
 					var unitWidth:Number = UIUtil.measureUnitWidth(unit.name);
-					return 70 + 2 + unitWidth;
+					return 70 + DOUBLE_BORDER_WEIGHT + unitWidth;
 				} else {
-					return 70;
+					return 70 + DOUBLE_BORDER_WEIGHT;
 				}
 			} else if(def is RangeAttributeDefinitionProxy) {
 				var rangeDef:RangeAttributeDefinitionProxy = RangeAttributeDefinitionProxy(def);
 				var rangeUnitsCount:int = rangeDef.units.length;
 				if(rangeUnitsCount > 1) {
-					return 242;
+					return 242 + DOUBLE_BORDER_WEIGHT;
 				} else if(rangeUnitsCount == 1) {
-					return 147;
+					return 147 + DOUBLE_BORDER_WEIGHT;
 				} else {
-					return 120;
+					return 120 + DOUBLE_BORDER_WEIGHT;
 				}
 			} else if(def is TaxonAttributeDefinitionProxy) {
 				if(parentLayout == UIUtil.LAYOUT_TABLE) {

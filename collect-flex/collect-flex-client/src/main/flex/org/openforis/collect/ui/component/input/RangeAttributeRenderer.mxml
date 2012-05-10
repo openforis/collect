@@ -6,9 +6,9 @@
 				xmlns:input="org.openforis.collect.ui.component.input.*" 
 				xmlns:detail="org.openforis.collect.ui.component.detail.*"
 				inputFields="{[rangeInputField, unitInputField]}"
-				width="120"
-				width.singleUnit="147"
-				width.multipleUnits="242"
+				width="122"
+				width.singleUnit="149"
+				width.multipleUnits="244"
 				>
 	<fx:Script>
 		<![CDATA[
