@@ -9,22 +9,23 @@ import java.util.concurrent.Callable;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.model.CollectRecord;
-import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
-import org.openforis.collect.model.User;
+import org.openforis.collect.model.RecordSummarySortField;
 import org.openforis.collect.persistence.xml.DataMarshaller;
+import org.openforis.collect.remoting.service.export.DataExportProcess;
+import org.openforis.collect.remoting.service.export.DataExportState;
+import org.openforis.collect.remoting.service.export.DataExportState.Format;
 
 /**
  * 
  * @author S. Ricci
  *
  */
-public class BackupProcess implements Callable<Void> {
+public class BackupProcess implements Callable<Void>, DataExportProcess {
 
 	private static Log LOG = LogFactory.getLog(BackupProcess.class);
 	
@@ -33,68 +34,98 @@ public class BackupProcess implements Callable<Void> {
 	
 	private File directory;
 	private CollectSurvey survey;
+	private DataExportState state;
+	private int[] stepNumbers;
 	private String rootEntityName;
-	private List<CollectRecord> recordSummaries;
-	private Step[] steps;
-	private User user;
-	private int count = -1;
-	private int total = -1;
-	private boolean active = false;
-	private boolean cancelled = false;
 	
-	public BackupProcess(RecordManager recordManager, DataMarshaller dataMarshaller, File directory, CollectSurvey survey, String rootEntityName) {
+	public BackupProcess(RecordManager recordManager, DataMarshaller dataMarshaller, File directory,
+			CollectSurvey survey, String rootEntityName, int[] stepNumbers) {
 		super();
 		this.recordManager = recordManager;
 		this.dataMarshaller = dataMarshaller;
 		this.directory = directory;
 		this.survey = survey;
 		this.rootEntityName = rootEntityName;
+		this.stepNumbers = stepNumbers;
+		this.state = new DataExportState(Format.XML);
 	}
 
 	@Override
-	public Void call() throws Exception {
-		this.active = Boolean.TRUE;
-		this.cancelled = Boolean.FALSE;
+	public DataExportState getState() {
+		return state;
+	}
 
-		String fileName = buildFileName();
-		File file = new File(directory, fileName);
-		if (file.exists()) {
-			file.delete();
-		}
-		FileOutputStream fileOutputStream = new FileOutputStream(file);
-		BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(fileOutputStream);
-		ZipOutputStream zipOutputStream = new ZipOutputStream(bufferedOutputStream);
-		count = 0;
-		if ( recordSummaries != null && steps != null ) {
-			total = calculateTotal();
-			for (CollectRecord summary : recordSummaries) {
-				if ( ! cancelled ) {
-					int recordStepNumber = summary.getStep().getStepNumber();
-					for (Step step: steps) {
-						int stepNumber = step.getStepNumber();
-						if ( stepNumber <= recordStepNumber) {
-							backup(summary, step, zipOutputStream);
-							count++;
-						}
-					}
-				} else {
-					finish();
-				}
-			}
-		}
-		zipOutputStream.flush();
-		zipOutputStream.close();
-
-		finish();
-		return null;
+	@Override
+	public void cancel() {
+		state.setCancelled(true);
+		state.setRunning(false);
 	}
 	
-	private int calculateTotal() {
+	@Override
+	public boolean isRunning() {
+		return state.isRunning();
+	}
+	
+	@Override
+	public boolean isComplete() {
+		return state.isComplete();
+	}
+	
+	@Override
+	public Void call() throws Exception {
+		try {
+			state.reset();
+			state.setRunning(true);
+			String fileName = "data.zip";
+			File file = new File(directory, fileName);
+			if (file.exists()) {
+				file.delete();
+			}
+			FileOutputStream fileOutputStream = new FileOutputStream(file);
+			BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(fileOutputStream);
+			ZipOutputStream zipOutputStream = new ZipOutputStream(bufferedOutputStream);
+			List<CollectRecord> recordSummaries = loadAllSummaries();
+			if ( recordSummaries != null && stepNumbers != null ) {
+				state.setTotal(calculateTotal(recordSummaries));
+				for (CollectRecord summary : recordSummaries) {
+					if ( ! state.isCancelled() ) {
+						int recordStepNumber = summary.getStep().getStepNumber();
+						for (int stepNum: stepNumbers) {
+							if ( stepNum <= recordStepNumber) {
+								backup(summary, stepNum, zipOutputStream);
+								state.incrementCount();
+							}
+						}
+					} else {
+						state.setRunning(false);
+						break;
+					}
+				}
+			}
+			zipOutputStream.flush();
+			zipOutputStream.close();
+			if ( ! state.isCancelled() ) {
+				state.setComplete(true);
+			}
+		} catch (Exception e) {
+			state.setError(true);
+			LOG.error("Error during data export", e);
+		} finally {
+			state.setRunning(false);
+		}
+		return null;
+	}
+
+	private List<CollectRecord> loadAllSummaries() {
+		List<CollectRecord> summaries = recordManager.loadSummaries(survey, rootEntityName, 0, Integer.MAX_VALUE, (List<RecordSummarySortField>) null, (String) null);
+		return summaries;
+	}
+	
+	private int calculateTotal(List<CollectRecord> recordSummaries) {
 		int count = 0;
 		for (CollectRecord summary : recordSummaries) {
 			int recordStepNumber = summary.getStep().getStepNumber();
-			for (Step step: steps) {
-				int stepNumber = step.getStepNumber();
+			for (int stepNumber: stepNumbers) {
 				if ( stepNumber <= recordStepNumber ) {
 					count ++;
 				}
@@ -103,10 +134,9 @@ public class BackupProcess implements Callable<Void> {
 		return count;
 	}
 	
-	private synchronized void backup(CollectRecord summary, Step step, ZipOutputStream zipOutputStream) {
+	private synchronized void backup(CollectRecord summary, int stepNumber, ZipOutputStream zipOutputStream) {
 		Integer id = summary.getId();
 		try {
-			int stepNumber = step.getStepNumber();
 			CollectRecord record = recordManager.load(survey, id, stepNumber);
 			String entryFileName = buildEntryFileName(record, stepNumber);
 			ZipEntry entry = new ZipEntry(entryFileName);
@@ -116,124 +146,16 @@ public class BackupProcess implements Callable<Void> {
 			zipOutputStream.closeEntry();
 			zipOutputStream.flush();
 		} catch (Exception e) {
+			String message = "Error while backing up " + id;
 			if (LOG.isErrorEnabled()) {
-				LOG.error("Error while backing up " + id, e);
+				LOG.error(message, e);
 			}
-			throw new RuntimeException("Error while backing up " + id, e);
+			throw new RuntimeException(message, e);
 		}
-	}
-	
-	public void cancel() throws Exception {
-		this.cancelled = true;
-		this.recordSummaries = null;
-		this.count = -1;
-
-		File file = new File(directory, survey + "_" + user);
-		if (file.exists()) {
-			file.delete();
-		}
-		finish();
 	}
 	
 	private String buildEntryFileName(CollectRecord record, int stepNumber) {
 		return stepNumber + File.separator + record.getId() + ".xml";
 	}
-	
-	private String buildFileName() {
-		String surveyName = survey.getName();
-		String fileName = surveyName +  "_" + rootEntityName + "_" + user.getName() + ".zip";
-		return fileName;
-	}
-
-	private void finish() {
-		this.active = false;
-	}
-	
-	@Override
-	public int hashCode() {
-		return new HashCodeBuilder().append(this.survey.getId()).toHashCode();
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		BackupProcess other = (BackupProcess) obj;
-		if (survey == null) {
-			if (other.survey != null)
-				return false;
-		} else if (!this.survey.getId().equals(other.survey.getId()))
-			return false;
-		return true;
-	}
-
-	public String getRootEntityName() {
-		return rootEntityName;
-	}
-
-	public void setRootEntityName(String rootEntityName) {
-		this.rootEntityName = rootEntityName;
-	}
-
-	public boolean isActive() {
-		return active;
-	}
-
-	public boolean isCancelled() {
-		return cancelled;
-	}
-
-	public User getUser() {
-		return user;
-	}
-
-	public void setUser(User user) {
-		this.user = user;
-	}
-
-	public int getTotal() {
-		return total;
-	}
-
-	public int getCount() {
-		return count;
-	}
-
-	public RecordManager getRecordManager() {
-		return recordManager;
-	}
-
-	public void setRecordManager(RecordManager recordManager) {
-		this.recordManager = recordManager;
-	}
-
-	public DataMarshaller getDataMarshaller() {
-		return dataMarshaller;
-	}
-
-	public void setDataMarshaller(DataMarshaller dataMarshaller) {
-		this.dataMarshaller = dataMarshaller;
-	}
-
-	public List<CollectRecord> getRecordSummaries() {
-		return recordSummaries;
-	}
-
-	public void setRecordSummaries(List<CollectRecord> recordSummaries) {
-		this.recordSummaries = recordSummaries;
-	}
-
-	public Step[] getSteps() {
-		return steps;
-	}
-
-	public void setSteps(Step[] steps) {
-		this.steps = steps;
-	}
-	
 	
 }

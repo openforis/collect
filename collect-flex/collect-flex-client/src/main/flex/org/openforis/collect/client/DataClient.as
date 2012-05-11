@@ -127,7 +127,7 @@ package org.openforis.collect.client {
 			Application.activeRecord.update(responses, token);
 		}
 
-		private function getRecordStepNumber(step:CollectRecord$Step):int {
+		public static function getRecordStepNumber(step:CollectRecord$Step):int {
 			switch(step) {
 				case CollectRecord$Step.ENTRY:
 					return 1;

@@ -8,7 +8,7 @@ import java.util.Locale;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.User;
-import org.openforis.collect.remoting.service.export.DataExportState;
+import org.openforis.collect.remoting.service.export.DataExportProcess;
 
 /**
  * @author M. Togna
@@ -25,7 +25,7 @@ public class SessionState {
 	private long lastHeartBeatTime;
 	private CollectSurvey activeSurvey;
 	private Locale locale;
-	private DataExportState dataExportState;
+	private DataExportProcess dataExportProcess;
 
 	public boolean isActiveRecordBeingEdited() {
 		if (activeRecord != null) {
@@ -85,14 +85,12 @@ public class SessionState {
 		this.locale = locale;
 	}
 
-	public DataExportState getDataExportState() {
-		return dataExportState;
+	public DataExportProcess getDataExportProcess() {
+		return dataExportProcess;
 	}
 
-	public void setDataExportState(
-			DataExportState dataExportState) {
-		this.dataExportState = dataExportState;
+	public void setDataExportProcess(DataExportProcess dataExportProcess) {
+		this.dataExportProcess = dataExportProcess;
 	}
-	
 
 }

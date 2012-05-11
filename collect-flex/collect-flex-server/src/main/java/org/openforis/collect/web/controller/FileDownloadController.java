@@ -16,7 +16,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.User;
-import org.openforis.collect.remoting.service.export.DataExportState;
+import org.openforis.collect.remoting.service.export.DataExportProcess;
 import org.openforis.collect.web.session.SessionState;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -40,8 +40,8 @@ public class FileDownloadController {
 	public @ResponseBody String downloadDataExport(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		try {
 			SessionState sessionState = getSessionState(request);
-			DataExportState dataExportState = sessionState.getDataExportState();
-			if ( dataExportState != null && dataExportState.isComplete() ) {
+			DataExportProcess dataExportProcess = sessionState.getDataExportProcess();
+			if ( dataExportProcess != null && dataExportProcess.isComplete() ) {
 				String path = buildDataExportFilePath(request);
 				File file = new File(path);
 				if ( file.exists() ) {

@@ -265,3 +265,12 @@ s|Label.indent {
 	skinClass: ClassReference("org.openforis.collect.ui.skin.DataGroupHeaderSkin");
 }
 
+.formLabel {
+	fontWeight: bold;
+}
+
+.infoMessage {
+	fontWeight: bold;
+	fontSize: 14;
+}
+

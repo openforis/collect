@@ -9,10 +9,7 @@ import javax.servlet.ServletContext;
 
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SessionManager;
-import org.openforis.collect.model.CollectRecord;
-import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
-import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.xml.DataMarshaller;
 import org.openforis.collect.remoting.service.backup.BackupProcess;
 import org.openforis.collect.util.ExecutorServiceUtil;
@@ -63,28 +60,9 @@ public class BackupService {
 		Map<String, Object> result = new HashMap<String, Object>();
 		try {
 			BackupProcess backup = getBackup(rootEntityName);
-			if (backup.isActive()) {
+			if (backup.isRunning()) {
 				result.put("error", "Another backup is already active for this survey. Please try later in a few minutes.");
 			} else {
-				SessionState sessionState = sessionManager.getSessionState();
-				User user = sessionState.getUser();
-				List<CollectRecord> summaries;
-				if ( ids == null ) {
-					summaries = getAllRecordSummaries(rootEntityName);
-				} else {
-					//todo
-					summaries = null;
-				}
-				Step[] steps;
-				if ( stepNumber == null || stepNumber <= 0) {
-					steps = Step.values();
-				} else {
-					Step step = Step.valueOf(stepNumber);
-					steps = new Step[] {step};
-				}
-				backup.setRecordSummaries(summaries);
-				backup.setUser(user);
-				backup.setSteps(steps);
 				ExecutorServiceUtil.executeInCachedPool(backup);
 				result.put("start", "The backup is started");
 			}
@@ -96,7 +74,7 @@ public class BackupService {
 	
 	public void cancel(String rootEntityName) throws Exception {
 		BackupProcess backup = getBackup(rootEntityName);
-		if (backup.isActive()) {
+		if (backup.isRunning()) {
 			backup.cancel();
 		}
 	}
@@ -104,9 +82,9 @@ public class BackupService {
 	public Map<String, Object> getStatus(String rootEntityName) throws Exception {
 		Map<String, Object> result = new HashMap<String, Object>();
 		BackupProcess backup = getBackup(rootEntityName);
-		result.put("active", backup.isActive());
-		result.put("total", backup.getTotal());
-		result.put("count", backup.getCount());
+		result.put("active", backup.isRunning());
+		//result.put("total", backup.getTotal());
+		//result.put("count", backup.getCount());
 		return result;
 	}
 	
@@ -121,17 +99,11 @@ public class BackupService {
 		}
 		BackupProcess backup = backupsPerSurvey.get(rootEntityName);
 		if (backup == null) {
-			backup = new BackupProcess(recordManager, dataMarshaller, backupDirectory, survey, rootEntityName);
+			int[] stepNumbers = {1, 2, 3};
+			backup = new BackupProcess(recordManager, dataMarshaller, backupDirectory, survey, rootEntityName, stepNumbers );
 			backupsPerSurvey.put(rootEntityName, backup);
 		}
 		return backup;
 	}
 
-	private List<CollectRecord> getAllRecordSummaries(String rootEntityName) {
-		SessionState sessionState = sessionManager.getSessionState();
-		CollectSurvey survey = sessionState.getActiveSurvey();
-		List<CollectRecord> summaries = recordManager.loadSummaries(survey, rootEntityName, 0, Integer.MAX_VALUE, null);
-		return summaries;
-	}
-	
 }

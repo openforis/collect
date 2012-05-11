@@ -82,6 +82,7 @@ public class CollectRecord extends Record {
 					throw new IllegalArgumentException("This record cannot be promoted.");
 			}
 		}
+		
 	}
 
 	public enum State {

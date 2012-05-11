@@ -2,6 +2,7 @@ package org.openforis.collect.remoting.service.export;
 
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 
+
 /**
  * 
  * @author S. Ricci
@@ -9,34 +10,46 @@ import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedPro
  */
 public class DataExportState {
 
-	private boolean exporting = false;
-	private boolean compressing = false;
+	public enum Format {
+		XML, CSV
+	}
+	
+	private boolean running = false;
 	private boolean error = false;
 	private boolean cancelled = false;
 	private boolean complete = false;
+	private Format format;
 
 	private int count;
 	private int total;
 
+	public DataExportState(Format format) {
+		super();
+		this.format = format;
+	}
+	
 	@ExternalizedProperty
 	public boolean isRunning() {
-		return (! complete && ! error) && (exporting || compressing);
+		return (! complete && ! error) && running;
+	}
+	
+	public void reset() {
+		count = 0;
+		running = false;
+		complete = false;
+		error = false;
+	}
+	
+	public void incrementCount() {
+		count ++;
 	}
 	
 	public boolean isExporting() {
-		return exporting;
+		return running;
 	}
 
-	public void setExporting(boolean exporting) {
-		this.exporting = exporting;
-	}
-
-	public boolean isCompressing() {
-		return compressing;
-	}
-
-	public void setCompressing(boolean compressing) {
-		this.compressing = compressing;
+	public void setRunning(boolean running) {
+		this.running = running;
 	}
 
 	public boolean isError() {
@@ -59,10 +72,6 @@ public class DataExportState {
 		return count;
 	}
 
-	public void setCount(int count) {
-		this.count = count;
-	}
-
 	public int getTotal() {
 		return total;
 	}
@@ -79,6 +88,8 @@ public class DataExportState {
 		this.complete = complete;
 	}
 
-	
-	
+	public Format getFormat() {
+		return format;
+	}
+
 }

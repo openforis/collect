@@ -16,6 +16,7 @@ import org.apache.commons.logging.LogFactory;
 import org.openforis.collect.manager.ConfigurationManager;
 import org.openforis.collect.model.Configuration;
 import org.openforis.collect.model.User;
+import org.openforis.collect.remoting.service.export.DataExportProcess;
 import org.openforis.collect.remoting.service.export.DataExportState;
 import org.openforis.collect.web.session.SessionState;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,8 +40,8 @@ public class DataExportController {
 	public @ResponseBody String downloadExportExportedData(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		try {
 			SessionState sessionState = getSessionState(request);
-			DataExportState dataExportState = sessionState.getDataExportState();
-			if ( dataExportState != null && dataExportState.isComplete() ) {
+			DataExportProcess dataExportProcess = sessionState.getDataExportProcess();
+			if ( dataExportProcess != null && dataExportProcess.isComplete() ) {
 				User user = sessionState.getUser();
 				String userName = user.getName();
 				Configuration configuration = configurationManager.getConfiguration();
