@@ -87,8 +87,8 @@ package org.openforis.collect.presenter {
 		
 		protected static function approveMissingHandler(event:NodeEvent): void {
 			var updRequest:UpdateRequest = new UpdateRequest();
-			if(event.nodeProxy != null || event.nodes != null) {
-				var node:NodeProxy = event.nodeProxy;
+			if(event.node != null || event.nodes != null) {
+				var node:NodeProxy = event.node;
 				if(node == null) {
 					var nodes:IList = event.nodes;
 					if(nodes != null && nodes.length == 1) {
@@ -110,8 +110,8 @@ package org.openforis.collect.presenter {
 		protected static function applyDefaultValueHandler(event:NodeEvent):void {
 			var updRequestOp:UpdateRequestOperation = new UpdateRequestOperation();
 			updRequestOp.method = UpdateRequestOperation$Method.APPLY_DEFAULT_VALUE;
-			updRequestOp.parentEntityId = event.nodeProxy.parentId;
-			updRequestOp.nodeId = event.nodeProxy.id;
+			updRequestOp.parentEntityId = event.node.parentId;
+			updRequestOp.nodeId = event.node.id;
 			
 			var updRequest:UpdateRequest = new UpdateRequest(updRequestOp);
 			_dataClient.updateActiveRecord(updRequest, null, faultHandler);
@@ -121,8 +121,8 @@ package org.openforis.collect.presenter {
 			var updRequest:UpdateRequest = new UpdateRequest();
 			var operation:UpdateRequestOperation;
 			var fieldIdx:int;
-			if(event.nodeProxy != null) {
-				var attribute:AttributeProxy = AttributeProxy(event.nodeProxy);
+			if(event.node != null) {
+				var attribute:AttributeProxy = AttributeProxy(event.node);
 				if(event.fieldIdx >= 0) {
 					prepareUpdateRemarksRequest(updRequest, attribute, event.remarks, event.fieldIdx);
 				} else {
@@ -154,7 +154,7 @@ package org.openforis.collect.presenter {
 		
 		protected static function updateSymbolHandler(event:NodeEvent): void {
 			var updRequest:UpdateRequest = new UpdateRequest();
-			prepareUpdateSymbolRequests(updRequest, event.nodeProxy, event.symbol, event.fieldIdx, event.applyToNonEmptyNodes);
+			prepareUpdateSymbolRequests(updRequest, event.node, event.symbol, event.fieldIdx, event.applyToNonEmptyNodes);
 			_dataClient.updateActiveRecord(updRequest, null, faultHandler);
 		}
 		
@@ -254,8 +254,8 @@ package org.openforis.collect.presenter {
 		protected static function confirmErrorHandler(event:NodeEvent):void {
 			var updRequest:UpdateRequest = new UpdateRequest();
 			var op:UpdateRequestOperation;
-			if ( event.nodeProxy != null ) {
-				op = createConfirmErrorOperation(event.nodeProxy);
+			if ( event.node != null ) {
+				op = createConfirmErrorOperation(event.node);
 				updRequest.addOperation(op);
 			} else {
 				for each (var node:NodeProxy in event.nodes) {
@@ -279,7 +279,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected static function deleteNodeHandler(event:NodeEvent):void {
-			var node:NodeProxy = event.nodeProxy;
+			var node:NodeProxy = event.node;
 			var updRequestOp:UpdateRequestOperation = new UpdateRequestOperation();
 			updRequestOp.method = UpdateRequestOperation$Method.DELETE;
 			updRequestOp.parentEntityId = node.parentId;

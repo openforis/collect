@@ -174,13 +174,13 @@ package org.openforis.collect.ui.component.input {
 				case SET_DASH_IN_ROW:
 					nodeEvent = new NodeEvent(NodeEvent.UPDATE_SYMBOL);
 					nodeEvent.symbol = FieldSymbol.DASH_ON_FORM;
-					nodeEvent.nodeProxy = parentEntity;
+					nodeEvent.node = parentEntity;
 					nodeEvent.applyToNonEmptyNodes = false;
 					break;
 				case SET_STAR_IN_ROW:
 					nodeEvent = new NodeEvent(NodeEvent.UPDATE_SYMBOL);
 					nodeEvent.symbol = FieldSymbol.BLANK_ON_FORM;
-					nodeEvent.nodeProxy = parentEntity;
+					nodeEvent.node = parentEntity;
 					nodeEvent.applyToNonEmptyNodes = false;
 					break;
 				case DELETE_ATTRIBUTE:
@@ -205,7 +205,7 @@ package org.openforis.collect.ui.component.input {
 					break;
 				case APPROVE_MISSING_IN_ROW:
 					nodeEvent = new NodeEvent(NodeEvent.APPROVE_MISSING);
-					nodeEvent.nodeProxy = parentEntity;
+					nodeEvent.node = parentEntity;
 					nodeEvent.applyToNonEmptyNodes = false;
 					break;
 				case APPLY_DEFAULT_VALUE:
@@ -224,7 +224,7 @@ package org.openforis.collect.ui.component.input {
 			if(attrDefn.multiple && inputField is CodeInputField) {
 				event.nodes = inputField.parentEntity.getChildren(attrDefn.name);
 			} else {
-				event.nodeProxy = inputField.attribute;
+				event.node = inputField.attribute;
 				event.fieldIdx = inputField.fieldIndex;
 			}
 			return event;
@@ -232,7 +232,7 @@ package org.openforis.collect.ui.component.input {
 		
 		private static function performDeleteNode(node:NodeProxy):void {
 			var event:NodeEvent = new NodeEvent(NodeEvent.DELETE_NODE);
-			event.nodeProxy = node;
+			event.node = node;
 			EventDispatcherFactory.getEventDispatcher().dispatchEvent(event);
 		}
 		

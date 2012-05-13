@@ -112,7 +112,7 @@ package org.openforis.collect.ui.component.input {
 							nodeEvent.nodeName = nodeDefinition.name;
 							
 							if ( ! nodeDefinition.multiple) {
-								nodeEvent.nodeProxy = AttributeFormItem(formItem).attribute;
+								nodeEvent.node = AttributeFormItem(formItem).attribute;
 							} else {
 								nodeEvent.parentEntity = parentEntity;
 								nodeEvent.nodes = parentEntity.getChildren(nodeDefinition.name);
