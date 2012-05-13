@@ -44,6 +44,7 @@ package org.openforis.collect.model.proxy {
 		 * */
 		public function traverse(funct:Function):void {
 			if ( rootEntity != null ) {
+				funct(rootEntity);
 				rootEntity.traverse(funct);
 			}
 		}

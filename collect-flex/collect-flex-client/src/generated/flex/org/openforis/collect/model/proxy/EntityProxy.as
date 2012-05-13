@@ -85,12 +85,13 @@ package org.openforis.collect.model.proxy {
 		 * */
 		public function traverse(funct:Function):void {
 			var stack:Array = new Array();
-			stack.push(this);
+			var children:IList = getChildren();
+			ArrayUtil.addAll(stack, children.toArray());
 			while ( stack.length > 0 ) {
 				var node:NodeProxy = NodeProxy(stack.pop());
 				funct(node);
 				if ( node is EntityProxy ) {
-					var children:IList = EntityProxy(node).getChildren();
+					children = EntityProxy(node).getChildren();
 					ArrayUtil.addAll(stack, children.toArray());
 				}
 			}
