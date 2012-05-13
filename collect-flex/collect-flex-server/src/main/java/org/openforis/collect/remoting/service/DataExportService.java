@@ -93,12 +93,7 @@ public class DataExportService {
 			}
 			CollectSurvey survey = sessionState.getActiveSurvey();
 			if ( stepNumbers == null ) {
-				Step[] steps = Step.values();
-				stepNumbers = new int[steps.length];
-				int i = 0;
-				for (Step step : steps) {
-					stepNumbers[i++] = step.getStepNumber();
-				}
+				stepNumbers = getAllStepNumbers();
 			}
 			BackupProcess process = new BackupProcess(recordManager, dataMarshaller, exportDir, survey, rootEntityName, stepNumbers);
 			dataExportProcess = process;
@@ -106,6 +101,17 @@ public class DataExportService {
 			ExecutorServiceUtil.executeInCachedPool(process);
 		}
 		return dataExportProcess.getState();
+	}
+
+	private int[] getAllStepNumbers() {
+		int[] stepNumbers;
+		Step[] steps = Step.values();
+		stepNumbers = new int[steps.length];
+		int i = 0;
+		for (Step step : steps) {
+			stepNumbers[i++] = step.getStepNumber();
+		}
+		return stepNumbers;
 	}
 	
 	public void cancel() {

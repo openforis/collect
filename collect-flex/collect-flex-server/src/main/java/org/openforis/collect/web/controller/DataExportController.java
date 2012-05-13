@@ -17,7 +17,6 @@ import org.openforis.collect.manager.ConfigurationManager;
 import org.openforis.collect.model.Configuration;
 import org.openforis.collect.model.User;
 import org.openforis.collect.remoting.service.export.DataExportProcess;
-import org.openforis.collect.remoting.service.export.DataExportState;
 import org.openforis.collect.web.session.SessionState;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
