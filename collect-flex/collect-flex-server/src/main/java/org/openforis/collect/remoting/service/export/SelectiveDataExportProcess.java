@@ -6,11 +6,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openforis.collect.manager.RecordManager;
@@ -20,6 +22,7 @@ import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.RecordSummarySortField;
 import org.openforis.collect.persistence.RecordPersistenceException;
 import org.openforis.collect.remoting.service.export.DataExportState.Format;
+import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.model.expression.InvalidExpressionException;
@@ -27,6 +30,8 @@ import org.openforis.idm.transform.AutomaticColumnProvider;
 import org.openforis.idm.transform.ColumnProvider;
 import org.openforis.idm.transform.ColumnProviderChain;
 import org.openforis.idm.transform.DataTransformation;
+import org.openforis.idm.transform.PivotExpressionColumnProvider;
+import org.openforis.idm.transform.SingleAttributeColumnProvider;
 import org.openforis.idm.transform.csv.ModelCsvWriter;
 
 /**
@@ -161,23 +166,51 @@ public class SelectiveDataExportProcess implements Callable<Void>, DataExportPro
 	private DataTransformation getTransform() throws InvalidExpressionException {
 		Schema schema = survey.getSchema();
 		EntityDefinition entityDefn = (EntityDefinition) schema.getById(entityId);
+		List<ColumnProvider> columnProviders = createAncestorsKeyColumnsProvider(entityDefn);
+		columnProviders.add(new AutomaticColumnProvider(entityDefn));
+		ColumnProvider provider = new ColumnProviderChain(columnProviders);
 		String axisPath = entityDefn.getPath();
-		EntityDefinition rowDefn = (EntityDefinition) schema.getByPath(axisPath);
-		
-		ColumnProvider provider = new ColumnProviderChain(
-				/*
-				new PivotExpressionColumnProvider("parent()/parent()", 
-						new SingleAttributeColumnProvider("id", "cluster_id"),
-						new SingleAttributeColumnProvider("region", "cluster_region"),
-						new SingleAttributeColumnProvider("district", "cluster_district")),
-				new PivotExpressionColumnProvider("parent()", 
-						new SingleAttributeColumnProvider("no","plot_no"),	
-						new SingleAttributeColumnProvider("subplot", "subplot")),
-				//new TaxonColumnProvider("species"),
-				 */
-				new AutomaticColumnProvider(rowDefn)
-				);
 		return new DataTransformation(axisPath, provider);
 	}
 	
+	private List<ColumnProvider> createAncestorsKeyColumnsProvider(EntityDefinition entityDefn) {
+		List<ColumnProvider> columnProviders = new ArrayList<ColumnProvider>();
+		EntityDefinition parentDefn = entityDefn.getParentDefinition();
+		int depth = 1;
+		while ( parentDefn != null ) {
+			ColumnProvider parentKeyColumnsProvider = createKeyColumnsProvider(parentDefn, depth);
+			columnProviders.add(0, parentKeyColumnsProvider);
+			parentDefn = parentDefn.getParentDefinition();
+			depth++;
+		}
+		return columnProviders;
+	}
+	
+	private ColumnProvider createKeyColumnsProvider(EntityDefinition entityDefn, int depth) {
+		List<AttributeDefinition> keyAttrDefns = entityDefn.getKeyAttributeDefinitions();
+		ColumnProvider[] providers = new ColumnProvider[keyAttrDefns.size()];
+		for (int i = 0; i < keyAttrDefns.size(); i++) {
+			AttributeDefinition keyDefn = keyAttrDefns.get(i);
+			String columnName = createKeyAttributeColumnName(keyDefn);
+			providers[i] = new SingleAttributeColumnProvider(keyDefn.getName(), columnName);
+		}
+		String expression = StringUtils.repeat("parent()", "/", depth);
+		ColumnProvider result = new PivotExpressionColumnProvider(expression, providers);
+		return result;
+	}
+	
+	private String createKeyAttributeColumnName(AttributeDefinition attrDefn) {
+		StringBuilder sb = new StringBuilder();
+		String name = attrDefn.getName();
+		sb.append(name);
+		EntityDefinition parent = attrDefn.getParentDefinition();
+		while ( parent != null ) {
+			String parentName = parent.getName();
+			sb.insert(0, '_').insert(0, parentName);
+			parent = parent.getParentDefinition();
+		}
+		return sb.toString();
+	}
+	
 }
+
