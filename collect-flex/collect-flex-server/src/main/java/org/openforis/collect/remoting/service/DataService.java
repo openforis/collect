@@ -585,6 +585,12 @@ public class DataService {
 		this.sessionManager.clearActiveRecord();
 	}
 	
+	public void moveNode(int nodeId, int index) {
+		SessionState sessionState = sessionManager.getSessionState();
+		CollectRecord record = sessionState.getActiveRecord();
+		recordManager.moveNode(record, nodeId, index);
+	}
+
 	/**
 	 * Gets the code list items assignable to the specified attribute and matching the specified codes.
 	 * 

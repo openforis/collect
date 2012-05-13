@@ -4,13 +4,26 @@ package org.openforis.collect.presenter
 	
 	import mx.binding.utils.ChangeWatcher;
 	import mx.collections.IList;
+	import mx.controls.Alert;
+	import mx.rpc.AsyncResponder;
+	import mx.rpc.IResponder;
+	import mx.rpc.events.ResultEvent;
 	
+	import org.openforis.collect.Application;
+	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.event.ApplicationEvent;
+	import org.openforis.collect.event.NodeEvent;
+	import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
+	import org.openforis.collect.metamodel.proxy.SchemaProxy;
+	import org.openforis.collect.model.proxy.EntityProxy;
+	import org.openforis.collect.model.proxy.NodeProxy;
 	import org.openforis.collect.remoting.service.UpdateResponse;
 	import org.openforis.collect.ui.component.detail.CollectFormItem;
 	import org.openforis.collect.ui.component.detail.RelevanceDisplayManager;
 	import org.openforis.collect.ui.component.detail.ValidationDisplayManager;
 	import org.openforis.collect.ui.component.input.FormItemContextMenu;
+	import org.openforis.collect.util.CollectionUtil;
+	import org.openforis.collect.model.proxy.RecordProxy;
 
 	/**
 	 * 
@@ -24,6 +37,10 @@ package org.openforis.collect.presenter
 		protected var _relevanceDisplayManager:RelevanceDisplayManager;
 		private var _contextMenu:FormItemContextMenu;
 		
+		{
+			eventDispatcher.addEventListener(NodeEvent.MOVE, nodeMoveHandler);
+		}
+		
 		public function FormItemPresenter(view:CollectFormItem) {
 			_view = view;
 			_relevanceDisplayManager = new RelevanceDisplayManager(view);
@@ -32,6 +49,26 @@ package org.openforis.collect.presenter
 			super();
 			
 			updateView();
+		}
+		
+		private static function nodeMoveHandler(event:NodeEvent):void {
+			var schema:SchemaProxy = Application.activeSurvey.schema;
+			var record:RecordProxy = Application.activeRecord;
+			var node:NodeProxy = event.node;
+			var index:int = event.index;
+			var parent:EntityProxy = EntityProxy(record.getNode(node.parentId));
+			var nodeId:int = node.id;
+			var nodeDefn:NodeDefinitionProxy = schema.getDefinitionById(node.definitionId);
+			var nodeName:String = nodeDefn.name;
+			var attributes:IList = parent.getChildren(nodeName);
+			CollectionUtil.moveItem(attributes, node, index);
+			
+			var responder:IResponder = new AsyncResponder(moveResultHandler, faultHandler); 
+			ClientFactory.dataClient.moveNode(responder, nodeId, index);
+		}
+		
+		private static function moveResultHandler(event:ResultEvent):void {
+			//do nothing
 		}
 		
 		override internal function initEventListeners():void {

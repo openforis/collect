@@ -54,16 +54,8 @@ package org.openforis.collect.util
 		}
 		
 		public static function moveItem(list:IList, item:Object, newIndex:int):void {
-			var oldIndex:int = removeItem(list, item);
-			var index:int;
-			if(oldIndex > newIndex) {
-				index = newIndex;
-			} else if(newIndex > 0) {
-				index = newIndex - 1;
-			} else {
-				index = 0;
-			}
-			list.addItemAt(item, index);
+			removeItem(list, item);
+			list.addItemAt(item, newIndex);
 		}
 		
 		public static function contains(list:IList, item:Object):Boolean {

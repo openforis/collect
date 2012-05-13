@@ -10,8 +10,9 @@ package org.openforis.collect.client {
 	import org.openforis.collect.event.EventDispatcherFactory;
 	import org.openforis.collect.model.CollectRecord$Step;
 	import org.openforis.collect.model.proxy.FieldProxy;
-	import org.openforis.collect.remoting.service.UpdateRequest;
+	import org.openforis.collect.model.proxy.NodeProxy;
 	import org.openforis.collect.model.proxy.RecordProxy;
+	import org.openforis.collect.remoting.service.UpdateRequest;
 	
 	/**
 	 * 
@@ -22,6 +23,7 @@ package org.openforis.collect.client {
 		private var _queueProcessor:RemoteCallQueueProcessor;
 
 		private var _updateActiveRecordOperation:Operation;
+		private var _moveNodeOperation:Operation;
 		private var _saveActiveRecordOperation:Operation;
 		private var _createRecordOperation:Operation;
 		private var _deleteRecordOperation:Operation;
@@ -39,6 +41,7 @@ package org.openforis.collect.client {
 			
 			this._queueProcessor = new RemoteCallQueueProcessor(1, queueResultHandler);
 			this._updateActiveRecordOperation = getOperation("updateActiveRecord");
+			this._moveNodeOperation = getOperation("moveNode");
 			this._saveActiveRecordOperation = getOperation("saveActiveRecord");
 			this._createRecordOperation = getOperation("createRecord");
 			this._deleteRecordOperation = getOperation("deleteRecord");
@@ -83,6 +86,11 @@ package org.openforis.collect.client {
 		
 		public function updateActiveRecord(request:UpdateRequest, resultHandler:Function = null, faultHandler:Function = null):void {
 			this._queueProcessor.appendOperation(request, resultHandler, faultHandler, _updateActiveRecordOperation, request);
+		}
+		
+		public function moveNode(responder:IResponder, nodeId:int, index:int):void {
+			var token:AsyncToken = this._moveNodeOperation.send(nodeId, index);
+			token.addResponder(responder);
 		}
 		
 		public function isLockingActiveRecord(responder:IResponder):void {
