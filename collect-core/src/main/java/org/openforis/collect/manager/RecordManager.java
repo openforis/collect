@@ -162,7 +162,7 @@ public class RecordManager {
 	}
 
 	@Transactional
-	public void promote(CollectRecord record, User user) throws RecordPromoteException {
+	public void promote(CollectRecord record, User user) throws RecordPromoteException, MissingRecordKeyException {
 		Integer errors = record.getErrors();
 		Integer skipped = record.getSkipped();
 		Integer missing = record.getMissingErrors();
@@ -170,6 +170,9 @@ public class RecordManager {
 		if( totalErrors > 0 ){
 			throw new RecordPromoteException("Record cannot be promoted becuase it contains errors.");
 		}
+		record.updateRootEntityKeyValues();
+		checkAllKeysSpecified(record);
+		record.updateEntityCounts();
 
 		Integer id = record.getId();
 		// before save record in current step
