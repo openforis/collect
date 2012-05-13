@@ -274,6 +274,15 @@ public class RecordManager {
 		return entity;
 	}
 	
+	public void moveNode(CollectRecord record, int nodeId, int index) {
+		Node<?> node = record.getNodeByInternalId(nodeId);
+		Entity parent = node.getParent();
+		String name = node.getName();
+		List<Node<?>> siblings = parent.getAll(name);
+		int oldIndex = siblings.indexOf(node);
+		parent.move(name, oldIndex, index);
+	}
+	
 	public void addEmptyNodes(Entity entity) {
 		Record record = entity.getRecord();
 		ModelVersion version = record.getVersion();
