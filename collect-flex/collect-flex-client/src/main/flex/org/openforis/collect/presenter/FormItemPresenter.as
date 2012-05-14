@@ -67,7 +67,7 @@ package org.openforis.collect.presenter
 			ClientFactory.dataClient.moveNode(responder, nodeId, index);
 		}
 		
-		private static function moveResultHandler(event:ResultEvent):void {
+		private static function moveResultHandler(event:ResultEvent, token:Object = null):void {
 			//do nothing
 		}
 		

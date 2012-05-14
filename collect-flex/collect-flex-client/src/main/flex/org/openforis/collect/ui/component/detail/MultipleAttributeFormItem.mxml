@@ -3,7 +3,7 @@
 		 xmlns:s="library://ns.adobe.com/flex/spark" 
 		 xmlns:mx="library://ns.adobe.com/flex/mx"
 		 xmlns:detail="org.openforis.collect.ui.component.detail.*"
-		 xmlns:input="org.openforis.collect.ui.component.input.*"
+		 xmlns:input="org.openforis.collect.ui.component.input.*" xmlns:datagroup="org.openforis.collect.ui.component.datagroup.*"
 		 >
 
 	<fx:Script>
@@ -26,49 +26,6 @@
 			
 			override protected function initPresenter():void {
 				presenter = new MultipleAttributeFormItemPresenter(this);
-			}
-			
-			public function grabberMouseMoveHandler(event:MouseEvent):void {
-				// Get the drag initiator component from the event object.
-				var dragInitiator:ItemRenderer = event.currentTarget.parent as ItemRenderer;
-				
-				var ds:DragSource = new DragSource();
-				
-				DragManager.doDrag(dragInitiator, ds, event);
-			}
-			
-			/**
-			 * Called when the user moves the drag indicator onto the drop target.
-			 */
-			public function dragEnterHandler(event:DragEvent):void {
-				var dragInitiator:ItemRenderer = event.dragInitiator as ItemRenderer;
-				var dropTarget:ItemRenderer = ItemRenderer(event.currentTarget);
-				
-				// Accept the drag if dragged attribute is relative to the same form item
-				if ( dragInitiator != null && dragInitiator != dropTarget && dragInitiator.parentDocument == dropTarget.parentDocument) {
-					DragManager.acceptDragDrop(dropTarget);
-				}
-			}
-			
-			/**
-			 * Called if the target accepts the dragged object and the user 
-			 * releases the mouse button while over another ItemRenderer.
-			 */ 
-			public function dragDropHandler(event:DragEvent):void {
-				var dragInitiator:ItemRenderer = ItemRenderer(event.dragInitiator);
-				var dragAttr:AttributeProxy = AttributeProxy(dragInitiator.data);
-				var dropTarget:ItemRenderer = ItemRenderer(event.currentTarget);
-				var dropAttr:AttributeProxy = AttributeProxy(dropTarget.data);
-
-				var attrName:String = attributeDefinition.name;
-				var attributes:IList = parentEntity.getChildren(attrName);
-				
-				var indexTo:int = attributes.getItemIndex(dropAttr);
-				
-				var nodeEvent:NodeEvent = new NodeEvent(NodeEvent.MOVE);
-				nodeEvent.node = dragAttr;
-				nodeEvent.index = indexTo;
-				EventDispatcherFactory.getEventDispatcher().dispatchEvent(nodeEvent);
 			}
 			
 		]]>
@@ -95,19 +52,19 @@
 				</s:layout>
 				<s:itemRenderer>
 					<fx:Component>
-						<s:ItemRenderer autoDrawBackground="false"
-										dragEnter="outerDocument.dragEnterHandler(event)"
-										dragDrop="outerDocument.dragDropHandler(event)"
-										>
-							<s:layout>
+						<datagroup:MultipleNodesDataGroupItemRenderer
+							dragEnabled="{Application.activeRecordEditable}"
+							>
+							<datagroup:layout>
 								<s:HorizontalLayout gap="2" />
-							</s:layout>
+							</datagroup:layout>
 							<fx:Script>
 								<![CDATA[
 									import mx.binding.utils.BindingUtils;
 									import mx.core.UIComponent;
 									import mx.events.FlexEvent;
 									
+									import org.openforis.collect.Application;
 									import org.openforis.collect.model.proxy.AttributeProxy;
 									import org.openforis.collect.ui.UIBuilder;
 									import org.openforis.collect.ui.component.input.InputField;
@@ -123,28 +80,15 @@
 									
 									override protected function createChildren():void {
 										super.createChildren();
-										/*
-										var grabber:UIComponent = createGrabber();
-										addElement(grabber);
-										*/
+										
 										var renderer:AttributeItemRenderer = UIBuilder.getAttributeItemRenderer(outerDocument.attributeDefinition);
 										BindingUtils.bindProperty(renderer, "parentEntity", outerDocument, "parentEntity");
 										BindingUtils.bindProperty(renderer, "attribute", this, "attribute");
-										addElement(renderer);
+										contentGroup.addElement(renderer);
 									}
-									
-									protected function createGrabber():UIComponent {
-										var g:Button = new Button();
-										g.buttonMode = true;
-										g.width = 10;
-										g.height = 30;
-										g.addEventListener(MouseEvent.MOUSE_MOVE, outerDocument.grabberMouseMoveHandler);
-										return g;
-									}
-									
 								]]>
 							</fx:Script>
-						</s:ItemRenderer>
+						</datagroup:MultipleNodesDataGroupItemRenderer>
 					</fx:Component>
 				</s:itemRenderer>
 			</s:DataGroup>
