@@ -28,6 +28,7 @@ package org.openforis.collect.ui.component.input {
 		public static const ERROR_STYLE:String = "error";
 		public static const NOT_RELEVANT_STYLE:String = "notRelevant";
 		public static const REMARKS_PRESENT_STYLE:String = "remarksPresent";
+		public static const READONLY_STYLE:String = "readOnly";
 		
 		public static const STATE_SAVING:String = "saving";
 		public static const STATE_SAVE_COMPLETE:String = "saveComplete";
@@ -266,8 +267,11 @@ package org.openforis.collect.ui.component.input {
 		
 		public function set editable(value:Boolean):void {
 			_editable = value;
-			if(textInput != null && textInput.hasOwnProperty("editable")) {
-				textInput["editable"] = value;
+			if( textInput != null ) {
+				if ( textInput.hasOwnProperty("editable") ) {
+					textInput["editable"] = value;
+				}
+				UIUtil.toggleStyleName(textInput, READONLY_STYLE, ! value);
 			}
 		}
 	}

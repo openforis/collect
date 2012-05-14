@@ -154,6 +154,14 @@ package org.openforis.collect.util
 			return component.styleName as String;
 		}
 		
+		public static function toggleStyleName(component:UIComponent, READONLY_STYLE:String, apply:Boolean = true, applyImmediately:Boolean = true):String {
+			if ( apply ) {
+				return addStyleName(component, READONLY_STYLE, applyImmediately);
+			} else {
+				return removeStyleName(component, READONLY_STYLE, applyImmediately);
+			}
+		}
+
 		public static function hasStyleName(component:UIComponent, styleName:String):Boolean {
 			var componentStyleName:String = component.styleName as String;
 			if(componentStyleName != null) {
@@ -211,5 +219,6 @@ package org.openforis.collect.util
 			var measure:TextLineMetrics = unitTextFormat.measureText(text);
 			return measure.width;
 		}
+		
 	}
 }

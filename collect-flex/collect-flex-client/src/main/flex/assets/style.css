@@ -188,6 +188,14 @@ input|TextInput.remarksPresent, mx|TextArea.remarksPresent {
 	remarksPresentIconVisible: true;
 }
 
+input|TextInput.readOnly, mx|TextArea.readOnly {
+	contentBackgroundColor: #ECECEC;
+}
+
+.notRelevant input|TextInput.readOnly, .notRelevant mx|TextArea.readOnly { 
+	contentBackgroundColor: #DDDDDD;
+}
+
 s|BorderContainer.entityForm {
 	borderColor: #CCCCCC;
 	borderAlpha: 0.8;
