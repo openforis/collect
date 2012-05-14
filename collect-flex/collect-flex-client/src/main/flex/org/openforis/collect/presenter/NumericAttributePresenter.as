@@ -14,6 +14,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.ui.component.input.IntegerInputField;
 	import org.openforis.collect.ui.component.input.NumericAttributeRenderer;
 	import org.openforis.collect.ui.component.input.NumericInputField;
+	import org.openforis.collect.util.UIUtil;
 	
 	/**
 	 * 

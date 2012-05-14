@@ -231,7 +231,6 @@ package org.openforis.collect.ui {
 		
 		public static function getInputFieldWidth(def:AttributeDefinitionProxy):Number {
 			var parentLayout:String = def.parentLayout;
-			var DOUBLE_BORDER_WEIGHT:int = 2;
 			if(def is BooleanAttributeDefinitionProxy) {
 				return 100;
 			} else if(def is CodeAttributeDefinitionProxy) {
@@ -257,24 +256,25 @@ package org.openforis.collect.ui {
 				return 300;
 			} else if(def is NumberAttributeDefinitionProxy) {
 				var units:IList = NumberAttributeDefinitionProxy(def).units;
+				var gap:int = 2;
 				if(units.length > 1) {
-					return 192 + DOUBLE_BORDER_WEIGHT;
+					return 192;
 				} else if(units.length == 1) {
 					var unit:UnitProxy = units.getItemAt(0) as UnitProxy;
 					var unitWidth:Number = UIUtil.measureUnitWidth(unit.name);
-					return 70 + DOUBLE_BORDER_WEIGHT + unitWidth;
+					return 70 + gap + unitWidth;
 				} else {
-					return 70 + DOUBLE_BORDER_WEIGHT;
+					return 70;
 				}
 			} else if(def is RangeAttributeDefinitionProxy) {
 				var rangeDef:RangeAttributeDefinitionProxy = RangeAttributeDefinitionProxy(def);
 				var rangeUnitsCount:int = rangeDef.units.length;
 				if(rangeUnitsCount > 1) {
-					return 242 + DOUBLE_BORDER_WEIGHT;
+					return 242;
 				} else if(rangeUnitsCount == 1) {
-					return 147 + DOUBLE_BORDER_WEIGHT;
+					return 147;
 				} else {
-					return 120 + DOUBLE_BORDER_WEIGHT;
+					return 120;
 				}
 			} else if(def is TaxonAttributeDefinitionProxy) {
 				if(parentLayout == UIUtil.LAYOUT_TABLE) {
@@ -371,7 +371,8 @@ package org.openforis.collect.ui {
 				if(numberAttributeDefn.precisionDefinitions != null && numberAttributeDefn.units.length >= 1) {
 					renderer = new NumericAttributeRenderer();
 					var width:Number = getInputFieldWidth(def);
-					renderer.width = width;
+					var borderWidth:Number = 1;
+					renderer.width = width + borderWidth * 2;
 				}
 			} else if(def is RangeAttributeDefinitionProxy) {
 				var rangeDef:RangeAttributeDefinitionProxy = RangeAttributeDefinitionProxy(def);
