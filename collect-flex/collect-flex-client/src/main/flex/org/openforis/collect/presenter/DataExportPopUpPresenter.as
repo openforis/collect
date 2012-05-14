@@ -200,23 +200,28 @@ package org.openforis.collect.presenter {
 					if ( _progressTimer == null ) {
 						startProgressTimer();
 					}
-				} else if ( _state.error ) {
-					_view.currentState = DataExportPopUp.STATE_TYPE_SELECTION;
+				} else if ( !_firstOpen && _state.complete ) {
+					_view.currentState = DataExportPopUp.STATE_COMPLETE;
 					stopProgressTimer();
-					AlertUtil.showError("export.error");
-				} else if ( _state.complete ) {
-					if ( _firstOpen ) {
-						_view.currentState = DataExportPopUp.STATE_TYPE_SELECTION;
-					} else {
-						_view.currentState = DataExportPopUp.STATE_COMPLETE;
+				} else {
+					if ( !_firstOpen ) {
+						if ( _state.error ) {
+							AlertUtil.showError("export.error");
+						} else if ( _state.cancelled ) {
+							AlertUtil.showError("export.cancelled");
+						}
 					}
-					stopProgressTimer();
+					resetView();
 				}
 			} else {
-				_view.currentState = DataExportPopUp.STATE_TYPE_SELECTION;
-				stopProgressTimer();
+				resetView();
 			}
 			_firstOpen = false;
+		}
+		
+		protected function resetView():void {
+			_view.currentState = DataExportPopUp.STATE_TYPE_SELECTION;
+			stopProgressTimer();
 		}
 		
 		protected function initView():void {

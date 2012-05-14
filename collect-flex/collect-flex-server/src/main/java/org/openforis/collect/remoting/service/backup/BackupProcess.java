@@ -75,37 +75,23 @@ public class BackupProcess implements Callable<Void>, DataExportProcess {
 	public Void call() throws Exception {
 		try {
 			state.reset();
-			state.setRunning(true);
-			String fileName = "data.zip";
-			File file = new File(directory, fileName);
-			if (file.exists()) {
-				file.delete();
-			}
-			FileOutputStream fileOutputStream = new FileOutputStream(file);
-			BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(fileOutputStream);
-			ZipOutputStream zipOutputStream = new ZipOutputStream(bufferedOutputStream);
 			List<CollectRecord> recordSummaries = loadAllSummaries();
 			if ( recordSummaries != null && stepNumbers != null ) {
-				state.setTotal(calculateTotal(recordSummaries));
-				for (CollectRecord summary : recordSummaries) {
-					if ( ! state.isCancelled() ) {
-						int recordStepNumber = summary.getStep().getStepNumber();
-						for (int stepNum: stepNumbers) {
-							if ( stepNum <= recordStepNumber) {
-								backup(summary, stepNum, zipOutputStream);
-								state.incrementCount();
-							}
-						}
-					} else {
-						state.setRunning(false);
-						break;
-					}
+				state.setRunning(true);
+				String fileName = "data.zip";
+				File file = new File(directory, fileName);
+				if (file.exists()) {
+					file.delete();
 				}
-			}
-			zipOutputStream.flush();
-			zipOutputStream.close();
-			if ( ! state.isCancelled() ) {
-				state.setComplete(true);
+				FileOutputStream fileOutputStream = new FileOutputStream(file);
+				BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(fileOutputStream);
+				ZipOutputStream zipOutputStream = new ZipOutputStream(bufferedOutputStream);
+				backup(zipOutputStream, recordSummaries);
+				zipOutputStream.flush();
+				zipOutputStream.close();
+				if ( ! state.isCancelled() ) {
+					state.setComplete(true);
+				}
 			}
 		} catch (Exception e) {
 			state.setError(true);
@@ -114,6 +100,25 @@ public class BackupProcess implements Callable<Void>, DataExportProcess {
 			state.setRunning(false);
 		}
 		return null;
+	}
+
+	private void backup(ZipOutputStream zipOutputStream, List<CollectRecord> recordSummaries) {
+		int total = calculateTotal(recordSummaries);
+		state.setTotal(total);
+		for (CollectRecord summary : recordSummaries) {
+			if ( ! state.isCancelled() ) {
+				int recordStepNumber = summary.getStep().getStepNumber();
+				for (int stepNum: stepNumbers) {
+					if ( stepNum <= recordStepNumber) {
+						backup(summary, stepNum, zipOutputStream);
+						state.incrementCount();
+					}
+				}
+			} else {
+				state.setRunning(false);
+				break;
+			}
+		}
 	}
 
 	private List<CollectRecord> loadAllSummaries() {

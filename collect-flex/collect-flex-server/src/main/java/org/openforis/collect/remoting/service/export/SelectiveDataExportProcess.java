@@ -90,7 +90,9 @@ public class SelectiveDataExportProcess implements Callable<Void>, DataExportPro
 			state.reset();
 			state.setRunning(true);
 			exportData();
-			state.setComplete(true);
+			if ( ! state.isCancelled() ) {
+				state.setComplete(true);
+			}
 		} catch (Exception e) {
 			state.setError(true);
 			LOG.error("Error during data export", e);
