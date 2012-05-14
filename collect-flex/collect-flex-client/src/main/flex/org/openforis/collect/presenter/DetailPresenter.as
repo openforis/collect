@@ -5,7 +5,9 @@ package org.openforis.collect.presenter {
 	 * */
 	import flash.display.DisplayObject;
 	import flash.events.Event;
+	import flash.events.KeyboardEvent;
 	import flash.events.MouseEvent;
+	import flash.ui.Keyboard;
 	
 	import mx.binding.utils.ChangeWatcher;
 	import mx.core.FlexGlobals;
@@ -51,8 +53,9 @@ package org.openforis.collect.presenter {
 			_view.rejectButton.addEventListener(MouseEvent.CLICK, rejectButtonClickHandler);
 			eventDispatcher.addEventListener(ApplicationEvent.UPDATE_RESPONSE_RECEIVED, updateResponseReceivedHandler);
 			eventDispatcher.addEventListener(ApplicationEvent.RECORD_SAVED, recordSavedHandler);
-
 			eventDispatcher.addEventListener(UIEvent.ACTIVE_RECORD_CHANGED, activeRecordChangedListener);
+			
+			_view.stage.addEventListener(KeyboardEvent.KEY_DOWN, stageKeyDownHandler);
 		}
 		
 		/**
@@ -144,6 +147,10 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function saveButtonClickHandler(event:MouseEvent):void {
+			performSaveActiveRecord();
+		}
+		
+		protected function performSaveActiveRecord():void {
 			_dataClient.saveActiveRecord(saveActiveRecordResultHandler, faultHandler);
 		}
 		
@@ -221,6 +228,12 @@ package org.openforis.collect.presenter {
 		
 		protected function updateResponseReceivedHandler(event:ApplicationEvent):void {
 			//update 
+		}
+		
+		protected function stageKeyDownHandler(event:KeyboardEvent):void {
+			if ( Application.activeRecordEditable && event.ctrlKey && event.keyCode == Keyboard.S ) {
+				performSaveActiveRecord();
+			}
 		}
 	}
 }
