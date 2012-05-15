@@ -101,19 +101,6 @@ package org.openforis.collect.presenter {
 			form.record = activeRecord;
 		}
 		
-		protected function getStepLabel(step:CollectRecord$Step):String {
-			switch(step) {
-				case CollectRecord$Step.ENTRY:
-					return Message.get("edit.dataEntry");
-				case CollectRecord$Step.CLEANSING:
-					return Message.get("edit.dataCleansing");
-				case CollectRecord$Step.ANALYSIS:
-					return Message.get("edit.dataAnalysis");
-				default:
-					return null;
-			}
-		}
-		
 		protected function recordSavedHandler(event:ApplicationEvent):void {
 			var rootEntityLabel:String = Application.activeRootEntity.getLabelText()
 			_view.recordSavedMessage.text = Message.get("edit.recordSaved", [rootEntityLabel]);
@@ -217,18 +204,26 @@ package org.openforis.collect.presenter {
 		}
 		
 		internal function promoteRecordResultHandler(event:ResultEvent, token:Object = null):void {
+			var rootEntity:EntityDefinitionProxy = Application.activeRootEntity;
+			var rootEntityLabel:String = rootEntity.getLabelText();
 			var r:RecordProxy = Application.activeRecord;
 			var keyLabel:String = r.rootEntity.keyText;
-			AlertUtil.showMessage("edit.recordSubmitted", [keyLabel]);
+			var actualStep:CollectRecord$Step = getNextStep(r.step);
+			var stepLabel:String = getStepLabel(actualStep).toLowerCase();
+			AlertUtil.showMessage("edit.recordSubmitted", [rootEntityLabel, keyLabel, stepLabel], "edit.recordSubmittedTitle", [rootEntityLabel]);
 			Application.activeRecord = null;
 			var uiEvent:UIEvent = new UIEvent(UIEvent.BACK_TO_LIST);
 			eventDispatcher.dispatchEvent(uiEvent);
 		}
 		
 		internal function rejectRecordResultHandler(event:ResultEvent, token:Object = null):void {
+			var rootEntity:EntityDefinitionProxy = Application.activeRootEntity;
+			var rootEntityLabel:String = rootEntity.getLabelText();
 			var r:RecordProxy = Application.activeRecord;
 			var keyLabel:String = r.rootEntity.keyText;
-			AlertUtil.showMessage("edit.recordRejected", [keyLabel]);
+			var actualStep:CollectRecord$Step = getPreviousStep(r.step);
+			var stepLabel:String = getStepLabel(actualStep).toLowerCase();
+			AlertUtil.showMessage("edit.recordRejected", [rootEntityLabel, keyLabel, stepLabel], "edit.recordRejectedTitle", [rootEntityLabel]);
 			Application.activeRecord = null;
 			var uiEvent:UIEvent = new UIEvent(UIEvent.BACK_TO_LIST);
 			eventDispatcher.dispatchEvent(uiEvent);
@@ -241,6 +236,43 @@ package org.openforis.collect.presenter {
 		protected function stageKeyDownHandler(event:KeyboardEvent):void {
 			if ( Application.activeRecordEditable && event.ctrlKey && event.keyCode == Keyboard.S ) {
 				performSaveActiveRecord();
+			}
+		}
+		
+		public static function getNextStep(step:CollectRecord$Step):CollectRecord$Step {
+			switch ( step ) {
+				case CollectRecord$Step.ENTRY:
+					return CollectRecord$Step.CLEANSING;
+				case CollectRecord$Step.CLEANSING:
+					return CollectRecord$Step.ANALYSIS;
+				default:
+					return null;
+					
+			}
+		}
+		
+		public static function getPreviousStep(step:CollectRecord$Step):CollectRecord$Step {
+			switch ( step ) {
+				case CollectRecord$Step.CLEANSING:
+					return CollectRecord$Step.ENTRY;
+				case CollectRecord$Step.ANALYSIS:
+					return CollectRecord$Step.CLEANSING;
+				default:
+					return null;
+					
+			}
+		}
+
+		public static function getStepLabel(step:CollectRecord$Step):String {
+			switch ( step ) {
+				case CollectRecord$Step.ENTRY:
+					return Message.get("edit.dataEntry");
+				case CollectRecord$Step.CLEANSING:
+					return Message.get("edit.dataCleansing");
+				case CollectRecord$Step.ANALYSIS:
+					return Message.get("edit.dataAnalysis");
+				default:
+					return null;
 			}
 		}
 	}
