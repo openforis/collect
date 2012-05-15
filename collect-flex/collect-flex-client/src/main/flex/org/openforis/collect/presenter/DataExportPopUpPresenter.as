@@ -65,10 +65,9 @@ package org.openforis.collect.presenter {
 		override internal function initEventListeners():void {
 			super.initEventListeners();
 			eventDispatcher.addEventListener(UIEvent.ROOT_ENTITY_SELECTED, rootEntitySelectedHandler);
-			DataExportPopUp(_view).continueButton.addEventListener(MouseEvent.CLICK, continueButtonClickHandler);
 			DataExportPopUp(_view).closeButton1.addEventListener(MouseEvent.CLICK, closeHandler);
+			DataExportPopUp(_view).typeGroup.addEventListener(Event.CHANGE, typeChangeHandler);
 			DataExportPopUp(_view).exportButton.addEventListener(MouseEvent.CLICK, exportButtonClickHandler);
-			DataExportPopUp(_view).closeButton2.addEventListener(MouseEvent.CLICK, closeHandler);
 			DataExportPopUp(_view).cancelExportButton.addEventListener(MouseEvent.CLICK, cancelExportButtonClickHandler);
 			DataExportPopUp(_view).downloadButton.addEventListener(MouseEvent.CLICK, downloadButtonClickHandler);
 			DataExportPopUp(_view).closeButton3.addEventListener(MouseEvent.CLICK, closeHandler);
@@ -86,7 +85,7 @@ package org.openforis.collect.presenter {
 			initView();
 		}
 		
-		protected function continueButtonClickHandler(event:MouseEvent):void {
+		protected function typeChangeHandler(event:Event):void {
 			var type:String = DataExportPopUp(_view).typeGroup.selectedValue as String;
 			_type = type;
 			initStepsDropDown();
@@ -133,6 +132,8 @@ package org.openforis.collect.presenter {
 						stepNums = [1, 2, 3];
 					}
 					ClientFactory.dataExportClient.fullExport(_exportResponder, rootEntity, stepNums);
+					_view.currentState = DataExportPopUp.STATE_EXPORTING;
+					DataExportPopUp(_view).progressBar.setProgress(0, 0);
 					break;
 			}
 		}
@@ -175,9 +176,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function cancelResultHandler(event:ResultEvent, token:Object = null):void {
-			_state = null;
-			stopProgressTimer();
-			_view.currentState = DataExportPopUp.STATE_TYPE_SELECTION;
+			resetView();
 		}
 		
 		protected function getStateResultHandler(event:ResultEvent, token:Object = null):void {
@@ -207,11 +206,17 @@ package org.openforis.collect.presenter {
 					if ( !_firstOpen ) {
 						if ( _state.error ) {
 							AlertUtil.showError("export.error");
+							resetView();
 						} else if ( _state.cancelled ) {
 							AlertUtil.showError("export.cancelled");
+							resetView();
+						} else {
+							//process starting in a while...
+							startProgressTimer();
 						}
+					} else {
+						resetView();
 					}
-					resetView();
 				}
 			} else {
 				resetView();
@@ -220,7 +225,9 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function resetView():void {
+			_state = null;
 			_view.currentState = DataExportPopUp.STATE_TYPE_SELECTION;
+			DataExportPopUp(_view).typeGroup.selection = null;
 			stopProgressTimer();
 		}
 		
@@ -249,7 +256,9 @@ package org.openforis.collect.presenter {
 			var stepDropDownList:DropDownList = DataExportPopUp(_view).stepDropDownList;
 			stepDropDownList.dataProvider = steps;
 			stepDropDownList.callLater(function():void {
-				stepDropDownList.selectedIndex = 0;
+				if ( _type == "full" ) {
+					stepDropDownList.selectedIndex = 0;
+				}
 			});
 		}
 		
