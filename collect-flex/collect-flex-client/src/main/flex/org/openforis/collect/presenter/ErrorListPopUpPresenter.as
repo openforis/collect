@@ -6,7 +6,6 @@ package org.openforis.collect.presenter
 	
 	import org.openforis.collect.Application;
 	import org.openforis.collect.i18n.Message;
-	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.SchemaProxy;
@@ -16,8 +15,6 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.model.proxy.NodeProxy;
 	import org.openforis.collect.model.proxy.RecordProxy;
 	import org.openforis.collect.ui.component.ErrorListPopUp;
-	import org.openforis.collect.ui.component.PopUp;
-	import org.openforis.collect.util.ArrayUtil;
 	import org.openforis.collect.util.StringUtil;
 	import org.openforis.idm.metamodel.validation.ValidationResultFlag;
 	
@@ -77,8 +74,8 @@ package org.openforis.collect.presenter
 		}
 		
 		protected function createEntityDataGridItems(entity:EntityProxy):IList {
-			var schema:SchemaProxy = Application.activeSurvey.schema;
 			var result:IList = new ArrayCollection();
+			var schema:SchemaProxy = Application.activeSurvey.schema;
 			var entityDefn:EntityDefinitionProxy = EntityDefinitionProxy(schema.getDefinitionById(entity.definitionId));
 			var childDefinitions:ListCollectionView = entityDefn.childDefinitions;
 			var messages:Array
@@ -93,7 +90,7 @@ package org.openforis.collect.presenter
 						messages = [Message.get("edit.validation.maxCount", [childDefn.maxCount > 0 ? childDefn.maxCount: 1])];
 					}
 					var message:String = StringUtil.concat(", ", messages);
-					var label:String = (entity.parent != null ? createNodeLabel(entity) + "/": "") + childDefn.getLabelText();
+					var label:String = (entity.parent != null ? createNodeLabel(entity) + " / ": "") + childDefn.getLabelText();
 					var item:Object = {label:label, message: message};
 					result.addItem(item);
 				}
