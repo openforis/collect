@@ -39,6 +39,7 @@ package org.openforis.collect.presenter {
 	
 		private var _dataClient:DataClient;
 		private var _view:DetailView;
+		private var _errorsListPopUp:ErrorListPopUp;
 		
 		public function DetailPresenter(view:DetailView) {
 			this._view = view;
@@ -161,8 +162,7 @@ package org.openforis.collect.presenter {
 			eventDispatcher.dispatchEvent(applicationEvent);
 			var totalErrors:int = r.errors + r.missingErrors + r.skipped;
 			if ( totalErrors > 0 ) {
-				//AlertUtil.showError("error.promoteException");
-				PopUpUtil.createPopUp(ErrorListPopUp, false);
+				openErrorsListPopUp();
 			} else {
 				var messageResource:String;
 				if(r.step == CollectRecord$Step.ENTRY) {
@@ -172,6 +172,14 @@ package org.openforis.collect.presenter {
 				}
 				AlertUtil.showConfirm(messageResource, null, null, performSubmit);
 			}
+		}
+		
+		protected function openErrorsListPopUp():void {
+			if ( _errorsListPopUp != null ) {
+				PopUpManager.removePopUp(_errorsListPopUp);
+				_errorsListPopUp = null;
+			}
+			_errorsListPopUp = ErrorListPopUp(PopUpUtil.createPopUp(ErrorListPopUp, false));
 		}
 		
 		protected function rejectButtonClickHandler(event:MouseEvent):void {
