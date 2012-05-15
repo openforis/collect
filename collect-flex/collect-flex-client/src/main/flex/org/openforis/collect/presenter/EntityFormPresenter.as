@@ -135,12 +135,12 @@ package org.openforis.collect.presenter
 			_view.dropDownList.selectedItem = entity;
 			_view.entity = entity;
 			if(entity != null) {
+				selectFirstTab();
 				if(_view.internalContainer.visible) {
 					//internal container already visible, call programmatically the showEffect
 					_view.showFormEffect.play([_view.internalContainer]);
 				} else {
 					_view.internalContainer.visible = true;
-					selectFirstTab();
 				}
 			} else if(_view.entityDefinition == null || _view.entityDefinition.multiple) {
 				_view.internalContainer.visible = false;
