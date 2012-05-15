@@ -14,6 +14,7 @@ package org.openforis.collect.presenter {
 	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
 	import mx.collections.ListCollectionView;
+	import mx.controls.Alert;
 	import mx.core.FlexGlobals;
 	import mx.events.CloseEvent;
 	import mx.events.FlexEvent;
@@ -234,14 +235,15 @@ package org.openforis.collect.presenter {
 				PopUpUtil.POSITION_BELOW, 
 				PopUpUtil.VERTICAL_ALIGN_BOTTOM, 
 				PopUpUtil.HORIZONTAL_ALIGN_RIGHT);
-			//PopUpManager.centerPopUp(_filterPopUp);
+			
+			_filterPopUp.setFocus();
 		}
 		
 		protected function closeFilterPopUp():void {
 			PopUpManager.removePopUp(_filterPopUp);
 			_filterPopUp.removeEventListener(FlexMouseEvent.MOUSE_DOWN_OUTSIDE, filterPopUpCloseHandler);
 			_filterPopUp = null;
-			
+			_view.openFilterPopUpButton.selected = currentKeyValuesFilter != null;
 		}
 		
 		protected function filterPopUpCloseHandler(event:Event = null):void {
@@ -256,11 +258,19 @@ package org.openforis.collect.presenter {
 		
 		protected function filterPopUpApplyHandler(event:Event):void {
 			var filter:Array = new Array();
+			var empty:Boolean = true;
 			for each (var textInput:TextInput in _filterPopUp.textInput) {
-				var key:String = StringUtil.trim(textInput.text.toUpperCase());
+				var key:String = StringUtil.trim(textInput.text).toUpperCase();
 				filter.push(key);
+				if ( key != "" ) {
+					empty = false;
+				}
 			}
-			currentKeyValuesFilter = filter;
+			if ( ! empty ) {
+				currentKeyValuesFilter = filter;
+			} else {
+				currentKeyValuesFilter = null;
+			}
 			currentPage = 1;
 			loadRecordSummariesCurrentPage();
 			closeFilterPopUp();

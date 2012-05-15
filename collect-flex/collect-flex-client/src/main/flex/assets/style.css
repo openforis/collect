@@ -27,6 +27,11 @@ s|Button.expand {
 	skin-class: ClassReference('org.openforis.collect.ui.skin.ExpandButtonSkin');
 }
 
+s|ToggleButton.filter {
+	icon: Embed(source='assets/images/filter.png');
+	cornerRadius: 5;
+}
+
 view|Footer {
 	padding-bottom: 5;
 }
