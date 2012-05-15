@@ -53,10 +53,13 @@ package org.openforis.collect.presenter {
 			
 			//id text input
 			view.codeTextInput.addEventListener(InputFieldEvent.CHANGING, inputFieldChangingHandler);
+			view.codeTextInput.textInput.addEventListener(KeyboardEvent.KEY_DOWN, inputFieldKeyDownHandler);
 			//scientific name text input
 			view.scientificNameTextInput.addEventListener(InputFieldEvent.CHANGING, inputFieldChangingHandler);
+			view.scientificNameTextInput.textInput.addEventListener(KeyboardEvent.KEY_DOWN, inputFieldKeyDownHandler);
 			//vernacular name text input
 			view.vernacularNameTextInput.addEventListener(InputFieldEvent.CHANGING, inputFieldChangingHandler);
+			view.vernacularNameTextInput.textInput.addEventListener(KeyboardEvent.KEY_DOWN, inputFieldKeyDownHandler);
 			//language code text input
 			view.languageCodeTextInput.addEventListener(InputFieldEvent.CHANGING, inputFieldChangingHandler);
 			//language variety text input
@@ -91,6 +94,12 @@ package org.openforis.collect.presenter {
 			}
 			if(searchType != null) {
 				showAutoCompletePopUp(searchType, inputField, view.codeTextInput);
+			}
+		}
+		
+		protected function inputFieldKeyDownHandler(event:KeyboardEvent):void {
+			if ( event.keyCode == Keyboard.DOWN && autoCompletePopUpOpen ) {
+				autoCompletePopUp.dataGrid.setFocus();
 			}
 		}
 		
