@@ -141,6 +141,10 @@ public class CollectRecord extends Record {
 		// use List to preserve the order of the keys and counts
 		rootEntityKeyValues = new ArrayList<String>();
 		entityCounts = new ArrayList<Integer>();
+		initErrorCountInfo();
+	}
+
+	private void initErrorCountInfo() {
 		minCountErrorCounts = new HashMap<Integer, Set<String>>();
 		minCountWarningCounts = new HashMap<Integer, Set<String>>();
 		maxCountErrorCounts = new HashMap<Integer, Set<String>>();
@@ -148,6 +152,12 @@ public class CollectRecord extends Record {
 		errorCounts = new HashMap<Integer, Integer>();
 		warningCounts = new HashMap<Integer, Integer>();
 		skippedNodes = new HashSet<Integer>();
+		skipped = null;
+		missing = null;
+		missingErrors = null;
+		missingWarnings = null;
+		errors = null;
+		warnings = null;
 	}
 
 	public Node<?> deleteNode(Node<?> node) {
@@ -511,6 +521,7 @@ public class CollectRecord extends Record {
 	 * Update all derived states of all nodes
 	 */
 	public void updateDerivedStates() {
+		initErrorCountInfo();
 		Entity rootEntity = getRootEntity();
 		rootEntity.traverse(new NodeVisitor() {
 			@Override
