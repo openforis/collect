@@ -247,6 +247,7 @@ public class DataService {
 				attribute = (Attribute<AttributeDefinition, ?>) node;
 				record.setErrorConfirmed(attribute, false);
 				record.setMissingApproved(parentEntity, node.getName(), false);
+				record.setDefaultValueApplied(attribute, false);
 				
 				cardinalityNodePointers = getCardinalityNodePointers(attribute);
 				response = getUpdateResponse(responseMap, attribute);
