@@ -173,7 +173,7 @@ package org.openforis.collect.util
 		public static function replaceStyleNames(component:UIComponent, newStyles:Array, oldStyles:Array, applyImmediately:Boolean = true):String {
 			var cleanedStyle:String = removeStyleNames(component, oldStyles);
 			var newStylesConcat:String = StringUtil.concat(" ", newStyles);
-			var result:String = cleanedStyle + " " + newStylesConcat;
+			var result:String = StringUtil.concat(" ", [cleanedStyle, newStylesConcat]);
 			if(applyImmediately) {
 				component.styleName = result;
 			}
