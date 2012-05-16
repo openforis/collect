@@ -37,6 +37,7 @@ public class CollectRecord extends Record {
 	
 	private static final int APPROVED_MISSING_POSITION = 0;
 	private static final int CONFIRMED_ERROR_POSITION = 0;
+	private static final int DEFAULT_APPLIED_POSITION = 1;
 	
 	public enum Step {
 		ENTRY(1), CLEANSING(2), ANALYSIS(3);
@@ -200,6 +201,26 @@ public class CollectRecord extends Record {
 		org.openforis.idm.model.State childState = parentEntity.getChildState(childName);
 		return childState.get(APPROVED_MISSING_POSITION);
 	} 
+	
+	public void setDefaultValueApplied(Attribute<?, ?> attribute, boolean applied) {
+		int fieldCount = attribute.getFieldCount();
+		
+		for( int i=0; i <fieldCount; i++ ){
+			Field<?> field = attribute.getField(i);
+			field.getState().set(DEFAULT_APPLIED_POSITION, applied);
+		}
+	}
+	
+	public boolean isDefaultValueApplied(Attribute<?, ?> attribute) {
+		int fieldCount = attribute.getFieldCount();		
+		for( int i=0; i <fieldCount; i++ ){
+			Field<?> field = attribute.getField(i);
+			if( !field.getState().get(DEFAULT_APPLIED_POSITION) ){
+				return false;
+			}
+		}
+		return true;
+	}
 
 	public void updateValidationMinCounts(Integer entityId, String childName, ValidationResultFlag flag) {
 		Set<String> errors = clearEntityValidationCounts(minCountErrorCounts, entityId, childName);
