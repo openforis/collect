@@ -138,7 +138,8 @@ package org.openforis.collect.presenter {
 				case SEARCH_BY_VERNACULAR_NAME:
 					//detect the use of qualifier
 					//client.findByVernacularName(autoCompleteSearchResponder, searchText, MAX_RESULTS);					
-					client.findByVernacularName(autoCompleteSearchResponder, searchText, MAX_RESULTS);					
+					client.findByVernacularName(autoCompleteSearchResponder, searchText, MAX_RESULTS);	
+					trace("yow.." + inputField.id);
 					break;
 				default:
 			}
@@ -186,10 +187,7 @@ package org.openforis.collect.presenter {
 				var renderer:TaxonAttributeRenderer = autoCompleteLastInputField.parentDocument as TaxonAttributeRenderer;
 				var presenter:TaxonAttributePresenter = renderer.presenter as TaxonAttributePresenter;
 				presenter.performSelectTaxon(taxon);
-			}
-			CONFIG::debugging {
-				itrace.msg(" can not close, right?");
-			} 
+			}			
 			closeAutoCompletePopUp();
 		}
 		

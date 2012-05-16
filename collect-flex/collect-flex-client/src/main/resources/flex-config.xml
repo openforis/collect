@@ -3,7 +3,7 @@
 	<compiler>
 	    <define append="true"> 
 	        <name>CONFIG::debugging</name> 
-	        <value>true</value> 
+	        <value>false</value> 
 	    </define> 
 	    <define append="true"> 
 	        <name>CONFIG::version</name> 

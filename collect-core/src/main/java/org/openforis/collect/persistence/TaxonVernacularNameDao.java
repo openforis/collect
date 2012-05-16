@@ -28,9 +28,11 @@ import org.springframework.transaction.annotation.Transactional;
  * @author E. Wibowo
  */
 @Transactional
-public class TaxonVernacularNameDao
-		extends
-		MappingJooqDaoSupport<TaxonVernacularName, TaxonVernacularNameDao.JooqFactory> {
+@SuppressWarnings({ "unchecked", "rawtypes" })
+public class TaxonVernacularNameDao extends MappingJooqDaoSupport<TaxonVernacularName, TaxonVernacularNameDao.JooqFactory> {
+	
+	private static final TableField[] QUALIFIER_FIELDS = {OFC_TAXON_VERNACULAR_NAME.QUALIFIER1, OFC_TAXON_VERNACULAR_NAME.QUALIFIER2, OFC_TAXON_VERNACULAR_NAME.QUALIFIER3};
+
 	public TaxonVernacularNameDao() {
 		super(TaxonVernacularNameDao.JooqFactory.class);
 	}
@@ -41,9 +43,11 @@ public class TaxonVernacularNameDao
 				searchString, maxResults);
 	}
 	
-	public List<TaxonVernacularName> findByVernacularName(String searchString, HashMap<TableField, String> qualifiers,
+	public List<TaxonVernacularName> findByVernacularName(String searchString, List<String> qualifiers,
 			int maxResults) {
-		return findContaining(OFC_TAXON_VERNACULAR_NAME.VERNACULAR_NAME,searchString, qualifiers, maxResults);
+		return findContaining(OFC_TAXON_VERNACULAR_NAME.VERNACULAR_NAME,
+				searchString, maxResults);
+		//return findByVernacularNameInternal(searchString, qualifiers, maxResults);
 	}
 	
 	@Override
@@ -66,18 +70,15 @@ public class TaxonVernacularNameDao
 		super.delete(id);
 	}
 	
-	protected List<TaxonVernacularName> findContaining(TableField<?,String> field, String searchString, HashMap<TableField, String> qualifiers,
+	protected List<TaxonVernacularName> findVernacularNameInternal(String searchString, List<String> qualifiers,
 			int maxResults) {
 		TaxonVernacularNameDao.JooqFactory jf = getMappingJooqFactory();
-		SimpleSelectQuery<?> query = jf.selectContainsQuery(field, searchString);
+		SimpleSelectQuery<?> query = jf.selectContainsQuery(OFC_TAXON_VERNACULAR_NAME.VERNACULAR_NAME, searchString);
 		query.addLimit(maxResults);
 		
-		Enumeration<TableField> e = Collections.enumeration(qualifiers.keySet());
-		while(e.hasMoreElements())
-		{	
-			TableField<?, String> t = e.nextElement();
+		/*for ( TableField<?,String> t : qualifiers.keySet() ) {	
 			query.addConditions(t.equal(qualifiers.get(t)));//query.addConditions(field2.equal(qualifier1));			
-		}
+		}*/
 		
 		query.execute();
 		Result<?> result = query.getResult();
@@ -85,31 +86,26 @@ public class TaxonVernacularNameDao
 		return entities;
 	}
 
-	protected static class JooqFactory extends
-			MappingJooqFactory<TaxonVernacularName> {
+	protected static class JooqFactory extends MappingJooqFactory<TaxonVernacularName> {
 
 		private static final long serialVersionUID = 1L;
 
 		public JooqFactory(Connection connection) {
-			super(connection, OFC_TAXON_VERNACULAR_NAME.ID,
-					OFC_TAXON_VERNACULAR_NAME_ID_SEQ, TaxonVernacularName.class);
+			super(connection, OFC_TAXON_VERNACULAR_NAME.ID, OFC_TAXON_VERNACULAR_NAME_ID_SEQ, TaxonVernacularName.class);
 		}
 
 		@Override
 		public void fromRecord(Record r, TaxonVernacularName t) {
 			t.setId(r.getValue(OFC_TAXON_VERNACULAR_NAME.ID));
-			t.setVernacularName(r
-					.getValue(OFC_TAXON_VERNACULAR_NAME.VERNACULAR_NAME));
-			t.setLanguageCode(r
-					.getValue(OFC_TAXON_VERNACULAR_NAME.LANGUAGE_CODE));
-			t.setLanguageVariety(r
-					.getValue(OFC_TAXON_VERNACULAR_NAME.LANGUAGE_VARIETY));
+			t.setVernacularName(r.getValue(OFC_TAXON_VERNACULAR_NAME.VERNACULAR_NAME));
+			t.setLanguageCode(r.getValue(OFC_TAXON_VERNACULAR_NAME.LANGUAGE_CODE));
+			t.setLanguageVariety(r.getValue(OFC_TAXON_VERNACULAR_NAME.LANGUAGE_VARIETY));
 			t.setTaxonSystemId(r.getValue(OFC_TAXON_VERNACULAR_NAME.TAXON_ID));
 			t.setStep(r.getValue(OFC_TAXON_VERNACULAR_NAME.STEP));
 			List<String> q = new ArrayList<String>();
-			if(r.getValue(OFC_TAXON_VERNACULAR_NAME.QUALIFIER1)!=null) q.add(r.getValue(OFC_TAXON_VERNACULAR_NAME.QUALIFIER1));				
-			if(r.getValue(OFC_TAXON_VERNACULAR_NAME.QUALIFIER2)!=null) q.add(r.getValue(OFC_TAXON_VERNACULAR_NAME.QUALIFIER2));
-			if(r.getValue(OFC_TAXON_VERNACULAR_NAME.QUALIFIER3)!=null) q.add(r.getValue(OFC_TAXON_VERNACULAR_NAME.QUALIFIER3));
+			for ( TableField field : QUALIFIER_FIELDS ) {
+				q.add((String) r.getValue(field));
+			}
 			t.setQualifiers(q);
 		}
 
@@ -125,14 +121,9 @@ public class TaxonVernacularNameDao
 			q.addValue(OFC_TAXON_VERNACULAR_NAME.TAXON_ID, t.getTaxonSystemId());
 			q.addValue(OFC_TAXON_VERNACULAR_NAME.STEP, t.getStep());
 			
-			if(t.getQualifiers()!=null)
-			{
-				for(int i=0;i<t.getQualifiers().size();i++)
-				{
-					if(i==0) q.addValue(OFC_TAXON_VERNACULAR_NAME.QUALIFIER1, t.getQualifiers().get(0));
-					else if(i==1) q.addValue(OFC_TAXON_VERNACULAR_NAME.QUALIFIER2, t.getQualifiers().get(0));
-					else if(i==2) q.addValue(OFC_TAXON_VERNACULAR_NAME.QUALIFIER3, t.getQualifiers().get(0));
-				}
+			List<String> qualifiers = t.getQualifiers();
+			for (int i = 0; i < qualifiers.size(); i++) {
+				q.addValue(QUALIFIER_FIELDS[i], qualifiers.get(i));
 			}
 		}
 

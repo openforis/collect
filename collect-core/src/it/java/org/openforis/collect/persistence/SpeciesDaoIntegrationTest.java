@@ -344,7 +344,7 @@ public class SpeciesDaoIntegrationTest {
 		t = taxonomyDao.loadById(t.getId());
 		assertNull(t);
 	}
-	
+	/*
 	private TaxonVernacularName testInsertAndLoadVernacularNameWithQualifier(TaxonVernacularName tvn, Taxon taxon1, String name, String lang, String variety, int step, String qualifer1) {
 		// Insert
 		Integer id = tvn.getId();
@@ -485,7 +485,7 @@ public class SpeciesDaoIntegrationTest {
 		qualifiers.put(OFC_TAXON_VERNACULAR_NAME.QUALIFIER1, "21");
 		findVernacularNameBasedOnQualifier1("Nyatoh", qualifiers,100, 0);
 	}
-	
+*/	
 	
 
 	
