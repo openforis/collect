@@ -246,6 +246,8 @@ public class RecordManager {
 					V value = attributeDefault.evaluate(attribute);
 					if ( value != null ) {
 						attribute.setValue(value);
+						CollectRecord record = (CollectRecord) attribute.getRecord();
+						record.setDefaultValueApplied(attribute, true);
 						clearRelevanceRequiredStates(attribute);
 						clearValidationResults(attribute);
 					}
@@ -335,6 +337,8 @@ public class RecordManager {
 			symbolChar = symbol.getCode();
 		}
 		field.setSymbol(symbolChar);
+		CollectRecord record = (CollectRecord) attribute.getRecord();
+		record.setDefaultValueApplied(attribute, false);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -343,6 +347,8 @@ public class RecordManager {
 		Field<V> field = (Field<V>) attribute.getField(0);
 		field.setRemarks(remarks);
 		field.setSymbol(null);
+		CollectRecord record = (CollectRecord) attribute.getRecord();
+		record.setDefaultValueApplied(attribute, false);
 	}
 	
 	public Set<Attribute<?, ?>> clearValidationResults(Attribute<?,?> attribute){
