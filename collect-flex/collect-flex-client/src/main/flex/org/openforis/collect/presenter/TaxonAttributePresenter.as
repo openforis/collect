@@ -17,11 +17,13 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.client.SpeciesClient;
 	import org.openforis.collect.event.InputFieldEvent;
 	import org.openforis.collect.event.TaxonInputFieldEvent;
+	import org.openforis.collect.i18n.Message;
 	import org.openforis.collect.model.proxy.TaxonOccurrenceProxy;
 	import org.openforis.collect.remoting.service.UpdateRequest;
 	import org.openforis.collect.ui.component.input.InputField;
 	import org.openforis.collect.ui.component.input.TaxonAttributeRenderer;
 	import org.openforis.collect.ui.component.input.TaxonAutoCompletePopUp;
+	import org.openforis.collect.util.CollectionUtil;
 	import org.openforis.collect.util.PopUpUtil;
 	
 	/**
@@ -35,6 +37,9 @@ package org.openforis.collect.presenter {
 		private static const SEARCH_BY_SCIENTIFIC_NAME:String = "byScientificName";
 		private static const SEARCH_BY_VERNACULAR_NAME:String = "byVernacularName";
 		
+		private static const UNKNOWN_ITEM:Object = {code: "UNK", scientificName: Message.get("edit.taxon.unknown")};
+		private static const UNLISTED_ITEM:Object = {code: "UNL", scientificName: Message.get("edit.taxon.unlisted")};
+		
 		protected static var autoCompletePopUp:TaxonAutoCompletePopUp;
 		protected static var autoCompletePopUpOpen:Boolean = false;
 		protected static var autoCompleteSearchResponder:AsyncResponder;
@@ -42,7 +47,7 @@ package org.openforis.collect.presenter {
 		
 		private var minCharsToStartAutoComplete:int = 2;
 		
-		private var _lastSelectedTaxon:TaxonOccurrenceProxy;
+		private var _lastSelectedTaxon:Object;
 		
 		public function TaxonAttributePresenter(view:TaxonAttributeRenderer) {
 			super(view);
@@ -98,8 +103,20 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function inputFieldKeyDownHandler(event:KeyboardEvent):void {
-			if ( event.keyCode == Keyboard.DOWN && autoCompletePopUpOpen ) {
-				autoCompletePopUp.dataGrid.setFocus();
+			switch ( event.keyCode ) {
+				case Keyboard.DOWN:
+					if ( autoCompletePopUpOpen ) {
+						autoCompletePopUp.dataGrid.setFocus();
+						if ( CollectionUtil.isNotEmpty(autoCompletePopUp.dataGrid.dataProvider) ) {
+							autoCompletePopUp.dataGrid.selectedIndex = 0;
+						}
+					}
+					break;
+				case Keyboard.ESCAPE:
+					if ( autoCompletePopUpOpen ) {
+						closeAutoCompletePopUp();
+					}
+					break;
 			}
 		}
 		
@@ -178,11 +195,11 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected static function taxonSelectHandler(event:TaxonInputFieldEvent = null):void {
-			var taxon:TaxonOccurrenceProxy;
+			var taxon:Object;
 			if(event != null) {
 				taxon = event.taxon;
 			} else {
-				taxon = autoCompletePopUp.dataGrid.selectedItem as TaxonOccurrenceProxy;
+				taxon = autoCompletePopUp.dataGrid.selectedItem;
 			}
 			if(taxon != null) {
 				var renderer:TaxonAttributeRenderer = autoCompleteLastInputField.parentDocument as TaxonAttributeRenderer;
@@ -192,7 +209,7 @@ package org.openforis.collect.presenter {
 			closeAutoCompletePopUp();
 		}
 		
-		public function performSelectTaxon(taxonOccurrence:TaxonOccurrenceProxy):void {
+		public function performSelectTaxon(taxonOccurrence:Object):void {
 			_lastSelectedTaxon = taxonOccurrence;
 			var req:UpdateRequest = new UpdateRequest();
 			view.codeTextInput.text = taxonOccurrence.code;
@@ -215,6 +232,10 @@ package org.openforis.collect.presenter {
 		
 		protected static function autoCompleteSearchResultHandler(event:ResultEvent, token:Object):void {
 			var data:IList = event.result as IList;
+			if ( CollectionUtil.isEmpty(data) ) {
+				data.addItem(UNKNOWN_ITEM);
+				data.addItem(UNLISTED_ITEM);
+			}
 			autoCompletePopUp.dataGrid.dataProvider = data;
 		}
 		
