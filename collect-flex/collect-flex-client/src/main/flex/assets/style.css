@@ -138,21 +138,17 @@ mx|ToolTip.warning, mx|ToolTip.warningConfirmedError {
 }
 
 detail|AttributeItemRenderer {
-	skinClass: ClassReference("org.openforis.collect.ui.skin.AttributeRendererSkin");
+	borderColor: #FFFFFF;
+	borderWeight: 1;
 }
 
-detail|AttributeItemRenderer, 
-	detail|MultipleAttributeFormItem s|BorderContainer, 
+detail|MultipleAttributeFormItem s|BorderContainer, 
 	detail|SingleEntityFormItem s|BorderContainer,
 	detail|MultipleEntityFormItem s|BorderContainer  {
 	borderColor: #FFFFFF;
 	borderWeight: 1;
 }
-/*
-detail|AttributeItemRenderer.approved {
-	approvedIconVisible: true;
-}
-*/
+
 detail|AttributeItemRenderer.error, 
 	detail|MultipleAttributeFormItem.error s|BorderContainer,
 	detail|SingleEntityFormItem.error s|BorderContainer,
