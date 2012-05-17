@@ -74,6 +74,7 @@ package org.openforis.collect.presenter {
 			super.initEventListeners();
 			
 			eventDispatcher.addEventListener(ApplicationEvent.UPDATE_RESPONSE_RECEIVED, updateResponseReceivedHandler);
+			eventDispatcher.addEventListener(InputFieldEvent.SET_FOCUS, setFocusHandler);
 			
 			if(_view.textInput != null) {
 				_view.textInput.addEventListener(KeyboardEvent.KEY_DOWN, keyDownHandler);
@@ -83,6 +84,14 @@ package org.openforis.collect.presenter {
 			}
 			
 			BindingUtils.bindSetter(setAttribute, _view, "attribute");
+		}
+		
+		protected function setFocusHandler(event:InputFieldEvent):void {
+			if ( _view.textInput != null && _view.attribute != null && 
+					_view.attribute.id == event.attributeId && 
+					_view.fieldIndex == event.fieldIdx ) {
+				_view.textInput.setFocus();
+			}
 		}
 		
 		protected static function approveMissingHandler(event:NodeEvent): void {
@@ -336,6 +345,40 @@ package org.openforis.collect.presenter {
 				case Keyboard.ESCAPE:
 					undoLastChange();
 					break;
+				case Keyboard.DOWN:
+					setFocusOnNextAttribute();
+					break;
+				case Keyboard.UP:
+					setFocusOnPreviousAttribute();
+					break;
+				case Keyboard.PAGE_DOWN:
+					setFocusOnNextAttribute(10);
+					break;
+				case Keyboard.PAGE_UP:
+					setFocusOnPreviousAttribute(10);
+					break;
+			}
+		}
+		
+		protected function setFocusOnNextAttribute(offset:int = 1):void {
+			setFocusOnSiblingEntityChild(offset);
+		}
+		
+		protected function setFocusOnPreviousAttribute(offset:int = 1):void {
+			setFocusOnSiblingEntityChild(- offset);
+		}
+		
+		protected function setFocusOnSiblingEntityChild(offset:int):void {
+			var attributeName:String = _view.attributeDefinition.name
+			if ( _view.attributeDefinition is AttributeDefinitionProxy && ! _view.attributeDefinition.multiple ) {
+				var entity:EntityProxy = EntityProxy(_view.parentEntity.getSibling(offset));
+				if ( entity != null ) {
+					var attribute:AttributeProxy = entity.getSingleAttribute(attributeName);
+					var nodeEvent:InputFieldEvent = new InputFieldEvent(InputFieldEvent.SET_FOCUS);
+					nodeEvent.attributeId = attribute.id;
+					nodeEvent.fieldIdx = _view.fieldIndex;
+					eventDispatcher.dispatchEvent(nodeEvent);
+				}
 			}
 		}
 		
