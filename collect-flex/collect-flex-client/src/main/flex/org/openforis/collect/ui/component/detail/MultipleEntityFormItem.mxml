@@ -111,7 +111,6 @@
 									]]>
 								</fx:Script>
 							</detail:EntityDataGroupItemRenderer>
-
 						</fx:Component>
 					</s:itemRenderer>
 				</s:DataGroup>
