@@ -34,6 +34,42 @@ package org.openforis.collect.model.proxy {
 				return idx;
 			}
 		}
+		
+		public function getNextSibling(offset:int = 1):NodeProxy {
+			return getSibling(offset);
+		}
+		
+		public function getPreviousSibling(offset:int = 1):NodeProxy {
+			return getSibling(-offset);
+		}
+
+		public function getSibling(offset:int):NodeProxy {
+			var result:NodeProxy = null;
+			var siblings:IList = getSiblings();
+			if ( siblings != null ) {
+				var itemIndex:int = siblings.getItemIndex(this);
+				var resultIndex:int = itemIndex + offset;
+				if ( resultIndex < 0 ) {
+					resultIndex = 0;
+				} else if ( resultIndex > siblings.length - 1 ) {
+					resultIndex = siblings.length - 1;
+				}
+				if ( resultIndex != itemIndex ) {
+					result = NodeProxy(siblings.getItemAt(resultIndex));
+				}
+			}
+			return result;
+		}
+		
+		public function getSiblings():IList {
+			if ( parent != null ) {
+				var result:IList = parent.getChildren(name);
+				return result;
+			} else {
+				return null;
+			}
+		}
+		
     }
 
 }
