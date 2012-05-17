@@ -120,6 +120,7 @@ package org.openforis.collect.presenter {
 			this._view.paginationBar.nextPageButton.addEventListener(MouseEvent.CLICK, nextPageClickHandler);
 			this._view.paginationBar.lastPageButton.addEventListener(MouseEvent.CLICK, lastPageClickHandler);
 			//this._view.paginationBar.goToPageButton.addEventListener(MouseEvent.CLICK, goToPageClickHandler);
+			_view.stage.addEventListener(MouseEvent.CLICK, stageClickHandler);
 		}
 	
 		/**
@@ -217,13 +218,18 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function openFilterPopUpButtonClickHandler(event:Event):void {
-			var application:DisplayObject = DisplayObject(FlexGlobals.topLevelApplication);
-			if(_filterPopUp == null) {
-				_filterPopUp = RecordFilterPopUp(PopUpManager.createPopUp(application, RecordFilterPopUp));
-				_filterPopUp.addEventListener(CloseEvent.CLOSE, filterPopUpCloseHandler);
-				_filterPopUp.applyButton.addEventListener(MouseEvent.CLICK, filterPopUpApplyHandler);
-				_filterPopUp.addEventListener(FlexMouseEvent.MOUSE_DOWN_OUTSIDE, filterPopUpCloseHandler);
+			if ( _filterPopUp != null ) {
+				closeFilterPopUp();
+			} else {
+				openFilterPopUp();
 			}
+		}
+		
+		protected function openFilterPopUp():void {
+			var application:DisplayObject = DisplayObject(FlexGlobals.topLevelApplication);
+			_filterPopUp = RecordFilterPopUp(PopUpManager.createPopUp(application, RecordFilterPopUp));
+			_filterPopUp.addEventListener(CloseEvent.CLOSE, filterPopUpCloseHandler);
+			_filterPopUp.applyButton.addEventListener(MouseEvent.CLICK, filterPopUpApplyHandler);
 			PopUpManager.addPopUp(_filterPopUp, application);
 			var keyAttributeDefinitions:IList = Application.activeRootEntity.keyAttributeDefinitions;
 			_filterPopUp.fieldsRp.dataProvider = keyAttributeDefinitions;
@@ -239,10 +245,18 @@ package org.openforis.collect.presenter {
 			_filterPopUp.setFocus();
 		}
 		
+		protected function stageClickHandler(event:MouseEvent):void {
+			if ( event.target != _view.openFilterPopUpButton &&  _filterPopUp != null && 
+				! _filterPopUp.hitTestPoint( event.stageX, event.stageY ) ) {
+				closeFilterPopUp();
+			}
+		}
+		
 		protected function closeFilterPopUp():void {
-			PopUpManager.removePopUp(_filterPopUp);
-			_filterPopUp.removeEventListener(FlexMouseEvent.MOUSE_DOWN_OUTSIDE, filterPopUpCloseHandler);
-			_filterPopUp = null;
+			if ( _filterPopUp != null ) {
+				PopUpManager.removePopUp(_filterPopUp);
+				_filterPopUp = null;
+			}
 			_view.openFilterPopUpButton.selected = currentKeyValuesFilter != null;
 		}
 		
