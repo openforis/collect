@@ -12,8 +12,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import javax.xml.namespace.QName;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -60,8 +58,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class RecordManager {
 	private final Log log = LogFactory.getLog(RecordManager.class);
 	
-	private static final QName LAYOUT_ANNOTATION = new QName("http://www.openforis.org/collect/3.0/ui", "layout");
-
 	@Autowired
 	private RecordDao recordDao;
 	
@@ -298,8 +294,7 @@ public class RecordManager {
 				if(entity.getCount(name) == 0) {
 					int count = 0;
 					int toBeInserted = entity.getEffectiveMinCount(name);
-					String layout = nodeDefn.getAnnotation(LAYOUT_ANNOTATION);
-					if(nodeDefn instanceof AttributeDefinition || (! (nodeDefn.isMultiple() && "form".equals(layout)))) {
+					if ( count == 0 && (nodeDefn instanceof AttributeDefinition || ! nodeDefn.isMultiple()) ) {
 						//insert at least one node
 						toBeInserted = 1;
 					}
