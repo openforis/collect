@@ -84,8 +84,9 @@ public class DataMarshallerIntegrationTest {
 		assertNotNull(record2);
 		
 		Entity rootEntity1 = record.getRootEntity();
-		Entity rootEntity2 = record2.getRootEntity();
 		
+		Entity rootEntity2 = record2.getRootEntity();		
+			
 		assertNotNull(rootEntity2);
 		
 		testSingleAttributesEqual(rootEntity1, rootEntity2, "region");
@@ -220,6 +221,7 @@ public class DataMarshallerIntegrationTest {
 			tree2.addValue("total_height", 4.0);
 		}
 	}
+	
 	private CollectSurvey importModel() throws IOException, SurveyImportException, InvalidIdmlException {
 		URL idm = ClassLoader.getSystemResource("test.idm.xml");
 		InputStream is = idm.openStream();
