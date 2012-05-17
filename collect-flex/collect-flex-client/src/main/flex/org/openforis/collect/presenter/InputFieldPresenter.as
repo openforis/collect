@@ -15,7 +15,6 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.event.InputFieldEvent;
 	import org.openforis.collect.event.NodeEvent;
 	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
-	import org.openforis.collect.model.CollectRecord$Step;
 	import org.openforis.collect.model.FieldSymbol;
 	import org.openforis.collect.model.proxy.AttributeProxy;
 	import org.openforis.collect.model.proxy.EntityProxy;
@@ -346,29 +345,29 @@ package org.openforis.collect.presenter {
 					undoLastChange();
 					break;
 				case Keyboard.DOWN:
-					setFocusOnNextAttribute();
+					setFocusOnNextSiblingEntity();
 					break;
 				case Keyboard.UP:
-					setFocusOnPreviousAttribute();
+					setFocusOnPreviousSiblingEntity();
 					break;
 				case Keyboard.PAGE_DOWN:
-					setFocusOnNextAttribute(10);
+					setFocusOnNextSiblingEntity(10);
 					break;
 				case Keyboard.PAGE_UP:
-					setFocusOnPreviousAttribute(10);
+					setFocusOnPreviousSiblingEntity(10);
 					break;
 			}
 		}
 		
-		protected function setFocusOnNextAttribute(offset:int = 1):void {
-			setFocusOnSiblingEntityChild(offset);
+		protected function setFocusOnNextSiblingEntity(offset:int = 1):void {
+			setFocusOnSiblingEntity(offset);
 		}
 		
-		protected function setFocusOnPreviousAttribute(offset:int = 1):void {
-			setFocusOnSiblingEntityChild(- offset);
+		protected function setFocusOnPreviousSiblingEntity(offset:int = 1):void {
+			setFocusOnSiblingEntity(- offset);
 		}
 		
-		protected function setFocusOnSiblingEntityChild(offset:int):void {
+		protected function setFocusOnSiblingEntity(offset:int):void {
 			var attributeName:String = _view.attributeDefinition.name
 			if ( _view.attributeDefinition is AttributeDefinitionProxy && ! _view.attributeDefinition.multiple ) {
 				var entity:EntityProxy = EntityProxy(_view.parentEntity.getSibling(offset));
