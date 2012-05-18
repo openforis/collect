@@ -45,7 +45,7 @@ package org.openforis.collect.presenter
 			
 			ChangeWatcher.watch(_view, "parentEntity", parentEntityChangeHandler);
 			
-			if(_view.entityDefinition != null && _view.entityDefinition.multiple) {
+			if(_view.entityDefinition != null && _view.entityDefinition.multiple && _view.entityDefinition.parent != null) {
 				_view.addButton.addEventListener(MouseEvent.CLICK, addButtonClickHandler);
 				_view.addButton.addEventListener(FocusEvent.FOCUS_IN, buttonFocusInHandler);
 				_view.deleteButton.addEventListener(MouseEvent.CLICK, deleteButtonClickHandler);
@@ -61,7 +61,7 @@ package org.openforis.collect.presenter
 		protected function updateView():void {
 			if(_view.entityDefinition != null) {
 				var entities:IList = getEntities();
-				if(_view.entityDefinition.multiple) {
+				if ( _view.entityDefinition.multiple && _view.entityDefinition.parent != null ) {
 					_view.entities = entities;
 					selectEntity(null);
 					selectFirstTab();

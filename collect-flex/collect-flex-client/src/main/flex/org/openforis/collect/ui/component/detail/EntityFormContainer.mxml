@@ -198,8 +198,8 @@
 			<s:VerticalLayout gap="4" />
 		</s:layout>
 		<s:Group id="addSection" 
-				 includeInLayout="{entityDefinition.multiple}" 
-				 visible="{entityDefinition.multiple}">
+				 includeInLayout="{entityDefinition.multiple &amp;&amp; entityDefinition.parent != null}" 
+				 visible="{entityDefinition.multiple &amp;&amp; entityDefinition.parent != null}">
 			<s:layout>
 				<s:HorizontalLayout paddingTop="5" horizontalAlign="left" paddingLeft="10" gap="12" verticalAlign="middle" />
 			</s:layout>
@@ -229,7 +229,7 @@
 				 height="100%" width="100%"
 				 showEffect="{showFormEffect}" 
 				 hideEffect="{hideFormEffect}"
-				 visible="{! entityDefinition.multiple || dropDownList.selectedItem != null}"
+				 visible="{! entityDefinition.multiple || entityDefinition.parent == null || dropDownList.selectedItem != null}"
 				 >
 			<s:VGroup id="tabbedContainer" 
 					  width="100%" height="100%" 
