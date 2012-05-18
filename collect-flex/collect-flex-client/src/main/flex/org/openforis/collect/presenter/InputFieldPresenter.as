@@ -484,9 +484,20 @@ package org.openforis.collect.presenter {
 				hasRemarks = StringUtil.isNotBlank(getRemarks());
 				_contextMenu.updateItems();
 			}
-			_view.hasRemarks = hasRemarks;
 			
+			var newStyles:Array = [];
+			if ( hasRemarks ) {
+				newStyles.push(InputField.REMARKS_PRESENT_STYLE);
+			}
+			if ( ! Application.activeRecordEditable ) {
+				newStyles.push(InputField.READONLY_STYLE);	
+			}
+			UIUtil.replaceStyleNames(_view.validationStateDisplay, newStyles, 
+				[InputField.REMARKS_PRESENT_STYLE, InputField.READONLY_STYLE] );
+			/*
+			_view.hasRemarks = hasRemarks;
 			_view.editable = Application.activeRecordEditable;
+			*/
 		}
 		
 		protected function getField():FieldProxy {
