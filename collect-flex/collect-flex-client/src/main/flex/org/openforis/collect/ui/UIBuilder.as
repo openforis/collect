@@ -258,8 +258,8 @@ package org.openforis.collect.ui {
 				var units:IList = NumberAttributeDefinitionProxy(def).units;
 				var gap:int = 2;
 				if(units.length > 1) {
-					return 192;
-				} else if(units.length == 1) {
+					return 70 + gap + 120;
+				} else if ( units.length == 1 && def.parentLayout == UIUtil.LAYOUT_FORM ) {
 					var unit:UnitProxy = units.getItemAt(0) as UnitProxy;
 					var unitWidth:Number = UIUtil.measureUnitWidth(unit.name);
 					return 70 + gap + unitWidth;
@@ -271,7 +271,7 @@ package org.openforis.collect.ui {
 				var rangeUnitsCount:int = rangeDef.units.length;
 				if(rangeUnitsCount > 1) {
 					return 242;
-				} else if(rangeUnitsCount == 1) {
+				} else if(rangeUnitsCount == 1 && def.parentLayout == UIUtil.LAYOUT_FORM ) {
 					return 147;
 				} else {
 					return 120;
@@ -470,6 +470,17 @@ package org.openforis.collect.ui {
 				l = getLabel(Message.get('edit.coordinate.y'), 100, "bold");
 				h.addElement(l);
 				result.addElement(h);
+			} else if (defn is NumberAttributeDefinitionProxy && NumberAttributeDefinitionProxy(defn).defaultUnit != null || 
+				defn is RangeAttributeDefinitionProxy && RangeAttributeDefinitionProxy(defn).defaultUnit != null ) {
+				var defaultUnit:UnitProxy;
+				if (defn is NumberAttributeDefinitionProxy) {
+					defaultUnit = NumberAttributeDefinitionProxy(defn).defaultUnit;
+				} else {
+					defaultUnit = RangeAttributeDefinitionProxy(defn).defaultUnit;
+				}
+				var labStr:String = defn.getLabelText() + " (" + defaultUnit.name + ")";
+				l = getLabel(labStr, width, "bold");
+				result.addElement(l);
 			} else {
 				l = getLabel(defn.getLabelText(), width, "bold");
 				result.addElement(l);

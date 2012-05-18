@@ -101,9 +101,13 @@ package org.openforis.collect.presenter {
 			var units:IList = attrDefn.units;
 			if(units.length > 0) {
 				if(units.length == 1) {
-					view.currentState = NumericAttributeRenderer.SINGLE_UNIT_STATE;
-					var unit:UnitProxy = UnitProxy(units.getItemAt(0));
-					view.unitLabel.text = unit.name;
+					if ( view.attributeDefinition.parentLayout == UIUtil.LAYOUT_FORM ) {
+						view.currentState = NumericAttributeRenderer.SINGLE_UNIT_STATE;
+						var unit:UnitProxy = UnitProxy(units.getItemAt(0));
+						view.unitLabel.text = unit.name;
+					} else {
+						view.currentState = NumericAttributeRenderer.NO_UNIT_STATE;
+					}
 				} else {
 					view.currentState = NumericAttributeRenderer.MULTIPLE_UNIT_STATE;
 					view.unitInputField.dataProvider = units;
