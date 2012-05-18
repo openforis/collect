@@ -22,7 +22,10 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 	</properties>
 
-		
+	<scm>
+	    <connection>scm:git:git://github.com/openforis/collect.git</connection>
+	</scm>
+	
 	<build>
 		<plugins>
 			<!--  Set Eclipse project text encoding to UTF-8 -->
@@ -40,7 +43,12 @@
 						</file>
 					</additionalConfig>
 				</configuration>
-			</plugin>			
+			</plugin>
+			<plugin>
+		        <groupId>org.apache.maven.plugins</groupId>
+		        <artifactId>maven-release-plugin</artifactId>
+		        <version>2.3</version>
+	      	</plugin>	
 		</plugins>
 		<pluginManagement>
 			<plugins>
