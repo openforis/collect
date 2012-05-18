@@ -159,7 +159,7 @@ public class DataMarshaller {
 
 	private void writeField(XmlSerializer serializer, Attribute<?, ?> attr, int fieldIdx) throws IOException {
 		AttributeDefinition definition = attr.getDefinition();
-		List<FieldDefinition> fldDefns = definition.getFieldsDefinitions();
+		List<FieldDefinition> fldDefns = definition.getFieldDefinitions();
 		Field<?> fld = attr.getField(fieldIdx);
 		if ( fld.hasData() ) {
 			FieldDefinition fldDefn = fldDefns.get(fieldIdx);
