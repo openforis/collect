@@ -48,6 +48,7 @@
 				  		toolTip="{Message.get('list.filter')}"
 				  		right="0"
 						width="20"
+						height="20"
 						styleName="filter"
 				  		/>
 

@@ -8,8 +8,6 @@ package org.openforis.collect.presenter
 	
 	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.model.proxy.AttributeProxy;
-	import org.openforis.collect.model.proxy.NodeProxy;
-	import org.openforis.collect.remoting.service.UpdateResponse;
 	import org.openforis.collect.ui.component.detail.AttributeFormItem;
 	import org.openforis.collect.util.UIUtil;
 

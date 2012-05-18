@@ -167,8 +167,8 @@ package org.openforis.collect.presenter {
 		*/
 		
 		protected function updateView():void {
-			var errorConfirmed:Boolean = isErrorConfirmed();
-			_view.approved = errorConfirmed;
+			//var errorConfirmed:Boolean = isErrorConfirmed();
+			//_view.approved = errorConfirmed;
 			
 			updateValidationDisplayManager();
 		}
