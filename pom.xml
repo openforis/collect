@@ -23,7 +23,9 @@
 	</properties>
 
 	<scm>
-	    <connection>scm:git:git://github.com/openforis/collect.git</connection>
+	    <connection>scm:git:git@github.com:openforis/collect.git</connection>
+	    <url>scm:git:git@github.com:openforis/collect.git</url>
+		<developerConnection>scm:git:git@github.com:openforis/collect.git</developerConnection>
 	</scm>
 	
 	<build>
