@@ -17,7 +17,9 @@
 	
 	<!--<s:Image source="/assets/images/{surveyBannerFileName}" />-->
 	
-	<s:Image source="@Embed(source='/assets/images/banner.jpg')"/>
-	<s:Spacer width="100%"/>
-	<s:Image source="@Embed(source='/assets/images/specific_logo.jpg')"/>
+	<mx:HBox width="100%">
+        <s:Image source="@Embed(source='/assets/images/banner.jpg')"/>
+        <s:Spacer width="100%"/>
+        <s:Image source="@Embed(source='/assets/images/specific_logo.jpg')"/> 
+    </mx:HBox>	
 </s:Group>

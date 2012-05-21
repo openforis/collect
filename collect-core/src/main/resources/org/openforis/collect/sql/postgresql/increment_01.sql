@@ -38,6 +38,9 @@ UPDATE collect.ofc_record
 	SET  root_entity_definition_id=1447
 GO
 
+ALTER TABLE collect.ofc_record
+	 ALTER COLUMN root_entity_definition_id set not null
+GO
 
 ALTER TABLE collect.ofc_record
 	 ALTER COLUMN root_entity_definition_id set not null
@@ -46,3 +49,5 @@ GO
 ALTER TABLE collect.ofc_record
 	ADD COLUMN "lock_id" varchar(50) NULL
 GO
+
+
