@@ -8,13 +8,13 @@
 package org.openforis.collect.model.proxy {
 	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
-	import mx.messaging.management.Attribute;
 	
 	import org.granite.collections.IMap;
 	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.NumberAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.NumberAttributeDefinitionProxy$Type;
+	import org.openforis.collect.util.ArrayUtil;
 	import org.openforis.collect.util.ObjectUtil;
 	import org.openforis.collect.util.StringUtil;
 	import org.openforis.collect.util.UIUtil;
@@ -84,11 +84,15 @@ package org.openforis.collect.model.proxy {
 		 * Traverse each child and pass it to the argument function
 		 * */
 		public function traverse(funct:Function):void {
+			var stack:Array = new Array();
 			var children:IList = getChildren();
-			for each (var child:NodeProxy in children) {
-				funct(child);
-				if(child is EntityProxy) {
-					EntityProxy(child).traverse(funct);
+			ArrayUtil.addAll(stack, children.toArray());
+			while ( stack.length > 0 ) {
+				var node:NodeProxy = NodeProxy(stack.pop());
+				funct(node);
+				if ( node is EntityProxy ) {
+					children = EntityProxy(node).getChildren();
+					ArrayUtil.addAll(stack, children.toArray());
 				}
 			}
 		}
@@ -255,17 +259,11 @@ package org.openforis.collect.model.proxy {
 			return required == true;
 		}
 		
-		public function showErrorsOnDescendants():void {
-			var childNodeNames:ArrayCollection = showChildrenErrorsMap.keySet;
-			for each (var name:String in childNodeNames) {
-				showChildrenErrorsMap.put(name, true);
-				var children:IList = getChildren(name);
-				for each (var child:NodeProxy in children) {
-					if(child is EntityProxy) {
-						EntityProxy(child).showErrorsOnDescendants();
-					}
-				}
-			}
+		public function get childDefinitionNames():IList {
+			//taken from showChildrenErrorsMap that is fully populated from the server
+			//with an entry for each child definition
+			var names:ArrayCollection = showChildrenErrorsMap.keySet;
+			return names;
 		}
 		
 		override public function hasErrors():Boolean {
@@ -313,6 +311,46 @@ package org.openforis.collect.model.proxy {
 			return children.length;
 		}
 		
+		override public function get empty():Boolean {
+			var children:IList = getChildren();
+			for each (var child:NodeProxy in children ) {
+				if ( ! child.empty ) {
+					return false;
+				}
+			}
+			return true;
+		}
+		
+		public function hasDescendantWithBlankField():Boolean {
+			var children:IList = getChildren();
+			var nodes:Array = children.toArray();
+			while ( nodes.length > 0 ) {
+				var node:NodeProxy = NodeProxy(nodes.pop());
+				if ( node is AttributeProxy && AttributeProxy(node).hasBlankField() ) {
+					return true;
+				} else if (node is EntityProxy) {
+					var descendants:IList = EntityProxy(node).getChildren();
+					nodes = nodes.concat(descendants.toArray());
+				}
+			}
+			return false;
+		}
+		
+		protected function updateMap(map:IMap, newMap:IMap):void {
+			if(map != null && newMap != null) {
+				var newKeys:ArrayCollection = newMap.keySet;
+				for each (var key:* in newKeys) {
+					var value:* = newMap.get(key);
+					if(value != null) {
+						map.put(key, value);
+					}
+				}
+			}
+		}
+		
+		/*
+		* GETTERS AND SETTERS
+		*/
 		public function get keyText():String {
 			return _keyText;
 		}
@@ -345,18 +383,6 @@ package org.openforis.collect.model.proxy {
 			_enumeratedEntitiesCodeWidths = value;
 		}
 
-		protected function updateMap(map:IMap, newMap:IMap):void {
-			if(map != null && newMap != null) {
-				var newKeys:ArrayCollection = newMap.keySet;
-				for each (var key:* in newKeys) {
-					var value:* = newMap.get(key);
-					if(value != null) {
-						map.put(key, value);
-					}
-				}
-			}
-		}
-		
 		
 	}
 }

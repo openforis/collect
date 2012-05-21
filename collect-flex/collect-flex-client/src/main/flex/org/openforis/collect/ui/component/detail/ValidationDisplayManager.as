@@ -52,39 +52,95 @@ package org.openforis.collect.ui.component.detail
 			_display = display;
 		}
 		
-		public function displayNodeValidation(parentEntity:EntityProxy, defn:NodeDefinitionProxy, attribute:AttributeProxy = null):void {
+		public function displayAttributeValidation(parentEntity:EntityProxy, defn:NodeDefinitionProxy, attribute:AttributeProxy):void {
 			var flag:ValidationResultFlag = null;
 			var validationMessages:Array = null;
 			if(parentEntity != null && defn != null) {
 				var hasErrors:Boolean = attribute != null ? attribute.hasErrors(): false;
 				var hasWarnings:Boolean = attribute != null ? attribute.hasWarnings(): false;
-				var name:String = defn.name;
-				//var required:Boolean = parentEntity.childrenRequiredMap.get(name);
+				var confirmedError:Boolean = false;
 				if(hasErrors || hasWarnings) {
 					if(hasErrors) {
 						flag = ValidationResultFlag.ERROR;
 					} else if(hasWarnings) {
 						flag = ValidationResultFlag.WARNING;
+						if ( attribute.errorConfirmed ) {
+							confirmedError = true;
+						}
 					}
 					validationMessages = attribute.validationResults.validationMessages;
+					apply(flag, validationMessages, confirmedError);
 				} else if(showMinMaxCountErrors) {
-					var minCountValid:ValidationResultFlag = parentEntity.childrenMinCountValidationMap.get(name);
-					var maxCountValid:ValidationResultFlag = parentEntity.childrenMaxCountValidationMap.get(name);
-					if(minCountValid != ValidationResultFlag.OK || maxCountValid != ValidationResultFlag.OK) {
-						if(minCountValid != ValidationResultFlag.OK) {
-							flag = minCountValid;
-							validationMessages = [Message.get("edit.validation.minCount", [defn.minCount])];
-						} else {
-							flag = maxCountValid;
-							validationMessages = [Message.get("edit.validation.maxCount", [defn.maxCount])];
+					displayMinMaxCountValidationErrors(parentEntity, defn);
+				} else {
+					reset();
+				}
+			} else {
+				reset();
+			}
+		}
+		
+		public function displayAttributesValidation(parentEntity:EntityProxy, defn:NodeDefinitionProxy):void {
+			var flag:ValidationResultFlag = null;
+			var validationMessages:Array = null;
+			if(parentEntity != null && defn != null) {
+				var errorMessages:Array = new Array();
+				var warningMessages:Array = new Array();
+				var attributes:IList = parentEntity.getChildren(defn.name);
+				var confirmedError:Boolean = false;
+				for each (var a:AttributeProxy in attributes) {
+					if (a.hasErrors()) {
+						errorMessages = errorMessages.concat(a.validationResults.validationMessages);
+					}
+					if (a.hasWarnings()) {
+						warningMessages = warningMessages.concat(a.validationResults.validationMessages);
+						if ( a.errorConfirmed ) {
+							confirmedError = true;
 						}
 					}
 				}
+				var hasErrors:Boolean = errorMessages.length > 0;
+				var hasWarnings:Boolean = warningMessages.length > 0;
+				if(hasErrors || hasWarnings) {
+					if(hasErrors) {
+						flag = ValidationResultFlag.ERROR;
+						validationMessages = errorMessages;
+					} else {
+						flag = ValidationResultFlag.WARNING;
+						validationMessages = warningMessages;
+					}
+					apply(flag, validationMessages, confirmedError);
+				} else if(showMinMaxCountErrors) {
+					displayMinMaxCountValidationErrors(parentEntity, defn);
+				} else {
+					reset();
+				}
+			} else {
+				reset();
 			}
-			apply(flag, validationMessages);
+		}
+		
+		public function displayMinMaxCountValidationErrors(parentEntity:EntityProxy, defn:NodeDefinitionProxy):void {
+			var flag:ValidationResultFlag = null;
+			var validationMessages:Array = null;
+			var name:String = defn.name;
+			var minCountValid:ValidationResultFlag = parentEntity.childrenMinCountValidationMap.get(name);
+			var maxCountValid:ValidationResultFlag = parentEntity.childrenMaxCountValidationMap.get(name);
+			if(minCountValid != ValidationResultFlag.OK || maxCountValid != ValidationResultFlag.OK) {
+				if(minCountValid != ValidationResultFlag.OK) {
+					flag = minCountValid;
+					validationMessages = [Message.get("edit.validation.minCount", [defn.minCount > 0 ? defn.minCount: 1])];
+				} else {
+					flag = maxCountValid;
+					validationMessages = [Message.get("edit.validation.maxCount", [defn.maxCount > 0 ? defn.maxCount: 1])];
+				}
+				apply(flag, validationMessages);
+			} else {
+				reset();
+			}
 		}
 
-		protected function apply(flag:ValidationResultFlag, messages:Array):void {
+		protected function apply(flag:ValidationResultFlag, messages:Array, confirmedError:Boolean = false):void {
 			if(_active) {
 				var newStyleName:String;
 				switch(flag) {
@@ -93,7 +149,11 @@ package org.openforis.collect.ui.component.detail
 						newStyleName = STYLE_NAME_ERROR;
 						break;
 					case ValidationResultFlag.WARNING:
-						_toolTipStyleName = ToolTipUtil.STYLE_NAME_WARNING;
+						if ( confirmedError ) {
+							_toolTipStyleName = ToolTipUtil.STYLE_NAME_WARNING_CONFIRMED_ERROR;
+						} else {
+							_toolTipStyleName = ToolTipUtil.STYLE_NAME_WARNING;
+						}
 						newStyleName = STYLE_NAME_WARNING;
 						break;
 					default:

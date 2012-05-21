@@ -64,6 +64,7 @@
 							  />
 
 		<s:VGroup paddingLeft="{occupyEntirePage ? 0: 30}" 
+				  paddingRight="0"
 				  height="100%" 
 				  width="100%">
 			<s:Scroller id="headerScroller" 
@@ -74,6 +75,9 @@
 						visible="{dataGroup.dataProvider.length > 0}"
 						>
 				<s:HGroup gap="0">
+					<s:Spacer id="dragAnchorSpacer"
+							  includeInLayout="{Application.activeRecordEditable &amp;&amp; ! entityDefinition.enumerable}"
+						width="13" />
 					<datagroup:DataGroupHeader id="header" 
 											   nodeDefinitions="{nodeDefinitions}"
 											   parentEntity="{parentEntity}"
@@ -99,7 +103,14 @@
 								entity="{data as EntityProxy}"
 								modelVersion="{outerDocument.modelVersion}"
 								nodeDefinitions="{outerDocument.nodeDefinitions}"
-								/>
+								dragEnabled="{Application.activeRecordEditable &amp;&amp; ! outerDocument.entityDefinition.enumerable}"
+								>
+								<fx:Script>
+									<![CDATA[
+										import org.openforis.collect.Application;
+									]]>
+								</fx:Script>
+							</detail:EntityDataGroupItemRenderer>
 						</fx:Component>
 					</s:itemRenderer>
 				</s:DataGroup>
@@ -112,8 +123,8 @@
 				icon="{Images.ADD}" 
 				labelPlacement="left" 
 				useHandCursor="true"
-				visible="{! entityDefinition.enumerable &amp;&amp; Application.activeRecord.step != CollectRecord$Step.ANALYSIS}"
-				includeInLayout="{! entityDefinition.enumerable &amp;&amp; Application.activeRecord.step != CollectRecord$Step.ANALYSIS}"
+				visible="{Application.activeRecordEditable &amp;&amp; ! entityDefinition.enumerable}"
+				includeInLayout="{Application.activeRecordEditable &amp;&amp; ! entityDefinition.enumerable}"
 				/>
 		</s:VGroup>
 		

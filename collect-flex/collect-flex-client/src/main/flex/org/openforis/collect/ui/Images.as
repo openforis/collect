@@ -3,11 +3,10 @@ package org.openforis.collect.ui {
 	/**
 	 * 
 	 * @author Mino Togna
+	 * @author Stefano Ricci
+	 * 
 	 * */
 	public class Images {
-		
-		public function Images() {
-		}
 		
 		[Embed("/assets/images/delete.png")]
 		public static const DELETE:Class;
@@ -77,8 +76,6 @@ package org.openforis.collect.ui {
 		
 		[Embed("/assets/images/expand.png")]
 		public static const EXPAND:Class;
-		
-		
 		
 	}
 }

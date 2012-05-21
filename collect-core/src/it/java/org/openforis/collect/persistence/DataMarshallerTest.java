@@ -27,6 +27,8 @@ import org.openforis.collect.model.CollectSurveyContext;
 import org.openforis.collect.model.FieldSymbol;
 import org.openforis.collect.persistence.xml.CollectIdmlBindingContext;
 import org.openforis.collect.persistence.xml.DataMarshaller;
+import org.openforis.idm.metamodel.NodeDefinition;
+import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.validation.Validator;
 import org.openforis.idm.metamodel.xml.InvalidIdmlException;
 import org.openforis.idm.metamodel.xml.SurveyUnmarshaller;
@@ -35,7 +37,6 @@ import org.openforis.idm.model.CodeAttribute;
 import org.openforis.idm.model.Coordinate;
 import org.openforis.idm.model.Date;
 import org.openforis.idm.model.Entity;
-import org.openforis.idm.model.Field;
 import org.openforis.idm.model.RealAttribute;
 import org.openforis.idm.model.Time;
 import org.openforis.idm.model.expression.ExpressionFactory;
@@ -84,30 +85,41 @@ public class DataMarshallerTest {
 		assertNotNull(xml);
 		Document doc = parseXml(xml);
 		
-		Object res = evaluateXPathExpression(doc, "record/cluster/id/code");
+		Object res = evaluateXPathExpression(doc, "cluster/id/code");
 		assertEquals("123_456", res);
-		res = evaluateXPathExpression(doc, "record/cluster/time_study[1]/start_time/minute");
+		res = evaluateXPathExpression(doc, "cluster/time_study[1]/start_time/minute");
 		assertEquals("15", res);
-		res = evaluateXPathExpression(doc, "record/cluster/time_study[1]/start_time/minute/@symbol");
+		res = evaluateXPathExpression(doc, "cluster/time_study[1]/start_time/minute/@symbol");
 		assertEquals("", res);
-		res = evaluateXPathExpression(doc, "record/cluster/time_study[2]/start_time/minute");
+		res = evaluateXPathExpression(doc, "cluster/time_study[2]/start_time/minute");
 		assertEquals("32", res);
-		res = evaluateXPathExpression(doc, "record/cluster/plot[1]/tree[1]/bole_height/value/@remarks");
+		res = evaluateXPathExpression(doc, "cluster/plot[1]/tree[1]/bole_height/value/@remarks");
 		assertEquals("No value specified", res);
-		res = evaluateXPathExpression(doc, "record/cluster/plot[1]/tree[1]/bole_height/value/@symbol");
+		res = evaluateXPathExpression(doc, "cluster/plot[1]/tree[1]/bole_height/value/@symbol");
 		assertEquals(Character.toString(FieldSymbol.BLANK_ON_FORM.getCode()), res);
-		res = evaluateXPathExpression(doc, "record/cluster/district/code/@state");
-		assertEquals("1", res);
-		res = evaluateXPathExpression(doc, "record/cluster/child_states/region");
-		assertEquals("2", res);
 
 		//test blank values
-		res = evaluateXPathExpression(doc, "record/cluster/id/code/@remarks");
+		res = evaluateXPathExpression(doc, "cluster/id/code/@remarks");
 		assertEquals("", res);
-		res = evaluateXPathExpression(doc, "record/cluster/id/code/@symbol");
+		res = evaluateXPathExpression(doc, "cluster/id/code/@symbol");
 		assertEquals("", res);
-		res = evaluateXPathExpression(doc, "record/cluster/id/code/@state");
+		
+		//test child state (confirmed error)
+		res = evaluateXPathExpression(doc, "cluster/district/code/@state");
+		assertEquals("1", res);
+		//test child state (approved missing value)
+		res = evaluateXPathExpression(doc, "cluster/accessibility/@state");
+		assertEquals("1", res);
+		//test blank child state
+		res = evaluateXPathExpression(doc, "cluster/id/@state");
 		assertEquals("", res);
+		
+		//test definition id
+		res = evaluateXPathExpression(doc, "cluster/id/@defnId");
+		Schema schema = survey.getSchema();
+		NodeDefinition nodeDefn = schema.getByPath("/cluster/id");
+		Integer nodeDefnId = nodeDefn.getId();
+		assertEquals(nodeDefnId.toString(), res);
 	}
 	
 	private CollectRecord createTestRecord(CollectSurvey survey) {
@@ -127,18 +139,18 @@ public class DataMarshallerTest {
 	}
 	
 	private void addTestValues(Entity cluster) {
+		CollectRecord record = (CollectRecord) cluster.getRecord();
 		cluster.addValue("id", new Code("123_456"));
 		cluster.addValue("gps_realtime", Boolean.TRUE);
 		cluster.addValue("region", new Code("001"));
-		CodeAttribute district = cluster.addValue("district", new Code("XXX"));
-		Field<String> districtCodeValueField = district.getCodeField();
-		districtCodeValueField.getState().set(0, true);
+		CodeAttribute districtAttr = cluster.addValue("district", new Code("XXX"));
+		record.setErrorConfirmed(districtAttr, true);
 		cluster.addValue("crew_no", 10);
 		cluster.addValue("map_sheet", "value 1");
 		cluster.addValue("map_sheet", "value 2");
 		cluster.addValue("vehicle_location", new Coordinate((double)432423423l, (double)4324324l, "srs"));
 		cluster.addValue("gps_model", "TomTom 1.232");
-		cluster.setChildState("region", 2);
+		cluster.setChildState("accessibility", 1);
 		{
 			Entity ts = cluster.addEntity("time_study");
 			ts.addValue("date", new Date(2011,2,14));

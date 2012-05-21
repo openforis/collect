@@ -3,24 +3,34 @@
  */
 package org.openforis.collect.manager;
 
+import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
-import javax.xml.namespace.QName;
-
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.State;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.FieldSymbol;
+import org.openforis.collect.model.RecordLock;
 import org.openforis.collect.model.RecordSummarySortField;
 import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.MissingRecordKeyException;
+import org.openforis.collect.persistence.MultipleEditException;
 import org.openforis.collect.persistence.RecordDao;
+import org.openforis.collect.persistence.RecordLockedByActiveUserException;
 import org.openforis.collect.persistence.RecordLockedException;
 import org.openforis.collect.persistence.RecordPersistenceException;
-import org.openforis.collect.persistence.UserDao;
+import org.openforis.collect.persistence.RecordUnlockedException;
+import org.openforis.idm.metamodel.AttributeDefault;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
@@ -37,6 +47,7 @@ import org.openforis.idm.model.Field;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.NodePointer;
 import org.openforis.idm.model.Record;
+import org.openforis.idm.model.expression.InvalidExpressionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,41 +56,49 @@ import org.springframework.transaction.annotation.Transactional;
  * @author S. Ricci
  */
 public class RecordManager {
-	//private final Log log = LogFactory.getLog(RecordManager.class);
+	private final Log log = LogFactory.getLog(RecordManager.class);
 	
-	private static final QName LAYOUT_ANNOTATION = new QName("http://www.openforis.org/collect/3.0/ui", "layout");
-
 	@Autowired
 	private RecordDao recordDao;
 	
-	@Autowired
-	private UserDao userDao;
+	private Map<Integer, RecordLock> locks;
+	
+	private long lockTimeoutMillis = 60000;
 	
 	protected void init() {
-		unlockAll();
+		locks = new HashMap<Integer, RecordLock>();
 	}
 	
 	@Transactional
-	public void save(CollectRecord record) throws RecordPersistenceException {
-		updateKeys(record);
+	public void save(CollectRecord record, String sessionId) throws RecordPersistenceException {
+		User user = record.getModifiedBy();
+		
+		record.updateRootEntityKeyValues();
+		checkAllKeysSpecified(record);
 		
 		record.updateEntityCounts();
-		
+
 		Integer id = record.getId();
 		if(id == null) {
 			recordDao.insert(record);
-			User user = record.getModifiedBy();
 			id = record.getId();
-			recordDao.lock(id, user.getId());
+			//todo fix: concurrency problem may occur..
+			lock(id, user, sessionId);
 		} else {
+			checkIsLocked(id, user, sessionId);
 			recordDao.update(record);
 		}
 	}
 
 	@Transactional
-	public void delete(int recordId, User user) throws RecordPersistenceException {
-		recordDao.lock(recordId, user.getId());
-		recordDao.delete(recordId);
+	public void delete(int recordId) throws RecordPersistenceException {
+		if ( isLocked(recordId) ) {
+			RecordLock lock = getLock(recordId);
+			User lockUser = lock.getUser();
+			throw new RecordLockedException(lockUser.getName());
+		} else {
+			recordDao.delete(recordId);
+		}
 	}
 
 	/**
@@ -88,46 +107,25 @@ public class RecordManager {
 	 * @param survey
 	 * @param user
 	 * @param recordId
+	 * @param step
+	 * @param sessionId
+	 * @param forceUnlock
 	 * @return
-	 * @throws RecordLockedException 
+	 * @throws RecordLockedException
+	 * @throws MultipleEditException
 	 */
 	@Transactional
-	public CollectRecord checkout(CollectSurvey survey, User user, int recordId, int step, boolean forceUnlock) throws RecordLockedException {
-		Integer lockingUserId = recordDao.getLockingUserId(recordId);
-		Integer userId = user.getId();
-		if ( lockingUserId == null || lockingUserId == userId || forceUnlock ) {
-			String lockId = recordDao.lock(recordId, userId);
-			CollectRecord record = recordDao.load(survey, recordId, step);
-			record.setLockedBy(user);
-			record.setLockId(lockId);
-			return record;
-		} else {
-			User lockingUser = userDao.loadById(lockingUserId);
-			String lockingUserName = lockingUser.getName();
-			throw new RecordLockedException("Record already locked", lockingUserName);
-		}
-	}
-	
-	public boolean isLocking(int userId, int recordId, String lockId) {
-		boolean result = recordDao.isLocking(userId, recordId, lockId);
-		return result;
+	public synchronized CollectRecord checkout(CollectSurvey survey, User user, int recordId, int step, String sessionId, boolean forceUnlock) throws RecordLockedException, MultipleEditException {
+		isLockAllowed(user, recordId, sessionId, forceUnlock);
+		lock(recordId, user, sessionId, forceUnlock);
+		CollectRecord record = recordDao.load(survey, recordId, step);
+		return record;
 	}
 	
 	@Transactional
 	public CollectRecord load(CollectSurvey survey, int recordId, int step) throws RecordPersistenceException {
 		CollectRecord record = recordDao.load(survey, recordId, step);
 		return record;
-	}
-	
-	@Transactional
-	public Integer getLockingUserId(int recordId) {
-		Integer userId = recordDao.getLockingUserId(recordId);
-		return userId;
-	}
-	
-	public Integer getLockedRecordId(int userId) {
-		Integer id = recordDao.getLockedRecordId(userId);
-		return id;
 	}
 	
 	@Transactional
@@ -150,10 +148,9 @@ public class RecordManager {
 	}
 
 	@Transactional
-	public CollectRecord create(CollectSurvey survey, EntityDefinition rootEntityDefinition, User user, String modelVersionName) throws RecordPersistenceException {
+	public CollectRecord create(CollectSurvey survey, EntityDefinition rootEntityDefinition, User user, String modelVersionName, String sessionId) throws RecordPersistenceException {
 		CollectRecord record = new CollectRecord(survey, modelVersionName);
 		record.createRootEntity(rootEntityDefinition.getName());
-		
 		record.setCreationDate(new Date());
 		record.setCreatedBy(user);
 		record.setStep(Step.ENTRY);
@@ -161,34 +158,27 @@ public class RecordManager {
 	}
 
 	@Transactional
-	public void unlock(CollectRecord record, User user) throws RecordLockedException {
-		recordDao.unlock(record.getId(), user);
-		record.setLockedBy(null);
-	}
-
-	@Transactional
-	public void unlockAll() {
-		recordDao.unlockAll();
-	}
-
-	@Transactional
-	public void promote(CollectRecord record, User user) throws RecordPersistenceException, RecordPromoteException {
-		//save changes on current step
+	public void promote(CollectRecord record, User user) throws RecordPromoteException, MissingRecordKeyException {
 		Integer errors = record.getErrors();
 		Integer skipped = record.getSkipped();
-		Integer missing = record.getMissing();
+		Integer missing = record.getMissingErrors();
 		int totalErrors = errors + skipped + missing;
 		if( totalErrors > 0 ){
 			throw new RecordPromoteException("Record cannot be promoted becuase it contains errors.");
 		}
-		
+		record.updateRootEntityKeyValues();
+		checkAllKeysSpecified(record);
+		record.updateEntityCounts();
+
 		Integer id = record.getId();
-		// before save record in current phase
+		// before save record in current step
 		if( id == null ) {
 			recordDao.insert( record );
 		} else {
 			recordDao.update( record );
 		}
+
+		applyDefaultValues(record);
 		
 		//change step and update the record
 		Step currentStep = record.getStep();
@@ -210,6 +200,60 @@ public class RecordManager {
 		recordDao.update( record );
 	}
 
+	/**
+	 * Applies default values on each descendant attribute of a record in which empty nodes have already been added.
+	 * Default values are applied only to "empty" attributes.
+	 * 
+	 * @param record
+	 * @throws InvalidExpressionException 
+	 */
+	protected void applyDefaultValues(CollectRecord record) {
+		Entity rootEntity = record.getRootEntity();
+		applyDefaultValues(rootEntity);
+	}
+
+	/**
+	 * Applies default values on each descendant attribute of an Entity in which empty nodes have already been added.
+	 * Default values are applied only to "empty" attributes.
+	 * 
+	 * @param entity
+	 * @throws InvalidExpressionException 
+	 */
+	protected void applyDefaultValues(Entity entity) {
+		List<Node<?>> children = entity.getChildren();
+		for (Node<?> child: children) {
+			if ( child instanceof Attribute ) {
+				Attribute<?, ?> attribute = (Attribute<?, ?>) child;
+				if ( attribute.isEmpty() ) {
+					applyDefaultValue(attribute);
+				}
+			} else if ( child instanceof Entity ) {
+				applyDefaultValues((Entity) child);
+			}
+		}
+	}
+
+	public <V> void applyDefaultValue(Attribute<?, V> attribute) {
+		AttributeDefinition attributeDefn = (AttributeDefinition) attribute.getDefinition();
+		List<AttributeDefault> defaults = attributeDefn.getAttributeDefaults();
+		if ( defaults != null && defaults.size() > 0 ) {
+			for (AttributeDefault attributeDefault : defaults) {
+				try {
+					V value = attributeDefault.evaluate(attribute);
+					if ( value != null ) {
+						attribute.setValue(value);
+						CollectRecord record = (CollectRecord) attribute.getRecord();
+						record.setDefaultValueApplied(attribute, true);
+						clearRelevanceRequiredStates(attribute);
+						clearValidationResults(attribute);
+					}
+				} catch (InvalidExpressionException e) {
+					log.warn("Error applying default value for attribute " + attributeDefn.getPath());
+				}
+			}
+		}
+	}
+	
 	@Transactional
 	public void demote(CollectSurvey survey, int recordId, Step currentStep, User user) throws RecordPersistenceException {
 		Step prevStep = currentStep.getPrevious();
@@ -228,6 +272,15 @@ public class RecordManager {
 		return entity;
 	}
 	
+	public void moveNode(CollectRecord record, int nodeId, int index) {
+		Node<?> node = record.getNodeByInternalId(nodeId);
+		Entity parent = node.getParent();
+		String name = node.getName();
+		List<Node<?>> siblings = parent.getAll(name);
+		int oldIndex = siblings.indexOf(node);
+		parent.move(name, oldIndex, index);
+	}
+	
 	public void addEmptyNodes(Entity entity) {
 		Record record = entity.getRecord();
 		ModelVersion version = record.getVersion();
@@ -241,8 +294,7 @@ public class RecordManager {
 				if(entity.getCount(name) == 0) {
 					int count = 0;
 					int toBeInserted = entity.getEffectiveMinCount(name);
-					String layout = nodeDefn.getAnnotation(LAYOUT_ANNOTATION);
-					if(nodeDefn instanceof AttributeDefinition || (! (nodeDefn.isMultiple() && "form".equals(layout)))) {
+					if ( count == 0 && (nodeDefn instanceof AttributeDefinition || ! nodeDefn.isMultiple()) ) {
 						//insert at least one node
 						toBeInserted = 1;
 					}
@@ -280,6 +332,8 @@ public class RecordManager {
 			symbolChar = symbol.getCode();
 		}
 		field.setSymbol(symbolChar);
+		CollectRecord record = (CollectRecord) attribute.getRecord();
+		record.setDefaultValueApplied(attribute, false);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -288,6 +342,8 @@ public class RecordManager {
 		Field<V> field = (Field<V>) attribute.getField(0);
 		field.setRemarks(remarks);
 		field.setSymbol(null);
+		CollectRecord record = (CollectRecord) attribute.getRecord();
+		record.setDefaultValueApplied(attribute, false);
 	}
 	
 	public Set<Attribute<?, ?>> clearValidationResults(Attribute<?,?> attribute){
@@ -397,29 +453,133 @@ public class RecordManager {
 		}
 	}
 	
-	private void updateKeys(CollectRecord record) throws RecordPersistenceException {
-		record.updateRootEntityKeyValues();
-		
-		//check that all keys have been specified
+	private void checkAllKeysSpecified(CollectRecord record) throws MissingRecordKeyException {
 		List<String> rootEntityKeyValues = record.getRootEntityKeyValues();
 		Entity rootEntity = record.getRootEntity();
 		EntityDefinition rootEntityDefn = rootEntity.getDefinition();
 		List<AttributeDefinition> keyAttributeDefns = rootEntityDefn.getKeyAttributeDefinitions();
-
-		boolean missingKey = false;
-		if (keyAttributeDefns.size() != rootEntityKeyValues.size()) {
-			missingKey = true;
-		} else {
-			for (String key : rootEntityKeyValues) {
-				if ( key == null ) {
-					missingKey = true;
-					break;
+		for (int i = 0; i < keyAttributeDefns.size(); i++) {
+			AttributeDefinition keyAttrDefn = keyAttributeDefns.get(i);
+			if ( rootEntity.isRequired(keyAttrDefn.getName()) ) {
+				String keyValue = rootEntityKeyValues.get(i);
+				if ( StringUtils.isBlank(keyValue) ) {
+					throw new MissingRecordKeyException();
 				}
 			}
 		}
-		if ( missingKey ) {
-			throw new MissingRecordKeyException();
+	}
+
+	
+	/* --- START OF LOCKING METHODS --- */
+	
+	public synchronized void releaseLock(int recordId) {
+		RecordLock lock = getLock(recordId);
+		if ( lock != null ) {
+			locks.remove(recordId);
 		}
 	}
 	
+	public synchronized boolean checkIsLocked(int recordId, User user, String sessionId) throws RecordUnlockedException {
+		RecordLock lock = getLock(recordId);
+		String lockUserName = null;
+		if ( lock != null) {
+			String lockSessionId = lock.getSessionId();
+			int lockRecordId = lock.getRecordId();
+			User lUser = lock.getUser();
+			if( recordId == lockRecordId  && 
+					( lUser == user || lUser.getId() == user.getId() ) &&  
+					lockSessionId.equals(sessionId) ) {
+				lock.keepAlive();
+				return true;
+			} else {
+				User lockUser = lock.getUser();
+				lockUserName = lockUser.getName();
+			}
+		}
+		throw new RecordUnlockedException(lockUserName);
+	}
+	
+	private synchronized void lock(int recordId, User user, String sessionId) throws RecordLockedException, MultipleEditException {
+		lock(recordId, user, sessionId, false);
+	}
+	
+	private synchronized void lock(int recordId, User user, String sessionId, boolean forceUnlock) throws RecordLockedException, MultipleEditException {
+		RecordLock oldLock = getLock(recordId);
+		if ( oldLock != null ) {
+			locks.remove(recordId);
+		}
+		RecordLock lock = new RecordLock(sessionId, recordId, user, lockTimeoutMillis);
+		locks.put(recordId, lock);
+	}
+
+	private boolean isForceUnlockAllowed(User user, RecordLock lock) {
+		boolean isAdmin = user.hasRole("ROLE_ADMIN");
+		Integer userId = user.getId();
+		User lockUser = lock.getUser();
+		return isAdmin || userId.equals(lockUser.getId());
+	}
+	
+	private synchronized boolean isLockAllowed(User user, int recordId, String sessionId, boolean forceUnlock) throws RecordLockedException, MultipleEditException {
+		RecordLock uLock = getLockBySessionId(sessionId);
+		if ( uLock != null ) {
+			throw new MultipleEditException("User is editing another record: " + uLock.getRecordId());
+		}
+		RecordLock lock = getLock(recordId);
+		if ( lock == null || ( forceUnlock && isForceUnlockAllowed(user, lock) ) ) {
+			return true;
+		} else if ( lock.getUser().getId().equals(user.getId()) ) {
+			throw new RecordLockedByActiveUserException(user.getName());
+		} else {
+			String lockingUserName = lock.getUser().getName();
+			throw new RecordLockedException("Record already locked", lockingUserName);
+		}
+	}
+	
+	private synchronized boolean isLocked(int recordId) {
+		RecordLock lock = getLock(recordId);
+		return lock != null;	
+	}
+	
+	private synchronized RecordLock getLock(int recordId) {
+		clearInactiveLocks();
+		RecordLock lock = locks.get(recordId);
+		return lock;
+	}
+	
+	private synchronized RecordLock getLockBySessionId(String sessionId) {
+		clearInactiveLocks();
+		Collection<RecordLock> lcks = locks.values();
+		for (RecordLock l : lcks) {
+			if ( l.getSessionId().equals(sessionId) ) {
+				return l;
+			}
+		}
+		return null;
+	}
+	
+	private synchronized void clearInactiveLocks() {
+		Set<Entry<Integer, RecordLock>> entrySet = locks.entrySet();
+		Iterator<Entry<Integer, RecordLock>> iterator = entrySet.iterator();
+		while (iterator.hasNext()) {
+			Entry<Integer, RecordLock> entry = iterator.next();
+			RecordLock lock = entry.getValue();
+			if( !lock.isActive() ){
+				iterator.remove();
+			}
+		}
+	}
+
+	/* --- END OF LOCKING METHODS --- */
+
+	/**
+	 * GETTERS AND SETTERS
+	 */
+	public long getLockTimeoutMillis() {
+		return lockTimeoutMillis;
+	}
+
+	public void setLockTimeoutMillis(long timeoutMillis) {
+		this.lockTimeoutMillis = timeoutMillis;
+	}
 }
+

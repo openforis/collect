@@ -4,8 +4,6 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.Writer;
-import java.util.List;
 
 import javax.activation.MimetypesFileTypeMap;
 import javax.servlet.ServletOutputStream;
@@ -16,29 +14,14 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openforis.collect.manager.ConfigurationManager;
-import org.openforis.collect.model.CollectRecord;
-import org.openforis.collect.model.CollectRecord.Step;
-import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.Configuration;
-import org.openforis.collect.model.RecordSummarySortField;
 import org.openforis.collect.model.User;
-import org.openforis.collect.persistence.RecordDao;
-import org.openforis.collect.remoting.service.export.DataExportState;
+import org.openforis.collect.remoting.service.export.DataExportProcess;
 import org.openforis.collect.web.session.SessionState;
-import org.openforis.idm.metamodel.EntityDefinition;
-import org.openforis.idm.metamodel.Schema;
-import org.openforis.idm.metamodel.Survey;
-import org.openforis.idm.model.expression.InvalidExpressionException;
-import org.openforis.idm.transform.AutomaticColumnProvider;
-import org.openforis.idm.transform.ColumnProvider;
-import org.openforis.idm.transform.ColumnProviderChain;
-import org.openforis.idm.transform.DataTransformation;
-import org.openforis.idm.transform.csv.ModelCsvWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
@@ -52,16 +35,12 @@ public class DataExportController {
 	@Autowired
 	private ConfigurationManager configurationManager;
 	
-	public DataExportController() {
-		
-	}
-	
 	@RequestMapping(value = "/downloadExportedData.htm", method = RequestMethod.GET)
 	public @ResponseBody String downloadExportExportedData(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		try {
 			SessionState sessionState = getSessionState(request);
-			DataExportState dataExportState = sessionState.getDataExportState();
-			if ( dataExportState != null && dataExportState.isComplete() ) {
+			DataExportProcess dataExportProcess = sessionState.getDataExportProcess();
+			if ( dataExportProcess != null && dataExportProcess.isComplete() ) {
 				User user = sessionState.getUser();
 				String userName = user.getName();
 				Configuration configuration = configurationManager.getConfiguration();

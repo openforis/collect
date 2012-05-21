@@ -8,12 +8,9 @@ import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.User;
-import org.openforis.collect.persistence.RecordLockedException;
 import org.openforis.collect.web.session.SessionState;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.context.WebApplicationContext;
@@ -25,7 +22,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  */
 public class SessionListener implements HttpSessionListener {
 
-	private static Log LOG = LogFactory.getLog(SessionListener.class);
+	//private static Log LOG = LogFactory.getLog(SessionListener.class);
 
 	@Override
 	public void sessionCreated(HttpSessionEvent se) {
@@ -50,13 +47,7 @@ public class SessionListener implements HttpSessionListener {
 			if (record != null && record.getId() != null && user != null) {
 				WebApplicationContext applicationContext = WebApplicationContextUtils.getWebApplicationContext(servletContext);
 				RecordManager recordManager = (RecordManager) applicationContext.getBean("recordManager");
-				try {
-					recordManager.unlock(record, user);
-				} catch (RecordLockedException e) {
-					if (LOG.isErrorEnabled()) {
-						LOG.error("Error while unlocking record after session expired", e);
-					}
-				}
+				recordManager.releaseLock(record.getId());
 			}
 		}
 

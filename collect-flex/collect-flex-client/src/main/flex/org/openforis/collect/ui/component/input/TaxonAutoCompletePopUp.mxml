@@ -33,6 +33,7 @@
 	<s:DataGrid id="dataGrid"
 				width="100%" 
 				height="200"
+				focusEnabled="false"
 				>
 		<s:columns>
 			<s:ArrayList>

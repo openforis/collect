@@ -17,6 +17,7 @@ import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.UserDao.JooqFactory;
 import org.openforis.collect.persistence.jooq.MappingJooqDaoSupport;
 import org.openforis.collect.persistence.jooq.MappingJooqFactory;
+import org.openforis.collect.persistence.jooq.tables.records.OfcUserRecord;
 import org.openforis.collect.persistence.jooq.tables.records.OfcUserRoleRecord;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -57,6 +58,21 @@ public class UserDao extends MappingJooqDaoSupport<User, JooqFactory> {
 			User user = jf.fromRecord(r);
 			jf.loadRoles(user);
 			return user;
+		}
+	}
+	
+	@Transactional
+	public List<User> loadAll() {
+		JooqFactory jf = getMappingJooqFactory();
+		Result<OfcUserRecord> r = jf.selectFrom(OFC_USER).fetch();
+		if (r == null) {
+			return null;
+		} else {
+			List<User> users = jf.fromResult(r);
+			for (User user : users) {
+				jf.loadRoles(user);
+			}
+			return users;
 		}
 	}
 	

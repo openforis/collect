@@ -60,7 +60,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function dateFieldCloseHandler(event:Event):void {
-			if(Application.activeRecord.step != CollectRecord$Step.ANALYSIS) {
+			if(Application.activeRecordEditable) {
 				var date:Date = (event.target as DateField).dropdown.selectedDate;
 				if(date != null) {
 					setDateOnFields(date.fullYear, date.month + 1, date.date);

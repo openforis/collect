@@ -69,7 +69,7 @@ package org.openforis.collect.presenter
 		override protected function updateValidationDisplayManager():void {
 			super.updateValidationDisplayManager();
 			if(view.parentEntity != null && view.entityDefinition != null) {
-				validationDisplayManager.displayNodeValidation(view.parentEntity, view.entityDefinition);
+				validationDisplayManager.displayMinMaxCountValidationErrors(view.parentEntity, view.entityDefinition);
 			}
 		}
 		

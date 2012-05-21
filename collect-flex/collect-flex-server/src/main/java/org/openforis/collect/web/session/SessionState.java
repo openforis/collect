@@ -8,7 +8,7 @@ import java.util.Locale;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.User;
-import org.openforis.collect.remoting.service.export.DataExportState;
+import org.openforis.collect.remoting.service.export.DataExportProcess;
 
 /**
  * @author M. Togna
@@ -17,14 +17,30 @@ import org.openforis.collect.remoting.service.export.DataExportState;
 public class SessionState {
 
 	public static String SESSION_ATTRIBUTE_NAME = "sessionState";
-
+	public static final long ACTIVE_RECORD_TIMEOUT = 70000;
+	
 	private String sessionId;
 	private User user;
 	private CollectRecord activeRecord;
+	private long lastHeartBeatTime;
 	private CollectSurvey activeSurvey;
 	private Locale locale;
-	private DataExportState dataExportState;
+	private DataExportProcess dataExportProcess;
 
+	public boolean isActiveRecordBeingEdited() {
+		if (activeRecord != null) {
+			long now = System.currentTimeMillis();
+			long diff = now - lastHeartBeatTime;
+			return diff <= ACTIVE_RECORD_TIMEOUT;
+		} else {
+			return false;
+		}
+	}
+	
+	public void keepActiveRecordAlive() {
+		lastHeartBeatTime = System.currentTimeMillis();
+	}
+	
 	public SessionState(String sessionId) {
 		this.sessionId = sessionId;
 	}
@@ -69,14 +85,12 @@ public class SessionState {
 		this.locale = locale;
 	}
 
-	public DataExportState getDataExportState() {
-		return dataExportState;
+	public DataExportProcess getDataExportProcess() {
+		return dataExportProcess;
 	}
 
-	public void setDataExportState(
-			DataExportState dataExportState) {
-		this.dataExportState = dataExportState;
+	public void setDataExportProcess(DataExportProcess dataExportProcess) {
+		this.dataExportProcess = dataExportProcess;
 	}
-	
 
 }

@@ -16,6 +16,7 @@ package org.openforis.collect.ui.component.input {
 	import org.openforis.collect.model.proxy.AttributeProxy;
 	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.model.proxy.NodeProxy;
+	import org.openforis.collect.presenter.InputFieldPresenter;
 	import org.openforis.collect.presenter.RemarksPopUpPresenter;
 	import org.openforis.collect.util.AlertUtil;
 	import org.openforis.collect.util.UIUtil;
@@ -37,6 +38,7 @@ package org.openforis.collect.ui.component.input {
 		private static const CONFIRM_ERROR:ContextMenuItem = new ContextMenuItem(Message.get("edit.contextMenu.approveError"), true);
 		private static const APPROVE_MISSING:ContextMenuItem = new ContextMenuItem(Message.get("edit.contextMenu.approveMissingValue"), true);
 		private static const APPROVE_MISSING_IN_ROW:ContextMenuItem = new ContextMenuItem(Message.get("edit.contextMenu.approveMissingValuesInRow"), true);
+		private static const APPLY_DEFAULT_VALUE:ContextMenuItem = new ContextMenuItem(Message.get("edit.contextMenu.applyDefaultValue"), true);
 		private static const MENU_ITEMS:Array = [
 			SET_STAR, 
 			SET_DASH, 
@@ -48,7 +50,8 @@ package org.openforis.collect.ui.component.input {
 			DELETE_ENTITY, 
 			CONFIRM_ERROR, 
 			APPROVE_MISSING,
-			APPROVE_MISSING_IN_ROW
+			APPROVE_MISSING_IN_ROW,
+			APPLY_DEFAULT_VALUE
 		];
 		
 		private static var remarksPopUpPresenter:RemarksPopUpPresenter;
@@ -87,25 +90,34 @@ package org.openforis.collect.ui.component.input {
 		
 		private function createMenuItems(step:CollectRecord$Step):Array {
 			var items:Array = new Array();
-			
-			if(_inputField.isEmpty()) {
-				switch(step) {
-					case CollectRecord$Step.ENTRY:
+
+			switch(step) {
+				case CollectRecord$Step.ENTRY:
+					// REASON BLANK ITEMS
+					if(_inputField.isEmpty() || InputFieldPresenter.isShortCutForReasonBlank(_inputField.text)) {
 						items.push( SET_STAR, SET_DASH, SET_ILLEGIBLE );
-						break;
-					case CollectRecord$Step.CLEANSING:
-						items.push(APPROVE_MISSING);
-						break;
-				}
-			} else if(step == CollectRecord$Step.ENTRY) {
-				var hasErrors:Boolean = _inputField.parentEntity.childContainsErrors(_inputField.attributeDefinition.name);
-				if(hasErrors) {
-					var hasConfirmedError:Boolean = _inputField.parentEntity.hasConfirmedError(_inputField.attributeDefinition.name);
-					if(! hasConfirmedError) {
-						items.push(CONFIRM_ERROR);
 					}
-				}
+					// CONFIRM ERROR ITEM
+					if( ! _inputField.isEmpty()) {
+						var hasErrors:Boolean = _inputField.parentEntity.childContainsErrors(_inputField.attributeDefinition.name);
+						if(hasErrors) {
+							var hasConfirmedError:Boolean = _inputField.parentEntity.hasConfirmedError(_inputField.attributeDefinition.name);
+							if(! hasConfirmedError) {
+								items.push(CONFIRM_ERROR);
+							}
+						}
+					}
+					break;
+				case CollectRecord$Step.CLEANSING:
+					if(_inputField.isEmpty() || InputFieldPresenter.isShortCutForReasonBlank(_inputField.text)) {
+						items.push(APPROVE_MISSING);
+						if ( _inputField.attributeDefinition.defaultValueApplicable ) {
+							items.push(APPLY_DEFAULT_VALUE);
+						}
+					}
+					break;
 			}
+			//REMARKS
 			items.push(EDIT_REMARKS_MENU_ITEM);
 			
 			if(step != CollectRecord$Step.ANALYSIS) {
@@ -115,12 +127,16 @@ package org.openforis.collect.ui.component.input {
 				} else if(def.parentLayout == UIUtil.LAYOUT_TABLE) {
 					var entityDef:EntityDefinitionProxy = def.parent;
 					if(entityDef != null && entityDef.multiple) {
+						//var parentEntity:EntityProxy = _inputField.parentEntity;
 						switch(step) {
 							case CollectRecord$Step.ENTRY:
-								items.push(SET_STAR_IN_ROW, SET_DASH_IN_ROW );
+								//if ( parentEntity.hasDescendantWithBlankField() ) {
+									items.push(SET_STAR_IN_ROW, SET_DASH_IN_ROW );
+								//}
 								break;
 							case CollectRecord$Step.CLEANSING:
 								items.push(APPROVE_MISSING_IN_ROW);
+								break;
 						}
 						if( !entityDef.enumerable) {
 							items.push(DELETE_ENTITY);
@@ -158,12 +174,14 @@ package org.openforis.collect.ui.component.input {
 				case SET_DASH_IN_ROW:
 					nodeEvent = new NodeEvent(NodeEvent.UPDATE_SYMBOL);
 					nodeEvent.symbol = FieldSymbol.DASH_ON_FORM;
-					nodeEvent.nodeProxy = parentEntity;
+					nodeEvent.node = parentEntity;
+					nodeEvent.applyToNonEmptyNodes = false;
 					break;
 				case SET_STAR_IN_ROW:
 					nodeEvent = new NodeEvent(NodeEvent.UPDATE_SYMBOL);
 					nodeEvent.symbol = FieldSymbol.BLANK_ON_FORM;
-					nodeEvent.nodeProxy = parentEntity;
+					nodeEvent.node = parentEntity;
+					nodeEvent.applyToNonEmptyNodes = false;
 					break;
 				case DELETE_ATTRIBUTE:
 					if(checkCanDelete(attribute, attrDefn)) {
@@ -187,10 +205,13 @@ package org.openforis.collect.ui.component.input {
 					break;
 				case APPROVE_MISSING_IN_ROW:
 					nodeEvent = new NodeEvent(NodeEvent.APPROVE_MISSING);
-					nodeEvent.nodeProxy = parentEntity;
+					nodeEvent.node = parentEntity;
+					nodeEvent.applyToNonEmptyNodes = false;
+					break;
+				case APPLY_DEFAULT_VALUE:
+					nodeEvent = createNodeEvent(NodeEvent.APPLY_DEFAULT_VALUE, inputField);
 					break;
 			}
-			
 			if(nodeEvent != null) {
 				nodeEvent['inputField'] = inputField;
 				EventDispatcherFactory.getEventDispatcher().dispatchEvent(nodeEvent);
@@ -203,7 +224,7 @@ package org.openforis.collect.ui.component.input {
 			if(attrDefn.multiple && inputField is CodeInputField) {
 				event.nodes = inputField.parentEntity.getChildren(attrDefn.name);
 			} else {
-				event.nodeProxy = inputField.attribute;
+				event.node = inputField.attribute;
 				event.fieldIdx = inputField.fieldIndex;
 			}
 			return event;
@@ -211,7 +232,7 @@ package org.openforis.collect.ui.component.input {
 		
 		private static function performDeleteNode(node:NodeProxy):void {
 			var event:NodeEvent = new NodeEvent(NodeEvent.DELETE_NODE);
-			event.nodeProxy = node;
+			event.node = node;
 			EventDispatcherFactory.getEventDispatcher().dispatchEvent(event);
 		}
 		

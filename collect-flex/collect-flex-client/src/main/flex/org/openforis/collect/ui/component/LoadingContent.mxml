@@ -3,9 +3,6 @@
 					xmlns:s="library://ns.adobe.com/flex/spark" 
 					xmlns:mx="library://ns.adobe.com/flex/mx" 
 					width="100%" height="100%">
-	<s:layout>
-		<s:VerticalLayout horizontalAlign="center" verticalAlign="middle" />
-	</s:layout>
 	
 	<fx:Script>
 		<![CDATA[
@@ -13,6 +10,10 @@
 		]]>
 	</fx:Script>
 	
-	<mx:ProgressBar indeterminate="true" label="{Message.get('master.loading')}" />
+	<mx:ProgressBar indeterminate="true" 
+					label="{Message.get('master.loading')}"
+					horizontalCenter="0"
+					verticalCenter="0"
+					/>
 	
 </s:NavigatorContent>

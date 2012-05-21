@@ -1,7 +1,9 @@
 package org.openforis.collect.presenter {
 	import flash.display.DisplayObject;
 	import flash.events.Event;
+	import flash.events.KeyboardEvent;
 	import flash.events.MouseEvent;
+	import flash.ui.Keyboard;
 	
 	import mx.collections.IList;
 	import mx.core.FlexGlobals;
@@ -20,6 +22,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.model.proxy.FieldProxy;
 	import org.openforis.collect.ui.component.input.CodeInputField;
 	import org.openforis.collect.ui.component.input.CodeListDialog;
+	import org.openforis.collect.ui.component.input.InputField;
 	import org.openforis.collect.ui.component.input.TextInput;
 	import org.openforis.collect.util.ArrayUtil;
 	import org.openforis.collect.util.CollectionUtil;
@@ -64,12 +67,14 @@ package org.openforis.collect.presenter {
 		 * Close the popup
 		 * */
 		internal static function closePopupHandler(event:Event = null):void {
+			var inputField:CodeInputField = _popUp.codeInputField;
 			PopUpManager.removePopUp(_popUp);
+			inputField.textInput.setFocus();
 		}
 		
 		internal static function cancelLoadingHandler(event:Event):void {
 			if(_lastLoadCodesAsyncToken != null) {
-				//_lastLoadCodesAsyncToken;
+				//todo cancel async request
 			}
 			closePopupHandler();
 		}
@@ -84,15 +89,16 @@ package org.openforis.collect.presenter {
 				_popUp.cancelLoading.addEventListener(MouseEvent.CLICK, cancelLoadingHandler);
 				_popUp.cancelButton.addEventListener(MouseEvent.CLICK, closePopupHandler);
 				_popUp.applyButton.addEventListener(MouseEvent.CLICK, applyButtonClickHandler);
+				_popUp.addEventListener(KeyboardEvent.KEY_DOWN, popUpKeyDownHandler);
 			}
 			PopUpManager.addPopUp(_popUp, FlexGlobals.topLevelApplication as DisplayObject, true);
 			PopUpManager.centerPopUp(_popUp);
-			_popUp.editable = Application.activeRecord.step != CollectRecord$Step.ANALYSIS;
+			_popUp.editable = Application.activeRecordEditable;
 			_popUp.multiple = _view.attributeDefinition.multiple;
 			_popUp.maxSpecified = _view.attributeDefinition.maxCount;
 			_popUp.title = _view.attributeDefinition.getLabelText();
 			_popUp.codeInputField = _view;
-			
+			_popUp.setFocus();
 			loadCodes();
 		}
 		
@@ -112,6 +118,12 @@ package org.openforis.collect.presenter {
 			_popUp.currentState = "default";
 		}
 
+		protected function popUpKeyDownHandler(event:KeyboardEvent):void {
+			if (event.keyCode == Keyboard.ESCAPE) {
+				closePopupHandler();
+			}
+		}
+		
 		protected static function applyButtonClickHandler(event:MouseEvent):void {
 			var items:IList = _popUp.dataGroup.dataProvider;
 			var parts:Array = new Array();

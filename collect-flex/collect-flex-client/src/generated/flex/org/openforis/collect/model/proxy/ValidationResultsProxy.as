@@ -8,6 +8,7 @@
 package org.openforis.collect.model.proxy {
 	import mx.collections.IList;
 	
+	import org.openforis.collect.util.ArrayUtil;
 	import org.openforis.collect.util.CollectionUtil;
 	import org.openforis.idm.metamodel.validation.ValidationResultFlag;
 
@@ -20,20 +21,19 @@ package org.openforis.collect.model.proxy {
 		
 		public function get validationMessages():Array {
 			var results:IList = null;
-			var flag:ValidationResultFlag;
 			if(CollectionUtil.isNotEmpty(errors)) {
 				results = errors;
-				flag = ValidationResultFlag.ERROR;
 			} else if(CollectionUtil.isNotEmpty(warnings)) {
 				results = warnings;
-				flag = ValidationResultFlag.WARNING;
 			}
 			var messages:Array = null;
 			if(results != null) {
 				messages = new Array();
 				for each (var r:ValidationResultProxy in results) {
 					var message:String = r.getMessage();
-					messages.push(message);
+					if ( ! ArrayUtil.contains(messages, message) ) {
+						messages.push(message);
+					}
 				}
 			}
 			return messages;

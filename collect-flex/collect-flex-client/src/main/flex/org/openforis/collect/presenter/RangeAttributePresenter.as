@@ -11,6 +11,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.remoting.service.UpdateRequestOperation;
 	import org.openforis.collect.remoting.service.UpdateRequestOperation$Method;
 	import org.openforis.collect.ui.component.input.RangeAttributeRenderer;
+	import org.openforis.collect.util.UIUtil;
 	
 	/**
 	 * 
@@ -87,9 +88,13 @@ package org.openforis.collect.presenter {
 			var units:IList = attrDefn.units;
 			if(units.length > 0) {
 				if(units.length == 1) {
-					view.currentState = RangeAttributeRenderer.SINGLE_UNIT_STATE;
-					var unit:UnitProxy = UnitProxy(units.getItemAt(0));
-					view.unitLabel.text = unit.name;
+					if ( attrDefn.parentLayout == UIUtil.LAYOUT_FORM ) {
+						view.currentState = RangeAttributeRenderer.SINGLE_UNIT_STATE;
+						var unit:UnitProxy = UnitProxy(units.getItemAt(0));
+						view.unitLabel.text = unit.name;
+					} else {
+						view.currentState = RangeAttributeRenderer.NO_UNIT_STATE;
+					}
 				} else {
 					view.currentState = RangeAttributeRenderer.MULTIPLE_UNIT_STATE;
 					view.unitInputField.dataProvider = units;

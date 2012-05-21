@@ -99,13 +99,16 @@ package org.openforis.collect.util
 		
 		public static function ensureElementIsVisible(field:Object):void {
 			var scroller:Scroller = UIUtil.getFirstAncestor(field, Scroller);
-			if(scroller != null) {
+			while ( scroller != null ) {
 				var elementToShow:IVisualElement = field as IVisualElement;
 				if(elementToShow == null) {
 					elementToShow = getFirstAncestor(field, IVisualElement);
 				}
 				if(elementToShow != null) {
 					scroller.ensureElementIsVisible(elementToShow);
+					
+					elementToShow = scroller;
+					scroller = UIUtil.getFirstAncestor(scroller, Scroller);
 				}
 			}
 		}
@@ -151,6 +154,14 @@ package org.openforis.collect.util
 			return component.styleName as String;
 		}
 		
+		public static function toggleStyleName(component:UIComponent, READONLY_STYLE:String, apply:Boolean = true, applyImmediately:Boolean = true):String {
+			if ( apply ) {
+				return addStyleName(component, READONLY_STYLE, applyImmediately);
+			} else {
+				return removeStyleName(component, READONLY_STYLE, applyImmediately);
+			}
+		}
+
 		public static function hasStyleName(component:UIComponent, styleName:String):Boolean {
 			var componentStyleName:String = component.styleName as String;
 			if(componentStyleName != null) {
@@ -162,7 +173,7 @@ package org.openforis.collect.util
 		public static function replaceStyleNames(component:UIComponent, newStyles:Array, oldStyles:Array, applyImmediately:Boolean = true):String {
 			var cleanedStyle:String = removeStyleNames(component, oldStyles);
 			var newStylesConcat:String = StringUtil.concat(" ", newStyles);
-			var result:String = cleanedStyle + " " + newStylesConcat;
+			var result:String = StringUtil.concat(" ", [cleanedStyle, newStylesConcat]);
 			if(applyImmediately) {
 				component.styleName = result;
 			}
@@ -208,5 +219,6 @@ package org.openforis.collect.util
 			var measure:TextLineMetrics = unitTextFormat.measureText(text);
 			return measure.width;
 		}
+		
 	}
 }

@@ -13,6 +13,7 @@
 			import org.openforis.collect.metamodel.proxy.UnitProxy;
 			import org.openforis.collect.presenter.NumericAttributePresenter;
 			
+			public static const NO_UNIT_STATE:String = "noUnit";
 			public static const SINGLE_UNIT_STATE:String = "singleUnit";
 			public static const MULTIPLE_UNIT_STATE:String = "multipleUnits";
 			
@@ -34,6 +35,7 @@
 	<detail:states>
 		<s:State name="horizontal" />
 		<s:State name="vertical" />
+		<s:State name="noUnit" />
 		<s:State name="singleUnit" />
 		<s:State name="multipleUnits" />
 	</detail:states>

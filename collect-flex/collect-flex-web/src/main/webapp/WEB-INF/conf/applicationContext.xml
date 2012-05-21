@@ -84,12 +84,14 @@
 	<!-- Managers -->
 	<!-- ===================================== -->
 	<bean id="configurationManager" class="org.openforis.collect.manager.ConfigurationManager" init-method="init" />
+	<bean id="recordManager"		class="org.openforis.collect.manager.RecordManager" init-method="init">
+		<property name="lockTimeoutMillis" value="60000" />
+	</bean>
 	<bean id="sessionManager"		class="org.openforis.collect.manager.SessionManager" />
-	<bean id="surveyManager"		class="org.openforis.collect.manager.SurveyManager" init-method="init" />
-	<bean id="recordManager"		class="org.openforis.collect.manager.RecordManager" init-method="init" />
 	<bean id="speciesManager"		class="org.openforis.collect.manager.SpeciesManager" />
+	<bean id="surveyManager"		class="org.openforis.collect.manager.SurveyManager" init-method="init" />
 	<bean id="userManager"			class="org.openforis.collect.manager.UserManager" />
-		
+
 <!-- 	<bean id="recordContext" class="org.openforis.collect.model.CollectRecordContext" /> -->
 	
 	<!-- XmlSerializerFactory -->

@@ -3,6 +3,7 @@ package org.openforis.collect.presenter {
 	 * 
 	 * @author S. Ricci
 	 * */
+	import flash.events.Event;
 	import flash.events.MouseEvent;
 	import flash.events.TimerEvent;
 	import flash.net.URLRequest;
@@ -33,11 +34,10 @@ package org.openforis.collect.presenter {
 	 * @author S. Ricci
 	 * 
 	 */
-	public class BackupPopUpPresenter extends AbstractPresenter {
+	public class BackupPopUpPresenter extends PopUpPresenter {
 		
 		private static const PROGRESS_DELAY:int = 5000;
 		
-		private var _view:BackupPopUp;
 		private var _cancelResponder:IResponder;
 		private var _backupResponder:IResponder;
 		private var _getStatusResponder:IResponder;
@@ -46,36 +46,47 @@ package org.openforis.collect.presenter {
 		private var _firstOpen:Boolean = true;
 		
 		public function BackupPopUpPresenter(view:BackupPopUp) {
-			this._view = view;
 			this._backupResponder = new AsyncResponder(backupResultHandler, faultHandler);
 			this._cancelResponder = new AsyncResponder(cancelResultHandler, faultHandler);
 			this._getStatusResponder = new AsyncResponder(getStatusResultHandler, faultHandler);
 			
-			super();
+			super(view);
 			
-			if(Application.activeRootEntity != null) {
-				initView(Application.activeRootEntity);
-			}
+			initView();
+		}
+		
+		internal function initView():void {
+			var steps:IList = new ArrayCollection(CollectRecord$Step.constants);
+			var allStepsItem:Object = {label: Message.get('global.allItemsLabel')};
+			steps.addItemAt(allStepsItem, 0);
+			BackupPopUp(_view).stepDropDownList.dataProvider = steps;
+			BackupPopUp(_view).stepDropDownList.callLater(function():void {
+				BackupPopUp(_view).stepDropDownList.selectedIndex = 0;
+			});
+			//try to see if there is an export still running
+			updateStatus();
 		}
 		
 		override internal function initEventListeners():void {
-			_view.addEventListener(CloseEvent.CLOSE, closeHandler);
-			_view.backupButton.addEventListener(MouseEvent.CLICK, backupButtonClickHandler);
-			_view.downloadButton.addEventListener(MouseEvent.CLICK, downloadButtonClickHandler);
-			_view.cancelButton.addEventListener(MouseEvent.CLICK, cancelButtonClickHandler);
+			super.initEventListeners();
+			BackupPopUp(_view).backupButton.addEventListener(MouseEvent.CLICK, backupButtonClickHandler);
+			BackupPopUp(_view).cancelButton.addEventListener(MouseEvent.CLICK, closeHandler);
+			BackupPopUp(_view).backupCompleteCloseButton.addEventListener(MouseEvent.CLICK, closeHandler);
+			BackupPopUp(_view).downloadButton.addEventListener(MouseEvent.CLICK, downloadButtonClickHandler);
+			BackupPopUp(_view).cancelBackupButton.addEventListener(MouseEvent.CLICK, cancelButtonClickHandler);
 		}
 		
-		protected function closeHandler(event:CloseEvent):void {
+		override protected function closeHandler(event:Event = null):void {
 			if ( _status != null && _status.running ) {
 				AlertUtil.showMessage("backup.cannotClosePopUp");
 			} else {
-				PopUpManager.removePopUp(_view);
+				super.closeHandler(event);
 			}
 		}
 		
 		protected function backupButtonClickHandler(event:MouseEvent):void {
 			var rootEntity:String = Application.activeRootEntity.name;
-			var step:Object = _view.stepDropDownList.selectedItem;
+			var step:Object = BackupPopUp(_view).stepDropDownList.selectedItem;
 			var stepNumber:int = -1;
 			switch(step) {
 				case CollectRecord$Step.ENTRY:
@@ -90,8 +101,8 @@ package org.openforis.collect.presenter {
 			}
 			ClientFactory.backupClient.backup(_backupResponder, rootEntity, null, stepNumber);
 			
-			_view.currentState = BackupPopUp.STATE_RUNNING;
-			_view.progressBar.setProgress(0, 0);
+			BackupPopUp(_view).currentState = BackupPopUp.STATE_RUNNING;
+			BackupPopUp(_view).progressBar.setProgress(0, 0);
 		}
 		
 		protected function downloadButtonClickHandler(event:MouseEvent):void {
@@ -150,48 +161,36 @@ package org.openforis.collect.presenter {
 		protected function cancelResultHandler(event:ResultEvent, token:Object = null):void {
 			_status = null;
 			stopProgressTimer();
-			_view.currentState = BackupPopUp.STATE_DEFAULT;
+			BackupPopUp(_view).currentState = BackupPopUp.STATE_DEFAULT;
 		}
 		
 		protected function getStatusResultHandler(event:ResultEvent, token:Object = null):void {
 			_status = event.result;
 			if(_status != null) {
 				if ( _status.active && _status.count < _status.total ) {
-					_view.currentState = BackupPopUp.STATE_RUNNING;
-					_view.progressBar.setProgress(_status.count, _status.total);
-					_view.progressLabel.text = Message.get("backup.progressLabel", [_status.count, _status.total]);
+					BackupPopUp(_view).currentState = BackupPopUp.STATE_RUNNING;
+					BackupPopUp(_view).progressBar.setProgress(_status.count, _status.total);
+					BackupPopUp(_view).progressLabel.text = Message.get("backup.progressLabel", [_status.count, _status.total]);
 					if ( _progressTimer == null || ! _progressTimer.running) {
 						startProgressTimer();
 					}
 				} else if ( _status.error) {
-					_view.currentState = BackupPopUp.STATE_DEFAULT;
+					BackupPopUp(_view).currentState = BackupPopUp.STATE_DEFAULT;
 					stopProgressTimer();
 					AlertUtil.showError("backup.error");
 				} else if ( _status.count == _status.total ) {
 					if ( _firstOpen ) {
-						_view.currentState = BackupPopUp.STATE_DEFAULT;
+						BackupPopUp(_view).currentState = BackupPopUp.STATE_DEFAULT;
 					} else {
-						_view.currentState = BackupPopUp.STATE_COMPLETE;
+						BackupPopUp(_view).currentState = BackupPopUp.STATE_COMPLETE;
 					}
 					stopProgressTimer();
 				}
 			} else {
-				_view.currentState = BackupPopUp.STATE_DEFAULT;
+				BackupPopUp(_view).currentState = BackupPopUp.STATE_DEFAULT;
 				stopProgressTimer();
 			}
 			_firstOpen = false;
-		}
-		
-		internal function initView(rootEntityDef:EntityDefinitionProxy):void {
-			var steps:IList = new ArrayCollection(CollectRecord$Step.constants);
-			var allStepsItem:Object = {label: Message.get('global.allItemsLabel')};
-			steps.addItemAt(allStepsItem, 0);
-			_view.stepDropDownList.dataProvider = steps;
-			_view.stepDropDownList.callLater(function():void {
-				_view.stepDropDownList.selectedIndex = 0;
-			});
-			//try to see if there is an export still running
-			updateStatus();
 		}
 		
 	}

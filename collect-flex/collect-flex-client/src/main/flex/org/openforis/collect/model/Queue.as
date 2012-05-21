@@ -49,6 +49,16 @@ package org.openforis.collect.model {
 			var data:Object = _first.data;
 			return data;
 		}
+		
+		/**
+		 * Append all the items to the queue
+		 */
+		public function pushAll(items:Array):void {
+			for each (var item:* in items) {
+				push(item);
+			}
+			
+		}
 	}
 }
 

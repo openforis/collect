@@ -37,6 +37,7 @@ public class CollectRecord extends Record {
 	
 	private static final int APPROVED_MISSING_POSITION = 0;
 	private static final int CONFIRMED_ERROR_POSITION = 0;
+	private static final int DEFAULT_APPLIED_POSITION = 1;
 	
 	public enum Step {
 		ENTRY(1), CLEANSING(2), ANALYSIS(3);
@@ -82,6 +83,7 @@ public class CollectRecord extends Record {
 					throw new IllegalArgumentException("This record cannot be promoted.");
 			}
 		}
+		
 	}
 
 	public enum State {
@@ -115,9 +117,9 @@ public class CollectRecord extends Record {
 	private transient User createdBy;
 	private transient Date modifiedDate;
 	private transient User modifiedBy;
-	private transient User lockedBy;
-	private transient String lockId;
 	private transient Integer missing;
+	private transient Integer missingErrors;
+	private transient Integer missingWarnings;
 	private transient Integer skipped;
 	private transient Integer errors;
 	private transient Integer warnings;
@@ -140,6 +142,10 @@ public class CollectRecord extends Record {
 		// use List to preserve the order of the keys and counts
 		rootEntityKeyValues = new ArrayList<String>();
 		entityCounts = new ArrayList<Integer>();
+		initErrorCountInfo();
+	}
+
+	private void initErrorCountInfo() {
 		minCountErrorCounts = new HashMap<Integer, Set<String>>();
 		minCountWarningCounts = new HashMap<Integer, Set<String>>();
 		maxCountErrorCounts = new HashMap<Integer, Set<String>>();
@@ -147,6 +153,12 @@ public class CollectRecord extends Record {
 		errorCounts = new HashMap<Integer, Integer>();
 		warningCounts = new HashMap<Integer, Integer>();
 		skippedNodes = new HashSet<Integer>();
+		skipped = null;
+		missing = null;
+		missingErrors = null;
+		missingWarnings = null;
+		errors = null;
+		warnings = null;
 	}
 
 	public Node<?> deleteNode(Node<?> node) {
@@ -189,6 +201,26 @@ public class CollectRecord extends Record {
 		org.openforis.idm.model.State childState = parentEntity.getChildState(childName);
 		return childState.get(APPROVED_MISSING_POSITION);
 	} 
+	
+	public void setDefaultValueApplied(Attribute<?, ?> attribute, boolean applied) {
+		int fieldCount = attribute.getFieldCount();
+		
+		for( int i=0; i <fieldCount; i++ ){
+			Field<?> field = attribute.getField(i);
+			field.getState().set(DEFAULT_APPLIED_POSITION, applied);
+		}
+	}
+	
+	public boolean isDefaultValueApplied(Attribute<?, ?> attribute) {
+		int fieldCount = attribute.getFieldCount();		
+		for( int i=0; i <fieldCount; i++ ){
+			Field<?> field = attribute.getField(i);
+			if( !field.getState().get(DEFAULT_APPLIED_POSITION) ){
+				return false;
+			}
+		}
+		return true;
+	}
 
 	public void updateValidationMinCounts(Integer entityId, String childName, ValidationResultFlag flag) {
 		Set<String> errors = clearEntityValidationCounts(minCountErrorCounts, entityId, childName);
@@ -202,6 +234,8 @@ public class CollectRecord extends Record {
 				break;
 		}
 		this.missing = null;
+		this.missingErrors = null;
+		this.missingWarnings = null;
 		this.errors = null;
 		this.warnings = null;
 	}
@@ -254,6 +288,8 @@ public class CollectRecord extends Record {
 		}
 		skipped = null;
 		missing = null;
+		missingErrors = null;
+		missingWarnings = null;
 		errors = null;
 		warnings = null;
 	}
@@ -318,11 +354,26 @@ public class CollectRecord extends Record {
 	}
 
 	public Integer getMissing() {
-		if ( missing == null ) {
-			missing = getMissingCount( minCountErrorCounts );
-			missing += getMissingCount( minCountWarningCounts );
+		if (missing == null) {
+			Integer errors = getMissingErrors();
+			Integer warnings = getMissingWarnings();
+			missing = errors + warnings;
 		}
 		return missing;
+	}
+	
+	public Integer getMissingErrors() {
+		if ( missingErrors == null ) {
+			missingErrors = getMissingCount( minCountErrorCounts );
+		}
+		return missingErrors;
+	}
+	
+	public Integer getMissingWarnings() {
+		if ( missingWarnings == null ) {
+			missingWarnings = getMissingCount( minCountWarningCounts);
+		}
+		return missingWarnings;
 	}
 
 	public void setMissing(Integer missing) {
@@ -415,22 +466,6 @@ public class CollectRecord extends Record {
 		this.entityCounts = counts;
 	}
 
-	public User getLockedBy() {
-		return lockedBy;
-	}
-	
-	public void setLockedBy(User lockedBy) {
-		this.lockedBy = lockedBy;
-	}
-	
-	public String getLockId() {
-		return lockId;
-	}
-
-	public void setLockId(String lockId) {
-		this.lockId = lockId;
-	}
-	
 	private Set<String> clearEntityValidationCounts(Map<Integer, Set<String>> counts, Integer entityId, String childName) {
 		Set<String> set = counts.get(entityId);
 		if(set == null) {
@@ -507,6 +542,7 @@ public class CollectRecord extends Record {
 	 * Update all derived states of all nodes
 	 */
 	public void updateDerivedStates() {
+		initErrorCountInfo();
 		Entity rootEntity = getRootEntity();
 		rootEntity.traverse(new NodeVisitor() {
 			@Override

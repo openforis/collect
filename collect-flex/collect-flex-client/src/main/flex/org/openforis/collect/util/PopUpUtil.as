@@ -6,13 +6,14 @@ package org.openforis.collect.util
 	
 	import mx.collections.ArrayCollection;
 	import mx.core.FlexGlobals;
+	import mx.core.IFlexDisplayObject;
 	import mx.core.UIComponent;
+	import mx.managers.PopUpManager;
 
 	/**
 	 * @author S. Ricci
 	 */
 	public class PopUpUtil {
-		
 		
 		public static const POSITION_RIGHT:String = "right";
 		public static const POSITION_ABOVE:String = "top";
@@ -29,6 +30,12 @@ package org.openforis.collect.util
 		public static const HORIZONTAL_ALIGN_RIGHT:String = "right";
 		public static const HORIZONTAL_ALIGN_CENTER:String = "center";
 		
+		public static function createPopUp(className:Class, modal:Boolean = true):IFlexDisplayObject {
+			var popUp:IFlexDisplayObject = PopUpManager.createPopUp(DisplayObject(FlexGlobals.topLevelApplication), className, modal);
+			PopUpManager.centerPopUp(popUp);
+			UIComponent(popUp).setFocus();
+			return popUp;
+		}
 		
 		public static function center(parent:DisplayObject, popup:UIComponent):void {
 			var pt:Point = new Point(0, 0);

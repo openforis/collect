@@ -51,8 +51,6 @@ CREATE TABLE "collect"."ofc_record"  (
 	"model_version"            	varchar(255) NOT NULL,
 	"step"                     	integer NULL,
 	"state"                    	char(1) NULL,
-	"locked_by_id"             	integer NULL,
-	"lock_id"                  	varchar(50) NULL,
 	"skipped"                  	integer NULL,
 	"missing"                  	integer NULL,
 	"errors"                   	integer NULL,
@@ -175,11 +173,6 @@ GO
 ALTER TABLE "collect"."ofc_user_role"
 	ADD CONSTRAINT "ofc_user_user_role_fkey"
 	FOREIGN KEY("user_id")
-	REFERENCES "collect"."ofc_user"("id")
-GO
-ALTER TABLE "collect"."ofc_record"
-	ADD CONSTRAINT "ofc_record_locked_by_user_fkey"
-	FOREIGN KEY("locked_by_id")
 	REFERENCES "collect"."ofc_user"("id")
 GO
 ALTER TABLE "collect"."ofc_record"

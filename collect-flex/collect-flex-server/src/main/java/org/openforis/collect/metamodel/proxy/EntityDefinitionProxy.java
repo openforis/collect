@@ -49,14 +49,12 @@ public class EntityDefinitionProxy extends NodeDefinitionProxy {
 		String result = entityDefinition.getAnnotation(layoutAnnotation);
 		if(StringUtils.isNotBlank(result)) {
 			return result;
-		} else if(isMultiple()) {
+		} else if(isMultiple() && parent != null) {
 			return "table";
+		} else if(parent != null) {
+			return parent.getLayout();
 		} else {
-			if(parent != null) {
-				return parent.getLayout();
-			} else {
-				return "form";
-			}
+			return "form";
 		}
 	}
 	

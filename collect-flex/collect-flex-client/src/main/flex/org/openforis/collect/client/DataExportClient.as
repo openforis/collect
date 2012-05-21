@@ -13,13 +13,15 @@ package org.openforis.collect.client {
 		
 		private var _getStateOperation:Operation;
 		private var _exportOperation:Operation;
+		private var _fullExportOperation:Operation;
 		private var _cancelOperation:Operation;
 		
 		public function DataExportClient() {
 			super("dataExportService");
 			
-			this._getStateOperation = getOperation("getState", CONCURRENCY_LAST, false);
 			this._exportOperation = getOperation("export");
+			this._fullExportOperation = getOperation("fullExport");
+			this._getStateOperation = getOperation("getState", CONCURRENCY_LAST, false);
 			this._cancelOperation = getOperation("cancel");
 		}
 		
@@ -28,8 +30,13 @@ package org.openforis.collect.client {
 			token.addResponder(responder);
 		}
 		
-		public function export(responder:IResponder, rootEntityName:String, entityId:int, stepNumber:int):void {
-			var token:AsyncToken = this._exportOperation.send(rootEntityName, entityId, stepNumber);
+		public function export(responder:IResponder, rootEntityName:String, stepNumber:int, entityId:Number = NaN):void {
+			var token:AsyncToken = this._exportOperation.send(rootEntityName, stepNumber, entityId);
+			token.addResponder(responder);
+		}
+
+		public function fullExport(responder:IResponder, rootEntityName:String, stepNumbers:Array = null):void {
+			var token:AsyncToken = this._fullExportOperation.send(rootEntityName, stepNumbers);
 			token.addResponder(responder);
 		}
 		

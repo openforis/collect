@@ -49,7 +49,7 @@
 								 parentEntity="{parentEntity}"
 								 attribute="{attribute}"
 								 fieldIndex="1"
-								 width="25 " 
+								 width="25" 
 								 maxChars="2"
 								 positive="true"
 								 />
@@ -66,7 +66,8 @@
 		<input:DateField id="dateField" 
 						 tabEnabled="false" 
 						 tabFocusEnabled="false"
-						 width="16" 
+						 width="16"
+						 height="18"
 						 editable="false"
 						 />
 	</s:HGroup>

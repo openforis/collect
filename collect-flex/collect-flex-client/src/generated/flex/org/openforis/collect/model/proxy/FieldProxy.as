@@ -8,6 +8,7 @@
 package org.openforis.collect.model.proxy {
 	import org.openforis.collect.model.FieldSymbol;
 	import org.openforis.collect.util.ArrayUtil;
+	import org.openforis.collect.util.StringUtil;
 
 	
 	/**
@@ -17,14 +18,20 @@ package org.openforis.collect.model.proxy {
     [RemoteClass(alias="org.openforis.collect.model.proxy.FieldProxy")]
     public class FieldProxy extends FieldProxyBase {
 		
+		public static const REASON_BLANK_SYMBOLS:Array = [
+			FieldSymbol.BLANK_ON_FORM, 
+			FieldSymbol.DASH_ON_FORM, 
+			FieldSymbol.ILLEGIBLE
+			];
+		
+		
 		public function hasReasonBlankSpecified():Boolean {
-			var reasonBlankSymbols:Array = [
-				FieldSymbol.BLANK_ON_FORM, 
-				FieldSymbol.DASH_ON_FORM, 
-				FieldSymbol.ILLEGIBLE];
-			
-			var result:Boolean = ArrayUtil.isIn(reasonBlankSymbols, symbol);
+			var result:Boolean = ArrayUtil.isIn(REASON_BLANK_SYMBOLS, symbol);
 			return result;
+		}
+		
+		public function hasValue():Boolean {
+			return value == null || StringUtil.isEmpty(value.toString());
 		}
 		
     }

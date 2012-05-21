@@ -3,8 +3,11 @@ package org.openforis.collect.ui.component.input {
 	import flash.events.TextEvent;
 	
 	import mx.controls.TextInput;
+	import mx.core.mx_internal;
 	
 	import org.openforis.collect.util.StringUtil;
+	
+	use namespace mx_internal;
 	
 	/***
 	 * @author Stefano Ricci
@@ -12,6 +15,8 @@ package org.openforis.collect.ui.component.input {
 	[Style(name="remarksIconVisible",type="Boolean",defaultValue="false")]
 	[Style(name="approvedIconVisible",type="Boolean",defaultValue="false")]
 	public class TextInput extends mx.controls.TextInput {
+		
+		private static const TEXT_PADDING_TOP:Number = 2;
 		
 		private var _restrictPattern:String;
 		private var _upperCase:Boolean = true;
@@ -21,6 +26,13 @@ package org.openforis.collect.ui.component.input {
 			minWidth = 0;
 			addEventListener(TextEvent.TEXT_INPUT, textInputHandler);
 			addEventListener(Event.CHANGE, changeHandler);
+		}
+		
+		override protected function updateDisplayList(unscaledWidth:Number,
+													  unscaledHeight:Number):void {
+			super.updateDisplayList(unscaledWidth, unscaledHeight);
+			//middle vertical alignment of textField
+			textField.y += TEXT_PADDING_TOP;
 		}
 		
 		public function selectAll():void {

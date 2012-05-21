@@ -61,7 +61,7 @@
 		</s:layout>
 		<s:itemRenderer>
 			<fx:Component>
-				<datagroup:DataGroupItemRenderer
+				<datagroup:DataGroupHeaderItemRenderer
 					height="100%"
 					parentEntity="{outerDocument.parentEntity}"
 					/>

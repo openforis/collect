@@ -16,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 
@@ -46,6 +45,7 @@ public class SessionManager {
 	public void setActiveRecord(CollectRecord record) {
 		SessionState sessionState = getSessionState();
 		sessionState.setActiveRecord(record);
+		sessionState.keepActiveRecordAlive();
 	}
 
 	public void clearActiveRecord() {
@@ -59,7 +59,7 @@ public class SessionManager {
 			LOG.debug("Keep alive request received");
 		}
 	}
-
+	
 	public void setLocale(String string) {
 		StringTokenizer stringTokenizer = new StringTokenizer(string, "_");
 		int tokens = stringTokenizer.countTokens();
@@ -76,29 +76,20 @@ public class SessionManager {
 		sessionState.setLocale(locale);
 	}
 
-	@Transactional
-	public void checkUserIsLockingActiveRecord(String lockId) throws RecordUnlockedException {
+	public void checkIsActiveRecordLocked() throws RecordUnlockedException {
 		SessionState sessionState = getSessionState();
 		CollectRecord record = sessionState.getActiveRecord();
 		User user = sessionState.getUser();
-		Integer userId = user.getId();
-		if ( record != null && record.getId() != null) {
-			Integer recordId = record.getId();
-			//verify that the record has not been unlocked
-			boolean isLocking = recordManager.isLocking(userId, recordId, lockId);
-			if( ! isLocking ) {
-				Integer lockingUserId = recordManager.getLockingUserId(recordId);
-				if ( lockingUserId != userId ) {
-					clearActiveRecord();
-				}
-				String lockingUserName = null;
-				if(lockingUserId != null) {
-					User lockingUser = userManager.loadById(lockingUserId);
-					lockingUserName = lockingUser.getName();
-					throw new RecordUnlockedException(lockingUserName);
-				} else {
-					throw new RecordUnlockedException();
-				}
+		String lockId = sessionState.getSessionId();
+		if ( record == null ) {
+			throw new RecordUnlockedException();
+		} else if ( record.getId() != null ) {
+			try {
+				recordManager.checkIsLocked(record.getId(), user, lockId);
+				sessionState.keepActiveRecordAlive();
+			} catch (RecordUnlockedException e) {
+				clearActiveRecord();
+				throw e;
 			}
 		}
 	}

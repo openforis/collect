@@ -6,15 +6,16 @@
 				xmlns:input="org.openforis.collect.ui.component.input.*" 
 				xmlns:detail="org.openforis.collect.ui.component.detail.*"
 				inputFields="{[rangeInputField, unitInputField]}"
-				width="120"
-				width.singleUnit="147"
-				width.multipleUnits="242"
+				width="122"
+				width.singleUnit="149"
+				width.multipleUnits="244"
 				>
 	<fx:Script>
 		<![CDATA[
 			import org.openforis.collect.metamodel.proxy.UnitProxy;
 			import org.openforis.collect.presenter.RangeAttributePresenter;
 			
+			public static const NO_UNIT_STATE:String = "noUnit";
 			public static const SINGLE_UNIT_STATE:String = "singleUnit";
 			public static const MULTIPLE_UNIT_STATE:String = "multipleUnits";
 			
@@ -36,6 +37,7 @@
 	<detail:states>
 		<s:State name="horizontal" />
 		<s:State name="vertical" />
+		<s:State name="noUnit" />
 		<s:State name="singleUnit" />
 		<s:State name="multipleUnits" />
 	</detail:states>

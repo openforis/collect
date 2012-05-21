@@ -27,19 +27,22 @@
 			private var _nodeDefinitions:IList;
 			private var _entity:EntityProxy;
 			
+			public static const STATE_DEFAULT:String = "default";
+			public static const STATE_MULTIPLE_ENTITY:String = "multipleEntity";
+			
 			protected function creationCompleteHandler(event:FlexEvent):void {
 				ChangeWatcher.watch(this, "nodeDefinitions", updateCurrentState);
 				updateCurrentState();
 			}
 			
 			protected function updateCurrentState(event:Event = null):void {
-				var state:String = "default";
+				var state:String = STATE_DEFAULT;
 				if(nodeDefinitions != null && nodeDefinitions.length == 1) {
 					var firstNode:Object = nodeDefinitions.getItemAt(0);
 					if(firstNode is EntityDefinitionProxy) {
 						var entity:EntityDefinitionProxy = EntityDefinitionProxy(firstNode);
 						if(entity.multiple && entity.layout == UIUtil.LAYOUT_TABLE) {
-							state = "multipleEntity";
+							state = STATE_MULTIPLE_ENTITY;
 						}
 					}
 				}
@@ -103,16 +106,16 @@
 				 excludeFrom="default"
 				 >
 		<s:layout>
-			<s:VerticalLayout gap="5" paddingBottom="10" paddingLeft="10" paddingRight="10" paddingTop="10" />
+			<s:VerticalLayout gap="5" paddingBottom="10" paddingLeft="10" paddingRight="0" paddingRight.multipleEntity="10" paddingTop="10" />
 		</s:layout>
 		<s:itemRenderer>
 			<fx:Component>
 				<detail:FormDataGroupItemRenderer
 					entity="{parentDocument.entity}"
 					modelVersion="{parentDocument.modelVersion}"
-					occupyEntirePage="{parentDocument.currentState == 'multipleEntity'}"
-					width="{parentDocument.currentState == 'multipleEntity' ? parentDocument.width: NaN}"
-					height="{parentDocument.currentState == 'multipleEntity' ? parentDocument.height: NaN}"
+					occupyEntirePage="{parentDocument.currentState == ScrollableFormContainer.STATE_MULTIPLE_ENTITY}"
+					width="{parentDocument.currentState == ScrollableFormContainer.STATE_MULTIPLE_ENTITY ? parentDocument.width: NaN}"
+					height="{parentDocument.currentState == ScrollableFormContainer.STATE_MULTIPLE_ENTITY ? parentDocument.height: NaN}"
 					/>
 <!--					occupyEntirePage.multipleEntity="true"-->
 			</fx:Component>

@@ -3,6 +3,7 @@ package org.openforis.collect.presenter {
 	 * 
 	 * @author S. Ricci
 	 * */
+	import flash.events.Event;
 	import flash.events.MouseEvent;
 	import flash.events.TimerEvent;
 	import flash.net.URLRequest;
@@ -10,6 +11,8 @@ package org.openforis.collect.presenter {
 	import flash.utils.Timer;
 	
 	import mx.collections.ArrayCollection;
+	import mx.collections.IList;
+	import mx.controls.Tree;
 	import mx.events.CloseEvent;
 	import mx.managers.PopUpManager;
 	import mx.rpc.AsyncResponder;
@@ -18,54 +21,59 @@ package org.openforis.collect.presenter {
 	
 	import org.openforis.collect.Application;
 	import org.openforis.collect.client.ClientFactory;
+	import org.openforis.collect.client.DataClient;
 	import org.openforis.collect.event.UIEvent;
 	import org.openforis.collect.i18n.Message;
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
+	import org.openforis.collect.model.CollectRecord$Step;
 	import org.openforis.collect.model.NodeItem;
 	import org.openforis.collect.remoting.service.export.DataExportState;
 	import org.openforis.collect.ui.component.DataExportPopUp;
+	import org.openforis.collect.ui.component.PopUp;
 	import org.openforis.collect.util.AlertUtil;
 	import org.openforis.collect.util.ApplicationConstants;
+	
+	import spark.components.DropDownList;
 
 	/**
 	 * 
 	 * @author S. Ricci
 	 * 
 	 */
-	public class DataExportPopUpPresenter extends AbstractPresenter {
+	public class DataExportPopUpPresenter extends PopUpPresenter {
 		
-		private static const PROGRESS_DELAY:int = 5000;
+		private static const PROGRESS_DELAY:int = 2000;
+		private static const ALL_STEPS_ITEM:Object = {label: Message.get('global.allItemsLabel')};
 		
-		private var _view:DataExportPopUp;
 		private var _cancelResponder:IResponder;
 		private var _exportResponder:IResponder;
 		private var _getStateResponder:IResponder;
 		private var _progressTimer:Timer;
+		private var _type:String;
 		private var _state:DataExportState;
 		private var _firstOpen:Boolean = true;
 		
 		public function DataExportPopUpPresenter(view:DataExportPopUp) {
-			this._view = view;
 			this._exportResponder = new AsyncResponder(exportResultHandler, faultHandler);
 			this._cancelResponder = new AsyncResponder(cancelResultHandler, faultHandler);
 			this._getStateResponder = new AsyncResponder(getStateResultHandler, faultHandler);
+			super(view);
 			
-			super();
-			
-			if(Application.activeRootEntity != null) {
-				initView(Application.activeRootEntity);
-			}
+			initView();
 		}
 		
 		override internal function initEventListeners():void {
+			super.initEventListeners();
 			eventDispatcher.addEventListener(UIEvent.ROOT_ENTITY_SELECTED, rootEntitySelectedHandler);
-			_view.addEventListener(CloseEvent.CLOSE, closeHandler);
-			_view.exportButton.addEventListener(MouseEvent.CLICK, exportButtonClickHandler);
-			_view.downloadButton.addEventListener(MouseEvent.CLICK, downloadButtonClickHandler);
-			_view.cancelButton.addEventListener(MouseEvent.CLICK, cancelButtonClickHandler);
+			DataExportPopUp(_view).closeButton1.addEventListener(MouseEvent.CLICK, closeHandler);
+			DataExportPopUp(_view).typeGroup.addEventListener(Event.CHANGE, typeChangeHandler);
+			DataExportPopUp(_view).exportButton.addEventListener(MouseEvent.CLICK, exportButtonClickHandler);
+			DataExportPopUp(_view).cancelExportButton.addEventListener(MouseEvent.CLICK, cancelExportButtonClickHandler);
+			DataExportPopUp(_view).downloadButton.addEventListener(MouseEvent.CLICK, downloadButtonClickHandler);
+			DataExportPopUp(_view).closeButton3.addEventListener(MouseEvent.CLICK, closeHandler);
 		}
 		
-		protected function closeHandler(event:CloseEvent):void {
+		override protected function closeHandler(event:Event = null):void {
 			if ( _state != null && _state.running ) {
 				AlertUtil.showMessage("export.cannotClosePopUp");
 			} else {
@@ -74,22 +82,59 @@ package org.openforis.collect.presenter {
 		}
 		
 		internal function rootEntitySelectedHandler(event:UIEvent):void {
-			var rootEntityDef:EntityDefinitionProxy = event.obj as EntityDefinitionProxy;
-			initView(rootEntityDef);
+			initView();
 		}
 		
+		protected function typeChangeHandler(event:Event):void {
+			var type:String = DataExportPopUp(_view).typeGroup.selectedValue as String;
+			_type = type;
+			initStepsDropDown();
+			switch ( type ) {
+				case "full":
+					_view.currentState = DataExportPopUp.STATE_PARAMETERS_SELECTION;
+					break;
+				case "partial":
+					_view.currentState = DataExportPopUp.STATE_PARTIAL_EXPORT_PARAMETERS_SELECTION;
+					break;
+			}
+		}
+			
 		protected function exportButtonClickHandler(event:MouseEvent):void {
-			var selectedEntity:NodeItem = _view.rootTree.selectedItem as NodeItem;
-			if ( selectedEntity == null ) {
-				AlertUtil.showMessage("export.selectAnEntity");
-			} else {
-				var rootEntity:String = Application.activeRootEntity.name;
-				var stepNumber:int = 1;
-				var entityId:int = selectedEntity.id;
-				ClientFactory.dataExportClient.export(_exportResponder, rootEntity, entityId, stepNumber);
-	
-				_view.currentState = DataExportPopUp.STATE_EXPORTING;
-				_view.progressBar.setProgress(0, 0);
+			var rootEntity:String = Application.activeRootEntity.name;
+			var step:Object;
+			var stepNumber:Number;
+			switch ( _type ) {
+				case "partial":
+					var selectedEntity:NodeItem = DataExportPopUp(_view).rootTree.selectedItem as NodeItem;
+					if ( selectedEntity == null ) {
+						AlertUtil.showMessage("export.selectAnEntity");
+					} else {
+						step = DataExportPopUp(_view).stepDropDownList.selectedItem;
+						if ( step == null ) {
+							AlertUtil.showError("export.error.selectStep");
+						} else {
+							stepNumber = DataClient.getRecordStepNumber(CollectRecord$Step(step));
+							var entityId:int = selectedEntity.id;
+							ClientFactory.dataExportClient.export(_exportResponder, rootEntity, stepNumber, entityId);
+							
+							_view.currentState = DataExportPopUp.STATE_EXPORTING;
+							DataExportPopUp(_view).progressBar.setProgress(0, 0);
+						}
+					}
+					break;
+				case "full":
+					step = DataExportPopUp(_view).stepDropDownList.selectedItem;
+					var stepNums:Array;
+					if ( step != ALL_STEPS_ITEM ) {
+						stepNumber = DataClient.getRecordStepNumber(CollectRecord$Step(step));
+						stepNums = [stepNumber];
+					} else {
+						stepNums = [1, 2, 3];
+					}
+					ClientFactory.dataExportClient.fullExport(_exportResponder, rootEntity, stepNums);
+					_view.currentState = DataExportPopUp.STATE_EXPORTING;
+					DataExportPopUp(_view).progressBar.setProgress(0, 0);
+					break;
 			}
 		}
 		
@@ -98,18 +143,13 @@ package org.openforis.collect.presenter {
 			navigateToURL(new URLRequest(url), "_new");
 		}
 		
-		protected function cancelButtonClickHandler(event:MouseEvent):void {
+		protected function cancelExportButtonClickHandler(event:MouseEvent):void {
 			ClientFactory.dataExportClient.cancel(_cancelResponder);
 		}
 		
 		protected function exportResultHandler(event:ResultEvent, token:Object = null):void {
-			if ( event.result == true ) {
-				//startProgressTimer();
-			} else {
-				//AlertUtil.showError("export.concurrentException");
-				//do nothing, update the state and try to "recover" the exporting
-			}
-			updateExportState();
+			_state = event.result as DataExportState;
+			updateView();
 		}
 		
 		protected function startProgressTimer():void {
@@ -123,6 +163,7 @@ package org.openforis.collect.presenter {
 		protected function stopProgressTimer():void {
 			if ( _progressTimer != null ) {
 				_progressTimer.stop();
+				_progressTimer = null;
 			}
 		}
 		
@@ -135,48 +176,90 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function cancelResultHandler(event:ResultEvent, token:Object = null):void {
-			_state = null;
-			stopProgressTimer();
-			_view.currentState = DataExportPopUp.STATE_DEFAULT;
+			resetView();
 		}
 		
 		protected function getStateResultHandler(event:ResultEvent, token:Object = null):void {
 			_state = event.result as DataExportState;
+			updateView();
+		}
+		
+		protected function updateView():void {
 			if(_state != null) {
 				if ( _state.running && _state.count <= _state.total ) {
 					_view.currentState = DataExportPopUp.STATE_EXPORTING;
-					_view.progressBar.setProgress(_state.count, _state.total);
-					_view.progressLabel.text = Message.get("export.progressLabel", [_state.count, _state.total]);
+					DataExportPopUp(_view).progressBar.setProgress(_state.count, _state.total);
+					var progressText:String;
+					if ( _state.total == 0 ) {
+						progressText = Message.get("export.processing");
+					} else {
+						progressText = Message.get("export.progressLabel", [_state.count, _state.total]);
+					}
+					DataExportPopUp(_view).progressLabel.text = progressText;
 					if ( _progressTimer == null ) {
 						startProgressTimer();
 					}
-				} else if ( _state.error) {
-					_view.currentState = DataExportPopUp.STATE_DEFAULT;
+				} else if ( !_firstOpen && _state.complete ) {
+					_view.currentState = DataExportPopUp.STATE_COMPLETE;
 					stopProgressTimer();
-					AlertUtil.showError("export.error");
-				} else if ( _state.complete ) {
-					if ( _firstOpen ) {
-						_view.currentState = DataExportPopUp.STATE_DEFAULT;
+				} else {
+					if ( !_firstOpen ) {
+						if ( _state.error ) {
+							AlertUtil.showError("export.error");
+							resetView();
+						} else if ( _state.cancelled ) {
+							AlertUtil.showError("export.cancelled");
+							resetView();
+						} else {
+							//process starting in a while...
+							startProgressTimer();
+						}
 					} else {
-						_view.currentState = DataExportPopUp.STATE_COMPLETE;
+						resetView();
 					}
-					stopProgressTimer();
 				}
 			} else {
-				_view.currentState = DataExportPopUp.STATE_DEFAULT;
-				stopProgressTimer();
+				resetView();
 			}
 			_firstOpen = false;
 		}
 		
-		internal function initView(rootEntityDef:EntityDefinitionProxy):void {
-			var rootNodeItem:NodeItem = NodeItem.fromNodeDef(rootEntityDef, true, false, false);
-			_view.rootTree.dataProvider = new ArrayCollection([rootNodeItem]);
-			_view.rootTree.callLater(function():void {
-				_view.rootTree.expandItem(rootNodeItem, true);
-			});
+		protected function resetView():void {
+			_state = null;
+			_view.currentState = DataExportPopUp.STATE_TYPE_SELECTION;
+			DataExportPopUp(_view).typeGroup.selection = null;
+			stopProgressTimer();
+		}
+		
+		protected function initView():void {
+			initEntitiesTree();
+			initStepsDropDown();
 			//try to see if there is an export still running
 			updateExportState();
+		}
+		
+		protected function initEntitiesTree():void {
+			var rootEntity:EntityDefinitionProxy = Application.activeRootEntity;
+			var rootNodeItem:NodeItem = NodeItem.fromNodeDef(rootEntity, true, false, false);
+			var tree:Tree = DataExportPopUp(_view).rootTree;
+			tree.dataProvider = new ArrayCollection([rootNodeItem]);
+			tree.callLater(function():void {
+				tree.expandItem(rootNodeItem, true);
+			});
+		}
+		
+		protected function initStepsDropDown():void {
+			var steps:IList = new ArrayCollection(CollectRecord$Step.constants);
+			if ( _type == "full" ) {
+				steps.addItemAt(ALL_STEPS_ITEM, 0);
+			}
+			var stepDropDownList:DropDownList = DataExportPopUp(_view).stepDropDownList;
+			stepDropDownList.dataProvider = steps;
+			stepDropDownList.callLater(function():void {
+				if ( _type == "full" ) {
+					stepDropDownList.selectedIndex = 0;
+				}
+			});
 		}
 		
 	}

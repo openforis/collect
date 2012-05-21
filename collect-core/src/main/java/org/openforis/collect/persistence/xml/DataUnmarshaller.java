@@ -40,11 +40,11 @@ public class DataUnmarshaller {
 		p.setContentHandler(handler);
 		try {
 			p.parse(source);
-			List<String> messages = handler.getMessages();
-			if ( messages.isEmpty() ) {
+			List<String> failures = handler.getFailures();
+			if ( failures.isEmpty() ) {
 				return handler.getRecord();
 			} else {
-				throw new DataUnmarshallerException(messages);
+				throw new DataUnmarshallerException(failures);
 			}
 		} catch (SAXException e) {
 			throw new DataUnmarshallerException(e);
@@ -78,6 +78,10 @@ public class DataUnmarshaller {
 		return parse(is);
 	}
 
+	public List<String> getLastParsingWarnings() {
+		return handler.getWarnings();
+	}
+	
 //	public static void main(String[] args) {
 //		try {
 //			

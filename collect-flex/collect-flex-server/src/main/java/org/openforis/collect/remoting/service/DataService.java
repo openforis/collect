@@ -3,6 +3,7 @@
  */
 package org.openforis.collect.remoting.service;
 
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -19,7 +20,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.RecordPromoteException;
 import org.openforis.collect.manager.SessionManager;
-import org.openforis.collect.manager.UserManager;
 import org.openforis.collect.metamodel.proxy.CodeListItemProxy;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectSurvey;
@@ -29,8 +29,6 @@ import org.openforis.collect.model.User;
 import org.openforis.collect.model.proxy.NodeProxy;
 import org.openforis.collect.model.proxy.RecordProxy;
 import org.openforis.collect.persistence.MultipleEditException;
-import org.openforis.collect.persistence.RecordAlreadyLockedException;
-import org.openforis.collect.persistence.RecordLockedException;
 import org.openforis.collect.persistence.RecordPersistenceException;
 import org.openforis.collect.persistence.RecordUnlockedException;
 import org.openforis.collect.remoting.service.UpdateRequestOperation.Method;
@@ -79,17 +77,15 @@ public class DataService {
 	@Autowired
 	private RecordManager recordManager;
 
-	@Autowired
-	private UserManager userManager;
-
 	@Transactional
 	public RecordProxy loadRecord(int id, int step, boolean forceUnlock) throws RecordPersistenceException {
 		SessionState sessionState = sessionManager.getSessionState();
+		if ( sessionState.isActiveRecordBeingEdited() ) {
+			throw new MultipleEditException();
+		}
 		CollectSurvey survey = sessionState.getActiveSurvey();
 		User user = sessionState.getUser();
-		Integer userId = user.getId();
-		checkCanLockRecord(id, userId, forceUnlock);
-		CollectRecord record = recordManager.checkout(survey, user, id, step, forceUnlock);
+		CollectRecord record = recordManager.checkout(survey, user, id, step, sessionState.getSessionId(), forceUnlock);
 		Entity rootEntity = record.getRootEntity();
 		recordManager.addEmptyNodes(rootEntity);
 		sessionManager.setActiveRecord(record);
@@ -127,14 +123,17 @@ public class DataService {
 
 	@Transactional
 	public RecordProxy createRecord(String rootEntityName, String versionName) throws RecordPersistenceException {
-		checkMultipleEdit();
 		SessionState sessionState = sessionManager.getSessionState();
+		if ( sessionState.isActiveRecordBeingEdited() ) {
+			throw new MultipleEditException();
+		}
+		String sessionId = sessionState.getSessionId();
 		CollectSurvey activeSurvey = sessionState.getActiveSurvey();
 		User user = sessionState.getUser();
 		ModelVersion version = activeSurvey.getVersion(versionName);
 		Schema schema = activeSurvey.getSchema();
 		EntityDefinition rootEntityDefinition = schema.getRootEntityDefinition(rootEntityName);
-		CollectRecord record = recordManager.create(activeSurvey, rootEntityDefinition, user, version.getName());
+		CollectRecord record = recordManager.create(activeSurvey, rootEntityDefinition, user, version.getName(), sessionId);
 		Entity rootEntity = record.getRootEntity();
 		recordManager.addEmptyNodes(rootEntity);
 		sessionManager.setActiveRecord(record);
@@ -142,74 +141,41 @@ public class DataService {
 		return recordProxy;
 	}
 	
-	private void checkCanLockRecord(int recordId, int userId, boolean forceUnlock) throws RecordLockedException, MultipleEditException {
-		Integer lockedRecordId = recordManager.getLockedRecordId(userId);
-		if ( lockedRecordId != null && lockedRecordId != recordId ) {
-			throw new MultipleEditException("User is editing another record: " + recordId);
-		}
-		Integer lockingUserId = recordManager.getLockingUserId(recordId);
-		if ( lockingUserId != null && ! forceUnlock ) {
-			if ( lockingUserId == userId ) {
-				throw new RecordAlreadyLockedException("Record already locked", null);
-			} else {
-				User lockingUser = userManager.loadById(lockingUserId);
-				String lockingUserName = lockingUser.getName();
-				throw new RecordLockedException("Record locked by another user", lockingUserName);
-			}
-		}
-	}
-	
-	
-	private void checkMultipleEdit() throws MultipleEditException {
-		SessionState sessionState = sessionManager.getSessionState();
-		CollectRecord activeRecord = sessionState.getActiveRecord();
-		if ( activeRecord == null ) {
-			User user = sessionState.getUser();
-			Integer userId = user.getId();
-			Integer lockedRecordId = recordManager.getLockedRecordId(userId);
-			if ( lockedRecordId != null ) {
-				throw new MultipleEditException("User is editing another record: " + lockedRecordId);
-			}
-		} else {
-			throw new MultipleEditException("User is editing another record");
-		}
-	}
-	
 	@Transactional
 	public void deleteRecord(int id) throws RecordPersistenceException {
-		SessionState sessionState = sessionManager.getSessionState();
-		User user = sessionState.getUser();
-		recordManager.delete(id, user);
+		recordManager.delete(id);
 		sessionManager.clearActiveRecord();
 	}
 	
 	@Transactional
 	public void saveActiveRecord() throws RecordPersistenceException {
+		sessionManager.checkIsActiveRecordLocked();
 		SessionState sessionState = sessionManager.getSessionState();
 		CollectRecord record = sessionState.getActiveRecord();
 		User user = sessionState.getUser();
 		record.setModifiedDate(new Date());
 		record.setModifiedBy(user);
-		recordManager.save(record);
+		recordManager.save(record, sessionState.getSessionId());
 	}
 
 	@Transactional
-	public void deleteActiveRecord() throws RecordPersistenceException {
-		SessionState sessionState = sessionManager.getSessionState();
-		Record record = sessionState.getActiveRecord();
-		User user = sessionState.getUser();
-		recordManager.delete(record.getId(), user);
-		sessionManager.clearActiveRecord();
-	}
-
-	@Transactional
-	public List<UpdateResponse> updateActiveRecord(String lockId, UpdateRequest request) throws RecordUnlockedException {
-		sessionManager.checkUserIsLockingActiveRecord(lockId);
+	public List<UpdateResponse> updateActiveRecord(UpdateRequest request) throws RecordUnlockedException {
+		sessionManager.checkIsActiveRecordLocked();
 		List<UpdateRequestOperation> operations = request.getOperations();
 		List<UpdateResponse> updateResponses = new ArrayList<UpdateResponse>();
 		for (UpdateRequestOperation operation : operations) {
 			Collection<UpdateResponse> responses = processUpdateRequestOperation(operation);
 			updateResponses.addAll(responses);
+		}
+		if ( updateResponses.size() > 0 ) {
+			CollectRecord activeRecord = getActiveRecord();
+			UpdateResponse firstResp = updateResponses.get(0);
+			firstResp.setErrors(activeRecord.getErrors());
+			firstResp.setMissing(activeRecord.getMissing());
+			firstResp.setMissingErrors(activeRecord.getMissingErrors());
+			firstResp.setMissingWarnings(activeRecord.getMissingWarnings());
+			firstResp.setSkipped(activeRecord.getSkipped());
+			firstResp.setWarnings(activeRecord.getWarnings());
 		}
 		return updateResponses;
 	}
@@ -281,6 +247,7 @@ public class DataService {
 				attribute = (Attribute<AttributeDefinition, ?>) node;
 				record.setErrorConfirmed(attribute, false);
 				record.setMissingApproved(parentEntity, node.getName(), false);
+				record.setDefaultValueApplied(attribute, false);
 				
 				cardinalityNodePointers = getCardinalityNodePointers(attribute);
 				response = getUpdateResponse(responseMap, attribute);
@@ -309,6 +276,27 @@ public class DataService {
 				relReqDependencies.add(new NodePointer(attribute.getParent(), attribute.getName()));
 				checkDependencies.add(attribute);
 				break;
+			case APPLY_DEFAULT_VALUE: 
+				if ( node instanceof Attribute ) {
+					attribute = (Attribute<AttributeDefinition, ?>) node;
+					recordManager.applyDefaultValue(attribute);
+					Map<Integer, Object> fieldValues = new HashMap<Integer, Object>();
+					int fieldCount = attribute.getFieldCount();
+					for (int idx = 0; idx < fieldCount; idx ++) {
+						Field<?> field = attribute.getField(idx);
+						fieldValues.put(idx, field.getValue());
+					}
+					response = getUpdateResponse(responseMap, attribute);
+					response.setUpdatedFieldValues(fieldValues);
+					cardinalityNodePointers = getCardinalityNodePointers(attribute);
+					relReqDependencies = recordManager.clearRelevanceRequiredStates(attribute);
+					checkDependencies = recordManager.clearValidationResults(attribute);
+					relReqDependencies.add(new NodePointer(attribute.getParent(), attribute.getName()));
+					checkDependencies.add(attribute);
+				} else {
+					throw new IllegalArgumentException("This method is applicable only to attributes");
+				}
+				break; 
 			case DELETE:
 				relReqDependencies = new HashSet<NodePointer>();
 				checkDependencies = new HashSet<Attribute<?,?>>();
@@ -443,7 +431,6 @@ public class DataService {
 	
 	@SuppressWarnings("unchecked")
 	private Node<?> addNode(Entity parentEntity, NodeDefinition nodeDef, String requestValue, FieldSymbol symbol, String remarks) {
-		
 		if(nodeDef instanceof AttributeDefinition) {
 			AttributeDefinition def = (AttributeDefinition) nodeDef;
 			Attribute<?, ?> attribute = (Attribute<?, ?>) def.createNode();
@@ -457,9 +444,12 @@ public class DataService {
 				if(symbol != null) {
 					symbolChar = symbol.getCode();
 				}
-				Field<?> firstField = attribute.getField(0);
-				firstField.setSymbol(symbolChar);
-				firstField.setRemarks(remarks);
+				int fieldCount = attribute.getFieldCount();
+				for (int idx = 0; idx < fieldCount; idx++) {
+					Field<?> field = attribute.getField(idx);
+					field.setSymbol(symbolChar);
+					field.setRemarks(remarks);
+				}
 			}
 			return attribute;
 		} else {
@@ -560,30 +550,26 @@ public class DataService {
 	
 	@Transactional
 	public void promoteActiveRecord() throws RecordPersistenceException, RecordPromoteException  {
+		sessionManager.checkIsActiveRecordLocked();
 		SessionState sessionState = sessionManager.getSessionState();
 		CollectRecord record = sessionState.getActiveRecord();
 		User user = sessionState.getUser();
 		recordManager.promote(record, user);
-		recordManager.unlock(record, user);
+		recordManager.releaseLock(record.getId());
 		sessionManager.clearActiveRecord();
 	}
 	
 	@Transactional
 	public void demoteActiveRecord() throws RecordPersistenceException {
+		sessionManager.checkIsActiveRecordLocked();
 		SessionState sessionState = sessionManager.getSessionState();
 		CollectSurvey survey = sessionState.getActiveSurvey();
 		CollectRecord record = sessionState.getActiveRecord();
 		User user = sessionState.getUser();
-		recordManager.demote(survey, record.getId(), record.getStep(), user);
-		recordManager.unlock(record, user);
+		Integer recordId = record.getId();
+		recordManager.demote(survey, recordId, record.getStep(), user);
+		recordManager.releaseLock(recordId);
 		sessionManager.clearActiveRecord();
-	}
-
-	public void updateNodeHierarchy(Node<? extends NodeDefinition> node, int newPosition) {
-	}
-
-	public List<String> find(String context, String query) {
-		return null;
 	}
 
 	/**
@@ -591,15 +577,21 @@ public class DataService {
 	 * @throws RecordPersistenceException 
 	 */
 	public void clearActiveRecord() throws RecordPersistenceException {
+		sessionManager.checkIsActiveRecordLocked();
 		SessionState sessionState = this.sessionManager.getSessionState();
 		CollectRecord activeRecord = sessionState.getActiveRecord();
-		User user = sessionState.getUser();
 		if ( activeRecord != null && activeRecord.getId() != null ) {
-			this.recordManager.unlock(activeRecord, user);
+			this.recordManager.releaseLock(activeRecord.getId());
 		}
 		this.sessionManager.clearActiveRecord();
 	}
 	
+	public void moveNode(int nodeId, int index) {
+		SessionState sessionState = sessionManager.getSessionState();
+		CollectRecord record = sessionState.getActiveRecord();
+		recordManager.moveNode(record, nodeId, index);
+	}
+
 	/**
 	 * Gets the code list items assignable to the specified attribute and matching the specified codes.
 	 * 
@@ -741,7 +733,7 @@ public class DataService {
 
 		for (CodeListItem item : siblings) {
 			String itemCode = item.getCode();
-			Pattern pattern = Pattern.compile("^[0]*" + adaptedCode + "$");
+			Pattern pattern = Pattern.compile("^[0]*" + adaptedCode + "$", Pattern.CASE_INSENSITIVE);
 			Matcher matcher = pattern.matcher(itemCode);
 			if(matcher.find()) {
 				return item;

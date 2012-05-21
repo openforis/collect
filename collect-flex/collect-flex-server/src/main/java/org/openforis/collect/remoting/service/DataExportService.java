@@ -2,15 +2,18 @@ package org.openforis.collect.remoting.service;
 
 import java.io.File;
 
-import org.openforis.collect.manager.ConfigurationManager;
+import javax.servlet.ServletContext;
+
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
-import org.openforis.collect.model.Configuration;
 import org.openforis.collect.model.User;
+import org.openforis.collect.persistence.xml.DataMarshaller;
+import org.openforis.collect.remoting.service.backup.BackupProcess;
 import org.openforis.collect.remoting.service.export.DataExportProcess;
 import org.openforis.collect.remoting.service.export.DataExportState;
+import org.openforis.collect.remoting.service.export.SelectiveDataExportProcess;
 import org.openforis.collect.util.ExecutorServiceUtil;
 import org.openforis.collect.web.session.SessionState;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +28,8 @@ public class DataExportService {
 
 	//private static Log LOG = LogFactory.getLog(DataExportService.class);
 
+	private static final String EXPORT_PATH = "export";
+	
 	@Autowired
 	private SessionManager sessionManager;
 
@@ -32,56 +37,98 @@ public class DataExportService {
 	private RecordManager recordManager;
 	
 	@Autowired
-	private ConfigurationManager configurationManager;
+	private DataMarshaller dataMarshaller;
+	
+	@Autowired 
+	private ServletContext servletContext;
 	
 	private File exportDirectory;
 	
 	public void init() {
-		Configuration configuration = configurationManager.getConfiguration();
-		String tempPath = configuration.get("export_path");
-		exportDirectory = new File(tempPath);
+		String exportRealPath = servletContext.getRealPath(EXPORT_PATH);
+		exportDirectory = new File(exportRealPath);
+		if ( exportDirectory.exists() ) {
+			exportDirectory.delete();
+		}
+		if ( ! exportDirectory.mkdirs() && ! exportDirectory.canRead() ) {
+			throw new IllegalStateException("Cannot access export directory: " + exportRealPath);
+		}
 	}
 
-	@Transactional
 	/**
 	 * 
 	 * @param rootEntityName
 	 * @param entityId
 	 * @param stepNumber
-	 * @return false if another export has been launched by the current user, true otherwise
+	 * @return state of the export
 	 */
-	public boolean export(String rootEntityName, int entityId, int stepNumber) {
+	@Transactional
+	public DataExportState export(String rootEntityName, int stepNumber, int entityId) {
 		SessionState sessionState = sessionManager.getSessionState();
 		User user = sessionState.getUser();
-		DataExportState state = sessionState.getDataExportState();
-		if ( state == null || ! state.isRunning() ) {
+		DataExportProcess dataExportProcess = sessionState.getDataExportProcess();
+		if ( dataExportProcess == null || ! dataExportProcess.isRunning() ) {
 			File exportDir = new File(exportDirectory, user.getName());
 			if ( ! exportDir.exists() && ! exportDir.mkdirs() ) {
-				throw new IllegalStateException("Cannot create temp directory");
+				throw new IllegalStateException("Cannot create export directory: " + exportDir.getAbsolutePath());
 			}
-			state = new DataExportState();
-			sessionState.setDataExportState(state);
 			CollectSurvey survey = sessionState.getActiveSurvey();
-			DataExportProcess process = new DataExportProcess(recordManager, exportDir, state, survey, rootEntityName, entityId, Step.valueOf(stepNumber));
+			SelectiveDataExportProcess process = new SelectiveDataExportProcess(recordManager, exportDir, survey, rootEntityName, entityId, Step.valueOf(stepNumber));
+			dataExportProcess = process;
+			sessionState.setDataExportProcess(process);
 			ExecutorServiceUtil.executeInCachedPool(process);
-			return true;
-		} else {
-			return false;
 		}
+		return dataExportProcess.getState();
+	}
+	
+	@Transactional
+	public DataExportState fullExport(String rootEntityName, int[] stepNumbers) {
+		SessionState sessionState = sessionManager.getSessionState();
+		User user = sessionState.getUser();
+		DataExportProcess dataExportProcess = sessionState.getDataExportProcess();
+		if ( dataExportProcess == null || ! dataExportProcess.isRunning() ) {
+			File exportDir = new File(exportDirectory, user.getName());
+			if ( ! exportDir.exists() && ! exportDir.mkdirs() ) {
+				throw new IllegalStateException("Cannot create export directory: " + exportDir.getAbsolutePath());
+			}
+			CollectSurvey survey = sessionState.getActiveSurvey();
+			if ( stepNumbers == null ) {
+				stepNumbers = getAllStepNumbers();
+			}
+			BackupProcess process = new BackupProcess(recordManager, dataMarshaller, exportDir, survey, rootEntityName, stepNumbers);
+			dataExportProcess = process;
+			sessionState.setDataExportProcess(process);
+			ExecutorServiceUtil.executeInCachedPool(process);
+		}
+		return dataExportProcess.getState();
+	}
+
+	private int[] getAllStepNumbers() {
+		int[] stepNumbers;
+		Step[] steps = Step.values();
+		stepNumbers = new int[steps.length];
+		int i = 0;
+		for (Step step : steps) {
+			stepNumbers[i++] = step.getStepNumber();
+		}
+		return stepNumbers;
 	}
 	
 	public void cancel() {
 		SessionState sessionState = sessionManager.getSessionState();
-		DataExportState state = sessionState.getDataExportState();
-		if ( state != null ) {
-			state.setCancelled(true);
+		DataExportProcess dataExportProcess = sessionState.getDataExportProcess();
+		if ( dataExportProcess != null ) {
+			dataExportProcess.cancel();
 		}
 	}
 
 	public DataExportState getState() {
 		SessionState sessionState = sessionManager.getSessionState();
-		DataExportState state = sessionState.getDataExportState();
-		return state;
+		DataExportProcess dataExportProcess = sessionState.getDataExportProcess();
+		if ( dataExportProcess != null ) {
+			return dataExportProcess.getState();
+		}
+		return null;
 	}
 	
 }

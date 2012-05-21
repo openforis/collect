@@ -24,11 +24,8 @@ package org.openforis.collect.ui.component.input {
 	 * */
 	public class InputField extends Group {
 		
-		public static const WARN_STYLE:String = "warn";
-		public static const ERROR_STYLE:String = "error";
-		public static const APPROVED_STYLE:String = "approved";
-		public static const NOT_RELEVANT_STYLE:String = "notRelevant";
 		public static const REMARKS_PRESENT_STYLE:String = "remarksPresent";
+		public static const READONLY_STYLE:String = "readOnly";
 		
 		public static const STATE_SAVING:String = "saving";
 		public static const STATE_SAVE_COMPLETE:String = "saveComplete";
@@ -96,14 +93,6 @@ package org.openforis.collect.ui.component.input {
 			}
 		}
 		
-		public function set relevant(value:Boolean):void {
-			if(value) {
-				UIUtil.removeStyleName(validationStateDisplay, NOT_RELEVANT_STYLE);
-			} else {
-				UIUtil.addStyleName(validationStateDisplay, NOT_RELEVANT_STYLE);
-			}
-		}
-		
 		public function get text():String {
 			return ObjectUtil.getValue(_textInput, "text");
 		}
@@ -120,6 +109,24 @@ package org.openforis.collect.ui.component.input {
 			}
 		}
 		
+		public function get editable():Boolean {
+			return _editable;
+		}
+		
+		public function set editable(value:Boolean):void {
+			_editable = value;
+			if( textInput != null ) {
+				if ( textInput.hasOwnProperty("editable") ) {
+					textInput["editable"] = value;
+				}
+				UIUtil.toggleStyleName(textInput, READONLY_STYLE, ! value);
+			}
+		}
+		
+		public function set hasRemarks(value:Boolean):void {
+			UIUtil.toggleStyleName(validationStateDisplay, REMARKS_PRESENT_STYLE, value);
+		}
+		
 		public function get textInput():UIComponent {
 			return _textInput;
 		}
@@ -128,38 +135,6 @@ package org.openforis.collect.ui.component.input {
 			_textInput = value;
 		}
 		
-		public function set error(value:String):void {
-			if(StringUtil.isBlank(value)) {
-				UIUtil.removeStyleName(validationStateDisplay, ERROR_STYLE);
-			} else {
-				UIUtil.addStyleName(validationStateDisplay, ERROR_STYLE);
-			}
-		}
-		
-		public function set warning(value:String):void {
-			if(StringUtil.isBlank(value)) {
-				UIUtil.removeStyleName(validationStateDisplay, WARN_STYLE);
-			} else {
-				UIUtil.addStyleName(validationStateDisplay, WARN_STYLE);
-			}
-		}
-		
-		public function set approved(value:Boolean):void {
-			if(value) {
-				UIUtil.addStyleName(validationStateDisplay, APPROVED_STYLE);
-			} else {
-				UIUtil.removeStyleName(validationStateDisplay, APPROVED_STYLE);
-			}
-		}
-
-		public function set hasRemarks(value:Boolean):void {
-			if(value) {
-				UIUtil.addStyleName(validationStateDisplay, REMARKS_PRESENT_STYLE);
-			} else {
-				UIUtil.removeStyleName(validationStateDisplay, REMARKS_PRESENT_STYLE);
-			}
-		}
-
 		public function get validationStateDisplay():UIComponent {
 			return _textInput;
 		}
@@ -269,15 +244,6 @@ package org.openforis.collect.ui.component.input {
 			_changed = value;
 		}
 		
-		public function get editable():Boolean {
-			return _editable;
-		}
-		
-		public function set editable(value:Boolean):void {
-			_editable = value;
-			if(textInput != null && textInput.hasOwnProperty("editable")) {
-				textInput["editable"] = value;
-			}
-		}
-	}
+
+}
 }

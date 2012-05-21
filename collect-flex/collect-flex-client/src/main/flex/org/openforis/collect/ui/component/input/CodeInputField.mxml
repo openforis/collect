@@ -44,7 +44,6 @@
 		
 		<input:TextInput id="textInput" 
 						 width="70" 
-						 height="100%"
 						 toolTip.default="{description}"
 						 />
 		

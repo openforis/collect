@@ -3,6 +3,8 @@
 		  xmlns:s="library://ns.adobe.com/flex/spark" 
 		  xmlns:mx="library://ns.adobe.com/flex/mx"
 		  gap="0"
+		  height="22"
+		  verticalAlign="middle"
 		  >
 	
 	<fx:Script>
@@ -69,6 +71,7 @@
 	
 	<s:Group id="descriptionIconContainer"
 			 width="20"
+			 height="100%"
 			 visible="{_description != null}"
 			 includeInLayout="{_description != null}"
 			 >

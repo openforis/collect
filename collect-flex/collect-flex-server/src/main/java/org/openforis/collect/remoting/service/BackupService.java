@@ -5,14 +5,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.openforis.collect.manager.ConfigurationManager;
+import javax.servlet.ServletContext;
+
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SessionManager;
-import org.openforis.collect.model.CollectRecord;
-import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
-import org.openforis.collect.model.Configuration;
-import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.xml.DataMarshaller;
 import org.openforis.collect.remoting.service.backup.BackupProcess;
 import org.openforis.collect.util.ExecutorServiceUtil;
@@ -26,8 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class BackupService {
 
-	@Autowired
-	private ConfigurationManager configurationManager;
+	private static final String BACKUP_PATH = "backup";
 	
 	@Autowired
 	private SessionManager sessionManager;
@@ -38,6 +34,9 @@ public class BackupService {
 	@Autowired
 	private DataMarshaller dataMarshaller;
 	
+	@Autowired 
+	private ServletContext servletContext;
+	
 	private File backupDirectory;
 	
 	private Map<Integer, Map<String, BackupProcess>> backups;
@@ -47,12 +46,13 @@ public class BackupService {
 	}
 	
 	public void init() {
-		Configuration configuration = configurationManager.getConfiguration();
-		String backupPath = configuration.get("backup_path");
-	
-		backupDirectory = new File(backupPath);
-		if ( ! backupDirectory.exists() || ! backupDirectory.canRead() ) {
-			throw new IllegalStateException("Cannot access backup directory. Check the configuration.");
+		String backupRealPath = servletContext.getRealPath(BACKUP_PATH);
+		backupDirectory = new File(backupRealPath);
+		if ( ! backupDirectory.exists() ) {
+			backupDirectory.mkdirs();
+			if (! backupDirectory.canRead() ) {
+				throw new IllegalStateException("Cannot access backup directory. Check the configuration.");
+			}
 		}
 	}
 	
@@ -60,28 +60,9 @@ public class BackupService {
 		Map<String, Object> result = new HashMap<String, Object>();
 		try {
 			BackupProcess backup = getBackup(rootEntityName);
-			if (backup.isActive()) {
+			if (backup.isRunning()) {
 				result.put("error", "Another backup is already active for this survey. Please try later in a few minutes.");
 			} else {
-				SessionState sessionState = sessionManager.getSessionState();
-				User user = sessionState.getUser();
-				List<CollectRecord> summaries;
-				if ( ids == null ) {
-					summaries = getAllRecordSummaries(rootEntityName);
-				} else {
-					//todo
-					summaries = null;
-				}
-				Step[] steps;
-				if ( stepNumber == null || stepNumber <= 0) {
-					steps = Step.values();
-				} else {
-					Step step = Step.valueOf(stepNumber);
-					steps = new Step[] {step};
-				}
-				backup.setRecordSummaries(summaries);
-				backup.setUser(user);
-				backup.setSteps(steps);
 				ExecutorServiceUtil.executeInCachedPool(backup);
 				result.put("start", "The backup is started");
 			}
@@ -93,7 +74,7 @@ public class BackupService {
 	
 	public void cancel(String rootEntityName) throws Exception {
 		BackupProcess backup = getBackup(rootEntityName);
-		if (backup.isActive()) {
+		if (backup.isRunning()) {
 			backup.cancel();
 		}
 	}
@@ -101,9 +82,9 @@ public class BackupService {
 	public Map<String, Object> getStatus(String rootEntityName) throws Exception {
 		Map<String, Object> result = new HashMap<String, Object>();
 		BackupProcess backup = getBackup(rootEntityName);
-		result.put("active", backup.isActive());
-		result.put("total", backup.getTotal());
-		result.put("count", backup.getCount());
+		result.put("active", backup.isRunning());
+		//result.put("total", backup.getTotal());
+		//result.put("count", backup.getCount());
 		return result;
 	}
 	
@@ -118,17 +99,11 @@ public class BackupService {
 		}
 		BackupProcess backup = backupsPerSurvey.get(rootEntityName);
 		if (backup == null) {
-			backup = new BackupProcess(recordManager, dataMarshaller, backupDirectory, survey, rootEntityName);
+			int[] stepNumbers = {1, 2, 3};
+			backup = new BackupProcess(recordManager, dataMarshaller, backupDirectory, survey, rootEntityName, stepNumbers );
 			backupsPerSurvey.put(rootEntityName, backup);
 		}
 		return backup;
 	}
 
-	private List<CollectRecord> getAllRecordSummaries(String rootEntityName) {
-		SessionState sessionState = sessionManager.getSessionState();
-		CollectSurvey survey = sessionState.getActiveSurvey();
-		List<CollectRecord> summaries = recordManager.loadSummaries(survey, rootEntityName, 0, Integer.MAX_VALUE, null);
-		return summaries;
-	}
-	
 }

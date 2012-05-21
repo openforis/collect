@@ -14,6 +14,7 @@ package org.openforis.collect.presenter {
 	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
 	import mx.collections.ListCollectionView;
+	import mx.controls.Alert;
 	import mx.core.FlexGlobals;
 	import mx.events.CloseEvent;
 	import mx.events.FlexEvent;
@@ -32,9 +33,12 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
+	import org.openforis.collect.model.CollectRecord$State;
+	import org.openforis.collect.model.CollectRecord$Step;
 	import org.openforis.collect.model.RecordSummarySortField;
 	import org.openforis.collect.model.RecordSummarySortField$Sortable;
 	import org.openforis.collect.model.proxy.RecordProxy;
+	import org.openforis.collect.model.proxy.UserProxy;
 	import org.openforis.collect.ui.UIBuilder;
 	import org.openforis.collect.ui.component.BackupPopUp;
 	import org.openforis.collect.ui.component.DataExportPopUp;
@@ -116,6 +120,7 @@ package org.openforis.collect.presenter {
 			this._view.paginationBar.nextPageButton.addEventListener(MouseEvent.CLICK, nextPageClickHandler);
 			this._view.paginationBar.lastPageButton.addEventListener(MouseEvent.CLICK, lastPageClickHandler);
 			//this._view.paginationBar.goToPageButton.addEventListener(MouseEvent.CLICK, goToPageClickHandler);
+			_view.stage.addEventListener(MouseEvent.CLICK, stageClickHandler);
 		}
 	
 		/**
@@ -189,31 +194,42 @@ package org.openforis.collect.presenter {
 		 * */
 		protected function deleteButtonClickHandler(event:MouseEvent):void {
 			var selectedRecord:RecordProxy = _view.dataGrid.selectedItem as RecordProxy;
-			if(selectedRecord != null) {
-				AlertUtil.showConfirm("list.delete.confirm", null, "list.delete.confirmTitle", executeDelete);
-				
-				function executeDelete():void {
-					_dataClient.deleteRecord(new AsyncResponder(deleteRecordResultHandler, faultHandler), selectedRecord.id);
+			if(selectedRecord == null) {
+				AlertUtil.showError("list.error.recordNotSelected");
+			} else if ( selectedRecord.step != CollectRecord$Step.ENTRY ) {
+				var rootEntityLabel:String = Application.activeRootEntity.getLabelText();
+				var stepName:String = Message.get("phase." + selectedRecord.step.name);
+				if ( Application.user.canReject(selectedRecord) ) {
+					AlertUtil.showError("list.error.cannotDelete.rejectBeforeDeletePromotedRecord", [rootEntityLabel, stepName]);
+				} else {
+					AlertUtil.showError("list.error.cannoDeletePromotedRecord", [rootEntityLabel, stepName]);
 				}
 			} else {
-				AlertUtil.showError("list.error.recordNotSelected");
+				AlertUtil.showConfirm("list.delete.confirm", null, "list.delete.confirmTitle", executeDelete, [selectedRecord]);
 			}
+		}
+		
+		protected function executeDelete(record:RecordProxy):void {
+			_dataClient.deleteRecord(new AsyncResponder(deleteRecordResultHandler, faultHandler), record.id);
 		}
 		
 		protected function exportButtonClickHandler(event:MouseEvent):void {
-			//var popUp:DataExportPopUp = DataExportPopUp(PopUpManager.createPopUp(FlexGlobals.topLevelApplication as DisplayObject, DataExportPopUp, true));
-			var popUp:BackupPopUp = BackupPopUp(PopUpManager.createPopUp(FlexGlobals.topLevelApplication as DisplayObject, BackupPopUp, true));
-			PopUpManager.centerPopUp(popUp);
+			PopUpUtil.createPopUp(DataExportPopUp, true);
 		}
 		
 		protected function openFilterPopUpButtonClickHandler(event:Event):void {
-			var application:DisplayObject = DisplayObject(FlexGlobals.topLevelApplication);
-			if(_filterPopUp == null) {
-				_filterPopUp = RecordFilterPopUp(PopUpManager.createPopUp(application, RecordFilterPopUp));
-				_filterPopUp.addEventListener(CloseEvent.CLOSE, filterPopUpCloseHandler);
-				_filterPopUp.applyButton.addEventListener(MouseEvent.CLICK, filterPopUpApplyHandler);
-				_filterPopUp.addEventListener(FlexMouseEvent.MOUSE_DOWN_OUTSIDE, filterPopUpCloseHandler);
+			if ( _filterPopUp != null ) {
+				closeFilterPopUp();
+			} else {
+				openFilterPopUp();
 			}
+		}
+		
+		protected function openFilterPopUp():void {
+			var application:DisplayObject = DisplayObject(FlexGlobals.topLevelApplication);
+			_filterPopUp = RecordFilterPopUp(PopUpManager.createPopUp(application, RecordFilterPopUp));
+			_filterPopUp.addEventListener(CloseEvent.CLOSE, filterPopUpCloseHandler);
+			_filterPopUp.applyButton.addEventListener(MouseEvent.CLICK, filterPopUpApplyHandler);
 			PopUpManager.addPopUp(_filterPopUp, application);
 			var keyAttributeDefinitions:IList = Application.activeRootEntity.keyAttributeDefinitions;
 			_filterPopUp.fieldsRp.dataProvider = keyAttributeDefinitions;
@@ -225,14 +241,23 @@ package org.openforis.collect.presenter {
 				PopUpUtil.POSITION_BELOW, 
 				PopUpUtil.VERTICAL_ALIGN_BOTTOM, 
 				PopUpUtil.HORIZONTAL_ALIGN_RIGHT);
-			//PopUpManager.centerPopUp(_filterPopUp);
+			
+			_filterPopUp.setFocus();
+		}
+		
+		protected function stageClickHandler(event:MouseEvent):void {
+			if ( event.target != _view.openFilterPopUpButton &&  _filterPopUp != null && 
+				! _filterPopUp.hitTestPoint( event.stageX, event.stageY ) ) {
+				closeFilterPopUp();
+			}
 		}
 		
 		protected function closeFilterPopUp():void {
-			PopUpManager.removePopUp(_filterPopUp);
-			_filterPopUp.removeEventListener(FlexMouseEvent.MOUSE_DOWN_OUTSIDE, filterPopUpCloseHandler);
-			_filterPopUp = null;
-			
+			if ( _filterPopUp != null ) {
+				PopUpManager.removePopUp(_filterPopUp);
+				_filterPopUp = null;
+			}
+			_view.openFilterPopUpButton.selected = currentKeyValuesFilter != null;
 		}
 		
 		protected function filterPopUpCloseHandler(event:Event = null):void {
@@ -247,11 +272,19 @@ package org.openforis.collect.presenter {
 		
 		protected function filterPopUpApplyHandler(event:Event):void {
 			var filter:Array = new Array();
+			var empty:Boolean = true;
 			for each (var textInput:TextInput in _filterPopUp.textInput) {
-				var key:String = StringUtil.trim(textInput.text.toUpperCase());
+				var key:String = StringUtil.trim(textInput.text).toUpperCase();
 				filter.push(key);
+				if ( key != "" ) {
+					empty = false;
+				}
 			}
-			currentKeyValuesFilter = filter;
+			if ( ! empty ) {
+				currentKeyValuesFilter = filter;
+			} else {
+				currentKeyValuesFilter = null;
+			}
 			currentPage = 1;
 			loadRecordSummariesCurrentPage();
 			closeFilterPopUp();

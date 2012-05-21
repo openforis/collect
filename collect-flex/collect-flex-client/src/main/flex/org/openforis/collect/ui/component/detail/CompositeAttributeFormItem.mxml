@@ -13,13 +13,6 @@
 		<s:VerticalLayout gap="2" />
 	</detail:layout>
 	
-	<detail:FormItemLabel id="formItemLabel"
-						  nodeDefinition="{attributeDefinition}"
-						  width="{labelWidth}"
-						  includeInLayout="{attributeDefinition.parentLayout == UIUtil.LAYOUT_FORM}"
-						  visible="{attributeDefinition.parentLayout == UIUtil.LAYOUT_FORM}"
-						  />
-	
 	<s:HGroup gap="0">
 		<s:Spacer width="20"
 				  includeInLayout="{attributeDefinition.parentLayout == UIUtil.LAYOUT_FORM}"

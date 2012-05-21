@@ -11,9 +11,12 @@ package org.openforis.collect.ui.component.input {
 	import org.openforis.collect.metamodel.proxy.CodeAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
 	import org.openforis.collect.model.CollectRecord$Step;
+	import org.openforis.collect.model.proxy.AttributeProxy;
 	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.ui.component.detail.AttributeFormItem;
 	import org.openforis.collect.ui.component.detail.CollectFormItem;
+	import org.openforis.collect.util.CollectionUtil;
+	import org.openforis.idm.metamodel.validation.ValidationResultFlag;
 
 	/**
 	 * @author M. Togna
@@ -63,26 +66,33 @@ package org.openforis.collect.ui.component.input {
 		}
 		
 		private function createMenuItems(step:CollectRecord$Step):Array {
+			var nodeDefinition:NodeDefinitionProxy = _formItem.nodeDefinition;
+			var parentEntity:EntityProxy = _formItem.parentEntity;
 			var items:Array = new Array();
-			if(_formItem.parentEntity != null) {
-				var nodeName:String = _formItem.nodeDefinition.name;
-				var count:int = _formItem.parentEntity.getCount(nodeName);
-				if(count == 0) {
+			if(parentEntity != null) {
+				var nodeName:String = nodeDefinition.name;
+				var count:int = parentEntity.getCount(nodeName);
+				var minCountValid:ValidationResultFlag = parentEntity.childrenMinCountValidationMap.get(nodeName);
+				if(count == 0 || minCountValid == ValidationResultFlag.ERROR) {
 					switch(step) {
-						case CollectRecord$Step.ENTRY:
+						/*case CollectRecord$Step.ENTRY:
 							items.push(SET_BLANK_ON_FORM);
-							break;
+							break;*/
 						case CollectRecord$Step.CLEANSING:
 							items.push(APPROVE_MISSING);
 							break;
 					}
 				}
 				if(step == CollectRecord$Step.ENTRY) {
-					var hasErrors:Boolean = _formItem.parentEntity.childContainsErrors(_formItem.nodeDefinition.name);
-					if(hasErrors) {
-						var hasConfirmedError:Boolean = _formItem.parentEntity.hasConfirmedError(_formItem.nodeDefinition.name);
-						if(! hasConfirmedError) {
-							items.push(CONFIRM_ERROR);
+					if ( _formItem.nodeDefinition is AttributeDefinitionProxy && ! nodeDefinition.multiple ) {
+						var attribute:AttributeProxy = parentEntity.getSingleAttribute(nodeDefinition.name);
+						var hasErrors:Boolean = attribute != null && attribute.hasErrors() &&
+							! CollectionUtil.containsItemWith(attribute.validationResults.errors, "ruleName", "SpecifiedValidator");
+						if(hasErrors) {
+							var hasConfirmedError:Boolean = parentEntity.hasConfirmedError(nodeDefinition.name);
+							if(! hasConfirmedError) {
+								items.push(CONFIRM_ERROR);
+							}
 						}
 					}
 				}
@@ -103,13 +113,18 @@ package org.openforis.collect.ui.component.input {
 					nodeEvent.nodeName = nodeDefinition.name;
 					break;
 				case CONFIRM_ERROR:
-					nodeEvent = new NodeEvent(NodeEvent.CONFIRM_ERROR);
 					if(nodeDefinition is AttributeDefinitionProxy) {
-						if(nodeDefinition.multiple && ! (nodeDefinition is CodeAttributeDefinitionProxy)) {
+						if ( ! nodeDefinition.multiple || nodeDefinition is CodeAttributeDefinitionProxy) {
+							nodeEvent = new NodeEvent(NodeEvent.CONFIRM_ERROR);
 							nodeEvent.parentEntity = parentEntity;
 							nodeEvent.nodeName = nodeDefinition.name;
-						} else {
-							nodeEvent.nodeProxy = AttributeFormItem(formItem).attribute;
+							
+							if ( ! nodeDefinition.multiple) {
+								nodeEvent.node = AttributeFormItem(formItem).attribute;
+							} else {
+								nodeEvent.parentEntity = parentEntity;
+								nodeEvent.nodes = parentEntity.getChildren(nodeDefinition.name);
+							}
 						}
 					}
 					break;

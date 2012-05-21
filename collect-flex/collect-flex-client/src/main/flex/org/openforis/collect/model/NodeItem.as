@@ -35,7 +35,7 @@ package org.openforis.collect.model
 				for each (var childNodeDefn:NodeDefinitionProxy in childDefinitions) {
 					if ( (childNodeDefn is EntityDefinitionProxy && (childNodeDefn.multiple || includeSingleEntities)) || 
 						(childNodeDefn is AttributeDefinitionProxy && includeChildrenAttributes) ) {
-						var child:NodeItem = fromNodeDef(childNodeDefn, includeChildren, includeChildrenAttributes);
+						var child:NodeItem = fromNodeDef(childNodeDefn, includeChildren, includeChildrenAttributes, includeSingleEntities);
 						children.addItem(child);
 					}
 				}

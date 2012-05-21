@@ -24,12 +24,7 @@ package org.openforis.collect.client {
 		
 		public function keepAlive(responder:IResponder):void {
 			var editing:Boolean = Application.isEditingRecord();
-			var activeRecord:RecordProxy = Application.activeRecord;
-			var lockId:String = null;
-			if ( activeRecord != null ) {
-				lockId = activeRecord.lockId;
-			}
-			var token:AsyncToken = this._keepAliveOperation.send(editing, lockId);
+			var token:AsyncToken = this._keepAliveOperation.send(editing);
 			token.addResponder(responder);
 		}
 		

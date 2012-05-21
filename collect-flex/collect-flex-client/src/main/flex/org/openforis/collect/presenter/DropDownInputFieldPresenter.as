@@ -134,10 +134,10 @@ package org.openforis.collect.presenter {
 			if(item == null && _view.defaultValue != null) {
 				item = getItem(_view.defaultValue);
 			}
-			contextMenu.updateItems();
-			_view.editable = Application.activeRecord.step != CollectRecord$Step.ANALYSIS;
+			_view.editable = Application.activeRecordEditable;
 			_view.dropDownList.selectedItem = item;
 			_view.hasRemarks = hasRemarks;
+			contextMenu.updateItems();
 		}
 		
 		override protected function keyDownHandler(event:KeyboardEvent):void {

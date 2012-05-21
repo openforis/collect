@@ -87,7 +87,7 @@ package org.openforis.collect.presenter {
 			if(firstOpen) {
 				view = new RemarksPopUp();
 			}
-			view.editable = Application.activeRecord.step != CollectRecord$Step.ANALYSIS;
+			view.editable = Application.activeRecordEditable;
 			_inputField = inputField;
 
 			if(! popUpOpened) {
@@ -142,7 +142,7 @@ package org.openforis.collect.presenter {
 					var attrName:String = _inputField.attributeDefinition.name;
 					nodeEvent.nodes = _inputField.parentEntity.getChildren(attrName);
 				} else {
-					nodeEvent.nodeProxy = _inputField.attribute;
+					nodeEvent.node = _inputField.attribute;
 					nodeEvent.fieldIdx = _inputField.fieldIndex;
 				}
 				EventDispatcherFactory.getEventDispatcher().dispatchEvent(nodeEvent);

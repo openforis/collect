@@ -30,6 +30,7 @@ package org.openforis.collect {
 		
 		private static var _activeSurvey:SurveyProxy;
 		private static var _activeRecord:RecordProxy;
+		private static var _activeRecordEditable:Boolean;
 		private static var _activeRootEntity:EntityDefinitionProxy;
 		private static var _activeStep:CollectRecord$Step;
 		private static var _serverOffline:Boolean;
@@ -115,6 +116,15 @@ package org.openforis.collect {
 		
 		public static function set activeRecord(record:RecordProxy):void{
 			_activeRecord = record;
+		}
+		
+		[Bindable]
+		public static function get activeRecordEditable():Boolean {
+			return _activeRecordEditable;
+		}
+		
+		public static function set activeRecordEditable(value:Boolean):void{
+			_activeRecordEditable = value;
 		}
 		
 		[Bindable]

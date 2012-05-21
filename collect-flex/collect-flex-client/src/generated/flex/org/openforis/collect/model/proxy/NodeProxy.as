@@ -6,7 +6,11 @@
  */
 
 package org.openforis.collect.model.proxy {
+	import mx.collections.IList;
 
+	/**
+	 * @author S. Ricci
+	 */
     [Bindable]
     [RemoteClass(alias="org.openforis.collect.model.proxy.NodeProxy")]
     public class NodeProxy extends NodeProxyBase {
@@ -15,6 +19,55 @@ package org.openforis.collect.model.proxy {
 
 		public function hasErrors():Boolean {
 			return false;
+		}
+		
+		public function get empty():Boolean {
+			return true;
+		}
+		
+		public function get index():int {
+			if ( parent == null ) {
+				return 0;
+			} else {
+				var children:IList = parent.getChildren(name);
+				var idx:int = children.getItemIndex(this);
+				return idx;
+			}
+		}
+		
+		public function getNextSibling(offset:int = 1):NodeProxy {
+			return getSibling(offset);
+		}
+		
+		public function getPreviousSibling(offset:int = 1):NodeProxy {
+			return getSibling(-offset);
+		}
+
+		public function getSibling(offset:int):NodeProxy {
+			var result:NodeProxy = null;
+			var siblings:IList = getSiblings();
+			if ( siblings != null ) {
+				var itemIndex:int = siblings.getItemIndex(this);
+				var resultIndex:int = itemIndex + offset;
+				if ( resultIndex < 0 ) {
+					resultIndex = 0;
+				} else if ( resultIndex > siblings.length - 1 ) {
+					resultIndex = siblings.length - 1;
+				}
+				if ( resultIndex != itemIndex ) {
+					result = NodeProxy(siblings.getItemAt(resultIndex));
+				}
+			}
+			return result;
+		}
+		
+		public function getSiblings():IList {
+			if ( parent != null ) {
+				var result:IList = parent.getChildren(name);
+				return result;
+			} else {
+				return null;
+			}
 		}
 		
     }

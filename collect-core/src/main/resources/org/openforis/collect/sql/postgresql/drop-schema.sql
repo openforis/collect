@@ -45,9 +45,6 @@ ALTER TABLE "collect"."ofc_user_role"
 	DROP CONSTRAINT "ofc_user_user_role_fkey" CASCADE 
 GO
 ALTER TABLE "collect"."ofc_record"
-	DROP CONSTRAINT "ofc_record_locked_by_user_fkey" CASCADE 
-GO
-ALTER TABLE "collect"."ofc_record"
 	DROP CONSTRAINT "ofc_record_created_by_user_fkey" CASCADE 
 GO
 ALTER TABLE "collect"."ofc_record"

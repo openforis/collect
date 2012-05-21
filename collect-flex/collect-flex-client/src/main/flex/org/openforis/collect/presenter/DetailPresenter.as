@@ -3,10 +3,15 @@ package org.openforis.collect.presenter {
 	 * 
 	 * @author S. Ricci
 	 * */
+	import flash.display.DisplayObject;
 	import flash.events.Event;
+	import flash.events.KeyboardEvent;
 	import flash.events.MouseEvent;
+	import flash.ui.Keyboard;
 	
 	import mx.binding.utils.ChangeWatcher;
+	import mx.core.FlexGlobals;
+	import mx.managers.PopUpManager;
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.events.ResultEvent;
 	
@@ -21,16 +26,20 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.model.CollectRecord$Step;
 	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.model.proxy.RecordProxy;
+	import org.openforis.collect.model.proxy.UserProxy;
 	import org.openforis.collect.ui.UIBuilder;
+	import org.openforis.collect.ui.component.ErrorListPopUp;
 	import org.openforis.collect.ui.component.detail.FormContainer;
 	import org.openforis.collect.ui.view.DetailView;
 	import org.openforis.collect.util.AlertUtil;
+	import org.openforis.collect.util.PopUpUtil;
 	import org.openforis.collect.util.StringUtil;
 
 	public class DetailPresenter extends AbstractPresenter {
 	
 		private var _dataClient:DataClient;
 		private var _view:DetailView;
+		private var _errorsListPopUp:ErrorListPopUp;
 		
 		public function DetailPresenter(view:DetailView) {
 			this._view = view;
@@ -45,8 +54,9 @@ package org.openforis.collect.presenter {
 			_view.rejectButton.addEventListener(MouseEvent.CLICK, rejectButtonClickHandler);
 			eventDispatcher.addEventListener(ApplicationEvent.UPDATE_RESPONSE_RECEIVED, updateResponseReceivedHandler);
 			eventDispatcher.addEventListener(ApplicationEvent.RECORD_SAVED, recordSavedHandler);
-
 			eventDispatcher.addEventListener(UIEvent.ACTIVE_RECORD_CHANGED, activeRecordChangedListener);
+			
+			_view.stage.addEventListener(KeyboardEvent.KEY_DOWN, stageKeyDownHandler);
 		}
 		
 		/**
@@ -54,6 +64,7 @@ package org.openforis.collect.presenter {
 		 * */
 		internal function activeRecordChangedListener(event:UIEvent):void {
 			var activeRecord:RecordProxy = Application.activeRecord;
+			var step:CollectRecord$Step = activeRecord.step;
 			var version:ModelVersionProxy = activeRecord.version;
 			var rootEntityDefn:EntityDefinitionProxy = Application.activeRootEntity;
 			var rootEntity:EntityProxy = activeRecord.rootEntity;
@@ -63,28 +74,16 @@ package org.openforis.collect.presenter {
 			ChangeWatcher.watch(rootEntity, "keyText", updateRecordKeyLabel);
 			
 			_view.formVersionText.text = version.getLabelText();
-			switch(activeRecord.step) {
-				case CollectRecord$Step.ENTRY:
-					_view.currentPhaseText.text = Message.get("edit.dataEntry");
-					break;
-				case CollectRecord$Step.CLEANSING:
-					_view.currentPhaseText.text = Message.get("edit.dataCleansing");
-					break;
-				case CollectRecord$Step.ANALYSIS:
-					_view.currentPhaseText.text = Message.get("edit.dataAnalysis");
-					break;
-			}
+			_view.currentPhaseText.text = getStepLabel(step);
 			
-			var canSubmit:Boolean = activeRecord.step == CollectRecord$Step.ENTRY || 
-				activeRecord.step == CollectRecord$Step.CLEANSING;
+			var user:UserProxy = Application.user;
+			var canSubmit:Boolean = user.canSubmit(activeRecord);
 			_view.submitButton.visible = _view.submitButton.includeInLayout = canSubmit;
 			
-			var canReject:Boolean = activeRecord.step == CollectRecord$Step.CLEANSING || 
-				activeRecord.step == CollectRecord$Step.ANALYSIS;
+			var canReject:Boolean = user.canReject(activeRecord);
 			_view.rejectButton.visible = _view.rejectButton.includeInLayout = canReject;
 			
-			var canSave:Boolean = activeRecord.step != CollectRecord$Step.ANALYSIS;
-			_view.saveButton.visible = canSave;
+			_view.saveButton.visible = Application.activeRecordEditable;
 			
 			var form:FormContainer = null;
 			if (_view.formsContainer.contatinsForm(version,rootEntityDefn)){
@@ -136,18 +135,38 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function saveButtonClickHandler(event:MouseEvent):void {
+			performSaveActiveRecord();
+		}
+		
+		protected function performSaveActiveRecord():void {
 			_dataClient.saveActiveRecord(saveActiveRecordResultHandler, faultHandler);
 		}
 		
 		protected function submitButtonClickHandler(event:MouseEvent):void {
-			var messageResource:String;
 			var r:RecordProxy = Application.activeRecord;
-			if(r.step == CollectRecord$Step.ENTRY) {
-				messageResource = "edit.confirmSubmitDataCleansing";
-			} else if(r.step == CollectRecord$Step.CLEANSING) {
-				messageResource = "edit.confirmSubmitDataAnalysis";
+			r.showErrors();
+			var applicationEvent:ApplicationEvent = new ApplicationEvent(ApplicationEvent.ASK_FOR_SUBMIT);
+			eventDispatcher.dispatchEvent(applicationEvent);
+			var totalErrors:int = r.errors + r.missingErrors + r.skipped;
+			if ( totalErrors > 0 ) {
+				openErrorsListPopUp();
+			} else {
+				var messageResource:String;
+				if(r.step == CollectRecord$Step.ENTRY) {
+					messageResource = "edit.confirmSubmitDataCleansing";
+				} else if(r.step == CollectRecord$Step.CLEANSING) {
+					messageResource = "edit.confirmSubmitDataAnalysis";
+				}
+				AlertUtil.showConfirm(messageResource, null, null, performSubmit);
 			}
-			AlertUtil.showConfirm(messageResource, null, null, performSubmit);
+		}
+		
+		protected function openErrorsListPopUp():void {
+			if ( _errorsListPopUp != null ) {
+				PopUpManager.removePopUp(_errorsListPopUp);
+				_errorsListPopUp = null;
+			}
+			_errorsListPopUp = ErrorListPopUp(PopUpUtil.createPopUp(ErrorListPopUp, false));
 		}
 		
 		protected function rejectButtonClickHandler(event:MouseEvent):void {
@@ -185,18 +204,26 @@ package org.openforis.collect.presenter {
 		}
 		
 		internal function promoteRecordResultHandler(event:ResultEvent, token:Object = null):void {
+			var rootEntity:EntityDefinitionProxy = Application.activeRootEntity;
+			var rootEntityLabel:String = rootEntity.getLabelText();
 			var r:RecordProxy = Application.activeRecord;
 			var keyLabel:String = r.rootEntity.keyText;
-			AlertUtil.showMessage("edit.recordSubmitted", [keyLabel]);
+			var actualStep:CollectRecord$Step = getNextStep(r.step);
+			var stepLabel:String = getStepLabel(actualStep).toLowerCase();
+			AlertUtil.showMessage("edit.recordSubmitted", [rootEntityLabel, keyLabel, stepLabel], "edit.recordSubmittedTitle", [rootEntityLabel]);
 			Application.activeRecord = null;
 			var uiEvent:UIEvent = new UIEvent(UIEvent.BACK_TO_LIST);
 			eventDispatcher.dispatchEvent(uiEvent);
 		}
 		
 		internal function rejectRecordResultHandler(event:ResultEvent, token:Object = null):void {
+			var rootEntity:EntityDefinitionProxy = Application.activeRootEntity;
+			var rootEntityLabel:String = rootEntity.getLabelText();
 			var r:RecordProxy = Application.activeRecord;
 			var keyLabel:String = r.rootEntity.keyText;
-			AlertUtil.showMessage("edit.recordRejected", [keyLabel]);
+			var actualStep:CollectRecord$Step = getPreviousStep(r.step);
+			var stepLabel:String = getStepLabel(actualStep).toLowerCase();
+			AlertUtil.showMessage("edit.recordRejected", [rootEntityLabel, keyLabel, stepLabel], "edit.recordRejectedTitle", [rootEntityLabel]);
 			Application.activeRecord = null;
 			var uiEvent:UIEvent = new UIEvent(UIEvent.BACK_TO_LIST);
 			eventDispatcher.dispatchEvent(uiEvent);
@@ -204,6 +231,49 @@ package org.openforis.collect.presenter {
 		
 		protected function updateResponseReceivedHandler(event:ApplicationEvent):void {
 			//update 
+		}
+		
+		protected function stageKeyDownHandler(event:KeyboardEvent):void {
+			if ( Application.activeRecordEditable && event.ctrlKey && event.keyCode == Keyboard.S ) {
+				performSaveActiveRecord();
+			}
+		}
+		
+		public static function getNextStep(step:CollectRecord$Step):CollectRecord$Step {
+			switch ( step ) {
+				case CollectRecord$Step.ENTRY:
+					return CollectRecord$Step.CLEANSING;
+				case CollectRecord$Step.CLEANSING:
+					return CollectRecord$Step.ANALYSIS;
+				default:
+					return null;
+					
+			}
+		}
+		
+		public static function getPreviousStep(step:CollectRecord$Step):CollectRecord$Step {
+			switch ( step ) {
+				case CollectRecord$Step.CLEANSING:
+					return CollectRecord$Step.ENTRY;
+				case CollectRecord$Step.ANALYSIS:
+					return CollectRecord$Step.CLEANSING;
+				default:
+					return null;
+					
+			}
+		}
+
+		public static function getStepLabel(step:CollectRecord$Step):String {
+			switch ( step ) {
+				case CollectRecord$Step.ENTRY:
+					return Message.get("edit.dataEntry");
+				case CollectRecord$Step.CLEANSING:
+					return Message.get("edit.dataCleansing");
+				case CollectRecord$Step.ANALYSIS:
+					return Message.get("edit.dataAnalysis");
+				default:
+					return null;
+			}
 		}
 	}
 }

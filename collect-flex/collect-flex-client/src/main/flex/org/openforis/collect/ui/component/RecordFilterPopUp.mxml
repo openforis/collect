@@ -1,21 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
+<component:PopUp xmlns:fx="http://ns.adobe.com/mxml/2009" 
 			   xmlns:s="library://ns.adobe.com/flex/spark" 
 			   xmlns:mx="library://ns.adobe.com/flex/mx"
 			   xmlns:detail="org.openforis.collect.ui.component.detail.*" 
 			   xmlns:input="org.openforis.collect.ui.component.input.*"
+			   xmlns:component="org.openforis.collect.ui.component.*"
 			   creationPolicy="all"
 			   width="240"
-			   title="{Message.get('list.filterTitle')}"
+			   title="{Message.get('list.filterTitle')}" 
 			   >
-	<s:layout>
+	<component:layout>
 		<s:VerticalLayout
 			paddingBottom="10"
 			paddingLeft="10"
 			paddingRight="10"
 			paddingTop="10"
 			/>
-	</s:layout>
+	</component:layout>
 	
 	<fx:Script>
 		<![CDATA[
@@ -59,4 +60,4 @@
 				  label="{Message.get('global.apply')}"/>
 	</s:HGroup>
 	
-</s:TitleWindow>
+</component:PopUp>

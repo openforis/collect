@@ -18,6 +18,7 @@ package org.openforis.collect.model.proxy {
 	import org.openforis.collect.remoting.service.UpdateRequestOperation;
 	import org.openforis.collect.remoting.service.UpdateRequestOperation$Method;
 	import org.openforis.collect.remoting.service.UpdateResponse;
+	import org.openforis.collect.util.ArrayUtil;
 
     [Bindable]
     [RemoteClass(alias="org.openforis.collect.model.proxy.RecordProxy")]
@@ -41,10 +42,10 @@ package org.openforis.collect.model.proxy {
 		 * Traverse all the record's nodes and execute the argument function passing
 		 * the visited node to it
 		 * */
-		public function traverse(fun:Function):void {
-			if(rootEntity != null) {
-				fun(rootEntity);
-				rootEntity.traverse(fun);
+		public function traverse(funct:Function):void {
+			if ( rootEntity != null ) {
+				funct(rootEntity);
+				rootEntity.traverse(funct);
 			}
 		}
 		
@@ -63,6 +64,17 @@ package org.openforis.collect.model.proxy {
 			for each (var response:UpdateResponse in responses)	{
 				processResponse(response);
 			}
+			
+			if ( responses != null && responses.length > 0 ) {
+				var firstResp:UpdateResponse = UpdateResponse(responses.getItemAt(0));
+				this.errors = firstResp.errors;
+				this.skipped = firstResp.skipped;
+				this.missing = firstResp.missing;
+				this.missingErrors = firstResp.missingErrors;
+				this.missingWarnings = firstResp.missingWarnings;
+				this.warnings = firstResp.warnings;
+			}
+			
 			_updated = true;
 			
 			var appEvt:ApplicationEvent = new ApplicationEvent(ApplicationEvent.UPDATE_RESPONSE_RECEIVED);
@@ -92,6 +104,19 @@ package org.openforis.collect.model.proxy {
 								field.symbol = reqOp.symbol;
 								field.remarks = reqOp.remarks;
 							}
+						}
+						break;
+					case UpdateRequestOperation$Method.APPLY_DEFAULT_VALUE:
+						//nullify the symbol (if any)
+						attr = getNode(reqOp.nodeId) as AttributeProxy;
+						for each (field in attr.fields) {
+							field.symbol = null;
+						}
+						break;
+					case UpdateRequestOperation$Method.CONFIRM_ERROR:
+						attr = getNode(reqOp.nodeId) as AttributeProxy;
+						if ( attr != null ) {
+							attr.errorConfirmed = true;
 						}
 						break;
 				}
@@ -152,7 +177,17 @@ package org.openforis.collect.model.proxy {
 		}
 		
 		public function showErrors():void {
-			rootEntity.showErrorsOnDescendants();
+			var stack:Array = new Array();
+			stack.push(rootEntity);
+			while ( stack.length > 0 ) {
+				var entity:EntityProxy = stack.pop();
+				var childDefinitionNames:IList = entity.childDefinitionNames;
+				for each (var name:String in childDefinitionNames) {
+					entity.showChildrenErrorsMap.put(name, true);
+				}
+				var childrenEntities:IList = entity.getChildEntities();
+				ArrayUtil.addAll(stack, childrenEntities.toArray());
+			}
 		}
 		
 		public function get updated():Boolean {

@@ -12,6 +12,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.ui.component.detail.AttributeItemRenderer;
 	import org.openforis.collect.ui.component.detail.ValidationDisplayManager;
 	import org.openforis.collect.ui.component.input.InputField;
+	import org.openforis.collect.util.CollectionUtil;
 	
 	/**
 	 * 
@@ -36,8 +37,10 @@ package org.openforis.collect.presenter {
 		override internal function initEventListeners():void {
 			super.initEventListeners();
 			eventDispatcher.addEventListener(ApplicationEvent.RECORD_SAVED, recordSavedHandler);
+			eventDispatcher.addEventListener(ApplicationEvent.ASK_FOR_SUBMIT, askForSubmitHandler);
 			eventDispatcher.addEventListener(ApplicationEvent.UPDATE_RESPONSE_RECEIVED, updateResponseReceivedHandler);
 			BindingUtils.bindSetter(setAttribute, _view, "attribute");
+			BindingUtils.bindSetter(setAttributes, _view, "attributes");
 		}
 		
 		protected function initValidationDisplayManager():void {
@@ -56,17 +59,38 @@ package org.openforis.collect.presenter {
 			updateValidationDisplayManager();
 		}
 		
+		protected function askForSubmitHandler(event:ApplicationEvent):void {
+			updateValidationDisplayManager();
+		}
+		
 		protected function updateResponseReceivedHandler(event:ApplicationEvent):void {
-			if(_view.attribute != null) {
+			if(_view.parentEntity != null && _view.attribute != null || _view.attributes != null) {
 				var responses:IList = IList(event.result);
-				for each (var response:UpdateResponse in responses) {
-					if(response.nodeId == _view.attribute.id ||
-						response.nodeId == _view.parentEntity.id) {
-						updateValidationDisplayManager();
-						break;
-					}
+				if ( nodeUpdated(responses) ) {
+					updateView();
+				} else if ( parentEntityUpdated(responses) ) {
+					updateValidationDisplayManager();
 				}
 			}
+		}
+		
+		protected function nodeUpdated(responses:IList):Boolean {
+			for each (var response:UpdateResponse in responses) {
+				if ( _view.attribute != null && _view.attribute.id == response.nodeId ||
+					 _view.attributes != null && CollectionUtil.containsItemWith(_view.attributes, "id", response.nodeId) ) {
+					return true;
+				}
+			}
+			return false;
+		}
+		
+		protected function parentEntityUpdated(responses:IList):Boolean {
+			for each (var response:UpdateResponse in responses) {
+				if ( response.nodeId == _view.parentEntity.id ) {
+					return true;
+				}
+			}
+			return false;
 		}
 		
 		protected function fieldVisitedHandler(event:PropertyChangeEvent):void {
@@ -84,7 +108,12 @@ package org.openforis.collect.presenter {
 		
 		protected function setAttribute(attribute:AttributeProxy):void {
 			_view.visited = false;
-			updateValidationDisplayManager();
+			updateView();
+		}
+		
+		protected function setAttributes(attributes:IList):void {
+			_view.visited = false;
+			updateView();
 		}
 		
 		protected function updateValidationDisplayManager():void {
@@ -94,15 +123,54 @@ package org.openforis.collect.presenter {
 				}
 				var attributeName:String = _view.attributeDefinition.name;
 				var visited:Boolean = _view.parentEntity.isErrorOnChildVisible(attributeName);
-				var active:Boolean = !_updating && _view.attribute != null && visited;
+				var active:Boolean = visited && !_updating && (_view.attribute != null || _view.attributes != null);
 				if(active) {
 					_validationDisplayManager.active = true;
-					_validationDisplayManager.displayNodeValidation(_view.parentEntity, _view.attributeDefinition, _view.attribute);
+					if (_view.attribute != null ) {
+						_validationDisplayManager.displayAttributeValidation(_view.parentEntity, _view.attributeDefinition, _view.attribute);
+					} else {
+						_validationDisplayManager.displayAttributesValidation(_view.parentEntity, _view.attributeDefinition);
+					}
 				} else {
 					_validationDisplayManager.active = false;
 					_validationDisplayManager.reset();
 				}
 			}
+		}
+		
+		protected function isErrorConfirmed():Boolean {
+			var result:Boolean = false;
+			if ( _view.parentEntity != null ) {
+				if ( _view.attribute != null ) {
+					result = _view.attribute.errorConfirmed;
+				} else if ( CollectionUtil.isNotEmpty(_view.attributes) ) {
+					for each (var a:AttributeProxy in _view.attributes) {
+						if ( a.errorConfirmed ) {
+							result = true;
+							break;
+						}
+					}
+				}
+			}
+			return result;
+		}
+		
+		/*
+		protected function isMissingValueApproved():Boolean {
+			var result:Boolean = false;
+			if ( _view.parentEntity != null && _view.attributeDefinition != null ) {
+				var attributeName:String = _view.attributeDefinition.name;
+				//to do
+			}
+			return result;
+		}
+		*/
+		
+		protected function updateView():void {
+			//var errorConfirmed:Boolean = isErrorConfirmed();
+			//_view.approved = errorConfirmed;
+			
+			updateValidationDisplayManager();
 		}
 
 	}

@@ -1,26 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
+<component:PopUp xmlns:fx="http://ns.adobe.com/mxml/2009" 
 		 xmlns:s="library://ns.adobe.com/flex/spark" 
 		 xmlns:mx="library://ns.adobe.com/flex/mx"
 		 xmlns:component="org.openforis.collect.ui.component.*"
-		 width="400" height="300"
+		 currentState="{STATE_LOADING}"
+		 width="400" height="300" height.partialExportParametersSelection="500"
 		 title="{Message.get('export.popUp.title')}"
 		 >
 	
 	<fx:Script>
 		<![CDATA[
 			import org.openforis.collect.i18n.Message;
+			import org.openforis.collect.model.CollectRecord$Step;
+			import org.openforis.collect.presenter.DataExportPopUpPresenter;
 			
-			public static const STATE_DEFAULT:String = "default";
+			public static const STATE_LOADING:String = "loading";
+			public static const STATE_TYPE_SELECTION:String = "typeSelection";
+			public static const STATE_PARAMETERS_SELECTION:String = "parametersSelection";
+			public static const STATE_PARTIAL_EXPORT_PARAMETERS_SELECTION:String = "partialExportParametersSelection";
 			public static const STATE_EXPORTING:String = "exporting";
 			public static const STATE_COMPLETE:String = "complete";
-			
-		]]>
-	</fx:Script>
-	
-	<fx:Script>
-		<![CDATA[
-			import org.openforis.collect.presenter.DataExportPopUpPresenter;
 			
 			private var _presenter:DataExportPopUpPresenter;
 
@@ -28,40 +27,142 @@
 				super.initializationComplete();
 				_presenter = new DataExportPopUpPresenter(this);
 			}
+			
+			protected function stepLabelFunction(step:Object):String {
+				switch(step) {
+					case CollectRecord$Step.ENTRY:
+						return Message.get("edit.dataEntry");
+					case CollectRecord$Step.CLEANSING:
+						return Message.get("edit.dataCleansing");
+					case CollectRecord$Step.ANALYSIS:
+						return Message.get("edit.dataAnalysis");
+					default:
+						return step.label;
+				} 
+			}
+			
 		]]>
 	</fx:Script>
 	
-	<s:states>
-		<s:State name="default" />
+	<fx:Declarations>
+		<s:RadioButtonGroup id="typeGroup" />
+	</fx:Declarations>
+	
+	<component:states>
+		<s:State name="loading" />
+		<s:State name="typeSelection" />
+		<s:State name="parametersSelection" basedOn="typeSelection" />
+		<s:State name="partialExportParametersSelection" basedOn="parametersSelection" />
 		<s:State name="exporting" />
 		<s:State name="complete" />
-	</s:states>
+	</component:states>
 	
-	<s:VGroup includeIn="default" 
+	<component:transitions>
+		<s:Transition fromState="*" toState="partialExportParametersSelection">
+			<s:Parallel>
+				<s:Resize target="{this}" 
+						  heightFrom="300" 
+						  heightTo="500" />
+				<s:Fade target="{parametersSelectionContainer}"
+						alphaFrom="0.3"
+						alphaTo="1"
+						duration="2000" />
+			</s:Parallel>
+		</s:Transition>
+		<s:Transition fromState="partialExportParametersSelection" toState="*">
+			<s:Parallel>
+				<s:Resize target="{this}" 
+						  heightFrom="500" 
+						  heightTo="300" />
+			</s:Parallel>
+		</s:Transition>
+	</component:transitions>
+	
+	<s:Group includeIn="loading"
+			 width="100%" height="100%">
+		<component:LoadingContent />
+	</s:Group>
+	<s:VGroup includeIn="typeSelection"
 			  itemCreationPolicy="immediate"
+			  horizontalAlign="center"
 			  width="100%" height="100%"
-			  horizontalAlign="center">
-		
-		<s:VGroup width="100%" height="100%">
-			<s:Label text="{Message.get('export.entitySelectionLabel')}" />
+			  gap="30"
+			  >
+		<s:VGroup gap="4" 
+				  horizontalAlign="center">
 			
-			<mx:Tree id="rootTree"
-					 height="100%"
-					 width="100%"
-					 />
+			<s:Label text="{Message.get('export.selectTypeLabel')}"
+					 styleName="formLabel" />
+			
+			<s:VGroup>
+				<s:RadioButton id="typeFull"
+							   label="{Message.get('export.typeFullLabel')}"
+							   value="full"
+							   group="{typeGroup}"
+							   />
+				<s:RadioButton id="typePartial"
+							   label="{Message.get('export.typeSelectiveLabel')}"
+							   value="partial"
+							   group="{typeGroup}"
+							   />
+			</s:VGroup>
+		</s:VGroup>
+			
+		<s:VGroup id="parametersSelectionContainer"
+				  horizontalAlign="center"
+				  width="100%" height="100%"
+				  gap="30"
+				  visible="false" includeInLayout="false"
+				  visible.parametersSelection="true" includeInLayout.parametersSelection="true"
+				  >
+			<s:HGroup verticalAlign="middle">
+				<s:Label text="{Message.get('export.selectStepLabel')}"
+						 styleName="formLabel"/>
+				<s:DropDownList id="stepDropDownList" labelFunction="stepLabelFunction" prompt="{Message.get('global.dropDownPrompt')} "/>
+			</s:HGroup>
+			
+			<s:VGroup visible="false" visible.partialExportParametersSelection="true"
+					  includeInLayout="false" includeInLayout.partialExportParametersSelection="true"
+					  horizontalAlign="center"
+					  gap="4"
+					  width="100%" 
+					  height="100%">
+				<s:Label text="{Message.get('export.entitySelectionLabel')}"
+						 styleName="formLabel"/>
+				
+				<mx:Tree id="rootTree"
+						 height="100%"
+						 width="100%"
+						 defaultLeafIcon="{null}"
+						 folderOpenIcon="{null}"
+						 folderClosedIcon="{null}"
+						 />
+			</s:VGroup>
 		</s:VGroup>
 		
-		<s:HGroup>
-			<s:Button id="exportButton" label="{Message.get('export.exportLabel')}" />
+		<s:HGroup horizontalAlign="center" width="100%" gap="40">
+			<s:Button id="exportButton"
+					  visible="false" visible.parametersSelection="true"
+					  includeInLayout="false" includeInLayout.parametersSelection="true"
+					  label="{Message.get('export.exportLabel')}"
+					  useHandCursor="true" 
+					  buttonMode="true"
+					  />
+			
+			<s:Button id="closeButton1"
+					  label="{Message.get('global.cancel')}"
+					  useHandCursor="true" 
+					  buttonMode="true" />
 		</s:HGroup>
 	</s:VGroup>
-		
+	
 	<s:VGroup includeIn="exporting" 
 			  itemCreationPolicy="immediate"
 			  width="100%" height="100%"
 			  horizontalAlign="center"
 			  verticalAlign="middle"
 			  gap="30">
+		
 		<mx:ProgressBar id="progressBar"
 						horizontalCenter="0"
 						verticalCenter="0"
@@ -73,8 +174,10 @@
 		
 		<s:Label id="progressLabel" />
 
-		<s:Button id="cancelButton"
+		<s:Button id="cancelExportButton"
 				  label="{Message.get('global.cancel')}"
+				  useHandCursor="true" 
+				  buttonMode="true"
 				  />
 	</s:VGroup>
 		
@@ -84,10 +187,23 @@
 			 verticalAlign="middle"
 			 gap="20"
 			 >
-		<s:Label text="{Message.get('export.complete')}" />
+		<s:Label text="{Message.get('export.complete')}"
+				 styleName="infoMessage"
+				 />
 		
-		<s:Button id="downloadButton" 
-				  label="{Message.get('global.download')}" />
+		<s:HGroup gap="30">
+			<s:Button id="downloadButton" 
+					  label="{Message.get('global.download')}"
+					  useHandCursor="true" 
+					  buttonMode="true"
+					  />
+			
+			<s:Button id="closeButton3"
+					  label="{Message.get('global.close')}"
+					  useHandCursor="true" 
+					  buttonMode="true"
+					  />
+		</s:HGroup>
 	</s:VGroup>
 	
-</s:TitleWindow>
+</component:PopUp>

@@ -198,8 +198,8 @@
 			<s:VerticalLayout gap="4" />
 		</s:layout>
 		<s:Group id="addSection" 
-				 includeInLayout="{entityDefinition.multiple}" 
-				 visible="{entityDefinition.multiple}">
+				 includeInLayout="{entityDefinition.multiple &amp;&amp; entityDefinition.parent != null}" 
+				 visible="{entityDefinition.multiple &amp;&amp; entityDefinition.parent != null}">
 			<s:layout>
 				<s:HorizontalLayout paddingTop="5" horizontalAlign="left" paddingLeft="10" gap="12" verticalAlign="middle" />
 			</s:layout>
@@ -214,22 +214,22 @@
 					  styleName="addButton" 
 					  buttonMode="true" 
 					  useHandCursor="true"
-					  visible="{Application.activeRecord.step != CollectRecord$Step.ANALYSIS}" 
-					  includeInLayout="{Application.activeRecord.step != CollectRecord$Step.ANALYSIS}" 
+					  visible="{Application.activeRecordEditable}" 
+					  includeInLayout="{Application.activeRecordEditable}" 
 					  />
 			<s:Button id="deleteButton" 
 					  styleName="deleteButton" 
 					  buttonMode="true" 
 					  useHandCursor="true"
-					  visible="{Application.activeRecord.step != CollectRecord$Step.ANALYSIS &amp;&amp; dropDownList.selectedIndex >= 0}" 
-					  includeInLayout="{Application.activeRecord.step != CollectRecord$Step.ANALYSIS &amp;&amp; dropDownList.selectedIndex >= 0}" 
+					  visible="{Application.activeRecordEditable &amp;&amp; dropDownList.selectedIndex >= 0}" 
+					  includeInLayout="{Application.activeRecordEditable &amp;&amp; dropDownList.selectedIndex >= 0}" 
 					  />
 		</s:Group>
 		<s:Group id="internalContainer" 
 				 height="100%" width="100%"
 				 showEffect="{showFormEffect}" 
 				 hideEffect="{hideFormEffect}"
-				 visible="{! entityDefinition.multiple || dropDownList.selectedItem != null}"
+				 visible="{! entityDefinition.multiple || entityDefinition.parent == null || dropDownList.selectedItem != null}"
 				 >
 			<s:VGroup id="tabbedContainer" 
 					  width="100%" height="100%" 

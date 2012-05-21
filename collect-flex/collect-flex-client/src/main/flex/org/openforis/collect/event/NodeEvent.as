@@ -20,15 +20,19 @@ package org.openforis.collect.event {
 		public static const CONFIRM_ERROR:String = "nodeEventConfirmError";
 		public static const APPROVE_MISSING:String = "nodeEventApproveMissing";
 		public static const DELETE_NODE:String = "nodeEventDeleteNode";
+		public static const APPLY_DEFAULT_VALUE:String = "nodeEventApplyDefaultValue";
+		public static const MOVE:String = "move";
 		
 		private var _inputField:InputField;
 		private var _parentEntity:EntityProxy;
 		private var _nodeName:String;
-		private var _nodeProxy:NodeProxy;
+		private var _node:NodeProxy;
 		private var _fieldIdx:Number;
 		private var _nodes:IList;
 		private var _symbol:FieldSymbol;
 		private var _remarks:String;
+		private var _applyToNonEmptyNodes:Boolean = true;
+		private var _index:int;
 		
 		public function NodeEvent(type:String, bubbles:Boolean=false, cancelable:Boolean=false) {
 			super(type, bubbles, cancelable);
@@ -50,12 +54,12 @@ package org.openforis.collect.event {
 			_symbol = value;
 		}
 
-		public function get nodeProxy():NodeProxy {
-			return _nodeProxy;
+		public function get node():NodeProxy {
+			return _node;
 		}
 
-		public function set nodeProxy(value:NodeProxy):void {
-			_nodeProxy = value;
+		public function set node(value:NodeProxy):void {
+			_node = value;
 		}
 
 		public function get fieldIdx():Number {
@@ -98,6 +102,21 @@ package org.openforis.collect.event {
 			_nodeName = value;
 		}
 
+		public function get applyToNonEmptyNodes():Boolean {
+			return _applyToNonEmptyNodes;
+		}
 
+		public function set applyToNonEmptyNodes(value:Boolean):void {
+			_applyToNonEmptyNodes = value;
+		}
+
+		public function get index():int {
+			return _index;
+		}
+		
+		public function set index(value:int):void {
+			_index = value;
+		}
+		
 	}
 }

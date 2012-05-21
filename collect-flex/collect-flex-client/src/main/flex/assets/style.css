@@ -27,6 +27,11 @@ s|Button.expand {
 	skin-class: ClassReference('org.openforis.collect.ui.skin.ExpandButtonSkin');
 }
 
+s|ToggleButton.filter {
+	icon: Embed(source='assets/images/filter.png');
+	cornerRadius: 5;
+}
+
 view|Footer {
 	padding-bottom: 5;
 }
@@ -97,7 +102,7 @@ component|BlockingMessagePopUp, component|SelectVersionPopUp, input|CodeListDial
 	background-alpha: 1.0;
 }
 
-component|BlockingMessagePopUp, component|SelectVersionPopUp, input|CodeListDialog {
+component|BlockingMessagePopUp, component|SelectVersionPopUp, input|CodeListDialog, component|DataExportPopUp, component|BackupPopUp {
 	showCloseButton: false;
 }
 
@@ -115,7 +120,7 @@ mx|ToolTip {
 }
 
 /* validation tooltips */
-mx|ToolTip.error, mx|ToolTip.warning {
+mx|ToolTip.error, mx|ToolTip.warning, mx|ToolTip.warningConfirmedError {
 	borderSkin: ClassReference("org.openforis.collect.ui.skin.ToolTipBorder");
 	color: #FFFFFF;
 	fontSize: 10;
@@ -128,16 +133,16 @@ mx|ToolTip.error {
 	borderColor: #CE2929;
 }
 
-mx|ToolTip.warning {
+mx|ToolTip.warning, mx|ToolTip.warningConfirmedError {
 	borderColor: #FF8800;
 }
 
 detail|AttributeItemRenderer {
-	skinClass: ClassReference("org.openforis.collect.ui.skin.AttributeRendererSkin");
+	borderColor: #FFFFFF;
+	borderWeight: 1;
 }
 
-detail|AttributeItemRenderer, 
-	detail|MultipleAttributeFormItem s|BorderContainer, 
+detail|MultipleAttributeFormItem s|BorderContainer, 
 	detail|SingleEntityFormItem s|BorderContainer,
 	detail|MultipleEntityFormItem s|BorderContainer  {
 	borderColor: #FFFFFF;
@@ -182,6 +187,14 @@ input|TextInput.warning, mx|TextArea.warning {
 
 input|TextInput.remarksPresent, mx|TextArea.remarksPresent {
 	remarksPresentIconVisible: true;
+}
+
+input|TextInput.readOnly, mx|TextArea.readOnly {
+	contentBackgroundColor: #ECECEC;
+}
+
+.notRelevant input|TextInput.readOnly, .notRelevant mx|TextArea.readOnly { 
+	contentBackgroundColor: #DDDDDD;
 }
 
 s|BorderContainer.entityForm {
@@ -259,5 +272,14 @@ s|Label.indent {
 
 .dataGroupHeader {
 	skinClass: ClassReference("org.openforis.collect.ui.skin.DataGroupHeaderSkin");
+}
+
+.formLabel {
+	fontWeight: bold;
+}
+
+.infoMessage {
+	fontWeight: bold;
+	fontSize: 14;
 }
 
