@@ -119,7 +119,6 @@ package org.openforis.collect.ui.component.input {
 				if ( textInput.hasOwnProperty("editable") ) {
 					textInput["editable"] = value;
 				}
-				UIUtil.toggleStyleName(textInput, READONLY_STYLE, ! value);
 			}
 		}
 		
