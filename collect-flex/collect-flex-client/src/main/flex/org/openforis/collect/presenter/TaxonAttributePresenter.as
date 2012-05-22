@@ -8,8 +8,10 @@ package org.openforis.collect.presenter {
 	import mx.controls.TextInput;
 	import mx.core.FlexGlobals;
 	import mx.events.FlexMouseEvent;
+	import mx.managers.IFocusManagerComponent;
 	import mx.managers.PopUpManager;
 	import mx.rpc.AsyncResponder;
+	import mx.rpc.IResponder;
 	import mx.rpc.events.FaultEvent;
 	import mx.rpc.events.ResultEvent;
 	import mx.utils.StringUtil;
@@ -26,7 +28,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.ui.component.input.TaxonAutoCompletePopUp;
 	import org.openforis.collect.util.CollectionUtil;
 	import org.openforis.collect.util.PopUpUtil;
-	import mx.managers.IFocusManagerComponent;
+	import org.openforis.collect.util.StringUtil;
 	
 	/**
 	 * 
@@ -45,7 +47,6 @@ package org.openforis.collect.presenter {
 		
 		protected static var autoCompletePopUp:TaxonAutoCompletePopUp;
 		protected static var autoCompletePopUpOpened:Boolean = false;
-		protected static var autoCompleteSearchResponder:AsyncResponder;
 		protected static var autoCompleteLastInputField:InputField;
 		
 		private var _lastSelectedTaxon:Object;
@@ -147,7 +148,6 @@ package org.openforis.collect.presenter {
 				autoCompletePopUp.addEventListener(KeyboardEvent.KEY_DOWN, autoCompleteKeyDownHandler);
 				autoCompletePopUp.addEventListener(FlexMouseEvent.MOUSE_DOWN_OUTSIDE, autoCompleteMouseDownOutsideHandler);
 				autoCompletePopUp.addEventListener(TaxonInputFieldEvent.TAXON_SELECT, taxonSelectHandler);
-				autoCompleteSearchResponder = new AsyncResponder(autoCompleteSearchResultHandler, searchFaultHandler);
 			}
 			if(! autoCompletePopUpOpened) {
 				PopUpManager.addPopUp(autoCompletePopUp, FlexGlobals.topLevelApplication as DisplayObject, false);
@@ -170,15 +170,17 @@ package org.openforis.collect.presenter {
 			autoCompletePopUp.dataGrid.dataProvider = null;
 			var client:SpeciesClient = ClientFactory.speciesClient;
 			var searchText:String = inputField.text;
+			var token:Object = {searchText: searchText, searchType: searchType};
+			var responder:IResponder = new AsyncResponder(autoCompleteSearchResultHandler, searchFaultHandler, token);
 			switch(searchType) {
 				case SEARCH_BY_CODE:
-					client.findByCode(autoCompleteSearchResponder, searchText, MAX_RESULTS);
+					client.findByCode(responder, searchText, MAX_RESULTS);
 					break;
 				case SEARCH_BY_SCIENTIFIC_NAME:
-					client.findByScientificName(autoCompleteSearchResponder, searchText, MAX_RESULTS);
+					client.findByScientificName(responder, searchText, MAX_RESULTS);
 					break;
 				case SEARCH_BY_VERNACULAR_NAME:
-					client.findByVernacularName(autoCompleteSearchResponder, searchText, MAX_RESULTS);
+					client.findByVernacularName(responder, searchText, MAX_RESULTS);
 					break;
 				default:
 			}
@@ -257,7 +259,14 @@ package org.openforis.collect.presenter {
 		protected static function autoCompleteSearchResultHandler(event:ResultEvent, token:Object):void {
 			var data:IList = event.result as IList;
 			if ( CollectionUtil.isEmpty(data) ) {
-				data.addItem(UNKNOWN_ITEM);
+				var searchType:String = token.searchType;
+				var searchText:String = token.searchText;
+				if ( (searchType == SEARCH_BY_SCIENTIFIC_NAME || searchType == SEARCH_BY_VERNACULAR_NAME) &&
+					org.openforis.collect.util.StringUtil.startsWith(UNKNOWN_ITEM.scientificName.toUpperCase(), searchText.toUpperCase()) ||
+					searchType == SEARCH_BY_CODE && org.openforis.collect.util.StringUtil.startsWith(UNKNOWN_ITEM.code.toUpperCase(), searchText.toUpperCase())
+					) {
+					data.addItem(UNKNOWN_ITEM);
+				}
 				data.addItem(UNLISTED_ITEM);
 			}
 			autoCompletePopUp.dataGrid.dataProvider = data;
