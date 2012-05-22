@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
 		 xmlns:s="library://ns.adobe.com/flex/spark" 
-		 xmlns:mx="library://ns.adobe.com/flex/mx" width="100%">
+		 xmlns:mx="library://ns.adobe.com/flex/mx" width="100%" creationComplete="init();">
 	<fx:Declarations>
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
 	</fx:Declarations>
@@ -12,6 +12,46 @@
 			[Bindable]
 			private var surveyBannerFileName:String = "banner.jpg";
 			*/
+			
+			import mx.utils.Base64Decoder;
+			import mx.rpc.AsyncResponder;
+			import mx.rpc.events.FaultEvent;
+			import mx.rpc.events.ResultEvent;
+			import org.openforis.collect.client.LogoClient;
+			import org.openforis.collect.client.ClientFactory;
+			import mx.controls.Alert;
+
+			[Embed(source="/assets/images/specific_logo.jpg")]
+			[Bindable]
+			public var imgLogo:Class;			
+			
+			[Bindable]
+			public var byteArray:ByteArray ;
+			var logoResponder:AsyncResponder;
+			
+			private function init():void 
+			{
+				var client:LogoClient = ClientFactory.logoClient;
+				logoResponder = new AsyncResponder(logoResultHandler, logoFaultHandler);
+				client.getLogo(logoResponder, 0);
+			}
+			
+			public function logoResultHandler(event:ResultEvent, token:Object):void {
+				var data:ByteArray = event.result as ByteArray;				
+				//trace("data = " + data);
+				//var encodedBytes:ByteArray = data;
+				//var baseDecoder:Base64Decoder = new Base64Decoder();
+				
+				//baseDecoder.decode(encodedBytes);
+				//byteArray = baseDecoder.toByteArray();
+				byteArray = data;
+				
+			}
+			
+			public function logoFaultHandler(event:FaultEvent, token:Object = null):void {
+				Alert.show(event.fault.faultString, "Error"); 
+			}
+			
 		]]>
 	</fx:Script>
 	
@@ -20,6 +60,6 @@
 	<mx:HBox width="100%">
         <s:Image source="@Embed(source='/assets/images/banner.jpg')"/>
         <s:Spacer width="100%"/>
-        <s:Image source="@Embed(source='/assets/images/specific_logo.jpg')"/> 
+        <s:Image source="{byteArray}"/> 
     </mx:HBox>	
 </s:Group>

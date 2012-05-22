@@ -69,6 +69,8 @@
 	<bean id="modelService"		class="org.openforis.collect.remoting.service.ModelService" autowire="byName" />
 	<bean id="sessionService" 	class="org.openforis.collect.remoting.service.SessionService" autowire="byName" />
 	<bean id="speciesService" 	class="org.openforis.collect.remoting.service.SpeciesService" autowire="byName" />
+	<bean id="logoService" 	class="org.openforis.collect.remoting.service.LogoService" autowire="byName" />
+	
 
 	<!-- <bean id="backupService" class="org.fao.openforis.web.service.BackupService"> -->
 	<!-- <property name="backupDirectory" value="backup" /> -->
@@ -91,6 +93,7 @@
 	<bean id="speciesManager"		class="org.openforis.collect.manager.SpeciesManager" />
 	<bean id="surveyManager"		class="org.openforis.collect.manager.SurveyManager" init-method="init" />
 	<bean id="userManager"			class="org.openforis.collect.manager.UserManager" />
+	<bean id="logoManager"			class="org.openforis.collect.manager.LogoManager" />
 
 <!-- 	<bean id="recordContext" class="org.openforis.collect.model.CollectRecordContext" /> -->
 	
@@ -147,6 +150,10 @@
 	
 	<bean id="dynamicTableDao" class="org.openforis.collect.persistence.DynamicTableDao">
     	<property name="dataSource" ref="dataSource"/>
+	</bean>
+	
+	<bean id="logoDao" class="org.openforis.collect.persistence.LogoDao">
+		<property name="dataSource" ref="dataSource"/>
 	</bean>
 
 
