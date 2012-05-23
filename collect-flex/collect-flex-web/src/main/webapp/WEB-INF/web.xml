@@ -19,6 +19,14 @@
         <param-value>collect.root</param-value>
     </context-param>
     
+	<context-param>
+		<param-name>log4jConfigLocation</param-name>
+		<param-value>/WEB-INF/conf/log4j.xml</param-value>
+	</context-param>
+	
+	<listener>
+	   <listener-class>org.springframework.web.util.Log4jConfigListener</listener-class>
+	</listener>
     <filter>
         <filter-name>localizationFilter</filter-name>
         <filter-class>org.springframework.web.filter.RequestContextFilter</filter-class>
