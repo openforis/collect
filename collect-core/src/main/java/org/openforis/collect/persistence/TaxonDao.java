@@ -7,7 +7,10 @@ import java.sql.Connection;
 import java.util.List;
 
 import org.jooq.Record;
+import org.jooq.Result;
+import org.jooq.Select;
 import org.jooq.StoreQuery;
+import org.jooq.TableField;
 import org.openforis.collect.persistence.jooq.MappingJooqDaoSupport;
 import org.openforis.collect.persistence.jooq.MappingJooqFactory;
 import org.openforis.idm.model.species.Taxon;
@@ -42,14 +45,30 @@ public class TaxonDao extends MappingJooqDaoSupport<Taxon, TaxonDao.JooqFactory>
 		super.delete(id);
 	}
 
-	public List<Taxon> findByCode(String searchString, int maxResults) {
-		return findStartingWith(OFC_TAXON.CODE, searchString, maxResults);
+	public List<Taxon> findByCode(int taxonomyId, String searchString, int maxResults) {
+		//todo add taxonomy to where conditions
+		return findStartingWith(OFC_TAXON.CODE, taxonomyId, searchString, maxResults);
 	}
 
-	public List<Taxon> findByScientificName(String searchString, int maxResults) {
-		return findStartingWith(OFC_TAXON.SCIENTIFIC_NAME, searchString, maxResults);
+	public List<Taxon> findByScientificName(int taxonomyId, String searchString, int maxResults) {
+		return findStartingWith(OFC_TAXON.SCIENTIFIC_NAME, taxonomyId, searchString, maxResults);
 	}
 
+	protected List<Taxon> findStartingWith(TableField<?,String> field, int taxonomyId, String searchString, int maxResults) {
+		JooqFactory jf = getMappingJooqFactory();
+		searchString = searchString.toUpperCase() + "%";
+		Select<?> query = 
+			jf.select()
+			.from(OFC_TAXON)
+			.where(OFC_TAXON.TAXONOMY_ID.equal(taxonomyId)
+				.and(JooqFactory.upper(field).like(searchString)))
+			.limit(maxResults);
+		Result<?> result = query.fetch();
+		List<Taxon> entities = jf.fromResult(result);
+		return entities;
+
+	}
+	
 	protected static class JooqFactory extends MappingJooqFactory<Taxon> {
 
 		private static final long serialVersionUID = 1L;

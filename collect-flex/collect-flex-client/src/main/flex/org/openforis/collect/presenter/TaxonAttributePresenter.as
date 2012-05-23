@@ -8,7 +8,6 @@ package org.openforis.collect.presenter {
 	import mx.controls.TextInput;
 	import mx.core.FlexGlobals;
 	import mx.events.FlexMouseEvent;
-	import mx.managers.IFocusManagerComponent;
 	import mx.managers.PopUpManager;
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.IResponder;
@@ -21,7 +20,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.event.InputFieldEvent;
 	import org.openforis.collect.event.TaxonInputFieldEvent;
 	import org.openforis.collect.i18n.Message;
-	import org.openforis.collect.model.proxy.TaxonOccurrenceProxy;
+	import org.openforis.collect.metamodel.proxy.TaxonAttributeDefinitionProxy;
 	import org.openforis.collect.remoting.service.UpdateRequest;
 	import org.openforis.collect.ui.component.input.InputField;
 	import org.openforis.collect.ui.component.input.TaxonAttributeRenderer;
@@ -79,10 +78,13 @@ package org.openforis.collect.presenter {
 		
 		protected function inputFieldFocusOutHandler(event:FocusEvent):void {
 			var inputField:InputField = event.target.document;
-			if ( inputField != null && inputField.changed && inputField != view.codeTextInput && ! inputField.isEmpty() &&
-					view.codeTextInput.isEmpty() && ! autoCompletePopUpOpened ) {
-				view.codeTextInput.text = UNLISTED_ITEM.code;
-				view.codeTextInput.presenter.updateValue();
+			if ( inputField != null && inputField.changed && ! autoCompletePopUpOpened ) {
+				if ( inputField != view.codeTextInput && ! inputField.isEmpty() && view.codeTextInput.isEmpty() ) {
+					view.codeTextInput.text = UNLISTED_ITEM.code;
+					view.codeTextInput.presenter.updateValue();
+				} else if ( inputField == view.codeTextInput ) {
+					
+				}
 			}
 		}
 		
@@ -170,17 +172,18 @@ package org.openforis.collect.presenter {
 			autoCompletePopUp.dataGrid.dataProvider = null;
 			var client:SpeciesClient = ClientFactory.speciesClient;
 			var searchText:String = inputField.text;
+			var taxonomy:String = TaxonAttributeDefinitionProxy(inputField.attributeDefinition).taxonomy;
 			var token:Object = {searchText: searchText, searchType: searchType};
 			var responder:IResponder = new AsyncResponder(autoCompleteSearchResultHandler, searchFaultHandler, token);
 			switch(searchType) {
 				case SEARCH_BY_CODE:
-					client.findByCode(responder, searchText, MAX_RESULTS);
+					client.findByCode(responder, taxonomy, searchText, MAX_RESULTS);
 					break;
 				case SEARCH_BY_SCIENTIFIC_NAME:
-					client.findByScientificName(responder, searchText, MAX_RESULTS);
+					client.findByScientificName(responder, taxonomy, searchText, MAX_RESULTS);
 					break;
 				case SEARCH_BY_VERNACULAR_NAME:
-					client.findByVernacularName(responder, searchText, MAX_RESULTS);
+					client.findByVernacularName(responder, taxonomy, searchText, MAX_RESULTS);
 					break;
 				default:
 			}

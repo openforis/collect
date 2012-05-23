@@ -12,6 +12,7 @@ import org.openforis.collect.persistence.TaxonomyDao;
 import org.openforis.idm.model.TaxonOccurrence;
 import org.openforis.idm.model.species.Taxon;
 import org.openforis.idm.model.species.TaxonVernacularName;
+import org.openforis.idm.model.species.Taxonomy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,13 +29,13 @@ public class SpeciesManager {
 	@Autowired
 	private TaxonVernacularNameDao taxonVernacularNameDao;
 
-	@SuppressWarnings("unused")
 	@Autowired
 	private TaxonomyDao taxonomyDao;
 
 	@Transactional
-	public List<TaxonOccurrence> findByCode(String searchString, int maxResults) {
-		List<Taxon> list = taxonDao.findByCode(searchString, maxResults);
+	public List<TaxonOccurrence> findByCode(String taxonomyName, String searchString, int maxResults) {
+		Taxonomy taxonomy = taxonomyDao.load(taxonomyName);
+		List<Taxon> list = taxonDao.findByCode(taxonomy.getId(), searchString, maxResults);
 		List<TaxonOccurrence> result = new ArrayList<TaxonOccurrence>();
 		for (Taxon taxon : list) {
 			TaxonOccurrence o = new TaxonOccurrence(taxon.getCode(), taxon.getScientificName());
@@ -44,8 +45,9 @@ public class SpeciesManager {
 	}
 
 	@Transactional
-	public List<TaxonOccurrence> findByScientificName(String searchString, int maxResults) {
-		List<Taxon> list = taxonDao.findByScientificName(searchString, maxResults);
+	public List<TaxonOccurrence> findByScientificName(String taxonomyName, String searchString, int maxResults) {
+		Taxonomy taxonomy = taxonomyDao.load(taxonomyName);
+		List<Taxon> list = taxonDao.findByScientificName(taxonomy.getId(), searchString, maxResults);
 		List<TaxonOccurrence> result = new ArrayList<TaxonOccurrence>();
 		for (Taxon taxon : list) {
 			TaxonOccurrence o = new TaxonOccurrence(taxon.getCode(), taxon.getScientificName());
@@ -55,8 +57,9 @@ public class SpeciesManager {
 	}
 
 	@Transactional
-	public List<TaxonOccurrence> findByVernacularName(String searchString, int maxResults) {
-		List<TaxonVernacularName> list = taxonVernacularNameDao.findByVernacularName(searchString, maxResults);
+	public List<TaxonOccurrence> findByVernacularName(String taxonomyName, String searchString, int maxResults) {
+		Taxonomy taxonomy = taxonomyDao.load(taxonomyName);
+		List<TaxonVernacularName> list = taxonVernacularNameDao.findByVernacularName(taxonomy.getId(), searchString, maxResults);
 		List<TaxonOccurrence> result = new ArrayList<TaxonOccurrence>();
 		for (TaxonVernacularName taxonVernacularName : list) {
 			Integer taxonId = taxonVernacularName.getTaxonSystemId();

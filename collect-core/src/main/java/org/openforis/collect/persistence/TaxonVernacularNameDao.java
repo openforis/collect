@@ -1,12 +1,15 @@
 package org.openforis.collect.persistence;
 
 import static org.openforis.collect.persistence.jooq.Sequences.OFC_TAXON_VERNACULAR_NAME_ID_SEQ;
+import static org.openforis.collect.persistence.jooq.tables.OfcTaxon.OFC_TAXON;
 import static org.openforis.collect.persistence.jooq.tables.OfcTaxonVernacularName.OFC_TAXON_VERNACULAR_NAME;
 
 import java.sql.Connection;
 import java.util.List;
 
 import org.jooq.Record;
+import org.jooq.Result;
+import org.jooq.Select;
 import org.jooq.StoreQuery;
 import org.openforis.collect.persistence.jooq.MappingJooqDaoSupport;
 import org.openforis.collect.persistence.jooq.MappingJooqFactory;
@@ -22,10 +25,22 @@ public class TaxonVernacularNameDao extends MappingJooqDaoSupport<TaxonVernacula
 		super(TaxonVernacularNameDao.JooqFactory.class);
 	}
 
-	public List<TaxonVernacularName> findByVernacularName(String searchString, int maxResults) {
-		return findContaining(OFC_TAXON_VERNACULAR_NAME.VERNACULAR_NAME, searchString, maxResults);
-	}
+	public List<TaxonVernacularName> findByVernacularName(int taxonomyId, String searchString, int maxResults) {
+		JooqFactory jf = getMappingJooqFactory();
+		//find containing
+		searchString = "%" + searchString.toUpperCase() + "%";
+		Select<?> query = 
+			jf.select(OFC_TAXON_VERNACULAR_NAME.getFields())
+			.from(OFC_TAXON_VERNACULAR_NAME)
+			.join(OFC_TAXON).on(OFC_TAXON.ID.equal(OFC_TAXON_VERNACULAR_NAME.TAXON_ID))
+			.where(OFC_TAXON.TAXONOMY_ID.equal(taxonomyId)
+					.and(JooqFactory.upper(OFC_TAXON_VERNACULAR_NAME.VERNACULAR_NAME).like(searchString)))
+			.limit(maxResults);
+		Result<?> result = query.fetch();
+		List<TaxonVernacularName> entities = jf.fromResult(result);
+		return entities;
 
+	}
 	@Override
 	public TaxonVernacularName loadById(int id) {
 		return super.loadById(id);

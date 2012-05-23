@@ -50,7 +50,7 @@ public class SpeciesDaoIntegrationTest {
 		Taxon genus1 = testInsertAndLoadTaxon(taxonomy1, 2, "JUG", "Juglans sp.", "genus", 9, family1);
 		testInsertAndLoadTaxon(taxonomy1, 3, "JUG/REG", "Juglans regia", "species", 9, genus1);
 
-		List<Taxon> results = taxonDao.findByCode(match, maxResults);
+		List<Taxon> results = taxonDao.findByCode(taxonomy1.getId(), match, maxResults);
 		assertEquals(expectedResults, results.size());
 		match = match.toUpperCase();
 		for (Taxon taxon : results) {
@@ -93,7 +93,7 @@ public class SpeciesDaoIntegrationTest {
 		Taxon genus1 = testInsertAndLoadTaxon(taxonomy1, 2, "JUG", "Juglans sp.", "genus", 9, family1);
 		testInsertAndLoadTaxon(taxonomy1, 3, "JUG/REG", "Juglans regia", "species", 9, genus1);
 		
-		List<Taxon> results = taxonDao.findByScientificName(match, maxResults);
+		List<Taxon> results = taxonDao.findByScientificName(taxonomy1.getId(), match, maxResults);
 		assertEquals(expectedResults, results.size());
 		match = match.toUpperCase();
 		for (Taxon taxon : results) {
@@ -128,7 +128,7 @@ public class SpeciesDaoIntegrationTest {
 		testInsertAndLoadVernacularName(species1, "Persian walnut", "eng", "", 9);
 		testInsertAndLoadVernacularName(species1, "Орех грецкий", "rus", "", 9);
 		
-		List<TaxonVernacularName> results = taxonVernacularNameDao.findByVernacularName(match, maxResults);
+		List<TaxonVernacularName> results = taxonVernacularNameDao.findByVernacularName(taxonomy1.getId(), match, maxResults);
 		assertEquals(expectedResults, results.size());
 		match = match.toUpperCase();
 		for (TaxonVernacularName tvn : results) {
