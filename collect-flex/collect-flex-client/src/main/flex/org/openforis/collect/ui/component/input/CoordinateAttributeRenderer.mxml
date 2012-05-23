@@ -48,17 +48,17 @@
 								  labelFunction="{srsLabelFunction}"
 								  dataProvider="{Application.activeSurvey.spatialReferenceSystems}"
 								  />
-		<input:NumericInputField id="xTextInput" includeIn="horizontal" itemCreationPolicy="immediate"
-								 attributeDefinition="{attributeDefinition}"
-								 parentEntity="{parentEntity}"
-								 attribute="{attribute}"
-								 fieldIndex="0"
-								 />
 		<input:NumericInputField id="yTextInput" includeIn="horizontal" itemCreationPolicy="immediate" 
 								 attributeDefinition="{attributeDefinition}"
 								 parentEntity="{parentEntity}"
 								 attribute="{attribute}"
 								 fieldIndex="1"
+								 />
+		<input:NumericInputField id="xTextInput" includeIn="horizontal" itemCreationPolicy="immediate"
+								 attributeDefinition="{attributeDefinition}"
+								 parentEntity="{parentEntity}"
+								 attribute="{attribute}"
+								 fieldIndex="0"
 								 />
 	</s:HGroup>
 	
@@ -69,12 +69,12 @@
 				<fx:Reparent target="srsDropDownList" includeIn="vertical" />
 			</s:HGroup>
 			<s:HGroup gap="0">
-				<s:Label width="{subLabelWidth}" styleName="bold" text="{Message.get('edit.coordinate.x')}"/>
-				<fx:Reparent target="xTextInput" includeIn="vertical" />
-			</s:HGroup>
-			<s:HGroup gap="0">
 				<s:Label width="{subLabelWidth}" styleName="bold" text="{Message.get('edit.coordinate.y')}"/>
 				<fx:Reparent target="yTextInput" includeIn="vertical" />
+			</s:HGroup>
+			<s:HGroup gap="0">
+				<s:Label width="{subLabelWidth}" styleName="bold" text="{Message.get('edit.coordinate.x')}"/>
+				<fx:Reparent target="xTextInput" includeIn="vertical" />
 			</s:HGroup>
 		</s:VGroup>
 	</s:VGroup>
