@@ -115,7 +115,7 @@ package org.openforis.collect.presenter {
 				var field:FieldProxy = attribute.getField(_view.fieldIndex);
 				hasRemarks = StringUtil.isNotBlank(getRemarks());
 				var value:Object = field.value;
-				if(field.symbol != null && isReasonBlankSymbol(field.symbol)) {
+				if(field.symbol != null && FieldProxy.isReasonBlankSymbol(field.symbol)) {
 					switch(field.symbol) {
 						case FieldSymbol.BLANK_ON_FORM:
 							item = BLANK_ON_FORM_ITEM;
@@ -144,13 +144,13 @@ package org.openforis.collect.presenter {
 			var item:Object = null;
 			var char:String = String.fromCharCode(event.charCode);
 			switch(char) {
-				case SHORTCUT_BLANK_ON_FORM:
+				case FieldProxy.SHORTCUT_BLANK_ON_FORM:
 					item = BLANK_ON_FORM_ITEM;
 					break;
-				case SHORTCUT_DASH_ON_FORM:
+				case FieldProxy.SHORTCUT_DASH_ON_FORM:
 					item = DASH_ON_FORM_ITEM;
 					break;
-				case SHORTCUT_ILLEGIBLE:
+				case FieldProxy.SHORTCUT_ILLEGIBLE:
 					item = ILLEGIBLE_ITEM;
 					break;
 			}

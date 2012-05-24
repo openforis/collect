@@ -150,7 +150,7 @@ package org.openforis.collect.presenter {
 			if(attribute != null) {
 				var field:FieldProxy = attribute.getField(0);
 				if(field.symbol != null) {
-					var shortCut:String = getShortCutForReasonBlank(field.symbol);
+					var shortCut:String = FieldProxy.getShortCutForReasonBlank(field.symbol);
 					if(shortCut != null) {
 						return shortCut;
 					}

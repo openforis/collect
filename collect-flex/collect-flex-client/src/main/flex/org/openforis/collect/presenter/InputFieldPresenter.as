@@ -26,7 +26,6 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.remoting.service.UpdateResponse;
 	import org.openforis.collect.ui.component.input.InputField;
 	import org.openforis.collect.ui.component.input.InputFieldContextMenu;
-	import org.openforis.collect.util.ArrayUtil;
 	import org.openforis.collect.util.StringUtil;
 	import org.openforis.collect.util.UIUtil;
 	
@@ -36,13 +35,6 @@ package org.openforis.collect.presenter {
 	 * @author S. Ricci
 	 * */
 	public class InputFieldPresenter extends AbstractPresenter {
-		
-		public static const SHORTCUT_BLANK_ON_FORM:String = "*";
-		public static const SHORTCUT_DASH_ON_FORM:String = "-";
-		public static const SHORTCUT_ILLEGIBLE:String = "?";
-		
-		public static const REASON_BLANK_SHORTCUTS:Array = [SHORTCUT_BLANK_ON_FORM, SHORTCUT_DASH_ON_FORM, SHORTCUT_ILLEGIBLE];
-		public static const REASON_BLANK_SYMBOLS:Array = [FieldSymbol.BLANK_ON_FORM, FieldSymbol.DASH_ON_FORM, FieldSymbol.ILLEGIBLE];
 		
 		private var _view:InputField;
 		private var _contextMenu:InputFieldContextMenu;
@@ -189,7 +181,7 @@ package org.openforis.collect.presenter {
 							operation.fieldIndex = index;
 							operation.remarks = field.remarks;
 							operation.symbol = symbol;
-							if (ArrayUtil.contains(REASON_BLANK_SYMBOLS, symbol) ) {
+							if ( FieldProxy.isReasonBlankSymbol(symbol) ) {
 								operation.value = null;
 							} else {
 								operation.value = field.value != null ? field.value.toString(): null;
@@ -209,7 +201,7 @@ package org.openforis.collect.presenter {
 						operation.remarks = field.remarks;
 						operation.symbol = symbol;
 						operation.symbol = symbol;
-						if (ArrayUtil.contains(REASON_BLANK_SYMBOLS, symbol) ) {
+						if ( FieldProxy.isReasonBlankSymbol(symbol) ) {
 							operation.value = null;
 						} else {
 							operation.value = field.value != null ? field.value.toString(): null;
@@ -391,8 +383,8 @@ package org.openforis.collect.presenter {
 			var value:String = null;
 			var text:String = textToRequestValue();
 			var symbol:FieldSymbol = null;
-			if(isShortCutForReasonBlank(text)) {
-				symbol = parseShortCutForReasonBlank(text);
+			if ( FieldProxy.isShortCutForReasonBlank(text) ) {
+				symbol = FieldProxy.parseShortCutForReasonBlank(text);
 			} else {
 				value = text;
 			}
@@ -403,8 +395,8 @@ package org.openforis.collect.presenter {
 			var symbol:FieldSymbol = null;
 			var value:String = null;
 			var text:String = textToRequestValue();
-			if(isShortCutForReasonBlank(text)) {
-				symbol = parseShortCutForReasonBlank(text);
+			if ( FieldProxy.isShortCutForReasonBlank(text) ) {
+				symbol = FieldProxy.parseShortCutForReasonBlank(text);
 			} else {
 				value = text;
 			}
@@ -451,7 +443,7 @@ package org.openforis.collect.presenter {
 			if(attribute != null) {
 				var field:FieldProxy = _view.attribute.getField(_view.fieldIndex);
 				if(field.symbol != null) {
-					var shortKey:String = getShortCutForReasonBlank(field.symbol);
+					var shortKey:String = FieldProxy.getShortCutForReasonBlank(field.symbol);
 					if(shortKey != null) {
 						return shortKey;
 					}
@@ -524,40 +516,6 @@ package org.openforis.collect.presenter {
 				return f.symbol;
 			} 
 			return null;
-		}
-		
-		public static function getShortCutForReasonBlank(symbol:FieldSymbol):String {
-			switch(symbol) {
-				case FieldSymbol.BLANK_ON_FORM:
-					return SHORTCUT_BLANK_ON_FORM;
-				case FieldSymbol.DASH_ON_FORM:
-					return SHORTCUT_DASH_ON_FORM;
-				case FieldSymbol.ILLEGIBLE:
-					return SHORTCUT_ILLEGIBLE;
-				default:
-					return null;
-			}
-		}
-		
-		public static function parseShortCutForReasonBlank(text:String):FieldSymbol {
-			switch(text) {
-				case SHORTCUT_BLANK_ON_FORM:
-					return FieldSymbol.BLANK_ON_FORM;
-				case SHORTCUT_DASH_ON_FORM:
-					return FieldSymbol.DASH_ON_FORM;
-				case SHORTCUT_ILLEGIBLE:
-					return FieldSymbol.ILLEGIBLE;
-				default:
-					return null;
-			}
-		}
-		
-		public static function isShortCutForReasonBlank(text:String):Boolean {
-			return ArrayUtil.isIn(REASON_BLANK_SHORTCUTS, text);
-		}
-		
-		public static function isReasonBlankSymbol(symbol:FieldSymbol):Boolean {
-			return ArrayUtil.isIn(REASON_BLANK_SYMBOLS, symbol);
 		}
 		
 		protected function get dataClient():DataClient {

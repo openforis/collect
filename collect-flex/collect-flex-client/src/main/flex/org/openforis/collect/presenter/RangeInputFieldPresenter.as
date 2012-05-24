@@ -29,7 +29,7 @@ package org.openforis.collect.presenter
 			if(attribute != null) {
 				var field:FieldProxy = attribute.getField(0);
 				if(field.symbol != null) {
-					var shortKey:String = getShortCutForReasonBlank(field.symbol);
+					var shortKey:String = FieldProxy.getShortCutForReasonBlank(field.symbol);
 					if(shortKey != null) {
 						return shortKey;
 					}

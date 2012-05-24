@@ -15,8 +15,8 @@ package org.openforis.collect.ui.component.input {
 	import org.openforis.collect.model.FieldSymbol;
 	import org.openforis.collect.model.proxy.AttributeProxy;
 	import org.openforis.collect.model.proxy.EntityProxy;
+	import org.openforis.collect.model.proxy.FieldProxy;
 	import org.openforis.collect.model.proxy.NodeProxy;
-	import org.openforis.collect.presenter.InputFieldPresenter;
 	import org.openforis.collect.presenter.RemarksPopUpPresenter;
 	import org.openforis.collect.util.AlertUtil;
 	import org.openforis.collect.util.UIUtil;
@@ -94,7 +94,7 @@ package org.openforis.collect.ui.component.input {
 			switch(step) {
 				case CollectRecord$Step.ENTRY:
 					// REASON BLANK ITEMS
-					if(_inputField.isEmpty() || InputFieldPresenter.isShortCutForReasonBlank(_inputField.text)) {
+					if(_inputField.isEmpty() || FieldProxy.isShortCutForReasonBlank(_inputField.text)) {
 						items.push( SET_STAR, SET_DASH, SET_ILLEGIBLE );
 					}
 					// CONFIRM ERROR ITEM
@@ -109,7 +109,7 @@ package org.openforis.collect.ui.component.input {
 					}
 					break;
 				case CollectRecord$Step.CLEANSING:
-					if(_inputField.isEmpty() || InputFieldPresenter.isShortCutForReasonBlank(_inputField.text)) {
+					if(_inputField.isEmpty() || FieldProxy.isShortCutForReasonBlank(_inputField.text)) {
 						items.push(APPROVE_MISSING);
 						if ( _inputField.attributeDefinition.defaultValueApplicable ) {
 							items.push(APPLY_DEFAULT_VALUE);

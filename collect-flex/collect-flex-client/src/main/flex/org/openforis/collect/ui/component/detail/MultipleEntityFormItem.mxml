@@ -13,7 +13,6 @@
 			
 			import org.openforis.collect.Application;
 			import org.openforis.collect.i18n.Message;
-			import org.openforis.collect.model.CollectRecord$Step;
 			import org.openforis.collect.presenter.MultipleEntityFormItemPresenter;
 			import org.openforis.collect.ui.Images;
 			

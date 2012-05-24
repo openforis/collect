@@ -22,8 +22,49 @@ package org.openforis.collect.model.proxy {
 			FieldSymbol.BLANK_ON_FORM, 
 			FieldSymbol.DASH_ON_FORM, 
 			FieldSymbol.ILLEGIBLE
-			];
+		];
+		public static const REASON_BLANK_SHORTCUTS:Array = [
+			SHORTCUT_BLANK_ON_FORM, 
+			SHORTCUT_DASH_ON_FORM, 
+			SHORTCUT_ILLEGIBLE
+		];
+		public static const SHORTCUT_BLANK_ON_FORM:String = "*";
+		public static const SHORTCUT_DASH_ON_FORM:String = "-";
+		public static const SHORTCUT_ILLEGIBLE:String = "?";
 		
+		public static function getShortCutForReasonBlank(symbol:FieldSymbol):String {
+			switch(symbol) {
+				case FieldSymbol.BLANK_ON_FORM:
+					return SHORTCUT_BLANK_ON_FORM;
+				case FieldSymbol.DASH_ON_FORM:
+					return SHORTCUT_DASH_ON_FORM;
+				case FieldSymbol.ILLEGIBLE:
+					return SHORTCUT_ILLEGIBLE;
+				default:
+					return null;
+			}
+		}
+		
+		public static function parseShortCutForReasonBlank(text:String):FieldSymbol {
+			switch(text) {
+				case SHORTCUT_BLANK_ON_FORM:
+					return FieldSymbol.BLANK_ON_FORM;
+				case SHORTCUT_DASH_ON_FORM:
+					return FieldSymbol.DASH_ON_FORM;
+				case SHORTCUT_ILLEGIBLE:
+					return FieldSymbol.ILLEGIBLE;
+				default:
+					return null;
+			}
+		}
+		
+		public static function isShortCutForReasonBlank(text:String):Boolean {
+			return ArrayUtil.isIn(REASON_BLANK_SHORTCUTS, text);
+		}
+		
+		public static function isReasonBlankSymbol(symbol:FieldSymbol):Boolean {
+			return ArrayUtil.isIn(REASON_BLANK_SYMBOLS, symbol);
+		}
 		
 		public function hasReasonBlankSpecified():Boolean {
 			var result:Boolean = ArrayUtil.isIn(REASON_BLANK_SYMBOLS, symbol);

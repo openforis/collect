@@ -17,7 +17,6 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.remoting.service.UpdateRequestOperation$Method;
 	import org.openforis.collect.remoting.service.UpdateResponse;
 	import org.openforis.collect.ui.component.input.MultipleCodeInputField;
-	import org.openforis.collect.util.ArrayUtil;
 	import org.openforis.collect.util.CollectionUtil;
 	import org.openforis.collect.util.StringUtil;
 	
@@ -67,7 +66,7 @@ package org.openforis.collect.presenter {
 					var firstAttribute:AttributeProxy = _view.attributes.getItemAt(0) as AttributeProxy;
 					var field:FieldProxy = firstAttribute.getField(0);
 					if(field.symbol != null) {
-						var shortCut:String = getShortCutForReasonBlank(field.symbol);
+						var shortCut:String = FieldProxy.getShortCutForReasonBlank(field.symbol);
 						if(shortCut != null) {
 							return shortCut;
 						}
@@ -99,8 +98,8 @@ package org.openforis.collect.presenter {
 			var symbol:FieldSymbol = null;
 			if(text != null) {
 				var parts:Array = text.split(",");
-				if(parts.length == 1 && isShortCutForReasonBlank(text)) {
-					symbol = parseShortCutForReasonBlank(text);
+				if(parts.length == 1 && FieldProxy.isShortCutForReasonBlank(text)) {
+					symbol = FieldProxy.parseShortCutForReasonBlank(text);
 					o = getUpdateRequestOperation(UpdateRequestOperation$Method.ADD, NaN, null, symbol, remarks);
 					addAttributesOperations.addItem(o);
 				} else {

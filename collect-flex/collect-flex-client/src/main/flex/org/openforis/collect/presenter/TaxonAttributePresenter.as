@@ -21,6 +21,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.event.TaxonInputFieldEvent;
 	import org.openforis.collect.i18n.Message;
 	import org.openforis.collect.metamodel.proxy.TaxonAttributeDefinitionProxy;
+	import org.openforis.collect.model.proxy.FieldProxy;
 	import org.openforis.collect.remoting.service.UpdateRequest;
 	import org.openforis.collect.ui.component.input.InputField;
 	import org.openforis.collect.ui.component.input.TaxonAttributeRenderer;
@@ -89,7 +90,7 @@ package org.openforis.collect.presenter {
 				if ( ! autoCompletePopUpOpened && ! UIUtil.isFocusOnComponent(autoCompletePopUp) ) {
 					inputField.presenter.updateValue();
 					if ( inputField != view.codeTextInput && ! inputField.isEmpty() && 
-						(view.codeTextInput.isEmpty() || InputFieldPresenter.isShortCutForReasonBlank(view.codeTextInput.text)) ) {
+						(view.codeTextInput.isEmpty() || FieldProxy.isShortCutForReasonBlank(view.codeTextInput.text)) ) {
 						view.codeTextInput.text = UNLISTED_ITEM.code;
 						view.codeTextInput.presenter.updateValue();
 					}
