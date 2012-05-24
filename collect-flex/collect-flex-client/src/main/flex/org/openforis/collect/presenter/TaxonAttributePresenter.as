@@ -28,6 +28,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.util.CollectionUtil;
 	import org.openforis.collect.util.PopUpUtil;
 	import org.openforis.collect.util.StringUtil;
+	import org.openforis.collect.util.UIUtil;
 	
 	/**
 	 * 
@@ -46,7 +47,10 @@ package org.openforis.collect.presenter {
 		
 		protected static var autoCompletePopUp:TaxonAutoCompletePopUp;
 		protected static var autoCompletePopUpOpened:Boolean = false;
+		protected static var autoCompleteDataLoading:Boolean = false;
+		protected static var autoCompleteLastSearchType:String;
 		protected static var autoCompleteLastInputField:InputField;
+		protected static var autoCompleteLastResult:IList;
 		
 		private var _lastSelectedTaxon:Object;
 		private var _lastSearchType:String;
@@ -59,14 +63,17 @@ package org.openforis.collect.presenter {
 			super.initEventListeners();
 			
 			//id text input
+			view.codeTextInput.applyChangesOnFocusOut = false;
 			view.codeTextInput.addEventListener(InputFieldEvent.CHANGING, inputFieldChangingHandler);
 			view.codeTextInput.addEventListener(FocusEvent.FOCUS_OUT, inputFieldFocusOutHandler);
 			view.codeTextInput.textInput.addEventListener(KeyboardEvent.KEY_DOWN, inputFieldKeyDownHandler);
 			//scientific name text input
+			view.scientificNameTextInput.applyChangesOnFocusOut = false;
 			view.scientificNameTextInput.addEventListener(InputFieldEvent.CHANGING, inputFieldChangingHandler);
 			view.scientificNameTextInput.addEventListener(FocusEvent.FOCUS_OUT, inputFieldFocusOutHandler);
 			view.scientificNameTextInput.textInput.addEventListener(KeyboardEvent.KEY_DOWN, inputFieldKeyDownHandler);
 			//vernacular name text input
+			view.vernacularNameTextInput.applyChangesOnFocusOut = false;
 			view.vernacularNameTextInput.addEventListener(InputFieldEvent.CHANGING, inputFieldChangingHandler);
 			view.vernacularNameTextInput.addEventListener(FocusEvent.FOCUS_OUT, inputFieldFocusOutHandler);
 			view.vernacularNameTextInput.textInput.addEventListener(KeyboardEvent.KEY_DOWN, inputFieldKeyDownHandler);
@@ -78,12 +85,14 @@ package org.openforis.collect.presenter {
 		
 		protected function inputFieldFocusOutHandler(event:FocusEvent):void {
 			var inputField:InputField = event.target.document;
-			if ( inputField != null && inputField.changed && ! autoCompletePopUpOpened ) {
-				if ( inputField != view.codeTextInput && ! inputField.isEmpty() && view.codeTextInput.isEmpty() ) {
-					view.codeTextInput.text = UNLISTED_ITEM.code;
-					view.codeTextInput.presenter.updateValue();
-				} else if ( inputField == view.codeTextInput ) {
-					
+			if ( inputField != null && inputField.changed ) {
+				if ( ! autoCompletePopUpOpened && ! UIUtil.isFocusOnComponent(autoCompletePopUp) ) {
+					inputField.presenter.updateValue();
+					if ( inputField != view.codeTextInput && ! inputField.isEmpty() && 
+						(view.codeTextInput.isEmpty() || InputFieldPresenter.isShortCutForReasonBlank(view.codeTextInput.text)) ) {
+						view.codeTextInput.text = UNLISTED_ITEM.code;
+						view.codeTextInput.presenter.updateValue();
+					}
 				}
 			}
 		}
@@ -124,7 +133,7 @@ package org.openforis.collect.presenter {
 				case Keyboard.DOWN:
 					if ( autoCompletePopUpOpened ) {
 						autoCompletePopUp.dataGrid.setFocus();
-						if ( CollectionUtil.isNotEmpty(autoCompletePopUp.dataGrid.dataProvider) ) {
+						if ( CollectionUtil.isNotEmpty(autoCompleteLastResult) ) {
 							autoCompletePopUp.dataGrid.selectedIndex = 0;
 						}
 					}
@@ -133,15 +142,39 @@ package org.openforis.collect.presenter {
 					closeAutoCompletePopUp();
 					break;
 				case Keyboard.TAB:
-					if ( autoCompletePopUpOpened ) {
+					if ( autoCompleteDataLoading ) {
+						event.preventDefault();
+					} else if ( autoCompletePopUpOpened ) {
+						var matchingResult:Object = getMatchingResult();
+						if ( matchingResult != null ) {
+							performSelectTaxon(matchingResult);
+						}
 						closeAutoCompletePopUp();
-						/*var nextFocusManagerComponent:IFocusManagerComponent = _view.focusManager.getNextFocusManagerComponent(event.shiftKey);
-						if ( nextFocusManagerComponent != null ) {
-							nextFocusManagerComponent.setFocus();
-						}*/
 					}
 					break;
 			}
+		}
+		
+		protected static function getMatchingResult():Object {
+			var searchText:String = autoCompleteLastInputField.text;
+			for each (var item:Object in autoCompleteLastResult) {
+				var compareToValue:String;
+				switch ( autoCompleteLastSearchType ) {
+					case SEARCH_BY_CODE:
+						compareToValue = item.code;
+						break;
+					case SEARCH_BY_SCIENTIFIC_NAME:
+						compareToValue = item.scientificName;
+						break;
+					case SEARCH_BY_VERNACULAR_NAME:
+						compareToValue = item.vernacularName;
+						break;
+				}
+				if ( compareToValue != null && searchText.toUpperCase() == compareToValue.toUpperCase() ) {
+					return item;
+				}
+			}
+			return null;
 		}
 		
 		protected static function showAutoCompletePopUp(searchType:String, inputField:InputField, alignField:DisplayObject):void {
@@ -164,18 +197,19 @@ package org.openforis.collect.presenter {
 				autoCompletePopUpOpened = true;
 			}
 			autoCompleteLastInputField = inputField;
-			autoCompleteLastInputField.applyChangesOnFocusOut = false;
-			loadAutoCompleteData(searchType, inputField);
+			autoCompleteLastSearchType = searchType;
+			loadAutoCompleteData();
 		}
 		
-		protected static function loadAutoCompleteData(searchType:String, inputField:InputField):void {
+		protected static function loadAutoCompleteData():void {
+			autoCompleteDataLoading = true;
 			autoCompletePopUp.dataGrid.dataProvider = null;
 			var client:SpeciesClient = ClientFactory.speciesClient;
-			var searchText:String = inputField.text;
-			var taxonomy:String = TaxonAttributeDefinitionProxy(inputField.attributeDefinition).taxonomy;
-			var token:Object = {searchText: searchText, searchType: searchType};
+			var searchText:String = autoCompleteLastInputField.text;
+			var taxonomy:String = TaxonAttributeDefinitionProxy(autoCompleteLastInputField.attributeDefinition).taxonomy;
+			var token:Object = {searchText: searchText, searchType: autoCompleteLastSearchType};
 			var responder:IResponder = new AsyncResponder(autoCompleteSearchResultHandler, searchFaultHandler, token);
-			switch(searchType) {
+			switch ( autoCompleteLastSearchType ) {
 				case SEARCH_BY_CODE:
 					client.findByCode(responder, taxonomy, searchText, MAX_RESULTS);
 					break;
@@ -209,7 +243,6 @@ package org.openforis.collect.presenter {
 			if ( autoCompletePopUpOpened ) {
 				PopUpManager.removePopUp(autoCompletePopUp);
 				autoCompletePopUpOpened = false;
-				autoCompleteLastInputField.applyChangesOnFocusOut = true;
 				var textInput:TextInput = autoCompleteLastInputField.textInput as TextInput;
 				textInput.setFocus();
 			}
@@ -273,9 +306,12 @@ package org.openforis.collect.presenter {
 				data.addItem(UNLISTED_ITEM);
 			}
 			autoCompletePopUp.dataGrid.dataProvider = data;
+			autoCompleteLastResult = data;
+			autoCompleteDataLoading = false;
 		}
 		
 		protected static function searchFaultHandler(event:FaultEvent, token:Object = null):void {
+			autoCompleteDataLoading = false;
 			faultHandler(event, token);
 		}
 	}

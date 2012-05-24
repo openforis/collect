@@ -10,6 +10,7 @@ package org.openforis.collect.util
 	import mx.core.IVisualElement;
 	import mx.core.UIComponent;
 	import mx.core.UITextFormat;
+	import mx.managers.IFocusManagerComponent;
 	import mx.styles.CSSStyleDeclaration;
 	import mx.styles.IStyleManager2;
 	
@@ -218,6 +219,29 @@ package org.openforis.collect.util
 		public static function measureUnitWidth(text:String):Number {
 			var measure:TextLineMetrics = unitTextFormat.measureText(text);
 			return measure.width;
+		}
+		
+		public static function isFocusOnComponent(component:UIComponent):Boolean {
+			var app:Application = FlexGlobals.topLevelApplication as Application;
+			var focussed:UIComponent = app.focusManager.getFocus() as UIComponent;
+			return focussed != null && ( focussed == component || isDescendantOf(component, focussed) );
+		}
+		
+		private static function isDescendantOf(parent:UIComponent, component:UIComponent):Boolean {
+			var currentComponent:UIComponent = component;
+			do {
+				if ( currentComponent.hasOwnProperty("parent") ) {
+					var currentParent:UIComponent = currentComponent["parent"] as UIComponent;
+					if ( parent == currentParent ) {
+						return true;
+					}
+					currentComponent = currentParent;
+				} else {
+					currentComponent = null;
+				}
+			} while (currentComponent != null);
+			
+			return false;
 		}
 		
 	}
