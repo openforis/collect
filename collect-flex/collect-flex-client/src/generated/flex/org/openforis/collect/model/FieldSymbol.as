@@ -16,7 +16,6 @@ package org.openforis.collect.model {
         public static const BLANK_ON_FORM:FieldSymbol = new FieldSymbol("BLANK_ON_FORM", _);
         public static const DASH_ON_FORM:FieldSymbol = new FieldSymbol("DASH_ON_FORM", _);
         public static const ILLEGIBLE:FieldSymbol = new FieldSymbol("ILLEGIBLE", _);
-        public static const CONFIRMED:FieldSymbol = new FieldSymbol("CONFIRMED", _);
 
         function FieldSymbol(value:String = null, restrictor:* = null) {
             super((value || BLANK_ON_FORM.name), restrictor);
@@ -27,7 +26,7 @@ package org.openforis.collect.model {
         }
 
         public static function get constants():Array {
-            return [BLANK_ON_FORM, DASH_ON_FORM, ILLEGIBLE, CONFIRMED];
+            return [BLANK_ON_FORM, DASH_ON_FORM, ILLEGIBLE];
         }
 
         public static function valueOf(name:String):FieldSymbol {
