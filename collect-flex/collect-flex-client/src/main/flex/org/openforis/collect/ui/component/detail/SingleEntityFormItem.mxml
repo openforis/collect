@@ -4,6 +4,7 @@
 		xmlns:s="library://ns.adobe.com/flex/spark" 
 		xmlns:mx="library://ns.adobe.com/flex/mx"
 		xmlns:detail="org.openforis.collect.ui.component.detail.*"
+		width="100%"
 		>
 	<fx:Declarations>
 		<s:VerticalLayout id="verticalLayout" 

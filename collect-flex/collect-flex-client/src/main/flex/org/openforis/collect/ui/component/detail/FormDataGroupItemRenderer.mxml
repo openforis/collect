@@ -4,8 +4,8 @@
 				xmlns:mx="library://ns.adobe.com/flex/mx"
 				dataChange="dataChangeHandler(event)" 
 				autoDrawBackground="false"
-				
 				creationComplete="creationCompleteHandler(event)"
+				width="100%"
 				>
 	
 	<fx:Script>

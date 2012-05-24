@@ -2,7 +2,6 @@
 <detail:CollectFormItem xmlns:fx="http://ns.adobe.com/mxml/2009" 
 		 xmlns:s="library://ns.adobe.com/flex/spark" 
 		 xmlns:mx="library://ns.adobe.com/flex/mx"
-		 width="100%"
 		 xmlns:detail="org.openforis.collect.ui.component.detail.*"
 		 >
 
