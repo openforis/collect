@@ -107,7 +107,7 @@ public class ValidationResultProxy implements Proxy {
 			if(validationResult.getFlag() == ValidationResultFlag.ERROR) {
 				key = "edit.validation.specifiedError";
 			} else {
-				key = "edit.validation.requiredWarning";
+				key = "edit.validation.requiredField";
 			}
 		} else if(validator instanceof TimeValidator) {
 			key = "edit.validation.timeError";
