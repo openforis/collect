@@ -88,9 +88,17 @@ public class ValidationResultProxy implements Proxy {
 		} else if(validator instanceof ComparisonCheck) {
 			key = "edit.validation.comparisonError";
 		} else if(validator instanceof CoordinateValidator) {
-			key = "edit.validation.coordinateError";
+			if ( attribute.isFilled() ) {
+				key = "edit.validation.coordinateError";
+			} else {
+				key = "edit.validation.incompleteCoordinateError";
+			}
 		} else if(validator instanceof DateValidator) {
-			key = "edit.validation.dateError";
+			if ( attribute.isFilled() ) {
+				key = "edit.validation.dateError";
+			} else {
+				key = "edit.validation.incompleteDateError";
+			}
 		} else if(validator instanceof DistanceCheck) {
 			key = "edit.validation.distanceError";
 		} else if(validator instanceof ExternalCodeValidator) {
@@ -110,7 +118,11 @@ public class ValidationResultProxy implements Proxy {
 				key = "edit.validation.requiredField";
 			}
 		} else if(validator instanceof TimeValidator) {
-			key = "edit.validation.timeError";
+			if ( attribute.isFilled() ) {
+				key = "edit.validation.timeError";
+			} else {
+				key = "edit.validation.incompleteTimeError";
+			}
 		} else if(validator instanceof UniquenessCheck) {
 			key = "edit.validation.uniquenessError";
 		}
