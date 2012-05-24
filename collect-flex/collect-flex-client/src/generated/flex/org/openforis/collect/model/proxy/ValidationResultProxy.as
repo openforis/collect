@@ -20,32 +20,35 @@ package org.openforis.collect.model.proxy {
 		public function getMessage():String {
 			var result:String = LanguageSpecificTextProxy.getLocalizedText(messages);
 			if(StringUtil.isBlank(result)) {
-				var messageResource:String = messageKey;
-				var args:Array = messageArgs;
 				if(ruleName == "ComparisonCheck") {
-					var nodeLabel:String = args[0];
-					var argsAdapted:Array = [];
-					for (var index:int = 1; index < args.length; index ++) {
-						var arg:String = args[index];
-						var argParts:Array = arg.split(";");
-						var op:String = argParts[0];
-						var value:String = argParts[1];
-						var opMessageKey:String =  "edit.validation.compare." + op;
-						var operator:String = Message.get(opMessageKey);
-						var argAdapted:String = StringUtil.concat(" ", operator, value);
-						argsAdapted.push(argAdapted);
-					}
-					var andOperator:String = " " + Message.get("edit.validation.compare.and") + " ";
-					var argsConcat:String = StringUtil.concat(andOperator, argsAdapted);
-					result = Message.get(messageResource, [nodeLabel, argsConcat]);
+					result = getComparisonCheckMessage();
 				} else {
-					if(messageResource != null) {
-						result = Message.get(messageResource, args);
+					if(messageKey != null) {
+						result = Message.get(messageKey, messageArgs);
 					} else {
 						result = ruleName;
 					}
 				}
 			}
+			return result;
+		}
+		
+		private function getComparisonCheckMessage():String {
+			var nodeLabel:String = messageArgs[0];
+			var argsAdapted:Array = [];
+			for (var index:int = 1; index < messageArgs.length; index ++) {
+				var arg:String = messageArgs[index];
+				var argParts:Array = arg.split(";");
+				var op:String = argParts[0];
+				var value:String = argParts[1];
+				var opMessageKey:String =  "edit.validation.compare." + op;
+				var operator:String = Message.get(opMessageKey);
+				var argAdapted:String = StringUtil.concat(" ", operator, value);
+				argsAdapted.push(argAdapted);
+			}
+			var andOperator:String = " " + Message.get("edit.validation.compare.and") + " ";
+			var argsConcat:String = StringUtil.concat(andOperator, argsAdapted);
+			var result:String = Message.get(messageKey, [nodeLabel, argsConcat]);
 			return result;
 		}
     }
