@@ -209,6 +209,8 @@
 							width="{Math.max(0, entityDefinition.keyAttributeDefinitions.length - 1) * 100 + 150}" 
 							labelField="fullKeyText"
 							dataProvider="{entities}"
+							visible="{entities != null &amp;&amp; entities.length &gt; 0}"
+							includeInLayout="{entities != null &amp;&amp; entities.length &gt; 0}"
 							/>
 			<s:Button id="addButton" 
 					  styleName="addButton" 

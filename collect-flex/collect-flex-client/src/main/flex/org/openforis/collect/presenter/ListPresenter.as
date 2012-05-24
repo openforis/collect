@@ -193,11 +193,11 @@ package org.openforis.collect.presenter {
 		 * Delete Button clicked 
 		 * */
 		protected function deleteButtonClickHandler(event:MouseEvent):void {
+			var rootEntityLabel:String = Application.activeRootEntity.getLabelText();
 			var selectedRecord:RecordProxy = _view.dataGrid.selectedItem as RecordProxy;
 			if(selectedRecord == null) {
 				AlertUtil.showError("list.error.recordNotSelected");
 			} else if ( selectedRecord.step != CollectRecord$Step.ENTRY ) {
-				var rootEntityLabel:String = Application.activeRootEntity.getLabelText();
 				var stepName:String = Message.get("phase." + selectedRecord.step.name);
 				if ( Application.user.canReject(selectedRecord) ) {
 					AlertUtil.showError("list.error.cannotDelete.rejectBeforeDeletePromotedRecord", [rootEntityLabel, stepName]);
@@ -205,7 +205,7 @@ package org.openforis.collect.presenter {
 					AlertUtil.showError("list.error.cannoDeletePromotedRecord", [rootEntityLabel, stepName]);
 				}
 			} else {
-				AlertUtil.showConfirm("list.delete.confirm", null, "list.delete.confirmTitle", executeDelete, [selectedRecord]);
+				AlertUtil.showConfirm("list.delete.confirm", [rootEntityLabel], "list.delete.confirmTitle", executeDelete, [selectedRecord]);
 			}
 		}
 		

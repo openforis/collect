@@ -494,10 +494,9 @@ package org.openforis.collect.presenter {
 			}
 			UIUtil.replaceStyleNames(_view.validationStateDisplay, newStyles, 
 				[InputField.REMARKS_PRESENT_STYLE, InputField.READONLY_STYLE] );
-			/*
-			_view.hasRemarks = hasRemarks;
+			
+			//_view.hasRemarks = hasRemarks;
 			_view.editable = Application.activeRecordEditable;
-			*/
 		}
 		
 		protected function getField():FieldProxy {
