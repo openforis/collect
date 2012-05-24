@@ -518,13 +518,12 @@ package org.openforis.collect.presenter {
 			return null;
 		}
 		
-		protected function get dataClient():DataClient {
-			return _dataClient;
-		}
-
 		protected function get contextMenu():InputFieldContextMenu {
 			return _contextMenu;
 		}
 
+		protected static function get dataClient():DataClient {
+			return _dataClient;
+		}
 	}
 }
