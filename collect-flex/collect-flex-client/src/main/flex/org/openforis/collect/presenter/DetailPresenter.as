@@ -3,14 +3,12 @@ package org.openforis.collect.presenter {
 	 * 
 	 * @author S. Ricci
 	 * */
-	import flash.display.DisplayObject;
 	import flash.events.Event;
 	import flash.events.KeyboardEvent;
 	import flash.events.MouseEvent;
 	import flash.ui.Keyboard;
 	
 	import mx.binding.utils.ChangeWatcher;
-	import mx.core.FlexGlobals;
 	import mx.managers.PopUpManager;
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.events.ResultEvent;
@@ -131,6 +129,10 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function performClearActiveRecord():void {
+			//reset immediately activeRecord to avoid concurrency problems
+			//when keepAlive message is sent and record is being unlocked
+			ClientFactory.sessionClient.cancelLastKeepAliveOperation();
+			Application.activeRecord = null; 
 			_dataClient.clearActiveRecord(new AsyncResponder(clearActiveRecordHandler, faultHandler));
 		}
 		
@@ -191,7 +193,6 @@ package org.openforis.collect.presenter {
 		}
 		
 		internal function clearActiveRecordHandler(event:ResultEvent, token:Object = null):void {
-			Application.activeRecord = null;
 			var uiEvent:UIEvent = new UIEvent(UIEvent.BACK_TO_LIST);
 			eventDispatcher.dispatchEvent(uiEvent);
 		}

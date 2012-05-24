@@ -4,7 +4,6 @@ package org.openforis.collect.client {
 	import mx.rpc.remoting.Operation;
 	
 	import org.openforis.collect.Application;
-	import org.openforis.collect.model.proxy.RecordProxy;
 	
 	/**
 	 * 
@@ -18,7 +17,7 @@ package org.openforis.collect.client {
 		public function SessionClient() {
 			super("sessionService");
 			
-			this._keepAliveOperation = getOperation("keepAlive");
+			this._keepAliveOperation = getOperation("keepAlive", CONCURRENCY_LAST);
 			this._initSessionOperation = getOperation("initSession");
 		}
 		
@@ -26,6 +25,10 @@ package org.openforis.collect.client {
 			var editing:Boolean = Application.isEditingRecord();
 			var token:AsyncToken = this._keepAliveOperation.send(editing);
 			token.addResponder(responder);
+		}
+		
+		public function cancelLastKeepAliveOperation():void {
+			this._keepAliveOperation.cancel();
 		}
 		
 		public function initSession(responder:IResponder, localeString:String):void {
