@@ -50,6 +50,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.ui.view.DataExportView;
 	import org.openforis.collect.ui.view.ListView;
 	import org.openforis.collect.util.AlertUtil;
+	import org.openforis.collect.util.ArrayUtil;
 	import org.openforis.collect.util.CollectionUtil;
 	import org.openforis.collect.util.PopUpUtil;
 	import org.openforis.collect.util.StringUtil;
@@ -220,8 +221,13 @@ package org.openforis.collect.presenter {
 		protected function openFilterPopUpButtonClickHandler(event:Event):void {
 			if ( _filterPopUp != null ) {
 				closeFilterPopUp();
-			} else {
+			} else if ( currentKeyValuesFilter == null ) {
 				openFilterPopUp();
+			} else {
+				currentKeyValuesFilter = null;
+				_view.openFilterPopUpButton.selected = false;
+				currentPage = 1;
+				loadRecordSummariesCurrentPage();
 			}
 		}
 		
@@ -242,7 +248,8 @@ package org.openforis.collect.presenter {
 				PopUpUtil.VERTICAL_ALIGN_BOTTOM, 
 				PopUpUtil.HORIZONTAL_ALIGN_RIGHT);
 			
-			_filterPopUp.setFocus();
+			var firstTextInput:TextInput = _filterPopUp.textInput[0];
+			firstTextInput.setFocus();
 		}
 		
 		protected function stageClickHandler(event:MouseEvent):void {

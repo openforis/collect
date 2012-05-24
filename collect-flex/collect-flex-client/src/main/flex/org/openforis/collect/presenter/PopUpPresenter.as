@@ -40,7 +40,7 @@ package org.openforis.collect.presenter {
 		protected function keyDownHandler(event:KeyboardEvent):void {
 			switch(event.keyCode) {
 				case Keyboard.ESCAPE:
-					closeHandler();
+					_view.dispatchEvent(new CloseEvent(CloseEvent.CLOSE));
 					break;
 			}
 		}
