@@ -271,6 +271,12 @@ public class RecordManager {
 		addEmptyNodes(entity);
 		return entity;
 	}
+
+	public Entity addEntity(Entity parentEntity, String nodeName, int idx) {
+		Entity entity = parentEntity.addEntity(nodeName, idx);
+		addEmptyNodes(entity);
+		return entity;
+	}
 	
 	public void moveNode(CollectRecord record, int nodeId, int index) {
 		Node<?> node = record.getNodeByInternalId(nodeId);
@@ -381,37 +387,41 @@ public class RecordManager {
 		}
 	}
 	
-	private void addEmptyEnumeratedEntities(Entity entity) {
-		Record record = entity.getRecord();
+	private void addEmptyEnumeratedEntities(Entity parentEntity) {
+		Record record = parentEntity.getRecord();
 		ModelVersion version = record.getVersion();
-		EntityDefinition entityDefn = entity.getDefinition();
-		List<NodeDefinition> childDefinitions = entityDefn.getChildDefinitions();
+		EntityDefinition parentEntityDefn = parentEntity.getDefinition();
+		List<NodeDefinition> childDefinitions = parentEntityDefn.getChildDefinitions();
 		for (NodeDefinition childDefn : childDefinitions) {
 			if(childDefn instanceof EntityDefinition && version.isApplicable(childDefn)) {
 				EntityDefinition childEntityDefn = (EntityDefinition) childDefn;
 				if(childEntityDefn.isMultiple() && childEntityDefn.isEnumerable()) {
-					addEmptyEnumeratedEntities(entity, childEntityDefn);
+					addEmptyEnumeratedEntities(parentEntity, childEntityDefn);
 				}
 			}
 		}
 	}
 
-	private void addEmptyEnumeratedEntities(Entity entity, EntityDefinition enumeratedEntityDefn) {
-		Record record = entity.getRecord();
+	private void addEmptyEnumeratedEntities(Entity parentEntity, EntityDefinition enumerableEntityDefn) {
+		Record record = parentEntity.getRecord();
 		ModelVersion version = record.getVersion();
-		CodeAttributeDefinition enumeratingCodeDefn = getEnumeratingKeyCodeAttribute(enumeratedEntityDefn, version);
+		String enumeratedEntityName = enumerableEntityDefn.getName();
+		CodeAttributeDefinition enumeratingCodeDefn = getEnumeratingKeyCodeAttribute(enumerableEntityDefn, version);
 		if(enumeratingCodeDefn != null) {
 			CodeList list = enumeratingCodeDefn.getList();
 			List<CodeListItem> items = list.getItems();
-			for (CodeListItem item : items) {
+			for (int i = 0; i < items.size(); i++) {
+				CodeListItem item = items.get(i);
 				if(version.isApplicable(item)) {
 					String code = item.getCode();
-					if(! hasEnumeratedEntity(entity, enumeratedEntityDefn, enumeratingCodeDefn, code)) {
-						Entity addedEntity = addEntity(entity, enumeratedEntityDefn.getName());
-						//there will be an empty CodeAttribute after the adding of the new entity
-						//set the value into this node
+					Entity enumeratedEntity = getEnumeratedEntity(parentEntity, enumerableEntityDefn, enumeratingCodeDefn, code);
+					if( enumeratedEntity == null ) {
+						Entity addedEntity = addEntity(parentEntity, enumeratedEntityName, i);
+						//set the value of the key CodeAttribute
 						CodeAttribute addedCode = (CodeAttribute) addedEntity.get(enumeratingCodeDefn.getName(), 0);
 						addedCode.setValue(new Code(code));
+					} else {
+						parentEntity.move(enumeratedEntityName, enumeratedEntity.getIndex(), i);
 					}
 				}
 			}
@@ -431,17 +441,17 @@ public class RecordManager {
 		return null;
 	}
 	
-	private boolean hasEnumeratedEntity(Entity parentEntity, EntityDefinition childEntityDefn, 
+	private Entity getEnumeratedEntity(Entity parentEntity, EntityDefinition childEntityDefn, 
 			CodeAttributeDefinition enumeratingCodeAttributeDef, String value) {
 		List<Node<?>> children = parentEntity.getAll(childEntityDefn.getName());
-		for (Node<?> node : children) {
-			Entity child = (Entity) node;
-			Code code = getCodeAttributeValue(child, enumeratingCodeAttributeDef);
+		for (Node<?> child : children) {
+			Entity entity = (Entity) child;
+			Code code = getCodeAttributeValue(entity, enumeratingCodeAttributeDef);
 			if(code != null && value.equals(code.getCode())) {
-				return true;
+				return entity;
 			}
 		}
-		return false;
+		return null;
 	}
 	
 	private Code getCodeAttributeValue(Entity entity, CodeAttributeDefinition def) {
