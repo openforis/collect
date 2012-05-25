@@ -451,18 +451,10 @@ package org.openforis.collect.presenter {
 			var attribute:AttributeProxy = _view.attribute;
 			if(attribute != null) {
 				var field:FieldProxy = _view.attribute.getField(_view.fieldIndex);
-				if(field.symbol != null) {
-					var shortKey:String = FieldProxy.getShortCutForReasonBlank(field.symbol);
-					if(shortKey != null) {
-						return shortKey;
-					}
-				}
-				var value:Object = field.value;
-				if(value != null && StringUtil.isNotBlank(value.toString())) {
-					return value.toString();
-				}
+				return field.getValueAsText();
+			} else {
+				return "";
 			}
-			return "";
 		}
 
 		protected function textToRequestValue():String {

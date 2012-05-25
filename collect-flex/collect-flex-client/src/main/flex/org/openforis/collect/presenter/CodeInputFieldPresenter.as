@@ -156,7 +156,8 @@ package org.openforis.collect.presenter {
 					}
 				}
 				var code:String = field.value as String;
-				var qualifier:String = attribute.getField(1) as String;
+				var qualifierField:FieldProxy = attribute.getField(1);
+				var qualifier:String = qualifierField.value as String;
 				return StringUtil.concat(": ", code, qualifier);
 			}
 			return "";

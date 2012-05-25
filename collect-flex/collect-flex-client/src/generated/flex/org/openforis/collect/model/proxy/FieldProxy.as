@@ -75,5 +75,18 @@ package org.openforis.collect.model.proxy {
 			return value == null || StringUtil.isEmpty(value.toString());
 		}
 		
+		public function getValueAsText():String {
+			if(symbol != null) {
+				var shortKey:String = getShortCutForReasonBlank(symbol);
+				if(shortKey != null) {
+					return shortKey;
+				}
+			}
+			if(value != null && StringUtil.isNotBlank(value.toString())) {
+				return value.toString();
+			}
+			return "";
+		}
+		
     }
 }
