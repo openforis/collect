@@ -168,15 +168,14 @@ package org.openforis.collect.ui {
 					}
 				}
 			}
-			
+			//errors count column
+			column = getGridColumn(Message.get("list.errors"), "errors", 80, RecordSummaryDataGrid.numberLabelFunction);
+			columns.addItem(column);
 			//skipped count column
 			column = getGridColumn(Message.get("list.skipped"), "skipped", 80, RecordSummaryDataGrid.numberLabelFunction);
 			columns.addItem(column);
 			//missing count column
 			column = getGridColumn(Message.get("list.missing"), "missing", 80, RecordSummaryDataGrid.numberLabelFunction);
-			columns.addItem(column);
-			//errors count column
-			column = getGridColumn(Message.get("list.errors"), "errors", 80, RecordSummaryDataGrid.numberLabelFunction);
 			columns.addItem(column);
 			//warnings count column
 			column = getGridColumn(Message.get("list.warnings"), "warnings", 80, RecordSummaryDataGrid.numberLabelFunction);
