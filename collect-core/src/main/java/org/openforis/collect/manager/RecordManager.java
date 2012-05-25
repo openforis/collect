@@ -402,11 +402,11 @@ public class RecordManager {
 		}
 	}
 
-	private void addEmptyEnumeratedEntities(Entity parentEntity, EntityDefinition enumerableEntityDefn) {
+	private void addEmptyEnumeratedEntities(Entity parentEntity, EntityDefinition enuberableEntityDefn) {
 		Record record = parentEntity.getRecord();
 		ModelVersion version = record.getVersion();
-		String enumeratedEntityName = enumerableEntityDefn.getName();
-		CodeAttributeDefinition enumeratingCodeDefn = getEnumeratingKeyCodeAttribute(enumerableEntityDefn, version);
+		String enumeratedEntityName = enuberableEntityDefn.getName();
+		CodeAttributeDefinition enumeratingCodeDefn = getEnumeratingKeyCodeAttribute(enuberableEntityDefn, version);
 		if(enumeratingCodeDefn != null) {
 			CodeList list = enumeratingCodeDefn.getList();
 			List<CodeListItem> items = list.getItems();
@@ -414,7 +414,7 @@ public class RecordManager {
 				CodeListItem item = items.get(i);
 				if(version.isApplicable(item)) {
 					String code = item.getCode();
-					Entity enumeratedEntity = getEnumeratedEntity(parentEntity, enumerableEntityDefn, enumeratingCodeDefn, code);
+					Entity enumeratedEntity = getEnumeratedEntity(parentEntity, enuberableEntityDefn, enumeratingCodeDefn, code);
 					if( enumeratedEntity == null ) {
 						Entity addedEntity = addEntity(parentEntity, enumeratedEntityName, i);
 						//set the value of the key CodeAttribute
