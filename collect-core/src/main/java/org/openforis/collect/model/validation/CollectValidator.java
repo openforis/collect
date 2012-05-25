@@ -17,6 +17,7 @@ import org.openforis.idm.metamodel.validation.ValidationResultFlag;
 import org.openforis.idm.metamodel.validation.ValidationResults;
 import org.openforis.idm.metamodel.validation.Validator;
 import org.openforis.idm.model.Attribute;
+import org.openforis.idm.model.CodeAttribute;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Field;
 import org.openforis.idm.model.NumberAttribute;
@@ -131,7 +132,7 @@ public class CollectValidator extends Validator {
 	static boolean isReasonBlankAlwaysSpecified(Attribute<?, ?> attribute) {
 		int fieldCount = 0;
 		// ignore unit for numeric attributes
-		if ( attribute instanceof NumberAttribute ) {
+		if ( attribute instanceof NumberAttribute || attribute instanceof CodeAttribute ) {
 			fieldCount = 1;
 		} else if ( attribute instanceof NumericRangeAttribute ) {
 			fieldCount = 2;
