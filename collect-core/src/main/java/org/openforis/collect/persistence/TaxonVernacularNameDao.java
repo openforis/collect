@@ -18,9 +18,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author G. Miceli
+ * @author S. Ricci
  */
 @Transactional
 public class TaxonVernacularNameDao extends MappingJooqDaoSupport<TaxonVernacularName, TaxonVernacularNameDao.JooqFactory> {
+	
 	public TaxonVernacularNameDao() {
 		super(TaxonVernacularNameDao.JooqFactory.class);
 	}
@@ -34,7 +36,7 @@ public class TaxonVernacularNameDao extends MappingJooqDaoSupport<TaxonVernacula
 			.from(OFC_TAXON_VERNACULAR_NAME)
 			.join(OFC_TAXON).on(OFC_TAXON.ID.equal(OFC_TAXON_VERNACULAR_NAME.TAXON_ID))
 			.where(OFC_TAXON.TAXONOMY_ID.equal(taxonomyId)
-					.and(JooqFactory.upper(OFC_TAXON_VERNACULAR_NAME.VERNACULAR_NAME).like(searchString)))
+				.and(JooqFactory.upper(OFC_TAXON_VERNACULAR_NAME.VERNACULAR_NAME).like(searchString)))
 			.limit(maxResults);
 		Result<?> result = query.fetch();
 		List<TaxonVernacularName> entities = jf.fromResult(result);

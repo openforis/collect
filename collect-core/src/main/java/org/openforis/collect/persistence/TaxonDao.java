@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author G. Miceli
+ * @author S. Ricci
  */
 @Transactional
 public class TaxonDao extends MappingJooqDaoSupport<Taxon, TaxonDao.JooqFactory> {
@@ -46,7 +47,6 @@ public class TaxonDao extends MappingJooqDaoSupport<Taxon, TaxonDao.JooqFactory>
 	}
 
 	public List<Taxon> findByCode(int taxonomyId, String searchString, int maxResults) {
-		//todo add taxonomy to where conditions
 		return findStartingWith(OFC_TAXON.CODE, taxonomyId, searchString, maxResults);
 	}
 
@@ -66,7 +66,6 @@ public class TaxonDao extends MappingJooqDaoSupport<Taxon, TaxonDao.JooqFactory>
 		Result<?> result = query.fetch();
 		List<Taxon> entities = jf.fromResult(result);
 		return entities;
-
 	}
 	
 	protected static class JooqFactory extends MappingJooqFactory<Taxon> {
