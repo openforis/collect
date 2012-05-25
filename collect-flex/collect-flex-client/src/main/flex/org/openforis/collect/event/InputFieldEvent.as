@@ -16,9 +16,11 @@ package org.openforis.collect.event
 		public static const VISITED:String = "visited";
 		public static const SET_FOCUS:String = "setFocus";
 		
+		private var _inputField:InputField;
+		private var _parentEntityId:int;
+		private var _nodeName:String;
 		private var _attributeId:int;
 		private var _fieldIdx:int;
-		private var _inputField:InputField;
 		
 		public function InputFieldEvent(type:String, bubbles:Boolean=false, cancelable:Boolean=false) {
 			super(type, bubbles, cancelable);
@@ -32,6 +34,22 @@ package org.openforis.collect.event
 			_inputField = value;
 		}
 
+		public function get parentEntityId():int {
+			return _parentEntityId;
+		}
+		
+		public function set parentEntityId(value:int):void {
+			_parentEntityId = value;
+		}
+		
+		public function get nodeName():String {
+			return _nodeName;
+		}
+		
+		public function set nodeName(value:String):void {
+			_nodeName = value;
+		}
+		
 		public function get attributeId():int {
 			return _attributeId;
 		}

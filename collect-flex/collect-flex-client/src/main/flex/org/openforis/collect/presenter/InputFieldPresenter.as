@@ -15,6 +15,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.event.InputFieldEvent;
 	import org.openforis.collect.event.NodeEvent;
 	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
+	import org.openforis.collect.metamodel.proxy.CodeAttributeDefinitionProxy;
 	import org.openforis.collect.model.FieldSymbol;
 	import org.openforis.collect.model.proxy.AttributeProxy;
 	import org.openforis.collect.model.proxy.EntityProxy;
@@ -360,16 +361,24 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function setFocusOnSiblingEntity(offset:int):void {
-			var attributeName:String = _view.attributeDefinition.name
-			if ( _view.attributeDefinition is AttributeDefinitionProxy && ! _view.attributeDefinition.multiple ) {
-				var entity:EntityProxy = EntityProxy(_view.parentEntity.getSibling(offset));
-				if ( entity != null ) {
-					var attribute:AttributeProxy = entity.getSingleAttribute(attributeName);
-					var nodeEvent:InputFieldEvent = new InputFieldEvent(InputFieldEvent.SET_FOCUS);
-					nodeEvent.attributeId = attribute.id;
-					nodeEvent.fieldIdx = _view.fieldIndex;
-					eventDispatcher.dispatchEvent(nodeEvent);
+			var attributeName:String = _view.attributeDefinition.name;
+			var inputFieldEvent:InputFieldEvent = new InputFieldEvent(InputFieldEvent.SET_FOCUS);
+			inputFieldEvent.nodeName = attributeName;
+			inputFieldEvent.fieldIdx = _view.fieldIndex;
+			var attributeToFocusIn:AttributeProxy;
+			if ( _view.attributeDefinition.multiple ) {
+				var attribute:AttributeProxy = _view.attribute;
+				attributeToFocusIn = AttributeProxy(attribute.getSibling(offset));
+			} else {
+				var siblingEntity:EntityProxy = EntityProxy(_view.parentEntity.getSibling(offset));
+				if ( siblingEntity != null ) {
+					attributeToFocusIn = siblingEntity.getSingleAttribute(attributeName);
 				}
+			}
+			if ( attributeToFocusIn != null ) {
+				inputFieldEvent.attributeId = attributeToFocusIn.id;
+				inputFieldEvent.parentEntityId = attributeToFocusIn.parentId;
+				eventDispatcher.dispatchEvent(inputFieldEvent);
 			}
 		}
 		

@@ -9,8 +9,10 @@ package org.openforis.collect.presenter {
 	import mx.rpc.IResponder;
 	
 	import org.openforis.collect.event.ApplicationEvent;
+	import org.openforis.collect.event.InputFieldEvent;
 	import org.openforis.collect.model.FieldSymbol;
 	import org.openforis.collect.model.proxy.AttributeProxy;
+	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.model.proxy.FieldProxy;
 	import org.openforis.collect.remoting.service.UpdateRequest;
 	import org.openforis.collect.remoting.service.UpdateRequestOperation;
@@ -45,6 +47,26 @@ package org.openforis.collect.presenter {
 				_view.attributes.addEventListener(CollectionEvent.COLLECTION_CHANGE, attributesChangeHandler);
 			}
 			updateView();
+		}
+		
+		override protected function setFocusHandler(event:InputFieldEvent):void {
+			if ( _view.textInput != null && _view.parentEntity != null && _view.attributeDefinition != null &&
+				_view.parentEntity.id == event.parentEntityId && _view.attributeDefinition.name == event.nodeName) {
+				_view.textInput.setFocus();
+			}
+		}
+		
+		override protected function setFocusOnSiblingEntity(offset:int):void {
+			var attributeName:String = _view.attributeDefinition.name;
+			var inputFieldEvent:InputFieldEvent = new InputFieldEvent(InputFieldEvent.SET_FOCUS);
+			inputFieldEvent.nodeName = attributeName;
+			inputFieldEvent.fieldIdx = _view.fieldIndex;
+			var attributeToFocusIn:AttributeProxy;
+			var siblingEntity:EntityProxy = EntityProxy(_view.parentEntity.getSibling(offset));
+			if ( siblingEntity != null ) {
+				inputFieldEvent.parentEntityId = siblingEntity.id;
+				eventDispatcher.dispatchEvent(inputFieldEvent);
+			}
 		}
 		
 		override protected function updateResponseReceivedHandler(event:ApplicationEvent):void {
