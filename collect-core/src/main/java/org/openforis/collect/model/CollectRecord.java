@@ -13,6 +13,7 @@ import javax.xml.namespace.QName;
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
+import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.validation.ValidationResultFlag;
 import org.openforis.idm.metamodel.validation.ValidationResults;
@@ -552,13 +553,15 @@ public class CollectRecord extends Record {
 					attribute.validateValue();
 				} else if ( node instanceof Entity ) {
 					Entity entity = (Entity) node;
-					
+					ModelVersion version = getVersion();
 					EntityDefinition definition = entity.getDefinition();
 					List<NodeDefinition> childDefinitions = definition.getChildDefinitions();
 					for (NodeDefinition childDefinition : childDefinitions) {
-						String childName = childDefinition.getName();
-						entity.validateMaxCount( childName );
-						entity.validateMinCount( childName );
+						if ( version.isApplicable(childDefinition) ) {
+							String childName = childDefinition.getName();
+							entity.validateMaxCount( childName );
+							entity.validateMinCount( childName );
+						}
 					}
 				}
 			}

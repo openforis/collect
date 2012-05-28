@@ -9,22 +9,29 @@ import java.util.Map;
 
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.idm.metamodel.EntityDefinition;
+import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.validation.ValidationResultFlag;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Node;
+import org.openforis.idm.model.Record;
 
 /**
  * @author M. Togna
+ * @author S. Ricci
  * 
  */
 public class EntityProxy extends NodeProxy {
 
 	private transient Entity entity;
-
+	private transient Record record;
+	private transient ModelVersion version;
+	
 	public EntityProxy(EntityProxy parent, Entity entity) {
 		super(parent, entity);
 		this.entity = entity;
+		record = entity.getRecord();
+		version = record.getVersion();
 	}
 	
 	@ExternalizedProperty
@@ -32,10 +39,12 @@ public class EntityProxy extends NodeProxy {
 		Map<String, List<NodeProxy>> result = new HashMap<String, List<NodeProxy>>();
 		List<NodeDefinition> childDefinitions = getChildDefinitions();
 		for (NodeDefinition childDefinition : childDefinitions) {
-			String name = childDefinition.getName();
-			List<Node<?>> childrenByName = this.entity.getAll(name);
-			List<NodeProxy> proxies = NodeProxy.fromList(this, childrenByName);
-			result.put(name, proxies);
+			if ( version.isApplicable(childDefinition) ) {
+				String name = childDefinition.getName();
+				List<Node<?>> childrenByName = this.entity.getAll(name);
+				List<NodeProxy> proxies = NodeProxy.fromList(this, childrenByName);
+				result.put(name, proxies);
+			}
 		}
 		return result;
 	}
@@ -45,9 +54,11 @@ public class EntityProxy extends NodeProxy {
 		List<NodeDefinition> childDefinitions = getChildDefinitions();
 		Map<String, Boolean> map = new HashMap<String, Boolean>();
 		for (NodeDefinition childDefinition : childDefinitions) {
-			String childName = childDefinition.getName();
-			boolean relevant = entity.isRelevant(childName );
-			map.put(childName, relevant);
+			if ( version.isApplicable(childDefinition) ) {
+				String childName = childDefinition.getName();
+				boolean relevant = entity.isRelevant(childName );
+				map.put(childName, relevant);
+			}
 		}
 		return map;
 	}
@@ -57,9 +68,11 @@ public class EntityProxy extends NodeProxy {
 		List<NodeDefinition> childDefinitions = getChildDefinitions();
 		Map<String, Boolean> map = new HashMap<String, Boolean>();
 		for (NodeDefinition childDefinition : childDefinitions) {
-			String childName = childDefinition.getName();
-			boolean required = entity.isRequired(childName );
-			map.put(childName, required);
+			if ( version.isApplicable(childDefinition) ) {
+				String childName = childDefinition.getName();
+				boolean required = entity.isRequired(childName );
+				map.put(childName, required);
+			}
 		}
 		return map;
 	}
@@ -69,9 +82,11 @@ public class EntityProxy extends NodeProxy {
 		List<NodeDefinition> childDefinitions = getChildDefinitions();
 		Map<String, ValidationResultFlag> map = new HashMap<String, ValidationResultFlag>();
 		for (NodeDefinition childDefinition : childDefinitions) {
-			String childName = childDefinition.getName();
-			ValidationResultFlag valid = entity.validateMinCount(childName);
-			map.put(childName, valid);
+			if ( version.isApplicable(childDefinition) ) {
+				String childName = childDefinition.getName();
+				ValidationResultFlag valid = entity.validateMinCount(childName);
+				map.put(childName, valid);
+			}
 		}
 		return map;
 	}
@@ -81,9 +96,11 @@ public class EntityProxy extends NodeProxy {
 		List<NodeDefinition> childDefinitions = getChildDefinitions();
 		Map<String, ValidationResultFlag> map = new HashMap<String, ValidationResultFlag>();
 		for (NodeDefinition childDefinition : childDefinitions) {
-			String childName = childDefinition.getName();
-			ValidationResultFlag valid = entity.validateMaxCount(childName);
-			map.put(childName, valid);
+			if ( version.isApplicable(childDefinition) ) {
+				String childName = childDefinition.getName();
+				ValidationResultFlag valid = entity.validateMaxCount(childName);
+				map.put(childName, valid);
+			}
 		}
 		return map;
 	}
@@ -93,8 +110,10 @@ public class EntityProxy extends NodeProxy {
 		List<NodeDefinition> childDefinitions = getChildDefinitions();
 		Map<String, Boolean> map = new HashMap<String, Boolean>();
 		for (NodeDefinition childDefinition : childDefinitions) {
-			String childName = childDefinition.getName();
-			map.put(childName, Boolean.FALSE);
+			if ( version.isApplicable(childDefinition) ) {
+				String childName = childDefinition.getName();
+				map.put(childName, Boolean.FALSE);
+			}
 		}
 		return map;
 	}
