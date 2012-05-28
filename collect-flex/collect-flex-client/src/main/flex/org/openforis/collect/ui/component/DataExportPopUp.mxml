@@ -188,7 +188,7 @@
 			 gap="20"
 			 >
 		<s:Label text="{Message.get('export.complete')}"
-				 styleName="infoMessage"
+				 styleName="infoMessageBig"
 				 />
 		
 		<s:HGroup gap="30">
