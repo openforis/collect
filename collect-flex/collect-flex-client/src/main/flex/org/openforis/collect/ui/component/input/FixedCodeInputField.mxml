@@ -33,7 +33,10 @@
 	<s:Label id="textInput" 
 			 styleName="fixedCode"
 			 maxDisplayedLines="1" 
-			 showTruncationTip="true" />
+			 showTruncationTip="true" 
+			 verticalAlign="middle"
+			 height="22"
+			 />
 	
 	<input:TextInput id="qualifierTextInput"
 					 visible="{qualifiable}"
