@@ -51,7 +51,7 @@
 	</fx:Script>
 	
 	<s:layout>
-		<s:VerticalLayout gap="1" paddingLeft="2"/>
+		<s:VerticalLayout gap="2" paddingLeft="2"/>
 	</s:layout>
 	
 	<s:itemRenderer>

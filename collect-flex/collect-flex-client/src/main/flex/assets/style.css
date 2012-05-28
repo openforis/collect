@@ -109,6 +109,11 @@ component|BlockingMessagePopUp, component|SelectVersionPopUp, input|CodeListDial
 component|RecordFilterPopUp {
 }
 
+input|CodeListDialog s|CheckBox {
+	fontSize: 11;
+	fontFamily: Verdana;
+}
+
 mx|ToolTip { 
 	fontSize: 10; 
 	backgroundColor: #AAD4FF;

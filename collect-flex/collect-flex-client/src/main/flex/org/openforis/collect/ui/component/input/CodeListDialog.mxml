@@ -4,11 +4,13 @@
 				  xmlns:mx="library://ns.adobe.com/flex/mx" 
 				  xmlns:input="org.openforis.collect.ui.component.input.*"
 				  xmlns:component="org.openforis.collect.ui.component.*"
-				  width="500" height="400" 
 				  >
 	<fx:Script>
 		<![CDATA[
 			import org.openforis.collect.i18n.Message;
+			
+			public static const STATE_DEFAULT:String = "default";
+			public static const STATE_LOADING:String = "loading";
 			
 			private var _maxSpecified:int = 1;
 			private var _multiple:Boolean = false;
@@ -59,8 +61,8 @@
 		<s:State name="loading" />
 	</s:states>
 	
-	<s:Group id="loadingContainer" height="100%" width="100%" includeIn="loading" itemCreationPolicy="immediate">
-		<component:LoadingContent />
+	<s:Group id="loadingContainer" includeIn="loading" itemCreationPolicy="immediate">
+		<component:LoadingContent height="100" width="200" />
 		<s:Button 
 				id="cancelLoading" 
 				bottom="0" 
@@ -71,7 +73,11 @@
 				/>
 	</s:Group>
 
-	<s:VGroup id="dataContainer" height="100%" width="100%" includeIn="default"  itemCreationPolicy="immediate">
+	<s:VGroup id="dataContainer" 
+			  maxHeight="500" 
+			  maxWidth="500" 
+			  includeIn="default"  
+			  itemCreationPolicy="immediate">
 		<s:Scroller height="100%" width="100%">
 			<input:CodeListDialogDataGroup
 					id="dataGroup" 

@@ -92,7 +92,6 @@ package org.openforis.collect.presenter {
 				_popUp.addEventListener(KeyboardEvent.KEY_DOWN, popUpKeyDownHandler);
 			}
 			PopUpManager.addPopUp(_popUp, FlexGlobals.topLevelApplication as DisplayObject, true);
-			PopUpManager.centerPopUp(_popUp);
 			_popUp.editable = Application.activeRecordEditable;
 			_popUp.multiple = _view.attributeDefinition.multiple;
 			_popUp.maxSpecified = _view.attributeDefinition.maxCount;
@@ -103,7 +102,8 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function loadCodes():void {
-			_popUp.currentState = "loading";
+			_popUp.currentState = CodeListDialog.STATE_LOADING;
+			PopUpManager.centerPopUp(_popUp);
 			
 			var codeAttributeDef:CodeAttributeDefinitionProxy = _view.attributeDefinition as CodeAttributeDefinitionProxy;
 			var attribute:String = codeAttributeDef.name;
@@ -115,7 +115,8 @@ package org.openforis.collect.presenter {
 		protected function loadListDialogDataResultHandler(event:ResultEvent, token:Object = null):void {
 			var data:IList = event.result as IList;
 			_popUp.dataGroup.dataProvider = data;
-			_popUp.currentState = "default";
+			_popUp.currentState = CodeListDialog.STATE_DEFAULT;
+			PopUpManager.centerPopUp(_popUp);
 		}
 
 		protected function popUpKeyDownHandler(event:KeyboardEvent):void {
