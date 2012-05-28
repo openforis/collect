@@ -31,11 +31,11 @@ public class DataMarshaller {
 
 	private static final String RECORD_VERSION_ATTRIBUTE = "version";
 	private static final String RECORD_STEP_ATTRIBUTE = "step";
-	private static final String RECORD_CREATED_BY_ATTRIBUTE = "createdBy";
+	private static final String RECORD_CREATED_BY_ATTRIBUTE = "created_by";
 	private static final String RECORD_CREATED_ATTRIBUTE = "created";
-	private static final String RECORD_MODIFIED_BY_ATTRIBUTE = "modifiedBy";
+	private static final String RECORD_MODIFIED_BY_ATTRIBUTE = "modified_by";
 	private static final String RECORD_MODIFIED_ATTRIBUTE = "modified";
-	private static final String DEFINITION_ID_ATTRIBUTE = "defnId";
+	private static final String DEFINITION_ID_ATTRIBUTE = "defn";
 	private static final String STATE_ATTRIBUTE = "state";
 	private static final String SYMBOL_ATTRIBUTE = "symbol";
 	private static final String REMARKS_ATTRIBUTE = "remarks";

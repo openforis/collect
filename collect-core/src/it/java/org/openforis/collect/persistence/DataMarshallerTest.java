@@ -115,7 +115,7 @@ public class DataMarshallerTest {
 		assertEquals("", res);
 		
 		//test definition id
-		res = evaluateXPathExpression(doc, "cluster/id/@defnId");
+		res = evaluateXPathExpression(doc, "cluster/id/@defn");
 		Schema schema = survey.getSchema();
 		NodeDefinition nodeDefn = schema.getByPath("/cluster/id");
 		Integer nodeDefnId = nodeDefn.getId();
