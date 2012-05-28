@@ -6,7 +6,16 @@
 				 title="{Message.get('edit.errorListPopUpTitle')}"
 				 height="400"
 				 width="600"
+				 minWidth="100"
+				 minHeight="100"
 				 >
+	<component:layout>
+		<s:VerticalLayout gap="10"
+						  horizontalAlign="center"
+						  paddingBottom="10" paddingLeft="10" paddingRight="10" paddingTop="10"
+						  />
+	</component:layout>
+	
 	<fx:Script>
 		<![CDATA[
 			import mx.events.FlexEvent;
@@ -32,5 +41,13 @@
 			</s:ArrayList>
 		</s:columns>
 	</s:DataGrid>
+	
+	<s:HGroup width="100%" horizontalAlign="center">
+		<s:Button id="okButton"
+				  label="{Message.get('global.ok')}"
+				  useHandCursor="true" 
+				  buttonMode="true"
+				  />
+	</s:HGroup>
 	
 </component:PopUp>
