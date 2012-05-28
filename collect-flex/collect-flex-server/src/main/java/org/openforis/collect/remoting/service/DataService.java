@@ -234,7 +234,7 @@ public class DataService {
 				record.setMissingApproved(parentEntity, nodeName, false);
 				response = getUpdateResponse(responseMap, createdNode);
 				response.setCreatedNode(NodeProxy.fromNode(createdNode));
-				relReqDependencies = recordManager. clearRelevanceRequiredStates(createdNode);
+				relReqDependencies = recordManager.clearRelevanceRequiredStates(createdNode);
 				if(createdNode instanceof Attribute){
 					attribute = (Attribute<? extends AttributeDefinition, ?>) createdNode;
 					checkDependencies = recordManager.clearValidationResults(attribute);
