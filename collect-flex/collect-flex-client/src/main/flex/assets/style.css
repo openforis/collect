@@ -114,6 +114,10 @@ input|CodeListDialog s|CheckBox {
 	fontFamily: Verdana;
 }
 
+component|ErrorListPopUp {
+	skinClass: ClassReference("org.openforis.collect.ui.skin.ResizableTitleWindowSkin");
+}
+
 mx|ToolTip { 
 	fontSize: 10; 
 	backgroundColor: #AAD4FF;
