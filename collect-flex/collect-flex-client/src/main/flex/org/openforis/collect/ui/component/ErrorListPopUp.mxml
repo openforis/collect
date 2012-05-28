@@ -6,8 +6,8 @@
 				 title="{Message.get('edit.errorListPopUpTitle')}"
 				 height="400"
 				 width="600"
-				 minWidth="100"
-				 minHeight="100"
+				 minWidth="200"
+				 minHeight="200"
 				 >
 	<component:layout>
 		<s:VerticalLayout gap="10"
@@ -30,6 +30,12 @@
 			}
 		]]>
 	</fx:Script>
+	
+	<s:Label text="{Message.get('error.promoteException')}"
+			 styleName="infoMessage"
+			 width="100%"
+			 showTruncationTip="true"
+			 />
 	
 	<s:DataGrid id="dataGrid" 
 				height="100%" 
