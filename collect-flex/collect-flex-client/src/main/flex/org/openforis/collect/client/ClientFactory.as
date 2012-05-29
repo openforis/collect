@@ -63,11 +63,8 @@ package org.openforis.collect.client {
 		
 		public static function get logoClient():LogoClient{
 			if(_logoClient == null){
-				trace("55");
 				_logoClient = new LogoClient();
-				trace("56");
 			}
-			trace("57");
 			return _logoClient;
 		}
 		

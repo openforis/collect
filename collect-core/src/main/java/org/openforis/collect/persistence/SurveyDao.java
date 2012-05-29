@@ -219,18 +219,20 @@ public class SurveyDao extends JooqDaoSupport {
 		query.execute();
 		Result<Record> result = query.getResult();
 
-		if (result.isEmpty()) { // we should insert it now
+		System.out.println("Checking survey");
+		if (result.isEmpty()) { // we should insert it now			
 			surveyId = jf.nextval(OFC_SURVEY_ID_SEQ).intValue();
+			System.out.println("    Survey " +  name + " not exist. Inserting with ID = " + surveyId );
 			jf.insertInto(OFC_SURVEY).set(OFC_SURVEY.ID, surveyId)
 					.set(OFC_SURVEY.NAME, name)
 					.set(OFC_SURVEY.IDML, Factory.val(idml, SQLDataType.CLOB))
 					.execute();
 			survey.setId(surveyId);
 		} else {
-			Record record = result.get(0);
-			surveyId = record.getValueAsInteger(OFC_SURVEY.ID);
+			Record record = result.get(0);			
+			surveyId = record.getValueAsInteger(OFC_SURVEY.ID);			
 			survey.setId(surveyId);
-			// Update Survey IDM
+			System.out.println("    Survey " +  name + " exist. Updating with ID = " + surveyId );
 			jf.update(OFC_SURVEY)
 					.set(OFC_SURVEY.IDML, Factory.val(idml, SQLDataType.CLOB))
 					.where(OFC_SURVEY.ID.equal(survey.getId())).execute();
@@ -239,11 +241,13 @@ public class SurveyDao extends JooqDaoSupport {
 		// Insert SCHEMA_DEFINITIONs for new Fields only
 		Schema schema = survey.getSchema();
 		Collection<NodeDefinition> definitions = schema.getAllDefinitions();
+		System.out.println("Enumerating all nodeDefinition.");
 		for (NodeDefinition definition : definitions) {
 			int definitionId = jf.nextval(OFC_SCHEMA_DEFINITION_ID_SEQ)
 					.intValue();
 			String path = definition.getPath();
-
+			
+			
 			query = jf.select(OFC_SCHEMA_DEFINITION.ID)
 					.from(OFC_SCHEMA_DEFINITION)
 					.where(OFC_SCHEMA_DEFINITION.PATH.equal(path))
@@ -251,11 +255,15 @@ public class SurveyDao extends JooqDaoSupport {
 			query.execute();
 			result = query.getResult();
 			if (result.isEmpty()) {
+				System.out.println("    Schema definition " + path + " not exist. Inserting.");
 				jf.insertInto(OFC_SCHEMA_DEFINITION)
 						.set(OFC_SCHEMA_DEFINITION.ID, definitionId)
 						.set(OFC_SCHEMA_DEFINITION.SURVEY_ID, surveyId)
 						.set(OFC_SCHEMA_DEFINITION.PATH, path).execute();
 				definition.setId(definitionId);
+			}else{
+				System.out.println("    Schema definition " + path + " exist. Updating.");
+				//TODO maintain integrity
 			}
 		}
 
@@ -266,13 +274,16 @@ public class SurveyDao extends JooqDaoSupport {
 		queryJoin.execute();
 		result = queryJoin.getResult();
 
+		System.out.println("Remove orphaned schema definition");
 		for (Record r : result) {
 			String path = r.getValueAsString(0);
 			NodeDefinition node = schema.getByPath(path);
 			if (node == null) {
+				System.out.println("    Removing " + path);
 				jf.delete(OFC_SCHEMA_DEFINITION)
 						.where(OFC_SCHEMA_DEFINITION.PATH.equal(path).and(OFC_SCHEMA_DEFINITION.SURVEY_ID.equal(surveyId)))
 						.execute();
+				//TODO maintain integrity
 			}
 		}
 

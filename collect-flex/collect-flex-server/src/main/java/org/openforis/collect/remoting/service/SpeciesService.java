@@ -12,7 +12,10 @@ import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.proxy.TaxonOccurrenceProxy;
 import org.openforis.collect.web.session.SessionState;
+import org.openforis.idm.metamodel.EntityDefinition;
+import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.TaxonAttributeDefinition;
+import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.TaxonAttribute;
 import org.openforis.idm.model.TaxonOccurrence;
@@ -61,12 +64,28 @@ public class SpeciesService {
 	 * @return
 	 */
 	public List<TaxonOccurrenceProxy> findByVernacularName(int nodeId, String searchString, int maxResults) {
+		System.out.println("nodeId = " + nodeId);
 		SessionState sessionState = sessionManager.getSessionState();
 		CollectRecord record = sessionState.getActiveRecord();
-		Node<?> node = record.getNodeByInternalId(nodeId);
-		if ( node instanceof TaxonAttribute ) {
-			TaxonAttribute attr = (TaxonAttribute) node;
-			TaxonAttributeDefinition definition = attr.getDefinition();
+		Node<? extends NodeDefinition> node = record.getNodeByInternalId(nodeId);
+		
+		TaxonAttribute attr = (TaxonAttribute) node;
+		System.out.println("node = "  + node);
+		TaxonAttributeDefinition definition = attr.getDefinition();
+		System.out.println(definition.getPath());
+		if (node instanceof TaxonAttribute) 
+		{
+			
+			List<String> q = definition.getQualifiers();
+			if(q!=null){
+				System.out.println("Search by qualifer");
+				for(String s : q){
+					System.out.println("Qualifer = " + s);
+				}
+			}else{
+				return find(SearchType.BY_VERNACULAR_NAME, searchString, maxResults);
+			}
+			
 		} else {
 			throw new IllegalArgumentException("Expected TaxonAttribute but got "+node.getClass());
 		}

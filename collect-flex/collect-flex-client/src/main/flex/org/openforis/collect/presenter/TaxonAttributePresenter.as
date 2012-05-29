@@ -180,7 +180,7 @@ package org.openforis.collect.presenter {
 					client.findByScientificName(responder, searchText, MAX_RESULTS);
 					break;
 				case SEARCH_BY_VERNACULAR_NAME:
-					client.findByVernacularName(responder, searchText, MAX_RESULTS);
+					client.findByVernacularName(responder,inputField.attributeDefinition.id,searchText, MAX_RESULTS);
 					break;
 				default:
 			}

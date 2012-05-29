@@ -4,7 +4,7 @@
 				  xmlns:mx="library://ns.adobe.com/flex/mx" 
 				  xmlns:input="org.openforis.collect.ui.component.input.*" 
 				  xmlns:detail="org.openforis.collect.ui.component.detail.*"
-				  inputFields="{[codeTextInput, scientificNameTextInput, vernacularNameTextInput, languageCodeTextInput, languageVarietyTextInput]}"
+				  inputFields="{[vernacularNameTextInput, codeTextInput, scientificNameTextInput, languageCodeTextInput, languageVarietyTextInput]}"
 				  >
 	<fx:Script>
 		<![CDATA[
@@ -23,12 +23,21 @@
 	</detail:states>
 	
 	<s:HGroup includeIn="horizontal" gap="6">
-		<input:StringInputField id="codeTextInput" 
+		<input:StringInputField id="vernacularNameTextInput" 
 								includeIn="horizontal"
 								attributeDefinition="{attributeDefinition}"
 								parentEntity="{parentEntity}"
 								attribute="{attribute}"
 								fieldIndex="0"
+								maxChars="255"
+								width="100" 
+								/>
+		<input:StringInputField id="codeTextInput" 
+								includeIn="horizontal"
+								attributeDefinition="{attributeDefinition}"
+								parentEntity="{parentEntity}"
+								attribute="{attribute}"
+								fieldIndex="1"
 								width="80" 
 								maxChars="32" 
 								/>
@@ -37,19 +46,10 @@
 								attributeDefinition="{attributeDefinition}"
 								parentEntity="{parentEntity}"
 								attribute="{attribute}"
-								fieldIndex="1"
-								maxChars="255"
-								width="100" 
-								/>
-		<input:StringInputField id="vernacularNameTextInput" 
-								includeIn="horizontal"
-								attributeDefinition="{attributeDefinition}"
-								parentEntity="{parentEntity}"
-								attribute="{attribute}"
 								fieldIndex="2"
 								maxChars="255"
 								width="100" 
-								/>
+								/>		
 		<input:StringInputField id="languageCodeTextInput" 
 								includeIn="horizontal"
 								attributeDefinition="{attributeDefinition}"
@@ -74,17 +74,17 @@
 		<s:Label styleName="bold" text="{attributeDefinition.getLabelText()}" />
 		<s:VGroup>
 			<s:HGroup>
+				<s:Label width="{subLabelWidth}" styleName="bold" text="{Message.get('edit.taxon.vernacularName')}"/>
+				<fx:Reparent target="vernacularNameTextInput" includeIn="vertical" />
+			</s:HGroup>
+			<s:HGroup>
 				<s:Label width="{subLabelWidth}" styleName="bold" text="{Message.get('edit.taxon.code')}"/>
 				<fx:Reparent target="codeTextInput" includeIn="vertical" />
 			</s:HGroup>
 			<s:HGroup>
 				<s:Label width="{subLabelWidth}" styleName="bold" text="{Message.get('edit.taxon.scientificName')}"/>
 				<fx:Reparent target="scientificNameTextInput" includeIn="vertical" />
-			</s:HGroup>
-			<s:HGroup>
-				<s:Label width="{subLabelWidth}" styleName="bold" text="{Message.get('edit.taxon.vernacularName')}"/>
-				<fx:Reparent target="vernacularNameTextInput" includeIn="vertical" />
-			</s:HGroup>
+			</s:HGroup>			
 			<s:HGroup>
 				<s:Label width="{subLabelWidth}" styleName="bold" text="{Message.get('edit.taxon.languageCode')}"/>
 				<fx:Reparent target="languageCodeTextInput" includeIn="vertical" />
