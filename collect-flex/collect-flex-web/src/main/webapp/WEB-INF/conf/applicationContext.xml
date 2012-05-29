@@ -59,8 +59,7 @@
 	<!-- Controllers -->
 	<bean id="fileNameViewController" class="org.springframework.web.servlet.mvc.UrlFilenameViewController" />
 	<bean id="unlockController" class="org.openforis.collect.web.controller.UnlockController" />
-	<bean id="dataExportController" class="org.openforis.collect.web.controller.DataExportController" />
-	<bean id="fileDownloadController" class="org.openforis.collect.web.controller.FileDownloadController" />
+	<bean id="dataExportDownloadController" class="org.openforis.collect.web.controller.DataExportDownloadController" />
 	<bean id="surveyImportController" class="org.openforis.collect.web.controller.SurveyImportController" />
 
 	<!-- ===================================== -->

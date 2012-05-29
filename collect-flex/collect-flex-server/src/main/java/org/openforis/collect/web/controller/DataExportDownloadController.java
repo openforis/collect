@@ -14,14 +14,12 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.User;
 import org.openforis.collect.remoting.service.export.DataExportProcess;
 import org.openforis.collect.web.session.SessionState;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
@@ -29,12 +27,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
  * 
  */
 @Controller
-public class FileDownloadController {
+public class DataExportDownloadController {
 
-	private static final String BACKUP_PATH = "backup";
 	private static final String EXPORT_PATH = "export";
 
-	private static Log LOG = LogFactory.getLog(FileDownloadController.class);
+	private static Log LOG = LogFactory.getLog(DataExportDownloadController.class);
 	
 	@RequestMapping(value = "/downloadDataExport.htm", method = RequestMethod.GET)
 	public @ResponseBody String downloadDataExport(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -59,23 +56,6 @@ public class FileDownloadController {
 		return "ok";
 	}
 	
-	@RequestMapping(value = "/downloadBackup.htm", method = RequestMethod.GET)
-	public @ResponseBody String downloadBackup(HttpServletRequest request, HttpServletResponse response, @RequestParam String rootEntityName) throws IOException {
-		try {
-			String path = buildBackupFilePath(request, rootEntityName);
-			File file = new File(path);
-			if ( file.exists() ) {
-				write(response, file);
-			} else {
-				throw new IOException("Backup file not found");
-			}
-		} catch (IOException e) {
-			LOG.error(e);
-			throw e;
-		}
-		return "ok";
-	}
-
 	private String buildDataExportFilePath(HttpServletRequest request) {
 		ServletContext context = request.getSession().getServletContext();
 		String exportRealPath = context.getRealPath(EXPORT_PATH);
@@ -84,19 +64,6 @@ public class FileDownloadController {
 		String userName = user.getName();
 		String fileName = "data.zip";
 		String path = exportRealPath + File.separator + userName + File.separator + fileName;
-		return path;
-	}
-
-	private String buildBackupFilePath(HttpServletRequest request, String rootEntityName) {
-		ServletContext context = request.getSession().getServletContext();
-		String backupRealPath = context.getRealPath(BACKUP_PATH);
-		SessionState sessionState = getSessionState(request);
-		CollectSurvey survey = sessionState.getActiveSurvey();
-		User user = sessionState.getUser();
-		String surveyName = survey.getName();
-		String userName = user.getName();
-		String fileName = surveyName +  "_" + rootEntityName + "_" + userName + ".zip";
-		String path = backupRealPath + File.separator + fileName;
 		return path;
 	}
 
