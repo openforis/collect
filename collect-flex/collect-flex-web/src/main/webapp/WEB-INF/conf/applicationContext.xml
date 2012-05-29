@@ -40,6 +40,7 @@
 		<entry key="/accessDenied.htm" value-ref="fileNameViewController" />
 		<entry key="/exitUser.htm" value-ref="fileNameViewController" />
 		<entry key="/login.htm" value-ref="fileNameViewController" />
+		<entry key="/importSurvey.htm" value-ref="fileNameViewController" />
 	</util:map>
 
 	<bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
@@ -52,13 +53,15 @@
 		<property name="urlMap" ref="urlMappings">
 		</property>
 	</bean>
-
+	
+	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver" />
 
 	<!-- Controllers -->
 	<bean id="fileNameViewController" class="org.springframework.web.servlet.mvc.UrlFilenameViewController" />
 	<bean id="unlockController" class="org.openforis.collect.web.controller.UnlockController" />
 	<bean id="dataExportController" class="org.openforis.collect.web.controller.DataExportController" />
 	<bean id="fileDownloadController" class="org.openforis.collect.web.controller.FileDownloadController" />
+	<bean id="surveyImportController" class="org.openforis.collect.web.controller.SurveyImportController" />
 
 	<!-- ===================================== -->
 	<!-- GraniteDs services -->
@@ -166,10 +169,6 @@
 	<bean id="userDetailsService"	class="org.openforis.collect.security.CollectUserDetailsService" />
 	
 	
-	<!-- Controllers -->
-	<!-- <bean id="multipartResolver" -->
-	<!-- class="org.springframework.web.multipart.commons.CommonsMultipartResolver" /> -->
-
 	<!-- <bean id="fileController" class="org.fao.openforis.web.controller.FileController" -->
 	<!-- scope="session"> -->
 	<!-- </bean> -->
