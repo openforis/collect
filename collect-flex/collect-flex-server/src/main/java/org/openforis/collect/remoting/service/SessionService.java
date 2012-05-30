@@ -3,6 +3,9 @@
  */
 package org.openforis.collect.remoting.service;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.model.User;
 import org.openforis.collect.model.proxy.UserProxy;
@@ -30,7 +33,7 @@ public class SessionService {
 //	@Secured("isAuthenticated()")
 	@Transactional
 	public void keepAlive(Boolean editing) throws RecordUnlockedException {
-		this.sessionManager.keepSessionAlive();
+		sessionManager.keepSessionAlive();
 		if(editing) {
 			sessionManager.checkIsActiveRecordLocked();
 		}
@@ -39,15 +42,18 @@ public class SessionService {
 	/**
 	 * Set a locale (language, country) into the session state object
 	 * 
-	 * @return logged user
+	 * @return map with user, sessionId
 	 */
-	public UserProxy initSession(String locale) {
-		this.sessionManager.setLocale(locale);
-		
+	public Map<String, Object> initSession(String locale) {
+		sessionManager.setLocale(locale);
 		SessionState sessionState = sessionManager.getSessionState();
 		User user = sessionState.getUser();
 		UserProxy userProxy = new UserProxy(user);
-		return userProxy;
+		String sessionId = sessionState.getSessionId();
+		Map<String, Object> result = new HashMap<String, Object>();
+		result.put("user", userProxy);
+		result.put("sessionId", sessionId);
+		return result;
 	}
 	
 }

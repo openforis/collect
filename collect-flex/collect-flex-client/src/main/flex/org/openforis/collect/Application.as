@@ -28,6 +28,7 @@ package org.openforis.collect {
 		
 		private static var _surveySummaries:IList;
 		
+		private static var _sessionId:String;
 		private static var _activeSurvey:SurveyProxy;
 		private static var _activeRecord:RecordProxy;
 		private static var _activeRecordEditable:Boolean;
@@ -80,6 +81,14 @@ package org.openforis.collect {
 			var list:ArrayCollection = new ArrayCollection();
 			list.addAll(_surveySummaries);
 			return list;
+		}
+		
+		public static function get sessionId():String {
+			return _sessionId;
+		}
+		
+		public static function set sessionId(value:String):void {
+			_sessionId = value;
 		}
 		
 		[Bindable]

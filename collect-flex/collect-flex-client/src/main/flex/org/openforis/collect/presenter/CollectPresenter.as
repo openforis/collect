@@ -33,6 +33,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.ui.Images;
 	import org.openforis.collect.model.proxy.UserProxy;
 	import flash.events.MouseEvent;
+	import org.openforis.collect.util.ApplicationConstants;
 	
 	/**
 	 * 
@@ -85,7 +86,8 @@ package org.openforis.collect.presenter {
 		}
 		
 		internal function initSessionResultHandler(event:ResultEvent, token:Object = null):void {
-			Application.user = event.result as UserProxy;
+			Application.user = event.result.user;
+			Application.sessionId = event.result.sessionId;
 			getSurveySummaries();
 		}
 		
