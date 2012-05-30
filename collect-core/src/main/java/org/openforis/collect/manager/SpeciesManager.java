@@ -4,6 +4,7 @@
 package org.openforis.collect.manager;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.openforis.collect.persistence.TaxonDao;
@@ -55,8 +56,8 @@ public class SpeciesManager {
 	}
 
 	@Transactional
-	public List<TaxonOccurrence> findByVernacularName(String searchString, int maxResults) {
-		List<TaxonVernacularName> list = taxonVernacularNameDao.findByVernacularName(searchString, maxResults);
+	public List<TaxonOccurrence> findByVernacularName(String searchString, int maxResults, HashMap<String, String> hashQualifier) {
+		List<TaxonVernacularName> list = taxonVernacularNameDao.findByVernacularName(searchString, maxResults, hashQualifier);
 		List<TaxonOccurrence> result = new ArrayList<TaxonOccurrence>();
 		for (TaxonVernacularName taxonVernacularName : list) {
 			Integer taxonId = taxonVernacularName.getTaxonSystemId();

@@ -37,17 +37,12 @@ public class TaxonVernacularNameDao extends MappingJooqDaoSupport<TaxonVernacula
 		super(TaxonVernacularNameDao.JooqFactory.class);
 	}
 
-	public List<TaxonVernacularName> findByVernacularName(String searchString,
-			int maxResults) {
-		return findContaining(OFC_TAXON_VERNACULAR_NAME.VERNACULAR_NAME,
-				searchString, maxResults);
-	}
-	
-	public List<TaxonVernacularName> findByVernacularName(String searchString, List<String> qualifiers,
-			int maxResults) {
-		return findContaining(OFC_TAXON_VERNACULAR_NAME.VERNACULAR_NAME,
-				searchString, maxResults);
-		//return findByVernacularNameInternal(searchString, qualifiers, maxResults);
+	public List<TaxonVernacularName> findByVernacularName(String searchString, int maxResults, HashMap<String, String> hashQualifier) {
+		if(hashQualifier==null){
+			return findContaining(OFC_TAXON_VERNACULAR_NAME.VERNACULAR_NAME, searchString, maxResults);
+		} else {
+			return findVernacularNameInternal(searchString, hashQualifier, maxResults);
+		}
 	}
 	
 	@Override
@@ -70,15 +65,23 @@ public class TaxonVernacularNameDao extends MappingJooqDaoSupport<TaxonVernacula
 		super.delete(id);
 	}
 	
-	protected List<TaxonVernacularName> findVernacularNameInternal(String searchString, List<String> qualifiers,
+	protected List<TaxonVernacularName> findVernacularNameInternal(String searchString, HashMap<String, String> hashQualifier,
 			int maxResults) {
 		TaxonVernacularNameDao.JooqFactory jf = getMappingJooqFactory();
 		SimpleSelectQuery<?> query = jf.selectContainsQuery(OFC_TAXON_VERNACULAR_NAME.VERNACULAR_NAME, searchString);
 		query.addLimit(maxResults);
 		
-		/*for ( TableField<?,String> t : qualifiers.keySet() ) {	
-			query.addConditions(t.equal(qualifiers.get(t)));//query.addConditions(field2.equal(qualifier1));			
-		}*/
+		for ( String s : hashQualifier.keySet()) {	
+			TableField field = null;
+			if(s.equals("qualifier1")){
+				field = OFC_TAXON_VERNACULAR_NAME.QUALIFIER1;
+			}else if(s.equals("qualifier2")){
+				field = OFC_TAXON_VERNACULAR_NAME.QUALIFIER2;
+			}else if(s.equals("qualifier3")){
+				field = OFC_TAXON_VERNACULAR_NAME.QUALIFIER3;
+			}
+			query.addConditions(field.equal(hashQualifier.get(s)));				
+		}
 		
 		query.execute();
 		Result<?> result = query.getResult();

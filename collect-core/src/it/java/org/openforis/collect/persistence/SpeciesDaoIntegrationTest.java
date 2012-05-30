@@ -110,7 +110,7 @@ public class SpeciesDaoIntegrationTest {
 
 	@Test
 	public void testFindScientificName() throws Exception {
-		testFindScientificName("jugl", 100, 3);
+		testFindScientificName("jugl", 100, 4);
 	}
 
 	@Test
@@ -133,7 +133,7 @@ public class SpeciesDaoIntegrationTest {
 		testInsertAndLoadVernacularName(species1, "Persian walnut", "eng", "", 9);
 		testInsertAndLoadVernacularName(species1, "Орех грецкий", "rus", "", 9);
 		
-		List<TaxonVernacularName> results = taxonVernacularNameDao.findByVernacularName(match, maxResults);
+		List<TaxonVernacularName> results = taxonVernacularNameDao.findByVernacularName(match, maxResults, null);
 		assertEquals(expectedResults, results.size());
 		match = match.toUpperCase();
 		for (TaxonVernacularName tvn : results) {
