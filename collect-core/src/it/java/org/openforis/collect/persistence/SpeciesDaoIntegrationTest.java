@@ -110,7 +110,7 @@ public class SpeciesDaoIntegrationTest {
 
 	@Test
 	public void testFindScientificName() throws Exception {
-		testFindScientificName("jugl", 100, 4);
+		testFindScientificName("jugl", 100, 3);
 	}
 
 	@Test
