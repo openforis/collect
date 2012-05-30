@@ -14,10 +14,8 @@ public class LogoService {
 	@Autowired
 	private LogoManager logoManager;
 
-	public byte[] getLogo(int id) {
-		byte[] logo;
-		logo = logoManager.getLogo(id);
-		return logo;
+	public byte[] loadLogo(int id) {
+		return logoManager.loadLogo(id);
 	}
 
 }

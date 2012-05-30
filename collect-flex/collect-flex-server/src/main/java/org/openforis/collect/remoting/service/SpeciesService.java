@@ -79,7 +79,7 @@ public class SpeciesService {
 		
 		TaxonAttribute attr = (TaxonAttribute) node;
 		TaxonAttributeDefinition definition = attr.getDefinition();
-		HashMap<String, String> hashQualifiers = new HashMap();	
+		HashMap<String, String> hashQualifiers = new HashMap<String, String>();	
 		
 		if (node instanceof TaxonAttribute){			
 			List<String> q = definition.getQualifiers();
@@ -94,12 +94,19 @@ public class SpeciesService {
 						CodeAttribute code = (CodeAttribute) expression.evaluate(record);
 						qualifierValue = code.getValue().getCode();
 
-					} catch (InvalidExpressionException e) {
+					} catch (Exception e) { //catch any exception
 						e.printStackTrace();
+						break;
 					}
 					hashQualifiers.put("qualifier" + i, qualifierValue);
 				}
-				return find(SearchType.BY_VERNACULAR_NAME_QUALIFIERS, searchString, maxResults,hashQualifiers);
+				
+				//if anything happened, ignore qualifier
+				if(hashQualifiers.size()>0){
+					return find(SearchType.BY_VERNACULAR_NAME_QUALIFIERS, searchString, maxResults,hashQualifiers);
+				}else{
+					return find(SearchType.BY_VERNACULAR_NAME, searchString, maxResults, null);
+				}
 			}else{
 				return find(SearchType.BY_VERNACULAR_NAME, searchString, maxResults, null);
 			}

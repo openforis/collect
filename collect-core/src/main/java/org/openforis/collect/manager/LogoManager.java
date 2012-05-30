@@ -18,7 +18,7 @@ public class LogoManager {
 	private LogoDao logoDao;
 	
 	@Transactional
-	public byte[] getLogo(int id) {
+	public byte[] loadLogo(int id) {
 		Logo logo = logoDao.loadById(id);
 		return logo.getImage();
 	}

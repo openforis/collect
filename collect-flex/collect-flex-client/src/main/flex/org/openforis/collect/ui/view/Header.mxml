@@ -8,11 +8,6 @@
 	
 	<fx:Script>
 		<![CDATA[
-			/*
-			[Bindable]
-			private var surveyBannerFileName:String = "banner.jpg";
-			*/
-			
 			import mx.utils.Base64Decoder;
 			import mx.rpc.AsyncResponder;
 			import mx.rpc.events.FaultEvent;
@@ -20,10 +15,6 @@
 			import org.openforis.collect.client.LogoClient;
 			import org.openforis.collect.client.ClientFactory;
 			import mx.controls.Alert;
-
-			[Embed(source="/assets/images/specific_logo.jpg")]
-			[Bindable]
-			public var imgLogo:Class;			
 			
 			[Bindable]
 			public var byteArray:ByteArray ;
@@ -33,33 +24,24 @@
 			{
 				var client:LogoClient = ClientFactory.logoClient;
 				logoResponder = new AsyncResponder(logoResultHandler, logoFaultHandler);
-				client.getLogo(logoResponder, 0);
+				client.loadLogo(logoResponder, 0);
 			}
 			
 			public function logoResultHandler(event:ResultEvent, token:Object):void {
 				var data:ByteArray = event.result as ByteArray;				
-				//trace("data = " + data);
-				//var encodedBytes:ByteArray = data;
-				//var baseDecoder:Base64Decoder = new Base64Decoder();
-				
-				//baseDecoder.decode(encodedBytes);
-				//byteArray = baseDecoder.toByteArray();
 				byteArray = data;
-				
 			}
 			
 			public function logoFaultHandler(event:FaultEvent, token:Object = null):void {
-				Alert.show(event.fault.faultString, "Error"); 
+				Alert.show(event.fault.faultString, "Error on loading Logo"); 
 			}
 			
 		]]>
 	</fx:Script>
 	
-	<!--<s:Image source="/assets/images/{surveyBannerFileName}" />-->
-	
 	<mx:HBox width="100%">
         <s:Image source="@Embed(source='/assets/images/banner.jpg')"/>
         <s:Spacer width="100%"/>
         <s:Image source="{byteArray}"/> 
-    </mx:HBox>	
+    </mx:HBox>
 </s:Group>
