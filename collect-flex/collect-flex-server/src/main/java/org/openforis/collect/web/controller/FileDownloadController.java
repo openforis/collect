@@ -93,9 +93,9 @@ public class FileDownloadController {
 		SessionState sessionState = getSessionState(request);
 		CollectSurvey survey = sessionState.getActiveSurvey();
 		User user = sessionState.getUser();
-		String surveyUri = survey.getUri();
+		String surveyName = survey.getName();
 		String userName = user.getName();
-		String fileName = surveyUri +  "_" + rootEntityName + "_" + userName + ".zip";
+		String fileName = surveyName +  "_" + rootEntityName + "_" + userName + ".zip";
 		String path = backupRealPath + File.separator + fileName;
 		return path;
 	}

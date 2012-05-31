@@ -123,8 +123,8 @@ package org.openforis.collect.presenter {
 		 * */
 		protected function surveySelectedHandler(event:UIEvent):void {
 			var s:SurveySummary = event.obj as SurveySummary;
-			var uri:String = s.uri;
-			_modelClient.setActiveSurvey(new ItemResponder(setActiveSurveyResultHandler, faultHandler), uri);			
+			var name:String = s.name;
+			_modelClient.setActiveSurvey(new ItemResponder(setActiveSurveyResultHandler, faultHandler), name);			
 		}
 		
 		internal function setActiveSurveyResultHandler(event:ResultEvent, token:Object = null):void {

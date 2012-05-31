@@ -59,7 +59,7 @@ public class ModelSerializationTest {
 		CollectIdmlBindingContext idmlBindingContext = new CollectIdmlBindingContext(context);
 		SurveyUnmarshaller surveyUnmarshaller = idmlBindingContext.createSurveyUnmarshaller();
 		CollectSurvey survey = (CollectSurvey) surveyUnmarshaller.unmarshal(is);
-		survey.setUri("http://www.openforis.org/idm/archenland1");
+		survey.setName("archenland1");
 		Schema schema = survey.getSchema();
 		List<EntityDefinition> rootEntityDefinitions = schema.getRootEntityDefinitions();
 		int nextId = 0;

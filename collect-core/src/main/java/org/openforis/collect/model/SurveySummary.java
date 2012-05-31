@@ -10,13 +10,13 @@ package org.openforis.collect.model;
 public class SurveySummary {
 
 	private Integer id;
-	private String uri;
+	private String name;
 	private String projectName;
 
-	public SurveySummary(Integer id, String uri, String projectName) {
+	public SurveySummary(Integer id, String name, String projectName) {
 		super();
 		this.id = id;
-		this.uri = uri;
+		this.name = name;
 		this.projectName = projectName;
 	}
 
@@ -24,8 +24,8 @@ public class SurveySummary {
 		return id;
 	}
 
-	public String getUri() {
-		return uri;
+	public String getName() {
+		return name;
 	}
 
 	public String getProjectName() {

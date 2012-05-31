@@ -32,7 +32,7 @@ public class IdmUpdater {
 	@Autowired
 	protected Validator validator;
 	
-	public Survey updateModel(String uri, URL idmUrl) throws IOException, InvalidIdmlException,
+	public Survey updateModel(String name, String uri, URL idmUrl) throws IOException, InvalidIdmlException,
 			SurveyImportException {
 		InputStream is = idmUrl.openStream();
 		CollectIdmlBindingContext idmlBindingContext = surveyDao
@@ -40,12 +40,13 @@ public class IdmUpdater {
 		SurveyUnmarshaller surveyUnmarshaller = idmlBindingContext
 				.createSurveyUnmarshaller();
 		CollectSurvey survey = (CollectSurvey) surveyUnmarshaller.unmarshal(is);
+		survey.setName(name);
 		survey.setUri(uri);
 		surveyDao.updateModel(survey);
 		return survey;
 	}
 
-	public Survey importIdnfi(String idmName, URL idmUrl) throws IOException, SurveyImportException,
+	public Survey importIdnfi(String name, String uri, URL idmUrl) throws IOException, SurveyImportException,
 			InvalidIdmlException {
 		InputStream is = idmUrl.openStream();
 		CollectIdmlBindingContext idmlBindingContext = surveyDao
@@ -53,6 +54,8 @@ public class IdmUpdater {
 		SurveyUnmarshaller surveyUnmarshaller = idmlBindingContext
 				.createSurveyUnmarshaller();
 		CollectSurvey survey = (CollectSurvey) surveyUnmarshaller.unmarshal(is);
+		survey.setName(name);
+		survey.setUri(uri);
 		surveyDao.clearModel();
 		surveyDao.importModel(survey);
 		return survey;

@@ -24,7 +24,7 @@ package org.openforis.collect.metamodel.proxy {
 				var langText:LanguageSpecificTextProxy = LanguageSpecificTextProxy(projectNames.getItemAt(0));
 				return langText.text;
 			} else {
-				return uri;
+				return name;
 			}
 		}
     }

@@ -27,13 +27,13 @@ public class SurveyManager {
 	@Autowired
 	private SurveyDao surveyDao;
 	
-	private Map<String, CollectSurvey> surveysByUri;
+	private Map<String, CollectSurvey> surveysByName;
 	private Map<Integer, CollectSurvey> surveysById;
 	private List<CollectSurvey> surveys;
 
 	public SurveyManager() {
 		surveysById = new HashMap<Integer, CollectSurvey>();
-		surveysByUri = new HashMap<String, CollectSurvey>();
+		surveysByName = new HashMap<String, CollectSurvey>();
 	}
 
 	public List<CollectSurvey> getAll() {
@@ -41,8 +41,8 @@ public class SurveyManager {
 	}
 
 	@Transactional
-	public CollectSurvey get(String uri) {
-		CollectSurvey survey = surveysByUri.get(uri);
+	public CollectSurvey get(String name) {
+		CollectSurvey survey = surveysByName.get(name);
 		return survey;
 	}
 
@@ -58,8 +58,8 @@ public class SurveyManager {
 		for (Survey survey : surveys) {
 			Integer id = survey.getId();
 			String projectName = getProjectName(survey, lang);
-			String uri = survey.getUri();
-			SurveySummary summary = new SurveySummary(id, uri, projectName);
+			String name = survey.getName();
+			SurveySummary summary = new SurveySummary(id, name, projectName);
 			summaries.add(summary);
 		}
 		return summaries;
@@ -91,7 +91,7 @@ public class SurveyManager {
 
 	private void initSurvey(CollectSurvey survey) {
 		surveysById.put(survey.getId(), survey);
-		surveysByUri.put(survey.getUri(), survey);
+		surveysByName.put(survey.getName(), survey);
 	}
 
 }
