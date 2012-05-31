@@ -4,7 +4,9 @@
 <html>
   <head>
   	<meta http-equiv="Pragma" content="no-cache">
-  	<style type="text/css" media="screen"> 
+  	<script type="text/javascript" src="script/jquery-1.6.2.min.js"></script>
+    <script type="text/javascript" src="script/sessionping.js"></script>
+    <style type="text/css" media="screen"> 
 		html, body	{ height:100%; }
 		body {
 			font-family: verdana, serif, monospace;
