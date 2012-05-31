@@ -76,6 +76,7 @@ public class SurveyDao extends JooqDaoSupport {
 		int surveyId = jf.nextval(OFC_SURVEY_ID_SEQ).intValue();
 		jf.insertInto(OFC_SURVEY).set(OFC_SURVEY.ID, surveyId)
 				.set(OFC_SURVEY.NAME, name)
+				.set(OFC_SURVEY.URI, survey.getUri())
 				.set(OFC_SURVEY.IDML, Factory.val(idml, SQLDataType.CLOB))
 				.execute();
 
@@ -225,6 +226,7 @@ public class SurveyDao extends JooqDaoSupport {
 			System.out.println("    Survey " +  name + " not exist. Inserting with ID = " + surveyId );
 			jf.insertInto(OFC_SURVEY).set(OFC_SURVEY.ID, surveyId)
 					.set(OFC_SURVEY.NAME, name)
+					.set(OFC_SURVEY.URI, survey.getUri())
 					.set(OFC_SURVEY.IDML, Factory.val(idml, SQLDataType.CLOB))
 					.execute();
 			survey.setId(surveyId);
@@ -235,6 +237,7 @@ public class SurveyDao extends JooqDaoSupport {
 			System.out.println("    Survey " +  name + " exist. Updating with ID = " + surveyId );
 			jf.update(OFC_SURVEY)
 					.set(OFC_SURVEY.IDML, Factory.val(idml, SQLDataType.CLOB))
+					.set(OFC_SURVEY.URI, survey.getUri())
 					.where(OFC_SURVEY.ID.equal(survey.getId())).execute();
 		}
 
