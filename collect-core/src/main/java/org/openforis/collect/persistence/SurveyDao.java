@@ -63,8 +63,8 @@ public class SurveyDao extends JooqDaoSupport {
 
 	@Transactional
 	public void importModel(Survey survey) throws SurveyImportException {
-		String name = survey.getName();
-		if (StringUtils.isBlank(name)) {
+		String uri = survey.getUri();
+		if (StringUtils.isBlank(uri)) {
 			throw new SurveyImportException(
 					"Survey name must be set before importing");
 		}
@@ -75,7 +75,6 @@ public class SurveyDao extends JooqDaoSupport {
 		Factory jf = getJooqFactory();
 		int surveyId = jf.nextval(OFC_SURVEY_ID_SEQ).intValue();
 		jf.insertInto(OFC_SURVEY).set(OFC_SURVEY.ID, surveyId)
-				.set(OFC_SURVEY.NAME, name)
 				.set(OFC_SURVEY.URI, survey.getUri())
 				.set(OFC_SURVEY.IDML, Factory.val(idml, SQLDataType.CLOB))
 				.execute();
@@ -108,10 +107,10 @@ public class SurveyDao extends JooqDaoSupport {
 		return survey;
 	}
 
-	public CollectSurvey load(String name) {
+	public CollectSurvey load(String uri) {
 		Factory jf = getJooqFactory();
 		Record record = jf.select().from(OFC_SURVEY)
-				.where(OFC_SURVEY.NAME.equal(name)).fetchOne();
+				.where(OFC_SURVEY.URI.equal(uri)).fetchOne();
 		CollectSurvey survey = processSurveyRow(record);
 		if (survey != null) {
 			loadNodeDefinitions(survey);
@@ -142,7 +141,7 @@ public class SurveyDao extends JooqDaoSupport {
 			String idml = row.getValueAsString(OFC_SURVEY.IDML);
 			CollectSurvey survey = (CollectSurvey) unmarshalIdml(idml);
 			survey.setId(row.getValueAsInteger(OFC_SURVEY.ID));
-			survey.setName(row.getValue(OFC_SURVEY.NAME));
+			survey.setUri(row.getValue(OFC_SURVEY.URI));
 			return survey;
 		} catch (IOException e) {
 			throw new RuntimeException(
@@ -204,8 +203,8 @@ public class SurveyDao extends JooqDaoSupport {
 	}
 
 	public void updateModel(CollectSurvey survey) throws SurveyImportException {
-		String name = survey.getName();
-		if (StringUtils.isBlank(name)) {
+		String uri = survey.getUri();
+		if (StringUtils.isBlank(uri)) {
 			throw new SurveyImportException(
 					"Survey name must be set before importing");
 		}
@@ -216,16 +215,15 @@ public class SurveyDao extends JooqDaoSupport {
 		Factory jf = getJooqFactory();
 		int surveyId = 0;
 		SelectConditionStep query = jf.select(OFC_SURVEY.ID).from(OFC_SURVEY)
-				.where(OFC_SURVEY.NAME.equal(name));
+				.where(OFC_SURVEY.URI.equal(uri));
 		query.execute();
 		Result<Record> result = query.getResult();
 
 		System.out.println("Checking survey");
 		if (result.isEmpty()) { // we should insert it now			
 			surveyId = jf.nextval(OFC_SURVEY_ID_SEQ).intValue();
-			System.out.println("    Survey " +  name + " not exist. Inserting with ID = " + surveyId );
+			System.out.println("    Survey " +  uri + " not exist. Inserting with ID = " + surveyId );
 			jf.insertInto(OFC_SURVEY).set(OFC_SURVEY.ID, surveyId)
-					.set(OFC_SURVEY.NAME, name)
 					.set(OFC_SURVEY.URI, survey.getUri())
 					.set(OFC_SURVEY.IDML, Factory.val(idml, SQLDataType.CLOB))
 					.execute();
@@ -234,7 +232,7 @@ public class SurveyDao extends JooqDaoSupport {
 			Record record = result.get(0);			
 			surveyId = record.getValueAsInteger(OFC_SURVEY.ID);			
 			survey.setId(surveyId);
-			System.out.println("    Survey " +  name + " exist. Updating with ID = " + surveyId );
+			System.out.println("    Survey " +  uri + " exist. Updating with ID = " + surveyId );
 			jf.update(OFC_SURVEY)
 					.set(OFC_SURVEY.IDML, Factory.val(idml, SQLDataType.CLOB))
 					.set(OFC_SURVEY.URI, survey.getUri())

@@ -77,8 +77,7 @@ CREATE TABLE "collect"."ofc_schema_definition"  (
 GO
 CREATE TABLE "collect"."ofc_survey"  ( 
 	"id"  	integer NOT NULL,
-	"name"	varchar(255) NOT NULL,
-	"uri" 	varchar(255) NULL,
+	"uri" 	varchar(255) NOT NULL,
 	"idml"	text NOT NULL,
 	PRIMARY KEY("id")
 )
@@ -102,6 +101,9 @@ CREATE TABLE "collect"."ofc_taxon_vernacular_name"  (
 	"language_variety"	varchar(255) NULL,
 	"taxon_id"        	integer NULL,
 	"step"            	integer NOT NULL,
+    "qualifier1"	varchar(255) NULL,
+    "qualifier2"	varchar(255) NULL,
+    "qualifier3"	varchar(255) NULL,
 	PRIMARY KEY("id")
 )
 GO
@@ -128,10 +130,6 @@ CREATE TABLE "collect"."ofc_user_role"  (
 	"role"   	varchar(256) NULL,
 	PRIMARY KEY("id")
 )
-GO
-ALTER TABLE "collect"."ofc_survey"
-	ADD CONSTRAINT "ofc_survey_name_key"
-	UNIQUE ("name")
 GO
 ALTER TABLE "collect"."ofc_survey"
 	ADD CONSTRAINT "ofc_survey_uri_key"
