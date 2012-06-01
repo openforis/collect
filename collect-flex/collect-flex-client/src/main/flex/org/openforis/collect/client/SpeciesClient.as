@@ -6,6 +6,7 @@ package org.openforis.collect.client {
 	/**
 	 * 
 	 * @author S. Ricci
+	 * @author E. Wibowo
 	 * */
 	public class SpeciesClient extends AbstractClient {
 		
@@ -31,8 +32,8 @@ package org.openforis.collect.client {
 			token.addResponder(responder);
 		}
 		
-		public function findByVernacularName(responder:IResponder, taxonomy:String, value:String, maxResults:int):void {
-			var token:AsyncToken = this._findByVernacularNameOperation.send(taxonomy, value, maxResults);
+		public function findByVernacularName(responder:IResponder, taxonomy:String, nodeId:int, value:String, maxResults:int):void {
+			var token:AsyncToken = this._findByVernacularNameOperation.send(taxonomy, nodeId, value, maxResults);
 			token.addResponder(responder);
 		}
 

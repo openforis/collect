@@ -346,6 +346,7 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 
 			if ( dataAlias != null ) {
 				byte[] data = r.getValue(dataAlias);
+				//System.out.println("r.getValue(dataAlias) = " + r.getValue(dataAlias));
 				Entity rootEntity = c.createRootEntity(rootEntityId);
 				ModelSerializer modelSerializer = getSerializer();
 				modelSerializer.mergeFrom(data, rootEntity);

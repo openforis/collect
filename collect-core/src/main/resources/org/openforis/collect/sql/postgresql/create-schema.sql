@@ -57,7 +57,7 @@ CREATE TABLE "collect"."ofc_schema_definition"  (
 CREATE TABLE "collect"."ofc_survey"  ( 
 	"id"  	integer NOT NULL,
 	"name"	varchar(255) NOT NULL,
-	"uri" 	varchar(255) NULL,
+	"uri" 	varchar(255) NOT NULL,
 	"idml"	text NOT NULL,
 	PRIMARY KEY("id")
 );
@@ -79,6 +79,9 @@ CREATE TABLE "collect"."ofc_taxon_vernacular_name"  (
 	"language_variety"	varchar(255) NULL,
 	"taxon_id"        	integer NULL,
 	"step"            	integer NOT NULL,
+	"qualifier1"	varchar(255) NULL,
+    "qualifier2"	varchar(255) NULL,
+    "qualifier3"	varchar(255) NULL,
 	PRIMARY KEY("id")
 );
 COMMENT ON COLUMN "collect"."ofc_taxon_vernacular_name"."language_variety" IS 'Dialect, lect, sublanguage or other';
@@ -148,7 +151,6 @@ ALTER TABLE "collect"."ofc_record"
 --------------------------
 --- END GENERATED CODE ---
 --------------------------
-
 
 ----------------------------
 --- BEGIN DEFAULT VALUES ---

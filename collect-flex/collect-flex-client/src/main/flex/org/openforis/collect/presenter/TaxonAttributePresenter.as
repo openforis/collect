@@ -218,7 +218,8 @@ package org.openforis.collect.presenter {
 					client.findByScientificName(responder, taxonomy, searchText, MAX_RESULTS);
 					break;
 				case SEARCH_BY_VERNACULAR_NAME:
-					client.findByVernacularName(responder, taxonomy, searchText, MAX_RESULTS);
+					var nodeId:int = autoCompleteLastInputField.attribute.id;
+					client.findByVernacularName(responder, taxonomy, nodeId, searchText, MAX_RESULTS);
 					break;
 				default:
 			}

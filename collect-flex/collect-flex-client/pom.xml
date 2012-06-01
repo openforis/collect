@@ -113,7 +113,8 @@
 					</execution>
 				</executions>
 				<configuration>
-					<showWarnings>false</showWarnings>
+					<debug>false</debug>
+					<showWarnings>false</showWarnings>					
 					<staticLinkRuntimeSharedLibraries>true</staticLinkRuntimeSharedLibraries>
 					<sourceDirectory>${basedir}/src/main/flex</sourceDirectory>
 					<sourceFile>collect.mxml</sourceFile>
