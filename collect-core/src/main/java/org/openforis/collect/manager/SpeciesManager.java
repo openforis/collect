@@ -83,14 +83,13 @@ public class SpeciesManager {
 					ExpressionFactory expressionFactory = context.getExpressionFactory();					
 					try {
 						AbsoluteModelPathExpression expression = expressionFactory.createAbsoluteModelPathExpression(qualifierExpression);
-						CodeAttribute code = (CodeAttribute) expression.evaluate(record);
+						CodeAttribute code = (CodeAttribute) expression.evaluate(record);//may cause internal Exception : MissingValueException
 						qualifierValue = code.getValue().getCode();
-
-					} catch (Exception e) { //catch any exception
-						e.printStackTrace();
+						hashQualifiers.put("qualifier" + i, qualifierValue);
+					} catch (Exception e) {
+						hashQualifiers.clear();						
 						break;
 					}
-					hashQualifiers.put("qualifier" + i, qualifierValue);
 				}
 				
 				//if anything happened, ignore qualifier
