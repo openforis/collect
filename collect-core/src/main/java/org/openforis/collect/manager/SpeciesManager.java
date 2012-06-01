@@ -11,7 +11,6 @@ import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.persistence.TaxonDao;
 import org.openforis.collect.persistence.TaxonVernacularNameDao;
 import org.openforis.collect.persistence.TaxonomyDao;
-import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.SurveyContext;
 import org.openforis.idm.metamodel.TaxonAttributeDefinition;
 import org.openforis.idm.model.CodeAttribute;

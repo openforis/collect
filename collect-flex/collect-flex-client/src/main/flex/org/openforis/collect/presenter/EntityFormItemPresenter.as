@@ -2,10 +2,13 @@ package org.openforis.collect.presenter
 {
 	import flash.events.Event;
 	
+	import mx.binding.utils.BindingUtils;
 	import mx.binding.utils.ChangeWatcher;
 	import mx.collections.IList;
 	
 	import org.openforis.collect.event.ApplicationEvent;
+	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
+	import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
 	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.remoting.service.UpdateResponse;
 	import org.openforis.collect.ui.UIBuilder;
@@ -26,25 +29,25 @@ package org.openforis.collect.presenter
 		override internal function initEventListeners():void {
 			super.initEventListeners();
 			
-			ChangeWatcher.watch(view, "entityDefinition", entityDefinitionChangeHandler);
+			BindingUtils.bindSetter(setModelVersion, _view, "modelVersion");
+			BindingUtils.bindSetter(setEntityDefinition, view, "entityDefinition");
 		}
 		
-		protected function entityDefinitionChangeHandler(event:Event):void {
+		protected function setEntityDefinition(entityDefinition:EntityDefinitionProxy):void {
 			initNodeDefinitions();
 			updateView();
 		}
 		
-		override protected function modelVersionChangeHandler(event:Event):void {
+		protected function setModelVersion(version:ModelVersionProxy):void {
 			initNodeDefinitions();
 			updateView();
-			super.modelVersionChangeHandler(event);
 		}
 		
 		private function get view():EntityFormItem {
 			return EntityFormItem(_view);
 		}
 		
-		protected function initNodeDefinitions(event:Event = null):void {
+		protected function initNodeDefinitions():void {
 			var temp:IList = null;
 			if(view.entityDefinition != null && view.modelVersion != null) {
 				temp = UIBuilder.getDefinitionsInVersion(view.entityDefinition.childDefinitions, view.modelVersion);

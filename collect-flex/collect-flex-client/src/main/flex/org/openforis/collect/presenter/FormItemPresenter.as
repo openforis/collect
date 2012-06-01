@@ -2,6 +2,7 @@ package org.openforis.collect.presenter
 {
 	import flash.events.Event;
 	
+	import mx.binding.utils.BindingUtils;
 	import mx.binding.utils.ChangeWatcher;
 	import mx.collections.IList;
 	import mx.controls.Alert;
@@ -13,17 +14,18 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.event.NodeEvent;
+	import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
 	import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.SchemaProxy;
 	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.model.proxy.NodeProxy;
+	import org.openforis.collect.model.proxy.RecordProxy;
 	import org.openforis.collect.remoting.service.UpdateResponse;
 	import org.openforis.collect.ui.component.detail.CollectFormItem;
 	import org.openforis.collect.ui.component.detail.RelevanceDisplayManager;
 	import org.openforis.collect.ui.component.detail.ValidationDisplayManager;
 	import org.openforis.collect.ui.component.input.FormItemContextMenu;
 	import org.openforis.collect.util.CollectionUtil;
-	import org.openforis.collect.model.proxy.RecordProxy;
 
 	/**
 	 * 
@@ -78,7 +80,6 @@ package org.openforis.collect.presenter
 			eventDispatcher.addEventListener(ApplicationEvent.RECORD_SAVED, recordSavedHandler);
 			eventDispatcher.addEventListener(ApplicationEvent.ASK_FOR_SUBMIT, askForSubmitHandler);
 			ChangeWatcher.watch(_view, "parentEntity", parentEntityChangeHandler);
-			ChangeWatcher.watch(_view, "modelVersion", modelVersionChangeHandler);
 		}
 		
 		protected function updateResponseReceivedHandler(event:ApplicationEvent):void {
@@ -105,9 +106,6 @@ package org.openforis.collect.presenter
 		
 		protected function parentEntityChangeHandler(event:Event):void {
 			updateView();
-		}
-		
-		protected function modelVersionChangeHandler(event:Event):void {
 		}
 		
 		protected function updateView():void {
