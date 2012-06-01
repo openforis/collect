@@ -113,7 +113,7 @@
 					</execution>
 				</executions>
 				<configuration>
-					<debug>true</debug>
+					<debug>false</debug>
 					<showWarnings>false</showWarnings>					
 					<staticLinkRuntimeSharedLibraries>true</staticLinkRuntimeSharedLibraries>
 					<sourceDirectory>${basedir}/src/main/flex</sourceDirectory>
