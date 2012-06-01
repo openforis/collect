@@ -38,7 +38,7 @@ public class TaxonVernacularNameDao extends MappingJooqDaoSupport<TaxonVernacula
 	}
 
 	public List<TaxonVernacularName> findByVernacularName(String searchString, int maxResults, HashMap<String, String> hashQualifier) {
-		if(hashQualifier==null){
+		if(hashQualifier == null){
 			return findContaining(OFC_TAXON_VERNACULAR_NAME.VERNACULAR_NAME, searchString, maxResults);
 		} else {
 			return findVernacularNameInternal(searchString, hashQualifier, maxResults);

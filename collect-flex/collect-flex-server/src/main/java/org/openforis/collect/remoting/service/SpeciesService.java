@@ -32,6 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 /**
  * @author M. Togna
  * @author S. Ricci
+ * @author E. Wibowo 
  */
 public class SpeciesService {
 
@@ -44,8 +45,7 @@ public class SpeciesService {
 	private enum SearchType {
 		BY_CODE,
 		BY_SCIENTIFIC_NAME,
-		BY_VERNACULAR_NAME,
-		BY_VERNACULAR_NAME_QUALIFIERS
+		BY_VERNACULAR_NAME
 	}
 	
 	/**
@@ -53,7 +53,7 @@ public class SpeciesService {
 	 * @param maxResults 
 	 */
 	public List<TaxonOccurrenceProxy> findByCode(String searchString, int maxResults) {
-		return find(SearchType.BY_CODE, searchString, maxResults, null);
+		return find(SearchType.BY_CODE, searchString, maxResults, -1);
 	}
 
 	/**
@@ -63,7 +63,7 @@ public class SpeciesService {
 	 * @return
 	 */
 	public List<TaxonOccurrenceProxy> findByScientificName(String searchString, int maxResults) {
-		return find(SearchType.BY_SCIENTIFIC_NAME, searchString, maxResults, null);
+		return find(SearchType.BY_SCIENTIFIC_NAME, searchString, maxResults, -1);
 	}
 	
 	/**
@@ -73,47 +73,7 @@ public class SpeciesService {
 	 * @return
 	 */
 	public List<TaxonOccurrenceProxy> findByVernacularName(int nodeId, String searchString, int maxResults) {
-		SessionState sessionState = sessionManager.getSessionState();
-		CollectRecord record = sessionState.getActiveRecord();
-		Node<? extends NodeDefinition> node = record.getNodeByInternalId(nodeId);
-		
-		TaxonAttribute attr = (TaxonAttribute) node;
-		TaxonAttributeDefinition definition = attr.getDefinition();
-		HashMap<String, String> hashQualifiers = new HashMap<String, String>();	
-		
-		if (node instanceof TaxonAttribute){			
-			List<String> q = definition.getQualifiers();
-			if(q!=null){
-				int i = 1;
-				for(String qualifierExpression : q){
-					String qualifierValue="";
-					SurveyContext context = record.getSurveyContext();
-					ExpressionFactory expressionFactory = context.getExpressionFactory();					
-					try {
-						AbsoluteModelPathExpression expression = expressionFactory.createAbsoluteModelPathExpression(qualifierExpression);
-						CodeAttribute code = (CodeAttribute) expression.evaluate(record);
-						qualifierValue = code.getValue().getCode();
-
-					} catch (Exception e) { //catch any exception
-						e.printStackTrace();
-						break;
-					}
-					hashQualifiers.put("qualifier" + i, qualifierValue);
-				}
-				
-				//if anything happened, ignore qualifier
-				if(hashQualifiers.size()>0){
-					return find(SearchType.BY_VERNACULAR_NAME_QUALIFIERS, searchString, maxResults,hashQualifiers);
-				}else{
-					return find(SearchType.BY_VERNACULAR_NAME, searchString, maxResults, null);
-				}
-			}else{
-				return find(SearchType.BY_VERNACULAR_NAME, searchString, maxResults, null);
-			}
-			
-		} else {
-			throw new IllegalArgumentException("Expected TaxonAttribute but got "+node.getClass());
-		}
+		return find(SearchType.BY_VERNACULAR_NAME, searchString, maxResults, nodeId);
 	}
 
 	/**
@@ -125,7 +85,7 @@ public class SpeciesService {
 	 * @param hashQualifiers 
 	 * @return
 	 */
-	private List<TaxonOccurrenceProxy> find(SearchType type, String searchString, int maxResults, HashMap<String, String> hashQualifiers) {
+	private List<TaxonOccurrenceProxy> find(SearchType type, String searchString, int maxResults, int nodeId) {
 		List<TaxonOccurrence> list = null;
 		switch(type) {
 			case BY_CODE:
@@ -135,10 +95,10 @@ public class SpeciesService {
 				list = taxonManager.findByScientificName(searchString, maxResults);
 				break;
 			case BY_VERNACULAR_NAME:
-				list = taxonManager.findByVernacularName(searchString, maxResults, null);
-				break;
-			case BY_VERNACULAR_NAME_QUALIFIERS:
-				list = taxonManager.findByVernacularName(searchString, maxResults, hashQualifiers);
+				SessionState sessionState = sessionManager.getSessionState();
+                CollectRecord record = sessionState.getActiveRecord();
+                Node<? extends NodeDefinition> node = record.getNodeByInternalId(nodeId);
+				list = taxonManager.findByVernacularName(searchString, maxResults, record, node);
 				break;
 		}
 		List<TaxonOccurrenceProxy> result = new ArrayList<TaxonOccurrenceProxy>();
