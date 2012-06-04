@@ -14,7 +14,8 @@
 			import mx.rpc.events.ResultEvent;
 			import org.openforis.collect.client.LogoClient;
 			import org.openforis.collect.client.ClientFactory;
-			import mx.controls.Alert;
+			import org.openforis.collect.util.AlertUtil;
+
 			
 			[Bindable]
 			public var byteArray:ByteArray ;
@@ -33,7 +34,7 @@
 			}
 			
 			public function logoFaultHandler(event:FaultEvent, token:Object = null):void {
-				Alert.show(event.fault.faultString, "Error on loading Logo"); 
+				AlertUtil.showError('error.logoNotFound'); 
 			}
 			
 		]]>

@@ -20,6 +20,7 @@ import org.openforis.idm.model.TaxonAttribute;
 import org.openforis.idm.model.TaxonOccurrence;
 import org.openforis.idm.model.expression.AbsoluteModelPathExpression;
 import org.openforis.idm.model.expression.ExpressionFactory;
+import org.openforis.idm.model.expression.ModelPathExpression;
 import org.openforis.idm.model.species.Taxon;
 import org.openforis.idm.model.species.TaxonVernacularName;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,10 +81,20 @@ public class SpeciesManager {
 				for(String qualifierExpression : q){
 					String qualifierValue="";
 					SurveyContext context = record.getSurveyContext();
-					ExpressionFactory expressionFactory = context.getExpressionFactory();					
+					ExpressionFactory expressionFactory = context.getExpressionFactory();
+					
 					try {
-						AbsoluteModelPathExpression expression = expressionFactory.createAbsoluteModelPathExpression(qualifierExpression);
-						CodeAttribute code = (CodeAttribute) expression.evaluate(record);//may cause internal Exception : MissingValueException
+						CodeAttribute code = null;
+						if(qualifierExpression.startsWith("/")) {
+							AbsoluteModelPathExpression expression = expressionFactory.createAbsoluteModelPathExpression(qualifierExpression);
+							code = (CodeAttribute) expression.evaluate(record);
+						}else if(qualifierExpression.startsWith("()")){
+							ModelPathExpression expression = expressionFactory.createModelPathExpression(qualifierExpression);
+							code = (CodeAttribute) expression.evaluate(node, null);
+						}else {
+							throw new IllegalArgumentException("Qualifier expression : " + qualifierExpression + " is not valid");
+						}
+					
 						qualifierValue = code.getValue().getCode();
 						hashQualifiers.put("qualifier" + i, qualifierValue);
 					} catch (Exception e) {
