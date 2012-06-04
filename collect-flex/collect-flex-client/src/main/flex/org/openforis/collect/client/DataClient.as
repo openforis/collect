@@ -30,8 +30,10 @@ package org.openforis.collect.client {
 		private var _loadRecordSummariesOperation:Operation;
 		private var _loadRecordOperation:Operation;
 		private var _isLockingActiveRecordOperation:Operation;
-		private var _promoteActiveRecordOperation:Operation;
-		private var _demoteActiveRecordOperation:Operation;
+		private var _promoteToCleansingOperation:Operation;
+		private var _promoteToAnalysisOperation:Operation;
+		private var _demoteToCleansingOperation:Operation;
+		private var _demoteToEntryOperation:Operation;
 		private var _clearActiveRecordOperation:Operation;
 		private var _getCodeListItemsOperation:Operation;
 		private var _findAssignableCodeListItemsOperation:Operation;
@@ -47,8 +49,10 @@ package org.openforis.collect.client {
 			this._deleteRecordOperation = getOperation("deleteRecord");
 			this._loadRecordSummariesOperation = getOperation("loadRecordSummaries");
 			this._loadRecordOperation = getOperation("loadRecord");
-			this._promoteActiveRecordOperation = getOperation("promoteActiveRecord");
-			this._demoteActiveRecordOperation = getOperation("demoteActiveRecord");
+			this._promoteToCleansingOperation = getOperation("promoteToCleansing");
+			this._promoteToAnalysisOperation = getOperation("promoteToAnalysis");
+			this._demoteToCleansingOperation = getOperation("demoteToCleansing");
+			this._demoteToEntryOperation = getOperation("demoteToEntry");
 			this._clearActiveRecordOperation = getOperation("clearActiveRecord");
 			this._getCodeListItemsOperation = getOperation("getCodeListItems", CONCURRENCY_MULTIPLE);
 			this._findAssignableCodeListItemsOperation = getOperation("findAssignableCodeListItems", CONCURRENCY_MULTIPLE);
@@ -98,13 +102,23 @@ package org.openforis.collect.client {
 			token.addResponder(responder);
 		}
 		
-		public function promoteActiveRecord(responder:IResponder):void {
-			var token:AsyncToken = this._promoteActiveRecordOperation.send();
+		public function promoteToCleansing(responder:IResponder):void {
+			var token:AsyncToken = this._promoteToCleansingOperation.send();
 			token.addResponder(responder);
 		}
 		
-		public function demoteActiveRecord(responder:IResponder):void {
-			var token:AsyncToken = this._demoteActiveRecordOperation.send();
+		public function promoteToAnalysis(responder:IResponder):void {
+			var token:AsyncToken = this._promoteToAnalysisOperation.send();
+			token.addResponder(responder);
+		}
+		
+		public function demoteToCleansing(responder:IResponder):void {
+			var token:AsyncToken = this._demoteToCleansingOperation.send();
+			token.addResponder(responder);
+		}
+		
+		public function demoteToEntry(responder:IResponder):void {
+			var token:AsyncToken = this._demoteToEntryOperation.send();
 			token.addResponder(responder);
 		}
 		
