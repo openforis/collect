@@ -22,6 +22,14 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 	</properties>
 
+	<distributionManagement>
+		<repository>
+			<id>releases</id>
+			<name>Repository with internal releases</name>
+			<url>http://ldvfo01:9000/nexus/content/repositories/releases</url>
+		</repository>
+	</distributionManagement>
+
 	<scm>
 	    <connection>scm:git:git@github.com:openforis/collect.git</connection>
 	    <url>scm:git:git@github.com:openforis/collect.git</url>
@@ -162,17 +170,17 @@
 			<dependency>
 				<groupId>org.openforis.idm</groupId>
 				<artifactId>idm-api</artifactId>
-				<version>3.0-SNAPSHOT</version>
+				<version>3.0-Alpha1</version>
 			</dependency>
 			<dependency>
 				<groupId>org.openforis.idm</groupId>
 				<artifactId>idm-ri</artifactId>
-				<version>3.0-SNAPSHOT</version>
+				<version>3.0-Alpha1</version>
 			</dependency>
 			<dependency>
 				<groupId>org.openforis.idm</groupId>
 				<artifactId>idm-test</artifactId>
-				<version>3.0-SNAPSHOT</version>
+				<version>3.0-Alpha1</version>
 				<scope>test</scope>
 			</dependency>
 			<dependency>
