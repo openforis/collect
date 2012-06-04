@@ -14,8 +14,6 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openforis.collect.model.User;
-import org.openforis.collect.remoting.service.export.DataExportProcess;
 import org.openforis.collect.web.session.SessionState;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -36,18 +34,12 @@ public class DataExportDownloadController {
 	@RequestMapping(value = "/downloadDataExport.htm", method = RequestMethod.GET)
 	public @ResponseBody String downloadDataExport(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		try {
-			SessionState sessionState = getSessionState(request);
-			DataExportProcess dataExportProcess = sessionState.getDataExportProcess();
-			if ( dataExportProcess != null && dataExportProcess.isComplete() ) {
-				String path = buildDataExportFilePath(request);
-				File file = new File(path);
-				if ( file.exists() ) {
-					write(response, file);
-				} else {
-					throw new IOException("Data export file not found");
-				}
+			String path = buildDataExportFilePath(request);
+			File file = new File(path);
+			if ( file.exists() ) {
+				write(response, file);
 			} else {
-				throw new IllegalStateException("No data export completed");
+				throw new IOException("Data export file not found");
 			}
 		} catch (IOException e) {
 			LOG.error(e);
@@ -60,11 +52,11 @@ public class DataExportDownloadController {
 		ServletContext context = request.getSession().getServletContext();
 		String exportRealPath = context.getRealPath(EXPORT_PATH);
 		SessionState sessionState = getSessionState(request);
-		User user = sessionState.getUser();
-		String userName = user.getName();
 		String fileName = "data.zip";
-		String path = exportRealPath + File.separator + userName + File.separator + fileName;
-		return path;
+		String sessionId = sessionState.getSessionId();
+		StringBuilder sb = new StringBuilder();
+		sb.append(exportRealPath).append(File.separator).append(sessionId).append(File.separator).append(fileName);
+		return sb.toString();
 	}
 
 	private SessionState getSessionState(HttpServletRequest request) {
