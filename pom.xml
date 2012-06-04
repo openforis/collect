@@ -10,7 +10,6 @@
 
 	<modules>
 		<module>collect-core</module>
-		<module>collect-mobile</module>
 		<module>collect-flex</module>
 	</modules>
 
