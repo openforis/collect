@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<datagroup:MultipleNodesDataGroupItemRenderer 
+				xmlns:fx="http://ns.adobe.com/mxml/2009" 
+				xmlns:s="library://ns.adobe.com/flex/spark" 
+				xmlns:mx="library://ns.adobe.com/flex/mx"
+				xmlns:detail="org.openforis.collect.ui.component.detail.*" 
+				xmlns:datagroup="org.openforis.collect.ui.component.datagroup.*"
+				>
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.collections.IList;
+			
+			import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
+			import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
+			import org.openforis.collect.model.proxy.EntityProxy;
+
+			private var _entityDefinition:EntityDefinitionProxy;
+			private var _nodeDefinitions:IList;
+			private var _modelVersion:ModelVersionProxy;
+			private var _entity:EntityProxy;
+			
+			override protected function createChildren():void {
+				super.createChildren();
+				
+				contentGroup.addElement(dataGroup);
+			}
+			
+			[Bindable]
+			public function get entityDefinition():EntityDefinitionProxy {
+				return _entityDefinition;
+			}
+			
+			public function set entityDefinition(value:EntityDefinitionProxy):void {
+				_entityDefinition = value;
+			}
+			
+			[Bindable]
+			public function get modelVersion():ModelVersionProxy {
+				return _modelVersion;
+			}
+			
+			public function set modelVersion(value:ModelVersionProxy):void {
+				_modelVersion = value;
+			}
+			
+			[Bindable]
+			public function get nodeDefinitions():IList {
+				return _nodeDefinitions;
+			}
+			
+			public function set nodeDefinitions(value:IList):void {
+				_nodeDefinitions = value;
+			}
+			
+			[Bindable]
+			public function get entity():EntityProxy {
+				return _entity;
+			}
+			
+			public function set entity(value:EntityProxy):void {
+				_entity = value;
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<fx:Declarations>
+		<s:DataGroup id="dataGroup" dataProvider="{nodeDefinitions}">
+			<s:layout>
+				<s:HorizontalLayout gap="4" />
+			</s:layout>
+			<s:itemRenderer>
+				<fx:Component>
+					<detail:FormDataGroupItemRenderer
+						entity="{parentDocument.entity}"
+						modelVersion="{parentDocument.modelVersion}"
+						/>
+				</fx:Component>
+			</s:itemRenderer>
+		</s:DataGroup>
+	</fx:Declarations>
+	
+		
+	
+</datagroup:MultipleNodesDataGroupItemRenderer>

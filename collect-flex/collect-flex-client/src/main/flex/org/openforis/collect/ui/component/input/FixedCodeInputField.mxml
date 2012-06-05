@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<input:InputField xmlns:fx="http://ns.adobe.com/mxml/2009" 
+				  xmlns:s="library://ns.adobe.com/flex/spark" 
+				  xmlns:mx="library://ns.adobe.com/flex/mx" 
+				  xmlns:input="org.openforis.collect.ui.component.input.*" 
+				  >
+
+	<fx:Script>
+		<![CDATA[
+			import org.openforis.collect.presenter.FixedCodeInputFieldPresenter;
+			
+			private var _qualifiable:Boolean = false;
+			
+			override protected function initPresenter():void {
+				this.presenter = new FixedCodeInputFieldPresenter(this);
+			}
+			
+			[Bindable]
+			public function get qualifiable():Boolean {
+				return _qualifiable;
+			}
+			
+			public function set qualifiable(value:Boolean):void {
+				_qualifiable = value;
+			}
+		]]>
+	</fx:Script>
+	
+	<input:layout>
+		<s:HorizontalLayout gap="2" />
+	</input:layout>
+	
+	<s:Label id="textInput" 
+			 styleName="fixedCode"
+			 maxDisplayedLines="1" 
+			 showTruncationTip="true" />
+	
+	<input:TextInput id="qualifierTextInput"
+					 visible="{qualifiable}"
+					 includeInLayout="{qualifiable}"
+					 width="100"
+					 />
+	
+</input:InputField>

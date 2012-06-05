@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<detail:CompositeAttributeRenderer 
+				xmlns:fx="http://ns.adobe.com/mxml/2009" 
+				xmlns:s="library://ns.adobe.com/flex/spark" 
+				xmlns:mx="library://ns.adobe.com/flex/mx" 
+				xmlns:input="org.openforis.collect.ui.component.input.*" 
+				xmlns:detail="org.openforis.collect.ui.component.detail.*"
+				inputFields="{[numericInputField, unitInputField]}"
+				>
+	<fx:Script>
+		<![CDATA[
+			import org.openforis.collect.metamodel.proxy.NumberAttributeDefinitionProxy;
+			import org.openforis.collect.metamodel.proxy.UnitProxy;
+			import org.openforis.collect.presenter.NumericAttributePresenter;
+			
+			public static const NO_UNIT_STATE:String = "noUnit";
+			public static const SINGLE_UNIT_STATE:String = "singleUnit";
+			public static const MULTIPLE_UNIT_STATE:String = "multipleUnits";
+			
+			override protected function initPresenter():void {
+				presenter = new NumericAttributePresenter(this);
+			}
+			
+			protected function unitLabelFunction(item:Object):String {
+				if(item is UnitProxy) {
+					var unit:UnitProxy = UnitProxy(item);
+					return unit.name;
+				} else {
+					return item.label;
+				}
+			}
+		]]>
+	</fx:Script>
+
+	<detail:states>
+		<s:State name="horizontal" />
+		<s:State name="vertical" />
+		<s:State name="noUnit" />
+		<s:State name="singleUnit" />
+		<s:State name="multipleUnits" />
+	</detail:states>
+	
+	<s:HGroup gap="2" 
+			  verticalAlign="middle">
+		<input:NumericInputField id="numericInputField" 
+								 attributeDefinition="{attributeDefinition}"
+								 parentEntity="{parentEntity}"
+								 attribute="{attribute}"
+								 fieldIndex="0"
+								 width="70"
+								 />
+		
+		<input:DropDownInputField id="unitInputField" 
+								  includeIn="multipleUnits"
+								  attributeDefinition="{attributeDefinition}"
+								  parentEntity="{parentEntity}"
+								  attribute="{attribute}"
+								  fieldIndex="1"
+								  width="120" 
+								  dataField="name"
+								  labelFunction="{unitLabelFunction}"
+								  />
+		
+		<s:Label id="unitLabel"
+				 styleName="unit"
+				 includeIn="singleUnit"
+				 maxDisplayedLines="1"
+				 showTruncationTip="true" />
+				 
+	</s:HGroup>
+	
+</detail:CompositeAttributeRenderer>

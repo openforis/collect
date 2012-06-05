@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Context path="/collect" reloadable="false">
+    <ResourceLink name="jdbc/collectDs"
+        type="javax.sql.DataSource"
+        global="jdbc/collectDs"/>
+</Context>

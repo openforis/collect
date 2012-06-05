@@ -1,0 +1,4 @@
+.*
+target
+!.gitignore
+dev.properties

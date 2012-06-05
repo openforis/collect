@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx">
+	
+	<s:layout>
+		<s:HorizontalLayout verticalAlign="middle" gap="10"/>
+	</s:layout>
+	
+	<fx:Script>
+		<![CDATA[
+			import org.openforis.collect.i18n.Message;
+			import org.openforis.collect.ui.Images;
+			
+			public static const LOADING_STATE:String = "loading";
+			public static const NO_PAGES_STATE:String = "noPages";
+			public static const SINGLE_PAGE_STATE:String = "singlePage";
+			public static const FIRST_PAGE_STATE:String = "firstPage";
+			public static const LAST_PAGE_STATE:String = "lastPage";
+			public static const MIDDLE_PAGE_STATE:String = "middlePage";
+		]]>
+	</fx:Script>
+	
+	<s:states>
+		<s:State name="loading" stateGroups="inactive" />
+		<s:State name="noPages" stateGroups="inactive"/>
+		<s:State name="singlePage" stateGroups="inactive" />
+		<s:State name="firstPage" />
+		<s:State name="lastPage" />
+		<s:State name="middlePage" />
+	</s:states>
+	
+	<!-- TODO change Image in Button and use skin to apply image background -->
+	<s:Image 
+			id="firstPageButton" 
+			source="{Images.FIRST}" 
+			toolTip="{Message.get('list.first')}" 
+			width="16" 
+			height="16" 
+			useHandCursor="true" 
+			buttonMode="true"
+			enabled.inactive="false" 
+			enabled.firstPage="false" 
+			/>
+	
+	<s:Image 
+			id="previousPageButton" 
+			source="{Images.PREV}" 
+			toolTip="{Message.get('list.previous')}" 
+			width="16" 
+			height="16" 
+			useHandCursor="true" 
+			buttonMode="true"
+			enabled.inactive="false" 
+			enabled.firstPage="false" 
+			/>
+	
+	<mx:Text 
+			fontSize="12" 
+			fontWeight="bold" 
+			id="currentPageText" 
+			/>
+	
+	<s:Image 
+			id="nextPageButton" 
+			source="{Images.NEXT}" 
+			toolTip="{Message.get('list.next')}" 
+			width="16" 
+			height="16" 
+			useHandCursor="true" 
+			buttonMode="true"
+			enabled.inactive="false" 
+			enabled.lastPage="false" 
+			/>
+	
+	<s:Image 
+			id="lastPageButton" 
+			 source="{Images.LAST}" 
+			 toolTip="{Message.get('list.last')}" 
+			 width="16" 
+			 height="16" 
+			 useHandCursor="true" 
+			 buttonMode="true"
+			 enabled.inactive="false" 
+			 enabled.lastPage="false" />
+	
+</s:Group>

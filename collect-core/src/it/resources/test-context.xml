@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:security="http://www.springframework.org/schema/security"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx" 
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="
+    http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+    http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.1.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd
+    http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd
+    http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.1.xsd"
+	default-lazy-init="true"
+	default-autowire="byName">
+	
+    <context:annotation-config/>
+    
+<!--     <bean id="applicationContextProvider" class="org.openforis.collect.context.ApplicationContextAwareImpl" /> -->
+    
+    <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="location" value="file:${user.dir}/dev.properties"/>
+    </bean>
+     
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+		<property name="driverClassName" value="org.postgresql.Driver" />
+		<property name="url" value="${collect.devdb.url}"/>
+		<property name="username" value="${collect.devdb.username}" />
+		<property name="password" value="${collect.devdb.password}" />
+	</bean>
+ 
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+    	<property name="dataSource" ref="dataSource"/>
+    </bean>
+    
+	<bean id="configurationDao" class="org.openforis.collect.persistence.ConfigurationDao">
+    	<property name="dataSource" ref="dataSource"/>
+	</bean>
+	
+	<bean id="surveyDao" class="org.openforis.collect.persistence.SurveyDao" init-method="init">
+    	<property name="dataSource" ref="dataSource"/>
+	</bean>
+
+	<bean id="logoDao" class="org.openforis.collect.persistence.LogoDao">
+    	<property name="dataSource" ref="dataSource"/>
+	</bean>
+	
+	<bean id="recordDao" class="org.openforis.collect.persistence.RecordDao">
+    	<property name="dataSource" ref="dataSource"/>
+	</bean>
+
+	<bean id="taxonomyDao" class="org.openforis.collect.persistence.TaxonomyDao">
+    	<property name="dataSource" ref="dataSource"/>
+	</bean>
+	
+	<bean id="taxonDao" class="org.openforis.collect.persistence.TaxonDao">
+    	<property name="dataSource" ref="dataSource"/>
+	</bean>
+	
+	<bean id="taxonVernacularNameDao" class="org.openforis.collect.persistence.TaxonVernacularNameDao">
+    	<property name="dataSource" ref="dataSource"/>
+	</bean>
+
+	<bean id="dynamicTableDao" class="org.openforis.collect.persistence.DynamicTableDao">
+    	<property name="dataSource" ref="dataSource"/>
+	</bean>
+	
+	<!--  Managers -->
+	<bean id="recordManager" 					class="org.openforis.collect.manager.RecordManager" init-method="init" />	
+	<bean id="surveyManager"	 				class="org.openforis.collect.manager.SurveyManager" init-method="init" />
+
+	<!-- Expression Factory -->
+	<bean id="expressionFactory" class="org.openforis.idm.model.expression.ExpressionFactory" />
+	<bean id="validator" 					class="org.openforis.idm.metamodel.validation.Validator" />
+	<bean id="externalCodeListProvider" 	class="org.openforis.collect.persistence.DatabaseExternalCodeListProvider" />
+
+	<!-- XmlSerializer -->
+	<bean id="xmlSerializerFactory" class="org.openforis.collect.persistence.xml.FastXmlSerializerFactory" />
+	
+	<!-- XML DataMarshaller -->
+	<bean id="dataMarshaller" class="org.openforis.collect.persistence.xml.DataMarshaller" lazy-init="false" autowire-candidate="true" autowire="byName" />
+	
+	<!-- enables interpretation of the @Transactional annotations for declarative transaction management-->
+	<tx:annotation-driven transaction-manager="transactionManager" proxy-target-class="true"/>
+</beans>

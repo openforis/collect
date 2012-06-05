@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<detail:EntityFormItem 
+		xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		xmlns:s="library://ns.adobe.com/flex/spark" 
+		xmlns:mx="library://ns.adobe.com/flex/mx"
+		xmlns:detail="org.openforis.collect.ui.component.detail.*"
+		>
+	<fx:Declarations>
+		<s:VerticalLayout id="verticalLayout" 
+						  gap="2" 
+						  paddingLeft="20" 
+						  />
+		<s:HorizontalLayout id="horizontalLayout" 
+							gap="4" />
+	</fx:Declarations>
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.events.FlexEvent;
+			
+			import org.openforis.collect.util.UIUtil;
+			
+			private static const STATE_HORIZONTAL:String = "horizontal";
+			private static const STATE_VERTICAL:String = "vertical";
+
+			override protected function creationCompleteHandler(event:FlexEvent):void {
+				super.creationCompleteHandler(event);
+				checkState();
+			}
+
+			protected function checkState(event:Event = null):void {
+				if(entityDefinition.parentLayout == UIUtil.LAYOUT_TABLE) {
+					currentState = STATE_HORIZONTAL;
+				} else {
+					currentState = STATE_VERTICAL;
+				}
+			}
+			
+		]]>
+	</fx:Script>
+	
+	
+	<detail:states>
+		<s:State name="horizontal" />
+		<s:State name="vertical" />
+	</detail:states>
+	
+	<detail:layout>
+		<s:VerticalLayout />
+	</detail:layout>
+
+	<!--<s:BorderContainer id="border" 
+					   height="100%" 
+					   width="100%"
+					   minHeight="0"
+					   minWidth="0">
+	-->		
+	
+	<detail:FormItemLabel id="formItemLabel"
+		  				  nodeDefinition="{entityDefinition}" 
+						  includeIn="vertical" />
+
+	<s:DataGroup 
+		dataProvider="{nodeDefinitions}" 
+		layout.horizontal="{horizontalLayout}" 
+		layout.vertical="{verticalLayout}">
+		<s:itemRenderer>
+			<fx:Component>
+				<detail:FormDataGroupItemRenderer
+					modelVersion="{outerDocument.modelVersion}"
+					entity="{outerDocument.entity}"
+					labelWidth="130"
+					/>
+			</fx:Component>
+		</s:itemRenderer>
+	</s:DataGroup>
+	
+</detail:EntityFormItem>

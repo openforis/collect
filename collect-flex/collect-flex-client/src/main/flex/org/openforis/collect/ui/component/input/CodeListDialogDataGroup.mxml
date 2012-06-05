@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:DataGroup xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			 xmlns:s="library://ns.adobe.com/flex/spark" 
+			 xmlns:mx="library://ns.adobe.com/flex/mx">
+	
+	<fx:Script>
+		<![CDATA[
+			private var _maxSpecified:int = 1;
+			private var _multiple:Boolean = false;
+			private var _editable:Boolean = true;
+			
+			internal function checkSelection(lastSelectedData:Object):void {
+				if(! multiple) {
+					for each(var data:Object in dataProvider) {
+						if(data != lastSelectedData) {
+							//reset selection
+							data.selected = false;
+						}
+					}
+				}
+			}
+			[Bindable]
+			public function get maxSpecified():int {
+				return _maxSpecified;
+			}
+
+			public function set maxSpecified(value:int):void {
+				_maxSpecified = value;
+			}
+
+			[Bindable]
+			public function get multiple():Boolean {
+				return _multiple;
+			}
+
+			public function set multiple(value:Boolean):void {
+				_multiple = value;
+			}
+
+			[Bindable]
+			public function get editable():Boolean {
+				return _editable;
+			}
+
+			public function set editable(value:Boolean):void {
+				_editable = value;
+			}
+
+			
+		]]>
+	</fx:Script>
+	
+	<s:layout>
+		<s:VerticalLayout gap="1" paddingLeft="2"/>
+	</s:layout>
+	
+	<s:itemRenderer>
+		<fx:Component>
+			<s:ItemRenderer width="100%" autoDrawBackground="false">
+				<fx:Script>
+					<![CDATA[
+						import org.openforis.collect.metamodel.proxy.CodeListItemProxy;
+						
+						private function textInputChangeHandler(event:Event):void {
+							data.qualifier = textInput.text;
+						}
+						
+						private function checkBoxChangeHandler(event:Event):void {
+							data.selected = checkBox.selected;
+							
+							outerDocument.checkSelection(data);
+						}
+						
+						[Bindable(event="dataChange")]
+						override public function get label():String {
+							var code:CodeListItemProxy = CodeListItemProxy(data);
+							var label:String = code.code + " - " + code.getLabelText();
+							return label;
+						}
+						
+					]]>
+				</fx:Script>
+				
+				<s:layout>
+					<s:HorizontalLayout verticalAlign="middle" horizontalAlign="left"
+										gap="0"
+										paddingBottom="0" paddingRight="0" paddingLeft="0" paddingTop="0" />
+				</s:layout>
+
+				<s:CheckBox id="checkBox" 
+							enabled="{outerDocument.editable}"
+							selected="{data.selected}" 
+							label="{label}" 
+							change="checkBoxChangeHandler(event)" 
+							/>
+				
+				<mx:TextInput height="20" id="textInput" 
+							  visible="{data.qualifiable}" 
+							  includeInLayout="{data.qualifiable}"
+							  text="{data.qualifier}"
+							  change="textInputChangeHandler(event)"/>
+			</s:ItemRenderer>
+		</fx:Component>
+	</s:itemRenderer>
+	
+</s:DataGroup>

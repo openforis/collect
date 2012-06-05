@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:datagroup="org.openforis.collect.ui.component.datagroup.*"
+		 >
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.collections.ArrayCollection;
+			
+			import org.openforis.collect.model.proxy.EntityProxy;
+			
+			import mx.collections.IList;
+			
+			import spark.layouts.ConstraintLayout;
+			
+			private var _parentEntity:EntityProxy;
+			private var _nodeDefinitions:IList;
+			
+			//private var _constraintLayout:ConstraintLayout;
+			
+			[Bindable]
+			public function get nodeDefinitions():IList {
+				return _nodeDefinitions;
+			}
+			
+			public function set nodeDefinitions(value:IList):void {
+				_nodeDefinitions = value;
+			}
+
+			[Bindable]
+			public function get parentEntity():EntityProxy {
+				return _parentEntity;
+			}
+
+			public function set parentEntity(value:EntityProxy):void {
+				_parentEntity = value;
+			}
+
+			/*
+			[Bindable]
+			public function get constraintLayout():ConstraintLayout {
+				return _constraintLayout;
+			}
+			
+			public function set constraintLayout(value:ConstraintLayout):void {
+				_constraintLayout = value;
+			}
+			*/
+			
+		]]>
+	</fx:Script>
+	
+	<s:DataGroup dataProvider="{nodeDefinitions}"
+				 height="100%">
+		<s:layout>
+			<s:HorizontalLayout 
+								gap="4" 
+								verticalAlign="bottom" />
+		</s:layout>
+		<s:itemRenderer>
+			<fx:Component>
+				<datagroup:DataGroupHeaderItemRenderer
+					height="100%"
+					parentEntity="{outerDocument.parentEntity}"
+					/>
+			</fx:Component>
+		</s:itemRenderer>
+	</s:DataGroup>
+	
+</s:Group>

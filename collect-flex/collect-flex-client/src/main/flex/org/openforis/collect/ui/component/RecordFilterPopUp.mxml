@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component:PopUp xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx"
+			   xmlns:detail="org.openforis.collect.ui.component.detail.*" 
+			   xmlns:input="org.openforis.collect.ui.component.input.*"
+			   xmlns:component="org.openforis.collect.ui.component.*"
+			   creationPolicy="all"
+			   width="240"
+			   title="{Message.get('list.filterTitle')}" 
+			   >
+	<component:layout>
+		<s:VerticalLayout
+			paddingBottom="10"
+			paddingLeft="10"
+			paddingRight="10"
+			paddingTop="10"
+			/>
+	</component:layout>
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.collections.ArrayCollection;
+			
+			import org.openforis.collect.i18n.Message;
+			
+			private var _fields:ArrayCollection;
+			
+			[Bindable]
+			public function get fields():ArrayCollection {
+				return _fields;
+			}
+			
+			public function set fields(value:ArrayCollection):void {
+				_fields = value;
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<mx:VBox>
+		<mx:Repeater id="fieldsRp" dataProvider="{fields}">
+			<mx:HBox>
+				<detail:FormItemLabel nodeDefinition="{fieldsRp.currentItem as NodeDefinitionProxy}"
+									  width="120"
+									  />
+				<input:TextInput id="textInput"
+								 width="80"/>
+			</mx:HBox>
+		</mx:Repeater>
+	</mx:VBox>
+	
+	<s:HGroup id="buttonBar" width="100%" 
+			  horizontalAlign="center" 
+			  verticalAlign="middle" 
+			  gap="20">
+		<s:Button id="applyButton" 
+				  buttonMode="true" 
+				  useHandCursor="true"
+				  label="{Message.get('global.apply')}"/>
+	</s:HGroup>
+	
+</component:PopUp>

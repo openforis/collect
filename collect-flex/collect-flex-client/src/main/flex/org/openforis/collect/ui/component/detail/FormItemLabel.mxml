@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:HGroup xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		  xmlns:s="library://ns.adobe.com/flex/spark" 
+		  xmlns:mx="library://ns.adobe.com/flex/mx"
+		  gap="0"
+		  height="22"
+		  verticalAlign="middle"
+		  >
+	
+	<fx:Script>
+		<![CDATA[
+			import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
+			import org.openforis.collect.metamodel.proxy.NodeLabelProxy;
+			import org.openforis.collect.metamodel.proxy.NodeLabelProxy$Type;
+			import org.openforis.collect.ui.Images;
+			
+			protected static const NUMBER_SUFFIX:String = ".";
+			
+			private var _nodeDefinition:NodeDefinitionProxy;
+			
+			[Bindable]
+			protected var _numberLabelText:String;
+			[Bindable]
+			protected var _instanceLabelText:String;
+			[Bindable]
+			protected var _description:String;
+			
+			protected function init():void {
+				if(_nodeDefinition != null) {
+					var numberLabelProxy:NodeLabelProxy = _nodeDefinition.getLabel(NodeLabelProxy$Type.NUMBER);
+					if(numberLabelProxy != null) {
+						_numberLabelText = numberLabelProxy.text + NUMBER_SUFFIX;
+						_instanceLabelText = _nodeDefinition.getLabelText(null, false);
+					} else {
+						_instanceLabelText = _nodeDefinition.getLabelText(null, true);
+					}
+					_description = _nodeDefinition.getDescription();
+				} else {
+					_numberLabelText = null;
+					_instanceLabelText = null;
+					_description = null;
+				}
+			}
+			
+			[Bindable]
+			public function get nodeDefinition():NodeDefinitionProxy {
+				return _nodeDefinition;
+			}
+
+			public function set nodeDefinition(value:NodeDefinitionProxy):void {
+				_nodeDefinition = value;
+				init();
+			}
+
+		]]>
+	</fx:Script>
+	
+	<s:Label id="numberLabel"
+			 styleName="bold"
+			 width="30"
+			 visible="{_numberLabelText != null}"
+			 includeInLayout="{_numberLabelText != null}"
+			 text="{_numberLabelText}"
+			 />
+			
+	<s:Label id="instanceLabel"
+			 styleName="bold"
+			 width="100%"
+			 text="{_instanceLabelText}"
+			 />
+	
+	<s:Group id="descriptionIconContainer"
+			 width="20"
+			 height="100%"
+			 visible="{_description != null}"
+			 includeInLayout="{_description != null}"
+			 >
+		<s:Image id="descriptionIcon"
+				 source="{Images.INFO}"
+				 toolTip="{_description}"
+				 horizontalCenter="0"
+				 verticalCenter="0"
+				 />
+	</s:Group>
+	
+</s:HGroup>

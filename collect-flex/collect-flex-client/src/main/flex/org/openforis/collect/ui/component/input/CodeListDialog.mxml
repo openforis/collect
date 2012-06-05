@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
+				  xmlns:s="library://ns.adobe.com/flex/spark" 
+				  xmlns:mx="library://ns.adobe.com/flex/mx" 
+				  xmlns:input="org.openforis.collect.ui.component.input.*"
+				  xmlns:component="org.openforis.collect.ui.component.*"
+				  width="500" height="400" 
+				  >
+	<fx:Script>
+		<![CDATA[
+			import org.openforis.collect.i18n.Message;
+			
+			private var _maxSpecified:int = 1;
+			private var _multiple:Boolean = false;
+			private var _editable:Boolean = true;
+			private var _codeInputField:CodeInputField;
+			
+			[Bindable]
+			public function get multiple():Boolean {
+				return _multiple;
+			}
+
+			public function set multiple(value:Boolean):void {
+				_multiple = value;
+			}
+
+			[Bindable]
+			public function get maxSpecified():int {
+				return _maxSpecified;
+			}
+
+			public function set maxSpecified(value:int):void {
+				_maxSpecified = value;
+			}
+			
+			[Bindable]
+			public function get codeInputField():CodeInputField {
+				return _codeInputField;
+			}
+			
+			public function set codeInputField(value:CodeInputField):void {
+				_codeInputField = value;
+			}
+
+			[Bindable]
+			public function get editable():Boolean {
+				return _editable;
+			}
+			
+			public function set editable(value:Boolean):void {
+				_editable = value;
+			}
+
+		]]>
+	</fx:Script>
+		
+	<s:states>
+		<s:State name="default" />
+		<s:State name="loading" />
+	</s:states>
+	
+	<s:Group id="loadingContainer" height="100%" width="100%" includeIn="loading" itemCreationPolicy="immediate">
+		<component:LoadingContent />
+		<s:Button 
+				id="cancelLoading" 
+				bottom="0" 
+				horizontalCenter="0" 
+				useHandCursor="true" 
+				buttonMode="true" 
+				label="{Message.get('global.cancel')}" 
+				/>
+	</s:Group>
+
+	<s:VGroup id="dataContainer" height="100%" width="100%" includeIn="default"  itemCreationPolicy="immediate">
+		<s:Scroller height="100%" width="100%">
+			<input:CodeListDialogDataGroup
+					id="dataGroup" 
+					multiple="{multiple}" 
+					editable="{editable}"
+					maxSpecified="{maxSpecified}"
+					width="100%" 
+					/>
+		</s:Scroller>
+		
+		<s:HGroup width="100%" horizontalAlign="center" verticalAlign="middle" gap="30">
+			<s:Button id="applyButton"
+					  useHandCursor="true" 
+					  buttonMode="true" 
+					  label="{Message.get('global.apply')}"
+					  enabled="{editable}"
+					  />
+			<s:Button id="cancelButton"
+					  useHandCursor="true"
+					  buttonMode="true" 
+					  label="{Message.get('global.cancel')}"  />
+		</s:HGroup>
+	</s:VGroup>
+	
+</s:TitleWindow>

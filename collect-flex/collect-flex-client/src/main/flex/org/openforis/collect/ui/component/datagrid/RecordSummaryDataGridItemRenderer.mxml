@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<s:GridItemRenderer xmlns:fx="http://ns.adobe.com/mxml/2009"
+					xmlns:s="library://ns.adobe.com/flex/spark" 
+					xmlns:mx="library://ns.adobe.com/flex/mx" clipAndEnableScrolling="true"
+					doubleClick="doubleClickHandler(event)" 
+					
+					>
+	<fx:Script> 
+		<![CDATA[ 
+			import org.openforis.collect.event.EventDispatcherFactory;
+			import org.openforis.collect.event.UIEvent;
+			
+			
+			override public function set data(value:Object):void {
+				super.data = value;
+				
+				/* updateCurrentState(); */
+			}
+
+			/* protected function updateCurrentState():void {
+				if(data != null && data.submitted) {
+					this.currentState = "submitted";
+				} else if(data != null && data.rejected) {
+					this.currentState = "rejected";
+				} else {
+					this.currentState = "normal";
+				}
+			} */
+			
+			protected function doubleClickHandler(event:MouseEvent):void {
+				var uiEvent:UIEvent = new UIEvent(UIEvent.RECORD_SELECTED);
+				uiEvent.obj = data;
+				EventDispatcherFactory.getEventDispatcher().dispatchEvent(uiEvent);
+			}
+			
+/* 			override protected function getCurrentRendererState():String {
+				var newRenderState:String = super.getCurrentRendererState();
+				var prefix:String = null;
+				if(StringUtil.startsWith(currentState, "submitted")) {
+					prefix = "submitted";
+				} else if(StringUtil.startsWith(currentState, "rejected")) {
+					prefix = "rejected";
+				}
+				if(prefix != null) {
+					switch(newRenderState) {
+						case "normal":
+							newRenderState = prefix;
+							break;
+						case "hovered":
+							newRenderState = prefix + "Hovered";
+							break;
+						case "selected":
+							newRenderState = prefix + "Selected";
+							break;
+					}
+				}
+				return newRenderState;
+			} */
+
+		]]> 
+	</fx:Script>
+	
+	<s:states>
+		<s:State name="normal" />
+		<s:State name="hovered" />
+		<s:State name="selected" />
+		<s:State name="submitted" />
+		<s:State name="submittedHovered"/>
+		<s:State name="submittedSelected"/>
+		<s:State name="rejected" />
+		<s:State name="rejectedHovered"/>
+		<s:State name="rejectedSelected"/>
+	</s:states>
+	
+	<s:Rect id="backgroundFill" includeIn="submitted, rejected" top="0" bottom="0" right="0" left="0"> 
+		<s:fill> 
+			<s:SolidColor color.submitted="#E0E0E0" color.rejected="#FFFF84" alpha="0.5"/> 
+		</s:fill>
+	</s:Rect>
+	
+	<s:Label id="labelDisplay" 
+			 paddingLeft="5" 
+			 color.submitted="0x505050" 
+			 alpha.submitted="0.5" 
+			 minHeight="20" 
+			 textAlign="left" 
+			 verticalAlign="middle" 
+			 height="100%" width="100%" />
+	
+</s:GridItemRenderer>

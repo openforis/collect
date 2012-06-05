@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<input:InputField xmlns:fx="http://ns.adobe.com/mxml/2009" 
+				  xmlns:s="library://ns.adobe.com/flex/spark" 
+				  xmlns:mx="library://ns.adobe.com/flex/mx" 
+				  xmlns:input="org.openforis.collect.ui.component.input.*" 
+				  width="20">
+	<fx:Script>
+		<![CDATA[
+			import org.openforis.collect.presenter.BooleanInputFieldPresenter;
+			import org.openforis.collect.util.UIUtil;
+			
+			override protected function initPresenter():void {
+				this.presenter = new BooleanInputFieldPresenter(this);
+			}
+			
+		]]>
+	</fx:Script>
+
+	<input:layout>
+		<s:BasicLayout />
+	</input:layout>
+	
+	<input:TextInput id="textInput" width="20" 
+					 horizontalCenter="{attributeDefinition.parentLayout == UIUtil.LAYOUT_TABLE ? 0: NaN}" 
+					 maxChars="1" 
+					 minWidth="0" />
+	
+</input:InputField>

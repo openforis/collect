@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:jms="http://www.springframework.org/schema/jms"
+	xmlns:amq="http://activemq.apache.org/schema/core" 
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="
+            http://www.springframework.org/schema/beans 
+            http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+            http://www.springframework.org/schema/aop 
+            http://www.springframework.org/schema/aop/spring-aop-2.5.xsd
+            http://activemq.apache.org/schema/core 
+            http://activemq.apache.org/schema/core/activemq-core-5.2.0.xsd
+            http://www.springframework.org/schema/jms
+            http://www.springframework.org/schema/jms/spring-jms-2.5.xsd">
+        
+	<amq:broker useJmx="false">
+		<amq:transportConnectors>
+			<amq:transportConnector uri="tcp://localhost:61616" />
+		</amq:transportConnectors>
+	</amq:broker>
+
+	<amq:queue id="editRecordQueue" physicalName="editRecordQueue" />
+	<amq:topic id="updateResult" physicalName="updateResult" />
+	
+	<amq:connectionFactory id="connectionFactory" brokerURL="tcp://localhost:61616" />
+	
+	<bean id="jmsTemplate" class="org.springframework.jms.core.JmsTemplate">
+		<property name="connectionFactory" ref="connectionFactory" />
+	</bean>
+	
+	<bean id="topicTest" class="org.openforis.collect.jms.TopicTest" autowire="byName" />
+	
+	<bean id="jmsTest" class="org.openforis.collect.jms.JmsTest" autowire="byName">
+<!-- 	    <property name="jmsTemplate" ref="jmsTemplate" /> -->
+<!-- 	    <property name="queue" ref="editRecordQueue" /> -->
+<!-- 	    <property name="producer" ref="updateResult" /> -->
+	</bean>
+
+	<jms:listener-container connection-factory="connectionFactory" destination-type="queue">
+		<jms:listener id="jmsListener" destination="editRecordQueue" ref="jmsTest" method="update" />
+	</jms:listener-container>
+	<jms:listener-container connection-factory="connectionFactory" destination-type="topic" >
+		<jms:listener id="jmsListener2" destination="updateResult" ref="topicTest" method="receive" />
+	</jms:listener-container>
+</beans>
