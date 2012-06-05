@@ -118,7 +118,11 @@
 			<s:HGroup verticalAlign="middle">
 				<s:Label text="{Message.get('export.selectStepLabel')}"
 						 styleName="formLabel"/>
-				<s:DropDownList id="stepDropDownList" labelFunction="stepLabelFunction" prompt="{Message.get('global.dropDownPrompt')} "/>
+				<s:DropDownList id="stepDropDownList" 
+								labelFunction="stepLabelFunction" 
+								prompt="{Message.get('global.dropDownPrompt')}"
+								width="150"
+								/>
 			</s:HGroup>
 			
 			<s:VGroup visible="false" visible.partialExportParametersSelection="true"
