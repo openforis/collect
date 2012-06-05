@@ -31,7 +31,7 @@ import org.openforis.idm.model.expression.ExpressionFactory;
 public class ModelSerializationTest {
 //	private final Log log = LogFactory.getLog(ModelSerializationTest.class);
 	
-	//@Test
+	@Test
 	public void testProto() throws Exception {
 		// Create
 		CollectSurvey survey = loadSurvey();
