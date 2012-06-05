@@ -5,9 +5,13 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import static org.openforis.collect.persistence.jooq.tables.OfcTaxonVernacularName.OFC_TAXON_VERNACULAR_NAME;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
 
+import org.jooq.TableField;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openforis.collect.persistence.TaxonDao;
@@ -25,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * @author G. Miceli
  * @author S. Ricci
+ * @author E. Wibowo
  */
 @RunWith( SpringJUnit4ClassRunner.class )
 @ContextConfiguration( locations = {"classpath:test-context.xml"} )
@@ -128,7 +133,7 @@ public class SpeciesDaoIntegrationTest {
 		testInsertAndLoadVernacularName(species1, "Persian walnut", "eng", "", 9);
 		testInsertAndLoadVernacularName(species1, "Орех грецкий", "rus", "", 9);
 		
-		List<TaxonVernacularName> results = taxonVernacularNameDao.findByVernacularName(match, maxResults);
+		List<TaxonVernacularName> results = taxonVernacularNameDao.findByVernacularName(match, maxResults, null);
 		assertEquals(expectedResults, results.size());
 		match = match.toUpperCase();
 		for (TaxonVernacularName tvn : results) {
@@ -339,4 +344,149 @@ public class SpeciesDaoIntegrationTest {
 		t = taxonomyDao.loadById(t.getId());
 		assertNull(t);
 	}
+	/*
+	private TaxonVernacularName testInsertAndLoadVernacularNameWithQualifier(TaxonVernacularName tvn, Taxon taxon1, String name, String lang, String variety, int step, String qualifer1) {
+		// Insert
+		Integer id = tvn.getId();
+		tvn.setVernacularName(name);
+		tvn.setLanguageCode(lang);
+		tvn.setLanguageVariety(variety);
+		tvn.setTaxonSystemId(taxon1.getSystemId());
+		tvn.setStep(step);
+		taxonVernacularNameDao.update(tvn);
+		
+		// Confirm saved
+		tvn = taxonVernacularNameDao.loadById(id);
+		assertNotNull(tvn);
+		assertEquals(id, tvn.getId());
+		assertEquals(taxon1.getSystemId(), tvn.getTaxonSystemId());
+		assertEquals(name, tvn.getVernacularName());
+		assertEquals(lang, tvn.getLanguageCode());
+		assertEquals(variety, tvn.getLanguageVariety());
+		assertEquals(step, tvn.getStep());
+		
+		return tvn;
+	}
+
+	private TaxonVernacularName testUpdateAndLoadVernacularNameWithQualifier(TaxonVernacularName tvn, Taxon taxon1, String name, String lang, String variety, int step, String qualifer1) {
+		// Insert
+		Integer id = tvn.getId();
+		tvn.setVernacularName(name);
+		tvn.setLanguageCode(lang);
+		tvn.setLanguageVariety(variety);
+		tvn.setTaxonSystemId(taxon1.getSystemId());
+		tvn.setStep(step);
+		taxonVernacularNameDao.update(tvn);
+		
+		// Confirm saved
+		tvn = taxonVernacularNameDao.loadById(id);
+		assertNotNull(tvn);
+		assertEquals(id, tvn.getId());
+		assertEquals(taxon1.getSystemId(), tvn.getTaxonSystemId());
+		assertEquals(name, tvn.getVernacularName());
+		assertEquals(lang, tvn.getLanguageCode());
+		assertEquals(variety, tvn.getLanguageVariety());
+		assertEquals(step, tvn.getStep());
+		
+		return tvn;
+	}	
+	
+	private TaxonVernacularName testInsertAndLoadVernacularNameWithQualifier(Taxon taxon1, String name, String lang, String variety, int step, String qualifier1) {
+		// Insert
+		TaxonVernacularName tvn = new TaxonVernacularName();
+		tvn.setVernacularName(name);
+		tvn.setLanguageCode(lang);
+		tvn.setLanguageVariety(variety);
+		tvn.setTaxonSystemId(taxon1.getSystemId());
+		tvn.setStep(step);
+		List<String> q = new ArrayList<String>();
+		q.add(qualifier1);
+		tvn.setQualifiers(q);
+		taxonVernacularNameDao.insert(tvn);
+		
+		// Confirm saved
+		tvn = taxonVernacularNameDao.loadById(tvn.getId());
+		assertNotNull(tvn);
+		assertEquals(taxon1.getSystemId(), tvn.getTaxonSystemId());
+		assertEquals(name, tvn.getVernacularName());
+		assertEquals(lang, tvn.getLanguageCode());
+		assertEquals(variety, tvn.getLanguageVariety());
+		assertEquals(1, tvn.getQualifiers().size());		
+		assertEquals(qualifier1, tvn.getQualifiers().get(0));
+		assertEquals(step, tvn.getStep());
+		return tvn;
+	}
+	
+	public void findVernacularNameWithQualifer(String match, int maxResults, int expectedResults)
+	{
+		// Create taxonomy
+		Taxonomy taxonomy1 = testInsertAndLoadTaxonomy("it_bamboo");
+		testUpdateAndLoadTaxonomy(taxonomy1, "it_trees");
+		
+		// From IDNFI NFICODE=604		CODE=0340736052431	FAMILY=Dipterocarpaceae	GENUS=Shorea	SPECIES=S. leprosula Miq.
+		Taxon family1 = testInsertAndLoadTaxon(taxonomy1, 1, "DIP","Dipterocarpaceae", "family", 9, null);
+		Taxon genus1 = testInsertAndLoadTaxon(taxonomy1, 2, "SHO", "Shorea.", "genus", 9, family1);
+		Taxon species1 = testInsertAndLoadTaxon(taxonomy1, 3, "LEP", "S. leprosula Miq.", "species", 9, genus1);
+		
+		testInsertAndLoadVernacularNameWithQualifier(species1, "Meranti", "id", "", 9,"21"); // Kalimantan Timur, East Borneo
+		
+		List<TaxonVernacularName> results = taxonVernacularNameDao.findByVernacularName(match, maxResults);
+		assertEquals(expectedResults, results.size());
+		match = match.toUpperCase();
+		for (TaxonVernacularName tvn : results) {
+			String name = tvn.getVernacularName();
+			name = name.toUpperCase();
+			assertTrue(name.contains(match));
+		}
+	}
+	
+	@Test
+	public void testFindVernacularNameWithQualifer() throws Exception {
+		findVernacularNameWithQualifer("Meranti", 100, 1);
+	}
+	
+	public void findVernacularNameBasedOnQualifier1(String match, HashMap<TableField, String> qualifiers, int maxResults, int expectedResults)
+	{
+		// Create taxonomy
+		Taxonomy taxonomy1 = testInsertAndLoadTaxonomy("it_bamboo");
+		testUpdateAndLoadTaxonomy(taxonomy1, "it_trees");
+		
+		// From IDNFI NFICODE=604		CODE=0340736052431	FAMILY=Dipterocarpaceae	GENUS=Shorea	SPECIES=S. leprosula Miq.
+		Taxon family1 = testInsertAndLoadTaxon(taxonomy1, 1, "DIP","Dipterocarpaceae", "family", 9, null);
+		Taxon genus1 = testInsertAndLoadTaxon(taxonomy1, 2, "SHO", "Shorea.", "genus", 9, family1);
+		Taxon species1 = testInsertAndLoadTaxon(taxonomy1, 3, "LEP", "S. leprosula Miq.", "species", 9, genus1);
+		
+		testInsertAndLoadVernacularNameWithQualifier(species1, "Meranti", "id", "", 9,"21"); // Kalimantan Timur, East Borneo
+		testInsertAndLoadVernacularNameWithQualifier(species1, "Meranti bunga", "id", "", 9,"21"); // Kalimantan Timur, East Borneo
+		testInsertAndLoadVernacularNameWithQualifier(species1, "Meranti putih", "id", "", 9,"21"); // Kalimantan Timur, East Borneo
+		
+		List<TaxonVernacularName> results = taxonVernacularNameDao.findByVernacularName(match, qualifiers, maxResults);//already using qualifer1 as the criteria
+		assertEquals(expectedResults, results.size());
+		match = match.toUpperCase();
+		for (TaxonVernacularName tvn : results) {
+			String name = tvn.getVernacularName();
+			name = name.toUpperCase();
+			assertTrue(name.contains(match));
+		}
+	}
+	
+	@Test
+	public void testFindVernacularNameBasedOnQualifier1_Exist()
+	{
+		HashMap<TableField,String> qualifiers = new HashMap();
+		qualifiers.put(OFC_TAXON_VERNACULAR_NAME.QUALIFIER1, "21");
+		findVernacularNameBasedOnQualifier1("Meranti", qualifiers,100, 3);
+	}
+	
+	@Test
+	public void testFindVernacularNameBasedOnQualifier1_NonExist()
+	{
+		HashMap<TableField,String> qualifiers = new HashMap();
+		qualifiers.put(OFC_TAXON_VERNACULAR_NAME.QUALIFIER1, "21");
+		findVernacularNameBasedOnQualifier1("Nyatoh", qualifiers,100, 0);
+	}
+*/	
+	
+
+	
 }

@@ -8,6 +8,7 @@ package org.openforis.collect.client {
 	/**
 	 * 
 	 * @author S. Ricci
+	 * @author E. Wibowo
 	 * */
 	public class SpeciesClient extends AbstractClient {
 		
@@ -33,8 +34,8 @@ package org.openforis.collect.client {
 			token.addResponder(responder);
 		}
 		
-		public function findByVernacularName(responder:IResponder, value:String, maxResults:int):void {
-			var token:AsyncToken = this._findByVernacularNameOperation.send(value, maxResults);
+		public function findByVernacularName(responder:IResponder, id:int, value:String, maxResults:int):void {
+			var token:AsyncToken = this._findByVernacularNameOperation.send(id, value, maxResults);
 			token.addResponder(responder);
 		}
 

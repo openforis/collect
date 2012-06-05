@@ -66,6 +66,14 @@
 		            <scope>application</scope>
 		        </properties>
 			</destination>
+			
+			<destination id="logoService">
+				<properties>
+					<factory>springFactory</factory>
+					<source>logoService</source>
+					<scope>application</scope>
+				</properties>
+			</destination>
         </service>
 
         <default-channels>

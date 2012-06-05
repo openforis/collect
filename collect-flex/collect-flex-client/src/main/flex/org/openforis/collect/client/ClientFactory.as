@@ -4,7 +4,7 @@ package org.openforis.collect.client {
 	 * 
 	 * @author Mino Togna
 	 * @author Stefano Ricci
-	 * 
+	 * @author E. Wibowo
 	 * */
 	public class ClientFactory {
 		
@@ -14,6 +14,7 @@ package org.openforis.collect.client {
 		private static var _dataClient:DataClient;
 		private static var _dataExportClient:DataExportClient;
 		private static var _speciesClient:SpeciesClient;
+		private static var _logoClient:LogoClient;
 		
 		public function ClientFactory() {
 		}
@@ -58,6 +59,13 @@ package org.openforis.collect.client {
 				_speciesClient = new SpeciesClient();
 			}
 			return _speciesClient;
+		}
+		
+		public static function get logoClient():LogoClient{
+			if(_logoClient == null){
+				_logoClient = new LogoClient();
+			}
+			return _logoClient;
 		}
 		
 	}
