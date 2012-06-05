@@ -44,6 +44,8 @@ public class DataExportService {
 	
 	private File exportDirectory;
 	
+	private DataExportProcess dataExportProcess;
+
 	public void init() {
 		String exportRealPath = servletContext.getRealPath(EXPORT_PATH);
 		exportDirectory = new File(exportRealPath);
@@ -64,18 +66,15 @@ public class DataExportService {
 	 */
 	@Transactional
 	public DataExportState export(String rootEntityName, int stepNumber, int entityId) {
-		SessionState sessionState = sessionManager.getSessionState();
-		User user = sessionState.getUser();
-		DataExportProcess dataExportProcess = sessionState.getDataExportProcess();
 		if ( dataExportProcess == null || ! dataExportProcess.isRunning() ) {
-			File exportDir = new File(exportDirectory, user.getName());
+			SessionState sessionState = sessionManager.getSessionState();
+			File exportDir = new File(exportDirectory, sessionState.getSessionId());
 			if ( ! exportDir.exists() && ! exportDir.mkdirs() ) {
 				throw new IllegalStateException("Cannot create export directory: " + exportDir.getAbsolutePath());
 			}
 			CollectSurvey survey = sessionState.getActiveSurvey();
 			SelectiveDataExportProcess process = new SelectiveDataExportProcess(recordManager, exportDir, survey, rootEntityName, entityId, Step.valueOf(stepNumber));
 			dataExportProcess = process;
-			sessionState.setDataExportProcess(process);
 			ExecutorServiceUtil.executeInCachedPool(process);
 		}
 		return dataExportProcess.getState();
@@ -83,11 +82,9 @@ public class DataExportService {
 	
 	@Transactional
 	public DataExportState fullExport(String rootEntityName, int[] stepNumbers) {
-		SessionState sessionState = sessionManager.getSessionState();
-		User user = sessionState.getUser();
-		DataExportProcess dataExportProcess = sessionState.getDataExportProcess();
 		if ( dataExportProcess == null || ! dataExportProcess.isRunning() ) {
-			File exportDir = new File(exportDirectory, user.getName());
+			SessionState sessionState = sessionManager.getSessionState();
+			File exportDir = new File(exportDirectory, sessionState.getSessionId());
 			if ( ! exportDir.exists() && ! exportDir.mkdirs() ) {
 				throw new IllegalStateException("Cannot create export directory: " + exportDir.getAbsolutePath());
 			}
@@ -97,7 +94,6 @@ public class DataExportService {
 			}
 			BackupProcess process = new BackupProcess(recordManager, dataMarshaller, exportDir, survey, rootEntityName, stepNumbers);
 			dataExportProcess = process;
-			sessionState.setDataExportProcess(process);
 			ExecutorServiceUtil.executeInCachedPool(process);
 		}
 		return dataExportProcess.getState();
@@ -115,20 +111,17 @@ public class DataExportService {
 	}
 	
 	public void cancel() {
-		SessionState sessionState = sessionManager.getSessionState();
-		DataExportProcess dataExportProcess = sessionState.getDataExportProcess();
 		if ( dataExportProcess != null ) {
 			dataExportProcess.cancel();
 		}
 	}
 
 	public DataExportState getState() {
-		SessionState sessionState = sessionManager.getSessionState();
-		DataExportProcess dataExportProcess = sessionState.getDataExportProcess();
 		if ( dataExportProcess != null ) {
 			return dataExportProcess.getState();
+		} else {
+			return null;
 		}
-		return null;
 	}
 	
 }

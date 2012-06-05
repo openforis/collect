@@ -13,9 +13,9 @@
         http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd">
 
 	<!-- Enables Method Security and Expression-based access control -->
-	<global-method-security pre-post-annotations="enabled" secured-annotations="enabled" >
+	<global-method-security pre-post-annotations="enabled" secured-annotations="enabled" access-decision-manager-ref="methodAccessDecisionManager" >
 		<expression-handler ref="expressionHandler"  />
-<!-- 		<protect-pointcut expression="execution(* org.openforis.collect.remoting.service.*Service.*(..))" access="ROLE_USER"/> -->
+		<protect-pointcut expression="execution(* org.openforis.collect.remoting.service.*Service.*(..))" access="ROLE_USER"/>
 	</global-method-security>
 
 	<http use-expressions="true" auto-config="true" access-decision-manager-ref="accessDecisionManager">
@@ -60,6 +60,14 @@
 		</b:property>
 	</b:bean>
 
+	<b:bean id="methodAccessDecisionManager" class="org.springframework.security.access.vote.AffirmativeBased">
+		<b:property name="decisionVoters">
+			<b:list>
+				<b:ref bean="roleVoter" />
+			</b:list>
+		</b:property>
+	</b:bean>
+	
 	<b:bean id="roleVoter" class="org.springframework.security.access.vote.RoleHierarchyVoter">
 		<b:constructor-arg ref="roleHierarchy" />
 	</b:bean>

@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>org.openforis.collect</groupId>
 		<artifactId>collect</artifactId>
-		<version>3.0-SNAPSHOT</version>
+		<version>3.0-Alpha2-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>collect-core</artifactId>
@@ -12,6 +12,7 @@
 	
 	<properties>
 		<geotools.version>2.6.5</geotools.version>
+		<jooq.version>2.0.5</jooq.version>
 	</properties>
 
 	<repositories>
@@ -40,7 +41,7 @@
 			<plugin>
 				<groupId>org.jooq</groupId>
 				<artifactId>jooq-codegen-maven</artifactId>
-				<version>2.0.1</version>
+				<version>${jooq.version}</version>
 				<dependencies>
 					<dependency>
 						<groupId>postgresql</groupId>
@@ -60,7 +61,7 @@
 						<database>
 							<name>org.jooq.util.postgres.PostgresDatabase</name>
 							<includes>.*</includes>
-							<excludes></excludes>
+							<excludes />
 							<inputSchema>collect</inputSchema>
 						</database>
 						<generate>
@@ -206,13 +207,13 @@
 									<pluginExecutionFilter>
 										<groupId>org.jooq</groupId>
 										<artifactId>jooq-codegen-maven</artifactId>
-										<versionRange>[2.0.1,)</versionRange>
+										<versionRange>[${jooq.version},)</versionRange>
 										<goals>
 											<goal>generate</goal>
 										</goals>
 									</pluginExecutionFilter>
 									<action>
-										<ignore></ignore>
+										<ignore />
 									</action>
 								</pluginExecution>
 								<pluginExecution>
@@ -227,7 +228,7 @@
 										</goals>
 									</pluginExecutionFilter>
 									<action>
-										<ignore></ignore>
+										<ignore />
 									</action>
 								</pluginExecution>
 								<pluginExecution>
@@ -242,7 +243,7 @@
 										</goals>
 									</pluginExecutionFilter>
 									<action>
-										<ignore></ignore>
+										<ignore />
 									</action>
 								</pluginExecution>
 							</pluginExecutions>
@@ -261,7 +262,7 @@
 		<dependency>
 			<groupId>org.openforis.idm</groupId>
 			<artifactId>idm-api-protostuff</artifactId>
-			<version>3.0-SNAPSHOT</version>
+			<version>3.0-Alpha1</version>
 		</dependency>
 
 		<!-- Apache commons -->
@@ -305,7 +306,7 @@
 		<dependency>
 		  <groupId>org.jooq</groupId>
 		  <artifactId>jooq</artifactId>
-		  <version>2.0.5</version>
+		  <version>${jooq.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>

@@ -25,7 +25,6 @@ public class SessionState {
 	private long lastHeartBeatTime;
 	private CollectSurvey activeSurvey;
 	private Locale locale;
-	private DataExportProcess dataExportProcess;
 
 	public boolean isActiveRecordBeingEdited() {
 		if (activeRecord != null) {
@@ -83,14 +82,6 @@ public class SessionState {
 
 	public void setLocale(Locale locale) {
 		this.locale = locale;
-	}
-
-	public DataExportProcess getDataExportProcess() {
-		return dataExportProcess;
-	}
-
-	public void setDataExportProcess(DataExportProcess dataExportProcess) {
-		this.dataExportProcess = dataExportProcess;
 	}
 
 }

@@ -156,10 +156,11 @@ package org.openforis.collect.presenter {
 				var messageResource:String;
 				if(r.step == CollectRecord$Step.ENTRY) {
 					messageResource = "edit.confirmSubmitDataCleansing";
+					AlertUtil.showConfirm(messageResource, null, null, performSubmitToClenasing);
 				} else if(r.step == CollectRecord$Step.CLEANSING) {
 					messageResource = "edit.confirmSubmitDataAnalysis";
+					AlertUtil.showConfirm(messageResource, null, null, performSubmitToAnalysis);
 				}
-				AlertUtil.showConfirm(messageResource, null, null, performSubmit);
 			}
 		}
 		
@@ -176,22 +177,33 @@ package org.openforis.collect.presenter {
 			var r:RecordProxy = Application.activeRecord;
 			if(r.step == CollectRecord$Step.CLEANSING) {
 				messageResource = "edit.confirmRejectDataCleansing";
+				AlertUtil.showConfirm(messageResource, null, null, performRejectToEntry);
 			} else if(r.step == CollectRecord$Step.ANALYSIS) {
 				messageResource = "edit.confirmRejectDataAnalysis";
+				AlertUtil.showConfirm(messageResource, null, null, performRejectToCleansing);
 			}
-			AlertUtil.showConfirm(messageResource, null, null, performReject);
 		}
 		
-		protected function performSubmit():void {
+		protected function performSubmitToClenasing():void {
 			var responder:AsyncResponder = new AsyncResponder(promoteRecordResultHandler, faultHandler);
-			_dataClient.promoteActiveRecord(responder);
+			_dataClient.promoteToCleansing(responder);
 		}
 		
-		protected function performReject():void {
+		protected function performSubmitToAnalysis():void {
+			var responder:AsyncResponder = new AsyncResponder(promoteRecordResultHandler, faultHandler);
+			_dataClient.promoteToAnalysis(responder);
+		}
+		
+		protected function performRejectToCleansing():void {
 			var responder:AsyncResponder = new AsyncResponder(rejectRecordResultHandler, faultHandler);
-			_dataClient.demoteActiveRecord(responder);
+			_dataClient.demoteToCleansing(responder);
 		}
 		
+		protected function performRejectToEntry():void {
+			var responder:AsyncResponder = new AsyncResponder(rejectRecordResultHandler, faultHandler);
+			_dataClient.demoteToEntry(responder);
+		}
+
 		internal function clearActiveRecordHandler(event:ResultEvent, token:Object = null):void {
 			var uiEvent:UIEvent = new UIEvent(UIEvent.BACK_TO_LIST);
 			eventDispatcher.dispatchEvent(uiEvent);

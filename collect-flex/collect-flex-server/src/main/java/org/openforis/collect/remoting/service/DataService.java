@@ -22,6 +22,7 @@ import org.openforis.collect.manager.RecordPromoteException;
 import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.metamodel.proxy.CodeListItemProxy;
 import org.openforis.collect.model.CollectRecord;
+import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.FieldSymbol;
 import org.openforis.collect.model.RecordSummarySortField;
@@ -62,6 +63,7 @@ import org.openforis.idm.model.Record;
 import org.openforis.idm.model.expression.ExpressionFactory;
 import org.openforis.idm.model.expression.ModelPathExpression;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -78,6 +80,7 @@ public class DataService {
 	private RecordManager recordManager;
 
 	@Transactional
+	@Secured("ROLE_ENTRY")
 	public RecordProxy loadRecord(int id, int step, boolean forceUnlock) throws RecordPersistenceException {
 		SessionState sessionState = sessionManager.getSessionState();
 		if ( sessionState.isActiveRecordBeingEdited() ) {
@@ -103,6 +106,7 @@ public class DataService {
 	 * @return map with "count" and "records" items
 	 */
 	@Transactional
+	@Secured("ROLE_ENTRY")
 	public Map<String, Object> loadRecordSummaries(String rootEntityName, int offset, int maxNumberOfRows, List<RecordSummarySortField> sortFields, String[] keyValues) {
 		Map<String, Object> result = new HashMap<String, Object>();
 		SessionState sessionState = sessionManager.getSessionState();
@@ -122,6 +126,7 @@ public class DataService {
 	}
 
 	@Transactional
+	@Secured("ROLE_ENTRY")
 	public RecordProxy createRecord(String rootEntityName, String versionName) throws RecordPersistenceException {
 		SessionState sessionState = sessionManager.getSessionState();
 		if ( sessionState.isActiveRecordBeingEdited() ) {
@@ -142,12 +147,14 @@ public class DataService {
 	}
 	
 	@Transactional
+	@Secured("ROLE_ENTRY")
 	public void deleteRecord(int id) throws RecordPersistenceException {
 		recordManager.delete(id);
 		sessionManager.clearActiveRecord();
 	}
 	
 	@Transactional
+	@Secured("ROLE_ENTRY")
 	public void saveActiveRecord() throws RecordPersistenceException {
 		sessionManager.checkIsActiveRecordLocked();
 		SessionState sessionState = sessionManager.getSessionState();
@@ -159,6 +166,7 @@ public class DataService {
 	}
 
 	@Transactional
+	@Secured("ROLE_ENTRY")
 	public List<UpdateResponse> updateActiveRecord(UpdateRequest request) throws RecordUnlockedException {
 		sessionManager.checkIsActiveRecordLocked();
 		List<UpdateRequestOperation> operations = request.getOperations();
@@ -548,34 +556,67 @@ public class DataService {
 		return result;
 	}
 	
-	@Transactional
-	public void promoteActiveRecord() throws RecordPersistenceException, RecordPromoteException  {
-		sessionManager.checkIsActiveRecordLocked();
-		SessionState sessionState = sessionManager.getSessionState();
-		CollectRecord record = sessionState.getActiveRecord();
-		User user = sessionState.getUser();
-		recordManager.promote(record, user);
-		recordManager.releaseLock(record.getId());
-		sessionManager.clearActiveRecord();
+	@Secured("ROLE_ENTRY")
+	public void promoteToCleansing() throws RecordPersistenceException, RecordPromoteException  {
+		promote(Step.CLEANSING);
+	}
+
+	@Secured("ROLE_CLEANSING")
+	public void promoteToAnalysis() throws RecordPersistenceException, RecordPromoteException  {
+		promote(Step.ANALYSIS);
 	}
 	
 	@Transactional
-	public void demoteActiveRecord() throws RecordPersistenceException {
+	private void promote(Step to) throws RecordPersistenceException, RecordPromoteException  {
 		sessionManager.checkIsActiveRecordLocked();
 		SessionState sessionState = sessionManager.getSessionState();
-		CollectSurvey survey = sessionState.getActiveSurvey();
 		CollectRecord record = sessionState.getActiveRecord();
-		User user = sessionState.getUser();
-		Integer recordId = record.getId();
-		recordManager.demote(survey, recordId, record.getStep(), user);
-		recordManager.releaseLock(recordId);
-		sessionManager.clearActiveRecord();
+		Step currentStep = record.getStep();
+		Step exptectedStep = to.getPrevious();
+		if ( exptectedStep == currentStep ) {
+			User user = sessionState.getUser();
+			recordManager.promote(record, user);
+			recordManager.releaseLock(record.getId());
+			sessionManager.clearActiveRecord();
+		} else {
+			throw new IllegalStateException("The active record cannot be submitted: it is not in the exptected phase: " + exptectedStep);
+		}
+	}
+	
+	@Secured("ROLE_ANALYSIS")
+	public void demoteToCleansing() throws RecordPersistenceException {
+		demote(Step.CLEANSING);
+	}
+	
+	@Secured("ROLE_CLEANSING")
+	public void demoteToEntry() throws RecordPersistenceException {
+		demote(Step.ENTRY);
+	}
+		
+	@Transactional
+	private void demote(Step to) throws RecordPersistenceException {
+		sessionManager.checkIsActiveRecordLocked();
+		SessionState sessionState = sessionManager.getSessionState();
+		CollectRecord record = sessionState.getActiveRecord();
+		Step currentStep = record.getStep();
+		Step exptectedStep = to.getNext();
+		if ( exptectedStep == currentStep ) {
+			CollectSurvey survey = sessionState.getActiveSurvey();
+			User user = sessionState.getUser();
+			Integer recordId = record.getId();
+			recordManager.demote(survey, recordId, record.getStep(), user);
+			recordManager.releaseLock(recordId);
+			sessionManager.clearActiveRecord();
+		} else {
+			throw new IllegalStateException("The active record cannot be demoted: it is not in the exptected phase: " + exptectedStep);
+		}
 	}
 
 	/**
 	 * remove the active record from the current session
 	 * @throws RecordPersistenceException 
 	 */
+	@Secured("ROLE_ENTRY")
 	public void clearActiveRecord() throws RecordPersistenceException {
 		sessionManager.checkIsActiveRecordLocked();
 		SessionState sessionState = this.sessionManager.getSessionState();
@@ -586,6 +627,7 @@ public class DataService {
 		this.sessionManager.clearActiveRecord();
 	}
 	
+	@Secured("ROLE_ENTRY")
 	public void moveNode(int nodeId, int index) {
 		SessionState sessionState = sessionManager.getSessionState();
 		CollectRecord record = sessionState.getActiveRecord();
@@ -600,6 +642,7 @@ public class DataService {
 	 * @param codes
 	 * @return
 	 */
+	@Secured("ROLE_ENTRY")
 	public List<CodeListItemProxy> getCodeListItems(int parentEntityId, String attrName, String[] codes){
 		CollectRecord record = getActiveRecord();
 		Entity parent = (Entity) record.getNodeByInternalId(parentEntityId);
@@ -627,6 +670,7 @@ public class DataService {
 	 * @param attrName
 	 * @return
 	 */
+	@Secured("ROLE_ENTRY")
 	public List<CodeListItemProxy> findAssignableCodeListItems(int parentEntityId, String attrName){
 		CollectRecord record = getActiveRecord();
 		Entity parent = (Entity) record.getNodeByInternalId(parentEntityId);
@@ -646,6 +690,7 @@ public class DataService {
 	 * @param codes
 	 * @return
 	 */
+	@Secured("ROLE_ENTRY")
 	public List<CodeListItemProxy> findAssignableCodeListItems(int parentEntityId, String attributeName, String[] codes) {
 		CollectRecord record = getActiveRecord();
 		Entity parent = (Entity) record.getNodeByInternalId(parentEntityId);
