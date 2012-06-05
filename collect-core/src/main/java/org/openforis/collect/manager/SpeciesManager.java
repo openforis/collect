@@ -85,16 +85,8 @@ public class SpeciesManager {
 					
 					try {
 						CodeAttribute code = null;
-						if(qualifierExpression.startsWith("/")) {
-							AbsoluteModelPathExpression expression = expressionFactory.createAbsoluteModelPathExpression(qualifierExpression);
-							code = (CodeAttribute) expression.evaluate(record);
-						}else if(qualifierExpression.startsWith("()")){
-							ModelPathExpression expression = expressionFactory.createModelPathExpression(qualifierExpression);
-							code = (CodeAttribute) expression.evaluate(node, null);
-						}else {
-							throw new IllegalArgumentException("Qualifier expression : " + qualifierExpression + " is not valid");
-						}
-					
+						ModelPathExpression expression = expressionFactory.createModelPathExpression(qualifierExpression);
+						code = (CodeAttribute) expression.evaluate(node, null);
 						qualifierValue = code.getValue().getCode();
 						hashQualifiers.put("qualifier" + i, qualifierValue);
 					} catch (Exception e) {
