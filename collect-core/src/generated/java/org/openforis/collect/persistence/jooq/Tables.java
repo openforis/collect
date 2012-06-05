@@ -13,6 +13,11 @@ package org.openforis.collect.persistence.jooq;
 public final class Tables {
 
 	/**
+	 * The table collect.ofc_application_info
+	 */
+	public static org.openforis.collect.persistence.jooq.tables.OfcApplicationInfo OFC_APPLICATION_INFO = org.openforis.collect.persistence.jooq.tables.OfcApplicationInfo.OFC_APPLICATION_INFO;
+
+	/**
 	 * The table collect.ofc_config
 	 */
 	public static org.openforis.collect.persistence.jooq.tables.OfcConfig OFC_CONFIG = org.openforis.collect.persistence.jooq.tables.OfcConfig.OFC_CONFIG;

@@ -11,7 +11,9 @@ CREATE SEQUENCE "collect"."ofc_user_role_id_seq";
 ----------------------------
 --- BEGIN GENERATED CODE ---
 ----------------------------
-
+CREATE TABLE "collect"."ofc_application_info"  ( 
+	"version"	varchar(25) NOT NULL 
+);
 CREATE TABLE "collect"."ofc_config"  ( 
 	"name" 	varchar(25) NOT NULL,
 	"value"	varchar(255) NOT NULL,
