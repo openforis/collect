@@ -19,6 +19,10 @@ import javax.servlet.http.HttpServletResponse;
 import javax.xml.parsers.FactoryConfigurationError;
 
 import org.apache.log4j.xml.DOMConfigurator;
+import org.openforis.collect.manager.DatabaseVersionManager;
+import org.openforis.collect.manager.DatabaseVersionNotCompatibleException;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * @author M. Togna
@@ -50,11 +54,26 @@ public class InitServlet extends HttpServlet {
 
 		// TODO init path
 		// FileUtil.init(basePath);
-
+		
+		checkDatabaseVersion();
+		
 		this.initLog4J();
 		// initValiadtionMap();
 
 		System.out.println("====================================================");
+	}
+
+	private void checkDatabaseVersion() {
+		System.out.println("============= Check database version compatibility... =============");
+		WebApplicationContext applicationContext = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
+		DatabaseVersionManager databaseVersionManager = applicationContext.getBean(DatabaseVersionManager.class);
+		try {
+			databaseVersionManager.checkIsVersionCompatible();
+			System.out.println("======== Database version is compatible with application version ========");
+		} catch (DatabaseVersionNotCompatibleException e) {
+			System.out.println("======== ERROR: database version not compatible =========");
+			throw new RuntimeException(e);			
+		}
 	}
 
 	/**

@@ -132,7 +132,7 @@
 				<configuration>
 					<includes>
 						<!-- replace the token in this file -->
-						<include>${project.build.directory}/classes/org/openforis/collect/version.properties</include>
+						<include>target/classes/org/openforis/collect/version.properties</include>
 					</includes>
 					<regex>false</regex>
 					<!-- the name of the token to replace -->
@@ -219,8 +219,8 @@
 								<pluginExecution>
 									<pluginExecutionFilter>
 										<groupId>org.codehaus.mojo</groupId>
-										<artifactId>maven-properties-plugin</artifactId>
-										<versionRange>[1.0-SNAPSHOT,)</versionRange>
+										<artifactId>properties-maven-plugin</artifactId>
+										<versionRange>[1.0-alpha-2,)</versionRange>
 										<goals>
 											<goal>
 												read-project-properties
@@ -233,17 +233,42 @@
 								</pluginExecution>
 								<pluginExecution>
 									<pluginExecutionFilter>
-										<groupId>org.codehaus.mojo</groupId>
-										<artifactId>properties-maven-plugin</artifactId>
-										<versionRange>[1.0-alpha-2,)</versionRange>
+										<groupId>
+											com.google.code.maven-replacer-plugin
+										</groupId>
+										<artifactId>
+											maven-replacer-plugin
+										</artifactId>
+										<versionRange>
+											[1.4.0,)
+										</versionRange>
 										<goals>
-											<goal>
-												read-project-properties
-											</goal>
+											<goal>replace</goal>
 										</goals>
 									</pluginExecutionFilter>
 									<action>
-										<ignore />
+										<ignore></ignore>
+									</action>
+								</pluginExecution>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>
+											org.codehaus.mojo
+										</groupId>
+										<artifactId>
+											build-helper-maven-plugin
+										</artifactId>
+										<versionRange>
+											[1.7,)
+										</versionRange>
+										<goals>
+											<goal>add-source</goal>
+											<goal>add-test-source</goal>
+											<goal>add-test-resource</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore></ignore>
 									</action>
 								</pluginExecution>
 							</pluginExecutions>

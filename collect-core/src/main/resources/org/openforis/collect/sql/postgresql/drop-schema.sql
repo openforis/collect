@@ -35,7 +35,9 @@ ALTER TABLE "collect"."ofc_taxon"
 	DROP CONSTRAINT "ofc_taxon_id_key" CASCADE;
 ALTER TABLE "collect"."ofc_taxonomy"
 	DROP CONSTRAINT "ofc_taxonomy_name_key" CASCADE;
-DROP TABLE "collect"."ofc_config";
+
+DROP TABLE IF EXISTS "collect"."ofc_application_info";
+DROP TABLE IF EXISTS "collect"."ofc_config";
 DROP TABLE IF EXISTS "collect"."ofc_logo";
 DROP TABLE IF EXISTS "collect"."ofc_record";
 DROP TABLE IF EXISTS "collect"."ofc_schema_definition";

@@ -88,6 +88,7 @@
 	<!-- ===================================== -->
 	<bean id="configurationManager" class="org.openforis.collect.manager.ConfigurationManager" init-method="init" />
 	<bean id="logoManager"			class="org.openforis.collect.manager.LogoManager" />
+	<bean id="databaseVersionManager" class="org.openforis.collect.manager.DatabaseVersionManager" />
 	<bean id="recordManager"		class="org.openforis.collect.manager.RecordManager" init-method="init">
 		<property name="lockTimeoutMillis" value="60000" />
 	</bean>
@@ -121,6 +122,10 @@
     <!-- ===================================== -->
 	<!-- Daos -->
 	<!-- ===================================== -->
+	<bean id="applicationInfoDao" class="org.openforis.collect.persistence.ApplicationInfoDao">
+    	<property name="dataSource" ref="dataSource"/>
+	</bean>
+
 	<bean id="configurationDao" class="org.openforis.collect.persistence.ConfigurationDao">
     	<property name="dataSource" ref="dataSource"/>
 	</bean>
