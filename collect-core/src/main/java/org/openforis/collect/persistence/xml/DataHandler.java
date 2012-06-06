@@ -15,6 +15,7 @@ import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Field;
 import org.openforis.idm.model.Node;
+import org.openforis.idm.model.Value;
 import org.openforis.idm.util.CollectionUtil;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -218,7 +219,7 @@ public class DataHandler extends DefaultHandler {
 	protected void setSingleElementValue(Attribute attr) {
 		AttributeDefinition defn = (AttributeDefinition) attr.getDefinition();
 		String xmlValue = getXmlValue();
-		Object val = defn.createValue(xmlValue);
+		Value val = defn.createValue(xmlValue);
 		attr.setValue(val);
 	}
 

@@ -423,9 +423,9 @@ public class CollectRecord extends Record {
 						keyValue = code.getCode();
 					}
 				} else if(keyNode instanceof TextAttribute) {
-					keyValue = ((TextAttribute) keyNode).getValue();
-				} else if(keyNode instanceof NumberAttribute<?>) {
-					Object obj = ((NumberAttribute<?>) keyNode).getValue();
+					keyValue = ((TextAttribute) keyNode).getText();
+				} else if(keyNode instanceof NumberAttribute<?,?>) {
+					Number obj = ((NumberAttribute<?,?>) keyNode).getNumber();
 					if(obj != null) {
 						keyValue = obj.toString();
 					}

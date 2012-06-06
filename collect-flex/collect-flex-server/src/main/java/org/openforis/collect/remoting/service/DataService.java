@@ -44,6 +44,7 @@ import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NumberAttributeDefinition;
 import org.openforis.idm.metamodel.NumberAttributeDefinition.Type;
+import org.openforis.idm.metamodel.NumericAttributeDefinition;
 import org.openforis.idm.metamodel.RangeAttributeDefinition;
 import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.TimeAttributeDefinition;
@@ -477,7 +478,7 @@ public class DataService {
 			Integer val = Integer.valueOf(value);
 			fieldValue = val;
 		} else if(def instanceof NumberAttributeDefinition) {
-			NumberAttributeDefinition numberDef = (NumberAttributeDefinition) def;
+			NumericAttributeDefinition numberDef = (NumericAttributeDefinition) def;
 			if(fieldIndex != null && fieldIndex == 1) {
 				//unit name
 				fieldValue = value;

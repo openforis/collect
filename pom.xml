@@ -10,8 +10,8 @@
 
 	<modules>
 		<module>collect-core</module>
-		<module>collect-mobile</module>
 		<module>collect-flex</module>
+		<module>collect-rdb</module>
 	</modules>
 
 	<properties>
@@ -166,7 +166,7 @@
 			</dependency>
 			<dependency>
 				<groupId>org.openforis.idm</groupId>
-				<artifactId>idm-ri</artifactId>
+				<artifactId>idm-transform</artifactId>
 				<version>3.0-SNAPSHOT</version>
 			</dependency>
 			<dependency>

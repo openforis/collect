@@ -28,8 +28,8 @@ import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.model.expression.InvalidExpressionException;
 import org.openforis.idm.transform.AutomaticColumnProvider;
-import org.openforis.idm.transform.ColumnProvider;
-import org.openforis.idm.transform.ColumnProviderChain;
+import org.openforis.idm.transform.NodeColumnProvider;
+import org.openforis.idm.transform.NodeColumnProviderChain;
 import org.openforis.idm.transform.DataTransformation;
 import org.openforis.idm.transform.NodePositionColumnProvider;
 import org.openforis.idm.transform.PivotExpressionColumnProvider;
@@ -170,19 +170,19 @@ public class SelectiveDataExportProcess implements Callable<Void>, DataExportPro
 	private DataTransformation getTransform() throws InvalidExpressionException {
 		Schema schema = survey.getSchema();
 		EntityDefinition entityDefn = (EntityDefinition) schema.getById(entityId);
-		List<ColumnProvider> columnProviders = createAncestorsColumnsProvider(entityDefn);
+		List<NodeColumnProvider> columnProviders = createAncestorsColumnsProvider(entityDefn);
 		columnProviders.add(new AutomaticColumnProvider(entityDefn));
-		ColumnProvider provider = new ColumnProviderChain(columnProviders);
+		NodeColumnProvider provider = new NodeColumnProviderChain(columnProviders);
 		String axisPath = entityDefn.getPath();
 		return new DataTransformation(axisPath, provider);
 	}
 	
-	private List<ColumnProvider> createAncestorsColumnsProvider(EntityDefinition entityDefn) {
-		List<ColumnProvider> columnProviders = new ArrayList<ColumnProvider>();
+	private List<NodeColumnProvider> createAncestorsColumnsProvider(EntityDefinition entityDefn) {
+		List<NodeColumnProvider> columnProviders = new ArrayList<NodeColumnProvider>();
 		EntityDefinition parentDefn = entityDefn.getParentDefinition();
 		int depth = 1;
 		while ( parentDefn != null ) {
-			ColumnProvider parentKeysColumnsProvider = createAncestorColumnProvider(parentDefn, depth);
+			NodeColumnProvider parentKeysColumnsProvider = createAncestorColumnProvider(parentDefn, depth);
 			columnProviders.add(0, parentKeysColumnsProvider);
 			parentDefn = parentDefn.getParentDefinition();
 			depth++;
@@ -190,24 +190,24 @@ public class SelectiveDataExportProcess implements Callable<Void>, DataExportPro
 		return columnProviders;
 	}
 	
-	private ColumnProvider createAncestorColumnProvider(EntityDefinition entityDefn, int depth) {
+	private NodeColumnProvider createAncestorColumnProvider(EntityDefinition entityDefn, int depth) {
 		List<AttributeDefinition> keyAttrDefns = entityDefn.getKeyAttributeDefinitions();
-		List<ColumnProvider> providers = new ArrayList<ColumnProvider>();
+		List<NodeColumnProvider> providers = new ArrayList<NodeColumnProvider>();
 		for (AttributeDefinition keyDefn : keyAttrDefns) {
 			String columnName = createKeyAttributeColumnName(keyDefn);
 			SingleAttributeColumnProvider keyColumnProvider = new SingleAttributeColumnProvider(keyDefn.getName(), columnName);
 			providers.add(keyColumnProvider);
 		}
 		if ( entityDefn.getParentDefinition() != null ) {
-			ColumnProvider positionColumnProvider = createPositionColumnProvider(entityDefn);
+			NodeColumnProvider positionColumnProvider = createPositionColumnProvider(entityDefn);
 			providers.add(positionColumnProvider);
 		}
 		String expression = StringUtils.repeat("parent()", "/", depth);
-		ColumnProvider result = new PivotExpressionColumnProvider(expression, providers.toArray(new ColumnProvider[1]));
+		NodeColumnProvider result = new PivotExpressionColumnProvider(expression, providers.toArray(new NodeColumnProvider[1]));
 		return result;
 	}
 	
-	private ColumnProvider createPositionColumnProvider(EntityDefinition entityDefn) {
+	private NodeColumnProvider createPositionColumnProvider(EntityDefinition entityDefn) {
 		String columnName = createPositionColumnName(entityDefn);
 		NodePositionColumnProvider columnProvider = new NodePositionColumnProvider(columnName);
 		return columnProvider;

@@ -47,6 +47,7 @@ import org.openforis.idm.model.Field;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.NodePointer;
 import org.openforis.idm.model.Record;
+import org.openforis.idm.model.Value;
 import org.openforis.idm.model.expression.InvalidExpressionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -233,7 +234,7 @@ public class RecordManager {
 		}
 	}
 
-	public <V> void applyDefaultValue(Attribute<?, V> attribute) {
+	public <V extends Value> void applyDefaultValue(Attribute<?, V> attribute) {
 		AttributeDefinition attributeDefn = (AttributeDefinition) attribute.getDefinition();
 		List<AttributeDefault> defaults = attributeDefn.getAttributeDefaults();
 		if ( defaults != null && defaults.size() > 0 ) {
@@ -337,7 +338,7 @@ public class RecordManager {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public <V> void setAttributeValue(Attribute<?,V> attribute, Object value, String remarks){
+	public <V extends Value> void setAttributeValue(Attribute<?,V> attribute, Object value, String remarks){
 		attribute.setValue((V)value);
 		Field<V> field = (Field<V>) attribute.getField(0);
 		field.setRemarks(remarks);

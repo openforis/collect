@@ -73,18 +73,13 @@ public class ModelDaoIntegrationTest {
 		testLoadAllSurveys("archenland1");
 
 		// SAVE NEW
-		CollectRecord record = createTestRecord(survey, "123_456");
-		recordDao.insert(record);
-		
-		String saved = record.toString();
-		log.debug("Saving record:\n"+saved);
+		CollectRecord saved = createTestRecord(survey, "123_456");
+		recordDao.insert(saved);
 		
 		// RELOAD
-		record = recordDao.load(survey, record.getId(), 1);
-		String reloaded = record.toString();
-		log.debug("Reloaded as:\n"+reloaded);
+		CollectRecord reloaded = recordDao.load(survey, saved.getId(), 1);
 		
-		assertEquals(saved, reloaded);
+		assertEquals(saved.getRootEntity(), reloaded.getRootEntity());
 	}
 	
 	@Test
