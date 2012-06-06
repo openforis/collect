@@ -48,7 +48,7 @@ public class ValidationController {
 				return;
 			}
 			//SessionState sessionState = getSessionState(request);
-			print(outputStream, "Starting validation of all clusters: ");
+			print(outputStream, "Starting validation of all records: ");
 			CollectSurvey survey = surveyManager.get(s);
 			if ( survey == null ) {
 				print(outputStream, "Survey not found");
@@ -57,11 +57,11 @@ public class ValidationController {
 			//List<CollectRecord> summaries = recordManager.loadSummaries(survey, r, (String) null);
 			List<CollectRecord> summaries = recordDao.loadSummaries(survey, r, (String) null);
 			if ( summaries != null ) {
-				print(outputStream, "Clusters to validate: " + summaries.size());
+				print(outputStream, "Records to validate: " + summaries.size());
 				for (CollectRecord summary : summaries) {
 					String recordKey = getRecordKey(summary);
 					long start = System.currentTimeMillis();
-					print(outputStream, "Start validating cluster: " + recordKey);
+					print(outputStream, "Start validating record: " + recordKey);
 					Integer id = summary.getId();
 					int stepNumber = summary.getStep().getStepNumber();
 					/*
@@ -75,10 +75,10 @@ public class ValidationController {
 					recordDao.update(record);
 					//recordManager.releaseLock(id);
 					long elapsedMillis = System.currentTimeMillis() - start;
-					print(outputStream, "Validation of cluster " + recordKey + " completed in " + elapsedMillis + " millis");
+					print(outputStream, "Validation of record " + recordKey + " completed in " + elapsedMillis + " millis");
 				}
 			}
-			print(outputStream, "End of validation of all clusters.");
+			print(outputStream, "End of validation of all records.");
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
 			throw new RuntimeException(e);
