@@ -95,38 +95,12 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 		Record r = q.fetchOne();
 		return r.getValueAsInteger(0);
 	}
-	
-	/**
-	 * Load a list of record summaries that match the primary keys
-	 * 
-	 * @param survey
-	 * @param rootEntity
-	 * @param keys
-	 * @return
-	 */
+
 	@Transactional
-	@SuppressWarnings("unchecked")
-	public List<CollectRecord> loadSummaries(CollectSurvey survey, String rootEntity, String... keys) {
-		JooqFactory jf = getMappingJooqFactory(survey);
-		SelectQuery q = jf.selectQuery();
-		q.addSelect(SUMMARY_FIELDS);
-		q.addFrom(OFC_RECORD);
-		// build conditions
-		Schema schema = survey.getSchema();
-		EntityDefinition rootEntityDefn = schema.getRootEntityDefinition(rootEntity);
-		Integer rootEntityDefnId = rootEntityDefn.getId();
-		q.addConditions(OFC_RECORD.ROOT_ENTITY_DEFINITION_ID.equal(rootEntityDefnId));
-		int i = 0;
-		for (String key : keys) {
-			String keyColumnName = "key" + (++i);
-			Field<String> keyField = (Field<String>) OFC_RECORD.getField(keyColumnName);
-			q.addConditions(keyField.equal(key));
-		}
-		// fetch
-		Result<Record> result = q.fetch();
-		return jf.fromResult(result);
+	public List<CollectRecord> loadSummaries(CollectSurvey survey, String rootEntity, String... keyValues) {
+		return loadSummaries(survey, rootEntity, 0, Integer.MAX_VALUE, null, keyValues);
 	}
-	
+
 	@Transactional
 	public List<CollectRecord> loadSummaries(CollectSurvey survey, String rootEntity, int offset, int maxRecords, List<RecordSummarySortField> sortFields, String... keyValues) {
 		JooqFactory jf = getMappingJooqFactory(survey);
