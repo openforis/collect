@@ -8,7 +8,6 @@ import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
-import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.xml.DataMarshaller;
 import org.openforis.collect.remoting.service.backup.BackupProcess;
 import org.openforis.collect.remoting.service.export.DataExportProcess;

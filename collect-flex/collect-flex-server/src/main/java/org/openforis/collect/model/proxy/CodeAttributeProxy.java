@@ -37,7 +37,7 @@ public class CodeAttributeProxy extends AttributeProxy {
 	@ExternalizedProperty
 	public boolean isEnumerator() {
 		CodeAttributeDefinition definition = codeAttribute.getDefinition();
-		EntityDefinition parentDefinition = definition.getParentDefinition();
+		EntityDefinition parentDefinition = (EntityDefinition) definition.getParentDefinition();
 		if(parentDefinition.isEnumerable() && definition.isKey() && 
 				definition.getList() != null && StringUtils.isBlank(definition.getList().getLookupTable())) {
 			return true;

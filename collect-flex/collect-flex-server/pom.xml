@@ -25,6 +25,10 @@
 			<artifactId>collect-core</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>org.openforis.idm</groupId>
+			<artifactId>idm-transform</artifactId>
+		</dependency>
 
 		<!-- <dependency> -->
 		<!-- <groupId>org.openforis.collect</groupId> -->

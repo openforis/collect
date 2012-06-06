@@ -44,10 +44,11 @@ import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NumberAttributeDefinition;
-import org.openforis.idm.metamodel.NumberAttributeDefinition.Type;
+import org.openforis.idm.metamodel.NumericAttributeDefinition;
 import org.openforis.idm.metamodel.RangeAttributeDefinition;
 import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.TimeAttributeDefinition;
+import org.openforis.idm.metamodel.Unit;
 import org.openforis.idm.metamodel.validation.ValidationResults;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Code;
@@ -60,6 +61,7 @@ import org.openforis.idm.model.NodePointer;
 import org.openforis.idm.model.NumericRange;
 import org.openforis.idm.model.RealRange;
 import org.openforis.idm.model.Record;
+import org.openforis.idm.model.Value;
 import org.openforis.idm.model.expression.ExpressionFactory;
 import org.openforis.idm.model.expression.ModelPathExpression;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -444,8 +446,8 @@ public class DataService {
 			Attribute<?, ?> attribute = (Attribute<?, ?>) def.createNode();
 			parentEntity.add(attribute);
 			if(StringUtils.isNotBlank(requestValue)) {
-				Object value = parseCompositeAttributeValue(parentEntity, (AttributeDefinition) nodeDef, requestValue);
-				((Attribute<?, Object>) attribute).setValue(value);
+				Value value = parseCompositeAttributeValue(parentEntity, (AttributeDefinition) nodeDef, requestValue);
+				((Attribute<?, Value> ) attribute).setValue(value);
 			}
 			if(symbol != null || remarks != null) {
 				Character symbolChar = null;
@@ -485,12 +487,12 @@ public class DataService {
 			Integer val = Integer.valueOf(value);
 			fieldValue = val;
 		} else if(def instanceof NumberAttributeDefinition) {
-			NumberAttributeDefinition numberDef = (NumberAttributeDefinition) def;
+			NumericAttributeDefinition numberDef = (NumericAttributeDefinition) def;
 			if(fieldIndex != null && fieldIndex == 1) {
 				//unit name
 				fieldValue = value;
 			} else {
-				Type type = numberDef.getType();
+				NumericAttributeDefinition.Type type = numberDef.getType();
 				Number number = null;
 				switch(type) {
 					case INTEGER:
@@ -531,8 +533,8 @@ public class DataService {
 		return fieldValue;
 	}
 	
-	private Object parseCompositeAttributeValue(Entity parentEntity, AttributeDefinition defn, String value) {
-		Object result;
+	private Value parseCompositeAttributeValue(Entity parentEntity, AttributeDefinition defn, String value) {
+		Value result;
 		if(defn instanceof CodeAttributeDefinition) {
 			Record record = parentEntity.getRecord();
 			ModelVersion version = record .getVersion();
@@ -541,12 +543,13 @@ public class DataService {
 			RangeAttributeDefinition rangeDef = (RangeAttributeDefinition) defn;
 			RangeAttributeDefinition.Type type = rangeDef.getType();
 			NumericRange<?> range = null;
+			Unit unit = null; //todo check if unit is required here or is set later by the client
 			switch(type) {
 				case INTEGER:
-					range = IntegerRange.parseIntegerRange(value);
+					range = IntegerRange.parseIntegerRange(value, unit);
 					break;
 				case REAL:
-					range = RealRange.parseRealRange(value);
+					range = RealRange.parseRealRange(value, unit);
 					break;
 			}
 			result = range;

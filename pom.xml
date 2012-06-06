@@ -10,6 +10,7 @@
 	<modules>
 		<module>collect-core</module>
 		<module>collect-flex</module>
+		<module>collect-rdb</module>
 	</modules>
 
 	<properties>
@@ -169,17 +170,17 @@
 			<dependency>
 				<groupId>org.openforis.idm</groupId>
 				<artifactId>idm-api</artifactId>
-				<version>3.0-Alpha1</version>
+				<version>3.0-Alpha2-SNAPSHOT</version>
 			</dependency>
 			<dependency>
 				<groupId>org.openforis.idm</groupId>
-				<artifactId>idm-ri</artifactId>
-				<version>3.0-Alpha1</version>
+				<artifactId>idm-transform</artifactId>
+				<version>3.0-Alpha2-SNAPSHOT</version>
 			</dependency>
 			<dependency>
 				<groupId>org.openforis.idm</groupId>
 				<artifactId>idm-test</artifactId>
-				<version>3.0-Alpha1</version>
+				<version>3.0-Alpha2-SNAPSHOT</version>
 				<scope>test</scope>
 			</dependency>
 			<dependency>

@@ -47,9 +47,7 @@ public class ModelSerializationTest {
 		Entity reloadedEntity = record2.createRootEntity("cluster");
 		ms.mergeFrom(data, reloadedEntity);
 		
-		String text = entity.toString();
-		String reloadedText = reloadedEntity.toString();
-		Assert.assertEquals(text, reloadedText);
+		Assert.assertEquals(entity, reloadedEntity);
 	}
 	
 	private CollectSurvey loadSurvey() throws IOException, SurveyImportException, InvalidIdmlException {
