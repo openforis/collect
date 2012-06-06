@@ -61,6 +61,7 @@
 	<bean id="unlockController" class="org.openforis.collect.web.controller.UnlockController" />
 	<bean id="dataExportDownloadController" class="org.openforis.collect.web.controller.DataExportDownloadController" />
 	<bean id="surveyImportController" class="org.openforis.collect.web.controller.SurveyImportController" />
+	<bean id="validationController" class="org.openforis.collect.web.controller.ValidationController" />
 
 	<!-- ===================================== -->
 	<!-- GraniteDs services -->

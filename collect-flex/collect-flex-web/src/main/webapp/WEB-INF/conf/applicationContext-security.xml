@@ -22,6 +22,7 @@
 		<intercept-url pattern="/error.htm" access="permitAll" />
 		<intercept-url pattern="/login.htm*" access="permitAll" />
 		<intercept-url pattern="/importSurvey.htm" access="hasRole('ROLE_ADMIN')" />
+		<intercept-url pattern="/validateAllRecords.htm" access="hasRole('ROLE_ADMIN')" />
 		<intercept-url pattern="/*" access="hasRole('ROLE_USER')" />
 		<intercept-url pattern="/index.htm" access="hasRole('ROLE_USER')" />
 		<intercept-url pattern="/**/*.swf" access="hasRole('ROLE_USER')" />
