@@ -8,7 +8,6 @@ import java.util.Locale;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.User;
-import org.openforis.collect.remoting.service.export.DataExportProcess;
 
 /**
  * @author M. Togna
