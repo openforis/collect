@@ -41,8 +41,8 @@ public class ValidationController {
 	
 	@RequestMapping(value = "/validateAllRecords.htm", method = RequestMethod.GET)
 	public void validateAllRecords(HttpServletRequest request, HttpServletResponse response, @RequestParam String s, @RequestParam String r) {
+		ServletOutputStream outputStream = response.getOutputStream();
 		try {
-			ServletOutputStream outputStream = response.getOutputStream();
 			if ( s == null || r == null) {
 				outputStream.println("Wrong parameters: please specify 's' (survey) and 'r' (root entity name).");
 				return;
@@ -80,6 +80,7 @@ public class ValidationController {
 			}
 			print(outputStream, "End of validation of all records.");
 		} catch (Exception e) {
+			outputStream.println("ERROR - Validation of records not completed: " + e.getMessage());
 			LOG.error(e.getMessage(), e);
 			throw new RuntimeException(e);
 		}
