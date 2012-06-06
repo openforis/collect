@@ -139,7 +139,6 @@ public class ModelDaoIntegrationTest {
 		SurveyUnmarshaller surveyUnmarshaller = idmlBindingContext.createSurveyUnmarshaller();
 		CollectSurvey survey = (CollectSurvey) surveyUnmarshaller.unmarshal(is);
 		survey.setName("archenland1");
-		survey.setUri("http://www.openforis.org/idm/archenland1");
 		surveyDao.importModel(survey);
 		return survey;
 	}

@@ -17,7 +17,6 @@ import org.openforis.idm.model.CodeAttribute;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.TaxonAttribute;
 import org.openforis.idm.model.TaxonOccurrence;
-import org.openforis.idm.model.expression.AbsoluteModelPathExpression;
 import org.openforis.idm.model.expression.ExpressionFactory;
 import org.openforis.idm.model.expression.ModelPathExpression;
 import org.openforis.idm.model.species.Taxon;
@@ -86,16 +85,8 @@ public class SpeciesManager {
 					
 					try {
 						CodeAttribute code = null;
-						if(qualifierExpression.startsWith("/")) {
-							AbsoluteModelPathExpression expression = expressionFactory.createAbsoluteModelPathExpression(qualifierExpression);
-							code = (CodeAttribute) expression.evaluate(record);
-						}else if(qualifierExpression.startsWith("()")){
-							ModelPathExpression expression = expressionFactory.createModelPathExpression(qualifierExpression);
-							code = (CodeAttribute) expression.evaluate(node, null);
-						}else {
-							throw new IllegalArgumentException("Qualifier expression : " + qualifierExpression + " is not valid");
-						}
-					
+						ModelPathExpression expression = expressionFactory.createModelPathExpression(qualifierExpression);
+						code = (CodeAttribute) expression.evaluate(node, null);
 						qualifierValue = code.getValue().getCode();
 						hashQualifiers.put("qualifier" + i, qualifierValue);
 					} catch (Exception e) {

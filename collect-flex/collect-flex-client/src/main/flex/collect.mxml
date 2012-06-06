@@ -49,7 +49,7 @@
 	
 	<fx:Style source="assets/style.css" />
 	
-	<s:SkinnableContainer height="100%" horizontalCenter="0" width="90%">
+	<s:SkinnableContainer height="100%" horizontalCenter="0" width="974">
 		<s:layout>
 			<s:VerticalLayout />
 		</s:layout>
