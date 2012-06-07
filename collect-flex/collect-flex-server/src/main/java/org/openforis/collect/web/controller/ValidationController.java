@@ -40,7 +40,7 @@ public class ValidationController {
 	private SurveyManager surveyManager;
 	
 	@RequestMapping(value = "/validateAllRecords.htm", method = RequestMethod.GET)
-	public void validateAllRecords(HttpServletRequest request, HttpServletResponse response, @RequestParam String s, @RequestParam String r) {
+	public void validateAllRecords(HttpServletRequest request, HttpServletResponse response, @RequestParam String s, @RequestParam String r) throws IOException {
 		ServletOutputStream outputStream = response.getOutputStream();
 		try {
 			if ( s == null || r == null) {
