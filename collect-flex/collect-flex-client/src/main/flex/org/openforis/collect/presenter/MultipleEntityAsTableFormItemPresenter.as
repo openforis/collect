@@ -13,43 +13,34 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.remoting.service.UpdateRequest;
 	import org.openforis.collect.remoting.service.UpdateRequestOperation;
 	import org.openforis.collect.remoting.service.UpdateRequestOperation$Method;
+	import org.openforis.collect.ui.component.detail.MultipleEntityAsTableFormItem;
 	import org.openforis.collect.ui.component.detail.MultipleEntityFormItem;
 	import org.openforis.collect.ui.component.input.InputField;
 	import org.openforis.collect.util.AlertUtil;
 	import org.openforis.collect.util.CollectionUtil;
 	import org.openforis.collect.util.UIUtil;
-	
-	import spark.events.IndexChangeEvent;
 
 	/**
 	 * 
 	 * @author S. Ricci
 	 *  
 	 */
-	public class MultipleEntityFormItemPresenter extends EntityFormItemPresenter {
+	public class MultipleEntityAsTableFormItemPresenter extends EntityFormItemPresenter {
 		
-		public function MultipleEntityFormItemPresenter(view:MultipleEntityFormItem) {
+		public function MultipleEntityAsTableFormItemPresenter(view:MultipleEntityAsTableFormItem) {
 			super(view);
 		}
 		
 		override internal function initEventListeners():void {
 			super.initEventListeners();
 			
-			eventDispatcher.addEventListener(InputFieldEvent.VISITED, inputFieldVisitedHandler);
-			
 			view.addButton.addEventListener(MouseEvent.CLICK, addButtonClickHandler);
-			view.addButton.addEventListener(FocusEvent.FOCUS_IN, buttonFocusInHandler);
-			view.deleteButton.addEventListener(MouseEvent.CLICK, deleteButtonClickHandler);
-			view.deleteButton.addEventListener(FocusEvent.FOCUS_IN, buttonFocusInHandler);
-			view.dropDownList.addEventListener(IndexChangeEvent.CHANGE, dropDownListChangeHandler);
+			view.addButton.addEventListener(FocusEvent.FOCUS_IN, addButtonFocusInHandler);
+			eventDispatcher.addEventListener(InputFieldEvent.VISITED, inputFieldVisitedHandler);
 		}
 		
-		private function get view():MultipleEntityFormItem {
-			return MultipleEntityFormItem(_view);
-		}
-		
-		protected function buttonFocusInHandler(event:FocusEvent):void {
-			UIUtil.ensureElementIsVisible(event.target);
+		private function get view():MultipleEntityAsTableFormItem {
+			return MultipleEntityAsTableFormItem(_view);
 		}
 		
 		override protected function updateResponseReceivedHandler(event:ApplicationEvent):void {
@@ -67,8 +58,9 @@ package org.openforis.collect.presenter
 					&& view.parentEntity != null 
 					&& view.modelVersion != null) {
 				var entities:IList = getEntities();
-				view.entities = entities;
-				selectEntity(null);
+				view.dataGroup.dataProvider = entities;
+			} else {
+				view.dataGroup.dataProvider = null;
 			}
 			super.updateView();
 		}
@@ -82,6 +74,10 @@ package org.openforis.collect.presenter
 			return entities;
 		}
 
+		protected function addButtonFocusInHandler(event:FocusEvent):void {
+			UIUtil.ensureElementIsVisible(event.target);
+		}
+		
 		protected function addButtonClickHandler(event:MouseEvent):void {
 			var entities:IList = getEntities();
 			var maxCount:Number = view.entityDefinition.maxCount
@@ -98,18 +94,15 @@ package org.openforis.collect.presenter
 			}
 		}
 		
-		protected function deleteButtonClickHandler(event:MouseEvent):void {
-			AlertUtil.showConfirm("global.confirmDelete", [view.entityDefinition.getLabelText()], 
-				"global.confirmAlertTitle", performDeletion);
-		}
-		
-		protected function performDeletion():void {
-			var o:UpdateRequestOperation = new UpdateRequestOperation();
-			o.method = UpdateRequestOperation$Method.DELETE;
-			o.parentEntityId = _view.parentEntity.id;
-			o.nodeId = view.entity.id;
-			var req:UpdateRequest = new UpdateRequest(o);
-			ClientFactory.dataClient.updateActiveRecord(req, deleteResultHandler, faultHandler);
+		protected function addResultHandler(event:ResultEvent, token:Object = null):void {
+			view.callLater(function():void {
+				updateValidationDisplayManager();
+				
+				if(view.scroller != null && view.scroller.verticalScrollBar != null) {
+					view.scroller.verticalScrollBar.value = view.scroller.verticalScrollBar.maximum;
+				}
+				UIUtil.ensureElementIsVisible(view.addButton);
+			});
 		}
 		
 		protected function inputFieldVisitedHandler(event:InputFieldEvent):void {
@@ -138,43 +131,6 @@ package org.openforis.collect.presenter
 					_validationDisplayManager.active = false;
 					_validationDisplayManager.reset();
 				}
-			}
-		}
-		
-		protected function addResultHandler(event:ResultEvent, token:Object = null):void {
-			//select the inserted entity
-			_view.callLater(function():void {
-				var entities:IList = getEntities();
-				var lastEntity:EntityProxy = entities.getItemAt(entities.length -1) as EntityProxy; 
-				selectEntity(lastEntity);
-			});
-		}
-		
-		protected function deleteResultHandler(event:ResultEvent, token:Object = null):void {
-			var responses:IList = IList(event.result);
-			var appEvt:ApplicationEvent = new ApplicationEvent(ApplicationEvent.UPDATE_RESPONSE_RECEIVED);
-			appEvt.result = responses;
-			eventDispatcher.dispatchEvent(appEvt);
-		}
-		
-		protected function dropDownListChangeHandler(event:IndexChangeEvent):void {
-			var entity:EntityProxy = view.dropDownList.selectedItem as EntityProxy;
-			selectEntity(entity);
-		}
-		
-		protected function selectEntity(entity:EntityProxy):void {
-			view.selectedEntity = entity;
-			view.dropDownList.selectedItem = entity;
-			view.entity = entity;
-			if(entity != null) {
-				if(view.internalContainer.visible) {
-					//internal container already visible, call programmatically the showEffect
-					view.showFormEffect.play([view.internalContainer]);
-				} else {
-					view.internalContainer.visible = true;
-				}
-			} else if(view.entityDefinition == null || view.entityDefinition.multiple) {
-				view.internalContainer.visible = false;
 			}
 		}
 		

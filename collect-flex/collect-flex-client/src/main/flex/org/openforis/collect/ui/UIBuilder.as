@@ -43,6 +43,7 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.ui.component.detail.FormContainer;
 	import org.openforis.collect.ui.component.detail.MultipleAttributeDataGroupFormItem;
 	import org.openforis.collect.ui.component.detail.MultipleAttributeFormItem;
+	import org.openforis.collect.ui.component.detail.MultipleEntityAsTableFormItem;
 	import org.openforis.collect.ui.component.detail.MultipleEntityFormItem;
 	import org.openforis.collect.ui.component.detail.SingleAttributeFormItem;
 	import org.openforis.collect.ui.component.detail.SingleEntityFormItem;
@@ -220,7 +221,11 @@ package org.openforis.collect.ui {
 		public static function getEntityFormItem(definition:EntityDefinitionProxy):EntityFormItem {
 			var entityFormItem:EntityFormItem = null;
 			if(definition.multiple) {
-				entityFormItem = new MultipleEntityFormItem();
+				if ( definition.layout == UIUtil.LAYOUT_FORM ) {
+					entityFormItem = new MultipleEntityFormItem();
+				} else {
+					entityFormItem = new MultipleEntityAsTableFormItem();
+				}
 			} else {
 				entityFormItem = new SingleEntityFormItem();
 			}

@@ -4,17 +4,24 @@
 					   xmlns:mx="library://ns.adobe.com/flex/mx"
 					   xmlns:datagroup="org.openforis.collect.ui.component.datagroup.*"
 					   xmlns:detail="org.openforis.collect.ui.component.detail.*"
+					   width="100%" height="100%"
 					   >
 	
 	<fx:Script>
 		<![CDATA[
 			import mx.binding.utils.BindingUtils;
+			import mx.collections.IList;
 			import mx.events.FlexEvent;
 			
 			import org.openforis.collect.Application;
 			import org.openforis.collect.i18n.Message;
+			import org.openforis.collect.model.proxy.EntityProxy;
 			import org.openforis.collect.presenter.MultipleEntityFormItemPresenter;
 			import org.openforis.collect.ui.Images;
+			
+			private var _entities:IList;
+			
+			private var _selectedEntity:EntityProxy;
 			
 			//private var _constraintLayout:ConstraintLayout;
 			
@@ -22,14 +29,31 @@
 				super.creationCompleteHandler(event);
 				//bind the position of horizontal scrollbars of header and content
 				//so that the header is always aligned with the content
-				BindingUtils.bindProperty(
-					headerScroller.horizontalScrollBar, "value", 
-					scroller, ["horizontalScrollBar", "value"]);
 			}
 			
 			override protected function initPresenter():void {
 				presenter = new MultipleEntityFormItemPresenter(this);
 			}
+
+			[Bindable]
+			public function get selectedEntity():EntityProxy {
+				return _selectedEntity;
+			}
+
+			public function set selectedEntity(value:EntityProxy):void {
+				_selectedEntity = value;
+			}
+
+			[Bindable]
+			public function get entities():IList {
+				return _entities;
+			}
+
+			public function set entities(value:IList):void {
+				_entities = value;
+			}
+
+
 			/*
 			[Bindable]
 			public function get constraintLayout():ConstraintLayout {
@@ -42,6 +66,22 @@
 			*/
 		]]>
 	</fx:Script>
+	
+	<fx:Declarations>
+		
+		<s:Fade id="showFormEffect" 
+				duration="600" 
+				alphaFrom="0" 
+				alphaTo="1"
+				/>
+		
+		<s:Fade id="hideFormEffect" 
+				duration="400" 
+				alphaFrom="1" 
+				alphaTo="0"
+				/>
+		
+	</fx:Declarations>
 	
 	<detail:layout>
 		<s:VerticalLayout />
@@ -56,77 +96,48 @@
 			<s:VerticalLayout />
 		</s:layout>
 
-		<detail:FormItemLabel id="formItemLabel"
-			  				  nodeDefinition="{entityDefinition}"
-							  visible="{! occupyEntirePage}"
-							  includeInLayout="{! occupyEntirePage}"
-							  />
-
-		<s:VGroup paddingLeft="{occupyEntirePage ? 0: 30}" 
-				  paddingRight="0"
-				  height="100%" 
-				  width="100%">
-			<s:Scroller id="headerScroller" 
-						horizontalScrollPolicy="off" 
-						verticalScrollPolicy="off"
-						width="100%"
-						includeInLayout="{dataGroup.dataProvider.length > 0}"
-						visible="{dataGroup.dataProvider.length > 0}"
-						>
-				<s:HGroup gap="0">
-					<s:Spacer id="dragAnchorSpacer"
-							  includeInLayout="{Application.activeRecordEditable &amp;&amp; ! entityDefinition.enumerable}"
-						width="13" />
-					<datagroup:DataGroupHeader id="header" 
-											   nodeDefinitions="{nodeDefinitions}"
-											   parentEntity="{parentEntity}"
-											   />
-					<!-- spacer to ensure correct alignment of the headerScroller with the dataGroup scroller -->
-					<s:Spacer 
-						includeInLayout="{scroller.verticalScrollBar != null}" 
-						width="{scroller.verticalScrollBar.width}" />
-				</s:HGroup>
-			</s:Scroller>
-				
-			<s:Scroller id="scroller" 
-						width="100%"
-						height="100%"
-						>
-				<s:DataGroup id="dataGroup">
-					<s:layout>
-						<s:VerticalLayout gap="2" />
-					</s:layout> 
-					<s:itemRenderer>
-						<fx:Component>
-							<detail:EntityDataGroupItemRenderer
-								entity="{data as EntityProxy}"
-								modelVersion="{outerDocument.modelVersion}"
-								nodeDefinitions="{outerDocument.nodeDefinitions}"
-								dragEnabled="{Application.activeRecordEditable &amp;&amp; ! outerDocument.entityDefinition.enumerable}"
-								>
-								<fx:Script>
-									<![CDATA[
-										import org.openforis.collect.Application;
-									]]>
-								</fx:Script>
-							</detail:EntityDataGroupItemRenderer>
-						</fx:Component>
-					</s:itemRenderer>
-				</s:DataGroup>
-			</s:Scroller>
-			
-			<mx:LinkButton
-				id="addButton"
-				label="{Message.get('global.add')}" 
-				buttonMode="true" 
-				icon="{Images.ADD}" 
-				labelPlacement="left" 
-				useHandCursor="true"
-				visible="{Application.activeRecordEditable &amp;&amp; ! entityDefinition.enumerable}"
-				includeInLayout="{Application.activeRecordEditable &amp;&amp; ! entityDefinition.enumerable}"
-				/>
-		</s:VGroup>
+		<s:Group id="addSection" 
+				 includeInLayout="{entityDefinition.multiple &amp;&amp; entityDefinition.parent != null}" 
+				 visible="{entityDefinition.multiple &amp;&amp; entityDefinition.parent != null}">
+			<s:layout>
+				<s:HorizontalLayout paddingTop="5" horizontalAlign="left" paddingLeft="10" gap="12" verticalAlign="middle" />
+			</s:layout>
+			<s:Label text="{entityDefinition.getLabelText()}" styleName="bold" />
+			<s:DropDownList id="dropDownList"
+							prompt="{Message.get('global.dropDownPrompt')}" 
+							width="{Math.max(0, entityDefinition.keyAttributeDefinitions.length - 1) * 100 + 150}" 
+							labelField="fullKeyText"
+							dataProvider="{entities}"
+							visible="{entities != null &amp;&amp; entities.length &gt; 0}"
+							includeInLayout="{entities != null &amp;&amp; entities.length &gt; 0}"
+							/>
+			<s:Button id="addButton" 
+					  styleName="addButton" 
+					  buttonMode="true" 
+					  useHandCursor="true"
+					  visible="{Application.activeRecordEditable}" 
+					  includeInLayout="{Application.activeRecordEditable}" 
+					  />
+			<s:Button id="deleteButton" 
+					  styleName="deleteButton" 
+					  buttonMode="true" 
+					  useHandCursor="true"
+					  visible="{Application.activeRecordEditable &amp;&amp; dropDownList.selectedIndex >= 0}" 
+					  includeInLayout="{Application.activeRecordEditable &amp;&amp; dropDownList.selectedIndex >= 0}" 
+					  />
+		</s:Group>
 		
+		<detail:ScrollableFormContainer 
+			id="internalContainer"
+			modelVersion="{modelVersion}"
+			entityDefinition="{entityDefinition}"
+			nodeDefinitions="{nodeDefinitions}"
+			entity="{selectedEntity}"
+			height="100%" width="100%"
+			showEffect="{showFormEffect}" 
+			hideEffect="{hideFormEffect}"
+			visible="{! entityDefinition.multiple || entityDefinition.parent == null || dropDownList.selectedItem != null}"
+			/>
 			
 	</s:BorderContainer>
 	
