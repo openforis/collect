@@ -24,8 +24,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 /**
  * @author S. Ricci
  * 
- * Controller that manages the unlocking of active record
- * when closing browser's window
+ * Controller that manages the validation of records
  *
  */
 @Controller
