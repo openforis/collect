@@ -55,10 +55,10 @@ public class InitServlet extends HttpServlet {
 		// TODO init path
 		// FileUtil.init(basePath);
 		
-		checkDatabaseVersion();
-		
 		this.initLog4J();
 		// initValiadtionMap();
+
+		checkDatabaseVersion();
 
 		System.out.println("====================================================");
 	}
