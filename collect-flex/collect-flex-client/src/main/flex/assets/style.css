@@ -153,7 +153,7 @@ detail|AttributeItemRenderer {
 
 detail|MultipleAttributeFormItem s|BorderContainer, 
 	detail|SingleEntityFormItem s|BorderContainer,
-	detail|MultipleEntityFormItem s|BorderContainer  {
+	detail|MultipleEntityAsTableFormItem s|BorderContainer  {
 	borderColor: #FFFFFF;
 	borderWeight: 1;
 }
@@ -161,14 +161,14 @@ detail|MultipleAttributeFormItem s|BorderContainer,
 detail|AttributeItemRenderer.error, 
 	detail|MultipleAttributeFormItem.error s|BorderContainer,
 	detail|SingleEntityFormItem.error s|BorderContainer,
-	detail|MultipleEntityFormItem.error s|BorderContainer {
+	detail|MultipleEntityAsTableFormItem.error s|BorderContainer {
 	borderColor: #FF0000;
 }
 
 detail|AttributeItemRenderer.warning, 
 	detail|MultipleAttributeFormItem.warning s|BorderContainer,
 	detail|SingleEntityFormItem.warning s|BorderContainer,
-	detail|MultipleEntityFormItem.warning s|BorderContainer {
+	detail|MultipleEntityAsTableFormItem.warning s|BorderContainer {
 	borderColor: #FF8800;
 }
 
