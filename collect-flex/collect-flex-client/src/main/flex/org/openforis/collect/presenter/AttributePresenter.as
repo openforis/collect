@@ -7,6 +7,7 @@ package org.openforis.collect.presenter {
 	
 	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
+	import org.openforis.collect.metamodel.proxy.CodeAttributeDefinitionProxy;
 	import org.openforis.collect.model.proxy.AttributeProxy;
 	import org.openforis.collect.remoting.service.UpdateResponse;
 	import org.openforis.collect.ui.component.detail.AttributeItemRenderer;
@@ -49,7 +50,7 @@ package org.openforis.collect.presenter {
 			var validationToolTipTrigger:UIComponent = validationStateDisplay;
 			_validationDisplayManager = new ValidationDisplayManager(validationToolTipTrigger, validationStateDisplay);
 			var attrDefn:AttributeDefinitionProxy = _view.attributeDefinition;
-			_validationDisplayManager.showMinMaxCountErrors = ! attrDefn.multiple;
+			_validationDisplayManager.showMinMaxCountErrors = ! attrDefn.multiple || attrDefn instanceof CodeAttributeDefinitionProxy;
 			if(_view.attribute != null) {
 				updateValidationDisplayManager();
 			}
