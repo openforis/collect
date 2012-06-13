@@ -18,6 +18,8 @@ import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.CollectSurveyContext;
 import org.openforis.collect.model.FieldSymbol;
+import org.openforis.collect.persistence.SurveyDao;
+import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.collect.persistence.xml.CollectIdmlBindingContext;
 import org.openforis.collect.persistence.xml.DataHandler;
 import org.openforis.collect.persistence.xml.DataMarshaller;
