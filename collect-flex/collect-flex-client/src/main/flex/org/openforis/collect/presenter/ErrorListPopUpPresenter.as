@@ -91,7 +91,7 @@ package org.openforis.collect.presenter
 			for each (var childDefn:NodeDefinitionProxy in childDefinitions) {
 				var childName:String = childDefn.name;
 				var minCountValid:ValidationResultFlag = entity.childrenMinCountValidationMap.get(childName);
-				var maxCountValid:ValidationResultFlag = entity.childrenMinCountValidationMap.get(childName);
+				var maxCountValid:ValidationResultFlag = entity.childrenMaxCountValidationMap.get(childName);
 				if(minCountValid == ValidationResultFlag.ERROR || maxCountValid == ValidationResultFlag.ERROR) {
 					if ( minCountValid == ValidationResultFlag.ERROR ) {
 						messages = [Message.get("edit.validation.minCount", [childDefn.minCount > 0 ? childDefn.minCount: 1])];
@@ -105,7 +105,6 @@ package org.openforis.collect.presenter
 				}
 			}
 			return result;
-			
 		}
 		
 		protected function createNodeLabel(node:NodeProxy):String {

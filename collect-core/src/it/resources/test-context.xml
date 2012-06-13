@@ -76,7 +76,7 @@
 	<bean id="externalCodeListProvider" 	class="org.openforis.collect.persistence.DatabaseExternalCodeListProvider" />
 
 	<!-- XmlSerializer -->
-	<bean id="xmlSerializerFactory" class="org.openforis.collect.persistence.xml.FastXmlSerializerFactory" />
+	<bean id="xmlSerializerFactory" class="org.openforis.collect.persistence.xml.XmlPullSerializerFactory" />
 	
 	<!-- XML DataMarshaller -->
 	<bean id="dataMarshaller" class="org.openforis.collect.persistence.xml.DataMarshaller" lazy-init="false" autowire-candidate="true" autowire="byName" />
