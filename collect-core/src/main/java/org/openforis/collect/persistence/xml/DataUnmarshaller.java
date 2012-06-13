@@ -14,21 +14,14 @@ import org.xml.sax.SAXException;
 
 /**
  * @author G. Miceli
+ * @author S. Ricci
  *
  */
 public class DataUnmarshaller {
 
-//	private CollectSurvey survey;
-//	private CollectRecordContext recordContext;
 	private DataHandler handler;
 	
 	private final Log log = LogFactory.getLog(getClass());
-
-//	public DataUnmarshaller(CollectSurvey survey, CollectRecordContext recordContext) {
-//		super();
-//		this.survey = survey;
-//		this.recordContext = recordContext;
-//	}
 
 	public DataUnmarshaller(DataHandler handler) {
 		this.handler = handler;
@@ -36,7 +29,6 @@ public class DataUnmarshaller {
 	
 	private CollectRecord parse(InputSource source) throws DataUnmarshallerException {
 		SAXParser p = new SAXParser();
-//		DataHandler handler = new DataHandler(recordContext, survey);
 		p.setContentHandler(handler);
 		try {
 			p.parse(source);
@@ -82,27 +74,4 @@ public class DataUnmarshaller {
 		return handler.getWarnings();
 	}
 	
-//	public static void main(String[] args) {
-//		try {
-//			
-//			// Load IDML
-//			CollectIdmlBindingContext idmlBindingContext = new CollectIdmlBindingContext();
-//			SurveyUnmarshaller surveyUnmarshaller = idmlBindingContext.createSurveyUnmarshaller();
-//			CollectSurvey survey = (CollectSurvey) surveyUnmarshaller.unmarshal("/home/gino/workspace/faofin/tz/naforma-idm/tanzania-naforma.idm.xml");
-//			// Load record
-//			long start = System.currentTimeMillis();
-//			DataHandler handler = new DataHandler(survey);
-//			DataUnmarshaller dataUnmarshaller = new DataUnmarshaller(handler);
-//			CollectRecord record = dataUnmarshaller.parse("/home/gino/workspace/temp/tzdata/data/3/143_169/data.xml");
-//			long end = System.currentTimeMillis();
-//			System.out.println(record);
-//			System.out.println("Loaded in "+(end-start)+"ms");
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		} catch (InvalidIdmlException e) {
-//			e.printStackTrace();
-//		} catch (DataUnmarshallerException e) {
-//			e.printStackTrace();
-//		}
-//	}
 }
