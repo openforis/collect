@@ -35,7 +35,7 @@ import java.nio.charset.UnsupportedCharsetException;
  * painfully slow like the normal one.  It only does what is needed for the
  * specific XML files being written with it.
  */
-public class FastXmlSerializer implements org.xmlpull.v1.XmlSerializer {
+public class XmlPullSerializer implements org.xmlpull.v1.XmlSerializer {
 
 	private static final String ESCAPE_TABLE[] = new String[] {
 		null,     null,     null,     null,     null,     null,     null,     null,  // 0-7
@@ -149,7 +149,7 @@ public class FastXmlSerializer implements org.xmlpull.v1.XmlSerializer {
 		if (lastPos < pos) append(buf, lastPos, pos-lastPos);
 	}
 
-	public FastXmlSerializer attribute(String namespace, String name, String value) throws IOException,
+	public XmlPullSerializer attribute(String namespace, String name, String value) throws IOException,
 	IllegalArgumentException, IllegalStateException {
 		append(' ');
 		if (namespace != null) {
@@ -183,7 +183,7 @@ public class FastXmlSerializer implements org.xmlpull.v1.XmlSerializer {
 		flush();
 	}
 
-	public FastXmlSerializer endTag(String namespace, String name) throws IOException,
+	public XmlPullSerializer endTag(String namespace, String name) throws IOException,
 	IllegalArgumentException, IllegalStateException {
 		if (mInTag) {
 			append(" />\n");
@@ -329,7 +329,7 @@ public class FastXmlSerializer implements org.xmlpull.v1.XmlSerializer {
 				+ (standalone ? "yes" : "no") + "' ?>\n");
 	}
 
-	public FastXmlSerializer startTag(String namespace, String name) throws IOException,
+	public XmlPullSerializer startTag(String namespace, String name) throws IOException,
 	IllegalArgumentException, IllegalStateException {
 		if (mInTag) {
 			append(">\n");
@@ -344,7 +344,7 @@ public class FastXmlSerializer implements org.xmlpull.v1.XmlSerializer {
 		return this;
 	}
 
-	public FastXmlSerializer text(char[] buf, int start, int len) throws IOException,
+	public XmlPullSerializer text(char[] buf, int start, int len) throws IOException,
 	IllegalArgumentException, IllegalStateException {
 		if (mInTag) {
 			append(">");
@@ -354,7 +354,7 @@ public class FastXmlSerializer implements org.xmlpull.v1.XmlSerializer {
 		return this;
 	}
 
-	public FastXmlSerializer text(String text) throws IOException, IllegalArgumentException,
+	public XmlPullSerializer text(String text) throws IOException, IllegalArgumentException,
 	IllegalStateException {
 		if (mInTag) {
 			append(">");

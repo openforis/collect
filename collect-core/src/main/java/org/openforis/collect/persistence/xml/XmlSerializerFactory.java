@@ -9,6 +9,6 @@ import org.xmlpull.v1.XmlSerializer;
  */
 public interface XmlSerializerFactory {
 
-	public XmlSerializer newSerializer();
+	public XmlSerializer getSerializer();
 	
 }
