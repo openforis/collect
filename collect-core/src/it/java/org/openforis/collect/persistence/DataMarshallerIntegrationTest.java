@@ -9,8 +9,11 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.URL;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openforis.collect.model.CollectRecord;
@@ -18,6 +21,7 @@ import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.CollectSurveyContext;
 import org.openforis.collect.model.FieldSymbol;
+import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.SurveyDao;
 import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.collect.persistence.xml.CollectIdmlBindingContext;
@@ -63,6 +67,21 @@ public class DataMarshallerIntegrationTest {
 	@Autowired
 	private DataMarshaller dataMarshaller;
 	
+	private static Map<String, User> users;
+	
+	@BeforeClass
+	public static void init() {
+		users = new HashMap<String, User>();
+		User user = new User();
+		user.setId(1);
+		user.setName("admin");
+		users.put(user.getName(), user);
+		user = new User();
+		user.setId(2);
+		user.setName("data_entry");
+		users.put(user.getName(), user);
+	}
+	
 	@Test
 	public void testMarshal() throws Exception  {
 		// LOAD MODEL
@@ -85,68 +104,11 @@ public class DataMarshallerIntegrationTest {
 
 		assertNotNull(record2);
 		
-		Entity rootEntity1 = record.getRootEntity();
-		
-		Entity rootEntity2 = record2.getRootEntity();		
-			
-		assertNotNull(rootEntity2);
-		
-		testSingleAttributesEqual(rootEntity1, rootEntity2, "region");
-		testSingleAttributesEqual(rootEntity1, rootEntity2, "crew_no");
-		testSingleAttributesEqual(rootEntity1, rootEntity2, "vehicle_location");
-		
-		testMultipleAttributesEqual(rootEntity1, rootEntity2, "map_sheet");
-		
-		Entity plot1 = (Entity) rootEntity1.get("plot", 0);
-		Entity plot2 = (Entity) rootEntity2.get("plot", 0);
-		
-		assertNotNull(plot2);
-		
-		testSingleAttributesEqual(plot1, plot2, "no");
-		
-		Entity tree1 = (Entity) plot1.get("tree", 0);
-		Entity tree2 = (Entity) plot2.get("tree", 0);
-		
-		assertNotNull(tree2);
-		
-		testSingleAttributesEqual(tree1, tree2, "dbh");
-		testSingleAttributesEqual(tree1, tree2, "bole_height");
+		assertEquals(record, record2);
 	}
 	
-	private void testMultipleAttributesEqual(Entity rootEntity1, Entity rootEntity2, String attributeName) {
-		List<Node<?>> attributes1 = rootEntity1.getAll(attributeName);
-		List<Node<?>> attributes2 = rootEntity2.getAll(attributeName);
-		assertEquals(attributes1.size(), attributes2.size());
-		
-		for (int i = 0; i < attributes1.size(); i++) {
-			Attribute<?, ?> a1 = (Attribute<?, ?>) attributes1.get(i);
-			Attribute<?, ?> a2 = (Attribute<?, ?>) attributes2.get(i);
-			testAttributesEqual(a1, a2);
-		}
-	}
-
-	private void testSingleAttributesEqual(Entity rootEntity1, Entity rootEntity2, String attributeName) {
-		Attribute<?, ?> attribute1 = (Attribute<?, ?>) rootEntity1.get(attributeName, 0);
-		Attribute<?, ?> attribute2 = (Attribute<?, ?>) rootEntity2.get(attributeName, 0);
-		assertNotNull(attribute1);
-		assertNotNull(attribute2);
-		testAttributesEqual(attribute1, attribute2);
-	}
-
-	private void testAttributesEqual(Attribute<?, ?> attribute1, Attribute<?, ?> attribute2) {
-		int fieldCount = attribute1.getFieldCount();
-		for (int i = 0; i < fieldCount; i++) {
-			Field<?> field1 = attribute1.getField(i);
-			Field<?> field2 = attribute2.getField(i);
-			assertEquals(field1.getValue(), field2.getValue());
-			assertEquals(field1.getRemarks(), field2.getRemarks());
-			assertEquals(field1.getSymbol(), field2.getSymbol());
-			assertEquals(field1.getState().intValue(), field2.getState().intValue());
-		}
-	}
-
 	private CollectRecord parseRecord(CollectSurvey survey, String xml) throws IOException, DataUnmarshallerException {
-		DataHandler dataHandler = new DataHandler(survey);
+		DataHandler dataHandler = new DataHandler(survey, users);
 		DataUnmarshaller dataUnmarshaller = new DataUnmarshaller(dataHandler);
 		StringReader reader = new StringReader(xml);
 		CollectRecord parsedRecord = dataUnmarshaller.parse(reader);
@@ -155,9 +117,12 @@ public class DataMarshallerIntegrationTest {
 	
 	private CollectRecord createTestRecord(CollectSurvey survey) {
 		CollectRecord record = new CollectRecord(survey, "2.0");
+		User user = users.get("admin");
+		record.setCreatedBy(user);
+		record.setModifiedBy(user);
 		Entity cluster = record.createRootEntity("cluster");
 		record.setCreationDate(new GregorianCalendar(2011, 12, 31, 23, 59).getTime());
-		//record.setCreatedBy("ModelDaoIntegrationTest");
+		record.setModifiedDate(new GregorianCalendar(2012, 2, 3, 9, 30).getTime());
 		record.setStep(Step.ENTRY);
 
 		addTestValues(cluster);

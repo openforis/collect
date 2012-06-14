@@ -150,6 +150,7 @@ public class DataMarshaller {
 				int childStateInt = childState.intValue();
 				if (childStateInt > 0) {
 					serializer.startTag(null, childName);
+					serializer.attribute(null, DEFINITION_ID_ATTRIBUTE, childDefn.getId().toString());
 					serializer.attribute(null, STATE_ATTRIBUTE, Integer.toString(childStateInt));
 					serializer.endTag(null, childName);
 				}
