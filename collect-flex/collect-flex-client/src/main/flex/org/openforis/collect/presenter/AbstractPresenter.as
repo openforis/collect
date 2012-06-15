@@ -60,19 +60,26 @@ package org.openforis.collect.presenter {
 				case "org.openforis.collect.persistence.MissingRecordKeyException":
 					AlertUtil.showError("error.missingRootEntityKeys");
 					break;
+				case "org.openforis.collect.manager.DatabaseVersionNotCompatibleException":
+					showBlockingMessage("error.databaseVersionNotCompatible", event);
+					break;
 				case "Channel.Call.Failed":
 					"Client.Error.MessageSend"
 					"Client.Error.DeliveryInDoubt"
 				default:
-					if(! Application.serverOffline) {
-						var message:String = Message.get("global.faultHandlerMsg");
-						var now:String = new Date().toString();
-						var details:String = StringUtil.concat("\n\n", now, faultCode, event.fault.faultDetail);
-						BlockingMessagePopUp.show(Message.get("global.errorAlertTitle"), message, details, Images.ERROR);
-					}
-					Application.serverOffline = true;
-					Application.activeRecord = null;
+					showBlockingMessage("global.faultHandlerMsg", event);
 			}
+		}
+		
+		internal static function showBlockingMessage(messageKey:String, event:FaultEvent):void {
+			if(! Application.serverOffline) {
+				var message:String = Message.get(messageKey);
+				var now:String = new Date().toString();
+				var details:String = StringUtil.concat("\n\n", now, event.fault.faultCode, event.fault.faultDetail);
+				BlockingMessagePopUp.show(Message.get("global.errorAlertTitle"), message, details, Images.ERROR);
+			}
+			Application.serverOffline = true;
+			Application.activeRecord = null;
 		}
 		
 		internal function initEventListeners():void {}

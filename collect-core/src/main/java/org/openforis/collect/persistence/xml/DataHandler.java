@@ -147,9 +147,7 @@ public class DataHandler extends DefaultHandler {
 
 	public void startChildNode(String localName, Attributes attributes) {
 		Entity entity = (Entity) node;
-		EntityDefinition entityDefn = entity.getDefinition();
-		Schema schema = entityDefn.getSchema();
-		NodeDefinition childDefn = getNodeDefinition(schema, localName, attributes);
+		NodeDefinition childDefn = getNodeDefinition(entity, localName, attributes);
 		if ( childDefn == null ) {
 			warn("Undefined node '"+localName+"' in "+getPath());
 			pushIgnore();
@@ -164,11 +162,19 @@ public class DataHandler extends DefaultHandler {
 		}
 	}
 
-	private NodeDefinition getNodeDefinition(Schema schema, String localName, Attributes attributes) {
+	private NodeDefinition getNodeDefinition(Entity entity, String localName, Attributes attributes) {
+		EntityDefinition entityDefn = entity.getDefinition();
+		Schema schema = entityDefn.getSchema();
+		NodeDefinition defn = null;
 		String childDefnIdStr = attributes.getValue(ATTRIBUTE_DEFINITION_ID);
-		int childDefnId = Integer.parseInt(childDefnIdStr);
-		NodeDefinition childDefn = schema.getById(childDefnId);
-		return childDefn;
+		if ( StringUtils.isNotBlank(childDefnIdStr) ) {
+			int childDefnId = Integer.parseInt(childDefnIdStr);
+			defn = schema.getById(childDefnId);
+		} else {
+			//compatibility with previous version of data marshaller
+			defn = entityDefn.getChildDefinition(localName);
+		}
+		return defn;
 	}
 	
 	protected void startAttributeField(String localName, Attributes attributes) {

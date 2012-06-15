@@ -6,6 +6,8 @@ package org.openforis.collect.remoting.service;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.openforis.collect.manager.DatabaseVersionManager;
+import org.openforis.collect.manager.DatabaseVersionNotCompatibleException;
 import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.model.User;
 import org.openforis.collect.model.proxy.UserProxy;
@@ -26,6 +28,9 @@ public class SessionService {
 	@Autowired
 	protected SessionManager sessionManager;
 
+	@Autowired
+	protected DatabaseVersionManager databaseVersionManager;
+
 	/**
 	 * Method used to keep the session alive
 	 * @throws RecordUnlockedException 
@@ -43,8 +48,11 @@ public class SessionService {
 	 * Set a locale (language, country) into the session state object
 	 * 
 	 * @return map with user, sessionId
+	 * @throws DatabaseVersionNotCompatibleException 
 	 */
-	public Map<String, Object> initSession(String locale) {
+	public Map<String, Object> initSession(String locale) throws DatabaseVersionNotCompatibleException {
+		databaseVersionManager.checkIsVersionCompatible();
+		
 		sessionManager.setLocale(locale);
 		SessionState sessionState = sessionManager.getSessionState();
 		User user = sessionState.getUser();
