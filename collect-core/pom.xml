@@ -288,7 +288,7 @@
 		<dependency>
 			<groupId>org.openforis.idm</groupId>
 			<artifactId>idm-api-protostuff</artifactId>
-			<version>3.0-Alpha2-SNAPSHOT</version>
+			<version>3.0-Alpha2</version>
 		</dependency>
 
 		<!-- Apache commons -->
