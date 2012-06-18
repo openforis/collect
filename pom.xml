@@ -170,17 +170,17 @@
 			<dependency>
 				<groupId>org.openforis.idm</groupId>
 				<artifactId>idm-api</artifactId>
-				<version>3.0-Alpha2</version>
+				<version>3.0-Alpha3-SNAPSHOT</version>
 			</dependency>
 			<dependency>
 				<groupId>org.openforis.idm</groupId>
 				<artifactId>idm-transform</artifactId>
-				<version>3.0-Alpha2</version>
+				<version>3.0-Alpha3-SNAPSHOT</version>
 			</dependency>
 			<dependency>
 				<groupId>org.openforis.idm</groupId>
 				<artifactId>idm-test</artifactId>
-				<version>3.0-Alpha2</version>
+				<version>3.0-Alpha3-SNAPSHOT</version>
 				<scope>test</scope>
 			</dependency>
 			<dependency>
