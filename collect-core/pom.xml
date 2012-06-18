@@ -13,7 +13,7 @@
 	<properties>
 		<geotools.version>2.6.5</geotools.version>
 		<jooq.version>2.0.5</jooq.version>
-		<jooq.codegen.version>2.0.1</jooq.codegen.version>
+		<jooq-codegen.version>2.0.1</jooq-codegen.version>
 	</properties>
 
 	<repositories>
@@ -42,7 +42,7 @@
 			<plugin>
 				<groupId>org.jooq</groupId>
 				<artifactId>jooq-codegen-maven</artifactId>
-				<version>${jooq.codegen.version}</version>
+				<version>${jooq-codegen.version}</version>
 				<dependencies>
 					<dependency>
 						<groupId>postgresql</groupId>
@@ -208,7 +208,7 @@
 									<pluginExecutionFilter>
 										<groupId>org.jooq</groupId>
 										<artifactId>jooq-codegen-maven</artifactId>
-										<versionRange>[${jooq.codegen.version},)</versionRange>
+										<versionRange>[${jooq-codegen.version},)</versionRange>
 										<goals>
 											<goal>generate</goal>
 										</goals>

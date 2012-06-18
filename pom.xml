@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.openforis.collect</groupId>
 	<artifactId>collect</artifactId>
-	<version>3.0-Alpha2-SNAPSHOT</version>
+	<version>3.0-Alpha2</version>
 	<packaging>pom</packaging>
 
 	<modules>
@@ -25,7 +25,7 @@
 		<repository>
 			<id>releases</id>
 			<name>Repository with internal releases</name>
-			<url>http://ldvfo01:9000/nexus/content/repositories/releases</url>
+			<url>${collect-repository.url}</url>
 		</repository>
 	</distributionManagement>
 
@@ -33,8 +33,8 @@
 	    <connection>scm:git:git@github.com:openforis/collect.git</connection>
 	    <url>scm:git:git@github.com:openforis/collect.git</url>
 		<developerConnection>scm:git:git@github.com:openforis/collect.git</developerConnection>
-	  <tag>HEAD</tag>
-  </scm>
+	  	<tag>HEAD</tag>
+  	</scm>
 	
 	<build>
 		<plugins>
@@ -170,17 +170,17 @@
 			<dependency>
 				<groupId>org.openforis.idm</groupId>
 				<artifactId>idm-api</artifactId>
-				<version>3.0-Alpha2-SNAPSHOT</version>
+				<version>3.0-Alpha2</version>
 			</dependency>
 			<dependency>
 				<groupId>org.openforis.idm</groupId>
 				<artifactId>idm-transform</artifactId>
-				<version>3.0-Alpha2-SNAPSHOT</version>
+				<version>3.0-Alpha2</version>
 			</dependency>
 			<dependency>
 				<groupId>org.openforis.idm</groupId>
 				<artifactId>idm-test</artifactId>
-				<version>3.0-Alpha2-SNAPSHOT</version>
+				<version>3.0-Alpha2</version>
 				<scope>test</scope>
 			</dependency>
 			<dependency>
