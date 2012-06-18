@@ -81,13 +81,13 @@
 			<artifactId>collect-flex-server</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-	<dependency>
-		<groupId>org.openforis.collect</groupId>
-		<artifactId>collect-flex-client</artifactId>
-		<version>${project.version}</version>
-		<type>swf</type>
-		<scope>runtime</scope>
-	</dependency>
+		<dependency>
+			<groupId>org.openforis.collect</groupId>
+			<artifactId>collect-flex-client</artifactId>
+			<version>${project.version}</version>
+			<type>swf</type>
+			<scope>runtime</scope>
+		</dependency>
 		<!-- JSTL -->
 		<dependency>
 			<groupId>javax.servlet.jsp.jstl</groupId>
