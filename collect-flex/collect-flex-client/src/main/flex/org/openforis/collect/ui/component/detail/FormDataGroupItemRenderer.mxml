@@ -78,8 +78,8 @@
 					}
 					for(var i:int = 0; i < numElements; i++) {
 						var el:IVisualElement = getElementAt(i);
-						if(el is MultipleEntityFormItem) {
-							MultipleEntityFormItem(el).maxWidth = maxAvailableWidth;
+						if(el is MultipleEntityAsTableFormItem) {
+							MultipleEntityAsTableFormItem(el).maxWidth = maxAvailableWidth;
 						}
 					}
 				}
