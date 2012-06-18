@@ -28,9 +28,11 @@ package org.openforis.collect.util
 		
 		private static var fixedCodeTextFormat:UITextFormat
 		private static var unitTextFormat:UITextFormat;
+		private static var gridHeaderFormat:UITextFormat;
 		{
 			fixedCodeTextFormat = createUITextFormat("spark.components.Label.fixedCode");
 			unitTextFormat = createUITextFormat("spark.components.Label.unit");
+			gridHeaderFormat = createUITextFormat("spark.components.Label.dataGroupHeader");
 		}
 		
 		private static function createUITextFormat(styleName:String):UITextFormat {
@@ -218,6 +220,11 @@ package org.openforis.collect.util
 		
 		public static function measureUnitWidth(text:String):Number {
 			var measure:TextLineMetrics = unitTextFormat.measureText(text);
+			return measure.width;
+		}
+		
+		public static function measureGridHeaderWidth(text:String):Number {
+			var measure:TextLineMetrics = gridHeaderFormat.measureText(text);
 			return measure.width;
 		}
 		

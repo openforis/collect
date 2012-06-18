@@ -236,7 +236,10 @@ package org.openforis.collect.ui {
 		public static function getInputFieldWidth(def:AttributeDefinitionProxy):Number {
 			var parentLayout:String = def.parentLayout;
 			if(def is BooleanAttributeDefinitionProxy) {
-				return 100;
+				var headerText:String = def.getLabelText();
+				var headerWidth:Number = UIUtil.measureGridHeaderWidth(headerText);
+				var width:Number = Math.max(headerWidth, 20);
+				return width;
 			} else if(def is CodeAttributeDefinitionProxy) {
 				if(parentLayout == UIUtil.LAYOUT_TABLE) {
 					if(def.key && def.parent.enumerable) {
@@ -308,7 +311,10 @@ package org.openforis.collect.ui {
 			var parentEntityDefn:EntityDefinitionProxy = def.parent;
 			if(ancestorEntity != null && parentEntityDefn.enumerable && def.key && def is CodeAttributeDefinitionProxy) {
 				var enumeratedCodeWidth:Number = ancestorEntity.getEnumeratedCodeWidth(parentEntityDefn.name);
-				return enumeratedCodeWidth + 2;
+				var headerText:String = def.getLabelText();
+				var headerWidth:Number = UIUtil.measureGridHeaderWidth(headerText);
+				var width:Number = Math.max(headerWidth, enumeratedCodeWidth);
+				return width + 2;
 			} else {
 				var inputFieldWidth:Number = getInputFieldWidth(def);
 				if(!isNaN(inputFieldWidth)) {
@@ -444,7 +450,7 @@ package org.openforis.collect.ui {
 			var l:Label;
 			if(defn is TaxonAttributeDefinitionProxy) {
 				//attribute label
-				l = getLabel(defn.getLabelText(), 100, "bold");
+				l = getLabel(defn.getLabelText(), 100, "dataGroupHeader");
 				result.addElement(l);
 				//subheader
 				h = new HGroup();

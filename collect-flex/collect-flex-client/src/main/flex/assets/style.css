@@ -244,16 +244,11 @@ input|TaxonAutoCompletePopUp s|DataGrid {
 	alternatingRowColors: #FFFFFF, #E9E9E9;
 }
 
-s|Label.bold {
+s|Label.bold, .formLabel {
 	fontWeight: bold;
 }
 
-s|Label.fixedCode {
-	fontSize: 10;
-	fontFamily: Verdana;
-}
-
-s|Label.unit {
+s|Label.fixedCode, s|Label.unit {
 	fontSize: 10;
 	fontFamily: Verdana;
 }
@@ -283,8 +278,10 @@ s|Label.indent {
 	skinClass: ClassReference("org.openforis.collect.ui.skin.DataGroupHeaderSkin");
 }
 
-.formLabel {
+s|Label.dataGroupHeader {
 	fontWeight: bold;
+	font-size: 10;
+	fontFamily: Verdana;
 }
 
 .infoMessage {
