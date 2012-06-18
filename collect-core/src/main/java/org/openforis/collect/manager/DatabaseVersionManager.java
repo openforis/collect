@@ -16,6 +16,10 @@ public class DatabaseVersionManager {
 
 	private static final String VOID_VERSION = "PROJECT_VERSION"; //token was not being replaced into version.properties in previous releases
 	
+	private static final String[] MIGRATION_VERSIONS = new String[]{
+		"3.0-Alpha2"
+	};
+	
 	@Autowired
 	private ApplicationInfoDao applicationInfoDao;
 	
@@ -36,8 +40,13 @@ public class DatabaseVersionManager {
 	private boolean isVersionCompatible(String appVersion, String schemaVersion) {
 		if ( ( schemaVersion == null && appVersion.equals(VOID_VERSION) ) || appVersion.equals(schemaVersion) ) {
 			return true;
-		} else  {
-			return false;
+		} else {
+			String lastMigrationVersion = MIGRATION_VERSIONS[MIGRATION_VERSIONS.length - 1];
+			if ( appVersion.compareTo(lastMigrationVersion) >= 0) {
+				return true;
+			} else {
+				return false;
+			}
 		}
 	}
 	
