@@ -25,7 +25,7 @@
 		<repository>
 			<id>releases</id>
 			<name>Repository with internal releases</name>
-			<url>${collect-repository.url}</url>
+			<url>${collect-internal-repository.url}</url>
 		</repository>
 	</distributionManagement>
 
