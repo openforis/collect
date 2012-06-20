@@ -10,20 +10,18 @@ import java.io.StringWriter;
 import java.net.URL;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openforis.collect.model.CollectRecord;
+import org.openforis.collect.model.CollectRecord.State;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.CollectSurveyContext;
 import org.openforis.collect.model.FieldSymbol;
 import org.openforis.collect.model.User;
-import org.openforis.collect.persistence.SurveyDao;
-import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.collect.persistence.xml.CollectIdmlBindingContext;
 import org.openforis.collect.persistence.xml.DataHandler;
 import org.openforis.collect.persistence.xml.DataMarshaller;
@@ -32,14 +30,11 @@ import org.openforis.collect.persistence.xml.DataUnmarshallerException;
 import org.openforis.idm.metamodel.validation.Validator;
 import org.openforis.idm.metamodel.xml.InvalidIdmlException;
 import org.openforis.idm.metamodel.xml.SurveyUnmarshaller;
-import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Code;
 import org.openforis.idm.model.CodeAttribute;
 import org.openforis.idm.model.Coordinate;
 import org.openforis.idm.model.Date;
 import org.openforis.idm.model.Entity;
-import org.openforis.idm.model.Field;
-import org.openforis.idm.model.Node;
 import org.openforis.idm.model.RealAttribute;
 import org.openforis.idm.model.Time;
 import org.openforis.idm.model.expression.ExpressionFactory;
@@ -124,7 +119,8 @@ public class DataMarshallerIntegrationTest {
 		record.setCreationDate(new GregorianCalendar(2011, 12, 31, 23, 59).getTime());
 		record.setModifiedDate(new GregorianCalendar(2012, 2, 3, 9, 30).getTime());
 		record.setStep(Step.ENTRY);
-
+		record.setState(State.REJECTED);
+		
 		addTestValues(cluster);
 
 		//update counts and keys
@@ -146,7 +142,7 @@ public class DataMarshallerIntegrationTest {
 		cluster.addValue("map_sheet", "value 2");
 		cluster.addValue("vehicle_location", new Coordinate((double)432423423l, (double)4324324l, "srs"));
 		cluster.addValue("gps_model", "TomTom 1.232");
-		cluster.setChildState("accessibility", 1);
+		record.setMissingApproved(cluster, "accessibility", true);
 		{
 			Entity ts = cluster.addEntity("time_study");
 			ts.addValue("date", new Date(2011,2,14));

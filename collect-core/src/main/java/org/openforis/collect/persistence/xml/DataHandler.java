@@ -12,6 +12,7 @@ import javax.xml.bind.DatatypeConverter;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.model.CollectRecord;
+import org.openforis.collect.model.CollectRecord.State;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.FieldSymbol;
 import org.openforis.collect.model.User;
@@ -127,7 +128,9 @@ public class DataHandler extends DefaultHandler {
 				fail("Missing version number");
 			} else {
 				record = new CollectRecord(survey, version);
-				
+				String stateAttr = attributes.getValue(ATTRIBUTE_STATE);
+				State state = State.fromCode(stateAttr);
+				record.setState(state);
 				Date created = parseDateTime(attributes.getValue(ATTRIBUTE_DATE_CREATED));
 				Date modified = parseDateTime(attributes.getValue(ATTRIBUTE_DATE_MODIFIED));
 				record.setCreationDate(created);
