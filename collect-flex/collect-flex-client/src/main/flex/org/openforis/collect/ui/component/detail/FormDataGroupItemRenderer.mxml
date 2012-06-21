@@ -62,8 +62,8 @@
 					maxAvailableHeight -= 10; //padding difficult to extimate...
 					for(var i:int = 0; i < numElements; i++) {
 						var el:IVisualElement = getElementAt(i);
-						if(el is MultipleEntityFormItem) {
-							MultipleEntityFormItem(el).maxHeight = maxAvailableHeight;
+						if(el is MultipleEntityAsTableFormItem) {
+							MultipleEntityAsTableFormItem(el).maxHeight = maxAvailableHeight;
 						}
 					}
 				}
