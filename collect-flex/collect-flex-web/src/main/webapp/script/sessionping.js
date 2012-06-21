@@ -5,7 +5,7 @@
 			_local,
 			timeout,
 			defaults = {
-				time: 1 * 60 * 1000, // time in miliseconds
+				time: 60 * 1000, // time in miliseconds
 				address: window.location.href
 			},
 			settings;
