@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>collect-flex</artifactId>
 		<groupId>org.openforis.collect</groupId>
-		<version>3.0-Alpha3-SNAPSHOT</version>
+		<version>3.0-Alpha2-SP1</version>
 		<relativePath>..</relativePath>
 	</parent>
 
@@ -235,14 +235,14 @@
 		<dependency>
 			<groupId>org.openforis.collect</groupId>
 			<artifactId>collect-core</artifactId>
-			<version>${project.version}</version>
+			<version>3.0-Alpha2-SP1</version>
 			<scope>provided</scope>
 			<type>jar</type>
 		</dependency>
 		<dependency>
 			<groupId>org.openforis.collect</groupId>
 			<artifactId>collect-flex-server</artifactId>
-			<version>${project.version}</version>
+			<version>3.0-Alpha2-SP1</version>
 			<scope>provided</scope>
 			<type>jar</type>
 		</dependency>
