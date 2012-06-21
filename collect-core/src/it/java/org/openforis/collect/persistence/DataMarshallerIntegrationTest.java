@@ -146,7 +146,7 @@ public class DataMarshallerIntegrationTest {
 		cluster.addValue("map_sheet", "value 2");
 		cluster.addValue("vehicle_location", new Coordinate((double)432423423l, (double)4324324l, "srs"));
 		cluster.addValue("gps_model", "TomTom 1.232");
-		cluster.setChildState("accessibility", 1);
+		record.setMissingApproved(cluster, "accessibility", true);
 		{
 			Entity ts = cluster.addEntity("time_study");
 			ts.addValue("date", new Date(2011,2,14));
