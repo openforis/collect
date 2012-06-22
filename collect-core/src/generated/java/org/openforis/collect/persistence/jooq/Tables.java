@@ -33,11 +33,6 @@ public final class Tables {
 	public static org.openforis.collect.persistence.jooq.tables.OfcRecord OFC_RECORD = org.openforis.collect.persistence.jooq.tables.OfcRecord.OFC_RECORD;
 
 	/**
-	 * The table collect.ofc_schema_definition
-	 */
-	public static org.openforis.collect.persistence.jooq.tables.OfcSchemaDefinition OFC_SCHEMA_DEFINITION = org.openforis.collect.persistence.jooq.tables.OfcSchemaDefinition.OFC_SCHEMA_DEFINITION;
-
-	/**
 	 * The table collect.ofc_survey
 	 */
 	public static org.openforis.collect.persistence.jooq.tables.OfcSurvey OFC_SURVEY = org.openforis.collect.persistence.jooq.tables.OfcSurvey.OFC_SURVEY;
