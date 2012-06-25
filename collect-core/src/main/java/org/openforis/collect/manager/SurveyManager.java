@@ -3,6 +3,7 @@
  */
 package org.openforis.collect.manager;
 
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -20,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author M. Togna
+ * @author S. Ricci
  * 
  */
 public class SurveyManager {
@@ -63,6 +65,23 @@ public class SurveyManager {
 			summaries.add(summary);
 		}
 		return summaries;
+	}
+	
+	public String marshalSurvey(Survey survey)  {
+		try {
+			String result = surveyDao.marshalSurvey(survey);
+			return result;
+		} catch (SurveyImportException e) {
+			throw new RuntimeException(e.getMessage(), e);
+		}
+	}
+
+	public void marshalSurvey(Survey survey, OutputStream os)  {
+		try {
+			surveyDao.marshalSurvey(survey, os);
+		} catch (SurveyImportException e) {
+			throw new RuntimeException(e.getMessage(), e);
+		}
 	}
 
 	private String getProjectName(Survey survey, String lang) {

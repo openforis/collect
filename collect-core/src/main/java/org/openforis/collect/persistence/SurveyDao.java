@@ -7,6 +7,7 @@ import static org.openforis.collect.persistence.jooq.tables.OfcSurvey.OFC_SURVEY
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -146,16 +147,24 @@ public class SurveyDao extends JooqDaoSupport {
 		return survey;
 	}
 
-	private String marshalSurvey(Survey survey) throws SurveyImportException {
+	public String marshalSurvey(Survey survey) throws SurveyImportException {
 		try {
 			// Serialize Survey to XML
 			ByteArrayOutputStream os = new ByteArrayOutputStream();
+			marshalSurvey(survey, os);
+			return os.toString("UTF-8");
+		} catch (IOException e) {
+			throw new SurveyImportException("Error marshalling survey", e);
+		}
+	}
+	
+	public void marshalSurvey(Survey survey, OutputStream os) throws SurveyImportException {
+		try {
 			SurveyMarshaller sm = bindingContext.createSurveyMarshaller();
 			sm.setIndent(true);
 			sm.marshal(survey, os);
-			return os.toString("UTF-8");
 		} catch (IOException e) {
-			throw new SurveyImportException("Error unmarshalling survey", e);
+			throw new SurveyImportException("Error marshalling survey", e);
 		}
 	}
 

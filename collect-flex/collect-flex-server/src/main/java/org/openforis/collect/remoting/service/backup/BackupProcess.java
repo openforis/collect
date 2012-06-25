@@ -3,6 +3,7 @@ package org.openforis.collect.remoting.service.backup;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -12,6 +13,7 @@ import java.util.zip.ZipOutputStream;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openforis.collect.manager.RecordManager;
+import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.RecordSummarySortField;
@@ -28,8 +30,11 @@ import org.openforis.collect.remoting.service.export.DataExportState.Format;
 public class BackupProcess implements Callable<Void>, DataExportProcess {
 
 	private static Log LOG = LogFactory.getLog(BackupProcess.class);
-	
+
+	private static final String FILE_NAME = "data.zip";
+
 	private RecordManager recordManager;
+	private SurveyManager surveyManager;
 	private DataMarshaller dataMarshaller;
 	
 	private File directory;
@@ -38,9 +43,10 @@ public class BackupProcess implements Callable<Void>, DataExportProcess {
 	private int[] stepNumbers;
 	private String rootEntityName;
 	
-	public BackupProcess(RecordManager recordManager, DataMarshaller dataMarshaller, File directory,
+	public BackupProcess(SurveyManager surveyManager, RecordManager recordManager, DataMarshaller dataMarshaller, File directory,
 			CollectSurvey survey, String rootEntityName, int[] stepNumbers) {
 		super();
+		this.surveyManager = surveyManager;
 		this.recordManager = recordManager;
 		this.dataMarshaller = dataMarshaller;
 		this.directory = directory;
@@ -78,7 +84,7 @@ public class BackupProcess implements Callable<Void>, DataExportProcess {
 			List<CollectRecord> recordSummaries = loadAllSummaries();
 			if ( recordSummaries != null && stepNumbers != null ) {
 				state.setRunning(true);
-				String fileName = "data.zip";
+				String fileName = FILE_NAME;
 				File file = new File(directory, fileName);
 				if (file.exists()) {
 					file.delete();
@@ -105,12 +111,13 @@ public class BackupProcess implements Callable<Void>, DataExportProcess {
 	private void backup(ZipOutputStream zipOutputStream, List<CollectRecord> recordSummaries) {
 		int total = calculateTotal(recordSummaries);
 		state.setTotal(total);
+		includeIdml(zipOutputStream);
 		for (CollectRecord summary : recordSummaries) {
 			if ( ! state.isCancelled() ) {
 				int recordStepNumber = summary.getStep().getStepNumber();
 				for (int stepNum: stepNumbers) {
 					if ( stepNum <= recordStepNumber) {
-						backup(summary, stepNum, zipOutputStream);
+						backup(zipOutputStream, summary, stepNum);
 						state.incrementCount();
 					}
 				}
@@ -139,7 +146,27 @@ public class BackupProcess implements Callable<Void>, DataExportProcess {
 		return count;
 	}
 	
-	private synchronized void backup(CollectRecord summary, int stepNumber, ZipOutputStream zipOutputStream) {
+	private void includeIdml(ZipOutputStream zipOutputStream) {
+		String entryFileName = "idml.xml";
+		ZipEntry entry = new ZipEntry(entryFileName);
+		try {
+			zipOutputStream.putNextEntry(entry);
+			surveyManager.marshalSurvey(survey, zipOutputStream);
+//			String surveyMarshalled = surveyManager.marshalSurvey(survey);
+//			PrintWriter printWriter = new PrintWriter(zipOutputStream);
+//			printWriter.write(surveyMarshalled);
+			zipOutputStream.closeEntry();
+			zipOutputStream.flush();
+		} catch (IOException e) {
+			String message = "Error while including idml into zip file: " + e.getMessage();
+			if (LOG.isErrorEnabled()) {
+				LOG.error(message, e);
+			}
+			throw new RuntimeException(message, e);
+		}
+	}
+	
+	private void backup(ZipOutputStream zipOutputStream, CollectRecord summary, int stepNumber) {
 		Integer id = summary.getId();
 		try {
 			CollectRecord record = recordManager.load(survey, id, stepNumber);
@@ -151,7 +178,7 @@ public class BackupProcess implements Callable<Void>, DataExportProcess {
 			zipOutputStream.closeEntry();
 			zipOutputStream.flush();
 		} catch (Exception e) {
-			String message = "Error while backing up " + id;
+			String message = "Error while backing up " + id + " " + e.getMessage();
 			if (LOG.isErrorEnabled()) {
 				LOG.error(message, e);
 			}

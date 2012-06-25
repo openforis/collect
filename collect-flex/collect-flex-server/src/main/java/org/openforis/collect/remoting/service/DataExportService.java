@@ -6,6 +6,7 @@ import javax.servlet.ServletContext;
 
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SessionManager;
+import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.persistence.xml.DataMarshaller;
@@ -31,6 +32,9 @@ public class DataExportService {
 	
 	@Autowired
 	private SessionManager sessionManager;
+
+	@Autowired
+	private SurveyManager surveyManager;
 
 	@Autowired
 	private RecordManager recordManager;
@@ -91,7 +95,7 @@ public class DataExportService {
 			if ( stepNumbers == null ) {
 				stepNumbers = getAllStepNumbers();
 			}
-			BackupProcess process = new BackupProcess(recordManager, dataMarshaller, exportDir, survey, rootEntityName, stepNumbers);
+			BackupProcess process = new BackupProcess(surveyManager, recordManager, dataMarshaller, exportDir, survey, rootEntityName, stepNumbers);
 			dataExportProcess = process;
 			ExecutorServiceUtil.executeInCachedPool(process);
 		}

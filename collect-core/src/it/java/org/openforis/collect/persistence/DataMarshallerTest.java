@@ -113,13 +113,6 @@ public class DataMarshallerTest {
 		//test blank child state
 		res = evaluateXPathExpression(doc, "cluster/id/@state");
 		assertEquals("", res);
-		
-		//test definition id
-		res = evaluateXPathExpression(doc, "cluster/id/@defn");
-		Schema schema = survey.getSchema();
-		NodeDefinition nodeDefn = schema.getByPath("/cluster/id");
-		Integer nodeDefnId = nodeDefn.getId();
-		assertEquals(nodeDefnId.toString(), res);
 	}
 	
 	private CollectRecord createTestRecord(CollectSurvey survey) {
