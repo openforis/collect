@@ -7,7 +7,6 @@ import java.util.List;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
@@ -32,7 +31,7 @@ import org.springframework.web.bind.annotation.RequestParam;
  *
  */
 @Controller
-public class ValidationController {
+public class ValidationController extends BasicController {
 	private static Log LOG = LogFactory.getLog(ValidationController.class);
 	
 	@Autowired
@@ -77,19 +76,6 @@ public class ValidationController {
 			outputStream.println("ERROR - Validation of records not completed: " + e.getMessage());
 			LOG.error(e.getMessage(), e);
 			throw new RuntimeException(e);
-		}
-	}
-	
-	private SessionState getSessionState(HttpServletRequest request) {
-		HttpSession session = request.getSession();
-		SessionState sessionState = null;
-		if(session != null) {
-			sessionState = (SessionState) session.getAttribute(SessionState.SESSION_ATTRIBUTE_NAME);
-		}
-		if ( sessionState == null ) {
-			throw new RuntimeException("Invalid session or user not correctly logged in");
-		} else {
-			return sessionState;
 		}
 	}
 	

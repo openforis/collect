@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
  * 
  */
 @Controller
-public class DataExportDownloadController {
+public class DataExportDownloadController extends BasicController {
 
 	private static final String EXPORT_PATH = "export";
 
@@ -37,7 +37,7 @@ public class DataExportDownloadController {
 			String path = buildDataExportFilePath(request);
 			File file = new File(path);
 			if ( file.exists() ) {
-				write(response, file);
+				writeFileToResponse(response, file);
 			} else {
 				throw new IOException("Data export file not found");
 			}
@@ -59,42 +59,4 @@ public class DataExportDownloadController {
 		return sb.toString();
 	}
 
-	private SessionState getSessionState(HttpServletRequest request) {
-		HttpSession session = request.getSession();
-		if(session != null) {
-			SessionState sessionState = (SessionState) session.getAttribute(SessionState.SESSION_ATTRIBUTE_NAME);
-			return sessionState;
-		}
-		return null;
-	}
-	
-	private void write(HttpServletResponse response, File file) throws IOException {
-		FileInputStream is = null;
-		BufferedInputStream buf = null;
-		try {
-			String name = file.getName();
-			String contentType = MimetypesFileTypeMap.getDefaultFileTypeMap().getContentType(name);
-			response.setContentType(contentType); 
-			response.setContentLength(new Long(file.length()).intValue());
-			response.setHeader("Content-Disposition", "attachment; filename=" + name);
-			ServletOutputStream outputStream = response.getOutputStream();
-			is = new FileInputStream(file);
-			buf = new BufferedInputStream(is);
-			int readBytes = 0;
-			//read from the file; write to the ServletOutputStream
-			while ((readBytes = buf.read()) != -1) {
-				outputStream.write(readBytes);
-			}
-		} catch (IOException e) {
-			throw e;
-		} finally {
-			if ( buf != null) {
-				buf.close();
-			}
-			if ( is != null ) {
-				is.close();
-			}
-		}
-	}
-	
 }
