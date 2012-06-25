@@ -9,6 +9,7 @@ import javax.servlet.ServletContext;
 
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SessionManager;
+import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.persistence.xml.DataMarshaller;
 import org.openforis.collect.remoting.service.backup.BackupProcess;
@@ -27,6 +28,9 @@ public class BackupService {
 	
 	@Autowired
 	private SessionManager sessionManager;
+	
+	@Autowired
+	private SurveyManager surveyManager;
 	
 	@Autowired
 	private RecordManager recordManager;
@@ -100,7 +104,7 @@ public class BackupService {
 		BackupProcess backup = backupsPerSurvey.get(rootEntityName);
 		if (backup == null) {
 			int[] stepNumbers = {1, 2, 3};
-			backup = new BackupProcess(recordManager, dataMarshaller, backupDirectory, survey, rootEntityName, stepNumbers );
+			backup = new BackupProcess(surveyManager, recordManager, dataMarshaller, backupDirectory, survey, rootEntityName, stepNumbers );
 			backupsPerSurvey.put(rootEntityName, backup);
 		}
 		return backup;

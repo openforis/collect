@@ -66,7 +66,6 @@
 	<!-- ===================================== -->
 	<!-- GraniteDs services -->
 	<!-- ===================================== -->
-	<bean id="backupService" 	class="org.openforis.collect.remoting.service.BackupService" autowire="byName" init-method="init" />
 	<bean id="dataService" 		class="org.openforis.collect.remoting.service.DataService" autowire="byName" />
 	<bean id="dataExportService" class="org.openforis.collect.remoting.service.DataExportService" autowire="byName" init-method="init" scope="session" />
 	<bean id="logoService" 	class="org.openforis.collect.remoting.service.LogoService" autowire="byName" />
