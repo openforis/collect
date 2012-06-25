@@ -118,7 +118,7 @@ public class BackupProcess implements Callable<Void>, DataExportProcess {
 				for (int stepNum: stepNumbers) {
 					if ( stepNum <= recordStepNumber) {
 						backup(zipOutputStream, summary, stepNum);
-						state.incrementCount();
+						state.incrementInsertedCount();
 					}
 				}
 			} else {

@@ -147,7 +147,7 @@ public class SelectiveDataExportProcess implements Callable<Void>, DataExportPro
 				if ( stepNumber == s.getStep().getStepNumber() ) {
 					CollectRecord record = recordManager.load(survey, s.getId(), stepNumber);
 					modelWriter.printData(record);
-					state.incrementCount();
+					state.incrementInsertedCount();
 				}
 			} else {
 				break;
