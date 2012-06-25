@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	elementFormDefault="qualified" version="1.0"
+	xmlns:idml="http://www.openforis.org/idml/3.0" targetNamespace="http://www.openforis.org/collect/3.0/ui"
+	xmlns:ui="http://www.openforis.org/collect/3.0/ui" xmlns="http://www.openforis.org/idml/3.0">
+	<xs:annotation>
+		<xs:documentation xml:lang="en">
+			Inventory Data Modeling Language 3.0 - UI
+			S. Ricci
+		</xs:documentation>
+	</xs:annotation>
+
+	<xs:import namespace="http://www.w3.org/XML/1998/namespace"
+		schemaLocation="xml.xsd" />
+
+	<!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+	<!-- Types used throughout this schema -->
+	<!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+	<xs:complexType name="tabDefinition">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">
+				Tab definition for a root
+				entity
+			</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element minOccurs="0" name="tabs" type="ui:tabs">
+				<xs:annotation>
+					<xs:documentation xml:lang="en">
+						TO-DO
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+		<xs:attribute name="rootEntity" type="xs:string">
+			<xs:annotation>
+				<xs:documentation xml:lang="en">
+					Name of the
+					corresponding root entity
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:complexType>
+
+	<xs:complexType name="tabs">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">
+				Set of tabs defined for a
+				root entity
+			</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element minOccurs="1" maxOccurs="unbounded" name="tab"
+				type="ui:tab">
+				<xs:annotation>
+					<xs:documentation xml:lang="en">
+						TO-DO
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="tab">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">
+				TO-DO
+			</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element minOccurs="1" maxOccurs="1" name="label" type="xs:string">
+				<xs:annotation>
+					<xs:documentation xml:lang="en">
+						TO-DO
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element minOccurs="0" maxOccurs="1" name="tabs" type="ui:tabs">
+				<xs:annotation>
+					<xs:documentation xml:lang="en">
+						TO-DO
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+		<xs:attribute name="name" type="xs:string">
+			<xs:annotation>
+				<xs:documentation xml:lang="en">
+					TO-DO
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:complexType>
+
+	<xs:element name="flex" id="flex">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">
+				Top level element
+				representing the Adobe Flex client configuration
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="tabDefinition" type="ui:tabDefinition"
+					minOccurs="1" maxOccurs="unbounded">
+					<xs:annotation>
+						<xs:documentation xml:lang="en">
+							TO-TO
+						</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+</xs:schema> 
+    
