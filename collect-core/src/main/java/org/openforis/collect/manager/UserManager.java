@@ -3,6 +3,8 @@
  */
 package org.openforis.collect.manager;
 
+import java.util.List;
+
 import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.UserDao;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,5 +31,9 @@ public class UserManager {
 	
 	public User loadByUserName(String userName){
 		return userDao.loadByUserName(userName);
+	}
+	
+	public List<User> loadAll() {
+		return userDao.loadAll();
 	}
 }
