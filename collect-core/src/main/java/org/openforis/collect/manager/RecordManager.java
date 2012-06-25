@@ -272,6 +272,16 @@ public class RecordManager {
 		recordDao.update( record );
 	}
 	
+	@Transactional
+	public void validate(CollectSurvey survey, User user, String sessionId, int recordId, Step step) throws RecordLockedException, MultipleEditException {
+		isLockAllowed(user, recordId, sessionId, true);
+		lock(recordId, user, sessionId, true);
+		CollectRecord record = recordDao.load(survey, recordId, step.getStepNumber());
+		record.updateDerivedStates();
+		recordDao.update(record);
+		releaseLock(recordId);
+	}
+	
 	public Entity addEntity(Entity parentEntity, String nodeName) {
 		Entity entity = parentEntity.addEntity(nodeName);
 		addEmptyNodes(entity);
