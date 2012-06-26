@@ -1,6 +1,6 @@
-package org.openforis.collect.remoting.service.export;
+package org.openforis.collect.remoting.service.dataExport;
 
-import org.openforis.collect.remoting.service.dataImport.DataProcessingState;
+import org.openforis.collect.remoting.service.dataProcessing.DataProcessingState;
 
 
 /**

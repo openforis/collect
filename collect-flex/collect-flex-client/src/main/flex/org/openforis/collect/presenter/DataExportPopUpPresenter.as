@@ -27,7 +27,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 	import org.openforis.collect.model.CollectRecord$Step;
 	import org.openforis.collect.model.NodeItem;
-	import org.openforis.collect.remoting.service.export.DataExportState;
+	import org.openforis.collect.remoting.service.dataExport.DataExportState;
 	import org.openforis.collect.ui.component.DataExportPopUp;
 	import org.openforis.collect.ui.component.PopUp;
 	import org.openforis.collect.util.AlertUtil;

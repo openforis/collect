@@ -1,4 +1,4 @@
-package org.openforis.collect.remoting.service.dataImport;
+package org.openforis.collect.remoting.service.dataProcessing;
 
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 
@@ -15,9 +15,8 @@ public class DataProcessingState {
 	private boolean cancelled = false;
 	private boolean complete = false;
 
-	private int insertedCount;
-	private int updatedCount;
 	private int total;
+	private int count;
 
 	public DataProcessingState() {
 		super();
@@ -29,24 +28,17 @@ public class DataProcessingState {
 	}
 	
 	public void reset() {
-		insertedCount = 0;
+		count = 0;
+		total = 0;
 		running = false;
 		complete = false;
 		error = false;
 	}
 	
-	public void incrementInsertedCount() {
-		insertedCount ++;
+	public void incrementCount() {
+		count++;
 	}
 	
-	public void incrementUpdatedCount() {
-		updatedCount ++;
-	}
-	
-	public boolean isExporting() {
-		return running;
-	}
-
 	public void setRunning(boolean running) {
 		this.running = running;
 	}
@@ -68,7 +60,7 @@ public class DataProcessingState {
 	}
 	
 	public int getCount() {
-		return insertedCount;
+		return count;
 	}
 
 	public int getTotal() {

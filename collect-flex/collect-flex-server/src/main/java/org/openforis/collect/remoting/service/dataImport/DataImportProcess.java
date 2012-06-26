@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -46,19 +47,19 @@ public class DataImportProcess implements Callable<Void> {
 	private RecordDao recordDao;
 	private SurveyManager surveyManager;
 	
-	private CollectSurvey survey;
-	private DataImportState state;
-	private String rootEntityName;
 	private Map<String, User> users;
+	private String surveyName;
+	private String rootEntityName;
+	private DataImportState state;
 	private File packagedFile;
 	
 	public DataImportProcess(SurveyManager surveyManager, RecordManager recordManager, Map<String, User> users, 
-			CollectSurvey survey, String rootEntityName, File packagedFile) {
+			String surveyName, String rootEntityName, File packagedFile) {
 		super();
 		this.surveyManager = surveyManager;
 		this.recordManager = recordManager;
 		this.users = users;
-		this.survey = survey;
+		this.surveyName = surveyName;
 		this.rootEntityName = rootEntityName;
 		this.packagedFile = packagedFile;
 		this.state = new DataImportState();
@@ -81,14 +82,52 @@ public class DataImportProcess implements Callable<Void> {
 		return state.isComplete();
 	}
 	
+	public void init() throws DataImportExeption {
+		try {
+			state.reset();
+			Map<Step, Integer> totalRecords = new HashMap<CollectRecord.Step, Integer>();
+			int total = 0;
+			ZipFile zipFile = new ZipFile(packagedFile);
+			Enumeration<? extends ZipEntry> entries = zipFile.entries();
+			while (entries.hasMoreElements()) {
+				ZipEntry zipEntry = (ZipEntry) entries.nextElement();
+				if ( zipEntry.isDirectory() ) {
+					continue;
+				}
+				String entryName = zipEntry.getName();
+				String filePathSeparator = /*Pattern.quote(File.separator);*/ Pattern.quote("/");
+				String[] entryNameSplitted = entryName.split(filePathSeparator);
+				String stepNumStr = entryNameSplitted[0];
+				int stepNum = Integer.parseInt(stepNumStr);
+				Step step = Step.valueOf(stepNum);
+				Integer totalPerStep = totalRecords.get(step);
+				if ( totalPerStep == null ) {
+					totalPerStep = 0;
+				}
+				totalRecords.put(step, totalPerStep + 1);
+				total ++;
+			}
+			state.setTotal(total);
+			state.setTotalPerStep(totalRecords);
+		} catch (Exception e) {
+			throw new DataImportExeption("Error initializing data import process", e);
+		}
+	}
+	
 	@Override
 	public Void call() throws Exception {
 		try {
-			state.reset();
+			CollectSurvey packagedSurvey = extractIdml();
+
+			CollectSurvey existingSurvey = surveyManager.get(surveyName);
+			
+			//TODO compare packaged survey with the one into db matching surveyName (if any)
+			CollectSurvey survey = existingSurvey;
+			
 			DataHandler handler = new DataHandler(survey, users);
+			
 			DataUnmarshaller dataUnmarshaller = new DataUnmarshaller(handler);
 
-			//CollectSurvey packagedSurvey = extractIdml();
 			Step[] steps = Step.values();
 			for (Step step : steps) {
 				ZipFile zipFile = new ZipFile(packagedFile);
@@ -119,7 +158,7 @@ public class DataImportProcess implements Callable<Void> {
 						state.addSkipped(entryName);
 					} else {
 						parsedRecord.setStep(step);
-						CollectRecord oldRecord = findExistingRecord(parsedRecord);
+						CollectRecord oldRecord = findExistingRecord(survey, parsedRecord);
 						if ( oldRecord != null ) {
 							replaceData(parsedRecord, oldRecord);
 							recordDao.update(oldRecord);
@@ -155,7 +194,7 @@ public class DataImportProcess implements Callable<Void> {
 		return null;
 	}
 	
-	private CollectRecord findExistingRecord(CollectRecord parsedRecord) {
+	private CollectRecord findExistingRecord(CollectSurvey survey, CollectRecord parsedRecord) {
 		List<String> keyValues = parsedRecord.getRootEntityKeyValues();
 		List<CollectRecord> oldRecords = recordDao.loadSummaries(survey, rootEntityName, keyValues.toArray(new String[0]));
 		if ( oldRecords != null && oldRecords.size() == 1 ) {

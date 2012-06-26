@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.openforis.collect.remoting.service.export;
+package org.openforis.collect.remoting.service.dataExport;
 
 /**
  * @author S. Ricci

@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.openforis.collect.model.CollectRecord.Step;
+import org.openforis.collect.remoting.service.dataProcessing.DataProcessingState;
 
 
 /**
@@ -19,10 +20,15 @@ public class DataImportState extends DataProcessingState {
 	private Map<String, String> errors;
 	private Map<String, String> warnings;
 	
-	private Map<Step, Integer> totalRecords;
+	private Map<Step, Integer> totalPerStep;
 	
+	private int insertedCount;
+	private int updatedCount;
+
 	public DataImportState() {
 		super();
+		insertedCount = 0;
+		updatedCount = 0;
 		skippedFileNames = new ArrayList<String>();
 		errors = new HashMap<String, String>();
 		warnings = new HashMap<String, String>();
@@ -43,6 +49,33 @@ public class DataImportState extends DataProcessingState {
 	public List<String> getSkippedFileNames() {
 		return skippedFileNames;
 	}
+
+	public Map<Step, Integer> getTotalPerStep() {
+		return totalPerStep;
+	}
+
+	public void setTotalPerStep(Map<Step, Integer> totalPerStep) {
+		this.totalPerStep = totalPerStep;
+	}
+	
+	public void incrementInsertedCount() {
+		insertedCount ++;
+	}
+	
+	public void incrementUpdatedCount() {
+		updatedCount ++;
+	}
+
+	public int getInsertedCount() {
+		return insertedCount;
+	}
+
+	public int getUpdatedCount() {
+		return updatedCount;
+	}
+	
+	
+	
 	
 //	public class RecordEntry {
 //		

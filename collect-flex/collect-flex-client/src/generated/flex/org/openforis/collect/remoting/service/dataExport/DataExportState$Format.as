@@ -5,12 +5,12 @@
  * THE GENERATOR.
  */
 
-package org.openforis.collect.remoting.service.export {
+package org.openforis.collect.remoting.service.dataExport {
 
     import org.granite.util.Enum;
 
     [Bindable]
-    [RemoteClass(alias="org.openforis.collect.remoting.service.export.DataExportState$Format")]
+    [RemoteClass(alias="org.openforis.collect.remoting.service.dataExport.DataExportState$Format")]
     public class DataExportState$Format extends Enum {
 
         public static const XML:DataExportState$Format = new DataExportState$Format("XML", _);

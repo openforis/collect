@@ -1,4 +1,4 @@
-package org.openforis.collect.remoting.service.export;
+package org.openforis.collect.remoting.service.dataExport;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -21,7 +21,7 @@ import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.RecordSummarySortField;
 import org.openforis.collect.persistence.RecordPersistenceException;
-import org.openforis.collect.remoting.service.export.DataExportState.Format;
+import org.openforis.collect.remoting.service.dataExport.DataExportState.Format;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -147,7 +147,7 @@ public class SelectiveDataExportProcess implements Callable<Void>, DataExportPro
 				if ( stepNumber == s.getStep().getStepNumber() ) {
 					CollectRecord record = recordManager.load(survey, s.getId(), stepNumber);
 					modelWriter.printData(record);
-					state.incrementInsertedCount();
+					state.incrementCount();
 				}
 			} else {
 				break;

@@ -1,4 +1,4 @@
-package org.openforis.collect.remoting.service.backup;
+package org.openforis.collect.remoting.service.dataExport;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -18,9 +18,7 @@ import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.RecordSummarySortField;
 import org.openforis.collect.persistence.xml.DataMarshaller;
-import org.openforis.collect.remoting.service.export.DataExportProcess;
-import org.openforis.collect.remoting.service.export.DataExportState;
-import org.openforis.collect.remoting.service.export.DataExportState.Format;
+import org.openforis.collect.remoting.service.dataExport.DataExportState.Format;
 
 /**
  * 
@@ -118,7 +116,7 @@ public class BackupProcess implements Callable<Void>, DataExportProcess {
 				for (int stepNum: stepNumbers) {
 					if ( stepNum <= recordStepNumber) {
 						backup(zipOutputStream, summary, stepNum);
-						state.incrementInsertedCount();
+						state.incrementCount();
 					}
 				}
 			} else {
