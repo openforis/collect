@@ -41,7 +41,7 @@
 					var firstNode:Object = nodeDefinitions.getItemAt(0);
 					if(firstNode is EntityDefinitionProxy) {
 						var entity:EntityDefinitionProxy = EntityDefinitionProxy(firstNode);
-						if(entity.multiple && entity.layout == UIUtil.LAYOUT_TABLE) {
+						if(entity.multiple /*&& entity.layout == UIUtil.LAYOUT_TABLE*/) {
 							state = STATE_MULTIPLE_ENTITY;
 						}
 					}
@@ -106,7 +106,16 @@
 				 excludeFrom="default"
 				 >
 		<s:layout>
-			<s:VerticalLayout gap="5" paddingBottom="10" paddingLeft="10" paddingRight="0" paddingRight.multipleEntity="10" paddingTop="10" />
+			<s:VerticalLayout gap="5" 
+							  paddingBottom="10" 
+							  paddingLeft="10" 
+							  paddingRight="10"
+							  paddingTop="10"
+							  paddingBottom.multipleEntity="0" 
+							  paddingLeft.multipleEntity="0" 
+							  paddingRight.multipleEntity="0" 
+							  paddingTop.multipleEntity="0" 
+			/>
 		</s:layout>
 		<s:itemRenderer>
 			<fx:Component>

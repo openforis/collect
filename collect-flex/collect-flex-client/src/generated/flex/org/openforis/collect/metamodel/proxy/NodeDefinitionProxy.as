@@ -17,6 +17,8 @@ package org.openforis.collect.metamodel.proxy {
     [RemoteClass(alias="org.openforis.collect.metamodel.proxy.NodeDefinitionProxy")]
     public class NodeDefinitionProxy extends NodeDefinitionProxyBase {
 		
+		private var _survey:SurveyProxy;
+		
 		public function getLabelText(language:String = null, firstIfNotFound:Boolean = true):String {
 			var labelTypes:Array = [NodeLabelProxy$Type.INSTANCE, NodeLabelProxy$Type.HEADING, null];
 			var label:NodeLabelProxy = null;
@@ -55,6 +57,17 @@ package org.openforis.collect.metamodel.proxy {
 			return result;
 		}
 		
+		public function get rootEntity():EntityDefinitionProxy {
+			var parentEntity:EntityDefinitionProxy = this.parent;
+			if ( parentEntity == null ) {
+				return this as EntityDefinitionProxy;
+			}
+			while ( parentEntity.parent != null ) {
+				parentEntity = parentEntity.parent;
+			}
+			return parentEntity;
+		}
+		
 		[Bindable]
 		public function get parentLayout():String {
 			if(parent != null) {
@@ -62,6 +75,14 @@ package org.openforis.collect.metamodel.proxy {
 			} else {
 				return UIUtil.LAYOUT_FORM;
 			}
+		}
+		
+		public function get survey():SurveyProxy {
+			return _survey;
+		}
+		
+		public function set survey(value:SurveyProxy):void {
+			_survey = value;
 		}
     }
 }

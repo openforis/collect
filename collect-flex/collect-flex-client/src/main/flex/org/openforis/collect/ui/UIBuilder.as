@@ -22,6 +22,8 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.metamodel.proxy.NumberAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.NumberAttributeDefinitionProxy$Type;
 	import org.openforis.collect.metamodel.proxy.RangeAttributeDefinitionProxy;
+	import org.openforis.collect.metamodel.proxy.SchemaProxy;
+	import org.openforis.collect.metamodel.proxy.SurveyProxy;
 	import org.openforis.collect.metamodel.proxy.TaxonAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.TextAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.TextAttributeDefinitionProxy$Type;
@@ -63,6 +65,8 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.ui.component.input.StringInputField;
 	import org.openforis.collect.ui.component.input.TaxonAttributeRenderer;
 	import org.openforis.collect.ui.component.input.TimeAttributeRenderer;
+	import org.openforis.collect.util.CollectionUtil;
+	import org.openforis.collect.util.StringUtil;
 	import org.openforis.collect.util.UIUtil;
 	
 	import spark.components.HGroup;
@@ -88,19 +92,16 @@ package org.openforis.collect.ui {
 			form.modelVersion = version;
 			
 			var uiConfig:UIConfiguration = Application.activeSurvey.uiConfiguration;
-			var tabs:ListCollectionView = null;
+			var uiTabDefn:UITabDefinition = getRootEntityTabDefinition(Application.activeSurvey, rootEntity);
 			var uiTab:UITab = null;
-			if(uiConfig != null) {
-				var tabDef:UITabDefinition = uiConfig.getTabDefinition(rootEntity.name);
-				if(tabDef != null) {
-					tabs = tabDef.tabs;
-					uiTab = tabDef.getTab(rootEntity.name);
+			if (uiTabDefn != null ) {
+				uiTab = uiTabDefn.getTab(rootEntity.uiTabName);
+				if ( uiTab != null ) {
+					form.uiTabs = uiTab.tabs;
 				}
 			}
-			form.uiTabs = uiTab != null ? uiTab.tabs: null;
 			form.build();
-			
-			if(uiTab !=null){
+			if(uiTab != null){
 				form.label = uiTab.label;
 			} else {
 				form.label = rootEntity.getLabelText();
@@ -113,8 +114,8 @@ package org.openforis.collect.ui {
 			form.parentEntity = null;
 			BindingUtils.bindProperty(form, "entity", formContainer, ["record", "rootEntity"]);
 			
-			if(tabs != null) {
-				for each (var tab:UITab in tabs) {
+			if ( uiTabDefn != null && uiTabDefn.tabs != null) {
+				for each (var tab:UITab in uiTabDefn.tabs) {
 					var childForm:EntityFormContainer = new EntityFormContainer();
 					childForm.label = tab.label;
 					var child:NodeDefinitionProxy = rootEntity.getChildDefinitionByTabName(tab.name);
@@ -532,6 +533,62 @@ package org.openforis.collect.ui {
 				}
 			}
 			return result;
+		}
+		
+		/**
+		 * Returns a list of lists of NodeDefinitionProxy object.
+		 * Each item of the list is a list of node definitions associated to the tab in that index.
+		 **/
+		public static function getDefinitionsPerTab(uiTabs:IList, modelVersion:ModelVersionProxy, entityDefinition:EntityDefinitionProxy):IList {
+			var totalTabs:int = 1 + (uiTabs != null ? uiTabs.length: 0);
+			//init an empty list for each tab
+			var temp:Array = new Array(totalTabs);
+			for(var i:int = 0; i < totalTabs; i ++) {
+				temp[i] = new ArrayCollection();
+			}
+			//put each definition in the corresponding list per tab
+			var childDefns:IList = UIBuilder.getDefinitionsInVersion(entityDefinition.childDefinitions, modelVersion);
+			for each (var defn:NodeDefinitionProxy in childDefns) {
+				var tabName:String = defn.uiTabName;
+				var index:int = -1;
+				if(StringUtil.isBlank(tabName)) {
+					index = 0;
+				} else if(uiTabs != null) {
+					var tabIndex:int = CollectionUtil.getItemIndex(uiTabs, "name", tabName);
+					if(tabIndex >= 0) {
+						index = tabIndex + 1;
+					}
+				}
+				if(index >= 0) {
+					var nodeDefs:IList = temp[index];
+					nodeDefs.addItem(defn);
+				}
+			}
+			return new ArrayCollection(temp);
+		}
+		
+		public static function getRootEntityTabDefinition(survey:SurveyProxy, rootEntityDefinition:NodeDefinitionProxy):UITabDefinition {
+			var nodeName:String = rootEntityDefinition.name;
+			var uiConfig:UIConfiguration = survey.uiConfiguration;
+			var tabDef:UITabDefinition = null;
+			if(uiConfig != null) {
+				tabDef = uiConfig.getTabDefinition(nodeName);
+			}
+			return tabDef;
+		}
+		
+		public static function getUITab(nodeDefn:NodeDefinitionProxy):UITab {
+			var survey:SurveyProxy = nodeDefn.survey;
+			var rootEntity:EntityDefinitionProxy = nodeDefn.rootEntity;
+			var uiConfig:UIConfiguration = survey.uiConfiguration;
+			if ( uiConfig != null ) {
+				var tabDefn:UITabDefinition = uiConfig.getTabDefinition(rootEntity.name);
+				if ( tabDefn != null ) {
+					var tab:UITab = tabDefn.getTab(nodeDefn.uiTabName);
+					return tab;
+				}
+			}
+			return null;
 		}
 		
 	}

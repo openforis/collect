@@ -46,11 +46,11 @@ package org.openforis.collect.presenter
 			ChangeWatcher.watch(_view, "parentEntity", parentEntityChangeHandler);
 			
 			if(_view.entityDefinition != null && _view.entityDefinition.multiple && _view.entityDefinition.parent != null) {
-				_view.addButton.addEventListener(MouseEvent.CLICK, addButtonClickHandler);
-				_view.addButton.addEventListener(FocusEvent.FOCUS_IN, buttonFocusInHandler);
-				_view.deleteButton.addEventListener(MouseEvent.CLICK, deleteButtonClickHandler);
-				_view.deleteButton.addEventListener(FocusEvent.FOCUS_IN, buttonFocusInHandler);
-				_view.dropDownList.addEventListener(IndexChangeEvent.CHANGE, dropDownListChangeHandler);
+				_view.addSection.addButton.addEventListener(MouseEvent.CLICK, addButtonClickHandler);
+				_view.addSection.addButton.addEventListener(FocusEvent.FOCUS_IN, buttonFocusInHandler);
+				_view.addSection.deleteButton.addEventListener(MouseEvent.CLICK, deleteButtonClickHandler);
+				_view.addSection.deleteButton.addEventListener(FocusEvent.FOCUS_IN, buttonFocusInHandler);
+				_view.addSection.dropDownList.addEventListener(IndexChangeEvent.CHANGE, dropDownListChangeHandler);
 			}
 		}
 		
@@ -127,12 +127,12 @@ package org.openforis.collect.presenter
 		}
 		
 		protected function dropDownListChangeHandler(event:IndexChangeEvent):void {
-			var entity:EntityProxy = _view.dropDownList.selectedItem as EntityProxy;
+			var entity:EntityProxy = _view.addSection.dropDownList.selectedItem as EntityProxy;
 			selectEntity(entity);
 		}
 		
 		protected function selectEntity(entity:EntityProxy):void {
-			_view.dropDownList.selectedItem = entity;
+			_view.addSection.dropDownList.selectedItem = entity;
 			_view.entity = entity;
 			if(entity != null) {
 				selectFirstTab();

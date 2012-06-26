@@ -16,11 +16,13 @@ package org.openforis.collect.metamodel.proxy {
     [RemoteClass(alias="org.openforis.collect.metamodel.proxy.SchemaProxy")]
     public class SchemaProxy extends SchemaProxyBase {
 		
+		private var _survey:SurveyProxy;
+		
 		private var _definitionsMap:Dictionary;
 		
 		public function init():void {
 			_definitionsMap = new Dictionary();
-			traverse(addDefinitionToMap);
+			traverse(initDefinition);
 		}
 		
 		public function traverse(funct:Function):void {
@@ -36,13 +38,24 @@ package org.openforis.collect.metamodel.proxy {
 			}
 		}
 		
-		protected function addDefinitionToMap(defn:NodeDefinitionProxy):void {
+		protected function initDefinition(defn:NodeDefinitionProxy):void {
+			defn.survey = this.survey;
+			//add definition to map
 			_definitionsMap[defn.id] = defn;
 		}
 		
 		public function getDefinitionById(id:int):NodeDefinitionProxy {
 			return _definitionsMap[id];
 		}
+
+		public function get survey():SurveyProxy {
+			return _survey;
+		}
+
+		public function set survey(value:SurveyProxy):void {
+			_survey = value;
+		}
+
 		
     }
 }

@@ -6,7 +6,7 @@
 					xmlns:layout="org.openforis.collect.ui.layout.*"
 					width="100%" height="100%"
 					creationComplete="creationCompleteHandler(event)"
-					creationPolicy="all" 
+					creationPolicy="all" xmlns:component="org.openforis.collect.ui.component.*" 
 					>
 	
 	<fx:Script>
@@ -36,7 +36,7 @@
 		
 			private var _modelVersion:ModelVersionProxy;
 			private var _entityDefinition:EntityDefinitionProxy;
-			private var _uiTabs:ListCollectionView;	
+			private var _uiTabs:ListCollectionView;
 			private var _definitionsPerTab:IList;
 			private var _parentEntity:EntityProxy;
 			private var _entity:EntityProxy;
@@ -68,31 +68,7 @@
 			 * with uiTabName blank or null
 			 */
 			private function initDefinitionsPerTab():void {
-				var totalTabs:int = 1 + (uiTabs != null ? uiTabs.length: 0);
-				//init an empty list for each tab
-				var temp:Array = new Array(totalTabs);
-				for(var i:int = 0; i < totalTabs; i ++) {
-					temp[i] = new ArrayCollection();
-				}
-				//put each definition in the corresponding list per tab
-				var childDefns:IList = UIBuilder.getDefinitionsInVersion(entityDefinition.childDefinitions, modelVersion);
-				for each (var defn:NodeDefinitionProxy in childDefns) {
-					var tabName:String = defn.uiTabName;
-					var index:int = -1;
-					if(StringUtil.isBlank(tabName)) {
-						index = 0;
-					} else if(uiTabs != null) {
-						var tabIndex:int = CollectionUtil.getItemIndex(uiTabs, "name", tabName);
-						if(tabIndex >= 0) {
-							index = tabIndex + 1;
-						}
-					}
-					if(index >= 0) {
-						var nodeDefs:IList = temp[index];
-						nodeDefs.addItem(defn);
-					}
-				}
-				this.definitionsPerTab = new ArrayCollection(temp);
+				this.definitionsPerTab = UIBuilder.getDefinitionsPerTab(uiTabs, modelVersion, entityDefinition);
 			}
 			
 			public function resetScrollbars():void {
@@ -197,41 +173,16 @@
 		<s:layout>
 			<s:VerticalLayout gap="4" />
 		</s:layout>
-		<s:Group id="addSection" 
-				 includeInLayout="{entityDefinition.multiple &amp;&amp; entityDefinition.parent != null}" 
-				 visible="{entityDefinition.multiple &amp;&amp; entityDefinition.parent != null}">
-			<s:layout>
-				<s:HorizontalLayout paddingTop="5" horizontalAlign="left" paddingLeft="10" gap="12" verticalAlign="middle" />
-			</s:layout>
-			<s:Label text="{entityDefinition.getLabelText()}" styleName="bold" />
-			<s:DropDownList id="dropDownList"
-							prompt="{Message.get('global.dropDownPrompt')}" 
-							width="{Math.max(0, entityDefinition.keyAttributeDefinitions.length - 1) * 100 + 150}" 
-							labelField="fullKeyText"
-							dataProvider="{entities}"
-							visible="{entities != null &amp;&amp; entities.length &gt; 0}"
-							includeInLayout="{entities != null &amp;&amp; entities.length &gt; 0}"
-							/>
-			<s:Button id="addButton" 
-					  styleName="addButton" 
-					  buttonMode="true" 
-					  useHandCursor="true"
-					  visible="{Application.activeRecordEditable}" 
-					  includeInLayout="{Application.activeRecordEditable}" 
-					  />
-			<s:Button id="deleteButton" 
-					  styleName="deleteButton" 
-					  buttonMode="true" 
-					  useHandCursor="true"
-					  visible="{Application.activeRecordEditable &amp;&amp; dropDownList.selectedIndex >= 0}" 
-					  includeInLayout="{Application.activeRecordEditable &amp;&amp; dropDownList.selectedIndex >= 0}" 
-					  />
-		</s:Group>
+		<component:AddEntityControlBar id="addSection"
+									   entityDefinition="{entityDefinition}"
+									   entities="{entities}"
+									   includeInLayout="{entityDefinition.multiple &amp;&amp; entityDefinition.parent != null}" 
+									   visible="{entityDefinition.multiple &amp;&amp; entityDefinition.parent != null}" />
 		<s:Group id="internalContainer" 
 				 height="100%" width="100%"
 				 showEffect="{showFormEffect}" 
 				 hideEffect="{hideFormEffect}"
-				 visible="{! entityDefinition.multiple || entityDefinition.parent == null || dropDownList.selectedItem != null}"
+				 visible="{! entityDefinition.multiple || entityDefinition.parent == null || addSection.dropDownList.selectedItem != null}"
 				 >
 			<s:VGroup id="tabbedContainer" 
 					  width="100%" height="100%" 

@@ -6,13 +6,17 @@ package org.openforis.collect.presenter
 	import mx.collections.IList;
 	import mx.rpc.events.ResultEvent;
 	
+	import org.openforis.collect.Application;
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.event.InputFieldEvent;
+	import org.openforis.collect.model.UIConfiguration;
+	import org.openforis.collect.model.UITab;
 	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.remoting.service.UpdateRequest;
 	import org.openforis.collect.remoting.service.UpdateRequestOperation;
 	import org.openforis.collect.remoting.service.UpdateRequestOperation$Method;
+	import org.openforis.collect.ui.UIBuilder;
 	import org.openforis.collect.ui.component.detail.MultipleEntityFormItem;
 	import org.openforis.collect.ui.component.input.InputField;
 	import org.openforis.collect.util.AlertUtil;
@@ -37,11 +41,11 @@ package org.openforis.collect.presenter
 			
 			eventDispatcher.addEventListener(InputFieldEvent.VISITED, inputFieldVisitedHandler);
 			
-			view.addButton.addEventListener(MouseEvent.CLICK, addButtonClickHandler);
-			view.addButton.addEventListener(FocusEvent.FOCUS_IN, buttonFocusInHandler);
-			view.deleteButton.addEventListener(MouseEvent.CLICK, deleteButtonClickHandler);
-			view.deleteButton.addEventListener(FocusEvent.FOCUS_IN, buttonFocusInHandler);
-			view.dropDownList.addEventListener(IndexChangeEvent.CHANGE, dropDownListChangeHandler);
+			view.addSection.addButton.addEventListener(MouseEvent.CLICK, addButtonClickHandler);
+			view.addSection.addButton.addEventListener(FocusEvent.FOCUS_IN, buttonFocusInHandler);
+			view.addSection.deleteButton.addEventListener(MouseEvent.CLICK, deleteButtonClickHandler);
+			view.addSection.deleteButton.addEventListener(FocusEvent.FOCUS_IN, buttonFocusInHandler);
+			view.addSection.dropDownList.addEventListener(IndexChangeEvent.CHANGE, dropDownListChangeHandler);
 		}
 		
 		private function get view():MultipleEntityFormItem {
@@ -66,6 +70,18 @@ package org.openforis.collect.presenter
 					&& view.entityDefinition.multiple
 					&& view.parentEntity != null 
 					&& view.modelVersion != null) {
+				var uiTab:UITab = UIBuilder.getUITab(view.entityDefinition);
+				var uiTabs:IList = null;
+				if ( uiTab != null ) {
+					uiTabs = uiTab.tabs;
+				}
+				if(uiTabs == null) {
+					view.currentState = MultipleEntityFormItem.STATE_WITHOUT_TABS;
+				} else {
+					view.uiTabs = uiTabs;
+					view.definitionsPerTab = UIBuilder.getDefinitionsPerTab(uiTabs, view.modelVersion, view.entityDefinition);
+					view.currentState = MultipleEntityFormItem.STATE_WITH_TABS;
+				}
 				var entities:IList = getEntities();
 				view.entities = entities;
 				selectEntity(null);
@@ -158,13 +174,13 @@ package org.openforis.collect.presenter
 		}
 		
 		protected function dropDownListChangeHandler(event:IndexChangeEvent):void {
-			var entity:EntityProxy = view.dropDownList.selectedItem as EntityProxy;
+			var entity:EntityProxy = view.addSection.dropDownList.selectedItem as EntityProxy;
 			selectEntity(entity);
 		}
 		
 		protected function selectEntity(entity:EntityProxy):void {
 			view.selectedEntity = entity;
-			view.dropDownList.selectedItem = entity;
+			view.addSection.dropDownList.selectedItem = entity;
 			view.entity = entity;
 			if(entity != null) {
 				if(view.internalContainer.visible) {
