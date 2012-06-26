@@ -57,11 +57,12 @@
 	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver" />
 
 	<!-- Controllers -->
-	<bean id="fileNameViewController" class="org.springframework.web.servlet.mvc.UrlFilenameViewController" />
-	<bean id="unlockController" class="org.openforis.collect.web.controller.UnlockController" />
+	<bean id="dataImportControllerController" class="org.openforis.collect.web.controller.DataImportController" />
 	<bean id="dataExportDownloadController" class="org.openforis.collect.web.controller.DataExportDownloadController" />
+	<bean id="fileNameViewController" class="org.springframework.web.servlet.mvc.UrlFilenameViewController" />
 	<bean id="surveyImportController" class="org.openforis.collect.web.controller.SurveyImportController" />
 	<bean id="validationController" class="org.openforis.collect.web.controller.ValidationController" />
+	<bean id="unlockController" class="org.openforis.collect.web.controller.UnlockController" />
 
 	<!-- ===================================== -->
 	<!-- GraniteDs services -->

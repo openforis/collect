@@ -117,7 +117,7 @@ public class DataImportProcess implements Callable<Void> {
 	@Override
 	public Void call() throws Exception {
 		try {
-			CollectSurvey packagedSurvey = extractIdml();
+			//CollectSurvey packagedSurvey = extractPackagedSurvey();
 
 			CollectSurvey existingSurvey = surveyManager.get(surveyName);
 			
@@ -160,6 +160,7 @@ public class DataImportProcess implements Callable<Void> {
 						parsedRecord.setStep(step);
 						CollectRecord oldRecord = findExistingRecord(survey, parsedRecord);
 						if ( oldRecord != null ) {
+							//TODO let the user choose what to do
 							replaceData(parsedRecord, oldRecord);
 							recordDao.update(oldRecord);
 							state.incrementUpdatedCount();
@@ -204,7 +205,7 @@ public class DataImportProcess implements Callable<Void> {
 		}
 	}
 
-	public CollectSurvey extractIdml() throws IOException, InvalidIdmlException {
+	public CollectSurvey extractPackagedSurvey() throws IOException, InvalidIdmlException {
 		ZipFile zipFile = new ZipFile(packagedFile);
 		Enumeration<? extends ZipEntry> entries = zipFile.entries();
 		while (entries.hasMoreElements()) {

@@ -15,15 +15,16 @@ package org.openforis.collect.util {
 		
 		internal static const CONTEXT_NAME:String = "collect";
 
-		//TODO: are these necessay here??
+		private static const DATA_IMPORT_UPLOAD_SERVLET_NAME:String = "uploadData.htm";
 		/*
-		public static const FILE_UPLOAD_SERVLET_NAME:String = "upload";
-		public static const FILE_DOWNLOAD_SERVLET_NAME:String = "download";
-		public static const FILE_DELETE_SERVLET_NAME:String = "deleteFile";
+		private static const FILE_UPLOAD_SERVLET_NAME:String = "upload";
+		private static const FILE_DOWNLOAD_SERVLET_NAME:String = "download";
+		private static const FILE_DELETE_SERVLET_NAME:String = "deleteFile";
 		*/
-		public static const DOWNLOAD_EXPORTED_DATA_SERVLET_NAME:String = "downloadDataExport.htm";
-		public static const DOWNLOAD_BACKUP_SERVLET_NAME:String = "downloadBackup.htm";
+		private static const DOWNLOAD_EXPORTED_DATA_SERVLET_NAME:String = "downloadDataExport.htm";
+		private static const DOWNLOAD_BACKUP_SERVLET_NAME:String = "downloadBackup.htm";
 		
+		private static var _DATA_IMPORT_UPLOAD_URL:String; 
 		private static var _FILEUPLOAD_URL:String; 
 		private static var _FILEDOWNLOAD_URL:String; 
 		private static var _FILEDELETE_URL:String; 
@@ -41,6 +42,10 @@ package org.openforis.collect.util {
 		public static function init():void {
 			var url:String = FlexGlobals.topLevelApplication.url;
 			setUrl(url);
+		}
+		
+		public static function get DATA_IMPORT_UPLOAD_URL():String {
+			return _DATA_IMPORT_UPLOAD_URL;
 		}
 		
 		public static function get FILEUPLOAD_URL():String {
@@ -88,6 +93,7 @@ package org.openforis.collect.util {
 			var applicationUrl:String = protocol + "://"+ _HOST + ":" + _PORT + "/" + CONTEXT_NAME + "/"; 
 			_URL = applicationUrl;
 			
+			_DATA_IMPORT_UPLOAD_URL = _URL + DATA_IMPORT_UPLOAD_SERVLET_NAME;
 			/*
 			_FILEUPLOAD_URL = _URL + FILE_UPLOAD_SERVLET_NAME;
 			_FILEDOWNLOAD_URL = _URL + FILE_DOWNLOAD_SERVLET_NAME;

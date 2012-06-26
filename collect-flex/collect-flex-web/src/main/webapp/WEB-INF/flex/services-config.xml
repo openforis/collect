@@ -43,6 +43,14 @@
 		        </properties>
 			</destination>
 			
+			<destination id="dataImportService">
+		        <properties>
+		        	<factory>springFactory</factory>
+		            <source>dataImportService</source>
+		            <scope>application</scope>
+		        </properties>
+			</destination>
+			
 			<destination id="modelService">
 		        <properties>
 		        	<factory>springFactory</factory>
