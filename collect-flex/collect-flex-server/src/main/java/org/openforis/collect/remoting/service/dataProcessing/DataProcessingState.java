@@ -22,11 +22,6 @@ public class DataProcessingState {
 		super();
 	}
 	
-	@ExternalizedProperty
-	public boolean isRunning() {
-		return (! complete && ! error) && running;
-	}
-	
 	public void reset() {
 		count = 0;
 		total = 0;
@@ -37,6 +32,11 @@ public class DataProcessingState {
 	
 	public void incrementCount() {
 		count++;
+	}
+	
+	@ExternalizedProperty
+	public boolean isRunning() {
+		return (! complete && ! error) && running;
 	}
 	
 	public void setRunning(boolean running) {
@@ -63,6 +63,10 @@ public class DataProcessingState {
 		return count;
 	}
 
+	public void setCount(int count) {
+		this.count = count;
+	}
+	
 	public int getTotal() {
 		return total;
 	}
