@@ -77,9 +77,10 @@ package org.openforis.collect.presenter
 				}
 				if(uiTabs == null) {
 					view.currentState = MultipleEntityFormItem.STATE_WITHOUT_TABS;
+					view.definitionsPerMainTab = UIBuilder.getDefinitionsPerMainTab(view.entityDefinition, view.modelVersion);
 				} else {
 					view.uiTabs = uiTabs;
-					view.definitionsPerTab = UIBuilder.getDefinitionsPerTab(uiTabs, view.modelVersion, view.entityDefinition);
+					view.definitionsPerTab = UIBuilder.getDefinitionsPerEachSubTab(view.entityDefinition, view.modelVersion);
 					view.currentState = MultipleEntityFormItem.STATE_WITH_TABS;
 				}
 				var entities:IList = getEntities();

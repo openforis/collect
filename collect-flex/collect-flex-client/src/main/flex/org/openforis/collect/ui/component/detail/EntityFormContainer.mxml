@@ -4,9 +4,10 @@
 					xmlns:mx="library://ns.adobe.com/flex/mx" 
 					xmlns:detail="org.openforis.collect.ui.component.detail.*"
 					xmlns:layout="org.openforis.collect.ui.layout.*"
+					xmlns:component="org.openforis.collect.ui.component.*" 
 					width="100%" height="100%"
 					creationComplete="creationCompleteHandler(event)"
-					creationPolicy="all" xmlns:component="org.openforis.collect.ui.component.*" 
+					creationPolicy="all" 
 					>
 	
 	<fx:Script>
@@ -22,6 +23,7 @@
 			import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
 			import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
 			import org.openforis.collect.model.CollectRecord$Step;
+			import org.openforis.collect.model.UITab;
 			import org.openforis.collect.model.proxy.EntityProxy;
 			import org.openforis.collect.presenter.EntityFormPresenter;
 			import org.openforis.collect.ui.UIBuilder;
@@ -38,6 +40,7 @@
 			private var _entityDefinition:EntityDefinitionProxy;
 			private var _uiTabs:ListCollectionView;
 			private var _definitionsPerTab:IList;
+			private var _definitionsPerMainTab:IList;
 			private var _parentEntity:EntityProxy;
 			private var _entity:EntityProxy;
 			private var _entities:IList;
@@ -50,10 +53,17 @@
 			}
 			
 			public function build():void {
-				if(uiTabs == null) {
-					this.currentState = STATE_WITHOUT_TABS;
+				var uiTab:UITab = UIBuilder.getUITab(entityDefinition);
+				if ( uiTab != null && StringUtil.isNotBlank(uiTab.label) ) {
+					this.label = uiTab.label;
 				} else {
+					this.label = entityDefinition.getLabelText();
+				}
+				if(uiTab != null && uiTab.tabs != null) {
+					uiTabs = uiTab.tabs;
 					this.currentState = STATE_WITH_TABS;
+				} else {
+					this.currentState = STATE_WITHOUT_TABS;
 				}
 				initDefinitionsPerTab();
 			}
@@ -64,11 +74,13 @@
 			
 			/**
 			 * Creates the list of node definitions per each tab
-			 * In the first position there will be the node definitions
-			 * with uiTabName blank or null
 			 */
 			private function initDefinitionsPerTab():void {
-				this.definitionsPerTab = UIBuilder.getDefinitionsPerTab(uiTabs, modelVersion, entityDefinition);
+				if ( uiTabs != null ) {
+					definitionsPerTab = UIBuilder.getDefinitionsPerEachSubTab(entityDefinition, modelVersion);
+				} else {
+					definitionsPerMainTab = UIBuilder.getDefinitionsPerMainTab(entityDefinition, modelVersion);
+				}
 			}
 			
 			public function resetScrollbars():void {
@@ -136,14 +148,22 @@
 			}
 
 			[Bindable]
+			public function get definitionsPerMainTab():IList {
+				return _definitionsPerMainTab;
+			}
+
+			public function set definitionsPerMainTab(value:IList):void {
+				_definitionsPerMainTab = value;
+			}
+
+			[Bindable]
 			public function get entities():IList {
 				return _entities;
 			}
-
+			
 			public function set entities(value:IList):void {
 				_entities = value;
 			}
-			
 		]]>
 	</fx:Script>
 	
@@ -210,7 +230,7 @@
 								id="formContainers"
 								modelVersion="{modelVersion}"
 								entityDefinition="{entityDefinition}"
-								nodeDefinitions="{IList(definitionsPerTab.getItemAt(tabsRP.currentIndex + 1))}"
+								nodeDefinitions="{IList(definitionsPerTab.getItemAt(tabsRP.currentIndex))}"
 								entity="{entity}"
 								label="{tabsRP.currentItem.label}"
 								/>
@@ -222,7 +242,7 @@
 				id="withoutTabsContainer"
 				modelVersion="{modelVersion}"
 				entityDefinition="{entityDefinition}"
-				nodeDefinitions="{IList(definitionsPerTab.getItemAt(0))}"
+				nodeDefinitions="{definitionsPerMainTab}"
 				entity="{entity}"
 				includeIn="withoutTabs"
 				/>

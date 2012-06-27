@@ -25,6 +25,7 @@
 			private var _selectedEntity:EntityProxy;
 			private var _uiTabs:IList;
 			private var _definitionsPerTab:IList;
+			private var _definitionsPerMainTab:IList;
 			
 			public static const STATE_WITH_TABS:String = "withTabs";
 			public static const STATE_WITHOUT_TABS:String = "withoutTabs";
@@ -77,7 +78,15 @@
 				_definitionsPerTab = value;
 			}
 
-
+			[Bindable]
+			public function get definitionsPerMainTab():IList {
+				return _definitionsPerMainTab;
+			}
+			
+			public function set definitionsPerMainTab(value:IList):void {
+				_definitionsPerMainTab = value;
+			}
+			
 			/*
 			[Bindable]
 			public function get constraintLayout():ConstraintLayout {
@@ -162,7 +171,7 @@
 								id="formContainers"
 								modelVersion="{modelVersion}"
 								entityDefinition="{entityDefinition}"
-								nodeDefinitions="{IList(definitionsPerTab.getItemAt(tabsRP.currentIndex + 1))}"
+								nodeDefinitions="{IList(definitionsPerTab.getItemAt(tabsRP.currentIndex))}"
 								entity="{entity}"
 								label="{tabsRP.currentItem.label}"
 								/>
@@ -174,7 +183,7 @@
 				id="withoutTabsContainer"
 				modelVersion="{modelVersion}"
 				entityDefinition="{entityDefinition}"
-				nodeDefinitions="{IList(definitionsPerTab.getItemAt(0))}"
+				nodeDefinitions="{definitionsPerMainTab}"
 				entity="{entity}"
 				includeIn="withoutTabs"
 				/>
