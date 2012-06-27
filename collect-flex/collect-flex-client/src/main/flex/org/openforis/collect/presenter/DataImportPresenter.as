@@ -30,7 +30,7 @@ package org.openforis.collect.presenter {
 		
 		private var _view:DataImportView;
 		
-		private var _fileReference:FileReference;
+		public var _fileReference:FileReference;
 		
 		private var _dataImportClient:DataImportClient;
 		
@@ -81,9 +81,10 @@ package org.openforis.collect.presenter {
 			var request:URLRequest = new URLRequest(url);
 			//request paramters
 			request.method = URLRequestMethod.POST;
-			request.data = new URLVariables();
-			request.data.surveyName = _view.surveyNameTextInput.text;
-			request.data.rootEntityName = _view.rootEntityNameTextInput.text;
+			var parameters:URLVariables = new URLVariables();
+			parameters.surveyName = _view.surveyNameTextInput.text;
+			parameters.rootEntityName = _view.rootEntityNameTextInput.text;
+			request.data = parameters;
 			_fileReference.upload(request);
 		}
 		

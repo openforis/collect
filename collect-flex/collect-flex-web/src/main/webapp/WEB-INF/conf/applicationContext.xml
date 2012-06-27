@@ -69,6 +69,7 @@
 	<!-- ===================================== -->
 	<bean id="dataService" 		class="org.openforis.collect.remoting.service.DataService" autowire="byName" />
 	<bean id="dataExportService" class="org.openforis.collect.remoting.service.DataExportService" autowire="byName" init-method="init" scope="session" />
+	<bean id="dataImportService" class="org.openforis.collect.remoting.service.DataImportService" autowire="byName" init-method="init" scope="session" />
 	<bean id="logoService" 	class="org.openforis.collect.remoting.service.LogoService" autowire="byName" />
 	<bean id="modelService"		class="org.openforis.collect.remoting.service.ModelService" autowire="byName" />
 	<bean id="sessionService" 	class="org.openforis.collect.remoting.service.SessionService" autowire="byName" />

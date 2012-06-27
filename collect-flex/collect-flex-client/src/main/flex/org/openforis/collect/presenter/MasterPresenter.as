@@ -110,6 +110,7 @@ package org.openforis.collect.presenter {
 			var rootEntityDef:EntityDefinitionProxy = event.obj as EntityDefinitionProxy;
 			Application.activeRootEntity = rootEntityDef;
 			_view.currentState = MasterView.LIST_STATE;
+			//_view.currentState = MasterView.IMPORT_STATE;
 			
 			var uiEvent:UIEvent = new UIEvent(UIEvent.LOAD_RECORD_SUMMARIES);
 			eventDispatcher.dispatchEvent(uiEvent);
