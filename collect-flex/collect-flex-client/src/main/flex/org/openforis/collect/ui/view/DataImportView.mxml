@@ -15,6 +15,12 @@
 			import org.openforis.collect.i18n.Message;
 			import org.openforis.collect.presenter.DataImportPresenter;
 			
+			public static const STATE_DEFAULT:String = "default";
+			public static const STATE_UPLOADING:String = "uploading";
+			public static const STATE_UPLOAD_COMPLETE:String = "uploadComplete";
+			public static const STATE_IMPORTING:String = "importing";
+			public static const STATE_IMPORT_COMPLETE:String = "importComplete";
+			
 			private var _presenter:DataImportPresenter;
 			
 			protected function creationCompleteHandler(event:FlexEvent):void {
@@ -24,24 +30,46 @@
 		]]>
 	</fx:Script>
 
+	<s:states>
+		<s:State name="default" />
+		<s:State name="uploading" />
+		<s:State name="uploadComplete" />
+		<s:State name="importing" />
+	</s:states>
+	
 	<s:Form id="form">
 		<s:FormItem label="{Message.get('dataImport.surveyNameLabel')}">
-			<s:TextInput id="surveyNameTextInput" />
-		</s:FormItem>
-		<s:FormItem label="{Message.get('dataImport.rootEntityNameLabel')}">
-			<s:TextInput id="rootEntityNameTextInput" />
+			<s:TextInput id="surveyNameTextInput" editable="false" editable.default="true" />
 		</s:FormItem>
 	</s:Form>
 	
 	<s:Button id="uploadButton" 
-			  label="{Message.get('dataImport.upload')}" />
+			  label="{Message.get('dataImport.selectFileToUpload')}"
+			  includeIn="default"
+			  useHandCursor="true"
+			  buttonMode="true"
+			  />
 	
-	<mx:ProgressBar id="progressBar"
-					horizontalCenter="0"
-					verticalCenter="0"
-					mode="manual"
-					label="%3%"
-					labelPlacement="center"
-					width="80%"
-					/>
+	<s:VGroup width="100%" 
+			  visible="false" visible.importing="true" visible.uploading="true"
+			  includeInLayout="false" includeInLayout.importing="true" includeInLayout.uploading="true"
+			  >
+		<mx:ProgressBar id="progressBar"
+						horizontalCenter="0"
+						verticalCenter="0"
+						mode="manual"
+						label="%3%"
+						labelPlacement="center"
+						width="80%"
+						/>
+		
+		<s:Label id="progressLabel" />
+		
+		<s:Button id="cancelButton"
+				  label="{Message.get('dataImport.cancel')}"
+				  useHandCursor="true"
+				  buttonMode="true"
+				  />
+	</s:VGroup>
+
 </s:Group>

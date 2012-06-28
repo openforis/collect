@@ -57,7 +57,7 @@
 	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver" />
 
 	<!-- Controllers -->
-	<bean id="dataImportControllerController" class="org.openforis.collect.web.controller.DataImportController" />
+	<bean id="dataImportController" class="org.openforis.collect.web.controller.DataImportController" />
 	<bean id="dataExportDownloadController" class="org.openforis.collect.web.controller.DataExportDownloadController" />
 	<bean id="fileNameViewController" class="org.springframework.web.servlet.mvc.UrlFilenameViewController" />
 	<bean id="surveyImportController" class="org.openforis.collect.web.controller.SurveyImportController" />
@@ -127,39 +127,30 @@
 	<bean id="applicationInfoDao" class="org.openforis.collect.persistence.ApplicationInfoDao">
     	<property name="dataSource" ref="dataSource"/>
 	</bean>
-
 	<bean id="configurationDao" class="org.openforis.collect.persistence.ConfigurationDao">
     	<property name="dataSource" ref="dataSource"/>
 	</bean>
-
 	<bean id="dynamicTableDao" class="org.openforis.collect.persistence.DynamicTableDao">
     	<property name="dataSource" ref="dataSource"/>
 	</bean>
-
 	<bean id="logoDao" class="org.openforis.collect.persistence.LogoDao">
 		<property name="dataSource" ref="dataSource"/>
 	</bean>
-
 	<bean id="recordDao" class="org.openforis.collect.persistence.RecordDao">
     	<property name="dataSource" ref="dataSource"/>
 	</bean>
-
 	<bean id="surveyDao" class="org.openforis.collect.persistence.SurveyDao" init-method="init">
     	<property name="dataSource" ref="dataSource"/>
 	</bean>
-
 	<bean id="taxonDao" class="org.openforis.collect.persistence.TaxonDao">
     	<property name="dataSource" ref="dataSource"/>
 	</bean>
-	
 	<bean id="taxonomyDao" class="org.openforis.collect.persistence.TaxonomyDao">
     	<property name="dataSource" ref="dataSource"/>
 	</bean>
-	
 	<bean id="taxonVernacularNameDao" class="org.openforis.collect.persistence.TaxonVernacularNameDao">
     	<property name="dataSource" ref="dataSource"/>
 	</bean>
-	
 	<bean id="userDao" class="org.openforis.collect.persistence.UserDao">
     	<property name="dataSource" ref="dataSource"/>
 	</bean>

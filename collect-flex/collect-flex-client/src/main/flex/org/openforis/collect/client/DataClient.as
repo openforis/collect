@@ -78,7 +78,7 @@ package org.openforis.collect.client {
 		}
 		
 		public function loadRecord(responder:IResponder, id:int, step:CollectRecord$Step, forceUnlock:Boolean = false):void {
-			var stepNumber:int = getRecordStepNumber(step);
+			var stepNumber:int = Application.getRecordStepNumber(step);
 			var token:AsyncToken = this._loadRecordOperation.send(id, stepNumber, forceUnlock);
 			token.addResponder(responder);
 		}
@@ -149,18 +149,5 @@ package org.openforis.collect.client {
 			Application.activeRecord.update(responses, token);
 		}
 
-		public static function getRecordStepNumber(step:CollectRecord$Step):int {
-			switch(step) {
-				case CollectRecord$Step.ENTRY:
-					return 1;
-				case CollectRecord$Step.CLEANSING:
-					return 2;
-				case CollectRecord$Step.ANALYSIS:
-					return 3;
-				default:
-					return -1;
-			}
-		}
-		
 	}
 }

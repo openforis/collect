@@ -35,20 +35,27 @@ public class DataImportController {
 	private static final String FILE_NAME = "data_import.zip";
 	
 	@RequestMapping(value = "/uploadData.htm", method = RequestMethod.POST)
-	public @ResponseBody String uploadData(HttpServletRequest request, UploadItem uploadItem, BindingResult result, @RequestParam String surveyName, @RequestParam String rootEntityName) 
+	public @ResponseBody String uploadData(UploadItem uploadItem, BindingResult result, HttpServletRequest request, @RequestParam String sessionId) 
 			throws IOException, InvalidIdmlException, SurveyImportException {
-		File file = getDataImportFile(request);
+		File file = creteTempFile(request, sessionId);
 		writeToFile(uploadItem, file);
 		return "ok";
 	}
 
-	private File getDataImportFile(HttpServletRequest request) {
+	private File creteTempFile(HttpServletRequest request, String sessionId) throws IOException {
 		HttpSession session = request.getSession();
 		ServletContext servletContext = session.getServletContext();
 		String importRealPath = servletContext.getRealPath(EXPORT_PATH);
 		File importRootDirectory = new File(importRealPath);
-		File importDirectory = new File(importRootDirectory, session.getId());
+		File importDirectory = new File(importRootDirectory, sessionId);
+		if ( ! importDirectory.exists() ) {
+			importDirectory.mkdirs();
+		} 
 		File file = new File(importDirectory, FILE_NAME);
+		if ( file.exists() ) {
+			file.delete();
+		}
+		file.createNewFile();
 		return file;
 	}
 	

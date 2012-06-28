@@ -11,8 +11,11 @@ import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.UserManager;
 import org.openforis.collect.model.User;
+import org.openforis.collect.persistence.RecordDao;
+import org.openforis.collect.remoting.service.dataImport.DataImportExeption;
 import org.openforis.collect.remoting.service.dataImport.DataImportProcess;
 import org.openforis.collect.remoting.service.dataImport.DataImportState;
+import org.openforis.collect.util.ExecutorServiceUtil;
 import org.openforis.collect.web.session.SessionState;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -35,6 +38,9 @@ public class DataImportService {
 	
 	@Autowired
 	private RecordManager recordManager;
+	
+	@Autowired
+	private RecordDao recordDao;
 	
 	@Autowired
 	private UserManager userManager;
@@ -60,18 +66,32 @@ public class DataImportService {
 		}
 	}
 	
-	public DataImportState initProcess(String surveyName, String rootEntityName) {
-		SessionState sessionState = sessionManager.getSessionState();
-		File userImportFolder = new File(importDirectory, sessionState.getSessionId());
-		packagedFile = new File(userImportFolder, FILE_NAME);
-		List<User> usersList = userManager.loadAll();
-		HashMap<String, User> users = new HashMap<String, User>();
-		for (User user : usersList) {
-			users.put(user.getName(), user);
+	public DataImportState initProcess(String surveyName) throws DataImportExeption {
+		if ( dataImportProcess == null || ! dataImportProcess.isRunning() ) {
+			SessionState sessionState = sessionManager.getSessionState();
+			File userImportFolder = new File(importDirectory, sessionState.getSessionId());
+			packagedFile = new File(userImportFolder, FILE_NAME);
+			List<User> usersList = userManager.loadAll();
+			HashMap<String, User> users = new HashMap<String, User>();
+			for (User user : usersList) {
+				users.put(user.getName(), user);
+			}
+			dataImportProcess = new DataImportProcess(surveyManager, recordManager, recordDao, users, surveyName, packagedFile);
+			dataImportProcess.init();
 		}
-		if ( dataImportProcess == null || dataImportProcess.isComplete() ) {
-			dataImportProcess = new DataImportProcess(surveyManager, recordManager, users, surveyName, rootEntityName, packagedFile);
-		}
-		return null;
+		return dataImportProcess.getState();
+	}
+	
+	public DataImportState startImport() throws Exception {
+		ExecutorServiceUtil.executeInCachedPool(dataImportProcess);
+		return dataImportProcess.getState();
+	}
+	
+	public void cancel() {
+		dataImportProcess.cancel();
+	}
+	
+	public DataImportState getState() {
+		return dataImportProcess.getState();
 	}
 }

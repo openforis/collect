@@ -35,8 +35,8 @@ package org.openforis.collect.client {
 			token.addResponder(responder);
 		}
 
-		public function initProcess(responder:IResponder, surveyName:String, rootEntityName:String):void {
-			var token:AsyncToken = this._initProcessOperation.send(surveyName, rootEntityName);
+		public function initProcess(responder:IResponder, surveyName:String):void {
+			var token:AsyncToken = this._initProcessOperation.send(surveyName);
 			token.addResponder(responder);
 		}
 		

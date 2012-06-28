@@ -53,8 +53,8 @@ public class DataHandler extends DefaultHandler {
 	private List<String> warnings;
 	private StringBuilder content;
 	protected Attributes attributes;
-	private CollectSurvey originalSurvey;
-	private CollectSurvey newSurvey;
+	private CollectSurvey recordSurvey;
+	private CollectSurvey currentSurvey;
 	private int ignoreLevels;
 	
 	private Map<String, User> users;
@@ -63,9 +63,9 @@ public class DataHandler extends DefaultHandler {
 		this(survey, survey, users);
 	}
 	
-	public DataHandler(CollectSurvey newSurvey, CollectSurvey originalSurvey, Map<String, User> users) {
-		this.newSurvey = newSurvey;
-		this.originalSurvey = originalSurvey;
+	public DataHandler(CollectSurvey currentSurvey, CollectSurvey recordSurvey, Map<String, User> users) {
+		this.currentSurvey = currentSurvey;
+		this.recordSurvey = recordSurvey;
 		this.users = users;
 	}
 
@@ -123,7 +123,7 @@ public class DataHandler extends DefaultHandler {
 	}
 
 	public void startRecord(String localName, Attributes attributes) {
-		Schema schema = newSurvey.getSchema();
+		Schema schema = currentSurvey.getSchema();
 		EntityDefinition defn = schema.getRootEntityDefinition(localName);
 		if ( defn == null ) {
 			fail("Unknown root entity: "+localName);
@@ -132,7 +132,7 @@ public class DataHandler extends DefaultHandler {
 			if ( StringUtils.isBlank(version) ) {
 				fail("Missing version number");
 			} else {
-				record = new CollectRecord(newSurvey, version);
+				record = new CollectRecord(currentSurvey, version);
 				
 				String stateAttr = attributes.getValue(ATTRIBUTE_STATE);
 				State state = State.fromCode(stateAttr);
@@ -174,10 +174,10 @@ public class DataHandler extends DefaultHandler {
 
 	private NodeDefinition getNodeDefinition(Entity parentEntity, String localName, Attributes attributes) {
 		EntityDefinition parentEntityDefn = parentEntity.getDefinition();
-		Schema originalSchema = originalSurvey.getSchema();
+		Schema originalSchema = recordSurvey.getSchema();
 		EntityDefinition originlParentEntityDefn = (EntityDefinition) originalSchema.getById(parentEntityDefn.getId());
 		NodeDefinition originalDefn = originlParentEntityDefn.getChildDefinition(localName);
-		Schema newSchema = newSurvey.getSchema();
+		Schema newSchema = currentSurvey.getSchema();
 		NodeDefinition newDefn = newSchema.getById(originalDefn.getId());
 		return newDefn;
 	}

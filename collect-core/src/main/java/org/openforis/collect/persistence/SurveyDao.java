@@ -136,11 +136,10 @@ public class SurveyDao extends JooqDaoSupport {
 
 	private Survey unmarshalIdml(String idml) throws IOException {
 		byte[] bytes = idml.getBytes("UTF-8");
-		ByteArrayInputStream is = new ByteArrayInputStream(bytes);
 		SurveyUnmarshaller su = bindingContext.createSurveyUnmarshaller();
 		CollectSurvey survey;
 		try {
-			survey = (CollectSurvey) su.unmarshal(is);
+			survey = (CollectSurvey) su.unmarshal(bytes);
 		} catch (InvalidIdmlException e) {
 			throw new DataInconsistencyException("Invalid idm");
 		}

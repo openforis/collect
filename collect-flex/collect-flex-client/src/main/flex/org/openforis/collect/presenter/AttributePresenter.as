@@ -50,7 +50,7 @@ package org.openforis.collect.presenter {
 			var validationToolTipTrigger:UIComponent = validationStateDisplay;
 			_validationDisplayManager = new ValidationDisplayManager(validationToolTipTrigger, validationStateDisplay);
 			var attrDefn:AttributeDefinitionProxy = _view.attributeDefinition;
-			_validationDisplayManager.showMinMaxCountErrors = ! attrDefn.multiple || attrDefn instanceof CodeAttributeDefinitionProxy;
+			_validationDisplayManager.showMinMaxCountErrors = ! attrDefn.multiple || attrDefn is CodeAttributeDefinitionProxy;
 			if(_view.attribute != null) {
 				updateValidationDisplayManager();
 			}
