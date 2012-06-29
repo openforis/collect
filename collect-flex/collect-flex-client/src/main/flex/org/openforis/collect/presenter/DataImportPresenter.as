@@ -12,6 +12,7 @@ package org.openforis.collect.presenter {
 	import flash.net.URLVariables;
 	import flash.utils.Timer;
 	
+	import mx.collections.IList;
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.IResponder;
 	import mx.rpc.events.ResultEvent;
@@ -47,6 +48,7 @@ package org.openforis.collect.presenter {
 		
 		public function DataImportPresenter(view:DataImportView) {
 			this._view = view;
+			_firstOpen = true;
 			_fileReference = new FileReference();
 			_dataImportClient = ClientFactory.dataImportClient;
 			
@@ -137,7 +139,7 @@ package org.openforis.collect.presenter {
 			var responder:AsyncResponder = new AsyncResponder(startImportResultHandler, faultHandler);
 			_dataImportClient.startImport(responder);
 			_view.progressBar.setProgress(0, 0);
-			_view.currentState = DataImportView.STATE_IMPORTING;
+			_view.currentState = DataImportView.STATE_IMPORT_RUNNING;
 		}
 		
 		protected function startImportResultHandler(event:ResultEvent, token:Object = null):void {
@@ -150,7 +152,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function updateState():void {
-			ClientFactory.dataExportClient.getState(_getStateResponder);
+			_dataImportClient.getState(_getStateResponder);
 		}
 		
 		protected function getStateResultHandler(event:ResultEvent, token:Object = null):void {
@@ -180,20 +182,14 @@ package org.openforis.collect.presenter {
 		private function updateView():void {
 			if(_state != null) {
 				if ( _state.running && _state.count <= _state.total ) {
-					_view.currentState = DataImportView.STATE_IMPORTING;
-					_view.progressBar.setProgress(_state.count, _state.total);
-					var progressText:String;
-					if ( _state.total == 0 ) {
-						progressText = Message.get("dataImport.processing");
-					} else {
-						progressText = Message.get("dataImport.progressLabel", [_state.count, _state.total]);
-					}
-					_view.progressLabel.text = progressText;
+					_view.currentState = DataImportView.STATE_IMPORT_RUNNING;
+					updateViewForImporting();
 					if ( _progressTimer == null ) {
 						startProgressTimer();
 					}
 				} else if ( !_firstOpen && _state.complete ) {
 					_view.currentState = DataImportView.STATE_IMPORT_COMPLETE;
+					updateViewForImporting();
 					stopProgressTimer();
 				} else {
 					if ( !_firstOpen ) {
@@ -217,7 +213,35 @@ package org.openforis.collect.presenter {
 			_firstOpen = false;
 		}
 		
-		private function resetView():void {
+		private function updateViewForImporting():void {
+			_view.progressBar.setProgress(_state.count, _state.total);
+			updateProgressText();
+			updateErrorsTextArea()
+		}
+		
+		protected function updateProgressText():void {
+			var progressText:String;
+			if ( _state.total == 0 ) {
+				progressText = Message.get("dataImport.processing");
+			} else {
+				progressText = Message.get("dataImport.progressLabel", [_state.count, _state.total]);
+			}
+			_view.progressLabel.text = progressText;
+		}
+		
+		protected function updateErrorsTextArea():void {
+			var result:String = "";
+			if ( _state != null && _state.errors != null ) {
+				var files:IList = _state.errors.keySet;
+				for each (var fileName:String in files ) {
+					var errorMessage:String = _state.errors.get(fileName);
+					result += Message.get('dataImport.errorInFile', [fileName, errorMessage]);
+				}
+			}
+			_view.errorsTextArea.text = result;
+		}
+		
+		protected function resetView():void {
 			_state = null;
 			_view.currentState = DataImportView.STATE_DEFAULT;
 			stopProgressTimer();

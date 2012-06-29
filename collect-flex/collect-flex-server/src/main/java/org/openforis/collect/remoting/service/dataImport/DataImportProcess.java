@@ -119,6 +119,7 @@ public class DataImportProcess implements Callable<Void> {
 	@Override
 	public Void call() throws Exception {
 		try {
+			state.setRunning(true);
 			DataHandler handler;
 			existingSurvey = surveyManager.get(surveyName);
 			if ( existingSurvey == null ) {
@@ -136,16 +137,14 @@ public class DataImportProcess implements Callable<Void> {
 				while (entries.hasMoreElements()) {
 					ZipEntry zipEntry = (ZipEntry) entries.nextElement();
 					String entryName = zipEntry.getName();
-					if ( zipEntry.isDirectory() || IDML_FILE_NAME.equals(entryName) ) {
-						continue;
+					if ( ! zipEntry.isDirectory() && ! IDML_FILE_NAME.equals(entryName) ) {
+						Step entryStep = getStep(entryName);
+						if (entryStep == step) {
+							InputStream entryInputStream = zipFile.getInputStream(zipEntry);
+							importZipEntry(entryInputStream, entryName, step, dataUnmarshaller);
+							entryInputStream.close();
+						}
 					}
-					Step entryStep = getStep(entryName);
-					if ( entryStep != step ) {
-						continue;
-					}
-					InputStream entryInputStream = zipFile.getInputStream(zipEntry);
-					importZipEntry(entryInputStream, entryName, existingSurvey != null ? existingSurvey: packagedSurvey, step, dataUnmarshaller);
-					entryInputStream.close();
 				}
 				zipFile.close();
 			}
@@ -162,18 +161,17 @@ public class DataImportProcess implements Callable<Void> {
 		return null;
 	}
 	
-	private void importZipEntry(InputStream inputStream, String entryName, CollectSurvey survey, Step step, DataUnmarshaller dataUnmarshaller) throws IOException {
+	private void importZipEntry(InputStream inputStream, String entryName, Step step, DataUnmarshaller dataUnmarshaller) throws IOException {
 		LOG.info("Extracting: " + entryName);
 		InputStreamReader reader = new InputStreamReader(inputStream);
 		ParseRecordResult parseRecordResult = parseRecord(dataUnmarshaller, reader);
 		CollectRecord parsedRecord = parseRecordResult.record;
 		String message = parseRecordResult.message;
 		if ( parsedRecord == null ) {
-			LOG.info("Skipped: " + entryName);
-			state.addSkipped(entryName);
+			state.addError(entryName, message);
 		} else {
 			parsedRecord.setStep(step);
-			CollectRecord oldRecord = findExistingRecord(survey, parsedRecord);
+			CollectRecord oldRecord = findAlreadyExistingRecord(parsedRecord);
 			if ( oldRecord != null ) {
 				//TODO let the user choose what to do
 				replaceData(parsedRecord, oldRecord);
@@ -185,7 +183,6 @@ public class DataImportProcess implements Callable<Void> {
 				state.incrementInsertedCount();
 				LOG.info("Inserted: " + parsedRecord.getId() + " (from file " + entryName + ")");
 			}
-			state.incrementCount();
 		}
 		if ( ! parseRecordResult.success ) {
 			if ( parseRecordResult.warnings > 0 ) {
@@ -194,9 +191,11 @@ public class DataImportProcess implements Callable<Void> {
 				state.addError(entryName, message);
 			}
 		}
+		state.incrementCount();
 	}
 	
-	private CollectRecord findExistingRecord(CollectSurvey survey, CollectRecord parsedRecord) {
+	private CollectRecord findAlreadyExistingRecord(CollectRecord parsedRecord) {
+		CollectSurvey survey = (CollectSurvey) parsedRecord.getSurvey();
 		List<String> keyValues = parsedRecord.getRootEntityKeyValues();
 		Entity rootEntity = parsedRecord.getRootEntity();
 		String rootEntityName = rootEntity.getName();

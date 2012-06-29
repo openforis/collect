@@ -18,7 +18,7 @@
 			public static const STATE_DEFAULT:String = "default";
 			public static const STATE_UPLOADING:String = "uploading";
 			public static const STATE_UPLOAD_COMPLETE:String = "uploadComplete";
-			public static const STATE_IMPORTING:String = "importing";
+			public static const STATE_IMPORT_RUNNING:String = "importRunning";
 			public static const STATE_IMPORT_COMPLETE:String = "importComplete";
 			
 			private var _presenter:DataImportPresenter;
@@ -34,7 +34,8 @@
 		<s:State name="default" />
 		<s:State name="uploading" />
 		<s:State name="uploadComplete" />
-		<s:State name="importing" />
+		<s:State name="importRunning" stateGroups="importing" />
+		<s:State name="importComplete" stateGroups="importing" />
 	</s:states>
 	
 	<s:Form id="form">
@@ -66,10 +67,22 @@
 		<s:Label id="progressLabel" />
 		
 		<s:Button id="cancelButton"
-				  label="{Message.get('dataImport.cancel')}"
+				  label="{Message.get('global.cancel')}"
 				  useHandCursor="true"
 				  buttonMode="true"
+				  visible.importComplete="false"
 				  />
+		
+		<s:VGroup width="100%">
+			<s:Label text="{Message.get('dataImport.filesInError')}" />
+			<s:TextArea id="errorsTextArea"
+						editable="false"
+						width="100%"
+						heightInLines="5" />
+			
+		</s:VGroup>
+		
 	</s:VGroup>
 
 </s:Group>
+

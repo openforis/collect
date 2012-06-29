@@ -88,10 +88,16 @@ public class DataImportService {
 	}
 	
 	public void cancel() {
-		dataImportProcess.cancel();
+		if ( dataImportProcess != null ) {
+			dataImportProcess.cancel();
+		}
 	}
 	
 	public DataImportState getState() {
-		return dataImportProcess.getState();
+		if ( dataImportProcess != null ) {
+			return dataImportProcess.getState();
+		} else {
+			return null;
+		}
 	}
 }
