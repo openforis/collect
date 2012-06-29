@@ -66,7 +66,7 @@ public class DataImportService {
 		}
 	}
 	
-	public DataImportState initProcess(String surveyName) throws DataImportExeption {
+	public DataImportState initProcess(String surveyName, boolean overwriteAll) throws DataImportExeption {
 		if ( dataImportProcess == null || ! dataImportProcess.isRunning() ) {
 			SessionState sessionState = sessionManager.getSessionState();
 			File userImportFolder = new File(importDirectory, sessionState.getSessionId());
@@ -76,7 +76,7 @@ public class DataImportService {
 			for (User user : usersList) {
 				users.put(user.getName(), user);
 			}
-			dataImportProcess = new DataImportProcess(surveyManager, recordManager, recordDao, users, surveyName, packagedFile);
+			dataImportProcess = new DataImportProcess(surveyManager, recordManager, recordDao, users, packagedFile, overwriteAll, surveyName);
 			dataImportProcess.init();
 		}
 		return dataImportProcess.getState();
@@ -85,6 +85,13 @@ public class DataImportService {
 	public DataImportState startImport() throws Exception {
 		ExecutorServiceUtil.executeInCachedPool(dataImportProcess);
 		return dataImportProcess.getState();
+	}
+	
+	public void overwriteExistingRecordInConflict(boolean value, boolean overwriteAll) {
+		dataImportProcess.setOverwriteExistingRecordInConflict(value);
+		dataImportProcess.setOverwriteAll(overwriteAll);
+		//continue the process
+		ExecutorServiceUtil.executeInCachedPool(dataImportProcess);
 	}
 	
 	public void cancel() {

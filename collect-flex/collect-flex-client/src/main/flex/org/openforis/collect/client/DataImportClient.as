@@ -14,6 +14,7 @@ package org.openforis.collect.client {
 		private var _getStateOperation:Operation;
 		private var _initProcessOperation:Operation;
 		private var _startImportOperation:Operation;
+		private var _overwriteExistingRecordInConflict:Operation;
 		private var _cancelOperation:Operation;
 		
 		public function DataImportClient() {
@@ -21,6 +22,7 @@ package org.openforis.collect.client {
 			
 			this._initProcessOperation = getOperation("initProcess");
 			this._startImportOperation = getOperation("startImport");
+			this._overwriteExistingRecordInConflict = getOperation("overwriteExistingRecordInConflict");
 			this._getStateOperation = getOperation("getState", CONCURRENCY_LAST, false);
 			this._cancelOperation = getOperation("cancel");
 		}
@@ -35,8 +37,13 @@ package org.openforis.collect.client {
 			token.addResponder(responder);
 		}
 
-		public function initProcess(responder:IResponder, surveyName:String):void {
-			var token:AsyncToken = this._initProcessOperation.send(surveyName);
+		public function overwriteRecordInConflict(responder:IResponder, value:Boolean, overwriteAll:Boolean = false):void {
+			var token:AsyncToken = this._overwriteExistingRecordInConflict.send(value, overwriteAll);
+			token.addResponder(responder);
+		}
+
+		public function initProcess(responder:IResponder, surveyName:String, overwriteAll:Boolean = false):void {
+			var token:AsyncToken = this._initProcessOperation.send(surveyName, overwriteAll);
 			token.addResponder(responder);
 		}
 		

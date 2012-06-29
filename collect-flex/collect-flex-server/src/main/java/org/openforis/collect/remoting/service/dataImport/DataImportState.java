@@ -21,6 +21,7 @@ public class DataImportState extends DataProcessingState {
 	
 	private int insertedCount;
 	private int updatedCount;
+	private DataImportConflict conflict;
 
 	public DataImportState() {
 		super();
@@ -48,10 +49,12 @@ public class DataImportState extends DataProcessingState {
 	
 	public void incrementInsertedCount() {
 		insertedCount ++;
+		incrementCount();
 	}
 	
 	public void incrementUpdatedCount() {
 		updatedCount ++;
+		incrementCount();
 	}
 
 	public int getInsertedCount() {
@@ -68,6 +71,14 @@ public class DataImportState extends DataProcessingState {
 
 	public Map<String, String> getWarnings() {
 		return warnings;
+	}
+
+	public DataImportConflict getConflict() {
+		return conflict;
+	}
+	
+	public void setConflict(DataImportConflict conflict) {
+		this.conflict = conflict;
 	}
 	
 //	public class RecordEntry {

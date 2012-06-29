@@ -13,6 +13,8 @@ package org.openforis.collect.presenter {
 	import flash.utils.Timer;
 	
 	import mx.collections.IList;
+	import mx.collections.ListCollectionView;
+	import mx.formatters.DateFormatter;
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.IResponder;
 	import mx.rpc.events.ResultEvent;
@@ -23,10 +25,15 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.client.DataImportClient;
 	import org.openforis.collect.i18n.Message;
 	import org.openforis.collect.model.CollectRecord$Step;
+	import org.openforis.collect.remoting.service.dataImport.DataImportConflict;
 	import org.openforis.collect.remoting.service.dataImport.DataImportState;
+	import org.openforis.collect.ui.component.datagrid.RecordSummaryDataGrid;
 	import org.openforis.collect.ui.view.DataImportView;
 	import org.openforis.collect.util.AlertUtil;
 	import org.openforis.collect.util.ApplicationConstants;
+	import org.openforis.collect.util.StringUtil;
+	
+	import spark.formatters.DateTimeFormatter;
 
 	/**
 	 * 
@@ -187,6 +194,11 @@ package org.openforis.collect.presenter {
 					if ( _progressTimer == null ) {
 						startProgressTimer();
 					}
+				} else if ( _state.conflict != null ) {
+					_view.currentState = DataImportView.STATE_IMPORT_RUNNING;
+					updateViewForImporting();
+					stopProgressTimer();
+					showConfirmForConflict();
 				} else if ( !_firstOpen && _state.complete ) {
 					_view.currentState = DataImportView.STATE_IMPORT_COMPLETE;
 					updateViewForImporting();
@@ -211,6 +223,32 @@ package org.openforis.collect.presenter {
 				resetView();
 			}
 			_firstOpen = false;
+		}
+		
+		protected function showConfirmForConflict():void {
+			var conflict:DataImportConflict = _state.conflict;
+			var rootEntityKeys:Array = conflict.existingRecord.rootEntityKeys.toArray();
+			var recordKey:String = StringUtil.concat("-", rootEntityKeys);
+			var dateFormatter:DateTimeFormatter = new DateTimeFormatter();
+			dateFormatter.dateTimePattern = RecordSummaryDataGrid.DATE_TIME_PATTERN;
+			var existingRecordModifiedDate:String = dateFormatter.format(conflict.existingRecord.modifiedDate);
+			var importRecordModifiedDate:String = dateFormatter.format(conflict.importRecord.modifiedDate);
+			AlertUtil.showConfirm("dataImport.conflict", 
+				[recordKey, existingRecordModifiedDate, importRecordModifiedDate], 
+				"dataImport.conflict.title", overwriteExistingRecordInConflict, null, doNotOverwriteExistingRecordInConflict);
+		}
+		
+		protected function overwriteExistingRecordInConflict(value:Boolean = true):void {
+			var responder:AsyncResponder = new AsyncResponder(overwriteExistingRecordInConflictResultHandler, faultHandler);
+			_dataImportClient.overwriteRecordInConflict(responder, value);
+		}
+		
+		private function overwriteExistingRecordInConflictResultHandler(event:ResultEvent, token:Object = null):void {
+			updateState();
+		}
+		
+		private function doNotOverwriteExistingRecordInConflict():void {
+			overwriteExistingRecordInConflict(false);
 		}
 		
 		private function updateViewForImporting():void {

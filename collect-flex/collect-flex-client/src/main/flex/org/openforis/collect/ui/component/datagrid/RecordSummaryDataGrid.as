@@ -21,7 +21,7 @@ package org.openforis.collect.ui.component.datagrid
 	 */
 	public class RecordSummaryDataGrid extends spark.components.DataGrid {
 		
-		protected static const DATE_TIME_PATTERN:String = "dd-MM-yyyy HH:mm";
+		public static const DATE_TIME_PATTERN:String = "dd-MM-yyyy HH:mm";
 		protected static var _dataTimeFormatter:DateTimeFormatter;
 		
 		//init static variables

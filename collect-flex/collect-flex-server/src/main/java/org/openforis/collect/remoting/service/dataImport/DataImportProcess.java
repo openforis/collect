@@ -54,19 +54,26 @@ public class DataImportProcess implements Callable<Void> {
 	private File packagedFile;
 
 	private CollectSurvey packagedSurvey;
-
 	private CollectSurvey existingSurvey;
 	
+	private boolean overwriteAll;
+
+	private String conflictingEntryName;
+	private boolean overwriteExistingRecordInConflict;
+	
 	public DataImportProcess(SurveyManager surveyManager, RecordManager recordManager, RecordDao recordDao, Map<String, User> users, 
-			String surveyName, File packagedFile) {
+			File packagedFile, boolean overwriteAll, String surveyName) {
 		super();
 		this.surveyManager = surveyManager;
 		this.recordManager = recordManager;
 		this.recordDao = recordDao;
 		this.users = users;
-		this.surveyName = surveyName;
 		this.packagedFile = packagedFile;
+		this.overwriteAll = overwriteAll;
+		this.surveyName = surveyName;
 		this.state = new DataImportState();
+		this.conflictingEntryName = null;
+		this.overwriteExistingRecordInConflict = false;
 	}
 
 	public DataImportState getState() {
@@ -90,6 +97,10 @@ public class DataImportProcess implements Callable<Void> {
 		try {
 			state.reset();
 			packagedSurvey = extractPackagedSurvey();
+			/*
+			String uri = packagedSurvey.getUri();
+			CollectSurvey survey = surveyManager.getByUri(uri);
+			 */
 			packagedSurvey.setName(surveyName);
 			Map<Step, Integer> totalRecords = new HashMap<CollectRecord.Step, Integer>();
 			int total = 0;
@@ -140,16 +151,26 @@ public class DataImportProcess implements Callable<Void> {
 					if ( ! zipEntry.isDirectory() && ! IDML_FILE_NAME.equals(entryName) ) {
 						Step entryStep = getStep(entryName);
 						if (entryStep == step) {
+							if ( conflictingEntryName != null && ! conflictingEntryName.equals(entryName)) {
+								continue;
+							}
 							InputStream entryInputStream = zipFile.getInputStream(zipEntry);
+							state.setConflict(null);
 							importZipEntry(entryInputStream, entryName, step, dataUnmarshaller);
 							entryInputStream.close();
+							if ( state.getConflict() != null ) {
+								break;
+							} else {
+								conflictingEntryName = null;
+								overwriteExistingRecordInConflict = false;
+							}
 						}
 					}
 				}
 				zipFile.close();
 			}
 				
-			if ( ! state.isCancelled() ) {
+			if ( ! state.isCancelled() && state.getConflict() == null ) {
 				state.setComplete(true);
 			}
 		} catch (Exception e) {
@@ -167,17 +188,28 @@ public class DataImportProcess implements Callable<Void> {
 		ParseRecordResult parseRecordResult = parseRecord(dataUnmarshaller, reader);
 		CollectRecord parsedRecord = parseRecordResult.record;
 		String message = parseRecordResult.message;
+		Boolean promptForConflict = ! overwriteAll && conflictingEntryName == null;
+		Boolean overwriteExistingRecord = overwriteAll || conflictingEntryName != null && overwriteExistingRecordInConflict;
 		if ( parsedRecord == null ) {
 			state.addError(entryName, message);
+			state.incrementCount();
 		} else {
 			parsedRecord.setStep(step);
 			CollectRecord oldRecord = findAlreadyExistingRecord(parsedRecord);
 			if ( oldRecord != null ) {
-				//TODO let the user choose what to do
-				replaceData(parsedRecord, oldRecord);
-				recordDao.update(oldRecord);
-				state.incrementUpdatedCount();
-				LOG.info("Updated: " + oldRecord.getId() + " (from file " + entryName + ")");
+				if ( overwriteExistingRecord ) {
+					replaceData(parsedRecord, oldRecord);
+					recordDao.update(oldRecord);
+					state.incrementUpdatedCount();
+					LOG.info("Updated: " + oldRecord.getId() + " (from file " + entryName + ")");
+				} else if ( promptForConflict ) {
+					conflictingEntryName = entryName;
+					DataImportConflict conflict = new DataImportConflict(entryName, oldRecord, parsedRecord);
+					state.setConflict(conflict);
+				} else {
+					//skip record
+					state.incrementCount();
+				}
 			} else {
 				recordDao.insert(parsedRecord);
 				state.incrementInsertedCount();
@@ -191,7 +223,6 @@ public class DataImportProcess implements Callable<Void> {
 				state.addError(entryName, message);
 			}
 		}
-		state.incrementCount();
 	}
 	
 	private CollectRecord findAlreadyExistingRecord(CollectRecord parsedRecord) {
@@ -291,6 +322,18 @@ public class DataImportProcess implements Callable<Void> {
 		toRecord.updateEntityCounts();
 	}
 	
+	public void setOverwriteExistingRecordInConflict(boolean overwriteExistingRecordInConflict) {
+		this.overwriteExistingRecordInConflict = overwriteExistingRecordInConflict;
+	}
+	
+	public boolean isOverwriteAll() {
+		return overwriteAll;
+	}
+
+	public void setOverwriteAll(boolean overwriteAll) {
+		this.overwriteAll = overwriteAll;
+	}
+	
 	private class ParseRecordResult {
 		private boolean success;
 		private String message;
@@ -301,4 +344,5 @@ public class DataImportProcess implements Callable<Void> {
 			success = false;
 		}
 	}
+
 }
