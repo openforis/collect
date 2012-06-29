@@ -133,11 +133,10 @@ public class DataHandler extends DefaultHandler {
 				fail("Missing version number");
 			} else {
 				record = new CollectRecord(currentSurvey, version);
-				
 				String stateAttr = attributes.getValue(ATTRIBUTE_STATE);
 				State state = State.fromCode(stateAttr);
 				record.setState(state);
-				
+
 				Date created = parseDateTime(attributes.getValue(ATTRIBUTE_DATE_CREATED));
 				Date modified = parseDateTime(attributes.getValue(ATTRIBUTE_DATE_MODIFIED));
 				record.setCreationDate(created);

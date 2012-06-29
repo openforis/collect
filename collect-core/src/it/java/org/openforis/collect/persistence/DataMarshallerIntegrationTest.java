@@ -16,6 +16,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openforis.collect.model.CollectRecord;
+import org.openforis.collect.model.CollectRecord.State;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.CollectSurveyContext;
@@ -118,7 +119,8 @@ public class DataMarshallerIntegrationTest {
 		record.setCreationDate(new GregorianCalendar(2011, 12, 31, 23, 59).getTime());
 		record.setModifiedDate(new GregorianCalendar(2012, 2, 3, 9, 30).getTime());
 		record.setStep(Step.ENTRY);
-
+		record.setState(State.REJECTED);
+		
 		addTestValues(cluster);
 
 		//update counts and keys

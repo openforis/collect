@@ -41,6 +41,9 @@ package org.openforis.collect.metamodel.proxy {
 			return list;
 		}
 		
+		public function isRoot():Boolean {
+			return this == rootEntity;
+		}
 	}
 		
 }

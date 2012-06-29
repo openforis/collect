@@ -156,8 +156,12 @@ public class NodeDefinitionProxy implements Proxy {
 	public String getUiTabName() {
 		String namespaceURI = "http://www.openforis.org/collect/3.0/ui";
 		QName qname = new QName(namespaceURI, "tab");
-		String string = nodeDefinition.getAnnotation(qname);
-		return string;
+		String tabName = nodeDefinition.getAnnotation(qname);
+		if ( tabName != null) {
+			return tabName;
+		} else {
+			return parent.getUiTabName();
+		}
 	}
 
 	public EntityDefinitionProxy getParent() {

@@ -14,6 +14,11 @@ package org.openforis.collect.metamodel.proxy {
     [RemoteClass(alias="org.openforis.collect.metamodel.proxy.SurveyProxy")]
     public class SurveyProxy extends SurveyProxyBase {
 		
+		public function init():void {
+			schema.survey = this;
+			schema.init();
+		}
+		
 		public function getProjectName(lang:String = "en", firstIfNotFound:Boolean = true):String {
 			for each (var p:LanguageSpecificTextProxy in projectNames) {
 				if(p.language == lang) {
@@ -27,5 +32,7 @@ package org.openforis.collect.metamodel.proxy {
 				return name;
 			}
 		}
-    }
+		
+		
+	}
 }

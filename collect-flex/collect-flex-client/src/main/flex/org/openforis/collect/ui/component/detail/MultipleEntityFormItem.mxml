@@ -4,7 +4,9 @@
 					   xmlns:mx="library://ns.adobe.com/flex/mx"
 					   xmlns:datagroup="org.openforis.collect.ui.component.datagroup.*"
 					   xmlns:detail="org.openforis.collect.ui.component.detail.*"
-					   width="100%" height="100%"
+					   xmlns:component="org.openforis.collect.ui.component.*"
+					   xmlns:layout="org.openforis.collect.ui.layout.*" 
+					   width="100%" height="100%" 
 					   >
 	
 	<fx:Script>
@@ -20,8 +22,13 @@
 			import org.openforis.collect.ui.Images;
 			
 			private var _entities:IList;
-			
 			private var _selectedEntity:EntityProxy;
+			private var _uiTabs:IList;
+			private var _definitionsPerTab:IList;
+			private var _definitionsPerMainTab:IList;
+			
+			public static const STATE_WITH_TABS:String = "withTabs";
+			public static const STATE_WITHOUT_TABS:String = "withoutTabs";
 			
 			//private var _constraintLayout:ConstraintLayout;
 			
@@ -53,7 +60,33 @@
 				_entities = value;
 			}
 
+			[Bindable]
+			public function get uiTabs():IList {
+				return _uiTabs;
+			}
 
+			public function set uiTabs(value:IList):void {
+				_uiTabs = value;
+			}
+
+			[Bindable]
+			public function get definitionsPerTab():IList {
+				return _definitionsPerTab;
+			}
+
+			public function set definitionsPerTab(value:IList):void {
+				_definitionsPerTab = value;
+			}
+
+			[Bindable]
+			public function get definitionsPerMainTab():IList {
+				return _definitionsPerMainTab;
+			}
+			
+			public function set definitionsPerMainTab(value:IList):void {
+				_definitionsPerMainTab = value;
+			}
+			
 			/*
 			[Bindable]
 			public function get constraintLayout():ConstraintLayout {
@@ -87,6 +120,11 @@
 		<s:VerticalLayout />
 	</detail:layout>
 	
+	<detail:states>
+		<s:State name="withoutTabs" />
+		<s:State name="withTabs" />
+	</detail:states>
+	
 	<s:BorderContainer id="border" 
 					   height="100%" 
 					   width="100%"
@@ -96,49 +134,60 @@
 			<s:VerticalLayout />
 		</s:layout>
 
-		<s:Group id="addSection" 
-				 includeInLayout="{entityDefinition.multiple &amp;&amp; entityDefinition.parent != null}" 
-				 visible="{entityDefinition.multiple &amp;&amp; entityDefinition.parent != null}">
-			<s:layout>
-				<s:HorizontalLayout paddingTop="5" horizontalAlign="left" paddingLeft="10" gap="12" verticalAlign="middle" />
-			</s:layout>
-			<s:Label text="{entityDefinition.getLabelText()}" styleName="bold" />
-			<s:DropDownList id="dropDownList"
-							prompt="{Message.get('global.dropDownPrompt')}" 
-							width="{Math.max(0, entityDefinition.keyAttributeDefinitions.length - 1) * 100 + 150}" 
-							labelField="fullKeyText"
-							dataProvider="{entities}"
-							visible="{entities != null &amp;&amp; entities.length &gt; 0}"
-							includeInLayout="{entities != null &amp;&amp; entities.length &gt; 0}"
-							/>
-			<s:Button id="addButton" 
-					  styleName="addButton" 
-					  buttonMode="true" 
-					  useHandCursor="true"
-					  visible="{Application.activeRecordEditable}" 
-					  includeInLayout="{Application.activeRecordEditable}" 
-					  />
-			<s:Button id="deleteButton" 
-					  styleName="deleteButton" 
-					  buttonMode="true" 
-					  useHandCursor="true"
-					  visible="{Application.activeRecordEditable &amp;&amp; dropDownList.selectedIndex >= 0}" 
-					  includeInLayout="{Application.activeRecordEditable &amp;&amp; dropDownList.selectedIndex >= 0}" 
-					  />
-		</s:Group>
-		
-		<detail:ScrollableFormContainer 
-			id="internalContainer"
-			modelVersion="{modelVersion}"
-			entityDefinition="{entityDefinition}"
-			nodeDefinitions="{nodeDefinitions}"
-			entity="{selectedEntity}"
-			height="100%" width="100%"
-			showEffect="{showFormEffect}" 
-			hideEffect="{hideFormEffect}"
-			visible="{! entityDefinition.multiple || entityDefinition.parent == null || dropDownList.selectedItem != null}"
-			/>
-			
+		<component:AddEntityControlBar id="addSection"
+									   entityDefinition="{entityDefinition}"
+									   entities="{entities}"
+									   includeInLayout="{entityDefinition.multiple &amp;&amp; entityDefinition.parent != null}" 
+									   visible="{entityDefinition.multiple &amp;&amp; entityDefinition.parent != null}" />
+		<s:Group id="internalContainer" 
+				 height="100%" width="100%"
+				 showEffect="{showFormEffect}" 
+				 hideEffect="{hideFormEffect}"
+				 visible="{addSection.dropDownList.selectedItem != null}"
+				 >
+			<s:VGroup id="tabbedContainer" 
+					  width="100%" height="100%" 
+					  gap="0" 
+					  includeIn="withTabs"
+					  >
+				<s:TabBar id="tabBar" 
+						  dataProvider="{viewStack}"
+						  width="100%">
+					<s:layout>
+						<layout:FlowLayout />
+					</s:layout>
+				</s:TabBar>
+				
+				<s:BorderContainer
+					width="100%" 
+					height="100%"
+					styleName="entityForm"
+					>
+					<mx:ViewStack id="viewStack" width="100%" height="100%" 
+								  verticalGap="0"
+								  creationPolicy="auto">
+						<mx:Repeater id="tabsRP" dataProvider="{uiTabs}">
+							<detail:ScrollableFormContainer 
+								id="formContainers"
+								modelVersion="{modelVersion}"
+								entityDefinition="{entityDefinition}"
+								nodeDefinitions="{IList(definitionsPerTab.getItemAt(tabsRP.currentIndex))}"
+								entity="{entity}"
+								label="{tabsRP.currentItem.label}"
+								/>
+						</mx:Repeater>
+					</mx:ViewStack>
+				</s:BorderContainer>
+			</s:VGroup>
+			<detail:ScrollableFormContainer 
+				id="withoutTabsContainer"
+				modelVersion="{modelVersion}"
+				entityDefinition="{entityDefinition}"
+				nodeDefinitions="{definitionsPerMainTab}"
+				entity="{entity}"
+				includeIn="withoutTabs"
+				/>
+		</s:Group>	
 	</s:BorderContainer>
 	
 </detail:EntityFormItem>

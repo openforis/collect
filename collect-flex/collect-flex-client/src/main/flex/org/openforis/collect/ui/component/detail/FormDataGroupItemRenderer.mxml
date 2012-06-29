@@ -59,7 +59,6 @@
 			protected function updateMultipleEntitiesMaxHeight(value:Number):void {
 				var maxAvailableHeight:Number = UIUtil.getMaxAvailableHeight(UIComponent(parentDocument));
 				if(!isNaN(maxAvailableHeight)) {
-					maxAvailableHeight -= 10; //padding difficult to extimate...
 					for(var i:int = 0; i < numElements; i++) {
 						var el:IVisualElement = getElementAt(i);
 						if(el is MultipleEntityAsTableFormItem) {
@@ -72,7 +71,6 @@
 			protected function updateMultipleEntitiesMaxWidth(value:Number):void {
 				var maxAvailableWidth:Number = UIUtil.getMaxAvailableWidth(UIComponent(parentDocument));
 				if(!isNaN(maxAvailableWidth)) {
-					maxAvailableWidth -= 10; //padding difficult to extimate...
 					if ( ! occupyEntirePage ) {
 						maxAvailableWidth -= 15;
 					}

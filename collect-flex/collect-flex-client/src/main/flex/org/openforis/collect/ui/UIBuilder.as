@@ -22,6 +22,8 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.metamodel.proxy.NumberAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.NumberAttributeDefinitionProxy$Type;
 	import org.openforis.collect.metamodel.proxy.RangeAttributeDefinitionProxy;
+	import org.openforis.collect.metamodel.proxy.SchemaProxy;
+	import org.openforis.collect.metamodel.proxy.SurveyProxy;
 	import org.openforis.collect.metamodel.proxy.TaxonAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.TextAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.TextAttributeDefinitionProxy$Type;
@@ -63,6 +65,8 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.ui.component.input.StringInputField;
 	import org.openforis.collect.ui.component.input.TaxonAttributeRenderer;
 	import org.openforis.collect.ui.component.input.TimeAttributeRenderer;
+	import org.openforis.collect.util.CollectionUtil;
+	import org.openforis.collect.util.StringUtil;
 	import org.openforis.collect.util.UIUtil;
 	
 	import spark.components.HGroup;
@@ -83,28 +87,29 @@ package org.openforis.collect.ui {
 			var formContainer:FormContainer = new FormContainer();
 			formContainer.initialize();
 			
+			addMainEntityFormContainer(formContainer, rootEntity, version);
+			
+			var uiTabDefn:UITabDefinition = getRootEntityTabDefinition(rootEntity);
+			if ( uiTabDefn != null && uiTabDefn.tabs != null) {
+				for each (var tab:UITab in uiTabDefn.tabs) {
+					if ( ! isMainTab(rootEntity, tab) ) {
+						addChildEntityFormContainer(formContainer, rootEntity, version, tab);
+					}
+				}
+			}
+			return formContainer;
+		}
+		
+		private static function isMainTab(rootEntity:EntityDefinitionProxy, tab:UITab):Boolean {
+			return tab.name == rootEntity.uiTabName;
+		}
+		
+		private static function addMainEntityFormContainer(formContainer:FormContainer, rootEntity:EntityDefinitionProxy, version:ModelVersionProxy):void {
 			var form:EntityFormContainer = new EntityFormContainer();
 			form.entityDefinition = rootEntity;
 			form.modelVersion = version;
 			
-			var uiConfig:UIConfiguration = Application.activeSurvey.uiConfiguration;
-			var tabs:ListCollectionView = null;
-			var uiTab:UITab = null;
-			if(uiConfig != null) {
-				var tabDef:UITabDefinition = uiConfig.getTabDefinition(rootEntity.name);
-				if(tabDef != null) {
-					tabs = tabDef.tabs;
-					uiTab = tabDef.getTab(rootEntity.name);
-				}
-			}
-			form.uiTabs = uiTab != null ? uiTab.tabs: null;
 			form.build();
-			
-			if(uiTab !=null){
-				form.label = uiTab.label;
-			} else {
-				form.label = rootEntity.getLabelText();
-			}
 			formContainer.addEntityFormContainer(form);
 			/*
 			in this case the parentEntity of the formContainer will be null and 
@@ -112,27 +117,22 @@ package org.openforis.collect.ui {
 			*/
 			form.parentEntity = null;
 			BindingUtils.bindProperty(form, "entity", formContainer, ["record", "rootEntity"]);
-			
-			if(tabs != null) {
-				for each (var tab:UITab in tabs) {
-					var childForm:EntityFormContainer = new EntityFormContainer();
-					childForm.label = tab.label;
-					var child:NodeDefinitionProxy = rootEntity.getChildDefinitionByTabName(tab.name);
-					if(child is EntityDefinitionProxy) {
-						var edp:EntityDefinitionProxy = child as EntityDefinitionProxy;
-						childForm.entityDefinition = edp;
-						childForm.modelVersion = version;
-						childForm.uiTabs = tab.tabs;
-						childForm.build();
-						formContainer.addEntityFormContainer(childForm);
-						/*
-						in this case the parentEntity will be the record's rootEntity
-						*/
-						BindingUtils.bindProperty(childForm, "parentEntity", formContainer, ["record", "rootEntity"]);
-					}
-				}
+		}
+		
+		private static function addChildEntityFormContainer(formContainer:FormContainer, rootEntity:EntityDefinitionProxy, version:ModelVersionProxy, tab:UITab):void {
+			var childForm:EntityFormContainer = new EntityFormContainer();
+			var child:NodeDefinitionProxy = rootEntity.getChildDefinitionByTabName(tab.name);
+			if(child is EntityDefinitionProxy) {
+				var edp:EntityDefinitionProxy = child as EntityDefinitionProxy;
+				childForm.entityDefinition = edp;
+				childForm.modelVersion = version;
+				childForm.build();
+				formContainer.addEntityFormContainer(childForm);
+				/*
+				in this case the parentEntity will be the record's rootEntity
+				*/
+				BindingUtils.bindProperty(childForm, "parentEntity", formContainer, ["record", "rootEntity"]);
 			}
-			return formContainer;
 		}
 		
 		public static function getRecordSummaryListColumns(rootEntity:EntityDefinitionProxy):IList {
@@ -532,6 +532,73 @@ package org.openforis.collect.ui {
 				}
 			}
 			return result;
+		}
+		
+		/**
+		 * Returns a list of lists of NodeDefinitionProxy object.
+		 * Each item of the list is a list of node definitions associated to the tab in that index.
+		 **/
+		public static function getDefinitionsPerEachSubTab(entityDefinition:EntityDefinitionProxy, modelVersion:ModelVersionProxy):IList {
+			var result:IList = new ArrayCollection();
+			var uiTab:UITab = getUITab(entityDefinition);
+			if ( uiTab != null ) {
+				var tabs:ListCollectionView = uiTab.tabs;
+				if ( CollectionUtil.isNotEmpty(tabs) ) {
+					var totalTabs:int = tabs.length;
+					for(var i:int = 0; i < totalTabs; i ++) {
+						result.addItemAt(new ArrayCollection(), i);
+					}
+					//put each definition in the corresponding list per tab
+					var childDefns:IList = UIBuilder.getDefinitionsInVersion(entityDefinition.childDefinitions, modelVersion);
+					for each (var defn:NodeDefinitionProxy in childDefns) {
+						var tabName:String = defn.uiTabName;
+						var tabIndex:int = CollectionUtil.getItemIndex(tabs, "name", tabName);
+						if(tabIndex >= 0) {
+							var nodeDefs:IList = result[tabIndex];
+							nodeDefs.addItem(defn);
+						}
+					}
+				}
+			}
+			return result;
+		}
+			
+		public static function getDefinitionsPerMainTab(entityDefinition:EntityDefinitionProxy, modelVersion:ModelVersionProxy):IList {
+			var result:IList = new ArrayCollection();
+			var uiTab:UITab = getUITab(entityDefinition);
+			var childDefns:IList = UIBuilder.getDefinitionsInVersion(entityDefinition.childDefinitions, modelVersion);
+			for each (var defn:NodeDefinitionProxy in childDefns) {
+				var tabName:String = defn.uiTabName;
+				if ( tabName == uiTab.name ) {
+					result.addItem(defn);
+				}
+			}
+			return result;
+		}
+		
+		public static function getRootEntityTabDefinition(rootEntityDefinition:NodeDefinitionProxy):UITabDefinition {
+			var survey:SurveyProxy = rootEntityDefinition.survey;
+			var uiConfig:UIConfiguration = survey.uiConfiguration;
+			var tabDef:UITabDefinition = null;
+			if(uiConfig != null) {
+				var nodeName:String = rootEntityDefinition.name;
+				tabDef = uiConfig.getTabDefinition(nodeName);
+			}
+			return tabDef;
+		}
+		
+		public static function getUITab(nodeDefn:NodeDefinitionProxy):UITab {
+			var survey:SurveyProxy = nodeDefn.survey;
+			var rootEntity:EntityDefinitionProxy = nodeDefn.rootEntity;
+			var uiConfig:UIConfiguration = survey.uiConfiguration;
+			if ( uiConfig != null ) {
+				var tabDefn:UITabDefinition = uiConfig.getTabDefinition(rootEntity.name);
+				if ( tabDefn != null ) {
+					var tab:UITab = tabDefn.getTab(nodeDefn.uiTabName);
+					return tab;
+				}
+			}
+			return null;
 		}
 		
 	}

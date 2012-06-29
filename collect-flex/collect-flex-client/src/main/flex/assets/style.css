@@ -153,6 +153,7 @@ detail|AttributeItemRenderer {
 
 detail|MultipleAttributeFormItem s|BorderContainer, 
 	detail|SingleEntityFormItem s|BorderContainer,
+	detail|MultipleEntityFormItem s|BorderContainer,
 	detail|MultipleEntityAsTableFormItem s|BorderContainer  {
 	borderColor: #FFFFFF;
 	borderWeight: 1;
