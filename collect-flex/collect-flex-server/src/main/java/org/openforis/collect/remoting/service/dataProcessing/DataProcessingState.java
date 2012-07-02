@@ -1,5 +1,7 @@
 package org.openforis.collect.remoting.service.dataProcessing;
 
+import java.io.Serializable;
+
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 
 
@@ -8,8 +10,13 @@ import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedPro
  * @author S. Ricci
  *
  */
-public class DataProcessingState {
+public class DataProcessingState implements Serializable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	
 	private boolean running = false;
 	private boolean error = false;
 	private boolean cancelled = false;
@@ -17,6 +24,8 @@ public class DataProcessingState {
 
 	private int total;
 	private int count;
+	
+	private String errorMessage;
 
 	public DataProcessingState() {
 		super();
@@ -81,6 +90,14 @@ public class DataProcessingState {
 
 	public void setComplete(boolean complete) {
 		this.complete = complete;
+	}
+
+	public String getErrorMessage() {
+		return errorMessage;
+	}
+
+	public void setErrorMessage(String errorMessage) {
+		this.errorMessage = errorMessage;
 	}
 
 }

@@ -49,6 +49,7 @@
 			<include type="org.openforis.collect.remoting.service.dataExport.DataExportState"/>
 			<include type="org.openforis.collect.remoting.service.dataImport.DataImportConflict"/>
 			<include type="org.openforis.collect.remoting.service.dataImport.DataImportState"/>
+			<include type="org.openforis.collect.remoting.service.dataImport.DataImportState$Step"/>
         </externalizer>
     </externalizers>
   

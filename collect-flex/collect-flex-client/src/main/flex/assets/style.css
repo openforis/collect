@@ -91,7 +91,7 @@ mx|Alert {
 
 }*/
 
-component|BlockingMessagePopUp, component|SelectVersionPopUp, input|CodeListDialog, component|DataExportPopUp, component|BackupPopUp {
+component|BlockingMessagePopUp, component|SelectVersionPopUp, input|CodeListDialog, component|DataExportPopUp, component|BackupPopUp, component|DataImportPopUp {
 	skin-class: ClassReference("org.openforis.collect.ui.skin.TitleWindowSkin");
 	title-style-name: dialogHeaderStyle;
 	border-color: #000000;

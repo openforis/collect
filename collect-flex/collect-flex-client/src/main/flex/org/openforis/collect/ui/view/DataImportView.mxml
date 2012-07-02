@@ -3,9 +3,10 @@
 		 xmlns:s="library://ns.adobe.com/flex/spark" 
 		 xmlns:mx="library://ns.adobe.com/flex/mx"
 		 creationComplete="creationCompleteHandler(event)"
+		 xmlns:component="org.openforis.collect.ui.component.*"
 		 width="100%" height="100%">
 	<s:layout>
-		<s:VerticalLayout/>
+		<s:VerticalLayout horizontalAlign="center" />
 	</s:layout>
 	
 	<fx:Script>
@@ -16,8 +17,10 @@
 			import org.openforis.collect.presenter.DataImportPresenter;
 			
 			public static const STATE_DEFAULT:String = "default";
+			public static const STATE_LOADING:String = "loading";
 			public static const STATE_UPLOADING:String = "uploading";
 			public static const STATE_UPLOAD_COMPLETE:String = "uploadComplete";
+			public static const STATE_UPLOAD_COMPLETE_NEW_SURVEY:String = "uploadCompleteNewSurvey";
 			public static const STATE_IMPORT_RUNNING:String = "importRunning";
 			public static const STATE_IMPORT_COMPLETE:String = "importComplete";
 			
@@ -32,17 +35,13 @@
 
 	<s:states>
 		<s:State name="default" />
+		<s:State name="loading" />
 		<s:State name="uploading" />
 		<s:State name="uploadComplete" />
-		<s:State name="importRunning" stateGroups="importing" />
+		<s:State name="uploadCompleteNewSurvey" basedOn="uploadComplete" />
+		<s:State name="importRunning" basedOn="uploadComplete" stateGroups="importing" />
 		<s:State name="importComplete" stateGroups="importing" />
 	</s:states>
-	
-	<s:Form id="form">
-		<s:FormItem label="{Message.get('dataImport.surveyNameLabel')}">
-			<s:TextInput id="surveyNameTextInput" editable="false" editable.default="true" />
-		</s:FormItem>
-	</s:Form>
 	
 	<s:Button id="uploadButton" 
 			  label="{Message.get('dataImport.selectFileToUpload')}"
@@ -50,6 +49,28 @@
 			  useHandCursor="true"
 			  buttonMode="true"
 			  />
+
+	<component:LoadingContent includeIn="loading"
+							  height="100%" width="100%" />
+	
+	<s:VGroup includeInLayout="false" includeInLayout.uploadComplete="true"
+			  visible="false" visible.uploadComplete="true">
+		<s:Form id="form" includeIn="uploadCompleteNewSurvey">
+			<s:FormItem label="{Message.get('dataImport.newSurveyNameLabel')}">
+				<s:TextInput id="surveyNameTextInput" editable="false" editable.uploadCompleteNewSurvey="true" />
+			</s:FormItem>
+		</s:Form>
+		
+		<s:Label id="importSummaryLabel" />
+		
+		<s:Button id="startImportButton" 
+				  label="{Message.get('dataImport.startImport')}"
+				  useHandCursor="true"
+				  buttonMode="true"
+				  includeInLayout="false" includeInLayout.uploadComplete="true" includeInLayout.importing="false"
+				  visible="false" visible.uploadComplete="true" visible.importing="false"
+				  />
+	</s:VGroup>
 	
 	<s:VGroup width="100%" 
 			  visible="false" visible.importing="true" visible.uploading="true"

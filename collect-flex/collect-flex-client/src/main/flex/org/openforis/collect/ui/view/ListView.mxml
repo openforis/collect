@@ -15,7 +15,9 @@
 			import mx.collections.ArrayCollection;
 			import mx.events.FlexEvent;
 			
+			import org.openforis.collect.Application;
 			import org.openforis.collect.i18n.Message;
+			import org.openforis.collect.model.proxy.UserProxy;
 			import org.openforis.collect.presenter.ListPresenter;
 			
 			public static const DEFAULT_STATE:String = "default";
@@ -85,5 +87,13 @@
 		<s:Button id="exportButton" label="{Message.get('list.export')}" 
 				  useHandCursor="true" buttonMode="true" 
 				  enabled.inactive="false" />
+		
+		<mx:PopUpMenuButton id="adminSettingsButton"
+				  toolTip="{Message.get('list.adminSettings')}" 
+				  useHandCursor="true" buttonMode="true" 
+				  enabled.inactive="false"
+				  visible="{Application.user.hasRole(UserProxy.ROLE_ADMIN)}"
+				  />
+		
 	</s:HGroup>
 </s:Group>

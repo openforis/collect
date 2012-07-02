@@ -32,8 +32,13 @@ package org.openforis.collect.client {
 			token.addResponder(responder);
 		}
 		
-		public function startImport(responder:IResponder):void {
-			var token:AsyncToken = this._startImportOperation.send();
+		public function initProcess(responder:IResponder, overwriteAll:Boolean = false):void {
+			var token:AsyncToken = this._initProcessOperation.send(overwriteAll);
+			token.addResponder(responder);
+		}
+		
+		public function startImport(responder:IResponder, surveyName:String = null):void {
+			var token:AsyncToken = this._startImportOperation.send(surveyName);
 			token.addResponder(responder);
 		}
 
@@ -42,11 +47,6 @@ package org.openforis.collect.client {
 			token.addResponder(responder);
 		}
 
-		public function initProcess(responder:IResponder, surveyName:String, overwriteAll:Boolean = false):void {
-			var token:AsyncToken = this._initProcessOperation.send(surveyName, overwriteAll);
-			token.addResponder(responder);
-		}
-		
 		public function cancel(responder:IResponder):void {
 			var token:AsyncToken = this._cancelOperation.send();
 			token.addResponder(responder);

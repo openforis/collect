@@ -10,7 +10,6 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.Application;
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.client.DataClient;
-	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.event.UIEvent;
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 	import org.openforis.collect.model.CollectRecord$Step;
@@ -110,7 +109,6 @@ package org.openforis.collect.presenter {
 			var rootEntityDef:EntityDefinitionProxy = event.obj as EntityDefinitionProxy;
 			Application.activeRootEntity = rootEntityDef;
 			_view.currentState = MasterView.LIST_STATE;
-			//_view.currentState = MasterView.IMPORT_STATE;
 			
 			var uiEvent:UIEvent = new UIEvent(UIEvent.LOAD_RECORD_SUMMARIES);
 			eventDispatcher.dispatchEvent(uiEvent);

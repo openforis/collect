@@ -19,9 +19,7 @@
 			public static const LOADING_STATE:String = "loading";
 			public static const HOME_STATE:String = "home";
 			public static const LIST_STATE:String = "list";
-			public static const EXPORT_STATE:String = "export";
 			public static const DETAIL_STATE:String = "detail";
-			public static const IMPORT_STATE:String = "import";
 			
 			private var _masterPresenter:MasterPresenter;
 			
@@ -44,8 +42,6 @@
 		-->
 		<s:State name="list" />
 		<s:State name="detail" />
-		<s:State name="export" />
-		<s:State name="import" />
 	</s:states>
 	
 	<component:LoadingContent width="100%" height="100%" includeIn="loading" itemCreationPolicy="immediate"/>
@@ -56,6 +52,5 @@
 	-->
 	<view:ListView id="listView" includeIn="list" itemCreationPolicy="immediate" />
 	<view:DetailView id="detailView" includeIn="detail" itemCreationPolicy="immediate" />
-	<!--<view:DataExportView id="dataExportView" includeIn="export" itemCreationPolicy="immediate" />-->
-	<view:DataImportView id="dataImportView" includeIn="import" itemCreationPolicy="deferred" />
+	
 </s:Group>

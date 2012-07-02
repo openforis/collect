@@ -5,21 +5,16 @@ package org.openforis.collect.presenter {
 	 * */
 	import flash.display.DisplayObject;
 	import flash.events.Event;
-	import flash.events.FocusEvent;
-	import flash.events.KeyboardEvent;
 	import flash.events.MouseEvent;
 	
-	import mx.binding.utils.BindingUtils;
-	import mx.binding.utils.ChangeWatcher;
 	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
 	import mx.collections.ListCollectionView;
-	import mx.controls.Alert;
 	import mx.core.FlexGlobals;
+	import mx.core.IFlexDisplayObject;
 	import mx.events.CloseEvent;
 	import mx.events.FlexEvent;
-	import mx.events.FlexMouseEvent;
-	import mx.events.PropertyChangeEvent;
+	import mx.events.MenuEvent;
 	import mx.managers.PopUpManager;
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.IResponder;
@@ -30,33 +25,23 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.client.DataClient;
 	import org.openforis.collect.event.UIEvent;
 	import org.openforis.collect.i18n.Message;
-	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
-	import org.openforis.collect.model.CollectRecord$State;
 	import org.openforis.collect.model.CollectRecord$Step;
-	import org.openforis.collect.model.RecordSummarySortField;
-	import org.openforis.collect.model.RecordSummarySortField$Sortable;
 	import org.openforis.collect.model.proxy.RecordProxy;
-	import org.openforis.collect.model.proxy.UserProxy;
 	import org.openforis.collect.ui.UIBuilder;
-	import org.openforis.collect.ui.component.BackupPopUp;
 	import org.openforis.collect.ui.component.DataExportPopUp;
+	import org.openforis.collect.ui.component.DataImportPopUp;
 	import org.openforis.collect.ui.component.RecordFilterPopUp;
 	import org.openforis.collect.ui.component.SelectVersionPopUp;
 	import org.openforis.collect.ui.component.datagrid.PaginationBar;
 	import org.openforis.collect.ui.component.datagrid.RecordSummaryDataGrid;
 	import org.openforis.collect.ui.component.input.TextInput;
-	import org.openforis.collect.ui.view.DataExportView;
 	import org.openforis.collect.ui.view.ListView;
 	import org.openforis.collect.util.AlertUtil;
-	import org.openforis.collect.util.ArrayUtil;
-	import org.openforis.collect.util.CollectionUtil;
 	import org.openforis.collect.util.PopUpUtil;
 	import org.openforis.collect.util.StringUtil;
 	
-	import spark.collections.Sort;
-	import spark.collections.SortField;
 	import spark.events.GridSortEvent;
 
 
@@ -68,6 +53,9 @@ package org.openforis.collect.presenter {
 		private var _selectVersionPopUp:SelectVersionPopUp;
 		private var _newRecordResponder:IResponder;
 		private var _filterPopUp:RecordFilterPopUp;
+		
+		private const IMPORT_DATA_ITEM:String = Message.get("list.admin.importData");
+		private const ADMIN_SETTINGS_ITEMS:ArrayCollection = new ArrayCollection([IMPORT_DATA_ITEM]);
 		
 		/**
 		 * The total number of records.
@@ -101,6 +89,7 @@ package org.openforis.collect.presenter {
 			this._dataClient = ClientFactory.dataClient;
 			this._view.dataGrid.requestedRowCount = MAX_RECORDS_PER_PAGE;
 			_newRecordResponder = new AsyncResponder(createRecordResultHandler, faultHandler);
+			_view.adminSettingsButton.dataProvider = ADMIN_SETTINGS_ITEMS;
 			super();
 		}
 
@@ -121,9 +110,18 @@ package org.openforis.collect.presenter {
 			this._view.paginationBar.nextPageButton.addEventListener(MouseEvent.CLICK, nextPageClickHandler);
 			this._view.paginationBar.lastPageButton.addEventListener(MouseEvent.CLICK, lastPageClickHandler);
 			//this._view.paginationBar.goToPageButton.addEventListener(MouseEvent.CLICK, goToPageClickHandler);
+			_view.adminSettingsButton.addEventListener(MenuEvent.ITEM_CLICK, adminSettingsItemClickHandler);
 			_view.stage.addEventListener(MouseEvent.CLICK, stageClickHandler);
 		}
-	
+		
+		protected function adminSettingsItemClickHandler(event:MenuEvent):void {
+			switch ( event.item ) {
+				case IMPORT_DATA_ITEM:
+					var popUp:IFlexDisplayObject = PopUpUtil.createPopUp(DataImportPopUp, true);
+					break;
+			}
+		}
+		
 		/**
 		 * New Record Button clicked 
 		 * */

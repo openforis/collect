@@ -13,20 +13,18 @@ package org.openforis.collect.presenter {
 	import flash.utils.Timer;
 	
 	import mx.collections.IList;
-	import mx.collections.ListCollectionView;
-	import mx.formatters.DateFormatter;
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.IResponder;
 	import mx.rpc.events.ResultEvent;
 	
 	import org.openforis.collect.Application;
 	import org.openforis.collect.client.ClientFactory;
-	import org.openforis.collect.client.DataClient;
 	import org.openforis.collect.client.DataImportClient;
 	import org.openforis.collect.i18n.Message;
 	import org.openforis.collect.model.CollectRecord$Step;
 	import org.openforis.collect.remoting.service.dataImport.DataImportConflict;
 	import org.openforis.collect.remoting.service.dataImport.DataImportState;
+	import org.openforis.collect.remoting.service.dataImport.DataImportState$Step;
 	import org.openforis.collect.ui.component.datagrid.RecordSummaryDataGrid;
 	import org.openforis.collect.ui.view.DataImportView;
 	import org.openforis.collect.util.AlertUtil;
@@ -76,6 +74,7 @@ package org.openforis.collect.presenter {
 			_fileReference.addEventListener(DataEvent.UPLOAD_COMPLETE_DATA, fileReferenceUploadCompleteDataHandler);
 			
 			_view.uploadButton.addEventListener(MouseEvent.CLICK, uploadButtonClickHandler);
+			_view.startImportButton.addEventListener(MouseEvent.CLICK, startImportClickHandler);
 			_view.cancelButton.addEventListener(MouseEvent.CLICK, cancelButtonClickHandler);
 		}
 		
@@ -123,10 +122,9 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function fileReferenceUploadCompleteDataHandler(event:DataEvent):void {
-			_view.currentState = DataImportView.STATE_UPLOAD_COMPLETE;
+			_view.currentState = DataImportView.STATE_LOADING;
 			var responder:AsyncResponder = new AsyncResponder(initProcessResultHandler, faultHandler);
-			var surveyName:String = _view.surveyNameTextInput.text;
-			_dataImportClient.initProcess(responder, surveyName);
+			_dataImportClient.initProcess(responder);
 		}
 		
 		protected function fileReferenceIoErrorHandler(event:IOErrorEvent):void {
@@ -136,17 +134,43 @@ package org.openforis.collect.presenter {
 		
 		protected function initProcessResultHandler(event:ResultEvent, token:Object = null):void {
 			var state:DataImportState = event.result as DataImportState;
+			if ( state.newSurvey ) {
+				_view.currentState = DataImportView.STATE_UPLOAD_COMPLETE_NEW_SURVEY;
+			} else {
+				_view.currentState = DataImportView.STATE_UPLOAD_COMPLETE;
+			}
 			var entryTotalRecords:int = state.totalPerStep.get(CollectRecord$Step.ENTRY);
 			var cleansingTotalRecords:int = state.totalPerStep.get(CollectRecord$Step.CLEANSING);
 			var analysisTotalRecords:int = state.totalPerStep.get(CollectRecord$Step.ANALYSIS);
-			AlertUtil.showConfirm("dataImport.confirmStart", [entryTotalRecords, cleansingTotalRecords, analysisTotalRecords], null, initProcessConfirmHandler);
+			var importSummary:String = Message.get("dataImport.importSummary", [entryTotalRecords, cleansingTotalRecords, analysisTotalRecords]);
+			_view.importSummaryLabel.text = importSummary;
+			//AlertUtil.showConfirm("dataImport.confirmStart", [entryTotalRecords, cleansingTotalRecords, analysisTotalRecords], null, initProcessConfirmHandler);
 		}
 		
-		protected function initProcessConfirmHandler():void {
-			var responder:AsyncResponder = new AsyncResponder(startImportResultHandler, faultHandler);
-			_dataImportClient.startImport(responder);
-			_view.progressBar.setProgress(0, 0);
-			_view.currentState = DataImportView.STATE_IMPORT_RUNNING;
+		protected function startImportClickHandler(event:MouseEvent):void {
+			if ( validateForm() ) {
+				var responder:AsyncResponder = new AsyncResponder(startImportResultHandler, faultHandler);
+				var surveyName:String = null;
+				if ( _view.currentState == DataImportView.STATE_UPLOAD_COMPLETE_NEW_SURVEY ) {
+					surveyName = _view.surveyNameTextInput.text;
+				}
+				_dataImportClient.startImport(responder, surveyName);
+				_view.progressBar.setProgress(0, 0);
+				_view.currentState = DataImportView.STATE_IMPORT_RUNNING;
+			}
+		}
+		
+		protected function validateForm():Boolean {
+			if ( _view.currentState == DataImportView.STATE_UPLOAD_COMPLETE_NEW_SURVEY ) {
+				var surveyName:String = _view.surveyNameTextInput.text;
+				surveyName = StringUtil.trim(surveyName);
+				_view.surveyNameTextInput.text = surveyName;
+				if ( StringUtil.isBlank(surveyName) ) {
+					AlertUtil.showError("dataImport.error.specifySurveyName");
+					return false;
+				}
+			}
+			return true;
 		}
 		
 		protected function startImportResultHandler(event:ResultEvent, token:Object = null):void {
@@ -188,36 +212,40 @@ package org.openforis.collect.presenter {
 		
 		private function updateView():void {
 			if(_state != null) {
-				if ( _state.running && _state.count <= _state.total ) {
+				var step:DataImportState$Step = _state.step;
+				switch ( step ) {
+				case DataImportState$Step.IMPORTING:
 					_view.currentState = DataImportView.STATE_IMPORT_RUNNING;
 					updateViewForImporting();
 					if ( _progressTimer == null ) {
 						startProgressTimer();
 					}
-				} else if ( _state.conflict != null ) {
+					break;
+				case DataImportState$Step.COMPLETE:
+					if ( _firstOpen ) {
+						resetView();
+					} else {
+						_view.currentState = DataImportView.STATE_IMPORT_COMPLETE;
+						updateViewForImporting();
+						stopProgressTimer();
+					}
+					break;
+				case DataImportState$Step.CONFLICT:
 					_view.currentState = DataImportView.STATE_IMPORT_RUNNING;
 					updateViewForImporting();
 					stopProgressTimer();
 					showConfirmForConflict();
-				} else if ( !_firstOpen && _state.complete ) {
-					_view.currentState = DataImportView.STATE_IMPORT_COMPLETE;
-					updateViewForImporting();
-					stopProgressTimer();
-				} else {
-					if ( !_firstOpen ) {
-						if ( _state.error ) {
-							AlertUtil.showError("dataImport.error");
-							resetView();
-						} else if ( _state.cancelled ) {
-							AlertUtil.showError("dataImport.cancelled");
-							resetView();
-						} else {
-							//process starting in a while...
-							startProgressTimer();
-						}
-					} else {
-						resetView();
-					}
+					break;
+				case DataImportState$Step.ERROR:
+					AlertUtil.showError("dataImport.error");
+					resetView();
+					break;
+				case DataImportState$Step.CANCELLED:
+					AlertUtil.showError("dataImport.cancelled");
+					resetView();
+					break;
+				default:
+					resetView();
 				}
 			} else {
 				resetView();
