@@ -89,11 +89,15 @@
 				  enabled.inactive="false" />
 		
 		<mx:PopUpMenuButton id="adminSettingsButton"
-				  toolTip="{Message.get('list.adminSettings')}" 
-				  useHandCursor="true" buttonMode="true" 
-				  enabled.inactive="false"
-				  visible="{Application.user.hasRole(UserProxy.ROLE_ADMIN)}"
-				  />
+							openAlways="true"
+							toolTip="{Message.get('list.adminSettings')}" 
+							useHandCursor="true" buttonMode="true" 
+							enabled.inactive="false"
+							styleName="settings"
+							visible="{Application.user.hasRole(UserProxy.ROLE_ADMIN)}"
+							arrowButtonWidth="20"
+							width="20"
+							/>
 		
 	</s:HGroup>
 </s:Group>

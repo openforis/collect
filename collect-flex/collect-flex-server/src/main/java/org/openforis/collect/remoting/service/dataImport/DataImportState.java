@@ -20,7 +20,7 @@ public class DataImportState extends DataProcessingState {
 	private static final long serialVersionUID = 1L;
 
 	public enum Step {
-		PREPARE, INITED, IMPORTING, CONFLICT, COMPLETE, CANCELLED, ERROR;
+		PREPARE, INITED, STARTING, IMPORTING, CONFLICT, COMPLETE, CANCELLED, ERROR;
 	}
 	
 	private Step step;
@@ -41,8 +41,8 @@ public class DataImportState extends DataProcessingState {
 		updatedCount = 0;
 		errors = new HashMap<String, String>();
 		warnings = new HashMap<String, String>();
-		totalPerStep = new HashMap<CollectRecord.Step, Integer>();
-		step = Step.PREPARE;
+		//totalPerStep = new HashMap<CollectRecord.Step, Integer>();
+		step = Step.ERROR;
 	}
 
 	public void addError(String fileName, String error) {
@@ -52,7 +52,7 @@ public class DataImportState extends DataProcessingState {
 	public void addWarning(String fileName, String warning) {
 		warnings.put(fileName, warning);
 	}
-
+	
 	public Map<CollectRecord.Step, Integer> getTotalPerStep() {
 		return totalPerStep;
 	}
@@ -60,7 +60,7 @@ public class DataImportState extends DataProcessingState {
 	public void setTotalPerStep(Map<CollectRecord.Step, Integer> totalPerStep) {
 		this.totalPerStep = totalPerStep;
 	}
-	
+
 	public void incrementInsertedCount() {
 		insertedCount ++;
 		incrementCount();

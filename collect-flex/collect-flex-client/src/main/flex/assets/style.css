@@ -295,3 +295,6 @@ s|Label.dataGroupHeader {
 	fontSize: 14;
 }
 
+mx|PopUpMenuButton.settings {
+	popUpIcon: Embed(source='assets/images/settings.png');
+}

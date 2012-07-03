@@ -23,8 +23,8 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.i18n.Message;
 	import org.openforis.collect.model.CollectRecord$Step;
 	import org.openforis.collect.remoting.service.dataImport.DataImportConflict;
-	import org.openforis.collect.remoting.service.dataImport.DataImportState;
 	import org.openforis.collect.remoting.service.dataImport.DataImportState$Step;
+	import org.openforis.collect.remoting.service.dataImport.DataImportStateProxy;
 	import org.openforis.collect.ui.component.datagrid.RecordSummaryDataGrid;
 	import org.openforis.collect.ui.view.DataImportView;
 	import org.openforis.collect.util.AlertUtil;
@@ -46,7 +46,7 @@ package org.openforis.collect.presenter {
 		private var _fileReference:FileReference;
 		private var _dataImportClient:DataImportClient;
 		private var _progressTimer:Timer;
-		private var _state:DataImportState;
+		private var _state:DataImportStateProxy;
 		
 		private var _getStateResponder:IResponder;
 		private var _firstOpen:Boolean;
@@ -133,15 +133,19 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function initProcessResultHandler(event:ResultEvent, token:Object = null):void {
-			var state:DataImportState = event.result as DataImportState;
-			if ( state.newSurvey ) {
+			_state = event.result as DataImportStateProxy;
+			updateViewProcessInited();
+		}
+		
+		protected function updateViewProcessInited():void {
+			if ( _state.newSurvey ) {
 				_view.currentState = DataImportView.STATE_UPLOAD_COMPLETE_NEW_SURVEY;
 			} else {
 				_view.currentState = DataImportView.STATE_UPLOAD_COMPLETE;
 			}
-			var entryTotalRecords:int = state.totalPerStep.get(CollectRecord$Step.ENTRY);
-			var cleansingTotalRecords:int = state.totalPerStep.get(CollectRecord$Step.CLEANSING);
-			var analysisTotalRecords:int = state.totalPerStep.get(CollectRecord$Step.ANALYSIS);
+			var entryTotalRecords:int = _state.totalPerStep.get(CollectRecord$Step.ENTRY);
+			var cleansingTotalRecords:int = _state.totalPerStep.get(CollectRecord$Step.CLEANSING);
+			var analysisTotalRecords:int = _state.totalPerStep.get(CollectRecord$Step.ANALYSIS);
 			var importSummary:String = Message.get("dataImport.importSummary", [entryTotalRecords, cleansingTotalRecords, analysisTotalRecords]);
 			_view.importSummaryLabel.text = importSummary;
 			//AlertUtil.showConfirm("dataImport.confirmStart", [entryTotalRecords, cleansingTotalRecords, analysisTotalRecords], null, initProcessConfirmHandler);
@@ -174,7 +178,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function startImportResultHandler(event:ResultEvent, token:Object = null):void {
-			_state = event.result as DataImportState;
+			_state = event.result as DataImportStateProxy;
 			updateView();
 		}
 		
@@ -187,7 +191,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function getStateResultHandler(event:ResultEvent, token:Object = null):void {
-			_state = event.result as DataImportState;
+			_state = event.result as DataImportStateProxy;
 			updateView();
 		}
 		
@@ -214,6 +218,15 @@ package org.openforis.collect.presenter {
 			if(_state != null) {
 				var step:DataImportState$Step = _state.step;
 				switch ( step ) {
+				case DataImportState$Step.INITED:
+					resetView();
+					break;
+				case DataImportState$Step.STARTING:
+					_view.currentState = DataImportView.STATE_LOADING;
+					if ( _progressTimer == null ) {
+						startProgressTimer();
+					}
+					break;
 				case DataImportState$Step.IMPORTING:
 					_view.currentState = DataImportView.STATE_IMPORT_RUNNING;
 					updateViewForImporting();

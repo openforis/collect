@@ -21,18 +21,14 @@ import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
-import org.openforis.collect.model.CollectSurveyContext;
 import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.RecordDao;
 import org.openforis.collect.persistence.SurveyImportException;
-import org.openforis.collect.persistence.xml.CollectIdmlBindingContext;
 import org.openforis.collect.persistence.xml.DataHandler;
 import org.openforis.collect.persistence.xml.DataUnmarshaller;
 import org.openforis.collect.persistence.xml.DataUnmarshallerException;
 import org.openforis.idm.metamodel.xml.InvalidIdmlException;
-import org.openforis.idm.metamodel.xml.SurveyUnmarshaller;
 import org.openforis.idm.model.Entity;
-import org.openforis.idm.model.expression.ExpressionFactory;
 
 /**
  * 
@@ -128,16 +124,25 @@ public class DataImportProcess implements Callable<Void> {
 		}
 	}
 
+	public void prepareToStart() {
+		state.setStep(DataImportState.Step.STARTING);
+	}
+
 	@Override
 	public Void call() throws Exception {
+		ZipFile zipFile = null;
 		try {
 			state.setRunning(true);
-			if (state.getStep() == DataImportState.Step.INITED) {
+			if (state.getStep() == DataImportState.Step.STARTING) {
 				dataUnmarshaller = initDataUnmarshaller();
+			}
+			DataImportState.Step dataImportStep = state.getStep();
+			if ( dataImportStep != DataImportState.Step.CONFLICT ) {
+				state.setStep(DataImportState.Step.IMPORTING);
 			}
 			Step[] steps = Step.values();
 			for (Step step : steps) {
-				ZipFile zipFile = new ZipFile(packagedFile);
+				zipFile = new ZipFile(packagedFile);
 				Enumeration<? extends ZipEntry> entries = zipFile.entries();
 				while (entries.hasMoreElements()) {
 					ZipEntry zipEntry = (ZipEntry) entries.nextElement();
@@ -145,12 +150,10 @@ public class DataImportProcess implements Callable<Void> {
 					if (!zipEntry.isDirectory() && !IDML_FILE_NAME.equals(entryName)) {
 						Step entryStep = getStep(entryName);
 						if (entryStep == step) {
-							DataImportState.Step dataImportStep = state.getStep();
 							if (dataImportStep == DataImportState.Step.CONFLICT && !state.getConflictingEntryName().equals(entryName)) {
 								continue;
 							}
 							InputStream entryInputStream = zipFile.getInputStream(zipEntry);
-							state.setStep(DataImportState.Step.IMPORTING);
 							importZipEntry(entryInputStream, entryName, step);
 							entryInputStream.close();
 							dataImportStep = state.getStep();
@@ -174,6 +177,9 @@ public class DataImportProcess implements Callable<Void> {
 			state.setErrorMessage(e.getMessage());
 			state.setStep(DataImportState.Step.ERROR);
 			LOG.error("Error during data export", e);
+			if ( zipFile != null ) {
+				zipFile.close();
+			}
 		} finally {
 			state.setRunning(false);
 		}
@@ -199,12 +205,13 @@ public class DataImportProcess implements Callable<Void> {
 	private void importZipEntry(InputStream inputStream, String entryName, Step step) throws IOException {
 		LOG.info("Extracting: " + entryName);
 		InputStreamReader reader = new InputStreamReader(inputStream);
-		ParseRecordResult parseRecordResult = parseRecord(dataUnmarshaller, reader);
+		ParseRecordResult parseRecordResult = parseRecord(reader);
 		CollectRecord parsedRecord = parseRecordResult.record;
 		String message = parseRecordResult.message;
 		DataImportState.Step dataImportStep = state.getStep();
 		Boolean promptForConflict = !overwriteAll && dataImportStep != DataImportState.Step.CONFLICT;
 		Boolean overwriteExistingRecord = overwriteAll || dataImportStep == DataImportState.Step.CONFLICT && overwriteExistingRecordInConflict;
+		state.setStep(DataImportState.Step.IMPORTING);
 		if (parsedRecord == null) {
 			state.addError(entryName, message);
 			state.incrementCount();
@@ -213,8 +220,14 @@ public class DataImportProcess implements Callable<Void> {
 			CollectRecord oldRecord = findAlreadyExistingRecord(parsedRecord);
 			if (oldRecord != null) {
 				if (overwriteExistingRecord) {
-					replaceData(parsedRecord, oldRecord);
-					recordDao.update(oldRecord);
+					CollectRecord oldRecordFull = recordDao.load((CollectSurvey) parsedRecord.getSurvey(), parsedRecord.getId(), oldRecord.getStep().getStepNumber());
+					replaceData(parsedRecord, oldRecordFull);
+					recordDao.update(oldRecordFull);
+					if ( oldRecordFull.getStep() != parsedRecord.getStep() ) {
+						oldRecordFull.setStep(oldRecord.getStep());
+						oldRecordFull.updateDerivedStates();
+						recordDao.update(oldRecordFull);
+					}
 					state.incrementUpdatedCount();
 					LOG.info("Updated: " + oldRecord.getId() + " (from file " + entryName + ")");
 				} else if (promptForConflict) {
@@ -248,10 +261,10 @@ public class DataImportProcess implements Callable<Void> {
 		String rootEntityName = rootEntity.getName();
 		List<CollectRecord> oldRecords = recordManager.loadSummaries(survey, rootEntityName, keyValues.toArray(new String[0]));
 		if (oldRecords != null && oldRecords.size() == 1) {
-			return oldRecords.get(0);
-		} else {
-			return null;
+			CollectRecord existingRecord = oldRecords.get(0);
+			return existingRecord;
 		}
+		return null;
 	}
 
 	public CollectSurvey extractPackagedSurvey() throws IOException, InvalidIdmlException {
@@ -265,31 +278,14 @@ public class DataImportProcess implements Callable<Void> {
 			String entryName = zipEntry.getName();
 			if (IDML_FILE_NAME.equals(entryName)) {
 				InputStream is = zipFile.getInputStream(zipEntry);
-				CollectSurvey survey = unmarshalSurvey(is);
+				CollectSurvey survey = surveyManager.unmarshalSurvey(is);
 				return survey;
 			}
 		}
 		return null;
 	}
 
-	public CollectSurvey unmarshalSurvey(InputStream is) throws InvalidIdmlException {
-		CollectSurvey survey = surveyManager.unmarshalSurvey(is);
-		return survey;
-	}
-
-	public CollectSurvey importSurvey(String name, String idmlFilename) throws Exception {
-		CollectSurvey survey = surveyManager.get(name);
-		if (survey == null) {
-			CollectIdmlBindingContext idmlBindingContext = new CollectIdmlBindingContext(new CollectSurveyContext(new ExpressionFactory(), null, null));
-			SurveyUnmarshaller surveyUnmarshaller = idmlBindingContext.createSurveyUnmarshaller();
-			survey = (CollectSurvey) surveyUnmarshaller.unmarshal(idmlFilename);
-			survey.setName(name);
-			surveyManager.importModel(survey);
-		}
-		return survey;
-	}
-
-	private ParseRecordResult parseRecord(DataUnmarshaller dataUnmarshaller, Reader reader) throws IOException {
+	private ParseRecordResult parseRecord(Reader reader) throws IOException {
 		ParseRecordResult result = new ParseRecordResult();
 		try {
 			CollectRecord record = dataUnmarshaller.parse(reader);
@@ -302,7 +298,11 @@ public class DataImportProcess implements Callable<Void> {
 				result.success = false;
 			} else {
 				result.success = true;
-				record.updateDerivedStates();
+				try {
+					record.updateDerivedStates();
+				} catch (Exception e) {
+					LOG.info("Error validating record: " + record.getRootEntityKeyValues());
+				}
 				record.updateRootEntityKeyValues();
 				record.updateEntityCounts();
 			}

@@ -8,7 +8,7 @@
 package org.openforis.collect.remoting.service.dataImport {
 
     [Bindable]
-    [RemoteClass(alias="org.openforis.collect.remoting.service.dataImport.DataImportState")]
-    public class DataImportState extends DataImportStateBase {
+    [RemoteClass(alias="org.openforis.collect.remoting.service.dataImport.DataImportStateProxy")]
+    public class DataImportStateProxy extends DataImportStateProxyBase {
     }
 }
