@@ -33,7 +33,7 @@ public class DataImportState extends DataProcessingState {
 	private int insertedCount;
 	private int updatedCount;
 	private DataImportConflict conflict;
-	private String conflictingEntryName;
+	private int conflictingEntryRecordId;
 
 	public DataImportState() {
 		super();
@@ -111,12 +111,12 @@ public class DataImportState extends DataProcessingState {
 		this.step = step;
 	}
 
-	public String getConflictingEntryName() {
-		return conflictingEntryName;
+	public int getConflictingEntryRecordId() {
+		return conflictingEntryRecordId;
 	}
 
-	public void setConflictingEntryName(String conflictingEntryName) {
-		this.conflictingEntryName = conflictingEntryName;
+	public void setConflictingEntryRecordId(int conflictingEntryRecordId) {
+		this.conflictingEntryRecordId = conflictingEntryRecordId;
 	}
-	
+
 }

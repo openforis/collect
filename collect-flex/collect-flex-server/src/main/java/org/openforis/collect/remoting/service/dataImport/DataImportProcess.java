@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
@@ -59,6 +60,7 @@ public class DataImportProcess implements Callable<Void> {
 
 	private DataUnmarshaller dataUnmarshaller;
 	
+	private Map<Step, List<Integer>> recordsPerStep;
 	private List<Integer> processedRecords;
 
 	public DataImportProcess(SurveyManager surveyManager, RecordManager recordManager, RecordDao recordDao, Map<String, User> users, File packagedFile, boolean overwriteAll) {
@@ -95,12 +97,16 @@ public class DataImportProcess implements Callable<Void> {
 		try {
 			state.reset();
 			state.setStep(DataImportState.Step.PREPARE);
+			processedRecords = new ArrayList<Integer>();
 			packagedSurvey = extractPackagedSurvey();
 
 			String uri = packagedSurvey.getUri();
 			CollectSurvey survey = surveyManager.getByUri(uri);
 			state.setNewSurvey(survey == null);
-			Map<CollectRecord.Step, Integer> totalRecords = new HashMap<CollectRecord.Step, Integer>();
+			recordsPerStep = new HashMap<CollectRecord.Step, List<Integer>>();
+			for(Step step: Step.values()) {
+				recordsPerStep.put(step, new ArrayList<Integer>());
+			}
 			int total = 0;
 			ZipFile zipFile = new ZipFile(packagedFile);
 			Enumeration<? extends ZipEntry> entries = zipFile.entries();
@@ -111,14 +117,19 @@ public class DataImportProcess implements Callable<Void> {
 					continue;
 				}
 				Step step = getStep(entryName);
-				Integer totalPerStep = totalRecords.get(step);
-				if (totalPerStep == null) {
-					totalPerStep = 0;
-				}
-				totalRecords.put(step, totalPerStep + 1);
+				List<Integer> records = recordsPerStep.get(step);
+				Integer recordId = getRecordId(entryName);
+				records.add(recordId);
 				total++;
 			}
+			zipFile.close();
 			state.setTotal(total);
+			Map<CollectRecord.Step, Integer> totalRecords = new HashMap<CollectRecord.Step, Integer>();
+			for(Step step: Step.values()) {
+				List<Integer> records = recordsPerStep.get(step);
+				int size = records.size();
+				totalRecords.put(step, size);
+			}
 			state.setTotalPerStep(totalRecords);
 			state.setStep(DataImportState.Step.INITED);
 		} catch (Exception e) {
@@ -132,46 +143,33 @@ public class DataImportProcess implements Callable<Void> {
 
 	@Override
 	public Void call() throws Exception {
-		ZipFile zipFile = null;
 		try {
+			ZipFile zipFile = new ZipFile(packagedFile);
 			state.setRunning(true);
 			if (state.getStep() == DataImportState.Step.STARTING) {
 				dataUnmarshaller = initDataUnmarshaller();
 			}
 			DataImportState.Step dataImportStep = state.getStep();
-			if ( dataImportStep != DataImportState.Step.CONFLICT ) {
+			if ( dataImportStep == DataImportState.Step.CONFLICT ) {
+				importEntries(zipFile, state.getConflictingEntryRecordId());
+			} else {
 				state.setStep(DataImportState.Step.IMPORTING);
 			}
 			Step[] steps = Step.values();
 			for (Step step : steps) {
-				zipFile = new ZipFile(packagedFile);
-				Enumeration<? extends ZipEntry> entries = zipFile.entries();
-				while (entries.hasMoreElements()) {
-					ZipEntry zipEntry = (ZipEntry) entries.nextElement();
-					String entryName = zipEntry.getName();
-					if (!zipEntry.isDirectory() && !IDML_FILE_NAME.equals(entryName)) {
-						Step entryStep = getStep(entryName);
-						if (entryStep == step) {
-							if (dataImportStep == DataImportState.Step.CONFLICT && !state.getConflictingEntryName().equals(entryName)) {
-								continue;
-							}
-							InputStream entryInputStream = zipFile.getInputStream(zipEntry);
-							importZipEntry(entryInputStream, entryName, step);
-							entryInputStream.close();
-							dataImportStep = state.getStep();
-							if (dataImportStep == DataImportState.Step.CONFLICT) {
-								zipFile.close();
-								return null;
-							} else {
-								overwriteExistingRecordInConflict = false;
-							}
+				List<Integer> records = recordsPerStep.get(step);
+				for (Integer recordId : records) {
+					if ( ! processedRecords.contains(recordId) ) {
+						importEntries(zipFile, recordId);
+						dataImportStep = state.getStep();
+						if ( dataImportStep == DataImportState.Step.CONFLICT ) {
+							return null;
 						}
 					}
 				}
-				zipFile.close();
 			}
-			DataImportState.Step step = state.getStep();
-			if (!(step == DataImportState.Step.CANCELLED || step == DataImportState.Step.CONFLICT)) {
+			dataImportStep = state.getStep();
+			if (!(dataImportStep == DataImportState.Step.CANCELLED || dataImportStep == DataImportState.Step.CONFLICT)) {
 				state.setStep(DataImportState.Step.COMPLETE);
 			}
 		} catch (Exception e) {
@@ -179,25 +177,91 @@ public class DataImportProcess implements Callable<Void> {
 			state.setErrorMessage(e.getMessage());
 			state.setStep(DataImportState.Step.ERROR);
 			LOG.error("Error during data export", e);
-			if ( zipFile != null ) {
-				zipFile.close();
-			}
 		} finally {
 			state.setRunning(false);
 		}
 		return null;
 	}
 	
-	private InputStream getEntryInputStream(Integer recordId, Step step) throws IOException, DataImportExeption {
-		ZipFile zipFile = new ZipFile(packagedFile);
+	private void importEntries(ZipFile zipFile, int recordId) throws IOException, DataImportExeption {
+		Step[] steps = Step.values();
+		DataImportState.Step dataImportStep = state.getStep();
+		Boolean promptForConflict = !overwriteAll && dataImportStep != DataImportState.Step.CONFLICT;
+		Boolean overwriteExistingRecord = overwriteAll || dataImportStep == DataImportState.Step.CONFLICT && overwriteExistingRecordInConflict;
+		state.setStep(DataImportState.Step.IMPORTING);
+		CollectRecord lastStepRecord = null;
+		Step oldRecordStep = null;
+		for (Step step : steps) {
+			String entryName = step.getStepNumber() + File.separator + recordId + ".xml";
+			InputStream inputStream = getEntryInputStream(zipFile, recordId, step);
+			if ( inputStream != null ) {
+				InputStreamReader reader = new InputStreamReader(inputStream);
+				ParseRecordResult parseRecordResult = parseRecord(reader);
+				CollectRecord parsedRecord = parseRecordResult.record;
+				String message = parseRecordResult.message;
+				if (parsedRecord == null) {
+					state.addError(entryName, message);
+					state.incrementCount();
+				} else {
+					parsedRecord.setStep(step);
+					if ( lastStepRecord == null ) {
+						CollectRecord oldRecord = findAlreadyExistingRecord(parsedRecord);
+						if (oldRecord != null) {
+							if (overwriteExistingRecord) {
+								oldRecordStep = oldRecord != null ? oldRecord.getStep(): null;
+								lastStepRecord = recordDao.load((CollectSurvey) parsedRecord.getSurvey(), oldRecord.getId(), oldRecord.getStep().getStepNumber());
+								replaceData(parsedRecord, lastStepRecord);
+								recordDao.update(lastStepRecord);
+								state.incrementUpdatedCount();
+								LOG.info("Updated: " + oldRecord.getId() + " (from file " + entryName  + ")");
+							} else if (promptForConflict) {
+								DataImportConflict conflict = new DataImportConflict(entryName, oldRecord, parsedRecord);
+								state.setStep(DataImportState.Step.CONFLICT);
+								state.setConflict(conflict);
+								state.setConflictingEntryRecordId(recordId);
+								return;
+							} else {
+								// skip record
+								state.incrementCount();
+							}
+						} else {
+							recordDao.insert(parsedRecord);
+							lastStepRecord = parsedRecord;
+							state.incrementInsertedCount();
+							LOG.info("Inserted: " + parsedRecord.getId() + " (from file " + entryName + ")");
+						}
+					} else {
+						replaceData(parsedRecord, lastStepRecord);
+						recordDao.update(lastStepRecord);
+						state.incrementUpdatedCount();
+					}
+				}
+				if (!parseRecordResult.success) {
+					if (parseRecordResult.warnings > 0) {
+						state.addWarning(entryName, message);
+					} else {
+						state.addError(entryName, message);
+					}
+				}
+			}
+			if ( lastStepRecord != null && oldRecordStep != null && lastStepRecord.getStep() != oldRecordStep ) {
+				lastStepRecord.setStep(oldRecordStep);
+				lastStepRecord.updateDerivedStates();
+				recordDao.update(lastStepRecord);
+			}
+			processedRecords.add(recordId);
+		}
+	}
+
+	private InputStream getEntryInputStream(ZipFile zipFile, int recordId, Step step) throws IOException, DataImportExeption {
 		Enumeration<? extends ZipEntry> entries = zipFile.entries();
 		while (entries.hasMoreElements()) {
 			ZipEntry zipEntry = (ZipEntry) entries.nextElement();
 			String entryName = zipEntry.getName();
-			Step entryStep = getStep(entryName);
-			if ( entryStep == step) {
-				Integer entryRecordId = getRecordId(entryName);
-				if ( entryRecordId == recordId ) {
+			if ( ! ( zipEntry.isDirectory() || IDML_FILE_NAME.equals(entryName) ) ) {
+				Step entryStep = getStep(entryName);
+				int entryRecordId = getRecordId(entryName);
+				if ( entryStep == step && entryRecordId == recordId ) {
 					return zipFile.getInputStream(zipEntry);
 				}
 			}
@@ -219,58 +283,6 @@ public class DataImportProcess implements Callable<Void> {
 		}
 		DataUnmarshaller dataUnmarshaller = new DataUnmarshaller(handler);
 		return dataUnmarshaller;
-	}
-
-	private void importZipEntry(InputStream inputStream, String entryName, Step step) throws IOException {
-		LOG.info("Extracting: " + entryName);
-		InputStreamReader reader = new InputStreamReader(inputStream);
-		ParseRecordResult parseRecordResult = parseRecord(reader);
-		CollectRecord parsedRecord = parseRecordResult.record;
-		String message = parseRecordResult.message;
-		DataImportState.Step dataImportStep = state.getStep();
-		Boolean promptForConflict = !overwriteAll && dataImportStep != DataImportState.Step.CONFLICT;
-		Boolean overwriteExistingRecord = overwriteAll || dataImportStep == DataImportState.Step.CONFLICT && overwriteExistingRecordInConflict;
-		state.setStep(DataImportState.Step.IMPORTING);
-		if (parsedRecord == null) {
-			state.addError(entryName, message);
-			state.incrementCount();
-		} else {
-			parsedRecord.setStep(step);
-			CollectRecord oldRecord = findAlreadyExistingRecord(parsedRecord);
-			if (oldRecord != null) {
-				if (overwriteExistingRecord) {
-					CollectRecord oldRecordFull = recordDao.load((CollectSurvey) parsedRecord.getSurvey(), parsedRecord.getId(), oldRecord.getStep().getStepNumber());
-					replaceData(parsedRecord, oldRecordFull);
-					recordDao.update(oldRecordFull);
-					if ( oldRecordFull.getStep() != parsedRecord.getStep() ) {
-						oldRecordFull.setStep(oldRecord.getStep());
-						oldRecordFull.updateDerivedStates();
-						recordDao.update(oldRecordFull);
-					}
-					state.incrementUpdatedCount();
-					LOG.info("Updated: " + oldRecord.getId() + " (from file " + entryName + ")");
-				} else if (promptForConflict) {
-					DataImportConflict conflict = new DataImportConflict(entryName, oldRecord, parsedRecord);
-					state.setStep(DataImportState.Step.CONFLICT);
-					state.setConflict(conflict);
-					state.setConflictingEntryName(entryName);
-				} else {
-					// skip record
-					state.incrementCount();
-				}
-			} else {
-				recordDao.insert(parsedRecord);
-				state.incrementInsertedCount();
-				LOG.info("Inserted: " + parsedRecord.getId() + " (from file " + entryName + ")");
-			}
-		}
-		if (!parseRecordResult.success) {
-			if (parseRecordResult.warnings > 0) {
-				state.addWarning(entryName, message);
-			} else {
-				state.addError(entryName, message);
-			}
-		}
 	}
 
 	private CollectRecord findAlreadyExistingRecord(CollectRecord parsedRecord) {
@@ -340,7 +352,7 @@ public class DataImportProcess implements Callable<Void> {
 		return Step.valueOf(stepNumber);
 	}
 
-	private Integer getRecordId(String zipEntryName) throws DataImportExeption {
+	private int getRecordId(String zipEntryName) throws DataImportExeption {
 		String[] entryNameSplitted = getEntryNameSplitted(zipEntryName);
 		String fileName = entryNameSplitted[1];
 		String[] fileNameSplitted = fileName.split(Pattern.quote("."));

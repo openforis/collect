@@ -6,6 +6,11 @@ import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedPro
 import org.openforis.collect.Proxy;
 import org.openforis.collect.model.CollectRecord.Step;
 
+/**
+ * 
+ * @author S. Ricci
+ *
+ */
 public class DataImportStateProxy implements Proxy {
 	
 	private transient DataImportState state;
@@ -90,9 +95,4 @@ public class DataImportStateProxy implements Proxy {
 		return state.getStep();
 	}
 
-	@ExternalizedProperty
-	public String getConflictingEntryName() {
-		return state.getConflictingEntryName();
-	}
-	
 }
