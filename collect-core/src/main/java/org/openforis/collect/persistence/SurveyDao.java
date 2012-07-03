@@ -4,8 +4,10 @@ import static org.openforis.collect.persistence.jooq.Sequences.OFC_SURVEY_ID_SEQ
 import static org.openforis.collect.persistence.jooq.tables.OfcRecord.OFC_RECORD;
 import static org.openforis.collect.persistence.jooq.tables.OfcSurvey.OFC_SURVEY;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -133,18 +135,28 @@ public class SurveyDao extends JooqDaoSupport {
 		}
 	}
 
-	private Survey unmarshalIdml(String idml) throws IOException {
+	public CollectSurvey unmarshalIdml(String idml) throws IOException {
 		byte[] bytes = idml.getBytes("UTF-8");
+		ByteArrayInputStream is = new ByteArrayInputStream(bytes);
+		return unmarshalIdml(is);
+	}
+	
+	public CollectSurvey unmarshalIdml(InputStream is) throws IOException {
 		SurveyUnmarshaller su = bindingContext.createSurveyUnmarshaller();
 		CollectSurvey survey;
 		try {
-			survey = (CollectSurvey) su.unmarshal(bytes);
+			survey = (CollectSurvey) su.unmarshal(is);
 		} catch (InvalidIdmlException e) {
 			throw new DataInconsistencyException("Invalid idm");
 		}
 		return survey;
 	}
 
+	public void validateAgainstSchema(byte[] idml) throws InvalidIdmlException {
+		SurveyUnmarshaller su = bindingContext.createSurveyUnmarshaller();
+		su.validateAgainstSchema(idml);
+	}
+	
 	public String marshalSurvey(Survey survey) throws SurveyImportException {
 		try {
 			// Serialize Survey to XML

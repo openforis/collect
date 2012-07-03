@@ -13,17 +13,12 @@ import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.openforis.collect.model.CollectSurvey;
-import org.openforis.collect.model.CollectSurveyContext;
 import org.openforis.collect.model.SurveySummary;
 import org.openforis.collect.persistence.SurveyDao;
 import org.openforis.collect.persistence.SurveyImportException;
-import org.openforis.collect.persistence.xml.CollectIdmlBindingContext;
 import org.openforis.idm.metamodel.LanguageSpecificText;
 import org.openforis.idm.metamodel.Survey;
-import org.openforis.idm.metamodel.validation.Validator;
 import org.openforis.idm.metamodel.xml.InvalidIdmlException;
-import org.openforis.idm.metamodel.xml.SurveyUnmarshaller;
-import org.openforis.idm.model.expression.ExpressionFactory;
 import org.openforis.idm.util.CollectionUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,12 +30,6 @@ import org.springframework.transaction.annotation.Transactional;
  */
 public class SurveyManager {
 
-	@Autowired
-	private ExpressionFactory expressionFactory;
-	
-	@Autowired
-	private Validator validator;
-	
 	@Autowired
 	private SurveyDao surveyDao;
 	
@@ -121,14 +110,11 @@ public class SurveyManager {
 	}
 
 	public CollectSurvey unmarshalSurvey(InputStream is) throws InvalidIdmlException {
-		CollectSurveyContext surveyContext = new CollectSurveyContext(expressionFactory, validator, null);
-		CollectIdmlBindingContext idmlBindingContext = new CollectIdmlBindingContext(surveyContext);
-		SurveyUnmarshaller surveyUnmarshaller = idmlBindingContext.createSurveyUnmarshaller();
 		try {
 			byte[] bytes = IOUtils.toByteArray(is);
-			surveyUnmarshaller.validateAgainstSchema(bytes);
-			CollectSurvey survey = (CollectSurvey) surveyUnmarshaller.unmarshal(bytes);
-			return survey;
+			surveyDao.validateAgainstSchema(bytes);
+			String idml = new String(bytes, "UTF-8");
+			return surveyDao.unmarshalIdml(idml);
 		} catch (IOException e) {
 			throw new InvalidIdmlException("Error reading input stream");
 		}
