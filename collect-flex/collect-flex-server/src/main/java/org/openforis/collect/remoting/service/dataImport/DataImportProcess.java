@@ -58,6 +58,8 @@ public class DataImportProcess implements Callable<Void> {
 	private boolean overwriteExistingRecordInConflict;
 
 	private DataUnmarshaller dataUnmarshaller;
+	
+	private List<Integer> processedRecords;
 
 	public DataImportProcess(SurveyManager surveyManager, RecordManager recordManager, RecordDao recordDao, Map<String, User> users, File packagedFile, boolean overwriteAll) {
 		super();
@@ -182,6 +184,23 @@ public class DataImportProcess implements Callable<Void> {
 			}
 		} finally {
 			state.setRunning(false);
+		}
+		return null;
+	}
+	
+	private InputStream getEntryInputStream(Integer recordId, Step step) throws IOException, DataImportExeption {
+		ZipFile zipFile = new ZipFile(packagedFile);
+		Enumeration<? extends ZipEntry> entries = zipFile.entries();
+		while (entries.hasMoreElements()) {
+			ZipEntry zipEntry = (ZipEntry) entries.nextElement();
+			String entryName = zipEntry.getName();
+			Step entryStep = getStep(entryName);
+			if ( entryStep == step) {
+				Integer entryRecordId = getRecordId(entryName);
+				if ( entryRecordId == recordId ) {
+					return zipFile.getInputStream(zipEntry);
+				}
+			}
 		}
 		return null;
 	}
@@ -315,6 +334,22 @@ public class DataImportProcess implements Callable<Void> {
 	}
 
 	private Step getStep(String zipEntryName) throws DataImportExeption {
+		String[] entryNameSplitted = getEntryNameSplitted(zipEntryName);
+		String stepNumStr = entryNameSplitted[0];
+		int stepNumber = Integer.parseInt(stepNumStr);
+		return Step.valueOf(stepNumber);
+	}
+
+	private Integer getRecordId(String zipEntryName) throws DataImportExeption {
+		String[] entryNameSplitted = getEntryNameSplitted(zipEntryName);
+		String fileName = entryNameSplitted[1];
+		String[] fileNameSplitted = fileName.split(Pattern.quote("."));
+		String recordId = fileNameSplitted[0];
+		int result = Integer.parseInt(recordId);
+		return result;
+	}
+
+	private String[] getEntryNameSplitted(String zipEntryName) throws DataImportExeption {
 		String entryPathSeparator = Pattern.quote(File.separator);
 		String[] entryNameSplitted = zipEntryName.split(entryPathSeparator);
 		if (entryNameSplitted.length != 2) {
@@ -324,11 +359,9 @@ public class DataImportProcess implements Callable<Void> {
 		if (entryNameSplitted.length != 2) {
 			throw new DataImportExeption("Packaged file format exception: wrong entry name: " + zipEntryName);
 		}
-		String stepNumStr = entryNameSplitted[0];
-		int stepNumber = Integer.parseInt(stepNumStr);
-		return Step.valueOf(stepNumber);
+		return entryNameSplitted;
 	}
-
+	
 	private void replaceData(CollectRecord fromRecord, CollectRecord toRecord) {
 		toRecord.setCreatedBy(fromRecord.getCreatedBy());
 		toRecord.setCreationDate(fromRecord.getCreationDate());
