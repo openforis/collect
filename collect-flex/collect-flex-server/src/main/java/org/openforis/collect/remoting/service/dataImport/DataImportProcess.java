@@ -159,36 +159,48 @@ public class DataImportProcess implements Callable<Void> {
 			}
 			zipFile.close();
 
-			DataImportSummary summary = new DataImportSummary();
-			summary.setNewSurvey(isNewSurvey);
-			
-			List<DataImportSummaryItem> recordsToImport = new ArrayList<DataImportSummaryItem>();
-			Set<Integer> entryIds = packagedRecords.keySet();
-			for (Integer entryId: entryIds) {
-				CollectRecord record = packagedRecords.get(entryId);
-				if ( ! conflictingPackagedRecords.containsKey(entryId)) {
-					List<Step> steps = packagedStepsPerRecord.get(entryId);
-					DataImportSummaryItem item = new DataImportSummaryItem(entryId, record, steps);
-					recordsToImport.add(item);
-				}
-			}
-			List<DataImportSummaryItem> conflictingRecordItems = new ArrayList<DataImportSummaryItem>();
-			Set<Integer> conflictingEntryIds = conflictingPackagedRecords.keySet();
-			for (Integer entryId: conflictingEntryIds) {
-				CollectRecord record = packagedRecords.get(entryId);
-				CollectRecord conflictingRecord = conflictingPackagedRecords.get(entryId);
-				List<Step> steps = packagedStepsPerRecord.get(entryId);
-				DataImportSummaryItem item = new DataImportSummaryItem(entryId, record, steps, conflictingRecord);
-				conflictingRecordItems.add(item);
-			}
-			summary.setRecordsToImport(recordsToImport);
-			summary.setConflictingRecords(conflictingRecordItems);
-			summary.setSkippedFileErrors(packagedSkippedFileErrors);
-			summary.setTotalPerStep(totalPerStep);
+			DataImportSummary summary = createSummary(packagedSkippedFileErrors, isNewSurvey,
+					totalPerStep, packagedRecords, packagedStepsPerRecord,
+					conflictingPackagedRecords);
 			return summary;
 		} catch (Exception e) {
 			throw new DataImportExeption(e.getMessage(), e);
 		}
+	}
+
+	private DataImportSummary createSummary(
+			Map<String, String> packagedSkippedFileErrors, boolean isNewSurvey,
+			Map<Step, Integer> totalPerStep,
+			Map<Integer, CollectRecord> packagedRecords,
+			Map<Integer, List<Step>> packagedStepsPerRecord,
+			Map<Integer, CollectRecord> conflictingPackagedRecords) {
+		DataImportSummary summary = new DataImportSummary();
+		summary.setNewSurvey(isNewSurvey);
+		
+		List<DataImportSummaryItem> recordsToImport = new ArrayList<DataImportSummaryItem>();
+		Set<Integer> entryIds = packagedRecords.keySet();
+		for (Integer entryId: entryIds) {
+			CollectRecord record = packagedRecords.get(entryId);
+			if ( ! conflictingPackagedRecords.containsKey(entryId)) {
+				List<Step> steps = packagedStepsPerRecord.get(entryId);
+				DataImportSummaryItem item = new DataImportSummaryItem(entryId, record, steps);
+				recordsToImport.add(item);
+			}
+		}
+		List<DataImportSummaryItem> conflictingRecordItems = new ArrayList<DataImportSummaryItem>();
+		Set<Integer> conflictingEntryIds = conflictingPackagedRecords.keySet();
+		for (Integer entryId: conflictingEntryIds) {
+			CollectRecord record = packagedRecords.get(entryId);
+			CollectRecord conflictingRecord = conflictingPackagedRecords.get(entryId);
+			List<Step> steps = packagedStepsPerRecord.get(entryId);
+			DataImportSummaryItem item = new DataImportSummaryItem(entryId, record, steps, conflictingRecord);
+			conflictingRecordItems.add(item);
+		}
+		summary.setRecordsToImport(recordsToImport);
+		summary.setConflictingRecords(conflictingRecordItems);
+		summary.setSkippedFileErrors(packagedSkippedFileErrors);
+		summary.setTotalPerStep(totalPerStep);
+		return summary;
 	}
 
 	public void prepareToStart() {
@@ -204,6 +216,8 @@ public class DataImportProcess implements Callable<Void> {
 	@Transactional
 	protected void importPackagedFile() {
 		try {
+			state.setStep(DataImportState.Step.IMPORTING);
+			processedRecords = new ArrayList<Integer>();
 			String uri = packagedSurvey.getUri();
 			CollectSurvey oldSurvey = surveyManager.getByUri(uri);
 			state.setTotal(entryIdsToImport.size());
@@ -233,10 +247,9 @@ public class DataImportProcess implements Callable<Void> {
 	}
 	
 	private void importEntries(ZipFile zipFile, int recordId) throws IOException, DataImportExeption {
-		Step[] steps = Step.values();
-		state.setStep(DataImportState.Step.IMPORTING);
 		CollectRecord lastStepRecord = null;
 		Step oldRecordStep = null;
+		Step[] steps = Step.values();
 		for (Step step : steps) {
 			String entryName = step.getStepNumber() + File.separator + recordId + ".xml";
 			InputStream inputStream = getEntryInputStream(zipFile, recordId, step);
