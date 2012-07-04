@@ -31,6 +31,7 @@ import org.openforis.collect.persistence.xml.DataUnmarshaller;
 import org.openforis.collect.persistence.xml.DataUnmarshallerException;
 import org.openforis.idm.metamodel.xml.InvalidIdmlException;
 import org.openforis.idm.model.Entity;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 
@@ -58,7 +59,6 @@ public class DataImportProcess implements Callable<Void> {
 
 	private DataUnmarshaller dataUnmarshaller;
 	
-	private Map<Step, List<Integer>> recordsPerStep;
 	private List<Integer> processedRecords;
 
 	private DataImportSummary summary;
@@ -123,7 +123,6 @@ public class DataImportProcess implements Callable<Void> {
 			Map<Integer, CollectRecord> packagedRecords = new HashMap<Integer, CollectRecord>();
 			Map<Integer, List<Step>> packagedStepsPerRecord = new HashMap<Integer, List<Step>>();
 			Map<Integer, CollectRecord> conflictingPackagedRecords = new HashMap<Integer, CollectRecord>();
-			int total = 0;
 			ZipFile zipFile = new ZipFile(packagedFile);
 			Enumeration<? extends ZipEntry> entries = zipFile.entries();
 			while (entries.hasMoreElements()) {
@@ -157,13 +156,9 @@ public class DataImportProcess implements Callable<Void> {
 						conflictingPackagedRecords.put(packagedRecordId, oldRecord);
 					}
 				}
-				List<Integer> records = recordsPerStep.get(step);
-				Integer recordId = getRecordId(entryName);
-				records.add(recordId);
-				total++;
 			}
 			zipFile.close();
-			state.setTotal(total);
+
 			DataImportSummary summary = new DataImportSummary();
 			summary.setNewSurvey(isNewSurvey);
 			
@@ -202,6 +197,12 @@ public class DataImportProcess implements Callable<Void> {
 
 	@Override
 	public Void call() throws Exception {
+		importPackagedFile();
+		return null;
+	}
+
+	@Transactional
+	protected void importPackagedFile() {
 		try {
 			String uri = packagedSurvey.getUri();
 			CollectSurvey oldSurvey = surveyManager.getByUri(uri);
@@ -229,7 +230,6 @@ public class DataImportProcess implements Callable<Void> {
 		} finally {
 			state.setRunning(false);
 		}
-		return null;
 	}
 	
 	private void importEntries(ZipFile zipFile, int recordId) throws IOException, DataImportExeption {

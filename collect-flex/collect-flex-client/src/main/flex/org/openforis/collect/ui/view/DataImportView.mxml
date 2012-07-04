@@ -41,15 +41,6 @@
 				return key;
 			}
 			
-			protected function recordDateCreatedFunction(item:Object, column:Object):String {
-			
-				return "";
-			}
-			
-			protected function recordDateModifiedFunction(item:Object, column:Object):String {
-				return "";
-			}
-			
 		]]>
 		
 	</fx:Script>
@@ -82,44 +73,95 @@
 			</s:FormItem>
 		</s:Form>
 		
-		<s:Label text="{Message.get('dataImport.recordsInConflict')}" />
+		<s:VGroup id="conflictsContainer" 
+				  visible="{conflictDataGrid.dataProvider.length > 0}"
+				  includeInLayout="{conflictDataGrid.dataProvider.length > 0}">
+			<s:Label text="{Message.get('dataImport.recordsInConflict')}" />
+			
+			<mx:AdvancedDataGrid id="conflictDataGrid"
+								 sortExpertMode="true"
+								 selectable="false">
+				<mx:groupedColumns>
+					<mx:AdvancedDataGridColumn dataField="record.id"
+											   headerText="{Message.get('dataImport.recordList.key')}" 
+											   labelFunction="{recordKeyLabelFunction}" />
+					<mx:AdvancedDataGridColumnGroup headerText="{Message.get('dataImport.recordConflicts.currentRecord')}">
+						<mx:AdvancedDataGridColumn dataField="conflictingRecord.creationDate" 
+												   width="120"
+												   headerText="{Message.get('dataImport.recordList.creationDate')}" 
+												   labelFunction="{UIUtil.gridColumnDateTimeLabelFunction}" />
+						<mx:AdvancedDataGridColumn dataField="conflictingRecord.modifiedDate" 
+												   width="120"
+												   headerText="{Message.get('dataImport.recordList.modifiedDate')}" 
+												   labelFunction="{UIUtil.gridColumnDateTimeLabelFunction}" />
+					</mx:AdvancedDataGridColumnGroup>
+					<mx:AdvancedDataGridColumnGroup headerText="{Message.get('dataImport.recordConflicts.newRecord')}">
+						<mx:AdvancedDataGridColumn dataField="record.creationDate" 
+												   width="120"
+												   headerText="{Message.get('dataImport.recordList.creationDate')}" 
+												   labelFunction="{UIUtil.gridColumnDateTimeLabelFunction}" />
+						<mx:AdvancedDataGridColumn dataField="record.modifiedDate" 
+												   width="120"
+												   headerText="{Message.get('dataImport.recordList.modifiedDate')}" 
+												   labelFunction="{UIUtil.gridColumnDateTimeLabelFunction}" />
+					</mx:AdvancedDataGridColumnGroup>
+					<mx:AdvancedDataGridColumn dataField="selected" 
+											   headerText="{Message.get('dataImport.recordConflicts.replace')}"
+											   width="60"
+											   editable="true"
+											   itemRenderer="mx.controls.CheckBox"
+											   rendererIsEditor="true"
+											   />
+				</mx:groupedColumns>
+			</mx:AdvancedDataGrid>
+		</s:VGroup>
 		
-		<mx:AdvancedDataGrid id="conflictDataGrid">
-			<mx:columns>
-				<mx:AdvancedDataGridColumn dataField="record.id" 
-										   labelFunction="{recordKeyLabelFunction}" />
-				<mx:AdvancedDataGridColumn dataField="record.creationDate" 
-										   labelFunction="{UIUtil.gridColumnDateTimeLabelFunction}" />
-				<mx:AdvancedDataGridColumn dataField="record.modifiedDate" 
-										   labelFunction="{UIUtil.gridColumnDateTimeLabelFunction}" />
-			</mx:columns>
-		</mx:AdvancedDataGrid>
+		<s:VGroup id="recordsContainer" 
+				  visible="{recordToImportDataGrid.dataProvider.length > 0}"
+				  includeInLayout="{recordToImportDataGrid.dataProvider.length > 0}">
+			<s:Label text="{Message.get('dataImport.recordsToBeImported')}" />
+	
+			<mx:AdvancedDataGrid id="recordToImportDataGrid"
+								 sortExpertMode="true"
+								 selectable="false">
+				<mx:columns>
+					<mx:AdvancedDataGridColumn dataField="record.id"
+											   headerText="{Message.get('dataImport.recordList.key')}" 
+											   labelFunction="{recordKeyLabelFunction}" />
+					<mx:AdvancedDataGridColumn dataField="record.creationDate"
+											   width="120"
+											   headerText="{Message.get('dataImport.recordList.creationDate')}"
+											   labelFunction="{UIUtil.gridColumnDateTimeLabelFunction}" />
+					<mx:AdvancedDataGridColumn dataField="record.modifiedDate" 
+											   width="120"
+											   headerText="{Message.get('dataImport.recordList.modifiedDate')}"
+											   labelFunction="{UIUtil.gridColumnDateTimeLabelFunction}" />
+					<mx:AdvancedDataGridColumn dataField="selected" 
+											   headerText="{Message.get('dataImport.recordList.import')}"
+											   width="60"
+											   editable="true"
+											   itemRenderer="mx.controls.CheckBox"
+											   rendererIsEditor="true"
+											   />
+				</mx:columns>
+			</mx:AdvancedDataGrid>
+		</s:VGroup>
 		
-		<s:Label text="{Message.get('dataImport.recordsToBeImported')}" />
+		<s:VGroup id="skippedFilesContainer" 
+				  visible="{skippedFilesDataGrid.dataProvider.length > 0}"
+				  includeInLayout="{skippedFilesDataGrid.dataProvider.length > 0}">
+			<s:Label text="{Message.get('dataImport.skippedFiles')}" />
+		
+			<s:DataGrid id="skippedFilesDataGrid" >
+				<s:columns>
+					<s:ArrayList>
+						<s:GridColumn dataField="fileName" headerText="{Message.get('dataImport.skippedFiles.fileName')}" />
+						<s:GridColumn dataField="message" headerText="{Message.get('dataImport.skippedFiles.message')}" />
+					</s:ArrayList>
+				</s:columns>
+			</s:DataGrid>
+		</s:VGroup>
 
-		<mx:AdvancedDataGrid id="recordToImportDataGrid">
-			<mx:columns>
-				<mx:AdvancedDataGridColumn dataField="record.id"
-										   headerText="{Message.get('dataImport.recordList.key')}" 
-										   labelFunction="{recordKeyLabelFunction}" />
-				<mx:AdvancedDataGridColumn dataField="record.creationDate"
-										   headerText="{Message.get('dataImport.recordList.creationDate')}"
-										   labelFunction="{UIUtil.gridColumnDateTimeLabelFunction}" />
-				<mx:AdvancedDataGridColumn dataField="record.modifiedDate" 
-										   headerText="{Message.get('dataImport.recordList.modifiedDate')}"
-										   labelFunction="{UIUtil.gridColumnDateTimeLabelFunction}" />
-			</mx:columns>
-		</mx:AdvancedDataGrid>
-		
-		<s:DataGrid id="skippedFilesDataGrid" >
-			<s:columns>
-				<s:ArrayList>
-					<s:GridColumn dataField="fileName" headerText="{Message.get('dataImport.skippedFiles.fileName')}" />
-					<s:GridColumn dataField="message" headerText="{Message.get('dataImport.skippedFiles.message')}" />
-				</s:ArrayList>
-			</s:columns>
-		</s:DataGrid>
-		
 		<s:Button id="startImportButton" 
 				  label="{Message.get('dataImport.startImport')}"
 				  useHandCursor="true"
