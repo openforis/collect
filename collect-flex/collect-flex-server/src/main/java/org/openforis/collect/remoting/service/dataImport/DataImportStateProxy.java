@@ -4,8 +4,12 @@ import java.util.Map;
 
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.collect.Proxy;
-import org.openforis.collect.model.CollectRecord.Step;
 
+/**
+ * 
+ * @author S. Ricci
+ *
+ */
 public class DataImportStateProxy implements Proxy {
 	
 	private transient DataImportState state;
@@ -33,11 +37,6 @@ public class DataImportStateProxy implements Proxy {
 	@ExternalizedProperty
 	public int getCount() {
 		return state.getCount();
-	}
-
-	@ExternalizedProperty
-	public Map<Step, Integer> getTotalPerStep() {
-		return state.getTotalPerStep();
 	}
 
 	@ExternalizedProperty
@@ -76,23 +75,8 @@ public class DataImportStateProxy implements Proxy {
 	}
 
 	@ExternalizedProperty
-	public DataImportConflict getConflict() {
-		return state.getConflict();
-	}
-
-	@ExternalizedProperty
-	public boolean isNewSurvey() {
-		return state.isNewSurvey();
-	}
-
-	@ExternalizedProperty
 	public org.openforis.collect.remoting.service.dataImport.DataImportState.Step getStep() {
 		return state.getStep();
 	}
 
-	@ExternalizedProperty
-	public String getConflictingEntryName() {
-		return state.getConflictingEntryName();
-	}
-	
 }

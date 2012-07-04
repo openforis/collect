@@ -17,7 +17,6 @@ package org.openforis.collect.remoting.service.dataImport {
         public static const INITED:DataImportState$Step = new DataImportState$Step("INITED", _);
         public static const STARTING:DataImportState$Step = new DataImportState$Step("STARTING", _);
         public static const IMPORTING:DataImportState$Step = new DataImportState$Step("IMPORTING", _);
-        public static const CONFLICT:DataImportState$Step = new DataImportState$Step("CONFLICT", _);
         public static const COMPLETE:DataImportState$Step = new DataImportState$Step("COMPLETE", _);
         public static const CANCELLED:DataImportState$Step = new DataImportState$Step("CANCELLED", _);
         public static const ERROR:DataImportState$Step = new DataImportState$Step("ERROR", _);
@@ -31,7 +30,7 @@ package org.openforis.collect.remoting.service.dataImport {
         }
 
         public static function get constants():Array {
-            return [PREPARE, INITED, STARTING, IMPORTING, CONFLICT, COMPLETE, CANCELLED, ERROR];
+            return [PREPARE, INITED, STARTING, IMPORTING, COMPLETE, CANCELLED, ERROR];
         }
 
         public static function valueOf(name:String):DataImportState$Step {

@@ -12,6 +12,7 @@ package org.openforis.collect.presenter {
 	import flash.net.URLVariables;
 	import flash.utils.Timer;
 	
+	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.IResponder;
@@ -22,16 +23,14 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.client.DataImportClient;
 	import org.openforis.collect.i18n.Message;
 	import org.openforis.collect.model.CollectRecord$Step;
-	import org.openforis.collect.remoting.service.dataImport.DataImportConflict;
 	import org.openforis.collect.remoting.service.dataImport.DataImportState$Step;
 	import org.openforis.collect.remoting.service.dataImport.DataImportStateProxy;
-	import org.openforis.collect.ui.component.datagrid.RecordSummaryDataGrid;
+	import org.openforis.collect.remoting.service.dataImport.DataImportSummaryItemProxy;
+	import org.openforis.collect.remoting.service.dataImport.DataImportSummaryProxy;
 	import org.openforis.collect.ui.view.DataImportView;
 	import org.openforis.collect.util.AlertUtil;
 	import org.openforis.collect.util.ApplicationConstants;
 	import org.openforis.collect.util.StringUtil;
-	
-	import spark.formatters.DateTimeFormatter;
 
 	/**
 	 * 
@@ -47,6 +46,7 @@ package org.openforis.collect.presenter {
 		private var _dataImportClient:DataImportClient;
 		private var _progressTimer:Timer;
 		private var _state:DataImportStateProxy;
+		private var _summary:DataImportSummaryProxy;
 		
 		private var _getStateResponder:IResponder;
 		private var _firstOpen:Boolean;
@@ -133,34 +133,64 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function initProcessResultHandler(event:ResultEvent, token:Object = null):void {
-			_state = event.result as DataImportStateProxy;
+			_summary = event.result as DataImportSummaryProxy;
 			updateViewProcessInited();
 		}
 		
 		protected function updateViewProcessInited():void {
-			if ( _state.newSurvey ) {
+			if ( _summary.newSurvey ) {
 				_view.currentState = DataImportView.STATE_UPLOAD_COMPLETE_NEW_SURVEY;
 			} else {
 				_view.currentState = DataImportView.STATE_UPLOAD_COMPLETE;
 			}
-			var entryTotalRecords:int = _state.totalPerStep.get(CollectRecord$Step.ENTRY);
-			var cleansingTotalRecords:int = _state.totalPerStep.get(CollectRecord$Step.CLEANSING);
-			var analysisTotalRecords:int = _state.totalPerStep.get(CollectRecord$Step.ANALYSIS);
-			var importSummary:String = Message.get("dataImport.importSummary", [entryTotalRecords, cleansingTotalRecords, analysisTotalRecords]);
-			_view.importSummaryLabel.text = importSummary;
-			//AlertUtil.showConfirm("dataImport.confirmStart", [entryTotalRecords, cleansingTotalRecords, analysisTotalRecords], null, initProcessConfirmHandler);
+			var entryTotalRecords:int = _summary.totalPerStep.get(CollectRecord$Step.ENTRY);
+			var cleansingTotalRecords:int = _summary.totalPerStep.get(CollectRecord$Step.CLEANSING);
+			var analysisTotalRecords:int = _summary.totalPerStep.get(CollectRecord$Step.ANALYSIS);
+			
+			
+			var skippedFileItems:IList = new ArrayCollection();
+			var skippedFileNames:ArrayCollection = _summary.skippedFileErrors.keySet;
+			for each (var fileName:String in skippedFileNames) {
+				var message:String = _summary.skippedFileErrors.get(fileName);
+				var item:Object = {fileName: fileName, message: message};
+				skippedFileItems.addItem(item);
+			}
+			_view.skippedFilesDataGrid.dataProvider = skippedFileItems;
+			//default selected
+			setItemsSelected(_summary.recordsToImport);
+			_view.recordToImportDataGrid.dataProvider = _summary.recordsToImport;
+			//default not selected
+			setItemsSelected(_summary.conflictingRecords, false);
+			_view.conflictDataGrid.dataProvider = _summary.conflictingRecords;
 		}
 		
 		protected function startImportClickHandler(event:MouseEvent):void {
 			if ( validateForm() ) {
+				var entryIdsToImport:IList = new ArrayCollection();
+				for each (var item:DataImportSummaryItemProxy in _summary.recordsToImport) {
+					if ( item.selected ) {
+						entryIdsToImport.addItem(item.entryId);
+					}
+				}
+				for each (var item:DataImportSummaryItemProxy in _summary.conflictingRecords) {
+					if ( item.selected ) {
+						entryIdsToImport.addItem(item.entryId);
+					}
+				}
 				var responder:AsyncResponder = new AsyncResponder(startImportResultHandler, faultHandler);
 				var surveyName:String = null;
 				if ( _view.currentState == DataImportView.STATE_UPLOAD_COMPLETE_NEW_SURVEY ) {
 					surveyName = _view.surveyNameTextInput.text;
 				}
-				_dataImportClient.startImport(responder, surveyName);
+				_dataImportClient.startImport(responder, entryIdsToImport, surveyName);
 				_view.progressBar.setProgress(0, 0);
 				_view.currentState = DataImportView.STATE_IMPORT_RUNNING;
+			}
+		}
+		
+		protected function setItemsSelected(items:IList, value:Boolean = true):void {
+			for each (var item:DataImportSummaryItemProxy in items) {
+				item.selected = value;
 			}
 		}
 		
@@ -243,12 +273,6 @@ package org.openforis.collect.presenter {
 						stopProgressTimer();
 					}
 					break;
-				case DataImportState$Step.CONFLICT:
-					_view.currentState = DataImportView.STATE_IMPORT_RUNNING;
-					updateViewForImporting();
-					stopProgressTimer();
-					showConfirmForConflict();
-					break;
 				case DataImportState$Step.ERROR:
 					AlertUtil.showError("dataImport.error");
 					resetView();
@@ -264,19 +288,6 @@ package org.openforis.collect.presenter {
 				resetView();
 			}
 			_firstOpen = false;
-		}
-		
-		protected function showConfirmForConflict():void {
-			var conflict:DataImportConflict = _state.conflict;
-			var rootEntityKeys:Array = conflict.existingRecord.rootEntityKeys.toArray();
-			var recordKey:String = StringUtil.concat("-", rootEntityKeys);
-			var dateFormatter:DateTimeFormatter = new DateTimeFormatter();
-			dateFormatter.dateTimePattern = RecordSummaryDataGrid.DATE_TIME_PATTERN;
-			var existingRecordModifiedDate:String = dateFormatter.format(conflict.existingRecord.modifiedDate);
-			var importRecordModifiedDate:String = dateFormatter.format(conflict.importRecord.modifiedDate);
-			AlertUtil.showConfirm("dataImport.conflict", 
-				[recordKey, existingRecordModifiedDate, importRecordModifiedDate], 
-				"dataImport.conflict.title", overwriteExistingRecordInConflict, null, doNotOverwriteExistingRecordInConflict);
 		}
 		
 		protected function overwriteExistingRecordInConflict(value:Boolean = true):void {

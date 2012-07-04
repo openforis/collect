@@ -3,7 +3,6 @@ package org.openforis.collect.remoting.service.dataImport;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.remoting.service.dataProcessing.DataProcessingState;
 
 
@@ -20,20 +19,15 @@ public class DataImportState extends DataProcessingState {
 	private static final long serialVersionUID = 1L;
 
 	public enum Step {
-		PREPARE, INITED, STARTING, IMPORTING, CONFLICT, COMPLETE, CANCELLED, ERROR;
+		PREPARE, INITED, STARTING, IMPORTING, COMPLETE, CANCELLED, ERROR;
 	}
 	
 	private Step step;
-	private boolean newSurvey;
 	private Map<String, String> errors;
 	private Map<String, String> warnings;
 	
-	private Map<CollectRecord.Step, Integer> totalPerStep;
-	
 	private int insertedCount;
 	private int updatedCount;
-	private DataImportConflict conflict;
-	private String conflictingEntryName;
 
 	public DataImportState() {
 		super();
@@ -41,8 +35,7 @@ public class DataImportState extends DataProcessingState {
 		updatedCount = 0;
 		errors = new HashMap<String, String>();
 		warnings = new HashMap<String, String>();
-		//totalPerStep = new HashMap<CollectRecord.Step, Integer>();
-		step = Step.ERROR;
+		step = Step.PREPARE;
 	}
 
 	public void addError(String fileName, String error) {
@@ -53,14 +46,6 @@ public class DataImportState extends DataProcessingState {
 		warnings.put(fileName, warning);
 	}
 	
-	public Map<CollectRecord.Step, Integer> getTotalPerStep() {
-		return totalPerStep;
-	}
-
-	public void setTotalPerStep(Map<CollectRecord.Step, Integer> totalPerStep) {
-		this.totalPerStep = totalPerStep;
-	}
-
 	public void incrementInsertedCount() {
 		insertedCount ++;
 		incrementCount();
@@ -87,22 +72,6 @@ public class DataImportState extends DataProcessingState {
 		return warnings;
 	}
 
-	public DataImportConflict getConflict() {
-		return conflict;
-	}
-	
-	public void setConflict(DataImportConflict conflict) {
-		this.conflict = conflict;
-	}
-
-	public boolean isNewSurvey() {
-		return newSurvey;
-	}
-
-	public void setNewSurvey(boolean newSurvey) {
-		this.newSurvey = newSurvey;
-	}
-
 	public Step getStep() {
 		return step;
 	}
@@ -111,12 +80,4 @@ public class DataImportState extends DataProcessingState {
 		this.step = step;
 	}
 
-	public String getConflictingEntryName() {
-		return conflictingEntryName;
-	}
-
-	public void setConflictingEntryName(String conflictingEntryName) {
-		this.conflictingEntryName = conflictingEntryName;
-	}
-	
 }

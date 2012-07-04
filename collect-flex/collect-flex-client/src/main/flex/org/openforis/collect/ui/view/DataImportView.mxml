@@ -14,7 +14,11 @@
 			import mx.events.FlexEvent;
 			
 			import org.openforis.collect.i18n.Message;
+			import org.openforis.collect.model.proxy.RecordProxy;
 			import org.openforis.collect.presenter.DataImportPresenter;
+			import org.openforis.collect.remoting.service.dataImport.DataImportSummaryItemProxy;
+			import org.openforis.collect.util.StringUtil;
+			import org.openforis.collect.util.UIUtil;
 			
 			public static const STATE_DEFAULT:String = "default";
 			public static const STATE_LOADING:String = "loading";
@@ -30,7 +34,24 @@
 				_presenter = new DataImportPresenter(this);
 			}
 			
+			protected function recordKeyLabelFunction(item:Object, column:Object):String {
+				var summaryItem:DataImportSummaryItemProxy = item as DataImportSummaryItemProxy;
+				var record:RecordProxy = summaryItem.record;
+				var key:String = StringUtil.concat("-", record.rootEntityKeys.toArray());
+				return key;
+			}
+			
+			protected function recordDateCreatedFunction(item:Object, column:Object):String {
+			
+				return "";
+			}
+			
+			protected function recordDateModifiedFunction(item:Object, column:Object):String {
+				return "";
+			}
+			
 		]]>
+		
 	</fx:Script>
 
 	<s:states>
@@ -39,7 +60,7 @@
 		<s:State name="uploading" />
 		<s:State name="uploadComplete" />
 		<s:State name="uploadCompleteNewSurvey" basedOn="uploadComplete" />
-		<s:State name="importRunning" basedOn="uploadComplete" stateGroups="importing" />
+		<s:State name="importRunning" stateGroups="importing" />
 		<s:State name="importComplete" stateGroups="importing" />
 	</s:states>
 	
@@ -61,7 +82,43 @@
 			</s:FormItem>
 		</s:Form>
 		
-		<s:Label id="importSummaryLabel" />
+		<s:Label text="{Message.get('dataImport.recordsInConflict')}" />
+		
+		<mx:AdvancedDataGrid id="conflictDataGrid">
+			<mx:columns>
+				<mx:AdvancedDataGridColumn dataField="record.id" 
+										   labelFunction="{recordKeyLabelFunction}" />
+				<mx:AdvancedDataGridColumn dataField="record.creationDate" 
+										   labelFunction="{UIUtil.gridColumnDateTimeLabelFunction}" />
+				<mx:AdvancedDataGridColumn dataField="record.modifiedDate" 
+										   labelFunction="{UIUtil.gridColumnDateTimeLabelFunction}" />
+			</mx:columns>
+		</mx:AdvancedDataGrid>
+		
+		<s:Label text="{Message.get('dataImport.recordsToBeImported')}" />
+
+		<mx:AdvancedDataGrid id="recordToImportDataGrid">
+			<mx:columns>
+				<mx:AdvancedDataGridColumn dataField="record.id"
+										   headerText="{Message.get('dataImport.recordList.key')}" 
+										   labelFunction="{recordKeyLabelFunction}" />
+				<mx:AdvancedDataGridColumn dataField="record.creationDate"
+										   headerText="{Message.get('dataImport.recordList.creationDate')}"
+										   labelFunction="{UIUtil.gridColumnDateTimeLabelFunction}" />
+				<mx:AdvancedDataGridColumn dataField="record.modifiedDate" 
+										   headerText="{Message.get('dataImport.recordList.modifiedDate')}"
+										   labelFunction="{UIUtil.gridColumnDateTimeLabelFunction}" />
+			</mx:columns>
+		</mx:AdvancedDataGrid>
+		
+		<s:DataGrid id="skippedFilesDataGrid" >
+			<s:columns>
+				<s:ArrayList>
+					<s:GridColumn dataField="fileName" headerText="{Message.get('dataImport.skippedFiles.fileName')}" />
+					<s:GridColumn dataField="message" headerText="{Message.get('dataImport.skippedFiles.message')}" />
+				</s:ArrayList>
+			</s:columns>
+		</s:DataGrid>
 		
 		<s:Button id="startImportButton" 
 				  label="{Message.get('dataImport.startImport')}"

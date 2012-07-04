@@ -3,6 +3,7 @@
  */
 package org.openforis.collect.model.proxy;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -39,6 +40,17 @@ public class RecordProxy implements Proxy {
 		warnings = record.getWarnings();
 	}
 
+	public static List<RecordProxy> fromList(List<CollectRecord> records) {
+		List<RecordProxy> result = new ArrayList<RecordProxy>();
+		if ( records != null ) {
+			for (CollectRecord collectRecord : records) {
+				RecordProxy proxy = new RecordProxy(collectRecord);
+				result.add(proxy);
+			}
+		}
+		return result;
+	}
+	
 	@ExternalizedProperty
 	public Step getStep() {
 		return record.getStep();

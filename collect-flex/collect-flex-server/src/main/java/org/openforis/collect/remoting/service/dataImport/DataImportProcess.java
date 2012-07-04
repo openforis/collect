@@ -5,10 +5,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
@@ -46,21 +48,22 @@ public class DataImportProcess implements Callable<Void> {
 	private SurveyManager surveyManager;
 
 	private Map<String, User> users;
-	private String surveyName;
+	private String newSurveyName;
 	private DataImportState state;
 	private File packagedFile;
 
 	private CollectSurvey packagedSurvey;
-	private CollectSurvey existingSurvey;
 
 	private boolean overwriteAll;
-
-	private boolean overwriteExistingRecordInConflict;
 
 	private DataUnmarshaller dataUnmarshaller;
 	
 	private List<Integer> processedRecords;
 
+	private DataImportSummary summary;
+	
+	private List<Integer> entryIdsToImport;
+	
 	public DataImportProcess(SurveyManager surveyManager, RecordManager recordManager, RecordDao recordDao, Map<String, User> users, File packagedFile, boolean overwriteAll) {
 		super();
 		this.surveyManager = surveyManager;
@@ -70,7 +73,8 @@ public class DataImportProcess implements Callable<Void> {
 		this.packagedFile = packagedFile;
 		this.overwriteAll = overwriteAll;
 		this.state = new DataImportState();
-		this.overwriteExistingRecordInConflict = false;
+		processedRecords = new ArrayList<Integer>();
+		entryIdsToImport = new ArrayList<Integer>();
 	}
 
 	public DataImportState getState() {
@@ -95,12 +99,29 @@ public class DataImportProcess implements Callable<Void> {
 		try {
 			state.reset();
 			state.setStep(DataImportState.Step.PREPARE);
-			packagedSurvey = extractPackagedSurvey();
+			summary = calculateDataImportSummary();
+			state.setStep(DataImportState.Step.INITED);
+		} catch (Exception e) {
+			throw new DataImportExeption("Error initializing data import process", e);
+		}
+	}
 
+	private DataImportSummary calculateDataImportSummary() throws DataImportExeption {
+		try {
+			packagedSurvey = extractPackagedSurvey();
+			Map<String, String> packagedSkippedFileErrors = new HashMap<String, String>();
 			String uri = packagedSurvey.getUri();
-			CollectSurvey survey = surveyManager.getByUri(uri);
-			state.setNewSurvey(survey == null);
-			Map<CollectRecord.Step, Integer> totalRecords = new HashMap<CollectRecord.Step, Integer>();
+			CollectSurvey oldSurvey = surveyManager.getByUri(uri);
+			boolean isNewSurvey = oldSurvey == null;
+			dataUnmarshaller = initDataUnmarshaller(packagedSurvey, oldSurvey != null ? oldSurvey: packagedSurvey);
+			
+			Map<Step, Integer> totalPerStep = new HashMap<CollectRecord.Step, Integer>();
+			for (Step step : Step.values()) {
+				totalPerStep.put(step, 0);
+			}
+			Map<Integer, CollectRecord> packagedRecords = new HashMap<Integer, CollectRecord>();
+			Map<Integer, List<Step>> packagedStepsPerRecord = new HashMap<Integer, List<Step>>();
+			Map<Integer, CollectRecord> conflictingPackagedRecords = new HashMap<Integer, CollectRecord>();
 			int total = 0;
 			ZipFile zipFile = new ZipFile(packagedFile);
 			Enumeration<? extends ZipEntry> entries = zipFile.entries();
@@ -111,18 +132,63 @@ public class DataImportProcess implements Callable<Void> {
 					continue;
 				}
 				Step step = getStep(entryName);
-				Integer totalPerStep = totalRecords.get(step);
-				if (totalPerStep == null) {
-					totalPerStep = 0;
+				InputStream inputStream = zipFile.getInputStream(zipEntry);
+				InputStreamReader reader = new InputStreamReader(inputStream);
+				ParseRecordResult parseRecordResult = parseRecord(reader);
+				CollectRecord parsedRecord = parseRecordResult.record;
+				String message = parseRecordResult.message;
+				if (parsedRecord == null) {
+					packagedSkippedFileErrors.put(entryName, message);
+				} else {
+					int packagedRecordId = getRecordId(entryName);
+					CollectRecord recordSummary = createRecordSummary(parsedRecord);
+					packagedRecords.put(packagedRecordId, recordSummary);
+					List<Step> stepsPerRecord = packagedStepsPerRecord.get(packagedRecordId);
+					if ( stepsPerRecord == null ) {
+						stepsPerRecord = new ArrayList<CollectRecord.Step>();
+						packagedStepsPerRecord.put(packagedRecordId, stepsPerRecord);
+					}
+					stepsPerRecord.add(step);
+					Integer totalPerStep1 = totalPerStep.get(step);
+					totalPerStep.put(step, totalPerStep1 + 1);
+					CollectRecord oldRecord = findAlreadyExistingRecord(parsedRecord);
+					if ( oldRecord != null ) {
+						conflictingPackagedRecords.put(packagedRecordId, oldRecord);
+					}
 				}
-				totalRecords.put(step, totalPerStep + 1);
 				total++;
 			}
+			zipFile.close();
 			state.setTotal(total);
-			state.setTotalPerStep(totalRecords);
-			state.setStep(DataImportState.Step.INITED);
+			DataImportSummary summary = new DataImportSummary();
+			summary.setNewSurvey(isNewSurvey);
+			
+			List<DataImportSummaryItem> recordsToImport = new ArrayList<DataImportSummaryItem>();
+			Set<Integer> entryIds = packagedRecords.keySet();
+			for (Integer entryId: entryIds) {
+				CollectRecord record = packagedRecords.get(entryId);
+				if ( ! conflictingPackagedRecords.containsKey(entryId)) {
+					List<Step> steps = packagedStepsPerRecord.get(entryId);
+					DataImportSummaryItem item = new DataImportSummaryItem(entryId, record, steps);
+					recordsToImport.add(item);
+				}
+			}
+			List<DataImportSummaryItem> conflictingRecordItems = new ArrayList<DataImportSummaryItem>();
+			Set<Integer> conflictingEntryIds = conflictingPackagedRecords.keySet();
+			for (Integer entryId: conflictingEntryIds) {
+				CollectRecord record = packagedRecords.get(entryId);
+				CollectRecord conflictingRecord = conflictingPackagedRecords.get(entryId);
+				List<Step> steps = packagedStepsPerRecord.get(entryId);
+				DataImportSummaryItem item = new DataImportSummaryItem(entryId, record, steps, conflictingRecord);
+				conflictingRecordItems.add(item);
+			}
+			summary.setRecordsToImport(recordsToImport);
+			summary.setConflictingRecords(conflictingRecordItems);
+			summary.setSkippedFileErrors(packagedSkippedFileErrors);
+			summary.setTotalPerStep(totalPerStep);
+			return summary;
 		} catch (Exception e) {
-			throw new DataImportExeption("Error initializing data import process", e);
+			throw new DataImportExeption(e.getMessage(), e);
 		}
 	}
 
@@ -132,46 +198,23 @@ public class DataImportProcess implements Callable<Void> {
 
 	@Override
 	public Void call() throws Exception {
-		ZipFile zipFile = null;
 		try {
+			String uri = packagedSurvey.getUri();
+			CollectSurvey oldSurvey = surveyManager.getByUri(uri);
+			state.setTotal(entryIdsToImport.size());
+			if ( oldSurvey == null ) {
+				packagedSurvey.setName(newSurveyName);
+				surveyManager.importModel(packagedSurvey);
+			}
+			ZipFile zipFile = new ZipFile(packagedFile);
 			state.setRunning(true);
-			if (state.getStep() == DataImportState.Step.STARTING) {
-				dataUnmarshaller = initDataUnmarshaller();
+			for (Integer entryId : entryIdsToImport) {
+				if ( ! processedRecords.contains(entryId) ) {
+					importEntries(zipFile, entryId);
+				}
 			}
 			DataImportState.Step dataImportStep = state.getStep();
-			if ( dataImportStep != DataImportState.Step.CONFLICT ) {
-				state.setStep(DataImportState.Step.IMPORTING);
-			}
-			Step[] steps = Step.values();
-			for (Step step : steps) {
-				zipFile = new ZipFile(packagedFile);
-				Enumeration<? extends ZipEntry> entries = zipFile.entries();
-				while (entries.hasMoreElements()) {
-					ZipEntry zipEntry = (ZipEntry) entries.nextElement();
-					String entryName = zipEntry.getName();
-					if (!zipEntry.isDirectory() && !IDML_FILE_NAME.equals(entryName)) {
-						Step entryStep = getStep(entryName);
-						if (entryStep == step) {
-							if (dataImportStep == DataImportState.Step.CONFLICT && !state.getConflictingEntryName().equals(entryName)) {
-								continue;
-							}
-							InputStream entryInputStream = zipFile.getInputStream(zipEntry);
-							importZipEntry(entryInputStream, entryName, step);
-							entryInputStream.close();
-							dataImportStep = state.getStep();
-							if (dataImportStep == DataImportState.Step.CONFLICT) {
-								zipFile.close();
-								return null;
-							} else {
-								overwriteExistingRecordInConflict = false;
-							}
-						}
-					}
-				}
-				zipFile.close();
-			}
-			DataImportState.Step step = state.getStep();
-			if (!(step == DataImportState.Step.CANCELLED || step == DataImportState.Step.CONFLICT)) {
+			if (! (dataImportStep == DataImportState.Step.CANCELLED || dataImportStep == DataImportState.Step.ERROR) ) {
 				state.setStep(DataImportState.Step.COMPLETE);
 			}
 		} catch (Exception e) {
@@ -179,25 +222,74 @@ public class DataImportProcess implements Callable<Void> {
 			state.setErrorMessage(e.getMessage());
 			state.setStep(DataImportState.Step.ERROR);
 			LOG.error("Error during data export", e);
-			if ( zipFile != null ) {
-				zipFile.close();
-			}
 		} finally {
 			state.setRunning(false);
 		}
 		return null;
 	}
 	
-	private InputStream getEntryInputStream(Integer recordId, Step step) throws IOException, DataImportExeption {
-		ZipFile zipFile = new ZipFile(packagedFile);
+	private void importEntries(ZipFile zipFile, int recordId) throws IOException, DataImportExeption {
+		Step[] steps = Step.values();
+		state.setStep(DataImportState.Step.IMPORTING);
+		CollectRecord lastStepRecord = null;
+		Step oldRecordStep = null;
+		for (Step step : steps) {
+			String entryName = step.getStepNumber() + File.separator + recordId + ".xml";
+			InputStream inputStream = getEntryInputStream(zipFile, recordId, step);
+			if ( inputStream != null ) {
+				InputStreamReader reader = new InputStreamReader(inputStream);
+				ParseRecordResult parseRecordResult = parseRecord(reader);
+				CollectRecord parsedRecord = parseRecordResult.record;
+				String message = parseRecordResult.message;
+				if (parsedRecord == null) {
+					state.addError(entryName, message);
+				} else {
+					parsedRecord.setStep(step);
+					if ( lastStepRecord == null ) {
+						CollectRecord oldRecord = findAlreadyExistingRecord(parsedRecord);
+						if (oldRecord != null) {
+							oldRecordStep = oldRecord != null ? oldRecord.getStep(): null;
+							lastStepRecord = recordDao.load((CollectSurvey) parsedRecord.getSurvey(), oldRecord.getId(), oldRecord.getStep().getStepNumber());
+							replaceData(parsedRecord, lastStepRecord);
+							recordDao.update(lastStepRecord);
+							LOG.info("Updated: " + oldRecord.getId() + " (from file " + entryName  + ")");
+						} else {
+							recordDao.insert(parsedRecord);
+							lastStepRecord = parsedRecord;
+							LOG.info("Inserted: " + parsedRecord.getId() + " (from file " + entryName + ")");
+						}
+					} else {
+						replaceData(parsedRecord, lastStepRecord);
+						recordDao.update(lastStepRecord);
+					}
+				}
+				if (!parseRecordResult.success) {
+					if (parseRecordResult.warnings > 0) {
+						state.addWarning(entryName, message);
+					} else {
+						state.addError(entryName, message);
+					}
+				}
+			}
+			if ( lastStepRecord != null && oldRecordStep != null && lastStepRecord.getStep() != oldRecordStep ) {
+				lastStepRecord.setStep(oldRecordStep);
+				lastStepRecord.updateDerivedStates();
+				recordDao.update(lastStepRecord);
+			}
+		}
+		processedRecords.add(recordId);
+		state.incrementCount();
+	}
+
+	private InputStream getEntryInputStream(ZipFile zipFile, int recordId, Step step) throws IOException, DataImportExeption {
 		Enumeration<? extends ZipEntry> entries = zipFile.entries();
 		while (entries.hasMoreElements()) {
 			ZipEntry zipEntry = (ZipEntry) entries.nextElement();
 			String entryName = zipEntry.getName();
-			Step entryStep = getStep(entryName);
-			if ( entryStep == step) {
-				Integer entryRecordId = getRecordId(entryName);
-				if ( entryRecordId == recordId ) {
+			if ( ! ( zipEntry.isDirectory() || IDML_FILE_NAME.equals(entryName) ) ) {
+				Step entryStep = getStep(entryName);
+				int entryRecordId = getRecordId(entryName);
+				if ( entryStep == step && entryRecordId == recordId ) {
 					return zipFile.getInputStream(zipEntry);
 				}
 			}
@@ -205,72 +297,10 @@ public class DataImportProcess implements Callable<Void> {
 		return null;
 	}
 
-	private DataUnmarshaller initDataUnmarshaller() throws SurveyImportException {
-		DataHandler handler;
-		if (state.isNewSurvey()) {
-			packagedSurvey.setName(surveyName);
-			surveyManager.importModel(packagedSurvey);
-			handler = new DataHandler(packagedSurvey, users);
-		} else {
-			String uri = packagedSurvey.getUri();
-			existingSurvey = surveyManager.getByUri(uri);
-			// TODO compare packaged survey with the one into db matching surveyName (if any)
-			handler = new DataHandler(existingSurvey, packagedSurvey, users);
-		}
+	private DataUnmarshaller initDataUnmarshaller(CollectSurvey packagedSurvey, CollectSurvey existingSurvey) throws SurveyImportException {
+		DataHandler handler = new DataHandler(existingSurvey, packagedSurvey, users);;
 		DataUnmarshaller dataUnmarshaller = new DataUnmarshaller(handler);
 		return dataUnmarshaller;
-	}
-
-	private void importZipEntry(InputStream inputStream, String entryName, Step step) throws IOException {
-		LOG.info("Extracting: " + entryName);
-		InputStreamReader reader = new InputStreamReader(inputStream);
-		ParseRecordResult parseRecordResult = parseRecord(reader);
-		CollectRecord parsedRecord = parseRecordResult.record;
-		String message = parseRecordResult.message;
-		DataImportState.Step dataImportStep = state.getStep();
-		Boolean promptForConflict = !overwriteAll && dataImportStep != DataImportState.Step.CONFLICT;
-		Boolean overwriteExistingRecord = overwriteAll || dataImportStep == DataImportState.Step.CONFLICT && overwriteExistingRecordInConflict;
-		state.setStep(DataImportState.Step.IMPORTING);
-		if (parsedRecord == null) {
-			state.addError(entryName, message);
-			state.incrementCount();
-		} else {
-			parsedRecord.setStep(step);
-			CollectRecord oldRecord = findAlreadyExistingRecord(parsedRecord);
-			if (oldRecord != null) {
-				if (overwriteExistingRecord) {
-					CollectRecord oldRecordFull = recordDao.load((CollectSurvey) parsedRecord.getSurvey(), parsedRecord.getId(), oldRecord.getStep().getStepNumber());
-					replaceData(parsedRecord, oldRecordFull);
-					recordDao.update(oldRecordFull);
-					if ( oldRecordFull.getStep() != parsedRecord.getStep() ) {
-						oldRecordFull.setStep(oldRecord.getStep());
-						oldRecordFull.updateDerivedStates();
-						recordDao.update(oldRecordFull);
-					}
-					state.incrementUpdatedCount();
-					LOG.info("Updated: " + oldRecord.getId() + " (from file " + entryName + ")");
-				} else if (promptForConflict) {
-					DataImportConflict conflict = new DataImportConflict(entryName, oldRecord, parsedRecord);
-					state.setStep(DataImportState.Step.CONFLICT);
-					state.setConflict(conflict);
-					state.setConflictingEntryName(entryName);
-				} else {
-					// skip record
-					state.incrementCount();
-				}
-			} else {
-				recordDao.insert(parsedRecord);
-				state.incrementInsertedCount();
-				LOG.info("Inserted: " + parsedRecord.getId() + " (from file " + entryName + ")");
-			}
-		}
-		if (!parseRecordResult.success) {
-			if (parseRecordResult.warnings > 0) {
-				state.addWarning(entryName, message);
-			} else {
-				state.addError(entryName, message);
-			}
-		}
 	}
 
 	private CollectRecord findAlreadyExistingRecord(CollectRecord parsedRecord) {
@@ -340,7 +370,7 @@ public class DataImportProcess implements Callable<Void> {
 		return Step.valueOf(stepNumber);
 	}
 
-	private Integer getRecordId(String zipEntryName) throws DataImportExeption {
+	private int getRecordId(String zipEntryName) throws DataImportExeption {
 		String[] entryNameSplitted = getEntryNameSplitted(zipEntryName);
 		String fileName = entryNameSplitted[1];
 		String[] fileNameSplitted = fileName.split(Pattern.quote("."));
@@ -375,10 +405,25 @@ public class DataImportProcess implements Callable<Void> {
 		toRecord.updateEntityCounts();
 	}
 
-	public void setOverwriteExistingRecordInConflict(boolean overwriteExistingRecordInConflict) {
-		this.overwriteExistingRecordInConflict = overwriteExistingRecordInConflict;
+	protected CollectRecord createRecordSummary(CollectRecord record) {
+		CollectSurvey survey = (CollectSurvey) record.getSurvey();
+		String versionName = record.getVersion().getName();
+		CollectRecord result = new CollectRecord(survey, versionName);
+		result.setCreatedBy(record.getCreatedBy());
+		result.setCreationDate(record.getCreationDate());
+		result.setEntityCounts(record.getEntityCounts());
+		result.setErrors(record.getErrors());
+		result.setId(record.getId());
+		result.setMissing(record.getMissing());
+		result.setModifiedBy(record.getModifiedBy());
+		result.setModifiedDate(record.getModifiedDate());
+		result.setRootEntityKeyValues(record.getRootEntityKeyValues());
+		result.setSkipped(record.getSkipped());
+		result.setState(record.getState());
+		result.setStep(record.getStep());
+		return result;
 	}
-
+	
 	public boolean isOverwriteAll() {
 		return overwriteAll;
 	}
@@ -387,8 +432,8 @@ public class DataImportProcess implements Callable<Void> {
 		this.overwriteAll = overwriteAll;
 	}
 
-	public void setSurveyName(String surveyName) {
-		this.surveyName = surveyName;
+	public void setNewSurveyName(String newSurveyName) {
+		this.newSurveyName = newSurveyName;
 	}
 
 	private class ParseRecordResult {
@@ -400,6 +445,18 @@ public class DataImportProcess implements Callable<Void> {
 		public ParseRecordResult() {
 			success = false;
 		}
+	}
+
+	public DataImportSummary getSummary() {
+		return summary;
+	}
+
+	public List<Integer> getEntryIdsToImport() {
+		return entryIdsToImport;
+	}
+
+	public void setEntryIdsToImport(List<Integer> entryIdsToImport) {
+		this.entryIdsToImport = entryIdsToImport;
 	}
 
 }

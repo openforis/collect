@@ -8,7 +8,7 @@
 package org.openforis.collect.remoting.service.dataImport {
 
     [Bindable]
-    [RemoteClass(alias="org.openforis.collect.remoting.service.dataImport.DataImportConflict")]
-    public class DataImportConflict extends DataImportConflictBase {
+    [RemoteClass(alias="org.openforis.collect.remoting.service.dataImport.DataImportConflictProxy")]
+    public class DataImportConflictProxy extends DataImportConflictProxyBase {
     }
 }

@@ -1,4 +1,5 @@
 package org.openforis.collect.client {
+	import mx.collections.IList;
 	import mx.controls.Alert;
 	import mx.rpc.AsyncToken;
 	import mx.rpc.IResponder;
@@ -37,8 +38,8 @@ package org.openforis.collect.client {
 			token.addResponder(responder);
 		}
 		
-		public function startImport(responder:IResponder, surveyName:String = null):void {
-			var token:AsyncToken = this._startImportOperation.send(surveyName);
+		public function startImport(responder:IResponder, entryIdsToImport:IList, newSurveyName:String = null):void {
+			var token:AsyncToken = this._startImportOperation.send(entryIdsToImport, newSurveyName);
 			token.addResponder(responder);
 		}
 

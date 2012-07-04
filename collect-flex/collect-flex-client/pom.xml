@@ -100,9 +100,11 @@
 								<includeClass>org.openforis.collect.remoting.service.dataProcessing.DataProcessingState</includeClass>
 								<includeClass>org.openforis.collect.remoting.service.dataExport.DataExportState</includeClass>
 								<includeClass>org.openforis.collect.remoting.service.dataExport.DataExportState$Format</includeClass>
-								<includeClass>org.openforis.collect.remoting.service.dataImport.DataImportConflict</includeClass>
+								<includeClass>org.openforis.collect.remoting.service.dataImport.DataImportConflictProxy</includeClass>
 								<includeClass>org.openforis.collect.remoting.service.dataImport.DataImportStateProxy</includeClass>
 								<includeClass>org.openforis.collect.remoting.service.dataImport.DataImportState$Step</includeClass>
+								<includeClass>org.openforis.collect.remoting.service.dataImport.DataImportSummaryProxy</includeClass>
+								<includeClass>org.openforis.collect.remoting.service.dataImport.DataImportSummaryItemProxy</includeClass>
 							</includeJavaClasses>
 						</configuration>
 					</execution>

@@ -16,6 +16,8 @@ import org.openforis.collect.remoting.service.dataImport.DataImportExeption;
 import org.openforis.collect.remoting.service.dataImport.DataImportProcess;
 import org.openforis.collect.remoting.service.dataImport.DataImportState;
 import org.openforis.collect.remoting.service.dataImport.DataImportStateProxy;
+import org.openforis.collect.remoting.service.dataImport.DataImportSummary;
+import org.openforis.collect.remoting.service.dataImport.DataImportSummaryProxy;
 import org.openforis.collect.util.ExecutorServiceUtil;
 import org.openforis.collect.web.session.SessionState;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,7 +70,7 @@ public class DataImportService {
 	}
 	
 	@Secured("ROLE_ADMIN")
-	public DataImportStateProxy initProcess(boolean overwriteAll) throws DataImportExeption {
+	public DataImportSummaryProxy initProcess(boolean overwriteAll) throws DataImportExeption {
 		if ( dataImportProcess == null || ! dataImportProcess.isRunning() ) {
 			SessionState sessionState = sessionManager.getSessionState();
 			File userImportFolder = new File(importDirectory, sessionState.getSessionId());
@@ -81,27 +83,20 @@ public class DataImportService {
 			dataImportProcess = new DataImportProcess(surveyManager, recordManager, recordDao, users, packagedFile, overwriteAll);
 			dataImportProcess.init();
 		}
-		DataImportState state = dataImportProcess.getState();
-		DataImportStateProxy proxy = new DataImportStateProxy(state);
+		DataImportSummary summary = dataImportProcess.getSummary();
+		DataImportSummaryProxy proxy = new DataImportSummaryProxy(summary);
 		return proxy;
 	}
 	
 	@Secured("ROLE_ADMIN")
-	public DataImportStateProxy startImport(String surveyName) throws Exception {
-		dataImportProcess.setSurveyName(surveyName);
+	public DataImportStateProxy startImport(List<Integer> entryIdsToImport, String surveyName) throws Exception {
+		dataImportProcess.setEntryIdsToImport(entryIdsToImport);
+		dataImportProcess.setNewSurveyName(surveyName);
 		dataImportProcess.prepareToStart();
 		ExecutorServiceUtil.executeInCachedPool(dataImportProcess);
 		DataImportState state = dataImportProcess.getState();
 		DataImportStateProxy proxy = new DataImportStateProxy(state);
 		return proxy;
-	}
-	
-	@Secured("ROLE_ADMIN")
-	public void overwriteExistingRecordInConflict(boolean value, boolean overwriteAll) {
-		dataImportProcess.setOverwriteExistingRecordInConflict(value);
-		dataImportProcess.setOverwriteAll(overwriteAll);
-		//continue the process
-		ExecutorServiceUtil.executeInCachedPool(dataImportProcess);
 	}
 	
 	@Secured("ROLE_ADMIN")
