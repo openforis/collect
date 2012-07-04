@@ -58,6 +58,7 @@ public class DataImportProcess implements Callable<Void> {
 
 	private DataUnmarshaller dataUnmarshaller;
 	
+	private Map<Step, List<Integer>> recordsPerStep;
 	private List<Integer> processedRecords;
 
 	private DataImportSummary summary;
@@ -156,6 +157,9 @@ public class DataImportProcess implements Callable<Void> {
 						conflictingPackagedRecords.put(packagedRecordId, oldRecord);
 					}
 				}
+				List<Integer> records = recordsPerStep.get(step);
+				Integer recordId = getRecordId(entryName);
+				records.add(recordId);
 				total++;
 			}
 			zipFile.close();
