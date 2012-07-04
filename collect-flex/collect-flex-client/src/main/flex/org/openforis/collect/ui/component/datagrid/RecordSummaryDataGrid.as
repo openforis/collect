@@ -7,7 +7,7 @@ package org.openforis.collect.ui.component.datagrid
 	import org.openforis.collect.model.RecordSummarySortField;
 	import org.openforis.collect.model.RecordSummarySortField$Sortable;
 	import org.openforis.collect.model.proxy.RecordProxy;
-	import org.openforis.collect.util.ArrayUtil;
+	import org.openforis.collect.util.ApplicationConstants;
 	import org.openforis.collect.util.CollectionUtil;
 	import org.openforis.collect.util.ObjectUtil;
 	
@@ -20,15 +20,6 @@ package org.openforis.collect.ui.component.datagrid
 	 * @author S. Ricci
 	 */
 	public class RecordSummaryDataGrid extends spark.components.DataGrid {
-		
-		public static const DATE_TIME_PATTERN:String = "dd-MM-yyyy HH:mm";
-		protected static var _dataTimeFormatter:DateTimeFormatter;
-		
-		//init static variables
-		{
-			_dataTimeFormatter = new DateTimeFormatter();
-			_dataTimeFormatter.dateTimePattern = DATE_TIME_PATTERN;
-		}
 		
 		/**
 		 * list of items selected using checkboxes (see SelectRecordColumnHeaderRenderer and SelectRecordColumnItemRenderer) 
@@ -49,16 +40,6 @@ package org.openforis.collect.ui.component.datagrid
 		public function setAllItemsByChecbox():void {
 			selectedByCheckBox.removeAll();
 			selectedByCheckBox.addAll(dataProvider);
-		}
-		
-		public static function dateTimeLabelFunction(item:Object,column:GridColumn):String {
-			if(item.hasOwnProperty(column.dataField)) {
-				var date:Date = item[column.dataField];
-				var result:String = _dataTimeFormatter.format(date);
-				return result;
-			} else {
-				return null;
-			}
 		}
 		
 		public static function recordSummariesKeyLabelFunction(item:Object, gridColumn:GridColumn):String {

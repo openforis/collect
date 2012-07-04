@@ -182,10 +182,10 @@ package org.openforis.collect.ui {
 			column = getGridColumn(Message.get("list.warnings"), "warnings", 80, RecordSummaryDataGrid.numberLabelFunction);
 			columns.addItem(column);
 			//creation date column
-			column = getGridColumn(Message.get("list.creationDate"), "creationDate", 120, RecordSummaryDataGrid.dateTimeLabelFunction);
+			column = getGridColumn(Message.get("list.creationDate"), "creationDate", 120, UIUtil.gridColumnDateTimeLabelFunction);
 			columns.addItem(column);
 			//date modified column
-			column = getGridColumn(Message.get("list.modifiedDate"), "modifiedDate", 120, RecordSummaryDataGrid.dateTimeLabelFunction);
+			column = getGridColumn(Message.get("list.modifiedDate"), "modifiedDate", 120, UIUtil.gridColumnDateTimeLabelFunction);
 			columns.addItem(column);
 			//entry completed column
 			column = getGridColumn(Message.get("list.entryComplete"), "entryComplete", 70, 

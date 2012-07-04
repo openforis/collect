@@ -24,6 +24,8 @@ package org.openforis.collect.util {
 		private static const DOWNLOAD_EXPORTED_DATA_SERVLET_NAME:String = "downloadDataExport.htm";
 		private static const DOWNLOAD_BACKUP_SERVLET_NAME:String = "downloadBackup.htm";
 		
+		public static const DATE_TIME_PATTERN:String = "dd-MM-yyyy HH:mm";
+		
 		private static var _DATA_IMPORT_UPLOAD_URL:String; 
 		private static var _FILEUPLOAD_URL:String; 
 		private static var _FILEDOWNLOAD_URL:String; 

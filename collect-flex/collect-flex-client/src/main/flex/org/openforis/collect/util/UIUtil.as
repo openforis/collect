@@ -17,6 +17,8 @@ package org.openforis.collect.util
 	import spark.components.Application;
 	import spark.components.NavigatorContent;
 	import spark.components.Scroller;
+	import spark.components.gridClasses.GridColumn;
+	import spark.formatters.DateTimeFormatter;
 	
 	/**
 	 * @author S. Ricci
@@ -29,7 +31,12 @@ package org.openforis.collect.util
 		private static var fixedCodeTextFormat:UITextFormat
 		private static var unitTextFormat:UITextFormat;
 		private static var gridHeaderFormat:UITextFormat;
+		
+		private static var _dataTimeFormatter:DateTimeFormatter;
+		//init static variables
 		{
+			_dataTimeFormatter = new DateTimeFormatter();
+			_dataTimeFormatter.dateTimePattern = ApplicationConstants.DATE_TIME_PATTERN;
 			fixedCodeTextFormat = createUITextFormat("spark.components.Label.fixedCode");
 			unitTextFormat = createUITextFormat("spark.components.Label.unit");
 			gridHeaderFormat = createUITextFormat("spark.components.Label.dataGroupHeader");
@@ -232,6 +239,16 @@ package org.openforis.collect.util
 			var app:Application = FlexGlobals.topLevelApplication as Application;
 			var focussed:UIComponent = app.focusManager.getFocus() as UIComponent;
 			return focussed != null && ( focussed == component || isDescendantOf(component, focussed) );
+		}
+		
+		public static function gridColumnDateTimeLabelFunction(item:Object, column:Object):String {
+			var result:String = null;
+			var value:* = ObjectUtil.getValue(item, column.dataField);
+			if ( value != null && value is Date ) {
+				var date:Date = value as Date;
+				result = _dataTimeFormatter.format(date);
+			}
+			return result;
 		}
 		
 		private static function isDescendantOf(parent:UIComponent, component:UIComponent):Boolean {
