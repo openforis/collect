@@ -72,7 +72,11 @@
 			  horizontalAlign="center"
 			  verticalAlign="middle"
 			  height="100%" width="100%"
+			  gap="30"
 			  >
+		<s:Label text="{Message.get('dataImport.introduction')}"
+				 styleName="infoMessageBig"
+				 textAlign="center" />
 		<s:Button id="uploadButton" 
 				  label="{Message.get('dataImport.selectFileToUpload')}"
 				  includeIn="default"
@@ -102,7 +106,8 @@
 				  includeInLayout="{conflictDataGrid.dataProvider.length > 0}"
 				  horizontalAlign="center"
 				  >
-			<s:Label text="{Message.get('dataImport.recordsInConflict')}" />
+			<s:Label text="{Message.get('dataImport.recordsInConflict')}"
+					 styleName="formLabel" />
 			
 			<mx:AdvancedDataGrid id="conflictDataGrid"
 								 sortExpertMode="true"
@@ -177,7 +182,8 @@
 				  visible="{recordToImportDataGrid.dataProvider.length > 0}"
 				  includeInLayout="{recordToImportDataGrid.dataProvider.length > 0}"
 				  horizontalAlign="center">
-			<s:Label text="{Message.get('dataImport.recordsToBeImported')}" />
+			<s:Label text="{Message.get('dataImport.recordsToBeImported')}"
+					 styleName="formLabel" />
 	
 			<mx:AdvancedDataGrid id="recordToImportDataGrid"
 								 sortExpertMode="true"
@@ -234,7 +240,8 @@
 				  visible="{skippedFilesDataGrid.dataProvider.length > 0}"
 				  includeInLayout="{skippedFilesDataGrid.dataProvider.length > 0}"
 				  horizontalAlign="center">
-			<s:Label text="{Message.get('dataImport.skippedFiles')}" />
+			<s:Label text="{Message.get('dataImport.skippedFiles')}"
+					 styleName="formLabel" />
 		
 			<s:DataGrid id="skippedFilesDataGrid" >
 				<s:columns>
@@ -260,8 +267,10 @@
 			  itemCreationPolicy="immediate"
 			  horizontalAlign="center"
 			  verticalAlign="middle"
+			  gap="20"
 			  >
-		<s:Label id="progressTitle" />
+		<s:Label id="progressTitle"
+				 styleName="formLabel" />
 		
 		<mx:ProgressBar id="progressBar"
 						horizontalCenter="0"
@@ -272,7 +281,8 @@
 						width="80%"
 						/>
 		
-		<s:Label id="progressLabel" />
+		<s:Label id="progressLabel"
+				 styleName="formLabel" />
 		
 		<s:Button id="cancelButton"
 				  label="{Message.get('global.cancel')}"
@@ -284,10 +294,10 @@
 	
 	<s:VGroup includeIn="importComplete"
 			  height="100%" width="100%"
-			  horizontalAlign="center" verticalAlign="middle"
-			  >
+			  horizontalAlign="center" verticalAlign="middle">
 		
-		<s:Label text="{Message.get('dataImport.complete')}" />
+		<s:Label text="{Message.get('dataImport.complete')}"
+				 styleName="infoMessage" />
 		
 	</s:VGroup>
 
