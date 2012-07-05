@@ -109,7 +109,25 @@
 								 selectable="false">
 				<mx:groupedColumns>
 					<mx:AdvancedDataGridColumn dataField="key"
-											   headerText="{Message.get('dataImport.recordList.key')}" />
+											   headerText="{Message.get('dataImport.recordList.key')}"
+											   width="100" />
+					<mx:AdvancedDataGridColumnGroup headerText="{Message.get('dataImport.recordConflicts.currentRecord')}">
+						<mx:AdvancedDataGridColumn dataField="conflictingRecord.creationDate" 
+												   sortable="false"
+												   width="120"
+												   headerText="{Message.get('dataImport.recordList.creationDate')}" 
+												   labelFunction="{UIUtil.gridColumnDateTimeLabelFunction}" />
+						<mx:AdvancedDataGridColumn dataField="conflictingRecord.modifiedDate" 
+												   sortable="false"
+												   width="120"
+												   headerText="{Message.get('dataImport.recordList.modifiedDate')}" 
+												   labelFunction="{UIUtil.gridColumnDateTimeLabelFunction}" />
+						<mx:AdvancedDataGridColumn dataField="conflictingRecord.step"
+												   sortable="false"
+												   width="60"
+												   headerText="{Message.get('dataImport.recordList.step')}" 
+												   labelFunction="{conflictingRecordStepLabelFunction}" />
+					</mx:AdvancedDataGridColumnGroup>
 					<mx:AdvancedDataGridColumnGroup headerText="{Message.get('dataImport.recordConflicts.newRecord')}">
 						<mx:AdvancedDataGridColumn dataField="record.creationDate" 
 												   sortable="false"
@@ -135,23 +153,6 @@
 													   headerText="{Message.get('dataImport.recordList.analysisDataPresent')}"
 													   itemRenderer="org.openforis.collect.ui.component.datagrid.AdvancedDataGridBooleanColumnItemRenderer" />
 						</mx:AdvancedDataGridColumnGroup>
-					</mx:AdvancedDataGridColumnGroup>
-					<mx:AdvancedDataGridColumnGroup headerText="{Message.get('dataImport.recordConflicts.currentRecord')}">
-						<mx:AdvancedDataGridColumn dataField="conflictingRecord.creationDate" 
-												   sortable="false"
-												   width="120"
-												   headerText="{Message.get('dataImport.recordList.creationDate')}" 
-												   labelFunction="{UIUtil.gridColumnDateTimeLabelFunction}" />
-						<mx:AdvancedDataGridColumn dataField="conflictingRecord.modifiedDate" 
-												   sortable="false"
-												   width="120"
-												   headerText="{Message.get('dataImport.recordList.modifiedDate')}" 
-												   labelFunction="{UIUtil.gridColumnDateTimeLabelFunction}" />
-						<mx:AdvancedDataGridColumn dataField="conflictingRecord.step"
-												   sortable="false"
-												   width="60"
-												   headerText="{Message.get('dataImport.recordList.step')}" 
-												   labelFunction="{conflictingRecordStepLabelFunction}" />
 					</mx:AdvancedDataGridColumnGroup>
 					<mx:AdvancedDataGridColumn dataField="selected" 
 											   headerText="{Message.get('dataImport.recordConflicts.replace')}"
@@ -183,7 +184,8 @@
 								 selectable="false">
 				<mx:groupedColumns>
 					<mx:AdvancedDataGridColumn dataField="key"
-											   headerText="{Message.get('dataImport.recordList.key')}" />
+											   headerText="{Message.get('dataImport.recordList.key')}"
+											   width="100" />
 					<mx:AdvancedDataGridColumn dataField="record.creationDate"
 											   sortable="false"
 											   width="120"
