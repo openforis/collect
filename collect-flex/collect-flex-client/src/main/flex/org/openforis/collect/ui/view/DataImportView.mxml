@@ -14,9 +14,11 @@
 			import mx.events.FlexEvent;
 			
 			import org.openforis.collect.i18n.Message;
+			import org.openforis.collect.model.CollectRecord$Step;
 			import org.openforis.collect.model.proxy.RecordProxy;
 			import org.openforis.collect.presenter.DataImportPresenter;
 			import org.openforis.collect.remoting.service.dataImport.DataImportSummaryItemProxy;
+			import org.openforis.collect.util.ObjectUtil;
 			import org.openforis.collect.util.StringUtil;
 			import org.openforis.collect.util.UIUtil;
 			
@@ -34,11 +36,19 @@
 				_presenter = new DataImportPresenter(this);
 			}
 			
-			protected function recordKeyLabelFunction(item:Object, column:Object):String {
-				var summaryItem:DataImportSummaryItemProxy = item as DataImportSummaryItemProxy;
-				var record:RecordProxy = summaryItem.record;
-				var key:String = StringUtil.concat("-", record.rootEntityKeys.toArray());
-				return key;
+			protected function conflictingRecordStepLabelFunction(item:Object, column:Object):String {
+				var dataField:String = column.dataField;
+				var step:CollectRecord$Step = ObjectUtil.getValue(item, dataField) as CollectRecord$Step;
+				switch ( step ) {
+					case CollectRecord$Step.ENTRY:
+						return Message.get('phase.short.ENTRY');
+					case CollectRecord$Step.CLEANSING:
+						return Message.get('phase.short.CLEANSING');
+					case CollectRecord$Step.ANALYSIS:
+						return Message.get('phase.short.ANALYSIS');
+					default:
+						return "";
+				}
 			}
 			
 		]]>
@@ -66,7 +76,8 @@
 							  height="100%" width="100%" />
 	
 	<s:VGroup includeInLayout="false" includeInLayout.uploadComplete="true"
-			  visible="false" visible.uploadComplete="true">
+			  visible="false" visible.uploadComplete="true"
+			  horizontalAlign="center">
 		<s:Form id="form" includeIn="uploadCompleteNewSurvey">
 			<s:FormItem label="{Message.get('dataImport.newSurveyNameLabel')}">
 				<s:TextInput id="surveyNameTextInput" editable="false" editable.uploadCompleteNewSurvey="true" />
@@ -75,59 +86,92 @@
 		
 		<s:VGroup id="conflictsContainer" 
 				  visible="{conflictDataGrid.dataProvider.length > 0}"
-				  includeInLayout="{conflictDataGrid.dataProvider.length > 0}">
+				  includeInLayout="{conflictDataGrid.dataProvider.length > 0}"
+				  horizontalAlign="center"
+				  >
 			<s:Label text="{Message.get('dataImport.recordsInConflict')}" />
 			
 			<mx:AdvancedDataGrid id="conflictDataGrid"
 								 sortExpertMode="true"
 								 selectable="false">
 				<mx:groupedColumns>
-					<mx:AdvancedDataGridColumn dataField="record.id"
-											   headerText="{Message.get('dataImport.recordList.key')}" 
-											   labelFunction="{recordKeyLabelFunction}" />
+					<mx:AdvancedDataGridColumn dataField="key"
+											   headerText="{Message.get('dataImport.recordList.key')}" />
 					<mx:AdvancedDataGridColumnGroup headerText="{Message.get('dataImport.recordConflicts.currentRecord')}">
-						<mx:AdvancedDataGridColumn dataField="conflictingRecord.creationDate" 
-												   width="120"
-												   headerText="{Message.get('dataImport.recordList.creationDate')}" 
-												   labelFunction="{UIUtil.gridColumnDateTimeLabelFunction}" />
-						<mx:AdvancedDataGridColumn dataField="conflictingRecord.modifiedDate" 
-												   width="120"
-												   headerText="{Message.get('dataImport.recordList.modifiedDate')}" 
-												   labelFunction="{UIUtil.gridColumnDateTimeLabelFunction}" />
-					</mx:AdvancedDataGridColumnGroup>
-					<mx:AdvancedDataGridColumnGroup headerText="{Message.get('dataImport.recordConflicts.newRecord')}">
 						<mx:AdvancedDataGridColumn dataField="record.creationDate" 
+												   sortable="false"
 												   width="120"
 												   headerText="{Message.get('dataImport.recordList.creationDate')}" 
 												   labelFunction="{UIUtil.gridColumnDateTimeLabelFunction}" />
 						<mx:AdvancedDataGridColumn dataField="record.modifiedDate" 
+												   sortable="false"
 												   width="120"
 												   headerText="{Message.get('dataImport.recordList.modifiedDate')}" 
 												   labelFunction="{UIUtil.gridColumnDateTimeLabelFunction}" />
+						<mx:AdvancedDataGridColumnGroup headerText="{Message.get('dataImport.recordList.steps')}">
+							<mx:AdvancedDataGridColumn dataField="entryDataPresent" 
+													   width="60"
+													   headerText="{Message.get('dataImport.recordList.entryDataPresent')}"
+													   itemRenderer="org.openforis.collect.ui.component.datagrid.AdvancedDataGridBooleanColumnItemRenderer" />
+							<mx:AdvancedDataGridColumn dataField="cleansingDataPresent" 
+													   width="60"
+													   headerText="{Message.get('dataImport.recordList.cleansingDataPresent')}"
+													   itemRenderer="org.openforis.collect.ui.component.datagrid.AdvancedDataGridBooleanColumnItemRenderer" />
+							<mx:AdvancedDataGridColumn dataField="analysisDataPresent" 
+													   width="60"
+													   headerText="{Message.get('dataImport.recordList.analysisDataPresent')}"
+													   itemRenderer="org.openforis.collect.ui.component.datagrid.AdvancedDataGridBooleanColumnItemRenderer" />
+						</mx:AdvancedDataGridColumnGroup>
+					</mx:AdvancedDataGridColumnGroup>
+					<mx:AdvancedDataGridColumnGroup headerText="{Message.get('dataImport.recordConflicts.newRecord')}">
+						<mx:AdvancedDataGridColumn dataField="conflictingRecord.creationDate" 
+												   sortable="false"
+												   width="120"
+												   headerText="{Message.get('dataImport.recordList.creationDate')}" 
+												   labelFunction="{UIUtil.gridColumnDateTimeLabelFunction}" />
+						<mx:AdvancedDataGridColumn dataField="conflictingRecord.modifiedDate" 
+												   sortable="false"
+												   width="120"
+												   headerText="{Message.get('dataImport.recordList.modifiedDate')}" 
+												   labelFunction="{UIUtil.gridColumnDateTimeLabelFunction}" />
+						<mx:AdvancedDataGridColumn dataField="conflictingRecord.step"
+												   sortable="false"
+												   width="60"
+												   headerText="{Message.get('dataImport.recordList.step')}" 
+												   labelFunction="{conflictingRecordStepLabelFunction}" />
 					</mx:AdvancedDataGridColumnGroup>
 					<mx:AdvancedDataGridColumn dataField="selected" 
 											   headerText="{Message.get('dataImport.recordConflicts.replace')}"
-											   width="60"
+											   width="70"
 											   editable="true"
-											   itemRenderer="mx.controls.CheckBox"
 											   rendererIsEditor="true"
-											   />
+											   >
+						<mx:itemRenderer>
+							<fx:Component>
+								<mx:Canvas width="100%" height="100%">
+									<mx:CheckBox horizontalCenter="0" verticalCenter="0" 
+												 selected="{data.selected}" 
+												 change="{data.selected = event.target.selected}" />
+								</mx:Canvas>
+							</fx:Component>
+						</mx:itemRenderer>
+					</mx:AdvancedDataGridColumn>
 				</mx:groupedColumns>
 			</mx:AdvancedDataGrid>
 		</s:VGroup>
 		
 		<s:VGroup id="recordsContainer" 
 				  visible="{recordToImportDataGrid.dataProvider.length > 0}"
-				  includeInLayout="{recordToImportDataGrid.dataProvider.length > 0}">
+				  includeInLayout="{recordToImportDataGrid.dataProvider.length > 0}"
+				  horizontalAlign="center">
 			<s:Label text="{Message.get('dataImport.recordsToBeImported')}" />
 	
 			<mx:AdvancedDataGrid id="recordToImportDataGrid"
 								 sortExpertMode="true"
 								 selectable="false">
-				<mx:columns>
-					<mx:AdvancedDataGridColumn dataField="record.id"
-											   headerText="{Message.get('dataImport.recordList.key')}" 
-											   labelFunction="{recordKeyLabelFunction}" />
+				<mx:groupedColumns>
+					<mx:AdvancedDataGridColumn dataField="key"
+											   headerText="{Message.get('dataImport.recordList.key')}" />
 					<mx:AdvancedDataGridColumn dataField="record.creationDate"
 											   width="120"
 											   headerText="{Message.get('dataImport.recordList.creationDate')}"
@@ -136,27 +180,53 @@
 											   width="120"
 											   headerText="{Message.get('dataImport.recordList.modifiedDate')}"
 											   labelFunction="{UIUtil.gridColumnDateTimeLabelFunction}" />
+					<mx:AdvancedDataGridColumnGroup headerText="{Message.get('dataImport.recordList.steps')}">
+						<mx:AdvancedDataGridColumn dataField="entryDataPresent" 
+												   width="60"
+												   headerText="{Message.get('dataImport.recordList.entryDataPresent')}"
+												   itemRenderer="org.openforis.collect.ui.component.datagrid.AdvancedDataGridBooleanColumnItemRenderer" />
+						<mx:AdvancedDataGridColumn dataField="cleansingDataPresent" 
+												   width="60"
+												   headerText="{Message.get('dataImport.recordList.cleansingDataPresent')}"
+												   itemRenderer="org.openforis.collect.ui.component.datagrid.AdvancedDataGridBooleanColumnItemRenderer" />
+						<mx:AdvancedDataGridColumn dataField="analysisDataPresent" 
+												   width="60"
+												   headerText="{Message.get('dataImport.recordList.analysisDataPresent')}"
+												   itemRenderer="org.openforis.collect.ui.component.datagrid.AdvancedDataGridBooleanColumnItemRenderer" />
+					</mx:AdvancedDataGridColumnGroup>
 					<mx:AdvancedDataGridColumn dataField="selected" 
 											   headerText="{Message.get('dataImport.recordList.import')}"
 											   width="60"
 											   editable="true"
-											   itemRenderer="mx.controls.CheckBox"
 											   rendererIsEditor="true"
-											   />
-				</mx:columns>
+											   >
+						<mx:itemRenderer>
+							<fx:Component>
+								<mx:Canvas width="100%" height="100%">
+									<mx:CheckBox horizontalCenter="0" verticalCenter="0" 
+												 selected="{data.selected}" 
+												 change="{data.selected = event.target.selected}" />
+								</mx:Canvas>
+							</fx:Component>
+						</mx:itemRenderer>
+					</mx:AdvancedDataGridColumn>
+				</mx:groupedColumns>
 			</mx:AdvancedDataGrid>
 		</s:VGroup>
 		
 		<s:VGroup id="skippedFilesContainer" 
 				  visible="{skippedFilesDataGrid.dataProvider.length > 0}"
-				  includeInLayout="{skippedFilesDataGrid.dataProvider.length > 0}">
+				  includeInLayout="{skippedFilesDataGrid.dataProvider.length > 0}"
+				  horizontalAlign="center">
 			<s:Label text="{Message.get('dataImport.skippedFiles')}" />
 		
 			<s:DataGrid id="skippedFilesDataGrid" >
 				<s:columns>
 					<s:ArrayList>
-						<s:GridColumn dataField="fileName" headerText="{Message.get('dataImport.skippedFiles.fileName')}" />
-						<s:GridColumn dataField="message" headerText="{Message.get('dataImport.skippedFiles.message')}" />
+						<s:GridColumn dataField="fileName" 
+									  headerText="{Message.get('dataImport.skippedFiles.fileName')}" />
+						<s:GridColumn dataField="message" 
+									  headerText="{Message.get('dataImport.skippedFiles.message')}" />
 					</s:ArrayList>
 				</s:columns>
 			</s:DataGrid>

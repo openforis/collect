@@ -56,10 +56,35 @@ public class DataImportSummaryItemProxy implements Proxy {
 		}
 	}
 	
-	
 	@ExternalizedProperty
 	public List<Step> getSteps() {
 		return item.getSteps();
+	}
+	
+	@ExternalizedProperty
+	public boolean isEntryDataPresent() {
+		Step step = Step.ENTRY;
+		return hasStep(step);
+	}
+
+	@ExternalizedProperty
+	public boolean isCleansingDataPresent() {
+		Step step = Step.CLEANSING;
+		return hasStep(step);
+	}
+
+	@ExternalizedProperty
+	public boolean isAnalysisDataPresent() {
+		Step step = Step.ANALYSIS;
+		return hasStep(step);
+	}
+
+	protected boolean hasStep(Step step) {
+		if ( item.getSteps() != null ) {
+			return item.getSteps().contains(step);
+		} else {
+			return false;
+		}
 	}
 
 }

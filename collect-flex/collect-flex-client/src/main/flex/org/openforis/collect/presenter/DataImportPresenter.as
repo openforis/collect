@@ -166,16 +166,14 @@ package org.openforis.collect.presenter {
 		
 		protected function startImportClickHandler(event:MouseEvent):void {
 			if ( validateForm() ) {
-				var entryIdsToImport:IList = new ArrayCollection();
-				for each (var item:DataImportSummaryItemProxy in _summary.recordsToImport) {
-					if ( item.selected ) {
-						entryIdsToImport.addItem(item.entryId);
-					}
-				}
-				for each (var item:DataImportSummaryItemProxy in _summary.conflictingRecords) {
-					if ( item.selected ) {
-						entryIdsToImport.addItem(item.entryId);
-					}
+				var entryIdsToImport:ArrayCollection = new ArrayCollection();
+				var tempSelectedItemIds:IList = getSelectedItemIds(_summary.recordsToImport);
+				entryIdsToImport.addAll(tempSelectedItemIds);
+				tempSelectedItemIds = getSelectedItemIds(_summary.conflictingRecords);
+				entryIdsToImport.addAll(tempSelectedItemIds);
+				if ( entryIdsToImport.length == 0 ) {
+					AlertUtil.showError("dataImport.error.emptyImportSelection");
+					return;
 				}
 				var responder:AsyncResponder = new AsyncResponder(startImportResultHandler, faultHandler);
 				var surveyName:String = null;
@@ -188,6 +186,15 @@ package org.openforis.collect.presenter {
 			}
 		}
 		
+		protected function getSelectedItemIds(items:IList):IList {
+			var result:IList = new ArrayCollection();
+			for each (var item:DataImportSummaryItemProxy in items) {
+				if ( item.selected ) {
+					result.addItem(item.entryId);
+				}
+			}
+			return result;
+		}
 		protected function setItemsSelected(items:IList, value:Boolean = true):void {
 			for each (var item:DataImportSummaryItemProxy in items) {
 				item.selected = value;

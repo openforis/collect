@@ -6,6 +6,7 @@
  */
 
 package org.openforis.collect.remoting.service.dataImport {
+	import org.openforis.collect.util.StringUtil;
 
     [Bindable]
     [RemoteClass(alias="org.openforis.collect.remoting.service.dataImport.DataImportSummaryItemProxy")]
@@ -20,6 +21,11 @@ package org.openforis.collect.remoting.service.dataImport {
 		public function set selected(value:Boolean):void {
 			_selected = value;
 		}
-
+		
+		public function get key():String {
+			var result:String = StringUtil.concat("-", record.rootEntityKeys.toArray());
+			return result;
+		}
+		
     }
 }
