@@ -227,7 +227,7 @@ public class SpeciesDaoIntegrationTest {
 		t.setTaxonId(taxonId);
 		t.setCode(code);
 		t.setScientificName(scientificName);
-		t.setTaxonomicRank(rank);
+		t.setTaxonRank(rank);
 		t.setStep(step);
 		t.setTaxonomyId(taxonomy.getId());
 		t.setParentId(parentId);
@@ -238,7 +238,7 @@ public class SpeciesDaoIntegrationTest {
 		assertNotNull(t);
 		assertEquals((Integer) taxonId, t.getTaxonId());
 		assertEquals(scientificName, t.getScientificName());
-		assertEquals(rank, t.getTaxonomicRank());
+		assertEquals(rank, t.getTaxonRank());
 		assertEquals(taxonomy.getId(), t.getTaxonomyId());
 		assertEquals(step, t.getStep());
 		assertEquals(parentId, t.getParentId());
@@ -251,7 +251,7 @@ public class SpeciesDaoIntegrationTest {
 		
 		// Insert
 		t.setScientificName(scientificName);
-		t.setTaxonomicRank(rank);
+		t.setTaxonRank(rank);
 		t.setStep(step);
 		t.setParentId(parentId);
 		taxonDao.update(t);
@@ -260,7 +260,7 @@ public class SpeciesDaoIntegrationTest {
 		t = taxonDao.loadById(t.getSystemId());
 		assertNotNull(t);
 		assertEquals(scientificName, t.getScientificName());
-		assertEquals(rank, t.getTaxonomicRank());
+		assertEquals(rank, t.getTaxonRank());
 		assertEquals(step, t.getStep());
 		assertEquals(parentId, t.getParentId());
 		return t;

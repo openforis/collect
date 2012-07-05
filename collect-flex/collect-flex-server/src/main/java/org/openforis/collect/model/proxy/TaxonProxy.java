@@ -44,8 +44,8 @@ public class TaxonProxy implements Proxy {
 	}
 
 	@ExternalizedProperty
-	public String getTaxonomicRank() {
-		return taxon.getTaxonomicRank();
+	public String getTaxonRank() {
+		return taxon.getTaxonRank();
 	}
 
 	@ExternalizedProperty

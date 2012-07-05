@@ -83,7 +83,7 @@ public class TaxonDao extends MappingJooqDaoSupport<Taxon, TaxonDao.JooqFactory>
 			t.setParentId(r.getValue(OFC_TAXON.PARENT_ID));
 			t.setCode(r.getValueAsString(OFC_TAXON.CODE));
 			t.setScientificName(r.getValue(OFC_TAXON.SCIENTIFIC_NAME));
-			t.setTaxonomicRank(r.getValue(OFC_TAXON.TAXON_RANK));
+			t.setTaxonRank(r.getValue(OFC_TAXON.TAXON_RANK));
 			t.setTaxonomyId(r.getValue(OFC_TAXON.TAXONOMY_ID));
 			t.setStep(r.getValue(OFC_TAXON.STEP));
 		}
@@ -95,7 +95,7 @@ public class TaxonDao extends MappingJooqDaoSupport<Taxon, TaxonDao.JooqFactory>
 			q.addValue(OFC_TAXON.PARENT_ID, t.getParentId());
 			q.addValue(OFC_TAXON.CODE, t.getCode());
 			q.addValue(OFC_TAXON.SCIENTIFIC_NAME, t.getScientificName());
-			q.addValue(OFC_TAXON.TAXON_RANK, t.getTaxonomicRank());
+			q.addValue(OFC_TAXON.TAXON_RANK, t.getTaxonRank());
 			q.addValue(OFC_TAXON.TAXONOMY_ID, t.getTaxonomyId());
 			q.addValue(OFC_TAXON.STEP, t.getStep());
 		}
