@@ -16,10 +16,9 @@ public class DataImportSummary {
 	private List<DataImportSummaryItem> recordsToImport;
 	private List<DataImportSummaryItem> conflictingRecords;
 	private Map<String, String> skippedFileErrors;
-	private boolean newSurvey;
+	private String surveyName;
 	
 	public DataImportSummary() {
-		newSurvey = true;
 	}
 
 	public Map<String, String> getSkippedFileErrors() {
@@ -28,14 +27,6 @@ public class DataImportSummary {
 
 	public void setSkippedFileErrors(Map<String, String> skippedFileErrors) {
 		this.skippedFileErrors = skippedFileErrors;
-	}
-
-	public boolean isNewSurvey() {
-		return newSurvey;
-	}
-
-	public void setNewSurvey(boolean newSurvey) {
-		this.newSurvey = newSurvey;
 	}
 
 	public Map<Step, Integer> getTotalPerStep() {
@@ -60,6 +51,14 @@ public class DataImportSummary {
 
 	public void setConflictingRecords(List<DataImportSummaryItem> conflictingRecords) {
 		this.conflictingRecords = conflictingRecords;
+	}
+
+	public String getSurveyName() {
+		return surveyName;
+	}
+
+	public void setSurveyName(String surveyName) {
+		this.surveyName = surveyName;
 	}
 
 	

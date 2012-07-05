@@ -78,11 +78,15 @@
 	<s:VGroup includeInLayout="false" includeInLayout.uploadComplete="true"
 			  visible="false" visible.uploadComplete="true"
 			  horizontalAlign="center">
-		<s:Form id="form" includeIn="uploadCompleteNewSurvey">
-			<s:FormItem label="{Message.get('dataImport.newSurveyNameLabel')}">
+		<s:Form id="form">
+			<s:FormItem label="{Message.get('dataImport.newSurveyNameLabel')}" includeIn="uploadCompleteNewSurvey">
 				<s:TextInput id="surveyNameTextInput" editable="false" editable.uploadCompleteNewSurvey="true" />
 			</s:FormItem>
+			<s:FormItem label="{Message.get('dataImport.surveyNameLabel')}" excludeFrom="uploadCompleteNewSurvey">
+				<s:Label id="surveyNameLabel" />
+			</s:FormItem>
 		</s:Form>
+		
 		
 		<s:VGroup id="conflictsContainer" 
 				  visible="{conflictDataGrid.dataProvider.length > 0}"

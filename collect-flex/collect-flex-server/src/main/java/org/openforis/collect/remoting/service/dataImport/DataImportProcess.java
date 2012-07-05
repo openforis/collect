@@ -113,7 +113,7 @@ public class DataImportProcess implements Callable<Void> {
 			Map<String, String> packagedSkippedFileErrors = new HashMap<String, String>();
 			String uri = packagedSurvey.getUri();
 			CollectSurvey oldSurvey = surveyManager.getByUri(uri);
-			boolean isNewSurvey = oldSurvey == null;
+			String surveyName = oldSurvey != null ? oldSurvey.getName(): null;
 			dataUnmarshaller = initDataUnmarshaller(packagedSurvey, oldSurvey != null ? oldSurvey: packagedSurvey);
 			
 			Map<Step, Integer> totalPerStep = new HashMap<CollectRecord.Step, Integer>();
@@ -159,7 +159,7 @@ public class DataImportProcess implements Callable<Void> {
 			}
 			zipFile.close();
 
-			DataImportSummary summary = createSummary(packagedSkippedFileErrors, isNewSurvey,
+			DataImportSummary summary = createSummary(packagedSkippedFileErrors, surveyName,
 					totalPerStep, packagedRecords, packagedStepsPerRecord,
 					conflictingPackagedRecords);
 			return summary;
@@ -169,13 +169,13 @@ public class DataImportProcess implements Callable<Void> {
 	}
 
 	private DataImportSummary createSummary(
-			Map<String, String> packagedSkippedFileErrors, boolean isNewSurvey,
+			Map<String, String> packagedSkippedFileErrors, String surveyName,
 			Map<Step, Integer> totalPerStep,
 			Map<Integer, CollectRecord> packagedRecords,
 			Map<Integer, List<Step>> packagedStepsPerRecord,
 			Map<Integer, CollectRecord> conflictingPackagedRecords) {
 		DataImportSummary summary = new DataImportSummary();
-		summary.setNewSurvey(isNewSurvey);
+		summary.setSurveyName(surveyName);
 		
 		List<DataImportSummaryItem> recordsToImport = new ArrayList<DataImportSummaryItem>();
 		Set<Integer> entryIds = packagedRecords.keySet();

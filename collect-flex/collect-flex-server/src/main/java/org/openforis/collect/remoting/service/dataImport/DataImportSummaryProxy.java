@@ -27,8 +27,8 @@ public class DataImportSummaryProxy implements Proxy {
 	}
 
 	@ExternalizedProperty
-	public boolean isNewSurvey() {
-		return summary.isNewSurvey();
+	public String getSurveyName() {
+		return summary.getSurveyName();
 	}
 
 	@ExternalizedProperty

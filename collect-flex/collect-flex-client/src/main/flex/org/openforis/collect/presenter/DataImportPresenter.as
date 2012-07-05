@@ -138,10 +138,11 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function updateViewProcessInited():void {
-			if ( _summary.newSurvey ) {
+			if ( _summary.surveyName == null ) {
 				_view.currentState = DataImportView.STATE_UPLOAD_COMPLETE_NEW_SURVEY;
 			} else {
 				_view.currentState = DataImportView.STATE_UPLOAD_COMPLETE;
+				_view.surveyNameLabel.text = _summary.surveyName;
 			}
 			var entryTotalRecords:int = _summary.totalPerStep.get(CollectRecord$Step.ENTRY);
 			var cleansingTotalRecords:int = _summary.totalPerStep.get(CollectRecord$Step.CLEANSING);
