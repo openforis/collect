@@ -25,8 +25,9 @@
 			public static const STATE_DEFAULT:String = "default";
 			public static const STATE_LOADING:String = "loading";
 			public static const STATE_UPLOADING:String = "uploading";
-			public static const STATE_UPLOAD_COMPLETE:String = "uploadComplete";
-			public static const STATE_UPLOAD_COMPLETE_NEW_SURVEY:String = "uploadCompleteNewSurvey";
+			public static const STATE_SUMMARY_CREATIION_RUNNING:String = "summaryCreationRunning";
+			public static const STATE_SUMMARY_CREATION_COMPLETE:String = "summaryCreationComplete";
+			public static const STATE_SUMMARY_CREATION_COMPLETE_NEW_SURVEY:String = "summaryCreationCompleteNewSurvey";
 			public static const STATE_IMPORT_RUNNING:String = "importRunning";
 			public static const STATE_IMPORT_COMPLETE:String = "importComplete";
 			
@@ -59,34 +60,42 @@
 		<s:State name="default" />
 		<s:State name="loading" />
 		<s:State name="uploading" />
-		<s:State name="uploadComplete" />
-		<s:State name="uploadCompleteNewSurvey" basedOn="uploadComplete" />
+		<s:State name="summaryCreationRunning" />
+		<s:State name="summaryCreationComplete" />
+		<s:State name="summaryCreationCompleteNewSurvey" basedOn="summaryCreationComplete" />
 		<s:State name="importRunning" stateGroups="importing" />
-		<s:State name="importComplete" stateGroups="importing" />
+		<s:State name="importComplete" />
 	</s:states>
 	
-	<s:Button id="uploadButton" 
-			  label="{Message.get('dataImport.selectFileToUpload')}"
-			  includeIn="default"
-			  useHandCursor="true"
-			  buttonMode="true"
-			  />
+	<s:VGroup includeIn="default"
+			  itemCreationPolicy="immediate"
+			  horizontalAlign="center"
+			  verticalAlign="middle"
+			  height="100%" width="100%"
+			  >
+		<s:Button id="uploadButton" 
+				  label="{Message.get('dataImport.selectFileToUpload')}"
+				  includeIn="default"
+				  useHandCursor="true"
+				  buttonMode="true"
+				  />
+	</s:VGroup>
 
 	<component:LoadingContent includeIn="loading"
 							  height="100%" width="100%" />
 	
-	<s:VGroup includeInLayout="false" includeInLayout.uploadComplete="true"
-			  visible="false" visible.uploadComplete="true"
-			  horizontalAlign="center">
+	<s:VGroup includeIn="summaryCreationComplete, summaryCreationCompleteNewSurvey"
+			  itemCreationPolicy="immediate"
+			  horizontalAlign="center"
+			  height="100%" width="100%"
+			  >
 		<s:Form id="form">
-			<s:FormItem label="{Message.get('dataImport.newSurveyNameLabel')}" includeIn="uploadCompleteNewSurvey">
-				<s:TextInput id="surveyNameTextInput" editable="false" editable.uploadCompleteNewSurvey="true" />
-			</s:FormItem>
-			<s:FormItem label="{Message.get('dataImport.surveyNameLabel')}" excludeFrom="uploadCompleteNewSurvey">
-				<s:Label id="surveyNameLabel" />
+			<s:FormItem label="{Message.get('dataImport.surveyNameLabel')}" 
+						label.summaryCreationCompleteNewSurvey="{Message.get('dataImport.newSurveyNameLabel')}">
+				<s:TextInput id="surveyNameTextInput" editable="false" 
+							 editable.summaryCreationCompleteNewSurvey="true" />
 			</s:FormItem>
 		</s:Form>
-		
 		
 		<s:VGroup id="conflictsContainer" 
 				  visible="{conflictDataGrid.dataProvider.length > 0}"
@@ -101,7 +110,7 @@
 				<mx:groupedColumns>
 					<mx:AdvancedDataGridColumn dataField="key"
 											   headerText="{Message.get('dataImport.recordList.key')}" />
-					<mx:AdvancedDataGridColumnGroup headerText="{Message.get('dataImport.recordConflicts.currentRecord')}">
+					<mx:AdvancedDataGridColumnGroup headerText="{Message.get('dataImport.recordConflicts.newRecord')}">
 						<mx:AdvancedDataGridColumn dataField="record.creationDate" 
 												   sortable="false"
 												   width="120"
@@ -127,7 +136,7 @@
 													   itemRenderer="org.openforis.collect.ui.component.datagrid.AdvancedDataGridBooleanColumnItemRenderer" />
 						</mx:AdvancedDataGridColumnGroup>
 					</mx:AdvancedDataGridColumnGroup>
-					<mx:AdvancedDataGridColumnGroup headerText="{Message.get('dataImport.recordConflicts.newRecord')}">
+					<mx:AdvancedDataGridColumnGroup headerText="{Message.get('dataImport.recordConflicts.currentRecord')}">
 						<mx:AdvancedDataGridColumn dataField="conflictingRecord.creationDate" 
 												   sortable="false"
 												   width="120"
@@ -148,8 +157,7 @@
 											   headerText="{Message.get('dataImport.recordConflicts.replace')}"
 											   width="70"
 											   editable="true"
-											   rendererIsEditor="true"
-											   >
+											   rendererIsEditor="true" >
 						<mx:itemRenderer>
 							<fx:Component>
 								<mx:Canvas width="100%" height="100%">
@@ -242,15 +250,17 @@
 				  label="{Message.get('dataImport.startImport')}"
 				  useHandCursor="true"
 				  buttonMode="true"
-				  includeInLayout="false" includeInLayout.uploadComplete="true" includeInLayout.importing="false"
-				  visible="false" visible.uploadComplete="true" visible.importing="false"
 				  />
 	</s:VGroup>
 	
-	<s:VGroup width="100%" 
-			  visible="false" visible.importing="true" visible.uploading="true"
-			  includeInLayout="false" includeInLayout.importing="true" includeInLayout.uploading="true"
+	<s:VGroup width="100%" height="100%"
+			  includeIn="importing, summaryCreationRunning"
+			  itemCreationPolicy="immediate"
+			  horizontalAlign="center"
+			  verticalAlign="middle"
 			  >
+		<s:Label id="progressTitle" />
+		
 		<mx:ProgressBar id="progressBar"
 						horizontalCenter="0"
 						verticalCenter="0"
@@ -266,17 +276,16 @@
 				  label="{Message.get('global.cancel')}"
 				  useHandCursor="true"
 				  buttonMode="true"
-				  visible.importComplete="false"
 				  />
 		
-		<s:VGroup width="100%">
-			<s:Label text="{Message.get('dataImport.filesInError')}" />
-			<s:TextArea id="errorsTextArea"
-						editable="false"
-						width="100%"
-						heightInLines="5" />
-			
-		</s:VGroup>
+	</s:VGroup>
+	
+	<s:VGroup includeIn="importComplete"
+			  height="100%" width="100%"
+			  horizontalAlign="center" verticalAlign="middle"
+			  >
+		
+		<s:Label text="{Message.get('dataImport.complete')}" />
 		
 	</s:VGroup>
 

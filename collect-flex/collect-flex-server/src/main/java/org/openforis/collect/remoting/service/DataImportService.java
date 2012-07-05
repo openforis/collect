@@ -70,7 +70,7 @@ public class DataImportService {
 	}
 	
 	@Secured("ROLE_ADMIN")
-	public DataImportSummaryProxy initProcess(boolean overwriteAll) throws DataImportExeption {
+	public DataImportStateProxy startSummaryCreation(boolean overwriteAll) throws DataImportExeption {
 		if ( dataImportProcess == null || ! dataImportProcess.isRunning() ) {
 			SessionState sessionState = sessionManager.getSessionState();
 			File userImportFolder = new File(importDirectory, sessionState.getSessionId());
@@ -81,10 +81,11 @@ public class DataImportService {
 				users.put(user.getName(), user);
 			}
 			dataImportProcess = new DataImportProcess(surveyManager, recordManager, recordDao, users, packagedFile, overwriteAll);
-			dataImportProcess.init();
+			dataImportProcess.prepareToStartSummaryCreation();
+			ExecutorServiceUtil.executeInCachedPool(dataImportProcess);
 		}
-		DataImportSummary summary = dataImportProcess.getSummary();
-		DataImportSummaryProxy proxy = new DataImportSummaryProxy(summary);
+		DataImportState state = dataImportProcess.getState();
+		DataImportStateProxy proxy = new DataImportStateProxy(state);
 		return proxy;
 	}
 	
@@ -92,18 +93,11 @@ public class DataImportService {
 	public DataImportStateProxy startImport(List<Integer> entryIdsToImport, String surveyName) throws Exception {
 		dataImportProcess.setEntryIdsToImport(entryIdsToImport);
 		dataImportProcess.setNewSurveyName(surveyName);
-		dataImportProcess.prepareToStart();
+		dataImportProcess.prepareToStartImport();
 		ExecutorServiceUtil.executeInCachedPool(dataImportProcess);
 		DataImportState state = dataImportProcess.getState();
 		DataImportStateProxy proxy = new DataImportStateProxy(state);
 		return proxy;
-	}
-	
-	@Secured("ROLE_ADMIN")
-	public void cancel() {
-		if ( dataImportProcess != null ) {
-			dataImportProcess.cancel();
-		}
 	}
 	
 	@Secured("ROLE_ADMIN")
@@ -116,4 +110,23 @@ public class DataImportService {
 			return null;
 		}
 	}
+	
+	@Secured("ROLE_ADMIN")
+	public DataImportSummaryProxy getSummary() {
+		if ( dataImportProcess != null ) {
+			DataImportSummary summary = dataImportProcess.getSummary();
+			DataImportSummaryProxy proxy = new DataImportSummaryProxy(summary);
+			return proxy;
+		} else {
+			return null;
+		}
+	}
+
+	@Secured("ROLE_ADMIN")
+	public void cancel() {
+		if ( dataImportProcess != null ) {
+			dataImportProcess.cancel();
+		}
+	}
+	
 }

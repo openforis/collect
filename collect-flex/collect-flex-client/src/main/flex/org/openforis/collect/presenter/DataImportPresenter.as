@@ -23,7 +23,8 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.client.DataImportClient;
 	import org.openforis.collect.i18n.Message;
 	import org.openforis.collect.model.CollectRecord$Step;
-	import org.openforis.collect.remoting.service.dataImport.DataImportState$Step;
+	import org.openforis.collect.remoting.service.dataImport.DataImportState$MainStep;
+	import org.openforis.collect.remoting.service.dataImport.DataImportState$SubStep;
 	import org.openforis.collect.remoting.service.dataImport.DataImportStateProxy;
 	import org.openforis.collect.remoting.service.dataImport.DataImportSummaryItemProxy;
 	import org.openforis.collect.remoting.service.dataImport.DataImportSummaryProxy;
@@ -62,6 +63,7 @@ package org.openforis.collect.presenter {
 			super();
 			
 			//try to see if there is a process still running
+			_view.currentState = DataImportView.STATE_LOADING;
 			updateState();
 		}
 		
@@ -123,8 +125,9 @@ package org.openforis.collect.presenter {
 		
 		protected function fileReferenceUploadCompleteDataHandler(event:DataEvent):void {
 			_view.currentState = DataImportView.STATE_LOADING;
-			var responder:AsyncResponder = new AsyncResponder(initProcessResultHandler, faultHandler);
-			_dataImportClient.initProcess(responder);
+			var responder:AsyncResponder = new AsyncResponder(startSummaryCreationResultHandler, faultHandler);
+			_dataImportClient.startSummaryCreation(responder);
+			startProgressTimer();
 		}
 		
 		protected function fileReferenceIoErrorHandler(event:IOErrorEvent):void {
@@ -132,22 +135,27 @@ package org.openforis.collect.presenter {
 			AlertUtil.showError("dataImport.file.error", [event.text]);
 		}
 		
-		protected function initProcessResultHandler(event:ResultEvent, token:Object = null):void {
-			_summary = event.result as DataImportSummaryProxy;
-			updateViewProcessInited();
+		protected function startSummaryCreationResultHandler(event:ResultEvent, token:Object = null):void {
+			_state = event.result as DataImportStateProxy;
+			updateView();
 		}
 		
-		protected function updateViewProcessInited():void {
+		protected function updateViewSummaryCompleted():void {
+			var responder:AsyncResponder = new AsyncResponder(getSummaryResultHandler, faultHandler);
+			_dataImportClient.getSummary(responder);
+		}
+		
+		protected function getSummaryResultHandler(event:ResultEvent, token:Object = null):void {
+			_summary = event.result as DataImportSummaryProxy;
 			if ( _summary.surveyName == null ) {
-				_view.currentState = DataImportView.STATE_UPLOAD_COMPLETE_NEW_SURVEY;
+				_view.currentState = DataImportView.STATE_SUMMARY_CREATION_COMPLETE_NEW_SURVEY;
 			} else {
-				_view.currentState = DataImportView.STATE_UPLOAD_COMPLETE;
-				_view.surveyNameLabel.text = _summary.surveyName;
+				_view.currentState = DataImportView.STATE_SUMMARY_CREATION_COMPLETE;
+				_view.surveyNameTextInput.text = _summary.surveyName;
 			}
 			var entryTotalRecords:int = _summary.totalPerStep.get(CollectRecord$Step.ENTRY);
 			var cleansingTotalRecords:int = _summary.totalPerStep.get(CollectRecord$Step.CLEANSING);
 			var analysisTotalRecords:int = _summary.totalPerStep.get(CollectRecord$Step.ANALYSIS);
-			
 			
 			var skippedFileItems:IList = new ArrayCollection();
 			var skippedFileNames:ArrayCollection = _summary.skippedFileErrors.keySet;
@@ -178,7 +186,7 @@ package org.openforis.collect.presenter {
 				}
 				var responder:AsyncResponder = new AsyncResponder(startImportResultHandler, faultHandler);
 				var surveyName:String = null;
-				if ( _view.currentState == DataImportView.STATE_UPLOAD_COMPLETE_NEW_SURVEY ) {
+				if ( _view.currentState == DataImportView.STATE_SUMMARY_CREATION_COMPLETE_NEW_SURVEY ) {
 					surveyName = _view.surveyNameTextInput.text;
 				}
 				_dataImportClient.startImport(responder, entryIdsToImport, surveyName);
@@ -203,7 +211,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function validateForm():Boolean {
-			if ( _view.currentState == DataImportView.STATE_UPLOAD_COMPLETE_NEW_SURVEY ) {
+			if ( _view.currentState == DataImportView.STATE_SUMMARY_CREATION_COMPLETE_NEW_SURVEY ) {
 				var surveyName:String = _view.surveyNameTextInput.text;
 				surveyName = StringUtil.trim(surveyName);
 				_view.surveyNameTextInput.text = surveyName;
@@ -253,81 +261,96 @@ package org.openforis.collect.presenter {
 		}
 		
 		private function updateView():void {
-			if(_state != null) {
-				var step:DataImportState$Step = _state.step;
-				switch ( step ) {
-				case DataImportState$Step.INITED:
-					resetView();
-					break;
-				case DataImportState$Step.STARTING:
-					_view.currentState = DataImportView.STATE_LOADING;
-					if ( _progressTimer == null ) {
-						startProgressTimer();
-					}
-					break;
-				case DataImportState$Step.IMPORTING:
-					_view.currentState = DataImportView.STATE_IMPORT_RUNNING;
-					updateViewForImporting();
-					if ( _progressTimer == null ) {
-						startProgressTimer();
-					}
-					break;
-				case DataImportState$Step.COMPLETE:
-					if ( _firstOpen ) {
-						resetView();
-					} else {
-						_view.currentState = DataImportView.STATE_IMPORT_COMPLETE;
-						updateViewForImporting();
-						stopProgressTimer();
-					}
-					break;
-				case DataImportState$Step.ERROR:
-					AlertUtil.showError("dataImport.error");
-					resetView();
-					break;
-				case DataImportState$Step.CANCELLED:
-					AlertUtil.showError("dataImport.cancelled");
-					resetView();
-					break;
-				default:
-					resetView();
-				}
-			} else {
+			if(_state == null || _state.mainStep == DataImportState$MainStep.INITED || 
+				(_firstOpen && _state.subStep != DataImportState$SubStep.RUNNING) ) {
 				resetView();
+			} else {
+				var mainStep:DataImportState$MainStep = _state.mainStep;
+				var subStep:DataImportState$SubStep = _state.subStep;
+				switch ( subStep ) {
+					case DataImportState$SubStep.INITED:
+						switch ( mainStep ) {
+							case DataImportState$MainStep.SUMMARY_CREATION:
+								resetView();
+								break;
+							case DataImportState$MainStep.IMPORT:
+								updateViewSummaryCompleted();
+								break;
+						}
+						break;
+					case DataImportState$SubStep.PREPARING:
+						_view.currentState = DataImportView.STATE_LOADING;
+						startProgressTimer();
+						break;
+					case DataImportState$SubStep.RUNNING:
+						switch ( mainStep ) {
+							case DataImportState$MainStep.SUMMARY_CREATION:
+								updateViewForCreatingSummary();
+								break;
+							case DataImportState$MainStep.IMPORT:
+								updateViewForImporting();
+								break;
+						}
+						startProgressTimer();
+						break;
+					case DataImportState$SubStep.COMPLETE:
+						stopProgressTimer();
+						switch ( mainStep ) {
+							case DataImportState$MainStep.SUMMARY_CREATION:
+								updateViewSummaryCompleted();
+								break;
+							case DataImportState$MainStep.IMPORT:
+								updateViewImportCompleted();
+								break;
+						}
+						break;
+					case DataImportState$SubStep.ERROR:
+						AlertUtil.showError("dataImport.error", [_state.errorMessage]);
+						resetView();
+						break;
+					case DataImportState$SubStep.CANCELLED:
+						AlertUtil.showError("dataImport.cancelled");
+						resetView();
+						break;
+					default:
+						resetView();
+				}
 			}
 			_firstOpen = false;
 		}
 		
-		protected function overwriteExistingRecordInConflict(value:Boolean = true):void {
-			var responder:AsyncResponder = new AsyncResponder(overwriteExistingRecordInConflictResultHandler, faultHandler);
-			_dataImportClient.overwriteRecordInConflict(responder, value);
-		}
-		
-		private function overwriteExistingRecordInConflictResultHandler(event:ResultEvent, token:Object = null):void {
-			updateState();
-		}
-		
-		private function doNotOverwriteExistingRecordInConflict():void {
-			overwriteExistingRecordInConflict(false);
+		protected function updateViewImportCompleted():void {
+			_view.currentState = DataImportView.STATE_IMPORT_COMPLETE;
 		}
 		
 		private function updateViewForImporting():void {
+			_view.currentState = DataImportView.STATE_IMPORT_RUNNING;
+			_view.progressTitle.text = Message.get("dataImport.importingRecords");
 			_view.progressBar.setProgress(_state.count, _state.total);
-			updateProgressText();
+			updateProgressText("dataImport.importingRecordsProgressLabel");
+			updateErrorsTextArea()
+		}
+
+		private function updateViewForCreatingSummary():void {
+			_view.currentState = DataImportView.STATE_SUMMARY_CREATIION_RUNNING;
+			_view.progressTitle.text = Message.get("dataImport.creatingSummary");
+			_view.progressBar.setProgress(_state.count, _state.total);
+			updateProgressText("dataImport.creatingSummaryProgressLabel");
 			updateErrorsTextArea()
 		}
 		
-		protected function updateProgressText():void {
+		protected function updateProgressText(progressLabelResource:String):void {
 			var progressText:String;
 			if ( _state.total == 0 ) {
 				progressText = Message.get("dataImport.processing");
 			} else {
-				progressText = Message.get("dataImport.progressLabel", [_state.count, _state.total]);
+				progressText = Message.get(progressLabelResource, [_state.count, _state.total]);
 			}
 			_view.progressLabel.text = progressText;
 		}
 		
 		protected function updateErrorsTextArea():void {
+			/*
 			var result:String = "";
 			if ( _state != null && _state.errors != null ) {
 				var files:IList = _state.errors.keySet;
@@ -336,7 +359,8 @@ package org.openforis.collect.presenter {
 					result += Message.get('dataImport.errorInFile', [fileName, errorMessage]);
 				}
 			}
-			_view.errorsTextArea.text = result;
+			//_view.errorsTextArea.text = result;
+			*/
 		}
 		
 		protected function resetView():void {

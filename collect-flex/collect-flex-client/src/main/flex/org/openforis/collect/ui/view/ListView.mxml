@@ -74,7 +74,9 @@
 		
 	</s:Group>
 	
-	<s:HGroup id="controlsBar" width="100%" horizontalAlign="center" verticalAlign="bottom" height="30">
+	<s:HGroup id="controlsBar" width="100%" horizontalAlign="center" verticalAlign="bottom" 
+			  height="30" 
+			  gap="10">
 		<s:Button id="addButton" label="{Message.get('list.add')}" 
 				  useHandCursor="true" buttonMode="true" 
 				  enabled.inactive="false" />

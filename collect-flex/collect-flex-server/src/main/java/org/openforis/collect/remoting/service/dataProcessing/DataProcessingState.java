@@ -43,6 +43,10 @@ public class DataProcessingState implements Serializable {
 		count++;
 	}
 	
+	public void resetCount() {
+		count = 0;
+	}
+	
 	@ExternalizedProperty
 	public boolean isRunning() {
 		return (! complete && ! error) && running;
@@ -72,10 +76,6 @@ public class DataProcessingState implements Serializable {
 		return count;
 	}
 
-	public void setCount(int count) {
-		this.count = count;
-	}
-	
 	public int getTotal() {
 		return total;
 	}

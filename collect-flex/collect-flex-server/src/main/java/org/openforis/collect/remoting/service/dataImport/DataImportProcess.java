@@ -29,6 +29,8 @@ import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.collect.persistence.xml.DataHandler;
 import org.openforis.collect.persistence.xml.DataUnmarshaller;
 import org.openforis.collect.persistence.xml.DataUnmarshallerException;
+import org.openforis.collect.remoting.service.dataImport.DataImportState.MainStep;
+import org.openforis.collect.remoting.service.dataImport.DataImportState.SubStep;
 import org.openforis.idm.metamodel.xml.InvalidIdmlException;
 import org.openforis.idm.model.Entity;
 import org.springframework.transaction.annotation.Transactional;
@@ -85,7 +87,9 @@ public class DataImportProcess implements Callable<Void> {
 	public void cancel() {
 		state.setCancelled(true);
 		state.setRunning(false);
-		state.setStep(DataImportState.Step.CANCELLED);
+		if ( state.getSubStep() == DataImportState.SubStep.RUNNING) {
+			state.setSubStep(DataImportState.SubStep.CANCELLED);
+		}
 	}
 
 	public boolean isRunning() {
@@ -96,19 +100,23 @@ public class DataImportProcess implements Callable<Void> {
 		return state.isComplete();
 	}
 
-	public void init() throws DataImportExeption {
-		try {
-			state.reset();
-			state.setStep(DataImportState.Step.PREPARE);
-			summary = calculateDataImportSummary();
-			state.setStep(DataImportState.Step.INITED);
-		} catch (Exception e) {
-			throw new DataImportExeption("Error initializing data import process", e);
+	@Override
+	public Void call() throws Exception {
+		if ( state.getSubStep() == SubStep.PREPARING ) {
+			if ( state.getMainStep() == MainStep.SUMMARY_CREATION ) {
+				createDataImportSummary();
+			} else if ( state.getMainStep() == MainStep.IMPORT ) {
+				importPackagedFile();
+			}
 		}
+		return null;
 	}
 
-	private DataImportSummary calculateDataImportSummary() throws DataImportExeption {
+	private void createDataImportSummary() throws DataImportExeption {
+		ZipFile zipFile = null;
 		try {
+			state.setSubStep(SubStep.RUNNING);
+			summary = null;
 			packagedSurvey = extractPackagedSurvey();
 			Map<String, String> packagedSkippedFileErrors = new HashMap<String, String>();
 			String uri = packagedSurvey.getUri();
@@ -123,48 +131,69 @@ public class DataImportProcess implements Callable<Void> {
 			Map<Integer, CollectRecord> packagedRecords = new HashMap<Integer, CollectRecord>();
 			Map<Integer, List<Step>> packagedStepsPerRecord = new HashMap<Integer, List<Step>>();
 			Map<Integer, CollectRecord> conflictingPackagedRecords = new HashMap<Integer, CollectRecord>();
-			ZipFile zipFile = new ZipFile(packagedFile);
+			zipFile = new ZipFile(packagedFile);
 			Enumeration<? extends ZipEntry> entries = zipFile.entries();
+			state.setTotal(zipFile.size());
+			state.resetCount();
+			SubStep subStep;
 			while (entries.hasMoreElements()) {
-				ZipEntry zipEntry = (ZipEntry) entries.nextElement();
-				String entryName = zipEntry.getName();
-				if (zipEntry.isDirectory() || IDML_FILE_NAME.equals(entryName)) {
-					continue;
-				}
-				Step step = getStep(entryName);
-				InputStream inputStream = zipFile.getInputStream(zipEntry);
-				InputStreamReader reader = new InputStreamReader(inputStream);
-				ParseRecordResult parseRecordResult = parseRecord(reader);
-				CollectRecord parsedRecord = parseRecordResult.record;
-				String message = parseRecordResult.message;
-				if (parsedRecord == null) {
-					packagedSkippedFileErrors.put(entryName, message);
+				subStep = state.getSubStep();
+				if ( subStep == DataImportState.SubStep.RUNNING ) {
+					ZipEntry zipEntry = (ZipEntry) entries.nextElement();
+					String entryName = zipEntry.getName();
+					if (zipEntry.isDirectory() || IDML_FILE_NAME.equals(entryName)) {
+						continue;
+					}
+					Step step = getStep(entryName);
+					InputStream inputStream = zipFile.getInputStream(zipEntry);
+					InputStreamReader reader = new InputStreamReader(inputStream);
+					ParseRecordResult parseRecordResult = parseRecord(reader);
+					CollectRecord parsedRecord = parseRecordResult.record;
+					String message = parseRecordResult.message;
+					if (parsedRecord == null) {
+						packagedSkippedFileErrors.put(entryName, message);
+					} else {
+						int packagedRecordId = getRecordId(entryName);
+						CollectRecord recordSummary = createRecordSummary(parsedRecord);
+						packagedRecords.put(packagedRecordId, recordSummary);
+						List<Step> stepsPerRecord = packagedStepsPerRecord.get(packagedRecordId);
+						if ( stepsPerRecord == null ) {
+							stepsPerRecord = new ArrayList<CollectRecord.Step>();
+							packagedStepsPerRecord.put(packagedRecordId, stepsPerRecord);
+						}
+						stepsPerRecord.add(step);
+						Integer totalPerStep1 = totalPerStep.get(step);
+						totalPerStep.put(step, totalPerStep1 + 1);
+						CollectRecord oldRecord = findAlreadyExistingRecord(parsedRecord);
+						if ( oldRecord != null ) {
+							conflictingPackagedRecords.put(packagedRecordId, oldRecord);
+						}
+					}
+					state.incrementCount();
 				} else {
-					int packagedRecordId = getRecordId(entryName);
-					CollectRecord recordSummary = createRecordSummary(parsedRecord);
-					packagedRecords.put(packagedRecordId, recordSummary);
-					List<Step> stepsPerRecord = packagedStepsPerRecord.get(packagedRecordId);
-					if ( stepsPerRecord == null ) {
-						stepsPerRecord = new ArrayList<CollectRecord.Step>();
-						packagedStepsPerRecord.put(packagedRecordId, stepsPerRecord);
-					}
-					stepsPerRecord.add(step);
-					Integer totalPerStep1 = totalPerStep.get(step);
-					totalPerStep.put(step, totalPerStep1 + 1);
-					CollectRecord oldRecord = findAlreadyExistingRecord(parsedRecord);
-					if ( oldRecord != null ) {
-						conflictingPackagedRecords.put(packagedRecordId, oldRecord);
-					}
+					break;
 				}
 			}
-			zipFile.close();
 
-			DataImportSummary summary = createSummary(packagedSkippedFileErrors, surveyName,
-					totalPerStep, packagedRecords, packagedStepsPerRecord,
-					conflictingPackagedRecords);
-			return summary;
+			subStep = state.getSubStep();
+			if ( subStep == SubStep.RUNNING ) {
+				summary = createSummary(packagedSkippedFileErrors, surveyName,
+						totalPerStep, packagedRecords, packagedStepsPerRecord,
+						conflictingPackagedRecords);
+				state.setSubStep(DataImportState.SubStep.COMPLETE);
+			}
 		} catch (Exception e) {
-			throw new DataImportExeption(e.getMessage(), e);
+			state.setSubStep(SubStep.ERROR);
+			state.setErrorMessage(e.getMessage());
+			LOG.error(e.getMessage(), e);
+		} finally {
+			if ( zipFile != null ) {
+				try {
+					zipFile.close();
+				} catch (IOException e) {
+					LOG.error(e.getMessage(), e);
+				}
+			}
 		}
 	}
 
@@ -203,56 +232,68 @@ public class DataImportProcess implements Callable<Void> {
 		return summary;
 	}
 
-	public void prepareToStart() {
-		state.setStep(DataImportState.Step.STARTING);
+	public void prepareToStartSummaryCreation() {
+		state.setMainStep(MainStep.SUMMARY_CREATION);
+		state.setSubStep(DataImportState.SubStep.PREPARING);
 	}
 
-	@Override
-	public Void call() throws Exception {
-		importPackagedFile();
-		return null;
+	public void prepareToStartImport() {
+		state.setMainStep(MainStep.IMPORT);
+		state.setSubStep(DataImportState.SubStep.PREPARING);
 	}
 
 	@Transactional
 	protected void importPackagedFile() {
+		ZipFile zipFile = null;
 		try {
-			state.setStep(DataImportState.Step.IMPORTING);
+			state.setSubStep(DataImportState.SubStep.RUNNING);
 			processedRecords = new ArrayList<Integer>();
+			state.setTotal(entryIdsToImport.size());
+			state.resetCount();
 			String uri = packagedSurvey.getUri();
 			CollectSurvey oldSurvey = surveyManager.getByUri(uri);
-			state.setTotal(entryIdsToImport.size());
 			if ( oldSurvey == null ) {
 				packagedSurvey.setName(newSurveyName);
 				surveyManager.importModel(packagedSurvey);
 			}
-			ZipFile zipFile = new ZipFile(packagedFile);
+			zipFile = new ZipFile(packagedFile);
 			state.setRunning(true);
 			for (Integer entryId : entryIdsToImport) {
-				if ( ! processedRecords.contains(entryId) ) {
+				if ( state.getSubStep() == SubStep.RUNNING && ! processedRecords.contains(entryId) ) {
 					importEntries(zipFile, entryId);
+					processedRecords.add(entryId);
+					state.incrementCount();
+				} else {
+					break;
 				}
 			}
-			DataImportState.Step dataImportStep = state.getStep();
-			if (! (dataImportStep == DataImportState.Step.CANCELLED || dataImportStep == DataImportState.Step.ERROR) ) {
-				state.setStep(DataImportState.Step.COMPLETE);
+			if ( state.getSubStep() == SubStep.RUNNING ) {
+				state.setSubStep(SubStep.COMPLETE);
 			}
 		} catch (Exception e) {
 			state.setError(true);
 			state.setErrorMessage(e.getMessage());
-			state.setStep(DataImportState.Step.ERROR);
+			state.setSubStep(SubStep.ERROR);
 			LOG.error("Error during data export", e);
 		} finally {
 			state.setRunning(false);
+			if ( zipFile != null ) {
+				try {
+					zipFile.close();
+				} catch (IOException e) {
+					LOG.error(e.getMessage(), e);
+				}
+			}
 		}
 	}
 	
-	private void importEntries(ZipFile zipFile, int recordId) throws IOException, DataImportExeption {
+	private void importEntries(ZipFile zipFile, int entryId) throws IOException, DataImportExeption {
 		CollectRecord lastStepRecord = null;
 		Step oldRecordStep = null;
 		Step[] steps = Step.values();
 		for (Step step : steps) {
-			String entryName = step.getStepNumber() + File.separator + recordId + ".xml";
-			InputStream inputStream = getEntryInputStream(zipFile, recordId, step);
+			String entryName = step.getStepNumber() + File.separator + entryId + ".xml";
+			InputStream inputStream = getEntryInputStream(zipFile, entryId, step);
 			if ( inputStream != null ) {
 				InputStreamReader reader = new InputStreamReader(inputStream);
 				ParseRecordResult parseRecordResult = parseRecord(reader);
@@ -294,8 +335,6 @@ public class DataImportProcess implements Callable<Void> {
 				recordDao.update(lastStepRecord);
 			}
 		}
-		processedRecords.add(recordId);
-		state.incrementCount();
 	}
 
 	private InputStream getEntryInputStream(ZipFile zipFile, int recordId, Step step) throws IOException, DataImportExeption {
@@ -348,6 +387,7 @@ public class DataImportProcess implements Callable<Void> {
 				return survey;
 			}
 		}
+		zipFile.close();
 		return null;
 	}
 

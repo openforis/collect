@@ -4,6 +4,8 @@ import java.util.Map;
 
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.collect.Proxy;
+import org.openforis.collect.remoting.service.dataImport.DataImportState.MainStep;
+import org.openforis.collect.remoting.service.dataImport.DataImportState.SubStep;
 
 /**
  * 
@@ -75,8 +77,13 @@ public class DataImportStateProxy implements Proxy {
 	}
 
 	@ExternalizedProperty
-	public org.openforis.collect.remoting.service.dataImport.DataImportState.Step getStep() {
-		return state.getStep();
+	public MainStep getMainStep() {
+		return state.getMainStep();
+	}
+
+	@ExternalizedProperty
+	public SubStep getSubStep() {
+		return state.getSubStep();
 	}
 
 }

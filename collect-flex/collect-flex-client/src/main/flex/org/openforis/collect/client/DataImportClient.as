@@ -13,7 +13,8 @@ package org.openforis.collect.client {
 	public class DataImportClient extends AbstractClient {
 		
 		private var _getStateOperation:Operation;
-		private var _initProcessOperation:Operation;
+		private var _startSummaryCreationOperation:Operation;
+		private var _getSummaryOperation:Operation;
 		private var _startImportOperation:Operation;
 		private var _overwriteExistingRecordInConflict:Operation;
 		private var _cancelOperation:Operation;
@@ -21,11 +22,12 @@ package org.openforis.collect.client {
 		public function DataImportClient() {
 			super("dataImportService");
 			
-			this._initProcessOperation = getOperation("initProcess");
-			this._startImportOperation = getOperation("startImport");
-			this._overwriteExistingRecordInConflict = getOperation("overwriteExistingRecordInConflict");
-			this._getStateOperation = getOperation("getState", CONCURRENCY_LAST, false);
-			this._cancelOperation = getOperation("cancel");
+			_startSummaryCreationOperation = getOperation("startSummaryCreation");
+			_getSummaryOperation = getOperation("getSummary");
+			_startImportOperation = getOperation("startImport");
+			_overwriteExistingRecordInConflict = getOperation("overwriteExistingRecordInConflict");
+			_getStateOperation = getOperation("getState", CONCURRENCY_LAST, false);
+			_cancelOperation = getOperation("cancel");
 		}
 		
 		public function getState(responder:IResponder):void {
@@ -33,8 +35,13 @@ package org.openforis.collect.client {
 			token.addResponder(responder);
 		}
 		
-		public function initProcess(responder:IResponder, overwriteAll:Boolean = false):void {
-			var token:AsyncToken = this._initProcessOperation.send(overwriteAll);
+		public function getSummary(responder:IResponder):void {
+			var token:AsyncToken = this._getSummaryOperation.send();
+			token.addResponder(responder);
+		}
+		
+		public function startSummaryCreation(responder:IResponder, overwriteAll:Boolean = false):void {
+			var token:AsyncToken = this._startSummaryCreationOperation.send(overwriteAll);
 			token.addResponder(responder);
 		}
 		

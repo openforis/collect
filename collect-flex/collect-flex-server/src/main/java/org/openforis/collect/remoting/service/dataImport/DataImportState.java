@@ -18,11 +18,16 @@ public class DataImportState extends DataProcessingState {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public enum Step {
-		PREPARE, INITED, STARTING, IMPORTING, COMPLETE, CANCELLED, ERROR;
+	public enum MainStep {
+		INITED, SUMMARY_CREATION, IMPORT;
 	}
 	
-	private Step step;
+	public enum SubStep {
+		INITED, PREPARING, RUNNING, COMPLETE, CANCELLED, ERROR;
+	}
+	
+	private MainStep mainStep;
+	private SubStep subStep;
 	private Map<String, String> errors;
 	private Map<String, String> warnings;
 	
@@ -35,7 +40,8 @@ public class DataImportState extends DataProcessingState {
 		updatedCount = 0;
 		errors = new HashMap<String, String>();
 		warnings = new HashMap<String, String>();
-		step = Step.PREPARE;
+		mainStep = MainStep.SUMMARY_CREATION;
+		subStep = SubStep.INITED;
 	}
 
 	public void addError(String fileName, String error) {
@@ -72,12 +78,20 @@ public class DataImportState extends DataProcessingState {
 		return warnings;
 	}
 
-	public Step getStep() {
-		return step;
+	public MainStep getMainStep() {
+		return mainStep;
 	}
 
-	public void setStep(Step step) {
-		this.step = step;
+	public void setMainStep(MainStep mainStep) {
+		this.mainStep = mainStep;
+	}
+
+	public SubStep getSubStep() {
+		return subStep;
+	}
+
+	public void setSubStep(SubStep subStep) {
+		this.subStep = subStep;
 	}
 
 }

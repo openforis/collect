@@ -5,7 +5,7 @@
 		 xmlns:view="org.openforis.collect.ui.view.*"
 		 xmlns:component="org.openforis.collect.ui.component.*"
 		 title="{Message.get('dataImport.popUp.title')}" 
-		 width="950" height="600" 
+		 width="950" height="620" 
 		 >
 	<fx:Script>
 		<![CDATA[
