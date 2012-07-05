@@ -173,10 +173,12 @@
 					<mx:AdvancedDataGridColumn dataField="key"
 											   headerText="{Message.get('dataImport.recordList.key')}" />
 					<mx:AdvancedDataGridColumn dataField="record.creationDate"
+											   sortable="false"
 											   width="120"
 											   headerText="{Message.get('dataImport.recordList.creationDate')}"
 											   labelFunction="{UIUtil.gridColumnDateTimeLabelFunction}" />
 					<mx:AdvancedDataGridColumn dataField="record.modifiedDate" 
+											   sortable="false"
 											   width="120"
 											   headerText="{Message.get('dataImport.recordList.modifiedDate')}"
 											   labelFunction="{UIUtil.gridColumnDateTimeLabelFunction}" />
