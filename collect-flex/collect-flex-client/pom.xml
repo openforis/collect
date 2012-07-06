@@ -81,6 +81,7 @@
 <!-- 								<includeClass>org.openforis.collect.session.**</includeClass> -->
 <!-- 								<includeClass>org.openforis.collect.model.**</includeClass> -->
 <!-- 								<includeClass>org.openforis.idm.model.**</includeClass> -->
+								<includeClass>org.openforis.idm.model.species.Taxon$TaxonRank</includeClass>
 								<includeClass>org.openforis.idm.metamodel.validation.ValidationResultFlag</includeClass>
 								<includeClass>org.openforis.collect.model.CollectRecord$State</includeClass>
 								<includeClass>org.openforis.collect.model.RecordSummarySortField</includeClass>
