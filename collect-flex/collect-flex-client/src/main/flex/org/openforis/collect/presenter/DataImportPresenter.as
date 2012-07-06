@@ -95,7 +95,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function fileReferenceSelectHandler(event:Event):void {
-			_view.currentState = DataImportView.STATE_UPLOADING;
+			updateViewForUploading();
 			
 			var url:String = ApplicationConstants.DATA_IMPORT_UPLOAD_URL;
 			//workaround for firefox/chrome flahplayer bug
@@ -323,6 +323,12 @@ package org.openforis.collect.presenter {
 			_view.currentState = DataImportView.STATE_IMPORT_COMPLETE;
 		}
 		
+		private function updateViewForUploading():void {
+			_view.currentState = DataImportView.STATE_UPLOADING;
+			_view.progressTitle.text = Message.get("dataImport.uploadingFile");
+			_view.progressLabel.text = "";
+		}
+
 		private function updateViewForImporting():void {
 			_view.currentState = DataImportView.STATE_IMPORT_RUNNING;
 			_view.progressTitle.text = Message.get("dataImport.importingRecords");

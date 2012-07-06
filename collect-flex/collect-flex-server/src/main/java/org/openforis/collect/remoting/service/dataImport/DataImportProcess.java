@@ -118,6 +118,9 @@ public class DataImportProcess implements Callable<Void> {
 			state.setSubStep(SubStep.RUNNING);
 			summary = null;
 			packagedSurvey = extractPackagedSurvey();
+			if ( packagedSurvey == null ) {
+				throw new DataImportExeption(IDML_FILE_NAME + " not found in packaged file.");
+			}
 			Map<String, String> packagedSkippedFileErrors = new HashMap<String, String>();
 			String uri = packagedSurvey.getUri();
 			CollectSurvey oldSurvey = surveyManager.getByUri(uri);
@@ -131,55 +134,24 @@ public class DataImportProcess implements Callable<Void> {
 			Map<Integer, CollectRecord> packagedRecords = new HashMap<Integer, CollectRecord>();
 			Map<Integer, List<Step>> packagedStepsPerRecord = new HashMap<Integer, List<Step>>();
 			Map<Integer, CollectRecord> conflictingPackagedRecords = new HashMap<Integer, CollectRecord>();
+			Map<Integer, Map<Step, List<String>>> warnings = new HashMap<Integer, Map<Step,List<String>>>();
 			zipFile = new ZipFile(packagedFile);
 			Enumeration<? extends ZipEntry> entries = zipFile.entries();
 			state.setTotal(zipFile.size());
 			state.resetCount();
-			SubStep subStep;
 			while (entries.hasMoreElements()) {
-				subStep = state.getSubStep();
-				if ( subStep == DataImportState.SubStep.RUNNING ) {
-					ZipEntry zipEntry = (ZipEntry) entries.nextElement();
-					String entryName = zipEntry.getName();
-					if (zipEntry.isDirectory() || IDML_FILE_NAME.equals(entryName)) {
-						continue;
-					}
-					Step step = getStep(entryName);
-					InputStream inputStream = zipFile.getInputStream(zipEntry);
-					InputStreamReader reader = new InputStreamReader(inputStream);
-					ParseRecordResult parseRecordResult = parseRecord(reader);
-					CollectRecord parsedRecord = parseRecordResult.record;
-					String message = parseRecordResult.message;
-					if (parsedRecord == null) {
-						packagedSkippedFileErrors.put(entryName, message);
-					} else {
-						int packagedRecordId = getRecordId(entryName);
-						CollectRecord recordSummary = createRecordSummary(parsedRecord);
-						packagedRecords.put(packagedRecordId, recordSummary);
-						List<Step> stepsPerRecord = packagedStepsPerRecord.get(packagedRecordId);
-						if ( stepsPerRecord == null ) {
-							stepsPerRecord = new ArrayList<CollectRecord.Step>();
-							packagedStepsPerRecord.put(packagedRecordId, stepsPerRecord);
-						}
-						stepsPerRecord.add(step);
-						Integer totalPerStep1 = totalPerStep.get(step);
-						totalPerStep.put(step, totalPerStep1 + 1);
-						CollectRecord oldRecord = findAlreadyExistingRecord(parsedRecord);
-						if ( oldRecord != null ) {
-							conflictingPackagedRecords.put(packagedRecordId, oldRecord);
-						}
-					}
-					state.incrementCount();
+				if ( state.getSubStep() == DataImportState.SubStep.RUNNING ) {
+					createSummaryForEntry(entries, zipFile, packagedSkippedFileErrors, 
+							packagedRecords, packagedStepsPerRecord, totalPerStep, 
+							conflictingPackagedRecords, warnings);
 				} else {
 					break;
 				}
 			}
-
-			subStep = state.getSubStep();
-			if ( subStep == SubStep.RUNNING ) {
+			if ( state.getSubStep() == SubStep.RUNNING ) {
 				summary = createSummary(packagedSkippedFileErrors, surveyName,
 						totalPerStep, packagedRecords, packagedStepsPerRecord,
-						conflictingPackagedRecords);
+						conflictingPackagedRecords, warnings);
 				state.setSubStep(DataImportState.SubStep.COMPLETE);
 			}
 		} catch (Exception e) {
@@ -197,12 +169,57 @@ public class DataImportProcess implements Callable<Void> {
 		}
 	}
 
+	private void createSummaryForEntry(Enumeration<? extends ZipEntry> entries, ZipFile zipFile, 
+			Map<String, String> packagedSkippedFileErrors, Map<Integer, CollectRecord> packagedRecords, 
+			Map<Integer, List<Step>> packagedStepsPerRecord, Map<Step, Integer> totalPerStep, 
+			Map<Integer, CollectRecord> conflictingPackagedRecords, Map<Integer, Map<Step, List<String>>> warnings) throws DataImportExeption, IOException {
+		ZipEntry zipEntry = (ZipEntry) entries.nextElement();
+		String entryName = zipEntry.getName();
+		if (zipEntry.isDirectory() || IDML_FILE_NAME.equals(entryName)) {
+			return;
+		}
+		Step step = getStep(entryName);
+		InputStream inputStream = zipFile.getInputStream(zipEntry);
+		InputStreamReader reader = new InputStreamReader(inputStream);
+		ParseRecordResult parseRecordResult = parseRecord(reader);
+		CollectRecord parsedRecord = parseRecordResult.record;
+		String message = parseRecordResult.message;
+		if (parsedRecord == null) {
+			packagedSkippedFileErrors.put(entryName, message);
+		} else {
+			int entryId = getRecordId(entryName);
+			CollectRecord recordSummary = createRecordSummary(parsedRecord);
+			packagedRecords.put(entryId, recordSummary);
+			List<Step> stepsPerRecord = packagedStepsPerRecord.get(entryId);
+			if ( stepsPerRecord == null ) {
+				stepsPerRecord = new ArrayList<CollectRecord.Step>();
+				packagedStepsPerRecord.put(entryId, stepsPerRecord);
+			}
+			stepsPerRecord.add(step);
+			Integer totalPerStep1 = totalPerStep.get(step);
+			totalPerStep.put(step, totalPerStep1 + 1);
+			CollectRecord oldRecord = findAlreadyExistingRecord(parsedRecord);
+			if ( oldRecord != null ) {
+				conflictingPackagedRecords.put(entryId, oldRecord);
+			}
+			if ( parseRecordResult.hasWarnings() ) {
+				Map<Step, List<String>> warningsPerEntry = warnings.get(entryId);
+				if ( warningsPerEntry == null ) {
+					warningsPerEntry = new HashMap<CollectRecord.Step, List<String>>();
+					warnings.put(entryId, warningsPerEntry);
+				}
+				warningsPerEntry.put(step, parseRecordResult.warnings);
+			}
+		}
+		state.incrementCount();
+	}
+	
 	private DataImportSummary createSummary(
 			Map<String, String> packagedSkippedFileErrors, String surveyName,
 			Map<Step, Integer> totalPerStep,
 			Map<Integer, CollectRecord> packagedRecords,
 			Map<Integer, List<Step>> packagedStepsPerRecord,
-			Map<Integer, CollectRecord> conflictingPackagedRecords) {
+			Map<Integer, CollectRecord> conflictingPackagedRecords, Map<Integer, Map<Step, List<String>>> warnings) {
 		DataImportSummary summary = new DataImportSummary();
 		summary.setSurveyName(surveyName);
 		
@@ -213,6 +230,7 @@ public class DataImportProcess implements Callable<Void> {
 			if ( ! conflictingPackagedRecords.containsKey(entryId)) {
 				List<Step> steps = packagedStepsPerRecord.get(entryId);
 				DataImportSummaryItem item = new DataImportSummaryItem(entryId, record, steps);
+				item.setWarnings(warnings.get(entryId));
 				recordsToImport.add(item);
 			}
 		}
@@ -223,6 +241,7 @@ public class DataImportProcess implements Callable<Void> {
 			CollectRecord conflictingRecord = conflictingPackagedRecords.get(entryId);
 			List<Step> steps = packagedStepsPerRecord.get(entryId);
 			DataImportSummaryItem item = new DataImportSummaryItem(entryId, record, steps, conflictingRecord);
+			item.setWarnings(warnings.get(entryId));
 			conflictingRecordItems.add(item);
 		}
 		summary.setRecordsToImport(recordsToImport);
@@ -320,12 +339,8 @@ public class DataImportProcess implements Callable<Void> {
 						replaceData(parsedRecord, lastStepRecord);
 						recordDao.update(lastStepRecord);
 					}
-				}
-				if (!parseRecordResult.success) {
-					if (parseRecordResult.warnings > 0) {
-						state.addWarning(entryName, message);
-					} else {
-						state.addError(entryName, message);
+					if ( parseRecordResult.hasWarnings() ) {
+						state.addWarnings(entryName, parseRecordResult.warnings);
 					}
 				}
 			}
@@ -398,19 +413,16 @@ public class DataImportProcess implements Callable<Void> {
 			recordManager.addEmptyNodes(record.getRootEntity());
 			result.record = record;
 			List<String> warns = dataUnmarshaller.getLastParsingWarnings();
+			try {
+				record.updateDerivedStates();
+			} catch (Exception e) {
+				LOG.info("Error validating record: " + record.getRootEntityKeyValues());
+			}
+			record.updateRootEntityKeyValues();
+			record.updateEntityCounts();
 			if (warns.size() > 0) {
 				result.message = "Processed with errors: " + warns.toString();
-				result.warnings = warns.size();
-				result.success = false;
-			} else {
-				result.success = true;
-				try {
-					record.updateDerivedStates();
-				} catch (Exception e) {
-					LOG.info("Error validating record: " + record.getRootEntityKeyValues());
-				}
-				record.updateRootEntityKeyValues();
-				record.updateEntityCounts();
+				result.warnings = warns;
 			}
 		} catch (DataUnmarshallerException e) {
 			result.message = "Unable to process: " + e.getMessages().toString();
@@ -494,16 +506,19 @@ public class DataImportProcess implements Callable<Void> {
 	}
 
 	private class ParseRecordResult {
-		private boolean success;
 		private String message;
-		private int warnings;
+		private List<String> warnings;
 		private CollectRecord record;
 
 		public ParseRecordResult() {
-			success = false;
+			warnings = new ArrayList<String>();
+		}
+		
+		public boolean hasWarnings() {
+			return warnings != null && warnings.size() > 0;
 		}
 	}
-
+	
 	public DataImportSummary getSummary() {
 		return summary;
 	}

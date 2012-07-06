@@ -27,5 +27,9 @@ package org.openforis.collect.remoting.service.dataImport {
 			return result;
 		}
 		
+		public function hasWarnings():Boolean {
+			return warnings != null && warnings.length > 0;
+		}
+		
     }
 }
