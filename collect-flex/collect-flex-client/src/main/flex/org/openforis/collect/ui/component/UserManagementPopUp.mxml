@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component:PopUp xmlns:fx="http://ns.adobe.com/mxml/2009"
+				 xmlns:s="library://ns.adobe.com/flex/spark"
+				 xmlns:mx="library://ns.adobe.com/flex/mx"
+				 xmlns:component="org.openforis.collect.ui.component.*"
+				 width="840" height="520">
+	<component:layout>
+		<s:VerticalLayout gap="10" horizontalAlign="center" />
+	</component:layout>
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.events.FlexEvent;
+			
+			import org.openforis.collect.i18n.Message;
+			import org.openforis.collect.model.proxy.UserProxy;
+			import org.openforis.collect.presenter.UserManagementPresenter;
+			
+			public static const STATE_DEFAULT:String = "default";
+			public static const STATE_NEW:String = "new";
+			public static const STATE_SELECTED:String = "selected";
+			
+			private var _presenter:UserManagementPresenter;
+			
+			override protected function creationCompleteHandler(event:FlexEvent):void {
+				_presenter = new UserManagementPresenter(this);
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<component:states>
+		<s:State name="default" />
+		<s:State name="new" />
+		<s:State name="selected" />
+	</component:states>
+	
+	<s:DataGrid id="dataGrid" height="200">
+		<s:columns>
+			<s:ArrayList>
+				<s:GridColumn headerText="{Message.get('usersManagement.name')}"
+							  dataField="name"
+							  width="200"
+							  />
+				<s:GridColumn headerText="{Message.get('usersManagement.roles')}"
+							  dataField="roles"
+							  width="200"
+							  />
+			</s:ArrayList>
+		</s:columns>
+	</s:DataGrid>
+	
+	<s:HGroup id="defaultActionButtons"
+			  includeIn="default"
+			  itemCreationPolicy="immediate">
+
+		<s:Button id="newUserButton" 
+				  label="{Message.get('usersManagement.addNewUser')}"
+				  useHandCursor="true" buttonMode="true" />
+
+	</s:HGroup>
+	
+	<s:VGroup includeIn="new, selected"
+			  itemCreationPolicy="immediate"
+			  horizontalAlign="center"
+			  >
+		<s:Form id="detailForm">
+			<s:FormItem label="{Message.get('usersManagement.name')}">
+				<s:TextInput id="nameTextInput" />
+			</s:FormItem>
+			<s:FormItem label="{Message.get('usersManagement.password')}">
+				<s:TextInput id="passwordTextInput" displayAsPassword="true" />
+			</s:FormItem>
+			<s:FormItem label="{Message.get('usersManagement.repeatPassword')}">
+				<s:TextInput id="repeatPasswordTextInput" displayAsPassword="true" />
+			</s:FormItem>
+			<s:FormItem label="{Message.get('usersManagement.roles')}">
+				<s:CheckBox id="roleEntryCheckBox"
+							label="{Message.get('roles.entry')}" />
+				<s:CheckBox id="roleCleansingCheckBox" 
+							label="{Message.get('roles.cleansing')}" />
+				<s:CheckBox id="roleAnalysisCheckBox"
+							label="{Message.get('roles.analysis')}" />
+				<s:CheckBox id="roleAdminCheckBox"
+							label="{Message.get('roles.admin')}" />
+			</s:FormItem>
+		</s:Form>
+		<s:HGroup gap="30">
+			<s:Button id="saveButton" 
+					  label="{Message.get('usersManagement.save')}"
+					  useHandCursor="true" buttonMode="true"
+					  />
+			<s:Button id="deleteButton"
+					  includeIn="selected" 
+					  itemCreationPolicy="immediate"
+					  label="{Message.get('usersManagement.delete')}"
+					  useHandCursor="true" buttonMode="true"
+					  />
+		</s:HGroup>
+	</s:VGroup>
+	
+</component:PopUp>
