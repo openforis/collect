@@ -12,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author M. Togna
- *
+ * @author S. Ricci
  */
 public class UserManager {
 
@@ -35,5 +35,20 @@ public class UserManager {
 	
 	public List<User> loadAll() {
 		return userDao.loadAll();
+	}
+	
+	@Transactional
+	public void update(User user) {
+		userDao.update(user);
+	}
+	
+	@Transactional
+	public void insert(User user) {
+		userDao.insert(user);
+	}
+	
+	@Transactional
+	public void delete(int id) {
+		userDao.delete(id);
 	}
 }

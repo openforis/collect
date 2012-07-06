@@ -34,6 +34,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.ui.component.DataImportPopUp;
 	import org.openforis.collect.ui.component.RecordFilterPopUp;
 	import org.openforis.collect.ui.component.SelectVersionPopUp;
+	import org.openforis.collect.ui.component.UserManagementPopUp;
 	import org.openforis.collect.ui.component.datagrid.PaginationBar;
 	import org.openforis.collect.ui.component.datagrid.RecordSummaryDataGrid;
 	import org.openforis.collect.ui.component.input.TextInput;
@@ -54,8 +55,9 @@ package org.openforis.collect.presenter {
 		private var _newRecordResponder:IResponder;
 		private var _filterPopUp:RecordFilterPopUp;
 		
-		private const IMPORT_DATA_ITEM:String = Message.get("list.admin.importData");
-		private const ADMIN_SETTINGS_ITEMS:ArrayCollection = new ArrayCollection([IMPORT_DATA_ITEM]);
+		private const IMPORT_DATA_MENU_ITEM:String = Message.get("list.admin.importData");
+		private const USERS_MANAGEMENT_MENU_ITEM:String = Message.get("list.admin.usersManagement");
+		private const ADMIN_SETTINGS_ITEMS:ArrayCollection = new ArrayCollection([IMPORT_DATA_MENU_ITEM, USERS_MANAGEMENT_MENU_ITEM]);
 		
 		/**
 		 * The total number of records.
@@ -116,8 +118,11 @@ package org.openforis.collect.presenter {
 		
 		protected function adminSettingsItemClickHandler(event:MenuEvent):void {
 			switch ( event.item ) {
-				case IMPORT_DATA_ITEM:
+				case IMPORT_DATA_MENU_ITEM:
 					var popUp:IFlexDisplayObject = PopUpUtil.createPopUp(DataImportPopUp, true);
+					break;
+				case USERS_MANAGEMENT_MENU_ITEM:
+					var popUp:IFlexDisplayObject = PopUpUtil.createPopUp(UserManagementPopUp, true);
 					break;
 			}
 		}
