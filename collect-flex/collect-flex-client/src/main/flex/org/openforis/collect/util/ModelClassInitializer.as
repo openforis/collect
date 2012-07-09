@@ -33,9 +33,6 @@ package org.openforis.collect.util {
 	import org.openforis.collect.metamodel.proxy.TimeAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.UnitProxy;
 	import org.openforis.collect.model.SurveySummary;
-	import org.openforis.collect.model.UIConfiguration;
-	import org.openforis.collect.model.UITab;
-	import org.openforis.collect.model.UITabDefinition;
 	import org.openforis.collect.model.proxy.AttributeProxy;
 	import org.openforis.collect.model.proxy.CodeAttributeProxy;
 	import org.openforis.collect.model.proxy.CodeProxy;
@@ -53,6 +50,9 @@ package org.openforis.collect.util {
 	import org.openforis.collect.model.proxy.TimeProxy;
 	import org.openforis.collect.model.proxy.ValidationResultProxy;
 	import org.openforis.collect.model.proxy.ValidationResultsProxy;
+	import org.openforis.collect.model.ui.UIConfiguration;
+	import org.openforis.collect.model.ui.UITab;
+	import org.openforis.collect.model.ui.UITabDefinition;
 	import org.openforis.collect.remoting.service.UpdateResponse;
 	import org.openforis.collect.remoting.service.dataExport.DataExportState;
 	import org.openforis.collect.remoting.service.dataImport.DataImportStateProxy;

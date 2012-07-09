@@ -43,9 +43,9 @@
 			<include type="org.openforis.collect.model.CollectRecord"/>
 			<include type="org.openforis.collect.model.RecordSummary"/>
 			<include type="org.openforis.collect.model.RecordSummarySortField"/>
-			<include type="org.openforis.collect.model.UIConfiguration"/>
-			<include type="org.openforis.collect.model.UITabDefinition"/>
-			<include type="org.openforis.collect.model.UITab"/>
+			<include type="org.openforis.collect.model.ui.UIConfiguration"/>
+			<include type="org.openforis.collect.model.ui.UITabDefinition"/>
+			<include type="org.openforis.collect.model.ui.UITab"/>
 			<include type="org.openforis.collect.remoting.service.dataExport.DataExportState"/>
         </externalizer>
     </externalizers>

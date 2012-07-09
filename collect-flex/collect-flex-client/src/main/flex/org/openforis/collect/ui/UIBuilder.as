@@ -29,10 +29,10 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.metamodel.proxy.TextAttributeDefinitionProxy$Type;
 	import org.openforis.collect.metamodel.proxy.TimeAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.UnitProxy;
-	import org.openforis.collect.model.UIConfiguration;
-	import org.openforis.collect.model.UITab;
-	import org.openforis.collect.model.UITabDefinition;
 	import org.openforis.collect.model.proxy.EntityProxy;
+	import org.openforis.collect.model.ui.UIConfiguration;
+	import org.openforis.collect.model.ui.UITab;
+	import org.openforis.collect.model.ui.UITabDefinition;
 	import org.openforis.collect.ui.component.datagrid.CompleteColumnItemRenderer;
 	import org.openforis.collect.ui.component.datagrid.RecordSummaryDataGrid;
 	import org.openforis.collect.ui.component.datagroup.DataGridHeaderRenderer;

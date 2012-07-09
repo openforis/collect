@@ -6,13 +6,11 @@ package org.openforis.collect.presenter
 	import mx.collections.IList;
 	import mx.rpc.events.ResultEvent;
 	
-	import org.openforis.collect.Application;
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.event.InputFieldEvent;
-	import org.openforis.collect.model.UIConfiguration;
-	import org.openforis.collect.model.UITab;
 	import org.openforis.collect.model.proxy.EntityProxy;
+	import org.openforis.collect.model.ui.UITab;
 	import org.openforis.collect.remoting.service.UpdateRequest;
 	import org.openforis.collect.remoting.service.UpdateRequestOperation;
 	import org.openforis.collect.remoting.service.UpdateRequestOperation$Method;

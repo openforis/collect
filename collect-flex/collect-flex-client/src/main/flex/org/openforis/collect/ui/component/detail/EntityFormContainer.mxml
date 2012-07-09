@@ -23,8 +23,8 @@
 			import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
 			import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
 			import org.openforis.collect.model.CollectRecord$Step;
-			import org.openforis.collect.model.UITab;
 			import org.openforis.collect.model.proxy.EntityProxy;
+			import org.openforis.collect.model.ui.UITab;
 			import org.openforis.collect.presenter.EntityFormPresenter;
 			import org.openforis.collect.ui.UIBuilder;
 			import org.openforis.collect.util.CollectionUtil;

@@ -1,4 +1,4 @@
-package org.openforis.collect.model;
+package org.openforis.collect.model.ui;
 
 import java.util.List;
 
@@ -45,8 +45,6 @@ public class UIConfiguration implements Configuration {
 		result = prime * result + ((tabDefinitions == null) ? 0 : tabDefinitions.hashCode());
 		return result;
 	}
-
-
 
 	@Override
 	public boolean equals(Object obj) {

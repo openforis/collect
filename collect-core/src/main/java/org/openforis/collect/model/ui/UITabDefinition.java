@@ -1,4 +1,4 @@
-package org.openforis.collect.model;
+package org.openforis.collect.model.ui;
 
 import java.io.Serializable;
 import java.util.List;
@@ -17,27 +17,20 @@ import javax.xml.bind.annotation.XmlType;
  */
 
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "", propOrder = { "name", "label", "tabs" })
-public class UITab implements Serializable {
+@XmlType(name = "", propOrder = { "rootEntity", "tabs" })
+public class UITabDefinition implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	@XmlAttribute(name = "name")
-	private String name;
-
-	@XmlElement(name = "label")
-	private String label;
+	@XmlAttribute(name = "rootEntity")
+	private String rootEntity;
 
 	@XmlElementWrapper(name = "tabs")
 	@XmlElement(name = "tab", type = UITab.class)
 	private List<UITab> tabs;
 
-	public String getName() {
-		return name;
-	}
-
-	public String getLabel() {
-		return label;
+	public String getRootEntity() {
+		return rootEntity;
 	}
 
 	public List<UITab> getTabs() {
@@ -48,8 +41,7 @@ public class UITab implements Serializable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((label == null) ? 0 : label.hashCode());
-		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		result = prime * result + ((rootEntity == null) ? 0 : rootEntity.hashCode());
 		result = prime * result + ((tabs == null) ? 0 : tabs.hashCode());
 		return result;
 	}
@@ -62,16 +54,11 @@ public class UITab implements Serializable {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		UITab other = (UITab) obj;
-		if (label == null) {
-			if (other.label != null)
+		UITabDefinition other = (UITabDefinition) obj;
+		if (rootEntity == null) {
+			if (other.rootEntity != null)
 				return false;
-		} else if (!label.equals(other.label))
-			return false;
-		if (name == null) {
-			if (other.name != null)
-				return false;
-		} else if (!name.equals(other.name))
+		} else if (!rootEntity.equals(other.rootEntity))
 			return false;
 		if (tabs == null) {
 			if (other.tabs != null)
@@ -80,5 +67,5 @@ public class UITab implements Serializable {
 			return false;
 		return true;
 	}
-
+	
 }

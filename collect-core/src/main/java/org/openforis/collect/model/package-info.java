@@ -1,11 +1,6 @@
-@XmlSchema( namespace="http://www.openforis.org/collect/3.0/ui",
-			xmlns = {
-					@XmlNs(namespaceURI = "http://www.openforis.org/collect/3.0/ui", prefix = "ui")
-			},
-			elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED
-		)
+@XmlSchema(namespace = "http://www.openforis.org/idml/3.0", elementFormDefault = XmlNsForm.QUALIFIED)
 package org.openforis.collect.model;
 
-import javax.xml.bind.annotation.XmlNs;
+import javax.xml.bind.annotation.XmlNsForm;
 import javax.xml.bind.annotation.XmlSchema;
   
