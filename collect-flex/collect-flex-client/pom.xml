@@ -235,11 +235,6 @@
 	</build>
 
 	<dependencies>
-<!-- 		<dependency> -->
-<!-- 			<groupId>org.openforis</groupId> -->
-<!-- 			<artifactId>idm</artifactId> -->
-<!-- 			<version>3.0.0-SNAPSHOT</version> -->
-<!-- 		</dependency> -->
 		<dependency>
 			<groupId>org.openforis.collect</groupId>
 			<artifactId>collect-core</artifactId>
