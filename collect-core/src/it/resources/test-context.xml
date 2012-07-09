@@ -38,15 +38,19 @@
     	<property name="dataSource" ref="dataSource"/>
 	</bean>
 	
-	<bean id="surveyDao" class="org.openforis.collect.persistence.SurveyDao" init-method="init">
+	<bean id="dynamicTableDao" class="org.openforis.collect.persistence.DynamicTableDao">
     	<property name="dataSource" ref="dataSource"/>
 	</bean>
-
+	
 	<bean id="logoDao" class="org.openforis.collect.persistence.LogoDao">
     	<property name="dataSource" ref="dataSource"/>
 	</bean>
 	
 	<bean id="recordDao" class="org.openforis.collect.persistence.RecordDao">
+    	<property name="dataSource" ref="dataSource"/>
+	</bean>
+
+	<bean id="surveyDao" class="org.openforis.collect.persistence.SurveyDao" init-method="init">
     	<property name="dataSource" ref="dataSource"/>
 	</bean>
 
@@ -62,7 +66,7 @@
     	<property name="dataSource" ref="dataSource"/>
 	</bean>
 
-	<bean id="dynamicTableDao" class="org.openforis.collect.persistence.DynamicTableDao">
+	<bean id="userDao" class="org.openforis.collect.persistence.UserDao">
     	<property name="dataSource" ref="dataSource"/>
 	</bean>
 	

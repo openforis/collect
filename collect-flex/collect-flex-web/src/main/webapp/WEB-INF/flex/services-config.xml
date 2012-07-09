@@ -19,14 +19,6 @@
             class="flex.messaging.services.RemotingService"
             messageTypes="flex.messaging.messages.RemotingMessage">
             
-            <destination id="backupService">
-		        <properties>
-		        	<factory>springFactory</factory>
-		            <source>backupService</source>
-		            <scope>application</scope>
-		        </properties>
-			</destination>
-			
 			<destination id="dataService">
 		        <properties>
 		        	<factory>springFactory</factory>
@@ -51,6 +43,14 @@
 		        </properties>
 			</destination>
 			
+			<destination id="logoService">
+				<properties>
+					<factory>springFactory</factory>
+					<source>logoService</source>
+					<scope>application</scope>
+				</properties>
+			</destination>
+
 			<destination id="modelService">
 		        <properties>
 		        	<factory>springFactory</factory>
@@ -75,13 +75,14 @@
 		        </properties>
 			</destination>
 			
-			<destination id="logoService">
-				<properties>
-					<factory>springFactory</factory>
-					<source>logoService</source>
-					<scope>application</scope>
-				</properties>
+ 			<destination id="userService">
+		        <properties>
+		        	<factory>springFactory</factory>
+		            <source>userService</source>
+		            <scope>application</scope>
+		        </properties>
 			</destination>
+			
         </service>
 
         <default-channels>

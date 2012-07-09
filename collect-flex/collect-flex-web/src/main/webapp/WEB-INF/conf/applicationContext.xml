@@ -74,7 +74,8 @@
 	<bean id="modelService"		class="org.openforis.collect.remoting.service.ModelService" autowire="byName" />
 	<bean id="sessionService" 	class="org.openforis.collect.remoting.service.SessionService" autowire="byName" />
 	<bean id="speciesService" 	class="org.openforis.collect.remoting.service.SpeciesService" autowire="byName" />
-
+	<bean id="userService" 		class="org.openforis.collect.remoting.service.UserService" autowire="byName" />
+	
 	<!-- <bean id="backupService" class="org.fao.openforis.web.service.BackupService"> -->
 	<!-- <property name="backupDirectory" value="backup" /> -->
 	<!-- </bean> -->

@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * 
  * @author M. Togna
+ * @author S. Ricci
  * 
  */
 public class CollectUserDetailsService implements UserDetailsService {
@@ -27,7 +28,7 @@ public class CollectUserDetailsService implements UserDetailsService {
 	@Override
 	@Transactional
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		User user = userManager.loadByUserName(username);
+		User user = userManager.loadByUserName(username, true);
 		
 		if (user == null) {
 			throw new UsernameNotFoundException(username);

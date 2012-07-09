@@ -121,8 +121,6 @@ public class DataImportProcess implements Callable<Void> {
 			if ( packagedSurvey == null ) {
 				throw new DataImportExeption(IDML_FILE_NAME + " not found in packaged file.");
 			}
-			
-			Map<String, String> packagedSkippedFileErrors = new HashMap<String, String>();
 			String uri = packagedSurvey.getUri();
 			CollectSurvey oldSurvey = surveyManager.getByUri(uri);
 			String surveyName = oldSurvey != null ? oldSurvey.getName(): null;
@@ -141,6 +139,7 @@ public class DataImportProcess implements Callable<Void> {
 			}
 			Map<Integer, CollectRecord> packagedRecords = new HashMap<Integer, CollectRecord>();
 			Map<Integer, List<Step>> packagedStepsPerRecord = new HashMap<Integer, List<Step>>();
+			Map<String, String> packagedSkippedFileErrors = new HashMap<String, String>();
 			Map<Integer, CollectRecord> conflictingPackagedRecords = new HashMap<Integer, CollectRecord>();
 			Map<Integer, Map<Step, List<String>>> warnings = new HashMap<Integer, Map<Step,List<String>>>();
 			zipFile = new ZipFile(packagedFile);

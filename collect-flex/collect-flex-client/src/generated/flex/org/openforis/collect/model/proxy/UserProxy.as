@@ -48,5 +48,6 @@ package org.openforis.collect.model.proxy {
 			return hasRole(ROLE_CLEANSING) && record.step == CollectRecord$Step.CLEANSING || 
 				hasRole(ROLE_ANALYSIS) && record.step == CollectRecord$Step.ANALYSIS;
 		}
-}
+
+	}
 }
