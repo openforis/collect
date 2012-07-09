@@ -5,11 +5,11 @@ package org.openforis.collect.remoting.service;
 
 import java.util.List;
 
+import org.openforis.collect.manager.InvalidPassword;
 import org.openforis.collect.manager.UserManager;
 import org.openforis.collect.model.User;
 import org.openforis.collect.model.proxy.UserProxy;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.encoding.Md5PasswordEncoder;
 
 /**
  * @author S. Ricci
@@ -38,24 +38,9 @@ public class UserService {
 		return result;
 	}
 
-	public UserProxy save(UserProxy user) {
+	public UserProxy save(UserProxy user) throws InvalidPassword {
 		User u = user.toUser();
-		Integer userId = u.getId();
-		if ( userId == null ) {
-			userManager.insert(u);
-		} else {
-			User oldUser = userManager.loadById(userId);
-			String password = u.getPassword();
-			if ( password == null ) {
-				//preserve old password
-				u.setPassword(oldUser.getPassword());
-			} else {
-				//hash password
-				Md5PasswordEncoder passwordEncoder = new Md5PasswordEncoder();
-				passwordEncoder
-			}
-			userManager.update(u);
-		}
+		userManager.save(u);
 		UserProxy proxy = new UserProxy(u);
 		return proxy;
 	}

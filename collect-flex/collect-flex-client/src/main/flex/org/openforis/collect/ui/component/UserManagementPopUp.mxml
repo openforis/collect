@@ -3,7 +3,7 @@
 				 xmlns:s="library://ns.adobe.com/flex/spark"
 				 xmlns:mx="library://ns.adobe.com/flex/mx"
 				 xmlns:component="org.openforis.collect.ui.component.*"
-				 width="840" height="520">
+				 width="840" height="550" xmlns:input="org.openforis.collect.ui.component.input.*" xmlns:container="org.openforis.collect.ui.container.*">
 	<component:layout>
 		<s:VerticalLayout gap="10" horizontalAlign="center" />
 	</component:layout>
@@ -13,9 +13,9 @@
 			import mx.events.FlexEvent;
 			
 			import org.openforis.collect.i18n.Message;
-			import org.openforis.collect.model.proxy.UserProxy;
 			import org.openforis.collect.presenter.UserManagementPresenter;
 			
+			public static const STATE_LOADING:String = "loading";
 			public static const STATE_DEFAULT:String = "default";
 			public static const STATE_NEW:String = "new";
 			public static const STATE_SELECTED:String = "selected";
@@ -30,43 +30,64 @@
 	</fx:Script>
 	
 	<component:states>
+		<s:State name="loading" />
 		<s:State name="default" />
 		<s:State name="new" />
 		<s:State name="selected" />
 	</component:states>
 	
-	<s:DataGrid id="dataGrid" height="200">
-		<s:columns>
-			<s:ArrayList>
-				<s:GridColumn headerText="{Message.get('usersManagement.name')}"
-							  dataField="name"
-							  width="200"
-							  />
-				<s:GridColumn headerText="{Message.get('usersManagement.roles')}"
-							  dataField="roles"
-							  width="200"
-							  />
-			</s:ArrayList>
-		</s:columns>
-	</s:DataGrid>
+	<component:LoadingContent height="100%" width="100%" 
+							  includeIn="loading" />
 	
-	<s:HGroup id="defaultActionButtons"
-			  includeIn="default"
-			  itemCreationPolicy="immediate">
+	<s:VGroup id="defaultContent" 
+			  height="100%" width="100%"
+			  horizontalAlign="center">
+		<s:DataGrid id="dataGrid" height="200">
+			<s:columns>
+				<s:ArrayList>
+					<s:GridColumn headerText="{Message.get('usersManagement.name')}"
+								  dataField="name"
+								  width="200"
+								  />
+					<s:GridColumn headerText="{Message.get('usersManagement.roles')}"
+								  dataField="roles"
+								  width="200"
+								  />
+					<s:GridColumn headerText="{Message.get('usersManagement.enabled')}"
+								  dataField="enabled"
+								  width="50" 
+								  itemRenderer="org.openforis.collect.ui.component.datagrid.BooleanColumnItemRenderer"
+								  />
+				</s:ArrayList>
+			</s:columns>
+		</s:DataGrid>
+		
+		<s:HGroup id="defaultActionButtons"
+				  includeIn="default"
+				  itemCreationPolicy="immediate">
+			
+			<s:Button id="newUserButton" 
+					  label="{Message.get('usersManagement.addNewUser')}"
+					  useHandCursor="true" buttonMode="true" />
+			
+		</s:HGroup>
+	</s:VGroup>
 
-		<s:Button id="newUserButton" 
-				  label="{Message.get('usersManagement.addNewUser')}"
-				  useHandCursor="true" buttonMode="true" />
-
-	</s:HGroup>
-	
 	<s:VGroup includeIn="new, selected"
 			  itemCreationPolicy="immediate"
 			  horizontalAlign="center"
 			  >
+		
 		<s:Form id="detailForm">
+			<s:layout>
+				<s:FormLayout gap="2" />
+			</s:layout>
+			<s:FormHeading label="{Message.get('usersManagement.userDetails')}" />
+			<s:FormItem label="{Message.get('usersManagement.enabled')}">
+				<s:CheckBox id="enabledCheckBox" />
+			</s:FormItem>
 			<s:FormItem label="{Message.get('usersManagement.name')}">
-				<s:TextInput id="nameTextInput" />
+				<input:TextInput id="nameTextInput" restrictPattern="^\w$" />
 			</s:FormItem>
 			<s:FormItem label="{Message.get('usersManagement.password')}">
 				<s:TextInput id="passwordTextInput" displayAsPassword="true" />
@@ -97,6 +118,7 @@
 					  useHandCursor="true" buttonMode="true"
 					  />
 		</s:HGroup>
+
 	</s:VGroup>
 	
 </component:PopUp>

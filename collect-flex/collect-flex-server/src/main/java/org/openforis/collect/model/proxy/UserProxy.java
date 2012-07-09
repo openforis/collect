@@ -16,6 +16,7 @@ import org.openforis.collect.model.User;
  */
 public class UserProxy implements Proxy {
 
+	private Boolean enabled;
 	private Integer id;
 	private String name;
 	private String password;
@@ -23,9 +24,11 @@ public class UserProxy implements Proxy {
 
 	public UserProxy(User user) {
 		super();
+		this.enabled = user.getEnabled();
 		this.id = user.getId();
 		this.name = user.getName();
 		this.roles = user.getRoles();
+		//password is not initialized, so the client will not know its value
 	}
 
 	public static List<UserProxy> fromList(List<User> users) {
@@ -41,11 +44,20 @@ public class UserProxy implements Proxy {
 	
 	public User toUser() {
 		User user = new User();
+		user.setEnabled(enabled);
 		user.setId(id);
 		user.setName(name);
 		user.setPassword(password);
 		user.setRoles(roles);
 		return user;
+	}
+	
+	public Boolean getEnabled() {
+		return enabled;
+	}
+
+	public void setEnabled(Boolean enabled) {
+		this.enabled = enabled;
 	}
 	
 	public Integer getId() {
@@ -72,5 +84,12 @@ public class UserProxy implements Proxy {
 		this.roles = roles;
 	}
 
-	
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
 }

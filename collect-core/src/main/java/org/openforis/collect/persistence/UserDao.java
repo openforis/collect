@@ -13,6 +13,7 @@ import java.util.List;
 import org.jooq.DeleteQuery;
 import org.jooq.Record;
 import org.jooq.Result;
+import org.jooq.SimpleSelectConditionStep;
 import org.jooq.SimpleSelectQuery;
 import org.jooq.StoreQuery;
 import org.jooq.impl.Factory;
@@ -51,9 +52,15 @@ public class UserDao extends MappingJooqDaoSupport<User, JooqFactory> {
 	}
 	
 	@Transactional
-	public User loadByUserName(String userName){
+	public User loadByUserName(String userName, Boolean enabled){
 		JooqFactory jf = getMappingJooqFactory();
-		SimpleSelectQuery<?> query = jf.selectByFieldQuery(OFC_USER.USERNAME, userName); 
+		SimpleSelectConditionStep<OfcUserRecord> query = 
+				jf.selectFrom(OFC_USER)
+				.where(OFC_USER.USERNAME.equal(userName));
+		if ( enabled != null ) {
+			String enabledFlag = enabled ? "Y": "N";
+			query.and(OFC_USER.ENABLED.equal(enabledFlag));
+		}
 		Record r = query.fetchOne();
 		if(r == null){
 			return null;
@@ -124,6 +131,9 @@ public class UserDao extends MappingJooqDaoSupport<User, JooqFactory> {
 
 		@Override
 		protected void fromRecord(Record r, User user) {
+			String enabledFlag = r.getValue(OFC_USER.ENABLED);
+			boolean enabled = "Y".equals(enabledFlag);
+			user.setEnabled(enabled);
 			user.setId(r.getValueAsInteger(OFC_USER.ID));
 			user.setName(r.getValueAsString(OFC_USER.USERNAME));
 			user.setPassword(r.getValueAsString(OFC_USER.PASSWORD));
@@ -133,6 +143,9 @@ public class UserDao extends MappingJooqDaoSupport<User, JooqFactory> {
 
 		@Override
 		protected void fromObject(User user, StoreQuery<?> q) {
+			Boolean enabled = user.getEnabled();
+			String enabledFlag = enabled != null && enabled.booleanValue() ? "Y": "N";
+			q.addValue(OFC_USER.ENABLED, enabledFlag);
 			q.addValue(OFC_USER.ID, user.getId());
 			q.addValue(OFC_USER.USERNAME, user.getName());
 			q.addValue(OFC_USER.PASSWORD, user.getPassword());

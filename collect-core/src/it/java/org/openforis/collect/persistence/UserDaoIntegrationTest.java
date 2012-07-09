@@ -30,6 +30,7 @@ public class UserDaoIntegrationTest {
 	public void testCRUD() throws Exception  {
 		// SAVE NEW
 		User user = new User();
+		user.setEnabled(Boolean.TRUE);
 		user.setName("user1");
 		user.setPassword("pass1");
 		user.addRole("role1");

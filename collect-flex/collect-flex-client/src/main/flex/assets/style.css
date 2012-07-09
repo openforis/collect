@@ -11,6 +11,10 @@ container|CollapsiblePanel {
 	skin-class: ClassReference('org.openforis.collect.ui.skin.CollapsiblePanelSkin');
 }
 
+container|TitleBorderBox {
+	skin-class: ClassReference('org.openforis.collect.ui.skin.TitleBorderBoxSkin');
+}
+
 container|CollapsiblePanel s|Label.title {
 	fontWeight: bold;
 }
