@@ -121,10 +121,18 @@ public class DataImportProcess implements Callable<Void> {
 			if ( packagedSurvey == null ) {
 				throw new DataImportExeption(IDML_FILE_NAME + " not found in packaged file.");
 			}
+			
 			Map<String, String> packagedSkippedFileErrors = new HashMap<String, String>();
 			String uri = packagedSurvey.getUri();
 			CollectSurvey oldSurvey = surveyManager.getByUri(uri);
 			String surveyName = oldSurvey != null ? oldSurvey.getName(): null;
+			if ( oldSurvey != null ) {
+				packagedSurvey.setId(oldSurvey.getId());
+				packagedSurvey.setName(oldSurvey.getName());
+				if ( ! oldSurvey.equals(packagedSurvey) ) {
+					throw new DataImportExeption("Packaged survey is different from the survey already present into the system");
+				}
+			}
 			dataUnmarshaller = initDataUnmarshaller(packagedSurvey, oldSurvey != null ? oldSurvey: packagedSurvey);
 			
 			Map<Step, Integer> totalPerStep = new HashMap<CollectRecord.Step, Integer>();
