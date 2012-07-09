@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>collect-flex</artifactId>
 		<groupId>org.openforis.collect</groupId>
-		<version>3.0-Alpha3-SNAPSHOT</version>
+		<version>3.0-Alpha3</version>
 		<relativePath>..</relativePath>
 	</parent>
 
