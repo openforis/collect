@@ -37,6 +37,33 @@ public class UIConfiguration implements Configuration {
 	public List<UITabDefinition> getTabDefinitions() {
 		return tabDefinitions;
 	}
+	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((tabDefinitions == null) ? 0 : tabDefinitions.hashCode());
+		return result;
+	}
+
+
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		UIConfiguration other = (UIConfiguration) obj;
+		if (tabDefinitions == null) {
+			if (other.tabDefinitions != null)
+				return false;
+		} else if (!tabDefinitions.equals(other.tabDefinitions))
+			return false;
+		return true;
+	}
 
 	public static class UIConfigurationAdapter implements ConfigurationAdapter<UIConfiguration> {
 
@@ -78,25 +105,6 @@ public class UIConfiguration implements Configuration {
 			}
 		}
 
-		/*
-		public static void main(String[] a) {
-			Document xmldoc= new DocumentImpl();
-			Element flex = xmldoc.createElementNS("http://www.openforis.org/collect/3.0/ui", "flex");
-			Element tabDefinition = xmldoc.createElementNS("http://www.openforis.org/collect/3.0/ui", "tabDefinition");
-			tabDefinition.setAttributeNS(null, "rootEntity", "myRootEntity");
-			Element tabs = xmldoc.createElementNS("http://www.openforis.org/collect/3.0/ui", "tabs");
-			Element tab = xmldoc.createElementNS("http://www.openforis.org/collect/3.0/ui", "tab");
-			tab.setAttributeNS(null, "name", "tab1");
-			Element label = xmldoc.createElementNS("http://www.openforis.org/collect/3.0/ui", "label");
-			label.setTextContent("Tab 1 label");
-			tab.appendChild(label);
-			tabs.appendChild(tab);
-			tabDefinition.appendChild(tabs);
-			flex.appendChild(tabDefinition);
-			UIConfiguration uiConfiguration = new UIConfigurationAdapter().unmarshal(flex);
-			System.out.println(uiConfiguration.getTabDefinitions().size());
-		}
-		*/
 	}
 
 }

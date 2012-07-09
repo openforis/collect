@@ -1,6 +1,7 @@
 package org.openforis.collect.remoting.service.dataImport;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.openforis.collect.remoting.service.dataProcessing.DataProcessingState;
@@ -29,7 +30,7 @@ public class DataImportState extends DataProcessingState {
 	private MainStep mainStep;
 	private SubStep subStep;
 	private Map<String, String> errors;
-	private Map<String, String> warnings;
+	private Map<String, List<String>> warnings;
 	
 	private int insertedCount;
 	private int updatedCount;
@@ -39,8 +40,8 @@ public class DataImportState extends DataProcessingState {
 		insertedCount = 0;
 		updatedCount = 0;
 		errors = new HashMap<String, String>();
-		warnings = new HashMap<String, String>();
-		mainStep = MainStep.SUMMARY_CREATION;
+		warnings = new HashMap<String, List<String>>();
+		mainStep = MainStep.INITED;
 		subStep = SubStep.INITED;
 	}
 
@@ -48,8 +49,8 @@ public class DataImportState extends DataProcessingState {
 		errors.put(fileName, error);
 	}
 
-	public void addWarning(String fileName, String warning) {
-		warnings.put(fileName, warning);
+	public void addWarnings(String entryName, List<String> warnings) {
+		this.warnings.put(entryName, warnings);
 	}
 	
 	public void incrementInsertedCount() {
@@ -74,10 +75,6 @@ public class DataImportState extends DataProcessingState {
 		return errors;
 	}
 
-	public Map<String, String> getWarnings() {
-		return warnings;
-	}
-
 	public MainStep getMainStep() {
 		return mainStep;
 	}
@@ -92,6 +89,10 @@ public class DataImportState extends DataProcessingState {
 
 	public void setSubStep(SubStep subStep) {
 		this.subStep = subStep;
+	}
+
+	public Map<String, List<String>> getWarnings() {
+		return warnings;
 	}
 
 }

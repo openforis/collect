@@ -1,5 +1,6 @@
 package org.openforis.collect.remoting.service.dataImport;
 
+import java.util.List;
 import java.util.Map;
 
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
@@ -19,6 +20,16 @@ public class DataImportStateProxy implements Proxy {
 	public DataImportStateProxy(DataImportState state) {
 		super();
 		this.state = state;
+	}
+
+	@ExternalizedProperty
+	public MainStep getMainStep() {
+		return state.getMainStep();
+	}
+
+	@ExternalizedProperty
+	public SubStep getSubStep() {
+		return state.getSubStep();
 	}
 
 	@ExternalizedProperty
@@ -72,18 +83,8 @@ public class DataImportStateProxy implements Proxy {
 	}
 
 	@ExternalizedProperty
-	public Map<String, String> getWarnings() {
+	public Map<String, List<String>> getWarnings() {
 		return state.getWarnings();
-	}
-
-	@ExternalizedProperty
-	public MainStep getMainStep() {
-		return state.getMainStep();
-	}
-
-	@ExternalizedProperty
-	public SubStep getSubStep() {
-		return state.getSubStep();
 	}
 
 }

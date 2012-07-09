@@ -263,7 +263,7 @@
 	</s:VGroup>
 	
 	<s:VGroup width="100%" height="100%"
-			  includeIn="importing, summaryCreationRunning"
+			  includeIn="uploading, importing, summaryCreationRunning"
 			  itemCreationPolicy="immediate"
 			  horizontalAlign="center"
 			  verticalAlign="middle"

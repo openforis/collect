@@ -1,6 +1,8 @@
 package org.openforis.collect.remoting.service.dataImport;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
@@ -16,11 +18,16 @@ public class DataImportSummaryItem {
 	private CollectRecord record;
 	private CollectRecord conflictingRecord;
 	private List<Step> steps;
+	/**
+	 * Map containing the warnings for each step (if any) 
+	 */
+	private Map<Step, List<String>> warnings;
 
 	public DataImportSummaryItem(int entryId, CollectRecord record, List<Step> steps) {
 		this.entryId = entryId;
 		this.record = record;
 		this.steps = steps;
+		this.warnings = new HashMap<Step, List<String>>();
 	}
 	
 	public DataImportSummaryItem(int entryId, CollectRecord record, List<Step> steps, CollectRecord conflictingRecord) {
@@ -59,6 +66,12 @@ public class DataImportSummaryItem {
 	public void setSteps(List<Step> steps) {
 		this.steps = steps;
 	}
-	
-	
+
+	public Map<Step, List<String>> getWarnings() {
+		return warnings;
+	}
+
+	public void setWarnings(Map<Step, List<String>> warnings) {
+		this.warnings = warnings;
+	}
 }
