@@ -3,7 +3,11 @@
 				 xmlns:s="library://ns.adobe.com/flex/spark"
 				 xmlns:mx="library://ns.adobe.com/flex/mx"
 				 xmlns:component="org.openforis.collect.ui.component.*"
-				 width="840" height="550" xmlns:input="org.openforis.collect.ui.component.input.*" xmlns:container="org.openforis.collect.ui.container.*">
+				 xmlns:input="org.openforis.collect.ui.component.input.*" 
+				 xmlns:container="org.openforis.collect.ui.container.*"
+				 title="{Message.get('usersManagement.title')}"
+				 width="840" height="550" 
+				 >
 	<component:layout>
 		<s:VerticalLayout gap="10" horizontalAlign="center" />
 	</component:layout>
@@ -41,7 +45,10 @@
 	
 	<s:VGroup id="defaultContent" 
 			  height="100%" width="100%"
-			  horizontalAlign="center">
+			  horizontalAlign="center"
+			  includeIn="default"
+			  itemCreationPolicy="immediate"
+			  >
 		<s:DataGrid id="dataGrid" height="200">
 			<s:columns>
 				<s:ArrayList>
@@ -108,13 +115,13 @@
 		</s:Form>
 		<s:HGroup gap="30">
 			<s:Button id="saveButton" 
-					  label="{Message.get('usersManagement.save')}"
+					  label="{Message.get('global.save')}"
 					  useHandCursor="true" buttonMode="true"
 					  />
 			<s:Button id="deleteButton"
 					  includeIn="selected" 
 					  itemCreationPolicy="immediate"
-					  label="{Message.get('usersManagement.delete')}"
+					  label="{Message.get('global.delete')}"
 					  useHandCursor="true" buttonMode="true"
 					  />
 		</s:HGroup>

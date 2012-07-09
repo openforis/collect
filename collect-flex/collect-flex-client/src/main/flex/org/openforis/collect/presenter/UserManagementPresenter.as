@@ -132,7 +132,7 @@ package org.openforis.collect.presenter {
 			//trim fields
 			view.nameTextInput.text = StringUtil.trim(view.nameTextInput.text);
 			if ( StringUtil.isBlank(view.nameTextInput.text) ) {
-				AlertUtil.showError('usersManagement.error.repeatPasswordCorrectly');
+				AlertUtil.showError('usersManagement.error.nameRequired');
 				return false;
 			}
 			//TODO validate password against regexp

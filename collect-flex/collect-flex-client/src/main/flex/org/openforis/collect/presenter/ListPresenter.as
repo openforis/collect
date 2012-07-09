@@ -119,10 +119,10 @@ package org.openforis.collect.presenter {
 		protected function adminSettingsItemClickHandler(event:MenuEvent):void {
 			switch ( event.item ) {
 				case IMPORT_DATA_MENU_ITEM:
-					var popUp:IFlexDisplayObject = PopUpUtil.createPopUp(DataImportPopUp, true);
+					PopUpUtil.createPopUp(DataImportPopUp, true);
 					break;
 				case USERS_MANAGEMENT_MENU_ITEM:
-					var popUp:IFlexDisplayObject = PopUpUtil.createPopUp(UserManagementPopUp, true);
+					PopUpUtil.createPopUp(UserManagementPopUp, true);
 					break;
 			}
 		}
