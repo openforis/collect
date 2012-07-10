@@ -43,12 +43,8 @@ public class UserDao extends MappingJooqDaoSupport<User, JooqFactory> {
 		JooqFactory jf = getMappingJooqFactory();
 		SimpleSelectQuery<?> query = jf.selectByIdQuery(id);
 		Record r = query.fetchOne();
-		if(r == null){
-			return null;
-		} else {
-			User user = jf.fromRecord(r);
-			return user;
-		}
+		User user = r != null ? jf.fromRecord(r): null;
+		return user;
 	}
 	
 	@Transactional
@@ -62,30 +58,30 @@ public class UserDao extends MappingJooqDaoSupport<User, JooqFactory> {
 			query.and(OFC_USER.ENABLED.equal(enabledFlag));
 		}
 		Record r = query.fetchOne();
-		if(r == null){
-			return null;
-		} else {
-			User user = jf.fromRecord(r);
-			return user;
-		}
+		User user = r != null ? jf.fromRecord(r): null;
+		return user;
 	}
 	
 	@Transactional
 	public List<User> loadAll() {
 		JooqFactory jf = getMappingJooqFactory();
-		Result<OfcUserRecord> r = jf.selectFrom(OFC_USER).fetch();
-		if (r == null) {
-			return null;
-		} else {
-			List<User> users = jf.fromResult(r);
-			return users;
-		}
+		Result<OfcUserRecord> r = 
+				jf.selectFrom(OFC_USER)
+				.orderBy(OFC_USER.USERNAME)
+				.fetch();
+		
+		List<User> users = r != null ? jf.fromResult(r): null;
+		return users;
 	}
 	
 	@Transactional
 	public int getUserId(String username) {
-		Factory jooqFactory = getJooqFactory();
-		Record record = jooqFactory.select(OFC_USER.ID).from(OFC_USER).where(OFC_USER.USERNAME.equal(username)).fetchOne();
+		Factory jf = getJooqFactory();
+		Record record =
+				jf.select(OFC_USER.ID)
+				.from(OFC_USER)
+				.where(OFC_USER.USERNAME.equal(username))
+				.fetchOne();
 		Integer id = record.getValueAsInteger(OFC_USER.ID);
 		return id;
 	}

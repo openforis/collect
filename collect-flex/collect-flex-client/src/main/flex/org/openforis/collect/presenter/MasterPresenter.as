@@ -83,13 +83,13 @@ package org.openforis.collect.presenter {
 			var editable:Boolean = false;
 			switch ( step ) {
 				case CollectRecord$Step.ENTRY:
-					editable = user.hasRole(UserProxy.ROLE_ENTRY) || 
-						user.hasRole(UserProxy.ROLE_CLEANSING) || 
-						user.hasRole(UserProxy.ROLE_ADMIN);
+					editable = user.hasEffectiveRole(UserProxy.ROLE_ENTRY) || 
+						user.hasEffectiveRole(UserProxy.ROLE_CLEANSING) || 
+						user.hasEffectiveRole(UserProxy.ROLE_ADMIN);
 					break;
 				case CollectRecord$Step.CLEANSING:
-					editable = user.hasRole(UserProxy.ROLE_CLEANSING) || 
-						user.hasRole(UserProxy.ROLE_ADMIN);
+					editable = user.hasEffectiveRole(UserProxy.ROLE_CLEANSING) || 
+						user.hasEffectiveRole(UserProxy.ROLE_ADMIN);
 					break;
 				case CollectRecord$Step.ANALYSIS:
 					editable = false
@@ -128,7 +128,7 @@ package org.openforis.collect.presenter {
 		protected function loadRecordFaultHandler(event:FaultEvent, token:Object = null):void {
 			var faultCode:String = event.fault.faultCode;
 			if(faultCode == "org.openforis.collect.persistence.RecordLockedByActiveUserException" ||
-				(faultCode == "org.openforis.collect.persistence.RecordLockedException" && Application.user.hasRole(UserProxy.ROLE_ADMIN))) {
+				(faultCode == "org.openforis.collect.persistence.RecordLockedException" && Application.user.hasEffectiveRole(UserProxy.ROLE_ADMIN))) {
 					AlertUtil.showConfirm('edit.confirmUnlock', null, null, performUnlock, [token as RecordProxy]);
 			} else {
 				AbstractPresenter.faultHandler(event, token);

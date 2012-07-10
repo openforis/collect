@@ -17,6 +17,7 @@ package org.openforis.collect.model.proxy {
 		public static const ROLE_CLEANSING:String = "ROLE_CLEANSING";
 		public static const ROLE_ANALYSIS:String = "ROLE_ANALYSIS";
 		public static const ROLE_ADMIN:String = "ROLE_ADMIN";
+		public static const ROLES:Array = [ROLE_ENTRY, ROLE_CLEANSING, ROLE_ANALYSIS, ROLE_ADMIN];
 		
 		protected static const ROLES_HIERARCHY:Array = [ROLE_ENTRY, ROLE_CLEANSING, ROLE_ANALYSIS, ROLE_ADMIN];
 		
@@ -32,21 +33,35 @@ package org.openforis.collect.model.proxy {
 		}
 		
 		public function hasRole(role:String):Boolean {
+			var result:Boolean = CollectionUtil.contains(roles, role);
+			return result;
+		}
+		
+		public function hasEffectiveRole(role:String):Boolean {
 			var highest:int = calculateHighestRoleIndex();
 			var index:int = ROLES_HIERARCHY.indexOf(role);
 			return highest >= index;
-			//var result:Boolean = CollectionUtil.contains(roles, role);
-			//return result;
+		}
+		
+		public function addRole(role:String):void {
+			roles.addItem(role);
+		}
+		
+		public function removeRole(role:String):void {
+			var index:int = roles.getItemIndex(role);
+			if ( index >= 0 ) {
+				roles.removeItemAt(index);
+			}
 		}
 		
 		public function canSubmit(record:RecordProxy):Boolean {
-			return hasRole(ROLE_ENTRY) && record.step == CollectRecord$Step.ENTRY || 
-				hasRole(ROLE_CLEANSING) && record.step == CollectRecord$Step.CLEANSING;
+			return hasEffectiveRole(ROLE_ENTRY) && record.step == CollectRecord$Step.ENTRY || 
+				hasEffectiveRole(ROLE_CLEANSING) && record.step == CollectRecord$Step.CLEANSING;
 		}
 
 		public function canReject(record:RecordProxy):Boolean {
-			return hasRole(ROLE_CLEANSING) && record.step == CollectRecord$Step.CLEANSING || 
-				hasRole(ROLE_ANALYSIS) && record.step == CollectRecord$Step.ANALYSIS;
+			return hasEffectiveRole(ROLE_CLEANSING) && record.step == CollectRecord$Step.CLEANSING || 
+				hasEffectiveRole(ROLE_ANALYSIS) && record.step == CollectRecord$Step.ANALYSIS;
 		}
 
 	}

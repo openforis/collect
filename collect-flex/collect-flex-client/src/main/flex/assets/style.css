@@ -15,6 +15,14 @@ container|TitleBorderBox {
 	skin-class: ClassReference('org.openforis.collect.ui.skin.TitleBorderBoxSkin');
 }
 
+container|FieldSet {
+	cornerRadius: 4;
+	gap: 6;
+	paddingLeft: 10;
+	paddingRight: 0;
+	skin-class: ClassReference('org.openforis.collect.ui.skin.FieldSetSkin');
+}
+
 container|CollapsiblePanel s|Label.title {
 	fontWeight: bold;
 }

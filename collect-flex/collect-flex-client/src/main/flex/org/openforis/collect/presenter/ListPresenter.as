@@ -34,7 +34,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.ui.component.DataImportPopUp;
 	import org.openforis.collect.ui.component.RecordFilterPopUp;
 	import org.openforis.collect.ui.component.SelectVersionPopUp;
-	import org.openforis.collect.ui.component.UserManagementPopUp;
+	import org.openforis.collect.ui.component.user.UserManagementPopUp;
 	import org.openforis.collect.ui.component.datagrid.PaginationBar;
 	import org.openforis.collect.ui.component.datagrid.RecordSummaryDataGrid;
 	import org.openforis.collect.ui.component.input.TextInput;
