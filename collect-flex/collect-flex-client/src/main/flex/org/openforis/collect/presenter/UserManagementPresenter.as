@@ -21,6 +21,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.ui.component.user.UserPerRoleContainer;
 	import org.openforis.collect.ui.component.user.UsersListContainer;
 	import org.openforis.collect.util.AlertUtil;
+	import org.openforis.collect.util.CollectionUtil;
 	import org.openforis.collect.util.StringUtil;
 	
 	import spark.events.GridSelectionEvent;
@@ -130,6 +131,7 @@ package org.openforis.collect.presenter {
 			view.usersListContainer.enabledCheckBox.selected = user.enabled;
 			view.usersListContainer.nameTextInput.text = user.name;
 			view.usersListContainer.passwordTextInput.text = "";
+			view.usersListContainer.repeatPasswordTextInput.text = "";
 			resetRolesCheckBoxes();
 			var roles:ListCollectionView = user.roles;
 			for each (var role:String in roles) {
@@ -197,7 +199,12 @@ package org.openforis.collect.presenter {
 			//trim fields
 			var name:String = view.usersListContainer.nameTextInput.text;
 			name = StringUtil.trim(name);
-			
+			view.usersListContainer.nameTextInput.text = name;
+			var selectedUser:UserProxy = view.usersListContainer.dataGrid.selectedItem as UserProxy;
+			if ( (selectedUser == null || selectedUser.name != name) && existsUsername(name) ) {
+				AlertUtil.showError("usersManagement.error.duplicatedUsername");
+				return false;
+			}
 			var result:ValidationResultEvent;
 			var validators:Array = [view.usersListContainer.fNameV, view.usersListContainer.fPasswordV, view.usersListContainer.fRepeatedPasswordV];
 			var failed:Boolean = false;
@@ -206,6 +213,9 @@ package org.openforis.collect.presenter {
 				if (result.type==ValidationResultEvent.INVALID) {
 					failed = true;
 				}
+			}
+			if ( failed ) {
+				AlertUtil.showError("usersManagement.error.errorsInForm");
 			}
 			return ! failed;
 			/*
@@ -235,6 +245,11 @@ package org.openforis.collect.presenter {
 			}
 			*/
 			return true;
+		}
+		
+		protected function existsUsername(username:String):Boolean {
+			var result:Boolean = CollectionUtil.containsItemWith(_loadedUsers, "name", username);
+			return result;
 		}
 		
 		protected function extractUserFromForm():UserProxy {
@@ -271,6 +286,7 @@ package org.openforis.collect.presenter {
 		
 		protected function newUserButtonClickHandler(event:MouseEvent):void {
 			view.usersListContainer.currentState = UsersListContainer.STATE_NEW;
+			view.usersListContainer.dataGrid.selectedItem = null;
 			resetForm();
 		}
 		
@@ -279,8 +295,6 @@ package org.openforis.collect.presenter {
 				var user:UserProxy = extractUserFromForm();
 				var responder:IResponder = new AsyncResponder(saveUserResultHandler, faultHandler);
 				_userClient.save(responder, user);
-			} else {
-				AlertUtil.showError("usersManagement.error.errorsInForm");
 			}
 		}
 		
