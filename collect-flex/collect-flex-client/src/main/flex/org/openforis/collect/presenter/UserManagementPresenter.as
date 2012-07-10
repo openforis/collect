@@ -4,6 +4,8 @@ package org.openforis.collect.presenter {
 	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
 	import mx.collections.ListCollectionView;
+	import mx.controls.Alert;
+	import mx.controls.CheckBox;
 	import mx.events.FlexEvent;
 	import mx.events.ValidationResultEvent;
 	import mx.rpc.AsyncResponder;
@@ -21,7 +23,6 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.util.AlertUtil;
 	import org.openforis.collect.util.StringUtil;
 	
-	import spark.components.CheckBox;
 	import spark.events.GridSelectionEvent;
 	import spark.events.IndexChangeEvent;
 	
@@ -120,6 +121,8 @@ package org.openforis.collect.presenter {
 			view.usersListContainer.nameTextInput.errorString = "";
 			view.usersListContainer.passwordTextInput.text = "";
 			view.usersListContainer.passwordTextInput.errorString = "";
+			view.usersListContainer.repeatPasswordTextInput.text = "";
+			view.usersListContainer.repeatPasswordTextInput.errorString = "";
 			resetRolesCheckBoxes();
 		}
 		
@@ -196,7 +199,7 @@ package org.openforis.collect.presenter {
 			name = StringUtil.trim(name);
 			
 			var result:ValidationResultEvent;
-			var validators:Array = [view.usersListContainer.fNameV, view.usersListContainer.fPasswordV];
+			var validators:Array = [view.usersListContainer.fNameV, view.usersListContainer.fPasswordV, view.usersListContainer.fRepeatedPasswordV];
 			var failed:Boolean = false;
 			for each (var validator:Validator in validators) {
 				result = validator.validate();
@@ -276,6 +279,8 @@ package org.openforis.collect.presenter {
 				var user:UserProxy = extractUserFromForm();
 				var responder:IResponder = new AsyncResponder(saveUserResultHandler, faultHandler);
 				_userClient.save(responder, user);
+			} else {
+				AlertUtil.showError("usersManagement.error.errorsInForm");
 			}
 		}
 		
@@ -300,6 +305,7 @@ package org.openforis.collect.presenter {
 				var selectedUserIndex:int = _loadedUsers.getItemIndex(selectedUser);
 				_loadedUsers.setItemAt(savedUser, selectedUserIndex);
 			} else {
+				AlertUtil.showMessage("usersManagement.userSaved");
 				loadAll();
 			}
 		}

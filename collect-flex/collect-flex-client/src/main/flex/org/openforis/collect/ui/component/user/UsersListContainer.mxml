@@ -19,7 +19,6 @@
 	
 	<fx:Script>
 		<![CDATA[
-			import org.granite.validation.constraints.Pattern;
 			import org.openforis.collect.i18n.Message;
 			
 			public static const STATE_LOADING:String = "loading";
@@ -43,9 +42,10 @@
 							source="{passwordTextInput}" 
 							property="text"/>
 		<mx:RegExpValidator id="fRepeatedPasswordV"
+							enabled="{passwordTextInput.text.length &gt; 0}"
 							required="true"
 							required.selected="false"
-							expression="[{passwordTextInput.text}]"
+							expression="{passwordTextInput.text}"
 							noMatchError="{Message.get('usersManagement.error.repeatPassword')}"
 							source="{repeatPasswordTextInput}" 
 							property="text"/>
@@ -95,33 +95,31 @@
 			<container:layout>
 				<s:VerticalLayout horizontalAlign="center" paddingBottom="10" />
 			</container:layout>
-			<s:Form id="detailForm">
-				<s:layout>
-					<s:FormLayout gap="-14" />
-				</s:layout>
-				<s:FormItem label="{Message.get('usersManagement.enabled')}">
-					<s:CheckBox id="enabledCheckBox" />
-				</s:FormItem>
-				<s:FormItem label="{Message.get('usersManagement.name')}">
+			<mx:Form id="detailForm">
+				<mx:FormItem label="{Message.get('usersManagement.enabled')}">
+					<mx:CheckBox id="enabledCheckBox" />
+				</mx:FormItem>
+				<mx:FormItem label="{Message.get('usersManagement.name')}">
 					<input:TextInput id="nameTextInput" restrictPattern="^\w*$" upperCase="false" />
-				</s:FormItem>
-				<s:FormItem label="{Message.get('usersManagement.password')}">
-					<s:TextInput id="passwordTextInput" displayAsPassword="true" />
-				</s:FormItem>
-				<s:FormItem label="{Message.get('usersManagement.repeatPassword')}">
-					<s:TextInput id="repeatPasswordTextInput" displayAsPassword="true" />
-				</s:FormItem>
-				<s:FormItem label="{Message.get('usersManagement.roles')}">
-					<s:CheckBox id="roleEntryCheckBox"
+				</mx:FormItem>
+				<mx:FormItem label="{Message.get('usersManagement.password')}"
+							 label.selected="{Message.get('usersManagement.changePassword')}">
+					<mx:TextInput id="passwordTextInput" displayAsPassword="true" />
+				</mx:FormItem>
+				<mx:FormItem label="{Message.get('usersManagement.repeatPassword')}">
+					<mx:TextInput id="repeatPasswordTextInput" displayAsPassword="true" />
+				</mx:FormItem>
+				<mx:FormItem label="{Message.get('usersManagement.roles')}">
+					<mx:CheckBox id="roleEntryCheckBox"
 								label="{Message.get('roles.entry')}" />
-					<s:CheckBox id="roleCleansingCheckBox" 
+					<mx:CheckBox id="roleCleansingCheckBox" 
 								label="{Message.get('roles.cleansing')}" />
-					<s:CheckBox id="roleAnalysisCheckBox"
+					<mx:CheckBox id="roleAnalysisCheckBox"
 								label="{Message.get('roles.analysis')}" />
-					<s:CheckBox id="roleAdminCheckBox"
+					<mx:CheckBox id="roleAdminCheckBox"
 								label="{Message.get('roles.admin')}" />
-				</s:FormItem>
-			</s:Form>
+				</mx:FormItem>
+			</mx:Form>
 			<s:HGroup gap="30">
 				<s:Button id="saveButton" 
 						  label="{Message.get('global.save')}"
