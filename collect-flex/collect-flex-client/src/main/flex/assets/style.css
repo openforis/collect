@@ -6,6 +6,7 @@
 @namespace view "org.openforis.collect.ui.view.*";
 @namespace component "org.openforis.collect.ui.component.*";
 @namespace container "org.openforis.collect.ui.container.*";
+@namespace user "org.openforis.collect.ui.component.user.*";
 
 container|CollapsiblePanel {
 	skin-class: ClassReference('org.openforis.collect.ui.skin.CollapsiblePanelSkin');
@@ -103,7 +104,8 @@ mx|Alert {
 
 }*/
 
-component|BlockingMessagePopUp, component|SelectVersionPopUp, input|CodeListDialog, component|DataExportPopUp, component|BackupPopUp, component|DataImportPopUp {
+component|BlockingMessagePopUp, component|SelectVersionPopUp, input|CodeListDialog, component|DataExportPopUp, 
+	component|BackupPopUp, component|DataImportPopUp, user|UserManagementPopUp {
 	skin-class: ClassReference("org.openforis.collect.ui.skin.TitleWindowSkin");
 	title-style-name: dialogHeaderStyle;
 	border-color: #000000;

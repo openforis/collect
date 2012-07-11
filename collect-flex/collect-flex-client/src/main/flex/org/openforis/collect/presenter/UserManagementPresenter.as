@@ -210,7 +210,7 @@ package org.openforis.collect.presenter {
 			var failed:Boolean = false;
 			for each (var validator:Validator in validators) {
 				result = validator.validate();
-				if (result.type==ValidationResultEvent.INVALID) {
+				if ( result != null && result.type==ValidationResultEvent.INVALID ) {
 					failed = true;
 				}
 			}
@@ -301,7 +301,7 @@ package org.openforis.collect.presenter {
 		protected function deleteButtonClickHandler(event:MouseEvent):void {
 			var selectedUser:UserProxy = view.usersListContainer.dataGrid.selectedItem as UserProxy;
 			if ( selectedUser != null ) {
-				AlertUtil.showConfirm("usersManagement.delete.confirm", null, "global.confirm.delete", performDelete, [selectedUser.id]);
+				AlertUtil.showConfirm("usersManagement.delete.confirm", null, "global.deleteTitle", performDelete, [selectedUser.id]);
 			} else {
 				AlertUtil.showError("usersManagement.delete.selectUser");
 			}

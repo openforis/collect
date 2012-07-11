@@ -7,7 +7,8 @@
 		 width="100%" height="100%" xmlns:container="org.openforis.collect.ui.container.*" 
 		 >
 	<s:layout>
-		<s:VerticalLayout horizontalAlign="center"/>
+		<s:VerticalLayout horizontalAlign="center"
+						  paddingBottom="5" paddingLeft="5" paddingRight="5" paddingTop="5" />
 	</s:layout>
 	
 	<s:states>
@@ -67,7 +68,7 @@
 							  />
 				<s:GridColumn headerText="{Message.get('usersManagement.roles')}"
 							  dataField="roles"
-							  width="200"
+							  width="250"
 							  />
 				<s:GridColumn headerText="{Message.get('usersManagement.enabled')}"
 							  dataField="enabled"
@@ -87,10 +88,12 @@
 	<s:VGroup includeIn="new, selected"
 			  itemCreationPolicy="immediate"
 			  horizontalAlign="center"
+			  gap="6"
 			  >
 		
 		<container:FieldSet id="userDetailsBox" 
 							legend="{Message.get('usersManagement.userDetails')}" 
+							legend.new="{Message.get('usersManagement.newUserDetails')}" 
 							creationPolicy="all">
 			<container:layout>
 				<s:VerticalLayout horizontalAlign="center" paddingBottom="10" />

@@ -6,7 +6,8 @@
 		 width="100%" height="100%" 
 		 >
 	<s:layout>
-		<s:VerticalLayout/>
+		<s:VerticalLayout gap="20"
+						  paddingBottom="5" paddingLeft="5" paddingRight="5" paddingTop="5" />
 	</s:layout>
 	
 	<s:states>
@@ -30,11 +31,9 @@
 	<component:LoadingContent height="100%" width="100%" 
 							  includeIn="loading" />
 	
-	<s:Label visible="true" visible.loading="false" visible.roleSelected="false"
-			 includeInLayout="true" includeInLayout.loading="false" includeInLayout.roleSelected="false"
+	<s:Label excludeFrom="loading"
 			 text="{Message.get('usersManagement.usersPerRoleIntro')}"
-			 styleName="formLabel"
-			 />
+			 styleName="formLabel" />
 
 	<mx:HDividedBox height="100%" width="100%"
 					includeIn="default, roleSelected"
@@ -53,33 +52,39 @@
 				  >
 			<s:Label text="{Message.get('usersManagement.users')}"
 					 styleName="formLabel" />
-			<s:Scroller height="100%" width="100%">
-				<s:DataGroup id="usersDataGroup"
-							 height="100%" width="100%">
-					<s:layout>
-						<s:VerticalLayout />
-					</s:layout>
-					<s:itemRenderer>
-						<fx:Component>
-							<s:ItemRenderer>
-								<s:layout>
-									<s:HorizontalLayout />
-								</s:layout>
-								<fx:Script>
-									<![CDATA[
-										import org.openforis.collect.event.EventDispatcherFactory;
-										import org.openforis.collect.event.UserManagementEvent;
-									]]>
-								</fx:Script>
-								<s:CheckBox selected="{data.selected}" change="{data.selected = event.target.selected; 
-											EventDispatcherFactory.getEventDispatcher().dispatchEvent(
-												new UserManagementEvent(UserManagementEvent.USER_PER_ROLE_SELECTED, false, false, outerDocument.rolesList.selectedItem, data.user, data.selected));}" />
-								<s:Label text="{data.user.name}" />
-							</s:ItemRenderer>
-						</fx:Component>
-					</s:itemRenderer>
-				</s:DataGroup>
-			</s:Scroller>
+			
+			<s:BorderContainer height="100%" width="100%">
+				<s:Scroller height="100%" width="100%">
+					<s:DataGroup id="usersDataGroup"
+								 height="100%" width="100%"
+								 >
+						<s:layout>
+							<s:VerticalLayout />
+						</s:layout>
+						<s:itemRenderer>
+							<fx:Component>
+								<s:ItemRenderer autoDrawBackground="false">
+									<s:layout>
+										<s:HorizontalLayout verticalAlign="middle" />
+									</s:layout>
+									<fx:Script>
+										<![CDATA[
+											import org.openforis.collect.event.EventDispatcherFactory;
+											import org.openforis.collect.event.UserManagementEvent;
+										]]>
+									</fx:Script>
+									<s:CheckBox selected="{data.selected}" change="{data.selected = event.target.selected; 
+												EventDispatcherFactory.getEventDispatcher().dispatchEvent(
+													new UserManagementEvent(UserManagementEvent.USER_PER_ROLE_SELECTED, false, false, 
+														outerDocument.rolesList.selectedItem, data.user, data.selected));}"
+												/>
+									<s:Label text="{data.user.name}" />
+								</s:ItemRenderer>
+							</fx:Component>
+						</s:itemRenderer>
+					</s:DataGroup>
+				</s:Scroller>
+			</s:BorderContainer>
 		</s:VGroup>
 	</mx:HDividedBox>
 	

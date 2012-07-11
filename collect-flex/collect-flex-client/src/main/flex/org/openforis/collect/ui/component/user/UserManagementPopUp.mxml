@@ -7,14 +7,14 @@
 				 xmlns:container="org.openforis.collect.ui.container.*"
 				 xmlns:user="org.openforis.collect.ui.component.user.*" 
 				 title="{Message.get('usersManagement.title')}"
-				 width="840" height="600" 
+				 width="840" height="630" 
 				 >
 	<component:layout>
 		<s:VerticalLayout gap="0"
-						  paddingBottom="20"
-						  paddingLeft="20"
-						  paddingRight="20"
-						  paddingTop="20"
+						  paddingBottom="10"
+						  paddingLeft="10"
+						  paddingRight="10"
+						  paddingTop="10"
 						  />
 	</component:layout>
 	
