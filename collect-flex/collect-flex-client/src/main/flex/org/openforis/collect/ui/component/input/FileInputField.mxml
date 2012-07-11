@@ -3,10 +3,17 @@
 				  xmlns:s="library://ns.adobe.com/flex/spark" 
 				  xmlns:mx="library://ns.adobe.com/flex/mx" 
 				  xmlns:input="org.openforis.collect.ui.component.input.*"
+				  currentState="default"
+				  height="23"
 				  >
+	<input:layout>
+		<s:VerticalLayout />
+	</input:layout>
 	
 	<fx:Script>
 		<![CDATA[
+			import mx.core.UIComponent;
+			
 			import org.openforis.collect.i18n.Message;
 			import org.openforis.collect.presenter.FileInputFieldPresenter;
 			
@@ -21,6 +28,10 @@
 			override public function set text(value:String):void {
 				//empty
 			}
+			
+			override public function get validationStateDisplay():UIComponent {
+				return this;
+			}
 		]]>
 	</fx:Script>
 	
@@ -30,23 +41,26 @@
 		<s:State name="fileUplaoded" />
 	</input:states>
 	
-	<s:VGroup id="controlsContainer" includeInLayout="{editable}">
-		<s:HGroup gap="20">
-			<s:Button id="browseButton" 
-					  label="{Message.get('edit.file.browseLabel')}" />
-			
-			<mx:ProgressBar id="uploadProgressBar" 
-							width="100" 
-							label="{Message.get('edit.file.uploadProgressBarLabel')}"
-							mode="manual"
-							/>
-			
-			<s:HGroup id="fileUploadedControlsContainer" gap="20"
-					  includeIn="fileUplaoded">
-				<s:Button id="downloadButton" label="{Message.get('global.download')}" />
-				<s:Button id="removeButton" label="{Message.get('global.remove')}" />
-			</s:HGroup>
+	<s:HGroup id="controlsContainer" includeInLayout="{editable}" gap="20">
+		<s:Button id="browseButton" 
+				  excludeFrom="uploading"
+				  itemCreationPolicy="immediate"
+				  label="{Message.get('edit.file.browseLabel')}" />
+		
+		<mx:ProgressBar id="uploadProgressBar" 
+						width="100" 
+						label="{Message.get('edit.file.uploadProgressBarLabel')}"
+						mode="manual"
+						includeIn="uploading"
+						itemCreationPolicy="immediate"
+						/>
+		
+		<s:HGroup id="fileUploadedControlsContainer" gap="20"
+				  includeIn="fileUplaoded"
+				  itemCreationPolicy="immediate">
+			<s:Button id="downloadButton" label="{Message.get('global.download')}" />
+			<s:Button id="removeButton" label="{Message.get('global.remove')}" />
 		</s:HGroup>
-	</s:VGroup>
+	</s:HGroup>
 	
 </input:InputField>

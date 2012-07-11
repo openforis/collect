@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
+import javax.activation.FileTypeMap;
 import javax.activation.MimetypesFileTypeMap;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
@@ -35,7 +36,8 @@ public class BasicController {
 		BufferedInputStream buf = null;
 		try {
 			String name = file.getName();
-			String contentType = MimetypesFileTypeMap.getDefaultFileTypeMap().getContentType(name);
+			FileTypeMap defaultFileTypeMap = MimetypesFileTypeMap.getDefaultFileTypeMap();
+			String contentType = defaultFileTypeMap.getContentType(name);
 			response.setContentType(contentType); 
 			response.setContentLength(new Long(file.length()).intValue());
 			response.setHeader("Content-Disposition", "attachment; filename=" + name);

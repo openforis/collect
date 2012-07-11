@@ -8,23 +8,17 @@ package org.openforis.collect.client {
 	 * */
 	public class ClientFactory {
 		
-		private static var _modelClient:ModelClient;
-		private static var _sessionClient:SessionClient;
 		private static var _dataClient:DataClient;
 		private static var _dataExportClient:DataExportClient;
 		private static var _dataImportClient:DataImportClient;
-		private static var _speciesClient:SpeciesClient;
 		private static var _logoClient:LogoClient;
+		private static var _modelClient:ModelClient;
+		private static var _modelFileClient:ModelFileClient;
+		private static var _sessionClient:SessionClient;
+		private static var _speciesClient:SpeciesClient;
 		private static var _userClient:UserClient;
 		
 		public function ClientFactory() {
-		}
-		
-		public static function get sessionClient():SessionClient {
-			if(_sessionClient == null){
-				_sessionClient = new SessionClient();
-			}
-			return _sessionClient;
 		}
 		
 		public static function get dataClient():DataClient {
@@ -55,11 +49,11 @@ package org.openforis.collect.client {
 			return _modelClient;
 		}
 		
-		public static function get speciesClient():SpeciesClient {
-			if(_speciesClient == null){
-				_speciesClient = new SpeciesClient();
+		public static function get modelFileClient():ModelFileClient {
+			if(_modelFileClient == null){
+				_modelFileClient = new ModelFileClient();
 			}
-			return _speciesClient;
+			return _modelFileClient;
 		}
 		
 		public static function get logoClient():LogoClient {
@@ -67,6 +61,20 @@ package org.openforis.collect.client {
 				_logoClient = new LogoClient();
 			}
 			return _logoClient;
+		}
+		
+		public static function get sessionClient():SessionClient {
+			if(_sessionClient == null){
+				_sessionClient = new SessionClient();
+			}
+			return _sessionClient;
+		}
+		
+		public static function get speciesClient():SpeciesClient {
+			if(_speciesClient == null){
+				_speciesClient = new SpeciesClient();
+			}
+			return _speciesClient;
 		}
 		
 		public static function get userClient():UserClient {

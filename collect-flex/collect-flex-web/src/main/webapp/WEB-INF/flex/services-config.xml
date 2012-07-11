@@ -59,6 +59,14 @@
 		        </properties>
 			</destination>
 			
+			<destination id="modelFileService">
+		        <properties>
+		        	<factory>springFactory</factory>
+		            <source>modelFileService</source>
+		            <scope>application</scope>
+		        </properties>
+			</destination>
+			
             <destination id="sessionService">
 		        <properties>
 		        	<factory>springFactory</factory>

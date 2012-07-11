@@ -8,7 +8,6 @@ package org.openforis.collect.ui {
 	import mx.core.IFactory;
 	import mx.core.IVisualElement;
 	
-	import org.openforis.collect.Application;
 	import org.openforis.collect.i18n.Message;
 	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.BooleanAttributeDefinitionProxy;
@@ -22,7 +21,6 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.metamodel.proxy.NumberAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.NumberAttributeDefinitionProxy$Type;
 	import org.openforis.collect.metamodel.proxy.RangeAttributeDefinitionProxy;
-	import org.openforis.collect.metamodel.proxy.SchemaProxy;
 	import org.openforis.collect.metamodel.proxy.SurveyProxy;
 	import org.openforis.collect.metamodel.proxy.TaxonAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.TextAttributeDefinitionProxy;
@@ -54,6 +52,7 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.ui.component.input.CoordinateAttributeRenderer;
 	import org.openforis.collect.ui.component.input.DateAttributeRenderer;
 	import org.openforis.collect.ui.component.input.FixedCodeInputField;
+	import org.openforis.collect.ui.component.input.ImageInputField;
 	import org.openforis.collect.ui.component.input.InputField;
 	import org.openforis.collect.ui.component.input.IntegerInputField;
 	import org.openforis.collect.ui.component.input.MemoInputField;
@@ -66,7 +65,6 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.ui.component.input.TaxonAttributeRenderer;
 	import org.openforis.collect.ui.component.input.TimeAttributeRenderer;
 	import org.openforis.collect.util.CollectionUtil;
-	import org.openforis.collect.util.StringUtil;
 	import org.openforis.collect.util.UIUtil;
 	
 	import spark.components.HGroup;
@@ -340,7 +338,8 @@ package org.openforis.collect.ui {
 					inputField = new CodeInputField();
 				}
 			} else if(def is FileAttributeDefinitionProxy) {
-				//inputField = new FileInputField();
+				//TODO use different input fields for text and image files
+				inputField = new ImageInputField();
 			} else if(def is NumberAttributeDefinitionProxy) {
 				var numberAttributeDefn:NumberAttributeDefinitionProxy = NumberAttributeDefinitionProxy(def);
 				if(numberAttributeDefn.type == NumberAttributeDefinitionProxy$Type.INTEGER) {

@@ -10,15 +10,20 @@ package org.openforis.collect.presenter {
 	import flash.net.URLRequestMethod;
 	import flash.net.URLVariables;
 	import flash.net.navigateToURL;
+	import flash.utils.ByteArray;
 	
 	import mx.collections.IList;
 	import mx.collections.ListCollectionView;
+	import mx.rpc.AsyncResponder;
+	import mx.rpc.IResponder;
 	import mx.rpc.events.FaultEvent;
 	import mx.rpc.events.ResultEvent;
 	import mx.rpc.http.HTTPService;
 	
 	import org.openforis.collect.Application;
+	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.metamodel.proxy.FileAttributeDefinitionProxy;
+	import org.openforis.collect.model.proxy.AttributeProxy;
 	import org.openforis.collect.model.proxy.FieldProxy;
 	import org.openforis.collect.ui.component.input.FileInputField;
 	import org.openforis.collect.util.AlertUtil;
@@ -36,6 +41,8 @@ package org.openforis.collect.presenter {
 		private var _view:FileInputField;
 		
 		private var fileReference:FileReference;
+		private var fileFilter:FileFilter;
+		private var maxSizeDescription:String;
 		
 		public function FileInputFieldPresenter(inputField:FileInputField) {
 			_view = inputField;
@@ -46,12 +53,12 @@ package org.openforis.collect.presenter {
 		override internal function initEventListeners():void {
 			super.initEventListeners();
 			fileReference.addEventListener(Event.SELECT, fileReferenceSelectHandler);
-			fileReference.addEventListener(Event.COMPLETE, fileReferenceCompleteHandler);
 			fileReference.addEventListener(ProgressEvent.PROGRESS, fileReferenceProgressHandler);
-			fileReference.addEventListener(Event.OPEN, fileReferenceOpenHandler);
 			fileReference.addEventListener(IOErrorEvent.IO_ERROR, fileReferenceIoErrorHandler);
+			fileReference.addEventListener(Event.COMPLETE, fileReferenceLoadComplete);
 			fileReference.addEventListener(DataEvent.UPLOAD_COMPLETE_DATA, fileReferenceUploadCompleteDataHandler);
 			
+			_view.browseButton.addEventListener(MouseEvent.CLICK, browseClickHandler);
 			_view.downloadButton.addEventListener(MouseEvent.CLICK, downloadClickHandler);
 			_view.removeButton.addEventListener(MouseEvent.CLICK, removeClickHandler);
 			
@@ -66,14 +73,14 @@ package org.openforis.collect.presenter {
 				extensionsAdapted.push("*." + extension);
 			}
 			var allowedFileExtensionsDescription:String = extensionsAdapted.join(", ");
-			var fileFilter:FileFilter = new FileFilter(allowedFileExtensionsDescription, extensionsAdapted.join("; "));
+			fileFilter = new FileFilter(allowedFileExtensionsDescription, extensionsAdapted.join("; "));
 			
 			//init maxFileSizeDescription
 			var maxSize:Number = attrDefn.maxSize;
 			var numberFormatter:spark.formatters.NumberFormatter = new NumberFormatter();
 			numberFormatter.fractionalDigits = 0;
 			
-			var maxSizeDescription:String = numberFormatter.format(maxSize);
+			maxSizeDescription = numberFormatter.format(maxSize);
 		}
 		
 		override protected function updateView():void {
@@ -88,15 +95,11 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function fileReferenceUploadCompleteDataHandler(event:DataEvent):void {
-			
-		}
-		
-		protected function fileReferenceOpenHandler(event:Event):void {
-			
-		}
-		
-		protected function fileReferenceCompleteHandler(event:Event):void {
-			
+			//upload completed, get data from response
+			var fileName:String = event.data as String;
+			var fileAttribute:AttributeProxy = _view.attribute;
+			fileAttribute.getField(0).value = fileName;
+			_view.currentState = FileInputField.STATE_FILE_UPLOADED;
 		}
 		
 		protected function fileReferenceProgressHandler(event:ProgressEvent):void {
@@ -116,29 +119,42 @@ package org.openforis.collect.presenter {
 			}
 			_view.currentState = FileInputField.STATE_UPLOADING;
 			
-			var url:String = ApplicationConstants.FILEUPLOAD_URL;
+			/*
+			var url:String = ApplicationConstants.MODEL_FILE_UPLOAD_URL;
 			//workaround for firefox/chrome flahplayer bug
 			url +=";jsessionid=" + Application.sessionId;
 			
 			var request:URLRequest = new URLRequest(url);
 			//request paramters
 			request.method = URLRequestMethod.POST;
-			request.data = new URLVariables();
+			var parameters:URLVariables = new URLVariables();
+			parameters.sessionId = Application.sessionId;
+			parameters.surveyId = Application.activeSurvey.id;
+			parameters.recordId = Application.activeRecord.id;
+			parameters.nodeDefnId = attrDefn.id;
+			parameters.nodeId = _view.attribute.id;
+			request.data = parameters;
 			//request.data.path = internalXPath;
-			if(_view.attribute != null && ! _view.attribute.empty) {
-				var field:FieldProxy = _view.attribute.getField(0);
-				request.data.overwriteOldFile = true;
-				request.data.oldFileName = field.value;
-			} else {
-				request.data.overwriteOldFile = false;
-				request.data.oldFileName = null;
-			}
 			fileReference.upload(request);
+			*/
+			fileReference.load();
+		}
+		
+		protected function fileReferenceLoadComplete(event:Event):void {
+			var data:ByteArray = fileReference.data;
+			var originalFileName:String = fileReference.name;
+			var nodeId:Number = _view.attribute.id;
+			var responder:IResponder = new AsyncResponder(uploadCompleteResultHandler, faultHandler);
+			ClientFactory.modelFileClient.upload(responder, data, originalFileName, nodeId);
 		}
 		
 		protected function fileReferenceIoErrorHandler(event:IOErrorEvent):void {
 			_view.currentState = FileInputField.STATE_DEFAULT;
 			AlertUtil.showError("edit.file.error", [event.text]);
+		}
+		
+		protected function browseClickHandler(event:MouseEvent):void {
+			fileReference.browse([fileFilter]);
 		}
 		
 		protected function downloadClickHandler(event:MouseEvent):void {
@@ -150,11 +166,11 @@ package org.openforis.collect.presenter {
 		
 		protected function getDownloadUrlRequest():URLRequest {
 			if ( _view.attribute != null && ! _view.attribute.empty ) {
-				var id:Number = _view.attribute.id;
-				var request:URLRequest = new URLRequest(ApplicationConstants.FILEDOWNLOAD_URL);
+				var request:URLRequest = new URLRequest(ApplicationConstants.MODEL_FILE_DOWNLOAD_URL);
 				request.method = URLRequestMethod.POST;
-				request.data = new URLVariables();
-				request.data.id = id;
+				var parameters:URLVariables = new URLVariables();
+				parameters.nodeId = _view.attribute.id;
+				request.data = parameters;
 				//timestamp parameter to avoid caching
 				request.data._r = new Date().getTime();
 				return request;
@@ -172,7 +188,7 @@ package org.openforis.collect.presenter {
 			var httpService:HTTPService = new HTTPService();
 			httpService.addEventListener(ResultEvent.RESULT, deleteResultHandler);
 			httpService.addEventListener(FaultEvent.FAULT, faultHandler);
-			httpService.url = ApplicationConstants.FILEDELETE_URL;
+			httpService.url = ApplicationConstants.MODEL_FILE_DELETE_URL;
 			httpService.method = URLRequestMethod.POST;
 			var id:Number = _view.attribute.id;
 			var data:Object = {
@@ -183,6 +199,13 @@ package org.openforis.collect.presenter {
 		
 		protected function deleteResultHandler(event:ResultEvent):void {
 			_view.currentState = FileInputField.STATE_DEFAULT;
+		}
+		
+		protected function uploadCompleteResultHandler(event:ResultEvent, token:Object = null):void {
+			var fileName = event.result as String;
+			var fileAttribute:AttributeProxy = _view.attribute;
+			fileAttribute.getField(0).value = fileName;
+			_view.currentState = FileInputField.STATE_FILE_UPLOADED;
 		}
 		
 	}

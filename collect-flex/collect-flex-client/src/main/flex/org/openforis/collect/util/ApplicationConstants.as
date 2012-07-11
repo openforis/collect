@@ -16,20 +16,20 @@ package org.openforis.collect.util {
 		internal static const CONTEXT_NAME:String = "collect";
 
 		private static const DATA_IMPORT_UPLOAD_SERVLET_NAME:String = "uploadData.htm";
-		/*
-		private static const FILE_UPLOAD_SERVLET_NAME:String = "upload";
-		private static const FILE_DOWNLOAD_SERVLET_NAME:String = "download";
-		private static const FILE_DELETE_SERVLET_NAME:String = "deleteFile";
-		*/
+		
+		private static const MODEL_FILE_UPLOAD_SERVLET_NAME:String = "uploadModelFile.htm";
+		private static const MODEL_FILE_DOWNLOAD_SERVLET_NAME:String = "downloadModelFile.htm";
+		private static const MODEL_FILE_DELETE_SERVLET_NAME:String = "deleteModelFile.htm";
+		
 		private static const DOWNLOAD_EXPORTED_DATA_SERVLET_NAME:String = "downloadDataExport.htm";
 		private static const DOWNLOAD_BACKUP_SERVLET_NAME:String = "downloadBackup.htm";
 		
 		public static const DATE_TIME_PATTERN:String = "dd-MM-yyyy HH:mm";
 		
 		private static var _DATA_IMPORT_UPLOAD_URL:String; 
-		private static var _FILEUPLOAD_URL:String; 
-		private static var _FILEDOWNLOAD_URL:String; 
-		private static var _FILEDELETE_URL:String; 
+		private static var _MODEL_FILE_UPLOAD_URL:String; 
+		private static var _MODEL_FILE_DOWNLOAD_URL:String; 
+		private static var _MODEL_FILE_DELETE_URL:String; 
 		private static var _DOWNLOAD_EXPORTED_DATA_URL:String;
 		private static var _DOWNLOAD_BACKUP_DATA_URL:String;
 		
@@ -50,16 +50,16 @@ package org.openforis.collect.util {
 			return _DATA_IMPORT_UPLOAD_URL;
 		}
 		
-		public static function get FILEUPLOAD_URL():String {
-			return _FILEUPLOAD_URL;
+		public static function get MODEL_FILE_UPLOAD_URL():String {
+			return _MODEL_FILE_UPLOAD_URL;
 		}
 		
-		public static function get FILEDOWNLOAD_URL():String {
-			return _FILEDOWNLOAD_URL;
+		public static function get MODEL_FILE_DOWNLOAD_URL():String {
+			return _MODEL_FILE_DOWNLOAD_URL;
 		}
 		
-		public static function get FILEDELETE_URL():String {
-			return _FILEDELETE_URL;
+		public static function get MODEL_FILE_DELETE_URL():String {
+			return _MODEL_FILE_DELETE_URL;
 		}
 		
 		public static function get DOWNLOAD_EXPORTED_DATA_URL():String {
@@ -96,11 +96,11 @@ package org.openforis.collect.util {
 			_URL = applicationUrl;
 			
 			_DATA_IMPORT_UPLOAD_URL = _URL + DATA_IMPORT_UPLOAD_SERVLET_NAME;
-			/*
-			_FILEUPLOAD_URL = _URL + FILE_UPLOAD_SERVLET_NAME;
-			_FILEDOWNLOAD_URL = _URL + FILE_DOWNLOAD_SERVLET_NAME;
-			_FILEDELETE_URL = _URL + FILE_DELETE_SERVLET_NAME;
-			*/
+			
+			_MODEL_FILE_UPLOAD_URL = _URL + MODEL_FILE_UPLOAD_SERVLET_NAME;
+			_MODEL_FILE_DOWNLOAD_URL = _URL + MODEL_FILE_DOWNLOAD_SERVLET_NAME;
+			_MODEL_FILE_DELETE_URL = _URL + MODEL_FILE_DELETE_SERVLET_NAME;
+			
 			_DOWNLOAD_EXPORTED_DATA_URL = _URL + DOWNLOAD_EXPORTED_DATA_SERVLET_NAME;
 			_DOWNLOAD_BACKUP_DATA_URL = _URL + DOWNLOAD_BACKUP_SERVLET_NAME;
 		}
