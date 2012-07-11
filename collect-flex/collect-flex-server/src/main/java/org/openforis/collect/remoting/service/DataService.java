@@ -4,6 +4,7 @@
 package org.openforis.collect.remoting.service;
 
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -17,6 +18,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
+import org.openforis.collect.manager.ModelFileManager;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.RecordPromoteException;
 import org.openforis.collect.manager.SessionManager;
@@ -80,6 +82,9 @@ public class DataService {
 
 	@Autowired
 	private RecordManager recordManager;
+	
+	@Autowired
+	private ModelFileManager fileManager;
 
 	@Transactional
 	@Secured("ROLE_ENTRY")
@@ -151,20 +156,26 @@ public class DataService {
 	@Transactional
 	@Secured("ROLE_ENTRY")
 	public void deleteRecord(int id) throws RecordPersistenceException {
+		SessionState sessionState = sessionManager.getSessionState();
+		CollectRecord record = sessionState.getActiveRecord();
+		fileManager.deleteAllFiles(record);
 		recordManager.delete(id);
 		sessionManager.clearActiveRecord();
 	}
 	
 	@Transactional
 	@Secured("ROLE_ENTRY")
-	public void saveActiveRecord() throws RecordPersistenceException {
+	public void saveActiveRecord() throws RecordPersistenceException, IOException {
 		sessionManager.checkIsActiveRecordLocked();
 		SessionState sessionState = sessionManager.getSessionState();
 		CollectRecord record = sessionState.getActiveRecord();
 		User user = sessionState.getUser();
 		record.setModifiedDate(new Date());
 		record.setModifiedBy(user);
-		recordManager.save(record, sessionState.getSessionId());
+		String sessionId = sessionState.getSessionId();
+		recordManager.save(record, sessionId);
+		fileManager.completeFilesDeletion(record);
+		fileManager.moveTempFilesToRepository(sessionId, record);
 	}
 
 	@Transactional
@@ -627,6 +638,8 @@ public class DataService {
 		if ( activeRecord != null && activeRecord.getId() != null ) {
 			this.recordManager.releaseLock(activeRecord.getId());
 		}
+		String sessionId = sessionState.getSessionId();
+		fileManager.deleteAllTempFiles(sessionId, activeRecord);
 		this.sessionManager.clearActiveRecord();
 	}
 	

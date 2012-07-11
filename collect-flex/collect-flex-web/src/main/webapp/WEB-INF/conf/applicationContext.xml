@@ -68,7 +68,7 @@
 	<!-- ===================================== -->
 	<!-- GraniteDs services -->
 	<!-- ===================================== -->
-	<bean id="dataService" 		class="org.openforis.collect.remoting.service.DataService" autowire="byName" />
+	<bean id="dataService" 		class="org.openforis.collect.remoting.service.DataService" autowire="byName" scope="session" />
 	<bean id="dataExportService" class="org.openforis.collect.remoting.service.DataExportService" autowire="byName" init-method="init" scope="session" />
 	<bean id="dataImportService" class="org.openforis.collect.remoting.service.DataImportService" autowire="byName" init-method="init" scope="session" />
 	<bean id="logoService" 	class="org.openforis.collect.remoting.service.LogoService" autowire="byName" />
@@ -93,7 +93,7 @@
 	<bean id="configurationManager" class="org.openforis.collect.manager.ConfigurationManager" init-method="init" />
 	<bean id="databaseVersionManager" class="org.openforis.collect.manager.DatabaseVersionManager" />
 	<bean id="logoManager"			class="org.openforis.collect.manager.LogoManager" />
-	<bean id="modelFileManager"		class="org.openforis.collect.manager.ModelFileManager" init-method="init" />
+	<bean id="modelFileManager"		class="org.openforis.collect.manager.ModelFileManager" init-method="init" scope="session" />
 	<bean id="recordManager"		class="org.openforis.collect.manager.RecordManager" init-method="init">
 		<property name="lockTimeoutMillis" value="60000" />
 	</bean>

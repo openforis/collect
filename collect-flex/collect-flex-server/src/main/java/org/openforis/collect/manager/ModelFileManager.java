@@ -7,16 +7,24 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.UUID;
 
 import javax.servlet.ServletContext;
 
+import org.apache.commons.io.FileUtils;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.Configuration;
 import org.openforis.idm.metamodel.FileAttributeDefinition;
+import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Survey;
+import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.FileAttribute;
+import org.openforis.idm.model.Node;
+import org.openforis.idm.model.NodeVisitor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -101,10 +109,83 @@ public class ModelFileManager {
 		} catch (IOException e) {
 			throw new Exception(e);
 		}
-		
+	}
+	
+	public void moveTempFilesToRepository(String sessionId, CollectRecord record) throws IOException {
+		Set<Entry<FileKey, FileInfo>> entrySet = tempFiles.entrySet();
+		Iterator<Entry<FileKey, FileInfo>> iterator = entrySet.iterator();
+		Integer recordId = record.getId();
+		while (iterator.hasNext()) {
+			Entry<FileKey, FileInfo> entry = iterator.next();
+			FileInfo fileInfo = entry.getValue();
+			FileKey key = fileInfo.getKey();
+			CollectRecord fileRecord = key.getRecord();
+			if ( fileRecord.getId().equals(recordId) ) {
+				moveTempFileToRepository(sessionId, fileInfo);
+				iterator.remove();
+			}
+		}
+	}
+	
+	public void deleteAllTempFiles(String sessionId, CollectRecord record) {
+		Set<Entry<FileKey, FileInfo>> entrySet = tempFiles.entrySet();
+		Iterator<Entry<FileKey, FileInfo>> iterator = entrySet.iterator();
+		Integer recordId = record.getId();
+		while (iterator.hasNext()) {
+			Entry<FileKey, FileInfo> entry = iterator.next();
+			FileInfo fileInfo = entry.getValue();
+			FileKey key = fileInfo.getKey();
+			CollectRecord fileRecord = key.getRecord();
+			if ( fileRecord.getId().equals(recordId) ) {
+				File tempFile = getTempFile(sessionId, key);
+				tempFile.delete();
+				iterator.remove();
+			}
+		}
+	}
+	
+	public void deleteAllFiles(final CollectRecord record) {
+		Entity rootEntity = record.getRootEntity();
+		rootEntity.traverse(new NodeVisitor() {
+			
+			@Override
+			public void visit(Node<? extends NodeDefinition> node, int pos) {
+				if ( node instanceof FileAttribute ) {
+					File repositoryFile = getRepositoryFile(record, node.getId());
+					repositoryFile.delete();
+				}
+			}
+		});
+	}
+	
+	public void completeFilesDeletion(CollectRecord record) {
+		Set<Entry<FileKey, FileInfo>> entrySet = filesToDelete.entrySet();
+		Iterator<Entry<FileKey, FileInfo>> iterator = entrySet.iterator();
+		Integer recordId = record.getId();
+		while (iterator.hasNext()) {
+			Entry<FileKey, FileInfo> entry = iterator.next();
+			FileInfo fileInfo = entry.getValue();
+			FileKey key = fileInfo.getKey();
+			CollectRecord fileRecord = key.getRecord();
+			if ( fileRecord.getId().equals(recordId) ) {
+				File repositoryFile = getRepositoryFile(record, key.getNodeId());
+				repositoryFile.delete();
+				iterator.remove();
+			}
+		}
+	}
+	
+	private void moveTempFileToRepository(String sessionId, FileInfo fileInfo) throws IOException {
+		FileKey key = fileInfo.getKey();
+		int nodeId = key.getNodeId();
+		CollectRecord record = key.getRecord();
+		File tempFile = getTempFile(sessionId, key);
+		File repositoryFile = getRepositoryFile(record, nodeId);
+		FileUtils.copyFile(tempFile, repositoryFile, true);
+		tempFile.delete();
 	}
 
-	public File getFile(String sessionId, CollectRecord record, int nodeId) throws Exception {
+	public File getFile(String sessionId, CollectRecord record, int nodeId) {
 		File file;
 		FileKey fileKey = new FileKey(record, nodeId);
 		if ( tempFiles.containsKey(fileKey) ) {
@@ -115,24 +196,24 @@ public class ModelFileManager {
 		return file;
 	}
 
-	protected String generateUniqueFilename(String originalFileName) throws Exception {
+	protected String generateUniqueFilename(String originalFileName) {
 		String extension = getExtension(originalFileName);
 		String fileId = UUID.randomUUID().toString() + "." + extension;
 		return fileId;
 	}
 	
-	protected File getTempDestRootDirPerSession(String sessionId) throws Exception {
+	protected File getTempDestRootDirPerSession(String sessionId) {
 		File file = new File(tempRootDir, sessionId);
 		return file;
 	}
 
-	protected File getTempDestDir(String sessionId, FileKey key) throws Exception {
+	protected File getTempDestDir(String sessionId, FileKey key) {
 		File tempDestRootDirPerSession = getTempDestRootDirPerSession(sessionId);
 		File file = new File(tempDestRootDirPerSession, Integer.toString(key.getNodeId()));
 		return file;
 	}
 	
-	protected File getTempFile(String sessionId, FileKey key) throws Exception {
+	protected File getTempFile(String sessionId, FileKey key) {
 		File tempDestDir = getTempDestDir(sessionId, key);
 		File[] listFiles = tempDestDir.listFiles();
 		if ( listFiles != null && listFiles.length > 0 ) {
@@ -142,12 +223,12 @@ public class ModelFileManager {
 		}
 	}
 	
-	protected File getRepositoryDir(Integer surveyId, Integer nodeDefnId) throws Exception {
+	protected File getRepositoryDir(Integer surveyId, Integer nodeDefnId) {
 		File file = new File(respositoryRootDir, surveyId + File.separator + nodeDefnId);
 		return file;
 	}
 	
-	protected File getRepositoryFile(CollectRecord record, int nodeId) throws Exception {
+	protected File getRepositoryFile(CollectRecord record, int nodeId) {
 		Survey survey = record.getSurvey();
 		Integer surveyId = survey.getId();
 		FileAttribute fileAttribute = (FileAttribute) record.getNodeByInternalId(nodeId);
@@ -278,5 +359,5 @@ public class ModelFileManager {
 		}
 		
 	}
-	
+
 }
