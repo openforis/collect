@@ -1,4 +1,6 @@
 package org.openforis.collect.ui.component.input {
+	import flash.events.Event;
+	
 	import mx.binding.utils.BindingUtils;
 	import mx.controls.TextInput;
 	import mx.core.UIComponent;
@@ -108,6 +110,7 @@ package org.openforis.collect.ui.component.input {
 			}
 		}
 		
+		[Bindable(event="editablePropertyChange")]
 		public function get editable():Boolean {
 			return _editable;
 		}
@@ -119,6 +122,7 @@ package org.openforis.collect.ui.component.input {
 					textInput["editable"] = value;
 				}
 			}
+			dispatchEvent(new Event("editablePropertyChange")); 
 		}
 		
 		public function set hasRemarks(value:Boolean):void {
