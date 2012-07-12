@@ -18,7 +18,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
-import org.openforis.collect.manager.ModelFileManager;
+import org.openforis.collect.manager.RecordFileManager;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.RecordPromoteException;
 import org.openforis.collect.manager.SessionManager;
@@ -84,7 +84,7 @@ public class DataService {
 	private RecordManager recordManager;
 	
 	@Autowired
-	private ModelFileManager fileManager;
+	private RecordFileManager fileManager;
 
 	@Transactional
 	@Secured("ROLE_ENTRY")

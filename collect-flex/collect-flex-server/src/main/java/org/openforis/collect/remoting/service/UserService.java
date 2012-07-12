@@ -5,8 +5,9 @@ package org.openforis.collect.remoting.service;
 
 import java.util.List;
 
-import org.openforis.collect.manager.InvalidPassword;
+import org.openforis.collect.manager.CannotDeleteUserException;
 import org.openforis.collect.manager.UserManager;
+import org.openforis.collect.manager.UserPersistenceException;
 import org.openforis.collect.model.User;
 import org.openforis.collect.model.proxy.UserProxy;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,14 +39,14 @@ public class UserService {
 		return result;
 	}
 
-	public UserProxy save(UserProxy user) throws InvalidPassword {
+	public UserProxy save(UserProxy user) throws UserPersistenceException {
 		User u = user.toUser();
 		userManager.save(u);
 		UserProxy proxy = new UserProxy(u);
 		return proxy;
 	}
 
-	public void delete(int id) {
+	public void delete(int id) throws CannotDeleteUserException {
 		userManager.delete(id);
 	}
 

@@ -7,8 +7,7 @@
 		 width="100%" height="100%" xmlns:container="org.openforis.collect.ui.container.*" 
 		 >
 	<s:layout>
-		<s:VerticalLayout horizontalAlign="center"
-						  paddingBottom="5" paddingLeft="5" paddingRight="5" paddingTop="5" />
+		<s:HorizontalLayout paddingBottom="5" paddingLeft="5" paddingRight="5" paddingTop="5" />
 	</s:layout>
 	
 	<s:states>
@@ -44,8 +43,7 @@
 							property="text"/>
 		<mx:RegExpValidator id="fRepeatedPasswordV"
 							enabled="{passwordTextInput.text.length &gt; 0}"
-							required="true"
-							required.selected="false"
+							required="{passwordTextInput.text.length &gt; 0}"
 							expression="{passwordTextInput.text}"
 							noMatchError="{Message.get('usersManagement.error.repeatPassword')}"
 							source="{repeatPasswordTextInput}" 
@@ -56,7 +54,7 @@
 	<component:LoadingContent height="100%" width="100%" 
 							  includeIn="loading" />
 	
-	<s:DataGrid id="dataGrid" height="200"
+	<s:DataGrid id="dataGrid" height="100%"
 				includeIn="default, new, selected"
 				itemCreationPolicy="immediate"
 				>
@@ -64,11 +62,11 @@
 			<s:ArrayList>
 				<s:GridColumn headerText="{Message.get('usersManagement.name')}"
 							  dataField="name"
-							  width="200"
+							  width="150"
 							  />
 				<s:GridColumn headerText="{Message.get('usersManagement.roles')}"
 							  dataField="roles"
-							  width="250"
+							  width="150"
 							  />
 				<s:GridColumn headerText="{Message.get('usersManagement.enabled')}"
 							  dataField="enabled"
@@ -79,63 +77,65 @@
 		</s:columns>
 	</s:DataGrid>
 	
-	<s:Button id="newUserButton" 
-			  excludeFrom="loading"
-			  itemCreationPolicy="immediate"
-			  label="{Message.get('usersManagement.addNewUser')}"
-			  useHandCursor="true" buttonMode="true" />
-	
-	<s:VGroup includeIn="new, selected"
-			  itemCreationPolicy="immediate"
-			  horizontalAlign="center"
-			  gap="6"
-			  >
+	<s:VGroup horizontalAlign="center" width="100%" excludeFrom="loading">
+		<s:Button id="newUserButton" 
+				  excludeFrom="loading"
+				  itemCreationPolicy="immediate"
+				  label="{Message.get('usersManagement.addNewUser')}"
+				  useHandCursor="true" buttonMode="true" />
 		
-		<container:FieldSet id="userDetailsBox" 
-							legend="{Message.get('usersManagement.userDetails')}" 
-							legend.new="{Message.get('usersManagement.newUserDetails')}" 
-							creationPolicy="all">
-			<container:layout>
-				<s:VerticalLayout horizontalAlign="center" paddingBottom="10" />
-			</container:layout>
-			<mx:Form id="detailForm">
-				<mx:FormItem label="{Message.get('usersManagement.enabled')}">
-					<mx:CheckBox id="enabledCheckBox" />
-				</mx:FormItem>
-				<mx:FormItem label="{Message.get('usersManagement.name')}">
-					<input:TextInput id="nameTextInput" restrictPattern="^\w*$" upperCase="false" />
-				</mx:FormItem>
-				<mx:FormItem label="{Message.get('usersManagement.password')}"
-							 label.selected="{Message.get('usersManagement.changePassword')}">
-					<mx:TextInput id="passwordTextInput" displayAsPassword="true" />
-				</mx:FormItem>
-				<mx:FormItem label="{Message.get('usersManagement.repeatPassword')}">
-					<mx:TextInput id="repeatPasswordTextInput" displayAsPassword="true" />
-				</mx:FormItem>
-				<mx:FormItem label="{Message.get('usersManagement.roles')}">
-					<mx:CheckBox id="roleEntryCheckBox"
-								label="{Message.get('roles.entry')}" />
-					<mx:CheckBox id="roleCleansingCheckBox" 
-								label="{Message.get('roles.cleansing')}" />
-					<mx:CheckBox id="roleAnalysisCheckBox"
-								label="{Message.get('roles.analysis')}" />
-					<mx:CheckBox id="roleAdminCheckBox"
-								label="{Message.get('roles.admin')}" />
-				</mx:FormItem>
-			</mx:Form>
-			<s:HGroup gap="30">
-				<s:Button id="saveButton" 
-						  label="{Message.get('global.save')}"
-						  useHandCursor="true" buttonMode="true"
-						  />
-				<s:Button id="deleteButton"
-						  includeIn="selected" 
-						  itemCreationPolicy="immediate"
-						  label="{Message.get('global.delete')}"
-						  useHandCursor="true" buttonMode="true"
-						  />
-			</s:HGroup>
-		</container:FieldSet>
+		<s:VGroup includeIn="new, selected"
+				  itemCreationPolicy="immediate"
+				  horizontalAlign="center"
+				  gap="6"
+				  >
+			
+			<container:FieldSet id="userDetailsBox" 
+								legend="{Message.get('usersManagement.userDetails')}" 
+								legend.new="{Message.get('usersManagement.newUserDetails')}" 
+								creationPolicy="all">
+				<container:layout>
+					<s:VerticalLayout horizontalAlign="center" paddingBottom="10" />
+				</container:layout>
+				<mx:Form id="detailForm">
+					<mx:FormItem label="{Message.get('usersManagement.enabled')}">
+						<mx:CheckBox id="enabledCheckBox" />
+					</mx:FormItem>
+					<mx:FormItem label="{Message.get('usersManagement.name')}">
+						<input:TextInput id="nameTextInput" restrictPattern="^\w*$" upperCase="false" />
+					</mx:FormItem>
+					<mx:FormItem label="{Message.get('usersManagement.password')}"
+								 label.selected="{Message.get('usersManagement.changePassword')}">
+						<mx:TextInput id="passwordTextInput" displayAsPassword="true" />
+					</mx:FormItem>
+					<mx:FormItem label="{Message.get('usersManagement.repeatPassword')}">
+						<mx:TextInput id="repeatPasswordTextInput" displayAsPassword="true" />
+					</mx:FormItem>
+					<mx:FormItem label="{Message.get('usersManagement.roles')}">
+						<mx:CheckBox id="roleEntryCheckBox"
+									label="{Message.get('roles.entry')}" />
+						<mx:CheckBox id="roleCleansingCheckBox" 
+									label="{Message.get('roles.cleansing')}" />
+						<mx:CheckBox id="roleAnalysisCheckBox"
+									label="{Message.get('roles.analysis')}" />
+						<mx:CheckBox id="roleAdminCheckBox"
+									label="{Message.get('roles.admin')}" />
+					</mx:FormItem>
+				</mx:Form>
+				<s:HGroup gap="30">
+					<s:Button id="saveButton" 
+							  label="{Message.get('global.save')}"
+							  useHandCursor="true" buttonMode="true"
+							  />
+					<s:Button id="deleteButton"
+							  includeIn="selected" 
+							  itemCreationPolicy="immediate"
+							  label="{Message.get('global.delete')}"
+							  useHandCursor="true" buttonMode="true"
+							  />
+				</s:HGroup>
+			</container:FieldSet>
+		</s:VGroup>
 	</s:VGroup>
 	
 </s:BorderContainer>

@@ -145,7 +145,7 @@ package org.openforis.collect.presenter {
 			var originalFileName:String = fileReference.name;
 			var nodeId:Number = _view.attribute.id;
 			var responder:IResponder = new AsyncResponder(uploadCompleteResultHandler, faultHandler);
-			ClientFactory.modelFileClient.upload(responder, data, originalFileName, nodeId);
+			ClientFactory.recorFileClient.upload(responder, data, originalFileName, nodeId);
 		}
 		
 		protected function fileReferenceIoErrorHandler(event:IOErrorEvent):void {
@@ -166,7 +166,7 @@ package org.openforis.collect.presenter {
 		
 		protected function getDownloadUrlRequest():URLRequest {
 			if ( _view.attribute != null && ! _view.attribute.empty ) {
-				var request:URLRequest = new URLRequest(ApplicationConstants.MODEL_FILE_DOWNLOAD_URL);
+				var request:URLRequest = new URLRequest(ApplicationConstants.RECORD_FILE_DOWNLOAD_URL);
 				request.method = URLRequestMethod.POST;
 				var parameters:URLVariables = new URLVariables();
 				parameters.nodeId = _view.attribute.id;
@@ -188,7 +188,7 @@ package org.openforis.collect.presenter {
 			var httpService:HTTPService = new HTTPService();
 			httpService.addEventListener(ResultEvent.RESULT, deleteResultHandler);
 			httpService.addEventListener(FaultEvent.FAULT, faultHandler);
-			httpService.url = ApplicationConstants.MODEL_FILE_DELETE_URL;
+			httpService.url = ApplicationConstants.RECORD_FILE_DELETE_URL;
 			httpService.method = URLRequestMethod.POST;
 			var id:Number = _view.attribute.id;
 			var data:Object = {

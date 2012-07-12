@@ -4,12 +4,12 @@ package org.openforis.collect.presenter {
 	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
 	import mx.collections.ListCollectionView;
-	import mx.controls.Alert;
 	import mx.controls.CheckBox;
 	import mx.events.FlexEvent;
 	import mx.events.ValidationResultEvent;
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.IResponder;
+	import mx.rpc.events.FaultEvent;
 	import mx.rpc.events.ResultEvent;
 	import mx.validators.Validator;
 	
@@ -308,8 +308,22 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function performDelete(id:int):void {
-			var responder:IResponder = new AsyncResponder(deleteUserResultHandler, faultHandler);
+			var responder:IResponder = new AsyncResponder(deleteUserResultHandler, deleteFaultHandler);
 			_userClient.deleteUser(responder, id);
+		}
+		
+		protected function deleteFaultHandler(event:FaultEvent, token:Object = null):void {
+			var faultCode:String = event.fault.faultCode;
+			switch(faultCode) {
+				case "org.openforis.collect.manager.CannotDeleteUserException":
+					AlertUtil.showMessage("usersMaangement.error.cannotDelete");
+					break;
+				case "org.openforis.collect.manager.InvalidUserPasswordException":
+					AlertUtil.showMessage("usersMaangement.error.invalidPassword");
+					break;
+				default:
+					faultHandler(event, token);
+			}
 		}
 		
 		protected function saveUserResultHandler(event:ResultEvent, token:Object = null):void {

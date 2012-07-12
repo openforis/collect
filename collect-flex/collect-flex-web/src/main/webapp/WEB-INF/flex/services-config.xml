@@ -59,10 +59,10 @@
 		        </properties>
 			</destination>
 			
-			<destination id="modelFileService">
+			<destination id="recordFileService">
 		        <properties>
 		        	<factory>springFactory</factory>
-		            <source>modelFileService</source>
+		            <source>recordFileService</source>
 		            <scope>application</scope>
 		        </properties>
 			</destination>

@@ -7,7 +7,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openforis.collect.manager.ModelFileManager;
+import org.openforis.collect.manager.RecordFileManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.web.session.SessionState;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,14 +22,14 @@ import org.springframework.web.multipart.MultipartFile;
  * @author S. Ricci
  *
  */
-public class ModelFileController extends BasicController {
+public class RecordFileController extends BasicController {
 	
-	private static Log LOG = LogFactory.getLog(ModelFileController.class);
+	private static Log LOG = LogFactory.getLog(RecordFileController.class);
 	
 	@Autowired
-	private ModelFileManager fileManager;
+	private RecordFileManager fileManager;
 	
-	@RequestMapping(value = "/uploadModelFile.htm", method = RequestMethod.POST)
+	@RequestMapping(value = "/uploadRecordFile.htm", method = RequestMethod.POST)
 	public @ResponseBody String upload(@RequestParam("Filedata") MultipartFile file, HttpServletRequest request, 
 			@RequestParam("sessionId") String sessionId, @RequestParam("surveyId") Integer surveyId, @RequestParam("recordId") Integer recordId,
 			@RequestParam("nodeId") Integer nodeId) throws Exception {
@@ -37,7 +37,7 @@ public class ModelFileController extends BasicController {
 		return null;
 	}
 	
-	@RequestMapping(value = "/downloadModelFile.htm", method = RequestMethod.POST)
+	@RequestMapping(value = "/downloadRecordFile.htm", method = RequestMethod.POST)
 	public void download(HttpServletRequest request, HttpServletResponse response, @RequestParam("nodeId") Integer nodeId) throws Exception {
 		SessionState sessionState = getSessionState(request);
 		String sessionId = sessionState.getSessionId();

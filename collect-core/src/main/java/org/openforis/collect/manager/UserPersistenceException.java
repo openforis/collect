@@ -7,7 +7,7 @@ package org.openforis.collect.manager;
  * @author S. Ricci
  *
  */
-public class InvalidPassword extends Exception {
+public class UserPersistenceException extends Exception {
 
 	/**
 	 * 
@@ -17,21 +17,20 @@ public class InvalidPassword extends Exception {
 	/**
 	 * 
 	 */
-	public InvalidPassword() {
-		super("Invalid user password specified");
+	public UserPersistenceException() {
 	}
 
 	/**
 	 * @param message
 	 */
-	public InvalidPassword(String message) {
+	public UserPersistenceException(String message) {
 		super(message);
 	}
 
 	/**
 	 * @param cause
 	 */
-	public InvalidPassword(Throwable cause) {
+	public UserPersistenceException(Throwable cause) {
 		super(cause);
 	}
 
@@ -39,7 +38,7 @@ public class InvalidPassword extends Exception {
 	 * @param message
 	 * @param cause
 	 */
-	public InvalidPassword(String message, Throwable cause) {
+	public UserPersistenceException(String message, Throwable cause) {
 		super(message, cause);
 	}
 

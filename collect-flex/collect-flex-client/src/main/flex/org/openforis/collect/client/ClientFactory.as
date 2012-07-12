@@ -13,7 +13,7 @@ package org.openforis.collect.client {
 		private static var _dataImportClient:DataImportClient;
 		private static var _logoClient:LogoClient;
 		private static var _modelClient:ModelClient;
-		private static var _modelFileClient:ModelFileClient;
+		private static var _recordFileClient:RecordFileClient;
 		private static var _sessionClient:SessionClient;
 		private static var _speciesClient:SpeciesClient;
 		private static var _userClient:UserClient;
@@ -49,11 +49,11 @@ package org.openforis.collect.client {
 			return _modelClient;
 		}
 		
-		public static function get modelFileClient():ModelFileClient {
-			if(_modelFileClient == null){
-				_modelFileClient = new ModelFileClient();
+		public static function get recorFileClient():RecordFileClient {
+			if(_recordFileClient == null){
+				_recordFileClient = new RecordFileClient();
 			}
-			return _modelFileClient;
+			return _recordFileClient;
 		}
 		
 		public static function get logoClient():LogoClient {

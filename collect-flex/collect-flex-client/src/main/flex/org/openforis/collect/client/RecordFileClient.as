@@ -11,12 +11,12 @@ package org.openforis.collect.client {
 	 * 
 	 * @author S. Ricci
 	 * */
-	public class ModelFileClient extends AbstractClient {
+	public class RecordFileClient extends AbstractClient {
 		
 		private var _uploadOperation:Operation;
 		
-		public function ModelFileClient() {
-			super("modelFileService");
+		public function RecordFileClient() {
+			super("recordFileService");
 			
 			this._uploadOperation = getOperation("upload");
 		}

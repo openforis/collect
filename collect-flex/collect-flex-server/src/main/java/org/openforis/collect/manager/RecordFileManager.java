@@ -33,7 +33,7 @@ import org.springframework.web.multipart.MultipartFile;
  * @author S. Ricci
  *
  */
-public class ModelFileManager {
+public class RecordFileManager {
 	
 	private static final String TEMP_PATH = "tempModelFileUpload";
 
@@ -52,8 +52,8 @@ public class ModelFileManager {
 	protected File respositoryRootDir;
 	
 	protected void init() {
-		tempFiles = new HashMap<FileKey, ModelFileManager.FileInfo>();
-		filesToDelete = new HashMap<FileKey, ModelFileManager.FileInfo>();
+		tempFiles = new HashMap<FileKey, RecordFileManager.FileInfo>();
+		filesToDelete = new HashMap<FileKey, RecordFileManager.FileInfo>();
 		
 		String tempRealPath = servletContext.getRealPath(TEMP_PATH);
 		tempRootDir = new File(tempRealPath);
@@ -354,8 +354,8 @@ public class ModelFileManager {
 			return true;
 		}
 
-		private ModelFileManager getOuterType() {
-			return ModelFileManager.this;
+		private RecordFileManager getOuterType() {
+			return RecordFileManager.this;
 		}
 		
 	}

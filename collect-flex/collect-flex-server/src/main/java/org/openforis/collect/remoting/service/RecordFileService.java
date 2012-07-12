@@ -1,6 +1,6 @@
 package org.openforis.collect.remoting.service;
 
-import org.openforis.collect.manager.ModelFileManager;
+import org.openforis.collect.manager.RecordFileManager;
 import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.web.session.SessionState;
@@ -11,10 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author S. Ricci
  *
  */
-public class ModelFileService {
+public class RecordFileService {
 
 	@Autowired
-	private ModelFileManager fileManager;
+	private RecordFileManager fileManager;
 	
 	@Autowired
 	private SessionManager sessionManager;

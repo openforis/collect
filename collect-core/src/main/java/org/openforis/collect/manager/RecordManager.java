@@ -149,8 +149,13 @@ public class RecordManager {
 	public int getRecordCount(CollectSurvey survey, String rootEntity, String... keyValues) {
 		Schema schema = survey.getSchema();
 		EntityDefinition rootEntityDefinition = schema.getRootEntityDefinition(rootEntity);
-		int count = recordDao.countRecords(rootEntityDefinition.getId(), keyValues);
+		int count = recordDao.countRecords(survey.getId(), rootEntityDefinition.getId(), keyValues);
 		return count;
+	}
+	
+	@Transactional
+	public boolean hasAssociatedRecords(int userId) {
+		return recordDao.hasAssociatedRecords(userId);
 	}
 
 	@Transactional

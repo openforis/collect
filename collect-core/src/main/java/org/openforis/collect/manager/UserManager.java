@@ -11,6 +11,7 @@ import java.util.regex.Pattern;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.model.User;
+import org.openforis.collect.persistence.RecordDao;
 import org.openforis.collect.persistence.UserDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +26,10 @@ public class UserManager {
 
 	@Autowired
 	private UserDao userDao;
+	
+	@Autowired
+	private RecordDao recordDao;
+	
 
 	@Transactional
 	public int getUserId(String username) {
@@ -50,7 +55,7 @@ public class UserManager {
 	}
 
 	@Transactional
-	public void save(User user) throws InvalidPassword {
+	public void save(User user) throws UserPersistenceException {
 		Integer userId = user.getId();
 		String password = user.getPassword();
 		if (StringUtils.isBlank(password)) {
@@ -70,7 +75,7 @@ public class UserManager {
 		}
 	}
 
-	protected String encodePassword(String password) throws InvalidPassword {
+	protected String encodePassword(String password) throws UserPersistenceException {
 		boolean matchesPattern = Pattern.matches(PASSWORD_PATTERN, password);
 		if (matchesPattern) {
 			MessageDigest messageDigest;
@@ -81,10 +86,10 @@ public class UserManager {
 				char[] resultChar = Hex.encodeHex(digest);
 				return new String(resultChar);
 			} catch (NoSuchAlgorithmException e) {
-				throw new RuntimeException("Error encoding user password");
+				throw new UserPersistenceException("Error encoding user password");
 			}
 		} else {
-			throw new InvalidPassword();
+			throw new InvalidUserPasswordException();
 		}
 	}
 
@@ -94,7 +99,10 @@ public class UserManager {
 	}
 
 	@Transactional
-	public void delete(int id) {
+	public void delete(int id) throws CannotDeleteUserException {
+		if ( recordDao.hasAssociatedRecords(id) ) {
+			throw new CannotDeleteUserException();
+		}
 		userDao.delete(id);
 	}
 }

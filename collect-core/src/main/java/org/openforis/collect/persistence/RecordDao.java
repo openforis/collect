@@ -88,13 +88,25 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 	}
 
 	@Transactional
-	public int countRecords(int rootDefinitionId, String... keyValues) {
+	public int countRecords(int surveyId, int rootDefinitionId, String... keyValues) {
 		JooqFactory f = getMappingJooqFactory();
 		SelectQuery q = f.selectCountQuery();
-		q.addConditions(OFC_RECORD.ROOT_ENTITY_DEFINITION_ID.equal(rootDefinitionId));
+		q.addConditions(OFC_RECORD.SURVEY_ID.equal(surveyId)
+				.and(OFC_RECORD.ROOT_ENTITY_DEFINITION_ID.equal(rootDefinitionId)));
 		addFilterByKeyConditions(q, keyValues);
 		Record r = q.fetchOne();
 		return r.getValueAsInteger(0);
+	}
+	
+	@Transactional
+	public boolean hasAssociatedRecords(int userId) {
+		JooqFactory f = getMappingJooqFactory();
+		SelectQuery q = f.selectCountQuery();
+		q.addConditions(OFC_RECORD.CREATED_BY_ID.equal(userId)
+				.or(OFC_RECORD.MODIFIED_BY_ID.equal(userId)));
+		Record r = q.fetchOne();
+		Integer count = r.getValueAsInteger(0);
+		return count > 0;
 	}
 
 	@Transactional
