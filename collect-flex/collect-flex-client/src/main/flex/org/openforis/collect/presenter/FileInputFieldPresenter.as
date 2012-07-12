@@ -25,6 +25,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.metamodel.proxy.FileAttributeDefinitionProxy;
 	import org.openforis.collect.model.proxy.AttributeProxy;
 	import org.openforis.collect.model.proxy.FieldProxy;
+	import org.openforis.collect.model.proxy.FileProxy;
 	import org.openforis.collect.ui.component.input.FileInputField;
 	import org.openforis.collect.util.AlertUtil;
 	import org.openforis.collect.util.ApplicationConstants;
@@ -211,9 +212,10 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function uploadCompleteResultHandler(event:ResultEvent, token:Object = null):void {
-			var fileName:String = event.result as String;
+			var file:FileProxy = event.result as FileProxy;
 			var fileAttribute:AttributeProxy = _view.attribute;
-			fileAttribute.getField(0).value = fileName;
+			fileAttribute.getField(0).value = file.filename;
+			fileAttribute.getField(1).value = file.size;
 			_view.currentState = FileInputField.STATE_FILE_UPLOADED;
 			updateView();
 		}

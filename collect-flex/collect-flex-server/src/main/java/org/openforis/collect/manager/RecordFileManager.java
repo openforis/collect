@@ -38,7 +38,7 @@ import org.springframework.web.multipart.MultipartFile;
  */
 public class RecordFileManager {
 	
-	private static final String TEMP_PATH = "tempModelFileUpload";
+	private static final String TEMP_PATH = "temp" + File.separator + "recordFiles";
 
 	private static final String UPLOAD_PATH_CONFIGURATION_KEY = "upload_path";
 	
@@ -58,6 +58,11 @@ public class RecordFileManager {
 		tempFiles = new HashMap<Integer, String>();
 		filesToDelete = new HashMap<Integer, String>();
 		
+		initTempDir();
+		initRepositoryDir();
+	}
+
+	protected void initTempDir() {
 		String tempRealPath = servletContext.getRealPath(TEMP_PATH);
 		tempRootDir = new File(tempRealPath);
 		if ( ! tempRootDir.exists() ) {
@@ -66,6 +71,9 @@ public class RecordFileManager {
 		if ( ! tempRootDir.canRead() ) {
 			throw new IllegalStateException("Cannot access temp directory: " + tempRealPath);
 		}
+	}
+	
+	protected void initRepositoryDir() {
 		Configuration configuration = configurationManager.getConfiguration();
 		String repositoryRootPath = configuration.get(UPLOAD_PATH_CONFIGURATION_KEY);
 		respositoryRootDir = new File(repositoryRootPath);
@@ -76,7 +84,7 @@ public class RecordFileManager {
 			throw new IllegalStateException("Cannot access repository directory: " + repositoryRootPath);
 		}
 	}
-	
+
 	public String saveToTempFolder(byte[] data, String originalFileName, String sessionId, CollectRecord record, int nodeId) throws Exception {
 		String fileId = saveToTempFolder(new ByteArrayInputStream(data), originalFileName, sessionId, record, nodeId);
 		return fileId;
