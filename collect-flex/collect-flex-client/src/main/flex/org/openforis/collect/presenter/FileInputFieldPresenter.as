@@ -179,7 +179,6 @@ package org.openforis.collect.presenter {
 			}
 		}
 		
-		
 		protected function removeClickHandler(event:MouseEvent):void {
 			AlertUtil.showConfirm("edit.file.removeConfirm", null, "global.confirmTitle", performDelete);
 		}

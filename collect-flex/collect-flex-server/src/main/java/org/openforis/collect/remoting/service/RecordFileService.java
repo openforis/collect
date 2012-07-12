@@ -4,6 +4,7 @@ import org.openforis.collect.manager.RecordFileManager;
 import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.web.session.SessionState;
+import org.openforis.idm.model.FileAttribute;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -19,13 +20,14 @@ public class RecordFileService {
 	@Autowired
 	private SessionManager sessionManager;
 	
-	
 	public String upload(byte[] data, String originalFileName, int nodeId) throws Exception {
 		SessionState sessionState = sessionManager.getSessionState();
 		String sessionId = sessionState.getSessionId();
 		CollectRecord record = sessionState.getActiveRecord();
-		String fileId = fileManager.saveToTempFolder(data, originalFileName, sessionId, record, nodeId);
-		return fileId;
+		String fileName = fileManager.saveToTempFolder(data, originalFileName, sessionId, record, nodeId);
+		FileAttribute fileAttr = (FileAttribute) record.getNodeByInternalId(nodeId);
+		fileAttr.setFilename(fileName);
+		return fileName;
 	}
 	
 }

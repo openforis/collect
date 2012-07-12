@@ -31,6 +31,8 @@ import org.springframework.web.multipart.MultipartFile;
 /**
  * 
  * @author S. Ricci
+ * 
+ * It needs to be associated to a user session
  *
  */
 public class RecordFileManager {
@@ -45,15 +47,15 @@ public class RecordFileManager {
 	@Autowired 
 	private ServletContext servletContext;
 	
-	private Map<FileKey, FileInfo> tempFiles;
-	private Map<FileKey, FileInfo> filesToDelete;
+	private Map<Integer, String> tempFiles;
+	private Map<Integer, String> filesToDelete;
 
 	protected File tempRootDir;
 	protected File respositoryRootDir;
 	
 	protected void init() {
-		tempFiles = new HashMap<FileKey, RecordFileManager.FileInfo>();
-		filesToDelete = new HashMap<FileKey, RecordFileManager.FileInfo>();
+		tempFiles = new HashMap<Integer, String>();
+		filesToDelete = new HashMap<Integer, String>();
 		
 		String tempRealPath = servletContext.getRealPath(TEMP_PATH);
 		tempRootDir = new File(tempRealPath);
@@ -90,15 +92,13 @@ public class RecordFileManager {
 	
 	public String saveToTempFolder(InputStream is, String originalFileName, String sessionId, CollectRecord record, int nodeId) throws Exception {
 		try {
-			FileKey fileKey = new FileKey(record, nodeId);
-			File tempDestinationFolder = getTempDestDir(sessionId, fileKey);
+			File tempDestinationFolder = getTempDestDir(sessionId, nodeId);
 			if (tempDestinationFolder.exists() || tempDestinationFolder.mkdirs()) {
 				String fileId = generateUniqueFilename(originalFileName);
 				File tempDestinationFile = new File(tempDestinationFolder, fileId);
 				if (!tempDestinationFile.exists() && tempDestinationFile.createNewFile()) {
 					writeToFile(is, tempDestinationFile);
-					FileInfo fileInfo = new FileInfo(fileKey, fileId);
-					tempFiles.put(fileKey, fileInfo);
+					tempFiles.put(nodeId, fileId);
 					return fileId;
 				} else {
 					throw new Exception("Cannot write file");
@@ -112,35 +112,25 @@ public class RecordFileManager {
 	}
 	
 	public void moveTempFilesToRepository(String sessionId, CollectRecord record) throws IOException {
-		Set<Entry<FileKey, FileInfo>> entrySet = tempFiles.entrySet();
-		Iterator<Entry<FileKey, FileInfo>> iterator = entrySet.iterator();
-		Integer recordId = record.getId();
+		Set<Entry<Integer,String>> entrySet = tempFiles.entrySet();
+		Iterator<Entry<Integer, String>> iterator = entrySet.iterator();
 		while (iterator.hasNext()) {
-			Entry<FileKey, FileInfo> entry = iterator.next();
-			FileInfo fileInfo = entry.getValue();
-			FileKey key = fileInfo.getKey();
-			CollectRecord fileRecord = key.getRecord();
-			if ( fileRecord.getId().equals(recordId) ) {
-				moveTempFileToRepository(sessionId, fileInfo);
-				iterator.remove();
-			}
+			Entry<Integer, String> entry = iterator.next();
+			int nodeId = entry.getKey();
+			moveTempFileToRepository(sessionId, record, nodeId);
+			iterator.remove();
 		}
 	}
 	
 	public void deleteAllTempFiles(String sessionId, CollectRecord record) {
-		Set<Entry<FileKey, FileInfo>> entrySet = tempFiles.entrySet();
-		Iterator<Entry<FileKey, FileInfo>> iterator = entrySet.iterator();
-		Integer recordId = record.getId();
+		Set<Entry<Integer,String>> entrySet = tempFiles.entrySet();
+		Iterator<Entry<Integer, String>> iterator = entrySet.iterator();
 		while (iterator.hasNext()) {
-			Entry<FileKey, FileInfo> entry = iterator.next();
-			FileInfo fileInfo = entry.getValue();
-			FileKey key = fileInfo.getKey();
-			CollectRecord fileRecord = key.getRecord();
-			if ( fileRecord.getId().equals(recordId) ) {
-				File tempFile = getTempFile(sessionId, key);
-				tempFile.delete();
-				iterator.remove();
-			}
+			Entry<Integer, String> entry = iterator.next();
+			int nodeId = entry.getKey();
+			File tempFile = getTempFile(sessionId, nodeId);
+			tempFile.delete();
+			iterator.remove();
 		}
 	}
 	
@@ -159,27 +149,19 @@ public class RecordFileManager {
 	}
 	
 	public void completeFilesDeletion(CollectRecord record) {
-		Set<Entry<FileKey, FileInfo>> entrySet = filesToDelete.entrySet();
-		Iterator<Entry<FileKey, FileInfo>> iterator = entrySet.iterator();
-		Integer recordId = record.getId();
+		Set<Entry<Integer,String>> entrySet = filesToDelete.entrySet();
+		Iterator<Entry<Integer, String>> iterator = entrySet.iterator();
 		while (iterator.hasNext()) {
-			Entry<FileKey, FileInfo> entry = iterator.next();
-			FileInfo fileInfo = entry.getValue();
-			FileKey key = fileInfo.getKey();
-			CollectRecord fileRecord = key.getRecord();
-			if ( fileRecord.getId().equals(recordId) ) {
-				File repositoryFile = getRepositoryFile(record, key.getNodeId());
-				repositoryFile.delete();
-				iterator.remove();
-			}
+			Entry<Integer, String> entry = iterator.next();
+			int nodeId = entry.getKey();
+			File repositoryFile = getRepositoryFile(record, nodeId);
+			repositoryFile.delete();
+			iterator.remove();
 		}
 	}
 	
-	private void moveTempFileToRepository(String sessionId, FileInfo fileInfo) throws IOException {
-		FileKey key = fileInfo.getKey();
-		int nodeId = key.getNodeId();
-		CollectRecord record = key.getRecord();
-		File tempFile = getTempFile(sessionId, key);
+	private void moveTempFileToRepository(String sessionId, CollectRecord record, int nodeId) throws IOException {
+		File tempFile = getTempFile(sessionId, nodeId);
 		File repositoryFile = getRepositoryFile(record, nodeId);
 		FileUtils.copyFile(tempFile, repositoryFile, true);
 		tempFile.delete();
@@ -187,9 +169,8 @@ public class RecordFileManager {
 
 	public File getFile(String sessionId, CollectRecord record, int nodeId) {
 		File file;
-		FileKey fileKey = new FileKey(record, nodeId);
-		if ( tempFiles.containsKey(fileKey) ) {
-			file = getTempFile(sessionId, fileKey);
+		if ( tempFiles.containsKey(nodeId) ) {
+			file = getTempFile(sessionId, nodeId);
 		} else {
 			file = getRepositoryFile(record, nodeId);
 		}
@@ -207,14 +188,14 @@ public class RecordFileManager {
 		return file;
 	}
 
-	protected File getTempDestDir(String sessionId, FileKey key) {
+	protected File getTempDestDir(String sessionId, int nodeId) {
 		File tempDestRootDirPerSession = getTempDestRootDirPerSession(sessionId);
-		File file = new File(tempDestRootDirPerSession, Integer.toString(key.getNodeId()));
+		File file = new File(tempDestRootDirPerSession, Integer.toString(nodeId));
 		return file;
 	}
 	
-	protected File getTempFile(String sessionId, FileKey key) {
-		File tempDestDir = getTempDestDir(sessionId, key);
+	protected File getTempFile(String sessionId, int nodeId) {
+		File tempDestDir = getTempDestDir(sessionId, nodeId);
 		File[] listFiles = tempDestDir.listFiles();
 		if ( listFiles != null && listFiles.length > 0 ) {
 			return listFiles[0];
@@ -268,96 +249,4 @@ public class RecordFileManager {
 		}  
 	}
 	
-	public class FileInfo {
-		
-		private FileKey key;
-		private String fileName;
-
-		public FileInfo(FileKey key, String fileName) {
-			super();
-			this.key = key;
-			this.fileName = fileName;
-		}
-		
-		public FileKey getKey() {
-			return key;
-		}
-
-		public void setKey(FileKey key) {
-			this.key = key;
-		}
-
-		public String getFileName() {
-			return fileName;
-		}
-
-		public void setFileName(String fileName) {
-			this.fileName = fileName;
-		}
-	}
-	
-	public class FileKey {
-		
-		private CollectRecord record;
-		private int nodeId;
-		
-		public FileKey(CollectRecord record, int nodeId) {
-			super();
-			this.record = record;
-			this.nodeId = nodeId;
-		}
-
-		public CollectRecord getRecord() {
-			return record;
-		}
-
-		public void setRecord(CollectRecord record) {
-			this.record = record;
-		}
-
-		public int getNodeId() {
-			return nodeId;
-		}
-
-		public void setNodeId(int nodeId) {
-			this.nodeId = nodeId;
-		}
-
-		@Override
-		public int hashCode() {
-			final int prime = 31;
-			int result = 1;
-			result = prime * result + getOuterType().hashCode();
-			result = prime * result + nodeId;
-			result = prime * result + ((record == null) ? 0 : record.hashCode());
-			return result;
-		}
-
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj)
-				return true;
-			if (obj == null)
-				return false;
-			if (getClass() != obj.getClass())
-				return false;
-			FileKey other = (FileKey) obj;
-			if (!getOuterType().equals(other.getOuterType()))
-				return false;
-			if (nodeId != other.nodeId)
-				return false;
-			if (record == null) {
-				if (other.record != null)
-					return false;
-			} else if (!record.equals(other.record))
-				return false;
-			return true;
-		}
-
-		private RecordFileManager getOuterType() {
-			return RecordFileManager.this;
-		}
-		
-	}
-
 }
