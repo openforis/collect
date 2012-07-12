@@ -30,4 +30,13 @@ public class RecordFileService {
 		return fileName;
 	}
 	
+	public void deleteFile(int nodeId) {
+		SessionState sessionState = sessionManager.getSessionState();
+		String sessionId = sessionState.getSessionId();
+		CollectRecord record = sessionState.getActiveRecord();
+		FileAttribute fileAttr = (FileAttribute) record.getNodeByInternalId(nodeId);
+		fileManager.prepareDeleteFile(sessionId, record, nodeId);
+		fileAttr.setFilename(null);
+	}
+	
 }

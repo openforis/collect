@@ -15,6 +15,7 @@ import org.openforis.idm.model.Code;
 import org.openforis.idm.model.Coordinate;
 import org.openforis.idm.model.Date;
 import org.openforis.idm.model.Field;
+import org.openforis.idm.model.File;
 import org.openforis.idm.model.TaxonOccurrence;
 import org.openforis.idm.model.Time;
 
@@ -49,6 +50,8 @@ public class AttributeProxy extends NodeProxy {
 				return new CoordinateProxy((Coordinate) val);
 			} else if (val instanceof Date) {
 				return new DateProxy((Date) val);
+			} else if (val instanceof File) {
+				return new FileProxy((File) val);
 			} else if (val instanceof TaxonOccurrence) {
 				return new TaxonOccurrenceProxy((TaxonOccurrence) val);
 			} else if (val instanceof Time) {

@@ -16,6 +16,7 @@ import java.util.UUID;
 import javax.servlet.ServletContext;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.Configuration;
 import org.openforis.idm.metamodel.FileAttributeDefinition;
@@ -92,6 +93,8 @@ public class RecordFileManager {
 	
 	public String saveToTempFolder(InputStream is, String originalFileName, String sessionId, CollectRecord record, int nodeId) throws Exception {
 		try {
+			prepareDeleteFile(sessionId, record, nodeId);
+			
 			File tempDestinationFolder = getTempDestDir(sessionId, nodeId);
 			if (tempDestinationFolder.exists() || tempDestinationFolder.mkdirs()) {
 				String fileId = generateUniqueFilename(originalFileName);
@@ -210,13 +213,19 @@ public class RecordFileManager {
 	}
 	
 	protected File getRepositoryFile(CollectRecord record, int nodeId) {
+		File file = null;
 		Survey survey = record.getSurvey();
 		Integer surveyId = survey.getId();
+		String filename = null;
 		FileAttribute fileAttribute = (FileAttribute) record.getNodeByInternalId(nodeId);
-		FileAttributeDefinition definition = fileAttribute.getDefinition();
-		String filename = fileAttribute.getFilename();
-		File repositoryDir = getRepositoryDir(surveyId, definition.getId());
-		File file = new File(repositoryDir, filename);
+		if ( fileAttribute != null ) {
+			FileAttributeDefinition definition = fileAttribute.getDefinition();
+			filename = fileAttribute.getFilename();
+			if ( StringUtils.isNotBlank(filename) ) {
+				File repositoryDir = getRepositoryDir(surveyId, definition.getId());
+				file = new File(repositoryDir, filename);
+			}
+		}
 		return file;
 	}
 
@@ -247,6 +256,20 @@ public class RecordFileManager {
 		finally { 
 			is.close(); 
 		}  
+	}
+
+	public void prepareDeleteFile(String sessionId, CollectRecord record, int nodeId) {
+		if ( tempFiles.containsKey(nodeId) ) {
+			File tempFile = getTempFile(sessionId, nodeId);
+			tempFile.delete();
+			tempFiles.remove(nodeId);
+		} else {
+			File repositoryFile = getRepositoryFile(record, nodeId);
+			if ( repositoryFile != null ) {
+				String fileName = repositoryFile.getName();
+				filesToDelete.put(nodeId, fileName);
+			}
+		}
 	}
 	
 }

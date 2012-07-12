@@ -4,10 +4,9 @@
 				  xmlns:mx="library://ns.adobe.com/flex/mx" 
 				  xmlns:input="org.openforis.collect.ui.component.input.*"
 				  currentState="default"
-				  height="23"
 				  >
 	<input:layout>
-		<s:VerticalLayout />
+		<s:HorizontalLayout />
 	</input:layout>
 	
 	<fx:Script>
@@ -19,7 +18,7 @@
 			
 			public static const STATE_DEFAULT:String = "default";
 			public static const STATE_UPLOADING:String = "uploading";
-			public static const STATE_FILE_UPLOADED:String = "fileUplaoded";
+			public static const STATE_FILE_UPLOADED:String = "fileUploaded";
 			
 			override protected function initPresenter():void {
 				presenter = new FileInputFieldPresenter(this);
@@ -38,14 +37,21 @@
 	<input:states>
 		<s:State name="default" />
 		<s:State name="uploading" />
-		<s:State name="fileUplaoded" />
+		<s:State name="fileUploaded" />
 	</input:states>
 	
-	<s:HGroup id="controlsContainer" includeInLayout="{editable}" gap="20">
+	<mx:UIComponent id="previewContainer"
+					includeIn="fileUploaded"
+					itemCreationPolicy="immediate"
+					/>
+	
+	<s:HGroup id="controlsContainer" 
+			  visible="{editable}" 
+			  includeInLayout="{editable}" gap="20">
 		<s:Button id="browseButton" 
 				  excludeFrom="uploading"
 				  itemCreationPolicy="immediate"
-				  label="{Message.get('edit.file.browseLabel')}" />
+				  label="{Message.get('edit.file.upload')}" />
 		
 		<mx:ProgressBar id="uploadProgressBar" 
 						width="100" 
@@ -56,10 +62,10 @@
 						/>
 		
 		<s:HGroup id="fileUploadedControlsContainer" gap="20"
-				  includeIn="fileUplaoded"
+				  includeIn="fileUploaded"
 				  itemCreationPolicy="immediate">
 			<s:Button id="downloadButton" label="{Message.get('global.download')}" />
-			<s:Button id="removeButton" label="{Message.get('global.remove')}" />
+			<s:Button id="removeButton" label="{Message.get('global.delete')}" />
 		</s:HGroup>
 	</s:HGroup>
 	

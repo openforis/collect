@@ -72,7 +72,7 @@ package org.openforis.collect.model.proxy {
 		}
 		
 		public function hasValue():Boolean {
-			return value == null || StringUtil.isEmpty(value.toString());
+			return value != null && StringUtil.isNotEmpty(value.toString());
 		}
 		
 		public function getValueAsText():String {

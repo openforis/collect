@@ -84,13 +84,16 @@ package org.openforis.collect.presenter {
 		}
 		
 		override protected function updateView():void {
-			//update view according to attribute (generic text value)
 			super.updateView();
-			
-			if ( _view.attribute != null && ! _view.attribute.empty ) {
-				_view.currentState = FileInputField.STATE_FILE_UPLOADED;
-			} else {
+			var fileName:String = null;
+			if ( _view.attribute != null ) {
+				var nameField:FieldProxy = _view.attribute.getField(0);
+				fileName = nameField.value as String;
+			}
+			if ( StringUtil.isBlank(fileName) ) {
 				_view.currentState = FileInputField.STATE_DEFAULT;
+			} else {
+				_view.currentState = FileInputField.STATE_FILE_UPLOADED;
 			}
 		}
 		
@@ -180,31 +183,39 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function removeClickHandler(event:MouseEvent):void {
-			AlertUtil.showConfirm("edit.file.removeConfirm", null, "global.confirmTitle", performDelete);
+			AlertUtil.showConfirm("edit.file.deleteConfirm", null, "global.deleteTitle", performDelete);
 		}
 		
 		protected function performDelete():void {
+			var responder:IResponder = new AsyncResponder(deleteResultHandler, faultHandler);
+			var nodeId:Number = _view.attribute.id;
+			ClientFactory.recorFileClient.deleteFile(responder, nodeId);
+			/*
 			var httpService:HTTPService = new HTTPService();
 			httpService.addEventListener(ResultEvent.RESULT, deleteResultHandler);
 			httpService.addEventListener(FaultEvent.FAULT, faultHandler);
 			httpService.url = ApplicationConstants.RECORD_FILE_DELETE_URL;
 			httpService.method = URLRequestMethod.POST;
-			var id:Number = _view.attribute.id;
+			var nodeId:Number = _view.attribute.id;
 			var data:Object = {
-				fileId: id
+				fileId: nodeId
 			};
 			httpService.send(data);
+			*/
 		}
 		
-		protected function deleteResultHandler(event:ResultEvent):void {
+		protected function deleteResultHandler(event:ResultEvent, token:Object = null):void {
 			_view.currentState = FileInputField.STATE_DEFAULT;
+			var fileAttribute:AttributeProxy = _view.attribute;
+			fileAttribute.getField(0).value = null;
 		}
 		
 		protected function uploadCompleteResultHandler(event:ResultEvent, token:Object = null):void {
-			var fileName = event.result as String;
+			var fileName:String = event.result as String;
 			var fileAttribute:AttributeProxy = _view.attribute;
 			fileAttribute.getField(0).value = fileName;
 			_view.currentState = FileInputField.STATE_FILE_UPLOADED;
+			updateView();
 		}
 		
 	}

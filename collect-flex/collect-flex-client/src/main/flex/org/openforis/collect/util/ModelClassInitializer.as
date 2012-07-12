@@ -40,6 +40,7 @@ package org.openforis.collect.util {
 	import org.openforis.collect.model.proxy.DateProxy;
 	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.model.proxy.FieldProxy;
+	import org.openforis.collect.model.proxy.FileProxy;
 	import org.openforis.collect.model.proxy.IntegerRangeProxy;
 	import org.openforis.collect.model.proxy.NodeProxy;
 	import org.openforis.collect.model.proxy.RealRangeProxy;
@@ -92,6 +93,7 @@ package org.openforis.collect.util {
 				EntityProxy,
 				FieldProxy,
 				FileAttributeDefinitionProxy,
+				FileProxy,
 				IntegerRangeProxy,
 				LanguageSpecificTextProxy,
 				ModelVersionProxy,
