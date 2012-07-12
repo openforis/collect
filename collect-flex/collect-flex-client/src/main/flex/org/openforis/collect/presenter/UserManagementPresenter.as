@@ -293,7 +293,7 @@ package org.openforis.collect.presenter {
 		protected function saveButtonClickHandler(event:MouseEvent):void {
 			if ( validateForm() ) {
 				var user:UserProxy = extractUserFromForm();
-				var responder:IResponder = new AsyncResponder(saveUserResultHandler, faultHandler);
+				var responder:IResponder = new AsyncResponder(saveUserResultHandler, saveUserFaultHandler);
 				_userClient.save(responder, user);
 			}
 		}
@@ -316,10 +316,10 @@ package org.openforis.collect.presenter {
 			var faultCode:String = event.fault.faultCode;
 			switch(faultCode) {
 				case "org.openforis.collect.manager.CannotDeleteUserException":
-					AlertUtil.showMessage("usersMaangement.error.cannotDelete");
+					AlertUtil.showError("usersManagement.error.cannotDelete");
 					break;
 				case "org.openforis.collect.manager.InvalidUserPasswordException":
-					AlertUtil.showMessage("usersMaangement.error.invalidPassword");
+					AlertUtil.showError("usersManagement.error.invalidPassword");
 					break;
 				default:
 					faultHandler(event, token);
@@ -335,6 +335,17 @@ package org.openforis.collect.presenter {
 			} else {
 				AlertUtil.showMessage("usersManagement.userSaved");
 				loadAll();
+			}
+		}
+		
+		protected function saveUserFaultHandler(event:FaultEvent, token:Object = null):void {
+			var faultCode:String = event.fault.faultCode;
+			switch(faultCode) {
+				case "org.openforis.collect.manager.InvalidUserPasswordException":
+					AlertUtil.showError("usersManagement.error.invalidPassword");
+					break;
+				default:
+					faultHandler(event, token);
 			}
 		}
 		
