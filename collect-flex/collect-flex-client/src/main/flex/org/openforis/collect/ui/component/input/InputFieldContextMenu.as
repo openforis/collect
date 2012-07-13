@@ -10,6 +10,7 @@ package org.openforis.collect.ui.component.input {
 	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.CodeAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
+	import org.openforis.collect.metamodel.proxy.FileAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
 	import org.openforis.collect.model.CollectRecord$Step;
 	import org.openforis.collect.model.FieldSymbol;
@@ -94,7 +95,8 @@ package org.openforis.collect.ui.component.input {
 			switch(step) {
 				case CollectRecord$Step.ENTRY:
 					// REASON BLANK ITEMS
-					if(_inputField.isEmpty() || FieldProxy.isShortCutForReasonBlank(_inputField.text)) {
+					if( ! ( _inputField.attributeDefinition is FileAttributeDefinitionProxy) && 
+						( _inputField.isEmpty() || FieldProxy.isShortCutForReasonBlank(_inputField.text) )) {
 						items.push( SET_STAR, SET_DASH, SET_ILLEGIBLE );
 					}
 					// CONFIRM ERROR ITEM

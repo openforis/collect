@@ -18,6 +18,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
+import org.openforis.collect.manager.RecordFileException;
 import org.openforis.collect.manager.RecordFileManager;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.RecordPromoteException;
@@ -99,6 +100,7 @@ public class DataService {
 		Entity rootEntity = record.getRootEntity();
 		recordManager.addEmptyNodes(rootEntity);
 		sessionManager.setActiveRecord(record);
+		fileManager.reset();
 		return new RecordProxy(record);
 	}
 	
@@ -276,17 +278,7 @@ public class DataService {
 				if (fieldIndex < 0) {
 					Object value = null;
 					if ( nodeDef instanceof FileAttributeDefinition) {
-						String sessionId = sessionState.getSessionId();
-						if ( requestValue != null ) {
-							if ( requestValue instanceof FileWrapper ) {
-								FileWrapper fileWrapper = (FileWrapper) requestValue;
-								value = fileManager.saveToTempFolder(fileWrapper.getData(), fileWrapper.getFileName(), sessionId, record, nodeId);
-							} else {
-								throw new IllegalArgumentException("Invalid value type: expected byte[]");
-							}
-						} else {
-							fileManager.prepareDeleteFile(sessionId, record, nodeId);
-						}
+						value = parseFileAttributeValue(nodeId, requestValue);
 					} else if (requestValue != null) {
 						value = parseCompositeAttributeValue(parentEntity, attribute.getDefinition(), requestValue);
 					}
@@ -297,13 +289,11 @@ public class DataService {
 						updatedFieldValues.put(idx, fieldValue);
 						recordManager.setFieldValue(attribute, fieldValue, remarks, symbol, idx);
 					}
-				} else if ( requestValue instanceof String ) {
+				} else {
 					Object value = parseFieldValue(parentEntity, attribute.getDefinition(), (String) requestValue, fieldIndex);
 					recordManager.setFieldValue(attribute, value, remarks, symbol, fieldIndex);
 					Field<?> field = attribute.getField(fieldIndex);
 					updatedFieldValues.put(fieldIndex, field.getValue());
-				} else {
-					throw new IllegalArgumentException("Invalid value type: expected byte[]");
 				}
 				response.setUpdatedFieldValues(updatedFieldValues);
 				relReqDependencies = recordManager.clearRelevanceRequiredStates(attribute);
@@ -341,6 +331,25 @@ public class DataService {
 		}
 		prepareUpdateResponse(responseMap, relReqDependencies, checkDependencies, cardinalityNodePointers);
 		return responseMap.values();
+	}
+
+	private Object parseFileAttributeValue(Integer nodeId, Object requestValue) throws RecordFileException {
+		Object result;
+		SessionState sessionState = sessionManager.getSessionState();
+		CollectRecord record = sessionState.getActiveRecord();
+		String sessionId = sessionState.getSessionId();
+		if ( requestValue != null ) {
+			if ( requestValue instanceof FileWrapper ) {
+				FileWrapper fileWrapper = (FileWrapper) requestValue;
+				result = fileManager.saveToTempFolder(fileWrapper.getData(), fileWrapper.getFileName(), sessionId, record, nodeId);
+			} else {
+				throw new IllegalArgumentException("Invalid value type: expected byte[]");
+			}
+		} else {
+			fileManager.prepareDeleteFile(sessionId, record, nodeId);
+			result = null;
+		}
+		return result;
 	}
 	
 	private List<NodePointer> getCardinalityNodePointers(Node<?> node){

@@ -201,7 +201,6 @@ package org.openforis.collect.presenter {
 						operation.fieldIndex = fieldIdx;
 						operation.remarks = field.remarks;
 						operation.symbol = symbol;
-						operation.symbol = symbol;
 						if ( FieldProxy.isReasonBlankSymbol(symbol) ) {
 							operation.value = null;
 						} else {

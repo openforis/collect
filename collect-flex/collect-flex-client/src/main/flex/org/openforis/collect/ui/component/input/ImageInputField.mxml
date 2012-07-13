@@ -3,7 +3,7 @@
 				  xmlns:s="library://ns.adobe.com/flex/spark" 
 				  xmlns:mx="library://ns.adobe.com/flex/mx" 
 				  xmlns:input="org.openforis.collect.ui.component.input.*" 
-				  xmlns:component="org.openforis.collect.ui.component.*"
+				  xmlns:component="org.openforis.collect.ui.component.*" xmlns:graphics="org.openforis.collect.ui.skin.graphics.*"
 				  >
 	
 	<fx:Script>
@@ -52,17 +52,25 @@
 	
 	<s:HGroup id="controlsContainer" 
 			  visible="{editable}" 
-			  includeInLayout="{editable}" gap="20">
-		<s:Button id="browseButton" 
-				  excludeFrom="uploading"
-				  itemCreationPolicy="immediate"
-				  label="{Message.get('edit.file.upload')}"
-				  label.fileUploaded="{Message.get('edit.file.uploadAgain')}"
-				  />
-		
+			  includeInLayout="{editable}" 
+			  gap="20">
+		<s:Group excludeFrom="uploading"
+				 itemCreationPolicy="immediate">
+			<s:Button id="browseButton" 
+					  label="{Message.get('edit.file.upload')}"
+					  label.fileUploaded="{Message.get('edit.file.uploadAgain')}"
+					  />
+			<graphics:RemarksPresentIcon id="remarksPresentIcon"
+										 top="0"
+										 right="0"
+										 visible="{remarksPresent}"
+										 />
+		</s:Group>
+
 		<mx:ProgressBar id="uploadProgressBar" 
 						width="100" 
 						label="{Message.get('edit.file.uploadProgressBarLabel')}"
+						labelPlacement="center"
 						mode="manual"
 						includeIn="uploading"
 						itemCreationPolicy="immediate"

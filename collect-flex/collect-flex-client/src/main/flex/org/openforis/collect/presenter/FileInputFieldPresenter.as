@@ -94,6 +94,10 @@ package org.openforis.collect.presenter {
 			} else {
 				_view.currentState = FileInputField.STATE_FILE_UPLOADED;
 			}
+			var hasRemarks:Boolean = false;
+			var remarks:String = getRemarks();
+			hasRemarks = StringUtil.isNotBlank(remarks);
+			_view.remarksPresent = hasRemarks;
 		}
 		
 		protected function fileReferenceUploadCompleteDataHandler(event:DataEvent):void {
@@ -147,8 +151,7 @@ package org.openforis.collect.presenter {
 			fileWrapper.data = fileReference.data;
 			fileWrapper.fileName = fileReference.name;
 			var nodeId:Number = _view.attribute.id;
-			var responder:IResponder = new AsyncResponder(uploadCompleteResultHandler, faultHandler);
-			var updateReq:UpdateRequestOperation = getFileUpdateRequestOperation(fileWrapper);
+			var updateReq:UpdateRequestOperation = createFileUpdateRequestOperation(fileWrapper);
 			sendUpdateRequest(updateReq);
 		}
 		
@@ -188,12 +191,12 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function performDelete():void {
-			var responder:IResponder = new AsyncResponder(deleteResultHandler, faultHandler);
 			var nodeId:Number = _view.attribute.id;
-			//ClientFactory.recordFileClient.deleteFile(responder, nodeId);
-			
-			var updateReq:UpdateRequestOperation = getFileUpdateRequestOperation(null);
+			var updateReq:UpdateRequestOperation = createFileUpdateRequestOperation(null);
 			sendUpdateRequest(updateReq);
+
+			//var responder:IResponder = new AsyncResponder(deleteResultHandler, faultHandler);
+			//ClientFactory.recordFileClient.deleteFile(responder, nodeId);
 			/*
 			var httpService:HTTPService = new HTTPService();
 			httpService.addEventListener(ResultEvent.RESULT, deleteResultHandler);
@@ -214,16 +217,7 @@ package org.openforis.collect.presenter {
 			fileAttribute.getField(0).value = null;
 		}
 		
-		protected function uploadCompleteResultHandler(event:ResultEvent, token:Object = null):void {
-			var file:FileProxy = event.result as FileProxy;
-			var fileAttribute:AttributeProxy = _view.attribute;
-			fileAttribute.getField(0).value = file.filename;
-			fileAttribute.getField(1).value = file.size;
-			_view.currentState = FileInputField.STATE_FILE_UPLOADED;
-			updateView();
-		}
-		
-		protected function getFileUpdateRequestOperation(fileWrapper:FileWrapper):UpdateRequestOperation {
+		protected function createFileUpdateRequestOperation(fileWrapper:FileWrapper):UpdateRequestOperation {
 			var o:UpdateRequestOperation = new UpdateRequestOperation();
 			var def:AttributeDefinitionProxy = _view.attributeDefinition;
 			o.method = UpdateRequestOperation$Method.UPDATE;
