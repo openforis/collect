@@ -18,7 +18,7 @@ public class UpdateRequestOperation implements Proxy {
 	private String nodeName;
 	private Integer nodeId;
 	private Integer fieldIndex;
-	private String value;
+	private Object value;
 	private Method method;
 	private String remarks;
 	private FieldSymbol symbol;
@@ -79,11 +79,11 @@ public class UpdateRequestOperation implements Proxy {
 		this.fieldIndex = fieldIndex;
 	}
 
-	public String getValue() {
+	public Object getValue() {
 		return value;
 	}
 
-	public void setValue(String value) {
+	public void setValue(Object value) {
 		this.value = value;
 	}
 

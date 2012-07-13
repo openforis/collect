@@ -10,22 +10,20 @@ package org.openforis.collect.presenter {
 	import flash.net.URLRequestMethod;
 	import flash.net.URLVariables;
 	import flash.net.navigateToURL;
-	import flash.utils.ByteArray;
 	
 	import mx.collections.IList;
-	import mx.collections.ListCollectionView;
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.IResponder;
-	import mx.rpc.events.FaultEvent;
 	import mx.rpc.events.ResultEvent;
-	import mx.rpc.http.HTTPService;
 	
-	import org.openforis.collect.Application;
-	import org.openforis.collect.client.ClientFactory;
+	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.FileAttributeDefinitionProxy;
 	import org.openforis.collect.model.proxy.AttributeProxy;
 	import org.openforis.collect.model.proxy.FieldProxy;
 	import org.openforis.collect.model.proxy.FileProxy;
+	import org.openforis.collect.remoting.service.FileWrapper;
+	import org.openforis.collect.remoting.service.UpdateRequestOperation;
+	import org.openforis.collect.remoting.service.UpdateRequestOperation$Method;
 	import org.openforis.collect.ui.component.input.FileInputField;
 	import org.openforis.collect.util.AlertUtil;
 	import org.openforis.collect.util.ApplicationConstants;
@@ -145,11 +143,13 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function fileReferenceLoadComplete(event:Event):void {
-			var data:ByteArray = fileReference.data;
-			var originalFileName:String = fileReference.name;
+			var fileWrapper:FileWrapper = new FileWrapper();
+			fileWrapper.data = fileReference.data;
+			fileWrapper.fileName = fileReference.name;
 			var nodeId:Number = _view.attribute.id;
 			var responder:IResponder = new AsyncResponder(uploadCompleteResultHandler, faultHandler);
-			ClientFactory.recorFileClient.upload(responder, data, originalFileName, nodeId);
+			var updateReq:UpdateRequestOperation = getFileUpdateRequestOperation(fileWrapper);
+			sendUpdateRequest(updateReq);
 		}
 		
 		protected function fileReferenceIoErrorHandler(event:IOErrorEvent):void {
@@ -190,7 +190,10 @@ package org.openforis.collect.presenter {
 		protected function performDelete():void {
 			var responder:IResponder = new AsyncResponder(deleteResultHandler, faultHandler);
 			var nodeId:Number = _view.attribute.id;
-			ClientFactory.recorFileClient.deleteFile(responder, nodeId);
+			//ClientFactory.recordFileClient.deleteFile(responder, nodeId);
+			
+			var updateReq:UpdateRequestOperation = getFileUpdateRequestOperation(null);
+			sendUpdateRequest(updateReq);
 			/*
 			var httpService:HTTPService = new HTTPService();
 			httpService.addEventListener(ResultEvent.RESULT, deleteResultHandler);
@@ -218,6 +221,20 @@ package org.openforis.collect.presenter {
 			fileAttribute.getField(1).value = file.size;
 			_view.currentState = FileInputField.STATE_FILE_UPLOADED;
 			updateView();
+		}
+		
+		protected function getFileUpdateRequestOperation(fileWrapper:FileWrapper):UpdateRequestOperation {
+			var o:UpdateRequestOperation = new UpdateRequestOperation();
+			var def:AttributeDefinitionProxy = _view.attributeDefinition;
+			o.method = UpdateRequestOperation$Method.UPDATE;
+			o.parentEntityId = _view.parentEntity.id;
+			o.nodeName = def.name;
+			o.nodeId = _view.attribute.id;
+			o.fieldIndex = -1;
+			o.value = fileWrapper;
+			o.symbol = null;
+			o.remarks = getRemarks();
+			return o;
 		}
 		
 	}

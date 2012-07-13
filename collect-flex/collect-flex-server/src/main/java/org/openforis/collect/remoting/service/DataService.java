@@ -33,7 +33,6 @@ import org.openforis.collect.model.proxy.NodeProxy;
 import org.openforis.collect.model.proxy.RecordProxy;
 import org.openforis.collect.persistence.MultipleEditException;
 import org.openforis.collect.persistence.RecordPersistenceException;
-import org.openforis.collect.persistence.RecordUnlockedException;
 import org.openforis.collect.remoting.service.UpdateRequestOperation.Method;
 import org.openforis.collect.web.session.SessionState;
 import org.openforis.idm.metamodel.AttributeDefinition;
@@ -43,6 +42,7 @@ import org.openforis.idm.metamodel.CodeListItem;
 import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
 import org.openforis.idm.metamodel.DateAttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
+import org.openforis.idm.metamodel.FileAttributeDefinition;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NumberAttributeDefinition;
@@ -180,7 +180,7 @@ public class DataService {
 
 	@Transactional
 	@Secured("ROLE_ENTRY")
-	public List<UpdateResponse> updateActiveRecord(UpdateRequest request) throws RecordUnlockedException {
+	public List<UpdateResponse> updateActiveRecord(UpdateRequest request) throws RecordPersistenceException {
 		sessionManager.checkIsActiveRecordLocked();
 		List<UpdateRequestOperation> operations = request.getOperations();
 		List<UpdateResponse> updateResponses = new ArrayList<UpdateResponse>();
@@ -202,7 +202,7 @@ public class DataService {
 	}
 	
 	@SuppressWarnings("unchecked")
-	private Collection<UpdateResponse> processUpdateRequestOperation(UpdateRequestOperation operation) {
+	private Collection<UpdateResponse> processUpdateRequestOperation(UpdateRequestOperation operation) throws RecordPersistenceException {
 		SessionState sessionState = sessionManager.getSessionState();
 		CollectRecord record = sessionState.getActiveRecord();
 
@@ -217,7 +217,7 @@ public class DataService {
 			node = record.getNodeByInternalId(nodeId);
 		}
 		NodeDefinition nodeDef = ((EntityDefinition) parentEntity.getDefinition()).getChildDefinition(nodeName);
-		String requestValue = operation.getValue();
+		Object requestValue = operation.getValue();
 		String remarks = operation.getRemarks();
 		
 		FieldSymbol symbol = operation.getSymbol();
@@ -275,7 +275,19 @@ public class DataService {
 				Map<Integer, Object> updatedFieldValues = new HashMap<Integer, Object>();
 				if (fieldIndex < 0) {
 					Object value = null;
-					if (requestValue != null) {
+					if ( nodeDef instanceof FileAttributeDefinition) {
+						String sessionId = sessionState.getSessionId();
+						if ( requestValue != null ) {
+							if ( requestValue instanceof FileWrapper ) {
+								FileWrapper fileWrapper = (FileWrapper) requestValue;
+								value = fileManager.saveToTempFolder(fileWrapper.getData(), fileWrapper.getFileName(), sessionId, record, nodeId);
+							} else {
+								throw new IllegalArgumentException("Invalid value type: expected byte[]");
+							}
+						} else {
+							fileManager.prepareDeleteFile(sessionId, record, nodeId);
+						}
+					} else if (requestValue != null) {
 						value = parseCompositeAttributeValue(parentEntity, attribute.getDefinition(), requestValue);
 					}
 					recordManager.setAttributeValue(attribute, value, remarks);
@@ -285,11 +297,13 @@ public class DataService {
 						updatedFieldValues.put(idx, fieldValue);
 						recordManager.setFieldValue(attribute, fieldValue, remarks, symbol, idx);
 					}
-				} else {
-					Object value = parseFieldValue(parentEntity, attribute.getDefinition(), requestValue, fieldIndex);
+				} else if ( requestValue instanceof String ) {
+					Object value = parseFieldValue(parentEntity, attribute.getDefinition(), (String) requestValue, fieldIndex);
 					recordManager.setFieldValue(attribute, value, remarks, symbol, fieldIndex);
 					Field<?> field = attribute.getField(fieldIndex);
 					updatedFieldValues.put(fieldIndex, field.getValue());
+				} else {
+					throw new IllegalArgumentException("Invalid value type: expected byte[]");
 				}
 				response.setUpdatedFieldValues(updatedFieldValues);
 				relReqDependencies = recordManager.clearRelevanceRequiredStates(attribute);
@@ -451,13 +465,13 @@ public class DataService {
 	}
 	
 	@SuppressWarnings("unchecked")
-	private Node<?> addNode(Entity parentEntity, NodeDefinition nodeDef, String requestValue, FieldSymbol symbol, String remarks) {
-		if(nodeDef instanceof AttributeDefinition) {
-			AttributeDefinition def = (AttributeDefinition) nodeDef;
+	private Node<?> addNode(Entity parentEntity, NodeDefinition nodeDefn, Object requestValue, FieldSymbol symbol, String remarks) {
+		if(nodeDefn instanceof AttributeDefinition) {
+			AttributeDefinition def = (AttributeDefinition) nodeDefn;
 			Attribute<?, ?> attribute = (Attribute<?, ?>) def.createNode();
 			parentEntity.add(attribute);
-			if(StringUtils.isNotBlank(requestValue)) {
-				Value value = parseCompositeAttributeValue(parentEntity, (AttributeDefinition) nodeDef, requestValue);
+			if(requestValue != null) {
+				Value value = parseCompositeAttributeValue(parentEntity, (AttributeDefinition) nodeDefn, requestValue);
 				((Attribute<?, Value> ) attribute).setValue(value);
 			}
 			if(symbol != null || remarks != null) {
@@ -474,7 +488,7 @@ public class DataService {
 			}
 			return attribute;
 		} else {
-			Entity e = recordManager.addEntity(parentEntity, nodeDef.getName());
+			Entity e = recordManager.addEntity(parentEntity, nodeDefn.getName());
 			return e;
 		}
 	}
@@ -544,26 +558,36 @@ public class DataService {
 		return fieldValue;
 	}
 	
-	private Value parseCompositeAttributeValue(Entity parentEntity, AttributeDefinition defn, String value) {
+	private Value parseCompositeAttributeValue(Entity parentEntity, AttributeDefinition defn, Object value) {
 		Value result;
 		if(defn instanceof CodeAttributeDefinition) {
-			Record record = parentEntity.getRecord();
-			ModelVersion version = record .getVersion();
-			result = parseCode(parentEntity, (CodeAttributeDefinition) defn, value, version );
-		} else if(defn instanceof RangeAttributeDefinition) {
-			RangeAttributeDefinition rangeDef = (RangeAttributeDefinition) defn;
-			RangeAttributeDefinition.Type type = rangeDef.getType();
-			NumericRange<?> range = null;
-			Unit unit = null; //todo check if unit is required here or is set later by the client
-			switch(type) {
-				case INTEGER:
-					range = IntegerRange.parseIntegerRange(value, unit);
-					break;
-				case REAL:
-					range = RealRange.parseRealRange(value, unit);
-					break;
+			if ( value instanceof String) {
+				String stringVal = (String) value;
+				Record record = parentEntity.getRecord();
+				ModelVersion version = record .getVersion();
+				result = parseCode(parentEntity, (CodeAttributeDefinition) defn, stringVal, version );
+			} else {
+				throw new IllegalArgumentException("Invalid value type: expected String");
 			}
-			result = range;
+		} else if(defn instanceof RangeAttributeDefinition) {
+			if ( value instanceof String) {
+				String stringVal = (String) value;
+				RangeAttributeDefinition rangeDef = (RangeAttributeDefinition) defn;
+				RangeAttributeDefinition.Type type = rangeDef.getType();
+				NumericRange<?> range = null;
+				Unit unit = null; //todo check if unit is required here or is set later by the client
+				switch(type) {
+					case INTEGER:
+						range = IntegerRange.parseIntegerRange(stringVal, unit);
+						break;
+					case REAL:
+						range = RealRange.parseRealRange(stringVal, unit);
+						break;
+				}
+				result = range;
+			} else {
+				throw new IllegalArgumentException("Invalid value type: expected String");
+			}
 		} else {
 			throw new IllegalArgumentException("Invalid AttributeDefinition: expected CodeAttributeDefinition or RangeAttributeDefinition");
 		}

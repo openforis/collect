@@ -75,7 +75,8 @@
 			 includeIn="loadComplete"
 			 itemCreationPolicy="immediate"
 			 click="imageClickHandler(event)"
-			 buttonMode="true" toolTip="{Message.get('global.image.view')}" />
+			 buttonMode="true" 
+			 toolTip="{Message.get('imageLoader.clickToDownload')}" />
 	
 	<mx:ProgressBar id="progressBar" 
 					includeIn="loading"
@@ -84,7 +85,7 @@
 	
 	<s:Label includeIn="error" 
 			 itemCreationPolicy="immediate"
-			 text="{Message.get('global.error.imageNotFound')}" 
+			 text="{Message.get('imageLoader.error.imageNotFound')}" 
 			 width="100%" />
 	
 	

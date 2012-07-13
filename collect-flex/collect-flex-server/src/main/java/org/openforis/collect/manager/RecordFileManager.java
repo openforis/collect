@@ -1,7 +1,6 @@
 package org.openforis.collect.manager;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,6 +22,7 @@ import org.openforis.idm.metamodel.FileAttributeDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.model.Entity;
+import org.openforis.idm.model.File;
 import org.openforis.idm.model.FileAttribute;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.NodeVisitor;
@@ -33,12 +33,13 @@ import org.springframework.web.multipart.MultipartFile;
  * 
  * @author S. Ricci
  * 
- * It needs to be associated to a user session
+ * It needs to have scope "session" because it manages files to be associated
+ * to the current edited record (one per session)
  *
  */
 public class RecordFileManager {
 	
-	private static final String TEMP_PATH = "temp" + File.separator + "recordFiles";
+	private static final String TEMP_PATH = "temp" + java.io.File.separator + "recordFiles";
 
 	private static final String UPLOAD_PATH_CONFIGURATION_KEY = "upload_path";
 	
@@ -51,8 +52,8 @@ public class RecordFileManager {
 	private Map<Integer, String> tempFiles;
 	private Map<Integer, String> filesToDelete;
 
-	protected File tempRootDir;
-	protected File respositoryRootDir;
+	protected java.io.File tempRootDir;
+	protected java.io.File respositoryRootDir;
 	
 	protected void init() {
 		tempFiles = new HashMap<Integer, String>();
@@ -64,7 +65,7 @@ public class RecordFileManager {
 
 	protected void initTempDir() {
 		String tempRealPath = servletContext.getRealPath(TEMP_PATH);
-		tempRootDir = new File(tempRealPath);
+		tempRootDir = new java.io.File(tempRealPath);
 		if ( ! tempRootDir.exists() ) {
 			tempRootDir.mkdirs();
 		}	
@@ -76,7 +77,7 @@ public class RecordFileManager {
 	protected void initRepositoryDir() {
 		Configuration configuration = configurationManager.getConfiguration();
 		String repositoryRootPath = configuration.get(UPLOAD_PATH_CONFIGURATION_KEY);
-		respositoryRootDir = new File(repositoryRootPath);
+		respositoryRootDir = new java.io.File(repositoryRootPath);
 		if ( ! respositoryRootDir.exists() ) {
 			respositoryRootDir.mkdirs();
 		}
@@ -85,40 +86,42 @@ public class RecordFileManager {
 		}
 	}
 
-	public String saveToTempFolder(byte[] data, String originalFileName, String sessionId, CollectRecord record, int nodeId) throws Exception {
-		String fileId = saveToTempFolder(new ByteArrayInputStream(data), originalFileName, sessionId, record, nodeId);
-		return fileId;
+	public File saveToTempFolder(byte[] data, String originalFileName, String sessionId, CollectRecord record, int nodeId) throws RecordFileException {
+		 File file = saveToTempFolder(new ByteArrayInputStream(data), originalFileName, sessionId, record, nodeId);
+		return file;
 	}
 	
-	public String saveToTempFolder(MultipartFile file, String sessionId, CollectRecord record, int nodeId) throws Exception {
+	public File saveToTempFolder(MultipartFile file, String sessionId, CollectRecord record, int nodeId) throws Exception {
 		if (!file.isEmpty()) {
-			String fileId = saveToTempFolder(file.getInputStream(), file.getOriginalFilename(), sessionId, record, nodeId);
-			return fileId;
+			File result = saveToTempFolder(file.getInputStream(), file.getOriginalFilename(), sessionId, record, nodeId);
+			return result;
 		} else {
 			throw new Exception("file is empty");
 		}
 	}
 	
-	public String saveToTempFolder(InputStream is, String originalFileName, String sessionId, CollectRecord record, int nodeId) throws Exception {
+	public File saveToTempFolder(InputStream is, String originalFileName, String sessionId, CollectRecord record, int nodeId) throws RecordFileException {
 		try {
 			prepareDeleteFile(sessionId, record, nodeId);
 			
-			File tempDestinationFolder = getTempDestDir(sessionId, nodeId);
+			java.io.File tempDestinationFolder = getTempDestDir(sessionId, nodeId);
 			if (tempDestinationFolder.exists() || tempDestinationFolder.mkdirs()) {
 				String fileId = generateUniqueFilename(originalFileName);
-				File tempDestinationFile = new File(tempDestinationFolder, fileId);
+				java.io.File tempDestinationFile = new java.io.File(tempDestinationFolder, fileId);
 				if (!tempDestinationFile.exists() && tempDestinationFile.createNewFile()) {
 					writeToFile(is, tempDestinationFile);
 					tempFiles.put(nodeId, fileId);
-					return fileId;
+					long size = tempDestinationFile.length();
+					File result = new File(fileId, size);
+					return result;
 				} else {
-					throw new Exception("Cannot write file");
+					throw new RecordFileException("Cannot write file");
 				}
 			} else {
-				throw new Exception("Cannot write to destination folder");
+				throw new RecordFileException("Cannot write to destination folder");
 			}
 		} catch (IOException e) {
-			throw new Exception(e);
+			throw new RecordFileException(e);
 		}
 	}
 	
@@ -139,7 +142,7 @@ public class RecordFileManager {
 		while (iterator.hasNext()) {
 			Entry<Integer, String> entry = iterator.next();
 			int nodeId = entry.getKey();
-			File tempFile = getTempFile(sessionId, nodeId);
+			java.io.File tempFile = getTempFile(sessionId, nodeId);
 			tempFile.delete();
 			iterator.remove();
 		}
@@ -152,11 +155,25 @@ public class RecordFileManager {
 			@Override
 			public void visit(Node<? extends NodeDefinition> node, int pos) {
 				if ( node instanceof FileAttribute ) {
-					File repositoryFile = getRepositoryFile(record, node.getId());
+					java.io.File repositoryFile = getRepositoryFile(record, node.getId());
 					repositoryFile.delete();
 				}
 			}
 		});
+	}
+	
+	public void prepareDeleteFile(String sessionId, CollectRecord record, int nodeId) {
+		if ( tempFiles.containsKey(nodeId) ) {
+			java.io.File tempFile = getTempFile(sessionId, nodeId);
+			tempFile.delete();
+			tempFiles.remove(nodeId);
+		} else {
+			java.io.File repositoryFile = getRepositoryFile(record, nodeId);
+			if ( repositoryFile != null ) {
+				String fileName = repositoryFile.getName();
+				filesToDelete.put(nodeId, fileName);
+			}
+		}
 	}
 	
 	public void completeFilesDeletion(CollectRecord record) {
@@ -165,21 +182,21 @@ public class RecordFileManager {
 		while (iterator.hasNext()) {
 			Entry<Integer, String> entry = iterator.next();
 			int nodeId = entry.getKey();
-			File repositoryFile = getRepositoryFile(record, nodeId);
+			java.io.File repositoryFile = getRepositoryFile(record, nodeId);
 			repositoryFile.delete();
 			iterator.remove();
 		}
 	}
 	
 	private void moveTempFileToRepository(String sessionId, CollectRecord record, int nodeId) throws IOException {
-		File tempFile = getTempFile(sessionId, nodeId);
-		File repositoryFile = getRepositoryFile(record, nodeId);
+		java.io.File tempFile = getTempFile(sessionId, nodeId);
+		java.io.File repositoryFile = getRepositoryFile(record, nodeId);
 		FileUtils.copyFile(tempFile, repositoryFile, true);
 		tempFile.delete();
 	}
 
-	public File getFile(String sessionId, CollectRecord record, int nodeId) {
-		File file;
+	public java.io.File getFile(String sessionId, CollectRecord record, int nodeId) {
+		java.io.File file;
 		if ( tempFiles.containsKey(nodeId) ) {
 			file = getTempFile(sessionId, nodeId);
 		} else {
@@ -194,20 +211,20 @@ public class RecordFileManager {
 		return fileId;
 	}
 	
-	protected File getTempDestRootDirPerSession(String sessionId) {
-		File file = new File(tempRootDir, sessionId);
+	protected java.io.File getTempDestRootDirPerSession(String sessionId) {
+		java.io.File file = new java.io.File(tempRootDir, sessionId);
 		return file;
 	}
 
-	protected File getTempDestDir(String sessionId, int nodeId) {
-		File tempDestRootDirPerSession = getTempDestRootDirPerSession(sessionId);
-		File file = new File(tempDestRootDirPerSession, Integer.toString(nodeId));
+	protected java.io.File getTempDestDir(String sessionId, int nodeId) {
+		java.io.File tempDestRootDirPerSession = getTempDestRootDirPerSession(sessionId);
+		java.io.File file = new java.io.File(tempDestRootDirPerSession, Integer.toString(nodeId));
 		return file;
 	}
 	
-	protected File getTempFile(String sessionId, int nodeId) {
-		File tempDestDir = getTempDestDir(sessionId, nodeId);
-		File[] listFiles = tempDestDir.listFiles();
+	protected java.io.File getTempFile(String sessionId, int nodeId) {
+		java.io.File tempDestDir = getTempDestDir(sessionId, nodeId);
+		java.io.File[] listFiles = tempDestDir.listFiles();
 		if ( listFiles != null && listFiles.length > 0 ) {
 			return listFiles[0];
 		} else {
@@ -215,13 +232,13 @@ public class RecordFileManager {
 		}
 	}
 	
-	protected File getRepositoryDir(Integer surveyId, Integer nodeDefnId) {
-		File file = new File(respositoryRootDir, surveyId + File.separator + nodeDefnId);
+	protected java.io.File getRepositoryDir(Integer surveyId, Integer nodeDefnId) {
+		java.io.File file = new java.io.File(respositoryRootDir, surveyId + java.io.File.separator + nodeDefnId);
 		return file;
 	}
 	
-	protected File getRepositoryFile(CollectRecord record, int nodeId) {
-		File file = null;
+	protected java.io.File getRepositoryFile(CollectRecord record, int nodeId) {
+		java.io.File file = null;
 		Survey survey = record.getSurvey();
 		Integer surveyId = survey.getId();
 		String filename = null;
@@ -230,8 +247,8 @@ public class RecordFileManager {
 			FileAttributeDefinition definition = fileAttribute.getDefinition();
 			filename = fileAttribute.getFilename();
 			if ( StringUtils.isNotBlank(filename) ) {
-				File repositoryDir = getRepositoryDir(surveyId, definition.getId());
-				file = new File(repositoryDir, filename);
+				java.io.File repositoryDir = getRepositoryDir(surveyId, definition.getId());
+				file = new java.io.File(repositoryDir, filename);
 			}
 		}
 		return file;
@@ -248,7 +265,7 @@ public class RecordFileManager {
 		return extension;
 	}
 	
-	protected static void writeToFile(InputStream is, File file) throws IOException {
+	protected static void writeToFile(InputStream is, java.io.File file) throws IOException {
 		try {  
 			OutputStream os = new FileOutputStream(file);  
 			try {  
@@ -266,18 +283,4 @@ public class RecordFileManager {
 		}  
 	}
 
-	public void prepareDeleteFile(String sessionId, CollectRecord record, int nodeId) {
-		if ( tempFiles.containsKey(nodeId) ) {
-			File tempFile = getTempFile(sessionId, nodeId);
-			tempFile.delete();
-			tempFiles.remove(nodeId);
-		} else {
-			File repositoryFile = getRepositoryFile(record, nodeId);
-			if ( repositoryFile != null ) {
-				String fileName = repositoryFile.getName();
-				filesToDelete.put(nodeId, fileName);
-			}
-		}
-	}
-	
 }
