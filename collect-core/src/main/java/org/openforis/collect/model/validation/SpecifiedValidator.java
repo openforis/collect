@@ -13,6 +13,7 @@ import org.openforis.idm.metamodel.validation.ValidationResultFlag;
 import org.openforis.idm.metamodel.validation.ValidationRule;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Entity;
+import org.openforis.idm.model.FileAttribute;
 
 /**
  * @author M. Togna
@@ -27,7 +28,7 @@ public class SpecifiedValidator implements ValidationRule<Attribute<?,?>> {
 		Step step = record.getStep();
 		
 		if ( Step.ENTRY == step ) {
-			if ( isRelevant(attribute) && attribute.isEmpty() ) {
+			if ( isRelevant(attribute) && attribute.isEmpty() && ! (attribute instanceof FileAttribute) ) {
 				if ( isReasonBlankAlwaysSpecified(attribute) ) {
 					if ( isRequired(attribute) ) {
 						return WARNING;
