@@ -1,7 +1,6 @@
 package org.openforis.collect.remoting.service.dataImport;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.openforis.collect.remoting.service.dataProcessing.DataProcessingState;
@@ -30,7 +29,7 @@ public class DataImportState extends DataProcessingState {
 	private MainStep mainStep;
 	private SubStep subStep;
 	private Map<String, String> errors;
-	private Map<String, List<String>> warnings;
+	private Map<String, Map<String, String>> warnings;
 	
 	private int insertedCount;
 	private int updatedCount;
@@ -40,7 +39,7 @@ public class DataImportState extends DataProcessingState {
 		insertedCount = 0;
 		updatedCount = 0;
 		errors = new HashMap<String, String>();
-		warnings = new HashMap<String, List<String>>();
+		warnings = new HashMap<String, Map<String, String>>();
 		mainStep = MainStep.INITED;
 		subStep = SubStep.INITED;
 	}
@@ -49,7 +48,7 @@ public class DataImportState extends DataProcessingState {
 		errors.put(fileName, error);
 	}
 
-	public void addWarnings(String entryName, List<String> warnings) {
+	public void addWarnings(String entryName, Map<String, String> warnings) {
 		this.warnings.put(entryName, warnings);
 	}
 	
@@ -91,7 +90,7 @@ public class DataImportState extends DataProcessingState {
 		this.subStep = subStep;
 	}
 
-	public Map<String, List<String>> getWarnings() {
+	public Map<String, Map<String, String>> getWarnings() {
 		return warnings;
 	}
 

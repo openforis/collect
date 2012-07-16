@@ -9,6 +9,7 @@ import org.openforis.collect.Proxy;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.proxy.RecordProxy;
+import org.openforis.collect.persistence.xml.DataHandler.NodeErrorItem;
 
 /**
  * 
@@ -58,8 +59,24 @@ public class DataImportSummaryItemProxy implements Proxy {
 	}
 	
 	@ExternalizedProperty
-	public Map<Step, List<String>> getWarnings() {
-		return item.getWarnings();
+	public Map<Step, List<NodeErrorItem>> getWarnings() {
+		Map<Step, List<NodeErrorItem>> warnings = item.getWarnings();
+		/*
+		List<NodeErrorItem> result = new ArrayList<NodeErrorItem>();
+		Set<Step> steps = warnings.keySet();
+		for (Step step : steps) {
+			List<NodeErrorItem> warningsPerStep = warnings.get(step);
+			if ( warningsPerStep != null ) {
+				Set<String> paths = warningsPerStep.keySet();
+				for (String path : paths) {
+					String warn = warningsPerStep.get(path);
+					NodeErrorItem item = new NodeErrorItem(step, path, warn);
+					result.add(item);
+				}
+			}
+		}
+		*/
+		return warnings;
 	}
 
 	@ExternalizedProperty
@@ -92,5 +109,6 @@ public class DataImportSummaryItemProxy implements Proxy {
 			return false;
 		}
 	}
+	
 
 }

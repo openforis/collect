@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
+import org.openforis.collect.persistence.xml.DataHandler.NodeErrorItem;
 
 /**
  * 
@@ -19,15 +20,16 @@ public class DataImportSummaryItem {
 	private CollectRecord conflictingRecord;
 	private List<Step> steps;
 	/**
-	 * Map containing the warnings for each step (if any) 
+	 * Map containing the warnings for each step (if any).
+	 * The warnings are stored in a Map where the node path is the key of the warning.
 	 */
-	private Map<Step, List<String>> warnings;
+	private Map<Step, List<NodeErrorItem>> warnings;
 
 	public DataImportSummaryItem(int entryId, CollectRecord record, List<Step> steps) {
 		this.entryId = entryId;
 		this.record = record;
 		this.steps = steps;
-		this.warnings = new HashMap<Step, List<String>>();
+		this.warnings = new HashMap<CollectRecord.Step, List<NodeErrorItem>>();
 	}
 	
 	public DataImportSummaryItem(int entryId, CollectRecord record, List<Step> steps, CollectRecord conflictingRecord) {
@@ -67,11 +69,11 @@ public class DataImportSummaryItem {
 		this.steps = steps;
 	}
 
-	public Map<Step, List<String>> getWarnings() {
+	public Map<Step, List<NodeErrorItem>> getWarnings() {
 		return warnings;
 	}
 
-	public void setWarnings(Map<Step, List<String>> warnings) {
+	public void setWarnings(Map<Step, List<NodeErrorItem>> warnings) {
 		this.warnings = warnings;
 	}
 }

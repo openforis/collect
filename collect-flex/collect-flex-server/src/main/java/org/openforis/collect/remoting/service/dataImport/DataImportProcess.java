@@ -27,10 +27,12 @@ import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.RecordDao;
 import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.collect.persistence.xml.DataHandler;
+import org.openforis.collect.persistence.xml.DataHandler.NodeErrorItem;
 import org.openforis.collect.persistence.xml.DataUnmarshaller;
-import org.openforis.collect.persistence.xml.DataUnmarshallerException;
+import org.openforis.collect.persistence.xml.DataUnmarshaller.ParseRecordResult;
 import org.openforis.collect.remoting.service.dataImport.DataImportState.MainStep;
 import org.openforis.collect.remoting.service.dataImport.DataImportState.SubStep;
+import org.openforis.collect.remoting.service.dataImport.DataImportSummary.FileErrorItem;
 import org.openforis.idm.metamodel.xml.InvalidIdmlException;
 import org.openforis.idm.model.Entity;
 import org.springframework.transaction.annotation.Transactional;
@@ -139,9 +141,9 @@ public class DataImportProcess implements Callable<Void> {
 			}
 			Map<Integer, CollectRecord> packagedRecords = new HashMap<Integer, CollectRecord>();
 			Map<Integer, List<Step>> packagedStepsPerRecord = new HashMap<Integer, List<Step>>();
-			Map<String, String> packagedSkippedFileErrors = new HashMap<String, String>();
+			Map<String, List<NodeErrorItem>> packagedSkippedFileErrors = new HashMap<String, List<NodeErrorItem>>();
 			Map<Integer, CollectRecord> conflictingPackagedRecords = new HashMap<Integer, CollectRecord>();
-			Map<Integer, Map<Step, List<String>>> warnings = new HashMap<Integer, Map<Step,List<String>>>();
+			Map<Integer, Map<Step, List<NodeErrorItem>>> warnings = new HashMap<Integer, Map<Step,List<NodeErrorItem>>>();
 			zipFile = new ZipFile(packagedFile);
 			Enumeration<? extends ZipEntry> entries = zipFile.entries();
 			state.setTotal(zipFile.size());
@@ -177,9 +179,9 @@ public class DataImportProcess implements Callable<Void> {
 	}
 
 	private void createSummaryForEntry(Enumeration<? extends ZipEntry> entries, ZipFile zipFile, 
-			Map<String, String> packagedSkippedFileErrors, Map<Integer, CollectRecord> packagedRecords, 
+			Map<String, List<NodeErrorItem>> packagedSkippedFileErrors, Map<Integer, CollectRecord> packagedRecords, 
 			Map<Integer, List<Step>> packagedStepsPerRecord, Map<Step, Integer> totalPerStep, 
-			Map<Integer, CollectRecord> conflictingPackagedRecords, Map<Integer, Map<Step, List<String>>> warnings) throws DataImportExeption, IOException {
+			Map<Integer, CollectRecord> conflictingPackagedRecords, Map<Integer, Map<Step, List<NodeErrorItem>>> warnings) throws DataImportExeption, IOException {
 		ZipEntry zipEntry = (ZipEntry) entries.nextElement();
 		String entryName = zipEntry.getName();
 		if (zipEntry.isDirectory() || IDML_FILE_NAME.equals(entryName)) {
@@ -189,10 +191,10 @@ public class DataImportProcess implements Callable<Void> {
 		InputStream inputStream = zipFile.getInputStream(zipEntry);
 		InputStreamReader reader = new InputStreamReader(inputStream);
 		ParseRecordResult parseRecordResult = parseRecord(reader);
-		CollectRecord parsedRecord = parseRecordResult.record;
-		String message = parseRecordResult.message;
-		if (parsedRecord == null) {
-			packagedSkippedFileErrors.put(entryName, message);
+		CollectRecord parsedRecord = parseRecordResult.getRecord();
+		if ( ! parseRecordResult.isSuccess()) {
+			List<NodeErrorItem> failures = parseRecordResult.getFailures();
+			packagedSkippedFileErrors.put(entryName, failures);
 		} else {
 			int entryId = getRecordId(entryName);
 			CollectRecord recordSummary = createRecordSummary(parsedRecord);
@@ -210,23 +212,25 @@ public class DataImportProcess implements Callable<Void> {
 				conflictingPackagedRecords.put(entryId, oldRecord);
 			}
 			if ( parseRecordResult.hasWarnings() ) {
-				Map<Step, List<String>> warningsPerEntry = warnings.get(entryId);
+				Map<Step, List<NodeErrorItem>> warningsPerEntry = warnings.get(entryId);
 				if ( warningsPerEntry == null ) {
-					warningsPerEntry = new HashMap<CollectRecord.Step, List<String>>();
+					warningsPerEntry = new HashMap<CollectRecord.Step, List<NodeErrorItem>>();
 					warnings.put(entryId, warningsPerEntry);
 				}
-				warningsPerEntry.put(step, parseRecordResult.warnings);
+				warningsPerEntry.put(step, parseRecordResult.getWarnings());
 			}
 		}
 		state.incrementCount();
 	}
 	
 	private DataImportSummary createSummary(
-			Map<String, String> packagedSkippedFileErrors, String surveyName,
+			Map<String, List<NodeErrorItem>> packagedSkippedFileErrors, 
+			String surveyName,
 			Map<Step, Integer> totalPerStep,
 			Map<Integer, CollectRecord> packagedRecords,
 			Map<Integer, List<Step>> packagedStepsPerRecord,
-			Map<Integer, CollectRecord> conflictingPackagedRecords, Map<Integer, Map<Step, List<String>>> warnings) {
+			Map<Integer, CollectRecord> conflictingPackagedRecords, 
+			Map<Integer, Map<Step, List<NodeErrorItem>>> warnings) {
 		DataImportSummary summary = new DataImportSummary();
 		summary.setSurveyName(surveyName);
 		
@@ -253,7 +257,14 @@ public class DataImportProcess implements Callable<Void> {
 		}
 		summary.setRecordsToImport(recordsToImport);
 		summary.setConflictingRecords(conflictingRecordItems);
-		summary.setSkippedFileErrors(packagedSkippedFileErrors);
+		List<FileErrorItem> packagedSkippedFileErrorsList = new ArrayList<DataImportSummary.FileErrorItem>();
+		Set<String> skippedFileNames = packagedSkippedFileErrors.keySet();
+		for (String fileName : skippedFileNames) {
+			List<NodeErrorItem> nodeErrors = packagedSkippedFileErrors.get(fileName);
+			FileErrorItem fileErrorItem = new FileErrorItem(fileName, nodeErrors);
+			packagedSkippedFileErrorsList.add(fileErrorItem);
+		}
+		summary.setSkippedFileErrors(packagedSkippedFileErrorsList);
 		summary.setTotalPerStep(totalPerStep);
 		return summary;
 	}
@@ -323,8 +334,8 @@ public class DataImportProcess implements Callable<Void> {
 			if ( inputStream != null ) {
 				InputStreamReader reader = new InputStreamReader(inputStream);
 				ParseRecordResult parseRecordResult = parseRecord(reader);
-				CollectRecord parsedRecord = parseRecordResult.record;
-				String message = parseRecordResult.message;
+				CollectRecord parsedRecord = parseRecordResult.getRecord();
+				String message = parseRecordResult.getMessage();
 				if (parsedRecord == null) {
 					state.addError(entryName, message);
 				} else {
@@ -347,7 +358,7 @@ public class DataImportProcess implements Callable<Void> {
 						recordDao.update(lastStepRecord);
 					}
 					if ( parseRecordResult.hasWarnings() ) {
-						state.addWarnings(entryName, parseRecordResult.warnings);
+						//state.addWarnings(entryName, parseRecordResult.getWarnings());
 					}
 				}
 			}
@@ -414,12 +425,10 @@ public class DataImportProcess implements Callable<Void> {
 	}
 
 	private ParseRecordResult parseRecord(Reader reader) throws IOException {
-		ParseRecordResult result = new ParseRecordResult();
-		try {
-			CollectRecord record = dataUnmarshaller.parse(reader);
+		ParseRecordResult result = dataUnmarshaller.parse(reader);
+		CollectRecord record = result.getRecord();
+		if ( record != null ) {
 			recordManager.addEmptyNodes(record.getRootEntity());
-			result.record = record;
-			List<String> warns = dataUnmarshaller.getLastParsingWarnings();
 			try {
 				record.updateDerivedStates();
 			} catch (Exception e) {
@@ -427,14 +436,6 @@ public class DataImportProcess implements Callable<Void> {
 			}
 			record.updateRootEntityKeyValues();
 			record.updateEntityCounts();
-			if (warns.size() > 0) {
-				result.message = "Processed with errors: " + warns.toString();
-				result.warnings = warns;
-			}
-		} catch (DataUnmarshallerException e) {
-			result.message = "Unable to process: " + e.getMessages().toString();
-		} catch (RuntimeException e) {
-			result.message = "Unable to process: " + e.toString();
 		}
 		return result;
 	}
@@ -512,20 +513,6 @@ public class DataImportProcess implements Callable<Void> {
 		this.newSurveyName = newSurveyName;
 	}
 
-	private class ParseRecordResult {
-		private String message;
-		private List<String> warnings;
-		private CollectRecord record;
-
-		public ParseRecordResult() {
-			warnings = new ArrayList<String>();
-		}
-		
-		public boolean hasWarnings() {
-			return warnings != null && warnings.size() > 0;
-		}
-	}
-	
 	public DataImportSummary getSummary() {
 		return summary;
 	}

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.openforis.collect.model.CollectRecord.Step;
+import org.openforis.collect.persistence.xml.DataHandler.NodeErrorItem;
 
 /**
  * 
@@ -15,18 +16,10 @@ public class DataImportSummary {
 	private Map<Step, Integer> totalPerStep;
 	private List<DataImportSummaryItem> recordsToImport;
 	private List<DataImportSummaryItem> conflictingRecords;
-	private Map<String, String> skippedFileErrors;
+	private List<FileErrorItem> skippedFileErrors;
 	private String surveyName;
 	
 	public DataImportSummary() {
-	}
-
-	public Map<String, String> getSkippedFileErrors() {
-		return skippedFileErrors;
-	}
-
-	public void setSkippedFileErrors(Map<String, String> skippedFileErrors) {
-		this.skippedFileErrors = skippedFileErrors;
 	}
 
 	public Map<Step, Integer> getTotalPerStep() {
@@ -60,7 +53,44 @@ public class DataImportSummary {
 	public void setSurveyName(String surveyName) {
 		this.surveyName = surveyName;
 	}
-
 	
+	public List<FileErrorItem> getSkippedFileErrors() {
+		return skippedFileErrors;
+	}
+
+	public void setSkippedFileErrors(List<FileErrorItem> skippedFileErrors) {
+		this.skippedFileErrors = skippedFileErrors;
+	}
+
+	public static class FileErrorItem {
+		
+		private String fileName;
+		private List<NodeErrorItem> errors;
+		
+		public FileErrorItem(String fileName, List<NodeErrorItem> errors) {
+			super();
+			this.fileName = fileName;
+			this.errors = errors;
+		}
+
+		public String getFileName() {
+			return fileName;
+		}
+
+		public void setFileName(String fileName) {
+			this.fileName = fileName;
+		}
+
+		public List<NodeErrorItem> getErrors() {
+			return errors;
+		}
+
+		public void setErrors(List<NodeErrorItem> errors) {
+			this.errors = errors;
+		}
+		
+		
+		
+	}
 
 }

@@ -14,6 +14,9 @@ package org.openforis.collect.util
 	import mx.styles.CSSStyleDeclaration;
 	import mx.styles.IStyleManager2;
 	
+	import org.openforis.collect.i18n.Message;
+	import org.openforis.collect.model.CollectRecord$Step;
+	
 	import spark.components.Application;
 	import spark.components.NavigatorContent;
 	import spark.components.Scroller;
@@ -249,6 +252,22 @@ package org.openforis.collect.util
 				result = _dataTimeFormatter.format(date);
 			}
 			return result;
+		}
+		
+		public static function gridColumnStepLabelFunction(item:Object, column:Object):String {
+			var dataField:String = column.dataField;
+			var step:CollectRecord$Step = ObjectUtil.getValue(item, dataField) as CollectRecord$Step;
+			if ( step != null ) {
+				switch ( step.name ) {
+					case CollectRecord$Step.ENTRY.name:
+						return Message.get('phase.short.ENTRY');
+					case CollectRecord$Step.CLEANSING.name:
+						return Message.get('phase.short.CLEANSING');
+					case CollectRecord$Step.ANALYSIS.name:
+						return Message.get('phase.short.ANALYSIS');
+				}
+			}
+			return "";
 		}
 		
 		private static function isDescendantOf(parent:UIComponent, component:UIComponent):Boolean {

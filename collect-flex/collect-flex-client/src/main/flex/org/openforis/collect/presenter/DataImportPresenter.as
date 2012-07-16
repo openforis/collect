@@ -14,13 +14,17 @@ package org.openforis.collect.presenter {
 	
 	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
+	import mx.core.IFlexDisplayObject;
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.IResponder;
 	import mx.rpc.events.ResultEvent;
 	
+	import org.granite.collections.IMap;
+	import org.granite.ns.tide;
 	import org.openforis.collect.Application;
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.client.DataImportClient;
+	import org.openforis.collect.event.DataImportEvent;
 	import org.openforis.collect.i18n.Message;
 	import org.openforis.collect.model.CollectRecord$Step;
 	import org.openforis.collect.remoting.service.dataImport.DataImportState$MainStep;
@@ -28,9 +32,11 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.remoting.service.dataImport.DataImportStateProxy;
 	import org.openforis.collect.remoting.service.dataImport.DataImportSummaryItemProxy;
 	import org.openforis.collect.remoting.service.dataImport.DataImportSummaryProxy;
+	import org.openforis.collect.ui.component.WarningsPopUp;
 	import org.openforis.collect.ui.view.DataImportView;
 	import org.openforis.collect.util.AlertUtil;
 	import org.openforis.collect.util.ApplicationConstants;
+	import org.openforis.collect.util.PopUpUtil;
 	import org.openforis.collect.util.StringUtil;
 
 	/**
@@ -78,6 +84,8 @@ package org.openforis.collect.presenter {
 			_view.uploadButton.addEventListener(MouseEvent.CLICK, uploadButtonClickHandler);
 			_view.startImportButton.addEventListener(MouseEvent.CLICK, startImportClickHandler);
 			_view.cancelButton.addEventListener(MouseEvent.CLICK, cancelButtonClickHandler);
+			
+			eventDispatcher.addEventListener(DataImportEvent.SHOW_IMPORT_WARNINGS, showImportWarningsPopUp);
 		}
 		
 		protected function uploadButtonClickHandler(event:MouseEvent):void {
@@ -157,14 +165,7 @@ package org.openforis.collect.presenter {
 			var cleansingTotalRecords:int = _summary.totalPerStep.get(CollectRecord$Step.CLEANSING);
 			var analysisTotalRecords:int = _summary.totalPerStep.get(CollectRecord$Step.ANALYSIS);
 			
-			var skippedFileItems:IList = new ArrayCollection();
-			var skippedFileNames:ArrayCollection = _summary.skippedFileErrors.keySet;
-			for each (var fileName:String in skippedFileNames) {
-				var message:String = _summary.skippedFileErrors.get(fileName);
-				var item:Object = {fileName: fileName, message: message};
-				skippedFileItems.addItem(item);
-			}
-			_view.skippedFilesDataGrid.dataProvider = skippedFileItems;
+			_view.skippedFilesDataGrid.dataProvider = _summary.skippedFileErrors;
 			//default selected
 			setItemsSelected(_summary.recordsToImport);
 			_view.recordToImportDataGrid.dataProvider = _summary.recordsToImport;
@@ -373,6 +374,17 @@ package org.openforis.collect.presenter {
 			_state = null;
 			_view.currentState = DataImportView.STATE_DEFAULT;
 			stopProgressTimer();
+		}
+		
+		protected function showImportWarningsPopUp(event:DataImportEvent):void {
+			var summaryItem:DataImportSummaryItemProxy = event.summaryItem;
+			/*
+			var warnings:IList = summaryItem.warnings;
+			var popUp:WarningsPopUp = WarningsPopUp(PopUpUtil.createPopUp(WarningsPopUp, false));
+			var recordKey:String = summaryItem.key;
+			popUp.title = Message.get("dataImport.warnings.title", [recordKey]);
+			popUp.dataGrid.dataProvider = warnings;
+			*/
 		}
 		
 	}

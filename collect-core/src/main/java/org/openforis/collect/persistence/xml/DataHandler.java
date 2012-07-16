@@ -13,6 +13,7 @@ import javax.xml.bind.DatatypeConverter;
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.State;
+import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.FieldSymbol;
 import org.openforis.collect.model.User;
@@ -49,8 +50,8 @@ public class DataHandler extends DefaultHandler {
 	protected Node<?> node;
 	protected String field;
 	private boolean failed;
-	private List<String> failures;
-	private List<String> warnings;
+	private List<NodeErrorItem> failures;
+	private List<NodeErrorItem> warnings;
 	private StringBuilder content;
 	protected Attributes attributes;
 	private CollectSurvey recordSurvey;
@@ -75,8 +76,8 @@ public class DataHandler extends DefaultHandler {
 		this.node = null;
 		this.failed = false;
 		this.field = null;
-		this.failures = new ArrayList<String>();
-		this.warnings = new ArrayList<String>();
+		this.failures = new ArrayList<DataHandler.NodeErrorItem>();
+		this.warnings = new ArrayList<DataHandler.NodeErrorItem>();
 		this.attributes = null;
 		this.ignoreLevels = 0;
 	}
@@ -158,9 +159,9 @@ public class DataHandler extends DefaultHandler {
 		Entity entity = (Entity) node;
 		NodeDefinition childDefn = getNodeDefinition(entity, localName, attributes);
 		if ( childDefn == null ) {
-			warn("Undefined node '"+localName+"' in "+getPath());
+			warn(localName, "Undefined node");
 			pushIgnore();
-		} else {
+		} else if ( record.getVersion().isApplicable(childDefn)) {
 			Node<?> newNode = childDefn.createNode();
 			entity.add(newNode);
 			Integer stateValue = getNodeState();
@@ -168,6 +169,9 @@ public class DataHandler extends DefaultHandler {
 				entity.setChildState(localName, stateValue);
 			}
 			this.node = newNode;
+		} else {
+			warn(localName, "Node definition is not applicable to the record version");
+			pushIgnore();
 		}
 	}
 
@@ -189,12 +193,16 @@ public class DataHandler extends DefaultHandler {
 		ignoreLevels++;
 	}
 
-	protected void warn(String msg) {
-		warnings.add(msg);
+	protected void warn(String localName, String msg) {
+		String path = getPath() + "/" + localName;
+		NodeErrorItem nodeErrorItem = new NodeErrorItem(record.getStep(), path, msg);
+		warnings.add(nodeErrorItem);
 	}
 
 	protected void fail(String msg) {
-		failures.add(msg);
+		String path = getPath();
+		NodeErrorItem nodeErrorItem = new NodeErrorItem(record.getStep(), path, msg);
+		failures.add(nodeErrorItem);
 		failed = true;
 	}
 	
@@ -254,17 +262,17 @@ public class DataHandler extends DefaultHandler {
 				if ( fld != null ) {
 					setField(fld);
 				} else {
-					warn("Can't parse field '"+field+"' for "+node.getPath()+" with type "+attr.getClass().getSimpleName());
+					warn(field, "Can't parse field with type "+attr.getClass().getSimpleName());
 					this.node = node.getParent();
 				}
 			}
 		} catch (NumberFormatException e) {
-			warn(e+" at "+getPath());
+			warn(field, e.toString());
 		}
-		Node<?> parent = node.getParent();
-		removeIfEmpty(node);
 		if ( field == null ) {
-			this.node = parent;
+			Node<?> oldNode = node;
+			this.node = node.getParent();
+			removeIfEmpty(oldNode);
 		} else {
 			this.field = null;
 		}
@@ -346,15 +354,6 @@ public class DataHandler extends DefaultHandler {
 		return result;
 	}
 
-	
-	public List<String> getFailures() {
-		return CollectionUtil.unmodifiableList(failures);
-	}
-
-	public List<String> getWarnings() {
-		return CollectionUtil.unmodifiableList(warnings);
-	}
-
 	public CollectRecord getRecord() {
 		return record;
 	}
@@ -362,5 +361,51 @@ public class DataHandler extends DefaultHandler {
 	public Attributes getAttributes() {
 		return attributes;
 	}
+
+	public List<NodeErrorItem> getFailures() {
+		return CollectionUtil.unmodifiableList(failures);
+	}
 	
+	public List<NodeErrorItem> getWarnings() {
+		return CollectionUtil.unmodifiableList(warnings);
+	}
+	
+	public static class NodeErrorItem {
+		
+		private Step step;
+		private String path;
+		private String message;
+		
+		public NodeErrorItem(Step step, String path, String message) {
+			super();
+			this.step = step;
+			this.path = path;
+			this.message = message;
+		}
+		
+		public Step getStep() {
+			return step;
+		}
+		
+		public void setStep(Step step) {
+			this.step = step;
+		}
+		
+		public String getPath() {
+			return path;
+		}
+		
+		public void setPath(String path) {
+			this.path = path;
+		}
+
+		public String getMessage() {
+			return message;
+		}
+
+		public void setMessage(String message) {
+			this.message = message;
+		}
+
+	}
 }

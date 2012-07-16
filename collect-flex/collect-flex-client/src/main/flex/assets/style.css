@@ -128,7 +128,7 @@ input|CodeListDialog s|CheckBox {
 	fontFamily: Verdana;
 }
 
-component|ErrorListPopUp {
+component|ErrorListPopUp, component|WarningsPopUp {
 	skinClass: ClassReference("org.openforis.collect.ui.skin.ResizableTitleWindowSkin");
 }
 
@@ -238,6 +238,10 @@ s|Button.addButton {
 
 s|Button.deleteButton {
 	skin-class: ClassReference("org.openforis.collect.ui.skin.DeleteButtonSkin");
+}
+
+s|Button.errorButton {
+	skin-class: ClassReference("org.openforis.collect.ui.skin.ErrorButtonSkin");
 }
 
 .dialogHeaderStyle {

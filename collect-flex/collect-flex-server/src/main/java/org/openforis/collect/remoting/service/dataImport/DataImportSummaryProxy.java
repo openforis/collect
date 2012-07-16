@@ -6,6 +6,7 @@ import java.util.Map;
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.collect.Proxy;
 import org.openforis.collect.model.CollectRecord.Step;
+import org.openforis.collect.remoting.service.dataImport.DataImportSummary.FileErrorItem;
 
 /**
  * 
@@ -22,7 +23,7 @@ public class DataImportSummaryProxy implements Proxy {
 	}
 
 	@ExternalizedProperty
-	public Map<String, String> getSkippedFileErrors() {
+	public List<FileErrorItem> getSkippedFileErrors() {
 		return summary.getSkippedFileErrors();
 	}
 
@@ -45,5 +46,6 @@ public class DataImportSummaryProxy implements Proxy {
 	public List<DataImportSummaryItemProxy> getConflictingRecords() {
 		return DataImportSummaryItemProxy.fromList(summary.getConflictingRecords());
 	}
+
 	
 }

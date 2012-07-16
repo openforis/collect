@@ -14,12 +14,8 @@
 			import mx.events.FlexEvent;
 			
 			import org.openforis.collect.i18n.Message;
-			import org.openforis.collect.model.CollectRecord$Step;
-			import org.openforis.collect.model.proxy.RecordProxy;
 			import org.openforis.collect.presenter.DataImportPresenter;
 			import org.openforis.collect.remoting.service.dataImport.DataImportSummaryItemProxy;
-			import org.openforis.collect.util.ObjectUtil;
-			import org.openforis.collect.util.StringUtil;
 			import org.openforis.collect.util.UIUtil;
 			
 			public static const STATE_DEFAULT:String = "default";
@@ -35,21 +31,6 @@
 			
 			protected function creationCompleteHandler(event:FlexEvent):void {
 				_presenter = new DataImportPresenter(this);
-			}
-			
-			protected function conflictingRecordStepLabelFunction(item:Object, column:Object):String {
-				var dataField:String = column.dataField;
-				var step:CollectRecord$Step = ObjectUtil.getValue(item, dataField) as CollectRecord$Step;
-				switch ( step ) {
-					case CollectRecord$Step.ENTRY:
-						return Message.get('phase.short.ENTRY');
-					case CollectRecord$Step.CLEANSING:
-						return Message.get('phase.short.CLEANSING');
-					case CollectRecord$Step.ANALYSIS:
-						return Message.get('phase.short.ANALYSIS');
-					default:
-						return "";
-				}
 			}
 			
 		]]>
@@ -111,7 +92,9 @@
 			
 			<mx:AdvancedDataGrid id="conflictDataGrid"
 								 sortExpertMode="true"
-								 selectable="false">
+								 selectable="false"
+								 height="150"
+								 >
 				<mx:groupedColumns>
 					<mx:AdvancedDataGridColumn dataField="key"
 											   headerText="{Message.get('dataImport.recordList.key')}"
@@ -131,7 +114,7 @@
 												   sortable="false"
 												   width="60"
 												   headerText="{Message.get('dataImport.recordList.step')}" 
-												   labelFunction="{conflictingRecordStepLabelFunction}" />
+												   labelFunction="{UIUtil.gridColumnStepLabelFunction}" />
 					</mx:AdvancedDataGridColumnGroup>
 					<mx:AdvancedDataGridColumnGroup headerText="{Message.get('dataImport.recordConflicts.newRecord')}">
 						<mx:AdvancedDataGridColumn dataField="record.creationDate" 
@@ -187,7 +170,9 @@
 	
 			<mx:AdvancedDataGrid id="recordToImportDataGrid"
 								 sortExpertMode="true"
-								 selectable="false">
+								 selectable="false"
+								 height="150"
+								 >
 				<mx:groupedColumns>
 					<mx:AdvancedDataGridColumn dataField="key"
 											   headerText="{Message.get('dataImport.recordList.key')}"
@@ -216,6 +201,30 @@
 												   headerText="{Message.get('dataImport.recordList.analysisDataPresent')}"
 												   itemRenderer="org.openforis.collect.ui.component.datagrid.AdvancedDataGridBooleanColumnItemRenderer" />
 					</mx:AdvancedDataGridColumnGroup>
+					<mx:AdvancedDataGridColumn dataField="warnings" 
+											   headerText="{Message.get('dataImport.recordList.warnigns')}"
+											   width="60"
+											   >
+						<mx:itemRenderer>
+							<fx:Component>
+								<mx:Canvas width="100%" height="100%">
+									<fx:Script>
+										<![CDATA[
+											import org.openforis.collect.event.DataImportEvent;
+											import org.openforis.collect.event.EventDispatcherFactory;
+											import org.openforis.collect.remoting.service.dataImport.DataImportSummaryItemProxy;
+										]]>
+									</fx:Script>
+									<s:Button horizontalCenter="0" verticalCenter="0"
+											  styleName="errorButton"
+											  useHandCursor="true" buttonMode="true"
+											  visible="{data.warnings.length &gt; 0}"
+												 click="{EventDispatcherFactory.getEventDispatcher().dispatchEvent(
+												 	new DataImportEvent(DataImportEvent.SHOW_IMPORT_WARNINGS, data as DataImportSummaryItemProxy))}" />
+								</mx:Canvas>
+							</fx:Component>
+						</mx:itemRenderer>
+					</mx:AdvancedDataGridColumn>
 					<mx:AdvancedDataGridColumn dataField="selected" 
 											   headerText="{Message.get('dataImport.recordList.import')}"
 											   width="60"
@@ -243,12 +252,16 @@
 			<s:Label text="{Message.get('dataImport.skippedFiles')}"
 					 styleName="formLabel" />
 		
-			<s:DataGrid id="skippedFilesDataGrid" >
+			<s:DataGrid id="skippedFilesDataGrid"
+						height="100"
+						>
 				<s:columns>
 					<s:ArrayList>
 						<s:GridColumn dataField="fileName" 
+									  width="100"
 									  headerText="{Message.get('dataImport.skippedFiles.fileName')}" />
-						<s:GridColumn dataField="message" 
+						<s:GridColumn dataField="message"
+									  width="200"
 									  headerText="{Message.get('dataImport.skippedFiles.message')}" />
 					</s:ArrayList>
 				</s:columns>

@@ -1,6 +1,5 @@
 package org.openforis.collect.remoting.service.dataImport;
 
-import java.util.List;
 import java.util.Map;
 
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
@@ -83,7 +82,7 @@ public class DataImportStateProxy implements Proxy {
 	}
 
 	@ExternalizedProperty
-	public Map<String, List<String>> getWarnings() {
+	public Map<String, Map<String, String>> getWarnings() {
 		return state.getWarnings();
 	}
 

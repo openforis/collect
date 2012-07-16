@@ -26,6 +26,7 @@ import org.openforis.collect.persistence.xml.CollectIdmlBindingContext;
 import org.openforis.collect.persistence.xml.DataHandler;
 import org.openforis.collect.persistence.xml.DataMarshaller;
 import org.openforis.collect.persistence.xml.DataUnmarshaller;
+import org.openforis.collect.persistence.xml.DataUnmarshaller.ParseRecordResult;
 import org.openforis.collect.persistence.xml.DataUnmarshallerException;
 import org.openforis.idm.metamodel.validation.Validator;
 import org.openforis.idm.metamodel.xml.InvalidIdmlException;
@@ -95,19 +96,23 @@ public class DataMarshallerIntegrationTest {
 		String xml = out.toString();
 		assertNotNull(xml);
 		
-		CollectRecord record2 = parseRecord(survey, xml);
+		ParseRecordResult parseRecordResult = parseRecord(survey, xml);
+		
+		assertNotNull(parseRecordResult);
+		
+		CollectRecord record2 = parseRecordResult.getRecord();
 
 		assertNotNull(record2);
 		
 		assertEquals(record, record2);
 	}
 	
-	private CollectRecord parseRecord(CollectSurvey survey, String xml) throws IOException, DataUnmarshallerException {
+	private ParseRecordResult parseRecord(CollectSurvey survey, String xml) throws IOException, DataUnmarshallerException {
 		DataHandler dataHandler = new DataHandler(survey, users);
 		DataUnmarshaller dataUnmarshaller = new DataUnmarshaller(dataHandler);
 		StringReader reader = new StringReader(xml);
-		CollectRecord parsedRecord = dataUnmarshaller.parse(reader);
-		return parsedRecord;
+		ParseRecordResult result = dataUnmarshaller.parse(reader);
+		return result;
 	}
 	
 	private CollectRecord createTestRecord(CollectSurvey survey) {
