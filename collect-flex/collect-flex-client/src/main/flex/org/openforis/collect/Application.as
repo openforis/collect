@@ -35,6 +35,7 @@ package org.openforis.collect {
 		private static var _activeRootEntity:EntityDefinitionProxy;
 		private static var _activeStep:CollectRecord$Step;
 		private static var _serverOffline:Boolean;
+		private static var _locale:String;
 		
 		private static var initialized:Boolean = false;
 		
@@ -166,7 +167,16 @@ package org.openforis.collect {
 		public static function set serverOffline(value:Boolean):void {
 			_serverOffline = value;
 		}
-
+		
+		[Bindable]
+		public static function get locale():String {
+			return _locale;
+		}
+		
+		public static function set locale(value:String):void {
+			_locale = value;
+		}
+		
 
 	}
 }

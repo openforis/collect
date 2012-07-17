@@ -15,10 +15,12 @@ package org.openforis.collect.presenter {
 	import mx.rpc.events.ResultEvent;
 	import mx.utils.StringUtil;
 	
+	import org.openforis.collect.Application;
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.client.SpeciesClient;
 	import org.openforis.collect.event.InputFieldEvent;
 	import org.openforis.collect.event.TaxonInputFieldEvent;
+	import org.openforis.collect.i18n.LanguageCodes;
 	import org.openforis.collect.i18n.Message;
 	import org.openforis.collect.metamodel.proxy.TaxonAttributeDefinitionProxy;
 	import org.openforis.collect.model.proxy.FieldProxy;
@@ -79,7 +81,6 @@ package org.openforis.collect.presenter {
 			view.vernacularNameTextInput.addEventListener(FocusEvent.FOCUS_OUT, inputFieldFocusOutHandler);
 			view.vernacularNameTextInput.textInput.addEventListener(KeyboardEvent.KEY_DOWN, inputFieldKeyDownHandler);
 			//language code text input
-			view.languageCodeTextInput.addEventListener(InputFieldEvent.CHANGING, inputFieldChangingHandler);
 			//language variety text input
 			view.languageVarietyTextInput.addEventListener(InputFieldEvent.CHANGING, inputFieldChangingHandler);
 		}
@@ -300,8 +301,8 @@ package org.openforis.collect.presenter {
 				var searchType:String = token.searchType;
 				var searchText:String = token.searchText;
 				if ( (searchType == SEARCH_BY_SCIENTIFIC_NAME || searchType == SEARCH_BY_VERNACULAR_NAME) &&
-					org.openforis.collect.util.StringUtil.startsWith(UNKNOWN_ITEM.scientificName.toUpperCase(), searchText.toUpperCase()) ||
-					searchType == SEARCH_BY_CODE && org.openforis.collect.util.StringUtil.startsWith(UNKNOWN_ITEM.code.toUpperCase(), searchText.toUpperCase())
+					org.openforis.collect.util.StringUtil.startsWith(UNKNOWN_ITEM.scientificName, searchText, true) ||
+					searchType == SEARCH_BY_CODE && org.openforis.collect.util.StringUtil.startsWith(UNKNOWN_ITEM.code, searchText, true)
 					) {
 					data.addItem(UNKNOWN_ITEM);
 				}

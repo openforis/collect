@@ -4,7 +4,8 @@
 				  xmlns:mx="library://ns.adobe.com/flex/mx" 
 				  xmlns:input="org.openforis.collect.ui.component.input.*" 
 				  xmlns:detail="org.openforis.collect.ui.component.detail.*"
-				  inputFields="{[codeTextInput, scientificNameTextInput, vernacularNameTextInput, languageCodeTextInput, languageVarietyTextInput]}"
+				  inputFields="{[codeTextInput, scientificNameTextInput, vernacularNameTextInput, languageCodeTextInput, languageVarietyTextInput]}" 
+				  xmlns:component="org.openforis.collect.ui.component.*"
 				  >
 	<fx:Script>
 		<![CDATA[
@@ -50,11 +51,12 @@
 								maxChars="255"
 								width="100" 
 								/>
-		<input:StringInputField id="languageCodeTextInput" 
+		<input:LanguageCodeAutoComplete id="languageCodeTextInput" 
 								includeIn="horizontal"
 								attributeDefinition="{attributeDefinition}"
 								parentEntity="{parentEntity}"
 								attribute="{attribute}"
+								upperCase="false"
 								fieldIndex="3"
 								maxChars="3"
 								width="100" 

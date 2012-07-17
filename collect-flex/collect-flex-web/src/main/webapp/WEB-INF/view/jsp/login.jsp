@@ -113,8 +113,8 @@
 					
 					        <tr>
 					        	<td colspan='2' width="100%" style="text-align: center;">
-					        		<input name="submit" type="submit" class="button" value="Submit" />
-					        		<input name="reset" type="reset" class="button" value="Reset"/>
+					        		<input name="submit" type="submit" class="button" value="Login" />
+<!-- 					        		<input name="reset" type="reset" class="button" value="Reset"/> -->
 				        		</td>
 			        		</tr>
 			    </form>

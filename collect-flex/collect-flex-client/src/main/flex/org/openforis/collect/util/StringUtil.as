@@ -110,8 +110,18 @@ package org.openforis.collect.util
 			return parts.join(separator);
 		}
 		
-		public static function startsWith(string:String, startsWith:String):Boolean {
-			return string != null && string.indexOf(startsWith) == 0;
+		public static function startsWith(string:String, startsWith:String, ignoreCase:Boolean = false):Boolean {
+			if ( string == null && startsWith == null ) {
+				return true;
+			} else if ( string == null ) {
+				return false;
+			} else {
+				if ( ignoreCase ) {
+					string = string.toLowerCase();
+					startsWith = startsWith.toLowerCase();
+				}
+				return string.indexOf(startsWith) == 0;
+			}
 		}
 		
 		public static function pad(str:String, length:int, pad:String):String {

@@ -45,6 +45,7 @@
 	
 	<fx:Metadata>
 		[ResourceBundle("messages")]
+		[ResourceBundle("language_codes_iso_639_2")]
 	</fx:Metadata>
 	
 	<fx:Style source="assets/style.css" />

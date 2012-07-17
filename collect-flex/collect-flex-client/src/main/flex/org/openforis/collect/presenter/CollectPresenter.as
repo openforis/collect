@@ -88,6 +88,7 @@ package org.openforis.collect.presenter {
 		internal function initSessionResultHandler(event:ResultEvent, token:Object = null):void {
 			Application.user = event.result.user;
 			Application.sessionId = event.result.sessionId;
+			Application.locale = FlexGlobals.topLevelApplication.parameters.lang as String;
 			getSurveySummaries();
 		}
 		

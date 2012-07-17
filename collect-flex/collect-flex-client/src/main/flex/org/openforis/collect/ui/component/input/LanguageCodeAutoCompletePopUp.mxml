@@ -3,6 +3,7 @@
 		 xmlns:s="library://ns.adobe.com/flex/spark" 
 		 xmlns:mx="library://ns.adobe.com/flex/mx"
 		 focusEnabled="false"
+		 creationPolicy="all"
 		>
 	<s:layout>
 		<s:BasicLayout />
@@ -10,25 +11,21 @@
 	
 	<fx:Script>
 		<![CDATA[
-			import mx.events.FlexMouseEvent;
-			
-			import org.openforis.collect.event.TaxonInputFieldEvent;
+			import org.openforis.collect.event.UIEvent;
 			import org.openforis.collect.i18n.Message;
-			import org.openforis.collect.model.proxy.TaxonOccurrenceProxy;
-			import org.openforis.collect.util.ObjectUtil;
 			
 			public function itemClickHandler(event:MouseEvent=null):void {
 				if(dataGrid.selectedItem!=null) {
-					var taxonEvent:TaxonInputFieldEvent = new TaxonInputFieldEvent(TaxonInputFieldEvent.TAXON_SELECT);
-					taxonEvent.taxon = dataGrid.selectedItem as TaxonOccurrenceProxy;
-					dispatchEvent(taxonEvent);
+					var evt:UIEvent = new UIEvent(UIEvent.ITEM_SELECT);
+					evt.obj = dataGrid.selectedItem;
+					dispatchEvent(evt);
 				}
 			}
 		]]>
 	</fx:Script>
 	
 	<fx:Metadata>
-		[Event(name="taxonSelect", type="org.openforis.collect.event.TaxonInputFieldEvent")] 
+		[Event(name="itemSelect", type="org.openforis.collect.event.UIEvent")] 
 	</fx:Metadata>
 	
 	<s:DataGrid id="dataGrid"
@@ -38,25 +35,13 @@
 				>
 		<s:columns>
 			<s:ArrayList>
-				<s:GridColumn headerText="{Message.get('edit.taxon.code')}" 
+				<s:GridColumn headerText="{Message.get('language.code')}" 
 							  dataField="code" 
-							  width="83" 
+							  width="83"
 							  />
-				<s:GridColumn headerText="{Message.get('edit.taxon.scientificName')}" 
-							  dataField="scientificName" 
+				<s:GridColumn headerText="{Message.get('language.label')}" 
+							  dataField="label"
 							  width="106" 
-							  />
-				<s:GridColumn headerText="{Message.get('edit.taxon.vernacularName')}" 
-							  dataField="vernacularName" 
-							  width="106" 
-							  />
-				<s:GridColumn headerText="{Message.get('edit.taxon.languageCode')}" 
-							  dataField="languageCode" 
-							  width="106" 
-							  />
-				<s:GridColumn headerText="{Message.get('edit.taxon.languageVariety')}" 
-							  dataField="languageVariety" 
-							  width="103" 
 							  />
 			</s:ArrayList>
 		</s:columns>
