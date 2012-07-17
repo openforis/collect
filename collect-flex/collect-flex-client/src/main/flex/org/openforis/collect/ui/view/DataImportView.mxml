@@ -98,7 +98,7 @@
 				<mx:groupedColumns>
 					<mx:AdvancedDataGridColumn dataField="key"
 											   headerText="{Message.get('dataImport.recordList.key')}"
-											   width="100" />
+											   width="90" />
 					<mx:AdvancedDataGridColumnGroup headerText="{Message.get('dataImport.recordConflicts.currentRecord')}">
 						<mx:AdvancedDataGridColumn dataField="conflictingRecord.creationDate" 
 												   sortable="false"
@@ -141,6 +141,30 @@
 													   headerText="{Message.get('dataImport.recordList.analysisDataPresent')}"
 													   itemRenderer="org.openforis.collect.ui.component.datagrid.AdvancedDataGridBooleanColumnItemRenderer" />
 						</mx:AdvancedDataGridColumnGroup>
+						<mx:AdvancedDataGridColumn dataField="warnings" 
+												   headerText="{Message.get('dataImport.recordList.warnigns')}"
+												   width="50"
+												   >
+							<mx:itemRenderer>
+								<fx:Component>
+									<mx:Canvas width="100%" height="100%">
+										<fx:Script>
+											<![CDATA[
+												import org.openforis.collect.event.DataImportEvent;
+												import org.openforis.collect.event.EventDispatcherFactory;
+												import org.openforis.collect.remoting.service.dataImport.DataImportSummaryItemProxy;
+											]]>
+										</fx:Script>
+										<s:Button horizontalCenter="0" verticalCenter="0"
+												  styleName="errorButton"
+												  useHandCursor="true" buttonMode="true"
+												  visible="{data.warnings.length &gt; 0}"
+												  click="{EventDispatcherFactory.getEventDispatcher().dispatchEvent(
+												  new DataImportEvent(DataImportEvent.SHOW_IMPORT_WARNINGS, data as DataImportSummaryItemProxy))}" />
+									</mx:Canvas>
+								</fx:Component>
+							</mx:itemRenderer>
+						</mx:AdvancedDataGridColumn>
 					</mx:AdvancedDataGridColumnGroup>
 					<mx:AdvancedDataGridColumn dataField="selected" 
 											   headerText="{Message.get('dataImport.recordConflicts.replace')}"
@@ -258,11 +282,32 @@
 				<s:columns>
 					<s:ArrayList>
 						<s:GridColumn dataField="fileName" 
-									  width="100"
-									  headerText="{Message.get('dataImport.skippedFiles.fileName')}" />
-						<s:GridColumn dataField="message"
 									  width="200"
-									  headerText="{Message.get('dataImport.skippedFiles.message')}" />
+									  headerText="{Message.get('dataImport.skippedFiles.fileName')}" />
+						<s:GridColumn dataField="errors" 
+									  headerText="{Message.get('dataImport.skippedFiles.errors')}"
+									  width="60"
+									  >
+							<s:itemRenderer>
+								<fx:Component>
+									<s:GridItemRenderer width="100%" height="100%">
+										<fx:Script>
+											<![CDATA[
+												import org.openforis.collect.event.DataImportEvent;
+												import org.openforis.collect.event.EventDispatcherFactory;
+												import org.openforis.collect.remoting.service.dataImport.FileUnmarshallingErrorProxy;
+											]]>
+										</fx:Script>
+										<s:Button horizontalCenter="0" verticalCenter="0"
+												  styleName="errorButton"
+												  useHandCursor="true" buttonMode="true"
+												  visible="{data.errors.length &gt; 0}"
+												  click="{EventDispatcherFactory.getEventDispatcher().dispatchEvent(
+												  	new DataImportEvent(DataImportEvent.SHOW_SKIPPED_FILE_ERRORS, null, data as FileUnmarshallingErrorProxy))}" />
+									</s:GridItemRenderer>
+								</fx:Component>
+							</s:itemRenderer>
+						</s:GridColumn>
 					</s:ArrayList>
 				</s:columns>
 			</s:DataGrid>

@@ -9,6 +9,17 @@
 			import org.openforis.collect.i18n.Message;
 			import org.openforis.collect.util.UIUtil;
 			
+			private var _showStep:Boolean = true;
+			
+			[Bindable]
+			public function get showStep():Boolean {
+				return _showStep;
+			}
+
+			public function set showStep(value:Boolean):void {
+				_showStep = value;
+			}
+
 		]]>
 	</fx:Script>
 	
@@ -22,17 +33,18 @@
 				>
 		<s:columns>
 			<s:ArrayList>
-				<s:GridColumn headerText="{Message.get('dataImport.warnings.step')}"
+				<s:GridColumn headerText="{Message.get('dataImport.errors.step')}"
 							  dataField="step"
 							  width="50"
+							  visible="{showStep}"
 							  labelFunction="{UIUtil.gridColumnStepLabelFunction}"
 							  />
-				<s:GridColumn headerText="{Message.get('dataImport.warnings.path')}"
+				<s:GridColumn headerText="{Message.get('dataImport.errors.path')}"
 							  dataField="path"
 							  width="200"
 							  />
-				<s:GridColumn headerText="{Message.get('dataImport.warnings.warn')}"
-							  dataField="warn"
+				<s:GridColumn headerText="{Message.get('dataImport.errors.message')}"
+							  dataField="message"
 							  />
 			</s:ArrayList>
 		</s:columns>

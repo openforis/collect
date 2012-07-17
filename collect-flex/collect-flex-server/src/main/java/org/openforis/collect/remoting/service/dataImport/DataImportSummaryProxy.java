@@ -23,8 +23,10 @@ public class DataImportSummaryProxy implements Proxy {
 	}
 
 	@ExternalizedProperty
-	public List<FileErrorItem> getSkippedFileErrors() {
-		return summary.getSkippedFileErrors();
+	public List<FileUnmarshallingErrorProxy> getSkippedFileErrors() {
+		List<FileErrorItem> skippedFileErrors = summary.getSkippedFileErrors();
+		List<FileUnmarshallingErrorProxy> proxies = FileUnmarshallingErrorProxy.fromList(skippedFileErrors);
+		return proxies;
 	}
 
 	@ExternalizedProperty

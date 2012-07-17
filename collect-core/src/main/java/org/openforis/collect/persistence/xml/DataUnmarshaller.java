@@ -3,13 +3,14 @@ package org.openforis.collect.persistence.xml;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.xerces.parsers.SAXParser;
 import org.openforis.collect.model.CollectRecord;
-import org.openforis.collect.persistence.xml.DataHandler.NodeErrorItem;
+import org.openforis.collect.persistence.xml.DataHandler.NodeUnmarshallingError;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -34,11 +35,11 @@ public class DataUnmarshaller {
 		p.setContentHandler(handler);
 		try {
 			p.parse(source);
-			List<NodeErrorItem> failures = handler.getFailures();
+			List<NodeUnmarshallingError> failures = handler.getFailures();
 			if ( failures.isEmpty() ) {
 				CollectRecord record = handler.getRecord();
 				result.setRecord(record);
-				List<NodeErrorItem> warns = handler.getWarnings();
+				List<NodeUnmarshallingError> warns = handler.getWarnings();
 				if (warns.size() > 0) {
 					result.setMessage("Processed with errors: " + warns.toString());
 					result.setWarnings(warns);
@@ -47,10 +48,10 @@ public class DataUnmarshaller {
 			} else {
 				result.setFailures(failures);
 			}
-		} catch (SAXException e) {
-			result.setMessage("Unable to process: " + e.getMessage());
-		} catch (IOException e) {
-			result.setMessage("Unable to process: " + e.getMessage());
+		} catch (Exception e) {
+			String message = e.getMessage();
+			NodeUnmarshallingError error = new NodeUnmarshallingError(message);
+			result.setFailures(Arrays.asList(error));
 		}
 		return result;
 	}
@@ -84,8 +85,8 @@ public class DataUnmarshaller {
 		
 		private boolean success;
 		private String message;
-		private List<NodeErrorItem> warnings;
-		private List<NodeErrorItem> failures;
+		private List<NodeUnmarshallingError> warnings;
+		private List<NodeUnmarshallingError> failures;
 		private CollectRecord record;
 
 		public ParseRecordResult() {
@@ -124,19 +125,19 @@ public class DataUnmarshaller {
 			this.success = success;
 		}
 
-		public List<NodeErrorItem> getWarnings() {
+		public List<NodeUnmarshallingError> getWarnings() {
 			return warnings;
 		}
 
-		public void setWarnings(List<NodeErrorItem> warnings) {
+		public void setWarnings(List<NodeUnmarshallingError> warnings) {
 			this.warnings = warnings;
 		}
 
-		public List<NodeErrorItem> getFailures() {
+		public List<NodeUnmarshallingError> getFailures() {
 			return failures;
 		}
 
-		public void setFailures(List<NodeErrorItem> failures) {
+		public void setFailures(List<NodeUnmarshallingError> failures) {
 			this.failures = failures;
 		}
 

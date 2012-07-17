@@ -50,8 +50,8 @@ public class DataHandler extends DefaultHandler {
 	protected Node<?> node;
 	protected String field;
 	private boolean failed;
-	private List<NodeErrorItem> failures;
-	private List<NodeErrorItem> warnings;
+	private List<NodeUnmarshallingError> failures;
+	private List<NodeUnmarshallingError> warnings;
 	private StringBuilder content;
 	protected Attributes attributes;
 	private CollectSurvey recordSurvey;
@@ -76,8 +76,8 @@ public class DataHandler extends DefaultHandler {
 		this.node = null;
 		this.failed = false;
 		this.field = null;
-		this.failures = new ArrayList<DataHandler.NodeErrorItem>();
-		this.warnings = new ArrayList<DataHandler.NodeErrorItem>();
+		this.failures = new ArrayList<DataHandler.NodeUnmarshallingError>();
+		this.warnings = new ArrayList<DataHandler.NodeUnmarshallingError>();
 		this.attributes = null;
 		this.ignoreLevels = 0;
 	}
@@ -176,12 +176,15 @@ public class DataHandler extends DefaultHandler {
 	}
 
 	private NodeDefinition getNodeDefinition(Entity parentEntity, String localName, Attributes attributes) {
+		NodeDefinition newDefn = null;
 		EntityDefinition parentEntityDefn = parentEntity.getDefinition();
 		Schema originalSchema = recordSurvey.getSchema();
 		EntityDefinition originlParentEntityDefn = (EntityDefinition) originalSchema.getById(parentEntityDefn.getId());
 		NodeDefinition originalDefn = originlParentEntityDefn.getChildDefinition(localName);
-		Schema newSchema = currentSurvey.getSchema();
-		NodeDefinition newDefn = newSchema.getById(originalDefn.getId());
+		if ( originalDefn != null ) {
+			Schema newSchema = currentSurvey.getSchema();
+			newDefn = newSchema.getById(originalDefn.getId());
+		}
 		return newDefn;
 	}
 	
@@ -195,13 +198,13 @@ public class DataHandler extends DefaultHandler {
 
 	protected void warn(String localName, String msg) {
 		String path = getPath() + "/" + localName;
-		NodeErrorItem nodeErrorItem = new NodeErrorItem(record.getStep(), path, msg);
+		NodeUnmarshallingError nodeErrorItem = new NodeUnmarshallingError(record.getStep(), path, msg);
 		warnings.add(nodeErrorItem);
 	}
 
 	protected void fail(String msg) {
 		String path = getPath();
-		NodeErrorItem nodeErrorItem = new NodeErrorItem(record.getStep(), path, msg);
+		NodeUnmarshallingError nodeErrorItem = new NodeUnmarshallingError(record.getStep(), path, msg);
 		failures.add(nodeErrorItem);
 		failed = true;
 	}
@@ -362,25 +365,28 @@ public class DataHandler extends DefaultHandler {
 		return attributes;
 	}
 
-	public List<NodeErrorItem> getFailures() {
+	public List<NodeUnmarshallingError> getFailures() {
 		return CollectionUtil.unmodifiableList(failures);
 	}
 	
-	public List<NodeErrorItem> getWarnings() {
+	public List<NodeUnmarshallingError> getWarnings() {
 		return CollectionUtil.unmodifiableList(warnings);
 	}
 	
-	public static class NodeErrorItem {
+	public static class NodeUnmarshallingError {
 		
 		private Step step;
 		private String path;
 		private String message;
 		
-		public NodeErrorItem(Step step, String path, String message) {
-			super();
+		public NodeUnmarshallingError(String message) {
+			this.message = message;
+		}
+		
+		public NodeUnmarshallingError(Step step, String path, String message) {
+			this(message);
 			this.step = step;
 			this.path = path;
-			this.message = message;
 		}
 		
 		public Step getStep() {

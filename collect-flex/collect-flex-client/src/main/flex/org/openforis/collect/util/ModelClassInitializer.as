@@ -59,6 +59,8 @@ package org.openforis.collect.util {
 	import org.openforis.collect.remoting.service.dataImport.DataImportStateProxy;
 	import org.openforis.collect.remoting.service.dataImport.DataImportSummaryItemProxy;
 	import org.openforis.collect.remoting.service.dataImport.DataImportSummaryProxy;
+	import org.openforis.collect.remoting.service.dataImport.FileUnmarshallingErrorProxy;
+	import org.openforis.collect.remoting.service.dataImport.NodeUnmarshallingErrorProxy;
 	import org.openforis.idm.metamodel.validation.ValidationResultFlag;
 
 	public class ModelClassInitializer {
@@ -93,10 +95,12 @@ package org.openforis.collect.util {
 				EntityProxy,
 				FieldProxy,
 				FileAttributeDefinitionProxy,
+				FileUnmarshallingErrorProxy,
 				FileProxy,
 				IntegerRangeProxy,
 				LanguageSpecificTextProxy,
 				ModelVersionProxy,
+				NodeUnmarshallingErrorProxy,
 				NodeLabelProxy,
 				NodeLabelProxy$Type,
 				NodeProxy,

@@ -128,7 +128,7 @@ input|CodeListDialog s|CheckBox {
 	fontFamily: Verdana;
 }
 
-component|ErrorListPopUp, component|WarningsPopUp {
+component|ErrorListPopUp, component|DataImportNodeErrorsPopUp {
 	skinClass: ClassReference("org.openforis.collect.ui.skin.ResizableTitleWindowSkin");
 }
 

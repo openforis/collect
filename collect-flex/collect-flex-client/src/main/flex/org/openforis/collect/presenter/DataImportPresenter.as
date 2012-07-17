@@ -14,13 +14,10 @@ package org.openforis.collect.presenter {
 	
 	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
-	import mx.core.IFlexDisplayObject;
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.IResponder;
 	import mx.rpc.events.ResultEvent;
 	
-	import org.granite.collections.IMap;
-	import org.granite.ns.tide;
 	import org.openforis.collect.Application;
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.client.DataImportClient;
@@ -32,7 +29,8 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.remoting.service.dataImport.DataImportStateProxy;
 	import org.openforis.collect.remoting.service.dataImport.DataImportSummaryItemProxy;
 	import org.openforis.collect.remoting.service.dataImport.DataImportSummaryProxy;
-	import org.openforis.collect.ui.component.WarningsPopUp;
+	import org.openforis.collect.remoting.service.dataImport.FileUnmarshallingErrorProxy;
+	import org.openforis.collect.ui.component.DataImportNodeErrorsPopUp;
 	import org.openforis.collect.ui.view.DataImportView;
 	import org.openforis.collect.util.AlertUtil;
 	import org.openforis.collect.util.ApplicationConstants;
@@ -86,6 +84,7 @@ package org.openforis.collect.presenter {
 			_view.cancelButton.addEventListener(MouseEvent.CLICK, cancelButtonClickHandler);
 			
 			eventDispatcher.addEventListener(DataImportEvent.SHOW_IMPORT_WARNINGS, showImportWarningsPopUp);
+			eventDispatcher.addEventListener(DataImportEvent.SHOW_SKIPPED_FILE_ERRORS, showSkippedFileErrorsPopUp);
 		}
 		
 		protected function uploadButtonClickHandler(event:MouseEvent):void {
@@ -378,14 +377,21 @@ package org.openforis.collect.presenter {
 		
 		protected function showImportWarningsPopUp(event:DataImportEvent):void {
 			var summaryItem:DataImportSummaryItemProxy = event.summaryItem;
-			/*
 			var warnings:IList = summaryItem.warnings;
-			var popUp:WarningsPopUp = WarningsPopUp(PopUpUtil.createPopUp(WarningsPopUp, false));
+			var popUp:DataImportNodeErrorsPopUp = DataImportNodeErrorsPopUp(PopUpUtil.createPopUp(DataImportNodeErrorsPopUp, false));
 			var recordKey:String = summaryItem.key;
 			popUp.title = Message.get("dataImport.warnings.title", [recordKey]);
 			popUp.dataGrid.dataProvider = warnings;
-			*/
 		}
 		
+		protected function showSkippedFileErrorsPopUp(event:DataImportEvent):void {
+			var fileErrorItem:FileUnmarshallingErrorProxy = event.fileUnmarshallingError;
+			var errors:IList = fileErrorItem.errors;
+			var popUp:DataImportNodeErrorsPopUp = DataImportNodeErrorsPopUp(PopUpUtil.createPopUp(DataImportNodeErrorsPopUp, false));
+			var fileName:String = fileErrorItem.fileName;
+			popUp.title = Message.get("dataImport.skippedFileErrors.title", [fileName]);
+			popUp.showStep = false;
+			popUp.dataGrid.dataProvider = errors;
+		}
 	}
 }

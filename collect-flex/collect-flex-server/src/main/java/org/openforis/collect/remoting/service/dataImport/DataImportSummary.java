@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.openforis.collect.model.CollectRecord.Step;
-import org.openforis.collect.persistence.xml.DataHandler.NodeErrorItem;
+import org.openforis.collect.persistence.xml.DataHandler.NodeUnmarshallingError;
 
 /**
  * 
@@ -65,9 +65,9 @@ public class DataImportSummary {
 	public static class FileErrorItem {
 		
 		private String fileName;
-		private List<NodeErrorItem> errors;
+		private List<NodeUnmarshallingError> errors;
 		
-		public FileErrorItem(String fileName, List<NodeErrorItem> errors) {
+		public FileErrorItem(String fileName, List<NodeUnmarshallingError> errors) {
 			super();
 			this.fileName = fileName;
 			this.errors = errors;
@@ -81,11 +81,11 @@ public class DataImportSummary {
 			this.fileName = fileName;
 		}
 
-		public List<NodeErrorItem> getErrors() {
+		public List<NodeUnmarshallingError> getErrors() {
 			return errors;
 		}
 
-		public void setErrors(List<NodeErrorItem> errors) {
+		public void setErrors(List<NodeUnmarshallingError> errors) {
 			this.errors = errors;
 		}
 		

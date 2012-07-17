@@ -3,13 +3,14 @@ package org.openforis.collect.remoting.service.dataImport;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.collect.Proxy;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.proxy.RecordProxy;
-import org.openforis.collect.persistence.xml.DataHandler.NodeErrorItem;
+import org.openforis.collect.persistence.xml.DataHandler.NodeUnmarshallingError;
 
 /**
  * 
@@ -59,24 +60,18 @@ public class DataImportSummaryItemProxy implements Proxy {
 	}
 	
 	@ExternalizedProperty
-	public Map<Step, List<NodeErrorItem>> getWarnings() {
-		Map<Step, List<NodeErrorItem>> warnings = item.getWarnings();
-		/*
-		List<NodeErrorItem> result = new ArrayList<NodeErrorItem>();
-		Set<Step> steps = warnings.keySet();
-		for (Step step : steps) {
-			List<NodeErrorItem> warningsPerStep = warnings.get(step);
-			if ( warningsPerStep != null ) {
-				Set<String> paths = warningsPerStep.keySet();
-				for (String path : paths) {
-					String warn = warningsPerStep.get(path);
-					NodeErrorItem item = new NodeErrorItem(step, path, warn);
-					result.add(item);
-				}
+	public List<NodeUnmarshallingErrorProxy> getWarnings() {
+		List<NodeUnmarshallingError> result = new ArrayList<NodeUnmarshallingError>();
+		Map<Step, List<NodeUnmarshallingError>> warnings = item.getWarnings();
+		if ( warnings != null ) {
+			Set<Step> steps = warnings.keySet();
+			for (Step step : steps) {
+				List<NodeUnmarshallingError> warningsPerStep = warnings.get(step);
+				result.addAll(warningsPerStep);
 			}
 		}
-		*/
-		return warnings;
+		List<NodeUnmarshallingErrorProxy> proxies = NodeUnmarshallingErrorProxy.fromList(result);
+		return proxies;
 	}
 
 	@ExternalizedProperty

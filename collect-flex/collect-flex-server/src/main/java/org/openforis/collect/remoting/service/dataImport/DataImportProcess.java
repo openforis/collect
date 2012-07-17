@@ -27,7 +27,7 @@ import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.RecordDao;
 import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.collect.persistence.xml.DataHandler;
-import org.openforis.collect.persistence.xml.DataHandler.NodeErrorItem;
+import org.openforis.collect.persistence.xml.DataHandler.NodeUnmarshallingError;
 import org.openforis.collect.persistence.xml.DataUnmarshaller;
 import org.openforis.collect.persistence.xml.DataUnmarshaller.ParseRecordResult;
 import org.openforis.collect.remoting.service.dataImport.DataImportState.MainStep;
@@ -141,9 +141,9 @@ public class DataImportProcess implements Callable<Void> {
 			}
 			Map<Integer, CollectRecord> packagedRecords = new HashMap<Integer, CollectRecord>();
 			Map<Integer, List<Step>> packagedStepsPerRecord = new HashMap<Integer, List<Step>>();
-			Map<String, List<NodeErrorItem>> packagedSkippedFileErrors = new HashMap<String, List<NodeErrorItem>>();
+			Map<String, List<NodeUnmarshallingError>> packagedSkippedFileErrors = new HashMap<String, List<NodeUnmarshallingError>>();
 			Map<Integer, CollectRecord> conflictingPackagedRecords = new HashMap<Integer, CollectRecord>();
-			Map<Integer, Map<Step, List<NodeErrorItem>>> warnings = new HashMap<Integer, Map<Step,List<NodeErrorItem>>>();
+			Map<Integer, Map<Step, List<NodeUnmarshallingError>>> warnings = new HashMap<Integer, Map<Step,List<NodeUnmarshallingError>>>();
 			zipFile = new ZipFile(packagedFile);
 			Enumeration<? extends ZipEntry> entries = zipFile.entries();
 			state.setTotal(zipFile.size());
@@ -179,9 +179,9 @@ public class DataImportProcess implements Callable<Void> {
 	}
 
 	private void createSummaryForEntry(Enumeration<? extends ZipEntry> entries, ZipFile zipFile, 
-			Map<String, List<NodeErrorItem>> packagedSkippedFileErrors, Map<Integer, CollectRecord> packagedRecords, 
+			Map<String, List<NodeUnmarshallingError>> packagedSkippedFileErrors, Map<Integer, CollectRecord> packagedRecords, 
 			Map<Integer, List<Step>> packagedStepsPerRecord, Map<Step, Integer> totalPerStep, 
-			Map<Integer, CollectRecord> conflictingPackagedRecords, Map<Integer, Map<Step, List<NodeErrorItem>>> warnings) throws DataImportExeption, IOException {
+			Map<Integer, CollectRecord> conflictingPackagedRecords, Map<Integer, Map<Step, List<NodeUnmarshallingError>>> warnings) throws DataImportExeption, IOException {
 		ZipEntry zipEntry = (ZipEntry) entries.nextElement();
 		String entryName = zipEntry.getName();
 		if (zipEntry.isDirectory() || IDML_FILE_NAME.equals(entryName)) {
@@ -193,7 +193,7 @@ public class DataImportProcess implements Callable<Void> {
 		ParseRecordResult parseRecordResult = parseRecord(reader);
 		CollectRecord parsedRecord = parseRecordResult.getRecord();
 		if ( ! parseRecordResult.isSuccess()) {
-			List<NodeErrorItem> failures = parseRecordResult.getFailures();
+			List<NodeUnmarshallingError> failures = parseRecordResult.getFailures();
 			packagedSkippedFileErrors.put(entryName, failures);
 		} else {
 			int entryId = getRecordId(entryName);
@@ -212,9 +212,9 @@ public class DataImportProcess implements Callable<Void> {
 				conflictingPackagedRecords.put(entryId, oldRecord);
 			}
 			if ( parseRecordResult.hasWarnings() ) {
-				Map<Step, List<NodeErrorItem>> warningsPerEntry = warnings.get(entryId);
+				Map<Step, List<NodeUnmarshallingError>> warningsPerEntry = warnings.get(entryId);
 				if ( warningsPerEntry == null ) {
-					warningsPerEntry = new HashMap<CollectRecord.Step, List<NodeErrorItem>>();
+					warningsPerEntry = new HashMap<CollectRecord.Step, List<NodeUnmarshallingError>>();
 					warnings.put(entryId, warningsPerEntry);
 				}
 				warningsPerEntry.put(step, parseRecordResult.getWarnings());
@@ -224,13 +224,13 @@ public class DataImportProcess implements Callable<Void> {
 	}
 	
 	private DataImportSummary createSummary(
-			Map<String, List<NodeErrorItem>> packagedSkippedFileErrors, 
+			Map<String, List<NodeUnmarshallingError>> packagedSkippedFileErrors, 
 			String surveyName,
 			Map<Step, Integer> totalPerStep,
 			Map<Integer, CollectRecord> packagedRecords,
 			Map<Integer, List<Step>> packagedStepsPerRecord,
 			Map<Integer, CollectRecord> conflictingPackagedRecords, 
-			Map<Integer, Map<Step, List<NodeErrorItem>>> warnings) {
+			Map<Integer, Map<Step, List<NodeUnmarshallingError>>> warnings) {
 		DataImportSummary summary = new DataImportSummary();
 		summary.setSurveyName(surveyName);
 		
@@ -260,7 +260,7 @@ public class DataImportProcess implements Callable<Void> {
 		List<FileErrorItem> packagedSkippedFileErrorsList = new ArrayList<DataImportSummary.FileErrorItem>();
 		Set<String> skippedFileNames = packagedSkippedFileErrors.keySet();
 		for (String fileName : skippedFileNames) {
-			List<NodeErrorItem> nodeErrors = packagedSkippedFileErrors.get(fileName);
+			List<NodeUnmarshallingError> nodeErrors = packagedSkippedFileErrors.get(fileName);
 			FileErrorItem fileErrorItem = new FileErrorItem(fileName, nodeErrors);
 			packagedSkippedFileErrorsList.add(fileErrorItem);
 		}
@@ -426,8 +426,8 @@ public class DataImportProcess implements Callable<Void> {
 
 	private ParseRecordResult parseRecord(Reader reader) throws IOException {
 		ParseRecordResult result = dataUnmarshaller.parse(reader);
-		CollectRecord record = result.getRecord();
-		if ( record != null ) {
+		if ( result.isSuccess() ) {
+			CollectRecord record = result.getRecord();
 			recordManager.addEmptyNodes(record.getRootEntity());
 			try {
 				record.updateDerivedStates();

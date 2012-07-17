@@ -108,6 +108,8 @@
 								<includeClass>org.openforis.collect.remoting.service.dataImport.DataImportState$SubStep</includeClass>
 								<includeClass>org.openforis.collect.remoting.service.dataImport.DataImportSummaryProxy</includeClass>
 								<includeClass>org.openforis.collect.remoting.service.dataImport.DataImportSummaryItemProxy</includeClass>
+								<includeClass>org.openforis.collect.remoting.service.dataImport.FileUnmarshallingErrorProxy</includeClass>
+								<includeClass>org.openforis.collect.remoting.service.dataImport.NodeUnmarshallingErrorProxy</includeClass>
 							</includeJavaClasses>
 						</configuration>
 					</execution>
