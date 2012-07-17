@@ -98,7 +98,7 @@
 				<mx:groupedColumns>
 					<mx:AdvancedDataGridColumn dataField="key"
 											   headerText="{Message.get('dataImport.recordList.key')}"
-											   width="90" />
+											   width="100" />
 					<mx:AdvancedDataGridColumnGroup headerText="{Message.get('dataImport.recordConflicts.currentRecord')}">
 						<mx:AdvancedDataGridColumn dataField="conflictingRecord.creationDate" 
 												   sortable="false"
@@ -277,6 +277,7 @@
 					 styleName="formLabel" />
 		
 			<s:DataGrid id="skippedFilesDataGrid"
+						selectionMode="none"
 						height="100"
 						>
 				<s:columns>
