@@ -1,7 +1,6 @@
 package org.openforis.collect.presenter
 {
 	import flash.display.DisplayObject;
-	import flash.events.Event;
 	import flash.events.FocusEvent;
 	import flash.events.KeyboardEvent;
 	import flash.ui.Keyboard;
@@ -13,18 +12,20 @@ package org.openforis.collect.presenter
 	import mx.events.FlexMouseEvent;
 	import mx.managers.PopUpManager;
 	
+	import org.granite.reflect.Field;
 	import org.openforis.collect.Application;
 	import org.openforis.collect.event.InputFieldEvent;
 	import org.openforis.collect.event.UIEvent;
 	import org.openforis.collect.i18n.LanguageCodes;
 	import org.openforis.collect.model.LanguageItem;
+	import org.openforis.collect.model.proxy.FieldProxy;
+	import org.openforis.collect.ui.component.input.InputField;
 	import org.openforis.collect.ui.component.input.LanguageCodeAutoComplete;
 	import org.openforis.collect.ui.component.input.LanguageCodeAutoCompletePopUp;
+	import org.openforis.collect.util.CollectionUtil;
 	import org.openforis.collect.util.PopUpUtil;
 	import org.openforis.collect.util.StringUtil;
-	
-	import spark.events.GridEvent;
-	import spark.events.GridSelectionEvent;
+	import org.openforis.collect.util.UIUtil;
 
 	/**
 	 * 
@@ -63,11 +64,56 @@ package org.openforis.collect.presenter
 		}
 		
 		protected function inputFieldKeyDownHandler(event:KeyboardEvent):void {
-			
+			switch ( event.keyCode ) {
+				case Keyboard.DOWN:
+					if ( autoCompletePopUpOpened ) {
+						autoCompletePopUp.dataGrid.setFocus();
+						if ( CollectionUtil.isNotEmpty(autoCompletePopUp.dataGrid.dataProvider) ) {
+							autoCompletePopUp.dataGrid.selectedIndex = 0;
+						}
+					}
+					break;
+				case Keyboard.ESCAPE:
+					closeAutoCompletePopUp();
+					break;
+				case Keyboard.TAB:
+					if ( autoCompletePopUpOpened ) {
+						var matchingResult:LanguageItem = getMatchingResult() as LanguageItem;
+						if ( matchingResult != null ) {
+							performSelectLanguage(matchingResult);
+						} else {
+							var text:String = autoCompleteLastInputField.text;
+							if ( StringUtil.isBlank(text) || FieldProxy.isShortCutForReasonBlank(text) ) {
+								autoCompleteLastInputField.presenter.updateValue();
+							} else {
+								autoCompleteLastInputField.presenter.undoLastChange();
+							}
+						}
+						closeAutoCompletePopUp();
+					}
+					break;
+			}
+		}
+		
+		protected static function getMatchingResult():Object {
+			var searchText:String = autoCompleteLastInputField.text;
+			var list:IList = autoCompletePopUp.dataGrid.dataProvider;
+			for each (var item:Object in list) {
+				var compareToValue:String = item.code;
+				if ( compareToValue != null && searchText.toUpperCase() == compareToValue.toUpperCase() ) {
+					return item;
+				}
+			}
+			return null;
 		}
 		
 		protected function inputFieldFocusOutHandler(event:FocusEvent):void {
-			
+			var inputField:InputField = event.target.document;
+			if ( inputField != null && inputField.changed ) {
+				if ( ! autoCompletePopUpOpened && ! UIUtil.isFocusOnComponent(autoCompletePopUp) ) {
+					inputField.presenter.undoLastChange();
+				}
+			}
 		}
 		
 		protected function inputFieldChangingHandler(event:InputFieldEvent):void {
@@ -77,7 +123,7 @@ package org.openforis.collect.presenter
 		
 		protected static function languagesFilterFunction(item:LanguageItem):Boolean {
 			if ( StringUtil.isNotBlank(searchText) ) {
-				return StringUtil.startsWith(item.code, searchText, true);
+				return StringUtil.startsWith(item.code, searchText, true) || StringUtil.startsWith(item.label, searchText, true);
 			} else {
 				return false;
 			}
@@ -115,6 +161,10 @@ package org.openforis.collect.presenter
 		
 		protected static function languageSelectHandler(event:UIEvent = null):void {
 			var selectedLanguage:LanguageItem = autoCompletePopUp.dataGrid.selectedItem as LanguageItem;
+			performSelectLanguage(selectedLanguage);
+		}
+		
+		protected static function performSelectLanguage(selectedLanguage:LanguageItem):void {
 			if ( selectedLanguage != null ) {
 				autoCompleteLastInputField.text = selectedLanguage.code;
 				autoCompleteLastInputField.presenter.updateValue();
