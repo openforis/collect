@@ -352,12 +352,17 @@
 	</s:VGroup>
 	
 	<s:VGroup includeIn="importComplete"
+			  itemCreationPolicy="immediate"
 			  height="100%" width="100%"
-			  horizontalAlign="center" verticalAlign="middle">
+			  horizontalAlign="center" 
+			  verticalAlign="middle"
+			  gap="30">
 		
 		<s:Label text="{Message.get('dataImport.complete')}"
 				 styleName="infoMessage" />
 		
+		<s:Button id="closeButton"
+				  label="{Message.get('global.close')}"/>
 	</s:VGroup>
 
 </s:Group>

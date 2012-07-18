@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.openforis.collect</groupId>
 	<artifactId>collect</artifactId>
-	<version>3.0-Alpha4-SNAPSHOT</version>
+	<version>3.0-Alpha5-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<modules>
@@ -170,17 +170,17 @@
 			<dependency>
 				<groupId>org.openforis.idm</groupId>
 				<artifactId>idm-api</artifactId>
-				<version>3.0-Alpha4-SNAPSHOT</version>
+				<version>3.0-Alpha4</version>
 			</dependency>
 			<dependency>
 				<groupId>org.openforis.idm</groupId>
 				<artifactId>idm-transform</artifactId>
-				<version>3.0-Alpha4-SNAPSHOT</version>
+				<version>3.0-Alpha4</version>
 			</dependency>
 			<dependency>
 				<groupId>org.openforis.idm</groupId>
 				<artifactId>idm-test</artifactId>
-				<version>3.0-Alpha4-SNAPSHOT</version>
+				<version>3.0-Alpha4</version>
 				<scope>test</scope>
 			</dependency>
 			<dependency>

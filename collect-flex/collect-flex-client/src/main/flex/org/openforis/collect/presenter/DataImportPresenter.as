@@ -14,6 +14,8 @@ package org.openforis.collect.presenter {
 	
 	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
+	import mx.controls.Alert;
+	import mx.managers.PopUpManager;
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.IResponder;
 	import mx.rpc.events.ResultEvent;
@@ -22,6 +24,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.client.DataImportClient;
 	import org.openforis.collect.event.DataImportEvent;
+	import org.openforis.collect.event.UIEvent;
 	import org.openforis.collect.i18n.Message;
 	import org.openforis.collect.model.CollectRecord$Step;
 	import org.openforis.collect.remoting.service.dataImport.DataImportState$MainStep;
@@ -31,6 +34,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.remoting.service.dataImport.DataImportSummaryProxy;
 	import org.openforis.collect.remoting.service.dataImport.FileUnmarshallingErrorProxy;
 	import org.openforis.collect.ui.component.DataImportNodeErrorsPopUp;
+	import org.openforis.collect.ui.component.DataImportPopUp;
 	import org.openforis.collect.ui.view.DataImportView;
 	import org.openforis.collect.util.AlertUtil;
 	import org.openforis.collect.util.ApplicationConstants;
@@ -82,6 +86,7 @@ package org.openforis.collect.presenter {
 			_view.uploadButton.addEventListener(MouseEvent.CLICK, uploadButtonClickHandler);
 			_view.startImportButton.addEventListener(MouseEvent.CLICK, startImportClickHandler);
 			_view.cancelButton.addEventListener(MouseEvent.CLICK, cancelButtonClickHandler);
+			_view.closeButton.addEventListener(MouseEvent.CLICK, closeButtonClickHandler);
 			
 			eventDispatcher.addEventListener(DataImportEvent.SHOW_IMPORT_WARNINGS, showImportWarningsPopUp);
 			eventDispatcher.addEventListener(DataImportEvent.SHOW_SKIPPED_FILE_ERRORS, showSkippedFileErrorsPopUp);
@@ -93,12 +98,19 @@ package org.openforis.collect.presenter {
 		
 		protected function cancelButtonClickHandler(event:MouseEvent):void {
 			if ( _view.currentState == DataImportView.STATE_UPLOADING ) {
+				//cancel uploading
 				_fileReference.cancel();
 			} else {
+				//cancel import
 				var responder:AsyncResponder = new AsyncResponder(cancelImportResultHandler, faultHandler);
 				_dataImportClient.cancel(responder);
 			}
 			_view.currentState = DataImportView.STATE_DEFAULT;
+		}
+		
+		protected function closeButtonClickHandler(event:MouseEvent):void {
+			var popUp:DataImportPopUp = _view.owner as DataImportPopUp;
+			PopUpManager.removePopUp(popUp);
 		}
 		
 		protected function fileReferenceSelectHandler(event:Event):void {
@@ -321,6 +333,9 @@ package org.openforis.collect.presenter {
 		
 		protected function updateViewImportCompleted():void {
 			_view.currentState = DataImportView.STATE_IMPORT_COMPLETE;
+			//reload record summaries
+			var uiEvent:UIEvent = new UIEvent(UIEvent.RELOAD_RECORD_SUMMARIES);
+			eventDispatcher.dispatchEvent(uiEvent);
 		}
 		
 		private function updateViewForUploading():void {
