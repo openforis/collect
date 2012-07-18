@@ -13,7 +13,7 @@ package org.openforis.collect.i18n {
 	 * */
 	public class LanguageCodes {
 		
-		public static const LANGUAGE_CODES_RESOURCE:String = "language_codes_iso_639_2";
+		public static const LANGUAGE_CODES_RESOURCE:String = "language_codes_iso_639_3";
 		
 		public static function getLanguageCodes(locale:String):ArrayCollection {
 			var result:ArrayCollection  = new ArrayCollection();
