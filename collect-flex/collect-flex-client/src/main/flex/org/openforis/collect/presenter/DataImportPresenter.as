@@ -98,8 +98,10 @@ package org.openforis.collect.presenter {
 		
 		protected function cancelButtonClickHandler(event:MouseEvent):void {
 			if ( _view.currentState == DataImportView.STATE_UPLOADING ) {
+				//cancel uploading
 				_fileReference.cancel();
 			} else {
+				//cancel import
 				var responder:AsyncResponder = new AsyncResponder(cancelImportResultHandler, faultHandler);
 				_dataImportClient.cancel(responder);
 			}
@@ -107,7 +109,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function closeButtonClickHandler(event:MouseEvent):void {
-			var popUp:DataImportPopUp = _view.parentDocument as DataImportPopUp;
+			var popUp:DataImportPopUp = _view.owner as DataImportPopUp;
 			PopUpManager.removePopUp(popUp);
 		}
 		
