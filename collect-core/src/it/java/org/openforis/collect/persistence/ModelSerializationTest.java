@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.GregorianCalendar;
-import java.util.List;
 
 import junit.framework.Assert;
 
@@ -14,9 +13,6 @@ import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.CollectSurveyContext;
 import org.openforis.collect.persistence.xml.CollectIdmlBindingContext;
-import org.openforis.idm.metamodel.EntityDefinition;
-import org.openforis.idm.metamodel.NodeDefinition;
-import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.xml.InvalidIdmlException;
 import org.openforis.idm.metamodel.xml.SurveyUnmarshaller;
 import org.openforis.idm.model.Code;
@@ -58,26 +54,7 @@ public class ModelSerializationTest {
 		SurveyUnmarshaller surveyUnmarshaller = idmlBindingContext.createSurveyUnmarshaller();
 		CollectSurvey survey = (CollectSurvey) surveyUnmarshaller.unmarshal(is);
 		survey.setName("archenland1");
-		Schema schema = survey.getSchema();
-		List<EntityDefinition> rootEntityDefinitions = schema.getRootEntityDefinitions();
-		int nextId = 0;
-		for (EntityDefinition entityDefinition : rootEntityDefinitions) {
-			nextId = initIds(entityDefinition, nextId);
-		}
 		return survey;
-	}
-
-	private int initIds(NodeDefinition nodeDefinition, int nextId) {
-		nodeDefinition.setId(nextId++);
-		if ( nodeDefinition instanceof EntityDefinition ) {
-			EntityDefinition entityDefinition = (EntityDefinition) nodeDefinition;
-			List<NodeDefinition> childDefinitions = entityDefinition.getChildDefinitions();
-			for (NodeDefinition childDefn : childDefinitions) {
-				nextId = initIds(childDefn, nextId);
-			}
-		}
-		return nextId;
-		
 	}
 
 	private CollectRecord createTestRecord(CollectSurvey survey) {
