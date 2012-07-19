@@ -1,16 +1,20 @@
 package org.openforis.collect.manager;
 
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.GregorianCalendar;
-import java.util.Set;
+import java.util.List;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.openforis.collect.manager.RecordDataIndexManager;
+import org.openforis.collect.manager.RecordDataIndexManager.SearchType;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
@@ -42,14 +46,69 @@ public class RecordDataIndexManagerIntegrationTest {
 	@Autowired
 	protected RecordDataIndexManager indexManager;
 	
+	@Before
+	public void before() throws Exception {
+		indexManager.destroyIndex();
+	}
+	
 	@Test
 	public void roundTripTest() throws Exception  {
 		CollectSurvey survey = loadSurvey();
-		CollectRecord record = createTestRecord(survey);
-		indexManager.index(record);
+		String[] gpsModels = new String[] {"GPS MAP 62 S", "GPS MAP 60CSX", "SXBLUEII-L", "GPS MAP 62S"};
+		createIndex(survey, gpsModels);
 		NodeDefinition autoCompleteNodeDefn = survey.getSchema().getByPath("/cluster/gps_model");
-		Set<String> result = indexManager.search(survey, autoCompleteNodeDefn.getId(), 0, "GPS");
+		
+		//testSingleResultMatching(survey, autoCompleteNodeDefn);
+		
+		testMultipleResultsFound(survey, autoCompleteNodeDefn);
+		
+		testLimitedMultipleResultsFound(survey, autoCompleteNodeDefn);
+		
+		testNoResultsFound(survey, autoCompleteNodeDefn);
+	}
+	
+	@After
+	public void after() throws Exception {
+		indexManager.destroyIndex();
+	}
+
+	private void testSingleResultMatching(CollectSurvey survey, NodeDefinition autoCompleteNodeDefn) throws Exception {
+		List<String> result = indexManager.search(SearchType.EQUAL, survey, autoCompleteNodeDefn.getId(), 0, "SXBLUEII-L", 10);
 		assertNotNull(result);
+		assertEquals(1, result.size());
+		String value = result.iterator().next();
+		assertEquals("SXBLUEII-L", value);
+	}
+
+	private void testMultipleResultsFound(CollectSurvey survey, NodeDefinition autoCompleteNodeDefn) throws Exception {
+		List<String> result;
+		result = indexManager.search(SearchType.STARTS_WITH, survey, autoCompleteNodeDefn.getId(), 0, "GPS", 10);
+		assertNotNull(result);
+		assertEquals(3, result.size());
+		assertArrayEquals(new String[] {"GPS MAP 60CSX", "GPS MAP 62 S", "GPS MAP 62S"}, result.toArray());
+	}
+
+	private void testNoResultsFound(CollectSurvey survey, NodeDefinition autoCompleteNodeDefn) throws Exception {
+		List<String> result;
+		result = indexManager.search(SearchType.STARTS_WITH, survey, autoCompleteNodeDefn.getId(), 0, "GPS NOT LISTED", 10);
+		assertNotNull(result);
+		assertEquals(0, result.size());
+	}
+
+	private void testLimitedMultipleResultsFound(CollectSurvey survey, NodeDefinition autoCompleteNodeDefn) throws Exception {
+		List<String> result;
+		result = indexManager.search(SearchType.STARTS_WITH, survey, autoCompleteNodeDefn.getId(), 0, "GPS", 2);
+		assertNotNull(result);
+		assertEquals(2, result.size());
+		assertArrayEquals(new String[] {"GPS MAP 60CSX", "GPS MAP 62 S"}, result.toArray());
+	}
+
+	private void createIndex(CollectSurvey survey, String[] gpsModels) throws Exception {
+		int count = 1;
+		for (String gpsModel : gpsModels) {
+			CollectRecord record = createTestRecord(survey, Integer.toString(count++), gpsModel);
+			indexManager.index(record);
+		}
 	}
 	
 	private CollectSurvey loadSurvey() throws IOException, SurveyImportException, InvalidIdmlException {
@@ -63,13 +122,13 @@ public class RecordDataIndexManagerIntegrationTest {
 		return survey;
 	}
 
-	private CollectRecord createTestRecord(CollectSurvey survey) {
+	private CollectRecord createTestRecord(CollectSurvey survey, String id, String gpsModel) {
 		CollectRecord record = new CollectRecord(survey, "2.0");
 		Entity cluster = record.createRootEntity("cluster");
 		record.setCreationDate(new GregorianCalendar(2011, 12, 31, 23, 59).getTime());
 		record.setStep(Step.ENTRY);
-		cluster.addValue("id", new Code("123_456"));
-		cluster.addValue("gps_model", "GPS Model 1");
+		cluster.addValue("id", new Code(id));
+		cluster.addValue("gps_model", gpsModel);
 		return record;
 	}
 

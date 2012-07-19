@@ -4,7 +4,6 @@
 package org.openforis.collect.remoting.service;
 
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -18,6 +17,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
+import org.openforis.collect.manager.RecordDataIndexManager;
+import org.openforis.collect.manager.RecordDataIndexManager.SearchType;
 import org.openforis.collect.manager.RecordFileException;
 import org.openforis.collect.manager.RecordFileManager;
 import org.openforis.collect.manager.RecordManager;
@@ -87,6 +88,9 @@ public class DataService {
 	@Autowired
 	private RecordFileManager fileManager;
 
+	@Autowired
+	private RecordDataIndexManager recordDataIndexManager;
+	
 	@Transactional
 	@Secured("ROLE_ENTRY")
 	public RecordProxy loadRecord(int id, int step, boolean forceUnlock) throws RecordPersistenceException {
@@ -167,7 +171,7 @@ public class DataService {
 	
 	@Transactional
 	@Secured("ROLE_ENTRY")
-	public void saveActiveRecord() throws RecordPersistenceException, IOException {
+	public void saveActiveRecord() throws RecordPersistenceException, Exception {
 		sessionManager.checkIsActiveRecordLocked();
 		SessionState sessionState = sessionManager.getSessionState();
 		CollectRecord record = sessionState.getActiveRecord();
@@ -178,6 +182,7 @@ public class DataService {
 		recordManager.save(record, sessionId);
 		fileManager.completeFilesDeletion(record);
 		fileManager.moveTempFilesToRepository(sessionId, record);
+		recordDataIndexManager.index(record);
 	}
 
 	@Transactional
@@ -755,6 +760,16 @@ public class DataService {
 		}
 		return result;
 	}
+	
+	@Secured("ROLE_ENTRY")
+	public List<String> searchAutoCompleteValues(int attributeDefnId, int fieldIndex, String searchText) throws Exception {
+		SessionState sessionState = sessionManager.getSessionState();
+		CollectSurvey survey = sessionState.getActiveSurvey();
+		int maxResults = 10;
+		List<String> result = recordDataIndexManager.search(SearchType.STARTS_WITH, survey, attributeDefnId, fieldIndex, searchText, maxResults);
+		return result;
+	}
+	
 	
 	protected CollectRecord getActiveRecord() {
 		SessionState sessionState = getSessionManager().getSessionState();

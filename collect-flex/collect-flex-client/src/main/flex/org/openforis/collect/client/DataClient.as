@@ -37,6 +37,7 @@ package org.openforis.collect.client {
 		private var _clearActiveRecordOperation:Operation;
 		private var _getCodeListItemsOperation:Operation;
 		private var _findAssignableCodeListItemsOperation:Operation;
+		private var _searchAutoCompleteValuesOperation:Operation;
 		
 		public function DataClient() {
 			super("dataService");
@@ -56,6 +57,7 @@ package org.openforis.collect.client {
 			this._clearActiveRecordOperation = getOperation("clearActiveRecord");
 			this._getCodeListItemsOperation = getOperation("getCodeListItems", CONCURRENCY_MULTIPLE);
 			this._findAssignableCodeListItemsOperation = getOperation("findAssignableCodeListItems", CONCURRENCY_MULTIPLE);
+			this._searchAutoCompleteValuesOperation = getOperation("searchAutoCompleteValues", CONCURRENCY_LAST);
 		}
 		
 		public function createNewRecord(responder:IResponder, rootEntityName:String, versionName:String):void {
@@ -130,6 +132,11 @@ package org.openforis.collect.client {
 		
 		public function getCodeListItems(responder:IResponder, parentEntityId:int, attribute:String, codes:Array):void {
 			var token:AsyncToken = this._getCodeListItemsOperation.send(parentEntityId, attribute, codes);
+			token.addResponder(responder);
+		}
+		
+		public function searchAutoCompleteValues(responder:IResponder, attributeId:int, fieldIdx:int, searchText:String):void {
+			var token:AsyncToken = this._searchAutoCompleteValuesOperation.send(attributeId, fieldIdx, searchText);
 			token.addResponder(responder);
 		}
 		

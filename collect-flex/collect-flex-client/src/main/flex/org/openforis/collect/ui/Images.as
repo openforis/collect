@@ -77,5 +77,9 @@ package org.openforis.collect.ui {
 		[Embed("/assets/images/expand.png")]
 		public static const EXPAND:Class;
 		
+		[Embed("/assets/images/loader_small.gif")]
+		public static const LOADER_SMALL_ICON:Class;
+		
+		
 	}
 }

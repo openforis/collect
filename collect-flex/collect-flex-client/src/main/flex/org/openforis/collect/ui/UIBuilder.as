@@ -47,6 +47,7 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.ui.component.detail.MultipleEntityFormItem;
 	import org.openforis.collect.ui.component.detail.SingleAttributeFormItem;
 	import org.openforis.collect.ui.component.detail.SingleEntityFormItem;
+	import org.openforis.collect.ui.component.input.AutoCompleteStringInputField;
 	import org.openforis.collect.ui.component.input.BooleanInputField;
 	import org.openforis.collect.ui.component.input.CodeInputField;
 	import org.openforis.collect.ui.component.input.CoordinateAttributeRenderer;
@@ -358,11 +359,13 @@ package org.openforis.collect.ui {
 						break;
 					case TextAttributeDefinitionProxy$Type.SHORT:
 					default:
-						inputField = new StringInputField();
+						if(def.autocomplete) {
+							inputField = new AutoCompleteStringInputField();
+						} else {
+							inputField = new StringInputField();
+						}
 						break;
 				}
-			} else {
-				inputField = new StringInputField();
 			}
 			inputField.width = getInputFieldWidth(def);
 			inputField.attributeDefinition = def;
