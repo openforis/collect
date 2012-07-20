@@ -17,6 +17,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
+import org.openforis.collect.manager.RecordDataIndexException;
 import org.openforis.collect.manager.RecordDataIndexManager;
 import org.openforis.collect.manager.RecordDataIndexManager.SearchType;
 import org.openforis.collect.manager.RecordFileException;
@@ -90,10 +91,15 @@ public class DataService {
 
 	@Autowired
 	private RecordDataIndexManager recordDataIndexManager;
+
+	/**
+	 * it's true when the root entity definition of the record in session has some nodes with the "collect:index" annotation
+	 */
+	private boolean recordDataIndexEnabled;
 	
 	@Transactional
 	@Secured("ROLE_ENTRY")
-	public RecordProxy loadRecord(int id, int step, boolean forceUnlock) throws RecordPersistenceException {
+	public RecordProxy loadRecord(int id, int step, boolean forceUnlock) throws RecordPersistenceException, RecordDataIndexException {
 		SessionState sessionState = sessionManager.getSessionState();
 		if ( sessionState.isActiveRecordBeingEdited() ) {
 			throw new MultipleEditException();
@@ -105,6 +111,10 @@ public class DataService {
 		recordManager.addEmptyNodes(rootEntity);
 		sessionManager.setActiveRecord(record);
 		fileManager.reset();
+		recordDataIndexEnabled = recordDataIndexManager.hasIndexableNodes(rootEntity.getDefinition());
+		if ( recordDataIndexEnabled ) {
+			recordDataIndexManager.destroyTemporaryIndex();
+		}
 		return new RecordProxy(record);
 	}
 	
@@ -171,7 +181,7 @@ public class DataService {
 	
 	@Transactional
 	@Secured("ROLE_ENTRY")
-	public void saveActiveRecord() throws RecordPersistenceException, Exception {
+	public void saveActiveRecord() throws RecordPersistenceException, RecordDataIndexException {
 		sessionManager.checkIsActiveRecordLocked();
 		SessionState sessionState = sessionManager.getSessionState();
 		CollectRecord record = sessionState.getActiveRecord();
@@ -180,14 +190,15 @@ public class DataService {
 		record.setModifiedBy(user);
 		String sessionId = sessionState.getSessionId();
 		recordManager.save(record, sessionId);
-		fileManager.completeFilesDeletion(record);
-		fileManager.moveTempFilesToRepository(sessionId, record);
-		recordDataIndexManager.index(record);
+		fileManager.commitChanges(sessionId, record);
+		if ( recordDataIndexEnabled ) {
+			recordDataIndexManager.index(record);
+		}
 	}
 
 	@Transactional
 	@Secured("ROLE_ENTRY")
-	public List<UpdateResponse> updateActiveRecord(UpdateRequest request) throws RecordPersistenceException {
+	public List<UpdateResponse> updateActiveRecord(UpdateRequest request) throws RecordPersistenceException, RecordDataIndexException {
 		sessionManager.checkIsActiveRecordLocked();
 		List<UpdateRequestOperation> operations = request.getOperations();
 		List<UpdateResponse> updateResponses = new ArrayList<UpdateResponse>();
@@ -204,6 +215,9 @@ public class DataService {
 			firstResp.setMissingWarnings(activeRecord.getMissingWarnings());
 			firstResp.setSkipped(activeRecord.getSkipped());
 			firstResp.setWarnings(activeRecord.getWarnings());
+			if ( recordDataIndexEnabled ) {
+				recordDataIndexManager.temporaryIndex(activeRecord);
+			}
 		}
 		return updateResponses;
 	}

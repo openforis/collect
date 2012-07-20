@@ -57,7 +57,7 @@ package org.openforis.collect.client {
 			this._clearActiveRecordOperation = getOperation("clearActiveRecord");
 			this._getCodeListItemsOperation = getOperation("getCodeListItems", CONCURRENCY_MULTIPLE);
 			this._findAssignableCodeListItemsOperation = getOperation("findAssignableCodeListItems", CONCURRENCY_MULTIPLE);
-			this._searchAutoCompleteValuesOperation = getOperation("searchAutoCompleteValues", CONCURRENCY_LAST);
+			this._searchAutoCompleteValuesOperation = getOperation("searchAutoCompleteValues", CONCURRENCY_LAST, false);
 		}
 		
 		public function createNewRecord(responder:IResponder, rootEntityName:String, versionName:String):void {

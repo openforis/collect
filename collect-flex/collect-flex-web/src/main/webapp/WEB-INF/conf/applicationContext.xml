@@ -96,7 +96,7 @@
 	<bean id="recordManager"		class="org.openforis.collect.manager.RecordManager" init-method="init">
 		<property name="lockTimeoutMillis" value="60000" />
 	</bean>
-	<bean id="recordDataIndexManager" class="org.openforis.collect.manager.RecordDataIndexManager" init-method="init" />
+	<bean id="recordDataIndexManager" class="org.openforis.collect.manager.RecordDataIndexManager" init-method="init" scope="session" />
 	<bean id="sessionManager"		class="org.openforis.collect.manager.SessionManager" />
 	<bean id="speciesManager"		class="org.openforis.collect.manager.SpeciesManager" />
 	<bean id="surveyManager"		class="org.openforis.collect.manager.SurveyManager" init-method="init" />

@@ -68,29 +68,26 @@ package org.openforis.collect.presenter
 				case Keyboard.ESCAPE:
 					closePopUp();
 					break;
-				/*case Keyboard.TAB:
+				case Keyboard.TAB:
 					if ( popUpOpened ) {
 						var matchingResult:String = getMatchingResult();
 						if ( matchingResult != null ) {
-							itemSelectHandler(matchingResult);
+							performSelectValue(matchingResult);
 						} else {
-							var text:String = autoCompleteLastInputField.text;
-							if ( StringUtil.isBlank(text) || FieldProxy.isShortCutForReasonBlank(text) ) {
-								autoCompleteLastInputField.presenter.updateValue();
-							} else {
-								autoCompleteLastInputField.presenter.undoLastChange();
+							popUp.list.setFocus();
+							if ( CollectionUtil.isNotEmpty(popUp.list.dataProvider) ) {
+								popUp.list.selectedIndex = 0;
 							}
 						}
-						closepopUp();
-					}*/
+					}
 					break;
 			}
 		}
 		
-		protected static function getMatchingResult():Object {
+		protected static function getMatchingResult():String {
 			var searchText:String = lastInputField.text;
 			var dataProvider:IList = popUp.list.dataProvider;
-			for each (var item:Object in dataProvider) {
+			for each (var item:String in dataProvider) {
 				if ( searchText.toUpperCase() == item.toUpperCase() ) {
 					return item;
 				}
@@ -100,7 +97,7 @@ package org.openforis.collect.presenter
 		protected function inputFieldFocusOutHandler(event:FocusEvent):void {
 			var inputField:InputField = event.target.document;
 			if ( inputField != null && inputField.changed ) {
-				if ( ! popUpOpened && ! UIUtil.isFocusOnComponent(popUp) ) {
+				if ( ! popUpOpened ) {
 					//inputField.presenter.undoLastChange();
 					inputField.presenter.updateValue();
 				}

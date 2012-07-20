@@ -128,14 +128,18 @@ public class RecordFileManager {
 		}
 	}
 	
-	public void moveTempFilesToRepository(String sessionId, CollectRecord record) throws IOException {
-		Set<Entry<Integer,String>> entrySet = tempFiles.entrySet();
-		Iterator<Entry<Integer, String>> iterator = entrySet.iterator();
-		while (iterator.hasNext()) {
-			Entry<Integer, String> entry = iterator.next();
-			int nodeId = entry.getKey();
-			moveTempFileToRepository(sessionId, record, nodeId);
-			iterator.remove();
+	public void moveTempFilesToRepository(String sessionId, CollectRecord record) throws RecordFileException {
+		try {
+			Set<Entry<Integer,String>> entrySet = tempFiles.entrySet();
+			Iterator<Entry<Integer, String>> iterator = entrySet.iterator();
+			while (iterator.hasNext()) {
+				Entry<Integer, String> entry = iterator.next();
+				int nodeId = entry.getKey();
+				moveTempFileToRepository(sessionId, record, nodeId);
+				iterator.remove();
+			}
+		} catch (IOException e) {
+			throw new RecordFileException(e);
 		}
 	}
 	
@@ -154,7 +158,6 @@ public class RecordFileManager {
 	public void deleteAllFiles(final CollectRecord record) {
 		Entity rootEntity = record.getRootEntity();
 		rootEntity.traverse(new NodeVisitor() {
-			
 			@Override
 			public void visit(Node<? extends NodeDefinition> node, int pos) {
 				if ( node instanceof FileAttribute ) {
@@ -179,7 +182,22 @@ public class RecordFileManager {
 		}
 	}
 	
-	public void completeFilesDeletion(CollectRecord record) {
+	public void commitChanges(String sessionId, CollectRecord record) throws RecordFileException {
+		completeFilesDeletion(record);
+		moveTempFilesToRepository(sessionId, record);
+	}
+	
+	public java.io.File getFile(String sessionId, CollectRecord record, int nodeId) {
+		java.io.File file;
+		if ( tempFiles.containsKey(nodeId) ) {
+			file = getTempFile(sessionId, nodeId);
+		} else {
+			file = getRepositoryFile(record, nodeId);
+		}
+		return file;
+	}
+
+	protected void completeFilesDeletion(CollectRecord record) {
 		Set<Entry<Integer,String>> entrySet = filesToDelete.entrySet();
 		Iterator<Entry<Integer, String>> iterator = entrySet.iterator();
 		while (iterator.hasNext()) {
@@ -192,22 +210,12 @@ public class RecordFileManager {
 		}
 	}
 	
-	private void moveTempFileToRepository(String sessionId, CollectRecord record, int nodeId) throws IOException {
+	protected void moveTempFileToRepository(String sessionId, CollectRecord record, int nodeId) throws IOException {
 		java.io.File tempFile = getTempFile(sessionId, nodeId);
 		String fileName = tempFile.getName();
 		java.io.File repositoryFile = getRepositoryFile(record, nodeId, fileName);
 		FileUtils.copyFile(tempFile, repositoryFile, true);
 		tempFile.delete();
-	}
-
-	public java.io.File getFile(String sessionId, CollectRecord record, int nodeId) {
-		java.io.File file;
-		if ( tempFiles.containsKey(nodeId) ) {
-			file = getTempFile(sessionId, nodeId);
-		} else {
-			file = getRepositoryFile(record, nodeId);
-		}
-		return file;
 	}
 
 	protected String generateUniqueFilename(String originalFileName) {
