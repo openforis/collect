@@ -213,7 +213,7 @@ public class RecordManager {
 	 * @param record
 	 * @throws InvalidExpressionException 
 	 */
-	protected void applyDefaultValues(CollectRecord record) {
+	public void applyDefaultValues(CollectRecord record) {
 		Entity rootEntity = record.getRootEntity();
 		applyDefaultValues(rootEntity);
 	}
