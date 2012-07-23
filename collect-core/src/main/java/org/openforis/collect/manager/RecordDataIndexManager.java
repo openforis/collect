@@ -3,9 +3,11 @@
  */
 package org.openforis.collect.manager;
 
+import java.io.BufferedReader;
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -18,6 +20,8 @@ import javax.xml.namespace.QName;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.WhitespaceAnalyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
@@ -29,10 +33,12 @@ import org.apache.lucene.index.IndexWriterConfig.OpenMode;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
+import org.apache.lucene.queryParser.QueryParser.Operator;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
+import org.apache.lucene.search.TopScoreDocCollector;
 import org.apache.lucene.search.WildcardQuery;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.RAMDirectory;
@@ -219,15 +225,17 @@ public class RecordDataIndexManager {
 	private Set<String> search(String indexName, IndexSearcher indexSearcher, SearchType searchType, String queryText, int fieldIndex, int maxResults)
 			throws Exception {
 		Set<String> result = new HashSet<String>();
-		String indexFieldKey = indexName + "_" +Integer.toString(fieldIndex);
-		Query query = createQuery(searchType, indexFieldKey, queryText);
-		TopDocs hits = indexSearcher.search(query, maxResults);
-		ScoreDoc[] scoreDocs = hits.scoreDocs;
-		for (ScoreDoc scoreDoc : scoreDocs) {
-		    Document doc = indexSearcher.doc(scoreDoc.doc);
-		    String value = doc.get(indexFieldKey);
-			result.add(value);
-		}
+        if ( indexSearcher != null ) {
+			String indexFieldKey = indexName + "_" +Integer.toString(fieldIndex);
+			Query query = createQuery(searchType, indexFieldKey, queryText);
+			TopDocs hits = indexSearcher.search(query, maxResults);
+			ScoreDoc[] scoreDocs = hits.scoreDocs;
+			for (ScoreDoc scoreDoc : scoreDocs) {
+			    Document doc = indexSearcher.doc(scoreDoc.doc);
+			    String value = doc.get(indexFieldKey);
+				result.add(value);
+			}
+        }
 		return result;
 	}
     
@@ -267,8 +275,13 @@ public class RecordDataIndexManager {
 	        if ( indexDir.exists() || indexDir.mkdirs() ) {
 				Directory directory = new SimpleFSDirectory(indexDir);
 		        IndexReader indexReader = IndexReader.open(directory);
-		        IndexSearcher indexSearcher = new IndexSearcher(indexReader);
-		        return indexSearcher;
+				int numDocs = indexReader.numDocs();
+				if ( numDocs > 0 ) {
+			        IndexSearcher indexSearcher = new IndexSearcher(indexReader);
+			        return indexSearcher;
+				} else {
+					return null;
+				}
 	        } else {
 	        	throw new RecordDataIndexException("Cannot access index directory: " + indexRootPath);
 	        }
@@ -336,12 +349,13 @@ public class RecordDataIndexManager {
 		}
 		Term term = new Term(indexFieldKey, queryText);
         Query query = new WildcardQuery(term);
-		/*
+        /*
 		StandardAnalyzer analyzer = new StandardAnalyzer(Version.LUCENE_35);
 		QueryParser queryParser = new QueryParser(Version.LUCENE_35, queryText, analyzer);
+		queryParser.setDefaultOperator(Operator.AND);
 		Query query = queryParser.parse(queryText);
 		*/
-        //This is wild card query, to use Fuzzy Query use following
+		//This is wild card query, to use Fuzzy Query use following
         /*
          Term term = new Term(key,queryText+"~");
         Query  query = new FuzzyQuery(term,0.4F); 0.4 is 40 % matching with queryText
@@ -376,5 +390,96 @@ public class RecordDataIndexManager {
 			}
 		}
 	}
-	
+
+	/*
+	public static void main(String[] args) throws IOException, ParseException {
+		// 0. Specify the analyzer for tokenizing text.
+		//    The same analyzer should be used for indexing and searching
+		StandardAnalyzer analyzer = new StandardAnalyzer(Version.LUCENE_35);
+
+		// 1. create the index
+		Directory index = new RAMDirectory();
+
+		IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_35, analyzer);
+
+		IndexWriter w = new IndexWriter(index, config);
+		addDoc(w, "Lucene in Action");
+		addDoc(w, "Lucene for Dummies");
+		addDoc(w, "Managing Gigabytes");
+		addDoc(w, "The Art of Computer Science");
+		w.close();
+
+		// 2. query
+		while(true)
+			search(index);
+	}
+
+	private static void search(Directory index) throws IOException, ParseException, CorruptIndexException {
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		String querystr = br.readLine();
+
+		// the "title" arg specifies the default field to use
+		// when no field is explicitly specified in the query.
+		
+		Analyzer analyzer = new WhitespaceAnalyzer(Version.LUCENE_35);
+		QueryParser queryParser = new QueryParser(Version.LUCENE_35, "title", analyzer);
+		queryParser.setDefaultOperator(Operator.AND);
+		Query q = queryParser.parse(querystr);
+		
+		/*
+		BooleanQuery bq = new BooleanQuery();
+		String[] splitted = querystr.split(" ");
+		for (String part : splitted) {
+			part = part.trim();
+			if ( ! part.equals(" ") ) {
+				Term term = new Term("title", part);
+				bq.add(new TermQuery(term), Occur.MUST);
+			}
+		}
+		Query q = bq;
+		
+		Term term = new Term("title", querystr);
+		PhraseQuery phraseQuery = new PhraseQuery();
+		phraseQuery.add(term);
+		Query q = phraseQuery;
+		
+		PhraseQuery phraseQuery = new PhraseQuery();
+		String[] splitted = querystr.split(" ");
+		for (String part : splitted) {
+			part = part.trim();
+			if ( ! part.equals(" ") ) {
+				Term term = new Term("title", part);
+				phraseQuery.add(term);
+			}
+		}
+		Query q = phraseQuery;
+		
+		//Query q = new WildcardQuery(term);
+		// 3. search
+		int hitsPerPage = 10;
+		IndexReader reader = IndexReader.open(index);
+		IndexSearcher searcher = new IndexSearcher(reader);
+		TopScoreDocCollector collector = TopScoreDocCollector.create(hitsPerPage, true);
+		searcher.search(q, collector);
+		ScoreDoc[] hits = collector.topDocs().scoreDocs;
+
+		// 4. display results
+		System.out.println("Found " + hits.length + " hits.");
+		for(int i=0;i<hits.length;++i) {
+			int docId = hits[i].doc;
+			Document d = searcher.doc(docId);
+			System.out.println((i + 1) + ". " + d.get("title"));
+		}
+
+		// searcher can only be closed when there
+		// is no need to access the documents any more. 
+		searcher.close();
+	}
+
+	private static void addDoc(IndexWriter w, String value) throws IOException {
+		Document doc = new Document();
+		doc.add(new Field("title", value, Field.Store.YES, Field.Index.ANALYZED));
+		w.addDocument(doc);
+	}
+	*/
 }

@@ -60,6 +60,8 @@ public class RecordDataIndexManagerIntegrationTest {
 		
 		//testSingleResultMatching(survey, autoCompleteNodeDefn);
 		
+		//testSingleResultMatchingPhrase(survey, autoCompleteNodeDefn);
+		
 		testMultipleResultsFound(survey, autoCompleteNodeDefn);
 		
 		testLimitedMultipleResultsFound(survey, autoCompleteNodeDefn);
@@ -78,6 +80,14 @@ public class RecordDataIndexManagerIntegrationTest {
 		assertEquals(1, result.size());
 		String value = result.iterator().next();
 		assertEquals("SXBLUEII-L", value);
+	}
+
+	private void testSingleResultMatchingPhrase(CollectSurvey survey, NodeDefinition autoCompleteNodeDefn) throws Exception {
+		List<String> result = indexManager.search(SearchType.CONTAINS, survey, autoCompleteNodeDefn.getId(), 0, "GPS 60CSX", 10);
+		assertNotNull(result);
+		assertEquals(1, result.size());
+		String value = result.iterator().next();
+		assertEquals("GPS MAP 60CSX", value);
 	}
 
 	private void testMultipleResultsFound(CollectSurvey survey, NodeDefinition autoCompleteNodeDefn) throws Exception {
