@@ -116,7 +116,7 @@ public class RecordDataIndexManagerIntegrationTest {
 	private void createIndex(CollectSurvey survey, String[] gpsModels) throws Exception {
 		int count = 1;
 		for (String gpsModel : gpsModels) {
-			CollectRecord record = createTestRecord(survey, Integer.toString(count++), gpsModel);
+			CollectRecord record = createTestRecord(survey, count, Integer.toString(count++), gpsModel);
 			indexManager.index(record);
 		}
 	}
@@ -132,8 +132,9 @@ public class RecordDataIndexManagerIntegrationTest {
 		return survey;
 	}
 
-	private CollectRecord createTestRecord(CollectSurvey survey, String id, String gpsModel) {
+	private CollectRecord createTestRecord(CollectSurvey survey, int internalId, String id, String gpsModel) {
 		CollectRecord record = new CollectRecord(survey, "2.0");
+		record.setId(internalId);
 		Entity cluster = record.createRootEntity("cluster");
 		record.setCreationDate(new GregorianCalendar(2011, 12, 31, 23, 59).getTime());
 		record.setStep(Step.ENTRY);

@@ -3,11 +3,9 @@
  */
 package org.openforis.collect.manager;
 
-import java.io.BufferedReader;
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -20,8 +18,6 @@ import javax.xml.namespace.QName;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.WhitespaceAnalyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
@@ -33,18 +29,17 @@ import org.apache.lucene.index.IndexWriterConfig.OpenMode;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
-import org.apache.lucene.queryParser.QueryParser.Operator;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
-import org.apache.lucene.search.TopScoreDocCollector;
 import org.apache.lucene.search.WildcardQuery;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.RAMDirectory;
 import org.apache.lucene.store.SimpleFSDirectory;
 import org.apache.lucene.util.Version;
 import org.openforis.collect.model.CollectRecord;
+import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.Configuration;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
@@ -55,6 +50,7 @@ import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.NodeVisitor;
+import org.openforis.idm.model.Record;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -72,12 +68,17 @@ public class RecordDataIndexManager {
 	protected static final String INDEX_PATH_CONFIGURATION_KEY = "index_path";
 	
 	protected static final QName INDEX_NAME_ANNOTATION = new QName("http://www.openforis.org/collect/3.0/collect", "index");
+
+	private static final String RECORD_ID_FIELD = "_record_id";
 	
 	protected RAMDirectory ramDirectory;
 	
 	@Autowired
 	private ConfigurationManager configurationManager;
 
+	@Autowired
+	private RecordManager recordManager;
+	
 	private String indexRootPath;
 	
 	protected void init() throws Exception {
@@ -116,19 +117,48 @@ public class RecordDataIndexManager {
 		Entity rootEntity = record.getRootEntity();
 		EntityDefinition rootEntityDefn = rootEntity.getDefinition();
 		if ( hasIndexableNodes(rootEntityDefn) ) {
+			IndexWriter indexWriter = null;
 			try {
-				IndexWriter indexWriter = createTemporaryIndexWriter();
-				indexWriter.deleteAll();
-				index(record, indexWriter);
+				indexWriter = createTemporaryIndexWriter();
+				indexWriter.deleteAll(); //temporary index is relative only to one record
+				index(indexWriter, record);
 			} catch (Exception e) {
 				throw new RecordDataIndexException(e);
+			} finally {
+				closeIndexHandler(indexWriter);
 			}
 		}
 	}
 	
 	public void index(CollectRecord record) throws RecordDataIndexException {
-		IndexWriter indexWriter = createIndexWriter();
-		index(record, indexWriter);
+		IndexWriter indexWriter = null;
+		try {
+			indexWriter = createIndexWriter();
+			Integer recordId = record.getId();
+			deleteDocuments(indexWriter, recordId);
+			index(indexWriter, record);
+		} catch (Exception e) {
+			throw new RecordDataIndexException(e);
+		} finally {
+			closeIndexHandler(indexWriter);
+		}
+	}
+	
+	public void indexAllRecords(CollectSurvey survey, String rootEntity) throws RecordDataIndexException {
+		List<CollectRecord> summaries = recordManager.loadSummaries(survey, rootEntity);
+		IndexWriter indexWriter = null;
+		try {
+			indexWriter = createIndexWriter();
+			for (CollectRecord record : summaries) {
+				Integer recordId = record.getId();
+				deleteDocuments(indexWriter, recordId);
+				index(indexWriter, record);
+			}
+		} catch (Exception e) {
+			throw new RecordDataIndexException(e);
+		} finally {
+			closeIndexHandler(indexWriter);
+		}
 	}
 
 	public boolean hasIndexableNodes(Survey survey) {
@@ -160,7 +190,7 @@ public class RecordDataIndexManager {
 		return false;
 	}
 	
-	private void index(CollectRecord record, final IndexWriter indexWriter) throws RecordDataIndexException {
+	private void index(final IndexWriter indexWriter, CollectRecord record) throws RecordDataIndexException {
 		try {
 			Entity rootEntity = record.getRootEntity();
 			rootEntity.traverse(new NodeVisitor() {
@@ -174,8 +204,6 @@ public class RecordDataIndexManager {
 			});
 		} catch (Exception e) {
 			throw new RecordDataIndexException(e);
-		} finally {
-			closeIndexHandler(indexWriter);
 		}
 	}
 
@@ -210,7 +238,17 @@ public class RecordDataIndexManager {
 		}
     }
 
-	private List<String> mergeSearchResults(int maxResults, Set<String> tempResult, Set<String> committedResult) {
+	protected void deleteDocuments(IndexWriter indexWriter, Integer recordId)
+			throws RecordDataIndexException {
+		try {
+			Term term = new Term(RECORD_ID_FIELD, recordId != null ? recordId.toString(): "null");
+			indexWriter.deleteDocuments(term);
+		} catch (Exception e) {
+			throw new RecordDataIndexException(e);
+		}
+	}
+
+	protected List<String> mergeSearchResults(int maxResults, Set<String> tempResult, Set<String> committedResult) {
 		Set<String> result = new HashSet<String>();
 		result.addAll(tempResult);
 		result.addAll(committedResult);
@@ -222,7 +260,7 @@ public class RecordDataIndexManager {
 		return sortedList;
 	}
 
-	private Set<String> search(String indexName, IndexSearcher indexSearcher, SearchType searchType, String queryText, int fieldIndex, int maxResults)
+	protected Set<String> search(String indexName, IndexSearcher indexSearcher, SearchType searchType, String queryText, int fieldIndex, int maxResults)
 			throws Exception {
 		Set<String> result = new HashSet<String>();
         if ( indexSearcher != null ) {
@@ -307,7 +345,11 @@ public class RecordDataIndexManager {
 			try {
 				Object value = attr.getValue();
 				if ( value != null ) {
+					Record record = attr.getRecord();
+					Integer recordId = record.getId();
 					Document doc = new Document();
+					Field recordKeyField = createRecordIdField(recordId);
+					doc.add(recordKeyField);
 					int fieldCount = attr.getFieldCount();
 					for (int fieldIndex = 0; fieldIndex < fieldCount; fieldIndex++ ) {
 						org.openforis.idm.model.Field<?> field = attr.getField(fieldIndex);
@@ -327,15 +369,21 @@ public class RecordDataIndexManager {
 		if ( fieldValue != null ) {
 			String fieldValueStr = fieldValue.toString();
 			if ( StringUtils.isNotBlank(fieldValueStr)) {
-				String docFieldKey = indexName + "_" + Integer.toString(fieldIndex);
-				Field docField = new Field(docFieldKey, fieldValueStr, Field.Store.YES, Field.Index.ANALYZED);
+				String fieldKey = indexName + "_" + Integer.toString(fieldIndex);
+				Field docField = new Field(fieldKey, fieldValueStr, Field.Store.YES, Field.Index.ANALYZED);
 				doc.add(docField);
 			}
 		}
 	}
 	
+	protected Field createRecordIdField(Integer recordId) {
+		Field recordKeyField = new Field(RECORD_ID_FIELD, recordId != null ? recordId.toString(): "null", Field.Store.YES, Field.Index.NOT_ANALYZED);
+		return recordKeyField;
+	}
+
 	protected Query createQuery(SearchType searchType, String indexFieldKey, String searchText) throws ParseException {
 		String escapedSearchText = QueryParser.escape(searchText.toLowerCase());
+		//String escapedSearchText = searchText.toLowerCase();
 		String queryText;
 		switch ( searchType ) {
 		case STARTS_WITH:
@@ -395,8 +443,9 @@ public class RecordDataIndexManager {
 	public static void main(String[] args) throws IOException, ParseException {
 		// 0. Specify the analyzer for tokenizing text.
 		//    The same analyzer should be used for indexing and searching
-		StandardAnalyzer analyzer = new StandardAnalyzer(Version.LUCENE_35);
-
+		//StandardAnalyzer analyzer = new StandardAnalyzer(Version.LUCENE_35);
+		Analyzer analyzer = new KeywordAnalyzer();
+		//Analyzer analyzer = new WhitespaceAnalyzer(Version.LUCENE_35);
 		// 1. create the index
 		Directory index = new RAMDirectory();
 
@@ -413,7 +462,7 @@ public class RecordDataIndexManager {
 		while(true)
 			search(index);
 	}
-
+	
 	private static void search(Directory index) throws IOException, ParseException, CorruptIndexException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		String querystr = br.readLine();
@@ -422,39 +471,41 @@ public class RecordDataIndexManager {
 		// when no field is explicitly specified in the query.
 		
 		Analyzer analyzer = new WhitespaceAnalyzer(Version.LUCENE_35);
+		//Analyzer analyzer = new KeywordAnalyzer();
+		
 		QueryParser queryParser = new QueryParser(Version.LUCENE_35, "title", analyzer);
 		queryParser.setDefaultOperator(Operator.AND);
 		Query q = queryParser.parse(querystr);
 		
-		/*
-		BooleanQuery bq = new BooleanQuery();
-		String[] splitted = querystr.split(" ");
-		for (String part : splitted) {
-			part = part.trim();
-			if ( ! part.equals(" ") ) {
-				Term term = new Term("title", part);
-				bq.add(new TermQuery(term), Occur.MUST);
-			}
-		}
-		Query q = bq;
+//		BooleanQuery bq = new BooleanQuery();
+//		String[] splitted = querystr.split(" ");
+//		for (String part : splitted) {
+//			part = part.trim();
+//			if ( ! part.equals(" ") ) {
+//				Term term = new Term("title", part);
+//				bq.add(new TermQuery(term), Occur.MUST);
+//			}
+//		}
+//		Query q = bq;
+//		
+//		Term term = new Term("title", querystr);
 		
-		Term term = new Term("title", querystr);
-		PhraseQuery phraseQuery = new PhraseQuery();
-		phraseQuery.add(term);
-		Query q = phraseQuery;
-		
-		PhraseQuery phraseQuery = new PhraseQuery();
-		String[] splitted = querystr.split(" ");
-		for (String part : splitted) {
-			part = part.trim();
-			if ( ! part.equals(" ") ) {
-				Term term = new Term("title", part);
-				phraseQuery.add(term);
-			}
-		}
-		Query q = phraseQuery;
+//		PhraseQuery phraseQuery = new PhraseQuery();
+//		phraseQuery.add(term);
+//		Query q = phraseQuery;
+//		PhraseQuery phraseQuery = new PhraseQuery();
+//		String[] splitted = querystr.split(" ");
+//		for (String part : splitted) {
+//			part = part.trim();
+//			if ( ! part.equals(" ") ) {
+//				Term term = new Term("title", part);
+//				phraseQuery.add(term);
+//			}
+//		}
+//		Query q = phraseQuery;
 		
 		//Query q = new WildcardQuery(term);
+		
 		// 3. search
 		int hitsPerPage = 10;
 		IndexReader reader = IndexReader.open(index);
