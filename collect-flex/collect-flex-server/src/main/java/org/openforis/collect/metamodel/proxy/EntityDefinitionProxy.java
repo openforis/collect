@@ -18,8 +18,11 @@ import org.openforis.idm.metamodel.EntityDefinition;
  */
 public class EntityDefinitionProxy extends NodeDefinitionProxy {
 
+	private static final String LAYOUT_FORM = "form";
+	private static final String LAYOUT_TABLE = "table";
 	private static QName countInSummaryListAnnotation = new QName("http://www.openforis.org/collect/3.0/collect", "count");
 	private static QName layoutAnnotation = new QName("http://www.openforis.org/collect/3.0/ui", "layout");
+	private static QName showRowNumbersAnnotation = new QName("http://www.openforis.org/collect/3.0/ui", "showRowNumbers");
 
 	private transient EntityDefinition entityDefinition;
 
@@ -50,11 +53,22 @@ public class EntityDefinitionProxy extends NodeDefinitionProxy {
 		if(StringUtils.isNotBlank(result)) {
 			return result;
 		} else if(isMultiple() && parent != null) {
-			return "table";
+			return LAYOUT_TABLE;
 		} else if(parent != null) {
 			return parent.getLayout();
 		} else {
-			return "form";
+			return LAYOUT_FORM;
+		}
+	}
+	
+	@ExternalizedProperty
+	public boolean isShowRowNumbers() {
+		String showRowNumbersString = entityDefinition.getAnnotation(showRowNumbersAnnotation);
+		if ( StringUtils.isNotBlank(showRowNumbersString) ) {
+			boolean result = Boolean.parseBoolean(showRowNumbersString);
+			return result;
+		} else {
+			return false;
 		}
 	}
 	
