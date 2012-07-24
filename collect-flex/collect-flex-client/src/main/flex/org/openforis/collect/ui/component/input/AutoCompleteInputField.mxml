@@ -7,14 +7,14 @@
 	>
 	<fx:Script>
 		<![CDATA[
-			import org.openforis.collect.presenter.AutoCompleteStringInputFieldPresenter;
+			import org.openforis.collect.presenter.AutoCompleteInputFieldPresenter;
 			import org.openforis.collect.ui.Images;
 			
 			public static const STATE_LOADING:String = "loading";
 			public static const STATE_DEFAULT:String = "default";
 			
 			override protected function initPresenter():void {
-				presenter = new AutoCompleteStringInputFieldPresenter(this);
+				presenter = new AutoCompleteInputFieldPresenter(this);
 			}
 			
 		]]>

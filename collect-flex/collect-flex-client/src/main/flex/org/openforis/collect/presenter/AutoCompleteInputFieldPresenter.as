@@ -18,7 +18,7 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.client.DataClient;
 	import org.openforis.collect.event.InputFieldEvent;
 	import org.openforis.collect.event.UIEvent;
-	import org.openforis.collect.ui.component.input.AutoCompleteStringInputField;
+	import org.openforis.collect.ui.component.input.AutoCompleteInputField;
 	import org.openforis.collect.ui.component.input.InputField;
 	import org.openforis.collect.ui.component.input.TextAutoCompletePopUp;
 	import org.openforis.collect.ui.component.input.TextInput;
@@ -31,18 +31,18 @@ package org.openforis.collect.presenter
 	 * @author S. Ricci
 	 * 
 	 **/
-	public class AutoCompleteStringInputFieldPresenter extends InputFieldPresenter {
+	public class AutoCompleteInputFieldPresenter extends InputFieldPresenter {
 		
 		protected static const MIN_CHARS_TO_START_AUTOCOMPLETE:int = 2;
 		
 		protected static var popUp:TextAutoCompletePopUp;
 		protected static var popUpOpened:Boolean = false;
-		protected static var lastInputField:AutoCompleteStringInputField;
+		protected static var lastInputField:AutoCompleteInputField;
 		
-		private var _view:AutoCompleteStringInputField;
+		private var _view:AutoCompleteInputField;
 		private static var dataLoading:Boolean;
 		
-		public function AutoCompleteStringInputFieldPresenter(view:AutoCompleteStringInputField) {
+		public function AutoCompleteInputFieldPresenter(view:AutoCompleteInputField) {
 			_view = view;
 			super(view);
 		}
@@ -111,10 +111,10 @@ package org.openforis.collect.presenter
 			}
 		}
 		
-		protected static function loadAutoCompleteData(text:String, inputField:AutoCompleteStringInputField):void {
+		protected static function loadAutoCompleteData(text:String, inputField:AutoCompleteInputField):void {
 			dataLoading = true;
 			lastInputField = inputField;
-			lastInputField.currentState = AutoCompleteStringInputField.STATE_LOADING;
+			lastInputField.currentState = AutoCompleteInputField.STATE_LOADING;
 			var client:DataClient = ClientFactory.dataClient;
 			var searchText:String = lastInputField.text;
 			var token:Object = {searchText: searchText};
@@ -194,7 +194,7 @@ package org.openforis.collect.presenter
 		
 		protected static function autoCompleteSearchResultHandler(event:ResultEvent, token:Object):void {
 			dataLoading = false;
-			lastInputField.currentState = AutoCompleteStringInputField.STATE_DEFAULT;
+			lastInputField.currentState = AutoCompleteInputField.STATE_DEFAULT;
 			var data:IList = event.result as IList;
 			if ( CollectionUtil.isEmpty(data) ) {
 				closePopUp();
