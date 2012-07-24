@@ -18,9 +18,10 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.client.DataClient;
 	import org.openforis.collect.event.InputFieldEvent;
 	import org.openforis.collect.event.UIEvent;
+	import org.openforis.collect.model.proxy.FieldProxy;
 	import org.openforis.collect.ui.component.input.AutoCompleteInputField;
+	import org.openforis.collect.ui.component.input.AutoCompletePopUp;
 	import org.openforis.collect.ui.component.input.InputField;
-	import org.openforis.collect.ui.component.input.TextAutoCompletePopUp;
 	import org.openforis.collect.ui.component.input.TextInput;
 	import org.openforis.collect.util.CollectionUtil;
 	import org.openforis.collect.util.PopUpUtil;
@@ -33,17 +34,19 @@ package org.openforis.collect.presenter
 	 **/
 	public class AutoCompleteInputFieldPresenter extends InputFieldPresenter {
 		
-		protected static const MIN_CHARS_TO_START_AUTOCOMPLETE:int = 2;
+		protected var _minCharsToStartAutocomplete:int;
 		
-		protected static var popUp:TextAutoCompletePopUp;
-		protected static var popUpOpened:Boolean = false;
-		protected static var lastInputField:AutoCompleteInputField;
+		protected var popUp:AutoCompletePopUp;
+		protected var popUpOpened:Boolean = false;
 		
+		private var _allowNotListedValues:Boolean;
 		private var _view:AutoCompleteInputField;
-		private static var dataLoading:Boolean;
+		private var dataLoading:Boolean;
 		
 		public function AutoCompleteInputFieldPresenter(view:AutoCompleteInputField) {
 			_view = view;
+			_minCharsToStartAutocomplete = 2;
+			_allowNotListedValues = true;
 			super(view);
 		}
 		
@@ -59,9 +62,9 @@ package org.openforis.collect.presenter
 			switch ( event.keyCode ) {
 				case Keyboard.DOWN:
 					if ( popUpOpened ) {
-						popUp.list.setFocus();
-						if ( CollectionUtil.isNotEmpty(popUp.list.dataProvider) ) {
-							popUp.list.selectedIndex = 0;
+						popUp.listComponent.setFocus();
+						if ( CollectionUtil.isNotEmpty(popUp.listComponent.dataProvider) ) {
+							popUp.listComponent.selectedIndex = 0;
 						}
 					}
 					break;
@@ -70,13 +73,13 @@ package org.openforis.collect.presenter
 					break;
 				case Keyboard.TAB:
 					if ( popUpOpened ) {
-						var matchingResult:String = getMatchingResult();
+						var matchingResult:Object = getMatchingResult();
 						if ( matchingResult != null ) {
 							performSelectValue(matchingResult);
 						} else {
-							popUp.list.setFocus();
-							if ( CollectionUtil.isNotEmpty(popUp.list.dataProvider) ) {
-								popUp.list.selectedIndex = 0;
+							popUp.listComponent.setFocus();
+							if ( CollectionUtil.isNotEmpty(popUp.listComponent.dataProvider) ) {
+								popUp.listComponent.selectedIndex = 0;
 							}
 						}
 					}
@@ -84,9 +87,9 @@ package org.openforis.collect.presenter
 			}
 		}
 		
-		protected static function getMatchingResult():String {
-			var searchText:String = lastInputField.text;
-			var dataProvider:IList = popUp.list.dataProvider;
+		protected function getMatchingResult():* {
+			var searchText:String = _view.text;
+			var dataProvider:IList = popUp.listComponent.dataProvider;
 			for each (var item:String in dataProvider) {
 				if ( searchText.toUpperCase() == item.toUpperCase() ) {
 					return item;
@@ -94,40 +97,45 @@ package org.openforis.collect.presenter
 			}
 			return null;
 		}
+		
 		protected function inputFieldFocusOutHandler(event:FocusEvent):void {
 			var inputField:InputField = event.target.document;
 			if ( inputField != null && inputField.changed ) {
 				if ( ! popUpOpened ) {
-					//inputField.presenter.undoLastChange();
-					inputField.presenter.updateValue();
+					if ( allowNotListedValues || _view.isEmpty() || FieldProxy.isShortCutForReasonBlank(_view.text) ) {
+						inputField.presenter.updateValue();
+					} else {
+						inputField.presenter.undoLastChange();
+					}
 				}
 			}
 		}
 		
 		protected function inputFieldChangingHandler(event:InputFieldEvent):void {
 			var text:String = (_view.textInput as TextInput).text;
-			if ( text.length > MIN_CHARS_TO_START_AUTOCOMPLETE) {
-				loadAutoCompleteData(text, _view);
+			if ( text.length > minCharsToStartAutocomplete ) {
+				loadAutoCompleteData();
+			} else {
+				
 			}
 		}
 		
-		protected static function loadAutoCompleteData(text:String, inputField:AutoCompleteInputField):void {
+		protected function loadAutoCompleteData():void {
 			dataLoading = true;
-			lastInputField = inputField;
-			lastInputField.currentState = AutoCompleteInputField.STATE_LOADING;
+			_view.currentState = AutoCompleteInputField.STATE_LOADING;
 			var client:DataClient = ClientFactory.dataClient;
-			var searchText:String = lastInputField.text;
+			var searchText:String = _view.text;
 			var token:Object = {searchText: searchText};
-			var responder:IResponder = new AsyncResponder(autoCompleteSearchResultHandler, searchFaultHandler, token);
-			var attributeDefnId:int = lastInputField.attributeDefinition.id;
-			var fieldIndex:int = lastInputField.fieldIndex;
+			var responder:IResponder = new AsyncResponder(searchResultHandler, searchFaultHandler, token);
+			var attributeDefnId:int = _view.attributeDefinition.id;
+			var fieldIndex:int = _view.fieldIndex;
 			client.searchAutoCompleteValues(responder, attributeDefnId, fieldIndex, searchText);
 		}
 		
-		protected static function showPopUp():void {
+		protected function showPopUp():void {
 			var firstCreated:Boolean = false;
 			if(popUp == null) {
-				popUp = new TextAutoCompletePopUp();
+				popUp = createPopUp();
 				popUp.addEventListener(KeyboardEvent.KEY_DOWN, autoCompleteKeyDownHandler);
 				popUp.addEventListener(FlexMouseEvent.MOUSE_DOWN_OUTSIDE, autoCompleteMouseDownOutsideHandler);
 				firstCreated = true;
@@ -135,7 +143,7 @@ package org.openforis.collect.presenter
 			if(! popUpOpened) {
 				PopUpManager.addPopUp(popUp, FlexGlobals.topLevelApplication as DisplayObject, false);
 				
-				PopUpUtil.alignToField(popUp, lastInputField, 
+				PopUpUtil.alignToField(popUp, _view, 
 					PopUpUtil.POSITION_BELOW, 
 					PopUpUtil.VERTICAL_ALIGN_BOTTOM, 
 					PopUpUtil.HORIZONTAL_ALIGN_LEFT,
@@ -150,20 +158,25 @@ package org.openforis.collect.presenter
 			}
 		}
 		
-		protected static function itemSelectHandler(event:UIEvent = null):void {
-			var selectedValue:String = popUp.list.selectedItem as String;
+		protected function createPopUp():AutoCompletePopUp {
+			var popUp:AutoCompletePopUp = new AutoCompletePopUp();
+			return popUp;
+		}
+		
+		protected function itemSelectHandler(event:UIEvent = null):void {
+			var selectedValue:Object = popUp.listComponent.selectedItem;
 			performSelectValue(selectedValue);
 		}
 		
-		protected static function performSelectValue(selectedValue:String):void {
+		protected function performSelectValue(selectedValue:*):void {
 			if ( selectedValue != null ) {
-				lastInputField.text = selectedValue;
-				lastInputField.presenter.updateValue();
+				_view.text = selectedValue.toString();
+				_view.presenter.updateValue();
 			}
 			closePopUp();
 		}
 		
-		protected static function autoCompleteKeyDownHandler(event:KeyboardEvent):void {
+		protected function autoCompleteKeyDownHandler(event:KeyboardEvent):void {
 			var keyCode:uint = event.keyCode;
 			switch(keyCode) {
 				case Keyboard.ENTER:
@@ -175,38 +188,59 @@ package org.openforis.collect.presenter
 			}
 		}
 		
-		protected static function autoCompleteMouseDownOutsideHandler(event:FlexMouseEvent):void {
+		protected function autoCompleteMouseDownOutsideHandler(event:FlexMouseEvent):void {
 			cancelAutoComplete();
 		}
 		
-		protected static function closePopUp():void {
+		protected function closePopUp():void {
 			if ( popUpOpened ) {
 				PopUpManager.removePopUp(popUp);
 				popUpOpened = false;
-				var textInput:TextInput = lastInputField.textInput as TextInput;
+				var textInput:TextInput = _view.textInput as TextInput;
 				textInput.setFocus();
 			}
 		}
 		
-		protected static function cancelAutoComplete():void {
+		protected function cancelAutoComplete():void {
 			closePopUp();
 		}
 		
-		protected static function autoCompleteSearchResultHandler(event:ResultEvent, token:Object):void {
-			dataLoading = false;
-			lastInputField.currentState = AutoCompleteInputField.STATE_DEFAULT;
+		protected function searchResultHandler(event:ResultEvent, token:Object):void {
 			var data:IList = event.result as IList;
+			handleSearchResult(data);
+		}
+		
+		protected function handleSearchResult(data:IList):void {
+			dataLoading = false;
+			_view.currentState = AutoCompleteInputField.STATE_DEFAULT;
 			if ( CollectionUtil.isEmpty(data) ) {
 				closePopUp();
 			} else {
 				showPopUp();
-				popUp.list.dataProvider = data;
+				popUp.listComponent.dataProvider = data;
 			}
 		}
 		
-		protected static function searchFaultHandler(event:FaultEvent, token:Object = null):void {
+		protected function searchFaultHandler(event:FaultEvent, token:Object = null):void {
 			dataLoading = false;
 			faultHandler(event, token);
 		}
+		
+		public function get allowNotListedValues():Boolean {
+			return _allowNotListedValues;
+		}
+		
+		public function set allowNotListedValues(value:Boolean):void {
+			_allowNotListedValues = value;
+		}
+		
+		public function get minCharsToStartAutocomplete():int {
+			return _minCharsToStartAutocomplete;
+		}
+		
+		public function set minCharsToStartAutocomplete(value:int):void {
+			_minCharsToStartAutocomplete = value;
+		}
+		
 	}
 }

@@ -58,7 +58,6 @@
 								attribute="{attribute}"
 								upperCase="false"
 								fieldIndex="3"
-								maxChars="3"
 								width="100" 
 								/>
 		<input:StringInputField id="languageVarietyTextInput" 

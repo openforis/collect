@@ -1,25 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
-<s:SkinnableContainer xmlns:fx="http://ns.adobe.com/mxml/2009" 
+<input:AutoCompletePopUp xmlns:fx="http://ns.adobe.com/mxml/2009" 
 		 xmlns:s="library://ns.adobe.com/flex/spark" 
 		 xmlns:mx="library://ns.adobe.com/flex/mx"
+		 xmlns:input="org.openforis.collect.ui.component.input.*"
 		 focusEnabled="false"
-		 creationPolicy="all"
-		>
-	<s:layout>
+		 creationPolicy="all" 
+		 height="150" 
+		 >
+	<input:layout>
 		<s:BasicLayout />
-	</s:layout>
+	</input:layout>
 	
 	<fx:Script>
 		<![CDATA[
+			import mx.core.UIComponent;
+			
 			import org.openforis.collect.event.UIEvent;
 			import org.openforis.collect.i18n.Message;
 			
-			public function itemClickHandler(event:MouseEvent=null):void {
+			override public function itemClickHandler(event:MouseEvent=null):void {
 				if(dataGrid.selectedItem!=null) {
 					var evt:UIEvent = new UIEvent(UIEvent.ITEM_SELECT);
 					evt.obj = dataGrid.selectedItem;
 					dispatchEvent(evt);
 				}
+			}
+			
+			override public function get listComponent():* {
+				return dataGrid;
 			}
 		]]>
 	</fx:Script>
@@ -29,7 +37,6 @@
 	</fx:Metadata>
 	
 	<s:DataGrid id="dataGrid"
-				width="100%" 
 				height="200"
 				focusEnabled="false"
 				>
@@ -37,11 +44,11 @@
 			<s:ArrayList>
 				<s:GridColumn headerText="{Message.get('language.code')}" 
 							  dataField="code" 
-							  width="83"
+							  width="80"
 							  />
 				<s:GridColumn headerText="{Message.get('language.label')}" 
 							  dataField="label"
-							  width="106" 
+							  width="110" 
 							  />
 			</s:ArrayList>
 		</s:columns>
@@ -64,4 +71,4 @@
 		</s:itemRenderer>
 	</s:DataGrid>
 	
-</s:SkinnableContainer>
+</input:AutoCompletePopUp>

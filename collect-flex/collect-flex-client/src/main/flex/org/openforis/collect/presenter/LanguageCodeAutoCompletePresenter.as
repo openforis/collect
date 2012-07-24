@@ -19,6 +19,8 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.i18n.LanguageCodes;
 	import org.openforis.collect.model.LanguageItem;
 	import org.openforis.collect.model.proxy.FieldProxy;
+	import org.openforis.collect.ui.component.input.AutoCompleteInputField;
+	import org.openforis.collect.ui.component.input.AutoCompletePopUp;
 	import org.openforis.collect.ui.component.input.InputField;
 	import org.openforis.collect.ui.component.input.LanguageCodeAutoComplete;
 	import org.openforis.collect.ui.component.input.LanguageCodeAutoCompletePopUp;
@@ -32,72 +34,35 @@ package org.openforis.collect.presenter
 	 * @author S. Ricci
 	 * 
 	 **/
-	public class LanguageCodeAutoCompletePresenter extends InputFieldPresenter {
+	public class LanguageCodeAutoCompletePresenter extends AutoCompleteInputFieldPresenter {
 		
 		private var _view:LanguageCodeAutoComplete;
 		
-		private static var autoCompletePopUp:LanguageCodeAutoCompletePopUp;
-		private static var autoCompletePopUpOpened:Boolean;
-		
 		private static var languages:ArrayCollection;
-		private static var autoCompleteLastInputField:LanguageCodeAutoComplete;
-		private static var searchText:String;
-		
 		{
 			//init static vars
 			languages = LanguageCodes.getLanguageCodes(Application.locale);
-			languages.filterFunction = languagesFilterFunction;
 		}
 		
 		public function LanguageCodeAutoCompletePresenter(view:LanguageCodeAutoComplete) {
 			this._view = view;
-
 			super(view);
+			minCharsToStartAutocomplete = 1;
+			allowNotListedValues = false;
 		}
 		
-		override internal function initEventListeners():void {
-			super.initEventListeners();
-			_view.applyChangesOnFocusOut = false;
-			_view.addEventListener(InputFieldEvent.CHANGING, inputFieldChangingHandler);
-			_view.addEventListener(FocusEvent.FOCUS_OUT, inputFieldFocusOutHandler);
-			_view.textInput.addEventListener(KeyboardEvent.KEY_DOWN, inputFieldKeyDownHandler);
-		}
-		
-		protected function inputFieldKeyDownHandler(event:KeyboardEvent):void {
-			switch ( event.keyCode ) {
-				case Keyboard.DOWN:
-					if ( autoCompletePopUpOpened ) {
-						autoCompletePopUp.dataGrid.setFocus();
-						if ( CollectionUtil.isNotEmpty(autoCompletePopUp.dataGrid.dataProvider) ) {
-							autoCompletePopUp.dataGrid.selectedIndex = 0;
-						}
-					}
-					break;
-				case Keyboard.ESCAPE:
-					closeAutoCompletePopUp();
-					break;
-				case Keyboard.TAB:
-					if ( autoCompletePopUpOpened ) {
-						var matchingResult:LanguageItem = getMatchingResult() as LanguageItem;
-						if ( matchingResult != null ) {
-							performSelectLanguage(matchingResult);
-						} else {
-							var text:String = autoCompleteLastInputField.text;
-							if ( StringUtil.isBlank(text) || FieldProxy.isShortCutForReasonBlank(text) ) {
-								autoCompleteLastInputField.presenter.updateValue();
-							} else {
-								autoCompleteLastInputField.presenter.undoLastChange();
-							}
-						}
-						closeAutoCompletePopUp();
-					}
-					break;
+		protected function languagesFilterFunction(item:LanguageItem):Boolean {
+			var searchText:String = _view.text;
+			if ( StringUtil.isNotBlank(searchText) ) {
+				return StringUtil.startsWith(item.code, searchText, true) || StringUtil.startsWith(item.label, searchText, true);
+			} else {
+				return false;
 			}
 		}
 		
-		protected static function getMatchingResult():Object {
-			var searchText:String = autoCompleteLastInputField.text;
-			var list:IList = autoCompletePopUp.dataGrid.dataProvider;
+		override protected function getMatchingResult():* {
+			var searchText:String = _view.text;
+			var list:IList = LanguageCodeAutoCompletePopUp(popUp).dataGrid.dataProvider;
 			for each (var item:Object in list) {
 				var compareToValue:String = item.code;
 				if ( compareToValue != null && searchText.toUpperCase() == compareToValue.toUpperCase() ) {
@@ -107,98 +72,32 @@ package org.openforis.collect.presenter
 			return null;
 		}
 		
-		protected function inputFieldFocusOutHandler(event:FocusEvent):void {
-			var inputField:InputField = event.target.document;
-			if ( inputField != null && inputField.changed ) {
-				if ( ! autoCompletePopUpOpened && ! UIUtil.isFocusOnComponent(autoCompletePopUp) ) {
-					inputField.presenter.undoLastChange();
-				}
-			}
-		}
-		
-		protected function inputFieldChangingHandler(event:InputFieldEvent):void {
-			var text:String = (_view.textInput as TextInput).text;
-			showAutoCompletePopUp(text, _view);
-		}
-		
-		protected static function languagesFilterFunction(item:LanguageItem):Boolean {
-			if ( StringUtil.isNotBlank(searchText) ) {
-				return StringUtil.startsWith(item.code, searchText, true) || StringUtil.startsWith(item.label, searchText, true);
-			} else {
-				return false;
-			}
-		}
-		
-		protected static function showAutoCompletePopUp(text:String, inputField:LanguageCodeAutoComplete):void {
-			var firstCreated:Boolean = false;
-			if(autoCompletePopUp == null) {
-				autoCompletePopUp = new LanguageCodeAutoCompletePopUp();
-				autoCompletePopUp.addEventListener(KeyboardEvent.KEY_DOWN, autoCompleteKeyDownHandler);
-				autoCompletePopUp.addEventListener(FlexMouseEvent.MOUSE_DOWN_OUTSIDE, autoCompleteMouseDownOutsideHandler);
-				firstCreated = true;
-			}
-			if(! autoCompletePopUpOpened) {
-				PopUpManager.addPopUp(autoCompletePopUp, FlexGlobals.topLevelApplication as DisplayObject, false);
-				
-				PopUpUtil.alignToField(autoCompletePopUp, inputField, 
-					PopUpUtil.POSITION_BELOW, 
-					PopUpUtil.VERTICAL_ALIGN_BOTTOM, 
-					PopUpUtil.HORIZONTAL_ALIGN_LEFT,
-					false
-				);
-				
-				autoCompletePopUpOpened = true;
-				
-				if ( firstCreated ) {
-					autoCompletePopUp.addEventListener(UIEvent.ITEM_SELECT, languageSelectHandler);
-				}
-			}
-			searchText = text;
-			autoCompleteLastInputField = inputField;
+		override protected function loadAutoCompleteData():void {
+			languages.filterFunction = languagesFilterFunction;
 			languages.refresh();
-			autoCompletePopUp.dataGrid.dataProvider = languages;
+			handleSearchResult(languages);
 		}
 		
-		protected static function languageSelectHandler(event:UIEvent = null):void {
-			var selectedLanguage:LanguageItem = autoCompletePopUp.dataGrid.selectedItem as LanguageItem;
-			performSelectLanguage(selectedLanguage);
-		}
-		
-		protected static function performSelectLanguage(selectedLanguage:LanguageItem):void {
-			if ( selectedLanguage != null ) {
-				autoCompleteLastInputField.text = selectedLanguage.code;
-				autoCompleteLastInputField.presenter.updateValue();
-			}
-			closeAutoCompletePopUp();
-		}
-		
-		protected static function autoCompleteKeyDownHandler(event:KeyboardEvent):void {
-			var keyCode:uint = event.keyCode;
-			switch(keyCode) {
-				case Keyboard.ENTER:
-					languageSelectHandler();
-					break;
-				case Keyboard.ESCAPE:
-					cancelAutoComplete();
-					break;
+		override protected function handleSearchResult(data:IList):void {
+			if ( CollectionUtil.isEmpty(data) ) {
+				closePopUp();
+			} else {
+				showPopUp();
+				LanguageCodeAutoCompletePopUp(popUp).dataGrid.dataProvider = data;
 			}
 		}
 		
-		protected static function autoCompleteMouseDownOutsideHandler(event:FlexMouseEvent):void {
-			cancelAutoComplete();
+		override protected function createPopUp():AutoCompletePopUp {
+			var popUp:LanguageCodeAutoCompletePopUp = new LanguageCodeAutoCompletePopUp();
+			return popUp;
 		}
 		
-		protected static function closeAutoCompletePopUp():void {
-			if ( autoCompletePopUpOpened ) {
-				PopUpManager.removePopUp(autoCompletePopUp);
-				autoCompletePopUpOpened = false;
-				var textInput:TextInput = autoCompleteLastInputField.textInput as TextInput;
-				textInput.setFocus();
+		override protected function performSelectValue(selectedValue:*):void {
+			if ( selectedValue != null ) {
+				_view.text = selectedValue.code;
+				updateValue();
 			}
-		}
-		
-		protected static function cancelAutoComplete():void {
-			closeAutoCompletePopUp();
+			closePopUp();
 		}
 		
 	}
