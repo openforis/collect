@@ -22,7 +22,7 @@
 			
 			override protected function createChildren():void {
 				super.createChildren();
-				
+				contentGroup.addElement(rowNumberLabel);
 				contentGroup.addElement(dataGroup);
 			}
 			
@@ -66,6 +66,17 @@
 	</fx:Script>
 	
 	<fx:Declarations>
+		<s:Label id="rowNumberLabel"
+				 styleName="formLabel"
+				 visible="{entityDefinition.showRowNumbers}"
+				 includeInLayout="{entityDefinition.showRowNumbers}"
+				 text="{entity.index + 1}."
+				 width="20"
+				 height="22"
+				 verticalAlign="middle"
+				 textAlign="right"
+				 />
+		
 		<s:DataGroup id="dataGroup" dataProvider="{nodeDefinitions}">
 			<s:layout>
 				<s:HorizontalLayout gap="4" />
@@ -80,7 +91,5 @@
 			</s:itemRenderer>
 		</s:DataGroup>
 	</fx:Declarations>
-	
-		
 	
 </datagroup:MultipleNodesDataGroupItemRenderer>

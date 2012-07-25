@@ -2,10 +2,8 @@ package org.openforis.collect.presenter
 {
 	import flash.events.Event;
 	
-	import mx.binding.utils.BindingUtils;
 	import mx.binding.utils.ChangeWatcher;
 	import mx.collections.IList;
-	import mx.controls.Alert;
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.IResponder;
 	import mx.rpc.events.ResultEvent;
@@ -14,8 +12,6 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.event.NodeEvent;
-	import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
-	import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.SchemaProxy;
 	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.model.proxy.NodeProxy;
@@ -25,7 +21,6 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.ui.component.detail.RelevanceDisplayManager;
 	import org.openforis.collect.ui.component.detail.ValidationDisplayManager;
 	import org.openforis.collect.ui.component.input.FormItemContextMenu;
-	import org.openforis.collect.util.CollectionUtil;
 
 	/**
 	 * 
@@ -59,12 +54,8 @@ package org.openforis.collect.presenter
 			var node:NodeProxy = event.node;
 			var index:int = event.index;
 			var parent:EntityProxy = EntityProxy(record.getNode(node.parentId));
+			parent.moveChild(node, index);
 			var nodeId:int = node.id;
-			var nodeDefn:NodeDefinitionProxy = schema.getDefinitionById(node.definitionId);
-			var nodeName:String = nodeDefn.name;
-			var attributes:IList = parent.getChildren(nodeName);
-			CollectionUtil.moveItem(attributes, node, index);
-			
 			var responder:IResponder = new AsyncResponder(moveResultHandler, faultHandler); 
 			ClientFactory.dataClient.moveNode(responder, nodeId, index);
 		}

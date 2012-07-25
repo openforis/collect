@@ -15,6 +15,7 @@ package org.openforis.collect.model.proxy {
 	import org.openforis.collect.metamodel.proxy.NumberAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.NumberAttributeDefinitionProxy$Type;
 	import org.openforis.collect.util.ArrayUtil;
+	import org.openforis.collect.util.CollectionUtil;
 	import org.openforis.collect.util.ObjectUtil;
 	import org.openforis.collect.util.StringUtil;
 	import org.openforis.collect.util.UIUtil;
@@ -152,9 +153,9 @@ package org.openforis.collect.model.proxy {
 				children = new ArrayCollection();
 				childrenByName.put(name, children);
 			}
-			children.addItem(node);
 			node.parent = this;
 			node.init();
+			children.addItem(node);
 			showErrorsOnChild(name);
 		}
 		
@@ -173,6 +174,14 @@ package org.openforis.collect.model.proxy {
 			var children:ArrayCollection = childrenByName.get(name);
 			var index:int = children.getItemIndex(oldNode);
 			children.setItemAt(newNode, index);
+		}
+		
+		public function moveChild(node:NodeProxy, index:int):void {
+			var children:IList = getChildren(node.name);
+			CollectionUtil.moveItem(children, node, index);
+			for each (var child:NodeProxy in children){
+				child.updateIndex();
+			}
 		}
 		
 		public function updateKeyText():void {
@@ -383,6 +392,5 @@ package org.openforis.collect.model.proxy {
 			_enumeratedEntitiesCodeWidths = value;
 		}
 
-		
 	}
 }

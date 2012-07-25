@@ -73,10 +73,13 @@
 						includeInLayout="{dataGroup.dataProvider.length > 0}"
 						visible="{dataGroup.dataProvider.length > 0}"
 						>
-				<s:HGroup gap="0">
+				<s:HGroup gap="2">
 					<s:Spacer id="dragAnchorSpacer"
 							  includeInLayout="{Application.activeRecordEditable &amp;&amp; ! entityDefinition.enumerable}"
-						width="13" />
+						width="11" />
+					<s:Spacer id="rowNumberSpacer"
+							  includeInLayout="{entityDefinition.showRowNumbers}"
+							  width="20" />
 					<datagroup:DataGroupHeader id="header" 
 											   nodeDefinitions="{nodeDefinitions}"
 											   parentEntity="{parentEntity}"
@@ -99,6 +102,7 @@
 					<s:itemRenderer>
 						<fx:Component>
 							<detail:EntityDataGroupItemRenderer
+								entityDefinition="{outerDocument.entityDefinition}"
 								entity="{data as EntityProxy}"
 								modelVersion="{outerDocument.modelVersion}"
 								nodeDefinitions="{outerDocument.nodeDefinitions}"

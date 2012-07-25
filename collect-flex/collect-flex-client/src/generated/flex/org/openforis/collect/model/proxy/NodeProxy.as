@@ -15,7 +15,11 @@ package org.openforis.collect.model.proxy {
     [RemoteClass(alias="org.openforis.collect.model.proxy.NodeProxy")]
     public class NodeProxy extends NodeProxyBase {
 		
-		public function init():void {}
+		private var _index:int;
+		
+		public function init():void {
+			updateIndex();
+		}
 
 		public function hasErrors():Boolean {
 			return false;
@@ -26,6 +30,18 @@ package org.openforis.collect.model.proxy {
 		}
 		
 		public function get index():int {
+			return _index;
+		}
+		
+		public function set index(value:int):void {
+			_index = value;
+		}
+		
+		public function updateIndex():void {
+			index = calculateIndex();
+		}
+		
+		protected function calculateIndex():int {
 			if ( parent == null ) {
 				return 0;
 			} else {
