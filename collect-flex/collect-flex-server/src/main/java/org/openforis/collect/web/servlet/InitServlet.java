@@ -52,7 +52,6 @@ public class InitServlet extends HttpServlet {
 		// FileUtil.init(basePath);
 		
 		this.initLog4J();
-		// initValiadtionMap();
 
 		System.out.println("====================================================");
 	}

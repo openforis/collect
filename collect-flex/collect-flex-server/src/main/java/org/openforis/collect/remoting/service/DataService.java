@@ -17,11 +17,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
-import org.openforis.collect.manager.RecordDataIndexException;
-import org.openforis.collect.manager.RecordDataIndexManager;
-import org.openforis.collect.manager.RecordDataIndexManager.SearchType;
 import org.openforis.collect.manager.RecordFileException;
 import org.openforis.collect.manager.RecordFileManager;
+import org.openforis.collect.manager.RecordIndexException;
+import org.openforis.collect.manager.RecordIndexManager;
+import org.openforis.collect.manager.RecordIndexManager.SearchType;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.RecordPromoteException;
 import org.openforis.collect.manager.SessionManager;
@@ -90,7 +90,7 @@ public class DataService {
 	private RecordFileManager fileManager;
 
 	@Autowired
-	private RecordDataIndexManager recordDataIndexManager;
+	private RecordIndexManager recordDataIndexManager;
 
 	/**
 	 * it's true when the root entity definition of the record in session has some nodes with the "collect:index" annotation
@@ -99,7 +99,7 @@ public class DataService {
 	
 	@Transactional
 	@Secured("ROLE_ENTRY")
-	public RecordProxy loadRecord(int id, int step, boolean forceUnlock) throws RecordPersistenceException, RecordDataIndexException {
+	public RecordProxy loadRecord(int id, int step, boolean forceUnlock) throws RecordPersistenceException, RecordIndexException {
 		SessionState sessionState = sessionManager.getSessionState();
 		if ( sessionState.isActiveRecordBeingEdited() ) {
 			throw new MultipleEditException();
@@ -181,7 +181,7 @@ public class DataService {
 	
 	@Transactional
 	@Secured("ROLE_ENTRY")
-	public void saveActiveRecord() throws RecordPersistenceException, RecordDataIndexException {
+	public void saveActiveRecord() throws RecordPersistenceException, RecordIndexException {
 		sessionManager.checkIsActiveRecordLocked();
 		SessionState sessionState = sessionManager.getSessionState();
 		CollectRecord record = sessionState.getActiveRecord();
@@ -198,7 +198,7 @@ public class DataService {
 
 	@Transactional
 	@Secured("ROLE_ENTRY")
-	public List<UpdateResponse> updateActiveRecord(UpdateRequest request) throws RecordPersistenceException, RecordDataIndexException {
+	public List<UpdateResponse> updateActiveRecord(UpdateRequest request) throws RecordPersistenceException, RecordIndexException {
 		sessionManager.checkIsActiveRecordLocked();
 		List<UpdateRequestOperation> operations = request.getOperations();
 		List<UpdateResponse> updateResponses = new ArrayList<UpdateResponse>();

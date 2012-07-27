@@ -14,7 +14,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.openforis.collect.manager.RecordDataIndexManager.SearchType;
+import org.openforis.collect.manager.RecordIndexManager.SearchType;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
@@ -44,11 +44,11 @@ public class RecordDataIndexManagerIntegrationTest {
 	//private final Log log = LogFactory.getLog(ConfigurationDaoIntegrationTest.class);
 	
 	@Autowired
-	protected RecordDataIndexManager indexManager;
+	protected RecordIndexManager indexManager;
 	
 	@Before
 	public void before() throws Exception {
-		indexManager.destroyIndex();
+		RecordIndexManager.destroyIndex();
 	}
 	
 	@Test
@@ -58,11 +58,13 @@ public class RecordDataIndexManagerIntegrationTest {
 		createIndex(survey, gpsModels);
 		NodeDefinition autoCompleteNodeDefn = survey.getSchema().getByPath("/cluster/gps_model");
 		
-		//testSingleResultMatching(survey, autoCompleteNodeDefn);
+		testSingleResultMatching(survey, autoCompleteNodeDefn);
 		
-		//testSingleResultMatchingPhrase(survey, autoCompleteNodeDefn);
+		testMultipleResultsFoundWithNonCompleteTerm(survey, autoCompleteNodeDefn);
 		
 		testMultipleResultsFound(survey, autoCompleteNodeDefn);
+		
+		//testSingleResultMatchingPhrase(survey, autoCompleteNodeDefn);
 		
 		testLimitedMultipleResultsFound(survey, autoCompleteNodeDefn);
 		
@@ -71,7 +73,7 @@ public class RecordDataIndexManagerIntegrationTest {
 	
 	@After
 	public void after() throws Exception {
-		indexManager.destroyIndex();
+		RecordIndexManager.destroyIndex();
 	}
 
 	private void testSingleResultMatching(CollectSurvey survey, NodeDefinition autoCompleteNodeDefn) throws Exception {
@@ -98,6 +100,14 @@ public class RecordDataIndexManagerIntegrationTest {
 		assertArrayEquals(new String[] {"GPS MAP 60CSX", "GPS MAP 62 S", "GPS MAP 62S"}, result.toArray());
 	}
 
+	private void testMultipleResultsFoundWithNonCompleteTerm(CollectSurvey survey, NodeDefinition autoCompleteNodeDefn) throws Exception {
+		List<String> result;
+		result = indexManager.search(SearchType.STARTS_WITH, survey, autoCompleteNodeDefn.getId(), 0, "GPS MA", 10);
+		assertNotNull(result);
+		assertEquals(3, result.size());
+		assertArrayEquals(new String[] {"GPS MAP 60CSX", "GPS MAP 62 S", "GPS MAP 62S"}, result.toArray());
+	}
+	
 	private void testNoResultsFound(CollectSurvey survey, NodeDefinition autoCompleteNodeDefn) throws Exception {
 		List<String> result;
 		result = indexManager.search(SearchType.STARTS_WITH, survey, autoCompleteNodeDefn.getId(), 0, "GPS NOT LISTED", 10);

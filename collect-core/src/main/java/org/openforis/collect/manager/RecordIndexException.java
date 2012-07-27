@@ -7,7 +7,7 @@ package org.openforis.collect.manager;
  * @author riccist
  *
  */
-public class RecordDataIndexException extends Exception {
+public class RecordIndexException extends Exception {
 
 	
 	/**
@@ -18,20 +18,20 @@ public class RecordDataIndexException extends Exception {
 	/**
 	 * 
 	 */
-	public RecordDataIndexException() {
+	public RecordIndexException() {
 	}
 
 	/**
 	 * @param message
 	 */
-	public RecordDataIndexException(String message) {
+	public RecordIndexException(String message) {
 		super(message);
 	}
 
 	/**
 	 * @param cause
 	 */
-	public RecordDataIndexException(Throwable cause) {
+	public RecordIndexException(Throwable cause) {
 		super(cause);
 	}
 
@@ -39,7 +39,7 @@ public class RecordDataIndexException extends Exception {
 	 * @param message
 	 * @param cause
 	 */
-	public RecordDataIndexException(String message, Throwable cause) {
+	public RecordIndexException(String message, Throwable cause) {
 		super(message, cause);
 	}
 
