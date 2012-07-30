@@ -10,6 +10,8 @@ import org.openforis.collect.remoting.service.dataProcessing.DataProcessingState
  */
 public class DataExportState extends DataProcessingState {
 
+	private static final long serialVersionUID = 1L;
+
 	public enum Format {
 		XML, CSV
 	}
