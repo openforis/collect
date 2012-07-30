@@ -3,32 +3,18 @@
  */
 package org.openforis.collect.web.servlet;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Date;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.xml.parsers.FactoryConfigurationError;
-
-import org.apache.log4j.xml.DOMConfigurator;
 
 /**
  * @author M. Togna
  * 
  */
 public class InitServlet extends HttpServlet {
-
-	private String getTimestamp() {
-		return new Date().toString();
-	}
 
 	/**
 	 * 
@@ -48,48 +34,9 @@ public class InitServlet extends HttpServlet {
 
 		// String basePath = getServletContext().getRealPath("/");
 
-		// TODO init path
-		// FileUtil.init(basePath);
-		
-		this.initLog4J();
-
 		System.out.println("====================================================");
 	}
 
-	/**
-	 * @throws FactoryConfigurationError
-	 */
-	protected void initLog4J() throws FactoryConfigurationError {
-		// Get data from web.xml
-		String file = this.getInitParameter("log4j-init-file");
-		String logdir = this.getInitParameter("log4j-log-dir");
-
-		if (logdir == null) {
-			// Use default location for OpenForis logs if not specified in web.xml
-			logdir = "WEB-INF/logs";
-		}
-
-		// Get path where OpenForis is running
-		String openForisDir = this.getServletContext().getRealPath("/");
-
-		// Define location of logfiles
-		File logsdir = new File(openForisDir, logdir);
-		logsdir.mkdirs();
-
-		System.out.println(this.getTimestamp() + " - OpenForis logs dir=" + logsdir.getAbsolutePath());
-
-		// Get log4j configuration file
-		File srcConfigFile = new File(openForisDir, file);
-
-		// Convert
-		File log4jConfigFile = new File(openForisDir, "WEB-INF/TMPfile.xml");
-		this.convertLogFile(srcConfigFile, log4jConfigFile, logsdir);
-
-		System.out.println(this.getTimestamp() + " - OpenForis log4j configuration=" + log4jConfigFile.getAbsolutePath());
-
-		// Configure log4j
-		DOMConfigurator.configure(log4jConfigFile.getAbsolutePath());
-	}
 
 	/*
 	 * (non-Javadoc)
@@ -102,46 +49,4 @@ public class InitServlet extends HttpServlet {
 		// super.doGet(req, resp);
 	}
 
-	private void convertLogFile(File srcConfig, File destConfig, File logDir) {
-		// Step 1 read config file into memory
-		String srcDoc = "not initialized";
-		try {
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			FileInputStream is = new FileInputStream(srcConfig);
-
-			byte[] buf = new byte[1024];
-			int len;
-			while ((len = is.read(buf)) > 0) {
-				baos.write(buf, 0, len);
-			}
-
-			is.close();
-			baos.close();
-			srcDoc = new String(baos.toByteArray());
-		} catch (FileNotFoundException ex) {
-			ex.printStackTrace();
-		} catch (IOException ex) {
-			ex.printStackTrace();
-		}
-
-		// Step 2 ; substitute Patterns
-		String destDoc = srcDoc.replaceAll("loggerdir", logDir.getAbsolutePath().replaceAll("\\\\", "/"));
-
-		// Step 3 ; write back to file
-		try {
-			ByteArrayInputStream bais = new ByteArrayInputStream(destDoc.getBytes());
-			FileOutputStream fos = new FileOutputStream(destConfig);
-			byte[] buf = new byte[1024];
-			int len;
-			while ((len = bais.read(buf)) > 0) {
-				fos.write(buf, 0, len);
-			}
-			fos.close();
-			bais.close();
-		} catch (FileNotFoundException ex) {
-			ex.printStackTrace();
-		} catch (IOException ex) {
-			ex.printStackTrace();
-		}
-	}
 }
