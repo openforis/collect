@@ -14,6 +14,7 @@ import org.openforis.collect.model.proxy.UserProxy;
 import org.openforis.collect.persistence.RecordUnlockedException;
 import org.openforis.collect.web.session.SessionState;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -35,7 +36,7 @@ public class SessionService {
 	 * Method used to keep the session alive
 	 * @throws RecordUnlockedException 
 	 */
-//	@Secured("isAuthenticated()")
+	//@Secured("isAuthenticated()")
 	@Transactional
 	public void keepAlive(Boolean editing) throws RecordUnlockedException {
 		sessionManager.keepSessionAlive();
@@ -50,6 +51,8 @@ public class SessionService {
 	 * @return map with user, sessionId
 	 * @throws DatabaseVersionNotCompatibleException 
 	 */
+	//@Secured("isAuthenticated()")
+	@Transactional
 	public Map<String, Object> initSession(String locale) throws DatabaseVersionNotCompatibleException {
 		databaseVersionManager.checkIsVersionCompatible();
 		
@@ -62,6 +65,11 @@ public class SessionService {
 		result.put("user", userProxy);
 		result.put("sessionId", sessionId);
 		return result;
+	}
+	
+	//@Secured("isAuthenticated()")
+	public void logout() {
+		sessionManager.invalidateSession();
 	}
 	
 }

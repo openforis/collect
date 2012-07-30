@@ -34,6 +34,11 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.model.proxy.UserProxy;
 	import flash.events.MouseEvent;
 	import org.openforis.collect.util.ApplicationConstants;
+	import flash.events.Event;
+	import mx.rpc.IResponder;
+	import flash.net.URLRequest;
+	import flash.net.navigateToURL;
+	import org.openforis.collect.util.AlertUtil;
 	
 	/**
 	 * 
@@ -83,6 +88,28 @@ package org.openforis.collect.presenter {
 			//mouse wheel handler to increment scroll step size
 			FlexGlobals.topLevelApplication.systemManager.addEventListener(MouseEvent.MOUSE_WHEEL, mouseWheelHandler, true);
 			eventDispatcher.addEventListener(UIEvent.SURVEY_SELECTED, surveySelectedHandler);
+			eventDispatcher.addEventListener(UIEvent.LOGOUT, logoutHandler);
+		}
+		
+		protected function logoutHandler(event:UIEvent):void {
+			var messageKey:String;
+			if ( Application.activeRecord != null && Application.activeRecord.updated ) {
+				messageKey = "global.confirmLogoutRecordUpdated";
+			} else {
+				messageKey = "global.confirmLogout";
+			}
+			AlertUtil.showConfirm(messageKey, null, "global.confirmLogoutTitle", performLogout);
+		}
+		
+		protected function performLogout():void {
+			var responder:IResponder = new AsyncResponder(logoutResultHandler, faultHandler);
+			_sessionClient.logout(responder);
+		}
+		
+		internal function logoutResultHandler(event:ResultEvent, token:Object = null):void {
+			Application.activeRecord = null;
+			var u:URLRequest = new URLRequest(ApplicationConstants.URL +"login.htm");
+			navigateToURL(u,"_self");
 		}
 		
 		internal function initSessionResultHandler(event:ResultEvent, token:Object = null):void {

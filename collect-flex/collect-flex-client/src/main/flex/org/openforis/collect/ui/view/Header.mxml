@@ -7,13 +7,15 @@
 	
 	<fx:Script>
 		<![CDATA[
-			import mx.utils.Base64Decoder;
 			import mx.rpc.AsyncResponder;
 			import mx.rpc.events.FaultEvent;
 			import mx.rpc.events.ResultEvent;
-			import org.openforis.collect.client.LogoClient;
+			
 			import org.openforis.collect.client.ClientFactory;
-			import org.openforis.collect.util.AlertUtil;
+			import org.openforis.collect.client.LogoClient;
+			import org.openforis.collect.event.EventDispatcherFactory;
+			import org.openforis.collect.event.UIEvent;
+			import org.openforis.collect.i18n.Message;
 
 			[Bindable]
 			public var logoData:ByteArray;
@@ -25,13 +27,17 @@
 				client.loadLogo(logoResponder, 0);
 			}
 			
-			public function logoResultHandler(event:ResultEvent, token:Object):void {
+			protected function logoResultHandler(event:ResultEvent, token:Object):void {
 				var data:ByteArray = event.result as ByteArray;				
 				logoData = data;
 			}
 			
-			public function logoFaultHandler(event:FaultEvent, token:Object = null):void {
+			protected function logoFaultHandler(event:FaultEvent, token:Object = null):void {
 				//AlertUtil.showError('error.logoNotFound'); 
+			}
+			
+			protected function logoutButtonClickHandler(event:MouseEvent):void {
+				EventDispatcherFactory.getEventDispatcher().dispatchEvent(new UIEvent(UIEvent.LOGOUT));
 			}
 			
 		]]>
@@ -40,6 +46,13 @@
 	<s:Group>
         <s:Image source="@Embed(source='/assets/images/banner.jpg')"/>
         <s:Image source="{logoData}" right="0" /> 
+		<!--<s:Button id="logoutButton"
+				  useHandCursor="true"
+				  buttonMode="true"
+				  label="{Message.get('global.logout')}"
+				  click="logoutButtonClickHandler(event)"
+				  bottom="0" right="0"
+				  />-->
 	</s:Group>
 	
 </s:Group>

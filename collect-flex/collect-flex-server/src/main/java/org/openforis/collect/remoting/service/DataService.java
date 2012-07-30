@@ -698,15 +698,7 @@ public class DataService {
 	 */
 	@Secured("ROLE_ENTRY")
 	public void clearActiveRecord() throws RecordPersistenceException {
-		sessionManager.checkIsActiveRecordLocked();
-		SessionState sessionState = this.sessionManager.getSessionState();
-		CollectRecord activeRecord = sessionState.getActiveRecord();
-		if ( activeRecord != null && activeRecord.getId() != null ) {
-			this.recordManager.releaseLock(activeRecord.getId());
-		}
-		String sessionId = sessionState.getSessionId();
-		fileManager.deleteAllTempFiles(sessionId, activeRecord);
-		this.sessionManager.clearActiveRecord();
+		sessionManager.releaseRecord();
 	}
 	
 	@Secured("ROLE_ENTRY")

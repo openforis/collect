@@ -143,7 +143,7 @@ public class RecordFileManager {
 		}
 	}
 	
-	public void deleteAllTempFiles(String sessionId, CollectRecord record) {
+	public void deleteAllTempFiles(String sessionId) {
 		Set<Entry<Integer,String>> entrySet = tempFiles.entrySet();
 		Iterator<Entry<Integer, String>> iterator = entrySet.iterator();
 		while (iterator.hasNext()) {

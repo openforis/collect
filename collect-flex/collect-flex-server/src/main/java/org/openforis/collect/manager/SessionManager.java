@@ -4,9 +4,13 @@ import java.util.Collection;
 import java.util.Locale;
 import java.util.StringTokenizer;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.granite.context.GraniteContext;
+import org.granite.messaging.webapp.HttpGraniteContext;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.RecordUnlockedException;
@@ -31,6 +35,10 @@ public class SessionManager {
 	@Autowired
 	protected RecordManager recordManager;
 
+	@Autowired
+	private RecordFileManager fileManager;
+
+	
 	public SessionState getSessionState() {
 		SessionState sessionState = (SessionState) getSessionAttribute(SessionState.SESSION_ATTRIBUTE_NAME);
 		if (sessionState == null) {
@@ -122,6 +130,33 @@ public class SessionManager {
 		} else {
 			throw new IllegalStateException("Error getting session info");
 		}
+	}
+	
+	public void invalidateSession() {
+		try {
+			releaseRecord();
+		} catch (RecordUnlockedException e) {
+			//do nothing
+		}
+		GraniteContext graniteContext = GraniteContext.getCurrentInstance();
+		if ( graniteContext != null && graniteContext instanceof HttpGraniteContext ) {
+			HttpGraniteContext httpGraniteContext = (HttpGraniteContext) graniteContext;
+			HttpServletRequest request = httpGraniteContext.getRequest();
+			HttpSession session = request.getSession();
+			session.invalidate();
+		}
+	}
+
+	public void releaseRecord() throws RecordUnlockedException {
+		checkIsActiveRecordLocked();
+		SessionState sessionState = getSessionState();
+		CollectRecord activeRecord = sessionState.getActiveRecord();
+		if ( activeRecord != null && activeRecord.getId() != null ) {
+			recordManager.releaseLock(activeRecord.getId());
+		}
+		String sessionId = sessionState.getSessionId();
+		fileManager.deleteAllTempFiles(sessionId);
+		sessionState.setActiveRecord(null);
 	}
 	
 }
