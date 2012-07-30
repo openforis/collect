@@ -204,7 +204,7 @@ public class DataService {
 			indexProcess.cancel();
 		}
 		indexProcess = new RecordIndexProcess(indexManager, record);
-		ExecutorServiceUtil.executeCallable(indexProcess);
+		ExecutorServiceUtil.executeInCachedPool(indexProcess);
 	}
 
 	@Transactional
