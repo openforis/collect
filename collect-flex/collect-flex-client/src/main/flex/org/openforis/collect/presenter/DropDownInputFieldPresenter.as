@@ -4,15 +4,12 @@ package org.openforis.collect.presenter {
 	import flash.events.KeyboardEvent;
 	
 	import mx.binding.utils.BindingUtils;
-	import mx.binding.utils.ChangeWatcher;
 	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
-	import mx.events.PropertyChangeEvent;
 	
 	import org.openforis.collect.Application;
 	import org.openforis.collect.event.UIEvent;
 	import org.openforis.collect.i18n.Message;
-	import org.openforis.collect.model.CollectRecord$Step;
 	import org.openforis.collect.model.FieldSymbol;
 	import org.openforis.collect.model.proxy.AttributeProxy;
 	import org.openforis.collect.model.proxy.FieldProxy;
@@ -27,7 +24,7 @@ package org.openforis.collect.presenter {
 	 * */
 	public class DropDownInputFieldPresenter extends InputFieldPresenter {
 		
-		public static const EMPTY_ITEM:Object = {label: Message.get('global.dropDownEmpty'), separator: true};
+		public static const EMPTY_ITEM:Object = {label: Message.get('global.dropDownEmpty'), separator: false};
 		public static const BLANK_ON_FORM_ITEM:Object = {label: Message.get('edit.dropDownList.blankOnForm'), shortCut: "*", separator: true};
 		public static const DASH_ON_FORM_ITEM:Object = {label: Message.get('edit.dropDownList.dashOnForm'), shortCut: "-"};
 		public static const ILLEGIBLE_ITEM:Object = {label: Message.get('edit.dropDownList.illegible'), shortCut: "?"};
@@ -78,12 +75,14 @@ package org.openforis.collect.presenter {
 		
 		protected function initInternalDataProvider():void {
 			var temp:ArrayCollection = new ArrayCollection();
+			temp.addItem(EMPTY_ITEM);
 			if(_view.dataProvider != null) {
 				temp.addAll(_view.dataProvider);
 			}
 			temp.addItem(BLANK_ON_FORM_ITEM);
 			temp.addItem(DASH_ON_FORM_ITEM);
 			temp.addItem(ILLEGIBLE_ITEM);
+			
 			_view.internalDataProvider = temp;
 		}
 		
@@ -92,6 +91,8 @@ package org.openforis.collect.presenter {
 			var selectedItem:* = _view.dropDownList.selectedItem;
 			if(selectedItem != null) {
 				switch(selectedItem) {
+					case EMPTY_ITEM:
+						break;
 					case BLANK_ON_FORM_ITEM:
 					case DASH_ON_FORM_ITEM:
 					case ILLEGIBLE_ITEM:
@@ -131,7 +132,7 @@ package org.openforis.collect.presenter {
 					item = getItem(value);
 				}
 			}
-			if(item == null && _view.defaultValue != null) {
+			if ( item == null && _view.defaultValue != null && (_view.attribute == null || _view.attribute.empty) ) {
 				item = getItem(_view.defaultValue);
 			}
 			_view.editable = Application.activeRecordEditable;

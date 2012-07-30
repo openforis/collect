@@ -94,6 +94,26 @@ public class CollectValidator extends Validator {
 		return flag;
 	}
 	
+	@Override
+	protected void validateNumericAttributeUnit(
+			NumberAttribute<?, ?> attribute, ValidationResults results) {
+		CollectRecord record = (CollectRecord) attribute.getRecord();
+		Step step = record.getStep();
+		if ( step != Step.ENTRY || attribute.getUnitField().getSymbol() == null ) {
+			super.validateNumericAttributeUnit(attribute, results);
+		}
+	}
+	
+	@Override
+	protected void validateNumericRangeUnit(
+			NumericRangeAttribute<?, ?> attribute, ValidationResults results) {
+		CollectRecord record = (CollectRecord) attribute.getRecord();
+		Step step = record.getStep();
+		if ( step != Step.ENTRY || attribute.getUnitField().getSymbol() == null ) {
+			super.validateNumericRangeUnit(attribute, results);
+		}
+	}
+	
 	private ValidationResults adjustErrorsForEntryPhase(ValidationResults results, Attribute<?, ?> attribute) {
 		boolean confirmed = isErrorConfirmed(attribute);
 		
