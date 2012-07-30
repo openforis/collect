@@ -147,7 +147,9 @@ ALTER TABLE "collect"."ofc_record"
 ----------------------------
 --- BEGIN DEFAULT VALUES ---
 ----------------------------
-INSERT INTO "collect"."ofc_config" ("name", "value") VALUES ('upload_path', '/home/openforis/collect-upload');
+INSERT INTO "collect"."ofc_config" ("name", "value") VALUES 
+	('upload_path', '/home/openforis/collect-upload'), 
+	('index_path', '/home/openforis/collect-index');
 --------------------------
 --- END DEFAULT VALUES ---
 --------------------------

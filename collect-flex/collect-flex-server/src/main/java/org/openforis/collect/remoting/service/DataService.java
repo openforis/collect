@@ -37,6 +37,7 @@ import org.openforis.collect.model.proxy.RecordProxy;
 import org.openforis.collect.persistence.MultipleEditException;
 import org.openforis.collect.persistence.RecordPersistenceException;
 import org.openforis.collect.remoting.service.UpdateRequestOperation.Method;
+import org.openforis.collect.util.ExecutorServiceUtil;
 import org.openforis.collect.web.session.SessionState;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.BooleanAttributeDefinition;
@@ -90,12 +91,14 @@ public class DataService {
 	private RecordFileManager fileManager;
 
 	@Autowired
-	private RecordIndexManager recordDataIndexManager;
+	private RecordIndexManager indexManager;
 
 	/**
 	 * it's true when the root entity definition of the record in session has some nodes with the "collect:index" annotation
 	 */
-	private boolean recordDataIndexEnabled;
+	private boolean indexingEnabled;
+
+	private RecordIndexProcess indexProcess;
 	
 	@Transactional
 	@Secured("ROLE_ENTRY")
@@ -111,9 +114,9 @@ public class DataService {
 		recordManager.addEmptyNodes(rootEntity);
 		sessionManager.setActiveRecord(record);
 		fileManager.reset();
-		recordDataIndexEnabled = recordDataIndexManager.hasIndexableNodes(rootEntity.getDefinition());
-		if ( recordDataIndexEnabled ) {
-			recordDataIndexManager.destroyTemporaryIndex();
+		indexingEnabled = indexManager.hasIndexableNodes(rootEntity.getDefinition());
+		if ( indexingEnabled ) {
+			indexManager.destroyTemporaryIndex();
 		}
 		return new RecordProxy(record);
 	}
@@ -191,9 +194,17 @@ public class DataService {
 		String sessionId = sessionState.getSessionId();
 		recordManager.save(record, sessionId);
 		fileManager.commitChanges(sessionId, record);
-		if ( recordDataIndexEnabled ) {
-			recordDataIndexManager.index(record);
+		if ( indexingEnabled ) {
+			index(record);
 		}
+	}
+
+	protected void index(CollectRecord record) {
+		if ( indexProcess != null && indexProcess.isRunning() ) {
+			indexProcess.cancel();
+		}
+		indexProcess = new RecordIndexProcess(indexManager, record);
+		ExecutorServiceUtil.executeCallable(indexProcess);
 	}
 
 	@Transactional
@@ -215,8 +226,8 @@ public class DataService {
 			firstResp.setMissingWarnings(activeRecord.getMissingWarnings());
 			firstResp.setSkipped(activeRecord.getSkipped());
 			firstResp.setWarnings(activeRecord.getWarnings());
-			if ( recordDataIndexEnabled ) {
-				recordDataIndexManager.temporaryIndex(activeRecord);
+			if ( indexingEnabled ) {
+				indexManager.temporaryIndex(activeRecord);
 			}
 		}
 		return updateResponses;
@@ -644,6 +655,9 @@ public class DataService {
 			recordManager.promote(record, user);
 			recordManager.releaseLock(record.getId());
 			sessionManager.clearActiveRecord();
+			if ( indexingEnabled ) {
+				index(record);
+			}
 		} else {
 			throw new IllegalStateException("The active record cannot be submitted: it is not in the exptected phase: " + exptectedStep);
 		}
@@ -780,7 +794,7 @@ public class DataService {
 		SessionState sessionState = sessionManager.getSessionState();
 		CollectSurvey survey = sessionState.getActiveSurvey();
 		int maxResults = 10;
-		List<String> result = recordDataIndexManager.search(SearchType.STARTS_WITH, survey, attributeDefnId, fieldIndex, searchText, maxResults);
+		List<String> result = indexManager.search(SearchType.STARTS_WITH, survey, attributeDefnId, fieldIndex, searchText, maxResults);
 		return result;
 	}
 	

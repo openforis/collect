@@ -83,6 +83,8 @@ public class RecordIndexManager {
 	protected static String indexRootPath;
 	
 	protected static boolean inited = false;
+	
+	private boolean cancelled;
 
 	public RecordIndexManager() {
 	}
@@ -92,6 +94,7 @@ public class RecordIndexManager {
 			initStatics();
 		}
 		initTemporaryIndex();
+		cancelled = false;
 	}
 
 	protected void initStatics() throws RecordIndexException {
@@ -170,12 +173,14 @@ public class RecordIndexManager {
 	}
 	
 	public void index(CollectRecord record) throws RecordIndexException {
+		cancelled = false;
 		IndexWriter indexWriter = null;
 		try {
 			indexWriter = createIndexWriter();
 			Integer recordId = record.getId();
 			deleteDocuments(indexWriter, recordId);
 			index(indexWriter, record);
+			//TODO cancel indexing if "cancelled" becomes "true"
 		} catch (Exception e) {
 			throw new RecordIndexException(e);
 		} finally {
@@ -184,20 +189,29 @@ public class RecordIndexManager {
 	}
 	
 	public void indexAllRecords(CollectSurvey survey, String rootEntity) throws RecordIndexException {
+		cancelled = false;
 		List<CollectRecord> summaries = recordManager.loadSummaries(survey, rootEntity);
 		IndexWriter indexWriter = null;
 		try {
 			indexWriter = createIndexWriter();
 			for (CollectRecord record : summaries) {
-				Integer recordId = record.getId();
-				deleteDocuments(indexWriter, recordId);
-				index(indexWriter, record);
+				if ( ! cancelled ) {
+					Integer recordId = record.getId();
+					deleteDocuments(indexWriter, recordId);
+					index(indexWriter, record);
+				} else {
+					break;
+				}
 			}
 		} catch (Exception e) {
 			throw new RecordIndexException(e);
 		} finally {
 			closeIndexHandler(indexWriter);
 		}
+	}
+
+	public void cancelIndexing() {
+		cancelled = true;
 	}
 
 	public boolean hasIndexableNodes(Survey survey) {
@@ -251,7 +265,7 @@ public class RecordIndexManager {
 			index(record);
 		}
 	}
-
+	
     public List<String> search(SearchType searchType, Survey survey, int attributeDefnId, int fieldIndex, String queryText, int maxResults)  throws RecordIndexException {
     	Schema schema = survey.getSchema();
     	AttributeDefinition defn = (AttributeDefinition) schema.getById(attributeDefnId);
