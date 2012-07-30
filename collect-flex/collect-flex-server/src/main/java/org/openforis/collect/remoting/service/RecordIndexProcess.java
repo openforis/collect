@@ -1,7 +1,6 @@
 package org.openforis.collect.remoting.service;
 
-import java.util.concurrent.Callable;
-
+import org.openforis.collect.manager.RecordIndexException;
 import org.openforis.collect.manager.RecordIndexManager;
 import org.openforis.collect.model.CollectRecord;
 
@@ -10,7 +9,7 @@ import org.openforis.collect.model.CollectRecord;
  * @author S. Ricci
  *
  */
-public class RecordIndexProcess implements Callable<Void> {
+public class RecordIndexProcess implements Runnable {
 
 	private RecordIndexManager indexManager;
 	private CollectRecord record;
@@ -22,13 +21,16 @@ public class RecordIndexProcess implements Callable<Void> {
 		this.record = record;
 		this.running = false;
 	}
-
+	
 	@Override
-	public Void call() throws Exception {
+	public void run() {
 		running = true;
-		indexManager.index(record);
+		try {
+			indexManager.index(record);
+		} catch (RecordIndexException e) {
+			throw new RuntimeException(e);
+		}
 		running = false;
-		return null;
 	}
 	
 	public void cancel() {

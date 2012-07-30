@@ -118,7 +118,7 @@ public class RecordIndexManager {
 		}
 	}
 	
-	protected static void destroyIndex() {
+	public static void destroyIndex() {
 		File indexDir = new File(indexRootPath);
 		indexDir.delete();
 	}
