@@ -30,7 +30,7 @@ import org.openforis.idm.metamodel.validation.DistanceCheck;
 import org.openforis.idm.metamodel.validation.ExternalCodeValidator;
 import org.openforis.idm.metamodel.validation.IntegerRangeValidator;
 import org.openforis.idm.metamodel.validation.NumericRangeUnitValidator;
-import org.openforis.idm.metamodel.validation.NumericUnitValidator;
+import org.openforis.idm.metamodel.validation.NumberValueUnitValidator;
 import org.openforis.idm.metamodel.validation.PatternCheck;
 import org.openforis.idm.metamodel.validation.RealRangeValidator;
 import org.openforis.idm.metamodel.validation.TimeValidator;
@@ -127,7 +127,7 @@ public class ValidationResultProxy implements Proxy {
 			}
 		} else if(validator instanceof UniquenessCheck) {
 			key = "edit.validation.uniquenessError";
-		} else if(validator instanceof NumericUnitValidator || validator instanceof NumericRangeUnitValidator) {
+		} else if(validator instanceof NumberValueUnitValidator || validator instanceof NumericRangeUnitValidator) {
 			key = "edit.validation.unitNotSpecifiedError";
 		}
 		return key;
