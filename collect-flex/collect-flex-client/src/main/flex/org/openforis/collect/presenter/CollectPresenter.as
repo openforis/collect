@@ -56,11 +56,11 @@ package org.openforis.collect.presenter {
 		private var _keepAliveTimer:Timer;
 		
 		public function CollectPresenter(view:collect) {
-			super();
-			
 			this._view = view;
 			this._modelClient = ClientFactory.modelClient;
 			this._sessionClient = ClientFactory.sessionClient;
+
+			super();
 
 			_keepAliveTimer = new Timer(KEEP_ALIVE_FREQUENCY)
 			_keepAliveTimer.addEventListener(TimerEvent.TIMER, sendKeepAliveMessage);
@@ -88,10 +88,11 @@ package org.openforis.collect.presenter {
 			//mouse wheel handler to increment scroll step size
 			FlexGlobals.topLevelApplication.systemManager.addEventListener(MouseEvent.MOUSE_WHEEL, mouseWheelHandler, true);
 			eventDispatcher.addEventListener(UIEvent.SURVEY_SELECTED, surveySelectedHandler);
-			eventDispatcher.addEventListener(UIEvent.LOGOUT, logoutHandler);
+			
+			_view.footer.logoutButton.addEventListener(MouseEvent.CLICK, logoutButtonClickHandler);
 		}
 		
-		protected function logoutHandler(event:UIEvent):void {
+		protected function logoutButtonClickHandler(event:MouseEvent):void {
 			var messageKey:String;
 			if ( Application.activeRecord != null && Application.activeRecord.updated ) {
 				messageKey = "global.confirmLogoutRecordUpdated";
@@ -116,6 +117,7 @@ package org.openforis.collect.presenter {
 			Application.user = event.result.user;
 			Application.sessionId = event.result.sessionId;
 			Application.locale = FlexGlobals.topLevelApplication.parameters.lang as String;
+			
 			getSurveySummaries();
 		}
 		

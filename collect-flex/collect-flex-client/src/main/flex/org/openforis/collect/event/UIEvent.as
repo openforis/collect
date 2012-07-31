@@ -26,8 +26,6 @@ package org.openforis.collect.event {
 		
 		public static const ITEM_SELECT:String = "itemSelect";
 		
-		public static const LOGOUT:String = "logout";
-		
 		private var _obj:Object;
 		private var _params:Array;
 		

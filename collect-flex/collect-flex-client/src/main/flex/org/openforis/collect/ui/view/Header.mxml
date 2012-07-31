@@ -13,9 +13,6 @@
 			
 			import org.openforis.collect.client.ClientFactory;
 			import org.openforis.collect.client.LogoClient;
-			import org.openforis.collect.event.EventDispatcherFactory;
-			import org.openforis.collect.event.UIEvent;
-			import org.openforis.collect.i18n.Message;
 
 			[Bindable]
 			public var logoData:ByteArray;
@@ -36,23 +33,12 @@
 				//AlertUtil.showError('error.logoNotFound'); 
 			}
 			
-			protected function logoutButtonClickHandler(event:MouseEvent):void {
-				EventDispatcherFactory.getEventDispatcher().dispatchEvent(new UIEvent(UIEvent.LOGOUT));
-			}
-			
 		]]>
 	</fx:Script>
 	
 	<s:Group>
         <s:Image source="@Embed(source='/assets/images/banner.jpg')"/>
         <s:Image source="{logoData}" right="0" /> 
-		<!--<s:Button id="logoutButton"
-				  useHandCursor="true"
-				  buttonMode="true"
-				  label="{Message.get('global.logout')}"
-				  click="logoutButtonClickHandler(event)"
-				  bottom="0" right="0"
-				  />-->
 	</s:Group>
 	
 </s:Group>

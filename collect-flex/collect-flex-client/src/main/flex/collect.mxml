@@ -50,13 +50,16 @@
 	
 	<fx:Style source="assets/style.css" />
 	
-	<s:SkinnableContainer height="100%" horizontalCenter="0" width="974">
+	<s:SkinnableContainer height="100%" 
+						  width="974" 
+						  horizontalCenter="0" 
+						  creationPolicy="all">
 		<s:layout>
 			<s:VerticalLayout />
 		</s:layout>
-		<view:Header width="100%" />
+		<view:Header id="header" width="100%" />
 		<view:MasterView id="masterView" width="100%" height="100%" />
-		<view:Footer width="100%"  />
+		<view:Footer id="footer" width="100%"  />
 	</s:SkinnableContainer>
 	
 </s:Application>
