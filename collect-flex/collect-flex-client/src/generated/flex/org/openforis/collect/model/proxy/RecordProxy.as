@@ -14,6 +14,8 @@ package org.openforis.collect.model.proxy {
 	
 	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.event.EventDispatcherFactory;
+	import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
+	import org.openforis.collect.metamodel.proxy.SurveyProxy;
 	import org.openforis.collect.remoting.service.UpdateRequest;
 	import org.openforis.collect.remoting.service.UpdateRequestOperation;
 	import org.openforis.collect.remoting.service.UpdateRequestOperation$Method;
@@ -24,6 +26,7 @@ package org.openforis.collect.model.proxy {
     [RemoteClass(alias="org.openforis.collect.model.proxy.RecordProxy")]
     public class RecordProxy extends RecordProxyBase {
 		
+		private var _survey:SurveyProxy;
 		private var _nodesMap:Dictionary;
 		private var _updated:Boolean = false;
 		
@@ -35,6 +38,7 @@ package org.openforis.collect.model.proxy {
 		
 		public function init():void {
 			_nodesMap = new Dictionary();
+			traverse(associateDefinition);
 			traverse(initNode);
 		}
 		
@@ -47,6 +51,11 @@ package org.openforis.collect.model.proxy {
 				funct(rootEntity);
 				rootEntity.traverse(funct);
 			}
+		}
+		
+		protected function associateDefinition(node:NodeProxy):void {
+			var defn:NodeDefinitionProxy = survey.schema.getDefinitionById(node.definitionId);
+			node.definition = defn;
 		}
 		
 		protected function initNode(node:NodeProxy):void {
@@ -127,6 +136,11 @@ package org.openforis.collect.model.proxy {
 			var node:NodeProxy, oldNode:NodeProxy, parent:EntityProxy;
 			if(response.createdNode != null) {
 				node = response.createdNode;
+				var defn:NodeDefinitionProxy = survey.schema.getDefinitionById(node.definitionId);
+				node.definition = defn;
+				if ( node is EntityProxy ) {
+					EntityProxy(node).traverse(associateDefinition);
+				}
 				parent = getNode(node.parentId) as EntityProxy;
 				parent.addChild(node);
 				initNode(node);
@@ -188,6 +202,14 @@ package org.openforis.collect.model.proxy {
 				var childrenEntities:IList = entity.getChildEntities();
 				ArrayUtil.addAll(stack, childrenEntities.toArray());
 			}
+		}
+		
+		public function get survey():SurveyProxy {
+			return _survey;
+		}
+		
+		public function set survey(value:SurveyProxy):void {
+			_survey = value;
 		}
 		
 		public function get updated():Boolean {

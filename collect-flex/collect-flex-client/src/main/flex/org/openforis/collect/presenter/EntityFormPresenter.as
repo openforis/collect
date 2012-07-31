@@ -62,6 +62,7 @@ package org.openforis.collect.presenter
 			if(_view.entityDefinition != null) {
 				var entities:IList = getEntities();
 				if ( _view.entityDefinition.multiple && _view.entityDefinition.parent != null ) {
+					_view.parentEntity.sortChildrenByKey(_view.entityDefinition.name);
 					_view.entities = entities;
 					selectEntity(null);
 					selectFirstTab();

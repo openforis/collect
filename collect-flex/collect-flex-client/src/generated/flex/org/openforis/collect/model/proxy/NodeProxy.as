@@ -7,6 +7,8 @@
 
 package org.openforis.collect.model.proxy {
 	import mx.collections.IList;
+	
+	import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
 
 	/**
 	 * @author S. Ricci
@@ -14,6 +16,8 @@ package org.openforis.collect.model.proxy {
     [Bindable]
     [RemoteClass(alias="org.openforis.collect.model.proxy.NodeProxy")]
     public class NodeProxy extends NodeProxyBase {
+		
+		private var _definition:NodeDefinitionProxy;
 		
 		private var _index:int;
 		
@@ -84,6 +88,14 @@ package org.openforis.collect.model.proxy {
 			} else {
 				return null;
 			}
+		}
+		
+		public function get definition():NodeDefinitionProxy {
+			return _definition;
+		}
+		
+		public function set definition(value:NodeDefinitionProxy):void {
+			_definition = value;
 		}
 		
     }

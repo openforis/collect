@@ -8,10 +8,12 @@
 package org.openforis.collect.model.proxy {
 	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
+	import mx.collections.Sort;
 	
 	import org.granite.collections.IMap;
 	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
+	import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.NumberAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.NumberAttributeDefinitionProxy$Type;
 	import org.openforis.collect.util.ArrayUtil;
@@ -27,13 +29,14 @@ package org.openforis.collect.model.proxy {
     [RemoteClass(alias="org.openforis.collect.model.proxy.EntityProxy")]
     public class EntityProxy extends EntityProxyBase {
 		
+		private static const _SORT:Sort = new Sort();
+		
 		private static const KEY_LABEL_SEPARATOR:String = "-";
 		private static const FULL_KEY_LABEL_SEPARATOR:String = " ";
 		
 		private var _keyText:String;
 		private var _fullKeyText:String;
 		private var _compactKeyText:String;
-		private var _definition:EntityDefinitionProxy;
 		private var _enumeratedEntitiesCodeWidths:Array;
 		
 		override public function init():void {
@@ -112,18 +115,56 @@ package org.openforis.collect.model.proxy {
 		}
 		
 		public function getChildren(nodeName:String = null):IList {
+			var result:ArrayCollection;
 			if(nodeName != null) {
-				return childrenByName.get(nodeName);
+				result = childrenByName.get(nodeName);
 			} else {
-				var result:ArrayCollection = new ArrayCollection();
+				result = new ArrayCollection();
 				var listsOfChildren:ArrayCollection = childrenByName.values;
 				for each (var list:IList in listsOfChildren) {
 					result.addAll(list);
 				}
-				return result;
+			}
+			return result;
+		}
+		
+		public function sortChildrenByKey(nodeName:String):void {
+			var children:ArrayCollection = getChildren(nodeName) as ArrayCollection;
+			if ( children != null ) {
+				var defn:NodeDefinitionProxy = EntityDefinitionProxy(definition).getChildDefinition(nodeName);
+				if ( defn is EntityDefinitionProxy && defn.multiple && EntityDefinitionProxy(defn).layout == UIUtil.LAYOUT_FORM ) {
+					var sort:Sort = new Sort();
+					sort.compareFunction = entitiesCompareFunction;
+					children.sort = sort;
+					children.refresh();
+				}
 			}
 		}
-
+		
+		protected function entitiesCompareFunction(entity1:EntityProxy, entity2:EntityProxy, fields:Array = null):int {
+			if ( entity1 == null && entity2 == null ) {
+				return 0;
+			} else if ( entity1 == null ) {
+				return -1;
+			} else if ( entity2 == null ) {
+				return 1;
+			} else if ( entity1 == entity2 ) {
+				return 0;
+			} else {
+				var keyValues1:Array = entity1.getKeyValues();
+				var keyValues2:Array = entity2.getKeyValues();
+				for (var i:int = 0; i < keyValues1.length; i++) {
+					var keyValue1:Object = keyValues1[i];
+					var keyValue2:Object = keyValues2[i];
+					var partialCompareResult:int = _SORT.compareFunction.call(null, keyValues1, keyValue2, fields);
+					if ( partialCompareResult != 0 ) {
+						return partialCompareResult;
+					}
+				}
+			}
+			return 0;
+		}
+	
 		public function getChild(nodeName:String, index:int):NodeProxy {
 			var children:IList = getChildren(nodeName);
 			if(children != null && children.length > index) {
@@ -185,35 +226,42 @@ package org.openforis.collect.model.proxy {
 		}
 		
 		public function updateKeyText():void {
-			if(_definition != null) {
-				var keyDefs:IList = _definition.keyAttributeDefinitions;
-				if(keyDefs.length > 0) {
-					var shortKeyParts:Array = new Array();
-					var fullKeyParts:Array = new Array();
-					for each (var def:AttributeDefinitionProxy in keyDefs) {
-						var key:AttributeProxy = getSingleAttribute(def.name);
-						if(key != null) {
-							var keyPart:String = getKeyLabelPart(def, key);
-							if(StringUtil.isNotBlank(keyPart)) {
-								shortKeyParts.push(keyPart);
-								var label:String = def.getLabelText();
-								var fullKeyPart:String = label + " " + keyPart;
-								fullKeyParts.push(fullKeyPart);
-							}
+			var keyDefs:IList = EntityDefinitionProxy(definition).keyAttributeDefinitions;
+			if(keyDefs.length > 0) {
+				var shortKeyParts:Array = new Array();
+				var fullKeyParts:Array = new Array();
+				for each (var def:AttributeDefinitionProxy in keyDefs) {
+					var key:AttributeProxy = getSingleAttribute(def.name);
+					if(key != null) {
+						var keyPart:String = getKeyLabelPart(def, key);
+						if(StringUtil.isNotBlank(keyPart)) {
+							shortKeyParts.push(keyPart);
+							var label:String = def.getLabelText();
+							var fullKeyPart:String = label + " " + keyPart;
+							fullKeyParts.push(fullKeyPart);
 						}
 					}
-					keyText = StringUtil.concat(KEY_LABEL_SEPARATOR, shortKeyParts);
-					fullKeyText = StringUtil.concat(FULL_KEY_LABEL_SEPARATOR, fullKeyParts);
-				} else if(parent != null) {
-					var siblings:IList = parent.getChildren(name);
-					var itemIndex:int = siblings.getItemIndex(this);
-					keyText = String(itemIndex + 1);
-					fullKeyText = keyText;
 				}
-			} else {
-				keyText = "";
-				fullKeyText = "";
+				keyText = StringUtil.concat(KEY_LABEL_SEPARATOR, shortKeyParts);
+				fullKeyText = StringUtil.concat(FULL_KEY_LABEL_SEPARATOR, fullKeyParts);
+			} else if(parent != null) {
+				var siblings:IList = parent.getChildren(name);
+				var itemIndex:int = siblings.getItemIndex(this);
+				keyText = String(itemIndex + 1);
+				fullKeyText = keyText;
 			}
+		}
+		
+		protected function getKeyValues():Array {
+			var result:Array = new Array();
+			var keyDefs:IList = EntityDefinitionProxy(definition).keyAttributeDefinitions;
+			if(keyDefs.length > 0) {
+				for each (var def:AttributeDefinitionProxy in keyDefs) {
+					var key:AttributeProxy = getSingleAttribute(def.name);
+					result.push(key);
+				}
+			}
+			return result;
 		}
 		
 		private function getKeyLabelPart(attributeDefn:AttributeDefinitionProxy, attribute:AttributeProxy):String {
@@ -376,14 +424,6 @@ package org.openforis.collect.model.proxy {
 			_fullKeyText = value;
 		}
 		
-		public function get definition():EntityDefinitionProxy {
-			return _definition;
-		}
-		
-		public function set definition(value:EntityDefinitionProxy):void {
-			_definition = value;
-		}
-
 		public function get enumeratedEntitiesCodeWidths():Array {
 			return _enumeratedEntitiesCodeWidths;
 		}
