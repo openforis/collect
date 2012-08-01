@@ -33,5 +33,14 @@ package org.openforis.collect.util
 		public static function isNotNull(item:Object):Boolean {
 			return ! isNull(item);
 		}
+		
+		public static function isNumber(value:Object):Boolean {
+			return ! isNaN(Number(value));
+		}
+		
+		public static function toNumber(item:Object):Number {
+			var result:Number = Number(item);
+			return result;
+		}
 	}
 }
