@@ -152,14 +152,18 @@ package org.openforis.collect.model.proxy {
 				return 0;
 			} else {
 				var keyValues1:Array = entity1.getKeyValues();
-				var keyValues2:Array = entity2.getKeyValues();
-				for (var i:int = 0; i < keyValues1.length; i++) {
-					var keyValue1:Object = keyValues1[i];
-					var keyValue2:Object = keyValues2[i];
-					var partialCompareResult:int = _SORT.compareFunction.call(null, keyValues1, keyValue2, fields);
-					if ( partialCompareResult != 0 ) {
-						return partialCompareResult;
+				if ( keyValues1.length > 0 ) {
+					var keyValues2:Array = entity2.getKeyValues();
+					for (var i:int = 0; i < keyValues1.length; i++) {
+						var keyValue1:Object = keyValues1[i];
+						var keyValue2:Object = keyValues2[i];
+						var partialCompareResult:int = _SORT.compareFunction.call(null, keyValues1, keyValue2, fields);
+						if ( partialCompareResult != 0 ) {
+							return partialCompareResult;
+						}
 					}
+				} else {
+					return _SORT.compareFunction.call(null, entity1.index, entity2.index, fields);
 				}
 			}
 			return 0;
