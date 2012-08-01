@@ -132,7 +132,7 @@ package org.openforis.collect.model.proxy {
 			if ( entities != null ) {
 				result = new ArrayCollection(entities.toArray());
 				var sort:Sort = new Sort();
-				sort.compareFunction = entitiesCompareFunction;
+				sort.compareFunction = entitiesKeyCompareFunction;
 				result.sort = sort;
 				result.refresh();
 				//to prevent issue due to use of a custom sort function in data providers...
@@ -141,7 +141,7 @@ package org.openforis.collect.model.proxy {
 			return result;
 		}
 		
-		protected static function entitiesCompareFunction(entity1:EntityProxy, entity2:EntityProxy, fields:Array = null):int {
+		protected static function entitiesKeyCompareFunction(entity1:EntityProxy, entity2:EntityProxy, fields:Array = null):int {
 			if ( entity1 == null && entity2 == null ) {
 				return 0;
 			} else if ( entity1 == null ) {
@@ -157,9 +157,9 @@ package org.openforis.collect.model.proxy {
 					for (var i:int = 0; i < keyValues1.length; i++) {
 						var keyValue1:Object = keyValues1[i];
 						var keyValue2:Object = keyValues2[i];
-						var partialCompareResult:int = _SORT.compareFunction.call(null, keyValues1, keyValue2, fields);
-						if ( partialCompareResult != 0 ) {
-							return partialCompareResult;
+						var compareResult:int = compareKeyValues(keyValue1, keyValue2, fields);
+						if ( compareResult != 0 ) {
+							return compareResult;
 						}
 					}
 				} else {
@@ -169,6 +169,15 @@ package org.openforis.collect.model.proxy {
 			return 0;
 		}
 	
+		protected static function compareKeyValues(keyValue1:Object, keyValue2:Object, fields:Array = null):int {
+			if ( ObjectUtil.isNumber(keyValue1) && ObjectUtil.isNumber(keyValue2) ) {
+				keyValue1 = ObjectUtil.toNumber(keyValue1);
+				keyValue2 = ObjectUtil.toNumber(keyValue2);
+			}
+			var partialCompareResult:int = _SORT.compareFunction.call(null, keyValue1, keyValue2, fields);
+			return partialCompareResult;
+		}
+		
 		public function getChild(nodeName:String, index:int):NodeProxy {
 			var children:IList = getChildren(nodeName);
 			if(children != null && children.length > index) {
@@ -237,9 +246,9 @@ package org.openforis.collect.model.proxy {
 				for each (var def:AttributeDefinitionProxy in keyDefs) {
 					var keyAttr:AttributeProxy = getSingleAttribute(def.name);
 					if(keyAttr != null) {
-						var keyValue:String = getKeyLabelPart(def, keyAttr);
-						if(StringUtil.isNotBlank(keyValue)) {
-							shortKeyParts.push(keyValue);
+						var keyValue:Object = getKeyLabelPart(def, keyAttr);
+						if(keyValue != null && StringUtil.isNotBlank(keyValue.toString())) {
+							shortKeyParts.push(keyValue.toString());
 							var label:String = def.getLabelText();
 							var fullKeyPart:String = label + " " + keyValue;
 							fullKeyParts.push(fullKeyPart);
@@ -262,15 +271,15 @@ package org.openforis.collect.model.proxy {
 			if(keyDefs.length > 0) {
 				for each (var def:AttributeDefinitionProxy in keyDefs) {
 					var keyAttr:AttributeProxy = getSingleAttribute(def.name);
-					var keyValue:String = getKeyLabelPart(def, keyAttr);
+					var keyValue:Object = getKeyLabelPart(def, keyAttr);
 					result.push(keyValue);
 				}
 			}
 			return result;
 		}
 		
-		private function getKeyLabelPart(attributeDefn:AttributeDefinitionProxy, attribute:AttributeProxy):String {
-			var result:String = null;
+		private function getKeyLabelPart(attributeDefn:AttributeDefinitionProxy, attribute:AttributeProxy):Object {
+			var result:Object = null;
 			var f:FieldProxy = attribute.getField(0);
 			var value:Object = f.value;
 			if(ObjectUtil.isNotNull(value)) {
@@ -278,14 +287,14 @@ package org.openforis.collect.model.proxy {
 					var numberDefn:NumberAttributeDefinitionProxy = NumberAttributeDefinitionProxy(attributeDefn);
 					switch(numberDefn.type) {
 						case NumberAttributeDefinitionProxy$Type.INTEGER:
-							result = int(value).toString();
+							result = int(value);
 							break;
 						case NumberAttributeDefinitionProxy$Type.REAL:
 						default:
-							result = Number(value).toString();
+							result = Number(value);
 					}
 				} else {
-					result = value.toString();
+					result = value;
 				}
 			}
 			return result;
