@@ -38,6 +38,7 @@ package org.openforis.collect.presenter {
 		private var _dataClient:DataClient;
 		private var _view:DetailView;
 		private var _errorsListPopUp:ErrorListPopUp;
+		private var _rootEntityKeyTextChangeWatcher:ChangeWatcher;
 		
 		public function DetailPresenter(view:DetailView) {
 			this._view = view;
@@ -66,11 +67,13 @@ package org.openforis.collect.presenter {
 			var version:ModelVersionProxy = activeRecord.version;
 			var rootEntityDefn:EntityDefinitionProxy = Application.activeRootEntity;
 			var rootEntity:EntityProxy = activeRecord.rootEntity;
-			rootEntity.definition = rootEntityDefn;
 			rootEntity.updateKeyText();
 			updateRecordKeyLabel();
-			ChangeWatcher.watch(rootEntity, "keyText", updateRecordKeyLabel);
-			
+			if ( _rootEntityKeyTextChangeWatcher == null ) {
+				_rootEntityKeyTextChangeWatcher = ChangeWatcher.watch(rootEntity, "keyText", updateRecordKeyLabel);
+			} else {
+				_rootEntityKeyTextChangeWatcher.reset(rootEntity);
+			}
 			_view.formVersionText.text = version.getLabelText();
 			_view.currentPhaseText.text = getStepLabel(step);
 			
