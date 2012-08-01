@@ -136,8 +136,7 @@ package org.openforis.collect.model.proxy {
 			var node:NodeProxy, oldNode:NodeProxy, parent:EntityProxy;
 			if(response.createdNode != null) {
 				node = response.createdNode;
-				var defn:NodeDefinitionProxy = survey.schema.getDefinitionById(node.definitionId);
-				node.definition = defn;
+				associateDefinition(node);
 				if ( node is EntityProxy ) {
 					EntityProxy(node).traverse(associateDefinition);
 				}

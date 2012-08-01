@@ -13,7 +13,6 @@ package org.openforis.collect.model.proxy {
 	import org.granite.collections.IMap;
 	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
-	import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.NumberAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.NumberAttributeDefinitionProxy$Type;
 	import org.openforis.collect.util.ArrayUtil;
@@ -128,20 +127,21 @@ package org.openforis.collect.model.proxy {
 			return result;
 		}
 		
-		public function sortChildrenByKey(nodeName:String):void {
-			var children:ArrayCollection = getChildren(nodeName) as ArrayCollection;
-			if ( children != null ) {
-				var defn:NodeDefinitionProxy = EntityDefinitionProxy(definition).getChildDefinition(nodeName);
-				if ( defn is EntityDefinitionProxy && defn.multiple && EntityDefinitionProxy(defn).layout == UIUtil.LAYOUT_FORM ) {
-					var sort:Sort = new Sort();
-					sort.compareFunction = entitiesCompareFunction;
-					children.sort = sort;
-					children.refresh();
-				}
+		public static function sortEntitiesByKey(entities:IList):IList {
+			var result:ArrayCollection = null;
+			if ( entities != null ) {
+				result = new ArrayCollection(entities.toArray());
+				var sort:Sort = new Sort();
+				sort.compareFunction = entitiesCompareFunction;
+				result.sort = sort;
+				result.refresh();
+				//to prevent issue due to use of a custom sort function in data providers...
+				result = new ArrayCollection(result.toArray());
 			}
+			return result;
 		}
 		
-		protected function entitiesCompareFunction(entity1:EntityProxy, entity2:EntityProxy, fields:Array = null):int {
+		protected static function entitiesCompareFunction(entity1:EntityProxy, entity2:EntityProxy, fields:Array = null):int {
 			if ( entity1 == null && entity2 == null ) {
 				return 0;
 			} else if ( entity1 == null ) {
@@ -231,13 +231,13 @@ package org.openforis.collect.model.proxy {
 				var shortKeyParts:Array = new Array();
 				var fullKeyParts:Array = new Array();
 				for each (var def:AttributeDefinitionProxy in keyDefs) {
-					var key:AttributeProxy = getSingleAttribute(def.name);
-					if(key != null) {
-						var keyPart:String = getKeyLabelPart(def, key);
-						if(StringUtil.isNotBlank(keyPart)) {
-							shortKeyParts.push(keyPart);
+					var keyAttr:AttributeProxy = getSingleAttribute(def.name);
+					if(keyAttr != null) {
+						var keyValue:String = getKeyLabelPart(def, keyAttr);
+						if(StringUtil.isNotBlank(keyValue)) {
+							shortKeyParts.push(keyValue);
 							var label:String = def.getLabelText();
-							var fullKeyPart:String = label + " " + keyPart;
+							var fullKeyPart:String = label + " " + keyValue;
 							fullKeyParts.push(fullKeyPart);
 						}
 					}
@@ -257,8 +257,9 @@ package org.openforis.collect.model.proxy {
 			var keyDefs:IList = EntityDefinitionProxy(definition).keyAttributeDefinitions;
 			if(keyDefs.length > 0) {
 				for each (var def:AttributeDefinitionProxy in keyDefs) {
-					var key:AttributeProxy = getSingleAttribute(def.name);
-					result.push(key);
+					var keyAttr:AttributeProxy = getSingleAttribute(def.name);
+					var keyValue:String = getKeyLabelPart(def, keyAttr);
+					result.push(keyValue);
 				}
 			}
 			return result;

@@ -3,13 +3,16 @@ package org.openforis.collect.presenter
 	import flash.events.Event;
 	import flash.events.FocusEvent;
 	import flash.events.MouseEvent;
+	import flash.utils.Timer;
+	import flash.utils.setTimeout;
 	
+	import mx.binding.utils.BindingUtils;
 	import mx.binding.utils.ChangeWatcher;
+	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
-	import mx.rpc.AsyncResponder;
+	import mx.events.PropertyChangeEvent;
 	import mx.rpc.events.ResultEvent;
 	
-	import org.openforis.collect.Application;
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.model.proxy.EntityProxy;
@@ -31,10 +34,12 @@ package org.openforis.collect.presenter
 	public class EntityFormPresenter extends AbstractPresenter {
 		
 		protected var _view:EntityFormContainer;
+		private var _keyTextChangeWatchers:Array;
 		
 		public function EntityFormPresenter(view:EntityFormContainer) {
 			_view = view;
-			
+			_keyTextChangeWatchers = new Array();
+
 			super();
 			
 			updateView();
@@ -62,12 +67,12 @@ package org.openforis.collect.presenter
 			if(_view.entityDefinition != null) {
 				var entities:IList = getEntities();
 				if ( _view.entityDefinition.multiple && _view.entityDefinition.parent != null ) {
-					_view.parentEntity.sortChildrenByKey(_view.entityDefinition.name);
-					_view.entities = entities;
+					_view.entities = EntityProxy.sortEntitiesByKey(entities);
 					selectEntity(null);
 					selectFirstTab();
 				} else if(CollectionUtil.isNotEmpty(entities)) {
 					_view.entity = entities.getItemAt(0) as EntityProxy;
+					_view.internalContainer.visible = true;
 				}
 			}
 		}
@@ -76,12 +81,31 @@ package org.openforis.collect.presenter
 			var entities:IList = null;
 			if(_view.parentEntity != null && _view.entityDefinition != null) {
 				entities = _view.parentEntity.getChildren(_view.entityDefinition.name);
-				for each (var entity:EntityProxy in entities) {
-					entity.definition = _view.entityDefinition;
-					entity.updateKeyText();
-				}
 			}
 			return entities;
+		}
+		
+		protected function updateViewEntities():void {
+			var selectedEntity:* = _view.addSection.dropDownList.selectedItem;
+			var entities:IList = getEntities();
+			_view.entities = EntityProxy.sortEntitiesByKey(entities);
+			initEntitiesKeyTextChangeWatchers();
+			_view.addSection.dropDownList.selectedItem = selectedEntity;
+		}
+		
+		protected function initEntitiesKeyTextChangeWatchers():void {
+			for each (var cw:ChangeWatcher in _keyTextChangeWatchers) { 
+				cw.unwatch();
+			}
+			_keyTextChangeWatchers = new Array();
+			for each (var entity:EntityProxy in _view.entities) {
+				var watcher:ChangeWatcher = ChangeWatcher.watch(entity, "keyText", entityKeyTextChangeHandler);
+				_keyTextChangeWatchers.push(watcher);
+			}
+		}
+		
+		protected function entityKeyTextChangeHandler(event:PropertyChangeEvent):void {
+			updateViewEntities();
 		}
 		
 		protected function buttonFocusInHandler(event:FocusEvent):void {
@@ -112,10 +136,11 @@ package org.openforis.collect.presenter
 		}
 		
 		protected function addResultHandler(event:ResultEvent, token:Object = null):void {
+			updateViewEntities();
 			//select the inserted entity
-			_view.callLater(function():void {
+			_view.addSection.callLater(function():void {
 				var entities:IList = getEntities();
-				var lastEntity:EntityProxy = entities.getItemAt(entities.length -1) as EntityProxy; 
+				var lastEntity:EntityProxy = entities.getItemAt(entities.length - 1) as EntityProxy;
 				selectEntity(lastEntity);
 			});
 		}
@@ -125,6 +150,8 @@ package org.openforis.collect.presenter
 			var appEvt:ApplicationEvent = new ApplicationEvent(ApplicationEvent.UPDATE_RESPONSE_RECEIVED);
 			appEvt.result = responses;
 			eventDispatcher.dispatchEvent(appEvt);
+			selectEntity(null);
+			updateViewEntities();
 		}
 		
 		protected function dropDownListChangeHandler(event:IndexChangeEvent):void {

@@ -3,7 +3,9 @@ package org.openforis.collect.presenter
 	import flash.events.FocusEvent;
 	import flash.events.MouseEvent;
 	
+	import mx.binding.utils.ChangeWatcher;
 	import mx.collections.IList;
+	import mx.events.PropertyChangeEvent;
 	import mx.rpc.events.ResultEvent;
 	
 	import org.openforis.collect.client.ClientFactory;
@@ -29,6 +31,8 @@ package org.openforis.collect.presenter
 	 *  
 	 */
 	public class MultipleEntityFormItemPresenter extends EntityFormItemPresenter {
+		
+		private var _keyTextChangeWatchers:Array;
 		
 		public function MultipleEntityFormItemPresenter(view:MultipleEntityFormItem) {
 			super(view);
@@ -82,7 +86,7 @@ package org.openforis.collect.presenter
 					view.currentState = MultipleEntityFormItem.STATE_WITH_TABS;
 				}
 				var entities:IList = getEntities();
-				view.entities = entities;
+				view.entities = EntityProxy.sortEntitiesByKey(entities);
 				selectEntity(null);
 			}
 			super.updateView();
@@ -95,6 +99,29 @@ package org.openforis.collect.presenter
 				entities = view.parentEntity.getChildren(name);
 			}
 			return entities;
+		}
+		
+		protected function updateViewEntities():void {
+			var selectedEntity:* = view.addSection.dropDownList.selectedItem;
+			var entities:IList = getEntities();
+			view.entities = EntityProxy.sortEntitiesByKey(entities);
+			initEntitiesKeyTextChangeWatchers();
+			view.addSection.dropDownList.selectedItem = selectedEntity;
+		}
+		
+		protected function initEntitiesKeyTextChangeWatchers():void {
+			for each (var cw:ChangeWatcher in _keyTextChangeWatchers) { 
+				cw.unwatch();
+			}
+			_keyTextChangeWatchers = new Array();
+			for each (var entity:EntityProxy in view.entities) {
+				var watcher:ChangeWatcher = ChangeWatcher.watch(entity, "keyText", entityKeyTextChangeHandler);
+				_keyTextChangeWatchers.push(watcher);
+			}
+		}
+		
+		protected function entityKeyTextChangeHandler(event:PropertyChangeEvent):void {
+			updateViewEntities();
 		}
 
 		protected function addButtonClickHandler(event:MouseEvent):void {
@@ -157,6 +184,7 @@ package org.openforis.collect.presenter
 		}
 		
 		protected function addResultHandler(event:ResultEvent, token:Object = null):void {
+			updateViewEntities();
 			//select the inserted entity
 			_view.callLater(function():void {
 				var entities:IList = getEntities();
@@ -170,6 +198,8 @@ package org.openforis.collect.presenter
 			var appEvt:ApplicationEvent = new ApplicationEvent(ApplicationEvent.UPDATE_RESPONSE_RECEIVED);
 			appEvt.result = responses;
 			eventDispatcher.dispatchEvent(appEvt);
+			selectEntity(null);
+			updateViewEntities();
 		}
 		
 		protected function dropDownListChangeHandler(event:IndexChangeEvent):void {
@@ -188,7 +218,7 @@ package org.openforis.collect.presenter
 				} else {
 					view.internalContainer.visible = true;
 				}
-			} else if(view.entityDefinition == null || view.entityDefinition.multiple) {
+			} else {
 				view.internalContainer.visible = false;
 			}
 		}

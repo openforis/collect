@@ -87,16 +87,6 @@
 				_definitionsPerMainTab = value;
 			}
 			
-			/*
-			[Bindable]
-			public function get constraintLayout():ConstraintLayout {
-				return _constraintLayout;
-			}
-			
-			public function set constraintLayout(value:ConstraintLayout):void {
-				_constraintLayout = value;
-			}
-			*/
 		]]>
 	</fx:Script>
 	
@@ -143,7 +133,6 @@
 				 height="100%" width="100%"
 				 showEffect="{showFormEffect}" 
 				 hideEffect="{hideFormEffect}"
-				 visible="{addSection.dropDownList.selectedItem != null}"
 				 >
 			<s:VGroup id="tabbedContainer" 
 					  width="100%" height="100%" 

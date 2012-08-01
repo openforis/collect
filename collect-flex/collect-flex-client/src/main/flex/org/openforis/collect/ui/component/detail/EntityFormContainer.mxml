@@ -12,24 +12,17 @@
 	
 	<fx:Script>
 		<![CDATA[
-			import mx.collections.ArrayCollection;
 			import mx.collections.IList;
 			import mx.collections.ListCollectionView;
 			import mx.events.FlexEvent;
 			
-			import org.openforis.collect.Application;
-			import org.openforis.collect.i18n.Message;
 			import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 			import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
-			import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
-			import org.openforis.collect.model.CollectRecord$Step;
 			import org.openforis.collect.model.proxy.EntityProxy;
 			import org.openforis.collect.model.ui.UITab;
 			import org.openforis.collect.presenter.EntityFormPresenter;
 			import org.openforis.collect.ui.UIBuilder;
-			import org.openforis.collect.util.CollectionUtil;
 			import org.openforis.collect.util.StringUtil;
-			import org.openforis.collect.util.UIUtil;
 			
 			public static const STATE_WITH_TABS:String = "withTabs";
 			public static const STATE_WITHOUT_TABS:String = "withoutTabs";
@@ -202,7 +195,6 @@
 				 height="100%" width="100%"
 				 showEffect="{showFormEffect}" 
 				 hideEffect="{hideFormEffect}"
-				 visible="{! entityDefinition.multiple || entityDefinition.parent == null || addSection.dropDownList.selectedItem != null}"
 				 >
 			<s:VGroup id="tabbedContainer" 
 					  width="100%" height="100%" 

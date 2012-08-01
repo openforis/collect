@@ -1,16 +1,12 @@
 package org.openforis.collect.presenter
 {
-	import flash.events.Event;
-	
 	import mx.binding.utils.BindingUtils;
-	import mx.binding.utils.ChangeWatcher;
 	import mx.collections.IList;
 	
 	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
 	import org.openforis.collect.model.proxy.EntityProxy;
-	import org.openforis.collect.remoting.service.UpdateResponse;
 	import org.openforis.collect.ui.UIBuilder;
 	import org.openforis.collect.ui.component.detail.EntityFormItem;
 	

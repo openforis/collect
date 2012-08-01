@@ -26,7 +26,7 @@ package org.openforis.collect.util
 			}
 		}
 		
-		public static function getItem(list:IList, propertyName:String, value:Object):Object {
+		public static function getItem(list:IList, propertyName:String, value:Object):* {
 			for each(var item:Object in list) {
 				if(ObjectUtil.getValue(item, propertyName) == value) {
 					return item;
@@ -58,9 +58,19 @@ package org.openforis.collect.util
 			list.addItemAt(item, newIndex);
 		}
 		
-		public static function contains(list:IList, item:Object):Boolean {
-			var idx:int = list.getItemIndex(item);
-			return idx >= 0;
+		public static function contains(list:IList, item:Object, keyProperty:String = null):Boolean {
+			if ( keyProperty == null ) {
+				var idx:int = list.getItemIndex(item);
+				return idx >= 0;
+			} else {
+				var keyValue:* = ObjectUtil.getValue(item, keyProperty);
+				if ( keyValue != null ) {
+					var item:Object = getItem(list, keyProperty, keyValue);
+					return item != null;
+				} else {
+					return false;
+				}
+			}
 		}
 		
 		public static function containsItemWith(list:IList, propertyName:String, value:*):Boolean {
@@ -68,5 +78,18 @@ package org.openforis.collect.util
 			return item != null;
 		}
 		
+		public static function merge(oldCollection:IList, newCollection:IList, keyProperty:String = null):void {
+			for each (var newItem:* in newCollection) {
+				if ( ! contains(oldCollection, newItem, keyProperty) ) {
+					oldCollection.addItem(newItem);
+				}
+			}
+			for each (var oldItem:* in oldCollection) {
+				if ( ! contains(newCollection, oldItem, keyProperty) ) {
+					removeItem(oldCollection, oldItem);
+				}
+			}
+			
+		}
 	}
 }
