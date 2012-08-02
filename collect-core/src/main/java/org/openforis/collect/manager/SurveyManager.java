@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -57,6 +58,7 @@ public class SurveyManager {
 		surveysByName.put(survey.getName(), survey);
 		surveysByUri.put(survey.getUri(), survey);
 	}
+	
 	public List<CollectSurvey> getAll() {
 		return CollectionUtil.unmodifiableList(surveys);
 	}
@@ -76,6 +78,23 @@ public class SurveyManager {
 	@Transactional
 	public void importModel(CollectSurvey survey) throws SurveyImportException {
 		surveyDao.importModel(survey);
+		initSurvey(survey);
+	}
+	
+	@Transactional
+	public void updateModel(CollectSurvey survey) throws SurveyImportException {
+		//remove old survey from surveys cache
+		String name = survey.getName();
+		Iterator<CollectSurvey> iterator = surveys.iterator();
+		while ( iterator.hasNext() ) {
+			CollectSurvey oldSurvey = iterator.next();
+			if (oldSurvey.getName().equals(name)) {
+				iterator.remove();
+				break;
+			}
+		}
+		surveyDao.updateModel(survey);
+		surveys.add(survey);
 		initSurvey(survey);
 	}
 
