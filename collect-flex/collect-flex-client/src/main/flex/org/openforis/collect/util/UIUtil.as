@@ -270,6 +270,16 @@ package org.openforis.collect.util
 			return "";
 		}
 		
+		public static function gridColumnNumberLabelFunction(item:Object, gridColumn:GridColumn):String {
+			var dataField:String = gridColumn.dataField;
+			var value:Object = ObjectUtil.getValue(item, dataField);
+			if ( value != null && !isNaN(Number(value)) ) {
+				return value.toString();
+			} else {
+				return "";
+			}
+		}
+		
 		private static function isDescendantOf(parent:UIComponent, component:UIComponent):Boolean {
 			var currentComponent:UIComponent = component;
 			do {

@@ -33,6 +33,7 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.model.ui.UITabDefinition;
 	import org.openforis.collect.ui.component.datagrid.CompleteColumnItemRenderer;
 	import org.openforis.collect.ui.component.datagrid.RecordSummaryDataGrid;
+	import org.openforis.collect.ui.component.datagrid.RecordSummaryErrorsColumnItemRenderer;
 	import org.openforis.collect.ui.component.datagroup.DataGridHeaderRenderer;
 	import org.openforis.collect.ui.component.detail.AttributeFormItem;
 	import org.openforis.collect.ui.component.detail.AttributeItemRenderer;
@@ -145,7 +146,7 @@ package org.openforis.collect.ui {
 				headerText = keyAttributeDef.getLabelText();
 				dataField = "key" + position;
 				width = NaN;
-				labelFunction = RecordSummaryDataGrid.recordSummariesKeyLabelFunction;
+				labelFunction = RecordSummaryDataGrid.keyLabelFunction;
 				column = getGridColumn(headerText, dataField, width, labelFunction, true);
 				columns.addItem(column);
 				position ++;
@@ -160,25 +161,30 @@ package org.openforis.collect.ui {
 						//headerText = Message.get("list.headerCount", [entityDef.getLabelText()]);
 						headerText = entityDef.getLabelText();
 						dataField = "count" + position;
-						width = 70;
-						labelFunction = RecordSummaryDataGrid.recordSummariesCountEntityLabelFunction;
+						width = 80;
+						labelFunction = RecordSummaryDataGrid.entityCountLabelFunction;
 						column = getGridColumn(headerText, dataField, width, labelFunction, true);
 						columns.addItem(column);
 						position ++;
 					}
 				}
 			}
+			/*
 			//errors count column
-			column = getGridColumn(Message.get("list.errors"), "errors", 80, RecordSummaryDataGrid.numberLabelFunction);
+			column = getGridColumn(Message.get("list.errors"), "errors", 80, UIUtil.gridColumnNumberLabelFunction);
 			columns.addItem(column);
 			//skipped count column
-			column = getGridColumn(Message.get("list.skipped"), "skipped", 80, RecordSummaryDataGrid.numberLabelFunction);
+			column = getGridColumn(Message.get("list.skipped"), "skipped", 80, UIUtil.gridColumnNumberLabelFunction);
 			columns.addItem(column);
 			//missing count column
-			column = getGridColumn(Message.get("list.missing"), "missing", 80, RecordSummaryDataGrid.numberLabelFunction);
+			column = getGridColumn(Message.get("list.missing"), "missing", 80, UIUtil.gridColumnNumberLabelFunction);
+			columns.addItem(column);
+			*/
+			//errors count column
+			column = getGridColumn(Message.get("list.errors"), "errors", 80, RecordSummaryDataGrid.errorsCountLabelFunction, false, new ClassFactory(RecordSummaryErrorsColumnItemRenderer));
 			columns.addItem(column);
 			//warnings count column
-			column = getGridColumn(Message.get("list.warnings"), "warnings", 80, RecordSummaryDataGrid.numberLabelFunction);
+			column = getGridColumn(Message.get("list.warnings"), "warnings", 80, UIUtil.gridColumnNumberLabelFunction);
 			columns.addItem(column);
 			//creation date column
 			column = getGridColumn(Message.get("list.creationDate"), "creationDate", 120, UIUtil.gridColumnDateTimeLabelFunction);

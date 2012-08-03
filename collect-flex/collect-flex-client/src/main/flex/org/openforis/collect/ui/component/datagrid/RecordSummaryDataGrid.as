@@ -4,6 +4,7 @@ package org.openforis.collect.ui.component.datagrid
 	import mx.collections.IList;
 	import mx.core.ClassFactory;
 	
+	import org.openforis.collect.model.CollectRecord$Step;
 	import org.openforis.collect.model.RecordSummarySortField;
 	import org.openforis.collect.model.RecordSummarySortField$Sortable;
 	import org.openforis.collect.model.proxy.RecordProxy;
@@ -42,23 +43,27 @@ package org.openforis.collect.ui.component.datagrid
 			selectedByCheckBox.addAll(dataProvider);
 		}
 		
-		public static function recordSummariesKeyLabelFunction(item:Object, gridColumn:GridColumn):String {
+		public static function keyLabelFunction(item:Object, gridColumn:GridColumn):String {
 			return listFieldLabelFunction(item, gridColumn, "rootEntityKeys", "key");
 		}
 		
-		public static function recordSummariesCountEntityLabelFunction(item:Object, gridColumn:GridColumn):String {
+		public static function entityCountLabelFunction(item:Object, gridColumn:GridColumn):String {
 			return listFieldLabelFunction(item, gridColumn, "entityCounts", "count");
 		}
 		
-		public static function numberLabelFunction(item:Object, gridColumn:GridColumn):String {
-			var dataField:String = gridColumn.dataField;
-			if(item.hasOwnProperty(dataField)) {
-				var value:Number = item[dataField];
-				if(! isNaN(value)) {
-					return value.toString();
-				}
+		public static function errorsCountLabelFunction(item:Object, gridColumn:GridColumn):String {
+			var recordSummary:RecordProxy = item as RecordProxy;
+			var totalErrors:int = 0;
+			switch ( recordSummary.step ) {
+				case CollectRecord$Step.ANALYSIS:
+				case CollectRecord$Step.CLEANSING:
+					totalErrors = recordSummary.errors + recordSummary.missingErrors + recordSummary.skipped;
+					break;
+				case CollectRecord$Step.ENTRY:
+					totalErrors = recordSummary.errors + recordSummary.skipped;
+					break;
 			}
-			return "";
+			return totalErrors.toString();
 		}
 		
 		private static function listFieldLabelFunction(item:Object, gridColumn:GridColumn, listFieldName:String, dataFieldPrefix:String):String {
