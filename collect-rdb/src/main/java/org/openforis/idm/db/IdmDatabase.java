@@ -8,6 +8,8 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.List;
 
+import org.openforis.idm.metamodel.Survey;
+
 import liquibase.change.Change;
 import liquibase.changelog.ChangeSet;
 import liquibase.changelog.DatabaseChangeLog;
@@ -29,6 +31,17 @@ import liquibase.statement.DatabaseFunction;
 import liquibase.statement.SqlStatement;
 
 public class IdmDatabase implements Database {
+
+	
+	private Survey survey;
+
+	public IdmDatabase(Survey survey) {
+		this.survey = survey;
+	}
+	
+	public Survey getSurvey() {
+		return survey;
+	}
 
 	@Override
 	public DatabaseObject[] getContainingObjects() {
@@ -87,31 +100,26 @@ public class IdmDatabase implements Database {
 
 	@Override
 	public boolean supportsDDLInTransaction() {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
 	public String getDatabaseProductName() {
-		// TODO Auto-generated method stub
-		return null;
+		return "IDM";
 	}
 
 	@Override
 	public String getDatabaseProductVersion() throws DatabaseException {
-		// TODO Auto-generated method stub
-		return null;
+		return "3.0";
 	}
 
 	@Override
 	public int getDatabaseMajorVersion() throws DatabaseException {
-		// TODO Auto-generated method stub
-		return 0;
+		return 3;
 	}
 
 	@Override
 	public int getDatabaseMinorVersion() throws DatabaseException {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 
