@@ -282,7 +282,11 @@ public class RecordManager {
 		isLockAllowed(user, recordId, sessionId, true);
 		lock(recordId, user, sessionId, true);
 		CollectRecord record = recordDao.load(survey, recordId, step.getStepNumber());
+		Entity rootEntity = record.getRootEntity();
+		addEmptyNodes(rootEntity);
 		record.updateDerivedStates();
+		record.updateRootEntityKeyValues();
+		record.updateEntityCounts();
 		recordDao.update(record);
 		releaseLock(recordId);
 	}
