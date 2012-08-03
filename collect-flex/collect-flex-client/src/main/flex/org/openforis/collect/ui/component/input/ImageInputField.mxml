@@ -3,7 +3,8 @@
 				  xmlns:s="library://ns.adobe.com/flex/spark" 
 				  xmlns:mx="library://ns.adobe.com/flex/mx" 
 				  xmlns:input="org.openforis.collect.ui.component.input.*" 
-				  xmlns:component="org.openforis.collect.ui.component.*" xmlns:graphics="org.openforis.collect.ui.skin.graphics.*"
+				  xmlns:component="org.openforis.collect.ui.component.*" 
+				  xmlns:graphics="org.openforis.collect.ui.skin.graphics.*"
 				  >
 	
 	<fx:Script>
@@ -47,7 +48,7 @@
 	<component:ImageLoader id="imagePreview" 
 						   includeIn="fileUploaded"
 						   itemCreationPolicy="immediate"
-						   maxHeight="200" maxWidth="300"
+						   maxHeight="100" maxWidth="150"
 						   />
 	
 	<s:HGroup id="controlsContainer" 

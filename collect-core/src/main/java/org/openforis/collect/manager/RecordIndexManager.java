@@ -7,6 +7,7 @@ import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -15,6 +16,7 @@ import java.util.Stack;
 
 import javax.xml.namespace.QName;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -34,7 +36,6 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.RAMDirectory;
 import org.apache.lucene.store.SimpleFSDirectory;
 import org.apache.lucene.util.Version;
 import org.openforis.collect.model.CollectRecord;
@@ -72,28 +73,25 @@ public class RecordIndexManager {
 
 	protected static final String RECORD_ID_FIELD = "_record_id";
 	
-	protected RAMDirectory ramDirectory;
-	
 	@Autowired
 	private ConfigurationManager configurationManager;
 
 	@Autowired
 	private RecordManager recordManager;
 	
-	protected static String indexRootPath;
+	protected String indexRootPath;
 	
-	protected static boolean inited = false;
+	private Directory indexDirectory;
 	
 	private boolean cancelled;
-
-	public RecordIndexManager() {
-	}
 	
 	protected void init() throws RecordIndexException {
-		if ( ! inited ) {
-			initStatics();
-		}
-		initTemporaryIndex();
+		Configuration configuration = configurationManager.getConfiguration();
+		indexRootPath = configuration.get(INDEX_PATH_CONFIGURATION_KEY);
+		indexDirectory = createIndexDirectory();
+		unlock();
+		IndexWriter indexWriter = createIndexWriter();
+		close(indexWriter);
 		cancelled = false;
 	}
 
@@ -102,11 +100,24 @@ public class RecordIndexManager {
 		indexRootPath = configuration.get(INDEX_PATH_CONFIGURATION_KEY);
 		unlock();
 		IndexWriter indexWriter = createIndexWriter();
-		closeIndexHandler(indexWriter);
-		inited = true;
+		close(indexWriter);
 	}
 	
-	public static void unlock() throws RecordIndexException {
+	protected Directory createIndexDirectory() throws RecordIndexException {
+		try {
+			File indexDir = new File(indexRootPath);
+			if ( indexDir.exists() || indexDir.mkdirs() ) {
+				Directory directory = new SimpleFSDirectory(indexDir);
+				return directory;
+			} else {
+				throw new RecordIndexException("Cannot create index directory: " + indexRootPath);
+			}
+		} catch (IOException e) {
+			throw new RecordIndexException(e);
+		}
+	}
+	
+	public void unlock() throws RecordIndexException {
 		try {
 			File indexRootDir = new File(indexRootPath);
 			Directory directory = new SimpleFSDirectory(indexRootDir);
@@ -118,30 +129,21 @@ public class RecordIndexManager {
 		}
 	}
 	
-	public static void destroyIndex() {
-		File indexDir = new File(indexRootPath);
-		indexDir.delete();
-	}
-	
-	public void initTemporaryIndex() throws RecordIndexException {
-		ramDirectory = new RAMDirectory();
-		IndexWriter indexWriter = null;
+	public void destroyIndex() throws RecordIndexException {
 		try {
-			indexWriter = createTemporaryIndexWriter();
-		} catch (Exception e) {
-			throw new RecordIndexException(e);
-		} finally {
-			closeIndexHandler(indexWriter);
+			cleanIndex();
+		} catch (RecordIndexException e) {
+			try {
+				File indexDir = new File(indexRootPath);
+				FileUtils.forceDelete(indexDir);
+			} catch (IOException e1) {
+				throw new RecordIndexException(e1);
+			}
 		}
 	}
-
+	
 	public void cleanIndex() throws RecordIndexException {
 		IndexWriter indexWriter = createIndexWriter();
-		destroyIndex(indexWriter);
-	}
-	
-	public void destroyTemporaryIndex() throws RecordIndexException {
-		IndexWriter indexWriter = createTemporaryIndexWriter();
 		destroyIndex(indexWriter);
 	}
 	
@@ -151,27 +153,10 @@ public class RecordIndexManager {
 		} catch (Exception e) {
 			throw new RecordIndexException(e);
 		} finally {
-			closeIndexHandler(indexWriter);
+			close(indexWriter);
 		}
 	}
 
-	public void temporaryIndex(CollectRecord record) throws RecordIndexException {
-		Entity rootEntity = record.getRootEntity();
-		EntityDefinition rootEntityDefn = rootEntity.getDefinition();
-		if ( hasIndexableNodes(rootEntityDefn) ) {
-			IndexWriter indexWriter = null;
-			try {
-				indexWriter = createTemporaryIndexWriter();
-				indexWriter.deleteAll(); //temporary index is relative only to one record
-				index(indexWriter, record);
-			} catch (Exception e) {
-				throw new RecordIndexException(e);
-			} finally {
-				closeIndexHandler(indexWriter);
-			}
-		}
-	}
-	
 	public void index(CollectRecord record) throws RecordIndexException {
 		cancelled = false;
 		IndexWriter indexWriter = null;
@@ -184,7 +169,7 @@ public class RecordIndexManager {
 		} catch (Exception e) {
 			throw new RecordIndexException(e);
 		} finally {
-			closeIndexHandler(indexWriter);
+			close(indexWriter);
 		}
 	}
 	
@@ -206,7 +191,7 @@ public class RecordIndexManager {
 		} catch (Exception e) {
 			throw new RecordIndexException(e);
 		} finally {
-			closeIndexHandler(indexWriter);
+			close(indexWriter);
 		}
 	}
 
@@ -243,7 +228,7 @@ public class RecordIndexManager {
 		return false;
 	}
 	
-	private void index(final IndexWriter indexWriter, CollectRecord record) throws RecordIndexException {
+	protected void index(final IndexWriter indexWriter, CollectRecord record) throws RecordIndexException {
 		try {
 			Entity rootEntity = record.getRootEntity();
 			rootEntity.traverse(new NodeVisitor() {
@@ -273,36 +258,26 @@ public class RecordIndexManager {
 		if ( StringUtils.isNotBlank(indexName) ) {
 			IndexSearcher indexSearcher = null;
 			try {
-				//search in ram directory
-				Set<String> tempResult = searchInTemporaryDirectory(searchType, indexName,
-						fieldIndex, queryText, maxResults);
-				//search in file system index
 		        indexSearcher = createIndexSearcher();
-		        Set<String> committedResult = search(indexName, indexSearcher, searchType, queryText, fieldIndex, maxResults);
-		        List<String> result = mergeSearchResults(maxResults, tempResult, committedResult);
-		        return result;
+		        Set<String> result = search(indexName, indexSearcher, searchType, queryText, fieldIndex, maxResults);
+		        List<String> sortedList = getSortedList(result);
+		        return sortedList;
 	        } catch(Exception e) {
 	        	throw new RecordIndexException(e);
 	        } finally {
-	        	closeIndexHandler(indexSearcher);
+	        	close(indexSearcher);
 	        }
 		} else {
-			throw new RecordIndexException("");
+			throw new RecordIndexException("Index name is not defined for attribute with id: " + attributeDefnId);
 		}
     }
 
-	protected Set<String> searchInTemporaryDirectory(SearchType searchType, String indexName,
-			int fieldIndex, String queryText, int maxResults)
-			throws RecordIndexException, Exception {
-		if ( ramDirectory != null ) {
-			IndexSearcher indexSearcher = createTemporaryIndexSearcher();
-			Set<String> tempResult = search(indexName, indexSearcher, searchType, queryText, fieldIndex, maxResults);
-			return tempResult;
-		} else {
-			return Collections.emptySet();
-		}
+	protected void deleteDocuments(IndexWriter indexWriter, CollectRecord record) throws RecordIndexException {
+		Integer id = record.getId();
+		deleteDocuments(indexWriter, id);
 	}
-
+	
+	
 	protected void deleteDocuments(IndexWriter indexWriter, int recordId)
 			throws RecordIndexException {
 		try {
@@ -313,15 +288,9 @@ public class RecordIndexManager {
 		}
 	}
 
-	protected List<String> mergeSearchResults(int maxResults, Set<String> tempResult, Set<String> committedResult) {
-		Set<String> result = new HashSet<String>();
-		result.addAll(tempResult);
-		result.addAll(committedResult);
+	protected List<String> getSortedList(Collection<String> result) {
 		List<String> sortedList = new ArrayList<String>(result);
 		Collections.sort(sortedList);
-		if ( sortedList.size() > maxResults ) {
-			sortedList = sortedList.subList(0, maxResults - 1);
-		}
 		return sortedList;
 	}
 
@@ -342,31 +311,13 @@ public class RecordIndexManager {
 		return result;
 	}
     
-    protected IndexWriter createTemporaryIndexWriter() throws RecordIndexException {
-    	try {
-    		SimpleAnalyzer analyzer = new SimpleAnalyzer(LUCENE_VERSION);
+	protected IndexWriter createIndexWriter() throws RecordIndexException {
+		try {
+			SimpleAnalyzer analyzer = new SimpleAnalyzer(LUCENE_VERSION);
 			IndexWriterConfig conf = new IndexWriterConfig(LUCENE_VERSION, analyzer);
 			conf.setOpenMode(OpenMode.CREATE_OR_APPEND);
-			IndexWriter indexWriter = new IndexWriter(ramDirectory, conf);
-	    	return indexWriter;
-    	} catch (IOException e) {
-			throw new RecordIndexException(e.getMessage(), e);
-		}
-    }
-
-	protected static IndexWriter createIndexWriter() throws RecordIndexException {
-		try {
-			File indexDir = new File(indexRootPath);
-			if ( indexDir.exists() || indexDir.mkdirs() ) {
-				SimpleAnalyzer analyzer = new SimpleAnalyzer(LUCENE_VERSION);
-				IndexWriterConfig conf = new IndexWriterConfig(LUCENE_VERSION, analyzer);
-				conf.setOpenMode(OpenMode.CREATE_OR_APPEND);
-				Directory directory = new SimpleFSDirectory(indexDir);
-				IndexWriter indexWriter = new IndexWriter(directory, conf);
-				return indexWriter;
-			} else {
-				throw new RecordIndexException("Cannot access index directory: " + indexRootPath);
-			}
+			IndexWriter indexWriter = new IndexWriter(indexDirectory, conf);
+			return indexWriter;
 		} catch (IOException e) {
 			throw new RecordIndexException(e.getMessage(), e);
 		}
@@ -374,35 +325,19 @@ public class RecordIndexManager {
 
 	protected IndexSearcher createIndexSearcher() throws RecordIndexException {
 		try {
-			File indexDir = new File(indexRootPath);
-	        if ( indexDir.exists() || indexDir.mkdirs() ) {
-				Directory directory = new SimpleFSDirectory(indexDir);
-		        IndexReader indexReader = IndexReader.open(directory);
-				int numDocs = indexReader.numDocs();
-				if ( numDocs > 0 ) {
-			        IndexSearcher indexSearcher = new IndexSearcher(indexReader);
-			        return indexSearcher;
-				} else {
-					return null;
-				}
-	        } else {
-	        	throw new RecordIndexException("Cannot access index directory: " + indexRootPath);
-	        }
+	        IndexReader indexReader = IndexReader.open(indexDirectory);
+			int numDocs = indexReader.numDocs();
+			if ( numDocs > 0 ) {
+		        IndexSearcher indexSearcher = new IndexSearcher(indexReader);
+		        return indexSearcher;
+			} else {
+				return null;
+			}
 		} catch (IOException e) {
 			throw new RecordIndexException(e.getMessage(), e);
 		}
     }
 	
-	protected IndexSearcher createTemporaryIndexSearcher() throws RecordIndexException {
-		try {
-			IndexReader indexReader = IndexReader.open(ramDirectory);
-	        IndexSearcher indexSearcher = new IndexSearcher(indexReader);
-	        return indexSearcher;
-		} catch (IOException e) {
-			throw new RecordIndexException(e.getMessage(), e);
-		}
-	}
-
 	protected void index(IndexWriter indexWriter, Attribute<?, ?> attr) {
 		AttributeDefinition defn = attr.getDefinition();
 		String indexName = defn.getAnnotation(INDEX_NAME_ANNOTATION);
@@ -472,7 +407,7 @@ public class RecordIndexManager {
         return query;
     }
 	
-	private void closeIndexHandler(Closeable indexHandler) {
+	protected void close(Closeable indexHandler) {
 		if ( indexHandler != null ) {
 			try {
 				indexHandler.close();

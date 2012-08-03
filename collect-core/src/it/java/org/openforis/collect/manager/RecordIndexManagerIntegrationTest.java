@@ -26,6 +26,7 @@ import org.openforis.idm.metamodel.xml.InvalidIdmlException;
 import org.openforis.idm.metamodel.xml.SurveyUnmarshaller;
 import org.openforis.idm.model.Code;
 import org.openforis.idm.model.Entity;
+import org.openforis.idm.model.EntityBuilder;
 import org.openforis.idm.model.expression.ExpressionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -40,7 +41,7 @@ import org.springframework.transaction.annotation.Transactional;
 @ContextConfiguration( locations = {"classpath:test-context.xml"} )
 @TransactionConfiguration(defaultRollback=true)
 @Transactional
-public class RecordDataIndexManagerIntegrationTest {
+public class RecordIndexManagerIntegrationTest {
 	//private final Log log = LogFactory.getLog(ConfigurationDaoIntegrationTest.class);
 	
 	@Autowired
@@ -48,7 +49,7 @@ public class RecordDataIndexManagerIntegrationTest {
 	
 	@Before
 	public void before() throws Exception {
-		RecordIndexManager.destroyIndex();
+		indexManager.destroyIndex();
 	}
 	
 	@Test
@@ -73,7 +74,7 @@ public class RecordDataIndexManagerIntegrationTest {
 	
 	@After
 	public void after() throws Exception {
-		RecordIndexManager.destroyIndex();
+		indexManager.destroyIndex();
 	}
 
 	private void testSingleResultMatching(CollectSurvey survey, NodeDefinition autoCompleteNodeDefn) throws Exception {
@@ -148,8 +149,8 @@ public class RecordDataIndexManagerIntegrationTest {
 		Entity cluster = record.createRootEntity("cluster");
 		record.setCreationDate(new GregorianCalendar(2011, 12, 31, 23, 59).getTime());
 		record.setStep(Step.ENTRY);
-		cluster.addValue("id", new Code(id));
-		cluster.addValue("gps_model", gpsModel);
+		EntityBuilder.addValue(cluster, "id", new Code(id));
+		EntityBuilder.addValue(cluster, "gps_model", gpsModel);
 		return record;
 	}
 
