@@ -43,6 +43,7 @@ import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Code;
 import org.openforis.idm.model.CodeAttribute;
 import org.openforis.idm.model.Entity;
+import org.openforis.idm.model.EntityBuilder;
 import org.openforis.idm.model.Field;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.NodePointer;
@@ -292,13 +293,13 @@ public class RecordManager {
 	}
 	
 	public Entity addEntity(Entity parentEntity, String nodeName) {
-		Entity entity = parentEntity.addEntity(nodeName);
+		Entity entity = EntityBuilder.addEntity(parentEntity, nodeName);
 		addEmptyNodes(entity);
 		return entity;
 	}
 
 	public Entity addEntity(Entity parentEntity, String nodeName, int idx) {
-		Entity entity = parentEntity.addEntity(nodeName, idx);
+		Entity entity = EntityBuilder.addEntity(parentEntity, nodeName, idx);
 		addEmptyNodes(entity);
 		return entity;
 	}

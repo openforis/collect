@@ -33,6 +33,7 @@ import org.openforis.idm.model.Code;
 import org.openforis.idm.model.Coordinate;
 import org.openforis.idm.model.Date;
 import org.openforis.idm.model.Entity;
+import org.openforis.idm.model.EntityBuilder;
 import org.openforis.idm.model.RealAttribute;
 import org.openforis.idm.model.Time;
 import org.openforis.idm.model.expression.ExpressionFactory;
@@ -157,54 +158,54 @@ public class ModelDaoIntegrationTest {
 	}
 
 	private void addTestValues(Entity cluster, String id) {
-		cluster.addValue("id", new Code(id));
-		cluster.addValue("gps_realtime", Boolean.TRUE);
-		cluster.addValue("region", new Code("001"));
-		cluster.addValue("district", new Code("002"));
-		cluster.addValue("crew_no", 10);
-		cluster.addValue("map_sheet", "value 1");
-		cluster.addValue("map_sheet", "value 2");
-		cluster.addValue("vehicle_location", new Coordinate((double)432423423l, (double)4324324l, "srs"));
-		cluster.addValue("gps_model", "TomTom 1.232");
+		EntityBuilder.addValue(cluster, "id", new Code(id));
+		EntityBuilder.addValue(cluster, "gps_realtime", Boolean.TRUE);
+		EntityBuilder.addValue(cluster, "region", new Code("001"));
+		EntityBuilder.addValue(cluster, "district", new Code("002"));
+		EntityBuilder.addValue(cluster, "crew_no", 10);
+		EntityBuilder.addValue(cluster, "map_sheet", "value 1");
+		EntityBuilder.addValue(cluster, "map_sheet", "value 2");
+		EntityBuilder.addValue(cluster, "vehicle_location", new Coordinate((double)432423423l, (double)4324324l, "srs"));
+		EntityBuilder.addValue(cluster, "gps_model", "TomTom 1.232");
 		{
-			Entity ts = cluster.addEntity("time_study");
-			ts.addValue("date", new Date(2011,2,14));
-			ts.addValue("start_time", new Time(8,15));
-			ts.addValue("end_time", new Time(15,29));
+			Entity ts = EntityBuilder.addEntity(cluster, "time_study");
+			EntityBuilder.addValue(ts, "date", new Date(2011,2,14));
+			EntityBuilder.addValue(ts, "start_time", new Time(8,15));
+			EntityBuilder.addValue(ts, "end_time", new Time(15,29));
 		}
 		{
-			Entity ts = cluster.addEntity("time_study");
-			ts.addValue("date", new Date(2011,2,15));
-			ts.addValue("start_time", new Time(8,32));
-			ts.addValue("end_time", new Time(11,20));
+			Entity ts = EntityBuilder.addEntity(cluster, "time_study");
+			EntityBuilder.addValue(ts, "date", new Date(2011,2,15));
+			EntityBuilder.addValue(ts, "start_time", new Time(8,32));
+			EntityBuilder.addValue(ts, "end_time", new Time(11,20));
 		}
 		{
-			Entity plot = cluster.addEntity("plot");
-			plot.addValue("no", new Code("1"));
-			Entity tree1 = plot.addEntity("tree");
-			tree1.addValue("tree_no", 1);
-			tree1.addValue("dbh", 54.2);
-			tree1.addValue("total_height", 2.0);
-//			tree1.addValue("bole_height", (Double) null).setMetadata(new CollectAttributeMetadata('*',null,"No value specified"));
-			RealAttribute boleHeight = tree1.addValue("bole_height", (Double) null);
+			Entity plot = EntityBuilder.addEntity(cluster, "plot");
+			EntityBuilder.addValue(plot, "no", new Code("1"));
+			Entity tree1 = EntityBuilder.addEntity(plot, "tree");
+			EntityBuilder.addValue(tree1, "tree_no", 1);
+			EntityBuilder.addValue(tree1, "dbh", 54.2);
+			EntityBuilder.addValue(tree1, "total_height", 2.0);
+//			EntityBuilder.addValue(tree1, "bole_height", (Double) null).setMetadata(new CollectAttributeMetadata('*',null,"No value specified"));
+			RealAttribute boleHeight = EntityBuilder.addValue(tree1, "bole_height", (Double) null);
 			boleHeight.getField(0).setSymbol('*');
 			boleHeight.getField(0).setRemarks("No value specified");
-			Entity tree2 = plot.addEntity("tree");
-			tree2.addValue("tree_no", 2);
-			tree2.addValue("dbh", 82.8);
-			tree2.addValue("total_height", 3.0);
+			Entity tree2 = EntityBuilder.addEntity(plot, "tree");
+			EntityBuilder.addValue(tree2, "tree_no", 2);
+			EntityBuilder.addValue(tree2, "dbh", 82.8);
+			EntityBuilder.addValue(tree2, "total_height", 3.0);
 		}
 		{
-			Entity plot = cluster.addEntity("plot");
-			plot.addValue("no", new Code("2"));
-			Entity tree1 = plot.addEntity("tree");
-			tree1.addValue("tree_no", 1);
-			tree1.addValue("dbh", 34.2);
-			tree1.addValue("total_height", 2.0);
-			Entity tree2 = plot.addEntity("tree");
-			tree2.addValue("tree_no", 2);
-			tree2.addValue("dbh", 85.8);
-			tree2.addValue("total_height", 4.0);
+			Entity plot = EntityBuilder.addEntity(cluster, "plot");
+			EntityBuilder.addValue(plot, "no", new Code("2"));
+			Entity tree1 = EntityBuilder.addEntity(plot, "tree");
+			EntityBuilder.addValue(tree1, "tree_no", 1);
+			EntityBuilder.addValue(tree1, "dbh", 34.2);
+			EntityBuilder.addValue(tree1, "total_height", 2.0);
+			Entity tree2 = EntityBuilder.addEntity(plot, "tree");
+			EntityBuilder.addValue(tree2, "tree_no", 2);
+			EntityBuilder.addValue(tree2, "dbh", 85.8);
+			EntityBuilder.addValue(tree2, "total_height", 4.0);
 		}
 	}
 

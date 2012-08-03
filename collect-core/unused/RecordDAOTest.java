@@ -169,30 +169,30 @@ public class RecordDaoTest {
 		record.setWarnings(warningsCount);
 		Entity cluster = record.createRootEntity("cluster");
 		String keyId = Integer.toString(sequenceNumber);
-		cluster.addValue("id", new Code(keyId));
-		cluster.addValue("gps_realtime", Boolean.TRUE);
-		cluster.addValue("region", new Code("001"));
-		cluster.addValue("district", new Code("002"));
-		cluster.addValue("vehicle_location", new Coordinate(432423423l, 4324324l,"srs"));
-		cluster.addValue("gps_model", "TomTom 1.232");
+		EntityBuilder.addValue(cluster, "id", new Code(keyId));
+		EntityBuilder.addValue(cluster, "gps_realtime", Boolean.TRUE);
+		EntityBuilder.addValue(cluster, "region", new Code("001"));
+		EntityBuilder.addValue(cluster, "district", new Code("002"));
+		EntityBuilder.addValue(cluster, "vehicle_location", new Coordinate(432423423l, 4324324l,"srs"));
+		EntityBuilder.addValue(cluster, "gps_model", "TomTom 1.232");
 		{
-			Entity ts = cluster.addEntity("time_study");
+			Entity ts = EntityBuilder.addEntity(cluster, "time_study");
 			ts.addValue("date", new Date(2011,2,14));
 			ts.addValue("start_time", new Time(8,15));
 			ts.addValue("end_time", new Time(15,29));
 		}
 		{
-			Entity ts = cluster.addEntity("time_study");
+			Entity ts = EntityBuilder.addEntity(cluster, "time_study");
 			ts.addValue("date", new Date(2011,2,15));
 			ts.addValue("start_time", new Time(8,32));
 			ts.addValue("end_time", new Time(11,20));
 		}
 		for (int i = 0; i < numberOfPlots; i++) {
-			Entity plot = cluster.addEntity("plot");
-			plot.addValue("no", new Code(Integer.toString(i + 1)));
+			Entity plot = EntityBuilder.addEntity(cluster, "plot");
+			EntityBuilder.addValue(plot, "no", new Code(Integer.toString(i + 1)));
 			
 			for (int j = 0; j < numberOfTrees; j++) {
-				Entity tree = plot.addEntity("tree");
+				Entity tree = EntityBuilder.addEntity(plot, "tree");
 				tree.addValue("dbh", 54.2);
 				tree.addValue("total_height", 2.0);
 				
