@@ -14,7 +14,6 @@ import org.openforis.collect.model.proxy.UserProxy;
 import org.openforis.collect.persistence.RecordUnlockedException;
 import org.openforis.collect.web.session.SessionState;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
