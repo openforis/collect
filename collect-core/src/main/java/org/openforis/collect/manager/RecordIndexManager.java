@@ -88,6 +88,9 @@ public class RecordIndexManager {
 	protected void init() throws RecordIndexException {
 		Configuration configuration = configurationManager.getConfiguration();
 		indexRootPath = configuration.get(INDEX_PATH_CONFIGURATION_KEY);
+		if ( indexRootPath == null ) {
+			throw new RuntimeException("Record index path not configured properly");
+		}
 		indexDirectory = createIndexDirectory();
 		unlock();
 		IndexWriter indexWriter = createIndexWriter();
