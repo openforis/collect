@@ -69,7 +69,7 @@ public class RecordIndexManager {
 
 	protected static final String INDEX_PATH_CONFIGURATION_KEY = "index_path";
 	
-	protected static final QName INDEX_NAME_ANNOTATION = new QName("http://www.openforis.org/collect/3.0/collect", "index");
+	protected static final QName INDEX_NAME_ANNOTATION = new QName("http://www.openforis.org/collect/3.0/ui", "autocomplete");
 
 	protected static final String RECORD_ID_FIELD = "_record_id";
 	

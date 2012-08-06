@@ -5,6 +5,7 @@ package org.openforis.collect.metamodel.proxy;
 
 import javax.xml.namespace.QName;
 
+import org.apache.commons.lang3.StringUtils;
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.collect.Proxy;
 import org.openforis.idm.metamodel.AttributeDefinition;
@@ -16,7 +17,8 @@ import org.openforis.idm.metamodel.KeyAttributeDefinition;
  */
 public abstract class AttributeDefinitionProxy extends NodeDefinitionProxy implements Proxy {
 
-	protected static final QName AUTOCOMPLETE_ANNOTATION = new QName("http://www.openforis.org/collect/3.0/collect", "autocomplete");
+	protected static final QName AUTOCOMPLETE_ANNOTATION = new QName("http://www.openforis.org/collect/3.0/ui", "autocomplete");
+
 	private transient AttributeDefinition attributeDefinition;
 
 	public AttributeDefinitionProxy(EntityDefinitionProxy parent, AttributeDefinition attributeDefinition) {
@@ -41,7 +43,7 @@ public abstract class AttributeDefinitionProxy extends NodeDefinitionProxy imple
 	@ExternalizedProperty
 	public boolean isAutocomplete() {
 		String autocompleteStrValue = attributeDefinition.getAnnotation(AUTOCOMPLETE_ANNOTATION);
-		boolean autocomplete = Boolean.parseBoolean(autocompleteStrValue);
+		boolean autocomplete = StringUtils.isNotBlank(autocompleteStrValue);
 		return autocomplete;
 	}
 	

@@ -32,6 +32,8 @@ import org.openforis.idm.metamodel.TimeAttributeDefinition;
  */
 public class NodeDefinitionProxy implements Proxy {
 
+	protected static final QName TAB_NAME_ANNOTATION = new QName("http://www.openforis.org/collect/3.0/ui", "tab");
+
 	private transient NodeDefinition nodeDefinition;
 	protected EntityDefinitionProxy parent;
 	
@@ -154,9 +156,7 @@ public class NodeDefinitionProxy implements Proxy {
 
 	@ExternalizedProperty
 	public String getUiTabName() {
-		String namespaceURI = "http://www.openforis.org/collect/3.0/ui";
-		QName qname = new QName(namespaceURI, "tab");
-		String tabName = nodeDefinition.getAnnotation(qname);
+		String tabName = nodeDefinition.getAnnotation(TAB_NAME_ANNOTATION);
 		if ( tabName != null) {
 			return tabName;
 		} else {
