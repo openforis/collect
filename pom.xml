@@ -11,6 +11,7 @@
 		<module>collect-core</module>
 		<module>collect-flex</module>
 		<module>collect-rdb</module>
+		<module>collect-designer</module>
 	</modules>
 
 	<properties>
