@@ -23,7 +23,11 @@
 	<context:annotation-config />
 
 	<context:component-scan base-package="org.openforis.collect.designer" />
-	
+
+	<!-- Imports -->
+	<import resource="webmvc-config.xml" />
+	<import resource="webflow-config.xml" />
+
 	<!-- <context:component-scan base-package="org.fao.openforis.service"/> -->
 	<!-- <context:component-scan base-package="org.fao.openforis"/> -->
 
@@ -31,35 +35,12 @@
 
 <!-- 	<bean id="applicationContextProvider" class="org.openforis.collect.context.ApplicationContextAwareImpl" /> -->
 
-	<bean class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping" />
-	<bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter" />
-	<bean class="org.openforis.collect.spring.handler.UrlFilenameHandlerAdapter" autowire="byName" />
-	
-	<util:map id="urlMappings">
-<!-- 		<entry key="**/messagebroker/**" value-ref="_messageBroker" /> -->
-		<entry key="/index.htm" value-ref="fileNameViewController" />
-		<entry key="/error.htm" value-ref="fileNameViewController" />
-		<entry key="/accessDenied.htm" value-ref="fileNameViewController" />
-		<entry key="/exitUser.htm" value-ref="fileNameViewController" />
-		<entry key="/login.htm" value-ref="fileNameViewController" />
-	</util:map>
-	
-	<bean id="fileNameViewController" class="org.springframework.web.servlet.mvc.UrlFilenameViewController" />
-
-	<bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
-		<property name="viewClass" value="org.springframework.web.servlet.view.JstlView" />
-		<property name="prefix" value="/WEB-INF/view/jsp/" />
-		<property name="suffix" value=".jsp" />
-	</bean>
-	
-	<bean class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
-		<property name="urlMap" ref="urlMappings" />
-	</bean>
-	
 	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver" />
 
 	<!-- UI Composers -->
 	<bean id="surveySelectComposer" class="org.openforis.collect.designer.composer.SurveySelectComposer" />
+	<bean id="surveyEditComposer" class="org.openforis.collect.designer.composer.SurveyEditComposer" />
+	<bean id="surveyEditInfoComposer" class="org.openforis.collect.designer.composer.SurveyEditInfoComposer" />
 	
 	<!-- ===================================== -->
 	<!-- Managers -->
@@ -135,8 +116,4 @@
 	<!-- ===================================== -->
 	<bean id="userDetailsService"	class="org.openforis.collect.security.CollectUserDetailsService" />
 	
-	<!-- Imports -->
-	<import resource="webmvc-config.xml" />
-	<import resource="webflow-config.xml" />
-
 </beans>

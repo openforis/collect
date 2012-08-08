@@ -21,14 +21,13 @@
 	<http use-expressions="true" auto-config="true" access-decision-manager-ref="accessDecisionManager">
 		<intercept-url pattern="/error.htm" access="permitAll" />
 		<intercept-url pattern="/login.htm*" access="permitAll" />
-		<intercept-url pattern="/*" access="hasRole('ROLE_ADMIN')" />
-		<intercept-url pattern="/index.htm" access="hasRole('ROLE_ADMIN')" />
-		<!-- <intercept-url pattern="/script/**" access="hasAnyRole('ROLE_ADMIN','ROLE_EDITOR','ROLE_USER')" /> -->
+		<intercept-url pattern="/*" access="permitAll" />
+<!-- 		<intercept-url pattern="/*" access="hasRole('ROLE_ADMIN')" /> -->
+<!-- 		<intercept-url pattern="/index.htm" access="hasRole('ROLE_ADMIN')" /> -->
 		
 		<form-login login-page="/login.htm" authentication-failure-url="/login.htm?login_error=1"  />
 		<http-basic />
 		<logout logout-success-url="/index.htm" />
-		<!-- remember-me / -->
 	</http>
 
 	<authentication-manager alias="authManager">
