@@ -1,0 +1,31 @@
+<?page title="Openforis Collect Designer - Edit Survey" contentType="text/html;charset=UTF-8"?>
+<?variable-resolver class="org.zkoss.zkplus.spring.DelegatingVariableResolver"?>
+<zk>
+	<div apply="${surveyEditInfoComposer}"
+		validationMessages="@id('vmsgs')"
+		form="@id('fx') @load(${composer}.survey) @save(${composer}.survey, before='save')">
+
+		<grid>
+			<columns>
+				<column label="" width="150px" />
+				<column label="" />
+			</columns>
+			<rows>
+				<row>
+					<label value="Name:" />
+					<textbox width="99%" value="${suvey.name}" />
+				</row>
+				<row>
+					<label value="Uri:" />
+					<textbox width="99%" value="${survey.uri}" />
+				</row>
+				<row>
+					<label value="Project Cycle:" />
+					<textbox width="99%" value="${survey.cycle}" />
+				</row>
+			</rows>
+		</grid>
+
+	</div>
+
+</zk>

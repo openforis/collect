@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<flow xmlns="http://www.springframework.org/schema/webflow"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/webflow http://www.springframework.org/schema/webflow/spring-webflow-2.0.xsd">
+
+	<var name="surveyName" class="java.lang.String" />
+
+	<view-state id="survey_edit">
+<!-- 		<on-render> -->
+<!-- 			<evaluate expression="surveyManager.get(surveyName)" -->
+<!-- 				result="viewScope.survey" /> -->
+<!-- 		</on-render> -->
+		<transition on="cancel" to="survey_select" />
+	</view-state>
+
+	<view-state id="survey_select">
+<!-- 		<on-render> -->
+<!-- 			<evaluate expression="surveyManager.getAll()" -->
+<!-- 				result="viewScope.surveys" /> -->
+<!-- 		</on-render> -->
+		<transition on="edit" to="survey_edit">
+		</transition>
+		<transition on="new" to="survey_edit">
+		</transition>
+	</view-state>
+
+	<end-state id="finish" />
+
+</flow>

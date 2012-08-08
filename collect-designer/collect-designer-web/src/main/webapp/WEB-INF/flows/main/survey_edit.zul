@@ -1,0 +1,34 @@
+<?page title="Openforis Collect Designer - Edit Survey" contentType="text/html;charset=UTF-8"?>
+<?init class="org.zkoss.zk.ui.util.Composition" arg0="/WEB-INF/layouts/template.zul"?>
+<?variable-resolver class="org.zkoss.zkplus.spring.DelegatingVariableResolver"?>
+<zk>
+	<vbox height="100%" width="100%" self="@define(content)"
+		apply="${surveyEditComposer}">
+		<tabbox id="tb" height="100%" width="100%">
+		    <tabs id="tabs">
+		        <tab id="infoTab" label="Info" />
+		        <tab id="configurationTab" label="Configuration" />
+		        <tab id="versioningTab" label="Versioning" />
+		        <tab id="codeListsTab" label="Code Lists" />
+		        <tab id="unitsTab" label="Units" />
+		        <tab id="srsTab" label="SRS" />
+		    </tabs>
+		    <tabpanels height="100%" width="100%">
+		        <tabpanel height="100%" width="100%">
+		        	<include src="survey_edit_info.zul" />
+		        </tabpanel>
+		        <tabpanel height="100%" width="100%">Configuration</tabpanel>
+		        <tabpanel height="100%" width="100%">Versioning</tabpanel>
+		        <tabpanel height="100%" width="100%">Code Lists</tabpanel>
+		        <tabpanel height="100%" width="100%">Units</tabpanel>
+		        <tabpanel height="100%" width="100%">SRS</tabpanel>
+		    </tabpanels>
+		</tabbox>
+		
+		<label visible="@load(empty vmsgs)"
+			value="@load(empty vmsgs ? 'Form successfully submitted!' : '', before='save')" />
+		<button label="Save" width="100px"
+			height="30px" onClick="@command('save')" />
+			
+	</vbox>
+</zk>

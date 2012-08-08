@@ -1,0 +1,22 @@
+<?page docType="html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd""?>
+<zk>
+	<style src="/assets/style.css" />
+	<borderlayout width="100%" height="100%">
+		<north height="102px">
+			<div id="header" sclass="header">
+				<image src="/assets/images/header.jpg" />
+			</div>
+		</north>
+		<center>
+			<vbox height="100%" width="100%">
+				<div self="@{insert(content_title)}" sclass="content_title">${contentTitle}</div>
+				<div self="@{insert(content)}" sclass="content"></div>
+			</vbox>
+		</center>
+		<south height="30px">
+			<div id="footer" sclass="footer">
+				<image src="/assets/images/footer.jpg" />
+			</div>
+		</south>
+	</borderlayout>
+</zk>
