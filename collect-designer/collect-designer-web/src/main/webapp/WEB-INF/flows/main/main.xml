@@ -6,11 +6,14 @@
 	<var name="surveyName" class="java.lang.String" />
 
 	<view-state id="survey_edit">
-<!-- 		<on-render> -->
-<!-- 			<evaluate expression="surveyManager.get(surveyName)" -->
-<!-- 				result="viewScope.survey" /> -->
-<!-- 		</on-render> -->
-		<transition on="cancel" to="survey_select" />
+ 		<on-render>
+			<evaluate expression="surveyManager.createSurvey()" 
+                  result="flowScope.survey" />
+ 		</on-render>
+		<transition on="cancel" to="survey_select">
+<!-- 			<evaluate expression="surveyManager.createSurvey()"  -->
+<!--                   result="flowScope.survey" /> -->
+		</transition>
 	</view-state>
 
 	<view-state id="survey_select">
@@ -19,8 +22,12 @@
 <!-- 				result="viewScope.surveys" /> -->
 <!-- 		</on-render> -->
 		<transition on="edit" to="survey_edit">
+			<evaluate expression="surveyManager.get(selectedSurvey.name)"
+				result="viewScope.survey" />
 		</transition>
 		<transition on="new" to="survey_edit">
+			<evaluate expression="surveyManager.createSurvey()" 
+                  result="flowScope.survey" />
 		</transition>
 	</view-state>
 

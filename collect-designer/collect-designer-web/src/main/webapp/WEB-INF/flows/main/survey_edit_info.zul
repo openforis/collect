@@ -1,9 +1,9 @@
 <?page title="Openforis Collect Designer - Edit Survey" contentType="text/html;charset=UTF-8"?>
-<?variable-resolver class="org.zkoss.zkplus.spring.DelegatingVariableResolver"?>
+<?init class="org.zkoss.zkplus.databind.AnnotateDataBinderInit" arg0="./surveyEditInfoBox"?>
 <zk>
-	<div apply="${surveyEditInfoComposer}"
+	<div id="surveyEditInfoBox"
 		validationMessages="@id('vmsgs')"
-		form="@id('fx') @load(${composer}.survey) @save(${composer}.survey, before='save')">
+		form="@id('fx') @load(vm.survey) @save(vm.survey, before='save')">
 
 		<grid>
 			<columns>
@@ -13,15 +13,14 @@
 			<rows>
 				<row>
 					<label value="Name:" />
-					<textbox width="99%" value="${suvey.name}" />
+					<textbox width="99%" value="@bind(vm.survey.name)" />
 				</row>
 				<row>
 					<label value="Uri:" />
-					<textbox width="99%" value="${survey.uri}" />
+					<textbox width="99%" value="@bind(vm.survey.uri)" />
 				</row>
 				<row>
 					<label value="Project Cycle:" />
-					<textbox width="99%" value="${survey.cycle}" />
 				</row>
 			</rows>
 		</grid>
