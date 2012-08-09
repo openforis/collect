@@ -59,6 +59,11 @@ public class SurveyManager {
 		surveysByUri.put(survey.getUri(), survey);
 	}
 	
+	public CollectSurvey createSurvey() {
+		CollectSurvey survey = new CollectSurvey();
+		return survey;
+	}
+	
 	public List<CollectSurvey> getAll() {
 		return CollectionUtil.unmodifiableList(surveys);
 	}
