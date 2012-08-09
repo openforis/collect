@@ -37,11 +37,6 @@
 
 	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver" />
 
-	<!-- UI Composers -->
-	<bean id="surveySelectComposer" class="org.openforis.collect.designer.composer.SurveySelectComposer" />
-	<bean id="surveyEditComposer" class="org.openforis.collect.designer.composer.SurveyEditComposer" />
-	<bean id="surveyEditInfoComposer" class="org.openforis.collect.designer.composer.SurveyEditInfoComposer" />
-	
 	<!-- ===================================== -->
 	<!-- Managers -->
 	<!-- ===================================== -->

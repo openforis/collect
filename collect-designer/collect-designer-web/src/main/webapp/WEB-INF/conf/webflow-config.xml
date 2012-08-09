@@ -26,23 +26,6 @@
         <webflow:flow-location id="main" path="/WEB-INF/flows/main/main.xml" />
     </webflow:flow-registry>
  	
- 	<!-- Enables FlowHandler URL mapping -->
-	<bean class="org.springframework.webflow.mvc.servlet.FlowHandlerAdapter">
-	    <property name="flowExecutor" ref="flowExecutor" />
-	</bean>
-	
-	<!-- Maps request paths to flows in the flowRegistry -->
-	<bean class="org.springframework.webflow.mvc.servlet.FlowHandlerMapping">
-	    <property name="flowRegistry" ref="flowRegistry"/>
-	    <property name="order" value="0"/>
-	</bean>
-		
- 	<bean id="expressionParser" class="org.springframework.webflow.expression.el.WebFlowELExpressionParser">
-	    <constructor-arg>
-	        <bean class="com.sun.el.ExpressionFactoryImpl" />
-	    </constructor-arg>
-	</bean>
-	
     <!-- Installs a listener that manages JPA persistence contexts for flows that require them -->
 <!--     <bean id="jpaFlowExecutionListener" -->
 <!--         class="org.springframework.webflow.persistence.JpaFlowExecutionListener"> -->
@@ -56,19 +39,37 @@
          
     <!-- Configures the ZK Spring Web Flow integration -->
     <zksp:flow-controller id="flowController" flow-executor="flowExecutor"/>
-
-<!--     <zksp:flow-builder-services id="zkFlowBuilderServices" /> -->
+    <zksp:flow-builder-services id="zkFlowBuilderServices" />
     
-    <webflow:flow-builder-services id="zkFlowBuilderServices"
-                conversion-service="zkConversionService"
-                expression-parser="expressionParser"
-                view-factory-creator="zkFlowViewFactoryCreator" />
+<!--     <webflow:flow-builder-services id="zkFlowBuilderServices" -->
+<!--                 conversion-service="zkConversionService" -->
+<!--                 expression-parser="expressionParser" -->
+<!--                 view-factory-creator="zkFlowViewFactoryCreator" /> -->
 
-     <bean id="zkConversionService"
-             class="org.zkoss.spring.binding.convert.service.ZkConversionService" />
+<!--      <bean id="zkConversionService" -->
+<!--              class="org.zkoss.spring.binding.convert.service.ZkConversionService" /> -->
              
-     <bean id="zkFlowViewFactoryCreator"
-             class="org.zkoss.spring.webflow.engine.builder.ZkFlowViewFactoryCreator">
-             <property name="viewResolvers" ref="flowViewResolver" />
-     </bean>
+<!--      <bean id="zkFlowViewFactoryCreator" -->
+<!--              class="org.zkoss.spring.webflow.engine.builder.ZkFlowViewFactoryCreator"> -->
+<!--              <property name="viewResolvers" ref="flowViewResolver" /> -->
+<!--      </bean> -->
+
+<!--  	<bean id="expressionParser" class="org.springframework.webflow.expression.el.WebFlowELExpressionParser"> -->
+<!-- 	    <constructor-arg> -->
+<!-- 	        <bean class="com.sun.el.ExpressionFactoryImpl" /> -->
+<!-- 	    </constructor-arg> -->
+<!-- 	</bean> -->
+
+  	<!-- Enables FlowHandler URL mapping -->
+<!-- 	<bean class="org.springframework.webflow.mvc.servlet.FlowHandlerAdapter"> -->
+<!-- 	    <property name="flowExecutor" ref="flowExecutor" /> -->
+<!-- 	</bean> -->
+	
+ 	<!-- Maps request paths to flows in the flowRegistry -->
+<!-- 	<bean class="org.springframework.webflow.mvc.servlet.FlowHandlerMapping"> -->
+<!-- 	    <property name="flowRegistry" ref="flowRegistry"/> -->
+<!-- 	    <property name="order" value="0"/> -->
+<!-- 	</bean> -->
+		
+
 </beans>

@@ -13,4 +13,14 @@
 	<system-config>
         <disable-event-thread/>
     </system-config>
+    
+<!--     <listener> -->
+<!-- 		<description>Spring Web Flow Controller Listener</description> -->
+<!-- 		<listener-class>org.zkoss.spring.webflow.mvc.servlet.ZkFlowControllerListener</listener-class> -->
+<!-- 	</listener> -->
+
+<!-- 	<listener> -->
+<!-- 		<description>Spring Web Flow URL and FlowId Listener</description> -->
+<!-- 		<listener-class>org.zkoss.spring.webflow.context.servlet.ZkFlowResourceListener</listener-class> -->
+<!-- 	</listener> -->
 </zk>
