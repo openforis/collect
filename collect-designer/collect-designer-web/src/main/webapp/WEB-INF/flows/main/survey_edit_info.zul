@@ -1,7 +1,6 @@
 <?page title="Openforis Collect Designer - Edit Survey" contentType="text/html;charset=UTF-8"?>
-<?init class="org.zkoss.zkplus.databind.AnnotateDataBinderInit" arg0="./surveyEditInfoBox"?>
 <zk>
-	<div id="surveyEditInfoBox"
+	<div 
 		validationMessages="@id('vmsgs')"
 		form="@id('fx') @load(vm.survey) @save(vm.survey, before='save')">
 
@@ -18,6 +17,10 @@
 				<row>
 					<label value="Uri:" />
 					<textbox width="99%" value="@bind(vm.survey.uri)" />
+				</row>
+				<row>
+					<label value="Project Name:" />
+					<textbox width="99%" value="@bind(vm.projectName)" />
 				</row>
 				<row>
 					<label value="Project Cycle:" />

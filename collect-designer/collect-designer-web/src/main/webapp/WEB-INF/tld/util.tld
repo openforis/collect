@@ -1,0 +1,26 @@
+<taglib>
+    <function>
+        <name>parseXMLDateTime</name>
+        <function-class>org.openforis.collect.util.DateUtil</function-class>
+        <function-signature>java.util.Date parseXMLDateTime(java.lang.String)</function-signature>
+        <description>Returns a Date from a date string in XML format</description>
+    </function>
+    <function>
+        <name>formatStringDate</name>
+        <function-class>org.openforis.collect.util.DateUtil</function-class>
+        <function-signature>java.lang.String formatStringDate(java.lang.String, java.lang.String)</function-signature>
+        <description>Formats a date according to the specified format</description>
+    </function>
+    <function>
+        <name>formatDate</name>
+        <function-class>org.openforis.collect.util.DateUtil</function-class>
+        <function-signature>java.lang.String formatDate(java.util.Date, java.lang.String)</function-signature>
+        <description>Formats a date according to the specified format</description>
+    </function>
+    <function>
+        <name>formatDateToXML</name>
+        <function-class>org.openforis.collect.util.DateUtil</function-class>
+        <function-signature>java.lang.String formatDateToXML(java.util.Date)</function-signature>
+        <description>Formats a date according to the XML format (yyyy-MM-ddTHH:mm:ss)</description>
+    </function>
+</taglib>

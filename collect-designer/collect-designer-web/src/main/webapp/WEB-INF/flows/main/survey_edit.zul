@@ -1,13 +1,21 @@
 <?page title="Openforis Collect Designer - Edit Survey" contentType="text/html;charset=UTF-8"?>
 <?init class="org.zkoss.zk.ui.util.Composition" arg0="/WEB-INF/layouts/template.zul"?>
 <?init class="org.zkoss.zkplus.databind.AnnotateDataBinderInit" arg0="./surveyEditBox"?>
-<?variable-resolver class="org.zkoss.zkplus.spring.DelegatingVariableResolver"?>
 <zk>
 	<vbox id="surveyEditBox"
 		height="100%" width="100%" 
 		self="@define(content)"
-		apply="org.zkoss.bind.BindComposer"
-		viewModel="@id('vm') @init('org.openforis.collect.designer.composer.SurveyEditComposer')">
+		apply="org.openforis.collect.designer.composer.SurveyEditComposer"
+		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SurveyViewModel')">
+		
+		<hbox>
+			<label value="Language:" />
+			<combobox
+				selectedItem="@bind(vm.selectedLanguageCode)"
+				model="@{$composer.languageCodes}">
+			</combobox>
+		</hbox>
+		
 		<tabbox id="tb" height="100%" width="100%">
 		    <tabs id="tabs">
 		        <tab id="infoTab" label="Info" />
@@ -34,9 +42,11 @@
 		<label visible="@load(empty vmsgs)"
 			value="@load(empty vmsgs ? 'Form successfully submitted!' : '', before='save')" />
 		
-		<button label="Save" onClick="@command('save')" />
-			
-		<button label="Cancel" onClick="" self="@{action(cancel)}" />
+		<hbox spacing="20px" align="center">
+			<button label="Save" onClick="@command('save')" />
+				
+			<button label="Cancel" onClick="" self="@{action(cancel)}" />
+		</hbox>
 			
 	</vbox>
 </zk>

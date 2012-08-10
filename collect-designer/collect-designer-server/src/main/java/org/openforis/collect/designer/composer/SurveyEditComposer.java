@@ -6,11 +6,14 @@ package org.openforis.collect.designer.composer;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.persistence.SurveyImportException;
+import org.openforis.idm.metamodel.Languages;
 import org.zkoss.bind.BindComposer;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
+import org.zkoss.zul.ListModel;
+import org.zkoss.zul.ListModelList;
 
 /**
  * @author S. Ricci
@@ -27,22 +30,14 @@ public class SurveyEditComposer extends BindComposer<Component> {
 	@WireVariable
 	private SurveyManager surveyManager;
 	
-	private CollectSurvey survey;
-	
-	public CollectSurvey getSurvey() {
-		if ( survey == null ) {
-			survey = surveyManager.createSurvey();
-		}
-		return survey;
-	}
-	
-	public void setSurvey(CollectSurvey survey) {
-		this.survey = survey;
-	}
-	
 	@Command
     public void save() throws SurveyImportException {
+		CollectSurvey survey = (CollectSurvey) getViewModel();
 		surveyManager.importModel(survey);
     }
+	
+	public ListModel<String> getLanguageCodes() {
+		return new ListModelList<String>(Languages.LANGUAGE_CODES);
+	}
 	
 }

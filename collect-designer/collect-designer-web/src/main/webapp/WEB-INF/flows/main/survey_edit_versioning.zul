@@ -1,41 +1,47 @@
 <?page title="Openforis Collect Designer - Edit Survey" contentType="text/html;charset=UTF-8"?>
+<?taglib uri="/WEB-INF/tld/util.tld" prefix="util"?>
 <zk>
 	<div apply="org.openforis.collect.designer.composer.SurveyEditVersioningComposer">
-        <grid id="versioningGrid" model="@load($composer.versions) @template($composer.editingStatus.get(each) ? 'editable' : 'noneditable')">
-            <columns>
-                <column width="300px">Name</column>
-                <column width="100px">Date</column>
-                <column width="100px">Label</column>
-                <column width="100px">Description</column>
-                <column width="100px">Edit</column>
-            </columns>
-            <template name="editable">
-                <row>
-                    <textbox value="@load(each.name) @save(each.name, before='confirm')" />
-                    <textbox value="@load(each.date) @save(each.date, before='confirm')" />
-                    <textbox value="@load(each.label) @save(each.label, before='confirm')" />
-                    <textbox value="@load(each.description) @save(each.description, before='confirm')" />
-                    <div>
-                        <button
-                            image="/widgets/grid/inline_row_editing/img/tick-small.png"
-                            onClick="@command('confirm', version=each)" />
-                        <button
-                            image="/widgets/grid/inline_row_editing/img/cross-small.png"
-                            onClick="@command('changeEditableStatus', version=each)" />
-                    </div>
-                </row>
-            </template>
-            <template name="noneditable">
-                <row>
-                    <label value="@load(each.name)" />
-                    <label value="@load(each.date)" />
-                    <label value="@load(each.label)" />
-                    <label value="@load(each.description)" />
-                    <button
-                        image="/widgets/grid/inline_row_editing/img/pencil-small.png"
-                        onClick="@command('changeEditableStatus', currentVersion=each)" />
-                </row>
-            </template>
-        </grid>
+		<vbox>
+	        <grid id="versioningGrid" model="@load(vm.survey.versions) @template($composer.editingStatus.get(each) ? 'editable' : 'noneditable')">
+	            <columns>
+	                <column width="300px">Name</column>
+	                <column width="150px">Date</column>
+	                <column width="100px">Label</column>
+	                <column width="100px">Description</column>
+	                <column width="100px">Edit</column>
+	            </columns>
+	            <template name="editable">
+	                <row>
+	                    <textbox value="@load(each.name) @save(each.name, before='confirm')" />
+	                    <datebox width="100px" compact="false" buttonVisible="true" format="dd/MM/yyyy" 
+	                    	value="@load(util:parseXMLDateTime(each.date)) @save(each.date, before='confirm')" />
+	                    <textbox value="@load(each.label) @save(each.label, before='confirm')" />
+	                    <textbox value="@load(each.description) @save(each.description, before='confirm')" />
+	                    <div>
+	                        <button
+	                            image="/assets/images/tick-small.png"
+	                            onClick="@command('confirm', version=each)" />
+	                        <button
+	                            image="/assets/images/cross-small.png"
+	                            onClick="@command('changeEditableStatus', version=each)" />
+	                    </div>
+	                </row>
+	            </template>
+	            <template name="noneditable">
+	                <row>
+	                    <label value="@load(each.name)" />
+	                    <label value="@load(util:formatStringDate(each.date, 'dd/MM/yyyy'))" />
+	                    <label value="@load(each.label)" />
+	                    <label value="@load(each.description)" />
+	                    <button
+	                        image="/assets/images/pencil-small.png"
+	                        onClick="@command('changeEditableStatus', currentVersion=each)" />
+	                </row>
+	            </template>
+	        </grid>
+	        
+	        <button label="New Version" onClick="@command('newVersion')" />
+		</vbox>
     </div>
 </zk>

@@ -1,8 +1,10 @@
 <?page title="Collect Database Designer - Select Survey"?>
 <?init class="org.zkoss.zk.ui.util.Composition" arg0="/WEB-INF/layouts/template.zul"?>
-<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c" ?>
+<?init class="org.zkoss.zkplus.databind.AnnotateDataBinderInit" arg0="./surveySelectBox"?>
 <?variable-resolver class="org.zkoss.zkplus.spring.DelegatingVariableResolver"?>
-<vbox self="@define(content)"
+<vbox
+	id="surveySelectBox" 
+	self="@define(content)"
 	height="100%"
 	apply="org.zkoss.bind.BindComposer"
 	viewModel="@id('vm') @init('org.openforis.collect.designer.composer.SurveySelectComposer')">

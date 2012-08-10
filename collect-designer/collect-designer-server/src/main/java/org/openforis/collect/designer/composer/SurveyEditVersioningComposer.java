@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.openforis.collect.designer.viewmodel.SurveyViewModel;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.ModelVersion;
@@ -23,6 +24,8 @@ public class SurveyEditVersioningComposer extends BindComposer<Component> {
 	 */
 	private static final long serialVersionUID = 1L;
 
+	public static final String DATE_FORMAT = "dd/MM/yyyy";
+	
 	@WireVariable
 	private SurveyManager surveyManager;
 	
@@ -46,6 +49,21 @@ public class SurveyEditVersioningComposer extends BindComposer<Component> {
 		changeEditableStatus(version);
 	}
 
+	@Command
+	public void newVersion() {
+		int id = 0;
+		SurveyViewModel viewModel = (SurveyViewModel) getViewModel();
+		List<ModelVersion> versions = viewModel.getSurvey().getVersions();
+		for (ModelVersion v : versions) {
+			id = Math.max(id, v.getId());
+		}
+		id++;
+		ModelVersion version = new ModelVersion();
+		version.setId(id);
+		viewModel.getSurvey().addVersion(version);
+		versions.add(version);
+	}
+	
 	public void refreshRowTemplate(ModelVersion version) {
 		/*
 		 * This code is special and notifies ZK that the bean's value
