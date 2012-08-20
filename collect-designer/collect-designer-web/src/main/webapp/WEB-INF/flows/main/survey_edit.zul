@@ -18,29 +18,29 @@
 		
 		<tabbox id="tb" height="100%" width="100%">
 		    <tabs id="tabs">
-		        <tab id="infoTab" label="Info" />
-		        <tab id="configurationTab" label="Configuration" />
-		        <tab id="versioningTab" label="Versioning" />
-		        <tab id="codeListsTab" label="Code Lists" />
-		        <tab id="unitsTab" label="Units" />
-		        <tab id="srsTab" label="SRS" />
+		        <tab id="infoTab" label="${labels.survey.info}" />
+		        <tab id="configurationTab" label="${labels.survey.configuration}" />
+		        <tab id="versioningTab" label="${labels.survey.model_versions}" />
+		        <tab id="codeListsTab" label="${labels.survey.code_lists}" />
+		        <tab id="unitsTab" label="${labels.survey.units}" />
+		        <tab id="srsTab" label="${labels.survey.srs}" />
 		    </tabs>
 		    <tabpanels height="100%" width="100%">
 		        <tabpanel height="100%" width="100%">
 		        	<include src="survey_edit_info.zul" />
 		        </tabpanel>
-		        <tabpanel height="100%" width="100%">Configuration</tabpanel>
+		        <tabpanel height="100%" width="100%">TO DO</tabpanel>
 		        <tabpanel height="100%" width="100%">
 		        	<include src="survey_edit_versioning.zul" />
 		        </tabpanel>
-		        <tabpanel height="100%" width="100%">Code Lists</tabpanel>
-		        <tabpanel height="100%" width="100%">Units</tabpanel>
-		        <tabpanel height="100%" width="100%">SRS</tabpanel>
+		        <tabpanel height="100%" width="100%">TO DO</tabpanel>
+		        <tabpanel height="100%" width="100%">TO DO</tabpanel>
+		        <tabpanel height="100%" width="100%">TO DO</tabpanel>
 		    </tabpanels>
 		</tabbox>
 		
 		<label visible="@load(empty vmsgs)"
-			value="@load(empty vmsgs ? 'Form successfully submitted!' : '', before='save')" />
+			value="@load(empty vmsgs ? labels.survey.successfully_saved : '', before='save')" />
 		
 		<hbox spacing="20px" align="center">
 			<button label="Save" onClick="@command('save')" />

@@ -11,19 +11,19 @@
 			</columns>
 			<rows>
 				<row>
-					<label value="Name:" />
+					<label value="${labels.survey.name}:" />
 					<textbox width="99%" value="@bind(vm.survey.name)" />
 				</row>
 				<row>
-					<label value="Uri:" />
+					<label value="${labels.survey.uri}:" />
 					<textbox width="99%" value="@bind(vm.survey.uri)" />
 				</row>
 				<row>
-					<label value="Project Name:" />
+					<label value="${labels.survey.project_name}:" />
 					<textbox width="99%" value="@bind(vm.projectName)" />
 				</row>
 				<row>
-					<label value="Project Cycle:" />
+					<label value="${labels.survey.project_cycle}:" />
 				</row>
 			</rows>
 		</grid>

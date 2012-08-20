@@ -12,6 +12,7 @@
 	
 	<system-config>
         <disable-event-thread/>
+        <label-location>/WEB-INF/labels/label_en.properties</label-location>
     </system-config>
     
 <!--     <listener> -->

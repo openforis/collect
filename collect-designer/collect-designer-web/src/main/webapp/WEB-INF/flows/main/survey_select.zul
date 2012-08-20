@@ -9,11 +9,10 @@
 	apply="org.zkoss.bind.BindComposer"
 	viewModel="@id('vm') @init('org.openforis.collect.designer.composer.SurveySelectComposer')">
 
-	<listbox id="box" rows="5" model="@load(vm.surveys)" width="400px"
-		selectedItem="@bind(vm.selectedSurvey)">
+	<listbox id="listbox" rows="5" model="@load(vm.surveys)" width="400px">
 		<listhead>
-			<listheader label="Name" width="200px" />
-			<listheader label="URI" width="200px" />
+			<listheader label="${labels.survey.name}" width="200px" />
+			<listheader label="${labels.survey.uri}" width="200px" />
 		</listhead>
 		<template name="model" var="survey">
 			<listitem>
@@ -23,10 +22,10 @@
 		</template>
 	</listbox>
 
-	<button id="editSurveyBtn" label="Edit" onClick=""
+	<button id="editSurveyBtn" label="${labels.global.edit_item}" onClick=""
 		self="@action(edit)" />
 
-	<button id="newSurveyBtn" label="New" onClick=""
+	<button id="newSurveyBtn" label="${labels.global.new_item}" onClick=""
 		self="@action(new)" />
 		
 </vbox>

@@ -5,11 +5,11 @@
 		<vbox>
 	        <grid id="versioningGrid" model="@load(vm.survey.versions) @template($composer.editingStatus.get(each) ? 'editable' : 'noneditable')">
 	            <columns>
-	                <column width="300px">Name</column>
-	                <column width="150px">Date</column>
-	                <column width="100px">Label</column>
-	                <column width="100px">Description</column>
-	                <column width="100px">Edit</column>
+	                <column width="300px">${labels.survey.versioning.name}</column>
+	                <column width="150px">${labels.survey.versioning.date}</column>
+	                <column width="100px">${labels.survey.versioning.label}</column>
+	                <column width="100px">${labels.survey.versioning.description}</column>
+	                <column width="100px">${labels.global.edit_item}</column>
 	            </columns>
 	            <template name="editable">
 	                <row>
@@ -41,7 +41,7 @@
 	            </template>
 	        </grid>
 	        
-	        <button label="New Version" onClick="@command('newVersion')" />
+	        <button label="${labels.global.add_item}" onClick="@command('newVersion')" />
 		</vbox>
     </div>
 </zk>
