@@ -83,6 +83,7 @@ public class SurveyManager {
 	@Transactional
 	public void importModel(CollectSurvey survey) throws SurveyImportException {
 		surveyDao.importModel(survey);
+		surveys.add(survey);
 		initSurvey(survey);
 	}
 	
