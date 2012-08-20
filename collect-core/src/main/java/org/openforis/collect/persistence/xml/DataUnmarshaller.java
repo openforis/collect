@@ -12,7 +12,6 @@ import org.apache.xerces.parsers.SAXParser;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.persistence.xml.DataHandler.NodeUnmarshallingError;
 import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 /**
  * @author G. Miceli
