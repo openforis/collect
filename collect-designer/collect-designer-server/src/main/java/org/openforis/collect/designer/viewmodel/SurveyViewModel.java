@@ -3,7 +3,10 @@
  */
 package org.openforis.collect.designer.viewmodel;
 
+import java.util.List;
+
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.idm.metamodel.ModelVersion;
 
 /**
  * 
@@ -53,6 +56,20 @@ public class SurveyViewModel {
 
 	public void setSelectedLanguageCode(String selectedLanguageCode) {
 		this.selectedLanguageCode = selectedLanguageCode;
+	}
+	
+	public ModelVersion addNewVersion() {
+		int id = 0;
+		List<ModelVersion> versions = survey.getVersions();
+		for (ModelVersion v : versions) {
+			id = Math.max(id, v.getId());
+		}
+		id++;
+		ModelVersion version = new ModelVersion();
+		version.setId(id);
+		survey.addVersion(version);
+		versions.add(version);
+		return version;
 	}
 	
 }
