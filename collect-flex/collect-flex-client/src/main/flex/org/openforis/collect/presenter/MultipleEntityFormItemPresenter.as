@@ -95,6 +95,11 @@ package org.openforis.collect.presenter
 			var entities:IList = null;
 			if(view.parentEntity != null) {
 				entities = view.parentEntity.getChildren(name);
+				//update entities key label
+				for each (var entity:EntityProxy in entities) {
+					entity.definition = view.entityDefinition;
+					entity.updateKeyText();
+				}
 			}
 			return entities;
 		}
