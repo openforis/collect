@@ -1,5 +1,6 @@
 package org.openforis.collect.model.ui;
 
+import java.io.Serializable;
 import java.util.List;
 
 import javax.xml.bind.JAXBContext;
@@ -29,8 +30,10 @@ import org.w3c.dom.Element;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = { "tabDefinitions" })
 @XmlRootElement(name = "flex")
-public class UIConfiguration implements Configuration {
+public class UIConfiguration implements Configuration, Serializable {
 
+	private static final long serialVersionUID = 1L;
+	
 	@XmlElement(name = "tabDefinition", type = UITabDefinition.class)
 	private List<UITabDefinition> tabDefinitions;
 
