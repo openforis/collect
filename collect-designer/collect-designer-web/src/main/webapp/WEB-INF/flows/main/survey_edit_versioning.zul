@@ -1,9 +1,16 @@
 <?page title="Openforis Collect Designer - Edit Survey" contentType="text/html;charset=UTF-8"?>
 <?taglib uri="/WEB-INF/tld/util.tld" prefix="util"?>
 <zk>
-	<div apply="org.openforis.collect.designer.composer.SurveyEditVersioningComposer">
-		<vbox>
-	        <grid id="versioningGrid" model="@load(vm.survey.versions) @template($composer.editingStatus.get(each) ? 'editable' : 'noneditable')">
+	<div id="versioningContainer"
+		apply="org.zkoss.bind.BindComposer"
+		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SurveyVM')"
+		height="100%">
+		<vbox height="100%">
+	        <grid id="versioningGrid" 
+	        	model="@load(vm.versions) @template(vm.versionsEditingStatus.get(each) ? 'editable' : 'noneditable')"
+	        	height="100%"
+	        	width="800px"
+	        	>
 	            <columns>
 	                <column width="300px">${labels.survey.versioning.name}</column>
 	                <column width="150px">${labels.survey.versioning.date}</column>
@@ -13,18 +20,18 @@
 	            </columns>
 	            <template name="editable">
 	                <row>
-	                    <textbox value="@load(each.name) @save(each.name, before='confirm')" />
+	                    <textbox value="@load(each.name) @save(each.name, before='confirmVersionEdit')" />
 	                    <datebox width="100px" compact="false" buttonVisible="true" format="dd/MM/yyyy" 
-	                    	value="@load(util:parseXMLDateTime(each.date)) @save(each.date, before='confirm')" />
-	                    <textbox value="@load(each.label) @save(each.label, before='confirm')" />
-	                    <textbox value="@load(each.description) @save(each.description, before='confirm')" />
+	                    	value="@load(util:parseXMLDateTime(each.date)) @save(each.date, before='confirmVersionEdit') " />
+						<textbox value="@load(each.getLabel(vm.selectedLanguageCode))" />
+	                    <textbox value="@load(each.getDescription(vm.selectedLanguageCode))" />
 	                    <div>
 	                        <button
 	                            image="/assets/images/tick-small.png"
-	                            onClick="@command('confirm', version=each)" />
+	                            onClick="@command('confirmVersionEdit', version=each)" />
 	                        <button
 	                            image="/assets/images/cross-small.png"
-	                            onClick="@command('changeEditableStatus', version=each)" />
+	                            onClick="@command('changeVersionEditableStatus', version=each)" />
 	                    </div>
 	                </row>
 	            </template>
@@ -32,11 +39,11 @@
 	                <row>
 	                    <label value="@load(each.name)" />
 	                    <label value="@load(util:formatStringDate(each.date, 'dd/MM/yyyy'))" />
-	                    <label value="@load(each.label)" />
-	                    <label value="@load(each.description)" />
+	                    <label value="@load(each.getLabel(vm.selectedLanguageCode))" />
+	                    <label value="@load(each.getDescription(vm.selectedLanguageCode))" />
 	                    <button
 	                        image="/assets/images/pencil-small.png"
-	                        onClick="@command('changeEditableStatus', currentVersion=each)" />
+	                        onClick="@command('changeVersionEditableStatus', currentVersion=each)" />
 	                </row>
 	            </template>
 	        </grid>

@@ -10,7 +10,8 @@
 		<center>
 			<vbox height="100%" width="100%">
 				<div self="@{insert(content_title)}" sclass="content_title">${contentTitle}</div>
-				<div self="@{insert(content)}" sclass="content"></div>
+				<div self="@{insert(content)}" sclass="content"
+					height="100%" width="100%"></div>
 			</vbox>
 		</center>
 		<south height="30px">

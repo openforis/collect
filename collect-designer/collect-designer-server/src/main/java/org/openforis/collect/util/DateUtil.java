@@ -6,6 +6,8 @@ import java.util.Date;
 
 import javax.xml.bind.DatatypeConverter;
 
+import org.apache.commons.lang3.StringUtils;
+
 /**
  * 
  * @author S. Ricci
@@ -16,7 +18,7 @@ public class DateUtil {
 	private static final String XML_DATE_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
 
 	public static Date parseXMLDateTime(String dateTime) {
-		if ( dateTime != null ) {
+		if ( StringUtils.isNotBlank(dateTime) ) {
 			Calendar cal = DatatypeConverter.parseDateTime(dateTime);
 			Date result = cal.getTime();
 			return result;
@@ -26,8 +28,11 @@ public class DateUtil {
 	}
 	
 	public static String formatStringDate(String dateTimeStr, String format) {
-		Date dateTime = parseXMLDateTime(dateTimeStr);
-		String result = formatDate(dateTime, format);
+		String result = null;
+		if ( StringUtils.isNotBlank(dateTimeStr) ) {
+			Date dateTime = parseXMLDateTime(dateTimeStr);
+			result = formatDate(dateTime, format);
+		}
 		return result;
 	}
 

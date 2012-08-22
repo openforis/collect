@@ -1,0 +1,59 @@
+<?page title="Openforis Collect Designer - Edit Survey" contentType="text/html;charset=UTF-8"?>
+<?taglib uri="/WEB-INF/tld/util.tld" prefix="util"?>
+<zk>
+	<div id="unitsContainer"
+		apply="org.openforis.collect.designer.composer.SurveyEditUnitsComposer"
+		height="100%">
+		<vbox height="100%">
+	        <listbox id="unitsList"
+	        	model="${$composer.units}"
+	        	height="100%"
+	        	width="800px"
+	        	>
+	        	<listhead>
+					<listheader width="300px">${labels.survey.unit.name}</listheader>
+	                <listheader width="150px">${labels.survey.unit.dimension}</listheader>
+	                <listheader width="150px">${labels.survey.unit.conversionFactor}</listheader>
+	                <listheader width="100px">${labels.survey.unit.label}</listheader>
+	                <listheader width="100px">${labels.survey.unit.description}</listheader>
+				</listhead>
+	            <template name="model">
+	                <listitem>
+	                    <listcell value="@load(each.name)" />
+	                    <listcell value="@load(each.dimension)" />
+	                    <listcell value="@load(each.conversionFactor)" />
+	                    <listcell value="@load(each.getLabel(vm.selectedLanguageCode))" />
+	                    <listcell value="@load(each.getAbbreviation(vm.selectedLanguageCode))" />
+	                </listitem>
+	            </template>
+	        </listbox>
+	        
+	        <button label="${labels.global.add_item}" onClick="@command('newUnit')" />
+	        
+	        <div id="editUnitForm" visible="${$composer.currentUnit != null}">
+		        <grid>
+					<columns>
+						<column label="" width="150px" />
+						<column label="" />
+					</columns>
+					<rows>
+						<row>
+							<label value="${labels.survey.unit.name}:" />
+							<textbox width="99%" value="@bind($composer.currentUnit.name)" />
+						</row>
+						<row>
+							<label value="${labels.survey.unit.dimension}:" />
+							<textbox width="99%" value="@bind($composer.currentUnit.dimension)" />
+						</row>
+						<row>
+							<label value="${labels.survey.unit.conversionFactor}:" />
+							<textbox width="99%" value="@bind($composer.currentUnit.conversionFactor)" />
+						</row>
+					</rows>
+				</grid>
+			    
+			    <button label="${labels.global.apply}" onClick="@command('saveUnit')" />
+		    </div>
+		</vbox>
+    </div>
+</zk>

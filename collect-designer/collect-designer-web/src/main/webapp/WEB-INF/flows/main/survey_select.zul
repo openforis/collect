@@ -7,7 +7,7 @@
 	self="@define(content)"
 	height="100%"
 	apply="org.zkoss.bind.BindComposer"
-	viewModel="@id('vm') @init('org.openforis.collect.designer.composer.SurveySelectComposer')">
+	viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SurveyVM')">
 
 	<listbox id="listbox" rows="5" model="@load(vm.surveys)" width="400px">
 		<listhead>

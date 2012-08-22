@@ -5,25 +5,25 @@
 
 	<var name="surveyName" class="java.lang.String" />
 
-	<view-state id="survey_edit">
-		<transition on="cancel" to="survey_select">
-<!-- 			<evaluate expression="surveyManager.createSurvey()"  -->
-<!--                   result="flowScope.survey" /> -->
-		</transition>
-	</view-state>
-
 	<view-state id="survey_select">
-<!-- 		<on-render> -->
-<!-- 			<evaluate expression="surveyManager.getAll()" -->
-<!-- 				result="viewScope.surveys" /> -->
-<!-- 		</on-render> -->
+		<on-render>
+			<evaluate expression="surveyManager.getAll()"
+				result="viewScope.surveys" />
+		</on-render>
 		<transition on="edit" to="survey_edit">
-<!-- 			<evaluate expression="surveyManager.get(selectedSurvey.name)" -->
-<!-- 				result="flowScope.survey" /> -->
+			<evaluate expression="surveyManager.get('naforma1')"
+				result="flowScope.survey" />
 		</transition>
 		<transition on="new" to="survey_edit">
 			<evaluate expression="surveyManager.createSurvey()" 
                   result="flowScope.survey" />
+		</transition>
+	</view-state>
+
+	<view-state id="survey_edit">
+		<transition on="cancel" to="survey_select">
+<!-- 			<evaluate expression="surveyManager.createSurvey()"  -->
+<!--                   result="flowScope.survey" /> -->
 		</transition>
 	</view-state>
 

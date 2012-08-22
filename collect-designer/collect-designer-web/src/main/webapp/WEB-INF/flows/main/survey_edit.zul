@@ -6,7 +6,7 @@
 		height="100%" width="100%" 
 		self="@define(content)"
 		apply="org.openforis.collect.designer.composer.SurveyEditComposer"
-		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SurveyViewModel')">
+		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SurveyVM')">
 		
 		<hbox>
 			<label value="Language:" />
@@ -16,7 +16,7 @@
 			</combobox>
 		</hbox>
 		
-		<tabbox id="tb" height="100%" width="100%">
+		<tabbox id="tb" height="500px" width="100%">
 		    <tabs id="tabs">
 		        <tab id="infoTab" label="${labels.survey.info}" />
 		        <tab id="configurationTab" label="${labels.survey.configuration}" />
@@ -34,7 +34,9 @@
 		        	<include src="survey_edit_versioning.zul" />
 		        </tabpanel>
 		        <tabpanel height="100%" width="100%">TO DO</tabpanel>
-		        <tabpanel height="100%" width="100%">TO DO</tabpanel>
+		        <tabpanel height="100%" width="100%">
+		        	<include src="survey_edit_units.zul" />
+		        </tabpanel>
 		        <tabpanel height="100%" width="100%">TO DO</tabpanel>
 		    </tabpanels>
 		</tabbox>
