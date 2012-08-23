@@ -1,0 +1,87 @@
+<?page title="Openforis Collect Designer - Edit Survey" contentType="text/html;charset=UTF-8"?>
+<?taglib uri="/WEB-INF/tld/util.tld" prefix="util"?>
+<zk>
+	<div id="unitsContainer"
+		apply="org.openforis.collect.designer.composer.SurveyEditUnitsComposer"
+		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SurveyEditVM')"
+		height="100%">
+		<vbox height="100%">
+	        <grid id="unitsGrid"
+	        	model="@load(vm.units)"
+	        	height="100%"
+	        	width="850px"
+	        	>
+	        	<columns>
+					<column width="300px">${labels.survey.unit.id}</column>
+	                <column width="300px">${labels.survey.unit.name}</column>
+	                <column width="150px">${labels.survey.unit.dimension}</column>
+	                <column width="150px">${labels.survey.unit.conversionFactor}</column>
+	                <column width="100px">${labels.survey.unit.label}</column>
+	                <column width="100px">${labels.survey.unit.description}</column>
+	                <column width="50px">${labels.global.delete_item}</column>
+				</columns>
+	            <template name="model">
+	                <row>
+	                	<textbox inplace="true" value="@load(each.id)" disabled="true" />
+	                    <textbox inplace="true" value="@bind(each.name)" />
+	                    <textbox inplace="true" value="@bind(each.dimension)" />
+	                    <decimalbox inplace="true" value="@bind(each.conversionFactor)" />
+	                    <textbox inplace="true" value="@load(each.getLabel(vm.selectedLanguageCode))">
+	                    	<attribute name="onChange"><![CDATA[
+                   		     	org.zkoss.bind.sys.ReferenceBinding eachWrapper = (org.zkoss.bind.sys.ReferenceBinding) self.getParent().getAttribute("each");
+                   		        org.openforis.idm.metamodel.Unit unit = (org.openforis.idm.metamodel.Unit) eachWrapper.getValue(null);
+                   		        String val = self.getValue();
+                   		        unit.setLabel("eng", val);
+                   		        
+                   		        Object vm = unitsContainer.getAttribute("viewModel");
+                   		        alert(vm);
+							]]></attribute>
+	                    </textbox>
+	                    <textbox inplace="true" value="@load(each.getAbbreviation(vm.selectedLanguageCode))" />
+	                    <button
+	                            image="/assets/images/cross-small.png"
+	                            onClick="@command('deleteUnit', unit=each)" />
+	                </row>
+	            </template>
+	        </grid>
+	        
+	        <div 
+				validationMessages="@id('vmsgs')"
+				form="@id('unitForm') @load(vm.survey) @save(vm.survey, before='save')">
+		
+				<grid>
+					<columns>
+						<column label="" width="150px" />
+						<column label="" />
+					</columns>
+					<rows>
+						<row>
+							<label value="${labels.survey.unit.name}:" />
+							<textbox width="99%" value="@bind(vm.currentUnit.name)" />
+						</row>
+						<row>
+							<label value="${labels.survey.unit.dimension}:" />
+							<textbox width="99%" value="@bind(vm.currentUnit.dimension)" />
+						</row>
+						<row>
+							<label value="${labels.survey.unit.conversionFactor}:" />
+							<textbox width="99%" value="@bind(vm.currentUnit.conversionFactor)" />
+						</row>
+						<row>
+							<label value="${labels.survey.unit.label}:" />
+							<textbox width="99%" value="@load(vm.currentUnit.getLabel(vm.selectedLanguageCode))" />
+						</row>
+						<row>
+							<label value="${labels.survey.unit.label}:" />
+							<textbox width="99%" value="@load(vm.currentUnit.getAbbreviation(vm.selectedLanguageCode))" />
+						</row>
+					</rows>
+				</grid>
+			</div>
+			
+			<button label="${labels.global.add_item}" onClick="@command('newUnit')" />
+	        
+	        
+		</vbox>
+    </div>
+</zk>

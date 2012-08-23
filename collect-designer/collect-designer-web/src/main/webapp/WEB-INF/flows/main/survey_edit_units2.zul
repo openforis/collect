@@ -1,0 +1,73 @@
+<?page title="Openforis Collect Designer - Edit Survey" contentType="text/html;charset=UTF-8"?>
+<?taglib uri="/WEB-INF/tld/util.tld" prefix="util"?>
+<zk>
+	<div id="unitsContainer"
+		apply="org.openforis.collect.designer.composer.SurveyUnitsEditComposer"
+		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SurveyUnitsEditVM')"
+		height="100%">
+		<hbox>
+			<vbox>
+		        <listbox id="unitsListBox"
+		        	selectedItem="@bind(vm.selectedUnit)"
+		        	model="@load(vm.units)"
+		        	height="200px"
+		        	width="200px">
+		        	<listhead>
+						<listheader label="" width="150px" />
+					</listhead>
+		            <template name="model">
+		                <listitem>
+		                    <listcell label="@load(each.name)" />
+		                </listitem>
+		            </template>
+		        </listbox>
+		        
+		        <button label="${labels.global.add_item}" onClick="@command('newUnit')" />
+		    </vbox>
+	        
+	        <div 
+	        	visible="@load(vm.editingUnit)"
+				validationMessages="@id('vmsgs')"
+				form="@id('unitForm') @load(vm.editedUnit) @save(vm.editedUnit, before='save')"
+				width="400px"
+				>
+				<grid>
+					<columns>
+						<column label="" width="150px" />
+						<column label="" />
+					</columns>
+					<rows>
+						<row>
+							<label value="${labels.survey.unit.name}:" />
+							<textbox width="99%" value="@bind(vm.editedUnit.name)" />
+						</row>
+						<row>
+							<label value="${labels.survey.unit.label}:" />
+							<textbox id="labelTextBox" width="99%" value="@load(vm.editedUnit.getLabel(vm.selectedLanguageCode))" />
+						</row>
+						<row>
+							<label value="${labels.survey.unit.abbreviation}:" />
+							<textbox width="99%" value="@load(vm.editedUnit.getAbbreviation(vm.selectedLanguageCode))" />
+						</row>
+						<row>
+							<label value="${labels.survey.unit.dimension}:" />
+							<decimalbox width="99%" value="@bind(vm.editedUnit.dimension)" />
+						</row>
+						<row>
+							<label value="${labels.survey.unit.conversionFactor}:" />
+							<textbox width="99%" value="@bind(vm.editedUnit.conversionFactor)" />
+						</row>
+					</rows>
+				</grid>
+				
+				<hbox>
+					<button label="${labels.global.save_item}" onClick="@command('saveUnit')" />
+					
+					<button image="/assets/images/cross-small.png"
+		                     onClick="@command('deleteUnit', unit=each)" />
+				</hbox>
+			</div>
+	        
+		</hbox>
+    </div>
+</zk>

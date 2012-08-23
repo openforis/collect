@@ -7,9 +7,10 @@
 	self="@define(content)"
 	height="100%"
 	apply="org.zkoss.bind.BindComposer"
-	viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SurveyVM')">
+	viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SurveySelectVM')">
 
-	<listbox id="listbox" rows="5" model="@load(vm.surveys)" width="400px">
+	<listbox id="listbox" rows="5" model="@load(vm.surveys)" width="400px"
+		selectedItem="@load(vm.selectedSurvey)">
 		<listhead>
 			<listheader label="${labels.survey.name}" width="200px" />
 			<listheader label="${labels.survey.uri}" width="200px" />
@@ -23,6 +24,7 @@
 	</listbox>
 
 	<button id="editSurveyBtn" label="${labels.global.edit_item}" onClick=""
+		disabled="@load(vm.editingDisabled)"
 		self="@action(edit)" />
 
 	<button id="newSurveyBtn" label="${labels.global.new_item}" onClick=""

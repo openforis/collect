@@ -3,7 +3,7 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.springframework.org/schema/webflow http://www.springframework.org/schema/webflow/spring-webflow-2.0.xsd">
 
-	<var name="surveyName" class="java.lang.String" />
+	<var name="selectedSurvey" class="org.openforis.collect.model.CollectSurvey" />
 
 	<view-state id="survey_select">
 		<on-render>
@@ -11,19 +11,19 @@
 				result="viewScope.surveys" />
 		</on-render>
 		<transition on="edit" to="survey_edit">
-			<evaluate expression="surveyManager.get('naforma1')"
-				result="flowScope.survey" />
 		</transition>
 		<transition on="new" to="survey_edit">
-			<evaluate expression="surveyManager.createSurvey()" 
-                  result="flowScope.survey" />
 		</transition>
 	</view-state>
 
 	<view-state id="survey_edit">
+	    <on-render>
+			<evaluate expression="selectedSurvey != null ? 
+			    	surveyManager.get(selectedSurvey.name): 
+		    		surveyManager.createSurvey()"
+				result="viewScope.survey" />
+		</on-render>
 		<transition on="cancel" to="survey_select">
-<!-- 			<evaluate expression="surveyManager.createSurvey()"  -->
-<!--                   result="flowScope.survey" /> -->
 		</transition>
 	</view-state>
 

@@ -3,7 +3,7 @@
 <zk>
 	<div id="versioningContainer"
 		apply="org.zkoss.bind.BindComposer"
-		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SurveyVM')"
+		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SurveyEditVM')"
 		height="100%">
 		<vbox height="100%">
 	        <grid id="versioningGrid" 

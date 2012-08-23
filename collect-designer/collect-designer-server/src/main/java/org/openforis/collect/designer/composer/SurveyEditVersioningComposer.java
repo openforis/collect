@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.openforis.collect.designer.viewmodel.SurveyVM;
+import org.openforis.collect.designer.viewmodel.SurveyEditVM;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.ModelVersion;
@@ -35,7 +35,7 @@ public class SurveyEditVersioningComposer extends BindComposer<Component> {
 	@Listen("onChange=#versionLabelTextBox")
     public void onChangeVersionLabel() {
 		ModelVersion each = (ModelVersion) versionLabelTextBox.getAttribute("each");
-		each.setLabel(((SurveyVM) getViewModel()).getSelectedLanguageCode(), versionLabelTextBox.getValue());
+		each.setLabel(((SurveyEditVM) getViewModel()).getSelectedLanguageCode(), versionLabelTextBox.getValue());
 //        output.setValue(input.getValue());
     }
 	
