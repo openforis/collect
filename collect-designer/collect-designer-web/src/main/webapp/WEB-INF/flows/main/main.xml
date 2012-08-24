@@ -17,12 +17,12 @@
 	</view-state>
 
 	<view-state id="survey_edit">
-	    <on-render>
+	    <on-entry>
 			<evaluate expression="selectedSurvey != null ? 
 			    	surveyManager.get(selectedSurvey.name): 
 		    		surveyManager.createSurvey()"
 				result="viewScope.survey" />
-		</on-render>
+		</on-entry>
 		<transition on="cancel" to="survey_select">
 		</transition>
 	</view-state>

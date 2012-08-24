@@ -2,42 +2,36 @@
 <?taglib uri="/WEB-INF/tld/util.tld" prefix="util"?>
 <zk>
 	<div id="unitsContainer"
-		apply="org.zkoss.bind.BindComposer"
+		apply="org.openforis.collect.designer.composer.SurveyUnitsEditComposer"
 		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SurveyUnitsEditVM')"
 		height="100%">
-		<vbox>
-	        <listbox id="unitsListBox"
-	        	selectedItem="@bind(vm.selectedUnit)"
-	        	model="@load(vm.units)"
-	        	height="200px"
-	        	width="720px"
-	        	>
-	        	<listhead>
-					<listheader width="20px">${labels.survey.unit.id}</listheader>
-	                <listheader width="200px">${labels.survey.unit.name}</listheader>
-	                <listheader width="200px">${labels.survey.unit.label}</listheader>
-	                <listheader width="100px">${labels.survey.unit.abbreviation}</listheader>
-	                <listheader width="100px">${labels.survey.unit.dimension}</listheader>
-	                <listheader width="100px">${labels.survey.unit.conversionFactor}</listheader>
-				</listhead>
-	            <template name="model">
-	                <listitem>
-	                	<listcell label="@load(each.id)" />
-	                    <listcell label="@load(each.name)" />
-	                    <listcell label="@load(each.getLabel(vm.selectedLanguageCode))" />
-	                    <listcell label="@load(each.getAbbreviation(vm.selectedLanguageCode))" />
-	                    <listcell label="@load(each.dimension)" />
-	                    <listcell label="@load(each.conversionFactor)" />
-	                </listitem>
-	            </template>
-	        </listbox>
-	        
-	        <button label="${labels.global.add_item}" onClick="@command('newUnit')" />
+		<hbox>
+			<vbox>
+		        <listbox id="itemsListBox"
+		        	selectedItem="@bind(vm.selectedItem)"
+		        	model="@load(vm.items)"
+		        	onSelect="@command('selectionChanged')"
+		        	height="200px"
+		        	width="200px">
+		        	<listhead>
+						<listheader label="" width="150px" />
+					</listhead>
+		            <template name="model">
+		                <listitem>
+		                    <listcell label="@load(each.name)" />
+		                </listitem>
+		            </template>
+		        </listbox>
+		        
+		        <button label="${labels.global.add_item}" onClick="@command('newItem')" />
+		    </vbox>
 	        
 	        <div 
-	        	visible="@load(vm.editingUnit)"
+	        	visible="@load(vm.editingItem)"
 				validationMessages="@id('vmsgs')"
-				form="@id('unitForm') @load(vm.editedUnit) @save(vm.editedUnit, before='save')">
+				form="@id('itemEditForm') @load(vm.editedItem) @save(vm.editedItem, before='save')"
+				width="400px"
+				>
 				<grid>
 					<columns>
 						<column label="" width="150px" />
@@ -46,35 +40,33 @@
 					<rows>
 						<row>
 							<label value="${labels.survey.unit.name}:" />
-							<textbox width="99%" value="@bind(vm.editedUnit.name)" />
+							<textbox width="99%" value="@bind(vm.editedItem.name)" />
 						</row>
 						<row>
 							<label value="${labels.survey.unit.label}:" />
-							<textbox width="99%" value="@load(vm.editedUnit.getLabel(vm.selectedLanguageCode))" />
+							<textbox id="labelTextBox" width="99%" value="@bind(vm.itemLabel)" />
 						</row>
 						<row>
 							<label value="${labels.survey.unit.abbreviation}:" />
-							<textbox width="99%" value="@load(vm.editedUnit.getAbbreviation(vm.selectedLanguageCode))" />
+							<textbox width="99%" value="@bind(vm.itemAbbreviation)" />
 						</row>
 						<row>
 							<label value="${labels.survey.unit.dimension}:" />
-							<decimalbox width="99%" value="@bind(vm.editedUnit.dimension)" />
+							<decimalbox width="99%" value="@bind(vm.editedItem.dimension)" />
 						</row>
 						<row>
 							<label value="${labels.survey.unit.conversionFactor}:" />
-							<textbox width="99%" value="@bind(vm.editedUnit.conversionFactor)" />
+							<textbox width="99%" value="@bind(vm.editedItem.conversionFactor)" />
 						</row>
 					</rows>
 				</grid>
 				
 				<hbox>
-					<button label="${labels.global.save_item}" onClick="@command('saveUnit')" />
-					
 					<button image="/assets/images/cross-small.png"
-		                     onClick="@command('deleteUnit', unit=each)" />
+		                     onClick="@command('deleteItem')" />
 				</hbox>
 			</div>
 	        
-		</vbox>
+		</hbox>
     </div>
 </zk>

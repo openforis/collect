@@ -22,9 +22,6 @@ import org.zkoss.zul.ListModelList;
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class SurveyEditComposer extends BindComposer<Component> {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	
 	@WireVariable

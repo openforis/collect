@@ -3,52 +3,68 @@
 <zk>
 	<div id="versioningContainer"
 		apply="org.zkoss.bind.BindComposer"
-		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SurveyEditVM')"
+		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SurveyVersioningEditVM')"
 		height="100%">
-		<vbox height="100%">
-	        <grid id="versioningGrid" 
-	        	model="@load(vm.versions) @template(vm.versionsEditingStatus.get(each) ? 'editable' : 'noneditable')"
-	        	height="100%"
-	        	width="800px"
-	        	>
-	            <columns>
-	                <column width="300px">${labels.survey.versioning.name}</column>
-	                <column width="150px">${labels.survey.versioning.date}</column>
-	                <column width="100px">${labels.survey.versioning.label}</column>
-	                <column width="100px">${labels.survey.versioning.description}</column>
-	                <column width="100px">${labels.global.edit_item}</column>
-	            </columns>
-	            <template name="editable">
-	                <row>
-	                    <textbox value="@load(each.name) @save(each.name, before='confirmVersionEdit')" />
-	                    <datebox width="100px" compact="false" buttonVisible="true" format="dd/MM/yyyy" 
-	                    	value="@load(util:parseXMLDateTime(each.date)) @save(each.date, before='confirmVersionEdit') " />
-						<textbox value="@load(each.getLabel(vm.selectedLanguageCode))" />
-	                    <textbox value="@load(each.getDescription(vm.selectedLanguageCode))" />
-	                    <div>
-	                        <button
-	                            image="/assets/images/tick-small.png"
-	                            onClick="@command('confirmVersionEdit', version=each)" />
-	                        <button
-	                            image="/assets/images/cross-small.png"
-	                            onClick="@command('changeVersionEditableStatus', version=each)" />
-	                    </div>
-	                </row>
-	            </template>
-	            <template name="noneditable">
-	                <row>
-	                    <label value="@load(each.name)" />
-	                    <label value="@load(util:formatStringDate(each.date, 'dd/MM/yyyy'))" />
-	                    <label value="@load(each.getLabel(vm.selectedLanguageCode))" />
-	                    <label value="@load(each.getDescription(vm.selectedLanguageCode))" />
-	                    <button
-	                        image="/assets/images/pencil-small.png"
-	                        onClick="@command('changeVersionEditableStatus', currentVersion=each)" />
-	                </row>
-	            </template>
-	        </grid>
+		
+		<hbox>
+			<vbox>
+		        <listbox id="itemsListBox"
+		        	selectedItem="@bind(vm.selectedItem)"
+		        	model="@load(vm.items)"
+		        	onSelect="@command('selectionChanged')"
+		        	height="200px"
+		        	width="200px">
+		        	<listhead>
+						<listheader label="" width="200px" />
+					</listhead>
+		            <template name="model">
+		                <listitem>
+		                    <listcell label="@load(each.name)" />
+		                </listitem>
+		            </template>
+		        </listbox>
+		        
+		        <button label="${labels.global.add_item}" onClick="@command('newItem')" />
+		    </vbox>
 	        
-	        <button label="${labels.global.add_item}" onClick="@command('newVersion')" />
-		</vbox>
+	        <div 
+	        	visible="@load(vm.editingItem)"
+				validationMessages="@id('vmsgs')"
+				form="@id('itemEditForm') @load(vm.editedItem) @save(vm.editedItem, before='save')"
+				width="400px"
+				>
+				<grid>
+					<columns>
+						<column label="" width="150px" />
+						<column label="" />
+					</columns>
+					<rows>
+						<row>
+							<label value="${labels.survey.versioning.name}:" />
+							<textbox width="99%" value="@bind(vm.editedItem.name)" />
+						</row>
+						<row>
+							<label value="${labels.survey.versioning.label}:" />
+							<textbox id="labelTextBox" width="99%" value="@bind(vm.itemLabel)" />
+						</row>
+						<row>
+							<label value="${labels.survey.versioning.description}:" />
+							<textbox width="99%" value="@bind(vm.itemDescription)" />
+						</row>
+						<row>
+							<label value="${labels.survey.versioning.date}:" />
+							<datebox width="100px" compact="false" buttonVisible="true" format="@load(vm.dateFormat)" 
+	                    		value="@bind(vm.itemDate)"  />
+						</row>
+					</rows>
+				</grid>
+				
+				<hbox>
+					<button image="/assets/images/cross-small.png"
+		                     onClick="@command('deleteItem')" />
+				</hbox>
+			</div>
+	        
+		</hbox>
     </div>
 </zk>

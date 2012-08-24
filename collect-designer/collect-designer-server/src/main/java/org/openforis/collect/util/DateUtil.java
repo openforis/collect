@@ -36,6 +36,10 @@ public class DateUtil {
 		return result;
 	}
 
+	public static String formatStringDateInXMLFormat(String dateTimeStr) {
+		return formatStringDate(dateTimeStr, XML_DATE_TIME_FORMAT);
+	}
+	
 	public static String formatDate(Date dateTime, String format) {
 		if ( dateTime != null ) {
 			SimpleDateFormat formatter = new SimpleDateFormat(format);

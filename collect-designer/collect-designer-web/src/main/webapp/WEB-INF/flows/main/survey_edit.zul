@@ -23,8 +23,7 @@
 		        <tab id="versioningTab" label="${labels.survey.model_versions}" />
 		        <tab id="codeListsTab" label="${labels.survey.code_lists}" />
 		        <tab id="unitsTab" label="${labels.survey.units}" />
-		        <tab id="units2Tab" label="Units 2" />
-		        <tab id="srsTab" label="${labels.survey.srs}" />
+		        <tab id="srsTab" label="${labels.survey.srs.$}" />
 		    </tabs>
 		    <tabpanels height="100%" width="100%">
 		        <tabpanel height="100%" width="100%">
@@ -38,10 +37,9 @@
 		        <tabpanel height="100%" width="100%">
 		        	<include src="survey_edit_units.zul" />
 		        </tabpanel>
-		        <tabpanel height="100%" width="100%">
-		        	<include src="survey_edit_units2.zul" />
+		       <tabpanel height="100%" width="100%">
+		        	<include src="survey_edit_srs.zul" />
 		        </tabpanel>
-		        <tabpanel height="100%" width="100%">TO DO</tabpanel>
 		    </tabpanels>
 		</tabbox>
 		
