@@ -2,7 +2,8 @@
 <zk>
 	<div 
 		validationMessages="@id('vmsgs')"
-		form="@id('fx') @load(vm.survey) @save(vm.survey, before='save')">
+		form="@id('fx') @load(vm.survey) @save(vm.survey, before='save')"
+		width="400px">
 
 		<grid>
 			<columns>
@@ -19,11 +20,16 @@
 					<textbox width="99%" value="@bind(vm.survey.uri)" />
 				</row>
 				<row>
+					<label value="${labels.survey.description}:" />
+					<textbox width="99%" value="@bind(vm.description)" />
+				</row>
+				<row>
 					<label value="${labels.survey.project_name}:" />
 					<textbox width="99%" value="@bind(vm.projectName)" />
 				</row>
 				<row>
 					<label value="${labels.survey.project_cycle}:" />
+					<intbox width="99%" value="@bind(vm.survey.cycle)" />
 				</row>
 			</rows>
 		</grid>

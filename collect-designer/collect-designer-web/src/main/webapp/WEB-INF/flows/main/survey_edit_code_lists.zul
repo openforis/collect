@@ -1,0 +1,119 @@
+<?page title="Openforis Collect Designer - Edit Survey" contentType="text/html;charset=UTF-8"?>
+<?taglib uri="/WEB-INF/tld/util.tld" prefix="util"?>
+<zk>
+	<div id="itemsContainer"
+		apply="org.zkoss.bind.BindComposer"
+		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SurveyCodeListsEditVM')"
+		height="100%">
+		<hbox>
+			<vbox>
+		        <listbox id="itemsListBox"
+		        	selectedItem="@bind(vm.selectedItem)"
+		        	model="@load(vm.items)"
+		        	onSelect="@command('selectionChanged')"
+		        	height="200px"
+		        	width="200px">
+		        	<listhead>
+						<listheader label="" width="150px" />
+					</listhead>
+		            <template name="model">
+		                <listitem>
+		                    <listcell label="@load(each.name)" />
+		                </listitem>
+		            </template>
+		        </listbox>
+		        
+		        <button label="${labels.global.add_item}" onClick="@command('newItem')" />
+		    </vbox>
+	        
+	        <div 
+	        	visible="@load(vm.editingItem)"
+				validationMessages="@id('vmsgs')"
+				form="@id('itemEditForm') @load(vm.editedItem) @save(vm.editedItem, before='save')"
+				width="400px"
+				>
+				<grid>
+					<columns>
+						<column label="" width="150px" />
+						<column label="" />
+					</columns>
+					<rows>
+						<row>
+							<label value="${labels.global.item.name}:" />
+							<textbox width="99%" value="@bind(vm.editedItem.name)" />
+						</row>
+						<row>
+							<label value="${labels.survey.code_list.item_label}:" />
+							<textbox width="99%" value="@bind(vm.itemLabel)" />
+						</row>
+						<row>
+							<label value="${labels.survey.code_list.list_label}:" />
+							<textbox width="99%" value="@bind(vm.itemListLabel)" />
+						</row>
+						<row>
+							<label value="${labels.survey.code_list.items}:" />
+							<vbox>
+								<tree id="itemsTree" 
+									width="300px" 
+									model="@load(vm.childItems)"
+									onSelect="@command('childItemSelected', item=self.selectedItem)"
+									>
+									<template name="model">
+							            <treeitem>
+							                <treerow>
+							                    <treecell label="@load(each.data.code)"/>
+							                </treerow>
+							            </treeitem>
+							  		</template>
+							    </tree>
+							    <button label="${labels.survey.code_list.add_child_item}"
+			                     	onClick="@command('addChildItem')" />
+	                     	</vbox>
+						</row>
+					</rows>
+				</grid>
+				
+				<hbox>
+					<button image="/assets/images/cross-small.png"
+		                     onClick="@command('deleteItem')" />
+				</hbox>
+			</div>
+	        
+	         <div 
+	        	visible="@load(vm.editingChildItem)"
+				validationMessages="@id('vmsgs')"
+				form="@id('itemChildEditForm') @load(vm.editedChildItem) @save(vm.editedChildItem, before='save')"
+				width="400px"
+				>
+				<grid>
+					<columns>
+						<column label="" width="150px" />
+						<column label="" />
+					</columns>
+					<rows>
+						<row>
+							<label value="${labels.survey.code_list.code}:" />
+							<textbox width="99%" value="@bind(vm.editedChildItem.code)" />
+						</row>
+						<row>
+							<label value="${labels.survey.code_list.qualifiable}:" />
+							<checkbox value="@bind(vm.editedChildItem.qualifiable)" />
+						</row>
+						<row>
+							<label value="${labels.global.item.label}:" />
+							<textbox width="99%" value="@bind(vm.childItemLabel)" />
+						</row>
+						<row>
+							<label value="${labels.global.item.description}:" />
+							<textbox width="99%" value="@bind(vm.childItemDescription)" />
+						</row>
+					</rows>
+				</grid>
+			</div>
+			<hbox>
+				<button image="/assets/images/cross-small.png"
+	                     onClick="@command('deleteChildItem')" />
+			</hbox>
+		</hbox>
+    </div>
+</zk>

@@ -9,8 +9,10 @@ import java.util.Map;
 import org.openforis.collect.designer.converter.XMLStringDateConverter;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.idm.metamodel.Languages;
 import org.openforis.idm.metamodel.ModelVersion;
+import org.zkoss.bind.annotation.Command;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zkplus.databind.BindingListModelListModel;
@@ -41,6 +43,11 @@ public class SurveyEditVM {
 	public SurveyEditVM() {
 		selectedLanguageCode = ENGLISH_LANGUAGE_CODE;
 		survey = new CollectSurvey();
+	}
+	
+	@Command
+	public void save() throws SurveyImportException {
+		surveyManager.updateModel(survey);
 	}
 	
 	public BindingListModelListModel<String> getLanguageCodes() {

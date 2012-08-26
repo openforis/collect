@@ -33,7 +33,9 @@
 		        <tabpanel height="100%" width="100%">
 		        	<include src="survey_edit_versioning.zul" />
 		        </tabpanel>
-		        <tabpanel height="100%" width="100%">TO DO</tabpanel>
+		       <tabpanel height="100%" width="100%">
+		        	<include src="survey_edit_code_lists.zul" />
+		        </tabpanel>
 		        <tabpanel height="100%" width="100%">
 		        	<include src="survey_edit_units.zul" />
 		        </tabpanel>
