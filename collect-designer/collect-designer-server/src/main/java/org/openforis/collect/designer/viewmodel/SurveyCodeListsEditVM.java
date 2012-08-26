@@ -65,11 +65,15 @@ public class SurveyCodeListsEditVM extends SurveyItemEditVM<CodeList> {
 	@Command
 	public void addChildItem() {
 		CodeListItem item = new CodeListItem();
-		if ( editedChildItem == null ) {
-			editedItem.addItem(item);
-		} else {
-			editedChildItem.addChildItem(item);
-		}
+		editedChildItem.addChildItem(item);
+		editedChildItem = item;
+	}
+	
+	@NotifyChange({"childItems","editedChildItem","editingChildItem"})
+	@Command
+	public void addRootChildItem() {
+		CodeListItem item = new CodeListItem();
+		editedItem.addItem(item);
 		editedChildItem = item;
 	}
 	

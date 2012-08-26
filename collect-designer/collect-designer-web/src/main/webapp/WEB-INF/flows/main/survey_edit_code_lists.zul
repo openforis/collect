@@ -66,8 +66,10 @@
 							            </treeitem>
 							  		</template>
 							    </tree>
-							    <button label="${labels.survey.code_list.add_child_item}"
-			                     	onClick="@command('addChildItem')" />
+							    <button label="${labels.survey.code_list.add_root_child_item}"
+			                     	onClick="@command('addRootChildItem')" />
+		                     	<button label="${labels.survey.code_list.add_child_item}" disabled="@load(not vm.editingChildItem)"
+		                     		onClick="@command('addChildItem')" />
 	                     	</vbox>
 						</row>
 					</rows>
@@ -109,11 +111,11 @@
 						</row>
 					</rows>
 				</grid>
+				<hbox>
+					<button image="/assets/images/cross-small.png"
+		                     onClick="@command('deleteChildItem')" />
+				</hbox>
 			</div>
-			<hbox>
-				<button image="/assets/images/cross-small.png"
-	                     onClick="@command('deleteChildItem')" />
-			</hbox>
 		</hbox>
     </div>
 </zk>
