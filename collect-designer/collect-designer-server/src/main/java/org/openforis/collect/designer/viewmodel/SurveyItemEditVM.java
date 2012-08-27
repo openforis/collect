@@ -3,20 +3,37 @@
  */
 package org.openforis.collect.designer.viewmodel;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.commons.beanutils.BeanUtils;
+import org.openforis.idm.metamodel.ModelVersion;
+import org.openforis.idm.metamodel.Versionable;
 import org.springframework.core.GenericTypeResolver;
 import org.zkoss.bind.annotation.Command;
+import org.zkoss.bind.annotation.GlobalCommand;
 import org.zkoss.bind.annotation.NotifyChange;
-import org.zkoss.zk.ui.select.annotation.Wire;
+import org.zkoss.util.resource.Labels;
+import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zkplus.databind.BindingListModelList;
-import org.zkoss.zul.Textbox;
 
 /**
  * 
  * @author S. Ricci
  *
  */
+@VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public abstract class SurveyItemEditVM<T> extends SurveyEditVM {
+	
+	protected static ModelVersion VERSION_EMPTY_SELECTION;
+	
+	{
+		//init static variables
+		VERSION_EMPTY_SELECTION = new ModelVersion();
+		VERSION_EMPTY_SELECTION.setId(-1);
+		String emptyOptionLabel = Labels.getLabel("global.empty_option");
+		VERSION_EMPTY_SELECTION.setName(emptyOptionLabel);
+	}
 	
 	private final Class<T> genericType;
 
@@ -24,9 +41,6 @@ public abstract class SurveyItemEditVM<T> extends SurveyEditVM {
 	
 	protected T editedItem;
 	
-	@Wire
-	Textbox labelTextBox;
-
 	@SuppressWarnings("unchecked")
 	public SurveyItemEditVM() {
 		this.genericType = (Class<T>) GenericTypeResolver.resolveTypeArgument(getClass(), SurveyItemEditVM.class);
@@ -34,7 +48,7 @@ public abstract class SurveyItemEditVM<T> extends SurveyEditVM {
 	
 	public abstract BindingListModelList<T> getItems();	
 	
-	@NotifyChange({"editingItem","editedItem","items","selectedItem"})
+	@NotifyChange({"editingItem","editedItem","items","selectedItem","editedItemSinceVersion","editedItemDeprecatedVersion"})
 	@Command
 	public void newItem() {
 		//setSelectedItem(null);
@@ -78,6 +92,10 @@ public abstract class SurveyItemEditVM<T> extends SurveyEditVM {
 		setSelectedItem(null);
 	}
 
+	@NotifyChange("versionsForCombo")
+	@GlobalCommand
+	public void versionsUpdated() {}
+	
 	protected abstract void deleteItemFromSurvey();
 
 	protected void applyChangesToSelectedItem() {
@@ -92,7 +110,7 @@ public abstract class SurveyItemEditVM<T> extends SurveyEditVM {
 		return selectedItem;
 	}
 
-	@NotifyChange("editedItem")
+	@NotifyChange({"editedItem","editedItemSinceVersion","editedItemDeprecatedVersion"})
 	public void setSelectedItem(T item) {
 		selectedItem = item;
 		if ( item != null ) {
@@ -114,7 +132,7 @@ public abstract class SurveyItemEditVM<T> extends SurveyEditVM {
 		return editedItem;
 	}
 
-	@NotifyChange("editingItem")
+	@NotifyChange({"editingItem","editedItemSinceVersion","editedItemDeprecatedVersion"})
 	public void setEditedItem(T editedItem) {
 		this.editedItem = editedItem;
 	}
@@ -122,6 +140,41 @@ public abstract class SurveyItemEditVM<T> extends SurveyEditVM {
 	public boolean isEditingItem() {
 		return this.editedItem != null;
 	}
-
 	
+	public List<ModelVersion> getVersionsForCombo() {
+		List<ModelVersion> result = new ArrayList<ModelVersion>(survey.getVersions());
+		result.add(0, VERSION_EMPTY_SELECTION);
+		return new BindingListModelList<ModelVersion>(result, false);
+	}
+	
+	public ModelVersion getEditedItemSinceVersion() {
+		if ( editedItem != null && editedItem instanceof Versionable ) {
+			return ( (Versionable) editedItem).getSinceVersion();
+		} else {
+			return null;
+		}
+	}
+	
+	public void setEditedItemSinceVersion(ModelVersion value) {
+		if ( editedItem != null && editedItem instanceof Versionable ) {
+			ModelVersion modelVersion = value == VERSION_EMPTY_SELECTION ? null: value;
+			( (Versionable) editedItem).setSinceVersion(modelVersion);
+		}
+	}
+
+	public ModelVersion getEditedItemDeprecatedVersion() {
+		if ( editedItem != null && editedItem instanceof Versionable ) {
+			return ( (Versionable) editedItem).getDeprecatedVersion();
+		} else {
+			return null;
+		}
+	}
+
+	public void setEditedItemDeprecatedVersion(ModelVersion value) {
+		if ( editedItem != null && editedItem instanceof Versionable ) {
+			ModelVersion modelVersion = value == VERSION_EMPTY_SELECTION ? null: value;
+			( (Versionable) editedItem).setDeprecatedVersion(modelVersion);
+		}
+	}
+
 }

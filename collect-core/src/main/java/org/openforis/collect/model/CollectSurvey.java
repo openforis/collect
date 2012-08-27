@@ -9,6 +9,7 @@ import org.openforis.idm.metamodel.Survey;
 
 /**
  * @author M. Togna
+ * @author S. Ricci
  * 
  */
 @XmlRootElement(name = "survey")

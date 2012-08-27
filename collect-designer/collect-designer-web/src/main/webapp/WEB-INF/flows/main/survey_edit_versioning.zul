@@ -24,7 +24,7 @@
 		            </template>
 		        </listbox>
 		        
-		        <button label="${labels.global.add_item}" onClick="@command('newItem')" />
+		        <button label="${labels.global.add_item}" onClick="@command('newItem') @global-command('versionsUpdated')" />
 		    </vbox>
 	        
 	        <div 
@@ -61,7 +61,7 @@
 				
 				<hbox>
 					<button image="/assets/images/cross-small.png"
-		                     onClick="@command('deleteItem')" />
+		                     onClick="@command('deleteItem') @global-command('versionsUpdated')" />
 				</hbox>
 			</div>
 	        

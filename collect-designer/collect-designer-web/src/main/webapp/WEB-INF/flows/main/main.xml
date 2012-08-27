@@ -11,18 +11,20 @@
 				result="viewScope.surveys" />
 		</on-render>
 		<transition on="edit" to="survey_edit">
+	    	<evaluate expression="surveyManager.get(selectedSurvey.name)"
+				result="flowScope.survey" />
 		</transition>
 		<transition on="new" to="survey_edit">
+		    <evaluate expression="surveyManager.createSurvey()"
+				result="flowScope.survey" />
 		</transition>
 	</view-state>
 
 	<view-state id="survey_edit">
-	    <on-entry>
-			<evaluate expression="selectedSurvey != null ? 
-			    	surveyManager.get(selectedSurvey.name): 
-		    		surveyManager.createSurvey()"
-				result="viewScope.survey" />
-		</on-entry>
+<!-- 	    <on-entry> -->
+<!-- 	        <evaluate expression="selectedSurvey ? surveyManager.createSurvey()" -->
+<!-- 				result="viewScope.survey" /> -->
+<!-- 	    </on-entry> -->
 		<transition on="cancel" to="survey_select">
 		</transition>
 	</view-state>

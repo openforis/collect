@@ -51,6 +51,28 @@
 							<textbox width="99%" value="@bind(vm.itemListLabel)" />
 						</row>
 						<row>
+							<label value="${labels.global.item.since_version}:" />
+							<listbox width="150px"
+			                    model="@load(vm.versionsForCombo)" 
+			                    selectedItem="@bind(vm.editedItemSinceVersion)"
+			                    mold="select">
+			                    <template name="model">
+			                        <listitem label="@load(each.name)" />
+			                    </template>
+			                </listbox>
+			            </row>
+			            <row>
+							<label value="${labels.global.item.deprecated_version}:" />
+							<listbox width="150px"
+			                    model="@load(vm.versionsForCombo)" 
+			                    selectedItem="@bind(vm.editedItemDeprecatedVersion)"
+			                    mold="select">
+			                    <template name="model">
+			                        <listitem label="@load(each.name)" />
+			                    </template>
+			                </listbox>
+			            </row>
+						<row>
 							<label value="${labels.survey.code_list.items}:" />
 							<vbox>
 								<tree id="itemsTree" 
@@ -61,7 +83,7 @@
 									<template name="model">
 							            <treeitem>
 							                <treerow>
-							                    <treecell label="@load(each.data.code)"/>
+							                    <treecell label="@load(each.data.code) - @load(each.data.getLabel(vm.selectedLanguageCode))"/>
 							                </treerow>
 							            </treeitem>
 							  		</template>
@@ -99,7 +121,7 @@
 						</row>
 						<row>
 							<label value="${labels.survey.code_list.qualifiable}:" />
-							<checkbox value="@bind(vm.editedChildItem.qualifiable)" />
+							<checkbox checked="@bind(vm.childItemQualifiable)" />
 						</row>
 						<row>
 							<label value="${labels.global.item.label}:" />

@@ -6,6 +6,7 @@ package org.openforis.collect.designer.viewmodel;
 import org.openforis.idm.metamodel.SpatialReferenceSystem;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.NotifyChange;
+import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zkplus.databind.BindingListModelList;
 
 /**
@@ -13,6 +14,7 @@ import org.zkoss.zkplus.databind.BindingListModelList;
  * @author S. Ricci
  *
  */
+@VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class SurveySRSEditVM extends SurveyItemEditVM<SpatialReferenceSystem> {
 
 	@Override
@@ -30,13 +32,13 @@ public class SurveySRSEditVM extends SurveyItemEditVM<SpatialReferenceSystem> {
 		survey.removeSpatialReferenceSystem(selectedItem);
 	}
 	
-	@NotifyChange({"selectedItem","editedItem","editingItem","itemLabel","itemDescription","itemDate"})
+	@NotifyChange({"selectedItem","editedItem","editingItem","editedItemSinceVersion","editedItemDeprecatedVersion","itemLabel","itemDescription","itemDate"})
 	@Command
 	public void selectionChanged() {
 	}
 	
+	@NotifyChange({"items","selectedItem","editedItem","editingItem","editedItemSinceVersion","editedItemDeprecatedVersion","itemLabel","itemDescription","itemDate"})
 	@Override
-	@NotifyChange({"editingItem","editedItem","items","selectedItem","itemLabel","itemDescription"})
 	@Command
 	public void newItem() {
 		super.newItem();

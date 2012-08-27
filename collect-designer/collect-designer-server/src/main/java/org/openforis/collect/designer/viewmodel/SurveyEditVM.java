@@ -13,6 +13,11 @@ import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.idm.metamodel.Languages;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.zkoss.bind.annotation.Command;
+import org.zkoss.bind.annotation.ContextParam;
+import org.zkoss.bind.annotation.ContextType;
+import org.zkoss.spring.context.annotation.AfterCompose;
+import org.zkoss.zk.ui.Component;
+import org.zkoss.zk.ui.select.Selectors;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zkplus.databind.BindingListModelListModel;
@@ -42,9 +47,15 @@ public class SurveyEditVM {
 	
 	public SurveyEditVM() {
 		selectedLanguageCode = ENGLISH_LANGUAGE_CODE;
-		survey = new CollectSurvey();
+//		survey = new CollectSurvey();
 	}
 	
+	@AfterCompose
+    public void afterCompose(@ContextParam(ContextType.VIEW) Component view){
+        Selectors.wireComponents(view, this, false);
+        Selectors.wireVariables(view, this, null);
+    }
+	 
 	@Command
 	public void save() throws SurveyImportException {
 		surveyManager.updateModel(survey);

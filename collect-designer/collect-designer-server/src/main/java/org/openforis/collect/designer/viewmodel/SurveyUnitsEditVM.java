@@ -6,6 +6,7 @@ package org.openforis.collect.designer.viewmodel;
 import org.openforis.idm.metamodel.Unit;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.NotifyChange;
+import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zkplus.databind.BindingListModelList;
 
 /**
@@ -13,6 +14,7 @@ import org.zkoss.zkplus.databind.BindingListModelList;
  * @author S. Ricci
  *
  */
+@VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class SurveyUnitsEditVM extends SurveyItemEditVM<Unit> {
 
 	@Override
@@ -30,13 +32,13 @@ public class SurveyUnitsEditVM extends SurveyItemEditVM<Unit> {
 		survey.removeUnit(selectedItem);
 	}
 
-	@NotifyChange({"selectedItem","editedItem","editingItem","itemLabel","itemAbbreviation"})
+	@NotifyChange({"selectedItem","editedItem","editingItem","editedItemSinceVersion","editedItemDeprecatedVersion","itemLabel","itemAbbreviation"})
 	@Command
 	public void selectionChanged() {
 	}
 	
 	@Override
-	@NotifyChange({"editingItem","editedItem","items","selectedItem","itemLabel","itemAbbreviation"})
+	@NotifyChange({"editingItem","editedItem","items","selectedItem","editedItemSinceVersion","editedItemDeprecatedVersion","itemLabel","itemAbbreviation"})
 	@Command
 	public void newItem() {
 		super.newItem();

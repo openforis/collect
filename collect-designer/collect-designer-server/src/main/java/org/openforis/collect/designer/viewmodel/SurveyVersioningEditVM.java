@@ -9,6 +9,7 @@ import org.openforis.collect.util.DateUtil;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.NotifyChange;
+import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zkplus.databind.BindingListModelList;
 
 /**
@@ -16,6 +17,7 @@ import org.zkoss.zkplus.databind.BindingListModelList;
  * @author S. Ricci
  *
  */
+@VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class SurveyVersioningEditVM extends SurveyItemEditVM<ModelVersion> {
 	
 	@Override

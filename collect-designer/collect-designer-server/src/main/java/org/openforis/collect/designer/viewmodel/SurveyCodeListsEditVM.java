@@ -13,12 +13,12 @@ import org.openforis.idm.metamodel.CodeListLabel.Type;
 import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.NotifyChange;
+import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zkplus.databind.BindingListModelList;
 import org.zkoss.zul.DefaultTreeModel;
 import org.zkoss.zul.DefaultTreeNode;
 import org.zkoss.zul.Tree;
-import org.zkoss.zul.TreeModel;
 import org.zkoss.zul.TreeNode;
 import org.zkoss.zul.Treeitem;
 
@@ -27,12 +27,24 @@ import org.zkoss.zul.Treeitem;
  * @author S. Ricci
  *
  */
+@VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class SurveyCodeListsEditVM extends SurveyItemEditVM<CodeList> {
 
 	@Wire
 	Tree itemsTree;
 	
+	private DefaultTreeModel<CodeListItem> treeModel;
+	
 	private CodeListItem editedChildItem;
+	
+	public SurveyCodeListsEditVM() {
+//		ModelVersion version = new ModelVersion();
+//		version.setName("test1");
+//		survey.addVersion(version);
+//		version = new ModelVersion();
+//		version.setName("test2");
+//		survey.addVersion(version);
+	}
 	
 	@Override
 	public BindingListModelList<CodeList> getItems() {
@@ -54,19 +66,16 @@ public class SurveyCodeListsEditVM extends SurveyItemEditVM<CodeList> {
 	public void selectionChanged() {
 	}
 	
-	@Override
-	@NotifyChange({"editingItem","editedItem","items","selectedItem","itemLabel","itemListLabel","itemDescription"})
+	@NotifyChange({"editingItem","editedItem","items","selectedItem","editedItemSinceVersion","editedItemDeprecatedVersion","itemLabel","itemListLabel","itemDescription"})
 	@Command
 	public void newItem() {
 		super.newItem();
 	}
 	
-	@NotifyChange({"childItems","editedChildItem","editingChildItem"})
-	@Command
-	public void addChildItem() {
-		CodeListItem item = new CodeListItem();
-		editedChildItem.addChildItem(item);
-		editedChildItem = item;
+	@Override
+	public void setEditedItem(CodeList editedItem) {
+		super.setEditedItem(editedItem);
+		initTreeModel();
 	}
 	
 	@NotifyChange({"childItems","editedChildItem","editingChildItem"})
@@ -75,6 +84,16 @@ public class SurveyCodeListsEditVM extends SurveyItemEditVM<CodeList> {
 		CodeListItem item = new CodeListItem();
 		editedItem.addItem(item);
 		editedChildItem = item;
+		initTreeModel();
+	}
+	
+	@NotifyChange({"childItems","editedChildItem","editingChildItem","childItemLabel","childItemDescription","childItemQualifiable"})
+	@Command
+	public void addChildItem() {
+		CodeListItem item = new CodeListItem();
+		editedChildItem.addChildItem(item);
+		editedChildItem = item;
+		initTreeModel();
 	}
 	
 	@NotifyChange({"childItems","editedChildItem","editingChildItem"})
@@ -88,9 +107,10 @@ public class SurveyCodeListsEditVM extends SurveyItemEditVM<CodeList> {
 			editedItem.removeItem(id);
 		}
 		editedChildItem = null;
+		initTreeModel();
 	}
 	
-	@NotifyChange({"editedChildItem","editingChildItem"})
+	@NotifyChange({"editedChildItem","editingChildItem","childItemLabel","childItemDescription","childItemQualifiable"})
 	@Command
 	public void childItemSelected(@BindingParam("item") Treeitem item) {
 		if ( item != null ) {
@@ -132,15 +152,19 @@ public class SurveyCodeListsEditVM extends SurveyItemEditVM<CodeList> {
 	}
 
 	public DefaultTreeModel<CodeListItem> getChildItems() {
+		return treeModel;
+    }
+
+	private void initTreeModel() {
 		if ( editedItem != null ) {
 			List<CodeListItem> items = editedItem.getItems();
 			List<TreeNode<CodeListItem>> treeNodes = CodeListItemTreeNode.fromList(items);
 			TreeNode<CodeListItem> root = new CodeListItemTreeNode(null, treeNodes);
-	        return new DefaultTreeModel<CodeListItem>(root);
+			treeModel = new DefaultTreeModel<CodeListItem>(root);
 		} else {
-			return null;
+			treeModel = null;
 		}
-    }
+	}
 	
 	public CodeListItem getEditedChildItem() {
 		return editedChildItem;
@@ -174,8 +198,20 @@ public class SurveyCodeListsEditVM extends SurveyItemEditVM<CodeList> {
 		}
 	}
 	
+	public boolean isChildItemQualifiable() {
+		return editedChildItem != null && editedChildItem.isQualifiable();
+	}
+	
+	public void setChildItemQualifiable(boolean value) {
+		if ( editedChildItem != null ) {
+			editedChildItem.setQualifiable(value);
+		}
+	}
+	
 	public static class CodeListItemTreeNode extends DefaultTreeNode<CodeListItem> {
 	     
+		private static final long serialVersionUID = 1L;
+		
 		public CodeListItemTreeNode(CodeListItem data) {
 			this(data, null);
 		}
@@ -184,8 +220,6 @@ public class SurveyCodeListsEditVM extends SurveyItemEditVM<CodeList> {
 			super(data, children);
 		}
 
-		private static final long serialVersionUID = 1L;
-		
 		@Override
 		public List<TreeNode<CodeListItem>> getChildren() {
 			CodeListItem codeListItem = getData();
@@ -202,7 +236,9 @@ public class SurveyCodeListsEditVM extends SurveyItemEditVM<CodeList> {
 			if ( items != null ) {
 				result = new ArrayList<TreeNode<CodeListItem>>();
 				for (CodeListItem item : items) {
-					CodeListItemTreeNode node = new CodeListItemTreeNode(item);
+					List<CodeListItem> childItems = item.getChildItems();
+					List<TreeNode<CodeListItem>> childrenNodes = fromList(childItems);
+					CodeListItemTreeNode node = new CodeListItemTreeNode(item, childrenNodes);
 					result.add(node);
 				}
 			}
