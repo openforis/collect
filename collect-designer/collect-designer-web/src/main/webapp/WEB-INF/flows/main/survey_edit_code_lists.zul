@@ -131,6 +131,28 @@
 							<label value="${labels.global.item.description}:" />
 							<textbox width="99%" value="@bind(vm.childItemDescription)" />
 						</row>
+						<row>
+							<label value="${labels.global.item.since_version}:" />
+							<listbox width="150px"
+			                    model="@load(vm.versionsForCombo)" 
+			                    selectedItem="@bind(vm.childItemSinceVersion)"
+			                    mold="select">
+			                    <template name="model">
+			                        <listitem label="@load(each.name)" />
+			                    </template>
+			                </listbox>
+			            </row>
+			            <row>
+							<label value="${labels.global.item.deprecated_version}:" />
+							<listbox width="150px"
+			                    model="@load(vm.versionsForCombo)" 
+			                    selectedItem="@bind(vm.childItemDeprecatedVersion)"
+			                    mold="select">
+			                    <template name="model">
+			                        <listitem label="@load(each.name)" />
+			                    </template>
+			                </listbox>
+			            </row>
 					</rows>
 				</grid>
 				<hbox>

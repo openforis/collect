@@ -9,6 +9,8 @@ import java.util.List;
 
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
+import org.openforis.idm.metamodel.ModelVersion;
+import org.openforis.idm.metamodel.Versionable;
 import org.openforis.idm.metamodel.CodeListLabel.Type;
 import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
@@ -87,7 +89,7 @@ public class SurveyCodeListsEditVM extends SurveyItemEditVM<CodeList> {
 		initTreeModel();
 	}
 	
-	@NotifyChange({"childItems","editedChildItem","editingChildItem","childItemLabel","childItemDescription","childItemQualifiable"})
+	@NotifyChange({"childItems","editedChildItem","editingChildItem","childItemLabel","childItemDescription","childItemQualifiable","childItemSinceVersion","childItemDeprecatedVersion"})
 	@Command
 	public void addChildItem() {
 		CodeListItem item = new CodeListItem();
@@ -110,7 +112,7 @@ public class SurveyCodeListsEditVM extends SurveyItemEditVM<CodeList> {
 		initTreeModel();
 	}
 	
-	@NotifyChange({"editedChildItem","editingChildItem","childItemLabel","childItemDescription","childItemQualifiable"})
+	@NotifyChange({"editedChildItem","editingChildItem","childItemLabel","childItemDescription","childItemQualifiable","childItemSinceVersion","childItemDeprecatedVersion"})
 	@Command
 	public void childItemSelected(@BindingParam("item") Treeitem item) {
 		if ( item != null ) {
@@ -207,6 +209,37 @@ public class SurveyCodeListsEditVM extends SurveyItemEditVM<CodeList> {
 			editedChildItem.setQualifiable(value);
 		}
 	}
+	
+	public ModelVersion getChildItemSinceVersion() {
+		if ( editedChildItem != null && editedChildItem instanceof Versionable ) {
+			return ( (Versionable) editedChildItem).getSinceVersion();
+		} else {
+			return null;
+		}
+	}
+	
+	public void setChildItemSinceVersion(ModelVersion value) {
+		if ( editedChildItem != null && editedChildItem instanceof Versionable ) {
+			ModelVersion modelVersion = value == VERSION_EMPTY_SELECTION ? null: value;
+			( (Versionable) editedChildItem).setSinceVersion(modelVersion);
+		}
+	}
+
+	public ModelVersion getChildItemDeprecatedVersion() {
+		if ( editedChildItem != null && editedChildItem instanceof Versionable ) {
+			return ( (Versionable) editedChildItem).getDeprecatedVersion();
+		} else {
+			return null;
+		}
+	}
+
+	public void setChildItemDeprecatedVersion(ModelVersion value) {
+		if ( editedChildItem != null && editedChildItem instanceof Versionable ) {
+			ModelVersion modelVersion = value == VERSION_EMPTY_SELECTION ? null: value;
+			( (Versionable) editedChildItem).setDeprecatedVersion(modelVersion);
+		}
+	}
+
 	
 	public static class CodeListItemTreeNode extends DefaultTreeNode<CodeListItem> {
 	     
