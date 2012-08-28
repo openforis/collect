@@ -4,6 +4,7 @@
 package org.openforis.collect.designer.viewmodel;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -63,15 +64,16 @@ public class SurveyCodeListsEditVM extends SurveyItemEditVM<CodeList> {
 		survey.removeCodeList(selectedItem);
 	}
 
-	@NotifyChange({"selectedItem","editedItem","editingItem","itemLabel","itemListLabel","itemDescription"})
+	@NotifyChange({"selectedItem","editedItem","editingItem","childItems","itemLabel","itemListLabel","itemDescription"})
 	@Command
 	public void selectionChanged() {
 	}
 	
-	@NotifyChange({"editingItem","editedItem","items","selectedItem","editedItemSinceVersion","editedItemDeprecatedVersion","itemLabel","itemListLabel","itemDescription"})
+	@NotifyChange({"editingItem","editedItem","items","childItems","selectedItem","editedItemSinceVersion","editedItemDeprecatedVersion","itemLabel","itemListLabel","itemDescription"})
 	@Command
 	public void newItem() {
 		super.newItem();
+		editedChildItem = null;
 	}
 	
 	@Override
@@ -86,16 +88,31 @@ public class SurveyCodeListsEditVM extends SurveyItemEditVM<CodeList> {
 		CodeListItem item = new CodeListItem();
 		editedItem.addItem(item);
 		editedChildItem = item;
-		initTreeModel();
+		//initTreeModel();
+		addTreeNode(item);
 	}
-	
+
 	@NotifyChange({"childItems","editedChildItem","editingChildItem","childItemLabel","childItemDescription","childItemQualifiable","childItemSinceVersion","childItemDeprecatedVersion"})
 	@Command
 	public void addChildItem() {
 		CodeListItem item = new CodeListItem();
 		editedChildItem.addChildItem(item);
 		editedChildItem = item;
-		initTreeModel();
+		//initTreeModel();
+		addTreeNode(item);
+	}
+	
+	protected void addTreeNode(CodeListItem item) {
+		CodeListItemTreeNode treeNode = new CodeListItemTreeNode(item);
+		int[] selectionPath = treeModel.getSelectionPath();
+		if ( selectionPath == null || item.getParentItem() == null ) {
+			treeModel.getRoot().add(treeNode);
+		} else {
+			TreeNode<CodeListItem> selectedTreeNode = treeModel.getChild(selectionPath);
+			selectedTreeNode.add(treeNode);
+		}
+		treeModel.addOpenObject(treeNode.getParent());
+		treeModel.setSelection(Arrays.asList(treeNode));
 	}
 	
 	@NotifyChange({"childItems","editedChildItem","editingChildItem"})
@@ -109,7 +126,15 @@ public class SurveyCodeListsEditVM extends SurveyItemEditVM<CodeList> {
 			editedItem.removeItem(id);
 		}
 		editedChildItem = null;
-		initTreeModel();
+		removeSelectedTreeNode();
+		//initTreeModel();
+	}
+
+	private void removeSelectedTreeNode() {
+		int[] selectionPath = treeModel.getSelectionPath();
+		TreeNode<CodeListItem> treeNode = treeModel.getChild(selectionPath);
+		TreeNode<CodeListItem> parentTreeNode = treeNode.getParent();
+		parentTreeNode.remove(treeNode);
 	}
 	
 	@NotifyChange({"editedChildItem","editingChildItem","childItemLabel","childItemDescription","childItemQualifiable","childItemSinceVersion","childItemDeprecatedVersion"})
