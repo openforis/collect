@@ -18,6 +18,7 @@ import org.openforis.collect.model.SurveySummary;
 import org.openforis.collect.persistence.SurveyDao;
 import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.idm.metamodel.LanguageSpecificText;
+import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.xml.InvalidIdmlException;
 import org.openforis.idm.util.CollectionUtil;
@@ -61,6 +62,8 @@ public class SurveyManager {
 	
 	public CollectSurvey createSurvey() {
 		CollectSurvey survey = new CollectSurvey();
+		Schema schema = new Schema();
+		survey.setSchema(schema);
 		return survey;
 	}
 	

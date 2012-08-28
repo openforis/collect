@@ -35,6 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * @author G. Miceli
  * @author M. Togna
+ * @author S. Ricci
  */
 @Transactional
 public class SurveyDao extends JooqDaoSupport {
@@ -42,6 +43,8 @@ public class SurveyDao extends JooqDaoSupport {
 
 	private CollectIdmlBindingContext bindingContext;
 
+	private CollectSurveyContext surveyContext;
+	
 	@Autowired
 	private ExpressionFactory expressionFactory;
 	@Autowired
@@ -49,15 +52,13 @@ public class SurveyDao extends JooqDaoSupport {
 	@Autowired
 	private ExternalCodeListProvider externalCodeListProvider;
 
-	public SurveyDao() {
-	}
-
 	public void init() {
+		surveyContext = new CollectSurveyContext(expressionFactory, validator,
+				externalCodeListProvider);
 		bindingContext = new CollectIdmlBindingContext(
-				new CollectSurveyContext(expressionFactory, validator,
-						externalCodeListProvider));
+				surveyContext);
 	}
-
+	
 	@Transactional
 	public void importModel(Survey survey) throws SurveyImportException {
 		String name = survey.getName();
