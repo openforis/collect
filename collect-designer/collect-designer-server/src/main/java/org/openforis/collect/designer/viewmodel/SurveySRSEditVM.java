@@ -32,12 +32,12 @@ public class SurveySRSEditVM extends SurveyItemEditVM<SpatialReferenceSystem> {
 		survey.removeSpatialReferenceSystem(selectedItem);
 	}
 	
-	@NotifyChange({"selectedItem","editedItem","editingItem","editedItemSinceVersion","editedItemDeprecatedVersion","itemLabel","itemDescription","itemDate"})
+	@NotifyChange({"selectedItem","editedItem","editingItem","itemLabel","itemDescription","itemDate"})
 	@Command
 	public void selectionChanged() {
 	}
 	
-	@NotifyChange({"items","selectedItem","editedItem","editingItem","editedItemSinceVersion","editedItemDeprecatedVersion","itemLabel","itemDescription","itemDate"})
+	@NotifyChange({"items","selectedItem","editedItem","editingItem","itemLabel","itemDescription","itemDate"})
 	@Override
 	@Command
 	public void newItem() {

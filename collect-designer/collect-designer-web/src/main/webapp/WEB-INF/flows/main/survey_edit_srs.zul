@@ -54,28 +54,6 @@
 							<label value="${labels.survey.srs.wkt}:" />
 							<textbox width="99%" value="@bind(vm.editedItem.wellKnownText)" />
 						</row>
-						<row>
-							<label value="${labels.global.item.since_version}:" />
-							<listbox width="150px"
-			                    model="@load(vm.versionsForCombo)" 
-			                    selectedItem="@bind(vm.editedItemSinceVersion)"
-			                    mold="select">
-			                    <template name="model">
-			                        <listitem label="@load(each.name)" />
-			                    </template>
-			                </listbox>
-			            </row>
-			            <row>
-							<label value="${labels.global.item.deprecated_version}:" />
-							<listbox width="150px"
-			                    model="@load(vm.versionsForCombo)" 
-			                    selectedItem="@bind(vm.editedItemDeprecatedVersion)"
-			                    mold="select">
-			                    <template name="model">
-			                        <listitem label="@load(each.name)" />
-			                    </template>
-			                </listbox>
-			            </row>
 					</rows>
 				</grid>
 				
