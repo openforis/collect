@@ -13,7 +13,6 @@ import org.springframework.core.GenericTypeResolver;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.GlobalCommand;
 import org.zkoss.bind.annotation.NotifyChange;
-import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zkplus.databind.BindingListModelList;
 
@@ -24,16 +23,6 @@ import org.zkoss.zkplus.databind.BindingListModelList;
  */
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public abstract class SurveyItemEditVM<T> extends SurveyEditVM {
-	
-	protected static ModelVersion VERSION_EMPTY_SELECTION;
-	
-	{
-		//init static variables
-		VERSION_EMPTY_SELECTION = new ModelVersion();
-		VERSION_EMPTY_SELECTION.setId(-1);
-		String emptyOptionLabel = Labels.getLabel("global.empty_option");
-		VERSION_EMPTY_SELECTION.setName(emptyOptionLabel);
-	}
 	
 	private final Class<T> genericType;
 

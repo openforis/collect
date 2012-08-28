@@ -3,9 +3,6 @@
  */
 package org.openforis.collect.designer.viewmodel;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.openforis.collect.designer.converter.XMLStringDateConverter;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectSurvey;
@@ -13,11 +10,7 @@ import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.idm.metamodel.Languages;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.zkoss.bind.annotation.Command;
-import org.zkoss.bind.annotation.ContextParam;
-import org.zkoss.bind.annotation.ContextType;
-import org.zkoss.spring.context.annotation.AfterCompose;
-import org.zkoss.zk.ui.Component;
-import org.zkoss.zk.ui.select.Selectors;
+import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zkplus.databind.BindingListModelListModel;
@@ -33,6 +26,16 @@ public class SurveyEditVM {
 	
 	private static final String ENGLISH_LANGUAGE_CODE = "eng";
 
+	protected static ModelVersion VERSION_EMPTY_SELECTION;
+	
+	{
+		//init static variables
+		VERSION_EMPTY_SELECTION = new ModelVersion();
+		VERSION_EMPTY_SELECTION.setId(-1);
+		String emptyOptionLabel = Labels.getLabel("global.empty_option");
+		VERSION_EMPTY_SELECTION.setName(emptyOptionLabel);
+	}
+	
 	protected XMLStringDateConverter xmlStringDateConverter = new XMLStringDateConverter();
 	
 	private String dateFormat = "dd/MM/yyyy";
@@ -47,15 +50,8 @@ public class SurveyEditVM {
 	
 	public SurveyEditVM() {
 		selectedLanguageCode = ENGLISH_LANGUAGE_CODE;
-//		survey = new CollectSurvey();
 	}
 	
-	@AfterCompose
-    public void afterCompose(@ContextParam(ContextType.VIEW) Component view){
-        Selectors.wireComponents(view, this, false);
-        Selectors.wireVariables(view, this, null);
-    }
-	 
 	@Command
 	public void save() throws SurveyImportException {
 		surveyManager.updateModel(survey);

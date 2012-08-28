@@ -10,18 +10,16 @@ import java.util.List;
 
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
+import org.openforis.idm.metamodel.CodeListLabel.Type;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.Versionable;
-import org.openforis.idm.metamodel.CodeListLabel.Type;
 import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.NotifyChange;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
-import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zkplus.databind.BindingListModelList;
 import org.zkoss.zul.DefaultTreeModel;
 import org.zkoss.zul.DefaultTreeNode;
-import org.zkoss.zul.Tree;
 import org.zkoss.zul.TreeNode;
 import org.zkoss.zul.Treeitem;
 
@@ -33,21 +31,9 @@ import org.zkoss.zul.Treeitem;
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class SurveyCodeListsEditVM extends SurveyItemEditVM<CodeList> {
 
-	@Wire
-	Tree itemsTree;
-	
 	private DefaultTreeModel<CodeListItem> treeModel;
 	
 	private CodeListItem editedChildItem;
-	
-	public SurveyCodeListsEditVM() {
-//		ModelVersion version = new ModelVersion();
-//		version.setName("test1");
-//		survey.addVersion(version);
-//		version = new ModelVersion();
-//		version.setName("test2");
-//		survey.addVersion(version);
-	}
 	
 	@Override
 	public BindingListModelList<CodeList> getItems() {

@@ -1,0 +1,37 @@
+<?page title="Openforis Collect Designer - Edit Survey" contentType="text/html;charset=UTF-8"?>
+<?taglib uri="/WEB-INF/tld/util.tld" prefix="util"?>
+<?variable-resolver class="org.zkoss.zkplus.spring.DelegatingVariableResolver"?>
+<zk>
+	<div id="itemsContainer"
+		apply="org.zkoss.bind.BindComposer"
+		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SurveySchemaEditVM')"
+		height="100%">
+		<hbox>
+			<vbox>
+				<tree id="nodesTree" 
+					width="400px" 
+					model="@load(vm.nodes)"
+					onSelect="@command('nodeSelected', node=self.selectedItem)"
+					>
+					<template name="model">
+			            <treeitem>
+			                <treerow>
+			                    <treecell label="@load(each.data.name)"/>
+			                </treerow>
+			            </treeitem>
+			  		</template>
+			    </tree>
+		        
+		        <hbox>
+			        <button label="${labels.survey.schema.add_root_entity}" 
+			        	onClick="@command('addRootEntity')" />
+	
+			        <button label="${labels.survey.schema.add_node}" 
+			        	onClick="@command('addNode')" 
+			        	disabled="@load(empty vm.editedNode)" />
+		        </hbox>
+		    </vbox>
+	
+		</hbox>
+    </div>
+</zk>
