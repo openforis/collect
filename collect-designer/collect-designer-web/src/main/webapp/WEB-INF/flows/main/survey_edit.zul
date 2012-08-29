@@ -1,6 +1,5 @@
 <?page title="Openforis Collect Designer - Edit Survey" contentType="text/html;charset=UTF-8"?>
 <?init class="org.zkoss.zk.ui.util.Composition" arg0="/WEB-INF/layouts/template.zul"?>
-<?init class="org.zkoss.zkplus.databind.AnnotateDataBinderInit" arg0="./surveyEditBox"?>
 <zk>
 	<vbox id="surveyEditBox"
 		height="100%" width="100%" 

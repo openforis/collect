@@ -31,7 +31,10 @@
 			        	disabled="@load(empty vm.editedNode)" />
 		        </hbox>
 		    </vbox>
-	
+			
+			<hbox>
+				<include src="survey_edit_node.zul" />
+			</hbox>
 		</hbox>
     </div>
 </zk>

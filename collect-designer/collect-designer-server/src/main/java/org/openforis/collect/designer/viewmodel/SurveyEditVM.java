@@ -3,6 +3,9 @@
  */
 package org.openforis.collect.designer.viewmodel;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.openforis.collect.designer.converter.XMLStringDateConverter;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectSurvey;
@@ -13,6 +16,7 @@ import org.zkoss.bind.annotation.Command;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
+import org.zkoss.zkplus.databind.BindingListModelList;
 import org.zkoss.zkplus.databind.BindingListModelListModel;
 import org.zkoss.zul.ListModelList;
 
@@ -95,6 +99,12 @@ public class SurveyEditVM {
 
 	public String getDateFormat() {
 		return dateFormat;
+	}
+
+	public List<ModelVersion> getVersionsForCombo() {
+		List<ModelVersion> result = new ArrayList<ModelVersion>(survey.getVersions());
+		result.add(0, VERSION_EMPTY_SELECTION);
+		return new BindingListModelList<ModelVersion>(result, false);
 	}
 	
 }

@@ -3,8 +3,6 @@
  */
 package org.openforis.collect.designer.viewmodel;
 
-import java.util.ArrayList;
-import java.util.List;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.openforis.idm.metamodel.ModelVersion;
@@ -128,12 +126,6 @@ public abstract class SurveyItemEditVM<T> extends SurveyEditVM {
 	
 	public boolean isEditingItem() {
 		return this.editedItem != null;
-	}
-	
-	public List<ModelVersion> getVersionsForCombo() {
-		List<ModelVersion> result = new ArrayList<ModelVersion>(survey.getVersions());
-		result.add(0, VERSION_EMPTY_SELECTION);
-		return new BindingListModelList<ModelVersion>(result, false);
 	}
 	
 	public ModelVersion getEditedItemSinceVersion() {

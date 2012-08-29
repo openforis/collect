@@ -1,0 +1,84 @@
+<zk>
+	<div width="400px">
+		<radiogroup id="typeGroup" selectedItem="@bind(vm.nodeType)" />
+		<grid>
+			<columns>
+				<column label="" width="150px" />
+				<column label="" />
+			</columns>
+			<rows>
+				<row>
+					<label value="${labels.survey.schema.nodetype$}:" />
+					<hbox>
+						<radio id="entityRB" value="entity" label="${labels.survey.schema.nodetype.entity}" radiogroup="typeGroup" />
+						<radio id="attributeRB" value="attribute" label="${labels.survey.schema.nodetype.attribute}" radiogroup="typeGroup" />
+					</hbox>
+				</row>
+				<row visible="@load(vm.nodeType eq 'attribute')">
+					<label value="${labels.survey.schema.attribute.type$}:" />
+					<listbox id="subTypeListBox" selectedIndex="@save(vm.attributeTypeIndex)" 
+						width="100px" mold="select">
+						<listitem label="${labels.survey.schema.attribute.type.boolean$}"/>
+						<listitem label="${labels.survey.schema.attribute.type.code}"/>
+						<listitem label="${labels.survey.schema.attribute.type.coordinate}"/>
+						<listitem label="${labels.survey.schema.attribute.type.date}"/>
+						<listitem label="${labels.survey.schema.attribute.type.file}"/>
+						<listitem label="${labels.survey.schema.attribute.type.number}"/>
+						<listitem label="${labels.survey.schema.attribute.type.range}"/>
+						<listitem label="${labels.survey.schema.attribute.type.taxon}"/>
+						<listitem label="${labels.survey.schema.attribute.type.text}"/>
+						<listitem label="${labels.survey.schema.attribute.type.time}"/>
+					</listbox>
+				</row>
+			</rows>
+		</grid>
+		
+		<div visible="@load(not empty vm.nodeType and (vm.nodeType eq 'entity' or not empty vm.attributeTypeIndex))" >
+			<tabbox id="tb" height="150px" width="100%" 
+				selectedIndex="@load(empty vm.nodeType or vm.nodeType eq 'attribute' and empty vm.attributeTypeIndex ? 0: vm.nodeType eq 'entity'? 1: vm.attributeTypeIndex + 2)">
+			    <tabs id="tabs" visible="false">
+			        <tab id="emptyTab" />
+			        <tab id="entityTab" />
+			        <tab id="booleanTab" />
+			        <tab id="codeTab" />
+			        <tab id="coordinateTab" />
+			        <tab id="dateTab" />
+			        <tab id="fileTab" />
+			        <tab id="numberTab" />
+			        <tab id="rangeTab" />
+			        <tab id="taxonTab" />
+			        <tab id="textTab" />
+			    </tabs>
+			    <tabpanels height="100%" width="100%">
+			    	<tabpanel height="100%" width="100%">
+			        </tabpanel>
+			        <tabpanel height="100%" width="100%">
+			        	<include src="survey_edit_entity.zul" />
+			        </tabpanel>
+			        <tabpanel height="100%" width="100%">
+			        </tabpanel>
+			        <tabpanel height="100%" width="100%">
+			        </tabpanel>
+			        <tabpanel height="100%" width="100%">
+			        </tabpanel>
+			        <tabpanel height="100%" width="100%">
+			        </tabpanel>
+			        <tabpanel height="100%" width="100%">
+			        </tabpanel>
+			        <tabpanel height="100%" width="100%">
+			        </tabpanel>
+			        <tabpanel height="100%" width="100%">
+			        </tabpanel>
+			        <tabpanel height="100%" width="100%">
+			        </tabpanel>
+			        <tabpanel height="100%" width="100%">
+			        </tabpanel>
+			    </tabpanels>
+			</tabbox>
+			
+			<button label="${labels.survey.schema.node.save}" 
+		        	onClick="@command('saveNode')" />
+		</div>
+		
+	</div>
+</zk>
