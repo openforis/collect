@@ -79,10 +79,6 @@ public abstract class SurveyItemEditVM<T> extends SurveyEditVM {
 		setSelectedItem(null);
 	}
 
-	@NotifyChange("versionsForCombo")
-	@GlobalCommand
-	public void versionsUpdated() {}
-	
 	protected abstract void deleteItemFromSurvey();
 
 	protected void applyChangesToSelectedItem() {

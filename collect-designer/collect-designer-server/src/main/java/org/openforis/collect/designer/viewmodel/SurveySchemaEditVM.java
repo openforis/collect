@@ -83,13 +83,18 @@ public class SurveySchemaEditVM extends SurveyEditVM {
 	
 	@Command
 	public void saveNode() {
-		String name = (String) editedItem.get("name");
-		String description = (String) editedItem.get("name");
-		Boolean multiple = (Boolean) editedItem.get("multiple");
 		if ( NODE_TYPE_ENTITY.equals(nodeType) ) {
 			editedNode = new EntityDefinition();
 		} else {
 		}
+		copyCommonNodeProperties();
+	}
+
+	private void copyCommonNodeProperties() {
+		String name = (String) editedItem.get("name");
+		String description = (String) editedItem.get("name");
+		Boolean multiple = (Boolean) editedItem.get("multiple");
+
 		editedNode.setName(name);
 		editedNode.setDescription(selectedLanguageCode, description);
 		editedNode.setMultiple(multiple);

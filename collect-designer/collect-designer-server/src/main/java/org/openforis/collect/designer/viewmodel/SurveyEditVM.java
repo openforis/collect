@@ -13,6 +13,8 @@ import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.idm.metamodel.Languages;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.zkoss.bind.annotation.Command;
+import org.zkoss.bind.annotation.GlobalCommand;
+import org.zkoss.bind.annotation.NotifyChange;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
@@ -61,6 +63,10 @@ public class SurveyEditVM {
 		surveyManager.updateModel(survey);
 	}
 	
+	@NotifyChange("versionsForCombo")
+	@GlobalCommand
+	public void versionsUpdated() {}
+
 	public BindingListModelListModel<String> getLanguageCodes() {
 		return new BindingListModelListModel<String>(new ListModelList<String>(Languages.LANGUAGE_CODES));
 	}
