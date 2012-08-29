@@ -15,8 +15,6 @@ import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NodeLabel.Type;
 import org.openforis.idm.metamodel.Schema;
-import org.zkoss.bind.Form;
-import org.zkoss.bind.SimpleForm;
 import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.NotifyChange;
@@ -39,163 +37,112 @@ public class SurveySchemaEditVM extends SurveyEditVM {
 
 	private DefaultTreeModel<NodeDefinition> treeModel;
 	
-	private NodeDefinition editedNode;
+	private NodeDefinition selectedNode;
 	
-	private Map<String, Object> editedItem = new HashMap<String, Object>();
+	private Map<String, Object> tempNode = new HashMap<String, Object>();
 	
 	private String nodeType;
 	
-	private Form entityForm = new SimpleForm();
-	
 	private Integer attributeTypeIndex;
+	
+	private boolean rootEntityCreation;
+	
+	private boolean newNode;
 	
 	private enum AttributeTypes {
 		BOOLEAN, CODE, COORDINATE, DATE, FILE, NUMBER, RANGE, TAXON, TEXT, TIME
 	}
 	
-	@NotifyChange({"editedChildItem","editingChildItem","childItemLabel","childItemDescription","childItemQualifiable","childItemSinceVersion","childItemDeprecatedVersion"})
+	@NotifyChange({"tempNode","newNode","rootEntityCreation"})
 	@Command
 	public void nodeSelected(@BindingParam("node") Treeitem node) {
 		if ( node != null ) {
 			TreeNode<NodeDefinition> treeNode = node.getValue();
-			setEditedNode(treeNode.getData());
+			selectedNode = treeNode.getData();
 		} else {
-			setEditedNode(null);
+			selectedNode = null;
 		}
+		initTempNode(selectedNode);
 	}
 	
-	@NotifyChange({"nodes","editedNode","editingNode","editedNodeHeadingLabel","editedNodeInstanceLabel","editedNodeNumberLabel","editedNodeDescription"})
+	@NotifyChange({"tempNode","newNode","rootEntityCreation"})
 	@Command
 	public void addRootEntity() {
-		Schema schema = survey.getSchema();
-		EntityDefinition defn = new EntityDefinition();
-		schema.addRootEntityDefinition(defn);
-		addTreeNode(defn);
-		setEditedNode(defn);
+		rootEntityCreation = true;
+		newNode = true;
+		selectedNode = null;
 	}
 	
-	@NotifyChange({"nodes","editedNode","editingNode","editedNodeHeadingLabel","editedNodeInstanceLabel","editedNodeNumberLabel","editedNodeDescription"})
+	@NotifyChange({"tempNode","newNode","rootEntityCreation"})
 	@Command
 	public void addNode() {
-		if ( editedNode != null && editedNode instanceof EntityDefinition ) {
+		if ( selectedNode != null && selectedNode instanceof EntityDefinition ) {
+			tempNode = new HashMap<String, Object>();
+			rootEntityCreation = false;
+			newNode = true;
 		}
 	}
 	
+	@NotifyChange({"selectedNode","tempNode","newNode","rootEntityCreation"})
 	@Command
 	public void saveNode() {
-		if ( NODE_TYPE_ENTITY.equals(nodeType) ) {
+		EntityDefinition editedNode;
+		if ( newNode && NODE_TYPE_ENTITY.equals(nodeType) ) {
 			editedNode = new EntityDefinition();
 		} else {
+			//TODO
+			editedNode = null;
 		}
-		copyCommonNodeProperties();
+		copyCommonTempNodeProperties(editedNode);
+		//TODO copy specific properties
+		
+		if ( newNode ) {
+			if ( rootEntityCreation ) {
+				Schema schema = survey.getSchema();
+				schema.addRootEntityDefinition((EntityDefinition) editedNode);
+			} else {
+				
+			}
+			addTreeNode(editedNode);
+		}
+		selectedNode = editedNode;
 	}
 
-	private void copyCommonNodeProperties() {
-		String name = (String) editedItem.get("name");
-		String description = (String) editedItem.get("name");
-		Boolean multiple = (Boolean) editedItem.get("multiple");
+	private void copyCommonTempNodeProperties(NodeDefinition node) {
+		String name = (String) tempNode.get("name");
+		String description = (String) tempNode.get("name");
+		Boolean multiple = (Boolean) tempNode.get("multiple");
 
-		editedNode.setName(name);
-		editedNode.setDescription(selectedLanguageCode, description);
-		editedNode.setMultiple(multiple);
-		ModelVersion sinceVersion = (ModelVersion) editedItem.get("sinceVersion");
+		node.setName(name);
+		node.setDescription(selectedLanguageCode, description);
+		node.setMultiple(multiple);
+		ModelVersion sinceVersion = (ModelVersion) tempNode.get("sinceVersion");
 		if ( sinceVersion != null && sinceVersion != VERSION_EMPTY_SELECTION ) {
-			editedNode.setSinceVersion(sinceVersion);
+			node.setSinceVersion(sinceVersion);
 		} else {
-			editedNode.setSinceVersion(null);
+			node.setSinceVersion(null);
 		}
-		ModelVersion deprecatedVersion = (ModelVersion) editedItem.get("deprecatedVersion");
+		ModelVersion deprecatedVersion = (ModelVersion) tempNode.get("deprecatedVersion");
 		if ( deprecatedVersion != null && deprecatedVersion != VERSION_EMPTY_SELECTION ) {
-			editedNode.setDeprecatedVersion(deprecatedVersion);
+			node.setDeprecatedVersion(deprecatedVersion);
 		} else {
-			editedNode.setDeprecatedVersion(null);
+			node.setDeprecatedVersion(null);
 		}
 	}
 	
-	public NodeDefinition getEditedNode() {
-		return editedNode;
-	}
-
-	public void setEditedNode(NodeDefinition editedNode) {
-		this.editedNode = editedNode;
-	}
-
-	public boolean isEditingNode() {
-		return this.editedNode != null;
-	}
-	
-	public String getEditedNodeHeadingLabel() {
-		return getEditedNodeLabel(Type.HEADING);
-	}
-
-	public void setEditedNodeHeadingLabel(String label) {
-		setEditedNodeLabel(Type.HEADING, label);
-	}
-	
-	public String getEditedNodeInstanceLabel() {
-		return getEditedNodeLabel(Type.INSTANCE);
-	}
-
-	public void setEditedNodeInstanceLabel(String label) {
-		setEditedNodeLabel(Type.INSTANCE, label);
-	}
-
-	public String getEditedNodeNumberLabel() {
-		return getEditedNodeLabel(Type.NUMBER);
-	}
-
-	public void setEditedNodeNumberLabel(String label) {
-		setEditedNodeLabel(Type.NUMBER, label);
-	}
-
-	protected String getEditedNodeLabel(Type type) {
-		return editedNode != null ? editedNode.getLabel(type, selectedLanguageCode): null;
-	}
-	
-	private void setEditedNodeLabel(Type type, String label) {
-		if ( editedNode != null ) {
-			editedNode.setLabel(type, selectedLanguageCode, label);
-		}
-	}
-	
-	public String getEditedNodeDescription() {
-		return editedNode != null ? editedNode.getDescription(selectedLanguageCode): null;
-	}
-
-	public void setEditedNodeDescription(String description) {
-		if ( editedNode != null ) {
-			editedNode.setDescription(selectedLanguageCode, description);
-		}
-	}
-
-	public boolean isEditedNodeMultiple() {
-		return editedNode != null ? editedNode.isMultiple(): false;
-	}
-
-	public void setEditedNodeMultiple(boolean value) {
-		if ( editedNode != null ) {
-			editedNode.setMultiple(value);
-		}
-	}
-	public ModelVersion getEditedNodeSinceVersion() {
-		return editedNode != null ? editedNode.getSinceVersion(): null;
-	}
-	
-	public void setEditedNodeSinceVersion(ModelVersion value) {
-		if ( editedNode != null ) {
-			ModelVersion modelVersion = value == VERSION_EMPTY_SELECTION ? null: value;
-			editedNode.setSinceVersion(modelVersion);
-		}
-	}
-
-	public ModelVersion getEditedNodeDeprecatedVersion() {
-		return editedNode != null ? editedNode.getDeprecatedVersion(): null;
-	}
-
-	public void setEditedNodeDeprecatedVersion(ModelVersion value) {
-		if ( editedNode != null  ) {
-			ModelVersion modelVersion = value == VERSION_EMPTY_SELECTION ? null: value;
-			editedNode.setDeprecatedVersion(modelVersion);
+	protected void initTempNode(NodeDefinition node) {
+		if ( node == null ) {
+			tempNode = null;
+		} else {
+			tempNode = new HashMap<String, Object>();
+			tempNode.put("name", node.getName());
+			tempNode.put("headingLabel", node.getLabel(Type.HEADING, selectedLanguageCode));
+			tempNode.put("instanceLabel", node.getLabel(Type.INSTANCE, selectedLanguageCode));
+			tempNode.put("numberLabel", node.getLabel(Type.NUMBER, selectedLanguageCode));
+			tempNode.put("description", node.getDescription(selectedLanguageCode));
+			tempNode.put("multiple", node.isMultiple());
+			tempNode.put("sinceVersion", node.getSinceVersion());
+			tempNode.put("deprecatedVersion", node.getDeprecatedVersion());
 		}
 	}
 	
@@ -276,10 +223,6 @@ public class SurveySchemaEditVM extends SurveyEditVM {
 		this.nodeType = nodeType;
 	}
 
-	public Form getEntityForm() {
-		return entityForm;
-	}
-
 	public Integer getAttributeTypeIndex() {
 		return attributeTypeIndex;
 	}
@@ -288,13 +231,24 @@ public class SurveySchemaEditVM extends SurveyEditVM {
 		this.attributeTypeIndex = attributeTypeIndex;
 	}
 
-	public Map<String, Object> getEditedItem() {
-		return editedItem;
+	public boolean isRootEntityCreation() {
+		return rootEntityCreation;
 	}
 
-	public void setEditedItem(Map<String, Object> editedItem) {
-		this.editedItem = editedItem;
+	public boolean isNewNode() {
+		return newNode;
 	}
 
+	public Map<String, Object> getTempNode() {
+		return tempNode;
+	}
+
+	public void setTempNode(Map<String, Object> tempNode) {
+		this.tempNode = tempNode;
+	}
+
+	public NodeDefinition getSelectedNode() {
+		return selectedNode;
+	}
 	
 }

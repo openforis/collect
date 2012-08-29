@@ -10,8 +10,15 @@
 				<row>
 					<label value="${labels.survey.schema.nodetype$}:" />
 					<hbox>
-						<radio id="entityRB" value="entity" label="${labels.survey.schema.nodetype.entity}" radiogroup="typeGroup" />
-						<radio id="attributeRB" value="attribute" label="${labels.survey.schema.nodetype.attribute}" radiogroup="typeGroup" />
+						<radio id="entityRB" value="entity" 
+							label="${labels.survey.schema.nodetype.entity}" 
+							radiogroup="typeGroup"
+							selected="@load(newNode and vm.rootEntityCreation)" />
+						<radio id="attributeRB" value="attribute" 
+							label="${labels.survey.schema.nodetype.attribute}" 
+							radiogroup="typeGroup"
+							visible="@load(newNode and not vm.rootEntityCreation)"
+							 />
 					</hbox>
 				</row>
 				<row visible="@load(vm.nodeType eq 'attribute')">

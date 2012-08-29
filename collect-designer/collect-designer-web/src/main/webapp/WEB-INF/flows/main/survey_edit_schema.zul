@@ -28,7 +28,7 @@
 	
 			        <button label="${labels.survey.schema.add_node}" 
 			        	onClick="@command('addNode')" 
-			        	disabled="@load(empty vm.editedNode)" />
+			        	disabled="@load(empty vm.selectedNode)" />
 		        </hbox>
 		    </vbox>
 			

@@ -1,7 +1,7 @@
 <zk>
 	<div 
 		validationMessages="@id('vmsgs')"
-		form="@id('fx') @init(vm.entityForm) @load(vm.editedItem) @save(vm.editedItem, before='saveNode')"
+		form="@id('fx') @load(vm.tempNode) @save(vm.tempNode, before='saveNode')"
 		height="400opx" width="400px">
 
 		<include src="survey_edit_node_common.zul" />
