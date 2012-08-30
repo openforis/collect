@@ -9,17 +9,21 @@
 			<rows>
 				<row>
 					<label value="${labels.survey.schema.nodetype$}:" />
-					<hbox>
+					<hbox id="typeSelectionBox" 
+						visible="@load(vm.newNode and not vm.rootEntityCreation)">
 						<radio id="entityRB" value="entity" 
 							label="${labels.survey.schema.nodetype.entity}" 
 							radiogroup="typeGroup"
-							selected="@load(newNode and vm.rootEntityCreation)" />
+							/>
 						<radio id="attributeRB" value="attribute" 
 							label="${labels.survey.schema.nodetype.attribute}" 
 							radiogroup="typeGroup"
-							visible="@load(newNode and not vm.rootEntityCreation)"
-							 />
+							/>
 					</hbox>
+					<label visible="@load(not vm.newNode or vm.rootEntityCreation)"
+						value="@load(vm.nodeType eq entity ? 
+							$labels.survey.schema.nodetype.entity: 
+							$labels.survey.schema.nodetype.attribute))" />
 				</row>
 				<row visible="@load(vm.nodeType eq 'attribute')">
 					<label value="${labels.survey.schema.attribute.type$}:" />
@@ -42,7 +46,8 @@
 		
 		<div visible="@load(not empty vm.nodeType and (vm.nodeType eq 'entity' or not empty vm.attributeTypeIndex))" >
 			<tabbox id="tb" height="150px" width="100%" 
-				selectedIndex="@load(empty vm.nodeType or vm.nodeType eq 'attribute' and empty vm.attributeTypeIndex ? 0: vm.nodeType eq 'entity'? 1: vm.attributeTypeIndex + 2)">
+				selectedIndex="@load(empty vm.nodeType or vm.nodeType eq 'attribute' and empty vm.attributeTypeIndex ? 0: 
+					vm.nodeType eq 'entity'? 1: vm.attributeTypeIndex + 2)">
 			    <tabs id="tabs" visible="false">
 			        <tab id="emptyTab" />
 			        <tab id="entityTab" />

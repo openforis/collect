@@ -65,21 +65,28 @@ public class SurveySchemaEditVM extends SurveyEditVM {
 		initTempNode(selectedNode);
 	}
 	
-	@NotifyChange({"tempNode","newNode","rootEntityCreation"})
+	@NotifyChange({"tempNode","newNode","rootEntityCreation","nodeType"})
 	@Command
 	public void addRootEntity() {
-		rootEntityCreation = true;
 		newNode = true;
+		rootEntityCreation = true;
+		nodeType = NODE_TYPE_ENTITY;
 		selectedNode = null;
+		tempNode = new HashMap<String, Object>();
+		treeModel.setSelection(null);
 	}
 	
-	@NotifyChange({"tempNode","newNode","rootEntityCreation"})
+	@NotifyChange({"tempNode","newNode","rootEntityCreation","nodeType"})
 	@Command
-	public void addNode() {
+	public void addNode() throws Exception {
 		if ( selectedNode != null && selectedNode instanceof EntityDefinition ) {
 			tempNode = new HashMap<String, Object>();
 			rootEntityCreation = false;
 			newNode = true;
+			nodeType = null;
+			tempNode = new HashMap<String, Object>();
+		} else {
+			throw new Exception("Cannot add a child to an Attribute Definition");
 		}
 	}
 	
