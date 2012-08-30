@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import org.openforis.collect.designer.form.FormObject;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
 import org.openforis.idm.metamodel.CodeListLabel.Type;
@@ -231,7 +232,7 @@ public class SurveyCodeListsEditVM extends SurveyItemEditVM<CodeList> {
 	
 	public void setChildItemSinceVersion(ModelVersion value) {
 		if ( editedChildItem != null && editedChildItem instanceof Versionable ) {
-			ModelVersion modelVersion = value == VERSION_EMPTY_SELECTION ? null: value;
+			ModelVersion modelVersion = value == FormObject.VERSION_EMPTY_SELECTION ? null: value;
 			( (Versionable) editedChildItem).setSinceVersion(modelVersion);
 		}
 	}
@@ -246,7 +247,7 @@ public class SurveyCodeListsEditVM extends SurveyItemEditVM<CodeList> {
 
 	public void setChildItemDeprecatedVersion(ModelVersion value) {
 		if ( editedChildItem != null && editedChildItem instanceof Versionable ) {
-			ModelVersion modelVersion = value == VERSION_EMPTY_SELECTION ? null: value;
+			ModelVersion modelVersion = value == FormObject.VERSION_EMPTY_SELECTION ? null: value;
 			( (Versionable) editedChildItem).setDeprecatedVersion(modelVersion);
 		}
 	}

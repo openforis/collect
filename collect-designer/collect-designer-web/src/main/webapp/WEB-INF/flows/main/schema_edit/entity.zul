@@ -1,0 +1,11 @@
+<zk>
+	<div 
+		validationMessages="@id('vmsgs')"
+		form="@id('fx') @load(vm.formObject) @save(vm.formObject, before='saveNode')"
+		width="400px">
+
+		<include src="schema_edit/node_common.zul" />
+		
+	</div>
+
+</zk>

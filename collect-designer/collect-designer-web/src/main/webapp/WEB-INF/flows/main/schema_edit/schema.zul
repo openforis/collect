@@ -33,7 +33,7 @@
 		    </vbox>
 			
 			<hbox>
-				<include src="survey_edit_node.zul" />
+				<include src="schema_edit/node.zul" />
 			</hbox>
 		</hbox>
     </div>

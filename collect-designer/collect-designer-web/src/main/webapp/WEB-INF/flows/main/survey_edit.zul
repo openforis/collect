@@ -43,7 +43,7 @@
 		        	<include src="survey_edit_srs.zul" />
 		        </tabpanel>
 		        <tabpanel height="100%" width="100%">
-		        	<include src="survey_edit_schema.zul" />
+		        	<include src="schema_edit/schema.zul" />
 		        </tabpanel>
 		    </tabpanels>
 		</tabbox>

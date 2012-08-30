@@ -5,11 +5,11 @@ package org.openforis.collect.designer.viewmodel;
 
 
 import org.apache.commons.beanutils.BeanUtils;
+import org.openforis.collect.designer.form.FormObject;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.Versionable;
 import org.springframework.core.GenericTypeResolver;
 import org.zkoss.bind.annotation.Command;
-import org.zkoss.bind.annotation.GlobalCommand;
 import org.zkoss.bind.annotation.NotifyChange;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zkplus.databind.BindingListModelList;
@@ -134,7 +134,7 @@ public abstract class SurveyItemEditVM<T> extends SurveyEditVM {
 	
 	public void setEditedItemSinceVersion(ModelVersion value) {
 		if ( editedItem != null && editedItem instanceof Versionable ) {
-			ModelVersion modelVersion = value == VERSION_EMPTY_SELECTION ? null: value;
+			ModelVersion modelVersion = value == FormObject.VERSION_EMPTY_SELECTION ? null: value;
 			( (Versionable) editedItem).setSinceVersion(modelVersion);
 		}
 	}
@@ -149,7 +149,7 @@ public abstract class SurveyItemEditVM<T> extends SurveyEditVM {
 
 	public void setEditedItemDeprecatedVersion(ModelVersion value) {
 		if ( editedItem != null && editedItem instanceof Versionable ) {
-			ModelVersion modelVersion = value == VERSION_EMPTY_SELECTION ? null: value;
+			ModelVersion modelVersion = value == FormObject.VERSION_EMPTY_SELECTION ? null: value;
 			( (Versionable) editedItem).setDeprecatedVersion(modelVersion);
 		}
 	}

@@ -1,0 +1,84 @@
+<zk>
+	<grid>
+		<columns>
+			<column label="" width="150px" />
+			<column label="" />
+		</columns>
+		<rows>
+			<row>
+				<label value="${labels.global.item.name}:" />
+				<textbox width="99%" value="@bind(fx.name)" />
+			</row>
+			<row>
+				<label value="${labels.survey.schema.node.multiple}:" />
+				<checkbox checked="@load(fx.multiple eq true) @save(fx.multiple)" />
+			</row>
+			<row visible="@load(fx.multiple eq true)">
+				<label value="${labels.survey.schema.node.required}:" />
+				<checkbox checked="@load(fx.required eq true) @save(fx.required)" />
+			</row>
+			<row visible="@load(fx.multiple eq true)">
+				<label value="${labels.survey.schema.node.required_expression}:" />
+				<textbox width="99%" value="@bind(fx.requiredExpression)" />
+			</row>
+			<row visible="@load(fx.multiple ne true)">
+				<label value="${labels.survey.schema.node.min_count}:" />
+				<intbox value="@bind(fx.minCount)" />
+			</row>
+			<row visible="@load(fx.multiple ne true)">
+				<label value="${labels.survey.schema.node.max_count}:" />
+				<intbox value="@bind(fx.maxCount)" />
+			</row>
+			<row>
+				<label value="${labels.survey.schema.node.instanceLabel}:" />
+				<textbox width="99%" value="@bind(fx.instanceLabel)" />
+			</row>
+			<row>
+				<label value="${labels.survey.schema.node.headingLabel}:" />
+				<textbox width="99%" value="@bind(fx.headingLabel)" />
+			</row>
+			<row>
+				<label value="${labels.survey.schema.node.numberLabel}:" />
+				<textbox width="99%" value="@bind(fx.numberLabel)" />
+			</row>
+			<row>
+				<label value="${labels.survey.schema.node.interviewPromptLabel}:" />
+				<textbox width="99%" value="@bind(fx.interviewPromptLabel)" />
+			</row>
+			<row>
+				<label value="${labels.survey.schema.node.paperPromptLabel}:" />
+				<textbox width="99%" value="@bind(fx.paperPromptLabel)" />
+			</row>
+			<row>
+				<label value="${labels.survey.schema.node.handheldPromptLabel}:" />
+				<textbox width="99%" value="@bind(fx.handheldPromptLabel)" />
+			</row>
+			<row>
+				<label value="${labels.survey.schema.node.pcPromptLabel}:" />
+				<textbox width="99%" value="@bind(fx.pcPromptLabel)" />
+			</row>
+			<row>
+				<label value="${labels.global.item.description}:" />
+				<textbox width="99%" value="@bind(fx.description)" />
+			</row>
+			<row>
+				<label value="${labels.global.item.since_version}:" />
+				<listbox width="150px" model="@load(vm.versionsForCombo)"
+					selectedItem="@bind(fx.sinceVersion)" mold="select">
+					<template name="model">
+						<listitem label="@load(each.name)" />
+					</template>
+				</listbox>
+			</row>
+			<row>
+				<label value="${labels.global.item.deprecated_version}:" />
+				<listbox width="150px" model="@load(vm.versionsForCombo)"
+					selectedItem="@bind(fx.deprecatedVersion)" mold="select">
+					<template name="model">
+						<listitem label="@load(each.name)" />
+					</template>
+				</listbox>
+			</row>
+		</rows>
+	</grid>
+</zk>

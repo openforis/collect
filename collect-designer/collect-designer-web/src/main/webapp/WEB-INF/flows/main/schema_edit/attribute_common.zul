@@ -1,0 +1,4 @@
+<zk>
+	<include src="schema_edit/node_common.zul" />
+
+</zk>

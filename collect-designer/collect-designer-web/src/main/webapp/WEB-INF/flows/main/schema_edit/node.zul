@@ -1,6 +1,6 @@
 <zk>
 	<div width="400px">
-		<radiogroup id="typeGroup" selectedItem="@bind(vm.nodeType)" />
+		<radiogroup id="typeGroup" onCheck="@command('nodeTypeChanged', nodeType=self.selectedItem.value)" />
 		<grid>
 			<columns>
 				<column label="" width="150px" />
@@ -27,7 +27,8 @@
 				</row>
 				<row visible="@load(vm.nodeType eq 'attribute')">
 					<label value="${labels.survey.schema.attribute.type$}:" />
-					<listbox id="subTypeListBox" selectedIndex="@save(vm.attributeTypeIndex)" 
+					<listbox id="subTypeListBox"
+						onSelect="@command('attributeTypeChanged', attributeTypeIndex=self.selectedIndex)" 
 						width="100px" mold="select">
 						<listitem label="${labels.survey.schema.attribute.type.boolean$}"/>
 						<listitem label="${labels.survey.schema.attribute.type.code}"/>
@@ -44,10 +45,22 @@
 			</rows>
 		</grid>
 		
-		<div visible="@load(not empty vm.nodeType and (vm.nodeType eq 'entity' or not empty vm.attributeTypeIndex))" >
-			<tabbox id="tb" height="150px" width="100%" 
-				selectedIndex="@load(empty vm.nodeType or vm.nodeType eq 'attribute' and empty vm.attributeTypeIndex ? 0: 
-					vm.nodeType eq 'entity'? 1: vm.attributeTypeIndex + 2)">
+		<div visible="@load(not empty vm.nodeType and (vm.nodeType eq 'entity' or not empty vm.attributeType))" >
+			<tabbox id="tb" height="150px" width="100%"
+				selectedIndex="@load(empty vm.nodeType or vm.nodeType eq 'attribute' and empty vm.attributeType ? 0:
+					vm.nodeType eq 'entity'? 1:
+					vm.attributeType eq 'BOOLEAN' ? 1:
+					vm.attributeType eq 'CODE' ? 2:
+					vm.attributeType eq 'COORDINATE' ? 3:
+					vm.attributeType eq 'DATE' ? 4:
+					vm.attributeType eq 'FILE' ? 5:
+					vm.attributeType eq 'NUMBER' ? 6:
+					vm.attributeType eq 'RANGE' ? 7:
+					vm.attributeType eq 'TAXON' ? 8:
+					vm.attributeType eq 'TEXT' ? 9:
+					vm.attributeType eq 'TIME' ? 10: 
+					0
+					)" >
 			    <tabs id="tabs" visible="false">
 			        <tab id="emptyTab" />
 			        <tab id="entityTab" />
@@ -65,7 +78,7 @@
 			    	<tabpanel height="100%" width="100%">
 			        </tabpanel>
 			        <tabpanel height="100%" width="100%">
-			        	<include src="survey_edit_entity.zul" />
+			        	<include src="schema_edit/entity.zul" />
 			        </tabpanel>
 			        <tabpanel height="100%" width="100%">
 			        </tabpanel>
@@ -92,5 +105,7 @@
 		        	onClick="@command('saveNode')" />
 		</div>
 		
+<!-- 		selectedIndex="@load(empty vm.nodeType or vm.nodeType eq 'attribute' and empty vm.attributeTypeIndex ? 0:  -->
+<!-- 					vm.nodeType eq 'entity'? 1: vm.attributeTypeIndex + 2)" -->
 	</div>
 </zk>
