@@ -13,13 +13,13 @@
 			</columns>
 			<rows>
 				<row>
-					<label value="${labels.survey.schema.attribute.boolean.type$}:" />
+					<label value="${labels.survey.schema.attribute.bool.type$}:" />
 					<radiogroup selectedItem="@load(fx.affirmativeOnly ? 
 							affirmativeOnlyRadioButton: threeStateRadioButton)"
 						onCheck="@fx.affirmativeOnly = self.selectedItem == affirmativeOnlyRadioButton">
-						<radio id="affirmativeOnlyRadioButton" label="${labels.survey.schema.attribute.boolean.type.affirmativeOnly}"
+						<radio id="affirmativeOnlyRadioButton" label="${labels.survey.schema.attribute.bool.type.affirmativeOnly}"
 							value="affirmativeOnly" />
-						<radio id="threeStateRadioButton" label="${labels.survey.schema.attribute.boolean.type.threeState}"
+						<radio id="threeStateRadioButton" label="${labels.survey.schema.attribute.bool.type.threeState}"
 							value="threeState" />
 					</radiogroup>
 				</row>

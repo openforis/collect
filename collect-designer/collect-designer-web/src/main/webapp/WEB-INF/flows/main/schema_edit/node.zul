@@ -81,6 +81,7 @@
 			        	<include src="schema_edit/entity.zul" />
 			        </tabpanel>
 			        <tabpanel height="100%" width="100%">
+			        	<include src="schema_edit/attribute_boolean.zul" />
 			        </tabpanel>
 			        <tabpanel height="100%" width="100%">
 			        </tabpanel>
@@ -105,7 +106,5 @@
 		        	onClick="@command('saveNode')" />
 		</div>
 		
-<!-- 		selectedIndex="@load(empty vm.nodeType or vm.nodeType eq 'attribute' and empty vm.attributeTypeIndex ? 0:  -->
-<!-- 					vm.nodeType eq 'entity'? 1: vm.attributeTypeIndex + 2)" -->
 	</div>
 </zk>
