@@ -28,82 +28,46 @@
 				<row visible="@load(vm.nodeType eq 'attribute')">
 					<label value="${labels.survey.schema.attribute.type$}:" />
 					<listbox id="subTypeListBox"
-						onSelect="@command('attributeTypeChanged', attributeTypeIndex=self.selectedIndex)" 
+						onSelect="@command('attributeTypeChanged', attributeType=self.selectedItem.value)" 
 						width="100px" mold="select">
-						<listitem label="${labels.survey.schema.attribute.type.boolean$}"/>
-						<listitem label="${labels.survey.schema.attribute.type.code}"/>
-						<listitem label="${labels.survey.schema.attribute.type.coordinate}"/>
-						<listitem label="${labels.survey.schema.attribute.type.date}"/>
-						<listitem label="${labels.survey.schema.attribute.type.file}"/>
-						<listitem label="${labels.survey.schema.attribute.type.number}"/>
-						<listitem label="${labels.survey.schema.attribute.type.range}"/>
-						<listitem label="${labels.survey.schema.attribute.type.taxon}"/>
-						<listitem label="${labels.survey.schema.attribute.type.text}"/>
-						<listitem label="${labels.survey.schema.attribute.type.time}"/>
+						<listitem label="${labels.survey.schema.attribute.type.boolean$}" value="BOOLEAN" />
+						<listitem label="${labels.survey.schema.attribute.type.code}" value="CODE" />
+						<listitem label="${labels.survey.schema.attribute.type.coordinate}" value="COORDINATE" />
+						<listitem label="${labels.survey.schema.attribute.type.date}" value="DATE" />
+						<listitem label="${labels.survey.schema.attribute.type.file}" value="FILE" />
+						<listitem label="${labels.survey.schema.attribute.type.number}" value="NUMBER" />
+						<listitem label="${labels.survey.schema.attribute.type.range}" value="RANGE" />
+						<listitem label="${labels.survey.schema.attribute.type.taxon}" value="TAXON" />
+						<listitem label="${labels.survey.schema.attribute.type.text}" value="TEXT" />
+						<listitem label="${labels.survey.schema.attribute.type.time}" value="TIME" />
 					</listbox>
 				</row>
 			</rows>
 		</grid>
 		
 		<div visible="@load(not empty vm.nodeType and (vm.nodeType eq 'entity' or not empty vm.attributeType))" >
-			<tabbox id="tb" height="150px" width="100%"
-				selectedIndex="@load(empty vm.nodeType or vm.nodeType eq 'attribute' and empty vm.attributeType ? 0:
-					vm.nodeType eq 'entity'? 1:
-					vm.attributeType eq 'BOOLEAN' ? 1:
-					vm.attributeType eq 'CODE' ? 2:
-					vm.attributeType eq 'COORDINATE' ? 3:
-					vm.attributeType eq 'DATE' ? 4:
-					vm.attributeType eq 'FILE' ? 5:
-					vm.attributeType eq 'NUMBER' ? 6:
-					vm.attributeType eq 'RANGE' ? 7:
-					vm.attributeType eq 'TAXON' ? 8:
-					vm.attributeType eq 'TEXT' ? 9:
-					vm.attributeType eq 'TIME' ? 10: 
-					0
-					)" >
-			    <tabs id="tabs" visible="false">
-			        <tab id="emptyTab" />
-			        <tab id="entityTab" />
-			        <tab id="booleanTab" />
-			        <tab id="codeTab" />
-			        <tab id="coordinateTab" />
-			        <tab id="dateTab" />
-			        <tab id="fileTab" />
-			        <tab id="numberTab" />
-			        <tab id="rangeTab" />
-			        <tab id="taxonTab" />
-			        <tab id="textTab" />
-			    </tabs>
-			    <tabpanels height="100%" width="100%">
-			    	<tabpanel height="100%" width="100%">
-			        </tabpanel>
-			        <tabpanel height="100%" width="100%">
-			        	<include src="schema_edit/entity.zul" />
-			        </tabpanel>
-			        <tabpanel height="100%" width="100%">
-			        	<include src="schema_edit/attribute_boolean.zul" />
-			        </tabpanel>
-			        <tabpanel height="100%" width="100%">
-			        </tabpanel>
-			        <tabpanel height="100%" width="100%">
-			        </tabpanel>
-			        <tabpanel height="100%" width="100%">
-			        </tabpanel>
-			        <tabpanel height="100%" width="100%">
-			        </tabpanel>
-			        <tabpanel height="100%" width="100%">
-			        </tabpanel>
-			        <tabpanel height="100%" width="100%">
-			        </tabpanel>
-			        <tabpanel height="100%" width="100%">
-			        </tabpanel>
-			        <tabpanel height="100%" width="100%">
-			        </tabpanel>
-			    </tabpanels>
-			</tabbox>
-			
-			<button label="${labels.survey.schema.node.save}" 
-		        	onClick="@command('saveNode')" />
+			<div 
+				id="nodeFormContainer"
+				validationMessages="@id('vmsgs')"
+				form="@id('fx') @load(vm.formObject) @save(vm.formObject, before='saveNode')"
+				width="400px">
+				<include src="
+					@load(empty vm.nodeType or vm.nodeType eq 'attribute' and empty vm.attributeType ? null:
+ 						vm.nodeType eq 'entity'? 'schema_edit/entity.zul':
+ 						vm.attributeType eq 'BOOLEAN' ? 'schema_edit/attribute_boolean.zul':
+ 						vm.attributeType eq 'CODE' ? null:
+ 						vm.attributeType eq 'COORDINATE' ? null:
+ 						vm.attributeType eq 'DATE' ? null:
+ 						vm.attributeType eq 'FILE' ? null:
+ 						vm.attributeType eq 'NUMBER' ? null:
+ 						vm.attributeType eq 'RANGE' ? null:
+ 						vm.attributeType eq 'TAXON' ? null:
+ 						vm.attributeType eq 'TEXT' ? null:
+ 						vm.attributeType eq 'TIME' ? null: 
+ 						null)" />
+				<button label="${labels.survey.schema.node.save}" 
+			        	onClick="@command('saveNode')" />
+			</div>
 		</div>
 		
 	</div>

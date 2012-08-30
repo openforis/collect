@@ -1,31 +1,24 @@
 <zk>
-	<div 
-		validationMessages="@id('vmsgs')"
-		form="@id('fx') @load(vm.formObject) @save(vm.formObject, before='saveNode')"
-		height="400opx" width="400px">
-
-		<include src="schema_edit/attribute_common.zul" />
-		
-		<grid>
-			<columns>
-				<column label="" width="150px" />
-				<column label="" />
-			</columns>
-			<rows>
-				<row>
-					<label value="${labels.survey.schema.attribute.bool.type$}:" />
-					<radiogroup selectedItem="@load(fx.affirmativeOnly ? 
-							affirmativeOnlyRadioButton: threeStateRadioButton)"
-						onCheck="@fx.affirmativeOnly = self.selectedItem == affirmativeOnlyRadioButton">
-						<radio id="affirmativeOnlyRadioButton" label="${labels.survey.schema.attribute.bool.type.affirmativeOnly}"
-							value="affirmativeOnly" />
-						<radio id="threeStateRadioButton" label="${labels.survey.schema.attribute.bool.type.threeState}"
-							value="threeState" />
-					</radiogroup>
-				</row>
-			</rows>
-		</grid>
-		
-	</div>
-
+	<include src="schema_edit/attribute_common.zul" />
+	
+	<grid>
+		<columns>
+			<column label="" width="150px" />
+			<column label="" />
+		</columns>
+		<rows>
+			<row>
+				<label value="${labels.survey.schema.attribute.bool.type$}:" />
+				<radiogroup selectedItem="@load(fx.affirmativeOnly ? 
+							affirmativeOnlyRadioButton: threeStateRadioButton)">
+					<radio id="affirmativeOnlyRadioButton" 
+						label="${labels.survey.schema.attribute.bool.type.affirmativeOnly}"
+						value="affirmativeOnly" />
+					<radio id="threeStateRadioButton" 
+						label="${labels.survey.schema.attribute.bool.type.threeState}"
+						value="threeState" />
+				</radiogroup>
+			</row>
+		</rows>
+	</grid>
 </zk>

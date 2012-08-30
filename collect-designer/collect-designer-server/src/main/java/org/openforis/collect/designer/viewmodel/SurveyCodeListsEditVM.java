@@ -75,7 +75,6 @@ public class SurveyCodeListsEditVM extends SurveyItemEditVM<CodeList> {
 		CodeListItem item = new CodeListItem();
 		editedItem.addItem(item);
 		editedChildItem = item;
-		//initTreeModel();
 		addTreeNode(item);
 	}
 
@@ -85,7 +84,6 @@ public class SurveyCodeListsEditVM extends SurveyItemEditVM<CodeList> {
 		CodeListItem item = new CodeListItem();
 		editedChildItem.addChildItem(item);
 		editedChildItem = item;
-		//initTreeModel();
 		addTreeNode(item);
 	}
 	

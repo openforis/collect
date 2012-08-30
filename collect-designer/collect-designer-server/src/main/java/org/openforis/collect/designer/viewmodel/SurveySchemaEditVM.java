@@ -83,7 +83,7 @@ public class SurveySchemaEditVM extends SurveyEditVM {
 		rootEntityCreation = true;
 		nodeType = NODE_TYPE_ENTITY;
 		selectedNode = null;
-		formObject = new EntityDefinitionFormObject();
+		initFormObject();
 		Collection<NodeDefinitionTreeNode> emptySelection = Collections.emptyList();
 		treeModel.setSelection(emptySelection);
 	}
@@ -92,10 +92,11 @@ public class SurveySchemaEditVM extends SurveyEditVM {
 	@Command
 	public void addNode() throws Exception {
 		if ( selectedNode != null && selectedNode instanceof EntityDefinition ) {
+			nodeType = null;
+			attributeType = null;
 			formObject = null;
 			rootEntityCreation = false;
 			newNode = true;
-			nodeType = null;
 		} else {
 			throw new Exception("Cannot add a child to an Attribute Definition");
 		}
@@ -123,6 +124,7 @@ public class SurveySchemaEditVM extends SurveyEditVM {
 			addTreeNodeToSelectedNode(editedNode);
 		}
 		selectedNode = editedNode;
+		initFormObject(selectedNode);
 	}
 
 	@NotifyChange({"nodeType","formObject"})
@@ -134,8 +136,8 @@ public class SurveySchemaEditVM extends SurveyEditVM {
 
 	@NotifyChange({"attributeType","formObject"})
 	@Command
-	public void attributeTypeChanged(@BindingParam("attributeType") String attributeTypeIndex) {
-		this.attributeType = attributeTypeIndex;
+	public void attributeTypeChanged(@BindingParam("attributeType") String attributeType) {
+		this.attributeType = attributeType;
 		initFormObject();
 	}
 
