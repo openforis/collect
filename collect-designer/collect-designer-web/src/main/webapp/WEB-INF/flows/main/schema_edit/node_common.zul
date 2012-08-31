@@ -2,14 +2,14 @@
 	<grid>
 		<columns>
 			<column label="" width="150px" />
-			<column label="" />
+			<column label="" width="300px" />
 		</columns>
 		<rows>
 			<row>
 				<label value="${labels.global.item.name}:" />
 				<cell>
-					<textbox width="99%" value="@bind(fx.name)" />
-					<label class="error" value="@load(vmsgs['name'])" />
+					<textbox width="150px" value="@bind(fx.name)" />
+					<label class="error" value="@load(node_defn_vmsgs['name'])" />
 				</cell>
 			</row>
 			<row>
@@ -23,65 +23,65 @@
 			<row visible="@load(fx.multiple ne true)">
 				<label value="${labels.survey.schema.node.required_expression}:" />
 				<cell>
-					<textbox width="99%" value="@bind(fx.requiredExpression)" />
-					<label class="error" value="@load(vmsgs['requiredExpression'])" />
+					<textbox width="150px" value="@bind(fx.requiredExpression)" />
+					<label class="error" value="@load(node_defn_vmsgs['requiredExpression'])" />
 				</cell>
 			</row>
 			<row visible="@load(fx.multiple eq true)">
 				<label value="${labels.survey.schema.node.min_count}:" />
 				<cell>
 					<intbox value="@bind(fx.minCount)" />
-					<label class="error" value="@load(vmsgs['minCount'])" />
+					<label class="error" value="@load(node_defn_vmsgs['minCount'])" />
 				</cell>
 			</row>
 			<row visible="@load(fx.multiple eq true)">
 				<label value="${labels.survey.schema.node.max_count}:" />
 				<cell>
 					<intbox value="@bind(fx.maxCount)" />
-					<label class="error" value="@load(vmsgs['maxCount'])" />
+					<label class="error" value="@load(node_defn_vmsgs['maxCount'])" />
 				</cell>
 			</row>
 			<row>
 				<label value="${labels.survey.schema.node.instanceLabel}:" />
 				<cell>
-					<textbox width="99%" value="@bind(fx.instanceLabel)" />
-					<label class="error" value="@load(vmsgs['instanceLabel'])" />
+					<textbox width="150px" value="@bind(fx.instanceLabel)" />
+					<label class="error" value="@load(node_defn_vmsgs['instanceLabel'])" />
 				</cell>
 			</row>
 			<row>
 				<label value="${labels.survey.schema.node.headingLabel}:" />
 				<cell>
-					<textbox width="99%" value="@bind(fx.headingLabel)" />
-					<label class="error" value="@load(vmsgs['headingLabel'])" />
+					<textbox width="150px" value="@bind(fx.headingLabel)" />
+					<label class="error" value="@load(node_defn_vmsgs['headingLabel'])" />
 				</cell>
 			</row>
 			<row>
 				<label value="${labels.survey.schema.node.numberLabel}:" />
 				<cell>
-					<textbox width="99%" value="@bind(fx.numberLabel)" />
-					<label class="error" value="@load(vmsgs['numberLabel'])" />
+					<textbox width="150px" value="@bind(fx.numberLabel)" />
+					<label class="error" value="@load(node_defn_vmsgs['numberLabel'])" />
 				</cell>
 			</row>
 			<row>
 				<label value="${labels.survey.schema.node.interviewPromptLabel}:" />
-				<textbox width="99%" value="@bind(fx.interviewPromptLabel)" />
+				<textbox width="150px" value="@bind(fx.interviewPromptLabel)" />
 			</row>
 			<row>
 				<label value="${labels.survey.schema.node.paperPromptLabel}:" />
-				<textbox width="99%" value="@bind(fx.paperPromptLabel)" />
+				<textbox width="150px" value="@bind(fx.paperPromptLabel)" />
 			</row>
 			<row>
 				<label value="${labels.survey.schema.node.handheldPromptLabel}:" />
-				<textbox width="99%" value="@bind(fx.handheldPromptLabel)" />
+				<textbox width="150px" value="@bind(fx.handheldPromptLabel)" />
 			</row>
 			<row>
 				<label value="${labels.survey.schema.node.pcPromptLabel}:" />
-				<textbox width="99%" value="@bind(fx.pcPromptLabel)" />
+				<textbox width="150px" value="@bind(fx.pcPromptLabel)" />
 			</row>
 			<row>
 				<label value="${labels.global.item.description}:" />
-				<textbox width="99%" value="@bind(fx.description)" />
-				<label class="error" value="@load(vmsgs['description'])" />
+				<textbox width="150px" value="@bind(fx.description)" />
+				<label class="error" value="@load(node_defn_vmsgs['description'])" />
 			</row>
 			<row>
 				<label value="${labels.global.item.since_version}:" />
@@ -92,7 +92,7 @@
 							<listitem label="@load(each.name)" />
 						</template>
 					</listbox>
-					<label class="error" value="@load(vmsgs['sinceVersion'])" />
+					<label class="error" value="@load(node_defn_vmsgs['sinceVersion'])" />
 				</cell>
 			</row>
 			<row>
@@ -104,7 +104,7 @@
 							<listitem label="@load(each.name)" />
 						</template>
 					</listbox>
-					<label class="error" value="@load(vmsgs['deprecatedVersion'])" />
+					<label class="error" value="@load(node_defn_vmsgs['deprecatedVersion'])" />
 				</cell>
 			</row>
 		</rows>

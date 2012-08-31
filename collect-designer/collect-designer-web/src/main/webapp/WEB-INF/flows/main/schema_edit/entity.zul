@@ -1,9 +1,14 @@
 <zk>
 	<div 
 		id="nodeFormContainer"
-		validationMessages="@id('vmsgs')"
-		form="@id('fx') @load(vm.formObject) @save(vm.formObject, before='saveNode')"
-		width="400px">
+		validationMessages="@id('node_defn_vmsgs')"
+		form="@id('fx') 
+			@load(vm.formObject) 
+			@save(vm.formObject, before='saveNode')
+			@validator('org.openforis.collect.designer.form.validator.NodeDefinitionFormValidator')
+		">
+		
 		<include src="schema_edit/node_common.zul" />
+		
 	</div>
 </zk>

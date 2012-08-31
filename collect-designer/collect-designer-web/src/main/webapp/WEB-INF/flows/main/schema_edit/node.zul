@@ -3,12 +3,12 @@
 		<grid>
 			<columns>
 				<column label="" width="150px" />
-				<column label="" />
+				<column label="" width="300px" />
 			</columns>
 			<rows>
 				<row>
 					<label value="${labels.survey.schema.node.type_label}:" />
-					<hbox id="typeSelectionBox">
+					<div id="typeSelectionBox">
 						<radiogroup id="typeGroup" onCheck="@command('nodeTypeChanged', nodeType=self.selectedItem.value)"
 							visible="@load(vm.newNode and not vm.rootEntityCreation)">
 							<radio id="entityRB" value="ENTITY" 
@@ -20,7 +20,7 @@
 							value="@load(vm.nodeType eq 'ENTITY' ? 
 								labels.survey.schema.node.type.entity: 
 								labels.survey.schema.node.type.attribute)" />
-					</hbox>
+					</div>
 				</row>
 				<row visible="@load(vm.nodeType eq 'ATTRIBUTE')">
 					<label value="${labels.survey.schema.attribute.type_label}:" />
@@ -43,28 +43,28 @@
 		</grid>
 		
 		<div visible="@load(not empty vm.nodeType and (vm.nodeType eq 'ENTITY' or not empty vm.attributeType))" >
-			<div 
-				id="nodeFormContainer"
-				validationMessages="@id('vmsgs')"
-				form="@id('fx') @load(vm.formObject) @save(vm.formObject, before='saveNode')"
-				width="100%" height="100%" style="overflow:auto;">
-				<include src="
-					@load(empty vm.nodeType or vm.nodeType eq 'ATTRIBUTE' and empty vm.attributeType ? null:
- 						vm.nodeType eq 'ENTITY'? 'schema_edit/entity.zul':
- 						vm.attributeType eq 'BOOLEAN' ? 'schema_edit/attribute_boolean.zul':
- 						vm.attributeType eq 'CODE' ? 'schema_edit/attribute_code.zul':
- 						vm.attributeType eq 'COORDINATE' ? 'schema_edit/attribute_coordinate.zul':
- 						vm.attributeType eq 'DATE' ? 'schema_edit/attribute_date.zul':
- 						vm.attributeType eq 'FILE' ? 'schema_edit/attribute_file.zul':
- 						vm.attributeType eq 'NUMBER' ? 'schema_edit/attribute_number.zul':
- 						vm.attributeType eq 'RANGE' ? 'schema_edit/attribute_range.zul':
- 						vm.attributeType eq 'TAXON' ? 'schema_edit/attribute_taxon.zul':
- 						vm.attributeType eq 'TEXT' ? 'schema_edit/attribute_text.zul':
- 						vm.attributeType eq 'TIME' ? 'schema_edit/attribute_time.zul': 
- 						null)" />
-			</div>
-			<button label="${labels.survey.schema.node.save}" 
-		        	onClick="@command('saveNode')" />
+			<include src="
+				@load(empty vm.nodeType or vm.nodeType eq 'ATTRIBUTE' and empty vm.attributeType ? null:
+					vm.nodeType eq 'ENTITY'? 'schema_edit/entity.zul':
+					vm.attributeType eq 'BOOLEAN' ? 'schema_edit/attribute_boolean.zul':
+					vm.attributeType eq 'CODE' ? 'schema_edit/attribute_code.zul':
+					vm.attributeType eq 'COORDINATE' ? 'schema_edit/attribute_coordinate.zul':
+					vm.attributeType eq 'DATE' ? 'schema_edit/attribute_date.zul':
+					vm.attributeType eq 'FILE' ? 'schema_edit/attribute_file.zul':
+					vm.attributeType eq 'NUMBER' ? 'schema_edit/attribute_number.zul':
+					vm.attributeType eq 'RANGE' ? 'schema_edit/attribute_range.zul':
+					vm.attributeType eq 'TAXON' ? 'schema_edit/attribute_taxon.zul':
+					vm.attributeType eq 'TEXT' ? 'schema_edit/attribute_text.zul':
+					vm.attributeType eq 'TIME' ? 'schema_edit/attribute_time.zul': 
+					null)" />
+        	<hlayout>
+				<button label="${labels.survey.schema.node.apply_changes}" 
+			        	onClick="@command('saveNode')" />
+                <label visible="@load(empty node_defn_vmsgs, before='saveNode')"
+                	value="@load(labels.survey.schema.node.apply_changes_success, before='saveNode')" /> 
+                <label visible="@load(not empty node_defn_vmsgs, before='saveNode')" style="error"
+                	value="@load(labels.survey.schema.node.apply_changes_failure, before='saveNode')" /> 
+			</hlayout>
 		</div>
 		
 	</div>
