@@ -11,6 +11,7 @@ import org.openforis.collect.designer.form.FormObject;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.persistence.SurveyImportException;
+import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.Languages;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.zkoss.bind.annotation.Command;
@@ -57,6 +58,10 @@ public class SurveyEditVM {
 	@GlobalCommand
 	public void versionsUpdated() {}
 
+	@NotifyChange("codeLists")
+	@GlobalCommand
+	public void codeListsUpdated() {}
+	
 	public BindingListModelListModel<String> getLanguageCodes() {
 		return new BindingListModelListModel<String>(new ListModelList<String>(Languages.LANGUAGE_CODES));
 	}
@@ -101,6 +106,11 @@ public class SurveyEditVM {
 		List<ModelVersion> result = new ArrayList<ModelVersion>(survey.getVersions());
 		result.add(0, FormObject.VERSION_EMPTY_SELECTION);
 		return new BindingListModelList<ModelVersion>(result, false);
+	}
+	
+	public List<CodeList> getCodeLists() {
+		List<CodeList> result = new ArrayList<CodeList>(survey.getCodeLists());
+		return new BindingListModelList<CodeList>(result, false);
 	}
 	
 }

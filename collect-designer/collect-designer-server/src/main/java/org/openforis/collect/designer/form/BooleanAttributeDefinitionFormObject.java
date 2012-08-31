@@ -5,37 +5,49 @@ package org.openforis.collect.designer.form;
 
 import javax.xml.namespace.QName;
 
-import org.openforis.idm.metamodel.NodeDefinition;
+import org.openforis.idm.metamodel.BooleanAttributeDefinition;
 
 /**
  * @author S. Ricci
  *
  */
-public class BooleanAttributeDefinitionFormObject extends AttributeDefinitionFormObject {
+public class BooleanAttributeDefinitionFormObject<T extends BooleanAttributeDefinition> extends AttributeDefinitionFormObject<T> {
 	
 	private static final QName AFFIRMATIVE_ONLY_ANNOTATION = new QName("http://www.openforis.org/collect/3.0/ui", "type");
 	
-	private boolean affirmativeOnly;
+	enum Type {
+		THREE_STATE, AFFIRMATIVE_ONLY
+	}
+	
+	private Integer typeIndex;
 	
 	@Override
-	public void copyValues(NodeDefinition dest, String languageCode) {
+	public void copyValues(T dest, String languageCode) {
 		super.copyValues(dest, languageCode);
-		dest.setAnnotation(AFFIRMATIVE_ONLY_ANNOTATION, Boolean.toString(affirmativeOnly));
+		String annotationValue = null;
+		if ( typeIndex != null ) {
+			Type type = Type.values()[typeIndex];
+			if ( type == Type.AFFIRMATIVE_ONLY ) {
+				annotationValue = "true";
+			}
+		}
+		dest.setAnnotation(AFFIRMATIVE_ONLY_ANNOTATION, annotationValue);
 	}
 	
 	@Override
-	public void setValues(NodeDefinition source, String languageCode) {
+	public void setValues(T source, String languageCode) {
 		super.setValues(source, languageCode);
 		String affirmativeOnlyStringValue = source.getAnnotation(AFFIRMATIVE_ONLY_ANNOTATION);
-		affirmativeOnly = Boolean.parseBoolean(affirmativeOnlyStringValue);
+		boolean affirmativeOnly = Boolean.parseBoolean(affirmativeOnlyStringValue);
+		typeIndex = affirmativeOnly ? 1: 0;
 	}
 
-	public boolean isAffirmativeOnly() {
-		return affirmativeOnly;
+	public Integer getTypeIndex() {
+		return typeIndex;
 	}
 
-	public void setAffirmativeOnly(boolean affirmativeOnly) {
-		this.affirmativeOnly = affirmativeOnly;
+	public void setTypeIndex(Integer typeIndex) {
+		this.typeIndex = typeIndex;
 	}
 
 }

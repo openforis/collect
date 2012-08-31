@@ -15,6 +15,11 @@
         <label-location>/WEB-INF/labels/label_en.properties</label-location>
     </system-config>
     
+<!-- 	<library-property> -->
+<!-- 	    <name>org.zkoss.theme.preferred</name> -->
+<!-- 	    <value>silvertail</value> -->
+<!-- 	</library-property> -->
+	
 <!--     <listener> -->
 <!-- 		<description>Spring Web Flow Controller Listener</description> -->
 <!-- 		<listener-class>org.zkoss.spring.webflow.mvc.servlet.ZkFlowControllerListener</listener-class> -->

@@ -33,7 +33,7 @@
 		    </vbox>
 			
 			<hbox>
-				<include src="schema_edit/node.zul" />
+				<include src="schema_edit/node.zul" visible="@load(vm.editingNode)" />
 			</hbox>
 		</hbox>
     </div>

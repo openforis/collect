@@ -1,0 +1,40 @@
+<zk>
+	<div 
+		id="nodeFormContainer"
+		validationMessages="@id('vmsgs')"
+		form="@id('fx') @load(vm.formObject) @save(vm.formObject, before='saveNode')"
+		width="400px">
+		
+		<include src="schema_edit/attribute_common.zul" />
+		
+		<grid>
+			<columns>
+				<column label="" width="150px" />
+				<column label="" />
+			</columns>
+			<rows>
+				<row>
+					<label value="${labels.survey.schema.attribute.code.key}:" />
+					<checkbox checked="@load(fx.key eq true) @save(fx.key)" />
+				</row>
+				<row>
+					<label value="${labels.survey.schema.attribute.code.code_list}:" />
+					<listbox width="150px" model="@load(vm.codeLists)"
+						selectedItem="@bind(fx.list)" mold="select">
+						<template name="model">
+							<listitem label="@load(each.name)" />
+						</template>
+					</listbox>
+				</row>
+				<row>
+					<label value="${labels.survey.schema.attribute.code.strict}:" />
+					<checkbox checked="@load(fx.strict eq true) @save(fx.strict)" />
+				</row>
+				<row>
+					<label value="${labels.survey.schema.attribute.code.parent_expression}:" />
+					<textbox width="99%" value="@bind(fx.parentExpression)" />
+				</row>
+			</rows>
+		</grid>
+	</div>
+</zk>

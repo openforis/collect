@@ -60,6 +60,7 @@ public class SurveyCodeListsEditVM extends SurveyItemEditVM<CodeList> {
 	@Command
 	public void newItem() {
 		super.newItem();
+		editedItem.setSurvey(survey);
 		editedChildItem = null;
 	}
 	

@@ -1,20 +1,16 @@
 package org.openforis.collect.designer.form;
 
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
-import java.util.Locale;
-
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.NodeDefinition;
-import org.openforis.idm.metamodel.Prompt;
 import org.openforis.idm.metamodel.NodeLabel.Type;
+import org.openforis.idm.metamodel.Prompt;
 
 /**
  * 
  * @author S. Ricci
  *
  */
-public abstract class NodeDefinitionFormObject extends FormObject {
+public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends FormObject<T> {
 
 	private String name;
 	private String headingLabel;
@@ -34,8 +30,7 @@ public abstract class NodeDefinitionFormObject extends FormObject {
 	private Integer minCount;
 	private Integer maxCount;
 	
-	@Override
-	public void setValues(NodeDefinition source, String languageCode) {
+	public void setValues(T source, String languageCode) {
 		name = source.getName();
 		headingLabel = source.getLabel(Type.HEADING, languageCode);
 		instanceLabel = source.getLabel(Type.INSTANCE, languageCode);
@@ -46,17 +41,17 @@ public abstract class NodeDefinitionFormObject extends FormObject {
 		pcPromptLabel = source.getPrompt(Prompt.Type.PC, languageCode);
 		description = source.getDescription(languageCode);
 		multiple = source.isMultiple();
-		required = source.getMinCount() != null && source.getMinCount().intValue() == 1;
+		Integer nodeMinCount = source.getMinCount();
+		required = nodeMinCount != null && nodeMinCount.intValue() == 1;
 		requiredExpression = source.getRequiredExpression();
 		relevantExpression = source.getRelevantExpression();
-		minCount = source.getMinCount();
+		minCount = nodeMinCount;
 		maxCount = source.getMaxCount();
 		sinceVersion = source.getSinceVersion();
 		deprecatedVersion = source.getDeprecatedVersion();
 	}
 	
-	@Override
-	public void copyValues(NodeDefinition dest, String languageCode) {
+	public void copyValues(T dest, String languageCode) {
 		dest.setName(name);
 		dest.setLabel(Type.HEADING, languageCode, headingLabel);
 		dest.setLabel(Type.INSTANCE, languageCode, instanceLabel);
@@ -191,7 +186,7 @@ public abstract class NodeDefinitionFormObject extends FormObject {
 	}
 
 	public void setRequired(boolean required) {
-		this.required = required;
+		this.required =  required;
 	}
 
 	public String getRequiredExpression() {

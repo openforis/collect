@@ -9,6 +9,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import org.openforis.collect.designer.form.BooleanAttributeDefinitionFormObject;
+import org.openforis.collect.designer.form.CodeAttributeDefinitionFormObject;
 import org.openforis.collect.designer.form.EntityDefinitionFormObject;
 import org.openforis.collect.designer.form.NodeDefinitionFormObject;
 import org.openforis.idm.metamodel.BooleanAttributeDefinition;
@@ -41,47 +43,45 @@ import org.zkoss.zul.Treeitem;
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class SurveySchemaEditVM extends SurveyEditVM {
 
-	private static final String NODE_TYPE_ENTITY = "entity";
-	private static final String NODE_TYPE_ATTRIBUTE = "attribute";
-
+	enum NodeType {
+		ENTITY, ATTRIBUTE
+	}
 	private DefaultTreeModel<NodeDefinition> treeModel;
-	
 	private NodeDefinition selectedNode;
-	
-	private NodeDefinitionFormObject formObject;
-	
+	private NodeDefinitionFormObject<NodeDefinition> formObject;
 	private String nodeType;
-	
 	private String attributeType;
-	
+	private boolean editingNode;
+	private boolean newNode;
 	private boolean rootEntityCreation;
 	
-	private boolean newNode;
-	
-	private enum AttributeTypes {
+	private enum AttributeType {
 		BOOLEAN, CODE, COORDINATE, DATE, FILE, NUMBER, RANGE, TAXON, TEXT, TIME
 	}
 	
-	@NotifyChange({"formObject","newNode","rootEntityCreation"})
+	@NotifyChange({"editingNode","newNode","rootEntityCreation","formObject"})
 	@Command
 	public void nodeSelected(@BindingParam("node") Treeitem node) {
 		if ( node != null ) {
 			TreeNode<NodeDefinition> treeNode = node.getValue();
 			selectedNode = treeNode.getData();
+			editingNode = true;
 		} else {
 			selectedNode = null;
+			editingNode = false;
 		}
 		newNode = false;
 		rootEntityCreation = false;
 		initFormObject(selectedNode);
 	}
 	
-	@NotifyChange({"formObject","newNode","rootEntityCreation","nodeType"})
+	@NotifyChange({"editingNode","formObject","newNode","rootEntityCreation","nodeType"})
 	@Command
 	public void addRootEntity() {
+		editingNode = true;
 		newNode = true;
 		rootEntityCreation = true;
-		nodeType = NODE_TYPE_ENTITY;
+		nodeType = NodeType.ENTITY.name();
 		selectedNode = null;
 		initFormObject();
 		Collection<NodeDefinitionTreeNode> emptySelection = Collections.emptyList();
@@ -92,11 +92,12 @@ public class SurveySchemaEditVM extends SurveyEditVM {
 	@Command
 	public void addNode() throws Exception {
 		if ( selectedNode != null && selectedNode instanceof EntityDefinition ) {
+			editingNode = true;
+			newNode = true;
+			rootEntityCreation = false;
 			nodeType = null;
 			attributeType = null;
 			formObject = null;
-			rootEntityCreation = false;
-			newNode = true;
 		} else {
 			throw new Exception("Cannot add a child to an Attribute Definition");
 		}
@@ -105,12 +106,11 @@ public class SurveySchemaEditVM extends SurveyEditVM {
 	@NotifyChange({"selectedNode","formObject","newNode","rootEntityCreation"})
 	@Command
 	public void saveNode() {
-		EntityDefinition editedNode;
-		if ( newNode && NODE_TYPE_ENTITY.equals(nodeType) ) {
-			editedNode = new EntityDefinition();
+		NodeDefinition editedNode;
+		if ( newNode ) {
+			editedNode = createNodeDefinition();
 		} else {
-			//TODO
-			editedNode = null;
+			editedNode = selectedNode;
 		}
 		formObject.copyValues(editedNode, selectedLanguageCode);
 		
@@ -118,13 +118,72 @@ public class SurveySchemaEditVM extends SurveyEditVM {
 			if ( rootEntityCreation ) {
 				Schema schema = survey.getSchema();
 				schema.addRootEntityDefinition((EntityDefinition) editedNode);
-			} else if ( selectedNode != null && selectedNode instanceof EntityDefinition ) {
-				( (EntityDefinition) selectedNode).addChildDefinition(editedNode);
+			} else if ( selectedNode != null ) {
+				if ( selectedNode instanceof EntityDefinition ) {
+					( (EntityDefinition) selectedNode).addChildDefinition(editedNode);
+				} else {
+					throw new IllegalStateException("Trying to add a child to an Attribute");
+				}
+			} else {
+				throw new IllegalStateException("No entity parent node selected");
 			}
-			addTreeNodeToSelectedNode(editedNode);
+			appendTreeNodeToSelectedNode(editedNode);
 		}
 		selectedNode = editedNode;
 		initFormObject(selectedNode);
+		newNode = false;
+		rootEntityCreation = false;
+	}
+
+	private NodeDefinition createNodeDefinition() {
+		NodeDefinition result;
+		NodeType nodeTypeEnum = NodeType.valueOf(nodeType);
+		switch(nodeTypeEnum) {
+		case ENTITY:
+			result = new EntityDefinition();
+			break;
+		case ATTRIBUTE:
+			AttributeType attrType = AttributeType.valueOf(attributeType);
+			switch(attrType) {
+			case BOOLEAN:
+				result = new BooleanAttributeDefinition();
+				break;
+			case CODE:
+				result = new CodeAttributeDefinition();
+				break;
+			case COORDINATE:
+				result = new CoordinateAttributeDefinition();
+				break;
+			case DATE:
+				result = new DateAttributeDefinition();
+				break;
+			case FILE:
+				result = new FileAttributeDefinition();
+				break;
+			case NUMBER:
+				result = new NumberAttributeDefinition();
+				break;
+			case RANGE:
+				result = new RangeAttributeDefinition();
+				break;
+			case TAXON:
+				result = new TaxonAttributeDefinition();
+				break;
+			case TEXT:
+				result = new TextAttributeDefinition();
+				break;
+			case TIME:
+				result = new TimeAttributeDefinition();
+				break;
+			default:
+				throw new IllegalStateException("Attribute type not supported: " + attributeType);
+			}
+			break;
+		default:
+			throw new IllegalStateException("Node type not supported: " + nodeType);
+		}
+		result.setSchema(survey.getSchema());
+		return result;
 	}
 
 	@NotifyChange({"nodeType","formObject"})
@@ -141,9 +200,34 @@ public class SurveySchemaEditVM extends SurveyEditVM {
 		initFormObject();
 	}
 
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private void initFormObject() {
-		if ( NODE_TYPE_ENTITY.equals(nodeType)) {
-			formObject = new EntityDefinitionFormObject();
+		if ( nodeType != null ) {
+			NodeType nodeTypeEnum = NodeType.valueOf(nodeType);
+			switch ( nodeTypeEnum ) {
+			case ENTITY:
+				formObject = new EntityDefinitionFormObject();
+				break;
+			case ATTRIBUTE:
+				if ( attributeType != null ) {
+					AttributeType attrType = AttributeType.valueOf(attributeType);
+					switch (attrType) {
+					case BOOLEAN:
+						formObject = new BooleanAttributeDefinitionFormObject();
+						break;
+					case CODE:
+						formObject = new CodeAttributeDefinitionFormObject();
+						break;
+					default:
+						throw new IllegalStateException("Attribute type not supported");
+					}
+				} else {
+					formObject = null;
+				}
+				break;
+			}
+		} else {
+			formObject = null;
 		}
 	}
 
@@ -155,29 +239,29 @@ public class SurveySchemaEditVM extends SurveyEditVM {
 	
 	private void calculateNodeType(NodeDefinition node) {
 		if ( node instanceof EntityDefinition ) {
-			nodeType = NODE_TYPE_ENTITY;
+			nodeType = NodeType.ENTITY.name();
 		} else {
-			nodeType = NODE_TYPE_ATTRIBUTE;
+			nodeType = NodeType.ATTRIBUTE.name();
 			if ( node instanceof BooleanAttributeDefinition ) {
-				attributeType = AttributeTypes.BOOLEAN.name();
+				attributeType = AttributeType.BOOLEAN.name();
 			} else if ( node instanceof CodeAttributeDefinition ) {
-				attributeType = AttributeTypes.CODE.name();
+				attributeType = AttributeType.CODE.name();
 			} else if ( node instanceof CoordinateAttributeDefinition ) {
-				attributeType = AttributeTypes.COORDINATE.name();
+				attributeType = AttributeType.COORDINATE.name();
 			} else if ( node instanceof DateAttributeDefinition ) {
-				attributeType = AttributeTypes.DATE.name();
+				attributeType = AttributeType.DATE.name();
 			} else if ( node instanceof FileAttributeDefinition ) {
-				attributeType = AttributeTypes.FILE.name();
+				attributeType = AttributeType.FILE.name();
 			} else if ( node instanceof NumberAttributeDefinition ) {
-				attributeType = AttributeTypes.NUMBER.name();
+				attributeType = AttributeType.NUMBER.name();
 			} else if ( node instanceof RangeAttributeDefinition ) {
-				attributeType = AttributeTypes.RANGE.name();
+				attributeType = AttributeType.RANGE.name();
 			} else if ( node instanceof TaxonAttributeDefinition ) {
-				attributeType = AttributeTypes.TAXON.name();
+				attributeType = AttributeType.TAXON.name();
 			} else if ( node instanceof TextAttributeDefinition ) {
-				attributeType = AttributeTypes.TEXT.name();
+				attributeType = AttributeType.TEXT.name();
 			} else if ( node instanceof TimeAttributeDefinition ) {
-				attributeType = AttributeTypes.TIME.name();
+				attributeType = AttributeType.TIME.name();
 			}				
 		}
 		
@@ -202,7 +286,7 @@ public class SurveySchemaEditVM extends SurveyEditVM {
 		parentTreeNode.remove(treeNode);
 	}
 	
-	protected void addTreeNodeToSelectedNode(NodeDefinition item) {
+	protected void appendTreeNodeToSelectedNode(NodeDefinition item) {
 		NodeDefinitionTreeNode treeNode = new NodeDefinitionTreeNode(item);
 		int[] selectionPath = treeModel.getSelectionPath();
 		if ( selectionPath == null || item.getParentDefinition() == null ) {
@@ -274,8 +358,12 @@ public class SurveySchemaEditVM extends SurveyEditVM {
 		return selectedNode;
 	}
 	
-	public NodeDefinitionFormObject getFormObject() {
+	public NodeDefinitionFormObject<NodeDefinition> getFormObject() {
 		return formObject;
+	}
+
+	public boolean isEditingNode() {
+		return editingNode;
 	}
 	
 }

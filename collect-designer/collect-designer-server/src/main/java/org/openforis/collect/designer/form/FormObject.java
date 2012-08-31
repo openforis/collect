@@ -1,7 +1,6 @@
 package org.openforis.collect.designer.form;
 
 import org.openforis.idm.metamodel.ModelVersion;
-import org.openforis.idm.metamodel.NodeDefinition;
 import org.zkoss.util.resource.Labels;
 
 /**
@@ -9,7 +8,7 @@ import org.zkoss.util.resource.Labels;
  * @author S. Ricci
  *
  */
-public abstract class FormObject {
+public abstract class FormObject<T> {
 
 	public static ModelVersion VERSION_EMPTY_SELECTION;
 	
@@ -21,7 +20,4 @@ public abstract class FormObject {
 		VERSION_EMPTY_SELECTION.setName(emptyOptionLabel);
 	}
 	
-	public abstract void setValues(NodeDefinition node, String languageCode);
-		
-	public abstract void copyValues(NodeDefinition dest, String languageCode);		
 }

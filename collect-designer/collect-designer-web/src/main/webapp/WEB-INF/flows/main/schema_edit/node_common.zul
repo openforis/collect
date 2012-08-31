@@ -7,39 +7,60 @@
 		<rows>
 			<row>
 				<label value="${labels.global.item.name}:" />
-				<textbox width="99%" value="@bind(fx.name)" />
+				<cell>
+					<textbox width="99%" value="@bind(fx.name)" />
+					<label class="error" value="@load(vmsgs['name'])" />
+				</cell>
 			</row>
 			<row>
 				<label value="${labels.survey.schema.node.multiple}:" />
 				<checkbox checked="@load(fx.multiple eq true) @save(fx.multiple)" />
 			</row>
-			<row visible="@load(fx.multiple eq true)">
+			<row visible="@load(fx.multiple ne true)">
 				<label value="${labels.survey.schema.node.required}:" />
 				<checkbox checked="@load(fx.required eq true) @save(fx.required)" />
 			</row>
-			<row visible="@load(fx.multiple eq true)">
+			<row visible="@load(fx.multiple ne true)">
 				<label value="${labels.survey.schema.node.required_expression}:" />
-				<textbox width="99%" value="@bind(fx.requiredExpression)" />
+				<cell>
+					<textbox width="99%" value="@bind(fx.requiredExpression)" />
+					<label class="error" value="@load(vmsgs['requiredExpression'])" />
+				</cell>
 			</row>
-			<row visible="@load(fx.multiple ne true)">
+			<row visible="@load(fx.multiple eq true)">
 				<label value="${labels.survey.schema.node.min_count}:" />
-				<intbox value="@bind(fx.minCount)" />
+				<cell>
+					<intbox value="@bind(fx.minCount)" />
+					<label class="error" value="@load(vmsgs['minCount'])" />
+				</cell>
 			</row>
-			<row visible="@load(fx.multiple ne true)">
+			<row visible="@load(fx.multiple eq true)">
 				<label value="${labels.survey.schema.node.max_count}:" />
-				<intbox value="@bind(fx.maxCount)" />
+				<cell>
+					<intbox value="@bind(fx.maxCount)" />
+					<label class="error" value="@load(vmsgs['maxCount'])" />
+				</cell>
 			</row>
 			<row>
 				<label value="${labels.survey.schema.node.instanceLabel}:" />
-				<textbox width="99%" value="@bind(fx.instanceLabel)" />
+				<cell>
+					<textbox width="99%" value="@bind(fx.instanceLabel)" />
+					<label class="error" value="@load(vmsgs['instanceLabel'])" />
+				</cell>
 			</row>
 			<row>
 				<label value="${labels.survey.schema.node.headingLabel}:" />
-				<textbox width="99%" value="@bind(fx.headingLabel)" />
+				<cell>
+					<textbox width="99%" value="@bind(fx.headingLabel)" />
+					<label class="error" value="@load(vmsgs['headingLabel'])" />
+				</cell>
 			</row>
 			<row>
 				<label value="${labels.survey.schema.node.numberLabel}:" />
-				<textbox width="99%" value="@bind(fx.numberLabel)" />
+				<cell>
+					<textbox width="99%" value="@bind(fx.numberLabel)" />
+					<label class="error" value="@load(vmsgs['numberLabel'])" />
+				</cell>
 			</row>
 			<row>
 				<label value="${labels.survey.schema.node.interviewPromptLabel}:" />
@@ -60,24 +81,31 @@
 			<row>
 				<label value="${labels.global.item.description}:" />
 				<textbox width="99%" value="@bind(fx.description)" />
+				<label class="error" value="@load(vmsgs['description'])" />
 			</row>
 			<row>
 				<label value="${labels.global.item.since_version}:" />
-				<listbox width="150px" model="@load(vm.versionsForCombo)"
-					selectedItem="@bind(fx.sinceVersion)" mold="select">
-					<template name="model">
-						<listitem label="@load(each.name)" />
-					</template>
-				</listbox>
+				<cell>
+					<listbox width="150px" model="@load(vm.versionsForCombo)"
+						selectedItem="@bind(fx.sinceVersion)" mold="select">
+						<template name="model">
+							<listitem label="@load(each.name)" />
+						</template>
+					</listbox>
+					<label class="error" value="@load(vmsgs['sinceVersion'])" />
+				</cell>
 			</row>
 			<row>
 				<label value="${labels.global.item.deprecated_version}:" />
-				<listbox width="150px" model="@load(vm.versionsForCombo)"
-					selectedItem="@bind(fx.deprecatedVersion)" mold="select">
-					<template name="model">
-						<listitem label="@load(each.name)" />
-					</template>
-				</listbox>
+				<cell>
+					<listbox width="150px" model="@load(vm.versionsForCombo)"
+						selectedItem="@bind(fx.deprecatedVersion)" mold="select">
+						<template name="model">
+							<listitem label="@load(each.name)" />
+						</template>
+					</listbox>
+					<label class="error" value="@load(vmsgs['deprecatedVersion'])" />
+				</cell>
 			</row>
 		</rows>
 	</grid>
