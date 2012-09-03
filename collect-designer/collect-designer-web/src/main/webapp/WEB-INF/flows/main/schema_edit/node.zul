@@ -1,71 +1,68 @@
 <zk>
-	<div width="100%" height="100%" style="overflow:auto;">
-		<grid>
-			<columns>
-				<column label="" width="150px" />
-				<column label="" width="300px" />
-			</columns>
-			<rows>
-				<row>
-					<label value="${labels.survey.schema.node.type_label}:" />
-					<div id="typeSelectionBox">
-						<radiogroup id="typeGroup" onCheck="@command('nodeTypeChanged', nodeType=self.selectedItem.value)"
-							visible="@load(vm.newNode and not vm.rootEntityCreation)">
-							<radio id="entityRB" value="ENTITY" 
-								label="${labels.survey.schema.node.type.entity}" />
-							<radio id="attributeRB" value="ATTRIBUTE" 
-								label="${labels.survey.schema.node.type.attribute}" />
-						</radiogroup>
-						<label visible="@load(not vm.newNode or vm.rootEntityCreation)"
-							value="@load(vm.nodeType eq 'ENTITY' ? 
-								labels.survey.schema.node.type.entity: 
-								labels.survey.schema.node.type.attribute)" />
-					</div>
-				</row>
-				<row visible="@load(vm.nodeType eq 'ATTRIBUTE')">
-					<label value="${labels.survey.schema.attribute.type_label}:" />
-					<listbox id="subTypeListBox"
-						onSelect="@command('attributeTypeChanged', attributeType=self.selectedItem.value)" 
-						width="100px" mold="select">
-						<listitem label="${labels.survey.schema.attribute.type.bool}" value="BOOLEAN" />
-						<listitem label="${labels.survey.schema.attribute.type.code}" value="CODE" />
-						<listitem label="${labels.survey.schema.attribute.type.coordinate}" value="COORDINATE" />
-						<listitem label="${labels.survey.schema.attribute.type.date}" value="DATE" />
-						<listitem label="${labels.survey.schema.attribute.type.file}" value="FILE" />
-						<listitem label="${labels.survey.schema.attribute.type.number}" value="NUMBER" />
-						<listitem label="${labels.survey.schema.attribute.type.range}" value="RANGE" />
-						<listitem label="${labels.survey.schema.attribute.type.taxon}" value="TAXON" />
-						<listitem label="${labels.survey.schema.attribute.type.text}" value="TEXT" />
-						<listitem label="${labels.survey.schema.attribute.type.time}" value="TIME" />
-					</listbox>
-				</row>
-			</rows>
-		</grid>
-		
-		<div visible="@load(not empty vm.nodeType and (vm.nodeType eq 'ENTITY' or not empty vm.attributeType))" >
-			<include src="
-				@load(empty vm.nodeType or vm.nodeType eq 'ATTRIBUTE' and empty vm.attributeType ? null:
-					vm.nodeType eq 'ENTITY'? 'schema_edit/entity.zul':
-					vm.attributeType eq 'BOOLEAN' ? 'schema_edit/attribute_boolean.zul':
-					vm.attributeType eq 'CODE' ? 'schema_edit/attribute_code.zul':
-					vm.attributeType eq 'COORDINATE' ? 'schema_edit/attribute_coordinate.zul':
-					vm.attributeType eq 'DATE' ? 'schema_edit/attribute_date.zul':
-					vm.attributeType eq 'FILE' ? 'schema_edit/attribute_file.zul':
-					vm.attributeType eq 'NUMBER' ? 'schema_edit/attribute_number.zul':
-					vm.attributeType eq 'RANGE' ? 'schema_edit/attribute_range.zul':
-					vm.attributeType eq 'TAXON' ? 'schema_edit/attribute_taxon.zul':
-					vm.attributeType eq 'TEXT' ? 'schema_edit/attribute_text.zul':
-					vm.attributeType eq 'TIME' ? 'schema_edit/attribute_time.zul': 
-					null)" />
-        	<hlayout>
-				<button label="${labels.survey.schema.node.apply_changes}" 
-			        	onClick="@command('saveNode')" />
-                <label visible="@load(empty node_defn_vmsgs, before='saveNode')"
-                	value="@load(labels.survey.schema.node.apply_changes_success, before='saveNode')" /> 
-                <label visible="@load(not empty node_defn_vmsgs, before='saveNode')" style="error"
-                	value="@load(labels.survey.schema.node.apply_changes_failure, before='saveNode')" /> 
-			</hlayout>
-		</div>
-		
-	</div>
+	<borderlayout>
+		<north height="@load(vm.nodeType eq 'ATTRIBUTE' ? '70px': '40px')">
+			<grid height="@load(vm.nodeType eq 'ATTRIBUTE' ? '70px': '40px')">
+				<columns>
+					<column label="" width="150px" />
+					<column label="" width="300px" />
+				</columns>
+				<rows>
+					<row>
+						<label value="${labels.survey.schema.node.type_label}:" />
+						<div id="typeSelectionBox">
+							<radiogroup id="typeGroup" onCheck="@command('nodeTypeChanged', nodeType=self.selectedItem.value)"
+								selectedItem="@load(vm.nodeType)"
+								visible="@load(vm.newNode and not vm.rootEntityCreation)">
+								<radio id="entityRB" value="ENTITY" 
+									label="${labels.survey.schema.node.type.entity}" />
+								<radio id="attributeRB" value="ATTRIBUTE" 
+									label="${labels.survey.schema.node.type.attribute}" />
+							</radiogroup>
+							<label visible="@load(not vm.newNode or vm.rootEntityCreation)"
+								value="@load(vm.nodeType eq 'ENTITY' ? 
+									labels.survey.schema.node.type.entity: 
+									labels.survey.schema.node.type.attribute)" />
+						</div>
+					</row>
+					<row visible="@load(vm.nodeType eq 'ATTRIBUTE')">
+						<label value="${labels.survey.schema.attribute.type_label}:" />
+						<listbox id="subTypeListBox"
+							onSelect="@command('attributeTypeChanged', attributeType=self.selectedItem.value)" 
+							width="100px" mold="select">
+							<listitem label="${labels.survey.schema.attribute.type.bool}" value="BOOLEAN" />
+							<listitem label="${labels.survey.schema.attribute.type.code}" value="CODE" />
+							<listitem label="${labels.survey.schema.attribute.type.coordinate}" value="COORDINATE" />
+							<listitem label="${labels.survey.schema.attribute.type.date}" value="DATE" />
+							<listitem label="${labels.survey.schema.attribute.type.file}" value="FILE" />
+							<listitem label="${labels.survey.schema.attribute.type.number}" value="NUMBER" />
+							<listitem label="${labels.survey.schema.attribute.type.range}" value="RANGE" />
+							<listitem label="${labels.survey.schema.attribute.type.taxon}" value="TAXON" />
+							<listitem label="${labels.survey.schema.attribute.type.text}" value="TEXT" />
+							<listitem label="${labels.survey.schema.attribute.type.time}" value="TIME" />
+						</listbox>
+					</row>
+				</rows>
+			</grid>
+		</north>
+		<center>
+			<div visible="@load(not empty vm.nodeType and (vm.nodeType eq 'ENTITY' or not empty vm.attributeType))"
+				height="100%" width="100%"
+				style="overflow:auto;">
+				<include src="
+					@load(empty vm.nodeType or vm.nodeType eq 'ATTRIBUTE' and empty vm.attributeType ? null:
+						vm.nodeType eq 'ENTITY'? 'schema_edit/entity.zul':
+						vm.attributeType eq 'BOOLEAN' ? 'schema_edit/attribute_boolean.zul':
+						vm.attributeType eq 'CODE' ? 'schema_edit/attribute_code.zul':
+						vm.attributeType eq 'COORDINATE' ? 'schema_edit/attribute_coordinate.zul':
+						vm.attributeType eq 'DATE' ? 'schema_edit/attribute_date.zul':
+						vm.attributeType eq 'FILE' ? 'schema_edit/attribute_file.zul':
+						vm.attributeType eq 'NUMBER' ? 'schema_edit/attribute_number.zul':
+						vm.attributeType eq 'RANGE' ? 'schema_edit/attribute_range.zul':
+						vm.attributeType eq 'TAXON' ? 'schema_edit/attribute_taxon.zul':
+						vm.attributeType eq 'TEXT' ? 'schema_edit/attribute_text.zul':
+						vm.attributeType eq 'TIME' ? 'schema_edit/attribute_time.zul': 
+						null)" />
+			</div>
+		</center>
+	</borderlayout>
 </zk>

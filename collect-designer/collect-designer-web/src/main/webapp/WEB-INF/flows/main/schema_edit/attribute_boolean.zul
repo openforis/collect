@@ -1,21 +1,23 @@
 <zk>
-	<div 
+	<vlayout
 		id="nodeFormContainer"
-		validationMessages="@id('vmsgs')"
-		form="@id('fx') @load(vm.formObject) @save(vm.formObject, before='saveNode')
+		apply="org.zkoss.bind.BindComposer"
+		viewModel="@id('vm') @init(vm)"
+		validationMessages="@id('nodeDefnVmsgs')"
+		form="@id('nodeDefnFx') @load(vm.formObject) @save(vm.formObject, before='saveNode')
 			@validator('org.openforis.collect.designer.form.validator.NodeDefinitionFormValidator')">
-		
+
 		<include src="schema_edit/attribute_common.zul" />
 		
 		<grid>
 			<columns>
 				<column label="" width="150px" />
-				<column label="" />
+				<column label="" width="300px" />
 			</columns>
 			<rows>
 				<row>
 					<label value="${labels.survey.schema.attribute.bool.type_label}:" />
-					<radiogroup selectedIndex="@bind(fx.typeIndex)">
+					<radiogroup selectedIndex="@bind(nodeDefnFx.typeIndex)">
 						<radio id="threeStateRadioButton" 
 							label="${labels.survey.schema.attribute.bool.type.threeState}"
 							value="threeState" />
@@ -26,5 +28,7 @@
 				</row>
 			</rows>
 		</grid>
-	</div>
+		
+		<include src="schema_edit/node_common_footer.zul" />
+	</vlayout>
 </zk>

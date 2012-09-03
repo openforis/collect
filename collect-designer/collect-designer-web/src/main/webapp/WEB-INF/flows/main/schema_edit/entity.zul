@@ -1,14 +1,15 @@
 <zk>
-	<div 
+	<vlayout
 		id="nodeFormContainer"
-		validationMessages="@id('node_defn_vmsgs')"
-		form="@id('fx') 
+		apply="org.zkoss.bind.BindComposer"
+		viewModel="@id('vm') @init(vm)"
+		validationMessages="@id('nodeDefnVmsgs')"
+		form="@id('nodeDefnFx') 
 			@load(vm.formObject) 
 			@save(vm.formObject, before='saveNode')
-			@validator('org.openforis.collect.designer.form.validator.NodeDefinitionFormValidator')
-		">
-		
+			@validator('org.openforis.collect.designer.form.validator.NodeDefinitionFormValidator')">
 		<include src="schema_edit/node_common.zul" />
-		
-	</div>
+
+		<include src="schema_edit/node_common_footer.zul" />
+	</vlayout>
 </zk>

@@ -1,9 +1,14 @@
 <zk>
-	<div 
+	<vlayout 
 		id="nodeFormContainer"
-		validationMessages="@id('vmsgs')"
-		form="@id('fx') @load(vm.formObject) @save(vm.formObject, before='saveNode')"
-		width="400px">
+		apply="org.zkoss.bind.BindComposer"
+		viewModel="@id('vm') @init(vm)"
+		validationMessages="@id('nodeDefnVmsgs')"
+		form="@id('nodeDefnFx')
+			@init(vm.tempFormObject)
+			@load(vm.formObject) 
+			@save(vm.formObject, before='saveNode')
+			@validator('org.openforis.collect.designer.form.validator.NodeDefinitionFormValidator')">
 		
 		<include src="schema_edit/attribute_common.zul" />
 		
@@ -15,12 +20,12 @@
 			<rows>
 				<row>
 					<label value="${labels.survey.schema.attribute.code.key}:" />
-					<checkbox checked="@load(fx.key eq true) @save(fx.key)" />
+					<checkbox checked="@load(nodeDefnFx.key eq true) @save(nodeDefnFx.key)" />
 				</row>
 				<row>
 					<label value="${labels.survey.schema.attribute.code.code_list}:" />
 					<listbox width="150px" model="@load(vm.codeLists)"
-						selectedItem="@bind(fx.list)" mold="select">
+						selectedItem="@bind(nodeDefnFx.list)" mold="select">
 						<template name="model">
 							<listitem label="@load(each.name)" />
 						</template>
@@ -28,13 +33,15 @@
 				</row>
 				<row>
 					<label value="${labels.survey.schema.attribute.code.strict}:" />
-					<checkbox checked="@load(fx.strict eq true) @save(fx.strict)" />
+					<checkbox checked="@load(nodeDefnFx.strict eq true) @save(nodeDefnFx.strict)" />
 				</row>
 				<row>
 					<label value="${labels.survey.schema.attribute.code.parent_expression}:" />
-					<textbox width="99%" value="@bind(fx.parentExpression)" />
+					<textbox width="99%" value="@bind(nodeDefnFx.parentExpression)" />
 				</row>
 			</rows>
 		</grid>
-	</div>
+		
+		<include src="schema_edit/node_common_footer.zul" />
+	</vlayout>
 </zk>

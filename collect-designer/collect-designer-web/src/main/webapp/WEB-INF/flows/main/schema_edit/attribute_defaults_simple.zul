@@ -1,0 +1,19 @@
+<zk>
+	<vlayout>
+		<grid width="850px"
+			model="@load(vm.attributeDefaults)">
+			<columns height="22px">
+				<column width="150px"
+					label="${labels.survey.schema.attribute.attribute_default.value}" />
+			</columns>
+			<template name="model">
+				<row>
+					<textbox inplace="true" value="@bind(each.value)"
+						width="99%" />
+				</row>
+			</template>
+		</grid>
+		<button label="${labels.survey.schema.attribute.add_attribute_default}"
+			onClick="@command('addAttributeDefault')"  />
+	</vlayout>
+</zk>

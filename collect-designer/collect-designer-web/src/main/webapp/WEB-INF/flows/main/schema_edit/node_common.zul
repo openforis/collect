@@ -8,103 +8,103 @@
 			<row>
 				<label value="${labels.global.item.name}:" />
 				<cell>
-					<textbox width="150px" value="@bind(fx.name)" />
-					<label class="error" value="@load(node_defn_vmsgs['name'])" />
+					<textbox width="150px" value="@bind(nodeDefnFx.name)" />
+					<label class="error" value="@load(nodeDefnVmsgs['name'])" />
 				</cell>
 			</row>
 			<row>
 				<label value="${labels.survey.schema.node.multiple}:" />
-				<checkbox checked="@load(fx.multiple eq true) @save(fx.multiple)" />
+				<checkbox checked="@load(nodeDefnFx.multiple eq true) @save(nodeDefnFx.multiple)" />
 			</row>
-			<row visible="@load(fx.multiple ne true)">
+			<row visible="@load(nodeDefnFx.multiple ne true)">
 				<label value="${labels.survey.schema.node.required}:" />
-				<checkbox checked="@load(fx.required eq true) @save(fx.required)" />
+				<checkbox checked="@load(nodeDefnFx.required eq true) @save(nodeDefnFx.required)" />
 			</row>
-			<row visible="@load(fx.multiple ne true)">
+			<row visible="@load(nodeDefnFx.multiple ne true)">
 				<label value="${labels.survey.schema.node.required_expression}:" />
 				<cell>
-					<textbox width="150px" value="@bind(fx.requiredExpression)" />
-					<label class="error" value="@load(node_defn_vmsgs['requiredExpression'])" />
+					<textbox width="150px" value="@bind(nodeDefnFx.requiredExpression)" />
+					<label class="error" value="@load(nodeDefnVmsgs['requiredExpression'])" />
 				</cell>
 			</row>
-			<row visible="@load(fx.multiple eq true)">
+			<row visible="@load(nodeDefnFx.multiple eq true)">
 				<label value="${labels.survey.schema.node.min_count}:" />
 				<cell>
-					<intbox value="@bind(fx.minCount)" />
-					<label class="error" value="@load(node_defn_vmsgs['minCount'])" />
+					<intbox value="@bind(nodeDefnFx.minCount)" />
+					<label class="error" value="@load(nodeDefnVmsgs['minCount'])" />
 				</cell>
 			</row>
-			<row visible="@load(fx.multiple eq true)">
+			<row visible="@load(nodeDefnFx.multiple eq true)">
 				<label value="${labels.survey.schema.node.max_count}:" />
 				<cell>
-					<intbox value="@bind(fx.maxCount)" />
-					<label class="error" value="@load(node_defn_vmsgs['maxCount'])" />
+					<intbox value="@bind(nodeDefnFx.maxCount)" />
+					<label class="error" value="@load(nodeDefnVmsgs['maxCount'])" />
 				</cell>
 			</row>
 			<row>
 				<label value="${labels.survey.schema.node.instanceLabel}:" />
 				<cell>
-					<textbox width="150px" value="@bind(fx.instanceLabel)" />
-					<label class="error" value="@load(node_defn_vmsgs['instanceLabel'])" />
+					<textbox width="150px" value="@bind(nodeDefnFx.instanceLabel)" />
+					<label class="error" value="@load(nodeDefnVmsgs['instanceLabel'])" />
 				</cell>
 			</row>
 			<row>
 				<label value="${labels.survey.schema.node.headingLabel}:" />
 				<cell>
-					<textbox width="150px" value="@bind(fx.headingLabel)" />
-					<label class="error" value="@load(node_defn_vmsgs['headingLabel'])" />
+					<textbox width="150px" value="@bind(nodeDefnFx.headingLabel)" />
+					<label class="error" value="@load(nodeDefnVmsgs['headingLabel'])" />
 				</cell>
 			</row>
 			<row>
 				<label value="${labels.survey.schema.node.numberLabel}:" />
 				<cell>
-					<textbox width="150px" value="@bind(fx.numberLabel)" />
-					<label class="error" value="@load(node_defn_vmsgs['numberLabel'])" />
+					<textbox width="150px" value="@bind(nodeDefnFx.numberLabel)" />
+					<label class="error" value="@load(nodeDefnVmsgs['numberLabel'])" />
 				</cell>
 			</row>
 			<row>
 				<label value="${labels.survey.schema.node.interviewPromptLabel}:" />
-				<textbox width="150px" value="@bind(fx.interviewPromptLabel)" />
+				<textbox width="150px" value="@bind(nodeDefnFx.interviewPromptLabel)" />
 			</row>
 			<row>
 				<label value="${labels.survey.schema.node.paperPromptLabel}:" />
-				<textbox width="150px" value="@bind(fx.paperPromptLabel)" />
+				<textbox width="150px" value="@bind(nodeDefnFx.paperPromptLabel)" />
 			</row>
 			<row>
 				<label value="${labels.survey.schema.node.handheldPromptLabel}:" />
-				<textbox width="150px" value="@bind(fx.handheldPromptLabel)" />
+				<textbox width="150px" value="@bind(nodeDefnFx.handheldPromptLabel)" />
 			</row>
 			<row>
 				<label value="${labels.survey.schema.node.pcPromptLabel}:" />
-				<textbox width="150px" value="@bind(fx.pcPromptLabel)" />
+				<textbox width="150px" value="@bind(nodeDefnFx.pcPromptLabel)" />
 			</row>
 			<row>
 				<label value="${labels.global.item.description}:" />
-				<textbox width="150px" value="@bind(fx.description)" />
-				<label class="error" value="@load(node_defn_vmsgs['description'])" />
+				<textbox width="150px" value="@bind(nodeDefnFx.description)" />
+				<label class="error" value="@load(nodeDefnVmsgs['description'])" />
 			</row>
 			<row>
 				<label value="${labels.global.item.since_version}:" />
 				<cell>
 					<listbox width="150px" model="@load(vm.versionsForCombo)"
-						selectedItem="@bind(fx.sinceVersion)" mold="select">
+						selectedItem="@bind(nodeDefnFx.sinceVersion)" mold="select">
 						<template name="model">
 							<listitem label="@load(each.name)" />
 						</template>
 					</listbox>
-					<label class="error" value="@load(node_defn_vmsgs['sinceVersion'])" />
+					<label class="error" value="@load(nodeDefnVmsgs['sinceVersion'])" />
 				</cell>
 			</row>
 			<row>
 				<label value="${labels.global.item.deprecated_version}:" />
 				<cell>
 					<listbox width="150px" model="@load(vm.versionsForCombo)"
-						selectedItem="@bind(fx.deprecatedVersion)" mold="select">
+						selectedItem="@bind(nodeDefnFx.deprecatedVersion)" mold="select">
 						<template name="model">
 							<listitem label="@load(each.name)" />
 						</template>
 					</listbox>
-					<label class="error" value="@load(node_defn_vmsgs['deprecatedVersion'])" />
+					<label class="error" value="@load(nodeDefnVmsgs['deprecatedVersion'])" />
 				</cell>
 			</row>
 		</rows>

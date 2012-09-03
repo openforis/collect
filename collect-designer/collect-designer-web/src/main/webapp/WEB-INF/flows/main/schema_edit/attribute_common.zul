@@ -1,4 +1,19 @@
 <zk>
 	<include src="schema_edit/node_common.zul" />
 
+	<grid>
+		<columns>
+			<column label="" width="150px" />
+			<column label="" width="300px" />
+		</columns>
+		<rows>
+			<row>
+				<label value="${labels.survey.schema.attribute.default_values}:" />
+				<cell>
+					<include src="schema_edit/attribute_defaults_simple.zul" />
+					<label class="error" value="@load(nodeDefnVmsgs['attributeDefaults'])" />
+				</cell>
+			</row>
+		</rows>
+	</grid>
 </zk>

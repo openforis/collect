@@ -9,10 +9,12 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import org.openforis.collect.designer.form.AttributeDefinitionFormObject;
 import org.openforis.collect.designer.form.BooleanAttributeDefinitionFormObject;
 import org.openforis.collect.designer.form.CodeAttributeDefinitionFormObject;
 import org.openforis.collect.designer.form.EntityDefinitionFormObject;
 import org.openforis.collect.designer.form.NodeDefinitionFormObject;
+import org.openforis.idm.metamodel.AttributeDefault;
 import org.openforis.idm.metamodel.BooleanAttributeDefinition;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
@@ -26,6 +28,8 @@ import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.TaxonAttributeDefinition;
 import org.openforis.idm.metamodel.TextAttributeDefinition;
 import org.openforis.idm.metamodel.TimeAttributeDefinition;
+import org.zkoss.bind.Form;
+import org.zkoss.bind.SimpleForm;
 import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.NotifyChange;
@@ -48,18 +52,20 @@ public class SurveySchemaEditVM extends SurveyEditVM {
 	}
 	private DefaultTreeModel<NodeDefinition> treeModel;
 	private NodeDefinition selectedNode;
+	private Form tempFormObject;
 	private NodeDefinitionFormObject<NodeDefinition> formObject;
 	private String nodeType;
 	private String attributeType;
 	private boolean editingNode;
 	private boolean newNode;
 	private boolean rootEntityCreation;
+	private List<AttributeDefault> attributeDefaults;
 	
 	private enum AttributeType {
 		BOOLEAN, CODE, COORDINATE, DATE, FILE, NUMBER, RANGE, TAXON, TEXT, TIME
 	}
 	
-	@NotifyChange({"editingNode","newNode","rootEntityCreation","formObject"})
+	@NotifyChange({"editingNode","newNode","rootEntityCreation","tempFormObject","formObject"})
 	@Command
 	public void nodeSelected(@BindingParam("node") Treeitem node) {
 		if ( node != null ) {
@@ -75,7 +81,7 @@ public class SurveySchemaEditVM extends SurveyEditVM {
 		initFormObject(selectedNode);
 	}
 	
-	@NotifyChange({"editingNode","formObject","newNode","rootEntityCreation","nodeType"})
+	@NotifyChange({"editingNode","tempFormObject","formObject","newNode","rootEntityCreation","nodeType"})
 	@Command
 	public void addRootEntity() {
 		editingNode = true;
@@ -88,7 +94,7 @@ public class SurveySchemaEditVM extends SurveyEditVM {
 		treeModel.setSelection(emptySelection);
 	}
 	
-	@NotifyChange({"formObject","newNode","rootEntityCreation","nodeType"})
+	@NotifyChange({"tempFormObject","formObject","newNode","rootEntityCreation","nodeType"})
 	@Command
 	public void addNode() throws Exception {
 		if ( selectedNode != null && selectedNode instanceof EntityDefinition ) {
@@ -103,7 +109,7 @@ public class SurveySchemaEditVM extends SurveyEditVM {
 		}
 	}
 	
-	@NotifyChange({"selectedNode","formObject","newNode","rootEntityCreation"})
+	@NotifyChange({"selectedNode","tempFormObject","formObject","newNode","rootEntityCreation"})
 	@Command
 	public void saveNode() {
 		NodeDefinition editedNode;
@@ -135,6 +141,20 @@ public class SurveySchemaEditVM extends SurveyEditVM {
 		rootEntityCreation = false;
 	}
 
+	@NotifyChange("attributeDefaults")
+	@Command
+	public void addAttributeDefault() {
+		@SuppressWarnings("unchecked")
+		List<AttributeDefault> attributeDefaults = (List<AttributeDefault>) tempFormObject.getField("attributeDefaults");
+		if ( attributeDefaults == null ) {
+			attributeDefaults = new ArrayList<AttributeDefault>();
+			tempFormObject.setField("attributeDefaults", attributeDefaults);
+		}
+		AttributeDefault attributeDefault = new AttributeDefault();
+		attributeDefaults.add(attributeDefault);
+		this.attributeDefaults = attributeDefaults;
+	}
+	
 	private NodeDefinition createNodeDefinition() {
 		NodeDefinition result;
 		NodeType nodeTypeEnum = NodeType.valueOf(nodeType);
@@ -186,14 +206,14 @@ public class SurveySchemaEditVM extends SurveyEditVM {
 		return result;
 	}
 
-	@NotifyChange({"nodeType","formObject"})
+	@NotifyChange({"nodeType","tempFormObject","formObject"})
 	@Command
 	public void nodeTypeChanged(@BindingParam("nodeType") String nodeType) {
 		this.nodeType = nodeType;
 		initFormObject();
 	}
 
-	@NotifyChange({"attributeType","formObject"})
+	@NotifyChange({"attributeType","tempFormObject","formObject"})
 	@Command
 	public void attributeTypeChanged(@BindingParam("attributeType") String attributeType) {
 		this.attributeType = attributeType;
@@ -229,12 +249,17 @@ public class SurveySchemaEditVM extends SurveyEditVM {
 		} else {
 			formObject = null;
 		}
+		tempFormObject = new SimpleForm();
+		attributeDefaults = null;
 	}
 
 	protected void initFormObject(NodeDefinition node) {
 		calculateNodeType(node);
 		initFormObject();
 		formObject.setValues(node, selectedLanguageCode);
+		if ( formObject instanceof AttributeDefinitionFormObject ) {
+			attributeDefaults = ((AttributeDefinitionFormObject<?>) formObject).getAttributeDefaults();
+		}
 	}
 	
 	private void calculateNodeType(NodeDefinition node) {
@@ -364,6 +389,14 @@ public class SurveySchemaEditVM extends SurveyEditVM {
 
 	public boolean isEditingNode() {
 		return editingNode;
+	}
+
+	public Form getTempFormObject() {
+		return tempFormObject;
+	}
+
+	public List<AttributeDefault> getAttributeDefaults() {
+		return attributeDefaults;
 	}
 	
 }
