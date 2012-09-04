@@ -91,7 +91,6 @@ public class SurveySchemaEditVM extends SurveyEditVM {
 	
 	@NotifyChange({"editingNode","tempFormObject","formObject","newNode","rootEntityCreation","nodeType",
 		"attributeType","attributeDefaults","numericAttributePrecisions"})
-	@Command
 	public void addRootEntity() {
 		editingNode = true;
 		newNode = true;

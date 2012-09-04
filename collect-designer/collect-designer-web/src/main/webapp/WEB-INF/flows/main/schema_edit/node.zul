@@ -59,8 +59,8 @@
 						vm.attributeType eq 'DATE' ? 'schema_edit/attribute_date.zul':
 						vm.attributeType eq 'FILE' ? 'schema_edit/attribute_file.zul':
 						vm.attributeType eq 'NUMBER' ? 'schema_edit/attribute_number.zul':
-						vm.attributeType eq 'RANGE' ? 'schema_edit/attribute_range.zul':
-						vm.attributeType eq 'TAXON' ? 'schema_edit/attribute_taxon.zul':
+						vm.attributeType eq 'RANGE' ? 'schema_edit/attribute_numeric.zul':
+						vm.attributeType eq 'TAXON' ? 'schema_edit/attribute_range.zul':
 						vm.attributeType eq 'TEXT' ? 'schema_edit/attribute_text.zul':
 						vm.attributeType eq 'TIME' ? 'schema_edit/attribute_time.zul': 
 						null)" />
