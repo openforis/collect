@@ -5,9 +5,11 @@
 		viewModel="@id('vm') @init(vm)"
 		validationMessages="@id('nodeDefnVmsgs')"
 		form="@id('nodeDefnFx') 
+			@init(vm.tempFormObject)
 			@load(vm.formObject) 
 			@save(vm.formObject, before='saveNode')
 			@validator('org.openforis.collect.designer.form.validator.NodeDefinitionFormValidator')">
+		
 		<include src="schema_edit/node_common.zul" />
 
 		<include src="schema_edit/node_common_footer.zul" />

@@ -8,7 +8,7 @@
 			@init(vm.tempFormObject)
 			@load(vm.formObject) 
 			@save(vm.formObject, before='saveNode')
-			@validator('org.openforis.collect.designer.form.validator.NodeDefinitionFormValidator')">
+			@validator('org.openforis.collect.designer.form.validator.AttributeDefinitionFormValidator')">
 		
 		<include src="schema_edit/attribute_common.zul" />
 		

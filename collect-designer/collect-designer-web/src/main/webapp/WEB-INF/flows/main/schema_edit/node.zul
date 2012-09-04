@@ -28,6 +28,8 @@
 						<label value="${labels.survey.schema.attribute.type_label}:" />
 						<listbox id="subTypeListBox"
 							onSelect="@command('attributeTypeChanged', attributeType=self.selectedItem.value)" 
+							selectedItem="@load(vm.attributeType)"
+							disabled="@load(not vm.newNode)"
 							width="100px" mold="select">
 							<listitem label="${labels.survey.schema.attribute.type.bool}" value="BOOLEAN" />
 							<listitem label="${labels.survey.schema.attribute.type.code}" value="CODE" />
@@ -56,8 +58,8 @@
 						vm.attributeType eq 'COORDINATE' ? 'schema_edit/attribute_coordinate.zul':
 						vm.attributeType eq 'DATE' ? 'schema_edit/attribute_date.zul':
 						vm.attributeType eq 'FILE' ? 'schema_edit/attribute_file.zul':
-						vm.attributeType eq 'NUMBER' ? 'schema_edit/attribute_number.zul':
-						vm.attributeType eq 'RANGE' ? 'schema_edit/attribute_range.zul':
+						vm.attributeType eq 'NUMBER' ? 'schema_edit/attribute_numeric.zul':
+						vm.attributeType eq 'RANGE' ? 'schema_edit/attribute_numeric.zul':
 						vm.attributeType eq 'TAXON' ? 'schema_edit/attribute_taxon.zul':
 						vm.attributeType eq 'TEXT' ? 'schema_edit/attribute_text.zul':
 						vm.attributeType eq 'TIME' ? 'schema_edit/attribute_time.zul': 

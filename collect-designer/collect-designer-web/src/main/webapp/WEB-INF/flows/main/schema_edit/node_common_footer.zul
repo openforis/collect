@@ -3,7 +3,7 @@
 		<button label="${labels.survey.schema.node.apply_changes}" 
 	        	onClick="@command('saveNode')" />
 	    <hlayout visible="@load(nodeDefnFxStatus.dirty)">
-		    <image src="/assets/images/warning_16x16.png" />
+		    <image src="/assets/images/warning-small.png" />
 		    <label value="@load(nodeDefnFxStatus.dirty? labels.global.changes_not_applied: '')" />
 	    </hlayout>
          <label visible="@load(empty nodeDefnVmsgs, before='saveNode')"
