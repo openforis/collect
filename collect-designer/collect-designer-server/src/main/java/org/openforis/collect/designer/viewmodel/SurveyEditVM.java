@@ -14,6 +14,7 @@ import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.Languages;
 import org.openforis.idm.metamodel.ModelVersion;
+import org.openforis.idm.metamodel.Unit;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.GlobalCommand;
 import org.zkoss.bind.annotation.NotifyChange;
@@ -61,6 +62,10 @@ public class SurveyEditVM {
 	@NotifyChange("codeLists")
 	@GlobalCommand
 	public void codeListsUpdated() {}
+	
+	@NotifyChange("units")
+	@GlobalCommand
+	public void unitsUpdated() {}
 	
 	public BindingListModelListModel<String> getLanguageCodes() {
 		return new BindingListModelListModel<String>(new ListModelList<String>(Languages.LANGUAGE_CODES));
@@ -111,6 +116,11 @@ public class SurveyEditVM {
 	public List<CodeList> getCodeLists() {
 		List<CodeList> result = new ArrayList<CodeList>(survey.getCodeLists());
 		return new BindingListModelList<CodeList>(result, false);
+	}
+	
+	public List<Unit> getUnits() {
+		List<Unit> result = new ArrayList<Unit>(survey.getUnits());
+		return new BindingListModelList<Unit>(result, false);
 	}
 	
 }

@@ -3,7 +3,7 @@
  */
 package org.openforis.collect.designer.form;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.openforis.idm.metamodel.AttributeDefault;
@@ -18,15 +18,19 @@ public class AttributeDefinitionFormObject<T extends AttributeDefinition> extend
 
 	private List<AttributeDefault> attributeDefaults;
 
-	public AttributeDefinitionFormObject() {
-	}
-	
 	public void copyValues(T dest, String languageCode) {
 		super.copyValues(dest, languageCode);
+		dest.removeAllAttributeDefaults();
+		if ( attributeDefaults != null ) {
+			for (AttributeDefault attrDefault : attributeDefaults) {
+				dest.addAttributeDefault(attrDefault);
+			}
+		}
 	}
 	
 	public void setValues(T source, String languageCode) {
 		super.setValues(source, languageCode);
+		attributeDefaults = new ArrayList<AttributeDefault>(source.getAttributeDefaults());
 	}
 
 	public List<AttributeDefault> getAttributeDefaults() {

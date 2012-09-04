@@ -28,6 +28,8 @@
 						<label value="${labels.survey.schema.attribute.type_label}:" />
 						<listbox id="subTypeListBox"
 							onSelect="@command('attributeTypeChanged', attributeType=self.selectedItem.value)" 
+							selectedItem="@load(vm.attributeType)"
+							disabled="@load(not vm.newNode)"
 							width="100px" mold="select">
 							<listitem label="${labels.survey.schema.attribute.type.bool}" value="BOOLEAN" />
 							<listitem label="${labels.survey.schema.attribute.type.code}" value="CODE" />

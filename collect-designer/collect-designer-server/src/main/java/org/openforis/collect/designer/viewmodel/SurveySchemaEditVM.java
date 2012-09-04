@@ -14,6 +14,8 @@ import org.openforis.collect.designer.form.BooleanAttributeDefinitionFormObject;
 import org.openforis.collect.designer.form.CodeAttributeDefinitionFormObject;
 import org.openforis.collect.designer.form.EntityDefinitionFormObject;
 import org.openforis.collect.designer.form.NodeDefinitionFormObject;
+import org.openforis.collect.designer.form.NumberAttributeDefinitionFormObject;
+import org.openforis.collect.designer.form.NumericAttributeDefinitionFormObject;
 import org.openforis.idm.metamodel.AttributeDefault;
 import org.openforis.idm.metamodel.BooleanAttributeDefinition;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
@@ -23,6 +25,7 @@ import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.FileAttributeDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NumberAttributeDefinition;
+import org.openforis.idm.metamodel.Precision;
 import org.openforis.idm.metamodel.RangeAttributeDefinition;
 import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.TaxonAttributeDefinition;
@@ -47,6 +50,9 @@ import org.zkoss.zul.Treeitem;
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class SurveySchemaEditVM extends SurveyEditVM {
 
+	private static final String ATTRIBUTE_DEFAULTS_FIELD = "attributeDefaults";
+	private static final String NUMBER_ATTRIBUTE_PRECISIONS_FIELD = "precisions";
+
 	enum NodeType {
 		ENTITY, ATTRIBUTE
 	}
@@ -60,12 +66,14 @@ public class SurveySchemaEditVM extends SurveyEditVM {
 	private boolean newNode;
 	private boolean rootEntityCreation;
 	private List<AttributeDefault> attributeDefaults;
+	private List<Precision> numericAttributePrecisions;
 	
 	private enum AttributeType {
 		BOOLEAN, CODE, COORDINATE, DATE, FILE, NUMBER, RANGE, TAXON, TEXT, TIME
 	}
 	
-	@NotifyChange({"editingNode","newNode","rootEntityCreation","tempFormObject","formObject"})
+	@NotifyChange({"editingNode","newNode","rootEntityCreation","nodeType","attributeType",
+		"tempFormObject","formObject","attributeDefaults","numericAttributePrecisions"})
 	@Command
 	public void nodeSelected(@BindingParam("node") Treeitem node) {
 		if ( node != null ) {
@@ -81,7 +89,8 @@ public class SurveySchemaEditVM extends SurveyEditVM {
 		initFormObject(selectedNode);
 	}
 	
-	@NotifyChange({"editingNode","tempFormObject","formObject","newNode","rootEntityCreation","nodeType"})
+	@NotifyChange({"editingNode","tempFormObject","formObject","newNode","rootEntityCreation","nodeType",
+		"attributeType","attributeDefaults","numericAttributePrecisions"})
 	@Command
 	public void addRootEntity() {
 		editingNode = true;
@@ -94,7 +103,8 @@ public class SurveySchemaEditVM extends SurveyEditVM {
 		treeModel.setSelection(emptySelection);
 	}
 	
-	@NotifyChange({"tempFormObject","formObject","newNode","rootEntityCreation","nodeType"})
+	@NotifyChange({"tempFormObject","formObject","newNode","rootEntityCreation","nodeType","attributeType",
+		"attributeDefaults","numericAttributePrecisions"})
 	@Command
 	public void addNode() throws Exception {
 		if ( selectedNode != null && selectedNode instanceof EntityDefinition ) {
@@ -144,15 +154,49 @@ public class SurveySchemaEditVM extends SurveyEditVM {
 	@NotifyChange("attributeDefaults")
 	@Command
 	public void addAttributeDefault() {
-		@SuppressWarnings("unchecked")
-		List<AttributeDefault> attributeDefaults = (List<AttributeDefault>) tempFormObject.getField("attributeDefaults");
 		if ( attributeDefaults == null ) {
-			attributeDefaults = new ArrayList<AttributeDefault>();
-			tempFormObject.setField("attributeDefaults", attributeDefaults);
+			initAttributeDefaultsList();
 		}
 		AttributeDefault attributeDefault = new AttributeDefault();
 		attributeDefaults.add(attributeDefault);
-		this.attributeDefaults = attributeDefaults;
+	}
+	
+	@NotifyChange("attributeDefaults")
+	@Command
+	public void deleteAttributeDefault(@BindingParam("attributeDefault") AttributeDefault attributeDefault) {
+		attributeDefaults.remove(attributeDefault);
+	}
+	
+	@NotifyChange("numericAttributePrecisions")
+	@Command
+	public void addNumericAttributePrecision() {
+		if ( numericAttributePrecisions == null ) {
+			initNumericAttributePrecisionsList();
+		}
+		Precision precision = new Precision();
+		numericAttributePrecisions.add(precision);
+	}
+	
+	@NotifyChange("numericAttributePrecisions")
+	@Command
+	public void deleteNumericAttributePrecision(@BindingParam("precision") Precision precision) {
+		numericAttributePrecisions.remove(precision);
+	}
+	
+	protected void initAttributeDefaultsList() {
+		if ( attributeDefaults == null ) {
+			attributeDefaults = new ArrayList<AttributeDefault>();
+			tempFormObject.setField(ATTRIBUTE_DEFAULTS_FIELD, attributeDefaults);
+			((AttributeDefinitionFormObject<?>) formObject).setAttributeDefaults(attributeDefaults);
+		}
+	}
+	
+	protected void initNumericAttributePrecisionsList() {
+		if ( numericAttributePrecisions == null ) {
+			numericAttributePrecisions = new ArrayList<Precision>();
+			tempFormObject.setField(NUMBER_ATTRIBUTE_PRECISIONS_FIELD, numericAttributePrecisions);
+			((NumericAttributeDefinitionFormObject<?>) formObject).setPrecisions(numericAttributePrecisions);
+		}
 	}
 	
 	private NodeDefinition createNodeDefinition() {
@@ -238,6 +282,9 @@ public class SurveySchemaEditVM extends SurveyEditVM {
 					case CODE:
 						formObject = new CodeAttributeDefinitionFormObject();
 						break;
+					case NUMBER:
+						formObject = new NumberAttributeDefinitionFormObject();
+						break;
 					default:
 						throw new IllegalStateException("Attribute type not supported");
 					}
@@ -251,6 +298,7 @@ public class SurveySchemaEditVM extends SurveyEditVM {
 		}
 		tempFormObject = new SimpleForm();
 		attributeDefaults = null;
+		numericAttributePrecisions = null;
 	}
 
 	protected void initFormObject(NodeDefinition node) {
@@ -259,6 +307,12 @@ public class SurveySchemaEditVM extends SurveyEditVM {
 		formObject.setValues(node, selectedLanguageCode);
 		if ( formObject instanceof AttributeDefinitionFormObject ) {
 			attributeDefaults = ((AttributeDefinitionFormObject<?>) formObject).getAttributeDefaults();
+			tempFormObject.setField(ATTRIBUTE_DEFAULTS_FIELD, attributeDefaults);
+			
+			if ( formObject instanceof NumericAttributeDefinitionFormObject ) {
+				numericAttributePrecisions = ((NumericAttributeDefinitionFormObject<?>) formObject).getPrecisions();
+				tempFormObject.setField(NUMBER_ATTRIBUTE_PRECISIONS_FIELD, numericAttributePrecisions);
+			}
 		}
 	}
 	
@@ -397,6 +451,10 @@ public class SurveySchemaEditVM extends SurveyEditVM {
 
 	public List<AttributeDefault> getAttributeDefaults() {
 		return attributeDefaults;
+	}
+	
+	public List<Precision> getNumericAttributePrecisions() {
+		return numericAttributePrecisions;
 	}
 	
 }
