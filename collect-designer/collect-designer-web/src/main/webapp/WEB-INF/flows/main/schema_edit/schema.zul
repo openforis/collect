@@ -8,7 +8,8 @@
 		width="100%" height="100%">
 		<borderlayout>
 		 	<west title="${labels.survey.schema.nodes_title}"
-		 		width="300px" style="overflow: auto;">
+		 		width="300px"
+		 		splittable="true">
 		 		<borderlayout>
 		 			<north>
 						<tree id="nodesTree"
