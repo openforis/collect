@@ -1,6 +1,7 @@
 package org.openforis.collect.model.ui;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.bind.JAXBContext;
@@ -18,6 +19,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.openforis.idm.metamodel.Configuration;
 import org.openforis.idm.metamodel.xml.ConfigurationAdapter;
+import org.openforis.idm.util.CollectionUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -38,7 +40,36 @@ public class UIConfiguration implements Configuration, Serializable {
 	private List<UITabDefinition> tabDefinitions;
 
 	public List<UITabDefinition> getTabDefinitions() {
-		return tabDefinitions;
+		return CollectionUtil.unmodifiableList(tabDefinitions);
+	}
+	
+	public UITabDefinition getTabDefinition(String name) {
+		if ( tabDefinitions != null ) {
+			for (UITabDefinition tabDefn : tabDefinitions) {
+				if ( tabDefn.getName().equals(name) ) {
+					return tabDefn;
+				}
+			}
+		}
+		return null;
+	}
+	
+	public void addTabDefinition(UITabDefinition tabDefn) {
+		if ( tabDefinitions == null ) {
+			tabDefinitions = new ArrayList<UITabDefinition>();
+		}
+		tabDefinitions.add(tabDefn);
+	}
+	
+	public void setTabDefinition(int index, UITabDefinition tabDefn) {
+		if ( tabDefinitions == null ) {
+			tabDefinitions = new ArrayList<UITabDefinition>();
+		}
+		tabDefinitions.set(index, tabDefn);
+	}
+	
+	public void removeTabDefinition(UITabDefinition tabDefn) {
+		tabDefinitions.remove(tabDefn);
 	}
 	
 	@Override

@@ -31,11 +31,11 @@
 				</xs:annotation>
 			</xs:element>
 		</xs:sequence>
-		<xs:attribute name="rootEntity" type="xs:string">
+		<xs:attribute name="name" type="xs:string">
 			<xs:annotation>
 				<xs:documentation xml:lang="en">
-					Name of the
-					corresponding root entity
+					Name of the tab definition.
+					The root entity should refer to this.
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
