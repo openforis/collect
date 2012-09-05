@@ -3,7 +3,6 @@ package org.openforis.collect.designer.form.validator;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.openforis.collect.designer.form.NodeDefinitionFormObject;
 import org.zkoss.bind.AnnotateBinder;
 import org.zkoss.bind.BindContext;
 import org.zkoss.bind.Form;
@@ -20,6 +19,7 @@ import org.zkoss.zk.ui.Component;
  */
 public class NodeDefinitionFormValidator extends AbstractValidator {
 
+	private static final String FORM_ID = "fx";
 	protected static final String DESCRIPTION_FIELD = "description";
 	protected static final String NAME_FIELD = "name";
 	
@@ -67,7 +67,7 @@ public class NodeDefinitionFormValidator extends AbstractValidator {
 		BindContext bindContext = ctx.getBindContext();
 		AnnotateBinder binder = (AnnotateBinder) bindContext.getBinder();
 		Component formContainer = bindContext.getComponent();
-		Form form = binder.getForm(formContainer, "nodeDefnFx");
+		Form form = binder.getForm(formContainer, FORM_ID);
 		return form;
 	}
 	

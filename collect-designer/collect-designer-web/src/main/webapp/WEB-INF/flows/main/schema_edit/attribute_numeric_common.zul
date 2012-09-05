@@ -8,13 +8,13 @@
 			<row>
 				<label value="${labels.survey.schema.attribute.numeric.type_label}:" />
 				<cell>
-					<radiogroup selectedItem="@bind(nodeDefnFx.type)">
+					<radiogroup selectedItem="@bind(fx.type)">
 						<radio label="${labels.survey.schema.attribute.numeric.type.integer}"
 							value="INTEGER" />
 						<radio label="${labels.survey.schema.attribute.numeric.type.real}"
 							value="REAL" />
 					</radiogroup>
-					<label class="error" value="@load(nodeDefnVmsgs['type'])" />
+					<label class="error" value="@load(vmsgs['type'])" />
 				</cell>
 			</row>
 			<row>
@@ -51,7 +51,7 @@
 						<button label="${labels.survey.schema.attribute.numeric.precisions.add_precision}"
 								onClick="@command('addNumericAttributePrecision')" />
 					</vlayout>
-					<label class="error" value="@load(nodeDefnVmsgs['precisions'])" />
+					<label class="error" value="@load(vmsgs['precisions'])" />
 				</cell>
 			</row>
 <!-- 			<row> -->
@@ -60,16 +60,16 @@
 <!-- 					<label value="${labels.survey.schema.attribute.numeric.compare.greaterThan}:" /> -->
 <!-- 					<label value="(" /> -->
 <!-- 					<label value="${labels.survey.schema.attribute.numeric.compare.equal}" /> -->
-<!-- 					<checkbox checked="@bind(nodeDefnFx.greaterThanEqual)" /> -->
+<!-- 					<checkbox checked="@bind(fx.greaterThanEqual)" /> -->
 <!-- 					<label value=")" /> -->
-<!-- 					<doublebox value="@bind(nodeDefnFx.greaterThan)" /> -->
+<!-- 					<doublebox value="@bind(fx.greaterThan)" /> -->
 <!-- 					<label value="(" /> -->
 <!-- 					<label value="${labels.survey.schema.attribute.numeric.compare.lessThan}:" /> -->
 <!-- 					<label value="${labels.survey.schema.attribute.numeric.compare.equal}" /> -->
-<!-- 					<checkbox checked="@bind(nodeDefnFx.lessThanEqual)" /> -->
+<!-- 					<checkbox checked="@bind(fx.lessThanEqual)" /> -->
 <!-- 					<label value=")" /> -->
-<!-- 					<doublebox value="@bind(nodeDefnFx.lessThan)" /> -->
-<!-- 					<label class="error" value="@load(nodeDefnVmsgs['compare'])" /> -->
+<!-- 					<doublebox value="@bind(fx.lessThan)" /> -->
+<!-- 					<label class="error" value="@load(vmsgs['compare'])" /> -->
 <!-- 				</cell> -->
 <!-- 			</row> -->
 		</rows>

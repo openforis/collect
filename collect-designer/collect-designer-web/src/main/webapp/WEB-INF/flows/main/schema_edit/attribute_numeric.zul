@@ -3,8 +3,8 @@
 		id="nodeFormContainer"
 		apply="org.zkoss.bind.BindComposer"
 		viewModel="@id('vm') @init(vm)"
-		validationMessages="@id('nodeDefnVmsgs')"
-		form="@id('nodeDefnFx') 
+		validationMessages="@id('vmsgs')"
+		form="@id('fx') 
 			@init(vm.tempFormObject)
 			@load(vm.formObject) 
 			@save(vm.formObject, before='saveNode')
@@ -15,19 +15,19 @@
 		<grid>
 			<columns>
 				<column label="" width="150px" />
-				<column label="" width="300px" />
+				<column label="" width="100%" />
 			</columns>
 			<rows>
 				<row>
 					<label value="${labels.survey.schema.attribute.numeric.type_label}:" />
 					<cell>
-						<radiogroup selectedItem="@bind(nodeDefnFx.type)">
+						<radiogroup selectedItem="@bind(fx.type)">
 							<radio label="${labels.survey.schema.attribute.numeric.type.real}"
 								value="REAL" />
 							<radio label="${labels.survey.schema.attribute.numeric.type.integer}"
 								value="INTEGER" />
 						</radiogroup>
-						<label class="error" value="@load(nodeDefnVmsgs['type'])" />
+						<label class="error" value="@load(vmsgs['type'])" />
 					</cell>
 				</row>
 				<row>
@@ -64,7 +64,7 @@
 							<button label="${labels.survey.schema.attribute.numeric.precisions.add_precision}"
 									onClick="@command('addNumericAttributePrecision')" />
 						</vlayout>
-						<label class="error" value="@load(nodeDefnVmsgs['precisions'])" />
+						<label class="error" value="@load(vmsgs['precisions'])" />
 					</cell>
 				</row>
 			</rows>

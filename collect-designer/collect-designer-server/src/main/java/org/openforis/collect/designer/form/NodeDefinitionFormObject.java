@@ -1,9 +1,15 @@
 package org.openforis.collect.designer.form;
 
+import org.openforis.collect.designer.model.AttributeType;
+import org.openforis.collect.designer.model.NodeType;
+import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.ui.UIConfiguration;
+import org.openforis.collect.model.ui.UITab;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NodeLabel.Type;
 import org.openforis.idm.metamodel.Prompt;
+import org.openforis.idm.metamodel.Survey;
 
 /**
  * 
@@ -27,8 +33,39 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 	private String relevantExpression;
 	private ModelVersion sinceVersion;
 	private ModelVersion deprecatedVersion;
+	private UITab tab;
 	private Integer minCount;
 	private Integer maxCount;
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public static NodeDefinitionFormObject<NodeDefinition> newInstance(NodeType nodeType, AttributeType attributeType) {
+		NodeDefinitionFormObject<NodeDefinition> formObject = null;
+		if ( nodeType != null ) {
+			switch ( nodeType) {
+			case ENTITY:
+				formObject = new EntityDefinitionFormObject();
+				break;
+			case ATTRIBUTE:
+				if ( attributeType != null ) {
+					switch (attributeType) {
+					case BOOLEAN:
+						formObject = new BooleanAttributeDefinitionFormObject();
+						break;
+					case CODE:
+						formObject = new CodeAttributeDefinitionFormObject();
+						break;
+					case NUMBER:
+						formObject = new NumberAttributeDefinitionFormObject();
+						break;
+					default:
+						throw new IllegalStateException("Attribute type not supported");
+					}
+				}
+				break;
+			}
+		}
+		return formObject;
+	}
 	
 	public void setValues(T source, String languageCode) {
 		name = source.getName();
@@ -49,6 +86,9 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 		maxCount = source.getMaxCount();
 		sinceVersion = source.getSinceVersion();
 		deprecatedVersion = source.getDeprecatedVersion();
+		CollectSurvey survey = (CollectSurvey) source.getSurvey();
+		UIConfiguration uiConfiguration = survey.getUIConfiguration();
+		tab = uiConfiguration.getTab(source);
 	}
 	
 	public void copyValues(T dest, String languageCode) {
@@ -83,6 +123,8 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 		} else {
 			dest.setDeprecatedVersion(null);
 		}
+		String tabName = tab != null ? tab.getName(): null;
+		dest.setAnnotation(UIConfiguration.TAB_NAME_ANNOTATION, tabName);
 	}
 	
 	public String getName() {
@@ -219,6 +261,14 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 
 	public void setMaxCount(Integer maxCount) {
 		this.maxCount = maxCount;
+	}
+
+	public UITab getTab() {
+		return tab;
+	}
+
+	public void setTab(UITab tab) {
+		this.tab = tab;
 	}
 
 }

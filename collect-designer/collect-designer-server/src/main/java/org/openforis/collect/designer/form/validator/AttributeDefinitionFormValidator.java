@@ -3,9 +3,6 @@
  */
 package org.openforis.collect.designer.form.validator;
 
-import java.util.List;
-
-import org.openforis.idm.metamodel.AttributeDefault;
 import org.zkoss.bind.ValidationContext;
 
 /**
@@ -24,7 +21,7 @@ public class AttributeDefinitionFormValidator extends NodeDefinitionFormValidato
 	}
 	
 	protected void validateAttributeDefaults(ValidationContext ctx) {
-		List<AttributeDefault> attributeDefaults = (List<AttributeDefault>) getValueFromForm(ctx, ATTRIBUTE_DEFAULTS_FIELD);
+		//List<AttributeDefault> attributeDefaults = (List<AttributeDefault>) getValueFromForm(ctx, ATTRIBUTE_DEFAULTS_FIELD);
 		//TODO
 	}
 

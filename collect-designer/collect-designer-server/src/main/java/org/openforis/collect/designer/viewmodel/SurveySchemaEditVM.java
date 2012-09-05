@@ -10,27 +10,18 @@ import java.util.Collections;
 import java.util.List;
 
 import org.openforis.collect.designer.form.AttributeDefinitionFormObject;
-import org.openforis.collect.designer.form.BooleanAttributeDefinitionFormObject;
-import org.openforis.collect.designer.form.CodeAttributeDefinitionFormObject;
-import org.openforis.collect.designer.form.EntityDefinitionFormObject;
 import org.openforis.collect.designer.form.NodeDefinitionFormObject;
-import org.openforis.collect.designer.form.NumberAttributeDefinitionFormObject;
 import org.openforis.collect.designer.form.NumericAttributeDefinitionFormObject;
+import org.openforis.collect.designer.model.AttributeType;
+import org.openforis.collect.designer.model.NodeType;
+import org.openforis.collect.model.ui.UITab;
+import org.openforis.collect.util.SchemaNodeUtil;
 import org.openforis.idm.metamodel.AttributeDefault;
-import org.openforis.idm.metamodel.BooleanAttributeDefinition;
-import org.openforis.idm.metamodel.CodeAttributeDefinition;
-import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
-import org.openforis.idm.metamodel.DateAttributeDefinition;
+import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
-import org.openforis.idm.metamodel.FileAttributeDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
-import org.openforis.idm.metamodel.NumberAttributeDefinition;
 import org.openforis.idm.metamodel.Precision;
-import org.openforis.idm.metamodel.RangeAttributeDefinition;
 import org.openforis.idm.metamodel.Schema;
-import org.openforis.idm.metamodel.TaxonAttributeDefinition;
-import org.openforis.idm.metamodel.TextAttributeDefinition;
-import org.openforis.idm.metamodel.TimeAttributeDefinition;
 import org.zkoss.bind.Form;
 import org.zkoss.bind.SimpleForm;
 import org.zkoss.bind.annotation.BindingParam;
@@ -53,9 +44,6 @@ public class SurveySchemaEditVM extends SurveyEditVM {
 	private static final String ATTRIBUTE_DEFAULTS_FIELD = "attributeDefaults";
 	private static final String NUMBER_ATTRIBUTE_PRECISIONS_FIELD = "precisions";
 
-	enum NodeType {
-		ENTITY, ATTRIBUTE
-	}
 	private DefaultTreeModel<NodeDefinition> treeModel;
 	private NodeDefinition selectedNode;
 	private Form tempFormObject;
@@ -68,13 +56,9 @@ public class SurveySchemaEditVM extends SurveyEditVM {
 	private List<AttributeDefault> attributeDefaults;
 	private List<Precision> numericAttributePrecisions;
 	
-	private enum AttributeType {
-		BOOLEAN, CODE, COORDINATE, DATE, FILE, NUMBER, RANGE, TAXON, TEXT, TIME
-	}
-	
+	@Command
 	@NotifyChange({"editingNode","newNode","rootEntityCreation","nodeType","attributeType",
 		"tempFormObject","formObject","attributeDefaults","numericAttributePrecisions"})
-	@Command
 	public void nodeSelected(@BindingParam("node") Treeitem node) {
 		if ( node != null ) {
 			TreeNode<NodeDefinition> treeNode = node.getValue();
@@ -89,6 +73,7 @@ public class SurveySchemaEditVM extends SurveyEditVM {
 		initFormObject(selectedNode);
 	}
 	
+	@Command
 	@NotifyChange({"editingNode","tempFormObject","formObject","newNode","rootEntityCreation","nodeType",
 		"attributeType","attributeDefaults","numericAttributePrecisions"})
 	public void addRootEntity() {
@@ -102,9 +87,9 @@ public class SurveySchemaEditVM extends SurveyEditVM {
 		treeModel.setSelection(emptySelection);
 	}
 	
+	@Command
 	@NotifyChange({"tempFormObject","formObject","newNode","rootEntityCreation","nodeType","attributeType",
 		"attributeDefaults","numericAttributePrecisions"})
-	@Command
 	public void addNode() throws Exception {
 		if ( selectedNode != null && selectedNode instanceof EntityDefinition ) {
 			editingNode = true;
@@ -118,15 +103,16 @@ public class SurveySchemaEditVM extends SurveyEditVM {
 		}
 	}
 	
-	@NotifyChange({"selectedNode","tempFormObject","formObject","newNode","rootEntityCreation"})
 	@Command
-	public void saveNode() {
+	@NotifyChange({"selectedNode","tempFormObject","formObject","newNode","rootEntityCreation"})
+	public void applyChanges() {
 		NodeDefinition editedNode;
 		if ( newNode ) {
-			editedNode = createNodeDefinition();
+			editedNode = SchemaNodeUtil.createNodeDefinition(survey, nodeType, attributeType);
 		} else {
 			editedNode = selectedNode;
 		}
+		//TODO avoid the use of side effect...
 		formObject.copyValues(editedNode, selectedLanguageCode);
 		
 		if ( newNode ) {
@@ -150,8 +136,8 @@ public class SurveySchemaEditVM extends SurveyEditVM {
 		rootEntityCreation = false;
 	}
 
-	@NotifyChange("attributeDefaults")
 	@Command
+	@NotifyChange("attributeDefaults")
 	public void addAttributeDefault() {
 		if ( attributeDefaults == null ) {
 			initAttributeDefaultsList();
@@ -160,14 +146,14 @@ public class SurveySchemaEditVM extends SurveyEditVM {
 		attributeDefaults.add(attributeDefault);
 	}
 	
-	@NotifyChange("attributeDefaults")
 	@Command
+	@NotifyChange("attributeDefaults")
 	public void deleteAttributeDefault(@BindingParam("attributeDefault") AttributeDefault attributeDefault) {
 		attributeDefaults.remove(attributeDefault);
 	}
 	
-	@NotifyChange("numericAttributePrecisions")
 	@Command
+	@NotifyChange("numericAttributePrecisions")
 	public void addNumericAttributePrecision() {
 		if ( numericAttributePrecisions == null ) {
 			initNumericAttributePrecisionsList();
@@ -176,8 +162,8 @@ public class SurveySchemaEditVM extends SurveyEditVM {
 		numericAttributePrecisions.add(precision);
 	}
 	
-	@NotifyChange("numericAttributePrecisions")
 	@Command
+	@NotifyChange("numericAttributePrecisions")
 	public void deleteNumericAttributePrecision(@BindingParam("precision") Precision precision) {
 		numericAttributePrecisions.remove(precision);
 	}
@@ -198,103 +184,30 @@ public class SurveySchemaEditVM extends SurveyEditVM {
 		}
 	}
 	
-	private NodeDefinition createNodeDefinition() {
-		NodeDefinition result;
-		NodeType nodeTypeEnum = NodeType.valueOf(nodeType);
-		switch(nodeTypeEnum) {
-		case ENTITY:
-			result = new EntityDefinition();
-			break;
-		case ATTRIBUTE:
-			AttributeType attrType = AttributeType.valueOf(attributeType);
-			switch(attrType) {
-			case BOOLEAN:
-				result = new BooleanAttributeDefinition();
-				break;
-			case CODE:
-				result = new CodeAttributeDefinition();
-				break;
-			case COORDINATE:
-				result = new CoordinateAttributeDefinition();
-				break;
-			case DATE:
-				result = new DateAttributeDefinition();
-				break;
-			case FILE:
-				result = new FileAttributeDefinition();
-				break;
-			case NUMBER:
-				result = new NumberAttributeDefinition();
-				break;
-			case RANGE:
-				result = new RangeAttributeDefinition();
-				break;
-			case TAXON:
-				result = new TaxonAttributeDefinition();
-				break;
-			case TEXT:
-				result = new TextAttributeDefinition();
-				break;
-			case TIME:
-				result = new TimeAttributeDefinition();
-				break;
-			default:
-				throw new IllegalStateException("Attribute type not supported: " + attributeType);
-			}
-			break;
-		default:
-			throw new IllegalStateException("Node type not supported: " + nodeType);
-		}
-		result.setSchema(survey.getSchema());
-		return result;
-	}
-
-	@NotifyChange({"nodeType","tempFormObject","formObject"})
 	@Command
+	@NotifyChange({"nodeType","tempFormObject","formObject"})
 	public void nodeTypeChanged(@BindingParam("nodeType") String nodeType) {
 		this.nodeType = nodeType;
 		initFormObject();
 	}
 
-	@NotifyChange({"attributeType","tempFormObject","formObject"})
 	@Command
+	@NotifyChange({"attributeType","tempFormObject","formObject"})
 	public void attributeTypeChanged(@BindingParam("attributeType") String attributeType) {
 		this.attributeType = attributeType;
 		initFormObject();
 	}
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private void initFormObject() {
+		NodeType nodeTypeEnum = null;
+		AttributeType attributeTypeEnum = null;
 		if ( nodeType != null ) {
-			NodeType nodeTypeEnum = NodeType.valueOf(nodeType);
-			switch ( nodeTypeEnum ) {
-			case ENTITY:
-				formObject = new EntityDefinitionFormObject();
-				break;
-			case ATTRIBUTE:
-				if ( attributeType != null ) {
-					AttributeType attrType = AttributeType.valueOf(attributeType);
-					switch (attrType) {
-					case BOOLEAN:
-						formObject = new BooleanAttributeDefinitionFormObject();
-						break;
-					case CODE:
-						formObject = new CodeAttributeDefinitionFormObject();
-						break;
-					case NUMBER:
-						formObject = new NumberAttributeDefinitionFormObject();
-						break;
-					default:
-						throw new IllegalStateException("Attribute type not supported");
-					}
-				} else {
-					formObject = null;
-				}
-				break;
-			}
-		} else {
-			formObject = null;
+			nodeTypeEnum = NodeType.valueOf(nodeType);
 		}
+		if ( attributeType != null ) {
+			attributeTypeEnum = AttributeType.valueOf(attributeType);
+		}
+		formObject = NodeDefinitionFormObject.newInstance(nodeTypeEnum, attributeTypeEnum);
 		tempFormObject = new SimpleForm();
 		attributeDefaults = null;
 		numericAttributePrecisions = null;
@@ -315,37 +228,17 @@ public class SurveySchemaEditVM extends SurveyEditVM {
 		}
 	}
 	
-	private void calculateNodeType(NodeDefinition node) {
-		if ( node instanceof EntityDefinition ) {
-			nodeType = NodeType.ENTITY.name();
+	protected void calculateNodeType(NodeDefinition node) {
+		NodeType nodeTypeEnum = NodeType.typeOf(node);
+		nodeType = nodeTypeEnum.name();
+		if ( nodeTypeEnum == NodeType.ATTRIBUTE) {
+			AttributeType attributeTypeEnum = AttributeType.typeOf((AttributeDefinition) node);
+			attributeType = attributeTypeEnum.name();
 		} else {
-			nodeType = NodeType.ATTRIBUTE.name();
-			if ( node instanceof BooleanAttributeDefinition ) {
-				attributeType = AttributeType.BOOLEAN.name();
-			} else if ( node instanceof CodeAttributeDefinition ) {
-				attributeType = AttributeType.CODE.name();
-			} else if ( node instanceof CoordinateAttributeDefinition ) {
-				attributeType = AttributeType.COORDINATE.name();
-			} else if ( node instanceof DateAttributeDefinition ) {
-				attributeType = AttributeType.DATE.name();
-			} else if ( node instanceof FileAttributeDefinition ) {
-				attributeType = AttributeType.FILE.name();
-			} else if ( node instanceof NumberAttributeDefinition ) {
-				attributeType = AttributeType.NUMBER.name();
-			} else if ( node instanceof RangeAttributeDefinition ) {
-				attributeType = AttributeType.RANGE.name();
-			} else if ( node instanceof TaxonAttributeDefinition ) {
-				attributeType = AttributeType.TAXON.name();
-			} else if ( node instanceof TextAttributeDefinition ) {
-				attributeType = AttributeType.TEXT.name();
-			} else if ( node instanceof TimeAttributeDefinition ) {
-				attributeType = AttributeType.TIME.name();
-			}				
+			attributeType = null;
 		}
-		
-		
 	}
-
+	
 	//TODO move this part into a Composer...
 	
 	private void initTreeModel() {
@@ -385,6 +278,10 @@ public class SurveySchemaEditVM extends SurveyEditVM {
 		return treeModel;
     }
 
+	public List<UITab> getSelectableTabs() {
+		return null;
+	}
+	
 	public static class NodeDefinitionTreeNode extends DefaultTreeNode<NodeDefinition> {
 	     
 		private static final long serialVersionUID = 1L;

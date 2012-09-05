@@ -1,0 +1,34 @@
+<zk>
+	<borderlayout 
+		apply="org.zkoss.bind.BindComposer"
+		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SurveyConfigurationEditVM')">
+		<west title="${labels.survey.configuration.tabs_title}">
+			<vlayout>
+				<tree id="itemsTree" width="300px" model="@load(vm.tabs)"
+					onSelect="@command('tabSelected', node=self.selectedItem)">
+					<template name="model">
+						<treeitem>
+							<treerow>
+								<treecell label="@load(each.data.name)" />
+							</treerow>
+						</treeitem>
+					</template>
+				</tree>
+				
+				<hlayout>
+					<button label="${labels.survey.configuration.add_tab_definition}" 
+						onClick="@command('addTabDefinition')" />
+					<button label="${labels.survey.configuration.add_tab}" 
+						onClick="@command('addTab')"
+						disabled="@load(empty vm.selectedTab)" />
+				</hlayout>
+			</vlayout>
+		</west>
+		<center title="${labels.global.details_title}">
+			<include src="@load(
+				not empty vm.editedTabDefinition ? 'configuration_edit/tab_definition_edit.zul':
+				not empty vm.editedTab ? 'configuration_edit/tab_edit.zul':
+				'')" />
+		</center>
+	</borderlayout>
+</zk>

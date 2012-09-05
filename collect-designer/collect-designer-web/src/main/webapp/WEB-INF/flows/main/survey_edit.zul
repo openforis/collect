@@ -8,7 +8,7 @@
 		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SurveyEditVM')">
 		
 		<hbox>
-			<label value="Language:" />
+			<label value="${labels.survey.selected_language}" />
 			<combobox
 				selectedItem="@bind(vm.selectedLanguageCode)"
 				model="@load(vm.languageCodes)">
@@ -18,7 +18,7 @@
 		<tabbox id="tb" height="500px" width="100%">
 		    <tabs id="tabs">
 		        <tab id="infoTab" label="${labels.survey.info}" />
-		        <tab id="configurationTab" label="${labels.survey.configuration}" />
+		        <tab id="configurationTab" label="${labels.survey.configuration.$}" />
 		        <tab id="versioningTab" label="${labels.survey.model_versions}" />
 		        <tab id="codeListsTab" label="${labels.survey.code_lists}" />
 		        <tab id="unitsTab" label="${labels.survey.units}" />
@@ -29,7 +29,9 @@
 		        <tabpanel height="100%" width="100%">
 		        	<include src="survey_edit_info.zul" />
 		        </tabpanel>
-		        <tabpanel height="100%" width="100%">TO DO</tabpanel>
+		        <tabpanel height="100%" width="100%">
+		        	<include src="survey_edit_configuration.zul" />
+				</tabpanel>
 		        <tabpanel height="100%" width="100%">
 		        	<include src="survey_edit_versioning.zul" />
 		        </tabpanel>

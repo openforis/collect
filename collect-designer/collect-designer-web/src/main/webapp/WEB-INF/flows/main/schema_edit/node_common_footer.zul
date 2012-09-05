@@ -1,14 +1,3 @@
 <zk>
-	<hlayout>
-		<button label="${labels.survey.schema.node.apply_changes}" 
-	        	onClick="@command('saveNode')" />
-	    <hlayout visible="@load(nodeDefnFxStatus.dirty)">
-		    <image src="/assets/images/warning-small.png" />
-		    <label value="@load(nodeDefnFxStatus.dirty? labels.global.changes_not_applied: '')" />
-	    </hlayout>
-         <label visible="@load(empty nodeDefnVmsgs, before='saveNode')"
-         	value="@load(labels.survey.schema.node.apply_changes_success, before='saveNode')" /> 
-         <label visible="@load(not empty nodeDefnVmsgs, before='saveNode')" style="error"
-         	value="@load(labels.survey.schema.node.apply_changes_failure, before='saveNode')" /> 
-	</hlayout>
+	<include src="generic/apply_changes_bar.zul" />
 </zk>
