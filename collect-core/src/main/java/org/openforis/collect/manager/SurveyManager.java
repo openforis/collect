@@ -15,8 +15,10 @@ import java.util.Map;
 import org.apache.commons.io.IOUtils;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SurveySummary;
+import org.openforis.collect.model.ui.UIConfiguration;
 import org.openforis.collect.persistence.SurveyDao;
 import org.openforis.collect.persistence.SurveyImportException;
+import org.openforis.idm.metamodel.Configuration;
 import org.openforis.idm.metamodel.LanguageSpecificText;
 import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.Survey;
@@ -64,6 +66,8 @@ public class SurveyManager {
 		CollectSurvey survey = new CollectSurvey();
 		Schema schema = new Schema();
 		survey.setSchema(schema);
+		Configuration config = new UIConfiguration();
+		survey.addConfiguration(config);
 		return survey;
 	}
 	

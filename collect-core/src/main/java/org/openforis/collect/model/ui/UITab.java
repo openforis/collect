@@ -1,13 +1,9 @@
 package org.openforis.collect.model.ui;
 
-import java.io.Serializable;
-import java.util.List;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
 /**
@@ -18,39 +14,44 @@ import javax.xml.bind.annotation.XmlType;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = { "name", "label", "tabs" })
-public class UITab implements Serializable {
+public class UITab extends UITabsGroup {
 
 	private static final long serialVersionUID = 1L;
-
-	@XmlAttribute(name = "name")
-	private String name;
 
 	@XmlElement(name = "label")
 	private String label;
 
-	@XmlElementWrapper(name = "tabs")
-	@XmlElement(name = "tab", type = UITab.class)
-	private List<UITab> tabs;
-
-	public String getName() {
-		return name;
-	}
-
+	@XmlTransient
+	private UITabDefinition tabDefinition;
+	
 	public String getLabel() {
 		return label;
 	}
+	
+	public void setLabel(String label) {
+		this.label = label;
+	}
+	
+	public UITabDefinition getTabDefinition() {
+		return tabDefinition;
+	}
 
-	public List<UITab> getTabs() {
-		return tabs;
+	public void setTabDefinition(UITabDefinition tabDefinition) {
+		this.tabDefinition = tabDefinition;
+		if ( tabs != null ) {
+			for (UITab tab : tabs ) {
+				tab.setTabDefinition(tabDefinition);
+			}
+		}
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
-		int result = 1;
+		int result = super.hashCode();
 		result = prime * result + ((label == null) ? 0 : label.hashCode());
-		result = prime * result + ((name == null) ? 0 : name.hashCode());
-		result = prime * result + ((tabs == null) ? 0 : tabs.hashCode());
+		result = prime * result
+				+ ((tabDefinition == null) ? 0 : tabDefinition.hashCode());
 		return result;
 	}
 
@@ -58,7 +59,7 @@ public class UITab implements Serializable {
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
-		if (obj == null)
+		if (!super.equals(obj))
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
@@ -68,15 +69,10 @@ public class UITab implements Serializable {
 				return false;
 		} else if (!label.equals(other.label))
 			return false;
-		if (name == null) {
-			if (other.name != null)
+		if (tabDefinition == null) {
+			if (other.tabDefinition != null)
 				return false;
-		} else if (!name.equals(other.name))
-			return false;
-		if (tabs == null) {
-			if (other.tabs != null)
-				return false;
-		} else if (!tabs.equals(other.tabs))
+		} else if (!tabDefinition.equals(other.tabDefinition))
 			return false;
 		return true;
 	}
