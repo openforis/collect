@@ -39,6 +39,17 @@ public abstract class UITabsGroup implements Serializable {
 	public List<UITab> getTabs() {
 		return CollectionUtil.unmodifiableList(tabs);
 	}
+	
+	public UITab getChildTab(String name) {
+		if ( tabs != null ) {
+			for (UITab tab : tabs) {
+				if ( tab.getName().equals(name) ) {
+					return tab;
+				}
+			}
+		}
+		return null;
+	}
 
 	public void addTab(UITab tab) {
 		if ( tabs == null ) {
@@ -55,6 +66,13 @@ public abstract class UITabsGroup implements Serializable {
 		tabs.remove(tab);
 	}
 
+	public UITab updateTab(String tabName, String newName, String newLabel) {
+		UITab oldTab = getChildTab(tabName);
+		oldTab.setName(newName);
+		oldTab.setLabel(newLabel);
+		return oldTab;
+	}
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;

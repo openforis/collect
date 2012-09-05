@@ -20,9 +20,10 @@ public class EntityDefinitionProxy extends NodeDefinitionProxy {
 
 	private static final String LAYOUT_FORM = "form";
 	private static final String LAYOUT_TABLE = "table";
-	private static QName countInSummaryListAnnotation = new QName("http://www.openforis.org/collect/3.0/collect", "count");
-	private static QName layoutAnnotation = new QName("http://www.openforis.org/collect/3.0/ui", "layout");
-	private static QName showRowNumbersAnnotation = new QName("http://www.openforis.org/collect/3.0/ui", "showRowNumbers");
+	private static final QName TAB_DEFINITION_ANNOTATION = new QName("http://www.openforis.org/collect/3.0/ui", "tabDefinition");
+	private static final QName COUNT_IN_SUMMARY_LIST_ANNOTATION = new QName("http://www.openforis.org/collect/3.0/collect", "count");
+	private static final QName LAYOUT_ANNOTATION = new QName("http://www.openforis.org/collect/3.0/ui", "layout");
+	private static final QName SHOW_ROW_NUMBERS_ANNOTATION = new QName("http://www.openforis.org/collect/3.0/ui", "showRowNumbers");
 
 	private transient EntityDefinition entityDefinition;
 
@@ -38,7 +39,7 @@ public class EntityDefinitionProxy extends NodeDefinitionProxy {
 
 	@ExternalizedProperty
 	public boolean isCountInSummaryList() {
-		String annotation = entityDefinition.getAnnotation(countInSummaryListAnnotation);
+		String annotation = entityDefinition.getAnnotation(COUNT_IN_SUMMARY_LIST_ANNOTATION);
 		return annotation != null && Boolean.parseBoolean(annotation);
 	}
 
@@ -49,7 +50,7 @@ public class EntityDefinitionProxy extends NodeDefinitionProxy {
 
 	@ExternalizedProperty
 	public String getLayout() {
-		String result = entityDefinition.getAnnotation(layoutAnnotation);
+		String result = entityDefinition.getAnnotation(LAYOUT_ANNOTATION);
 		if(StringUtils.isNotBlank(result)) {
 			return result;
 		} else if(isMultiple() && parent != null) {
@@ -63,7 +64,7 @@ public class EntityDefinitionProxy extends NodeDefinitionProxy {
 	
 	@ExternalizedProperty
 	public boolean isShowRowNumbers() {
-		String showRowNumbersString = entityDefinition.getAnnotation(showRowNumbersAnnotation);
+		String showRowNumbersString = entityDefinition.getAnnotation(SHOW_ROW_NUMBERS_ANNOTATION);
 		if ( StringUtils.isNotBlank(showRowNumbersString) ) {
 			boolean result = Boolean.parseBoolean(showRowNumbersString);
 			return result;
@@ -71,5 +72,16 @@ public class EntityDefinitionProxy extends NodeDefinitionProxy {
 			return false;
 		}
 	}
+	
+	@ExternalizedProperty
+	public String getTabDefinitionName() {
+		if ( parent != null ) {
+			return parent.getTabDefinitionName();
+		} else {
+			String tabDefnName = entityDefinition.getAnnotation(TAB_DEFINITION_ANNOTATION);
+			return tabDefnName;
+		}
+	}
+
 	
 }

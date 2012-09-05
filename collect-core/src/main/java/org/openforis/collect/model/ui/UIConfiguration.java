@@ -13,11 +13,14 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
+import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.commons.lang3.StringUtils;
 import org.openforis.idm.metamodel.Configuration;
+import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.xml.ConfigurationAdapter;
 import org.openforis.idm.util.CollectionUtil;
 import org.w3c.dom.Document;
@@ -34,6 +37,9 @@ import org.w3c.dom.Element;
 @XmlRootElement(name = "flex")
 public class UIConfiguration implements Configuration, Serializable {
 
+	public static final QName TAB_DEFINITION_ANNOTATION = new QName("http://www.openforis.org/collect/3.0/ui", "tabDefinition");
+	public static final QName TAB_NAME_ANNOTATION = new QName("http://www.openforis.org/collect/3.0/ui", "tab");
+	
 	private static final long serialVersionUID = 1L;
 	
 	@XmlElement(name = "tabDefinition", type = UITabDefinition.class)
@@ -41,6 +47,23 @@ public class UIConfiguration implements Configuration, Serializable {
 
 	public List<UITabDefinition> getTabDefinitions() {
 		return CollectionUtil.unmodifiableList(tabDefinitions);
+	}
+	
+	public UITab getTab(NodeDefinition nodeDefn) {
+		UITab tab = null;
+		String tabName = nodeDefn.getAnnotation(TAB_NAME_ANNOTATION);
+		if ( nodeDefn.getParentDefinition() == null ) {
+			String tabDefnName = nodeDefn.getAnnotation(TAB_DEFINITION_ANNOTATION);
+			UITabDefinition tabDefinition = getTabDefinition(tabDefnName);
+			tab = tabDefinition.getChildTab(tabName);
+		} else {
+			NodeDefinition parentDefn = nodeDefn.getParentDefinition();
+			UITab parentTab = getTab(parentDefn);
+			if ( ! StringUtils.isBlank(tabName) ) {
+				tab = parentTab.getChildTab(tabName);
+			}
+		}
+		return tab;
 	}
 	
 	public UITabDefinition getTabDefinition(String name) {
@@ -70,6 +93,12 @@ public class UIConfiguration implements Configuration, Serializable {
 	
 	public void removeTabDefinition(UITabDefinition tabDefn) {
 		tabDefinitions.remove(tabDefn);
+	}
+	
+	public UITabDefinition updateTabDefinition(String name, String newName) {
+		UITabDefinition tabDefn = getTabDefinition(name);
+		tabDefn.setName(newName);
+		return tabDefn;
 	}
 	
 	@Override

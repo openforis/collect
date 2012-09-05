@@ -11,9 +11,9 @@ package org.openforis.collect.model.ui {
 	[RemoteClass(alias="org.openforis.collect.model.ui.UIConfiguration")]
 	public class UIConfiguration extends UIConfigurationBase {
 		
-		public function getTabDefinition(rootEntity:String):UITabDefinition {
+		public function getTabDefinition(name:String):UITabDefinition {
 			for each (var tabDef:UITabDefinition in tabDefinitions) {
-				if(tabDef.rootEntity == rootEntity) {
+				if(tabDef.name == name) {
 					return tabDef;
 				}
 			}

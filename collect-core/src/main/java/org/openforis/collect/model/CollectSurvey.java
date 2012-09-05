@@ -3,8 +3,12 @@
  */
 package org.openforis.collect.model;
 
+import java.util.List;
+
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.openforis.collect.model.ui.UIConfiguration;
+import org.openforis.idm.metamodel.Configuration;
 import org.openforis.idm.metamodel.Survey;
 
 /**
@@ -20,6 +24,17 @@ public class CollectSurvey extends Survey {
 	
 	public CollectSurvey() {
 		super();
+	}
+	
+	public UIConfiguration getUIConfiguration() {
+		List<Configuration> configurations = getConfiguration();
+		for (Configuration config : configurations) {
+			if ( config instanceof UIConfiguration ) {
+				UIConfiguration uiConfig = (UIConfiguration) config;
+				return uiConfig;
+			}
+		}
+		return null;
 	}
 
 	public boolean isPublished() {

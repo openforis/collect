@@ -88,6 +88,7 @@
 								<includeClass>org.openforis.collect.model.RecordSummarySortField$Sortable</includeClass>
 								<includeClass>org.openforis.collect.model.SurveySummary</includeClass>
 								<includeClass>org.openforis.collect.model.ui.UIConfiguration</includeClass>
+								<includeClass>org.openforis.collect.model.ui.UITabsGroup</includeClass>
 								<includeClass>org.openforis.collect.model.ui.UITabDefinition</includeClass>
 								<includeClass>org.openforis.collect.model.ui.UITab</includeClass>
 								<includeClass>org.openforis.collect.metamodel.proxy.*</includeClass>

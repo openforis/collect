@@ -584,13 +584,13 @@ package org.openforis.collect.ui {
 			return result;
 		}
 		
-		public static function getRootEntityTabDefinition(rootEntityDefinition:NodeDefinitionProxy):UITabDefinition {
+		public static function getRootEntityTabDefinition(rootEntityDefinition:EntityDefinitionProxy):UITabDefinition {
 			var survey:SurveyProxy = rootEntityDefinition.survey;
 			var uiConfig:UIConfiguration = survey.uiConfiguration;
 			var tabDef:UITabDefinition = null;
 			if(uiConfig != null) {
-				var nodeName:String = rootEntityDefinition.name;
-				tabDef = uiConfig.getTabDefinition(nodeName);
+				var tabDefnName:String = rootEntityDefinition.tabDefinitionName;
+				tabDef = uiConfig.getTabDefinition(tabDefnName);
 			}
 			return tabDef;
 		}

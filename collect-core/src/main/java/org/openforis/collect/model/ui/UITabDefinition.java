@@ -16,4 +16,5 @@ public class UITabDefinition extends UITabsGroup {
 
 	private static final long serialVersionUID = 1L;
 
+	
 }
