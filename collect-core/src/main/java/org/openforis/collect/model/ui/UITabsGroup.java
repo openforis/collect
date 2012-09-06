@@ -40,7 +40,7 @@ public abstract class UITabsGroup implements Serializable {
 		return CollectionUtil.unmodifiableList(tabs);
 	}
 	
-	public UITab getChildTab(String name) {
+	public UITab getTab(String name) {
 		if ( tabs != null ) {
 			for (UITab tab : tabs) {
 				if ( tab.getName().equals(name) ) {
@@ -67,7 +67,7 @@ public abstract class UITabsGroup implements Serializable {
 	}
 
 	public UITab updateTab(String tabName, String newName, String newLabel) {
-		UITab oldTab = getChildTab(tabName);
+		UITab oldTab = getTab(tabName);
 		oldTab.setName(newName);
 		oldTab.setLabel(newLabel);
 		return oldTab;

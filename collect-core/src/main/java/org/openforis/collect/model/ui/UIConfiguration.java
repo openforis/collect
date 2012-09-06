@@ -55,12 +55,12 @@ public class UIConfiguration implements Configuration, Serializable {
 		if ( nodeDefn.getParentDefinition() == null ) {
 			String tabDefnName = nodeDefn.getAnnotation(TAB_DEFINITION_ANNOTATION);
 			UITabDefinition tabDefinition = getTabDefinition(tabDefnName);
-			tab = tabDefinition.getChildTab(tabName);
+			tab = tabDefinition.getTab(tabName);
 		} else {
 			NodeDefinition parentDefn = nodeDefn.getParentDefinition();
 			UITab parentTab = getTab(parentDefn);
 			if ( ! StringUtils.isBlank(tabName) ) {
-				tab = parentTab.getChildTab(tabName);
+				tab = parentTab.getTab(tabName);
 			}
 		}
 		return tab;
