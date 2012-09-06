@@ -17,7 +17,7 @@ import org.zkoss.util.resource.Labels;
  * @author S. Ricci
  *
  */
-public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends FormObject<T> {
+public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends ItemFormObject<T> {
 	
 	public static UITab INHERIT_TAB;
 	{
@@ -75,6 +75,7 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 		return formObject;
 	}
 	
+	@Override
 	public void setValues(T source, String languageCode) {
 		name = source.getName();
 		headingLabel = source.getLabel(Type.HEADING, languageCode);
@@ -106,6 +107,7 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 		}
 	}
 	
+	@Override
 	public void copyValues(T dest, String languageCode) {
 		dest.setName(name);
 		dest.setLabel(Type.HEADING, languageCode, headingLabel);
