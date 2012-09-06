@@ -56,7 +56,7 @@
 						</row>
 						<row>
 							<label value="${labels.survey.unit.conversionFactor}:" />
-							<textbox width="99%" value="@bind(vm.editedItem.conversionFactor)" />
+							<decimalbox width="99%" value="@bind(vm.editedItem.conversionFactor)" />
 						</row>
 						<row>
 							<label value="${labels.global.item.since_version}:" />

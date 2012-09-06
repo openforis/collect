@@ -14,7 +14,9 @@ import org.openforis.collect.designer.form.NodeDefinitionFormObject;
 import org.openforis.collect.designer.form.NumericAttributeDefinitionFormObject;
 import org.openforis.collect.designer.model.AttributeType;
 import org.openforis.collect.designer.model.NodeType;
+import org.openforis.collect.model.ui.UIConfiguration;
 import org.openforis.collect.model.ui.UITab;
+import org.openforis.collect.model.ui.UITabDefinition;
 import org.openforis.collect.util.SchemaNodeUtil;
 import org.openforis.idm.metamodel.AttributeDefault;
 import org.openforis.idm.metamodel.AttributeDefinition;
@@ -26,8 +28,10 @@ import org.zkoss.bind.Form;
 import org.zkoss.bind.SimpleForm;
 import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
+import org.zkoss.bind.annotation.GlobalCommand;
 import org.zkoss.bind.annotation.NotifyChange;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
+import org.zkoss.zkplus.databind.BindingListModelList;
 import org.zkoss.zul.DefaultTreeModel;
 import org.zkoss.zul.DefaultTreeNode;
 import org.zkoss.zul.TreeNode;
@@ -58,7 +62,7 @@ public class SurveySchemaEditVM extends SurveyEditVM {
 	
 	@Command
 	@NotifyChange({"editingNode","newNode","rootEntityCreation","nodeType","attributeType",
-		"tempFormObject","formObject","attributeDefaults","numericAttributePrecisions"})
+		"tempFormObject","formObject","attributeDefaults","numericAttributePrecisions","tabDefinitions","selectableTabs"})
 	public void nodeSelected(@BindingParam("node") Treeitem node) {
 		if ( node != null ) {
 			TreeNode<NodeDefinition> treeNode = node.getValue();
@@ -75,7 +79,7 @@ public class SurveySchemaEditVM extends SurveyEditVM {
 	
 	@Command
 	@NotifyChange({"editingNode","tempFormObject","formObject","newNode","rootEntityCreation","nodeType",
-		"attributeType","attributeDefaults","numericAttributePrecisions"})
+		"attributeType","attributeDefaults","numericAttributePrecisions","tabDefinitions","selectableTabs"})
 	public void addRootEntity() {
 		editingNode = true;
 		newNode = true;
@@ -89,7 +93,7 @@ public class SurveySchemaEditVM extends SurveyEditVM {
 	
 	@Command
 	@NotifyChange({"tempFormObject","formObject","newNode","rootEntityCreation","nodeType","attributeType",
-		"attributeDefaults","numericAttributePrecisions"})
+		"attributeDefaults","numericAttributePrecisions","tabDefinitions","selectableTabs"})
 	public void addNode() throws Exception {
 		if ( selectedNode != null && selectedNode instanceof EntityDefinition ) {
 			editingNode = true;
@@ -103,6 +107,20 @@ public class SurveySchemaEditVM extends SurveyEditVM {
 		}
 	}
 	
+	@Command
+	@NotifyChange({"nodeType","tempFormObject","formObject","tabDefinitions","selectableTabs"})
+	public void nodeTypeChanged(@BindingParam("nodeType") String nodeType) {
+		this.nodeType = nodeType;
+		initFormObject();
+	}
+
+	@Command
+	@NotifyChange({"attributeType","tempFormObject","formObject","tabDefinitions","selectableTabs"})
+	public void attributeTypeChanged(@BindingParam("attributeType") String attributeType) {
+		this.attributeType = attributeType;
+		initFormObject();
+	}
+
 	@Command
 	@NotifyChange({"selectedNode","tempFormObject","formObject","newNode","rootEntityCreation"})
 	public void applyChanges() {
@@ -168,6 +186,17 @@ public class SurveySchemaEditVM extends SurveyEditVM {
 		numericAttributePrecisions.remove(precision);
 	}
 	
+	@Command
+	@NotifyChange("selectableTabs")
+	public void tabDefinitionSelected() {}
+	
+	@GlobalCommand
+	@NotifyChange({"tabDefinitions","selectableTabs"})
+	@Override
+	public void tabDefinitionsUpdated() {
+		super.tabDefinitionsUpdated();
+	}
+	
 	protected void initAttributeDefaultsList() {
 		if ( attributeDefaults == null ) {
 			attributeDefaults = new ArrayList<AttributeDefault>();
@@ -184,20 +213,6 @@ public class SurveySchemaEditVM extends SurveyEditVM {
 		}
 	}
 	
-	@Command
-	@NotifyChange({"nodeType","tempFormObject","formObject"})
-	public void nodeTypeChanged(@BindingParam("nodeType") String nodeType) {
-		this.nodeType = nodeType;
-		initFormObject();
-	}
-
-	@Command
-	@NotifyChange({"attributeType","tempFormObject","formObject"})
-	public void attributeTypeChanged(@BindingParam("attributeType") String attributeType) {
-		this.attributeType = attributeType;
-		initFormObject();
-	}
-
 	private void initFormObject() {
 		NodeType nodeTypeEnum = null;
 		AttributeType attributeTypeEnum = null;
@@ -278,8 +293,44 @@ public class SurveySchemaEditVM extends SurveyEditVM {
 		return treeModel;
     }
 
+	public List<UITabDefinition> getTabDefinitions() {
+		UIConfiguration uiConfig = survey.getUIConfiguration();
+		List<UITabDefinition> tabDefinitions = uiConfig.getTabDefinitions();
+		return new BindingListModelList<UITabDefinition>(tabDefinitions, false);
+	}
+	
 	public List<UITab> getSelectableTabs() {
-		return null;
+		UIConfiguration uiConfig = survey.getUIConfiguration();
+		List<UITab> allowedTabs = new ArrayList<UITab>();
+		if ( newNode && rootEntityCreation || 
+				!newNode && selectedNode != null && selectedNode.getParentDefinition() == null ) {
+			//root entity editing
+			UITabDefinition selectedTabDefinition = (UITabDefinition) tempFormObject.getField("tabDefinition");
+			if ( selectedTabDefinition != null ) {
+				allowedTabs.addAll(selectedTabDefinition.getTabs());
+			}
+		} else if ( selectedNode != null ) {
+			NodeDefinition parentDefn;
+			if ( newNode ) {
+				parentDefn = selectedNode;
+			} else {
+				parentDefn = selectedNode.getParentDefinition();
+			}
+			if ( parentDefn.getParentDefinition() == null ) {
+				//parent is root entity
+				UITabDefinition tabDefn = uiConfig.getTabDefinition((EntityDefinition) parentDefn);
+				if ( tabDefn != null ) {
+					allowedTabs.addAll(tabDefn.getTabs());
+				}
+			} else {
+				UITab parentNodeTab = uiConfig.getTab(parentDefn);
+				if ( parentNodeTab != null ) {
+					allowedTabs.addAll(parentNodeTab.getTabs());
+				}
+				allowedTabs.add(0, NodeDefinitionFormObject.INHERIT_TAB);
+			}
+		}
+		return new BindingListModelList<UITab>(allowedTabs, false);
 	}
 	
 	public static class NodeDefinitionTreeNode extends DefaultTreeNode<NodeDefinition> {

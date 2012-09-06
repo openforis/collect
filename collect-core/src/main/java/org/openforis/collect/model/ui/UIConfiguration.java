@@ -2,6 +2,7 @@ package org.openforis.collect.model.ui;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.xml.bind.JAXBContext;
@@ -20,6 +21,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.idm.metamodel.Configuration;
+import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.xml.ConfigurationAdapter;
 import org.openforis.idm.util.CollectionUtil;
@@ -52,18 +54,47 @@ public class UIConfiguration implements Configuration, Serializable {
 	public UITab getTab(NodeDefinition nodeDefn) {
 		UITab tab = null;
 		String tabName = nodeDefn.getAnnotation(TAB_NAME_ANNOTATION);
-		if ( nodeDefn.getParentDefinition() == null ) {
-			String tabDefnName = nodeDefn.getAnnotation(TAB_DEFINITION_ANNOTATION);
-			UITabDefinition tabDefinition = getTabDefinition(tabDefnName);
-			tab = tabDefinition.getTab(tabName);
+		NodeDefinition parentDefn = nodeDefn.getParentDefinition();
+		if ( parentDefn == null ) {
+			//root entity
+			if ( StringUtils.isNotBlank(tabName) ) {
+				UITabDefinition tabDefinition = getTabDefinition((EntityDefinition) nodeDefn);
+				if ( tabDefinition != null ) {
+					tab = tabDefinition.getTab(tabName);
+				}
+			}
 		} else {
-			NodeDefinition parentDefn = nodeDefn.getParentDefinition();
 			UITab parentTab = getTab(parentDefn);
 			if ( ! StringUtils.isBlank(tabName) ) {
 				tab = parentTab.getTab(tabName);
+			} else {
+				tab = parentTab;
 			}
 		}
 		return tab;
+	}
+
+	public UITabDefinition getTabDefinition(EntityDefinition rootEntityDefn) {
+		String tabDefnName = rootEntityDefn.getAnnotation(TAB_DEFINITION_ANNOTATION);
+		UITabDefinition tabDefinition = getTabDefinition(tabDefnName);
+		return tabDefinition;
+	}
+	
+	public List<UITab> getAllowedTabs(NodeDefinition nodeDefn) {
+		NodeDefinition parentDefn = nodeDefn.getParentDefinition();
+		if ( parentDefn != null ) {
+			UITab parentTab = getTab(parentDefn);
+			if ( parentTab != null ) {
+				return parentTab.getTabs();
+			}
+		} else {
+			//root entity
+			UITabDefinition tabDefinition = getTabDefinition((EntityDefinition) nodeDefn);
+			if ( tabDefinition != null ) {
+				return tabDefinition.getTabs();
+			}
+		}
+		return Collections.emptyList();
 	}
 	
 	public UITabDefinition getTabDefinition(String name) {

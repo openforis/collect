@@ -67,6 +67,10 @@ public class SurveyEditVM {
 	@GlobalCommand
 	public void unitsUpdated() {}
 	
+	@NotifyChange("tabDefinitions")
+	@GlobalCommand
+	public void tabDefinitionsUpdated() {}
+	
 	public BindingListModelListModel<String> getLanguageCodes() {
 		return new BindingListModelListModel<String>(new ListModelList<String>(Languages.LANGUAGE_CODES));
 	}

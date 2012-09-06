@@ -10,6 +10,28 @@
 			@save(vm.formObject, before='applyChanges')
 			@validator('org.openforis.collect.designer.form.validator.NodeDefinitionFormValidator')">
 		
+		<grid>
+			<columns>
+				<column label="" width="150px" />
+				<column label="" width="100%" />
+			</columns>
+			<rows>
+				<row visible="@load(vm.newNode and vm.rootEntityCreation or not vm.newNode and not empty vm.selectedNode and empty vm.selectedNode.parentDefinition)">
+					<label value="${labels.survey.schema.node.tab_definition}:" />
+					<cell>
+						<listbox width="150px" model="@load(vm.tabDefinitions)"
+							selectedItem="@bind(fx.tabDefinition)" mold="select"
+							onSelect="@command('tabDefinitionSelected')">
+							<template name="model">
+								<listitem label="@load(each.name)" />
+							</template>
+						</listbox>
+						<label class="error" value="@load(vmsgs['tab'])" />
+					</cell>
+				</row>
+			</rows>
+		</grid>
+		
 		<include src="schema_edit/node_common.zul" />
 
 		<include src="schema_edit/node_common_footer.zul" />

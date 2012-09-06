@@ -51,12 +51,14 @@ public class SurveyCodeListsEditVM extends SurveyItemEditVM<CodeList> {
 		survey.removeCodeList(selectedItem);
 	}
 
-	@NotifyChange({"selectedItem","editedItem","editingItem","childItems","itemLabel","itemListLabel","itemDescription"})
+	@NotifyChange({"selectedItem","editedItem","editingItem","childItems","itemLabel","itemListLabel","itemDescription","editedChildItem","editingChildItem"})
 	@Command
 	public void selectionChanged() {
+		editedChildItem = null;
 	}
 	
-	@NotifyChange({"editingItem","editedItem","items","childItems","selectedItem","editedItemSinceVersion","editedItemDeprecatedVersion","itemLabel","itemListLabel","itemDescription"})
+	@NotifyChange({"editingItem","editedItem","items","childItems","selectedItem","editedItemSinceVersion","editedItemDeprecatedVersion",
+		"itemLabel","itemListLabel","itemDescription","editedChildItem","editingChildItem"})
 	@Command
 	public void newItem() {
 		super.newItem();
@@ -79,7 +81,8 @@ public class SurveyCodeListsEditVM extends SurveyItemEditVM<CodeList> {
 		addTreeNode(item);
 	}
 
-	@NotifyChange({"childItems","editedChildItem","editingChildItem","childItemLabel","childItemDescription","childItemQualifiable","childItemSinceVersion","childItemDeprecatedVersion"})
+	@NotifyChange({"childItems","editedChildItem","editingChildItem","childItemLabel","childItemDescription","childItemQualifiable",
+		"childItemSinceVersion","childItemDeprecatedVersion"})
 	@Command
 	public void addChildItem() {
 		CodeListItem item = new CodeListItem();
@@ -123,7 +126,8 @@ public class SurveyCodeListsEditVM extends SurveyItemEditVM<CodeList> {
 		parentTreeNode.remove(treeNode);
 	}
 	
-	@NotifyChange({"editedChildItem","editingChildItem","childItemLabel","childItemDescription","childItemQualifiable","childItemSinceVersion","childItemDeprecatedVersion"})
+	@NotifyChange({"editedChildItem","editingChildItem","childItemLabel","childItemDescription","childItemQualifiable","childItemSinceVersion",
+		"childItemDeprecatedVersion"})
 	@Command
 	public void childItemSelected(@BindingParam("item") Treeitem item) {
 		if ( item != null ) {

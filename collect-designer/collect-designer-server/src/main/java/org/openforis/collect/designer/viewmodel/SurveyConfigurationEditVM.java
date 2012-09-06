@@ -6,12 +6,14 @@ package org.openforis.collect.designer.viewmodel;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 
 import org.openforis.collect.model.ui.UIConfiguration;
 import org.openforis.collect.model.ui.UITab;
 import org.openforis.collect.model.ui.UITabDefinition;
 import org.openforis.collect.model.ui.UITabsGroup;
+import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.NotifyChange;
@@ -29,6 +31,7 @@ import org.zkoss.zul.Treeitem;
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class SurveyConfigurationEditVM extends SurveyEditVM {
 
+	private static final String TAB_DEFINITIONS_UPDATED_COMMAND = "tabDefinitionsUpdated";
 	private UITabsGroup selectedTab;
 	private UITabDefinition editedTabDefinition;
 	private UITab editedTab;
@@ -103,6 +106,9 @@ public class SurveyConfigurationEditVM extends SurveyEditVM {
 			}
 		}
 		newTab = false;
+		HashMap<String, Object> args = new HashMap<String, Object>();
+		args.put("tab", selectedTab);
+		BindUtils.postGlobalCommand(null, null, TAB_DEFINITIONS_UPDATED_COMMAND, args);
 	}
 	
 	public DefaultTreeModel<UITabsGroup> getTabs() {

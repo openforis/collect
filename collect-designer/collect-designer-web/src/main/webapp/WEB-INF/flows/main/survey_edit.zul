@@ -9,10 +9,9 @@
 		
 		<hbox>
 			<label value="${labels.survey.selected_language}" />
-			<combobox
-				selectedItem="@bind(vm.selectedLanguageCode)"
-				model="@load(vm.languageCodes)">
-			</combobox>
+			<listbox width="150px" model="@load(vm.languageCodes)"
+				selectedItem="@bind(vm.selectedLanguageCode)" mold="select">
+			</listbox>
 		</hbox>
 		
 		<tabbox id="tb" height="500px" width="100%">

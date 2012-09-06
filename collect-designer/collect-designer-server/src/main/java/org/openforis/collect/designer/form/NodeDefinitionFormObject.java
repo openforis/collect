@@ -1,5 +1,6 @@
 package org.openforis.collect.designer.form;
 
+import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.designer.model.AttributeType;
 import org.openforis.collect.designer.model.NodeType;
 import org.openforis.collect.model.CollectSurvey;
@@ -9,7 +10,7 @@ import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NodeLabel.Type;
 import org.openforis.idm.metamodel.Prompt;
-import org.openforis.idm.metamodel.Survey;
+import org.zkoss.util.resource.Labels;
 
 /**
  * 
@@ -17,7 +18,14 @@ import org.openforis.idm.metamodel.Survey;
  *
  */
 public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends FormObject<T> {
-
+	
+	public static UITab INHERIT_TAB;
+	{
+		//init static variables
+		INHERIT_TAB = new UITab();
+		INHERIT_TAB.setName(Labels.getLabel("survey.configuration.tab.inherit"));
+	};
+	
 	private String name;
 	private String headingLabel;
 	private String instanceLabel;
@@ -88,7 +96,14 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 		deprecatedVersion = source.getDeprecatedVersion();
 		CollectSurvey survey = (CollectSurvey) source.getSurvey();
 		UIConfiguration uiConfiguration = survey.getUIConfiguration();
-		tab = uiConfiguration.getTab(source);
+		String tabName = source.getAnnotation(UIConfiguration.TAB_NAME_ANNOTATION);
+		if (StringUtils.isNotBlank(tabName) ) {
+			tab = uiConfiguration.getTab(source);
+		} else if ( source.getParentDefinition() != null ) {
+			tab = INHERIT_TAB;
+		} else {
+			tab = null;
+		}
 	}
 	
 	public void copyValues(T dest, String languageCode) {
@@ -123,7 +138,7 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 		} else {
 			dest.setDeprecatedVersion(null);
 		}
-		String tabName = tab != null ? tab.getName(): null;
+		String tabName = tab != null && tab != INHERIT_TAB ? tab.getName(): null;
 		dest.setAnnotation(UIConfiguration.TAB_NAME_ANNOTATION, tabName);
 	}
 	
