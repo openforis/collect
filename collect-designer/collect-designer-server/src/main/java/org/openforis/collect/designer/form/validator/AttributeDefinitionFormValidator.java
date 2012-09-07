@@ -15,8 +15,8 @@ public class AttributeDefinitionFormValidator extends NodeDefinitionFormValidato
 	protected static final String ATTRIBUTE_DEFAULTS_FIELD = "attributeDefaults";
 
 	@Override
-	public void validate(ValidationContext ctx) {
-		super.validate(ctx);
+	protected void internalValidate(ValidationContext ctx) {
+		super.internalValidate(ctx);
 		validateAttributeDefaults(ctx);
 	}
 	

@@ -3,9 +3,9 @@
  */
 package org.openforis.collect.designer.viewmodel;
 
+import org.openforis.collect.designer.form.ItemFormObject;
+import org.openforis.collect.designer.form.SpatialReferenceSystemFormObject;
 import org.openforis.idm.metamodel.SpatialReferenceSystem;
-import org.zkoss.bind.annotation.Command;
-import org.zkoss.bind.annotation.NotifyChange;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zkplus.databind.BindingListModelList;
 
@@ -28,40 +28,12 @@ public class SurveySRSEditVM extends SurveyItemEditVM<SpatialReferenceSystem> {
 	}
 
 	@Override
-	protected void deleteItemFromSurvey() {
-		survey.removeSpatialReferenceSystem(selectedItem);
+	protected void deleteItemFromSurvey(SpatialReferenceSystem item) {
+		survey.removeSpatialReferenceSystem(item);
 	}
 	
-	@NotifyChange({"selectedItem","editedItem","editingItem","itemLabel","itemDescription","itemDate"})
-	@Command
-	public void selectionChanged() {
-	}
-	
-	@NotifyChange({"items","selectedItem","editedItem","editingItem","itemLabel","itemDescription","itemDate"})
 	@Override
-	@Command
-	public void newItem() {
-		super.newItem();
+	protected ItemFormObject<SpatialReferenceSystem> createFormObject() {
+		return new SpatialReferenceSystemFormObject();
 	}
-	
-	public String getItemLabel() {
-		return editedItem != null ? editedItem.getLabel(selectedLanguageCode): null;
-	}
-	
-	public void setItemLabel(String label) {
-		if ( editedItem != null ) {
-			editedItem.setLabel(selectedLanguageCode, label);
-		}
-	}
-
-	public String getItemDescription() {
-		return editedItem != null ? editedItem.getDescription(selectedLanguageCode): null;
-	}
-
-	public void setItemDescription(String description) {
-		if ( editedItem != null ) {
-			editedItem.setDescription(selectedLanguageCode, description);
-		}
-	}
-
 }

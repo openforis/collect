@@ -22,8 +22,8 @@ public class BooleanAttributeDefinitionFormObject<T extends BooleanAttributeDefi
 	private Integer typeIndex;
 	
 	@Override
-	public void copyValues(T dest, String languageCode) {
-		super.copyValues(dest, languageCode);
+	public void saveTo(T dest, String languageCode) {
+		super.saveTo(dest, languageCode);
 		String annotationValue = null;
 		if ( typeIndex != null ) {
 			Type type = Type.values()[typeIndex];
@@ -35,8 +35,8 @@ public class BooleanAttributeDefinitionFormObject<T extends BooleanAttributeDefi
 	}
 	
 	@Override
-	public void setValues(T source, String languageCode) {
-		super.setValues(source, languageCode);
+	public void loadFrom(T source, String languageCode) {
+		super.loadFrom(source, languageCode);
 		String affirmativeOnlyStringValue = source.getAnnotation(AFFIRMATIVE_ONLY_ANNOTATION);
 		boolean affirmativeOnly = Boolean.parseBoolean(affirmativeOnlyStringValue);
 		typeIndex = affirmativeOnly ? 1: 0;

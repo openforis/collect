@@ -18,8 +18,8 @@ public class CodeAttributeDefinitionFormObject<T extends CodeAttributeDefinition
 	private boolean strict;
 	
 	@Override
-	public void copyValues(T dest, String languageCode) {
-		super.copyValues(dest, languageCode);
+	public void saveTo(T dest, String languageCode) {
+		super.saveTo(dest, languageCode);
 		dest.setList(list);
 		dest.setKey(key);
 		dest.setAllowUnlisted(! strict);
@@ -27,8 +27,8 @@ public class CodeAttributeDefinitionFormObject<T extends CodeAttributeDefinition
 	}
 	
 	@Override
-	public void setValues(T source, String languageCode) {
-		super.setValues(source, languageCode);
+	public void loadFrom(T source, String languageCode) {
+		super.loadFrom(source, languageCode);
 	}
 
 	public boolean isKey() {

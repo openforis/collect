@@ -131,7 +131,7 @@ public class SurveySchemaEditVM extends SurveyEditVM {
 			editedNode = selectedNode;
 		}
 		//TODO avoid the use of side effect...
-		formObject.copyValues(editedNode, selectedLanguageCode);
+		formObject.saveTo(editedNode, selectedLanguageCode);
 		
 		if ( newNode ) {
 			if ( rootEntityCreation ) {
@@ -231,7 +231,7 @@ public class SurveySchemaEditVM extends SurveyEditVM {
 	protected void initFormObject(NodeDefinition node) {
 		calculateNodeType(node);
 		initFormObject();
-		formObject.setValues(node, selectedLanguageCode);
+		formObject.loadFrom(node, selectedLanguageCode);
 		if ( formObject instanceof AttributeDefinitionFormObject ) {
 			attributeDefaults = ((AttributeDefinitionFormObject<?>) formObject).getAttributeDefaults();
 			tempFormObject.setField(ATTRIBUTE_DEFAULTS_FIELD, attributeDefaults);

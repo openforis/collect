@@ -3,7 +3,10 @@
  */
 package org.openforis.collect.designer.viewmodel;
 
+import org.openforis.collect.designer.form.ItemFormObject;
+import org.openforis.collect.designer.form.UnitFormObject;
 import org.openforis.idm.metamodel.Unit;
+import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.NotifyChange;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
@@ -17,6 +20,8 @@ import org.zkoss.zkplus.databind.BindingListModelList;
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class SurveyUnitsEditVM extends SurveyItemEditVM<Unit> {
 
+	private static final String UNITS_UPDATED_GLOBAL_COMMAND = "unitsUpdated";
+
 	@Override
 	public BindingListModelList<Unit> getItems() {
 		return new BindingListModelList<Unit>(survey.getUnits(), false);
@@ -28,40 +33,21 @@ public class SurveyUnitsEditVM extends SurveyItemEditVM<Unit> {
 	}
 
 	@Override
-	protected void deleteItemFromSurvey() {
-		survey.removeUnit(selectedItem);
+	protected void deleteItemFromSurvey(Unit item) {
+		survey.removeUnit(item);
 	}
 
-	@NotifyChange({"selectedItem","editedItem","editingItem","editedItemSinceVersion","editedItemDeprecatedVersion","itemLabel","itemAbbreviation"})
-	@Command
-	public void selectionChanged() {
+	@Override
+	protected ItemFormObject<Unit> createFormObject() {
+		return new UnitFormObject();
 	}
 	
 	@Override
-	@NotifyChange({"editingItem","editedItem","items","selectedItem","editedItemSinceVersion","editedItemDeprecatedVersion","itemLabel","itemAbbreviation"})
 	@Command
-	public void newItem() {
-		super.newItem();
-	}
-	
-	public String getItemLabel() {
-		return editedItem != null ? editedItem.getLabel(selectedLanguageCode): null;
-	}
-	
-	public void setItemLabel(String label) {
-		if ( editedItem != null ) {
-			editedItem.setLabel(selectedLanguageCode, label);
-		}
+	@NotifyChange({"editedItem","selectedItem"})
+	public void applyChanges() {
+		super.applyChanges();
+		BindUtils.postGlobalCommand(null, null, UNITS_UPDATED_GLOBAL_COMMAND, null);
 	}
 
-	public String getItemAbbreviation() {
-		return editedItem != null ? editedItem.getAbbreviation(selectedLanguageCode): null;
-	}
-
-	public void setItemAbbreviation(String abbreviation) {
-		if ( editedItem != null ) {
-			editedItem.setAbbreviation(selectedLanguageCode, abbreviation);
-		}
-	}
-	
 }

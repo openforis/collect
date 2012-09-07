@@ -1,70 +1,81 @@
 <?page title="Openforis Collect Designer - Edit Survey" contentType="text/html;charset=UTF-8"?>
 <?taglib uri="/WEB-INF/tld/util.tld" prefix="util"?>
 <zk>
-	<div id="versioningContainer"
-		apply="org.zkoss.bind.BindComposer"
-		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SurveyVersioningEditVM')"
-		height="100%">
-		
-		<hbox>
-			<vbox>
+	<borderlayout id="versioningContainer"
+			apply="org.zkoss.bind.BindComposer"
+			viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SurveyVersioningEditVM')"
+			validationMessages="@id('vmsgs')">
+		<west>
+			<vlayout>
 		        <listbox id="itemsListBox"
-		        	selectedItem="@bind(vm.selectedItem)"
+		        	selectedItem="@load(vm.selectedItem)"
 		        	model="@load(vm.items)"
-		        	onSelect="@command('selectionChanged')"
+		        	onSelect="@command('selectionChanged', selectedItem=self.selectedItem)"
 		        	height="200px"
-		        	width="200px">
+		        	width="250px">
 		        	<listhead>
 						<listheader label="" width="200px" />
+						<listheader label="" width="50px" />
 					</listhead>
 		            <template name="model">
 		                <listitem>
 		                    <listcell label="@load(each.name)" />
+		                    <listcell>
+		                    	<button image="/assets/images/cross-small.png"
+		                     		onClick="@command('deleteItem', item=each)" />
+		                    </listcell>
 		                </listitem>
 		            </template>
 		        </listbox>
 		        
-		        <button label="${labels.global.add_item}" onClick="@command('newItem') @global-command('versionsUpdated')" />
-		    </vbox>
-	        
-	        <div 
-	        	visible="@load(vm.editingItem)"
-				validationMessages="@id('vmsgs')"
-				form="@id('itemEditForm') @load(vm.editedItem) @save(vm.editedItem, before='save')"
-				width="400px"
-				>
+		        <button label="${labels.global.add_item}" onClick="@command('newItem')" />
+	       	</vlayout>
+	    </west>
+        <center>
+			<vlayout
+				visible="@load(vm.editingItem)"
+				form="@id('fx') 
+					@load(vm.formObject) @save(vm.formObject, before='applyChanges')
+					@validator('org.openforis.collect.designer.form.validator.ModelVersionFormValidator')"
+				width="100%">
 				<grid>
 					<columns>
 						<column label="" width="150px" />
-						<column label="" />
+						<column label="" width="100%" />
 					</columns>
 					<rows>
 						<row>
 							<label value="${labels.survey.versioning.name}:" />
-							<textbox width="99%" value="@bind(vm.editedItem.name)" />
+							<cell>
+								<textbox width="150px" value="@bind(fx.name)" onChange="@command('applyChanges')" />
+								<label class="error" value="@load(vmsgs['name'])" />
+							</cell>
 						</row>
 						<row>
 							<label value="${labels.survey.versioning.label}:" />
-							<textbox id="labelTextBox" width="99%" value="@bind(vm.itemLabel)" />
+							<cell>
+								<textbox id="labelTextBox" width="150px" value="@bind(fx.label)" onChange="@command('applyChanges')" />
+								<label class="error" value="@load(vmsgs['label'])" />
+							</cell>
 						</row>
 						<row>
 							<label value="${labels.survey.versioning.description}:" />
-							<textbox width="99%" value="@bind(vm.itemDescription)" />
+							<cell>
+								<textbox width="150px" value="@bind(fx.description)" onChange="@command('applyChanges')" />
+								<label class="error" value="@load(vmsgs['description'])" />
+							</cell>
 						</row>
 						<row>
 							<label value="${labels.survey.versioning.date}:" />
-							<datebox width="100px" compact="false" buttonVisible="true" format="@load(vm.dateFormat)" 
-	                    		value="@bind(vm.itemDate)"  />
+							<cell>
+								<datebox width="100px" compact="false" buttonVisible="true" format="@load(vm.dateFormat)" 
+		                    		value="@bind(fx.date)" onChange="@command('applyChanges')" />
+								<label class="error" value="@load(vmsgs['date'])" />
+							</cell>
 						</row>
 					</rows>
 				</grid>
-				
-				<hbox>
-					<button image="/assets/images/cross-small.png"
-		                     onClick="@command('deleteItem') @global-command('versionsUpdated')" />
-				</hbox>
-			</div>
-	        
-		</hbox>
-    </div>
+			</vlayout>
+		</center>
+	</borderlayout>
 </zk>

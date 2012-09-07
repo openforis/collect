@@ -76,7 +76,7 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 	}
 	
 	@Override
-	public void setValues(T source, String languageCode) {
+	public void loadFrom(T source, String languageCode) {
 		name = source.getName();
 		headingLabel = source.getLabel(Type.HEADING, languageCode);
 		instanceLabel = source.getLabel(Type.INSTANCE, languageCode);
@@ -108,7 +108,7 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 	}
 	
 	@Override
-	public void copyValues(T dest, String languageCode) {
+	public void saveTo(T dest, String languageCode) {
 		dest.setName(name);
 		dest.setLabel(Type.HEADING, languageCode, headingLabel);
 		dest.setLabel(Type.INSTANCE, languageCode, instanceLabel);

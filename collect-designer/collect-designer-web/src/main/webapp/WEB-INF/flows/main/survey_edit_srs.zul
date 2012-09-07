@@ -40,19 +40,19 @@
 					<rows>
 						<row>
 							<label value="${labels.survey.srs.id}:" />
-							<textbox width="99%" value="@bind(vm.editedItem.id)" />
+							<textbox width="99%" value="@bind(fx.id)" />
 						</row>
 						<row>
 							<label value="${labels.survey.srs.label}:" />
-							<textbox id="labelTextBox" width="99%" value="@bind(vm.itemLabel)" />
+							<textbox id="labelTextBox" width="99%" value="@bind(fx.label)" />
 						</row>
 						<row>
 							<label value="${labels.survey.srs.description}:" />
-							<textbox width="99%" value="@bind(vm.itemDescription)" />
+							<textbox width="99%" value="@bind(fxDescription)" />
 						</row>
 						<row>
 							<label value="${labels.survey.srs.wkt}:" />
-							<textbox width="99%" value="@bind(vm.editedItem.wellKnownText)" />
+							<textbox width="99%" value="@bind(fx.wellKnownText)" />
 						</row>
 					</rows>
 				</grid>

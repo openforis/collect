@@ -18,8 +18,8 @@ public class AttributeDefinitionFormObject<T extends AttributeDefinition> extend
 
 	private List<AttributeDefault> attributeDefaults;
 
-	public void copyValues(T dest, String languageCode) {
-		super.copyValues(dest, languageCode);
+	public void saveTo(T dest, String languageCode) {
+		super.saveTo(dest, languageCode);
 		dest.removeAllAttributeDefaults();
 		if ( attributeDefaults != null ) {
 			for (AttributeDefault attrDefault : attributeDefaults) {
@@ -28,8 +28,8 @@ public class AttributeDefinitionFormObject<T extends AttributeDefinition> extend
 		}
 	}
 	
-	public void setValues(T source, String languageCode) {
-		super.setValues(source, languageCode);
+	public void loadFrom(T source, String languageCode) {
+		super.loadFrom(source, languageCode);
 		attributeDefaults = new ArrayList<AttributeDefault>(source.getAttributeDefaults());
 	}
 

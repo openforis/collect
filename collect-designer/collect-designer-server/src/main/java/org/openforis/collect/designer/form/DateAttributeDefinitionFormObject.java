@@ -12,13 +12,13 @@ import org.openforis.idm.metamodel.CodeAttributeDefinition;
 public class DateAttributeDefinitionFormObject<T extends CodeAttributeDefinition> extends AttributeDefinitionFormObject<T> {
 	
 	@Override
-	public void copyValues(T dest, String languageCode) {
-		super.copyValues(dest, languageCode);
+	public void saveTo(T dest, String languageCode) {
+		super.saveTo(dest, languageCode);
 	}
 	
 	@Override
-	public void setValues(T source, String languageCode) {
-		super.setValues(source, languageCode);
+	public void loadFrom(T source, String languageCode) {
+		super.loadFrom(source, languageCode);
 	}
 
 }

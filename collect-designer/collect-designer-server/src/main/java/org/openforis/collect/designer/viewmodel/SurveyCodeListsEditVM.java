@@ -8,7 +8,9 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import org.openforis.collect.designer.form.CodeListFormObject;
 import org.openforis.collect.designer.form.FormObject;
+import org.openforis.collect.designer.form.ItemFormObject;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
 import org.openforis.idm.metamodel.CodeListLabel.Type;
@@ -47,8 +49,13 @@ public class SurveyCodeListsEditVM extends SurveyItemEditVM<CodeList> {
 	}
 
 	@Override
-	protected void deleteItemFromSurvey() {
-		survey.removeCodeList(selectedItem);
+	protected void deleteItemFromSurvey(CodeList item) {
+		survey.removeCodeList(item);
+	}
+	
+	@Override
+	protected ItemFormObject<CodeList> createFormObject() {
+		return new CodeListFormObject();
 	}
 
 	@NotifyChange({"selectedItem","editedItem","editingItem","childItems","itemLabel","itemListLabel","itemDescription","editedChildItem","editingChildItem"})

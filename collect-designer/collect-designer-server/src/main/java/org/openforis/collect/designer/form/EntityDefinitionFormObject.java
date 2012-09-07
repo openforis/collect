@@ -16,8 +16,8 @@ public class EntityDefinitionFormObject<T extends EntityDefinition> extends Node
 
 	private UITabDefinition tabDefinition;
 	
-	public void copyValues(T dest, String languageCode) {
-		super.copyValues(dest, languageCode);
+	public void saveTo(T dest, String languageCode) {
+		super.saveTo(dest, languageCode);
 		if ( dest.getParentDefinition() == null ) {
 			//root entity
 			String tabDefinitionName = null;
@@ -28,8 +28,8 @@ public class EntityDefinitionFormObject<T extends EntityDefinition> extends Node
 		}
 	}
 	
-	public void setValues(T source, String languageCode) {
-		super.setValues(source, languageCode);
+	public void loadFrom(T source, String languageCode) {
+		super.loadFrom(source, languageCode);
 		if ( source.getParentDefinition() == null ) {
 			//root entity
 			String tabDefinitionName = source.getAnnotation(UIConfiguration.TAB_DEFINITION_ANNOTATION);

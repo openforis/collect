@@ -8,8 +8,8 @@ package org.openforis.collect.designer.form;
  */
 public abstract class ItemFormObject<T> extends FormObject<T> {
 	
-	public abstract void setValues(T source, String languageCode);
+	public abstract void loadFrom(T source, String languageCode);
 	
-	public abstract void copyValues(T dest, String languageCode);
-			
+	public abstract void saveTo(T dest, String languageCode);
+	
 }

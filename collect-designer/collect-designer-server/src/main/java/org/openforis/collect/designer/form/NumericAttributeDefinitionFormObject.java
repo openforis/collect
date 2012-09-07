@@ -24,8 +24,8 @@ public class NumericAttributeDefinitionFormObject<T extends NumericAttributeDefi
 	}
 	
 	@Override
-	public void copyValues(T dest, String languageCode) {
-		super.copyValues(dest, languageCode);
+	public void saveTo(T dest, String languageCode) {
+		super.saveTo(dest, languageCode);
 		Type typeEnum = null;
 		if ( type != null ) {
 			typeEnum = NumericAttributeDefinition.Type.valueOf(type);
@@ -40,8 +40,8 @@ public class NumericAttributeDefinitionFormObject<T extends NumericAttributeDefi
 	}
 	
 	@Override
-	public void setValues(T source, String languageCode) {
-		super.setValues(source, languageCode);
+	public void loadFrom(T source, String languageCode) {
+		super.loadFrom(source, languageCode);
 		type = source.getType() != null ? source.getType().name(): null;
 		precisions = new ArrayList<Precision>(source.getPrecisionDefinitions());
 	}

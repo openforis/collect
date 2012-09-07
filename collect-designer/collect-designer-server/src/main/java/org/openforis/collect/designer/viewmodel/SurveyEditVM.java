@@ -15,6 +15,7 @@ import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.Languages;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.Unit;
+import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.GlobalCommand;
 import org.zkoss.bind.annotation.NotifyChange;
@@ -46,6 +47,8 @@ public class SurveyEditVM {
 	
 	protected String selectedLanguageCode;
 	
+	protected boolean currentFormValid;
+	
 	public SurveyEditVM() {
 		selectedLanguageCode = ENGLISH_LANGUAGE_CODE;
 	}
@@ -71,6 +74,11 @@ public class SurveyEditVM {
 	@GlobalCommand
 	public void tabDefinitionsUpdated() {}
 	
+	@GlobalCommand
+	public void currentFormValidated(@BindingParam("valid") boolean valid) {
+		currentFormValid = valid;
+	}
+
 	public BindingListModelListModel<String> getLanguageCodes() {
 		return new BindingListModelListModel<String>(new ListModelList<String>(Languages.LANGUAGE_CODES));
 	}
@@ -125,6 +133,14 @@ public class SurveyEditVM {
 	public List<Unit> getUnits() {
 		List<Unit> result = new ArrayList<Unit>(survey.getUnits());
 		return new BindingListModelList<Unit>(result, false);
+	}
+
+	public boolean isCurrentFormValid() {
+		return currentFormValid;
+	}
+
+	public void setCurrentFormValid(boolean currentFormValid) {
+		this.currentFormValid = currentFormValid;
 	}
 	
 }
