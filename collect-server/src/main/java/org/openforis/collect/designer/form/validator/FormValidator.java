@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.validator.routines.UrlValidator;
 import org.zkoss.bind.AnnotateBinder;
 import org.zkoss.bind.BindContext;
 import org.zkoss.bind.BindUtils;
@@ -22,6 +23,7 @@ import org.zkoss.zk.ui.Component;
 public abstract class FormValidator extends AbstractValidator {
 
 	protected static final String FIELD_REQUIRED_MESSAGE_KEY = "global.item.validation.required_field";
+	protected static final String INVALID_URI_MESSAGE_KEY = "global.item.validation.invalid_uri";
 
 	private static final String DEFAULT_FORM_ID = "fx";
 
@@ -55,7 +57,17 @@ public abstract class FormValidator extends AbstractValidator {
 		Object value = getValue(ctx, fieldName);
 		validateRequired(ctx, fieldName, value);
 	}
-
+	
+	protected void validateUri(ValidationContext ctx, String fieldName) {
+		Object value = getValue(ctx, fieldName);
+		if ( value instanceof String ) {
+			UrlValidator validator = UrlValidator.getInstance();
+			if ( ! validator.isValid((String) value) ) {
+				this.addInvalidMessage(ctx, fieldName, Labels.getLabel(INVALID_URI_MESSAGE_KEY));
+			}
+		}
+	}
+	
 	protected Object getValue(ValidationContext ctx, String fieldName) {
 		Map<String, Property> properties = getProperties(ctx);
 		Property property = properties.get(fieldName);
@@ -90,5 +102,7 @@ public abstract class FormValidator extends AbstractValidator {
 	public void setFormId(String formId) {
 		this.formId = formId;
 	}
+
+	
 
 }
