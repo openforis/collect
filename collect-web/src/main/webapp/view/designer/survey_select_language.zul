@@ -1,0 +1,39 @@
+<?page title="Collect Database Designer - Select Survey"?>
+<?init class="org.zkoss.zk.ui.util.Composition" arg0="layouts/template.zul"?>
+<?init class="org.zkoss.zkplus.databind.AnnotateDataBinderInit" arg0="./languageSelectBox"?>
+<?variable-resolver class="org.zkoss.zkplus.spring.DelegatingVariableResolver"?>
+<vbox
+	id="languageSelectBox" 
+	self="@define(content)"
+	height="100%"
+	width="500px"
+	apply="org.zkoss.bind.BindComposer"
+	viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SurveySelectLanguageVM')">
+	
+	<label value="${labels.survey.select_language}" />
+	
+	<grid>
+		<columns>
+			<column label="" width="150px" />
+			<column label="" width="100%" />
+		</columns>
+		<rows>
+			<row>
+				<cell colspan="2">
+					<label value="${labels.survey.select_language}:" />
+				</cell>
+			</row>
+			<row>
+				<label value="${labels.survey.language}" />
+				<listbox width="150px" model="@load(vm.languageCodes)"
+							selectedItem="@bind(vm.selectedLanguageCode)" mold="select">
+				</listbox>
+			</row>
+		</rows>
+	</grid>
+
+	<hlayout>
+		<button label="${labels.survey.new_survey}" 
+			onClick="@command('selectLanguage')" />
+	</hlayout>		
+</vbox>

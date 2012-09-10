@@ -7,47 +7,33 @@
 		apply="org.zkoss.bind.BindComposer"
 		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SurveyEditVM')">
 		
-		<hbox>
-			<label value="${labels.survey.selected_language}" />
-			<listbox width="150px" model="@load(vm.languageCodes)"
-				selectedItem="@bind(vm.selectedLanguageCode)" mold="select">
-			</listbox>
-		</hbox>
-		
-		<tabbox id="tb" height="500px" width="100%">
-		    <tabs id="tabs">
-		        <tab id="infoTab" label="${labels.survey.info}" />
-		        <tab id="configurationTab" label="${labels.survey.configuration.$}" />
-		        <tab id="versioningTab" label="${labels.survey.model_versions}" />
-		        <tab id="codeListsTab" label="${labels.survey.code_lists}" />
-		        <tab id="unitsTab" label="${labels.survey.units}" />
-		        <tab id="srsTab" label="${labels.survey.srs.$}" />
-		        <tab id="schemaTab" label="${labels.survey.schema.$}" />
-		    </tabs>
-		    <tabpanels height="100%" width="100%">
-		        <tabpanel height="100%" width="100%">
-		        	<include src="survey_edit_info.zul" />
-		        </tabpanel>
-		        <tabpanel height="100%" width="100%">
-		        	<include src="survey_edit_configuration.zul" />
-				</tabpanel>
-		        <tabpanel height="100%" width="100%">
-		        	<include src="survey_edit_versioning.zul" />
-		        </tabpanel>
-		       <tabpanel height="100%" width="100%">
-		        	<include src="survey_edit_code_lists.zul" />
-		        </tabpanel>
-		        <tabpanel height="100%" width="100%">
-		        	<include src="survey_edit_units.zul" />
-		        </tabpanel>
-		       	<tabpanel height="100%" width="100%">
-		        	<include src="survey_edit_srs.zul" />
-		        </tabpanel>
-		        <tabpanel height="100%" width="100%">
-		        	<include src="schema_edit/schema.zul" />
-		        </tabpanel>
-		    </tabpanels>
-		</tabbox>
+		<vlayout>
+			<!-- language selector -->
+			<hlayout width="100%" style="text-align: right;">
+				<label value="${labels.survey.selected_language}:" />
+				<radiogroup model="@load(vm.availableLanguages)"
+					selectedItem="@bind(vm.selectedLanguageCode)">
+					<template name="model">
+						<radio label="@load(each)" value="@load(each)" />
+					</template>
+				</radiogroup>
+			</hlayout>
+			<!-- main tabs -->
+			<tabbox id="tb" height="500px" width="100%">
+			    <tabs id="tabs">
+			        <tab id="surveyTab" label="${labels.survey.$}" />
+			        <tab id="schemaTab" label="${labels.survey.schema.$}" />
+			    </tabs>
+			    <tabpanels height="100%" width="100%">
+			        <tabpanel height="100%" width="100%">
+			        	<include src="survey_edit_info.zul" />
+			        </tabpanel>
+			        <tabpanel height="100%" width="100%">
+			        	<include src="schema_edit/schema.zul" />
+			        </tabpanel>
+			    </tabpanels>
+			</tabbox>
+		</vlayout>
 		
 		<label visible="@load(empty vmsgs)"
 			value="@load(empty vmsgs ? labels.survey.successfully_saved : '', before='save')" />
