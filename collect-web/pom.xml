@@ -78,12 +78,12 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.openforis.collect</groupId>
-			<artifactId>collect-flex-server</artifactId>
+			<artifactId>collect-server</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.openforis.collect</groupId>
-			<artifactId>collect-flex-client</artifactId>
+			<artifactId>collect-client</artifactId>
 			<version>${project.version}</version>
 			<type>swf</type>
 			<scope>runtime</scope>
