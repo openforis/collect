@@ -24,6 +24,8 @@ public abstract class FormValidator extends AbstractValidator {
 
 	protected static final String FIELD_REQUIRED_MESSAGE_KEY = "global.item.validation.required_field";
 	protected static final String INVALID_URI_MESSAGE_KEY = "global.item.validation.invalid_uri";
+	protected static final String GREATER_THAN_MESSAGE_KEY = "global.item.validation.greater_than";
+	protected static final String GREATER_THAN_EQUAL_MESSAGE_KEY = "global.item.validation.greater_than_equal";
 
 	private static final String DEFAULT_FORM_ID = "fx";
 
@@ -60,11 +62,32 @@ public abstract class FormValidator extends AbstractValidator {
 	
 	protected void validateUri(ValidationContext ctx, String fieldName) {
 		Object value = getValue(ctx, fieldName);
-		if ( value instanceof String ) {
+		if ( value instanceof String && StringUtils.isNotBlank((String) value) ) {
 			UrlValidator validator = UrlValidator.getInstance();
 			if ( ! validator.isValid((String) value) ) {
-				this.addInvalidMessage(ctx, fieldName, Labels.getLabel(INVALID_URI_MESSAGE_KEY));
+				String message = Labels.getLabel(INVALID_URI_MESSAGE_KEY);
+				this.addInvalidMessage(ctx, fieldName, message);
 			}
+		}
+	}
+	
+	protected void validateGreaterThan(ValidationContext ctx,
+			String fieldName, Number value) {
+		validateGreaterThan(ctx, fieldName, value, false);
+	}
+	
+	protected void validateGreaterThan(ValidationContext ctx,
+			String fieldName, Number value, boolean equal) {
+		Object fieldValue = getValue(ctx, fieldName);
+		if ( fieldValue instanceof Number ) {
+			double fieldDoubleValue = ((Number) fieldValue).doubleValue();
+			if ( fieldDoubleValue < value.doubleValue() || ! equal && fieldDoubleValue == value.doubleValue()) {
+				String messageKey = equal ? GREATER_THAN_EQUAL_MESSAGE_KEY: GREATER_THAN_MESSAGE_KEY;
+				String message = Labels.getLabel(messageKey, new Object[] {value});
+				addInvalidMessage(ctx, fieldName, message);
+			}
+		} else {
+			throw new IllegalArgumentException("Number field value expected: " + fieldName);
 		}
 	}
 	
