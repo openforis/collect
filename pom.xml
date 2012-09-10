@@ -9,9 +9,10 @@
 
 	<modules>
 		<module>collect-core</module>
-		<module>collect-flex</module>
+		<module>collect-server</module>
+		<module>collect-client</module>
+		<module>collect-web</module>
 		<module>collect-rdb</module>
-		<module>collect-designer</module>
 	</modules>
 
 	<properties>
@@ -76,6 +77,34 @@
 						<source>1.6</source>
 						<target>1.6</target>
 						<encoding>${project.build.sourceEncoding}</encoding>
+					</configuration>
+				</plugin>
+				<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself. -->
+				<plugin>
+					<groupId>org.eclipse.m2e</groupId>
+					<artifactId>lifecycle-mapping</artifactId>
+					<version>1.0.0</version>
+					<configuration>
+						<lifecycleMappingMetadata>
+							<pluginExecutions>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>org.sonatype.flexmojos</groupId>
+										<artifactId>flexmojos-maven-plugin</artifactId>
+										<versionRange>[4.0-pre-alpha-1,)</versionRange>
+										<goals>
+											<goal>compile-swf</goal>
+											<goal>test-compile</goal>
+											<goal>copy-flex-resources</goal>
+											<goal>generate</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<execute />
+									</action>
+								</pluginExecution>
+							</pluginExecutions>
+						</lifecycleMappingMetadata>
 					</configuration>
 				</plugin>
 			</plugins>

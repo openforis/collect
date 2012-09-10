@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+	Created by ZK Studio
+-->
+
+<zk>
+	<device-config>
+		<device-type>ajax</device-type>
+		<timeout-uri>/timeout.zul</timeout-uri><!-- An empty URL can cause the browser to reload the same URL -->
+	</device-config>
+	
+	<system-config>
+        <disable-event-thread/>
+        <label-location>/WEB-INF/labels/designer/label_en.properties</label-location>
+    </system-config>
+    
+<!-- 	<library-property> -->
+<!-- 	    <name>org.zkoss.theme.preferred</name> -->
+<!-- 	    <value>silvertail</value> -->
+<!-- 	</library-property> -->
+	
+<!--     <listener> -->
+<!-- 		<description>Spring Web Flow Controller Listener</description> -->
+<!-- 		<listener-class>org.zkoss.spring.webflow.mvc.servlet.ZkFlowControllerListener</listener-class> -->
+<!-- 	</listener> -->
+
+<!-- 	<listener> -->
+<!-- 		<description>Spring Web Flow URL and FlowId Listener</description> -->
+<!-- 		<listener-class>org.zkoss.spring.webflow.context.servlet.ZkFlowResourceListener</listener-class> -->
+<!-- 	</listener> -->
+</zk>

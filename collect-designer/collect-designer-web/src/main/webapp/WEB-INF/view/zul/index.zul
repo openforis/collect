@@ -1,5 +1,0 @@
-<?page title="Auto Generated index.zul"?>
-<window title="Collect Database Designer" border="normal" width="100%" height="100%"
-	>
-	<include src="survey_select.zul" />
-</window>

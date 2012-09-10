@@ -1,0 +1,66 @@
+<zk>
+	<div id="unitsContainer"
+		apply="org.zkoss.bind.BindComposer"
+		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SurveySRSEditVM')"
+		height="100%">
+		<hbox>
+			<vbox>
+		        <listbox id="itemsListBox"
+		        	selectedItem="@bind(vm.selectedItem)"
+		        	model="@load(vm.items)"
+		        	onSelect="@command('selectionChanged')"
+		        	height="200px"
+		        	width="200px">
+		        	<listhead>
+						<listheader label="" width="150px" />
+					</listhead>
+		            <template name="model">
+		                <listitem>
+		                    <listcell label="@load(each.id)" />
+		                </listitem>
+		            </template>
+		        </listbox>
+		        
+		        <button label="${labels.global.add_item}" onClick="@command('newItem')" />
+		    </vbox>
+	        
+	        <div 
+	        	visible="@load(vm.editingItem)"
+				validationMessages="@id('vmsgs')"
+				form="@id('itemEditForm') @load(vm.editedItem) @save(vm.editedItem, before='save')"
+				width="400px"
+				>
+				<grid>
+					<columns>
+						<column label="" width="150px" />
+						<column label="" />
+					</columns>
+					<rows>
+						<row>
+							<label value="${labels.survey.srs.id}:" />
+							<textbox width="99%" value="@bind(fx.id)" />
+						</row>
+						<row>
+							<label value="${labels.survey.srs.label}:" />
+							<textbox id="labelTextBox" width="99%" value="@bind(fx.label)" />
+						</row>
+						<row>
+							<label value="${labels.survey.srs.description}:" />
+							<textbox width="99%" value="@bind(fxDescription)" />
+						</row>
+						<row>
+							<label value="${labels.survey.srs.wkt}:" />
+							<textbox width="99%" value="@bind(fx.wellKnownText)" />
+						</row>
+					</rows>
+				</grid>
+				
+				<hbox>
+					<button image="/assets/images/cross-small.png"
+		                     onClick="@command('deleteItem')" />
+				</hbox>
+			</div>
+	        
+		</hbox>
+    </div>
+</zk>

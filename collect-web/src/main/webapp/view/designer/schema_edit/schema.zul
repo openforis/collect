@@ -1,0 +1,43 @@
+<zk>
+	<div id="itemsContainer"
+		apply="org.zkoss.bind.BindComposer"
+		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SurveySchemaEditVM')"
+		width="100%" height="100%">
+		<borderlayout>
+		 	<west title="${labels.survey.schema.nodes_title}"
+		 		width="300px"
+		 		splittable="true">
+		 		<borderlayout>
+		 			<north>
+						<tree id="nodesTree"
+							width="100%" height="300px"
+							model="@load(vm.nodes)"
+							onSelect="@command('nodeSelected', node=self.selectedItem)">
+							<template name="model">
+					            <treeitem>
+					                <treerow>
+					                    <treecell label="@load(each.data.name)"/>
+					                </treerow>
+					            </treeitem>
+					  		</template>
+					    </tree>
+		 			</north>
+		 			<south>
+				        <hlayout>
+					        <button label="${labels.survey.schema.add_root_entity}" 
+					        	onClick="@command('addRootEntity')" />
+			
+					        <button label="${labels.survey.schema.add_node}" 
+					        	onClick="@command('addNode')" 
+					        	disabled="@load(empty vm.selectedNode)" />
+				        </hlayout>
+		 			</south>
+			    </borderlayout>
+		   </west>
+		   <center title="${labels.survey.schema.node_detail_title}">
+				<include src="schema_edit/node.zul" visible="@load(vm.editingNode)" />
+			</center>
+			
+	    </borderlayout>
+    </div>
+</zk>

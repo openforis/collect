@@ -1,0 +1,85 @@
+<zk>
+	<borderlayout id="unitsContainer"
+			apply="org.zkoss.bind.BindComposer"
+			viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SurveyUnitsEditVM')"
+			validationMessages="@id('vmsgs')">
+		<west width="300px">
+			<vlayout>
+		        <listbox id="itemsListBox"
+		        	selectedItem="@load(vm.selectedItem)"
+		        	model="@load(vm.items)"
+		        	onSelect="@command('selectionChanged', selectedItem=self.selectedItem)"
+		        	height="300px"
+		        	width="100%">
+		        	<listhead>
+						<listheader label="" width="100%" />
+						<listheader label="" width="50px" />
+					</listhead>
+		            <template name="model">
+		                <listitem>
+		                    <listcell label="@load(each.name)" />
+		                    <listcell>
+		                    	<button image="/assets/images/cross-small.png"
+		                     		onClick="@command('deleteItem', item=each)" />
+		                    </listcell>
+		                </listitem>
+		            </template>
+		        </listbox>
+		        <button label="${labels.global.add_item}" onClick="@command('newItem')" />
+		    </vlayout>
+		</west>
+	    <center>
+	        <vlayout
+	        	visible="@load(vm.editingItem)"
+				form="@id('fx') 
+					@load(vm.formObject) @save(vm.formObject, before='applyChanges')
+					@validator('org.openforis.collect.designer.form.validator.UnitFormValidator')"
+				width="100%">
+				<grid>
+					<columns>
+						<column label="" width="150px" />
+						<column label="" width="100%" />
+					</columns>
+					<rows>
+						<row>
+							<label value="${labels.survey.unit.name}:" />
+							<cell>
+								<textbox width="150px" value="@bind(fx.name)" onChange="@command('applyChanges')" />
+								<label class="error" value="@load(vmsgs['name'])" />
+							</cell>
+						</row>
+						<row>
+							<label value="${labels.survey.unit.label}:" />
+							<cell>
+								<textbox id="labelTextBox" width="150px" value="@bind(fx.label)" />
+								<label class="error" value="@load(vmsgs['label'])" />
+							</cell>
+						</row>
+						<row>
+							<label value="${labels.survey.unit.abbreviation}:" />
+							<cell>
+								<textbox width="150px" value="@bind(fx.abbreviation)" />
+								<label class="error" value="@load(vmsgs['abbreviation'])" />
+							</cell>
+						</row>
+						<row>
+							<label value="${labels.survey.unit.dimension}:" />
+							<cell>
+								<decimalbox width="150px" value="@bind(fx.dimension)" />
+								<label class="error" value="@load(vmsgs['dimension'])" />
+							</cell>
+						</row>
+						<row>
+							<label value="${labels.survey.unit.conversionFactor}:" />
+							<cell>
+								<decimalbox width="150px" value="@bind(fx.conversionFactor)" />
+								<label class="error" value="@load(vmsgs['conversionFactor'])" />
+							</cell>
+						</row>
+					</rows>
+				</grid>
+			</vlayout>
+	        
+		</center>
+    </borderlayout>
+</zk>
