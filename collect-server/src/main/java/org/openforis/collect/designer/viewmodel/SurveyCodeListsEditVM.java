@@ -11,6 +11,7 @@ import java.util.List;
 import org.openforis.collect.designer.form.CodeListFormObject;
 import org.openforis.collect.designer.form.FormObject;
 import org.openforis.collect.designer.form.ItemFormObject;
+import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
 import org.openforis.idm.metamodel.CodeListLabel.Type;
@@ -40,16 +41,20 @@ public class SurveyCodeListsEditVM extends SurveyItemEditVM<CodeList> {
 	
 	@Override
 	public BindingListModelList<CodeList> getItems() {
-		return new BindingListModelList<CodeList>(survey.getCodeLists(), false);
+		CollectSurvey survey = getSurvey();
+		List<CodeList> codeLists = survey.getCodeLists();
+		return new BindingListModelList<CodeList>(codeLists, false);
 	}
 
 	@Override
 	protected void addNewItemToSurvey() {
+		CollectSurvey survey = getSurvey();
 		survey.addCodeList(editedItem);
 	}
 
 	@Override
 	protected void deleteItemFromSurvey(CodeList item) {
+		CollectSurvey survey = getSurvey();
 		survey.removeCodeList(item);
 	}
 	

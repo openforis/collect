@@ -3,8 +3,11 @@
  */
 package org.openforis.collect.designer.viewmodel;
 
+import java.util.List;
+
 import org.openforis.collect.designer.form.ItemFormObject;
 import org.openforis.collect.designer.form.ModelVersionFormObject;
+import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.annotation.Command;
@@ -24,16 +27,20 @@ public class SurveyVersioningEditVM extends SurveyItemEditVM<ModelVersion> {
 
 	@Override
 	public BindingListModelList<ModelVersion> getItems() {
-		return new BindingListModelList<ModelVersion>(survey.getVersions(), false);
+		CollectSurvey survey = getSurvey();
+		List<ModelVersion> versions = survey.getVersions();
+		return new BindingListModelList<ModelVersion>(versions, false);
 	}
 	
 	@Override
 	protected void addNewItemToSurvey() {
+		CollectSurvey survey = getSurvey();
 		survey.addVersion(editedItem);
 	}
 	
 	@Override
 	protected void deleteItemFromSurvey(ModelVersion item) {
+		CollectSurvey survey = getSurvey();
 		survey.removeVersion(item);
 	}
 

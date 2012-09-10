@@ -10,7 +10,7 @@
 	viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SurveySelectVM')">
 
 	<listbox id="listbox" rows="5" model="@load(vm.surveys)" width="400px"
-		selectedItem="@load(vm.selectedSurvey)">
+		selectedItem="@bind(vm.selectedSurvey)">
 		<listhead>
 			<listheader label="${labels.survey.name}" width="200px" />
 			<listheader label="${labels.survey.uri}" width="200px" />
@@ -23,11 +23,12 @@
 		</template>
 	</listbox>
 
-	<button id="editSurveyBtn" label="${labels.global.edit_item}" onClick=""
-		disabled="@load(vm.editingDisabled)"
-		self="@action(edit)" />
-
-	<button id="newSurveyBtn" label="${labels.global.new_item}" onClick=""
-		self="@action(new)" />
-		
+	<hlayout>
+		<button id="editSurveyBtn" label="${labels.global.edit_item}" 
+			onClick="@command('editSurvey')"
+			disabled="@load(vm.editingDisabled)" />
+	
+		<button id="newSurveyBtn" label="${labels.global.new_item}"
+			onClick="@command('newSurvey')" />
+	</hlayout>		
 </vbox>

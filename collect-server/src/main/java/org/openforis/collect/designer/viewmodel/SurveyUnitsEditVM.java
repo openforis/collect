@@ -3,8 +3,11 @@
  */
 package org.openforis.collect.designer.viewmodel;
 
+import java.util.List;
+
 import org.openforis.collect.designer.form.ItemFormObject;
 import org.openforis.collect.designer.form.UnitFormObject;
+import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.Unit;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.annotation.Command;
@@ -24,16 +27,20 @@ public class SurveyUnitsEditVM extends SurveyItemEditVM<Unit> {
 
 	@Override
 	public BindingListModelList<Unit> getItems() {
-		return new BindingListModelList<Unit>(survey.getUnits(), false);
+		CollectSurvey survey = getSurvey();
+		List<Unit> units = survey.getUnits();
+		return new BindingListModelList<Unit>(units, false);
 	}
 
 	@Override
 	protected void addNewItemToSurvey() {
+		CollectSurvey survey = getSurvey();
 		survey.addUnit(editedItem);
 	}
 
 	@Override
 	protected void deleteItemFromSurvey(Unit item) {
+		CollectSurvey survey = getSurvey();
 		survey.removeUnit(item);
 	}
 

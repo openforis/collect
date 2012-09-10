@@ -9,6 +9,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
+import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.ui.UIConfiguration;
 import org.openforis.collect.model.ui.UITab;
 import org.openforis.collect.model.ui.UITabDefinition;
@@ -79,6 +80,7 @@ public class SurveyConfigurationEditVM extends SurveyEditVM {
 	@Command
 	@NotifyChange({"editedTabDefinition","editedTab","selectedTab"})
 	public void applyChanges() {
+		CollectSurvey survey = getSurvey();
 		UIConfiguration uiConfiguration = survey.getUIConfiguration();
 		if ( newTab ) {
 			if ( editedTabDefinition != null ) {
@@ -113,7 +115,7 @@ public class SurveyConfigurationEditVM extends SurveyEditVM {
 	
 	public DefaultTreeModel<UITabsGroup> getTabs() {
 		if ( treeModel == null ) {
-			UIConfiguration uiConfig = survey.getUIConfiguration();
+			UIConfiguration uiConfig = getSurvey().getUIConfiguration();
 			treeModel = new UIConfigurationTreeModel(uiConfig);
 		}
 		return treeModel.getModel();

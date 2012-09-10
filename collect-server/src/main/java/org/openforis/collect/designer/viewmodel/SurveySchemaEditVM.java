@@ -14,6 +14,7 @@ import org.openforis.collect.designer.form.NodeDefinitionFormObject;
 import org.openforis.collect.designer.form.NumericAttributeDefinitionFormObject;
 import org.openforis.collect.designer.model.AttributeType;
 import org.openforis.collect.designer.model.NodeType;
+import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.ui.UIConfiguration;
 import org.openforis.collect.model.ui.UITab;
 import org.openforis.collect.model.ui.UITabDefinition;
@@ -107,6 +108,17 @@ public class SurveySchemaEditVM extends SurveyEditVM {
 	}
 	
 	@Command
+	@NotifyChange({"tempFormObject","formObject","newNode","rootEntityCreation","nodeType","attributeType",
+		"attributeDefaults","numericAttributePrecisions","tabDefinitions","selectableTabs"})
+	public void newNode(@BindingParam("nodeType") String nodeType, @BindingParam("attributeType") String attributeType) throws Exception {
+		editingNode = true;
+		newNode = true;
+		this.nodeType = nodeType;
+		this.attributeType = attributeType;
+		initFormObject();
+	}
+	
+	@Command
 	@NotifyChange({"nodeType","tempFormObject","formObject","tabDefinitions","selectableTabs"})
 	public void nodeTypeChanged(@BindingParam("nodeType") String nodeType) {
 		this.nodeType = nodeType;
@@ -134,6 +146,7 @@ public class SurveySchemaEditVM extends SurveyEditVM {
 		
 		if ( newNode ) {
 			if ( rootEntityCreation ) {
+				CollectSurvey survey = getSurvey();
 				Schema schema = survey.getSchema();
 				schema.addRootEntityDefinition((EntityDefinition) editedNode);
 			} else if ( selectedNode != null ) {
@@ -258,6 +271,7 @@ public class SurveySchemaEditVM extends SurveyEditVM {
 	private void initTreeModel() {
 //		SurveyEditVM viewModel = (SurveyEditVM) getViewModel();
 //		CollectSurvey survey = viewModel.getSurvey();
+		CollectSurvey survey = getSurvey();
 		List<EntityDefinition> rootDefns = survey.getSchema().getRootEntityDefinitions();
 		List<TreeNode<NodeDefinition>> treeNodes = NodeDefinitionTreeNode.fromList(rootDefns);
 		TreeNode<NodeDefinition> root = new NodeDefinitionTreeNode(null, treeNodes);
@@ -293,12 +307,14 @@ public class SurveySchemaEditVM extends SurveyEditVM {
     }
 
 	public List<UITabDefinition> getTabDefinitions() {
+		CollectSurvey survey = getSurvey();
 		UIConfiguration uiConfig = survey.getUIConfiguration();
 		List<UITabDefinition> tabDefinitions = uiConfig.getTabDefinitions();
 		return new BindingListModelList<UITabDefinition>(tabDefinitions, false);
 	}
 	
 	public List<UITab> getSelectableTabs() {
+		CollectSurvey survey = getSurvey();
 		UIConfiguration uiConfig = survey.getUIConfiguration();
 		List<UITab> allowedTabs = new ArrayList<UITab>();
 		if ( newNode && rootEntityCreation || 

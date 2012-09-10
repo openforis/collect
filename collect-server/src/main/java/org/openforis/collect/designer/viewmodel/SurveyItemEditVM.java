@@ -4,10 +4,7 @@
 package org.openforis.collect.designer.viewmodel;
 
 
-import org.openforis.collect.designer.form.FormObject;
 import org.openforis.collect.designer.form.ItemFormObject;
-import org.openforis.idm.metamodel.ModelVersion;
-import org.openforis.idm.metamodel.Versionable;
 import org.springframework.core.GenericTypeResolver;
 import org.zkoss.bind.Form;
 import org.zkoss.bind.annotation.AfterCompose;
@@ -52,17 +49,19 @@ public abstract class SurveyItemEditVM<T> extends SurveyEditVM {
 	public abstract BindingListModelList<T> getItems();	
 	
 	@Command
-	@NotifyChange({"formObject","editingItem","editedItem","items","selectedItem","editedItemSinceVersion","editedItemDeprecatedVersion"})
+	@NotifyChange({"formObject","editingItem","editedItem","items","selectedItem"})
 	public void newItem() {
 		T newInstance = createItemInstance();
 		setEditedItem(newInstance);
 		addNewItemToSurvey();
+		T editedItem = getEditedItem();
 		setSelectedItem(editedItem);
 	}
 
 	@Command
 	@NotifyChange({"editedItem","selectedItem"})
 	public void applyChanges() {
+		T editedItem = getEditedItem();
 		formObject.saveTo(editedItem, selectedLanguageCode);
 	}
 	
@@ -150,34 +149,4 @@ public abstract class SurveyItemEditVM<T> extends SurveyEditVM {
 		return this.editedItem != null;
 	}
 	
-	public ModelVersion getEditedItemSinceVersion() {
-		if ( editedItem != null && editedItem instanceof Versionable ) {
-			return ( (Versionable) editedItem).getSinceVersion();
-		} else {
-			return null;
-		}
-	}
-	
-	public void setEditedItemSinceVersion(ModelVersion value) {
-		if ( editedItem != null && editedItem instanceof Versionable ) {
-			ModelVersion modelVersion = value == FormObject.VERSION_EMPTY_SELECTION ? null: value;
-			( (Versionable) editedItem).setSinceVersion(modelVersion);
-		}
-	}
-
-	public ModelVersion getEditedItemDeprecatedVersion() {
-		if ( editedItem != null && editedItem instanceof Versionable ) {
-			return ( (Versionable) editedItem).getDeprecatedVersion();
-		} else {
-			return null;
-		}
-	}
-
-	public void setEditedItemDeprecatedVersion(ModelVersion value) {
-		if ( editedItem != null && editedItem instanceof Versionable ) {
-			ModelVersion modelVersion = value == FormObject.VERSION_EMPTY_SELECTION ? null: value;
-			( (Versionable) editedItem).setDeprecatedVersion(modelVersion);
-		}
-	}
-
 }

@@ -4,10 +4,12 @@
 package org.openforis.collect.designer.viewmodel;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.openforis.collect.designer.converter.XMLStringDateConverter;
 import org.openforis.collect.designer.form.FormObject;
+import org.openforis.collect.designer.session.SessionStatus;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.persistence.SurveyImportException;
@@ -18,6 +20,7 @@ import org.openforis.idm.metamodel.Unit;
 import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.GlobalCommand;
+import org.zkoss.bind.annotation.Init;
 import org.zkoss.bind.annotation.NotifyChange;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
@@ -31,7 +34,7 @@ import org.zkoss.zul.ListModelList;
  *
  */
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
-public class SurveyEditVM {
+public class SurveyEditVM extends BaseVM {
 	
 	private static final String ENGLISH_LANGUAGE_CODE = "eng";
 
@@ -44,13 +47,18 @@ public class SurveyEditVM {
 	
 	@WireVariable
 	protected CollectSurvey survey;
-	
+
 	protected String selectedLanguageCode;
 	
 	protected boolean currentFormValid;
 	
 	public SurveyEditVM() {
 		selectedLanguageCode = ENGLISH_LANGUAGE_CODE;
+	}
+	
+	@Init
+	public void init() {
+		initSurvey();
 	}
 	
 	@Command
@@ -79,28 +87,22 @@ public class SurveyEditVM {
 		currentFormValid = valid;
 	}
 
+	protected void initSurvey() {
+		if ( survey == null ) {
+			SessionStatus sessionStatus = getSessionStatus();
+			survey = sessionStatus.getSurvey();
+		}
+	}
+
 	public BindingListModelListModel<String> getLanguageCodes() {
 		return new BindingListModelListModel<String>(new ListModelList<String>(Languages.LANGUAGE_CODES));
 	}
 	
 	public CollectSurvey getSurvey() {
+		if ( survey == null ) {
+			initSurvey();
+		}
 		return survey;
-	}
-
-	public String getProjectName() {
-		return survey.getProjectName(selectedLanguageCode);
-	}
-	
-	public void setProjectName(String name) {
-		survey.setProjectName(selectedLanguageCode, name);
-	}
-	
-	public String getDescription() {
-		return survey.getDescription(selectedLanguageCode);
-	}
-	
-	public void setDescription(String description) {
-		survey.setDescription(selectedLanguageCode, description);
 	}
 
 	public String getSelectedLanguageCode() {
@@ -111,21 +113,19 @@ public class SurveyEditVM {
 		this.selectedLanguageCode = selectedLanguageCode;
 	}
 
-	public XMLStringDateConverter getXmlStringDateConverter() {
-		return xmlStringDateConverter;
-	}
-
 	public String getDateFormat() {
 		return dateFormat;
 	}
 
 	public List<ModelVersion> getVersionsForCombo() {
+		CollectSurvey survey = getSurvey();
 		List<ModelVersion> result = new ArrayList<ModelVersion>(survey.getVersions());
 		result.add(0, FormObject.VERSION_EMPTY_SELECTION);
 		return new BindingListModelList<ModelVersion>(result, false);
 	}
 	
 	public List<CodeList> getCodeLists() {
+		CollectSurvey survey = getSurvey();
 		List<CodeList> result = new ArrayList<CodeList>(survey.getCodeLists());
 		return new BindingListModelList<CodeList>(result, false);
 	}
@@ -135,6 +135,12 @@ public class SurveyEditVM {
 		return new BindingListModelList<Unit>(result, false);
 	}
 
+	public List<String> getAvailableLanguages() {
+		//TODO
+		List<String> languageCodes = Arrays.asList(ENGLISH_LANGUAGE_CODE);
+		return new BindingListModelList<String>(languageCodes, false);
+	}
+	
 	public boolean isCurrentFormValid() {
 		return currentFormValid;
 	}
