@@ -62,6 +62,12 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 					case CODE:
 						formObject = new CodeAttributeDefinitionFormObject();
 						break;
+					case COORDINATE:
+						formObject = new CoordinateAttributeDefinitionFormObject();
+						break;
+					case DATE:
+						formObject = new DateAttributeDefinitionFormObject();
+						break;
 					case NUMBER:
 						formObject = new NumberAttributeDefinitionFormObject();
 						break;
