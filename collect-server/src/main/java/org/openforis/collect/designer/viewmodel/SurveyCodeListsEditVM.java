@@ -9,14 +9,11 @@ import java.util.Collection;
 import java.util.List;
 
 import org.openforis.collect.designer.form.CodeListFormObject;
-import org.openforis.collect.designer.form.FormObject;
 import org.openforis.collect.designer.form.ItemFormObject;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
-import org.openforis.idm.metamodel.CodeListLabel.Type;
-import org.openforis.idm.metamodel.ModelVersion;
-import org.openforis.idm.metamodel.Versionable;
+import org.openforis.idm.metamodel.CodeListLevel;
 import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.NotifyChange;
@@ -25,7 +22,6 @@ import org.zkoss.zkplus.databind.BindingListModelList;
 import org.zkoss.zul.DefaultTreeModel;
 import org.zkoss.zul.DefaultTreeNode;
 import org.zkoss.zul.TreeNode;
-import org.zkoss.zul.Treeitem;
 
 /**
  * 
@@ -37,7 +33,9 @@ public class SurveyCodeListsEditVM extends SurveyItemEditVM<CodeList> {
 
 	private DefaultTreeModel<CodeListItem> treeModel;
 	
-	private CodeListItem editedChildItem;
+	private List<List<CodeListItem>> itemsPerLevel;
+	
+	private List<CodeListItem> selectedItemsPerLevel;
 	
 	@Override
 	public BindingListModelList<CodeList> getItems() {
@@ -63,44 +61,67 @@ public class SurveyCodeListsEditVM extends SurveyItemEditVM<CodeList> {
 		return new CodeListFormObject();
 	}
 
-	@NotifyChange({"selectedItem","editedItem","editingItem","childItems","itemLabel","itemListLabel","itemDescription","editedChildItem","editingChildItem"})
 	@Command
-	public void selectionChanged() {
-		editedChildItem = null;
-	}
-	
-	@NotifyChange({"editingItem","editedItem","items","childItems","selectedItem","editedItemSinceVersion","editedItemDeprecatedVersion",
-		"itemLabel","itemListLabel","itemDescription","editedChildItem","editingChildItem"})
-	@Command
+	@NotifyChange({"formObject","editingItem","editedItem","items","selectedItem"})
 	public void newItem() {
 		super.newItem();
 		editedItem.setSurvey(survey);
-		editedChildItem = null;
+	}
+	
+	@Command
+	@NotifyChange({"listLevels"})
+	public void addLevel() {
+		CodeListLevel level = new CodeListLevel();
+		editedItem.addLevel(level);
+	}
+	
+	@Command
+	@NotifyChange({"itemsPerLevel"})
+	public void addChildItem(@BindingParam("levelIndex") int levelIndex) {
+		CodeListItem item = new CodeListItem();
+		item.setCode("TEST");
+		if ( levelIndex == 0 ) {
+			editedItem.addItem(item);
+		} else {
+			CodeListItem parentItem = selectedItemsPerLevel.get(levelIndex - 1);
+			parentItem.addChildItem(item);
+		}
 	}
 	
 	@Override
 	public void setEditedItem(CodeList editedItem) {
 		super.setEditedItem(editedItem);
 		initTreeModel();
-	}
-	
-	@NotifyChange({"childItems","editedChildItem","editingChildItem"})
-	@Command
-	public void addRootChildItem() {
-		CodeListItem item = new CodeListItem();
-		editedItem.addItem(item);
-		editedChildItem = item;
-		addTreeNode(item);
+		selectedItemsPerLevel = new ArrayList<CodeListItem>();
+		initItemsPerLevel(editedItem);
 	}
 
-	@NotifyChange({"childItems","editedChildItem","editingChildItem","childItemLabel","childItemDescription","childItemQualifiable",
-		"childItemSinceVersion","childItemDeprecatedVersion"})
-	@Command
-	public void addChildItem() {
-		CodeListItem item = new CodeListItem();
-		editedChildItem.addChildItem(item);
-		editedChildItem = item;
-		addTreeNode(item);
+	private void initItemsPerLevel(CodeList editedItem) {
+		itemsPerLevel = new ArrayList<List<CodeListItem>>();
+		if ( editedItem != null ) {
+			List<CodeListItem> items = editedItem.getItems();
+			itemsPerLevel.add(items);
+			for (CodeListItem selectedItem : selectedItemsPerLevel) {
+				List<CodeListItem> childItems = selectedItem.getChildItems();
+				itemsPerLevel.add(childItems);
+			}
+		}
+	}
+	
+	public List<CodeListLevel> getListLevels() {
+		List<CodeListLevel> levels = null;
+		if ( editedItem != null ) {
+			levels = editedItem.getHierarchy();
+		}
+		return levels;
+	}
+	
+	public List<CodeListItem> getSelectedItemsPerLevel() {
+		return selectedItemsPerLevel;
+	}
+	
+	public List<List<CodeListItem>> getItemsPerLevel() {
+		return itemsPerLevel;
 	}
 	
 	protected void addTreeNode(CodeListItem item) {
@@ -116,21 +137,6 @@ public class SurveyCodeListsEditVM extends SurveyItemEditVM<CodeList> {
 		treeModel.setSelection(Arrays.asList(treeNode));
 	}
 	
-	@NotifyChange({"childItems","editedChildItem","editingChildItem"})
-	@Command
-	public void deleteChildItem() {
-		CodeListItem parentItem = editedChildItem.getParentItem();
-		int id = editedChildItem.getId();
-		if ( parentItem != null ) {
-			parentItem.removeChildItem(id);
-		} else {
-			editedItem.removeItem(id);
-		}
-		editedChildItem = null;
-		removeSelectedTreeNode();
-		//initTreeModel();
-	}
-
 	private void removeSelectedTreeNode() {
 		int[] selectionPath = treeModel.getSelectionPath();
 		TreeNode<CodeListItem> treeNode = treeModel.getChild(selectionPath);
@@ -138,48 +144,6 @@ public class SurveyCodeListsEditVM extends SurveyItemEditVM<CodeList> {
 		parentTreeNode.remove(treeNode);
 	}
 	
-	@NotifyChange({"editedChildItem","editingChildItem","childItemLabel","childItemDescription","childItemQualifiable","childItemSinceVersion",
-		"childItemDeprecatedVersion"})
-	@Command
-	public void childItemSelected(@BindingParam("item") Treeitem item) {
-		if ( item != null ) {
-			CodeListItemTreeNode treeNode = item.getValue();
-			editedChildItem = treeNode.getData();
-		} else {
-			editedChildItem = null;
-		}
-	}
-	
-	public String getItemListLabel() {
-		return editedItem != null ? editedItem.getLabel(Type.LIST, selectedLanguageCode): null;
-	}
-	
-	public void setItemListLabel(String label) {
-		if ( editedItem != null ) {
-			editedItem.setLabel(Type.LIST, selectedLanguageCode, label);
-		}
-	}
-	
-	public String getItemLabel() {
-		return editedItem != null ? editedItem.getLabel(Type.ITEM, selectedLanguageCode): null;
-	}
-	
-	public void setItemLabel(String label) {
-		if ( editedItem != null ) {
-			editedItem.setLabel(Type.ITEM, selectedLanguageCode, label);
-		}
-	}
-	
-	public String getItemDescription() {
-		return editedItem != null ? editedItem.getDescription(selectedLanguageCode): null;
-	}
-
-	public void setItemDescription(String description) {
-		if ( editedItem != null ) {
-			editedItem.setDescription(selectedLanguageCode, description);
-		}
-	}
-
 	public DefaultTreeModel<CodeListItem> getChildItems() {
 		return treeModel;
     }
@@ -194,79 +158,6 @@ public class SurveyCodeListsEditVM extends SurveyItemEditVM<CodeList> {
 			treeModel = null;
 		}
 	}
-	
-	public CodeListItem getEditedChildItem() {
-		return editedChildItem;
-	}
-	
-	public boolean isEditingChildItem() {
-		return editedChildItem != null;
-	}
-
-	public void setEditedChildItem(CodeListItem editedChildItem) {
-		this.editedChildItem = editedChildItem;
-	}
-	
-	public String getChildItemLabel() {
-		return editedChildItem != null ? editedChildItem.getLabel(selectedLanguageCode): null;
-	}
-	
-	public void setChildItemLabel(String label) {
-		if ( editedChildItem != null ) {
-			editedChildItem.setLabel(selectedLanguageCode, label);
-		}
-	}
-	
-	public String getChildItemDescription() {
-		return editedChildItem != null ? editedChildItem.getDescription(selectedLanguageCode): null;
-	}
-	
-	public void setChildItemDescription(String description) {
-		if ( editedChildItem != null ) {
-			editedChildItem.setDescription(selectedLanguageCode, description);
-		}
-	}
-	
-	public boolean isChildItemQualifiable() {
-		return editedChildItem != null && editedChildItem.isQualifiable();
-	}
-	
-	public void setChildItemQualifiable(boolean value) {
-		if ( editedChildItem != null ) {
-			editedChildItem.setQualifiable(value);
-		}
-	}
-	
-	public ModelVersion getChildItemSinceVersion() {
-		if ( editedChildItem != null && editedChildItem instanceof Versionable ) {
-			return ( (Versionable) editedChildItem).getSinceVersion();
-		} else {
-			return null;
-		}
-	}
-	
-	public void setChildItemSinceVersion(ModelVersion value) {
-		if ( editedChildItem != null && editedChildItem instanceof Versionable ) {
-			ModelVersion modelVersion = value == FormObject.VERSION_EMPTY_SELECTION ? null: value;
-			( (Versionable) editedChildItem).setSinceVersion(modelVersion);
-		}
-	}
-
-	public ModelVersion getChildItemDeprecatedVersion() {
-		if ( editedChildItem != null && editedChildItem instanceof Versionable ) {
-			return ( (Versionable) editedChildItem).getDeprecatedVersion();
-		} else {
-			return null;
-		}
-	}
-
-	public void setChildItemDeprecatedVersion(ModelVersion value) {
-		if ( editedChildItem != null && editedChildItem instanceof Versionable ) {
-			ModelVersion modelVersion = value == FormObject.VERSION_EMPTY_SELECTION ? null: value;
-			( (Versionable) editedChildItem).setDeprecatedVersion(modelVersion);
-		}
-	}
-
 	
 	public static class CodeListItemTreeNode extends DefaultTreeNode<CodeListItem> {
 	     

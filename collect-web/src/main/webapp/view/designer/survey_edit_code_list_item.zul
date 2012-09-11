@@ -1,0 +1,77 @@
+<zk>
+	<div 
+		apply="org.zkoss.bind.BindComposer"
+		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SurveyCodeListItemEditVM')"
+		validationMessages="@id('vmsgs')"
+		form="@id('fx') 
+			@load(vm.formObject) @save(vm.formObject, before='applyChanges')
+			@validator('org.openforis.collect.designer.form.validator.CodeListItemFormValidator')"
+		width="100%">
+		<grid>
+			<columns>
+				<column label="" width="150px" />
+				<column label="" width="100%" />
+			</columns>
+			<rows>
+				<row>
+					<label value="${labels.global.item.code}:" />
+					<cell>
+						<textbox width="150px" value="@bind(fx.code)" onChange="@command('applyChanges')" />
+						<label class="error" value="@load(vmsgs['code'])" />
+					</cell>
+				</row>
+				<row>
+					<label value="${labels.global.item.label}:" />
+					<cell>
+						<textbox width="150px" value="@bind(fx.label)" onChange="@command('applyChanges')" />
+						<label class="error" value="@load(vmsgs['label'])" />
+					</cell>
+				</row>
+				<row>
+					<label value="${labels.global.item.description}:" />
+					<cell>
+						<textbox width="150px" value="@bind(fx.description)" onChange="@command('applyChanges')" />
+						<label class="error" value="@load(vmsgs['description'])" />
+					</cell>
+				</row>
+				<row>
+					<label value="${labels.survey.code_list.qualifiable}:" />
+					<cell>
+						<checkbox value="@bind(fx.qualifiable)" onCheck="@command('applyChanges')" />
+						<label class="error" value="@load(vmsgs['qualifiable'])" />
+					</cell>
+				</row>
+				<row>
+					<label value="${labels.global.item.since_version}:" />
+					<cell>
+						<listbox width="150px"
+		                    model="@load(vm.versionsForCombo)" 
+		                    selectedItem="@bind(fx.sinceVersion)"
+		                    onSelect="@command('applyChanges')"
+		                    mold="select">
+		                    <template name="model">
+		                        <listitem label="@load(each.name)" />
+		                    </template>
+		                </listbox>
+	                	<label class="error" value="@load(vmsgs['sinceVersion'])" />
+					</cell>
+	            </row>
+	            <row>
+					<label value="${labels.global.item.deprecated_version}:" />
+					<cell>
+						<listbox width="150px"
+		                    model="@load(vm.versionsForCombo)" 
+		                    selectedItem="@bind(fx.deprecatedVersion)"
+		                    onSelect="@command('applyChanges')"
+		                    mold="select">
+		                    <template name="model">
+		                        <listitem label="@load(each.name)" />
+		                    </template>
+		                </listbox>
+		                <label class="error" value="@load(vmsgs['deprecatedVersion'])" />
+					</cell>
+	            </row>
+			</rows>
+		</grid>
+	</div>
+</zk>
