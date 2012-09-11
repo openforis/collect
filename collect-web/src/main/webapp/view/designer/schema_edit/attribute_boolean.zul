@@ -31,7 +31,5 @@
 				</row>
 			</rows>
 		</grid>
-		
-		<include src="schema_edit/node_common_footer.zul" />
 	</vlayout>
 </zk>

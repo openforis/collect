@@ -8,98 +8,107 @@
 			<row>
 				<label value="${labels.global.item.name}:" />
 				<cell>
-					<textbox width="150px" value="@bind(fx.name)" />
+					<textbox width="150px" value="@bind(fx.name)" onChange="@command('applyChanges')" />
 					<label class="error" value="@load(vmsgs['name'])" />
 				</cell>
 			</row>
 			<row>
-				<label value="${labels.survey.schema.node.tab}:" />
-				<cell>
-					<listbox width="150px" model="@load(vm.selectableTabs)"
-						selectedItem="@bind(fx.tab)" mold="select">
-						<template name="model">
-							<listitem label="@load(each.name)" />
-						</template>
-					</listbox>
-					<label class="error" value="@load(vmsgs['tab'])" />
-				</cell>
-			</row>
-			<row>
 				<label value="${labels.survey.schema.node.multiple}:" />
-				<checkbox checked="@load(fx.multiple eq true) @save(fx.multiple)" />
+				<cell>
+					<checkbox checked="@load(fx.multiple eq true) @save(fx.multiple)" onCheck="@command('applyChanges')" />
+					<label class="error" value="@load(vmsgs['multiple'])" />
+				</cell>
 			</row>
 			<row visible="@load(fx.multiple ne true)">
 				<label value="${labels.survey.schema.node.required}:" />
-				<checkbox checked="@load(fx.required eq true) @save(fx.required)" />
+				<cell>
+					<checkbox checked="@load(fx.required eq true) @save(fx.required)" onCheck="@command('applyChanges')" />
+					<label class="error" value="@load(vmsgs['required'])" />
+				</cell>
 			</row>
 			<row visible="@load(fx.multiple ne true)">
 				<label value="${labels.survey.schema.node.required_expression}:" />
 				<cell>
-					<textbox width="150px" value="@bind(fx.requiredExpression)" />
+					<textbox width="150px" value="@bind(fx.requiredExpression)" onChange="@command('applyChanges')" />
 					<label class="error" value="@load(vmsgs['requiredExpression'])" />
 				</cell>
 			</row>
 			<row visible="@load(fx.multiple eq true)">
 				<label value="${labels.survey.schema.node.min_count}:" />
 				<cell>
-					<intbox value="@bind(fx.minCount)" />
+					<intbox value="@bind(fx.minCount)" onChange="@command('applyChanges')" />
 					<label class="error" value="@load(vmsgs['minCount'])" />
 				</cell>
 			</row>
 			<row visible="@load(fx.multiple eq true)">
 				<label value="${labels.survey.schema.node.max_count}:" />
 				<cell>
-					<intbox value="@bind(fx.maxCount)" />
+					<intbox value="@bind(fx.maxCount)" onChange="@command('applyChanges')" />
 					<label class="error" value="@load(vmsgs['maxCount'])" />
 				</cell>
 			</row>
 			<row>
 				<label value="${labels.survey.schema.node.instanceLabel}:" />
 				<cell>
-					<textbox width="150px" value="@bind(fx.instanceLabel)" />
+					<textbox width="150px" value="@bind(fx.instanceLabel)" onChange="@command('applyChanges')" />
 					<label class="error" value="@load(vmsgs['instanceLabel'])" />
 				</cell>
 			</row>
 			<row>
 				<label value="${labels.survey.schema.node.headingLabel}:" />
 				<cell>
-					<textbox width="150px" value="@bind(fx.headingLabel)" />
+					<textbox width="150px" value="@bind(fx.headingLabel)" onChange="@command('applyChanges')" />
 					<label class="error" value="@load(vmsgs['headingLabel'])" />
 				</cell>
 			</row>
 			<row>
 				<label value="${labels.survey.schema.node.numberLabel}:" />
 				<cell>
-					<textbox width="150px" value="@bind(fx.numberLabel)" />
+					<textbox width="150px" value="@bind(fx.numberLabel)" onChange="@command('applyChanges')" />
 					<label class="error" value="@load(vmsgs['numberLabel'])" />
 				</cell>
 			</row>
 			<row>
 				<label value="${labels.survey.schema.node.interviewPromptLabel}:" />
-				<textbox width="150px" value="@bind(fx.interviewPromptLabel)" />
+				<cell>
+					<textbox width="150px" value="@bind(fx.interviewPromptLabel)" onChange="@command('applyChanges')" />
+					<label class="error" value="@load(vmsgs['interviewPromptLabel'])" />
+				</cell>
 			</row>
 			<row>
 				<label value="${labels.survey.schema.node.paperPromptLabel}:" />
-				<textbox width="150px" value="@bind(fx.paperPromptLabel)" />
+				<cell>
+					<textbox width="150px" value="@bind(fx.paperPromptLabel)" onChange="@command('applyChanges')" />
+					<label class="error" value="@load(vmsgs['paperPromptLabel'])" />
+				</cell>
 			</row>
 			<row>
 				<label value="${labels.survey.schema.node.handheldPromptLabel}:" />
-				<textbox width="150px" value="@bind(fx.handheldPromptLabel)" />
+				<cell>
+					<textbox width="150px" value="@bind(fx.handheldPromptLabel)" onChange="@command('applyChanges')" />
+					<label class="error" value="@load(vmsgs['handheldPromptLabel'])" />
+				</cell>
 			</row>
 			<row>
 				<label value="${labels.survey.schema.node.pcPromptLabel}:" />
-				<textbox width="150px" value="@bind(fx.pcPromptLabel)" />
+				<cell>
+					<textbox width="150px" value="@bind(fx.pcPromptLabel)" onChange="@command('applyChanges')" />
+					<label class="error" value="@load(vmsgs['pcPromptLabel'])" />
+				</cell>
 			</row>
 			<row>
 				<label value="${labels.global.item.description}:" />
-				<textbox width="150px" value="@bind(fx.description)" />
-				<label class="error" value="@load(vmsgs['description'])" />
+				<cell>
+					<textbox width="150px" value="@bind(fx.description)" onChange="@command('applyChanges')" />
+					<label class="error" value="@load(vmsgs['description'])" />
+				</cell>
 			</row>
 			<row>
 				<label value="${labels.global.item.since_version}:" />
 				<cell>
 					<listbox width="150px" model="@load(vm.versionsForCombo)"
-						selectedItem="@bind(fx.sinceVersion)" mold="select">
+						selectedItem="@bind(fx.sinceVersion)" mold="select"
+						onSelect="@command('applyChanges')">
 						<template name="model">
 							<listitem label="@load(each.name)" />
 						</template>
@@ -111,7 +120,8 @@
 				<label value="${labels.global.item.deprecated_version}:" />
 				<cell>
 					<listbox width="150px" model="@load(vm.versionsForCombo)"
-						selectedItem="@bind(fx.deprecatedVersion)" mold="select">
+						selectedItem="@bind(fx.deprecatedVersion)" mold="select"
+						onSelect="@command('applyChanges')">
 						<template name="model">
 							<listitem label="@load(each.name)" />
 						</template>

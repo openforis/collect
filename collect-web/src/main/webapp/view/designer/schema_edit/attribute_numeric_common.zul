@@ -8,7 +8,7 @@
 			<row>
 				<label value="${labels.survey.schema.attribute.numeric.type_label}:" />
 				<cell>
-					<radiogroup selectedItem="@bind(fx.type)">
+					<radiogroup selectedItem="@bind(fx.type)" onCheck="@command('applyChanges')">
 						<radio label="${labels.survey.schema.attribute.numeric.type.integer}"
 							value="INTEGER" />
 						<radio label="${labels.survey.schema.attribute.numeric.type.real}"

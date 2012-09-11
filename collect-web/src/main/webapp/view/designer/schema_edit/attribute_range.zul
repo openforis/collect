@@ -13,7 +13,5 @@
 		<include src="schema_edit/attribute_common.zul" />
 		
 		<include src="schema_edit/attribute_numeric_common.zul" />
-		
-		<include src="schema_edit/node_common_footer.zul" />
 	</vlayout>
 </zk>

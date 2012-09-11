@@ -1,7 +1,7 @@
 <zk>
 	<borderlayout>
-		<north height="@load(vm.nodeType eq 'ATTRIBUTE' ? '70px': '40px')">
-			<grid height="@load(vm.nodeType eq 'ATTRIBUTE' ? '70px': '40px')">
+		<north height="@load(vm.nodeType eq 'ATTRIBUTE' ? '50px': '25px')">
+			<grid height="@load(vm.nodeType eq 'ATTRIBUTE' ? '50px': '25px')">
 				<columns>
 					<column label="" width="150px" />
 					<column label="" width="300px" />
@@ -9,39 +9,25 @@
 				<rows>
 					<row>
 						<label value="${labels.survey.schema.node.type_label}:" />
-						<div id="typeSelectionBox">
-							<radiogroup id="typeGroup" onCheck="@command('nodeTypeChanged', nodeType=self.selectedItem.value)"
-								selectedItem="@load(vm.nodeType)"
-								visible="@load(vm.newNode and not vm.rootEntityCreation)">
-								<radio id="entityRB" value="ENTITY" 
-									label="${labels.survey.schema.node.type.entity}" />
-								<radio id="attributeRB" value="ATTRIBUTE" 
-									label="${labels.survey.schema.node.type.attribute}" />
-							</radiogroup>
-							<label visible="@load(not vm.newNode or vm.rootEntityCreation)"
-								value="@load(vm.nodeType eq 'ENTITY' ? 
-									labels.survey.schema.node.type.entity: 
-									labels.survey.schema.node.type.attribute)" />
-						</div>
+						<label value="@load(vm.nodeType eq 'ENTITY' ? 
+								labels.survey.schema.node.type.entity: 
+								labels.survey.schema.node.type.attribute)" />
 					</row>
 					<row visible="@load(vm.nodeType eq 'ATTRIBUTE')">
 						<label value="${labels.survey.schema.attribute.type_label}:" />
-						<listbox id="subTypeListBox"
-							onSelect="@command('attributeTypeChanged', attributeType=self.selectedItem.value)" 
-							selectedItem="@load(vm.attributeType)"
-							disabled="@load(not vm.newNode)"
-							width="100px" mold="select">
-							<listitem label="${labels.survey.schema.attribute.type.bool}" value="BOOLEAN" />
-							<listitem label="${labels.survey.schema.attribute.type.code}" value="CODE" />
-							<listitem label="${labels.survey.schema.attribute.type.coordinate}" value="COORDINATE" />
-							<listitem label="${labels.survey.schema.attribute.type.date}" value="DATE" />
-							<listitem label="${labels.survey.schema.attribute.type.file}" value="FILE" />
-							<listitem label="${labels.survey.schema.attribute.type.number}" value="NUMBER" />
-							<listitem label="${labels.survey.schema.attribute.type.range}" value="RANGE" />
-							<listitem label="${labels.survey.schema.attribute.type.taxon}" value="TAXON" />
-							<listitem label="${labels.survey.schema.attribute.type.text}" value="TEXT" />
-							<listitem label="${labels.survey.schema.attribute.type.time}" value="TIME" />
-						</listbox>
+						<label visible="@laod(vm.nodeType eq 'ATTRIBUTE')" 
+								value="@load(vm.attributeType eq 'BOOLEAN' ? labels.survey.schema.attribute.type.bool: 
+									vm.attributeType eq 'BOOLEAN' ? labels.survey.schema.attribute.type.bool:
+									vm.attributeType eq 'CODE' ? labels.survey.schema.attribute.type.code:
+									vm.attributeType eq 'COORDINATE' ? labels.survey.schema.attribute.type.coordinate:
+									vm.attributeType eq 'DATE' ? labels.survey.schema.attribute.type.date:
+									vm.attributeType eq 'FILE' ? labels.survey.schema.attribute.type.file:
+									vm.attributeType eq 'NUMBER' ? labels.survey.schema.attribute.type.number:
+									vm.attributeType eq 'RANGE' ? labels.survey.schema.attribute.type.range:
+									vm.attributeType eq 'TAXON' ? labels.survey.schema.attribute.type.taxon:
+									vm.attributeType eq 'TEXT' ? labels.survey.schema.attribute.type.text:
+									vm.attributeType eq 'TIME' ? labels.survey.schema.attribute.type.time:
+									'')" />
 					</row>
 				</rows>
 			</grid>
