@@ -53,6 +53,7 @@ public class SurveyEditVM extends BaseVM {
 	protected boolean currentFormValid;
 	
 	public SurveyEditVM() {
+		currentFormValid = true;
 		selectedLanguageCode = ENGLISH_LANGUAGE_CODE;
 	}
 	

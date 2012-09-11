@@ -113,6 +113,9 @@
 							<listitem label="@load(each.name)" />
 						</template>
 					</listbox>
+					<button tooltiptext="${labels.survey.versioning_manager}" 
+						onClick="@command('openVersioningManagerPopUp')"
+						image="/assets/images/pencil-small.png" />
 					<label class="error" value="@load(vmsgs['sinceVersion'])" />
 				</cell>
 			</row>
@@ -126,6 +129,9 @@
 							<listitem label="@load(each.name)" />
 						</template>
 					</listbox>
+					<button tooltiptext="${labels.survey.versioning_manager}" 
+						onClick="@command('openVersioningManagerPopUp')"
+						image="/assets/images/pencil-small.png" />
 					<label class="error" value="@load(vmsgs['deprecatedVersion'])" />
 				</cell>
 			</row>

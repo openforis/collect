@@ -6,17 +6,10 @@ package org.openforis.collect.designer.viewmodel;
 
 import org.openforis.collect.designer.form.ItemFormObject;
 import org.springframework.core.GenericTypeResolver;
-import org.zkoss.bind.Form;
-import org.zkoss.bind.annotation.AfterCompose;
 import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
-import org.zkoss.bind.annotation.ContextParam;
-import org.zkoss.bind.annotation.ContextType;
 import org.zkoss.bind.annotation.NotifyChange;
-import org.zkoss.zk.ui.Component;
-import org.zkoss.zk.ui.select.Selectors;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
-import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zkplus.databind.BindingListModelList;
 
 /**
@@ -33,13 +26,13 @@ public abstract class SurveyItemEditVM<T> extends SurveyEditVM {
 	protected T editedItem;
 	
 	//UI comopnents
-	@Wire("#fx")
-    Form form;
-	
-	@AfterCompose
-    public void afterCompose(@ContextParam(ContextType.VIEW) Component view){
-        Selectors.wireComponents(view, this, false);
-	}
+//	@Wire("#fx")
+//    Form form;
+//	
+//	@AfterCompose
+//    public void afterCompose(@ContextParam(ContextType.VIEW) Component view){
+//        Selectors.wireComponents(view, this, false);
+//	}
 	
 	@SuppressWarnings("unchecked")
 	public SurveyItemEditVM() {
@@ -66,6 +59,7 @@ public abstract class SurveyItemEditVM<T> extends SurveyEditVM {
 	}
 	
 	@Command
+	@NotifyChange({"formObject","editingItem","editedItem"})
 	public void selectionChanged(@BindingParam("selectedItem") T selectedItem) {
 		if ( currentFormValid ) {
 			setSelectedItem(selectedItem);

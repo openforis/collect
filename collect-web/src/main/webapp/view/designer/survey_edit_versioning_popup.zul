@@ -1,0 +1,10 @@
+<zk>
+	<window id="versioningManagerPopUp" title="${labels.survey.versioning_manager}" 
+		width="800px" 
+		height="300px"
+		border="normal"
+		position="center" 
+		closable="true">
+		<include src="survey_edit_versioning.zul" />
+	</window>
+</zk>

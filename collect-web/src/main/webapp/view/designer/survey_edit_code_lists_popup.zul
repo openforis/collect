@@ -1,0 +1,10 @@
+<zk>
+	<window id="codeListsManagerPopUp" title="${labels.survey.code_lists_manager}" 
+		width="800px" 
+		height="400px"
+		border="normal"
+		position="center" 
+		closable="true">
+		<include src="survey_edit_code_lists.zul" />
+	</window>
+</zk>

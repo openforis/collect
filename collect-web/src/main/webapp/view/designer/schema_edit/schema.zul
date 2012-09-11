@@ -60,8 +60,8 @@
 			             </menubar>
 		 			</south>
 			    </borderlayout>
-		   </west>
-		   <center title="${labels.survey.schema.node_detail_title}">
+			</west>
+			<center title="${labels.survey.schema.node_detail_title}">
 				<include src="schema_edit/node.zul" visible="@load(vm.editingNode)" />
 			</center>
 			

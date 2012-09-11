@@ -26,11 +26,13 @@ import org.zkoss.bind.SimpleForm;
 import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.NotifyChange;
+import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zul.DefaultTreeModel;
 import org.zkoss.zul.DefaultTreeNode;
 import org.zkoss.zul.TreeNode;
 import org.zkoss.zul.Treeitem;
+import org.zkoss.zul.Window;
 
 /**
  * 
@@ -40,9 +42,11 @@ import org.zkoss.zul.Treeitem;
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class SurveySchemaEditVM extends SurveyEditVM {
 
+	private static final String SURVEY_EDIT_VERSIONING_POPUP_URL = "survey_edit_versioning_popup.zul";
 	private static final String ATTRIBUTE_DEFAULTS_FIELD = "attributeDefaults";
 	private static final String NUMBER_ATTRIBUTE_PRECISIONS_FIELD = "precisions";
-
+	private static final String SURVEY_EDIT_CODE_LISTS_POPUP_URL = "survey_edit_code_lists_popup.zul";
+	
 	private DefaultTreeModel<NodeDefinition> treeModel;
 	private NodeDefinition selectedNode;
 	private Form tempFormObject;
@@ -162,6 +166,20 @@ public class SurveySchemaEditVM extends SurveyEditVM {
 		//initFormObject(selectedNode);
 		newNode = false;
 		rootEntityCreation = false;
+	}
+
+	@Command
+	public void openVersioningManagerPopUp() {
+		Window window = (Window) Executions.createComponents(
+				SURVEY_EDIT_VERSIONING_POPUP_URL, null, null);
+		window.doModal();
+	}
+
+	@Command
+	public void openCodeListsManagerPopUp() {
+		Window window = (Window) Executions.createComponents(
+				SURVEY_EDIT_CODE_LISTS_POPUP_URL, null, null);
+		window.doModal();
 	}
 
 	@Command

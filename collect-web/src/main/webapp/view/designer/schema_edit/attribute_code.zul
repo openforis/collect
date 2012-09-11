@@ -24,13 +24,19 @@
 				</row>
 				<row>
 					<label value="${labels.survey.schema.attribute.code.code_list}:" />
-					<listbox width="150px" model="@load(vm.codeLists)"
-						selectedItem="@bind(fx.list)" mold="select"
-						onSelect="@command('applyChanges')">
-						<template name="model">
-							<listitem label="@load(each.name)" />
-						</template>
-					</listbox>
+					<cell>
+						<listbox width="150px" model="@load(vm.codeLists)"
+							selectedItem="@bind(fx.list)" mold="select"
+							onSelect="@command('applyChanges')">
+							<template name="model">
+								<listitem label="@load(each.name)" />
+							</template>
+						</listbox>
+						<button tooltiptext="${labels.survey.code_lists_manager}" 
+							onClick="@command('openCodeListsManagerPopUp')"
+							image="/assets/images/pencil-small.png" />
+						<label class="error" value="@load(vmsgs['list'])" />
+					</cell>
 				</row>
 				<row>
 					<label value="${labels.survey.schema.attribute.code.strict}:" />

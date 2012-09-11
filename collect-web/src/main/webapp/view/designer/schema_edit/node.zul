@@ -1,10 +1,10 @@
 <zk>
 	<borderlayout>
-		<north height="@load(vm.nodeType eq 'ATTRIBUTE' ? '50px': '25px')">
-			<grid height="@load(vm.nodeType eq 'ATTRIBUTE' ? '50px': '25px')">
+		<north height="@load(vm.nodeType eq 'ATTRIBUTE' ? '55px': '30px')">
+			<grid height="@load(vm.nodeType eq 'ATTRIBUTE' ? '55px': '30px')">
 				<columns>
 					<column label="" width="150px" />
-					<column label="" width="300px" />
+					<column label="" width="100%" />
 				</columns>
 				<rows>
 					<row>

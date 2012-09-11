@@ -1,35 +1,42 @@
 <zk>
-	<div id="itemsContainer"
-		apply="org.zkoss.bind.BindComposer"
-		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SurveyCodeListsEditVM')"
-		height="100%">
-		<hbox>
+	<borderlayout id="codeListsManagerContainer"
+			apply="org.zkoss.bind.BindComposer"
+			viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SurveyCodeListsEditVM')"
+			validationMessages="@id('vmsgs')">
+		<west>
 			<vbox>
 		        <listbox id="itemsListBox"
 		        	selectedItem="@bind(vm.selectedItem)"
 		        	model="@load(vm.items)"
-		        	onSelect="@command('selectionChanged')"
+		        	onSelect="@command('selectionChanged', selectedItem=self.selectedItem.value)"
 		        	height="200px"
 		        	width="200px">
 		        	<listhead>
 						<listheader label="" width="150px" />
+						<listheader label="" width="50px" />
 					</listhead>
 		            <template name="model">
 		                <listitem>
 		                    <listcell label="@load(each.name)" />
+		                    <listcell>
+		                    	<button image="/assets/images/cross-small.png"
+		                     		onClick="@command('deleteItem', item=each)" />
+		                    </listcell>
 		                </listitem>
 		            </template>
 		        </listbox>
 		        
 		        <button label="${labels.global.add_item}" onClick="@command('newItem') @global-command('codeListsUpdated')" />
 		    </vbox>
-	        
+	    </west>
+	   	<center>
 	        <div 
 	        	visible="@load(vm.editingItem)"
 				validationMessages="@id('vmsgs')"
-				form="@id('itemEditForm') @load(vm.editedItem) @save(vm.editedItem, before='save')"
-				width="400px"
-				>
+				form="@id('fx') 
+					@load(vm.formObject) @save(vm.formObject, before='applyChanges')
+					@validator('org.openforis.collect.designer.form.validator.CodeListFormValidator')"
+				width="100%">
 				<grid>
 					<columns>
 						<column label="" width="150px" />
@@ -38,126 +45,86 @@
 					<rows>
 						<row>
 							<label value="${labels.global.item.name}:" />
-							<textbox width="99%" value="@bind(vm.editedItem.name)" />
+							<cell>
+								<textbox width="150px" value="@bind(fx.name)" onChange="@command('applyChanges')" />
+								<label class="error" value="@load(vmsgs['name'])" />
+							</cell>
 						</row>
 						<row>
 							<label value="${labels.survey.code_list.item_label}:" />
-							<textbox width="99%" value="@bind(vm.itemLabel)" />
+							<cell>
+								<textbox width="150px" value="@bind(fx.itemLabel)" onChange="@command('applyChanges')" />
+								<label class="error" value="@load(vmsgs['itemLabel'])" />
+							</cell>
 						</row>
 						<row>
 							<label value="${labels.survey.code_list.list_label}:" />
-							<textbox width="99%" value="@bind(vm.itemListLabel)" />
+							<cell>
+								<textbox width="150px" value="@bind(fx.listLabel)" onChange="@command('applyChanges')" />
+								<label class="error" value="@load(vmsgs['listLabel'])" />
+							</cell>
 						</row>
 						<row>
 							<label value="${labels.global.item.since_version}:" />
-							<listbox width="150px"
-			                    model="@load(vm.versionsForCombo)" 
-			                    selectedItem="@bind(vm.editedItemSinceVersion)"
-			                    mold="select">
-			                    <template name="model">
-			                        <listitem label="@load(each.name)" />
-			                    </template>
-			                </listbox>
+							<cell>
+								<listbox width="150px"
+				                    model="@load(vm.versionsForCombo)" 
+				                    selectedItem="@bind(fx.sinceVersion)"
+				                    onSelect="@command('applyChanges')"
+				                    mold="select">
+				                    <template name="model">
+				                        <listitem label="@load(each.name)" />
+				                    </template>
+				                </listbox>
+			                	<label class="error" value="@load(vmsgs['sinceVersion'])" />
+							</cell>
 			            </row>
 			            <row>
 							<label value="${labels.global.item.deprecated_version}:" />
-							<listbox width="150px"
-			                    model="@load(vm.versionsForCombo)" 
-			                    selectedItem="@bind(vm.editedItemDeprecatedVersion)"
-			                    mold="select">
-			                    <template name="model">
-			                        <listitem label="@load(each.name)" />
-			                    </template>
-			                </listbox>
+							<cell>
+								<listbox width="150px"
+				                    model="@load(vm.versionsForCombo)" 
+				                    selectedItem="@bind(fx.deprecatedVersion)"
+				                    onSelect="@command('applyChanges')"
+				                    mold="select">
+				                    <template name="model">
+				                        <listitem label="@load(each.name)" />
+				                    </template>
+				                </listbox>
+				                <label class="error" value="@load(vmsgs['deprecatedVersion'])" />
+							</cell>
 			            </row>
-						<row>
-							<label value="${labels.survey.code_list.items}:" />
-							<vbox>
-								<tree id="itemsTree" 
-									width="300px" 
-									model="@load(vm.childItems)"
-									onSelect="@command('childItemSelected', item=self.selectedItem)"
-									>
-									<template name="model">
-							            <treeitem>
-							                <treerow>
-							                    <treecell label="@load(each.data.code) - @load(each.data.getLabel(vm.selectedLanguageCode))"/>
-							                </treerow>
-							            </treeitem>
-							  		</template>
-							    </tree>
-							    <button label="${labels.survey.code_list.add_root_child_item}"
-			                     	onClick="@command('addRootChildItem')" />
-		                     	<button label="${labels.survey.code_list.add_child_item}" disabled="@load(not vm.editingChildItem)"
-		                     		onClick="@command('addChildItem')" />
-	                     	</vbox>
-						</row>
+			            <row>
+			            	<label value="${labels.survey.code_list.type.$}:" />
+							<radiogroup selectedItem="@bind(fx.type)">
+								<radio label="${labels.survey.code_list.type.flat}"
+									value="FLAT" />
+								<radio label="${labels.survey.code_list.type.hierarchical}"
+									value="HIERACHICAL" />
+							</radiogroup>
+			            </row>
 					</rows>
 				</grid>
 				
-				<hbox>
-					<button image="/assets/images/cross-small.png"
-		                     onClick="@command('deleteItem')  @global-command('codeListsUpdated')" />
-				</hbox>
+				<hlayout height="100%">
+					<hlayout children="@load(vm.listLevels)"
+						height="100%">
+						<template name="children">
+							<vlayout width="100px" height="100%">
+								<textbox value="@bind(each.name)" />
+								<listbox model="@load(vm.itemsPerLevel[forEachStatus.index])"
+									height="100%">
+									<template name="model">
+										<listitem label="@load(each.code)" />
+									</template>
+								</listbox>
+							</vlayout>
+						</template>
+					</hlayout>
+				 	<button label="${labels.survey.code_list.add_level}" 
+				 		onClick="@command('addLevel')" />
+				</hlayout>
 			</div>
-	        
-	         <div 
-	        	visible="@load(vm.editingChildItem)"
-				validationMessages="@id('vmsgs')"
-				form="@id('itemChildEditForm') @load(vm.editedChildItem) @save(vm.editedChildItem, before='save')"
-				width="400px"
-				>
-				<grid>
-					<columns>
-						<column label="" width="150px" />
-						<column label="" />
-					</columns>
-					<rows>
-						<row>
-							<label value="${labels.survey.code_list.code}:" />
-							<textbox width="99%" value="@bind(vm.editedChildItem.code)" />
-						</row>
-						<row>
-							<label value="${labels.survey.code_list.qualifiable}:" />
-							<checkbox checked="@bind(vm.childItemQualifiable)" />
-						</row>
-						<row>
-							<label value="${labels.global.item.label}:" />
-							<textbox width="99%" value="@bind(vm.childItemLabel)" />
-						</row>
-						<row>
-							<label value="${labels.global.item.description}:" />
-							<textbox width="99%" value="@bind(vm.childItemDescription)" />
-						</row>
-						<row>
-							<label value="${labels.global.item.since_version}:" />
-							<listbox width="150px"
-			                    model="@load(vm.versionsForCombo)" 
-			                    selectedItem="@bind(vm.childItemSinceVersion)"
-			                    mold="select">
-			                    <template name="model">
-			                        <listitem label="@load(each.name)" />
-			                    </template>
-			                </listbox>
-			            </row>
-			            <row>
-							<label value="${labels.global.item.deprecated_version}:" />
-							<listbox width="150px"
-			                    model="@load(vm.versionsForCombo)" 
-			                    selectedItem="@bind(vm.childItemDeprecatedVersion)"
-			                    mold="select">
-			                    <template name="model">
-			                        <listitem label="@load(each.name)" />
-			                    </template>
-			                </listbox>
-			            </row>
-					</rows>
-				</grid>
-				<hbox>
-					<button image="/assets/images/cross-small.png"
-		                     onClick="@command('deleteChildItem')" />
-				</hbox>
-			</div>
-		</hbox>
-    </div>
+		</center>
+	</borderlayout>
 </zk>
