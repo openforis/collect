@@ -30,13 +30,38 @@ public class CollectSurvey extends Survey {
 		List<Configuration> configurations = getConfiguration();
 		for (Configuration config : configurations) {
 			if ( config instanceof UIConfiguration ) {
-				UIConfiguration uiConfig = (UIConfiguration) config;
-				return uiConfig;
+				return (UIConfiguration) config;
 			}
 		}
 		return null;
 	}
 
+	public void setUIConfiguration(UIConfiguration conf) {
+		UIConfiguration oldConf = getUIConfiguration();
+		if ( oldConf == null ) {
+			removeConfiguration(oldConf);
+		}
+		addConfiguration(conf);
+	}
+	
+	public LanguageConfiguration getLanguageConfiguration() {
+		List<Configuration> configurations = getConfiguration();
+		for (Configuration config : configurations) {
+			if ( config instanceof LanguageConfiguration ) {
+				return (LanguageConfiguration) config;
+			}
+		}
+		return null;
+	}
+	
+	public void setLanguageConfiguration(LanguageConfiguration conf) {
+		LanguageConfiguration oldConf = getLanguageConfiguration();
+		if ( oldConf == null ) {
+			removeConfiguration(oldConf);
+		}
+		addConfiguration(conf);
+	}
+	
 	public boolean isPublished() {
 		return published;
 	}

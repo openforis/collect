@@ -4,7 +4,6 @@
 package org.openforis.collect.designer.viewmodel;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.openforis.collect.designer.converter.XMLStringDateConverter;
@@ -12,6 +11,7 @@ import org.openforis.collect.designer.form.FormObject;
 import org.openforis.collect.designer.session.SessionStatus;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.LanguageConfiguration;
 import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.Languages;
@@ -36,8 +36,6 @@ import org.zkoss.zul.ListModelList;
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class SurveyEditVM extends BaseVM {
 	
-	private static final String ENGLISH_LANGUAGE_CODE = "eng";
-
 	protected XMLStringDateConverter xmlStringDateConverter = new XMLStringDateConverter();
 	
 	private String dateFormat = "dd/MM/yyyy";
@@ -54,7 +52,12 @@ public class SurveyEditVM extends BaseVM {
 	
 	public SurveyEditVM() {
 		currentFormValid = true;
-		selectedLanguageCode = ENGLISH_LANGUAGE_CODE;
+		initSelectedLanguageCode();
+	}
+
+	private void initSelectedLanguageCode() {
+		SessionStatus sessionStatus = getSessionStatus();
+		selectedLanguageCode = sessionStatus.getSelectedLanguageCode();
 	}
 	
 	@Init
@@ -137,9 +140,9 @@ public class SurveyEditVM extends BaseVM {
 	}
 
 	public List<String> getAvailableLanguages() {
-		//TODO
-		List<String> languageCodes = Arrays.asList(ENGLISH_LANGUAGE_CODE);
-		return new BindingListModelList<String>(languageCodes, false);
+		LanguageConfiguration langConf = survey.getLanguageConfiguration();
+		List<String> langCodes = langConf.getLanguageCodes();
+		return new BindingListModelList<String>(langCodes, false);
 	}
 	
 	public boolean isCurrentFormValid() {

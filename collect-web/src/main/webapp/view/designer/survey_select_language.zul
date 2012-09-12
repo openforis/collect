@@ -12,28 +12,35 @@
 	
 	<label value="${labels.survey.select_language}" />
 	
-	<grid>
-		<columns>
-			<column label="" width="150px" />
-			<column label="" width="100%" />
-		</columns>
-		<rows>
-			<row>
-				<cell colspan="2">
-					<label value="${labels.survey.select_language}:" />
-				</cell>
-			</row>
-			<row>
-				<label value="${labels.survey.language}" />
-				<listbox width="150px" model="@load(vm.languageCodes)"
-							selectedItem="@bind(vm.selectedLanguageCode)" mold="select">
-				</listbox>
-			</row>
-		</rows>
-	</grid>
-
 	<hlayout>
-		<button label="${labels.survey.new_survey}" 
-			onClick="@command('selectLanguage')" />
+		<groupbox>
+			<caption label="${labels.survey.language.select_language_to_assign}" />
+			<listbox model="@load(vm.assignableLanguageCodes)"
+					selectedItem="@bind(vm.selectedAssignableLanguageCode)"
+					width="150px" mold="select">
+			</listbox>
+		</groupbox>
+		<vlayout>
+			<button label="&gt;" 
+				onClick="@command('assignLanguage')"
+				disabled="@load(empty vm.selectedAssignableLanguageCode)" />
+			<button label="&lt;" 
+				onClick="@command('removeLanguage')"
+				disabled="@load(empty vm.selectedDefaultLanguageCode)" />
+		</vlayout>
+		<groupbox>
+			<caption label="${labels.survey.language.assigned_languages}" />
+			<vlayout>
+				<listbox model="@load(vm.assignedLanguageCodes)"
+						width="150px" height="100%" checkmark="true"
+						selectedItem="@bind(vm.selectedDefaultLanguageCode)">
+				</listbox>
+				<label value="${labels.survey.language.select_current_language}" />
+			</vlayout>
+		</groupbox>
+	</hlayout>
+	<hlayout>
+		<button label="${labels.global.apply_changes}" 
+			onClick="@command('applyChanges')" />
 	</hlayout>		
 </vbox>
