@@ -25,13 +25,14 @@ public class SurveySelectLanguageVM extends BaseVM {
 	private static final String SURVEY_EDIT_URL = "survey_edit.zul";
 	
 	private String selectedAssignableLanguageCode;
-	private String selectedDefaultLanguageCode;
+	private String selectedCurrentLanguageCode;
 	private List<String> assignableLanguageCodes;
 	private List<String> assignedLanguageCodes;
 	
 	public SurveySelectLanguageVM() {
 		initAssignedLanguageCodes();
 		initAssignableLanguageCodes();
+		initSelectedDefaultLanguageCode();
 	}
 	
 	protected void initAssignedLanguageCodes() {
@@ -54,6 +55,11 @@ public class SurveySelectLanguageVM extends BaseVM {
 		}
 	}
 	
+	protected void initSelectedDefaultLanguageCode() {
+		SessionStatus sessionStatus = getSessionStatus();
+		selectedCurrentLanguageCode = sessionStatus.getSelectedLanguageCode();
+	}
+
 	public BindingListModelListModel<String> getAssignableLanguageCodes() {
 		return new BindingListModelListModel<String>(new ListModelList<String>(assignableLanguageCodes));
 	}
@@ -72,8 +78,8 @@ public class SurveySelectLanguageVM extends BaseVM {
 	@Command
 	@NotifyChange({"assignedLanguageCodes","assignableLanguageCodes"})
 	public void removeLanguage() {
-		assignedLanguageCodes.remove(selectedDefaultLanguageCode);
-		assignableLanguageCodes.add(selectedDefaultLanguageCode);
+		assignedLanguageCodes.remove(selectedCurrentLanguageCode);
+		assignableLanguageCodes.add(selectedCurrentLanguageCode);
 		Collections.sort(assignableLanguageCodes);
 	}
 
@@ -84,8 +90,8 @@ public class SurveySelectLanguageVM extends BaseVM {
 		LanguageConfiguration langConf = new LanguageConfiguration();
 		langConf.addLanguageCodes(assignedLanguageCodes);
 		survey.setLanguageConfiguration(langConf);
-		if ( StringUtils.isNotBlank(selectedDefaultLanguageCode) ) {
-			sessionStatus.setSelectedLanguageCode(selectedDefaultLanguageCode);
+		if ( StringUtils.isNotBlank(selectedCurrentLanguageCode) ) {
+			sessionStatus.setSelectedLanguageCode(selectedCurrentLanguageCode);
 			Executions.sendRedirect(SURVEY_EDIT_URL);
 		}
 	}
@@ -99,12 +105,12 @@ public class SurveySelectLanguageVM extends BaseVM {
 		this.selectedAssignableLanguageCode = selectedAssignableLanguageCode;
 	}
 
-	public String getSelectedDefaultLanguageCode() {
-		return selectedDefaultLanguageCode;
+	public String getSelectedCurrentLanguageCode() {
+		return selectedCurrentLanguageCode;
 	}
 
-	public void setSelectedDefaultLanguageCode(String selectedDefaultLanguageCode) {
-		this.selectedDefaultLanguageCode = selectedDefaultLanguageCode;
+	public void setSelectedCurrentLanguageCode(String selectedDefaultLanguageCode) {
+		this.selectedCurrentLanguageCode = selectedDefaultLanguageCode;
 	}
 
 	

@@ -26,14 +26,14 @@
 				disabled="@load(empty vm.selectedAssignableLanguageCode)" />
 			<button label="&lt;" 
 				onClick="@command('removeLanguage')"
-				disabled="@load(empty vm.selectedDefaultLanguageCode)" />
+				disabled="@load(empty vm.selectedCurrentLanguageCode)" />
 		</vlayout>
 		<groupbox>
 			<caption label="${labels.survey.language.assigned_languages}" />
 			<vlayout>
 				<listbox model="@load(vm.assignedLanguageCodes)"
-						width="150px" height="100%" checkmark="true"
-						selectedItem="@bind(vm.selectedDefaultLanguageCode)">
+						width="150px" height="200px" checkmark="true"
+						selectedItem="@bind(vm.selectedCurrentLanguageCode)">
 				</listbox>
 				<label value="${labels.survey.language.select_current_language}" />
 			</vlayout>
