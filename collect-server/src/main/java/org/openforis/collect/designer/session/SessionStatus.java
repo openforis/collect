@@ -11,22 +11,23 @@ import org.openforis.collect.model.CollectSurvey;
  */
 public class SessionStatus {
 
-	private String selectedLanguageCode;
+	private String currentLanguageCode;
 	private CollectSurvey survey;
 	
-	public String getSelectedLanguageCode() {
-		return selectedLanguageCode;
+	public String getCurrentLanguageCode() {
+		return currentLanguageCode;
 	}
-	public void setSelectedLanguageCode(String selectedLanguageCode) {
-		this.selectedLanguageCode = selectedLanguageCode;
+	
+	public void setCurrentLanguageCode(String currentLanguageCode) {
+		this.currentLanguageCode = currentLanguageCode;
 	}
+	
 	public CollectSurvey getSurvey() {
 		return survey;
 	}
+	
 	public void setSurvey(CollectSurvey survey) {
 		this.survey = survey;
 	}
-	
-	
 	
 }

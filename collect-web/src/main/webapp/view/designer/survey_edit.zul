@@ -12,11 +12,15 @@
 			<hlayout width="100%" style="text-align: right;">
 				<label value="${labels.survey.selected_language}:" />
 				<radiogroup model="@load(vm.availableLanguages)"
-					selectedItem="@bind(vm.selectedLanguageCode)">
+					selectedItem="@load(vm.currentLanguageCode)"
+					onCheck="@command('languageCodeSelected', code=self.selectedItem)">
 					<template name="model">
 						<radio label="@load(each)" value="@load(each)" />
 					</template>
 				</radiogroup>
+				<button tooltiptext="${labels.survey.language_manager}" 
+						onClick="@command('openLanguageManagerPopUp')"
+						image="/assets/images/pencil-small.png" />
 			</hlayout>
 			<!-- main tabs -->
 			<tabbox id="tb" height="500px" width="100%">

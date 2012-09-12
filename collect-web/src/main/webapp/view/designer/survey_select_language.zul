@@ -1,46 +1,44 @@
-<?page title="Collect Database Designer - Select Survey"?>
-<?init class="org.zkoss.zk.ui.util.Composition" arg0="layouts/template.zul"?>
-<?init class="org.zkoss.zkplus.databind.AnnotateDataBinderInit" arg0="./languageSelectBox"?>
-<?variable-resolver class="org.zkoss.zkplus.spring.DelegatingVariableResolver"?>
-<vbox
-	id="languageSelectBox" 
-	self="@define(content)"
-	height="100%"
-	width="500px"
-	apply="org.zkoss.bind.BindComposer"
-	viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SurveySelectLanguageVM')">
-	
-	<label value="${labels.survey.select_language}" />
-	
-	<hlayout>
-		<groupbox>
-			<caption label="${labels.survey.language.select_language_to_assign}" />
-			<listbox model="@load(vm.assignableLanguageCodes)"
-					selectedItem="@bind(vm.selectedAssignableLanguageCode)"
-					width="150px" mold="select">
-			</listbox>
-		</groupbox>
-		<vlayout>
-			<button label="&gt;" 
-				onClick="@command('assignLanguage')"
-				disabled="@load(empty vm.selectedAssignableLanguageCode)" />
-			<button label="&lt;" 
-				onClick="@command('removeLanguage')"
-				disabled="@load(empty vm.selectedCurrentLanguageCode)" />
-		</vlayout>
-		<groupbox>
-			<caption label="${labels.survey.language.assigned_languages}" />
-			<vlayout>
-				<listbox model="@load(vm.assignedLanguageCodes)"
-						width="150px" height="200px" checkmark="true"
-						selectedItem="@bind(vm.selectedCurrentLanguageCode)">
+<zk>
+	<vbox
+		id="languageSelectBox" 
+		self="@define(content)"
+		height="100%"
+		width="500px"
+		apply="org.zkoss.bind.BindComposer"
+		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SurveySelectLanguageVM')">
+		
+		<label value="${labels.survey.select_language}" />
+		
+		<hlayout>
+			<groupbox>
+				<caption label="${labels.survey.language.select_language_to_assign}" />
+				<listbox model="@load(vm.assignableLanguageCodes)"
+						selectedItem="@bind(vm.selectedAssignableLanguageCode)"
+						width="150px" mold="select">
 				</listbox>
-				<label value="${labels.survey.language.select_current_language}" />
+			</groupbox>
+			<vlayout>
+				<button label="&gt;" 
+					onClick="@command('assignLanguage')"
+					disabled="@load(empty vm.selectedAssignableLanguageCode)" />
+				<button label="&lt;" 
+					onClick="@command('removeLanguage')"
+					disabled="@load(empty vm.selectedCurrentLanguageCode)" />
 			</vlayout>
-		</groupbox>
-	</hlayout>
-	<hlayout>
-		<button label="${labels.global.apply_changes}" 
-			onClick="@command('applyChanges')" />
-	</hlayout>		
-</vbox>
+			<groupbox>
+				<caption label="${labels.survey.language.assigned_languages}" />
+				<vlayout>
+					<listbox model="@load(vm.assignedLanguageCodes)"
+							width="150px" height="200px" checkmark="true"
+							selectedItem="@bind(vm.selectedCurrentLanguageCode)">
+					</listbox>
+					<label value="${labels.survey.language.select_current_language}" />
+				</vlayout>
+			</groupbox>
+		</hlayout>
+		<hlayout>
+			<button label="${labels.global.apply_changes}" 
+				onClick="@command('applyChanges')" />
+		</hlayout>		
+	</vbox>
+</zk>

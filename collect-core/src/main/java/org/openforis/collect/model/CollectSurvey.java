@@ -56,7 +56,7 @@ public class CollectSurvey extends Survey {
 	
 	public void setLanguageConfiguration(LanguageConfiguration conf) {
 		LanguageConfiguration oldConf = getLanguageConfiguration();
-		if ( oldConf == null ) {
+		if ( oldConf != null ) {
 			removeConfiguration(oldConf);
 		}
 		addConfiguration(conf);
