@@ -42,7 +42,8 @@ public class SurveySelectVM extends BaseVM {
 		SessionStatus sessionStatus = getSessionStatus();
 		CollectSurvey survey = surveyManager.createSurvey();
 		sessionStatus.setSurvey(survey);
-		Executions.sendRedirect(SURVEY_SELECT_LANGUAGE_URL);
+		//Executions.sendRedirect(SURVEY_SELECT_LANGUAGE_URL);
+		Executions.sendRedirect(SURVEY_EDIT_URL);
 	}
 
 	public ListModel<CollectSurvey> getSurveys() {

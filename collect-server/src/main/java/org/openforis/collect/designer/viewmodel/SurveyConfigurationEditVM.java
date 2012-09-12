@@ -30,7 +30,7 @@ import org.zkoss.zul.Treeitem;
  *
  */
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
-public class SurveyConfigurationEditVM extends SurveyEditVM {
+public class SurveyConfigurationEditVM extends SurveyEditBaseVM {
 
 	private static final String TAB_DEFINITIONS_UPDATED_COMMAND = "tabDefinitionsUpdated";
 	private UITabsGroup selectedTab;

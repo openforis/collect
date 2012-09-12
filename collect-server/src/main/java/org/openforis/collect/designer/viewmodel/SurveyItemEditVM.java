@@ -18,7 +18,7 @@ import org.zkoss.zkplus.databind.BindingListModelList;
  *
  */
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
-public abstract class SurveyItemEditVM<T> extends SurveyEditVM {
+public abstract class SurveyItemEditVM<T> extends SurveyEditBaseVM {
 	
 	private final Class<T> genericType;
 	protected ItemFormObject<T> formObject;
@@ -55,7 +55,7 @@ public abstract class SurveyItemEditVM<T> extends SurveyEditVM {
 	@NotifyChange({"editedItem","selectedItem"})
 	public void applyChanges() {
 		T editedItem = getEditedItem();
-		formObject.saveTo(editedItem, selectedLanguageCode);
+		formObject.saveTo(editedItem, currentLanguageCode);
 	}
 	
 	@Command
@@ -135,7 +135,7 @@ public abstract class SurveyItemEditVM<T> extends SurveyEditVM {
 		this.editedItem = editedItem;
 		formObject = createFormObject();
 		if ( editedItem != null ) {
-			formObject.loadFrom(editedItem, selectedLanguageCode);
+			formObject.loadFrom(editedItem, currentLanguageCode);
 		}
 	}
 	

@@ -9,9 +9,9 @@ import org.openforis.collect.designer.session.SessionStatus;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.LanguageConfiguration;
 import org.openforis.idm.metamodel.Languages;
+import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.NotifyChange;
-import org.zkoss.zk.ui.Executions;
 import org.zkoss.zkplus.databind.BindingListModelListModel;
 import org.zkoss.zul.ListModelList;
 
@@ -22,8 +22,9 @@ import org.zkoss.zul.ListModelList;
  */
 public class SurveySelectLanguageVM extends BaseVM {
 
-	private static final String SURVEY_EDIT_URL = "survey_edit.zul";
-	
+	public static final String CURRENT_LANGUAGE_CHANGED_COMMAND = "currentLanguageChanged";
+	public static final String SURVEY_LANGUAGES_CHANGED_COMMAND = "surveyLanguagesChanged";
+
 	private String selectedAssignableLanguageCode;
 	private String selectedCurrentLanguageCode;
 	private List<String> assignableLanguageCodes;
@@ -57,7 +58,7 @@ public class SurveySelectLanguageVM extends BaseVM {
 	
 	protected void initSelectedDefaultLanguageCode() {
 		SessionStatus sessionStatus = getSessionStatus();
-		selectedCurrentLanguageCode = sessionStatus.getSelectedLanguageCode();
+		selectedCurrentLanguageCode = sessionStatus.getCurrentLanguageCode();
 	}
 
 	public BindingListModelListModel<String> getAssignableLanguageCodes() {
@@ -91,8 +92,10 @@ public class SurveySelectLanguageVM extends BaseVM {
 		langConf.addLanguageCodes(assignedLanguageCodes);
 		survey.setLanguageConfiguration(langConf);
 		if ( StringUtils.isNotBlank(selectedCurrentLanguageCode) ) {
-			sessionStatus.setSelectedLanguageCode(selectedCurrentLanguageCode);
-			Executions.sendRedirect(SURVEY_EDIT_URL);
+			sessionStatus.setCurrentLanguageCode(selectedCurrentLanguageCode);
+			BindUtils.postGlobalCommand(null, null, SURVEY_LANGUAGES_CHANGED_COMMAND, null);
+			BindUtils.postGlobalCommand(null, null, CURRENT_LANGUAGE_CHANGED_COMMAND, null);
+			
 		}
 	}
 

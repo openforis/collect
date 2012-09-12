@@ -40,7 +40,7 @@ import org.zkoss.zul.Window;
  *
  */
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
-public class SurveySchemaEditVM extends SurveyEditVM {
+public class SurveySchemaEditVM extends SurveyEditBaseVM {
 
 	private static final String SURVEY_EDIT_VERSIONING_POPUP_URL = "survey_edit_versioning_popup.zul";
 	private static final String ATTRIBUTE_DEFAULTS_FIELD = "attributeDefaults";
@@ -144,7 +144,7 @@ public class SurveySchemaEditVM extends SurveyEditVM {
 			editedNode = selectedNode;
 		}
 		//TODO avoid the use of side effect...
-		formObject.saveTo(editedNode, selectedLanguageCode);
+		formObject.saveTo(editedNode, currentLanguageCode);
 		
 		if ( newNode ) {
 			if ( rootEntityCreation ) {
@@ -248,7 +248,7 @@ public class SurveySchemaEditVM extends SurveyEditVM {
 	protected void initFormObject(NodeDefinition node) {
 		calculateNodeType(node);
 		initFormObject();
-		formObject.loadFrom(node, selectedLanguageCode);
+		formObject.loadFrom(node, currentLanguageCode);
 		if ( formObject instanceof AttributeDefinitionFormObject ) {
 			attributeDefaults = ((AttributeDefinitionFormObject<?>) formObject).getAttributeDefaults();
 			tempFormObject.setField(ATTRIBUTE_DEFAULTS_FIELD, attributeDefaults);

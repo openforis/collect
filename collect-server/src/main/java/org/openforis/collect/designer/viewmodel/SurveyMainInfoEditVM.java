@@ -30,7 +30,7 @@ public class SurveyMainInfoEditVM extends SurveyItemEditVM<CollectSurvey> {
 		if ( formObject == null ) {
 			CollectSurvey survey = getSurvey();
 			formObject = createFormObject();
-			formObject.loadFrom(survey, selectedLanguageCode);
+			formObject.loadFrom(survey, currentLanguageCode);
 		}
 		return formObject;
 	}
