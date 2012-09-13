@@ -73,10 +73,17 @@ public class SurveyCodeListsEditVM extends SurveyItemEditVM<CodeList> {
 	}
 
 	@Command
-	@NotifyChange({"formObject","editingItem","editedItem","items","selectedItem"})
+	@NotifyChange({"formObject","editingItem","editedItem","items","selectedItem","listLevels","itemsPerLevel","selectedItemsPerLevel"})
 	public void newItem() {
 		super.newItem();
 		editedItem.setSurvey(survey);
+	}
+	
+	@Override
+	@Command
+	@NotifyChange({"formObject","editingItem","editedItem","listLevels","itemsPerLevel","selectedItemsPerLevel"})
+	public void selectionChanged(CodeList selectedItem) {
+		super.selectionChanged(selectedItem);
 	}
 	
 	@Command

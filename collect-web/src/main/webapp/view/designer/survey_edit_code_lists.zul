@@ -98,9 +98,9 @@
 			            	<label value="${labels.survey.code_list.type.$}:" />
 							<radiogroup selectedItem="@bind(fx.type)">
 								<radio label="${labels.survey.code_list.type.flat}"
-									value="FLAT" />
+									value="FLAT" disabled="@load(vm.listLevels.size > 0)" />
 								<radio label="${labels.survey.code_list.type.hierarchical}"
-									value="HIERACHICAL" />
+									value="HIERARCHICAL" disabled="@load(vm.listLevels.size > 0)" />
 							</radiogroup>
 			            </row>
 					</rows>
@@ -122,7 +122,7 @@
 							</vlayout>
 						</template>
 					</hlayout>
-					<vlayout id="levelsControlBar" visible="@load(fx.type == 'HIERARCHICAL')">
+					<vlayout id="levelsControlBar" visible="@load(fx.type eq 'HIERARCHICAL')">
 					 	<button label="${labels.survey.code_list.add_level}" 
 					 		onClick="@command('addLevel')" />
 					 	<button label="${labels.survey.code_list.remove_level}" 
