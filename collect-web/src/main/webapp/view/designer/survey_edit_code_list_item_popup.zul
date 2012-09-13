@@ -1,12 +1,16 @@
 <zk>
-	<div 
+	<window id="codeListItemManagerPopUp" title="${labels.survey.code_list.item.manager.title}" 
+		width="800px"
+		height="270px"
+		border="normal"
+		position="center" 
+		closable="false"
 		apply="org.zkoss.bind.BindComposer"
 		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SurveyCodeListItemEditVM')"
 		validationMessages="@id('vmsgs')"
 		form="@id('fx') 
 			@load(vm.formObject) @save(vm.formObject, before='applyChanges')
-			@validator('org.openforis.collect.designer.form.validator.CodeListItemFormValidator')"
-		width="100%">
+			@validator('org.openforis.collect.designer.form.validator.CodeListItemFormValidator')">
 		<grid>
 			<columns>
 				<column label="" width="150px" />
@@ -73,5 +77,8 @@
 	            </row>
 			</rows>
 		</grid>
-	</div>
+		<box align="center" width="100%">
+			<button label="${labels.global.close}" onClick="@command('close')" />
+		</box>
+	</window>
 </zk>

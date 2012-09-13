@@ -14,8 +14,6 @@ import org.zkoss.bind.annotation.GlobalCommand;
 import org.zkoss.bind.annotation.Init;
 import org.zkoss.bind.annotation.NotifyChange;
 import org.zkoss.zk.ui.Executions;
-import org.zkoss.zk.ui.event.Event;
-import org.zkoss.zk.ui.event.Events;
 import org.zkoss.zkplus.databind.BindingListModelList;
 import org.zkoss.zul.Window;
 
@@ -58,8 +56,7 @@ public class SurveyEditVM extends SurveyEditBaseVM {
 	}
 
 	private void closeSelectLanguagePopUp() {
-		Event event = new Event("onClose", selectLanguagePopUp, null);
-		Events.postEvent(event);
+		closePopUp(selectLanguagePopUp);
 	}
 	
 	public List<String> getAvailableLanguages() {

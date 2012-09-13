@@ -6,7 +6,9 @@ package org.openforis.collect.designer.viewmodel;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.openforis.collect.designer.form.CodeListFormObject;
 import org.openforis.collect.designer.form.ItemFormObject;
@@ -16,12 +18,17 @@ import org.openforis.idm.metamodel.CodeListItem;
 import org.openforis.idm.metamodel.CodeListLevel;
 import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
+import org.zkoss.bind.annotation.GlobalCommand;
 import org.zkoss.bind.annotation.NotifyChange;
+import org.zkoss.zk.ui.Executions;
+import org.zkoss.zk.ui.event.Event;
+import org.zkoss.zk.ui.event.Events;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zkplus.databind.BindingListModelList;
 import org.zkoss.zul.DefaultTreeModel;
 import org.zkoss.zul.DefaultTreeNode;
 import org.zkoss.zul.TreeNode;
+import org.zkoss.zul.Window;
 
 /**
  * 
@@ -31,11 +38,15 @@ import org.zkoss.zul.TreeNode;
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class SurveyCodeListsEditVM extends SurveyItemEditVM<CodeList> {
 
+	private static final String CODE_LIST_ITEM_EDIT_POP_UP_URL = "survey_edit_code_list_item_popup.zul";
+	public static final String CLOSE_CODE_LIST_ITEM_POP_UP_COMMAND = "closeCodeListItemPopUp";
+
 	private DefaultTreeModel<CodeListItem> treeModel;
 	
 	private List<List<CodeListItem>> itemsPerLevel;
 	
 	private List<CodeListItem> selectedItemsPerLevel;
+	private Window codeListItemPopUp;
 	
 	@Override
 	public BindingListModelList<CodeList> getItems() {
@@ -74,18 +85,30 @@ public class SurveyCodeListsEditVM extends SurveyItemEditVM<CodeList> {
 		CodeListLevel level = new CodeListLevel();
 		editedItem.addLevel(level);
 	}
-	
+
+	@Command
+	@NotifyChange({"listLevels"})
+	public void removeLevel() {
+		List<CodeListLevel> levels = editedItem.getHierarchy();
+		if ( ! levels.isEmpty() ) {
+			CodeListLevel lastLevel = levels.get(levels.size() - 1);
+			editedItem.removeLevel(lastLevel.getId());
+		}
+	}
+
 	@Command
 	@NotifyChange({"itemsPerLevel"})
-	public void addChildItem(@BindingParam("levelIndex") int levelIndex) {
+	public void addItemInLevel(@BindingParam("levelIndex") int levelIndex) {
 		CodeListItem item = new CodeListItem();
-		item.setCode("TEST");
 		if ( levelIndex == 0 ) {
 			editedItem.addItem(item);
 		} else {
 			CodeListItem parentItem = selectedItemsPerLevel.get(levelIndex - 1);
 			parentItem.addChildItem(item);
 		}
+		List<CodeListItem> itemsForCurrentLevel = itemsPerLevel.get(levelIndex);
+		itemsForCurrentLevel.add(item);
+		openChildItemEditPopUp(item, levelIndex);
 	}
 	
 	@Override
@@ -93,16 +116,47 @@ public class SurveyCodeListsEditVM extends SurveyItemEditVM<CodeList> {
 		super.setEditedItem(editedItem);
 		initTreeModel();
 		selectedItemsPerLevel = new ArrayList<CodeListItem>();
-		initItemsPerLevel(editedItem);
+		initItemsPerLevel();
+	}
+	
+	public void openChildItemEditPopUp(CodeListItem item, int levelIndex) {
+		Map<String, Object> args = new HashMap<String, Object>();
+		args.put("item", item);
+		args.put("levelIndex", levelIndex);
+		codeListItemPopUp = (Window) Executions.createComponents(
+				CODE_LIST_ITEM_EDIT_POP_UP_URL, null, args);
+		codeListItemPopUp.doModal();
 	}
 
-	private void initItemsPerLevel(CodeList editedItem) {
+	@Command
+	@NotifyChange({"itemsPerLevel","selectedItemsPerLevel"})
+	public void listItemSelected(@BindingParam("item") CodeListItem item, 
+			@BindingParam("levelIndex") int levelIndex) {
+		deselectItemsAfterLevel(levelIndex);
+		selectedItemsPerLevel.add(item);
+		initItemsPerLevel();
+	}
+
+	private void deselectItemsAfterLevel(int levelIndex) {
+		int maxSelectedLevelIndex = selectedItemsPerLevel.size() - 1;
+		for (int i = maxSelectedLevelIndex; i >= levelIndex; i --) {
+			selectedItemsPerLevel.remove(i);
+		}
+	}
+	
+	@GlobalCommand
+	@NotifyChange({"itemsPerLevel"})
+	public void closeCodeListItemPopUp() {
+		closePopUp(codeListItemPopUp);
+	}
+
+	private void initItemsPerLevel() {
 		itemsPerLevel = new ArrayList<List<CodeListItem>>();
 		if ( editedItem != null ) {
-			List<CodeListItem> items = editedItem.getItems();
+			List<CodeListItem> items = new ArrayList<CodeListItem>(editedItem.getItems());
 			itemsPerLevel.add(items);
 			for (CodeListItem selectedItem : selectedItemsPerLevel) {
-				List<CodeListItem> childItems = selectedItem.getChildItems();
+				List<CodeListItem> childItems = new ArrayList<CodeListItem>(selectedItem.getChildItems());
 				itemsPerLevel.add(childItems);
 			}
 		}

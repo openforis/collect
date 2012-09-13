@@ -1,7 +1,7 @@
 <zk>
-	<window id="codeListsManagerPopUp" title="${labels.survey.code_lists_manager}" 
+	<window id="codeListsManagerPopUp" title="${labels.survey.code_list.manager.title}" 
 		width="800px" 
-		height="400px"
+		height="500px"
 		border="normal"
 		position="center" 
 		closable="true">

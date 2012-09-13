@@ -9,15 +9,15 @@ import org.zkoss.bind.ValidationContext;
  */
 public class CodeListItemFormValidator extends FormValidator {
 	
-	protected static final String NAME_FIELD = "name";
+	protected static final String CODE_FIELD = "code";
 	
 	@Override
 	protected void internalValidate(ValidationContext ctx) {
-		validateName(ctx);
+		validateCode(ctx);
 	}
 
-	protected void validateName(ValidationContext ctx) {
-		validateRequired(ctx, NAME_FIELD);
+	protected void validateCode(ValidationContext ctx) {
+		validateRequired(ctx, CODE_FIELD);
 	}
 
 }
