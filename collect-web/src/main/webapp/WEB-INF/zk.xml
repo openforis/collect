@@ -13,6 +13,7 @@
 	<system-config>
         <disable-event-thread/>
         <label-location>/WEB-INF/labels/designer/label_en.properties</label-location>
+        <label-location>/WEB-INF/labels/language_codes_iso_639_3.properties</label-location>
     </system-config>
     
 <!-- 	<library-property> -->
