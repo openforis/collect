@@ -24,8 +24,11 @@ import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.GlobalCommand;
 import org.zkoss.bind.annotation.NotifyChange;
+import org.zkoss.mesg.Messages;
 import org.zkoss.util.resource.Labels;
+import org.zkoss.zhtml.Messagebox;
 import org.zkoss.zk.ui.Executions;
+import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zkplus.databind.BindingListModelList;
 import org.zkoss.zul.DefaultTreeModel;
@@ -169,7 +172,7 @@ public class SurveyCodeListsEditVM extends SurveyItemEditVM<CodeList> {
 		}
 		List<CodeListItem> itemsForCurrentLevel = itemsPerLevel.get(levelIndex);
 		itemsForCurrentLevel.add(item);
-		openChildItemEditPopUp(item, levelIndex);
+		openChildItemEditPopUp(item);
 	}
 	
 	@Override
@@ -180,10 +183,14 @@ public class SurveyCodeListsEditVM extends SurveyItemEditVM<CodeList> {
 		initItemsPerLevel();
 	}
 	
-	public void openChildItemEditPopUp(CodeListItem item, int levelIndex) {
+	@Command
+	public void codeListItemDoubleClicked(@BindingParam("item") CodeListItem item) {
+		openChildItemEditPopUp(item);
+	}
+	
+	public void openChildItemEditPopUp(CodeListItem item) {
 		Map<String, Object> args = new HashMap<String, Object>();
 		args.put("item", item);
-		args.put("levelIndex", levelIndex);
 		codeListItemPopUp = (Window) Executions.createComponents(
 				CODE_LIST_ITEM_EDIT_POP_UP_URL, null, args);
 		codeListItemPopUp.doModal();

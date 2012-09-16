@@ -128,7 +128,7 @@
 									<template name="model">
 										<listitem>
 											<listcell>
-												<label value="@load(each.code)" />
+												<label value="@load(each.code)" onDoubleClick="@command('codeListItemDoubleClicked', item=each)" />
 											</listcell>
 											<listcell style="padding: 0px">
 												<image src="@load(each.hasChildItems() ? 
