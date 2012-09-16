@@ -1,3 +1,4 @@
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
 <zk>
 	<borderlayout id="codeListsManagerContainer"
 			apply="org.zkoss.bind.BindComposer"
@@ -98,9 +99,9 @@
 			            	<label value="${labels.survey.code_list.type.$}:" />
 							<radiogroup selectedItem="@bind(fx.type)">
 								<radio label="${labels.survey.code_list.type.flat}"
-									value="FLAT" disabled="@load(vm.listLevels.size > 0)" />
+									value="FLAT" disabled="@load(vm.multipleLevelsPresent)" />
 								<radio label="${labels.survey.code_list.type.hierarchical}"
-									value="HIERARCHICAL" disabled="@load(vm.listLevels.size > 0)" />
+									value="HIERARCHICAL" disabled="@load(vm.multipleLevelsPresent)" />
 							</radiogroup>
 			            </row>
 					</rows>
@@ -109,24 +110,33 @@
 				<hlayout>
 					<hlayout children="@load(vm.listLevels)">
 						<template name="children">
-							<vlayout width="100px">
-								<textbox value="@bind(each.name)" />
+							<groupbox width="100px" 
+								closable="false" 
+								mold="@load(fx.type eq 'HIERARCHICAL' ? '3d': '')">
+								<caption height="30px" visible="@load(fx.type eq 'HIERARCHICAL' ? true: false)">
+									<textbox inplace="true" value="@bind(each.name)" />
+								</caption>
 								<listbox model="@load(vm.itemsPerLevel[forEachStatus.index])"
-									height="150px" onSelect="@command('listItemSelected', item=self.selectedItem.value, levelIndex=forEachStatus.index)">
+									height="150px" 
+									selectedItem="@load(vm.lastSelectedLevelIndex ge forEachStatus.index ? 
+										vm.selectedItemsPerLevel[forEachStatus.index]: null)"
+									onSelect="@command('listItemSelected', item=self.selectedItem.value, levelIndex=forEachStatus.index)">
 									<template name="model">
 										<listitem label="@load(each.code)" />
 									</template>
 								</listbox>
 								<button label="${labels.survey.code_list.add_child_item}" 
+									disabled="@load(forEachStatus.index gt vm.lastSelectedLevelIndex + 1)"
 				 					onClick="@command('addItemInLevel', levelIndex=forEachStatus.index)" />
-							</vlayout>
+							</groupbox>
 						</template>
 					</hlayout>
 					<vlayout id="levelsControlBar" visible="@load(fx.type eq 'HIERARCHICAL')">
 					 	<button label="${labels.survey.code_list.add_level}" 
 					 		onClick="@command('addLevel')" />
 					 	<button label="${labels.survey.code_list.remove_level}" 
-					 		onClick="@command('removeLevel')" />
+					 		onClick="@command('removeLevel')"
+					 		visible="@load(vm.multipleLevelsPresent)" />
 					</vlayout>
 				</hlayout>
 			</div>

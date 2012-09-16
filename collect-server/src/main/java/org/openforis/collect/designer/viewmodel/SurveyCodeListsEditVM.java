@@ -12,17 +12,19 @@ import java.util.Map;
 
 import org.openforis.collect.designer.form.CodeListFormObject;
 import org.openforis.collect.designer.form.ItemFormObject;
+import org.openforis.collect.designer.util.MessageUtil;
+import org.openforis.collect.designer.util.MessageUtil.ConfirmHandler;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
 import org.openforis.idm.metamodel.CodeListLevel;
+import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.GlobalCommand;
 import org.zkoss.bind.annotation.NotifyChange;
+import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.Executions;
-import org.zkoss.zk.ui.event.Event;
-import org.zkoss.zk.ui.event.Events;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zkplus.databind.BindingListModelList;
 import org.zkoss.zul.DefaultTreeModel;
@@ -73,36 +75,68 @@ public class SurveyCodeListsEditVM extends SurveyItemEditVM<CodeList> {
 	}
 
 	@Command
-	@NotifyChange({"formObject","editingItem","editedItem","items","selectedItem","listLevels","itemsPerLevel","selectedItemsPerLevel"})
+	@NotifyChange({"formObject","editingItem","editedItem","items","selectedItem","listLevels","multipleLevelsPresent","itemsPerLevel","selectedItemsPerLevel","lastSelectedLevelIndex"})
 	public void newItem() {
 		super.newItem();
 		editedItem.setSurvey(survey);
 	}
 	
 	@Override
+	protected CodeList createItemInstance() {
+		CodeList instance = super.createItemInstance();
+		instance.addLevel(new CodeListLevel());
+		return instance;
+	}
+	
+	@Override
 	@Command
-	@NotifyChange({"formObject","editingItem","editedItem","listLevels","itemsPerLevel","selectedItemsPerLevel"})
-	public void selectionChanged(CodeList selectedItem) {
+	@NotifyChange({"formObject","editingItem","editedItem","listLevels","multipleLevelsPresent","itemsPerLevel","selectedItemsPerLevel","lastSelectedLevelIndex"})
+	public void selectionChanged(@BindingParam("selectedItem") CodeList selectedItem) {
 		super.selectionChanged(selectedItem);
 	}
 	
 	@Command
-	@NotifyChange({"listLevels"})
+	@NotifyChange({"listLevels","multipleLevelsPresent","lastSelectedLevelIndex"})
 	public void addLevel() {
 		CodeListLevel level = new CodeListLevel();
+		List<CodeListLevel> levels = editedItem.getHierarchy();
+		int levelPosition = levels.size() + 1;
+		String generatedName = Labels.getLabel("survey.code_list.generated_level_name", new Object[]{levelPosition});
+		level.setName(generatedName);
 		editedItem.addLevel(level);
 	}
 
 	@Command
-	@NotifyChange({"listLevels"})
+	@NotifyChange({"listLevels","multipleLevelsPresent","lastSelectedLevelIndex"})
 	public void removeLevel() {
-		List<CodeListLevel> levels = editedItem.getHierarchy();
+		final List<CodeListLevel> levels = editedItem.getHierarchy();
 		if ( ! levels.isEmpty() ) {
-			CodeListLevel lastLevel = levels.get(levels.size() - 1);
-			editedItem.removeLevel(lastLevel.getId());
+			final int levelIndex = levels.size() - 1;
+			if ( editedItem.hasItemsInLevel(levelIndex) ) {
+				ConfirmHandler handler = new MessageUtil.ConfirmHandler() {
+					public void onOk() {
+						performRemoveLevel(levelIndex);
+					}
+					public void onCancel() {}
+				};
+				MessageUtil.showConfirm(handler, "survey.code_list.alert.cannot_delete_non_empty_level");
+			} else {
+				performRemoveLevel(levelIndex);
+			}
 		}
 	}
 
+	@NotifyChange({"listLevels","multipleLevelsPresent","lastSelectedLevelIndex"})
+	protected void performRemoveLevel(int levelIndex) {
+		List<CodeListLevel> levels = editedItem.getHierarchy();
+		CodeListLevel level = levels.get(levelIndex);
+		editedItem.removeLevel(level.getId());
+		deselectItemsAfterLevel(levelIndex);
+		BindUtils.postNotifyChange(null, null, this, "listLevels");
+		BindUtils.postNotifyChange(null, null, this, "multipleLevelsPresent");
+		BindUtils.postNotifyChange(null, null, this, "lastSelectedLevelIndex");
+	}
+	
 	@Command
 	@NotifyChange({"itemsPerLevel"})
 	public void addItemInLevel(@BindingParam("levelIndex") int levelIndex) {
@@ -136,7 +170,7 @@ public class SurveyCodeListsEditVM extends SurveyItemEditVM<CodeList> {
 	}
 
 	@Command
-	@NotifyChange({"itemsPerLevel","selectedItemsPerLevel"})
+	@NotifyChange({"itemsPerLevel","selectedItemsPerLevel","lastSelectedLevelIndex"})
 	public void listItemSelected(@BindingParam("item") CodeListItem item, 
 			@BindingParam("levelIndex") int levelIndex) {
 		deselectItemsAfterLevel(levelIndex);
@@ -144,6 +178,14 @@ public class SurveyCodeListsEditVM extends SurveyItemEditVM<CodeList> {
 		initItemsPerLevel();
 	}
 
+	public boolean isMultipleLevelsPresent() {
+		if ( editedItem != null ) {
+			return editedItem.getHierarchy().size() > 1;
+		} else {
+			return false;
+		}
+	}
+	
 	private void deselectItemsAfterLevel(int levelIndex) {
 		int maxSelectedLevelIndex = selectedItemsPerLevel.size() - 1;
 		for (int i = maxSelectedLevelIndex; i >= levelIndex; i --) {
@@ -179,6 +221,10 @@ public class SurveyCodeListsEditVM extends SurveyItemEditVM<CodeList> {
 	
 	public List<CodeListItem> getSelectedItemsPerLevel() {
 		return selectedItemsPerLevel;
+	}
+	
+	public int getLastSelectedLevelIndex() {
+		return selectedItemsPerLevel.size() - 1;
 	}
 	
 	public List<List<CodeListItem>> getItemsPerLevel() {
