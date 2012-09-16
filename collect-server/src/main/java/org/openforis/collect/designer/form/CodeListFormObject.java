@@ -1,6 +1,9 @@
 package org.openforis.collect.designer.form;
 
+import java.util.List;
+
 import org.openforis.idm.metamodel.CodeList;
+import org.openforis.idm.metamodel.CodeListLevel;
 
 /**
  * 
@@ -16,8 +19,8 @@ public class CodeListFormObject extends VersionableItemFormObject<CodeList> {
 	private String description;
 	private String type;
 	
-	protected enum Type {
-		FLAT, HIERACHICAL;
+	public enum Type {
+		FLAT, HIERARCHICAL;
 	}
 	
 	public CodeListFormObject() {
@@ -32,6 +35,9 @@ public class CodeListFormObject extends VersionableItemFormObject<CodeList> {
 		itemLabel = source.getLabel(org.openforis.idm.metamodel.CodeListLabel.Type.ITEM, languageCode);
 		listLabel = source.getLabel(org.openforis.idm.metamodel.CodeListLabel.Type.LIST, languageCode);
 		description = source.getDescription(languageCode);
+		List<CodeListLevel> levels = source.getHierarchy();
+		boolean hasMultipleLevels = levels.size() > 1;
+		type = hasMultipleLevels ? Type.HIERARCHICAL.name(): Type.FLAT.name();
 	}
 	
 	@Override

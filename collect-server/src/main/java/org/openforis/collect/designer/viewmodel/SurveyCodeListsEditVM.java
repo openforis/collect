@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.openforis.collect.designer.form.CodeListFormObject;
+import org.openforis.collect.designer.form.CodeListFormObject.Type;
 import org.openforis.collect.designer.form.ItemFormObject;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.MessageUtil.ConfirmHandler;
@@ -40,6 +41,7 @@ import org.zkoss.zul.Window;
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class SurveyCodeListsEditVM extends SurveyItemEditVM<CodeList> {
 
+	private static final String SURVEY_CODE_LIST_GENERATED_LEVEL_NAME_LABEL_KEY = "survey.code_list.generated_level_name";
 	private static final String CODE_LIST_ITEM_EDIT_POP_UP_URL = "survey_edit_code_list_item_popup.zul";
 	public static final String CLOSE_CODE_LIST_ITEM_POP_UP_COMMAND = "closeCodeListItemPopUp";
 
@@ -84,7 +86,6 @@ public class SurveyCodeListsEditVM extends SurveyItemEditVM<CodeList> {
 	@Override
 	protected CodeList createItemInstance() {
 		CodeList instance = super.createItemInstance();
-		instance.addLevel(new CodeListLevel());
 		return instance;
 	}
 	
@@ -96,12 +97,31 @@ public class SurveyCodeListsEditVM extends SurveyItemEditVM<CodeList> {
 	}
 	
 	@Command
+	public void typeChanged(@BindingParam("type") String type) {
+		Type typeEnum = CodeListFormObject.Type.valueOf(type);
+		List<CodeListLevel> levels = editedItem.getHierarchy();
+		switch (typeEnum) {
+		case HIERARCHICAL:
+			if ( levels.size() == 0 ) {
+				addLevel();
+			}
+			break;
+		case FLAT:
+			if ( levels.size() == 1 ) {
+				CodeListLevel firstLevel = levels.get(0);
+				editedItem.removeLevel(firstLevel.getId());
+			}
+			break;
+		}
+	}
+	
+	@Command
 	@NotifyChange({"listLevels","multipleLevelsPresent","lastSelectedLevelIndex"})
 	public void addLevel() {
-		CodeListLevel level = new CodeListLevel();
 		List<CodeListLevel> levels = editedItem.getHierarchy();
 		int levelPosition = levels.size() + 1;
-		String generatedName = Labels.getLabel("survey.code_list.generated_level_name", new Object[]{levelPosition});
+		CodeListLevel level = new CodeListLevel();
+		String generatedName = Labels.getLabel(SURVEY_CODE_LIST_GENERATED_LEVEL_NAME_LABEL_KEY, new Object[]{levelPosition});
 		level.setName(generatedName);
 		editedItem.addLevel(level);
 	}
@@ -215,6 +235,10 @@ public class SurveyCodeListsEditVM extends SurveyItemEditVM<CodeList> {
 		List<CodeListLevel> levels = null;
 		if ( editedItem != null ) {
 			levels = editedItem.getHierarchy();
+			if ( levels.isEmpty() ) {
+				CodeListLevel fakeFirstLevel = new CodeListLevel();
+				return Arrays.asList(fakeFirstLevel);
+			}
 		}
 		return levels;
 	}

@@ -97,11 +97,11 @@
 			            </row>
 			            <row>
 			            	<label value="${labels.survey.code_list.type.$}:" />
-							<radiogroup selectedItem="@bind(fx.type)">
-								<radio label="${labels.survey.code_list.type.flat}"
-									value="FLAT" disabled="@load(vm.multipleLevelsPresent)" />
+							<radiogroup selectedItem="@bind(fx.type)" onCheck="@command('typeChanged', type=self.selectedItem.value)">
 								<radio label="${labels.survey.code_list.type.hierarchical}"
 									value="HIERARCHICAL" disabled="@load(vm.multipleLevelsPresent)" />
+								<radio label="${labels.survey.code_list.type.flat}"
+									value="FLAT" disabled="@load(vm.multipleLevelsPresent)" />
 							</radiogroup>
 			            </row>
 					</rows>
@@ -110,19 +110,33 @@
 				<hlayout>
 					<hlayout children="@load(vm.listLevels)">
 						<template name="children">
-							<groupbox width="100px" 
-								closable="false" 
-								mold="@load(fx.type eq 'HIERARCHICAL' ? '3d': '')">
-								<caption height="30px" visible="@load(fx.type eq 'HIERARCHICAL' ? true: false)">
-									<textbox inplace="true" value="@bind(each.name)" />
+							<groupbox closable="false" contentStyle="padding: 0px"
+								mold="@load(fx.type eq 'HIERARCHICAL' ? '3d': '')"
+								width="120px">
+								<caption visible="@load(fx.type eq 'HIERARCHICAL' ? true: false)">
+									<textbox inplace="true" width="100%" value="@bind(each.name)" />
 								</caption>
 								<listbox model="@load(vm.itemsPerLevel[forEachStatus.index])"
 									height="150px" 
 									selectedItem="@load(vm.lastSelectedLevelIndex ge forEachStatus.index ? 
 										vm.selectedItemsPerLevel[forEachStatus.index]: null)"
 									onSelect="@command('listItemSelected', item=self.selectedItem.value, levelIndex=forEachStatus.index)">
+									<listhead>
+										<listheader width="80px" label="" />
+										<listheader width="20px" label="" />
+									</listhead>
 									<template name="model">
-										<listitem label="@load(each.code)" />
+										<listitem>
+											<listcell>
+												<label value="@load(each.code)" />
+											</listcell>
+											<listcell style="padding: 0px">
+												<image src="@load(each.hasChildItems() ? 
+													(self.parent.listbox.selectedItem eq self.parent.parent ? 
+													'/assets/images/arrow_right_selected_small.png': 
+													'/assets/images/arrow_right_small.png'): '')" />
+											</listcell>
+										</listitem>
 									</template>
 								</listbox>
 								<button label="${labels.survey.code_list.add_child_item}" 
