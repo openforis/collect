@@ -185,6 +185,11 @@
 			<version>${zk.version}</version>
 		</dependency>
 		<dependency>
+		   <groupId>org.zkoss.composite</groupId>
+		   <artifactId>zkcomposite</artifactId>
+		   <version>0.8.0</version>
+		</dependency>
+		<dependency>
 			<groupId>org.zkoss.zk</groupId>
 			<artifactId>zkspring-core</artifactId>
 			<version>${zk.spring.version}</version>

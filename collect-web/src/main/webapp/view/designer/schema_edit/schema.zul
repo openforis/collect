@@ -30,29 +30,29 @@
 			                <menu label="${labels.survey.schema.add_node}">
 			                    <menupopup>
 	                                <menuitem label="${labels.survey.schema.node.type.entity}" value="ENTITY"
-	                                	onClick="@command('newNode', nodeType='ENTITY', attributeType=null)" />
+	                                	onClick="@command('addNode', nodeType='ENTITY', attributeType=null)" />
 	                                <menu label="${labels.survey.schema.node.type.attribute}">
 	                                	<menupopup>
 			                                <menuitem label="${labels.survey.schema.attribute.type.bool}" value="BOOLEAN"
-			                                	onClick="@command('newNode', nodeType='ATTRIBUTE', attributeType=self.value)" />
+			                                	onClick="@command('addNode', nodeType='ATTRIBUTE', attributeType=self.value)" />
 											<menuitem label="${labels.survey.schema.attribute.type.code}" value="CODE"
-												onClick="@command('newNode', nodeType='ATTRIBUTE', attributeType=self.value)" />
+												onClick="@command('addNode', nodeType='ATTRIBUTE', attributeType=self.value)" />
 											<menuitem label="${labels.survey.schema.attribute.type.coordinate}" value="COORDINATE"
-												onClick="@command('newNode', nodeType='ATTRIBUTE', attributeType=self.value)" />
+												onClick="@command('addNode', nodeType='ATTRIBUTE', attributeType=self.value)" />
 											<menuitem label="${labels.survey.schema.attribute.type.date}" value="DATE"
-												onClick="@command('newNode', nodeType='ATTRIBUTE', attributeType=self.value)" />
+												onClick="@command('addNode', nodeType='ATTRIBUTE', attributeType=self.value)" />
 											<menuitem label="${labels.survey.schema.attribute.type.file}" value="FILE"
-												onClick="@command('newNode', nodeType='ATTRIBUTE', attributeType=self.value)" />
+												onClick="@command('addNode', nodeType='ATTRIBUTE', attributeType=self.value)" />
 											<menuitem label="${labels.survey.schema.attribute.type.number}" value="NUMBER"
-												onClick="@command('newNode', nodeType='ATTRIBUTE', attributeType=self.value)" />
+												onClick="@command('addNode', nodeType='ATTRIBUTE', attributeType=self.value)" />
 											<menuitem label="${labels.survey.schema.attribute.type.range}" value="RANGE"
-												onClick="@command('newNode', nodeType='ATTRIBUTE', attributeType=self.value)" />
+												onClick="@command('addNode', nodeType='ATTRIBUTE', attributeType=self.value)" />
 											<menuitem label="${labels.survey.schema.attribute.type.taxon}" value="TAXON"
-												onClick="@command('newNode', nodeType='ATTRIBUTE', attributeType=self.value)" />
+												onClick="@command('addNode', nodeType='ATTRIBUTE', attributeType=self.value)" />
 											<menuitem label="${labels.survey.schema.attribute.type.text}" value="TEXT"
-												onClick="@command('newNode', nodeType='ATTRIBUTE', attributeType=self.value)" />
+												onClick="@command('addNode', nodeType='ATTRIBUTE', attributeType=self.value)" />
 											<menuitem label="${labels.survey.schema.attribute.type.time}" value="TIME"
-												onClick="@command('newNode', nodeType='ATTRIBUTE', attributeType=self.value)" />
+												onClick="@command('addNode', nodeType='ATTRIBUTE', attributeType=self.value)" />
 	                                	</menupopup>
 	                                </menu>
 	                            </menupopup>

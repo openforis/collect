@@ -9,9 +9,9 @@ import java.util.List;
 import org.openforis.collect.designer.converter.XMLStringDateConverter;
 import org.openforis.collect.designer.form.FormObject;
 import org.openforis.collect.designer.session.SessionStatus;
+import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectSurvey;
-import org.openforis.collect.model.LanguageConfiguration;
 import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.ModelVersion;
@@ -33,6 +33,8 @@ import org.zkoss.zkplus.databind.BindingListModelList;
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class SurveyEditBaseVM extends BaseVM {
 	
+	public static final String ERRORS_IN_PAGE_MESSAGE_KEY = "global.message.errors_in_page";
+
 	protected XMLStringDateConverter xmlStringDateConverter = new XMLStringDateConverter();
 	
 	private String dateFormat = "dd/MM/yyyy";
@@ -88,6 +90,15 @@ public class SurveyEditBaseVM extends BaseVM {
 		currentFormValid = valid;
 	}
 
+	public boolean checkCurrentFormValid() {
+		if ( currentFormValid ) {
+			return true;
+		} else {
+			MessageUtil.showWarning(ERRORS_IN_PAGE_MESSAGE_KEY);
+			return false;
+		}
+	}
+	
 	protected void initSurvey() {
 		if ( survey == null ) {
 			SessionStatus sessionStatus = getSessionStatus();

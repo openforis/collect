@@ -30,15 +30,13 @@ public enum NodeType {
 		}
 	}
 	
-	public static NodeDefinition createNodeDefinition(Survey survey, String nodeType, String attributeType) {
+	public static NodeDefinition createNodeDefinition(Survey survey, NodeType nodeType, AttributeType attrType) {
 		NodeDefinition result;
-		NodeType nodeTypeEnum = NodeType.valueOf(nodeType);
-		switch(nodeTypeEnum) {
+		switch(nodeType) {
 		case ENTITY:
 			result = new EntityDefinition();
 			break;
 		case ATTRIBUTE:
-			AttributeType attrType = AttributeType.valueOf(attributeType);
 			switch(attrType) {
 			case BOOLEAN:
 				result = new BooleanAttributeDefinition();
@@ -71,7 +69,7 @@ public enum NodeType {
 				result = new TimeAttributeDefinition();
 				break;
 			default:
-				throw new IllegalStateException("Attribute type not supported: " + attributeType);
+				throw new IllegalStateException("Attribute type not supported: " + attrType);
 			}
 			break;
 		default:

@@ -4,23 +4,25 @@
 package org.openforis.collect.designer.viewmodel;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
+import org.openforis.collect.designer.component.SchemaTreeModel;
 import org.openforis.collect.designer.form.AttributeDefinitionFormObject;
 import org.openforis.collect.designer.form.NodeDefinitionFormObject;
 import org.openforis.collect.designer.form.NumericAttributeDefinitionFormObject;
 import org.openforis.collect.designer.model.AttributeType;
 import org.openforis.collect.designer.model.NodeType;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.ui.UIConfiguration;
+import org.openforis.collect.model.ui.UITab;
+import org.openforis.collect.model.ui.UITabDefinition;
 import org.openforis.idm.metamodel.AttributeDefault;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Precision;
 import org.openforis.idm.metamodel.Schema;
+import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.Form;
 import org.zkoss.bind.SimpleForm;
 import org.zkoss.bind.annotation.BindingParam;
@@ -29,7 +31,6 @@ import org.zkoss.bind.annotation.NotifyChange;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zul.DefaultTreeModel;
-import org.zkoss.zul.DefaultTreeNode;
 import org.zkoss.zul.TreeNode;
 import org.zkoss.zul.Treeitem;
 import org.zkoss.zul.Window;
@@ -42,25 +43,25 @@ import org.zkoss.zul.Window;
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class SurveySchemaEditVM extends SurveyEditBaseVM {
 
+	private static final String SCHEMA_CHANGED_GLOBAL_COMMAND = "schemaChanged";
 	private static final String SURVEY_EDIT_VERSIONING_POPUP_URL = "survey_edit_versioning_popup.zul";
 	private static final String ATTRIBUTE_DEFAULTS_FIELD = "attributeDefaults";
 	private static final String NUMBER_ATTRIBUTE_PRECISIONS_FIELD = "precisions";
 	private static final String SURVEY_EDIT_CODE_LISTS_POPUP_URL = "survey_edit_code_lists_popup.zul";
+	private static final String SURVEY_EDIT_SRS_POPUP_URL = "survey_edit_srs_popup.zul";
 	
-	private DefaultTreeModel<NodeDefinition> treeModel;
+	private SchemaTreeModel treeModel;
 	private NodeDefinition selectedNode;
 	private Form tempFormObject;
 	private NodeDefinitionFormObject<NodeDefinition> formObject;
 	private String nodeType;
 	private String attributeType;
 	private boolean editingNode;
-	private boolean newNode;
-	private boolean rootEntityCreation;
 	private List<AttributeDefault> attributeDefaults;
 	private List<Precision> numericAttributePrecisions;
 	
 	@Command
-	@NotifyChange({"editingNode","newNode","rootEntityCreation","nodeType","attributeType",
+	@NotifyChange({"nodes","editingNode","nodeType","attributeType",
 		"tempFormObject","formObject","attributeDefaults","numericAttributePrecisions"})
 	public void nodeSelected(@BindingParam("node") Treeitem node) {
 		if ( node != null ) {
@@ -71,101 +72,80 @@ public class SurveySchemaEditVM extends SurveyEditBaseVM {
 			selectedNode = null;
 			editingNode = false;
 		}
-		newNode = false;
-		rootEntityCreation = false;
 		initFormObject(selectedNode);
 	}
 	
 	@Command
-	@NotifyChange({"editingNode","newNode","rootEntityCreation","nodeType","attributeType",
+	@NotifyChange({"nodes","editingNode","nodeType","attributeType",
 		"tempFormObject","formObject","attributeDefaults","numericAttributePrecisions"})
 	public void addRootEntity() {
 		editingNode = true;
-		newNode = true;
-		rootEntityCreation = true;
 		nodeType = NodeType.ENTITY.name();
-		selectedNode = null;
 		initFormObject();
-		Collection<NodeDefinitionTreeNode> emptySelection = Collections.emptyList();
-		treeModel.setSelection(emptySelection);
+		
+		NodeDefinition newNode = createRootEntityNode();
+		
+		treeModel.appendNodeToSelected(newNode);
+		
+		selectedNode = newNode;
+		
+		postSchemaChangedCommand();
+	}
+
+	protected EntityDefinition createRootEntityNode() {
+		EntityDefinition newNode = (EntityDefinition) NodeType.createNodeDefinition(survey, NodeType.ENTITY, null);
+		Schema schema = survey.getSchema();
+		schema.addRootEntityDefinition((EntityDefinition) newNode);
+		UIConfiguration uiConf = survey.getUIConfiguration();
+		//add tab definition
+		UITabDefinition tabDefn = new UITabDefinition();
+		int tabDefnPosition = uiConf.getTabDefinitions().size() + 1;
+		String tabDefnName = "tabdefn_" + tabDefnPosition;
+		tabDefn.setName(tabDefnName);
+		uiConf.addTabDefinition(tabDefn);
+		newNode.setAnnotation(UIConfiguration.TAB_DEFINITION_ANNOTATION, tabDefnName);
+		//add tab
+		UITab tab = new UITab();
+		int tabPosition = 1;
+		String tabName = "tab_" + tabPosition;
+		tab.setName(tabName);
+		tabDefn.addTab(tab);
+		newNode.setAnnotation(UIConfiguration.TAB_NAME_ANNOTATION, tabName);
+		return newNode;
+	}
+
+	private void postSchemaChangedCommand() {
+		BindUtils.postGlobalCommand(null, null, SCHEMA_CHANGED_GLOBAL_COMMAND, null);
 	}
 	
 	@Command
-	@NotifyChange({"editingNode","newNode","rootEntityCreation","nodeType","attributeType","tempFormObject","formObject",
+	@NotifyChange({"nodes","editingNode","nodeType","attributeType","tempFormObject","formObject",
 		"attributeDefaults","numericAttributePrecisions"})
-	public void addNode() throws Exception {
+	public void addNode(@BindingParam("nodeType") String nodeType, @BindingParam("attributeType") String attributeType) throws Exception {
 		if ( selectedNode != null && selectedNode instanceof EntityDefinition ) {
 			editingNode = true;
-			newNode = true;
-			rootEntityCreation = false;
-			nodeType = null;
-			attributeType = null;
-			formObject = null;
-		} else {
-			throw new Exception("Cannot add a child to an Attribute Definition");
-		}
-	}
-	
-	@Command
-	@NotifyChange({"editingNode","newNode","rootEntityCreation","nodeType","attributeType","tempFormObject","formObject",
-		"attributeDefaults","numericAttributePrecisions"})
-	public void newNode(@BindingParam("nodeType") String nodeType, @BindingParam("attributeType") String attributeType) throws Exception {
-		if ( selectedNode != null && selectedNode instanceof EntityDefinition ) {
-			editingNode = true;
-			newNode = true;
-			rootEntityCreation = false;
 			this.nodeType = nodeType;
 			this.attributeType = attributeType;
 			initFormObject();
+			
+			NodeType nodeTypeEnum = nodeType != null ? NodeType.valueOf(nodeType): null;
+			AttributeType attributeTypeEnum = attributeType != null ? AttributeType.valueOf(attributeType): null;
+			NodeDefinition newNode = NodeType.createNodeDefinition(survey, nodeTypeEnum, attributeTypeEnum );
+			( (EntityDefinition) selectedNode).addChildDefinition(newNode);
+			treeModel.appendNodeToSelected(newNode);
+			
+			selectedNode = newNode;
+			postSchemaChangedCommand();
+		} else {
+			throw new IllegalStateException("Trying to add a child to an Attribute");
 		}
 	}
 	
 	@Command
-	@NotifyChange({"nodeType","tempFormObject","formObject"})
-	public void nodeTypeChanged(@BindingParam("nodeType") String nodeType) {
-		this.nodeType = nodeType;
-		initFormObject();
-	}
-
-	@Command
-	@NotifyChange({"attributeType","tempFormObject","formObject"})
-	public void attributeTypeChanged(@BindingParam("attributeType") String attributeType) {
-		this.attributeType = attributeType;
-		initFormObject();
-	}
-
-	@Command
-	@NotifyChange({"selectedNode","tempFormObject","formObject","newNode","rootEntityCreation"})
+	@NotifyChange({"nodes","selectedNode","tempFormObject","formObject","newNode","rootEntityCreation"})
 	public void applyChanges() {
-		NodeDefinition editedNode;
-		if ( newNode ) {
-			editedNode = NodeType.createNodeDefinition(survey, nodeType, attributeType);
-		} else {
-			editedNode = selectedNode;
-		}
-		//TODO avoid the use of side effect...
-		formObject.saveTo(editedNode, currentLanguageCode);
-		
-		if ( newNode ) {
-			if ( rootEntityCreation ) {
-				CollectSurvey survey = getSurvey();
-				Schema schema = survey.getSchema();
-				schema.addRootEntityDefinition((EntityDefinition) editedNode);
-			} else if ( selectedNode != null ) {
-				if ( selectedNode instanceof EntityDefinition ) {
-					( (EntityDefinition) selectedNode).addChildDefinition(editedNode);
-				} else {
-					throw new IllegalStateException("Trying to add a child to an Attribute");
-				}
-			} else {
-				throw new IllegalStateException("No entity parent node selected");
-			}
-			appendTreeNodeToSelectedNode(editedNode);
-		}
-		selectedNode = editedNode;
-		//initFormObject(selectedNode);
-		newNode = false;
-		rootEntityCreation = false;
+		formObject.saveTo(selectedNode, currentLanguageCode);
+		postSchemaChangedCommand();
 	}
 
 	@Command
@@ -179,6 +159,13 @@ public class SurveySchemaEditVM extends SurveyEditBaseVM {
 	public void openCodeListsManagerPopUp() {
 		Window window = (Window) Executions.createComponents(
 				SURVEY_EDIT_CODE_LISTS_POPUP_URL, null, null);
+		window.doModal();
+	}
+
+	@Command
+	public void openSRSManagerPopUp() {
+		Window window = (Window) Executions.createComponents(
+				SURVEY_EDIT_SRS_POPUP_URL, null, null);
 		window.doModal();
 	}
 
@@ -271,76 +258,13 @@ public class SurveySchemaEditVM extends SurveyEditBaseVM {
 		}
 	}
 	
-	//TODO move this part into a Composer...
-	
-	private void initTreeModel() {
-//		SurveyEditVM viewModel = (SurveyEditVM) getViewModel();
-//		CollectSurvey survey = viewModel.getSurvey();
-		CollectSurvey survey = getSurvey();
-		List<EntityDefinition> rootDefns = survey.getSchema().getRootEntityDefinitions();
-		List<TreeNode<NodeDefinition>> treeNodes = NodeDefinitionTreeNode.fromList(rootDefns);
-		TreeNode<NodeDefinition> root = new NodeDefinitionTreeNode(null, treeNodes);
-		treeModel = new DefaultTreeModel<NodeDefinition>(root);
-	}
-	
-	protected void removeSelectedTreeNode() {
-		int[] selectionPath = treeModel.getSelectionPath();
-		TreeNode<NodeDefinition> treeNode = treeModel.getChild(selectionPath);
-		TreeNode<NodeDefinition> parentTreeNode = treeNode.getParent();
-		parentTreeNode.remove(treeNode);
-	}
-	
-	protected void appendTreeNodeToSelectedNode(NodeDefinition item) {
-		NodeDefinitionTreeNode treeNode = new NodeDefinitionTreeNode(item);
-		int[] selectionPath = treeModel.getSelectionPath();
-		if ( selectionPath == null || item.getParentDefinition() == null ) {
-			TreeNode<NodeDefinition> root = treeModel.getRoot();
-			root.add(treeNode);
-		} else {
-			TreeNode<NodeDefinition> selectedTreeNode = treeModel.getChild(selectionPath);
-			selectedTreeNode.add(treeNode);
-		}
-		treeModel.addOpenObject(treeNode.getParent());
-		treeModel.setSelection(Arrays.asList(treeNode));
-	}
-	
 	public DefaultTreeModel<NodeDefinition> getNodes() {
 		if ( treeModel == null ) {
-			initTreeModel();
+			CollectSurvey survey = getSurvey();
+			treeModel = SchemaTreeModel.createInstance(survey);
 		}
 		return treeModel;
     }
-
-	public static class NodeDefinitionTreeNode extends DefaultTreeNode<NodeDefinition> {
-	     
-		private static final long serialVersionUID = 1L;
-		
-		public NodeDefinitionTreeNode(NodeDefinition data) {
-			this(data, null);
-		}
-
-		public NodeDefinitionTreeNode(NodeDefinition data, Collection<TreeNode<NodeDefinition>> children) {
-			super(data, children);
-		}
-
-		public static List<TreeNode<NodeDefinition>> fromList(List<? extends NodeDefinition> items) {
-			List<TreeNode<NodeDefinition>> result = null;
-			if ( items != null ) {
-				result = new ArrayList<TreeNode<NodeDefinition>>();
-				for (NodeDefinition item : items) {
-					List<TreeNode<NodeDefinition>> childrenNodes = null;
-					if ( item instanceof EntityDefinition ) {
-						List<NodeDefinition> childDefns = ((EntityDefinition) item).getChildDefinitions();
-						childrenNodes = fromList(childDefns);
-					}
-					NodeDefinitionTreeNode node = new NodeDefinitionTreeNode(item, childrenNodes);
-					result.add(node);
-				}
-			}
-			return result;
-		}
-
-	}
 
 	public String getNodeType() {
 		return nodeType;
@@ -350,14 +274,6 @@ public class SurveySchemaEditVM extends SurveyEditBaseVM {
 		return attributeType;
 	}
 	
-	public boolean isRootEntityCreation() {
-		return rootEntityCreation;
-	}
-
-	public boolean isNewNode() {
-		return newNode;
-	}
-
 	public NodeDefinition getSelectedNode() {
 		return selectedNode;
 	}

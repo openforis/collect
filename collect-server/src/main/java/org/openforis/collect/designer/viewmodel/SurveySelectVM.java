@@ -23,7 +23,6 @@ import org.zkoss.zul.ListModelList;
 public class SurveySelectVM extends BaseVM {
 	
 	private static final String SURVEY_EDIT_URL = "survey_edit.zul";
-	private static final String SURVEY_SELECT_LANGUAGE_URL = "survey_select_language.zul";
 
 	@WireVariable
 	private SurveyManager surveyManager;

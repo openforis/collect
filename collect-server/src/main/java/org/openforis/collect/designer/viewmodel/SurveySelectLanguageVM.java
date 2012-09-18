@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.designer.session.SessionStatus;
+import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.LanguageConfiguration;
 import org.openforis.idm.metamodel.Languages;
@@ -95,7 +96,8 @@ public class SurveySelectLanguageVM extends BaseVM {
 			sessionStatus.setCurrentLanguageCode(selectedCurrentLanguageCode);
 			BindUtils.postGlobalCommand(null, null, SURVEY_LANGUAGES_CHANGED_COMMAND, null);
 			BindUtils.postGlobalCommand(null, null, CURRENT_LANGUAGE_CHANGED_COMMAND, null);
-			
+		} else {
+			MessageUtil.showWarning("survey.language.error.language_not_selected");
 		}
 	}
 

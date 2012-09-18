@@ -1,10 +1,7 @@
 package org.openforis.collect.designer.form;
 
-import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.designer.model.AttributeType;
 import org.openforis.collect.designer.model.NodeType;
-import org.openforis.collect.model.CollectSurvey;
-import org.openforis.collect.model.ui.UIConfiguration;
 import org.openforis.collect.model.ui.UITab;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -41,7 +38,6 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 	private String relevantExpression;
 	private ModelVersion sinceVersion;
 	private ModelVersion deprecatedVersion;
-	private UITab tab;
 	private Integer minCount;
 	private Integer maxCount;
 	
@@ -101,16 +97,6 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 		maxCount = source.getMaxCount();
 		sinceVersion = source.getSinceVersion();
 		deprecatedVersion = source.getDeprecatedVersion();
-		CollectSurvey survey = (CollectSurvey) source.getSurvey();
-		UIConfiguration uiConfiguration = survey.getUIConfiguration();
-		String tabName = source.getAnnotation(UIConfiguration.TAB_NAME_ANNOTATION);
-		if (StringUtils.isNotBlank(tabName) ) {
-			tab = uiConfiguration.getTab(source);
-		} else if ( source.getParentDefinition() != null ) {
-			tab = INHERIT_TAB;
-		} else {
-			tab = null;
-		}
 	}
 	
 	@Override
@@ -146,8 +132,6 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 		} else {
 			dest.setDeprecatedVersion(null);
 		}
-		String tabName = tab != null && tab != INHERIT_TAB ? tab.getName(): null;
-		dest.setAnnotation(UIConfiguration.TAB_NAME_ANNOTATION, tabName);
 	}
 	
 	public String getName() {
@@ -284,14 +268,6 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 
 	public void setMaxCount(Integer maxCount) {
 		this.maxCount = maxCount;
-	}
-
-	public UITab getTab() {
-		return tab;
-	}
-
-	public void setTab(UITab tab) {
-		this.tab = tab;
 	}
 
 }

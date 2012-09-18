@@ -32,7 +32,10 @@ public class SurveyEditVM extends SurveyEditBaseVM {
 	public void init() {
 		super.init();
 		if ( currentLanguageCode == null ) {
-			openLanguageManagerPopUp();
+			currentLanguageCode = "eng";
+			LanguageConfiguration languageConfiguration = new LanguageConfiguration();
+			languageConfiguration.addLanguageCode(currentLanguageCode);
+			//openLanguageManagerPopUp();
 		}
 	}
 	

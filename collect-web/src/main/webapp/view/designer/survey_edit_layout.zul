@@ -1,0 +1,36 @@
+<!-- <?component name="tabsgroup" macroURI="/view/designer/macros/tabsgroup.zul" tabs=null ?> -->
+<?component name="tabsgroup" class="org.openforis.collect.designer.component.TabsGroupContainer" ?>
+<zk>
+	<div id="itemsContainer"
+		apply="org.zkoss.bind.BindComposer"
+		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SurveyLayoutEditVM')"
+		width="100%" height="100%">
+		<borderlayout>
+		 	<west title="${labels.survey.schema.nodes_title}"
+		 		width="300px"
+		 		splittable="true">
+		 		<borderlayout>
+		 			<north>
+						<tree id="nodesTree"
+							width="100%" height="300px"
+							model="@load(vm.nodes)"
+							onSelect="@command('nodeSelected', node=self.selectedItem)">
+							<template name="model">
+					            <treeitem>
+					                <treerow>
+					                    <treecell label="@load(each.data.name)"/>
+					                </treerow>
+					            </treeitem>
+					  		</template>
+					    </tree>
+		 			</north>
+			    </borderlayout>
+			</west>
+			<center title="${labels.survey.schema.node_detail_title}">
+				<div id="tabsEditor" visible="@load(not empty vm.tabDefinition)">
+					<tabsgroup tabGroup="@load(vm.tabDefinition)" />
+				</div>
+			</center>
+	    </borderlayout>
+    </div>
+</zk>
