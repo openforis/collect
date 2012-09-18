@@ -1,6 +1,6 @@
 <?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
 <zk>
-	<vbox
+	<vlayout
 		id="languageSelectBox" 
 		self="@define(content)"
 		height="100%"
@@ -55,9 +55,9 @@
 				</vlayout>
 			</groupbox>
 		</hlayout>
-		<hlayout>
-			<button label="${labels.global.apply_changes}" 
+		<box align="center" width="100%">
+			<button label="${labels.global.close}" 
 				onClick="@command('applyChanges')" />
-		</hlayout>		
-	</vbox>
+		</box>
+	</vlayout>
 </zk>
