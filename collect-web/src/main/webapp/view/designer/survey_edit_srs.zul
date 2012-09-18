@@ -33,24 +33,37 @@
 				<grid>
 					<columns>
 						<column label="" width="150px" />
-						<column label="" />
+						<column label="" width="100%" />
 					</columns>
 					<rows>
 						<row>
 							<label value="${labels.survey.srs.id}:" />
-							<textbox width="99%" value="@bind(fx.id)" />
+							<cell>
+								<textbox width="150px" value="@bind(fx.id)" onChange="@command('applyChanges')" />
+								<label class="error" value="@load(vmsgs['id'])" />
+							</cell>
 						</row>
 						<row>
 							<label value="${labels.survey.srs.label}:" />
-							<textbox id="labelTextBox" width="99%" value="@bind(fx.label)" />
+							<cell>
+								<textbox width="150px" value="@bind(fx.label)" onChange="@command('applyChanges')" />
+								<label class="error" value="@load(vmsgs['label'])" />
+							</cell>
 						</row>
 						<row>
 							<label value="${labels.survey.srs.description}:" />
-							<textbox width="99%" value="@bind(fxDescription)" />
+							<cell>
+								<textbox width="150px" value="@bind(fx.description)" onChange="@command('applyChanges')" />
+								<label class="error" value="@load(vmsgs['description'])" />
+							</cell>
 						</row>
 						<row>
 							<label value="${labels.survey.srs.wkt}:" />
-							<textbox width="99%" value="@bind(fx.wellKnownText)" />
+							<cell>
+								<textbox width="250px" value="@bind(fx.wellKnownText)" multiline="true" rows="10" 
+									onChange="@command('applyChanges')" />
+								<label class="error" value="@load(vmsgs['wellKnownText'])" />
+							</cell>
 						</row>
 					</rows>
 				</grid>
