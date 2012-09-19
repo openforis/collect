@@ -14,7 +14,8 @@ public class TabsGroupEvent extends Event {
 
 	private static final long serialVersionUID = 1L;
 
-	public static final String ADD_TAB = "addTab";
+	public static final String ADD_TAB = "onAddTab";
+	public static final String GROUP_CHANGE = "onGroupChange";
 	
 	private UITabsGroup tabsGroup;
 

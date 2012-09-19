@@ -8,6 +8,7 @@ import org.openforis.collect.model.ui.UITabDefinition;
 import org.openforis.collect.model.ui.UITabsGroup;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
+import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.GlobalCommand;
@@ -48,13 +49,13 @@ public class SurveyLayoutEditVM extends SurveyEditBaseVM {
 		}
 	}
 	
-	@Command
-	@NotifyChange({"tabDefinition"})
+	@GlobalCommand
 	public void addTab(@BindingParam("group") UITabsGroup group) {
 		UITab tab = new UITab();
 		int tabPosition = group.getTabs().size() + 1;
 		tab.setName("tab_" + tabPosition);
 		group.addTab(tab);
+		BindUtils.postNotifyChange(null, null, group, "tabs");
 	}
 
 	@Command

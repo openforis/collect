@@ -3,11 +3,14 @@
  */
 package org.openforis.collect.designer.component;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.openforis.collect.designer.event.TabsGroupEvent;
 import org.openforis.collect.model.ui.UITab;
 import org.openforis.collect.model.ui.UITabsGroup;
+import org.zkoss.bind.BindUtils;
 import org.zkoss.composite.Composite;
 import org.zkoss.zk.ui.Components;
 import org.zkoss.zk.ui.Executions;
@@ -67,14 +70,21 @@ public class TabsGroupContainer extends Div implements IdSpace {
 		newChildTab.addEventListener("onClick", new EventListener<Event>() {
 			@Override
 			public void onEvent(Event event) throws Exception {
-				Event newEvent = new TabsGroupEvent(TabsGroupEvent.ADD_TAB, tabsGroup);
-				Events.postEvent(newEvent);
+				postAddTabCommand();
 			}
 		});
 		Tabs tabs = tabbox.getTabs();
 		tabs.appendChild(newChildTab);
 	}
 
+	private void postAddTabCommand() {
+		Map<String, Object> args = new HashMap<String, Object>();
+		args.put("group", tabsGroup);
+		BindUtils.postGlobalCommand(null, null, "addTab", args);
+//		Event newEvent = new TabsGroupEvent(TabsGroupEvent.ADD_TAB, tabsGroup);
+//		Events.sendEvent(this, newEvent);
+	}
+	
 	private void cleanTabs() {
 		Tabpanels tabpanels = tabbox.getTabpanels();
 		Tabs tabs = tabbox.getTabs();
@@ -109,7 +119,9 @@ public class TabsGroupContainer extends Div implements IdSpace {
 
 	public void setTabsGroup(UITabsGroup tabsGroup) {
 		this.tabsGroup = tabsGroup;
-		build();
+		TabsGroupEvent event = new TabsGroupEvent(TabsGroupEvent.GROUP_CHANGE, tabsGroup);
+		Events.sendEvent(this, event);
+//		build();
 	}
 
 }

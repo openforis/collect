@@ -27,7 +27,8 @@
 			</west>
 			<center title="${labels.survey.schema.node_detail_title}">
 				<div id="tabsEditor" visible="@load(not empty vm.tabDefinition)">
-					<tabsgroup tabsGroup="@load(vm.tabDefinition)" onAddNewTab="@command('addTab', group=event.tabsGroup)" />
+					<tabsgroup tabsGroup="@load(vm.tabDefinition)" 
+						apply="org.openforis.collect.designer.composer.TabsGroupComposer" />
 				</div>
 			</center>
 	    </borderlayout>
