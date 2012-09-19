@@ -85,6 +85,17 @@ public class TabsGroupContainer extends Div implements IdSpace {
 //		Events.sendEvent(this, newEvent);
 	}
 	
+//	private void addNewTab() {
+//		Tabs tabs = tabbox.getTabs();
+//		tabs.removeChild(newChildTab);
+//		UITab uiTab = new UITab();
+//		int position = tabsGroup.getTabs().size() + 1;
+//		String tabName = "tab_" + position;
+//		uiTab.setName(tabName);
+//		addTab(uiTab);
+//		addNewChildTab();
+//	}
+
 	private void cleanTabs() {
 		Tabpanels tabpanels = tabbox.getTabpanels();
 		Tabs tabs = tabbox.getTabs();
