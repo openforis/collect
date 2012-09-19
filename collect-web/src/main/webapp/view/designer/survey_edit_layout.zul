@@ -1,4 +1,3 @@
-<!-- <?component name="tabsgroup" macroURI="/view/designer/macros/tabsgroup.zul" tabs=null ?> -->
 <?component name="tabsgroup" class="org.openforis.collect.designer.component.TabsGroupContainer" ?>
 <zk>
 	<div id="itemsContainer"
@@ -28,7 +27,8 @@
 			</west>
 			<center title="${labels.survey.schema.node_detail_title}">
 				<div id="tabsEditor" visible="@load(not empty vm.tabDefinition)">
-					<tabsgroup tabGroup="@load(vm.tabDefinition)" />
+					<tabsgroup tabsGroup="@load(vm.tabDefinition)" 
+						apply="org.openforis.collect.designer.composer.TabsGroupComposer" />
 				</div>
 			</center>
 	    </borderlayout>

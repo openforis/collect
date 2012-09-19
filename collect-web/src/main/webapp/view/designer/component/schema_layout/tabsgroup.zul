@@ -1,0 +1,14 @@
+<zk>
+	<tabbox id="tabbox">
+		<tabs>
+			<zk forEach="@load(composer.group.tabs)">
+				<tab  label="${each.label}"
+					onClose="@command('removeTab', group=tabGroup, tab=each)" 
+					closable="true" />
+			</zk>
+			<tab label="+" onClick="@command('addTab', group=tabGroup)" />
+		</tabs>
+		<tabpanels forEach="${tabGroup.tabs}">
+		</tabpanels>
+	</tabbox>
+</zk>

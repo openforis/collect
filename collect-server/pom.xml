@@ -14,7 +14,7 @@
 	<properties>
 		<geotools.version>2.6.5</geotools.version>
 		<graniteds.version>2.3.0.GA</graniteds.version>
-		<zk.version>6.0.2</zk.version>
+		<zk.version>6.5.0</zk.version>
 		<zk.spring.version>3.1</zk.spring.version>
 <!-- 		<spring-security.version>3.0.5.RELEASE</spring-security.version> -->
 		<!-- 3.1.0.CI -->
