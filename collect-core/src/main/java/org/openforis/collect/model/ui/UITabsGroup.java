@@ -50,7 +50,7 @@ public abstract class UITabsGroup implements Serializable {
 		}
 		return null;
 	}
-
+	
 	public void addTab(UITab tab) {
 		if ( tabs == null ) {
 			tabs = new ArrayList<UITab>();
