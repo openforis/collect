@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Stack;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -20,9 +21,11 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.lang3.StringUtils;
+import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.Configuration;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
+import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.xml.ConfigurationAdapter;
 import org.openforis.idm.util.CollectionUtil;
 import org.w3c.dom.Document;
@@ -47,6 +50,37 @@ public class UIConfiguration implements Configuration, Serializable {
 	@XmlElement(name = "tabDefinition", type = UITabDefinition.class)
 	private List<UITabDefinition> tabDefinitions;
 
+	private transient CollectSurvey survey;
+
+	public void init() {
+		initParentRefernces();
+	}
+
+	protected void initParentRefernces() {
+		if ( tabDefinitions != null ) {
+			for (UITabsGroup group : tabDefinitions) {
+				setParentInChildrenTabs(group);
+			}
+		}
+	}
+
+	protected void setParentInChildrenTabs(UITabsGroup group) {
+		List<UITab> tabs = group.getTabs();
+		for (UITab uiTab : tabs) {
+			uiTab.setParent(group);
+			setParentInChildrenTabs(uiTab);
+		}
+	}
+		
+
+	public CollectSurvey getSurvey() {
+		return survey;
+	}
+
+	public void setSurvey(CollectSurvey survey) {
+		this.survey = survey;
+	}
+	
 	public List<UITabDefinition> getTabDefinitions() {
 		return CollectionUtil.unmodifiableList(tabDefinitions);
 	}
@@ -65,7 +99,7 @@ public class UIConfiguration implements Configuration, Serializable {
 			}
 		} else {
 			UITab parentTab = getTab(parentDefn);
-			if ( ! StringUtils.isBlank(tabName) ) {
+			if ( parentTab != null && StringUtils.isNotBlank(tabName) ) {
 				tab = parentTab.getTab(tabName);
 			} else {
 				tab = parentTab;
@@ -95,6 +129,19 @@ public class UIConfiguration implements Configuration, Serializable {
 			}
 		}
 		return Collections.emptyList();
+	}
+
+	public EntityDefinition getRootEntityDefinition(
+			UITabDefinition tabDefinition) {
+		Schema schema = survey.getSchema();
+		List<EntityDefinition> rootEntityDefinitions = schema.getRootEntityDefinitions();
+		for (EntityDefinition defn : rootEntityDefinitions) {
+			UITabDefinition entityTabDefn = getTabDefinition(defn);
+			if ( entityTabDefn != null && entityTabDefn.equals(tabDefinition) ) {
+				return defn;
+			}
+		}
+		return null;
 	}
 	
 	public UITabDefinition getTabDefinition(String name) {
@@ -177,6 +224,7 @@ public class UIConfiguration implements Configuration, Serializable {
 				JAXBContext jc = JAXBContext.newInstance(UIConfiguration.class);
 				Unmarshaller unmarshaller = jc.createUnmarshaller();
 				UIConfiguration configuration = (UIConfiguration) unmarshaller.unmarshal(elem);
+				configuration.init();
 				return configuration;
 			} catch (JAXBException e) {
 				throw new RuntimeException("Unable to marshal the UI configuration: "+ e.getMessage(), e);

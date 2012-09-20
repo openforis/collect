@@ -9,6 +9,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlTransient;
 
+import org.openforis.idm.metamodel.xml.internal.XmlParent;
 import org.openforis.idm.util.CollectionUtil;
 
 /**
@@ -28,6 +29,10 @@ public abstract class UITabsGroup implements Serializable {
 	@XmlElement(name = "tab", type = UITab.class)
 	protected List<UITab> tabs;
 
+	@XmlParent
+	@XmlTransient
+	protected UITabsGroup parent;
+	
 	public String getName() {
 		return name;
 	}
@@ -56,6 +61,7 @@ public abstract class UITabsGroup implements Serializable {
 			tabs = new ArrayList<UITab>();
 		}
 		tabs.add(tab);
+		tab.setParent(this);
 	}
 	
 	public void setTab(int index, UITab tab) {
@@ -72,6 +78,39 @@ public abstract class UITabsGroup implements Serializable {
 		oldTab.setLabel(newLabel);
 		return oldTab;
 	}
+	
+	public UITabDefinition getTabDefinition() {
+		if ( parent != null ) {
+			return parent.getTabDefinition();
+		} else if ( this instanceof UITabDefinition ) {
+			return (UITabDefinition) this;
+		} else {
+			throw new IllegalStateException("Invalid tabs hierarchy: tab definition expected as root element");
+		}
+	}
+
+	/**
+	 * Returns the depth of the tab group.
+	 * 
+	 * @return 0 if this is a tab definition (root), > 0 otherwise
+	 */
+	public int getDepth() {
+		int result = 0;
+		UITabsGroup prnt = getParent();
+		while ( prnt != null ) {
+			result ++;
+		}
+		return result;
+	}
+	
+	public UITabsGroup getParent() {
+		return parent;
+	}
+
+	protected void setParent(UITabsGroup parent) {
+		this.parent = parent;
+	}
+
 	
 	@Override
 	public int hashCode() {

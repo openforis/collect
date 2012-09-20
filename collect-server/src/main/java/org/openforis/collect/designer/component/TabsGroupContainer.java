@@ -130,8 +130,8 @@ public class TabsGroupContainer extends Div implements IdSpace {
 
 	public void setTabsGroup(UITabsGroup tabsGroup) {
 		this.tabsGroup = tabsGroup;
-		TabsGroupEvent event = new TabsGroupEvent(TabsGroupEvent.GROUP_CHANGE, tabsGroup);
-		Events.sendEvent(this, event);
+//		TabsGroupEvent event = new TabsGroupEvent(TabsGroupEvent.GROUP_CHANGE, tabsGroup);
+//		Events.sendEvent(this, event);
 //		build();
 	}
 

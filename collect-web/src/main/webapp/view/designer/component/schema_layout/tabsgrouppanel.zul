@@ -1,0 +1,16 @@
+<zk>
+	<div apply="org.openforis.collect.designer.composer.TabsGroupPanelComposer">
+		<listbox model="@load($composer.nodesPerTab)" 
+			height="100px">
+			<template name="model">
+				<listitem>
+                    <listcell label="@load(each.name)" />
+                </listitem>
+			</template>
+		</listbox>
+		
+		<include defer="true" 
+				src="/view/designer/component/schema_layout/tabsgroup.zul"
+				tabsGroup="${arg.tab}" />
+	</div>
+</zk>

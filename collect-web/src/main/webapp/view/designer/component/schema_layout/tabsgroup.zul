@@ -1,14 +1,29 @@
 <zk>
-	<tabbox id="tabbox">
-		<tabs>
-			<zk forEach="@load(vm.tabGroup.tabs)">
-				<tab label="@load(each.label)"
-					onClose="@command('removeTab', group=tabGroup, tab=each)" 
-					closable="true" />
-			</zk>
-			<tab label="+" onClick="@command('addTab', group=tabGroup)" />
-		</tabs>
-		<tabpanels forEach="${tabGroup.tabs}">
-		</tabpanels>
-	</tabbox>
+<!-- 	<custom-attributes -->
+<!-- 		tabsDefinition="${arg.tabsDefinition}"  -->
+<!-- 		tabsDefinitionName="${arg.tabsDefinitionName}"  -->
+<!-- 		tabsGroupName="${arg.tabsGroupName}" /> -->
+	<div apply="org.openforis.collect.designer.composer.TabsGroupComposer">
+		<tabbox id="tabbox">
+			<tabs children="@load($composer.tabsPlusAddButton) @template(each eq $composer.fakeAddTab ? 'addTab': 'children' )">
+				<template name="addTab">
+					<tab label="+" onClick="@command('addTab')" />
+				</template>
+				<template name="children">
+					<tab label="@load(each.label)"
+						onClose="@command('removeTab', group=tabGroup, tab=each)" 
+						closable="true" />
+				</template>
+			</tabs>
+			<tabpanels children="@load($composer.tabs)">
+				<template name="children">
+					<tabpanel>
+						<include defer="true" 
+							src="/view/designer/component/schema_layout/tabsgrouppanel.zul"
+							tab="${each}" />
+					</tabpanel>
+				</template>
+			</tabpanels>
+		</tabbox>
+	</div>
 </zk>

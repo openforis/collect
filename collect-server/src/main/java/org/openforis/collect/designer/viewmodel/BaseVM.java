@@ -14,14 +14,13 @@ import org.zkoss.zul.Window;
  */
 public class BaseVM {
 
-	protected static final String SESSION_STATUS_KEY = "designer_status";
-	
 	protected SessionStatus getSessionStatus() {
 		Session session = getSession();
-		SessionStatus sessionStatus = (SessionStatus) session.getAttribute(SESSION_STATUS_KEY);
+		String key = SessionStatus.SESSION_KEY;
+		SessionStatus sessionStatus = (SessionStatus) session.getAttribute(key);
 		if ( sessionStatus == null ) {
 			sessionStatus = new SessionStatus();
-			session.setAttribute(SESSION_STATUS_KEY, sessionStatus);
+			session.setAttribute(key, sessionStatus);
 		}
 		return sessionStatus;
 	}

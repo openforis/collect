@@ -11,6 +11,8 @@ import org.openforis.collect.model.CollectSurvey;
  */
 public class SessionStatus {
 
+	public static final String SESSION_KEY = "designer_status";
+	
 	private String currentLanguageCode;
 	private CollectSurvey survey;
 	

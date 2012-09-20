@@ -32,19 +32,6 @@ public class UITab extends UITabsGroup {
 		this.label = label;
 	}
 	
-	public UITabDefinition getTabDefinition() {
-		return tabDefinition;
-	}
-
-	public void setTabDefinition(UITabDefinition tabDefinition) {
-		this.tabDefinition = tabDefinition;
-		if ( tabs != null ) {
-			for (UITab tab : tabs ) {
-				tab.setTabDefinition(tabDefinition);
-			}
-		}
-	}
-
 	@Override
 	public int hashCode() {
 		final int prime = 31;

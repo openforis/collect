@@ -1,19 +1,27 @@
 package org.openforis.collect.designer.viewmodel;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.openforis.collect.designer.component.SchemaTreeModel;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.ui.UIConfiguration;
-import org.openforis.collect.model.ui.UITab;
 import org.openforis.collect.model.ui.UITabDefinition;
-import org.openforis.collect.model.ui.UITabsGroup;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.zkoss.bind.BindUtils;
+import org.zkoss.bind.annotation.AfterCompose;
 import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
+import org.zkoss.bind.annotation.ContextParam;
+import org.zkoss.bind.annotation.ContextType;
 import org.zkoss.bind.annotation.GlobalCommand;
 import org.zkoss.bind.annotation.NotifyChange;
+import org.zkoss.zk.ui.Component;
+import org.zkoss.zk.ui.select.Selectors;
+import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zul.DefaultTreeModel;
+import org.zkoss.zul.Include;
 import org.zkoss.zul.TreeNode;
 import org.zkoss.zul.Treeitem;
 
@@ -24,9 +32,18 @@ import org.zkoss.zul.Treeitem;
  */
 public class SurveyLayoutEditVM extends SurveyEditBaseVM {
 
-	private UITabDefinition tabDefinition;
+	private static final String TABSGROUP_URL = "/view/designer/component/schema_layout/tabsgroup.zul";
+	private UITabDefinition tabsDefinition;
 	private SchemaTreeModel treeModel;
 	private NodeDefinition selectedNode;
+	
+	@Wire
+	private Include tabsGroupContainerInclude;
+	
+	@AfterCompose
+	public void afterCompose(@ContextParam(ContextType.VIEW) Component view){
+		 Selectors.wireComponents(view, this, false);
+	}
 	
 	@GlobalCommand
 	@NotifyChange({"nodes"})
@@ -42,30 +59,24 @@ public class SurveyLayoutEditVM extends SurveyEditBaseVM {
 			selectedNode = treeNode.getData();
 			UIConfiguration uiConfiguration = survey.getUIConfiguration();
 			EntityDefinition rootEntity = selectedNode.getRootEntity();
-			tabDefinition = uiConfiguration.getTabDefinition(rootEntity);
+			tabsDefinition = uiConfiguration.getTabDefinition(rootEntity);
 		} else {
 			selectedNode = null;
-			tabDefinition = null;
+			tabsDefinition = null;
+		}
+		Map<String, Object> args = new HashMap<String, Object>();
+		args.put("tabDefinition", tabsDefinition);
+		BindUtils.postGlobalCommand(null, null, "tabDefinitionChanged", args);
+		
+		tabsGroupContainerInclude.setSrc(null);
+		if ( tabsDefinition != null ) {
+			tabsGroupContainerInclude.setDynamicProperty("tabsGroup", tabsDefinition);
+			tabsGroupContainerInclude.setSrc(TABSGROUP_URL);
 		}
 	}
 	
-	@GlobalCommand
-	public void addTab(@BindingParam("group") UITabsGroup group) {
-		UITab tab = new UITab();
-		int tabPosition = group.getTabs().size() + 1;
-		tab.setName("tab_" + tabPosition);
-		group.addTab(tab);
-		BindUtils.postNotifyChange(null, null, group, "tabs");
-	}
-
-	@Command
-	@NotifyChange({"tabDefinition"})
-	public void removeTab(@BindingParam("group") UITabsGroup group, @BindingParam("tab") UITab tab) {
-		group.removeTab(tab);
-	}
-	
 	public UITabDefinition getTabDefinition() {
-		return tabDefinition;
+		return tabsDefinition;
 	}
 	
 	public DefaultTreeModel<NodeDefinition> getNodes() {

@@ -1,4 +1,4 @@
-<?component name="tabsgroup" class="org.openforis.collect.designer.component.TabsGroupContainer" ?>
+<!-- <?component name="tabsgroup" class="org.openforis.collect.designer.component.TabsGroupContainer" ?> -->
 <zk>
 	<div id="itemsContainer"
 		apply="org.zkoss.bind.BindComposer"
@@ -27,8 +27,7 @@
 			</west>
 			<center title="${labels.survey.schema.node_detail_title}">
 				<div id="tabsEditor" visible="@load(not empty vm.tabDefinition)">
-					<tabsgroup tabsGroup="@load(vm.tabDefinition)" 
-						apply="org.openforis.collect.designer.composer.TabsGroupComposer" />
+					<include id="tabsGroupContainerInclude" defer="true" /> 
 				</div>
 			</center>
 	    </borderlayout>
