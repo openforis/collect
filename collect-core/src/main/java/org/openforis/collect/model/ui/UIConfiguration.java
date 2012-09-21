@@ -3,8 +3,9 @@ package org.openforis.collect.model.ui;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Stack;
+import java.util.Queue;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -22,6 +23,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.ui.UIConfiguration.Layout;
 import org.openforis.idm.metamodel.Configuration;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -42,10 +44,15 @@ import org.w3c.dom.Element;
 @XmlRootElement(name = "flex")
 public class UIConfiguration implements Configuration, Serializable {
 
+	private static final long serialVersionUID = 1L;
+	
 	public static final QName TAB_DEFINITION_ANNOTATION = new QName("http://www.openforis.org/collect/3.0/ui", "tabDefinition");
 	public static final QName TAB_NAME_ANNOTATION = new QName("http://www.openforis.org/collect/3.0/ui", "tab");
+	public static final QName LAYOUT_ANNOTATION = new QName("http://www.openforis.org/collect/3.0/ui", "layout");
 	
-	private static final long serialVersionUID = 1L;
+	public enum Layout {
+		FORM, TABLE
+	}
 	
 	@XmlElement(name = "tabDefinition", type = UITabDefinition.class)
 	private List<UITabDefinition> tabDefinitions;
@@ -71,8 +78,7 @@ public class UIConfiguration implements Configuration, Serializable {
 			setParentInChildrenTabs(uiTab);
 		}
 	}
-		
-
+	
 	public CollectSurvey getSurvey() {
 		return survey;
 	}
@@ -87,22 +93,20 @@ public class UIConfiguration implements Configuration, Serializable {
 	
 	public UITab getTab(NodeDefinition nodeDefn) {
 		UITab tab = null;
-		String tabName = nodeDefn.getAnnotation(TAB_NAME_ANNOTATION);
-		NodeDefinition parentDefn = nodeDefn.getParentDefinition();
-		if ( parentDefn == null ) {
-			//root entity
-			if ( StringUtils.isNotBlank(tabName) ) {
-				UITabDefinition tabDefinition = getTabDefinition((EntityDefinition) nodeDefn);
-				if ( tabDefinition != null ) {
-					tab = tabDefinition.getTab(tabName);
+		EntityDefinition rootEntity = nodeDefn.getRootEntity();
+		UITabDefinition tabDefinition = getTabDefinition(rootEntity);
+		if ( tabDefinition != null ) {
+			String tabName = nodeDefn.getAnnotation(TAB_NAME_ANNOTATION);
+			NodeDefinition parentDefn = nodeDefn.getParentDefinition();
+			if ( StringUtils.isNotBlank(tabName) && ( parentDefn == null || parentDefn.getParentDefinition() == null ) ) {
+				tab = tabDefinition.getTab(tabName);
+			} else if ( parentDefn != null ) {
+				UITab parentTab = getTab(parentDefn);
+				if ( parentTab != null && StringUtils.isNotBlank(tabName) ) {
+					tab = parentTab.getTab(tabName);
+				} else {
+					tab = parentTab;
 				}
-			}
-		} else {
-			UITab parentTab = getTab(parentDefn);
-			if ( parentTab != null && StringUtils.isNotBlank(tabName) ) {
-				tab = parentTab.getTab(tabName);
-			} else {
-				tab = parentTab;
 			}
 		}
 		return tab;
@@ -115,20 +119,78 @@ public class UIConfiguration implements Configuration, Serializable {
 	}
 	
 	public List<UITab> getAllowedTabs(NodeDefinition nodeDefn) {
-		NodeDefinition parentDefn = nodeDefn.getParentDefinition();
-		if ( parentDefn != null ) {
-			UITab parentTab = getTab(parentDefn);
-			if ( parentTab != null ) {
-				return parentTab.getTabs();
-			}
-		} else {
-			//root entity
-			UITabDefinition tabDefinition = getTabDefinition((EntityDefinition) nodeDefn);
-			if ( tabDefinition != null ) {
+		EntityDefinition rootEntity = nodeDefn.getRootEntity();
+		UITabDefinition tabDefinition = getTabDefinition(rootEntity);
+		if ( tabDefinition != null ) {
+			NodeDefinition parentDefn = nodeDefn.getParentDefinition();
+			if ( parentDefn == null || parentDefn.getParentDefinition() == null ) {
 				return tabDefinition.getTabs();
+			} else {
+				UITab parentTab = getTab(parentDefn);
+				if ( parentTab != null ) {
+					return parentTab.getTabs();
+				}
 			}
 		}
 		return Collections.emptyList();
+	}
+
+	public boolean isAssignableTo(NodeDefinition nodeDefn, UITab tab) {
+		List<UITab> allowedTabs = getAllowedTabs(nodeDefn);
+		boolean result = allowedTabs.contains(tab);
+		return result;
+	}
+
+	public List<NodeDefinition> getNodesPerTab(UITab tab, boolean includeChildrenOfEntities) {
+		List<NodeDefinition> result = new ArrayList<NodeDefinition>();
+		UITabDefinition tabDefinition = tab.getTabDefinition();
+		EntityDefinition rootEntity = getRootEntityDefinition(tabDefinition);
+		Queue<NodeDefinition> queue = new LinkedList<NodeDefinition>();
+		queue.addAll(rootEntity.getChildDefinitions());
+		while ( ! queue.isEmpty() ) {
+			NodeDefinition defn = queue.remove();
+			UITab nodeTab = getTab(defn);
+			boolean nodeInTab = false;
+			if ( nodeTab != null && nodeTab.equals(tab) ) {
+				result.add(defn);
+				nodeInTab = true;
+			}
+			if ( defn instanceof EntityDefinition && (includeChildrenOfEntities || !nodeInTab) ) {
+				queue.addAll(((EntityDefinition) defn).getChildDefinitions());
+			}
+		}
+		return result;
+	}
+
+	public void associateWithTab(NodeDefinition nodeDefn, UITab tab) {
+		String tabName = tab.getName();
+		nodeDefn.setAnnotation(TAB_NAME_ANNOTATION, tabName);
+	}
+	
+	public void removeTabAssociation(NodeDefinition nodeDefn) {
+		nodeDefn.setAnnotation(TAB_NAME_ANNOTATION, null);
+	}
+	
+	public Layout getLayout(EntityDefinition node) {
+		String layoutValue = node.getAnnotation(LAYOUT_ANNOTATION);
+		if ( layoutValue == null ) {
+			EntityDefinition parent = (EntityDefinition) node.getParentDefinition();
+			if ( parent != null ) {
+				if ( node.isMultiple()) {
+					return Layout.TABLE;
+				} else {
+					return getLayout(parent);
+				}
+			} else {
+				return Layout.FORM;
+			}
+		}
+		return layoutValue != null ? Layout.valueOf(layoutValue.toUpperCase()): null;
+	}
+
+	public void setLayout(NodeDefinition nodeDefn, Layout layout) {
+		String layoutValue = layout != null ? layout.name().toLowerCase(): null;
+		nodeDefn.setAnnotation(LAYOUT_ANNOTATION, layoutValue);
 	}
 
 	public EntityDefinition getRootEntityDefinition(

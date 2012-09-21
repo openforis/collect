@@ -46,7 +46,7 @@ public class MessageUtil {
 	}
 	
 	public static void showMessage(MessageType type, String messageKey) {
-		showMessage(type, messageKey);
+		showMessage(type, messageKey, null);
 	}
 	
 	public static void showMessage(MessageType type, String messageKey, Object[] args) {

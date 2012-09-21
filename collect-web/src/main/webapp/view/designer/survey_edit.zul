@@ -27,7 +27,7 @@
 			    <tabs id="tabs">
 			        <tab id="surveyTab" label="${labels.survey.$}" />
 			        <tab id="schemaTab" label="${labels.survey.schema.$}" />
-			        <tab id="layoutTab" label="${labels.survey.layout}" />
+			        <tab id="layoutTab" label="${labels.survey.layout.$}" />
 			    </tabs>
 			    <tabpanels height="100%" width="100%">
 			        <tabpanel height="100%" width="100%">

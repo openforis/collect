@@ -1,10 +1,7 @@
 <zk>
-<!-- 	<custom-attributes -->
-<!-- 		tabsDefinition="${arg.tabsDefinition}"  -->
-<!-- 		tabsDefinitionName="${arg.tabsDefinitionName}"  -->
-<!-- 		tabsGroupName="${arg.tabsGroupName}" /> -->
-	<div apply="org.openforis.collect.designer.composer.TabsGroupComposer">
-		<tabbox id="tabbox">
+	<div apply="org.openforis.collect.designer.composer.TabsGroupComposer"
+		width="100%" height="100%">
+		<tabbox id="tabbox" width="100%" height="100%">
 			<tabs children="@load($composer.tabsPlusAddButton) @template(each eq $composer.fakeAddTab ? 'addTab': 'children' )">
 				<template name="addTab">
 					<tab label="+" onClick="@command('addTab')" />
@@ -17,10 +14,10 @@
 			</tabs>
 			<tabpanels children="@load($composer.tabs)">
 				<template name="children">
-					<tabpanel>
+					<tabpanel style="overflow: auto;">
 						<include defer="true" 
 							src="/view/designer/component/schema_layout/tabsgrouppanel.zul"
-							tab="${each}" />
+							tab="${each}" width="100%" height="100%" />
 					</tabpanel>
 				</template>
 			</tabpanels>
