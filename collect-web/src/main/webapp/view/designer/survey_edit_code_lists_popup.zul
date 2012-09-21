@@ -138,8 +138,8 @@
 												<listcell style="padding: 0px">
 													<image src="@load(each.hasChildItems() ? 
 														(self.parent.listbox.selectedItem eq self.parent.parent ? 
-														'/assets/images/arrow_right_selected_small.png': 
-														'/assets/images/arrow_right_small.png'): '')" />
+														'/assets/images/arrow-right-selected-small.png': 
+														'/assets/images/arrow-right-small.png'): '')" />
 												</listcell>
 											</listitem>
 										</template>

@@ -6,7 +6,7 @@
 	<borderlayout width="100%" height="100%">
 		<north height="102px">
 			<div id="header" sclass="header">
-				<image src="/assets/images/designer_header.jpg" />
+				<image src="/assets/images/designer-header.jpg" />
 			</div>
 		</north>
 		<center>
@@ -18,7 +18,7 @@
 		</center>
 		<south height="30px">
 			<div id="footer" sclass="footer">
-				<image src="/assets/images/designer_footer.jpg" />
+				<image src="/assets/images/designer-footer.jpg" />
 			</div>
 		</south>
 	</borderlayout>

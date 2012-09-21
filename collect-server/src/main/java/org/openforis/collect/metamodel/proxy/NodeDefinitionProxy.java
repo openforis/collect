@@ -11,6 +11,7 @@ import javax.xml.namespace.QName;
 
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.collect.Proxy;
+import org.openforis.collect.model.ui.UIConfiguration;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.BooleanAttributeDefinition;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
@@ -31,8 +32,6 @@ import org.openforis.idm.metamodel.TimeAttributeDefinition;
  * 
  */
 public class NodeDefinitionProxy implements Proxy {
-
-	protected static final QName TAB_NAME_ANNOTATION = new QName("http://www.openforis.org/collect/3.0/ui", "tab");
 
 	private transient NodeDefinition nodeDefinition;
 	protected EntityDefinitionProxy parent;
@@ -156,7 +155,7 @@ public class NodeDefinitionProxy implements Proxy {
 
 	@ExternalizedProperty
 	public String getUiTabName() {
-		String tabName = nodeDefinition.getAnnotation(TAB_NAME_ANNOTATION);
+		String tabName = nodeDefinition.getAnnotation(UIConfiguration.TAB_NAME_ANNOTATION);
 		if ( tabName != null) {
 			return tabName;
 		} else {
