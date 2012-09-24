@@ -2,12 +2,12 @@
 <?init class="org.zkoss.zk.ui.util.Composition" arg0="layouts/template.zul"?>
 <zk>
 	<vbox id="surveyEditBox"
-		height="100%" width="100%" 
+		hflex="1" vflex="1"
 		self="@define(content)"
 		apply="org.zkoss.bind.BindComposer"
 		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SurveyEditVM')">
 		
-		<vlayout>
+		<vlayout  hflex="1" vflex="1">
 			<!-- language selector -->
 			<hlayout width="100%" style="text-align: right;">
 				<label value="${labels.survey.selected_language}:" />
@@ -23,21 +23,21 @@
 						image="/assets/images/pencil-small.png" />
 			</hlayout>
 			<!-- main tabs -->
-			<tabbox id="tb" height="500px" width="100%">
+			<tabbox id="tb" hflex="1" vflex="1">
 			    <tabs id="tabs">
 			        <tab id="surveyTab" label="${labels.survey.$}" />
 			        <tab id="schemaTab" label="${labels.survey.schema.$}" />
 			        <tab id="layoutTab" label="${labels.survey.layout.$}" />
 			    </tabs>
-			    <tabpanels height="100%" width="100%">
-			        <tabpanel height="100%" width="100%">
-			        	<include src="survey_edit_info.zul" />
+			    <tabpanels>
+			        <tabpanel>
+			        	<include src="survey_edit/info.zul" />
 			        </tabpanel>
-			        <tabpanel height="100%" width="100%">
-			        	<include src="schema_edit/schema.zul" />
+			        <tabpanel>
+			        	<include src="survey_edit/schema/schema.zul" />
 			        </tabpanel>
-			        <tabpanel height="100%" width="100%">
-			        	<include src="survey_edit_layout.zul" />
+			        <tabpanel>
+			        	<include src="survey_edit/layout.zul" />
 			        </tabpanel>
 			    </tabpanels>
 			</tabbox>

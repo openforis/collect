@@ -3,17 +3,16 @@
 	<style src="/assets/designer_style.css" />
 	<script type="text/javascript" src="/script/jquery-1.6.2.min.js"></script>
 	<script type="text/javascript" src="/script/sessionping.js"></script>
-	<borderlayout width="100%" height="100%">
+	<borderlayout hflex="1" vflex="1">
 		<north height="102px">
 			<div id="header" sclass="header">
 				<image src="/assets/images/designer-header.jpg" />
 			</div>
 		</north>
 		<center>
-			<vbox height="100%" width="100%">
+			<vbox hflex="1" vflex="1">
 				<div self="@{insert(content_title)}" sclass="content_title">${contentTitle}</div>
-				<div self="@{insert(content)}" sclass="content"
-					height="100%" width="100%"></div>
+				<div self="@{insert(content)}" sclass="content" hflex="1" vflex="1"></div>
 			</vbox>
 		</center>
 		<south height="30px">

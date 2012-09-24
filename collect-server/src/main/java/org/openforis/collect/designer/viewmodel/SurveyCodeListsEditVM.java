@@ -38,7 +38,7 @@ import org.zkoss.zul.Window;
 public class SurveyCodeListsEditVM extends SurveyItemEditVM<CodeList> {
 
 	private static final String SURVEY_CODE_LIST_GENERATED_LEVEL_NAME_LABEL_KEY = "survey.code_list.generated_level_name";
-	private static final String CODE_LIST_ITEM_EDIT_POP_UP_URL = "survey_edit_code_list_item_popup.zul";
+	private static final String CODE_LIST_ITEM_EDIT_POP_UP_URL = "code_list_item_popup.zul";
 	public static final String CLOSE_CODE_LIST_ITEM_POP_UP_COMMAND = "closeCodeListItemPopUp";
 
 //	private DefaultTreeModel<CodeListItem> treeModel;

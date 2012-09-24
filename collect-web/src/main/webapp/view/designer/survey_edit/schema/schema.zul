@@ -62,7 +62,7 @@
 			    </borderlayout>
 			</west>
 			<center title="${labels.survey.schema.node_detail_title}">
-				<include src="schema_edit/node.zul" visible="@load(vm.editingNode)" />
+				<include src="survey_edit/schema/node.zul" visible="@load(vm.editingNode)" />
 			</center>
 			
 	    </borderlayout>

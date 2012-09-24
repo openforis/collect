@@ -1,5 +1,5 @@
 <zk>
-	<div id="unitsContainer"
+	<div
 		apply="org.zkoss.bind.BindComposer"
 		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SurveySRSEditVM')"
 		height="100%">

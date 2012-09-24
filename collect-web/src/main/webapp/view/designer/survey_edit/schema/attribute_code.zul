@@ -10,7 +10,7 @@
 			@save(vm.formObject, before='applyChanges')
 			@validator('org.openforis.collect.designer.form.validator.AttributeDefinitionFormValidator')">
 		
-		<include src="schema_edit/attribute_common.zul" />
+		<include src="survey_edit/schema/attribute_common.zul" />
 		
 		<grid>
 			<columns>
@@ -20,7 +20,7 @@
 			<rows>
 				<row>
 					<label value="${labels.survey.schema.attribute.code.key}:" />
-					<checkbox checked="@load(fx.key eq true) @save(fx.key)" />
+					<checkbox checked="@load(fx.key eq true) @save(fx.key)" onCheck="@command('applyChanges')" />
 				</row>
 				<row>
 					<label value="${labels.survey.schema.attribute.code.code_list}:" />

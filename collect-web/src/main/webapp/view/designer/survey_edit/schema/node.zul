@@ -38,17 +38,17 @@
 				style="overflow:auto;">
 				<include src="
 					@load(empty vm.nodeType or vm.nodeType eq 'ATTRIBUTE' and empty vm.attributeType ? null:
-						vm.nodeType eq 'ENTITY'? 'schema_edit/entity.zul':
-						vm.attributeType eq 'BOOLEAN' ? 'schema_edit/attribute_boolean.zul':
-						vm.attributeType eq 'CODE' ? 'schema_edit/attribute_code.zul':
-						vm.attributeType eq 'COORDINATE' ? 'schema_edit/attribute_coordinate.zul':
-						vm.attributeType eq 'DATE' ? 'schema_edit/attribute_date.zul':
-						vm.attributeType eq 'FILE' ? 'schema_edit/attribute_file.zul':
-						vm.attributeType eq 'NUMBER' ? 'schema_edit/attribute_number.zul':
-						vm.attributeType eq 'RANGE' ? 'schema_edit/attribute_numeric.zul':
-						vm.attributeType eq 'TAXON' ? 'schema_edit/attribute_range.zul':
-						vm.attributeType eq 'TEXT' ? 'schema_edit/attribute_text.zul':
-						vm.attributeType eq 'TIME' ? 'schema_edit/attribute_time.zul': 
+						vm.nodeType eq 'ENTITY'? 'survey_edit/schema/entity.zul':
+						vm.attributeType eq 'BOOLEAN' ? 'survey_edit/schema/attribute_boolean.zul':
+						vm.attributeType eq 'CODE' ? 'survey_edit/schema/attribute_code.zul':
+						vm.attributeType eq 'COORDINATE' ? 'survey_edit/schema/attribute_coordinate.zul':
+						vm.attributeType eq 'DATE' ? 'survey_edit/schema/attribute_date.zul':
+						vm.attributeType eq 'FILE' ? 'survey_edit/schema/attribute_file.zul':
+						vm.attributeType eq 'NUMBER' ? 'survey_edit/schema/attribute_number.zul':
+						vm.attributeType eq 'RANGE' ? 'survey_edit/schema/attribute_numeric.zul':
+						vm.attributeType eq 'TAXON' ? 'survey_edit/schema/attribute_range.zul':
+						vm.attributeType eq 'TEXT' ? 'survey_edit/schema/attribute_text.zul':
+						vm.attributeType eq 'TIME' ? 'survey_edit/schema/attribute_time.zul': 
 						null)" />
 			</div>
 		</center>

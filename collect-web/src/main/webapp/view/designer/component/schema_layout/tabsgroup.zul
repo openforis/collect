@@ -15,9 +15,9 @@
 			<tabpanels children="@load($composer.tabs)">
 				<template name="children">
 					<tabpanel style="overflow: auto;">
-						<include defer="true" 
-							src="/view/designer/component/schema_layout/tabsgrouppanel.zul"
-							tab="${each}" width="100%" height="100%" />
+						<include
+							src="/view/designer/component/schema_layout/editablenodeslist.zul"
+							tab="${each}" />
 					</tabpanel>
 				</template>
 			</tabpanels>

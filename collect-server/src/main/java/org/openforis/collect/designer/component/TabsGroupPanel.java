@@ -4,19 +4,18 @@
 package org.openforis.collect.designer.component;
 
 import org.openforis.collect.model.ui.UITab;
-import org.openforis.collect.model.ui.UITabsGroup;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.IdSpace;
 import org.zkoss.zk.ui.select.Selectors;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zul.Div;
 import org.zkoss.zul.Listbox;
-import org.zkoss.zul.Tabbox;
 
 /**
  * @author S. Ricci
  *
  */
+@Deprecated
 public class TabsGroupPanel extends Div implements IdSpace {
 
 	private static final long serialVersionUID = 1L;

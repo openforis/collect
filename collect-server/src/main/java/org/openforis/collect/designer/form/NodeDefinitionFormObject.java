@@ -64,8 +64,18 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 					case DATE:
 						formObject = new DateAttributeDefinitionFormObject();
 						break;
+					case FILE:
+						formObject = new FileAttributeDefinitionFormObject();
+						break;
 					case NUMBER:
+					case RANGE:
 						formObject = new NumberAttributeDefinitionFormObject();
+						break;
+					case TEXT:
+						formObject = new TextAttributeDefinitionFormObject();
+						break;
+					case TIME:
+						formObject = new TimeAttributeDefinitionFormObject();
 						break;
 					default:
 						throw new IllegalStateException("Attribute type not supported");

@@ -10,7 +10,7 @@
 			@save(vm.formObject, before='applyChanges')
 			@validator('org.openforis.collect.designer.form.validator.AttributeDefinitionFormValidator')">
 
-		<include src="schema_edit/attribute_common.zul" />
+		<include src="survey_edit/schema/attribute_common.zul" />
 		
 	</vlayout>
 </zk>

@@ -1,5 +1,5 @@
 <zk>
-	<include src="schema_edit/node_common.zul" />
+	<include src="survey_edit/schema/node_common.zul" />
 
 	<grid>
 		<columns>
@@ -10,7 +10,7 @@
 			<row>
 				<label value="${labels.survey.schema.attribute.default_values}:" />
 				<cell>
-					<include src="schema_edit/attribute_defaults_simple.zul" />
+					<include src="survey_edit/schema/attribute_defaults_simple.zul" />
 					<label class="error" value="@load(vmsgs['attributeDefaults'])" />
 				</cell>
 			</row>

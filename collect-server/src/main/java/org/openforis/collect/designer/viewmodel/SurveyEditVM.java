@@ -23,7 +23,7 @@ import org.zkoss.zul.Window;
  */
 public class SurveyEditVM extends SurveyEditBaseVM {
 
-	private static final String SURVEY_SELECT_LANGUAGE_POP_UP_URL = "survey_select_language_popup.zul";
+	private static final String SURVEY_SELECT_LANGUAGE_POP_UP_URL = "survey_edit/select_language_popup.zul";
 	
 	private Window selectLanguagePopUp;
 	

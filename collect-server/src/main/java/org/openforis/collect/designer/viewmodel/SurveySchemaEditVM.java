@@ -44,11 +44,11 @@ import org.zkoss.zul.Window;
 public class SurveySchemaEditVM extends SurveyEditBaseVM {
 
 	private static final String SCHEMA_CHANGED_GLOBAL_COMMAND = "schemaChanged";
-	private static final String SURVEY_EDIT_VERSIONING_POPUP_URL = "survey_edit_versioning_popup.zul";
+	private static final String VERSIONING_POPUP_URL = "versioning_popup.zul";
 	private static final String ATTRIBUTE_DEFAULTS_FIELD = "attributeDefaults";
 	private static final String NUMBER_ATTRIBUTE_PRECISIONS_FIELD = "precisions";
-	private static final String SURVEY_EDIT_CODE_LISTS_POPUP_URL = "survey_edit_code_lists_popup.zul";
-	private static final String SURVEY_EDIT_SRS_POPUP_URL = "survey_edit_srs_popup.zul";
+	private static final String CODE_LISTS_POPUP_URL = "code_lists_popup.zul";
+	private static final String SRS_POPUP_URL = "srs_popup.zul";
 	
 	private SchemaTreeModel treeModel;
 	private NodeDefinition selectedNode;
@@ -151,21 +151,21 @@ public class SurveySchemaEditVM extends SurveyEditBaseVM {
 	@Command
 	public void openVersioningManagerPopUp() {
 		Window window = (Window) Executions.createComponents(
-				SURVEY_EDIT_VERSIONING_POPUP_URL, null, null);
+				VERSIONING_POPUP_URL, null, null);
 		window.doModal();
 	}
 
 	@Command
 	public void openCodeListsManagerPopUp() {
 		Window window = (Window) Executions.createComponents(
-				SURVEY_EDIT_CODE_LISTS_POPUP_URL, null, null);
+				CODE_LISTS_POPUP_URL, null, null);
 		window.doModal();
 	}
 
 	@Command
 	public void openSRSManagerPopUp() {
 		Window window = (Window) Executions.createComponents(
-				SURVEY_EDIT_SRS_POPUP_URL, null, null);
+				SRS_POPUP_URL, null, null);
 		window.doModal();
 	}
 
