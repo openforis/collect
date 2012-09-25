@@ -1,7 +1,7 @@
 <zk>
 	<div
 		apply="org.zkoss.bind.BindComposer"
-		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.EditableListOfNodesVM')">
+		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.layout.EditableListOfNodesVM')">
 		<listbox id="listOfNodesListbox"
 			model="@load(vm.nodesPerTab) @template(vm.getTemplateName(each))"
 			droppable="true" style="min-height: 150px">
@@ -121,14 +121,12 @@
 		                    			<label value="@load(each.name)" />
 		                    		</template>
 		                    	</vlayout>
-<!-- 		                    	<include src="/view/designer/component/schema_layout/nodeslist.zul" -->
-<!-- 									hflex="1" vflex="1" -->
-<!-- 									nodes="${vm.getChildDefinitionsInTab(each)}" /> -->
 	                    	</hlayout>
 		                    <include defer="true" 
 								src="/view/designer/component/schema_layout/tabsgroup.zul"
 								hflex="1" vflex="1"
-								tabsGroup="${vm.tab}" />
+								tabsGroup="${vm.tab}"
+								style="min-height: 180px" />
 		                </vlayout>
 	            	</listcell>
             	</listitem>

@@ -13,6 +13,7 @@ import org.openforis.collect.model.ui.UITabsGroup;
 import org.zkoss.bind.BindComposer;
 import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
+import org.zkoss.bind.annotation.DependsOn;
 import org.zkoss.bind.annotation.ExecutionArgParam;
 import org.zkoss.bind.annotation.Init;
 import org.zkoss.bind.annotation.NotifyChange;
@@ -41,7 +42,7 @@ public class TabsGroupComposer extends BindComposer<Component> {
 	}
 	
 	@Command
-	@NotifyChange({"tabs","tabsPlusAddButton"})
+	@NotifyChange({"tabs"})
 	public void addTab() {
 		UITab tab = new UITab();
 		String tabName = generateNewTabName(tabsGroup);
@@ -50,7 +51,7 @@ public class TabsGroupComposer extends BindComposer<Component> {
 	}
 	
 	@Command
-	@NotifyChange({"tabs","tabsPlusAddButton"})
+	@NotifyChange({"tabs"})
 	public void removeTab(@BindingParam("tab") UITab tab) {
 		UITabsGroup parent = tab.getParent();
 		parent.removeTab(tab);
@@ -83,6 +84,7 @@ public class TabsGroupComposer extends BindComposer<Component> {
 		return tabsGroup != null ? tabsGroup.getTabs(): null;
 	}
 	
+	@DependsOn("tabs")
 	public List<UITab> getTabsPlusAddButton() {
 		List<UITab> tabs = new ArrayList<UITab>();
 		if ( tabsGroup != null ) {
@@ -95,5 +97,5 @@ public class TabsGroupComposer extends BindComposer<Component> {
 	public UITab getFakeAddTab() {
 		return FAKE_ADD_TAB;
 	}
-	
+
 }

@@ -1,0 +1,16 @@
+<zk>
+	<window 
+		title="${labels.survey.layout.tab_label_popup.title}" 
+		border="normal"
+		position="center" 
+		closable="false">
+		
+		<vlayout>
+			<textbox id="textbox" width="150px" />
+			<box width="100%" align="center">
+				<button id="okBtn" label="${labels.global.ok}" />
+			</box>
+		</vlayout>
+		
+	</window>
+</zk>

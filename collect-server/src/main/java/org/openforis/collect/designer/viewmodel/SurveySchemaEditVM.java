@@ -12,6 +12,7 @@ import org.openforis.collect.designer.form.NodeDefinitionFormObject;
 import org.openforis.collect.designer.form.NumericAttributeDefinitionFormObject;
 import org.openforis.collect.designer.model.AttributeType;
 import org.openforis.collect.designer.model.NodeType;
+import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.ui.UIConfiguration;
 import org.openforis.collect.model.ui.UITab;
@@ -28,12 +29,10 @@ import org.zkoss.bind.SimpleForm;
 import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.NotifyChange;
-import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zul.DefaultTreeModel;
 import org.zkoss.zul.TreeNode;
 import org.zkoss.zul.Treeitem;
-import org.zkoss.zul.Window;
 
 /**
  * 
@@ -79,39 +78,49 @@ public class SurveySchemaEditVM extends SurveyEditBaseVM {
 	@NotifyChange({"nodes","editingNode","nodeType","attributeType",
 		"tempFormObject","formObject","attributeDefaults","numericAttributePrecisions"})
 	public void addRootEntity() {
-		editingNode = true;
-		nodeType = NodeType.ENTITY.name();
-		initFormObject();
-		
-		NodeDefinition newNode = createRootEntityNode();
-		
-		treeModel.appendNodeToSelected(newNode);
-		
-		selectedNode = newNode;
-		
-		postSchemaChangedCommand();
+		if ( checkCurrentFormValid() ) {
+			editingNode = true;
+			nodeType = NodeType.ENTITY.name();
+			initFormObject();
+			
+			NodeDefinition newNode = createRootEntityNode();
+			
+			treeModel.appendNodeToSelected(newNode);
+			
+			selectedNode = newNode;
+			
+			postSchemaChangedCommand();
+		}
 	}
 
 	protected EntityDefinition createRootEntityNode() {
 		EntityDefinition newNode = (EntityDefinition) NodeType.createNodeDefinition(survey, NodeType.ENTITY, null);
 		Schema schema = survey.getSchema();
 		schema.addRootEntityDefinition((EntityDefinition) newNode);
-		UIConfiguration uiConf = survey.getUIConfiguration();
-		//add tab definition
-		UITabDefinition tabDefn = new UITabDefinition();
-		int tabDefnPosition = uiConf.getTabDefinitions().size() + 1;
-		String tabDefnName = "tabdefn_" + tabDefnPosition;
-		tabDefn.setName(tabDefnName);
-		uiConf.addTabDefinition(tabDefn);
-		newNode.setAnnotation(UIConfiguration.TAB_DEFINITION_ANNOTATION, tabDefnName);
-		//add tab
+		UITabDefinition tabDefn = createRootTabDefinition(newNode);
+		createFirstTab(newNode, tabDefn);
+		return newNode;
+	}
+
+	private void createFirstTab(EntityDefinition newNode,
+			UITabDefinition tabDefn) {
 		UITab tab = new UITab();
 		int tabPosition = 1;
 		String tabName = "tab_" + tabPosition;
 		tab.setName(tabName);
 		tabDefn.addTab(tab);
 		newNode.setAnnotation(UIConfiguration.TAB_NAME_ANNOTATION, tabName);
-		return newNode;
+	}
+
+	private UITabDefinition createRootTabDefinition(EntityDefinition newNode) {
+		UIConfiguration uiConf = survey.getUIConfiguration();
+		UITabDefinition tabDefn = new UITabDefinition();
+		int tabDefnPosition = uiConf.getTabDefinitions().size() + 1;
+		String tabDefnName = "tabdefn_" + tabDefnPosition;
+		tabDefn.setName(tabDefnName);
+		uiConf.addTabDefinition(tabDefn);
+		newNode.setAnnotation(UIConfiguration.TAB_DEFINITION_ANNOTATION, tabDefnName);
+		return tabDefn;
 	}
 
 	private void postSchemaChangedCommand() {
@@ -122,22 +131,24 @@ public class SurveySchemaEditVM extends SurveyEditBaseVM {
 	@NotifyChange({"nodes","editingNode","nodeType","attributeType","tempFormObject","formObject",
 		"attributeDefaults","numericAttributePrecisions"})
 	public void addNode(@BindingParam("nodeType") String nodeType, @BindingParam("attributeType") String attributeType) throws Exception {
-		if ( selectedNode != null && selectedNode instanceof EntityDefinition ) {
-			editingNode = true;
-			this.nodeType = nodeType;
-			this.attributeType = attributeType;
-			initFormObject();
-			
-			NodeType nodeTypeEnum = nodeType != null ? NodeType.valueOf(nodeType): null;
-			AttributeType attributeTypeEnum = attributeType != null ? AttributeType.valueOf(attributeType): null;
-			NodeDefinition newNode = NodeType.createNodeDefinition(survey, nodeTypeEnum, attributeTypeEnum );
-			( (EntityDefinition) selectedNode).addChildDefinition(newNode);
-			treeModel.appendNodeToSelected(newNode);
-			
-			selectedNode = newNode;
-			postSchemaChangedCommand();
-		} else {
-			throw new IllegalStateException("Trying to add a child to an Attribute");
+		if ( checkCurrentFormValid() ) {
+			if ( selectedNode != null && selectedNode instanceof EntityDefinition ) {
+				editingNode = true;
+				this.nodeType = nodeType;
+				this.attributeType = attributeType;
+				initFormObject();
+				
+				NodeType nodeTypeEnum = nodeType != null ? NodeType.valueOf(nodeType): null;
+				AttributeType attributeTypeEnum = attributeType != null ? AttributeType.valueOf(attributeType): null;
+				NodeDefinition newNode = NodeType.createNodeDefinition(survey, nodeTypeEnum, attributeTypeEnum );
+				( (EntityDefinition) selectedNode).addChildDefinition(newNode);
+				treeModel.appendNodeToSelected(newNode);
+				
+				selectedNode = newNode;
+				postSchemaChangedCommand();
+			} else {
+				MessageUtil.showWarning("survey.schema.add_node.error.parent_entity_not_selected");
+			}
 		}
 	}
 	
@@ -150,23 +161,23 @@ public class SurveySchemaEditVM extends SurveyEditBaseVM {
 
 	@Command
 	public void openVersioningManagerPopUp() {
-		Window window = (Window) Executions.createComponents(
-				VERSIONING_POPUP_URL, null, null);
-		window.doModal();
+		if ( checkCurrentFormValid() ) {
+			openPopUp(VERSIONING_POPUP_URL, true);
+		}
 	}
 
 	@Command
 	public void openCodeListsManagerPopUp() {
-		Window window = (Window) Executions.createComponents(
-				CODE_LISTS_POPUP_URL, null, null);
-		window.doModal();
+		if ( checkCurrentFormValid() ) {
+			openPopUp(CODE_LISTS_POPUP_URL, true);
+		}
 	}
 
 	@Command
 	public void openSRSManagerPopUp() {
-		Window window = (Window) Executions.createComponents(
-				SRS_POPUP_URL, null, null);
-		window.doModal();
+		if ( checkCurrentFormValid() ) {
+			openPopUp(SRS_POPUP_URL, true);
+		}
 	}
 
 	@Command

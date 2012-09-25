@@ -30,6 +30,15 @@ public class BaseVM {
 		return session;
 	}
 	
+	protected Window openPopUp(String url, boolean modal) {
+		Window result = (Window) Executions.createComponents(
+				url, null, null);
+		if ( modal ) {
+			result.doModal();
+		}
+		return result;
+	}
+	
 	protected void closePopUp(Window popUp) {
 		Event event = new Event("onClose", popUp, null);
 		Events.postEvent(event);

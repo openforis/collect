@@ -24,8 +24,10 @@ import org.zkoss.zul.Window;
 public class SurveyEditVM extends SurveyEditBaseVM {
 
 	private static final String SURVEY_SELECT_LANGUAGE_POP_UP_URL = "survey_edit/select_language_popup.zul";
+	private static final String SRS_MANAGER_POP_UP_URL = "survey_edit/srs_popup.zul";
 	
 	private Window selectLanguagePopUp;
+	private Window srsPopUp;
 	
 	@Override
 	@Init(superclass=false)
@@ -44,6 +46,19 @@ public class SurveyEditVM extends SurveyEditBaseVM {
 		selectLanguagePopUp = (Window) Executions.createComponents(
 				SURVEY_SELECT_LANGUAGE_POP_UP_URL, null, null);
 		selectLanguagePopUp.doModal();
+	}
+	
+	@GlobalCommand
+	public void openSRSManagerPopUp() {
+		srsPopUp = (Window) Executions.createComponents(
+				SRS_MANAGER_POP_UP_URL, null, null);
+		srsPopUp.doModal();
+	}
+	
+	
+	@GlobalCommand
+	public void closeSRSManagerPopUp() {
+		closePopUp(srsPopUp);
 	}
 	
 	public void languageCodeSelected(@BindingParam("code") String selectedLanguageCode) {

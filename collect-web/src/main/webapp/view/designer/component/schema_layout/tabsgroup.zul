@@ -1,18 +1,21 @@
 <zk>
-	<div apply="org.openforis.collect.designer.composer.TabsGroupComposer"
+	<div 
+		apply="org.zkoss.bind.BindComposer"
+		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.layout.TabsGroupVM')"
 		width="100%" height="100%">
 		<tabbox id="tabbox" width="100%" height="100%">
-			<tabs children="@load($composer.tabsPlusAddButton) @template(each eq $composer.fakeAddTab ? 'addTab': 'children' )">
+			<tabs children="@load(vm.tabsPlusAddButton) @template(each eq vm.fakeAddTab ? 'addTab': 'children' )">
 				<template name="addTab">
 					<tab label="+" onClick="@command('addTab')" />
 				</template>
 				<template name="children">
 					<tab label="@load(each.label)"
 						onClose="@command('removeTab', group=tabGroup, tab=each)" 
+						onDoubleClick="@command('editTabLabel', tab=each)"
 						closable="true" />
 				</template>
 			</tabs>
-			<tabpanels children="@load($composer.tabs)">
+			<tabpanels children="@load(vm.tabs)">
 				<template name="children">
 					<tabpanel style="overflow: auto;">
 						<include

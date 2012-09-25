@@ -1,22 +1,27 @@
-package org.openforis.collect.designer.viewmodel;
+package org.openforis.collect.designer.viewmodel.layout;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.openforis.collect.designer.session.SessionStatus;
 import org.openforis.collect.designer.util.MessageUtil;
+import org.openforis.collect.designer.viewmodel.BaseVM;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.ui.UIConfiguration;
 import org.openforis.collect.model.ui.UIConfiguration.Layout;
 import org.openforis.collect.model.ui.UITab;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
+import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.annotation.AfterCompose;
 import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.ContextParam;
 import org.zkoss.bind.annotation.ContextType;
 import org.zkoss.bind.annotation.ExecutionArgParam;
+import org.zkoss.bind.annotation.GlobalCommand;
 import org.zkoss.bind.annotation.Init;
 import org.zkoss.bind.annotation.NotifyChange;
 import org.zkoss.zk.ui.Component;
@@ -47,7 +52,6 @@ public class EditableListOfNodesVM extends BaseVM {
 	}
 	
 	@Listen("onDrop = listbox#listOfNodesListbox")
-	@NotifyChange({"nodesPerTab"})
 	public void listOfNodesDropHandler(DropEvent evt) {
 		Component dragged = evt.getDragged();
 		if ( dragged instanceof Treeitem ) {
@@ -58,11 +62,23 @@ public class EditableListOfNodesVM extends BaseVM {
 				NodeDefinition nodeDefn = (NodeDefinition) data;
 				UIConfiguration uiConf = getUIConfiguration();
 				if ( uiConf.isAssignableTo(nodeDefn, tab) ) {
+					UITab oldTab = uiConf.getTab(nodeDefn);
 					uiConf.associateWithTab(nodeDefn, tab);
+					Map<String, Object> args = new HashMap<String, Object>();
+					args.put("oldTab", oldTab);
+					args.put("newTab", tab);
+					BindUtils.postGlobalCommand(null, null, "nodeAssignedToTab", args);
 				} else {
 					MessageUtil.showWarning("survey.layout.cannot_add_node_to_tab");
 				}
 			}
+		}
+	}
+	
+	@GlobalCommand
+	public void nodeAssignedToTab(@BindingParam("oldTab") UITab oldTab, @BindingParam("newTab") UITab newTab) {
+		if ( oldTab != null && oldTab.equals(tab) || newTab != null && newTab.equals(tab) ) {
+			BindUtils.postNotifyChange(null, null, this, "nodesPerTab");
 		}
 	}
 	
