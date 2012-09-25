@@ -46,6 +46,14 @@
 						<label class="error" value="@load(vmsgs['projectCycle'])" />
 					</cell>
 				</row>
+				<row>
+					<label value="${labels.survey.srs.$}:" />
+					<cell>
+						<button tooltiptext="${labels.survey.srs.$}" 
+							onClick="@global-command('openSRSManagerPopUp')"
+							image="/assets/images/pencil-small.png" />
+					</cell>
+				</row>
 			</rows>
 		</grid>
 

@@ -8,7 +8,9 @@
 			<row>
 				<label value="${labels.global.item.name}:" />
 				<cell>
-					<textbox width="150px" value="@bind(fx.name)" onChange="@command('applyChanges')" />
+					<textbox width="150px" value="@bind(fx.name)"
+						maxlength="40" 
+						onChange="@command('applyChanges')" />
 					<label class="error" value="@load(vmsgs['name'])" />
 				</cell>
 			</row>
@@ -68,34 +70,55 @@
 					<label class="error" value="@load(vmsgs['numberLabel'])" />
 				</cell>
 			</row>
-			<row>
-				<label value="${labels.survey.schema.node.interviewPromptLabel}:" />
-				<cell>
-					<textbox width="150px" value="@bind(fx.interviewPromptLabel)" onChange="@command('applyChanges')" />
-					<label class="error" value="@load(vmsgs['interviewPromptLabel'])" />
-				</cell>
-			</row>
-			<row>
-				<label value="${labels.survey.schema.node.paperPromptLabel}:" />
-				<cell>
-					<textbox width="150px" value="@bind(fx.paperPromptLabel)" onChange="@command('applyChanges')" />
-					<label class="error" value="@load(vmsgs['paperPromptLabel'])" />
-				</cell>
-			</row>
-			<row>
-				<label value="${labels.survey.schema.node.handheldPromptLabel}:" />
-				<cell>
-					<textbox width="150px" value="@bind(fx.handheldPromptLabel)" onChange="@command('applyChanges')" />
-					<label class="error" value="@load(vmsgs['handheldPromptLabel'])" />
-				</cell>
-			</row>
-			<row>
-				<label value="${labels.survey.schema.node.pcPromptLabel}:" />
-				<cell>
-					<textbox width="150px" value="@bind(fx.pcPromptLabel)" onChange="@command('applyChanges')" />
-					<label class="error" value="@load(vmsgs['pcPromptLabel'])" />
-				</cell>
-			</row>
+		</rows>
+	</grid>
+	<groupbox closable="true" open="false" contentStyle="padding: 0px"	mold="3d" hflex="1">
+		<caption>
+			<label value="${labels.survey.schema.node.otherLabels}" />
+		</caption>
+		<grid>
+			<columns>
+				<column label="" width="150px" />
+				<column label="" width="100%" />
+			</columns>
+			<rows>
+				<row>
+					<label value="${labels.survey.schema.node.interviewPromptLabel}:" />
+					<cell>
+						<textbox width="150px" value="@bind(fx.interviewPromptLabel)" onChange="@command('applyChanges')" />
+						<label class="error" value="@load(vmsgs['interviewPromptLabel'])" />
+					</cell>
+				</row>
+				<row>
+					<label value="${labels.survey.schema.node.paperPromptLabel}:" />
+					<cell>
+						<textbox width="150px" value="@bind(fx.paperPromptLabel)" onChange="@command('applyChanges')" />
+						<label class="error" value="@load(vmsgs['paperPromptLabel'])" />
+					</cell>
+				</row>
+				<row>
+					<label value="${labels.survey.schema.node.handheldPromptLabel}:" />
+					<cell>
+						<textbox width="150px" value="@bind(fx.handheldPromptLabel)" onChange="@command('applyChanges')" />
+						<label class="error" value="@load(vmsgs['handheldPromptLabel'])" />
+					</cell>
+				</row>
+				<row>
+					<label value="${labels.survey.schema.node.pcPromptLabel}:" />
+					<cell>
+						<textbox width="150px" value="@bind(fx.pcPromptLabel)" onChange="@command('applyChanges')" />
+						<label class="error" value="@load(vmsgs['pcPromptLabel'])" />
+					</cell>
+				</row>
+			</rows>
+		</grid>
+	</groupbox>
+	<grid>
+		<columns>
+			<column label="" width="150px" />
+			<column label="" width="100%" />
+		</columns>
+		<rows>
 			<row>
 				<label value="${labels.global.item.description}:" />
 				<cell>

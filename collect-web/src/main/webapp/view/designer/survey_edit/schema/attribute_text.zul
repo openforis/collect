@@ -23,11 +23,11 @@
 					<checkbox checked="@load(fx.key eq true) @save(fx.key)" onCheck="@command('applyChanges')" />
 				</row>
 				<row>
-	            	<label value="${labels.survey.schema.attribute.text.type.$}:" />
+	            	<label value="${labels.survey.schema.attribute.text.type}:" />
 					<radiogroup selectedItem="@bind(fx.type)" onCheck="@command('applyChanges')">
-						<radio label="${labels.survey.schema.attribute.text.type.short}"
+						<radio label="${labels.survey.schema.attribute.text.type_short}"
 							value="SHORT" />
-						<radio label="${labels.survey.schema.attribute.text.type.memo}"
+						<radio label="${labels.survey.schema.attribute.text.type_memo}"
 							value="MEMO" />
 					</radiogroup>
 	            </row>

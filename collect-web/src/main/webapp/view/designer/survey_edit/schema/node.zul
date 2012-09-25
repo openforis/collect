@@ -1,7 +1,7 @@
 <zk>
 	<borderlayout>
-		<north height="@load(vm.nodeType eq 'ATTRIBUTE' ? '55px': '30px')">
-			<grid height="@load(vm.nodeType eq 'ATTRIBUTE' ? '55px': '30px')">
+		<north height="@load(vm.nodeType eq 'ATTRIBUTE' ? '60px': '30px')">
+			<grid height="@load(vm.nodeType eq 'ATTRIBUTE' ? '60px': '30px')">
 				<columns>
 					<column label="" width="150px" />
 					<column label="" width="100%" />

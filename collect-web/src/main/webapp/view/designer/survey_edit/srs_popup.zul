@@ -1,22 +1,31 @@
 <zk>
-	<div
+	<window 
+		title="${labels.survey.srs.manager.title}" 
+		height="400px"
+		width="700px"
+		border="normal"
+		position="center" 
 		apply="org.zkoss.bind.BindComposer"
-		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SurveySRSEditVM')"
-		height="100%">
+		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SurveySRSEditVM')">
 		<hbox>
 			<vbox>
 		        <listbox id="itemsListBox"
 		        	selectedItem="@bind(vm.selectedItem)"
 		        	model="@load(vm.items)"
-		        	onSelect="@command('selectionChanged')"
+		        	onSelect="@command('selectionChanged', selectedItem=self.selectedItem.value)"
 		        	height="200px"
 		        	width="200px">
 		        	<listhead>
 						<listheader label="" width="150px" />
+						<listheader label="" width="50px" />
 					</listhead>
 		            <template name="model">
 		                <listitem>
 		                    <listcell label="@load(each.id)" />
+		                    <listcell>
+		                    	<button image="/assets/images/cross-small.png"
+		                     		onClick="@command('deleteItem', item=each)" />
+		                    </listcell>
 		                </listitem>
 		            </template>
 		        </listbox>
@@ -27,12 +36,13 @@
 	        <div 
 	        	visible="@load(vm.editingItem)"
 				validationMessages="@id('vmsgs')"
-				form="@id('itemEditForm') @load(vm.editedItem) @save(vm.editedItem, before='save')"
-				width="400px"
-				>
+				form="@id('fx') 
+					@load(vm.formObject) @save(vm.formObject, before='applyChanges')
+					@validator('org.openforis.collect.designer.form.validator.SRSFormValidator')"
+				width="500px">
 				<grid>
 					<columns>
-						<column label="" width="150px" />
+						<column label="" width="100px" />
 						<column label="" width="100%" />
 					</columns>
 					<rows>
@@ -60,20 +70,20 @@
 						<row>
 							<label value="${labels.survey.srs.wkt}:" />
 							<cell>
-								<textbox width="250px" value="@bind(fx.wellKnownText)" multiline="true" rows="10" 
+								<textbox width="250px" value="@bind(fx.wellKnownText)" 
+									multiline="true" rows="10" cols="40"
 									onChange="@command('applyChanges')" />
 								<label class="error" value="@load(vmsgs['wellKnownText'])" />
 							</cell>
 						</row>
 					</rows>
 				</grid>
-				
-				<hbox>
-					<button image="/assets/images/cross-small.png"
-		                     onClick="@command('deleteItem')" />
-				</hbox>
 			</div>
-	        
 		</hbox>
-    </div>
+		<separator height="40px" />
+		<box align="center" width="100%">
+			<button label="${labels.global.close}" 
+				onClick="@global-command('closeSRSManagerPopUp')" />
+		</box>
+    </window>
 </zk>
