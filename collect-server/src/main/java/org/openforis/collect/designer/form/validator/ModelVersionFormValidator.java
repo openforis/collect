@@ -18,6 +18,7 @@ public class ModelVersionFormValidator extends FormValidator {
 
 	protected void validateName(ValidationContext ctx) {
 		validateRequired(ctx, NAME_FIELD);
+		validateInternalName(ctx, NAME_FIELD);
 	}
 
 }

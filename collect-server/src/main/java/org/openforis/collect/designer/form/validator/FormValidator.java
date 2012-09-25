@@ -2,6 +2,8 @@ package org.openforis.collect.designer.form.validator;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.validator.routines.UrlValidator;
@@ -22,6 +24,8 @@ import org.zkoss.zk.ui.Component;
  */
 public abstract class FormValidator extends AbstractValidator {
 
+	protected static final String INTERNAL_NAME_REGEX = "[a-z][a-z0-9_]*";
+	protected static final String INTERNAL_NAME_INVALID_VALUE_ERROR_KEY = "global.validation.internal_name.invalid_value";
 	protected static final String FIELD_REQUIRED_MESSAGE_KEY = "global.item.validation.required_field";
 	protected static final String INVALID_URI_MESSAGE_KEY = "global.item.validation.invalid_uri";
 	protected static final String GREATER_THAN_MESSAGE_KEY = "global.item.validation.greater_than";
@@ -60,6 +64,23 @@ public abstract class FormValidator extends AbstractValidator {
 		validateRequired(ctx, fieldName, value);
 	}
 	
+	protected void validateInternalName(ValidationContext ctx, String fieldName) {
+		validateRegEx(ctx, INTERNAL_NAME_REGEX, fieldName, INTERNAL_NAME_INVALID_VALUE_ERROR_KEY);
+	}
+	
+	protected void validateRegEx(ValidationContext ctx, String regex,
+			String fieldName, String errorMessageKey) {
+		Object value = getValue(ctx, fieldName);
+		if ( value instanceof String && StringUtils.isNotBlank((String) value) ) {
+			Pattern pattern = Pattern.compile(regex);  
+			Matcher matcher = pattern.matcher((String) value);
+			if ( ! matcher.matches() ) {  
+				String message = Labels.getLabel(errorMessageKey);
+				this.addInvalidMessage(ctx, fieldName, message);
+			}
+		}
+	}
+
 	protected void validateUri(ValidationContext ctx, String fieldName) {
 		Object value = getValue(ctx, fieldName);
 		if ( value instanceof String && StringUtils.isNotBlank((String) value) ) {
