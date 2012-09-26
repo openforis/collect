@@ -10,14 +10,12 @@ import org.openforis.collect.designer.converter.XMLStringDateConverter;
 import org.openforis.collect.designer.form.FormObject;
 import org.openforis.collect.designer.session.SessionStatus;
 import org.openforis.collect.designer.util.MessageUtil;
-import org.openforis.collect.manager.SurveyManager;
+import org.openforis.collect.manager.SurveyWorkManager;
 import org.openforis.collect.model.CollectSurvey;
-import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.Unit;
 import org.zkoss.bind.annotation.BindingParam;
-import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.GlobalCommand;
 import org.zkoss.bind.annotation.Init;
 import org.zkoss.bind.annotation.NotifyChange;
@@ -40,7 +38,7 @@ public class SurveyEditBaseVM extends BaseVM {
 	private String dateFormat = "dd/MM/yyyy";
 	
 	@WireVariable
-	protected SurveyManager surveyManager;
+	protected SurveyWorkManager surveyWorkManager;
 	
 	@WireVariable
 	protected CollectSurvey survey;
@@ -62,11 +60,6 @@ public class SurveyEditBaseVM extends BaseVM {
 	@Init
 	public void init() {
 		initSurvey();
-	}
-	
-	@Command
-	public void save() throws SurveyImportException {
-		surveyManager.updateModel(survey);
 	}
 	
 	@GlobalCommand

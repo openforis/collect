@@ -38,6 +38,11 @@ public final class Tables {
 	public static org.openforis.collect.persistence.jooq.tables.OfcSurvey OFC_SURVEY = org.openforis.collect.persistence.jooq.tables.OfcSurvey.OFC_SURVEY;
 
 	/**
+	 * The table collect.ofc_survey_work
+	 */
+	public static org.openforis.collect.persistence.jooq.tables.OfcSurveyWork OFC_SURVEY_WORK = org.openforis.collect.persistence.jooq.tables.OfcSurveyWork.OFC_SURVEY_WORK;
+
+	/**
 	 * The table collect.ofc_taxon
 	 */
 	public static org.openforis.collect.persistence.jooq.tables.OfcTaxon OFC_TAXON = org.openforis.collect.persistence.jooq.tables.OfcTaxon.OFC_TAXON;

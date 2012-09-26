@@ -7,13 +7,13 @@ import java.util.List;
 
 import org.openforis.collect.designer.session.SessionStatus;
 import org.openforis.collect.model.LanguageConfiguration;
+import org.openforis.collect.persistence.SurveyImportException;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.GlobalCommand;
 import org.zkoss.bind.annotation.Init;
 import org.zkoss.bind.annotation.NotifyChange;
-import org.zkoss.zk.ui.Executions;
 import org.zkoss.zkplus.databind.BindingListModelList;
 import org.zkoss.zul.Window;
 
@@ -43,16 +43,16 @@ public class SurveyEditVM extends SurveyEditBaseVM {
 	
 	@Command
 	public void openLanguageManagerPopUp() {
-		selectLanguagePopUp = (Window) Executions.createComponents(
-				SURVEY_SELECT_LANGUAGE_POP_UP_URL, null, null);
-		selectLanguagePopUp.doModal();
+		if ( checkCurrentFormValid() ) {
+			selectLanguagePopUp = openPopUp(SURVEY_SELECT_LANGUAGE_POP_UP_URL, true);
+		}
 	}
 	
 	@GlobalCommand
 	public void openSRSManagerPopUp() {
-		srsPopUp = (Window) Executions.createComponents(
-				SRS_MANAGER_POP_UP_URL, null, null);
-		srsPopUp.doModal();
+		if ( checkCurrentFormValid() ) {
+			srsPopUp = openPopUp(SRS_MANAGER_POP_UP_URL, true);
+		}
 	}
 	
 	
@@ -65,6 +65,13 @@ public class SurveyEditVM extends SurveyEditBaseVM {
 		SessionStatus sessionStatus = getSessionStatus();
 		sessionStatus.setCurrentLanguageCode(selectedLanguageCode);
 		BindUtils.postGlobalCommand(null, null, SurveySelectLanguageVM.CURRENT_LANGUAGE_CHANGED_COMMAND, null);
+	}
+	
+	@Command
+	public void save() throws SurveyImportException {
+		if ( checkCurrentFormValid() ) {
+			surveyWorkManager.save(survey);
+		}
 	}
 	
 	@GlobalCommand

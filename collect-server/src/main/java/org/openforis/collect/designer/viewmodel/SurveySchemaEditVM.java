@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.openforis.collect.designer.component.SchemaTreeModel;
+import org.openforis.collect.designer.component.SchemaTreeModel.NodeDefinitionTreeNode;
 import org.openforis.collect.designer.form.AttributeDefinitionFormObject;
 import org.openforis.collect.designer.form.NodeDefinitionFormObject;
 import org.openforis.collect.designer.form.NumericAttributeDefinitionFormObject;
@@ -26,11 +27,21 @@ import org.openforis.idm.metamodel.Schema;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.Form;
 import org.zkoss.bind.SimpleForm;
+import org.zkoss.bind.annotation.AfterCompose;
 import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
+import org.zkoss.bind.annotation.ContextParam;
+import org.zkoss.bind.annotation.ContextType;
 import org.zkoss.bind.annotation.NotifyChange;
+import org.zkoss.zk.ui.Component;
+import org.zkoss.zk.ui.event.DropEvent;
+import org.zkoss.zk.ui.select.Selectors;
+import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
+import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zul.DefaultTreeModel;
+import org.zkoss.zul.Listitem;
+import org.zkoss.zul.Tree;
 import org.zkoss.zul.TreeNode;
 import org.zkoss.zul.Treeitem;
 
@@ -58,6 +69,15 @@ public class SurveySchemaEditVM extends SurveyEditBaseVM {
 	private boolean editingNode;
 	private List<AttributeDefault> attributeDefaults;
 	private List<Precision> numericAttributePrecisions;
+	
+	@Wire
+	private Tree nodesTree;
+	
+	@AfterCompose
+	public void afterCompose(@ContextParam(ContextType.VIEW) Component view){
+		 Selectors.wireComponents(view, this, false);
+		 Selectors.wireEventListeners(view, this);
+	}
 	
 	@Command
 	@NotifyChange({"nodes","editingNode","nodeType","attributeType",
@@ -90,6 +110,24 @@ public class SurveySchemaEditVM extends SurveyEditBaseVM {
 			selectedNode = newNode;
 			
 			postSchemaChangedCommand();
+		}
+	}
+
+	@Listen("onDrop = tree#nodesTree")
+	public void nodesTreeDropHandler(DropEvent evt) {
+		Component dragged = evt.getDragged();
+		if ( dragged instanceof Treeitem ) {
+			Treeitem treeItem = (Treeitem) dragged;
+			if ( treeItem.getTree() == nodesTree ) {
+				NodeDefinitionTreeNode treeNode = ((Treeitem) dragged).getValue();
+				NodeDefinition nodeDefn = treeNode.getData();
+				Component target = evt.getTarget();
+				if ( target == nodesTree ) {
+					
+				} else if ( target instanceof Treeitem ) {
+					
+				}
+			}
 		}
 	}
 

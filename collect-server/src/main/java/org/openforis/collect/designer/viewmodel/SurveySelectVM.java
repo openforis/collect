@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.openforis.collect.designer.session.SessionStatus;
 import org.openforis.collect.manager.SurveyManager;
+import org.openforis.collect.manager.SurveyWorkManager;
 import org.openforis.collect.model.CollectSurvey;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.NotifyChange;
@@ -26,6 +27,8 @@ public class SurveySelectVM extends BaseVM {
 
 	@WireVariable
 	private SurveyManager surveyManager;
+	@WireVariable
+	private SurveyWorkManager surveyWorkManager;
 	
 	private CollectSurvey selectedSurvey;
 	
@@ -33,20 +36,22 @@ public class SurveySelectVM extends BaseVM {
 	public void editSurvey() {
 		SessionStatus sessionStatus = getSessionStatus();
 		sessionStatus.setSurvey(selectedSurvey);
+		sessionStatus.setCurrentLanguageCode(null);
 		Executions.sendRedirect(SURVEY_EDIT_URL);
 	}
 
 	@Command
 	public void newSurvey() {
+		CollectSurvey survey = surveyWorkManager.createSurvey();
 		SessionStatus sessionStatus = getSessionStatus();
-		CollectSurvey survey = surveyManager.createSurvey();
 		sessionStatus.setSurvey(survey);
+		sessionStatus.setCurrentLanguageCode(null);
 		//Executions.sendRedirect(SURVEY_SELECT_LANGUAGE_URL);
 		Executions.sendRedirect(SURVEY_EDIT_URL);
 	}
 
-	public ListModel<CollectSurvey> getSurveys() {
-		List<CollectSurvey> surveys = surveyManager.getAll();
+	public ListModel<CollectSurvey> getSurveysWork() {
+		List<CollectSurvey> surveys = surveyWorkManager.getAll();
 		return new ListModelList<CollectSurvey>(surveys);
 	}
 

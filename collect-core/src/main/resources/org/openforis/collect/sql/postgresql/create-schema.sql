@@ -1,6 +1,7 @@
 CREATE SCHEMA "collect";
 CREATE SEQUENCE "collect"."ofc_record_id_seq";
 CREATE SEQUENCE "collect"."ofc_survey_id_seq";
+CREATE SEQUENCE "collect"."ofc_survey_work_id_seq";
 CREATE SEQUENCE "collect"."ofc_taxonomy_id_seq";
 CREATE SEQUENCE "collect"."ofc_taxon_id_seq";
 CREATE SEQUENCE "collect"."ofc_taxon_vernacular_name_id_seq";
@@ -57,6 +58,13 @@ CREATE TABLE "collect"."ofc_survey"  (
 	"idml"	text NOT NULL,
 	PRIMARY KEY("id")
 );
+CREATE TABLE "collect"."ofc_survey_work"  ( 
+	"id"  	integer NOT NULL,
+	"name"	varchar(255) NOT NULL,
+	"uri" 	varchar(255) NOT NULL,
+	"idml"	text NOT NULL,
+	PRIMARY KEY("id")
+);
 CREATE TABLE "collect"."ofc_taxon"  ( 
 	"id"             	integer NOT NULL,
 	"taxon_id"       	integer NOT NULL,
@@ -105,6 +113,12 @@ ALTER TABLE "collect"."ofc_survey"
 	UNIQUE ("name");
 ALTER TABLE "collect"."ofc_survey"
 	ADD CONSTRAINT "ofc_survey_uri_key"
+	UNIQUE ("uri");
+ALTER TABLE "collect"."ofc_survey_work"
+	ADD CONSTRAINT "ofc_survey_work_name_key"
+	UNIQUE ("name");
+ALTER TABLE "collect"."ofc_survey_work"
+	ADD CONSTRAINT "ofc_survey_work_uri_key"
 	UNIQUE ("uri");
 ALTER TABLE "collect"."ofc_taxon"
 	ADD CONSTRAINT "ofc_taxon_id_key"
@@ -155,7 +169,7 @@ INSERT INTO "collect"."ofc_config" ("name", "value") VALUES
 	('index_path', '/home/openforis/collect-index');
 
 INSERT INTO collect.ofc_user(id, username, password ,enabled)
-VALUE (nextval('collect.ofc_user_id_seq'), 'admin', '21232f297a57a5a743894a0e4a801fc3', 'Y');
+VALUES (nextval('collect.ofc_user_id_seq'), 'admin', '21232f297a57a5a743894a0e4a801fc3', 'Y');
 
 INSERT INTO collect.ofc_user_role(id, user_id, role)
 VALUES (nextval('collect.ofc_user_role_id_seq'), currval('collect.ofc_user_id_seq'), 'ROLE_ADMIN');

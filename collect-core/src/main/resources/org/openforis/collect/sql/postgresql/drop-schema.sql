@@ -1,5 +1,6 @@
 DROP SEQUENCE "collect"."ofc_record_id_seq";
 DROP SEQUENCE "collect"."ofc_survey_id_seq";
+DROP SEQUENCE "collect"."ofc_survey_work_id_seq";
 DROP SEQUENCE "collect"."ofc_taxonomy_id_seq";
 DROP SEQUENCE "collect"."ofc_taxon_id_seq";
 DROP SEQUENCE "collect"."ofc_taxon_vernacular_name_id_seq";
@@ -22,6 +23,10 @@ ALTER TABLE "collect"."ofc_record"
 	DROP CONSTRAINT "ofc_record_created_by_user_fkey" CASCADE;
 ALTER TABLE "collect"."ofc_record"
 	DROP CONSTRAINT "ofc_record_modified_by_user_fkey" CASCADE;
+ALTER TABLE "collect"."ofc_survey_work"
+	DROP CONSTRAINT "ofc_survey_work_name_key" CASCADE;
+ALTER TABLE "collect"."ofc_survey_work"
+	DROP CONSTRAINT "ofc_survey_work_uri_key" CASCADE;
 ALTER TABLE "collect"."ofc_survey"
 	DROP CONSTRAINT "ofc_survey_name_key" CASCADE;
 ALTER TABLE "collect"."ofc_survey"
@@ -36,6 +41,7 @@ DROP TABLE IF EXISTS "collect"."ofc_config";
 DROP TABLE IF EXISTS "collect"."ofc_logo";
 DROP TABLE IF EXISTS "collect"."ofc_record";
 DROP TABLE IF EXISTS "collect"."ofc_schema_definition";
+DROP TABLE IF EXISTS "collect"."ofc_survey_work";
 DROP TABLE IF EXISTS "collect"."ofc_survey";
 DROP TABLE IF EXISTS "collect"."ofc_taxon";
 DROP TABLE IF EXISTS "collect"."ofc_taxon_vernacular_name";

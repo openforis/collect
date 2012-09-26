@@ -43,10 +43,7 @@
 			</tabbox>
 		</vlayout>
 		
-		<label visible="@load(empty vmsgs)"
-			value="@load(empty vmsgs ? labels.survey.successfully_saved : '', before='save')" />
-		
-		<hbox spacing="20px" align="center">
+		<hbox width="100%" spacing="40px" align="center">
 			<button label="Save" onClick="@command('save')" />
 				
 			<button label="Cancel" onClick="" self="@{action(cancel)}" />

@@ -15,12 +15,9 @@ import java.util.Map;
 import org.apache.commons.io.IOUtils;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SurveySummary;
-import org.openforis.collect.model.ui.UIConfiguration;
 import org.openforis.collect.persistence.SurveyDao;
 import org.openforis.collect.persistence.SurveyImportException;
-import org.openforis.idm.metamodel.Configuration;
 import org.openforis.idm.metamodel.LanguageSpecificText;
-import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.xml.InvalidIdmlException;
 import org.openforis.idm.util.CollectionUtil;
@@ -62,18 +59,20 @@ public class SurveyManager {
 		surveysByUri.put(survey.getUri(), survey);
 	}
 	
-	public CollectSurvey createSurvey() {
-		CollectSurvey survey = new CollectSurvey();
-		Schema schema = new Schema();
-		survey.setSchema(schema);
-		Configuration config = new UIConfiguration();
-		survey.addConfiguration(config);
-		return survey;
-	}
-	
 	public List<CollectSurvey> getAll() {
 		return CollectionUtil.unmodifiableList(surveys);
 	}
+	
+	public List<CollectSurvey> getAllPublished() {
+		List<CollectSurvey> result = new ArrayList<CollectSurvey>();
+		for (CollectSurvey survey : surveys) {
+			if ( survey.isPublished() ) {
+				result.add(survey);
+			}
+		}
+		return CollectionUtil.unmodifiableList(result);
+	}
+	
 
 	@Transactional
 	public CollectSurvey get(String name) {
