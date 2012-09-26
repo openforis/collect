@@ -104,13 +104,15 @@ public class SurveyLayoutEditVM extends SurveyEditBaseVM {
 			UIConfiguration uiConf = survey.getUIConfiguration();
 			UITab oldTab = uiConf.getTab(node, false);
 			uiConf.removeTabAssociation(node);
-			postNodePerTabChangedCommand(oldTab);
+			if ( oldTab != null ) {
+				postNodePerTabChangedCommand(oldTab);
+			}
 		}
 	}
 
-	protected void postNodePerTabChangedCommand(UITab oldTab) {
+	protected void postNodePerTabChangedCommand(UITab tab) {
 		Map<String, Object> args = new HashMap<String, Object>();
-		args.put("tab", oldTab);
+		args.put("tab", tab);
 		BindUtils.postGlobalCommand(null, null, NODES_PER_TAB_CHANGED_GLOABAL_COMMAND, args);
 	}
 	
