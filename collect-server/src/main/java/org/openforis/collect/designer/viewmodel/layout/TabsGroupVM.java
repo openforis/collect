@@ -78,13 +78,14 @@ public class TabsGroupVM extends BaseVM {
 		openTabLabelEditPopUp(tab);
 	}
 
-	private void openTabLabelEditPopUp(final UITab tab) {
+	protected void openTabLabelEditPopUp(final UITab tab) {
 		tabLabelPopUp = openPopUp(TAB_LABEL_POPUP_URL, true);
 		Button okButton = (Button) tabLabelPopUp.query("#okBtn");
+		final Textbox textbox = (Textbox) tabLabelPopUp.query("#textbox");
+		textbox.setText(tab.getLabel());
 		okButton.addEventListener("onClick", new EventListener<Event>() {
 			@Override
 			public void onEvent(Event event) throws Exception {
-				Textbox textbox = (Textbox) tabLabelPopUp.query("#textbox");
 				String label = textbox.getText();
 				label.trim();
 				if ( validateTabLabel(label) ) {

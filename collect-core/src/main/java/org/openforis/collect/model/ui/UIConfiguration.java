@@ -91,6 +91,10 @@ public class UIConfiguration implements Configuration, Serializable {
 	}
 	
 	public UITab getTab(NodeDefinition nodeDefn) {
+		return getTab(nodeDefn, true);
+	}
+	
+	public UITab getTab(NodeDefinition nodeDefn, boolean includeInherited) {
 		UITab tab = null;
 		EntityDefinition rootEntity = nodeDefn.getRootEntity();
 		UITabDefinition tabDefinition = getTabDefinition(rootEntity);
@@ -103,7 +107,7 @@ public class UIConfiguration implements Configuration, Serializable {
 				UITab parentTab = getTab(parentDefn);
 				if ( parentTab != null && StringUtils.isNotBlank(tabName) ) {
 					tab = parentTab.getTab(tabName);
-				} else {
+				} else if ( includeInherited ) {
 					tab = parentTab;
 				}
 			}

@@ -86,6 +86,12 @@ public class EditableListOfNodesVM extends BaseVM {
 		return nodeDefn instanceof EntityDefinition;
 	}
 	
+	public boolean isTabInherited(NodeDefinition nodeDefn) {
+		UIConfiguration uiConf = getUIConfiguration();
+		UITab tab = uiConf.getTab(nodeDefn, false);
+		return tab != null;
+	}
+	
 	@Command
 	@NotifyChange({"nodesPerTab"})
 	public void removeTabAssociation(@BindingParam("node") NodeDefinition node) {
