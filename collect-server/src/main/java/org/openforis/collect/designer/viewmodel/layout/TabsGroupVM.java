@@ -4,7 +4,9 @@
 package org.openforis.collect.designer.viewmodel.layout;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Stack;
 
 import org.apache.commons.lang3.StringUtils;
@@ -43,6 +45,8 @@ import org.zkoss.zul.Window;
 public class TabsGroupVM extends BaseVM {
 
 	private static final String TAB_LABEL_POPUP_URL = "/view/designer/component/schema_layout/tab_label_popup.zul";
+
+	private static final String TAB_CHANGED_GLOBAL_COMMAND = "tabChanged";
 	
 	public static UITab FAKE_ADD_TAB;
 	
@@ -75,6 +79,7 @@ public class TabsGroupVM extends BaseVM {
 		String tabName = generateNewTabName(tabsGroup);
 		tab.setName(tabName);
 		tabsGroup.addTab(tab);
+		postTabChangedCommand(tabsGroup);
 		openTabLabelEditPopUp(tab);
 	}
 
@@ -125,12 +130,19 @@ public class TabsGroupVM extends BaseVM {
 			if ( nodesPerTab.isEmpty() ) {
 				UITabsGroup parent = tab.getParent();
 				parent.removeTab(tab);
+				postTabChangedCommand(parent);
 			} else {
 				MessageUtil.showWarning("survey.layout.tab.remove.error.associated_nodes_present");
 			}
 		} else {
 			MessageUtil.showWarning("survey.layout.tab.remove.error.nested_tabs_present");
 		}
+	}
+
+	private void postTabChangedCommand(UITabsGroup parent) {
+		Map<String, Object> args = new HashMap<String, Object>();
+		args.put("tab", parent);
+		BindUtils.postGlobalCommand(null, null, TAB_CHANGED_GLOBAL_COMMAND, args);
 	}
 	
 	private String generateNewTabName(UITabsGroup parentGroup) {

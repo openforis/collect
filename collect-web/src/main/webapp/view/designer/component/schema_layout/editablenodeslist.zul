@@ -1,9 +1,10 @@
 <zk>
 	<div
 		apply="org.zkoss.bind.BindComposer"
-		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.layout.EditableListOfNodesVM')">
+		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.layout.EditableListOfNodesVM')"
+		width="100%">
 		<listbox id="listOfNodesListbox"
-			model="@load(vm.nodesPerTab) @template(vm.getTemplateName(each))"
+			model="@load(vm.nodes) @template(vm.getTemplateName(each))"
 			droppable="true" style="min-height: 150px">
 			<listhead>
 				<listheader width="100px" />
@@ -11,58 +12,56 @@
 				<listheader width="100%" />
 			</listhead>
 			<template name="attribute">
-				<listitem>
-                    <listcell span="2">
+				<listitem draggable="true">
+                    <listcell span="3">
                     	<label value="@load(each.name)" />
-                    </listcell>
-                    <listcell>
-                    	<button image="/assets/images/cross-small.png"
-                    		visible="@load(vm.isTabInherited(each))"
-                     		onClick="@command('removeTabAssociation', node=each)" />
                     </listcell>
                 </listitem>
 			</template>
 			<template name="entity">
-				<listitem>
+				<listitem draggable="true">
                     <listcell span="3">
                     	<vlayout>
 	                    	<hlayout>
 	                    		<box width="160px">
 			                    	<label value="@load(each.name)" />
 	                    		</box>
-		                    	<button image="/assets/images/cross-small.png"
-		                    		visible="@load(vm.isTabInherited(each))"
-		                     		onClick="@command('removeTabAssociation', node=each)" />
 	                    	</hlayout>
 	                    	<hlayout>
 	                    		<separator width="50px" />
-		                    	<vlayout children="@load(each.childDefinitions)">
-	                    			<template name="children">
-		                    			<label value="@load(each.name)" />
-		                    		</template>
-		                    	</vlayout>
+		                    	<include src="/view/designer/component/schema_layout/editablenodeslist.zul"
+									tab="${vm.tab}" nodes="${each.childDefinitions}" />
 	                    	</hlayout>
 	                    </vlayout>
                     </listcell>
                 </listitem>
 			</template>
 			<template name="multiple_entity_table">
-				<listitem>
+				<listitem draggable="true">
                     <listcell span="3">
                     	<vlayout>
 	                    	<hlayout>
 	                    		<box width="100px">
 			                    	<label value="@load(each.name)" />
 	                    		</box>
-	                    		<toolbar>
-	                    			<toolbarbutton image="/assets/images/edit-small.png" popup="formLayoutPopup" />
-		                    		<toolbarbutton image="/assets/images/cross-small.png"
-			                     		visible="@load(vm.isTabInherited(each))"
-			                     		onClick="@command('removeTabAssociation', node=each)" />
-			                     </toolbar>
+	                    		<menubar>
+		                    		<menu image="/assets/images/edit-small.png">
+					                    <menupopup>
+											<menuitem label="${labels.survey.layout.multiple_entity_layout.form}" 
+												value="FORM"
+			                               		onClick="@command('setLayout', type=self.value, node=each)" 
+			                               		checkmark="true" checked="${vm.hasLayout(each, self.value)}" />
+			                               	<menuitem label="${labels.survey.layout.multiple_entity_layout.table}" 
+			                               		value="TABLE"
+			                               		onClick="@command('setLayout', type=self.value, node=each)"
+			                               		checkmark="true" checked="${vm.hasLayout(each, self.value)}" />
+			                           	</menupopup>
+			                        </menu>
+			                    </menubar>
 	                    	</hlayout>
 	                    	<hlayout>
 	                    		<separator width="150px" />
+	                    		<!-- table rapresentation of the entity -->
 		                    	<listbox>
 		                    		<listhead children="@load(each.childDefinitions)">
 			                    		<template name="children">
@@ -82,7 +81,7 @@
                 </listitem>
 			</template>
 			<template name="multiple_entity_form">
-				<listitem>
+				<listitem draggable="true">
                     <listcell span="3">
 						<vlayout width="100%" height="100%">
 	                    	<hlayout>
@@ -103,18 +102,17 @@
 			                           	</menupopup>
 			                        </menu>
 		                    	</menubar>
-		                    	<button image="/assets/images/cross-small.png"
-		                    		visible="@load(vm.isTabInherited(each))"
-		                     		onClick="@command('removeTabAssociation', node=each)" />
 		                    </hlayout>
    	                    	<!-- child definitions (visible only if there are no subtabs -->
 		                    <hlayout visible="@load(empty vm.tabs)">
 	                    		<separator width="50px" />
-		                    	<vlayout children="@load(vm.getChildDefinitionsInTab(each))">
-	                    			<template name="children">
-		                    			<label value="@load(each.name)" />
-		                    		</template>
-		                    	</vlayout>
+<!-- 		                    	<vlayout children="@load(vm.getChildDefinitionsInTab(each))"> -->
+<!-- 	                    			<template name="children"> -->
+<!-- 		                    			<label value="@load(each.name)" /> -->
+<!-- 		                    		</template> -->
+<!-- 		                    	</vlayout> -->
+		                    	<include src="/view/designer/component/schema_layout/editablenodeslist.zul"
+									tab="${vm.tab}" nodes="${vm.getChildDefinitionsInTab(each)}" />
 	                    	</hlayout>
 		                    <include defer="true" 
 								src="/view/designer/component/schema_layout/tabsgroup.zul"
@@ -127,16 +125,4 @@
 			</template>
 		</listbox>
 	</div>
-	<menupopup id="formLayoutPopup">
-		<menuitem
-			label="${labels.survey.layout.multiple_entity_layout.form}"
-			value="FORM"
-			onClick="@command('setLayout', type=self.value, node=each)"
-			checkmark="true" checked="${vm.hasLayout(each, self.value)}" />
-		<menuitem
-			label="${labels.survey.layout.multiple_entity_layout.table}"
-			value="TABLE"
-			onClick="@command('setLayout', type=self.value, node=each)"
-			checkmark="true" checked="${vm.hasLayout(each, self.value)}" />
-	</menupopup>
 </zk>

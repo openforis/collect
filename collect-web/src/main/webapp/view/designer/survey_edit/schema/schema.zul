@@ -8,9 +8,9 @@
 		 		width="300px"
 		 		splittable="true">
 		 		<borderlayout>
-		 			<north>
+		 			<center>
 						<tree id="nodesTree"
-							width="100%" height="300px"
+							width="100%" vflex="true"
 							model="@load(vm.nodes)"
 							onSelect="@command('nodeSelected', node=self.selectedItem)">
 							<template name="model">
@@ -21,7 +21,7 @@
 					            </treeitem>
 					  		</template>
 					    </tree>
-		 			</north>
+		 			</center>
 		 			<south>
 				        <menubar width="100%">
 					        <menuitem label="${labels.survey.schema.add_root_entity}" 

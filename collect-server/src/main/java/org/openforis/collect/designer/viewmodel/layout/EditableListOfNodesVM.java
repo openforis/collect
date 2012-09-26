@@ -12,6 +12,7 @@ import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.ui.UIConfiguration;
 import org.openforis.collect.model.ui.UIConfiguration.Layout;
 import org.openforis.collect.model.ui.UITab;
+import org.openforis.collect.model.ui.UITabsGroup;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.zkoss.bind.BindUtils;
@@ -20,6 +21,7 @@ import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.ContextParam;
 import org.zkoss.bind.annotation.ContextType;
+import org.zkoss.bind.annotation.DependsOn;
 import org.zkoss.bind.annotation.ExecutionArgParam;
 import org.zkoss.bind.annotation.GlobalCommand;
 import org.zkoss.bind.annotation.Init;
@@ -39,10 +41,12 @@ import org.zkoss.zul.Treeitem;
 public class EditableListOfNodesVM extends BaseVM {
 
 	private UITab tab;
+	private List<NodeDefinition> nodes;
 
 	@Init
-	public void init(@ExecutionArgParam("tab") UITab tab) {
+	public void init(@ExecutionArgParam("tab") UITab tab, @ExecutionArgParam("nodes") List<NodeDefinition> nodes) {
 		this.tab = tab;
+		this.nodes = nodes;
 	}
 	
 	@AfterCompose
@@ -75,13 +79,6 @@ public class EditableListOfNodesVM extends BaseVM {
 		}
 	}
 	
-	@GlobalCommand
-	public void nodeAssignedToTab(@BindingParam("oldTab") UITab oldTab, @BindingParam("newTab") UITab newTab) {
-		if ( oldTab != null && oldTab.equals(tab) || newTab != null && newTab.equals(tab) ) {
-			BindUtils.postNotifyChange(null, null, this, "nodesPerTab");
-		}
-	}
-	
 	public boolean isEntity(NodeDefinition nodeDefn) {
 		return nodeDefn instanceof EntityDefinition;
 	}
@@ -94,21 +91,17 @@ public class EditableListOfNodesVM extends BaseVM {
 	
 	@Command
 	@NotifyChange({"nodesPerTab"})
-	public void removeTabAssociation(@BindingParam("node") NodeDefinition node) {
-		UIConfiguration uiConf = getUIConfiguration();
-		uiConf.removeTabAssociation(node);
-	}
-	
-	@Command
-	@NotifyChange({"nodesPerTab"})
 	public void setLayout(@BindingParam("type") String type, @BindingParam("node") NodeDefinition node) {
 		UIConfiguration uiConf = getUIConfiguration();
 		Layout layout = Layout.valueOf(type);
 		uiConf.setLayout(node, layout);
 	}
 	
-	public UITab getTab() {
-		return tab;
+	@GlobalCommand
+	public void tabChanged(@BindingParam("tab") UITabsGroup tab) {
+		if ( tab.equals(this.tab) ) {
+			BindUtils.postNotifyChange(null, null, this, "tab");
+		}
 	}
 	
 	public String getTemplateName(NodeDefinition nodeDefn) {
@@ -134,12 +127,6 @@ public class EditableListOfNodesVM extends BaseVM {
 		UIConfiguration uiConf = getUIConfiguration();
 		Layout nodeLayout = uiConf.getLayout(entityDefn);
 		return nodeLayout.name().equals(layout);
-	}
-	
-	public List<NodeDefinition> getNodesPerTab() {
-		UIConfiguration uiConf = getUIConfiguration();
-		List<NodeDefinition> result = uiConf.getNodesPerTab(tab, false);
-		return result;
 	}
 	
 	public List<NodeDefinition> getChildDefinitions(EntityDefinition entityDefn) {
@@ -172,6 +159,18 @@ public class EditableListOfNodesVM extends BaseVM {
 		uiConf.setSurvey(survey);
 		return uiConf;
 	}
+
+	public List<NodeDefinition> getNodes() {
+		return nodes;
+	}
 	
+	public UITab getTab() {
+		return tab;
+	}
+	
+	@DependsOn("tab")
+	public List<UITab> getTabs() {
+		return tab != null ? tab.getTabs(): null;
+	}
 	
 }

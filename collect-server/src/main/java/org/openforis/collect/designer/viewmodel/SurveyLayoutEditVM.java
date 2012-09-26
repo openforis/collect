@@ -6,6 +6,7 @@ import java.util.Map;
 import org.openforis.collect.designer.component.SchemaTreeModel;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.ui.UIConfiguration;
+import org.openforis.collect.model.ui.UITab;
 import org.openforis.collect.model.ui.UITabDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -18,10 +19,14 @@ import org.zkoss.bind.annotation.ContextType;
 import org.zkoss.bind.annotation.GlobalCommand;
 import org.zkoss.bind.annotation.NotifyChange;
 import org.zkoss.zk.ui.Component;
+import org.zkoss.zk.ui.event.DropEvent;
 import org.zkoss.zk.ui.select.Selectors;
+import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zul.DefaultTreeModel;
 import org.zkoss.zul.Include;
+import org.zkoss.zul.Listitem;
+import org.zkoss.zul.Tree;
 import org.zkoss.zul.TreeNode;
 import org.zkoss.zul.Treeitem;
 
@@ -32,17 +37,20 @@ import org.zkoss.zul.Treeitem;
  */
 public class SurveyLayoutEditVM extends SurveyEditBaseVM {
 
+	private static final String NODES_PER_TAB_CHANGED_GLOABAL_COMMAND = "nodesPerTabChanged";
 	private static final String TABSGROUP_URL = "/view/designer/component/schema_layout/tabsgroup.zul";
 	private UITabDefinition tabsDefinition;
 	private SchemaTreeModel treeModel;
-	private NodeDefinition selectedNode;
 	
+	@Wire
+	private Tree nodesTree;
 	@Wire
 	private Include tabsGroupContainerInclude;
 	
 	@AfterCompose
 	public void afterCompose(@ContextParam(ContextType.VIEW) Component view){
 		 Selectors.wireComponents(view, this, false);
+		 Selectors.wireEventListeners(view, this);
 	}
 	
 	@GlobalCommand
@@ -52,27 +60,58 @@ public class SurveyLayoutEditVM extends SurveyEditBaseVM {
 	}
 	
 	@Command
-	@NotifyChange({"tabDefinition","selectedNode"})
+	@NotifyChange({"tabDefinition"})
 	public void nodeSelected(@BindingParam("node") Treeitem node) {
-		if ( node != null ) {
-			TreeNode<NodeDefinition> treeNode = node.getValue();
-			selectedNode = treeNode.getData();
-			UIConfiguration uiConfiguration = survey.getUIConfiguration();
-			EntityDefinition rootEntity = selectedNode.getRootEntity();
-			tabsDefinition = uiConfiguration.getTabDefinition(rootEntity);
-		} else {
-			selectedNode = null;
-			tabsDefinition = null;
-		}
+		UITabDefinition tabDefinition = extractTabDefinition(node);
+		refreshTabDefinitionLayoutPanel(tabDefinition);
+		this.tabsDefinition = tabDefinition;
+		postTabDefinitionChangedCommand();
+	}
+
+	protected void postTabDefinitionChangedCommand() {
 		Map<String, Object> args = new HashMap<String, Object>();
 		args.put("tabDefinition", tabsDefinition);
 		BindUtils.postGlobalCommand(null, null, "tabDefinitionChanged", args);
-		
-		tabsGroupContainerInclude.setSrc(null);
-		if ( tabsDefinition != null ) {
-			tabsGroupContainerInclude.setDynamicProperty("tabsGroup", tabsDefinition);
+	}
+
+	protected void refreshTabDefinitionLayoutPanel(UITabDefinition tabDefinition) {
+		if ( tabDefinition == null ) {
+			tabsGroupContainerInclude.setSrc(null);
+		} else if ( this.tabsDefinition != tabDefinition) {
+			tabsGroupContainerInclude.setDynamicProperty("tabsGroup", tabDefinition);
 			tabsGroupContainerInclude.setSrc(TABSGROUP_URL);
 		}
+	}
+	
+	protected UITabDefinition extractTabDefinition(Treeitem treeItem) {
+		if ( treeItem != null ) {
+			TreeNode<NodeDefinition> treeNode = treeItem.getValue();
+			NodeDefinition nodeDefn = treeNode.getData();
+			UIConfiguration uiConfiguration = survey.getUIConfiguration();
+			EntityDefinition rootEntity = nodeDefn.getRootEntity();
+			return uiConfiguration.getTabDefinition(rootEntity);
+		} else {
+			return null;
+		}
+	}
+	
+	@Listen("onDrop = tree#nodesTree")
+	public void listOfNodesDropHandler(DropEvent evt) {
+		Component dragged = evt.getDragged();
+		if ( dragged instanceof Listitem ) {
+			NodeDefinition node = ((Listitem) dragged).getValue();
+			CollectSurvey survey = getSurvey();
+			UIConfiguration uiConf = survey.getUIConfiguration();
+			UITab oldTab = uiConf.getTab(node, false);
+			uiConf.removeTabAssociation(node);
+			postNodePerTabChangedCommand(oldTab);
+		}
+	}
+
+	protected void postNodePerTabChangedCommand(UITab oldTab) {
+		Map<String, Object> args = new HashMap<String, Object>();
+		args.put("tab", oldTab);
+		BindUtils.postGlobalCommand(null, null, NODES_PER_TAB_CHANGED_GLOABAL_COMMAND, args);
 	}
 	
 	public UITabDefinition getTabDefinition() {
@@ -90,10 +129,5 @@ public class SurveyLayoutEditVM extends SurveyEditBaseVM {
 		CollectSurvey survey = getSurvey();
 		treeModel = SchemaTreeModel.createInstance(survey);
 	}
-
-	public NodeDefinition getSelectedNode() {
-		return selectedNode;
-	}
-	
 
 }

@@ -1,6 +1,9 @@
 <zk>
-	<div apply="org.openforis.collect.designer.composer.TabsGroupPanelComposer">
+	<div 
+		apply="org.zkoss.bind.BindComposer"
+		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.layout.TabsGroupPanelVM')">
+		
 		<include id="listOfNodesInclude" src="/view/designer/component/schema_layout/editablenodeslist.zul"
-			tab="${$composer.tab}" />
+			tab="${vm.tab}" nodes="${vm.nodesPerTab}" />
 	</div>
 </zk>
