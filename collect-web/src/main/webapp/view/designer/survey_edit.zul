@@ -1,13 +1,24 @@
 <?page title="Openforis Collect Designer - Edit Survey" contentType="text/html;charset=UTF-8"?>
 <?init class="org.zkoss.zk.ui.util.Composition" arg0="layouts/template.zul"?>
 <zk>
+	
 	<vbox id="surveyEditBox"
 		hflex="1" vflex="1"
 		self="@define(content)"
-		apply="org.zkoss.bind.BindComposer"
-		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SurveyEditVM')">
-		
-		<vlayout  hflex="1" vflex="1">
+		apply="org.openforis.collect.designer.composer.SurveyEditComposer"
+		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SurveyEditVM')"
+	 	xmlns:w="client">
+	 	
+		<script type="text/javascript"><![CDATA[
+			function switchTab(notify, init){
+				if (this.desktop && !init && notify) {
+					zAu.send(new zk.Event(this, 'onSwitchTab'));
+				} else {
+					this.$_sel(notify, init); //call the original method
+				}
+			}
+		]]></script>
+		<vlayout hflex="1" vflex="1">
 			<!-- language selector -->
 			<hlayout width="100%" style="text-align: right;">
 				<label value="${labels.survey.selected_language}:" />
@@ -25,9 +36,12 @@
 			<!-- main tabs -->
 			<tabbox id="tb" hflex="1" vflex="1">
 			    <tabs id="tabs">
-			        <tab id="surveyTab" label="${labels.survey.$}" />
-			        <tab id="schemaTab" label="${labels.survey.schema.$}" />
-			        <tab id="layoutTab" label="${labels.survey.layout.$}" />
+			        <tab id="surveyTab" label="${labels.survey.$}"
+			        	 w:_sel="switchTab" forward="onSwitchTab=onSwitchTab" />
+			        <tab id="schemaTab" label="${labels.survey.schema.$}"
+			        	 w:_sel="switchTab" forward="onSwitchTab=onSwitchTab" />
+			        <tab id="layoutTab" label="${labels.survey.layout.$}"
+			        	 w:_sel="switchTab" forward="onSwitchTab=onSwitchTab"  />
 			    </tabs>
 			    <tabpanels>
 			        <tabpanel>

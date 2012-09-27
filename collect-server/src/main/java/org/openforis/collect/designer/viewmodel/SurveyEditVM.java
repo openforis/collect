@@ -10,12 +10,21 @@ import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.model.LanguageConfiguration;
 import org.openforis.collect.persistence.SurveyImportException;
 import org.zkoss.bind.BindUtils;
+import org.zkoss.bind.annotation.AfterCompose;
 import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
+import org.zkoss.bind.annotation.ContextParam;
+import org.zkoss.bind.annotation.ContextType;
 import org.zkoss.bind.annotation.GlobalCommand;
 import org.zkoss.bind.annotation.Init;
 import org.zkoss.bind.annotation.NotifyChange;
+import org.zkoss.zk.ui.Component;
+import org.zkoss.zk.ui.event.Event;
+import org.zkoss.zk.ui.select.Selectors;
+import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zkplus.databind.BindingListModelList;
+import org.zkoss.zul.Tab;
+import org.zkoss.zul.Tabbox;
 import org.zkoss.zul.Window;
 
 /**
@@ -31,6 +40,21 @@ public class SurveyEditVM extends SurveyEditBaseVM {
 	
 	private Window selectLanguagePopUp;
 	private Window srsPopUp;
+	
+	@AfterCompose
+	public void afterCompose(@ContextParam(ContextType.VIEW) Component view){
+		 Selectors.wireComponents(view, this, false);
+		 Selectors.wireEventListeners(view, this);
+	}
+	
+//	@Listen("onSwitchTab = tab")
+//	public void onSwitchTab(Event event) throws InterruptedException {
+//		if ( isCurrentFormValid() ) {
+//			Tab tab = (Tab) event.getTarget();
+//			Tabbox tabbox = tab.getTabbox();
+//			tabbox.setSelectedTab(tab);
+//		}
+//	}
 	
 	@Override
 	@Init(superclass=false)

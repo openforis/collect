@@ -68,8 +68,10 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 						formObject = new FileAttributeDefinitionFormObject();
 						break;
 					case NUMBER:
-					case RANGE:
 						formObject = new NumberAttributeDefinitionFormObject();
+						break;
+					case RANGE:
+						formObject = new RangeAttributeDefinitionFormObject();
 						break;
 					case TEXT:
 						formObject = new TextAttributeDefinitionFormObject();

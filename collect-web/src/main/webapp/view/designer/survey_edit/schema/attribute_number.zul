@@ -12,6 +12,8 @@
 
 		<include src="survey_edit/schema/attribute_common.zul" />
 		
+		<include src="survey_edit/schema/attribute_numeric_common.zul" />
+		
 		<grid>
 			<columns>
 				<column label="" width="150px" />
