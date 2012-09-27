@@ -6,6 +6,7 @@ package org.openforis.collect.designer.viewmodel;
 import java.util.List;
 
 import org.openforis.collect.designer.session.SessionStatus;
+import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.model.LanguageConfiguration;
 import org.openforis.collect.persistence.SurveyImportException;
 import org.zkoss.bind.BindUtils;
@@ -23,8 +24,10 @@ import org.zkoss.zul.Window;
  */
 public class SurveyEditVM extends SurveyEditBaseVM {
 
-	private static final String SURVEY_SELECT_LANGUAGE_POP_UP_URL = "survey_edit/select_language_popup.zul";
+	private static final String SELECT_LANGUAGE_POP_UP_URL = "survey_edit/select_language_popup.zul";
 	private static final String SRS_MANAGER_POP_UP_URL = "survey_edit/srs_popup.zul";
+	
+	private static final String SURVEY_SUCCESSFULLY_SAVED_MESSAGE_KEY = "survey.successfully_saved";
 	
 	private Window selectLanguagePopUp;
 	private Window srsPopUp;
@@ -34,6 +37,7 @@ public class SurveyEditVM extends SurveyEditBaseVM {
 	public void init() {
 		super.init();
 		if ( currentLanguageCode == null ) {
+			//TEST
 			currentLanguageCode = "eng";
 			LanguageConfiguration languageConfiguration = new LanguageConfiguration();
 			languageConfiguration.addLanguageCode(currentLanguageCode);
@@ -44,7 +48,7 @@ public class SurveyEditVM extends SurveyEditBaseVM {
 	@Command
 	public void openLanguageManagerPopUp() {
 		if ( checkCurrentFormValid() ) {
-			selectLanguagePopUp = openPopUp(SURVEY_SELECT_LANGUAGE_POP_UP_URL, true);
+			selectLanguagePopUp = openPopUp(SELECT_LANGUAGE_POP_UP_URL, true);
 		}
 	}
 	
@@ -71,16 +75,13 @@ public class SurveyEditVM extends SurveyEditBaseVM {
 	public void save() throws SurveyImportException {
 		if ( checkCurrentFormValid() ) {
 			surveyWorkManager.save(survey);
+			MessageUtil.showInfo(SURVEY_SUCCESSFULLY_SAVED_MESSAGE_KEY);
 		}
 	}
 	
 	@GlobalCommand
 	@NotifyChange({"availableLanguages"})
 	public void surveyLanguagesChanged() {
-		closeSelectLanguagePopUp();
-	}
-
-	private void closeSelectLanguagePopUp() {
 		closePopUp(selectLanguagePopUp);
 	}
 	

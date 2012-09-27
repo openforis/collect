@@ -40,7 +40,6 @@ import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zul.DefaultTreeModel;
-import org.zkoss.zul.Listitem;
 import org.zkoss.zul.Tree;
 import org.zkoss.zul.TreeNode;
 import org.zkoss.zul.Treeitem;
@@ -53,12 +52,17 @@ import org.zkoss.zul.Treeitem;
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class SurveySchemaEditVM extends SurveyEditBaseVM {
 
-	private static final String SCHEMA_CHANGED_GLOBAL_COMMAND = "schemaChanged";
 	private static final String VERSIONING_POPUP_URL = "versioning_popup.zul";
-	private static final String ATTRIBUTE_DEFAULTS_FIELD = "attributeDefaults";
-	private static final String NUMBER_ATTRIBUTE_PRECISIONS_FIELD = "precisions";
 	private static final String CODE_LISTS_POPUP_URL = "code_lists_popup.zul";
 	private static final String SRS_POPUP_URL = "srs_popup.zul";
+	
+	private static final String SCHEMA_CHANGED_GLOBAL_COMMAND = "schemaChanged";
+	
+	private static final String ATTRIBUTE_DEFAULTS_FIELD = "attributeDefaults";
+	private static final String NUMBER_ATTRIBUTE_PRECISIONS_FIELD = "precisions";
+	
+	private static final String CONFIRM_REMOVE_NODE_MESSAGE_KEY = "survey.schema.confirm_remove_node";
+	private static final String CONFIRM_REMOVE_NON_EMPTY_ENTITY_MESSAGE_KEY = "survey.schema.confirm_remove_non_empty_entity";
 	
 	private SchemaTreeModel treeModel;
 	private NodeDefinition selectedNode;
@@ -79,6 +83,24 @@ public class SurveySchemaEditVM extends SurveyEditBaseVM {
 		 Selectors.wireEventListeners(view, this);
 	}
 	
+	@Listen("onDrop = tree#nodesTree")
+	public void nodesTreeDropHandler(DropEvent evt) {
+		Component dragged = evt.getDragged();
+		if ( dragged instanceof Treeitem ) {
+			Treeitem treeItem = (Treeitem) dragged;
+			if ( treeItem.getTree() == nodesTree ) {
+				NodeDefinitionTreeNode treeNode = ((Treeitem) dragged).getValue();
+				NodeDefinition nodeDefn = treeNode.getData();
+				Component target = evt.getTarget();
+				if ( target == nodesTree ) {
+					
+				} else if ( target instanceof Treeitem ) {
+					
+				}
+			}
+		}
+	}
+
 	@Command
 	@NotifyChange({"nodes","editingNode","nodeType","attributeType",
 		"tempFormObject","formObject","attributeDefaults","numericAttributePrecisions"})
@@ -113,58 +135,6 @@ public class SurveySchemaEditVM extends SurveyEditBaseVM {
 		}
 	}
 
-	@Listen("onDrop = tree#nodesTree")
-	public void nodesTreeDropHandler(DropEvent evt) {
-		Component dragged = evt.getDragged();
-		if ( dragged instanceof Treeitem ) {
-			Treeitem treeItem = (Treeitem) dragged;
-			if ( treeItem.getTree() == nodesTree ) {
-				NodeDefinitionTreeNode treeNode = ((Treeitem) dragged).getValue();
-				NodeDefinition nodeDefn = treeNode.getData();
-				Component target = evt.getTarget();
-				if ( target == nodesTree ) {
-					
-				} else if ( target instanceof Treeitem ) {
-					
-				}
-			}
-		}
-	}
-
-	protected EntityDefinition createRootEntityNode() {
-		EntityDefinition newNode = (EntityDefinition) NodeType.createNodeDefinition(survey, NodeType.ENTITY, null);
-		Schema schema = survey.getSchema();
-		schema.addRootEntityDefinition((EntityDefinition) newNode);
-		UITabDefinition tabDefn = createRootTabDefinition(newNode);
-		createFirstTab(newNode, tabDefn);
-		return newNode;
-	}
-
-	private void createFirstTab(EntityDefinition newNode,
-			UITabDefinition tabDefn) {
-		UITab tab = new UITab();
-		int tabPosition = 1;
-		String tabName = "tab_" + tabPosition;
-		tab.setName(tabName);
-		tabDefn.addTab(tab);
-		newNode.setAnnotation(UIConfiguration.TAB_NAME_ANNOTATION, tabName);
-	}
-
-	private UITabDefinition createRootTabDefinition(EntityDefinition newNode) {
-		UIConfiguration uiConf = survey.getUIConfiguration();
-		UITabDefinition tabDefn = new UITabDefinition();
-		int tabDefnPosition = uiConf.getTabDefinitions().size() + 1;
-		String tabDefnName = "tabdefn_" + tabDefnPosition;
-		tabDefn.setName(tabDefnName);
-		uiConf.addTabDefinition(tabDefn);
-		newNode.setAnnotation(UIConfiguration.TAB_DEFINITION_ANNOTATION, tabDefnName);
-		return tabDefn;
-	}
-
-	private void postSchemaChangedCommand() {
-		BindUtils.postGlobalCommand(null, null, SCHEMA_CHANGED_GLOBAL_COMMAND, null);
-	}
-	
 	@Command
 	@NotifyChange({"nodes","editingNode","nodeType","attributeType","tempFormObject","formObject",
 		"attributeDefaults","numericAttributePrecisions"})
@@ -178,6 +148,7 @@ public class SurveySchemaEditVM extends SurveyEditBaseVM {
 				
 				NodeType nodeTypeEnum = nodeType != null ? NodeType.valueOf(nodeType): null;
 				AttributeType attributeTypeEnum = attributeType != null ? AttributeType.valueOf(attributeType): null;
+				
 				NodeDefinition newNode = NodeType.createNodeDefinition(survey, nodeTypeEnum, attributeTypeEnum );
 				( (EntityDefinition) selectedNode).addChildDefinition(newNode);
 				treeModel.appendNodeToSelected(newNode);
@@ -188,6 +159,41 @@ public class SurveySchemaEditVM extends SurveyEditBaseVM {
 				MessageUtil.showWarning("survey.schema.add_node.error.parent_entity_not_selected");
 			}
 		}
+	}
+	
+	@Command
+	@NotifyChange({"nodes","editingNode","nodeType","attributeType","tempFormObject","formObject"})
+	public void removeNode() {
+		if ( selectedNode != null ) {
+			String confirmMessageKey;
+			if (selectedNode instanceof EntityDefinition && !((EntityDefinition) selectedNode).getChildDefinitions().isEmpty() ) {
+				confirmMessageKey = CONFIRM_REMOVE_NON_EMPTY_ENTITY_MESSAGE_KEY;
+			} else {
+				confirmMessageKey = CONFIRM_REMOVE_NODE_MESSAGE_KEY;
+			}
+			MessageUtil.showConfirm(new MessageUtil.ConfirmHandler() {
+				@Override
+				public void onOk() {
+					performRemoveSelectedNode();
+				}
+			}, confirmMessageKey);
+		}
+	}
+
+	private void performRemoveSelectedNode() {
+		EntityDefinition parentDefn = (EntityDefinition) selectedNode.getParentDefinition();
+		if ( parentDefn != null ) {
+			parentDefn.removeChildDefinition(selectedNode);
+		} else {
+			Schema schema = selectedNode.getSchema();
+			String nodeName = selectedNode.getName();
+			schema.removeRootEntityDefinition(nodeName);
+		}
+		treeModel.removeSelectedNode();
+		editingNode = false;
+		selectedNode = null;
+		tempFormObject = null;
+		formObject = null;
 	}
 	
 	@Command
@@ -248,6 +254,40 @@ public class SurveySchemaEditVM extends SurveyEditBaseVM {
 	@NotifyChange("numericAttributePrecisions")
 	public void deleteNumericAttributePrecision(@BindingParam("precision") Precision precision) {
 		numericAttributePrecisions.remove(precision);
+	}
+	
+	protected EntityDefinition createRootEntityNode() {
+		EntityDefinition newNode = (EntityDefinition) NodeType.createNodeDefinition(survey, NodeType.ENTITY, null);
+		Schema schema = survey.getSchema();
+		schema.addRootEntityDefinition((EntityDefinition) newNode);
+		UITabDefinition tabDefn = createRootTabDefinition(newNode);
+		createFirstTab(newNode, tabDefn);
+		return newNode;
+	}
+
+	protected void createFirstTab(EntityDefinition newNode,
+			UITabDefinition tabDefn) {
+		UITab tab = new UITab();
+		int tabPosition = 1;
+		String tabName = "tab_" + tabPosition;
+		tab.setName(tabName);
+		tabDefn.addTab(tab);
+		newNode.setAnnotation(UIConfiguration.TAB_NAME_ANNOTATION, tabName);
+	}
+
+	protected UITabDefinition createRootTabDefinition(EntityDefinition newNode) {
+		UIConfiguration uiConf = survey.getUIConfiguration();
+		UITabDefinition tabDefn = new UITabDefinition();
+		int tabDefnPosition = uiConf.getTabDefinitions().size() + 1;
+		String tabDefnName = "tabdefn_" + tabDefnPosition;
+		tabDefn.setName(tabDefnName);
+		uiConf.addTabDefinition(tabDefn);
+		newNode.setAnnotation(UIConfiguration.TAB_DEFINITION_ANNOTATION, tabDefnName);
+		return tabDefn;
+	}
+
+	protected void postSchemaChangedCommand() {
+		BindUtils.postGlobalCommand(null, null, SCHEMA_CHANGED_GLOBAL_COMMAND, null);
 	}
 	
 	protected void initAttributeDefaultsList() {

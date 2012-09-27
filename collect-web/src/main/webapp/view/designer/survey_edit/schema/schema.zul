@@ -12,10 +12,9 @@
 						<tree id="nodesTree"
 							width="100%" vflex="true"
 							model="@load(vm.nodes)"
-							onSelect="@command('nodeSelected', node=self.selectedItem)"
-							droppable="true">
+							onSelect="@command('nodeSelected', node=self.selectedItem)">
 							<template name="model">
-					            <treeitem draggable="true" droppable="true">
+					            <treeitem draggable="true">
 					                <treerow>
 					                    <treecell label="@load(each.data.name)"/>
 					                </treerow>
@@ -27,7 +26,6 @@
 				        <menubar width="100%">
 					        <menuitem label="${labels.survey.schema.add_root_entity}" 
 					        	onClick="@command('addRootEntity')" />
-			
 			                <menu label="${labels.survey.schema.add_node.label}">
 			                    <menupopup>
 	                                <menuitem label="${labels.survey.schema.node.type.entity}" value="ENTITY"
@@ -58,6 +56,8 @@
 	                                </menu>
 	                            </menupopup>
 			                </menu>
+							<menuitem label="${labels.survey.schema.remove_node}" 
+					        	onClick="@command('removeNode')" />
 			             </menubar>
 		 			</south>
 			    </borderlayout>

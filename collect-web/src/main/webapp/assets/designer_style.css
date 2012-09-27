@@ -1,7 +1,18 @@
 .error {
 	color: red;
 }
-
 .nopadding {
 	padding: 0px;
+}
+.z-groupbox-3d.insideForm {
+	margin: 5px;
+}
+.insideForm .z-groupbox-3d-cnt {
+	padding: 0px;
+}
+.z-groupbox-3d .open-false .z-caption-l {
+	background: url("images/arrow-down-small.png") no-repeat 0 0px;
+}
+.z-groupbox-3d .open-true .z-caption-l {
+	background: url("images/arrow-up-small.png") no-repeat 0 0px;;
 }

@@ -25,15 +25,6 @@ public abstract class SurveyItemEditVM<T> extends SurveyEditBaseVM {
 	protected T selectedItem;
 	protected T editedItem;
 	
-	//UI comopnents
-//	@Wire("#fx")
-//    Form form;
-//	
-//	@AfterCompose
-//    public void afterCompose(@ContextParam(ContextType.VIEW) Component view){
-//        Selectors.wireComponents(view, this, false);
-//	}
-	
 	@SuppressWarnings("unchecked")
 	public SurveyItemEditVM() {
 		this.genericType = (Class<T>) GenericTypeResolver.resolveTypeArgument(getClass(), SurveyItemEditVM.class);
