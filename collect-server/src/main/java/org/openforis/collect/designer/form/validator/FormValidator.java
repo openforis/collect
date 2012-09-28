@@ -53,22 +53,25 @@ public abstract class FormValidator extends AbstractValidator {
 
 	protected abstract void internalValidate(ValidationContext ctx);
 
-	protected void validateRequired(ValidationContext ctx,  String fieldName, Object value) {
+	protected boolean validateRequired(ValidationContext ctx,  String fieldName, Object value) {
 		if ( value == null || value instanceof String && StringUtils.isBlank((String) value)) {
 			this.addInvalidMessage(ctx, fieldName, Labels.getLabel(FIELD_REQUIRED_MESSAGE_KEY));
+			return false;
+		} else {
+			return true;
 		}
 	}
 	
-	protected void validateRequired(ValidationContext ctx, String fieldName) {
+	protected boolean validateRequired(ValidationContext ctx, String fieldName) {
 		Object value = getValue(ctx, fieldName);
-		validateRequired(ctx, fieldName, value);
+		return validateRequired(ctx, fieldName, value);
 	}
 	
-	protected void validateInternalName(ValidationContext ctx, String fieldName) {
-		validateRegEx(ctx, INTERNAL_NAME_REGEX, fieldName, INTERNAL_NAME_INVALID_VALUE_ERROR_KEY);
+	protected boolean validateInternalName(ValidationContext ctx, String fieldName) {
+		return validateRegEx(ctx, INTERNAL_NAME_REGEX, fieldName, INTERNAL_NAME_INVALID_VALUE_ERROR_KEY);
 	}
 	
-	protected void validateRegEx(ValidationContext ctx, String regex,
+	protected boolean validateRegEx(ValidationContext ctx, String regex,
 			String fieldName, String errorMessageKey) {
 		Object value = getValue(ctx, fieldName);
 		if ( value instanceof String && StringUtils.isNotBlank((String) value) ) {
@@ -77,27 +80,31 @@ public abstract class FormValidator extends AbstractValidator {
 			if ( ! matcher.matches() ) {  
 				String message = Labels.getLabel(errorMessageKey);
 				this.addInvalidMessage(ctx, fieldName, message);
+				return false;
 			}
 		}
+		return true;
 	}
 
-	protected void validateUri(ValidationContext ctx, String fieldName) {
+	protected boolean validateUri(ValidationContext ctx, String fieldName) {
 		Object value = getValue(ctx, fieldName);
 		if ( value instanceof String && StringUtils.isNotBlank((String) value) ) {
 			UrlValidator validator = UrlValidator.getInstance();
 			if ( ! validator.isValid((String) value) ) {
 				String message = Labels.getLabel(INVALID_URI_MESSAGE_KEY);
 				this.addInvalidMessage(ctx, fieldName, message);
+				return false;
 			}
 		}
+		return true;
 	}
 	
-	protected void validateGreaterThan(ValidationContext ctx,
+	protected boolean validateGreaterThan(ValidationContext ctx,
 			String fieldName, Number value) {
-		validateGreaterThan(ctx, fieldName, value, false);
+		return validateGreaterThan(ctx, fieldName, value, false);
 	}
 	
-	protected void validateGreaterThan(ValidationContext ctx,
+	protected boolean validateGreaterThan(ValidationContext ctx,
 			String fieldName, Number value, boolean equal) {
 		Object fieldValue = getValue(ctx, fieldName);
 		if ( fieldValue instanceof Number ) {
@@ -106,6 +113,9 @@ public abstract class FormValidator extends AbstractValidator {
 				String messageKey = equal ? GREATER_THAN_EQUAL_MESSAGE_KEY: GREATER_THAN_MESSAGE_KEY;
 				String message = Labels.getLabel(messageKey, new Object[] {value});
 				addInvalidMessage(ctx, fieldName, message);
+				return false;
+			} else {
+				return true;
 			}
 		} else {
 			throw new IllegalArgumentException("Number field value expected: " + fieldName);

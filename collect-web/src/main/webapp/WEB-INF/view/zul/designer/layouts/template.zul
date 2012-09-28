@@ -21,6 +21,8 @@
 			</div>
 		</south>
 	</borderlayout>
+	
 	<!-- session keep alive timer -->
-	<timer id="timerKeepAliveSession" repeats="true" delay="30000"/>
+	<timer id="timerKeepAliveSession" repeats="true" delay="30000"
+		apply="org.openforis.collect.designer.composer.SessionKeepAliveTimerComposer"/>
 </zk>

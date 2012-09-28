@@ -19,7 +19,7 @@
 				<template name="children">
 					<tabpanel style="overflow: auto;">
 						<include
-							src="${vm.componentsBasePath)/survey_edit/schema_layout/tabsgrouppanel.zul"
+							src="${vm.componentsPath}/survey_edit/schema_layout/tabsgrouppanel.zul"
 							tab="${each}" />
 					</tabpanel>
 				</template>
