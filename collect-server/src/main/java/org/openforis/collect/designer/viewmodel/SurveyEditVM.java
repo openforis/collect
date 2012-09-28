@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.openforis.collect.designer.session.SessionStatus;
 import org.openforis.collect.designer.util.MessageUtil;
+import org.openforis.collect.designer.util.Resources;
 import org.openforis.collect.model.LanguageConfiguration;
 import org.openforis.collect.persistence.SurveyImportException;
 import org.zkoss.bind.BindUtils;
@@ -31,10 +32,6 @@ import org.zkoss.zul.Window;
  *
  */
 public class SurveyEditVM extends SurveyEditBaseVM {
-
-	private static final String SELECT_LANGUAGE_POP_UP_URL = "survey_edit/select_language_popup.zul";
-	private static final String SRS_MANAGER_POP_UP_URL = "survey_edit/srs_popup.zul";
-	private static final String SURVEYS_LIST_URL = "survey_select.zul";
 
 	private static final String SURVEY_SUCCESSFULLY_SAVED_MESSAGE_KEY = "survey.successfully_saved";
 	
@@ -66,14 +63,14 @@ public class SurveyEditVM extends SurveyEditBaseVM {
 	@Command
 	public void openLanguageManagerPopUp() {
 		if ( checkCurrentFormValid() ) {
-			selectLanguagePopUp = openPopUp(SELECT_LANGUAGE_POP_UP_URL, true);
+			selectLanguagePopUp = openPopUp(Resources.Component.SELECT_LANGUAGE_POP_UP.getLocation(), true);
 		}
 	}
 	
 	@GlobalCommand
 	public void openSRSManagerPopUp() {
 		if ( checkCurrentFormValid() ) {
-			srsPopUp = openPopUp(SRS_MANAGER_POP_UP_URL, true);
+			srsPopUp = openPopUp(Resources.Component.SRS_MANAGER_POP_UP.getLocation(), true);
 		}
 	}
 	
@@ -88,7 +85,7 @@ public class SurveyEditVM extends SurveyEditBaseVM {
 		SessionStatus sessionStatus = getSessionStatus();
 		sessionStatus.setSurvey(null);
 		sessionStatus.setCurrentLanguageCode(null);
-		Executions.sendRedirect(SURVEYS_LIST_URL);
+		Executions.sendRedirect(Resources.Page.MAIN.getLocation());
 	}
 	
 	public void languageCodeSelected(@BindingParam("code") String selectedLanguageCode) {

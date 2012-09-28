@@ -14,6 +14,7 @@ import org.openforis.collect.designer.form.CodeListFormObject.Type;
 import org.openforis.collect.designer.form.ItemFormObject;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.MessageUtil.ConfirmHandler;
+import org.openforis.collect.designer.util.Resources;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
@@ -24,7 +25,6 @@ import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.GlobalCommand;
 import org.zkoss.bind.annotation.NotifyChange;
 import org.zkoss.util.resource.Labels;
-import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zkplus.databind.BindingListModelList;
 import org.zkoss.zul.Window;
@@ -38,7 +38,6 @@ import org.zkoss.zul.Window;
 public class SurveyCodeListsEditVM extends SurveyItemEditVM<CodeList> {
 
 	private static final String SURVEY_CODE_LIST_GENERATED_LEVEL_NAME_LABEL_KEY = "survey.code_list.generated_level_name";
-	private static final String CODE_LIST_ITEM_EDIT_POP_UP_URL = "code_list_item_popup.zul";
 	public static final String CLOSE_CODE_LIST_ITEM_POP_UP_COMMAND = "closeCodeListItemPopUp";
 
 //	private DefaultTreeModel<CodeListItem> treeModel;
@@ -184,9 +183,7 @@ public class SurveyCodeListsEditVM extends SurveyItemEditVM<CodeList> {
 	public void openChildItemEditPopUp(CodeListItem item) {
 		Map<String, Object> args = new HashMap<String, Object>();
 		args.put("item", item);
-		codeListItemPopUp = (Window) Executions.createComponents(
-				CODE_LIST_ITEM_EDIT_POP_UP_URL, null, args);
-		codeListItemPopUp.doModal();
+		openPopUp(Resources.Component.CODE_LIST_ITEM_EDIT_POP_UP.getLocation(), true);
 	}
 
 	@Command

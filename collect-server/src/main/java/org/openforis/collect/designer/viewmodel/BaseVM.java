@@ -1,6 +1,7 @@
 package org.openforis.collect.designer.viewmodel;
 
 import org.openforis.collect.designer.session.SessionStatus;
+import org.openforis.collect.designer.util.Resources;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.Session;
 import org.zkoss.zk.ui.event.Event;
@@ -14,6 +15,10 @@ import org.zkoss.zul.Window;
  */
 public class BaseVM {
 
+	public String getComponentsPath() {
+		return Resources.COMPONENTS_BASE_PATH;
+	}
+	
 	protected SessionStatus getSessionStatus() {
 		Session session = getSession();
 		String key = SessionStatus.SESSION_KEY;

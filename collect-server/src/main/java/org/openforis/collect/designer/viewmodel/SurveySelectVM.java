@@ -3,10 +3,11 @@
  */
 package org.openforis.collect.designer.viewmodel;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.openforis.collect.designer.session.SessionStatus;
-import org.openforis.collect.manager.SurveyManager;
+import org.openforis.collect.designer.util.Resources.Page;
 import org.openforis.collect.manager.SurveyWorkManager;
 import org.openforis.collect.model.CollectSurvey;
 import org.zkoss.bind.annotation.Command;
@@ -23,31 +24,26 @@ import org.zkoss.zul.ListModelList;
  */
 public class SurveySelectVM extends BaseVM {
 	
-	private static final String SURVEY_EDIT_URL = "survey_edit.zul";
-
-	@WireVariable
-	private SurveyManager surveyManager;
 	@WireVariable
 	private SurveyWorkManager surveyWorkManager;
 	
 	private CollectSurvey selectedSurvey;
 	
 	@Command
-	public void editSurvey() {
+	public void editSurvey() throws IOException {
 		SessionStatus sessionStatus = getSessionStatus();
 		sessionStatus.setSurvey(selectedSurvey);
 		sessionStatus.setCurrentLanguageCode(null);
-		Executions.sendRedirect(SURVEY_EDIT_URL);
+		Executions.sendRedirect(Page.SURVEY_EDIT.getLocation());
 	}
 
 	@Command
-	public void newSurvey() {
+	public void newSurvey() throws IOException {
 		CollectSurvey survey = surveyWorkManager.createSurvey();
 		SessionStatus sessionStatus = getSessionStatus();
 		sessionStatus.setSurvey(survey);
 		sessionStatus.setCurrentLanguageCode(null);
-		//Executions.sendRedirect(SURVEY_SELECT_LANGUAGE_URL);
-		Executions.sendRedirect(SURVEY_EDIT_URL);
+		Executions.sendRedirect(Page.SURVEY_EDIT.getLocation());
 	}
 
 	public ListModel<CollectSurvey> getSurveysWork() {

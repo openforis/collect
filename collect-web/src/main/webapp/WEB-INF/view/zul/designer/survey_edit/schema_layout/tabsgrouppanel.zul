@@ -3,7 +3,7 @@
 		apply="org.zkoss.bind.BindComposer"
 		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.layout.TabsGroupPanelVM')">
 		
-		<include id="listOfNodesInclude" src="/view/designer/component/schema_layout/editablenodeslist.zul"
+		<include id="listOfNodesInclude" src="editablenodeslist.zul"
 			tab="${vm.tab}" nodes="${vm.nodesPerTab}" />
 	</div>
 </zk>

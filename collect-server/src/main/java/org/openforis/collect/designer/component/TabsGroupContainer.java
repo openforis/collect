@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.openforis.collect.designer.util.Resources.Component;
 import org.openforis.collect.model.ui.UITab;
 import org.openforis.collect.model.ui.UITabsGroup;
 import org.zkoss.bind.BindUtils;
@@ -36,8 +37,6 @@ public class TabsGroupContainer extends Div implements IdSpace {
 
 	private static final long serialVersionUID = 1L;
 	
-	private static final String TABSGROUP_URL = "/view/designer/component/schema_layout/tabsgroup.zul";
-	
     @Wire
     private Tabbox tabbox;
     
@@ -46,7 +45,7 @@ public class TabsGroupContainer extends Div implements IdSpace {
 	private Tab newChildTab;
  
     public TabsGroupContainer() {
-        Executions.createComponents(TABSGROUP_URL, this, null);
+        Executions.createComponents(Component.TABSGROUP.getLocation(), this, null);
         Selectors.wireComponents(this, this, false);
         Selectors.wireEventListeners(this, this);
     }

@@ -14,6 +14,7 @@ import org.openforis.collect.designer.form.NumericAttributeDefinitionFormObject;
 import org.openforis.collect.designer.model.AttributeType;
 import org.openforis.collect.designer.model.NodeType;
 import org.openforis.collect.designer.util.MessageUtil;
+import org.openforis.collect.designer.util.Resources;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.ui.UIConfiguration;
 import org.openforis.collect.model.ui.UITab;
@@ -53,10 +54,6 @@ import org.zkoss.zul.Treeitem;
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class SurveySchemaEditVM extends SurveyEditBaseVM {
 
-	private static final String VERSIONING_POPUP_URL = "versioning_popup.zul";
-	private static final String CODE_LISTS_POPUP_URL = "code_lists_popup.zul";
-	private static final String SRS_POPUP_URL = "srs_popup.zul";
-	
 	private static final String SCHEMA_CHANGED_GLOBAL_COMMAND = "schemaChanged";
 	
 	private static final String ATTRIBUTE_DEFAULTS_FIELD = "attributeDefaults";
@@ -215,21 +212,21 @@ public class SurveySchemaEditVM extends SurveyEditBaseVM {
 	@Command
 	public void openVersioningManagerPopUp() {
 		if ( checkCurrentFormValid() ) {
-			openPopUp(VERSIONING_POPUP_URL, true);
+			openPopUp(Resources.Component.VERSIONING_POPUP.getLocation(), true);
 		}
 	}
 
 	@Command
 	public void openCodeListsManagerPopUp() {
 		if ( checkCurrentFormValid() ) {
-			openPopUp(CODE_LISTS_POPUP_URL, true);
+			openPopUp(Resources.Component.CODE_LISTS_POPUP.getLocation(), true);
 		}
 	}
 
 	@Command
 	public void openSRSManagerPopUp() {
 		if ( checkCurrentFormValid() ) {
-			openPopUp(SRS_POPUP_URL, true);
+			openPopUp(Resources.Component.SRS_MANAGER_POP_UP.getLocation(), true);
 		}
 	}
 

@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.openforis.collect.designer.component.SchemaTreeModel;
+import org.openforis.collect.designer.util.Resources;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.ui.UIConfiguration;
 import org.openforis.collect.model.ui.UITab;
@@ -38,7 +39,7 @@ import org.zkoss.zul.Treeitem;
 public class SurveyLayoutEditVM extends SurveyEditBaseVM {
 
 	private static final String NODES_PER_TAB_CHANGED_GLOABAL_COMMAND = "nodesPerTabChanged";
-	private static final String TABSGROUP_URL = "/view/designer/component/schema_layout/tabsgroup.zul";
+	
 	private UITabDefinition tabsDefinition;
 	private SchemaTreeModel treeModel;
 	
@@ -79,7 +80,7 @@ public class SurveyLayoutEditVM extends SurveyEditBaseVM {
 			tabsGroupContainerInclude.setSrc(null);
 		} else if ( this.tabsDefinition != tabDefinition) {
 			tabsGroupContainerInclude.setDynamicProperty("tabsGroup", tabDefinition);
-			tabsGroupContainerInclude.setSrc(TABSGROUP_URL);
+			tabsGroupContainerInclude.setSrc(Resources.Component.TABSGROUP.getLocation());
 		}
 	}
 	

@@ -6,6 +6,7 @@ package org.openforis.collect.designer.viewmodel.layout;
 import java.util.List;
 
 import org.openforis.collect.designer.session.SessionStatus;
+import org.openforis.collect.designer.util.Resources;
 import org.openforis.collect.designer.viewmodel.BaseVM;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.ui.UIConfiguration;
@@ -29,8 +30,6 @@ import org.zkoss.zul.Include;
  *
  */
 public class TabsGroupPanelVM extends BaseVM {
-
-	public static final String LIST_OF_NODES_URL = "/view/designer/component/schema_layout/editablenodeslist.zul";
 
 	@Wire
 	private Include listOfNodesInclude;
@@ -69,7 +68,7 @@ public class TabsGroupPanelVM extends BaseVM {
 		List<NodeDefinition> nodesPerTab = getNodesPerTab();
 		listOfNodesInclude.setDynamicProperty("tab", tab);
 		listOfNodesInclude.setDynamicProperty("nodes", nodesPerTab);
-		listOfNodesInclude.setSrc(LIST_OF_NODES_URL);
+		listOfNodesInclude.setSrc(Resources.Component.TABSGROUP_LIST_OF_NODES.getLocation());
 	}
 	
 	public List<NodeDefinition> getNodesPerTab() {

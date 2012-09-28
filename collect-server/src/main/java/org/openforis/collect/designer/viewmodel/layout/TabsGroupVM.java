@@ -12,6 +12,7 @@ import java.util.Stack;
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.designer.session.SessionStatus;
 import org.openforis.collect.designer.util.MessageUtil;
+import org.openforis.collect.designer.util.Resources;
 import org.openforis.collect.designer.viewmodel.BaseVM;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.ui.UIConfiguration;
@@ -43,8 +44,6 @@ import org.zkoss.zul.Window;
  *
  */
 public class TabsGroupVM extends BaseVM {
-
-	private static final String TAB_LABEL_POPUP_URL = "/view/designer/component/schema_layout/tab_label_popup.zul";
 
 	private static final String TAB_CHANGED_GLOBAL_COMMAND = "tabChanged";
 	
@@ -84,7 +83,7 @@ public class TabsGroupVM extends BaseVM {
 	}
 
 	protected void openTabLabelEditPopUp(final UITab tab) {
-		tabLabelPopUp = openPopUp(TAB_LABEL_POPUP_URL, true);
+		tabLabelPopUp = openPopUp(Resources.Component.TAB_LABEL_POPUP.getLocation(), true);
 		Button okButton = (Button) tabLabelPopUp.query("#okBtn");
 		final Textbox textbox = (Textbox) tabLabelPopUp.query("#textbox");
 		textbox.setText(tab.getLabel());
