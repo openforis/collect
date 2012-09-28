@@ -1,28 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!--
-	Created by ZK Studio
--->
-
 <zk>
 	<device-config>
 		<device-type>ajax</device-type>
-		<timeout-uri>/timeout.zul</timeout-uri><!-- An empty URL can cause the browser to reload the same URL -->
+		<timeout-uri>/designer.htm</timeout-uri><!-- An empty URL can cause the browser to reload the same URL -->
 	</device-config>
 	
+	<!-- labels -->
 	<system-config>
         <disable-event-thread/>
         <label-location>/WEB-INF/labels/designer/label_en.properties</label-location>
         <label-location>/WEB-INF/labels/language_codes_iso_639_3.properties</label-location>
     </system-config>
     
-	<client-config>
-	    <debug-js>true</debug-js>
-	</client-config>
-	<library-property>
-	    <name>org.zkoss.web.classWebResource.cache</name>
-	    <value>false</value>
-	</library-property>
+	<session-config>
+		<timer-keep-alive>true</timer-keep-alive>
+	</session-config>
+	
+	<!-- JavaScript debug -->
+<!-- 	<client-config> -->
+<!-- 	    <debug-js>true</debug-js> -->
+<!-- 	</client-config> -->
+<!-- 	<library-property> -->
+<!-- 	    <name>org.zkoss.web.classWebResource.cache</name> -->
+<!-- 	    <value>false</value> -->
+<!-- 	</library-property> -->
+
 <!-- 	<library-property> -->
 <!-- 	    <name>org.zkoss.theme.preferred</name> -->
 <!-- 	    <value>silvertail</value> -->

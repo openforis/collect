@@ -13,7 +13,7 @@ import org.zkoss.zul.Window;
  * @author S. Ricci
  *
  */
-public class BaseVM {
+public abstract class BaseVM {
 
 	public String getComponentsPath() {
 		return Resources.COMPONENTS_BASE_PATH;
