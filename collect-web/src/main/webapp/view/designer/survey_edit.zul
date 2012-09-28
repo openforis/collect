@@ -1,23 +1,21 @@
 <?page title="Openforis Collect Designer - Edit Survey" contentType="text/html;charset=UTF-8"?>
 <?init class="org.zkoss.zk.ui.util.Composition" arg0="layouts/template.zul"?>
-<zk>
-	
+<zk xmlns:w="client">
+	<script type="text/javascript"><![CDATA[
+		function switchTab(notify, init){
+			if (this.desktop && !init && notify) {
+				zAu.send(new zk.Event(this, 'onSwitchTab'));
+			} else {
+				this.$_sel(notify, init); //call the original method
+			}
+		}
+	]]></script>
 	<vbox id="surveyEditBox"
 		hflex="1" vflex="1"
 		self="@define(content)"
 		apply="org.openforis.collect.designer.composer.SurveyEditComposer"
-		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SurveyEditVM')"
-	 	xmlns:w="client">
+		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SurveyEditVM')">
 	 	
-		<script type="text/javascript"><![CDATA[
-			function switchTab(notify, init){
-				if (this.desktop && !init && notify) {
-					zAu.send(new zk.Event(this, 'onSwitchTab'));
-				} else {
-					this.$_sel(notify, init); //call the original method
-				}
-			}
-		]]></script>
 		<vlayout hflex="1" vflex="1">
 			<!-- language selector -->
 			<hlayout width="100%" style="text-align: right;">
@@ -57,11 +55,18 @@
 			</tabbox>
 		</vlayout>
 		
-		<hbox width="100%" spacing="40px" align="center">
-			<button label="Save" onClick="@command('save')" />
-				
-			<button label="Cancel" onClick="" self="@{action(cancel)}" />
-		</hbox>
-			
+		<borderlayout hflex="1" height="30px">
+			<west border="none" size="20%">
+				<button label="${labels.survey.list_of_surveys}" 
+					onClick="@command('backToSurveysList')" />
+			</west>
+			<center border="none">
+				<box width="100%" align="center">
+					<button label="Save" onClick="@command('save')" />
+				</box>
+			</center>
+			<east border="none" size="20%">
+			</east>
+		</borderlayout>
 	</vbox>
 </zk>
