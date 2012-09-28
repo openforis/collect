@@ -160,7 +160,6 @@ public class SurveySchemaEditVM extends SurveyEditBaseVM {
 	}
 	
 	@Command
-	@NotifyChange({"nodes","editingNode","nodeType","attributeType","tempFormObject","formObject"})
 	public void removeNode() {
 		if ( selectedNode != null ) {
 			String confirmMessageKey;
@@ -178,7 +177,7 @@ public class SurveySchemaEditVM extends SurveyEditBaseVM {
 		}
 	}
 
-	private void performRemoveSelectedNode() {
+	protected void performRemoveSelectedNode() {
 		EntityDefinition parentDefn = (EntityDefinition) selectedNode.getParentDefinition();
 		if ( parentDefn != null ) {
 			parentDefn.removeChildDefinition(selectedNode);
@@ -192,6 +191,10 @@ public class SurveySchemaEditVM extends SurveyEditBaseVM {
 		selectedNode = null;
 		tempFormObject = null;
 		formObject = null;
+		BindUtils.postNotifyChange(null, null, this, "nodes");
+		BindUtils.postNotifyChange(null, null, this, "editingNode");
+		BindUtils.postNotifyChange(null, null, this, "tempFormObject");
+		BindUtils.postNotifyChange(null, null, this, "formObject");
 	}
 
 	@Override
