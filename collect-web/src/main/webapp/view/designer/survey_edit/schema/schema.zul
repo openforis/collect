@@ -1,6 +1,6 @@
 <zk>
 	<div id="itemsContainer"
-		apply="org.zkoss.bind.BindComposer"
+		apply="org.openforis.collect.designer.composer.SurveySchemaEditComposer"
 		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SurveySchemaEditVM')"
 		width="100%" height="100%">
 		<borderlayout>
@@ -14,7 +14,7 @@
 							model="@load(vm.nodes)"
 							onSelect="@command('nodeSelected', node=self.selectedItem)">
 							<template name="model">
-					            <treeitem draggable="true">
+					            <treeitem draggable="false"> 
 					                <treerow>
 					                    <treecell label="@load(each.data.name)"/>
 					                </treerow>

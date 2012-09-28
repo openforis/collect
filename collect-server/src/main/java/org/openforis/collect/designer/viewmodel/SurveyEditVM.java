@@ -19,12 +19,11 @@ import org.zkoss.bind.annotation.GlobalCommand;
 import org.zkoss.bind.annotation.Init;
 import org.zkoss.bind.annotation.NotifyChange;
 import org.zkoss.zk.ui.Component;
-import org.zkoss.zk.ui.event.Event;
+import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.select.Selectors;
-import org.zkoss.zk.ui.select.annotation.Listen;
+import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zkplus.databind.BindingListModelList;
-import org.zkoss.zul.Tab;
-import org.zkoss.zul.Tabbox;
+import org.zkoss.zul.Tree;
 import org.zkoss.zul.Window;
 
 /**
@@ -35,26 +34,21 @@ public class SurveyEditVM extends SurveyEditBaseVM {
 
 	private static final String SELECT_LANGUAGE_POP_UP_URL = "survey_edit/select_language_popup.zul";
 	private static final String SRS_MANAGER_POP_UP_URL = "survey_edit/srs_popup.zul";
-	
+	private static final String SURVEYS_LIST_URL = "survey_select.zul";
+
 	private static final String SURVEY_SUCCESSFULLY_SAVED_MESSAGE_KEY = "survey.successfully_saved";
 	
 	private Window selectLanguagePopUp;
 	private Window srsPopUp;
+	
+	@Wire
+	private Tree nodesTree;
 	
 	@AfterCompose
 	public void afterCompose(@ContextParam(ContextType.VIEW) Component view){
 		 Selectors.wireComponents(view, this, false);
 		 Selectors.wireEventListeners(view, this);
 	}
-	
-//	@Listen("onSwitchTab = tab")
-//	public void onSwitchTab(Event event) throws InterruptedException {
-//		if ( isCurrentFormValid() ) {
-//			Tab tab = (Tab) event.getTarget();
-//			Tabbox tabbox = tab.getTabbox();
-//			tabbox.setSelectedTab(tab);
-//		}
-//	}
 	
 	@Override
 	@Init(superclass=false)
@@ -87,6 +81,14 @@ public class SurveyEditVM extends SurveyEditBaseVM {
 	@GlobalCommand
 	public void closeSRSManagerPopUp() {
 		closePopUp(srsPopUp);
+	}
+	
+	@Command
+	public void backToSurveysList() {
+		SessionStatus sessionStatus = getSessionStatus();
+		sessionStatus.setSurvey(null);
+		sessionStatus.setCurrentLanguageCode(null);
+		Executions.sendRedirect(SURVEYS_LIST_URL);
 	}
 	
 	public void languageCodeSelected(@BindingParam("code") String selectedLanguageCode) {

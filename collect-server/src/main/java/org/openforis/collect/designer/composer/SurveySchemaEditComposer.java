@@ -1,6 +1,6 @@
 package org.openforis.collect.designer.composer;
 
-import org.openforis.collect.designer.viewmodel.SurveyEditBaseVM;
+import org.openforis.collect.designer.viewmodel.SurveySchemaEditVM;
 import org.zkoss.bind.BindComposer;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.event.Event;
@@ -14,7 +14,7 @@ import org.zkoss.zul.Tabbox;
  * @author S. Ricci
  *
  */
-public class SurveyEditComposer extends BindComposer<Component> {
+public class SurveySchemaEditComposer extends BindComposer<Component> {
 
 	private static final long serialVersionUID = 1L;
 
@@ -24,9 +24,10 @@ public class SurveyEditComposer extends BindComposer<Component> {
 		Selectors.wireEventListeners(comp, this);
 	}
 	
-	@Listen("onSwitchTab = tab")
-	public void onSwitchTab(Event event) throws InterruptedException {
-		if ( ( (SurveyEditBaseVM) getViewModel()).checkCurrentFormValid() ) {
+	@Listen("onSelectTreeNode")
+	public void onSelectTreeNode(Event event) throws InterruptedException {
+		SurveySchemaEditVM vm = (SurveySchemaEditVM) getViewModel();
+		if ( vm.checkCurrentFormValid() ) {
 			Tab tab = (Tab) event.getTarget();
 			Tabbox tabbox = tab.getTabbox();
 			tabbox.setSelectedTab(tab);

@@ -79,6 +79,7 @@ public class SurveyEditBaseVM extends BaseVM {
 	public void tabDefinitionsUpdated() {}
 	
 	@GlobalCommand
+	@NotifyChange("currentFormValid")
 	public void currentFormValidated(@BindingParam("valid") boolean valid) {
 		currentFormValid = valid;
 	}
