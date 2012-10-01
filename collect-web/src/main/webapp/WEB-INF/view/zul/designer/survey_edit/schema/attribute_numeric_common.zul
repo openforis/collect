@@ -26,7 +26,11 @@
 								<column width="80px"
 									label="${labels.survey.schema.attribute.numeric.precisions.is_default}" />
 								<column width="150px"
-									label="${labels.survey.schema.attribute.numeric.precisions.unit}" />
+									label="${labels.survey.schema.attribute.numeric.precisions.unit}">
+									<button tooltiptext="${labels.survey.unit.manager.title}" 
+										onClick="@command('openUnitsManagerPopUp')"
+										image="/assets/images/pencil-small.png" />
+								</column>
 								<column width="100px"
 									label="${labels.survey.schema.attribute.numeric.precisions.decimal_digits}" />
 								<column width="50px"

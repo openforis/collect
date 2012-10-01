@@ -74,7 +74,6 @@ public class SurveyEditVM extends SurveyEditBaseVM {
 		}
 	}
 	
-	
 	@GlobalCommand
 	public void closeSRSManagerPopUp() {
 		closePopUp(srsPopUp);

@@ -4,11 +4,8 @@
 package org.openforis.collect.designer.viewmodel;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.designer.component.SchemaTreeModel;
 import org.openforis.collect.designer.component.SchemaTreeModel.NodeDefinitionTreeNode;
 import org.openforis.collect.designer.form.AttributeDefinitionFormObject;
@@ -26,7 +23,6 @@ import org.openforis.idm.metamodel.AttributeDefault;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
-import org.openforis.idm.metamodel.NodeLabel;
 import org.openforis.idm.metamodel.Precision;
 import org.openforis.idm.metamodel.Schema;
 import org.zkoss.bind.BindUtils;
@@ -49,6 +45,7 @@ import org.zkoss.zul.DefaultTreeModel;
 import org.zkoss.zul.Tree;
 import org.zkoss.zul.TreeNode;
 import org.zkoss.zul.Treeitem;
+import org.zkoss.zul.Window;
 
 /**
  * 
@@ -78,6 +75,11 @@ public class SurveySchemaEditVM extends SurveyEditBaseVM {
 	
 	@Wire
 	private Tree nodesTree;
+
+	//popups
+	private Window unitsPopUp;
+	private Window codeListsPopUp;
+	private Window versioningPopUp;
 	
 	@AfterCompose
 	public void afterCompose(@ContextParam(ContextType.VIEW) Component view){
@@ -216,33 +218,51 @@ public class SurveySchemaEditVM extends SurveyEditBaseVM {
 	@NotifyChange({"nodes","selectedNode","tempFormObject","formObject","newNode","rootEntityCreation"})
 	public void applyChanges() {
 		formObject.saveTo(selectedNode, currentLanguageCode);
-		if ( selectedNode instanceof EntityDefinition && selectedNode.getParentDefinition() == null ) {
-			updateFirstTabLabel((EntityDefinition) selectedNode);
-		}
 		postSchemaChangedCommand();
 	}
 
 	@Command
 	public void openVersioningManagerPopUp() {
 		if ( checkCurrentFormValid() ) {
-			openPopUp(Resources.Component.VERSIONING_POPUP.getLocation(), true);
+			versioningPopUp = openPopUp(Resources.Component.VERSIONING_POPUP.getLocation(), true);
 		}
 	}
 
+	@GlobalCommand
+	public void closeVersioningManagerPopUp() {
+		if ( checkCurrentFormValid() ) {
+			closePopUp(versioningPopUp);
+		}
+	}
+	
 	@Command
 	public void openCodeListsManagerPopUp() {
 		if ( checkCurrentFormValid() ) {
-			openPopUp(Resources.Component.CODE_LISTS_POPUP.getLocation(), true);
+			codeListsPopUp = openPopUp(Resources.Component.CODE_LISTS_POPUP.getLocation(), true);
 		}
 	}
 
-	@Command
-	public void openSRSManagerPopUp() {
+	@GlobalCommand
+	public void closeCodeListsManagerPopUp() {
 		if ( checkCurrentFormValid() ) {
-			openPopUp(Resources.Component.SRS_MANAGER_POP_UP.getLocation(), true);
+			closePopUp(codeListsPopUp);
 		}
 	}
-
+	
+	@Command
+	public void openUnitsManagerPopUp() {
+		if ( checkCurrentFormValid() ) {
+			unitsPopUp = openPopUp(Resources.Component.UNITS_MANAGER_POP_UP.getLocation(), true);
+		}
+	}
+	
+	@GlobalCommand
+	public void closeUnitsManagerPopUp() {
+		if ( checkCurrentFormValid() ) {
+			closePopUp(unitsPopUp);
+		}
+	}
+	
 	@Command
 	@NotifyChange("attributeDefaults")
 	public void addAttributeDefault() {
@@ -292,18 +312,6 @@ public class SurveySchemaEditVM extends SurveyEditBaseVM {
 		tab.setName(tabName);
 		tabDefn.addTab(tab);
 		newNode.setAnnotation(UIConfiguration.TAB_NAME_ANNOTATION, tabName);
-	}
-
-	protected void updateFirstTabLabel(EntityDefinition rootEntityDefn) {
-		UIConfiguration uiConf = survey.getUIConfiguration();
-		UITabDefinition tabDefn = uiConf.getTabDefinition(rootEntityDefn);
-		UITab firstTab = tabDefn.getTabs().get(0);
-		String oldLabel = firstTab.getLabel();
-		String label = rootEntityDefn.getLabel(NodeLabel.Type.INSTANCE, currentLanguageCode);
-		if ( ! StringUtils.equals(oldLabel, label) ) {
-			firstTab.setLabel(label);
-			BindUtils.postNotifyChange(null, null, firstTab, "label");
-		}
 	}
 
 	protected UITabDefinition createRootTabDefinition(EntityDefinition newNode) {

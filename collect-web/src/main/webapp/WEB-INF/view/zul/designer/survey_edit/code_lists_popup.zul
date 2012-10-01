@@ -4,7 +4,7 @@
 		height="500px"
 		border="normal"
 		position="center" 
-		closable="true">
+		closable="false">
 		<borderlayout id="codeListsManagerContainer"
 				apply="org.zkoss.bind.BindComposer"
 				viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SurveyCodeListsEditVM')"
@@ -160,6 +160,12 @@
 					</hlayout>
 				</div>
 			</center>
+			<south>
+				<box align="center" width="100%">
+					<button label="${labels.global.close}" 
+						onClick="@global-command('closeCodeListsManagerPopUp')" />
+				</box>
+			</south>
 		</borderlayout>
 	</window>
 </zk>

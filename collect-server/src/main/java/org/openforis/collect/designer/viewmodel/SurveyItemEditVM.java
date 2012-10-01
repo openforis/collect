@@ -5,9 +5,13 @@ package org.openforis.collect.designer.viewmodel;
 
 
 import org.openforis.collect.designer.form.ItemFormObject;
+import org.openforis.collect.designer.util.MessageUtil;
+import org.openforis.collect.designer.util.MessageUtil.ConfirmHandler;
 import org.springframework.core.GenericTypeResolver;
+import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
+import org.zkoss.bind.annotation.DependsOn;
 import org.zkoss.bind.annotation.NotifyChange;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zkplus.databind.BindingListModelList;
@@ -35,11 +39,13 @@ public abstract class SurveyItemEditVM<T> extends SurveyEditBaseVM {
 	@Command
 	@NotifyChange({"formObject","editingItem","editedItem","items","selectedItem"})
 	public void newItem() {
-		T newInstance = createItemInstance();
-		setEditedItem(newInstance);
-		addNewItemToSurvey();
-		T editedItem = getEditedItem();
-		setSelectedItem(editedItem);
+		if ( checkCurrentFormValid() ) {
+			T newInstance = createItemInstance();
+			setEditedItem(newInstance);
+			addNewItemToSurvey();
+			T editedItem = getEditedItem();
+			setSelectedItem(editedItem);
+		}
 	}
 
 	@Command
@@ -50,14 +56,21 @@ public abstract class SurveyItemEditVM<T> extends SurveyEditBaseVM {
 	}
 	
 	@Command
-	@NotifyChange({"formObject","editingItem","editedItem"})
-	public void selectionChanged(@BindingParam("selectedItem") T selectedItem) {
-		if ( currentFormValid ) {
-			setSelectedItem(selectedItem);
-			setEditedItem(selectedItem);
+	public void selectionChanged(@BindingParam("selectedItem") T item) {
+		if ( checkCurrentFormValid() ) {
+			performItemSelection(item);
 		} else {
 			setSelectedItem(this.selectedItem);
+			BindUtils.postNotifyChange(null, null, this, "selectedItem");
 		}
+	}
+
+	@NotifyChange({"formObject","editedItem"})
+	protected void performItemSelection(T item) {
+		setSelectedItem(item);
+		setEditedItem(item);
+		BindUtils.postNotifyChange(null, null, this, "formObject");
+		BindUtils.postNotifyChange(null, null, this, "editedItem");
 	}
 	
 	protected abstract ItemFormObject<T> createFormObject();
@@ -76,17 +89,33 @@ public abstract class SurveyItemEditVM<T> extends SurveyEditBaseVM {
 	protected abstract void addNewItemToSurvey();
 	
 	@Command
-	@NotifyChange({"items","editingItem","editedItem","formObject"})
-	public void deleteItem(@BindingParam("item") T item) {
-		if ( currentFormValid ) {
-			deleteItemFromSurvey(item);
+	public void deleteItem(@BindingParam("item") final T item) {
+		boolean deleteEditedItem = item.equals(selectedItem);
+		if ( deleteEditedItem || checkCurrentFormValid() ) {
+			ConfirmHandler handler = new ConfirmHandler() {
+				@Override
+				public void onOk() {
+					performRemoveItem(item);
+				}
+			};
+			MessageUtil.showConfirm(handler, "global.item.confirm_remove");
 		} else {
 			//TODO show confirm cancel changes message
 		}
+	}
+
+	protected void performRemoveItem(T item) {
+		deleteItemFromSurvey(item);
+		BindUtils.postNotifyChange(null, null, this, "items");
 		if ( item.equals(selectedItem) ) {
 			formObject = null;
 			editedItem = null;
 			selectedItem = null;
+			currentFormValid = true;
+			BindUtils.postNotifyChange(null, null, this, "formObject");
+			BindUtils.postNotifyChange(null, null, this, "editedItem");
+			BindUtils.postNotifyChange(null, null, this, "selectedItem");
+			BindUtils.postNotifyChange(null, null, this, "currentFormValid");
 		}
 	}
 
@@ -130,6 +159,7 @@ public abstract class SurveyItemEditVM<T> extends SurveyEditBaseVM {
 		}
 	}
 	
+	@DependsOn("editedItem")
 	public boolean isEditingItem() {
 		return this.editedItem != null;
 	}

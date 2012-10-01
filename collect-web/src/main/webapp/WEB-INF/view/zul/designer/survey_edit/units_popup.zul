@@ -1,24 +1,24 @@
 <zk>
-	<window id="versioningManagerPopUp" title="${labels.survey.versioning_manager}" 
-		apply="org.zkoss.bind.BindComposer"
-		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SurveyVersioningEditVM')"
-		validationMessages="@id('vmsgs')"
-		width="800px" 
-		height="300px"
+	<window id="unitsManagerPopUp" title="${labels.survey.unit.manager.title}" 
+		width="800px"
+		height="470px"
 		border="normal"
 		position="center" 
-		closable="false">
+		closable="false"
+		apply="org.zkoss.bind.BindComposer"
+		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SurveyUnitsEditVM')"
+		validationMessages="@id('vmsgs')">
 		<borderlayout>
-			<west>
+			<west width="300px">
 				<vlayout>
 			        <listbox id="itemsListBox"
 			        	selectedItem="@load(vm.selectedItem)"
 			        	model="@load(vm.items)"
 			        	onSelect="@command('selectionChanged', selectedItem=self.selectedItem.value)"
-			        	height="200px"
-			        	width="250px">
+			        	height="300px"
+			        	width="100%">
 			        	<listhead>
-							<listheader label="" width="200px" />
+							<listheader label="" width="100%" />
 							<listheader label="" width="50px" />
 						</listhead>
 			            <template name="model">
@@ -31,16 +31,15 @@
 			                </listitem>
 			            </template>
 			        </listbox>
-			        
 			        <button label="${labels.global.add_item}" onClick="@command('newItem')" />
-		       	</vlayout>
-		    </west>
-	        <center>
-				<vlayout
-					visible="@load(vm.editingItem)"
+			    </vlayout>
+			</west>
+		    <center>
+		        <vlayout
+		        	visible="@load(vm.editingItem)"
 					form="@id('fx') 
 						@load(vm.formObject) @save(vm.formObject, before='applyChanges')
-						@validator('org.openforis.collect.designer.form.validator.ModelVersionFormValidator')"
+						@validator('org.openforis.collect.designer.form.validator.UnitFormValidator')"
 					width="100%">
 					<grid>
 						<columns>
@@ -49,32 +48,38 @@
 						</columns>
 						<rows>
 							<row>
-								<label value="${labels.survey.versioning.name}:" />
+								<label value="${labels.survey.unit.name}:" />
 								<cell>
 									<textbox width="150px" value="@bind(fx.name)" onChange="@command('applyChanges')" />
 									<label class="error" value="@load(vmsgs['name'])" />
 								</cell>
 							</row>
 							<row>
-								<label value="${labels.survey.versioning.label}:" />
+								<label value="${labels.survey.unit.label}:" />
 								<cell>
 									<textbox id="labelTextBox" width="150px" value="@bind(fx.label)" onChange="@command('applyChanges')" />
 									<label class="error" value="@load(vmsgs['label'])" />
 								</cell>
 							</row>
 							<row>
-								<label value="${labels.survey.versioning.description}:" />
+								<label value="${labels.survey.unit.abbreviation}:" />
 								<cell>
-									<textbox width="150px" value="@bind(fx.description)" onChange="@command('applyChanges')" />
-									<label class="error" value="@load(vmsgs['description'])" />
+									<textbox width="150px" value="@bind(fx.abbreviation)" onChange="@command('applyChanges')" />
+									<label class="error" value="@load(vmsgs['abbreviation'])" />
 								</cell>
 							</row>
 							<row>
-								<label value="${labels.survey.versioning.date}:" />
+								<label value="${labels.survey.unit.dimension}:" />
 								<cell>
-									<datebox width="100px" compact="false" buttonVisible="true" format="@load(vm.dateFormat)" 
-			                    		value="@bind(fx.date)" onChange="@command('applyChanges')" />
-									<label class="error" value="@load(vmsgs['date'])" />
+									<decimalbox width="150px" value="@bind(fx.dimension)" onChange="@command('applyChanges')" />
+									<label class="error" value="@load(vmsgs['dimension'])" />
+								</cell>
+							</row>
+							<row>
+								<label value="${labels.survey.unit.conversionFactor}:" />
+								<cell>
+									<decimalbox width="150px" value="@bind(fx.conversionFactor)" onChange="@command('applyChanges')" />
+									<label class="error" value="@load(vmsgs['conversionFactor'])" />
 								</cell>
 							</row>
 						</rows>
@@ -84,9 +89,9 @@
 			<south>
 				<box align="center" width="100%">
 					<button label="${labels.global.close}" 
-						onClick="@global-command('closeVersioningManagerPopUp')" />
+						onClick="@global-command('closeUnitsManagerPopUp')" />
 				</box>
 			</south>
-		</borderlayout>
+	    </borderlayout>
 	</window>
 </zk>
