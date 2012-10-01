@@ -50,13 +50,24 @@ public class NodeDefinitionFormValidator extends FormValidator {
 	protected boolean validateNameUniqueness(ValidationContext ctx) {
 		NodeDefinition editedNode = getEditedNode(ctx);
 		String name = (String) getValue(ctx, NAME_FIELD);
-		if ( existsHomonymousSibling(editedNode, name) ) {
+		if ( ! isNameUnique(editedNode, name) ) {
 			String message = Labels.getLabel(NAME_ALREADY_DEFINED_MESSAGE_KEY);
 			this.addInvalidMessage(ctx, NAME_FIELD, message);
 			return false;
 		} else {
 			return true;
 		}
+	}
+	
+	protected boolean isNameUnique(NodeDefinition editedNode, String name) {
+		if ( editedNode instanceof EntityDefinition ) {
+			if ( existsHomonymous((EntityDefinition) editedNode, name) ) {
+				return false;
+			}
+		} else if ( existsHomonymousSibling(editedNode, name) ) {
+			return false;
+		}
+		return true;
 	}
 
 	protected boolean existsHomonymousSibling(NodeDefinition defn, String name) {
