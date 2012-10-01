@@ -4,8 +4,11 @@
 package org.openforis.collect.designer.viewmodel;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.designer.component.SchemaTreeModel;
 import org.openforis.collect.designer.component.SchemaTreeModel.NodeDefinitionTreeNode;
 import org.openforis.collect.designer.form.AttributeDefinitionFormObject;
@@ -23,6 +26,7 @@ import org.openforis.idm.metamodel.AttributeDefault;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
+import org.openforis.idm.metamodel.NodeLabel;
 import org.openforis.idm.metamodel.Precision;
 import org.openforis.idm.metamodel.Schema;
 import org.zkoss.bind.BindUtils;
@@ -182,6 +186,9 @@ public class SurveySchemaEditVM extends SurveyEditBaseVM {
 		if ( parentDefn != null ) {
 			parentDefn.removeChildDefinition(selectedNode);
 		} else {
+			UIConfiguration uiConfiguration = survey.getUIConfiguration();
+			UITabDefinition tabDefn = uiConfiguration.getTabDefinition((EntityDefinition) selectedNode);
+			uiConfiguration.removeTabDefinition(tabDefn);
 			Schema schema = selectedNode.getSchema();
 			String nodeName = selectedNode.getName();
 			schema.removeRootEntityDefinition(nodeName);
@@ -209,6 +216,9 @@ public class SurveySchemaEditVM extends SurveyEditBaseVM {
 	@NotifyChange({"nodes","selectedNode","tempFormObject","formObject","newNode","rootEntityCreation"})
 	public void applyChanges() {
 		formObject.saveTo(selectedNode, currentLanguageCode);
+		if ( selectedNode instanceof EntityDefinition && selectedNode.getParentDefinition() == null ) {
+			updateFirstTabLabel((EntityDefinition) selectedNode);
+		}
 		postSchemaChangedCommand();
 	}
 
@@ -270,11 +280,11 @@ public class SurveySchemaEditVM extends SurveyEditBaseVM {
 		Schema schema = survey.getSchema();
 		schema.addRootEntityDefinition((EntityDefinition) newNode);
 		UITabDefinition tabDefn = createRootTabDefinition(newNode);
-		createFirstTab(newNode, tabDefn);
+		addFirstTab(newNode, tabDefn);
 		return newNode;
 	}
 
-	protected void createFirstTab(EntityDefinition newNode,
+	protected void addFirstTab(EntityDefinition newNode,
 			UITabDefinition tabDefn) {
 		UITab tab = new UITab();
 		int tabPosition = 1;
@@ -282,6 +292,18 @@ public class SurveySchemaEditVM extends SurveyEditBaseVM {
 		tab.setName(tabName);
 		tabDefn.addTab(tab);
 		newNode.setAnnotation(UIConfiguration.TAB_NAME_ANNOTATION, tabName);
+	}
+
+	protected void updateFirstTabLabel(EntityDefinition rootEntityDefn) {
+		UIConfiguration uiConf = survey.getUIConfiguration();
+		UITabDefinition tabDefn = uiConf.getTabDefinition(rootEntityDefn);
+		UITab firstTab = tabDefn.getTabs().get(0);
+		String oldLabel = firstTab.getLabel();
+		String label = rootEntityDefn.getLabel(NodeLabel.Type.INSTANCE, currentLanguageCode);
+		if ( ! StringUtils.equals(oldLabel, label) ) {
+			firstTab.setLabel(label);
+			BindUtils.postNotifyChange(null, null, firstTab, "label");
+		}
 	}
 
 	protected UITabDefinition createRootTabDefinition(EntityDefinition newNode) {

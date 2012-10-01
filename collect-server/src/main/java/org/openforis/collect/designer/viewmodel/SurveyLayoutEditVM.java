@@ -27,7 +27,6 @@ import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zul.DefaultTreeModel;
 import org.zkoss.zul.Include;
 import org.zkoss.zul.Listitem;
-import org.zkoss.zul.Tree;
 import org.zkoss.zul.TreeNode;
 import org.zkoss.zul.Treeitem;
 
@@ -43,8 +42,8 @@ public class SurveyLayoutEditVM extends SurveyEditBaseVM {
 	private UITabDefinition tabsDefinition;
 	private SchemaTreeModel treeModel;
 	
-	@Wire
-	private Tree nodesTree;
+//	@Wire
+//	private Tree nodesTree;
 	@Wire
 	private Include tabsGroupContainerInclude;
 	
@@ -79,6 +78,7 @@ public class SurveyLayoutEditVM extends SurveyEditBaseVM {
 		if ( tabDefinition == null ) {
 			tabsGroupContainerInclude.setSrc(null);
 		} else if ( this.tabsDefinition != tabDefinition) {
+			tabsGroupContainerInclude.setSrc(null); //workaround: include is not refreshed otherwise
 			tabsGroupContainerInclude.setDynamicProperty("tabsGroup", tabDefinition);
 			tabsGroupContainerInclude.setSrc(Resources.Component.TABSGROUP.getLocation());
 		}
