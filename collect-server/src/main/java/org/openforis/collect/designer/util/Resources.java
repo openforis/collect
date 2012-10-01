@@ -45,7 +45,9 @@ public class Resources {
 		CODE_LISTS_POPUP(
 				COMPONENTS_BASE_PATH + "survey_edit/code_lists_popup.zul"), 
 		UNITS_MANAGER_POP_UP(
-				COMPONENTS_BASE_PATH + "survey_edit/units_popup.zul");
+				COMPONENTS_BASE_PATH + "survey_edit/units_popup.zul"), 
+		NODE(
+				COMPONENTS_BASE_PATH + "survey_edit/schema/node.zul");
 		
 		private String location;
 		

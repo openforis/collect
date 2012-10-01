@@ -36,20 +36,7 @@
 			<div visible="@load(not empty vm.nodeType and (vm.nodeType eq 'ENTITY' or not empty vm.attributeType))"
 				height="100%" width="100%"
 				style="overflow:auto;">
-				<include src="
-					@load(empty vm.nodeType or vm.nodeType eq 'ATTRIBUTE' and empty vm.attributeType ? null:
-						vm.nodeType eq 'ENTITY'? 'survey_edit/schema/entity.zul':
-						vm.attributeType eq 'BOOLEAN' ? 'survey_edit/schema/attribute_boolean.zul':
-						vm.attributeType eq 'CODE' ? 'survey_edit/schema/attribute_code.zul':
-						vm.attributeType eq 'COORDINATE' ? 'survey_edit/schema/attribute_coordinate.zul':
-						vm.attributeType eq 'DATE' ? 'survey_edit/schema/attribute_date.zul':
-						vm.attributeType eq 'FILE' ? 'survey_edit/schema/attribute_file.zul':
-						vm.attributeType eq 'NUMBER' ? 'survey_edit/schema/attribute_number.zul':
-						vm.attributeType eq 'RANGE' ? 'survey_edit/schema/attribute_numeric.zul':
-						vm.attributeType eq 'TAXON' ? 'survey_edit/schema/attribute_range.zul':
-						vm.attributeType eq 'TEXT' ? 'survey_edit/schema/attribute_text.zul':
-						vm.attributeType eq 'TIME' ? 'survey_edit/schema/attribute_time.zul': 
-						null)" />
+				<include id="nodeDetailFormInclude" />
 			</div>
 		</center>
 	</borderlayout>

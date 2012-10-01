@@ -1,5 +1,6 @@
 <zk>
 	<vlayout 
+		id="nodeFormContainer"
 		apply="org.zkoss.bind.BindComposer"
 		viewModel="@id('vm') @init(vm)"
 		validationMessages="@id('vmsgs')"

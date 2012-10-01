@@ -11,20 +11,13 @@ import org.openforis.collect.designer.util.Resources;
 import org.openforis.collect.model.LanguageConfiguration;
 import org.openforis.collect.persistence.SurveyImportException;
 import org.zkoss.bind.BindUtils;
-import org.zkoss.bind.annotation.AfterCompose;
 import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
-import org.zkoss.bind.annotation.ContextParam;
-import org.zkoss.bind.annotation.ContextType;
 import org.zkoss.bind.annotation.GlobalCommand;
 import org.zkoss.bind.annotation.Init;
 import org.zkoss.bind.annotation.NotifyChange;
-import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
-import org.zkoss.zk.ui.select.Selectors;
-import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zkplus.databind.BindingListModelList;
-import org.zkoss.zul.Tree;
 import org.zkoss.zul.Window;
 
 /**
@@ -37,15 +30,6 @@ public class SurveyEditVM extends SurveyEditBaseVM {
 	
 	private Window selectLanguagePopUp;
 	private Window srsPopUp;
-	
-	@Wire
-	private Tree nodesTree;
-	
-	@AfterCompose
-	public void afterCompose(@ContextParam(ContextType.VIEW) Component view){
-		 Selectors.wireComponents(view, this, false);
-		 Selectors.wireEventListeners(view, this);
-	}
 	
 	@Override
 	@Init(superclass=false)
@@ -76,7 +60,9 @@ public class SurveyEditVM extends SurveyEditBaseVM {
 	
 	@GlobalCommand
 	public void closeSRSManagerPopUp() {
-		closePopUp(srsPopUp);
+		if ( checkCurrentFormValid() ) {
+			closePopUp(srsPopUp);
+		}
 	}
 	
 	@Command

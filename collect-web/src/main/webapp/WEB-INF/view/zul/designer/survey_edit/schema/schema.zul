@@ -63,7 +63,9 @@
 			    </borderlayout>
 			</west>
 			<center title="${labels.survey.schema.node_detail_title}">
-				<include src="survey_edit/schema/node.zul" visible="@load(vm.editingNode)" />
+				<include id="nodeFormInclude" 
+					src="survey_edit/schema/node.zul" 
+					visible="@load(vm.editingNode)" />
 			</center>
 			
 	    </borderlayout>

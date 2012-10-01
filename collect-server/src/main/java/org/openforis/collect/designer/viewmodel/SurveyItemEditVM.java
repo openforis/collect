@@ -9,8 +9,11 @@ import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.MessageUtil.ConfirmHandler;
 import org.springframework.core.GenericTypeResolver;
 import org.zkoss.bind.BindUtils;
+import org.zkoss.bind.Binder;
 import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
+import org.zkoss.bind.annotation.ContextParam;
+import org.zkoss.bind.annotation.ContextType;
 import org.zkoss.bind.annotation.DependsOn;
 import org.zkoss.bind.annotation.NotifyChange;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
@@ -37,15 +40,31 @@ public abstract class SurveyItemEditVM<T> extends SurveyEditBaseVM {
 	public abstract BindingListModelList<T> getItems();	
 	
 	@Command
-	@NotifyChange({"formObject","editingItem","editedItem","items","selectedItem"})
-	public void newItem() {
+	public void newItem(@ContextParam(ContextType.BINDER) Binder binder) {
 		if ( checkCurrentFormValid() ) {
-			T newInstance = createItemInstance();
-			setEditedItem(newInstance);
-			addNewItemToSurvey();
-			T editedItem = getEditedItem();
-			setSelectedItem(editedItem);
+			performNewItem(binder);
 		}
+	}
+
+	protected void performNewItem(Binder binder) {
+		T newInstance = createItemInstance();
+		setEditedItem(newInstance);
+		addNewItemToSurvey();
+		T editedItem = getEditedItem();
+		setSelectedItem(editedItem);
+		
+		BindUtils.postNotifyChange(null, null, this, "editingItem");
+		BindUtils.postNotifyChange(null, null, this, "editedItem");
+		BindUtils.postNotifyChange(null, null, this, "formObject");
+		BindUtils.postNotifyChange(null, null, this, "items");
+		BindUtils.postNotifyChange(null, null, this, "selectedItem");
+		
+		validateForm(binder);
+	}
+
+	private void validateForm(Binder binder) {
+		//post apply changes command to force validation
+		binder.postCommand("applyChanges", null);
 	}
 
 	@Command

@@ -2,6 +2,7 @@ package org.openforis.collect.designer.viewmodel;
 
 import org.openforis.collect.designer.session.SessionStatus;
 import org.openforis.collect.designer.util.Resources;
+import org.zkoss.bind.BindUtils;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.Session;
 import org.zkoss.zk.ui.event.Event;
@@ -47,6 +48,12 @@ public abstract class BaseVM {
 	protected void closePopUp(Window popUp) {
 		Event event = new Event("onClose", popUp, null);
 		Events.postEvent(event);
+	}
+	
+	protected void notifyChange(String ... properties) {
+		for (String property : properties) {
+			BindUtils.postNotifyChange(null, null, this, property);
+		}
 	}
 	
 }

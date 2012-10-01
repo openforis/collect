@@ -24,9 +24,11 @@ public class FileAttributeDefinitionFormObject<T extends FileAttributeDefinition
 		super.saveTo(dest, languageCode);
 		dest.setMaxSize(maxSize);
 		dest.removeAllExtensions();
-		String[] extensionsArr = extensions.split(EXTENSIONS_SEPARATOR);
-		List<String> extensionsList = Arrays.asList(extensionsArr);
-		dest.addExtensions(extensionsList);
+		if  ( extensions != null ) {
+			String[] extensionsArr = extensions.split(EXTENSIONS_SEPARATOR);
+			List<String> extensionsList = Arrays.asList(extensionsArr);
+			dest.addExtensions(extensionsList);
+		}
 	}
 	
 	@Override

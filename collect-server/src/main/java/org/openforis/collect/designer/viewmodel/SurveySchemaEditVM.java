@@ -26,6 +26,7 @@ import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Precision;
 import org.openforis.idm.metamodel.Schema;
 import org.zkoss.bind.BindUtils;
+import org.zkoss.bind.Binder;
 import org.zkoss.bind.Form;
 import org.zkoss.bind.SimpleForm;
 import org.zkoss.bind.annotation.AfterCompose;
@@ -36,12 +37,15 @@ import org.zkoss.bind.annotation.ContextType;
 import org.zkoss.bind.annotation.GlobalCommand;
 import org.zkoss.bind.annotation.NotifyChange;
 import org.zkoss.zk.ui.Component;
+import org.zkoss.zk.ui.IdSpace;
+import org.zkoss.zk.ui.Path;
 import org.zkoss.zk.ui.event.DropEvent;
 import org.zkoss.zk.ui.select.Selectors;
 import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zul.DefaultTreeModel;
+import org.zkoss.zul.Include;
 import org.zkoss.zul.Tree;
 import org.zkoss.zul.TreeNode;
 import org.zkoss.zul.Treeitem;
@@ -75,7 +79,9 @@ public class SurveySchemaEditVM extends SurveyEditBaseVM {
 	
 	@Wire
 	private Tree nodesTree;
-
+	@Wire
+	private Include nodeFormInclude;
+	
 	//popups
 	private Window unitsPopUp;
 	private Window codeListsPopUp;
@@ -118,12 +124,11 @@ public class SurveySchemaEditVM extends SurveyEditBaseVM {
 			editingNode = false;
 		}
 		initFormObject(selectedNode);
+		refreshNodeForm();
 	}
 	
 	@Command
-	@NotifyChange({"nodes","editingNode","nodeType","attributeType",
-		"tempFormObject","formObject","attributeDefaults","numericAttributePrecisions"})
-	public void addRootEntity() {
+	public void addRootEntity(@ContextParam(ContextType.BINDER) Binder binder) {
 		if ( checkCurrentFormValid() ) {
 			editingNode = true;
 			nodeType = NodeType.ENTITY.name();
@@ -131,18 +136,12 @@ public class SurveySchemaEditVM extends SurveyEditBaseVM {
 			
 			NodeDefinition newNode = createRootEntityNode();
 			
-			treeModel.appendNodeToSelected(newNode);
-			
-			selectedNode = newNode;
-			
-			postSchemaChangedCommand();
+			onAfterNodeCreated(binder, newNode);
 		}
 	}
 
 	@Command
-	@NotifyChange({"nodes","editingNode","nodeType","attributeType","tempFormObject","formObject",
-		"attributeDefaults","numericAttributePrecisions"})
-	public void addNode(@BindingParam("nodeType") String nodeType, @BindingParam("attributeType") String attributeType) throws Exception {
+	public void addNode(@ContextParam(ContextType.BINDER) Binder binder, @BindingParam("nodeType") String nodeType, @BindingParam("attributeType") String attributeType) throws Exception {
 		if ( checkCurrentFormValid() ) {
 			if ( selectedNode != null && selectedNode instanceof EntityDefinition ) {
 				editingNode = true;
@@ -155,16 +154,57 @@ public class SurveySchemaEditVM extends SurveyEditBaseVM {
 				
 				NodeDefinition newNode = NodeType.createNodeDefinition(survey, nodeTypeEnum, attributeTypeEnum );
 				( (EntityDefinition) selectedNode).addChildDefinition(newNode);
-				treeModel.appendNodeToSelected(newNode);
 				
-				selectedNode = newNode;
-				postSchemaChangedCommand();
+				onAfterNodeCreated(binder, newNode);
 			} else {
 				MessageUtil.showWarning("survey.schema.add_node.error.parent_entity_not_selected");
 			}
 		}
 	}
+
 	
+	protected void onAfterNodeCreated(Binder binder, NodeDefinition newNode) {
+		treeModel.appendNodeToSelected(newNode);
+		
+		selectedNode = newNode;
+		
+		refreshNodeForm();
+		
+		notifyChange("nodes","editingNode","nodeType","attributeType",
+				"tempFormObject","formObject", "attributeDefaults","numericAttributePrecisions");
+
+		validateForm(binder);
+		postSchemaChangedCommand();
+	}
+	
+	protected void refreshNodeForm() {
+		nodeFormInclude.setSrc(null);
+		nodeFormInclude.setSrc(Resources.Component.NODE.getLocation());
+		IdSpace nodeFormIncludeIdSpace = nodeFormInclude.getSpaceOwner();
+		Include nodeDetailFormInclude = (Include) Path.getComponent(nodeFormIncludeIdSpace, "nodeDetailFormInclude");
+		NodeType nodeTypeEnum = NodeType.valueOf(nodeType);
+		String nodeDetailFormIncludeSrc = null;
+		switch(nodeTypeEnum) {
+		case ENTITY:
+			nodeDetailFormIncludeSrc = Resources.COMPONENTS_BASE_PATH + "survey_edit/schema/entity.zul";
+			break;
+		case ATTRIBUTE:
+			if ( attributeType != null ) {
+				nodeDetailFormIncludeSrc = Resources.COMPONENTS_BASE_PATH + "survey_edit/schema/attribute_" + attributeType.toLowerCase() + ".zul";
+			}
+			break;
+		}
+		nodeDetailFormInclude.setSrc(nodeDetailFormIncludeSrc);
+	}
+	
+	protected void validateForm(@ContextParam(ContextType.BINDER) Binder binder) {
+		Component view = binder.getView();
+		IdSpace currentIdSpace = view.getSpaceOwner();
+		Component formComponent = Path.getComponent(currentIdSpace, "nodeFormInclude/nodeDetailFormInclude/nodeFormContainer");
+		Binder formComponentBinder = (Binder) formComponent.getAttribute("binder");
+		formComponentBinder.postCommand("applyChanges", null);
+	}
+
 	@Command
 	public void removeNode() {
 		if ( selectedNode != null ) {
