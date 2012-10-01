@@ -29,7 +29,8 @@
 	                    	</hlayout>
 	                    	<hlayout>
 	                    		<separator width="50px" />
-		                    	<include src="editablenodeslist.zul"
+		                    	<include 
+		                    		src="${vm.componentsPath}/survey_edit/schema_layout/editablenodeslist.zul"
 									tab="${vm.tab}" nodes="${each.childDefinitions}" />
 	                    	</hlayout>
 	                    </vlayout>
@@ -106,12 +107,8 @@
    	                    	<!-- child definitions (visible only if there are no subtabs -->
 		                    <hlayout visible="@load(empty vm.tabs)">
 	                    		<separator width="50px" />
-<!-- 		                    	<vlayout children="@load(vm.getChildDefinitionsInTab(each))"> -->
-<!-- 	                    			<template name="children"> -->
-<!-- 		                    			<label value="@load(each.name)" /> -->
-<!-- 		                    		</template> -->
-<!-- 		                    	</vlayout> -->
-		                    	<include src="editablenodeslist.zul"
+		                    	<include 
+		                    		src="${vm.componentsPath}/survey_edit/schema_layout/editablenodeslist.zul"
 									tab="${vm.tab}" nodes="${vm.getChildDefinitionsInTab(each)}" />
 	                    	</hlayout>
 		                    <include defer="true" 
