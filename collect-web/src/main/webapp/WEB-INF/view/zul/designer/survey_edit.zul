@@ -22,7 +22,7 @@
 				<label value="${labels.survey.selected_language}:" />
 				<radiogroup model="@load(vm.availableLanguages)"
 					selectedItem="@load(vm.currentLanguageCode)"
-					onCheck="@command('languageCodeSelected', code=self.selectedItem)">
+					onCheck="@command('languageCodeSelected', code=self.selectedItem.value)">
 					<template name="model">
 						<radio label="@load(each)" value="@load(each)" />
 					</template>

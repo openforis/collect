@@ -39,7 +39,9 @@ public class SurveyEditVM extends SurveyEditBaseVM {
 			//TEST
 			currentLanguageCode = "eng";
 			LanguageConfiguration languageConfiguration = new LanguageConfiguration();
-			languageConfiguration.addLanguageCode(currentLanguageCode);
+			languageConfiguration.addLanguageCode("eng");
+			languageConfiguration.addLanguageCode("spa");
+			notifyChange("availableLanguages");
 			//openLanguageManagerPopUp();
 		}
 	}
@@ -73,10 +75,15 @@ public class SurveyEditVM extends SurveyEditBaseVM {
 		Executions.sendRedirect(Resources.Page.MAIN.getLocation());
 	}
 	
+	@Command
+	@NotifyChange({"currentLanguageCode"})
 	public void languageCodeSelected(@BindingParam("code") String selectedLanguageCode) {
 		SessionStatus sessionStatus = getSessionStatus();
-		sessionStatus.setCurrentLanguageCode(selectedLanguageCode);
-		BindUtils.postGlobalCommand(null, null, SurveySelectLanguageVM.CURRENT_LANGUAGE_CHANGED_COMMAND, null);
+		if ( checkCurrentFormValid() ) {
+			sessionStatus.setCurrentLanguageCode(selectedLanguageCode);
+			BindUtils.postGlobalCommand(null, null, SurveySelectLanguageVM.CURRENT_LANGUAGE_CHANGED_COMMAND, null);
+		}
+		currentLanguageCode = sessionStatus.getCurrentLanguageCode();
 	}
 	
 	@Command

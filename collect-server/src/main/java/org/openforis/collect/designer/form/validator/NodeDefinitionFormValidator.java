@@ -6,7 +6,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.designer.viewmodel.SurveySchemaEditVM;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
-import org.openforis.idm.metamodel.NodeDefinitionVisitor;
 import org.openforis.idm.metamodel.Schema;
 import org.zkoss.bind.BindContext;
 import org.zkoss.bind.ValidationContext;

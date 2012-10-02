@@ -12,6 +12,7 @@ import org.openforis.collect.model.LanguageConfiguration;
 import org.openforis.idm.metamodel.Languages;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.annotation.Command;
+import org.zkoss.bind.annotation.Init;
 import org.zkoss.bind.annotation.NotifyChange;
 import org.zkoss.zkplus.databind.BindingListModelListModel;
 import org.zkoss.zul.ListModelList;
@@ -26,12 +27,14 @@ public class SurveySelectLanguageVM extends BaseVM {
 	public static final String CURRENT_LANGUAGE_CHANGED_COMMAND = "currentLanguageChanged";
 	public static final String SURVEY_LANGUAGES_CHANGED_COMMAND = "surveyLanguagesChanged";
 
-	private String selectedAssignableLanguageCode;
-	private String selectedCurrentLanguageCode;
 	private List<String> assignableLanguageCodes;
 	private List<String> assignedLanguageCodes;
+
+	private String selectedAssignableLanguageCode;
+	private String selectedCurrentLanguageCode;
 	
-	public SurveySelectLanguageVM() {
+	@Init
+	public void init() {
 		initAssignedLanguageCodes();
 		initAssignableLanguageCodes();
 		initSelectedDefaultLanguageCode();

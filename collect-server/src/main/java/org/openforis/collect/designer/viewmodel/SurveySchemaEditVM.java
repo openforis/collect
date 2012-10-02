@@ -180,8 +180,6 @@ public class SurveySchemaEditVM extends SurveyEditBaseVM {
 	protected void refreshNodeForm() {
 		nodeFormInclude.setSrc(null);
 		nodeFormInclude.setSrc(Resources.Component.NODE.getLocation());
-		IdSpace nodeFormIncludeIdSpace = nodeFormInclude.getSpaceOwner();
-		Include nodeDetailFormInclude = (Include) Path.getComponent(nodeFormIncludeIdSpace, "nodeDetailFormInclude");
 		NodeType nodeTypeEnum = NodeType.valueOf(nodeType);
 		String nodeDetailFormIncludeSrc = null;
 		switch(nodeTypeEnum) {
@@ -194,6 +192,8 @@ public class SurveySchemaEditVM extends SurveyEditBaseVM {
 			}
 			break;
 		}
+		IdSpace nodeFormIncludeIdSpace = nodeFormInclude.getSpaceOwner();
+		Include nodeDetailFormInclude = (Include) Path.getComponent(nodeFormIncludeIdSpace, "nodeDetailFormInclude");
 		nodeDetailFormInclude.setSrc(nodeDetailFormIncludeSrc);
 	}
 	
@@ -252,6 +252,17 @@ public class SurveySchemaEditVM extends SurveyEditBaseVM {
 	public void currentFormValidated(@BindingParam("valid") boolean valid) {
 		super.currentFormValidated(valid);
 		nodesTree.setNonselectableTags(valid ? "": "*");
+	}
+	
+	@Override
+	@GlobalCommand
+	public void currentLanguageChanged() {
+		super.currentLanguageChanged();
+		if ( editingNode ) {
+			initFormObject(selectedNode);
+//			refreshNodeForm();
+			notifyChange("tempFormObject","formObject","attributeDefaults","numericAttributePrecisions");
+		}
 	}
 	
 	@Command

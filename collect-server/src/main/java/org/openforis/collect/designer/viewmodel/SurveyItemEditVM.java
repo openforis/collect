@@ -15,6 +15,7 @@ import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.ContextParam;
 import org.zkoss.bind.annotation.ContextType;
 import org.zkoss.bind.annotation.DependsOn;
+import org.zkoss.bind.annotation.GlobalCommand;
 import org.zkoss.bind.annotation.NotifyChange;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zkplus.databind.BindingListModelList;
@@ -50,8 +51,7 @@ public abstract class SurveyItemEditVM<T> extends SurveyEditBaseVM {
 		T newInstance = createItemInstance();
 		setEditedItem(newInstance);
 		addNewItemToSurvey();
-		T editedItem = getEditedItem();
-		setSelectedItem(editedItem);
+		setSelectedItem(newInstance);
 		
 		BindUtils.postNotifyChange(null, null, this, "editingItem");
 		BindUtils.postNotifyChange(null, null, this, "editedItem");
@@ -62,9 +62,18 @@ public abstract class SurveyItemEditVM<T> extends SurveyEditBaseVM {
 		validateForm(binder);
 	}
 
-	private void validateForm(Binder binder) {
+	protected void validateForm(Binder binder) {
 		//post apply changes command to force validation
 		binder.postCommand("applyChanges", null);
+	}
+	
+	@Override
+	@GlobalCommand
+	public void currentLanguageChanged() {
+		super.currentLanguageChanged();
+		if ( isEditingItem() ) {
+			performItemSelection(editedItem);
+		}
 	}
 
 	@Command
@@ -84,7 +93,7 @@ public abstract class SurveyItemEditVM<T> extends SurveyEditBaseVM {
 		}
 	}
 
-	@NotifyChange({"formObject","editedItem"})
+//	@NotifyChange({"formObject","editedItem"})
 	protected void performItemSelection(T item) {
 		setSelectedItem(item);
 		setEditedItem(item);
@@ -169,7 +178,7 @@ public abstract class SurveyItemEditVM<T> extends SurveyEditBaseVM {
 		return editedItem;
 	}
 
-	@NotifyChange({"editingItem","formObject"})
+	@NotifyChange({"editedItem","formObject"})
 	public void setEditedItem(T editedItem) {
 		this.editedItem = editedItem;
 		formObject = createFormObject();

@@ -20,8 +20,11 @@ import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
 import org.openforis.idm.metamodel.CodeListLevel;
 import org.zkoss.bind.BindUtils;
+import org.zkoss.bind.Binder;
 import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
+import org.zkoss.bind.annotation.ContextParam;
+import org.zkoss.bind.annotation.ContextType;
 import org.zkoss.bind.annotation.GlobalCommand;
 import org.zkoss.bind.annotation.NotifyChange;
 import org.zkoss.util.resource.Labels;
@@ -72,9 +75,9 @@ public class SurveyCodeListsEditVM extends SurveyItemEditVM<CodeList> {
 	}
 
 	@Command
-	@NotifyChange({"formObject","editingItem","editedItem","items","selectedItem","listLevels","multipleLevelsPresent","itemsPerLevel","selectedItemsPerLevel","lastSelectedLevelIndex"})
-	public void newItem() {
-		super.newItem();
+	@NotifyChange({"formObject","editedItem","items","selectedItem","listLevels","multipleLevelsPresent","itemsPerLevel","selectedItemsPerLevel","lastSelectedLevelIndex"})
+	public void newItem(@ContextParam(ContextType.BINDER) Binder binder) {
+		super.newItem(binder);
 		editedItem.setSurvey(survey);
 	}
 	
