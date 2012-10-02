@@ -4,6 +4,7 @@
 package org.openforis.collect.designer.session;
 
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.idm.metamodel.ModelVersion;
 
 /**
  * @author S. Ricci
@@ -15,6 +16,7 @@ public class SessionStatus {
 	
 	private String currentLanguageCode;
 	private CollectSurvey survey;
+	private ModelVersion layoutFormVersion;
 	
 	public String getCurrentLanguageCode() {
 		return currentLanguageCode;
@@ -30,6 +32,14 @@ public class SessionStatus {
 	
 	public void setSurvey(CollectSurvey survey) {
 		this.survey = survey;
+	}
+
+	public ModelVersion getLayoutFormVersion() {
+		return layoutFormVersion;
+	}
+
+	public void setLayoutFormVersion(ModelVersion layoutFormVersion) {
+		this.layoutFormVersion = layoutFormVersion;
 	}
 	
 }

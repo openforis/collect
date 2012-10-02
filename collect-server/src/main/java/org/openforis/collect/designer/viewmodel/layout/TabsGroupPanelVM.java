@@ -3,6 +3,7 @@
  */
 package org.openforis.collect.designer.viewmodel.layout;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.openforis.collect.designer.session.SessionStatus;
@@ -12,6 +13,7 @@ import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.ui.UIConfiguration;
 import org.openforis.collect.model.ui.UITab;
 import org.openforis.collect.model.ui.UITabsGroup;
+import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.zkoss.bind.annotation.AfterCompose;
 import org.zkoss.bind.annotation.BindingParam;
@@ -73,7 +75,14 @@ public class TabsGroupPanelVM extends BaseVM {
 	
 	public List<NodeDefinition> getNodesPerTab() {
 		UIConfiguration uiConf = getUIConfiguration();
-		List<NodeDefinition> result = uiConf.getNodesPerTab(tab, false);
+		List<NodeDefinition> result = new ArrayList<NodeDefinition>();
+		List<NodeDefinition> nodesPerTab = uiConf.getNodesPerTab(tab, false);
+		ModelVersion version = getFormVersion();
+		for (NodeDefinition nodeDefn : nodesPerTab) {
+			if ( version == null || version.isApplicable(nodeDefn) ) {
+				result.add(nodeDefn);
+			}
+		}
 		return result;
 	}
 	
@@ -81,6 +90,12 @@ public class TabsGroupPanelVM extends BaseVM {
 		SessionStatus sessionStatus = super.getSessionStatus();
 		CollectSurvey survey = sessionStatus.getSurvey();
 		return survey;
+	}
+	
+	public ModelVersion getFormVersion() {
+		SessionStatus sessionStatus = super.getSessionStatus();
+		ModelVersion version = sessionStatus.getLayoutFormVersion();
+		return version;
 	}
 	
 	protected UIConfiguration getUIConfiguration() {

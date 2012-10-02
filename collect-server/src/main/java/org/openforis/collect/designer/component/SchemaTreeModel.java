@@ -9,7 +9,9 @@ import java.util.List;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
+import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.NodeDefinition;
+import org.openforis.idm.metamodel.Schema;
 import org.zkoss.zul.DefaultTreeModel;
 import org.zkoss.zul.DefaultTreeNode;
 import org.zkoss.zul.TreeNode;
@@ -23,8 +25,13 @@ public class SchemaTreeModel extends DefaultTreeModel<NodeDefinition> {
 	}
 	
 	public static SchemaTreeModel createInstance(CollectSurvey survey) {
-		List<EntityDefinition> rootDefns = survey.getSchema().getRootEntityDefinitions();
-		List<TreeNode<NodeDefinition>> treeNodes = NodeDefinitionTreeNode.fromList(rootDefns);
+		return createInstance(survey, null);
+	}
+	
+	public static SchemaTreeModel createInstance(CollectSurvey survey, ModelVersion version) {
+		Schema schema = survey.getSchema();
+		List<EntityDefinition> rootDefns = schema.getRootEntityDefinitions();
+		List<TreeNode<NodeDefinition>> treeNodes = NodeDefinitionTreeNode.fromList(rootDefns, version);
 		TreeNode<NodeDefinition> root = new NodeDefinitionTreeNode(null, treeNodes);
 		SchemaTreeModel result = new SchemaTreeModel(root);
 		return result;
@@ -46,21 +53,24 @@ public class SchemaTreeModel extends DefaultTreeModel<NodeDefinition> {
 			super(data, new ArrayList<TreeNode<NodeDefinition>>());
 		}
 		
-		public static List<TreeNode<NodeDefinition>> fromList(List<? extends NodeDefinition> items) {
+		public static List<TreeNode<NodeDefinition>> fromList(List<? extends NodeDefinition> items,
+				ModelVersion version) {
 			List<TreeNode<NodeDefinition>> result = null;
 			if ( items != null ) {
 				result = new ArrayList<TreeNode<NodeDefinition>>();
 				for (NodeDefinition item : items) {
-					List<TreeNode<NodeDefinition>> childrenNodes = null;
-					NodeDefinitionTreeNode node;
-					if ( item instanceof EntityDefinition ) {
-						List<NodeDefinition> childDefns = ((EntityDefinition) item).getChildDefinitions();
-						childrenNodes = fromList(childDefns);
-						node = new NodeDefinitionTreeNode((EntityDefinition) item, childrenNodes);
-					} else {
-						node = new NodeDefinitionTreeNode((AttributeDefinition) item);	
+					if ( version == null || version.isApplicable(item) ) {
+						List<TreeNode<NodeDefinition>> childrenNodes = null;
+						NodeDefinitionTreeNode node;
+						if ( item instanceof EntityDefinition ) {
+							List<NodeDefinition> childDefns = ((EntityDefinition) item).getChildDefinitions();
+							childrenNodes = fromList(childDefns, version);
+							node = new NodeDefinitionTreeNode((EntityDefinition) item, childrenNodes);
+						} else {
+							node = new NodeDefinitionTreeNode((AttributeDefinition) item);	
+						}
+						result.add(node);
 					}
-					result.add(node);
 				}
 			}
 			return result;
@@ -117,6 +127,16 @@ public class SchemaTreeModel extends DefaultTreeModel<NodeDefinition> {
 		}
 		addOpenObject(treeNode.getParent());
 		setSelection(Arrays.asList(treeNode));
+	}
+	
+	public void moveSelectedNode(int toIndex) {
+		int[] selectionPath = getSelectionPath();
+		NodeDefinitionTreeNode treeNode = (NodeDefinitionTreeNode) getChild(selectionPath);
+		TreeNode<NodeDefinition> parentTreeNode = treeNode.getParent();
+		parentTreeNode.remove(treeNode);
+		parentTreeNode.insert(treeNode, toIndex);
+		List<NodeDefinitionTreeNode> selection = Arrays.asList(treeNode);
+		setSelection(selection);
 	}
 	
 }

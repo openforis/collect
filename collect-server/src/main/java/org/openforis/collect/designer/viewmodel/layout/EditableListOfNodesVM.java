@@ -14,6 +14,7 @@ import org.openforis.collect.model.ui.UIConfiguration.Layout;
 import org.openforis.collect.model.ui.UITab;
 import org.openforis.collect.model.ui.UITabsGroup;
 import org.openforis.idm.metamodel.EntityDefinition;
+import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.annotation.AfterCompose;
@@ -130,7 +131,14 @@ public class EditableListOfNodesVM extends BaseVM {
 	}
 	
 	public List<NodeDefinition> getChildDefinitions(EntityDefinition entityDefn) {
+		List<NodeDefinition> result = new ArrayList<NodeDefinition>();
 		List<NodeDefinition> childDefinitions = entityDefn.getChildDefinitions();
+		ModelVersion formVersion = getLayoutFormVersion();
+		for (NodeDefinition nodeDefn : childDefinitions) {
+			if ( formVersion == null || formVersion.isApplicable(nodeDefn) ) {
+				result.add(nodeDefn);
+			}
+		}
 		return childDefinitions;
 	}
 	
@@ -138,10 +146,13 @@ public class EditableListOfNodesVM extends BaseVM {
 		UIConfiguration uiConf = getUIConfiguration();
 		List<NodeDefinition> childDefinitions = entityDefn.getChildDefinitions();
 		List<NodeDefinition> result = new ArrayList<NodeDefinition>();
+		ModelVersion formVersion = getLayoutFormVersion();
 		for (NodeDefinition nodeDefn : childDefinitions) {
-			UITab nodeTab = uiConf.getTab(nodeDefn);
-			if ( nodeTab == tab ) {
-				result.add(nodeDefn);
+			if ( formVersion == null || formVersion.isApplicable(nodeDefn) ) {
+				UITab nodeTab = uiConf.getTab(nodeDefn);
+				if ( nodeTab == tab ) {
+					result.add(nodeDefn);
+				}
 			}
 		}
 		return result;
@@ -160,6 +171,12 @@ public class EditableListOfNodesVM extends BaseVM {
 		return uiConf;
 	}
 
+	public ModelVersion getLayoutFormVersion() {
+		SessionStatus sessionStatus = getSessionStatus();
+		ModelVersion version = sessionStatus.getLayoutFormVersion();
+		return version;
+	}
+	
 	public List<NodeDefinition> getNodes() {
 		return nodes;
 	}

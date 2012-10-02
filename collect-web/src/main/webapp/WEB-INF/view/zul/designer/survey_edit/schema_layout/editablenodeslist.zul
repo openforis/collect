@@ -5,7 +5,8 @@
 		width="100%">
 		<listbox id="listOfNodesListbox"
 			model="@load(vm.nodes) @template(vm.getTemplateName(each))"
-			droppable="true" style="min-height: 150px">
+			droppable="true" style="min-height: 150px"
+			nonselectableTags="*">
 			<listhead>
 				<listheader width="100px" />
 				<listheader width="60px" />
@@ -63,7 +64,7 @@
 	                    	<hlayout>
 	                    		<separator width="150px" />
 	                    		<!-- table rapresentation of the entity -->
-		                    	<listbox>
+		                    	<listbox nonselectableTags="*">
 		                    		<listhead children="@load(each.childDefinitions)">
 			                    		<template name="children">
 			                    			<listheader width="100px" label="${each.name}" />
@@ -112,7 +113,7 @@
 									tab="${vm.tab}" nodes="${vm.getChildDefinitionsInTab(each)}" />
 	                    	</hlayout>
 		                    <include defer="true" 
-								src="tabsgroup.zul"
+								src="${vm.componentsPath}/survey_edit/schema_layout/tabsgroup.zul"
 								hflex="1" vflex="1"
 								tabsGroup="${vm.tab}"
 								style="min-height: 180px" />

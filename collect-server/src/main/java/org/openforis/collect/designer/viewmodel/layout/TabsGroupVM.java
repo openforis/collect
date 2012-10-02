@@ -17,7 +17,6 @@ import org.openforis.collect.designer.viewmodel.BaseVM;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.ui.UIConfiguration;
 import org.openforis.collect.model.ui.UITab;
-import org.openforis.collect.model.ui.UITabDefinition;
 import org.openforis.collect.model.ui.UITabsGroup;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.zkoss.bind.BindUtils;
@@ -85,9 +84,7 @@ public class TabsGroupVM extends BaseVM {
 
 	@Command
 	public void editTabLabel(@BindingParam("tab") UITab tab) {
-		if ( canEditTabLabel(tab) ) {
-			openTabLabelEditPopUp(tab);
-		}
+		openTabLabelEditPopUp(tab);
 	}
 
 	@Command
@@ -110,20 +107,6 @@ public class TabsGroupVM extends BaseVM {
 		}
 	}
 
-	protected boolean canEditTabLabel(UITab tab) {
-		UITabsGroup parent = tab.getParent();
-		if ( parent instanceof UITabDefinition ) {
-			int index = parent.getTabs().indexOf(tab);
-			if ( index != 0 ) {
-				return true;
-			} else {
-				return false;
-			}
-		} else {
-			return true;
-		}
-	}
-	
 	protected void openTabLabelEditPopUp(final UITab tab) {
 		tabLabelPopUp = openPopUp(Resources.Component.TAB_LABEL_POPUP.getLocation(), true);
 		Button okButton = (Button) tabLabelPopUp.query("#okBtn");
