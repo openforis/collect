@@ -21,7 +21,7 @@ import org.openforis.idm.util.CollectionUtil;
  *
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "", propOrder = { "tabDefinitions" })
+@XmlType(name = "", propOrder = { "languageCodes" })
 @XmlRootElement(name = "language")
 public class LanguageConfiguration implements Configuration {
 

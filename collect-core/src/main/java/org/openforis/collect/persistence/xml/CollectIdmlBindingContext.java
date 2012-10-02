@@ -3,7 +3,6 @@ package org.openforis.collect.persistence.xml;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.openforis.collect.model.CollectSurvey;
-import org.openforis.collect.model.ui.UIConfiguration.UIConfigurationAdapter;
 import org.openforis.idm.metamodel.Configuration;
 import org.openforis.idm.metamodel.SurveyContext;
 import org.openforis.idm.metamodel.xml.ConfigurationAdapter;
@@ -17,7 +16,7 @@ public class CollectIdmlBindingContext extends IdmlBindingContext {
 	
 	public CollectIdmlBindingContext(SurveyContext surveyContext) {
 		super(CollectSurvey.class, surveyContext);
-		UIConfigurationAdapter configurationAdapter = new UIConfigurationAdapter();
+		CollectSurveyConfigurationAdapter configurationAdapter = new CollectSurveyConfigurationAdapter();
 		super.setConfigurationAdapter(configurationAdapter);
 	}
 
