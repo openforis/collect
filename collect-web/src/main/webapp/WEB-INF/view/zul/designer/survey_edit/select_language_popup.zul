@@ -1,3 +1,4 @@
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
 <zk>
 	<window id="selectLanguagePopUp" title="${labels.survey.language_manager}" 
 		width="800px" 
