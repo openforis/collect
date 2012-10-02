@@ -113,6 +113,7 @@ public class SurveySchemaEditVM extends SurveyEditBaseVM {
 
 	@Command
 	@NotifyChange({"nodes","editingNode","nodeType","attributeType",
+		"moveNodeUpDisallowed","moveNodeDownDisallowed",
 		"tempFormObject","formObject","attributeDefaults","numericAttributePrecisions"})
 	public void nodeSelected(@BindingParam("node") Treeitem node) {
 		if ( node != null ) {
@@ -223,6 +224,34 @@ public class SurveySchemaEditVM extends SurveyEditBaseVM {
 		}
 	}
 
+	@Command
+	public void moveNodeUp() {
+		moveNode(true);
+	}
+	
+	@Command
+	public void moveNodeDown() {
+		moveNode(false);
+	}
+	
+	@NotifyChange({"moveNodeUpDisallowed","moveNodeDownDisallowed"})
+	protected void moveNode(boolean up) {
+		int newIndex;
+		EntityDefinition parentDefn = (EntityDefinition) selectedNode.getParentDefinition();
+		if ( parentDefn != null ) {
+			int oldIndex = parentDefn.getChildIndex(selectedNode);
+			newIndex = up ? oldIndex - 1: oldIndex + 1;
+			parentDefn.moveChildDefinition(selectedNode, newIndex);
+		} else {
+			EntityDefinition rootEntity = selectedNode.getRootEntity();
+			Schema schema = rootEntity.getSchema();
+			int oldIndex = schema.getRootEntityIndex(rootEntity);
+			newIndex = up ? oldIndex - 1: oldIndex + 1;
+			schema.moveRootEntityDefinition(rootEntity, newIndex);
+		}
+		treeModel.moveSelectedNode(newIndex);
+	}
+	
 	protected void performRemoveSelectedNode() {
 		EntityDefinition parentDefn = (EntityDefinition) selectedNode.getParentDefinition();
 		if ( parentDefn != null ) {
@@ -240,10 +269,8 @@ public class SurveySchemaEditVM extends SurveyEditBaseVM {
 		selectedNode = null;
 		tempFormObject = null;
 		formObject = null;
-		BindUtils.postNotifyChange(null, null, this, "nodes");
-		BindUtils.postNotifyChange(null, null, this, "editingNode");
-		BindUtils.postNotifyChange(null, null, this, "tempFormObject");
-		BindUtils.postNotifyChange(null, null, this, "formObject");
+		notifyChange("nodes","editingNode","tempFormObject","formObject",
+				"moveNodeUpDisallowed","moveNodeDownDisallowed");
 	}
 
 	@Override
@@ -444,6 +471,52 @@ public class SurveySchemaEditVM extends SurveyEditBaseVM {
 		}
 		return treeModel;
     }
+
+	public List<NodeDefinition> getSiblings(NodeDefinition nodeDefinition) {
+		List<NodeDefinition> siblings = new ArrayList<NodeDefinition>();
+		EntityDefinition parentDefn = (EntityDefinition) selectedNode.getParentDefinition();
+		if ( parentDefn != null ) {
+			siblings.addAll(parentDefn.getChildDefinitions());
+		} else {
+			EntityDefinition rootEntity = selectedNode.getRootEntity();
+			Schema schema = rootEntity.getSchema();
+			siblings.addAll(schema.getRootEntityDefinitions());
+		}
+		siblings.remove(nodeDefinition);
+		return siblings;
+	}
+	
+	public int getSelectedNodeIndex() {
+		int index;
+		if ( selectedNode != null ) {
+			EntityDefinition parentDefn = (EntityDefinition) selectedNode.getParentDefinition();
+			if ( parentDefn != null ) {
+				index = parentDefn.getChildIndex(selectedNode);
+			} else {
+				EntityDefinition rootEntity = selectedNode.getRootEntity();
+				Schema schema = rootEntity.getSchema();
+				index = schema.getRootEntityIndex(rootEntity);
+			}
+		} else {
+			index = -1;
+		}
+		return index;
+	}
+
+	public boolean isMoveNodeUpDisallowed() {
+		int index = getSelectedNodeIndex();
+		return index <= 0;
+	}
+	
+	public boolean isMoveNodeDownDisallowed() {
+		if ( selectedNode != null ) {
+			List<NodeDefinition> siblings = getSiblings(selectedNode);
+			int index = getSelectedNodeIndex();
+			return index < 0 || index >= siblings.size();
+		} else {
+			return true;
+		}
+	}
 
 	public String getNodeType() {
 		return nodeType;

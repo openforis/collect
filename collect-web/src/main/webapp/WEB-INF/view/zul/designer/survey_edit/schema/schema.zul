@@ -58,6 +58,12 @@
 			                </menu>
 							<menuitem label="${labels.survey.schema.remove_node}" 
 					        	onClick="@command('removeNode')" />
+			                <menuitem image="/assets/images/arrow-up.png" width="30px"
+								disabled="@load(vm.moveNodeUpDisallowed)"
+					        	onClick="@command('moveNodeUp')" />
+			                <menuitem image="/assets/images/arrow-down.png" width="30px"
+			                	disabled="@load(vm.moveNodeDownDisallowed)" 
+					        	onClick="@command('moveNodeDown')" />
 			             </menubar>
 		 			</south>
 			    </borderlayout>

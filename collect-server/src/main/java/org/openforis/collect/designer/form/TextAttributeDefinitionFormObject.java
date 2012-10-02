@@ -15,6 +15,10 @@ public class TextAttributeDefinitionFormObject<T extends TextAttributeDefinition
 	private boolean key;
 	private String type;
 	
+	public TextAttributeDefinitionFormObject() {
+		Type.SHORT.name();
+	}
+	
 	@Override
 	public void saveTo(T dest, String languageCode) {
 		super.saveTo(dest, languageCode);

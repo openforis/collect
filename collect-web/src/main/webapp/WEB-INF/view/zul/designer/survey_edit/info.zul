@@ -21,14 +21,14 @@
 				<row>
 					<label value="${labels.survey.uri}:" />
 					<cell>
-						<textbox width="150px" value="@bind(fx.uri)" onChange="@command('applyChanges')" />
+						<textbox width="350px" value="@bind(fx.uri)" onChange="@command('applyChanges')" />
 						<label class="error" value="@load(vmsgs['uri'])" />
 					</cell>
 				</row>
 				<row>
 					<label value="${labels.survey.description}:" />
 					<cell>
-						<textbox width="150px" value="@bind(fx.description)" onChange="@command('applyChanges')" />
+						<textbox width="350px" value="@bind(fx.description)" onChange="@command('applyChanges')" />
 						<label class="error" value="@load(vmsgs['description'])" />
 					</cell>
 				</row>
@@ -42,7 +42,7 @@
 				<row>
 					<label value="${labels.survey.project_cycle}:" />
 					<cell>
-						<intbox width="30px" value="@bind(fx.projectCycle)" onChange="@command('applyChanges')" />
+						<intbox width="50px" value="@bind(fx.projectCycle)" onChange="@command('applyChanges')" />
 						<label class="error" value="@load(vmsgs['projectCycle'])" />
 					</cell>
 				</row>
