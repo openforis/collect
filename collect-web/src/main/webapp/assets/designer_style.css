@@ -16,3 +16,8 @@
 .z-groupbox-3d .open-true .z-caption-l {
 	background: url("images/arrow-up-small.png") no-repeat 0 0px;;
 }
+.z-menuitem.icon-button .z-menuitem-btn  {
+	width: 20px;
+	height: 25px;
+	padding-left: 20px;
+}
