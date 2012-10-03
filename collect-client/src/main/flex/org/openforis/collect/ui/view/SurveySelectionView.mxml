@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 width="100%" height="100%"
+		 creationComplete="creationCompleteHandler(event)">
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.events.FlexEvent;
+			
+			import org.openforis.collect.i18n.Message;
+			import org.openforis.collect.presenter.SurveySelectionPresenter;
+			
+			public static const DEFAULT_STATE:String = "default";
+			public static const LOADING_ROOT_ENTITIES_STATE:String = "loadingRootEntities";
+			public static const ROOT_ENTITIES_LOADED_STATE:String = "rootEntitiesLoaded";
+			
+			private var _presenter:SurveySelectionPresenter;
+			
+			protected function creationCompleteHandler(event:FlexEvent):void {
+				_presenter = new SurveySelectionPresenter(this);
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<s:layout>
+		<s:VerticalLayout horizontalAlign="center" />
+	</s:layout>
+	
+	<s:states>
+		<s:State name="default" />
+		<s:State name="loadingRootEntities" />
+		<s:State name="rootEntitiesLoaded" />
+	</s:states>
+	
+	<s:Form>
+		<s:FormItem label="{Message.get('surveySelection.survey')}">
+			<s:DropDownList id="surveyDDL" labelField="name" />
+		</s:FormItem>
+		<s:FormItem label="{Message.get('surveySelection.rootEntity')}">
+			<s:DropDownList id="rootEntityDDL" labelField="name" />
+		</s:FormItem>
+		
+	</s:Form>
+	
+	<s:Button id="okButton" label="{Message.get('surveySelection.ok')}"
+			  useHandCursor="true" buttonMode="true"
+			  enabled.loadingRootEntities="false"
+			  />
+</s:Group>

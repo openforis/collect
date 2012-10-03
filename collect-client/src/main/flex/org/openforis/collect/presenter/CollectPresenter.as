@@ -138,29 +138,25 @@ package org.openforis.collect.presenter {
 			var summaries:IList =  event.result as IList;
 			Application.surveySummaries = summaries;
 			
-			if(summaries.length > 1){
-				//TODO 
-			} else {
+			if ( summaries.length == 1) {
 				var s:SurveySummary = summaries.getItemAt(0) as SurveySummary;
-				
 				var uiEvent:UIEvent = new UIEvent(UIEvent.SURVEY_SELECTED);
 				uiEvent.obj = s;
+				eventDispatcher.dispatchEvent(uiEvent);
+			} else {
+				var uiEvent:UIEvent = new UIEvent(UIEvent.SHOW_SURVEY_SELECTION);
 				eventDispatcher.dispatchEvent(uiEvent);
 			}
 		}
 		
-		/**
-		 * 
-		 * 
-		 * */
 		protected function surveySelectedHandler(event:UIEvent):void {
 			var s:SurveySummary = event.obj as SurveySummary;
 			var name:String = s.name;
-			_modelClient.setActiveSurvey(new ItemResponder(setActiveSurveyResultHandler, faultHandler), name);			
+			var responder:IResponder = new ItemResponder(setActiveSurveyResultHandler, faultHandler);
+			_modelClient.setActiveSurvey(responder, name);			
 		}
 		
-		internal function setActiveSurveyResultHandler(event:ResultEvent, token:Object = null):void {
-			var survey:SurveyProxy = event.result as SurveyProxy;
+		protected function setActiveSurvey(survey:SurveyProxy):void {
 			Application.activeSurvey = survey;
 			survey.init();
 			var schema:SchemaProxy = survey.schema;
@@ -171,18 +167,14 @@ package org.openforis.collect.presenter {
 				uiEvent.obj = rootEntityDef;
 				eventDispatcher.dispatchEvent(uiEvent);
 			} else {
-				//TODO
-				
-				//REMOVE IT: TEMPORARY select of first root entity
-				var listView:ListView = _view.masterView.listView;
-				
-				var rootEntityDef:EntityDefinitionProxy = rootEntityDefinitions.getItemAt(0) as EntityDefinitionProxy;
-				Application.activeRootEntity = rootEntityDef;
-				
-				var uiEvent:UIEvent = new UIEvent(UIEvent.ROOT_ENTITY_SELECTED);
-				uiEvent.obj = rootEntityDef;
+				var uiEvent:UIEvent = new UIEvent(UIEvent.SHOW_ROOT_ENTITY_SELECTION);
 				eventDispatcher.dispatchEvent(uiEvent);
 			}
+		}
+		
+		internal function setActiveSurveyResultHandler(event:ResultEvent, token:Object = null):void {
+			var survey:SurveyProxy = event.result as SurveyProxy;
+			setActiveSurvey(survey);
 		}
 		
 		internal function sendKeepAliveMessage(event:TimerEvent):void {

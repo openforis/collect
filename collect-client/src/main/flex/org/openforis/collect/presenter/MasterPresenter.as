@@ -3,6 +3,8 @@ package org.openforis.collect.presenter {
 	 * 
 	 * @author Mino Togna
 	 * */
+	import flash.events.Event;
+	
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.events.FaultEvent;
 	import mx.rpc.events.ResultEvent;
@@ -43,10 +45,20 @@ package org.openforis.collect.presenter {
 		
 		override internal function initEventListeners():void {
 			//eventDispatcher.addEventListener(ApplicationEvent.APPLICATION_INITIALIZED, applicationInitializedHandler);
+			eventDispatcher.addEventListener(UIEvent.SHOW_SURVEY_SELECTION, showSurveySelectionHandler);
+			eventDispatcher.addEventListener(UIEvent.SHOW_ROOT_ENTITY_SELECTION, showRootEntitySelectionHandler);
 			eventDispatcher.addEventListener(UIEvent.ROOT_ENTITY_SELECTED, rootEntitySelectedHandler);
 			eventDispatcher.addEventListener(UIEvent.BACK_TO_LIST, backToListHandler);
 			eventDispatcher.addEventListener(UIEvent.RECORD_SELECTED, recordSelectedHandler);
 			eventDispatcher.addEventListener(UIEvent.RECORD_CREATED, recordCreatedHandler);
+		}
+		
+		protected function showSurveySelectionHandler(event:Event):void {
+			_view.currentState = MasterView.SURVEY_SELECTION_STATE;
+		}
+		
+		protected function showRootEntitySelectionHandler(event:Event):void {
+			_view.currentState = MasterView.SURVEY_SELECTION_STATE;
 		}
 		
 		/**
