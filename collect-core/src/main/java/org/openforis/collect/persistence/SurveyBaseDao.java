@@ -1,7 +1,5 @@
 package org.openforis.collect.persistence;
 
-import static org.openforis.collect.persistence.jooq.tables.OfcSurveyWork.OFC_SURVEY_WORK;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -11,6 +9,7 @@ import java.io.OutputStream;
 import org.jooq.Record;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.CollectSurveyContext;
+import org.openforis.collect.model.SurveySummary;
 import org.openforis.collect.persistence.jooq.JooqDaoSupport;
 import org.openforis.collect.persistence.xml.CollectIdmlBindingContext;
 import org.openforis.idm.metamodel.ExternalCodeListProvider;
@@ -25,7 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 /**
  *  @author S. Ricci
  */
-class SurveyBaseDao extends JooqDaoSupport {
+abstract class SurveyBaseDao extends JooqDaoSupport {
 	
 	protected CollectIdmlBindingContext bindingContext;
 
@@ -45,22 +44,10 @@ class SurveyBaseDao extends JooqDaoSupport {
 				surveyContext);
 	}
 	
-	protected <T extends CollectSurvey> T processSurveyRow(Record row) {
-		try {
-			if (row == null) {
-				return null;
-			}
-			String idml = row.getValueAsString(OFC_SURVEY_WORK.IDML);
-			T survey = unmarshalIdml(idml);
-			survey.setId(row.getValueAsInteger(OFC_SURVEY_WORK.ID));
-			survey.setName(row.getValue(OFC_SURVEY_WORK.NAME));
-			return survey;
-		} catch (IOException e) {
-			throw new RuntimeException(
-					"Error deserializing IDML from database", e);
-		}
-	}
+	protected abstract <T extends CollectSurvey> T processSurveyRow(Record row);
 
+	protected abstract SurveySummary processSurveySummaryRow(Record row);
+	
 	public <T extends CollectSurvey> T unmarshalIdml(String idml) throws IOException {
 		byte[] bytes = idml.getBytes("UTF-8");
 		ByteArrayInputStream is = new ByteArrayInputStream(bytes);

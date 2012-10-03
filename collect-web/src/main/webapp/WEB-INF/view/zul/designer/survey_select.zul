@@ -13,16 +13,20 @@
 
 	<label value="${labels.survey.list_of_surveys}" />
 
-	<listbox id="listbox" rows="10" model="@load(vm.surveysWork)"
+	<listbox id="listbox" rows="10" model="@load(vm.surveySummaries)"
 		selectedItem="@bind(vm.selectedSurvey)">
 		<listhead>
 			<listheader label="${labels.survey.name}" width="200px" />
 			<listheader label="${labels.survey.uri}" width="250px" />
+			<listheader label="${labels.survey.working}" width="100px" />
+			<listheader label="${labels.survey.published}" width="100px" />
 		</listhead>
 		<template name="model" var="survey">
 			<listitem>
 				<listcell label="@load(survey.name)" onDoubleClick="@command('editSurvey')" />
 				<listcell label="@load(survey.uri)" onDoubleClick="@command('editSurvey')" />
+				<listcell label="@load(survey.working)" onDoubleClick="@command('editSurvey')" />
+				<listcell label="@load(survey.published)" onDoubleClick="@command('editSurvey')" />
 			</listitem>
 		</template>
 	</listbox>

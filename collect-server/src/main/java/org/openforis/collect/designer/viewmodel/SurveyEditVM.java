@@ -8,6 +8,7 @@ import java.util.List;
 import org.openforis.collect.designer.session.SessionStatus;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.Resources;
+import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.LanguageConfiguration;
 import org.openforis.collect.persistence.SurveyImportException;
 import org.zkoss.bind.BindUtils;
@@ -17,6 +18,7 @@ import org.zkoss.bind.annotation.GlobalCommand;
 import org.zkoss.bind.annotation.Init;
 import org.zkoss.bind.annotation.NotifyChange;
 import org.zkoss.zk.ui.Executions;
+import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zkplus.databind.BindingListModelList;
 import org.zkoss.zul.Window;
 
@@ -27,9 +29,13 @@ import org.zkoss.zul.Window;
 public class SurveyEditVM extends SurveyEditBaseVM {
 
 	private static final String SURVEY_SUCCESSFULLY_SAVED_MESSAGE_KEY = "survey.successfully_saved";
+//	private static final String SURVEY_SUCCESSFULLY_PUBLISHED_MESSAGE_KEY = "survey.successfully_published";
 	
 	private Window selectLanguagePopUp;
 	private Window srsPopUp;
+	
+	@WireVariable
+	private SurveyManager surveyManager;
 	
 	@Override
 	@Init(superclass=false)
@@ -89,8 +95,29 @@ public class SurveyEditVM extends SurveyEditBaseVM {
 	@Command
 	public void save() throws SurveyImportException {
 		if ( checkCurrentFormValid() ) {
-			surveyWorkManager.save(survey);
+			surveyManager.saveSurveyWork(survey);
 			MessageUtil.showInfo(SURVEY_SUCCESSFULLY_SAVED_MESSAGE_KEY);
+		}
+	}
+	
+	@Command
+	public void publish() {
+		if ( checkCurrentFormValid() ) {
+			MessageUtil.showConfirm(new MessageUtil.ConfirmHandler() {
+				@Override
+				public void onOk() {
+					performSurveyPublishing();
+				}
+			}, "survey.publish.confirm");
+		}
+	}
+
+	protected void performSurveyPublishing() {
+		try {
+			surveyManager.publish(survey);
+			backToSurveysList();
+		} catch (SurveyImportException e) {
+			throw new RuntimeException(e);
 		}
 	}
 	

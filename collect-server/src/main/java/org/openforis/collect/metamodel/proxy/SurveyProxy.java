@@ -67,7 +67,7 @@ public class SurveyProxy implements Proxy {
 
 	@ExternalizedProperty
 	public UIConfiguration getUiConfiguration() {
-		List<Configuration> configuration = survey.getConfiguration();
+		List<Configuration> configuration = survey.getConfigurations();
 		if (configuration != null && !configuration.isEmpty()) {
 			UIConfiguration uiConf = (UIConfiguration) configuration.get(0);
 			return uiConf;

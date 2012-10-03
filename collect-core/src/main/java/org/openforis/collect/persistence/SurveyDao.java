@@ -1,9 +1,11 @@
 package org.openforis.collect.persistence;
 
 import static org.openforis.collect.persistence.jooq.Sequences.OFC_SURVEY_ID_SEQ;
+
 import static org.openforis.collect.persistence.jooq.tables.OfcRecord.OFC_RECORD;
 import static org.openforis.collect.persistence.jooq.tables.OfcSurvey.OFC_SURVEY;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,6 +16,7 @@ import org.jooq.SelectConditionStep;
 import org.jooq.impl.Factory;
 import org.jooq.impl.SQLDataType;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.SurveySummary;
 import org.openforis.collect.persistence.xml.CollectIdmlBindingContext;
 import org.openforis.idm.metamodel.Survey;
 import org.springframework.transaction.annotation.Transactional;
@@ -137,5 +140,34 @@ public class SurveyDao extends SurveyBaseDao {
 					.where(OFC_SURVEY.ID.equal(survey.getId())).execute();
 		}
 
+	}
+	
+	@Override
+	protected <T extends CollectSurvey> T processSurveyRow(Record row) {
+		try {
+			if (row == null) {
+				return null;
+			}
+			String idml = row.getValueAsString(OFC_SURVEY.IDML);
+			T survey = unmarshalIdml(idml);
+			survey.setId(row.getValueAsInteger(OFC_SURVEY.ID));
+			survey.setName(row.getValue(OFC_SURVEY.NAME));
+			return survey;
+		} catch (IOException e) {
+			throw new RuntimeException(
+					"Error deserializing IDML from database", e);
+		}
+	}
+	
+	@Override
+	protected SurveySummary processSurveySummaryRow(Record row) {
+		if (row == null) {
+			return null;
+		}
+		Integer id = row.getValueAsInteger(OFC_SURVEY.ID);
+		String name = row.getValue(OFC_SURVEY.NAME);
+		String uri = row.getValue(OFC_SURVEY.URI);
+		SurveySummary survey = new SurveySummary(id, name, uri);
+		return survey;
 	}
 }

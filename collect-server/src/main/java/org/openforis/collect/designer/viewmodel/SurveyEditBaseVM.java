@@ -10,7 +10,6 @@ import org.openforis.collect.designer.converter.XMLStringDateConverter;
 import org.openforis.collect.designer.form.FormObject;
 import org.openforis.collect.designer.session.SessionStatus;
 import org.openforis.collect.designer.util.MessageUtil;
-import org.openforis.collect.manager.SurveyWorkManager;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.ModelVersion;
@@ -36,9 +35,6 @@ public class SurveyEditBaseVM extends BaseVM {
 	protected XMLStringDateConverter xmlStringDateConverter = new XMLStringDateConverter();
 	
 	private String dateFormat = "dd/MM/yyyy";
-	
-	@WireVariable
-	protected SurveyWorkManager surveyWorkManager;
 	
 	@WireVariable
 	protected CollectSurvey survey;

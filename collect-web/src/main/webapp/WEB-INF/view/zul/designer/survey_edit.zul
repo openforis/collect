@@ -63,10 +63,15 @@
 				</west>
 				<center border="none">
 					<box width="100%" align="center">
-						<button label="Save" onClick="@command('save')" />
+						<button label="${labels.global.save_item}" 
+							onClick="@command('save')" />
 					</box>
 				</center>
 				<east border="none" size="20%">
+					<box width="100%" align="right">
+						<button label="${labels.survey.publish.$}" 
+							onClick="@command('publish')" />
+					</box>
 				</east>
 			</borderlayout>
 		</south>

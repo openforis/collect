@@ -25,7 +25,7 @@ public class CollectSurvey extends Survey {
 	}
 	
 	public UIConfiguration getUIConfiguration() {
-		List<Configuration> configurations = getConfiguration();
+		List<Configuration> configurations = getConfigurations();
 		for (Configuration config : configurations) {
 			if ( config instanceof UIConfiguration ) {
 				return (UIConfiguration) config;
@@ -36,14 +36,14 @@ public class CollectSurvey extends Survey {
 
 	public void setUIConfiguration(UIConfiguration conf) {
 		UIConfiguration oldConf = getUIConfiguration();
-		if ( oldConf == null ) {
+		if ( oldConf != null ) {
 			removeConfiguration(oldConf);
 		}
 		addConfiguration(conf);
 	}
 	
 	public LanguageConfiguration getLanguageConfiguration() {
-		List<Configuration> configurations = getConfiguration();
+		List<Configuration> configurations = getConfigurations();
 		for (Configuration config : configurations) {
 			if ( config instanceof LanguageConfiguration ) {
 				return (LanguageConfiguration) config;

@@ -103,7 +103,6 @@
 	<bean id="sessionManager"		class="org.openforis.collect.manager.SessionManager" scope="session" />
 	<bean id="speciesManager"		class="org.openforis.collect.manager.SpeciesManager" />
 	<bean id="surveyManager"		class="org.openforis.collect.manager.SurveyManager" init-method="init" />
-	<bean id="surveyWorkManager"	class="org.openforis.collect.manager.SurveyWorkManager" />
 	<bean id="userManager"			class="org.openforis.collect.manager.UserManager" />
 	
 <!-- 	<bean id="recordContext" class="org.openforis.collect.model.CollectRecordContext" /> -->

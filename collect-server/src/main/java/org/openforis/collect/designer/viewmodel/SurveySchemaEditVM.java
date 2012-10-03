@@ -161,7 +161,6 @@ public class SurveySchemaEditVM extends SurveyEditBaseVM {
 			}
 		}
 	}
-
 	
 	protected void onAfterNodeCreated(Binder binder, NodeDefinition newNode) {
 		treeModel.appendNodeToSelected(newNode);

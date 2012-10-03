@@ -1,8 +1,10 @@
 package org.openforis.collect.persistence;
 
 import static org.openforis.collect.persistence.jooq.Sequences.OFC_SURVEY_WORK_ID_SEQ;
+import static org.openforis.collect.persistence.jooq.tables.OfcSurvey.OFC_SURVEY;
 import static org.openforis.collect.persistence.jooq.tables.OfcSurveyWork.OFC_SURVEY_WORK;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,7 +13,7 @@ import org.jooq.Result;
 import org.jooq.impl.Factory;
 import org.jooq.impl.SQLDataType;
 import org.openforis.collect.model.CollectSurvey;
-import org.openforis.idm.metamodel.Survey;
+import org.openforis.collect.model.SurveySummary;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -53,9 +55,24 @@ public class SurveyWorkDao extends SurveyBaseDao {
 		}
 		return surveys;
 	}
+	
+	@Transactional
+	public List<SurveySummary> loadSummaries() {
+		Factory jf = getJooqFactory();
+		List<SurveySummary> surveys = new ArrayList<SurveySummary>();
+		Result<Record> results = jf.select().from(OFC_SURVEY_WORK).fetch();
+		for (Record row : results) {
+			SurveySummary survey = processSurveySummaryRow(row);
+			if (survey != null) {
+				//loadNodeDefinitions(survey);
+				surveys.add(survey);
+			}
+		}
+		return surveys;
+	}
 
 	@Transactional
-	public void insert(Survey survey) throws SurveyImportException {
+	public void insert(CollectSurvey survey) throws SurveyImportException {
 		String idml = marshalSurvey(survey);
 		Factory jf = getJooqFactory();
 		int surveyId = jf.nextval(OFC_SURVEY_WORK_ID_SEQ).intValue();
@@ -69,7 +86,7 @@ public class SurveyWorkDao extends SurveyBaseDao {
 	}
 	
 	@Transactional
-	public void update(Survey survey) throws SurveyImportException {
+	public void update(CollectSurvey survey) throws SurveyImportException {
 		String idml = marshalSurvey(survey);
 		Factory jf = getJooqFactory();
 		Integer id = survey.getId();
@@ -78,6 +95,48 @@ public class SurveyWorkDao extends SurveyBaseDao {
 			.set(OFC_SURVEY_WORK.NAME, survey.getName())
 			.set(OFC_SURVEY_WORK.URI, survey.getUri())
 			.where(OFC_SURVEY_WORK.ID.equal(id)).execute();
+	}
+
+	@Transactional
+	public void delete(CollectSurvey survey) {
+		Integer id = survey.getId();
+		delete(id);
+	}
+
+	@Transactional
+	public void delete(int id) {
+		Factory jf = getJooqFactory();
+		jf.delete(OFC_SURVEY_WORK)
+			.where(OFC_SURVEY_WORK.ID.equal(id)).execute();
+	}
+
+	@Override
+	protected <T extends CollectSurvey> T processSurveyRow(Record row) {
+		try {
+			if (row == null) {
+				return null;
+			}
+			String idml = row.getValueAsString(OFC_SURVEY_WORK.IDML);
+			T survey = unmarshalIdml(idml);
+			survey.setId(row.getValueAsInteger(OFC_SURVEY_WORK.ID));
+			survey.setName(row.getValue(OFC_SURVEY_WORK.NAME));
+			return survey;
+		} catch (IOException e) {
+			throw new RuntimeException(
+					"Error deserializing IDML from database", e);
+		}
+	}
+	
+	@Override
+	protected SurveySummary processSurveySummaryRow(Record row) {
+		if (row == null) {
+			return null;
+		}
+		Integer id = row.getValueAsInteger(OFC_SURVEY_WORK.ID);
+		String name = row.getValue(OFC_SURVEY_WORK.NAME);
+		String uri = row.getValue(OFC_SURVEY.URI);
+		SurveySummary survey = new SurveySummary(id, name, uri);
+		return survey;
 	}
 
 }
