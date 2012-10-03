@@ -21,7 +21,8 @@
 				<row>
 					<label value="${labels.survey.uri}:" />
 					<cell>
-						<textbox width="350px" value="@bind(fx.uri)" onChange="@command('applyChanges')" />
+						<textbox width="350px" value="@bind(fx.uri)" onChange="@command('applyChanges')"
+							readonly="@load(fx.published)" />
 						<label class="error" value="@load(vmsgs['uri'])" />
 					</cell>
 				</row>

@@ -10,6 +10,7 @@ import org.openforis.collect.model.CollectSurvey;
 public class SurveyMainInfoFormObject extends ItemFormObject<CollectSurvey> {
 
 	private String name;
+	private boolean published;
 	private String uri;
 	private String description;
 	private String projectName;
@@ -20,6 +21,7 @@ public class SurveyMainInfoFormObject extends ItemFormObject<CollectSurvey> {
 		name = source.getName();
 		description = source.getDescription(languageCode);
 		uri = source.getUri();
+		published = source.isPublished();
 		projectName = source.getProjectName(languageCode);
 		projectCycle = source.getCycle();
 	}
@@ -31,6 +33,7 @@ public class SurveyMainInfoFormObject extends ItemFormObject<CollectSurvey> {
 		dest.setDescription(languageCode, description);
 		dest.setProjectName(languageCode, projectName);
 		dest.setCycle(projectCycle);
+		dest.setPublished(published);
 	}
 
 	public String getName() {
@@ -49,6 +52,14 @@ public class SurveyMainInfoFormObject extends ItemFormObject<CollectSurvey> {
 		this.uri = uri;
 	}
 
+	public boolean isPublished() {
+		return published;
+	}
+	
+	public void setPublished(boolean published) {
+		this.published = published;
+	}
+	
 	public String getDescription() {
 		return description;
 	}
