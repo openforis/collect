@@ -67,6 +67,7 @@ public class SurveyLayoutEditVM extends SurveyEditBaseVM {
 	@NotifyChange({"nodes"})
 	public void schemaChanged() {
 		initTreeModel();
+		nodeSelected(null);
 	}
 	
 	@Command

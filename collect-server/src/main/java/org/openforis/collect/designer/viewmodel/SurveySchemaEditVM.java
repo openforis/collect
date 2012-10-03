@@ -44,7 +44,6 @@ import org.zkoss.zk.ui.select.Selectors;
 import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
-import org.zkoss.zul.DefaultTreeModel;
 import org.zkoss.zul.Include;
 import org.zkoss.zul.Tree;
 import org.zkoss.zul.TreeNode;
@@ -225,16 +224,17 @@ public class SurveySchemaEditVM extends SurveyEditBaseVM {
 	}
 
 	@Command
+	@NotifyChange({"nodes","moveNodeUpDisallowed","moveNodeDownDisallowed"})
 	public void moveNodeUp() {
 		moveNode(true);
 	}
 	
 	@Command
+	@NotifyChange({"nodes","moveNodeUpDisallowed","moveNodeDownDisallowed"})
 	public void moveNodeDown() {
 		moveNode(false);
 	}
 	
-	@NotifyChange({"moveNodeUpDisallowed","moveNodeDownDisallowed"})
 	protected void moveNode(boolean up) {
 		int newIndex;
 		EntityDefinition parentDefn = (EntityDefinition) selectedNode.getParentDefinition();
@@ -250,6 +250,7 @@ public class SurveySchemaEditVM extends SurveyEditBaseVM {
 			schema.moveRootEntityDefinition(rootEntity, newIndex);
 		}
 		treeModel.moveSelectedNode(newIndex);
+		postSchemaChangedCommand();
 	}
 	
 	protected void performRemoveSelectedNode() {
@@ -464,7 +465,7 @@ public class SurveySchemaEditVM extends SurveyEditBaseVM {
 		}
 	}
 	
-	public DefaultTreeModel<NodeDefinition> getNodes() {
+	public SchemaTreeModel getNodes() {
 		if ( treeModel == null ) {
 			CollectSurvey survey = getSurvey();
 			treeModel = SchemaTreeModel.createInstance(survey);
