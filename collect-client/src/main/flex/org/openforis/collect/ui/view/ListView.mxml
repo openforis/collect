@@ -19,6 +19,7 @@
 			import org.openforis.collect.i18n.Message;
 			import org.openforis.collect.model.proxy.UserProxy;
 			import org.openforis.collect.presenter.ListPresenter;
+			import org.openforis.collect.util.ApplicationConstants;
 			
 			public static const DEFAULT_STATE:String = "default";
 			public static const INACTIVE_STATE:String = "inactive";
@@ -73,22 +74,25 @@
 								/>
 		
 	</s:Group>
-	
-	<s:HGroup id="controlsBar" width="100%" horizontalAlign="center" verticalAlign="bottom" 
-			  height="30" 
-			  gap="10">
-		<s:Button id="addButton" label="{Message.get('list.add')}" 
-				  useHandCursor="true" buttonMode="true" 
-				  enabled.inactive="false" />
-		<s:Button id="editButton" label="{Message.get('list.edit')}" 
-				  useHandCursor="true" buttonMode="true" 
-				  enabled.inactive="false" />
-		<s:Button id="deleteButton" label="{Message.get('list.delete')}" 
-				  useHandCursor="true" buttonMode="true" 
-				  enabled.inactive="false" />
-		<s:Button id="exportButton" label="{Message.get('list.export')}" 
-				  useHandCursor="true" buttonMode="true" 
-				  enabled.inactive="false" />
-		
-	</s:HGroup>
+	<s:Group width="100%" id="bottomBar">
+		<s:HGroup id="controlsBar" horizontalCenter="0" verticalCenter="0" 
+				  height="30" gap="10">
+			<s:Button id="addButton" label="{Message.get('list.add')}" 
+					  useHandCursor="true" buttonMode="true" 
+					  enabled.inactive="false" />
+			<s:Button id="editButton" label="{Message.get('list.edit')}" 
+					  useHandCursor="true" buttonMode="true" 
+					  enabled.inactive="false" />
+			<s:Button id="deleteButton" label="{Message.get('list.delete')}" 
+					  useHandCursor="true" buttonMode="true" 
+					  enabled.inactive="false" />
+			<s:Button id="exportButton" label="{Message.get('list.export')}" 
+					  useHandCursor="true" buttonMode="true" 
+					  enabled.inactive="false" />
+		</s:HGroup>
+		<s:HGroup right="0" verticalCenter="0">
+			<s:Label styleName="appVersionLabel" text="{Message.get('footer.versionLabel')}" />
+			<s:Label styleName="appVersionText" text="{ApplicationConstants.VERSION}" />
+		</s:HGroup>
+	</s:Group>
 </s:Group>
