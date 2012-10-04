@@ -42,22 +42,4 @@ public class CollectSurvey extends Survey {
 		addConfiguration(conf);
 	}
 	
-	public LanguageConfiguration getLanguageConfiguration() {
-		List<Configuration> configurations = getConfigurations();
-		for (Configuration config : configurations) {
-			if ( config instanceof LanguageConfiguration ) {
-				return (LanguageConfiguration) config;
-			}
-		}
-		return null;
-	}
-	
-	public void setLanguageConfiguration(LanguageConfiguration conf) {
-		LanguageConfiguration oldConf = getLanguageConfiguration();
-		if ( oldConf != null ) {
-			removeConfiguration(oldConf);
-		}
-		addConfiguration(conf);
-	}
-	
 }

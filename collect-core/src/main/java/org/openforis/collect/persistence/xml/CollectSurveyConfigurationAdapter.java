@@ -8,7 +8,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.openforis.collect.model.LanguageConfiguration;
 import org.openforis.collect.model.ui.UIConfiguration;
 import org.openforis.idm.metamodel.Configuration;
 import org.openforis.idm.metamodel.xml.ConfigurationAdapter;
@@ -23,7 +22,6 @@ import org.w3c.dom.Element;
 public class CollectSurveyConfigurationAdapter implements ConfigurationAdapter<Configuration> {
 	
 	private static final String FLEX_TAG_NAME = "flex";
-	private static final String LANGUAGE_TAG_NAME = "language";
 	
 	private static DocumentBuilder documentBuilder;
 	
@@ -40,18 +38,18 @@ public class CollectSurveyConfigurationAdapter implements ConfigurationAdapter<C
 	@Override
 	public Configuration unmarshal(Element elem) {
 		try {
-			String nodeName = elem.getLocalName();
-			JAXBContext jc;
-			if ( FLEX_TAG_NAME.equals(nodeName) ) {
-				jc = JAXBContext.newInstance(UIConfiguration.class);
-			} else if ( LANGUAGE_TAG_NAME.equals(nodeName) ) {
-				jc = JAXBContext.newInstance(LanguageConfiguration.class);
-			} else {
-				throw new IllegalArgumentException("Unsupported tag: " + nodeName);
-			}
-			Unmarshaller unmarshaller = jc.createUnmarshaller();
-			Configuration configuration = (Configuration) unmarshaller.unmarshal(elem);
-			if ( configuration instanceof UIConfiguration ) {
+			Configuration configuration = null;
+			String namespaceURI = elem.getNamespaceURI();
+			if (UIConfiguration.UI_NAMESPACE_URI.equals(namespaceURI) ) {
+				String nodeName = elem.getLocalName();
+				JAXBContext jc;
+				if ( FLEX_TAG_NAME.equals(nodeName) ) {
+					jc = JAXBContext.newInstance(UIConfiguration.class);
+				} else {
+					throw new IllegalArgumentException("Unsupported tag: " + nodeName);
+				}
+				Unmarshaller unmarshaller = jc.createUnmarshaller();
+				configuration = (Configuration) unmarshaller.unmarshal(elem);
 				((UIConfiguration) configuration).init();
 			}
 			return configuration;

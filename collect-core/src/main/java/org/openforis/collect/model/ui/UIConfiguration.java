@@ -10,6 +10,7 @@ import java.util.Queue;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.namespace.QName;
@@ -18,6 +19,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.Configuration;
 import org.openforis.idm.metamodel.EntityDefinition;
+import org.openforis.idm.metamodel.Languages;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.util.CollectionUtil;
@@ -29,15 +31,17 @@ import org.openforis.idm.util.CollectionUtil;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "", propOrder = { "tabDefinitions" })
+@XmlType(name = "", propOrder = { "tabDefinitions","languageCodes" })
 @XmlRootElement(name = "flex")
 public class UIConfiguration implements Configuration, Serializable {
 
 	private static final long serialVersionUID = 1L;
 	
-	public static final QName TAB_DEFINITION_ANNOTATION = new QName("http://www.openforis.org/collect/3.0/ui", "tabDefinition");
-	public static final QName TAB_NAME_ANNOTATION = new QName("http://www.openforis.org/collect/3.0/ui", "tab");
-	public static final QName LAYOUT_ANNOTATION = new QName("http://www.openforis.org/collect/3.0/ui", "layout");
+	public static final String UI_NAMESPACE_URI = "http://www.openforis.org/collect/3.0/ui";
+	
+	public static final QName TAB_DEFINITION_ANNOTATION = new QName(UI_NAMESPACE_URI, "tabDefinition");
+	public static final QName TAB_NAME_ANNOTATION = new QName(UI_NAMESPACE_URI, "tab");
+	public static final QName LAYOUT_ANNOTATION = new QName(UI_NAMESPACE_URI, "layout");
 	
 	public enum Layout {
 		FORM, TABLE
@@ -45,6 +49,10 @@ public class UIConfiguration implements Configuration, Serializable {
 	
 	@XmlElement(name = "tabDefinition", type = UITabDefinition.class)
 	private List<UITabDefinition> tabDefinitions;
+
+	@XmlElementWrapper(name = "languageCodes", required=false)
+	@XmlElement(name = "languageCode")
+	private List<String> languageCodes;
 
 	private transient CollectSurvey survey;
 
@@ -232,6 +240,39 @@ public class UIConfiguration implements Configuration, Serializable {
 		UITabDefinition tabDefn = getTabDefinition(name);
 		tabDefn.setName(newName);
 		return tabDefn;
+	}
+	
+	public List<String> getLanguageCodes() {
+		return CollectionUtil.unmodifiableList(languageCodes);
+	}
+	
+	public void addLanguageCode(String code) {
+		if ( Languages.contains(code) ) { 
+			if ( languageCodes == null ) {
+				languageCodes = new ArrayList<String>();
+			}
+			if ( ! languageCodes.contains(code) ) {
+				languageCodes.add(code);
+			}
+		} else {
+			throw new IllegalArgumentException("Unsupported language code: " + code);
+		}
+	}
+	
+	public void removeLanguageCode(String code) {
+		languageCodes.remove(code);
+	}
+
+	public void addLanguageCodes(List<String> codes) {
+		for (String code : codes) {
+			addLanguageCode(code);
+		}
+	}
+	
+	public void clearLanguageCodes() {
+		if ( languageCodes != null ) {
+			languageCodes.clear();
+		}
 	}
 	
 	@Override

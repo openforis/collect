@@ -8,7 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.designer.session.SessionStatus;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.model.CollectSurvey;
-import org.openforis.collect.model.LanguageConfiguration;
+import org.openforis.collect.model.ui.UIConfiguration;
 import org.openforis.idm.metamodel.Languages;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.annotation.Command;
@@ -45,9 +45,9 @@ public class SurveySelectLanguageVM extends BaseVM {
 		SessionStatus sessionStatus = getSessionStatus();
 		CollectSurvey survey = sessionStatus.getSurvey();
 		if ( survey != null ) {
-			LanguageConfiguration languageConfiguration = survey.getLanguageConfiguration();
-			if ( languageConfiguration != null ) {
-				assignedLanguageCodes.addAll(languageConfiguration.getLanguageCodes());
+			UIConfiguration uiConf = survey.getUIConfiguration();
+			if ( uiConf != null ) {
+				assignedLanguageCodes.addAll(uiConf.getLanguageCodes());
 			}
 		}
 	}
@@ -92,9 +92,9 @@ public class SurveySelectLanguageVM extends BaseVM {
 	public void applyChanges() {
 		SessionStatus sessionStatus = getSessionStatus();
 		CollectSurvey survey = sessionStatus.getSurvey();
-		LanguageConfiguration langConf = new LanguageConfiguration();
-		langConf.addLanguageCodes(assignedLanguageCodes);
-		survey.setLanguageConfiguration(langConf);
+		UIConfiguration uiConf = survey.getUIConfiguration();
+		uiConf.clearLanguageCodes();
+		uiConf.addLanguageCodes(assignedLanguageCodes);
 		if ( StringUtils.isNotBlank(selectedCurrentLanguageCode) ) {
 			sessionStatus.setCurrentLanguageCode(selectedCurrentLanguageCode);
 			BindUtils.postGlobalCommand(null, null, SURVEY_LANGUAGES_CHANGED_COMMAND, null);
