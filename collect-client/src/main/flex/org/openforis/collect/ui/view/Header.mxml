@@ -11,8 +11,11 @@
 			import mx.rpc.events.FaultEvent;
 			import mx.rpc.events.ResultEvent;
 			
+			import org.openforis.collect.Application;
 			import org.openforis.collect.client.ClientFactory;
 			import org.openforis.collect.client.LogoClient;
+			import org.openforis.collect.i18n.Message;
+			import org.openforis.collect.model.proxy.UserProxy;
 
 			[Bindable]
 			public var logoData:ByteArray;
@@ -39,6 +42,33 @@
 	<s:Group>
         <s:Image source="@Embed(source='/assets/images/banner.jpg')"/>
         <s:Image source="{logoData}" right="0" /> 
+		
+		<s:VGroup right="0" horizontalAlign="right">
+			<s:HGroup verticalAlign="middle">
+				<!--<s:Label text="{Message.get('global.loggedAsLabel')}" />-->
+				
+				<s:Label id="loggedAsText"
+						 text="{Application.user.name}"
+						 styleName="formLabel"
+						 />
+				<!--<s:Button id="logoutButton"
+						  useHandCursor="true"
+						  buttonMode="true"
+						  toolTip="{Message.get('settings.logout')}"
+						  styleName="logout"
+						  verticalCenter="0"
+						  right="0"
+						  />-->
+				<mx:PopUpMenuButton id="settingsButton"
+									openAlways="true"
+									toolTip="{Message.get('settings.tooltip')}" 
+									useHandCursor="true" buttonMode="true" 
+									styleName="settings"
+									arrowButtonWidth="20"
+									width="20"
+									/>
+			</s:HGroup>
+		</s:VGroup>
 	</s:Group>
 	
 </s:Group>

@@ -39,6 +39,10 @@ package org.openforis.collect.presenter {
 	import flash.net.URLRequest;
 	import flash.net.navigateToURL;
 	import org.openforis.collect.util.AlertUtil;
+	import mx.events.MenuEvent;
+	import org.openforis.collect.util.PopUpUtil;
+	import org.openforis.collect.ui.component.DataImportPopUp;
+	import org.openforis.collect.ui.component.user.UserManagementPopUp;
 	
 	/**
 	 * 
@@ -47,7 +51,15 @@ package org.openforis.collect.presenter {
 	public class CollectPresenter extends AbstractPresenter {
 
 		private static const KEEP_ALIVE_FREQUENCY:Number = 30000;
-
+		
+		private static const MOUSE_WHEEL_BUMP_DELTA:Number = 30;
+		
+		private const SURVEY_SELECTION_MENU_ITEM:String = Message.get("settings.selectSurvey");
+		private const IMPORT_DATA_MENU_ITEM:String = Message.get("settings.admin.importData");
+		private const USERS_MANAGEMENT_MENU_ITEM:String = Message.get("settings.admin.usersManagement");
+		private const LOGOUT_MENU_ITEM:String = Message.get("settings.logout");
+		private const ADMIN_SETTINGS_ITEMS:ArrayCollection = new ArrayCollection([IMPORT_DATA_MENU_ITEM, USERS_MANAGEMENT_MENU_ITEM]);
+		
 		private var _view:collect;
 		private var _modelClient:ModelClient;
 		private var _sessionClient:SessionClient;
@@ -66,17 +78,26 @@ package org.openforis.collect.presenter {
 			_keepAliveTimer.addEventListener(TimerEvent.TIMER, sendKeepAliveMessage);
 			_keepAliveTimer.start();
 
-			//init context menu presenter
-			//this._contextMenuPresenter = new ContextMenuPresenter(view);
-			
 			//set language in session
 			var localeString:String = FlexGlobals.topLevelApplication.parameters.lang as String;
 			if(localeString != null) {
 				this._sessionClient.initSession(new AsyncResponder(initSessionResultHandler, faultHandler), localeString);
 			}
+		}
+		
+		override internal function initEventListeners():void {
+			//mouse wheel handler to increment scroll step size
+			FlexGlobals.topLevelApplication.systemManager.addEventListener(MouseEvent.MOUSE_WHEEL, mouseWheelHandler, true);
+			eventDispatcher.addEventListener(UIEvent.SHOW_SURVEY_SELECTION, showSurveySelectionHandler);
+			eventDispatcher.addEventListener(UIEvent.SURVEY_SELECTED, surveySelectedHandler);
+			eventDispatcher.addEventListener(UIEvent.ROOT_ENTITY_SELECTED, rootEntitySelectedHandler);
+			
+			//_view.header.logoutButton.addEventListener(MouseEvent.CLICK, logoutButtonClickHandler);
+			
+			_view.header.settingsButton.addEventListener(MenuEvent.ITEM_CLICK, settingsItemClickHandler);
 			
 			CONFIG::debugging {
-				view.addEventListener(KeyboardEvent.KEY_DOWN, function(event:KeyboardEvent):void {
+				_view.addEventListener(KeyboardEvent.KEY_DOWN, function(event:KeyboardEvent):void {
 					//open FlexSpy popup pressing CTRL+i
 					if(event.ctrlKey && event.charCode == 105)
 						FlexSpy.show();
@@ -84,12 +105,21 @@ package org.openforis.collect.presenter {
 			}
 		}
 		
-		override internal function initEventListeners():void {
-			//mouse wheel handler to increment scroll step size
-			FlexGlobals.topLevelApplication.systemManager.addEventListener(MouseEvent.MOUSE_WHEEL, mouseWheelHandler, true);
-			eventDispatcher.addEventListener(UIEvent.SURVEY_SELECTED, surveySelectedHandler);
-			
-			_view.footer.logoutButton.addEventListener(MouseEvent.CLICK, logoutButtonClickHandler);
+		protected function updateSettingsPopUpMenu(includeSurveySelectionItem:Boolean = true):void {
+			var result:ArrayCollection = new ArrayCollection();
+			if ( includeSurveySelectionItem && canHaveSurveySelection() ) {
+				result.addItem(SURVEY_SELECTION_MENU_ITEM);
+			}
+			if ( Application.user.hasEffectiveRole(UserProxy.ROLE_ADMIN) ) {
+				result.addAll(ADMIN_SETTINGS_ITEMS);
+			}
+			result.addItem(LOGOUT_MENU_ITEM);
+			_view.header.settingsButton.dataProvider = result;
+		}
+		
+		protected function canHaveSurveySelection():Boolean {
+			return Application.surveySummaries && Application.surveySummaries.length > 1 || 
+				Application.activeSurvey != null && Application.activeSurvey.schema.rootEntityDefinitions.length > 0; 
 		}
 		
 		protected function logoutButtonClickHandler(event:MouseEvent):void {
@@ -119,11 +149,31 @@ package org.openforis.collect.presenter {
 			Application.locale = FlexGlobals.topLevelApplication.parameters.lang as String;
 			
 			getSurveySummaries();
+			
+			updateSettingsPopUpMenu();
 		}
 		
 		internal function mouseWheelHandler(event:MouseEvent):void {
 			//bump delta
-			event.delta *= 30;
+			event.delta *= MOUSE_WHEEL_BUMP_DELTA;
+		}
+		
+		protected function settingsItemClickHandler(event:MenuEvent):void {
+			switch ( event.item ) {
+				case SURVEY_SELECTION_MENU_ITEM:
+					var uiEvent:UIEvent = new UIEvent(UIEvent.SHOW_SURVEY_SELECTION);
+					eventDispatcher.dispatchEvent(uiEvent);
+					break;
+				case IMPORT_DATA_MENU_ITEM:
+					PopUpUtil.createPopUp(DataImportPopUp, true);
+					break;
+				case USERS_MANAGEMENT_MENU_ITEM:
+					PopUpUtil.createPopUp(UserManagementPopUp, true);
+					break;
+				case LOGOUT_MENU_ITEM:
+					logoutButtonClickHandler(null);
+					break;
+			}
 		}
 		
 		/**
@@ -137,16 +187,20 @@ package org.openforis.collect.presenter {
 		internal function getSurveySummariesResultHandler(event:ResultEvent, token:Object = null):void {
 			var summaries:IList =  event.result as IList;
 			Application.surveySummaries = summaries;
-			
+			var uiEvent:UIEvent;
 			if ( summaries.length == 1) {
 				var s:SurveySummary = summaries.getItemAt(0) as SurveySummary;
-				var uiEvent:UIEvent = new UIEvent(UIEvent.SURVEY_SELECTED);
+				uiEvent = new UIEvent(UIEvent.SURVEY_SELECTED);
 				uiEvent.obj = s;
 				eventDispatcher.dispatchEvent(uiEvent);
 			} else {
-				var uiEvent:UIEvent = new UIEvent(UIEvent.SHOW_SURVEY_SELECTION);
+				uiEvent = new UIEvent(UIEvent.SHOW_SURVEY_SELECTION);
 				eventDispatcher.dispatchEvent(uiEvent);
 			}
+		}
+		
+		protected function showSurveySelectionHandler(event:UIEvent):void {
+			updateSettingsPopUpMenu(false);
 		}
 		
 		protected function surveySelectedHandler(event:UIEvent):void {
@@ -156,18 +210,23 @@ package org.openforis.collect.presenter {
 			_modelClient.setActiveSurvey(responder, name);			
 		}
 		
+		protected function rootEntitySelectedHandler(event:UIEvent):void {
+			updateSettingsPopUpMenu();
+		}
+		
 		protected function setActiveSurvey(survey:SurveyProxy):void {
 			Application.activeSurvey = survey;
 			survey.init();
 			var schema:SchemaProxy = survey.schema;
 			var rootEntityDefinitions:ListCollectionView = schema.rootEntityDefinitions;
-			if(rootEntityDefinitions.length == 1){
+			var uiEvent:UIEvent;
+			if ( rootEntityDefinitions.length == 1) {
 				var rootEntityDef:EntityDefinitionProxy = rootEntityDefinitions.getItemAt(0) as EntityDefinitionProxy;
-				var uiEvent:UIEvent = new UIEvent(UIEvent.ROOT_ENTITY_SELECTED);
+				uiEvent = new UIEvent(UIEvent.ROOT_ENTITY_SELECTED);
 				uiEvent.obj = rootEntityDef;
 				eventDispatcher.dispatchEvent(uiEvent);
 			} else {
-				var uiEvent:UIEvent = new UIEvent(UIEvent.SHOW_ROOT_ENTITY_SELECTION);
+				uiEvent = new UIEvent(UIEvent.SHOW_ROOT_ENTITY_SELECTION);
 				eventDispatcher.dispatchEvent(uiEvent);
 			}
 		}

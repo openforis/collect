@@ -40,6 +40,10 @@ s|Button.expand {
 	skin-class: ClassReference('org.openforis.collect.ui.skin.ExpandButtonSkin');
 }
 
+s|Button.logout {
+	skin-class: ClassReference('org.openforis.collect.ui.skin.LogoutButtonSkin');
+}
+
 s|ToggleButton.filter {
 	icon: Embed(source='assets/images/filter.png');
 	cornerRadius: 5;

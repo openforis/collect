@@ -90,6 +90,7 @@
 								<includeClass>org.openforis.collect.model.ui.UITabsGroup</includeClass>
 								<includeClass>org.openforis.collect.model.ui.UITabDefinition</includeClass>
 								<includeClass>org.openforis.collect.model.ui.UITab</includeClass>
+								<includeClass>org.openforis.collect.metamodel.NodeDefinitionSummary</includeClass>
 								<includeClass>org.openforis.collect.metamodel.proxy.*</includeClass>
 								<includeClass>org.openforis.collect.model.proxy.*</includeClass>
 								<includeClass>org.openforis.collect.Proxy</includeClass>

@@ -7,14 +7,11 @@ package org.openforis.collect.presenter {
 	import flash.events.Event;
 	import flash.events.MouseEvent;
 	
-	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
 	import mx.collections.ListCollectionView;
 	import mx.core.FlexGlobals;
-	import mx.core.IFlexDisplayObject;
 	import mx.events.CloseEvent;
 	import mx.events.FlexEvent;
-	import mx.events.MenuEvent;
 	import mx.managers.PopUpManager;
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.IResponder;
@@ -31,10 +28,8 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.model.proxy.RecordProxy;
 	import org.openforis.collect.ui.UIBuilder;
 	import org.openforis.collect.ui.component.DataExportPopUp;
-	import org.openforis.collect.ui.component.DataImportPopUp;
 	import org.openforis.collect.ui.component.RecordFilterPopUp;
 	import org.openforis.collect.ui.component.SelectVersionPopUp;
-	import org.openforis.collect.ui.component.user.UserManagementPopUp;
 	import org.openforis.collect.ui.component.datagrid.PaginationBar;
 	import org.openforis.collect.ui.component.datagrid.RecordSummaryDataGrid;
 	import org.openforis.collect.ui.component.input.TextInput;
@@ -54,10 +49,6 @@ package org.openforis.collect.presenter {
 		private var _selectVersionPopUp:SelectVersionPopUp;
 		private var _newRecordResponder:IResponder;
 		private var _filterPopUp:RecordFilterPopUp;
-		
-		private const IMPORT_DATA_MENU_ITEM:String = Message.get("list.admin.importData");
-		private const USERS_MANAGEMENT_MENU_ITEM:String = Message.get("list.admin.usersManagement");
-		private const ADMIN_SETTINGS_ITEMS:ArrayCollection = new ArrayCollection([IMPORT_DATA_MENU_ITEM, USERS_MANAGEMENT_MENU_ITEM]);
 		
 		/**
 		 * The total number of records.
@@ -91,7 +82,6 @@ package org.openforis.collect.presenter {
 			this._dataClient = ClientFactory.dataClient;
 			this._view.dataGrid.requestedRowCount = MAX_RECORDS_PER_PAGE;
 			_newRecordResponder = new AsyncResponder(createRecordResultHandler, faultHandler);
-			_view.adminSettingsButton.dataProvider = ADMIN_SETTINGS_ITEMS;
 			super();
 		}
 
@@ -112,19 +102,7 @@ package org.openforis.collect.presenter {
 			this._view.paginationBar.nextPageButton.addEventListener(MouseEvent.CLICK, nextPageClickHandler);
 			this._view.paginationBar.lastPageButton.addEventListener(MouseEvent.CLICK, lastPageClickHandler);
 			//this._view.paginationBar.goToPageButton.addEventListener(MouseEvent.CLICK, goToPageClickHandler);
-			_view.adminSettingsButton.addEventListener(MenuEvent.ITEM_CLICK, adminSettingsItemClickHandler);
 			_view.stage.addEventListener(MouseEvent.CLICK, stageClickHandler);
-		}
-		
-		protected function adminSettingsItemClickHandler(event:MenuEvent):void {
-			switch ( event.item ) {
-				case IMPORT_DATA_MENU_ITEM:
-					PopUpUtil.createPopUp(DataImportPopUp, true);
-					break;
-				case USERS_MANAGEMENT_MENU_ITEM:
-					PopUpUtil.createPopUp(UserManagementPopUp, true);
-					break;
-			}
 		}
 		
 		/**

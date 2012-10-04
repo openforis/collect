@@ -6,8 +6,8 @@
 	
 	<fx:Script>
 		<![CDATA[
-			import org.openforis.collect.Application;
 			import org.openforis.collect.i18n.Message;
+			import org.openforis.collect.util.ApplicationConstants;
 		]]>
 	</fx:Script>
 	
@@ -15,26 +15,7 @@
 	
 	<!--<s:HGroup height="100%" width="100%" horizontalAlign="right">
 		<s:Label styleName="appVersionLabel" text="{Message.get('footer.versionLabel')}" />
-		<s:Label styleName="appVersionText" text="{Application.VERSION}" />
+		<s:Label styleName="appVersionText" text="{ApplicationConstants.VERSION}" />
 	</s:HGroup>-->
 	
-	<s:HGroup right="0" 
-			  visible="false" includeInLayout="false"
-			  verticalAlign="middle">
-		<s:Label text="{Message.get('global.loggedAsLabel')}" />
-		
-		<s:Label id="loggedAsText"
-				 text="{Application.user.name}"
-				 styleName="formLabel"
-				 />
-		
-		<s:Button id="logoutButton"
-			useHandCursor="true"
-			buttonMode="true"
-			label="{Message.get('global.logout')}"
-			verticalCenter="0"
-			right="0"
-			/>
-	</s:HGroup>
-
 </s:Group>

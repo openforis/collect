@@ -5,6 +5,8 @@ package org.openforis.collect.client {
 	import mx.rpc.events.FaultEvent;
 	import mx.rpc.remoting.Operation;
 	
+	import org.openforis.collect.Application;
+	
 	/**
 	 * 
 	 * @author S. Ricci
@@ -13,14 +15,14 @@ package org.openforis.collect.client {
 		
 		private var _getSurveysOperation:Operation;
 		private var _setActiveSurveyOperation:Operation;
-		private var _getSchemaOperation:Operation;
+		private var _getRootEntitiesSummariesOperation:Operation;
 		
 		public function ModelClient() {
 			super("modelService");
 			
 			this._getSurveysOperation = getOperation("getSurveySummaries");
 			this._setActiveSurveyOperation = getOperation("setActiveSurvey");
-			this._getSchemaOperation = getOperation("getSchema");
+			this._getRootEntitiesSummariesOperation = getOperation("getRootEntitiesSummaries");
 		}
 		
 		public function getSurveySummaries(responder:IResponder):void {
@@ -33,8 +35,8 @@ package org.openforis.collect.client {
 			token.addResponder(responder);
 		}
 		
-		public function getSchema(responder:IResponder, surveyId:String):void {
-			var token:AsyncToken = this._getSchemaOperation.send(surveyId);
+		public function getRootEntitiesSummaries(responder:IResponder, surveyName:String):void {
+			var token:AsyncToken = this._getRootEntitiesSummariesOperation.send(surveyName);
 			token.addResponder(responder);
 		}
 		

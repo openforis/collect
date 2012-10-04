@@ -93,7 +93,9 @@ package org.openforis.collect {
 		
 		public static function get surveySummaries():IList {
 			var list:ArrayCollection = new ArrayCollection();
-			list.addAll(_surveySummaries);
+			if ( _surveySummaries ) {
+				list.addAll(_surveySummaries);
+			}
 			return list;
 		}
 		

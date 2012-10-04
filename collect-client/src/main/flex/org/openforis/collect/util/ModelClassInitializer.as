@@ -1,6 +1,7 @@
 package org.openforis.collect.util {
 	
 	import org.granite.collections.BasicMap;
+	import org.openforis.collect.metamodel.NodeDefinitionSummary;
 	import org.openforis.collect.metamodel.proxy.AttributeDefaultProxy;
 	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.BooleanAttributeDefinitionProxy;
@@ -63,8 +64,13 @@ package org.openforis.collect.util {
 	import org.openforis.collect.remoting.service.dataImport.NodeUnmarshallingErrorProxy;
 	import org.openforis.idm.metamodel.validation.ValidationResultFlag;
 
+	/**
+	 * 
+	 * @author M. Togna
+	 * @author S. Ricci
+	 * 
+	 */
 	public class ModelClassInitializer {
-		
 
 		public static function init():void {
 			var array:Array = [
@@ -100,6 +106,7 @@ package org.openforis.collect.util {
 				IntegerRangeProxy,
 				LanguageSpecificTextProxy,
 				ModelVersionProxy,
+				NodeDefinitionSummary,
 				NodeUnmarshallingErrorProxy,
 				NodeLabelProxy,
 				NodeLabelProxy$Type,
