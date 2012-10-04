@@ -598,15 +598,13 @@ package org.openforis.collect.ui {
 		public static function getUITab(nodeDefn:NodeDefinitionProxy):UITab {
 			var survey:SurveyProxy = nodeDefn.survey;
 			var rootEntity:EntityDefinitionProxy = nodeDefn.rootEntity;
-			var uiConfig:UIConfiguration = survey.uiConfiguration;
-			if ( uiConfig != null ) {
-				var tabDefn:UITabDefinition = uiConfig.getTabDefinition(rootEntity.name);
-				if ( tabDefn != null ) {
-					var tab:UITab = tabDefn.getTab(nodeDefn.uiTabName);
-					return tab;
-				}
+			var tabDefn:UITabDefinition = getRootEntityTabDefinition(rootEntity);
+			if ( tabDefn != null ) {
+				var tab:UITab = tabDefn.getTab(nodeDefn.uiTabName);
+				return tab;
+			} else {
+				return null;
 			}
-			return null;
 		}
 		
 	}
