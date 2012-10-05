@@ -3,11 +3,12 @@
  */
 package org.openforis.collect.designer.viewmodel;
 
+import java.util.List;
+
 import org.openforis.collect.designer.form.ItemFormObject;
 import org.openforis.collect.designer.form.SurveyMainInfoFormObject;
 import org.openforis.collect.model.CollectSurvey;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
-import org.zkoss.zkplus.databind.BindingListModelList;
 
 /**
  * 
@@ -41,16 +42,17 @@ public class SurveyMainInfoEditVM extends SurveyItemEditVM<CollectSurvey> {
 	}
 
 	@Override
-	public BindingListModelList<CollectSurvey> getItems() {
+	protected List<CollectSurvey> getItemsInternal() {
+		// TODO Auto-generated method stub
 		return null;
 	}
+	
+	@Override
+	protected void addNewItemToSurvey() {}
 
 	@Override
-	protected void addNewItemToSurvey() {
-	}
+	protected void deleteItemFromSurvey(CollectSurvey item) {}
 
 	@Override
-	protected void deleteItemFromSurvey(CollectSurvey item) {
-	}
-
+	protected void moveSelectedItem(int indexTo) {}
 }

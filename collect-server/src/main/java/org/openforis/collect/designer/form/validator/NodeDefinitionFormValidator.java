@@ -7,10 +7,8 @@ import org.openforis.collect.designer.viewmodel.SurveySchemaEditVM;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Schema;
-import org.zkoss.bind.BindContext;
 import org.zkoss.bind.ValidationContext;
 import org.zkoss.util.resource.Labels;
-import org.zkoss.zk.ui.Component;
 
 /**
  * 
@@ -19,9 +17,7 @@ import org.zkoss.zk.ui.Component;
  */
 public class NodeDefinitionFormValidator extends FormValidator {
 
-	private static final String VM_ID_ATTRIBUTE = "$VM_ID$";
-
-	protected static final String NAME_ALREADY_DEFINED_MESSAGE_KEY = "survey.schema.node.validation.name_already_defined";
+	protected static final String NODE_NAME_ALREADY_DEFINED_MESSAGE_KEY = "survey.schema.node.validation.name_already_defined";
 	
 	protected static final String DESCRIPTION_FIELD = "description";
 	protected static final String NAME_FIELD = "name";
@@ -50,7 +46,7 @@ public class NodeDefinitionFormValidator extends FormValidator {
 		NodeDefinition editedNode = getEditedNode(ctx);
 		String name = (String) getValue(ctx, NAME_FIELD);
 		if ( ! isNameUnique(editedNode, name) ) {
-			String message = Labels.getLabel(NAME_ALREADY_DEFINED_MESSAGE_KEY);
+			String message = Labels.getLabel(NODE_NAME_ALREADY_DEFINED_MESSAGE_KEY);
 			this.addInvalidMessage(ctx, NAME_FIELD, message);
 			return false;
 		} else {
@@ -115,14 +111,6 @@ public class NodeDefinitionFormValidator extends FormValidator {
 		} else {
 			throw new IllegalArgumentException("Unsupported View Model Type: " + vmObject.getClass().getName());
 		}
-	}
-
-	protected Object getVM(ValidationContext ctx) {
-		BindContext bindContext = ctx.getBindContext();
-		Component component = bindContext.getComponent();
-		String vmId = (String) component.getAttribute(VM_ID_ATTRIBUTE);
-		Object vmObject = component.getAttribute(vmId);
-		return vmObject;
 	}
 
 }

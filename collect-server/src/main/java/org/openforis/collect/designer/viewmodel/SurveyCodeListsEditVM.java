@@ -29,7 +29,6 @@ import org.zkoss.bind.annotation.GlobalCommand;
 import org.zkoss.bind.annotation.NotifyChange;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
-import org.zkoss.zkplus.databind.BindingListModelList;
 import org.zkoss.zul.Window;
 
 /**
@@ -51,10 +50,10 @@ public class SurveyCodeListsEditVM extends SurveyItemEditVM<CodeList> {
 	private Window codeListItemPopUp;
 	
 	@Override
-	public BindingListModelList<CodeList> getItems() {
+	protected List<CodeList> getItemsInternal() {
 		CollectSurvey survey = getSurvey();
 		List<CodeList> codeLists = survey.getCodeLists();
-		return new BindingListModelList<CodeList>(codeLists, false);
+		return codeLists;
 	}
 
 	@Override
@@ -92,6 +91,11 @@ public class SurveyCodeListsEditVM extends SurveyItemEditVM<CodeList> {
 		"multipleLevelsPresent","itemsPerLevel","selectedItemsPerLevel","lastSelectedLevelIndex"})
 	protected void performItemSelection(CodeList item) {
 		super.performItemSelection(item);
+	}
+	
+	@Override
+	protected void moveSelectedItem(int indexTo) {
+		survey.moveCodeList(selectedItem, indexTo);
 	}
 	
 	@Command

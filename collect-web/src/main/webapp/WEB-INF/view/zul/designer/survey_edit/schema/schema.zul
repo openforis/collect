@@ -60,11 +60,11 @@
 					        	onClick="@command('removeNode')" />
 			                <menuitem image="/assets/images/arrow-up.png"
 			                	class="icon-button" 
-								disabled="@load(vm.moveNodeUpDisallowed)" 
+								disabled="@load(vm.moveNodeUpDisabled)" 
 					        	onClick="@command('moveNodeUp')" />
 			                <menuitem image="/assets/images/arrow-down.png"
 			                	class="icon-button" 
-			                	disabled="@load(vm.moveNodeDownDisallowed)" 
+			                	disabled="@load(vm.moveNodeDownDisabled)" 
 					        	onClick="@command('moveNodeDown')" />
 			             </menubar>
 		 			</south>

@@ -5,8 +5,6 @@ package org.openforis.collect.metamodel.proxy;
 
 import java.util.List;
 
-import javax.xml.namespace.QName;
-
 import org.apache.commons.lang3.StringUtils;
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.collect.model.CollectSurvey;
@@ -20,9 +18,6 @@ import org.openforis.idm.metamodel.EntityDefinition;
  * 
  */
 public class EntityDefinitionProxy extends NodeDefinitionProxy {
-
-	private static final QName COUNT_IN_SUMMARY_LIST_ANNOTATION = new QName("http://www.openforis.org/collect/3.0/collect", "count");
-	private static final QName SHOW_ROW_NUMBERS_ANNOTATION = new QName("http://www.openforis.org/collect/3.0/ui", "showRowNumbers");
 
 	private transient EntityDefinition entityDefinition;
 
@@ -38,7 +33,7 @@ public class EntityDefinitionProxy extends NodeDefinitionProxy {
 
 	@ExternalizedProperty
 	public boolean isCountInSummaryList() {
-		String annotation = entityDefinition.getAnnotation(COUNT_IN_SUMMARY_LIST_ANNOTATION);
+		String annotation = entityDefinition.getAnnotation(UIConfiguration.Annotation.COUNT_IN_SUMMARY_LIST.getQName());
 		return annotation != null && Boolean.parseBoolean(annotation);
 	}
 
@@ -57,7 +52,7 @@ public class EntityDefinitionProxy extends NodeDefinitionProxy {
 	
 	@ExternalizedProperty
 	public boolean isShowRowNumbers() {
-		String showRowNumbersString = entityDefinition.getAnnotation(SHOW_ROW_NUMBERS_ANNOTATION);
+		String showRowNumbersString = entityDefinition.getAnnotation(UIConfiguration.Annotation.SHOW_ROW_NUMBERS.getQName());
 		if ( StringUtils.isNotBlank(showRowNumbersString) ) {
 			boolean result = Boolean.parseBoolean(showRowNumbersString);
 			return result;
@@ -71,10 +66,9 @@ public class EntityDefinitionProxy extends NodeDefinitionProxy {
 		if ( parent != null ) {
 			return parent.getTabDefinitionName();
 		} else {
-			String tabDefnName = entityDefinition.getAnnotation(UIConfiguration.TAB_DEFINITION_ANNOTATION);
+			String tabDefnName = entityDefinition.getAnnotation(UIConfiguration.Annotation.TAB_DEFINITION.getQName());
 			return tabDefnName;
 		}
 	}
-
 	
 }

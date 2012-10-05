@@ -20,13 +20,13 @@
 			<rows>
 				<row>
 					<label value="${labels.survey.schema.attribute.bool.type_label}:" />
-					<radiogroup selectedIndex="@bind(fx.typeIndex)">
+					<radiogroup selectedIndex="@bind(fx.typeValue)">
 						<radio id="threeStateRadioButton" 
 							label="${labels.survey.schema.attribute.bool.type.threeState}"
-							value="threeState" />
+							value="THREE_STATE" />
 						<radio id="affirmativeOnlyRadioButton" 
 							label="${labels.survey.schema.attribute.bool.type.affirmativeOnly}"
-							value="affirmativeOnly" />
+							value="AFFIRMATIVE_ONLY" />
 					</radiogroup>
 				</row>
 			</rows>

@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.openforis.collect.designer.component.SchemaTreeModel;
-import org.openforis.collect.designer.component.SchemaTreeModel.NodeDefinitionTreeNode;
 import org.openforis.collect.designer.form.AttributeDefinitionFormObject;
 import org.openforis.collect.designer.form.NodeDefinitionFormObject;
 import org.openforis.collect.designer.form.NumericAttributeDefinitionFormObject;
@@ -39,9 +38,7 @@ import org.zkoss.bind.annotation.NotifyChange;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.IdSpace;
 import org.zkoss.zk.ui.Path;
-import org.zkoss.zk.ui.event.DropEvent;
 import org.zkoss.zk.ui.select.Selectors;
-import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zul.Include;
@@ -92,27 +89,9 @@ public class SurveySchemaEditVM extends SurveyEditBaseVM {
 		 Selectors.wireEventListeners(view, this);
 	}
 	
-	@Listen("onDrop = tree#nodesTree")
-	public void nodesTreeDropHandler(DropEvent evt) {
-		Component dragged = evt.getDragged();
-		if ( dragged instanceof Treeitem ) {
-			Treeitem treeItem = (Treeitem) dragged;
-			if ( treeItem.getTree() == nodesTree ) {
-				NodeDefinitionTreeNode treeNode = ((Treeitem) dragged).getValue();
-				NodeDefinition nodeDefn = treeNode.getData();
-				Component target = evt.getTarget();
-				if ( target == nodesTree ) {
-					
-				} else if ( target instanceof Treeitem ) {
-					
-				}
-			}
-		}
-	}
-
 	@Command
 	@NotifyChange({"nodes","editingNode","nodeType","attributeType",
-		"moveNodeUpDisallowed","moveNodeDownDisallowed",
+		"moveNodeUpDisabled","moveNodeDownDisabled",
 		"tempFormObject","formObject","attributeDefaults","numericAttributePrecisions"})
 	public void nodeSelected(@BindingParam("node") Treeitem node) {
 		if ( node != null ) {
@@ -223,13 +202,13 @@ public class SurveySchemaEditVM extends SurveyEditBaseVM {
 	}
 
 	@Command
-	@NotifyChange({"nodes","moveNodeUpDisallowed","moveNodeDownDisallowed"})
+	@NotifyChange({"nodes","moveNodeUpDisabled","moveNodeDownDisabled"})
 	public void moveNodeUp() {
 		moveNode(true);
 	}
 	
 	@Command
-	@NotifyChange({"nodes","moveNodeUpDisallowed","moveNodeDownDisallowed"})
+	@NotifyChange({"nodes","moveNodeUpDisabled","moveNodeDownDisabled"})
 	public void moveNodeDown() {
 		moveNode(false);
 	}
@@ -270,7 +249,7 @@ public class SurveySchemaEditVM extends SurveyEditBaseVM {
 		tempFormObject = null;
 		formObject = null;
 		notifyChange("nodes","editingNode","tempFormObject","formObject",
-				"moveNodeUpDisallowed","moveNodeDownDisallowed");
+				"moveNodeUpDisabled","moveNodeDownDisabled");
 	}
 
 	@Override
@@ -389,7 +368,7 @@ public class SurveySchemaEditVM extends SurveyEditBaseVM {
 		String tabName = "tab_" + tabPosition;
 		tab.setName(tabName);
 		tabDefn.addTab(tab);
-		newNode.setAnnotation(UIConfiguration.TAB_NAME_ANNOTATION, tabName);
+		newNode.setAnnotation(UIConfiguration.Annotation.TAB_DEFINITION.getQName(), tabName);
 	}
 
 	protected UITabDefinition createRootTabDefinition(EntityDefinition newNode) {
@@ -399,7 +378,7 @@ public class SurveySchemaEditVM extends SurveyEditBaseVM {
 		String tabDefnName = "tabdefn_" + tabDefnPosition;
 		tabDefn.setName(tabDefnName);
 		uiConf.addTabDefinition(tabDefn);
-		newNode.setAnnotation(UIConfiguration.TAB_DEFINITION_ANNOTATION, tabDefnName);
+		newNode.setAnnotation(UIConfiguration.Annotation.TAB_DEFINITION.getQName(), tabDefnName);
 		return tabDefn;
 	}
 
@@ -503,12 +482,12 @@ public class SurveySchemaEditVM extends SurveyEditBaseVM {
 		return index;
 	}
 
-	public boolean isMoveNodeUpDisallowed() {
+	public boolean isMoveNodeUpDisabled() {
 		int index = getSelectedNodeIndex();
 		return index <= 0;
 	}
 	
-	public boolean isMoveNodeDownDisallowed() {
+	public boolean isMoveNodeDownDisabled() {
 		if ( selectedNode != null ) {
 			List<NodeDefinition> siblings = getSiblings(selectedNode);
 			int index = getSelectedNodeIndex();

@@ -7,15 +7,13 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.validator.routines.UrlValidator;
-import org.zkoss.bind.AnnotateBinder;
 import org.zkoss.bind.BindContext;
 import org.zkoss.bind.BindUtils;
-import org.zkoss.bind.Form;
+import org.zkoss.bind.Binder;
 import org.zkoss.bind.Property;
 import org.zkoss.bind.ValidationContext;
 import org.zkoss.bind.validator.AbstractValidator;
 import org.zkoss.util.resource.Labels;
-import org.zkoss.zk.ui.Component;
 
 /**
  * 
@@ -25,19 +23,13 @@ import org.zkoss.zk.ui.Component;
 public abstract class FormValidator extends AbstractValidator {
 
 	protected static final String INTERNAL_NAME_REGEX = "[a-z][a-z0-9_]*";
+	
 	protected static final String INTERNAL_NAME_INVALID_VALUE_ERROR_KEY = "global.validation.internal_name.invalid_value";
 	protected static final String FIELD_REQUIRED_MESSAGE_KEY = "global.item.validation.required_field";
 	protected static final String INVALID_URI_MESSAGE_KEY = "global.item.validation.invalid_uri";
 	protected static final String GREATER_THAN_MESSAGE_KEY = "global.item.validation.greater_than";
 	protected static final String GREATER_THAN_EQUAL_MESSAGE_KEY = "global.item.validation.greater_than_equal";
-
-	private static final String DEFAULT_FORM_ID = "fx";
-
-	private String formId;
-	
-	public FormValidator() {
-		formId = DEFAULT_FORM_ID;
-	}
+	protected static final String ITEM_NAME_ALREADY_DEFINED_MESSAGE_KEY = "global.item.validation.name_already_defined";
 	
 	@Override
 	public void validate(ValidationContext ctx) {
@@ -74,7 +66,7 @@ public abstract class FormValidator extends AbstractValidator {
 	protected boolean validateRegEx(ValidationContext ctx, String regex,
 			String fieldName, String errorMessageKey) {
 		Object value = getValue(ctx, fieldName);
-		if ( value instanceof String && StringUtils.isNotBlank((String) value) ) {
+		if ( value != null && value instanceof String && StringUtils.isNotBlank((String) value) ) {
 			Pattern pattern = Pattern.compile(regex);  
 			Matcher matcher = pattern.matcher((String) value);
 			if ( ! matcher.matches() ) {  
@@ -88,7 +80,7 @@ public abstract class FormValidator extends AbstractValidator {
 
 	protected boolean validateUri(ValidationContext ctx, String fieldName) {
 		Object value = getValue(ctx, fieldName);
-		if ( value instanceof String && StringUtils.isNotBlank((String) value) ) {
+		if ( value != null && value instanceof String && StringUtils.isNotBlank((String) value) ) {
 			UrlValidator validator = UrlValidator.getInstance();
 			if ( ! validator.isValid((String) value) ) {
 				String message = Labels.getLabel(INVALID_URI_MESSAGE_KEY);
@@ -107,18 +99,22 @@ public abstract class FormValidator extends AbstractValidator {
 	protected boolean validateGreaterThan(ValidationContext ctx,
 			String fieldName, Number value, boolean equal) {
 		Object fieldValue = getValue(ctx, fieldName);
-		if ( fieldValue instanceof Number ) {
-			double fieldDoubleValue = ((Number) fieldValue).doubleValue();
-			if ( fieldDoubleValue < value.doubleValue() || ! equal && fieldDoubleValue == value.doubleValue()) {
-				String messageKey = equal ? GREATER_THAN_EQUAL_MESSAGE_KEY: GREATER_THAN_MESSAGE_KEY;
-				String message = Labels.getLabel(messageKey, new Object[] {value});
-				addInvalidMessage(ctx, fieldName, message);
-				return false;
+		if ( fieldValue != null ) {
+			if ( fieldValue instanceof Number ) {
+				double fieldDoubleValue = ((Number) fieldValue).doubleValue();
+				if ( fieldDoubleValue < value.doubleValue() || ! equal && fieldDoubleValue == value.doubleValue()) {
+					String messageKey = equal ? GREATER_THAN_EQUAL_MESSAGE_KEY: GREATER_THAN_MESSAGE_KEY;
+					String message = Labels.getLabel(messageKey, new Object[] {value});
+					addInvalidMessage(ctx, fieldName, message);
+					return false;
+				} else {
+					return true;
+				}
 			} else {
-				return true;
+				throw new IllegalArgumentException("Number field value expected: " + fieldName);
 			}
 		} else {
-			throw new IllegalArgumentException("Number field value expected: " + fieldName);
+			return true;
 		}
 	}
 	
@@ -135,28 +131,14 @@ public abstract class FormValidator extends AbstractValidator {
 		return properties;
 	}
 
-	protected Form getForm(ValidationContext ctx) {
+	protected Object getVM(ValidationContext ctx) {
 		BindContext bindContext = ctx.getBindContext();
-		AnnotateBinder binder = (AnnotateBinder) bindContext.getBinder();
-		Component formContainer = bindContext.getComponent();
-		Form form = binder.getForm(formContainer, formId);
-		return form;
+		Binder binder = bindContext.getBinder();
+		Object vmObject = binder.getViewModel();
+		if ( vmObject == null ) {
+			throw new IllegalStateException("Unable to find view model instance");
+		}
+		return vmObject;
 	}
-	
-	protected Object getValueFromForm(ValidationContext ctx, String fieldName) {
-		Form form = getForm(ctx);
-		Object value = form.getField(fieldName);
-		return value;
-	}
-
-	public String getFormId() {
-		return formId;
-	}
-
-	public void setFormId(String formId) {
-		this.formId = formId;
-	}
-
-	
 
 }

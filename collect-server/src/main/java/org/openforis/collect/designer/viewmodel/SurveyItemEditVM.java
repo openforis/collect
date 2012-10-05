@@ -4,6 +4,8 @@
 package org.openforis.collect.designer.viewmodel;
 
 
+import java.util.List;
+
 import org.openforis.collect.designer.form.ItemFormObject;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.MessageUtil.ConfirmHandler;
@@ -38,8 +40,13 @@ public abstract class SurveyItemEditVM<T> extends SurveyEditBaseVM {
 		this.genericType = (Class<T>) GenericTypeResolver.resolveTypeArgument(getClass(), SurveyItemEditVM.class);
 	}
 	
-	public abstract BindingListModelList<T> getItems();	
+	public BindingListModelList<T> getItems() {
+		List<T> items = getItemsInternal();
+		return new BindingListModelList<T>(items, false);
+	}
 	
+	protected abstract List<T> getItemsInternal();
+
 	@Command
 	public void newItem(@ContextParam(ContextType.BINDER) Binder binder) {
 		if ( checkCurrentFormValid() ) {
@@ -52,13 +59,7 @@ public abstract class SurveyItemEditVM<T> extends SurveyEditBaseVM {
 		setEditedItem(newInstance);
 		addNewItemToSurvey();
 		setSelectedItem(newInstance);
-		
-		BindUtils.postNotifyChange(null, null, this, "editingItem");
-		BindUtils.postNotifyChange(null, null, this, "editedItem");
-		BindUtils.postNotifyChange(null, null, this, "formObject");
-		BindUtils.postNotifyChange(null, null, this, "items");
-		BindUtils.postNotifyChange(null, null, this, "selectedItem");
-		
+		notifyChange("editedItem", "formObject", "items", "selectedItem","moveSelectedItemUpDisabled","moveSelectedItemDownDisabled");
 		validateForm(binder);
 	}
 
@@ -97,10 +98,51 @@ public abstract class SurveyItemEditVM<T> extends SurveyEditBaseVM {
 	protected void performItemSelection(T item) {
 		setSelectedItem(item);
 		setEditedItem(item);
-		BindUtils.postNotifyChange(null, null, this, "formObject");
-		BindUtils.postNotifyChange(null, null, this, "editedItem");
+		notifyChange("formObject","editedItem","moveSelectedItemUpDisabled","moveSelectedItemDownDisabled");
 	}
 	
+	@Command
+	@NotifyChange({"items","moveSelectedItemUpDisabled","moveSelectedItemDownDisabled"})
+	public void moveSelectedItemUp() {
+		moveSelectedItem(true);
+	}
+	
+	@Command
+	@NotifyChange({"items","moveSelectedItemUpDisabled","moveSelectedItemDownDisabled"})
+	public void moveSelectedItemDown() {
+		moveSelectedItem(false);
+	}
+	
+	protected int getSelectedItemIndex() {
+		List<T> items = getItemsInternal();
+		int index = items.indexOf(selectedItem);
+		return index;
+	}
+	
+	protected void moveSelectedItem(boolean up) {
+		int indexFrom = getSelectedItemIndex();
+		int indexTo = up ? indexFrom - 1: indexFrom + 1;
+		moveSelectedItem(indexTo);
+	}
+	
+	protected abstract void moveSelectedItem(int indexTo);
+
+	public boolean isMoveSelectedItemUpDisabled() {
+		int index = getSelectedItemIndex();
+		return index <= 0;
+	}
+	
+	public boolean isMoveSelectedItemDownDisabled() {
+		if ( selectedItem != null ) {
+			List<T> items = getItemsInternal();
+			int size = items.size();
+			int index = getSelectedItemIndex();
+			return index < 0 || index >= size - 1;
+		} else {
+			return true;
+		}
+	}
+
 	protected abstract ItemFormObject<T> createFormObject();
 	
 	protected T createItemInstance() {
@@ -134,16 +176,13 @@ public abstract class SurveyItemEditVM<T> extends SurveyEditBaseVM {
 
 	protected void performRemoveItem(T item) {
 		deleteItemFromSurvey(item);
-		BindUtils.postNotifyChange(null, null, this, "items");
+		notifyChange("items");
 		if ( item.equals(selectedItem) ) {
 			formObject = null;
 			editedItem = null;
 			selectedItem = null;
 			currentFormValid = true;
-			BindUtils.postNotifyChange(null, null, this, "formObject");
-			BindUtils.postNotifyChange(null, null, this, "editedItem");
-			BindUtils.postNotifyChange(null, null, this, "selectedItem");
-			BindUtils.postNotifyChange(null, null, this, "currentFormValid");
+			notifyChange("formObject", "editedItem", "selectedItem", "currentFormValid");
 		}
 	}
 

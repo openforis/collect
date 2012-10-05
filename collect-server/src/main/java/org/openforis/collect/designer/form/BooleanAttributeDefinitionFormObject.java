@@ -3,8 +3,7 @@
  */
 package org.openforis.collect.designer.form;
 
-import javax.xml.namespace.QName;
-
+import org.openforis.collect.model.ui.UIConfiguration;
 import org.openforis.idm.metamodel.BooleanAttributeDefinition;
 
 /**
@@ -13,41 +12,41 @@ import org.openforis.idm.metamodel.BooleanAttributeDefinition;
  */
 public class BooleanAttributeDefinitionFormObject<T extends BooleanAttributeDefinition> extends AttributeDefinitionFormObject<T> {
 	
-	private static final QName AFFIRMATIVE_ONLY_ANNOTATION = new QName("http://www.openforis.org/collect/3.0/ui", "type");
-	
 	enum Type {
 		THREE_STATE, AFFIRMATIVE_ONLY
 	}
 	
-	private Integer typeIndex;
+	private String typeValue;
+	
+	public BooleanAttributeDefinitionFormObject() {
+		typeValue = Type.THREE_STATE.name();
+	}
 	
 	@Override
 	public void saveTo(T dest, String languageCode) {
 		super.saveTo(dest, languageCode);
 		String annotationValue = null;
-		if ( typeIndex != null ) {
-			Type type = Type.values()[typeIndex];
+		if ( typeValue != null ) {
+			Type type = Type.valueOf(typeValue);
 			if ( type == Type.AFFIRMATIVE_ONLY ) {
-				annotationValue = "true";
+				annotationValue = type.name().toLowerCase();
 			}
 		}
-		dest.setAnnotation(AFFIRMATIVE_ONLY_ANNOTATION, annotationValue);
+		dest.setAnnotation(UIConfiguration.Annotation.TYPE.getQName(), annotationValue);
 	}
 	
 	@Override
 	public void loadFrom(T source, String languageCode) {
 		super.loadFrom(source, languageCode);
-		String affirmativeOnlyStringValue = source.getAnnotation(AFFIRMATIVE_ONLY_ANNOTATION);
-		boolean affirmativeOnly = Boolean.parseBoolean(affirmativeOnlyStringValue);
-		typeIndex = affirmativeOnly ? 1: 0;
+		typeValue = source.getAnnotation(UIConfiguration.Annotation.TYPE.getQName());
 	}
 
-	public Integer getTypeIndex() {
-		return typeIndex;
+	public String getTypeValue() {
+		return typeValue;
 	}
 
-	public void setTypeIndex(Integer typeIndex) {
-		this.typeIndex = typeIndex;
+	public void setTypeValue(String typeValue) {
+		this.typeValue = typeValue;
 	}
 
 }

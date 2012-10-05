@@ -3,6 +3,8 @@
  */
 package org.openforis.collect.designer.viewmodel;
 
+import java.util.List;
+
 import org.openforis.collect.designer.form.CodeListItemFormObject;
 import org.openforis.collect.designer.form.ItemFormObject;
 import org.openforis.idm.metamodel.CodeListItem;
@@ -10,7 +12,6 @@ import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.ExecutionArgParam;
 import org.zkoss.bind.annotation.Init;
-import org.zkoss.zkplus.databind.BindingListModelList;
 
 /**
  * 
@@ -35,9 +36,14 @@ public class SurveyCodeListItemEditVM extends SurveyItemEditVM<CodeListItem> {
 	}
 	
 	@Override
-	public BindingListModelList<CodeListItem> getItems() {
-		//do nothing
+	protected List<CodeListItem> getItemsInternal() {
+		// TODO Auto-generated method stub
 		return null;
+	}
+	
+	@Override
+	protected void moveSelectedItem(int indexTo) {
+		//do nothing
 	}
 	
 	@Override

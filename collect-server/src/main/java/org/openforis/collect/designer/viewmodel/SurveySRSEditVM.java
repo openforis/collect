@@ -10,7 +10,6 @@ import org.openforis.collect.designer.form.SpatialReferenceSystemFormObject;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.SpatialReferenceSystem;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
-import org.zkoss.zkplus.databind.BindingListModelList;
 
 /**
  * 
@@ -21,10 +20,10 @@ import org.zkoss.zkplus.databind.BindingListModelList;
 public class SurveySRSEditVM extends SurveyItemEditVM<SpatialReferenceSystem> {
 
 	@Override
-	public BindingListModelList<SpatialReferenceSystem> getItems() {
+	public List<SpatialReferenceSystem> getItemsInternal() {
 		CollectSurvey survey = getSurvey();
 		List<SpatialReferenceSystem> spatialReferenceSystems = survey.getSpatialReferenceSystems();
-		return new BindingListModelList<SpatialReferenceSystem>(spatialReferenceSystems, false);
+		return spatialReferenceSystems;
 	}
 
 	@Override
@@ -42,5 +41,10 @@ public class SurveySRSEditVM extends SurveyItemEditVM<SpatialReferenceSystem> {
 	@Override
 	protected ItemFormObject<SpatialReferenceSystem> createFormObject() {
 		return new SpatialReferenceSystemFormObject();
+	}
+	
+	@Override
+	protected void moveSelectedItem(int indexTo) {
+		survey.moveSpatialReferenceSystem(selectedItem, indexTo);
 	}
 }

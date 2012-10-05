@@ -155,7 +155,7 @@ public class NodeDefinitionProxy implements Proxy {
 
 	@ExternalizedProperty
 	public String getUiTabName() {
-		String tabName = nodeDefinition.getAnnotation(UIConfiguration.TAB_NAME_ANNOTATION);
+		String tabName = nodeDefinition.getAnnotation(UIConfiguration.Annotation.TAB_NAME.getQName());
 		if ( tabName != null) {
 			return tabName;
 		} else {

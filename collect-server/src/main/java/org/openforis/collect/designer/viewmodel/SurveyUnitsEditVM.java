@@ -13,7 +13,6 @@ import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.NotifyChange;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
-import org.zkoss.zkplus.databind.BindingListModelList;
 
 /**
  * 
@@ -26,10 +25,10 @@ public class SurveyUnitsEditVM extends SurveyItemEditVM<Unit> {
 	private static final String UNITS_UPDATED_GLOBAL_COMMAND = "unitsUpdated";
 
 	@Override
-	public BindingListModelList<Unit> getItems() {
+	protected List<Unit> getItemsInternal() {
 		CollectSurvey survey = getSurvey();
 		List<Unit> units = survey.getUnits();
-		return new BindingListModelList<Unit>(units, false);
+		return units;
 	}
 
 	@Override
@@ -42,6 +41,11 @@ public class SurveyUnitsEditVM extends SurveyItemEditVM<Unit> {
 	protected void deleteItemFromSurvey(Unit item) {
 		CollectSurvey survey = getSurvey();
 		survey.removeUnit(item);
+	}
+	
+	@Override
+	protected void moveSelectedItem(int indexTo) {
+		survey.moveUnit(selectedItem, indexTo);
 	}
 
 	@Override
