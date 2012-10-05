@@ -108,9 +108,26 @@
 						</xs:documentation>
 					</xs:annotation>
 				</xs:element>
+				<xs:element name="languageCodes" minOccurs="0" maxOccurs="1">
+           			<xs:annotation>
+	           			<xs:documentation xml:lang="en">
+							Language codes used during the definition of the survey  
+						</xs:documentation>
+           			</xs:annotation>
+           			<xs:complexType>
+           				<xs:sequence>
+							<xs:element name="languageCode" minOccurs="1" maxOccurs="unbounded">
+								<xs:annotation>
+									<xs:documentation xml:lang="en">
+					                    A valid language code
+				                  	</xs:documentation>
+			                  </xs:annotation>
+		           			</xs:element>
+		           		</xs:sequence>
+	           		</xs:complexType>
+           		</xs:element>
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
-
 </xs:schema> 
     
