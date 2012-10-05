@@ -39,9 +39,25 @@ public class UIConfiguration implements Configuration, Serializable {
 	
 	public static final String UI_NAMESPACE_URI = "http://www.openforis.org/collect/3.0/ui";
 	
-	public static final QName TAB_DEFINITION_ANNOTATION = new QName(UI_NAMESPACE_URI, "tabDefinition");
-	public static final QName TAB_NAME_ANNOTATION = new QName(UI_NAMESPACE_URI, "tab");
-	public static final QName LAYOUT_ANNOTATION = new QName(UI_NAMESPACE_URI, "layout");
+	public enum Annotation {
+		TAB_DEFINITION(new QName(UI_NAMESPACE_URI, "tabDefinition")),
+		TAB_NAME(new QName(UI_NAMESPACE_URI, "tab")),
+		LAYOUT(new QName(UI_NAMESPACE_URI, "layout")),
+		COUNT_IN_SUMMARY_LIST(new QName(UI_NAMESPACE_URI, "count")),
+		SHOW_ROW_NUMBERS(new QName(UI_NAMESPACE_URI, "showRowNumbers")),
+		AUTOCOMPLETE(new QName(UI_NAMESPACE_URI, "autocomplete")),
+		TYPE(new QName(UI_NAMESPACE_URI, "type"));
+		
+		private QName qName;
+
+		private Annotation(QName qname) {
+			this.qName = qname;
+		}
+		
+		public QName getQName() {
+			return qName;
+		}
+	}
 	
 	public enum Layout {
 		FORM, TABLE
@@ -97,7 +113,7 @@ public class UIConfiguration implements Configuration, Serializable {
 		EntityDefinition rootEntity = nodeDefn.getRootEntity();
 		UITabDefinition tabDefinition = getTabDefinition(rootEntity);
 		if ( tabDefinition != null ) {
-			String tabName = nodeDefn.getAnnotation(TAB_NAME_ANNOTATION);
+			String tabName = nodeDefn.getAnnotation(Annotation.TAB_NAME.getQName());
 			NodeDefinition parentDefn = nodeDefn.getParentDefinition();
 			if ( StringUtils.isNotBlank(tabName) && ( parentDefn == null || parentDefn.getParentDefinition() == null ) ) {
 				tab = tabDefinition.getTab(tabName);
@@ -114,7 +130,7 @@ public class UIConfiguration implements Configuration, Serializable {
 	}
 
 	public UITabDefinition getTabDefinition(EntityDefinition rootEntityDefn) {
-		String tabDefnName = rootEntityDefn.getAnnotation(TAB_DEFINITION_ANNOTATION);
+		String tabDefnName = rootEntityDefn.getAnnotation(Annotation.TAB_DEFINITION.getQName());
 		UITabDefinition tabDefinition = getTabDefinition(tabDefnName);
 		return tabDefinition;
 	}
@@ -165,15 +181,15 @@ public class UIConfiguration implements Configuration, Serializable {
 
 	public void associateWithTab(NodeDefinition nodeDefn, UITab tab) {
 		String tabName = tab.getName();
-		nodeDefn.setAnnotation(TAB_NAME_ANNOTATION, tabName);
+		nodeDefn.setAnnotation(Annotation.TAB_NAME.getQName(), tabName);
 	}
 	
 	public void removeTabAssociation(NodeDefinition nodeDefn) {
-		nodeDefn.setAnnotation(TAB_NAME_ANNOTATION, null);
+		nodeDefn.setAnnotation(Annotation.TAB_NAME.getQName(), null);
 	}
 	
 	public Layout getLayout(EntityDefinition node) {
-		String layoutValue = node.getAnnotation(LAYOUT_ANNOTATION);
+		String layoutValue = node.getAnnotation(Annotation.LAYOUT.getQName());
 		if ( layoutValue == null ) {
 			EntityDefinition parent = (EntityDefinition) node.getParentDefinition();
 			if ( parent != null ) {
@@ -191,7 +207,7 @@ public class UIConfiguration implements Configuration, Serializable {
 
 	public void setLayout(NodeDefinition nodeDefn, Layout layout) {
 		String layoutValue = layout != null ? layout.name().toLowerCase(): null;
-		nodeDefn.setAnnotation(LAYOUT_ANNOTATION, layoutValue);
+		nodeDefn.setAnnotation(Annotation.LAYOUT.getQName(), layoutValue);
 	}
 
 	public EntityDefinition getRootEntityDefinition(

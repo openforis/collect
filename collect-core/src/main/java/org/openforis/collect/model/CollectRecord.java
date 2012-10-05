@@ -8,9 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.xml.namespace.QName;
-
 import org.apache.commons.lang3.StringUtils;
+import org.openforis.collect.model.ui.UIConfiguration;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.ModelVersion;
@@ -34,8 +33,6 @@ import org.openforis.idm.model.TextAttribute;
  */
 public class CollectRecord extends Record {
 
-	private static final QName COUNT_ANNOTATION = new QName("http://www.openforis.org/collect/3.0/collect", "count");
-	
 	private static final int APPROVED_MISSING_POSITION = 0;
 	private static final int CONFIRMED_ERROR_POSITION = 0;
 	private static final int DEFAULT_APPLIED_POSITION = 1;
@@ -581,7 +578,7 @@ public class CollectRecord extends Record {
 		for (NodeDefinition childDefinition : childDefinitions) {
 			if(childDefinition instanceof EntityDefinition) {
 				EntityDefinition entityDefinition = (EntityDefinition) childDefinition;
-				String annotation = childDefinition.getAnnotation(COUNT_ANNOTATION);
+				String annotation = childDefinition.getAnnotation(UIConfiguration.Annotation.COUNT_IN_SUMMARY_LIST.getQName());
 				if(annotation != null && Boolean.parseBoolean(annotation)) {
 					result.add(entityDefinition);
 				}

@@ -14,8 +14,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.Stack;
 
-import javax.xml.namespace.QName;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
@@ -41,6 +39,7 @@ import org.apache.lucene.util.Version;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.Configuration;
+import org.openforis.collect.model.ui.UIConfiguration;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -69,8 +68,6 @@ public class RecordIndexManager {
 
 	protected static final String INDEX_PATH_CONFIGURATION_KEY = "index_path";
 	
-	protected static final QName INDEX_NAME_ANNOTATION = new QName("http://www.openforis.org/collect/3.0/ui", "autocomplete");
-
 	protected static final String RECORD_ID_FIELD = "_record_id";
 	
 	@Autowired
@@ -219,7 +216,7 @@ public class RecordIndexManager {
 		stack.push(entityDefn);
 		while ( ! stack.isEmpty() ) {
 			NodeDefinition defn = stack.pop();
-			String indexName = defn.getAnnotation(INDEX_NAME_ANNOTATION);
+			String indexName = defn.getAnnotation(UIConfiguration.Annotation.AUTOCOMPLETE.getQName());
 			if ( StringUtils.isNotBlank(indexName) ) {
 				return true;
 			}
@@ -257,7 +254,7 @@ public class RecordIndexManager {
     public List<String> search(SearchType searchType, Survey survey, int attributeDefnId, int fieldIndex, String queryText, int maxResults)  throws RecordIndexException {
     	Schema schema = survey.getSchema();
     	AttributeDefinition defn = (AttributeDefinition) schema.getById(attributeDefnId);
-    	String indexName = defn.getAnnotation(INDEX_NAME_ANNOTATION);
+    	String indexName = defn.getAnnotation(UIConfiguration.Annotation.AUTOCOMPLETE.getQName());
 		if ( StringUtils.isNotBlank(indexName) ) {
 			IndexSearcher indexSearcher = null;
 			try {
@@ -343,7 +340,7 @@ public class RecordIndexManager {
 	
 	protected void index(IndexWriter indexWriter, Attribute<?, ?> attr) {
 		AttributeDefinition defn = attr.getDefinition();
-		String indexName = defn.getAnnotation(INDEX_NAME_ANNOTATION);
+		String indexName = defn.getAnnotation(UIConfiguration.Annotation.AUTOCOMPLETE.getQName());
 		if ( StringUtils.isNotBlank(indexName) ) {
 			try {
 				Object value = attr.getValue();
