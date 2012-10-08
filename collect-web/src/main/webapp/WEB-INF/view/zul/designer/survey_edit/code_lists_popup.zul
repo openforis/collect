@@ -13,7 +13,7 @@
 				<borderlayout>
 					<center border="none">
 					    <listbox id="itemsListBox"
-					        	selectedItem="@bind(vm.selectedItem)"
+					        	selectedItem="@load(vm.selectedItem)"
 					        	model="@load(vm.items)"
 					        	onSelect="@command('selectionChanged', selectedItem=self.selectedItem.value)"
 					        	width="220px"

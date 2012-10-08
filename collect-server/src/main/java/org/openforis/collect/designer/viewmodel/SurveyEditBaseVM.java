@@ -4,7 +4,9 @@
 package org.openforis.collect.designer.viewmodel;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.openforis.collect.designer.converter.XMLStringDateConverter;
 import org.openforis.collect.designer.form.FormObject;
@@ -14,6 +16,7 @@ import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.Unit;
+import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.GlobalCommand;
 import org.zkoss.bind.annotation.Init;
@@ -41,7 +44,7 @@ public class SurveyEditBaseVM extends BaseVM {
 
 	protected String currentLanguageCode;
 	
-	protected boolean currentFormValid;
+	private boolean currentFormValid;
 	
 	public SurveyEditBaseVM() {
 		currentFormValid = true;
@@ -79,7 +82,13 @@ public class SurveyEditBaseVM extends BaseVM {
 	public void currentFormValidated(@BindingParam("valid") boolean valid) {
 		currentFormValid = valid;
 	}
-
+	
+	public void dispatchCurrentFormValidatedCommand(boolean valid) {
+		Map<String, Object> args = new HashMap<String, Object>();
+		args.put("valid", valid);
+		BindUtils.postGlobalCommand(null, null, "currentFormValidated", args);
+	}
+	
 	public boolean checkCurrentFormValid() {
 		if ( currentFormValid ) {
 			return true;
@@ -139,8 +148,4 @@ public class SurveyEditBaseVM extends BaseVM {
 		return currentFormValid;
 	}
 
-	public void setCurrentFormValid(boolean currentFormValid) {
-		this.currentFormValid = currentFormValid;
-	}
-	
 }

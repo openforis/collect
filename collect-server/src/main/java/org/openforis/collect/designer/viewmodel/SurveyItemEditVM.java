@@ -50,11 +50,11 @@ public abstract class SurveyItemEditVM<T> extends SurveyEditBaseVM {
 	@Command
 	public void newItem(@ContextParam(ContextType.BINDER) Binder binder) {
 		if ( checkCurrentFormValid() ) {
-			performNewItem(binder);
+			performNewItemCreation(binder);
 		}
 	}
 
-	protected void performNewItem(Binder binder) {
+	protected void performNewItemCreation(Binder binder) {
 		T newInstance = createItemInstance();
 		setEditedItem(newInstance);
 		addNewItemToSurvey();
@@ -184,7 +184,7 @@ public abstract class SurveyItemEditVM<T> extends SurveyEditBaseVM {
 			formObject = null;
 			editedItem = null;
 			selectedItem = null;
-			currentFormValid = true;
+			dispatchCurrentFormValidatedCommand(true);
 			notifyChange("formObject", "editedItem", "selectedItem", "currentFormValid");
 		}
 	}

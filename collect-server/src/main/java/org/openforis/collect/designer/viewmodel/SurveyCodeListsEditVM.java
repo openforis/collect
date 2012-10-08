@@ -23,8 +23,6 @@ import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.Binder;
 import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
-import org.zkoss.bind.annotation.ContextParam;
-import org.zkoss.bind.annotation.ContextType;
 import org.zkoss.bind.annotation.GlobalCommand;
 import org.zkoss.bind.annotation.NotifyChange;
 import org.zkoss.util.resource.Labels;
@@ -74,10 +72,10 @@ public class SurveyCodeListsEditVM extends SurveyItemEditVM<CodeList> {
 	}
 
 	@Command
-	@NotifyChange({"formObject","editedItem","items","selectedItem","listLevels","multipleLevelsPresent","itemsPerLevel","selectedItemsPerLevel","lastSelectedLevelIndex"})
-	public void newItem(@ContextParam(ContextType.BINDER) Binder binder) {
-		super.newItem(binder);
-		editedItem.setSurvey(survey);
+	@Override
+	protected void performNewItemCreation(Binder binder) {
+		super.performNewItemCreation(binder);
+		notifyChange("listLevels","multipleLevelsPresent","itemsPerLevel","selectedItemsPerLevel","lastSelectedLevelIndex");
 	}
 	
 	@Override
@@ -87,10 +85,9 @@ public class SurveyCodeListsEditVM extends SurveyItemEditVM<CodeList> {
 	}
 	
 	@Override
-	@NotifyChange({"formObject","editedItem","listLevels",
-		"multipleLevelsPresent","itemsPerLevel","selectedItemsPerLevel","lastSelectedLevelIndex"})
 	protected void performItemSelection(CodeList item) {
 		super.performItemSelection(item);
+		notifyChange("listLevels","multipleLevelsPresent","itemsPerLevel","selectedItemsPerLevel","lastSelectedLevelIndex");
 	}
 	
 	@Override
@@ -259,77 +256,4 @@ public class SurveyCodeListsEditVM extends SurveyItemEditVM<CodeList> {
 		return itemsPerLevel;
 	}
 	
-//	protected void addTreeNode(CodeListItem item) {
-//		CodeListItemTreeNode treeNode = new CodeListItemTreeNode(item);
-//		int[] selectionPath = treeModel.getSelectionPath();
-//		if ( selectionPath == null || item.getParentItem() == null ) {
-//			treeModel.getRoot().add(treeNode);
-//		} else {
-//			TreeNode<CodeListItem> selectedTreeNode = treeModel.getChild(selectionPath);
-//			selectedTreeNode.add(treeNode);
-//		}
-//		treeModel.addOpenObject(treeNode.getParent());
-//		treeModel.setSelection(Arrays.asList(treeNode));
-//	}
-	
-//	private void removeSelectedTreeNode() {
-//		int[] selectionPath = treeModel.getSelectionPath();
-//		TreeNode<CodeListItem> treeNode = treeModel.getChild(selectionPath);
-//		TreeNode<CodeListItem> parentTreeNode = treeNode.getParent();
-//		parentTreeNode.remove(treeNode);
-//	}
-	
-//	public DefaultTreeModel<CodeListItem> getChildItems() {
-//		return treeModel;
-//    }
-//
-//	private void initTreeModel() {
-//		if ( editedItem != null ) {
-//			List<CodeListItem> items = editedItem.getItems();
-//			List<TreeNode<CodeListItem>> treeNodes = CodeListItemTreeNode.fromList(items);
-//			TreeNode<CodeListItem> root = new CodeListItemTreeNode(null, treeNodes);
-//			treeModel = new DefaultTreeModel<CodeListItem>(root);
-//		} else {
-//			treeModel = null;
-//		}
-//	}
-//	
-//	public static class CodeListItemTreeNode extends DefaultTreeNode<CodeListItem> {
-//	     
-//		private static final long serialVersionUID = 1L;
-//		
-//		public CodeListItemTreeNode(CodeListItem data) {
-//			this(data, null);
-//		}
-//
-//		public CodeListItemTreeNode(CodeListItem data, Collection<TreeNode<CodeListItem>> children) {
-//			super(data, children);
-//		}
-//
-//		@Override
-//		public List<TreeNode<CodeListItem>> getChildren() {
-//			CodeListItem codeListItem = getData();
-//			if ( codeListItem != null ) {
-//				List<CodeListItem> items = codeListItem.getChildItems();
-//				return fromList(items);
-//			} else {
-//				return super.getChildren();
-//			}
-//		}
-//
-//		public static List<TreeNode<CodeListItem>> fromList(List<CodeListItem> items) {
-//			List<TreeNode<CodeListItem>> result = null;
-//			if ( items != null ) {
-//				result = new ArrayList<TreeNode<CodeListItem>>();
-//				for (CodeListItem item : items) {
-//					List<CodeListItem> childItems = item.getChildItems();
-//					List<TreeNode<CodeListItem>> childrenNodes = fromList(childItems);
-//					CodeListItemTreeNode node = new CodeListItemTreeNode(item, childrenNodes);
-//					result.add(node);
-//				}
-//			}
-//			return result;
-//		}
-//
-//	}
 }
