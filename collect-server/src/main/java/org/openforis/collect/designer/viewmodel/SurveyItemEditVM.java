@@ -65,6 +65,10 @@ public abstract class SurveyItemEditVM<T> extends SurveyEditBaseVM {
 
 	protected void validateForm(Binder binder) {
 		//post apply changes command to force validation
+		dispatchApplyChangesCommand(binder);
+	}
+
+	protected void dispatchApplyChangesCommand(Binder binder) {
 		binder.postCommand("applyChanges", null);
 	}
 	
@@ -94,7 +98,6 @@ public abstract class SurveyItemEditVM<T> extends SurveyEditBaseVM {
 		}
 	}
 
-//	@NotifyChange({"formObject","editedItem"})
 	protected void performItemSelection(T item) {
 		setSelectedItem(item);
 		setEditedItem(item);

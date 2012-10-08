@@ -17,6 +17,10 @@ public class CodeAttributeDefinitionFormObject<T extends CodeAttributeDefinition
 	private String parentExpression;
 	private boolean strict;
 	
+	public CodeAttributeDefinitionFormObject() {
+		strict = true;
+	}
+	
 	@Override
 	public void saveTo(T dest, String languageCode) {
 		super.saveTo(dest, languageCode);

@@ -23,7 +23,7 @@ public class CodeListItemFormValidator extends FormValidator {
 	protected boolean validateCode(ValidationContext ctx) {
 		boolean result = validateRequired(ctx, CODE_FIELD);
 		if ( result ) {
-			
+			result = validateCodeUniqueness(ctx);
 		}
 		return result;
 	}

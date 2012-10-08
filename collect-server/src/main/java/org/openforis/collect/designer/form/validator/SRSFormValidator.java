@@ -15,7 +15,7 @@ public class SRSFormValidator extends FormValidator {
 	
 	protected static final String ID_FIELD = "id";
 	
-	private static final String ITEM_ID_ALREADY_DEFINED_MESSAGE_KEY = "";
+	private static final String ITEM_ID_ALREADY_DEFINED_MESSAGE_KEY = "survey.srs.validation.id_already_defined";
 	
 	@Override
 	protected void internalValidate(ValidationContext ctx) {
