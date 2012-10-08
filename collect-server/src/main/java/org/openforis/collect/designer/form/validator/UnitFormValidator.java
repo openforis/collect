@@ -14,10 +14,12 @@ import org.zkoss.util.resource.Labels;
 public class UnitFormValidator extends FormValidator {
 	
 	protected static final String NAME_FIELD = "name";
+	protected static final String DIMENSION_FIELD_NAME = "dimensionLabel";
 	
 	@Override
 	protected void internalValidate(ValidationContext ctx) {
 		validateName(ctx);
+		validateRequired(ctx, DIMENSION_FIELD_NAME);
 	}
 
 	protected boolean validateName(ValidationContext ctx) {

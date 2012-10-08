@@ -36,6 +36,7 @@
 			</west>
 		    <center>
 		        <vlayout
+		        	id="formContainer"
 		        	visible="@load(vm.editingItem)"
 					form="@id('fx') 
 						@load(vm.formObject) @save(vm.formObject, before='applyChanges')
@@ -69,10 +70,16 @@
 								</cell>
 							</row>
 							<row>
-								<label value="${labels.survey.unit.dimension}:" />
+								<label value="${labels.survey.unit.dimension.$}:" />
 								<cell>
-									<decimalbox width="150px" value="@bind(fx.dimension)" onChange="@command('applyChanges')" />
-									<label class="error" value="@load(vmsgs['dimension'])" />
+									<listbox width="150px" model="@load(vm.availableDimensions)"
+										selectedItem="@bind(fx.dimensionLabel)" mold="select"
+										onSelect="@command('applyChanges')" >
+										<template name="model">
+											<listitem label="@load(each)" />
+										</template>
+									</listbox>
+									<label class="error" value="@load(vmsgs['dimensionLabel'])" />
 								</cell>
 							</row>
 							<row>

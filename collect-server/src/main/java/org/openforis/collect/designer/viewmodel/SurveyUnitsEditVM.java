@@ -3,15 +3,18 @@
  */
 package org.openforis.collect.designer.viewmodel;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.openforis.collect.designer.form.ItemFormObject;
 import org.openforis.collect.designer.form.UnitFormObject;
+import org.openforis.collect.designer.form.UnitFormObject.Dimension;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.Unit;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.NotifyChange;
+import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 
 /**
@@ -60,5 +63,15 @@ public class SurveyUnitsEditVM extends SurveyItemEditVM<Unit> {
 		super.applyChanges();
 		BindUtils.postGlobalCommand(null, null, UNITS_UPDATED_GLOBAL_COMMAND, null);
 	}
-
+	
+	public List<String> getAvailableDimensions() {
+		Dimension[] dimensions = Dimension.values();
+		List<String> result = new ArrayList<String>(dimensions.length);
+		for (Dimension dimension : dimensions) {
+			String label = dimension.getLabel();
+			result.add(label);
+		}
+		return result;
+	}
+	
 }
