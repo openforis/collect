@@ -250,6 +250,8 @@ public class SurveySchemaEditVM extends SurveyEditBaseVM {
 		formObject = null;
 		notifyChange("nodes","editingNode","tempFormObject","formObject",
 				"moveNodeUpDisabled","moveNodeDownDisabled");
+		dispatchCurrentFormValidatedCommand(true);
+		updateTreeSelectionActivation();
 	}
 
 	@Override
@@ -257,7 +259,11 @@ public class SurveySchemaEditVM extends SurveyEditBaseVM {
 	@NotifyChange("currentFormValid")
 	public void currentFormValidated(@BindingParam("valid") boolean valid) {
 		super.currentFormValidated(valid);
-		nodesTree.setNonselectableTags(valid ? "": "*");
+		updateTreeSelectionActivation();
+	}
+
+	protected void updateTreeSelectionActivation() {
+		nodesTree.setNonselectableTags(isCurrentFormValid() ? "": "*");
 	}
 	
 	@Override

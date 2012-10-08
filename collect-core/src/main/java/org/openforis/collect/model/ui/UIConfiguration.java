@@ -45,8 +45,7 @@ public class UIConfiguration implements Configuration, Serializable {
 		LAYOUT(new QName(UI_NAMESPACE_URI, "layout")),
 		COUNT_IN_SUMMARY_LIST(new QName(UI_NAMESPACE_URI, "count")),
 		SHOW_ROW_NUMBERS(new QName(UI_NAMESPACE_URI, "showRowNumbers")),
-		AUTOCOMPLETE(new QName(UI_NAMESPACE_URI, "autocomplete")),
-		TYPE(new QName(UI_NAMESPACE_URI, "type"));
+		AUTOCOMPLETE(new QName(UI_NAMESPACE_URI, "autocomplete"));
 		
 		private QName qName;
 
