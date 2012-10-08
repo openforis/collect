@@ -15,6 +15,8 @@ public class CodeListItemFormValidator extends FormValidator {
 	
 	protected static final String CODE_FIELD = "code";
 	
+	public static final String CODE_ALREADY_DEFINED_MESSAGE_KEY = "survey.code_list.validation.code_already_defined";
+	
 	@Override
 	protected void internalValidate(ValidationContext ctx) {
 		validateCode(ctx);
@@ -35,13 +37,13 @@ public class CodeListItemFormValidator extends FormValidator {
 		CodeListItem parentItem = editedItem.getParentItem();
 		CodeListItem existingItem;
 		if ( parentItem != null ) {
-			existingItem = parentItem.getChildItem(code);
+			existingItem = parentItem.findChildItem(code);
 		} else {
 			CodeList codeList = editedItem.getCodeList();
-			existingItem = codeList.getItem(code);
+			existingItem = codeList.findItem(code);
 		}
 		if ( existingItem != null && existingItem.getId() != editedItem.getId() ) {
-			String message = Labels.getLabel(ITEM_NAME_ALREADY_DEFINED_MESSAGE_KEY);
+			String message = Labels.getLabel(CODE_ALREADY_DEFINED_MESSAGE_KEY);
 			addInvalidMessage(ctx, CODE_FIELD, message);
 			return false;
 		} else {

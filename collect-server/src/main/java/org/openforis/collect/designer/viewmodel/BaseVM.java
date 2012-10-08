@@ -1,5 +1,7 @@
 package org.openforis.collect.designer.viewmodel;
 
+import java.util.Map;
+
 import org.openforis.collect.designer.session.SessionStatus;
 import org.openforis.collect.designer.util.Resources;
 import org.zkoss.bind.BindUtils;
@@ -37,8 +39,12 @@ public abstract class BaseVM {
 	}
 	
 	protected Window openPopUp(String url, boolean modal) {
+		return openPopUp(url, modal, null);
+	}
+	
+	protected Window openPopUp(String url, boolean modal, Map<String, Object> args) {
 		Window result = (Window) Executions.createComponents(
-				url, null, null);
+				url, null, args);
 		if ( modal ) {
 			result.doModal();
 		}

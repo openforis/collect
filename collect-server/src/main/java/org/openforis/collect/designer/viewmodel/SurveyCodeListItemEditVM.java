@@ -54,8 +54,7 @@ public class SurveyCodeListItemEditVM extends SurveyItemEditVM<CodeListItem> {
 	@Command
 	public void close() {
 		if ( checkCurrentFormValid() ) {
-			String command = SurveyCodeListsEditVM.CLOSE_CODE_LIST_ITEM_POP_UP_COMMAND;
-			BindUtils.postGlobalCommand(null, null, command, null);
+			BindUtils.postGlobalCommand(null, null, SurveyCodeListsEditVM.CLOSE_CODE_LIST_ITEM_POP_UP_COMMAND, null);
 		}
 	}
 	

@@ -33,6 +33,10 @@ public class CodeAttributeDefinitionFormObject<T extends CodeAttributeDefinition
 	@Override
 	public void loadFrom(T source, String languageCode) {
 		super.loadFrom(source, languageCode);
+		key = source.isKey();
+		list = source.getList();
+		parentExpression = source.getParentExpression();
+		strict = ! source.isAllowUnlisted();
 	}
 
 	public boolean isKey() {
