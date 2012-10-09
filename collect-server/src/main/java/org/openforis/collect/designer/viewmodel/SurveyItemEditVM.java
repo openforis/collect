@@ -82,10 +82,10 @@ public abstract class SurveyItemEditVM<T> extends SurveyEditBaseVM {
 	}
 
 	@Command
-	@NotifyChange({"editedItem","selectedItem"})
 	public void applyChanges() {
 		T editedItem = getEditedItem();
 		formObject.saveTo(editedItem, currentLanguageCode);
+		notifyChange("editedItem","selectedItem");
 	}
 	
 	@Command

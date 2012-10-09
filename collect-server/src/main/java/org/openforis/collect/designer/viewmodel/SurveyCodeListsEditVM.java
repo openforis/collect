@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.designer.form.CodeListFormObject;
 import org.openforis.collect.designer.form.CodeListFormObject.Type;
 import org.openforis.collect.designer.form.ItemFormObject;
@@ -75,7 +76,7 @@ public class SurveyCodeListsEditVM extends SurveyItemEditVM<CodeList> {
 	@Override
 	protected void performNewItemCreation(Binder binder) {
 		super.performNewItemCreation(binder);
-		notifyChange("listLevels","itemsPerLevel","selectedItemsPerLevel","lastSelectedLevelIndex");
+		notifyChange("listLevels","itemsPerLevel","selectedItemsPerLevel");
 	}
 	
 	@Override
@@ -87,7 +88,7 @@ public class SurveyCodeListsEditVM extends SurveyItemEditVM<CodeList> {
 	@Override
 	protected void performItemSelection(CodeList item) {
 		super.performItemSelection(item);
-		notifyChange("listLevels","itemsPerLevel","selectedItemsPerLevel","lastSelectedLevelIndex");
+		notifyChange("listLevels","itemsPerLevel","selectedItemsPerLevel");
 	}
 	
 	@Override
@@ -115,7 +116,7 @@ public class SurveyCodeListsEditVM extends SurveyItemEditVM<CodeList> {
 	}
 	
 	@Command
-	@NotifyChange({"listLevels","lastSelectedLevelIndex"})
+	@NotifyChange({"listLevels"})
 	public void addLevel() {
 		List<CodeListLevel> levels = editedItem.getHierarchy();
 		int levelPosition = levels.size() + 1;
@@ -126,7 +127,6 @@ public class SurveyCodeListsEditVM extends SurveyItemEditVM<CodeList> {
 	}
 
 	@Command
-	@NotifyChange({"listLevels","lastSelectedLevelIndex"})
 	public void removeLevel() {
 		final List<CodeListLevel> levels = editedItem.getHierarchy();
 		if ( ! levels.isEmpty() ) {
@@ -145,13 +145,12 @@ public class SurveyCodeListsEditVM extends SurveyItemEditVM<CodeList> {
 		}
 	}
 
-	@NotifyChange({"listLevels","lastSelectedLevelIndex"})
 	protected void performRemoveLevel(int levelIndex) {
 		List<CodeListLevel> levels = editedItem.getHierarchy();
 		CodeListLevel level = levels.get(levelIndex);
 		editedItem.removeLevel(level.getId());
 		deselectItemsAfterLevel(levelIndex);
-		notifyChange("listLevels","lastSelectedLevelIndex");
+		notifyChange("listLevels","selectedItemsPerLevel");
 	}
 	
 	@Command
@@ -200,7 +199,7 @@ public class SurveyCodeListsEditVM extends SurveyItemEditVM<CodeList> {
 	}
 
 	@Command
-	@NotifyChange({"itemsPerLevel","selectedItemsPerLevel","lastSelectedLevelIndex"})
+	@NotifyChange({"itemsPerLevel","selectedItemsPerLevel"})
 	public void listItemSelected(@BindingParam("item") CodeListItem item, 
 			@BindingParam("levelIndex") int levelIndex) {
 		deselectItemsAfterLevel(levelIndex);
@@ -230,7 +229,7 @@ public class SurveyCodeListsEditVM extends SurveyItemEditVM<CodeList> {
 		closePopUp(codeListItemPopUp);
 	}
 
-	private void initItemsPerLevel() {
+	protected void initItemsPerLevel() {
 		itemsPerLevel = new ArrayList<List<CodeListItem>>();
 		if ( editedItem != null ) {
 			List<CodeListItem> items = new ArrayList<CodeListItem>(editedItem.getItems());
@@ -258,12 +257,17 @@ public class SurveyCodeListsEditVM extends SurveyItemEditVM<CodeList> {
 		return selectedItemsPerLevel;
 	}
 	
+	@DependsOn("selectedItemsPerLevel")
 	public int getLastSelectedLevelIndex() {
 		return selectedItemsPerLevel.size() - 1;
 	}
 	
 	public List<List<CodeListItem>> getItemsPerLevel() {
 		return itemsPerLevel;
+	}
+	
+	public boolean isCodeListItemSelected(CodeListItem item) {
+		return selectedItemsPerLevel.contains(item);
 	}
 	
 }

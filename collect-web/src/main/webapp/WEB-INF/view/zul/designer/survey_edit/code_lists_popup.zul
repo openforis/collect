@@ -83,6 +83,13 @@
 								</cell>
 							</row>
 							<row>
+								<label value="${labels.survey.code_list.lookup_table}:" />
+								<cell>
+									<textbox width="150px" value="@bind(fx.lookupTable)" onChange="@command('applyChanges')" />
+									<label class="error" value="@load(vmsgs['lookupTable'])" />
+								</cell>
+							</row>
+							<row>
 								<label value="${labels.global.item.since_version}:" />
 								<cell>
 									<listbox width="150px"
@@ -149,15 +156,16 @@
 												</listcell>
 												<listcell style="padding: 0px">
 													<image src="@load(each.hasChildItems() ? 
-														(self.parent.listbox.selectedItem eq self.parent.parent ? 
-														'/assets/images/arrow-right-selected-small.png': 
-														'/assets/images/arrow-right-small.png'): '')" />
+														(vm.isCodeListItemSelected(each) ? 
+															'/assets/images/arrow-right-selected-small.png': 
+															'/assets/images/arrow-right-small.png'
+														): '')" />
 												</listcell>
 											</listitem>
 										</template>
 									</listbox>
 									<button label="${labels.survey.code_list.add_child_item}" 
-										disabled="@load(forEachStatus.index gt vm.lastSelectedLevelIndex + 1)"
+										disabled="@load(not empty vm.editedItem.lookupTable || forEachStatus.index gt vm.lastSelectedLevelIndex + 1)"
 					 					onClick="@command('addItemInLevel', levelIndex=forEachStatus.index)" />
 								</groupbox>
 							</template>
