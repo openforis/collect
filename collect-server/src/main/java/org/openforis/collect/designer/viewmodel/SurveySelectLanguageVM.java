@@ -8,7 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.designer.session.SessionStatus;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.model.CollectSurvey;
-import org.openforis.collect.model.ui.UIConfiguration;
+import org.openforis.collect.model.ui.UIOptions;
 import org.openforis.idm.metamodel.Languages;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.annotation.Command;
@@ -45,7 +45,7 @@ public class SurveySelectLanguageVM extends BaseVM {
 		SessionStatus sessionStatus = getSessionStatus();
 		CollectSurvey survey = sessionStatus.getSurvey();
 		if ( survey != null ) {
-			UIConfiguration uiConf = survey.getUIConfiguration();
+			UIOptions uiConf = survey.getUIConfiguration();
 			if ( uiConf != null ) {
 				assignedLanguageCodes.addAll(uiConf.getLanguageCodes());
 			}
@@ -92,7 +92,7 @@ public class SurveySelectLanguageVM extends BaseVM {
 	public void applyChanges() {
 		SessionStatus sessionStatus = getSessionStatus();
 		CollectSurvey survey = sessionStatus.getSurvey();
-		UIConfiguration uiConf = survey.getUIConfiguration();
+		UIOptions uiConf = survey.getUIConfiguration();
 		uiConf.clearLanguageCodes();
 		uiConf.addLanguageCodes(assignedLanguageCodes);
 		if ( StringUtils.isNotBlank(selectedCurrentLanguageCode) ) {

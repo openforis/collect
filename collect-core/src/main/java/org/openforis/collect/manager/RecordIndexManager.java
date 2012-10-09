@@ -39,7 +39,7 @@ import org.apache.lucene.util.Version;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.Configuration;
-import org.openforis.collect.model.ui.UIConfiguration;
+import org.openforis.collect.model.ui.UIOptions;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -216,7 +216,7 @@ public class RecordIndexManager {
 		stack.push(entityDefn);
 		while ( ! stack.isEmpty() ) {
 			NodeDefinition defn = stack.pop();
-			String indexName = defn.getAnnotation(UIConfiguration.Annotation.AUTOCOMPLETE.getQName());
+			String indexName = defn.getAnnotation(UIOptions.Annotation.AUTOCOMPLETE.getQName());
 			if ( StringUtils.isNotBlank(indexName) ) {
 				return true;
 			}
@@ -254,7 +254,7 @@ public class RecordIndexManager {
     public List<String> search(SearchType searchType, Survey survey, int attributeDefnId, int fieldIndex, String queryText, int maxResults)  throws RecordIndexException {
     	Schema schema = survey.getSchema();
     	AttributeDefinition defn = (AttributeDefinition) schema.getById(attributeDefnId);
-    	String indexName = defn.getAnnotation(UIConfiguration.Annotation.AUTOCOMPLETE.getQName());
+    	String indexName = defn.getAnnotation(UIOptions.Annotation.AUTOCOMPLETE.getQName());
 		if ( StringUtils.isNotBlank(indexName) ) {
 			IndexSearcher indexSearcher = null;
 			try {
@@ -340,7 +340,7 @@ public class RecordIndexManager {
 	
 	protected void index(IndexWriter indexWriter, Attribute<?, ?> attr) {
 		AttributeDefinition defn = attr.getDefinition();
-		String indexName = defn.getAnnotation(UIConfiguration.Annotation.AUTOCOMPLETE.getQName());
+		String indexName = defn.getAnnotation(UIOptions.Annotation.AUTOCOMPLETE.getQName());
 		if ( StringUtils.isNotBlank(indexName) ) {
 			try {
 				Object value = attr.getValue();

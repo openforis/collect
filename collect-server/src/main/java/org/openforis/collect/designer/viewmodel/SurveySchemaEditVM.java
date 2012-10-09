@@ -15,7 +15,7 @@ import org.openforis.collect.designer.model.NodeType;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.Resources;
 import org.openforis.collect.model.CollectSurvey;
-import org.openforis.collect.model.ui.UIConfiguration;
+import org.openforis.collect.model.ui.UIOptions;
 import org.openforis.collect.model.ui.UITab;
 import org.openforis.collect.model.ui.UITabDefinition;
 import org.openforis.idm.metamodel.AttributeDefault;
@@ -236,7 +236,7 @@ public class SurveySchemaEditVM extends SurveyEditBaseVM {
 		if ( parentDefn != null ) {
 			parentDefn.removeChildDefinition(selectedNode);
 		} else {
-			UIConfiguration uiConfiguration = survey.getUIConfiguration();
+			UIOptions uiConfiguration = survey.getUIConfiguration();
 			UITabDefinition tabDefn = uiConfiguration.getTabDefinition((EntityDefinition) selectedNode);
 			uiConfiguration.removeTabDefinition(tabDefn);
 			Schema schema = selectedNode.getSchema();
@@ -374,17 +374,17 @@ public class SurveySchemaEditVM extends SurveyEditBaseVM {
 		String tabName = "tab_" + tabPosition;
 		tab.setName(tabName);
 		tabDefn.addTab(tab);
-		newNode.setAnnotation(UIConfiguration.Annotation.TAB_DEFINITION.getQName(), tabName);
+		newNode.setAnnotation(UIOptions.Annotation.TAB_DEFINITION.getQName(), tabName);
 	}
 
 	protected UITabDefinition createRootTabDefinition(EntityDefinition newNode) {
-		UIConfiguration uiConf = survey.getUIConfiguration();
+		UIOptions uiConf = survey.getUIConfiguration();
 		UITabDefinition tabDefn = new UITabDefinition();
 		int tabDefnPosition = uiConf.getTabDefinitions().size() + 1;
 		String tabDefnName = "tabdefn_" + tabDefnPosition;
 		tabDefn.setName(tabDefnName);
 		uiConf.addTabDefinition(tabDefn);
-		newNode.setAnnotation(UIConfiguration.Annotation.TAB_DEFINITION.getQName(), tabDefnName);
+		newNode.setAnnotation(UIOptions.Annotation.TAB_DEFINITION.getQName(), tabDefnName);
 		return tabDefn;
 	}
 

@@ -3,13 +3,12 @@
  */
 package org.openforis.collect.model;
 
-import java.util.List;
-
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.openforis.collect.model.ui.UIConfiguration;
-import org.openforis.idm.metamodel.Configuration;
+import org.openforis.collect.model.ui.UIOptions;
+import org.openforis.idm.metamodel.ApplicationOptions;
 import org.openforis.idm.metamodel.Survey;
+import org.openforis.idm.metamodel.SurveyContext;
 
 /**
  * @author M. Togna
@@ -18,28 +17,20 @@ import org.openforis.idm.metamodel.Survey;
  */
 @XmlRootElement(name = "survey")
 public class CollectSurvey extends Survey {
+	
+	protected CollectSurvey(SurveyContext surveyContext) {
+		super(surveyContext);
+	}
+
 	private static final long serialVersionUID = 1L;
 
-	public CollectSurvey() {
-		super();
-	}
-	
-	public UIConfiguration getUIConfiguration() {
-		List<Configuration> configurations = getConfigurations();
-		for (Configuration config : configurations) {
-			if ( config instanceof UIConfiguration ) {
-				return (UIConfiguration) config;
-			}
-		}
-		return null;
+	public UIOptions getUIConfiguration() {
+		ApplicationOptions applicationOptions = getApplicationOptions(UIOptions.UI_TYPE);
+		return (UIOptions) applicationOptions;
 	}
 
-	public void setUIConfiguration(UIConfiguration conf) {
-		UIConfiguration oldConf = getUIConfiguration();
-		if ( oldConf != null ) {
-			removeConfiguration(oldConf);
-		}
-		addConfiguration(conf);
+	public void setUIConfiguration(UIOptions conf) {
+		setApplicationOptions(conf);
 	}
 	
 }

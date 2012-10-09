@@ -6,12 +6,14 @@ package org.openforis.collect.model;
 import java.io.Serializable;
 
 import org.openforis.idm.metamodel.ExternalCodeListProvider;
+import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.SurveyContext;
 import org.openforis.idm.metamodel.validation.Validator;
 import org.openforis.idm.model.expression.ExpressionFactory;
 
 /**
  * @author M. Togna
+ * @author S. Ricci
  * 
  */
 public class CollectSurveyContext implements SurveyContext, Serializable {
@@ -26,6 +28,12 @@ public class CollectSurveyContext implements SurveyContext, Serializable {
 		this.expressionFactory = expressionFactory;
 		this.validator = validator;
 		this.externalCodeListProvider = externalCodeListProvider;
+	}
+
+	@Override
+	public Survey createSurvey() {
+		CollectSurvey survey = new CollectSurvey(this);
+		return survey;
 	}
 
 	public ExpressionFactory getExpressionFactory() {

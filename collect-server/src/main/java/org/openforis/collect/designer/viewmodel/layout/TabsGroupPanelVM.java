@@ -10,7 +10,7 @@ import org.openforis.collect.designer.session.SessionStatus;
 import org.openforis.collect.designer.util.Resources;
 import org.openforis.collect.designer.viewmodel.BaseVM;
 import org.openforis.collect.model.CollectSurvey;
-import org.openforis.collect.model.ui.UIConfiguration;
+import org.openforis.collect.model.ui.UIOptions;
 import org.openforis.collect.model.ui.UITab;
 import org.openforis.collect.model.ui.UITabsGroup;
 import org.openforis.idm.metamodel.ModelVersion;
@@ -74,7 +74,7 @@ public class TabsGroupPanelVM extends BaseVM {
 	}
 	
 	public List<NodeDefinition> getNodesPerTab() {
-		UIConfiguration uiConf = getUIConfiguration();
+		UIOptions uiConf = getUIConfiguration();
 		List<NodeDefinition> result = new ArrayList<NodeDefinition>();
 		List<NodeDefinition> nodesPerTab = uiConf.getNodesPerTab(tab, false);
 		ModelVersion version = getFormVersion();
@@ -98,9 +98,9 @@ public class TabsGroupPanelVM extends BaseVM {
 		return version;
 	}
 	
-	protected UIConfiguration getUIConfiguration() {
+	protected UIOptions getUIConfiguration() {
 		CollectSurvey survey = getSurvey();
-		UIConfiguration uiConf = survey.getUIConfiguration();
+		UIOptions uiConf = survey.getUIConfiguration();
 		uiConf.setSurvey(survey);
 		return uiConf;
 	}

@@ -15,7 +15,7 @@ import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.Resources;
 import org.openforis.collect.designer.viewmodel.BaseVM;
 import org.openforis.collect.model.CollectSurvey;
-import org.openforis.collect.model.ui.UIConfiguration;
+import org.openforis.collect.model.ui.UIOptions;
 import org.openforis.collect.model.ui.UITab;
 import org.openforis.collect.model.ui.UITabsGroup;
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -93,7 +93,7 @@ public class TabsGroupVM extends BaseVM {
 		if ( tab.getTabs().isEmpty() ) {
 			SessionStatus sessionStatus = getSessionStatus();
 			CollectSurvey survey = sessionStatus.getSurvey();
-			UIConfiguration uiConfiguration = survey.getUIConfiguration();
+			UIOptions uiConfiguration = survey.getUIConfiguration();
 			List<NodeDefinition> nodesPerTab = uiConfiguration.getNodesPerTab(tab, false);
 			if ( nodesPerTab.isEmpty() ) {
 				UITabsGroup parent = tab.getParent();

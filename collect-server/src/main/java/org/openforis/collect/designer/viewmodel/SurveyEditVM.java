@@ -9,7 +9,7 @@ import org.openforis.collect.designer.session.SessionStatus;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.Resources;
 import org.openforis.collect.manager.SurveyManager;
-import org.openforis.collect.model.ui.UIConfiguration;
+import org.openforis.collect.model.ui.UIOptions;
 import org.openforis.collect.persistence.SurveyImportException;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.annotation.BindingParam;
@@ -42,7 +42,7 @@ public class SurveyEditVM extends SurveyEditBaseVM {
 	public void init() {
 		super.init();
 		if ( currentLanguageCode == null ) {
-			UIConfiguration uiConf = survey.getUIConfiguration();
+			UIOptions uiConf = survey.getUIConfiguration();
 			List<String> langCodes = uiConf.getLanguageCodes();
 			if ( langCodes.size() == 1 ) {
 				currentLanguageCode = langCodes.get(0);
@@ -133,7 +133,7 @@ public class SurveyEditVM extends SurveyEditBaseVM {
 	}
 	
 	public List<String> getAvailableLanguages() {
-		UIConfiguration uiConf = survey.getUIConfiguration();
+		UIOptions uiConf = survey.getUIConfiguration();
 		if ( uiConf != null ) {
 	 		List<String> langCodes = uiConf.getLanguageCodes();
 			return new BindingListModelList<String>(langCodes, false);

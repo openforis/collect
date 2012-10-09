@@ -290,6 +290,11 @@
 			<artifactId>idm-api-protostuff</artifactId>
 			<version>3.0-Alpha5-SNAPSHOT</version>
 		</dependency>
+		<dependency>
+			<groupId>org.openforis.idm</groupId>
+			<artifactId>idm-test</artifactId>
+			<scope>test</scope>
+		</dependency>
 		<!-- Apache commons -->
 		<dependency>
 			<groupId>commons-logging</groupId>
@@ -400,11 +405,6 @@
 			  <artifactId>mockito-all</artifactId>  
 			  <version>1.9.0</version> 
 			  <scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.openforis.idm</groupId>
-			<artifactId>idm-test</artifactId>
-			<scope>test</scope>
 		</dependency>
 	</dependencies>
 </project>

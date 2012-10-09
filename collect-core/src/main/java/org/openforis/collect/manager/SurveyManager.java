@@ -15,7 +15,7 @@ import java.util.Map;
 import org.apache.commons.io.IOUtils;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SurveySummary;
-import org.openforis.collect.model.ui.UIConfiguration;
+import org.openforis.collect.model.ui.UIOptions;
 import org.openforis.collect.persistence.SurveyDao;
 import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.collect.persistence.SurveyWorkDao;
@@ -195,7 +195,7 @@ public class SurveyManager {
 		CollectSurvey survey = new CollectSurvey();
 		Schema schema = new Schema();
 		survey.setSchema(schema);
-		Configuration config = new UIConfiguration();
+		Configuration config = new UIOptions();
 		survey.addConfiguration(config);
 		return survey;
 	}

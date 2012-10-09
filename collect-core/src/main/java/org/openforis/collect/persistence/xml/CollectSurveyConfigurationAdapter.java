@@ -8,7 +8,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.openforis.collect.model.ui.UIConfiguration;
+import org.openforis.collect.model.ui.UIOptions;
 import org.openforis.idm.metamodel.Configuration;
 import org.openforis.idm.metamodel.xml.ConfigurationAdapter;
 import org.w3c.dom.Document;
@@ -40,17 +40,17 @@ public class CollectSurveyConfigurationAdapter implements ConfigurationAdapter<C
 		try {
 			Configuration configuration = null;
 			String namespaceURI = elem.getNamespaceURI();
-			if (UIConfiguration.UI_NAMESPACE_URI.equals(namespaceURI) ) {
+			if (UIOptions.UI_NAMESPACE_URI.equals(namespaceURI) ) {
 				String nodeName = elem.getLocalName();
 				JAXBContext jc;
 				if ( FLEX_TAG_NAME.equals(nodeName) ) {
-					jc = JAXBContext.newInstance(UIConfiguration.class);
+					jc = JAXBContext.newInstance(UIOptions.class);
 				} else {
 					throw new IllegalArgumentException("Unsupported tag: " + nodeName);
 				}
 				Unmarshaller unmarshaller = jc.createUnmarshaller();
 				configuration = (Configuration) unmarshaller.unmarshal(elem);
-				((UIConfiguration) configuration).init();
+				((UIOptions) configuration).init();
 			}
 			return configuration;
 		} catch (JAXBException e) {

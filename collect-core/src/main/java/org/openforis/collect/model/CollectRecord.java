@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
-import org.openforis.collect.model.ui.UIConfiguration;
+import org.openforis.collect.model.ui.UIOptions;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.ModelVersion;
@@ -578,7 +578,7 @@ public class CollectRecord extends Record {
 		for (NodeDefinition childDefinition : childDefinitions) {
 			if(childDefinition instanceof EntityDefinition) {
 				EntityDefinition entityDefinition = (EntityDefinition) childDefinition;
-				String annotation = childDefinition.getAnnotation(UIConfiguration.Annotation.COUNT_IN_SUMMARY_LIST.getQName());
+				String annotation = childDefinition.getAnnotation(UIOptions.Annotation.COUNT_IN_SUMMARY_LIST.getQName());
 				if(annotation != null && Boolean.parseBoolean(annotation)) {
 					result.add(entityDefinition);
 				}

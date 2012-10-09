@@ -9,7 +9,7 @@ import org.openforis.collect.designer.component.SchemaTreeModel;
 import org.openforis.collect.designer.session.SessionStatus;
 import org.openforis.collect.designer.util.Resources;
 import org.openforis.collect.model.CollectSurvey;
-import org.openforis.collect.model.ui.UIConfiguration;
+import org.openforis.collect.model.ui.UIOptions;
 import org.openforis.collect.model.ui.UITab;
 import org.openforis.collect.model.ui.UITabDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
@@ -112,7 +112,7 @@ public class SurveyLayoutEditVM extends SurveyEditBaseVM {
 		if ( treeItem != null ) {
 			TreeNode<NodeDefinition> treeNode = treeItem.getValue();
 			NodeDefinition nodeDefn = treeNode.getData();
-			UIConfiguration uiConfiguration = survey.getUIConfiguration();
+			UIOptions uiConfiguration = survey.getUIConfiguration();
 			EntityDefinition rootEntity = nodeDefn.getRootEntity();
 			return uiConfiguration.getTabDefinition(rootEntity);
 		} else {
@@ -126,7 +126,7 @@ public class SurveyLayoutEditVM extends SurveyEditBaseVM {
 		if ( dragged instanceof Listitem ) {
 			NodeDefinition node = ((Listitem) dragged).getValue();
 			CollectSurvey survey = getSurvey();
-			UIConfiguration uiConf = survey.getUIConfiguration();
+			UIOptions uiConf = survey.getUIConfiguration();
 			UITab oldTab = uiConf.getTab(node, false);
 			uiConf.removeTabAssociation(node);
 			if ( oldTab != null ) {

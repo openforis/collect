@@ -9,8 +9,8 @@ import org.openforis.collect.designer.session.SessionStatus;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.viewmodel.BaseVM;
 import org.openforis.collect.model.CollectSurvey;
-import org.openforis.collect.model.ui.UIConfiguration;
-import org.openforis.collect.model.ui.UIConfiguration.Layout;
+import org.openforis.collect.model.ui.UIOptions;
+import org.openforis.collect.model.ui.UIOptions.Layout;
 import org.openforis.collect.model.ui.UITab;
 import org.openforis.collect.model.ui.UITabsGroup;
 import org.openforis.idm.metamodel.EntityDefinition;
@@ -65,7 +65,7 @@ public class EditableListOfNodesVM extends BaseVM {
 			Object data = value.getData();
 			if ( data instanceof NodeDefinition ) {
 				NodeDefinition nodeDefn = (NodeDefinition) data;
-				UIConfiguration uiConf = getUIConfiguration();
+				UIOptions uiConf = getUIConfiguration();
 				if ( uiConf.isAssignableTo(nodeDefn, tab) ) {
 					UITab oldTab = uiConf.getTab(nodeDefn);
 					uiConf.associateWithTab(nodeDefn, tab);
@@ -85,7 +85,7 @@ public class EditableListOfNodesVM extends BaseVM {
 	}
 	
 	public boolean isTabInherited(NodeDefinition nodeDefn) {
-		UIConfiguration uiConf = getUIConfiguration();
+		UIOptions uiConf = getUIConfiguration();
 		UITab tab = uiConf.getTab(nodeDefn, false);
 		return tab != null;
 	}
@@ -93,7 +93,7 @@ public class EditableListOfNodesVM extends BaseVM {
 	@Command
 	@NotifyChange({"nodesPerTab"})
 	public void setLayout(@BindingParam("type") String type, @BindingParam("node") NodeDefinition node) {
-		UIConfiguration uiConf = getUIConfiguration();
+		UIOptions uiConf = getUIConfiguration();
 		Layout layout = Layout.valueOf(type);
 		uiConf.setLayout(node, layout);
 	}
@@ -108,7 +108,7 @@ public class EditableListOfNodesVM extends BaseVM {
 	public String getTemplateName(NodeDefinition nodeDefn) {
 		if ( nodeDefn instanceof EntityDefinition ) {
 			if ( nodeDefn.isMultiple() ) {
-				UIConfiguration uiConf = getUIConfiguration();
+				UIOptions uiConf = getUIConfiguration();
 				Layout layout = uiConf.getLayout((EntityDefinition) nodeDefn);
 				switch ( layout ) {
 				case FORM:
@@ -125,7 +125,7 @@ public class EditableListOfNodesVM extends BaseVM {
 	}
 	
 	public boolean hasLayout(EntityDefinition entityDefn, String layout) {
-		UIConfiguration uiConf = getUIConfiguration();
+		UIOptions uiConf = getUIConfiguration();
 		Layout nodeLayout = uiConf.getLayout(entityDefn);
 		return nodeLayout.name().equals(layout);
 	}
@@ -143,7 +143,7 @@ public class EditableListOfNodesVM extends BaseVM {
 	}
 	
 	public List<NodeDefinition> getChildDefinitionsInTab(EntityDefinition entityDefn) {
-		UIConfiguration uiConf = getUIConfiguration();
+		UIOptions uiConf = getUIConfiguration();
 		List<NodeDefinition> childDefinitions = entityDefn.getChildDefinitions();
 		List<NodeDefinition> result = new ArrayList<NodeDefinition>();
 		ModelVersion formVersion = getLayoutFormVersion();
@@ -164,9 +164,9 @@ public class EditableListOfNodesVM extends BaseVM {
 		return survey;
 	}
 	
-	protected UIConfiguration getUIConfiguration() {
+	protected UIOptions getUIConfiguration() {
 		CollectSurvey survey = getSurvey();
-		UIConfiguration uiConf = survey.getUIConfiguration();
+		UIOptions uiConf = survey.getUIConfiguration();
 		uiConf.setSurvey(survey);
 		return uiConf;
 	}

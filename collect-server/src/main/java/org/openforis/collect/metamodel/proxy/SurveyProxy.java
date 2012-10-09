@@ -5,7 +5,7 @@ import java.util.List;
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.collect.Proxy;
 import org.openforis.collect.model.CollectSurvey;
-import org.openforis.collect.model.ui.UIConfiguration;
+import org.openforis.collect.model.ui.UIOptions;
 import org.openforis.idm.metamodel.Configuration;
 
 public class SurveyProxy implements Proxy {
@@ -66,10 +66,10 @@ public class SurveyProxy implements Proxy {
 	}
 
 	@ExternalizedProperty
-	public UIConfiguration getUiConfiguration() {
+	public UIOptions getUiConfiguration() {
 		List<Configuration> configuration = survey.getConfigurations();
 		if (configuration != null && !configuration.isEmpty()) {
-			UIConfiguration uiConf = (UIConfiguration) configuration.get(0);
+			UIOptions uiConf = (UIOptions) configuration.get(0);
 			return uiConf;
 		} else {
 			return null;

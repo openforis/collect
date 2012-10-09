@@ -11,7 +11,7 @@ import javax.xml.namespace.QName;
 
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.collect.Proxy;
-import org.openforis.collect.model.ui.UIConfiguration;
+import org.openforis.collect.model.ui.UIOptions;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.BooleanAttributeDefinition;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
@@ -155,7 +155,7 @@ public class NodeDefinitionProxy implements Proxy {
 
 	@ExternalizedProperty
 	public String getUiTabName() {
-		String tabName = nodeDefinition.getAnnotation(UIConfiguration.Annotation.TAB_NAME.getQName());
+		String tabName = nodeDefinition.getAnnotation(UIOptions.Annotation.TAB_NAME.getQName());
 		if ( tabName != null) {
 			return tabName;
 		} else {
