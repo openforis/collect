@@ -9,7 +9,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.designer.form.CodeListFormObject;
 import org.openforis.collect.designer.form.CodeListFormObject.Type;
 import org.openforis.collect.designer.form.ItemFormObject;
@@ -23,11 +22,15 @@ import org.openforis.idm.metamodel.CodeListLevel;
 import org.zkoss.bind.Binder;
 import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
+import org.zkoss.bind.annotation.ContextParam;
+import org.zkoss.bind.annotation.ContextType;
 import org.zkoss.bind.annotation.DependsOn;
 import org.zkoss.bind.annotation.GlobalCommand;
 import org.zkoss.bind.annotation.NotifyChange;
 import org.zkoss.util.resource.Labels;
+import org.zkoss.zk.ui.event.DropEvent;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
+import org.zkoss.zul.Listitem;
 import org.zkoss.zul.Window;
 
 /**
@@ -173,10 +176,53 @@ public class SurveyCodeListsEditVM extends SurveyItemEditVM<CodeList> {
 		}
 	}
 	
+	@Command
+	@NotifyChange({"itemsPerLevel"})
+	public void removeItem(@BindingParam("item") final CodeListItem item) {
+		String messageKey;
+		if ( item.hasChildItems() ) {
+			messageKey = "survey.code_list.confirm.delete_non_empty_item";
+		} else {
+			messageKey = "survey.code_list.confirm.delete_item";
+		}
+		MessageUtil.showConfirm(new MessageUtil.ConfirmHandler() {
+			@Override
+			public void onOk() {
+				performRemoveItem(item);
+			}
+		}, messageKey);
+	}
+
+	protected void performRemoveItem(CodeListItem item) {
+		if ( isCodeListItemSelected(item) ) {
+			int itemLevelIndex = item.getDepth() - 1;
+			deselectItemsAfterLevel(itemLevelIndex);
+		}
+		CodeListItem parentItem = item.getParentItem();
+		int id = item.getId();
+		if ( parentItem == null ) {
+			CodeList codeList = item.getCodeList();
+			codeList.removeItem(id);
+		} else {
+			parentItem.removeChildItem(id);
+		}
+		initItemsPerLevel();
+		notifyChange("itemsPerLevel","selectedItemsPerLevel");
+	}
+	
+	@Command
+	public void moveChildItem(@ContextParam(ContextType.TRIGGER_EVENT) DropEvent event) {
+		Listitem dragged = (Listitem) event.getDragged();
+		Listitem dropped = (Listitem) event.getTarget();
+		CodeListItem draggedItem = dragged.getValue();
+		CodeListItem droppedItem = dropped.getValue();
+		int indexTo = getItemIndex(droppedItem);
+		moveChildItem(draggedItem, indexTo);
+	}
+	
 	@Override
 	public void setEditedItem(CodeList editedItem) {
 		super.setEditedItem(editedItem);
-//		initTreeModel();
 		selectedItemsPerLevel = new ArrayList<CodeListItem>();
 		initItemsPerLevel();
 	}
@@ -216,11 +262,42 @@ public class SurveyCodeListsEditVM extends SurveyItemEditVM<CodeList> {
 		}
 	}
 	
-	private void deselectItemsAfterLevel(int levelIndex) {
+	protected void deselectItemsAfterLevel(int levelIndex) {
 		int maxSelectedLevelIndex = selectedItemsPerLevel.size() - 1;
 		for (int i = maxSelectedLevelIndex; i >= levelIndex; i --) {
 			selectedItemsPerLevel.remove(i);
 		}
+	}
+	
+	protected void moveChildItem(CodeListItem item, int indexTo) {
+		CodeListItem parentItem = item.getParentItem();
+		int depth = item.getDepth();
+		int levelIndex = depth - 1;
+		List<CodeListItem> siblings;
+		if ( parentItem == null ) {
+			CodeList codeList = item.getCodeList();
+			codeList.moveItem(item, indexTo);
+			siblings = codeList.getItems();
+		} else {
+			parentItem.moveChildItem(item, indexTo);
+			siblings = parentItem.getChildItems();
+		}
+		itemsPerLevel.set(levelIndex, siblings);
+		notifyChange("itemsPerLevel");
+	}
+
+	protected int getItemIndex(CodeListItem item) {
+		CodeListItem parentItem = item.getParentItem();
+		int index;
+		List<CodeListItem> siblings;
+		if ( parentItem == null ) {
+			CodeList codeList = item.getCodeList();
+			siblings = codeList.getItems();
+		} else {
+			siblings = parentItem.getChildItems();
+		}
+		index = siblings.indexOf(item);
+		return index;
 	}
 	
 	@GlobalCommand
@@ -269,5 +346,6 @@ public class SurveyCodeListsEditVM extends SurveyItemEditVM<CodeList> {
 	public boolean isCodeListItemSelected(CodeListItem item) {
 		return selectedItemsPerLevel.contains(item);
 	}
+	
 	
 }
