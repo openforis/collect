@@ -1,12 +1,10 @@
 package org.openforis.collect.designer.form.validator;
 
-import java.util.Collection;
-
-import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.designer.viewmodel.SurveySchemaEditVM;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Schema;
+import org.openforis.idm.path.InvalidPathException;
 import org.zkoss.bind.ValidationContext;
 import org.zkoss.util.resource.Labels;
 
@@ -55,14 +53,11 @@ public class NodeDefinitionFormValidator extends FormValidator {
 	}
 	
 	protected boolean isNameUnique(NodeDefinition editedNode, String name) {
-		if ( editedNode instanceof EntityDefinition ) {
-			if ( existsHomonymous((EntityDefinition) editedNode, name) ) {
-				return false;
-			}
-		} else if ( existsHomonymousSibling(editedNode, name) ) {
+		if ( existsHomonymousSibling(editedNode, name) ) {
 			return false;
+		} else {
+			return true;
 		}
-		return true;
 	}
 
 	protected boolean existsHomonymousSibling(NodeDefinition defn, String name) {
@@ -74,19 +69,13 @@ public class NodeDefinitionFormValidator extends FormValidator {
 			parentPath = "";
 		}
 		Schema schema = defn.getSchema();
-		NodeDefinition nodeInPath = schema.getByPath(parentPath + "/" + name);
-		return nodeInPath != null && ! nodeInPath.getId().equals(defn.getId());
-	}
-	
-	protected boolean existsHomonymous(EntityDefinition editedNode, String name) {
-		Schema schema = editedNode.getSchema();
-		Collection<NodeDefinition> allDefinitions = schema.getAllDefinitions();
-		for (NodeDefinition defn : allDefinitions) {
-			if ( defn instanceof EntityDefinition && StringUtils.equals(defn.getName(), name) ) {
-				return ! defn.getId().equals(editedNode.getId());
-			}
+		NodeDefinition nodeInPath;
+		try {
+			nodeInPath = schema.getDefinitionByPath(parentPath + "/" + name);
+		} catch (InvalidPathException e) {
+			throw new RuntimeException("Error validating node definition name uniqueness", e);
 		}
-		return false;
+		return nodeInPath != null && nodeInPath.getId() != defn.getId();
 	}
 	
 	protected void validateDescription(ValidationContext ctx) {

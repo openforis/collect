@@ -9,10 +9,10 @@ import java.util.List;
 import org.openforis.collect.designer.session.SessionStatus;
 import org.openforis.collect.designer.util.Resources;
 import org.openforis.collect.designer.viewmodel.BaseVM;
+import org.openforis.collect.metamodel.ui.UIOptions;
+import org.openforis.collect.metamodel.ui.UITab;
+import org.openforis.collect.metamodel.ui.UITabSet;
 import org.openforis.collect.model.CollectSurvey;
-import org.openforis.collect.model.ui.UIOptions;
-import org.openforis.collect.model.ui.UITab;
-import org.openforis.collect.model.ui.UITabsGroup;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.zkoss.bind.annotation.AfterCompose;
@@ -58,7 +58,7 @@ public class TabsGroupPanelVM extends BaseVM {
 	}
 	
 	@GlobalCommand
-	public void nodesPerTabChanged(@BindingParam("tab") UITabsGroup tab) {
+	public void nodesPerTabChanged(@BindingParam("tab") UITabSet tab) {
 		if ( tab.equals(this.tab) ) {
 			//BindUtils.postNotifyChange(null, null, this, "nodesPerTab");
 			refreshListOfNodes();
@@ -74,9 +74,9 @@ public class TabsGroupPanelVM extends BaseVM {
 	}
 	
 	public List<NodeDefinition> getNodesPerTab() {
-		UIOptions uiConf = getUIConfiguration();
+		UIOptions uiOpts = getUIOptions();
 		List<NodeDefinition> result = new ArrayList<NodeDefinition>();
-		List<NodeDefinition> nodesPerTab = uiConf.getNodesPerTab(tab, false);
+		List<NodeDefinition> nodesPerTab = uiOpts.getNodesPerTab(getSurvey(), tab, false);
 		ModelVersion version = getFormVersion();
 		for (NodeDefinition nodeDefn : nodesPerTab) {
 			if ( version == null || version.isApplicable(nodeDefn) ) {
@@ -98,10 +98,9 @@ public class TabsGroupPanelVM extends BaseVM {
 		return version;
 	}
 	
-	protected UIOptions getUIConfiguration() {
+	protected UIOptions getUIOptions() {
 		CollectSurvey survey = getSurvey();
-		UIOptions uiConf = survey.getUIConfiguration();
-		uiConf.setSurvey(survey);
+		UIOptions uiConf = survey.getUIOptions();
 		return uiConf;
 	}
 	

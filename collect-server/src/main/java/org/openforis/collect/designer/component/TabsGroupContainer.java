@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.openforis.collect.designer.util.Resources.Component;
-import org.openforis.collect.model.ui.UITab;
-import org.openforis.collect.model.ui.UITabsGroup;
+import org.openforis.collect.metamodel.ui.UITab;
+import org.openforis.collect.metamodel.ui.UITabSet;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.composite.Composite;
 import org.zkoss.zk.ui.Components;
@@ -40,7 +40,7 @@ public class TabsGroupContainer extends Div implements IdSpace {
     @Wire
     private Tabbox tabbox;
     
-    private UITabsGroup tabsGroup;
+    private UITabSet tabsGroup;
 
 	private Tab newChildTab;
  
@@ -115,18 +115,18 @@ public class TabsGroupContainer extends Div implements IdSpace {
 	private void addTab(UITab uiTab) {
 		Tabs tabs = tabbox.getTabs();
 		Tab tab = new Tab();
-		tab.setLabel(uiTab.getLabel());
+		//tab.setLabel(uiTab.getLabel());
 		tabs.appendChild(tab);
 		Tabpanels tabpanels = tabbox.getTabpanels();
 		Tabpanel tabpanel = new Tabpanel();
 		tabpanels.appendChild(tabpanel);
 	}
 	
-	public UITabsGroup getTabsGroup() {
+	public UITabSet getTabsGroup() {
 		return tabsGroup;
 	}
 
-	public void setTabsGroup(UITabsGroup tabsGroup) {
+	public void setTabsGroup(UITabSet tabsGroup) {
 		this.tabsGroup = tabsGroup;
 //		TabsGroupEvent event = new TabsGroupEvent(TabsGroupEvent.GROUP_CHANGE, tabsGroup);
 //		Events.sendEvent(this, event);

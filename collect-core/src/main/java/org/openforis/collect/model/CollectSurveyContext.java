@@ -36,6 +36,7 @@ public class CollectSurveyContext implements SurveyContext, Serializable {
 		return survey;
 	}
 
+	@Override
 	public ExpressionFactory getExpressionFactory() {
 		return expressionFactory;
 	}
@@ -44,6 +45,7 @@ public class CollectSurveyContext implements SurveyContext, Serializable {
 		this.expressionFactory = expressionFactory;
 	}
 
+	@Override
 	public Validator getValidator() {
 		return validator;
 	}

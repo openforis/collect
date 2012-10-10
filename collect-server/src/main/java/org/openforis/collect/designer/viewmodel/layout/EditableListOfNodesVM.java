@@ -8,11 +8,11 @@ import java.util.Map;
 import org.openforis.collect.designer.session.SessionStatus;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.viewmodel.BaseVM;
+import org.openforis.collect.metamodel.ui.UIOptions;
+import org.openforis.collect.metamodel.ui.UITab;
+import org.openforis.collect.metamodel.ui.UITabSet;
+import org.openforis.collect.metamodel.ui.UIOptions.Layout;
 import org.openforis.collect.model.CollectSurvey;
-import org.openforis.collect.model.ui.UIOptions;
-import org.openforis.collect.model.ui.UIOptions.Layout;
-import org.openforis.collect.model.ui.UITab;
-import org.openforis.collect.model.ui.UITabsGroup;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -65,10 +65,10 @@ public class EditableListOfNodesVM extends BaseVM {
 			Object data = value.getData();
 			if ( data instanceof NodeDefinition ) {
 				NodeDefinition nodeDefn = (NodeDefinition) data;
-				UIOptions uiConf = getUIConfiguration();
-				if ( uiConf.isAssignableTo(nodeDefn, tab) ) {
-					UITab oldTab = uiConf.getTab(nodeDefn);
-					uiConf.associateWithTab(nodeDefn, tab);
+				UIOptions uiOpts = getUIOptions();
+				if ( uiOpts.isAssignableTo(nodeDefn, tab) ) {
+					UITab oldTab = uiOpts.getTab(nodeDefn);
+					uiOpts.associateWithTab(nodeDefn, tab);
 					Map<String, Object> args = new HashMap<String, Object>();
 					args.put("oldTab", oldTab);
 					args.put("newTab", tab);
@@ -85,21 +85,21 @@ public class EditableListOfNodesVM extends BaseVM {
 	}
 	
 	public boolean isTabInherited(NodeDefinition nodeDefn) {
-		UIOptions uiConf = getUIConfiguration();
-		UITab tab = uiConf.getTab(nodeDefn, false);
+		UIOptions uiOpts = getUIOptions();
+		UITab tab = uiOpts.getTab(nodeDefn, false);
 		return tab != null;
 	}
 	
 	@Command
 	@NotifyChange({"nodesPerTab"})
 	public void setLayout(@BindingParam("type") String type, @BindingParam("node") NodeDefinition node) {
-		UIOptions uiConf = getUIConfiguration();
+		UIOptions uiOpts = getUIOptions();
 		Layout layout = Layout.valueOf(type);
-		uiConf.setLayout(node, layout);
+		uiOpts.setLayout(node, layout);
 	}
 	
 	@GlobalCommand
-	public void tabChanged(@BindingParam("tab") UITabsGroup tab) {
+	public void tabChanged(@BindingParam("tab") UITabSet tab) {
 		if ( tab.equals(this.tab) ) {
 			BindUtils.postNotifyChange(null, null, this, "tab");
 		}
@@ -108,8 +108,8 @@ public class EditableListOfNodesVM extends BaseVM {
 	public String getTemplateName(NodeDefinition nodeDefn) {
 		if ( nodeDefn instanceof EntityDefinition ) {
 			if ( nodeDefn.isMultiple() ) {
-				UIOptions uiConf = getUIConfiguration();
-				Layout layout = uiConf.getLayout((EntityDefinition) nodeDefn);
+				UIOptions uiOpts = getUIOptions();
+				Layout layout = uiOpts.getLayout((EntityDefinition) nodeDefn);
 				switch ( layout ) {
 				case FORM:
 					return "multiple_entity_form";
@@ -125,8 +125,8 @@ public class EditableListOfNodesVM extends BaseVM {
 	}
 	
 	public boolean hasLayout(EntityDefinition entityDefn, String layout) {
-		UIOptions uiConf = getUIConfiguration();
-		Layout nodeLayout = uiConf.getLayout(entityDefn);
+		UIOptions uiOpts = getUIOptions();
+		Layout nodeLayout = uiOpts.getLayout(entityDefn);
 		return nodeLayout.name().equals(layout);
 	}
 	
@@ -143,13 +143,13 @@ public class EditableListOfNodesVM extends BaseVM {
 	}
 	
 	public List<NodeDefinition> getChildDefinitionsInTab(EntityDefinition entityDefn) {
-		UIOptions uiConf = getUIConfiguration();
+		UIOptions uiOpts = getUIOptions();
 		List<NodeDefinition> childDefinitions = entityDefn.getChildDefinitions();
 		List<NodeDefinition> result = new ArrayList<NodeDefinition>();
 		ModelVersion formVersion = getLayoutFormVersion();
 		for (NodeDefinition nodeDefn : childDefinitions) {
 			if ( formVersion == null || formVersion.isApplicable(nodeDefn) ) {
-				UITab nodeTab = uiConf.getTab(nodeDefn);
+				UITab nodeTab = uiOpts.getTab(nodeDefn);
 				if ( nodeTab == tab ) {
 					result.add(nodeDefn);
 				}
@@ -164,11 +164,10 @@ public class EditableListOfNodesVM extends BaseVM {
 		return survey;
 	}
 	
-	protected UIOptions getUIConfiguration() {
+	protected UIOptions getUIOptions() {
 		CollectSurvey survey = getSurvey();
-		UIOptions uiConf = survey.getUIConfiguration();
-		uiConf.setSurvey(survey);
-		return uiConf;
+		UIOptions uiOpts = survey.getUIOptions();
+		return uiOpts;
 	}
 
 	public ModelVersion getLayoutFormVersion() {

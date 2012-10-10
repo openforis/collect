@@ -7,9 +7,9 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
+import org.openforis.collect.metamodel.ui.UIOptions;
+import org.openforis.collect.metamodel.ui.UIOptions.Layout;
 import org.openforis.collect.model.CollectSurvey;
-import org.openforis.collect.model.ui.UIOptions;
-import org.openforis.collect.model.ui.UIOptions.Layout;
 import org.openforis.idm.metamodel.EntityDefinition;
 
 /**
@@ -45,8 +45,8 @@ public class EntityDefinitionProxy extends NodeDefinitionProxy {
 	@ExternalizedProperty
 	public String getLayout() {
 		CollectSurvey survey = (CollectSurvey) entityDefinition.getSurvey();
-		UIOptions uiConfiguration = survey.getUIConfiguration();
-		Layout layout = uiConfiguration.getLayout(entityDefinition);
+		UIOptions uiOpts = survey.getUIOptions();
+		Layout layout = uiOpts.getLayout(entityDefinition);
 		return layout.name().toLowerCase();
 	}
 	
@@ -66,7 +66,7 @@ public class EntityDefinitionProxy extends NodeDefinitionProxy {
 		if ( parent != null ) {
 			return parent.getTabDefinitionName();
 		} else {
-			String tabDefnName = entityDefinition.getAnnotation(UIOptions.Annotation.TAB_DEFINITION.getQName());
+			String tabDefnName = entityDefinition.getAnnotation(UIOptions.Annotation.TAB_SET.getQName());
 			return tabDefnName;
 		}
 	}

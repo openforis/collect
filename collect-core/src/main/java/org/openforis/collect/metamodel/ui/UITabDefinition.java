@@ -1,4 +1,4 @@
-package org.openforis.collect.model.ui;
+package org.openforis.collect.metamodel.ui;
 
 import java.util.List;
 import java.util.Stack;
@@ -15,14 +15,15 @@ import javax.xml.bind.annotation.XmlType;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = { "name", "tabs" })
-public class UITabDefinition extends UITabsGroup {
+@Deprecated
+public class UITabDefinition extends UITabSet {
 
 	private static final long serialVersionUID = 1L;
 	
 	public UITab getDescendantTab(String name) {
-		Stack<UITabsGroup> stack = new Stack<UITabsGroup>();
+		Stack<UITabSet> stack = new Stack<UITabSet>();
 		while ( ! stack.isEmpty() ) {
-			UITabsGroup group = stack.pop();
+			UITabSet group = stack.pop();
 			List<UITab> tabs = group.getTabs();
 			for (UITab uiTab : tabs) {
 				String tabName = uiTab.getName();

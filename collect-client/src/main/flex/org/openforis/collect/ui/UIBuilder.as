@@ -27,10 +27,10 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.metamodel.proxy.TextAttributeDefinitionProxy$Type;
 	import org.openforis.collect.metamodel.proxy.TimeAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.UnitProxy;
+	import org.openforis.collect.metamodel.ui.UIOptions;
+	import org.openforis.collect.metamodel.ui.UITab;
+	import org.openforis.collect.metamodel.ui.UITabSet;
 	import org.openforis.collect.model.proxy.EntityProxy;
-	import org.openforis.collect.model.ui.UIConfiguration;
-	import org.openforis.collect.model.ui.UITab;
-	import org.openforis.collect.model.ui.UITabDefinition;
 	import org.openforis.collect.ui.component.datagrid.CompleteColumnItemRenderer;
 	import org.openforis.collect.ui.component.datagrid.RecordSummaryDataGrid;
 	import org.openforis.collect.ui.component.datagrid.RecordSummaryErrorsColumnItemRenderer;
@@ -89,9 +89,9 @@ package org.openforis.collect.ui {
 			
 			addMainEntityFormContainer(formContainer, rootEntity, version);
 			
-			var uiTabDefn:UITabDefinition = getRootEntityTabDefinition(rootEntity);
-			if ( uiTabDefn != null && uiTabDefn.tabs != null) {
-				for each (var tab:UITab in uiTabDefn.tabs) {
+			var tabSet:UITabSet = getRootEntityTabDefinition(rootEntity);
+			if ( tabSet != null && tabSet.tabs != null) {
+				for each (var tab:UITab in tabSet.tabs) {
 					if ( ! isMainTab(rootEntity, tab) ) {
 						addChildEntityFormContainer(formContainer, rootEntity, version, tab);
 					}
@@ -584,23 +584,23 @@ package org.openforis.collect.ui {
 			return result;
 		}
 		
-		public static function getRootEntityTabDefinition(rootEntityDefinition:EntityDefinitionProxy):UITabDefinition {
+		public static function getRootEntityTabDefinition(rootEntityDefinition:EntityDefinitionProxy):UITabSet {
 			var survey:SurveyProxy = rootEntityDefinition.survey;
-			var uiConfig:UIConfiguration = survey.uiConfiguration;
-			var tabDef:UITabDefinition = null;
-			if(uiConfig != null) {
+			var uiOpts:UIOptions = survey.uiOptions;
+			var tabSet:UITabSet = null;
+			if(uiOpts != null) {
 				var tabDefnName:String = rootEntityDefinition.tabDefinitionName;
-				tabDef = uiConfig.getTabDefinition(tabDefnName);
+				tabSet = uiOpts.getTabSet(tabDefnName);
 			}
-			return tabDef;
+			return tabSet;
 		}
 		
 		public static function getUITab(nodeDefn:NodeDefinitionProxy):UITab {
 			var survey:SurveyProxy = nodeDefn.survey;
 			var rootEntity:EntityDefinitionProxy = nodeDefn.rootEntity;
-			var tabDefn:UITabDefinition = getRootEntityTabDefinition(rootEntity);
-			if ( tabDefn != null ) {
-				var tab:UITab = tabDefn.getTab(nodeDefn.uiTabName);
+			var tabSet:UITabSet = getRootEntityTabDefinition(rootEntity);
+			if ( tabSet != null ) {
+				var tab:UITab = tabSet.getTab(nodeDefn.uiTabName);
 				return tab;
 			} else {
 				return null;

@@ -10,8 +10,8 @@ import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.RAMDirectory;
+import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.model.CollectRecord;
-import org.openforis.collect.model.ui.UIOptions;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.Survey;
@@ -49,7 +49,7 @@ public class RecordTemporaryIndexManager extends RecordIndexManager {
 
 	public List<String> search(SearchType searchType, Survey survey, int attributeDefnId, int fieldIndex, String queryText, int maxResults)  throws RecordIndexException {
 		Schema schema = survey.getSchema();
-		AttributeDefinition defn = (AttributeDefinition) schema.getById(attributeDefnId);
+		AttributeDefinition defn = (AttributeDefinition) schema.getDefinitionById(attributeDefnId);
 		String indexName = defn.getAnnotation(UIOptions.Annotation.AUTOCOMPLETE.getQName());
 		if ( StringUtils.isNotBlank(indexName) ) {
 			IndexSearcher indexSearcher = null;

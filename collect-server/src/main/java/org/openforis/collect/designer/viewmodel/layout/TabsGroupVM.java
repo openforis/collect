@@ -14,10 +14,10 @@ import org.openforis.collect.designer.session.SessionStatus;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.Resources;
 import org.openforis.collect.designer.viewmodel.BaseVM;
+import org.openforis.collect.metamodel.ui.UIOptions;
+import org.openforis.collect.metamodel.ui.UITab;
+import org.openforis.collect.metamodel.ui.UITabSet;
 import org.openforis.collect.model.CollectSurvey;
-import org.openforis.collect.model.ui.UIOptions;
-import org.openforis.collect.model.ui.UITab;
-import org.openforis.collect.model.ui.UITabsGroup;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.annotation.AfterCompose;
@@ -51,7 +51,7 @@ public class TabsGroupVM extends BaseVM {
 	
 	static {
 		FAKE_ADD_TAB = new UITab();
-		FAKE_ADD_TAB.setLabel("+");
+		FAKE_ADD_TAB.setLabel(null, "+");
 	}
 	
 	@Wire
@@ -62,12 +62,12 @@ public class TabsGroupVM extends BaseVM {
 		 Selectors.wireComponents(view, this, false);
 	}
 	
-	private UITabsGroup tabsGroup;
+	private UITabSet tabsGroup;
 
 	private Window tabLabelPopUp;
 	
 	@Init
-	public void init(@ExecutionArgParam("tabsGroup") UITabsGroup tabsGroup) {
+	public void init(@ExecutionArgParam("tabsGroup") UITabSet tabsGroup) {
 		this.tabsGroup = tabsGroup;
 	}
 	
@@ -93,10 +93,10 @@ public class TabsGroupVM extends BaseVM {
 		if ( tab.getTabs().isEmpty() ) {
 			SessionStatus sessionStatus = getSessionStatus();
 			CollectSurvey survey = sessionStatus.getSurvey();
-			UIOptions uiConfiguration = survey.getUIConfiguration();
-			List<NodeDefinition> nodesPerTab = uiConfiguration.getNodesPerTab(tab, false);
+			UIOptions uiOpts = survey.getUIOptions();
+			List<NodeDefinition> nodesPerTab = uiOpts.getNodesPerTab(survey, tab, false);
 			if ( nodesPerTab.isEmpty() ) {
-				UITabsGroup parent = tab.getParent();
+				UITabSet parent = tab.getParent();
 				parent.removeTab(tab);
 				postTabChangedCommand(parent);
 			} else {
@@ -111,7 +111,7 @@ public class TabsGroupVM extends BaseVM {
 		tabLabelPopUp = openPopUp(Resources.Component.TAB_LABEL_POPUP.getLocation(), true);
 		Button okButton = (Button) tabLabelPopUp.query("#okBtn");
 		final Textbox textbox = (Textbox) tabLabelPopUp.query("#textbox");
-		textbox.setText(tab.getLabel());
+		textbox.setText(tab.getLabel(getCurrentLanguageCode()));
 		okButton.addEventListener("onClick", new EventListener<Event>() {
 			@Override
 			public void onEvent(Event event) throws Exception {
@@ -121,7 +121,7 @@ public class TabsGroupVM extends BaseVM {
 					List<UITab> tabs = tabsGroup.getTabs();
 					int index = tabs.indexOf(tab);
 					tabbox.setSelectedIndex(index);
-					tab.setLabel(label);
+					tab.setLabel(getCurrentLanguageCode(), label);
 					closePopUp(tabLabelPopUp);
 					BindUtils.postNotifyChange(null, null, tab, "label");
 				}
@@ -138,16 +138,16 @@ public class TabsGroupVM extends BaseVM {
 		});
 	}
 	
-	private void postTabChangedCommand(UITabsGroup parent) {
+	private void postTabChangedCommand(UITabSet parent) {
 		Map<String, Object> args = new HashMap<String, Object>();
 		args.put("tab", parent);
 		BindUtils.postGlobalCommand(null, null, TAB_CHANGED_GLOBAL_COMMAND, args);
 	}
 	
-	private String generateNewTabName(UITabsGroup parentGroup) {
+	private String generateNewTabName(UITabSet parentGroup) {
 		String prefix = "tab_";
 		Stack<Integer> parts = new Stack<Integer>();
-		UITabsGroup currentGroup = parentGroup;
+		UITabSet currentGroup = parentGroup;
 		do {
 			int position = currentGroup.getTabs().size() + 1;
 			parts.push(position);
@@ -163,7 +163,7 @@ public class TabsGroupVM extends BaseVM {
 //		group = tabDefinition;
 //	}
 	
-	public UITabsGroup getTabsGroup() {
+	public UITabSet getTabsGroup() {
 		return tabsGroup;
 	}
 	

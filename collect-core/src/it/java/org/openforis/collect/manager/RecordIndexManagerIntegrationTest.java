@@ -4,9 +4,6 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
 import java.util.GregorianCalendar;
 import java.util.List;
 
@@ -14,20 +11,15 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.openforis.collect.CollectIntegrationTest;
 import org.openforis.collect.manager.RecordIndexManager.SearchType;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
-import org.openforis.collect.model.CollectSurveyContext;
-import org.openforis.collect.persistence.SurveyImportException;
-import org.openforis.collect.persistence.xml.CollectIdmlBindingContext;
 import org.openforis.idm.metamodel.NodeDefinition;
-import org.openforis.idm.metamodel.xml.InvalidIdmlException;
-import org.openforis.idm.metamodel.xml.SurveyUnmarshaller;
 import org.openforis.idm.model.Code;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.EntityBuilder;
-import org.openforis.idm.model.expression.ExpressionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -41,7 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 @ContextConfiguration( locations = {"classpath:test-context.xml"} )
 @TransactionConfiguration(defaultRollback=true)
 @Transactional
-public class RecordIndexManagerIntegrationTest {
+public class RecordIndexManagerIntegrationTest extends CollectIntegrationTest {
 	//private final Log log = LogFactory.getLog(ConfigurationDaoIntegrationTest.class);
 	
 	@Autowired
@@ -57,7 +49,7 @@ public class RecordIndexManagerIntegrationTest {
 		CollectSurvey survey = loadSurvey();
 		String[] gpsModels = new String[] {"GPS MAP 62 S", "GPS MAP 60CSX", "SXBLUEII-L", "GPS MAP 62S"};
 		createIndex(survey, gpsModels);
-		NodeDefinition autoCompleteNodeDefn = survey.getSchema().getByPath("/cluster/gps_model");
+		NodeDefinition autoCompleteNodeDefn = survey.getSchema().getDefinitionByPath("cluster/gps_model");
 		
 		testSingleResultMatching(survey, autoCompleteNodeDefn);
 		
@@ -132,17 +124,6 @@ public class RecordIndexManagerIntegrationTest {
 		}
 	}
 	
-	private CollectSurvey loadSurvey() throws IOException, SurveyImportException, InvalidIdmlException {
-		URL idm = ClassLoader.getSystemResource("test.idm.xml");
-		InputStream is = idm.openStream();
-		CollectSurveyContext context = new CollectSurveyContext(new ExpressionFactory(), null, null);
-		CollectIdmlBindingContext idmlBindingContext = new CollectIdmlBindingContext(context);
-		SurveyUnmarshaller surveyUnmarshaller = idmlBindingContext.createSurveyUnmarshaller();
-		CollectSurvey survey = (CollectSurvey) surveyUnmarshaller.unmarshal(is);
-		survey.setName("archenland1");
-		return survey;
-	}
-
 	private CollectRecord createTestRecord(CollectSurvey survey, int internalId, String id, String gpsModel) {
 		CollectRecord record = new CollectRecord(survey, "2.0");
 		record.setId(internalId);

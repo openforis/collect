@@ -14,7 +14,6 @@ import org.openforis.collect.designer.session.SessionStatus;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.CodeList;
-import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.Unit;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.annotation.BindingParam;
@@ -122,11 +121,11 @@ public class SurveyEditBaseVM extends BaseVM {
 		return dateFormat;
 	}
 
-	public List<ModelVersion> getVersionsForCombo() {
+	public List<Object> getVersionsForCombo() {
 		CollectSurvey survey = getSurvey();
-		List<ModelVersion> result = new ArrayList<ModelVersion>(survey.getVersions());
+		List<Object> result = new ArrayList<Object>(survey.getVersions());
 		result.add(0, FormObject.VERSION_EMPTY_SELECTION);
-		return new BindingListModelList<ModelVersion>(result, false);
+		return new BindingListModelList<Object>(result, false);
 	}
 	
 	public List<CodeList> getCodeLists() {

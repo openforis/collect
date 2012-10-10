@@ -14,7 +14,7 @@ public class SurveyMainInfoFormObject extends ItemFormObject<CollectSurvey> {
 	private String uri;
 	private String description;
 	private String projectName;
-	private Integer projectCycle;
+	private String projectCycle;
 	
 	@Override
 	public void loadFrom(CollectSurvey source, String languageCode) {
@@ -76,11 +76,11 @@ public class SurveyMainInfoFormObject extends ItemFormObject<CollectSurvey> {
 		this.projectName = projectName;
 	}
 
-	public Integer getProjectCycle() {
+	public String getProjectCycle() {
 		return projectCycle;
 	}
 
-	public void setProjectCycle(Integer projectCycle) {
+	public void setProjectCycle(String projectCycle) {
 		this.projectCycle = projectCycle;
 	}
 	

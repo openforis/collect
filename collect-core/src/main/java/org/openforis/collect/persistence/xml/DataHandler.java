@@ -179,11 +179,11 @@ public class DataHandler extends DefaultHandler {
 		NodeDefinition newDefn = null;
 		EntityDefinition parentEntityDefn = parentEntity.getDefinition();
 		Schema originalSchema = recordSurvey.getSchema();
-		EntityDefinition originlParentEntityDefn = (EntityDefinition) originalSchema.getById(parentEntityDefn.getId());
+		EntityDefinition originlParentEntityDefn = (EntityDefinition) originalSchema.getDefinitionById(parentEntityDefn.getId());
 		NodeDefinition originalDefn = originlParentEntityDefn.getChildDefinition(localName);
 		if ( originalDefn != null ) {
 			Schema newSchema = currentSurvey.getSchema();
-			newDefn = newSchema.getById(originalDefn.getId());
+			newDefn = newSchema.getDefinitionById(originalDefn.getId());
 		}
 		return newDefn;
 	}

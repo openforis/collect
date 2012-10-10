@@ -169,11 +169,17 @@
 		<property name="lookupProvider" ref="lookupProvider" />
 	</bean>
 	
-	<!--  Survey Context -->
+    <!--  Survey Context -->
 	<bean id="validator" 					class="org.openforis.collect.model.validation.CollectValidator" />
 	<bean id="lookupProvider" 				class="org.openforis.collect.persistence.DatabaseLookupProvider" />
 	<bean id="externalCodeListProvider" 	class="org.openforis.collect.persistence.DatabaseExternalCodeListProvider" />
 	
+    <bean id="collectSurveyContext" class="org.openforis.collect.model.CollectSurveyContext">
+        <constructor-arg><ref bean="expressionFactory"/></constructor-arg>
+        <constructor-arg><ref bean="validator"/></constructor-arg>
+        <constructor-arg><ref bean="externalCodeListProvider"/></constructor-arg>
+    </bean>
+    
 	<!-- ===================================== -->
 	<!-- Security -->
 	<!-- ===================================== -->

@@ -81,6 +81,12 @@
 	<bean id="validator" 					class="org.openforis.idm.metamodel.validation.Validator" />
 	<bean id="externalCodeListProvider" 	class="org.openforis.collect.persistence.DatabaseExternalCodeListProvider" />
 
+	<bean id="collectSurveyContext" class="org.openforis.collect.model.CollectSurveyContext">
+      <constructor-arg><ref bean="expressionFactory"/></constructor-arg>
+      <constructor-arg><ref bean="validator"/></constructor-arg>
+      <constructor-arg><ref bean="externalCodeListProvider"/></constructor-arg>
+	</bean>
+	
 	<!-- XmlSerializer -->
 	<bean id="xmlSerializerFactory" class="org.openforis.collect.persistence.xml.XmlPullSerializerFactory" />
 	

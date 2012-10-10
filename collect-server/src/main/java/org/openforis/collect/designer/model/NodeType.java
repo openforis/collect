@@ -1,18 +1,9 @@
 package org.openforis.collect.designer.model;
 
-import org.openforis.idm.metamodel.BooleanAttributeDefinition;
-import org.openforis.idm.metamodel.CodeAttributeDefinition;
-import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
-import org.openforis.idm.metamodel.DateAttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
-import org.openforis.idm.metamodel.FileAttributeDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
-import org.openforis.idm.metamodel.NumberAttributeDefinition;
-import org.openforis.idm.metamodel.RangeAttributeDefinition;
+import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.Survey;
-import org.openforis.idm.metamodel.TaxonAttributeDefinition;
-import org.openforis.idm.metamodel.TextAttributeDefinition;
-import org.openforis.idm.metamodel.TimeAttributeDefinition;
 
 /**
  * 
@@ -32,41 +23,42 @@ public enum NodeType {
 	
 	public static NodeDefinition createNodeDefinition(Survey survey, NodeType nodeType, AttributeType attrType) {
 		NodeDefinition result;
+		Schema schema = survey.getSchema();
 		switch(nodeType) {
 		case ENTITY:
-			result = new EntityDefinition();
+			result = schema.createEntityDefinition();
 			break;
 		case ATTRIBUTE:
 			switch(attrType) {
 			case BOOLEAN:
-				result = new BooleanAttributeDefinition();
+				result = schema.createBooleanAttributeDefinition();
 				break;
 			case CODE:
-				result = new CodeAttributeDefinition();
+				result = schema.createCodeAttributeDefinition();
 				break;
 			case COORDINATE:
-				result = new CoordinateAttributeDefinition();
+				result = schema.createCoordinateAttributeDefinition();
 				break;
 			case DATE:
-				result = new DateAttributeDefinition();
+				result = schema.createDateAttributeDefinition();
 				break;
 			case FILE:
-				result = new FileAttributeDefinition();
+				result = schema.createFileAttributeDefinition();
 				break;
 			case NUMBER:
-				result = new NumberAttributeDefinition();
+				result = schema.createNumberAttributeDefinition();
 				break;
 			case RANGE:
-				result = new RangeAttributeDefinition();
+				result = schema.createRangeAttributeDefinition();
 				break;
 			case TAXON:
-				result = new TaxonAttributeDefinition();
+				result = schema.createTaxonAttributeDefinition();
 				break;
 			case TEXT:
-				result = new TextAttributeDefinition();
+				result = schema.createTextAttributeDefinition();
 				break;
 			case TIME:
-				result = new TimeAttributeDefinition();
+				result = schema.createTimeAttributeDefinition();
 				break;
 			default:
 				throw new IllegalStateException("Attribute type not supported: " + attrType);
@@ -75,7 +67,6 @@ public enum NodeType {
 		default:
 			throw new IllegalStateException("Node type not supported: " + nodeType);
 		}
-		result.setSchema(survey.getSchema());
 		return result;
 	}
 	

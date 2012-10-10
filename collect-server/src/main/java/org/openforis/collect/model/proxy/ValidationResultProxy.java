@@ -29,8 +29,8 @@ import org.openforis.idm.metamodel.validation.DateValidator;
 import org.openforis.idm.metamodel.validation.DistanceCheck;
 import org.openforis.idm.metamodel.validation.ExternalCodeValidator;
 import org.openforis.idm.metamodel.validation.IntegerRangeValidator;
-import org.openforis.idm.metamodel.validation.NumericRangeUnitValidator;
 import org.openforis.idm.metamodel.validation.NumberValueUnitValidator;
+import org.openforis.idm.metamodel.validation.NumericRangeUnitValidator;
 import org.openforis.idm.metamodel.validation.PatternCheck;
 import org.openforis.idm.metamodel.validation.RealRangeValidator;
 import org.openforis.idm.metamodel.validation.TimeValidator;
@@ -42,7 +42,6 @@ import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Record;
 import org.openforis.idm.model.expression.ExpressionFactory;
-import org.openforis.idm.model.expression.InvalidExpressionException;
 import org.openforis.idm.model.expression.ModelPathExpression;
 
 /**
@@ -180,11 +179,12 @@ public class ValidationResultProxy implements Proxy {
 			List<String> referencedPaths = modelPathExpression.getReferencedPaths();
 			for (String path : referencedPaths) {
 				String absolutePath = parentDefinition.getPath() + "/" + path;
-				NodeDefinition nodeDefinition = schema.getByPath(absolutePath);
+				NodeDefinition nodeDefinition = schema.getDefinitionByPath(absolutePath);
 				String label = getInstanceLabelText(nodeDefinition);
 				result = result.replaceAll(nodeDefinition.getName(), label);
 			}
-		} catch (InvalidExpressionException e) {
+		} catch (Exception e) {
+			throw new RuntimeException(e);
 		}
 		return result;
 	}

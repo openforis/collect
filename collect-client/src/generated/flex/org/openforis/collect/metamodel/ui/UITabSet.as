@@ -5,14 +5,17 @@
  * your custom code here.
  */
 
-package org.openforis.collect.model.ui {
+package org.openforis.collect.metamodel.ui {
 	import mx.collections.IList;
 	
 	import org.openforis.collect.util.CollectionUtil;
 
+	/**
+	 * S. Ricci
+	 */
     [Bindable]
-    [RemoteClass(alias="org.openforis.collect.model.ui.UITabDefinition")]
-    public class UITabDefinition extends UITabDefinitionBase {
+    [RemoteClass(alias="org.openforis.collect.metamodel.ui.UITabSet")]
+    public class UITabSet extends UITabSetBase {
 		
 		public function getTab(name:String):UITab {
 			var stack:Array = new Array();
@@ -30,5 +33,6 @@ package org.openforis.collect.model.ui {
 			}
 			return null;
 		}
+		
     }
 }

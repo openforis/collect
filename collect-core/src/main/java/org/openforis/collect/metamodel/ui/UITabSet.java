@@ -1,15 +1,9 @@
-package org.openforis.collect.model.ui;
+package org.openforis.collect.metamodel.ui;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
-import javax.xml.bind.annotation.XmlTransient;
-
-import org.openforis.idm.metamodel.xml.internal.XmlParent;
 import org.openforis.idm.util.CollectionUtil;
 
 /**
@@ -17,21 +11,15 @@ import org.openforis.idm.util.CollectionUtil;
  * @author S. Ricci
  *
  */
-@XmlTransient
-public abstract class UITabsGroup implements Serializable {
+public class UITabSet implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
 	
-	@XmlAttribute(name = "name")
 	protected String name;
 
-	@XmlElementWrapper(name = "tabs")
-	@XmlElement(name = "tab", type = UITab.class)
 	protected List<UITab> tabs;
 
-	@XmlParent
-	@XmlTransient
-	protected UITabsGroup parent;
+	protected UITabSet parent;
 	
 	public String getName() {
 		return name;
@@ -61,7 +49,7 @@ public abstract class UITabsGroup implements Serializable {
 			tabs = new ArrayList<UITab>();
 		}
 		tabs.add(tab);
-		tab.setParent(this);
+		tab.parent = this;
 	}
 	
 	public void setTab(int index, UITab tab) {
@@ -72,20 +60,18 @@ public abstract class UITabsGroup implements Serializable {
 		tabs.remove(tab);
 	}
 
-	public UITab updateTab(String tabName, String newName, String newLabel) {
-		UITab oldTab = getTab(tabName);
-		oldTab.setName(newName);
-		oldTab.setLabel(newLabel);
-		return oldTab;
+	public UITab updateTab(String tabName, String newName, String newLabel, String language) {
+		UITab tab = getTab(tabName);
+		tab.setName(newName);
+		tab.setLabel(language, newLabel);
+		return tab;
 	}
 	
-	public UITabDefinition getTabDefinition() {
-		if ( parent != null ) {
-			return parent.getTabDefinition();
-		} else if ( this instanceof UITabDefinition ) {
-			return (UITabDefinition) this;
+	public UITabSet getRootTabSet() {
+		if ( parent == null ) {
+			return this;
 		} else {
-			throw new IllegalStateException("Invalid tabs hierarchy: tab definition expected as root element");
+			return parent.getRootTabSet();
 		}
 	}
 
@@ -96,18 +82,18 @@ public abstract class UITabsGroup implements Serializable {
 	 */
 	public int getDepth() {
 		int result = 0;
-		UITabsGroup prnt = getParent();
+		UITabSet prnt = getParent();
 		while ( prnt != null ) {
 			result ++;
 		}
 		return result;
 	}
 	
-	public UITabsGroup getParent() {
+	public UITabSet getParent() {
 		return parent;
 	}
 
-	protected void setParent(UITabsGroup parent) {
+	protected void setParent(UITabSet parent) {
 		this.parent = parent;
 	}
 
@@ -129,7 +115,7 @@ public abstract class UITabsGroup implements Serializable {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		UITabsGroup other = (UITabsGroup) obj;
+		UITabSet other = (UITabSet) obj;
 		if (name == null) {
 			if (other.name != null)
 				return false;

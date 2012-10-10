@@ -111,8 +111,7 @@ public class SurveyCodeListsEditVM extends SurveyItemEditVM<CodeList> {
 			break;
 		case FLAT:
 			if ( levels.size() == 1 ) {
-				CodeListLevel firstLevel = levels.get(0);
-				editedItem.removeLevel(firstLevel.getId());
+				editedItem.removeLevel(0);
 			}
 			break;
 		}
@@ -149,9 +148,7 @@ public class SurveyCodeListsEditVM extends SurveyItemEditVM<CodeList> {
 	}
 
 	protected void performRemoveLevel(int levelIndex) {
-		List<CodeListLevel> levels = editedItem.getHierarchy();
-		CodeListLevel level = levels.get(levelIndex);
-		editedItem.removeLevel(level.getId());
+		editedItem.removeLevel(levelIndex);
 		deselectItemsAfterLevel(levelIndex);
 		notifyChange("listLevels","selectedItemsPerLevel");
 	}
@@ -160,7 +157,7 @@ public class SurveyCodeListsEditVM extends SurveyItemEditVM<CodeList> {
 	@NotifyChange({"itemsPerLevel"})
 	public void addItemInLevel(@BindingParam("levelIndex") int levelIndex) {
 		if ( checkCurrentFormValid() ) {
-			CodeListItem item = new CodeListItem();
+			CodeListItem item = editedItem.createItem();
 			String code = generateItemCode(item);
 			item.setCode(code);
 			item.setCodeList(editedItem);

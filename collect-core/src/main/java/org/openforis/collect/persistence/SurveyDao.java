@@ -1,7 +1,6 @@
 package org.openforis.collect.persistence;
 
 import static org.openforis.collect.persistence.jooq.Sequences.OFC_SURVEY_ID_SEQ;
-
 import static org.openforis.collect.persistence.jooq.tables.OfcRecord.OFC_RECORD;
 import static org.openforis.collect.persistence.jooq.tables.OfcSurvey.OFC_SURVEY;
 
@@ -17,7 +16,6 @@ import org.jooq.impl.Factory;
 import org.jooq.impl.SQLDataType;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SurveySummary;
-import org.openforis.collect.persistence.xml.CollectIdmlBindingContext;
 import org.openforis.idm.metamodel.Survey;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -95,10 +93,6 @@ public class SurveyDao extends SurveyBaseDao {
 		Factory jf = getJooqFactory();
 		jf.delete(OFC_RECORD).execute();
 		jf.delete(OFC_SURVEY).execute();
-	}
-
-	public CollectIdmlBindingContext getBindingContext() {
-		return bindingContext;
 	}
 
 	public void updateModel(CollectSurvey survey) throws SurveyImportException {

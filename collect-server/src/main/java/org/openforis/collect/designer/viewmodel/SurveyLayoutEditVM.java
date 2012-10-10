@@ -8,10 +8,10 @@ import java.util.Map;
 import org.openforis.collect.designer.component.SchemaTreeModel;
 import org.openforis.collect.designer.session.SessionStatus;
 import org.openforis.collect.designer.util.Resources;
+import org.openforis.collect.metamodel.ui.UIOptions;
+import org.openforis.collect.metamodel.ui.UITab;
+import org.openforis.collect.metamodel.ui.UITabSet;
 import org.openforis.collect.model.CollectSurvey;
-import org.openforis.collect.model.ui.UIOptions;
-import org.openforis.collect.model.ui.UITab;
-import org.openforis.collect.model.ui.UITabDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -44,7 +44,7 @@ public class SurveyLayoutEditVM extends SurveyEditBaseVM {
 
 	private static final String NODES_PER_TAB_CHANGED_GLOABAL_COMMAND = "nodesPerTabChanged";
 	
-	private UITabDefinition tabsDefinition;
+	private UITabSet tabSet;
 	private SchemaTreeModel treeModel;
 	
 //	@Wire
@@ -75,9 +75,9 @@ public class SurveyLayoutEditVM extends SurveyEditBaseVM {
 	public void nodeSelected(@BindingParam("node") Treeitem node) {
 		List<ModelVersion> versions = survey.getVersions();
 		setFormVersion(versions.isEmpty() ? null: versions.get(0));
-		UITabDefinition tabDefinition = extractTabDefinition(node);
-		refreshTabDefinitionLayoutPanel(tabDefinition, false);
-		this.tabsDefinition = tabDefinition;
+		UITabSet tabSet = extractTabDefinition(node);
+		refreshTabSetLayoutPanel(tabSet, false);
+		this.tabSet = tabSet;
 		dispatchTabDefinitionChangedCommand();
 	}
 
@@ -85,7 +85,7 @@ public class SurveyLayoutEditVM extends SurveyEditBaseVM {
 	@NotifyChange({"nodes"})
 	public void formVersionChanged(@BindingParam("version") ModelVersion version) {
 		setFormVersion(version);
-		refreshTabDefinitionLayoutPanel(this.tabsDefinition, true);
+		refreshTabSetLayoutPanel(this.tabSet, true);
 		initTreeModel();
 		Map<String, Object> args = new HashMap<String, Object>();
 		args.put("version", version);
@@ -94,27 +94,27 @@ public class SurveyLayoutEditVM extends SurveyEditBaseVM {
 	
 	protected void dispatchTabDefinitionChangedCommand() {
 		Map<String, Object> args = new HashMap<String, Object>();
-		args.put("tabDefinition", tabsDefinition);
+		args.put("tabDefinition", tabSet);
 		BindUtils.postGlobalCommand(null, null, "tabDefinitionChanged", args);
 	}
 
-	protected void refreshTabDefinitionLayoutPanel(UITabDefinition tabDefinition, boolean forceRefresh) {
-		if ( tabDefinition == null ) {
+	protected void refreshTabSetLayoutPanel(UITabSet tabSet, boolean forceRefresh) {
+		if ( tabSet == null ) {
 			tabsGroupContainerInclude.setSrc(null);
-		} else if ( forceRefresh || this.tabsDefinition != tabDefinition) {
+		} else if ( forceRefresh || this.tabSet != tabSet) {
 			tabsGroupContainerInclude.setSrc(null); //workaround: include is not refreshed otherwise
-			tabsGroupContainerInclude.setDynamicProperty("tabsGroup", tabDefinition);
+			tabsGroupContainerInclude.setDynamicProperty("tabsGroup", tabSet);
 			tabsGroupContainerInclude.setSrc(Resources.Component.TABSGROUP.getLocation());
 		}
 	}
 	
-	protected UITabDefinition extractTabDefinition(Treeitem treeItem) {
+	protected UITabSet extractTabDefinition(Treeitem treeItem) {
 		if ( treeItem != null ) {
 			TreeNode<NodeDefinition> treeNode = treeItem.getValue();
 			NodeDefinition nodeDefn = treeNode.getData();
-			UIOptions uiConfiguration = survey.getUIConfiguration();
+			UIOptions uiOptions = survey.getUIOptions();
 			EntityDefinition rootEntity = nodeDefn.getRootEntity();
-			return uiConfiguration.getTabDefinition(rootEntity);
+			return uiOptions.getTabSet(rootEntity);
 		} else {
 			return null;
 		}
@@ -126,9 +126,9 @@ public class SurveyLayoutEditVM extends SurveyEditBaseVM {
 		if ( dragged instanceof Listitem ) {
 			NodeDefinition node = ((Listitem) dragged).getValue();
 			CollectSurvey survey = getSurvey();
-			UIOptions uiConf = survey.getUIConfiguration();
-			UITab oldTab = uiConf.getTab(node, false);
-			uiConf.removeTabAssociation(node);
+			UIOptions uiOpts = survey.getUIOptions();
+			UITab oldTab = uiOpts.getTab(node, false);
+			uiOpts.removeTabAssociation(node);
 			if ( oldTab != null ) {
 				postNodePerTabChangedCommand(oldTab);
 			}
@@ -141,8 +141,8 @@ public class SurveyLayoutEditVM extends SurveyEditBaseVM {
 		BindUtils.postGlobalCommand(null, null, NODES_PER_TAB_CHANGED_GLOABAL_COMMAND, args);
 	}
 	
-	public UITabDefinition getTabDefinition() {
-		return tabsDefinition;
+	public UITabSet getTabSet() {
+		return tabSet;
 	}
 	
 	public DefaultTreeModel<NodeDefinition> getNodes() {

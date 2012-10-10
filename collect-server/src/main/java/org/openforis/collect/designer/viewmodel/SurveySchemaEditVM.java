@@ -14,10 +14,10 @@ import org.openforis.collect.designer.model.AttributeType;
 import org.openforis.collect.designer.model.NodeType;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.Resources;
+import org.openforis.collect.metamodel.ui.UIOptions;
+import org.openforis.collect.metamodel.ui.UITab;
+import org.openforis.collect.metamodel.ui.UITabSet;
 import org.openforis.collect.model.CollectSurvey;
-import org.openforis.collect.model.ui.UIOptions;
-import org.openforis.collect.model.ui.UITab;
-import org.openforis.collect.model.ui.UITabDefinition;
 import org.openforis.idm.metamodel.AttributeDefault;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
@@ -236,9 +236,9 @@ public class SurveySchemaEditVM extends SurveyEditBaseVM {
 		if ( parentDefn != null ) {
 			parentDefn.removeChildDefinition(selectedNode);
 		} else {
-			UIOptions uiConfiguration = survey.getUIConfiguration();
-			UITabDefinition tabDefn = uiConfiguration.getTabDefinition((EntityDefinition) selectedNode);
-			uiConfiguration.removeTabDefinition(tabDefn);
+			UIOptions uiOpts = survey.getUIOptions();
+			UITabSet tabSet = uiOpts.getTabSet((EntityDefinition) selectedNode);
+			uiOpts.removeTabSet(tabSet);
 			Schema schema = selectedNode.getSchema();
 			String nodeName = selectedNode.getName();
 			schema.removeRootEntityDefinition(nodeName);
@@ -362,29 +362,29 @@ public class SurveySchemaEditVM extends SurveyEditBaseVM {
 		EntityDefinition newNode = (EntityDefinition) NodeType.createNodeDefinition(survey, NodeType.ENTITY, null);
 		Schema schema = survey.getSchema();
 		schema.addRootEntityDefinition((EntityDefinition) newNode);
-		UITabDefinition tabDefn = createRootTabDefinition(newNode);
-		addFirstTab(newNode, tabDefn);
+		UITabSet tabSet = createRootTabSet(newNode);
+		addFirstTab(newNode, tabSet);
 		return newNode;
 	}
 
 	protected void addFirstTab(EntityDefinition newNode,
-			UITabDefinition tabDefn) {
+			UITabSet tabSet) {
 		UITab tab = new UITab();
 		int tabPosition = 1;
 		String tabName = "tab_" + tabPosition;
 		tab.setName(tabName);
-		tabDefn.addTab(tab);
-		newNode.setAnnotation(UIOptions.Annotation.TAB_DEFINITION.getQName(), tabName);
+		tabSet.addTab(tab);
+		newNode.setAnnotation(UIOptions.Annotation.TAB_SET.getQName(), tabName);
 	}
 
-	protected UITabDefinition createRootTabDefinition(EntityDefinition newNode) {
-		UIOptions uiConf = survey.getUIConfiguration();
-		UITabDefinition tabDefn = new UITabDefinition();
-		int tabDefnPosition = uiConf.getTabDefinitions().size() + 1;
+	protected UITabSet createRootTabSet(EntityDefinition newNode) {
+		UIOptions uiOpts = survey.getUIOptions();
+		UITabSet tabDefn = new UITabSet();
+		int tabDefnPosition = uiOpts.getTabSets().size() + 1;
 		String tabDefnName = "tabdefn_" + tabDefnPosition;
 		tabDefn.setName(tabDefnName);
-		uiConf.addTabDefinition(tabDefn);
-		newNode.setAnnotation(UIOptions.Annotation.TAB_DEFINITION.getQName(), tabDefnName);
+		uiOpts.addTabSet(tabDefn);
+		newNode.setAnnotation(UIOptions.Annotation.TAB_SET.getQName(), tabDefnName);
 		return tabDefn;
 	}
 

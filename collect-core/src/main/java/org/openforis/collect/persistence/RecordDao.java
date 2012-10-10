@@ -281,7 +281,7 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 			int rootEntityId = r.getValueAsInteger(OFC_RECORD.ROOT_ENTITY_DEFINITION_ID);
 			String version = r.getValueAsString(OFC_RECORD.MODEL_VERSION);
 			Schema schema = survey.getSchema();
-			NodeDefinition rootEntityDefn = schema.getById(rootEntityId);
+			NodeDefinition rootEntityDefn = schema.getDefinitionById(rootEntityId);
 			if (rootEntityDefn == null) {
 				throw new DataInconsistencyException("Unknown root entity id " + rootEntityId);
 			}

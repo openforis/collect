@@ -169,7 +169,7 @@ public class SelectiveDataExportProcess implements Callable<Void>, DataExportPro
 
 	private DataTransformation getTransform() throws InvalidExpressionException {
 		Schema schema = survey.getSchema();
-		EntityDefinition entityDefn = (EntityDefinition) schema.getById(entityId);
+		EntityDefinition entityDefn = (EntityDefinition) schema.getDefinitionById(entityId);
 		List<ColumnProvider> columnProviders = createAncestorsColumnsProvider(entityDefn);
 		columnProviders.add(new AutomaticColumnProvider(entityDefn));
 		ColumnProvider provider = new ColumnProviderChain(columnProviders);

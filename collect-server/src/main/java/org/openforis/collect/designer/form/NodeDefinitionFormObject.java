@@ -2,7 +2,7 @@ package org.openforis.collect.designer.form;
 
 import org.openforis.collect.designer.model.AttributeType;
 import org.openforis.collect.designer.model.NodeType;
-import org.openforis.collect.model.ui.UITab;
+import org.openforis.collect.metamodel.ui.UITab;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NodeLabel.Type;
@@ -36,8 +36,8 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 	private boolean required;
 	private String requiredExpression;
 	private String relevantExpression;
-	private ModelVersion sinceVersion;
-	private ModelVersion deprecatedVersion;
+	private Object sinceVersion;
+	private Object deprecatedVersion;
 	private Integer minCount;
 	private Integer maxCount;
 	
@@ -126,21 +126,21 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 		if ( multiple ) {
 			dest.setMinCount(minCount);
 			dest.setMaxCount(maxCount);
-			dest.setRequired(null);
+//			dest.setRequired(null);
 			dest.setRequiredExpression(null);
 		} else {
 			dest.setMinCount(null);
 			dest.setMaxCount(null);
-			dest.setRequired(required);
+//			dest.setRequired(required);
 			dest.setRequiredExpression(requiredExpression);
 		}
 		if ( sinceVersion != null && sinceVersion != VERSION_EMPTY_SELECTION ) {
-			dest.setSinceVersion(sinceVersion);
+			dest.setSinceVersion((ModelVersion) sinceVersion);
 		} else {
 			dest.setSinceVersion(null);
 		}
 		if ( deprecatedVersion != null && deprecatedVersion != VERSION_EMPTY_SELECTION ) {
-			dest.setDeprecatedVersion(deprecatedVersion);
+			dest.setDeprecatedVersion((ModelVersion) deprecatedVersion);
 		} else {
 			dest.setDeprecatedVersion(null);
 		}
@@ -194,19 +194,19 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 		this.multiple = multiple;
 	}
 	
-	public ModelVersion getSinceVersion() {
+	public Object getSinceVersion() {
 		return sinceVersion;
 	}
 	
-	public void setSinceVersion(ModelVersion sinceVersion) {
+	public void setSinceVersion(Object sinceVersion) {
 		this.sinceVersion = sinceVersion;
 	}
 	
-	public ModelVersion getDeprecatedVersion() {
+	public Object getDeprecatedVersion() {
 		return deprecatedVersion;
 	}
 	
-	public void setDeprecatedVersion(ModelVersion deprecatedVersion) {
+	public void setDeprecatedVersion(Object deprecatedVersion) {
 		this.deprecatedVersion = deprecatedVersion;
 	}
 

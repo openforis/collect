@@ -1,4 +1,4 @@
-package org.openforis.collect.model.ui;
+package org.openforis.collect.metamodel.ui;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -7,11 +7,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
 import javax.xml.namespace.QName;
 
 import org.apache.commons.lang3.StringUtils;
@@ -28,9 +23,6 @@ import org.openforis.idm.util.CollectionUtil;
  * @author S. Ricci
  * 
  */
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "", propOrder = { "tabDefinitions" })
-@XmlRootElement(name = "flex")
 public class UIOptions implements ApplicationOptions, Serializable {
 
 	public static final String UI_TYPE = "ui";
@@ -40,7 +32,7 @@ public class UIOptions implements ApplicationOptions, Serializable {
 	public static final String UI_NAMESPACE_URI = "http://www.openforis.org/collect/3.0/ui";
 	
 	public enum Annotation {
-		TAB_DEFINITION(new QName(UI_NAMESPACE_URI, "tabDefinition")),
+		TAB_SET(new QName(UI_NAMESPACE_URI, "tabSet")),
 		TAB_NAME(new QName(UI_NAMESPACE_URI, "tab")),
 		LAYOUT(new QName(UI_NAMESPACE_URI, "layout")),
 		COUNT_IN_SUMMARY_LIST(new QName(UI_NAMESPACE_URI, "count")),
@@ -62,10 +54,7 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		FORM, TABLE
 	}
 	
-	@XmlElement(name = "tabDefinition", type = UITabDefinition.class)
-	private List<UITabDefinition> tabDefinitions;
-
-	private transient CollectSurvey survey;
+	private List<UITabSet> tabSets;
 
 	@Override
 	public String getType() {
@@ -77,14 +66,14 @@ public class UIOptions implements ApplicationOptions, Serializable {
 	}
 
 	protected void initParentRefernces() {
-		if ( tabDefinitions != null ) {
-			for (UITabsGroup group : tabDefinitions) {
+		if ( tabSets != null ) {
+			for (UITabSet group : tabSets) {
 				setParentInChildrenTabs(group);
 			}
 		}
 	}
 
-	protected void setParentInChildrenTabs(UITabsGroup group) {
+	protected void setParentInChildrenTabs(UITabSet group) {
 		List<UITab> tabs = group.getTabs();
 		for (UITab uiTab : tabs) {
 			uiTab.setParent(group);
@@ -92,16 +81,8 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		}
 	}
 	
-	public CollectSurvey getSurvey() {
-		return survey;
-	}
-
-	public void setSurvey(CollectSurvey survey) {
-		this.survey = survey;
-	}
-	
-	public List<UITabDefinition> getTabDefinitions() {
-		return CollectionUtil.unmodifiableList(tabDefinitions);
+	public List<UITabSet> getTabSets() {
+		return CollectionUtil.unmodifiableList(tabSets);
 	}
 	
 	public UITab getTab(NodeDefinition nodeDefn) {
@@ -111,12 +92,12 @@ public class UIOptions implements ApplicationOptions, Serializable {
 	public UITab getTab(NodeDefinition nodeDefn, boolean includeInherited) {
 		UITab tab = null;
 		EntityDefinition rootEntity = nodeDefn.getRootEntity();
-		UITabDefinition tabDefinition = getTabDefinition(rootEntity);
-		if ( tabDefinition != null ) {
+		UITabSet tabSet = getTabSet(rootEntity);
+		if ( tabSet != null ) {
 			String tabName = nodeDefn.getAnnotation(Annotation.TAB_NAME.getQName());
 			NodeDefinition parentDefn = nodeDefn.getParentDefinition();
 			if ( StringUtils.isNotBlank(tabName) && ( parentDefn == null || parentDefn.getParentDefinition() == null ) ) {
-				tab = tabDefinition.getTab(tabName);
+				tab = tabSet.getTab(tabName);
 			} else if ( parentDefn != null ) {
 				UITab parentTab = getTab(parentDefn);
 				if ( parentTab != null && StringUtils.isNotBlank(tabName) ) {
@@ -129,19 +110,19 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		return tab;
 	}
 
-	public UITabDefinition getTabDefinition(EntityDefinition rootEntityDefn) {
-		String tabDefnName = rootEntityDefn.getAnnotation(Annotation.TAB_DEFINITION.getQName());
-		UITabDefinition tabDefinition = getTabDefinition(tabDefnName);
-		return tabDefinition;
+	public UITabSet getTabSet(EntityDefinition rootEntityDefn) {
+		String tabDefnName = rootEntityDefn.getAnnotation(Annotation.TAB_SET.getQName());
+		UITabSet tabSet = getTabSet(tabDefnName);
+		return tabSet;
 	}
 	
 	public List<UITab> getAllowedTabs(NodeDefinition nodeDefn) {
 		EntityDefinition rootEntity = nodeDefn.getRootEntity();
-		UITabDefinition tabDefinition = getTabDefinition(rootEntity);
-		if ( tabDefinition != null ) {
+		UITabSet tabSet = getTabSet(rootEntity);
+		if ( tabSet != null ) {
 			NodeDefinition parentDefn = nodeDefn.getParentDefinition();
 			if ( parentDefn == null || parentDefn.getParentDefinition() == null ) {
-				return tabDefinition.getTabs();
+				return tabSet.getTabs();
 			} else {
 				UITab parentTab = getTab(parentDefn);
 				if ( parentTab != null ) {
@@ -158,10 +139,10 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		return result;
 	}
 
-	public List<NodeDefinition> getNodesPerTab(UITab tab, boolean includeChildrenOfEntities) {
+	public List<NodeDefinition> getNodesPerTab(CollectSurvey survey, UITab tab, boolean includeChildrenOfEntities) {
 		List<NodeDefinition> result = new ArrayList<NodeDefinition>();
-		UITabDefinition tabDefinition = tab.getTabDefinition();
-		EntityDefinition rootEntity = getRootEntityDefinition(tabDefinition);
+		UITabSet tabSet = tab.getRootTabSet();
+		EntityDefinition rootEntity = getRootEntityDefinition(survey, tabSet);
 		Queue<NodeDefinition> queue = new LinkedList<NodeDefinition>();
 		queue.addAll(rootEntity.getChildDefinitions());
 		while ( ! queue.isEmpty() ) {
@@ -210,59 +191,59 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		nodeDefn.setAnnotation(Annotation.LAYOUT.getQName(), layoutValue);
 	}
 
-	public EntityDefinition getRootEntityDefinition(
-			UITabDefinition tabDefinition) {
+	public EntityDefinition getRootEntityDefinition(CollectSurvey survey,
+			UITabSet tabSet) {
 		Schema schema = survey.getSchema();
 		List<EntityDefinition> rootEntityDefinitions = schema.getRootEntityDefinitions();
 		for (EntityDefinition defn : rootEntityDefinitions) {
-			UITabDefinition entityTabDefn = getTabDefinition(defn);
-			if ( entityTabDefn != null && entityTabDefn.equals(tabDefinition) ) {
+			UITabSet entityTabSet = getTabSet(defn);
+			if ( entityTabSet != null && entityTabSet.equals(tabSet) ) {
 				return defn;
 			}
 		}
 		return null;
 	}
 	
-	public UITabDefinition getTabDefinition(String name) {
-		if ( tabDefinitions != null ) {
-			for (UITabDefinition tabDefn : tabDefinitions) {
-				if ( tabDefn.getName().equals(name) ) {
-					return tabDefn;
+	public UITabSet getTabSet(String name) {
+		if ( tabSets != null ) {
+			for (UITabSet tabSet : tabSets) {
+				if ( tabSet.getName().equals(name) ) {
+					return tabSet;
 				}
 			}
 		}
 		return null;
 	}
 	
-	public void addTabDefinition(UITabDefinition tabDefn) {
-		if ( tabDefinitions == null ) {
-			tabDefinitions = new ArrayList<UITabDefinition>();
+	public void addTabSet(UITabSet tabSet) {
+		if ( tabSets == null ) {
+			tabSets = new ArrayList<UITabSet>();
 		}
-		tabDefinitions.add(tabDefn);
+		tabSets.add(tabSet);
 	}
 	
-	public void setTabDefinition(int index, UITabDefinition tabDefn) {
-		if ( tabDefinitions == null ) {
-			tabDefinitions = new ArrayList<UITabDefinition>();
+	public void setTabSet(int index, UITabSet tabSet) {
+		if ( tabSets == null ) {
+			tabSets = new ArrayList<UITabSet>();
 		}
-		tabDefinitions.set(index, tabDefn);
+		tabSets.set(index, tabSet);
 	}
 	
-	public void removeTabDefinition(UITabDefinition tabDefn) {
-		tabDefinitions.remove(tabDefn);
+	public void removeTabSet(UITabSet tabSet) {
+		tabSets.remove(tabSet);
 	}
 	
-	public UITabDefinition updateTabDefinition(String name, String newName) {
-		UITabDefinition tabDefn = getTabDefinition(name);
-		tabDefn.setName(newName);
-		return tabDefn;
+	public UITabSet updateTabSet(String name, String newName) {
+		UITabSet tabSet = getTabSet(name);
+		tabSet.setName(newName);
+		return tabSet;
 	}
 	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((tabDefinitions == null) ? 0 : tabDefinitions.hashCode());
+		result = prime * result + ((tabSets == null) ? 0 : tabSets.hashCode());
 		return result;
 	}
 
@@ -275,10 +256,10 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		UIOptions other = (UIOptions) obj;
-		if (tabDefinitions == null) {
-			if (other.tabDefinitions != null)
+		if (tabSets == null) {
+			if (other.tabSets != null)
 				return false;
-		} else if (!tabDefinitions.equals(other.tabDefinitions))
+		} else if (!tabSets.equals(other.tabSets))
 			return false;
 		return true;
 	}

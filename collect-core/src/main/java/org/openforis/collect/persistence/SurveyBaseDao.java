@@ -11,13 +11,11 @@ import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.CollectSurveyContext;
 import org.openforis.collect.model.SurveySummary;
 import org.openforis.collect.persistence.jooq.JooqDaoSupport;
-import org.openforis.idm.metamodel.ExternalCodeListProvider;
 import org.openforis.idm.metamodel.Survey;
-import org.openforis.idm.metamodel.validation.Validator;
 import org.openforis.idm.metamodel.xml.IdmlValidator;
 import org.openforis.idm.metamodel.xml.InvalidIdmlException;
-import org.openforis.idm.metamodel.xml.SurveyBinder;
-import org.openforis.idm.model.expression.ExpressionFactory;
+import org.openforis.idm.metamodel.xml.SurveyIdmlBinder;
+import org.openforis.idm.metamodel.xml.XmlParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -26,17 +24,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 abstract class SurveyBaseDao extends JooqDaoSupport {
 	
 	@Autowired
-	protected ExpressionFactory expressionFactory;
-	@Autowired
-	protected Validator validator;
-	@Autowired
-	protected ExternalCodeListProvider externalCodeListProvider;
-
 	protected CollectSurveyContext surveyContext;
 	
 	public void init() {
-		surveyContext = new CollectSurveyContext(expressionFactory, validator,
-				externalCodeListProvider);
+		
 	}
 
 	protected abstract <T extends CollectSurvey> T processSurveyRow(Record row);
@@ -51,12 +42,12 @@ abstract class SurveyBaseDao extends JooqDaoSupport {
 	
 	@SuppressWarnings("unchecked")
 	public <T extends CollectSurvey> T unmarshalIdml(InputStream is) throws IOException {
-		SurveyBinder parser = new SurveyBinder(surveyContext);
+		SurveyIdmlBinder parser = new SurveyIdmlBinder(surveyContext);
 		T survey;
 		try {
 			survey = (T) parser.unmarshal(is);
-		} catch (InvalidIdmlException e) {
-			throw new DataInconsistencyException("Invalid idm");
+		} catch (XmlParseException e) {
+			throw new DataInconsistencyException("Invalid idm", e);
 		}
 		return survey;
 	}
@@ -78,12 +69,12 @@ abstract class SurveyBaseDao extends JooqDaoSupport {
 	}
 	
 	public void marshalSurvey(Survey survey, OutputStream os) throws SurveyImportException {
-		try {
-			SurveyBinder parser = new SurveyBinder(surveyContext);
-			//parser.marshal(survey, os);
-		} catch (IOException e) {
-			throw new SurveyImportException("Error marshalling survey", e);
-		}
+//		try {
+//			SurveyBinder parser = new SurveyBinder(surveyContext);
+//			//parser.marshal(survey, os);
+//		} catch (IOException e) {
+//			throw new SurveyImportException("Error marshalling survey", e);
+//		}
 	}
 	
 }

@@ -4,9 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
 import java.util.Arrays;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -16,19 +13,14 @@ import junit.framework.Assert;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.openforis.collect.CollectIntegrationTest;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
-import org.openforis.collect.model.CollectSurveyContext;
 import org.openforis.collect.model.RecordSummarySortField;
 import org.openforis.collect.model.RecordSummarySortField.Sortable;
-import org.openforis.collect.persistence.xml.CollectIdmlBindingContext;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.Survey;
-import org.openforis.idm.metamodel.validation.Validator;
-import org.openforis.idm.metamodel.xml.InvalidIdmlException;
-import org.openforis.idm.metamodel.xml.SurveyUnmarshaller;
 import org.openforis.idm.model.Code;
 import org.openforis.idm.model.Coordinate;
 import org.openforis.idm.model.Date;
@@ -36,30 +28,13 @@ import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.EntityBuilder;
 import org.openforis.idm.model.RealAttribute;
 import org.openforis.idm.model.Time;
-import org.openforis.idm.model.expression.ExpressionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.transaction.TransactionConfiguration;
-import org.springframework.transaction.annotation.Transactional;
 
-@RunWith( SpringJUnit4ClassRunner.class )
-@ContextConfiguration( locations = {"classpath:test-context.xml"} )
-@TransactionConfiguration(defaultRollback=true)
-@Transactional
-public class ModelDaoIntegrationTest {
+public class ModelDaoIntegrationTest extends CollectIntegrationTest {
 	private final Log log = LogFactory.getLog(ModelDaoIntegrationTest.class);
 	
 	@Autowired
-	protected SurveyDao surveyDao;
-	
-	@Autowired
 	protected RecordDao recordDao;
-	@Autowired
-	private ExpressionFactory expressionFactory;
-	
-	@Autowired
-	private Validator validator;
 	
 	//@Test
 	public void testCRUD() throws Exception  {
@@ -125,18 +100,6 @@ public class ModelDaoIntegrationTest {
 	public void testSurveyNotFoundByName() {		
 		Survey survey = surveyDao.load("!!!!!!");
 		assertNull(survey);
-	}
-
-	private CollectSurvey importModel() throws IOException, SurveyImportException, InvalidIdmlException {
-		URL idm = ClassLoader.getSystemResource("test.idm.xml");
-		InputStream is = idm.openStream();
-		CollectSurveyContext surveyContext = new CollectSurveyContext(expressionFactory, validator, null);
-		CollectIdmlBindingContext idmlBindingContext = new CollectIdmlBindingContext(surveyContext);
-		SurveyUnmarshaller surveyUnmarshaller = idmlBindingContext.createSurveyUnmarshaller();
-		CollectSurvey survey = (CollectSurvey) surveyUnmarshaller.unmarshal(is);
-		survey.setName("archenland1");
-		surveyDao.importModel(survey);
-		return survey;
 	}
 
 	private CollectRecord createTestRecord(CollectSurvey survey, String id) {

@@ -9,6 +9,7 @@ import java.util.List;
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.collect.Proxy;
 import org.openforis.idm.metamodel.CodeList;
+import org.openforis.idm.metamodel.ModelVersion;
 
 /**
  * @author M. Togna
@@ -39,12 +40,14 @@ public class CodeListProxy implements Proxy {
 
 	@ExternalizedProperty
 	public String getSinceVersionName() {
-		return codeList.getSinceVersionName();
+		ModelVersion sinceVersion = codeList.getSinceVersion();
+		return sinceVersion != null ? sinceVersion.getName(): null;
 	}
 
 	@ExternalizedProperty
 	public String getDeprecatedVersionName() {
-		return codeList.getDeprecatedVersionName();
+		ModelVersion deprecatedVersion = codeList.getDeprecatedVersion();
+		return deprecatedVersion != null ? deprecatedVersion.getName(): null;
 	}
 
 	@ExternalizedProperty

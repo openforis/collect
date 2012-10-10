@@ -1,20 +1,14 @@
 package org.openforis.collect.persistence;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
 import java.util.GregorianCalendar;
 
 import junit.framework.Assert;
 
 import org.junit.Test;
+import org.openforis.collect.CollectIntegrationTest;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
-import org.openforis.collect.model.CollectSurveyContext;
-import org.openforis.collect.persistence.xml.CollectIdmlBindingContext;
-import org.openforis.idm.metamodel.xml.InvalidIdmlException;
-import org.openforis.idm.metamodel.xml.SurveyUnmarshaller;
 import org.openforis.idm.model.Code;
 import org.openforis.idm.model.Coordinate;
 import org.openforis.idm.model.Date;
@@ -23,9 +17,8 @@ import org.openforis.idm.model.EntityBuilder;
 import org.openforis.idm.model.ModelSerializer;
 import org.openforis.idm.model.RealAttribute;
 import org.openforis.idm.model.Time;
-import org.openforis.idm.model.expression.ExpressionFactory;
 
-public class ModelSerializationTest {
+public class ModelSerializationTest extends CollectIntegrationTest {
 //	private final Log log = LogFactory.getLog(ModelSerializationTest.class);
 	
 	@Test
@@ -47,17 +40,6 @@ public class ModelSerializationTest {
 		Assert.assertEquals(entity, reloadedEntity);
 	}
 	
-	private CollectSurvey loadSurvey() throws IOException, SurveyImportException, InvalidIdmlException {
-		URL idm = ClassLoader.getSystemResource("test.idm.xml");
-		InputStream is = idm.openStream();
-		CollectSurveyContext context = new CollectSurveyContext(new ExpressionFactory(), null, null);
-		CollectIdmlBindingContext idmlBindingContext = new CollectIdmlBindingContext(context);
-		SurveyUnmarshaller surveyUnmarshaller = idmlBindingContext.createSurveyUnmarshaller();
-		CollectSurvey survey = (CollectSurvey) surveyUnmarshaller.unmarshal(is);
-		survey.setName("archenland1");
-		return survey;
-	}
-
 	private CollectRecord createTestRecord(CollectSurvey survey) {
 		CollectRecord record = new CollectRecord(survey, "2.0");
 		Entity cluster = record.createRootEntity("cluster");

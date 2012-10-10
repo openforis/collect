@@ -33,6 +33,11 @@ public abstract class BaseVM {
 		return sessionStatus;
 	}
 	
+	public String getCurrentLanguageCode() {
+		SessionStatus sessionStatus = getSessionStatus();
+		return sessionStatus.getCurrentLanguageCode();
+	}
+	
 	protected Session getSession() {
 		Session session = Executions.getCurrent().getSession();
 		return session;

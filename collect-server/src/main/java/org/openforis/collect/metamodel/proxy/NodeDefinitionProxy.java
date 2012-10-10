@@ -11,7 +11,7 @@ import javax.xml.namespace.QName;
 
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.collect.Proxy;
-import org.openforis.collect.model.ui.UIOptions;
+import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.BooleanAttributeDefinition;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
@@ -19,6 +19,7 @@ import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
 import org.openforis.idm.metamodel.DateAttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.FileAttributeDefinition;
+import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NumberAttributeDefinition;
 import org.openforis.idm.metamodel.NumericAttributeDefinition;
@@ -81,7 +82,8 @@ public class NodeDefinitionProxy implements Proxy {
 	}
 
 	public String getSinceVersionName() {
-		return nodeDefinition.getSinceVersionName();
+		ModelVersion sinceVersion = nodeDefinition.getSinceVersion();
+		return sinceVersion != null ? sinceVersion.getName(): null;
 	}
 
 	@ExternalizedProperty

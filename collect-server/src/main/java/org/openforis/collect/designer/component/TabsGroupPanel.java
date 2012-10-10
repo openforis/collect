@@ -3,7 +3,7 @@
  */
 package org.openforis.collect.designer.component;
 
-import org.openforis.collect.model.ui.UITab;
+import org.openforis.collect.metamodel.ui.UITab;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.IdSpace;
 import org.zkoss.zk.ui.select.Selectors;

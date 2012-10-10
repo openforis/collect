@@ -4,13 +4,13 @@
 package org.openforis.collect.designer.form;
 
 import org.openforis.idm.metamodel.ModelVersion;
-import org.openforis.idm.metamodel.Versionable;
+import org.openforis.idm.metamodel.VersionableSurveyObject;
 
 /**
  * @author S. Ricci
  *
  */
-public class VersionableItemFormObject<T extends Versionable> extends ItemFormObject<T> {
+public class VersionableItemFormObject<T extends VersionableSurveyObject> extends ItemFormObject<T> {
 
 	private ModelVersion sinceVersion;
 	

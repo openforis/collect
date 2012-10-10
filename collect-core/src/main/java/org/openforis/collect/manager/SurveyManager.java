@@ -13,15 +13,14 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
+import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.CollectSurveyContext;
 import org.openforis.collect.model.SurveySummary;
-import org.openforis.collect.model.ui.UIOptions;
 import org.openforis.collect.persistence.SurveyDao;
 import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.collect.persistence.SurveyWorkDao;
-import org.openforis.idm.metamodel.Configuration;
 import org.openforis.idm.metamodel.LanguageSpecificText;
-import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.xml.InvalidIdmlException;
 import org.openforis.idm.util.CollectionUtil;
@@ -39,6 +38,8 @@ public class SurveyManager {
 	private SurveyDao surveyDao;
 	@Autowired
 	private SurveyWorkDao surveyWorkDao;
+	@Autowired
+	private CollectSurveyContext collectSurveyContext;
 	
 	private List<CollectSurvey> surveys;
 	private Map<Integer, CollectSurvey> surveysById;
@@ -192,11 +193,9 @@ public class SurveyManager {
 	}
 
 	public CollectSurvey createSurveyWork() {
-		CollectSurvey survey = new CollectSurvey();
-		Schema schema = new Schema();
-		survey.setSchema(schema);
-		Configuration config = new UIOptions();
-		survey.addConfiguration(config);
+		CollectSurvey survey = (CollectSurvey) collectSurveyContext.createSurvey();
+		UIOptions uiOptions = new UIOptions();
+		survey.setUIOptions(uiOptions);
 		return survey;
 	}
 	

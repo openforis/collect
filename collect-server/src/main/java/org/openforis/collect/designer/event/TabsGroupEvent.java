@@ -3,7 +3,7 @@
  */
 package org.openforis.collect.designer.event;
 
-import org.openforis.collect.model.ui.UITabsGroup;
+import org.openforis.collect.metamodel.ui.UITabSet;
 import org.zkoss.zk.ui.event.Event;
 
 /**
@@ -17,14 +17,14 @@ public class TabsGroupEvent extends Event {
 	public static final String ADD_TAB = "onAddTab";
 	public static final String GROUP_CHANGE = "onGroupChange";
 	
-	private UITabsGroup tabsGroup;
+	private UITabSet tabsGroup;
 
-	public TabsGroupEvent(String name, UITabsGroup tabsGroup) {
+	public TabsGroupEvent(String name, UITabSet tabsGroup) {
 		super(name);
 		this.tabsGroup = tabsGroup;
 	}
 
-	public UITabsGroup getTabsGroup() {
+	public UITabSet getTabsGroup() {
 		return tabsGroup;
 	}
 	

@@ -6,6 +6,7 @@ import java.util.List;
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.collect.Proxy;
 import org.openforis.idm.metamodel.Precision;
+import org.openforis.idm.metamodel.Unit;
 
 /**
  * 
@@ -42,7 +43,8 @@ public class PrecisionProxy implements Proxy {
 
 	@ExternalizedProperty
 	public String getUnitName() {
-		return precision.getUnitName();
+		Unit unit = precision.getUnit();
+		return unit != null ? unit.getName(): null;
 	}
 	
 	@ExternalizedProperty

@@ -7,7 +7,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
-import java.net.URL;
 import java.util.GregorianCalendar;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -20,16 +19,12 @@ import javax.xml.xpath.XPathFactory;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.openforis.collect.CollectIntegrationTest;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
-import org.openforis.collect.model.CollectSurveyContext;
 import org.openforis.collect.model.FieldSymbol;
-import org.openforis.collect.persistence.xml.CollectIdmlBindingContext;
 import org.openforis.collect.persistence.xml.DataMarshaller;
-import org.openforis.idm.metamodel.validation.Validator;
-import org.openforis.idm.metamodel.xml.InvalidIdmlException;
-import org.openforis.idm.metamodel.xml.SurveyUnmarshaller;
 import org.openforis.idm.model.Code;
 import org.openforis.idm.model.CodeAttribute;
 import org.openforis.idm.model.Coordinate;
@@ -38,7 +33,6 @@ import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.EntityBuilder;
 import org.openforis.idm.model.RealAttribute;
 import org.openforis.idm.model.Time;
-import org.openforis.idm.model.expression.ExpressionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -51,16 +45,7 @@ import org.xml.sax.SAXException;
 @ContextConfiguration( locations = {"classpath:test-context.xml"} )
 @TransactionConfiguration(defaultRollback=true)
 @Transactional
-public class DataMarshallerTest {
-	
-	@Autowired
-	protected SurveyDao surveyDao;
-	
-	@Autowired
-	private ExpressionFactory expressionFactory;
-	
-	@Autowired
-	private Validator validator;
+public class DataMarshallerTest extends CollectIntegrationTest {
 	
 	@Autowired
 	private DataMarshaller dataMarshaller;
@@ -184,19 +169,6 @@ public class DataMarshallerTest {
 			EntityBuilder.addValue(tree2, "total_height", 4.0);
 		}
 	}
-	
-	private CollectSurvey importModel() throws IOException, SurveyImportException, InvalidIdmlException {
-		URL idm = ClassLoader.getSystemResource("test.idm.xml");
-		InputStream is = idm.openStream();
-		CollectSurveyContext surveyContext = new CollectSurveyContext(expressionFactory, validator, null);
-		CollectIdmlBindingContext idmlBindingContext = new CollectIdmlBindingContext(surveyContext);
-		SurveyUnmarshaller surveyUnmarshaller = idmlBindingContext.createSurveyUnmarshaller();
-		CollectSurvey survey = (CollectSurvey) surveyUnmarshaller.unmarshal(is);
-		survey.setName("archenland1");
-		surveyDao.importModel(survey);
-		return survey;
-	}
-
 	
 	private Document parseXml(String xml) throws SAXException, IOException, ParserConfigurationException {
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
