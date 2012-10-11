@@ -1,5 +1,7 @@
 package org.openforis.collect.persistence.xml;
 
+import static org.openforis.collect.metamodel.ui.UIOptionsConstants.*;
+
 import java.io.IOException;
 import java.util.List;
 
@@ -7,6 +9,7 @@ import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.metamodel.ui.UITab;
 import org.openforis.collect.metamodel.ui.UITabSet;
 import org.openforis.idm.metamodel.LanguageSpecificText;
+import org.openforis.idm.metamodel.xml.IdmlConstants;
 import org.openforis.idm.metamodel.xml.XmlParseException;
 import org.openforis.idm.metamodel.xml.internal.marshal.XmlPullReader;
 import org.xmlpull.v1.XmlPullParser;
@@ -22,7 +25,7 @@ public class UIOptionsPullReader extends XmlPullReader {
 	private UIOptions uiOptions;
 
 	public UIOptionsPullReader() {
-		super(UIOptions.UI_NAMESPACE_URI, "tabSets");
+		super(UI_NAMESPACE_URI, TAB_SETS);
 		
 		addChildPullReaders(
 			new TabSetPR()
@@ -42,7 +45,7 @@ public class UIOptionsPullReader extends XmlPullReader {
 	private class TabSetPR extends TabSetPRBase {
 
 		public TabSetPR() {
-			super("tabSet");
+			super(TAB_SET);
 			
 			addChildPullReaders(
 				new TabPR()
@@ -53,7 +56,7 @@ public class UIOptionsPullReader extends XmlPullReader {
 		protected void onStartTag() throws XmlParseException,
 				XmlPullParserException, IOException {
 			tabSet = new UITabSet();
-			tabSet.setName(getAttribute("name", true));
+			tabSet.setName(getAttribute(NAME, true));
 			
 			setParentSetInChildren(tabSet);
 		}
@@ -80,7 +83,7 @@ public class UIOptionsPullReader extends XmlPullReader {
 		protected UITabSet tabSet;
 
 		public TabSetPRBase(String tabName) {
-			super(UIOptions.UI_NAMESPACE_URI, tabName);
+			super(UI_NAMESPACE_URI, tabName);
 		}
 		
 		@Override
@@ -116,7 +119,7 @@ public class UIOptionsPullReader extends XmlPullReader {
 		
 		@Override
 		protected void onStartTag() throws XmlParseException, XmlPullParserException, IOException {
-			String name = getAttribute("name", false);
+			String name = getAttribute(NAME, false);
 			tabSet = new UITab();
 			tabSet.setName(name);
 		}
@@ -127,8 +130,9 @@ public class UIOptionsPullReader extends XmlPullReader {
 		}
 		
 		private class LabelPR extends LanguageSpecificTextPR {
+
 			public LabelPR() {
-				super("label");
+				super(LABEL);
 			}
 			
 			@Override
@@ -142,7 +146,7 @@ public class UIOptionsPullReader extends XmlPullReader {
 		private boolean requireType;
 		
 		public LanguageSpecificTextPR(String tagName, boolean requireType) {
-			super(UIOptions.UI_NAMESPACE_URI, tagName);
+			super(UI_NAMESPACE_URI, tagName);
 			this.requireType = requireType;
 		}
 		
@@ -153,8 +157,8 @@ public class UIOptionsPullReader extends XmlPullReader {
 		@Override
 		protected void onStartTag() throws XmlParseException, XmlPullParserException, IOException {
 			XmlPullParser parser = getParser();
-			String lang = parser.getAttributeValue(UIOptions.UI_NAMESPACE_URI, "lang");
-			String type = getAttribute("type", requireType);
+			String lang = parser.getAttributeValue(UI_NAMESPACE_URI, IdmlConstants.XML_LANG_ATTRIBUTE);
+			String type = getAttribute(TYPE, requireType);
 			String text = parser.nextText();
 			processText(lang, type, text);
 		}

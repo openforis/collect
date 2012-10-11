@@ -1,6 +1,7 @@
 package org.openforis.collect.metamodel.ui;
 
 import java.io.Serializable;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -17,6 +18,8 @@ import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.util.CollectionUtil;
 
+import static org.openforis.collect.metamodel.ui.UIOptionsConstants.*;
+
 
 /**
  * @author M. Togna
@@ -25,19 +28,15 @@ import org.openforis.idm.util.CollectionUtil;
  */
 public class UIOptions implements ApplicationOptions, Serializable {
 
-	public static final String UI_TYPE = "ui";
-
 	private static final long serialVersionUID = 1L;
 	
-	public static final String UI_NAMESPACE_URI = "http://www.openforis.org/collect/3.0/ui";
-	
 	public enum Annotation {
-		TAB_SET(new QName(UI_NAMESPACE_URI, "tabSet")),
-		TAB_NAME(new QName(UI_NAMESPACE_URI, "tab")),
-		LAYOUT(new QName(UI_NAMESPACE_URI, "layout")),
-		COUNT_IN_SUMMARY_LIST(new QName(UI_NAMESPACE_URI, "count")),
-		SHOW_ROW_NUMBERS(new QName(UI_NAMESPACE_URI, "showRowNumbers")),
-		AUTOCOMPLETE(new QName(UI_NAMESPACE_URI, "autocomplete"));
+		TAB_SET(new QName(UI_NAMESPACE_URI, UIOptionsConstants.TAB_SET_NAME)),
+		TAB_NAME(new QName(UI_NAMESPACE_URI, UIOptionsConstants.TAB_NAME)),
+		LAYOUT(new QName(UI_NAMESPACE_URI, UIOptionsConstants.LAYOUT)),
+		COUNT_IN_SUMMARY_LIST(new QName(UI_NAMESPACE_URI, UIOptionsConstants.COUNT)),
+		SHOW_ROW_NUMBERS(new QName(UI_NAMESPACE_URI, UIOptionsConstants.SHOW_ROW_NUMBERS)),
+		AUTOCOMPLETE(new QName(UI_NAMESPACE_URI, UIOptionsConstants.AUTOCOMPLETE));
 		
 		private QName qName;
 

@@ -6,6 +6,7 @@ package org.openforis.collect.model;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.openforis.collect.metamodel.ui.UIOptions;
+import org.openforis.collect.metamodel.ui.UIOptionsConstants;
 import org.openforis.idm.metamodel.ApplicationOptions;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.SurveyContext;
@@ -25,7 +26,7 @@ public class CollectSurvey extends Survey {
 	private static final long serialVersionUID = 1L;
 
 	public UIOptions getUIOptions() {
-		ApplicationOptions applicationOptions = getApplicationOptions(UIOptions.UI_TYPE);
+		ApplicationOptions applicationOptions = getApplicationOptions(UIOptionsConstants.UI_TYPE);
 		return (UIOptions) applicationOptions;
 	}
 

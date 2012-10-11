@@ -6,6 +6,7 @@ package org.openforis.collect.persistence.xml;
 import java.io.StringReader;
 
 import org.openforis.collect.metamodel.ui.UIOptions;
+import org.openforis.collect.metamodel.ui.UIOptionsConstants;
 import org.openforis.collect.persistence.DataInconsistencyException;
 import org.openforis.idm.metamodel.xml.ApplicationOptionsBinder;
 import org.xmlpull.v1.XmlPullParser;
@@ -43,7 +44,7 @@ public class UIOptionsBinder implements
 
 	@Override
 	public boolean isSupported(String optionsType) {
-		if ( UIOptions.UI_TYPE.equals(optionsType) ) {
+		if ( UIOptionsConstants.UI_TYPE.equals(optionsType) ) {
 			return true;
 		} else {
 			return false;
