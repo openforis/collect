@@ -35,6 +35,7 @@ import java.nio.charset.UnsupportedCharsetException;
  * painfully slow like the normal one.  It only does what is needed for the
  * specific XML files being written with it.
  */
+@Deprecated
 public class XmlPullSerializer implements org.xmlpull.v1.XmlSerializer {
 
 	private static final String ESCAPE_TABLE[] = new String[] {

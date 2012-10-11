@@ -32,7 +32,7 @@ public class UIOptions implements ApplicationOptions, Serializable {
 	
 	public enum Annotation {
 		TAB_SET(new QName(UI_NAMESPACE_URI, UIOptionsConstants.TAB_SET_NAME)),
-		TAB_NAME(new QName(UI_NAMESPACE_URI, UIOptionsConstants.TAB_NAME)),
+		TAB_NAME(new QName(UI_NAMESPACE_URI, UIOptionsConstants.TAB)),
 		LAYOUT(new QName(UI_NAMESPACE_URI, UIOptionsConstants.LAYOUT)),
 		COUNT_IN_SUMMARY_LIST(new QName(UI_NAMESPACE_URI, UIOptionsConstants.COUNT)),
 		SHOW_ROW_NUMBERS(new QName(UI_NAMESPACE_URI, UIOptionsConstants.SHOW_ROW_NUMBERS)),

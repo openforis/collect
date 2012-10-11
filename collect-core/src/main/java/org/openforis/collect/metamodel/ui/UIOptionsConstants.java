@@ -14,12 +14,11 @@ public interface UIOptionsConstants {
 
 	String AUTOCOMPLETE = "autocomplete";
 	String TAB_SET_NAME = "tabSet";
-	String TAB_NAME = "tab";
+	String TAB = "tab";
 	String LAYOUT = "layout";
 	String COUNT = "count";
 	String SHOW_ROW_NUMBERS = "showRowNumbers";
 
-	String TAB_SETS = "tabSets";
 	String TAB_SET = "tabSet";
 	String NAME = "name";
 	String TYPE = "type";

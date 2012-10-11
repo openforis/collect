@@ -1,5 +1,6 @@
 package org.openforis.collect.persistence.xml;
 
+import org.kxml2.io.KXmlSerializer;
 import org.xmlpull.v1.XmlSerializer;
 
 /**
@@ -7,11 +8,10 @@ import org.xmlpull.v1.XmlSerializer;
  * @author S. Ricci
  *
  */
-public class XmlPullSerializerFactory implements XmlSerializerFactory {
+public final class XmlPullSerializerFactory {
 
-	@Override
-	public XmlSerializer getSerializer() {
-		return new XmlPullSerializer();
+	public static XmlSerializer createInstance() {
+		return new KXmlSerializer();
 	}
 	
 }

@@ -40,7 +40,7 @@ public class DataMarshaller {
 	private static final String REMARKS_ATTRIBUTE = "remarks";
 	
 	public void write(CollectRecord record, Writer out) throws IOException {
-		XmlSerializer serializer = new XmlPullSerializer();
+		XmlSerializer serializer = XmlPullSerializerFactory.createInstance();
 		serializer.setOutput(out);
 		serializer.startDocument("UTF-8", true);
 		
