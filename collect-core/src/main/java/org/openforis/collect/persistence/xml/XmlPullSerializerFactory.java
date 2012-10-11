@@ -10,8 +10,14 @@ import org.xmlpull.v1.XmlSerializer;
  */
 public final class XmlPullSerializerFactory {
 
-	public static XmlSerializer createInstance() {
+	public static XmlPullSerializerFactory createInstance() {
+		return new XmlPullSerializerFactory();
+	}
+	
+	public XmlSerializer createSerializer() {
 		return new KXmlSerializer();
 	}
+	
+	
 	
 }
