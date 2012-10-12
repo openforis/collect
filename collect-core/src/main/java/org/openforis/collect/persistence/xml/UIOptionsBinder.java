@@ -17,6 +17,7 @@ import org.openforis.collect.persistence.xml.internal.unmarshal.UITabSetPR;
 import org.openforis.idm.metamodel.xml.ApplicationOptionsBinder;
 import org.openforis.idm.metamodel.xml.XmlParseException;
 import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
 
 /**
@@ -36,19 +37,29 @@ public class UIOptionsBinder implements
 			StringReader reader = new StringReader(body);
 			parser.setInput(reader);
 			UIOptions uiOptions = new UIOptions();
-			while ( true ) {
-				try {
-					UITabSetPR tabSetPR = new UITabSetPR();
-					tabSetPR.parse(parser);
-					UITabSet tabSet = tabSetPR.getTabSet();
-					uiOptions.addTabSet(tabSet);
-				} catch ( XmlParseException e) {
-					break;
-				}
+			UITabSet tabSet = unmarshalTabSet(parser);
+			while ( tabSet != null ) {
+				uiOptions.addTabSet(tabSet);
+				tabSet = unmarshalTabSet(parser);
 			}
 			return uiOptions;
 		} catch (Exception e) {
 			throw new DataInconsistencyException(e.getMessage(), e);
+		}
+	}
+
+	private UITabSet unmarshalTabSet(XmlPullParser parser) throws IOException, XmlPullParserException, XmlParseException {
+		try {
+			UITabSetPR tabSetPR = new UITabSetPR();
+			tabSetPR.parse(parser);
+			UITabSet tabSet = tabSetPR.getTabSet();
+			return tabSet;
+		} catch ( XmlParseException e) {
+			if ( parser != null && parser.getEventType() == XmlPullParser.END_DOCUMENT ) {
+				return null;
+			} else {
+				throw e;
+			}
 		}
 	}
 
