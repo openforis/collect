@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.openforis.idm.metamodel.LanguageSpecificText;
+import org.openforis.idm.metamodel.LanguageSpecificTextMap;
 
 /**
  * 
@@ -16,36 +17,36 @@ public class UITab extends UITabSet {
 
 	private static final long serialVersionUID = 1L;
 
-	private List<LanguageSpecificText> labels;
+	private LanguageSpecificTextMap labels;
 
 	public List<LanguageSpecificText> getLabels() {
-		return Collections.unmodifiableList(this.labels);
-	}
-
-	public String getLabel(String language) {
-		if (labels != null ) {
-			return LanguageSpecificText.getText(labels, language);
+		if ( labels == null ) {
+			return Collections.emptyList();
 		} else {
-			return null;
+			return labels.getAll();
 		}
 	}
 	
+	public String getLabel(String language) {
+		return labels == null ? null: labels.getText(language);
+	}
+	
+	public void addLabel(LanguageSpecificText label) {
+		if ( labels == null ) {
+			labels = new LanguageSpecificTextMap();
+		}
+		labels.add(label);
+	}
+
 	public void setLabel(String language, String text) {
 		if ( labels == null ) {
-			labels = new ArrayList<LanguageSpecificText>();
+			labels = new LanguageSpecificTextMap();
 		}
-		LanguageSpecificText.setText(labels, language, text);
+		labels.setText(language, text);
 	}
 	
-	public void addLabel(LanguageSpecificText text) {
-		if ( labels == null ) {
-			labels = new ArrayList<LanguageSpecificText>();
-		}
-		labels.add(text);
-	}
-
 	public void removeLabel(String language) {
-		LanguageSpecificText.remove(labels, language);
+		labels.remove(language);
 	}
 
 	@Override
