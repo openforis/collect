@@ -25,7 +25,6 @@ package org.openforis.collect.metamodel.proxy {
 						return true;
 					}
 				}
-				
 			}
 			return false;
 		}

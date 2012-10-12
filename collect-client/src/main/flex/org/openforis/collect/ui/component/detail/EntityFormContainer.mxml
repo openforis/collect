@@ -24,6 +24,7 @@
 			import org.openforis.collect.presenter.EntityFormPresenter;
 			import org.openforis.collect.ui.UIBuilder;
 			import org.openforis.collect.util.ApplicationConstants;
+			import org.openforis.collect.util.CollectionUtil;
 			import org.openforis.collect.util.StringUtil;
 			
 			public static const STATE_WITH_TABS:String = "withTabs";
@@ -58,7 +59,7 @@
 				} else {
 					this.label = entityDefinition.getLabelText();
 				}
-				if(uiTab != null && uiTab.tabs != null) {
+				if(uiTab != null && CollectionUtil.isNotEmpty(uiTab.tabs) ) {
 					uiTabs = uiTab.tabs;
 					this.currentState = STATE_WITH_TABS;
 				} else {
@@ -230,7 +231,7 @@
 								entityDefinition="{entityDefinition}"
 								nodeDefinitions="{IList(definitionsPerTab.getItemAt(tabsRP.currentIndex))}"
 								entity="{entity}"
-								label="{tabsRP.currentItem.label}"
+								label="{UITabProxy(tabsRP.currentItem).getLabelText(Application.locale)}"
 								/>
 						</mx:Repeater>
 					</mx:ViewStack>

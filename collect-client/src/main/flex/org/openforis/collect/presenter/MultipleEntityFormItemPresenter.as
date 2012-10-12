@@ -77,7 +77,7 @@ package org.openforis.collect.presenter
 				if ( uiTab != null ) {
 					uiTabs = uiTab.tabs;
 				}
-				if(uiTabs == null) {
+				if ( CollectionUtil.isEmpty(uiTabs) ) {
 					view.currentState = MultipleEntityFormItem.STATE_WITHOUT_TABS;
 					view.definitionsPerMainTab = UIBuilder.getDefinitionsPerMainTab(view.entityDefinition, view.modelVersion);
 				} else {

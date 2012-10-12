@@ -11,10 +11,10 @@ import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.CollectSurveyContext;
 import org.openforis.collect.model.SurveySummary;
 import org.openforis.collect.persistence.jooq.JooqDaoSupport;
+import org.openforis.collect.persistence.xml.CollectSurveyIdmlBinder;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.xml.IdmlValidator;
 import org.openforis.idm.metamodel.xml.InvalidIdmlException;
-import org.openforis.idm.metamodel.xml.SurveyIdmlBinder;
 import org.openforis.idm.metamodel.xml.XmlParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -42,10 +42,10 @@ abstract class SurveyBaseDao extends JooqDaoSupport {
 	
 	@SuppressWarnings("unchecked")
 	public <T extends CollectSurvey> T unmarshalIdml(InputStream is) throws IOException {
-		SurveyIdmlBinder parser = new SurveyIdmlBinder(surveyContext);
+		CollectSurveyIdmlBinder binder = new CollectSurveyIdmlBinder(surveyContext);
 		T survey;
 		try {
-			survey = (T) parser.unmarshal(is);
+			survey = (T) binder.unmarshal(is);
 		} catch (XmlParseException e) {
 			throw new DataInconsistencyException("Invalid idm", e);
 		}
@@ -70,8 +70,8 @@ abstract class SurveyBaseDao extends JooqDaoSupport {
 	
 	public void marshalSurvey(Survey survey, OutputStream os) throws SurveyImportException {
 //		try {
-//			SurveyBinder parser = new SurveyBinder(surveyContext);
-//			//parser.marshal(survey, os);
+//			CollectSurveyIdmlBinder binder = new CollectSurveyIdmlBinder(surveyContext);
+//			binder.marshal(survey, os);
 //		} catch (IOException e) {
 //			throw new SurveyImportException("Error marshalling survey", e);
 //		}

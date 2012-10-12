@@ -89,7 +89,7 @@ package org.openforis.collect.ui {
 			
 			addMainEntityFormContainer(formContainer, rootEntity, version);
 			
-			var tabSet:UITabSetProxy = getRootEntityTabDefinition(rootEntity);
+			var tabSet:UITabSetProxy = getRootEntityTabSet(rootEntity);
 			if ( tabSet != null && tabSet.tabs != null) {
 				for each (var tab:UITabProxy in tabSet.tabs) {
 					if ( ! isMainTab(rootEntity, tab) ) {
@@ -584,7 +584,7 @@ package org.openforis.collect.ui {
 			return result;
 		}
 		
-		public static function getRootEntityTabDefinition(rootEntityDefinition:EntityDefinitionProxy):UITabSetProxy {
+		public static function getRootEntityTabSet(rootEntityDefinition:EntityDefinitionProxy):UITabSetProxy {
 			var survey:SurveyProxy = rootEntityDefinition.survey;
 			var uiOpts:UIOptionsProxy = survey.uiOptions;
 			var tabSet:UITabSetProxy = null;
@@ -598,7 +598,7 @@ package org.openforis.collect.ui {
 		public static function getUITab(nodeDefn:NodeDefinitionProxy):UITabProxy {
 			var survey:SurveyProxy = nodeDefn.survey;
 			var rootEntity:EntityDefinitionProxy = nodeDefn.rootEntity;
-			var tabSet:UITabSetProxy = getRootEntityTabDefinition(rootEntity);
+			var tabSet:UITabSetProxy = getRootEntityTabSet(rootEntity);
 			if ( tabSet != null ) {
 				var tab:UITabProxy = tabSet.getTab(nodeDefn.uiTabName);
 				return tab;
