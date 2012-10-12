@@ -11,7 +11,7 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.event.InputFieldEvent;
-	import org.openforis.collect.metamodel.ui.UITab;
+	import org.openforis.collect.metamodel.proxy.UITabProxy;
 	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.remoting.service.UpdateRequest;
 	import org.openforis.collect.remoting.service.UpdateRequestOperation;
@@ -72,7 +72,7 @@ package org.openforis.collect.presenter
 					&& view.entityDefinition.multiple
 					&& view.parentEntity != null 
 					&& view.modelVersion != null) {
-				var uiTab:UITab = UIBuilder.getUITab(view.entityDefinition);
+				var uiTab:UITabProxy = UIBuilder.getUITab(view.entityDefinition);
 				var uiTabs:IList = null;
 				if ( uiTab != null ) {
 					uiTabs = uiTab.tabs;

@@ -1,6 +1,5 @@
 package org.openforis.collect.metamodel.ui;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -12,7 +11,6 @@ import org.openforis.idm.metamodel.LanguageSpecificTextMap;
  * @author S. Ricci
  * 
  */
-
 public class UITab extends UITabSet {
 
 	private static final long serialVersionUID = 1L;

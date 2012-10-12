@@ -5,15 +5,11 @@
  * your custom code here.
  */
 
-package org.openforis.collect.metamodel.ui {
-	import org.openforis.collect.metamodel.proxy.LanguageSpecificTextProxy;
+package org.openforis.collect.metamodel.proxy {
 
-	/**
-	 * @author S. Ricci 
-	 */
     [Bindable]
-    [RemoteClass(alias="org.openforis.collect.metamodel.ui.UITab")]
-    public class UITab extends UITabBase {
+    [RemoteClass(alias="org.openforis.collect.metamodel.proxy.UITabProxy")]
+    public class UITabProxy extends UITabProxyBase {
 		
 		public function getLabelText(language:String="en"):String {
 			var result:String = LanguageSpecificTextProxy.getLocalizedText(this.labels, language);
@@ -24,7 +20,7 @@ package org.openforis.collect.metamodel.ui {
 			if(this.tabs == null || this.tabs.length ==0){
 				return false;
 			} else {
-				for each (var tab:UITab in this.tabs) {
+				for each (var tab:UITabProxy in this.tabs) {
 					if(tab.name == name){
 						return true;
 					}

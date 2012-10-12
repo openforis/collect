@@ -5,24 +5,21 @@
  * your custom code here.
  */
 
-package org.openforis.collect.metamodel.ui {
+package org.openforis.collect.metamodel.proxy {
 	import mx.collections.IList;
 	
 	import org.openforis.collect.util.CollectionUtil;
 
-	/**
-	 * S. Ricci
-	 */
     [Bindable]
-    [RemoteClass(alias="org.openforis.collect.metamodel.ui.UITabSet")]
-    public class UITabSet extends UITabSetBase {
+    [RemoteClass(alias="org.openforis.collect.metamodel.proxy.UITabSetProxy")]
+    public class UITabSetProxy extends UITabSetProxyBase {
 		
-		public function getTab(name:String):UITab {
+		public function getTab(name:String):UITabProxy {
 			var stack:Array = new Array();
 			stack.push(tabs);
 			while (stack.length > 0) {
 				var tabs:IList = stack.pop();
-				for each(var tab:UITab in tabs) {
+				for each(var tab:UITabProxy in tabs) {
 					if(tab.name == name) {
 						return tab;
 					}
@@ -33,6 +30,5 @@ package org.openforis.collect.metamodel.ui {
 			}
 			return null;
 		}
-		
     }
 }

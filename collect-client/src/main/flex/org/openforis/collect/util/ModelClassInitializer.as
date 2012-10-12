@@ -32,10 +32,10 @@ package org.openforis.collect.util {
 	import org.openforis.collect.metamodel.proxy.TextAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.TextAttributeDefinitionProxy$Type;
 	import org.openforis.collect.metamodel.proxy.TimeAttributeDefinitionProxy;
+	import org.openforis.collect.metamodel.proxy.UIOptionsProxy;
+	import org.openforis.collect.metamodel.proxy.UITabProxy;
+	import org.openforis.collect.metamodel.proxy.UITabSetProxy;
 	import org.openforis.collect.metamodel.proxy.UnitProxy;
-	import org.openforis.collect.metamodel.ui.UIOptions;
-	import org.openforis.collect.metamodel.ui.UITab;
-	import org.openforis.collect.metamodel.ui.UITabSet;
 	import org.openforis.collect.model.SurveySummary;
 	import org.openforis.collect.model.proxy.AttributeProxy;
 	import org.openforis.collect.model.proxy.CodeAttributeProxy;
@@ -129,9 +129,9 @@ package org.openforis.collect.util {
 				TextAttributeDefinitionProxy$Type,
 				TimeAttributeDefinitionProxy,
 				TimeProxy,
-				UIOptions,
-				UITabSet,
-				UITab,
+				UIOptionsProxy,
+				UITabSetProxy,
+				UITabProxy,
 				UnitProxy,
 				UpdateResponse,
 				ValidationResultsProxy,

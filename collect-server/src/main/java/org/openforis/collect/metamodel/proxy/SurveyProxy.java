@@ -65,9 +65,9 @@ public class SurveyProxy implements Proxy {
 	}
 
 	@ExternalizedProperty
-	public UIOptions getUiOptions() {
+	public UIOptionsProxy getUiOptions() {
 		UIOptions uiOptions = survey.getUIOptions();
-		return uiOptions;
+		return new UIOptionsProxy(uiOptions);
 	}
 
 }

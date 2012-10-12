@@ -26,10 +26,10 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.metamodel.proxy.TextAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.TextAttributeDefinitionProxy$Type;
 	import org.openforis.collect.metamodel.proxy.TimeAttributeDefinitionProxy;
+	import org.openforis.collect.metamodel.proxy.UIOptionsProxy;
+	import org.openforis.collect.metamodel.proxy.UITabProxy;
+	import org.openforis.collect.metamodel.proxy.UITabSetProxy;
 	import org.openforis.collect.metamodel.proxy.UnitProxy;
-	import org.openforis.collect.metamodel.ui.UIOptions;
-	import org.openforis.collect.metamodel.ui.UITab;
-	import org.openforis.collect.metamodel.ui.UITabSet;
 	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.ui.component.datagrid.CompleteColumnItemRenderer;
 	import org.openforis.collect.ui.component.datagrid.RecordSummaryDataGrid;
@@ -89,9 +89,9 @@ package org.openforis.collect.ui {
 			
 			addMainEntityFormContainer(formContainer, rootEntity, version);
 			
-			var tabSet:UITabSet = getRootEntityTabDefinition(rootEntity);
+			var tabSet:UITabSetProxy = getRootEntityTabDefinition(rootEntity);
 			if ( tabSet != null && tabSet.tabs != null) {
-				for each (var tab:UITab in tabSet.tabs) {
+				for each (var tab:UITabProxy in tabSet.tabs) {
 					if ( ! isMainTab(rootEntity, tab) ) {
 						addChildEntityFormContainer(formContainer, rootEntity, version, tab);
 					}
@@ -100,7 +100,7 @@ package org.openforis.collect.ui {
 			return formContainer;
 		}
 		
-		private static function isMainTab(rootEntity:EntityDefinitionProxy, tab:UITab):Boolean {
+		private static function isMainTab(rootEntity:EntityDefinitionProxy, tab:UITabProxy):Boolean {
 			return tab.name == rootEntity.uiTabName;
 		}
 		
@@ -119,7 +119,7 @@ package org.openforis.collect.ui {
 			BindingUtils.bindProperty(form, "entity", formContainer, ["record", "rootEntity"]);
 		}
 		
-		private static function addChildEntityFormContainer(formContainer:FormContainer, rootEntity:EntityDefinitionProxy, version:ModelVersionProxy, tab:UITab):void {
+		private static function addChildEntityFormContainer(formContainer:FormContainer, rootEntity:EntityDefinitionProxy, version:ModelVersionProxy, tab:UITabProxy):void {
 			var childForm:EntityFormContainer = new EntityFormContainer();
 			var child:NodeDefinitionProxy = rootEntity.getChildDefinitionByTabName(tab.name);
 			if(child is EntityDefinitionProxy) {
@@ -548,7 +548,7 @@ package org.openforis.collect.ui {
 		 **/
 		public static function getDefinitionsPerEachSubTab(entityDefinition:EntityDefinitionProxy, modelVersion:ModelVersionProxy):IList {
 			var result:IList = new ArrayCollection();
-			var uiTab:UITab = getUITab(entityDefinition);
+			var uiTab:UITabProxy = getUITab(entityDefinition);
 			if ( uiTab != null ) {
 				var tabs:ListCollectionView = uiTab.tabs;
 				if ( CollectionUtil.isNotEmpty(tabs) ) {
@@ -573,7 +573,7 @@ package org.openforis.collect.ui {
 			
 		public static function getDefinitionsPerMainTab(entityDefinition:EntityDefinitionProxy, modelVersion:ModelVersionProxy):IList {
 			var result:IList = new ArrayCollection();
-			var uiTab:UITab = getUITab(entityDefinition);
+			var uiTab:UITabProxy = getUITab(entityDefinition);
 			var childDefns:IList = UIBuilder.getDefinitionsInVersion(entityDefinition.childDefinitions, modelVersion);
 			for each (var defn:NodeDefinitionProxy in childDefns) {
 				var tabName:String = defn.uiTabName;
@@ -584,10 +584,10 @@ package org.openforis.collect.ui {
 			return result;
 		}
 		
-		public static function getRootEntityTabDefinition(rootEntityDefinition:EntityDefinitionProxy):UITabSet {
+		public static function getRootEntityTabDefinition(rootEntityDefinition:EntityDefinitionProxy):UITabSetProxy {
 			var survey:SurveyProxy = rootEntityDefinition.survey;
-			var uiOpts:UIOptions = survey.uiOptions;
-			var tabSet:UITabSet = null;
+			var uiOpts:UIOptionsProxy = survey.uiOptions;
+			var tabSet:UITabSetProxy = null;
 			if(uiOpts != null) {
 				var tabDefnName:String = rootEntityDefinition.tabDefinitionName;
 				tabSet = uiOpts.getTabSet(tabDefnName);
@@ -595,12 +595,12 @@ package org.openforis.collect.ui {
 			return tabSet;
 		}
 		
-		public static function getUITab(nodeDefn:NodeDefinitionProxy):UITab {
+		public static function getUITab(nodeDefn:NodeDefinitionProxy):UITabProxy {
 			var survey:SurveyProxy = nodeDefn.survey;
 			var rootEntity:EntityDefinitionProxy = nodeDefn.rootEntity;
-			var tabSet:UITabSet = getRootEntityTabDefinition(rootEntity);
+			var tabSet:UITabSetProxy = getRootEntityTabDefinition(rootEntity);
 			if ( tabSet != null ) {
-				var tab:UITab = tabSet.getTab(nodeDefn.uiTabName);
+				var tab:UITabProxy = tabSet.getTab(nodeDefn.uiTabName);
 				return tab;
 			} else {
 				return null;
