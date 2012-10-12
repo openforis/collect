@@ -30,8 +30,4 @@ public class CollectSurvey extends Survey {
 		return (UIOptions) applicationOptions;
 	}
 
-	public void setUIOptions(UIOptions conf) {
-		setApplicationOptions(conf);
-	}
-	
 }

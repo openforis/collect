@@ -6,7 +6,7 @@ import java.io.IOException;
 
 import org.openforis.collect.metamodel.ui.UITabSet;
 import org.openforis.idm.metamodel.xml.XmlParseException;
-import org.openforis.idm.metamodel.xml.internal.marshal.XmlPullReader;
+import org.openforis.idm.metamodel.xml.internal.unmarshal.XmlPullReader;
 import org.xmlpull.v1.XmlPullParserException;
 
 /**

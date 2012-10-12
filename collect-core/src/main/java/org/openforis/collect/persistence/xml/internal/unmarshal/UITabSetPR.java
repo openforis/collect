@@ -11,7 +11,8 @@ import java.util.List;
 
 import org.openforis.collect.metamodel.ui.UITabSet;
 import org.openforis.idm.metamodel.xml.XmlParseException;
-import org.openforis.idm.metamodel.xml.internal.marshal.XmlPullReader;
+import org.openforis.idm.metamodel.xml.internal.unmarshal.XmlPullReader;
+import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
 /**
@@ -26,6 +27,12 @@ public class UITabSetPR extends UITabSetPRBase {
 		addChildPullReaders(
 			new UITabPR()
 		);
+	}
+	
+	@Override
+	public synchronized void parse(XmlPullParser parser)
+			throws XmlParseException, IOException {
+		super.parse(parser);
 	}
 	
 	@Override

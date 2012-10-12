@@ -195,7 +195,7 @@ public class SurveyManager {
 	public CollectSurvey createSurveyWork() {
 		CollectSurvey survey = (CollectSurvey) collectSurveyContext.createSurvey();
 		UIOptions uiOptions = new UIOptions();
-		survey.setUIOptions(uiOptions);
+		survey.addApplicationOptions(uiOptions);
 		return survey;
 	}
 	

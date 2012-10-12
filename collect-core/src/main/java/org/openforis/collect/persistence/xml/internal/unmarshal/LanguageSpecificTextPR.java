@@ -8,7 +8,7 @@ import java.io.IOException;
 import org.openforis.idm.metamodel.LanguageSpecificText;
 import org.openforis.idm.metamodel.xml.IdmlConstants;
 import org.openforis.idm.metamodel.xml.XmlParseException;
-import org.openforis.idm.metamodel.xml.internal.marshal.XmlPullReader;
+import org.openforis.idm.metamodel.xml.internal.unmarshal.XmlPullReader;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -33,7 +33,7 @@ class LanguageSpecificTextPR extends XmlPullReader {
 	@Override
 	protected void onStartTag() throws XmlParseException, XmlPullParserException, IOException {
 		XmlPullParser parser = getParser();
-		String lang = parser.getAttributeValue(IdmlConstants.XML_NS_URI, IdmlConstants.XML_LANG_ATTRIBUTE);
+		String lang = parser.getAttributeValue(IdmlConstants.XML_NAMESPACE_URI, IdmlConstants.XML_LANG_ATTRIBUTE);
 		String type = getAttribute(TYPE, requireType);
 		String text = parser.nextText();
 		processText(lang, type, text);

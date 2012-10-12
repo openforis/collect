@@ -4,6 +4,7 @@
 package org.openforis.collect.persistence.xml;
 
 import java.io.IOException;
+import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -34,7 +35,7 @@ public class UIOptionsBinder implements
 			XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
 			parser = factory.newPullParser();
 			parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, true);
-			StringReader reader = new StringReader(body);
+			Reader reader = new StringReader(body);
 			parser.setInput(reader);
 			UIOptions uiOptions = new UIOptions();
 			UITabSet tabSet = unmarshalTabSet(parser);
