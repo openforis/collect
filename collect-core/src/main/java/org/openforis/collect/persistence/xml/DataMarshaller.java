@@ -22,6 +22,8 @@ import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Field;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.State;
+import org.xmlpull.v1.XmlPullParserException;
+import org.xmlpull.v1.XmlPullParserFactory;
 import org.xmlpull.v1.XmlSerializer;
 
 /**
@@ -39,9 +41,9 @@ public class DataMarshaller {
 	private static final String SYMBOL_ATTRIBUTE = "symbol";
 	private static final String REMARKS_ATTRIBUTE = "remarks";
 	
-	public void write(CollectRecord record, Writer out) throws IOException {
-		XmlPullSerializerFactory factory = XmlPullSerializerFactory.createInstance();
-		XmlSerializer serializer = factory.createSerializer();
+	public void write(CollectRecord record, Writer out) throws IOException, XmlPullParserException {
+		XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
+		XmlSerializer serializer = factory.newSerializer();
 		serializer.setOutput(out);
 		serializer.startDocument("UTF-8", true);
 		

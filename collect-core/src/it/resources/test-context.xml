@@ -87,9 +87,6 @@
       <constructor-arg><ref bean="externalCodeListProvider"/></constructor-arg>
 	</bean>
 	
-	<!-- XmlSerializer -->
-	<bean id="xmlSerializerFactory" class="org.openforis.collect.persistence.xml.XmlPullSerializerFactory" />
-	
 	<!-- XML DataMarshaller -->
 	<bean id="dataMarshaller" class="org.openforis.collect.persistence.xml.DataMarshaller" lazy-init="false" autowire-candidate="true" autowire="byName" />
 	

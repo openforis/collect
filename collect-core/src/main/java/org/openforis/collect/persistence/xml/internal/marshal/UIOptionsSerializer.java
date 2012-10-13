@@ -10,12 +10,12 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.List;
 
-import org.kxml2.io.KXmlSerializer;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.metamodel.ui.UITab;
 import org.openforis.collect.metamodel.ui.UITabSet;
 import org.openforis.idm.metamodel.LanguageSpecificText;
 import org.openforis.idm.metamodel.xml.IdmlConstants;
+import org.xmlpull.v1.XmlPullParserFactory;
 import org.xmlpull.v1.XmlSerializer;
 
 /**
@@ -27,18 +27,23 @@ public class UIOptionsSerializer {
 
 	private static final String INDENT = "http://xmlpull.org/v1/doc/features.html#indent-output";
 
-	public void write(UIOptions options, Writer out) throws IOException {
-		XmlSerializer serializer = new KXmlSerializer();
-		serializer.setFeature(INDENT, true);
-		serializer.setOutput(out);
-		serializer.startDocument("UTF-8", true);
-		serializer.setPrefix("ui", UI_NAMESPACE_URI);
-		List<UITabSet> tabSets = options.getTabSets();
-		for (UITabSet tabSet : tabSets) {
-			writeTabSet(serializer, tabSet);
+	public void write(UIOptions options, Writer out) {
+		try {
+			XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
+			XmlSerializer serializer = factory.newSerializer();
+			serializer.setFeature(INDENT, true);
+			serializer.setOutput(out);
+			serializer.startDocument("UTF-8", true);
+			serializer.setPrefix("ui", UI_NAMESPACE_URI);
+			List<UITabSet> tabSets = options.getTabSets();
+			for (UITabSet tabSet : tabSets) {
+				writeTabSet(serializer, tabSet);
+			}
+			serializer.endDocument();
+			serializer.flush();
+		} catch ( Exception e ) {
+			throw new RuntimeException(e);
 		}
-		serializer.endDocument();
-		serializer.flush();
 	}
 
 	protected void writeTabSet(XmlSerializer serializer, UITabSet tabSet)

@@ -72,7 +72,7 @@ public class UIOptionsBinder implements
 			serializer.write(options, writer);
 			String result = writer.toString();
 			return result;
-		} catch (IOException e) {
+		} catch (Exception e) {
 			throw new RuntimeException("Error serializing UIOptions", e);
 		}
 	}
