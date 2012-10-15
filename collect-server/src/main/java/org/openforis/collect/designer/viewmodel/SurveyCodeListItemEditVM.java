@@ -47,6 +47,12 @@ public class SurveyCodeListItemEditVM extends SurveyItemEditVM<CodeListItem> {
 	}
 	
 	@Override
+	protected CodeListItem createItemInstance() {
+		//items instantiated in CodeListEditVM
+		return null;
+	}
+	
+	@Override
 	protected ItemFormObject<CodeListItem> createFormObject() {
 		return new CodeListItemFormObject();
 	}

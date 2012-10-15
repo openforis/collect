@@ -62,8 +62,7 @@ public class NodeDefinitionFormValidator extends FormValidator {
 
 	protected boolean existsHomonymousSibling(NodeDefinition defn, String name) {
 		String parentPath;
-		EntityDefinition parentDefn = (EntityDefinition) defn
-				.getParentDefinition();
+		EntityDefinition parentDefn = (EntityDefinition) defn.getParentDefinition();
 		if (parentDefn != null) {
 			parentPath = parentDefn.getPath();
 		} else {
@@ -97,12 +96,11 @@ public class NodeDefinitionFormValidator extends FormValidator {
 	protected NodeDefinition getEditedNode(ValidationContext ctx) {
 		Object vmObject = getVM(ctx);
 		if (vmObject instanceof SurveySchemaEditVM) {
-			NodeDefinition editedNode = ((SurveySchemaEditVM) vmObject)
-					.getSelectedNode();
+			NodeDefinition editedNode = ((SurveySchemaEditVM) vmObject).getEditedNode();
 			return editedNode;
 		} else {
-			throw new IllegalArgumentException("Unsupported View Model Type: "
-					+ vmObject.getClass().getName());
+			throw new IllegalArgumentException("Unsupported View Model Type: " +
+					vmObject.getClass().getName());
 		}
 	}
 

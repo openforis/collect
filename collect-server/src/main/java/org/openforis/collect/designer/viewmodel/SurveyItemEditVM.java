@@ -9,7 +9,6 @@ import java.util.List;
 import org.openforis.collect.designer.form.ItemFormObject;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.MessageUtil.ConfirmHandler;
-import org.springframework.core.GenericTypeResolver;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.Binder;
 import org.zkoss.bind.annotation.BindingParam;
@@ -30,15 +29,9 @@ import org.zkoss.zkplus.databind.BindingListModelList;
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public abstract class SurveyItemEditVM<T> extends SurveyEditBaseVM {
 	
-	private final Class<T> genericType;
 	protected ItemFormObject<T> formObject;
 	protected T selectedItem;
 	protected T editedItem;
-	
-	@SuppressWarnings("unchecked")
-	public SurveyItemEditVM() {
-		this.genericType = (Class<T>) GenericTypeResolver.resolveTypeArgument(getClass(), SurveyItemEditVM.class);
-	}
 	
 	public BindingListModelList<T> getItems() {
 		List<T> items = getItemsInternal();
@@ -148,15 +141,7 @@ public abstract class SurveyItemEditVM<T> extends SurveyEditBaseVM {
 
 	protected abstract ItemFormObject<T> createFormObject();
 	
-	protected T createItemInstance() {
-		T newInstance = null;
-		try {
-			newInstance = genericType.newInstance();
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-		return newInstance;
-	}
+	protected abstract T createItemInstance();
 	
 	@NotifyChange("items")
 	protected abstract void addNewItemToSurvey();

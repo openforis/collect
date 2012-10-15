@@ -37,6 +37,12 @@ public class SurveyMainInfoEditVM extends SurveyItemEditVM<CollectSurvey> {
 	}
 	
 	@Override
+	protected CollectSurvey createItemInstance() {
+		//do nothing, no child instances created
+		return null;
+	}
+	
+	@Override
 	protected ItemFormObject<CollectSurvey> createFormObject() {
 		return new SurveyMainInfoFormObject();
 	}

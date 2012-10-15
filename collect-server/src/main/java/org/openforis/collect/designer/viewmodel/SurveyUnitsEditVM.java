@@ -32,6 +32,12 @@ public class SurveyUnitsEditVM extends SurveyItemEditVM<Unit> {
 		List<Unit> units = survey.getUnits();
 		return units;
 	}
+	
+	@Override
+	protected Unit createItemInstance() {
+		Unit instance = survey.createUnit();
+		return instance;
+	}
 
 	@Override
 	protected void addNewItemToSurvey() {

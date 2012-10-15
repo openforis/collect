@@ -43,7 +43,7 @@
 				<row>
 					<label value="${labels.survey.project_cycle}:" />
 					<cell>
-						<intbox width="50px" value="@bind(fx.projectCycle)" onChange="@command('applyChanges')" />
+						<textbox width="150px" value="@bind(fx.projectCycle)" onChange="@command('applyChanges')" />
 						<label class="error" value="@load(vmsgs['projectCycle'])" />
 					</cell>
 				</row>

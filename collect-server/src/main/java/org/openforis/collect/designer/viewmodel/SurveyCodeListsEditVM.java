@@ -47,6 +47,9 @@ public class SurveyCodeListsEditVM extends SurveyItemEditVM<CodeList> {
 //	private DefaultTreeModel<CodeListItem> treeModel;
 	
 	private List<List<CodeListItem>> itemsPerLevel;
+	private boolean newChildItem;
+	private CodeListItem editedChildItem;
+	private int editedChildItemLevel;
 	
 	private List<CodeListItem> selectedItemsPerLevel;
 	private Window codeListItemPopUp;
@@ -84,7 +87,7 @@ public class SurveyCodeListsEditVM extends SurveyItemEditVM<CodeList> {
 	
 	@Override
 	protected CodeList createItemInstance() {
-		CodeList instance = super.createItemInstance();
+		CodeList instance = survey.createCodeList();
 		return instance;
 	}
 	
@@ -157,19 +160,11 @@ public class SurveyCodeListsEditVM extends SurveyItemEditVM<CodeList> {
 	@NotifyChange({"itemsPerLevel"})
 	public void addItemInLevel(@BindingParam("levelIndex") int levelIndex) {
 		if ( checkCurrentFormValid() ) {
-			CodeListItem item = editedItem.createItem();
-			String code = generateItemCode(item);
-			item.setCode(code);
-			item.setCodeList(editedItem);
-			if ( levelIndex == 0 ) {
-				editedItem.addItem(item);
-			} else {
-				CodeListItem parentItem = selectedItemsPerLevel.get(levelIndex - 1);
-				parentItem.addChildItem(item);
-			}
-			List<CodeListItem> itemsForCurrentLevel = itemsPerLevel.get(levelIndex);
-			itemsForCurrentLevel.add(item);
-			openChildItemEditPopUp(item);
+			newChildItem = true;
+			editedChildItemLevel = levelIndex;
+			editedChildItem = editedItem.createItem();
+			editedChildItem.setCodeList(editedItem);
+			openChildItemEditPopUp(editedChildItem);
 		}
 	}
 	
@@ -226,6 +221,7 @@ public class SurveyCodeListsEditVM extends SurveyItemEditVM<CodeList> {
 	
 	@Command
 	public void codeListItemDoubleClicked(@BindingParam("item") CodeListItem item) {
+		newChildItem = false;
 		openChildItemEditPopUp(item);
 	}
 	
@@ -301,6 +297,20 @@ public class SurveyCodeListsEditVM extends SurveyItemEditVM<CodeList> {
 	@NotifyChange({"itemsPerLevel"})
 	public void closeCodeListItemPopUp() {
 		closePopUp(codeListItemPopUp);
+		if ( newChildItem ) {
+			addChildItemToCodeList();
+		}
+	}
+
+	private void addChildItemToCodeList() {
+		if ( editedChildItemLevel == 0 ) {
+			editedItem.addItem(editedChildItem);
+		} else {
+			CodeListItem parentItem = selectedItemsPerLevel.get(editedChildItemLevel - 1);
+			parentItem.addChildItem(editedChildItem);
+		}
+		List<CodeListItem> itemsForCurrentLevel = itemsPerLevel.get(editedChildItemLevel);
+		itemsForCurrentLevel.add(editedChildItem);
 	}
 
 	protected void initItemsPerLevel() {

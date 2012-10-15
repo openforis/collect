@@ -31,6 +31,11 @@ public class SurveyVersioningEditVM extends SurveyItemEditVM<ModelVersion> {
 		return versions;
 	}
 	
+	protected ModelVersion createItemInstance() {
+		ModelVersion instance = survey.createModelVersion();
+		return instance;
+	}
+	
 	@Override
 	protected void addNewItemToSurvey() {
 		CollectSurvey survey = getSurvey();

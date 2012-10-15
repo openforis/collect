@@ -8,7 +8,7 @@
 			@init(vm.tempFormObject)
 			@load(vm.formObject) 
 			@save(vm.formObject, before='applyChanges')
-			@validator('org.openforis.collect.designer.form.validator.AttributeDefinitionFormValidator')">
+			@validator('org.openforis.collect.designer.form.validator.CodeAttributeDefinitionFormValidator')">
 		
 		<include src="survey_edit/schema/attribute_common.zul" />
 		

@@ -25,6 +25,12 @@ public class SurveySRSEditVM extends SurveyItemEditVM<SpatialReferenceSystem> {
 		List<SpatialReferenceSystem> spatialReferenceSystems = survey.getSpatialReferenceSystems();
 		return spatialReferenceSystems;
 	}
+	
+	@Override
+	protected SpatialReferenceSystem createItemInstance() {
+		SpatialReferenceSystem instance = new SpatialReferenceSystem();
+		return instance;
+	}
 
 	@Override
 	protected void addNewItemToSurvey() {
