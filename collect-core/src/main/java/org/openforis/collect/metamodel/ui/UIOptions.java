@@ -110,8 +110,8 @@ public class UIOptions implements ApplicationOptions, Serializable {
 	}
 
 	public UITabSet getTabSet(EntityDefinition rootEntityDefn) {
-		String tabDefnName = rootEntityDefn.getAnnotation(Annotation.TAB_SET.getQName());
-		UITabSet tabSet = getTabSet(tabDefnName);
+		String tabSetName = rootEntityDefn.getAnnotation(Annotation.TAB_SET.getQName());
+		UITabSet tabSet = getTabSet(tabSetName);
 		return tabSet;
 	}
 	

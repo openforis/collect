@@ -41,12 +41,13 @@ public class SurveyEditVM extends SurveyEditBaseVM {
 	public void init() {
 		super.init();
 		if ( currentLanguageCode == null ) {
-			List<String> langCodes = survey.getLanguages();
-			if ( langCodes.size() == 1 ) {
-				currentLanguageCode = langCodes.get(0);
-			} else {
-				openLanguageManagerPopUp();
-			}
+//			TODO
+//			List<String> langCodes = survey.getLanguages();
+//			if ( langCodes.size() == 1 ) {
+//				currentLanguageCode = langCodes.get(0);
+//			} else {
+//				openLanguageManagerPopUp();
+//			}
 			//TEST
 //			currentLanguageCode = "eng";
 //			uiConf.addLanguageCode("eng");

@@ -115,7 +115,7 @@
 		                    <include defer="true" 
 								src="${vm.componentsPath}/survey_edit/schema_layout/tabsgroup.zul"
 								hflex="1" vflex="1"
-								tabsGroup="${vm.tab}"
+								tabSet="${vm.tab}"
 								style="min-height: 180px" />
 		                </vlayout>
 	            	</listcell>

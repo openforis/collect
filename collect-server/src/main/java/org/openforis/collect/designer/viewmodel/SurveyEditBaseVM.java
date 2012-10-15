@@ -73,8 +73,8 @@ public class SurveyEditBaseVM extends BaseVM {
 	public void unitsUpdated() {}
 	
 	@GlobalCommand
-	@NotifyChange("tabDefinitions")
-	public void tabDefinitionsUpdated() {}
+	@NotifyChange("tabSets")
+	public void tabSetsUpdated() {}
 	
 	@GlobalCommand
 	@NotifyChange("currentFormValid")

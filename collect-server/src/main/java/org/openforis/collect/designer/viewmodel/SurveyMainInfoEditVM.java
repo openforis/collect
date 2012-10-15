@@ -8,6 +8,7 @@ import java.util.List;
 import org.openforis.collect.designer.form.ItemFormObject;
 import org.openforis.collect.designer.form.SurveyMainInfoFormObject;
 import org.openforis.collect.model.CollectSurvey;
+import org.zkoss.bind.annotation.Init;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 
 /**
@@ -19,13 +20,12 @@ import org.zkoss.zk.ui.select.annotation.VariableResolver;
 public class SurveyMainInfoEditVM extends SurveyItemEditVM<CollectSurvey> {
 	
 	@Override
-	public CollectSurvey getEditedItem() {
-		if ( editedItem == null ) {
-			editedItem = getSurvey();
-		}
-		return editedItem;
+	@Init(superclass=false)
+	public void init() {
+		super.init();
+		editedItem = getSurvey();
 	}
-	
+
 	@Override
 	public ItemFormObject<CollectSurvey> getFormObject() {
 		if ( formObject == null ) {

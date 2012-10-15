@@ -589,8 +589,8 @@ package org.openforis.collect.ui {
 			var uiOpts:UIOptionsProxy = survey.uiOptions;
 			var tabSet:UITabSetProxy = null;
 			if(uiOpts != null) {
-				var tabDefnName:String = rootEntityDefinition.tabDefinitionName;
-				tabSet = uiOpts.getTabSet(tabDefnName);
+				var tabSetName:String = rootEntityDefinition.rootTabSetName;
+				tabSet = uiOpts.getTabSet(tabSetName);
 			}
 			return tabSet;
 		}

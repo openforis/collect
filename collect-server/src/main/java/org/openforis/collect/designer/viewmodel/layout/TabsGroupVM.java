@@ -62,23 +62,23 @@ public class TabsGroupVM extends BaseVM {
 		 Selectors.wireComponents(view, this, false);
 	}
 	
-	private UITabSet tabsGroup;
+	private UITabSet tabSet;
 
 	private Window tabLabelPopUp;
 	
 	@Init
-	public void init(@ExecutionArgParam("tabsGroup") UITabSet tabsGroup) {
-		this.tabsGroup = tabsGroup;
+	public void init(@ExecutionArgParam("tabSet") UITabSet tabSet) {
+		this.tabSet = tabSet;
 	}
 	
 	@Command
 	@NotifyChange({"tabs"})
 	public void addTab() {
 		UITab tab = new UITab();
-		String tabName = generateNewTabName(tabsGroup);
+		String tabName = generateNewTabName(tabSet);
 		tab.setName(tabName);
-		tabsGroup.addTab(tab);
-		postTabChangedCommand(tabsGroup);
+		tabSet.addTab(tab);
+		postTabChangedCommand(tabSet);
 		openTabLabelEditPopUp(tab);
 	}
 
@@ -118,7 +118,7 @@ public class TabsGroupVM extends BaseVM {
 				String label = textbox.getText();
 				label.trim();
 				if ( validateTabLabel(label) ) {
-					List<UITab> tabs = tabsGroup.getTabs();
+					List<UITab> tabs = tabSet.getTabs();
 					int index = tabs.indexOf(tab);
 					tabbox.setSelectedIndex(index);
 					tab.setLabel(getCurrentLanguageCode(), label);
@@ -159,23 +159,23 @@ public class TabsGroupVM extends BaseVM {
 	}
 
 //	@GlobalCommand
-//	public void tabDefinitionChanged(@BindingParam("tabDefinition") UITabDefinition tabDefinition) {
-//		group = tabDefinition;
+//	public void rootTabSetChanged(@BindingParam("tabSet") UITabSet tabSet) {
+//		tabsGroup = tabSet;
 //	}
 	
 	public UITabSet getTabsGroup() {
-		return tabsGroup;
+		return tabSet;
 	}
 	
 	public List<UITab> getTabs() {
-		return tabsGroup != null ? tabsGroup.getTabs(): null;
+		return tabSet != null ? tabSet.getTabs(): null;
 	}
 	
 	@DependsOn("tabs")
 	public List<UITab> getTabsPlusAddButton() {
 		List<UITab> tabs = new ArrayList<UITab>();
-		if ( tabsGroup != null ) {
-			tabs.addAll(tabsGroup.getTabs());
+		if ( tabSet != null ) {
+			tabs.addAll(tabSet.getTabs());
 		}
 		tabs.add(FAKE_ADD_TAB);
 		return tabs;

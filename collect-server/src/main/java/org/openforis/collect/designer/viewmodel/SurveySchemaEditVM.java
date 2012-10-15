@@ -379,13 +379,13 @@ public class SurveySchemaEditVM extends SurveyEditBaseVM {
 
 	protected UITabSet createRootTabSet(EntityDefinition newNode) {
 		UIOptions uiOpts = survey.getUIOptions();
-		UITabSet tabDefn = new UITabSet();
-		int tabDefnPosition = uiOpts.getTabSets().size() + 1;
-		String tabDefnName = "tabdefn_" + tabDefnPosition;
-		tabDefn.setName(tabDefnName);
-		uiOpts.addTabSet(tabDefn);
-		newNode.setAnnotation(UIOptions.Annotation.TAB_SET.getQName(), tabDefnName);
-		return tabDefn;
+		UITabSet tabSet = new UITabSet();
+		int tabSetPosition = uiOpts.getTabSets().size() + 1;
+		String tabSetName = "tabset_" + tabSetPosition;
+		tabSet.setName(tabSetName);
+		uiOpts.addTabSet(tabSet);
+		newNode.setAnnotation(UIOptions.Annotation.TAB_SET.getQName(), tabSetName);
+		return tabSet;
 	}
 
 	protected void postSchemaChangedCommand() {

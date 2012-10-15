@@ -62,12 +62,12 @@ public class EntityDefinitionProxy extends NodeDefinitionProxy {
 	}
 	
 	@ExternalizedProperty
-	public String getTabDefinitionName() {
+	public String getRootTabSetName() {
 		if ( parent != null ) {
-			return parent.getTabDefinitionName();
+			return parent.getRootTabSetName();
 		} else {
-			String tabDefnName = entityDefinition.getAnnotation(UIOptions.Annotation.TAB_SET.getQName());
-			return tabDefnName;
+			String tabSetName = entityDefinition.getAnnotation(UIOptions.Annotation.TAB_SET.getQName());
+			return tabSetName;
 		}
 	}
 	

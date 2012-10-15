@@ -33,7 +33,7 @@
 	 		</vlayout>
 		</west>
 		<center title="${labels.survey.layout.form_layout}">
-			<div id="tabsEditor" visible="@load(not empty vm.tabDefinition)" width="100%" height="100%">
+			<div id="tabsEditor" visible="@load(not empty vm.rootTabSet)" width="100%" height="100%">
 				<include id="tabsGroupContainerInclude" defer="true" width="100%" height="100%" /> 
 			</div>
 		</center>

@@ -49,7 +49,7 @@ public class RecordIndexManagerIntegrationTest extends CollectIntegrationTest {
 		CollectSurvey survey = loadSurvey();
 		String[] gpsModels = new String[] {"GPS MAP 62 S", "GPS MAP 60CSX", "SXBLUEII-L", "GPS MAP 62S"};
 		createIndex(survey, gpsModels);
-		NodeDefinition autoCompleteNodeDefn = survey.getSchema().getDefinitionByPath("cluster/gps_model");
+		NodeDefinition autoCompleteNodeDefn = survey.getSchema().getDefinitionByPath("/cluster/gps_model");
 		
 		testSingleResultMatching(survey, autoCompleteNodeDefn);
 		
