@@ -21,7 +21,7 @@ public class UITab extends UITabSet {
 		if ( labels == null ) {
 			return Collections.emptyList();
 		} else {
-			return labels.getAll();
+			return labels.values();
 		}
 	}
 	
