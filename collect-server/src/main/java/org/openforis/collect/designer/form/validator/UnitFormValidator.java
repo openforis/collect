@@ -11,7 +11,7 @@ import org.zkoss.util.resource.Labels;
  * @author S. Ricci
  *
  */
-public class UnitFormValidator extends FormValidator {
+public class UnitFormValidator extends SurveyObjectFormValidator<Unit> {
 	
 	protected static final String NAME_FIELD = "name";
 	protected static final String DIMENSION_FIELD_NAME = "dimensionLabel";
@@ -34,7 +34,7 @@ public class UnitFormValidator extends FormValidator {
 	}
 
 	protected boolean validateNameUniqueness(ValidationContext ctx) {
-		SurveyObjectBaseVM<Unit> viewModel = getSurveyItemEditVM(ctx);
+		SurveyObjectBaseVM<Unit> viewModel = getSurveyObjectVM(ctx);
 		Unit editedItem = viewModel.getEditedItem();
 		CollectSurvey survey = viewModel.getSurvey();
 		String name = (String) getValue(ctx, NAME_FIELD);
@@ -48,15 +48,5 @@ public class UnitFormValidator extends FormValidator {
 		}
 	}
 	
-	protected SurveyObjectBaseVM<Unit> getSurveyItemEditVM(ValidationContext ctx) {
-		Object vm = getVM(ctx);
-		if ( vm instanceof SurveyObjectBaseVM ) {
-			@SuppressWarnings("unchecked")
-			SurveyObjectBaseVM<Unit> viewModel = (SurveyObjectBaseVM<Unit>) vm;
-			return viewModel;
-		} else {
-			throw new  IllegalStateException("Unexpected view model class: " + vm.getClass().getName());
-		}
-	}
 
 }

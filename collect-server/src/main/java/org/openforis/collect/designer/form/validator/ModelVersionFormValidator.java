@@ -11,7 +11,7 @@ import org.zkoss.util.resource.Labels;
  * @author S. Ricci
  *
  */
-public class ModelVersionFormValidator extends FormValidator {
+public class ModelVersionFormValidator extends SurveyObjectFormValidator<ModelVersion> {
 	
 	protected static final String NAME_FIELD = "name";
 	
@@ -28,7 +28,7 @@ public class ModelVersionFormValidator extends FormValidator {
 	}
 
 	protected boolean validateNameUniqueness(ValidationContext ctx) {
-		SurveyObjectBaseVM<ModelVersion> viewModel = getSurveyItemEditVM(ctx);
+		SurveyObjectBaseVM<ModelVersion> viewModel = getSurveyObjectVM(ctx);
 		ModelVersion editedItem = viewModel.getEditedItem();
 		CollectSurvey survey = viewModel.getSurvey();
 		String name = (String) getValue(ctx, NAME_FIELD);
@@ -42,15 +42,4 @@ public class ModelVersionFormValidator extends FormValidator {
 		}
 	}
 	
-	protected SurveyObjectBaseVM<ModelVersion> getSurveyItemEditVM(ValidationContext ctx) {
-		Object vm = getVM(ctx);
-		if ( vm instanceof SurveyObjectBaseVM ) {
-			@SuppressWarnings("unchecked")
-			SurveyObjectBaseVM<ModelVersion> viewModel = (SurveyObjectBaseVM<ModelVersion>) vm;
-			return viewModel;
-		} else {
-			throw new  IllegalStateException("Unexpected view model class: " + vm.getClass().getName());
-		}
-	}
-
 }

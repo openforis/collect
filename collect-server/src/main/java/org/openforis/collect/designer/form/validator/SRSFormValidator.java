@@ -45,12 +45,11 @@ public class SRSFormValidator extends FormValidator {
 		}
 	}
 	
+	@SuppressWarnings("unchecked")
 	protected SurveyObjectBaseVM<SpatialReferenceSystem> getSurveyItemEditVM(ValidationContext ctx) {
 		Object vm = getVM(ctx);
 		if ( vm instanceof SurveyObjectBaseVM ) {
-			@SuppressWarnings("unchecked")
-			SurveyObjectBaseVM<SpatialReferenceSystem> viewModel = (SurveyObjectBaseVM<SpatialReferenceSystem>) vm;
-			return viewModel;
+			return (SurveyObjectBaseVM<SpatialReferenceSystem>) vm;
 		} else {
 			throw new  IllegalStateException("Unexpected view model class: " + vm.getClass().getName());
 		}
