@@ -29,7 +29,7 @@ public class UIOptionsBinder implements
 		ApplicationOptionsBinder<UIOptions> {
 
 	@Override
-	public UIOptions unmarshal(String body) {
+	public UIOptions unmarshal(String type, String body) {
 		XmlPullParser parser = null;
 		try {
 			XmlPullParserFactory factory = XmlPullParserFactory.newInstance();

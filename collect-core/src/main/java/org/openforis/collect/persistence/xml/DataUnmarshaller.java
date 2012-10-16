@@ -8,7 +8,6 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.xerces.parsers.SAXParser;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.persistence.xml.DataHandler.NodeUnmarshallingError;
 import org.xml.sax.InputSource;
@@ -30,28 +29,28 @@ public class DataUnmarshaller {
 	
 	private ParseRecordResult parse(InputSource source) {
 		ParseRecordResult result = new ParseRecordResult();
-		SAXParser p = new SAXParser();
-		p.setContentHandler(handler);
-		try {
-			p.parse(source);
-			List<NodeUnmarshallingError> failures = handler.getFailures();
-			if ( failures.isEmpty() ) {
-				CollectRecord record = handler.getRecord();
-				result.setRecord(record);
-				List<NodeUnmarshallingError> warns = handler.getWarnings();
-				if (warns.size() > 0) {
-					result.setMessage("Processed with errors: " + warns.toString());
-					result.setWarnings(warns);
-				}
-				result.setSuccess(true);
-			} else {
-				result.setFailures(failures);
-			}
-		} catch (Exception e) {
-			String message = e.getMessage();
-			NodeUnmarshallingError error = new NodeUnmarshallingError(message);
-			result.setFailures(Arrays.asList(error));
-		}
+//		SAXParser p = new SAXParser();
+//		p.setContentHandler(handler);
+//		try {
+//			p.parse(source);
+//			List<NodeUnmarshallingError> failures = handler.getFailures();
+//			if ( failures.isEmpty() ) {
+//				CollectRecord record = handler.getRecord();
+//				result.setRecord(record);
+//				List<NodeUnmarshallingError> warns = handler.getWarnings();
+//				if (warns.size() > 0) {
+//					result.setMessage("Processed with errors: " + warns.toString());
+//					result.setWarnings(warns);
+//				}
+//				result.setSuccess(true);
+//			} else {
+//				result.setFailures(failures);
+//			}
+//		} catch (Exception e) {
+//			String message = e.getMessage();
+//			NodeUnmarshallingError error = new NodeUnmarshallingError(message);
+//			result.setFailures(Arrays.asList(error));
+//		}
 		return result;
 	}
 	
