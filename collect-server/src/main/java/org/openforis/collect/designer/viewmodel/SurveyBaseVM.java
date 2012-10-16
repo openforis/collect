@@ -30,7 +30,7 @@ import org.zkoss.zkplus.databind.BindingListModelList;
  *
  */
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
-public class SurveyEditBaseVM extends BaseVM {
+public abstract class SurveyBaseVM extends BaseVM {
 	
 	public static final String ERRORS_IN_PAGE_MESSAGE_KEY = "global.message.errors_in_page";
 
@@ -45,7 +45,7 @@ public class SurveyEditBaseVM extends BaseVM {
 	
 	private boolean currentFormValid;
 	
-	public SurveyEditBaseVM() {
+	public SurveyBaseVM() {
 		currentFormValid = true;
 		initCurrentLanguageCode();
 	}

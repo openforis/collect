@@ -2,7 +2,7 @@
 	<div 
 		validationMessages="@id('vmsgs')"
 		apply="org.zkoss.bind.BindComposer"
-		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SurveyMainInfoEditVM')"
+		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SurveyMainInfoVM')"
 		form="@id('fx') @load(vm.formObject) @save(vm.formObject, before='applyChanges')
 			@validator('org.openforis.collect.designer.form.validator.SurveyMainInfoFormValidator')">
 		<grid>

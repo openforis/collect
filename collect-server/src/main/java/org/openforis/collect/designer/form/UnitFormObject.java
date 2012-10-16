@@ -8,7 +8,7 @@ import org.zkoss.util.resource.Labels;
  * @author S. Ricci
  *
  */
-public class UnitFormObject extends ItemFormObject<Unit> {
+public class UnitFormObject extends SurveyObjectFormObject<Unit> {
 
 	private String name;
 	private String label;

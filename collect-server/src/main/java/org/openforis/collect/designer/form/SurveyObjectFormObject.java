@@ -6,7 +6,7 @@ package org.openforis.collect.designer.form;
  *
  * @param <T>
  */
-public abstract class ItemFormObject<T> extends FormObject<T> {
+public abstract class SurveyObjectFormObject<T> extends FormObject<T> {
 	
 	public abstract void loadFrom(T source, String languageCode);
 	

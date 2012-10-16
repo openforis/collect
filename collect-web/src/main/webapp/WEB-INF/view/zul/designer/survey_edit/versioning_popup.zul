@@ -1,7 +1,7 @@
 <zk>
 	<window id="versioningManagerPopUp" title="${labels.survey.versioning_manager}" 
 		apply="org.zkoss.bind.BindComposer"
-		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SurveyVersioningEditVM')"
+		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.VersioningVM')"
 		validationMessages="@id('vmsgs')"
 		width="800px" 
 		height="300px"

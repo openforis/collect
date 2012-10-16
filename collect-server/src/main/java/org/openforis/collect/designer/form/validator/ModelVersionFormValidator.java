@@ -1,6 +1,6 @@
 package org.openforis.collect.designer.form.validator;
 
-import org.openforis.collect.designer.viewmodel.SurveyItemEditVM;
+import org.openforis.collect.designer.viewmodel.SurveyObjectBaseVM;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.zkoss.bind.ValidationContext;
@@ -28,7 +28,7 @@ public class ModelVersionFormValidator extends FormValidator {
 	}
 
 	protected boolean validateNameUniqueness(ValidationContext ctx) {
-		SurveyItemEditVM<ModelVersion> viewModel = getSurveyItemEditVM(ctx);
+		SurveyObjectBaseVM<ModelVersion> viewModel = getSurveyItemEditVM(ctx);
 		ModelVersion editedItem = viewModel.getEditedItem();
 		CollectSurvey survey = viewModel.getSurvey();
 		String name = (String) getValue(ctx, NAME_FIELD);
@@ -42,11 +42,11 @@ public class ModelVersionFormValidator extends FormValidator {
 		}
 	}
 	
-	protected SurveyItemEditVM<ModelVersion> getSurveyItemEditVM(ValidationContext ctx) {
+	protected SurveyObjectBaseVM<ModelVersion> getSurveyItemEditVM(ValidationContext ctx) {
 		Object vm = getVM(ctx);
-		if ( vm instanceof SurveyItemEditVM ) {
+		if ( vm instanceof SurveyObjectBaseVM ) {
 			@SuppressWarnings("unchecked")
-			SurveyItemEditVM<ModelVersion> viewModel = (SurveyItemEditVM<ModelVersion>) vm;
+			SurveyObjectBaseVM<ModelVersion> viewModel = (SurveyObjectBaseVM<ModelVersion>) vm;
 			return viewModel;
 		} else {
 			throw new  IllegalStateException("Unexpected view model class: " + vm.getClass().getName());

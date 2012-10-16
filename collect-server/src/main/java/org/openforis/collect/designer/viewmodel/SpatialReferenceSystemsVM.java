@@ -5,7 +5,7 @@ package org.openforis.collect.designer.viewmodel;
 
 import java.util.List;
 
-import org.openforis.collect.designer.form.ItemFormObject;
+import org.openforis.collect.designer.form.SurveyObjectFormObject;
 import org.openforis.collect.designer.form.SpatialReferenceSystemFormObject;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.SpatialReferenceSystem;
@@ -17,7 +17,7 @@ import org.zkoss.zk.ui.select.annotation.VariableResolver;
  *
  */
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
-public class SurveySRSEditVM extends SurveyItemEditVM<SpatialReferenceSystem> {
+public class SpatialReferenceSystemsVM extends SurveyObjectBaseVM<SpatialReferenceSystem> {
 
 	@Override
 	public List<SpatialReferenceSystem> getItemsInternal() {
@@ -45,7 +45,7 @@ public class SurveySRSEditVM extends SurveyItemEditVM<SpatialReferenceSystem> {
 	}
 	
 	@Override
-	protected ItemFormObject<SpatialReferenceSystem> createFormObject() {
+	protected SurveyObjectFormObject<SpatialReferenceSystem> createFormObject() {
 		return new SpatialReferenceSystemFormObject();
 	}
 	

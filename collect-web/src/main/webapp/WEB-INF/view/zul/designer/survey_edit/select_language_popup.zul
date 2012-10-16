@@ -10,7 +10,7 @@
 			self="@define(content)"
 			height="100%"
 			apply="org.zkoss.bind.BindComposer"
-			viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SurveySelectLanguageVM')">
+			viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SurveyLocaleVM')">
 			
 			<label value="${labels.survey.select_language}" />
 			

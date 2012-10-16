@@ -1,7 +1,7 @@
 <zk>
 	<borderlayout id="itemsContainer"
 		apply="org.zkoss.bind.BindComposer"
-		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SurveyLayoutEditVM')"
+		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SchemaLayoutVM')"
 		width="100%" height="100%">
 	 	<west title="${labels.survey.schema.nodes_title}"
 	 		width="300px"

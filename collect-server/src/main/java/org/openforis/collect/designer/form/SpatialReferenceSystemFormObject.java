@@ -7,7 +7,7 @@ import org.openforis.idm.metamodel.SpatialReferenceSystem;
  * @author S. Ricci
  *
  */
-public class SpatialReferenceSystemFormObject extends ItemFormObject<SpatialReferenceSystem> {
+public class SpatialReferenceSystemFormObject extends SurveyObjectFormObject<SpatialReferenceSystem> {
 
 	private String id;
 	private String label;

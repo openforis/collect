@@ -21,7 +21,7 @@ import org.zkoss.zul.ListModelList;
  * @author S. Ricci
  *
  */
-public class SurveySelectLanguageVM extends BaseVM {
+public class SurveyLocaleVM extends BaseVM {
 
 	public static final String CURRENT_LANGUAGE_CHANGED_COMMAND = "currentLanguageChanged";
 	public static final String SURVEY_LANGUAGES_CHANGED_COMMAND = "surveyLanguagesChanged";

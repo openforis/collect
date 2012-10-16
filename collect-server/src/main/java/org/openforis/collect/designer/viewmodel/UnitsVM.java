@@ -6,7 +6,7 @@ package org.openforis.collect.designer.viewmodel;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.openforis.collect.designer.form.ItemFormObject;
+import org.openforis.collect.designer.form.SurveyObjectFormObject;
 import org.openforis.collect.designer.form.UnitFormObject;
 import org.openforis.collect.designer.form.UnitFormObject.Dimension;
 import org.openforis.collect.model.CollectSurvey;
@@ -22,7 +22,7 @@ import org.zkoss.zk.ui.select.annotation.VariableResolver;
  *
  */
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
-public class SurveyUnitsEditVM extends SurveyItemEditVM<Unit> {
+public class UnitsVM extends SurveyObjectBaseVM<Unit> {
 
 	private static final String UNITS_UPDATED_GLOBAL_COMMAND = "unitsUpdated";
 
@@ -57,7 +57,7 @@ public class SurveyUnitsEditVM extends SurveyItemEditVM<Unit> {
 	}
 
 	@Override
-	protected ItemFormObject<Unit> createFormObject() {
+	protected SurveyObjectFormObject<Unit> createFormObject() {
 		return new UnitFormObject();
 	}
 	

@@ -7,7 +7,7 @@ import org.openforis.collect.model.CollectSurvey;
  * @author S. Ricci
  *
  */
-public class SurveyMainInfoFormObject extends ItemFormObject<CollectSurvey> {
+public class SurveyMainInfoFormObject extends SurveyObjectFormObject<CollectSurvey> {
 
 	private String name;
 	private boolean published;

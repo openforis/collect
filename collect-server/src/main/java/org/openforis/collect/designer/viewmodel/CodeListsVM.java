@@ -11,7 +11,7 @@ import java.util.Map;
 
 import org.openforis.collect.designer.form.CodeListFormObject;
 import org.openforis.collect.designer.form.CodeListFormObject.Type;
-import org.openforis.collect.designer.form.ItemFormObject;
+import org.openforis.collect.designer.form.SurveyObjectFormObject;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.MessageUtil.ConfirmHandler;
 import org.openforis.collect.designer.util.Resources;
@@ -39,7 +39,7 @@ import org.zkoss.zul.Window;
  *
  */
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
-public class SurveyCodeListsEditVM extends SurveyItemEditVM<CodeList> {
+public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 
 	private static final String SURVEY_CODE_LIST_GENERATED_LEVEL_NAME_LABEL_KEY = "survey.code_list.generated_level_name";
 	public static final String CLOSE_CODE_LIST_ITEM_POP_UP_COMMAND = "closeCodeListItemPopUp";
@@ -74,7 +74,7 @@ public class SurveyCodeListsEditVM extends SurveyItemEditVM<CodeList> {
 	}
 	
 	@Override
-	protected ItemFormObject<CodeList> createFormObject() {
+	protected SurveyObjectFormObject<CodeList> createFormObject() {
 		return new CodeListFormObject();
 	}
 

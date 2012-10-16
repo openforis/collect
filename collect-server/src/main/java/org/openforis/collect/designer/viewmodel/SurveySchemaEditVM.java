@@ -54,7 +54,7 @@ import org.zkoss.zul.Window;
  *
  */
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
-public class SurveySchemaEditVM extends SurveyEditBaseVM {
+public class SurveySchemaEditVM extends SurveyBaseVM {
 
 	private static final String SCHEMA_CHANGED_GLOBAL_COMMAND = "schemaChanged";
 	

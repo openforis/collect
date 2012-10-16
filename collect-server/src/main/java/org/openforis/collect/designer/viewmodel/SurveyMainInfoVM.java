@@ -5,7 +5,7 @@ package org.openforis.collect.designer.viewmodel;
 
 import java.util.List;
 
-import org.openforis.collect.designer.form.ItemFormObject;
+import org.openforis.collect.designer.form.SurveyObjectFormObject;
 import org.openforis.collect.designer.form.SurveyMainInfoFormObject;
 import org.openforis.collect.model.CollectSurvey;
 import org.zkoss.bind.annotation.Init;
@@ -17,7 +17,7 @@ import org.zkoss.zk.ui.select.annotation.VariableResolver;
  *
  */
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
-public class SurveyMainInfoEditVM extends SurveyItemEditVM<CollectSurvey> {
+public class SurveyMainInfoVM extends SurveyObjectBaseVM<CollectSurvey> {
 	
 	@Override
 	@Init(superclass=false)
@@ -27,7 +27,7 @@ public class SurveyMainInfoEditVM extends SurveyItemEditVM<CollectSurvey> {
 	}
 
 	@Override
-	public ItemFormObject<CollectSurvey> getFormObject() {
+	public SurveyObjectFormObject<CollectSurvey> getFormObject() {
 		if ( formObject == null ) {
 			CollectSurvey survey = getSurvey();
 			formObject = createFormObject();
@@ -43,7 +43,7 @@ public class SurveyMainInfoEditVM extends SurveyItemEditVM<CollectSurvey> {
 	}
 	
 	@Override
-	protected ItemFormObject<CollectSurvey> createFormObject() {
+	protected SurveyObjectFormObject<CollectSurvey> createFormObject() {
 		return new SurveyMainInfoFormObject();
 	}
 

@@ -25,7 +25,7 @@ import org.zkoss.zul.Window;
  * @author S. Ricci
  *
  */
-public class SurveyEditVM extends SurveyEditBaseVM {
+public class SurveyEditVM extends SurveyBaseVM {
 
 	private static final String SURVEY_SUCCESSFULLY_SAVED_MESSAGE_KEY = "survey.successfully_saved";
 //	private static final String SURVEY_SUCCESSFULLY_PUBLISHED_MESSAGE_KEY = "survey.successfully_published";
@@ -91,7 +91,7 @@ public class SurveyEditVM extends SurveyEditBaseVM {
 		SessionStatus sessionStatus = getSessionStatus();
 		if ( checkCurrentFormValid() ) {
 			sessionStatus.setCurrentLanguageCode(selectedLanguageCode);
-			BindUtils.postGlobalCommand(null, null, SurveySelectLanguageVM.CURRENT_LANGUAGE_CHANGED_COMMAND, null);
+			BindUtils.postGlobalCommand(null, null, SurveyLocaleVM.CURRENT_LANGUAGE_CHANGED_COMMAND, null);
 		}
 		currentLanguageCode = sessionStatus.getCurrentLanguageCode();
 	}

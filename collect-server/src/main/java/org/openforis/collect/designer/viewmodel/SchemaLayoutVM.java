@@ -40,7 +40,7 @@ import org.zkoss.zul.Treeitem;
  * @author S. Ricci
  *
  */
-public class SurveyLayoutEditVM extends SurveyEditBaseVM {
+public class SchemaLayoutVM extends SurveyBaseVM {
 
 	private static final String NODES_PER_TAB_CHANGED_GLOABAL_COMMAND = "nodesPerTabChanged";
 	

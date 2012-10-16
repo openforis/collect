@@ -6,7 +6,7 @@
 		position="center" 
 		closable="false"
 		apply="org.zkoss.bind.BindComposer"
-		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SurveyCodeListItemEditVM')"
+		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.CodeListItemVM')"
 		validationMessages="@id('vmsgs')"
 		form="@id('fx') 
 			@load(vm.formObject) @save(vm.formObject, before='applyChanges')

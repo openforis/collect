@@ -6,7 +6,7 @@ package org.openforis.collect.designer.viewmodel;
 
 import java.util.List;
 
-import org.openforis.collect.designer.form.ItemFormObject;
+import org.openforis.collect.designer.form.SurveyObjectFormObject;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.MessageUtil.ConfirmHandler;
 import org.zkoss.bind.BindUtils;
@@ -27,9 +27,9 @@ import org.zkoss.zkplus.databind.BindingListModelList;
  *
  */
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
-public abstract class SurveyItemEditVM<T> extends SurveyEditBaseVM {
+public abstract class SurveyObjectBaseVM<T> extends SurveyBaseVM {
 	
-	protected ItemFormObject<T> formObject;
+	protected SurveyObjectFormObject<T> formObject;
 	protected T selectedItem;
 	protected T editedItem;
 	
@@ -139,7 +139,7 @@ public abstract class SurveyItemEditVM<T> extends SurveyEditBaseVM {
 		}
 	}
 
-	protected abstract ItemFormObject<T> createFormObject();
+	protected abstract SurveyObjectFormObject<T> createFormObject();
 	
 	protected abstract T createItemInstance();
 	
@@ -197,7 +197,7 @@ public abstract class SurveyItemEditVM<T> extends SurveyEditBaseVM {
 		}
 	}
 	
-	public ItemFormObject<T> getFormObject() {
+	public SurveyObjectFormObject<T> getFormObject() {
 		return formObject;
 	}
 

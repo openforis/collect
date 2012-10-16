@@ -7,7 +7,7 @@
 		closable="false">
 		<borderlayout id="codeListsManagerContainer"
 				apply="org.zkoss.bind.BindComposer"
-				viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SurveyCodeListsEditVM')"
+				viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.CodeListsVM')"
 				validationMessages="@id('vmsgs')">
 			<west width="220px">
 				<borderlayout>

@@ -14,7 +14,7 @@ import org.zkoss.util.resource.Labels;
  * @author S. Ricci
  *
  */
-public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends ItemFormObject<T> {
+public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends SurveyObjectFormObject<T> {
 	
 	public static UITab INHERIT_TAB;
 	{

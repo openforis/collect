@@ -10,7 +10,7 @@ import org.openforis.idm.metamodel.ModelVersion;
  * @author S. Ricci
  *
  */
-public class ModelVersionFormObject extends ItemFormObject<ModelVersion> {
+public class ModelVersionFormObject extends SurveyObjectFormObject<ModelVersion> {
 
 	private String name;
 	private String label;

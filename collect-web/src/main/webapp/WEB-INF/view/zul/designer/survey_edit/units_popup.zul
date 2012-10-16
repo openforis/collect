@@ -6,7 +6,7 @@
 		position="center" 
 		closable="false"
 		apply="org.zkoss.bind.BindComposer"
-		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SurveyUnitsEditVM')"
+		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.UnitsVM')"
 		validationMessages="@id('vmsgs')">
 		<borderlayout>
 			<west width="300px">

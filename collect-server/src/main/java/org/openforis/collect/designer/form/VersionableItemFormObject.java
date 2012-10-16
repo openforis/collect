@@ -10,7 +10,7 @@ import org.openforis.idm.metamodel.VersionableSurveyObject;
  * @author S. Ricci
  *
  */
-public class VersionableItemFormObject<T extends VersionableSurveyObject> extends ItemFormObject<T> {
+public class VersionableItemFormObject<T extends VersionableSurveyObject> extends SurveyObjectFormObject<T> {
 
 	private ModelVersion sinceVersion;
 	
