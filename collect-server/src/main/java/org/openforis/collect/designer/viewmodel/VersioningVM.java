@@ -46,6 +46,7 @@ public class VersioningVM extends SurveyObjectBaseVM<ModelVersion> {
 	protected void deleteItemFromSurvey(ModelVersion item) {
 		CollectSurvey survey = getSurvey();
 		survey.removeVersion(item);
+		dispatchVersionsUpdatedCommand();
 	}
 
 	@Override
@@ -64,6 +65,10 @@ public class VersioningVM extends SurveyObjectBaseVM<ModelVersion> {
 	@NotifyChange({"editedItem","selectedItem"})
 	public void applyChanges() {
 		super.applyChanges();
+		dispatchVersionsUpdatedCommand();
+	}
+
+	protected void dispatchVersionsUpdatedCommand() {
 		BindUtils.postGlobalCommand(null, null, VERSIONS_UPDATED_GLOBAL_COMMAND, null);
 	}
 

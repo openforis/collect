@@ -27,12 +27,12 @@ public class CodeListItemVM extends SurveyObjectBaseVM<CodeListItem> {
 	
 	@Override
 	protected void addNewItemToSurvey() {
-		//do nothing
+		//do nothing, performed by CodeListVM
 	}
 	
 	@Override
 	protected void deleteItemFromSurvey(CodeListItem item) {
-		//do nothing
+		//do nothing, performed by CodeListVM
 	}
 	
 	@Override

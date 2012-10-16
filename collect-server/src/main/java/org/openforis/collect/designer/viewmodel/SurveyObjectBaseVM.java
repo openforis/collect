@@ -29,9 +29,10 @@ import org.zkoss.zkplus.databind.BindingListModelList;
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public abstract class SurveyObjectBaseVM<T> extends SurveyBaseVM {
 	
-	protected SurveyObjectFormObject<T> formObject;
+	protected boolean newItem;
 	protected T selectedItem;
 	protected T editedItem;
+	protected SurveyObjectFormObject<T> formObject;
 	
 	public BindingListModelList<T> getItems() {
 		List<T> items = getItemsInternal();
@@ -49,10 +50,10 @@ public abstract class SurveyObjectBaseVM<T> extends SurveyBaseVM {
 
 	protected void performNewItemCreation(Binder binder) {
 		T newInstance = createItemInstance();
+		newItem = true;
 		setEditedItem(newInstance);
-		addNewItemToSurvey();
-		setSelectedItem(newInstance);
-		notifyChange("editedItem", "formObject", "items", "selectedItem","moveSelectedItemUpDisabled","moveSelectedItemDownDisabled");
+		setSelectedItem(null);
+		notifyChange("editedItem","formObject","items","selectedItem");
 		validateForm(binder);
 	}
 
@@ -76,9 +77,13 @@ public abstract class SurveyObjectBaseVM<T> extends SurveyBaseVM {
 
 	@Command
 	public void applyChanges() {
-		T editedItem = getEditedItem();
 		formObject.saveTo(editedItem, currentLanguageCode);
-		notifyChange("editedItem","selectedItem");
+		if ( newItem ) {
+			addNewItemToSurvey();
+			setSelectedItem(editedItem);
+			newItem = false;
+		}
+		notifyChange("items","selectedItem");
 	}
 	
 	@Command
@@ -92,19 +97,20 @@ public abstract class SurveyObjectBaseVM<T> extends SurveyBaseVM {
 	}
 
 	protected void performItemSelection(T item) {
+		newItem = false;
 		setSelectedItem(item);
 		setEditedItem(item);
-		notifyChange("formObject","editedItem","moveSelectedItemUpDisabled","moveSelectedItemDownDisabled");
+		notifyChange("selectedItem","formObject","editedItem");
 	}
 	
 	@Command
-	@NotifyChange({"items","moveSelectedItemUpDisabled","moveSelectedItemDownDisabled"})
+	@NotifyChange({"items"})
 	public void moveSelectedItemUp() {
 		moveSelectedItem(true);
 	}
 	
 	@Command
-	@NotifyChange({"items","moveSelectedItemUpDisabled","moveSelectedItemDownDisabled"})
+	@NotifyChange({"items"})
 	public void moveSelectedItemDown() {
 		moveSelectedItem(false);
 	}
@@ -123,11 +129,13 @@ public abstract class SurveyObjectBaseVM<T> extends SurveyBaseVM {
 	
 	protected abstract void moveSelectedItem(int indexTo);
 
+	@DependsOn({"items","selectedItem"})
 	public boolean isMoveSelectedItemUpDisabled() {
 		int index = getSelectedItemIndex();
 		return index <= 0;
 	}
 	
+	@DependsOn({"items","selectedItem"})
 	public boolean isMoveSelectedItemDownDisabled() {
 		if ( selectedItem != null ) {
 			List<T> items = getItemsInternal();
@@ -153,7 +161,7 @@ public abstract class SurveyObjectBaseVM<T> extends SurveyBaseVM {
 			ConfirmHandler handler = new ConfirmHandler() {
 				@Override
 				public void onOk() {
-					performRemoveItem(item);
+					performDeleteItem(item);
 				}
 			};
 			MessageUtil.showConfirm(handler, "global.item.confirm_remove");
@@ -162,7 +170,7 @@ public abstract class SurveyObjectBaseVM<T> extends SurveyBaseVM {
 		}
 	}
 
-	protected void performRemoveItem(T item) {
+	protected void performDeleteItem(T item) {
 		deleteItemFromSurvey(item);
 		notifyChange("items");
 		if ( item.equals(selectedItem) ) {
@@ -180,21 +188,8 @@ public abstract class SurveyObjectBaseVM<T> extends SurveyBaseVM {
 		return selectedItem;
 	}
 
-	@NotifyChange({"selectedItem"})
 	public void setSelectedItem(T item) {
 		selectedItem = item;
-		if ( item != null ) {
-			/*
-			try {
-				//T clonedInstance = (T) BeanUtils.cloneBean(item);
-				T clonedInstance = createItemInstance();
-				BeanUtils.copyProperties(clonedInstance, item);
-				setEditedItem(clonedInstance);
-			} catch (Exception e) {
-				throw new RuntimeException(e);
-			}
-			*/
-		}
 	}
 	
 	public SurveyObjectFormObject<T> getFormObject() {

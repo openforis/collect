@@ -20,6 +20,7 @@ import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.GlobalCommand;
 import org.zkoss.bind.annotation.Init;
 import org.zkoss.bind.annotation.NotifyChange;
+import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zkplus.databind.BindingListModelList;
@@ -33,10 +34,10 @@ import org.zkoss.zkplus.databind.BindingListModelList;
 public abstract class SurveyBaseVM extends BaseVM {
 	
 	public static final String ERRORS_IN_PAGE_MESSAGE_KEY = "global.message.errors_in_page";
+	private static final String DATE_FORMAT = Labels.getLabel("global.date_format");
 
 	protected XMLStringDateConverter xmlStringDateConverter = new XMLStringDateConverter();
 	
-	private String dateFormat = "dd/MM/yyyy";
 	
 	@WireVariable
 	protected CollectSurvey survey;
@@ -118,7 +119,7 @@ public abstract class SurveyBaseVM extends BaseVM {
 	}
 
 	public String getDateFormat() {
-		return dateFormat;
+		return DATE_FORMAT;
 	}
 
 	public List<Object> getVersionsForCombo() {
