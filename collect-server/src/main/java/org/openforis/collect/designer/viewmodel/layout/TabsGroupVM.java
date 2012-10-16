@@ -27,16 +27,13 @@ import org.zkoss.bind.annotation.ContextParam;
 import org.zkoss.bind.annotation.ContextType;
 import org.zkoss.bind.annotation.DependsOn;
 import org.zkoss.bind.annotation.ExecutionArgParam;
+import org.zkoss.bind.annotation.GlobalCommand;
 import org.zkoss.bind.annotation.Init;
 import org.zkoss.bind.annotation.NotifyChange;
 import org.zkoss.zk.ui.Component;
-import org.zkoss.zk.ui.event.Event;
-import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.select.Selectors;
 import org.zkoss.zk.ui.select.annotation.Wire;
-import org.zkoss.zul.Button;
 import org.zkoss.zul.Tabbox;
-import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Window;
 
 /**
@@ -45,7 +42,9 @@ import org.zkoss.zul.Window;
  */
 public class TabsGroupVM extends BaseVM {
 
-	private static final String TAB_CHANGED_GLOBAL_COMMAND = "tabChanged";
+	private static final String TAB_NAME_PREFIX = "tab_";
+	private static final String TAB_NAME_SEPARATOR = "_";
+	public static final String TAB_CHANGED_GLOBAL_COMMAND = "tabChanged";
 	
 	public static UITab FAKE_ADD_TAB;
 	
@@ -108,34 +107,35 @@ public class TabsGroupVM extends BaseVM {
 	}
 
 	protected void openTabLabelEditPopUp(final UITab tab) {
-		tabLabelPopUp = openPopUp(Resources.Component.TAB_LABEL_POPUP.getLocation(), true);
-		Button okButton = (Button) tabLabelPopUp.query("#okBtn");
-		final Textbox textbox = (Textbox) tabLabelPopUp.query("#textbox");
-		textbox.setText(tab.getLabel(getCurrentLanguageCode()));
-		okButton.addEventListener("onClick", new EventListener<Event>() {
-			@Override
-			public void onEvent(Event event) throws Exception {
-				String label = textbox.getText();
-				label.trim();
-				if ( validateTabLabel(label) ) {
-					List<UITab> tabs = tabSet.getTabs();
-					int index = tabs.indexOf(tab);
-					tabbox.setSelectedIndex(index);
-					tab.setLabel(getCurrentLanguageCode(), label);
-					closePopUp(tabLabelPopUp);
-					BindUtils.postNotifyChange(null, null, tab, "label");
-				}
-			}
-			
-			boolean validateTabLabel(String label) {
-				if ( StringUtils.isBlank(label) ) {
-					MessageUtil.showWarning("survey.layout.tab.label.error.required");
-					return false;
-				} else {
-					return true;
-				}
-			}
-		});
+		Map<String, Object> args = new HashMap<String, Object>();
+		args.put("tab", tab);
+		tabLabelPopUp = openPopUp(Resources.Component.TAB_LABEL_POPUP.getLocation(), true, args);
+	}
+	
+	@GlobalCommand
+	public void applyChangesToTabLabel(@BindingParam("tab") UITab tab, @BindingParam("label") String label) {
+		UITabSet parent = tab.getParent();
+		if ( parent.equals(tabSet) && validateTabLabel(label) ) {
+			performUpdateTabLabel(tab, label);
+		}
+	}
+
+	protected void performUpdateTabLabel(UITab tab, String label) {
+		List<UITab> tabs = tabSet.getTabs();
+		int index = tabs.indexOf(tab);
+		tabbox.setSelectedIndex(index);
+		tab.setLabel(getCurrentLanguageCode(), label.trim());
+		closePopUp(tabLabelPopUp);
+		BindUtils.postNotifyChange(null, null, tab, "*");
+	}
+	
+	protected boolean validateTabLabel(String label) {
+		if ( StringUtils.isBlank(label) ) {
+			MessageUtil.showWarning("survey.layout.tab.label.error.required");
+			return false;
+		} else {
+			return true;
+		}
 	}
 	
 	private void postTabChangedCommand(UITabSet parent) {
@@ -145,7 +145,7 @@ public class TabsGroupVM extends BaseVM {
 	}
 	
 	private String generateNewTabName(UITabSet parentGroup) {
-		String prefix = "tab_";
+		String prefix = TAB_NAME_PREFIX;
 		Stack<Integer> parts = new Stack<Integer>();
 		UITabSet currentGroup = parentGroup;
 		do {
@@ -153,7 +153,7 @@ public class TabsGroupVM extends BaseVM {
 			parts.push(position);
 			currentGroup = currentGroup.getParent();
 		} while ( currentGroup != null );
-		String suffix = StringUtils.join(parts.toArray(), "_");
+		String suffix = StringUtils.join(parts.toArray(), TAB_NAME_SEPARATOR);
 		String tabName = prefix + suffix;
 		return tabName;
 	}

@@ -9,7 +9,7 @@
 					<tab label="+" onClick="@command('addTab')" />
 				</template>
 				<template name="children">
-					<tab label="@load(each.label)"
+					<tab label="@load(each.getLabel(vm.currentLanguageCode))"
 						onClose="@command('removeTab', group=tabGroup, tab=each)" 
 						onDoubleClick="@command('editTabLabel', tab=each)"
 						closable="true" />

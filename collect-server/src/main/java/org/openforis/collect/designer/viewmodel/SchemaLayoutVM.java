@@ -71,7 +71,7 @@ public class SchemaLayoutVM extends SurveyBaseVM {
 	}
 	
 	@Command
-	@NotifyChange({"tabSet"})
+	@NotifyChange({"rootTabSet"})
 	public void nodeSelected(@BindingParam("node") Treeitem node) {
 		List<ModelVersion> versions = survey.getVersions();
 		setFormVersion(versions.isEmpty() ? null: versions.get(0));
@@ -103,7 +103,7 @@ public class SchemaLayoutVM extends SurveyBaseVM {
 			tabsGroupContainerInclude.setSrc(null);
 		} else if ( forceRefresh || this.rootTabSet != tabSet) {
 			tabsGroupContainerInclude.setSrc(null); //workaround: include is not refreshed otherwise
-			tabsGroupContainerInclude.setDynamicProperty("tabsGroup", tabSet);
+			tabsGroupContainerInclude.setDynamicProperty("tabSet", tabSet);
 			tabsGroupContainerInclude.setSrc(Resources.Component.TABSGROUP.getLocation());
 		}
 	}
@@ -151,6 +151,12 @@ public class SchemaLayoutVM extends SurveyBaseVM {
 		}
 		return treeModel;
     }
+	
+	public boolean isAssociatedToTab(NodeDefinition nodeDefn) {
+		UIOptions uiOptions = survey.getUIOptions();
+		boolean result = uiOptions.isAssociatedToTab(nodeDefn);
+		return result;
+	}
 	
 	public List<ModelVersion> getFormVersions() {
 		CollectSurvey survey = getSurvey();
