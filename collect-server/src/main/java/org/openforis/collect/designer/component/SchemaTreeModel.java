@@ -53,24 +53,31 @@ public class SchemaTreeModel extends DefaultTreeModel<NodeDefinition> {
 			EntityDefinition parent = (EntityDefinition) defn.getParentDefinition();
 			NodeDefinition current = defn;
 			List<Integer> temp = new ArrayList<Integer>();
+			int index;
 			while ( parent != null ) {
-				int index = parent.getChildIndex(current);
+				index = parent.getChildIndex(current);
 				temp.add(0, index);
-				parent = (EntityDefinition) current.getParentDefinition();
 				current = parent;
+				parent = (EntityDefinition) current.getParentDefinition();
 			}
 			EntityDefinition rootEntity = current.getRootEntity();
 			Schema schema = rootEntity.getSchema();
-			schema.getRootEntityIndex(rootEntity);
-			int[] result = new int[temp.size()];
-			for (int i = 0; i < temp.size(); i++) {
-				int index = temp.get(i);
-				result[i] = index;
-			}
+			index = schema.getRootEntityIndex(rootEntity);
+			temp.add(0, index);
+			int[] result = toArray(temp);
 			return result;
 		} else {
 			return null;
 		}
+	}
+
+	private int[] toArray(List<Integer> temp) {
+		int[] result = new int[temp.size()];
+		for (int i = 0; i < temp.size(); i++) {
+			int value = temp.get(i).intValue();
+			result[i] = value;
+		}
+		return result;
 	}
 	
 	public static SchemaTreeModel createInstance(CollectSurvey survey) {

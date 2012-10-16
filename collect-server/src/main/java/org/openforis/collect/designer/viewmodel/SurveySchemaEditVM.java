@@ -155,9 +155,11 @@ public class SurveySchemaEditVM extends SurveyEditBaseVM {
 		editedNode = newNode;
 		selectedNode = null;
 		
+		treeModel.select(null);
+		
 		refreshNodeForm();
 		
-		notifyChange("nodes","editedNode","nodeType","attributeType",
+		notifyChange("nodes","selectedNode","editedNode","nodeType","attributeType",
 				"tempFormObject","formObject", "attributeDefaults","numericAttributePrecisions");
 
 		validateForm(binder);

@@ -4,7 +4,6 @@ import org.openforis.collect.designer.viewmodel.SurveySchemaEditVM;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Schema;
-import org.openforis.idm.path.InvalidPathException;
 import org.zkoss.bind.ValidationContext;
 import org.zkoss.util.resource.Labels;
 
@@ -61,20 +60,17 @@ public class NodeDefinitionFormValidator extends FormValidator {
 	}
 
 	protected boolean existsHomonymousSibling(NodeDefinition defn, String name) {
-		String parentPath;
 		EntityDefinition parentDefn = (EntityDefinition) defn.getParentDefinition();
-		if (parentDefn != null) {
-			parentPath = parentDefn.getPath();
-		} else {
-			parentPath = "";
-		}
-		Schema schema = defn.getSchema();
-		NodeDefinition nodeInPath;
+		NodeDefinition nodeInPath = null;
 		try {
-			nodeInPath = schema.getDefinitionByPath(parentPath + "/" + name);
-		} catch (InvalidPathException e) {
-			throw new RuntimeException(
-					"Error validating node definition name uniqueness", e);
+			if (parentDefn != null) {
+				nodeInPath = parentDefn.getChildDefinition(name);
+			} else {
+				Schema schema = defn.getSchema();
+				nodeInPath = schema.getRootEntityDefinition(name);
+			}
+		} catch ( IllegalArgumentException e ) {
+			//sibling not found
 		}
 		return nodeInPath != null && nodeInPath.getId() != defn.getId();
 	}
