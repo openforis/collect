@@ -168,6 +168,11 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		nodeDefn.setAnnotation(Annotation.TAB_NAME.getQName(), null);
 	}
 	
+	public boolean isAssociatedToTab(NodeDefinition nodeDefn) {
+		UITab tab = getTab(nodeDefn);
+		return tab != null;
+	}
+	
 	public Layout getLayout(EntityDefinition node) {
 		String layoutValue = node.getAnnotation(Annotation.LAYOUT.getQName());
 		if ( layoutValue == null ) {

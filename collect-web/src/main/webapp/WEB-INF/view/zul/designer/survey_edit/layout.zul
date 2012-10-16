@@ -25,7 +25,8 @@
 					<template name="model">
 			            <treeitem draggable="true" >
 			                <treerow>
-			                    <treecell label="@load(each.data.name)"/>
+			                    <treecell label="@load(each.data.name)" 
+                                   sclass="@load(vm.isAssociatedToTab(each.data) ? 'associated': '')" />
 			                </treerow>
 			            </treeitem>
 			  		</template>

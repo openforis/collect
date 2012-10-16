@@ -21,3 +21,12 @@
 	height: 25px;
 	padding-left: 20px;
 }
+.z-treecell {
+	font-style: bold;
+	font-size: 14px;
+}
+.z-treecell.associated {
+	color: grey;
+	font-style: italic;
+}
+
