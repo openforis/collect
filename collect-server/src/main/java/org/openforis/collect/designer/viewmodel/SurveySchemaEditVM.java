@@ -56,6 +56,10 @@ import org.zkoss.zul.Window;
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class SurveySchemaEditVM extends SurveyBaseVM {
 
+	private static final String TAB_NAME_PREFIX = "tab_";
+
+	private static final String ROOT_TABSET_NAME_PREFIX = "tabset_";
+
 	private static final String SCHEMA_CHANGED_GLOBAL_COMMAND = "schemaChanged";
 	
 	private static final String ATTRIBUTE_DEFAULTS_FIELD = "attributeDefaults";
@@ -163,7 +167,6 @@ public class SurveySchemaEditVM extends SurveyBaseVM {
 				"tempFormObject","formObject", "attributeDefaults","numericAttributePrecisions");
 
 		validateForm(binder);
-		dispatchSchemaChangedCommand();
 	}
 	
 	protected void refreshNodeForm() {
@@ -391,7 +394,7 @@ public class SurveySchemaEditVM extends SurveyBaseVM {
 	protected EntityDefinition createRootEntityNode() {
 		EntityDefinition newNode = (EntityDefinition) NodeType.createNodeDefinition(survey, NodeType.ENTITY, null);
 		UITabSet tabSet = createRootTabSet(newNode);
-		addFirstTab(newNode, tabSet);
+		newNode.setAnnotation(UIOptions.Annotation.TAB_SET.getQName(), tabSet.getName());
 		return newNode;
 	}
 
@@ -399,20 +402,19 @@ public class SurveySchemaEditVM extends SurveyBaseVM {
 			UITabSet tabSet) {
 		UITab tab = new UITab();
 		int tabPosition = 1;
-		String tabName = "tab_" + tabPosition;
+		String tabName = TAB_NAME_PREFIX + tabPosition;
 		tab.setName(tabName);
 		tabSet.addTab(tab);
-		newNode.setAnnotation(UIOptions.Annotation.TAB_SET.getQName(), tabName);
 	}
 
-	protected UITabSet createRootTabSet(EntityDefinition newNode) {
+	protected UITabSet createRootTabSet(EntityDefinition rootEntity) {
 		UIOptions uiOpts = survey.getUIOptions();
 		UITabSet tabSet = new UITabSet();
 		int tabSetPosition = uiOpts.getTabSets().size() + 1;
-		String tabSetName = "tabset_" + tabSetPosition;
+		String tabSetName = ROOT_TABSET_NAME_PREFIX + tabSetPosition;
 		tabSet.setName(tabSetName);
+		addFirstTab(rootEntity, tabSet);
 		uiOpts.addTabSet(tabSet);
-		newNode.setAnnotation(UIOptions.Annotation.TAB_SET.getQName(), tabSetName);
 		return tabSet;
 	}
 
