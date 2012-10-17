@@ -43,6 +43,9 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.util.PopUpUtil;
 	import org.openforis.collect.ui.component.DataImportPopUp;
 	import org.openforis.collect.ui.component.user.UserManagementPopUp;
+	import org.openforis.collect.ui.component.SurveySelectionPopUp;
+	import mx.managers.PopUpManager;
+	import flash.display.DisplayObject;
 	
 	/**
 	 * 
@@ -89,18 +92,16 @@ package org.openforis.collect.presenter {
 			//mouse wheel handler to increment scroll step size
 			FlexGlobals.topLevelApplication.systemManager.addEventListener(MouseEvent.MOUSE_WHEEL, mouseWheelHandler, true);
 			eventDispatcher.addEventListener(UIEvent.SHOW_SURVEY_SELECTION, showSurveySelectionHandler);
-			eventDispatcher.addEventListener(UIEvent.SURVEY_SELECTED, surveySelectedHandler);
-			eventDispatcher.addEventListener(UIEvent.ROOT_ENTITY_SELECTED, rootEntitySelectedHandler);
-			
-			//_view.header.logoutButton.addEventListener(MouseEvent.CLICK, logoutButtonClickHandler);
+			eventDispatcher.addEventListener(UIEvent.SHOW_LIST_OF_RECORDS, showListOfRecordsHandler);
 			
 			_view.header.settingsButton.addEventListener(MenuEvent.ITEM_CLICK, settingsItemClickHandler);
 			
 			CONFIG::debugging {
 				_view.addEventListener(KeyboardEvent.KEY_DOWN, function(event:KeyboardEvent):void {
 					//open FlexSpy popup pressing CTRL+i
-					if(event.ctrlKey && event.charCode == 105)
+					if ( event.ctrlKey && event.charCode == 105 ) {
 						FlexSpy.show();
+					}
 				});
 			}
 		}
@@ -176,64 +177,50 @@ package org.openforis.collect.presenter {
 			}
 		}
 		
+		protected function showListOfRecordsHandler(event:UIEvent):void {
+			if ( Application.activeSurvey == null || Application.activeRootEntity == null ) {
+				openSurveySelectionPopUp();
+			} else {
+				var uiEvent:UIEvent = new UIEvent(UIEvent.ROOT_ENTITY_SELECTED);
+				uiEvent.obj = Application.activeRootEntity;
+				eventDispatcher.dispatchEvent(uiEvent);
+			}
+		}
+		
+		protected function openSurveySelectionPopUp(automaticallySelect:Boolean = true):void {
+			var popUp:SurveySelectionPopUp = new SurveySelectionPopUp();
+			popUp.visible = false;
+			popUp.automaticallySelect = automaticallySelect;
+			PopUpManager.addPopUp(popUp, FlexGlobals.topLevelApplication as DisplayObject, true);
+			PopUpManager.centerPopUp(popUp);
+		}
+		
 		/**
 		 * Get Survey Summaries
 		 * 
 		 * */
 		internal function getSurveySummaries():void {
-			_modelClient.getSurveySummaries(new ItemResponder(getSurveySummariesResultHandler, faultHandler));
+			var responder:IResponder = new ItemResponder(getSurveySummariesResultHandler, faultHandler);
+			_modelClient.getSurveySummaries(responder);
 		}
 		
 		internal function getSurveySummariesResultHandler(event:ResultEvent, token:Object = null):void {
 			var summaries:IList =  event.result as IList;
 			Application.surveySummaries = summaries;
-			var uiEvent:UIEvent;
-			if ( summaries.length == 1) {
-				var s:SurveySummary = summaries.getItemAt(0) as SurveySummary;
-				uiEvent = new UIEvent(UIEvent.SURVEY_SELECTED);
-				uiEvent.obj = s;
-				eventDispatcher.dispatchEvent(uiEvent);
+			if ( ! Application.user.hasEffectiveRole(UserProxy.ROLE_ADMIN) ) {
+				showListOfRecordsHandler(null);
 			} else {
-				uiEvent = new UIEvent(UIEvent.SHOW_SURVEY_SELECTION);
-				eventDispatcher.dispatchEvent(uiEvent);
+				showHomePage();
 			}
+		}
+		
+		protected function showHomePage():void {
+			var uiEvent:UIEvent = new UIEvent(UIEvent.SHOW_HOME_PAGE);
+			eventDispatcher.dispatchEvent(uiEvent);
 		}
 		
 		protected function showSurveySelectionHandler(event:UIEvent):void {
 			updateSettingsPopUpMenu(false);
-		}
-		
-		protected function surveySelectedHandler(event:UIEvent):void {
-			var s:SurveySummary = event.obj as SurveySummary;
-			var name:String = s.name;
-			var responder:IResponder = new ItemResponder(setActiveSurveyResultHandler, faultHandler);
-			_modelClient.setActiveSurvey(responder, name);			
-		}
-		
-		protected function rootEntitySelectedHandler(event:UIEvent):void {
-			updateSettingsPopUpMenu();
-		}
-		
-		protected function setActiveSurvey(survey:SurveyProxy):void {
-			Application.activeSurvey = survey;
-			survey.init();
-			var schema:SchemaProxy = survey.schema;
-			var rootEntityDefinitions:ListCollectionView = schema.rootEntityDefinitions;
-			var uiEvent:UIEvent;
-			if ( rootEntityDefinitions.length == 1) {
-				var rootEntityDef:EntityDefinitionProxy = rootEntityDefinitions.getItemAt(0) as EntityDefinitionProxy;
-				uiEvent = new UIEvent(UIEvent.ROOT_ENTITY_SELECTED);
-				uiEvent.obj = rootEntityDef;
-				eventDispatcher.dispatchEvent(uiEvent);
-			} else {
-				uiEvent = new UIEvent(UIEvent.SHOW_ROOT_ENTITY_SELECTION);
-				eventDispatcher.dispatchEvent(uiEvent);
-			}
-		}
-		
-		internal function setActiveSurveyResultHandler(event:ResultEvent, token:Object = null):void {
-			var survey:SurveyProxy = event.result as SurveyProxy;
-			setActiveSurvey(survey);
 		}
 		
 		internal function sendKeepAliveMessage(event:TimerEvent):void {

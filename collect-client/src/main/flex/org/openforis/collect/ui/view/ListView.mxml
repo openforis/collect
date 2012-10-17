@@ -45,6 +45,10 @@
 	</s:states>
 	
 	<s:Group width="100%" height="30">
+		<s:Button id="backToMainMenuButton" label="{Message.get('list.backToMainMenu')}" 
+				  useHandCursor="true" buttonMode="true" 
+				  enabled.inactive="false" />
+		
 		<s:Label id="titleLabel" styleName="listTitle" verticalCenter="0" horizontalCenter="0" />
 		
 		<s:ToggleButton id="openFilterPopUpButton"

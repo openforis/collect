@@ -14,6 +14,8 @@ package org.openforis.collect.event {
 		public static const SURVEY_SELECTED:String = "surveySelected";
 		public static const ROOT_ENTITY_SELECTED:String = "rootEntitySelected";
 		public static const BACK_TO_LIST:String = "backToList";
+		public static const SHOW_HOME_PAGE:String = "backToHome";
+		public static const SHOW_LIST_OF_RECORDS:String = "showListOfRecords";
 		
 		public static const RECORD_SELECTED:String = "recordSelected";
 		public static const RECORD_CREATED:String = "recordCreated";

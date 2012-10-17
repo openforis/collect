@@ -1,6 +1,7 @@
 package org.openforis.collect.util {
 	import mx.core.FlexGlobals;
 	import mx.utils.URLUtil;
+	import flash.net.URLRequest;
 	
 	/**
 	 * 
@@ -23,6 +24,7 @@ package org.openforis.collect.util {
 		
 		private static const DOWNLOAD_EXPORTED_DATA_SERVLET_NAME:String = "downloadDataExport.htm";
 		private static const DOWNLOAD_BACKUP_SERVLET_NAME:String = "downloadBackup.htm";
+		private static const _DESIGNER_URL_PART:String = "designer.htm";
 		
 		public static const DATE_TIME_PATTERN:String = "dd-MM-yyyy HH:mm";
 		
@@ -32,6 +34,7 @@ package org.openforis.collect.util {
 		private static var _RECORD_FILE_DELETE_URL:String; 
 		private static var _DOWNLOAD_EXPORTED_DATA_URL:String;
 		private static var _DOWNLOAD_BACKUP_DATA_URL:String;
+		private static var _DESIGNER_URL:String;
 		
 		private static var _HOST:String;
 		private static var _PORT:uint;
@@ -70,6 +73,10 @@ package org.openforis.collect.util {
 			return _DOWNLOAD_BACKUP_DATA_URL;
 		}
 		
+		public static function get DESIGNER_URL():String {
+			return _DESIGNER_URL;
+		}
+		
 		public static function get HOST():String {
 			return _HOST;
 		}
@@ -103,6 +110,7 @@ package org.openforis.collect.util {
 			
 			_DOWNLOAD_EXPORTED_DATA_URL = _URL + DOWNLOAD_EXPORTED_DATA_SERVLET_NAME;
 			_DOWNLOAD_BACKUP_DATA_URL = _URL + DOWNLOAD_BACKUP_SERVLET_NAME;
+			_DESIGNER_URL = _URL + _DESIGNER_URL_PART;
 		}
 
 	}

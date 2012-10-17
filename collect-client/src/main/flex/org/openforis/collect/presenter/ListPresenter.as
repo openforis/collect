@@ -88,21 +88,26 @@ package org.openforis.collect.presenter {
 		override internal function initEventListeners():void {
 			eventDispatcher.addEventListener(UIEvent.LOAD_RECORD_SUMMARIES, loadRecordSummariesHandler);
 			eventDispatcher.addEventListener(UIEvent.RELOAD_RECORD_SUMMARIES, reloadRecordSummariesHandler);
-
-			this._view.addButton.addEventListener(MouseEvent.CLICK, addButtonClickHandler);
-			this._view.editButton.addEventListener(MouseEvent.CLICK, editButtonClickHandler);
-			this._view.deleteButton.addEventListener(MouseEvent.CLICK, deleteButtonClickHandler);
-			this._view.exportButton.addEventListener(MouseEvent.CLICK, exportButtonClickHandler);
-			this._view.openFilterPopUpButton.addEventListener(MouseEvent.CLICK, openFilterPopUpButtonClickHandler);
 			
-			this._view.dataGrid.addEventListener(GridSortEvent.SORT_CHANGING, dataGridSortChangingHandler);
+			_view.backToMainMenuButton.addEventListener(MouseEvent.CLICK, backToMainMenuClickHandler);
+			_view.addButton.addEventListener(MouseEvent.CLICK, addButtonClickHandler);
+			_view.editButton.addEventListener(MouseEvent.CLICK, editButtonClickHandler);
+			_view.deleteButton.addEventListener(MouseEvent.CLICK, deleteButtonClickHandler);
+			_view.exportButton.addEventListener(MouseEvent.CLICK, exportButtonClickHandler);
+			_view.openFilterPopUpButton.addEventListener(MouseEvent.CLICK, openFilterPopUpButtonClickHandler);
 			
-			this._view.paginationBar.firstPageButton.addEventListener(MouseEvent.CLICK, firstPageClickHandler);
-			this._view.paginationBar.previousPageButton.addEventListener(MouseEvent.CLICK, previousPageClickHandler);
-			this._view.paginationBar.nextPageButton.addEventListener(MouseEvent.CLICK, nextPageClickHandler);
-			this._view.paginationBar.lastPageButton.addEventListener(MouseEvent.CLICK, lastPageClickHandler);
-			//this._view.paginationBar.goToPageButton.addEventListener(MouseEvent.CLICK, goToPageClickHandler);
+			_view.dataGrid.addEventListener(GridSortEvent.SORT_CHANGING, dataGridSortChangingHandler);
+			
+			_view.paginationBar.firstPageButton.addEventListener(MouseEvent.CLICK, firstPageClickHandler);
+			_view.paginationBar.previousPageButton.addEventListener(MouseEvent.CLICK, previousPageClickHandler);
+			_view.paginationBar.nextPageButton.addEventListener(MouseEvent.CLICK, nextPageClickHandler);
+			_view.paginationBar.lastPageButton.addEventListener(MouseEvent.CLICK, lastPageClickHandler);
+			//_view.paginationBar.goToPageButton.addEventListener(MouseEvent.CLICK, goToPageClickHandler);
 			_view.stage.addEventListener(MouseEvent.CLICK, stageClickHandler);
+		}
+		
+		protected function backToMainMenuClickHandler(event:Event):void {
+			eventDispatcher.dispatchEvent(new UIEvent(UIEvent.SHOW_HOME_PAGE));
 		}
 		
 		/**

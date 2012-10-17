@@ -45,20 +45,11 @@ package org.openforis.collect.presenter {
 		
 		override internal function initEventListeners():void {
 			//eventDispatcher.addEventListener(ApplicationEvent.APPLICATION_INITIALIZED, applicationInitializedHandler);
-			eventDispatcher.addEventListener(UIEvent.SHOW_SURVEY_SELECTION, showSurveySelectionHandler);
-			eventDispatcher.addEventListener(UIEvent.SHOW_ROOT_ENTITY_SELECTION, showRootEntitySelectionHandler);
 			eventDispatcher.addEventListener(UIEvent.ROOT_ENTITY_SELECTED, rootEntitySelectedHandler);
+			eventDispatcher.addEventListener(UIEvent.SHOW_HOME_PAGE, backToHomeHandler);
 			eventDispatcher.addEventListener(UIEvent.BACK_TO_LIST, backToListHandler);
 			eventDispatcher.addEventListener(UIEvent.RECORD_SELECTED, recordSelectedHandler);
 			eventDispatcher.addEventListener(UIEvent.RECORD_CREATED, recordCreatedHandler);
-		}
-		
-		protected function showSurveySelectionHandler(event:Event):void {
-			_view.currentState = MasterView.SURVEY_SELECTION_STATE;
-		}
-		
-		protected function showRootEntitySelectionHandler(event:Event):void {
-			_view.currentState = MasterView.SURVEY_SELECTION_STATE;
 		}
 		
 		/**
@@ -131,6 +122,12 @@ package org.openforis.collect.presenter {
 			_view.currentState = MasterView.DETAIL_STATE;
 		}
 		
+		internal function backToHomeHandler(event:UIEvent):void {
+			Application.activeSurvey = null;
+			Application.activeRootEntity = null;
+			_view.currentState = MasterView.HOME_STATE;
+		}
+			
 		internal function backToListHandler(event:UIEvent):void {
 			//reload record summaries 
 			_view.currentState = MasterView.LIST_STATE;

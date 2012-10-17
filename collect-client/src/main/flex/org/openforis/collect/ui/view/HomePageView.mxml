@@ -44,7 +44,15 @@
 			<!-- TODO Introduction -->
 		</s:Group>
 		<s:VGroup height="100%" width="30%">
-			<s:List id="functionList" height="100%" width="100%" />
+			<s:List id="functionList" height="100%" width="100%" styleName="functionList">
+				<s:itemRenderer>
+					<fx:Component>
+						<s:ItemRenderer>
+							<s:Label styleName="functionLabel" text="{data.label}" />
+						</s:ItemRenderer>
+					</fx:Component>
+				</s:itemRenderer>
+			</s:List>
 		</s:VGroup>
 	</s:HGroup>
 	

@@ -44,6 +44,21 @@ s|Button.logout {
 	skin-class: ClassReference('org.openforis.collect.ui.skin.LogoutButtonSkin');
 }
 
+/* Home Page */
+.functionList{
+	/*skin-class: ClassReference('org.openforis.collect.ui.skin.FunctionListSkin');*/
+	borderVisible: false;
+}
+.functionLabel {
+	fontSize: 15;
+	fontWeight: bold;
+	paddingBottom: 5;
+	paddingTop: 5;
+	paddingRight: 5;
+	paddingLeft: 5;
+}
+/* end of Home Page */
+
 s|ToggleButton.filter {
 	icon: Embed(source='assets/images/filter.png');
 	cornerRadius: 5;
@@ -108,7 +123,7 @@ mx|Alert {
 
 }*/
 
-component|BlockingMessagePopUp, component|SelectVersionPopUp, input|CodeListDialog, component|DataExportPopUp, 
+component|BlockingMessagePopUp, component|SurveySelectionPopUp, component|SelectVersionPopUp, input|CodeListDialog, component|DataExportPopUp, 
 	component|BackupPopUp, component|DataImportPopUp, user|UserManagementPopUp {
 	skin-class: ClassReference("org.openforis.collect.ui.skin.TitleWindowSkin");
 	title-style-name: dialogHeaderStyle;
@@ -120,7 +135,7 @@ component|BlockingMessagePopUp, component|SelectVersionPopUp, input|CodeListDial
 	background-alpha: 1.0;
 }
 
-component|BlockingMessagePopUp, component|SelectVersionPopUp, input|CodeListDialog, component|DataExportPopUp, component|BackupPopUp {
+component|BlockingMessagePopUp, component|SurveySelectionPopUp, component|SelectVersionPopUp, input|CodeListDialog, component|DataExportPopUp, component|BackupPopUp {
 	showCloseButton: false;
 }
 
@@ -320,3 +335,4 @@ s|Label.dataGroupHeader {
 mx|PopUpMenuButton.settings {
 	popUpIcon: Embed(source='assets/images/settings.png');
 }
+

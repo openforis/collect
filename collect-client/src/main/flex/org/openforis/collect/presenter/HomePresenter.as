@@ -24,7 +24,7 @@ package org.openforis.collect.presenter {
 	public class HomePresenter extends AbstractPresenter {
 
 		private static const DATA_MANAGEMENT_MENU_ITEM:Object = {label: Message.get('home.dataManagement')};
-		private static const USERS_MANAGEMENT_MENU_ITEM:Object = {label: Message.get('home.usersManagement')};
+		private static const USERS_MANAGEMENT_MENU_ITEM:Object = {label: Message.get('home.userAccounts')};
 		private static const DESIGNER_MENU_ITEM:Object = {label: Message.get('home.databaseDesigner')};
 		
 		private var _view:HomePageView;
@@ -65,6 +65,7 @@ package org.openforis.collect.presenter {
 					eventDispatcher.dispatchEvent(new UIEvent(UIEvent.SHOW_LIST_OF_RECORDS));
 					break;
 			}
+			_view.functionList.selectedItem = null;
 		}
 		
 		
