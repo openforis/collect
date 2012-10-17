@@ -6,11 +6,17 @@ import java.io.Reader;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.persistence.xml.DataHandler.NodeUnmarshallingError;
 import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.XMLReader;
 
 /**
  * @author G. Miceli
@@ -29,29 +35,38 @@ public class DataUnmarshaller {
 	
 	private ParseRecordResult parse(InputSource source) {
 		ParseRecordResult result = new ParseRecordResult();
-//		SAXParser p = new SAXParser();
-//		p.setContentHandler(handler);
-//		try {
-//			p.parse(source);
-//			List<NodeUnmarshallingError> failures = handler.getFailures();
-//			if ( failures.isEmpty() ) {
-//				CollectRecord record = handler.getRecord();
-//				result.setRecord(record);
-//				List<NodeUnmarshallingError> warns = handler.getWarnings();
-//				if (warns.size() > 0) {
-//					result.setMessage("Processed with errors: " + warns.toString());
-//					result.setWarnings(warns);
-//				}
-//				result.setSuccess(true);
-//			} else {
-//				result.setFailures(failures);
-//			}
-//		} catch (Exception e) {
-//			String message = e.getMessage();
-//			NodeUnmarshallingError error = new NodeUnmarshallingError(message);
-//			result.setFailures(Arrays.asList(error));
-//		}
+		try {
+			XMLReader reader = createReader();
+			reader.parse(source);
+			List<NodeUnmarshallingError> failures = handler.getFailures();
+			if ( failures.isEmpty() ) {
+				CollectRecord record = handler.getRecord();
+				result.setRecord(record);
+				List<NodeUnmarshallingError> warns = handler.getWarnings();
+				if (warns.size() > 0) {
+					result.setMessage("Processed with errors: " + warns.toString());
+					result.setWarnings(warns);
+				}
+				result.setSuccess(true);
+			} else {
+				result.setFailures(failures);
+			}
+		} catch (Exception e) {
+			String message = e.getMessage();
+			NodeUnmarshallingError error = new NodeUnmarshallingError(message);
+			result.setFailures(Arrays.asList(error));
+		}
 		return result;
+	}
+
+	protected XMLReader createReader() throws ParserConfigurationException, SAXException {
+		SAXParserFactory factory = SAXParserFactory.newInstance();
+		// create a parser
+		SAXParser parser = factory.newSAXParser();
+		// create the reader (scanner)
+		XMLReader reader = parser.getXMLReader();
+		reader.setContentHandler(handler);
+		return reader;
 	}
 	
 	public ParseRecordResult parse(String filename) throws DataUnmarshallerException {
