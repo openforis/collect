@@ -9,6 +9,7 @@ package org.openforis.collect.metamodel.ui;
 public interface UIOptionsConstants {
 
 	String UI_NAMESPACE_URI = "http://www.openforis.org/collect/3.0/ui";
+	String UI_PREFIX = "ui";
 	
 	String UI_TYPE = "ui";
 

@@ -69,12 +69,12 @@ abstract class SurveyBaseDao extends JooqDaoSupport {
 	}
 	
 	public void marshalSurvey(Survey survey, OutputStream os) throws SurveyImportException {
-//		try {
-//			CollectSurveyIdmlBinder binder = new CollectSurveyIdmlBinder(surveyContext);
-//			binder.marshal(survey, os);
-//		} catch (IOException e) {
-//			throw new SurveyImportException("Error marshalling survey", e);
-//		}
+		try {
+			CollectSurveyIdmlBinder binder = new CollectSurveyIdmlBinder(surveyContext);
+			binder.marshal(survey, os);
+		} catch (IOException e) {
+			throw new SurveyImportException("Error marshalling survey", e);
+		}
 	}
 	
 }

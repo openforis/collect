@@ -5,6 +5,7 @@ import static org.openforis.collect.metamodel.ui.UIOptionsConstants.NAME;
 import static org.openforis.collect.metamodel.ui.UIOptionsConstants.TAB;
 import static org.openforis.collect.metamodel.ui.UIOptionsConstants.TAB_SET;
 import static org.openforis.collect.metamodel.ui.UIOptionsConstants.UI_NAMESPACE_URI;
+import static org.openforis.collect.metamodel.ui.UIOptionsConstants.UI_PREFIX;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -15,6 +16,7 @@ import org.openforis.collect.metamodel.ui.UITab;
 import org.openforis.collect.metamodel.ui.UITabSet;
 import org.openforis.idm.metamodel.LanguageSpecificText;
 import org.openforis.idm.metamodel.xml.IdmlConstants;
+import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
 import org.xmlpull.v1.XmlSerializer;
 
@@ -29,21 +31,25 @@ public class UIOptionsSerializer {
 
 	public void write(UIOptions options, Writer out) {
 		try {
-			XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
-			XmlSerializer serializer = factory.newSerializer();
-			serializer.setFeature(INDENT, true);
+			XmlSerializer serializer = createXmlSerializer();
 			serializer.setOutput(out);
-			serializer.startDocument("UTF-8", true);
-			serializer.setPrefix("ui", UI_NAMESPACE_URI);
 			List<UITabSet> tabSets = options.getTabSets();
 			for (UITabSet tabSet : tabSets) {
 				writeTabSet(serializer, tabSet);
 			}
-			serializer.endDocument();
 			serializer.flush();
 		} catch ( Exception e ) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	protected XmlSerializer createXmlSerializer() throws XmlPullParserException,
+			IOException {
+		XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
+		XmlSerializer serializer = factory.newSerializer();
+		serializer.setFeature(INDENT, true);
+		serializer.setPrefix(UI_PREFIX, UI_NAMESPACE_URI);
+		return serializer;
 	}
 
 	protected void writeTabSet(XmlSerializer serializer, UITabSet tabSet)
