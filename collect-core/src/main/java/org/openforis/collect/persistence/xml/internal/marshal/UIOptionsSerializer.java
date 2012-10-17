@@ -74,7 +74,10 @@ public class UIOptionsSerializer {
 	protected void writeLabel(XmlSerializer serializer, LanguageSpecificText label)
 			throws IOException {
 		serializer.startTag(UI_NAMESPACE_URI, LABEL);
-		serializer.attribute(UI_NAMESPACE_URI, IdmlConstants.XML_LANG_ATTRIBUTE, label.getLanguage());
+		String lang = label.getLanguage();
+		if ( lang != null ) {
+			serializer.attribute(UI_NAMESPACE_URI, IdmlConstants.XML_LANG_ATTRIBUTE, lang);
+		}
 		serializer.text(label.getText());
 		serializer.endTag(UI_NAMESPACE_URI, LABEL);
 	}
