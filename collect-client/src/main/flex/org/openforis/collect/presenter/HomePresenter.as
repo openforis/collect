@@ -38,7 +38,7 @@ package org.openforis.collect.presenter {
 		
 		override internal function initEventListeners():void {
 			super.initEventListeners();
-			_view.functionList.addEventListener(IndexChangeEvent.CHANGE, functionListChangeHandler);
+			_view.functionList.addEventListener(IndexChangeEvent.CHANGING, functionListChangingHandler);
 		}
 		
 		protected function createFunctionsList():IList {
@@ -51,9 +51,10 @@ package org.openforis.collect.presenter {
 			return result;
 		}
 		
-		protected function functionListChangeHandler(event:IndexChangeEvent):void {
+		protected function functionListChangingHandler(event:IndexChangeEvent):void {
 			var items:IList = _view.functionList.dataProvider;
 			var item:Object = items.getItemAt(event.newIndex);
+			event.preventDefault();
 			switch (item) {
 				case DESIGNER_MENU_ITEM:
 					navigateToURL(new URLRequest(ApplicationConstants.DESIGNER_URL), "_self");
@@ -65,7 +66,6 @@ package org.openforis.collect.presenter {
 					eventDispatcher.dispatchEvent(new UIEvent(UIEvent.SHOW_LIST_OF_RECORDS));
 					break;
 			}
-			_view.functionList.selectedItem = null;
 		}
 		
 		
