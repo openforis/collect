@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx"
+		 xmlns:component="org.openforis.collect.ui.component.*"
+		 width="100%" height="100%"
+		 creationComplete="creationCompleteHandler(event)" >
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.events.FlexEvent;
+			
+			import org.openforis.collect.i18n.Message;
+			import org.openforis.collect.presenter.HomePresenter;
+			import org.openforis.collect.ui.Images;
+			import org.openforis.collect.util.ApplicationConstants;
+			
+			public static const DEFAULT_STATE:String = "default";
+			public static const LOADING_STATE:String = "loading";
+			
+			private var _presenter:HomePresenter;
+			
+			protected function creationCompleteHandler(event:FlexEvent):void {
+				_presenter = new HomePresenter(this);
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<s:layout>
+		<s:VerticalLayout gap="0" />
+	</s:layout>
+	
+	<s:states>
+		<s:State name="default" />
+		<s:State name="loading" />
+	</s:states>
+	
+	<component:LoadingContent width="100%" height="100%" includeIn="loading" 
+							  itemCreationPolicy="immediate"/>
+	
+	<s:HGroup height="100%" width="100%" gap="0">
+		<s:Group height="100%" width="70%">
+			<!-- TODO Introduction -->
+		</s:Group>
+		<s:VGroup height="100%" width="30%">
+			<s:List id="functionList" height="100%" width="100%" />
+		</s:VGroup>
+	</s:HGroup>
+	
+	<s:HGroup width="100%" horizontalAlign="right">
+		<s:Label styleName="appVersionLabel" text="{Message.get('footer.versionLabel')}" />
+		<s:Label styleName="appVersionText" text="{ApplicationConstants.VERSION}" />
+	</s:HGroup>
+	<s:Image source="{Images.FOOTER}" />
+</s:Group>
