@@ -57,12 +57,6 @@ package org.openforis.collect.presenter {
 		
 		private static const MOUSE_WHEEL_BUMP_DELTA:Number = 30;
 		
-		private const SURVEY_SELECTION_MENU_ITEM:String = Message.get("settings.selectSurvey");
-		private const IMPORT_DATA_MENU_ITEM:String = Message.get("settings.admin.importData");
-		private const USERS_MANAGEMENT_MENU_ITEM:String = Message.get("settings.admin.usersManagement");
-		private const LOGOUT_MENU_ITEM:String = Message.get("settings.logout");
-		private const ADMIN_SETTINGS_ITEMS:ArrayCollection = new ArrayCollection([IMPORT_DATA_MENU_ITEM, USERS_MANAGEMENT_MENU_ITEM]);
-		
 		private var _view:collect;
 		private var _modelClient:ModelClient;
 		private var _sessionClient:SessionClient;
@@ -91,10 +85,7 @@ package org.openforis.collect.presenter {
 		override internal function initEventListeners():void {
 			//mouse wheel handler to increment scroll step size
 			FlexGlobals.topLevelApplication.systemManager.addEventListener(MouseEvent.MOUSE_WHEEL, mouseWheelHandler, true);
-			eventDispatcher.addEventListener(UIEvent.SHOW_SURVEY_SELECTION, showSurveySelectionHandler);
 			eventDispatcher.addEventListener(UIEvent.SHOW_LIST_OF_RECORDS, showListOfRecordsHandler);
-			
-			_view.header.settingsButton.addEventListener(MenuEvent.ITEM_CLICK, settingsItemClickHandler);
 			
 			CONFIG::debugging {
 				_view.addEventListener(KeyboardEvent.KEY_DOWN, function(event:KeyboardEvent):void {
@@ -104,18 +95,6 @@ package org.openforis.collect.presenter {
 					}
 				});
 			}
-		}
-		
-		protected function updateSettingsPopUpMenu(includeSurveySelectionItem:Boolean = true):void {
-			var result:ArrayCollection = new ArrayCollection();
-			if ( includeSurveySelectionItem && canHaveSurveySelection() ) {
-				result.addItem(SURVEY_SELECTION_MENU_ITEM);
-			}
-			if ( Application.user.hasEffectiveRole(UserProxy.ROLE_ADMIN) ) {
-				result.addAll(ADMIN_SETTINGS_ITEMS);
-			}
-			result.addItem(LOGOUT_MENU_ITEM);
-			_view.header.settingsButton.dataProvider = result;
 		}
 		
 		protected function canHaveSurveySelection():Boolean {
@@ -150,31 +129,11 @@ package org.openforis.collect.presenter {
 			Application.locale = FlexGlobals.topLevelApplication.parameters.lang as String;
 			
 			getSurveySummaries();
-			
-			updateSettingsPopUpMenu();
 		}
 		
 		internal function mouseWheelHandler(event:MouseEvent):void {
 			//bump delta
 			event.delta *= MOUSE_WHEEL_BUMP_DELTA;
-		}
-		
-		protected function settingsItemClickHandler(event:MenuEvent):void {
-			switch ( event.item ) {
-				case SURVEY_SELECTION_MENU_ITEM:
-					var uiEvent:UIEvent = new UIEvent(UIEvent.SHOW_SURVEY_SELECTION);
-					eventDispatcher.dispatchEvent(uiEvent);
-					break;
-				case IMPORT_DATA_MENU_ITEM:
-					PopUpUtil.createPopUp(DataImportPopUp, true);
-					break;
-				case USERS_MANAGEMENT_MENU_ITEM:
-					PopUpUtil.createPopUp(UserManagementPopUp, true);
-					break;
-				case LOGOUT_MENU_ITEM:
-					logoutButtonClickHandler(null);
-					break;
-			}
 		}
 		
 		protected function showListOfRecordsHandler(event:UIEvent):void {
@@ -217,10 +176,6 @@ package org.openforis.collect.presenter {
 		protected function showHomePage():void {
 			var uiEvent:UIEvent = new UIEvent(UIEvent.SHOW_HOME_PAGE);
 			eventDispatcher.dispatchEvent(uiEvent);
-		}
-		
-		protected function showSurveySelectionHandler(event:UIEvent):void {
-			updateSettingsPopUpMenu(false);
 		}
 		
 		internal function sendKeepAliveMessage(event:TimerEvent):void {

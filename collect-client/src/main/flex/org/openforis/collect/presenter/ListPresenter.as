@@ -7,11 +7,13 @@ package org.openforis.collect.presenter {
 	import flash.events.Event;
 	import flash.events.MouseEvent;
 	
+	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
 	import mx.collections.ListCollectionView;
 	import mx.core.FlexGlobals;
 	import mx.events.CloseEvent;
 	import mx.events.FlexEvent;
+	import mx.events.MenuEvent;
 	import mx.managers.PopUpManager;
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.IResponder;
@@ -26,8 +28,10 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
 	import org.openforis.collect.model.CollectRecord$Step;
 	import org.openforis.collect.model.proxy.RecordProxy;
+	import org.openforis.collect.model.proxy.UserProxy;
 	import org.openforis.collect.ui.UIBuilder;
 	import org.openforis.collect.ui.component.DataExportPopUp;
+	import org.openforis.collect.ui.component.DataImportPopUp;
 	import org.openforis.collect.ui.component.RecordFilterPopUp;
 	import org.openforis.collect.ui.component.SelectVersionPopUp;
 	import org.openforis.collect.ui.component.datagrid.PaginationBar;
@@ -42,6 +46,9 @@ package org.openforis.collect.presenter {
 
 
 	public class ListPresenter extends AbstractPresenter {
+		
+		private const EXPORT_DATA_MENU_ITEM:String = Message.get("list.admin.exportData");
+		private const IMPORT_DATA_MENU_ITEM:String = Message.get("list.admin.importData");
 		
 		private var _view:ListView;
 		private var _dataClient:DataClient;
@@ -82,6 +89,7 @@ package org.openforis.collect.presenter {
 			this._dataClient = ClientFactory.dataClient;
 			this._view.dataGrid.requestedRowCount = MAX_RECORDS_PER_PAGE;
 			_newRecordResponder = new AsyncResponder(createRecordResultHandler, faultHandler);
+			createAdvancedFunctionMenu();
 			super();
 		}
 
@@ -93,7 +101,7 @@ package org.openforis.collect.presenter {
 			_view.addButton.addEventListener(MouseEvent.CLICK, addButtonClickHandler);
 			_view.editButton.addEventListener(MouseEvent.CLICK, editButtonClickHandler);
 			_view.deleteButton.addEventListener(MouseEvent.CLICK, deleteButtonClickHandler);
-			_view.exportButton.addEventListener(MouseEvent.CLICK, exportButtonClickHandler);
+			_view.advancedFunctionsButton.addEventListener(MenuEvent.ITEM_CLICK, advancedFunctionItemClickHandler);
 			_view.openFilterPopUpButton.addEventListener(MouseEvent.CLICK, openFilterPopUpButtonClickHandler);
 			
 			_view.dataGrid.addEventListener(GridSortEvent.SORT_CHANGING, dataGridSortChangingHandler);
@@ -135,6 +143,26 @@ package org.openforis.collect.presenter {
 			_selectVersionPopUp.versionsDropDownList.dataProvider = Application.activeSurvey.versions;
 			_selectVersionPopUp.title = Message.get('list.newRecordPopUp.title', [rootEntityLabel]);
 			PopUpManager.centerPopUp(_selectVersionPopUp);
+		}
+		
+		protected function createAdvancedFunctionMenu():void {
+			var result:ArrayCollection = new ArrayCollection();
+			result.addItem(EXPORT_DATA_MENU_ITEM);
+			if ( Application.user.hasEffectiveRole(UserProxy.ROLE_ADMIN) ) {
+				result.addItem(IMPORT_DATA_MENU_ITEM);
+			}
+			_view.advancedFunctionsButton.dataProvider = result;
+		}
+		
+		protected function advancedFunctionItemClickHandler(event:MenuEvent):void {
+			switch ( event.item ) {
+				case IMPORT_DATA_MENU_ITEM:
+					PopUpUtil.createPopUp(DataImportPopUp, true);
+					break;
+				case EXPORT_DATA_MENU_ITEM:
+					PopUpUtil.createPopUp(DataExportPopUp, true);
+					break;
+			}
 		}
 		
 		protected function newRecordVersionSelectedHandler(event:Event):void {
