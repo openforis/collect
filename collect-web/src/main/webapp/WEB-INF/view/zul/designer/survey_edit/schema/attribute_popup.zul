@@ -1,0 +1,16 @@
+<zk>
+	<window id="attributePopUp" title="${labels.survey.schema.attribute.popup.title}" 
+		width="800px"
+		height="270px"
+		border="normal"
+		position="center" 
+		closable="false"
+		apply="org.zkoss.bind.BindComposer"
+		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.AttributeVM')">
+    
+        <include id="attributeDetailFormInclude" />
+        
+		<button label="${labels.global.ok}" onClick="@command('ok')" />
+    
+	</window>
+</zk>

@@ -116,11 +116,10 @@ public class SchemaTreeModel extends DefaultTreeModel<NodeDefinition> {
 				result = new ArrayList<TreeNode<NodeDefinition>>();
 				for (NodeDefinition item : items) {
 					if ( version == null || version.isApplicable(item) ) {
-						List<TreeNode<NodeDefinition>> childrenNodes = null;
 						NodeDefinitionTreeNode node = null;
 						if ( item instanceof EntityDefinition ) {
 							List<NodeDefinition> childDefns = ((EntityDefinition) item).getChildDefinitions();
-							childrenNodes = fromList(childDefns, version, includeAttributes);
+							List<TreeNode<NodeDefinition>> childrenNodes = fromList(childDefns, version, includeAttributes);
 							node = new NodeDefinitionTreeNode((EntityDefinition) item, childrenNodes);
 						} else if ( includeAttributes ) {
 							node = new NodeDefinitionTreeNode((AttributeDefinition) item);	

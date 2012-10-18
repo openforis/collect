@@ -50,40 +50,46 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 				formObject = new EntityDefinitionFormObject();
 				break;
 			case ATTRIBUTE:
-				if ( attributeType != null ) {
-					switch (attributeType) {
-					case BOOLEAN:
-						formObject = new BooleanAttributeDefinitionFormObject();
-						break;
-					case CODE:
-						formObject = new CodeAttributeDefinitionFormObject();
-						break;
-					case COORDINATE:
-						formObject = new CoordinateAttributeDefinitionFormObject();
-						break;
-					case DATE:
-						formObject = new DateAttributeDefinitionFormObject();
-						break;
-					case FILE:
-						formObject = new FileAttributeDefinitionFormObject();
-						break;
-					case NUMBER:
-						formObject = new NumberAttributeDefinitionFormObject();
-						break;
-					case RANGE:
-						formObject = new RangeAttributeDefinitionFormObject();
-						break;
-					case TEXT:
-						formObject = new TextAttributeDefinitionFormObject();
-						break;
-					case TIME:
-						formObject = new TimeAttributeDefinitionFormObject();
-						break;
-					default:
-						throw new IllegalStateException("Attribute type not supported");
-					}
-				}
+				return (NodeDefinitionFormObject<NodeDefinition>) newInstance(attributeType);
+			}
+		}
+		return formObject;
+	}
+	
+	@SuppressWarnings({ "rawtypes" })
+	public static AttributeDefinitionFormObject<?> newInstance(AttributeType attributeType) {
+		AttributeDefinitionFormObject<?> formObject = null;
+		if ( attributeType != null ) {
+			switch (attributeType) {
+			case BOOLEAN:
+				formObject = new BooleanAttributeDefinitionFormObject();
 				break;
+			case CODE:
+				formObject = new CodeAttributeDefinitionFormObject();
+				break;
+			case COORDINATE:
+				formObject = new CoordinateAttributeDefinitionFormObject();
+				break;
+			case DATE:
+				formObject = new DateAttributeDefinitionFormObject();
+				break;
+			case FILE:
+				formObject = new FileAttributeDefinitionFormObject();
+				break;
+			case NUMBER:
+				formObject = new NumberAttributeDefinitionFormObject();
+				break;
+			case RANGE:
+				formObject = new RangeAttributeDefinitionFormObject();
+				break;
+			case TEXT:
+				formObject = new TextAttributeDefinitionFormObject();
+				break;
+			case TIME:
+				formObject = new TimeAttributeDefinitionFormObject();
+				break;
+			default:
+				throw new IllegalStateException("Attribute type not supported");
 			}
 		}
 		return formObject;

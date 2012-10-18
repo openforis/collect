@@ -13,8 +13,9 @@
 		
 		<include src="survey_edit/schema/node_common.zul" />
 
-		<listbox id="listbox" rows="10"
-		  model="@load(vm.childAttributes)">
+		<listbox id="listbox" rows="5"
+		  model="@load(vm.childAttributes)"
+          selectedItem="@bind(vm.selectedAttribute)">
 		  <listhead>
 		    <listheader label="${labels.survey.schema.node.type.attribute}" 
               width="200px" />
@@ -29,14 +30,32 @@
 		    <listitem>
 		      <listcell label="@load(each.name)"
 		        onDoubleClick="@command('editAttribute', attribute=each)" />
-		      <listcell label=""
+		      <listcell label="@load(vm.getAttributeInstanceLabel(each))"
 		        onDoubleClick="@command('editAttribute', attribute=each)" />
-		      <listcell label="${vm.getAttributeTypeLabel(each)}"
+		      <listcell label="${vm.getAttributeTypeLabelFromDefinition(each)}"
 		        onDoubleClick="@command('editAttribute', attribute=each)" />
 		      <listcell label="@load(vm.isAttributeRequired(each))"
 		        onDoubleClick="@command('editAttribute', attribute=each)" />
 		    </listitem>
 		  </template>
 		</listbox>
+        <menubar>
+           <menu label="${labels.survey.schema.node.type.attribute}">
+              <menupopup>
+                  <zk forEach="${vm.attributeTypeValues}">
+                    <menuitem
+                      label="${vm.getAttributeTypeLabel(each)}" value="${each}"
+                      onClick="@command('addAttribute', attributeType=self.value)" />
+                  </zk>
+              </menupopup>
+            </menu>
+           <menuitem image="/assets/images/arrow-up.png"
+             class="icon-button" disabled="@load(vm.moveAttributeUpDisabled)"
+             onClick="@command('moveAttributeUp')" />
+           <menuitem image="/assets/images/arrow-down.png"
+              class="icon-button" 
+              disabled="@load(vm.moveAttributeDownDisabled)" 
+              onClick="@command('moveAttributeDown')" />
+       </menubar>
 	</vlayout>
 </zk>

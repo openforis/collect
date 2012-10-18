@@ -1,6 +1,6 @@
 package org.openforis.collect.designer.form.validator;
 
-import org.openforis.collect.designer.viewmodel.SurveySchemaEditVM;
+import org.openforis.collect.designer.viewmodel.SchemaVM;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Schema;
@@ -91,8 +91,8 @@ public class NodeDefinitionFormValidator extends FormValidator {
 
 	protected NodeDefinition getEditedNode(ValidationContext ctx) {
 		Object vmObject = getVM(ctx);
-		if (vmObject instanceof SurveySchemaEditVM) {
-			NodeDefinition editedNode = ((SurveySchemaEditVM) vmObject).getEditedNode();
+		if (vmObject instanceof SchemaVM) {
+			NodeDefinition editedNode = ((SchemaVM) vmObject).getEditedNode();
 			return editedNode;
 		} else {
 			throw new IllegalArgumentException("Unsupported View Model Type: " +
