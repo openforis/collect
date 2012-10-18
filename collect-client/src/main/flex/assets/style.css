@@ -52,8 +52,8 @@ s|Button.logout {
 .functionLabel {
 	fontSize: 15;
 	fontWeight: bold;
-	paddingBottom: 5;
-	paddingTop: 5;
+	paddingBottom: 15;
+	paddingTop: 15;
 	paddingRight: 5;
 	paddingLeft: 5;
 }

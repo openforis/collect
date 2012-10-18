@@ -48,6 +48,7 @@ package org.openforis.collect.presenter {
 			super.initEventListeners();
 			view.surveyDDL.addEventListener(IndexChangeEvent.CHANGE, surveySelectedHandler);
 			view.okButton.addEventListener(MouseEvent.CLICK, okButtonClickHandler);
+			view.cancelButton.addEventListener(MouseEvent.CLICK, closeHandler);
 		}
 		
 		protected function surveySelectedHandler(event:IndexChangeEvent):void {
