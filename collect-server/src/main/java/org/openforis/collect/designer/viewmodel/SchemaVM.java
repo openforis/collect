@@ -185,7 +185,7 @@ public class SchemaVM extends SurveyBaseVM {
 	protected void validateForm(@ContextParam(ContextType.BINDER) Binder binder) {
 		Component view = binder.getView();
 		IdSpace currentIdSpace = view.getSpaceOwner();
-		Component formComponent = Path.getComponent(currentIdSpace, "nodeFormInclude/nodeDetailFormInclude/nodeFormContainer");
+		Component formComponent = Path.getComponent(currentIdSpace, "nodeFormInclude/nodeFormContainer");
 		Binder formComponentBinder = (Binder) formComponent.getAttribute("binder");
 		formComponentBinder.postCommand("applyChanges", null);
 	}

@@ -57,7 +57,8 @@
 			</west>
 			<center title="${labels.survey.schema.node_detail_title}">
 				<include id="nodeFormInclude"
-					visible="@load(vm.editingNode)" />
+					visible="@load(vm.editingNode)"
+					height="100%" width="100%" style="overflow: auto;" />
 			</center>
 			
 	    </borderlayout>

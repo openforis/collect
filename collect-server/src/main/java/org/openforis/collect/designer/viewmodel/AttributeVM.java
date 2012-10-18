@@ -11,13 +11,23 @@ import org.openforis.collect.designer.model.AttributeType;
 import org.openforis.idm.metamodel.AttributeDefault;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.Precision;
+import org.zkoss.bind.Binder;
 import org.zkoss.bind.Form;
 import org.zkoss.bind.SimpleForm;
+import org.zkoss.bind.annotation.AfterCompose;
 import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
+import org.zkoss.bind.annotation.ContextParam;
+import org.zkoss.bind.annotation.ContextType;
 import org.zkoss.bind.annotation.ExecutionArgParam;
 import org.zkoss.bind.annotation.Init;
 import org.zkoss.bind.annotation.NotifyChange;
+import org.zkoss.zk.ui.Component;
+import org.zkoss.zk.ui.IdSpace;
+import org.zkoss.zk.ui.Path;
+import org.zkoss.zk.ui.select.Selectors;
+import org.zkoss.zk.ui.select.annotation.Wire;
+import org.zkoss.zul.Include;
 
 /**
  * 
@@ -33,12 +43,27 @@ public class AttributeVM extends SurveyObjectBaseVM<AttributeDefinition> {
 	private List<Precision> numericAttributePrecisions;
 
 	private Form tempFormObject;
-
+	
+	@Wire
+	private Include attributeDetailsInclude;
+	
+	@AfterCompose
+	public void afterCompose(@ContextParam(ContextType.VIEW) Component view){
+		 Selectors.wireComponents(view, this, false);
+		 Selectors.wireEventListeners(view, this);
+		 refreshNodeForm();
+	}
+	
 	@Init
 	public void init(@ExecutionArgParam("item") AttributeDefinition attributeDefn) {
 		setEditedItem(attributeDefn);
 	}
 	
+	protected void refreshNodeForm() {
+		String type = getAttributeType();
+		attributeDetailsInclude.setSrc("survey_edit/schema/attribute_" + type + ".zul");
+	}
+
 	@Override
 	protected List<AttributeDefinition> getItemsInternal() {
 		return null;
@@ -55,9 +80,7 @@ public class AttributeVM extends SurveyObjectBaseVM<AttributeDefinition> {
 		AttributeType attributeTypeEnum = AttributeType.valueOf(editedItem);
 		formObject = (AttributeDefinitionFormObject<AttributeDefinition>) NodeDefinitionFormObject.newInstance(attributeTypeEnum);
 		tempFormObject = new SimpleForm();
-		attributeDefaults = null;
-		numericAttributePrecisions = null;
-		return null;
+		return formObject;
 	}
 
 	@Override
@@ -87,6 +110,9 @@ public class AttributeVM extends SurveyObjectBaseVM<AttributeDefinition> {
 				numericAttributePrecisions = ((NumericAttributeDefinitionFormObject<?>) formObject).getPrecisions();
 				tempFormObject.setField(NUMBER_ATTRIBUTE_PRECISIONS_FIELD, numericAttributePrecisions);
 			}
+		} else {
+			attributeDefaults = null;
+			numericAttributePrecisions = null;
 		}
 	}
 	
@@ -138,6 +164,30 @@ public class AttributeVM extends SurveyObjectBaseVM<AttributeDefinition> {
 		}
 	}
 	
+	protected void validateForm() {
+		if ( editedItem != null ) {
+			Binder binder = (Binder) attributeDetailsInclude.getAttribute("$BINDER$");
+			validateForm(binder);
+		}
+	}
+		
+	protected void validateForm(@ContextParam(ContextType.BINDER) Binder binder) {
+		Component view = binder.getView();
+		IdSpace currentIdSpace = view.getSpaceOwner();
+		Component formComponent = Path.getComponent(currentIdSpace, "nodeFormContainer");
+		Binder formComponentBinder = (Binder) formComponent.getAttribute("binder");
+		formComponentBinder.postCommand("applyChanges", null);
+	}
+	
+	public String getAttributeType() {
+		if ( editedItem == null ) {
+			return null;
+		} else {
+			AttributeType type = AttributeType.valueOf(editedItem);
+			return type.name().toLowerCase();
+		}
+	}
+
 	public List<AttributeDefault> getAttributeDefaults() {
 		return attributeDefaults;
 	}
@@ -145,6 +195,9 @@ public class AttributeVM extends SurveyObjectBaseVM<AttributeDefinition> {
 	public List<Precision> getNumericAttributePrecisions() {
 		return numericAttributePrecisions;
 	}
-
+	
+	public Form getTempFormObject() {
+		return tempFormObject;
+	}
 
 }

@@ -8,7 +8,7 @@
 		apply="org.zkoss.bind.BindComposer"
 		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.AttributeVM')">
     
-        <include id="attributeDetailFormInclude" />
+       	<include id="attributeDetailsInclude" />
         
 		<button label="${labels.global.ok}" onClick="@command('ok')" />
     
