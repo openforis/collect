@@ -16,6 +16,8 @@ package org.openforis.collect.util {
 		
 		internal static const CONTEXT_NAME:String = "collect";
 
+		public static var COUNTRY_LOGO_ID:int = 0;
+
 		private static const DATA_IMPORT_UPLOAD_SERVLET_NAME:String = "uploadData.htm";
 		
 		private static const RECORD_FILE_UPLOAD_SERVLET_NAME:String = "uploadRecordFile.htm";

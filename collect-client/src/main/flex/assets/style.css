@@ -83,10 +83,9 @@ detail|RecordSavedMessage s|Label {
 	fontWeight: bold;
 }
 
-.appVersionLabel, .appVersionText {
-	font-style: italic;
-	font-size: 9;
-	padding-bottom: 5;
+.appVersionLabel, .appVersionText, .loggedAsLabel {
+	fontStyle: italic;
+	fontSize: 9;
 }
 
 .currentPhase {

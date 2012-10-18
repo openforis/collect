@@ -9,6 +9,7 @@ package org.openforis.collect.event {
 	public class UIEvent extends Event {
 		
 		//?
+		public static const LOGOUT_CLICK:String = "logoutClick";
 		public static const SHOW_SURVEY_SELECTION:String = "showSurveySelection";
 		public static const SHOW_ROOT_ENTITY_SELECTION:String = "showRootEntitySelection";
 		public static const SURVEY_SELECTED:String = "surveySelected";

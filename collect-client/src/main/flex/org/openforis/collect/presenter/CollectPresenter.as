@@ -85,6 +85,7 @@ package org.openforis.collect.presenter {
 		override internal function initEventListeners():void {
 			//mouse wheel handler to increment scroll step size
 			FlexGlobals.topLevelApplication.systemManager.addEventListener(MouseEvent.MOUSE_WHEEL, mouseWheelHandler, true);
+			eventDispatcher.addEventListener(UIEvent.LOGOUT_CLICK, logoutClickHandler);
 			eventDispatcher.addEventListener(UIEvent.SHOW_LIST_OF_RECORDS, showListOfRecordsHandler);
 			
 			CONFIG::debugging {
@@ -102,7 +103,7 @@ package org.openforis.collect.presenter {
 				Application.activeSurvey != null && Application.activeSurvey.schema.rootEntityDefinitions.length > 0; 
 		}
 		
-		protected function logoutButtonClickHandler(event:MouseEvent):void {
+		protected function logoutClickHandler(event:UIEvent):void {
 			var messageKey:String;
 			if ( Application.activeRecord != null && Application.activeRecord.updated ) {
 				messageKey = "global.confirmLogoutRecordUpdated";

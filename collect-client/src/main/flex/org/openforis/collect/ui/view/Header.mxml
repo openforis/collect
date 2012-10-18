@@ -16,6 +16,7 @@
 			import org.openforis.collect.client.LogoClient;
 			import org.openforis.collect.i18n.Message;
 			import org.openforis.collect.model.proxy.UserProxy;
+			import org.openforis.collect.util.ApplicationConstants;
 
 			[Bindable]
 			public var logoData:ByteArray;
@@ -24,7 +25,7 @@
 				var client:LogoClient = ClientFactory.logoClient;
 				var logoResponder:AsyncResponder;
 				logoResponder = new AsyncResponder(logoResultHandler, logoFaultHandler);
-				client.loadLogo(logoResponder, 0);
+				client.loadLogo(logoResponder, ApplicationConstants.COUNTRY_LOGO_ID);
 			}
 			
 			protected function logoResultHandler(event:ResultEvent, token:Object):void {
@@ -42,25 +43,6 @@
 	<s:Group>
         <s:Image source="@Embed(source='/assets/images/banner.jpg')"/>
         <s:Image source="{logoData}" right="0" /> 
-		
-		<s:VGroup right="0" horizontalAlign="right">
-			<s:HGroup verticalAlign="middle">
-				<!--<s:Label text="{Message.get('global.loggedAsLabel')}" />-->
-				
-				<s:Label id="loggedAsText"
-						 text="{Application.user.name}"
-						 styleName="formLabel"
-						 />
-				<!--<s:Button id="logoutButton"
-						  useHandCursor="true"
-						  buttonMode="true"
-						  toolTip="{Message.get('settings.logout')}"
-						  styleName="logout"
-						  verticalCenter="0"
-						  right="0"
-						  />-->
-			</s:HGroup>
-		</s:VGroup>
 	</s:Group>
 	
 </s:Group>
