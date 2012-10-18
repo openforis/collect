@@ -4,17 +4,15 @@
 		 xmlns:mx="library://ns.adobe.com/flex/mx" 
 		 xmlns:component="org.openforis.collect.ui.component.*"
 		 xmlns:input="org.openforis.collect.ui.component.input.*" 
-		 width="100%" height="100%" xmlns:container="org.openforis.collect.ui.container.*" 
-		 >
-	<s:layout>
-		<s:HorizontalLayout paddingBottom="5" paddingLeft="5" paddingRight="5" paddingTop="5" />
-	</s:layout>
+		 xmlns:container="org.openforis.collect.ui.container.*" 
+		 width="100%" height="100%">
 	
 	<s:states>
 		<s:State name="loading" />
 		<s:State name="default" />
 		<s:State name="new" basedOn="default" />
 		<s:State name="selected" basedOn="default" />
+		<s:State name="adminSelected" basedOn="selected" />
 	</s:states>
 	
 	<fx:Script>
@@ -25,6 +23,7 @@
 			public static const STATE_DEFAULT:String = "default";
 			public static const STATE_NEW:String = "new";
 			public static const STATE_SELECTED:String = "selected";
+			public static const STATE_ADMIN_SELECTED:String = "adminSelected";
 		]]>
 	</fx:Script>
 	
@@ -54,43 +53,41 @@
 	<component:LoadingContent height="100%" width="100%" 
 							  includeIn="loading" />
 	
-	<s:DataGrid id="dataGrid" height="100%"
-				includeIn="default, new, selected"
-				itemCreationPolicy="immediate"
-				>
-		<s:columns>
-			<s:ArrayList>
-				<s:GridColumn headerText="{Message.get('usersManagement.name')}"
-							  dataField="name"
-							  width="150"
-							  />
-				<s:GridColumn headerText="{Message.get('usersManagement.roles')}"
-							  dataField="roles"
-							  width="150"
-							  />
-				<s:GridColumn headerText="{Message.get('usersManagement.enabled')}"
-							  dataField="enabled"
-							  width="50" 
-							  itemRenderer="org.openforis.collect.ui.component.datagrid.BooleanColumnItemRenderer"
-							  />
-			</s:ArrayList>
-		</s:columns>
-	</s:DataGrid>
-	
-	<s:VGroup horizontalAlign="center" width="100%" excludeFrom="loading">
-		<s:Button id="newUserButton" 
-				  excludeFrom="loading"
-				  itemCreationPolicy="immediate"
-				  label="{Message.get('usersManagement.addNewUser')}"
-				  useHandCursor="true" buttonMode="true" />
-		
-		<s:VGroup includeIn="new, selected"
-				  itemCreationPolicy="immediate"
-				  horizontalAlign="center"
-				  gap="6"
-				  >
+	<s:HGroup excludeFrom="loading" itemCreationPolicy="immediate" 
+			 height="100%" width="50%"
+			 paddingBottom="5" paddingLeft="5" paddingRight="5" paddingTop="5">
+		<s:VGroup horizontalAlign="center" height="100%">
+			<s:DataGrid id="dataGrid" height="100%">
+				<s:columns>
+					<s:ArrayList>
+						<s:GridColumn headerText="{Message.get('usersManagement.name')}"
+									  dataField="name"
+									  width="150"
+									  />
+						<s:GridColumn headerText="{Message.get('usersManagement.roles')}"
+									  dataField="roles"
+									  width="150"
+									  />
+						<s:GridColumn headerText="{Message.get('usersManagement.enabled')}"
+									  dataField="enabled"
+									  width="60" 
+									  itemRenderer="org.openforis.collect.ui.component.datagrid.BooleanColumnItemRenderer"
+									  />
+					</s:ArrayList>
+				</s:columns>
+			</s:DataGrid>
 			
+			<s:Button id="newUserButton" 
+					  label="{Message.get('usersManagement.addNewUser')}"
+					  useHandCursor="true" buttonMode="true" />
+			
+		</s:VGroup>
+		
+		<s:Group width="50%">
 			<container:FieldSet id="userDetailsBox" 
+								horizontalCenter="0"
+								includeIn="new, selected"
+								itemCreationPolicy="immediate"
 								legend="{Message.get('usersManagement.userDetails')}" 
 								legend.new="{Message.get('usersManagement.newUserDetails')}" 
 								creationPolicy="all">
@@ -99,10 +96,13 @@
 				</container:layout>
 				<mx:Form id="detailForm">
 					<mx:FormItem label="{Message.get('usersManagement.enabled')}">
-						<mx:CheckBox id="enabledCheckBox" />
+						<mx:CheckBox id="enabledCheckBox" 
+									 enabled.adminSelected="false" />
 					</mx:FormItem>
 					<mx:FormItem label="{Message.get('usersManagement.name')}">
-						<input:TextInput id="nameTextInput" restrictPattern="^\w*$" upperCase="false" />
+						<input:TextInput id="nameTextInput" restrictPattern="^\w*$" 
+										 upperCase="false" 
+										 editable.adminSelected="false"  />
 					</mx:FormItem>
 					<mx:FormItem label="{Message.get('usersManagement.password')}"
 								 label.selected="{Message.get('usersManagement.changePassword')}">
@@ -119,7 +119,8 @@
 						<mx:CheckBox id="roleAnalysisCheckBox"
 									label="{Message.get('roles.analysis')}" />
 						<mx:CheckBox id="roleAdminCheckBox"
-									label="{Message.get('roles.admin')}" />
+									label="{Message.get('roles.admin')}"
+									enabled.adminSelected="false"/>
 					</mx:FormItem>
 				</mx:Form>
 				<s:HGroup gap="30">
@@ -132,10 +133,12 @@
 							  itemCreationPolicy="immediate"
 							  label="{Message.get('global.delete')}"
 							  useHandCursor="true" buttonMode="true"
+							  enabled.adminSelected="false"
 							  />
 				</s:HGroup>
 			</container:FieldSet>
-		</s:VGroup>
-	</s:VGroup>
+		</s:Group>
+		
+	</s:HGroup>
 	
 </s:BorderContainer>

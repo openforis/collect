@@ -16,6 +16,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.client.UserClient;
 	import org.openforis.collect.event.UserManagementEvent;
+	import org.openforis.collect.model.UserPerRoleWrapper;
 	import org.openforis.collect.model.proxy.UserProxy;
 	import org.openforis.collect.ui.component.user.UserManagementPopUp;
 	import org.openforis.collect.ui.component.user.UserPerRoleContainer;
@@ -33,6 +34,8 @@ package org.openforis.collect.presenter {
 	 * 
 	 **/
 	public class UserManagementPresenter extends PopUpPresenter {
+		
+		public static const ADMIN_USER_NAME:String = "admin";
 		
 		private var _userClient:UserClient;
 		private var _loadedUsers:IList;
@@ -90,10 +93,14 @@ package org.openforis.collect.presenter {
 		
 		protected function dataGridSelectionChangeHandler(event:GridSelectionEvent):void {
 			var selectedUser:UserProxy = view.usersListContainer.dataGrid.selectedItem as UserProxy;
-			if ( selectedUser == null ) {
-				view.usersListContainer.currentState = UsersListContainer.STATE_DEFAULT;
-			} else {
-				view.usersListContainer.currentState = UsersListContainer.STATE_SELECTED;
+			/* workaround flex bug on inherited states: reset currentState before changing from child to parent state */
+			view.usersListContainer.currentState = UsersListContainer.STATE_DEFAULT; 
+			if ( selectedUser != null ) {
+				if ( selectedUser.name == ADMIN_USER_NAME ) {
+					view.usersListContainer.currentState = UsersListContainer.STATE_ADMIN_SELECTED;
+				} else {
+					view.usersListContainer.currentState = UsersListContainer.STATE_SELECTED;
+				}
 				fillForm(selectedUser);
 			}
 		}
@@ -106,7 +113,7 @@ package org.openforis.collect.presenter {
 				var selectableUsers:IList = new ArrayCollection();
 				for each (var user:UserProxy in _loadedUsers) {
 					var hasRole:Boolean = user.hasRole(role);
-					var item:Object = {user: user, selected: hasRole};
+					var item:UserPerRoleWrapper = new UserPerRoleWrapper(user, role, hasRole);
 					selectableUsers.addItem(item);
 				}
 				view.userPerRoleContainer.currentState = UserPerRoleContainer.STATE_ROLE_SELECTED;
