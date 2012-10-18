@@ -102,7 +102,7 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 		description = source.getDescription(languageCode);
 		multiple = source.isMultiple();
 		Integer nodeMinCount = source.getMinCount();
-		required = nodeMinCount != null && nodeMinCount.intValue() == 1;
+		required = nodeMinCount != null && nodeMinCount.intValue() > 0;
 		requiredExpression = source.getRequiredExpression();
 		relevantExpression = source.getRelevantExpression();
 		minCount = nodeMinCount;

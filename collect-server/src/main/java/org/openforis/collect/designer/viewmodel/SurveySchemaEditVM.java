@@ -4,6 +4,7 @@
 package org.openforis.collect.designer.viewmodel;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.openforis.collect.designer.component.SchemaTreeModel;
@@ -36,6 +37,7 @@ import org.zkoss.bind.annotation.ContextType;
 import org.zkoss.bind.annotation.DependsOn;
 import org.zkoss.bind.annotation.GlobalCommand;
 import org.zkoss.bind.annotation.NotifyChange;
+import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.IdSpace;
 import org.zkoss.zk.ui.Path;
@@ -149,6 +151,11 @@ public class SurveySchemaEditVM extends SurveyBaseVM {
 				MessageUtil.showWarning("survey.schema.add_node.error.parent_entity_not_selected");
 			}
 		}
+	}
+	
+	@Command
+	public void editAttribute(@BindingParam("attribute") AttributeDefinition attribute) {
+		
 	}
 	
 	protected void onAfterNodeCreated(Binder binder, NodeDefinition newNode) {
@@ -472,7 +479,7 @@ public class SurveySchemaEditVM extends SurveyBaseVM {
 		NodeType nodeTypeEnum = NodeType.typeOf(node);
 		nodeType = nodeTypeEnum.name();
 		if ( nodeTypeEnum == NodeType.ATTRIBUTE) {
-			AttributeType attributeTypeEnum = AttributeType.typeOf((AttributeDefinition) node);
+			AttributeType attributeTypeEnum = AttributeType.valueOf((AttributeDefinition) node);
 			attributeType = attributeTypeEnum.name();
 		} else {
 			attributeType = null;
@@ -482,11 +489,48 @@ public class SurveySchemaEditVM extends SurveyBaseVM {
 	public SchemaTreeModel getNodes() {
 		if ( treeModel == null ) {
 			CollectSurvey survey = getSurvey();
-			treeModel = SchemaTreeModel.createInstance(survey);
+			treeModel = SchemaTreeModel.createInstance(survey, false);
 		}
 		return treeModel;
     }
+	
+	@DependsOn("editedNode")
+	public List<NodeDefinition> getChildAttributes() {
+		List<NodeDefinition> result = new ArrayList<NodeDefinition>();
+		if ( editedNode instanceof EntityDefinition ) {
+			List<NodeDefinition> childDefns = ((EntityDefinition) editedNode).getChildDefinitions();
+			for (NodeDefinition nodeDefn : childDefns) {
+				if ( nodeDefn instanceof AttributeDefinition ) {
+					result.add(nodeDefn);
+				}
+			}
+		}
+		return result;
+	}
 
+	public boolean isAttributeRequired(AttributeDefinition attributeDefn) {
+		return attributeDefn.getMinCount() != null && attributeDefn.getMinCount() > 0;
+	}
+	
+	public List<String> getAttributeTypeValues() {
+		List<String> result = new ArrayList<String>();
+		AttributeType[] values = AttributeType.values();
+		for (AttributeType type : values) {
+			result.add(type.name());
+		}
+		return result;
+	}
+	
+	public String getAttributeTypeLabel(String typeValue) {
+		AttributeType type = AttributeType.valueOf(typeValue);
+		return type.getLabel();
+	}
+	
+	public String getAttributeTypeLabel(AttributeDefinition attributeDefn) {
+		AttributeType type = AttributeType.valueOf(attributeDefn);
+		return type.getLabel();
+	}
+	
 	public List<NodeDefinition> getSiblings(NodeDefinition nodeDefinition) {
 		List<NodeDefinition> siblings = new ArrayList<NodeDefinition>();
 		EntityDefinition parentDefn = (EntityDefinition) selectedNode.getParentDefinition();

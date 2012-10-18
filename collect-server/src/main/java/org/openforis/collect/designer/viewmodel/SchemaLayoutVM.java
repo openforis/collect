@@ -167,7 +167,7 @@ public class SchemaLayoutVM extends SurveyBaseVM {
 	protected void initTreeModel() {
 		CollectSurvey survey = getSurvey();
 		ModelVersion formVersion = getFormVersion();
-		treeModel = SchemaTreeModel.createInstance(survey, formVersion);
+		treeModel = SchemaTreeModel.createInstance(survey, formVersion, true);
 	}
 
 	public ModelVersion getFormVersion() {

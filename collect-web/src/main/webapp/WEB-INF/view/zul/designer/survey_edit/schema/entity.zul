@@ -1,3 +1,4 @@
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
 <zk>
 	<vlayout
 		id="nodeFormContainer"
@@ -11,5 +12,31 @@
 			@validator('org.openforis.collect.designer.form.validator.NodeDefinitionFormValidator')">
 		
 		<include src="survey_edit/schema/node_common.zul" />
+
+		<listbox id="listbox" rows="10"
+		  model="@load(vm.childAttributes)">
+		  <listhead>
+		    <listheader label="${labels.survey.schema.node.type.attribute}" 
+              width="200px" />
+		    <listheader label="${labels.survey.schema.node.instance_label}"
+		      width="250px" />
+		    <listheader label="${labels.survey.schema.attribute.type_label_short}"
+		      width="100px" />
+		    <listheader label="${labels.survey.schema.node.required}"
+		      width="100px" />
+		  </listhead>
+		  <template name="model">
+		    <listitem>
+		      <listcell label="@load(each.name)"
+		        onDoubleClick="@command('editAttribute', attribute=each)" />
+		      <listcell label=""
+		        onDoubleClick="@command('editAttribute', attribute=each)" />
+		      <listcell label="${vm.getAttributeTypeLabel(each)}"
+		        onDoubleClick="@command('editAttribute', attribute=each)" />
+		      <listcell label="@load(vm.isAttributeRequired(each))"
+		        onDoubleClick="@command('editAttribute', attribute=each)" />
+		    </listitem>
+		  </template>
+		</listbox>
 	</vlayout>
 </zk>

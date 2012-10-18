@@ -80,14 +80,14 @@ public class SchemaTreeModel extends DefaultTreeModel<NodeDefinition> {
 		return result;
 	}
 	
-	public static SchemaTreeModel createInstance(CollectSurvey survey) {
-		return createInstance(survey, null);
+	public static SchemaTreeModel createInstance(CollectSurvey survey, boolean includeAttributes) {
+		return createInstance(survey, null, includeAttributes);
 	}
 	
-	public static SchemaTreeModel createInstance(CollectSurvey survey, ModelVersion version) {
+	public static SchemaTreeModel createInstance(CollectSurvey survey, ModelVersion version, boolean includeAttributes) {
 		Schema schema = survey.getSchema();
 		List<EntityDefinition> rootDefns = schema.getRootEntityDefinitions();
-		List<TreeNode<NodeDefinition>> treeNodes = NodeDefinitionTreeNode.fromList(rootDefns, version);
+		List<TreeNode<NodeDefinition>> treeNodes = NodeDefinitionTreeNode.fromList(rootDefns, version, includeAttributes);
 		TreeNode<NodeDefinition> root = new NodeDefinitionTreeNode(null, treeNodes);
 		SchemaTreeModel result = new SchemaTreeModel(root);
 		return result;
@@ -110,22 +110,24 @@ public class SchemaTreeModel extends DefaultTreeModel<NodeDefinition> {
 		}
 		
 		public static List<TreeNode<NodeDefinition>> fromList(List<? extends NodeDefinition> items,
-				ModelVersion version) {
+				ModelVersion version, boolean includeAttributes) {
 			List<TreeNode<NodeDefinition>> result = null;
 			if ( items != null ) {
 				result = new ArrayList<TreeNode<NodeDefinition>>();
 				for (NodeDefinition item : items) {
 					if ( version == null || version.isApplicable(item) ) {
 						List<TreeNode<NodeDefinition>> childrenNodes = null;
-						NodeDefinitionTreeNode node;
+						NodeDefinitionTreeNode node = null;
 						if ( item instanceof EntityDefinition ) {
 							List<NodeDefinition> childDefns = ((EntityDefinition) item).getChildDefinitions();
-							childrenNodes = fromList(childDefns, version);
+							childrenNodes = fromList(childDefns, version, includeAttributes);
 							node = new NodeDefinitionTreeNode((EntityDefinition) item, childrenNodes);
-						} else {
+						} else if ( includeAttributes ) {
 							node = new NodeDefinitionTreeNode((AttributeDefinition) item);	
 						}
-						result.add(node);
+						if ( node != null ) {
+							result.add(node);
+						}
 					}
 				}
 			}
