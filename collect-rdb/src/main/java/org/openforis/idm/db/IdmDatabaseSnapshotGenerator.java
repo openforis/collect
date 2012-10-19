@@ -24,10 +24,13 @@ import liquibase.snapshot.DatabaseSnapshot;
 import liquibase.snapshot.DatabaseSnapshotGenerator;
 import liquibase.snapshot.DatabaseSnapshotGeneratorFactory;
 
+import org.openforis.idm.metamodel.DefaultSurveyContext;
 import org.openforis.idm.metamodel.Survey;
-import org.openforis.idm.metamodel.xml.IdmlBindingContext;
+import org.openforis.idm.metamodel.SurveyContext;
+import org.openforis.idm.metamodel.xml.IdmlParseException;
 import org.openforis.idm.metamodel.xml.InvalidIdmlException;
-import org.openforis.idm.metamodel.xml.SurveyUnmarshaller;
+import org.openforis.idm.metamodel.xml.SurveyIdmlBinder;
+import org.openforis.idm.metamodel.xml.internal.unmarshal.SurveyUnmarshaller;
 
 public class IdmDatabaseSnapshotGenerator implements DatabaseSnapshotGenerator {
 	
@@ -141,11 +144,11 @@ public class IdmDatabaseSnapshotGenerator implements DatabaseSnapshotGenerator {
 		return false;
 	}
 	
-	private static Survey loadSurvey() throws IOException, InvalidIdmlException {
+	private static Survey loadSurvey() throws IdmlParseException {
 		InputStream is = new FileInputStream("/home/gino/workspace/faofin/tz/naforma-idm/tanzania-naforma.idm.xml");
-		IdmlBindingContext idmlBindingContext = new IdmlBindingContext();
-		SurveyUnmarshaller su = idmlBindingContext.createSurveyUnmarshaller();
-		return su.unmarshal(is);		
+		SurveyContext ctx = new DefaultSurveyContext();
+		SurveyIdmlBinder binder = new SurveyIdmlBinder(ctx);
+		return binder.unmarshal(is);
 	}
 
 	public static void main(String[] args) {
