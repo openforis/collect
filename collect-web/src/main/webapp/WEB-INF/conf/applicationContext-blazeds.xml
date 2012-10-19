@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans 
+    xmlns="http://www.springframework.org/schema/beans"
+    xmlns:flex="http://www.springframework.org/schema/flex"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xsi:schemaLocation=" 
+    http://www.springframework.org/schema/beans 
+    http://www.springframework.org/schema/beans/spring-beans.xsd 
+    http://www.springframework.org/schema/flex 
+    http://www.springframework.org/schema/flex/spring-flex-1.0.xsd
+    http://www.springframework.org/schema/context
+    http://www.springframework.org/schema/context/spring-context.xsd">
+    
+<!--    <context:annotation-config />-->
+<!--    <context:component-scan base-package="org.fao.openforis.web.service"/>-->
+    
+    <flex:message-broker >
+        <!-- <flex:message-service default-channels="my-streaming-amf,my-longpolling-amf,my-polling-amf" /> <flex:secured /> -->
+    </flex:message-broker>
+    
+    <!-- Expose a bean for BlazeDS remoting <bean id="service" class="org.fao.openforis.service.Service"></bean>
+        <flex:remoting-destination ref="service" /> <bean id="test-service" class="org.fao.openforis.service.Service"></bean>
+        -->
+<!-- 	<flex:remoting-destination ref="service" /> -->
+<!-- 	<flex:remoting-destination ref="backupService" destination-id="backupService" /> -->
+<!-- 	<flex:remoting-destination ref="securityService" destination-id="securityService" /> -->
+<!-- 	<flex:remoting-destination ref="restoreService" destination-id="restoreService" /> -->
+
+	<flex:remoting-destination ref="sessionService" destination-id="sessionService" />
+	<flex:remoting-destination ref="taxonService" destination-id="taxonService" />
+	<flex:remoting-destination ref="metaDataService" destination-id="metaDataService" />
+	<flex:remoting-destination ref="dataService" destination-id="dataService" /> 
+	
+<!-- 	<flex:jms-message-destination id="edit-record-jms" jms-destination="editRecordQueue" /> -->
+<!-- 	<flex:jms-message-destination id="update-result-topic" jms-destination="updateResult"  /> -->
+
+</beans>
+

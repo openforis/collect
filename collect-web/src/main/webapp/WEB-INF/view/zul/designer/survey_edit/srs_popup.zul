@@ -1,0 +1,104 @@
+<zk>
+	<window 
+		title="${labels.survey.srs.manager.title}" 
+		height="400px"
+		width="700px"
+		border="normal"
+		position="center" 
+		validationMessages="@id('vmsgs')"
+		apply="org.zkoss.bind.BindComposer"
+		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SpatialReferenceSystemsVM')">
+		<borderlayout>
+			<west width="220px">
+				<borderlayout>
+					<center border="none">
+						<listbox id="itemsListBox"
+				        	selectedItem="@load(vm.selectedItem)"
+				        	model="@load(vm.items)"
+				        	onSelect="@command('selectionChanged', selectedItem=self.selectedItem.value)"
+				        	width="220px"
+				        	vflex="true">
+				        	<listhead>
+								<listheader label="" width="150px" />
+								<listheader label="" width="50px" />
+							</listhead>
+				            <template name="model">
+				                <listitem>
+				                    <listcell label="@load(each.id)" />
+				                    <listcell>
+				                    	<button image="/assets/images/cross-small.png"
+				                     		onClick="@command('deleteItem', item=each)" />
+				                    </listcell>
+				                </listitem>
+				            </template>
+				        </listbox>
+					</center>
+					<south border="none">
+				        <toolbar>
+				        	<toolbarbutton label="${labels.global.add_item}" onClick="@command('newItem')" />
+				        	<toolbarbutton image="/assets/images/arrow-up.png"
+									disabled="@load(vm.moveSelectedItemUpDisabled)" 
+						        	onClick="@command('moveSelectedItemUp')" />
+				        	<toolbarbutton image="/assets/images/arrow-down.png"
+									disabled="@load(vm.moveSelectedItemDownDisabled)" 
+						        	onClick="@command('moveSelectedItemDown')" />
+				        </toolbar>
+					</south>
+				</borderlayout>
+		    </west>
+	        <center>
+		        <div 
+		        	visible="@load(vm.editingItem)"
+					form="@id('fx') 
+						@load(vm.formObject) @save(vm.formObject, before='applyChanges')
+						@validator('org.openforis.collect.designer.form.validator.SRSFormValidator')"
+					width="500px">
+					<grid>
+						<columns>
+							<column label="" width="100px" />
+							<column label="" width="100%" />
+						</columns>
+						<rows>
+							<row>
+								<label value="${labels.survey.srs.id}:" />
+								<cell>
+									<textbox width="150px" value="@bind(fx.id)" onChange="@command('applyChanges')" />
+									<label class="error" value="@load(vmsgs['id'])" />
+								</cell>
+							</row>
+							<row>
+								<label value="${labels.survey.srs.label}:" />
+								<cell>
+									<textbox width="150px" value="@bind(fx.label)" onChange="@command('applyChanges')" />
+									<label class="error" value="@load(vmsgs['label'])" />
+								</cell>
+							</row>
+							<row>
+								<label value="${labels.survey.srs.description}:" />
+								<cell>
+									<textbox width="150px" value="@bind(fx.description)" onChange="@command('applyChanges')" />
+									<label class="error" value="@load(vmsgs['description'])" />
+								</cell>
+							</row>
+							<row>
+								<label value="${labels.survey.srs.wkt}:" />
+								<cell>
+									<textbox width="250px" value="@bind(fx.wellKnownText)" 
+										multiline="true" rows="10" cols="40"
+										onChange="@command('applyChanges')" />
+									<label class="error" value="@load(vmsgs['wellKnownText'])" />
+								</cell>
+							</row>
+						</rows>
+					</grid>
+				</div>
+			</center>
+			<south>
+				<box align="center" width="100%">
+					<button label="${labels.global.close}" 
+						onClick="@global-command('closeSRSManagerPopUp')" />
+				</box>
+			</south>
+		</borderlayout>
+    </window>
+</zk>

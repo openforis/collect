@@ -1,0 +1,81 @@
+<zk>
+	<div id="itemsContainer"
+		apply="org.openforis.collect.designer.composer.SurveySchemaEditComposer"
+		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SurveySchemaEditVM')"
+		width="100%" height="100%">
+		<borderlayout>
+		 	<west title="${labels.survey.schema.nodes_title}"
+		 		width="350px"
+		 		splittable="true">
+		 		<borderlayout>
+		 			<center>
+						<tree id="nodesTree"
+							width="100%" vflex="true"
+							model="@load(vm.nodes)"
+							onSelect="@command('nodeSelected', node=self.selectedItem)">
+							<template name="model">
+					            <treeitem draggable="false"> 
+					                <treerow>
+					                    <treecell label="@load(each.data.name)"/>
+					                </treerow>
+					            </treeitem>
+					  		</template>
+					    </tree>
+		 			</center>
+		 			<south>
+				        <menubar width="100%">
+					        <menuitem label="${labels.survey.schema.add_root_entity}" 
+					        	onClick="@command('addRootEntity')" />
+			                <menu label="${labels.survey.schema.add_node.label}">
+			                    <menupopup>
+	                                <menuitem label="${labels.survey.schema.node.type.entity}" value="ENTITY"
+	                                	onClick="@command('addNode', nodeType='ENTITY', attributeType=null)" />
+	                                <menu label="${labels.survey.schema.node.type.attribute}">
+	                                	<menupopup>
+			                                <menuitem label="${labels.survey.schema.attribute.type.bool}" value="BOOLEAN"
+			                                	onClick="@command('addNode', nodeType='ATTRIBUTE', attributeType=self.value)" />
+											<menuitem label="${labels.survey.schema.attribute.type.code}" value="CODE"
+												onClick="@command('addNode', nodeType='ATTRIBUTE', attributeType=self.value)" />
+											<menuitem label="${labels.survey.schema.attribute.type.coordinate}" value="COORDINATE"
+												onClick="@command('addNode', nodeType='ATTRIBUTE', attributeType=self.value)" />
+											<menuitem label="${labels.survey.schema.attribute.type.date}" value="DATE"
+												onClick="@command('addNode', nodeType='ATTRIBUTE', attributeType=self.value)" />
+											<menuitem label="${labels.survey.schema.attribute.type.file}" value="FILE"
+												onClick="@command('addNode', nodeType='ATTRIBUTE', attributeType=self.value)" />
+											<menuitem label="${labels.survey.schema.attribute.type.number}" value="NUMBER"
+												onClick="@command('addNode', nodeType='ATTRIBUTE', attributeType=self.value)" />
+											<menuitem label="${labels.survey.schema.attribute.type.range}" value="RANGE"
+												onClick="@command('addNode', nodeType='ATTRIBUTE', attributeType=self.value)" />
+											<menuitem label="${labels.survey.schema.attribute.type.taxon}" value="TAXON"
+												onClick="@command('addNode', nodeType='ATTRIBUTE', attributeType=self.value)" />
+											<menuitem label="${labels.survey.schema.attribute.type.text}" value="TEXT"
+												onClick="@command('addNode', nodeType='ATTRIBUTE', attributeType=self.value)" />
+											<menuitem label="${labels.survey.schema.attribute.type.time}" value="TIME"
+												onClick="@command('addNode', nodeType='ATTRIBUTE', attributeType=self.value)" />
+	                                	</menupopup>
+	                                </menu>
+	                            </menupopup>
+			                </menu>
+							<menuitem label="${labels.survey.schema.remove_node}" 
+					        	onClick="@command('removeNode')" />
+			                <menuitem image="/assets/images/arrow-up.png"
+			                	class="icon-button" 
+								disabled="@load(vm.moveNodeUpDisabled)" 
+					        	onClick="@command('moveNodeUp')" />
+			                <menuitem image="/assets/images/arrow-down.png"
+			                	class="icon-button" 
+			                	disabled="@load(vm.moveNodeDownDisabled)" 
+					        	onClick="@command('moveNodeDown')" />
+			             </menubar>
+		 			</south>
+			    </borderlayout>
+			</west>
+			<center title="${labels.survey.schema.node_detail_title}">
+				<include id="nodeFormInclude" 
+					src="survey_edit/schema/node.zul" 
+					visible="@load(vm.editingNode)" />
+			</center>
+			
+	    </borderlayout>
+    </div>
+</zk>

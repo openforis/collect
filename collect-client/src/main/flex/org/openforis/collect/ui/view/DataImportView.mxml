@@ -1,0 +1,369 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx"
+		 creationComplete="creationCompleteHandler(event)"
+		 xmlns:component="org.openforis.collect.ui.component.*"
+		 width="100%" height="100%">
+	<s:layout>
+		<s:VerticalLayout horizontalAlign="center" />
+	</s:layout>
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.events.FlexEvent;
+			
+			import org.openforis.collect.i18n.Message;
+			import org.openforis.collect.presenter.DataImportPresenter;
+			import org.openforis.collect.remoting.service.dataImport.DataImportSummaryItemProxy;
+			import org.openforis.collect.util.UIUtil;
+			
+			public static const STATE_DEFAULT:String = "default";
+			public static const STATE_LOADING:String = "loading";
+			public static const STATE_UPLOADING:String = "uploading";
+			public static const STATE_SUMMARY_CREATIION_RUNNING:String = "summaryCreationRunning";
+			public static const STATE_SUMMARY_CREATION_COMPLETE:String = "summaryCreationComplete";
+			public static const STATE_SUMMARY_CREATION_COMPLETE_NEW_SURVEY:String = "summaryCreationCompleteNewSurvey";
+			public static const STATE_IMPORT_RUNNING:String = "importRunning";
+			public static const STATE_IMPORT_COMPLETE:String = "importComplete";
+			
+			private var _presenter:DataImportPresenter;
+			
+			protected function creationCompleteHandler(event:FlexEvent):void {
+				_presenter = new DataImportPresenter(this);
+			}
+			
+		]]>
+		
+	</fx:Script>
+
+	<s:states>
+		<s:State name="default" />
+		<s:State name="loading" />
+		<s:State name="uploading" />
+		<s:State name="summaryCreationRunning" />
+		<s:State name="summaryCreationComplete" />
+		<s:State name="summaryCreationCompleteNewSurvey" basedOn="summaryCreationComplete" />
+		<s:State name="importRunning" stateGroups="importing" />
+		<s:State name="importComplete" />
+	</s:states>
+	
+	<s:VGroup includeIn="default"
+			  itemCreationPolicy="immediate"
+			  horizontalAlign="center"
+			  verticalAlign="middle"
+			  height="100%" width="100%"
+			  gap="30"
+			  >
+		<s:Label text="{Message.get('dataImport.introduction')}"
+				 styleName="infoMessageBig"
+				 textAlign="center" />
+		<s:Button id="uploadButton" 
+				  label="{Message.get('dataImport.selectFileToUpload')}"
+				  includeIn="default"
+				  useHandCursor="true"
+				  buttonMode="true"
+				  />
+	</s:VGroup>
+
+	<component:LoadingContent includeIn="loading"
+							  height="100%" width="100%" />
+	
+	<s:VGroup includeIn="summaryCreationComplete, summaryCreationCompleteNewSurvey"
+			  itemCreationPolicy="immediate"
+			  horizontalAlign="center"
+			  height="100%" width="100%"
+			  >
+		<s:Form id="form">
+			<s:FormItem label="{Message.get('dataImport.surveyNameLabel')}" 
+						label.summaryCreationCompleteNewSurvey="{Message.get('dataImport.newSurveyNameLabel')}">
+				<s:TextInput id="surveyNameTextInput" editable="false" 
+							 editable.summaryCreationCompleteNewSurvey="true" />
+			</s:FormItem>
+		</s:Form>
+		
+		<s:VGroup id="conflictsContainer" 
+				  visible="{conflictDataGrid.dataProvider.length > 0}"
+				  includeInLayout="{conflictDataGrid.dataProvider.length > 0}"
+				  horizontalAlign="center"
+				  >
+			<s:Label text="{Message.get('dataImport.recordsInConflict')}"
+					 styleName="formLabel" />
+			
+			<mx:AdvancedDataGrid id="conflictDataGrid"
+								 sortExpertMode="true"
+								 selectable="false"
+								 height="150"
+								 >
+				<mx:groupedColumns>
+					<mx:AdvancedDataGridColumn dataField="key"
+											   headerText="{Message.get('dataImport.recordList.key')}"
+											   width="100" />
+					<mx:AdvancedDataGridColumnGroup headerText="{Message.get('dataImport.recordConflicts.currentRecord')}">
+						<mx:AdvancedDataGridColumn dataField="conflictingRecord.creationDate" 
+												   sortable="false"
+												   width="120"
+												   headerText="{Message.get('dataImport.recordList.creationDate')}" 
+												   labelFunction="{UIUtil.gridColumnDateTimeLabelFunction}" />
+						<mx:AdvancedDataGridColumn dataField="conflictingRecord.modifiedDate" 
+												   sortable="false"
+												   width="120"
+												   headerText="{Message.get('dataImport.recordList.modifiedDate')}" 
+												   labelFunction="{UIUtil.gridColumnDateTimeLabelFunction}" />
+						<mx:AdvancedDataGridColumn dataField="conflictingRecord.step"
+												   sortable="false"
+												   width="60"
+												   headerText="{Message.get('dataImport.recordList.step')}" 
+												   labelFunction="{UIUtil.gridColumnStepLabelFunction}" />
+					</mx:AdvancedDataGridColumnGroup>
+					<mx:AdvancedDataGridColumnGroup headerText="{Message.get('dataImport.recordConflicts.newRecord')}">
+						<mx:AdvancedDataGridColumn dataField="record.creationDate" 
+												   sortable="false"
+												   width="120"
+												   headerText="{Message.get('dataImport.recordList.creationDate')}" 
+												   labelFunction="{UIUtil.gridColumnDateTimeLabelFunction}" />
+						<mx:AdvancedDataGridColumn dataField="record.modifiedDate" 
+												   sortable="false"
+												   width="120"
+												   headerText="{Message.get('dataImport.recordList.modifiedDate')}" 
+												   labelFunction="{UIUtil.gridColumnDateTimeLabelFunction}" />
+						<mx:AdvancedDataGridColumnGroup headerText="{Message.get('dataImport.recordList.steps')}">
+							<mx:AdvancedDataGridColumn dataField="entryDataPresent" 
+													   width="60"
+													   headerText="{Message.get('dataImport.recordList.entryDataPresent')}"
+													   itemRenderer="org.openforis.collect.ui.component.datagrid.AdvancedDataGridBooleanColumnItemRenderer" />
+							<mx:AdvancedDataGridColumn dataField="cleansingDataPresent" 
+													   width="60"
+													   headerText="{Message.get('dataImport.recordList.cleansingDataPresent')}"
+													   itemRenderer="org.openforis.collect.ui.component.datagrid.AdvancedDataGridBooleanColumnItemRenderer" />
+							<mx:AdvancedDataGridColumn dataField="analysisDataPresent" 
+													   width="60"
+													   headerText="{Message.get('dataImport.recordList.analysisDataPresent')}"
+													   itemRenderer="org.openforis.collect.ui.component.datagrid.AdvancedDataGridBooleanColumnItemRenderer" />
+						</mx:AdvancedDataGridColumnGroup>
+						<mx:AdvancedDataGridColumn dataField="warnings" 
+												   headerText="{Message.get('dataImport.recordList.warnigns')}"
+												   width="50"
+												   >
+							<mx:itemRenderer>
+								<fx:Component>
+									<mx:Canvas width="100%" height="100%">
+										<fx:Script>
+											<![CDATA[
+												import org.openforis.collect.event.DataImportEvent;
+												import org.openforis.collect.event.EventDispatcherFactory;
+												import org.openforis.collect.remoting.service.dataImport.DataImportSummaryItemProxy;
+											]]>
+										</fx:Script>
+										<s:Button horizontalCenter="0" verticalCenter="0"
+												  styleName="errorButton"
+												  useHandCursor="true" buttonMode="true"
+												  visible="{data.warnings.length &gt; 0}"
+												  click="{EventDispatcherFactory.getEventDispatcher().dispatchEvent(
+												  new DataImportEvent(DataImportEvent.SHOW_IMPORT_WARNINGS, data as DataImportSummaryItemProxy))}" />
+									</mx:Canvas>
+								</fx:Component>
+							</mx:itemRenderer>
+						</mx:AdvancedDataGridColumn>
+					</mx:AdvancedDataGridColumnGroup>
+					<mx:AdvancedDataGridColumn dataField="selected" 
+											   headerText="{Message.get('dataImport.recordConflicts.replace')}"
+											   width="70"
+											   editable="true"
+											   rendererIsEditor="true" >
+						<mx:itemRenderer>
+							<fx:Component>
+								<mx:Canvas width="100%" height="100%">
+									<mx:CheckBox horizontalCenter="0" verticalCenter="0" 
+												 selected="{data.selected}" 
+												 change="{data.selected = event.target.selected}" />
+								</mx:Canvas>
+							</fx:Component>
+						</mx:itemRenderer>
+					</mx:AdvancedDataGridColumn>
+				</mx:groupedColumns>
+			</mx:AdvancedDataGrid>
+		</s:VGroup>
+		
+		<s:VGroup id="recordsContainer" 
+				  visible="{recordToImportDataGrid.dataProvider.length > 0}"
+				  includeInLayout="{recordToImportDataGrid.dataProvider.length > 0}"
+				  horizontalAlign="center">
+			<s:Label text="{Message.get('dataImport.recordsToBeImported')}"
+					 styleName="formLabel" />
+	
+			<mx:AdvancedDataGrid id="recordToImportDataGrid"
+								 sortExpertMode="true"
+								 selectable="false"
+								 height="150"
+								 >
+				<mx:groupedColumns>
+					<mx:AdvancedDataGridColumn dataField="key"
+											   headerText="{Message.get('dataImport.recordList.key')}"
+											   width="100" />
+					<mx:AdvancedDataGridColumn dataField="record.creationDate"
+											   sortable="false"
+											   width="120"
+											   headerText="{Message.get('dataImport.recordList.creationDate')}"
+											   labelFunction="{UIUtil.gridColumnDateTimeLabelFunction}" />
+					<mx:AdvancedDataGridColumn dataField="record.modifiedDate" 
+											   sortable="false"
+											   width="120"
+											   headerText="{Message.get('dataImport.recordList.modifiedDate')}"
+											   labelFunction="{UIUtil.gridColumnDateTimeLabelFunction}" />
+					<mx:AdvancedDataGridColumnGroup headerText="{Message.get('dataImport.recordList.steps')}">
+						<mx:AdvancedDataGridColumn dataField="entryDataPresent" 
+												   width="60"
+												   headerText="{Message.get('dataImport.recordList.entryDataPresent')}"
+												   itemRenderer="org.openforis.collect.ui.component.datagrid.AdvancedDataGridBooleanColumnItemRenderer" />
+						<mx:AdvancedDataGridColumn dataField="cleansingDataPresent" 
+												   width="60"
+												   headerText="{Message.get('dataImport.recordList.cleansingDataPresent')}"
+												   itemRenderer="org.openforis.collect.ui.component.datagrid.AdvancedDataGridBooleanColumnItemRenderer" />
+						<mx:AdvancedDataGridColumn dataField="analysisDataPresent" 
+												   width="60"
+												   headerText="{Message.get('dataImport.recordList.analysisDataPresent')}"
+												   itemRenderer="org.openforis.collect.ui.component.datagrid.AdvancedDataGridBooleanColumnItemRenderer" />
+					</mx:AdvancedDataGridColumnGroup>
+					<mx:AdvancedDataGridColumn dataField="warnings" 
+											   headerText="{Message.get('dataImport.recordList.warnigns')}"
+											   width="60"
+											   >
+						<mx:itemRenderer>
+							<fx:Component>
+								<mx:Canvas width="100%" height="100%">
+									<fx:Script>
+										<![CDATA[
+											import org.openforis.collect.event.DataImportEvent;
+											import org.openforis.collect.event.EventDispatcherFactory;
+											import org.openforis.collect.remoting.service.dataImport.DataImportSummaryItemProxy;
+										]]>
+									</fx:Script>
+									<s:Button horizontalCenter="0" verticalCenter="0"
+											  styleName="errorButton"
+											  useHandCursor="true" buttonMode="true"
+											  visible="{data.warnings.length &gt; 0}"
+												 click="{EventDispatcherFactory.getEventDispatcher().dispatchEvent(
+												 	new DataImportEvent(DataImportEvent.SHOW_IMPORT_WARNINGS, data as DataImportSummaryItemProxy))}" />
+								</mx:Canvas>
+							</fx:Component>
+						</mx:itemRenderer>
+					</mx:AdvancedDataGridColumn>
+					<mx:AdvancedDataGridColumn dataField="selected" 
+											   headerText="{Message.get('dataImport.recordList.import')}"
+											   width="60"
+											   editable="true"
+											   rendererIsEditor="true"
+											   >
+						<mx:itemRenderer>
+							<fx:Component>
+								<mx:Canvas width="100%" height="100%">
+									<mx:CheckBox horizontalCenter="0" verticalCenter="0" 
+												 selected="{data.selected}" 
+												 change="{data.selected = event.target.selected}" />
+								</mx:Canvas>
+							</fx:Component>
+						</mx:itemRenderer>
+					</mx:AdvancedDataGridColumn>
+				</mx:groupedColumns>
+			</mx:AdvancedDataGrid>
+		</s:VGroup>
+		
+		<s:VGroup id="skippedFilesContainer" 
+				  visible="{skippedFilesDataGrid.dataProvider.length > 0}"
+				  includeInLayout="{skippedFilesDataGrid.dataProvider.length > 0}"
+				  horizontalAlign="center">
+			<s:Label text="{Message.get('dataImport.skippedFiles')}"
+					 styleName="formLabel" />
+		
+			<s:DataGrid id="skippedFilesDataGrid"
+						selectionMode="none"
+						height="100"
+						>
+				<s:columns>
+					<s:ArrayList>
+						<s:GridColumn dataField="fileName" 
+									  width="200"
+									  headerText="{Message.get('dataImport.skippedFiles.fileName')}" />
+						<s:GridColumn dataField="errors" 
+									  headerText="{Message.get('dataImport.skippedFiles.errors')}"
+									  width="60"
+									  >
+							<s:itemRenderer>
+								<fx:Component>
+									<s:GridItemRenderer width="100%" height="100%">
+										<fx:Script>
+											<![CDATA[
+												import org.openforis.collect.event.DataImportEvent;
+												import org.openforis.collect.event.EventDispatcherFactory;
+												import org.openforis.collect.remoting.service.dataImport.FileUnmarshallingErrorProxy;
+											]]>
+										</fx:Script>
+										<s:Button horizontalCenter="0" verticalCenter="0"
+												  styleName="errorButton"
+												  useHandCursor="true" buttonMode="true"
+												  visible="{data.errors.length &gt; 0}"
+												  click="{EventDispatcherFactory.getEventDispatcher().dispatchEvent(
+												  	new DataImportEvent(DataImportEvent.SHOW_SKIPPED_FILE_ERRORS, null, data as FileUnmarshallingErrorProxy))}" />
+									</s:GridItemRenderer>
+								</fx:Component>
+							</s:itemRenderer>
+						</s:GridColumn>
+					</s:ArrayList>
+				</s:columns>
+			</s:DataGrid>
+		</s:VGroup>
+
+		<s:Button id="startImportButton" 
+				  label="{Message.get('dataImport.startImport')}"
+				  useHandCursor="true"
+				  buttonMode="true"
+				  />
+	</s:VGroup>
+	
+	<s:VGroup width="100%" height="100%"
+			  includeIn="uploading, importing, summaryCreationRunning"
+			  itemCreationPolicy="immediate"
+			  horizontalAlign="center"
+			  verticalAlign="middle"
+			  gap="20"
+			  >
+		<s:Label id="progressTitle"
+				 styleName="formLabel" />
+		
+		<mx:ProgressBar id="progressBar"
+						horizontalCenter="0"
+						verticalCenter="0"
+						mode="manual"
+						label="%3%"
+						labelPlacement="center"
+						width="80%"
+						/>
+		
+		<s:Label id="progressLabel"
+				 styleName="formLabel" />
+		
+		<s:Button id="cancelButton"
+				  label="{Message.get('global.cancel')}"
+				  useHandCursor="true"
+				  buttonMode="true"
+				  />
+		
+	</s:VGroup>
+	
+	<s:VGroup includeIn="importComplete"
+			  itemCreationPolicy="immediate"
+			  height="100%" width="100%"
+			  horizontalAlign="center" 
+			  verticalAlign="middle"
+			  gap="30">
+		
+		<s:Label text="{Message.get('dataImport.complete')}"
+				 styleName="infoMessage" />
+		
+		<s:Button id="closeButton"
+				  label="{Message.get('global.close')}"/>
+	</s:VGroup>
+
+</s:Group>
+

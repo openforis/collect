@@ -38,7 +38,7 @@ public class RecordKeyUniquenessValidator implements ValidationRule<Attribute<?,
 		CollectSurvey survey = (CollectSurvey) record.getSurvey();
 		String[] keys = getKeys(rootEntity);
 
-		List<CollectRecord> records = recordManager.getSummaries(survey, rootEntity.getName(), keys);
+		List<CollectRecord> records = recordManager.loadSummaries(survey, rootEntity.getName(), keys);
 		boolean unique = checkUniqueness(records, record);
 		return ValidationResultFlag.valueOf(unique);
 	}

@@ -1,0 +1,28 @@
+<?page docType="html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd""?>
+<zk>
+	<style src="/assets/designer_style.css" />
+	<borderlayout hflex="1" vflex="1">
+		<north height="102px">
+			<div id="header" sclass="header">
+				<image src="/assets/images/designer-header.jpg" />
+			</div>
+		</north>
+		<center>
+			<vlayout hflex="1" vflex="1">
+				<div self="@{insert(content_title)}" sclass="content_title"
+					hflex="1">${contentTitle}</div>
+				<div self="@{insert(content)}" sclass="content" 
+					hflex="1" vflex="1"></div>
+			</vlayout>
+		</center>
+		<south height="30px">
+			<div id="footer" sclass="footer">
+				<image src="/assets/images/designer-footer.jpg" />
+			</div>
+		</south>
+	</borderlayout>
+	
+	<!-- session keep alive timer -->
+	<timer id="timerKeepAliveSession" repeats="true" delay="30000"
+		apply="org.openforis.collect.designer.composer.SessionKeepAliveTimerComposer"/>
+</zk>

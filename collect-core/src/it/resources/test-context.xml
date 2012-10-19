@@ -38,15 +38,19 @@
     	<property name="dataSource" ref="dataSource"/>
 	</bean>
 	
-	<bean id="surveyDao" class="org.openforis.collect.persistence.SurveyDao" init-method="init">
+	<bean id="dynamicTableDao" class="org.openforis.collect.persistence.DynamicTableDao">
     	<property name="dataSource" ref="dataSource"/>
 	</bean>
-
+	
 	<bean id="logoDao" class="org.openforis.collect.persistence.LogoDao">
     	<property name="dataSource" ref="dataSource"/>
 	</bean>
 	
 	<bean id="recordDao" class="org.openforis.collect.persistence.RecordDao">
+    	<property name="dataSource" ref="dataSource"/>
+	</bean>
+
+	<bean id="surveyDao" class="org.openforis.collect.persistence.SurveyDao" init-method="init">
     	<property name="dataSource" ref="dataSource"/>
 	</bean>
 
@@ -62,12 +66,14 @@
     	<property name="dataSource" ref="dataSource"/>
 	</bean>
 
-	<bean id="dynamicTableDao" class="org.openforis.collect.persistence.DynamicTableDao">
+	<bean id="userDao" class="org.openforis.collect.persistence.UserDao">
     	<property name="dataSource" ref="dataSource"/>
 	</bean>
 	
 	<!--  Managers -->
+	<bean id="configurationManager" 			class="org.openforis.collect.manager.ConfigurationManager" init-method="init" lazy-init="false" />
 	<bean id="recordManager" 					class="org.openforis.collect.manager.RecordManager" init-method="init" />	
+	<bean id="recordIndexManager" 				class="org.openforis.collect.manager.RecordIndexManager" lazy-init="false" init-method="init" />
 	<bean id="surveyManager"	 				class="org.openforis.collect.manager.SurveyManager" init-method="init" />
 
 	<!-- Expression Factory -->
@@ -75,8 +81,11 @@
 	<bean id="validator" 					class="org.openforis.idm.metamodel.validation.Validator" />
 	<bean id="externalCodeListProvider" 	class="org.openforis.collect.persistence.DatabaseExternalCodeListProvider" />
 
-	<!-- XmlSerializer -->
-	<bean id="xmlSerializerFactory" class="org.openforis.collect.persistence.xml.FastXmlSerializerFactory" />
+	<bean id="collectSurveyContext" class="org.openforis.collect.model.CollectSurveyContext">
+      <constructor-arg><ref bean="expressionFactory"/></constructor-arg>
+      <constructor-arg><ref bean="validator"/></constructor-arg>
+      <constructor-arg><ref bean="externalCodeListProvider"/></constructor-arg>
+	</bean>
 	
 	<!-- XML DataMarshaller -->
 	<bean id="dataMarshaller" class="org.openforis.collect.persistence.xml.DataMarshaller" lazy-init="false" autowire-candidate="true" autowire="byName" />

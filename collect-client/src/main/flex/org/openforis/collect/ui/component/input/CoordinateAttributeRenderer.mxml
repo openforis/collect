@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<detail:CompositeAttributeRenderer 
+				xmlns:fx="http://ns.adobe.com/mxml/2009" 
+				xmlns:s="library://ns.adobe.com/flex/spark" 
+				xmlns:mx="library://ns.adobe.com/flex/mx" 
+				xmlns:input="org.openforis.collect.ui.component.input.*" 
+				xmlns:detail="org.openforis.collect.ui.component.detail.*"
+				inputFields="{[srsDropDownList, xTextInput, yTextInput]}"
+				>
+	<fx:Script>
+		<![CDATA[
+			import org.openforis.collect.Application;
+			import org.openforis.collect.i18n.Message;
+			import org.openforis.collect.metamodel.proxy.SpatialReferenceSystemProxy;
+			
+			/*
+			override protected function initPresenter():void {
+				this.presenter = new CoordinateInputFieldPresenter(this);
+			}
+			*/
+			
+			protected function srsLabelFunction(item:Object):String {
+				if(item is SpatialReferenceSystemProxy) {
+					var srs:SpatialReferenceSystemProxy = SpatialReferenceSystemProxy(item);
+					return srs.getLabelText();
+				} else {
+					return item.label;
+				}
+			}
+		]]>
+	</fx:Script>
+
+	<detail:states>
+		<s:State name="horizontal" />
+		<s:State name="vertical" />
+	</detail:states>
+	
+	<s:HGroup includeIn="horizontal" gap="6">
+		<input:DropDownInputField id="srsDropDownList" 
+								  attributeDefinition="{attributeDefinition}"
+								  parentEntity="{parentEntity}"
+								  attribute="{attribute}"
+								  fieldIndex="2"
+								  width="150" 
+								  dataField="id"
+								  includeIn="horizontal" 
+								  itemCreationPolicy="immediate"
+								  labelFunction="{srsLabelFunction}"
+								  dataProvider="{Application.activeSurvey.spatialReferenceSystems}"
+								  />
+		<input:NumericInputField id="yTextInput" includeIn="horizontal" itemCreationPolicy="immediate" 
+								 attributeDefinition="{attributeDefinition}"
+								 parentEntity="{parentEntity}"
+								 attribute="{attribute}"
+								 fieldIndex="1"
+								 />
+		<input:NumericInputField id="xTextInput" includeIn="horizontal" itemCreationPolicy="immediate"
+								 attributeDefinition="{attributeDefinition}"
+								 parentEntity="{parentEntity}"
+								 attribute="{attribute}"
+								 fieldIndex="0"
+								 />
+	</s:HGroup>
+	
+	<s:VGroup includeIn="vertical" gap="2">
+		<s:VGroup>
+			<s:HGroup gap="0">
+				<s:Label width="{subLabelWidth}" styleName="bold" text="{Message.get('edit.coordinate.srs')}"/>
+				<fx:Reparent target="srsDropDownList" includeIn="vertical" />
+			</s:HGroup>
+			<s:HGroup gap="0">
+				<s:Label width="{subLabelWidth}" styleName="bold" text="{Message.get('edit.coordinate.y')}"/>
+				<fx:Reparent target="yTextInput" includeIn="vertical" />
+			</s:HGroup>
+			<s:HGroup gap="0">
+				<s:Label width="{subLabelWidth}" styleName="bold" text="{Message.get('edit.coordinate.x')}"/>
+				<fx:Reparent target="xTextInput" includeIn="vertical" />
+			</s:HGroup>
+		</s:VGroup>
+	</s:VGroup>
+	
+</detail:CompositeAttributeRenderer>

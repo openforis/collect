@@ -1,0 +1,7 @@
+<zk>
+	<vlayout children="${arg.nodes}">
+		<template name="children">
+  			<label value="@load(each.name)" />
+  		</template>
+  	</vlayout>
+</zk>

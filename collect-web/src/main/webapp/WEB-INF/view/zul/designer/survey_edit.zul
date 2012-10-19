@@ -1,0 +1,79 @@
+<?page title="Openforis Collect Designer - Edit Survey" contentType="text/html;charset=UTF-8"?>
+<?init class="org.zkoss.zk.ui.util.Composition" arg0="layouts/template.zul"?>
+<zk xmlns:w="client">
+	<script type="text/javascript"><![CDATA[
+		function switchTab(notify, init){
+			if (this.desktop && !init && notify) {
+				zAu.send(new zk.Event(this, 'onSwitchTab'));
+			} else {
+				this.$_sel(notify, init); //call the original method
+			}
+		}
+	]]></script>
+	<borderlayout id="surveyEditBox"
+		hflex="1" vflex="1"
+		self="@define(content)"
+		apply="org.openforis.collect.designer.composer.SurveyEditComposer"
+		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SurveyEditVM')">
+	 	<center>
+			<vlayout hflex="1" vflex="1">
+				<!-- language selector -->
+<!-- 				<hlayout width="100%" style="text-align: right;"> -->
+<!-- 					<label value="${labels.survey.selected_language}:" /> -->
+<!-- 					<radiogroup model="@load(vm.availableLanguages)" -->
+<!-- 						selectedItem="@load(vm.currentLanguageCode)" -->
+<!-- 						onCheck="@command('languageCodeSelected', code=self.selectedItem.value)"> -->
+<!-- 						<template name="model"> -->
+<!-- 							<radio label="@load(each)" value="@load(each)" /> -->
+<!-- 						</template> -->
+<!-- 					</radiogroup> -->
+<!-- 					<button tooltiptext="${labels.survey.language_manager}"  -->
+<!-- 							onClick="@command('openLanguageManagerPopUp')" -->
+<!-- 							image="/assets/images/pencil-small.png" /> -->
+<!-- 				</hlayout> -->
+				<!-- main tabs -->
+				<tabbox id="tb" hflex="1" vflex="1">
+				    <tabs id="tabs">
+				        <tab id="surveyTab" label="${labels.survey.$}"
+				        	 w:_sel="switchTab" forward="onSwitchTab=onSwitchTab" />
+				        <tab id="schemaTab" label="${labels.survey.schema.$}"
+				        	 w:_sel="switchTab" forward="onSwitchTab=onSwitchTab" />
+				        <tab id="layoutTab" label="${labels.survey.layout.$}"
+				        	 w:_sel="switchTab" forward="onSwitchTab=onSwitchTab"  />
+				    </tabs>
+				    <tabpanels>
+				        <tabpanel>
+				        	<include src="survey_edit/info.zul" />
+				        </tabpanel>
+				        <tabpanel>
+				        	<include src="survey_edit/schema/schema.zul" />
+				        </tabpanel>
+				        <tabpanel>
+				        	<include src="survey_edit/layout.zul" />
+				        </tabpanel>
+				    </tabpanels>
+				</tabbox>
+			</vlayout>
+	 	</center>
+		<south height="30px">
+			<borderlayout hflex="1">
+				<west border="none" size="20%">
+					<button label="${labels.survey.list_of_surveys}" 
+						onClick="@command('backToSurveysList')" />
+				</west>
+				<center border="none">
+					<box width="100%" align="center">
+						<button label="${labels.global.save_item}" 
+							onClick="@command('save')" />
+					</box>
+				</center>
+				<east border="none" size="20%">
+					<box width="100%" align="right">
+						<button label="${labels.survey.publish.$}" 
+							onClick="@command('publish')" />
+					</box>
+				</east>
+			</borderlayout>
+		</south>
+	</borderlayout>
+</zk>

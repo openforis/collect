@@ -1,0 +1,42 @@
+<?page title="Collect Database Designer - Select Survey"?>
+<?init class="org.zkoss.zk.ui.util.Composition" arg0="layouts/template.zul"?>
+<?init class="org.zkoss.zkplus.databind.AnnotateDataBinderInit" arg0="./surveySelectBox"?>
+<?variable-resolver class="org.zkoss.zkplus.spring.DelegatingVariableResolver"?>
+
+<vbox
+	id="surveySelectBox" 
+	self="@define(content)"
+	height="100%" width="100%"
+	align="center"
+	apply="org.zkoss.bind.BindComposer"
+	viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SurveySelectVM')">
+
+	<label value="${labels.survey.list_of_surveys}" />
+
+	<listbox id="listbox" rows="10" model="@load(vm.surveySummaries)"
+		selectedItem="@bind(vm.selectedSurvey)">
+		<listhead>
+			<listheader label="${labels.survey.name}" width="200px" />
+			<listheader label="${labels.survey.uri}" width="250px" />
+			<listheader label="${labels.survey.working}" width="100px" />
+			<listheader label="${labels.survey.published}" width="100px" />
+		</listhead>
+		<template name="model" var="survey">
+			<listitem>
+				<listcell label="@load(survey.name)" onDoubleClick="@command('editSurvey')" />
+				<listcell label="@load(survey.uri)" onDoubleClick="@command('editSurvey')" />
+				<listcell label="@load(survey.working)" onDoubleClick="@command('editSurvey')" />
+				<listcell label="@load(survey.published)" onDoubleClick="@command('editSurvey')" />
+			</listitem>
+		</template>
+	</listbox>
+
+	<hlayout spacing="30px">
+		<button id="newSurveyBtn" label="${labels.global.new_item}"
+			onClick="@command('newSurvey')" />
+
+		<button id="editSurveyBtn" label="${labels.global.edit_item}" 
+			onClick="@command('editSurvey')"
+			disabled="@load(vm.editingDisabled)" />
+	</hlayout>		
+</vbox>

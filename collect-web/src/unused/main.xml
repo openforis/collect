@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<flow xmlns="http://www.springframework.org/schema/webflow"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/webflow http://www.springframework.org/schema/webflow/spring-webflow-2.0.xsd">
+
+	<var name="selectedSurvey" class="org.openforis.collect.model.CollectSurvey" />
+
+	<view-state id="survey_select">
+		<on-render>
+			<evaluate expression="surveyManager.getAll()"
+				result="viewScope.surveys" />
+		</on-render>
+		<transition on="edit" to="survey_edit">
+	    	<evaluate expression="surveyManager.get(selectedSurvey.name)"
+				result="flowScope.survey" />
+		</transition>
+		<transition on="new" to="survey_edit">
+		    <evaluate expression="surveyManager.createSurvey()"
+				result="flowScope.survey" />
+		</transition>
+	</view-state>
+
+	<view-state id="survey_edit">
+<!-- 	    <on-entry> -->
+<!-- 	        <evaluate expression="selectedSurvey ? surveyManager.createSurvey()" -->
+<!-- 				result="viewScope.survey" /> -->
+<!-- 	    </on-entry> -->
+		<transition on="cancel" to="survey_select">
+		</transition>
+	</view-state>
+
+	<end-state id="finish" />
+
+</flow>

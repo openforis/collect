@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="utf-8"?>
+<detail:EntityFormItem xmlns:fx="http://ns.adobe.com/mxml/2009"
+					   xmlns:s="library://ns.adobe.com/flex/spark"
+					   xmlns:mx="library://ns.adobe.com/flex/mx"
+					   xmlns:datagroup="org.openforis.collect.ui.component.datagroup.*"
+					   xmlns:detail="org.openforis.collect.ui.component.detail.*"
+					   xmlns:component="org.openforis.collect.ui.component.*"
+					   xmlns:layout="org.openforis.collect.ui.layout.*" 
+					   width="100%" height="100%" 
+					   >
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.binding.utils.BindingUtils;
+			import mx.collections.IList;
+			import mx.events.FlexEvent;
+			
+			import org.openforis.collect.Application;
+			import org.openforis.collect.i18n.Message;
+			import org.openforis.collect.model.proxy.EntityProxy;
+			import org.openforis.collect.presenter.MultipleEntityFormItemPresenter;
+			import org.openforis.collect.ui.Images;
+			
+			private var _entities:IList;
+			private var _selectedEntity:EntityProxy;
+			private var _uiTabs:IList;
+			private var _definitionsPerTab:IList;
+			private var _definitionsPerMainTab:IList;
+			
+			public static const STATE_WITH_TABS:String = "withTabs";
+			public static const STATE_WITHOUT_TABS:String = "withoutTabs";
+			
+			//private var _constraintLayout:ConstraintLayout;
+			
+			override protected function creationCompleteHandler(event:FlexEvent):void {
+				super.creationCompleteHandler(event);
+				//bind the position of horizontal scrollbars of header and content
+				//so that the header is always aligned with the content
+			}
+			
+			override protected function initPresenter():void {
+				presenter = new MultipleEntityFormItemPresenter(this);
+			}
+
+			[Bindable]
+			public function get selectedEntity():EntityProxy {
+				return _selectedEntity;
+			}
+
+			public function set selectedEntity(value:EntityProxy):void {
+				_selectedEntity = value;
+			}
+
+			[Bindable]
+			public function get entities():IList {
+				return _entities;
+			}
+
+			public function set entities(value:IList):void {
+				_entities = value;
+			}
+
+			[Bindable]
+			public function get uiTabs():IList {
+				return _uiTabs;
+			}
+
+			public function set uiTabs(value:IList):void {
+				_uiTabs = value;
+			}
+
+			[Bindable]
+			public function get definitionsPerTab():IList {
+				return _definitionsPerTab;
+			}
+
+			public function set definitionsPerTab(value:IList):void {
+				_definitionsPerTab = value;
+			}
+
+			[Bindable]
+			public function get definitionsPerMainTab():IList {
+				return _definitionsPerMainTab;
+			}
+			
+			public function set definitionsPerMainTab(value:IList):void {
+				_definitionsPerMainTab = value;
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<fx:Declarations>
+		
+		<s:Fade id="showFormEffect" 
+				duration="600" 
+				alphaFrom="0" 
+				alphaTo="1"
+				/>
+		
+		<s:Fade id="hideFormEffect" 
+				duration="400" 
+				alphaFrom="1" 
+				alphaTo="0"
+				/>
+		
+	</fx:Declarations>
+	
+	<detail:layout>
+		<s:VerticalLayout />
+	</detail:layout>
+	
+	<detail:states>
+		<s:State name="withoutTabs" />
+		<s:State name="withTabs" />
+	</detail:states>
+	
+	<s:BorderContainer id="border" 
+					   height="100%" 
+					   width="100%"
+					   minHeight="0"
+					   minWidth="0">
+		<s:layout>
+			<s:VerticalLayout />
+		</s:layout>
+
+		<component:AddEntityControlBar id="addSection"
+									   entityDefinition="{entityDefinition}"
+									   entities="{entities}"
+									   includeInLayout="{entityDefinition.multiple &amp;&amp; entityDefinition.parent != null}" 
+									   visible="{entityDefinition.multiple &amp;&amp; entityDefinition.parent != null}" />
+		<s:Group id="internalContainer" 
+				 height="100%" width="100%"
+				 showEffect="{showFormEffect}" 
+				 hideEffect="{hideFormEffect}"
+				 >
+			<s:VGroup id="tabbedContainer" 
+					  width="100%" height="100%" 
+					  gap="0" 
+					  includeIn="withTabs"
+					  >
+				<s:TabBar id="tabBar" 
+						  dataProvider="{viewStack}"
+						  width="100%">
+					<s:layout>
+						<layout:FlowLayout />
+					</s:layout>
+				</s:TabBar>
+				
+				<s:BorderContainer
+					width="100%" 
+					height="100%"
+					styleName="entityForm"
+					>
+					<mx:ViewStack id="viewStack" width="100%" height="100%" 
+								  verticalGap="0"
+								  creationPolicy="auto">
+						<mx:Repeater id="tabsRP" dataProvider="{uiTabs}">
+							<detail:ScrollableFormContainer 
+								id="formContainers"
+								modelVersion="{modelVersion}"
+								entityDefinition="{entityDefinition}"
+								nodeDefinitions="{IList(definitionsPerTab.getItemAt(tabsRP.currentIndex))}"
+								entity="{entity}"
+								label="{tabsRP.currentItem.label}"
+								/>
+						</mx:Repeater>
+					</mx:ViewStack>
+				</s:BorderContainer>
+			</s:VGroup>
+			<detail:ScrollableFormContainer 
+				id="withoutTabsContainer"
+				modelVersion="{modelVersion}"
+				entityDefinition="{entityDefinition}"
+				nodeDefinitions="{definitionsPerMainTab}"
+				entity="{entity}"
+				includeIn="withoutTabs"
+				/>
+		</s:Group>	
+	</s:BorderContainer>
+	
+</detail:EntityFormItem>

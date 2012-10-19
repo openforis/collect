@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<zk>
+	<device-config>
+		<device-type>ajax</device-type>
+		<timeout-uri>/designer.htm</timeout-uri><!-- An empty URL can cause the browser to reload the same URL -->
+	</device-config>
+	
+	<system-config>
+        <disable-event-thread/>
+		<!-- labels -->
+        <label-location>/WEB-INF/labels/designer/label_en.properties</label-location>
+        <label-location>/WEB-INF/labels/language_codes_iso_639_3.properties</label-location>
+    </system-config>
+    
+	<session-config>
+		<timer-keep-alive>true</timer-keep-alive>
+	</session-config>
+	
+	<!-- JavaScript debug -->
+<!-- 	<client-config> -->
+<!-- 	    <debug-js>true</debug-js> -->
+<!-- 	</client-config> -->
+<!-- 	<library-property> -->
+<!-- 	    <name>org.zkoss.web.classWebResource.cache</name> -->
+<!-- 	    <value>false</value> -->
+<!-- 	</library-property> -->
+
+<!-- 	<library-property> -->
+<!-- 	    <name>org.zkoss.theme.preferred</name> -->
+<!-- 	    <value>silvertail</value> -->
+<!-- 	</library-property> -->
+	
+<!--     <listener> -->
+<!-- 		<description>Spring Web Flow Controller Listener</description> -->
+<!-- 		<listener-class>org.zkoss.spring.webflow.mvc.servlet.ZkFlowControllerListener</listener-class> -->
+<!-- 	</listener> -->
+
+<!-- 	<listener> -->
+<!-- 		<description>Spring Web Flow URL and FlowId Listener</description> -->
+<!-- 		<listener-class>org.zkoss.spring.webflow.context.servlet.ZkFlowResourceListener</listener-class> -->
+<!-- 	</listener> -->
+</zk>

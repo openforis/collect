@@ -8,9 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.xml.namespace.QName;
-
 import org.apache.commons.lang3.StringUtils;
+import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.ModelVersion;
@@ -34,8 +33,6 @@ import org.openforis.idm.model.TextAttribute;
  */
 public class CollectRecord extends Record {
 
-	private static final QName COUNT_ANNOTATION = new QName("http://www.openforis.org/collect/3.0/collect", "count");
-	
 	private static final int APPROVED_MISSING_POSITION = 0;
 	private static final int CONFIRMED_ERROR_POSITION = 0;
 	private static final int DEFAULT_APPLIED_POSITION = 1;
@@ -581,7 +578,7 @@ public class CollectRecord extends Record {
 		for (NodeDefinition childDefinition : childDefinitions) {
 			if(childDefinition instanceof EntityDefinition) {
 				EntityDefinition entityDefinition = (EntityDefinition) childDefinition;
-				String annotation = childDefinition.getAnnotation(COUNT_ANNOTATION);
+				String annotation = childDefinition.getAnnotation(UIOptions.Annotation.COUNT_IN_SUMMARY_LIST.getQName());
 				if(annotation != null && Boolean.parseBoolean(annotation)) {
 					result.add(entityDefinition);
 				}
@@ -590,4 +587,53 @@ public class CollectRecord extends Record {
 		return result;
 	}
 
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + ((createdBy == null) ? 0 : createdBy.hashCode());
+		result = prime * result + ((creationDate == null) ? 0 : creationDate.hashCode());
+		result = prime * result + ((modifiedBy == null) ? 0 : modifiedBy.hashCode());
+		result = prime * result + ((modifiedDate == null) ? 0 : modifiedDate.hashCode());
+		result = prime * result + ((state == null) ? 0 : state.hashCode());
+		result = prime * result + ((step == null) ? 0 : step.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		CollectRecord other = (CollectRecord) obj;
+		if (createdBy == null) {
+			if (other.createdBy != null)
+				return false;
+		} else if (!createdBy.equals(other.createdBy))
+			return false;
+		if (creationDate == null) {
+			if (other.creationDate != null)
+				return false;
+		} else if (!creationDate.equals(other.creationDate))
+			return false;
+		if (modifiedBy == null) {
+			if (other.modifiedBy != null)
+				return false;
+		} else if (!modifiedBy.equals(other.modifiedBy))
+			return false;
+		if (modifiedDate == null) {
+			if (other.modifiedDate != null)
+				return false;
+		} else if (!modifiedDate.equals(other.modifiedDate))
+			return false;
+		if (state != other.state)
+			return false;
+		if (step != other.step)
+			return false;
+		return true;
+	}
+	
 }

@@ -1,0 +1,37 @@
+<zk>
+	<vlayout 
+		id="nodeFormContainer"
+		apply="org.zkoss.bind.BindComposer"
+		viewModel="@id('vm') @init(vm)"
+		validationMessages="@id('vmsgs')"
+		form="@id('fx')
+			@init(vm.tempFormObject)
+			@load(vm.formObject) 
+			@save(vm.formObject, before='applyChanges')
+			@validator('org.openforis.collect.designer.form.validator.AttributeDefinitionFormValidator')">
+		
+		<include src="survey_edit/schema/attribute_common.zul" />
+		
+		<grid>
+			<columns>
+				<column label="" width="150px" />
+				<column label="" width="100%" />
+			</columns>
+			<rows>
+				<row>
+					<label value="${labels.survey.schema.attribute.text.key}:" />
+					<checkbox checked="@load(fx.key eq true) @save(fx.key)" onCheck="@command('applyChanges')" />
+				</row>
+				<row>
+	            	<label value="${labels.survey.schema.attribute.text.type}:" />
+					<radiogroup selectedItem="@bind(fx.type)" onCheck="@command('applyChanges')">
+						<radio label="${labels.survey.schema.attribute.text.type_short}"
+							value="SHORT" />
+						<radio label="${labels.survey.schema.attribute.text.type_memo}"
+							value="MEMO" />
+					</radiogroup>
+	            </row>
+			</rows>
+		</grid>
+	</vlayout>
+</zk>

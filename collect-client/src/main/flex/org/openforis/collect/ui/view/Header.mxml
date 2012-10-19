@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 width="100%" 
+		 creationComplete="init();">
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.rpc.AsyncResponder;
+			import mx.rpc.events.FaultEvent;
+			import mx.rpc.events.ResultEvent;
+			
+			import org.openforis.collect.Application;
+			import org.openforis.collect.client.ClientFactory;
+			import org.openforis.collect.client.LogoClient;
+			import org.openforis.collect.i18n.Message;
+			import org.openforis.collect.model.proxy.UserProxy;
+
+			[Bindable]
+			public var logoData:ByteArray;
+			
+			private function init():void  {
+				var client:LogoClient = ClientFactory.logoClient;
+				var logoResponder:AsyncResponder;
+				logoResponder = new AsyncResponder(logoResultHandler, logoFaultHandler);
+				client.loadLogo(logoResponder, 0);
+			}
+			
+			protected function logoResultHandler(event:ResultEvent, token:Object):void {
+				var data:ByteArray = event.result as ByteArray;				
+				logoData = data;
+			}
+			
+			protected function logoFaultHandler(event:FaultEvent, token:Object = null):void {
+				//AlertUtil.showError('error.logoNotFound'); 
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<s:Group>
+        <s:Image source="@Embed(source='/assets/images/banner.jpg')"/>
+        <s:Image source="{logoData}" right="0" /> 
+		
+		<s:VGroup right="0" horizontalAlign="right">
+			<s:HGroup verticalAlign="middle">
+				<!--<s:Label text="{Message.get('global.loggedAsLabel')}" />-->
+				
+				<s:Label id="loggedAsText"
+						 text="{Application.user.name}"
+						 styleName="formLabel"
+						 />
+				<!--<s:Button id="logoutButton"
+						  useHandCursor="true"
+						  buttonMode="true"
+						  toolTip="{Message.get('settings.logout')}"
+						  styleName="logout"
+						  verticalCenter="0"
+						  right="0"
+						  />-->
+				<mx:PopUpMenuButton id="settingsButton"
+									openAlways="true"
+									toolTip="{Message.get('settings.tooltip')}" 
+									useHandCursor="true" buttonMode="true" 
+									styleName="settings"
+									arrowButtonWidth="20"
+									width="20"
+									/>
+			</s:HGroup>
+		</s:VGroup>
+	</s:Group>
+	
+</s:Group>

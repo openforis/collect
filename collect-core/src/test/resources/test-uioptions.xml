@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tabSet 
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns="http://www.openforis.org/collect/3.0/ui"
+      xsi:schemaLocation="http://www.openforis.org/collect/3.0/ui ../../main/resources/idml3-ui.xsd"
+      name="cluster">
+  <tab name="cluster">
+    <label xml:lang="en">Cluster</label>
+  </tab>
+  <tab name="plot">
+    <label xml:lang="en">Plot</label>
+    <tab name="plot_det">
+      <label xml:lang="en">Details (2)</label>
+    </tab>
+    <tab name="shrubs_regen">
+      <label xml:lang="en">Shrubs &amp; Regeneration (3)</label>
+    </tab>
+    <tab name="tree">
+      <label xml:lang="en">Trees (4)</label>
+    </tab>
+    <tab name="dead_wood">
+      <label xml:lang="en">Dead Wood (5a)</label>
+    </tab>
+    <tab name="stump">
+      <label xml:lang="en">Stumps (5b)</label>
+    </tab>
+    <tab name="bamboo">
+      <label xml:lang="en">Bamboo (6)</label>
+    </tab>
+  </tab>
+  <tab name="informant">
+    <label xml:lang="en">Informant Interviews</label>
+  </tab>
+  <tab name="household">
+    <label xml:lang="en">Household Surveys</label>
+    <tab name="hs_general">
+      <label xml:lang="en">General (A/B/C)</label>
+    </tab>
+    <tab name="hs_assets">
+      <label xml:lang="en">Assets (D)</label>
+    </tab>
+    <tab name="hs_foodsecurity">
+      <label xml:lang="en">Food Security (E)</label>
+    </tab>
+    <tab name="hs_income_opinions">
+      <label xml:lang="en">Income &amp; Opinions (F/G)</label>
+    </tab>
+    <tab name="hs_forest_products">
+      <label xml:lang="en">Forest Products &amp; Services (H)</label>
+    </tab>
+    <tab name="hs_org_comments">
+      <label xml:lang="en">Organizations &amp; Comments (I/J)</label>
+    </tab>
+    <tab name="hs_forest_governance">
+      <label xml:lang="en">Forest Governance (K)</label>
+    </tab>
+    <tab name="hs_comments">
+      <label xml:lang="en">Comments</label>
+    </tab>
+  </tab>
+</tabSet>

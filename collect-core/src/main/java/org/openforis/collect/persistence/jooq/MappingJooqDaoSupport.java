@@ -1,9 +1,6 @@
 package org.openforis.collect.persistence.jooq;
 
 import java.sql.Connection;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.List;
 
 import org.jooq.Record;
@@ -11,9 +8,6 @@ import org.jooq.Result;
 import org.jooq.ResultQuery;
 import org.jooq.SimpleSelectQuery;
 import org.jooq.TableField;
-import org.openforis.collect.persistence.jooq.tables.OfcTaxonVernacularName;
-import org.openforis.collect.persistence.jooq.tables.records.OfcTaxonVernacularNameRecord;
-import org.openforis.idm.model.species.TaxonVernacularName;
 import org.springframework.transaction.annotation.Transactional;
 
 /**

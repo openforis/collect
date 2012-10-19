@@ -1,0 +1,170 @@
+<zk>
+	<grid>
+		<columns>
+			<column label="" width="150px" />
+			<column label="" width="100%" />
+		</columns>
+		<rows>
+			<row>
+				<label value="${labels.global.item.name}:" />
+				<cell>
+					<textbox width="150px" value="@bind(fx.name)"
+						maxlength="40" 
+						onChange="@command('applyChanges')" />
+					<label class="error" value="@load(vmsgs['name'])" />
+				</cell>
+			</row>
+			<row>
+				<label value="${labels.survey.schema.node.multiple}:" />
+				<cell>
+					<checkbox checked="@load(fx.multiple eq true) @save(fx.multiple)" onCheck="@command('applyChanges')" />
+					<label class="error" value="@load(vmsgs['multiple'])" />
+				</cell>
+			</row>
+			<row visible="@load(fx.multiple ne true)">
+				<label value="${labels.survey.schema.node.required}:" />
+				<cell>
+					<checkbox checked="@load(fx.required eq true) @save(fx.required)" onCheck="@command('applyChanges')" />
+					<label class="error" value="@load(vmsgs['required'])" />
+				</cell>
+			</row>
+			<row visible="@load(fx.multiple ne true)">
+				<label value="${labels.survey.schema.node.required_expression}:" />
+				<cell>
+					<textbox width="150px" value="@bind(fx.requiredExpression)" onChange="@command('applyChanges')" />
+					<label class="error" value="@load(vmsgs['requiredExpression'])" />
+				</cell>
+			</row>
+			<row visible="@load(fx.multiple eq true)">
+				<label value="${labels.survey.schema.node.min_count}:" />
+				<cell>
+					<intbox value="@bind(fx.minCount)" onChange="@command('applyChanges')" />
+					<label class="error" value="@load(vmsgs['minCount'])" />
+				</cell>
+			</row>
+			<row visible="@load(fx.multiple eq true)">
+				<label value="${labels.survey.schema.node.max_count}:" />
+				<cell>
+					<intbox value="@bind(fx.maxCount)" onChange="@command('applyChanges')" />
+					<label class="error" value="@load(vmsgs['maxCount'])" />
+				</cell>
+			</row>
+			<row>
+				<label value="${labels.survey.schema.node.instance_label}:" />
+				<cell>
+					<textbox width="150px" value="@bind(fx.instanceLabel)" onChange="@command('applyChanges')" />
+					<label class="error" value="@load(vmsgs['instanceLabel'])" />
+				</cell>
+			</row>
+			<row>
+				<label value="${labels.survey.schema.node.heading_label}:" />
+				<cell>
+					<textbox width="150px" value="@bind(fx.headingLabel)" onChange="@command('applyChanges')" />
+					<label class="error" value="@load(vmsgs['headingLabel'])" />
+				</cell>
+			</row>
+			<row>
+				<label value="${labels.survey.schema.node.number_label}:" />
+				<cell>
+					<textbox width="150px" value="@bind(fx.numberLabel)" onChange="@command('applyChanges')" />
+					<label class="error" value="@load(vmsgs['numberLabel'])" />
+				</cell>
+			</row>
+		</rows>
+	</grid>
+	<groupbox closable="true" open="false" 
+		sclass="insideForm"
+		mold="3d" width="100%">
+		<attribute name="onOpen"><![CDATA[
+		    caption.setSclass("open-" + self.isOpen());
+		]]></attribute>
+		<caption id="caption" sclass="open-false">
+			<div align="left">
+				<label value="${labels.survey.schema.node.other_labels}" />
+			</div>
+		</caption>
+		<grid>
+			<columns>
+				<column label="" width="150px" />
+				<column label="" width="100%" />
+			</columns>
+			<rows>
+				<row>
+					<label value="${labels.survey.schema.node.interview_prompt_label}:" />
+					<cell>
+						<textbox width="150px" value="@bind(fx.interviewPromptLabel)" onChange="@command('applyChanges')" />
+						<label class="error" value="@load(vmsgs['interviewPromptLabel'])" />
+					</cell>
+				</row>
+				<row>
+					<label value="${labels.survey.schema.node.paper_prompt_label}:" />
+					<cell>
+						<textbox width="150px" value="@bind(fx.paperPromptLabel)" onChange="@command('applyChanges')" />
+						<label class="error" value="@load(vmsgs['paperPromptLabel'])" />
+					</cell>
+				</row>
+				<row>
+					<label value="${labels.survey.schema.node.handheld_prompt_label}:" />
+					<cell>
+						<textbox width="150px" value="@bind(fx.handheldPromptLabel)" onChange="@command('applyChanges')" />
+						<label class="error" value="@load(vmsgs['handheldPromptLabel'])" />
+					</cell>
+				</row>
+				<row>
+					<label value="${labels.survey.schema.node.pc_prompt_label}:" />
+					<cell>
+						<textbox width="150px" value="@bind(fx.pcPromptLabel)" onChange="@command('applyChanges')" />
+						<label class="error" value="@load(vmsgs['pcPromptLabel'])" />
+					</cell>
+				</row>
+			</rows>
+		</grid>
+	</groupbox>
+	<grid>
+		<columns>
+			<column label="" width="150px" />
+			<column label="" width="100%" />
+		</columns>
+		<rows>
+			<row>
+				<label value="${labels.global.item.description}:" />
+				<cell>
+					<textbox width="150px" value="@bind(fx.description)" onChange="@command('applyChanges')" />
+					<label class="error" value="@load(vmsgs['description'])" />
+				</cell>
+			</row>
+			<row>
+				<label value="${labels.global.item.since_version}:" />
+				<cell>
+					<listbox width="150px" model="@load(vm.versionsForCombo)"
+						selectedItem="@bind(fx.sinceVersion)" mold="select"
+						onSelect="@command('applyChanges')">
+						<template name="model">
+							<listitem label="@load(each.name)" />
+						</template>
+					</listbox>
+					<button tooltiptext="${labels.survey.versioning_manager}" 
+						onClick="@command('openVersioningManagerPopUp')"
+						image="/assets/images/pencil-small.png" />
+					<label class="error" value="@load(vmsgs['sinceVersion'])" />
+				</cell>
+			</row>
+			<row>
+				<label value="${labels.global.item.deprecated_version}:" />
+				<cell>
+					<listbox width="150px" model="@load(vm.versionsForCombo)"
+						selectedItem="@bind(fx.deprecatedVersion)" mold="select"
+						onSelect="@command('applyChanges')">
+						<template name="model">
+							<listitem label="@load(each.name)" />
+						</template>
+					</listbox>
+					<button tooltiptext="${labels.survey.versioning_manager}" 
+						onClick="@command('openVersioningManagerPopUp')"
+						image="/assets/images/pencil-small.png" />
+					<label class="error" value="@load(vmsgs['deprecatedVersion'])" />
+				</cell>
+			</row>
+		</rows>
+	</grid>
+</zk>

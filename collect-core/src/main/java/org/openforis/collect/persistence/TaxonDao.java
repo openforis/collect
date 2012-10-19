@@ -14,6 +14,7 @@ import org.jooq.TableField;
 import org.openforis.collect.persistence.jooq.MappingJooqDaoSupport;
 import org.openforis.collect.persistence.jooq.MappingJooqFactory;
 import org.openforis.idm.model.species.Taxon;
+import org.openforis.idm.model.species.Taxon.TaxonRank;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -83,7 +84,9 @@ public class TaxonDao extends MappingJooqDaoSupport<Taxon, TaxonDao.JooqFactory>
 			t.setParentId(r.getValue(OFC_TAXON.PARENT_ID));
 			t.setCode(r.getValueAsString(OFC_TAXON.CODE));
 			t.setScientificName(r.getValue(OFC_TAXON.SCIENTIFIC_NAME));
-			t.setTaxonomicRank(r.getValue(OFC_TAXON.TAXON_RANK));
+			String taxonRankName = r.getValue(OFC_TAXON.TAXON_RANK);
+			TaxonRank taxonRank = TaxonRank.fromName(taxonRankName);
+			t.setTaxonRank(taxonRank);
 			t.setTaxonomyId(r.getValue(OFC_TAXON.TAXONOMY_ID));
 			t.setStep(r.getValue(OFC_TAXON.STEP));
 		}
@@ -95,7 +98,8 @@ public class TaxonDao extends MappingJooqDaoSupport<Taxon, TaxonDao.JooqFactory>
 			q.addValue(OFC_TAXON.PARENT_ID, t.getParentId());
 			q.addValue(OFC_TAXON.CODE, t.getCode());
 			q.addValue(OFC_TAXON.SCIENTIFIC_NAME, t.getScientificName());
-			q.addValue(OFC_TAXON.TAXON_RANK, t.getTaxonomicRank());
+			TaxonRank taxonRank = t.getTaxonRank();
+			q.addValue(OFC_TAXON.TAXON_RANK, taxonRank != null ? taxonRank.getName(): null);
 			q.addValue(OFC_TAXON.TAXONOMY_ID, t.getTaxonomyId());
 			q.addValue(OFC_TAXON.STEP, t.getStep());
 		}

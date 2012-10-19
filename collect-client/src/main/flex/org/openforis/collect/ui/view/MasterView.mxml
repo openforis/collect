@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx"
+		 xmlns:component="org.openforis.collect.ui.component.*" 
+		 xmlns:view="org.openforis.collect.ui.view.*"
+		 creationComplete="creationCompleteHandler(event)"
+		 width="100%" height="100%" 
+		 >
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.events.FlexEvent;
+			
+			import org.openforis.collect.i18n.Message;
+			import org.openforis.collect.presenter.MasterPresenter;
+			
+			
+			public static const LOADING_STATE:String = "loading";
+			public static const HOME_STATE:String = "home";
+			public static const LIST_STATE:String = "list";
+			public static const DETAIL_STATE:String = "detail";
+			public static const SURVEY_SELECTION_STATE:String = "surveySelection";
+			
+			private var _masterPresenter:MasterPresenter;
+			
+			protected function creationCompleteHandler(event:FlexEvent):void {
+				this._masterPresenter = new MasterPresenter(this); 
+			}
+		]]>
+	</fx:Script>
+	
+	<s:layout>
+		<s:VerticalLayout horizontalAlign="center" />
+	</s:layout>
+	
+	<s:states>
+		<s:State name="loading" />
+		<!--
+		<s:State name="home" />
+		-->
+		<s:State name="surveySelection" />
+		<s:State name="list" />
+		<s:State name="detail" />
+	</s:states>
+	
+	<component:LoadingContent width="100%" height="100%" includeIn="loading" itemCreationPolicy="immediate"/>
+	
+	<view:SurveySelectionView id="surveySelectionView" includeIn="surveySelection" itemCreationPolicy="immediate" />
+	<!--
+	<view:RootEntitySelectionView id="rootEntitySelectionView" includeIn="rootEntitySelection" itemCreationPolicy="immediate" />
+	-->
+	<view:ListView id="listView" includeIn="list" itemCreationPolicy="immediate" />
+	<view:DetailView id="detailView" includeIn="detail" itemCreationPolicy="immediate" />
+	
+</s:Group>

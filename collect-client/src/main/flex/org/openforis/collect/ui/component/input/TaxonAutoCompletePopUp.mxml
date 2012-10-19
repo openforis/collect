@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:SkinnableContainer xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx"
+		 focusEnabled="false"
+		>
+	<s:layout>
+		<s:BasicLayout />
+	</s:layout>
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.events.FlexMouseEvent;
+			
+			import org.openforis.collect.event.TaxonInputFieldEvent;
+			import org.openforis.collect.i18n.Message;
+			import org.openforis.collect.model.proxy.TaxonOccurrenceProxy;
+			import org.openforis.collect.util.ObjectUtil;
+			
+			public function itemClickHandler(event:MouseEvent=null):void {
+				if(dataGrid.selectedItem!=null) {
+					var taxonEvent:TaxonInputFieldEvent = new TaxonInputFieldEvent(TaxonInputFieldEvent.TAXON_SELECT);
+					taxonEvent.taxon = dataGrid.selectedItem as TaxonOccurrenceProxy;
+					dispatchEvent(taxonEvent);
+				}
+			}
+		]]>
+	</fx:Script>
+	
+	<fx:Metadata>
+		[Event(name="taxonSelect", type="org.openforis.collect.event.TaxonInputFieldEvent")] 
+	</fx:Metadata>
+	
+	<s:DataGrid id="dataGrid"
+				width="100%" 
+				height="200"
+				focusEnabled="false"
+				>
+		<s:columns>
+			<s:ArrayList>
+				<s:GridColumn headerText="{Message.get('edit.taxon.code')}" 
+							  dataField="code" 
+							  width="83" 
+							  />
+				<s:GridColumn headerText="{Message.get('edit.taxon.scientificName')}" 
+							  dataField="scientificName" 
+							  width="106" 
+							  />
+				<s:GridColumn headerText="{Message.get('edit.taxon.vernacularName')}" 
+							  dataField="vernacularName" 
+							  width="106" 
+							  />
+				<s:GridColumn headerText="{Message.get('edit.taxon.languageCode')}" 
+							  dataField="languageCode" 
+							  width="106" 
+							  />
+				<s:GridColumn headerText="{Message.get('edit.taxon.languageVariety')}" 
+							  dataField="languageVariety" 
+							  width="103" 
+							  />
+			</s:ArrayList>
+		</s:columns>
+		<s:itemRenderer>
+			<fx:Component>
+				<s:GridItemRenderer height="20" click="outerDocument.itemClickHandler(event)">
+					<s:Label id="labelDisplay" 
+							 minHeight="20" 
+							 height="100%" 
+							 width="100%"
+							 top="2" 
+							 left="2" 
+							 textAlign="left" 
+							 verticalAlign="middle" 
+							 maxDisplayedLines="1"
+							 showTruncationTip="true"
+							 />
+				</s:GridItemRenderer>
+			</fx:Component>
+		</s:itemRenderer>
+	</s:DataGrid>
+	
+</s:SkinnableContainer>

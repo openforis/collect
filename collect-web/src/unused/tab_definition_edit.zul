@@ -1,0 +1,23 @@
+<zk>
+	<div 
+		validationMessages="@id('vmsgs')"
+		apply="org.zkoss.bind.BindComposer"
+		viewModel="@id('vm') @init(vm)"
+		form="@id('fx') 
+			@load(vm.editedTabDefinition) @save(vm.editedTabDefinition, before='applyChanges')"
+		width="400px">
+		<grid>
+			<columns>
+				<column label="" width="150px" />
+				<column label="" width="100%" />
+			</columns>
+			<rows>
+				<row>
+					<label value="${labels.global.item.name}:" />
+					<textbox width="99%" value="@bind(fx.name)" />
+				</row>
+			</rows>
+		</grid>
+		<include src="generic/apply_changes_bar.zul" />
+	</div>
+</zk>

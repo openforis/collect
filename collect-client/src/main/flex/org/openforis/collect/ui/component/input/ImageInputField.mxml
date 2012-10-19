@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<input:FileInputField xmlns:fx="http://ns.adobe.com/mxml/2009" 
+				  xmlns:s="library://ns.adobe.com/flex/spark" 
+				  xmlns:mx="library://ns.adobe.com/flex/mx" 
+				  xmlns:input="org.openforis.collect.ui.component.input.*" 
+				  xmlns:component="org.openforis.collect.ui.component.*" 
+				  xmlns:graphics="org.openforis.collect.ui.skin.graphics.*"
+				  >
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.core.IVisualElement;
+			
+			import org.openforis.collect.i18n.Message;
+			import org.openforis.collect.presenter.ImageInputFieldPresenter;
+			
+			override protected function initPresenter():void {
+				presenter = new ImageInputFieldPresenter(this);
+			}
+			/*
+			override public function set mxmlContent(value:Array):void {
+				var adding:Boolean = true;
+				var index:int = 0;
+				while ( adding ) {
+					var ive:IVisualElement = null;
+					try {
+						ive = super.getElementAt(index);
+					} catch (e:Error) {}
+					if ( ive != null ) {
+						value.unshift(ive);
+						index++;
+					}else{
+						adding = false;
+					}
+				}
+				super.mxmlContent = value;
+			}
+			*/
+		]]>
+	</fx:Script>
+	
+	<input:states>
+		<s:State name="default" />
+		<s:State name="uploading" />
+		<s:State name="fileUploaded" />
+	</input:states>
+	
+	<component:ImageLoader id="imagePreview" 
+						   includeIn="fileUploaded"
+						   itemCreationPolicy="immediate"
+						   maxHeight="100" maxWidth="150"
+						   />
+	
+	<s:HGroup id="controlsContainer" 
+			  visible="{editable}" 
+			  includeInLayout="{editable}" 
+			  gap="20">
+		<s:Group excludeFrom="uploading"
+				 itemCreationPolicy="immediate">
+			<s:Button id="browseButton" 
+					  label="{Message.get('edit.file.upload')}"
+					  label.fileUploaded="{Message.get('edit.file.uploadAgain')}"
+					  />
+			<graphics:RemarksPresentIcon id="remarksPresentIcon"
+										 top="0"
+										 right="0"
+										 visible="{remarksPresent}"
+										 />
+		</s:Group>
+
+		<mx:ProgressBar id="uploadProgressBar" 
+						width="100" 
+						label="{Message.get('edit.file.uploadProgressBarLabel')}"
+						labelPlacement="center"
+						mode="manual"
+						includeIn="uploading"
+						itemCreationPolicy="immediate"
+						/>
+		
+		<s:HGroup id="fileUploadedControlsContainer" gap="20"
+				  includeIn="fileUploaded"
+				  itemCreationPolicy="immediate">
+			<s:Button id="downloadButton" label="{Message.get('global.download')}" />
+			<s:Button id="removeButton" label="{Message.get('global.delete')}" />
+		</s:HGroup>
+	</s:HGroup>
+		
+</input:FileInputField>

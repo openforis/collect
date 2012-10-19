@@ -1,0 +1,63 @@
+<zk>
+	<div 
+		validationMessages="@id('vmsgs')"
+		apply="org.zkoss.bind.BindComposer"
+		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SurveyMainInfoVM')"
+		form="@id('fx') @load(vm.formObject) @save(vm.formObject, before='applyChanges')
+			@validator('org.openforis.collect.designer.form.validator.SurveyMainInfoFormValidator')">
+		<grid>
+			<columns>
+				<column label="" width="150px" />
+				<column label="" width="100%" />
+			</columns>
+			<rows>
+				<row>
+					<label value="${labels.survey.name}:" />
+					<cell>
+						<textbox width="150px" value="@bind(fx.name)" onChange="@command('applyChanges')" />
+						<label class="error" value="@load(vmsgs['name'])" />
+					</cell>
+				</row>
+				<row>
+					<label value="${labels.survey.uri}:" />
+					<cell>
+						<textbox width="350px" value="@bind(fx.uri)" onChange="@command('applyChanges')"
+							readonly="@load(fx.published)" />
+						<label class="error" value="@load(vmsgs['uri'])" />
+					</cell>
+				</row>
+				<row>
+					<label value="${labels.survey.description}:" />
+					<cell>
+						<textbox width="350px" value="@bind(fx.description)" onChange="@command('applyChanges')" />
+						<label class="error" value="@load(vmsgs['description'])" />
+					</cell>
+				</row>
+				<row>
+					<label value="${labels.survey.project_name}:" />
+					<cell>
+						<textbox width="150px" value="@bind(fx.projectName)" onChange="@command('applyChanges')" />
+						<label class="error" value="@load(vmsgs['projectName'])" />
+					</cell>
+				</row>
+				<row>
+					<label value="${labels.survey.project_cycle}:" />
+					<cell>
+						<textbox width="150px" value="@bind(fx.projectCycle)" onChange="@command('applyChanges')" />
+						<label class="error" value="@load(vmsgs['projectCycle'])" />
+					</cell>
+				</row>
+				<row>
+					<label value="${labels.survey.srs.$}:" />
+					<cell>
+						<button tooltiptext="${labels.survey.srs.$}" 
+							onClick="@global-command('openSRSManagerPopUp')"
+							image="/assets/images/pencil-small.png" />
+					</cell>
+				</row>
+			</rows>
+		</grid>
+
+	</div>
+
+</zk>

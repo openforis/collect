@@ -1,0 +1,79 @@
+<zk>
+	<borderlayout id="versioningContainer"
+			apply="org.zkoss.bind.BindComposer"
+			viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SurveyVersioningEditVM')"
+			validationMessages="@id('vmsgs')">
+		<west>
+			<vlayout>
+		        <listbox id="itemsListBox"
+		        	selectedItem="@load(vm.selectedItem)"
+		        	model="@load(vm.items)"
+		        	onSelect="@command('selectionChanged', selectedItem=self.selectedItem.value)"
+		        	height="200px"
+		        	width="250px">
+		        	<listhead>
+						<listheader label="" width="200px" />
+						<listheader label="" width="50px" />
+					</listhead>
+		            <template name="model">
+		                <listitem>
+		                    <listcell label="@load(each.name)" />
+		                    <listcell>
+		                    	<button image="/assets/images/cross-small.png"
+		                     		onClick="@command('deleteItem', item=each)" />
+		                    </listcell>
+		                </listitem>
+		            </template>
+		        </listbox>
+		        
+		        <button label="${labels.global.add_item}" onClick="@command('newItem')" />
+	       	</vlayout>
+	    </west>
+        <center>
+			<vlayout
+				visible="@load(vm.editingItem)"
+				form="@id('fx') 
+					@load(vm.formObject) @save(vm.formObject, before='applyChanges')
+					@validator('org.openforis.collect.designer.form.validator.ModelVersionFormValidator')"
+				width="100%">
+				<grid>
+					<columns>
+						<column label="" width="150px" />
+						<column label="" width="100%" />
+					</columns>
+					<rows>
+						<row>
+							<label value="${labels.survey.versioning.name}:" />
+							<cell>
+								<textbox width="150px" value="@bind(fx.name)" onChange="@command('applyChanges')" />
+								<label class="error" value="@load(vmsgs['name'])" />
+							</cell>
+						</row>
+						<row>
+							<label value="${labels.survey.versioning.label}:" />
+							<cell>
+								<textbox id="labelTextBox" width="150px" value="@bind(fx.label)" onChange="@command('applyChanges')" />
+								<label class="error" value="@load(vmsgs['label'])" />
+							</cell>
+						</row>
+						<row>
+							<label value="${labels.survey.versioning.description}:" />
+							<cell>
+								<textbox width="150px" value="@bind(fx.description)" onChange="@command('applyChanges')" />
+								<label class="error" value="@load(vmsgs['description'])" />
+							</cell>
+						</row>
+						<row>
+							<label value="${labels.survey.versioning.date}:" />
+							<cell>
+								<datebox width="100px" compact="false" buttonVisible="true" format="@load(vm.dateFormat)" 
+		                    		value="@bind(fx.date)" onChange="@command('applyChanges')" />
+								<label class="error" value="@load(vmsgs['date'])" />
+							</cell>
+						</row>
+					</rows>
+				</grid>
+			</vlayout>
+		</center>
+	</borderlayout>
+</zk>

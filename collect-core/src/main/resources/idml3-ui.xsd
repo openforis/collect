@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema 
+  elementFormDefault="qualified" version="1.0"
+  xmlns="http://www.openforis.org/collect/3.0/ui" 
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:idml="http://www.openforis.org/idml/3.0" 
+  targetNamespace="http://www.openforis.org/collect/3.0/ui"
+  >
+  <xs:annotation>
+    <xs:documentation xml:lang="en">
+      Inventory Data Modeling Language 3.0 - Collect UI Options
+      S. Ricci
+    </xs:documentation>
+  </xs:annotation>
+
+  <xs:import namespace="http://www.openforis.org/idml/3.0" 
+    schemaLocation="https://raw.github.com/openforis/idm/cleanup/idm-api/src/main/resources/idml3.xsd"/>
+  
+  <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+  <!-- Types used throughout this schema -->
+  <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+
+  <xs:complexType name="tabSet">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">
+        Set of tabs
+      </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="tab" type="tab" minOccurs="0" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">
+            TO-DO
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="name" type="xs:string">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+          Name of the tab set.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+
+  <xs:complexType name="tab">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">
+        TO-DO
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="tabSet">
+        <xs:sequence>
+          <xs:element name="label" minOccurs="1"  maxOccurs="unbounded"
+            type="idml:unformattedText">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">
+                TO-DO
+              </xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="tab" type="tab" minOccurs="0" maxOccurs="unbounded">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">
+                TO-DO
+              </xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:element name="tabSet" type="tabSet">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">
+        Group of tabs element. 
+        Each root entity must be associated to a tabSet, using ui:tabSet annotation
+      </xs:documentation>
+    </xs:annotation>
+  </xs:element>
+
+</xs:schema> 
+    

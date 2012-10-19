@@ -1,7 +1,7 @@
 CREATE SCHEMA "collect";
 CREATE SEQUENCE "collect"."ofc_record_id_seq";
-CREATE SEQUENCE "collect"."ofc_schema_definition_id_seq";
 CREATE SEQUENCE "collect"."ofc_survey_id_seq";
+CREATE SEQUENCE "collect"."ofc_survey_work_id_seq";
 CREATE SEQUENCE "collect"."ofc_taxonomy_id_seq";
 CREATE SEQUENCE "collect"."ofc_taxon_id_seq";
 CREATE SEQUENCE "collect"."ofc_taxon_vernacular_name_id_seq";
@@ -26,6 +26,7 @@ CREATE TABLE "collect"."ofc_logo"  (
 );
 CREATE TABLE "collect"."ofc_record"  ( 
 	"id"                       	integer NOT NULL,
+	"survey_id"					integer NOT NULL,
 	"root_entity_definition_id"	integer NOT NULL,
 	"date_created"             	timestamp NULL,
 	"created_by_id"            	integer NULL,
@@ -50,13 +51,14 @@ CREATE TABLE "collect"."ofc_record"  (
 	"data2"                    	bytea NULL,
 	PRIMARY KEY("id")
 );
-CREATE TABLE "collect"."ofc_schema_definition"  ( 
-	"id"       	integer NOT NULL,
-	"survey_id"	integer NOT NULL,
-	"path"     	varchar(255) NULL,
+CREATE TABLE "collect"."ofc_survey"  ( 
+	"id"  	integer NOT NULL,
+	"name"	varchar(255) NOT NULL,
+	"uri" 	varchar(255) NOT NULL,
+	"idml"	text NOT NULL,
 	PRIMARY KEY("id")
 );
-CREATE TABLE "collect"."ofc_survey"  ( 
+CREATE TABLE "collect"."ofc_survey_work"  ( 
 	"id"  	integer NOT NULL,
 	"name"	varchar(255) NOT NULL,
 	"uri" 	varchar(255) NOT NULL,
@@ -112,20 +114,18 @@ ALTER TABLE "collect"."ofc_survey"
 ALTER TABLE "collect"."ofc_survey"
 	ADD CONSTRAINT "ofc_survey_uri_key"
 	UNIQUE ("uri");
+ALTER TABLE "collect"."ofc_survey_work"
+	ADD CONSTRAINT "ofc_survey_work_name_key"
+	UNIQUE ("name");
+ALTER TABLE "collect"."ofc_survey_work"
+	ADD CONSTRAINT "ofc_survey_work_uri_key"
+	UNIQUE ("uri");
 ALTER TABLE "collect"."ofc_taxon"
 	ADD CONSTRAINT "ofc_taxon_id_key"
 	UNIQUE ("taxon_id", "taxonomy_id");
 ALTER TABLE "collect"."ofc_taxonomy"
 	ADD CONSTRAINT "ofc_taxonomy_name_key"
 	UNIQUE ("name");
-ALTER TABLE "collect"."ofc_record"
-	ADD CONSTRAINT "ofc_record_root_entity_definition_fkey"
-	FOREIGN KEY("root_entity_definition_id")
-	REFERENCES "collect"."ofc_schema_definition"("id");
-ALTER TABLE "collect"."ofc_schema_definition"
-	ADD CONSTRAINT "ofc_schema_definition_survey_fkey"
-	FOREIGN KEY("survey_id")
-	REFERENCES "collect"."ofc_survey"("id");
 ALTER TABLE "collect"."ofc_taxon_vernacular_name"
 	ADD CONSTRAINT "ofc_taxon_vernacular_name_taxon_fkey"
 	FOREIGN KEY("taxon_id")
@@ -143,6 +143,10 @@ ALTER TABLE "collect"."ofc_user_role"
 	FOREIGN KEY("user_id")
 	REFERENCES "collect"."ofc_user"("id");
 ALTER TABLE "collect"."ofc_record"
+    ADD CONSTRAINT "ofc_record_survey_fkey"
+	FOREIGN KEY("survey_id")
+	REFERENCES "collect"."ofc_survey"("id");
+ALTER TABLE "collect"."ofc_record"
 	ADD CONSTRAINT "ofc_record_created_by_user_fkey"
 	FOREIGN KEY("created_by_id")
 	REFERENCES "collect"."ofc_user"("id");
@@ -157,7 +161,19 @@ ALTER TABLE "collect"."ofc_record"
 ----------------------------
 --- BEGIN DEFAULT VALUES ---
 ----------------------------
-INSERT INTO "collect"."ofc_config" ("name", "value") VALUES ('upload_path', '/home/openforis/collect-upload');
+INSERT INTO "collect"."ofc_application_info" ("version")
+VALUES ('3.0-Alpha5');
+
+INSERT INTO "collect"."ofc_config" ("name", "value") VALUES 
+	('upload_path', '/home/openforis/collect-upload'), 
+	('index_path', '/home/openforis/collect-index');
+
+INSERT INTO collect.ofc_user(id, username, password ,enabled)
+VALUES (nextval('collect.ofc_user_id_seq'), 'admin', '21232f297a57a5a743894a0e4a801fc3', 'Y');
+
+INSERT INTO collect.ofc_user_role(id, user_id, role)
+VALUES (nextval('collect.ofc_user_role_id_seq'), currval('collect.ofc_user_id_seq'), 'ROLE_ADMIN');
+
 --------------------------
 --- END DEFAULT VALUES ---
 --------------------------

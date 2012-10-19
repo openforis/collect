@@ -1,0 +1,15 @@
+<zk>
+	<hlayout>
+		<button label="${labels.survey.schema.node.apply_changes}"
+			onClick="@command('applyChanges')" />
+		<hlayout visible="@load(fxStatus.dirty)">
+			<image src="/assets/images/warning-small.png" />
+			<label value="@load(fxStatus.dirty? labels.global.changes_not_applied: '')" />
+		</hlayout>
+		<label value="@load(empty vmsgs ? labels.survey.schema.node.apply_changes_success: '', before='applyChanges')" />
+		<label
+			visible="@load(not empty vmsgs)"
+			sclass="error"
+			value="@load(labels.survey.schema.node.apply_changes_failure)" />
+	</hlayout>
+</zk>

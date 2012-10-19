@@ -43,6 +43,7 @@ import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Code;
 import org.openforis.idm.model.CodeAttribute;
 import org.openforis.idm.model.Entity;
+import org.openforis.idm.model.EntityBuilder;
 import org.openforis.idm.model.Field;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.NodePointer;
@@ -130,7 +131,12 @@ public class RecordManager {
 	}
 	
 	@Transactional
-	public List<CollectRecord> getSummaries(CollectSurvey survey, String rootEntity, String... keys) {
+	public List<CollectRecord> loadSummaries(CollectSurvey survey, String rootEntity) {
+		return loadSummaries(survey, rootEntity, (String[]) null);
+	}
+
+	@Transactional
+	public List<CollectRecord> loadSummaries(CollectSurvey survey, String rootEntity, String... keys) {
 		return recordDao.loadSummaries(survey, rootEntity, keys);
 	}
 	
@@ -144,8 +150,13 @@ public class RecordManager {
 	public int getRecordCount(CollectSurvey survey, String rootEntity, String... keyValues) {
 		Schema schema = survey.getSchema();
 		EntityDefinition rootEntityDefinition = schema.getRootEntityDefinition(rootEntity);
-		int count = recordDao.countRecords(rootEntityDefinition.getId(), keyValues);
+		int count = recordDao.countRecords(survey.getId(), rootEntityDefinition.getId(), keyValues);
 		return count;
+	}
+	
+	@Transactional
+	public boolean hasAssociatedRecords(int userId) {
+		return recordDao.hasAssociatedRecords(userId);
 	}
 
 	@Transactional
@@ -208,7 +219,7 @@ public class RecordManager {
 	 * @param record
 	 * @throws InvalidExpressionException 
 	 */
-	protected void applyDefaultValues(CollectRecord record) {
+	public void applyDefaultValues(CollectRecord record) {
 		Entity rootEntity = record.getRootEntity();
 		applyDefaultValues(rootEntity);
 	}
@@ -267,14 +278,28 @@ public class RecordManager {
 		recordDao.update( record );
 	}
 	
+	@Transactional
+	public void validate(CollectSurvey survey, User user, String sessionId, int recordId, Step step) throws RecordLockedException, MultipleEditException {
+		isLockAllowed(user, recordId, sessionId, true);
+		lock(recordId, user, sessionId, true);
+		CollectRecord record = recordDao.load(survey, recordId, step.getStepNumber());
+		Entity rootEntity = record.getRootEntity();
+		addEmptyNodes(rootEntity);
+		record.updateDerivedStates();
+		record.updateRootEntityKeyValues();
+		record.updateEntityCounts();
+		recordDao.update(record);
+		releaseLock(recordId);
+	}
+	
 	public Entity addEntity(Entity parentEntity, String nodeName) {
-		Entity entity = parentEntity.addEntity(nodeName);
+		Entity entity = EntityBuilder.addEntity(parentEntity, nodeName);
 		addEmptyNodes(entity);
 		return entity;
 	}
 
 	public Entity addEntity(Entity parentEntity, String nodeName, int idx) {
-		Entity entity = parentEntity.addEntity(nodeName, idx);
+		Entity entity = EntityBuilder.addEntity(parentEntity, nodeName, idx);
 		addEmptyNodes(entity);
 		return entity;
 	}

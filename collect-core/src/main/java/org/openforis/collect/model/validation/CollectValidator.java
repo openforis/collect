@@ -12,6 +12,8 @@ import org.openforis.collect.model.FieldSymbol;
 import org.openforis.idm.metamodel.KeyAttributeDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.validation.MinCountValidator;
+import org.openforis.idm.metamodel.validation.NumberValueUnitValidator;
+import org.openforis.idm.metamodel.validation.NumericRangeUnitValidator;
 import org.openforis.idm.metamodel.validation.ValidationResult;
 import org.openforis.idm.metamodel.validation.ValidationResultFlag;
 import org.openforis.idm.metamodel.validation.ValidationResults;
@@ -92,6 +94,22 @@ public class CollectValidator extends Validator {
 		CollectRecord record = (CollectRecord) entity.getRecord();
 		record.updateValidationMaxCounts(entity.getInternalId(), childName, flag);
 		return flag;
+	}
+	
+	@Override
+	protected void validateNumericAttributeUnit(
+			NumberAttribute<?, ?> attribute, ValidationResults results) {
+		NumberValueUnitValidator validator = new CollectNumberValueUnitValidator();
+		ValidationResultFlag result = validator.evaluate(attribute);
+		results.addResult(validator, result);
+	}
+	
+	@Override
+	protected void validateNumericRangeUnit(
+			NumericRangeAttribute<?, ?> attribute, ValidationResults results) {
+		NumericRangeUnitValidator unitValidator = new CollectNumericRangeUnitValidator();
+		ValidationResultFlag unitValidationResult = unitValidator.evaluate(attribute);
+		results.addResult(unitValidator, unitValidationResult);
 	}
 	
 	private ValidationResults adjustErrorsForEntryPhase(ValidationResults results, Attribute<?, ?> attribute) {

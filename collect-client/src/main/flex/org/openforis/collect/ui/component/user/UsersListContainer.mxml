@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:BorderContainer xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:component="org.openforis.collect.ui.component.*"
+		 xmlns:input="org.openforis.collect.ui.component.input.*" 
+		 width="100%" height="100%" xmlns:container="org.openforis.collect.ui.container.*" 
+		 >
+	<s:layout>
+		<s:HorizontalLayout paddingBottom="5" paddingLeft="5" paddingRight="5" paddingTop="5" />
+	</s:layout>
+	
+	<s:states>
+		<s:State name="loading" />
+		<s:State name="default" />
+		<s:State name="new" basedOn="default" />
+		<s:State name="selected" basedOn="default" />
+	</s:states>
+	
+	<fx:Script>
+		<![CDATA[
+			import org.openforis.collect.i18n.Message;
+			
+			public static const STATE_LOADING:String = "loading";
+			public static const STATE_DEFAULT:String = "default";
+			public static const STATE_NEW:String = "new";
+			public static const STATE_SELECTED:String = "selected";
+		]]>
+	</fx:Script>
+	
+	<fx:Declarations>
+		<!-- Define the validators. -->
+		<mx:StringValidator id="fNameV" 
+							required="true"
+							source="{nameTextInput}" 
+							property="text"/>
+		<mx:RegExpValidator id="fPasswordV"
+							required="true"
+							required.selected="false"
+							expression="\w\{5,\}"
+							noMatchError="{Message.get('usersManagement.error.invalidPassword')}"
+							source="{passwordTextInput}" 
+							property="text"/>
+		<mx:RegExpValidator id="fRepeatedPasswordV"
+							enabled="{passwordTextInput.text.length &gt; 0}"
+							required="{passwordTextInput.text.length &gt; 0}"
+							expression="{passwordTextInput.text}"
+							noMatchError="{Message.get('usersManagement.error.repeatPassword')}"
+							source="{repeatPasswordTextInput}" 
+							property="text"/>
+		
+	</fx:Declarations>
+	
+	<component:LoadingContent height="100%" width="100%" 
+							  includeIn="loading" />
+	
+	<s:DataGrid id="dataGrid" height="100%"
+				includeIn="default, new, selected"
+				itemCreationPolicy="immediate"
+				>
+		<s:columns>
+			<s:ArrayList>
+				<s:GridColumn headerText="{Message.get('usersManagement.name')}"
+							  dataField="name"
+							  width="150"
+							  />
+				<s:GridColumn headerText="{Message.get('usersManagement.roles')}"
+							  dataField="roles"
+							  width="150"
+							  />
+				<s:GridColumn headerText="{Message.get('usersManagement.enabled')}"
+							  dataField="enabled"
+							  width="50" 
+							  itemRenderer="org.openforis.collect.ui.component.datagrid.BooleanColumnItemRenderer"
+							  />
+			</s:ArrayList>
+		</s:columns>
+	</s:DataGrid>
+	
+	<s:VGroup horizontalAlign="center" width="100%" excludeFrom="loading">
+		<s:Button id="newUserButton" 
+				  excludeFrom="loading"
+				  itemCreationPolicy="immediate"
+				  label="{Message.get('usersManagement.addNewUser')}"
+				  useHandCursor="true" buttonMode="true" />
+		
+		<s:VGroup includeIn="new, selected"
+				  itemCreationPolicy="immediate"
+				  horizontalAlign="center"
+				  gap="6"
+				  >
+			
+			<container:FieldSet id="userDetailsBox" 
+								legend="{Message.get('usersManagement.userDetails')}" 
+								legend.new="{Message.get('usersManagement.newUserDetails')}" 
+								creationPolicy="all">
+				<container:layout>
+					<s:VerticalLayout horizontalAlign="center" paddingBottom="10" />
+				</container:layout>
+				<mx:Form id="detailForm">
+					<mx:FormItem label="{Message.get('usersManagement.enabled')}">
+						<mx:CheckBox id="enabledCheckBox" />
+					</mx:FormItem>
+					<mx:FormItem label="{Message.get('usersManagement.name')}">
+						<input:TextInput id="nameTextInput" restrictPattern="^\w*$" upperCase="false" />
+					</mx:FormItem>
+					<mx:FormItem label="{Message.get('usersManagement.password')}"
+								 label.selected="{Message.get('usersManagement.changePassword')}">
+						<mx:TextInput id="passwordTextInput" displayAsPassword="true" />
+					</mx:FormItem>
+					<mx:FormItem label="{Message.get('usersManagement.repeatPassword')}">
+						<mx:TextInput id="repeatPasswordTextInput" displayAsPassword="true" />
+					</mx:FormItem>
+					<mx:FormItem label="{Message.get('usersManagement.roles')}">
+						<mx:CheckBox id="roleEntryCheckBox"
+									label="{Message.get('roles.entry')}" />
+						<mx:CheckBox id="roleCleansingCheckBox" 
+									label="{Message.get('roles.cleansing')}" />
+						<mx:CheckBox id="roleAnalysisCheckBox"
+									label="{Message.get('roles.analysis')}" />
+						<mx:CheckBox id="roleAdminCheckBox"
+									label="{Message.get('roles.admin')}" />
+					</mx:FormItem>
+				</mx:Form>
+				<s:HGroup gap="30">
+					<s:Button id="saveButton" 
+							  label="{Message.get('global.save')}"
+							  useHandCursor="true" buttonMode="true"
+							  />
+					<s:Button id="deleteButton"
+							  includeIn="selected" 
+							  itemCreationPolicy="immediate"
+							  label="{Message.get('global.delete')}"
+							  useHandCursor="true" buttonMode="true"
+							  />
+				</s:HGroup>
+			</container:FieldSet>
+		</s:VGroup>
+	</s:VGroup>
+	
+</s:BorderContainer>

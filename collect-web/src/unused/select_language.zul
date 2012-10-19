@@ -1,0 +1,63 @@
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk>
+	<vlayout
+		id="languageSelectBox" 
+		self="@define(content)"
+		height="100%"
+		apply="org.zkoss.bind.BindComposer"
+		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SurveySelectLanguageVM')">
+		
+		<label value="${labels.survey.select_language}" />
+		
+		<hlayout>
+			<groupbox closable="false">
+				<caption label="${labels.survey.language.select_language_to_assign}" />
+				<listbox model="@load(vm.assignableLanguageCodes)"
+						selectedItem="@bind(vm.selectedAssignableLanguageCode)"
+						width="300px" mold="select">
+						<template name="model">
+				            <listitem>
+				                <listcell label="${each} - ${c:l(each)}"/>
+				         	</listitem>
+				        </template>
+				</listbox>
+			</groupbox>
+			<vlayout>
+				<button label="&gt;" 
+					onClick="@command('assignLanguage')"
+					disabled="@load(empty vm.selectedAssignableLanguageCode)" />
+				<button label="&lt;" 
+					onClick="@command('removeLanguage')"
+					disabled="@load(empty vm.selectedCurrentLanguageCode)" />
+			</vlayout>
+			<groupbox closable="false">
+				<caption label="${labels.survey.language.assigned_languages}" />
+				<vlayout>
+					<listbox model="@load(vm.assignedLanguageCodes)"
+							height="200px" checkmark="true"
+							selectedItem="@bind(vm.selectedCurrentLanguageCode)">
+							<listhead>
+					            <listheader label="" width="30px" />
+					            <listheader label="" width="40px" />
+					            <listheader label="" width="15px" />
+					            <listheader label="" width="250px" />
+				            </listhead>
+							<template name="model">
+					            <listitem>
+					            	<listcell label="" />
+					                <listcell label="${each}" />
+					                <listcell label="-" />
+					                <listcell label="${c:l(each)}" />
+					         	</listitem>
+					        </template>
+					</listbox>
+					<label value="${labels.survey.language.select_current_language}" />
+				</vlayout>
+			</groupbox>
+		</hlayout>
+		<box align="center" width="100%">
+			<button label="${labels.global.close}" 
+				onClick="@command('applyChanges')" />
+		</box>
+	</vlayout>
+</zk>

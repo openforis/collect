@@ -1,0 +1,10 @@
+<zk>
+	<div 
+		apply="org.zkoss.bind.BindComposer"
+		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.layout.TabsGroupPanelVM')">
+		
+		<include id="listOfNodesInclude" 
+			src="${vm.componentsPath}/survey_edit/schema_layout/editablenodeslist.zul"
+			tab="${vm.tab}" nodes="${vm.nodesPerTab}" />
+	</div>
+</zk>
