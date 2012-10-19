@@ -10,9 +10,8 @@ import org.openforis.collect.model.CollectSurveyContext;
 import org.openforis.collect.persistence.SurveyDao;
 import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.collect.persistence.xml.UIOptionsBinder;
-import org.openforis.idm.metamodel.xml.InvalidIdmlException;
+import org.openforis.idm.metamodel.xml.IdmlParseException;
 import org.openforis.idm.metamodel.xml.SurveyIdmlBinder;
-import org.openforis.idm.metamodel.xml.XmlParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -35,7 +34,7 @@ public abstract class CollectIntegrationTest {
 	@Autowired
 	protected SurveyDao surveyDao;
 	
-	protected CollectSurvey loadSurvey() throws IOException, SurveyImportException, InvalidIdmlException, XmlParseException {
+	protected CollectSurvey loadSurvey() throws IdmlParseException, IOException  {
 		URL idm = ClassLoader.getSystemResource("test.idm.xml");
 		InputStream is = idm.openStream();
 		SurveyIdmlBinder binder = new SurveyIdmlBinder(collectSurveyContext);
@@ -45,7 +44,7 @@ public abstract class CollectIntegrationTest {
 		return survey;
 	}
 
-	protected CollectSurvey importModel() throws IOException, SurveyImportException, InvalidIdmlException, XmlParseException {
+	protected CollectSurvey importModel() throws SurveyImportException, IdmlParseException, IOException  {
 		CollectSurvey survey = (CollectSurvey) loadSurvey();
 		surveyDao.importModel(survey);
 		return survey;

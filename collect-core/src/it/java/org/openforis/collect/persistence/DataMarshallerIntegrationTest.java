@@ -1,11 +1,7 @@
 package org.openforis.collect.persistence;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
 import java.io.IOException;
 import java.io.StringReader;
-import java.io.StringWriter;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Map;

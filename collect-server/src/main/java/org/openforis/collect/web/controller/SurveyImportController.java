@@ -8,7 +8,7 @@ import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.persistence.SurveyDao;
 import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.collect.web.controller.upload.UploadItem;
-import org.openforis.idm.metamodel.xml.InvalidIdmlException;
+import org.openforis.idm.metamodel.xml.IdmlParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -35,7 +35,7 @@ public class SurveyImportController {
 	
 	@RequestMapping(value = "/uploadSurvey.htm", method = RequestMethod.POST)
 	public @ResponseBody String uploadSurvey(UploadItem uploadItem, BindingResult result, @RequestParam String name) 
-			throws IOException, InvalidIdmlException, SurveyImportException {
+			throws IOException, SurveyImportException, IdmlParseException {
 		CommonsMultipartFile fileData = uploadItem.getFileData();
 		InputStream is = fileData.getInputStream();
 		CollectSurvey newSurvey = surveyManager.unmarshalSurvey(is);

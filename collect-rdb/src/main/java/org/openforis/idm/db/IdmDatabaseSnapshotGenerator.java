@@ -1,7 +1,7 @@
 package org.openforis.idm.db;
 
 import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -28,9 +28,7 @@ import org.openforis.idm.metamodel.DefaultSurveyContext;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.SurveyContext;
 import org.openforis.idm.metamodel.xml.IdmlParseException;
-import org.openforis.idm.metamodel.xml.InvalidIdmlException;
 import org.openforis.idm.metamodel.xml.SurveyIdmlBinder;
-import org.openforis.idm.metamodel.xml.internal.unmarshal.SurveyUnmarshaller;
 
 public class IdmDatabaseSnapshotGenerator implements DatabaseSnapshotGenerator {
 	
@@ -144,11 +142,12 @@ public class IdmDatabaseSnapshotGenerator implements DatabaseSnapshotGenerator {
 		return false;
 	}
 	
-	private static Survey loadSurvey() throws IdmlParseException {
-		InputStream is = new FileInputStream("/home/gino/workspace/faofin/tz/naforma-idm/tanzania-naforma.idm.xml");
-		SurveyContext ctx = new DefaultSurveyContext();
-		SurveyIdmlBinder binder = new SurveyIdmlBinder(ctx);
-		return binder.unmarshal(is);
+	private static Survey loadSurvey() throws IdmlParseException, FileNotFoundException {
+//		InputStream is = new FileInputStream("/home/gino/workspace/faofin/tz/naforma-idm/tanzania-naforma.idm.xml");
+//		SurveyContext ctx = new DefaultSurveyContext();
+//		SurveyIdmlBinder binder = new SurveyIdmlBinder(ctx);
+//		return binder.unmarshal(is);
+		return null; // TODO
 	}
 
 	public static void main(String[] args) {

@@ -15,11 +15,13 @@ public class IdmCodeListTableBuilder extends AbstractIdmTableBuilder {
 
 	@Override
 	protected String getBaseName() {
-		String name = list.getAnnotation(TABLE_NAME_QNAME);
-		if ( name == null ) {
-			name = list.getName();
-		}
-		return name;
+//		String name = list.getAnnotation(TABLE_NAME_QNAME);
+//		if ( name == null ) {
+//			name = list.getName();
+//		}
+//		return name;
+		// TODO 
+		return null;
 	}
 
 	@Override
