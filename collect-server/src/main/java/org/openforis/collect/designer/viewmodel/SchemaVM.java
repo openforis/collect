@@ -99,9 +99,11 @@ public class SchemaVM extends SurveyBaseVM {
 			TreeNode<EntityDefinition> treeNode = node.getValue();
 			selectedNode = treeNode.getData();
 			editedNode = selectedNode;
+			selectedAttribute = null;
 		} else {
 			selectedNode = null;
 			editedNode = null;
+			selectedAttribute = null;
 		}
 		newItem = false;
 		initFormObject(selectedNode);
@@ -192,6 +194,7 @@ public class SchemaVM extends SurveyBaseVM {
 	protected void onAfterNodeCreated(Binder binder, EntityDefinition newNode) {
 		editedNode = newNode;
 		selectedNode = null;
+		selectedAttribute = null;
 		treeModel.select(null);
 		
 		refreshNodeForm();
