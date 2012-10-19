@@ -28,7 +28,7 @@
 								<column width="150px"
 									label="${labels.survey.schema.attribute.numeric.precisions.unit}">
 									<button tooltiptext="${labels.survey.unit.manager.title}" 
-										onClick="@command('openUnitsManagerPopUp')"
+										onClick="@global-command('openUnitsManagerPopUp')"
 										image="/assets/images/pencil-small.png" />
 								</column>
 								<column width="100px"

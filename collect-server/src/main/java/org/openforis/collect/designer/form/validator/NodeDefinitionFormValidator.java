@@ -1,5 +1,6 @@
 package org.openforis.collect.designer.form.validator;
 
+import org.openforis.collect.designer.viewmodel.AttributeVM;
 import org.openforis.collect.designer.viewmodel.SchemaVM;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -83,21 +84,24 @@ public class NodeDefinitionFormValidator extends FormValidator {
 	protected void validateMaxCount(ValidationContext ctx) {
 		Boolean multiple = (Boolean) getValue(ctx, MULTIPLE_FIELD);
 		if (multiple != null && multiple.booleanValue()) {
-			if (validateRequired(ctx, NAME_FIELD)) {
-				validateGreaterThan(ctx, MAX_COUNT_FIELD, 1, true);
+			if (validateRequired(ctx, MAX_COUNT_FIELD)) {
+				validateGreaterThan(ctx, MAX_COUNT_FIELD, 1);
 			}
 		}
 	}
 
 	protected NodeDefinition getEditedNode(ValidationContext ctx) {
 		Object vmObject = getVM(ctx);
+		NodeDefinition editedNode;
 		if (vmObject instanceof SchemaVM) {
-			NodeDefinition editedNode = ((SchemaVM) vmObject).getEditedNode();
-			return editedNode;
+			editedNode = ((SchemaVM) vmObject).getEditedNode();
+		} else if ( vmObject instanceof AttributeVM) {
+			editedNode = ((AttributeVM) vmObject).getEditedItem();
 		} else {
 			throw new IllegalArgumentException("Unsupported View Model Type: " +
 					vmObject.getClass().getName());
 		}
+		return editedNode;
 	}
 
 }

@@ -33,7 +33,7 @@
 							</template>
 						</listbox>
 						<button tooltiptext="${labels.survey.code_lists_manager}" 
-							onClick="@command('openCodeListsManagerPopUp')"
+							onClick="@global-command('openCodeListsManagerPopUp')"
 							image="/assets/images/pencil-small.png" />
 						<label class="error" value="@load(vmsgs['list'])" />
 					</cell>

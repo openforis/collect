@@ -32,6 +32,7 @@ public abstract class SurveyObjectBaseVM<T> extends SurveyBaseVM {
 	protected boolean newItem;
 	protected T selectedItem;
 	protected T editedItem;
+	protected boolean changed;
 	protected SurveyObjectFormObject<T> formObject;
 	
 	public BindingListModelList<T> getItems() {
@@ -53,7 +54,8 @@ public abstract class SurveyObjectBaseVM<T> extends SurveyBaseVM {
 		newItem = true;
 		setEditedItem(newInstance);
 		setSelectedItem(null);
-		notifyChange("editedItem","formObject","items","selectedItem");
+		changed = false;
+		notifyChange("editedItem","formObject","items","selectedItem","changed");
 		validateForm(binder);
 	}
 
@@ -83,7 +85,8 @@ public abstract class SurveyObjectBaseVM<T> extends SurveyBaseVM {
 			setSelectedItem(editedItem);
 			newItem = false;
 		}
-		notifyChange("items","selectedItem");
+		changed = true;
+		notifyChange("items","selectedItem","changed");
 	}
 	
 	@Command
@@ -94,6 +97,7 @@ public abstract class SurveyObjectBaseVM<T> extends SurveyBaseVM {
 			setSelectedItem(this.selectedItem);
 			BindUtils.postNotifyChange(null, null, this, "selectedItem");
 		}
+		changed = false;
 	}
 
 	protected void performItemSelection(T item) {
@@ -172,7 +176,8 @@ public abstract class SurveyObjectBaseVM<T> extends SurveyBaseVM {
 
 	protected void performDeleteItem(T item) {
 		deleteItemFromSurvey(item);
-		notifyChange("items");
+		changed = false;
+		notifyChange("items","changed");
 		if ( item.equals(selectedItem) ) {
 			formObject = null;
 			editedItem = null;
@@ -212,6 +217,10 @@ public abstract class SurveyObjectBaseVM<T> extends SurveyBaseVM {
 	@DependsOn("editedItem")
 	public boolean isEditingItem() {
 		return this.editedItem != null;
+	}
+	
+	public boolean isChanged() {
+		return changed;
 	}
 	
 }

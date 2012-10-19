@@ -27,7 +27,7 @@
 		      width="100px" />
 		  </listhead>
 		  <template name="model">
-		    <listitem>
+		    <listitem context="attributePopUp">
 		      <listcell label="@load(each.name)"
 		        onDoubleClick="@command('editAttribute', attribute=each)" />
 		      <listcell label="@load(vm.getAttributeInstanceLabel(each))"
@@ -40,7 +40,7 @@
 		  </template>
 		</listbox>
         <menubar>
-           <menu label="${labels.survey.schema.node.type.attribute}">
+           <menu label="${labels.global.add_item}">
               <menupopup>
                   <zk forEach="${vm.attributeTypeValues}">
                     <menuitem
@@ -48,14 +48,24 @@
                       onClick="@command('addAttribute', attributeType=self.value)" />
                   </zk>
               </menupopup>
-            </menu>
-           <menuitem image="/assets/images/arrow-up.png"
-             class="icon-button" disabled="@load(vm.moveAttributeUpDisabled)"
+           </menu>
+           <menuitem label="${labels.global.edit_item}"
+             disabled="@load(empty vm.selectedAttribute)"
+             tooltip="${labels.global.item.move_up}"
+             onClick="@command('editAttribute', attribute=vm.selectedAttribute)" />
+           <menuitem image="/assets/images/arrow-up.png" class="icon-button" 
+             disabled="@load(vm.moveAttributeUpDisabled)"
+             tooltip="${labels.global.item.move_up}"
              onClick="@command('moveAttributeUp')" />
-           <menuitem image="/assets/images/arrow-down.png"
-              class="icon-button" 
-              disabled="@load(vm.moveAttributeDownDisabled)" 
+           <menuitem image="/assets/images/arrow-down.png" class="icon-button" 
+              disabled="@load(vm.moveAttributeDownDisabled)"
+              tooltip="${labels.global.item.move_down}" 
               onClick="@command('moveAttributeDown')" />
        </menubar>
+       
+       <menupopup id="attributePopUp">
+          <menuitem label="${labels.survey.schema.remove_node}" 
+            onClick="@command('removeAttribute')" />
+        </menupopup>
 	</vlayout>
 </zk>

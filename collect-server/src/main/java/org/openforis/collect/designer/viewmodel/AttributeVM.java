@@ -36,13 +36,13 @@ import org.zkoss.zul.Include;
  */
 public class AttributeVM extends SurveyObjectBaseVM<AttributeDefinition> {
 
+	private static final String FORM_CONTAINER_ID = "nodeFormContainer";
 	private static final String ATTRIBUTE_DEFAULTS_FIELD = "attributeDefaults";
 	private static final String NUMBER_ATTRIBUTE_PRECISIONS_FIELD = "precisions";
 	
+	private Form tempFormObject;
 	private List<AttributeDefault> attributeDefaults;
 	private List<Precision> numericAttributePrecisions;
-
-	private Form tempFormObject;
 	
 	@Wire
 	private Include attributeDetailsInclude;
@@ -55,13 +55,18 @@ public class AttributeVM extends SurveyObjectBaseVM<AttributeDefinition> {
 	}
 	
 	@Init
-	public void init(@ExecutionArgParam("item") AttributeDefinition attributeDefn) {
-		setEditedItem(attributeDefn);
+	public void init(@ExecutionArgParam("item") AttributeDefinition attributeDefn, 
+			@ExecutionArgParam("newItem") Boolean newItem) {
+		if ( attributeDefn != null ) {
+			this.newItem = newItem;
+			setEditedItem(attributeDefn);
+		}
 	}
 	
 	protected void refreshNodeForm() {
 		String type = getAttributeType();
 		attributeDetailsInclude.setSrc("survey_edit/schema/attribute_" + type + ".zul");
+		validateForm();
 	}
 
 	@Override
@@ -96,6 +101,17 @@ public class AttributeVM extends SurveyObjectBaseVM<AttributeDefinition> {
 	@Override
 	protected void deleteItemFromSurvey(AttributeDefinition item) {
 		//do nothing
+	}
+	
+	@Override
+	@Command
+	public void applyChanges() {
+		//do not call super, postpone to commitChanges command
+		super.changed = true;
+	}
+	
+	public void commitChanges() {
+		super.applyChanges();
 	}
 	
 	@Override
@@ -166,7 +182,8 @@ public class AttributeVM extends SurveyObjectBaseVM<AttributeDefinition> {
 	
 	protected void validateForm() {
 		if ( editedItem != null ) {
-			Binder binder = (Binder) attributeDetailsInclude.getAttribute("$BINDER$");
+			Component formContainer = attributeDetailsInclude.getFellow(FORM_CONTAINER_ID);
+			Binder binder = (Binder) formContainer.getAttribute("$BINDER$");
 			validateForm(binder);
 		}
 	}
@@ -174,7 +191,7 @@ public class AttributeVM extends SurveyObjectBaseVM<AttributeDefinition> {
 	protected void validateForm(@ContextParam(ContextType.BINDER) Binder binder) {
 		Component view = binder.getView();
 		IdSpace currentIdSpace = view.getSpaceOwner();
-		Component formComponent = Path.getComponent(currentIdSpace, "nodeFormContainer");
+		Component formComponent = Path.getComponent(currentIdSpace, FORM_CONTAINER_ID);
 		Binder formComponentBinder = (Binder) formComponent.getAttribute("binder");
 		formComponentBinder.postCommand("applyChanges", null);
 	}

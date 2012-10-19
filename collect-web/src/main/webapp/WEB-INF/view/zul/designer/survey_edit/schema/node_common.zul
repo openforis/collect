@@ -8,7 +8,7 @@
 			<row>
 				<label value="${labels.global.item.name}:" />
 				<cell>
-					<textbox width="150px" value="@bind(fx.name)"
+					<textbox width="200px" value="@bind(fx.name)"
 						maxlength="40" 
 						onChange="@command('applyChanges')" />
 					<label class="error" value="@load(vmsgs['name'])" />
@@ -144,7 +144,7 @@
 						</template>
 					</listbox>
 					<button tooltiptext="${labels.survey.versioning_manager}" 
-						onClick="@command('openVersioningManagerPopUp')"
+						onClick="@global-command('openVersioningManagerPopUp')"
 						image="/assets/images/pencil-small.png" />
 					<label class="error" value="@load(vmsgs['sinceVersion'])" />
 				</cell>
@@ -160,7 +160,7 @@
 						</template>
 					</listbox>
 					<button tooltiptext="${labels.survey.versioning_manager}" 
-						onClick="@command('openVersioningManagerPopUp')"
+						onClick="@global-command('openVersioningManagerPopUp')"
 						image="/assets/images/pencil-small.png" />
 					<label class="error" value="@load(vmsgs['deprecatedVersion'])" />
 				</cell>

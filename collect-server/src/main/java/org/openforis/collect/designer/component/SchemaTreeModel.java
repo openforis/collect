@@ -24,9 +24,12 @@ import org.zkoss.zul.TreeNode;
 public class SchemaTreeModel extends DefaultTreeModel<NodeDefinition> {
 	
 	private static final long serialVersionUID = 1L;
+	
+	private boolean includeAttributes;
 
-	SchemaTreeModel(TreeNode<NodeDefinition> root) {
+	SchemaTreeModel(TreeNode<NodeDefinition> root, boolean includeAttributes) {
 		super(root);
+		this.includeAttributes = includeAttributes;
 	}
 	
 	public void select(NodeDefinition defn) {
@@ -55,7 +58,7 @@ public class SchemaTreeModel extends DefaultTreeModel<NodeDefinition> {
 			List<Integer> temp = new ArrayList<Integer>();
 			int index;
 			while ( parent != null ) {
-				index = parent.getChildIndex(current);
+				index = getIndexInTree(parent, current);
 				temp.add(0, index);
 				current = parent;
 				parent = (EntityDefinition) current.getParentDefinition();
@@ -68,6 +71,21 @@ public class SchemaTreeModel extends DefaultTreeModel<NodeDefinition> {
 			return result;
 		} else {
 			return null;
+		}
+	}
+
+	protected int getIndexInTree(EntityDefinition parent, NodeDefinition node) {
+		if ( includeAttributes ) {
+			return parent.getChildIndex(node);
+		} else {
+			List<NodeDefinition> childDefns = parent.getChildDefinitions();
+			List<EntityDefinition> siblingEtities = new ArrayList<EntityDefinition>();
+			for (NodeDefinition childDefn : childDefns) {
+				if ( childDefn instanceof EntityDefinition ) {
+					siblingEtities.add((EntityDefinition) childDefn);
+				}
+			}
+			return siblingEtities.indexOf(node);
 		}
 	}
 
@@ -89,11 +107,52 @@ public class SchemaTreeModel extends DefaultTreeModel<NodeDefinition> {
 		List<EntityDefinition> rootDefns = schema.getRootEntityDefinitions();
 		List<TreeNode<NodeDefinition>> treeNodes = NodeDefinitionTreeNode.fromList(rootDefns, version, includeAttributes);
 		TreeNode<NodeDefinition> root = new NodeDefinitionTreeNode(null, treeNodes);
-		SchemaTreeModel result = new SchemaTreeModel(root);
+		SchemaTreeModel result = new SchemaTreeModel(root, includeAttributes);
 		return result;
 	}
 	
-	public static class NodeDefinitionTreeNode extends DefaultTreeNode<NodeDefinition> {
+	public void deselect() {
+		Collection<NodeDefinitionTreeNode> emptySelection = Collections.emptyList();
+		setSelection(emptySelection);
+	}
+
+	public void removeSelectedNode() {
+		int[] selectionPath = getSelectionPath();
+		TreeNode<NodeDefinition> treeNode = getChild(selectionPath);
+		TreeNode<NodeDefinition> parentTreeNode = treeNode.getParent();
+		parentTreeNode.remove(treeNode);
+	}
+	
+	public void appendNodeToSelected(NodeDefinition item) {
+		NodeDefinitionTreeNode treeNode;
+		if ( item instanceof EntityDefinition ) {
+			treeNode = new NodeDefinitionTreeNode((EntityDefinition) item);
+		} else {
+			treeNode = new NodeDefinitionTreeNode((AttributeDefinition) item);
+		}
+		int[] selectionPath = getSelectionPath();
+		if ( selectionPath == null || item.getParentDefinition() == null ) {
+			TreeNode<NodeDefinition> root = getRoot();
+			root.add(treeNode);
+		} else {
+			TreeNode<NodeDefinition> selectedTreeNode = getChild(selectionPath);
+			selectedTreeNode.add(treeNode);
+		}
+		addOpenObject(treeNode.getParent());
+		setSelection(Arrays.asList(treeNode));
+	}
+	
+	public void moveSelectedNode(int toIndex) {
+		int[] selectionPath = getSelectionPath();
+		NodeDefinitionTreeNode treeNode = (NodeDefinitionTreeNode) getChild(selectionPath);
+		TreeNode<NodeDefinition> parentTreeNode = treeNode.getParent();
+		parentTreeNode.remove(treeNode);
+		parentTreeNode.insert(treeNode, toIndex);
+		List<NodeDefinitionTreeNode> selection = Arrays.asList(treeNode);
+		setSelection(selection);
+	}
+
+	static class NodeDefinitionTreeNode extends DefaultTreeNode<NodeDefinition> {
 		
 		private static final long serialVersionUID = 1L;
 		
@@ -155,45 +214,5 @@ public class SchemaTreeModel extends DefaultTreeModel<NodeDefinition> {
 		
 	}
 	
-	public void deselect() {
-		Collection<NodeDefinitionTreeNode> emptySelection = Collections.emptyList();
-		setSelection(emptySelection);
-	}
 
-	public void removeSelectedNode() {
-		int[] selectionPath = getSelectionPath();
-		TreeNode<NodeDefinition> treeNode = getChild(selectionPath);
-		TreeNode<NodeDefinition> parentTreeNode = treeNode.getParent();
-		parentTreeNode.remove(treeNode);
-	}
-	
-	public void appendNodeToSelected(NodeDefinition item) {
-		NodeDefinitionTreeNode treeNode;
-		if ( item instanceof EntityDefinition ) {
-			treeNode = new NodeDefinitionTreeNode((EntityDefinition) item);
-		} else {
-			treeNode = new NodeDefinitionTreeNode((AttributeDefinition) item);
-		}
-		int[] selectionPath = getSelectionPath();
-		if ( selectionPath == null || item.getParentDefinition() == null ) {
-			TreeNode<NodeDefinition> root = getRoot();
-			root.add(treeNode);
-		} else {
-			TreeNode<NodeDefinition> selectedTreeNode = getChild(selectionPath);
-			selectedTreeNode.add(treeNode);
-		}
-		addOpenObject(treeNode.getParent());
-		setSelection(Arrays.asList(treeNode));
-	}
-	
-	public void moveSelectedNode(int toIndex) {
-		int[] selectionPath = getSelectionPath();
-		NodeDefinitionTreeNode treeNode = (NodeDefinitionTreeNode) getChild(selectionPath);
-		TreeNode<NodeDefinition> parentTreeNode = treeNode.getParent();
-		parentTreeNode.remove(treeNode);
-		parentTreeNode.insert(treeNode, toIndex);
-		List<NodeDefinitionTreeNode> selection = Arrays.asList(treeNode);
-		setSelection(selection);
-	}
-	
 }

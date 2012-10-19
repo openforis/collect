@@ -1,16 +1,29 @@
 <zk>
 	<window id="attributePopUp" title="${labels.survey.schema.attribute.popup.title}" 
 		width="800px"
-		height="270px"
+		height="400px"
 		border="normal"
 		position="center" 
 		closable="false"
 		apply="org.zkoss.bind.BindComposer"
 		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.AttributeVM')">
     
-       	<include id="attributeDetailsInclude" />
-        
-		<button label="${labels.global.ok}" onClick="@command('ok')" />
+        <borderlayout>
+          <center>
+            <vlayout height="100%" width="100%" style="overflow: auto;">
+             	<include id="attributeDetailsInclude" />
+            </vlayout>
+          </center>
+          <south>
+            <box width="100%" align="center">
+              <hbox>
+        		<button label="${labels.global.apply}" onClick="@global-command('applyChangesToEditedAttribute')" />
+                <separator width="30px" />
+                <button label="${labels.global.cancel}" onClick="@global-command('cancelChangesToEditedAttribute')" />
+              </hbox>
+            </box>
+          </south>
+        </borderlayout>
     
 	</window>
 </zk>
