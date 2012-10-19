@@ -63,6 +63,7 @@ public class SchemaVM extends SurveyBaseVM {
 	
 	private static final String CONFIRM_REMOVE_NODE_MESSAGE_KEY = "survey.schema.confirm_remove_node";
 	private static final String CONFIRM_REMOVE_NON_EMPTY_ENTITY_MESSAGE_KEY = "survey.schema.confirm_remove_non_empty_entity";
+	private static final String CONFIRM_REMOVE_NODE_TITLE_KEY = "survey.schema.confirm_remove_node_title";
 	
 	private SchemaTreeModel treeModel;
 	private EntityDefinition selectedNode;
@@ -237,12 +238,16 @@ public class SchemaVM extends SurveyBaseVM {
 			} else {
 				confirmMessageKey = CONFIRM_REMOVE_NODE_MESSAGE_KEY;
 			}
+			NodeType type = NodeType.typeOf(nodeDefn);
+			String typeLabel = type.getLabel().toLowerCase();
+			Object[] messageArgs = new String[] {typeLabel, nodeDefn.getName()};
+			Object[] titleArgs = new String[] {typeLabel};
 			MessageUtil.showConfirm(new MessageUtil.ConfirmHandler() {
 				@Override
 				public void onOk() {
 					performRemoveNode(nodeDefn);
 				}
-			}, confirmMessageKey);
+			}, confirmMessageKey, messageArgs, CONFIRM_REMOVE_NODE_TITLE_KEY, titleArgs);
 		}
 	}
 	
