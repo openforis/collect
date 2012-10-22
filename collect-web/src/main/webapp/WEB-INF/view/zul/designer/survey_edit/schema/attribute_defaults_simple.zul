@@ -1,23 +1,26 @@
 <zk>
 	<vlayout>
-		<grid width="210px" model="@load(vm.attributeDefaults)">
-			<columns height="22px">
-				<column width="150px"
-					label="${labels.survey.schema.attribute.attribute_default.value}" />
-				<column width="60px"
-					label="${labels.global.delete_item}" />
-			</columns>
-			<template name="model">
-				<row>
-					<textbox inplace="true" value="@bind(each.value)"
-						width="99%" />
-					<button image="/assets/images/cross-small.png"
-						onClick="@command('deleteAttributeDefault', attributeDefault=each)" />
-				</row>
-			</template>
-		</grid>
-		<button
-			label="${labels.survey.schema.attribute.add_attribute_default}"
-			onClick="@command('addAttributeDefault')" />
+		<listbox id="attributeDefaultsList" width="210px" 
+            model="@load(vm.attributeDefaults)"
+            selectedItem="@bind(vm.selectedAttributeDefault)">
+           <listhead visible="false">
+              <listheader label="" width="200px" />
+            </listhead>
+           <template name="model">
+            <listitem>
+              <listcell>
+				<textbox inplace="true" value="@bind(each.value)" width="99%"
+                    onFocus="@command('selectAttributeDefault', attributeDefault = each)" />
+              </listcell>
+            </listitem>
+  		  </template>
+		</listbox>
+        <menubar>
+          <menuitem label="${labels.global.add_item}"
+              onClick="@command('addAttributeDefault')" />
+          <menuitem label="${labels.global.delete_item}"
+              disabled="@load(empty vm.selectedAttributeDefault)"
+              onClick="@command('deleteAttributeDefault', attributeDefault=vm.selectedAttributeDefault)" />
+        </menubar>
 	</vlayout>
 </zk>

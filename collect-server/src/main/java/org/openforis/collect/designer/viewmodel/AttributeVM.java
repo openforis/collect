@@ -43,6 +43,8 @@ public class AttributeVM extends SurveyObjectBaseVM<AttributeDefinition> {
 	private Form tempFormObject;
 	private List<AttributeDefault> attributeDefaults;
 	private List<Precision> numericAttributePrecisions;
+	private AttributeDefault selectedAttributeDefault;
+	private Precision selectedPrecision;
 	
 	@Wire
 	private Include attributeDetailsInclude;
@@ -143,9 +145,16 @@ public class AttributeVM extends SurveyObjectBaseVM<AttributeDefinition> {
 	}
 	
 	@Command
-	@NotifyChange("attributeDefaults")
-	public void deleteAttributeDefault(@BindingParam("attributeDefault") AttributeDefault attributeDefault) {
-		attributeDefaults.remove(attributeDefault);
+	@NotifyChange({"selectedAttributeDefault","attributeDefaults"})
+	public void deleteAttributeDefault() {
+		attributeDefaults.remove(selectedAttributeDefault);
+		selectedAttributeDefault = null;
+	}
+	
+	@Command
+	@NotifyChange("selectedAttributeDefault")
+	public void selectAttributeDefault(@BindingParam("attributeDefault") AttributeDefault attributeDefault) {
+		selectedAttributeDefault = attributeDefault;
 	}
 	
 	@Command
@@ -159,9 +168,10 @@ public class AttributeVM extends SurveyObjectBaseVM<AttributeDefinition> {
 	}
 	
 	@Command
-	@NotifyChange("numericAttributePrecisions")
-	public void deleteNumericAttributePrecision(@BindingParam("precision") Precision precision) {
-		numericAttributePrecisions.remove(precision);
+	@NotifyChange({"selectedPrecision","numericAttributePrecisions"})
+	public void deleteNumericAttributePrecision() {
+		numericAttributePrecisions.remove(selectedPrecision);
+		selectedPrecision = null;
 	}
 
 	protected void initAttributeDefaultsList() {
@@ -215,6 +225,23 @@ public class AttributeVM extends SurveyObjectBaseVM<AttributeDefinition> {
 	
 	public Form getTempFormObject() {
 		return tempFormObject;
+	}
+
+	public AttributeDefault getSelectedAttributeDefault() {
+		return selectedAttributeDefault;
+	}
+
+	public void setSelectedAttributeDefault(
+			AttributeDefault selectedAttributeDefault) {
+		this.selectedAttributeDefault = selectedAttributeDefault;
+	}
+
+	public Precision getSelectedPrecision() {
+		return selectedPrecision;
+	}
+
+	public void setSelectedPrecision(Precision selectedPrecision) {
+		this.selectedPrecision = selectedPrecision;
 	}
 
 }
