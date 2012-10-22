@@ -13,7 +13,7 @@
 		
 		<include src="survey_edit/schema/node_common.zul" />
 
-		<listbox id="listbox" rows="5"
+		<listbox id="listbox"
 		  model="@load(vm.childAttributes)"
           selectedItem="@bind(vm.selectedAttribute)">
 		  <listhead>
