@@ -95,7 +95,7 @@
 			</center>
 			<south>
 				<box align="center" width="100%">
-					<button label="${labels.global.close}" 
+					<button label="${labels.global.ok}" 
 						onClick="@global-command('closeSRSManagerPopUp')" />
 				</box>
 			</south>

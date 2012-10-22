@@ -78,7 +78,7 @@
 			</rows>
 		</grid>
 		<box align="center" width="100%">
-			<button label="${labels.global.close}" onClick="@command('close')" />
+			<button label="${labels.global.ok}" onClick="@command('close')" />
 		</box>
 	</window>
 </zk>

@@ -61,7 +61,7 @@
 				</groupbox>
 			</hlayout>
 			<box align="center" width="100%">
-				<button label="${labels.global.close}" 
+				<button label="${labels.global.ok}" 
 					onClick="@command('applyChanges')" />
 			</box>
 		</vlayout>
