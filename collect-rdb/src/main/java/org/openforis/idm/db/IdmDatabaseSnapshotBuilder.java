@@ -93,7 +93,8 @@ public class IdmDatabaseSnapshotBuilder {
 	private void createCodeListTables() throws DatabaseException {
 		List<CodeList> lists = survey.getCodeLists();
 		for (CodeList list : lists) {
-			IdmCodeListTableBuilder tb = new IdmCodeListTableBuilder(list);
+			IdmCodeListTableBuilder tb = new IdmCodeListTableBuilder();
+			tb.setList(list);
 			tb.setTablePrefix(tablePrefix);
 			tb.setTableSuffix(codeTableSuffix);
 			Table table = tb.toTable();

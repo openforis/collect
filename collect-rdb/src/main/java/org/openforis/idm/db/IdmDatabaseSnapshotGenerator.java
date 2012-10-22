@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -23,6 +24,7 @@ import liquibase.exception.DatabaseException;
 import liquibase.snapshot.DatabaseSnapshot;
 import liquibase.snapshot.DatabaseSnapshotGenerator;
 import liquibase.snapshot.DatabaseSnapshotGeneratorFactory;
+import liquibase.sqlgenerator.SqlGeneratorFactory;
 
 import org.openforis.idm.metamodel.DefaultSurveyContext;
 import org.openforis.idm.metamodel.Survey;
@@ -143,11 +145,13 @@ public class IdmDatabaseSnapshotGenerator implements DatabaseSnapshotGenerator {
 	}
 	
 	private static Survey loadSurvey() throws IdmlParseException, FileNotFoundException {
+//		InputStream is = ClassLoader.getSystemResourceAsStream("test.idm.xml");
+		
+		InputStream is = new FileInputStream("D:/Data/workspace/idm/idm-test/src/main/resources/test.idm.xml");
 //		InputStream is = new FileInputStream("/home/gino/workspace/faofin/tz/naforma-idm/tanzania-naforma.idm.xml");
-//		SurveyContext ctx = new DefaultSurveyContext();
-//		SurveyIdmlBinder binder = new SurveyIdmlBinder(ctx);
-//		return binder.unmarshal(is);
-		return null; // TODO
+		SurveyContext ctx = new DefaultSurveyContext();
+		SurveyIdmlBinder binder = new SurveyIdmlBinder(ctx);
+		return binder.unmarshal(is);
 	}
 
 	public static void main(String[] args) {
@@ -165,6 +169,10 @@ public class IdmDatabaseSnapshotGenerator implements DatabaseSnapshotGenerator {
 			generator.setTablePrefix("tz_");
 			generator.setCodeListTableSuffix("_code");
 			snapshotFactory.register(generator);
+			Set<DiffStatusListener> listeners = Collections.emptySet();
+			DatabaseSnapshot snapshot = snapshotFactory.createSnapshot(idmDb, "", listeners);
+			System.out.println(snapshot.toString());
+//			SqlGeneratorFactory.getInstance().generateSql(statement, database)
 			
 			Connection conn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/naforma1","postgres","postgres");
 			DatabaseConnection dbconn = new JdbcConnection(conn);
@@ -173,7 +181,8 @@ public class IdmDatabaseSnapshotGenerator implements DatabaseSnapshotGenerator {
 	//		Liquibase liq = new Liquibase("changes.log", new FileSystemResourceAccessor("/home/gino/temp/ofc"), idmDb);			
 			Diff diff = new Diff(idmDb, rdb);
 			DiffResult diffResult = diff.compare();
-			diffResult.printChangeLog(System.out, rdb);
+			diffResult.setChangeSetAuthor("collect-rdb-3.0-SNAPSHOT");
+//			diffResult.printChangeLog(System.out, rdb);
 //			diffResult.printResult(System.out);
 //			System.out.println(diffResult);
 	//		liq.update("changes");

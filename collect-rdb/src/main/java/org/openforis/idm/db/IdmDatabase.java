@@ -32,7 +32,6 @@ import liquibase.statement.SqlStatement;
 
 public class IdmDatabase implements Database {
 
-	
 	private Survey survey;
 
 	public IdmDatabase(Survey survey) {
