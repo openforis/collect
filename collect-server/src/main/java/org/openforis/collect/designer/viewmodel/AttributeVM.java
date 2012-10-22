@@ -6,6 +6,7 @@ import java.util.List;
 import org.openforis.collect.designer.form.AttributeDefinitionFormObject;
 import org.openforis.collect.designer.form.NodeDefinitionFormObject;
 import org.openforis.collect.designer.form.NumericAttributeDefinitionFormObject;
+import org.openforis.collect.designer.form.PrecisionFormObject;
 import org.openforis.collect.designer.form.SurveyObjectFormObject;
 import org.openforis.collect.designer.model.AttributeType;
 import org.openforis.idm.metamodel.AttributeDefault;
@@ -42,9 +43,9 @@ public class AttributeVM extends SurveyObjectBaseVM<AttributeDefinition> {
 	
 	private Form tempFormObject;
 	private List<AttributeDefault> attributeDefaults;
-	private List<Precision> numericAttributePrecisions;
+	private List<PrecisionFormObject> numericAttributePrecisions;
 	private AttributeDefault selectedAttributeDefault;
-	private Precision selectedPrecision;
+	private PrecisionFormObject selectedPrecision;
 	
 	@Wire
 	private Include attributeDetailsInclude;
@@ -163,7 +164,7 @@ public class AttributeVM extends SurveyObjectBaseVM<AttributeDefinition> {
 		if ( numericAttributePrecisions == null ) {
 			initNumericAttributePrecisionsList();
 		}
-		Precision precision = new Precision();
+		PrecisionFormObject precision = new PrecisionFormObject();
 		numericAttributePrecisions.add(precision);
 	}
 	
@@ -172,6 +173,12 @@ public class AttributeVM extends SurveyObjectBaseVM<AttributeDefinition> {
 	public void deleteNumericAttributePrecision() {
 		numericAttributePrecisions.remove(selectedPrecision);
 		selectedPrecision = null;
+	}
+	
+	@Command
+	@NotifyChange("selectedPrecision")
+	public void selectPrecision(@BindingParam("precision") PrecisionFormObject precision) {
+		selectedPrecision = precision;
 	}
 
 	protected void initAttributeDefaultsList() {
@@ -184,7 +191,7 @@ public class AttributeVM extends SurveyObjectBaseVM<AttributeDefinition> {
 	
 	protected void initNumericAttributePrecisionsList() {
 		if ( numericAttributePrecisions == null ) {
-			numericAttributePrecisions = new ArrayList<Precision>();
+			numericAttributePrecisions = new ArrayList<PrecisionFormObject>();
 			tempFormObject.setField(NUMBER_ATTRIBUTE_PRECISIONS_FIELD, numericAttributePrecisions);
 			((NumericAttributeDefinitionFormObject<?>) formObject).setPrecisions(numericAttributePrecisions);
 		}
@@ -219,7 +226,7 @@ public class AttributeVM extends SurveyObjectBaseVM<AttributeDefinition> {
 		return attributeDefaults;
 	}
 	
-	public List<Precision> getNumericAttributePrecisions() {
+	public List<PrecisionFormObject> getNumericAttributePrecisions() {
 		return numericAttributePrecisions;
 	}
 	
@@ -236,11 +243,11 @@ public class AttributeVM extends SurveyObjectBaseVM<AttributeDefinition> {
 		this.selectedAttributeDefault = selectedAttributeDefault;
 	}
 
-	public Precision getSelectedPrecision() {
+	public PrecisionFormObject getSelectedPrecision() {
 		return selectedPrecision;
 	}
 
-	public void setSelectedPrecision(Precision selectedPrecision) {
+	public void setSelectedPrecision(PrecisionFormObject selectedPrecision) {
 		this.selectedPrecision = selectedPrecision;
 	}
 

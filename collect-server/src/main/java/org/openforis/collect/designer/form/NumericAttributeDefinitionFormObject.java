@@ -3,7 +3,6 @@
  */
 package org.openforis.collect.designer.form;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -21,7 +20,7 @@ import org.openforis.idm.metamodel.validation.ComparisonCheck;
 public class NumericAttributeDefinitionFormObject<T extends NumericAttributeDefinition> extends AttributeDefinitionFormObject<T> {
 	
 	private String type;
-	private List<Precision> precisions;
+	private List<PrecisionFormObject> precisions;
 	
 	private String comparisonCheckFlag;
 	private String greaterThan;
@@ -44,7 +43,9 @@ public class NumericAttributeDefinitionFormObject<T extends NumericAttributeDefi
 		dest.setType(typeEnum);
 		dest.removeAllPrecisionDefinitions();
 		if ( precisions != null ) {
-			for (Precision precision : precisions) {
+			for (PrecisionFormObject precisionFormObject : precisions) {
+				Precision precision = new Precision();
+				precisionFormObject.saveTo(precision, languageCode);
 				dest.addPrecisionDefinition(precision);
 			}
 		}
@@ -55,7 +56,7 @@ public class NumericAttributeDefinitionFormObject<T extends NumericAttributeDefi
 	public void loadFrom(T source, String languageCode) {
 		super.loadFrom(source, languageCode);
 		type = source.getType() != null ? source.getType().name(): null;
-		precisions = new ArrayList<Precision>(source.getPrecisionDefinitions());
+		precisions = PrecisionFormObject.fromList(source.getPrecisionDefinitions(), languageCode);
 		loadChecks(source);
 	}
 
@@ -140,11 +141,11 @@ public class NumericAttributeDefinitionFormObject<T extends NumericAttributeDefi
 		this.type = type;
 	}
 
-	public List<Precision> getPrecisions() {
+	public List<PrecisionFormObject> getPrecisions() {
 		return precisions;
 	}
 
-	public void setPrecisions(List<Precision> precisions) {
+	public void setPrecisions(List<PrecisionFormObject> precisions) {
 		this.precisions = precisions;
 	}
 

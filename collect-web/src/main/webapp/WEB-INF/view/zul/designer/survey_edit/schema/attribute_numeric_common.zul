@@ -21,39 +21,49 @@
 				<label value="${labels.survey.schema.attribute.numeric.precisions.$}:" />
 				<cell>
 					<vlayout>
-						<grid width="380px" model="@load(vm.numericAttributePrecisions)">
-							<columns height="22px">
-								<column width="80px"
+						<listbox model="@load(vm.numericAttributePrecisions)" 
+                              selectedItem="@bind(vm.selectedPrecision)">
+							<listhead height="22px">
+								<listheader width="80px"
 									label="${labels.survey.schema.attribute.numeric.precisions.is_default}" />
-								<column width="150px"
+								<listheader width="150px"
 									label="${labels.survey.schema.attribute.numeric.precisions.unit}">
 									<button tooltiptext="${labels.survey.unit.manager.title}" 
 										onClick="@global-command('openUnitsManagerPopUp')"
 										image="/assets/images/pencil-small.png" />
-								</column>
-								<column width="100px"
+								</listheader>
+								<listheader width="100px"
 									label="${labels.survey.schema.attribute.numeric.precisions.decimal_digits}" />
-								<column width="50px"
-									label="${labels.global.delete_item}" />
-							</columns>
+							</listhead>
 							<template name="model">
-								<row>
-									<checkbox checked="@bind(each.defaultPrecision)" />
-									<listbox width="120px" model="@load(vm.units)"
-										selectedItem="@bind(each.unit)" mold="select">
-										<template name="model">
-											<listitem label="@load(each.name)" />
-										</template>
-									</listbox>
-									<intbox inplace="true" value="@bind(each.decimalDigits)"
-										width="99%" />
-									<button image="/assets/images/cross-small.png"
-										onClick="@command('deleteNumericAttributePrecision', precision=each)" />
-								</row>
-							</template>
-						</grid>
-						<button label="${labels.survey.schema.attribute.numeric.precisions.add_precision}"
-								onClick="@command('addNumericAttributePrecision')" />
+								<listitem>
+                                    <listcell>
+    								  <checkbox checked="@bind(each.defaultPrecision)" 
+                                        onCheck="@command('selectPrecision', precision = each)" />
+                                    </listcell>
+                                    <listcell>
+    									<listbox width="120px" model="@load(vm.units)"
+    										selectedItem="@bind(each.unit)" mold="select"
+                                            onSelect="@command('selectPrecision', precision = each)">
+    										<template name="model">
+    											<listitem label="@load(each.name)" />
+    										</template>
+    									</listbox>
+                                    </listcell>
+                                    <listcell>
+    									<intbox inplace="true" value="@bind(each.decimalDigits)"
+    										width="99%" onFocus="@command('selectPrecision', precision = each)" />
+                                    </listcell>
+                                </listitem>
+                             </template>
+						</listbox>
+                        <toolbar>
+                            <toolbarbutton label="${labels.global.add_item}"
+    					      onClick="@command('addNumericAttributePrecision')" />
+                            <toolbarbutton label="${labels.global.delete_item}"
+                              disabled="@load(empty vm.selectedPrecision)"
+                              onClick="@command('deleteNumericAttributePrecision')" />
+                        </toolbar>
 					</vlayout>
 					<label class="error" value="@load(vmsgs['precisions'])" />
 				</cell>
