@@ -1,3 +1,4 @@
+<?component name="fieldErrorHandler" class="org.openforis.collect.designer.component.FieldErrorHandler"?>
 <zk>
 	<vlayout
 		id="nodeFormContainer"

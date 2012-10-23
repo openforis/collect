@@ -1,3 +1,4 @@
+<?component name="fieldErrorHandler" class="org.openforis.collect.designer.component.FieldErrorHandler"?>
 <zk>
 	<window id="unitsManagerPopUp" title="${labels.survey.unit.manager.title}" 
 		width="800px"
@@ -50,28 +51,25 @@
 						<rows>
 							<row>
 								<label value="${labels.survey.unit.name}:" />
-								<cell>
+                                <fieldErrorHandler message="@load(vmsgs['name'])">
 									<textbox width="150px" value="@bind(fx.name)" onChange="@command('applyChanges')" />
-									<label class="error" value="@load(vmsgs['name'])" />
-								</cell>
+                                </fieldErrorHandler>
 							</row>
 							<row>
 								<label value="${labels.survey.unit.label}:" />
-								<cell>
+                                <fieldErrorHandler message="@load(vmsgs['label'])">
 									<textbox id="labelTextBox" width="150px" value="@bind(fx.label)" onChange="@command('applyChanges')" />
-									<label class="error" value="@load(vmsgs['label'])" />
-								</cell>
+                                </fieldErrorHandler>
 							</row>
 							<row>
 								<label value="${labels.survey.unit.abbreviation}:" />
-								<cell>
+                                <fieldErrorHandler message="@load(vmsgs['abbreviation'])">
 									<textbox width="150px" value="@bind(fx.abbreviation)" onChange="@command('applyChanges')" />
-									<label class="error" value="@load(vmsgs['abbreviation'])" />
-								</cell>
+                                </fieldErrorHandler>
 							</row>
 							<row>
 								<label value="${labels.survey.unit.dimension.$}:" />
-								<cell>
+                                <fieldErrorHandler message="@load(vmsgs['dimensionLabel'])">
 									<listbox width="150px" model="@load(vm.availableDimensions)"
 										selectedItem="@bind(fx.dimensionLabel)" mold="select"
 										onSelect="@command('applyChanges')" >
@@ -79,15 +77,13 @@
 											<listitem label="@load(each)" />
 										</template>
 									</listbox>
-									<label class="error" value="@load(vmsgs['dimensionLabel'])" />
-								</cell>
+                                </fieldErrorHandler>
 							</row>
 							<row>
 								<label value="${labels.survey.unit.conversionFactor}:" />
-								<cell>
+                                <fieldErrorHandler message="@load(vmsgs['conversionFactor'])">
 									<decimalbox width="150px" value="@bind(fx.conversionFactor)" onChange="@command('applyChanges')" />
-									<label class="error" value="@load(vmsgs['conversionFactor'])" />
-								</cell>
+                                </fieldErrorHandler>
 							</row>
 						</rows>
 					</grid>

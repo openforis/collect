@@ -297,6 +297,7 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 	@NotifyChange({"itemsPerLevel"})
 	public void closeCodeListItemPopUp() {
 		closePopUp(codeListItemPopUp);
+		codeListItemPopUp = null;
 		if ( newChildItem ) {
 			addChildItemToCodeList();
 		}

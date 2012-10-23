@@ -171,7 +171,7 @@ public class SchemaVM extends SurveyBaseVM {
 		Binder binder = (Binder) attributePopUp.getAttribute("binder");
 		AttributeVM viewModel = (AttributeVM) binder.getViewModel();
 		viewModel.commitChanges();
-		closePopUp(attributePopUp);
+		closeAttributeEditPopUp();
 		notifyChange("childAttributes");
 	}
 	
@@ -182,14 +182,20 @@ public class SchemaVM extends SurveyBaseVM {
 			Schema schema = editedAttribute.getSchema();
 			schema.detach(editedAttribute);
 		}
-		closePopUp(attributePopUp);
+		closeAttributeEditPopUp();
 	}
-	
+
 	protected void openAttributeEditPopUp() {
 		Map<String, Object> args = new HashMap<String, Object>();
 		args.put("newItem", editingNewAttribute);
 		args.put("item", editedAttribute);
 		attributePopUp = openPopUp(Resources.Component.ATTRIBUTE_POPUP.getLocation(), true, args);
+	}
+	
+	protected void closeAttributeEditPopUp() {
+		closePopUp(attributePopUp);
+		attributePopUp = null;
+		validateForm();
 	}
 	
 	protected void onAfterNodeCreated(Binder binder, EntityDefinition newNode) {
@@ -405,14 +411,17 @@ public class SchemaVM extends SurveyBaseVM {
 
 	@GlobalCommand
 	public void openVersioningManagerPopUp() {
-		dispatchCurrentFormValidatedCommand(true);
-		versioningPopUp = openPopUp(Resources.Component.VERSIONING_POPUP.getLocation(), true);
+		if ( versioningPopUp == null ) {
+			dispatchCurrentFormValidatedCommand(true);
+			versioningPopUp = openPopUp(Resources.Component.VERSIONING_POPUP.getLocation(), true);
+		}
 	}
 
 	@GlobalCommand
 	public void closeVersioningManagerPopUp() {
 		if ( checkCurrentFormValid() ) {
 			closePopUp(versioningPopUp);
+			versioningPopUp = null;
 			validateForm();
 		}
 	}
@@ -427,6 +436,7 @@ public class SchemaVM extends SurveyBaseVM {
 	public void closeCodeListsManagerPopUp() {
 		if ( checkCurrentFormValid() ) {
 			closePopUp(codeListsPopUp);
+			codeListsPopUp = null;
 			validateForm();
 		}
 	}
@@ -441,6 +451,7 @@ public class SchemaVM extends SurveyBaseVM {
 	public void closeUnitsManagerPopUp() {
 		if ( checkCurrentFormValid() ) {
 			closePopUp(unitsPopUp);
+			unitsPopUp = null;
 			validateForm();
 		}
 	}

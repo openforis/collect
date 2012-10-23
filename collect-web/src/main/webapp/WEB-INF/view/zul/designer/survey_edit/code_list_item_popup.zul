@@ -1,3 +1,4 @@
+<?component name="fieldErrorHandler" class="org.openforis.collect.designer.component.FieldErrorHandler"?>
 <zk>
 	<window id="codeListItemManagerPopUp" title="${labels.survey.code_list.item.manager.title}" 
 		width="800px"
@@ -19,35 +20,31 @@
 			<rows>
 				<row>
 					<label value="${labels.global.item.code}:" />
-					<cell>
-						<textbox width="150px" value="@bind(fx.code)" onChange="@command('applyChanges')" />
-						<label class="error" value="@load(vmsgs['code'])" />
-					</cell>
+					<fieldErrorHandler message="@load(vmsgs['code'])">
+                          <textbox width="150px" value="@bind(fx.code)" onChange="@command('applyChanges')" />
+					</fieldErrorHandler>
 				</row>
 				<row>
 					<label value="${labels.global.item.label}:" />
-					<cell>
+                    <fieldErrorHandler message="@load(vmsgs['label'])">
 						<textbox width="150px" value="@bind(fx.label)" onChange="@command('applyChanges')" />
-						<label class="error" value="@load(vmsgs['label'])" />
-					</cell>
+					</fieldErrorHandler>
 				</row>
 				<row>
 					<label value="${labels.global.item.description}:" />
-					<cell>
+                    <fieldErrorHandler message="@load(vmsgs['description'])">
 						<textbox width="150px" value="@bind(fx.description)" onChange="@command('applyChanges')" />
-						<label class="error" value="@load(vmsgs['description'])" />
-					</cell>
+					</fieldErrorHandler>
 				</row>
 				<row>
 					<label value="${labels.survey.code_list.qualifiable}:" />
-					<cell>
+                    <fieldErrorHandler message="@load(vmsgs['qualifiable'])">
 						<checkbox value="@bind(fx.qualifiable)" onCheck="@command('applyChanges')" />
-						<label class="error" value="@load(vmsgs['qualifiable'])" />
-					</cell>
+					</fieldErrorHandler>
 				</row>
 				<row>
 					<label value="${labels.global.item.since_version}:" />
-					<cell>
+                    <fieldErrorHandler message="@load(vmsgs['sinceVersion'])">
 						<listbox width="150px"
 		                    model="@load(vm.versionsForCombo)" 
 		                    selectedItem="@bind(fx.sinceVersion)"
@@ -57,12 +54,12 @@
 		                        <listitem label="@load(each.name)" />
 		                    </template>
 		                </listbox>
-	                	<label class="error" value="@load(vmsgs['sinceVersion'])" />
-					</cell>
+					</fieldErrorHandler>
 	            </row>
 	            <row>
 					<label value="${labels.global.item.deprecated_version}:" />
 					<cell>
+                    <fieldErrorHandler message="@load(vmsgs['deprecatedVersion'])">
 						<listbox width="150px"
 		                    model="@load(vm.versionsForCombo)" 
 		                    selectedItem="@bind(fx.deprecatedVersion)"
@@ -72,8 +69,7 @@
 		                        <listitem label="@load(each.name)" />
 		                    </template>
 		                </listbox>
-		                <label class="error" value="@load(vmsgs['deprecatedVersion'])" />
-					</cell>
+					</fieldErrorHandler>
 	            </row>
 			</rows>
 		</grid>

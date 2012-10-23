@@ -1,3 +1,4 @@
+<?component name="fieldErrorHandler" class="org.openforis.collect.designer.component.FieldErrorHandler"?>
 <zk>
 	<window 
 		title="${labels.survey.srs.manager.title}" 
@@ -61,33 +62,29 @@
 						<rows>
 							<row>
 								<label value="${labels.survey.srs.id}:" />
-								<cell>
+								<fieldErrorHandler message="@load(vmsgs['id'])">
 									<textbox width="150px" value="@bind(fx.id)" onChange="@command('applyChanges')" />
-									<label class="error" value="@load(vmsgs['id'])" />
-								</cell>
+								</fieldErrorHandler>
 							</row>
 							<row>
 								<label value="${labels.survey.srs.label}:" />
-								<cell>
+                                <fieldErrorHandler message="@load(vmsgs['label'])">
 									<textbox width="150px" value="@bind(fx.label)" onChange="@command('applyChanges')" />
-									<label class="error" value="@load(vmsgs['label'])" />
-								</cell>
+								</fieldErrorHandler>
 							</row>
 							<row>
 								<label value="${labels.survey.srs.description}:" />
-								<cell>
+                                <fieldErrorHandler message="@load(vmsgs['description'])">
 									<textbox width="150px" value="@bind(fx.description)" onChange="@command('applyChanges')" />
-									<label class="error" value="@load(vmsgs['description'])" />
-								</cell>
+								</fieldErrorHandler>
 							</row>
 							<row>
 								<label value="${labels.survey.srs.wkt}:" />
-								<cell>
+                                <fieldErrorHandler message="@load(vmsgs['wellKnownText'])">
 									<textbox width="250px" value="@bind(fx.wellKnownText)" 
 										multiline="true" rows="10" cols="40"
 										onChange="@command('applyChanges')" />
-									<label class="error" value="@load(vmsgs['wellKnownText'])" />
-								</cell>
+								</fieldErrorHandler>
 							</row>
 						</rows>
 					</grid>

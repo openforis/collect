@@ -1,3 +1,4 @@
+<?component name="fieldErrorHandler" class="org.openforis.collect.designer.component.FieldErrorHandler"?>
 <zk>
 	<grid>
 		<columns>
@@ -14,7 +15,6 @@
 						<radio label="${labels.survey.schema.attribute.numeric.type.real}"
 							value="REAL" />
 					</radiogroup>
-					<label class="error" value="@load(vmsgs['type'])" />
 				</cell>
 			</row>
 			<row>

@@ -1,3 +1,4 @@
+<?component name="fieldErrorHandler" class="org.openforis.collect.designer.component.FieldErrorHandler"?>
 <zk>
 	<div 
 		validationMessages="@id('vmsgs')"
@@ -13,39 +14,34 @@
 			<rows>
 				<row>
 					<label value="${labels.survey.name}:" />
-					<cell>
+					<fieldErrorHandler message="@load(vmsgs['name'])">
 						<textbox width="150px" value="@bind(fx.name)" onChange="@command('applyChanges')" />
-						<label class="error" value="@load(vmsgs['name'])" />
-					</cell>
+                    </fieldErrorHandler>
 				</row>
 				<row>
 					<label value="${labels.survey.uri}:" />
-					<cell>
+                    <fieldErrorHandler message="@load(vmsgs['uri'])">
 						<textbox width="350px" value="@bind(fx.uri)" onChange="@command('applyChanges')"
 							readonly="@load(fx.published)" />
-						<label class="error" value="@load(vmsgs['uri'])" />
-					</cell>
+					</fieldErrorHandler>
 				</row>
 				<row>
 					<label value="${labels.survey.description}:" />
-					<cell>
+                    <fieldErrorHandler message="@load(vmsgs['description'])">
 						<textbox width="350px" value="@bind(fx.description)" onChange="@command('applyChanges')" />
-						<label class="error" value="@load(vmsgs['description'])" />
-					</cell>
+                    </fieldErrorHandler>
 				</row>
 				<row>
 					<label value="${labels.survey.project_name}:" />
-					<cell>
+                    <fieldErrorHandler message="@load(vmsgs['projectName'])">
 						<textbox width="150px" value="@bind(fx.projectName)" onChange="@command('applyChanges')" />
-						<label class="error" value="@load(vmsgs['projectName'])" />
-					</cell>
+                    </fieldErrorHandler>
 				</row>
 				<row>
 					<label value="${labels.survey.project_cycle}:" />
-					<cell>
+                    <fieldErrorHandler message="@load(vmsgs['projectCycle'])">
 						<textbox width="150px" value="@bind(fx.projectCycle)" onChange="@command('applyChanges')" />
-						<label class="error" value="@load(vmsgs['projectCycle'])" />
-					</cell>
+                    </fieldErrorHandler>
 				</row>
 				<row>
 					<label value="${labels.survey.srs.$}:" />

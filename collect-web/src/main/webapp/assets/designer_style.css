@@ -29,4 +29,11 @@
 	color: grey;
 	font-style: italic;
 }
-
+.z-textbox.error, .z-intbox.error {
+	border: 2px inset #FF0000;
+	color: #000000;
+}
+.z-popup.error .z-popup-cnt {
+	background: #CE2929;
+	color: #FFFFFF;
+}

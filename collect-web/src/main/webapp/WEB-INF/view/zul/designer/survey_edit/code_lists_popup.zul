@@ -1,3 +1,4 @@
+<?component name="fieldErrorHandler" class="org.openforis.collect.designer.component.FieldErrorHandler"?>
 <zk>
 	<window id="codeListsManagerPopUp" title="${labels.survey.code_list.manager.title}" 
 		width="800px" 
@@ -64,35 +65,31 @@
 							<rows>
 								<row>
 									<label value="${labels.global.item.name}:" />
-									<cell>
+                                    <fieldErrorHandler message="@load(vmsgs['name'])">
 										<textbox width="150px" value="@bind(fx.name)" onChange="@command('applyChanges')" />
-										<label class="error" value="@load(vmsgs['name'])" />
-									</cell>
+                                    </fieldErrorHandler>
 								</row>
 								<row>
 									<label value="${labels.survey.code_list.item_label}:" />
-									<cell>
+                                    <fieldErrorHandler message="@load(vmsgs['itemLabel'])">
 										<textbox width="150px" value="@bind(fx.itemLabel)" onChange="@command('applyChanges')" />
-										<label class="error" value="@load(vmsgs['itemLabel'])" />
-									</cell>
+                                    </fieldErrorHandler>
 								</row>
 								<row>
 									<label value="${labels.survey.code_list.list_label}:" />
-									<cell>
+                                    <fieldErrorHandler message="@load(vmsgs['listLabel'])">
 										<textbox width="150px" value="@bind(fx.listLabel)" onChange="@command('applyChanges')" />
-										<label class="error" value="@load(vmsgs['listLabel'])" />
-									</cell>
+                                    </fieldErrorHandler>
 								</row>
 								<row>
 									<label value="${labels.survey.code_list.lookup_table}:" />
-									<cell>
+                                    <fieldErrorHandler message="@load(vmsgs['lookupTable'])">
 										<textbox width="150px" value="@bind(fx.lookupTable)" onChange="@command('applyChanges')" />
-										<label class="error" value="@load(vmsgs['lookupTable'])" />
-									</cell>
+                                    </fieldErrorHandler>
 								</row>
 								<row>
 									<label value="${labels.global.item.since_version}:" />
-									<cell>
+                                    <fieldErrorHandler message="@load(vmsgs['sinceVersion'])">
 										<listbox width="150px"
 						                    model="@load(vm.versionsForCombo)" 
 						                    selectedItem="@bind(fx.sinceVersion)"
@@ -102,12 +99,11 @@
 						                        <listitem label="@load(each.name)" />
 						                    </template>
 						                </listbox>
-					                	<label class="error" value="@load(vmsgs['sinceVersion'])" />
-									</cell>
+                                    </fieldErrorHandler>
 					            </row>
 					            <row>
 									<label value="${labels.global.item.deprecated_version}:" />
-									<cell>
+                                    <fieldErrorHandler message="@load(vmsgs['deprecatedVersion'])">
 										<listbox width="150px"
 						                    model="@load(vm.versionsForCombo)" 
 						                    selectedItem="@bind(fx.deprecatedVersion)"
@@ -117,8 +113,7 @@
 						                        <listitem label="@load(each.name)" />
 						                    </template>
 						                </listbox>
-						                <label class="error" value="@load(vmsgs['deprecatedVersion'])" />
-									</cell>
+                                    </fieldErrorHandler>
 					            </row>
 					            <row>
 					            	<label value="${labels.survey.code_list.type.$}:" />

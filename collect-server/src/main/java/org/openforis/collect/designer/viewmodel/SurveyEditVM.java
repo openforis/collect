@@ -74,6 +74,7 @@ public class SurveyEditVM extends SurveyBaseVM {
 	public void closeSRSManagerPopUp() {
 		if ( checkCurrentFormValid() ) {
 			closePopUp(srsPopUp);
+			srsPopUp = null;
 		}
 	}
 	
@@ -129,6 +130,7 @@ public class SurveyEditVM extends SurveyBaseVM {
 	@NotifyChange({"availableLanguages"})
 	public void surveyLanguagesChanged() {
 		closePopUp(selectLanguagePopUp);
+		selectLanguagePopUp = null;
 	}
 	
 	public List<String> getAvailableLanguages() {

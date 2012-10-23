@@ -27,7 +27,6 @@
 							<radio label="${labels.survey.schema.attribute.numeric.type.integer}"
 								value="INTEGER" />
 						</radiogroup>
-						<label class="error" value="@load(vmsgs['type'])" />
 					</cell>
 				</row>
 				<row>

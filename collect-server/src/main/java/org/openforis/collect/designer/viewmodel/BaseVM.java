@@ -57,8 +57,10 @@ public abstract class BaseVM {
 	}
 	
 	protected void closePopUp(Window popUp) {
-		Event event = new Event("onClose", popUp, null);
-		Events.postEvent(event);
+		if ( popUp != null ) {
+			Event event = new Event("onClose", popUp, null);
+			Events.postEvent(event);
+		}
 	}
 	
 	protected void notifyChange(String ... properties) {

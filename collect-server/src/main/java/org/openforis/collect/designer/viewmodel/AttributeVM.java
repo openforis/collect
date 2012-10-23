@@ -11,7 +11,6 @@ import org.openforis.collect.designer.form.SurveyObjectFormObject;
 import org.openforis.collect.designer.model.AttributeType;
 import org.openforis.idm.metamodel.AttributeDefault;
 import org.openforis.idm.metamodel.AttributeDefinition;
-import org.openforis.idm.metamodel.Precision;
 import org.zkoss.bind.Binder;
 import org.zkoss.bind.Form;
 import org.zkoss.bind.SimpleForm;
