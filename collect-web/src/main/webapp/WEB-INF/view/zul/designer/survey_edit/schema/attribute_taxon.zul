@@ -1,0 +1,65 @@
+<?component name="fieldErrorHandler" class="org.openforis.collect.designer.component.FieldErrorHandler"?>
+<zk>
+	<vlayout 
+		id="nodeFormContainer"
+		apply="org.zkoss.bind.BindComposer"
+		viewModel="@id('vm') @init(vm)"
+		validationMessages="@id('vmsgs')"
+		form="@id('fx')
+			@init(vm.tempFormObject)
+			@load(vm.formObject) 
+			@save(vm.formObject, before='applyChanges')
+			@validator('org.openforis.collect.designer.form.validator.AttributeDefinitionFormValidator')">
+		
+		<include src="survey_edit/schema/attribute_common.zul" />
+		
+		<grid>
+			<columns>
+				<column label="" width="150px" />
+				<column label="" />
+			</columns>
+			<rows>
+				<row>
+					<label value="${labels.survey.schema.attribute.taxon.taxonomy}:" />
+                    <fieldErrorHandler message="@load(vmsgs['taxonomy'])">
+						<textbox width="150px" value="@bind(fx.taxonomy)" onChange="@command('applyChanges')" />
+                    </fieldErrorHandler>
+				</row>
+				<row>
+					<label value="${labels.survey.schema.attribute.taxon.highest_rank}:" />
+                    <fieldErrorHandler message="@load(vmsgs['highestRank'])">
+                        <listbox width="150px" model="@load(vm.ranks)"
+                            selectedItem="@bind(fx.highestRank)" mold="select"
+                            onSelect="@command('applyChanges')">
+                        </listbox>
+<!-- 						<radiogroup selectedItem="@bind(fx.highestRank)" onCheck="@command('applyChanges')"> -->
+<!--                           <radio value="FAMILY"  -->
+<!--                             label="${labels.survey.schema.attribute.taxon.rank.family}" /> -->
+<!--                           <radio value="GENUS"  -->
+<!--                             label="${labels.survey.schema.attribute.taxon.rank.genus}" /> -->
+<!--                           <radio value="SPECIES"  -->
+<!--                             label="${labels.survey.schema.attribute.taxon.rank.species}" /> -->
+<!--                         </radiogroup> -->
+                    </fieldErrorHandler>
+				</row>
+                <row>
+                  <listbox id="qualifiersList" 
+                        model="@load(vm.qualifiers)"
+                        selectedItem="@bind(vm.selectedQualifier)">
+                       <listhead visible="false">
+                          <listheader label="" width="200px" />
+                        </listhead>
+                       <template name="model">
+                        <listitem>
+                          <listcell>
+                              <textbox inplace="true" value="@bind(each.value)" width="99%"
+                                onFocus="@command('selectQualifier', qualifier=each)" />
+                          </listcell>
+                        </listitem>
+                    </template>
+                </listbox>
+              </row>
+			</rows>
+		</grid>
+	</vlayout>
+</zk>

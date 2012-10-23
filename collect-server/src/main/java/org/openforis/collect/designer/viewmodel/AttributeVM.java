@@ -14,7 +14,6 @@ import org.openforis.idm.metamodel.AttributeDefinition;
 import org.zkoss.bind.Binder;
 import org.zkoss.bind.Form;
 import org.zkoss.bind.SimpleForm;
-import org.zkoss.bind.annotation.AfterCompose;
 import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.ContextParam;
@@ -34,30 +33,29 @@ import org.zkoss.zul.Include;
  * @author S. Ricci
  *
  */
-public class AttributeVM extends SurveyObjectBaseVM<AttributeDefinition> {
+public abstract class AttributeVM<T extends AttributeDefinition> extends SurveyObjectBaseVM<T> {
 
 	private static final String FORM_CONTAINER_ID = "nodeFormContainer";
 	private static final String ATTRIBUTE_DEFAULTS_FIELD = "attributeDefaults";
 	private static final String NUMBER_ATTRIBUTE_PRECISIONS_FIELD = "precisions";
 	
-	private Form tempFormObject;
-	private List<AttributeDefault> attributeDefaults;
-	private List<PrecisionFormObject> numericAttributePrecisions;
-	private AttributeDefault selectedAttributeDefault;
-	private PrecisionFormObject selectedPrecision;
+	protected Form tempFormObject;
+	protected List<AttributeDefault> attributeDefaults;
+	protected List<PrecisionFormObject> numericAttributePrecisions;
+	protected AttributeDefault selectedAttributeDefault;
+	protected PrecisionFormObject selectedPrecision;
 	
 	@Wire
 	private Include attributeDetailsInclude;
 	
-	@AfterCompose
-	public void afterCompose(@ContextParam(ContextType.VIEW) Component view){
+	protected void afterCompose(Component view){
 		 Selectors.wireComponents(view, this, false);
 		 Selectors.wireEventListeners(view, this);
 		 refreshNodeForm();
 	}
 	
 	@Init
-	public void init(@ExecutionArgParam("item") AttributeDefinition attributeDefn, 
+	public void init(@ExecutionArgParam("item") T attributeDefn, 
 			@ExecutionArgParam("newItem") Boolean newItem) {
 		if ( attributeDefn != null ) {
 			this.newItem = newItem;
@@ -72,7 +70,7 @@ public class AttributeVM extends SurveyObjectBaseVM<AttributeDefinition> {
 	}
 
 	@Override
-	protected List<AttributeDefinition> getItemsInternal() {
+	protected List<T> getItemsInternal() {
 		return null;
 	}
 
@@ -83,15 +81,15 @@ public class AttributeVM extends SurveyObjectBaseVM<AttributeDefinition> {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	protected SurveyObjectFormObject<AttributeDefinition> createFormObject() {
+	protected SurveyObjectFormObject<T> createFormObject() {
 		AttributeType attributeTypeEnum = AttributeType.valueOf(editedItem);
-		formObject = (AttributeDefinitionFormObject<AttributeDefinition>) NodeDefinitionFormObject.newInstance(attributeTypeEnum);
+		formObject = (AttributeDefinitionFormObject<T>) NodeDefinitionFormObject.newInstance(attributeTypeEnum);
 		tempFormObject = new SimpleForm();
 		return formObject;
 	}
 
 	@Override
-	protected AttributeDefinition createItemInstance() {
+	protected T createItemInstance() {
 		return null;
 	}
 
@@ -118,10 +116,10 @@ public class AttributeVM extends SurveyObjectBaseVM<AttributeDefinition> {
 	
 	@Override
 	@NotifyChange({"editedItem","formObject","tempFormObject"})
-	public void setEditedItem(AttributeDefinition editedItem) {
+	public void setEditedItem(T editedItem) {
 		super.setEditedItem(editedItem);
 		if ( editedItem != null ) {
-			attributeDefaults = ((AttributeDefinitionFormObject<AttributeDefinition>) formObject).getAttributeDefaults();
+			attributeDefaults = ((AttributeDefinitionFormObject<T>) formObject).getAttributeDefaults();
 			tempFormObject.setField(ATTRIBUTE_DEFAULTS_FIELD, attributeDefaults);
 			
 			if ( formObject instanceof NumericAttributeDefinitionFormObject ) {

@@ -82,6 +82,9 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 			case RANGE:
 				formObject = new RangeAttributeDefinitionFormObject();
 				break;
+			case TAXON:
+				formObject = new TaxonAttributeDefinitionFormObject();
+				break;
 			case TEXT:
 				formObject = new TextAttributeDefinitionFormObject();
 				break;

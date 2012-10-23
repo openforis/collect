@@ -2,6 +2,7 @@ package org.openforis.collect.designer.form;
 
 import org.openforis.collect.designer.model.NamedObject;
 import org.zkoss.util.resource.Labels;
+import static org.openforis.collect.designer.model.Labels.*;
 
 /**
  * 
@@ -14,7 +15,7 @@ public abstract class FormObject<T> {
 	
 	{
 		//init static variables
-		String emptyOptionLabel = Labels.getLabel("global.empty_option");
+		String emptyOptionLabel = Labels.getLabel(EMPTY_OPTION);
 		VERSION_EMPTY_SELECTION = new NamedObject(emptyOptionLabel);
 	}
 	
