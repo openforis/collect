@@ -131,14 +131,14 @@ public class SchemaTreeModel extends DefaultTreeModel<NodeDefinition> {
 			treeNode = new NodeDefinitionTreeNode((AttributeDefinition) item);
 		}
 		int[] selectionPath = getSelectionPath();
+		TreeNode<NodeDefinition> parentNode;
 		if ( selectionPath == null || item.getParentDefinition() == null ) {
-			TreeNode<NodeDefinition> root = getRoot();
-			root.add(treeNode);
+			parentNode = getRoot();
 		} else {
-			TreeNode<NodeDefinition> selectedTreeNode = getChild(selectionPath);
-			selectedTreeNode.add(treeNode);
+			parentNode = getChild(selectionPath);
 		}
-		addOpenObject(treeNode.getParent());
+		parentNode.add(treeNode);
+		addOpenObject(parentNode);
 		setSelection(Arrays.asList(treeNode));
 	}
 	
