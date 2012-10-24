@@ -21,15 +21,10 @@
 				        		vflex="true">
 				        	<listhead>
 								<listheader label="" width="150px" />
-								<listheader label="" width="50px" />
 							</listhead>
 				            <template name="model">
 				                <listitem>
 				                    <listcell label="@load(each.name)" />
-				                    <listcell>
-				                    	<button image="/assets/images/cross-small.png"
-				                     		onClick="@command('deleteItem', item=each)" />
-				                    </listcell>
 				                </listitem>
 				            </template>
 				        </listbox>
@@ -44,6 +39,9 @@
 				        	<toolbarbutton image="/assets/images/arrow-down.png"
 									disabled="@load(vm.moveSelectedItemDownDisabled)" 
 						        	onClick="@command('moveSelectedItemDown')" />
+                            <toolbarbutton label="${labels.global.delete_item}"
+                                      disabled="@load(empty vm.selectedItem)" 
+                                      onClick="@command('deleteItem', item=vm.selectedItem)" />
 				        </toolbar>
 					</south>
 			    </borderlayout>

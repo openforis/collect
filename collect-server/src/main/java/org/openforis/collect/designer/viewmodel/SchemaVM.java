@@ -471,8 +471,10 @@ public class SchemaVM extends SurveyBaseVM {
 	
 	@GlobalCommand
 	public void openUnitsManagerPopUp() {
-		dispatchCurrentFormValidatedCommand(true);
-		unitsPopUp = openPopUp(Resources.Component.UNITS_MANAGER_POP_UP.getLocation(), true);
+		if ( unitsPopUp == null ) {
+			dispatchCurrentFormValidatedCommand(true);
+			unitsPopUp = openPopUp(Resources.Component.UNITS_MANAGER_POP_UP.getLocation(), true);
+		}
 	}
 	
 	@GlobalCommand

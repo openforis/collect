@@ -20,19 +20,20 @@
 			        	width="100%">
 			        	<listhead>
 							<listheader label="" width="100%" />
-							<listheader label="" width="50px" />
 						</listhead>
 			            <template name="model">
 			                <listitem>
 			                    <listcell label="@load(each.name)" />
-			                    <listcell>
-			                    	<button image="/assets/images/cross-small.png"
-			                     		onClick="@command('deleteItem', item=each)" />
-			                    </listcell>
 			                </listitem>
 			            </template>
 			        </listbox>
-			        <button label="${labels.global.add_item}" onClick="@command('newItem')" />
+                    <menubar>
+    			      <menuitem label="${labels.global.add_item}" 
+                          onClick="@command('newItem')" />
+                      <menuitem label="${labels.global.delete_item}"
+                          disabled="@load(empty vm.selectedItem)"
+                          onClick="@command('deleteItem', item=vm.selectedItem)" />
+                    </menubar>
 			    </vlayout>
 			</west>
 		    <center>
