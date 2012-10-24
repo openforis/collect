@@ -43,7 +43,7 @@ public class NodeDefinitionFormValidator extends FormValidator {
 	protected boolean validateNameUniqueness(ValidationContext ctx) {
 		NodeDefinition editedNode = getEditedNode(ctx);
 		String name = (String) getValue(ctx, NAME_FIELD);
-		if (!isNameUnique(editedNode, name)) {
+		if (!isNameUnique(ctx, editedNode, name)) {
 			String message = Labels.getLabel(NODE_NAME_ALREADY_DEFINED_MESSAGE_KEY);
 			this.addInvalidMessage(ctx, NAME_FIELD, message);
 			return false;
@@ -52,16 +52,8 @@ public class NodeDefinitionFormValidator extends FormValidator {
 		}
 	}
 
-	protected boolean isNameUnique(NodeDefinition editedNode, String name) {
-		if (existsHomonymousSibling(editedNode, name)) {
-			return false;
-		} else {
-			return true;
-		}
-	}
-
-	protected boolean existsHomonymousSibling(NodeDefinition defn, String name) {
-		EntityDefinition parentDefn = (EntityDefinition) defn.getParentDefinition();
+	protected boolean isNameUnique(ValidationContext ctx, NodeDefinition defn, String name) {
+		EntityDefinition parentDefn = getParentEntity(ctx);
 		NodeDefinition nodeInPath = null;
 		try {
 			if (parentDefn != null) {
@@ -73,7 +65,7 @@ public class NodeDefinitionFormValidator extends FormValidator {
 		} catch ( IllegalArgumentException e ) {
 			//sibling not found
 		}
-		return nodeInPath != null && nodeInPath.getId() != defn.getId();
+		return nodeInPath == null || nodeInPath.getId() == defn.getId();
 	}
 
 	protected void validateDescription(ValidationContext ctx) {
@@ -96,12 +88,16 @@ public class NodeDefinitionFormValidator extends FormValidator {
 		if (vmObject instanceof SchemaVM) {
 			editedNode = ((SchemaVM) vmObject).getEditedNode();
 		} else if ( vmObject instanceof AttributeVM) {
-			editedNode = ((AttributeVM) vmObject).getEditedItem();
+			editedNode = ((AttributeVM<?>) vmObject).getEditedItem();
 		} else {
 			throw new IllegalArgumentException("Unsupported View Model Type: " +
 					vmObject.getClass().getName());
 		}
 		return editedNode;
+	}
+
+	protected EntityDefinition getParentEntity(ValidationContext ctx) {
+		return (EntityDefinition) ctx.getValidatorArg("parentEntity");
 	}
 
 }

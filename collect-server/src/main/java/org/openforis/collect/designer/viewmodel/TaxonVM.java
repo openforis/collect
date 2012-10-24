@@ -3,20 +3,20 @@
  */
 package org.openforis.collect.designer.viewmodel;
 
-import static org.openforis.collect.designer.model.Labels.EMPTY_OPTION;
+import static org.openforis.collect.designer.model.LabelKeys.DUPLICATED_QUALIFIER;
+import static org.openforis.collect.designer.model.LabelKeys.EMPTY_OPTION;
+import static org.openforis.collect.designer.model.LabelKeys.RANK_PREFIX;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.openforis.collect.designer.form.TaxonAttributeDefinitionFormObject;
+import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.idm.metamodel.TaxonAttributeDefinition;
-import org.zkoss.bind.annotation.AfterCompose;
-import org.zkoss.bind.annotation.ContextParam;
-import org.zkoss.bind.annotation.ContextType;
-import org.zkoss.bind.annotation.ExecutionArgParam;
-import org.zkoss.bind.annotation.Init;
+import org.zkoss.bind.annotation.BindingParam;
+import org.zkoss.bind.annotation.Command;
+import org.zkoss.bind.annotation.NotifyChange;
 import org.zkoss.util.resource.Labels;
-import org.zkoss.zk.ui.Component;
 
 /**
  * @author S. Ricci
@@ -24,7 +24,6 @@ import org.zkoss.zk.ui.Component;
  */
 public class TaxonVM extends AttributeVM<TaxonAttributeDefinition> {
 
-	private static final String RANK_LABEL_KEY_PREFIX = "survey.schema.attribute.taxon.rank.";
 	private static final String QUALIFIERS_FIELD = "qualifiers";
 	
 	public enum Rank {
@@ -34,21 +33,44 @@ public class TaxonVM extends AttributeVM<TaxonAttributeDefinition> {
 	private List<String> qualifiers;
 	private String selectedQualifier;
 
-	@AfterCompose
-	@Override
-	public void afterCompose(@ContextParam(ContextType.VIEW) Component view) {
-		//necessary because of not inheritance of AfterCompose behaviour
-		super.afterCompose(view);
+	@Command
+	@NotifyChange("qualifiers")
+	public void addQualifier() {
+		if ( qualifiers == null ) {
+			initQualifiersList();
+		}
+		if ( qualifiers.contains("") ) {
+			MessageUtil.showWarning(DUPLICATED_QUALIFIER);
+		} else {
+			qualifiers.add("");
+		}
 	}
 	
-	@Init(superclass=false)
-	@Override
-	public void init(@ExecutionArgParam("item") TaxonAttributeDefinition attributeDefn, 
-			@ExecutionArgParam("newItem") Boolean newItem) {
-		super.init(attributeDefn, newItem);
+	@Command
+	@NotifyChange({"selectedQualifier","qualifiers"})
+	public void updateQualifier(@BindingParam("text") String text) {
+		int index = qualifiers.indexOf(selectedQualifier);
+		if ( qualifiers.contains(text) && ! selectedQualifier.equals(text) ) {
+			MessageUtil.showWarning(DUPLICATED_QUALIFIER);
+		} else {
+			qualifiers.set(index, text);
+		}
 	}
 	
-	protected void initAttributeDefaultsList() {
+	@Command
+	@NotifyChange({"selectedQualifier","qualifiers"})
+	public void deleteQualifier() {
+		qualifiers.remove(selectedQualifier);
+		selectedQualifier = null;
+	}
+	
+	@Command
+	@NotifyChange("selectedQualifier")
+	public void selectQualifier(@BindingParam("qualifier") String qualifier) {
+		selectedQualifier = qualifier;
+	}
+	
+	protected void initQualifiersList() {
 		if ( qualifiers == null ) {
 			qualifiers = new ArrayList<String>();
 			tempFormObject.setField(QUALIFIERS_FIELD, qualifiers);
@@ -65,23 +87,23 @@ public class TaxonVM extends AttributeVM<TaxonAttributeDefinition> {
 		}
 	}
 	
-	public List<String> getQualifiers() {
-		return qualifiers;
-	}
-
 	public List<String> getRanks() {
 		List<String> result = new ArrayList<String>();
 		String emptyOption = Labels.getLabel(EMPTY_OPTION);
 		result.add(emptyOption);
 		Rank[] ranks = Rank.values();
 		for (Rank rank : ranks) {
-			String labelKey = RANK_LABEL_KEY_PREFIX + rank.name().toLowerCase();
+			String labelKey = RANK_PREFIX + rank.name().toLowerCase();
 			String label = Labels.getLabel(labelKey);
 			result.add(label);
 		}
 		return result;
 	}
 	
+	public List<String> getQualifiers() {
+		return qualifiers;
+	}
+
 	public String getSelectedQualifier() {
 		return selectedQualifier;
 	}

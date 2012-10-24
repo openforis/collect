@@ -2,7 +2,7 @@ package org.openforis.collect.designer.form;
 
 import org.openforis.collect.designer.model.NamedObject;
 import org.zkoss.util.resource.Labels;
-import static org.openforis.collect.designer.model.Labels.*;
+import static org.openforis.collect.designer.model.LabelKeys.*;
 
 /**
  * 

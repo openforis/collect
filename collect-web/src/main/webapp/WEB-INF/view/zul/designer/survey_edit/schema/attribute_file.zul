@@ -1,5 +1,6 @@
 <?component name="fieldErrorHandler" class="org.openforis.collect.designer.component.FieldErrorHandler"?>
 <zk>
+    <custom-attributes parentEntity="${arg.parentEntity}"/>
 	<vlayout 
 		id="nodeFormContainer"
 		apply="org.zkoss.bind.BindComposer"
@@ -9,7 +10,7 @@
 			@init(vm.tempFormObject)
 			@load(vm.formObject) 
 			@save(vm.formObject, before='applyChanges')
-			@validator('org.openforis.collect.designer.form.validator.AttributeDefinitionFormValidator')">
+			@validator('org.openforis.collect.designer.form.validator.AttributeDefinitionFormValidator', parentEntity=parentEntity)">
 		
 		<include src="survey_edit/schema/attribute_common.zul" />
 		

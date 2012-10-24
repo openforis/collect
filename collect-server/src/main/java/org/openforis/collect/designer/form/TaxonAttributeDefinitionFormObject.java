@@ -3,6 +3,7 @@
  */
 package org.openforis.collect.designer.form;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.openforis.idm.metamodel.TaxonAttributeDefinition;
@@ -22,7 +23,7 @@ public class TaxonAttributeDefinitionFormObject extends AttributeDefinitionFormO
 		super.loadFrom(source, languageCode);
 		taxonomy = source.getTaxonomy();
 		highestRank = source.getHighestRank();
-		qualifiers = source.getQualifiers();
+		qualifiers = new ArrayList<String>(source.getQualifiers());
 	}
 	
 	@Override

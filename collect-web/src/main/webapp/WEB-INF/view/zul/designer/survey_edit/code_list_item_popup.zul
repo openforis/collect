@@ -58,7 +58,6 @@
 	            </row>
 	            <row>
 					<label value="${labels.global.item.deprecated_version}:" />
-					<cell>
                     <fieldErrorHandler message="@load(vmsgs['deprecatedVersion'])">
 						<listbox width="150px"
 		                    model="@load(vm.versionsForCombo)" 

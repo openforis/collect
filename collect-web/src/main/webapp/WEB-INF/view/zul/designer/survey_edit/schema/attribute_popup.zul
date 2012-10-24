@@ -5,8 +5,7 @@
 		border="normal"
 		position="center" 
 		closable="false"
-		apply="org.zkoss.bind.BindComposer"
-		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.DefaultAttributeVM')">
+		apply="org.zkoss.bind.BindComposer">
     
         <borderlayout>
           <center>

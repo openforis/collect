@@ -1,15 +1,16 @@
 <?component name="fieldErrorHandler" class="org.openforis.collect.designer.component.FieldErrorHandler"?>
 <zk>
+    <custom-attributes parentEntity="${arg.parentEntity}"/>
 	<vlayout 
 		id="nodeFormContainer"
-		apply="org.zkoss.bind.BindComposer"
-		viewModel="@id('vm') @init(vm)"
 		validationMessages="@id('vmsgs')"
+        apply="org.zkoss.bind.BindComposer"
+        viewModel="@id('vm') @init(vm)"
 		form="@id('fx')
 			@init(vm.tempFormObject)
 			@load(vm.formObject) 
 			@save(vm.formObject, before='applyChanges')
-			@validator('org.openforis.collect.designer.form.validator.AttributeDefinitionFormValidator')">
+			@validator('org.openforis.collect.designer.form.validator.AttributeDefinitionFormValidator', parentEntity=parentEntity)">
 		
 		<include src="survey_edit/schema/attribute_common.zul" />
 		
@@ -32,32 +33,35 @@
                             selectedItem="@bind(fx.highestRank)" mold="select"
                             onSelect="@command('applyChanges')">
                         </listbox>
-<!-- 						<radiogroup selectedItem="@bind(fx.highestRank)" onCheck="@command('applyChanges')"> -->
-<!--                           <radio value="FAMILY"  -->
-<!--                             label="${labels.survey.schema.attribute.taxon.rank.family}" /> -->
-<!--                           <radio value="GENUS"  -->
-<!--                             label="${labels.survey.schema.attribute.taxon.rank.genus}" /> -->
-<!--                           <radio value="SPECIES"  -->
-<!--                             label="${labels.survey.schema.attribute.taxon.rank.species}" /> -->
-<!--                         </radiogroup> -->
                     </fieldErrorHandler>
 				</row>
                 <row>
-                  <listbox id="qualifiersList" 
-                        model="@load(vm.qualifiers)"
-                        selectedItem="@bind(vm.selectedQualifier)">
-                       <listhead visible="false">
-                          <listheader label="" width="200px" />
-                        </listhead>
-                       <template name="model">
-                        <listitem>
-                          <listcell>
-                              <textbox inplace="true" value="@bind(each.value)" width="99%"
-                                onFocus="@command('selectQualifier', qualifier=each)" />
-                          </listcell>
-                        </listitem>
-                    </template>
-                </listbox>
+                  <label value="${labels.survey.schema.attribute.taxon.qualifiers}:" />
+                  <vlayout>
+                    <listbox id="qualifiersList" 
+                          model="@load(vm.qualifiers)"
+                          selectedItem="@bind(vm.selectedQualifier)">
+                         <listhead visible="false">
+                            <listheader label="" width="200px" />
+                          </listhead>
+                         <template name="model">
+                          <listitem>
+                            <listcell>
+                                <textbox inplace="true" value="@load(each)" width="99%"
+                                  onChange="@command('updateQualifier', text=self.value)"
+                                  onFocus="@command('selectQualifier', qualifier=each)" />
+                            </listcell>
+                          </listitem>
+                      </template>
+                    </listbox>
+                    <menubar>
+                      <menuitem label="${labels.global.add_item}"
+                          onClick="@command('addQualifier')" />
+                      <menuitem label="${labels.global.delete_item}"
+                          disabled="@load(vm.selectedQualifier eq null)"
+                          onClick="@command('deleteQualifier')" />
+                    </menubar>
+                  </vlayout>
               </row>
 			</rows>
 		</grid>

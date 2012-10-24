@@ -11,6 +11,7 @@ import org.openforis.collect.designer.form.SurveyObjectFormObject;
 import org.openforis.collect.designer.model.AttributeType;
 import org.openforis.idm.metamodel.AttributeDefault;
 import org.openforis.idm.metamodel.AttributeDefinition;
+import org.openforis.idm.metamodel.EntityDefinition;
 import org.zkoss.bind.Binder;
 import org.zkoss.bind.Form;
 import org.zkoss.bind.SimpleForm;
@@ -18,8 +19,6 @@ import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.ContextParam;
 import org.zkoss.bind.annotation.ContextType;
-import org.zkoss.bind.annotation.ExecutionArgParam;
-import org.zkoss.bind.annotation.Init;
 import org.zkoss.bind.annotation.NotifyChange;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.IdSpace;
@@ -39,6 +38,7 @@ public abstract class AttributeVM<T extends AttributeDefinition> extends SurveyO
 	private static final String ATTRIBUTE_DEFAULTS_FIELD = "attributeDefaults";
 	private static final String NUMBER_ATTRIBUTE_PRECISIONS_FIELD = "precisions";
 	
+	private EntityDefinition parentEntity;
 	protected Form tempFormObject;
 	protected List<AttributeDefault> attributeDefaults;
 	protected List<PrecisionFormObject> numericAttributePrecisions;
@@ -54,10 +54,9 @@ public abstract class AttributeVM<T extends AttributeDefinition> extends SurveyO
 		 refreshNodeForm();
 	}
 	
-	@Init
-	public void init(@ExecutionArgParam("item") T attributeDefn, 
-			@ExecutionArgParam("newItem") Boolean newItem) {
+	public void init(EntityDefinition parentEntity, T attributeDefn, Boolean newItem) {
 		if ( attributeDefn != null ) {
+			this.parentEntity = parentEntity;
 			this.newItem = newItem;
 			setEditedItem(attributeDefn);
 		}
@@ -65,7 +64,11 @@ public abstract class AttributeVM<T extends AttributeDefinition> extends SurveyO
 	
 	protected void refreshNodeForm() {
 		String type = getAttributeType();
-		attributeDetailsInclude.setSrc("survey_edit/schema/attribute_" + type + ".zul");
+		String detailUrl = "survey_edit/schema/attribute_" + type + ".zul";
+		attributeDetailsInclude.setDynamicProperty("parentEntity", parentEntity);
+		attributeDetailsInclude.setDynamicProperty("newItem", newItem);
+		attributeDetailsInclude.setDynamicProperty("item", editedItem);
+		attributeDetailsInclude.setSrc(detailUrl);
 		validateForm();
 	}
 

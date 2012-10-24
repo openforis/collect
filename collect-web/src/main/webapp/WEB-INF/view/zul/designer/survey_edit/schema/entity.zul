@@ -1,5 +1,6 @@
 <?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
 <zk>
+    <custom-attributes parentEntity="${arg.parentEntity}"/>
 	<vlayout
 		id="nodeFormContainer"
 		apply="org.zkoss.bind.BindComposer"
@@ -9,7 +10,7 @@
 			@init(vm.tempFormObject)
 			@load(vm.formObject) 
 			@save(vm.formObject, before='applyChanges')
-			@validator('org.openforis.collect.designer.form.validator.NodeDefinitionFormValidator')">
+			@validator('org.openforis.collect.designer.form.validator.NodeDefinitionFormValidator', parentEntity=parentEntity)">
 		
 		<include src="survey_edit/schema/node_common.zul" />
 

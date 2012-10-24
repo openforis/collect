@@ -24,6 +24,8 @@ import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NodeLabel.Type;
 import org.openforis.idm.metamodel.Schema;
+import org.openforis.idm.metamodel.TaxonAttributeDefinition;
+import org.zkoss.bind.AnnotateBinder;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.Binder;
 import org.zkoss.bind.Form;
@@ -108,7 +110,8 @@ public class SchemaVM extends SurveyBaseVM {
 		}
 		newItem = false;
 		initFormObject(selectedNode);
-		refreshNodeForm();
+		EntityDefinition parentEntity = (EntityDefinition) (editedNode != null ? editedNode.getParentDefinition(): null);
+		refreshNodeForm(parentEntity);
 	}
 	
 	@Command
@@ -118,7 +121,7 @@ public class SchemaVM extends SurveyBaseVM {
 			parentEntity = null;
 			initFormObject();
 			EntityDefinition newNode = createRootEntityDefinition();
-			onAfterNodeCreated(binder, newNode);
+			onAfterNodeCreated(binder, null, newNode);
 		}
 	}
 
@@ -129,7 +132,7 @@ public class SchemaVM extends SurveyBaseVM {
 			parentEntity = selectedNode;
 			initFormObject();
 			EntityDefinition newNode = createEntityDefinition();
-			onAfterNodeCreated(binder, newNode);
+			onAfterNodeCreated(binder, parentEntity, newNode);
 		}
 	}
 	
@@ -137,14 +140,13 @@ public class SchemaVM extends SurveyBaseVM {
 	public void addAttribute(@ContextParam(ContextType.BINDER) Binder binder, @BindingParam("attributeType") String attributeType) throws Exception {
 		if ( checkCurrentFormValid() ) {
 			if ( selectedNode != null && selectedNode instanceof EntityDefinition ) {
-				newItem = true;
+				editingNewAttribute = true;
 				parentEntity = (EntityDefinition) selectedNode;
 				initFormObject();
 				
 				AttributeType attributeTypeEnum = attributeType != null ? AttributeType.valueOf(attributeType): null;
 				
 				editedAttribute = (AttributeDefinition) NodeType.createNodeDefinition(survey, NodeType.ATTRIBUTE, attributeTypeEnum );
-				editingNewAttribute = true;
 				openAttributeEditPopUp();
 //				( (EntityDefinition) selectedNode).addChildDefinition(newNode);
 			} else {
@@ -162,34 +164,55 @@ public class SchemaVM extends SurveyBaseVM {
 	
 	@GlobalCommand
 	public void applyChangesToEditedAttribute() {
-		if ( checkCurrentFormValid() ) {
+		if ( editedAttribute != null && checkCurrentFormValid() ) {
 			performCommitChangesOnEditedAttribute();
 		}
 	}
+	
 
 	protected void performCommitChangesOnEditedAttribute() {
 		Binder binder = (Binder) attributePopUp.getAttribute("binder");
-		AttributeVM viewModel = (AttributeVM) binder.getViewModel();
+		AttributeVM<?> viewModel = (AttributeVM<?>) binder.getViewModel();
 		viewModel.commitChanges();
+		if ( editingNewAttribute ) {
+			editedNode.addChildDefinition(editedAttribute);
+		}
 		closeAttributeEditPopUp();
+		editedAttribute = null;
 		notifyChange("childAttributes");
 	}
 	
 	@GlobalCommand
 	public void cancelChangesToEditedAttribute() {
 		//TODO confirm if there are not committed changes 
-		if ( editingNewAttribute ) {
-			Schema schema = editedAttribute.getSchema();
-			schema.detach(editedAttribute);
+		if ( editedAttribute != null ) {
+			if ( editingNewAttribute ) {
+				Schema schema = editedAttribute.getSchema();
+				schema.detach(editedAttribute);
+			}
+			closeAttributeEditPopUp();
+			editedAttribute = null;
 		}
-		closeAttributeEditPopUp();
 	}
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	protected void openAttributeEditPopUp() {
 		Map<String, Object> args = new HashMap<String, Object>();
+		args.put("parentEntity", editedNode);
 		args.put("newItem", editingNewAttribute);
 		args.put("item", editedAttribute);
 		attributePopUp = openPopUp(Resources.Component.ATTRIBUTE_POPUP.getLocation(), true, args);
+		AttributeVM viewModel;
+		if ( editedAttribute instanceof TaxonAttributeDefinition ) {
+			viewModel = new TaxonVM();
+		} else {
+			viewModel = new DefaultAttributeVM();
+		}
+		Binder binder = new AnnotateBinder();
+		binder.init(attributePopUp, viewModel, args);
+		viewModel.init(editedNode, editedAttribute, editingNewAttribute);
+		attributePopUp.setAttribute("vm", viewModel);
+		viewModel.afterCompose(attributePopUp);
 	}
 	
 	protected void closeAttributeEditPopUp() {
@@ -198,22 +221,25 @@ public class SchemaVM extends SurveyBaseVM {
 		validateForm();
 	}
 	
-	protected void onAfterNodeCreated(Binder binder, EntityDefinition newNode) {
+	protected void onAfterNodeCreated(Binder binder, EntityDefinition parentEntity, EntityDefinition newNode) {
 		editedNode = newNode;
 		selectedNode = null;
 		selectedAttribute = null;
 		treeModel.select(null);
 		
-		refreshNodeForm();
+		refreshNodeForm(parentEntity);
 		
 		notifyChange("nodes","selectedNode","editedNode");
 
 		validateForm(binder);
 	}
 	
-	protected void refreshNodeForm() {
+	protected void refreshNodeForm(EntityDefinition parentEntity) {
 		nodeFormInclude.setSrc(null);
-		nodeFormInclude.setSrc(Resources.Component.ENTITY.getLocation());
+		if ( editedNode != null ) {
+			nodeFormInclude.setDynamicProperty("parentEntity", parentEntity);
+			nodeFormInclude.setSrc(Resources.Component.ENTITY.getLocation());
+		}
 	}
 	
 	protected void validateForm() {
@@ -419,7 +445,7 @@ public class SchemaVM extends SurveyBaseVM {
 
 	@GlobalCommand
 	public void closeVersioningManagerPopUp() {
-		if ( checkCurrentFormValid() ) {
+		if ( versioningPopUp != null && checkCurrentFormValid() ) {
 			closePopUp(versioningPopUp);
 			versioningPopUp = null;
 			validateForm();
@@ -428,13 +454,15 @@ public class SchemaVM extends SurveyBaseVM {
 	
 	@GlobalCommand
 	public void openCodeListsManagerPopUp() {
-		dispatchCurrentFormValidatedCommand(true);
-		codeListsPopUp = openPopUp(Resources.Component.CODE_LISTS_POPUP.getLocation(), true);
+		if ( codeListsPopUp == null ) { 
+			dispatchCurrentFormValidatedCommand(true);
+			codeListsPopUp = openPopUp(Resources.Component.CODE_LISTS_POPUP.getLocation(), true);
+		}
 	}
 
 	@GlobalCommand
 	public void closeCodeListsManagerPopUp() {
-		if ( checkCurrentFormValid() ) {
+		if ( codeListsPopUp != null && checkCurrentFormValid() ) {
 			closePopUp(codeListsPopUp);
 			codeListsPopUp = null;
 			validateForm();
@@ -449,7 +477,7 @@ public class SchemaVM extends SurveyBaseVM {
 	
 	@GlobalCommand
 	public void closeUnitsManagerPopUp() {
-		if ( checkCurrentFormValid() ) {
+		if ( unitsPopUp != null && checkCurrentFormValid() ) {
 			closePopUp(unitsPopUp);
 			unitsPopUp = null;
 			validateForm();

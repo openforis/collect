@@ -127,7 +127,7 @@
 							</rows>
 						</grid>
 					</center>
-					<south height="240px" border="none">
+					<south height="230px" border="none">
 						<borderlayout>
 							<center>
 								<hlayout children="@load(vm.listLevels)" hflex="true" style="overflow: auto;">
