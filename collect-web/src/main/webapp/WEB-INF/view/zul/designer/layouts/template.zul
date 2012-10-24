@@ -1,26 +1,30 @@
 <?page docType="html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd""?>
 <zk>
 	<style src="/assets/designer_style.css" />
-	<borderlayout hflex="1" vflex="1">
-		<north height="102px">
-			<div id="header" sclass="header">
-				<image src="/assets/images/designer-header.jpg" />
-			</div>
-		</north>
-		<center>
-			<vlayout hflex="1" vflex="1">
-				<div self="@{insert(content_title)}" sclass="content_title"
-					hflex="1">${contentTitle}</div>
-				<div self="@{insert(content)}" sclass="content" 
-					hflex="1" vflex="1"></div>
-			</vlayout>
-		</center>
-		<south height="30px">
-			<div id="footer" sclass="footer">
-				<image src="/assets/images/designer-footer.jpg" />
-			</div>
-		</south>
-	</borderlayout>
+    <div align="center" hflex="1" vflex="1">
+        <div width="960px" vflex="1" align="left">
+        	<borderlayout hflex="1" vflex="1">
+        		<north height="102px" border="none">
+        			<div id="header" sclass="header">
+        				<image src="/assets/images/designer-header.jpg" />
+        			</div>
+        		</north>
+        		<center border="none">
+        			<vlayout hflex="1" vflex="1">
+        				<div self="@{insert(content_title)}" sclass="content_title"
+        					hflex="1">${contentTitle}</div>
+        				<div self="@{insert(content)}" sclass="content" 
+        					hflex="1" vflex="1"></div>
+        			</vlayout>
+        		</center>
+        		<south height="30px" border="none">
+        			<div id="footer" sclass="footer">
+        				<image src="/assets/images/designer-footer.jpg" />
+        			</div>
+        		</south>
+        	</borderlayout>
+        </div>
+    </div>
 	
 	<!-- session keep alive timer -->
 	<timer id="timerKeepAliveSession" repeats="true" delay="30000"
