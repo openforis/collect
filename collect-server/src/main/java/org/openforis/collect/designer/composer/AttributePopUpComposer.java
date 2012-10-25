@@ -1,26 +1,26 @@
 /**
  * 
  */
-package org.openforis.collect.designer.viewmodel;
+package org.openforis.collect.designer.composer;
 
 import org.openforis.collect.designer.model.AttributeType;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
-import org.zkoss.bind.annotation.AfterCompose;
-import org.zkoss.bind.annotation.ContextParam;
-import org.zkoss.bind.annotation.ContextType;
+import org.zkoss.bind.BindComposer;
 import org.zkoss.bind.annotation.ExecutionArgParam;
 import org.zkoss.bind.annotation.Init;
-import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.select.Selectors;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zul.Include;
+import org.zkoss.zul.Window;
 
 /**
  * @author S. Ricci
  *
  */
-public class AttributePopUpVM extends BaseVM {
+public class AttributePopUpComposer extends BindComposer<Window> {
+
+	private static final long serialVersionUID = 1L;
 
 	@Wire
 	private Include attributeDetailsInclude;
@@ -29,13 +29,13 @@ public class AttributePopUpVM extends BaseVM {
 	private Boolean newItem;
 	private AttributeDefinition item;
 	
-	@AfterCompose
-	public void afterCompose(@ContextParam(ContextType.VIEW) Component view){
-		 Selectors.wireComponents(view, this, false);
-		 Selectors.wireEventListeners(view, this);
-		 refreshNodeForm();
+	@Override
+	public void doAfterCompose(Window comp) throws Exception {
+		super.doAfterCompose(comp);
+		Selectors.wireComponents(comp, this, false);
+		refreshNodeForm();
 	}
-
+	
 	@Init
 	public void init(@ExecutionArgParam("parentEntity") EntityDefinition parentEntity,
 			@ExecutionArgParam("item") AttributeDefinition item, 
