@@ -5,7 +5,7 @@
 		id="nodeFormContainer"
 		validationMessages="@id('vmsgs')"
         apply="org.zkoss.bind.BindComposer"
-        viewModel="@id('vm') @init(vm)"
+		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.TaxonAttributeVM')"
 		form="@id('fx')
 			@init(vm.tempFormObject)
 			@load(vm.formObject) 

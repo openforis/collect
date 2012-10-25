@@ -22,7 +22,7 @@ import org.zkoss.util.resource.Labels;
  * @author S. Ricci
  *
  */
-public class TaxonVM extends AttributeVM<TaxonAttributeDefinition> {
+public class TaxonAttributeVM extends AttributeVM<TaxonAttributeDefinition> {
 
 	private static final String QUALIFIERS_FIELD = "qualifiers";
 	

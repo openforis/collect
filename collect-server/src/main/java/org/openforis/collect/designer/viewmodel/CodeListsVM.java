@@ -17,6 +17,7 @@ import org.openforis.collect.designer.util.MessageUtil.ConfirmHandler;
 import org.openforis.collect.designer.util.Resources;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.CodeList;
+import org.openforis.idm.metamodel.CodeList.CodeScope;
 import org.openforis.idm.metamodel.CodeListItem;
 import org.openforis.idm.metamodel.CodeListLevel;
 import org.zkoss.bind.Binder;
@@ -115,6 +116,10 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 		case FLAT:
 			if ( levels.size() == 1 ) {
 				editedItem.removeLevel(0);
+				CodeScope scope = CodeScope.SCHEME;
+				editedItem.setCodeScope(scope);
+				((CodeListFormObject) formObject).setCodeScope(scope.name());
+				notifyChange("formObject");
 			}
 			break;
 		}

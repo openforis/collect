@@ -58,8 +58,9 @@ public abstract class BaseVM {
 	
 	protected void closePopUp(Window popUp) {
 		if ( popUp != null ) {
-			Event event = new Event("onClose", popUp, null);
-			Events.postEvent(event);
+			popUp.detach();
+//			Event event = new Event("onClose", popUp, null);
+//			Events.postEvent(event);
 		}
 	}
 	

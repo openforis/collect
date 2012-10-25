@@ -20,6 +20,7 @@ import org.openforis.collect.metamodel.ui.UITab;
 import org.openforis.collect.metamodel.ui.UITabSet;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.AttributeDefinition;
+import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NodeLabel.Type;
@@ -85,8 +86,6 @@ public class SchemaVM extends SurveyBaseVM {
 	
 	//popups
 	private Window attributePopUp;
-	private Window unitsPopUp;
-	private Window codeListsPopUp;
 	private Window versioningPopUp;
 
 	@AfterCompose
@@ -171,7 +170,9 @@ public class SchemaVM extends SurveyBaseVM {
 	
 
 	protected void performCommitChangesOnEditedAttribute() {
-		Binder binder = (Binder) attributePopUp.getAttribute("binder");
+		IdSpace popUpIdSpace = attributePopUp.getSpaceOwner();
+		Component formContainer = Path.getComponent(popUpIdSpace, "attributeDetailsInclude/nodeFormContainer");
+		Binder binder = (Binder) formContainer.getAttribute("binder");
 		AttributeVM<?> viewModel = (AttributeVM<?>) binder.getViewModel();
 		viewModel.commitChanges();
 		if ( editingNewAttribute ) {
@@ -195,24 +196,31 @@ public class SchemaVM extends SurveyBaseVM {
 		}
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
+//	@SuppressWarnings({ "unchecked", "rawtypes" })
 	protected void openAttributeEditPopUp() {
 		Map<String, Object> args = new HashMap<String, Object>();
 		args.put("parentEntity", editedNode);
 		args.put("newItem", editingNewAttribute);
 		args.put("item", editedAttribute);
 		attributePopUp = openPopUp(Resources.Component.ATTRIBUTE_POPUP.getLocation(), true, args);
-		AttributeVM viewModel;
-		if ( editedAttribute instanceof TaxonAttributeDefinition ) {
-			viewModel = new TaxonVM();
+//		AttributeVM viewModel = getAttributeViewModel(editedAttribute);
+//		Binder binder = new AnnotateBinder();
+//		binder.init(attributePopUp, viewModel, args);
+//		viewModel.init(editedNode, editedAttribute, editingNewAttribute);
+//		attributePopUp.setAttribute("vm", viewModel);
+//		viewModel.afterCompose(attributePopUp);
+	}
+
+	protected AttributeVM<?> getAttributeViewModel(AttributeDefinition attributeDefn) {
+		AttributeVM<?> viewModel;
+		if ( attributeDefn instanceof CodeAttributeDefinition ) {
+			viewModel = new CodeAttributeVM();
+		} else if ( attributeDefn instanceof TaxonAttributeDefinition ) {
+			viewModel = new TaxonAttributeVM();
 		} else {
 			viewModel = new DefaultAttributeVM();
 		}
-		Binder binder = new AnnotateBinder();
-		binder.init(attributePopUp, viewModel, args);
-		viewModel.init(editedNode, editedAttribute, editingNewAttribute);
-		attributePopUp.setAttribute("vm", viewModel);
-		viewModel.afterCompose(attributePopUp);
+		return viewModel;
 	}
 	
 	protected void closeAttributeEditPopUp() {
@@ -448,40 +456,6 @@ public class SchemaVM extends SurveyBaseVM {
 		if ( versioningPopUp != null && checkCurrentFormValid() ) {
 			closePopUp(versioningPopUp);
 			versioningPopUp = null;
-			validateForm();
-		}
-	}
-	
-	@GlobalCommand
-	public void openCodeListsManagerPopUp() {
-		if ( codeListsPopUp == null ) { 
-			dispatchCurrentFormValidatedCommand(true);
-			codeListsPopUp = openPopUp(Resources.Component.CODE_LISTS_POPUP.getLocation(), true);
-		}
-	}
-
-	@GlobalCommand
-	public void closeCodeListsManagerPopUp() {
-		if ( codeListsPopUp != null && checkCurrentFormValid() ) {
-			closePopUp(codeListsPopUp);
-			codeListsPopUp = null;
-			validateForm();
-		}
-	}
-	
-	@GlobalCommand
-	public void openUnitsManagerPopUp() {
-		if ( unitsPopUp == null ) {
-			dispatchCurrentFormValidatedCommand(true);
-			unitsPopUp = openPopUp(Resources.Component.UNITS_MANAGER_POP_UP.getLocation(), true);
-		}
-	}
-	
-	@GlobalCommand
-	public void closeUnitsManagerPopUp() {
-		if ( unitsPopUp != null && checkCurrentFormValid() ) {
-			closePopUp(unitsPopUp);
-			unitsPopUp = null;
 			validateForm();
 		}
 	}

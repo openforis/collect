@@ -2,7 +2,9 @@ package org.openforis.collect.designer.form;
 
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.openforis.idm.metamodel.CodeList;
+import org.openforis.idm.metamodel.CodeList.CodeScope;
 import org.openforis.idm.metamodel.CodeListLevel;
 
 /**
@@ -18,6 +20,7 @@ public class CodeListFormObject extends VersionableItemFormObject<CodeList> {
 	private String listLabel;
 	private String description;
 	private String type;
+	private String codeScope;
 	
 	public enum Type {
 		FLAT, HIERARCHICAL;
@@ -38,6 +41,8 @@ public class CodeListFormObject extends VersionableItemFormObject<CodeList> {
 		List<CodeListLevel> levels = source.getHierarchy();
 		boolean hasMultipleLevels = levels.size() > 1;
 		type = hasMultipleLevels ? Type.HIERARCHICAL.name(): Type.FLAT.name();
+		CodeScope codeScopeEnum = source.getCodeScope();
+		codeScope = codeScopeEnum != null ? codeScopeEnum.name(): CodeScope.SCHEME.name();
 	}
 	
 	@Override
@@ -48,6 +53,8 @@ public class CodeListFormObject extends VersionableItemFormObject<CodeList> {
 		dest.setLabel(org.openforis.idm.metamodel.CodeListLabel.Type.ITEM, languageCode, itemLabel);
 		dest.setLabel(org.openforis.idm.metamodel.CodeListLabel.Type.LIST, languageCode, listLabel);
 		dest.setDescription(languageCode, description);
+		CodeScope scope = StringUtils.isNotBlank(codeScope) ? CodeScope.valueOf(codeScope): null;
+		dest.setCodeScope(scope);
 	}
 
 	public String getName() {
@@ -96,6 +103,14 @@ public class CodeListFormObject extends VersionableItemFormObject<CodeList> {
 
 	public void setType(String type) {
 		this.type = type;
+	}
+
+	public String getCodeScope() {
+		return codeScope;
+	}
+
+	public void setCodeScope(String codeScope) {
+		this.codeScope = codeScope;
 	}
 
 	
