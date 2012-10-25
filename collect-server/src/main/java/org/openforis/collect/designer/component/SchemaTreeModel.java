@@ -14,7 +14,6 @@ import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Schema;
 import org.zkoss.zul.DefaultTreeModel;
 import org.zkoss.zul.DefaultTreeNode;
-import org.zkoss.zul.TreeNode;
 
 /**
  * 
@@ -26,12 +25,60 @@ public class SchemaTreeModel extends DefaultTreeModel<NodeDefinition> {
 	private static final long serialVersionUID = 1L;
 	
 	private boolean includeAttributes;
+	private ModelVersion version;
 
-	SchemaTreeModel(TreeNode<NodeDefinition> root, boolean includeAttributes) {
+	SchemaTreeModel(NodeDefinitionTreeNode root, ModelVersion version, boolean includeAttributes) {
 		super(root);
 		this.includeAttributes = includeAttributes;
+		this.version = version;
 	}
 	
+	public static SchemaTreeModel createInstance(CollectSurvey survey, boolean includeAttributes) {
+		return createInstance(survey, null, includeAttributes);
+	}
+	
+	public static SchemaTreeModel createInstance(CollectSurvey survey, ModelVersion version, boolean includeAttributes) {
+		Schema schema = survey.getSchema();
+		List<EntityDefinition> rootDefns = schema.getRootEntityDefinitions();
+		List<NodeDefinitionTreeNode> treeNodes = NodeDefinitionTreeNode.fromList(rootDefns, version, includeAttributes);
+		NodeDefinitionTreeNode root = new NodeDefinitionTreeNode(null, treeNodes);
+		SchemaTreeModel result = new SchemaTreeModel(root, version, includeAttributes);
+		return result;
+	}
+	
+	public void deselect() {
+		Collection<NodeDefinitionTreeNode> emptySelection = Collections.emptyList();
+		setSelection(emptySelection);
+	}
+
+	public void removeSelectedNode() {
+		int[] selectionPath = getSelectionPath();
+		NodeDefinitionTreeNode treeNode = (NodeDefinitionTreeNode) getChild(selectionPath);
+		NodeDefinitionTreeNode parentTreeNode = (NodeDefinitionTreeNode) treeNode.getParent();
+		parentTreeNode.remove(treeNode);
+	}
+	
+	public void appendNodeToSelected(NodeDefinition nodeDefn) {
+		int[] selectionPath = getSelectionPath();
+		NodeDefinitionTreeNode parentNode;
+		if ( selectionPath == null || nodeDefn.getParentDefinition() == null ) {
+			parentNode = (NodeDefinitionTreeNode) getRoot();
+		} else {
+			parentNode = (NodeDefinitionTreeNode) getChild(selectionPath);
+		}
+		NodeDefinitionTreeNode nodeToSelect;
+		if ( parentNode.isLeaf() ) {
+			parentNode = recreateNode(parentNode);
+			nodeToSelect = getNode(nodeDefn);
+		} else {
+			NodeDefinitionTreeNode newNode = NodeDefinitionTreeNode.createNode(nodeDefn, version, includeAttributes);
+			parentNode.add(newNode);
+			nodeToSelect = newNode;
+		}
+		addOpenObject(parentNode);
+		setSelection(Arrays.asList(nodeToSelect));
+	}
+
 	public void select(NodeDefinition defn) {
 		if ( defn != null ) {
 			NodeDefinitionTreeNode treeNode = getNode(defn);
@@ -42,7 +89,7 @@ public class SchemaTreeModel extends DefaultTreeModel<NodeDefinition> {
 		}
 	}
 	
-	public NodeDefinitionTreeNode getNode(NodeDefinition defn) {
+	protected NodeDefinitionTreeNode getNode(NodeDefinition defn) {
 		if ( defn != null ) {
 			int[] path = getPath(defn);
 			return (NodeDefinitionTreeNode) getChild(path);
@@ -51,7 +98,7 @@ public class SchemaTreeModel extends DefaultTreeModel<NodeDefinition> {
 		}
 	}
 	
-	public int[] getPath(NodeDefinition defn) {
+	protected int[] getPath(NodeDefinition defn) {
 		if ( defn != null ) {
 			EntityDefinition parent = (EntityDefinition) defn.getParentDefinition();
 			NodeDefinition current = defn;
@@ -98,54 +145,18 @@ public class SchemaTreeModel extends DefaultTreeModel<NodeDefinition> {
 		return result;
 	}
 	
-	public static SchemaTreeModel createInstance(CollectSurvey survey, boolean includeAttributes) {
-		return createInstance(survey, null, includeAttributes);
-	}
-	
-	public static SchemaTreeModel createInstance(CollectSurvey survey, ModelVersion version, boolean includeAttributes) {
-		Schema schema = survey.getSchema();
-		List<EntityDefinition> rootDefns = schema.getRootEntityDefinitions();
-		List<TreeNode<NodeDefinition>> treeNodes = NodeDefinitionTreeNode.fromList(rootDefns, version, includeAttributes);
-		TreeNode<NodeDefinition> root = new NodeDefinitionTreeNode(null, treeNodes);
-		SchemaTreeModel result = new SchemaTreeModel(root, includeAttributes);
-		return result;
-	}
-	
-	public void deselect() {
-		Collection<NodeDefinitionTreeNode> emptySelection = Collections.emptyList();
-		setSelection(emptySelection);
+	protected NodeDefinitionTreeNode recreateNode(NodeDefinitionTreeNode node) {
+		NodeDefinitionTreeNode parent = (NodeDefinitionTreeNode) node.getParent();
+		NodeDefinition data = node.getData();
+		NodeDefinitionTreeNode newNode = NodeDefinitionTreeNode.createNode(data, version, includeAttributes);
+		parent.replace(node, newNode);
+		return newNode;
 	}
 
-	public void removeSelectedNode() {
-		int[] selectionPath = getSelectionPath();
-		TreeNode<NodeDefinition> treeNode = getChild(selectionPath);
-		TreeNode<NodeDefinition> parentTreeNode = treeNode.getParent();
-		parentTreeNode.remove(treeNode);
-	}
-	
-	public void appendNodeToSelected(NodeDefinition item) {
-		NodeDefinitionTreeNode treeNode;
-		if ( item instanceof EntityDefinition ) {
-			treeNode = new NodeDefinitionTreeNode((EntityDefinition) item);
-		} else {
-			treeNode = new NodeDefinitionTreeNode((AttributeDefinition) item);
-		}
-		int[] selectionPath = getSelectionPath();
-		TreeNode<NodeDefinition> parentNode;
-		if ( selectionPath == null || item.getParentDefinition() == null ) {
-			parentNode = getRoot();
-		} else {
-			parentNode = getChild(selectionPath);
-		}
-		parentNode.add(treeNode);
-		addOpenObject(parentNode);
-		setSelection(Arrays.asList(treeNode));
-	}
-	
 	public void moveSelectedNode(int toIndex) {
 		int[] selectionPath = getSelectionPath();
 		NodeDefinitionTreeNode treeNode = (NodeDefinitionTreeNode) getChild(selectionPath);
-		TreeNode<NodeDefinition> parentTreeNode = treeNode.getParent();
+		NodeDefinitionTreeNode parentTreeNode = (NodeDefinitionTreeNode) treeNode.getParent();
 		parentTreeNode.remove(treeNode);
 		parentTreeNode.insert(treeNode, toIndex);
 		List<NodeDefinitionTreeNode> selection = Arrays.asList(treeNode);
@@ -156,33 +167,43 @@ public class SchemaTreeModel extends DefaultTreeModel<NodeDefinition> {
 		
 		private static final long serialVersionUID = 1L;
 		
-		public NodeDefinitionTreeNode(AttributeDefinition data) {
+		NodeDefinitionTreeNode(AttributeDefinition data) {
 			super(data);
 		}
 		
-		public NodeDefinitionTreeNode(EntityDefinition data, Collection<TreeNode<NodeDefinition>> children) {
+		NodeDefinitionTreeNode(EntityDefinition data) {
+			super(data);
+		}
+		
+		NodeDefinitionTreeNode(EntityDefinition data, Collection<NodeDefinitionTreeNode> children) {
 			super(data, children);
 		}
 		
-		public NodeDefinitionTreeNode(EntityDefinition data) {
-			super(data, new ArrayList<TreeNode<NodeDefinition>>());
+		public static NodeDefinitionTreeNode createNode(NodeDefinition item, ModelVersion version,
+				boolean includeAttributes) {
+			NodeDefinitionTreeNode node = null;
+			if ( item instanceof EntityDefinition ) {
+				List<NodeDefinition> childDefns = ((EntityDefinition) item).getChildDefinitions();
+				List<NodeDefinitionTreeNode> childNodes = fromList(childDefns, version, includeAttributes);
+				if ( childNodes == null || childNodes.isEmpty() ) {
+					node = new NodeDefinitionTreeNode((EntityDefinition) item);
+				} else {
+					node = new NodeDefinitionTreeNode((EntityDefinition) item, childNodes);
+				}
+			} else if ( includeAttributes ) {
+				node = new NodeDefinitionTreeNode((AttributeDefinition) item);	
+			}
+			return node;
 		}
 		
-		public static List<TreeNode<NodeDefinition>> fromList(List<? extends NodeDefinition> items,
+		public static List<NodeDefinitionTreeNode> fromList(List<? extends NodeDefinition> items,
 				ModelVersion version, boolean includeAttributes) {
-			List<TreeNode<NodeDefinition>> result = null;
+			List<NodeDefinitionTreeNode> result = null;
 			if ( items != null ) {
-				result = new ArrayList<TreeNode<NodeDefinition>>();
+				result = new ArrayList<NodeDefinitionTreeNode>();
 				for (NodeDefinition item : items) {
 					if ( version == null || version.isApplicable(item) ) {
-						NodeDefinitionTreeNode node = null;
-						if ( item instanceof EntityDefinition ) {
-							List<NodeDefinition> childDefns = ((EntityDefinition) item).getChildDefinitions();
-							List<TreeNode<NodeDefinition>> childrenNodes = fromList(childDefns, version, includeAttributes);
-							node = new NodeDefinitionTreeNode((EntityDefinition) item, childrenNodes);
-						} else if ( includeAttributes ) {
-							node = new NodeDefinitionTreeNode((AttributeDefinition) item);	
-						}
+						NodeDefinitionTreeNode node = createNode(item, version, includeAttributes);
 						if ( node != null ) {
 							result.add(node);
 						}
@@ -191,7 +212,7 @@ public class SchemaTreeModel extends DefaultTreeModel<NodeDefinition> {
 			}
 			return result;
 		}
-		
+
 //		@Override
 //		public void insert(TreeNode<NodeDefinition> child, int index) {
 //			if ( isLeaf() ) {

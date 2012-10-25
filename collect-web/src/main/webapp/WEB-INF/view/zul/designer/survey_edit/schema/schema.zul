@@ -4,7 +4,7 @@
 		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SchemaVM')"
 		width="100%" height="100%">
 		<borderlayout>
-		 	<west title="${labels.survey.schema.nodes_title}"
+		 	<west title="${labels.survey.schema.entities_title}"
 		 		width="350px"
 		 		splittable="true">
 		 		<borderlayout>
