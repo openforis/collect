@@ -1,0 +1,33 @@
+<zk>
+	<vlayout>
+		<listbox id="checksList"
+            model="@load(vm.checks)"
+            selectedItem="@bind(vm.selectedCheck)">
+           <listhead visible="false">
+              <listheader label="" width="200px" />
+            </listhead>
+           <template name="model">
+            <listitem>
+              <listcell label="@bind(each.flag)" width="99%" />
+            </listitem>
+  		  </template>
+		</listbox>
+        <menubar>
+          <menu label="${labels.global.add_item}">
+              <menupopup>
+                  <zk forEach="${vm.checkTypeValues}">
+                    <menuitem
+                      label="${vm.getCheckTypeLabel(each)}" value="${each}"
+                      onClick="@command('addCheck', checkType=self.value)" />
+                  </zk>
+              </menupopup>
+           </menu>
+          <menuitem label="${labels.global.edit_item}"
+              disabled="@load(empty vm.selectedCheck)"
+              onClick="@command('editCheck')" />
+          <menuitem label="${labels.global.delete_item}"
+              disabled="@load(empty vm.selectedCheck)"
+              onClick="@command('deleteCheck', check=vm.selectedCheck)" />
+        </menubar>
+	</vlayout>
+</zk>

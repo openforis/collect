@@ -1,15 +1,20 @@
 package org.openforis.collect.designer.viewmodel;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.openforis.collect.designer.form.AttributeDefinitionFormObject;
 import org.openforis.collect.designer.form.NodeDefinitionFormObject;
 import org.openforis.collect.designer.form.SurveyObjectFormObject;
 import org.openforis.collect.designer.model.AttributeType;
+import org.openforis.collect.designer.model.CheckType;
+import org.openforis.collect.designer.util.Resources;
 import org.openforis.idm.metamodel.AttributeDefault;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
+import org.openforis.idm.metamodel.validation.Check;
 import org.zkoss.bind.Binder;
 import org.zkoss.bind.Form;
 import org.zkoss.bind.SimpleForm;
@@ -23,6 +28,7 @@ import org.zkoss.bind.annotation.NotifyChange;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.IdSpace;
 import org.zkoss.zk.ui.Path;
+import org.zkoss.zul.Window;
 
 /**
  * 
@@ -38,6 +44,9 @@ public abstract class AttributeVM<T extends AttributeDefinition> extends SurveyO
 	protected Form tempFormObject;
 	protected List<AttributeDefault> attributeDefaults;
 	protected AttributeDefault selectedAttributeDefault;
+	private Check<?> editedCheck;
+	private boolean editingNewCheck;
+	private Window checkPopUp;
 	
 	@Init(superclass=false)
 	public void init(@ExecutionArgParam("parentEntity") EntityDefinition parentEntity, 
@@ -131,6 +140,24 @@ public abstract class AttributeVM<T extends AttributeDefinition> extends SurveyO
 		selectedAttributeDefault = attributeDefault;
 	}
 	
+	@Command
+	public void addCheck(@ContextParam(ContextType.BINDER) Binder binder, 
+			@BindingParam("checkType") String checkType) throws Exception {
+		CheckType type = CheckType.valueOf(checkType.toUpperCase());
+		editedCheck = CheckType.createCheck(type);
+		openCheckEditPopUp();
+	}
+	
+	protected void openCheckEditPopUp() {
+		Map<String, Object> args = new HashMap<String, Object>();
+		args.put("parentNode", editedItem);
+		args.put("newItem", editingNewCheck);
+		args.put("check", editedCheck);
+		checkPopUp = openPopUp(Resources.Component.CHECK_POPUP.getLocation(), true, args);
+	}
+
+	
+	
 	protected void initAttributeDefaultsList() {
 		if ( attributeDefaults == null ) {
 			attributeDefaults = new ArrayList<AttributeDefault>();
@@ -173,5 +200,19 @@ public abstract class AttributeVM<T extends AttributeDefinition> extends SurveyO
 		this.selectedAttributeDefault = selectedAttributeDefault;
 	}
 
+	public List<Check<?>> getChecks() {
+		List<Check<?>> result = editedItem.getChecks();
+		return result;
+	}
 
+	public List<String> getCheckTypeValues() {
+		CheckType[] values = CheckType.values();
+		List<String> result = new ArrayList<String>();
+		for (CheckType checkType : values) {
+			String label = checkType.getLabel();
+			result.add(label);
+		}
+		return result;
+	}
+	
 }

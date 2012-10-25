@@ -26,7 +26,6 @@ import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NodeLabel.Type;
 import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.TaxonAttributeDefinition;
-import org.zkoss.bind.AnnotateBinder;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.Binder;
 import org.zkoss.bind.Form;
@@ -143,7 +142,7 @@ public class SchemaVM extends SurveyBaseVM {
 				parentEntity = (EntityDefinition) selectedNode;
 				initFormObject();
 				
-				AttributeType attributeTypeEnum = attributeType != null ? AttributeType.valueOf(attributeType): null;
+				AttributeType attributeTypeEnum = AttributeType.valueOf(attributeType);
 				
 				editedAttribute = (AttributeDefinition) NodeType.createNodeDefinition(survey, NodeType.ATTRIBUTE, attributeTypeEnum );
 				openAttributeEditPopUp();
@@ -196,19 +195,12 @@ public class SchemaVM extends SurveyBaseVM {
 		}
 	}
 
-//	@SuppressWarnings({ "unchecked", "rawtypes" })
 	protected void openAttributeEditPopUp() {
 		Map<String, Object> args = new HashMap<String, Object>();
 		args.put("parentEntity", editedNode);
 		args.put("newItem", editingNewAttribute);
 		args.put("item", editedAttribute);
 		attributePopUp = openPopUp(Resources.Component.ATTRIBUTE_POPUP.getLocation(), true, args);
-//		AttributeVM viewModel = getAttributeViewModel(editedAttribute);
-//		Binder binder = new AnnotateBinder();
-//		binder.init(attributePopUp, viewModel, args);
-//		viewModel.init(editedNode, editedAttribute, editingNewAttribute);
-//		attributePopUp.setAttribute("vm", viewModel);
-//		viewModel.afterCompose(attributePopUp);
 	}
 
 	protected AttributeVM<?> getAttributeViewModel(AttributeDefinition attributeDefn) {

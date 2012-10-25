@@ -39,7 +39,8 @@ public class Resources {
 		UNITS_MANAGER_POP_UP("survey_edit/units_popup.zul"), 
 		NODE("survey_edit/schema/node.zul"), 
 		ENTITY("survey_edit/schema/entity.zul"),
-		ATTRIBUTE_POPUP("survey_edit/schema/attribute_popup.zul");
+		ATTRIBUTE_POPUP("survey_edit/schema/attribute_popup.zul"), 
+		CHECK_POPUP("survey_edit/schema/check/popup.zul"),;
 		
 		private String location;
 		

@@ -1,6 +1,6 @@
 <zk>
 	<vlayout>
-		<listbox id="attributeDefaultsList" width="210px" 
+		<listbox id="attributeDefaultsList"
             model="@load(vm.attributeDefaults)"
             selectedItem="@bind(vm.selectedAttributeDefault)">
            <listhead visible="false">
