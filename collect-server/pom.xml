@@ -173,7 +173,11 @@
 			<groupId>commons-fileupload</groupId>
 			<artifactId>commons-fileupload</artifactId>
 		</dependency>
-		
+        <dependency>
+            <groupId>commons-validator</groupId>
+            <artifactId>commons-validator</artifactId>
+            <version>1.4.0</version>
+        </dependency>
 		<!-- ZK dependencies -->
 		<dependency>
 			<groupId>org.zkoss.zk</groupId>
@@ -239,11 +243,6 @@
           <version>${geotools.version}</version>
         </dependency>
         <!-- end of GeoTools dependencies -->
-		<dependency>
-			<groupId>commons-validator</groupId>
-			<artifactId>commons-validator</artifactId>
-			<version>1.4.0</version>
-		</dependency>
 		<dependency>
 			<groupId>net.sf.kxml</groupId>
 			<artifactId>kxml2</artifactId>
