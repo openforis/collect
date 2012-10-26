@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.openforis.idm.metamodel.AttributeDefault;
 import org.openforis.idm.metamodel.AttributeDefinition;
+import org.openforis.idm.metamodel.validation.Check;
 
 /**
  * 
@@ -17,6 +18,7 @@ import org.openforis.idm.metamodel.AttributeDefinition;
 public class AttributeDefinitionFormObject<T extends AttributeDefinition> extends NodeDefinitionFormObject<T> {
 
 	private List<AttributeDefault> attributeDefaults;
+	private List<Check<?>> checks;
 
 	public void saveTo(T dest, String languageCode) {
 		super.saveTo(dest, languageCode);
@@ -26,11 +28,18 @@ public class AttributeDefinitionFormObject<T extends AttributeDefinition> extend
 				dest.addAttributeDefault(attrDefault);
 			}
 		}
+		dest.removeAllChecks();
+		if ( checks != null ) {
+			for (Check<?> check : checks) {
+				dest.addCheck(check);
+			}
+		}
 	}
 	
 	public void loadFrom(T source, String languageCode) {
 		super.loadFrom(source, languageCode);
 		attributeDefaults = new ArrayList<AttributeDefault>(source.getAttributeDefaults());
+		checks = new ArrayList<Check<?>>(source.getChecks());
 	}
 
 	public List<AttributeDefault> getAttributeDefaults() {
@@ -40,5 +49,15 @@ public class AttributeDefinitionFormObject<T extends AttributeDefinition> extend
 	public void setAttributeDefaults(List<AttributeDefault> attributeDefaults) {
 		this.attributeDefaults = attributeDefaults;
 	}
+
+	public List<Check<?>> getChecks() {
+		return checks;
+	}
+
+	public void setChecks(List<Check<?>> checks) {
+		this.checks = checks;
+	}
+	
+	
 	
 }

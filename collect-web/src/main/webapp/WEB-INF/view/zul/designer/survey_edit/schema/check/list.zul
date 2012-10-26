@@ -14,14 +14,13 @@
 		</listbox>
         <menubar>
           <menu label="${labels.global.add_item}">
-              <menupopup>
-                  <zk forEach="${vm.checkTypeValues}">
-                    <menuitem
-                      label="${vm.getCheckTypeLabel(each)}" value="${each}"
-                      onClick="@command('addCheck', checkType=self.value)" />
-                  </zk>
-              </menupopup>
-           </menu>
+            <menupopup>
+                <zk forEach="${vm.checkTypes}">
+                  <menuitem label="${each.label}" value="${each}"
+                    onClick="@command('addCheck', checkType=self.value)" />
+                </zk>
+            </menupopup>
+          </menu>
           <menuitem label="${labels.global.edit_item}"
               disabled="@load(empty vm.selectedCheck)"
               onClick="@command('editCheck')" />

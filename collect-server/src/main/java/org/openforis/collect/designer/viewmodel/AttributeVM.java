@@ -1,6 +1,7 @@
 package org.openforis.collect.designer.viewmodel;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +24,7 @@ import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.ContextParam;
 import org.zkoss.bind.annotation.ContextType;
 import org.zkoss.bind.annotation.ExecutionArgParam;
+import org.zkoss.bind.annotation.GlobalCommand;
 import org.zkoss.bind.annotation.Init;
 import org.zkoss.bind.annotation.NotifyChange;
 import org.zkoss.zk.ui.Component;
@@ -39,13 +41,18 @@ public abstract class AttributeVM<T extends AttributeDefinition> extends SurveyO
 
 	private static final String FORM_CONTAINER_ID = "nodeFormContainer";
 	private static final String ATTRIBUTE_DEFAULTS_FIELD = "attributeDefaults";
+	private static final String CHECKS_FIELD = null;
 	
 //	private EntityDefinition parentEntity;
 	protected Form tempFormObject;
 	protected List<AttributeDefault> attributeDefaults;
 	protected AttributeDefault selectedAttributeDefault;
-	private Check<?> editedCheck;
+
 	private boolean editingNewCheck;
+	private Check<?> editedCheck;
+	private Check<?> selectedCheck;
+	private List<Check<?>> checks;
+
 	private Window checkPopUp;
 	
 	@Init(superclass=false)
@@ -112,6 +119,9 @@ public abstract class AttributeVM<T extends AttributeDefinition> extends SurveyO
 		if ( editedItem != null ) {
 			attributeDefaults = ((AttributeDefinitionFormObject<T>) formObject).getAttributeDefaults();
 			tempFormObject.setField(ATTRIBUTE_DEFAULTS_FIELD, attributeDefaults);
+			
+			checks = ((AttributeDefinitionFormObject<T>) formObject).getChecks();
+			tempFormObject.setField(CHECKS_FIELD, checks);
 		} else {
 			attributeDefaults = null;
 		}
@@ -140,28 +150,85 @@ public abstract class AttributeVM<T extends AttributeDefinition> extends SurveyO
 		selectedAttributeDefault = attributeDefault;
 	}
 	
-	@Command
-	public void addCheck(@ContextParam(ContextType.BINDER) Binder binder, 
-			@BindingParam("checkType") String checkType) throws Exception {
-		CheckType type = CheckType.valueOf(checkType.toUpperCase());
-		editedCheck = CheckType.createCheck(type);
-		openCheckEditPopUp();
-	}
-	
-	protected void openCheckEditPopUp() {
-		Map<String, Object> args = new HashMap<String, Object>();
-		args.put("parentNode", editedItem);
-		args.put("newItem", editingNewCheck);
-		args.put("check", editedCheck);
-		checkPopUp = openPopUp(Resources.Component.CHECK_POPUP.getLocation(), true, args);
-	}
-
-	
-	
 	protected void initAttributeDefaultsList() {
 		if ( attributeDefaults == null ) {
 			attributeDefaults = new ArrayList<AttributeDefault>();
 			tempFormObject.setField(ATTRIBUTE_DEFAULTS_FIELD, attributeDefaults);
+			((AttributeDefinitionFormObject<?>) formObject).setAttributeDefaults(attributeDefaults);
+		}
+	}
+	
+	@Command
+	public void addCheck(@BindingParam("checkType") String checkType) {
+		CheckType type = CheckType.valueOf(checkType.toUpperCase());
+		editingNewCheck = true;
+		editedCheck = CheckType.createCheck(type);
+		openCheckEditPopUp();
+	}
+	
+	@Command
+	public void editCheck() {
+		editedCheck = selectedCheck;
+		openCheckEditPopUp();
+	}
+	
+	@Command
+	@NotifyChange({"selectedCheck","checks"})
+	public void deleteCheck() {
+		checks.remove(selectedCheck);
+		selectedCheck = null;
+	}
+	
+	@Command
+	@NotifyChange("selectedAttributeDefault")
+	public void selectCheck(@BindingParam("check") Check<?> check) {
+		selectedCheck = check;
+	}
+	
+	@GlobalCommand
+	public void applyChangesToEditedCheck(@ContextParam(ContextType.BINDER) Binder binder) {
+		if ( editedCheck != null && checkCurrentFormValid() ) {
+			IdSpace popUpIdSpace = checkPopUp.getSpaceOwner();
+			Component formContainer = Path.getComponent(popUpIdSpace, "detailsInclude/nodeFormContainer");
+			Binder checkFormBinder = (Binder) formContainer.getAttribute("binder");
+			AttributeVM<?> checkFormViewModel = (AttributeVM<?>) checkFormBinder.getViewModel();
+			checkFormViewModel.commitChanges();
+			if ( editingNewCheck ) {
+				editedItem.addCheck(editedCheck);
+			}
+			closeCheckEditPopUp(binder);
+			editedCheck = null;
+			notifyChange("checks");
+		}
+	}
+	
+	@GlobalCommand
+	public void cancelChangesToEditedCheck(@ContextParam(ContextType.BINDER) Binder binder) {
+		//TODO confirm if there are not committed changes 
+		if ( editedCheck != null ) {
+			closeCheckEditPopUp(binder);
+			editedCheck = null;
+		}
+	}
+	
+	protected void closeCheckEditPopUp(Binder binder) {
+		closePopUp(checkPopUp);
+		checkPopUp = null;
+		validateForm(binder);
+	}
+
+	protected void openCheckEditPopUp() {
+		Map<String, Object> args = new HashMap<String, Object>();
+		args.put("parentDefinition", editedItem);
+		args.put("newItem", editingNewCheck);
+		args.put("check", editedCheck);
+		checkPopUp = openPopUp(Resources.Component.CHECK_POPUP.getLocation(), true, args);
+	}
+	
+	protected void initCheckList() {
+		if ( checks == null ) {
+			checks = new ArrayList<Check<?>>();
+			tempFormObject.setField(CHECKS_FIELD, checks);
 			((AttributeDefinitionFormObject<?>) formObject).setAttributeDefaults(attributeDefaults);
 		}
 	}
@@ -200,19 +267,21 @@ public abstract class AttributeVM<T extends AttributeDefinition> extends SurveyO
 		this.selectedAttributeDefault = selectedAttributeDefault;
 	}
 
+	public Check<?> getSelectedCheck() {
+		return selectedCheck;
+	}
+	
+	public void setSelectedCheck(Check<?> selectedCheck) {
+		this.selectedCheck = selectedCheck;
+	}
+	
 	public List<Check<?>> getChecks() {
-		List<Check<?>> result = editedItem.getChecks();
-		return result;
+		return checks;
 	}
 
-	public List<String> getCheckTypeValues() {
+	public List<CheckType> getCheckTypes() {
 		CheckType[] values = CheckType.values();
-		List<String> result = new ArrayList<String>();
-		for (CheckType checkType : values) {
-			String label = checkType.getLabel();
-			result.add(label);
-		}
-		return result;
+		return Arrays.asList(values);
 	}
 	
 }

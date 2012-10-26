@@ -1,0 +1,38 @@
+/**
+ * 
+ */
+package org.openforis.collect.designer.viewmodel;
+
+import java.util.List;
+
+import org.openforis.idm.metamodel.validation.Check;
+
+/**
+ * @author S. Ricci
+ *
+ */
+public abstract class CheckVM<T extends Check<?>> extends SurveyObjectBaseVM<T> {
+
+	@Override
+	protected List<T> getItemsInternal() {
+		return null;
+	}
+
+	@Override
+	protected void moveSelectedItem(int indexTo) {
+	}
+
+	@Override
+	protected T createItemInstance() {
+		return null;
+	}
+
+	@Override
+	protected void addNewItemToSurvey() {
+	}
+
+	@Override
+	protected void deleteItemFromSurvey(T item) {
+	}
+	
+}

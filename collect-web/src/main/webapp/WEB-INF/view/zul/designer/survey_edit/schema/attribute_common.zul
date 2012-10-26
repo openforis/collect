@@ -15,6 +15,13 @@
 					<label class="error" value="@load(vmsgs['attributeDefaults'])" />
 				</cell>
 			</row>
+            <row>
+              <label value="${labels.survey.schema.node.checks}:" />
+              <vlayout>
+                <include src="survey_edit/schema/check/list.zul" />
+                <label class="error" value="@load(vmsgs['checks'])" />
+              </vlayout>
+            </row>
 		</rows>
 	</grid>
 </zk>

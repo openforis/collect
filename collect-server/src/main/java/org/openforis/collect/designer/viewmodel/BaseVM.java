@@ -7,8 +7,6 @@ import org.openforis.collect.designer.util.Resources;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.Session;
-import org.zkoss.zk.ui.event.Event;
-import org.zkoss.zk.ui.event.Events;
 import org.zkoss.zul.Window;
 
 /**
@@ -59,8 +57,6 @@ public abstract class BaseVM {
 	protected void closePopUp(Window popUp) {
 		if ( popUp != null ) {
 			popUp.detach();
-//			Event event = new Event("onClose", popUp, null);
-//			Events.postEvent(event);
 		}
 	}
 	

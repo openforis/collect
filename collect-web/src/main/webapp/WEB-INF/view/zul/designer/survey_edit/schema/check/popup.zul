@@ -10,7 +10,7 @@
         <borderlayout>
           <center>
             <vlayout height="100%" width="100%" style="overflow: auto;">
-             	<include id="detailsInclude" src="survey_edit/schema/check/${vm.typeShort}.zul" />
+             	<include id="detailsInclude" src="survey_edit/schema/check/${$composer.typeShort}.zul" />
             </vlayout>
           </center>
           <south>
