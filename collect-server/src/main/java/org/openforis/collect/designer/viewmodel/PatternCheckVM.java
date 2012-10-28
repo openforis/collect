@@ -3,10 +3,10 @@
  */
 package org.openforis.collect.designer.viewmodel;
 
-import org.openforis.collect.designer.form.ComparisonCheckFormObject;
+import org.openforis.collect.designer.form.PatternCheckFormObject;
 import org.openforis.collect.designer.form.SurveyObjectFormObject;
 import org.openforis.idm.metamodel.AttributeDefinition;
-import org.openforis.idm.metamodel.validation.ComparisonCheck;
+import org.openforis.idm.metamodel.validation.PatternCheck;
 import org.zkoss.bind.annotation.ExecutionArgParam;
 import org.zkoss.bind.annotation.Init;
 
@@ -14,18 +14,18 @@ import org.zkoss.bind.annotation.Init;
  * @author S. Ricci
  *
  */
-public class ComparisonCheckVM extends CheckVM<ComparisonCheck> {
+public class PatternCheckVM extends CheckVM<PatternCheck> {
 
 	@Init(superclass=false)
 	@Override
 	public void init(@ExecutionArgParam("parentDefinition") AttributeDefinition parentDefinition,
-			@ExecutionArgParam("check") ComparisonCheck check, @ExecutionArgParam("newItem") Boolean newItem ) {
+			@ExecutionArgParam("check") PatternCheck check, @ExecutionArgParam("newItem") Boolean newItem ) {
 		super.init(parentDefinition, check, newItem);
 	}
 	
 	@Override
-	protected SurveyObjectFormObject<ComparisonCheck> createFormObject() {
-		return new ComparisonCheckFormObject();
+	protected SurveyObjectFormObject<PatternCheck> createFormObject() {
+		return new PatternCheckFormObject();
 	}
 
 }
