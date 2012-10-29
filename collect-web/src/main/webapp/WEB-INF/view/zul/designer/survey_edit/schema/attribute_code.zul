@@ -27,17 +27,18 @@
 				<row>
 					<label value="${labels.survey.schema.attribute.code.code_list}:" />
 					<cell>
-						<listbox width="150px" model="@load(vm.codeLists)"
-							selectedItem="@bind(fx.list)" mold="select"
-							onSelect="@command('applyChanges')">
-							<template name="model">
-								<listitem label="@load(each.name)" />
-							</template>
-						</listbox>
+						<fieldErrorHandler message="@load(vmsgs['list'])">
+                            <listbox width="150px" model="@load(vm.codeLists)"
+    							selectedItem="@bind(fx.list)" mold="select"
+    							onSelect="@command('applyChanges')">
+    							<template name="model">
+    								<listitem label="@load(each.name)" />
+    							</template>
+    						</listbox>
+                        </fieldErrorHandler>
 						<button tooltiptext="${labels.survey.code_lists_manager}" 
 							onClick="@global-command('openCodeListsManagerPopUp')"
 							image="/assets/images/pencil-small.png" />
-						<label class="error" value="@load(vmsgs['list'])" />
 					</cell>
 				</row>
 				<row>

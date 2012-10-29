@@ -2,6 +2,8 @@ package org.openforis.collect.designer.form.validator;
 
 import org.openforis.collect.designer.model.LabelKeys;
 import org.openforis.collect.designer.viewmodel.AttributeVM;
+import org.openforis.collect.designer.viewmodel.EntityDefinitionVM;
+import org.openforis.collect.designer.viewmodel.NodeDefinitionVM;
 import org.openforis.collect.designer.viewmodel.SchemaVM;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
@@ -111,10 +113,8 @@ public class NodeDefinitionFormValidator extends FormValidator {
 	protected NodeDefinition getEditedNode(ValidationContext ctx) {
 		Object vmObject = getVM(ctx);
 		NodeDefinition editedNode;
-		if (vmObject instanceof SchemaVM) {
-			editedNode = ((SchemaVM) vmObject).getEditedNode();
-		} else if ( vmObject instanceof AttributeVM) {
-			editedNode = ((AttributeVM<?>) vmObject).getEditedItem();
+		if (vmObject instanceof NodeDefinitionVM) {
+			editedNode = ((NodeDefinitionVM<?>) vmObject).getEditedItem();
 		} else {
 			throw new IllegalArgumentException("Unsupported View Model Type: " +
 					vmObject.getClass().getName());

@@ -4,7 +4,7 @@
 	<vlayout
 		id="nodeFormContainer"
 		apply="org.zkoss.bind.BindComposer"
-		viewModel="@id('vm') @init(vm)"
+        viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.EntityDefinitionVM')"
 		validationMessages="@id('vmsgs')"
 		form="@id('fx') 
 			@init(vm.tempFormObject)
@@ -13,60 +13,5 @@
 			@validator('org.openforis.collect.designer.form.validator.NodeDefinitionFormValidator', parentEntity=parentEntity)">
 		
 		<include src="survey_edit/schema/node_common.zul" />
-
-		<listbox id="listbox"
-		  model="@load(vm.childAttributes)"
-          selectedItem="@bind(vm.selectedAttribute)">
-		  <listhead>
-		    <listheader label="${labels.survey.schema.node.type.attribute}" 
-              width="200px" />
-		    <listheader label="${labels.survey.schema.node.instance_label}"
-		      width="200px" />
-		    <listheader label="${labels.survey.schema.attribute.type_label_short}"
-		      width="60px" />
-		    <listheader label="${labels.survey.schema.node.required}"
-		      width="60px" />
-		  </listhead>
-		  <template name="model">
-		    <listitem context="attributePopUp">
-		      <listcell label="@load(each.name)"
-		        onDoubleClick="@command('editAttribute', attribute=each)" />
-		      <listcell label="@load(vm.getAttributeInstanceLabel(each))"
-		        onDoubleClick="@command('editAttribute', attribute=each)" />
-		      <listcell label="${vm.getAttributeTypeLabelFromDefinition(each)}"
-		        onDoubleClick="@command('editAttribute', attribute=each)" />
-		      <listcell label="@load(vm.isAttributeRequired(each))"
-		        onDoubleClick="@command('editAttribute', attribute=each)" />
-		    </listitem>
-		  </template>
-		</listbox>
-        <menubar>
-           <menu label="${labels.global.add_item}">
-              <menupopup>
-                  <zk forEach="${vm.attributeTypeValues}">
-                    <menuitem
-                      label="${vm.getAttributeTypeLabel(each)}" value="${each}"
-                      onClick="@command('addAttribute', attributeType=self.value)" />
-                  </zk>
-              </menupopup>
-           </menu>
-           <menuitem label="${labels.global.edit_item}"
-             disabled="@load(empty vm.selectedAttribute)"
-             tooltip="${labels.global.item.move_up}"
-             onClick="@command('editAttribute', attribute=vm.selectedAttribute)" />
-           <menuitem image="/assets/images/arrow-up.png" class="icon-button" 
-             disabled="@load(vm.moveAttributeUpDisabled)"
-             tooltip="${labels.global.item.move_up}"
-             onClick="@command('moveAttributeUp')" />
-           <menuitem image="/assets/images/arrow-down.png" class="icon-button" 
-              disabled="@load(vm.moveAttributeDownDisabled)"
-              tooltip="${labels.global.item.move_down}" 
-              onClick="@command('moveAttributeDown')" />
-       </menubar>
-       
-       <menupopup id="attributePopUp">
-          <menuitem label="${labels.survey.schema.remove_node}" 
-            onClick="@command('removeAttribute')" />
-        </menupopup>
 	</vlayout>
 </zk>

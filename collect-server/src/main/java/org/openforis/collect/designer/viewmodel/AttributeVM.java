@@ -17,7 +17,6 @@ import org.openforis.collect.designer.model.CheckType;
 import org.openforis.collect.designer.util.Resources;
 import org.openforis.idm.metamodel.AttributeDefault;
 import org.openforis.idm.metamodel.AttributeDefinition;
-import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.validation.Check;
 import org.openforis.idm.metamodel.validation.Check.Flag;
 import org.zkoss.bind.Binder;
@@ -27,14 +26,9 @@ import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.ContextParam;
 import org.zkoss.bind.annotation.ContextType;
-import org.zkoss.bind.annotation.ExecutionArgParam;
 import org.zkoss.bind.annotation.GlobalCommand;
-import org.zkoss.bind.annotation.Init;
 import org.zkoss.bind.annotation.NotifyChange;
 import org.zkoss.util.resource.Labels;
-import org.zkoss.zk.ui.Component;
-import org.zkoss.zk.ui.IdSpace;
-import org.zkoss.zk.ui.Path;
 import org.zkoss.zul.Window;
 
 /**
@@ -42,14 +36,12 @@ import org.zkoss.zul.Window;
  * @author S. Ricci
  *
  */
-public abstract class AttributeVM<T extends AttributeDefinition> extends SurveyObjectBaseVM<T> {
+public abstract class AttributeVM<T extends AttributeDefinition> extends NodeDefinitionVM<T> {
 
-	private static final String FORM_CONTAINER_ID = "nodeFormContainer";
 	private static final String ATTRIBUTE_DEFAULTS_FIELD = "attributeDefaults";
 	private static final String CHECKS_FIELD = null;
 	
 //	private EntityDefinition parentEntity;
-	protected Form tempFormObject;
 	protected List<AttributeDefault> attributeDefaults;
 	protected AttributeDefault selectedAttributeDefault;
 
@@ -60,28 +52,6 @@ public abstract class AttributeVM<T extends AttributeDefinition> extends SurveyO
 
 	private Window checkPopUp;
 	
-	@Init(superclass=false)
-	public void init(@ExecutionArgParam("parentEntity") EntityDefinition parentEntity, 
-			@ExecutionArgParam("item") T attributeDefn, 
-			@ExecutionArgParam("newItem") Boolean newItem) {
-		super.init();
-		if ( attributeDefn != null ) {
-//			this.parentEntity = parentEntity;
-			this.newItem = newItem;
-			setEditedItem(attributeDefn);
-		}
-	}
-	
-	@Override
-	protected List<T> getItemsInternal() {
-		return null;
-	}
-
-	@Override
-	protected void moveSelectedItem(int indexTo) {
-		
-	}
-
 	@SuppressWarnings("unchecked")
 	@Override
 	protected SurveyObjectFormObject<T> createFormObject() {
@@ -91,32 +61,6 @@ public abstract class AttributeVM<T extends AttributeDefinition> extends SurveyO
 		return formObject;
 	}
 
-	@Override
-	protected T createItemInstance() {
-		return null;
-	}
-
-	@Override
-	protected void addNewItemToSurvey() {
-		//do nothing
-	}
-
-	@Override
-	protected void deleteItemFromSurvey(AttributeDefinition item) {
-		//do nothing
-	}
-	
-	@Override
-	@Command
-	public void applyChanges() {
-		//do not call super, postpone to commitChanges command
-		super.changed = true;
-	}
-	
-	public void commitChanges() {
-		super.applyChanges();
-	}
-	
 	@Override
 	@NotifyChange({"editedItem","formObject","tempFormObject"})
 	public void setEditedItem(T editedItem) {
@@ -166,6 +110,13 @@ public abstract class AttributeVM<T extends AttributeDefinition> extends SurveyO
 	@NotifyChange("selectedAttributeDefault")
 	public void selectAttributeDefault(@BindingParam("attributeDefault") AttributeDefault attributeDefault) {
 		selectedAttributeDefault = attributeDefault;
+	}
+	
+	@Override
+	@GlobalCommand
+	public void currentLanguageChanged() {
+		super.currentLanguageChanged();
+		notifyChange("attributeDefaults","numericAttributePrecisions");
 	}
 	
 	protected void initAttributeDefaultsList() {
@@ -246,14 +197,6 @@ public abstract class AttributeVM<T extends AttributeDefinition> extends SurveyO
 			tempFormObject.setField(CHECKS_FIELD, checks);
 			((AttributeDefinitionFormObject<?>) formObject).setAttributeDefaults(attributeDefaults);
 		}
-	}
-	
-	protected void validateForm(@ContextParam(ContextType.BINDER) Binder binder) {
-		Component view = binder.getView();
-		IdSpace currentIdSpace = view.getSpaceOwner();
-		Component formComponent = Path.getComponent(currentIdSpace, FORM_CONTAINER_ID);
-		Binder formComponentBinder = (Binder) formComponent.getAttribute("binder");
-		formComponentBinder.postCommand("applyChanges", null);
 	}
 	
 	public String getAttributeType() {

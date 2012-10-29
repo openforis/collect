@@ -15,7 +15,7 @@
                             context="nodesTreePopup"
 							onSelect="@command('nodeSelected', node=self.selectedItem)">
 							<template name="model">
-					            <treeitem draggable="false" context="entityPopup"> 
+					            <treeitem draggable="false" context="@load(vm.isEntity(each.data) ? entityPopup: attributePopup)"> 
 					                <treerow>
 					                    <treecell label="@load(each.data.name)"/>
 					                </treerow>
@@ -51,9 +51,22 @@
         <menupopup id="entityPopup">
           <menuitem label="${labels.survey.schema.add_child_entity}" 
             onClick="@command('addChildEntity')" />
+           <menu label="${labels.survey.schema.add_attribute.label}">
+              <menupopup>
+                  <zk forEach="${vm.attributeTypeValues}">
+                    <menuitem
+                      label="${vm.getAttributeTypeLabel(each)}" value="${each}"
+                      onClick="@command('addAttribute', attributeType=self.value)" />
+                  </zk>
+              </menupopup>
+       	  </menu>
           <menuseparator />
           <menuitem label="${labels.survey.schema.remove_node}" 
-            onClick="@command('removeNode')" />
+              onClick="@command('removeNode')" />
+        </menupopup>
+        <menupopup id="attributePopup">
+          <menuitem label="${labels.survey.schema.remove_node}" 
+              onClick="@command('removeNode')" />
         </menupopup>
     </div>
 </zk>
