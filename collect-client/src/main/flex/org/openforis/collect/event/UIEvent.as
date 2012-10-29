@@ -31,6 +31,9 @@ package org.openforis.collect.event {
 		
 		public static const ITEM_SELECT:String = "itemSelect";
 		
+		//survey preveiw
+		public static const SHOW_SURVEY_PREVIEW:String = "showSurveyPreview";
+		
 		private var _obj:Object;
 		private var _params:Array;
 		

@@ -3,8 +3,6 @@ package org.openforis.collect.presenter {
 	 * 
 	 * @author Mino Togna
 	 * */
-	import flash.events.Event;
-	
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.events.FaultEvent;
 	import mx.rpc.events.ResultEvent;
@@ -14,7 +12,6 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.client.DataClient;
 	import org.openforis.collect.event.UIEvent;
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
-	import org.openforis.collect.model.CollectRecord$Step;
 	import org.openforis.collect.model.proxy.RecordProxy;
 	import org.openforis.collect.model.proxy.UserProxy;
 	import org.openforis.collect.ui.view.MasterView;
@@ -82,22 +79,12 @@ package org.openforis.collect.presenter {
 		
 		protected function setActiveRecord(record:RecordProxy):void {
 			Application.activeRecord = record;
-			var user:UserProxy = Application.user;
-			var step:CollectRecord$Step = record.step;
 			var editable:Boolean = false;
-			switch ( step ) {
-				case CollectRecord$Step.ENTRY:
-					editable = user.hasEffectiveRole(UserProxy.ROLE_ENTRY) || 
-						user.hasEffectiveRole(UserProxy.ROLE_CLEANSING) || 
-						user.hasEffectiveRole(UserProxy.ROLE_ADMIN);
-					break;
-				case CollectRecord$Step.CLEANSING:
-					editable = user.hasEffectiveRole(UserProxy.ROLE_CLEANSING) || 
-						user.hasEffectiveRole(UserProxy.ROLE_ADMIN);
-					break;
-				case CollectRecord$Step.ANALYSIS:
-					editable = false
-					break;
+			if ( Application.preview ) {
+				editable = true;
+			} else {
+				var user:UserProxy = Application.user;
+				editable = user.canEdit(record);
 			}
 			Application.activeRecordEditable = editable;
 			_view.currentState = MasterView.DETAIL_STATE;

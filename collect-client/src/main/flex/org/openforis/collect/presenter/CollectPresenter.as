@@ -46,6 +46,9 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.ui.component.SurveySelectionPopUp;
 	import mx.managers.PopUpManager;
 	import flash.display.DisplayObject;
+	import org.openforis.collect.util.StringUtil;
+	import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
+	import org.openforis.collect.model.proxy.RecordProxy;
 	
 	/**
 	 * 
@@ -76,9 +79,26 @@ package org.openforis.collect.presenter {
 			_keepAliveTimer.start();
 
 			//set language in session
-			var localeString:String = FlexGlobals.topLevelApplication.parameters.lang as String;
-			if(localeString != null) {
-				this._sessionClient.initSession(new AsyncResponder(initSessionResultHandler, faultHandler), localeString);
+			init();
+		}
+		
+		internal function init():void {
+			var params:Object = FlexGlobals.topLevelApplication.parameters;
+			var preview:Boolean = params.preview == "true";
+			var localeString:String = params.lang as String;
+			if ( StringUtil.isEmpty(localeString) ) {
+				AlertUtil.showError("global.error.invalidLocaleSpecified");
+			} else if ( preview ) {
+				Application.preview = true;
+				var surveyId:int = int(params.surveyId);
+				var rootEntityId:int = int(params.rootEntityId);
+				var versionId:int = int(params.versionId);
+				var token:Object = {surveyId: surveyId, rootEntityId: rootEntityId, versionId: versionId};
+				var previewResp:IResponder = new AsyncResponder(initSessionForPreviewResultHandler, faultHandler, token);
+				this._sessionClient.initSession(previewResp, localeString);
+			} else {
+				var responder:IResponder = new AsyncResponder(initSessionResultHandler, faultHandler);
+				this._sessionClient.initSession(responder, localeString);
 			}
 		}
 		
@@ -124,12 +144,44 @@ package org.openforis.collect.presenter {
 			navigateToURL(u,"_self");
 		}
 		
-		internal function initSessionResultHandler(event:ResultEvent, token:Object = null):void {
+		internal function initSessionCommonResultHandler(event:ResultEvent, token:Object = null):void {
 			Application.user = event.result.user;
 			Application.sessionId = event.result.sessionId;
 			Application.locale = FlexGlobals.topLevelApplication.parameters.lang as String;
-			
+		}
+		
+		internal function initSessionResultHandler(event:ResultEvent, token:Object = null):void {
+			initSessionCommonResultHandler(event, token);
 			getSurveySummaries();
+		}
+		
+		internal function initSessionForPreviewResultHandler(event:ResultEvent, token:Object = null):void {
+			initSessionCommonResultHandler(event, token);
+			var surveyId:int = token.surveyId;
+			var responder:IResponder = new AsyncResponder(setActivePreviewSurveyResultHandler, faultHandler, token);
+			ClientFactory.sessionClient.setActivePreviewSurvey(responder, surveyId);
+		}
+		
+		protected function setActivePreviewSurveyResultHandler(event:ResultEvent, token:Object = null):void {
+			var survey:SurveyProxy = event.result as SurveyProxy;
+			Application.activeSurvey = survey;
+			survey.init();
+			var schema:SchemaProxy = survey.schema;
+			var rootEntityId:int = token.rootEntityId;
+			var version:ModelVersionProxy = survey.getVersion(token.versionId);
+			var rootEntityDef:EntityDefinitionProxy = EntityDefinitionProxy(schema.getDefinitionById(rootEntityId));
+			Application.activeRootEntity = rootEntityDef;
+			var newRecordResponder:IResponder = new AsyncResponder(createRecordResultHandler, faultHandler);
+			ClientFactory.dataClient.createNewRecord(newRecordResponder, rootEntityDef.name, version.name);
+		}
+		
+		protected function createRecordResultHandler(event:ResultEvent, token:Object = null):void {
+			var record:RecordProxy = event.result as RecordProxy;
+			record.survey = Application.activeSurvey;
+			record.init();
+			var uiEvent:UIEvent = new UIEvent(UIEvent.RECORD_CREATED);
+			uiEvent.obj = record;
+			eventDispatcher.dispatchEvent(uiEvent);
 		}
 		
 		internal function mouseWheelHandler(event:MouseEvent):void {

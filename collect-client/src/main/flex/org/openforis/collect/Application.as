@@ -29,6 +29,7 @@ package org.openforis.collect {
 		private static var _surveySummaries:IList;
 		
 		private static var _sessionId:String;
+		private static var _preview:Boolean;
 		private static var _activeSurvey:SurveyProxy;
 		private static var _activeRecord:RecordProxy;
 		private static var _activeRecordEditable:Boolean;
@@ -66,7 +67,7 @@ package org.openforis.collect {
 		
 		//called from External Interface (javascript)
 		public static function isEditingRecord():Boolean {
-			return ! serverOffline && Application.activeRecord != null;
+			return ! (serverOffline || Application.preview || Application.activeRecord == null);
 		}
 		
 		public static function getLeavingPageMessage():String {
@@ -105,6 +106,15 @@ package org.openforis.collect {
 		
 		public static function set sessionId(value:String):void {
 			_sessionId = value;
+		}
+		
+		[Bindable]
+		public static function get preview():Boolean {
+			return _preview;
+		}
+		
+		public static function set preview(value:Boolean):void{
+			_preview = value;
 		}
 		
 		[Bindable]

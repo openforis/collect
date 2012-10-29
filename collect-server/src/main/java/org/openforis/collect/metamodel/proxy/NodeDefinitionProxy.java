@@ -10,7 +10,6 @@ import java.util.Set;
 import javax.xml.namespace.QName;
 
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
-import org.openforis.collect.Proxy;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.BooleanAttributeDefinition;
@@ -19,7 +18,6 @@ import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
 import org.openforis.idm.metamodel.DateAttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.FileAttributeDefinition;
-import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NumberAttributeDefinition;
 import org.openforis.idm.metamodel.NumericAttributeDefinition;
@@ -30,15 +28,16 @@ import org.openforis.idm.metamodel.TimeAttributeDefinition;
 
 /**
  * @author M. Togna
+ * @author S. Ricci
  * 
  */
-public class NodeDefinitionProxy implements Proxy {
+public class NodeDefinitionProxy extends VersionableSurveyObjectProxy {
 
 	private transient NodeDefinition nodeDefinition;
 	protected EntityDefinitionProxy parent;
 	
 	public NodeDefinitionProxy(EntityDefinitionProxy parent, NodeDefinition nodeDefinition) {
-		super();
+		super(nodeDefinition);
 		this.parent = parent;
 		this.nodeDefinition = nodeDefinition;
 	}
@@ -81,28 +80,8 @@ public class NodeDefinitionProxy implements Proxy {
 		return proxies;
 	}
 
-	public String getSinceVersionName() {
-		ModelVersion sinceVersion = nodeDefinition.getSinceVersion();
-		return sinceVersion != null ? sinceVersion.getName(): null;
-	}
-
-	@ExternalizedProperty
-	public ModelVersionProxy getSinceVersion() {
-		return nodeDefinition.getSinceVersion() != null ? new ModelVersionProxy(nodeDefinition.getSinceVersion()) : null;
-	}
-
-	@ExternalizedProperty
-	public ModelVersionProxy getDeprecatedVersion() {
-		return nodeDefinition.getDeprecatedVersion() != null ? new ModelVersionProxy(nodeDefinition.getDeprecatedVersion()) : null;
-	}
-
 	public Set<QName> getAnnotationNames() {
 		return nodeDefinition.getAnnotationNames();
-	}
-
-	@ExternalizedProperty
-	public Integer getId() {
-		return nodeDefinition.getId();
 	}
 
 	@ExternalizedProperty

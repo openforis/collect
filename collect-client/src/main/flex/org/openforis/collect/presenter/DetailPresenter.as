@@ -62,6 +62,7 @@ package org.openforis.collect.presenter {
 		 * Active record changed
 		 * */
 		internal function activeRecordChangedListener(event:UIEvent):void {
+			var preview:Boolean = Application.preview;
 			var activeRecord:RecordProxy = Application.activeRecord;
 			var step:CollectRecord$Step = activeRecord.step;
 			var version:ModelVersionProxy = activeRecord.version;
@@ -78,13 +79,14 @@ package org.openforis.collect.presenter {
 			_view.currentPhaseText.text = getStepLabel(step);
 			
 			var user:UserProxy = Application.user;
-			var canSubmit:Boolean = user.canSubmit(activeRecord);
+			var canSubmit:Boolean = !preview && user.canSubmit(activeRecord);
+			var canReject:Boolean = !preview && user.canReject(activeRecord);
+			var canSave:Boolean = !preview && Application.activeRecordEditable;
+			
 			_view.submitButton.visible = _view.submitButton.includeInLayout = canSubmit;
-			
-			var canReject:Boolean = user.canReject(activeRecord);
 			_view.rejectButton.visible = _view.rejectButton.includeInLayout = canReject;
-			
-			_view.saveButton.visible = Application.activeRecordEditable;
+			_view.saveButton.visible = canSave;
+			_view.backToListButton.enabled = !preview;
 			
 			var form:FormContainer = null;
 			if (_view.formsContainer.contatinsForm(version,rootEntityDefn)){
@@ -97,7 +99,6 @@ package org.openforis.collect.presenter {
 				_view.formsContainer.addForm(form, version, rootEntityDefn);
 				_view.currentState = DetailView.EDIT_STATE;
 			}
-			
 			form = _view.formsContainer.setActiveForm(version, rootEntityDefn);
 			form.record = activeRecord;
 		}
