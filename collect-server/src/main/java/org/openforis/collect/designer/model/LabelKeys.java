@@ -11,4 +11,7 @@ public interface LabelKeys {
 	String RANK_PREFIX = "survey.schema.attribute.taxon.rank.";
 	String DUPLICATED_QUALIFIER = "survey.schema.attribute.taxon.duplicated_qualifier";
 	String NODE_MIN_COUNT = "survey.schema.node.min_count";
+	String CHECK_FLAG_WARNING = "survey.schema.node.check.flag.warning";
+	String CHECK_FLAG_ERROR = "survey.schema.node.check.flag.error";
+	
 }

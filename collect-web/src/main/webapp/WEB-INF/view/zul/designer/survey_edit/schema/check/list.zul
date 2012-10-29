@@ -5,10 +5,12 @@
             selectedItem="@bind(vm.selectedCheck)">
            <listhead visible="false">
               <listheader label="" width="200px" />
+              <listheader label="" width="60px" />
             </listhead>
            <template name="model">
             <listitem>
-              <listcell label="@bind(each.flag)" />
+              <listcell label="${vm.getCheckTypeLabel(each)}" onDoubleClick="@command('editCheck')" />
+              <listcell label="${vm.getCheckFlagLabel(each)}" onDoubleClick="@command('editCheck')" />
             </listitem>
   		  </template>
 		</listbox>

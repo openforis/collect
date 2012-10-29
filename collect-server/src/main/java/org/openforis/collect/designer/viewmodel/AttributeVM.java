@@ -1,5 +1,8 @@
 package org.openforis.collect.designer.viewmodel;
 
+import static org.openforis.collect.designer.model.LabelKeys.CHECK_FLAG_ERROR;
+import static org.openforis.collect.designer.model.LabelKeys.CHECK_FLAG_WARNING;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -16,6 +19,7 @@ import org.openforis.idm.metamodel.AttributeDefault;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.validation.Check;
+import org.openforis.idm.metamodel.validation.Check.Flag;
 import org.zkoss.bind.Binder;
 import org.zkoss.bind.Form;
 import org.zkoss.bind.SimpleForm;
@@ -27,6 +31,7 @@ import org.zkoss.bind.annotation.ExecutionArgParam;
 import org.zkoss.bind.annotation.GlobalCommand;
 import org.zkoss.bind.annotation.Init;
 import org.zkoss.bind.annotation.NotifyChange;
+import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.IdSpace;
 import org.zkoss.zk.ui.Path;
@@ -116,12 +121,25 @@ public abstract class AttributeVM<T extends AttributeDefinition> extends SurveyO
 	@NotifyChange({"editedItem","formObject","tempFormObject"})
 	public void setEditedItem(T editedItem) {
 		super.setEditedItem(editedItem);
+		initAttributeDefaults();
+		initChecks();
+	}
+
+	protected void initChecks() {
+		if ( editedItem != null ) {
+			AttributeDefinitionFormObject<T> fo = (AttributeDefinitionFormObject<T>) formObject;
+			checks = new ArrayList<Check<?>>(editedItem.getChecks());
+			fo.setChecks(checks);
+			tempFormObject.setField(CHECKS_FIELD, checks);
+		} else {
+			checks = null;
+		}
+	}
+
+	protected void initAttributeDefaults() {
 		if ( editedItem != null ) {
 			attributeDefaults = ((AttributeDefinitionFormObject<T>) formObject).getAttributeDefaults();
 			tempFormObject.setField(ATTRIBUTE_DEFAULTS_FIELD, attributeDefaults);
-			
-			checks = ((AttributeDefinitionFormObject<T>) formObject).getChecks();
-			tempFormObject.setField(CHECKS_FIELD, checks);
 		} else {
 			attributeDefaults = null;
 		}
@@ -169,6 +187,7 @@ public abstract class AttributeVM<T extends AttributeDefinition> extends SurveyO
 	@Command
 	public void editCheck() {
 		editedCheck = selectedCheck;
+		editingNewCheck = false;
 		openCheckEditPopUp();
 	}
 	
@@ -190,6 +209,7 @@ public abstract class AttributeVM<T extends AttributeDefinition> extends SurveyO
 		if ( editedCheck != null && checkCurrentFormValid() ) {
 			closeCheckEditPopUp(binder);
 			editedCheck = null;
+			initChecks();
 			notifyChange("checks");
 		}
 	}
@@ -198,6 +218,9 @@ public abstract class AttributeVM<T extends AttributeDefinition> extends SurveyO
 	public void cancelChangesToEditedCheck(@ContextParam(ContextType.BINDER) Binder binder) {
 		//TODO confirm if there are not committed changes 
 		if ( editedCheck != null ) {
+			if ( editingNewCheck ) {
+				editedItem.removeCheck(editedCheck);
+			}
 			closeCheckEditPopUp(binder);
 			editedCheck = null;
 		}
@@ -274,6 +297,23 @@ public abstract class AttributeVM<T extends AttributeDefinition> extends SurveyO
 	public List<CheckType> getCheckTypes() {
 		CheckType[] values = CheckType.values();
 		return Arrays.asList(values);
+	}
+	
+	public String getCheckTypeLabel(Check<?> check) {
+		CheckType type = CheckType.valueOf(check);
+		return type.getLabel();
+	}
+	
+	public String getCheckFlagLabel(Check<?> check) {
+		Flag flag = check.getFlag();
+		switch(flag) {
+		case ERROR:
+			return Labels.getLabel(CHECK_FLAG_ERROR);
+		case WARN:
+			return Labels.getLabel(CHECK_FLAG_WARNING);
+		default:
+			return null;
+		}
 	}
 	
 }

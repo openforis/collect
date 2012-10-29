@@ -4,7 +4,7 @@
   <custom-attributes check="${arg.check}"/>
   <custom-attributes newItem="${arg.newItem}"/>
   <vlayout
-    id="nodeFormContainer"
+    id="formContainer"
     apply="org.zkoss.bind.BindComposer"
     viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.DistanceCheckVM')"
     validationMessages="@id('vmsgs')"

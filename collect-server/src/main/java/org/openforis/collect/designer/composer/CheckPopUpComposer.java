@@ -19,6 +19,7 @@ import org.zkoss.zul.Window;
  */
 public class CheckPopUpComposer extends BindComposer<Window> {
 
+	private static final String VALIDATE_CHECK_FORM_COMMAND = "validateCheckForm";
 	private static final String APPLY_CHANGES_TO_EDITED_CHECK_COMMAND = "applyChangesToEditedCheck";
 	private static final String CANCEL_CHANGES_TO_EDITED_CHECK_COMMAND = "cancelChangesToEditedCheck";
 
@@ -33,6 +34,12 @@ public class CheckPopUpComposer extends BindComposer<Window> {
 		if ( check != null ) {
 			this.check = check;
 		}
+	}
+	
+	@Override
+	public void doAfterCompose(Window comp) throws Exception {
+		super.doAfterCompose(comp);
+		BindUtils.postGlobalCommand(null, null, VALIDATE_CHECK_FORM_COMMAND, null);
 	}
 	
 	@Command
