@@ -188,14 +188,6 @@ public abstract class AttributeVM<T extends AttributeDefinition> extends SurveyO
 	@GlobalCommand
 	public void applyChangesToEditedCheck(@ContextParam(ContextType.BINDER) Binder binder) {
 		if ( editedCheck != null && checkCurrentFormValid() ) {
-			IdSpace popUpIdSpace = checkPopUp.getSpaceOwner();
-			Component formContainer = Path.getComponent(popUpIdSpace, "detailsInclude/nodeFormContainer");
-			Binder checkFormBinder = (Binder) formContainer.getAttribute("binder");
-			AttributeVM<?> checkFormViewModel = (AttributeVM<?>) checkFormBinder.getViewModel();
-			checkFormViewModel.commitChanges();
-			if ( editingNewCheck ) {
-				editedItem.addCheck(editedCheck);
-			}
 			closeCheckEditPopUp(binder);
 			editedCheck = null;
 			notifyChange("checks");

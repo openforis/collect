@@ -5,7 +5,9 @@ package org.openforis.collect.designer.viewmodel;
 
 import java.util.List;
 
+import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.validation.Check;
+import org.zkoss.bind.annotation.Init;
 
 /**
  * @author S. Ricci
@@ -13,6 +15,16 @@ import org.openforis.idm.metamodel.validation.Check;
  */
 public abstract class CheckVM<T extends Check<?>> extends SurveyObjectBaseVM<T> {
 
+	protected AttributeDefinition parentDefinition;
+
+	@Init(superclass=false)
+	public void init(AttributeDefinition parentDefinition, T check, Boolean newItem ) {
+		super.init();
+		this.parentDefinition = parentDefinition;
+		this.newItem = newItem;
+		setEditedItem(check);
+	}
+	
 	@Override
 	protected List<T> getItemsInternal() {
 		return null;
@@ -29,6 +41,7 @@ public abstract class CheckVM<T extends Check<?>> extends SurveyObjectBaseVM<T> 
 
 	@Override
 	protected void addNewItemToSurvey() {
+		parentDefinition.addCheck(editedItem);
 	}
 
 	@Override

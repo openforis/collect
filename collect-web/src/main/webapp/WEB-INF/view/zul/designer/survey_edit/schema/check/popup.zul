@@ -1,7 +1,10 @@
 <zk>
-	<window id="checkPopUp" title="${labels.survey.schema.attribute.popup.title}" 
-		width="800px"
-		height="400px"
+	<custom-attributes parentDefinition="${arg.parentDefinition}"/>
+	<custom-attributes check="${arg.check}"/>
+	<custom-attributes newItem="${arg.newItem}"/>
+	<window id="checkPopUp" title="${labels.survey.schema.node.check.popup.title}" 
+		width="500px"
+		height="300px"
 		border="normal"
 		position="center" 
 		closable="false"
@@ -10,7 +13,8 @@
         <borderlayout>
           <center>
             <vlayout height="100%" width="100%" style="overflow: auto;">
-             	<include id="detailsInclude" src="survey_edit/schema/check/${$composer.typeShort}.zul" />
+             	<include id="detailsInclude" src="survey_edit/schema/check/${$composer.typeShort}.zul"
+             		parentDefinition="${parentDefinition}" newItem="${newItem}" check="${check}" />
             </vlayout>
           </center>
           <south>

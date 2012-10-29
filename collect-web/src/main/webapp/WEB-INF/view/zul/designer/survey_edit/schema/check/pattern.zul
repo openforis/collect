@@ -1,0 +1,45 @@
+<?component name="fieldErrorHandler" class="org.openforis.collect.designer.component.FieldErrorHandler"?>
+<zk>
+  <custom-attributes parentDefinition="${arg.parentDefinition}"/>
+  <custom-attributes check="${arg.check}"/>
+  <custom-attributes newItem="${arg.newItem}"/>
+  <vlayout
+    id="nodeFormContainer"
+    apply="org.zkoss.bind.BindComposer"
+    viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.PatternCheckVM')"
+    validationMessages="@id('vmsgs')"
+    form="@id('fx') 
+      @load(vm.formObject) 
+      @save(vm.formObject, before='applyChanges')
+      @validator('org.openforis.collect.designer.form.validator.PatternCheckFormValidator', parentDefinition=parentDefinition)">
+    <grid>
+      <columns>
+        <column label="" width="150px" />
+        <column label="" width="100%" />
+      </columns>
+      <rows>
+        <row>
+          <label value="${labels.survey.schema.node.check.flag.$}:" />
+          <listbox 
+              selectedItem="@bind(fx.flag)"
+              mold="select" onSelect="@command('applyChanges')">
+              <listitem
+                label="${labels.survey.schema.node.check.flag.error}"
+                value="ERROR" />
+              <listitem
+                label="${labels.survey.schema.node.check.flag.warning}"
+                value="WARN" />
+          </listbox>
+        </row>
+        <row>
+            <label value="${labels.survey.schema.node.check.pattern.regularExpression}" />
+            <fieldErrorHandler message="@load(vmsgs['regularExpression'])">
+	            <textbox value="@bind(fx.regularExpression)"
+	                    onChange="@command('applyChanges')" />
+          	</fieldErrorHandler>
+        </row>
+      </rows>
+    </grid>
+  </vlayout>
+</zk>
+     

@@ -8,7 +8,7 @@
             </listhead>
            <template name="model">
             <listitem>
-              <listcell label="@bind(each.flag)" width="99%" />
+              <listcell label="@bind(each.flag)" />
             </listitem>
   		  </template>
 		</listbox>
