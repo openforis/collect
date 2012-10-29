@@ -83,10 +83,10 @@ package org.openforis.collect.presenter {
 			var canReject:Boolean = !preview && user.canReject(activeRecord);
 			var canSave:Boolean = !preview && Application.activeRecordEditable;
 			
+			_view.header.visible = _view.header.includeInLayout = !preview;
 			_view.submitButton.visible = _view.submitButton.includeInLayout = canSubmit;
 			_view.rejectButton.visible = _view.rejectButton.includeInLayout = canReject;
 			_view.saveButton.visible = canSave;
-			_view.backToListButton.enabled = !preview;
 			
 			var form:FormContainer = null;
 			if (_view.formsContainer.contatinsForm(version,rootEntityDefn)){
@@ -251,7 +251,9 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function stageKeyDownHandler(event:KeyboardEvent):void {
-			if ( Application.activeRecordEditable && event.ctrlKey && event.keyCode == Keyboard.S ) {
+			//save record pressing CTRL + s
+			if ( !Application.preview && Application.activeRecordEditable && 
+					event.ctrlKey && event.keyCode == Keyboard.S ) {
 				performSaveActiveRecord();
 			}
 		}
