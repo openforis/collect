@@ -5,6 +5,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 
 import org.jooq.Record;
 import org.openforis.collect.model.CollectSurvey;
@@ -13,9 +14,7 @@ import org.openforis.collect.model.SurveySummary;
 import org.openforis.collect.persistence.jooq.JooqDaoSupport;
 import org.openforis.collect.persistence.xml.CollectSurveyIdmlBinder;
 import org.openforis.idm.metamodel.Survey;
-import org.openforis.idm.metamodel.xml.IdmlValidator;
-import org.openforis.idm.metamodel.xml.InvalidIdmlException;
-import org.openforis.idm.metamodel.xml.XmlParseException;
+import org.openforis.idm.metamodel.xml.IdmlParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -27,36 +26,28 @@ abstract class SurveyBaseDao extends JooqDaoSupport {
 	protected CollectSurveyContext surveyContext;
 	
 	public void init() {
-		
 	}
 
-	protected abstract <T extends CollectSurvey> T processSurveyRow(Record row);
+	protected abstract CollectSurvey processSurveyRow(Record row);
 
 	protected abstract SurveySummary processSurveySummaryRow(Record row);
 	
-	public <T extends CollectSurvey> T unmarshalIdml(String idml) throws IOException {
-		byte[] bytes = idml.getBytes("UTF-8");
-		ByteArrayInputStream is = new ByteArrayInputStream(bytes);
-		return unmarshalIdml(is);
+	public CollectSurvey unmarshalIdml(String idml) throws IdmlParseException {
+		byte[] bytes;
+		try {
+			bytes = idml.getBytes("UTF-8");
+			ByteArrayInputStream is = new ByteArrayInputStream(bytes);
+			return unmarshalIdml(is);
+		} catch (UnsupportedEncodingException e) {
+			throw new RuntimeException(e);
+		}
 	}
 	
-	@SuppressWarnings("unchecked")
-	public <T extends CollectSurvey> T unmarshalIdml(InputStream is) throws IOException {
+	public CollectSurvey unmarshalIdml(InputStream is) throws IdmlParseException {
 		CollectSurveyIdmlBinder binder = new CollectSurveyIdmlBinder(surveyContext);
-		T survey;
-		try {
-			survey = (T) binder.unmarshal(is);
-		} catch (XmlParseException e) {
-			throw new DataInconsistencyException("Invalid idm", e);
-		}
-		return survey;
+		return (CollectSurvey) binder.unmarshal(is);
 	}
 
-	public void validateAgainstSchema(byte[] idml) throws InvalidIdmlException {
-		IdmlValidator idmlValidator = new IdmlValidator();
-		idmlValidator.validate(idml);
-	}
-	
 	public String marshalSurvey(Survey survey) throws SurveyImportException {
 		try {
 			// Serialize Survey to XML

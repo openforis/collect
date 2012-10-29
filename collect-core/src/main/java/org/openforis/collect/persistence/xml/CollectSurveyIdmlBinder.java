@@ -14,7 +14,4 @@ public class CollectSurveyIdmlBinder extends SurveyIdmlBinder {
 		super(surveyContext);
 		addApplicationOptionsBinder(new UIOptionsBinder());
 	}
-	
-	
-
 }

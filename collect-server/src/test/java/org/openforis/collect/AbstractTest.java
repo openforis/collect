@@ -9,7 +9,7 @@ import org.junit.BeforeClass;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.TestSurveyContext;
 import org.openforis.idm.metamodel.Survey;
-import org.openforis.idm.metamodel.xml.InvalidIdmlException;
+import org.openforis.idm.metamodel.xml.IdmlParseException;
 import org.openforis.idm.metamodel.xml.SurveyIdmlBinder;
 import org.openforis.idm.metamodel.xml.XmlParseException;
 import org.openforis.idm.model.Entity;
@@ -27,7 +27,7 @@ public abstract class AbstractTest {
 	protected Record record;
 
 	@BeforeClass
-	public static void setUp() throws IOException, InvalidIdmlException, XmlParseException {
+	public static void setUp() throws IOException, XmlParseException, IdmlParseException {
 		URL idm = ClassLoader.getSystemResource("test.idm.xml");
 		InputStream is = idm.openStream();
 		SurveyIdmlBinder binder = new SurveyIdmlBinder(new TestSurveyContext());

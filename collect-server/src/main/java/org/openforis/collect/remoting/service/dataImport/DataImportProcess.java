@@ -33,7 +33,7 @@ import org.openforis.collect.persistence.xml.DataUnmarshaller.ParseRecordResult;
 import org.openforis.collect.remoting.service.dataImport.DataImportState.MainStep;
 import org.openforis.collect.remoting.service.dataImport.DataImportState.SubStep;
 import org.openforis.collect.remoting.service.dataImport.DataImportSummary.FileErrorItem;
-import org.openforis.idm.metamodel.xml.InvalidIdmlException;
+import org.openforis.idm.metamodel.xml.IdmlParseException;
 import org.openforis.idm.model.Entity;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -405,7 +405,7 @@ public class DataImportProcess implements Callable<Void> {
 		return null;
 	}
 
-	public CollectSurvey extractPackagedSurvey() throws IOException, InvalidIdmlException {
+	public CollectSurvey extractPackagedSurvey() throws IOException, IdmlParseException {
 		ZipFile zipFile = new ZipFile(packagedFile);
 		Enumeration<? extends ZipEntry> entries = zipFile.entries();
 		while (entries.hasMoreElements()) {

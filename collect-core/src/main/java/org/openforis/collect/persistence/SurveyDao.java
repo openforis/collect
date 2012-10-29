@@ -4,7 +4,6 @@ import static org.openforis.collect.persistence.jooq.Sequences.OFC_SURVEY_ID_SEQ
 import static org.openforis.collect.persistence.jooq.tables.OfcRecord.OFC_RECORD;
 import static org.openforis.collect.persistence.jooq.tables.OfcSurvey.OFC_SURVEY;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,6 +16,7 @@ import org.jooq.impl.SQLDataType;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SurveySummary;
 import org.openforis.idm.metamodel.Survey;
+import org.openforis.idm.metamodel.xml.IdmlParseException;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -137,19 +137,18 @@ public class SurveyDao extends SurveyBaseDao {
 	}
 	
 	@Override
-	protected <T extends CollectSurvey> T processSurveyRow(Record row) {
+	protected CollectSurvey processSurveyRow(Record row) {
 		try {
 			if (row == null) {
 				return null;
 			}
 			String idml = row.getValueAsString(OFC_SURVEY.IDML);
-			T survey = unmarshalIdml(idml);
+			CollectSurvey survey = unmarshalIdml(idml);
 			survey.setId(row.getValueAsInteger(OFC_SURVEY.ID));
 			survey.setName(row.getValue(OFC_SURVEY.NAME));
 			return survey;
-		} catch (IOException e) {
-			throw new RuntimeException(
-					"Error deserializing IDML from database", e);
+		} catch (IdmlParseException e) {
+			throw new RuntimeException("Error deserializing IDML from database", e);
 		}
 	}
 	

@@ -3,7 +3,6 @@
  */
 package org.openforis.collect.manager;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -12,7 +11,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.io.IOUtils;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.CollectSurveyContext;
@@ -22,7 +20,7 @@ import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.collect.persistence.SurveyWorkDao;
 import org.openforis.idm.metamodel.LanguageSpecificText;
 import org.openforis.idm.metamodel.Survey;
-import org.openforis.idm.metamodel.xml.InvalidIdmlException;
+import org.openforis.idm.metamodel.xml.IdmlParseException;
 import org.openforis.idm.util.CollectionUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -150,15 +148,8 @@ public class SurveyManager {
 		}
 	}
 
-	public CollectSurvey unmarshalSurvey(InputStream is) throws InvalidIdmlException {
-		try {
-			byte[] bytes = IOUtils.toByteArray(is);
-			surveyDao.validateAgainstSchema(bytes);
-			String idml = new String(bytes, "UTF-8");
-			return surveyDao.unmarshalIdml(idml);
-		} catch (IOException e) {
-			throw new InvalidIdmlException("Error reading input stream");
-		}
+	public CollectSurvey unmarshalSurvey(InputStream is) throws IdmlParseException {
+		return surveyDao.unmarshalIdml(is);
 	}
 	
 	@Transactional
