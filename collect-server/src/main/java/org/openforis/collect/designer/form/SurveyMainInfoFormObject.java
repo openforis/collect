@@ -35,6 +35,11 @@ public class SurveyMainInfoFormObject extends SurveyObjectFormObject<CollectSurv
 		dest.setCycle(projectCycle);
 		dest.setPublished(published);
 	}
+	
+	@Override
+	protected void reset() {
+		// TODO Auto-generated method stub
+	}
 
 	public String getName() {
 		return name;

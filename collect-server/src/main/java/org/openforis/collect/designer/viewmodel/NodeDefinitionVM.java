@@ -3,10 +3,15 @@
  */
 package org.openforis.collect.designer.viewmodel;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.openforis.collect.designer.form.NodeDefinitionFormObject;
+import org.openforis.collect.metamodel.ui.UIOptions;
+import org.openforis.collect.metamodel.ui.UITab;
+import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Schema;
@@ -108,4 +113,24 @@ public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyO
 		return tempFormObject;
 	}
 	
+	public List<UITab> getAssignableTabs() {
+		if ( editedItem == null ) {
+			return null;
+		} else {
+			CollectSurvey survey = getSurvey();
+			UIOptions uiOptions = survey.getUIOptions();
+			List<UITab> result = new ArrayList<UITab>();
+			result.add(NodeDefinitionFormObject.INHERIT_TAB);
+			result.addAll(uiOptions.getAllowedTabs(editedItem));
+			return result;
+		}
+	}
+	
+	public String getTabLabel(UITab tab) {
+		if ( tab == null || tab == NodeDefinitionFormObject.INHERIT_TAB ) {
+			return NodeDefinitionFormObject.INHERIT_TAB.getLabel(null);
+		} else {
+			return tab.getLabel(currentLanguageCode);
+		}
+	}
 }

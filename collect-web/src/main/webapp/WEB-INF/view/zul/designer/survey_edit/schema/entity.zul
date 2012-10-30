@@ -1,4 +1,5 @@
 <?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<?component name="fieldErrorHandler" class="org.openforis.collect.designer.component.FieldErrorHandler"?>
 <zk>
     <custom-attributes parentEntity="${arg.parentEntity}"/>
 	<vlayout
@@ -10,8 +11,31 @@
 			@init(vm.tempFormObject)
 			@load(vm.formObject) 
 			@save(vm.formObject, before='applyChanges')
-			@validator('org.openforis.collect.designer.form.validator.NodeDefinitionFormValidator', parentEntity=parentEntity)">
+			@validator('org.openforis.collect.designer.form.validator.EntityDefinitionFormValidator', parentEntity=parentEntity)">
 		
 		<include src="survey_edit/schema/node_common.zul" />
+    
+        <grid>
+          <columns>
+            <column label="" width="150px" />
+            <column label="" width="100%" />
+          </columns>
+          <rows>
+            <row>
+              <label value="${labels.survey.schema.entity.layout.type_label}:" />
+              <fieldErrorHandler message="@load(vmsgs['layoutType'])">
+                <div>
+                  <radiogroup selectedItem="@bind(fx.layoutType)" 
+                      onCheck="@command('applyChanges')">
+                    <radio value="FORM" disabled="${empty parentEntity}"
+                      label="${labels.survey.schema.entity.layout.type.form}" />
+                    <radio value="TABLE" disabled="${empty parentEntity}"
+                      label="${labels.survey.schema.entity.layout.type.table}" />
+                  </radiogroup>
+                </div>
+              </fieldErrorHandler>
+            </row>
+          </rows>
+        </grid>
 	</vlayout>
 </zk>

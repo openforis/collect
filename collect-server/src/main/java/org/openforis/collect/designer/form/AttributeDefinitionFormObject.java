@@ -20,6 +20,7 @@ public class AttributeDefinitionFormObject<T extends AttributeDefinition> extend
 	private List<AttributeDefault> attributeDefaults;
 	private List<Check<?>> checks;
 
+	@Override
 	public void saveTo(T dest, String languageCode) {
 		super.saveTo(dest, languageCode);
 		dest.removeAllAttributeDefaults();
@@ -36,10 +37,18 @@ public class AttributeDefinitionFormObject<T extends AttributeDefinition> extend
 		}
 	}
 	
+	@Override
 	public void loadFrom(T source, String languageCode) {
 		super.loadFrom(source, languageCode);
 		attributeDefaults = new ArrayList<AttributeDefault>(source.getAttributeDefaults());
 		checks = new ArrayList<Check<?>>(source.getChecks());
+	}
+	
+	@Override
+	protected void reset() {
+		super.reset();
+		attributeDefaults = null;
+		checks = null;
 	}
 
 	public List<AttributeDefault> getAttributeDefaults() {

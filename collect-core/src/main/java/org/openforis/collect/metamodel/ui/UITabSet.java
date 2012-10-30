@@ -16,9 +16,7 @@ public class UITabSet implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	protected String name;
-
 	protected List<UITab> tabs;
-
 	protected UITabSet parent;
 	
 	public String getName() {
@@ -58,6 +56,10 @@ public class UITabSet implements Serializable {
 	
 	public void removeTab(UITab tab) {
 		tabs.remove(tab);
+	}
+	
+	public void moveTab(UITab tab, int newIndex) {
+		CollectionUtil.moveItem(tabs, tab, newIndex);
 	}
 
 	public UITab updateTab(String tabName, String newName, String newLabel, String language) {

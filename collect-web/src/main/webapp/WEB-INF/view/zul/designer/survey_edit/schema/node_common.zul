@@ -18,7 +18,8 @@
 				<label value="${labels.survey.schema.node.multiple}:" />
                 <fieldErrorHandler message="@load(vmsgs['multiple'])">
     				<checkbox checked="@load(fx.multiple eq true) @save(fx.multiple)" 
-                      onCheck="@command('applyChanges')" />
+                      onCheck="@command('applyChanges')"
+                      disabled="${empty parentEntity}" />
                 </fieldErrorHandler>
 			</row>
 			<row visible="@load(fx.multiple ne true)">
@@ -163,4 +164,25 @@
 			</row>
 		</rows>
 	</grid>
+    <grid>
+      <columns>
+        <column label="" width="150px" />
+        <column label="" width="100%" />
+      </columns>
+      <rows>
+        <row>
+          <label value="${labels.survey.schema.node.layout.tab}:" />
+          <fieldErrorHandler message="@load(vmsgs['tab'])">
+              <listbox width="150px" model="@load(vm.assignableTabs)"
+                selectedItem="@bind(fx.tab)" mold="select"
+                onSelect="@command('applyChanges')"
+                disabled="${empty parentEntity}">
+              <template name="model">
+                <listitem label="@load(vm.getTabLabel(each))" />
+              </template>
+            </listbox>
+          </fieldErrorHandler>
+        </row>
+      </rows>
+    </grid>
 </zk>

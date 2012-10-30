@@ -61,6 +61,11 @@ public class UnitFormObject extends SurveyObjectFormObject<Unit> {
 		dest.setDimension(dimension != null ? dimension.name().toLowerCase(): null);
 		dest.setConversionFactor(conversionFactor != null ? conversionFactor.floatValue(): null);
 	}
+	
+	@Override
+	protected void reset() {
+		// TODO Auto-generated method stub
+	}
 
 	public String getName() {
 		return name;

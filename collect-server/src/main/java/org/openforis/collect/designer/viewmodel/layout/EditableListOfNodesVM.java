@@ -92,7 +92,7 @@ public class EditableListOfNodesVM extends BaseVM {
 	
 	@Command
 	@NotifyChange({"nodesPerTab"})
-	public void setLayout(@BindingParam("type") String type, @BindingParam("node") NodeDefinition node) {
+	public void setLayout(@BindingParam("type") String type, @BindingParam("node") EntityDefinition node) {
 		UIOptions uiOpts = getUIOptions();
 		Layout layout = Layout.valueOf(type);
 		uiOpts.setLayout(node, layout);

@@ -61,18 +61,18 @@ public class SchemaVM extends SurveyBaseVM {
 	private static final String CONFIRM_REMOVE_NON_EMPTY_ENTITY_MESSAGE_KEY = "survey.schema.confirm_remove_non_empty_entity";
 	private static final String CONFIRM_REMOVE_NODE_TITLE_KEY = "survey.schema.confirm_remove_node_title";
 	
-	private SchemaTreeModel treeModel;
 	private NodeDefinition selectedNode;
 	private NodeDefinition editedNode;
 	private boolean newItem;
 
 	@Wire
-	private Tree nodesTree;
-	@Wire
 	private Include nodeFormInclude;
+	@Wire
+	private Tree nodesTree;
 	
+	private SchemaTreeModel treeModel;
+
 	//popups
-	private Window attributePopUp;
 	private Window versioningPopUp;
 
 	@AfterCompose
@@ -82,7 +82,7 @@ public class SchemaVM extends SurveyBaseVM {
 	}
 	
 	@Command
-	@NotifyChange({"nodes","selectedNode","editedNode"})
+	@NotifyChange({"selectedNode","editedNode"})
 	public void nodeSelected(@BindingParam("node") Treeitem node) {
 		if ( node != null ) {
 			TreeNode<NodeDefinition> treeNode = node.getValue();
@@ -126,12 +126,6 @@ public class SchemaVM extends SurveyBaseVM {
 		}
 	}
 
-	protected void closeAttributeEditPopUp() {
-		closePopUp(attributePopUp);
-		attributePopUp = null;
-		validateForm();
-	}
-	
 	protected void onAfterNodeCreated(Binder binder, EntityDefinition parentEntity, NodeDefinition newNode) {
 		newItem = true;
 		editedNode = newNode;

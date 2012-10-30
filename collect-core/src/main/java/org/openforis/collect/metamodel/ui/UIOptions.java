@@ -138,7 +138,7 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		return result;
 	}
 
-	public List<NodeDefinition> getNodesPerTab(CollectSurvey survey, UITab tab, boolean includeChildrenOfEntities) {
+	public List<NodeDefinition> getNodesPerTab(CollectSurvey survey, UITab tab, boolean includeDescendants) {
 		List<NodeDefinition> result = new ArrayList<NodeDefinition>();
 		UITabSet tabSet = tab.getRootTabSet();
 		EntityDefinition rootEntity = getRootEntityDefinition(survey, tabSet);
@@ -152,7 +152,7 @@ public class UIOptions implements ApplicationOptions, Serializable {
 				result.add(defn);
 				nodeInTab = true;
 			}
-			if ( defn instanceof EntityDefinition && (includeChildrenOfEntities || !nodeInTab) ) {
+			if ( defn instanceof EntityDefinition && (includeDescendants || !nodeInTab) ) {
 				queue.addAll(((EntityDefinition) defn).getChildDefinitions());
 			}
 		}
@@ -190,9 +190,33 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		return layoutValue != null ? Layout.valueOf(layoutValue.toUpperCase()): null;
 	}
 
-	public void setLayout(NodeDefinition nodeDefn, Layout layout) {
+	public void setLayout(EntityDefinition entityDefn, Layout layout) {
 		String layoutValue = layout != null ? layout.name().toLowerCase(): null;
-		nodeDefn.setAnnotation(Annotation.LAYOUT.getQName(), layoutValue);
+		entityDefn.setAnnotation(Annotation.LAYOUT.getQName(), layoutValue);
+	}
+	
+	public boolean isAssignableTo(EntityDefinition parentEntityDefn, EntityDefinition entityDefn, Layout layout) {
+		if ( layout != Layout.FORM ) {
+			return true;
+		} else {
+			CollectSurvey survey = (CollectSurvey) entityDefn.getSurvey();
+			UITab tab = getTab(entityDefn);
+			EntityDefinition multipleEntity = getFormLayoutMultipleEntity(survey, tab);
+			return multipleEntity == null || multipleEntity == entityDefn;
+		}
+	}
+
+	protected EntityDefinition getFormLayoutMultipleEntity(CollectSurvey survey, UITab tab) {
+		List<NodeDefinition> nodesPerTab = getNodesPerTab(survey, tab, false);
+		for (NodeDefinition nodeDefn : nodesPerTab) {
+			if ( nodeDefn instanceof EntityDefinition && nodeDefn.isMultiple() ) {
+				Layout nodeLayout = getLayout((EntityDefinition) nodeDefn);
+				if ( nodeLayout == Layout.FORM ) {
+					return (EntityDefinition) nodeDefn;
+				}
+			}
+		}
+		return null;
 	}
 
 	public EntityDefinition getRootEntityDefinition(CollectSurvey survey,

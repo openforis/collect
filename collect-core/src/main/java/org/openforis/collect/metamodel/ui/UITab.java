@@ -46,6 +46,17 @@ public class UITab extends UITabSet {
 	public void removeLabel(String language) {
 		labels.remove(language);
 	}
+	
+	public List<UITab> getSiblings() {
+		UITabSet parent = getParent();
+		return parent.getTabs();
+	}
+	
+	public int getIndex() {
+		List<UITab> siblings = getSiblings();
+		int index = siblings.indexOf(this);
+		return index;
+	}
 
 	@Override
 	public int hashCode() {

@@ -26,6 +26,12 @@ public class CheckFormObject<T extends Check<?>> extends SurveyObjectFormObject<
 		dest.setFlag(Flag.valueOf(flag));
 		dest.setCondition(condition);
 	}
+	
+	@Override
+	protected void reset() {
+		flag = null;
+		condition = null;
+	}
 
 	public String getCondition() {
 		return condition;

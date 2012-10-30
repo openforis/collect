@@ -20,9 +20,7 @@ public abstract class FormObject<T> {
 	}
 	
 	
-	protected void reset() {
-		
-	}
+	protected abstract void reset();
 	
 	
 }

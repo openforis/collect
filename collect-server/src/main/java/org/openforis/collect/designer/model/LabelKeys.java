@@ -13,5 +13,5 @@ public interface LabelKeys {
 	String NODE_MIN_COUNT = "survey.schema.node.min_count";
 	String CHECK_FLAG_WARNING = "survey.schema.node.check.flag.warning";
 	String CHECK_FLAG_ERROR = "survey.schema.node.check.flag.error";
-	
+	String LAYOUT_NOT_SUPPORTED_MESSAGE_KEY = "survey.schema.entity.layout.not_supported_error";
 }

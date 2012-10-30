@@ -50,7 +50,7 @@
 				        	<include src="survey_edit/schema/schema.zul" />
 				        </tabpanel>
 				        <tabpanel>
-				        	<include src="survey_edit/layout.zul" />
+				        	<include src="survey_edit/layout_tabs.zul" />
 				        </tabpanel>
 				    </tabpanels>
 				</tabbox>

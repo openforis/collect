@@ -58,6 +58,7 @@ public class ComparisonCheckFormObject extends CheckFormObject<ComparisonCheck> 
 		}
 	}
 
+	@Override
 	protected void reset() {
 		super.reset();
 		message = null;

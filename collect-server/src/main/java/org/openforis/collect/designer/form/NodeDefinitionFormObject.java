@@ -2,7 +2,9 @@ package org.openforis.collect.designer.form;
 
 import org.openforis.collect.designer.model.AttributeType;
 import org.openforis.collect.designer.model.NodeType;
+import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.metamodel.ui.UITab;
+import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NodeLabel.Type;
@@ -17,13 +19,22 @@ import org.zkoss.util.resource.Labels;
 public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends SurveyObjectFormObject<T> {
 	
 	public static UITab INHERIT_TAB;
-	{
+	
+	static {
 		//init static variables
 		INHERIT_TAB = new UITab();
-		INHERIT_TAB.setName(Labels.getLabel("survey.configuration.tab.inherit"));
+		INHERIT_TAB.setLabel(null, Labels.getLabel("survey.schema.node.tab.inherited"));
 	};
-	
+	//generic
 	private String name;
+	private String description;
+	private boolean multiple;
+	private boolean required;
+	private String requiredExpression;
+	private String relevantExpression;
+	private Integer minCount;
+	private Integer maxCount;
+	//labels
 	private String headingLabel;
 	private String instanceLabel;
 	private String numberLabel;
@@ -31,15 +42,11 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 	private String paperPromptLabel;
 	private String handheldPromptLabel;
 	private String pcPromptLabel;
-	private String description;
-	private boolean multiple;
-	private boolean required;
-	private String requiredExpression;
-	private String relevantExpression;
+	//versioning
 	private Object sinceVersion;
 	private Object deprecatedVersion;
-	private Integer minCount;
-	private Integer maxCount;
+	//layout
+	private UITab tab;
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public static NodeDefinitionFormObject<NodeDefinition> newInstance(NodeType nodeType, AttributeType attributeType) {
@@ -118,6 +125,11 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 		maxCount = source.getMaxCount();
 		sinceVersion = source.getSinceVersion();
 		deprecatedVersion = source.getDeprecatedVersion();
+		UIOptions uiOptions = getUIOptions(source);
+		tab = uiOptions.getTab(source, false);
+		if ( tab == null ) {
+			tab = INHERIT_TAB;
+		}
 	}
 	
 	@Override
@@ -132,27 +144,40 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 		dest.setPrompt(Prompt.Type.PC, languageCode, pcPromptLabel);
 		dest.setDescription(languageCode, description);
 		dest.setMultiple(multiple);
+		dest.setMinCount(null);
+		dest.setMaxCount(null);
+		dest.setRequiredExpression(null);
 		if ( multiple ) {
 			dest.setMinCount(minCount);
 			dest.setMaxCount(maxCount);
-//			dest.setRequired(null);
-			dest.setRequiredExpression(null);
 		} else {
-			dest.setMinCount(null);
-			dest.setMaxCount(null);
-//			dest.setRequired(required);
 			dest.setRequiredExpression(requiredExpression);
 		}
+		dest.setSinceVersion(null);
+		dest.setDeprecatedVersion(null);
 		if ( sinceVersion != null && sinceVersion != VERSION_EMPTY_SELECTION ) {
 			dest.setSinceVersion((ModelVersion) sinceVersion);
-		} else {
-			dest.setSinceVersion(null);
 		}
 		if ( deprecatedVersion != null && deprecatedVersion != VERSION_EMPTY_SELECTION ) {
 			dest.setDeprecatedVersion((ModelVersion) deprecatedVersion);
-		} else {
-			dest.setDeprecatedVersion(null);
 		}
+		UIOptions uiOptions = getUIOptions(dest);
+		if ( tab == null || tab == INHERIT_TAB ) {
+			uiOptions.removeTabAssociation(dest);
+		} else {
+			uiOptions.associateWithTab(dest, tab);
+		}
+	}
+	
+	@Override
+	protected void reset() {
+		//TODO
+	}
+	
+	protected UIOptions getUIOptions(NodeDefinition nodeDefn) {
+		CollectSurvey survey = (CollectSurvey) nodeDefn.getSurvey();
+		UIOptions uiOptions = survey.getUIOptions();
+		return uiOptions;
 	}
 	
 	public String getName() {
@@ -289,6 +314,14 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 
 	public void setMaxCount(Integer maxCount) {
 		this.maxCount = maxCount;
+	}
+
+	public UITab getTab() {
+		return tab;
+	}
+
+	public void setTab(UITab tab) {
+		this.tab = tab;
 	}
 
 }

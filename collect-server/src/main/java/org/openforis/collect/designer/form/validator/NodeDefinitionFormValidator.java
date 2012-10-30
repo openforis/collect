@@ -1,10 +1,7 @@
 package org.openforis.collect.designer.form.validator;
 
 import org.openforis.collect.designer.model.LabelKeys;
-import org.openforis.collect.designer.viewmodel.AttributeVM;
-import org.openforis.collect.designer.viewmodel.EntityDefinitionVM;
 import org.openforis.collect.designer.viewmodel.NodeDefinitionVM;
-import org.openforis.collect.designer.viewmodel.SchemaVM;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -23,9 +20,9 @@ public class NodeDefinitionFormValidator extends FormValidator {
 
 	protected static final String 	DESCRIPTION_FIELD = "description";
 	protected static final String 	NAME_FIELD = "name";
+	protected static final String 	MULTIPLE_FIELD = "multiple";
 	private static final String 	MIN_COUNT_FIELD = "minCount";
 	protected static final String 	MAX_COUNT_FIELD = "maxCount";
-	protected static final String 	MULTIPLE_FIELD = "multiple";
 	protected static final int 		MAX_COUNT_MIN_VALUE = 2;
 
 	@Override
@@ -52,7 +49,7 @@ public class NodeDefinitionFormValidator extends FormValidator {
 		String name = (String) getValue(ctx, NAME_FIELD);
 		if (!isNameUnique(ctx, editedNode, name)) {
 			String message = Labels.getLabel(NODE_NAME_ALREADY_DEFINED_MESSAGE_KEY);
-			this.addInvalidMessage(ctx, NAME_FIELD, message);
+			addInvalidMessage(ctx, NAME_FIELD, message);
 			return false;
 		} else {
 			return true;

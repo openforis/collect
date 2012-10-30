@@ -41,6 +41,11 @@ public class PrecisionFormObject extends SurveyObjectFormObject<Precision> {
 		dest.setDefaultPrecision(defaultPrecision);
 	}
 
+	@Override
+	protected void reset() {
+		// TODO Auto-generated method stub
+	}
+	
 	public Unit getUnit() {
 		return unit;
 	}

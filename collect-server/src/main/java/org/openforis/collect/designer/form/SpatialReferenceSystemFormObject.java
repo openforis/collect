@@ -29,6 +29,11 @@ public class SpatialReferenceSystemFormObject extends SurveyObjectFormObject<Spa
 		dest.setDescription(languageCode, description);
 		dest.setWellKnownText(wellKnownText);
 	}
+	
+	@Override
+	protected void reset() {
+		// TODO Auto-generated method stub
+	}
 
 	public String getId() {
 		return id;

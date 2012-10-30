@@ -33,6 +33,11 @@ public class ModelVersionFormObject extends SurveyObjectFormObject<ModelVersion>
 		dest.setDate(DateUtil.formatDateToXML(date));
 	}
 	
+	@Override
+	protected void reset() {
+		// TODO 
+	}
+	
 	public String getName() {
 		return name;
 	}
