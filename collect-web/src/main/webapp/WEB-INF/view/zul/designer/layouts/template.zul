@@ -17,11 +17,6 @@
       				hflex="1" vflex="1"></div>
       		</vlayout>
       	</center>
-      	<south height="30px" border="none">
-      		<div id="footer" sclass="footer">
-      			<image src="/assets/images/designer-footer.jpg" />
-      		</div>
-      	</south>
       </borderlayout>
       <div hflex="1" />
     </hlayout>
