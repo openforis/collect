@@ -173,14 +173,12 @@ public class SurveyManager {
 	
 	@Transactional
 	public CollectSurvey loadPublishedSurveyForEdit(String uri) {
-		CollectSurvey survey = (CollectSurvey) surveyDao.loadByUri(uri);
-		CollectSurvey tempSurvey = surveyWorkDao.loadByUri(uri);
-		if ( tempSurvey != null ) {
-			return tempSurvey;
-		} else {
-			CollectSurvey surveyWork = createSurveyWork(survey);
-			return surveyWork;
+		CollectSurvey surveyWork = surveyWorkDao.loadByUri(uri);
+		if ( surveyWork == null ) {
+			CollectSurvey publishedSurvey = (CollectSurvey) surveyDao.loadByUri(uri);
+			surveyWork = createSurveyWork(publishedSurvey);
 		}
+		return surveyWork;
 	}
 
 	public CollectSurvey createSurveyWork() {
