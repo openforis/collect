@@ -40,7 +40,9 @@ public class SurveyEditVM extends SurveyBaseVM {
 	@Init(superclass=false)
 	public void init() {
 		super.init();
-		if ( currentLanguageCode == null ) {
+		if ( survey == null ) {
+			backToSurveysList();
+		} else if ( currentLanguageCode == null ) {
 //			TODO
 //			List<String> langCodes = survey.getLanguages();
 //			if ( langCodes.size() == 1 ) {
@@ -80,10 +82,17 @@ public class SurveyEditVM extends SurveyBaseVM {
 	
 	@Command
 	public void backToSurveysList() {
-		SessionStatus sessionStatus = getSessionStatus();
-		sessionStatus.setSurvey(null);
-		sessionStatus.setCurrentLanguageCode(null);
+		resetSessionStatus();
+		showMainPage();
+	}
+
+	protected void showMainPage() {
 		Executions.sendRedirect(Resources.Page.MAIN.getLocation());
+	}
+
+	protected void resetSessionStatus() {
+		SessionStatus sessionStatus = getSessionStatus();
+		sessionStatus.reset();
 	}
 	
 	@Command

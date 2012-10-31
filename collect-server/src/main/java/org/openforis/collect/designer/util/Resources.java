@@ -7,7 +7,7 @@ package org.openforis.collect.designer.util;
  */
 public class Resources {
 	
-	public static final String PAGES_BASE_PATH = "";
+	public static final String PAGES_BASE_PATH = "/";
 	public static final String COMPONENTS_BASE_PATH = "/WEB-INF/view/zul/designer/";
 	public static final String PREVIEW_PATH = "index.htm";
 	

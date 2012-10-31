@@ -18,6 +18,12 @@ public class SessionStatus {
 	private CollectSurvey survey;
 	private ModelVersion layoutFormVersion;
 	
+	public void reset() {
+		currentLanguageCode = null;
+		survey = null;
+		layoutFormVersion = null;
+	}
+
 	public String getCurrentLanguageCode() {
 		return currentLanguageCode;
 	}
@@ -41,5 +47,5 @@ public class SessionStatus {
 	public void setLayoutFormVersion(ModelVersion layoutFormVersion) {
 		this.layoutFormVersion = layoutFormVersion;
 	}
-	
+
 }

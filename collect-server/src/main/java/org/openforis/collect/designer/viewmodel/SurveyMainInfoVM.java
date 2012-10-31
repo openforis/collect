@@ -23,18 +23,18 @@ public class SurveyMainInfoVM extends SurveyObjectBaseVM<CollectSurvey> {
 	@Init(superclass=false)
 	public void init() {
 		super.init();
-		editedItem = getSurvey();
+		setEditedItem(getSurvey());
 	}
-
-	@Override
-	public SurveyObjectFormObject<CollectSurvey> getFormObject() {
-		if ( formObject == null ) {
-			CollectSurvey survey = getSurvey();
-			formObject = createFormObject();
-			formObject.loadFrom(survey, currentLanguageCode);
-		}
-		return formObject;
-	}
+	
+//	@Override
+//	public SurveyObjectFormObject<CollectSurvey> getFormObject() {
+//		if ( formObject == null ) {
+//			CollectSurvey survey = getSurvey();
+//			formObject = createFormObject();
+//			formObject.loadFrom(survey, currentLanguageCode);
+//		}
+//		return formObject;
+//	}
 	
 	@Override
 	protected CollectSurvey createItemInstance() {

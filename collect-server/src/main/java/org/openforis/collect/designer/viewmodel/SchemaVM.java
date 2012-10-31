@@ -345,7 +345,11 @@ public class SchemaVM extends SurveyBaseVM {
 	public SchemaTreeModel getNodes() {
 		if ( treeModel == null ) {
 			CollectSurvey survey = getSurvey();
-			treeModel = SchemaTreeModel.createInstance(survey, true);
+			if ( survey == null ) {
+				//TODO session expired...?
+			} else {
+				treeModel = SchemaTreeModel.createInstance(survey, true);
+			}
 		}
 		return treeModel;
     }

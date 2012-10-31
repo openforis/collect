@@ -261,23 +261,37 @@ public class SchemaLayoutSimpleVM extends SurveyBaseVM {
 			treeModel = null;
 		} else {
 			CollectSurvey survey = getSurvey();
-			UIOptions uiOptions = survey.getUIOptions();
-			rootTabSet = uiOptions.getTabSet(selectedRootEntity);
-			treeModel = UITabsTreeModel.createInstance(rootTabSet);
+			if ( survey == null ) {
+				//TODO session expired...?
+			} else {
+				UIOptions uiOptions = survey.getUIOptions();
+				rootTabSet = uiOptions.getTabSet(selectedRootEntity);
+				treeModel = UITabsTreeModel.createInstance(rootTabSet);
+			}
 		}
 	}
 
 	public List<EntityDefinition> getRootEntities() {
 		CollectSurvey survey = getSurvey();
-		Schema schema = survey.getSchema();
-		List<EntityDefinition> result = schema.getRootEntityDefinitions();
-		return result;
+		if ( survey == null ) {
+			//TODO session expired...?
+			return null;
+		} else {
+			Schema schema = survey.getSchema();
+			List<EntityDefinition> result = schema.getRootEntityDefinitions();
+			return result;
+		}
 	}
 	
 	public List<ModelVersion> getFormVersions() {
 		CollectSurvey survey = getSurvey();
-		List<ModelVersion> result = new ArrayList<ModelVersion>(survey.getVersions());
-		return new BindingListModelList<ModelVersion>(result, false);
+		if ( survey == null ) {
+			//TODO session expired...?
+			return null;
+		} else {
+			List<ModelVersion> result = new ArrayList<ModelVersion>(survey.getVersions());
+			return new BindingListModelList<ModelVersion>(result, false);
+		}
 	}
 	
 	public UITabSet getRootTabSet() {
