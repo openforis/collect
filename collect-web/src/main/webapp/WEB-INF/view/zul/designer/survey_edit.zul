@@ -17,44 +17,48 @@
 		apply="org.openforis.collect.designer.composer.SurveyEditComposer"
 		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SurveyEditVM')">
 	 	<center>
-			<vlayout hflex="1" vflex="1">
-				<!-- language selector -->
-				<hlayout width="100%" style="text-align: right;">
-					<label value="${labels.survey.selected_language}:" />
-					<radiogroup model="@load(vm.availableLanguages)"
-						selectedItem="@load(vm.currentLanguageCode)"
-						onCheck="@command('languageCodeSelected', code=self.selectedItem.value)">
-						<template name="model">
-							<radio label="@load(each)" value="@load(each)" />
-						</template>
-					</radiogroup>
-					<button tooltiptext="${labels.survey.language_manager}" 
-							onClick="@command('openLanguageManagerPopUp')"
-							image="/assets/images/pencil-small.png" />
-				</hlayout>
-				<!-- main tabs -->
-				<tabbox id="tb" hflex="1" vflex="1">
-				    <tabs id="tabs">
-				        <tab id="surveyTab" label="${labels.survey.$}"
-				        	 w:_sel="switchTab" forward="onSwitchTab=onSwitchTab" />
-				        <tab id="schemaTab" label="${labels.survey.schema.$}"
-				        	 w:_sel="switchTab" forward="onSwitchTab=onSwitchTab" />
-				        <tab id="layoutTab" label="${labels.survey.layout.$}"
-				        	 w:_sel="switchTab" forward="onSwitchTab=onSwitchTab"  />
-				    </tabs>
-				    <tabpanels>
-				        <tabpanel>
-				        	<include src="survey_edit/info.zul" />
-				        </tabpanel>
-				        <tabpanel>
-				        	<include src="survey_edit/schema/schema.zul" />
-				        </tabpanel>
-				        <tabpanel>
-				        	<include src="survey_edit/layout_tabs.zul" />
-				        </tabpanel>
-				    </tabpanels>
-				</tabbox>
-			</vlayout>
+			<absolutelayout hflex="1" vflex="1">
+                <absolutechildren x="600">
+    				<!-- language selector -->
+    				<hlayout id="languageSelector" style="text-align: right;">
+    					<label value="${labels.survey.selected_language}:" />
+    					<radiogroup model="@load(vm.availableLanguages)"
+    						selectedItem="@load(vm.currentLanguageCode)"
+    						onCheck="@command('languageCodeSelected', code=self.selectedItem.value)">
+    						<template name="model">
+    							<radio label="@load(each)" value="@load(each)" />
+    						</template>
+    					</radiogroup>
+    					<button tooltiptext="${labels.survey.language_manager}" 
+    							onClick="@command('openLanguageManagerPopUp')"
+    							image="/assets/images/pencil-small.png" />
+    				</hlayout>
+                </absolutechildren>
+                <absolutechildren hflex="1" vflex="1">
+    				<!-- main tabs -->
+    				<tabbox id="tb" hflex="1" vflex="1">
+    				    <tabs id="tabs">
+    				        <tab id="surveyTab" label="${labels.survey.$}"
+    				        	 w:_sel="switchTab" forward="onSwitchTab=onSwitchTab" />
+    				        <tab id="schemaTab" label="${labels.survey.schema.$}"
+    				        	 w:_sel="switchTab" forward="onSwitchTab=onSwitchTab" />
+    				        <tab id="layoutTab" label="${labels.survey.layout.$}"
+    				        	 w:_sel="switchTab" forward="onSwitchTab=onSwitchTab"  />
+    				    </tabs>
+    				    <tabpanels>
+    				        <tabpanel>
+    				        	<include src="survey_edit/info.zul" />
+    				        </tabpanel>
+    				        <tabpanel>
+    				        	<include src="survey_edit/schema/schema.zul" />
+    				        </tabpanel>
+    				        <tabpanel>
+    				        	<include src="survey_edit/layout_tabs.zul" />
+    				        </tabpanel>
+    				    </tabpanels>
+    				</tabbox>
+                </absolutechildren>
+			</absolutelayout>
 	 	</center>
 		<south height="30px">
 			<borderlayout hflex="1">

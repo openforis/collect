@@ -9,6 +9,7 @@ import org.openforis.collect.designer.session.SessionStatus;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.Resources;
 import org.openforis.collect.manager.SurveyManager;
+import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.persistence.SurveyImportException;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.annotation.BindingParam;
@@ -143,8 +144,14 @@ public class SurveyEditVM extends SurveyBaseVM {
 	}
 	
 	public List<String> getAvailableLanguages() {
-		List<String> languages = survey.getLanguages();
-		return new BindingListModelList<String>(languages, false);
+		CollectSurvey survey = getSurvey();
+		if ( survey == null ) {
+			//TODO session expired?
+			return null;
+		} else {
+			List<String> languages = survey.getLanguages();
+			return new BindingListModelList<String>(languages, false);
+		}
 	}
 	
 }
