@@ -10,7 +10,6 @@ import org.openforis.idm.metamodel.validation.ComparisonCheck;
  */
 public class ComparisonCheckFormObject extends CheckFormObject<ComparisonCheck> {
 	
-	private String message;
 	private String greaterThan;
 	private boolean greaterThanEqual;
 	private String lessThan;
@@ -20,7 +19,6 @@ public class ComparisonCheckFormObject extends CheckFormObject<ComparisonCheck> 
 	public void saveTo(ComparisonCheck dest, String languageCode) {
 		super.saveTo(dest, languageCode);
 		resetExpressions(dest);
-		dest.setMessage(languageCode, message);
 		if ( greaterThanEqual ) {
 			dest.setGreaterThanOrEqualsExpression(greaterThan);
 		} else {
@@ -36,7 +34,6 @@ public class ComparisonCheckFormObject extends CheckFormObject<ComparisonCheck> 
 	@Override
 	public void loadFrom(ComparisonCheck source, String languageCode, String defaultLanguage) {
 		super.loadFrom(source, languageCode, defaultLanguage);
-		
 		if ( StringUtils.isNotBlank(source.getEqualsExpression()) ) {
 			greaterThan = lessThan = source.getEqualsExpression();
 			greaterThanEqual = lessThanEqual = true;
@@ -61,7 +58,6 @@ public class ComparisonCheckFormObject extends CheckFormObject<ComparisonCheck> 
 	@Override
 	protected void reset() {
 		super.reset();
-		message = null;
 		greaterThan = lessThan = null;
 		greaterThanEqual = lessThanEqual = false;
 	}
@@ -71,14 +67,6 @@ public class ComparisonCheckFormObject extends CheckFormObject<ComparisonCheck> 
 		dest.setGreaterThanOrEqualsExpression(null);
 		dest.setLessThanExpression(null);
 		dest.setLessThanOrEqualsExpression(null);
-	}
-
-	public String getMessage() {
-		return message;
-	}
-
-	public void setMessage(String message) {
-		this.message = message;
 	}
 
 	public String getGreaterThan() {
