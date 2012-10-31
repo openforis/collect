@@ -16,24 +16,8 @@
 		self="@define(content)"
 		apply="org.openforis.collect.designer.composer.SurveyEditComposer"
 		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SurveyEditVM')">
-	 	<center>
+	 	<center border="none">
 			<absolutelayout hflex="1" vflex="1">
-                <absolutechildren x="600">
-    				<!-- language selector -->
-    				<hlayout id="languageSelector" style="text-align: right;">
-    					<label value="${labels.survey.selected_language}:" />
-    					<radiogroup model="@load(vm.availableLanguages)"
-    						selectedItem="@load(vm.currentLanguageCode)"
-    						onCheck="@command('languageCodeSelected', code=self.selectedItem.value)">
-    						<template name="model">
-    							<radio label="@load(each)" value="@load(each)" />
-    						</template>
-    					</radiogroup>
-    					<button tooltiptext="${labels.survey.language_manager}" 
-    							onClick="@command('openLanguageManagerPopUp')"
-    							image="/assets/images/pencil-small.png" />
-    				</hlayout>
-                </absolutechildren>
                 <absolutechildren hflex="1" vflex="1">
     				<!-- main tabs -->
     				<tabbox id="tb" hflex="1" vflex="1">
@@ -57,6 +41,22 @@
     				        </tabpanel>
     				    </tabpanels>
     				</tabbox>
+                </absolutechildren>
+                <absolutechildren x="480" width="50%">
+                    <!-- language selector -->
+                    <hlayout id="languageSelector" hflex="1" style="text-align: right;">
+                      <label value="${labels.survey.selected_language}:" />
+                      <radiogroup model="@load(vm.availableLanguages)"
+                        selectedItem="@load(vm.currentLanguageCode)"
+                        onCheck="@command('languageCodeSelected', code=self.selectedItem.value)">
+                        <template name="model">
+                          <radio label="@load(each)" value="@load(each)" />
+                        </template>
+                      </radiogroup>
+                      <button tooltiptext="${labels.survey.language_manager}" 
+                          onClick="@command('openLanguageManagerPopUp')"
+                          image="/assets/images/pencil-small.png" />
+                    </hlayout>
                 </absolutechildren>
 			</absolutelayout>
 	 	</center>

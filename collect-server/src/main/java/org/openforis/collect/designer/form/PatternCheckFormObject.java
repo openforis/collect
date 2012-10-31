@@ -26,8 +26,8 @@ public class PatternCheckFormObject extends CheckFormObject<PatternCheck> {
 	}
 	
 	@Override
-	public void loadFrom(PatternCheck source, String languageCode) {
-		super.loadFrom(source, languageCode);
+	public void loadFrom(PatternCheck source, String languageCode, String defaultLanguage) {
+		super.loadFrom(source, languageCode, defaultLanguage);
 		regularExpression = source.getRegularExpression();
 	}
 }

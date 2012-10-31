@@ -18,8 +18,8 @@ public class CustomCheckFormObject extends CheckFormObject<CustomCheck> {
 	}
 	
 	@Override
-	public void loadFrom(CustomCheck source, String languageCode) {
-		super.loadFrom(source, languageCode);
+	public void loadFrom(CustomCheck source, String languageCode, String defaultLanguage) {
+		super.loadFrom(source, languageCode, defaultLanguage);
 		expression = source.getExpression();
 	}
 

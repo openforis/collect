@@ -4,7 +4,7 @@
 package org.openforis.collect.designer.viewmodel;
 
 import org.openforis.collect.designer.form.ComparisonCheckFormObject;
-import org.openforis.collect.designer.form.SurveyObjectFormObject;
+import org.openforis.collect.designer.form.FormObject;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.validation.ComparisonCheck;
 import org.zkoss.bind.annotation.ExecutionArgParam;
@@ -24,7 +24,7 @@ public class ComparisonCheckVM extends CheckVM<ComparisonCheck> {
 	}
 	
 	@Override
-	protected SurveyObjectFormObject<ComparisonCheck> createFormObject() {
+	protected FormObject<ComparisonCheck> createFormObject() {
 		return new ComparisonCheckFormObject();
 	}
 

@@ -3,7 +3,7 @@
  */
 package org.openforis.collect.designer.viewmodel;
 
-import org.openforis.collect.designer.form.SurveyObjectFormObject;
+import org.openforis.collect.designer.form.FormObject;
 import org.openforis.collect.designer.form.UniquenessCheckFormObject;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.validation.UniquenessCheck;
@@ -24,7 +24,7 @@ public class UniquenessCheckVM extends CheckVM<UniquenessCheck> {
 	}
 	
 	@Override
-	protected SurveyObjectFormObject<UniquenessCheck> createFormObject() {
+	protected FormObject<UniquenessCheck> createFormObject() {
 		return new UniquenessCheckFormObject();
 	}
 

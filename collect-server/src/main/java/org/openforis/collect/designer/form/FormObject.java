@@ -13,13 +13,15 @@ public abstract class FormObject<T> {
 
 	public static NamedObject VERSION_EMPTY_SELECTION;
 	
-	{
+	static {
 		//init static variables
 		VERSION_EMPTY_SELECTION = new NamedObject(EMPTY_OPTION);
 	}
 	
+	public abstract void loadFrom(T source, String language, String defaultLanguage);
+	
+	public abstract void saveTo(T dest, String language);
 	
 	protected abstract void reset();
-	
 	
 }

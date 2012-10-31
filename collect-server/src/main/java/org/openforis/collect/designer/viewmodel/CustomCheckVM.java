@@ -4,7 +4,7 @@
 package org.openforis.collect.designer.viewmodel;
 
 import org.openforis.collect.designer.form.CustomCheckFormObject;
-import org.openforis.collect.designer.form.SurveyObjectFormObject;
+import org.openforis.collect.designer.form.FormObject;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.validation.CustomCheck;
 import org.zkoss.bind.annotation.ExecutionArgParam;
@@ -24,7 +24,7 @@ public class CustomCheckVM extends CheckVM<CustomCheck> {
 	}
 	
 	@Override
-	protected SurveyObjectFormObject<CustomCheck> createFormObject() {
+	protected FormObject<CustomCheck> createFormObject() {
 		return new CustomCheckFormObject();
 	}
 

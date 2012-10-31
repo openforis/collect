@@ -6,7 +6,7 @@ package org.openforis.collect.designer.viewmodel;
 import java.util.List;
 
 import org.openforis.collect.designer.form.CodeListItemFormObject;
-import org.openforis.collect.designer.form.SurveyObjectFormObject;
+import org.openforis.collect.designer.form.FormObject;
 import org.openforis.idm.metamodel.CodeListItem;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.annotation.Command;
@@ -53,7 +53,7 @@ public class CodeListItemVM extends SurveyObjectBaseVM<CodeListItem> {
 	}
 	
 	@Override
-	protected SurveyObjectFormObject<CodeListItem> createFormObject() {
+	protected FormObject<CodeListItem> createFormObject() {
 		return new CodeListItemFormObject();
 	}
 

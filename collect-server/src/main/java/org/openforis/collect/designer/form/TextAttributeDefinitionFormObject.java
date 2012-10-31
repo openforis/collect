@@ -28,8 +28,8 @@ public class TextAttributeDefinitionFormObject<T extends TextAttributeDefinition
 	}
 	
 	@Override
-	public void loadFrom(T source, String languageCode) {
-		super.loadFrom(source, languageCode);
+	public void loadFrom(T source, String languageCode, String defaultLanguage) {
+		super.loadFrom(source, languageCode, defaultLanguage);
 		key = source.isKey();
 		Type typeEnum = source.getType();
 		if ( typeEnum == null ) {

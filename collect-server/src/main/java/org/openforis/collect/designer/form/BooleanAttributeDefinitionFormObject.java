@@ -35,8 +35,8 @@ public class BooleanAttributeDefinitionFormObject<T extends BooleanAttributeDefi
 	}
 	
 	@Override
-	public void loadFrom(T source, String languageCode) {
-		super.loadFrom(source, languageCode);
+	public void loadFrom(T source, String languageCode, String defaultLanguage) {
+		super.loadFrom(source, languageCode, defaultLanguage);
 		typeValue = source.isAffirmativeOnly() ? Type.AFFIRMATIVE_ONLY.name(): Type.THREE_STATE.name();
 	}
 

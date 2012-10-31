@@ -14,13 +14,15 @@ public class NumberAttributeDefinitionFormObject<T extends NumberAttributeDefini
 
 	private boolean key;
 
+	@Override
 	public void saveTo(T dest, String languageCode) {
 		super.saveTo(dest, languageCode);
 		dest.setKey(key);
 	}
 	
-	public void loadFrom(T source, String languageCode) {
-		super.loadFrom(source, languageCode);
+	@Override
+	public void loadFrom(T source, String languageCode, String defaultLanguage) {
+		super.loadFrom(source, languageCode, defaultLanguage);
 		key = source.isKey();
 	}
 

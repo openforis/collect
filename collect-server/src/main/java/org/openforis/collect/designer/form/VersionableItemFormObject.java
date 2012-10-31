@@ -10,16 +10,18 @@ import org.openforis.idm.metamodel.VersionableSurveyObject;
  * @author S. Ricci
  *
  */
-public class VersionableItemFormObject<T extends VersionableSurveyObject> extends SurveyObjectFormObject<T> {
+public class VersionableItemFormObject<T extends VersionableSurveyObject> extends FormObject<T> {
 
 	private ModelVersion sinceVersion;
 	private ModelVersion deprecatedVersion;
 	
-	public void loadFrom(T source, String languageCode) {
+	@Override
+	public void loadFrom(T source, String languageCode, String defaultLanugage) {
 		sinceVersion = source.getSinceVersion();
 		deprecatedVersion = source.getDeprecatedVersion();
 	}
 	
+	@Override
 	public void saveTo(T dest, String languageCode) {
 		dest.setSinceVersion(sinceVersion);
 		dest.setDeprecatedVersion(deprecatedVersion);

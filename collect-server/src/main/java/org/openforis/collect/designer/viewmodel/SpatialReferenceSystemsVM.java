@@ -5,7 +5,7 @@ package org.openforis.collect.designer.viewmodel;
 
 import java.util.List;
 
-import org.openforis.collect.designer.form.SurveyObjectFormObject;
+import org.openforis.collect.designer.form.FormObject;
 import org.openforis.collect.designer.form.SpatialReferenceSystemFormObject;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.SpatialReferenceSystem;
@@ -45,7 +45,7 @@ public class SpatialReferenceSystemsVM extends SurveyObjectBaseVM<SpatialReferen
 	}
 	
 	@Override
-	protected SurveyObjectFormObject<SpatialReferenceSystem> createFormObject() {
+	protected FormObject<SpatialReferenceSystem> createFormObject() {
 		return new SpatialReferenceSystemFormObject();
 	}
 	

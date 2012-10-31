@@ -4,7 +4,7 @@
 package org.openforis.collect.designer.viewmodel;
 
 import org.openforis.collect.designer.form.DistanceCheckFormObject;
-import org.openforis.collect.designer.form.SurveyObjectFormObject;
+import org.openforis.collect.designer.form.FormObject;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.validation.DistanceCheck;
 import org.zkoss.bind.annotation.ExecutionArgParam;
@@ -24,7 +24,7 @@ public class DistanceCheckVM extends CheckVM<DistanceCheck> {
 	}
 	
 	@Override
-	protected SurveyObjectFormObject<DistanceCheck> createFormObject() {
+	protected FormObject<DistanceCheck> createFormObject() {
 		return new DistanceCheckFormObject();
 	}
 

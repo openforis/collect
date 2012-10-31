@@ -43,11 +43,9 @@ public class SurveyEditVM extends SurveyBaseVM {
 		super.init();
 		if ( survey == null ) {
 			backToSurveysList();
-		} else if ( currentLanguageCode == null ) {
-			List<String> langCodes = survey.getLanguages();
-			if ( langCodes.size() == 1 ) {
-				currentLanguageCode = langCodes.get(0);
-			} else {
+		} else {
+			currentLanguageCode = survey.getDefaultLanguage();
+			if ( currentLanguageCode == null ) {
 				openLanguageManagerPopUp();
 			}
 //			TEST

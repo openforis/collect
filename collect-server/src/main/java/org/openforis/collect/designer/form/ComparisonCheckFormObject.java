@@ -34,8 +34,8 @@ public class ComparisonCheckFormObject extends CheckFormObject<ComparisonCheck> 
 	}
 	
 	@Override
-	public void loadFrom(ComparisonCheck source, String languageCode) {
-		super.loadFrom(source, languageCode);
+	public void loadFrom(ComparisonCheck source, String languageCode, String defaultLanguage) {
+		super.loadFrom(source, languageCode, defaultLanguage);
 		
 		if ( StringUtils.isNotBlank(source.getEqualsExpression()) ) {
 			greaterThan = lessThan = source.getEqualsExpression();

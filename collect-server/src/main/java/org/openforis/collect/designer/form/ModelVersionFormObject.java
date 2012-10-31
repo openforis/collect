@@ -18,10 +18,10 @@ public class ModelVersionFormObject extends SurveyObjectFormObject<ModelVersion>
 	private Date date;
 	
 	@Override
-	public void loadFrom(ModelVersion source, String languageCode) {
+	public void loadFrom(ModelVersion source, String languageCode, String defaultLanguage) {
 		name = source.getName();
-		label = source.getLabel(languageCode);
-		description = source.getDescription(languageCode);
+		label = getLabel(source, languageCode, defaultLanguage);
+		description = getDescription(source, languageCode, defaultLanguage);
 		date = DateUtil.parseXMLDateTime(source.getDate());
 	}
 	
@@ -36,6 +36,24 @@ public class ModelVersionFormObject extends SurveyObjectFormObject<ModelVersion>
 	@Override
 	protected void reset() {
 		// TODO 
+	}
+	
+	protected String getLabel(ModelVersion source, String languageCode, String defaultLanguage) {
+		String result = source.getLabel(languageCode);
+		if ( result == null && languageCode != null && languageCode.equals(defaultLanguage) ) {
+			//try to get the label associated to default language
+			result = source.getLabel(null);
+		}
+		return result;
+	}
+
+	protected String getDescription(ModelVersion source, String languageCode, String defaultLanguage) {
+		String result = source.getDescription(languageCode);
+		if ( result == null && languageCode != null && languageCode.equals(defaultLanguage) ) {
+			//try to get the label associated to default language
+			result = source.getDescription(null);
+		}
+		return result;
 	}
 	
 	public String getName() {

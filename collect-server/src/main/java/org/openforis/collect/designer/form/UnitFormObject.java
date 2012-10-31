@@ -38,7 +38,7 @@ public class UnitFormObject extends SurveyObjectFormObject<Unit> {
 	}
 	
 	@Override
-	public void loadFrom(Unit source, String languageCode) {
+	public void loadFrom(Unit source, String languageCode, String defaultLanguage) {
 		name = source.getName();
 		label = source.getLabel(languageCode);
 		abbreviation = source.getAbbreviation(languageCode);
@@ -65,6 +65,24 @@ public class UnitFormObject extends SurveyObjectFormObject<Unit> {
 	@Override
 	protected void reset() {
 		// TODO Auto-generated method stub
+	}
+	
+	protected String getLabel(Unit source, String languageCode, String defaultLanguage) {
+		String result = source.getLabel(languageCode);
+		if ( result == null && languageCode != null && languageCode.equals(defaultLanguage) ) {
+			//try to get the label associated to default language
+			result = source.getLabel(null);
+		}
+		return result;
+	}
+
+	protected String getAbbreviation(Unit source, String languageCode, String defaultLanguage) {
+		String result = source.getAbbreviation(languageCode);
+		if ( result == null && languageCode != null && languageCode.equals(defaultLanguage) ) {
+			//try to get the label associated to default language
+			result = source.getAbbreviation(null);
+		}
+		return result;
 	}
 
 	public String getName() {

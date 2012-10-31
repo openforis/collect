@@ -6,9 +6,10 @@ package org.openforis.collect.designer.viewmodel;
 
 import java.util.List;
 
-import org.openforis.collect.designer.form.SurveyObjectFormObject;
+import org.openforis.collect.designer.form.FormObject;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.MessageUtil.ConfirmHandler;
+import org.openforis.collect.model.CollectSurvey;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.Binder;
 import org.zkoss.bind.annotation.BindingParam;
@@ -33,7 +34,7 @@ public abstract class SurveyObjectBaseVM<T> extends SurveyBaseVM {
 	protected T selectedItem;
 	protected T editedItem;
 	protected boolean changed;
-	protected SurveyObjectFormObject<T> formObject;
+	protected FormObject<T> formObject;
 	
 	public BindingListModelList<T> getItems() {
 		List<T> items = getItemsInternal();
@@ -151,7 +152,7 @@ public abstract class SurveyObjectBaseVM<T> extends SurveyBaseVM {
 		}
 	}
 
-	protected abstract SurveyObjectFormObject<T> createFormObject();
+	protected abstract FormObject<T> createFormObject();
 	
 	protected abstract T createItemInstance();
 	
@@ -197,7 +198,7 @@ public abstract class SurveyObjectBaseVM<T> extends SurveyBaseVM {
 		selectedItem = item;
 	}
 	
-	public SurveyObjectFormObject<T> getFormObject() {
+	public FormObject<T> getFormObject() {
 		return formObject;
 	}
 
@@ -210,7 +211,13 @@ public abstract class SurveyObjectBaseVM<T> extends SurveyBaseVM {
 		this.editedItem = editedItem;
 		formObject = createFormObject();
 		if ( editedItem != null ) {
-			formObject.loadFrom(editedItem, currentLanguageCode);
+			CollectSurvey survey = getSurvey();
+			if ( survey == null ) {
+				//session expired
+			} else {
+				String defaultLanguage = survey.getDefaultLanguage();
+				formObject.loadFrom(editedItem, currentLanguageCode, defaultLanguage);
+			}
 		}
 	}
 	

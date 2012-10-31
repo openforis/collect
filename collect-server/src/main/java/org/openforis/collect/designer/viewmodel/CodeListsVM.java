@@ -11,7 +11,7 @@ import java.util.Map;
 
 import org.openforis.collect.designer.form.CodeListFormObject;
 import org.openforis.collect.designer.form.CodeListFormObject.Type;
-import org.openforis.collect.designer.form.SurveyObjectFormObject;
+import org.openforis.collect.designer.form.FormObject;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.MessageUtil.ConfirmHandler;
 import org.openforis.collect.designer.util.Resources;
@@ -75,7 +75,7 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 	}
 	
 	@Override
-	protected SurveyObjectFormObject<CodeList> createFormObject() {
+	protected FormObject<CodeList> createFormObject() {
 		return new CodeListFormObject();
 	}
 

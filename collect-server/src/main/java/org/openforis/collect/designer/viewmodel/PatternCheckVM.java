@@ -3,8 +3,8 @@
  */
 package org.openforis.collect.designer.viewmodel;
 
+import org.openforis.collect.designer.form.FormObject;
 import org.openforis.collect.designer.form.PatternCheckFormObject;
-import org.openforis.collect.designer.form.SurveyObjectFormObject;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.validation.PatternCheck;
 import org.zkoss.bind.annotation.ExecutionArgParam;
@@ -24,7 +24,7 @@ public class PatternCheckVM extends CheckVM<PatternCheck> {
 	}
 	
 	@Override
-	protected SurveyObjectFormObject<PatternCheck> createFormObject() {
+	protected FormObject<PatternCheck> createFormObject() {
 		return new PatternCheckFormObject();
 	}
 

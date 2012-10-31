@@ -10,8 +10,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.openforis.collect.designer.form.AttributeDefinitionFormObject;
+import org.openforis.collect.designer.form.FormObject;
 import org.openforis.collect.designer.form.NodeDefinitionFormObject;
-import org.openforis.collect.designer.form.SurveyObjectFormObject;
 import org.openforis.collect.designer.model.AttributeType;
 import org.openforis.collect.designer.model.CheckType;
 import org.openforis.collect.designer.util.Resources;
@@ -54,7 +54,7 @@ public abstract class AttributeVM<T extends AttributeDefinition> extends NodeDef
 	
 	@SuppressWarnings("unchecked")
 	@Override
-	protected SurveyObjectFormObject<T> createFormObject() {
+	protected FormObject<T> createFormObject() {
 		AttributeType attributeTypeEnum = AttributeType.valueOf(editedItem);
 		formObject = (AttributeDefinitionFormObject<T>) NodeDefinitionFormObject.newInstance(attributeTypeEnum);
 		tempFormObject = new SimpleForm();

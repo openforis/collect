@@ -15,8 +15,8 @@ public class CodeListItemFormObject extends VersionableItemFormObject<CodeListIt
 	private boolean qualifiable;
 	
 	@Override
-	public void loadFrom(CodeListItem source, String languageCode) {
-		super.loadFrom(source, languageCode);
+	public void loadFrom(CodeListItem source, String languageCode, String defaultLanguage) {
+		super.loadFrom(source, languageCode, defaultLanguage);
 		code = source.getCode();
 		label = source.getLabel(languageCode);
 		description = source.getDescription(languageCode);

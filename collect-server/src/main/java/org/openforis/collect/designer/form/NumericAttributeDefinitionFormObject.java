@@ -41,10 +41,10 @@ public class NumericAttributeDefinitionFormObject<T extends NumericAttributeDefi
 	}
 
 	@Override
-	public void loadFrom(T source, String languageCode) {
-		super.loadFrom(source, languageCode);
+	public void loadFrom(T source, String languageCode, String defaultLanguage) {
+		super.loadFrom(source, languageCode, defaultLanguage);
 		type = source.getType() != null ? source.getType().name(): null;
-		precisions = PrecisionFormObject.fromList(source.getPrecisionDefinitions(), languageCode);
+		precisions = PrecisionFormObject.fromList(source.getPrecisionDefinitions(), languageCode, defaultLanguage);
 	}
 
 	public String getType() {

@@ -5,7 +5,7 @@ package org.openforis.collect.designer.viewmodel;
 
 import java.util.List;
 
-import org.openforis.collect.designer.form.SurveyObjectFormObject;
+import org.openforis.collect.designer.form.FormObject;
 import org.openforis.collect.designer.form.SurveyMainInfoFormObject;
 import org.openforis.collect.model.CollectSurvey;
 import org.zkoss.bind.annotation.Init;
@@ -43,7 +43,7 @@ public class SurveyMainInfoVM extends SurveyObjectBaseVM<CollectSurvey> {
 	}
 	
 	@Override
-	protected SurveyObjectFormObject<CollectSurvey> createFormObject() {
+	protected FormObject<CollectSurvey> createFormObject() {
 		return new SurveyMainInfoFormObject();
 	}
 
