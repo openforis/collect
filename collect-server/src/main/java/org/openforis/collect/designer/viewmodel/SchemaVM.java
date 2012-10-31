@@ -320,7 +320,7 @@ public class SchemaVM extends SurveyBaseVM {
 	
 	protected void addFirstTab(EntityDefinition newNode,
 			UITabSet tabSet) {
-		UITab tab = new UITab();
+		UITab tab = tabSet.createTab();
 		int tabPosition = 1;
 		String tabName = TAB_NAME_PREFIX + tabPosition;
 		tab.setName(tabName);
@@ -329,7 +329,7 @@ public class SchemaVM extends SurveyBaseVM {
 
 	protected UITabSet createRootTabSet(EntityDefinition rootEntity) {
 		UIOptions uiOpts = survey.getUIOptions();
-		UITabSet tabSet = new UITabSet();
+		UITabSet tabSet = uiOpts.createTabSet();
 		int tabSetPosition = uiOpts.getTabSets().size() + 1;
 		String tabSetName = ROOT_TABSET_NAME_PREFIX + tabSetPosition;
 		tabSet.setName(tabSetName);

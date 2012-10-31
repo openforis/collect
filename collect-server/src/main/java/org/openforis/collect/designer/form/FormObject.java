@@ -1,8 +1,8 @@
 package org.openforis.collect.designer.form;
 
+import static org.openforis.collect.designer.model.LabelKeys.EMPTY_OPTION;
+
 import org.openforis.collect.designer.model.NamedObject;
-import org.zkoss.util.resource.Labels;
-import static org.openforis.collect.designer.model.LabelKeys.*;
 
 /**
  * 
@@ -15,8 +15,7 @@ public abstract class FormObject<T> {
 	
 	{
 		//init static variables
-		String emptyOptionLabel = Labels.getLabel(EMPTY_OPTION);
-		VERSION_EMPTY_SELECTION = new NamedObject(emptyOptionLabel);
+		VERSION_EMPTY_SELECTION = new NamedObject(EMPTY_OPTION);
 	}
 	
 	

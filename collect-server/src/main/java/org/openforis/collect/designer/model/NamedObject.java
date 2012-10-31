@@ -1,5 +1,7 @@
 package org.openforis.collect.designer.model;
 
+import org.zkoss.util.resource.Labels;
+
 /**
  * 
  * @author S. Ricci
@@ -7,21 +9,19 @@ package org.openforis.collect.designer.model;
  */
 public class NamedObject {
 
-	private String name;
+	private String nameLabelKey;
 	
-	public NamedObject(String name) {
+	public NamedObject(String nameLabelKey) {
 		super();
-		this.name = name;
+		this.nameLabelKey = nameLabelKey;
 	}
 
 	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
+		return Labels.getLabel(nameLabelKey);
 	}
 	
-	
+	public void setLabelKey(String labelKey) {
+		this.nameLabelKey = labelKey;
+	}
 	
 }

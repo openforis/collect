@@ -76,7 +76,7 @@ public class TabsGroupPanelVM extends BaseVM {
 	public List<NodeDefinition> getNodesPerTab() {
 		UIOptions uiOpts = getUIOptions();
 		List<NodeDefinition> result = new ArrayList<NodeDefinition>();
-		List<NodeDefinition> nodesPerTab = uiOpts.getNodesPerTab(getSurvey(), tab, false);
+		List<NodeDefinition> nodesPerTab = uiOpts.getNodesPerTab(tab, false);
 		ModelVersion version = getFormVersion();
 		for (NodeDefinition nodeDefn : nodesPerTab) {
 			if ( version == null || version.isApplicable(nodeDefn) ) {

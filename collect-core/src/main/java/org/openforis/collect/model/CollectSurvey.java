@@ -25,9 +25,21 @@ public class CollectSurvey extends Survey {
 
 	private static final long serialVersionUID = 1L;
 
+	public UIOptions createUIOptions() {
+		return new UIOptions();
+	}
+	
 	public UIOptions getUIOptions() {
 		ApplicationOptions applicationOptions = getApplicationOptions(UIOptionsConstants.UI_TYPE);
 		return (UIOptions) applicationOptions;
+	}
+	
+	@Override
+	public void addApplicationOptions(ApplicationOptions options) {
+		super.addApplicationOptions(options);
+		if ( options instanceof UIOptions ) {
+			((UIOptions) options).setSurvey(this);
+		}
 	}
 
 }

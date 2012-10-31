@@ -1,12 +1,15 @@
 package org.openforis.collect.metamodel.ui;
 
-import java.io.Serializable;
+import static org.openforis.collect.metamodel.ui.UIOptionsConstants.UI_NAMESPACE_URI;
+import static org.openforis.collect.metamodel.ui.UIOptionsConstants.UI_TYPE;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.Stack;
 
 import javax.xml.namespace.QName;
 
@@ -17,8 +20,6 @@ import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.util.CollectionUtil;
-
-import static org.openforis.collect.metamodel.ui.UIOptionsConstants.*;
 
 
 /**
@@ -53,6 +54,7 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		FORM, TABLE
 	}
 	
+	private CollectSurvey survey;
 	private List<UITabSet> tabSets;
 
 	@Override
@@ -60,30 +62,22 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		return UI_TYPE;
 	}
 
-	public void init() {
-		initParentRefernces();
+	public CollectSurvey getSurvey() {
+		return survey;
 	}
-
-	protected void initParentRefernces() {
-		if ( tabSets != null ) {
-			for (UITabSet group : tabSets) {
-				setParentInChildrenTabs(group);
-			}
-		}
-	}
-
-	protected void setParentInChildrenTabs(UITabSet group) {
-		List<UITab> tabs = group.getTabs();
-		for (UITab uiTab : tabs) {
-			uiTab.setParent(group);
-			setParentInChildrenTabs(uiTab);
-		}
+	
+	public void setSurvey(CollectSurvey survey) {
+		this.survey = survey;
 	}
 	
 	public List<UITabSet> getTabSets() {
 		return CollectionUtil.unmodifiableList(tabSets);
 	}
 	
+	public UITabSet createTabSet() {
+		return new UITabSet(this);
+	}
+
 	public UITab getTab(NodeDefinition nodeDefn) {
 		return getTab(nodeDefn, true);
 	}
@@ -138,7 +132,7 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		return result;
 	}
 
-	public List<NodeDefinition> getNodesPerTab(CollectSurvey survey, UITab tab, boolean includeDescendants) {
+	public List<NodeDefinition> getNodesPerTab(UITab tab, boolean includeDescendants) {
 		List<NodeDefinition> result = new ArrayList<NodeDefinition>();
 		UITabSet tabSet = tab.getRootTabSet();
 		EntityDefinition rootEntity = getRootEntityDefinition(survey, tabSet);
@@ -168,6 +162,20 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		nodeDefn.setAnnotation(Annotation.TAB_NAME.getQName(), null);
 	}
 	
+	public void removeTabAssociation(UITab tab) {
+		Stack<UITab> stack = new Stack<UITab>();
+		stack.push(tab);
+		while ( ! stack.isEmpty() ) {
+			UITab currentTab = stack.pop();
+			List<NodeDefinition> nodesPerTab = getNodesPerTab(currentTab, true);
+			for (NodeDefinition nodeDefn : nodesPerTab) {
+				removeTabAssociation(nodeDefn);
+			}
+			List<UITab> childTabs = currentTab.getTabs();
+			stack.addAll(childTabs);
+		}
+	}
+
 	public boolean isAssociatedToTab(NodeDefinition nodeDefn) {
 		UITab tab = getTab(nodeDefn);
 		return tab != null;
@@ -199,15 +207,14 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		if ( layout != Layout.FORM ) {
 			return true;
 		} else {
-			CollectSurvey survey = (CollectSurvey) entityDefn.getSurvey();
 			UITab tab = getTab(entityDefn);
-			EntityDefinition multipleEntity = getFormLayoutMultipleEntity(survey, tab);
+			EntityDefinition multipleEntity = getFormLayoutMultipleEntity(tab);
 			return multipleEntity == null || multipleEntity == entityDefn;
 		}
 	}
 
-	protected EntityDefinition getFormLayoutMultipleEntity(CollectSurvey survey, UITab tab) {
-		List<NodeDefinition> nodesPerTab = getNodesPerTab(survey, tab, false);
+	protected EntityDefinition getFormLayoutMultipleEntity(UITab tab) {
+		List<NodeDefinition> nodesPerTab = getNodesPerTab(tab, false);
 		for (NodeDefinition nodeDefn : nodesPerTab) {
 			if ( nodeDefn instanceof EntityDefinition && nodeDefn.isMultiple() ) {
 				Layout nodeLayout = getLayout((EntityDefinition) nodeDefn);

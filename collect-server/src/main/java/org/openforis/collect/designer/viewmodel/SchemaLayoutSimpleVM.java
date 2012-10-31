@@ -38,6 +38,8 @@ import org.zkoss.zkplus.databind.BindingListModelList;
  */
 public class SchemaLayoutSimpleVM extends SurveyBaseVM {
 
+	private static final String TAB_SET_CHANGED_GLOBAL_COMMAND = "tabSetChanged";
+	private static final String TAB_CHANGED_GLOBAL_COMMAND = "tabChanged";
 	private static final String TAB_NAME_PREFIX = "tab_";
 	private static final String TAB_NAME_SEPARATOR = "_";
 
@@ -83,8 +85,8 @@ public class SchemaLayoutSimpleVM extends SurveyBaseVM {
 
 	@Command
 	@NotifyChange({"treeModel","selectedTab"})
-	public void addTab(@BindingParam("parent") UITab parent) {
-		UITab tab = new UITab();
+	public void addTab(@BindingParam("parent") UITabSet parent) {
+		UITab tab = parent.createTab();
 		String tabName = generateNewTabName(parent);
 		tab.setName(tabName);
 		tab.setLabel(currentLanguageCode, tabName);
@@ -94,23 +96,37 @@ public class SchemaLayoutSimpleVM extends SurveyBaseVM {
 	}
 	
 	@Command
-	@NotifyChange({"treeModel","selectedTab"})
 	public void removeTab() {
-		if ( selectedTab.getTabs().isEmpty() ) {
+		String confirmMessageKey = null;
+		if ( ! selectedTab.getTabs().isEmpty() ) {
+			confirmMessageKey = "survey.layout.tab.remove.confirm.nested_tabs_present";
+		} else {
 			CollectSurvey survey = getSurvey();
 			UIOptions uiOpts = survey.getUIOptions();
-			List<NodeDefinition> nodesPerTab = uiOpts.getNodesPerTab(survey, selectedTab, false);
-			if ( nodesPerTab.isEmpty() ) {
-				UITabSet parent = selectedTab.getParent();
-				parent.removeTab(selectedTab);
-				treeModel.removeSelectedNode();
-				selectedTab = null;
-			} else {
-				MessageUtil.showWarning("survey.layout.tab.remove.error.associated_nodes_present");
+			List<NodeDefinition> nodesPerTab = uiOpts.getNodesPerTab(selectedTab, false);
+			if ( ! nodesPerTab.isEmpty() ) {
+				confirmMessageKey = "survey.layout.tab.remove.confirm.associated_nodes_present";
 			}
-		} else {
-			MessageUtil.showWarning("survey.layout.tab.remove.error.nested_tabs_present");
 		}
+		if ( confirmMessageKey != null ) {
+			MessageUtil.showConfirm(new MessageUtil.ConfirmHandler() {
+				@Override
+				public void onOk() {
+					performRemoveSelectedTab();
+				}
+			}, confirmMessageKey);
+		} else {
+			performRemoveSelectedTab();
+		}
+	}
+
+	protected void performRemoveSelectedTab() {
+		UITabSet parent = selectedTab.getParent();
+		parent.removeTab(selectedTab);
+		treeModel.removeSelectedNode();
+		selectedTab = null;
+		notifyChange("treeModel", "selectedTab");
+		dispatchTabSetChangedCommand();
 	}
 
 	@Command
@@ -120,20 +136,9 @@ public class SchemaLayoutSimpleVM extends SurveyBaseVM {
 		}
 	}
 
-	@Command
-	public void showPreview() {
-		Execution current = Executions.getCurrent();
-		List<NameValuePair> params = new ArrayList<NameValuePair>();
-		params.add(new BasicNameValuePair("preview", "true"));
-		params.add(new BasicNameValuePair("surveyId", Integer.toString(survey.getId())));
-		params.add(new BasicNameValuePair("rootEntityId", Integer.toString(selectedRootEntity.getId())));
-		params.add(new BasicNameValuePair("versionId", Integer.toString(selectedVersion.getId())));
-		String uri = Resources.PREVIEW_PATH + "?" + URLEncodedUtils.format(params, "UTF-8");
-		current.sendRedirect(uri, "_blank");
-	}
-	
 	protected void performUpdateTabLabel(UITab tab, String label) {
 		tab.setLabel(currentLanguageCode, label.trim());
+		dispatchTabChangedCommand(tab);
 		BindUtils.postNotifyChange(null, null, tab, "*");
 	}
 	
@@ -144,6 +149,18 @@ public class SchemaLayoutSimpleVM extends SurveyBaseVM {
 		} else {
 			return true;
 		}
+	}
+	
+	@Command
+	public void showPreview() {
+		Execution current = Executions.getCurrent();
+		List<NameValuePair> params = new ArrayList<NameValuePair>();
+		params.add(new BasicNameValuePair("preview", "true"));
+		params.add(new BasicNameValuePair("surveyId", Integer.toString(survey.getId())));
+		params.add(new BasicNameValuePair("rootEntityId", Integer.toString(selectedRootEntity.getId())));
+		params.add(new BasicNameValuePair("versionId", Integer.toString(selectedVersion.getId())));
+		String uri = Resources.PREVIEW_PATH + "?" + URLEncodedUtils.format(params, "UTF-8");
+		current.sendRedirect(uri, "_blank");
 	}
 	
 	public String getTabLabel(UITab tab) {
@@ -167,7 +184,13 @@ public class SchemaLayoutSimpleVM extends SurveyBaseVM {
 	protected void dispatchTabSetChangedCommand() {
 		Map<String, Object> args = new HashMap<String, Object>();
 		args.put("tabSet", rootTabSet);
-		BindUtils.postGlobalCommand(null, null, "tabSetChanged", args);
+		BindUtils.postGlobalCommand(null, null, TAB_SET_CHANGED_GLOBAL_COMMAND, args);
+	}
+	
+	protected void dispatchTabChangedCommand(UITab tab) {
+		Map<String, Object> args = new HashMap<String, Object>();
+		args.put("tab", tab);
+		BindUtils.postGlobalCommand(null, null, TAB_CHANGED_GLOBAL_COMMAND, args);
 	}
 
 	@Command

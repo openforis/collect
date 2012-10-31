@@ -11,6 +11,7 @@ import java.util.Map;
 import org.openforis.collect.designer.form.NodeDefinitionFormObject;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.metamodel.ui.UITab;
+import org.openforis.collect.metamodel.ui.UITabSet;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -18,6 +19,7 @@ import org.openforis.idm.metamodel.Schema;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.Binder;
 import org.zkoss.bind.Form;
+import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.ContextParam;
 import org.zkoss.bind.annotation.ContextType;
@@ -100,6 +102,14 @@ public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyO
 		//do nothing
 	}
 	
+	@GlobalCommand
+	public void tabSetChanged(@ContextParam(ContextType.BINDER) Binder binder, @BindingParam("tabSet") UITabSet tabSet) {
+		notifyChange("assignableTabs");
+		if ( isEditingItem() ) {
+			dispatchApplyChangesCommand(binder);
+		}
+	}
+	
 	protected void validateForm(@ContextParam(ContextType.BINDER) Binder binder) {
 		Component view = binder.getView();
 		IdSpace currentIdSpace = view.getSpaceOwner();
@@ -113,24 +123,24 @@ public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyO
 		return tempFormObject;
 	}
 	
-	public List<UITab> getAssignableTabs() {
+	public List<Object> getAssignableTabs() {
 		if ( editedItem == null ) {
 			return null;
 		} else {
 			CollectSurvey survey = getSurvey();
 			UIOptions uiOptions = survey.getUIOptions();
-			List<UITab> result = new ArrayList<UITab>();
+			List<Object> result = new ArrayList<Object>();
 			result.add(NodeDefinitionFormObject.INHERIT_TAB);
 			result.addAll(uiOptions.getAllowedTabs(editedItem));
 			return result;
 		}
 	}
 	
-	public String getTabLabel(UITab tab) {
+	public String getTabLabel(Object tab) {
 		if ( tab == null || tab == NodeDefinitionFormObject.INHERIT_TAB ) {
-			return NodeDefinitionFormObject.INHERIT_TAB.getLabel(null);
+			return NodeDefinitionFormObject.INHERIT_TAB.getName();
 		} else {
-			return tab.getLabel(currentLanguageCode);
+			return ((UITab) tab).getLabel(currentLanguageCode);
 		}
 	}
 }

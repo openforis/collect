@@ -1,6 +1,7 @@
 package org.openforis.collect.designer.form;
 
 import org.openforis.collect.designer.model.AttributeType;
+import org.openforis.collect.designer.model.NamedObject;
 import org.openforis.collect.designer.model.NodeType;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.metamodel.ui.UITab;
@@ -9,7 +10,6 @@ import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NodeLabel.Type;
 import org.openforis.idm.metamodel.Prompt;
-import org.zkoss.util.resource.Labels;
 
 /**
  * 
@@ -18,12 +18,11 @@ import org.zkoss.util.resource.Labels;
  */
 public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends SurveyObjectFormObject<T> {
 	
-	public static UITab INHERIT_TAB;
+	public static NamedObject INHERIT_TAB;
 	
 	static {
 		//init static variables
-		INHERIT_TAB = new UITab();
-		INHERIT_TAB.setLabel(null, Labels.getLabel("survey.schema.node.tab.inherited"));
+		INHERIT_TAB = new NamedObject("survey.schema.node.tab.inherited");
 	};
 	//generic
 	private String name;
@@ -46,7 +45,7 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 	private Object sinceVersion;
 	private Object deprecatedVersion;
 	//layout
-	private UITab tab;
+	private Object tab;
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public static NodeDefinitionFormObject<NodeDefinition> newInstance(NodeType nodeType, AttributeType attributeType) {
@@ -165,7 +164,7 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 		if ( tab == null || tab == INHERIT_TAB ) {
 			uiOptions.removeTabAssociation(dest);
 		} else {
-			uiOptions.associateWithTab(dest, tab);
+			uiOptions.associateWithTab(dest, (UITab) tab);
 		}
 	}
 	
@@ -316,11 +315,11 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 		this.maxCount = maxCount;
 	}
 
-	public UITab getTab() {
+	public Object getTab() {
 		return tab;
 	}
 
-	public void setTab(UITab tab) {
+	public void setTab(Object tab) {
 		this.tab = tab;
 	}
 
