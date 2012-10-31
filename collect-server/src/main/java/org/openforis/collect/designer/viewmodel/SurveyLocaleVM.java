@@ -9,6 +9,7 @@ import org.openforis.collect.designer.session.SessionStatus;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.Languages;
+import org.openforis.idm.metamodel.Languages.Standard;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.Init;
@@ -50,7 +51,7 @@ public class SurveyLocaleVM extends BaseVM {
 	
 	protected void initAssignableLanguageCodes() {
 		assignableLanguageCodes = new ArrayList<String>();
-		assignableLanguageCodes.addAll(Languages.LANGUAGE_CODES);
+		assignableLanguageCodes.addAll(Languages.getCodes(Standard.ISO_639_1));
 		for (String assignedCode : assignedLanguageCodes) {
 			assignableLanguageCodes.remove(assignedCode);
 		}

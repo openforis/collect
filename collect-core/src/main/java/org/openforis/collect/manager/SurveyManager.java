@@ -192,6 +192,7 @@ public class SurveyManager {
 //		CollectSurvey surveyWork = survey.clone();
 		CollectSurvey surveyWork = survey;
 		surveyWork.setId(null);
+		surveyWork.setPublished(true);
 		return surveyWork;
 	}
 	
@@ -203,6 +204,7 @@ public class SurveyManager {
 		} else {
 			surveyWorkDao.update(survey);
 		}
+		survey.setPublished(false);
 	}
 	
 	@Transactional

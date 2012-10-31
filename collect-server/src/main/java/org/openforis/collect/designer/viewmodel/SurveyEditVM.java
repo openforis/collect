@@ -43,14 +43,13 @@ public class SurveyEditVM extends SurveyBaseVM {
 		if ( survey == null ) {
 			backToSurveysList();
 		} else if ( currentLanguageCode == null ) {
-//			TODO
-//			List<String> langCodes = survey.getLanguages();
-//			if ( langCodes.size() == 1 ) {
-//				currentLanguageCode = langCodes.get(0);
-//			} else {
-//				openLanguageManagerPopUp();
-//			}
-			//TEST
+			List<String> langCodes = survey.getLanguages();
+			if ( langCodes.size() == 1 ) {
+				currentLanguageCode = langCodes.get(0);
+			} else {
+				openLanguageManagerPopUp();
+			}
+//			TEST
 //			currentLanguageCode = "eng";
 //			uiConf.addLanguageCode("eng");
 //			uiConf.addLanguageCode("spa");
@@ -111,6 +110,7 @@ public class SurveyEditVM extends SurveyBaseVM {
 		if ( checkCurrentFormValid() ) {
 			surveyManager.saveSurveyWork(survey);
 			MessageUtil.showInfo(SURVEY_SUCCESSFULLY_SAVED_MESSAGE_KEY);
+			BindUtils.postNotifyChange(null, null, survey, "published");
 		}
 	}
 	

@@ -43,7 +43,7 @@ public enum AttributeType {
 		} else if ( defn instanceof TimeAttributeDefinition ) {
 			return TIME;
 		} else {
-			throw new IllegalArgumentException("Type not supported for " + defn.getClass().getSimpleName());
+			throw new IllegalArgumentException("Standard not supported for " + defn.getClass().getSimpleName());
 		}
 	}
 

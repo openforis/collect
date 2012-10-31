@@ -24,7 +24,7 @@ public enum NodeType {
 			labelKey = "survey.schema.node.type.entity";
 			break;
 		default:
-			throw new IllegalArgumentException("Type not supported: " + this.name());
+			throw new IllegalArgumentException("Standard not supported: " + this.name());
 		}
 		return Labels.getLabel(labelKey);
 	}

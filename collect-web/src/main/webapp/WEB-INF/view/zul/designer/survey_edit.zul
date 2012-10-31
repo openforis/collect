@@ -19,19 +19,19 @@
 	 	<center>
 			<vlayout hflex="1" vflex="1">
 				<!-- language selector -->
-<!-- 				<hlayout width="100%" style="text-align: right;"> -->
-<!-- 					<label value="${labels.survey.selected_language}:" /> -->
-<!-- 					<radiogroup model="@load(vm.availableLanguages)" -->
-<!-- 						selectedItem="@load(vm.currentLanguageCode)" -->
-<!-- 						onCheck="@command('languageCodeSelected', code=self.selectedItem.value)"> -->
-<!-- 						<template name="model"> -->
-<!-- 							<radio label="@load(each)" value="@load(each)" /> -->
-<!-- 						</template> -->
-<!-- 					</radiogroup> -->
-<!-- 					<button tooltiptext="${labels.survey.language_manager}"  -->
-<!-- 							onClick="@command('openLanguageManagerPopUp')" -->
-<!-- 							image="/assets/images/pencil-small.png" /> -->
-<!-- 				</hlayout> -->
+				<hlayout width="100%" style="text-align: right;">
+					<label value="${labels.survey.selected_language}:" />
+					<radiogroup model="@load(vm.availableLanguages)"
+						selectedItem="@load(vm.currentLanguageCode)"
+						onCheck="@command('languageCodeSelected', code=self.selectedItem.value)">
+						<template name="model">
+							<radio label="@load(each)" value="@load(each)" />
+						</template>
+					</radiogroup>
+					<button tooltiptext="${labels.survey.language_manager}" 
+							onClick="@command('openLanguageManagerPopUp')"
+							image="/assets/images/pencil-small.png" />
+				</hlayout>
 				<!-- main tabs -->
 				<tabbox id="tb" hflex="1" vflex="1">
 				    <tabs id="tabs">
@@ -70,7 +70,8 @@
 				</center>
 				<east border="none" size="20%">
 					<box width="100%" align="right">
-						<button label="${labels.survey.publish.$}" 
+						<button label="@load(vm.survey.published ? 
+                               labels.survey.update : labels.survey.publish.$)" 
 							onClick="@command('publish')" />
 					</box>
 				</east>

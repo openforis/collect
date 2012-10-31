@@ -3,6 +3,8 @@
  */
 package org.openforis.collect.model;
 
+import java.util.List;
+
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.openforis.collect.metamodel.ui.UIOptions;
@@ -25,6 +27,15 @@ public class CollectSurvey extends Survey {
 
 	private static final long serialVersionUID = 1L;
 
+	public String getDefaultLanguage() {
+		List<String> languages = getLanguages();
+		if ( languages == null || languages.isEmpty() ) {
+			return null;
+		} else {
+			return languages.get(0);
+		}
+	}
+	
 	public UIOptions createUIOptions() {
 		return new UIOptions();
 	}

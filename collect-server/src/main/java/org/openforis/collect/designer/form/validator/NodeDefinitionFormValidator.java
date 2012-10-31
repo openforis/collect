@@ -113,7 +113,7 @@ public class NodeDefinitionFormValidator extends FormValidator {
 		if (vmObject instanceof NodeDefinitionVM) {
 			editedNode = ((NodeDefinitionVM<?>) vmObject).getEditedItem();
 		} else {
-			throw new IllegalArgumentException("Unsupported View Model Type: " +
+			throw new IllegalArgumentException("Unsupported View Model Standard: " +
 					vmObject.getClass().getName());
 		}
 		return editedNode;
