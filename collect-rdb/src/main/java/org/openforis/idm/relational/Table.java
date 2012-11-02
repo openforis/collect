@@ -1,5 +1,6 @@
 package org.openforis.idm.relational;
 
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -10,7 +11,7 @@ import java.util.List;
  * @author G. Miceli
  *
  */
-public class Table {
+public class Table  {
 
 	private String name;
 	private LinkedHashMap<String, Column> columns;
@@ -22,6 +23,10 @@ public class Table {
 		this.columns = new LinkedHashMap<String, Column>();
 		this.uniquenessConstraints = new ArrayList<UniquenessConstraint>();
 		this.referentialConstraints = new ArrayList<ReferentialConstraint>();
+	}
+	
+	public String getName() {
+		return name;
 	}
 
 	void addColumn(Column column) throws SchemaGenerationException {
