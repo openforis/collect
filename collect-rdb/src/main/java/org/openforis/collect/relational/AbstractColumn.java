@@ -10,19 +10,19 @@ abstract class AbstractColumn<T> implements Column<T> {
 	private String name;
 	private int type;
 	private Integer length;
-	private boolean allowNulls;
+	private boolean nullable;
 
-	AbstractColumn(String name, int type, Integer length, boolean allowNulls) {
+	AbstractColumn(String name, int type, Integer length, boolean nullable) {
 		this.name = name;
 		this.type = type;
 		this.length = length;
-		this.allowNulls = allowNulls;
+		this.nullable = nullable;
 	}
 
 	AbstractColumn(String name, int type, boolean allowNulls) {
 		this.name = name;
 		this.type = type;
-		this.allowNulls = allowNulls;
+		this.nullable = allowNulls;
 	}
 
 	@Override
@@ -41,7 +41,7 @@ abstract class AbstractColumn<T> implements Column<T> {
 	}
 
 	@Override
-	public boolean isAllowNulls() {
-		return allowNulls;
+	public boolean isNullable() {
+		return nullable;
 	}	
 }

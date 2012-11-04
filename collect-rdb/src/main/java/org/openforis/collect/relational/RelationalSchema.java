@@ -21,17 +21,23 @@ import org.openforis.idm.model.Record;
 public final class RelationalSchema {
 
 	private Survey survey;
+	private String name;
 	private LinkedHashMap<String, Table<?>> tables;
 	private Map<String, DataTable> rootDataTables;
 	
-	RelationalSchema(Survey survey) throws SchemaGenerationException {
+	RelationalSchema(Survey survey, String name) throws SchemaGenerationException {
 		this.survey = survey;
+		this.name = name;
 		this.tables = new LinkedHashMap<String, Table<?>>();
 		this.rootDataTables = new HashMap<String, DataTable>();
 	}
 
 	public Survey getSurvey() {
 		return survey;
+	}
+	
+	public String getName() {
+		return name;
 	}
 	
 	public List<Table<?>> getTables() {

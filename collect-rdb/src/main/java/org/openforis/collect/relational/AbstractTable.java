@@ -15,14 +15,15 @@ abstract class AbstractTable<T> implements Table<T>  {
 	private String prefix;
 	private String name;
 	private LinkedHashMap<String, Column<?>> columns;
-	private List<UniquenessConstraint> uniquenessConstraints;
+	private PrimaryKeyConstraint primaryKeyConstraint;
+//	private List<UniquenessConstraint> uniquenessConstraints;
 	private List<ReferentialConstraint> referentialConstraints;
 	
 	AbstractTable(String prefix, String name) {
 		this.prefix = prefix;
 		this.name = name;
 		this.columns = new LinkedHashMap<String, Column<?>>();
-		this.uniquenessConstraints = new ArrayList<UniquenessConstraint>();
+//		this.uniquenessConstraints = new ArrayList<UniquenessConstraint>();
 		this.referentialConstraints = new ArrayList<ReferentialConstraint>();
 	}
 	
@@ -50,9 +51,13 @@ abstract class AbstractTable<T> implements Table<T>  {
 		columns.put(columnName, column);
 	}
 	
-	void addConstraint(UniquenessConstraint constraint) {
-		uniquenessConstraints.add(constraint);
+	void setPrimaryKeyConstraint(PrimaryKeyConstraint primaryKeyConstraint) {
+		this.primaryKeyConstraint = primaryKeyConstraint;
 	}
+	
+//	void addConstraint(UniquenessConstraint constraint) {
+//		uniquenessConstraints.add(constraint);
+//	}
 	
 	void addConstraint(ReferentialConstraint constraint) {
 		referentialConstraints.add(constraint);
@@ -65,9 +70,13 @@ abstract class AbstractTable<T> implements Table<T>  {
 	}
 	
 	@Override
-	public List<UniquenessConstraint> getUniquenessConstraints() {
-		return Collections.unmodifiableList(uniquenessConstraints);
+	public PrimaryKeyConstraint getPrimaryKeyConstraint() {
+		return primaryKeyConstraint;
 	}
+//	@Override
+//	public List<UniquenessConstraint> getUniquenessConstraints() {
+//		return Collections.unmodifiableList(uniquenessConstraints);
+//	}
 	
 	@Override
 	public List<ReferentialConstraint> getReferentialContraints() {

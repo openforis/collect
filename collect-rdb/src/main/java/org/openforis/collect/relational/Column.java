@@ -8,7 +8,7 @@ public interface Column<T> {
 
 	public abstract Integer getLength();
 
-	public abstract boolean isAllowNulls();
+	public abstract boolean isNullable();
 	
 	public Object extractValue(T source);
 

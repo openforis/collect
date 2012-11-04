@@ -17,7 +17,8 @@ public interface Table<T> {
 	
 	List<Column<?>> getColumns();
 
-	List<UniquenessConstraint> getUniquenessConstraints();
+	PrimaryKeyConstraint getPrimaryKeyConstraint();
+//	List<UniquenessConstraint> getUniquenessConstraints();
 
 	List<ReferentialConstraint> getReferentialContraints();
 

@@ -8,14 +8,12 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.List;
 
-import org.openforis.idm.metamodel.Survey;
-
 import liquibase.change.Change;
 import liquibase.changelog.ChangeSet;
-import liquibase.changelog.DatabaseChangeLog;
-import liquibase.changelog.RanChangeSet;
 import liquibase.changelog.ChangeSet.ExecType;
 import liquibase.changelog.ChangeSet.RunStatus;
+import liquibase.changelog.DatabaseChangeLog;
+import liquibase.changelog.RanChangeSet;
 import liquibase.database.Database;
 import liquibase.database.DatabaseConnection;
 import liquibase.database.structure.DatabaseObject;
@@ -30,18 +28,19 @@ import liquibase.sql.visitor.SqlVisitor;
 import liquibase.statement.DatabaseFunction;
 import liquibase.statement.SqlStatement;
 
+import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.persistence.SurveyDao;
+import org.springframework.beans.factory.annotation.Autowired;
+
 public class IdmDatabase implements Database {
 
-	private Survey survey;
+	@Autowired
+	private SurveyDao surveyDao;
 	
-	public IdmDatabase(Survey survey) {
-		this.survey = survey;
+	public void setSurveyDao(SurveyDao surveyDao) {
+		this.surveyDao = surveyDao;
 	}
 	
-	public Survey getSurvey() {
-		return survey;
-	}
-
 	@Override
 	public DatabaseObject[] getContainingObjects() {
 		// TODO Auto-generated method stub
@@ -602,6 +601,10 @@ public class IdmDatabase implements Database {
 	public boolean isReservedWord(String string) {
 		// TODO Auto-generated method stub
 		return false;
+	}
+
+	public CollectSurvey getSurvey(String surveyUri) {
+		return surveyDao.loadByUri(surveyUri);
 	}
 
 }
