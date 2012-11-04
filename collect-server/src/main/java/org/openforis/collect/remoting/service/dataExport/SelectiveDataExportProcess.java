@@ -28,13 +28,13 @@ import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.model.expression.InvalidExpressionException;
 import org.openforis.idm.transform.AutomaticColumnProvider;
-import org.openforis.idm.transform.ColumnProvider;
 import org.openforis.idm.transform.ColumnProviderChain;
 import org.openforis.idm.transform.DataTransformation;
 import org.openforis.idm.transform.NodePositionColumnProvider;
 import org.openforis.idm.transform.PivotExpressionColumnProvider;
 import org.openforis.idm.transform.SingleAttributeColumnProvider;
 import org.openforis.idm.transform.csv.ModelCsvWriter;
+import org.openforis.idm.transform2.ColumnProvider;
 
 /**
  * 

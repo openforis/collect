@@ -14,6 +14,7 @@ import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.Survey;
+import org.openforis.idm.transform2.Transformation;
 
 /**
  * 
@@ -61,35 +62,56 @@ public class IdmDatabaseSnapshotBuilder {
 	}
 	
 	private void createDataTables() throws DatabaseException {
-		List<EntityDefinition> rootDefns = schema.getRootEntityDefinitions();
-		for (EntityDefinition defn : rootDefns) {
-			createDataTable(defn);
+		RelationalTransformer rt = database.getRelationalTransformer();
+		List<Transformation> xforms = rt.getTransformations();
+		for (Transformation xform : xforms) {
+			createDataTable(xform);
 		}
+//		List<EntityDefinition> rootDefns = schema.getRootEntityDefinitions();
+//		for (EntityDefinition defn : rootDefns) {
+//			createDataTable(defn);
+//		}
 	}
 	
-	private void createDataTable(EntityDefinition defn)  throws DatabaseException {
+	private void createDataTable(Transformation xform) throws DatabaseException {
 		Set<Table> tables = snapshot.getTables();
-		
-		// Tail recursion so that leaf tables are created first; required for relations
-		List<NodeDefinition> childDefns = ((EntityDefinition) defn).getChildDefinitions();
-		for (NodeDefinition child : childDefns) {
-			if ( child instanceof EntityDefinition ) {			
-				createDataTable((EntityDefinition) child);				
-			}
-		}
-
-		IdmDataTableBuilder dtb = new IdmDataTableBuilder(defn);
+//		EntityDefinition defn = (EntityDefinition) xform.getNodeDefinition();
+		IdmDataTableBuilder dtb = new IdmDataTableBuilder(xform);
 		dtb.setTablePrefix(tablePrefix);
 		dtb.setTableSuffix(dataTableSuffix);
 		Table table = dtb.toTable();
 		
 		if ( tables.contains(table) ) {					
-			throw new DatabaseException("Duplicate table name '"+table.getName()+"' for "+defn.getPath());
+			throw new DatabaseException("Duplicate table name '"+table.getName()+"' for "+xform.getRowAxis());
 		}
 		
 		tables.add(table);
 	}
 
+//	private void createDataTable(EntityDefinition defn)  throws DatabaseException {
+//		Set<Table> tables = snapshot.getTables();
+//		
+//		// Tail recursion so that leaf tables are created first; required for relations
+//		List<NodeDefinition> childDefns = ((EntityDefinition) defn).getChildDefinitions();
+//		for (NodeDefinition child : childDefns) {
+//			if ( child instanceof EntityDefinition ) {			
+//				createDataTable((EntityDefinition) child);				
+//			}
+//		}
+//
+//		IdmDataTableBuilder dtb = new IdmDataTableBuilder(defn);
+//		dtb.setTablePrefix(tablePrefix);
+//		dtb.setTableSuffix(dataTableSuffix);
+//		Table table = dtb.toTable();
+//		
+//		if ( tables.contains(table) ) {					
+//			throw new DatabaseException("Duplicate table name '"+table.getName()+"' for "+defn.getPath());
+//		}
+//		
+//		tables.add(table);
+//	}
+
+	// TODO hierarchical code lists as multiple tables
 	private void createCodeListTables() throws DatabaseException {
 		List<CodeList> lists = survey.getCodeLists();
 		for (CodeList list : lists) {

@@ -1,4 +1,4 @@
-package org.openforis.idm.relational;
+package org.openforis.collect.relational;
 
 /**
  * 

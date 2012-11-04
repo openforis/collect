@@ -1,42 +1,46 @@
-package org.openforis.idm.relational;
+package org.openforis.collect.relational;
 
 /**
  * 
  * @author G. Miceli
  * 
  */
-public final class Column {
+abstract class AbstractColumn<T> implements Column<T> {
 
 	private String name;
-	private Class<?> type;
+	private int type;
 	private Integer length;
 	private boolean allowNulls;
 
-	Column(String name, Class<?> type, boolean allowNulls, Integer length) {
+	AbstractColumn(String name, int type, Integer length, boolean allowNulls) {
 		this.name = name;
 		this.type = type;
 		this.length = length;
 		this.allowNulls = allowNulls;
 	}
 
-	Column(String name, Class<?> type, boolean allowNulls) {
+	AbstractColumn(String name, int type, boolean allowNulls) {
 		this.name = name;
 		this.type = type;
 		this.allowNulls = allowNulls;
 	}
 
+	@Override
 	public String getName() {
 		return name;
 	}
 
-	public Class<?> getType() {
+	@Override
+	public int getType() {
 		return type;
 	}
 
+	@Override
 	public Integer getLength() {
 		return length;
 	}
 
+	@Override
 	public boolean isAllowNulls() {
 		return allowNulls;
 	}	

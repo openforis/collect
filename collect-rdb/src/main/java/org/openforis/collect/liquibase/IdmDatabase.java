@@ -1,4 +1,4 @@
-package org.openforis.idm.db;
+package org.openforis.collect.liquibase;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -33,7 +33,7 @@ import liquibase.statement.SqlStatement;
 public class IdmDatabase implements Database {
 
 	private Survey survey;
-
+	
 	public IdmDatabase(Survey survey) {
 		this.survey = survey;
 	}
@@ -104,12 +104,12 @@ public class IdmDatabase implements Database {
 
 	@Override
 	public String getDatabaseProductName() {
-		return "IDM";
+		return "Open Foris Inventory Data Model";
 	}
 
 	@Override
 	public String getDatabaseProductVersion() throws DatabaseException {
-		return "3.0";
+		return "3.1";
 	}
 
 	@Override
@@ -119,7 +119,7 @@ public class IdmDatabase implements Database {
 
 	@Override
 	public int getDatabaseMinorVersion() throws DatabaseException {
-		return 0;
+		return 1;
 	}
 
 	@Override

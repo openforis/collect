@@ -1,4 +1,4 @@
-package org.openforis.idm.db;
+package org.openforis.collect.liquibase;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -24,8 +24,8 @@ import liquibase.exception.DatabaseException;
 import liquibase.snapshot.DatabaseSnapshot;
 import liquibase.snapshot.DatabaseSnapshotGenerator;
 import liquibase.snapshot.DatabaseSnapshotGeneratorFactory;
-import liquibase.sqlgenerator.SqlGeneratorFactory;
 
+import org.openforis.collect.relational.RelationalSchema;
 import org.openforis.idm.metamodel.DefaultSurveyContext;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.SurveyContext;
@@ -33,22 +33,13 @@ import org.openforis.idm.metamodel.xml.IdmlParseException;
 import org.openforis.idm.metamodel.xml.SurveyIdmlBinder;
 
 public class IdmDatabaseSnapshotGenerator implements DatabaseSnapshotGenerator {
+
+	private RelationalSchema relationalSchema;
 	
-	private static final String RDB_NAMESPACE = "http://www.openforis.org/collect/3.0/rdb";	
-	private IdmDatabaseSnapshotBuilder builder;
-	
-	public IdmDatabaseSnapshotGenerator() {
-		this.builder = new IdmDatabaseSnapshotBuilder();
+	public IdmDatabaseSnapshotGenerator(RelationalSchema relationalSchema) {
+		this.relationalSchema = relationalSchema;
 	}
-	
-	public String getTablePrefix() {
-		return builder.getTablePrefix();
-	}
-	
-	public void setTablePrefix(String tablePrefix) {
-		builder.setTablePrefix(tablePrefix);
-	}
-	
+
 	@Override
 	public boolean supports(Database database) {
 		return database instanceof IdmDatabase;
@@ -63,9 +54,8 @@ public class IdmDatabaseSnapshotGenerator implements DatabaseSnapshotGenerator {
 	public DatabaseSnapshot createSnapshot(Database database, String surveyUri,
 			Set<DiffStatusListener> listeners) throws DatabaseException {
 		
-		builder.setDatabase((IdmDatabase) database);
-		
-		return builder.toSnapshot();
+		// TODO
+		return null;
 	}
 
 	@Override
@@ -144,58 +134,51 @@ public class IdmDatabaseSnapshotGenerator implements DatabaseSnapshotGenerator {
 		return false;
 	}
 	
-	private static Survey loadSurvey() throws IdmlParseException, FileNotFoundException {
-//		InputStream is = ClassLoader.getSystemResourceAsStream("test.idm.xml");
-		
-		InputStream is = new FileInputStream("D:/Data/workspace/idm/idm-test/src/main/resources/test.idm.xml");
-//		InputStream is = new FileInputStream("/home/gino/workspace/faofin/tz/naforma-idm/tanzania-naforma.idm.xml");
-		SurveyContext ctx = new DefaultSurveyContext();
-		SurveyIdmlBinder binder = new SurveyIdmlBinder(ctx);
-		return binder.unmarshal(is);
-	}
+//	private static Survey loadSurvey() throws IdmlParseException, FileNotFoundException {
+////		InputStream is = ClassLoader.getSystemResourceAsStream("test.idm.xml");
+//		
+//		InputStream is = new FileInputStream("D:/Data/workspace/idm/idm-test/src/main/resources/test.idm.xml");
+////		InputStream is = new FileInputStream("/home/gino/workspace/faofin/tz/naforma-idm/tanzania-naforma.idm.xml");
+//		SurveyContext ctx = new DefaultSurveyContext();
+//		SurveyIdmlBinder binder = new SurveyIdmlBinder(ctx);
+//		return binder.unmarshal(is);
+//	}
 
-	public static void main(String[] args) {
-		try { 
-			Survey survey = loadSurvey();
-			IdmDatabase idmDb = new IdmDatabase(survey);
-//			dbFactory.register(idmDb);
-
-			
-			
-			// Register snapshot generator for IDM "databases"
-			DatabaseFactory dbFactory = DatabaseFactory.getInstance();
-			DatabaseSnapshotGeneratorFactory snapshotFactory = DatabaseSnapshotGeneratorFactory.getInstance();
-			IdmDatabaseSnapshotGenerator generator = new IdmDatabaseSnapshotGenerator();
-			generator.setTablePrefix("tz_");
-			generator.setCodeListTableSuffix("_code");
-			snapshotFactory.register(generator);
-			Set<DiffStatusListener> listeners = Collections.emptySet();
-			DatabaseSnapshot snapshot = snapshotFactory.createSnapshot(idmDb, "", listeners);
-			System.out.println(snapshot.toString());
-//			SqlGeneratorFactory.getInstance().generateSql(statement, database)
-			
-			Connection conn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/naforma1","postgres","postgres");
-			DatabaseConnection dbconn = new JdbcConnection(conn);
-			PostgresDatabase rdb = (PostgresDatabase) dbFactory.findCorrectDatabaseImplementation(dbconn);
-	//		DatabaseSnapshot snapshot = snapshotFactory.createSnapshot(idmDb, "http://....", null);
-	//		Liquibase liq = new Liquibase("changes.log", new FileSystemResourceAccessor("/home/gino/temp/ofc"), idmDb);			
-			Diff diff = new Diff(idmDb, rdb);
-			DiffResult diffResult = diff.compare();
-			diffResult.setChangeSetAuthor("collect-rdb-3.0-SNAPSHOT");
-//			diffResult.printChangeLog(System.out, rdb);
-//			diffResult.printResult(System.out);
-//			System.out.println(diffResult);
-	//		liq.update("changes");
-		} catch ( Exception e ) {
-			e.printStackTrace();
-		}
-	}
-
-	public void setCodeListTableSuffix(String codeTableSuffix) {
-		builder.setCodeTableSuffix(codeTableSuffix);
-	}
-	
-	public String getCodeTableSuffix() {
-		return builder.getCodeTableSuffix();
-	}
+//	public static void main(String[] args) {
+//		try { 
+//			Survey survey = loadSurvey();
+//			
+//			IdmDatabase idmDb = new IdmDatabase(survey);
+////			dbFactory.register(idmDb);
+//
+//			
+//			
+//			// Register snapshot generator for IDM "databases"
+//			DatabaseFactory dbFactory = DatabaseFactory.getInstance();
+//			DatabaseSnapshotGeneratorFactory snapshotFactory = DatabaseSnapshotGeneratorFactory.getInstance();
+//			IdmDatabaseSnapshotGenerator generator = new IdmDatabaseSnapshotGenerator();
+//			generator.setTablePrefix("tz_");
+//			generator.setCodeListTableSuffix("_code");
+//			snapshotFactory.register(generator);
+//			Set<DiffStatusListener> listeners = Collections.emptySet();
+//			DatabaseSnapshot snapshot = snapshotFactory.createSnapshot(idmDb, "", listeners);
+//			System.out.println(snapshot.toString());
+////			SqlGeneratorFactory.getInstance().generateSql(statement, database)
+//			
+//			Connection conn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/naforma1","postgres","postgres");
+//			DatabaseConnection dbconn = new JdbcConnection(conn);
+//			PostgresDatabase rdb = (PostgresDatabase) dbFactory.findCorrectDatabaseImplementation(dbconn);
+//	//		DatabaseSnapshot snapshot = snapshotFactory.createSnapshot(idmDb, "http://....", null);
+//	//		Liquibase liq = new Liquibase("changes.log", new FileSystemResourceAccessor("/home/gino/temp/ofc"), idmDb);			
+//			Diff diff = new Diff(idmDb, rdb);
+//			DiffResult diffResult = diff.compare();
+//			diffResult.setChangeSetAuthor("collect-rdb-3.0-SNAPSHOT");
+////			diffResult.printChangeLog(System.out, rdb);
+////			diffResult.printResult(System.out);
+////			System.out.println(diffResult);
+//	//		liq.update("changes");
+//		} catch ( Exception e ) {
+//			e.printStackTrace();
+//		}
+//	}
 }

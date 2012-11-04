@@ -1,6 +1,5 @@
-package org.openforis.idm.relational;
+package org.openforis.collect.relational;
 
-import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -11,30 +10,44 @@ import java.util.List;
  * @author G. Miceli
  *
  */
-public class Table  {
+abstract class AbstractTable<T> implements Table<T>  {
 
+	private String prefix;
 	private String name;
-	private LinkedHashMap<String, Column> columns;
+	private LinkedHashMap<String, Column<?>> columns;
 	private List<UniquenessConstraint> uniquenessConstraints;
 	private List<ReferentialConstraint> referentialConstraints;
 	
-	Table(String name) {
+	AbstractTable(String prefix, String name) {
+		this.prefix = prefix;
 		this.name = name;
-		this.columns = new LinkedHashMap<String, Column>();
+		this.columns = new LinkedHashMap<String, Column<?>>();
 		this.uniquenessConstraints = new ArrayList<UniquenessConstraint>();
 		this.referentialConstraints = new ArrayList<ReferentialConstraint>();
 	}
 	
+	@Override
+	public String getPrefix() {
+		return prefix;
+	}
+	
+	@Override
 	public String getName() {
 		return name;
 	}
 
-	void addColumn(Column column) throws SchemaGenerationException {
+	@Override
+	public String getFullName() {
+		return prefix+name;
+	}
+	/**
+	 * Adds a column or replaces existing column with same name
+	 * @param column
+	 * @throws SchemaGenerationException
+	 */
+	void addColumn(Column<?> column) {
 		String columnName = column.getName();
-		if ( columns.containsKey(columnName) ) {
-			throw new SchemaGenerationException("Duplicate column '"+columnName+"' in table '"+name+"'");
-		}
-		columns.put(name, column);
+		columns.put(columnName, column);
 	}
 	
 	void addConstraint(UniquenessConstraint constraint) {
@@ -45,16 +58,24 @@ public class Table  {
 		referentialConstraints.add(constraint);
 	}
 	
-	public List<Column> getColumns() {
-		ArrayList<Column> columnList = new ArrayList<Column>(columns.values());
+	@Override
+	public List<Column<?>> getColumns() {
+		ArrayList<Column<?>> columnList = new ArrayList<Column<?>>(columns.values());
 		return Collections.unmodifiableList(columnList);
 	}
 	
+	@Override
 	public List<UniquenessConstraint> getUniquenessConstraints() {
 		return Collections.unmodifiableList(uniquenessConstraints);
 	}
 	
+	@Override
 	public List<ReferentialConstraint> getReferentialContraints() {
 		return Collections.unmodifiableList(referentialConstraints);
+	}
+	
+
+	public boolean containsColumn(String name) {
+		return columns.containsKey(name);
 	}
 }
