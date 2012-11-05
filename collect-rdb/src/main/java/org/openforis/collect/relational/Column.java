@@ -1,15 +1,25 @@
 package org.openforis.collect.relational;
 
+/**
+ * 
+ * @author G. Miceli
+ *
+ * @param <T>
+ */
 public interface Column<T> {
 
-	public abstract String getName();
+	String getName();
 
-	public abstract int getType();
+	/**
+	 * JDBC type from java.sql.Types
+	 * @return
+	 */
+	int getType();
 
-	public abstract Integer getLength();
+	Integer getLength();
 
-	public abstract boolean isNullable();
+	boolean isNullable();
 	
-	public Object extractValue(T source);
+	Object extractValue(T source);
 
 }

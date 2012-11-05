@@ -34,9 +34,9 @@ public class RelationalDatabaseTest {
 
 	@BeforeClass
 	public static void loadSurvey() throws IdmlParseException, FileNotFoundException {
-//		InputStream is = ClassLoader.getSystemResourceAsStream("test.idm.xml");
+		InputStream is = ClassLoader.getSystemResourceAsStream("test.idm.xml");
 //		InputStream is = new FileInputStream("/home/gino/workspace/of/idm/idm-test/src/main/resources/test.idm.xml");
-		InputStream is = new FileInputStream("D:/data/workspace/idm/idm-test/src/main/resources/test.idm.xml");
+//		InputStream is = new FileInputStream("D:/data/workspace/idm/idm-test/src/main/resources/test.idm.xml");
 //		InputStream is = new FileInputStream("/home/gino/workspace/faofin/tz/naforma-idm/tanzania-naforma.idm.xml");
 		CollectSurveyContext ctx = new CollectSurveyContext(new ExpressionFactory(), null, null);
 		CollectSurveyIdmlBinder binder = new CollectSurveyIdmlBinder(ctx);
