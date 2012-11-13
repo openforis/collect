@@ -18,6 +18,7 @@ import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.ApplicationOptions;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
+import org.openforis.idm.metamodel.NodeDefinitionVisitor;
 import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.util.CollectionUtil;
 
@@ -156,9 +157,36 @@ public class UIOptions implements ApplicationOptions, Serializable {
 	public void associateWithTab(NodeDefinition nodeDefn, UITab tab) {
 		String tabName = tab.getName();
 		nodeDefn.setAnnotation(Annotation.TAB_NAME.getQName(), tabName);
+		
+		afterTabAssociationChanged(nodeDefn);
+	}
+
+	protected void afterTabAssociationChanged(NodeDefinition nodeDefn) {
+		if ( nodeDefn instanceof EntityDefinition ) {
+			removeInvalidTabAssociationInDescendants((EntityDefinition) nodeDefn);
+		}
+	}
+
+	protected void removeInvalidTabAssociationInDescendants(EntityDefinition nodeDefn) {
+		((EntityDefinition) nodeDefn).traverse(new NodeDefinitionVisitor() {
+			@Override
+			public void visit(NodeDefinition descendantDefn) {
+				UITab descendantTab = getTab(descendantDefn, false);
+				if ( descendantTab == null ) {
+					//tab not set or not found
+					performTabAssociationRemoval(descendantDefn);
+				}
+			}
+		});
 	}
 	
 	public void removeTabAssociation(NodeDefinition nodeDefn) {
+		performTabAssociationRemoval(nodeDefn);
+		
+		afterTabAssociationChanged(nodeDefn);
+	}
+
+	protected void performTabAssociationRemoval(NodeDefinition nodeDefn) {
 		nodeDefn.setAnnotation(Annotation.TAB_NAME.getQName(), null);
 	}
 	
@@ -169,7 +197,7 @@ public class UIOptions implements ApplicationOptions, Serializable {
 			UITab currentTab = stack.pop();
 			List<NodeDefinition> nodesPerTab = getNodesPerTab(currentTab, true);
 			for (NodeDefinition nodeDefn : nodesPerTab) {
-				removeTabAssociation(nodeDefn);
+				performTabAssociationRemoval(nodeDefn);
 			}
 			List<UITab> childTabs = currentTab.getTabs();
 			stack.addAll(childTabs);
