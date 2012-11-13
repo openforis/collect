@@ -11,7 +11,7 @@ import org.openforis.collect.metamodel.ui.UITab;
 import org.openforis.collect.metamodel.ui.UITabSet;
 
 /**
- * @author riccist
+ * @author S. Ricci
  *
  */
 public class UITabsTreeModel extends AbstractTreeModel<UITabSet> {

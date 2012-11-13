@@ -1,8 +1,8 @@
 <?component name="fieldErrorHandler" class="org.openforis.collect.designer.component.FieldErrorHandler"?>
 <zk>
 	<window id="codeListItemManagerPopUp" title="${labels.survey.code_list.item.manager.title}" 
-		width="800px"
-		height="270px"
+		width="600px"
+		height="280px"
 		border="normal"
 		position="center" 
 		closable="false"
@@ -42,34 +42,36 @@
 						<checkbox value="@bind(fx.qualifiable)" onCheck="@command('applyChanges')" />
 					</fieldErrorHandler>
 				</row>
-				<row>
-					<label value="${labels.global.item.since_version}:" />
-                    <fieldErrorHandler message="@load(vmsgs['sinceVersion'])">
-						<listbox width="150px"
-		                    model="@load(vm.versionsForCombo)" 
-		                    selectedItem="@bind(fx.sinceVersion)"
-		                    onSelect="@command('applyChanges')"
-		                    mold="select">
-		                    <template name="model">
-		                        <listitem label="@load(each.name)" />
-		                    </template>
-		                </listbox>
-					</fieldErrorHandler>
-	            </row>
-	            <row>
-					<label value="${labels.global.item.deprecated_version}:" />
-                    <fieldErrorHandler message="@load(vmsgs['deprecatedVersion'])">
-						<listbox width="150px"
-		                    model="@load(vm.versionsForCombo)" 
-		                    selectedItem="@bind(fx.deprecatedVersion)"
-		                    onSelect="@command('applyChanges')"
-		                    mold="select">
-		                    <template name="model">
-		                        <listitem label="@load(each.name)" />
-		                    </template>
-		                </listbox>
-					</fieldErrorHandler>
-	            </row>
+    			<row>
+    				<label value="${labels.global.item.since_version}:" />
+    				<fieldErrorHandler message="@load(vmsgs['sinceVersionId'])">
+                    	<listbox width="150px" model="@load(vm.versionIdsForCombo)"
+    						selectedItem="@bind(fx.sinceVersionId)" mold="select"
+    						onSelect="@command('applyChanges')">
+    						<template name="model">
+    							<listitem label="@load(vm.getVersionLabel(each))" />
+    						</template>
+    					</listbox>
+    					<button tooltiptext="${labels.survey.versioning_manager}" 
+    						onClick="@global-command('openVersioningManagerPopUp')"
+    						image="/assets/images/pencil-small.png" />
+                    </fieldErrorHandler>
+    			</row>
+    			<row>
+    				<label value="${labels.global.item.deprecated_version}:" />
+    				<fieldErrorHandler message="@load(vmsgs['deprecatedVersionId'])">
+                    	<listbox width="150px" model="@load(vm.versionIdsForCombo)"
+    						selectedItem="@bind(fx.deprecatedVersionId)" mold="select"
+    						onSelect="@command('applyChanges')">
+    						<template name="model">
+    							<listitem label="@load(vm.getVersionLabel(each))" />
+    						</template>
+    					</listbox>
+    					<button tooltiptext="${labels.survey.versioning_manager}" 
+    						onClick="@global-command('openVersioningManagerPopUp')"
+    						image="/assets/images/pencil-small.png" />
+                    </fieldErrorHandler>
+    			</row>
 			</rows>
 		</grid>
 		<box align="center" width="100%">

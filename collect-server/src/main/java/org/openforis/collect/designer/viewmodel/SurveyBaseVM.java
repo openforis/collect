@@ -3,6 +3,8 @@
  */
 package org.openforis.collect.designer.viewmodel;
 
+import static org.openforis.collect.designer.model.LabelKeys.EMPTY_OPTION;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -14,6 +16,7 @@ import org.openforis.collect.designer.session.SessionStatus;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.CodeList;
+import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.Unit;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.annotation.BindingParam;
@@ -129,6 +132,32 @@ public abstract class SurveyBaseVM extends BaseVM {
 		return new BindingListModelList<Object>(result, false);
 	}
 	
+	public List<Integer> getVersionIdsForCombo() {
+		CollectSurvey survey = getSurvey();
+		List<ModelVersion> versions = survey.getVersions();
+		List<Integer> result = new ArrayList<Integer>();
+		result.add(0, -1);
+		for (ModelVersion modelVersion : versions) {
+			result.add(modelVersion.getId());
+		}
+		return new BindingListModelList<Integer>(result, false);
+	}
+	
+	public String getVersionLabel(int id) {
+		if ( id > 0 ) {
+			CollectSurvey survey = getSurvey();
+			ModelVersion version = survey.getVersionById(id);
+			String result = version.getLabel(currentLanguageCode);
+			if ( result == null && isDefaultLanguage() ) {
+				result = version.getLabel(null);
+			}
+			return result;
+		} else {
+			return Labels.getLabel(EMPTY_OPTION);
+		}
+			
+	}
+	
 	public List<CodeList> getCodeLists() {
 		CollectSurvey survey = getSurvey();
 		List<CodeList> result = new ArrayList<CodeList>(survey.getCodeLists());
@@ -140,6 +169,16 @@ public abstract class SurveyBaseVM extends BaseVM {
 		return new BindingListModelList<Unit>(result, false);
 	}
 
+	public boolean isDefaultLanguage() {
+		CollectSurvey survey = getSurvey();
+		if ( survey != null ) {
+			String defaultLanguageCode = survey.getDefaultLanguage();
+			return currentLanguageCode != null && currentLanguageCode.equals(defaultLanguageCode);
+		} else {
+			return false;
+		}
+	}
+	
 	public String getCurrentLanguageCode() {
 		return currentLanguageCode;
 	}

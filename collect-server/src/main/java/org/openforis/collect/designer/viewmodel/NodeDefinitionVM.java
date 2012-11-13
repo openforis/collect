@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.openforis.collect.designer.form.NodeDefinitionFormObject;
+import org.openforis.collect.designer.model.LabelKeys;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.metamodel.ui.UITab;
 import org.openforis.collect.metamodel.ui.UITabSet;
@@ -25,6 +26,7 @@ import org.zkoss.bind.annotation.ContextParam;
 import org.zkoss.bind.annotation.ContextType;
 import org.zkoss.bind.annotation.GlobalCommand;
 import org.zkoss.bind.annotation.Init;
+import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.IdSpace;
 import org.zkoss.zk.ui.Path;
@@ -123,6 +125,7 @@ public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyO
 		return tempFormObject;
 	}
 	
+	@Deprecated
 	public List<Object> getAssignableTabs() {
 		if ( editedItem == null ) {
 			return null;
@@ -136,11 +139,72 @@ public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyO
 		}
 	}
 	
-	public String getTabLabel(Object tab) {
-		if ( tab == null || tab == NodeDefinitionFormObject.INHERIT_TAB ) {
-			return NodeDefinitionFormObject.INHERIT_TAB.getName();
+	public List<String> getAssignableTabNames() {
+		if ( editedItem == null ) {
+			return null;
 		} else {
-			return ((UITab) tab).getLabel(currentLanguageCode);
+			CollectSurvey survey = getSurvey();
+			UIOptions uiOptions = survey.getUIOptions();
+			List<UITab> allowedTabs = uiOptions.getAllowedTabs(editedItem);
+			List<String> result = new ArrayList<String>();
+			result.add(NodeDefinitionFormObject.INHERIT_TAB_NAME);
+			for (UITab uiTab : allowedTabs) {
+				result.add(uiTab.getName());
+			}
+			return result;
 		}
+	}
+	
+//	public String getTabLabel(Object tab) {
+//		if ( tab == null || tab == NodeDefinitionFormObject.INHERIT_TAB ) {
+//			return Labels.getLabel(LabelKeys.INHERIT_TAB);
+//			//return NodeDefinitionFormObject.INHERIT_TAB.getName();
+//		} else {
+//			String result = ((UITab) tab).getLabel(currentLanguageCode);
+//			if ( result == null && isDefaultLanguage() ) {
+//				//try to get label associated to default language code
+//				result = ((UITab) tab).getLabel(null);
+//			}
+//			return result;
+//		}
+//	}
+//	
+
+	public String getTabLabel(String tabName) {
+		if ( tabName == null || tabName.equals(NodeDefinitionFormObject.INHERIT_TAB_NAME) ) {
+			return Labels.getLabel(LabelKeys.INHERIT_TAB);
+			//return NodeDefinitionFormObject.INHERIT_TAB.getName();
+		} else {
+			UITab tab = getTab(tabName);
+			if ( tab != null ) {
+				String result = tab.getLabel(currentLanguageCode);
+				if ( result == null && isDefaultLanguage() ) {
+					//try to get label associated to default language code
+					result = tab.getLabel(null);
+				}
+				return result;
+			} else {
+				return null;
+			}
+		}
+	}
+
+	protected UITab getTab(String tabName) {
+		UITabSet parentTabSet = getParentTabSet();
+		UITab tab = null;
+		if ( parentTabSet != null ) {
+			tab = parentTabSet.getTab(tabName);
+		}
+		return tab;
+	}
+	
+	protected UITabSet getParentTabSet() {
+		CollectSurvey survey = getSurvey();
+		UIOptions uiOptions = survey.getUIOptions();
+		UITabSet parentTabSet = null;
+		if ( editedItem != null ) {
+			parentTabSet = uiOptions.getParentTabSet(editedItem);
+		}
+		return parentTabSet;
 	}
 }

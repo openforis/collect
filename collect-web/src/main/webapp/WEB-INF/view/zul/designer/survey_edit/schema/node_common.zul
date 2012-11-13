@@ -134,12 +134,12 @@
 			</row>
 			<row>
 				<label value="${labels.global.item.since_version}:" />
-				<fieldErrorHandler message="@load(vmsgs['sinceVersion'])">
-                	<listbox width="150px" model="@load(vm.versionsForCombo)"
-						selectedItem="@bind(fx.sinceVersion)" mold="select"
+				<fieldErrorHandler message="@load(vmsgs['sinceVersionId'])">
+                	<listbox width="150px" model="@load(vm.versionIdsForCombo)"
+						selectedItem="@bind(fx.sinceVersionId)" mold="select"
 						onSelect="@command('applyChanges')">
 						<template name="model">
-							<listitem label="@load(each.name)" />
+							<listitem label="@load(vm.getVersionLabel(each))" />
 						</template>
 					</listbox>
 					<button tooltiptext="${labels.survey.versioning_manager}" 
@@ -149,12 +149,12 @@
 			</row>
 			<row>
 				<label value="${labels.global.item.deprecated_version}:" />
-				<fieldErrorHandler message="@load(vmsgs['deprecatedVersion'])">
-                	<listbox width="150px" model="@load(vm.versionsForCombo)"
-						selectedItem="@bind(fx.deprecatedVersion)" mold="select"
+				<fieldErrorHandler message="@load(vmsgs['deprecatedVersionId'])">
+                	<listbox width="150px" model="@load(vm.versionIdsForCombo)"
+						selectedItem="@bind(fx.deprecatedVersionId)" mold="select"
 						onSelect="@command('applyChanges')">
 						<template name="model">
-							<listitem label="@load(each.name)" />
+							<listitem label="@load(vm.getVersionLabel(each))" />
 						</template>
 					</listbox>
 					<button tooltiptext="${labels.survey.versioning_manager}" 
@@ -173,8 +173,8 @@
         <row>
           <label value="${labels.survey.schema.node.layout.tab}:" />
           <fieldErrorHandler message="@load(vmsgs['tab'])">
-              <listbox width="150px" model="@load(vm.assignableTabs)"
-                selectedItem="@bind(fx.tab)" mold="select"
+              <listbox width="150px" model="@load(vm.assignableTabNames)"
+                selectedItem="@bind(fx.tabName)" mold="select"
                 onSelect="@command('applyChanges')"
                 disabled="${empty parentEntity}">
               <template name="model">

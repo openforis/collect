@@ -1,12 +1,11 @@
 package org.openforis.collect.designer.form;
 
 import org.openforis.collect.designer.model.AttributeType;
-import org.openforis.collect.designer.model.NamedObject;
 import org.openforis.collect.designer.model.NodeType;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.metamodel.ui.UITab;
+import org.openforis.collect.metamodel.ui.UITabSet;
 import org.openforis.collect.model.CollectSurvey;
-import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NodeLabel.Type;
 import org.openforis.idm.metamodel.Prompt;
@@ -16,13 +15,17 @@ import org.openforis.idm.metamodel.Prompt;
  * @author S. Ricci
  *
  */
-public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends SurveyObjectFormObject<T> {
+public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends VersionableItemFormObject<T> {
 	
-	public static NamedObject INHERIT_TAB;
+	public static final String INHERIT_TAB_NAME = "inherit";
+	
+	//public static NamedObject INHERIT_TAB;
+	public static UITab INHERIT_TAB;
 	
 	static {
 		//init static variables
-		INHERIT_TAB = new NamedObject("survey.schema.node.tab.inherited");
+		//INHERIT_TAB = new NamedObject(LabelKeys.INHERIT_TAB);
+		INHERIT_TAB = new UITab();
 	};
 	//generic
 	private String name;
@@ -41,11 +44,8 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 	private String paperPromptLabel;
 	private String handheldPromptLabel;
 	private String pcPromptLabel;
-	//versioning
-	private Object sinceVersion;
-	private Object deprecatedVersion;
 	//layout
-	private Object tab;
+	private String tabName;
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public static NodeDefinitionFormObject<NodeDefinition> newInstance(NodeType nodeType, AttributeType attributeType) {
@@ -106,6 +106,7 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 	
 	@Override
 	public void loadFrom(T source, String language, String defaultLanguage) {
+		super.loadFrom(source, language, defaultLanguage);
 		//generic
 		name = source.getName();
 		multiple = source.isMultiple();
@@ -124,15 +125,10 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 		handheldPromptLabel = getPrompt(source, Prompt.Type.HANDHELD, language, defaultLanguage);
 		pcPromptLabel = getPrompt(source, Prompt.Type.PC, language, defaultLanguage);
 		description = getDescription(source, language, defaultLanguage);
-		//versioning
-		sinceVersion = source.getSinceVersion();
-		deprecatedVersion = source.getDeprecatedVersion();
 		//layout
 		UIOptions uiOptions = getUIOptions(source);
-		tab = uiOptions.getTab(source, false);
-		if ( tab == null ) {
-			tab = INHERIT_TAB;
-		}
+		UITab tab = uiOptions.getTab(source, false);
+		tabName = tab != null ? tab.getName(): INHERIT_TAB_NAME;
 	}
 
 	protected String getLabel(T source, Type type, String languageCode, String defaultLanguage) {
@@ -164,6 +160,7 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 	
 	@Override
 	public void saveTo(T dest, String languageCode) {
+		super.saveTo(dest, languageCode);
 		dest.setName(name);
 		dest.setLabel(Type.HEADING, languageCode, headingLabel);
 		dest.setLabel(Type.INSTANCE, languageCode, instanceLabel);
@@ -183,19 +180,19 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 		} else {
 			dest.setRequiredExpression(requiredExpression);
 		}
-		dest.setSinceVersion(null);
-		dest.setDeprecatedVersion(null);
-		if ( sinceVersion != null && sinceVersion != VERSION_EMPTY_SELECTION ) {
-			dest.setSinceVersion((ModelVersion) sinceVersion);
-		}
-		if ( deprecatedVersion != null && deprecatedVersion != VERSION_EMPTY_SELECTION ) {
-			dest.setDeprecatedVersion((ModelVersion) deprecatedVersion);
-		}
+		saveTabInfo(dest);
+	}
+
+	protected void saveTabInfo(T dest) {
 		UIOptions uiOptions = getUIOptions(dest);
-		if ( tab == null || tab == INHERIT_TAB ) {
+		if ( tabName == null || tabName.equals(INHERIT_TAB_NAME) ) {
 			uiOptions.removeTabAssociation(dest);
 		} else {
-			uiOptions.associateWithTab(dest, (UITab) tab);
+			UITabSet parentTabSet = uiOptions.getParentTabSet(dest);
+			if ( parentTabSet != null ) {
+				UITab tab = parentTabSet.getTab(tabName);
+				uiOptions.associateWithTab(dest, tab);
+			}
 		}
 	}
 	
@@ -258,22 +255,6 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 		this.multiple = multiple;
 	}
 	
-	public Object getSinceVersion() {
-		return sinceVersion;
-	}
-	
-	public void setSinceVersion(Object sinceVersion) {
-		this.sinceVersion = sinceVersion;
-	}
-	
-	public Object getDeprecatedVersion() {
-		return deprecatedVersion;
-	}
-	
-	public void setDeprecatedVersion(Object deprecatedVersion) {
-		this.deprecatedVersion = deprecatedVersion;
-	}
-
 	public String getInterviewPromptLabel() {
 		return interviewPromptLabel;
 	}
@@ -346,12 +327,12 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 		this.maxCount = maxCount;
 	}
 
-	public Object getTab() {
-		return tab;
+	public String getTabName() {
+		return tabName;
 	}
 
-	public void setTab(Object tab) {
-		this.tab = tab;
+	public void setTabName(String tabName) {
+		this.tabName = tabName;
 	}
 
 }

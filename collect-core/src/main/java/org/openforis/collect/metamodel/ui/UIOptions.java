@@ -110,21 +110,29 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		return tabSet;
 	}
 	
-	public List<UITab> getAllowedTabs(NodeDefinition nodeDefn) {
+	public UITabSet getParentTabSet(NodeDefinition nodeDefn) {
 		EntityDefinition rootEntity = nodeDefn.getRootEntity();
 		UITabSet tabSet = getTabSet(rootEntity);
 		if ( tabSet != null ) {
 			NodeDefinition parentDefn = nodeDefn.getParentDefinition();
 			if ( parentDefn == null || parentDefn.getParentDefinition() == null ) {
-				return tabSet.getTabs();
+				return tabSet;
 			} else {
 				UITab parentTab = getTab(parentDefn);
-				if ( parentTab != null ) {
-					return parentTab.getTabs();
-				}
+				return parentTab;
 			}
+		} else {
+			return null;
 		}
-		return Collections.emptyList();
+	}
+
+	public List<UITab> getAllowedTabs(NodeDefinition nodeDefn) {
+		UITabSet parentTabSet = getParentTabSet(nodeDefn);
+		if ( parentTabSet != null ) {
+			return parentTabSet.getTabs();
+		} else {
+			return Collections.emptyList();
+		}
 	}
 
 	public boolean isAssignableTo(NodeDefinition nodeDefn, UITab tab) {
@@ -136,7 +144,7 @@ public class UIOptions implements ApplicationOptions, Serializable {
 	public List<NodeDefinition> getNodesPerTab(UITab tab, boolean includeDescendants) {
 		List<NodeDefinition> result = new ArrayList<NodeDefinition>();
 		UITabSet tabSet = tab.getRootTabSet();
-		EntityDefinition rootEntity = getRootEntityDefinition(survey, tabSet);
+		EntityDefinition rootEntity = getRootEntityDefinition(tabSet);
 		Queue<NodeDefinition> queue = new LinkedList<NodeDefinition>();
 		queue.addAll(rootEntity.getChildDefinitions());
 		while ( ! queue.isEmpty() ) {
@@ -254,8 +262,7 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		return null;
 	}
 
-	public EntityDefinition getRootEntityDefinition(CollectSurvey survey,
-			UITabSet tabSet) {
+	public EntityDefinition getRootEntityDefinition(UITabSet tabSet) {
 		Schema schema = survey.getSchema();
 		List<EntityDefinition> rootEntityDefinitions = schema.getRootEntityDefinitions();
 		for (EntityDefinition defn : rootEntityDefinitions) {

@@ -137,9 +137,17 @@ public class SchemaLayoutSimpleVM extends SurveyBaseVM {
 	}
 
 	protected void performUpdateTabLabel(UITab tab, String label) {
-		tab.setLabel(currentLanguageCode, label.trim());
+		setTabLabel(tab, label);
 		dispatchTabChangedCommand(tab);
 		BindUtils.postNotifyChange(null, null, tab, "*");
+	}
+
+	protected void setTabLabel(UITab tab, String label) {
+		if ( isDefaultLanguage() ) {
+			//remove label associated to default language, if any
+			tab.removeLabel(null);
+		}
+		tab.setLabel(currentLanguageCode, label.trim());
 	}
 	
 	protected boolean validateTabLabel(String label) {
@@ -164,7 +172,16 @@ public class SchemaLayoutSimpleVM extends SurveyBaseVM {
 	}
 	
 	public String getTabLabel(UITab tab) {
-		return tab != null ? tab.getLabel(currentLanguageCode): null;
+		if ( tab != null ) {
+			String result = tab.getLabel(currentLanguageCode);
+			if ( result == null && isDefaultLanguage() ) {
+				//try to get label associated to default language code
+				result = tab.getLabel(null);
+			}
+			return result;
+		} else {
+			return null;
+		}
 	}
 	
 	private String generateNewTabName(UITabSet parentGroup) {

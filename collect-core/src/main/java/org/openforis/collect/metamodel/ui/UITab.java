@@ -13,6 +13,10 @@ import org.openforis.idm.metamodel.LanguageSpecificTextMap;
  */
 public class UITab extends UITabSet {
 
+	public UITab() {
+		super(null);
+	}
+	
 	UITab(UIOptions uiOptions) {
 		super(uiOptions);
 	}
