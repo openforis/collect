@@ -32,6 +32,8 @@ public class UIOptions implements ApplicationOptions, Serializable {
 
 	private static final long serialVersionUID = 1L;
 	
+	private static final String TABSET_NAME_PREFIX = "tabset_";
+
 	public enum Annotation {
 		TAB_SET(new QName(UI_NAMESPACE_URI, UIOptionsConstants.TAB_SET_NAME)),
 		TAB_NAME(new QName(UI_NAMESPACE_URI, UIOptionsConstants.TAB)),
@@ -76,7 +78,10 @@ public class UIOptions implements ApplicationOptions, Serializable {
 	}
 	
 	public UITabSet createTabSet() {
-		return new UITabSet(this);
+		UITabSet result = new UITabSet(this);
+		int tabSetsSize = tabSets != null ? tabSets.size(): 1;
+		result.setName(TABSET_NAME_PREFIX + tabSetsSize);
+		return result;
 	}
 
 	public UITab getAssignedTab(NodeDefinition nodeDefn) {
@@ -126,43 +131,54 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		return tabSet;
 	}
 	
-	protected UITabSet getParentAssignedTabSet(NodeDefinition nodeDefn) {
-		EntityDefinition parentDefn = (EntityDefinition) nodeDefn.getParentDefinition();
-		return getParentAssignedTabSet(parentDefn, nodeDefn);
-	}
-	
-	public UITabSet getParentAssignedTabSet(EntityDefinition parentEntityDefn,
-			NodeDefinition nodeDefn) {
-		EntityDefinition rootEntity = parentEntityDefn != null ? parentEntityDefn.getRootEntity(): 
-			nodeDefn.getRootEntity();
-		UITabSet rootTabSet = getAssignedRootTabSet(rootEntity);
-		if ( rootTabSet != null ) {
-			if ( parentEntityDefn == null || parentEntityDefn.getParentDefinition() == null ) {
-				return rootTabSet;
+	public List<UITab> getAssignableTabs(NodeDefinition nodeDefn) {
+		EntityDefinition parentEntity = (EntityDefinition) nodeDefn.getParentDefinition();
+		if ( parentEntity == null ) {
+			UITabSet rootTabSet = getAssignedRootTabSet((EntityDefinition) nodeDefn);
+			if ( rootTabSet != null ) {
+				return rootTabSet.getTabs();
 			} else {
-				UITab assignedTab = getAssignedTab(parentEntityDefn);
-				return assignedTab;
+				return Collections.emptyList();
 			}
 		} else {
-			return null;
+			return getTabsAssignableToChildren(parentEntity);
 		}
 	}
 	
-	public List<UITab> getAssignableTabs(EntityDefinition parentEntityDefn, NodeDefinition nodeDefn) {
-		UITabSet parentTabSet = getParentAssignedTabSet(parentEntityDefn, nodeDefn);
-		if ( parentTabSet == null) {
+	public UITabSet getAssignedParentTabSet(EntityDefinition parentDefn, NodeDefinition nodeDefn) {
+		UITabSet parentTabSet;
+		if ( parentDefn != null && parentDefn.getParentDefinition() != null) {
+			parentTabSet = getAssignedTab(nodeDefn);
+		} else if (nodeDefn instanceof EntityDefinition) {
+			parentTabSet = getAssignedRootTabSet((EntityDefinition) nodeDefn);
+		} else {
+			throw new IllegalArgumentException("Root entity definition expected");
+		}
+		return parentTabSet;
+	}
+	
+	public List<UITab> getTabsAssignableToChildren(EntityDefinition entityDefn) {
+		EntityDefinition rootEntity = entityDefn.getRootEntity();
+		UITabSet rootTabSet = getAssignedRootTabSet(rootEntity);
+		UITabSet parentTabSet = null;
+		if ( rootTabSet != null ) {
+			if ( entityDefn == null || entityDefn.getParentDefinition() == null ) {
+				parentTabSet = rootTabSet;
+			} else {
+				UITab assignedTab = getAssignedTab(entityDefn);
+				parentTabSet = assignedTab;
+			}
+		}
+		if (parentTabSet == null) {
 			return Collections.emptyList();
 		} else {
 			return parentTabSet.getTabs();
 		}
 	}
-
-	public List<UITab> getAssignableTabs(NodeDefinition nodeDefn) {
-		return getAssignableTabs((EntityDefinition) nodeDefn.getParentDefinition(), nodeDefn);
-	}
-
+	
 	public boolean isAssignableTo(NodeDefinition nodeDefn, UITab tab) {
-		List<UITab> allowedTabs = getAssignableTabs(nodeDefn);
+		EntityDefinition parentEntityDefn = (EntityDefinition) nodeDefn.getParentDefinition();
+		List<UITab> allowedTabs = getTabsAssignableToChildren(parentEntityDefn);
 		boolean result = allowedTabs.contains(tab);
 		return result;
 	}
@@ -186,6 +202,11 @@ public class UIOptions implements ApplicationOptions, Serializable {
 			}
 		}
 		return result;
+	}
+
+	public void assignToTabSet(EntityDefinition rootEntity, UITabSet tabSet) {
+		String name = tabSet.getName();
+		rootEntity.setAnnotation(Annotation.TAB_SET.getQName(), name);
 	}
 
 	public void assignToTab(NodeDefinition nodeDefn, UITab tab) {

@@ -196,14 +196,12 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 		if ( tabName == null || tabName.equals(INHERIT_TAB_NAME) ) {
 			uiOptions.removeTabAssociation(dest);
 		} else {
-			UITabSet parentTabSet = uiOptions.getParentAssignedTabSet(parentDefinition, dest);
-			if ( parentTabSet != null ) {
-				UITab tab = parentTabSet.getTab(tabName);
-				uiOptions.assignToTab(dest, tab);
-			}
+			UITabSet parentTabSet = uiOptions.getAssignedParentTabSet(parentDefinition, dest);
+			UITab tab = parentTabSet.getTab(tabName);
+			uiOptions.assignToTab(dest, tab);
 		}
 	}
-	
+
 	@Override
 	protected void reset() {
 		//TODO

@@ -52,9 +52,6 @@ import org.zkoss.zul.Window;
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class SchemaVM extends SurveyBaseVM {
 
-	private static final String TAB_NAME_PREFIX = "tab_";
-	private static final String ROOT_TABSET_NAME_PREFIX = "tabset_";
-
 	private static final String SCHEMA_CHANGED_GLOBAL_COMMAND = "schemaChanged";
 	
 	private static final String CONFIRM_REMOVE_NODE_MESSAGE_KEY = "survey.schema.confirm_remove_node";
@@ -321,20 +318,15 @@ public class SchemaVM extends SurveyBaseVM {
 	protected void addFirstTab(EntityDefinition newNode,
 			UITabSet tabSet) {
 		UITab tab = tabSet.createTab();
-		int tabPosition = 1;
-		String tabName = TAB_NAME_PREFIX + tabPosition;
-		tab.setName(tabName);
 		tabSet.addTab(tab);
 	}
 
 	protected UITabSet createRootTabSet(EntityDefinition rootEntity) {
 		UIOptions uiOpts = survey.getUIOptions();
 		UITabSet tabSet = uiOpts.createTabSet();
-		int tabSetPosition = uiOpts.getTabSets().size() + 1;
-		String tabSetName = ROOT_TABSET_NAME_PREFIX + tabSetPosition;
-		tabSet.setName(tabSetName);
 		addFirstTab(rootEntity, tabSet);
 		uiOpts.addTabSet(tabSet);
+		uiOpts.assignToTabSet(rootEntity, tabSet);
 		return tabSet;
 	}
 

@@ -145,7 +145,13 @@ public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyO
 		} else {
 			CollectSurvey survey = getSurvey();
 			UIOptions uiOptions = survey.getUIOptions();
-			List<UITab> assignableTabs = uiOptions.getAssignableTabs(parentEntity, editedItem);
+			List<UITab> assignableTabs;
+			if ( parentEntity != null ) {
+				assignableTabs = uiOptions.getTabsAssignableToChildren(parentEntity);
+			} else {
+				//edited item is root entity
+				assignableTabs = uiOptions.getTabsAssignableToChildren((EntityDefinition) editedItem);
+			}
 			List<String> result = new ArrayList<String>();
 			result.add(NodeDefinitionFormObject.INHERIT_TAB_NAME);
 			for (UITab uiTab : assignableTabs) {
@@ -201,7 +207,7 @@ public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyO
 	protected UITabSet getParentTabSet() {
 		CollectSurvey survey = getSurvey();
 		UIOptions uiOptions = survey.getUIOptions();
-		UITabSet result = uiOptions.getParentAssignedTabSet(parentEntity, editedItem);
+		UITabSet result = uiOptions.getAssignedParentTabSet(parentEntity, editedItem);
 		return result;
 	}
 }

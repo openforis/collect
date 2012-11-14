@@ -15,6 +15,8 @@ public class UITabSet implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
 	
+	private static final String TAB_NAME_PREFIX = "tab_";
+	
 	protected UIOptions uiOptions;
 	protected String name;
 	protected List<UITab> tabs;
@@ -60,7 +62,10 @@ public class UITabSet implements Serializable {
 	}
 	
 	public UITab createTab() {
-		return new UITab(uiOptions);
+		UITab result = new UITab(uiOptions);
+		int tabsSize = tabs != null ? tabs.size(): 1;
+		result.setName(TAB_NAME_PREFIX + tabsSize);
+		return result;
 	}
 	
 	public void setTab(int index, UITab tab) {
