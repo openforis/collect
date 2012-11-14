@@ -56,7 +56,7 @@ public abstract class AttributeVM<T extends AttributeDefinition> extends NodeDef
 	@Override
 	protected FormObject<T> createFormObject() {
 		AttributeType attributeTypeEnum = AttributeType.valueOf(editedItem);
-		formObject = (AttributeDefinitionFormObject<T>) NodeDefinitionFormObject.newInstance(attributeTypeEnum);
+		formObject = (AttributeDefinitionFormObject<T>) NodeDefinitionFormObject.newInstance(parentEntity, attributeTypeEnum);
 		tempFormObject = new SimpleForm();
 		return formObject;
 	}

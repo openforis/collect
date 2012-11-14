@@ -114,7 +114,7 @@ public class SchemaLayoutVM extends SurveyBaseVM {
 			NodeDefinition nodeDefn = treeNode.getData();
 			UIOptions uiOptions = survey.getUIOptions();
 			EntityDefinition rootEntity = nodeDefn.getRootEntity();
-			return uiOptions.getTabSet(rootEntity);
+			return uiOptions.getAssignedRootTabSet(rootEntity);
 		} else {
 			return null;
 		}
@@ -127,7 +127,7 @@ public class SchemaLayoutVM extends SurveyBaseVM {
 			NodeDefinition node = ((Listitem) dragged).getValue();
 			CollectSurvey survey = getSurvey();
 			UIOptions uiOpts = survey.getUIOptions();
-			UITab oldTab = uiOpts.getTab(node, false);
+			UITab oldTab = uiOpts.getAssignedTab(node, false);
 			uiOpts.removeTabAssociation(node);
 			if ( oldTab != null ) {
 				postNodePerTabChangedCommand(oldTab);

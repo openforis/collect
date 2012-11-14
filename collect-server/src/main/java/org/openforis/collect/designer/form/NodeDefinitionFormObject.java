@@ -6,6 +6,7 @@ import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.metamodel.ui.UITab;
 import org.openforis.collect.metamodel.ui.UITabSet;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NodeLabel.Type;
 import org.openforis.idm.metamodel.Prompt;
@@ -27,6 +28,9 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 		//INHERIT_TAB = new NamedObject(LabelKeys.INHERIT_TAB);
 		INHERIT_TAB = new UITab();
 	};
+	
+	private EntityDefinition parentDefinition;
+	
 	//generic
 	private String name;
 	private String description;
@@ -47,55 +51,59 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 	//layout
 	private String tabName;
 	
+	NodeDefinitionFormObject(EntityDefinition parentDefn) {
+		this.parentDefinition = parentDefn;
+	}
+	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public static NodeDefinitionFormObject<NodeDefinition> newInstance(NodeType nodeType, AttributeType attributeType) {
+	public static NodeDefinitionFormObject<? extends NodeDefinition> newInstance(EntityDefinition parentDefn, NodeType nodeType, AttributeType attributeType) {
 		NodeDefinitionFormObject<NodeDefinition> formObject = null;
 		if ( nodeType != null ) {
 			switch ( nodeType) {
 			case ENTITY:
-				formObject = new EntityDefinitionFormObject();
+				formObject = new EntityDefinitionFormObject(parentDefn);
 				break;
 			case ATTRIBUTE:
-				return (NodeDefinitionFormObject<NodeDefinition>) newInstance(attributeType);
+				return (NodeDefinitionFormObject<NodeDefinition>) newInstance(parentDefn, attributeType);
 			}
 		}
 		return formObject;
 	}
 	
 	@SuppressWarnings({ "rawtypes" })
-	public static AttributeDefinitionFormObject<?> newInstance(AttributeType attributeType) {
+	public static AttributeDefinitionFormObject<?> newInstance(EntityDefinition parentDefn, AttributeType attributeType) {
 		AttributeDefinitionFormObject<?> formObject = null;
 		if ( attributeType != null ) {
 			switch (attributeType) {
 			case BOOLEAN:
-				formObject = new BooleanAttributeDefinitionFormObject();
+				formObject = new BooleanAttributeDefinitionFormObject(parentDefn);
 				break;
 			case CODE:
-				formObject = new CodeAttributeDefinitionFormObject();
+				formObject = new CodeAttributeDefinitionFormObject(parentDefn);
 				break;
 			case COORDINATE:
-				formObject = new CoordinateAttributeDefinitionFormObject();
+				formObject = new CoordinateAttributeDefinitionFormObject(parentDefn);
 				break;
 			case DATE:
-				formObject = new DateAttributeDefinitionFormObject();
+				formObject = new DateAttributeDefinitionFormObject(parentDefn);
 				break;
 			case FILE:
-				formObject = new FileAttributeDefinitionFormObject();
+				formObject = new FileAttributeDefinitionFormObject(parentDefn);
 				break;
 			case NUMBER:
-				formObject = new NumberAttributeDefinitionFormObject();
+				formObject = new NumberAttributeDefinitionFormObject(parentDefn);
 				break;
 			case RANGE:
-				formObject = new RangeAttributeDefinitionFormObject();
+				formObject = new RangeAttributeDefinitionFormObject(parentDefn);
 				break;
 			case TAXON:
-				formObject = new TaxonAttributeDefinitionFormObject();
+				formObject = new TaxonAttributeDefinitionFormObject(parentDefn);
 				break;
 			case TEXT:
-				formObject = new TextAttributeDefinitionFormObject();
+				formObject = new TextAttributeDefinitionFormObject(parentDefn);
 				break;
 			case TIME:
-				formObject = new TimeAttributeDefinitionFormObject();
+				formObject = new TimeAttributeDefinitionFormObject(parentDefn);
 				break;
 			default:
 				throw new IllegalStateException("Attribute type not supported");
@@ -127,7 +135,7 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 		description = getDescription(source, language, defaultLanguage);
 		//layout
 		UIOptions uiOptions = getUIOptions(source);
-		UITab tab = uiOptions.getTab(source, false);
+		UITab tab = uiOptions.getAssignedTab(parentDefinition, source, false);
 		tabName = tab != null ? tab.getName(): INHERIT_TAB_NAME;
 	}
 
@@ -188,10 +196,10 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 		if ( tabName == null || tabName.equals(INHERIT_TAB_NAME) ) {
 			uiOptions.removeTabAssociation(dest);
 		} else {
-			UITabSet parentTabSet = uiOptions.getParentTabSet(dest);
+			UITabSet parentTabSet = uiOptions.getParentAssignedTabSet(parentDefinition, dest);
 			if ( parentTabSet != null ) {
 				UITab tab = parentTabSet.getTab(tabName);
-				uiOptions.associateWithTab(dest, tab);
+				uiOptions.assignToTab(dest, tab);
 			}
 		}
 	}

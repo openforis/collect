@@ -3,8 +3,9 @@
  */
 package org.openforis.collect.designer.viewmodel;
 
-import org.openforis.collect.designer.form.EntityDefinitionFormObject;
+import org.openforis.collect.designer.form.NodeDefinitionFormObject;
 import org.openforis.collect.designer.form.SurveyObjectFormObject;
+import org.openforis.collect.designer.model.NodeType;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.zkoss.bind.annotation.ExecutionArgParam;
 import org.zkoss.bind.annotation.Init;
@@ -24,8 +25,10 @@ public class EntityDefinitionVM extends NodeDefinitionVM<EntityDefinition> {
 	}
 	
 	@Override
+	@SuppressWarnings("unchecked")
 	protected SurveyObjectFormObject<EntityDefinition> createFormObject() {
-		return new EntityDefinitionFormObject<EntityDefinition>();
+		return (NodeDefinitionFormObject<EntityDefinition>) 
+				NodeDefinitionFormObject.newInstance(parentEntity, NodeType.ENTITY, null);
 	}
 
 	

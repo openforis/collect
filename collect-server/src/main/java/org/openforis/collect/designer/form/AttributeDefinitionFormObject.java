@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.openforis.idm.metamodel.AttributeDefault;
 import org.openforis.idm.metamodel.AttributeDefinition;
+import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.validation.Check;
 
 /**
@@ -19,6 +20,10 @@ public class AttributeDefinitionFormObject<T extends AttributeDefinition> extend
 
 	private List<AttributeDefault> attributeDefaults;
 	private List<Check<?>> checks;
+
+	AttributeDefinitionFormObject(EntityDefinition parentDefn) {
+		super(parentDefn);
+	}
 
 	@Override
 	public void saveTo(T dest, String languageCode) {

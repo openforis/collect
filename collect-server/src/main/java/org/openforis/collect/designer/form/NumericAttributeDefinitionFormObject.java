@@ -5,6 +5,7 @@ package org.openforis.collect.designer.form;
 
 import java.util.List;
 
+import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NumericAttributeDefinition;
 import org.openforis.idm.metamodel.NumericAttributeDefinition.Type;
 import org.openforis.idm.metamodel.Precision;
@@ -18,7 +19,8 @@ public class NumericAttributeDefinitionFormObject<T extends NumericAttributeDefi
 	private String type;
 	private List<PrecisionFormObject> precisions;
 	
-	public NumericAttributeDefinitionFormObject() {
+	NumericAttributeDefinitionFormObject(EntityDefinition parentDefn) {
+		super(parentDefn);
 		type = NumericAttributeDefinition.Type.INTEGER.name();
 	}
 	

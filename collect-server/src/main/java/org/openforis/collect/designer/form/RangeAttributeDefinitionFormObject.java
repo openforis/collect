@@ -3,6 +3,7 @@
  */
 package org.openforis.collect.designer.form;
 
+import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.RangeAttributeDefinition;
 
 /**
@@ -11,6 +12,10 @@ import org.openforis.idm.metamodel.RangeAttributeDefinition;
  *
  */
 public class RangeAttributeDefinitionFormObject<T extends RangeAttributeDefinition> extends NumericAttributeDefinitionFormObject<T> {
+
+	RangeAttributeDefinitionFormObject(EntityDefinition parentDefn) {
+		super(parentDefn);
+	}
 
 	@Override
 	public void saveTo(T dest, String languageCode) {

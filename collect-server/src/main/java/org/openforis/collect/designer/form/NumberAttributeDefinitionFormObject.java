@@ -3,6 +3,7 @@
  */
 package org.openforis.collect.designer.form;
 
+import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NumberAttributeDefinition;
 
 /**
@@ -13,6 +14,11 @@ import org.openforis.idm.metamodel.NumberAttributeDefinition;
 public class NumberAttributeDefinitionFormObject<T extends NumberAttributeDefinition> extends NumericAttributeDefinitionFormObject<T> {
 
 	private boolean key;
+
+	NumberAttributeDefinitionFormObject(EntityDefinition parentDefn) {
+		super(parentDefn);
+		key = false;
+	}
 
 	@Override
 	public void saveTo(T dest, String languageCode) {

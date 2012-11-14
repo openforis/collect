@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.FileAttributeDefinition;
 
 /**
@@ -15,9 +16,14 @@ import org.openforis.idm.metamodel.FileAttributeDefinition;
  */
 public class FileAttributeDefinitionFormObject<T extends FileAttributeDefinition> extends AttributeDefinitionFormObject<T> {
 	
-	private static final String EXTENSIONS_SEPARATOR = ",";
+	private static final String EXTENSIONS_SEPARATOR = " ";
+	
 	private int maxSize;
 	private String extensions;
+	
+	FileAttributeDefinitionFormObject(EntityDefinition parentDefn) {
+		super(parentDefn);
+	}
 	
 	@Override
 	public void saveTo(T dest, String languageCode) {

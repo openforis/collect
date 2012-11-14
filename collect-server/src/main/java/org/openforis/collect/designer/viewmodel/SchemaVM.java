@@ -250,7 +250,7 @@ public class SchemaVM extends SurveyBaseVM {
 			parentDefn.removeChildDefinition(nodeDefn);
 		} else {
 			UIOptions uiOpts = survey.getUIOptions();
-			UITabSet tabSet = uiOpts.getTabSet((EntityDefinition) nodeDefn);
+			UITabSet tabSet = uiOpts.getAssignedRootTabSet((EntityDefinition) nodeDefn);
 			uiOpts.removeTabSet(tabSet);
 			Schema schema = nodeDefn.getSchema();
 			String nodeName = nodeDefn.getName();

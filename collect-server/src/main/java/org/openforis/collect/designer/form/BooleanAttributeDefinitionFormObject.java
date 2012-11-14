@@ -4,6 +4,7 @@
 package org.openforis.collect.designer.form;
 
 import org.openforis.idm.metamodel.BooleanAttributeDefinition;
+import org.openforis.idm.metamodel.EntityDefinition;
 
 /**
  * @author S. Ricci
@@ -17,7 +18,8 @@ public class BooleanAttributeDefinitionFormObject<T extends BooleanAttributeDefi
 	
 	private String typeValue;
 	
-	public BooleanAttributeDefinitionFormObject() {
+	BooleanAttributeDefinitionFormObject(EntityDefinition parentDefn) {
+		super(parentDefn);
 		typeValue = Type.THREE_STATE.name();
 	}
 	

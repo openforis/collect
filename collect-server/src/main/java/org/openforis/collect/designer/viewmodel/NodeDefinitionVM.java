@@ -41,7 +41,7 @@ public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyO
 	protected static final String FORM_CONTAINER_ID = "nodeFormContainer";
 	
 	protected Form tempFormObject;
-	private EntityDefinition parentEntity;
+	protected EntityDefinition parentEntity;
 
 	@Init(superclass=false)
 	public void init(EntityDefinition parentEntity, T nodeDefn, Boolean newItem) {
@@ -134,7 +134,7 @@ public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyO
 			UIOptions uiOptions = survey.getUIOptions();
 			List<Object> result = new ArrayList<Object>();
 			result.add(NodeDefinitionFormObject.INHERIT_TAB);
-			result.addAll(uiOptions.getAllowedTabs(editedItem));
+			result.addAll(uiOptions.getAssignableTabs(editedItem));
 			return result;
 		}
 	}
@@ -145,10 +145,10 @@ public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyO
 		} else {
 			CollectSurvey survey = getSurvey();
 			UIOptions uiOptions = survey.getUIOptions();
-			List<UITab> allowedTabs = uiOptions.getAllowedTabs(editedItem);
+			List<UITab> assignableTabs = uiOptions.getAssignableTabs(parentEntity, editedItem);
 			List<String> result = new ArrayList<String>();
 			result.add(NodeDefinitionFormObject.INHERIT_TAB_NAME);
-			for (UITab uiTab : allowedTabs) {
+			for (UITab uiTab : assignableTabs) {
 				result.add(uiTab.getName());
 			}
 			return result;
@@ -201,10 +201,7 @@ public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyO
 	protected UITabSet getParentTabSet() {
 		CollectSurvey survey = getSurvey();
 		UIOptions uiOptions = survey.getUIOptions();
-		UITabSet parentTabSet = null;
-		if ( editedItem != null ) {
-			parentTabSet = uiOptions.getParentTabSet(editedItem);
-		}
-		return parentTabSet;
+		UITabSet result = uiOptions.getParentAssignedTabSet(parentEntity, editedItem);
+		return result;
 	}
 }

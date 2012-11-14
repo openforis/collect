@@ -3,6 +3,7 @@
  */
 package org.openforis.collect.designer.form;
 
+import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.TextAttributeDefinition;
 import org.openforis.idm.metamodel.TextAttributeDefinition.Type;
 
@@ -11,11 +12,12 @@ import org.openforis.idm.metamodel.TextAttributeDefinition.Type;
  *
  */
 public class TextAttributeDefinitionFormObject<T extends TextAttributeDefinition> extends AttributeDefinitionFormObject<T> {
-	
+
 	private boolean key;
 	private String type;
 	
-	public TextAttributeDefinitionFormObject() {
+	TextAttributeDefinitionFormObject(EntityDefinition parentDefn) {
+		super(parentDefn);
 		Type.SHORT.name();
 	}
 	

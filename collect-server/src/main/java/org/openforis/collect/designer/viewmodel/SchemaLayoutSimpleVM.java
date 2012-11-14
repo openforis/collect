@@ -282,7 +282,7 @@ public class SchemaLayoutSimpleVM extends SurveyBaseVM {
 				//TODO session expired...?
 			} else {
 				UIOptions uiOptions = survey.getUIOptions();
-				rootTabSet = uiOptions.getTabSet(selectedRootEntity);
+				rootTabSet = uiOptions.getAssignedRootTabSet(selectedRootEntity);
 				treeModel = UITabsTreeModel.createInstance(rootTabSet);
 			}
 		}
