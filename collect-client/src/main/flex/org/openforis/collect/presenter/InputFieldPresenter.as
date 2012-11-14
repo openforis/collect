@@ -109,12 +109,14 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected static function applyDefaultValueHandler(event:NodeEvent):void {
-			var updRequestOp:UpdateRequestOperation = new UpdateRequestOperation();
-			updRequestOp.method = UpdateRequestOperation$Method.APPLY_DEFAULT_VALUE;
-			updRequestOp.parentEntityId = event.node.parentId;
-			updRequestOp.nodeId = event.node.id;
+			var node:NodeProxy = event.node;
+			var o:UpdateRequestOperation = new UpdateRequestOperation();
+			o.method = UpdateRequestOperation$Method.APPLY_DEFAULT_VALUE;
+			o.parentEntityId = node.parentId;
+			o.nodeName = node.name;
+			o.nodeId = node.id;
 			
-			var updRequest:UpdateRequest = new UpdateRequest(updRequestOp);
+			var updRequest:UpdateRequest = new UpdateRequest(o);
 			_dataClient.updateActiveRecord(updRequest, null, faultHandler);
 		}
 		
@@ -144,13 +146,14 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected static function prepareUpdateRemarksRequest(req:UpdateRequest, node:NodeProxy, remarks:String, fieldIdx:Number = NaN):void {
-			var operation:UpdateRequestOperation = new UpdateRequestOperation();
-			operation.method = UpdateRequestOperation$Method.UPDATE_REMARKS;
-			operation.remarks = remarks;
-			operation.nodeId = node.id;
-			operation.parentEntityId = node.parentId;
-			operation.fieldIndex = fieldIdx;
-			req.addOperation(operation);
+			var o:UpdateRequestOperation = new UpdateRequestOperation();
+			o.method = UpdateRequestOperation$Method.UPDATE_REMARKS;
+			o.parentEntityId = node.parentId;
+			o.nodeName = node.name;
+			o.nodeId = node.id;
+			o.fieldIndex = fieldIdx;
+			o.remarks = remarks;
+			req.addOperation(o);
 		}
 		
 		protected static function updateSymbolHandler(event:NodeEvent): void {
@@ -159,15 +162,15 @@ package org.openforis.collect.presenter {
 			_dataClient.updateActiveRecord(updRequest, null, faultHandler);
 		}
 		
-		protected static function prepareUpdateSymbolRequests(updateRequest:UpdateRequest, nodeProxy:NodeProxy, symbol:FieldSymbol, fieldIdx:Number, applyToNonEmptyNodes:Boolean = false):void {
-			if( nodeProxy is EntityProxy ){
-				var entity:EntityProxy = nodeProxy as EntityProxy;
+		protected static function prepareUpdateSymbolRequests(updateRequest:UpdateRequest, node:NodeProxy, symbol:FieldSymbol, fieldIdx:Number, applyToNonEmptyNodes:Boolean = false):void {
+			if( node is EntityProxy ){
+				var entity:EntityProxy = node as EntityProxy;
 				var children:IList = entity.getChildren();
 				for each (var child:NodeProxy in children) {
 					prepareUpdateSymbolRequests(updateRequest, child, symbol, fieldIdx);
 				}
 			} else {
-				var attr:AttributeProxy = AttributeProxy(nodeProxy);
+				var attr:AttributeProxy = AttributeProxy(node);
 				var operation:UpdateRequestOperation;
 				var field:FieldProxy;
 				if(isNaN(fieldIdx) || fieldIdx < 0){
@@ -176,9 +179,9 @@ package org.openforis.collect.presenter {
 						if ( applyToNonEmptyNodes || (field.value == null && field.symbol == null)) {
 							operation = new UpdateRequestOperation();
 							operation.method = UpdateRequestOperation$Method.UPDATE;
-							operation.parentEntityId = nodeProxy.parentId;
-							operation.nodeName = nodeProxy.name;
-							operation.nodeId = nodeProxy.id;
+							operation.parentEntityId = node.parentId;
+							operation.nodeName = node.name;
+							operation.nodeId = node.id;
 							operation.fieldIndex = index;
 							operation.remarks = field.remarks;
 							operation.symbol = symbol;
@@ -195,9 +198,9 @@ package org.openforis.collect.presenter {
 					if ( applyToNonEmptyNodes || (field.value == null && field.symbol == null)) {
 						operation = new UpdateRequestOperation();
 						operation.method = UpdateRequestOperation$Method.UPDATE;
-						operation.parentEntityId = nodeProxy.parentId;
-						operation.nodeName = nodeProxy.name;
-						operation.nodeId = nodeProxy.id;
+						operation.parentEntityId = node.parentId;
+						operation.nodeName = node.name;
+						operation.nodeId = node.id;
 						operation.fieldIndex = fieldIdx;
 						operation.remarks = field.remarks;
 						operation.symbol = symbol;
@@ -283,8 +286,8 @@ package org.openforis.collect.presenter {
 			var updRequestOp:UpdateRequestOperation = new UpdateRequestOperation();
 			updRequestOp.method = UpdateRequestOperation$Method.DELETE;
 			updRequestOp.parentEntityId = node.parentId;
+			updRequestOp.nodeName = node.name;
 			updRequestOp.nodeId = node.id;
-			
 			var updRequest:UpdateRequest = new UpdateRequest(updRequestOp);
 			_dataClient.updateActiveRecord(updRequest, null, faultHandler);
 		}

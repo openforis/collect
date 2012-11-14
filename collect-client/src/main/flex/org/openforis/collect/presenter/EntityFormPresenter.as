@@ -130,6 +130,7 @@ package org.openforis.collect.presenter
 			var o:UpdateRequestOperation = new UpdateRequestOperation();
 			o.method = UpdateRequestOperation$Method.DELETE;
 			o.parentEntityId = _view.parentEntity.id;
+			o.nodeName = _view.entity.name;
 			o.nodeId = _view.entity.id;
 			var req:UpdateRequest = new UpdateRequest(o);
 			ClientFactory.dataClient.updateActiveRecord(req, deleteResultHandler, faultHandler);
