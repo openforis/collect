@@ -103,7 +103,7 @@ public class DataService {
 	/**
 	 * it's true when the root entity definition of the record in session has some nodes with the "collect:index" annotation
 	 */
-	private boolean indexingEnabled;
+	private boolean hasIndexedNodes;
 
 	private RecordIndexProcess indexProcess;
 	
@@ -121,7 +121,7 @@ public class DataService {
 		recordManager.addEmptyNodes(rootEntity);
 		sessionManager.setActiveRecord(record);
 		fileManager.reset();
-		indexingEnabled = sessionIndexManager.hasIndexableNodes(rootEntity.getDefinition());
+		hasIndexedNodes = sessionIndexManager.hasIndexableNodes(rootEntity.getDefinition());
 		return new RecordProxy(record);
 	}
 	
@@ -198,7 +198,7 @@ public class DataService {
 		String sessionId = sessionState.getSessionId();
 		recordManager.save(record, sessionId);
 		fileManager.commitChanges(sessionId, record);
-		if ( indexingEnabled ) {
+		if ( isIndexingEnabled() ) {
 			permanentlyIndex(record);
 		}
 	}
@@ -230,7 +230,7 @@ public class DataService {
 			firstResp.setMissingWarnings(activeRecord.getMissingWarnings());
 			firstResp.setSkipped(activeRecord.getSkipped());
 			firstResp.setWarnings(activeRecord.getWarnings());
-			if ( indexingEnabled ) {
+			if ( hasIndexedNodes ) {
 				sessionIndexManager.index(activeRecord);
 			}
 		}
@@ -243,16 +243,17 @@ public class DataService {
 		CollectRecord record = sessionState.getActiveRecord();
 
 		Integer parentEntityId = operation.getParentEntityId();
-		Entity parentEntity = (Entity) record.getNodeByInternalId(parentEntityId);
 		Integer nodeId = operation.getNodeId();
 		Integer fieldIndex = operation.getFieldIndex();
 		String nodeName = operation.getNodeName();
 		
+		Entity parentEntity = (Entity) record.getNodeByInternalId(parentEntityId);
+		EntityDefinition parentEntityDefn = parentEntity.getDefinition();
+		NodeDefinition nodeDef = parentEntityDefn.getChildDefinition(nodeName);
 		Node<?> node = null;
 		if(nodeId != null) {
 			node = record.getNodeByInternalId(nodeId);
 		}
-		NodeDefinition nodeDef = ((EntityDefinition) parentEntity.getDefinition()).getChildDefinition(nodeName);
 		Object requestValue = operation.getValue();
 		String remarks = operation.getRemarks();
 		
@@ -659,7 +660,7 @@ public class DataService {
 			recordManager.promote(record, user);
 			recordManager.releaseLock(record.getId());
 			sessionManager.clearActiveRecord();
-			if ( indexingEnabled ) {
+			if ( isIndexingEnabled() ) {
 				permanentlyIndex(record);
 			}
 		} else {
@@ -667,6 +668,10 @@ public class DataService {
 		}
 	}
 	
+	protected boolean isIndexingEnabled() {
+		return hasIndexedNodes && indexManager.isInited();
+	}
+
 	@Secured("ROLE_ANALYSIS")
 	public void demoteToCleansing() throws RecordPersistenceException {
 		demote(Step.CLEANSING);
