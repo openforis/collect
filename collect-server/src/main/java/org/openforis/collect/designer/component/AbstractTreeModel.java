@@ -39,10 +39,13 @@ public abstract class AbstractTreeModel<T> extends DefaultTreeModel<T> {
 	public void appendNodeToSelected(T item) {
 		AbstractTreeNode<T> parentNode = getSelectedNode();
 		AbstractTreeNode<T> nodeToSelect;
-		if ( parentNode.isLeaf() ) {
+		if ( parentNode != null && parentNode.isLeaf() ) {
 			parentNode = recreateNode(parentNode);
 			nodeToSelect = getNode(item);
 		} else {
+			if ( parentNode == null) {
+				parentNode = (AbstractTreeNode<T>) getRoot();
+			}
 			AbstractTreeNode<T> newNode = createNode(item);
 			parentNode.add(newNode);
 			nodeToSelect = newNode;
@@ -53,8 +56,7 @@ public abstract class AbstractTreeModel<T> extends DefaultTreeModel<T> {
 	
 	protected AbstractTreeNode<T> getSelectedNode() {
 		int[] selectionPath = getSelectionPath();
-		AbstractTreeNode<T> selectedNode = (AbstractTreeNode<T>) getChild(selectionPath);
-		return selectedNode;
+		return selectionPath != null ? (AbstractTreeNode<T>) getChild(selectionPath): null;
 	}
 
 	protected AbstractTreeNode<T> getParentNode(T item) {

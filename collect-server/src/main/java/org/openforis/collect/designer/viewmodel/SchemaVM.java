@@ -256,7 +256,7 @@ public class SchemaVM extends SurveyBaseVM {
 		treeModel.removeSelectedNode();
 		selectedNode = null;
 		editedNode = null;
-		notifyChange("nodes","moveNodeUpDisabled","moveNodeDownDisabled");
+		notifyChange("editedNode","selectedNode","nodes","moveNodeUpDisabled","moveNodeDownDisabled");
 		dispatchCurrentFormValidatedCommand(true);
 		updateTreeSelectionActivation();
 	}
@@ -304,8 +304,9 @@ public class SchemaVM extends SurveyBaseVM {
 	
 	protected EntityDefinition createRootEntityDefinition() {
 		EntityDefinition newNode = createEntityDefinition();
-		UITabSet tabSet = createRootTabSet(newNode);
-		newNode.setAnnotation(UIOptions.Annotation.TAB_SET.getQName(), tabSet.getName());
+		CollectSurvey survey = getSurvey();
+		UIOptions uiOptions = survey.getUIOptions();
+		uiOptions.createRootTabSet(newNode);
 		return newNode;
 	}
 
@@ -315,21 +316,6 @@ public class SchemaVM extends SurveyBaseVM {
 		return newNode;
 	}
 	
-	protected void addFirstTab(EntityDefinition newNode,
-			UITabSet tabSet) {
-		UITab tab = tabSet.createTab();
-		tabSet.addTab(tab);
-	}
-
-	protected UITabSet createRootTabSet(EntityDefinition rootEntity) {
-		UIOptions uiOpts = survey.getUIOptions();
-		UITabSet tabSet = uiOpts.createTabSet();
-		addFirstTab(rootEntity, tabSet);
-		uiOpts.addTabSet(tabSet);
-		uiOpts.assignToTabSet(rootEntity, tabSet);
-		return tabSet;
-	}
-
 	protected void dispatchSchemaChangedCommand() {
 		BindUtils.postGlobalCommand(null, null, SCHEMA_CHANGED_GLOBAL_COMMAND, null);
 	}

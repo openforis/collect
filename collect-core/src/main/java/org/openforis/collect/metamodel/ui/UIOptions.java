@@ -84,6 +84,23 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		return result;
 	}
 
+	public UITabSet createRootTabSet(EntityDefinition rootEntity) {
+		UIOptions uiOpts = survey.getUIOptions();
+		UITabSet tabSet = uiOpts.createTabSet();
+		UITab mainTab = createMainTab(rootEntity, tabSet);
+		uiOpts.addTabSet(tabSet);
+		uiOpts.assignToTabSet(rootEntity, tabSet);
+		uiOpts.assignToTab(rootEntity, mainTab);
+		return tabSet;
+	}
+
+	protected UITab createMainTab(EntityDefinition newNode,
+			UITabSet tabSet) {
+		UITab tab = tabSet.createTab();
+		tabSet.addTab(tab);
+		return tab;
+	}
+	
 	public UITab getAssignedTab(NodeDefinition nodeDefn) {
 		return getAssignedTab(nodeDefn, true);
 	}
@@ -287,7 +304,8 @@ public class UIOptions implements ApplicationOptions, Serializable {
 	}
 	
 	public boolean isAssignableTo(EntityDefinition parentEntityDefn, EntityDefinition entityDefn, Layout layout) {
-		if ( layout != Layout.FORM ) {
+		if ( parentEntityDefn != null && layout != Layout.FORM ||
+				parentEntityDefn == null && layout == Layout.FORM) {
 			return true;
 		} else {
 			UITab tab = getAssignedTab(parentEntityDefn, entityDefn, true);
