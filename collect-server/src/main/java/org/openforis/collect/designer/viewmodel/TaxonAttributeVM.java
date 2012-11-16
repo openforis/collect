@@ -12,9 +12,13 @@ import java.util.List;
 
 import org.openforis.collect.designer.form.TaxonAttributeDefinitionFormObject;
 import org.openforis.collect.designer.util.MessageUtil;
+import org.openforis.idm.metamodel.CodeAttributeDefinition;
+import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.TaxonAttributeDefinition;
 import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
+import org.zkoss.bind.annotation.ExecutionArgParam;
+import org.zkoss.bind.annotation.Init;
 import org.zkoss.bind.annotation.NotifyChange;
 import org.zkoss.util.resource.Labels;
 
@@ -33,6 +37,13 @@ public class TaxonAttributeVM extends AttributeVM<TaxonAttributeDefinition> {
 	private List<String> qualifiers;
 	private String selectedQualifier;
 
+	@Init(superclass=false)
+	public void init(@ExecutionArgParam("parentEntity") EntityDefinition parentEntity, 
+			@ExecutionArgParam("item") TaxonAttributeDefinition attributeDefn, 
+			@ExecutionArgParam("newItem") Boolean newItem) {
+		super.init(parentEntity, attributeDefn, newItem);
+	}
+	
 	@Command
 	@NotifyChange("qualifiers")
 	public void addQualifier() {
