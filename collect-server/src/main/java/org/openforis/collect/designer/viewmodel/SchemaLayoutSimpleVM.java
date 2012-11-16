@@ -7,12 +7,8 @@ import java.util.Map;
 import java.util.Stack;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.utils.URLEncodedUtils;
-import org.apache.http.message.BasicNameValuePair;
 import org.openforis.collect.designer.component.UITabsTreeModel;
 import org.openforis.collect.designer.util.MessageUtil;
-import org.openforis.collect.designer.util.Resources;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.metamodel.ui.UITab;
 import org.openforis.collect.metamodel.ui.UITabSet;
@@ -27,8 +23,6 @@ import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.DependsOn;
 import org.zkoss.bind.annotation.GlobalCommand;
 import org.zkoss.bind.annotation.NotifyChange;
-import org.zkoss.zk.ui.Execution;
-import org.zkoss.zk.ui.Executions;
 import org.zkoss.zkplus.databind.BindingListModelList;
 
 /**
@@ -157,18 +151,6 @@ public class SchemaLayoutSimpleVM extends SurveyBaseVM {
 		} else {
 			return true;
 		}
-	}
-	
-	@Command
-	public void showPreview() {
-		Execution current = Executions.getCurrent();
-		List<NameValuePair> params = new ArrayList<NameValuePair>();
-		params.add(new BasicNameValuePair("preview", "true"));
-		params.add(new BasicNameValuePair("surveyId", Integer.toString(survey.getId())));
-		params.add(new BasicNameValuePair("rootEntityId", Integer.toString(selectedRootEntity.getId())));
-		params.add(new BasicNameValuePair("versionId", Integer.toString(selectedVersion.getId())));
-		String uri = Resources.PREVIEW_PATH + "?" + URLEncodedUtils.format(params, "UTF-8");
-		current.sendRedirect(uri, "_blank");
 	}
 	
 	public String getTabLabel(UITab tab) {

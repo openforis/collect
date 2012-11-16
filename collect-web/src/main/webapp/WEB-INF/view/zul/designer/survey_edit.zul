@@ -73,11 +73,16 @@
 					</box>
 				</center>
 				<east border="none" size="20%">
-					<box width="100%" align="right">
-						<button label="@load(vm.survey.published ? 
-                               labels.survey.update : labels.survey.publish.$)" 
-							onClick="@command('publish')" />
-					</box>
+                    <box width="100%" align="right">
+                        <hbox>
+                            <button label="${labels.survey.preview.show_preview}" 
+                              onClick="@command('openPreviewPreferencesPopUp')" />
+                            <separator width="40px" />
+    						<button label="@load(vm.survey.published ? 
+                                   labels.survey.update : labels.survey.publish.$)" 
+    							onClick="@command('publish')" />
+                        </hbox>
+                    </box>
 				</east>
 			</borderlayout>
 		</south>

@@ -64,9 +64,6 @@
                     class="icon-button" 
                     disabled="@load(vm.moveItemDownDisabled)" 
                     onClick="@command('moveItemDown')" />
-                  <toolbarbutton 
-                    label="${labels.survey.layout.show_preview}"
-                    onClick="@command('showPreview')" />
                </toolbar>
           </south>
  		</borderlayout>

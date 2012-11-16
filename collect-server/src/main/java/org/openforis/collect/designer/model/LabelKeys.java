@@ -15,4 +15,5 @@ public interface LabelKeys {
 	String CHECK_FLAG_ERROR = "survey.schema.node.check.flag.error";
 	String LAYOUT_NOT_SUPPORTED_MESSAGE_KEY = "survey.schema.entity.layout.not_supported_error";
 	String INHERIT_TAB = "survey.schema.node.tab.inherited";
+	String PREVIEW_ROOT_ENTITY_NOT_SPECIFIED = "survey.preview.preferences.error.root_entity_not_specified";
 }
