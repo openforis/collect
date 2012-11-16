@@ -1,7 +1,8 @@
 <zk>
   <window title="${labels.survey.preview.preferences.title}"
     width="300px"
-    border="normal" position="center" closable="false"
+    border="normal" position="center" closable="true"
+    onClose="@global-commnad('closePreviewPreferencesPopUp')"
     apply="org.zkoss.bind.BindComposer"
     viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.PreviewPreferencesVM')">
 
@@ -34,9 +35,7 @@
 
     <box width="100%" align="center">
       <button id="okBtn" label="${labels.global.ok}"
-        onClick="@global-command('showPreview', formVersion=formVersionsList.selectedItem, rootEntity=rootEntitiesList.selectedItem)" />
-      <button id="cancelBtn" label="${labels.global.cancel}"
-        onClick="@global-command('closePreviewPreferencesPopUp')" />
+        onClick="@global-command('showPreview', formVersion=formVersionsList.selectedItem.value, rootEntity=rootEntitiesList.selectedItem.value)" />
     </box>
   </window>
 </zk>
