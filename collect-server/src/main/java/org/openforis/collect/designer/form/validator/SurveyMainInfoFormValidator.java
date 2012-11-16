@@ -27,7 +27,10 @@ public class SurveyMainInfoFormValidator extends FormValidator {
 	}
 
 	protected void validateUri(ValidationContext ctx) {
-		super.validateUri(ctx, URI_FIELD);
+		String field = URI_FIELD;
+		if ( validateRequired(ctx, field) ) {
+			validateUri(ctx, field);
+		}
 	}
 	
 }
