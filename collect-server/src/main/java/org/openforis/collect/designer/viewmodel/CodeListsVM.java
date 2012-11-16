@@ -20,6 +20,7 @@ import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeList.CodeScope;
 import org.openforis.idm.metamodel.CodeListItem;
 import org.openforis.idm.metamodel.CodeListLevel;
+import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.Binder;
 import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
@@ -42,6 +43,7 @@ import org.zkoss.zul.Window;
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 
+	private static final String CODE_LISTS_UPDATED_GLOBAL_COMMAND = "codeListsUpdated";
 	private static final String SURVEY_CODE_LIST_GENERATED_LEVEL_NAME_LABEL_KEY = "survey.code_list.generated_level_name";
 	public static final String CLOSE_CODE_LIST_ITEM_POP_UP_COMMAND = "closeCodeListItemPopUp";
 
@@ -66,12 +68,14 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 	protected void addNewItemToSurvey() {
 		CollectSurvey survey = getSurvey();
 		survey.addCodeList(editedItem);
+		dispatchCodeListsUpdatedCommand();
 	}
 
 	@Override
 	protected void deleteItemFromSurvey(CodeList item) {
 		CollectSurvey survey = getSurvey();
 		survey.removeCodeList(item);
+		dispatchCodeListsUpdatedCommand();
 	}
 	
 	@Override
@@ -79,6 +83,10 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 		return new CodeListFormObject();
 	}
 
+	protected void dispatchCodeListsUpdatedCommand() {
+		BindUtils.postGlobalCommand(null, null, CODE_LISTS_UPDATED_GLOBAL_COMMAND, null);
+	}
+	
 	@Command
 	@Override
 	protected void performNewItemCreation(Binder binder) {
