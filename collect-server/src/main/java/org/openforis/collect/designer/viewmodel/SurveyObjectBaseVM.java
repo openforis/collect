@@ -206,7 +206,6 @@ public abstract class SurveyObjectBaseVM<T> extends SurveyBaseVM {
 		return editedItem;
 	}
 
-	@NotifyChange({"editedItem","formObject"})
 	public void setEditedItem(T editedItem) {
 		this.editedItem = editedItem;
 		formObject = createFormObject();
@@ -219,6 +218,7 @@ public abstract class SurveyObjectBaseVM<T> extends SurveyBaseVM {
 				formObject.loadFrom(editedItem, currentLanguageCode, defaultLanguage);
 			}
 		}
+		notifyChange("editedItem","formObject");
 	}
 	
 	@DependsOn("editedItem")

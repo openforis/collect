@@ -43,7 +43,6 @@ public class NumericAttributeVM extends AttributeVM<NumericAttributeDefinition> 
 		super.init(parentEntity, attributeDefn, newItem);
 	}
 	
-	
 	@Override
 	public void setEditedItem(NumericAttributeDefinition editedItem) {
 		super.setEditedItem(editedItem);
