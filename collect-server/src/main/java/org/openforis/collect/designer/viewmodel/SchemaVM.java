@@ -126,7 +126,7 @@ public class SchemaVM extends SurveyBaseVM {
 		newItem = true;
 		editedNode = newNode;
 		selectedNode = null;
-		treeModel.select(null);
+		treeModel.deselect();
 		
 		refreshNodeForm(parentEntity);
 		
