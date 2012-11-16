@@ -72,44 +72,34 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 	
 	@SuppressWarnings({ "rawtypes" })
 	public static AttributeDefinitionFormObject<?> newInstance(EntityDefinition parentDefn, AttributeType attributeType) {
-		AttributeDefinitionFormObject<?> formObject = null;
 		if ( attributeType != null ) {
 			switch (attributeType) {
 			case BOOLEAN:
-				formObject = new BooleanAttributeDefinitionFormObject(parentDefn);
-				break;
+				return new BooleanAttributeDefinitionFormObject(parentDefn);
 			case CODE:
-				formObject = new CodeAttributeDefinitionFormObject(parentDefn);
-				break;
+				return new CodeAttributeDefinitionFormObject(parentDefn);
 			case COORDINATE:
-				formObject = new CoordinateAttributeDefinitionFormObject(parentDefn);
-				break;
+				return new CoordinateAttributeDefinitionFormObject(parentDefn);
 			case DATE:
-				formObject = new DateAttributeDefinitionFormObject(parentDefn);
-				break;
+				return new DateAttributeDefinitionFormObject(parentDefn);
 			case FILE:
-				formObject = new FileAttributeDefinitionFormObject(parentDefn);
-				break;
+				return new FileAttributeDefinitionFormObject(parentDefn);
 			case NUMBER:
-				formObject = new NumberAttributeDefinitionFormObject(parentDefn);
-				break;
+				return new NumberAttributeDefinitionFormObject(parentDefn);
 			case RANGE:
-				formObject = new RangeAttributeDefinitionFormObject(parentDefn);
-				break;
+				return new RangeAttributeDefinitionFormObject(parentDefn);
 			case TAXON:
-				formObject = new TaxonAttributeDefinitionFormObject(parentDefn);
-				break;
+				return new TaxonAttributeDefinitionFormObject(parentDefn);
 			case TEXT:
-				formObject = new TextAttributeDefinitionFormObject(parentDefn);
-				break;
+				return new TextAttributeDefinitionFormObject(parentDefn);
 			case TIME:
-				formObject = new TimeAttributeDefinitionFormObject(parentDefn);
-				break;
+				return new TimeAttributeDefinitionFormObject(parentDefn);
 			default:
 				throw new IllegalStateException("Attribute type not supported");
 			}
+		} else {
+			return null;
 		}
-		return formObject;
 	}
 	
 	@Override
