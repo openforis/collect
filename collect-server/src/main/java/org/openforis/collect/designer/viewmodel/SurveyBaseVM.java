@@ -41,7 +41,6 @@ public abstract class SurveyBaseVM extends BaseVM {
 
 	protected XMLStringDateConverter xmlStringDateConverter = new XMLStringDateConverter();
 	
-	
 	@WireVariable
 	protected CollectSurvey survey;
 
@@ -65,7 +64,7 @@ public abstract class SurveyBaseVM extends BaseVM {
 	}
 	
 	@GlobalCommand
-	@NotifyChange("versionsForCombo")
+	@NotifyChange({"versionsForCombo", "versionIdsForCombo"})
 	public void versionsUpdated() {}
 
 	@GlobalCommand
