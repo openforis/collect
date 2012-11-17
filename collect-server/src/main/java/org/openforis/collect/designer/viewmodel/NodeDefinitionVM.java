@@ -197,10 +197,7 @@ public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyO
 
 	protected UITab getTab(String tabName) {
 		UITabSet parentTabSet = getParentTabSet();
-		UITab tab = null;
-		if ( parentTabSet != null ) {
-			tab = parentTabSet.getTab(tabName);
-		}
+		UITab tab = parentTabSet != null ? parentTabSet.getTab(tabName): null;
 		return tab;
 	}
 	
