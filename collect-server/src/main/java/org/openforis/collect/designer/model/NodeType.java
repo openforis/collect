@@ -29,7 +29,7 @@ public enum NodeType {
 		return Labels.getLabel(labelKey);
 	}
 	
-	public static NodeType typeOf(NodeDefinition nodeDefn) {
+	public static NodeType valueOf(NodeDefinition nodeDefn) {
 		if ( nodeDefn instanceof EntityDefinition ) {
 			return ENTITY;
 		} else {
