@@ -1,4 +1,4 @@
-<?page title="Openforis Collect Designer - Edit Survey" contentType="text/html;charset=UTF-8"?>
+<?page title="Open Foris Collect Database Designer - Edit Survey" contentType="text/html;charset=UTF-8"?>
 <?init class="org.zkoss.zk.ui.util.Composition" arg0="layouts/template.zul"?>
 <?component name="extendedTextbox" class="org.openforis.collect.designer.component.ExtendedTextbox"?>
 <zk xmlns:w="client">
