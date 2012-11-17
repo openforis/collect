@@ -114,6 +114,9 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 		relevantExpression = source.getRelevantExpression();
 		minCount = nodeMinCount;
 		maxCount = source.getMaxCount();
+		if (! multiple ) {
+			maxCount = null;
+		}
 		//labels
 		headingLabel = getLabel(source, Type.HEADING, language, defaultLanguage);
 		instanceLabel = getLabel(source, Type.INSTANCE, language, defaultLanguage);
