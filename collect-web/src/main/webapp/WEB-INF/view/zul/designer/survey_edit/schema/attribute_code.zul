@@ -37,7 +37,7 @@
         							</template>
         						</listbox>
                             </fieldErrorHandler>
-    						<button tooltiptext="${labels.survey.code_lists_manager}" 
+    						<button tooltiptext="${labels.survey.code_list.manager.title}" 
     							onClick="@global-command('openCodeListsManagerPopUp')"
     							image="/assets/images/pencil-small.png" />
                         </hlayout>
