@@ -39,7 +39,6 @@ public class Resources {
 		CODE_LIST_ITEM_EDIT_POP_UP("survey_edit/code_list_item_popup.zul"),
 		CODE_LISTS_POPUP("survey_edit/code_lists_popup.zul"), 
 		UNITS_MANAGER_POP_UP("survey_edit/units_popup.zul"), 
-		NODE("survey_edit/schema/node.zul"), 
 		ENTITY("survey_edit/schema/entity.zul"),
 		ATTRIBUTE("survey_edit/schema/attribute_{0}.zul"),
 		ATTRIBUTE_POPUP("survey_edit/schema/attribute_popup.zul"), 
