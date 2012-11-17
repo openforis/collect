@@ -29,6 +29,8 @@ public abstract class FormValidator extends AbstractValidator {
 	protected static final String INVALID_URI_MESSAGE_KEY = "global.item.validation.invalid_uri";
 	protected static final String GREATER_THAN_MESSAGE_KEY = "global.item.validation.greater_than";
 	protected static final String GREATER_THAN_EQUAL_MESSAGE_KEY = "global.item.validation.greater_than_equal";
+	protected static final String LESS_THAN_MESSAGE_KEY = "global.item.validation.less_than";
+	protected static final String LESS_THAN_EQUAL_MESSAGE_KEY = "global.item.validation.less_than_equal";
 	protected static final String ITEM_NAME_ALREADY_DEFINED_MESSAGE_KEY = "global.item.validation.name_already_defined";
 	
 	@Override
@@ -101,6 +103,12 @@ public abstract class FormValidator extends AbstractValidator {
 		return validateGreaterThan(ctx, fieldName, value, null, strict);
 	}
 	
+	protected boolean validateGreaterThan(ValidationContext ctx, String fieldName, 
+			String compareFieldName, String compareFieldLabel, boolean strict) {
+		Integer compareValue = getValue(ctx, compareFieldName);
+		return validateGreaterThan(ctx, fieldName, compareValue, compareFieldLabel, strict);
+	}
+
 	protected boolean validateGreaterThan(ValidationContext ctx,
 			String fieldName, Number compareValue, String compareValueLabel, boolean strict) {
 		Object fieldValue = getValue(ctx, fieldName);
@@ -122,9 +130,40 @@ public abstract class FormValidator extends AbstractValidator {
 		}
 	}
 	
-	protected boolean validateGreaterThan(ValidationContext ctx, String fieldName, String compareFieldName, String compareFieldLabel, boolean strict) {
+	protected boolean validateLessThan(ValidationContext ctx, String fieldName, Number value) {
+		return validateLessThan(ctx, fieldName, value, null, true);
+	}
+
+	protected boolean validateLessThan(ValidationContext ctx,
+			String fieldName, Number value, boolean strict) {
+		return validateLessThan(ctx, fieldName, value, null, strict);
+	}
+	
+	protected boolean validateLessThan(ValidationContext ctx, String fieldName, 
+			String compareFieldName, String compareFieldLabel, boolean strict) {
 		Integer compareValue = getValue(ctx, compareFieldName);
-		return validateGreaterThan(ctx, fieldName, compareValue, compareFieldLabel, strict);
+		return validateLessThan(ctx, fieldName, compareValue, compareFieldLabel, strict);
+	}
+
+	protected boolean validateLessThan(ValidationContext ctx,
+			String fieldName, Number compareValue, String compareValueLabel, boolean strict) {
+		Object fieldValue = getValue(ctx, fieldName);
+		if ( fieldValue == null ) {
+			return true;
+		}
+		if ( ! (fieldValue instanceof Number) ) {
+			throw new IllegalArgumentException("Number field value expected: " + fieldName);				
+		} else {
+			double fieldDoubleValue = ((Number) fieldValue).doubleValue();
+			if ( fieldDoubleValue > compareValue.doubleValue() || strict && fieldDoubleValue == compareValue.doubleValue()) {
+				String message = createCompareMessage(LESS_THAN_MESSAGE_KEY, LESS_THAN_EQUAL_MESSAGE_KEY, strict, 
+						compareValue, compareValueLabel);
+				addInvalidMessage(ctx, fieldName, message );
+				return false;
+			} else {
+				return true;
+			}
+		}
 	}
 	
 	protected String createCompareMessage(String strictMessageKey, String notStrictMessageKey, boolean strict, 

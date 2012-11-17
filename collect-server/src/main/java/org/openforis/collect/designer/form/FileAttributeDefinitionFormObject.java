@@ -18,7 +18,7 @@ public class FileAttributeDefinitionFormObject<T extends FileAttributeDefinition
 	
 	private static final String EXTENSIONS_SEPARATOR = " ";
 	
-	private int maxSize;
+	private Integer maxSize;
 	private String extensions;
 	
 	FileAttributeDefinitionFormObject(EntityDefinition parentDefn) {
@@ -45,11 +45,11 @@ public class FileAttributeDefinitionFormObject<T extends FileAttributeDefinition
 		extensions = StringUtils.join(extensionsList, EXTENSIONS_SEPARATOR);
 	}
 
-	public int getMaxSize() {
+	public Integer getMaxSize() {
 		return maxSize;
 	}
 
-	public void setMaxSize(int maxSize) {
+	public void setMaxSize(Integer maxSize) {
 		this.maxSize = maxSize;
 	}
 
