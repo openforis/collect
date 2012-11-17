@@ -38,30 +38,35 @@
 			    </borderlayout>
 			</west>
 			<center title="${labels.survey.schema.node_detail_title}">
-				<vlayout width="100%" visible="@load(not empty vm.editedNode)">
-					<grid height="@load(vm.nodeType eq 'ATTRIBUTE' ? '60px': '30px')">
-						<columns>
-							<column label="" width="150px" />
-							<column label="" width="100%" />
-						</columns>
-						<rows>
-							<row>
-								<label value="${labels.survey.schema.node.type_label}:" />
-								<label value="@load(vm.nodeType eq 'ENTITY' ? 
-										labels.survey.schema.node.type.entity: 
-										labels.survey.schema.node.type.attribute)" />
-							</row>
-							<row visible="@load(vm.nodeType eq 'ATTRIBUTE')">
-								<label value="${labels.survey.schema.attribute.type_label}:" />
-								<label visible="@laod(vm.nodeType eq 'ATTRIBUTE')" 
-										value="@load(vm.attributeTypeLabel)" />
-							</row>
-						</rows>
-					</grid>
-					<include id="nodeFormInclude"
-						visible="@load(vm.editingNode)"
-						height="100%" width="100%" style="overflow: auto;" />
-				</vlayout>
+				<borderlayout hflex="1" visible="@load(not empty vm.editedNode)">
+					<north height="@load(vm.nodeType eq 'ATTRIBUTE' ? '60px': '30px')"
+						border="none">
+						<grid height="100%">
+							<columns>
+								<column label="" width="150px" />
+								<column label="" width="100%" />
+							</columns>
+							<rows>
+								<row>
+									<label value="${labels.survey.schema.node.type_label}:" />
+									<label value="@load(vm.nodeType eq 'ENTITY' ? 
+											labels.survey.schema.node.type.entity: 
+											labels.survey.schema.node.type.attribute)" />
+								</row>
+								<row visible="@load(vm.nodeType eq 'ATTRIBUTE')">
+									<label value="${labels.survey.schema.attribute.type_label}:" />
+									<label visible="@laod(vm.nodeType eq 'ATTRIBUTE')" 
+											value="@load(vm.attributeTypeLabel)" />
+								</row>
+							</rows>
+						</grid>
+					</north>
+					<center border="none">
+						<include id="nodeFormInclude"
+							visible="@load(vm.editingNode)"
+							height="100%" width="100%" style="overflow: auto;" />
+					</center>
+				</borderlayout>
 			</center>
           </borderlayout>
       
