@@ -41,7 +41,6 @@ import org.zkoss.zul.Include;
 import org.zkoss.zul.Tree;
 import org.zkoss.zul.TreeNode;
 import org.zkoss.zul.Treeitem;
-import org.zkoss.zul.Window;
 
 /**
  * 
@@ -67,9 +66,6 @@ public class SchemaVM extends SurveyBaseVM {
 	private Tree nodesTree;
 	
 	private SchemaTreeModel treeModel;
-
-	//popups
-	private Window versioningPopUp;
 
 	@AfterCompose
 	public void afterCompose(@ContextParam(ContextType.VIEW) Component view){
@@ -196,13 +192,13 @@ public class SchemaVM extends SurveyBaseVM {
 	}
 	
 	@Command
-	@NotifyChange({"nodes","moveNodeUpDisabled","moveNodeDownDisabled"})
+	@NotifyChange({"moveNodeUpDisabled","moveNodeDownDisabled"})
 	public void moveNodeUp() {
 		moveNode(true);
 	}
 	
 	@Command
-	@NotifyChange({"nodes","moveNodeUpDisabled","moveNodeDownDisabled"})
+	@NotifyChange({"moveNodeUpDisabled","moveNodeDownDisabled"})
 	public void moveNodeDown() {
 		moveNode(false);
 	}
@@ -282,23 +278,6 @@ public class SchemaVM extends SurveyBaseVM {
 			newItem = false;
 		}
 		dispatchSchemaChangedCommand();
-	}
-	
-	@GlobalCommand
-	public void openVersioningManagerPopUp() {
-		if ( versioningPopUp == null ) {
-			dispatchCurrentFormValidatedCommand(true);
-			versioningPopUp = openPopUp(Resources.Component.VERSIONING_POPUP.getLocation(), true);
-		}
-	}
-
-	@GlobalCommand
-	public void closeVersioningManagerPopUp() {
-		if ( versioningPopUp != null && checkCurrentFormValid() ) {
-			closePopUp(versioningPopUp);
-			versioningPopUp = null;
-			validateForm();
-		}
 	}
 	
 	protected EntityDefinition createRootEntityDefinition() {
