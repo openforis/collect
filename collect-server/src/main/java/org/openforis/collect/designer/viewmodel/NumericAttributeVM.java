@@ -8,7 +8,6 @@ import java.util.List;
 
 import org.openforis.collect.designer.form.NumericAttributeDefinitionFormObject;
 import org.openforis.collect.designer.form.PrecisionFormObject;
-import org.openforis.collect.designer.util.Resources;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NumericAttributeDefinition;
 import org.zkoss.bind.Binder;
@@ -20,7 +19,6 @@ import org.zkoss.bind.annotation.ExecutionArgParam;
 import org.zkoss.bind.annotation.GlobalCommand;
 import org.zkoss.bind.annotation.Init;
 import org.zkoss.bind.annotation.NotifyChange;
-import org.zkoss.zul.Window;
 
 /**
  * @author S. Ricci
@@ -32,9 +30,6 @@ public class NumericAttributeVM extends AttributeVM<NumericAttributeDefinition> 
 
 	protected List<PrecisionFormObject> numericAttributePrecisions;
 	protected PrecisionFormObject selectedPrecision;
-	
-	//popups
-	private Window unitsPopUp;
 	
 	@Init(superclass=false)
 	public void init(@ExecutionArgParam("parentEntity") EntityDefinition parentEntity, 
@@ -78,22 +73,10 @@ public class NumericAttributeVM extends AttributeVM<NumericAttributeDefinition> 
 	}
 
 	@GlobalCommand
-	public void openUnitsManagerPopUp() {
-		if ( unitsPopUp == null ) {
-			dispatchCurrentFormValidatedCommand(true);
-			unitsPopUp = openPopUp(Resources.Component.UNITS_MANAGER_POP_UP.getLocation(), true);
-		}
-	}
-	
-	@GlobalCommand
 	public void closeUnitsManagerPopUp(@ContextParam(ContextType.BINDER) Binder binder) {
-		if ( unitsPopUp != null && checkCurrentFormValid() ) {
-			closePopUp(unitsPopUp);
-			unitsPopUp = null;
-			validateForm(binder);
-		}
+		validateForm(binder);
 	}
-	
+
 	protected void initNumericAttributePrecisionsList() {
 		if ( numericAttributePrecisions == null ) {
 			numericAttributePrecisions = new ArrayList<PrecisionFormObject>();

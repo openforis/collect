@@ -112,6 +112,11 @@ public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyO
 		}
 	}
 	
+	@GlobalCommand
+	public void closeVersioningManagerPopUp(@ContextParam(ContextType.BINDER) Binder binder) {
+		validateForm(binder);
+	}
+	
 	protected void validateForm(@ContextParam(ContextType.BINDER) Binder binder) {
 		Component view = binder.getView();
 		IdSpace currentIdSpace = view.getSpaceOwner();

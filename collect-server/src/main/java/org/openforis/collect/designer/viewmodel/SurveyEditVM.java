@@ -19,8 +19,11 @@ import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.zkoss.bind.BindUtils;
+import org.zkoss.bind.Binder;
 import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
+import org.zkoss.bind.annotation.ContextParam;
+import org.zkoss.bind.annotation.ContextType;
 import org.zkoss.bind.annotation.GlobalCommand;
 import org.zkoss.bind.annotation.Init;
 import org.zkoss.bind.annotation.NotifyChange;
@@ -46,7 +49,10 @@ public class SurveyEditVM extends SurveyBaseVM {
 	private Window selectLanguagePopUp;
 	private Window previewPreferencesPopUp;
 	private Window srsPopUp;
-	
+	private Window codeListsPopUp;
+	private Window unitsPopUp;
+	private Window versioningPopUp;
+
 	@WireVariable
 	private SurveyManager surveyManager;
 	
@@ -61,11 +67,6 @@ public class SurveyEditVM extends SurveyBaseVM {
 			if ( currentLanguageCode == null ) {
 				openLanguageManagerPopUp();
 			}
-//			TEST
-//			currentLanguageCode = "eng";
-//			uiConf.addLanguageCode("eng");
-//			uiConf.addLanguageCode("spa");
-//			notifyChange("availableLanguages");
 		}
 	}
 	
@@ -88,6 +89,54 @@ public class SurveyEditVM extends SurveyBaseVM {
 		if ( checkCurrentFormValid() ) {
 			closePopUp(srsPopUp);
 			srsPopUp = null;
+		}
+	}
+	
+	@GlobalCommand
+	public void openCodeListsManagerPopUp() {
+		if ( codeListsPopUp == null ) { 
+			dispatchCurrentFormValidatedCommand(true);
+			codeListsPopUp = openPopUp(Resources.Component.CODE_LISTS_POPUP.getLocation(), true);
+		}
+	}
+
+	@GlobalCommand
+	public void closeCodeListsManagerPopUp(@ContextParam(ContextType.BINDER) Binder binder) {
+		if ( codeListsPopUp != null && checkCurrentFormValid() ) {
+			closePopUp(codeListsPopUp);
+			codeListsPopUp = null;
+		}
+	}
+	
+	@GlobalCommand
+	public void openUnitsManagerPopUp() {
+		if ( unitsPopUp == null ) {
+			dispatchCurrentFormValidatedCommand(true);
+			unitsPopUp = openPopUp(Resources.Component.UNITS_MANAGER_POP_UP.getLocation(), true);
+		}
+	}
+	
+	@GlobalCommand
+	public void closeUnitsManagerPopUp(@ContextParam(ContextType.BINDER) Binder binder) {
+		if ( unitsPopUp != null && checkCurrentFormValid() ) {
+			closePopUp(unitsPopUp);
+			unitsPopUp = null;
+		}
+	}	
+	
+	@GlobalCommand
+	public void openVersioningManagerPopUp() {
+		if ( versioningPopUp == null ) {
+			dispatchCurrentFormValidatedCommand(true);
+			versioningPopUp = openPopUp(Resources.Component.VERSIONING_POPUP.getLocation(), true);
+		}
+	}
+
+	@GlobalCommand
+	public void closeVersioningManagerPopUp() {
+		if ( versioningPopUp != null && checkCurrentFormValid() ) {
+			closePopUp(versioningPopUp);
+			versioningPopUp = null;
 		}
 	}
 	

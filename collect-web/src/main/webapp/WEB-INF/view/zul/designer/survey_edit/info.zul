@@ -51,6 +51,30 @@
 							image="/assets/images/pencil-small.png" />
 					</cell>
 				</row>
+				<row>
+					<label value="${labels.survey.code_lists}:" />
+					<cell>
+						<button tooltiptext="${labels.survey.code_list.manager.title}" 
+							onClick="@global-command('openCodeListsManagerPopUp')"
+							image="/assets/images/pencil-small.png" />
+					</cell>
+				</row>
+				<row>
+					<label value="${labels.survey.units}:" />
+					<cell>
+						<button tooltiptext="${labels.survey.unit.manager.title}" 
+							onClick="@global-command('openUnitsManagerPopUp')"
+							image="/assets/images/pencil-small.png" />
+					</cell>
+				</row>
+				<row>
+					<label value="${labels.survey.versioning_manager}:" />
+					<cell>
+						<button tooltiptext="${labels.survey.versioning_manager}" 
+							onClick="@global-command('openVersioningManagerPopUp')"
+							image="/assets/images/pencil-small.png" />
+					</cell>
+				</row>
 			</rows>
 		</grid>
 
