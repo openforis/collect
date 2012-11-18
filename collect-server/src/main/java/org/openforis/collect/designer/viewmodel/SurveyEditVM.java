@@ -3,6 +3,8 @@
  */
 package org.openforis.collect.designer.viewmodel;
 
+import java.io.ByteArrayOutputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,10 +29,12 @@ import org.zkoss.bind.annotation.ContextType;
 import org.zkoss.bind.annotation.GlobalCommand;
 import org.zkoss.bind.annotation.Init;
 import org.zkoss.bind.annotation.NotifyChange;
+import org.zkoss.util.media.ContentTypes;
 import org.zkoss.zk.ui.Execution;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zkplus.databind.BindingListModelList;
+import org.zkoss.zul.Filedownload;
 import org.zkoss.zul.Window;
 
 /**
@@ -39,10 +43,9 @@ import org.zkoss.zul.Window;
  */
 public class SurveyEditVM extends SurveyBaseVM {
 
+	private static final String TEXT_XML = "text/xml";
 	private static final String PREVIEW_WINDOW_ID = "collect_survey_preview";
-
 	public static final String SHOW_PREVIEW_POP_UP_GLOBAL_COMMAND = "showPreview";
-
 	private static final String SURVEY_SUCCESSFULLY_SAVED_MESSAGE_KEY = "survey.successfully_saved";
 //	private static final String SURVEY_SUCCESSFULLY_PUBLISHED_MESSAGE_KEY = "survey.successfully_published";
 	
@@ -75,6 +78,15 @@ public class SurveyEditVM extends SurveyBaseVM {
 		if ( checkCurrentFormValid() ) {
 			selectLanguagePopUp = openPopUp(Resources.Component.SELECT_LANGUAGE_POP_UP.getLocation(), true);
 		}
+	}
+	
+	@GlobalCommand
+	public void exportSurvey() {
+		ByteArrayOutputStream os = new ByteArrayOutputStream();
+		surveyManager.marshalSurvey(survey, os);
+		byte[] content = os.toByteArray();
+		String fileName = survey.getName() + ".xml";
+		Filedownload.save(content, TEXT_XML, fileName);
 	}
 	
 	@GlobalCommand

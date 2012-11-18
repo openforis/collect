@@ -38,5 +38,8 @@
 		<button id="editSurveyBtn" label="${labels.global.edit_item}" 
 			onClick="@command('editSurvey')"
 			disabled="@load(vm.editingDisabled)" />
+			
+		<button id="importSurveyBtn" label="${labels.survey.import_survey.$}"
+			onClick="@command('openSurveyImportPopUp')" />
 	</hlayout>		
 </vbox>

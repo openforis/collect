@@ -62,7 +62,7 @@
 	 	</center>
 		<south height="30px">
 			<borderlayout hflex="1">
-				<west border="none" size="20%">
+				<west border="none" size="40%">
 					<button label="${labels.survey.list_of_surveys}" 
 						onClick="@command('backToSurveysList')" />
 				</west>
@@ -72,11 +72,14 @@
 							onClick="@command('save')" />
 					</box>
 				</center>
-				<east border="none" size="20%">
+				<east border="none" size="40%">
                     <box width="100%" align="right">
                         <hbox>
                             <button label="${labels.survey.preview.show_preview}" 
                               onClick="@command('openPreviewPreferencesPopUp')" />
+    						<separator width="40px" />
+    						<button label="${labels.survey.export}"
+    							onClick="@global-command('exportSurvey')" />
                             <separator width="40px" />
     						<button label="@load(vm.survey.published ? 
                                    labels.survey.update : labels.survey.publish.$)" 

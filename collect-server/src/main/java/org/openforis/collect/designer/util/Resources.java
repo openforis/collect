@@ -42,7 +42,8 @@ public class Resources {
 		ENTITY("survey_edit/schema/entity.zul"),
 		ATTRIBUTE("survey_edit/schema/attribute_{0}.zul"),
 		ATTRIBUTE_POPUP("survey_edit/schema/attribute_popup.zul"), 
-		CHECK_POPUP("survey_edit/schema/check/popup.zul"),;
+		CHECK_POPUP("survey_edit/schema/check/popup.zul"), 
+		SURVEY_IMPORT_POPUP("survey_import_popup.zul");
 		
 		private String location;
 		

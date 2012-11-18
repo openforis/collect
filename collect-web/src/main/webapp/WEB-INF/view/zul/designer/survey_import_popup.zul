@@ -1,0 +1,52 @@
+<zk>
+  <window id="surveyImportPopUp"
+  	title="${labels.survey.import_survey.title}"
+    width="400px" border="normal" position="center" closable="true"
+    onClose="@global-commnad('closeSurveyImportPopUp')"
+    apply="org.zkoss.bind.BindComposer"
+    viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SurveyImportVM')"
+    onUpload="@command('fileUploaded')">
+
+	<zscript deferred="true"><![CDATA[
+	   import org.zkoss.util.media.Media;
+	
+	   Executions.getCurrent().getDesktop().setAttribute(
+	           "org.zkoss.zul.Fileupload.target", surveyImportPopUp);
+   ]]></zscript>
+   
+    <grid>
+      <columns>
+        <column width="100px" />
+        <column width="100%" />
+      </columns>
+      <rows>
+        <row>
+          <label value="${labels.survey.import_survey.survey_name}:" />
+          <textbox value="@bind(vm.surveyName)" />
+        </row>
+        <row>
+          <label value="${labels.survey.import_survey.file_name}:" />
+          <cell>
+          	<hbox hflex="1">
+	      		<hbox hflex="1">
+	          		<label value="@load(empty vm.fileName ? 
+          				labels.survey.import_survey.file_not_selected : vm.fileName)" />
+	          	</hbox>
+				<button id="selectFileBtn" label="${labels.global.select_file_to_upload}"
+			      	upload="true,maxsize=10240" onUpload="@command('fileUploaded')" />
+          	</hbox>
+          </cell>
+        </row>
+        <row>
+          <label value="${labels.survey.import_survey.uri}:" />
+          <label value="@load(vm.uploadedSurvey.uri)" />
+        </row>
+      </rows>
+    </grid>
+
+    <box width="100%" align="center">
+     <button id="okBtn" label="${labels.global.ok}"
+      	onClick="@command('importSurvey')" />
+    </box>
+  </window>
+</zk>
