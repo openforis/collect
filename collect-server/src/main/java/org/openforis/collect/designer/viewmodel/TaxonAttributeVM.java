@@ -12,7 +12,6 @@ import java.util.List;
 
 import org.openforis.collect.designer.form.TaxonAttributeDefinitionFormObject;
 import org.openforis.collect.designer.util.MessageUtil;
-import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.TaxonAttributeDefinition;
 import org.zkoss.bind.annotation.BindingParam;
