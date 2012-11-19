@@ -61,13 +61,18 @@ package org.openforis.collect {
 		private static function initExternalInterface():void {
 			if(ExternalInterface.available) {
 				ExternalInterface.addCallback("isEditingRecord", isEditingRecord);
+				ExternalInterface.addCallback("isPreview", isPreview);
 				ExternalInterface.addCallback("getLeavingPageMessage", getLeavingPageMessage);
 			}
 		}
 		
 		//called from External Interface (javascript)
 		public static function isEditingRecord():Boolean {
-			return ! (serverOffline || Application.preview || Application.activeRecord == null);
+			return ! (serverOffline || Application.activeRecord == null);
+		}
+		
+		public static function isPreview():Boolean {
+			return preview;
 		}
 		
 		public static function getLeavingPageMessage():String {
