@@ -89,9 +89,9 @@ package org.openforis.collect.ui {
 			
 			addMainEntityFormContainer(formContainer, rootEntity, version);
 			
-			var tabSet:UITabSetProxy = getRootEntityTabSet(rootEntity);
-			if ( tabSet != null && tabSet.tabs != null) {
-				for each (var tab:UITabProxy in tabSet.tabs) {
+			var rootTabSet:UITabSetProxy = getRootEntityTabSet(rootEntity);
+			if ( rootTabSet != null && rootTabSet.tabs != null) {
+				for each (var tab:UITabProxy in rootTabSet.tabs) {
 					if ( ! isMainTab(rootEntity, tab) ) {
 						addChildEntityFormContainer(formContainer, rootEntity, version, tab);
 					}
@@ -100,8 +100,12 @@ package org.openforis.collect.ui {
 			return formContainer;
 		}
 		
+		/**
+		 * Returns true if the tab is the first tab in the corresponding root tab set
+		 */
 		private static function isMainTab(rootEntity:EntityDefinitionProxy, tab:UITabProxy):Boolean {
-			return tab.name == rootEntity.uiTabName;
+			var rootTabSet:UITabSetProxy = getRootEntityTabSet(rootEntity);
+			return rootTabSet.tabs.getItemIndex(tab) == 0;
 		}
 		
 		private static function addMainEntityFormContainer(formContainer:FormContainer, rootEntity:EntityDefinitionProxy, version:ModelVersionProxy):void {
