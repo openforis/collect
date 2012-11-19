@@ -81,8 +81,7 @@
     						<button label="${labels.survey.export}"
     							onClick="@global-command('exportSurvey')" />
                             <separator width="40px" />
-    						<button label="@load(vm.survey.published ? 
-                                   labels.survey.update : labels.survey.publish.$)" 
+    						<button label="${labels.survey.publish.$}" 
     							onClick="@command('publish')" />
                         </hbox>
                     </box>
