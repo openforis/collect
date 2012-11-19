@@ -37,7 +37,7 @@ public class CollectSurvey extends Survey {
 	}
 	
 	public UIOptions createUIOptions() {
-		return new UIOptions();
+		return new UIOptions(this);
 	}
 	
 	public UIOptions getUIOptions() {

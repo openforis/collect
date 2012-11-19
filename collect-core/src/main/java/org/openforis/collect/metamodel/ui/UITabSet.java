@@ -15,8 +15,6 @@ public class UITabSet implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
 	
-	private static final String TAB_NAME_PREFIX = "tab_";
-	
 	protected UIOptions uiOptions;
 	protected String name;
 	protected List<UITab> tabs;
@@ -26,7 +24,7 @@ public class UITabSet implements Serializable {
 		this.uiOptions = uiOptions;
 	}
 	
-	public UIOptions getUiOptions() {
+	public UIOptions getUIOptions() {
 		return uiOptions;
 	}
 	
@@ -59,13 +57,6 @@ public class UITabSet implements Serializable {
 		}
 		tabs.add(tab);
 		tab.parent = this;
-	}
-	
-	public UITab createTab() {
-		UITab result = new UITab(uiOptions);
-		int tabsSize = tabs != null ? tabs.size(): 1;
-		result.setName(TAB_NAME_PREFIX + tabsSize);
-		return result;
 	}
 	
 	public void setTab(int index, UITab tab) {
@@ -109,6 +100,7 @@ public class UITabSet implements Serializable {
 		UITabSet prnt = getParent();
 		while ( prnt != null ) {
 			result ++;
+			prnt = prnt.getParent();
 		}
 		return result;
 	}

@@ -43,8 +43,7 @@ public class UITabSetPR extends UITabSetPRBase {
 	protected void onStartTag() throws XmlParseException,
 			XmlPullParserException, IOException {
 		UIOptions uiOptions = getUIOptions();
-		tabSet = uiOptions.createTabSet();
-		tabSet.setName(getAttribute(NAME, true));
+		tabSet = uiOptions.createTabSet(getAttribute(NAME, true));
 		setParentSetInChildren(tabSet);
 	}
 	

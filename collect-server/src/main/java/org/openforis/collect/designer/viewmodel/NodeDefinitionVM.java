@@ -209,7 +209,12 @@ public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyO
 	protected UITabSet getParentTabSet() {
 		CollectSurvey survey = getSurvey();
 		UIOptions uiOptions = survey.getUIOptions();
-		UITabSet result = uiOptions.getAssignedParentTabSet(parentEntity, editedItem);
+		UITabSet result;
+		if ( parentEntity == null ) {
+			result = uiOptions.getAssignedRootTabSet((EntityDefinition) editedItem);
+		} else {
+			result = uiOptions.getAssignedTabSet(parentEntity);
+		}
 		return result;
 	}
 }

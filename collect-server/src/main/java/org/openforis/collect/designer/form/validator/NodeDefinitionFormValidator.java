@@ -23,6 +23,8 @@ public class NodeDefinitionFormValidator extends FormValidator {
 	protected static final String 	MULTIPLE_FIELD = "multiple";
 	private static final String 	MIN_COUNT_FIELD = "minCount";
 	protected static final String 	MAX_COUNT_FIELD = "maxCount";
+	protected static final String 	TAB_NAME_FIELD = "tabName";
+	
 	protected static final int 		MAX_COUNT_MIN_VALUE = 2;
 
 	@Override

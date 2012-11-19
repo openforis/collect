@@ -56,13 +56,7 @@ public class TabsGroupVM extends BaseVM {
 	@Wire
 	private Tabbox tabbox;
 	
-	@AfterCompose
-	public void afterCompose(@ContextParam(ContextType.VIEW) Component view){
-		 Selectors.wireComponents(view, this, false);
-	}
-	
 	private UITabSet tabSet;
-
 	private Window tabLabelPopUp;
 	
 	@Init
@@ -70,10 +64,16 @@ public class TabsGroupVM extends BaseVM {
 		this.tabSet = tabSet;
 	}
 	
+	@AfterCompose
+	public void afterCompose(@ContextParam(ContextType.VIEW) Component view){
+		 Selectors.wireComponents(view, this, false);
+	}
+	
 	@Command
 	@NotifyChange({"tabs"})
 	public void addTab() {
-		UITab tab = tabSet.createTab();
+		UIOptions uiOptions = tabSet.getUIOptions();
+		UITab tab = uiOptions.createTab();
 		String tabName = generateNewTabName(tabSet);
 		tab.setName(tabName);
 		tabSet.addTab(tab);

@@ -72,10 +72,26 @@ public class UIOptionsTest {
 	
 	protected void addInnerTabs(UITabSet tabSet, String... tabNames) {
 		for (String name : tabNames) {
-			UITab innerTab = tabSet.createTab();
+			UITab innerTab = uiOptions.createTab();
 			innerTab.setName(name);
 			tabSet.addTab(innerTab);
 		}
+	}
+	
+	@Test
+	public void testUIOptionsGeneration() {
+		EntityDefinition cluster = schema.getRootEntityDefinition("cluster");
+
+		UITabSet clusterTabSet = uiOptions.getTabSet("cluster");
+		assertEquals(0, clusterTabSet.getDepth());
+		
+		EntityDefinition plot = (EntityDefinition) cluster.getChildDefinition("plot");
+		UITab plotTab = uiOptions.getAssignedTab(plot);
+		assertEquals(1, plotTab.getDepth());
+		
+		EntityDefinition tree = (EntityDefinition) plot.getChildDefinition("tree");
+		UITab treeTab = uiOptions.getAssignedTab(tree);
+		assertEquals(2, treeTab.getDepth());
 	}
 	
 	@Test
@@ -94,6 +110,12 @@ public class UIOptionsTest {
 		NodeDefinition tree = plot.getChildDefinition("tree");
 		assignedTab = uiOptions.getAssignedTab(tree);
 		assertEquals("tree", assignedTab.getName());
+		
+		UITabSet assignedToParentTabSet = uiOptions.getAssignedTabSet(plot);
+		assertEquals("plot", assignedToParentTabSet.getName());
+		
+		assignedToParentTabSet = uiOptions.getAssignedTabSet(cluster);
+		assertEquals("cluster", assignedToParentTabSet.getName());
 	}
 	
 	@Test
@@ -102,6 +124,23 @@ public class UIOptionsTest {
 		EntityDefinition plotDefn = (EntityDefinition) clusterDefn.getChildDefinition("plot");
 		List<UITab> plotAssignableTabs = uiOptions.getAssignableTabs(plotDefn);
 		assertEquals(3, plotAssignableTabs.size());
+		EntityDefinition treeDefn = (EntityDefinition) plotDefn.getChildDefinition("tree");
+		List<UITab> treeAssignableTabs = uiOptions.getAssignableTabs(treeDefn);
+		assertEquals(6, treeAssignableTabs.size());
+	}
+
+	@Test
+	public void testAssignableTabsToChildren() throws InvalidPathException {
+		EntityDefinition clusterDefn = schema.getRootEntityDefinition("cluster");
+		List<UITab> clusterTabs = uiOptions.getTabsAssignableToChildren(clusterDefn);
+		assertEquals(3, clusterTabs.size());
+		UITab plotTab = clusterTabs.get(1);
+		assertEquals("plot", plotTab.getName());
+		EntityDefinition plotDefn = (EntityDefinition) clusterDefn.getChildDefinition("plot");
+		List<UITab> plotTabs = uiOptions.getTabsAssignableToChildren(plotDefn);
+		assertEquals(6, plotTabs.size());
+		UITab treeTab = plotTabs.get(2);
+		assertEquals("tree", treeTab.getName());
 		EntityDefinition treeDefn = (EntityDefinition) plotDefn.getChildDefinition("tree");
 		List<UITab> treeAssignableTabs = uiOptions.getAssignableTabs(treeDefn);
 		assertEquals(6, treeAssignableTabs.size());

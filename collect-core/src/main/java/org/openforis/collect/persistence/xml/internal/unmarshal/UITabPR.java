@@ -5,6 +5,7 @@ import static org.openforis.collect.metamodel.ui.UIOptionsConstants.NAME;
 
 import java.io.IOException;
 
+import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.metamodel.ui.UITab;
 import org.openforis.collect.persistence.xml.UIOptionsBinder;
 import org.openforis.idm.metamodel.LanguageSpecificText;
@@ -30,8 +31,8 @@ class UITabPR extends UITabSetPRBase {
 	@Override
 	protected void onStartTag() throws XmlParseException, XmlPullParserException, IOException {
 		String name = getAttribute(NAME, false);
-		tabSet = parentTabSet.createTab();
-		tabSet.setName(name);
+		UIOptions uiOptions = parentTabSet.getUIOptions();
+		tabSet = uiOptions.createTab(name);
 	}
 	
 	@Override
