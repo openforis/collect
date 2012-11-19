@@ -7,8 +7,10 @@ import org.openforis.collect.designer.model.LabelKeys;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.metamodel.ui.UIOptions.Layout;
 import org.openforis.collect.metamodel.ui.UITab;
+import org.openforis.collect.metamodel.ui.UITabSet;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.EntityDefinition;
+import org.openforis.idm.metamodel.NodeDefinition;
 import org.zkoss.bind.ValidationContext;
 import org.zkoss.util.resource.Labels;
 
@@ -46,16 +48,22 @@ public class EntityDefinitionFormValidator extends NodeDefinitionFormValidator {
 
 	protected UITab getAssociatedTab(ValidationContext ctx, UIOptions uiOptions, EntityDefinition parentEntity) {
 		String tabName = getValue(ctx, TAB_NAME_FIELD);
-		List<UITab> assignableTabs = uiOptions.getTabsAssignableToChildren(parentEntity);
-		if (StringUtils.isNotBlank(tabName) ) {
-			for (UITab tab : assignableTabs) {
-				if ( tab.getName().equals(tabName) ) {
-					return tab;
+		if ( parentEntity == null ) {
+			NodeDefinition editedNode = getEditedNode(ctx);
+			UITabSet rootTabSet = uiOptions.getAssignedRootTabSet((EntityDefinition) editedNode);
+			return uiOptions.getMainTab(rootTabSet);
+		} else {
+			List<UITab> assignableTabs = uiOptions.getTabsAssignableToChildren(parentEntity);
+			if (StringUtils.isNotBlank(tabName) ) {
+				for (UITab tab : assignableTabs) {
+					if ( tab.getName().equals(tabName) ) {
+						return tab;
+					}
 				}
 			}
+			//inherited tab
+			return uiOptions.getAssignedTab(parentEntity);
 		}
-		//inherited tab
-		return uiOptions.getAssignedTab(parentEntity);
 	}
 	
 }

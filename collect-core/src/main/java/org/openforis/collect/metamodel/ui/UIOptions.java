@@ -143,6 +143,19 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		}
 	}
 	
+	public UITab getMainTab(UITabSet rootTabSet) {
+		List<UITab> tabs = rootTabSet.getTabs();
+		if ( tabs.isEmpty() ) {
+			return null;
+		} else {
+			return tabs.get(0);
+		}
+	}
+	
+	public boolean isMainTab(UITab tab) {
+		return tab.getIndex() == 0 && tab.getDepth() == 1;
+	}
+	
 	public UITab getAssignedTab(NodeDefinition nodeDefn) {
 		return getAssignedTab(nodeDefn, true);
 	}

@@ -211,6 +211,11 @@ public class SchemaLayoutSimpleVM extends SurveyBaseVM {
 		dispatchTabSetChangedCommand();
 	}
 	
+	public boolean isMainTab(UITab tab) {
+		UIOptions uiOptions = getUIOptions();
+		return uiOptions.isMainTab(tab);
+	}
+
 	@DependsOn("selectedTab")
 	public boolean isMoveItemUpDisabled() {
 		return isMoveItemDisabled(true);
@@ -222,7 +227,7 @@ public class SchemaLayoutSimpleVM extends SurveyBaseVM {
 	}
 	
 	protected boolean isMoveItemDisabled(boolean up) {
-		UIOptions uiOptions = survey.getUIOptions();
+		UIOptions uiOptions = getUIOptions();
 		if ( selectedTab == null || uiOptions.isMainTab(selectedTab) ) {
 			return true;
 		} else {
@@ -285,6 +290,11 @@ public class SchemaLayoutSimpleVM extends SurveyBaseVM {
 			List<ModelVersion> result = new ArrayList<ModelVersion>(survey.getVersions());
 			return new BindingListModelList<ModelVersion>(result, false);
 		}
+	}
+	
+	protected UIOptions getUIOptions() {
+		CollectSurvey survey = getSurvey();
+		return survey.getUIOptions();
 	}
 	
 	public UITabSet getRootTabSet() {

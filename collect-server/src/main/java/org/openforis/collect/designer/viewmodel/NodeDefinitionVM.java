@@ -166,21 +166,6 @@ public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyO
 		}
 	}
 	
-//	public String getTabLabel(Object tab) {
-//		if ( tab == null || tab == NodeDefinitionFormObject.INHERIT_TAB ) {
-//			return Labels.getLabel(LabelKeys.INHERIT_TAB);
-//			//return NodeDefinitionFormObject.INHERIT_TAB.getName();
-//		} else {
-//			String result = ((UITab) tab).getLabel(currentLanguageCode);
-//			if ( result == null && isDefaultLanguage() ) {
-//				//try to get label associated to default language code
-//				result = ((UITab) tab).getLabel(null);
-//			}
-//			return result;
-//		}
-//	}
-//	
-
 	public String getTabLabel(String tabName) {
 		if ( tabName == null || tabName.equals(NodeDefinitionFormObject.INHERIT_TAB_NAME) ) {
 			return Labels.getLabel(LabelKeys.INHERIT_TAB);
