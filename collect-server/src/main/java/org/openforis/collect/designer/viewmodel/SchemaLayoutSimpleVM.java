@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Stack;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.designer.component.UITabsTreeModel;
@@ -23,6 +22,7 @@ import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.DependsOn;
 import org.zkoss.bind.annotation.GlobalCommand;
 import org.zkoss.bind.annotation.NotifyChange;
+import org.zkoss.util.resource.Labels;
 import org.zkoss.zkplus.databind.BindingListModelList;
 
 /**
@@ -34,8 +34,6 @@ public class SchemaLayoutSimpleVM extends SurveyBaseVM {
 
 	private static final String TAB_SET_CHANGED_GLOBAL_COMMAND = "tabSetChanged";
 	private static final String TAB_CHANGED_GLOBAL_COMMAND = "tabChanged";
-	private static final String TAB_NAME_PREFIX = "tab_";
-	private static final String TAB_NAME_SEPARATOR = "_";
 
 	private EntityDefinition selectedRootEntity;
 	private UITabSet rootTabSet;
@@ -44,7 +42,7 @@ public class SchemaLayoutSimpleVM extends SurveyBaseVM {
 	private ModelVersion selectedVersion;
 
 	@GlobalCommand
-	@NotifyChange({"nodes"})
+	@NotifyChange({"rootEntities","nodes"})
 	public void schemaChanged() {
 		initTreeModel();
 		tabSelected(null);
@@ -80,13 +78,20 @@ public class SchemaLayoutSimpleVM extends SurveyBaseVM {
 	@Command
 	@NotifyChange({"treeModel","selectedTab"})
 	public void addTab(@BindingParam("parent") UITabSet parent) {
-		UITab tab = parent.createTab();
-		String tabName = generateNewTabName(parent);
-		tab.setName(tabName);
-		tab.setLabel(currentLanguageCode, tabName);
-		parent.addTab(tab);
-		selectedTab = tab;
-		treeModel.appendNodeToSelected(tab);
+		if ( rootTabSet != null ) {
+			if ( parent == null ) {
+				parent = rootTabSet;
+				treeModel.deselect();
+			}
+			CollectSurvey survey = getSurvey();
+			UIOptions uiOptions = survey.getUIOptions();
+			UITab tab = uiOptions.createTab();
+			String label = Labels.getLabel("survey.schema.node.layout.default_tab_label");
+			tab.setLabel(currentLanguageCode, label);
+			parent.addTab(tab);
+			treeModel.appendNodeToSelected(tab);
+			selectedTab = tab;
+		}
 	}
 	
 	@Command
@@ -113,7 +118,7 @@ public class SchemaLayoutSimpleVM extends SurveyBaseVM {
 			performRemoveSelectedTab();
 		}
 	}
-
+	
 	protected void performRemoveSelectedTab() {
 		UITabSet parent = selectedTab.getParent();
 		parent.removeTab(selectedTab);
@@ -139,7 +144,9 @@ public class SchemaLayoutSimpleVM extends SurveyBaseVM {
 	protected void setTabLabel(UITab tab, String label) {
 		if ( isDefaultLanguage() ) {
 			//remove label associated to default language, if any
-			tab.removeLabel(null);
+			if ( tab.getLabel(null) != null ) {
+				tab.removeLabel(null);
+			}
 		}
 		tab.setLabel(currentLanguageCode, label.trim());
 	}
@@ -164,20 +171,6 @@ public class SchemaLayoutSimpleVM extends SurveyBaseVM {
 		} else {
 			return null;
 		}
-	}
-	
-	private String generateNewTabName(UITabSet parentGroup) {
-		String prefix = TAB_NAME_PREFIX;
-		Stack<Integer> parts = new Stack<Integer>();
-		UITabSet currentGroup = parentGroup;
-		do {
-			int position = currentGroup.getTabs().size() + 1;
-			parts.push(position);
-			currentGroup = currentGroup.getParent();
-		} while ( currentGroup != null );
-		String suffix = StringUtils.join(parts.toArray(), TAB_NAME_SEPARATOR);
-		String tabName = prefix + suffix;
-		return tabName;
 	}
 	
 	protected void dispatchTabSetChangedCommand() {
@@ -220,26 +213,27 @@ public class SchemaLayoutSimpleVM extends SurveyBaseVM {
 	
 	@DependsOn("selectedTab")
 	public boolean isMoveItemUpDisabled() {
-		if ( selectedTab != null ) {
-			int index = selectedTab.getIndex();
-			return index <= 0;
-		} else {
-			return true;
-		}
+		return isMoveItemDisabled(true);
 	}
 	
 	@DependsOn("selectedTab")
 	public boolean isMoveItemDownDisabled() {
-		return isMoveNodeDisabled(false);
+		return isMoveItemDisabled(false);
 	}
 	
-	protected boolean isMoveNodeDisabled(boolean up) {
-		if ( selectedTab != null ) {
+	protected boolean isMoveItemDisabled(boolean up) {
+		UIOptions uiOptions = survey.getUIOptions();
+		if ( selectedTab == null || uiOptions.isMainTab(selectedTab) ) {
+			return true;
+		} else {
 			List<UITab> siblings = selectedTab.getSiblings();
 			int index = siblings.indexOf(selectedTab);
-			return isMoveItemDisabled(siblings, index, up);
-		} else {
-			return true;
+			if ( up ) {
+				boolean willMoveOverTheMainTab = index == 1 && selectedTab.getDepth() == 1;
+				return index <= 0 || willMoveOverTheMainTab;
+			} else {
+				return index < 0 || index >= siblings.size() - 1;
+			}
 		}
 	}
 

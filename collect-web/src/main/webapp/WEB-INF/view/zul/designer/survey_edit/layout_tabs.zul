@@ -42,7 +42,7 @@
     				model="@load(vm.treeModel)"
     				onSelect="@command('tabSelected', tab=self.selectedItem.value.data)">
     				<template name="model">
-    		            <treeitem context="treeItemContextMenu">
+    		            <treeitem context="${vm.isMainTab(each.data) ? mainTabContextMenu: treeItemContextMenu}">
     		                <treerow>
     		                    <treecell>
                                   <textbox value="@load(vm.getTabLabel(each.data))" inplace="true"
@@ -68,15 +68,19 @@
           </south>
  		</borderlayout>
     
+        <menupopup id="treeContextMenu">
+          <menuitem label="${labels.survey.layout.tab.add}" 
+            onClick="@command('addTab', parent=null)" />
+        </menupopup>
+        <menupopup id="mainTabContextMenu">
+          <menuitem label="${labels.survey.layout.tab.add}" 
+            onClick="@command('addTab', parent=vm.selectedTab)" />
+        </menupopup>
         <menupopup id="treeItemContextMenu">
           <menuitem label="${labels.survey.layout.tab.add}" 
             onClick="@command('addTab', parent=vm.selectedTab)" />
           <menuitem label="${labels.survey.layout.tab.remove.$}" 
               onClick="@command('removeTab')" />
-        </menupopup>
-        <menupopup id="treeContextMenu">
-          <menuitem label="${labels.survey.layout.tab.add}" 
-            onClick="@command('addTab', parent=null)" />
         </menupopup>
     </div>
 </zk>
