@@ -67,7 +67,6 @@ import org.openforis.idm.model.Node;
 import org.openforis.idm.model.NodePointer;
 import org.openforis.idm.model.NumericRange;
 import org.openforis.idm.model.RealRange;
-import org.openforis.idm.model.Record;
 import org.openforis.idm.model.Value;
 import org.openforis.idm.model.expression.ExpressionFactory;
 import org.openforis.idm.model.expression.ModelPathExpression;
@@ -165,10 +164,9 @@ public class DataService {
 		String sessionId = sessionState.getSessionId();
 		CollectSurvey activeSurvey = sessionState.getActiveSurvey();
 		User user = sessionState.getUser();
-		ModelVersion version = activeSurvey.getVersion(versionName);
 		Schema schema = activeSurvey.getSchema();
 		EntityDefinition rootEntityDefinition = schema.getRootEntityDefinition(rootEntityName);
-		CollectRecord record = recordManager.create(activeSurvey, rootEntityDefinition, user, version.getName(), sessionId);
+		CollectRecord record = recordManager.create(activeSurvey, rootEntityDefinition, user, versionName, sessionId);
 		Entity rootEntity = record.getRootEntity();
 		recordManager.addEmptyNodes(rootEntity);
 		sessionManager.setActiveRecord(record);
@@ -607,9 +605,7 @@ public class DataService {
 		if(defn instanceof CodeAttributeDefinition) {
 			if ( value instanceof String) {
 				String stringVal = (String) value;
-				Record record = parentEntity.getRecord();
-				ModelVersion version = record .getVersion();
-				result = parseCode(parentEntity, (CodeAttributeDefinition) defn, stringVal, version );
+				result = parseCode(parentEntity, (CodeAttributeDefinition) defn, stringVal );
 			} else {
 				throw new IllegalArgumentException("Invalid value type: expected String");
 			}
@@ -821,8 +817,6 @@ public class DataService {
 	 */
 	private List<CodeListItem> getAssignableCodeListItems(Entity parent, CodeAttributeDefinition def) {
 		CollectRecord record = getActiveRecord();
-		ModelVersion version = record.getVersion();
-		
 		List<CodeListItem> items = null;
 		if(StringUtils.isEmpty(def.getParentExpression())){
 			items = def.getList().getItems();
@@ -838,8 +832,9 @@ public class DataService {
 		}
 		List<CodeListItem> result = new ArrayList<CodeListItem>();
 		if(items != null) {
+			ModelVersion version = record.getVersion();
 			for (CodeListItem item : items) {
-				if(version.isApplicable(item)) {
+				if (version == null || version.isApplicable(item)) {
 					result.add(item);
 				}
 			}
@@ -880,13 +875,13 @@ public class DataService {
 		return null;
 	}
 	
-	private Code parseCode(Entity parent, CodeAttributeDefinition def, String value, ModelVersion version) {
+	private Code parseCode(Entity parent, CodeAttributeDefinition def, String value) {
 		List<CodeListItem> items = getAssignableCodeListItems(parent, def);
-		Code code = parseCode(value, items, version);
+		Code code = parseCode(value, items);
 		return code;
 	}
 	
-	private Code parseCode(String value, List<CodeListItem> codeList, ModelVersion version) {
+	private Code parseCode(String value, List<CodeListItem> codeList) {
 		Code code = null;
 		String[] strings = value.split(":");
 		String codeStr = null;

@@ -28,6 +28,7 @@ import org.openforis.collect.persistence.jooq.MappingJooqDaoSupport;
 import org.openforis.collect.persistence.jooq.MappingJooqFactory;
 import org.openforis.collect.persistence.jooq.tables.records.OfcUserRecord;
 import org.openforis.idm.metamodel.EntityDefinition;
+import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.Survey;
@@ -377,7 +378,9 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 			if (record.getModifiedBy() != null) {
 				q.addValue(OFC_RECORD.MODIFIED_BY_ID, record.getModifiedBy().getId());
 			}
-			q.addValue(OFC_RECORD.MODEL_VERSION, record.getVersion().getName());
+			ModelVersion version = record.getVersion();
+			String versionName = version != null ? version.getName(): null;
+			q.addValue(OFC_RECORD.MODEL_VERSION, versionName);
 			q.addValue(OFC_RECORD.STEP, record.getStep().getStepNumber());
 			q.addValue(OFC_RECORD.STATE, record.getState() != null ? record.getState().getCode(): null);
 			q.addValue(OFC_RECORD.SKIPPED, record.getSkipped());

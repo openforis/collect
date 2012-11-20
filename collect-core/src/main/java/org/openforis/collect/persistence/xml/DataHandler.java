@@ -18,6 +18,7 @@ import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.FieldSymbol;
 import org.openforis.collect.model.User;
 import org.openforis.idm.metamodel.EntityDefinition;
+import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.model.Attribute;
@@ -161,17 +162,20 @@ public class DataHandler extends DefaultHandler {
 		if ( childDefn == null ) {
 			warn(localName, "Undefined node");
 			pushIgnore();
-		} else if ( record.getVersion().isApplicable(childDefn)) {
-			Node<?> newNode = childDefn.createNode();
-			entity.add(newNode);
-			Integer stateValue = getNodeState();
-			if ( stateValue != null ) {
-				entity.setChildState(localName, stateValue);
-			}
-			this.node = newNode;
 		} else {
-			warn(localName, "Node definition is not applicable to the record version");
-			pushIgnore();
+			ModelVersion version = record.getVersion();
+			if ( version == null || version.isApplicable(childDefn)) {
+				Node<?> newNode = childDefn.createNode();
+				entity.add(newNode);
+				Integer stateValue = getNodeState();
+				if ( stateValue != null ) {
+					entity.setChildState(localName, stateValue);
+				}
+				this.node = newNode;
+			} else {
+				warn(localName, "Node definition is not applicable to the record version");
+				pushIgnore();
+			}
 		}
 	}
 

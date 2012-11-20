@@ -536,10 +536,10 @@ package org.openforis.collect.ui {
 			return l;
 		}
 
-		public static function getDefinitionsInVersion(defs:IList, currentVersion:ModelVersionProxy):IList {
+		public static function getDefinitionsInVersion(defs:IList, version:ModelVersionProxy):IList {
 			var result:IList = new ArrayCollection();
 			for each (var defn:NodeDefinitionProxy in defs) {
-				if(currentVersion.isApplicable(defn)){
+				if(version == null || version.isApplicable(defn)){
 					result.addItem(defn);
 				}
 			}
@@ -550,7 +550,7 @@ package org.openforis.collect.ui {
 		 * Returns a list of lists of NodeDefinitionProxy object.
 		 * Each item of the list is a list of node definitions associated to the tab in that index.
 		 **/
-		public static function getDefinitionsPerEachSubTab(entityDefinition:EntityDefinitionProxy, modelVersion:ModelVersionProxy):IList {
+		public static function getDefinitionsPerEachSubTab(entityDefinition:EntityDefinitionProxy, version:ModelVersionProxy):IList {
 			var result:IList = new ArrayCollection();
 			var uiTab:UITabProxy = getUITab(entityDefinition);
 			if ( uiTab != null ) {
@@ -561,7 +561,7 @@ package org.openforis.collect.ui {
 						result.addItemAt(new ArrayCollection(), i);
 					}
 					//put each definition in the corresponding list per tab
-					var childDefns:IList = UIBuilder.getDefinitionsInVersion(entityDefinition.childDefinitions, modelVersion);
+					var childDefns:IList = UIBuilder.getDefinitionsInVersion(entityDefinition.childDefinitions, version);
 					for each (var defn:NodeDefinitionProxy in childDefns) {
 						var tabName:String = defn.uiTabName;
 						var tabIndex:int = CollectionUtil.getItemIndex(tabs, "name", tabName);
@@ -575,10 +575,10 @@ package org.openforis.collect.ui {
 			return result;
 		}
 			
-		public static function getDefinitionsPerMainTab(entityDefinition:EntityDefinitionProxy, modelVersion:ModelVersionProxy):IList {
+		public static function getDefinitionsPerMainTab(entityDefinition:EntityDefinitionProxy, version:ModelVersionProxy):IList {
 			var result:IList = new ArrayCollection();
 			var uiTab:UITabProxy = getUITab(entityDefinition);
-			var childDefns:IList = UIBuilder.getDefinitionsInVersion(entityDefinition.childDefinitions, modelVersion);
+			var childDefns:IList = UIBuilder.getDefinitionsInVersion(entityDefinition.childDefinitions, version);
 			for each (var defn:NodeDefinitionProxy in childDefns) {
 				var tabName:String = defn.uiTabName;
 				if ( tabName == uiTab.name ) {

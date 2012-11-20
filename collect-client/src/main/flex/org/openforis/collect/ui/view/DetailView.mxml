@@ -102,8 +102,8 @@
 							   itemCreationPolicy="immediate" 
 							   verticalGap="0" />
 		
-		<s:Group width="100%" id="buttonBar">
-			<s:HGroup gap="5" left="0" verticalCenter="0">
+		<s:Group id="buttonBar" width="100%">
+			<s:HGroup id="formVersionContainer" gap="5" left="0" verticalCenter="0">
 				<!-- form version label -->
 				<s:Label styleName="formVersionLabel"
 						 text="{Message.get('edit.formVersion')}"/>

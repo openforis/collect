@@ -92,7 +92,7 @@ package org.openforis.collect.presenter {
 				Application.preview = true;
 				var surveyId:int = int(params.surveyId);
 				var rootEntityId:int = int(params.rootEntityId);
-				var versionId:int = int(params.versionId);
+				var versionId:Number = Number(params.versionId);
 				var token:Object = {surveyId: surveyId, rootEntityId: rootEntityId, versionId: versionId};
 				var previewResp:IResponder = new AsyncResponder(initSessionForPreviewResultHandler, faultHandler, token);
 				this._sessionClient.initSession(previewResp, localeString);
@@ -166,13 +166,17 @@ package org.openforis.collect.presenter {
 			var survey:SurveyProxy = event.result as SurveyProxy;
 			Application.activeSurvey = survey;
 			survey.init();
-			var schema:SchemaProxy = survey.schema;
+			var versionName:String = null;
+			if (! isNaN(token.versionId) ) {
+				var version:ModelVersionProxy = survey.getVersion(token.versionId);
+				versionName = version.name;
+			}
 			var rootEntityId:int = token.rootEntityId;
-			var version:ModelVersionProxy = survey.getVersion(token.versionId);
+			var schema:SchemaProxy = survey.schema;
 			var rootEntityDef:EntityDefinitionProxy = EntityDefinitionProxy(schema.getDefinitionById(rootEntityId));
 			Application.activeRootEntity = rootEntityDef;
 			var newRecordResponder:IResponder = new AsyncResponder(createRecordResultHandler, faultHandler);
-			ClientFactory.dataClient.createNewRecord(newRecordResponder, rootEntityDef.name, version.name);
+			ClientFactory.dataClient.createNewRecord(newRecordResponder, rootEntityDef.name, versionName);
 		}
 		
 		protected function createRecordResultHandler(event:ResultEvent, token:Object = null):void {

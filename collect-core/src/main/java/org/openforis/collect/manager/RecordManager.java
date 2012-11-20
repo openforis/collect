@@ -321,7 +321,7 @@ public class RecordManager {
 		EntityDefinition entityDefn = entity.getDefinition();
 		List<NodeDefinition> childDefinitions = entityDefn.getChildDefinitions();
 		for (NodeDefinition nodeDefn : childDefinitions) {
-			if(version.isApplicable(nodeDefn)) {
+			if(version == null || version.isApplicable(nodeDefn)) {
 				String name = nodeDefn.getName();
 				if(entity.getCount(name) == 0) {
 					int count = 0;
@@ -419,7 +419,7 @@ public class RecordManager {
 		EntityDefinition parentEntityDefn = parentEntity.getDefinition();
 		List<NodeDefinition> childDefinitions = parentEntityDefn.getChildDefinitions();
 		for (NodeDefinition childDefn : childDefinitions) {
-			if(childDefn instanceof EntityDefinition && version.isApplicable(childDefn)) {
+			if ( childDefn instanceof EntityDefinition && (version == null || version.isApplicable(childDefn)) ) {
 				EntityDefinition childEntityDefn = (EntityDefinition) childDefn;
 				if(childEntityDefn.isMultiple() && childEntityDefn.isEnumerable()) {
 					addEmptyEnumeratedEntities(parentEntity, childEntityDefn);
@@ -438,7 +438,7 @@ public class RecordManager {
 			List<CodeListItem> items = list.getItems();
 			for (int i = 0; i < items.size(); i++) {
 				CodeListItem item = items.get(i);
-				if(version.isApplicable(item)) {
+				if(version == null || version.isApplicable(item)) {
 					String code = item.getCode();
 					Entity enumeratedEntity = getEnumeratedEntity(parentEntity, enuberableEntityDefn, enumeratingCodeDefn, code);
 					if( enumeratedEntity == null ) {
@@ -457,7 +457,7 @@ public class RecordManager {
 	private CodeAttributeDefinition getEnumeratingKeyCodeAttribute(EntityDefinition entity, ModelVersion version) {
 		List<AttributeDefinition> keys = entity.getKeyAttributeDefinitions();
 		for (AttributeDefinition key: keys) {
-			if(key instanceof CodeAttributeDefinition && version.isApplicable(key)) {
+			if(key instanceof CodeAttributeDefinition && (version == null || version.isApplicable(key))) {
 				CodeAttributeDefinition codeDefn = (CodeAttributeDefinition) key;
 				if(codeDefn.getList().getLookupTable() == null) {
 					return codeDefn;

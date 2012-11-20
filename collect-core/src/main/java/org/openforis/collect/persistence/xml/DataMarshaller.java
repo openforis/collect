@@ -16,6 +16,7 @@ import org.openforis.collect.model.User;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.FieldDefinition;
+import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Entity;
@@ -51,7 +52,9 @@ public class DataMarshaller {
 		String rootEntityName = rootEntity.getName();
         serializer.startTag(null, rootEntityName);
         
-        serializer.attribute(null, RECORD_VERSION_ATTRIBUTE, record.getVersion().getName());
+        ModelVersion version = record.getVersion();
+		String versionName = version != null ? version.getName(): null;
+		serializer.attribute(null, RECORD_VERSION_ATTRIBUTE, versionName);
         serializer.attribute(null, RECORD_STEP_ATTRIBUTE, Integer.toString(record.getStep().getStepNumber()));
         if ( record.getState() != null ) {
             serializer.attribute(null, STATE_ATTRIBUTE, record.getState().getCode());

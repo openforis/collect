@@ -64,9 +64,7 @@ package org.openforis.collect.presenter {
 		internal function activeRecordChangedListener(event:UIEvent):void {
 			var preview:Boolean = Application.preview;
 			var activeRecord:RecordProxy = Application.activeRecord;
-			var step:CollectRecord$Step = activeRecord.step;
 			var version:ModelVersionProxy = activeRecord.version;
-			var rootEntityDefn:EntityDefinitionProxy = Application.activeRootEntity;
 			var rootEntity:EntityProxy = activeRecord.rootEntity;
 			rootEntity.updateKeyText();
 			updateRecordKeyLabel();
@@ -75,7 +73,11 @@ package org.openforis.collect.presenter {
 			} else {
 				_rootEntityKeyTextChangeWatcher.reset(rootEntity);
 			}
-			_view.formVersionText.text = version.getLabelText();
+			_view.formVersionContainer.visible = version != null;
+			if ( version != null ) {
+				_view.formVersionText.text = version.getLabelText();
+			}
+			var step:CollectRecord$Step = activeRecord.step;
 			_view.currentPhaseText.text = getStepLabel(step);
 			
 			var user:UserProxy = Application.user;
@@ -88,6 +90,7 @@ package org.openforis.collect.presenter {
 			_view.rejectButton.visible = _view.rejectButton.includeInLayout = canReject;
 			_view.saveButton.visible = canSave;
 			
+			var rootEntityDefn:EntityDefinitionProxy = Application.activeRootEntity;
 			var form:FormContainer = null;
 			if (_view.formsContainer.contatinsForm(version,rootEntityDefn)){
 				_view.currentState = DetailView.EDIT_STATE;

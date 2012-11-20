@@ -19,6 +19,7 @@ package org.openforis.collect.presenter {
 	import mx.rpc.IResponder;
 	import mx.rpc.events.ResultEvent;
 	
+	import org.granite.validation.constraints.Null;
 	import org.openforis.collect.Application;
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.client.DataClient;
@@ -134,7 +135,7 @@ package org.openforis.collect.presenter {
 				_selectVersionPopUp = new SelectVersionPopUp();
 				PopUpManager.addPopUp(_selectVersionPopUp, FlexGlobals.topLevelApplication as DisplayObject, true);
 				_selectVersionPopUp.addEventListener(CloseEvent.CLOSE, cancelSelectVersionClickHandler);
-				_selectVersionPopUp.addButton.addEventListener(MouseEvent.CLICK, newRecordVersionSelectedHandler);
+				_selectVersionPopUp.addButton.addEventListener(MouseEvent.CLICK, addRecordButtonClickHandler);
 				_selectVersionPopUp.cancelButton.addEventListener(MouseEvent.CLICK, cancelSelectVersionClickHandler);
 			} else {
 				PopUpManager.addPopUp(_selectVersionPopUp, FlexGlobals.topLevelApplication as DisplayObject, true);
@@ -165,7 +166,7 @@ package org.openforis.collect.presenter {
 			}
 		}
 		
-		protected function newRecordVersionSelectedHandler(event:Event):void {
+		protected function addRecordButtonClickHandler(event:Event):void {
 			var version:ModelVersionProxy = ModelVersionProxy(_selectVersionPopUp.versionsDropDownList.selectedItem);
 			PopUpManager.removePopUp(_selectVersionPopUp);
 			addNewRecord(version);
@@ -173,7 +174,8 @@ package org.openforis.collect.presenter {
 
 		protected function addNewRecord(version:ModelVersionProxy):void {
 			var rootEntityName:String = Application.activeRootEntity.name;
-			_dataClient.createNewRecord(_newRecordResponder, rootEntityName, version.name);
+			var versionName:String = version != null ? version.name: null;
+			_dataClient.createNewRecord(_newRecordResponder, rootEntityName, versionName);
 		}
 		
 		protected function cancelSelectVersionClickHandler(event:Event):void {
@@ -189,7 +191,6 @@ package org.openforis.collect.presenter {
 			eventDispatcher.dispatchEvent(uiEvent);
 			PopUpManager.removePopUp(_view);
 		}
-		
 		
 		/**
 		 * Edit Button clicked 

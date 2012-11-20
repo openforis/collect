@@ -132,7 +132,7 @@ public class CollectRecord extends Record {
 	private Map<Integer, Integer> errorCounts;
 	private Map<Integer, Integer> warningCounts;
 	private Set<Integer> skippedNodes;
-	
+
 	public CollectRecord(CollectSurvey survey, String versionName) {
 		super(survey, versionName);
 		this.step = Step.ENTRY;
@@ -554,7 +554,7 @@ public class CollectRecord extends Record {
 					EntityDefinition definition = entity.getDefinition();
 					List<NodeDefinition> childDefinitions = definition.getChildDefinitions();
 					for (NodeDefinition childDefinition : childDefinitions) {
-						if ( version.isApplicable(childDefinition) ) {
+						if ( version == null || version.isApplicable(childDefinition) ) {
 							String childName = childDefinition.getName();
 							entity.validateMaxCount( childName );
 							entity.validateMinCount( childName );
