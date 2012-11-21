@@ -150,6 +150,14 @@ component|ErrorListPopUp, component|DataImportNodeErrorsPopUp {
 	skinClass: ClassReference("org.openforis.collect.ui.skin.ResizableTitleWindowSkin");
 }
 
+
+input|NumericAttributeRenderer input|DropDownInputField s|DropDownList,
+	input|RangeAttributeRenderer input|DropDownInputField s|DropDownList,
+	input|CoordinateAttributeRenderer input|DropDownInputField s|DropDownList {
+	skinClass: ClassReference("org.openforis.collect.ui.skin.DropDownSkin");
+	dropDownWidth: 130;
+}
+
 mx|ToolTip { 
 	fontSize: 10; 
 	backgroundColor: #AAD4FF;
