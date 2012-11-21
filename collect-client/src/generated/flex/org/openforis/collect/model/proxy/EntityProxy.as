@@ -14,7 +14,6 @@ package org.openforis.collect.model.proxy {
 	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.NumberAttributeDefinitionProxy;
-	import org.openforis.collect.metamodel.proxy.NumberAttributeDefinitionProxy$Type;
 	import org.openforis.collect.util.ArrayUtil;
 	import org.openforis.collect.util.CollectionUtil;
 	import org.openforis.collect.util.ObjectUtil;
@@ -285,13 +284,10 @@ package org.openforis.collect.model.proxy {
 			if(ObjectUtil.isNotNull(value)) {
 				if(attributeDefn is NumberAttributeDefinitionProxy) {
 					var numberDefn:NumberAttributeDefinitionProxy = NumberAttributeDefinitionProxy(attributeDefn);
-					switch(numberDefn.type) {
-						case NumberAttributeDefinitionProxy$Type.INTEGER:
-							result = int(value);
-							break;
-						case NumberAttributeDefinitionProxy$Type.REAL:
-						default:
-							result = Number(value);
+					if ( numberDefn.integer ) {
+						result = int(value);
+					} else {
+						result = Number(value);
 					}
 				} else {
 					result = value;
