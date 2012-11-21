@@ -42,10 +42,6 @@
 				>
 		<s:columns>
 			<s:ArrayList>
-				<s:GridColumn headerText="{Message.get('language.code')}" 
-							  dataField="code" 
-							  width="80"
-							  />
 				<s:GridColumn headerText="{Message.get('language.label')}" 
 							  dataField="label"
 							  width="110" 

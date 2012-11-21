@@ -8,10 +8,10 @@
 	
 	<fx:Script>
 		<![CDATA[
-			import org.openforis.collect.presenter.LanguageCodeAutoCompletePresenter;
+			import org.openforis.collect.presenter.LanguageAutoCompletePresenter;
 			
 			override protected function initPresenter():void {
-				presenter = new LanguageCodeAutoCompletePresenter(this);
+				presenter = new LanguageAutoCompletePresenter(this);
 			}
 		]]>
 	</fx:Script>

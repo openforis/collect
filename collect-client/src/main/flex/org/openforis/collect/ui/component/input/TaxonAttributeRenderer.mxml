@@ -4,7 +4,7 @@
 				  xmlns:mx="library://ns.adobe.com/flex/mx" 
 				  xmlns:input="org.openforis.collect.ui.component.input.*" 
 				  xmlns:detail="org.openforis.collect.ui.component.detail.*"
-				  inputFields="{[codeTextInput, scientificNameTextInput, vernacularNameTextInput, languageCodeTextInput, languageVarietyTextInput]}" 
+				  inputFields="{[codeTextInput, scientificNameTextInput, vernacularNameTextInput, languageAutocomplete, languageVarietyTextInput]}" 
 				  xmlns:component="org.openforis.collect.ui.component.*"
 				  >
 	<fx:Script>
@@ -51,7 +51,7 @@
 								maxChars="255"
 								width="100" 
 								/>
-		<input:LanguageCodeAutoComplete id="languageCodeTextInput" 
+		<input:LanguageAutoComplete id="languageAutocomplete" 
 								includeIn="horizontal"
 								attributeDefinition="{attributeDefinition}"
 								parentEntity="{parentEntity}"
@@ -88,7 +88,7 @@
 			</s:HGroup>
 			<s:HGroup>
 				<s:Label width="{subLabelWidth}" styleName="bold" text="{Message.get('edit.taxon.languageCode')}"/>
-				<fx:Reparent target="languageCodeTextInput" includeIn="vertical" />
+				<fx:Reparent target="languageAutocomplete" includeIn="vertical" />
 			</s:HGroup>
 			<s:HGroup>
 				<s:Label width="{subLabelWidth}" styleName="bold" text="{Message.get('edit.taxon.languageVariety')}"/>

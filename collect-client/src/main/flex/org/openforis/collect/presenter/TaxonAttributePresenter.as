@@ -20,7 +20,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.client.SpeciesClient;
 	import org.openforis.collect.event.InputFieldEvent;
 	import org.openforis.collect.event.TaxonInputFieldEvent;
-	import org.openforis.collect.i18n.LanguageCodes;
+	import org.openforis.collect.i18n.Languages;
 	import org.openforis.collect.i18n.Message;
 	import org.openforis.collect.metamodel.proxy.TaxonAttributeDefinitionProxy;
 	import org.openforis.collect.model.proxy.FieldProxy;
@@ -284,13 +284,13 @@ package org.openforis.collect.presenter {
 				//update vernacular name
 				view.vernacularNameTextInput.text = taxonOccurrence.vernacularName;
 				//update language code
-				view.languageCodeTextInput.text = taxonOccurrence.languageCode;
+				view.languageAutocomplete.text = taxonOccurrence.language;
 				//update language variety
 				view.languageVarietyTextInput.text = taxonOccurrence.languageVariety;
 			}
 			req.addOperation(view.scientificNameTextInput.presenter.createUpdateValueOperation());
 			req.addOperation(view.vernacularNameTextInput.presenter.createUpdateValueOperation());
-			req.addOperation(view.languageCodeTextInput.presenter.createUpdateValueOperation());
+			req.addOperation(view.languageAutocomplete.presenter.createUpdateValueOperation());
 			req.addOperation(view.languageVarietyTextInput.presenter.createUpdateValueOperation());
 			ClientFactory.dataClient.updateActiveRecord(req, null, faultHandler);
 		}

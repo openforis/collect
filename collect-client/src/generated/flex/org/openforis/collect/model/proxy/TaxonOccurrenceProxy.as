@@ -6,9 +6,20 @@
  */
 
 package org.openforis.collect.model.proxy {
+	import org.openforis.collect.i18n.Languages;
+	import org.openforis.collect.util.StringUtil;
 
     [Bindable]
     [RemoteClass(alias="org.openforis.collect.model.proxy.TaxonOccurrenceProxy")]
     public class TaxonOccurrenceProxy extends TaxonOccurrenceProxyBase {
+		
+		public function get language():String {
+			if ( StringUtil.isNotBlank(languageCode) ) {
+				return Languages.getLanguageLabel(languageCode);
+			} else {
+				return null;
+			}
+		}
+		
     }
 }

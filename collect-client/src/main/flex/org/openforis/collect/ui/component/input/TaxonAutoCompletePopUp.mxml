@@ -50,8 +50,8 @@
 							  dataField="vernacularName" 
 							  width="106" 
 							  />
-				<s:GridColumn headerText="{Message.get('edit.taxon.languageCode')}" 
-							  dataField="languageCode" 
+				<s:GridColumn headerText="{Message.get('edit.taxon.language')}" 
+							  dataField="language" 
 							  width="106" 
 							  />
 				<s:GridColumn headerText="{Message.get('edit.taxon.languageVariety')}" 
