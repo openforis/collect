@@ -1,7 +1,6 @@
 package org.openforis.collect.presenter
 {
 	import org.openforis.collect.metamodel.proxy.RangeAttributeDefinitionProxy;
-	import org.openforis.collect.metamodel.proxy.RangeAttributeDefinitionProxy$Type;
 	import org.openforis.collect.model.proxy.AttributeProxy;
 	import org.openforis.collect.model.proxy.FieldProxy;
 	import org.openforis.collect.ui.component.input.RangeInputField;
@@ -48,14 +47,8 @@ package org.openforis.collect.presenter
 		}
 		
 		protected function setRestriction():void {
-			var type:RangeAttributeDefinitionProxy$Type = RangeAttributeDefinitionProxy(_view.attributeDefinition).type;
-			switch(type) {
-				case RangeAttributeDefinitionProxy$Type.INTEGER:
-					_view.restrict = INTEGER_RESTRICT_PATTERN;
-					break;
-				default:
-					_view.restrict = RESTRICT_PATTERN;
-			}
+			var integer:Boolean = RangeAttributeDefinitionProxy(_view.attributeDefinition).integer;
+			_view.restrict = integer ? INTEGER_RESTRICT_PATTERN: RESTRICT_PATTERN;
 		}
 		
 	}

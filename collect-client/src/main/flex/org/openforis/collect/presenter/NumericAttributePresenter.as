@@ -6,7 +6,6 @@ package org.openforis.collect.presenter {
 	
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.metamodel.proxy.NumberAttributeDefinitionProxy;
-	import org.openforis.collect.metamodel.proxy.NumberAttributeDefinitionProxy$Type;
 	import org.openforis.collect.metamodel.proxy.UnitProxy;
 	import org.openforis.collect.remoting.service.UpdateRequest;
 	import org.openforis.collect.remoting.service.UpdateRequestOperation;
@@ -89,11 +88,8 @@ package org.openforis.collect.presenter {
 		
 		protected function initRestriction():void {
 			var numberAttrDefn:NumberAttributeDefinitionProxy = NumberAttributeDefinitionProxy(view.attributeDefinition);
-			if(numberAttrDefn.type == NumberAttributeDefinitionProxy$Type.INTEGER) {
-				view.numericInputField.restrict = IntegerInputField.RESTRICTION_PATTERN;
-			} else {
-				view.numericInputField.restrict = NumericInputField.RESTRICTION_PATTERN;
-			}
+			view.numericInputField.restrict = numberAttrDefn.integer ? IntegerInputField.RESTRICTION_PATTERN: 
+				NumericInputField.RESTRICTION_PATTERN;
 		}
 		
 		override protected function initViewState():void {

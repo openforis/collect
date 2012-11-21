@@ -24,10 +24,10 @@ package org.openforis.collect.presenter {
 	 * */
 	public class DropDownInputFieldPresenter extends InputFieldPresenter {
 		
-		public static const EMPTY_ITEM:Object = {label: Message.get('global.dropDownEmpty'), separator: false};
-		public static const BLANK_ON_FORM_ITEM:Object = {label: Message.get('edit.dropDownList.blankOnForm'), shortCut: "*", separator: true};
-		public static const DASH_ON_FORM_ITEM:Object = {label: Message.get('edit.dropDownList.dashOnForm'), shortCut: "-"};
-		public static const ILLEGIBLE_ITEM:Object = {label: Message.get('edit.dropDownList.illegible'), shortCut: "?"};
+		public static const EMPTY_ITEM:Object = {label: Message.get('global.dropDownEmpty'), shortLabel: "", separator: false};
+		public static const BLANK_ON_FORM_ITEM:Object = {label: Message.get('edit.dropDownList.blankOnForm'), shortLabel: "*", shortCut: "*", separator: true};
+		public static const DASH_ON_FORM_ITEM:Object = {label: Message.get('edit.dropDownList.dashOnForm'), shortLabel: "-", shortCut: "-"};
+		public static const ILLEGIBLE_ITEM:Object = {label: Message.get('edit.dropDownList.illegible'), shortLabel: "?", shortCut: "?"};
 
 		private var _view:DropDownInputField;
 		

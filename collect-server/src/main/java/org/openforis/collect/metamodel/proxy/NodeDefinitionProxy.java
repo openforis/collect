@@ -20,7 +20,6 @@ import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.FileAttributeDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NumberAttributeDefinition;
-import org.openforis.idm.metamodel.NumericAttributeDefinition;
 import org.openforis.idm.metamodel.RangeAttributeDefinition;
 import org.openforis.idm.metamodel.TaxonAttributeDefinition;
 import org.openforis.idm.metamodel.TextAttributeDefinition;
@@ -59,7 +58,7 @@ public class NodeDefinitionProxy extends VersionableSurveyObjectProxy {
 					} else if (n instanceof FileAttributeDefinition) {
 						p = new FileAttributeDefinitionProxy(parent, (FileAttributeDefinition) n);
 					} else if (n instanceof NumberAttributeDefinition) {
-						p = new NumberAttributeDefinitionProxy(parent, (NumericAttributeDefinition) n);
+						p = new NumberAttributeDefinitionProxy(parent, (NumberAttributeDefinition) n);
 					} else if (n instanceof RangeAttributeDefinition) {
 						p = new RangeAttributeDefinitionProxy(parent, (RangeAttributeDefinition) n);
 					} else if (n instanceof TaxonAttributeDefinition) {

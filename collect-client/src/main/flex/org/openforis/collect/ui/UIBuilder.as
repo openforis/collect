@@ -19,7 +19,7 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
 	import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.NumberAttributeDefinitionProxy;
-	import org.openforis.collect.metamodel.proxy.NumberAttributeDefinitionProxy$Type;
+	import org.openforis.collect.metamodel.proxy.NumericAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.RangeAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.SurveyProxy;
 	import org.openforis.collect.metamodel.proxy.TaxonAttributeDefinitionProxy;
@@ -261,7 +261,7 @@ package org.openforis.collect.ui {
 				}
 			} else if(def is CoordinateAttributeDefinitionProxy) {
 				if(parentLayout == UIUtil.LAYOUT_TABLE) {
-					return 310;
+					return 260;
 				} else {
 					return 100;
 				}
@@ -269,28 +269,20 @@ package org.openforis.collect.ui {
 				return 130;
 			} else if(def is FileAttributeDefinitionProxy) {
 				return 300;
-			} else if(def is NumberAttributeDefinitionProxy) {
-				var units:IList = NumberAttributeDefinitionProxy(def).units;
+			} else if(def is NumericAttributeDefinitionProxy) {
+				var units:IList = NumericAttributeDefinitionProxy(def).units;
 				var gap:int = 2;
+				var numericInputFieldWidth:int = def is RangeAttributeDefinitionProxy ? 120: 70;
+				var unitDropDownWidth:int = 70;
+				var result:int = numericInputFieldWidth;
 				if(units.length > 1) {
-					return 70 + gap + 120;
+					result += gap + unitDropDownWidth;
 				} else if ( units.length == 1 && def.parentLayout == UIUtil.LAYOUT_FORM ) {
 					var unit:UnitProxy = units.getItemAt(0) as UnitProxy;
 					var unitWidth:Number = UIUtil.measureUnitWidth(unit.name);
-					return 70 + gap + unitWidth;
-				} else {
-					return 70;
+					result += gap + unitWidth;
 				}
-			} else if(def is RangeAttributeDefinitionProxy) {
-				var rangeDef:RangeAttributeDefinitionProxy = RangeAttributeDefinitionProxy(def);
-				var rangeUnitsCount:int = rangeDef.units.length;
-				if(rangeUnitsCount > 1) {
-					return 242;
-				} else if(rangeUnitsCount == 1 && def.parentLayout == UIUtil.LAYOUT_FORM ) {
-					return 147;
-				} else {
-					return 120;
-				}
+				return result;
 			} else if(def is TaxonAttributeDefinitionProxy) {
 				if(parentLayout == UIUtil.LAYOUT_TABLE) {
 					return 504;
@@ -352,7 +344,7 @@ package org.openforis.collect.ui {
 				inputField = new ImageInputField();
 			} else if(def is NumberAttributeDefinitionProxy) {
 				var numberAttributeDefn:NumberAttributeDefinitionProxy = NumberAttributeDefinitionProxy(def);
-				if(numberAttributeDefn.type == NumberAttributeDefinitionProxy$Type.INTEGER) {
+				if (numberAttributeDefn.integer) {
 					inputField = new IntegerInputField();
 				} else {
 					inputField = new NumericInputField();
@@ -387,17 +379,11 @@ package org.openforis.collect.ui {
 				renderer = new CoordinateAttributeRenderer();
 			} else if(def is DateAttributeDefinitionProxy) {
 				renderer = new DateAttributeRenderer();
-			} else if(def is NumberAttributeDefinitionProxy) {
-				var numberAttributeDefn:NumberAttributeDefinitionProxy = NumberAttributeDefinitionProxy(def);
-				if(numberAttributeDefn.precisionDefinitions != null && numberAttributeDefn.units.length >= 1) {
-					renderer = new NumericAttributeRenderer();
-					var width:Number = getInputFieldWidth(def);
-					var borderWidth:Number = 1;
-					renderer.width = width + borderWidth * 2;
-				}
-			} else if(def is RangeAttributeDefinitionProxy) {
-				var rangeDef:RangeAttributeDefinitionProxy = RangeAttributeDefinitionProxy(def);
-				renderer = new RangeAttributeRenderer();
+			} else if(def is NumericAttributeDefinitionProxy) {
+				renderer = def is NumberAttributeDefinitionProxy ? new NumericAttributeRenderer(): new RangeAttributeRenderer;
+				var width:Number = getInputFieldWidth(def);
+				var borderWidth:Number = 1;
+				renderer.width = width + borderWidth * 2;
 			} else if(def is TaxonAttributeDefinitionProxy) {
 				renderer = new TaxonAttributeRenderer();
 			} else if(def is TimeAttributeDefinitionProxy) {
