@@ -128,8 +128,9 @@
 			<row>
 				<label value="${labels.global.item.description}:" />
 				<fieldErrorHandler message="@load(vmsgs['description'])">
-                    <textbox width="150px" value="@bind(fx.description)" 
-                      onChange="@command('applyChanges')" />
+                    <textbox width="300px" multiline="true" rows="4"
+                        value="@bind(fx.description)" 
+                        onChange="@command('applyChanges')" />
                 </fieldErrorHandler>
 			</row>
 			<row>

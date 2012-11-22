@@ -74,13 +74,14 @@
 							<row>
 								<label value="${labels.survey.srs.description}:" />
                                 <fieldErrorHandler message="@load(vmsgs['description'])">
-									<textbox width="150px" value="@bind(fx.description)" onChange="@command('applyChanges')" />
+									<textbox width="300px" multiline="true" rows="4"
+                                      value="@bind(fx.description)" onChange="@command('applyChanges')" />
 								</fieldErrorHandler>
 							</row>
 							<row>
 								<label value="${labels.survey.srs.wkt}:" />
                                 <fieldErrorHandler message="@load(vmsgs['wellKnownText'])">
-									<textbox width="250px" value="@bind(fx.wellKnownText)" 
+									<textbox width="300px" value="@bind(fx.wellKnownText)" 
 										multiline="true" rows="10" cols="40"
 										onChange="@command('applyChanges')" />
 								</fieldErrorHandler>

@@ -2,7 +2,7 @@
 <zk>
 	<window id="codeListsManagerPopUp" title="${labels.survey.code_list.manager.title}" 
 		width="800px" 
-		height="550px"
+		height="600px"
 		border="normal"
 		position="center" 
 		closable="false">
@@ -79,6 +79,14 @@
 										<textbox width="150px" value="@bind(fx.listLabel)" onChange="@command('applyChanges')" />
                                     </fieldErrorHandler>
 								</row>
+                                <row>
+                                  <label value="${labels.global.item.description}:" />
+                                            <fieldErrorHandler message="@load(vmsgs['description'])">
+                                    <textbox width="300px" value="@bind(fx.description)"
+                                                  multiline="true" rows="4"
+                                                  onChange="@command('applyChanges')" />
+                                  </fieldErrorHandler>
+                                </row>
 								<row>
 									<label value="${labels.survey.code_list.lookup_table}:" />
                                     <fieldErrorHandler message="@load(vmsgs['lookupTable'])">

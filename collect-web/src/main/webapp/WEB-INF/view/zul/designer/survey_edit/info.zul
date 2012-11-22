@@ -29,6 +29,7 @@
           <label value="${labels.survey.description}:" />
           <fieldErrorHandler message="@load(vmsgs['description'])">
             <textbox width="350px" value="@bind(fx.description)"
+              multiline="true" rows="4"
               onChange="@command('applyChanges')" />
           </fieldErrorHandler>
         </row>
