@@ -8,15 +8,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.designer.form.NodeDefinitionFormObject;
+import org.openforis.collect.designer.model.AttributeType;
 import org.openforis.collect.designer.model.LabelKeys;
+import org.openforis.collect.designer.model.NodeType;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.metamodel.ui.UITab;
 import org.openforis.collect.metamodel.ui.UITabSet;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Schema;
+import org.springframework.context.annotation.DependsOn;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.Binder;
 import org.zkoss.bind.Form;
@@ -201,5 +206,40 @@ public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyO
 			result = uiOptions.getAssignedTabSet(parentEntity);
 		}
 		return result;
+	}
+	
+	@DependsOn("editedItem")
+	public String getNodeType() {
+		if ( editedItem != null ) {
+			NodeType type = NodeType.valueOf(editedItem);
+			return type.name();
+		} else {
+			return null;
+		}
+	}
+
+	@DependsOn("editedItem")
+	public String getAttributeType() {
+		if ( editedItem != null && editedItem instanceof AttributeDefinition ) {
+			AttributeType type = AttributeType.valueOf((AttributeDefinition) editedItem);
+			return type.name();
+		} else {
+			return null;
+		}
+	}
+	
+	@DependsOn("editedItem")
+	public String getAttributeTypeLabel() {
+		String type = getAttributeType();
+		return getAttributeTypeLabel(type);
+	}
+
+	public String getAttributeTypeLabel(String typeValue) {
+		if ( StringUtils.isNotBlank(typeValue) ) {
+			AttributeType type = AttributeType.valueOf(typeValue);
+			return type.getLabel();
+		} else {
+			return null;
+		}
 	}
 }

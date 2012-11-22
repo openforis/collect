@@ -12,27 +12,7 @@
 			@save(vm.formObject, before='applyChanges')
 			@validator('org.openforis.collect.designer.form.validator.FileAttributeDefinitionFormValidator', parentEntity=parentEntity)">
 		
-		<include src="survey_edit/schema/attribute_common.zul" />
-		
-		<grid>
-			<columns>
-				<column label="" width="150px" />
-				<column label="" />
-			</columns>
-			<rows>
-				<row>
-					<label value="${labels.survey.schema.attribute.file.max_size}:" />
-                    <fieldErrorHandler message="@load(vmsgs['maxSize'])">
-						<intbox width="150px" value="@bind(fx.maxSize)" onChange="@command('applyChanges')" />
-                    </fieldErrorHandler>
-				</row>
-				<row>
-					<label value="${labels.survey.schema.attribute.file.extensions}:" />
-                    <fieldErrorHandler message="@load(vmsgs['extensions'])">
-						<textbox width="150px" value="@bind(fx.extensions)" onChange="@command('applyChanges')" />
-                    </fieldErrorHandler>
-				</row>
-			</rows>
-		</grid>
+        <include src="survey_edit/schema/attribute_common.zul" otherGeneralDetailsForm="survey_edit/schema/attribute_file_general_part.zul" />
+        
 	</vlayout>
 </zk>

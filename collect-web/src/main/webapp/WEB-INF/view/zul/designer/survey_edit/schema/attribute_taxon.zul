@@ -12,58 +12,9 @@
 			@save(vm.formObject, before='applyChanges')
 			@validator('org.openforis.collect.designer.form.validator.TaxonAttributeDefinitionFormValidator', parentEntity=parentEntity)">
 		
-		<include src="survey_edit/schema/attribute_common.zul" />
-		
-		<grid>
-			<columns>
-				<column label="" width="150px" />
-				<column label="" />
-			</columns>
-			<rows>
-				<row>
-					<label value="${labels.survey.schema.attribute.taxon.taxonomy}:" />
-                    <fieldErrorHandler message="@load(vmsgs['taxonomy'])">
-						<textbox width="150px" value="@bind(fx.taxonomy)" onChange="@command('applyChanges')" />
-                    </fieldErrorHandler>
-				</row>
-				<row>
-					<label value="${labels.survey.schema.attribute.taxon.highest_rank}:" />
-                    <fieldErrorHandler message="@load(vmsgs['highestRank'])">
-                        <listbox width="150px" model="@load(vm.ranks)"
-                            selectedItem="@bind(fx.highestRank)" mold="select"
-                            onSelect="@command('applyChanges')">
-                        </listbox>
-                    </fieldErrorHandler>
-				</row>
-                <row>
-                  <label value="${labels.survey.schema.attribute.taxon.qualifiers}:" />
-                  <vlayout>
-                    <listbox id="qualifiersList" 
-                          model="@load(vm.qualifiers)"
-                          selectedItem="@bind(vm.selectedQualifier)">
-                         <listhead visible="false">
-                            <listheader label="" width="200px" />
-                          </listhead>
-                         <template name="model">
-                          <listitem>
-                            <listcell>
-                                <textbox inplace="true" value="@load(each)" width="99%"
-                                  onChange="@command('updateQualifier', text=self.value)"
-                                  onFocus="@command('selectQualifier', qualifier=each)" />
-                            </listcell>
-                          </listitem>
-                      </template>
-                    </listbox>
-                    <menubar>
-                      <menuitem label="${labels.global.add_item}"
-                          onClick="@command('addQualifier')" />
-                      <menuitem label="${labels.global.delete_item}"
-                          disabled="@load(vm.selectedQualifier eq null)"
-                          onClick="@command('deleteQualifier')" />
-                    </menubar>
-                  </vlayout>
-              </row>
-			</rows>
-		</grid>
+		<include src="survey_edit/schema/attribute_common.zul" 
+            otherGeneralDetailsForm="survey_edit/schema/attribute_taxon_other_general_form.zul"
+            otherAttributesForm="survey_edit/schema/attribute_taxon_other_attributes_form.zul"  />
+
 	</vlayout>
 </zk>

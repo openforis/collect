@@ -5,49 +5,60 @@
     viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SurveyMainInfoVM')"
     form="@id('fx') @load(vm.formObject) @save(vm.formObject, before='applyChanges')
 			@validator('org.openforis.collect.designer.form.validator.SurveyMainInfoFormValidator')">
+    <groupbox width="100%" closable="false">
+      <caption label="${labels.survey.details}"/>
+      <grid>
+        <columns>
+          <column label="" width="150px" />
+          <column label="" width="100%" />
+        </columns>
+        <rows>
+          <row>
+            <label value="${labels.survey.name}:" />
+            <fieldErrorHandler message="@load(vmsgs['name'])">
+              <textbox width="150px" value="@bind(fx.name)"
+                onChange="@command('applyChanges')" />
+            </fieldErrorHandler>
+          </row>
+          <row>
+            <label value="${labels.survey.project_cycle}:" />
+            <fieldErrorHandler message="@load(vmsgs['projectCycle'])">
+              <textbox width="150px" value="@bind(fx.projectCycle)"
+                onChange="@command('applyChanges')" />
+            </fieldErrorHandler>
+          </row>
+          <row>
+            <label value="${labels.survey.description}:" />
+            <fieldErrorHandler message="@load(vmsgs['description'])">
+              <textbox width="350px" value="@bind(fx.description)"
+                multiline="true" rows="4"
+                onChange="@command('applyChanges')" />
+            </fieldErrorHandler>
+          </row>
+          <row>
+            <label value="${labels.survey.uri}:" />
+            <fieldErrorHandler message="@load(vmsgs['uri'])">
+              <textbox width="350px" value="@bind(fx.uri)"
+                onChange="@command('applyChanges')"
+                readonly="@load(fx.published)" />
+            </fieldErrorHandler>
+          </row>
+          <row>
+            <label value="${labels.survey.project_name}:" />
+            <fieldErrorHandler message="@load(vmsgs['projectName'])">
+              <textbox width="150px" value="@bind(fx.projectName)"
+                onChange="@command('applyChanges')" />
+            </fieldErrorHandler>
+          </row>
+         </rows>
+	   </grid>
+    </groupbox>
     <grid>
       <columns>
         <column label="" width="150px" />
         <column label="" width="100%" />
       </columns>
       <rows>
-        <row>
-          <label value="${labels.survey.name}:" />
-          <fieldErrorHandler message="@load(vmsgs['name'])">
-            <textbox width="150px" value="@bind(fx.name)"
-              onChange="@command('applyChanges')" />
-          </fieldErrorHandler>
-        </row>
-        <row>
-          <label value="${labels.survey.project_cycle}:" />
-          <fieldErrorHandler message="@load(vmsgs['projectCycle'])">
-            <textbox width="150px" value="@bind(fx.projectCycle)"
-              onChange="@command('applyChanges')" />
-          </fieldErrorHandler>
-        </row>
-        <row>
-          <label value="${labels.survey.description}:" />
-          <fieldErrorHandler message="@load(vmsgs['description'])">
-            <textbox width="350px" value="@bind(fx.description)"
-              multiline="true" rows="4"
-              onChange="@command('applyChanges')" />
-          </fieldErrorHandler>
-        </row>
-        <row>
-          <label value="${labels.survey.uri}:" />
-          <fieldErrorHandler message="@load(vmsgs['uri'])">
-            <textbox width="350px" value="@bind(fx.uri)"
-              onChange="@command('applyChanges')"
-              readonly="@load(fx.published)" />
-          </fieldErrorHandler>
-        </row>
-        <row>
-          <label value="${labels.survey.project_name}:" />
-          <fieldErrorHandler message="@load(vmsgs['projectName'])">
-            <textbox width="150px" value="@bind(fx.projectName)"
-              onChange="@command('applyChanges')" />
-          </fieldErrorHandler>
-        </row>
         <row>
           <label value="${labels.survey.srs.$}:" />
           <cell>

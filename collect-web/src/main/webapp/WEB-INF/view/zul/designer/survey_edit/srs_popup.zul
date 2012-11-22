@@ -1,7 +1,7 @@
 <?component name="fieldErrorHandler" class="org.openforis.collect.designer.component.FieldErrorHandler"?>
 <zk>
 	<window 
-		title="${labels.survey.srs.manager.title}" 
+		title="${labels.survey.srs.$}" 
 		height="400px"
 		width="700px"
 		border="normal"

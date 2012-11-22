@@ -1,0 +1,25 @@
+<?component name="fieldErrorHandler" class="org.openforis.collect.designer.component.FieldErrorHandler"?>
+<zk>
+  <grid class="inner">
+    <columns>
+      <column width="150px" />
+      <column />
+    </columns>
+    <rows>
+      <row>
+        <label value="${labels.survey.schema.attribute.file.max_size}:" />
+        <fieldErrorHandler message="@load(vmsgs['maxSize'])">
+          <intbox width="150px" value="@bind(fx.maxSize)"
+            onChange="@command('applyChanges')" />
+        </fieldErrorHandler>
+      </row>
+      <row>
+        <label value="${labels.survey.schema.attribute.file.extensions}:" />
+        <fieldErrorHandler message="@load(vmsgs['extensions'])">
+          <textbox width="150px" value="@bind(fx.extensions)"
+            onChange="@command('applyChanges')" />
+        </fieldErrorHandler>
+      </row>
+    </rows>
+  </grid>
+</zk>

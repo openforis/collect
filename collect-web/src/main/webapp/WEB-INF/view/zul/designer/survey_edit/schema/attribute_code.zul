@@ -12,50 +12,7 @@
 			@save(vm.formObject, before='applyChanges')
 			@validator('org.openforis.collect.designer.form.validator.CodeAttributeDefinitionFormValidator', parentEntity=parentEntity)">
 		
-		<include src="survey_edit/schema/attribute_common.zul" />
-		
-		<grid>
-			<columns>
-				<column label="" width="150px" />
-				<column label="" />
-			</columns>
-			<rows>
-				<row>
-					<label value="${labels.survey.schema.attribute.code.key}:" />
-					<checkbox checked="@load(fx.key eq true) @save(fx.key)" onCheck="@command('applyChanges')" />
-				</row>
-				<row>
-					<label value="${labels.survey.schema.attribute.code.code_list}:" />
-					<cell>
-                        <hlayout>
-    						<fieldErrorHandler message="@load(vmsgs['list'])">
-                                <listbox width="150px" model="@load(vm.codeLists)"
-        							selectedItem="@bind(fx.list)" mold="select"
-        							onSelect="@command('applyChanges')">
-        							<template name="model">
-        								<listitem label="@load(each.name)" />
-        							</template>
-        						</listbox>
-                            </fieldErrorHandler>
-    						<button tooltiptext="${labels.survey.code_list.manager.title}" 
-    							onClick="@global-command('openCodeListsManagerPopUp')"
-    							image="/assets/images/pencil-small.png" />
-                        </hlayout>
-					</cell>
-				</row>
-				<row>
-					<label value="${labels.survey.schema.attribute.code.strict}:" />
-					<checkbox checked="@load(fx.strict eq true) @save(fx.strict)" 
-                          onCheck="@command('applyChanges')" />
-				</row>
-				<row>
-					<label value="${labels.survey.schema.attribute.code.parent_expression}:" />
-					<fieldErrorHandler message="@load(vmsgs['parentExpression'])">
-						<textbox width="150px" value="@bind(fx.parentExpression)" 
-                          onChange="@command('applyChanges')" />
-					</fieldErrorHandler>
-				</row>
-			</rows>
-		</grid>
+		<include src="survey_edit/schema/attribute_common.zul" otherGeneralDetailsForm="survey_edit/schema/attribute_code_general_part.zul" />
+
 	</vlayout>
 </zk>

@@ -199,15 +199,6 @@ public abstract class AttributeVM<T extends AttributeDefinition> extends NodeDef
 		}
 	}
 	
-	public String getAttributeType() {
-		if ( editedItem == null ) {
-			return null;
-		} else {
-			AttributeType type = AttributeType.valueOf(editedItem);
-			return type.name().toLowerCase();
-		}
-	}
-
 	public List<AttributeDefault> getAttributeDefaults() {
 		return attributeDefaults;
 	}

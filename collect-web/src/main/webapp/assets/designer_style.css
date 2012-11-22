@@ -4,10 +4,10 @@
 .nopadding {
 	padding: 0px;
 }
-.z-groupbox-3d.insideForm {
+.z-groupbox-3d.collapsible {
 	margin: 5px;
 }
-.insideForm .z-groupbox-3d-cnt {
+.collapsible .z-groupbox-3d-cnt {
 	padding: 0px;
 }
 .z-groupbox-3d .open-false .z-caption-l {
@@ -36,4 +36,13 @@
 .z-popup.error .z-popup-cnt {
 	background: #CE2929;
 	color: #FFFFFF;
+}
+.z-groupbox.formFieldSet .z-groupbox-cnt {
+	padding: 0px;
+}
+.z-groupbox.tableFieldSet .z-groupbox-cnt {
+	padding: 10px;
+}
+.z-grid.inner {
+	border: none;
 }

@@ -1,19 +1,55 @@
 <?component name="fieldErrorHandler" class="org.openforis.collect.designer.component.FieldErrorHandler"?>
 <zk>
-	<grid>
-		<columns>
-			<column label="" width="150px" />
-			<column label="" width="100%" />
-		</columns>
-		<rows>
-			<row>
-				<label value="${labels.global.item.name}:" />
-                <fieldErrorHandler message="@load(vmsgs['name'])">
-    				<textbox width="200px" maxlength="40"
-                        value="@bind(fx.name)"
-    					onChange="@command('applyChanges')" />
-                </fieldErrorHandler>
-			</row>
+  <custom-attributes otherGeneralDetailsForm="${arg.otherGeneralDetailsForm}"/>
+  <custom-attributes otherGeneralDetailsForm="${arg.otherLayoutForm}"/>
+  <custom-attributes otherAttributesForm="${arg.otherAttributesForm}"/>
+  
+  <groupbox width="100%" closable="false" class="formFieldSet">
+    <caption label="${labels.survey.schema.node.general}"/>
+    <grid class="inner">
+      <columns>
+        <column width="150px" />
+        <column />
+      </columns>
+      <rows>
+        <row>
+          <label value="${labels.survey.schema.node.type_label}:" />
+          <label
+            value="@load(vm.nodeType eq 'ENTITY' ? 
+                  labels.survey.schema.node.type.entity: 
+                  labels.survey.schema.node.type.attribute)" />
+        </row>
+        <row visible="@load(vm.nodeType eq 'ATTRIBUTE')">
+          <label value="${labels.survey.schema.attribute.type_label}:" />
+          <label visible="@laod(vm.nodeType eq 'ATTRIBUTE')"
+            value="@load(vm.attributeTypeLabel)" />
+        </row>
+        <row>
+          <label value="${labels.global.item.name}:" />
+          <fieldErrorHandler message="@load(vmsgs['name'])">
+            <textbox width="200px" maxlength="40" value="@bind(fx.name)"
+              onChange="@command('applyChanges')" />
+          </fieldErrorHandler>
+        </row>
+        <row>
+          <label value="${labels.global.item.description}:" />
+          <fieldErrorHandler message="@load(vmsgs['description'])">
+            <textbox width="300px" multiline="true" rows="4"
+              value="@bind(fx.description)"
+              onChange="@command('applyChanges')" />
+          </fieldErrorHandler>
+        </row>
+      </rows>
+    </grid>
+
+    <include src="${arg.otherGeneralDetailsForm}" />
+     
+    <grid class="inner">
+        <columns>
+          <column width="150px" />
+          <column />
+        </columns>
+        <rows>
 			<row>
 				<label value="${labels.survey.schema.node.multiple}:" />
                 <fieldErrorHandler message="@load(vmsgs['multiple'])">
@@ -26,28 +62,46 @@
 				<label value="${labels.survey.schema.node.required}:" />
 				<fieldErrorHandler message="@load(vmsgs['required'])">
                     <checkbox checked="@load(fx.required eq true) @save(fx.required)" 
-                        onCheck="@command('applyChanges')" />
+                        onCheck="@command('applyChanges')"
+                        disabled="${empty parentEntity}" />
                 </fieldErrorHandler>
 			</row>
 			<row visible="@load(fx.multiple ne true)">
 				<label value="${labels.survey.schema.node.required_expression}:" />
 				<fieldErrorHandler message="@load(vmsgs['requiredExpression'])">
                   <textbox width="150px" value="@bind(fx.requiredExpression)" 
-                      onChange="@command('applyChanges')" />
+                      onChange="@command('applyChanges')"
+                      disabled="${empty parentEntity}" />
                 </fieldErrorHandler>
 			</row>
 			<row visible="@load(fx.multiple eq true)">
 				<label value="${labels.survey.schema.node.min_count}:" />
 				<fieldErrorHandler message="@load(vmsgs['minCount'])">
-                    <intbox value="@bind(fx.minCount)" onChange="@command('applyChanges')" />
+                    <intbox value="@bind(fx.minCount)" onChange="@command('applyChanges')"
+                      disabled="${empty parentEntity}" />
                 </fieldErrorHandler>
 			</row>
 			<row visible="@load(fx.multiple eq true)">
 				<label value="${labels.survey.schema.node.max_count}:" />
 				<fieldErrorHandler message="@load(vmsgs['maxCount'])">
-                    <intbox value="@bind(fx.maxCount)" onChange="@command('applyChanges')" />
+                    <intbox value="@bind(fx.maxCount)" onChange="@command('applyChanges')"
+                      disabled="${empty parentEntity}" />
                 </fieldErrorHandler>
 			</row>
+      </rows>
+     </grid>
+    </groupbox>
+    
+    <include src="${arg.otherAttributesForm}" />
+    
+    <groupbox width="100%" closable="false" class="formFieldSet">
+      <caption label="${labels.survey.schema.node.labels}"/>
+      <grid class="inner">
+        <columns>
+          <column width="150px" />
+          <column />
+        </columns>
+        <rows>
 			<row>
 				<label value="${labels.survey.schema.node.instance_label}:" />
 				<fieldErrorHandler message="@load(vmsgs['instanceLabel'])">
@@ -69,121 +123,126 @@
                       onChange="@command('applyChanges')" />
                 </fieldErrorHandler>
 			</row>
-		</rows>
-	</grid>
-	<groupbox closable="true" open="false" 
-		sclass="insideForm"
-		mold="3d" width="100%">
-		<attribute name="onOpen"><![CDATA[
-		    caption.setSclass("open-" + self.isOpen());
-		]]></attribute>
-		<caption id="caption" sclass="open-false">
-			<div align="left">
-				<label value="${labels.survey.schema.node.other_labels}" />
-			</div>
-		</caption>
-		<grid>
-			<columns>
-				<column label="" width="150px" />
-				<column label="" width="100%" />
-			</columns>
-			<rows>
-				<row>
-					<label value="${labels.survey.schema.node.interview_prompt_label}:" />
-					<fieldErrorHandler message="@load(vmsgs['interviewPromptLabel'])">
-                      <textbox width="150px" value="@bind(fx.interviewPromptLabel)" 
-                          onChange="@command('applyChanges')" />
-                    </fieldErrorHandler>
-				</row>
-				<row>
-					<label value="${labels.survey.schema.node.paper_prompt_label}:" />
-					<fieldErrorHandler message="@load(vmsgs['paperPromptLabel'])">
-                      <textbox width="150px" value="@bind(fx.paperPromptLabel)"
-                                onChange="@command('applyChanges')" />
-                    </fieldErrorHandler>
-				</row>
-				<row>
-					<label value="${labels.survey.schema.node.handheld_prompt_label}:" />
-    				<fieldErrorHandler message="@load(vmsgs['handheldPromptLabel'])">
-                    	<textbox width="150px" value="@bind(fx.handheldPromptLabel)" 
+		  </rows>
+      </grid>
+      <groupbox closable="true" open="false"
+        class="formFieldSet" 
+      	sclass="collapsible"
+      	mold="3d" width="100%">
+      	<attribute name="onOpen"><![CDATA[
+      	    caption.setSclass("open-" + self.isOpen());
+      	]]></attribute>
+      	<caption id="caption" sclass="open-false">
+      		<div align="left">
+      			<label value="${labels.survey.schema.node.other_labels}" />
+      		</div>
+      	</caption>
+      	<grid class="inner">
+      		<columns>
+      			<column width="150px" />
+      			<column />
+      		</columns>
+      		<rows>
+      			<row>
+      				<label value="${labels.survey.schema.node.interview_prompt_label}:" />
+      				<fieldErrorHandler message="@load(vmsgs['interviewPromptLabel'])">
+                          <textbox width="150px" value="@bind(fx.interviewPromptLabel)" 
                               onChange="@command('applyChanges')" />
+                        </fieldErrorHandler>
+      			</row>
+      			<row>
+      				<label value="${labels.survey.schema.node.paper_prompt_label}:" />
+      				<fieldErrorHandler message="@load(vmsgs['paperPromptLabel'])">
+                          <textbox width="150px" value="@bind(fx.paperPromptLabel)"
+                                    onChange="@command('applyChanges')" />
+                        </fieldErrorHandler>
+      			</row>
+      			<row>
+      				<label value="${labels.survey.schema.node.handheld_prompt_label}:" />
+        				<fieldErrorHandler message="@load(vmsgs['handheldPromptLabel'])">
+                        	<textbox width="150px" value="@bind(fx.handheldPromptLabel)" 
+                                  onChange="@command('applyChanges')" />
+                        </fieldErrorHandler>
+      			</row>
+      			<row>
+      				<label value="${labels.survey.schema.node.pc_prompt_label}:" />
+        				<fieldErrorHandler message="@load(vmsgs['pcPromptLabel'])">
+                        	<textbox width="150px" value="@bind(fx.pcPromptLabel)" 
+                                  onChange="@command('applyChanges')" />
+                        </fieldErrorHandler>
+      			</row>
+      		</rows>
+      	</grid>
+      </groupbox>
+    </groupbox>
+    <groupbox width="100%" closable="false" class="formFieldSet">
+      <caption label="${labels.survey.schema.node.versioning}"/>
+    	<grid class="inner">
+    		<columns>
+    			<column width="150px" />
+    			<column />
+    		</columns>
+    		<rows>
+    			<row>
+    				<label value="${labels.global.item.since_version}:" />
+    				<fieldErrorHandler message="@load(vmsgs['sinceVersionId'])">
+                    	<listbox width="150px" model="@load(vm.versionIdsForCombo)"
+    						selectedItem="@bind(fx.sinceVersionId)" mold="select"
+    						onSelect="@command('applyChanges')">
+    						<template name="model">
+    							<listitem label="@load(vm.getVersionLabel(each))" />
+    						</template>
+    					</listbox>
+    					<button tooltiptext="${labels.survey.versioning_manager}" 
+    						onClick="@global-command('openVersioningManagerPopUp')"
+    						image="/assets/images/pencil-small.png" />
                     </fieldErrorHandler>
-				</row>
-				<row>
-					<label value="${labels.survey.schema.node.pc_prompt_label}:" />
-    				<fieldErrorHandler message="@load(vmsgs['pcPromptLabel'])">
-                    	<textbox width="150px" value="@bind(fx.pcPromptLabel)" 
-                              onChange="@command('applyChanges')" />
+    			</row>
+    			<row>
+    				<label value="${labels.global.item.deprecated_version}:" />
+    				<fieldErrorHandler message="@load(vmsgs['deprecatedVersionId'])">
+                    	<listbox width="150px" model="@load(vm.versionIdsForCombo)"
+    						selectedItem="@bind(fx.deprecatedVersionId)" mold="select"
+    						onSelect="@command('applyChanges')">
+    						<template name="model">
+    							<listitem label="@load(vm.getVersionLabel(each))" />
+    						</template>
+    					</listbox>
+    					<button tooltiptext="${labels.survey.versioning_manager}" 
+    						onClick="@global-command('openVersioningManagerPopUp')"
+    						image="/assets/images/pencil-small.png" />
                     </fieldErrorHandler>
-				</row>
-			</rows>
-		</grid>
-	</groupbox>
-	<grid>
-		<columns>
-			<column label="" width="150px" />
-			<column label="" width="100%" />
-		</columns>
-		<rows>
-			<row>
-				<label value="${labels.global.item.description}:" />
-				<fieldErrorHandler message="@load(vmsgs['description'])">
-                    <textbox width="300px" multiline="true" rows="4"
-                        value="@bind(fx.description)" 
-                        onChange="@command('applyChanges')" />
-                </fieldErrorHandler>
-			</row>
-			<row>
-				<label value="${labels.global.item.since_version}:" />
-				<fieldErrorHandler message="@load(vmsgs['sinceVersionId'])">
-                	<listbox width="150px" model="@load(vm.versionIdsForCombo)"
-						selectedItem="@bind(fx.sinceVersionId)" mold="select"
-						onSelect="@command('applyChanges')">
-						<template name="model">
-							<listitem label="@load(vm.getVersionLabel(each))" />
-						</template>
-					</listbox>
-					<button tooltiptext="${labels.survey.versioning_manager}" 
-						onClick="@global-command('openVersioningManagerPopUp')"
-						image="/assets/images/pencil-small.png" />
-                </fieldErrorHandler>
-			</row>
-			<row>
-				<label value="${labels.global.item.deprecated_version}:" />
-				<fieldErrorHandler message="@load(vmsgs['deprecatedVersionId'])">
-                	<listbox width="150px" model="@load(vm.versionIdsForCombo)"
-						selectedItem="@bind(fx.deprecatedVersionId)" mold="select"
-						onSelect="@command('applyChanges')">
-						<template name="model">
-							<listitem label="@load(vm.getVersionLabel(each))" />
-						</template>
-					</listbox>
-					<button tooltiptext="${labels.survey.versioning_manager}" 
-						onClick="@global-command('openVersioningManagerPopUp')"
-						image="/assets/images/pencil-small.png" />
-                </fieldErrorHandler>
-			</row>
-		</rows>
-	</grid>
-    <grid>
-      <columns>
-        <column label="" width="150px" />
-        <column label="" width="100%" />
-      </columns>
-      <rows>
-        <row>
-          <label value="${labels.survey.schema.node.layout.tab}:" />
-          <fieldErrorHandler message="@load(vmsgs['tab'])">
-              <listbox width="150px" model="@load(vm.assignableTabNames)"
-                selectedItem="@bind(fx.tabName)" mold="select"
-                onSelect="@command('applyChanges')"
-                disabled="${empty parentEntity}">
-              <template name="model">
-                <listitem label="@load(vm.getTabLabel(each))" />
-              </template>
-            </listbox>
-          </fieldErrorHandler>
-        </row>
-      </rows>
-    </grid>
+    			</row>
+    		</rows>
+    	</grid>
+   </groupbox>
+   <groupbox width="100%" closable="false" class="formFieldSet">
+    <caption label="${labels.survey.schema.node.layout.$}"/>
+    <vlayout width="100%">
+      <grid class="inner">
+        <columns>
+          <column width="150px" />
+          <column />
+        </columns>
+        <rows>
+          <row>
+            <label value="${labels.survey.schema.node.layout.tab}:" />
+            <fieldErrorHandler message="@load(vmsgs['tab'])">
+                <listbox width="150px" model="@load(vm.assignableTabNames)"
+                  selectedItem="@bind(fx.tabName)" mold="select"
+                  onSelect="@command('applyChanges')"
+                  disabled="${empty parentEntity}">
+                <template name="model">
+                  <listitem label="@load(vm.getTabLabel(each))" />
+                </template>
+              </listbox>
+            </fieldErrorHandler>
+          </row>
+        </rows>
+      </grid>
+      
+      <include src="${arg.otherLayoutForm}" />
+      
+    </vlayout>
+   </groupbox>
 </zk>

@@ -323,12 +323,6 @@ public class SchemaVM extends SurveyBaseVM {
 		return result;
 	}
 	
-	@DependsOn("editedNode")
-	public String getAttributeTypeLabel() {
-		String type = getAttributeType();
-		return getAttributeTypeLabel(type);
-	}
-	
 	public String getAttributeTypeLabel(String typeValue) {
 		if ( StringUtils.isNotBlank(typeValue) ) {
 			AttributeType type = AttributeType.valueOf(typeValue);
@@ -427,24 +421,4 @@ public class SchemaVM extends SurveyBaseVM {
 		return newItem;
 	}
 
-	@DependsOn("editedNode")
-	public String getNodeType() {
-		if ( editedNode != null ) {
-			NodeType type = NodeType.valueOf(editedNode);
-			return type.name();
-		} else {
-			return null;
-		}
-	}
-
-	@DependsOn("editedNode")
-	public String getAttributeType() {
-		if ( editedNode != null && editedNode instanceof AttributeDefinition ) {
-			AttributeType type = AttributeType.valueOf((AttributeDefinition) editedNode);
-			return type.name();
-		} else {
-			return null;
-		}
-	}
-	
 }

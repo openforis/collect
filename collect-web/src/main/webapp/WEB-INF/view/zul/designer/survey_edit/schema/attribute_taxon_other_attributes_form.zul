@@ -1,0 +1,30 @@
+<?component name="fieldErrorHandler" class="org.openforis.collect.designer.component.FieldErrorHandler"?>
+<zk>
+  <groupbox width="100%" closable="false" class="tableFieldSet">
+    <caption label="${labels.survey.schema.attribute.taxon.qualifiers}" />
+    <vlayout>
+      <listbox id="qualifiersList" model="@load(vm.qualifiers)"
+        selectedItem="@bind(vm.selectedQualifier)">
+        <listhead visible="false">
+          <listheader label="" width="200px" />
+        </listhead>
+        <template name="model">
+          <listitem>
+            <listcell>
+              <textbox inplace="true" value="@load(each)" width="99%"
+                onChange="@command('updateQualifier', text=self.value)"
+                onFocus="@command('selectQualifier', qualifier=each)" />
+            </listcell>
+          </listitem>
+        </template>
+      </listbox>
+      <menubar>
+        <menuitem label="${labels.global.add_item}"
+          onClick="@command('addQualifier')" />
+        <menuitem label="${labels.global.delete_item}"
+          disabled="@load(vm.selectedQualifier eq null)"
+          onClick="@command('deleteQualifier')" />
+      </menubar>
+    </vlayout>
+  </groupbox>
+</zk>
