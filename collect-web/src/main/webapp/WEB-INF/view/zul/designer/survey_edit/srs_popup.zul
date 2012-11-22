@@ -55,8 +55,8 @@
 					width="500px">
 					<grid>
 						<columns>
-							<column label="" width="100px" />
-							<column label="" width="100%" />
+							<column width="100px" />
+							<column />
 						</columns>
 						<rows>
 							<row>

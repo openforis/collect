@@ -14,8 +14,8 @@
       @validator('org.openforis.collect.designer.form.validator.ComparisonCheckFormValidator', parentDefinition=parentDefinition)">
     <grid>
       <columns>
-        <column label="" width="150px" />
-        <column label="" width="100%" />
+        <column width="150px" />
+        <column />
       </columns>
       <rows>
         <row>

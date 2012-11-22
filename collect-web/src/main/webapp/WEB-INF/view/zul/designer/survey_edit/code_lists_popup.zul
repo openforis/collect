@@ -57,8 +57,8 @@
 					<center border="none">
 						<grid>
 							<columns>
-								<column label="" width="150px" />
-								<column label="" width="100%" />
+								<column width="150px" />
+								<column />
 							</columns>
 							<rows>
 								<row>

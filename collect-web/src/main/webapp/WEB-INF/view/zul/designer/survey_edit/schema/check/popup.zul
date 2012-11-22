@@ -4,20 +4,17 @@
 	<custom-attributes newItem="${arg.newItem}"/>
 	<window id="checkPopUp" title="${labels.survey.schema.node.check.popup.title}" 
 		width="500px"
-		height="300px"
 		border="normal"
 		position="center" 
 		closable="false"
         apply="org.openforis.collect.designer.composer.CheckPopUpComposer">
     
-        <borderlayout>
-          <center>
-            <vlayout height="100%" width="100%" style="overflow: auto;">
-             	<include id="detailsInclude" src="survey_edit/schema/check/${$composer.typeShort}.zul"
-             		parentDefinition="${parentDefinition}" newItem="${newItem}" check="${check}" />
-            </vlayout>
-          </center>
-          <south>
+        <vlayout>
+           	<include id="detailsInclude" 
+              src="survey_edit/schema/check/${$composer.typeShort}.zul"
+   		      parentDefinition="${parentDefinition}" 
+              newItem="${newItem}" 
+              check="${check}" />
             <box width="100%" align="center">
               <hbox>
         		<button label="${labels.global.apply}" onClick="@command('applyChanges')" />
@@ -25,7 +22,6 @@
                 <button label="${labels.global.cancel}" onClick="@command('cancelChanges')" />
               </hbox>
             </box>
-          </south>
-        </borderlayout>
+        </vlayout>
 	</window>
 </zk>
