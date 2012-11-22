@@ -15,7 +15,9 @@
   		  </template>
 		</listbox>
         <menubar>
-          <menu label="${labels.global.add_item}">
+          <menu tooltiptext="${labels.global.add_item}"
+            class="icon-button"
+            image="/assets/images/add.png">
             <menupopup>
                 <zk forEach="${vm.checkTypes}">
                   <menuitem label="${each.label}" value="${each}"
@@ -23,12 +25,16 @@
                 </zk>
             </menupopup>
           </menu>
-          <menuitem label="${labels.global.edit_item}"
+          <menuitem tooltiptext="${labels.global.edit_item}"
+              image="/assets/images/edit.png"
               disabled="@load(empty vm.selectedCheck)"
-              onClick="@command('editCheck')" />
-          <menuitem label="${labels.global.delete_item}"
+              onClick="@command('editCheck')"
+              class="icon-button" />
+          <menuitem tooltiptext="${labels.global.delete_item}"
+              image="/assets/images/delete.png"
               disabled="@load(empty vm.selectedCheck)"
-              onClick="@command('deleteCheck', check=vm.selectedCheck)" />
+              onClick="@command('deleteCheck', check=vm.selectedCheck)"
+              class="icon-button" />
         </menubar>
 	</vlayout>
 </zk>

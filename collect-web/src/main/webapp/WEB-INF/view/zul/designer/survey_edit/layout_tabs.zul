@@ -57,11 +57,9 @@
             <south>
                 <toolbar width="100%">
                   <toolbarbutton image="/assets/images/arrow-up.png"
-                    class="icon-button" 
                     disabled="@load(vm.moveItemUpDisabled)" 
                     onClick="@command('moveItemUp')" />
                   <toolbarbutton image="/assets/images/arrow-down.png"
-                    class="icon-button" 
                     disabled="@load(vm.moveItemDownDisabled)" 
                     onClick="@command('moveItemDown')" />
                </toolbar>
@@ -70,16 +68,20 @@
     
         <menupopup id="treeContextMenu">
           <menuitem label="${labels.survey.layout.tab.add}" 
+            image="/assets/images/add.png"
             onClick="@command('addTab', parent=null)" />
         </menupopup>
         <menupopup id="mainTabContextMenu">
           <menuitem label="${labels.survey.layout.tab.add}" 
+            image="/assets/images/add.png"
             onClick="@command('addTab', parent=vm.selectedTab)" />
         </menupopup>
         <menupopup id="treeItemContextMenu">
           <menuitem label="${labels.survey.layout.tab.add}" 
+            image="/assets/images/add.png"
             onClick="@command('addTab', parent=vm.selectedTab)" />
           <menuitem label="${labels.survey.layout.tab.remove.$}" 
+              image="/assets/images/remove.png"
               onClick="@command('removeTab')" />
         </menupopup>
     </div>

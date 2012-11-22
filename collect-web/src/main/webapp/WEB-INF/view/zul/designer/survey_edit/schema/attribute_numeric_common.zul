@@ -64,9 +64,11 @@
         </template>
       </listbox>
       <toolbar>
-        <toolbarbutton label="${labels.global.add_item}"
+        <toolbarbutton tooltiptext="${labels.global.add_item}"
+          image="/assets/images/add.png"
           onClick="@command('addNumericAttributePrecision')" />
-        <toolbarbutton label="${labels.global.delete_item}"
+        <toolbarbutton tooltiptext="${labels.global.delete_item}"
+          image="/assets/images/delete.png"
           disabled="@load(empty vm.selectedPrecision)"
           onClick="@command('deleteNumericAttributePrecision')" />
       </toolbar>

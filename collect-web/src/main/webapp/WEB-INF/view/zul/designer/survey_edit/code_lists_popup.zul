@@ -31,7 +31,8 @@
 		        	</center>
 					<south border="none">
 				        <toolbar>
-				        	<toolbarbutton label="${labels.global.add_item}" 
+				        	<toolbarbutton tooltiptext="${labels.global.add_item}"
+                                    image="/assets/images/add.png"
 				        			onClick="@command('newItem')" />
 				        	<toolbarbutton image="/assets/images/arrow-up.png"
 									disabled="@load(vm.moveSelectedItemUpDisabled)" 
@@ -194,9 +195,11 @@
 							</center>
 							<east width="70px">
 								<vlayout id="levelsControlBar" visible="@load(fx.type eq 'HIERARCHICAL')">
-								 	<button label="${labels.survey.code_list.add_level}" 
+								 	<button image="/assets/images/add.png" 
+                                        label="${labels.survey.code_list.add_level}" 
 								 		onClick="@command('addLevel')" />
-								 	<button label="${labels.survey.code_list.remove_level}" 
+								 	<button image="/assets/images/remove.png" 
+                                        label="${labels.survey.code_list.remove_level}" 
 								 		onClick="@command('removeLevel')"
 								 		visible="@load(vm.multipleLevelsPresent)" />
 								</vlayout>

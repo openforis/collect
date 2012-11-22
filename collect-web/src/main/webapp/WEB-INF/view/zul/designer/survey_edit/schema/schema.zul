@@ -49,12 +49,15 @@
       
         <menupopup id="nodesTreePopup">
           <menuitem label="${labels.survey.schema.add_entity}" 
+            image="/assets/images/add.png"
             onClick="@command('addRootEntity')" />
         </menupopup>
         <menupopup id="entityPopup">
           <menuitem label="${labels.survey.schema.add_child_entity}" 
+            image="/assets/images/add.png"
             onClick="@command('addChildEntity')" />
-           <menu label="${labels.survey.schema.add_attribute.label}">
+           <menu label="${labels.survey.schema.add_attribute.label}"
+              image="/assets/images/add.png">
               <menupopup>
                   <zk forEach="${vm.attributeTypeValues}">
                     <menuitem
@@ -65,10 +68,12 @@
        	  </menu>
           <menuseparator />
           <menuitem label="${labels.survey.schema.remove_node}" 
+              image="/assets/images/delete.png"
               onClick="@command('removeNode')" />
         </menupopup>
         <menupopup id="attributePopup">
           <menuitem label="${labels.survey.schema.remove_node}" 
+              image="/assets/images/delete.png"
               onClick="@command('removeNode')" />
         </menupopup>
     </div>

@@ -1,8 +1,8 @@
 <?component name="fieldErrorHandler" class="org.openforis.collect.designer.component.FieldErrorHandler"?>
 <zk>
 	<window id="unitsManagerPopUp" title="${labels.survey.unit.manager.title}" 
-		width="800px"
-		height="470px"
+		width="600px"
+		height="370px"
 		border="normal"
 		position="center" 
 		closable="false"
@@ -10,31 +10,37 @@
 		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.UnitsVM')"
 		validationMessages="@id('vmsgs')">
 		<borderlayout>
-			<west width="300px">
-				<vlayout>
-			        <listbox id="itemsListBox"
-			        	selectedItem="@load(vm.selectedItem)"
-			        	model="@load(vm.items)"
-			        	onSelect="@command('selectionChanged', selectedItem=self.selectedItem.value)"
-			        	height="300px"
-			        	width="100%">
-			        	<listhead>
-							<listheader label="" width="100%" />
-						</listhead>
-			            <template name="model">
-			                <listitem>
-			                    <listcell label="@load(each.name)" />
-			                </listitem>
-			            </template>
-			        </listbox>
-                    <menubar>
-    			      <menuitem label="${labels.global.add_item}" 
-                          onClick="@command('newItem')" />
-                      <menuitem label="${labels.global.delete_item}"
-                          disabled="@load(empty vm.selectedItem)"
-                          onClick="@command('deleteItem', item=vm.selectedItem)" />
-                    </menubar>
-			    </vlayout>
+			<west width="220px">
+				<borderlayout>
+					<center border="none">
+    			        <listbox id="itemsListBox"
+    			        	selectedItem="@load(vm.selectedItem)"
+    			        	model="@load(vm.items)"
+    			        	onSelect="@command('selectionChanged', selectedItem=self.selectedItem.value)"
+    			        	width="220px"
+			        		vflex="true">
+    			        	<listhead>
+    							<listheader label="" width="100%" />
+    						</listhead>
+    			            <template name="model">
+    			                <listitem>
+    			                    <listcell label="@load(each.name)" />
+    			                </listitem>
+    			            </template>
+    			        </listbox>
+                    </center>
+                    <south border="none">
+                      <toolbar>
+      			       <toolbarbutton tooltiptext="${labels.global.add_item}" 
+                            image="/assets/images/add.png"
+                            onClick="@command('newItem')" />
+                        <toolbarbutton tooltiptext="${labels.global.delete_item}"
+                            image="/assets/images/delete.png"
+                            disabled="@load(empty vm.selectedItem)"
+                            onClick="@command('deleteItem', item=vm.selectedItem)" />
+                      </toolbar>
+                    </south>
+                </borderlayout>
 			</west>
 		    <center>
 		        <vlayout

@@ -18,13 +18,15 @@
           </listitem>
         </template>
       </listbox>
-      <menubar>
-        <menuitem label="${labels.global.add_item}"
+      <toolbar>
+        <toolbarbutton tooltiptext="${labels.global.add_item}"
+          image="/assets/images/add.png"
           onClick="@command('addQualifier')" />
-        <menuitem label="${labels.global.delete_item}"
+        <toolbarbutton tooltiptext="${labels.global.delete_item}"
+          image="/assets/images/delete.png"
           disabled="@load(vm.selectedQualifier eq null)"
           onClick="@command('deleteQualifier')" />
-      </menubar>
+      </toolbar>
     </vlayout>
   </groupbox>
 </zk>

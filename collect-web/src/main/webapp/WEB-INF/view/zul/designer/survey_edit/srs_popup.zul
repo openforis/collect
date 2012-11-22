@@ -31,17 +31,21 @@
 					</center>
 					<south border="none">
 				        <toolbar>
-				        	<toolbarbutton label="${labels.global.add_item}" 
+				        	<toolbarbutton tooltiptext="${labels.survey.layout.tab.add}" 
+                                    image="/assets/images/add.png"
                                     onClick="@command('newItem')" />
-				        	<toolbarbutton image="/assets/images/arrow-up.png"
-									disabled="@load(vm.moveSelectedItemUpDisabled)" 
-						        	onClick="@command('moveSelectedItemUp')" />
-				        	<toolbarbutton image="/assets/images/arrow-down.png"
-									disabled="@load(vm.moveSelectedItemDownDisabled)" 
-						        	onClick="@command('moveSelectedItemDown')" />
-                            <toolbarbutton label="${labels.global.delete_item}"
+                            <toolbarbutton tooltiptext="${labels.global.delete_item}" 
+                                    image="/assets/images/delete.png"
                                     disabled="@load(empty vm.selectedItem)" 
                                     onClick="@command('deleteItem', item=vm.selectedItem)" />
+				        	<toolbarbutton tooltiptext="${labels.global.item.move_up}" 
+                                    image="/assets/images/arrow-up.png"
+									disabled="@load(vm.moveSelectedItemUpDisabled)" 
+						        	onClick="@command('moveSelectedItemUp')" />
+				        	<toolbarbutton tooltiptext="${labels.global.item.move_down}" 
+                                    image="/assets/images/arrow-down.png"
+									disabled="@load(vm.moveSelectedItemDownDisabled)" 
+						        	onClick="@command('moveSelectedItemDown')" />
 				        </toolbar>
 					</south>
 				</borderlayout>
