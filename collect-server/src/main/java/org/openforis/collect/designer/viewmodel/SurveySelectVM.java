@@ -4,18 +4,15 @@
 package org.openforis.collect.designer.viewmodel;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
+import org.openforis.collect.designer.model.SurveyManagerUtil;
 import org.openforis.collect.designer.model.SurveyWorkSummary;
 import org.openforis.collect.designer.session.SessionStatus;
 import org.openforis.collect.designer.util.Resources;
 import org.openforis.collect.designer.util.Resources.Page;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectSurvey;
-import org.openforis.collect.model.SurveySummary;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.DependsOn;
 import org.zkoss.bind.annotation.GlobalCommand;
@@ -51,6 +48,11 @@ public class SurveySelectVM extends BaseVM {
 			surveyWork = surveyManager.loadSurveyWork(selectedSurvey.getId());
 		}
 		SessionStatus sessionStatus = getSessionStatus();
+		if ( selectedSurvey.isPublished() && ! selectedSurvey.isWorking() ) {
+			sessionStatus.setPublishedSurveyId(selectedSurvey.getId());
+		} else {
+			sessionStatus.setPublishedSurveyId(null);
+		}
 		sessionStatus.setSurvey(surveyWork);
 		sessionStatus.setCurrentLanguageCode(null);
 		Executions.sendRedirect(Page.SURVEY_EDIT.getLocation());
@@ -77,26 +79,8 @@ public class SurveySelectVM extends BaseVM {
 	}
 	
 	public ListModel<SurveyWorkSummary> getSurveySummaries() {
-		List<SurveySummary> surveySummaries = surveyManager.getSurveySummaries(null);
-		List<SurveySummary> surveyWorkSummaries = surveyManager.getSurveyWorkSummaries();
-		List<SurveyWorkSummary> result = new ArrayList<SurveyWorkSummary>();
-		Map<String, SurveyWorkSummary> workingSummariesByUri = new HashMap<String, SurveyWorkSummary>();
-		for (SurveySummary summary : surveyWorkSummaries) {
-			SurveyWorkSummary summaryWork = new SurveyWorkSummary(summary.getId(), summary.getName(), summary.getUri(), false, true);
-			result.add(summaryWork);
-			workingSummariesByUri.put(summary.getUri(), summaryWork);
-		}
-		for (SurveySummary summary : surveySummaries) {
-			SurveyWorkSummary summaryWork;
-			summaryWork = workingSummariesByUri.get(summary.getUri());
-			if ( summaryWork == null ) {
-				summaryWork = new SurveyWorkSummary(summary.getId(), summary.getName(), summary.getUri(), true, false);
-				result.add(summaryWork);
-			} else {
-				summaryWork.setPublished(true);
-			}
-		}
-		return new ListModelList<SurveyWorkSummary>(result);
+		List<SurveyWorkSummary> summaries = SurveyManagerUtil.getSurveySummaries(surveyManager);
+		return new ListModelList<SurveyWorkSummary>(summaries);
 	}
 
 	public SurveyWorkSummary getSelectedSurvey() {

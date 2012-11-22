@@ -11,6 +11,8 @@ import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.message.BasicNameValuePair;
 import org.openforis.collect.designer.model.LabelKeys;
+import org.openforis.collect.designer.model.SurveyManagerUtil;
+import org.openforis.collect.designer.model.SurveyWorkSummary;
 import org.openforis.collect.designer.session.SessionStatus;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.Resources;
@@ -178,13 +180,55 @@ public class SurveyEditVM extends SurveyBaseVM {
 	
 	@Command
 	public void save() throws SurveyImportException {
-		if ( checkCurrentFormValid() ) {
+		if ( checkCanSave(false) ) {
 			surveyManager.saveSurveyWork(survey);
 			MessageUtil.showInfo(SURVEY_SUCCESSFULLY_SAVED_MESSAGE_KEY);
 			BindUtils.postNotifyChange(null, null, survey, "published");
 		}
 	}
 	
+	protected boolean checkCanSave(boolean publishing) {
+		if ( checkCurrentFormValid() ) {
+			List<SurveyWorkSummary> surveySummaries = SurveyManagerUtil.getSurveySummaries(surveyManager);
+			for (SurveyWorkSummary surveySummary : surveySummaries) {
+				boolean notDuplicate = checkIsNotDuplicate(surveySummary, publishing);
+				if ( ! notDuplicate ) {
+					return false;
+				}
+			}
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	protected boolean checkIsNotDuplicate(SurveyWorkSummary summary, boolean publishing) {
+		Integer surveyId = survey.getId();
+		Integer publishedSurveyId = getSessionStatus().getPublishedSurveyId();
+		Integer summaryId = summary.getId();
+		boolean skip = false;
+		if ( surveyId == null ) {
+			if ( publishedSurveyId != null && summary.isPublished() && publishedSurveyId.equals(summaryId) ) {
+				skip = true;
+			}
+		} else if ( summaryId.equals(surveyId)) {
+			skip = true;
+		}
+		if ( ! skip ) {
+			if ( summary.getName().equals(survey.getName()) ) {
+				String messageKey = publishing ? LabelKeys.SURVEY_PUBLISH_ERROR_DUPLICATE_NAME: LabelKeys.SURVEY_SAVE_ERROR_DUPLICATE_NAME;
+				MessageUtil.showWarning(messageKey);
+				return false;
+			}
+			if ( summary.getUri().equals(survey.getUri()) ) {
+				String messageKey = publishing ? LabelKeys.SURVEY_PUBLISH_ERROR_DUPLICATE_URI: LabelKeys.SURVEY_SAVE_ERROR_DUPLICATE_URI;
+				MessageUtil.showWarning(messageKey);
+				return false;
+			}
+		}
+		return true;
+	}
+
 	@GlobalCommand
 	public void showPreview(@BindingParam("formVersion") ModelVersion formVersion, @BindingParam("rootEntity") EntityDefinition rootEntity) {
 		if ( rootEntity == null ) {
@@ -218,7 +262,7 @@ public class SurveyEditVM extends SurveyBaseVM {
 	
 	@Command
 	public void publish() {
-		if ( checkCurrentFormValid() ) {
+		if ( checkCanSave(true) ) {
 			MessageUtil.showConfirm(new MessageUtil.ConfirmHandler() {
 				@Override
 				public void onOk() {

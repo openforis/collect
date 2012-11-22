@@ -18,7 +18,6 @@ import org.openforis.collect.model.SurveySummary;
 import org.openforis.collect.persistence.SurveyDao;
 import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.collect.persistence.SurveyWorkDao;
-import org.openforis.idm.metamodel.LanguageSpecificText;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.xml.IdmlParseException;
 import org.openforis.idm.util.CollectionUtil;
@@ -116,7 +115,7 @@ public class SurveyManager {
 		List<SurveySummary> summaries = new ArrayList<SurveySummary>();
 		for (Survey survey : surveys) {
 			Integer id = survey.getId();
-			String projectName = getProjectName(survey, lang);
+			String projectName = survey.getProjectName(lang);
 			String name = survey.getName();
 			String uri = survey.getUri();
 			SurveySummary summary = new SurveySummary(id, name, uri, projectName);
@@ -157,7 +156,7 @@ public class SurveyManager {
 		List<SurveySummary> summaries = new ArrayList<SurveySummary>();
 		for (Survey survey : surveys) {
 			Integer id = survey.getId();
-			String projectName = getProjectName(survey, lang);
+			String projectName = survey.getProjectName(lang);
 			String name = survey.getName();
 			SurveySummary summary = new SurveySummary(id, name, projectName);
 			summaries.add(summary);
@@ -192,7 +191,7 @@ public class SurveyManager {
 //		CollectSurvey surveyWork = survey.clone();
 		CollectSurvey surveyWork = survey;
 		surveyWork.setId(null);
-		surveyWork.setPublished(true);
+		surveyWork.setPublished(false);
 		return surveyWork;
 	}
 	
@@ -204,7 +203,6 @@ public class SurveyManager {
 		} else {
 			surveyWorkDao.update(survey);
 		}
-		survey.setPublished(false);
 	}
 	
 	@Transactional
@@ -222,20 +220,4 @@ public class SurveyManager {
 		}
 	}
 	
-	private String getProjectName(Survey survey, String lang) {
-		List<LanguageSpecificText> names = survey.getProjectNames();
-		if (names == null || names.size() == 0) {
-			return "";
-		} else if (names.size() == 1) {
-			return names.get(0).getText();
-		} else {
-			for (LanguageSpecificText text : names) {
-				if (lang.equalsIgnoreCase(text.getLanguage())) {
-					return text.getText();
-				}
-			}
-		}
-		return "";
-	}
-
 }
