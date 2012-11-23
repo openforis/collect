@@ -14,6 +14,6 @@
         </rows>
       </grid>
       
-      <include src="survey_edit/schema/attribute_numeric_common.zul" />
+      <include src="survey_edit/schema/attribute_numeric_common_other_general_form.zul" />
     </vlayout>
 </zk>

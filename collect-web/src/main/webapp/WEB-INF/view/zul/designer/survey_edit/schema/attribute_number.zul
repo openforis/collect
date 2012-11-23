@@ -12,7 +12,9 @@
 			@save(vm.formObject, before='applyChanges')
 			@validator('org.openforis.collect.designer.form.validator.AttributeDefinitionFormValidator', parentEntity=parentEntity)">
 
-		<include src="survey_edit/schema/attribute_common.zul" otherGeneralDetailsForm="survey_edit/schema/attribute_number_general_part.zul" />
+		<include src="survey_edit/schema/attribute_common.zul" 
+            otherGeneralDetailsForm="survey_edit/schema/attribute_number_other_general_form.zul"
+            otherAttributesForm="survey_edit/schema/attribute_number_other_attributes_form.zul" />
 
 	</vlayout>
 </zk>
