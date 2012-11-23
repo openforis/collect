@@ -13,7 +13,7 @@
 							width="100%" vflex="true"
 							model="@load(vm.nodes)"
                             context="nodesTreePopup"
-							onSelect="@command('nodeSelected', node=self.selectedItem)">
+							onSelect="@command('nodeSelected', node=self.selectedItem.value.data)">
 							<template name="model">
 					            <treeitem draggable="false" context="@load(vm.isEntity(each.data) ? entityPopup: attributePopup)"> 
 					                <treerow>

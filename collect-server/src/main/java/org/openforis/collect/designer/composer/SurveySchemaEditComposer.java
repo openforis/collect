@@ -27,7 +27,7 @@ public class SurveySchemaEditComposer extends BindComposer<Component> {
 	@Listen("onSelectTreeNode")
 	public void onSelectTreeNode(Event event) throws InterruptedException {
 		SchemaVM vm = (SchemaVM) getViewModel();
-		if ( vm.checkCurrentFormValid() ) {
+		if ( vm.checkCanLeaveForm() ) {
 			Tab tab = (Tab) event.getTarget();
 			Tabbox tabbox = tab.getTabbox();
 			tabbox.setSelectedTab(tab);

@@ -14,6 +14,7 @@ import org.openforis.collect.designer.form.FormObject;
 import org.openforis.collect.designer.form.NodeDefinitionFormObject;
 import org.openforis.collect.designer.model.AttributeType;
 import org.openforis.collect.designer.model.CheckType;
+import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.Resources;
 import org.openforis.idm.metamodel.AttributeDefault;
 import org.openforis.idm.metamodel.AttributeDefinition;
@@ -143,10 +144,15 @@ public abstract class AttributeVM<T extends AttributeDefinition> extends NodeDef
 	}
 	
 	@Command
-	@NotifyChange({"selectedCheck","checks"})
 	public void deleteCheck() {
-		checks.remove(selectedCheck);
-		selectedCheck = null;
+		MessageUtil.showConfirm(new MessageUtil.ConfirmHandler() {
+			@Override
+			public void onOk() {
+				checks.remove(selectedCheck);
+				selectedCheck = null;
+				notifyChange("selectedCheck","checks");
+			}
+		}, "survey.schema.node.check.confirm_delete");
 	}
 	
 	@Command
@@ -157,7 +163,7 @@ public abstract class AttributeVM<T extends AttributeDefinition> extends NodeDef
 	
 	@GlobalCommand
 	public void applyChangesToEditedCheck(@ContextParam(ContextType.BINDER) Binder binder) {
-		if ( editedCheck != null && checkCurrentFormValid() ) {
+		if ( editedCheck != null && checkCanLeaveForm() ) {
 			closeCheckEditPopUp(binder);
 			editedCheck = null;
 			initChecks();

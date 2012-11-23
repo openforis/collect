@@ -3,17 +3,19 @@
  */
 package org.openforis.collect.designer.viewmodel;
 
+import static org.openforis.collect.designer.model.LabelKeys.CONFIRM_LEAVE_PAGE_WITH_ERRORS;
 import static org.openforis.collect.designer.model.LabelKeys.EMPTY_OPTION;
+import static org.openforis.collect.designer.model.LabelKeys.ERRORS_IN_PAGE;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.openforis.collect.designer.converter.XMLStringDateConverter;
 import org.openforis.collect.designer.form.FormObject;
 import org.openforis.collect.designer.session.SessionStatus;
 import org.openforis.collect.designer.util.MessageUtil;
+import org.openforis.collect.designer.util.MessageUtil.ConfirmHandler;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.ModelVersion;
@@ -36,20 +38,20 @@ import org.zkoss.zkplus.databind.BindingListModelList;
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public abstract class SurveyBaseVM extends BaseVM {
 	
-	public static final String ERRORS_IN_PAGE_MESSAGE_KEY = "global.message.errors_in_page";
-	private static final String DATE_FORMAT = Labels.getLabel("global.date_format");
-
-	protected XMLStringDateConverter xmlStringDateConverter = new XMLStringDateConverter();
+	public static final String UNDO_LAST_CHANGES_GLOBAL_COMMAND = "undoLastChanges";
+	public static final String DATE_FORMAT = Labels.getLabel("global.date_format");
 	
 	@WireVariable
 	protected CollectSurvey survey;
 
 	protected String currentLanguageCode;
 	
+	private boolean currentFormBlocking;
 	private boolean currentFormValid;
 	
 	public SurveyBaseVM() {
 		currentFormValid = true;
+		currentFormBlocking = false;
 		initCurrentLanguageCode();
 	}
 
@@ -80,26 +82,60 @@ public abstract class SurveyBaseVM extends BaseVM {
 	public void tabSetsUpdated() {}
 	
 	@GlobalCommand
-	@NotifyChange("currentFormValid")
-	public void currentFormValidated(@BindingParam("valid") boolean valid) {
+	public void currentFormValidated(@BindingParam("valid") boolean valid, 
+			@BindingParam("blocking") Boolean blocking) {
 		currentFormValid = valid;
+		currentFormBlocking = blocking != null && blocking.booleanValue();
+		notifyChange("currentFormValid","currentFormBlocking");
+	}
+	
+	@GlobalCommand
+	public void undoLastChanges() {
+		dispatchCurrentFormValidatedCommand(true);
 	}
 	
 	public void dispatchCurrentFormValidatedCommand(boolean valid) {
+		dispatchCurrentFormValidatedCommand(valid, false);
+	}
+
+	public void dispatchCurrentFormValidatedCommand(boolean valid, boolean blocking) {
 		Map<String, Object> args = new HashMap<String, Object>();
 		args.put("valid", valid);
+		args.put("blocking", blocking);
 		BindUtils.postGlobalCommand(null, null, "currentFormValidated", args);
 	}
-	
-	public boolean checkCurrentFormValid() {
-		if ( currentFormValid ) {
-			return true;
-		} else {
-			MessageUtil.showWarning(ERRORS_IN_PAGE_MESSAGE_KEY);
-			return false;
-		}
+
+	public boolean checkCanLeaveForm() {
+		return checkCanLeaveForm(null);
 	}
 	
+	/**
+	 * If the current form is valid, execute the onOk method of the specified confirmHandler and returns true, 
+	 * otherwise shows a confirm message handled by the specified confirmHandler and returns false
+	 * If the form is not valid and the confirmHandler is not specified, shows a warning message.
+	 * 
+	 * @param confirmHandler
+	 * @return
+	 */
+	public boolean checkCanLeaveForm(ConfirmHandler confirmHandler) {
+		return checkCanLeaveForm(confirmHandler, CONFIRM_LEAVE_PAGE_WITH_ERRORS);
+	}
+	
+	public boolean checkCanLeaveForm(ConfirmHandler confirmHandler, String messageKey) {
+		if ( currentFormValid ) {
+			if (confirmHandler != null ) {
+				confirmHandler.onOk();
+			}
+		} else {
+			if ( confirmHandler == null || currentFormBlocking ) {
+				MessageUtil.showWarning(ERRORS_IN_PAGE);
+			} else {
+				MessageUtil.showConfirm(confirmHandler, messageKey);
+			}
+		}
+		return currentFormValid;
+	}
+
 	protected void initSurvey() {
 		if ( survey == null ) {
 			SessionStatus sessionStatus = getSessionStatus();
@@ -146,15 +182,20 @@ public abstract class SurveyBaseVM extends BaseVM {
 		if ( id > 0 ) {
 			CollectSurvey survey = getSurvey();
 			ModelVersion version = survey.getVersionById(id);
-			String result = version.getLabel(currentLanguageCode);
-			if ( result == null && isDefaultLanguage() ) {
-				result = version.getLabel(null);
+			String result = null;
+			if ( version != null ) {
+				result = version.getLabel(currentLanguageCode);
+				if ( result == null && isDefaultLanguage() ) {
+					result = version.getLabel(null);
+				}
+				if ( result == null ) {
+					result = version.getName();
+				}
 			}
 			return result;
 		} else {
 			return Labels.getLabel(EMPTY_OPTION);
 		}
-			
 	}
 	
 	public List<CodeList> getCodeLists() {
@@ -184,6 +225,10 @@ public abstract class SurveyBaseVM extends BaseVM {
 	
 	public boolean isCurrentFormValid() {
 		return currentFormValid;
+	}
+	
+	public boolean isCurrentFormBlocking() {
+		return currentFormBlocking;
 	}
 
 }

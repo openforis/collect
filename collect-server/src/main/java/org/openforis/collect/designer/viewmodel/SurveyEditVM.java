@@ -75,7 +75,7 @@ public class SurveyEditVM extends SurveyBaseVM {
 	
 	@Command
 	public void openLanguageManagerPopUp() {
-		if ( checkCurrentFormValid() ) {
+		if ( checkCanLeaveForm() ) {
 			selectLanguagePopUp = openPopUp(Resources.Component.SELECT_LANGUAGE_POP_UP.getLocation(), true);
 		}
 	}
@@ -91,17 +91,21 @@ public class SurveyEditVM extends SurveyBaseVM {
 	
 	@GlobalCommand
 	public void openSRSManagerPopUp() {
-		if ( checkCurrentFormValid() ) {
+		if ( checkCanLeaveForm() ) {
 			srsPopUp = openPopUp(Resources.Component.SRS_MANAGER_POP_UP.getLocation(), true);
 		}
 	}
 	
 	@GlobalCommand
 	public void closeSRSManagerPopUp() {
-		if ( checkCurrentFormValid() ) {
-			closePopUp(srsPopUp);
-			srsPopUp = null;
-		}
+		checkCanLeaveForm(new MessageUtil.ConfirmHandler() {
+			@Override
+			public void onOk() {
+				closePopUp(srsPopUp);
+				srsPopUp = null;
+				dispatchCurrentFormValidatedCommand(true);
+			}
+		});
 	}
 	
 	@GlobalCommand
@@ -114,9 +118,15 @@ public class SurveyEditVM extends SurveyBaseVM {
 
 	@GlobalCommand
 	public void closeCodeListsManagerPopUp(@ContextParam(ContextType.BINDER) Binder binder) {
-		if ( codeListsPopUp != null && checkCurrentFormValid() ) {
-			closePopUp(codeListsPopUp);
-			codeListsPopUp = null;
+		if ( codeListsPopUp != null ) {
+			checkCanLeaveForm(new MessageUtil.ConfirmHandler() {
+				@Override
+				public void onOk() {
+					closePopUp(codeListsPopUp);
+					codeListsPopUp = null;
+					dispatchCurrentFormValidatedCommand(true);
+				}
+			});
 		}
 	}
 	
@@ -130,9 +140,15 @@ public class SurveyEditVM extends SurveyBaseVM {
 	
 	@GlobalCommand
 	public void closeUnitsManagerPopUp(@ContextParam(ContextType.BINDER) Binder binder) {
-		if ( unitsPopUp != null && checkCurrentFormValid() ) {
-			closePopUp(unitsPopUp);
-			unitsPopUp = null;
+		if ( unitsPopUp != null ) {
+			checkCanLeaveForm(new MessageUtil.ConfirmHandler() {
+				@Override
+				public void onOk() {
+					closePopUp(unitsPopUp);
+					unitsPopUp = null;
+					dispatchCurrentFormValidatedCommand(true);
+				}
+			});
 		}
 	}	
 	
@@ -146,9 +162,15 @@ public class SurveyEditVM extends SurveyBaseVM {
 
 	@GlobalCommand
 	public void closeVersioningManagerPopUp() {
-		if ( versioningPopUp != null && checkCurrentFormValid() ) {
-			closePopUp(versioningPopUp);
-			versioningPopUp = null;
+		if ( versioningPopUp != null ) {
+			checkCanLeaveForm(new MessageUtil.ConfirmHandler() {
+				@Override
+				public void onOk() {
+					closePopUp(versioningPopUp);
+					versioningPopUp = null;
+					dispatchCurrentFormValidatedCommand(true);
+				}
+			});
 		}
 	}
 	
@@ -169,13 +191,16 @@ public class SurveyEditVM extends SurveyBaseVM {
 	
 	@Command
 	@NotifyChange({"currentLanguageCode"})
-	public void languageCodeSelected(@BindingParam("code") String selectedLanguageCode) {
-		SessionStatus sessionStatus = getSessionStatus();
-		if ( checkCurrentFormValid() ) {
-			sessionStatus.setCurrentLanguageCode(selectedLanguageCode);
-			BindUtils.postGlobalCommand(null, null, SurveyLocaleVM.CURRENT_LANGUAGE_CHANGED_COMMAND, null);
-		}
-		currentLanguageCode = sessionStatus.getCurrentLanguageCode();
+	public void languageCodeSelected(@BindingParam("code") final String selectedLanguageCode) {
+		final SessionStatus sessionStatus = getSessionStatus();
+		checkCanLeaveForm(new MessageUtil.ConfirmHandler() {
+			@Override
+			public void onOk() {
+				sessionStatus.setCurrentLanguageCode(selectedLanguageCode);
+				BindUtils.postGlobalCommand(null, null, SurveyLocaleVM.CURRENT_LANGUAGE_CHANGED_COMMAND, null);
+				currentLanguageCode = sessionStatus.getCurrentLanguageCode();
+			}
+		});
 	}
 	
 	@Command
@@ -188,7 +213,7 @@ public class SurveyEditVM extends SurveyBaseVM {
 	}
 	
 	protected boolean checkCanSave(boolean publishing) {
-		if ( checkCurrentFormValid() ) {
+		if ( checkCanLeaveForm() ) {
 			List<SurveyWorkSummary> surveySummaries = SurveyManagerUtil.getSurveySummaries(surveyManager);
 			for (SurveyWorkSummary surveySummary : surveySummaries) {
 				boolean notDuplicate = checkIsNotDuplicate(surveySummary, publishing);

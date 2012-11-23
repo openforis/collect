@@ -172,7 +172,7 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 	@Command
 	@NotifyChange({"itemsPerLevel"})
 	public void addItemInLevel(@BindingParam("levelIndex") int levelIndex) {
-		if ( checkCurrentFormValid() ) {
+		if ( checkCanLeaveForm() ) {
 			newChildItem = true;
 			editedChildItemLevel = levelIndex;
 			editedChildItem = editedItem.createItem();
@@ -308,10 +308,10 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 	
 	@GlobalCommand
 	@NotifyChange({"itemsPerLevel"})
-	public void closeCodeListItemPopUp() {
+	public void closeCodeListItemPopUp(@BindingParam("undoChanges") boolean undoChanges) {
 		closePopUp(codeListItemPopUp);
 		codeListItemPopUp = null;
-		if ( newChildItem ) {
+		if ( newChildItem && ! undoChanges ) {
 			addChildItemToCodeList();
 		}
 	}

@@ -10,7 +10,6 @@ import org.openforis.collect.designer.form.FormObject;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.MessageUtil.ConfirmHandler;
 import org.openforis.collect.model.CollectSurvey;
-import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.Binder;
 import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
@@ -44,10 +43,13 @@ public abstract class SurveyObjectBaseVM<T> extends SurveyBaseVM {
 	protected abstract List<T> getItemsInternal();
 
 	@Command
-	public void newItem(@ContextParam(ContextType.BINDER) Binder binder) {
-		if ( checkCurrentFormValid() ) {
-			performNewItemCreation(binder);
-		}
+	public void newItem(@ContextParam(ContextType.BINDER) final Binder binder) {
+		checkCanLeaveForm(new MessageUtil.ConfirmHandler() {
+			@Override
+			public void onOk() {
+				performNewItemCreation(binder);
+			}
+		});
 	}
 
 	protected void performNewItemCreation(Binder binder) {
@@ -91,21 +93,27 @@ public abstract class SurveyObjectBaseVM<T> extends SurveyBaseVM {
 	}
 	
 	@Command
-	public void selectionChanged(@BindingParam("selectedItem") T item) {
-		if ( checkCurrentFormValid() ) {
-			performItemSelection(item);
-		} else {
-			setSelectedItem(this.selectedItem);
-			BindUtils.postNotifyChange(null, null, this, "selectedItem");
-		}
-		changed = false;
+	public void selectionChanged(@BindingParam("selectedItem") final T item) {
+		checkCanLeaveForm(new MessageUtil.CompleteConfirmHandler() {
+			@Override
+			public void onOk() {
+				performItemSelection(item);
+			}
+			@Override
+			public void onCancel() {
+				setSelectedItem(selectedItem);
+				notifyChange("selectedItem");
+			}
+		});
 	}
 
 	protected void performItemSelection(T item) {
 		newItem = false;
+		changed = false;
 		setSelectedItem(item);
 		setEditedItem(item);
 		notifyChange("selectedItem","formObject","editedItem");
+		dispatchCurrentFormValidatedCommand(true);
 	}
 	
 	@Command
@@ -161,18 +169,11 @@ public abstract class SurveyObjectBaseVM<T> extends SurveyBaseVM {
 	
 	@Command
 	public void deleteItem(@BindingParam("item") final T item) {
-		boolean deleteEditedItem = item.equals(selectedItem);
-		if ( deleteEditedItem || checkCurrentFormValid() ) {
-			ConfirmHandler handler = new ConfirmHandler() {
-				@Override
-				public void onOk() {
-					performDeleteItem(item);
-				}
-			};
-			MessageUtil.showConfirm(handler, "global.item.confirm_remove");
-		} else {
-			//TODO show confirm cancel changes message
-		}
+		MessageUtil.showConfirm(new ConfirmHandler() {
+			@Override
+			public void onOk() {
+				performDeleteItem(item);
+			}}, "global.item.confirm_remove");
 	}
 
 	protected void performDeleteItem(T item) {

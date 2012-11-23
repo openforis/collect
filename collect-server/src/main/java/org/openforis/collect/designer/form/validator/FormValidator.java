@@ -1,14 +1,13 @@
 package org.openforis.collect.designer.form.validator;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.validator.routines.UrlValidator;
+import org.openforis.collect.designer.viewmodel.SurveyBaseVM;
 import org.zkoss.bind.BindContext;
-import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.Binder;
 import org.zkoss.bind.Property;
 import org.zkoss.bind.ValidationContext;
@@ -32,6 +31,8 @@ public abstract class FormValidator extends AbstractValidator {
 	protected static final String LESS_THAN_MESSAGE_KEY = "global.item.validation.less_than";
 	protected static final String LESS_THAN_EQUAL_MESSAGE_KEY = "global.item.validation.less_than_equal";
 	protected static final String ITEM_NAME_ALREADY_DEFINED_MESSAGE_KEY = "global.item.validation.name_already_defined";
+
+	protected boolean blocking;
 	
 	@Override
 	public void validate(ValidationContext ctx) {
@@ -40,9 +41,10 @@ public abstract class FormValidator extends AbstractValidator {
 	}
 	
 	protected void afterValidate(ValidationContext ctx) {
-		Map<String, Object> args = new HashMap<String, Object>();
-		args.put("valid", ctx.isValid());
-		BindUtils.postGlobalCommand(null, null, "currentFormValidated", args);
+		Object vm = getVM(ctx);
+		if ( vm instanceof SurveyBaseVM) {
+			((SurveyBaseVM) vm).dispatchCurrentFormValidatedCommand(ctx.isValid(), blocking);
+		}
 	}
 
 	protected abstract void internalValidate(ValidationContext ctx);
@@ -198,4 +200,8 @@ public abstract class FormValidator extends AbstractValidator {
 		return vmObject;
 	}
 
+	public boolean isBlocking() {
+		return blocking;
+	}
+	
 }

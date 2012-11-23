@@ -3,10 +3,13 @@
  */
 package org.openforis.collect.designer.viewmodel;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.openforis.collect.designer.form.CodeListItemFormObject;
 import org.openforis.collect.designer.form.FormObject;
+import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.idm.metamodel.CodeListItem;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.annotation.Command;
@@ -59,9 +62,14 @@ public class CodeListItemVM extends SurveyObjectBaseVM<CodeListItem> {
 
 	@Command
 	public void close() {
-		if ( checkCurrentFormValid() ) {
-			BindUtils.postGlobalCommand(null, null, CodeListsVM.CLOSE_CODE_LIST_ITEM_POP_UP_COMMAND, null);
-		}
+		checkCanLeaveForm(new MessageUtil.ConfirmHandler() {
+			@Override
+			public void onOk() {
+				Map<String, Object> args = new HashMap<String, Object>();
+				args.put("undoChanges", isCurrentFormValid());
+				BindUtils.postGlobalCommand(null, null, CodeListsVM.CLOSE_CODE_LIST_ITEM_POP_UP_COMMAND, args);
+			}
+		});
 	}
 	
 }

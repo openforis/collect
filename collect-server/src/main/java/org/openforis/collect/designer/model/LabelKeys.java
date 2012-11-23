@@ -8,6 +8,8 @@ package org.openforis.collect.designer.model;
 public interface LabelKeys {
 	
 	String EMPTY_OPTION = "global.empty_option";
+	String ERRORS_IN_PAGE = "global.message.errors_in_page";
+	String CONFIRM_LEAVE_PAGE_WITH_ERRORS = "global.confirm.leave_page_with_errors";
 	String RANK_PREFIX = "survey.schema.attribute.taxon.rank.";
 	String DUPLICATED_QUALIFIER = "survey.schema.attribute.taxon.duplicated_qualifier";
 	String NODE_MIN_COUNT = "survey.schema.node.min_count";

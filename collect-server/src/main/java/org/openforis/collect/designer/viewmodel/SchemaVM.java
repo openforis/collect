@@ -38,9 +38,6 @@ import org.zkoss.zk.ui.select.Selectors;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zul.Include;
-import org.zkoss.zul.Tree;
-import org.zkoss.zul.TreeNode;
-import org.zkoss.zul.Treeitem;
 
 /**
  * 
@@ -62,8 +59,6 @@ public class SchemaVM extends SurveyBaseVM {
 
 	@Wire
 	private Include nodeFormInclude;
-	@Wire
-	private Tree nodesTree;
 	
 	private SchemaTreeModel treeModel;
 
@@ -75,46 +70,68 @@ public class SchemaVM extends SurveyBaseVM {
 	
 	@Command
 	@NotifyChange({"selectedNode","editedNode"})
-	public void nodeSelected(@BindingParam("node") Treeitem node) {
+	public void nodeSelected(@BindingParam("node") final NodeDefinition node) {
 		if ( node != null ) {
-			TreeNode<NodeDefinition> treeNode = node.getValue();
-			selectedNode = treeNode.getData();
-			editedNode = selectedNode;
+			checkCanLeaveForm(new MessageUtil.CompleteConfirmHandler() {
+				@Override
+				public void onOk() {
+					performSelectNode(node);
+				}
+				@Override
+				public void onCancel() {
+					treeModel.select(selectedNode);
+				}
+			});
 		} else {
-			selectedNode = null;
-			editedNode = null;
-		}
-		newItem = false;
-		EntityDefinition parentDefinition = selectedNode == null ? null : (EntityDefinition) selectedNode.getParentDefinition();
-		refreshNodeForm(parentDefinition);
-	}
-	
-	@Command
-	public void addRootEntity(@ContextParam(ContextType.BINDER) Binder binder) {
-		if ( checkCurrentFormValid() ) {
-			EntityDefinition newNode = createRootEntityDefinition();
-			onAfterNodeCreated(binder, null, newNode);
+			performSelectNode(null);
 		}
 	}
 
-	@Command
-	public void addChildEntity(@ContextParam(ContextType.BINDER) Binder binder) {
-		if ( checkCurrentFormValid() ) {
-			EntityDefinition newNode = createEntityDefinition();
-			onAfterNodeCreated(binder, (EntityDefinition) selectedNode, newNode);
-		}
+	protected void performSelectNode(NodeDefinition node) {
+		selectedNode = node;
+		editedNode = selectedNode;
+		newItem = false;
+		EntityDefinition parentDefinition = selectedNode == null ? null : (EntityDefinition) selectedNode.getParentDefinition();
+		refreshNodeForm(parentDefinition);
+		validateForm();
 	}
 	
 	@Command
-	public void addAttribute(@ContextParam(ContextType.BINDER) Binder binder, @BindingParam("attributeType") String attributeType) throws Exception {
-		if ( checkCurrentFormValid() ) {
-			if ( selectedNode != null && selectedNode instanceof EntityDefinition ) {
-				AttributeType attributeTypeEnum = AttributeType.valueOf(attributeType);
-				AttributeDefinition newNode = (AttributeDefinition) NodeType.createNodeDefinition(survey, NodeType.ATTRIBUTE, attributeTypeEnum);
-				onAfterNodeCreated(binder, (EntityDefinition) selectedNode, newNode);
-			} else {
-				MessageUtil.showWarning("survey.schema.add_node.error.parent_entity_not_selected");
+	public void addRootEntity(@ContextParam(ContextType.BINDER) final Binder binder) {
+		checkCanLeaveForm(new MessageUtil.ConfirmHandler() {
+			@Override
+			public void onOk() {
+				EntityDefinition newNode = createRootEntityDefinition();
+				onAfterNodeCreated(binder, null, newNode);
 			}
+		});
+	}
+
+	@Command
+	public void addChildEntity(@ContextParam(ContextType.BINDER) final Binder binder) {
+		checkCanLeaveForm(new MessageUtil.ConfirmHandler() {
+			@Override
+			public void onOk() {
+				EntityDefinition newNode = createEntityDefinition();
+				onAfterNodeCreated(binder, (EntityDefinition) selectedNode, newNode);
+			}
+		});
+	}
+	
+	@Command
+	public void addAttribute(@ContextParam(ContextType.BINDER) final Binder binder, 
+			@BindingParam("attributeType") final String attributeType) throws Exception {
+		if ( selectedNode != null && selectedNode instanceof EntityDefinition ) {
+			checkCanLeaveForm(new MessageUtil.ConfirmHandler() {
+				@Override
+				public void onOk() {
+					AttributeType attributeTypeEnum = AttributeType.valueOf(attributeType);
+					AttributeDefinition newNode = (AttributeDefinition) NodeType.createNodeDefinition(survey, NodeType.ATTRIBUTE, attributeTypeEnum);
+					onAfterNodeCreated(binder, (EntityDefinition) selectedNode, newNode);
+				}
+			});
+		} else {
+			MessageUtil.showWarning("survey.schema.add_node.error.parent_entity_not_selected");
 		}
 	}
 
@@ -154,6 +171,8 @@ public class SchemaVM extends SurveyBaseVM {
 		if ( editedNode != null ) {
 			Binder binder = (Binder) nodeFormInclude.getAttribute("$BINDER$");
 			validateForm(binder);
+		} else {
+			dispatchCurrentFormValidatedCommand(true);
 		}
 	}
 		
@@ -253,21 +272,8 @@ public class SchemaVM extends SurveyBaseVM {
 		editedNode = null;
 		notifyChange("editedNode","selectedNode","nodes","moveNodeUpDisabled","moveNodeDownDisabled");
 		dispatchCurrentFormValidatedCommand(true);
-		updateTreeSelectionActivation();
 	}
 
-	@Override
-	@GlobalCommand
-	@NotifyChange("currentFormValid")
-	public void currentFormValidated(@BindingParam("valid") boolean valid) {
-		super.currentFormValidated(valid);
-		updateTreeSelectionActivation();
-	}
-
-	protected void updateTreeSelectionActivation() {
-		nodesTree.setNonselectableTags(isCurrentFormValid() ? "": "*");
-	}
-	
 	@GlobalCommand
 	@NotifyChange({"nodes","selectedNode","newItem"})
 	public void editedNodeChanged(@BindingParam("parentEntity") EntityDefinition parentEntity) {

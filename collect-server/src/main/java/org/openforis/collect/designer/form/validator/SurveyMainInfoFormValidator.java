@@ -14,6 +14,10 @@ public class SurveyMainInfoFormValidator extends FormValidator {
 	protected static final String PROJECT_FIELD = "projectName";
 	protected static final String DESCRIPTION_FIELD = "description";
 
+	public SurveyMainInfoFormValidator() {
+		blocking = true;
+	}
+	
 	@Override
 	protected void internalValidate(ValidationContext ctx) {
 		validateName(ctx);
