@@ -8,8 +8,8 @@
       otherAttributesForm="${otherAttributesForm}" />
     
     <groupbox width="100%" closable="false" class="tableFieldSet">
-      <caption label="${labels.survey.schema.attribute.default_values}"/>
-      <include src="survey_edit/schema/attribute_defaults_simple.zul" />
+      <caption label="${labels.survey.schema.attribute.attribute_default.heading}"/>
+      <include src="survey_edit/schema/attribute_defaults_list.zul" />
     </groupbox>
     
     <groupbox width="100%" closable="false" class="tableFieldSet">

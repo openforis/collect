@@ -26,8 +26,6 @@ import org.zkoss.bind.annotation.NotifyChange;
  */
 public class NumericAttributeVM extends AttributeVM<NumericAttributeDefinition> {
 
-	private static final String NUMBER_ATTRIBUTE_PRECISIONS_FIELD = "precisions";
-
 	protected List<PrecisionFormObject> numericAttributePrecisions;
 	protected PrecisionFormObject selectedPrecision;
 	
@@ -43,7 +41,6 @@ public class NumericAttributeVM extends AttributeVM<NumericAttributeDefinition> 
 		super.setEditedItem(editedItem);
 		if ( editedItem != null ) {
 			numericAttributePrecisions = ((NumericAttributeDefinitionFormObject<?>) formObject).getPrecisions();
-			tempFormObject.setField(NUMBER_ATTRIBUTE_PRECISIONS_FIELD, numericAttributePrecisions);
 		} else {
 			numericAttributePrecisions = null;
 		}
@@ -80,7 +77,6 @@ public class NumericAttributeVM extends AttributeVM<NumericAttributeDefinition> 
 	protected void initNumericAttributePrecisionsList() {
 		if ( numericAttributePrecisions == null ) {
 			numericAttributePrecisions = new ArrayList<PrecisionFormObject>();
-			tempFormObject.setField(NUMBER_ATTRIBUTE_PRECISIONS_FIELD, numericAttributePrecisions);
 			((NumericAttributeDefinitionFormObject<?>) formObject).setPrecisions(numericAttributePrecisions);
 		}
 	}

@@ -34,6 +34,11 @@ public abstract class SurveyObjectBaseVM<T> extends SurveyBaseVM {
 	protected T editedItem;
 	protected boolean changed;
 	protected FormObject<T> formObject;
+	private boolean commitChangesOnApply;
+	
+	public SurveyObjectBaseVM() {
+		commitChangesOnApply = true;
+	}
 	
 	public BindingListModelList<T> getItems() {
 		List<T> items = getItemsInternal();
@@ -82,6 +87,12 @@ public abstract class SurveyObjectBaseVM<T> extends SurveyBaseVM {
 
 	@Command
 	public void applyChanges() {
+		if ( commitChangesOnApply ) {
+			commitChanges();
+		}
+	}
+
+	protected void commitChanges() {
 		formObject.saveTo(editedItem, currentLanguageCode);
 		if ( newItem ) {
 			addNewItemToSurvey();
@@ -229,6 +240,14 @@ public abstract class SurveyObjectBaseVM<T> extends SurveyBaseVM {
 	
 	public boolean isChanged() {
 		return changed;
+	}
+
+	public boolean isCommitChangesOnApply() {
+		return commitChangesOnApply;
+	}
+
+	public void setCommitChangesOnApply(boolean commitChangesOnApply) {
+		this.commitChangesOnApply = commitChangesOnApply;
 	}
 	
 }
