@@ -21,6 +21,13 @@
             </fieldErrorHandler>
           </row>
           <row>
+            <label value="${labels.survey.project_name}:" />
+            <fieldErrorHandler message="@load(vmsgs['projectName'])">
+              <textbox width="150px" value="@bind(fx.projectName)"
+                onChange="@command('applyChanges')" />
+            </fieldErrorHandler>
+          </row>
+          <row>
             <label value="${labels.survey.project_cycle}:" />
             <fieldErrorHandler message="@load(vmsgs['projectCycle'])">
               <textbox width="150px" value="@bind(fx.projectCycle)"
@@ -41,13 +48,6 @@
               <textbox width="350px" value="@bind(fx.uri)"
                 onChange="@command('applyChanges')"
                 readonly="@load(fx.published)" />
-            </fieldErrorHandler>
-          </row>
-          <row>
-            <label value="${labels.survey.project_name}:" />
-            <fieldErrorHandler message="@load(vmsgs['projectName'])">
-              <textbox width="150px" value="@bind(fx.projectName)"
-                onChange="@command('applyChanges')" />
             </fieldErrorHandler>
           </row>
          </rows>
