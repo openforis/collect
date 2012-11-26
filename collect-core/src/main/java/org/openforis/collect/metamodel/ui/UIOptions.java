@@ -6,6 +6,7 @@ import static org.openforis.collect.metamodel.ui.UIOptionsConstants.UI_TYPE;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -203,18 +204,30 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		return tabSet;
 	}
 	
-	public List<UITab> getAssignableTabs(NodeDefinition nodeDefn) {
-		EntityDefinition parentEntity = (EntityDefinition) nodeDefn.getParentDefinition();
-		if ( parentEntity == null ) {
-			UITabSet rootTabSet = getAssignedRootTabSet((EntityDefinition) nodeDefn);
-			if ( rootTabSet != null ) {
-				return rootTabSet.getTabs();
-			} else {
-				return Collections.emptyList();
+	public List<UITab> getAssignableTabs(EntityDefinition parentEntity, NodeDefinition contextNode) {
+		boolean contextNodeIsMultipleEntity = contextNode instanceof EntityDefinition && contextNode.isMultiple();
+		Layout contextNodeLayout = contextNode instanceof EntityDefinition ? getLayout((EntityDefinition) contextNode): null;
+		int contextNodeId = contextNode.getId();
+		return getAssignableTabs(parentEntity, contextNodeIsMultipleEntity,
+				contextNodeLayout, contextNodeId);
+	}
+
+	public List<UITab> getAssignableTabs(EntityDefinition parentEntity,
+			boolean contextNodeIsMultipleEntity, Layout contextNodeLayout,
+			int contextNodeId) {
+		List<UITab> result = new ArrayList<UITab>(getTabsAssignableToChildren(parentEntity));
+		Iterator<UITab> it = result.iterator();
+		while (it.hasNext()) {
+			UITab tab = (UITab) it.next();
+			boolean mainTab = isMainTab(tab);
+			EntityDefinition associatedMultipleEntityForm = getFormLayoutMultipleEntity(tab);
+			if ( mainTab && contextNodeIsMultipleEntity && 
+					contextNodeLayout == Layout.FORM ||
+					associatedMultipleEntityForm != null && associatedMultipleEntityForm.getId() != contextNodeId ) {
+				it.remove();
 			}
-		} else {
-			return getTabsAssignableToChildren(parentEntity);
 		}
+		return result;
 	}
 	
 	public UITabSet getAssignedTabSet(EntityDefinition entityDefn) {
@@ -251,6 +264,11 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		return result;
 	}
 
+	
+	public boolean isAssociatedWithMultipleEntityForm(UITab tab) {
+		return getFormLayoutMultipleEntity(tab) != null;
+	}
+	
 	public List<NodeDefinition> getNodesPerTab(UITab tab, boolean includeDescendants) {
 		List<NodeDefinition> result = new ArrayList<NodeDefinition>();
 		UITabSet tabSet = tab.getRootTabSet();

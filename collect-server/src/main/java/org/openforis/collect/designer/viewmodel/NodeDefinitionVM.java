@@ -4,6 +4,7 @@
 package org.openforis.collect.designer.viewmodel;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -144,7 +145,7 @@ public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyO
 			UIOptions uiOptions = survey.getUIOptions();
 			List<Object> result = new ArrayList<Object>();
 			result.add(NodeDefinitionFormObject.INHERIT_TAB);
-			result.addAll(uiOptions.getAssignableTabs(editedItem));
+			result.addAll(uiOptions.getAssignableTabs(parentEntity, editedItem));
 			return result;
 		}
 	}
@@ -152,16 +153,12 @@ public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyO
 	public List<String> getAssignableTabNames() {
 		if ( editedItem == null ) {
 			return null;
+		} else if ( parentEntity == null ) {
+			return Collections.emptyList();
 		} else {
 			CollectSurvey survey = getSurvey();
 			UIOptions uiOptions = survey.getUIOptions();
-			List<UITab> assignableTabs;
-			if ( parentEntity != null ) {
-				assignableTabs = uiOptions.getTabsAssignableToChildren(parentEntity);
-			} else {
-				//edited item is root entity
-				assignableTabs = uiOptions.getTabsAssignableToChildren((EntityDefinition) editedItem);
-			}
+			List<UITab> assignableTabs = uiOptions.getAssignableTabs(parentEntity, editedItem);
 			List<String> result = new ArrayList<String>();
 			result.add(NodeDefinitionFormObject.INHERIT_TAB_NAME);
 			for (UITab uiTab : assignableTabs) {

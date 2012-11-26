@@ -7,9 +7,11 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.openforis.collect.metamodel.ui.UIOptions.Layout;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.CollectSurveyContext;
 import org.openforis.collect.model.validation.CollectValidator;
+import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Schema;
@@ -37,9 +39,32 @@ public class UIOptionsTest {
 		SurveyContext ctx = new CollectSurveyContext(new ExpressionFactory(), new CollectValidator(), null);
 		survey = (CollectSurvey) ctx.createSurvey();
 		schema = survey.getSchema();
+		populateSchema();
+		initUIOptions();
+	}
+	
+	protected void populateSchema() {
 		EntityDefinition cluster = schema.createEntityDefinition();
 		cluster.setName("cluster");
 		schema.addRootEntityDefinition(cluster);
+		CodeAttributeDefinition region = schema.createCodeAttributeDefinition();
+		region.setName("region");
+		cluster.addChildDefinition(region);
+		EntityDefinition plot = schema.createEntityDefinition();
+		plot.setMultiple(true);
+		plot.setName("plot");
+		cluster.addChildDefinition(plot);
+		EntityDefinition tree = schema.createEntityDefinition();
+		tree.setMultiple(true);
+		tree.setName("tree");
+		plot.addChildDefinition(tree);
+		EntityDefinition informant = schema.createEntityDefinition();
+		informant.setMultiple(true);
+		informant.setName("informant");
+		cluster.addChildDefinition(informant);
+	}
+	
+	protected void initUIOptions() {
 		uiOptions = survey.createUIOptions();
 		UITabSet clusterTabSet = uiOptions.createTabSet();
 		clusterTabSet.setName("cluster");
@@ -55,19 +80,20 @@ public class UIOptionsTest {
 		householdTabSet.setName("household");
 		addInnerTabs(householdTabSet, "hs_general", "hs_assets", "hs_foodsecurity");
 		uiOptions.addTabSet(householdTabSet);
+		UITab informantTab = clusterTabSet.getTab("informant");
 		survey.addApplicationOptions(uiOptions);
 		
-		EntityDefinition plot = schema.createEntityDefinition();
-		plot.setName("plot");
-		cluster.addChildDefinition(plot);
-		EntityDefinition tree = schema.createEntityDefinition();
-		tree.setName("tree");
-		plot.addChildDefinition(tree);
-		
+		EntityDefinition cluster = schema.getRootEntityDefinition("cluster");
 		uiOptions.assignToTabSet(cluster, clusterTabSet);
 		uiOptions.assignToTab(cluster, clusterTab);
+		EntityDefinition plot = (EntityDefinition) cluster.getChildDefinition("plot");
+		uiOptions.setLayout(plot, Layout.FORM);
 		uiOptions.assignToTab(plot, plotTab);
+		EntityDefinition tree = (EntityDefinition) plot.getChildDefinition("tree");
 		uiOptions.assignToTab(tree, treeTab);
+		EntityDefinition informant = (EntityDefinition) cluster.getChildDefinition("informant");
+		uiOptions.setLayout(informant, Layout.FORM);
+		uiOptions.assignToTab(informant, informantTab);
 	}
 	
 	protected void addInnerTabs(UITabSet tabSet, String... tabNames) {
@@ -121,11 +147,16 @@ public class UIOptionsTest {
 	@Test
 	public void testAssignableTabs() throws InvalidPathException {
 		EntityDefinition clusterDefn = schema.getRootEntityDefinition("cluster");
+		NodeDefinition region = clusterDefn.getChildDefinition("region");
+		List<UITab> regionAssignableTabs = uiOptions.getAssignableTabs(clusterDefn, region);
+		assertEquals(1, regionAssignableTabs.size());
+		assertEquals("cluster", regionAssignableTabs.get(0).getName());
 		EntityDefinition plotDefn = (EntityDefinition) clusterDefn.getChildDefinition("plot");
-		List<UITab> plotAssignableTabs = uiOptions.getAssignableTabs(plotDefn);
-		assertEquals(3, plotAssignableTabs.size());
+		List<UITab> plotAssignableTabs = uiOptions.getAssignableTabs(clusterDefn, plotDefn);
+		assertEquals(1, plotAssignableTabs.size());
+		assertEquals("plot", plotAssignableTabs.get(0).getName());
 		EntityDefinition treeDefn = (EntityDefinition) plotDefn.getChildDefinition("tree");
-		List<UITab> treeAssignableTabs = uiOptions.getAssignableTabs(treeDefn);
+		List<UITab> treeAssignableTabs = uiOptions.getAssignableTabs(plotDefn, treeDefn);
 		assertEquals(6, treeAssignableTabs.size());
 	}
 
@@ -142,7 +173,7 @@ public class UIOptionsTest {
 		UITab treeTab = plotTabs.get(2);
 		assertEquals("tree", treeTab.getName());
 		EntityDefinition treeDefn = (EntityDefinition) plotDefn.getChildDefinition("tree");
-		List<UITab> treeAssignableTabs = uiOptions.getAssignableTabs(treeDefn);
+		List<UITab> treeAssignableTabs = uiOptions.getAssignableTabs(plotDefn, treeDefn);
 		assertEquals(6, treeAssignableTabs.size());
 	}
 
