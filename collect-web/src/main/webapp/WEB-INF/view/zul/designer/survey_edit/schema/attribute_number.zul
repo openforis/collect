@@ -14,7 +14,7 @@
 
 		<include src="survey_edit/schema/attribute_common.zul" 
             otherGeneralDetailsForm="survey_edit/schema/attribute_number_other_general_form.zul"
-            otherAttributesForm="survey_edit/schema/attribute_number_other_attributes_form.zul" />
+            otherAttributesForm="survey_edit/schema/attribute_numeric_precisions_list.zul" />
 
 	</vlayout>
 </zk>

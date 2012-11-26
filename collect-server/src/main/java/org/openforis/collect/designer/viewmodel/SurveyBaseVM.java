@@ -19,6 +19,7 @@ import org.openforis.collect.designer.util.MessageUtil.ConfirmHandler;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.ModelVersion;
+import org.openforis.idm.metamodel.Precision;
 import org.openforis.idm.metamodel.Unit;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.annotation.BindingParam;
@@ -208,7 +209,23 @@ public abstract class SurveyBaseVM extends BaseVM {
 		List<Unit> result = new ArrayList<Unit>(survey.getUnits());
 		return new BindingListModelList<Unit>(result, false);
 	}
-
+	
+	public String getUnitLabelFromPrecision(Precision precision) {
+		Unit unit = precision.getUnit();
+		return getUnitLabel(unit);
+	}
+	
+	public String getUnitLabel(Unit unit) {
+		String result = null;
+		if ( unit != null ) {
+			result = unit.getLabel(currentLanguageCode);
+			if ( result == null ) {
+				result = unit.getName();
+			}
+		}
+		return result;
+	}
+	
 	public boolean isDefaultLanguage() {
 		CollectSurvey survey = getSurvey();
 		if ( survey != null ) {

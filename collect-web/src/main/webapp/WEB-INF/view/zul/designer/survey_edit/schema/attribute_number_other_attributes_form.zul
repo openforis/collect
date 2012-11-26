@@ -1,4 +1,0 @@
-<?component name="fieldErrorHandler" class="org.openforis.collect.designer.component.FieldErrorHandler"?>
-<zk>
-    <include src="survey_edit/schema/attribute_numeric_common_other_attributes_form.zul" />
-</zk>

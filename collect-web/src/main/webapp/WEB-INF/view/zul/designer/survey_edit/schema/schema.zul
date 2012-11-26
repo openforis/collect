@@ -10,6 +10,7 @@
 		 		<borderlayout>
 		 			<center>
 						<tree id="nodesTree"
+                            zclass="z-dottree"
 							width="100%" vflex="true"
 							model="@load(vm.nodes)"
                             context="nodesTreePopup"
@@ -49,15 +50,12 @@
       
         <menupopup id="nodesTreePopup">
           <menuitem label="${labels.survey.schema.add_entity}" 
-            image="/assets/images/add.png"
             onClick="@command('addRootEntity')" />
         </menupopup>
         <menupopup id="entityPopup">
           <menuitem label="${labels.survey.schema.add_child_entity}" 
-            image="/assets/images/add.png"
             onClick="@command('addChildEntity')" />
-           <menu label="${labels.survey.schema.add_attribute.label}"
-              image="/assets/images/add.png">
+           <menu label="${labels.survey.schema.add_attribute.label}">
               <menupopup>
                   <zk forEach="${vm.attributeTypeValues}">
                     <menuitem
@@ -68,12 +66,10 @@
        	  </menu>
           <menuseparator />
           <menuitem label="${labels.survey.schema.remove_node}" 
-              image="/assets/images/delete.png"
               onClick="@command('removeNode')" />
         </menupopup>
         <menupopup id="attributePopup">
           <menuitem label="${labels.survey.schema.remove_node}" 
-              image="/assets/images/delete.png"
               onClick="@command('removeNode')" />
         </menupopup>
     </div>

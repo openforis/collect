@@ -93,7 +93,7 @@ public abstract class AttributeVM<T extends AttributeDefinition> extends NodeDef
 	@GlobalCommand
 	public void currentLanguageChanged() {
 		super.currentLanguageChanged();
-		notifyChange("attributeDefaults","numericAttributePrecisions");
+		notifyChange("attributeDefaults","precisions");
 	}
 	
 	@Command
@@ -215,7 +215,6 @@ public abstract class AttributeVM<T extends AttributeDefinition> extends NodeDef
 	public void selectAttributeDefault(@BindingParam("attributeDefault") AttributeDefault attributeDefault) {
 		selectedAttributeDefault = attributeDefault;
 	}
-	
 
 	protected void openAttributeDefaultEditPopUp() {
 		Map<String, Object> args = new HashMap<String, Object>();
@@ -266,7 +265,6 @@ public abstract class AttributeVM<T extends AttributeDefinition> extends NodeDef
 		int indexFrom = getSelectedAttributeDefaultIndex();
 		int indexTo = up ? indexFrom - 1: indexFrom + 1;
 		moveSelectedAttributeDefault(indexTo);
-		initAttributeDefaults();
 	}
 	
 	protected int getSelectedAttributeDefaultIndex() {
@@ -277,6 +275,7 @@ public abstract class AttributeVM<T extends AttributeDefinition> extends NodeDef
 
 	protected void moveSelectedAttributeDefault(int indexTo) {
 		editedItem.moveAttributeDefault(selectedAttributeDefault, indexTo);
+		initAttributeDefaults();
 	}
 	
 	@DependsOn({"attributeDefaults","selectedAttributeDefault"})
