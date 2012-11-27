@@ -32,6 +32,7 @@ import org.zkoss.bind.annotation.ContextType;
 import org.zkoss.bind.annotation.DependsOn;
 import org.zkoss.bind.annotation.GlobalCommand;
 import org.zkoss.bind.annotation.NotifyChange;
+import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.IdSpace;
 import org.zkoss.zk.ui.Path;
@@ -69,6 +70,8 @@ public class SchemaVM extends SurveyBaseVM {
 	private Include nodeFormInclude;
 	
 	private SchemaTreeModel treeModel;
+
+	private EntityDefinition editedNodeParentEntity;
 
 	@AfterCompose
 	public void afterCompose(@ContextParam(ContextType.VIEW) Component view){
@@ -134,10 +137,17 @@ public class SchemaVM extends SurveyBaseVM {
 		checkCanLeaveForm(new MessageUtil.ConfirmHandler() {
 			@Override
 			public void onOk() {
+				resetNodeSelection();
 				EntityDefinition newNode = createRootEntityDefinition();
 				editNode(binder, true, null, newNode);
 			}
 		});
+	}
+
+	@Command
+	public void addEntity(@ContextParam(ContextType.BINDER) final Binder binder) {
+		resetNodeSelection();
+		addChildEntity(binder);
 	}
 
 	@Command
@@ -154,6 +164,13 @@ public class SchemaVM extends SurveyBaseVM {
 	
 	@Command
 	public void addAttribute(@ContextParam(ContextType.BINDER) final Binder binder, 
+			@BindingParam("attributeType") final String attributeType) throws Exception {
+		resetNodeSelection();
+		addChildAttribute(binder, attributeType);
+	}
+	
+	@Command
+	public void addChildAttribute(@ContextParam(ContextType.BINDER) final Binder binder, 
 			@BindingParam("attributeType") final String attributeType) throws Exception {
 		if ( selectedNode != null && selectedNode instanceof EntityDefinition ) {
 			checkCanLeaveForm(new MessageUtil.ConfirmHandler() {
@@ -179,10 +196,21 @@ public class SchemaVM extends SurveyBaseVM {
 	}
 
 	protected void resetEditingStatus() {
-		selectedNode = null;
+		resetNodeSelection();
 		editedNode = null;
-		resetTreeSelection();
 		notifyChange("selectedNode","editedNode");
+	}
+	
+	protected void resetNodeSelection() {
+		selectedNode = null;
+		notifyChange("selectedNode");
+		resetTreeSelection();
+	}
+	
+	protected void resetTreeSelection() {
+		if ( treeModel != null ) {
+			treeModel.deselect();
+		}
 	}
 	
 	@Override
@@ -201,6 +229,7 @@ public class SchemaVM extends SurveyBaseVM {
 		if ( selectedRootEntity == null ) {
 			MessageUtil.showWarning(ROOT_ENTITY_NOT_SELECTED);
 		} else {
+			resetNodeSelection();
 			editNode(binder, false, null, selectedRootEntity);
 		}
 	}
@@ -209,10 +238,10 @@ public class SchemaVM extends SurveyBaseVM {
 	
 	protected void editNode(Binder binder, boolean newNode, EntityDefinition parentEntity, NodeDefinition node) {
 		newItem = newNode;
+		editedNodeParentEntity = parentEntity;
 		editedNode = node;
 		if ( newNode ) {
-			selectedNode = null;
-			resetTreeSelection();
+			resetNodeSelection();
 		} else {
 			selectedNode = node;
 		}
@@ -221,12 +250,6 @@ public class SchemaVM extends SurveyBaseVM {
 		notifyChange("selectedNode","editedNode");
 	}
 
-	protected void resetTreeSelection() {
-		if ( treeModel != null ) {
-			treeModel.deselect();
-		}
-	}
-	
 	protected void refreshNodeForm(EntityDefinition parentEntity) {
 		nodeFormInclude.setSrc(null);
 		if ( editedNode != null ) {
@@ -356,7 +379,7 @@ public class SchemaVM extends SurveyBaseVM {
 		}
 		selectedNode = null;
 		editedNode = null;
-		notifyChange("editedNode","selectedNode","nodes","moveNodeUpDisabled","moveNodeDownDisabled");
+		notifyChange("editedNode","selectedNode","nodes");
 		dispatchCurrentFormValidatedCommand(true);
 	}
 
@@ -364,13 +387,19 @@ public class SchemaVM extends SurveyBaseVM {
 	@NotifyChange({"nodes","selectedNode","newItem"})
 	public void editedNodeChanged(@BindingParam("parentEntity") EntityDefinition parentEntity) {
 		if ( newItem ) {
-			if ( treeModel != null ) {
-				treeModel.select(parentEntity);
-				if ( parentEntity != null ) {
+			if ( parentEntity != null ) {
+				if ( treeModel != null ) {
+					if ( parentEntity.getParentDefinition() != null ) {
+						//is not root entity, the nodes tree will contain it
+						treeModel.select(parentEntity);
+					}
 					treeModel.appendNodeToSelected(editedNode);
 				}
+				selectedNode = editedNode;
+			} else {
+				selectedRootEntity = (EntityDefinition) editedNode;
+				initTreeModel();
 			}
-			selectedNode = editedNode;
 			newItem = false;
 		}
 		dispatchSchemaChangedCommand();
@@ -406,7 +435,7 @@ public class SchemaVM extends SurveyBaseVM {
 		if ( survey == null ) {
 			//TODO session expired...?
 		} else if ( survey.getVersions().size() == 0 || selectedVersion != null ) {
-			treeModel = SchemaTreeModel.createInstance(selectedRootEntity, selectedVersion, true);
+			treeModel = SchemaTreeModel.createInstance(selectedRootEntity, selectedVersion, false, true);
 		} else {
 			treeModel = null;
 		}
@@ -414,37 +443,6 @@ public class SchemaVM extends SurveyBaseVM {
 	
 	public boolean isEntity(NodeDefinition nodeDefn) {
 		return nodeDefn instanceof EntityDefinition;
-	}
-	
-	public List<String> getAttributeTypeValues() {
-		List<String> result = new ArrayList<String>();
-		AttributeType[] values = AttributeType.values();
-		for (AttributeType type : values) {
-			result.add(type.name());
-		}
-		return result;
-	}
-	
-	public String getAttributeTypeLabel(String typeValue) {
-		if ( StringUtils.isNotBlank(typeValue) ) {
-			AttributeType type = AttributeType.valueOf(typeValue);
-			return type.getLabel();
-		} else {
-			return null;
-		}
-	}
-	
-	public String getAttributeTypeLabelFromDefinition(AttributeDefinition attrDefn) {
-		if ( attrDefn != null ) {
-			AttributeType type = AttributeType.valueOf(attrDefn);
-			return type.getLabel();
-		} else {
-			return null;
-		}
-	}
-	
-	public String getAttributeInstanceLabel(AttributeDefinition attrDefn) {
-		return attrDefn.getLabel(Type.INSTANCE, currentLanguageCode);
 	}
 	
 	public List<NodeDefinition> getSiblings(NodeDefinition nodeDefinition) {
@@ -504,6 +502,99 @@ public class SchemaVM extends SurveyBaseVM {
 
 	protected boolean isMoveItemDisabled(List<?> siblings, int index, boolean up) {
 		return up ? index <= 0: index < 0 || index >= siblings.size() - 1;
+	}
+	
+	@DependsOn("editedNode")
+	public String getNodeTypeHeaderLabel() {
+		String result = null;
+		String nodeTypeStr = getNodeType();
+		String messageKey;
+		if ( nodeTypeStr != null ) {
+			NodeType nodeType = NodeType.valueOf(nodeTypeStr);
+			switch (nodeType) {
+			case ENTITY:
+				if ( newItem ) {
+					if ( editedNodeParentEntity == null ) {
+						messageKey = "survey.schema.node_detail_title.new_root_entity";
+					} else {
+						messageKey = "survey.schema.node_detail_title.new_entity";
+					}
+				} else if ( editedNodeParentEntity == null ) {
+					messageKey = "survey.schema.node_detail_title.root_entity";
+				} else {
+					messageKey = "survey.schema.node_detail_title.entity";
+				}
+				result = Labels.getLabel(messageKey);
+				break;
+			case ATTRIBUTE:
+				if ( newItem ) {
+					messageKey = "survey.schema.node_detail_title.new_attribute";
+				} else {
+					messageKey = "survey.schema.node_detail_title.attribute";
+				}
+				Object[] args = new String[]{getAttributeTypeLabel()};
+				result = Labels.getLabel(messageKey, args);
+				break;
+			}
+		}
+		return result;
+	}
+	
+	@DependsOn("editedNode")
+	public String getNodeType() {
+		if ( editedNode != null ) {
+			NodeType type = NodeType.valueOf(editedNode);
+			return type.name();
+		} else {
+			return null;
+		}
+	}
+
+	@DependsOn("editedNode")
+	public String getAttributeType() {
+		if ( editedNode != null && editedNode instanceof AttributeDefinition ) {
+			AttributeType type = AttributeType.valueOf((AttributeDefinition) editedNode);
+			return type.name();
+		} else {
+			return null;
+		}
+	}
+	
+	@DependsOn("editedNode")
+	public String getAttributeTypeLabel() {
+		String type = getAttributeType();
+		return getAttributeTypeLabel(type);
+	}
+
+	public String getAttributeTypeLabel(String typeValue) {
+		if ( StringUtils.isNotBlank(typeValue) ) {
+			AttributeType type = AttributeType.valueOf(typeValue);
+			return type.getLabel();
+		} else {
+			return null;
+		}
+	}
+	
+	public List<String> getAttributeTypeValues() {
+		List<String> result = new ArrayList<String>();
+		AttributeType[] values = AttributeType.values();
+		for (AttributeType type : values) {
+			result.add(type.name());
+		}
+		return result;
+	}
+	
+	public String getAttributeTypeLabelFromDefinition(AttributeDefinition attrDefn) {
+		if ( attrDefn != null ) {
+			AttributeType type = AttributeType.valueOf(attrDefn);
+			return type.getLabel();
+		} else {
+			return null;
+		}
+	}
+	
+	public String getAttributeInstanceLabel(AttributeDefinition attrDefn) {
+		return attrDefn.getLabel(Type.INSTANCE, currentLanguageCode);
 	}
 	
 	public NodeDefinition getSelectedNode() {

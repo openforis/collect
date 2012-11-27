@@ -231,24 +231,6 @@ public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyO
 		return getAttributeTypeLabel(type);
 	}
 
-	public String getNodeTypeHeaderLabel() {
-		String result = null;
-		String nodeTypeStr = getNodeType();
-		if ( nodeTypeStr != null ) {
-			NodeType nodeType = NodeType.valueOf(nodeTypeStr);
-			switch (nodeType) {
-			case ENTITY:
-				result = Labels.getLabel("survey.schema.entity.general_header");
-				break;
-			case ATTRIBUTE:
-				Object[] args = new String[]{getAttributeTypeLabel()};
-				result = Labels.getLabel("survey.schema.attribute.general_header", args);
-				break;
-			}
-		}
-		return result;
-	}
-	
 	public String getAttributeTypeLabel(String typeValue) {
 		if ( StringUtils.isNotBlank(typeValue) ) {
 			AttributeType type = AttributeType.valueOf(typeValue);

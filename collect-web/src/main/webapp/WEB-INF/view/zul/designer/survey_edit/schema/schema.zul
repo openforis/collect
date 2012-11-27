@@ -41,7 +41,7 @@
 		 			</south>
 			    </borderlayout>
 			</west>
-			<center title="${labels.survey.schema.node_detail_title}">
+			<center title="@load(vm.nodeTypeHeaderLabel)">
                 <vlayout hflex="true" vflex="true" 
                     style="overflow: auto; padding: 10px">
     				<include id="nodeFormInclude"
@@ -53,7 +53,16 @@
       
         <menupopup id="nodesTreePopup">
           <menuitem label="${labels.survey.schema.add_entity}" 
-            onClick="@command('addChildEntity')" />
+            onClick="@command('addEntity')" />
+          <menu label="${labels.survey.schema.add_attribute.label}">
+              <menupopup>
+                  <zk forEach="${vm.attributeTypeValues}">
+                    <menuitem
+                      label="${vm.getAttributeTypeLabel(each)}" value="${each}"
+                      onClick="@command('addAttribute', attributeType=self.value)" />
+                  </zk>
+              </menupopup>
+          </menu>
         </menupopup>
         <menupopup id="entityPopup">
           <menuitem label="${labels.survey.schema.add_child_entity}" 
@@ -63,7 +72,7 @@
                   <zk forEach="${vm.attributeTypeValues}">
                     <menuitem
                       label="${vm.getAttributeTypeLabel(each)}" value="${each}"
-                      onClick="@command('addAttribute', attributeType=self.value)" />
+                      onClick="@command('addChildAttribute', attributeType=self.value)" />
                   </zk>
               </menupopup>
        	  </menu>

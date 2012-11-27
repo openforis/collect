@@ -6,7 +6,7 @@
   <custom-attributes otherAttributesForm="${arg.otherAttributesForm}"/>
   
   <groupbox width="100%" closable="false">
-    <caption label="${vm.nodeTypeHeaderLabel}"/>
+    <caption label="${labels.survey.schema.node.general}"/>
     <grid class="inner">
       <columns>
         <column width="150px" />
