@@ -7,7 +7,7 @@
             <north>
              <include src="survey_edit/schema/nodes_tree_filter.zul" canEditRootEntities="true" />
             </north>
-		 	<west title="${labels.survey.schema.entities_title}"
+		 	<west title="${labels.survey.schema.definitions}"
 		 		width="350px"
 		 		splittable="true">
 		 		<borderlayout>
