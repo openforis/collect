@@ -88,6 +88,9 @@ package org.openforis.collect.presenter {
 			_view.header.visible = _view.header.includeInLayout = !preview;
 			_view.submitButton.visible = _view.submitButton.includeInLayout = canSubmit;
 			_view.rejectButton.visible = _view.rejectButton.includeInLayout = canReject;
+			if ( canReject ) {
+				_view.rejectButton.label = step == CollectRecord$Step.ANALYSIS ? Message.get("edit.unlock"): Message.get("edit.reject");
+			}
 			_view.saveButton.visible = canSave;
 			
 			var rootEntityDefn:EntityDefinitionProxy = Application.activeRootEntity;
