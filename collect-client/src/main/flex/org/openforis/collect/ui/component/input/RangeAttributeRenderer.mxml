@@ -21,7 +21,7 @@
 			
 			protected function unitLabelFunction(item:Object):String {
 				if(item is UnitProxy) {
-					return UnitProxy(item).name;
+					return UnitProxy(item).getAbbreviation();
 				} else {
 					return item.shortLabel;
 				}
@@ -29,7 +29,7 @@
 			
 			protected function unitDropDownLabelFunction(item:Object):String {
 				if(item is UnitProxy) {
-					return UnitProxy(item).name;
+					return UnitProxy(item).getAbbreviation();
 				} else {
 					return item.label;
 				}

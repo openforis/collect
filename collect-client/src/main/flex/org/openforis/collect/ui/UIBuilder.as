@@ -279,7 +279,7 @@ package org.openforis.collect.ui {
 					result += gap + unitDropDownWidth;
 				} else if ( units.length == 1 && def.parentLayout == UIUtil.LAYOUT_FORM ) {
 					var unit:UnitProxy = units.getItemAt(0) as UnitProxy;
-					var unitWidth:Number = UIUtil.measureUnitWidth(unit.name);
+					var unitWidth:Number = UIUtil.measureUnitWidth(unit.getAbbreviation());
 					result += gap + unitWidth;
 				}
 				return result;
@@ -485,7 +485,7 @@ package org.openforis.collect.ui {
 				} else {
 					defaultUnit = RangeAttributeDefinitionProxy(defn).defaultUnit;
 				}
-				var labStr:String = defn.getLabelText() + " (" + defaultUnit.name + ")";
+				var labStr:String = defn.getLabelText() + " (" + defaultUnit.getAbbreviation() + ")";
 				l = getLabel(labStr, width, "bold");
 				result.addElement(l);
 			} else {

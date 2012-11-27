@@ -15,5 +15,13 @@ package org.openforis.collect.metamodel.proxy {
 			return LanguageSpecificTextProxy.getLocalizedText(labels, language);
 		}
 		
+		public function getAbbreviation(language:String = null):String {
+			var result:String = LanguageSpecificTextProxy.getLocalizedText(abbreviations, language);
+			if ( result == null ) {
+				result = name;
+			}
+			return result;
+		}
+		
     }
 }

@@ -100,7 +100,7 @@ package org.openforis.collect.presenter {
 					if ( view.attributeDefinition.parentLayout == UIUtil.LAYOUT_FORM ) {
 						view.currentState = NumericAttributeRenderer.SINGLE_UNIT_STATE;
 						var unit:UnitProxy = UnitProxy(units.getItemAt(0));
-						view.unitLabel.text = unit.name;
+						view.unitLabel.text = unit.getAbbreviation();
 					} else {
 						view.currentState = NumericAttributeRenderer.NO_UNIT_STATE;
 					}
