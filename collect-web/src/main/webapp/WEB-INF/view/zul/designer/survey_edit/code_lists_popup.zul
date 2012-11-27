@@ -41,8 +41,9 @@
 									disabled="@load(vm.moveSelectedItemDownDisabled)" 
 						        	onClick="@command('moveSelectedItemDown')" />
                             <toolbarbutton label="${labels.global.delete_item}"
-                                      disabled="@load(empty vm.selectedItem)" 
-                                      onClick="@command('deleteItem', item=vm.selectedItem)" />
+                                    image="/assets/images/delete.png"
+                                    disabled="@load(empty vm.selectedItem)" 
+                                    onClick="@command('deleteItem', item=vm.selectedItem)" />
 				        </toolbar>
 					</south>
 			    </borderlayout>
@@ -99,7 +100,7 @@
                     			<row>
                     				<label value="${labels.global.item.since_version}:" />
                     				<fieldErrorHandler message="@load(vmsgs['sinceVersionId'])">
-                                    	<listbox width="150px" model="@load(vm.versionIdsForCombo)"
+                                    	<listbox width="200px" model="@load(vm.formVersionIdsWithEmptyOption)"
                     						selectedItem="@bind(fx.sinceVersionId)" mold="select"
                     						onSelect="@command('applyChanges')">
                     						<template name="model">
@@ -114,7 +115,7 @@
                     			<row>
                     				<label value="${labels.global.item.deprecated_version}:" />
                     				<fieldErrorHandler message="@load(vmsgs['deprecatedVersionId'])">
-                                    	<listbox width="150px" model="@load(vm.versionIdsForCombo)"
+                                    	<listbox width="200px" model="@load(vm.formVersionIdsWithEmptyOption)"
                     						selectedItem="@bind(fx.deprecatedVersionId)" mold="select"
                     						onSelect="@command('applyChanges')">
                     						<template name="model">

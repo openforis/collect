@@ -33,6 +33,17 @@ public class SchemaTreeModel extends AbstractTreeModel<NodeDefinition> {
 		return createInstance(survey, null, includeAttributes);
 	}
 	
+	public static SchemaTreeModel createInstance(EntityDefinition rootEntity, ModelVersion version, boolean includeAttributes) {
+		if ( rootEntity != null && (version == null || version.isApplicable(rootEntity)) ) {
+			List<AbstractTreeNode<NodeDefinition>> treeNodes = NodeDefinitionTreeNode.fromList(rootEntity.getChildDefinitions(), version, includeAttributes);
+			NodeDefinitionTreeNode root = new NodeDefinitionTreeNode(null, treeNodes);
+			SchemaTreeModel result = new SchemaTreeModel(root, version, includeAttributes);
+			return result;
+		} else {
+			return null;
+		}
+	}
+	
 	public static SchemaTreeModel createInstance(CollectSurvey survey, ModelVersion version, boolean includeAttributes) {
 		Schema schema = survey.getSchema();
 		List<EntityDefinition> rootDefns = schema.getRootEntityDefinitions();

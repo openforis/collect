@@ -15,7 +15,6 @@ import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.NodeDefinition;
-import org.openforis.idm.metamodel.Schema;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
@@ -269,18 +268,6 @@ public class SchemaLayoutSimpleVM extends SurveyBaseVM {
 		}
 	}
 
-	public List<EntityDefinition> getRootEntities() {
-		CollectSurvey survey = getSurvey();
-		if ( survey == null ) {
-			//TODO session expired...?
-			return null;
-		} else {
-			Schema schema = survey.getSchema();
-			List<EntityDefinition> result = schema.getRootEntityDefinitions();
-			return result;
-		}
-	}
-	
 	public List<ModelVersion> getFormVersions() {
 		CollectSurvey survey = getSurvey();
 		if ( survey == null ) {

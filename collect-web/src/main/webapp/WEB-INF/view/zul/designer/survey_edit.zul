@@ -75,9 +75,6 @@
 				<east border="none" size="40%">
                     <box width="100%" align="right">
                         <hbox>
-                            <button label="${labels.survey.preview.show_preview}" 
-                              onClick="@command('openPreviewPreferencesPopUp')" />
-    						<separator width="40px" />
     						<button label="${labels.survey.export}"
     							onClick="@global-command('exportSurvey')" />
                             <separator width="40px" />

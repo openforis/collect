@@ -4,6 +4,9 @@
 		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SchemaVM')"
 		width="100%" height="100%">
 		<borderlayout>
+            <north>
+             <include src="survey_edit/schema/nodes_tree_filter.zul" canEditRootEntities="true" />
+            </north>
 		 	<west title="${labels.survey.schema.entities_title}"
 		 		width="350px"
 		 		splittable="true">
@@ -50,7 +53,7 @@
       
         <menupopup id="nodesTreePopup">
           <menuitem label="${labels.survey.schema.add_entity}" 
-            onClick="@command('addRootEntity')" />
+            onClick="@command('addChildEntity')" />
         </menupopup>
         <menupopup id="entityPopup">
           <menuitem label="${labels.survey.schema.add_child_entity}" 

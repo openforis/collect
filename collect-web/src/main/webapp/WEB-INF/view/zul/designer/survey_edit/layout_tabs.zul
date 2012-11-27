@@ -5,38 +5,12 @@
 		width="100%" height="100%">
  	
  		<borderlayout hflex="true" vflex="true">
-            <north border="none">
-              <grid>
-                <columns>
-                  <column width="100px" />
-                  <column width="100%" />
-                </columns>
-                <rows>
-                  <row>
-                    <label value="${labels.survey.layout.form_version}:" />
-                    <listbox width="150px" model="@load(vm.formVersions)"
-                      selectedItem="@load(vm.selectedVersion)" mold="select"
-                      onSelect="@command('versionSelected', version=self.selectedItem.value)">
-                      <template name="model">
-                        <listitem label="@load(each.name)" />
-                      </template>
-                    </listbox>
-                  </row>
-                  <row>
-  				    <label value="${labels.survey.layout.root_entity}:" />
-      				<listbox width="150px" model="@load(vm.rootEntities)"
-      					selectedItem="@load(vm.selectedRootEntity)" mold="select"
-      					onSelect="@command('rootEntitySelected', rootEntity=self.selectedItem.value)">
-      					<template name="model">
-      						<listitem label="@load(each.name)" />
-      					</template>
-      				</listbox>
-                  </row>
-                </rows>
-              </grid>
+           <north>
+             <include src="survey_edit/schema/nodes_tree_filter.zul" canEditRootEntities="false" />
             </north>
             <center border="none">
     			<tree id="tabsTree"
+                    zclass="z-dottree"
                     context="treeContextMenu"
     				width="100%" vflex="true"
     				model="@load(vm.treeModel)"

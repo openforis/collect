@@ -18,6 +18,7 @@ import org.openforis.collect.metamodel.ui.UITabSet;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
+import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NodeLabel.Type;
 import org.openforis.idm.metamodel.Schema;
@@ -47,6 +48,8 @@ import org.zkoss.zul.Include;
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class SchemaVM extends SurveyBaseVM {
 
+	private static final String ROOT_ENTITY_NOT_SELECTED = "survey.schema.edit_root_entity.not_selected";
+
 	private static final String SCHEMA_CHANGED_GLOBAL_COMMAND = "schemaChanged";
 	
 	private static final String CONFIRM_REMOVE_NODE_MESSAGE_KEY = "survey.schema.confirm_remove_node";
@@ -59,6 +62,9 @@ public class SchemaVM extends SurveyBaseVM {
 	private NodeDefinition editedNode;
 	private boolean newItem;
 
+	private EntityDefinition selectedRootEntity;
+	private ModelVersion selectedVersion;
+	
 	@Wire
 	private Include nodeFormInclude;
 	
@@ -72,12 +78,12 @@ public class SchemaVM extends SurveyBaseVM {
 	
 	@Command
 	@NotifyChange({"selectedNode","editedNode"})
-	public void nodeSelected(@BindingParam("node") final NodeDefinition node) {
+	public void nodeSelected(@ContextParam(ContextType.BINDER) final Binder binder, @BindingParam("node") final NodeDefinition node) {
 		if ( node != null ) {
 			checkCanLeaveForm(new MessageUtil.CompleteConfirmHandler() {
 				@Override
 				public void onOk() {
-					performSelectNode(node);
+					performSelectNode(binder, node);
 				}
 				@Override
 				public void onCancel() {
@@ -85,26 +91,51 @@ public class SchemaVM extends SurveyBaseVM {
 				}
 			});
 		} else {
-			performSelectNode(null);
+			resetEditingStatus();
 		}
 	}
 
-	protected void performSelectNode(NodeDefinition node) {
-		selectedNode = node;
-		editedNode = selectedNode;
-		newItem = false;
-		EntityDefinition parentDefinition = selectedNode == null ? null : (EntityDefinition) selectedNode.getParentDefinition();
-		refreshNodeForm(parentDefinition);
-		validateForm();
+	@Command
+	public void rootEntitySelected(@BindingParam("rootEntity") final EntityDefinition rootEntity) {
+		nodesTreeFilterChanged(rootEntity, selectedVersion);
 	}
 	
+	@Command
+	@NotifyChange({"selectedNode","nodes","selectedVersion"})
+	public void versionSelected(@BindingParam("version") ModelVersion version) {
+		nodesTreeFilterChanged(selectedRootEntity, version);
+	}
+	
+	protected void nodesTreeFilterChanged(final EntityDefinition rootEntity, final ModelVersion version) {
+		if(checkCanLeaveForm(new MessageUtil.CompleteConfirmHandler() {
+			@Override
+			public void onOk() {
+				selectedRootEntity = rootEntity;
+				selectedVersion = version;
+				resetEditingStatus();
+				initTreeModel();
+				dispatchCurrentFormValidatedCommand(true, isCurrentFormBlocking());
+				notifyChange("selectedNode","nodes","selectedRootEntity","selectedVersion");
+			}
+			@Override
+			public void onCancel() {
+				notifyChange("selectedRootEntity","selectedVersion");
+			}
+		}));
+	}
+
+	protected void performSelectNode(Binder binder, NodeDefinition node) {
+		selectedNode = node;
+		editNode(binder, false, selectedNode == null ? null : (EntityDefinition) selectedNode.getParentDefinition(), node);
+	}
+
 	@Command
 	public void addRootEntity(@ContextParam(ContextType.BINDER) final Binder binder) {
 		checkCanLeaveForm(new MessageUtil.ConfirmHandler() {
 			@Override
 			public void onOk() {
 				EntityDefinition newNode = createRootEntityDefinition();
-				onAfterNodeCreated(binder, null, newNode);
+				editNode(binder, true, null, newNode);
 			}
 		});
 	}
@@ -115,7 +146,8 @@ public class SchemaVM extends SurveyBaseVM {
 			@Override
 			public void onOk() {
 				EntityDefinition newNode = createEntityDefinition();
-				onAfterNodeCreated(binder, (EntityDefinition) selectedNode, newNode);
+				EntityDefinition parentEntity = (EntityDefinition) (selectedNode != null ? selectedNode: selectedRootEntity);
+				editNode(binder, true, parentEntity, newNode);
 			}
 		});
 	}
@@ -129,7 +161,7 @@ public class SchemaVM extends SurveyBaseVM {
 				public void onOk() {
 					AttributeType attributeTypeEnum = AttributeType.valueOf(attributeType);
 					AttributeDefinition newNode = (AttributeDefinition) NodeType.createNodeDefinition(survey, NodeType.ATTRIBUTE, attributeTypeEnum);
-					onAfterNodeCreated(binder, (EntityDefinition) selectedNode, newNode);
+					editNode(binder, true, (EntityDefinition) selectedNode, newNode);
 				}
 			});
 		} else {
@@ -141,23 +173,58 @@ public class SchemaVM extends SurveyBaseVM {
 	@GlobalCommand
 	public void undoLastChanges() {
 		if ( ! isCurrentFormValid() && editedNode != null ) {
-			performSelectNode(null);
-			treeModel.deselect();
+			resetEditingStatus();
 			notifyChange("selectedNode","editedNode");
 		}
 	}
-	
-	protected void onAfterNodeCreated(Binder binder, EntityDefinition parentEntity, NodeDefinition newNode) {
-		newItem = true;
-		editedNode = newNode;
-		selectedNode = null;
-		treeModel.deselect();
-		
-		refreshNodeForm(parentEntity);
-		
-		notifyChange("nodes","selectedNode","editedNode");
 
+	protected void resetEditingStatus() {
+		selectedNode = null;
+		editedNode = null;
+		resetTreeSelection();
+		notifyChange("selectedNode","editedNode");
+	}
+	
+	@Override
+	@GlobalCommand
+	public void versionsUpdated() {
+		super.versionsUpdated();
+		if ( selectedVersion != null && ! survey.getVersions().contains(selectedVersion) ) {
+			selectedVersion = null;
+			initTreeModel();
+			notifyChange("nodes","selectedVersion");
+		}
+	}
+	
+	@Command
+	public void editRootEntity(@ContextParam(ContextType.BINDER) Binder binder) {
+		if ( selectedRootEntity == null ) {
+			MessageUtil.showWarning(ROOT_ENTITY_NOT_SELECTED);
+		} else {
+			editNode(binder, false, null, selectedRootEntity);
+		}
+	}
+	
+	
+	
+	protected void editNode(Binder binder, boolean newNode, EntityDefinition parentEntity, NodeDefinition node) {
+		newItem = newNode;
+		editedNode = node;
+		if ( newNode ) {
+			selectedNode = null;
+			resetTreeSelection();
+		} else {
+			selectedNode = node;
+		}
+		refreshNodeForm(parentEntity);
 		validateForm(binder);
+		notifyChange("selectedNode","editedNode");
+	}
+
+	protected void resetTreeSelection() {
+		if ( treeModel != null ) {
+			treeModel.deselect();
+		}
 	}
 	
 	protected void refreshNodeForm(EntityDefinition parentEntity) {
@@ -196,6 +263,11 @@ public class SchemaVM extends SurveyBaseVM {
 		formComponentBinder.postCommand(VALIDATE_COMMAND, null);
 	}
 
+	@Command
+	public void removeRootEntity() {
+		removeNode(selectedRootEntity);
+	}
+	
 	@Command
 	public void removeNode() {
 		removeNode(selectedNode);
@@ -279,7 +351,9 @@ public class SchemaVM extends SurveyBaseVM {
 			String nodeName = nodeDefn.getName();
 			schema.removeRootEntityDefinition(nodeName);
 		}
-		treeModel.removeSelectedNode();
+		if ( treeModel != null ) {
+			treeModel.removeSelectedNode();
+		}
 		selectedNode = null;
 		editedNode = null;
 		notifyChange("editedNode","selectedNode","nodes","moveNodeUpDisabled","moveNodeDownDisabled");
@@ -290,8 +364,12 @@ public class SchemaVM extends SurveyBaseVM {
 	@NotifyChange({"nodes","selectedNode","newItem"})
 	public void editedNodeChanged(@BindingParam("parentEntity") EntityDefinition parentEntity) {
 		if ( newItem ) {
-			treeModel.select(parentEntity);
-			treeModel.appendNodeToSelected(editedNode);
+			if ( treeModel != null ) {
+				treeModel.select(parentEntity);
+				if ( parentEntity != null ) {
+					treeModel.appendNodeToSelected(editedNode);
+				}
+			}
 			selectedNode = editedNode;
 			newItem = false;
 		}
@@ -318,15 +396,21 @@ public class SchemaVM extends SurveyBaseVM {
 	
 	public SchemaTreeModel getNodes() {
 		if ( treeModel == null ) {
-			CollectSurvey survey = getSurvey();
-			if ( survey == null ) {
-				//TODO session expired...?
-			} else {
-				treeModel = SchemaTreeModel.createInstance(survey, true);
-			}
+			initTreeModel();
 		}
 		return treeModel;
     }
+
+	protected void initTreeModel() {
+		CollectSurvey survey = getSurvey();
+		if ( survey == null ) {
+			//TODO session expired...?
+		} else if ( survey.getVersions().size() == 0 || selectedVersion != null ) {
+			treeModel = SchemaTreeModel.createInstance(selectedRootEntity, selectedVersion, true);
+		} else {
+			treeModel = null;
+		}
+	}
 	
 	public boolean isEntity(NodeDefinition nodeDefn) {
 		return nodeDefn instanceof EntityDefinition;
@@ -437,6 +521,14 @@ public class SchemaVM extends SurveyBaseVM {
 
 	public boolean isNewNode() {
 		return newItem;
+	}
+
+	public EntityDefinition getSelectedRootEntity() {
+		return selectedRootEntity;
+	}
+
+	public ModelVersion getSelectedVersion() {
+		return selectedVersion;
 	}
 
 }

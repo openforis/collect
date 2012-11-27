@@ -91,7 +91,7 @@
 							<row>
 								<label value="${labels.survey.unit.conversionFactor}:" />
                                 <fieldErrorHandler message="@load(vmsgs['conversionFactor'])">
-									<decimalbox width="150px" value="@bind(fx.conversionFactor)" onChange="@command('applyChanges')" />
+									<doublebox width="150px" value="@bind(fx.conversionFactor)" onChange="@command('applyChanges')" />
                                 </fieldErrorHandler>
 							</row>
 						</rows>

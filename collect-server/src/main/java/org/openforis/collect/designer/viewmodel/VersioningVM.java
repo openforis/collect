@@ -22,8 +22,6 @@ import org.zkoss.zk.ui.select.annotation.VariableResolver;
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class VersioningVM extends SurveyObjectBaseVM<ModelVersion> {
 	
-	private static final String VERSIONS_UPDATED_GLOBAL_COMMAND = "versionsUpdated";
-
 	@Override
 	protected List<ModelVersion> getItemsInternal() {
 		CollectSurvey survey = getSurvey();

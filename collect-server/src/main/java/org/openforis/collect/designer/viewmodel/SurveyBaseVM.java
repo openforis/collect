@@ -18,8 +18,10 @@ import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.MessageUtil.ConfirmHandler;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.CodeList;
+import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.Precision;
+import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.Unit;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.annotation.BindingParam;
@@ -39,7 +41,9 @@ import org.zkoss.zkplus.databind.BindingListModelList;
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public abstract class SurveyBaseVM extends BaseVM {
 	
+	public static final String VERSIONS_UPDATED_GLOBAL_COMMAND = "versionsUpdated";
 	public static final String UNDO_LAST_CHANGES_GLOBAL_COMMAND = "undoLastChanges";
+	
 	public static final String DATE_FORMAT = Labels.getLabel("global.date_format");
 	
 	@WireVariable
@@ -67,20 +71,29 @@ public abstract class SurveyBaseVM extends BaseVM {
 	}
 	
 	@GlobalCommand
-	@NotifyChange({"versionsForCombo", "versionIdsForCombo"})
-	public void versionsUpdated() {}
+	public void schemaChanged() {
+		notifyChange("rootEntities");
+	}
+	
+	@GlobalCommand
+	public void versionsUpdated() {
+		notifyChange("formVersions","formVersionsWithEmptyOption","formVersionIdsWithEmptyOption");
+	}
 
 	@GlobalCommand
-	@NotifyChange("codeLists")
-	public void codeListsUpdated() {}
+	public void codeListsUpdated() {
+		notifyChange("codeLists");
+	}
 	
 	@GlobalCommand
-	@NotifyChange("units")
-	public void unitsUpdated() {}
+	public void unitsUpdated() {
+		notifyChange("units");
+	}
 	
 	@GlobalCommand
-	@NotifyChange("tabSets")
-	public void tabSetsUpdated() {}
+	public void tabSetsUpdated() {
+		notifyChange("tabSets");
+	}
 	
 	@GlobalCommand
 	public void currentFormValidated(@BindingParam("valid") boolean valid, 
@@ -161,14 +174,25 @@ public abstract class SurveyBaseVM extends BaseVM {
 		return DATE_FORMAT;
 	}
 
-	public List<Object> getVersionsForCombo() {
+	public List<ModelVersion> getFormVersions() {
+		CollectSurvey survey = getSurvey();
+		if ( survey == null ) {
+			//TODO session expired...?
+			return null;
+		} else {
+			List<ModelVersion> result = new ArrayList<ModelVersion>(survey.getVersions());
+			return new BindingListModelList<ModelVersion>(result, false);
+		}
+	}
+
+	public List<Object> getFormVersionsWithEmptyOption() {
 		CollectSurvey survey = getSurvey();
 		List<Object> result = new ArrayList<Object>(survey.getVersions());
 		result.add(0, FormObject.VERSION_EMPTY_SELECTION);
 		return new BindingListModelList<Object>(result, false);
 	}
 	
-	public List<Integer> getVersionIdsForCombo() {
+	public List<Integer> getFormVersionIdsWithEmptyOption() {
 		CollectSurvey survey = getSurvey();
 		List<ModelVersion> versions = survey.getVersions();
 		List<Integer> result = new ArrayList<Integer>();
@@ -196,6 +220,18 @@ public abstract class SurveyBaseVM extends BaseVM {
 			return result;
 		} else {
 			return Labels.getLabel(EMPTY_OPTION);
+		}
+	}
+	
+	public List<EntityDefinition> getRootEntities() {
+		CollectSurvey survey = getSurvey();
+		if ( survey == null ) {
+			//TODO session expired...?
+			return null;
+		} else {
+			Schema schema = survey.getSchema();
+			List<EntityDefinition> result = schema.getRootEntityDefinitions();
+			return result;
 		}
 	}
 	
