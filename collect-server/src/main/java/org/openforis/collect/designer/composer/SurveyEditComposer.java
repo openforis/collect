@@ -39,7 +39,9 @@ public class SurveyEditComposer extends BindComposer<Component> {
 	}
 	
 	protected void doSelectTab(final Tab tab) {
+		SurveyBaseVM vm = (SurveyBaseVM) getViewModel();
 		BindUtils.postGlobalCommand(null, null, SurveyBaseVM.UNDO_LAST_CHANGES_GLOBAL_COMMAND, null);
+		vm.dispatchCurrentFormValidatedCommand(true);
 		Tabbox tabbox = tab.getTabbox();
 		tabbox.setSelectedTab(tab);
 	}

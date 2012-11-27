@@ -135,6 +135,16 @@ public class SchemaVM extends SurveyBaseVM {
 		}
 	}
 
+	@Override
+	@GlobalCommand
+	public void undoLastChanges() {
+		if ( ! isCurrentFormValid() && editedNode != null ) {
+			performSelectNode(null);
+			treeModel.deselect();
+			notifyChange("selectedNode","editedNode");
+		}
+	}
+	
 	protected void onAfterNodeCreated(Binder binder, EntityDefinition parentEntity, NodeDefinition newNode) {
 		newItem = true;
 		editedNode = newNode;
