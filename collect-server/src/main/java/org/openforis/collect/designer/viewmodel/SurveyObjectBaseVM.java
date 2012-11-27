@@ -29,6 +29,10 @@ import org.zkoss.zkplus.databind.BindingListModelList;
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public abstract class SurveyObjectBaseVM<T> extends SurveyBaseVM {
 	
+	public static final String VALIDATE_COMMAND = "validate";
+	public static final String APPLY_CHANGES_COMMAND = "applyChanges";
+	public static final String COMMIT_CHANGES_COMMAND = "commitChanges";
+	
 	protected boolean newItem;
 	protected T selectedItem;
 	protected T editedItem;
@@ -69,11 +73,15 @@ public abstract class SurveyObjectBaseVM<T> extends SurveyBaseVM {
 
 	protected void validateForm(Binder binder) {
 		//post apply changes command to force validation
-		dispatchApplyChangesCommand(binder);
+		dispatchValidateCommand(binder);
+	}
+
+	protected void dispatchValidateCommand(Binder binder) {
+		binder.postCommand(VALIDATE_COMMAND, null);
 	}
 
 	protected void dispatchApplyChangesCommand(Binder binder) {
-		binder.postCommand("applyChanges", null);
+		binder.postCommand(APPLY_CHANGES_COMMAND, null);
 	}
 	
 	@Override
@@ -85,6 +93,10 @@ public abstract class SurveyObjectBaseVM<T> extends SurveyBaseVM {
 		}
 	}
 
+	@Command
+	public void validate() {
+	}
+	
 	@Command
 	public void applyChanges() {
 		if ( commitChangesOnApply ) {

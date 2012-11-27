@@ -52,6 +52,8 @@ public class SchemaVM extends SurveyBaseVM {
 	private static final String CONFIRM_REMOVE_NODE_MESSAGE_KEY = "survey.schema.confirm_remove_node";
 	private static final String CONFIRM_REMOVE_NON_EMPTY_ENTITY_MESSAGE_KEY = "survey.schema.confirm_remove_non_empty_entity";
 	private static final String CONFIRM_REMOVE_NODE_TITLE_KEY = "survey.schema.confirm_remove_node_title";
+
+	private static final String VALIDATE_COMMAND = "validate";
 	
 	private NodeDefinition selectedNode;
 	private NodeDefinition editedNode;
@@ -191,7 +193,7 @@ public class SchemaVM extends SurveyBaseVM {
 		IdSpace currentIdSpace = view.getSpaceOwner();
 		Component formComponent = Path.getComponent(currentIdSpace, "nodeFormInclude/nodeFormContainer");
 		Binder formComponentBinder = (Binder) formComponent.getAttribute("binder");
-		formComponentBinder.postCommand("applyChanges", null);
+		formComponentBinder.postCommand(VALIDATE_COMMAND, null);
 	}
 
 	@Command

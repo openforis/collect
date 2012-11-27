@@ -59,7 +59,8 @@
 					visible="@load(vm.editingItem)"
                     sclass="form"
 					form="@id('fx') 
-						@load(vm.formObject) @save(vm.formObject, before='applyChanges')
+						@load(vm.formObject)
+                        @save(vm.formObject, before={'validate','applyChanges'})
 						@validator('org.openforis.collect.designer.form.validator.ModelVersionFormValidator')"
 					width="100%">
 					<grid>

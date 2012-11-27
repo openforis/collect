@@ -3,7 +3,7 @@
   <div validationMessages="@id('vmsgs')"
     apply="org.zkoss.bind.BindComposer"
     viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SurveyMainInfoVM')"
-    form="@id('fx') @load(vm.formObject) @save(vm.formObject, before='applyChanges')
+    form="@id('fx') @load(vm.formObject) @save(vm.formObject, before={'validate','applyChanges'})
 			@validator('org.openforis.collect.designer.form.validator.SurveyMainInfoFormValidator')"
     sclass="form">
     <groupbox width="100%" closable="false">

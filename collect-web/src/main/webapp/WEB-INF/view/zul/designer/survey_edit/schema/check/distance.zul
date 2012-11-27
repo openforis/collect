@@ -11,7 +11,7 @@
     validationMessages="@id('vmsgs')"
     form="@id('fx') 
       @load(vm.formObject) 
-      @save(vm.formObject, before='applyChanges')
+      @save(vm.formObject, before={'validate','applyChanges'})
       @validator('org.openforis.collect.designer.form.validator.DistanceCheckFormValidator', parentDefinition=parentDefinition)">
     <grid>
       <columns>
