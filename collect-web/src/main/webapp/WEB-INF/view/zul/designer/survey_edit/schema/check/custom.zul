@@ -5,6 +5,7 @@
   <custom-attributes newItem="${arg.newItem}"/>
   <vlayout
     id="formContainer"
+    sclass="form"
     apply="org.zkoss.bind.BindComposer"
     viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.CustomCheckVM')"
     validationMessages="@id('vmsgs')"

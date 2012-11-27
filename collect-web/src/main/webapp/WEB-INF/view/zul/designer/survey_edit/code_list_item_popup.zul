@@ -6,6 +6,7 @@
 		border="normal"
 		position="center" 
 		closable="false"
+        sclass="form"
 		apply="org.zkoss.bind.BindComposer"
 		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.CodeListItemVM')"
 		validationMessages="@id('vmsgs')"

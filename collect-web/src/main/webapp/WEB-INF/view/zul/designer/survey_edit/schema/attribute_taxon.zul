@@ -3,7 +3,8 @@
     <custom-attributes parentEntity="${arg.parentEntity}"/>
 	<vlayout 
 		id="nodeFormContainer"
-		validationMessages="@id('vmsgs')"
+		sclass="form"
+        validationMessages="@id('vmsgs')"
         apply="org.zkoss.bind.BindComposer"
 		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.TaxonAttributeVM')"
 		form="@id('fx')

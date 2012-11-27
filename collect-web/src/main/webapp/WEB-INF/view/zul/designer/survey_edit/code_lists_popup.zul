@@ -50,6 +50,7 @@
 		   	<center border="none">
 		        <borderlayout 
 		        	visible="@load(vm.editingItem)"
+                    sclass="form"
 					validationMessages="@id('vmsgs')"
 					form="@id('fx') 
 						@load(vm.formObject) @save(vm.formObject, before='applyChanges')

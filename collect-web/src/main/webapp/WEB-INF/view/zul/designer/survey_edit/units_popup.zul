@@ -46,6 +46,7 @@
 		        <vlayout
 		        	id="formContainer"
 		        	visible="@load(vm.editingItem)"
+                    sclass="form"
 					form="@id('fx') 
 						@load(vm.formObject) @save(vm.formObject, before='applyChanges')
 						@validator('org.openforis.collect.designer.form.validator.UnitFormValidator')"

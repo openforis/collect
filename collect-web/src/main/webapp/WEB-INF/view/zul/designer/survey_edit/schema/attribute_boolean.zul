@@ -3,6 +3,7 @@
   
     <vlayout
 		id="nodeFormContainer"
+        sclass="form"
 		apply="org.zkoss.bind.BindComposer"
 		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.DefaultAttributeVM')"
 		validationMessages="@id('vmsgs')"

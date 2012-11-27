@@ -5,7 +5,10 @@
   <custom-attributes newItem="${arg.newItem}" />
   <window id="attributeDefaultPopUp"
     title="${labels.survey.schema.attribute.numeric.precisions.popup.title}"
-    width="500px" border="normal" position="center" closable="false"
+    width="500px" 
+    border="normal" 
+    position="center" 
+    closable="false"
     apply="org.zkoss.bind.BindComposer"
     viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.PrecisionVM')"
     validationMessages="@id('vmsgs')"
@@ -14,7 +17,8 @@
             @save(vm.formObject, before='applyChanges')
             @validator('org.openforis.collect.designer.form.validator.PrecisionFormValidator', parentDefinition=parentDefinition)">
 
-    <vlayout id="formContainer">
+    <vlayout id="formContainer"
+      sclass="form">
       <grid>
         <columns>
           <column width="150px" />

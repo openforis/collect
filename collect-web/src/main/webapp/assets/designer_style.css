@@ -38,12 +38,35 @@
 	background: #CE2929;
 	color: #FFFFFF;
 }
-.z-groupbox.formFieldSet .z-groupbox-cnt {
+//START OF GROUPBOX STYLE
+.form .z-groupbox .z-groupbox-cnt {
 	padding: 0px;
 }
 .z-groupbox.tableFieldSet .z-groupbox-cnt {
 	padding: 10px;
 }
+//END OF GROUPBOX STYLE
+
+//START OF GRID STYLE
 .z-grid.inner {
 	border: none;
 }
+.form div.z-grid {
+	border: none;
+	background: none;
+}
+.form div.z-grid tr.z-grid-odd td.z-row-inner, 
+	.form div.z-grid tr.z-grid-odd .z-cell, 
+	.form div.z-grid tr.z-grid-odd {
+	background: transparent;
+    border-top: 1px solid transparent;
+    border-bottom: 1px solid transparent;
+    border-left: 1px solid transparent;
+}
+.form tr.z-row-over > td.z-row-inner,
+	.form tr.z-row-over > .z-cell {
+	background-image: none;
+	border-top: 1px solid transparent;
+    border-bottom: 1px solid transparent;
+}
+//END OF GRID STYLE

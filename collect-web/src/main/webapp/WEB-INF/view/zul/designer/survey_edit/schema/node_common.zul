@@ -5,7 +5,7 @@
   <custom-attributes otherGeneralDetailsForm="${arg.otherLayoutForm}"/>
   <custom-attributes otherAttributesForm="${arg.otherAttributesForm}"/>
   
-  <groupbox width="100%" closable="false" class="formFieldSet">
+  <groupbox width="100%" closable="false">
     <caption label="${vm.nodeTypeHeaderLabel}"/>
     <grid class="inner">
       <columns>
@@ -83,7 +83,7 @@
     
     <include src="${arg.otherAttributesForm}" />
     
-    <groupbox width="100%" closable="false" class="formFieldSet">
+    <groupbox width="100%" closable="false">
       <caption label="${labels.survey.schema.node.labels}"/>
       <grid class="inner">
         <columns>
@@ -115,7 +115,7 @@
 		  </rows>
       </grid>
       <groupbox closable="true" open="false"
-        class="formFieldSet" 
+        
       	sclass="collapsible"
       	mold="3d" width="100%">
       	<attribute name="onOpen"><![CDATA[
@@ -164,7 +164,7 @@
       	</grid>
       </groupbox>
     </groupbox>
-    <groupbox width="100%" closable="false" class="formFieldSet">
+    <groupbox width="100%" closable="false">
       <caption label="${labels.survey.schema.node.versioning}"/>
     	<grid class="inner">
     		<columns>
@@ -205,7 +205,7 @@
     		</rows>
     	</grid>
    </groupbox>
-   <groupbox width="100%" closable="false" class="formFieldSet">
+   <groupbox width="100%" closable="false">
     <caption label="${labels.survey.schema.node.layout.$}"/>
     <vlayout width="100%">
       <grid class="inner">
