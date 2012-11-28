@@ -30,9 +30,11 @@ public abstract class AbstractTreeModel<T> extends DefaultTreeModel<T> {
 
 	public void removeSelectedNode() {
 		int[] selectionPath = getSelectionPath();
-		AbstractTreeNode<T> treeNode = (AbstractTreeNode<T>) getChild(selectionPath);
-		AbstractTreeNode<T> parentTreeNode = (AbstractTreeNode<T>) treeNode.getParent();
-		parentTreeNode.remove(treeNode);
+		if ( selectionPath != null ) {
+			AbstractTreeNode<T> treeNode = (AbstractTreeNode<T>) getChild(selectionPath);
+			AbstractTreeNode<T> parentTreeNode = (AbstractTreeNode<T>) treeNode.getParent();
+			parentTreeNode.remove(treeNode);
+		}
 	}
 	
 	@SuppressWarnings("unchecked")
