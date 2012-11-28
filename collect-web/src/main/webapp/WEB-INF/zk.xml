@@ -17,7 +17,7 @@
 		<timer-keep-alive>true</timer-keep-alive>
 	</session-config>
 	
-	<!-- JavaScript debug -->
+	<!-- Start of JavaScript debug part -->
 <!-- 	<client-config> -->
 <!-- 	    <debug-js>true</debug-js> -->
 <!-- 	</client-config> -->
@@ -25,7 +25,7 @@
 <!-- 	    <name>org.zkoss.web.classWebResource.cache</name> -->
 <!-- 	    <value>false</value> -->
 <!-- 	</library-property> -->
-
+    <!-- End of JavaScript debug part -->
 <!-- 	<library-property> -->
 <!-- 	    <name>org.zkoss.theme.preferred</name> -->
 <!-- 	    <value>silvertail</value> -->
