@@ -56,8 +56,9 @@ public class SchemaVM extends SurveyBaseVM {
 	private static final String CONFIRM_REMOVE_NODE_MESSAGE_KEY = "survey.schema.confirm_remove_node";
 	private static final String CONFIRM_REMOVE_NON_EMPTY_ENTITY_MESSAGE_KEY = "survey.schema.confirm_remove_non_empty_entity";
 	private static final String CONFIRM_REMOVE_NODE_TITLE_KEY = "survey.schema.confirm_remove_node_title";
-
+	
 	private static final String VALIDATE_COMMAND = "validate";
+
 	
 	private NodeDefinition selectedNode;
 	private NodeDefinition editedNode;
@@ -308,6 +309,10 @@ public class SchemaVM extends SurveyBaseVM {
 			}
 			NodeType type = NodeType.valueOf(nodeDefn);
 			String typeLabel = type.getLabel().toLowerCase();
+			boolean isRootEntity = nodeDefn.getParentDefinition() == null;
+			if ( isRootEntity ) {
+				typeLabel = Labels.getLabel("survey.schema.root_entity");
+			}
 			Object[] messageArgs = new String[] {typeLabel, nodeDefn.getName()};
 			Object[] titleArgs = new String[] {typeLabel};
 			MessageUtil.showConfirm(new MessageUtil.ConfirmHandler() {
@@ -375,14 +380,13 @@ public class SchemaVM extends SurveyBaseVM {
 			Schema schema = nodeDefn.getSchema();
 			String nodeName = nodeDefn.getName();
 			schema.removeRootEntityDefinition(nodeName);
+			selectedRootEntity = null;
+			notifyChange("selectedRootEntity");
+			updateTreeModel();
 		}
-		if ( treeModel != null ) {
-			treeModel.removeSelectedNode();
-		}
-		selectedNode = null;
-		editedNode = null;
-		notifyChange("editedNode","selectedNode","nodes");
+		resetEditingStatus();
 		dispatchCurrentFormValidatedCommand(true);
+		dispatchSchemaChangedCommand();
 	}
 
 	@GlobalCommand
