@@ -138,6 +138,8 @@ public class SchemaVM extends SurveyBaseVM {
 			@Override
 			public void onOk() {
 				resetNodeSelection();
+				selectedRootEntity = null;
+				initTreeModel();
 				EntityDefinition newNode = createRootEntityDefinition();
 				editNode(binder, true, null, newNode);
 			}

@@ -89,18 +89,23 @@ public class SchemaTreeModel extends AbstractTreeModel<NodeDefinition> {
 	}
 
 	protected int getIndexInTree(EntityDefinition parent, NodeDefinition node) {
-		if ( includeAttributes ) {
-			return parent.getChildIndex(node);
-		} else {
-			List<NodeDefinition> childDefns = parent.getChildDefinitions();
-			List<EntityDefinition> siblingEtities = new ArrayList<EntityDefinition>();
-			for (NodeDefinition childDefn : childDefns) {
-				if ( childDefn instanceof EntityDefinition ) {
-					siblingEtities.add((EntityDefinition) childDefn);
-				}
+		List<NodeDefinition> siblings = getSiblings(parent);
+		return siblings.indexOf(node);
+	}
+	
+	protected List<NodeDefinition> getSiblings(EntityDefinition parent) {
+		List<NodeDefinition> result = new ArrayList<NodeDefinition>();
+		List<NodeDefinition> allSiblings = parent.getChildDefinitions();
+		for (NodeDefinition childDefn : allSiblings) {
+			if ( isInVersion(childDefn) && (includeAttributes || childDefn instanceof EntityDefinition) ) {
+				result.add(childDefn);
 			}
-			return siblingEtities.indexOf(node);
 		}
+		return result;
+	}
+
+	protected boolean isInVersion(NodeDefinition childDefn) {
+		return version == null || version.isApplicable(childDefn);
 	}
 
 	protected NodeDefinitionTreeNode recreateNode(NodeDefinitionTreeNode node) {

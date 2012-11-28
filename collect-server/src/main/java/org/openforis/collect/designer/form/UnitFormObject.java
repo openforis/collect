@@ -49,7 +49,7 @@ public class UnitFormObject extends SurveyObjectFormObject<Unit> {
 		} else {
 			dimensionLabel = null;
 		}
-		conversionFactor = source.getConversionFactor();
+		conversionFactor = source.getConversionFactor() != null ? source.getConversionFactor().doubleValue(): null;
 	}
 	
 	@Override
