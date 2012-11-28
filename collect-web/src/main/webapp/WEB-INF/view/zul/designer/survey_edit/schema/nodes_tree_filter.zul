@@ -1,5 +1,5 @@
 <zk>
-  <custom-attributes canEditRootEntities="${arg.canEditRootEntities}"/>
+  <custom-attributes canEditRootEntities="${arg.canEditRootEntities}" />
   <hlayout>
     <label value="${labels.survey.schema.root_entity}:" />
     <listbox width="150px" model="@load(vm.rootEntities)"
@@ -10,7 +10,8 @@
       </template>
     </listbox>
     <toolbar visible="${canEditRootEntities}">
-      <toolbarbutton tooltiptext="${labels.survey.schema.add_root_entity}"
+      <toolbarbutton
+        tooltiptext="${labels.survey.schema.add_root_entity}"
         image="/assets/images/add.png"
         onClick="@command('addRootEntity')" />
       <toolbarbutton tooltiptext="${labels.global.edit_item}"
@@ -30,6 +31,9 @@
         <listitem label="@load(each.name)" />
       </template>
     </listbox>
+    <button tooltiptext="${labels.survey.versioning_manager}"
+      onClick="@global-command('openVersioningManagerPopUp')"
+      image="/assets/images/pencil-small.png" />
     <button label="${labels.survey.preview.show_preview}"
       onClick="@global-command('showPreview', formVersion=vm.selectedVersion, rootEntity=vm.selectedRootEntity)" />
   </hlayout>
