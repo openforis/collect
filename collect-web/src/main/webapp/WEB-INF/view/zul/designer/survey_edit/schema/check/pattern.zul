@@ -46,10 +46,11 @@
           </fieldErrorHandler>
         </row>
         <row>
-            <label value="${labels.survey.schema.node.check.pattern.regularExpression}" />
+            <label value="${labels.survey.schema.node.check.pattern.regularExpression}:" />
             <fieldErrorHandler message="@load(vmsgs['regularExpression'])">
-	            <textbox value="@bind(fx.regularExpression)"
-	                    onChange="@command('applyChanges')" />
+	            <textbox width="150px"
+                  value="@bind(fx.regularExpression)"
+	              onChange="@command('applyChanges')" />
           	</fieldErrorHandler>
         </row>
       </rows>

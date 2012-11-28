@@ -35,20 +35,20 @@
         <row>
           <label value="${labels.survey.schema.node.check.message}:" />
           <fieldErrorHandler message="@load(vmsgs['message'])">
-            <textbox width="150px" value="@bind(fx.message)" 
+            <textbox width="250px" value="@bind(fx.message)" 
                           onChange="@command('applyChanges')" />
           </fieldErrorHandler>
         </row>
         <row>
           <label value="${labels.survey.schema.node.check.condition}:" />
           <fieldErrorHandler message="@load(vmsgs['condition'])">
-            <textbox width="150px" value="@bind(fx.condition)" onChange="@command('applyChanges')" />
+            <textbox width="250px" value="@bind(fx.condition)" onChange="@command('applyChanges')" />
           </fieldErrorHandler>
         </row>
         <row>
-            <label value="${labels.survey.schema.node.check.uniqueness.expression}" />
+            <label value="${labels.survey.schema.node.check.uniqueness.expression}:" />
             <fieldErrorHandler message="@load(vmsgs['expression'])">
-	            <textbox value="@bind(fx.expression)"
+	            <textbox width="250px" value="@bind(fx.expression)"
 	                    onChange="@command('applyChanges')" />
           	</fieldErrorHandler>
         </row>

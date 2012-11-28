@@ -3,6 +3,7 @@
  */
 package org.openforis.collect.designer.form;
 
+import org.openforis.collect.designer.model.CheckType;
 import org.openforis.idm.metamodel.validation.Check;
 import org.openforis.idm.metamodel.validation.Check.Flag;
 
@@ -35,6 +36,10 @@ public class CheckFormObject<T extends Check<?>> extends FormObject<T> {
 		if ( result == null && languageCode != null && languageCode.equals(defaultLanguage) ) {
 			//try to get the label associated to default language
 			result = source.getMessage(null);
+		}
+		if ( result == null ) {
+			CheckType type = CheckType.valueOf(source);
+			result = type.getDefaultMessage();
 		}
 		return result;
 	}

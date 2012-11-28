@@ -35,41 +35,41 @@
         <row>
           <label value="${labels.survey.schema.node.check.message}:" />
           <fieldErrorHandler message="@load(vmsgs['message'])">
-            <textbox width="150px" value="@bind(fx.message)" 
+            <textbox width="250px" value="@bind(fx.message)" 
                           onChange="@command('applyChanges')" />
           </fieldErrorHandler>
         </row>
         <row>
           <label value="${labels.survey.schema.node.check.condition}:" />
           <fieldErrorHandler message="@load(vmsgs['condition'])">
-            <textbox width="150px" value="@bind(fx.condition)" onChange="@command('applyChanges')" />
+            <textbox width="250px" value="@bind(fx.condition)" onChange="@command('applyChanges')" />
           </fieldErrorHandler>
         </row>
         <row>
-            <label value="${labels.survey.schema.node.check.distance.sourcePointExpression}" />
+            <label value="${labels.survey.schema.node.check.distance.sourcePointExpression}:" />
             <fieldErrorHandler message="@load(vmsgs['sourcePointExpression'])">
-	            <textbox value="@bind(fx.sourcePointExpression)"
+	            <textbox width="150px" value="@bind(fx.sourcePointExpression)"
 	                    onChange="@command('applyChanges')" />
           	</fieldErrorHandler>
         </row>
         <row>
-            <label value="${labels.survey.schema.node.check.distance.destinationPointExpression}" />
+            <label value="${labels.survey.schema.node.check.distance.destinationPointExpression}:" />
             <fieldErrorHandler message="@load(vmsgs['destinationPointExpression'])">
-	            <textbox value="@bind(fx.destinationPointExpression)"
+	            <textbox width="150px" value="@bind(fx.destinationPointExpression)"
 	                    onChange="@command('applyChanges')" />
           	</fieldErrorHandler>
         </row>
         <row>
-            <label value="${labels.survey.schema.node.check.distance.minDistanceExpression}" />
+            <label value="${labels.survey.schema.node.check.distance.minDistanceExpression}:" />
             <fieldErrorHandler message="@load(vmsgs['minDistanceExpression'])">
-	            <textbox value="@bind(fx.minDistanceExpression)"
+	            <textbox width="150px" value="@bind(fx.minDistanceExpression)"
 	                    onChange="@command('applyChanges')" />
           	</fieldErrorHandler>
         </row>
         <row>
-            <label value="${labels.survey.schema.node.check.distance.maxDistanceExpression}" />
+            <label value="${labels.survey.schema.node.check.distance.maxDistanceExpression}:" />
             <fieldErrorHandler message="@load(vmsgs['maxDistanceExpression'])">
-	            <textbox value="@bind(fx.maxDistanceExpression)"
+	            <textbox width="150px" value="@bind(fx.maxDistanceExpression)"
 	                    onChange="@command('applyChanges')" />
           	</fieldErrorHandler>
         </row>

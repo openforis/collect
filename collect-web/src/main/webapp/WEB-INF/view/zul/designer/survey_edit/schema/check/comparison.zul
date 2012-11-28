@@ -35,13 +35,13 @@
         <row>
           <label value="${labels.survey.schema.node.check.message}:" />
           <fieldErrorHandler message="@load(vmsgs['message'])">
-            <textbox width="150px" value="@bind(fx.message)" onChange="@command('applyChanges')" />
+            <textbox width="250px" value="@bind(fx.message)" onChange="@command('applyChanges')" />
           </fieldErrorHandler>
         </row>
         <row>
           <label value="${labels.survey.schema.node.check.condition}:" />
           <fieldErrorHandler message="@load(vmsgs['condition'])">
-            <textbox width="150px" value="@bind(fx.condition)" onChange="@command('applyChanges')" />
+            <textbox width="250px" value="@bind(fx.condition)" onChange="@command('applyChanges')" />
           </fieldErrorHandler>
         </row>
         <row>
@@ -53,7 +53,7 @@
             <label value="):" />
           </cell>
           <fieldErrorHandler message="@load(vmsgs['greaterThan'])">
-            <textbox value="@bind(fx.greaterThan)" onChange="@command('applyChanges')" />
+            <textbox width="150px" value="@bind(fx.greaterThan)" onChange="@command('applyChanges')" />
           </fieldErrorHandler>
         </row>
         <row>
@@ -65,7 +65,7 @@
             <label value="):" />
           </cell>
           <fieldErrorHandler message="@load(vmsgs['lessThan'])">
-         	<textbox value="@bind(fx.lessThan)"
+         	<textbox width="150px" value="@bind(fx.lessThan)"
                     onChange="@command('applyChanges')" />
           </fieldErrorHandler>
         </row>            

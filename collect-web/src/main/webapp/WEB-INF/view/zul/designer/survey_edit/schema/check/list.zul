@@ -1,40 +1,43 @@
 <zk>
-	<vlayout>
-		<listbox id="checksList"
-            model="@load(vm.checks)"
-            selectedItem="@bind(vm.selectedCheck)">
-           <listhead visible="false">
-              <listheader label="" width="200px" />
-              <listheader label="" width="60px" />
-            </listhead>
-           <template name="model">
-            <listitem>
-              <listcell label="${vm.getCheckTypeLabel(each)}" onDoubleClick="@command('editCheck')" />
-              <listcell label="${vm.getCheckFlagLabel(each)}" onDoubleClick="@command('editCheck')" />
-            </listitem>
-  		  </template>
-		</listbox>
-        <menubar>
-          <menu tooltiptext="${labels.global.add_item}"
-            class="icon-button"
-            image="/assets/images/add.png">
-            <menupopup>
-                <zk forEach="${vm.checkTypes}">
-                  <menuitem label="${each.label}" value="${each}"
-                    onClick="@command('addCheck', checkType=self.value)" />
-                </zk>
-            </menupopup>
-          </menu>
-          <menuitem tooltiptext="${labels.global.edit_item}"
-              image="/assets/images/edit.png"
-              disabled="@load(empty vm.selectedCheck)"
-              onClick="@command('editCheck')"
-              class="icon-button" />
-          <menuitem tooltiptext="${labels.global.delete_item}"
-              image="/assets/images/delete.png"
-              disabled="@load(empty vm.selectedCheck)"
-              onClick="@command('deleteCheck', check=vm.selectedCheck)"
-              class="icon-button" />
-        </menubar>
-	</vlayout>
+  <vlayout>
+    <listbox id="checksList" model="@load(vm.checks)"
+      selectedItem="@bind(vm.selectedCheck)"
+      width="460px">
+      <listhead>
+        <listheader label="${labels.survey.schema.node.check.flag.$}" width="60px" />
+        <listheader label="${labels.survey.schema.node.check.type.$}" width="200px" />
+        <listheader label="${labels.survey.schema.node.check.message}" width="200px" />
+      </listhead>
+      <template name="model">
+        <listitem>
+          <listcell label="${vm.getCheckFlagLabel(each)}"
+            onDoubleClick="@command('editCheck')" />
+          <listcell label="${vm.getCheckTypeLabel(each)}"
+            onDoubleClick="@command('editCheck')" />
+          <listcell label="${vm.getCheckMessage(each)}"
+            onDoubleClick="@command('editCheck')" />
+        </listitem>
+      </template>
+    </listbox>
+    <menubar>
+      <menu tooltiptext="${labels.global.add_item}" class="icon-button"
+        image="/assets/images/add.png">
+        <menupopup>
+          <zk forEach="${vm.checkTypes}">
+            <menuitem label="${each.label}" value="${each}"
+              onClick="@command('addCheck', checkType=self.value)" />
+          </zk>
+        </menupopup>
+      </menu>
+      <menuitem tooltiptext="${labels.global.edit_item}"
+        image="/assets/images/edit.png"
+        disabled="@load(empty vm.selectedCheck)"
+        onClick="@command('editCheck')" class="icon-button" />
+      <menuitem tooltiptext="${labels.global.delete_item}"
+        image="/assets/images/delete.png"
+        disabled="@load(empty vm.selectedCheck)"
+        onClick="@command('deleteCheck', check=vm.selectedCheck)"
+        class="icon-button" />
+    </menubar>
+  </vlayout>
 </zk>

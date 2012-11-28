@@ -71,5 +71,27 @@ public enum CheckType {
 		}
 		return Labels.getLabel(labelKey);
 	}
+	
+	public String getDefaultMessage() {
+		String labelKey = null;
+		switch (this) {
+		case COMPARISON:
+			labelKey = "survey.schema.node.check.type.comparison.default_message";
+			break;
+		case CUSTOM:
+			labelKey = "survey.schema.node.check.type.custom.default_message";
+			break;
+		case DISTANCE:
+			labelKey = "survey.schema.node.check.type.distance.default_message";
+			break;
+		case PATTERN:
+			labelKey = "survey.schema.node.check.type.pattern.default_message";
+			break;
+		case UNIQUENESS:
+			labelKey = "survey.schema.node.check.type.uniqueness.default_message";
+			break;
+		}
+		return Labels.getLabel(labelKey);
+	}
 
 }
