@@ -116,9 +116,9 @@ public class SchemaVM extends SurveyBaseVM {
 				selectedRootEntity = rootEntity;
 				selectedVersion = version;
 				resetEditingStatus();
-				initTreeModel();
+				updateTreeModel();
 				dispatchCurrentFormValidatedCommand(true, isCurrentFormBlocking());
-				notifyChange("selectedNode","nodes","selectedRootEntity","selectedVersion");
+				notifyChange("selectedNode","selectedRootEntity","selectedVersion");
 			}
 			@Override
 			public void onCancel() {
@@ -139,7 +139,7 @@ public class SchemaVM extends SurveyBaseVM {
 			public void onOk() {
 				resetNodeSelection();
 				selectedRootEntity = null;
-				initTreeModel();
+				updateTreeModel();
 				EntityDefinition newNode = createRootEntityDefinition();
 				editNode(binder, true, null, newNode);
 			}
@@ -221,8 +221,8 @@ public class SchemaVM extends SurveyBaseVM {
 		super.versionsUpdated();
 		if ( selectedVersion != null && ! survey.getVersions().contains(selectedVersion) ) {
 			selectedVersion = null;
-			initTreeModel();
-			notifyChange("nodes","selectedVersion");
+			buildTreeModel();
+			notifyChange("selectedVersion");
 		}
 	}
 	
@@ -386,7 +386,7 @@ public class SchemaVM extends SurveyBaseVM {
 	}
 
 	@GlobalCommand
-	@NotifyChange({"nodes","selectedNode","newItem"})
+	@NotifyChange({"selectedNode","newItem"})
 	public void editedNodeChanged(@BindingParam("parentEntity") EntityDefinition parentEntity) {
 		if ( newItem ) {
 			if ( parentEntity != null ) {
@@ -400,7 +400,7 @@ public class SchemaVM extends SurveyBaseVM {
 				selectedNode = editedNode;
 			} else {
 				selectedRootEntity = (EntityDefinition) editedNode;
-				initTreeModel();
+				updateTreeModel();
 			}
 			newItem = false;
 		}
@@ -427,12 +427,12 @@ public class SchemaVM extends SurveyBaseVM {
 	
 	public SchemaTreeModel getNodes() {
 		if ( treeModel == null ) {
-			initTreeModel();
+			buildTreeModel();
 		}
 		return treeModel;
     }
 
-	protected void initTreeModel() {
+	protected void buildTreeModel() {
 		CollectSurvey survey = getSurvey();
 		if ( survey == null ) {
 			//TODO session expired...?
@@ -441,6 +441,11 @@ public class SchemaVM extends SurveyBaseVM {
 		} else {
 			treeModel = null;
 		}
+	}
+	
+	protected void updateTreeModel() {
+		buildTreeModel();
+		notifyChange("nodes");
 	}
 	
 	public boolean isEntity(NodeDefinition nodeDefn) {
