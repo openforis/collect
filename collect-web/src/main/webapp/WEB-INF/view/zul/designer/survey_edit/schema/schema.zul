@@ -1,88 +1,109 @@
 <zk>
-	<div id="itemsContainer"
-		apply="org.openforis.collect.designer.composer.SurveySchemaEditComposer"
-		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SchemaVM')"
-		width="100%" height="100%">
-		<borderlayout>
-            <north>
-             <include src="survey_edit/schema/nodes_tree_filter.zul" canEditRootEntities="true" />
-            </north>
-		 	<west title="${labels.survey.schema.definitions}"
-		 		width="350px"
-		 		splittable="true">
-		 		<borderlayout>
-		 			<center>
-						<tree id="nodesTree"
-                            zclass="z-dottree"
-							width="100%" vflex="true"
-							model="@load(vm.nodes)"
-                            context="nodesTreePopup"
-							onSelect="@command('nodeSelected', node=self.selectedItem.value.data)">
-							<template name="model">
-					            <treeitem draggable="false" context="@load(vm.isEntity(each.data) ? entityPopup: attributePopup)"> 
-					                <treerow>
-					                    <treecell label="@load(each.data.name)"/>
-					                </treerow>
-					            </treeitem>
-					  		</template>
-					    </tree>
-		 			</center>
-		 			<south>
-				        <menubar width="100%">
-			                <menuitem image="/assets/images/arrow-up.png"
-			                	class="icon-button" 
-								disabled="@load(vm.moveNodeUpDisabled)" 
-					        	onClick="@command('moveNodeUp')" />
-			                <menuitem image="/assets/images/arrow-down.png"
-			                	class="icon-button" 
-			                	disabled="@load(vm.moveNodeDownDisabled)" 
-					        	onClick="@command('moveNodeDown')" />
-			             </menubar>
-		 			</south>
-			    </borderlayout>
-			</west>
-			<center title="@load(vm.nodeTypeHeaderLabel)">
-                <vlayout hflex="true" vflex="true" 
-                    style="overflow: auto; padding: 10px">
-    				<include id="nodeFormInclude"
-    					visible="@load(vm.editingNode)"
-    					hflex="true" />
-                </vlayout>
-			</center>
-          </borderlayout>
-      
-        <menupopup id="nodesTreePopup">
-          <menuitem label="${labels.survey.schema.add_entity}" 
-            onClick="@command('addEntity')" />
-          <menu label="${labels.survey.schema.add_attribute.label}">
-              <menupopup>
-                  <zk forEach="${vm.attributeTypeValues}">
-                    <menuitem
-                      label="${vm.getAttributeTypeLabel(each)}" value="${each}"
-                      onClick="@command('addAttribute', attributeType=self.value)" />
-                  </zk>
-              </menupopup>
-          </menu>
+  <div id="itemsContainer"
+    apply="org.openforis.collect.designer.composer.SurveySchemaEditComposer"
+    viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SchemaVM')"
+    width="100%" height="100%">
+    <borderlayout>
+      <north>
+        <include src="survey_edit/schema/nodes_tree_filter.zul"
+          canEditRootEntities="true" />
+      </north>
+      <west title="${labels.survey.schema.definitions}" width="350px"
+        splittable="true">
+        <borderlayout>
+          <center>
+            <tree id="nodesTree" zclass="z-dottree" width="100%"
+              vflex="true" model="@load(vm.nodes)"
+              context="nodesTreePopup"
+              onSelect="@command('nodeSelected', node=self.selectedItem.value.data)">
+              <template name="model">
+                <treeitem draggable="false"
+                  context="@load(vm.isEntity(each.data) ? entityPopup: attributePopup)">
+                  <treerow>
+                    <treecell label="@load(each.data.name)" />
+                  </treerow>
+                </treeitem>
+              </template>
+            </tree>
+          </center>
+          <south>
+            <menubar width="100%">
+              <menuitem image="/assets/images/arrow-up.png"
+                class="icon-button"
+                disabled="@load(vm.moveNodeUpDisabled)"
+                onClick="@command('moveNodeUp')" />
+              <menuitem image="/assets/images/arrow-down.png"
+                class="icon-button"
+                disabled="@load(vm.moveNodeDownDisabled)"
+                onClick="@command('moveNodeDown')" />
+            </menubar>
+          </south>
+        </borderlayout>
+      </west>
+      <center title="@load(vm.nodeTypeHeaderLabel)">
+        <vlayout hflex="true" vflex="true"
+          style="overflow: auto; padding: 10px">
+          <include id="nodeFormInclude" visible="@load(vm.editingNode)"
+            hflex="true" />
+        </vlayout>
+      </center>
+    </borderlayout>
+
+    <menupopup id="nodesTreePopup">
+      <menu label="${labels.survey.schema.add_entity}">
+        <menupopup>
+          <menuitem 
+            disabled="${vm.isEntity(each.data)}"
+            label="${labels.survey.schema.add_single_entity}"
+            onClick="@command('addEntity', multiple=false, layout='FORM')" />
+          <menuitem
+            label="${labels.survey.schema.add_multiple_form_entity}"
+            onClick="@command('addEntity', multiple=true, layout='FORM')" />
+          <menuitem
+            label="${labels.survey.schema.add_multiple_table_entity}"
+            onClick="@command('addEntity', multiple=true, layout='TABLE')" />
         </menupopup>
-        <menupopup id="entityPopup">
-          <menuitem label="${labels.survey.schema.add_child_entity}" 
-            onClick="@command('addChildEntity')" />
-           <menu label="${labels.survey.schema.add_attribute.label}">
-              <menupopup>
-                  <zk forEach="${vm.attributeTypeValues}">
-                    <menuitem
-                      label="${vm.getAttributeTypeLabel(each)}" value="${each}"
-                      onClick="@command('addChildAttribute', attributeType=self.value)" />
-                  </zk>
-              </menupopup>
-       	  </menu>
-          <menuseparator />
-          <menuitem label="${labels.survey.schema.remove_node}" 
-              onClick="@command('removeNode')" />
+      </menu>
+      <menu label="${labels.survey.schema.add_attribute.label}">
+        <menupopup>
+          <zk forEach="${vm.attributeTypeValues}">
+            <menuitem label="${vm.getAttributeTypeLabel(each)}"
+              value="${each}"
+              onClick="@command('addAttribute', attributeType=self.value)" />
+          </zk>
         </menupopup>
-        <menupopup id="attributePopup">
-          <menuitem label="${labels.survey.schema.remove_node}" 
-              onClick="@command('removeNode')" />
+      </menu>
+    </menupopup>
+    <menupopup id="entityPopup">
+      <menu label="${labels.survey.schema.add_entity}">
+        <menupopup>
+          <menuitem 
+            label="${labels.survey.schema.add_single_entity}"
+            onClick="@command('addChildEntity', multiple=false, layout='FORM')" />
+          <menuitem
+            label="${labels.survey.schema.add_multiple_form_entity}"
+            onClick="@command('addChildEntity', multiple=true, layout='FORM')" />
+          <menuitem
+            label="${labels.survey.schema.add_multiple_table_entity}"
+            onClick="@command('addChildEntity', multiple=true, layout='TABLE')" />
         </menupopup>
-    </div>
+      </menu>
+      <menu label="${labels.survey.schema.add_attribute.label}">
+        <menupopup>
+          <zk forEach="${vm.attributeTypeValues}">
+            <menuitem label="${vm.getAttributeTypeLabel(each)}"
+              value="${each}"
+              onClick="@command('addChildAttribute', attributeType=self.value)" />
+          </zk>
+        </menupopup>
+      </menu>
+      <menuseparator />
+      <menuitem label="${labels.survey.schema.remove_node}"
+        onClick="@command('removeNode')" />
+    </menupopup>
+    <menupopup id="attributePopup">
+      <menuitem label="${labels.survey.schema.remove_node}"
+        onClick="@command('removeNode')" />
+    </menupopup>
+  </div>
 </zk>

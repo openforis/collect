@@ -10,10 +10,13 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.designer.component.SchemaTreeModel;
 import org.openforis.collect.designer.model.AttributeType;
+import org.openforis.collect.designer.model.LabelKeys;
 import org.openforis.collect.designer.model.NodeType;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.Resources;
 import org.openforis.collect.metamodel.ui.UIOptions;
+import org.openforis.collect.metamodel.ui.UIOptions.Layout;
+import org.openforis.collect.metamodel.ui.UITab;
 import org.openforis.collect.metamodel.ui.UITabSet;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.AttributeDefinition;
@@ -148,19 +151,31 @@ public class SchemaVM extends SurveyBaseVM {
 	}
 
 	@Command
-	public void addEntity(@ContextParam(ContextType.BINDER) final Binder binder) {
+	public void addEntity(@ContextParam(ContextType.BINDER) final Binder binder, 
+			@BindingParam("multiple") boolean multiple, 
+			@BindingParam("layout") String layout) {
 		resetNodeSelection();
-		addChildEntity(binder);
+		addChildEntity(binder, multiple, layout);
 	}
 
 	@Command
-	public void addChildEntity(@ContextParam(ContextType.BINDER) final Binder binder) {
+	public void addChildEntity(@ContextParam(ContextType.BINDER) final Binder binder,
+			@BindingParam("multiple") final boolean multiple, 
+			@BindingParam("layout") final String layout) {
 		checkCanLeaveForm(new MessageUtil.ConfirmHandler() {
 			@Override
 			public void onOk() {
 				EntityDefinition newNode = createEntityDefinition();
+				newNode.setMultiple(multiple);
+				UIOptions uiOpts = survey.getUIOptions();
 				EntityDefinition parentEntity = (EntityDefinition) (selectedNode != null ? selectedNode: selectedRootEntity);
-				editNode(binder, true, parentEntity, newNode);
+				Layout layoutEnum = Layout.valueOf(layout);
+//				if ( uiOpts.isLayoutSupported(parentEntity, newNode.getId(), (UITab) null, multiple, layoutEnum) ) {
+					uiOpts.setLayout(newNode, layoutEnum);
+					editNode(binder, true, parentEntity, newNode);
+//				} else {
+//					MessageUtil.showWarning(LabelKeys.LAYOUT_NOT_SUPPORTED_MESSAGE_KEY);
+//				}
 			}
 		});
 	}
@@ -175,18 +190,15 @@ public class SchemaVM extends SurveyBaseVM {
 	@Command
 	public void addChildAttribute(@ContextParam(ContextType.BINDER) final Binder binder, 
 			@BindingParam("attributeType") final String attributeType) throws Exception {
-		if ( selectedNode != null && selectedNode instanceof EntityDefinition ) {
-			checkCanLeaveForm(new MessageUtil.ConfirmHandler() {
-				@Override
-				public void onOk() {
-					AttributeType attributeTypeEnum = AttributeType.valueOf(attributeType);
-					AttributeDefinition newNode = (AttributeDefinition) NodeType.createNodeDefinition(survey, NodeType.ATTRIBUTE, attributeTypeEnum);
-					editNode(binder, true, (EntityDefinition) selectedNode, newNode);
-				}
-			});
-		} else {
-			MessageUtil.showWarning("survey.schema.add_node.error.parent_entity_not_selected");
-		}
+		checkCanLeaveForm(new MessageUtil.ConfirmHandler() {
+			@Override
+			public void onOk() {
+				AttributeType attributeTypeEnum = AttributeType.valueOf(attributeType);
+				AttributeDefinition newNode = (AttributeDefinition) NodeType.createNodeDefinition(survey, NodeType.ATTRIBUTE, attributeTypeEnum);
+				EntityDefinition parentEntity = (EntityDefinition) (selectedNode != null ? selectedNode: selectedRootEntity);
+				editNode(binder, true, parentEntity, newNode);
+			}
+		});
 	}
 
 	@Override
@@ -373,6 +385,9 @@ public class SchemaVM extends SurveyBaseVM {
 		EntityDefinition parentDefn = (EntityDefinition) nodeDefn.getParentDefinition();
 		if ( parentDefn != null ) {
 			parentDefn.removeChildDefinition(nodeDefn);
+			if ( treeModel != null ) {
+				treeModel.removeSelectedNode();
+			}
 		} else {
 			UIOptions uiOpts = survey.getUIOptions();
 			UITabSet tabSet = uiOpts.getAssignedRootTabSet((EntityDefinition) nodeDefn);
@@ -407,6 +422,7 @@ public class SchemaVM extends SurveyBaseVM {
 				updateTreeModel();
 			}
 			newItem = false;
+			notifyChange("nodeTypeHeaderLabel");
 		}
 		dispatchSchemaChangedCommand();
 	}
