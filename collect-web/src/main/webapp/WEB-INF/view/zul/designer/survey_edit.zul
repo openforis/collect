@@ -1,6 +1,7 @@
 <?page title="Open Foris Collect Database Designer - Edit Survey" contentType="text/html;charset=UTF-8"?>
 <?init class="org.zkoss.zk.ui.util.Composition" arg0="layouts/template.zul"?>
 <?component name="extendedTextbox" class="org.openforis.collect.designer.component.ExtendedTextbox"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
 <zk xmlns:w="client">
 	<script type="text/javascript"><![CDATA[
 		function switchTab(notify, init){
@@ -50,7 +51,7 @@
                         selectedItem="@load(vm.currentLanguageCode)"
                         onCheck="@command('languageCodeSelected', code=self.selectedItem.value)">
                         <template name="model">
-                          <radio label="@load(each)" value="@load(each)" />
+                          <radio label="${c:l(each)}" value="@load(each)" />
                         </template>
                       </radiogroup>
                       <button tooltiptext="${labels.survey.language_manager}" 
