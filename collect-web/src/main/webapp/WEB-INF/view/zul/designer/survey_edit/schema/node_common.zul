@@ -1,5 +1,6 @@
 <?component name="fieldErrorHandler" class="org.openforis.collect.designer.component.FieldErrorHandler"?>
 <?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<?component name="multilanguageLabel" class="org.openforis.collect.designer.component.MultilanguageLabel" macroURI="/WEB-INF/view/zul/designer/component/multilanguage_label.zul"?>
 <zk>
   <custom-attributes otherGeneralDetailsForm="${arg.otherGeneralDetailsForm}"/>
   <custom-attributes otherGeneralDetailsForm="${arg.otherLayoutForm}"/>
@@ -21,7 +22,8 @@
           </fieldErrorHandler>
         </row>
         <row>
-          <label value="${labels.global.item.description}:" />
+          <multilanguageLabel value="${labels.global.item.description}" 
+              languageCode="@load(vm.currentLanguageCode)" />
           <fieldErrorHandler message="@load(vmsgs['description'])">
             <textbox width="300px" multiline="true" rows="4"
               value="@bind(fx.description)"
@@ -92,21 +94,24 @@
         </columns>
         <rows>
 			<row>
-				<label value="${labels.survey.schema.node.instance_label}:" />
+                <multilanguageLabel value="${labels.survey.schema.node.instance_label}" 
+                  languageCode="@load(vm.currentLanguageCode)" />
 				<fieldErrorHandler message="@load(vmsgs['instanceLabel'])">
                   <textbox width="150px" value="@bind(fx.instanceLabel)" 
                       onChange="@command('applyChanges')" />
                 </fieldErrorHandler>
 			</row>
 			<row>
-				<label value="${labels.survey.schema.node.heading_label}:" />
+                <multilanguageLabel value="${labels.survey.schema.node.heading_label}" 
+                  languageCode="@load(vm.currentLanguageCode)" />
 				<fieldErrorHandler message="@load(vmsgs['headingLabel'])">
                   <textbox width="150px" value="@bind(fx.headingLabel)" 
                       onChange="@command('applyChanges')" />
                 </fieldErrorHandler>
 			</row>
 			<row>
-				<label value="${labels.survey.schema.node.number_label}:" />
+                <multilanguageLabel value="${labels.survey.schema.node.number_label}" 
+                  languageCode="@load(vm.currentLanguageCode)" />
 				<fieldErrorHandler message="@load(vmsgs['numberLabel'])">
                   <textbox width="150px" value="@bind(fx.numberLabel)" 
                       onChange="@command('applyChanges')" />
@@ -115,7 +120,6 @@
 		  </rows>
       </grid>
       <groupbox closable="true" open="false"
-        
       	sclass="collapsible"
       	mold="3d" width="100%">
       	<attribute name="onOpen"><![CDATA[
@@ -133,32 +137,36 @@
       		</columns>
       		<rows>
       			<row>
-      				<label value="${labels.survey.schema.node.interview_prompt_label}:" />
+                    <multilanguageLabel value="${labels.survey.schema.node.interview_prompt_label}" 
+                      languageCode="@load(vm.currentLanguageCode)" />
       				<fieldErrorHandler message="@load(vmsgs['interviewPromptLabel'])">
                           <textbox width="150px" value="@bind(fx.interviewPromptLabel)" 
                               onChange="@command('applyChanges')" />
                         </fieldErrorHandler>
       			</row>
       			<row>
-      				<label value="${labels.survey.schema.node.paper_prompt_label}:" />
+                    <multilanguageLabel value="${labels.survey.schema.node.paper_prompt_label}" 
+                      languageCode="@load(vm.currentLanguageCode)" />
       				<fieldErrorHandler message="@load(vmsgs['paperPromptLabel'])">
-                          <textbox width="150px" value="@bind(fx.paperPromptLabel)"
-                                    onChange="@command('applyChanges')" />
-                        </fieldErrorHandler>
+                        <textbox width="150px" value="@bind(fx.paperPromptLabel)"
+                                onChange="@command('applyChanges')" />
+                    </fieldErrorHandler>
       			</row>
       			<row>
-      				<label value="${labels.survey.schema.node.handheld_prompt_label}:" />
-        				<fieldErrorHandler message="@load(vmsgs['handheldPromptLabel'])">
-                        	<textbox width="150px" value="@bind(fx.handheldPromptLabel)" 
-                                  onChange="@command('applyChanges')" />
-                        </fieldErrorHandler>
+                    <multilanguageLabel value="${labels.survey.schema.node.handheld_prompt_label}" 
+                      languageCode="@load(vm.currentLanguageCode)" />
+      				<fieldErrorHandler message="@load(vmsgs['handheldPromptLabel'])">
+                      	<textbox width="150px" value="@bind(fx.handheldPromptLabel)" 
+                                onChange="@command('applyChanges')" />
+                    </fieldErrorHandler>
       			</row>
       			<row>
-      				<label value="${labels.survey.schema.node.pc_prompt_label}:" />
-        				<fieldErrorHandler message="@load(vmsgs['pcPromptLabel'])">
-                        	<textbox width="150px" value="@bind(fx.pcPromptLabel)" 
-                                  onChange="@command('applyChanges')" />
-                        </fieldErrorHandler>
+      				<multilanguageLabel value="${labels.survey.schema.node.pc_prompt_label}" 
+                      languageCode="@load(vm.currentLanguageCode)" />
+      				<fieldErrorHandler message="@load(vmsgs['pcPromptLabel'])">
+                      	<textbox width="150px" value="@bind(fx.pcPromptLabel)" 
+                                onChange="@command('applyChanges')" />
+                    </fieldErrorHandler>
       			</row>
       		</rows>
       	</grid>

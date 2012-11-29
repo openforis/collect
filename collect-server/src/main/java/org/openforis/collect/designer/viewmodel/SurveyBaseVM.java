@@ -67,6 +67,7 @@ public abstract class SurveyBaseVM extends BaseVM {
 	private void initCurrentLanguageCode() {
 		SessionStatus sessionStatus = getSessionStatus();
 		currentLanguageCode = sessionStatus.getCurrentLanguageCode();
+		notifyChange("currentLanguageCode");
 	}
 	
 	@GlobalCommand
@@ -166,7 +167,6 @@ public abstract class SurveyBaseVM extends BaseVM {
 	@GlobalCommand
 	public void currentLanguageChanged() {
 		initCurrentLanguageCode();
-		notifyChange("currentLanguageCode");
 	}
 
 	public String getDateFormat() {

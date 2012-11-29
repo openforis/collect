@@ -1,4 +1,5 @@
 <?component name="fieldErrorHandler" class="org.openforis.collect.designer.component.FieldErrorHandler"?>
+<?component name="multilanguageLabel" class="org.openforis.collect.designer.component.MultilanguageLabel" macroURI="/WEB-INF/view/zul/designer/component/multilanguage_label.zul"?>
 <zk>
   <custom-attributes parentDefinition="${arg.parentDefinition}"/>
   <custom-attributes check="${arg.check}"/>
@@ -33,7 +34,8 @@
           </listbox>
         </row>
         <row>
-          <label value="${labels.survey.schema.node.check.message}:" />
+          <multilanguageLabel value="${labels.survey.schema.node.check.message}" 
+              languageCode="@load(vm.currentLanguageCode)" />
           <fieldErrorHandler message="@load(vmsgs['message'])">
             <textbox width="250px" value="@bind(fx.message)" 
                           onChange="@command('applyChanges')" />

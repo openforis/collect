@@ -28,6 +28,7 @@ import org.zkoss.bind.annotation.ContextParam;
 import org.zkoss.bind.annotation.ContextType;
 import org.zkoss.bind.annotation.DependsOn;
 import org.zkoss.bind.annotation.GlobalCommand;
+import org.zkoss.bind.annotation.Init;
 import org.zkoss.bind.annotation.NotifyChange;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.event.DropEvent;
@@ -56,6 +57,12 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 	
 	private List<CodeListItem> selectedItemsPerLevel;
 	private Window codeListItemPopUp;
+	
+	@Override
+	@Init(superclass=false)
+	public void init() {
+		super.init();
+	}
 	
 	@Override
 	protected List<CodeList> getItemsInternal() {

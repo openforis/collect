@@ -1,4 +1,5 @@
 <?component name="fieldErrorHandler" class="org.openforis.collect.designer.component.FieldErrorHandler"?>
+<?component name="multilanguageLabel" class="org.openforis.collect.designer.component.MultilanguageLabel" macroURI="/WEB-INF/view/zul/designer/component/multilanguage_label.zul"?>
 <zk>
   <div validationMessages="@id('vmsgs')"
     apply="org.zkoss.bind.BindComposer"
@@ -22,7 +23,8 @@
             </fieldErrorHandler>
           </row>
           <row>
-            <label value="${labels.survey.project_name}:" />
+            <multilanguageLabel value="${labels.survey.project_name}" 
+              languageCode="@load(vm.currentLanguageCode)" />
             <fieldErrorHandler message="@load(vmsgs['projectName'])">
               <textbox width="150px" value="@bind(fx.projectName)"
                 onChange="@command('applyChanges')" />
@@ -36,7 +38,8 @@
             </fieldErrorHandler>
           </row>
           <row>
-            <label value="${labels.survey.description}:" />
+            <multilanguageLabel value="${labels.survey.description}" 
+              languageCode="@load(vm.currentLanguageCode)" />
             <fieldErrorHandler message="@load(vmsgs['description'])">
               <textbox width="350px" value="@bind(fx.description)"
                 multiline="true" rows="4"

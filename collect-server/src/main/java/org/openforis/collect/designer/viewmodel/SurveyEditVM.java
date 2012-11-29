@@ -69,6 +69,9 @@ public class SurveyEditVM extends SurveyBaseVM {
 			currentLanguageCode = survey.getDefaultLanguage();
 			if ( currentLanguageCode == null ) {
 				openLanguageManagerPopUp();
+			} else {
+				SessionStatus sessionStatus = getSessionStatus();
+				sessionStatus.setCurrentLanguageCode(currentLanguageCode);
 			}
 		}
 	}

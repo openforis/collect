@@ -11,6 +11,7 @@ import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.annotation.Command;
+import org.zkoss.bind.annotation.Init;
 import org.zkoss.bind.annotation.NotifyChange;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 
@@ -21,6 +22,12 @@ import org.zkoss.zk.ui.select.annotation.VariableResolver;
  */
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class VersioningVM extends SurveyObjectBaseVM<ModelVersion> {
+	
+	@Override
+	@Init(superclass=false)
+	public void init() {
+		super.init();
+	}
 	
 	@Override
 	protected List<ModelVersion> getItemsInternal() {

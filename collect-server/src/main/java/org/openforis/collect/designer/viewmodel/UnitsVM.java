@@ -13,6 +13,7 @@ import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.Unit;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.annotation.Command;
+import org.zkoss.bind.annotation.Init;
 import org.zkoss.bind.annotation.NotifyChange;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 
@@ -26,6 +27,12 @@ public class UnitsVM extends SurveyObjectBaseVM<Unit> {
 
 	private static final String UNITS_UPDATED_GLOBAL_COMMAND = "unitsUpdated";
 
+	@Override
+	@Init(superclass=false)
+	public void init() {
+		super.init();
+	}
+	
 	@Override
 	protected List<Unit> getItemsInternal() {
 		CollectSurvey survey = getSurvey();

@@ -41,8 +41,8 @@ public class UnitFormObject extends SurveyObjectFormObject<Unit> {
 	@Override
 	public void loadFrom(Unit source, String languageCode, String defaultLanguage) {
 		name = source.getName();
-		label = source.getLabel(languageCode);
-		abbreviation = source.getAbbreviation(languageCode);
+		label = getLabel(source, languageCode, defaultLanguage);
+		abbreviation = getAbbreviation(source, languageCode, defaultLanguage);
 		String dimensionValue = source.getDimension();
 		if ( dimensionValue != null ) {
 			Dimension dimension = Dimension.valueOf(dimensionValue.toUpperCase());

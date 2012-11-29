@@ -1,0 +1,13 @@
+<zk>
+<hlayout>
+    <label id="mainLabel" />
+    <hlayout spacing="0">
+      <hlayout id="languageCodeContainer" spacing="0">
+        <label value="("/>
+        <label id="languageCodeLabel" />
+        <label value=")"/>
+      </hlayout>
+      <label id="colonLabel" value=":"/>
+    </hlayout>
+</hlayout>
+</zk>

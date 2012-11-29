@@ -1,4 +1,5 @@
 <?component name="fieldErrorHandler" class="org.openforis.collect.designer.component.FieldErrorHandler"?>
+<?component name="multilanguageLabel" class="org.openforis.collect.designer.component.MultilanguageLabel" macroURI="/WEB-INF/view/zul/designer/component/multilanguage_label.zul"?>
 <zk>
 	<window id="codeListItemManagerPopUp" title="${labels.survey.code_list.item.manager.title}" 
 		width="600px"
@@ -27,13 +28,15 @@
 					</fieldErrorHandler>
 				</row>
 				<row>
-					<label value="${labels.global.item.label}:" />
+                    <multilanguageLabel value="${labels.global.item.label}" 
+                      languageCode="@load(vm.currentLanguageCode)" />
                     <fieldErrorHandler message="@load(vmsgs['label'])">
 						<textbox width="150px" value="@bind(fx.label)" onChange="@command('applyChanges')" />
 					</fieldErrorHandler>
 				</row>
 				<row>
-					<label value="${labels.global.item.description}:" />
+					<multilanguageLabel value="${labels.global.item.description}" 
+                      languageCode="@load(vm.currentLanguageCode)" />
                     <fieldErrorHandler message="@load(vmsgs['description'])">
 						<textbox width="300px" value="@bind(fx.description)"
                           multiline="true" rows="4"

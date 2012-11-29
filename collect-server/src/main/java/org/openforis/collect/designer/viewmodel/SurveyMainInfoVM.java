@@ -26,16 +26,6 @@ public class SurveyMainInfoVM extends SurveyObjectBaseVM<CollectSurvey> {
 		setEditedItem(getSurvey());
 	}
 	
-//	@Override
-//	public SurveyObjectFormObject<CollectSurvey> getFormObject() {
-//		if ( formObject == null ) {
-//			CollectSurvey survey = getSurvey();
-//			formObject = createFormObject();
-//			formObject.loadFrom(survey, currentLanguageCode);
-//		}
-//		return formObject;
-//	}
-	
 	@Override
 	protected CollectSurvey createItemInstance() {
 		//do nothing, no child instances created
@@ -49,7 +39,6 @@ public class SurveyMainInfoVM extends SurveyObjectBaseVM<CollectSurvey> {
 
 	@Override
 	protected List<CollectSurvey> getItemsInternal() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 	
