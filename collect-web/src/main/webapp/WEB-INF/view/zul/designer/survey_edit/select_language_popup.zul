@@ -13,9 +13,7 @@
         height="300px" 
         checkmark="true">
         <template name="model">
-          <listitem>
-            <listcell label="${each.label}" />
-          </listitem>
+          <listitem label="${each.label}" />
         </template>
       </listbox>
       <box align="center" width="100%">
