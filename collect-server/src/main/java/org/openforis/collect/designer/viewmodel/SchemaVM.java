@@ -113,7 +113,7 @@ public class SchemaVM extends SurveyBaseVM {
 	}
 	
 	@Command
-	@NotifyChange({"selectedNode","nodes","selectedVersion"})
+	@NotifyChange({"selectedNode","treeModel","selectedVersion"})
 	public void versionSelected(@BindingParam("version") ModelVersion version) {
 		nodesTreeFilterChanged(selectedRootEntity, version);
 	}
@@ -450,7 +450,7 @@ public class SchemaVM extends SurveyBaseVM {
 		BindUtils.postGlobalCommand(null, null, SCHEMA_CHANGED_GLOBAL_COMMAND, null);
 	}
 	
-	public SchemaTreeModel getNodes() {
+	public SchemaTreeModel getTreeModel() {
 		if ( treeModel == null ) {
 			buildTreeModel();
 		}
@@ -470,7 +470,7 @@ public class SchemaVM extends SurveyBaseVM {
 	
 	protected void updateTreeModel() {
 		buildTreeModel();
-		notifyChange("nodes");
+		notifyChange("treeModel");
 	}
 	
 	public boolean isEntity(NodeDefinition nodeDefn) {

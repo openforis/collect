@@ -9,6 +9,7 @@
       <label value="${labels.survey.language.select_language_to_assign}" />
 
       <listbox model="@load(vm.languagesModel)"
+        sclass="languagesList"
         width="100%" 
         height="300px" 
         checkmark="true">

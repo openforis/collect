@@ -38,16 +38,16 @@
 	background: #CE2929;
 	color: #FFFFFF;
 }
-//START OF GROUPBOX STYLE
+/* START OF GROUPBOX STYLE */
 .form .z-groupbox .z-groupbox-cnt {
 	padding: 0px;
 }
 .z-groupbox.tableFieldSet .z-groupbox-cnt {
 	padding: 10px;
 }
-//END OF GROUPBOX STYLE
+/* END OF GROUPBOX STYLE */
 
-//START OF GRID STYLE
+/* START OF GRID STYLE */
 .z-grid.inner {
 	border: none;
 }
@@ -69,4 +69,10 @@
 	border-top: 1px solid transparent;
     border-bottom: 1px solid transparent;
 }
-//END OF GRID STYLE
+/* END OF GRID STYLE */
+
+/* START OF LANGUAGES LIST STYLE */
+.z-listbox.languagesList div.z-listbox-body .z-listcell {
+	padding: 1px;
+}
+/* END OF LANGUAGES LIST STYLE */

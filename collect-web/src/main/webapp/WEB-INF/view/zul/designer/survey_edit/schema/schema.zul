@@ -10,10 +10,10 @@
       </north>
       <west title="${labels.survey.schema.definitions}" width="350px"
         splittable="true">
-        <borderlayout>
+        <borderlayout visible="@load(not empty vm.treeModel)">
           <center>
             <tree id="nodesTree" zclass="z-dottree" width="100%"
-              vflex="true" model="@load(vm.nodes)"
+              vflex="true" model="@load(vm.treeModel)"
               context="nodesTreePopup"
               onSelect="@command('nodeSelected', node=self.selectedItem.value.data)">
               <template name="model">
