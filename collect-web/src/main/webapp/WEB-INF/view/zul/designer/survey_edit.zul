@@ -46,14 +46,14 @@
                 <absolutechildren x="480" width="50%">
                     <!-- language selector -->
                     <hlayout id="languageSelector" hflex="1" style="text-align: right;">
-                      <label value="${labels.survey.selected_language}:" />
-                      <radiogroup model="@load(vm.availableLanguages)"
+                      <listbox model="@load(vm.availableLanguages)"
                         selectedItem="@load(vm.currentLanguageCode)"
-                        onCheck="@command('languageCodeSelected', code=self.selectedItem.value)">
+                        onSelect="@command('languageCodeSelected', code=self.selectedItem.value)"
+                        mold="select">
                         <template name="model">
-                          <radio label="${c:l(each)}" value="@load(each)" />
+                           <listitem label="${c:l(each)}" value="@load(each)" />
                         </template>
-                      </radiogroup>
+                      </listbox>
                       <button tooltiptext="${labels.survey.language_manager}" 
                           onClick="@command('openLanguageManagerPopUp')"
                           image="/assets/images/pencil-small.png" />
