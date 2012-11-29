@@ -27,7 +27,6 @@ import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.GlobalCommand;
 import org.zkoss.bind.annotation.Init;
-import org.zkoss.bind.annotation.NotifyChange;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
@@ -57,17 +56,17 @@ public abstract class SurveyBaseVM extends BaseVM {
 	public SurveyBaseVM() {
 		currentFormValid = true;
 		currentFormBlocking = false;
-		initCurrentLanguageCode();
 	}
 
-	private void initCurrentLanguageCode() {
-		SessionStatus sessionStatus = getSessionStatus();
-		currentLanguageCode = sessionStatus.getCurrentLanguageCode();
-	}
-	
 	@Init
 	public void init() {
 		initSurvey();
+		initCurrentLanguageCode();
+	}
+	
+	private void initCurrentLanguageCode() {
+		SessionStatus sessionStatus = getSessionStatus();
+		currentLanguageCode = sessionStatus.getCurrentLanguageCode();
 	}
 	
 	@GlobalCommand
@@ -165,9 +164,9 @@ public abstract class SurveyBaseVM extends BaseVM {
 	}
 
 	@GlobalCommand
-	@NotifyChange({"currentLanguageCode"})
 	public void currentLanguageChanged() {
 		initCurrentLanguageCode();
+		notifyChange("currentLanguageCode");
 	}
 
 	public String getDateFormat() {
