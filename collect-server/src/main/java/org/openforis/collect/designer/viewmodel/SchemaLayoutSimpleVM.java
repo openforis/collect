@@ -227,7 +227,10 @@ public class SchemaLayoutSimpleVM extends SurveyBaseVM {
 	
 	protected boolean isMoveItemDisabled(boolean up) {
 		UIOptions uiOptions = getUIOptions();
-		if ( selectedTab == null || uiOptions.isMainTab(selectedTab) ) {
+		if ( uiOptions == null ) {
+			//TODO session expired?!
+			return true;
+		} else if ( selectedTab == null || uiOptions.isMainTab(selectedTab) ) {
 			return true;
 		} else {
 			List<UITab> siblings = selectedTab.getSiblings();
@@ -281,7 +284,7 @@ public class SchemaLayoutSimpleVM extends SurveyBaseVM {
 	
 	protected UIOptions getUIOptions() {
 		CollectSurvey survey = getSurvey();
-		return survey.getUIOptions();
+		return survey == null ? null: survey.getUIOptions();
 	}
 	
 	public UITabSet getRootTabSet() {
