@@ -9,35 +9,43 @@
              <include src="survey_edit/schema/nodes_tree_filter.zul" canEditRootEntities="false" />
             </north>
             <center border="none">
-    			<tree id="tabsTree"
-                    zclass="z-dottree"
-                    context="treeContextMenu"
-    				width="100%" vflex="true"
-    				model="@load(vm.treeModel)"
-    				onSelect="@command('tabSelected', tab=self.selectedItem.value.data)">
-    				<template name="model">
-    		            <treeitem context="${vm.isMainTab(each.data) ? mainTabContextMenu: treeItemContextMenu}">
-    		                <treerow>
-    		                    <treecell>
-                                  <textbox value="@load(vm.getTabLabel(each.data))" inplace="true"
-                                      onChange="@command('tabChanged', tab=each.data, label=self.value)"
-                                      onFocus="@command('tabSelected', tab=each.data)" />
-                                </treecell>
-    		                </treerow>
-    		            </treeitem>
-    		  		</template>
-    		    </tree>
+                <borderlayout visible="@load(not empty vm.treeModel))">
+                  <north border="none" height="40px">
+                    <label sclass="sectionTitle" value="${labels.survey.layout.navigation_tree}" />
+                  </north>
+                  <center border="none">
+        			<tree id="tabsTree"
+                        zclass="z-vfiletree"
+                        context="treeContextMenu"
+        				width="100%" vflex="true"
+        				model="@load(vm.treeModel)"
+        				onSelect="@command('tabSelected', tab=self.selectedItem.value.data)">
+        				<template name="model">
+        		            <treeitem context="${vm.isMainTab(each.data) ? mainTabContextMenu: treeItemContextMenu}">
+        		                <treerow>
+        		                    <treecell>
+                                      <textbox 
+                                          value="@load(vm.getTabLabel(each.data))" 
+                                          onChange="@command('tabChanged', tab=each.data, label=self.value)"
+                                          onFocus="@command('tabSelected', tab=each.data)" />
+                                    </treecell>
+        		                </treerow>
+        		            </treeitem>
+        		  		</template>
+        		    </tree>
+                  </center>
+                  <south border="none">
+                      <toolbar width="100%">
+                        <toolbarbutton image="/assets/images/arrow-up.png"
+                          disabled="@load(vm.moveItemUpDisabled)" 
+                          onClick="@command('moveItemUp')" />
+                        <toolbarbutton image="/assets/images/arrow-down.png"
+                          disabled="@load(vm.moveItemDownDisabled)" 
+                          onClick="@command('moveItemDown')" />
+                     </toolbar>
+                </south>
+                </borderlayout>
             </center>
-            <south>
-                <toolbar width="100%">
-                  <toolbarbutton image="/assets/images/arrow-up.png"
-                    disabled="@load(vm.moveItemUpDisabled)" 
-                    onClick="@command('moveItemUp')" />
-                  <toolbarbutton image="/assets/images/arrow-down.png"
-                    disabled="@load(vm.moveItemDownDisabled)" 
-                    onClick="@command('moveItemDown')" />
-               </toolbar>
-          </south>
  		</borderlayout>
     
         <menupopup id="treeContextMenu">
@@ -55,7 +63,7 @@
             image="/assets/images/add.png"
             onClick="@command('addTab', parent=vm.selectedTab)" />
           <menuitem label="${labels.survey.layout.tab.remove.$}" 
-              image="/assets/images/remove.png"
+              image="/assets/images/delete.png"
               onClick="@command('removeTab')" />
         </menupopup>
     </div>
