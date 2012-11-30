@@ -78,21 +78,22 @@ public abstract class AbstractTreeModel<T> extends DefaultTreeModel<T> {
 	
 	@SuppressWarnings("unchecked")
 	public void select(T defn) {
-		if ( defn != null ) {
-			AbstractTreeNode<T> treeNode = getNode(defn);
-			setSelection(Arrays.asList(treeNode));
+		Collection<? extends TreeNode<T>> selection;
+		if ( defn == null ) {
+			selection = Collections.emptyList();
 		} else {
-			List<AbstractTreeNode<T>> emptyList = Collections.emptyList();
-			setSelection(emptyList);
+			AbstractTreeNode<T> treeNode = getNode(defn);
+			selection = Arrays.asList(treeNode);
 		}
+		setSelection(selection);
 	}
 	
 	protected AbstractTreeNode<T> getNode(T item) {
-		if ( item != null ) {
+		if ( item == null ) {
+			return null;
+		} else {
 			int[] path = getNodePath(item);
 			return (AbstractTreeNode<T>) getChild(path);
-		} else {
-			return null;
 		}
 	}
 	

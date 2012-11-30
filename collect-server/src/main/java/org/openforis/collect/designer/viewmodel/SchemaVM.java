@@ -5,6 +5,7 @@ package org.openforis.collect.designer.viewmodel;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -51,17 +52,16 @@ import org.zkoss.zul.Include;
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class SchemaVM extends SurveyBaseVM {
 
-	private static final String ROOT_ENTITY_NOT_SELECTED = "survey.schema.edit_root_entity.not_selected";
+	private static final boolean FILTER_BY_ROOT_ENTITY = true;
+	private static final boolean INCLUDE_ROOT_ENTITY_IN_TREE = true;
 
 	private static final String SCHEMA_CHANGED_GLOBAL_COMMAND = "schemaChanged";
+	private static final String VALIDATE_COMMAND = "validate";
 	
 	private static final String CONFIRM_REMOVE_NODE_MESSAGE_KEY = "survey.schema.confirm_remove_node";
 	private static final String CONFIRM_REMOVE_NON_EMPTY_ENTITY_MESSAGE_KEY = "survey.schema.confirm_remove_non_empty_entity";
 	private static final String CONFIRM_REMOVE_NODE_TITLE_KEY = "survey.schema.confirm_remove_node_title";
-	
-	private static final String VALIDATE_COMMAND = "validate";
 
-	
 	private NodeDefinition selectedNode;
 	private NodeDefinition editedNode;
 	private boolean newNode;
@@ -244,18 +244,6 @@ public class SchemaVM extends SurveyBaseVM {
 		}
 	}
 	
-	@Command
-	public void editRootEntity(@ContextParam(ContextType.BINDER) Binder binder) {
-		if ( selectedRootEntity == null ) {
-			MessageUtil.showWarning(ROOT_ENTITY_NOT_SELECTED);
-		} else {
-			resetNodeSelection();
-			editNode(binder, false, null, selectedRootEntity);
-		}
-	}
-	
-	
-	
 	protected void editNode(Binder binder, boolean newNode, EntityDefinition parentEntity, NodeDefinition node) {
 		this.newNode = newNode;
 		editedNodeParentEntity = parentEntity;
@@ -307,11 +295,6 @@ public class SchemaVM extends SurveyBaseVM {
 	}
 
 	@Command
-	public void removeRootEntity() {
-		removeNode(selectedRootEntity);
-	}
-	
-	@Command
 	public void removeNode() {
 		removeNode(selectedNode);
 	}
@@ -354,7 +337,7 @@ public class SchemaVM extends SurveyBaseVM {
 	}
 	
 	protected void moveNode(boolean up) {
-		List<NodeDefinition> siblings = getSiblings(selectedNode);
+		List<NodeDefinition> siblings = getSiblingsInTree(selectedNode);
 		int oldIndex = siblings.indexOf(selectedNode);
 		int newIndex = up ? oldIndex - 1: oldIndex + 1;
 		moveNode(newIndex);
@@ -362,28 +345,23 @@ public class SchemaVM extends SurveyBaseVM {
 		dispatchSchemaChangedCommand();
 	}
 	
-	protected void moveNode(int newIndex) {
+	protected void moveNode(int newIndexInTree) {
+		List<NodeDefinition> siblings = getSiblingsInTree(selectedNode);
 		EntityDefinition parentDefn = (EntityDefinition) selectedNode.getParentDefinition();
+		NodeDefinition treeNodeToMoveInto = siblings.get(newIndexInTree);
+		int toIndex;
+		if ( treeNodeToMoveInto != null ) {
+			toIndex = parentDefn.getChildDefinitionIndex(treeNodeToMoveInto);
+		} else {
+			toIndex = newIndexInTree;
+		}
 		if ( parentDefn != null ) {
-			parentDefn.moveChildDefinition(selectedNode, newIndex);
+			parentDefn.moveChildDefinition(selectedNode, toIndex);
 		} else {
 			EntityDefinition rootEntity = selectedNode.getRootEntity();
 			Schema schema = rootEntity.getSchema();
-			schema.moveRootEntityDefinition(rootEntity, newIndex);
+			schema.moveRootEntityDefinition(rootEntity, toIndex);
 		}
-	}
-	
-	protected int getIndex(NodeDefinition nodeDefn) {
-		int index;
-		EntityDefinition parentDefn = (EntityDefinition) nodeDefn.getParentDefinition();
-		if ( parentDefn != null ) {
-			index = parentDefn.getChildIndex(nodeDefn);
-		} else {
-			EntityDefinition rootEntity = selectedNode.getRootEntity();
-			Schema schema = rootEntity.getSchema();
-			index = schema.getRootEntityIndex(rootEntity);
-		}
-		return index;
 	}
 	
 	protected void performRemoveNode(NodeDefinition nodeDefn) {
@@ -413,18 +391,15 @@ public class SchemaVM extends SurveyBaseVM {
 	@NotifyChange({"selectedNode","newNode"})
 	public void editedNodeChanged(@BindingParam("parentEntity") EntityDefinition parentEntity) {
 		if ( newNode ) {
-			if ( parentEntity != null ) {
+			if ( parentEntity == null ) {
+				selectedRootEntity = (EntityDefinition) editedNode;
+				updateTreeModel();
+			} else {
 				if ( treeModel != null ) {
-					if ( parentEntity.getParentDefinition() != null ) {
-						//is not root entity, the nodes tree will contain it
-						treeModel.select(parentEntity);
-					}
+					treeModel.select(parentEntity);
 					treeModel.appendNodeToSelected(editedNode);
 				}
 				selectedNode = editedNode;
-			} else {
-				selectedRootEntity = (EntityDefinition) editedNode;
-				updateTreeModel();
 			}
 			newNode = false;
 			notifyChange("newNode");
@@ -459,7 +434,7 @@ public class SchemaVM extends SurveyBaseVM {
 		if ( survey == null ) {
 			//TODO session expired...?
 		} else if ( survey.getVersions().size() == 0 || selectedVersion != null ) {
-			treeModel = SchemaTreeModel.createInstance(selectedRootEntity, selectedVersion, false, true);
+			treeModel = SchemaTreeModel.createInstance(selectedRootEntity, selectedVersion, INCLUDE_ROOT_ENTITY_IN_TREE, true);
 		} else {
 			treeModel = null;
 		}
@@ -474,16 +449,20 @@ public class SchemaVM extends SurveyBaseVM {
 		return nodeDefn instanceof EntityDefinition;
 	}
 	
-	public List<NodeDefinition> getSiblings(NodeDefinition nodeDefinition) {
+	protected List<NodeDefinition> getSiblingsInTree(NodeDefinition nodeDefn) {
 		List<NodeDefinition> result = new ArrayList<NodeDefinition>();
-		EntityDefinition parentDefn = (EntityDefinition) nodeDefinition.getParentDefinition();
+		EntityDefinition parentDefn = (EntityDefinition) nodeDefn.getParentDefinition();
 		List<? extends NodeDefinition> allSiblings;
-		if ( parentDefn != null ) {
-			allSiblings = parentDefn.getChildDefinitions();
+		if ( parentDefn == null ) {
+			EntityDefinition rootEntity = nodeDefn.getRootEntity();
+			if ( FILTER_BY_ROOT_ENTITY ) {
+				allSiblings = Arrays.asList(rootEntity);
+			} else {
+				Schema schema = rootEntity.getSchema();
+				allSiblings = schema.getRootEntityDefinitions();
+			}
 		} else {
-			EntityDefinition rootEntity = nodeDefinition.getRootEntity();
-			Schema schema = rootEntity.getSchema();
-			allSiblings = schema.getRootEntityDefinitions();
+			allSiblings = parentDefn.getChildDefinitions();
 		}
 		//filter siblings
 		for (NodeDefinition sibling : allSiblings) {
@@ -494,31 +473,9 @@ public class SchemaVM extends SurveyBaseVM {
 		return result;
 	}
 	
-	public int getSelectedNodeIndex() {
-		int index;
-		if ( selectedNode != null ) {
-			EntityDefinition parentDefn = (EntityDefinition) selectedNode.getParentDefinition();
-			if ( parentDefn != null ) {
-				index = parentDefn.getChildIndex(selectedNode);
-			} else {
-				EntityDefinition rootEntity = selectedNode.getRootEntity();
-				Schema schema = rootEntity.getSchema();
-				index = schema.getRootEntityIndex(rootEntity);
-			}
-		} else {
-			index = -1;
-		}
-		return index;
-	}
-
 	@DependsOn("selectedNode")
 	public boolean isMoveNodeUpDisabled() {
-		if ( selectedNode != null ) {
-			int index = getIndex(selectedNode);
-			return index <= 0;
-		} else {
-			return true;
-		}
+		return isMoveNodeDisabled(true);
 	}
 	
 	@DependsOn("selectedNode")
@@ -528,7 +485,7 @@ public class SchemaVM extends SurveyBaseVM {
 	
 	protected boolean isMoveNodeDisabled(boolean up) {
 		if ( selectedNode != null ) {
-			List<NodeDefinition> siblings = getSiblings(selectedNode);
+			List<NodeDefinition> siblings = getSiblingsInTree(selectedNode);
 			int index = siblings.indexOf(selectedNode);
 			return isMoveItemDisabled(siblings, index, up);
 		} else {

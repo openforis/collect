@@ -1,6 +1,7 @@
 package org.openforis.collect.designer.component;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -20,39 +21,48 @@ public class SchemaTreeModel extends AbstractTreeModel<NodeDefinition> {
 	
 	private static final long serialVersionUID = 1L;
 	
-	private boolean includeAttributes;
 	private ModelVersion version;
-
+	
+	private boolean singleRootEntity;
+	private boolean includeAttributes;
 	private boolean includesRootEntities;
 
-	SchemaTreeModel(NodeDefinitionTreeNode root, ModelVersion version, boolean includesRootEntities, boolean includeAttributes) {
+	SchemaTreeModel(NodeDefinitionTreeNode root, ModelVersion version, boolean singleRootEntity, boolean includesRootEntities, boolean includeAttributes) {
 		super(root);
+		this.singleRootEntity = singleRootEntity;
 		this.includesRootEntities = includesRootEntities;
 		this.includeAttributes = includeAttributes;
 		this.version = version;
 	}
 	
-	public static SchemaTreeModel createInstance(CollectSurvey survey, boolean includeRootEntities, boolean includeAttributes) {
-		return createInstance(survey, null, includeRootEntities, includeAttributes);
+	public static SchemaTreeModel createInstance(CollectSurvey survey, boolean includeAttributes) {
+		return createInstance(survey, (ModelVersion) null, includeAttributes);
 	}
 	
-	public static SchemaTreeModel createInstance(EntityDefinition rootEntity, ModelVersion version, boolean includeRootEntities, boolean includeAttributes) {
+	@SuppressWarnings("unchecked")
+	public static SchemaTreeModel createInstance(EntityDefinition rootEntity, ModelVersion version, boolean includeRootEntity, boolean includeAttributes) {
 		if ( rootEntity != null && (version == null || version.isApplicable(rootEntity)) ) {
-			List<AbstractTreeNode<NodeDefinition>> treeNodes = NodeDefinitionTreeNode.fromList(rootEntity.getChildDefinitions(), version, includeAttributes);
-			NodeDefinitionTreeNode root = new NodeDefinitionTreeNode(null, treeNodes);
-			SchemaTreeModel result = new SchemaTreeModel(root, version, includeRootEntities, includeAttributes);
+			List<AbstractTreeNode<NodeDefinition>> firstLevelTreeNodes;
+			if ( includeRootEntity ) {
+				AbstractTreeNode<NodeDefinition> rootEntityNode = NodeDefinitionTreeNode.createNode(rootEntity, version, includeAttributes);
+				firstLevelTreeNodes = Arrays.asList(rootEntityNode);
+			} else {
+				firstLevelTreeNodes = NodeDefinitionTreeNode.fromList(rootEntity.getChildDefinitions(), version, includeAttributes);
+			}
+			NodeDefinitionTreeNode root = new NodeDefinitionTreeNode(null, firstLevelTreeNodes);
+			SchemaTreeModel result = new SchemaTreeModel(root, version, true, true, includeAttributes);
 			return result;
 		} else {
 			return null;
 		}
 	}
 	
-	public static SchemaTreeModel createInstance(CollectSurvey survey, ModelVersion version, boolean includeRootEntities, boolean includeAttributes) {
+	public static SchemaTreeModel createInstance(CollectSurvey survey, ModelVersion version, boolean includeAttributes) {
 		Schema schema = survey.getSchema();
 		List<EntityDefinition> rootDefns = schema.getRootEntityDefinitions();
 		List<AbstractTreeNode<NodeDefinition>> treeNodes = NodeDefinitionTreeNode.fromList(rootDefns, version, includeAttributes);
 		NodeDefinitionTreeNode root = new NodeDefinitionTreeNode(null, treeNodes);
-		SchemaTreeModel result = new SchemaTreeModel(root, version, includeRootEntities, includeAttributes);
+		SchemaTreeModel result = new SchemaTreeModel(root, version, false, true, includeAttributes);
 		return result;
 	}
 	
@@ -64,10 +74,12 @@ public class SchemaTreeModel extends AbstractTreeModel<NodeDefinition> {
 	
 	@Override
 	protected int[] getNodePath(NodeDefinition defn) {
-		if ( defn != null ) {
-			EntityDefinition parent = (EntityDefinition) defn.getParentDefinition();
-			NodeDefinition current = defn;
+		if ( defn == null ) {
+			return null;
+		} else {
 			List<Integer> temp = new ArrayList<Integer>();
+			NodeDefinition current = defn;
+			EntityDefinition parent = (EntityDefinition) defn.getParentDefinition();
 			int index;
 			while ( parent != null ) {
 				index = getIndexInTree(parent, current);
@@ -77,23 +89,36 @@ public class SchemaTreeModel extends AbstractTreeModel<NodeDefinition> {
 			}
 			if ( includesRootEntities ) {
 				EntityDefinition rootEntity = current.getRootEntity();
-				Schema schema = rootEntity.getSchema();
-				index = schema.getRootEntityIndex(rootEntity);
+				index = getIndexInTree(null, rootEntity);
 				temp.add(0, index);
 			}
 			int[] result = toArray(temp);
 			return result;
-		} else {
-			return null;
 		}
 	}
 
 	protected int getIndexInTree(EntityDefinition parent, NodeDefinition node) {
-		List<NodeDefinition> siblings = getSiblings(parent);
+		List<NodeDefinition> siblings;
+		if ( parent == null ) {
+			if ( singleRootEntity ) {
+				return 0;
+			} else {
+				Schema schema = node.getSchema();
+				siblings = new ArrayList<NodeDefinition>();
+				List<EntityDefinition> rootEntities = schema.getRootEntityDefinitions();
+				for (EntityDefinition rootEntity : rootEntities) {
+					if ( version == null || version.isApplicable(rootEntity) ) {
+						siblings.add(rootEntity);
+					}
+				}
+			}
+		} else {
+			siblings = getFilteredChildren(parent);
+		}
 		return siblings.indexOf(node);
 	}
 	
-	protected List<NodeDefinition> getSiblings(EntityDefinition parent) {
+	protected List<NodeDefinition> getFilteredChildren(EntityDefinition parent) {
 		List<NodeDefinition> result = new ArrayList<NodeDefinition>();
 		List<NodeDefinition> allSiblings = parent.getChildDefinitions();
 		for (NodeDefinition childDefn : allSiblings) {
