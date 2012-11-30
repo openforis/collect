@@ -68,6 +68,11 @@ public class SurveySelectVM extends BaseVM {
 	}
 	
 	@Command
+	public void goToIndex() {
+		Executions.sendRedirect(Page.INDEX.getLocation());
+	}
+	
+	@Command
 	public void openSurveyImportPopUp() {
 		surveyImportPopUp = openPopUp(Resources.Component.SURVEY_IMPORT_POPUP.getLocation(), true);
 	}

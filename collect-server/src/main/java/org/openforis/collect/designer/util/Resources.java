@@ -13,7 +13,8 @@ public class Resources {
 	
 	public enum Page {
 	
-		MAIN("designer.htm"),
+		INDEX("index.htm"),
+		DESIGNER("designer.htm"),
 		SURVEY_EDIT("editSurvey.htm");
 
 		private String location;

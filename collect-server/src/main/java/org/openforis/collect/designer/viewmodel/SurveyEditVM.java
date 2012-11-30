@@ -184,7 +184,7 @@ public class SurveyEditVM extends SurveyBaseVM {
 	}
 
 	protected void showMainPage() {
-		Executions.sendRedirect(Resources.Page.MAIN.getLocation());
+		Executions.sendRedirect(Resources.Page.DESIGNER.getLocation());
 	}
 
 	protected void resetSessionStatus() {
