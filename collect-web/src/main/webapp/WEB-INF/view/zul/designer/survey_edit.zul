@@ -64,7 +64,7 @@
 		<south height="30px">
 			<borderlayout hflex="1">
 				<west border="none" size="40%">
-					<button label="${labels.survey.list_of_surveys}" 
+					<button label="${labels.survey.back_to_list}" 
 						onClick="@command('backToSurveysList')" />
 				</west>
 				<center border="none">
@@ -75,13 +75,8 @@
 				</center>
 				<east border="none" size="40%">
                     <box width="100%" align="right">
-                        <hbox>
-    						<button label="${labels.survey.export}"
-    							onClick="@global-command('exportSurvey')" />
-                            <separator width="40px" />
-    						<button label="${labels.survey.publish.$}" 
-    							onClick="@command('publish')" />
-                        </hbox>
+  						<button label="${labels.survey.publish.$}" 
+  							onClick="@command('publish')" />
                     </box>
 				</east>
 			</borderlayout>

@@ -8,7 +8,7 @@
   apply="org.zkoss.bind.BindComposer"
   viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SurveySelectVM')">
 
-  <label sclass="mainTitle" value="${labels.title}" />
+  <label sclass="mainTitle" value="${labels.designer_title}" />
 
   <hlayout width="100%">
     <box hflex="30">
@@ -44,17 +44,26 @@
     </template>
   </listbox>
 
-  <hlayout spacing="30px">
-    <button id="newSurveyBtn" label="${labels.global.new_item}"
+  <hlayout spacing="50px">
+    <button
+      label="${labels.global.new_item}"
       onClick="@command('newSurvey')" />
-
-    <button id="editSurveyBtn" label="${labels.global.edit_item}"
-      onClick="@command('editSurvey')"
+    
+    <button
+      label="${labels.global.edit_item}"
+      onClick="@command('editSelectedSurvey')"
       disabled="@load(vm.editingDisabled)" />
+    
+    <button 
+      tooltiptext="${labels.surveys_list.admin_options}"
+      image="/assets/images/advanced-small.png" popup="adminOptionsPopUp" />
+   </hlayout>
 
-    <button id="importSurveyBtn"
-      label="${labels.survey.import_survey.$}"
+  <menupopup id="adminOptionsPopUp">
+    <menuitem label="${labels.survey.export}"
+      disabled="@load(vm.exportDisabled)"
+      onClick="@command('exportSelectedSurvey')" />
+    <menuitem label="${labels.survey.import_survey.$}"
       onClick="@command('openSurveyImportPopUp')" />
-  </hlayout>
-
+  </menupopup>
 </vbox>

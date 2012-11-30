@@ -3,6 +3,7 @@
  */
 package org.openforis.collect.designer.viewmodel;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
 
@@ -18,6 +19,7 @@ import org.zkoss.bind.annotation.DependsOn;
 import org.zkoss.bind.annotation.GlobalCommand;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
+import org.zkoss.zul.Filedownload;
 import org.zkoss.zul.ListModel;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Window;
@@ -29,8 +31,10 @@ import org.zkoss.zul.Window;
  */
 public class SurveySelectVM extends BaseVM {
 	
-	public static final String CLOSE_SURVEY_IMPORT_POP_UP_GLOBAL_COMMNAD = "closeSurveyImportPopUp";
+	private static final String TEXT_XML = "text/xml";
 
+	public static final String CLOSE_SURVEY_IMPORT_POP_UP_GLOBAL_COMMNAD = "closeSurveyImportPopUp";
+	
 	@WireVariable
 	private SurveyManager surveyManager;
 	
@@ -39,14 +43,8 @@ public class SurveySelectVM extends BaseVM {
 	private Window surveyImportPopUp;
 	
 	@Command
-	public void editSurvey() throws IOException {
-		String uri = selectedSurvey.getUri();
-		CollectSurvey surveyWork;
-		if ( selectedSurvey.isPublished() ) {
-			surveyWork = surveyManager.loadPublishedSurveyForEdit(uri);
-		} else {
-			surveyWork = surveyManager.loadSurveyWork(selectedSurvey.getId());
-		}
+	public void editSelectedSurvey() throws IOException {
+		CollectSurvey surveyWork = loadSelectedSurvey();
 		SessionStatus sessionStatus = getSessionStatus();
 		if ( selectedSurvey.isPublished() && ! selectedSurvey.isWorking() ) {
 			sessionStatus.setPublishedSurveyId(selectedSurvey.getId());
@@ -68,6 +66,16 @@ public class SurveySelectVM extends BaseVM {
 	}
 	
 	@Command
+	public void exportSelectedSurvey() throws IOException {
+		CollectSurvey survey = loadSelectedSurvey();
+		ByteArrayOutputStream os = new ByteArrayOutputStream();
+		surveyManager.marshalSurvey(survey, os);
+		byte[] content = os.toByteArray();
+		String fileName = survey.getName() + ".xml";
+		Filedownload.save(content, TEXT_XML, fileName);
+	}
+	
+	@Command
 	public void goToIndex() {
 		Executions.sendRedirect(Page.INDEX.getLocation());
 	}
@@ -81,6 +89,17 @@ public class SurveySelectVM extends BaseVM {
 	public void closeSurveyImportPopUp() {
 		closePopUp(surveyImportPopUp);
 		surveyImportPopUp = null;
+	}
+	
+	protected CollectSurvey loadSelectedSurvey() {
+		String uri = selectedSurvey.getUri();
+		CollectSurvey surveyWork;
+		if ( selectedSurvey.isPublished() ) {
+			surveyWork = surveyManager.loadPublishedSurveyForEdit(uri);
+		} else {
+			surveyWork = surveyManager.loadSurveyWork(selectedSurvey.getId());
+		}
+		return surveyWork;
 	}
 	
 	public ListModel<SurveyWorkSummary> getSurveySummaries() {
@@ -101,10 +120,14 @@ public class SurveySelectVM extends BaseVM {
 		return this.selectedSurvey != null;
 	}
 	
-	@DependsOn("surveySelected")
+	@DependsOn("selectedSurvey")
 	public boolean isEditingDisabled() {
 		return this.selectedSurvey == null;
 	}
 	
+	@DependsOn("selectedSurvey")
+	public boolean isExportDisabled() {
+		return this.selectedSurvey == null;
+	}
 	
 }
