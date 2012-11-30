@@ -20,6 +20,7 @@ import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.DependsOn;
 import org.zkoss.bind.annotation.GlobalCommand;
+import org.zkoss.bind.annotation.Init;
 import org.zkoss.bind.annotation.NotifyChange;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zkplus.databind.BindingListModelList;
@@ -40,11 +41,27 @@ public class SchemaLayoutSimpleVM extends SurveyBaseVM {
 	private UITab selectedTab;
 	private ModelVersion selectedVersion;
 
+	@Override
+	@Init(superclass=false)
+	public void init() {
+		super.init();
+	}
+	
 	@GlobalCommand
-	@NotifyChange({"rootEntities","nodes"})
+	@NotifyChange({"rootEntities","treeModel"})
 	public void schemaChanged() {
+		checkSelectedRootEntityExistence();
 		initTreeModel();
 		tabSelected(null);
+	}
+
+	protected void checkSelectedRootEntityExistence() {
+		if ( selectedRootEntity != null ) {
+			List<EntityDefinition> rootEntities = getRootEntities();
+			if ( rootEntities != null && ! rootEntities.contains(selectedRootEntity) ) {
+				selectedRootEntity = null;
+			}
+		}
 	}
 	
 	@Command
@@ -128,12 +145,12 @@ public class SchemaLayoutSimpleVM extends SurveyBaseVM {
 	}
 
 	@Command
-	public void tabChanged(@BindingParam("tab") UITab tab, @BindingParam("label") String label) {
+	public void tabLabelChanged(@BindingParam("tab") UITab tab, @BindingParam("label") String label) {
 		if ( validateTabLabel(label) ) {
 			performUpdateTabLabel(tab, label);
 		}
 	}
-
+	
 	protected void performUpdateTabLabel(UITab tab, String label) {
 		setTabLabel(tab, label);
 		dispatchTabChangedCommand(tab);

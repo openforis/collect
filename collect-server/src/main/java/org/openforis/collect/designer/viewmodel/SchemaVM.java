@@ -64,7 +64,7 @@ public class SchemaVM extends SurveyBaseVM {
 	
 	private NodeDefinition selectedNode;
 	private NodeDefinition editedNode;
-	private boolean newItem;
+	private boolean newNode;
 
 	private EntityDefinition selectedRootEntity;
 	private ModelVersion selectedVersion;
@@ -257,7 +257,7 @@ public class SchemaVM extends SurveyBaseVM {
 	
 	
 	protected void editNode(Binder binder, boolean newNode, EntityDefinition parentEntity, NodeDefinition node) {
-		newItem = newNode;
+		this.newNode = newNode;
 		editedNodeParentEntity = parentEntity;
 		editedNode = node;
 		if ( newNode ) {
@@ -275,7 +275,7 @@ public class SchemaVM extends SurveyBaseVM {
 		if ( editedNode != null ) {
 			nodeFormInclude.setDynamicProperty("parentEntity", parentEntity);
 			nodeFormInclude.setDynamicProperty("item", editedNode);
-			nodeFormInclude.setDynamicProperty("newItem", newItem);
+			nodeFormInclude.setDynamicProperty("newItem", newNode);
 			String location;
 			if ( editedNode instanceof EntityDefinition ) {
 				location = Resources.Component.ENTITY.getLocation();
@@ -410,9 +410,9 @@ public class SchemaVM extends SurveyBaseVM {
 	}
 
 	@GlobalCommand
-	@NotifyChange({"selectedNode","newItem"})
+	@NotifyChange({"selectedNode","newNode"})
 	public void editedNodeChanged(@BindingParam("parentEntity") EntityDefinition parentEntity) {
-		if ( newItem ) {
+		if ( newNode ) {
 			if ( parentEntity != null ) {
 				if ( treeModel != null ) {
 					if ( parentEntity.getParentDefinition() != null ) {
@@ -426,17 +426,14 @@ public class SchemaVM extends SurveyBaseVM {
 				selectedRootEntity = (EntityDefinition) editedNode;
 				updateTreeModel();
 			}
-			newItem = false;
-			notifyChange("nodeTypeHeaderLabel");
+			newNode = false;
+			notifyChange("newNode");
 		}
 		dispatchSchemaChangedCommand();
 	}
 	
 	protected EntityDefinition createRootEntityDefinition() {
 		EntityDefinition newNode = createEntityDefinition();
-		CollectSurvey survey = getSurvey();
-		UIOptions uiOptions = survey.getUIOptions();
-		uiOptions.createRootTabSet(newNode);
 		return newNode;
 	}
 
@@ -536,7 +533,7 @@ public class SchemaVM extends SurveyBaseVM {
 		return up ? index <= 0: index < 0 || index >= siblings.size() - 1;
 	}
 	
-	@DependsOn("editedNode")
+	@DependsOn({"newNode","editedNode"})
 	public String getNodeTypeHeaderLabel() {
 		String result = null;
 		String nodeTypeStr = getNodeType();
@@ -545,7 +542,7 @@ public class SchemaVM extends SurveyBaseVM {
 			NodeType nodeType = NodeType.valueOf(nodeTypeStr);
 			switch (nodeType) {
 			case ENTITY:
-				if ( newItem ) {
+				if ( newNode ) {
 					if ( editedNodeParentEntity == null ) {
 						messageKey = "survey.schema.node_detail_title.new_root_entity";
 					} else {
@@ -559,7 +556,7 @@ public class SchemaVM extends SurveyBaseVM {
 				result = Labels.getLabel(messageKey);
 				break;
 			case ATTRIBUTE:
-				if ( newItem ) {
+				if ( newNode ) {
 					messageKey = "survey.schema.node_detail_title.new_attribute";
 				} else {
 					messageKey = "survey.schema.node_detail_title.attribute";
@@ -643,7 +640,7 @@ public class SchemaVM extends SurveyBaseVM {
 	}
 
 	public boolean isNewNode() {
-		return newItem;
+		return newNode;
 	}
 
 	public EntityDefinition getSelectedRootEntity() {

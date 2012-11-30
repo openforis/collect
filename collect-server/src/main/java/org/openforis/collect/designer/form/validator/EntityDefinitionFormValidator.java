@@ -39,10 +39,14 @@ public class EntityDefinitionFormValidator extends NodeDefinitionFormValidator {
 		UIOptions uiOptions = survey.getUIOptions();
 		Boolean multiple = getValue(ctx, MULTIPLE_FIELD);
 		UITab tab = getAssociatedTab(ctx, uiOptions, parentEntity);
-		boolean assignable = uiOptions.isLayoutSupported(parentEntity, editedNode.getId(), tab, multiple, layout);
-		if ( ! assignable ) {
-			String message = Labels.getLabel(LabelKeys.LAYOUT_NOT_SUPPORTED_MESSAGE_KEY);
-			addInvalidMessage(ctx, field, message);
+		if ( tab != null ) {
+			boolean assignable = uiOptions.isLayoutSupported(parentEntity, editedNode.getId(), tab, multiple, layout);
+			if ( ! assignable ) {
+				String message = Labels.getLabel(LabelKeys.LAYOUT_NOT_SUPPORTED_MESSAGE_KEY);
+				addInvalidMessage(ctx, field, message);
+			}
+		} else {
+			//defining root entity, not yet added to schema...
 		}
 	}
 
@@ -51,7 +55,11 @@ public class EntityDefinitionFormValidator extends NodeDefinitionFormValidator {
 		if ( parentEntity == null ) {
 			NodeDefinition editedNode = getEditedNode(ctx);
 			UITabSet rootTabSet = uiOptions.getAssignedRootTabSet((EntityDefinition) editedNode);
-			return uiOptions.getMainTab(rootTabSet);
+			if ( rootTabSet != null ) {
+				return uiOptions.getMainTab(rootTabSet);
+			} else {
+				return null;
+			}
 		} else {
 			List<UITab> assignableTabs = uiOptions.getTabsAssignableToChildren(parentEntity);
 			if (StringUtils.isNotBlank(tabName) ) {

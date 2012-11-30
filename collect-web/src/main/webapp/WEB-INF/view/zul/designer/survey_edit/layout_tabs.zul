@@ -26,7 +26,7 @@
         		                    <treecell>
                                       <textbox 
                                           value="@load(vm.getTabLabel(each.data))" 
-                                          onChange="@command('tabChanged', tab=each.data, label=self.value)"
+                                          onChange="@command('tabLabelChanged', tab=each.data, label=self.value)"
                                           onFocus="@command('tabSelected', tab=each.data)" />
                                     </treecell>
         		                </treerow>

@@ -21,6 +21,7 @@ import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
+import org.openforis.idm.metamodel.NodeLabel.Type;
 import org.openforis.idm.metamodel.Schema;
 import org.springframework.context.annotation.DependsOn;
 import org.zkoss.bind.BindUtils;
@@ -81,8 +82,12 @@ public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyO
 	@Command
 	public void applyChanges() {
 		formObject.saveTo(editedItem, currentLanguageCode);
+		boolean editingRootEntity = parentEntity == null;
 		if ( newItem ) {
-			if ( parentEntity == null ) {
+			if ( editingRootEntity ) {
+				CollectSurvey survey = getSurvey();
+				UIOptions uiOptions = survey.getUIOptions();
+				uiOptions.createRootTabSet((EntityDefinition) editedItem);
 				Schema schema = editedItem.getSchema();
 				schema.addRootEntityDefinition((EntityDefinition) editedItem);
 			} else {
@@ -90,9 +95,35 @@ public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyO
 			}
 			newItem = false;
 		}
+		if ( editingRootEntity ) {
+			updateMainTabLabel((EntityDefinition) editedItem);
+		}
 		Map<String, Object> args = new HashMap<String, Object>();
 		args.put("parentEntity", parentEntity);
 		BindUtils.postGlobalCommand(null, null, "editedNodeChanged", args);
+	}
+
+	protected void updateMainTabLabel(EntityDefinition rootEntityDefn) {
+		UIOptions uiOptions = survey.getUIOptions();
+		UITabSet rootTabSet = uiOptions.getAssignedTabSet(rootEntityDefn);
+		UITab mainTab = uiOptions.getMainTab(rootTabSet);
+		if ( mainTab != null ) {
+			String tabLabel = getTabLabel(mainTab.getName());
+			if ( StringUtils.isBlank(tabLabel) ) {
+				String rootEntityLabel = getInstanceLabel(rootEntityDefn);
+				mainTab.setLabel(currentLanguageCode, rootEntityLabel);
+				BindUtils.postNotifyChange(null, null, mainTab, "*");
+				notifyChange("assignableTabNames");
+			}
+		}
+	}
+
+	protected String getInstanceLabel(NodeDefinition nodeDefn) {
+		String label = nodeDefn.getLabel(Type.INSTANCE, currentLanguageCode);
+		if ( label == null && isDefaultLanguage() ) {
+			label = nodeDefn.getLabel(Type.INSTANCE, null);
+		}
+		return label;
 	}
 	
 	@Override
