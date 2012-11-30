@@ -8,10 +8,12 @@
 	self="@define(content)"
 	height="100%" width="100%"
 	align="center"
+    spacing="10px"
 	apply="org.zkoss.bind.BindComposer"
 	viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SurveySelectVM')">
 
-	<label value="${labels.survey.list_of_surveys}" />
+	<label sclass="mainTitle" value="${labels.title}" />
+    <label sclass="sectionTitle" value="${labels.surveys_list.title}" />
 
 	<listbox id="listbox" rows="10" model="@load(vm.surveySummaries)"
 		selectedItem="@bind(vm.selectedSurvey)">

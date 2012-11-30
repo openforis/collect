@@ -38,6 +38,18 @@
 	background: #CE2929;
 	color: #FFFFFF;
 }
+
+/* START OF TITLES */
+.mainTitle {
+	font-size: 16px;
+	font-weight: bold;
+}
+.sectionTitle {
+	font-size: 14px;
+	font-weight: bold;
+}
+/* END OF TITLES */
+
 /* START OF GROUPBOX STYLE */
 .form .z-groupbox .z-groupbox-cnt {
 	padding: 0px;
