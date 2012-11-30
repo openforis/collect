@@ -44,7 +44,7 @@ public class UnitProxy extends IdentifiableSurveyObjectProxy {
 	}
 
 	@ExternalizedProperty
-	public Number getConversionFactor() {
+	public Double getConversionFactor() {
 		return unit.getConversionFactor();
 	}
 

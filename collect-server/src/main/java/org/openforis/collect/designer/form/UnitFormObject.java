@@ -1,6 +1,5 @@
 package org.openforis.collect.designer.form;
 
-import org.openforis.collect.util.NumberUtil;
 import org.openforis.idm.metamodel.Unit;
 import org.zkoss.util.resource.Labels;
 
@@ -50,7 +49,7 @@ public class UnitFormObject extends SurveyObjectFormObject<Unit> {
 		} else {
 			dimensionLabel = null;
 		}
-		conversionFactor = NumberUtil.toDouble(source.getConversionFactor());
+		conversionFactor = source.getConversionFactor();
 	}
 	
 	@Override
@@ -60,7 +59,7 @@ public class UnitFormObject extends SurveyObjectFormObject<Unit> {
 		dest.setAbbreviation(languageCode, abbreviation);
 		Dimension dimension = Dimension.fromLabel(dimensionLabel);
 		dest.setDimension(dimension != null ? dimension.name().toLowerCase(): null);
-		dest.setConversionFactor(conversionFactor != null ? conversionFactor.floatValue(): null);
+		dest.setConversionFactor(conversionFactor);
 	}
 	
 	@Override
