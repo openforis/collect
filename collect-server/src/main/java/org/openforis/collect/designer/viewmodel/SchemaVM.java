@@ -475,16 +475,23 @@ public class SchemaVM extends SurveyBaseVM {
 	}
 	
 	public List<NodeDefinition> getSiblings(NodeDefinition nodeDefinition) {
-		List<NodeDefinition> siblings = new ArrayList<NodeDefinition>();
+		List<NodeDefinition> result = new ArrayList<NodeDefinition>();
 		EntityDefinition parentDefn = (EntityDefinition) nodeDefinition.getParentDefinition();
+		List<? extends NodeDefinition> allSiblings;
 		if ( parentDefn != null ) {
-			siblings.addAll(parentDefn.getChildDefinitions());
+			allSiblings = parentDefn.getChildDefinitions();
 		} else {
 			EntityDefinition rootEntity = nodeDefinition.getRootEntity();
 			Schema schema = rootEntity.getSchema();
-			siblings.addAll(schema.getRootEntityDefinitions());
+			allSiblings = schema.getRootEntityDefinitions();
 		}
-		return siblings;
+		//filter siblings
+		for (NodeDefinition sibling : allSiblings) {
+			if ( selectedVersion == null || selectedVersion.isApplicable(sibling) ) {
+				result.add(sibling);
+			}
+		}
+		return result;
 	}
 	
 	public int getSelectedNodeIndex() {
