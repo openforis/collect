@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.Stack;
 
 import org.zkoss.zul.DefaultTreeModel;
 import org.zkoss.zul.DefaultTreeNode;
@@ -38,22 +39,17 @@ public abstract class AbstractTreeModel<T> extends DefaultTreeModel<T> {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public void appendNodeToSelected(T item) {
+	public void appendNodeToSelected(T data) {
 		AbstractTreeNode<T> parentNode = getSelectedNode();
-		AbstractTreeNode<T> nodeToSelect;
-		if ( parentNode != null && parentNode.isLeaf() ) {
+		if( parentNode == null ) {
+			parentNode = (AbstractTreeNode<T>) getRoot();
+		} else if ( parentNode.isLeaf() ) {
 			parentNode = recreateNode(parentNode);
-			nodeToSelect = getNode(item);
-		} else {
-			if ( parentNode == null) {
-				parentNode = (AbstractTreeNode<T>) getRoot();
-			}
-			AbstractTreeNode<T> newNode = createNode(item);
-			parentNode.add(newNode);
-			nodeToSelect = newNode;
 		}
+		AbstractTreeNode<T> newNode = createNode(data);
+		parentNode.add(newNode);
 		addOpenObject(parentNode);
-		setSelection(Arrays.asList(nodeToSelect));
+		setSelection(Arrays.asList(newNode));
 	}
 	
 	protected AbstractTreeNode<T> getSelectedNode() {
@@ -77,37 +73,64 @@ public abstract class AbstractTreeModel<T> extends DefaultTreeModel<T> {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public void select(T defn) {
+	public void select(T data) {
 		Collection<? extends TreeNode<T>> selection;
-		if ( defn == null ) {
+		if ( data == null ) {
 			selection = Collections.emptyList();
 		} else {
-			AbstractTreeNode<T> treeNode = getNode(defn);
+			AbstractTreeNode<T> treeNode = getNode(data);
 			selection = Arrays.asList(treeNode);
 		}
 		setSelection(selection);
 	}
 	
-	protected AbstractTreeNode<T> getNode(T item) {
-		if ( item == null ) {
+	protected AbstractTreeNode<T> getNode(T data) {
+		if ( data == null ) {
 			return null;
 		} else {
-			int[] path = getNodePath(item);
+			int[] path = getNodePath(data);
 			return (AbstractTreeNode<T>) getChild(path);
 		}
 	}
 	
-	protected abstract int[] getNodePath(T item);
+	protected int[] getNodePath(T data) {
+		 TreeNode<T> treeNode = getTreeNode(data);
+		 int[] result = getPath(treeNode);
+		 return result;
+	}
+
+	protected TreeNode<T> getTreeNode(T data) {
+		TreeNode<T> root = getRoot();
+		Stack<TreeNode<T>> treeNodesStack = new Stack<TreeNode<T>>();
+		treeNodesStack.push(root);
+		while ( ! treeNodesStack.isEmpty() ) {
+			TreeNode<T> treeNode = treeNodesStack.pop();
+			T treeNodeData = treeNode.getData();
+			if ( treeNodeData != null && treeNodeData.equals(data) ) {
+				return treeNode;
+			}
+			List<TreeNode<T>> children = treeNode.getChildren();
+			if ( children != null && children.size() > 0 ) {
+				treeNodesStack.addAll(children);
+			}
+		}
+		return null;
+	}
 
 	protected AbstractTreeNode<T> recreateNode(AbstractTreeNode<T> node) {
 		AbstractTreeNode<T> parent = (AbstractTreeNode<T>) node.getParent();
 		T data = node.getData();
-		AbstractTreeNode<T> newNode = createNode(data);
+		AbstractTreeNode<T> newNode = createNode(data, true);
 		parent.replace(node, newNode);
 		return newNode;
 	}
 
-	protected abstract AbstractTreeNode<T> createNode(T data);
+	protected AbstractTreeNode<T> createNode(T data) {
+		return createNode(data, false);
+	}
+	
+	protected abstract AbstractTreeNode<T> createNode(
+			T data, boolean defineEmptyChildrenForLeaves);
 
 	public void moveSelectedNode(int toIndex) {
 		int[] selectionPath = getSelectionPath();
@@ -140,4 +163,5 @@ public abstract class AbstractTreeModel<T> extends DefaultTreeModel<T> {
 		}
 		
 	}
+
 }

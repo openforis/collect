@@ -10,6 +10,7 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.designer.component.SchemaTreeModel;
+import org.openforis.collect.designer.component.SchemaTreeModel.SchemaTreeNodeData;
 import org.openforis.collect.designer.model.AttributeType;
 import org.openforis.collect.designer.model.NodeType;
 import org.openforis.collect.designer.util.MessageUtil;
@@ -62,7 +63,7 @@ public class SchemaVM extends SurveyBaseVM {
 	private static final String CONFIRM_REMOVE_NON_EMPTY_ENTITY_MESSAGE_KEY = "survey.schema.confirm_remove_non_empty_entity";
 	private static final String CONFIRM_REMOVE_NODE_TITLE_KEY = "survey.schema.confirm_remove_node_title";
 
-	private NodeDefinition selectedNode;
+	private SchemaTreeNodeData selectedTreeNode;
 	private NodeDefinition editedNode;
 	private boolean newNode;
 
@@ -89,17 +90,17 @@ public class SchemaVM extends SurveyBaseVM {
 	}
 	
 	@Command
-	@NotifyChange({"selectedNode","editedNode"})
-	public void nodeSelected(@ContextParam(ContextType.BINDER) final Binder binder, @BindingParam("node") final NodeDefinition node) {
-		if ( node != null ) {
+	public void nodeSelected(@ContextParam(ContextType.BINDER) final Binder binder, @BindingParam("data") final SchemaTreeNodeData data) {
+		if ( data != null ) {
 			checkCanLeaveForm(new MessageUtil.CompleteConfirmHandler() {
 				@Override
 				public void onOk() {
-					performSelectNode(binder, node);
+					undoLastChanges();
+					performSelectNode(binder, data);
 				}
 				@Override
 				public void onCancel() {
-					treeModel.select(selectedNode);
+					treeModel.select(selectedTreeNode);
 				}
 			});
 		} else {
@@ -113,7 +114,7 @@ public class SchemaVM extends SurveyBaseVM {
 	}
 	
 	@Command
-	@NotifyChange({"selectedNode","treeModel","selectedVersion"})
+	@NotifyChange({"selectedTreeNode","treeModel","selectedVersion"})
 	public void versionSelected(@BindingParam("version") ModelVersion version) {
 		nodesTreeFilterChanged(selectedRootEntity, version);
 	}
@@ -127,7 +128,7 @@ public class SchemaVM extends SurveyBaseVM {
 				resetEditingStatus();
 				updateTreeModel();
 				dispatchCurrentFormValidatedCommand(true, isCurrentFormBlocking());
-				notifyChange("selectedNode","selectedRootEntity","selectedVersion");
+				notifyChange("selectedTreeNode","selectedRootEntity","selectedVersion");
 			}
 			@Override
 			public void onCancel() {
@@ -136,9 +137,12 @@ public class SchemaVM extends SurveyBaseVM {
 		}));
 	}
 
-	protected void performSelectNode(Binder binder, NodeDefinition node) {
-		selectedNode = node;
-		editNode(binder, false, selectedNode == null ? null : (EntityDefinition) selectedNode.getParentDefinition(), node);
+	protected void performSelectNode(Binder binder, SchemaTreeNodeData data) {
+		selectedTreeNode = data;
+		treeModel.select(data);
+		NodeDefinition nodeDefn = data.getNodeDefinition();
+		EntityDefinition parentDefn = nodeDefn == null ? null : (EntityDefinition) nodeDefn.getParentDefinition();
+		editNode(binder, false, parentDefn, nodeDefn);
 	}
 
 	@Command
@@ -151,6 +155,7 @@ public class SchemaVM extends SurveyBaseVM {
 				updateTreeModel();
 				EntityDefinition newNode = createRootEntityDefinition();
 				editNode(binder, true, null, newNode);
+				afterNewNodeCreated(newNode);
 			}
 		});
 	}
@@ -173,7 +178,7 @@ public class SchemaVM extends SurveyBaseVM {
 				EntityDefinition newNode = createEntityDefinition();
 				newNode.setMultiple(multiple);
 				UIOptions uiOpts = survey.getUIOptions();
-				EntityDefinition parentEntity = (EntityDefinition) (selectedNode != null ? selectedNode: selectedRootEntity);
+				EntityDefinition parentEntity = (EntityDefinition) (selectedTreeNode == null ? selectedRootEntity: selectedTreeNode.getNodeDefinition());
 				Layout layoutEnum = Layout.valueOf(layout);
 //				if ( uiOpts.isLayoutSupported(parentEntity, newNode.getId(), (UITab) null, multiple, layoutEnum) ) {
 					uiOpts.setLayout(newNode, layoutEnum);
@@ -181,6 +186,7 @@ public class SchemaVM extends SurveyBaseVM {
 //				} else {
 //					MessageUtil.showWarning(LabelKeys.LAYOUT_NOT_SUPPORTED_MESSAGE_KEY);
 //				}
+				afterNewNodeCreated(newNode);
 			}
 		});
 	}
@@ -200,30 +206,41 @@ public class SchemaVM extends SurveyBaseVM {
 			public void onOk() {
 				AttributeType attributeTypeEnum = AttributeType.valueOf(attributeType);
 				AttributeDefinition newNode = (AttributeDefinition) NodeType.createNodeDefinition(survey, NodeType.ATTRIBUTE, attributeTypeEnum);
-				EntityDefinition parentEntity = (EntityDefinition) (selectedNode != null ? selectedNode: selectedRootEntity);
+				EntityDefinition parentEntity = (EntityDefinition) (selectedTreeNode == null ? selectedRootEntity: selectedTreeNode.getNodeDefinition());
 				editNode(binder, true, parentEntity, newNode);
+				afterNewNodeCreated(newNode);
 			}
 		});
+	}
+
+	private void afterNewNodeCreated(NodeDefinition nodeDefn) {
+		treeModel.select(editedNodeParentEntity);
+		treeModel.appendNodeToSelected(nodeDefn, true);
+		selectedTreeNode = treeModel.getNodeData(nodeDefn);
+		BindUtils.postNotifyChange(null, null, selectedTreeNode, "*");
 	}
 
 	@Override
 	@GlobalCommand
 	public void undoLastChanges() {
-		if ( ! isCurrentFormValid() && editedNode != null ) {
+		if ( editedNode != null ) {
+			if ( newNode ) {
+				treeModel.select(editedNode);
+				treeModel.removeSelectedNode();
+			}
 			resetEditingStatus();
-			notifyChange("selectedNode","editedNode");
 		}
 	}
 
 	protected void resetEditingStatus() {
 		resetNodeSelection();
 		editedNode = null;
-		notifyChange("selectedNode","editedNode");
+		notifyChange("selectedTreeNode","editedNode");
 	}
 	
 	protected void resetNodeSelection() {
-		selectedNode = null;
-		notifyChange("selectedNode");
+		selectedTreeNode = null;
+		notifyChange("selectedTreeNode");
 		resetTreeSelection();
 	}
 	
@@ -248,14 +265,12 @@ public class SchemaVM extends SurveyBaseVM {
 		this.newNode = newNode;
 		editedNodeParentEntity = parentEntity;
 		editedNode = node;
-		if ( newNode ) {
-			resetNodeSelection();
-		} else {
-			selectedNode = node;
+		if ( ! newNode ) {
+			selectedTreeNode = treeModel.getNodeData(node);
 		}
 		refreshNodeForm(parentEntity);
 		validateForm(binder);
-		notifyChange("selectedNode","editedNode");
+		notifyChange("selectedTreeNode","editedNode");
 	}
 
 	protected void refreshNodeForm(EntityDefinition parentEntity) {
@@ -296,10 +311,11 @@ public class SchemaVM extends SurveyBaseVM {
 
 	@Command
 	public void removeNode() {
-		removeNode(selectedNode);
+		removeNode(selectedTreeNode);
 	}
 
-	public void removeNode(final NodeDefinition nodeDefn) {
+	public void removeNode(final SchemaTreeNodeData data) {
+		final NodeDefinition nodeDefn = data.getNodeDefinition();
 		if ( nodeDefn != null ) {
 			String confirmMessageKey;
 			if (nodeDefn instanceof EntityDefinition && !((EntityDefinition) nodeDefn).getChildDefinitions().isEmpty() ) {
@@ -337,8 +353,9 @@ public class SchemaVM extends SurveyBaseVM {
 	}
 	
 	protected void moveNode(boolean up) {
-		List<NodeDefinition> siblings = getSiblingsInTree(selectedNode);
-		int oldIndex = siblings.indexOf(selectedNode);
+		List<NodeDefinition> siblings = getSiblingsInTree(selectedTreeNode);
+		NodeDefinition selectedNodeDefn = selectedTreeNode.getNodeDefinition();
+		int oldIndex = siblings.indexOf(selectedNodeDefn);
 		int newIndex = up ? oldIndex - 1: oldIndex + 1;
 		moveNode(newIndex);
 		treeModel.moveSelectedNode(newIndex);
@@ -346,8 +363,9 @@ public class SchemaVM extends SurveyBaseVM {
 	}
 	
 	protected void moveNode(int newIndexInTree) {
-		List<NodeDefinition> siblings = getSiblingsInTree(selectedNode);
-		EntityDefinition parentDefn = (EntityDefinition) selectedNode.getParentDefinition();
+		List<NodeDefinition> siblings = getSiblingsInTree(selectedTreeNode);
+		NodeDefinition selectedNodeDefn = selectedTreeNode.getNodeDefinition();
+		EntityDefinition parentDefn = (EntityDefinition) selectedNodeDefn.getParentDefinition();
 		NodeDefinition treeNodeToMoveInto = siblings.get(newIndexInTree);
 		int toIndex;
 		if ( treeNodeToMoveInto != null ) {
@@ -356,9 +374,9 @@ public class SchemaVM extends SurveyBaseVM {
 			toIndex = newIndexInTree;
 		}
 		if ( parentDefn != null ) {
-			parentDefn.moveChildDefinition(selectedNode, toIndex);
+			parentDefn.moveChildDefinition(selectedNodeDefn, toIndex);
 		} else {
-			EntityDefinition rootEntity = selectedNode.getRootEntity();
+			EntityDefinition rootEntity = selectedNodeDefn.getRootEntity();
 			Schema schema = rootEntity.getSchema();
 			schema.moveRootEntityDefinition(rootEntity, toIndex);
 		}
@@ -388,19 +406,17 @@ public class SchemaVM extends SurveyBaseVM {
 	}
 
 	@GlobalCommand
-	@NotifyChange({"selectedNode","newNode"})
+	@NotifyChange({"selectedTreeNode","newNode"})
 	public void editedNodeChanged(@BindingParam("parentEntity") EntityDefinition parentEntity) {
 		if ( newNode ) {
 			if ( parentEntity == null ) {
-				selectedRootEntity = (EntityDefinition) editedNode;
 				updateTreeModel();
 			} else {
-				if ( treeModel != null ) {
-					treeModel.select(parentEntity);
-					treeModel.appendNodeToSelected(editedNode);
-				}
-				selectedNode = editedNode;
+				selectedTreeNode.setDetached(false);
+				BindUtils.postNotifyChange(null, null, selectedTreeNode, "detached");
 			}
+			selectedTreeNode = treeModel.getNodeData(editedNode);
+			treeModel.select(selectedTreeNode);
 			newNode = false;
 			notifyChange("newNode");
 		}
@@ -449,16 +465,16 @@ public class SchemaVM extends SurveyBaseVM {
 		return nodeDefn instanceof EntityDefinition;
 	}
 	
-	protected List<NodeDefinition> getSiblingsInTree(NodeDefinition nodeDefn) {
+	protected List<NodeDefinition> getSiblingsInTree(SchemaTreeNodeData data) {
+		NodeDefinition nodeDefn = data.getNodeDefinition();
 		List<NodeDefinition> result = new ArrayList<NodeDefinition>();
 		EntityDefinition parentDefn = (EntityDefinition) nodeDefn.getParentDefinition();
 		List<? extends NodeDefinition> allSiblings;
 		if ( parentDefn == null ) {
-			EntityDefinition rootEntity = nodeDefn.getRootEntity();
 			if ( FILTER_BY_ROOT_ENTITY ) {
-				allSiblings = Arrays.asList(rootEntity);
+				allSiblings = Arrays.asList(selectedRootEntity);
 			} else {
-				Schema schema = rootEntity.getSchema();
+				Schema schema = selectedRootEntity.getSchema();
 				allSiblings = schema.getRootEntityDefinitions();
 			}
 		} else {
@@ -473,20 +489,21 @@ public class SchemaVM extends SurveyBaseVM {
 		return result;
 	}
 	
-	@DependsOn("selectedNode")
+	@DependsOn("selectedTreeNode")
 	public boolean isMoveNodeUpDisabled() {
 		return isMoveNodeDisabled(true);
 	}
 	
-	@DependsOn("selectedNode")
+	@DependsOn("selectedTreeNode")
 	public boolean isMoveNodeDownDisabled() {
 		return isMoveNodeDisabled(false);
 	}
 	
 	protected boolean isMoveNodeDisabled(boolean up) {
-		if ( selectedNode != null ) {
-			List<NodeDefinition> siblings = getSiblingsInTree(selectedNode);
-			int index = siblings.indexOf(selectedNode);
+		if ( ! newNode && selectedTreeNode != null ) {
+			List<NodeDefinition> siblings = getSiblingsInTree(selectedTreeNode);
+			NodeDefinition selectedNodeDefn = selectedTreeNode.getNodeDefinition();
+			int index = siblings.indexOf(selectedNodeDefn);
 			return isMoveItemDisabled(siblings, index, up);
 		} else {
 			return true;
@@ -503,34 +520,43 @@ public class SchemaVM extends SurveyBaseVM {
 		String nodeTypeStr = getNodeType();
 		String messageKey;
 		if ( nodeTypeStr != null ) {
+			String nodeTypeLabel = null;
 			NodeType nodeType = NodeType.valueOf(nodeTypeStr);
 			switch (nodeType) {
 			case ENTITY:
-				if ( newNode ) {
-					if ( editedNodeParentEntity == null ) {
-						messageKey = "survey.schema.node_detail_title.new_root_entity";
-					} else {
-						messageKey = "survey.schema.node_detail_title.new_entity";
-					}
-				} else if ( editedNodeParentEntity == null ) {
+				if ( editedNodeParentEntity == null ) {
 					messageKey = "survey.schema.node_detail_title.root_entity";
 				} else {
 					messageKey = "survey.schema.node_detail_title.entity";
 				}
-				result = Labels.getLabel(messageKey);
+				nodeTypeLabel = Labels.getLabel(messageKey);
 				break;
 			case ATTRIBUTE:
-				if ( newNode ) {
-					messageKey = "survey.schema.node_detail_title.new_attribute";
-				} else {
-					messageKey = "survey.schema.node_detail_title.attribute";
-				}
+				messageKey = "survey.schema.node_detail_title.attribute";
 				Object[] args = new String[]{getAttributeTypeLabel()};
-				result = Labels.getLabel(messageKey, args);
+				nodeTypeLabel = Labels.getLabel(messageKey, args);
 				break;
+			}
+			if ( newNode ) {
+				Object[] args = new String[]{nodeTypeLabel.toLowerCase()};
+				result = Labels.getLabel("survey.schema.node_detail_title.new_node", args);
+			} else {
+				result = nodeTypeLabel;
 			}
 		}
 		return result;
+	}
+	
+	@DependsOn({"newNode"})
+	public String getNewTreeNodeLabel() {
+		if ( newNode ) {
+			String nodeTypeLabel = getNodeTypeHeaderLabel();
+			Object[] args = new String[]{nodeTypeLabel};
+			String result = Labels.getLabel("survey.schema.tree.new_node_label", args);
+			return result;
+		} else {
+			return null;
+		}
 	}
 	
 	@DependsOn("editedNode")
@@ -590,8 +616,8 @@ public class SchemaVM extends SurveyBaseVM {
 		return attrDefn.getLabel(Type.INSTANCE, currentLanguageCode);
 	}
 	
-	public NodeDefinition getSelectedNode() {
-		return selectedNode;
+	public SchemaTreeNodeData getSelectedTreeNode() {
+		return selectedTreeNode;
 	}
 	
 	public NodeDefinition getEditedNode() {

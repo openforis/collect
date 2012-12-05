@@ -15,12 +15,12 @@
             <tree id="nodesTree" zclass="z-dottree" width="100%"
               vflex="true" model="@load(vm.treeModel)"
               context="nodesTreePopup"
-              onSelect="@command('nodeSelected', node=self.selectedItem.value.data)">
+              onSelect="@command('nodeSelected', data=self.selectedItem.value.data)">
               <template name="model">
                 <treeitem draggable="false"
-                  context="@load(vm.isEntity(each.data) ? entityPopup: attributePopup)">
+                  context="@load(vm.isEntity(each.data.nodeDefinition) ? entityPopup: attributePopup)">
                   <treerow>
-                    <treecell label="@load(each.data.name)" />
+                    <treecell label="@load(each.data.detached ? vm.newTreeNodeLabel : each.data.nodeDefinition.name)" />
                   </treerow>
                 </treeitem>
               </template>

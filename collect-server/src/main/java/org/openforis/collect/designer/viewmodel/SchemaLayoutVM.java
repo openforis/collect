@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.openforis.collect.designer.component.SchemaTreeModel;
+import org.openforis.collect.designer.component.SchemaTreeModel.SchemaTreeNodeData;
 import org.openforis.collect.designer.session.SessionStatus;
 import org.openforis.collect.designer.util.Resources;
 import org.openforis.collect.metamodel.ui.UIOptions;
@@ -145,7 +146,7 @@ public class SchemaLayoutVM extends SurveyBaseVM {
 		return rootTabSet;
 	}
 	
-	public DefaultTreeModel<NodeDefinition> getNodes() {
+	public DefaultTreeModel<SchemaTreeNodeData> getNodes() {
 		if ( treeModel == null ) {
 			initTreeModel();
 		}
