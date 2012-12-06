@@ -45,12 +45,21 @@ s|Button.logout {
 }
 
 /* Home Page */
+.introWelcomeText {
+	fontSize: 25px;
+	fontWeight: bold;
+	textAlign: center;
+}
+.introText {
+	fontSize: 15px;
+	textAlign: justify;
+}
 .functionList{
 	/*skin-class: ClassReference('org.openforis.collect.ui.skin.FunctionListSkin');*/
 	borderVisible: false;
 }
 .functionLabel {
-	fontSize: 15;
+	fontSize: 20;
 	fontWeight: bold;
 	paddingBottom: 15;
 	paddingTop: 15;
