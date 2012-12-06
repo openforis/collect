@@ -191,6 +191,10 @@
 														tooltiptext="${labels.survey.code_list.add_child_item}" 
 														visible="@load(empty vm.editedItem.lookupTable and forEachStatus.index le vm.lastSelectedLevelIndex + 1)"
 									 					onClick="@command('addItemInLevel', levelIndex=forEachStatus.index)" />
+                                                <toolbarbutton image="/assets/images/edit-small.png" 
+                                                        tooltiptext="${labels.global.edit_item}" 
+                                                        visible="@load(empty vm.editedItem.lookupTable and forEachStatus.index le vm.lastSelectedLevelIndex)" 
+											        	onClick="@command('codeListItemDoubleClicked', item=vm.selectedItemsPerLevel[forEachStatus.index])" />
 											    <toolbarbutton image="/assets/images/delete-small.png"
 									        			tooltiptext="${labels.global.delete_item}"
 														visible="@load(empty vm.editedItem.lookupTable and forEachStatus.index le vm.lastSelectedLevelIndex)" 

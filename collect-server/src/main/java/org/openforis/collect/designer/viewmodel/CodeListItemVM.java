@@ -67,7 +67,7 @@ public class CodeListItemVM extends SurveyObjectBaseVM<CodeListItem> {
 			@Override
 			public void onOk() {
 				Map<String, Object> args = new HashMap<String, Object>();
-				args.put("undoChanges", isCurrentFormValid());
+				args.put("undoChanges", ! isCurrentFormValid());
 				BindUtils.postGlobalCommand(null, null, CodeListsVM.CLOSE_CODE_LIST_ITEM_POP_UP_COMMAND, args);
 			}
 		});

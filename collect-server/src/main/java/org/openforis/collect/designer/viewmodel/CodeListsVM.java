@@ -314,7 +314,6 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 	}
 	
 	@GlobalCommand
-	@NotifyChange({"itemsPerLevel"})
 	public void closeCodeListItemPopUp(@BindingParam("undoChanges") boolean undoChanges) {
 		closePopUp(codeListItemPopUp);
 		codeListItemPopUp = null;
@@ -332,6 +331,10 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 		}
 		List<CodeListItem> itemsForCurrentLevel = itemsPerLevel.get(editedChildItemLevel);
 		itemsForCurrentLevel.add(editedChildItem);
+		deselectItemsAfterLevel(editedChildItemLevel);
+		selectedItemsPerLevel.add(editedChildItem);
+		initItemsPerLevel();
+		notifyChange("itemsPerLevel","selectedItemsPerLevel");
 	}
 
 	protected void initItemsPerLevel() {
