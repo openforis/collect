@@ -1,6 +1,16 @@
 .error {
 	color: red;
 }
+.z-textbox, .z-decimalbox, .z-intbox, .z-longbox, .z-doublebox {
+	border: 2px inset #E7E7E7;
+}
+.z-textbox-focus, .z-textbox-focus input, 
+	.z-decimalbox-focus, .z-decimalbox-focus input, 
+	.z-intbox-focus, .z-intbox-focus input,
+	.z-longbox-focus, .z-longbox-focus input,
+	.z-doublebox-focus, .z-doublebox-focus input {
+	border: 2px inset #41A4FF;
+}
 .nopadding {
 	padding: 0px;
 }
