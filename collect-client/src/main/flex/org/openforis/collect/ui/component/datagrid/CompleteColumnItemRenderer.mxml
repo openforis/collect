@@ -25,10 +25,10 @@
 					}
 				}
 				if(complete) {
-					image.source = Images.COMPLETE;
+					image.source = Images.APPROVED;
 					image.visible = true;
 				} else if(rejected) {
-					image.source = Images.REJECT;
+					image.source = Images.REJECTED;
 					image.visible = true;
 				} else {
 					image.source = null;

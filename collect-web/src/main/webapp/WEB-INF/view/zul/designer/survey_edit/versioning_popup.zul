@@ -31,7 +31,7 @@
 				        </listbox>
 					</center>
 					<south border="none">
-				        <toolbar>
+				        <toolbar height="30px">
 				        	<toolbarbutton
 				        	  tooltiptext="${labels.global.add_item}"
 				        	  image="/assets/images/add.png"

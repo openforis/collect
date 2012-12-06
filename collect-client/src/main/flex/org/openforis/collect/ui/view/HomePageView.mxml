@@ -84,7 +84,12 @@
 				<s:itemRenderer>
 					<fx:Component>
 						<s:ItemRenderer>
-							<s:Label styleName="functionLabel" text="{data.label}" />
+							<s:layout>
+								<s:HorizontalLayout />
+							</s:layout>
+							<s:Image source="{data.icon}" />
+							<s:Label styleName="functionLabel" 
+									 text="{data.label}" />
 						</s:ItemRenderer>
 					</fx:Component>
 				</s:itemRenderer>

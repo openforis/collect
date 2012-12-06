@@ -3,7 +3,7 @@
 <zk>
 	<window id="codeListsManagerPopUp" title="${labels.survey.code_list.manager.title}" 
 		width="800px" 
-		height="600px"
+		height="630px"
 		border="normal"
 		position="center" 
 		closable="false">
@@ -31,20 +31,20 @@
 				        </listbox>
 		        	</center>
 					<south border="none">
-				        <toolbar>
+				        <toolbar height="30px">
 				        	<toolbarbutton tooltiptext="${labels.global.add_item}"
                                     image="/assets/images/add.png"
 				        			onClick="@command('newItem')" />
+                            <toolbarbutton tooltiptext="${labels.global.delete_item}"
+                                    image="/assets/images/delete.png"
+                                    disabled="@load(empty vm.selectedItem)" 
+                                    onClick="@command('deleteItem', item=vm.selectedItem)" />
 				        	<toolbarbutton image="/assets/images/arrow-up.png"
 									disabled="@load(vm.moveSelectedItemUpDisabled)" 
 						        	onClick="@command('moveSelectedItemUp')" />
 				        	<toolbarbutton image="/assets/images/arrow-down.png"
 									disabled="@load(vm.moveSelectedItemDownDisabled)" 
 						        	onClick="@command('moveSelectedItemDown')" />
-                            <toolbarbutton label="${labels.global.delete_item}"
-                                    image="/assets/images/delete.png"
-                                    disabled="@load(empty vm.selectedItem)" 
-                                    onClick="@command('deleteItem', item=vm.selectedItem)" />
 				        </toolbar>
 					</south>
 			    </borderlayout>
@@ -75,7 +75,6 @@
 								<row>
 									<multilanguageLabel value="${labels.survey.code_list.item_label}" 
                                       languageCode="@load(vm.currentLanguageCode)" />
-                                    <label value="${labels.survey.code_list.item_label}:" />
                                     <fieldErrorHandler message="@load(vmsgs['itemLabel'])">
 										<textbox width="150px" value="@bind(fx.itemLabel)" onChange="@command('applyChanges')" />
                                     </fieldErrorHandler>
@@ -188,11 +187,11 @@
 												</template>
 											</listbox>
 											<toolbar height="25px">
-												<toolbarbutton image="/assets/images/add.png" 
+												<toolbarbutton image="/assets/images/add-small.png" 
 														tooltiptext="${labels.survey.code_list.add_child_item}" 
 														visible="@load(empty vm.editedItem.lookupTable and forEachStatus.index le vm.lastSelectedLevelIndex + 1)"
 									 					onClick="@command('addItemInLevel', levelIndex=forEachStatus.index)" />
-											    <toolbarbutton image="/assets/images/delete.png"
+											    <toolbarbutton image="/assets/images/delete-small.png"
 									        			tooltiptext="${labels.global.delete_item}"
 														visible="@load(empty vm.editedItem.lookupTable and forEachStatus.index le vm.lastSelectedLevelIndex)" 
 											        	onClick="@command('removeItem', item=vm.selectedItemsPerLevel[forEachStatus.index])" />
@@ -203,10 +202,10 @@
 							</center>
 							<east width="70px">
 								<vlayout id="levelsControlBar" visible="@load(fx.type eq 'HIERARCHICAL')">
-								 	<button image="/assets/images/add.png" 
+								 	<button image="/assets/images/add-small.png" 
                                         label="${labels.survey.code_list.add_level}" 
 								 		onClick="@command('addLevel')" />
-								 	<button image="/assets/images/remove.png" 
+								 	<button image="/assets/images/delete-small.png" 
                                         label="${labels.survey.code_list.remove_level}" 
 								 		onClick="@command('removeLevel')"
 								 		visible="@load(vm.multipleLevelsPresent)" />

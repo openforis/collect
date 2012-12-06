@@ -50,20 +50,20 @@
     
         <menupopup id="treeContextMenu">
           <menuitem label="${labels.survey.layout.tab.add}" 
-            image="/assets/images/add.png"
+            image="/assets/images/add-small.png"
             onClick="@command('addTab', parent=null)" />
         </menupopup>
         <menupopup id="mainTabContextMenu">
           <menuitem label="${labels.survey.layout.tab.add}" 
-            image="/assets/images/add.png"
+            image="/assets/images/add-small.png"
             onClick="@command('addTab', parent=vm.selectedTab)" />
         </menupopup>
         <menupopup id="treeItemContextMenu">
           <menuitem label="${labels.survey.layout.tab.add}" 
-            image="/assets/images/add.png"
+            image="/assets/images/add-small.png"
             onClick="@command('addTab', parent=vm.selectedTab)" />
           <menuitem label="${labels.survey.layout.tab.remove.$}" 
-              image="/assets/images/delete.png"
+              image="/assets/images/delete-small.png"
               onClick="@command('removeTab')" />
         </menupopup>
     </div>

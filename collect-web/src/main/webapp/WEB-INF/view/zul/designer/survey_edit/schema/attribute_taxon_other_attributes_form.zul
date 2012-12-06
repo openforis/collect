@@ -20,10 +20,10 @@
       </listbox>
       <toolbar>
         <toolbarbutton tooltiptext="${labels.global.add_item}"
-          image="/assets/images/add.png"
+          image="/assets/images/add-small.png"
           onClick="@command('addQualifier')" />
         <toolbarbutton tooltiptext="${labels.global.delete_item}"
-          image="/assets/images/delete.png"
+          image="/assets/images/delete-small.png"
           disabled="@load(vm.selectedQualifier eq null)"
           onClick="@command('deleteQualifier')" />
       </toolbar>

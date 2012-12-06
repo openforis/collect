@@ -12,7 +12,7 @@
     <hlayout visible="${canEditRootEntities}">
       <button
         tooltiptext="${labels.survey.schema.add_root_entity}"
-        image="/assets/images/add.png"
+        image="/assets/images/add-small.png"
         onClick="@command('addRootEntity')" />
     </hlayout>
     <label value="${labels.survey.schema.form_version}:" />
@@ -25,7 +25,7 @@
     </listbox>
     <button tooltiptext="${labels.survey.versioning_manager}"
       onClick="@global-command('openVersioningManagerPopUp')"
-      image="/assets/images/pencil-small.png" />
+      image="/assets/images/edit-small.png" />
     <button label="${labels.survey.preview.show_preview}"
       onClick="@global-command('showPreview', formVersion=vm.selectedVersion, rootEntity=vm.selectedRootEntity)" />
   </hlayout>

@@ -13,6 +13,7 @@
   <hlayout width="100%">
     <box hflex="30">
       <button id="goToIndexBtn"
+        image="/assets/images/back-small.png"
         label="${labels.surveys_list.go_to_index_page}"
         onClick="@command('goToIndex')" />
     </box>
@@ -65,8 +66,9 @@
       disabled="@load(vm.editingDisabled)" />
     
     <button 
-      tooltiptext="${labels.surveys_list.admin_options}"
-      image="/assets/images/advanced-small.png" popup="adminOptionsPopUp" />
+      tooltiptext="${labels.surveys_list.import_export}"
+      image="/assets/images/import-export-small.png" 
+      popup="adminOptionsPopUp" />
    </hlayout>
 
   <menupopup id="adminOptionsPopUp">

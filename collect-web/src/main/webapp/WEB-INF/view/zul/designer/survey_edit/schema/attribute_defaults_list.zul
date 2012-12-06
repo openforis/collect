@@ -28,22 +28,22 @@
     </listbox>
     <toolbar>
       <toolbarbutton tooltiptext="${labels.global.add_item}"
-        image="/assets/images/add.png"
+        image="/assets/images/add-small.png"
         onClick="@command('addAttributeDefault')" />
       <toolbarbutton tooltiptext="${labels.global.edit_item}"
-        image="/assets/images/edit.png"
+        image="/assets/images/edit-small.png"
         disabled="@load(empty vm.selectedAttributeDefault)"
         onClick="@command('editAttributeDefault')" />
       <toolbarbutton tooltiptext="${labels.global.delete_item}"
-        image="/assets/images/delete.png"
+        image="/assets/images/delete-small.png"
         disabled="@load(empty vm.selectedAttributeDefault)"
         onClick="@command('deleteAttributeDefault', attributeDefault=vm.selectedAttributeDefault)" />
       <toolbarbutton tooltiptext="${labels.global.item.move_up}"
-        image="/assets/images/arrow-up.png"
+        image="/assets/images/arrow-up-small.png"
         disabled="@load(vm.moveSelectedAttributeDefaultUpDisabled)"
         onClick="@command('moveSelectedAttributeDefaultUp')" />
       <toolbarbutton tooltiptext="${labels.global.item.move_down}"
-        image="/assets/images/arrow-down.png"
+        image="/assets/images/arrow-down-small.png"
         disabled="@load(vm.moveSelectedAttributeDefaultDownDisabled)"
         onClick="@command('moveSelectedAttributeDefaultDown')" />
     </toolbar>

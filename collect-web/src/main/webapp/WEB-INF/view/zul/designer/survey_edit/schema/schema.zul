@@ -20,7 +20,8 @@
                 <treeitem draggable="false"
                   context="@load(vm.isEntity(each.data.nodeDefinition) ? entityPopup: attributePopup)">
                   <treerow>
-                    <treecell label="@load(each.data.detached ? vm.newTreeNodeLabel : each.data.nodeDefinition.name)" />
+                    <treecell label="@load(each.data.detached ? vm.newTreeNodeLabel : each.data.nodeDefinition.name)"
+                        image="${vm.getIcon(each.data.nodeDefinition)}" />
                   </treerow>
                 </treeitem>
               </template>

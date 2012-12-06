@@ -31,8 +31,8 @@
 				        </listbox>
 					</center>
 					<south border="none">
-				        <toolbar>
-				        	<toolbarbutton tooltiptext="${labels.survey.layout.tab.add}" 
+				        <toolbar height="30px">
+				        	<toolbarbutton tooltiptext="${labels.global.add_item}" 
                                     image="/assets/images/add.png"
                                     onClick="@command('newItem')" />
                             <toolbarbutton tooltiptext="${labels.global.delete_item}" 
