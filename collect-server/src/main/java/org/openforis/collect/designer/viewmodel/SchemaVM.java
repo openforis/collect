@@ -217,6 +217,7 @@ public class SchemaVM extends SurveyBaseVM {
 		treeModel.select(editedNodeParentEntity);
 		treeModel.appendNodeToSelected(nodeDefn, true);
 		selectedTreeNode = treeModel.getNodeData(nodeDefn);
+		notifyChange("treeModel");
 		BindUtils.postNotifyChange(null, null, selectedTreeNode, "*");
 	}
 
@@ -388,6 +389,7 @@ public class SchemaVM extends SurveyBaseVM {
 			parentDefn.removeChildDefinition(nodeDefn);
 			if ( treeModel != null ) {
 				treeModel.removeSelectedNode();
+				notifyChange("treeModel");
 			}
 		} else {
 			UIOptions uiOpts = survey.getUIOptions();
@@ -410,6 +412,9 @@ public class SchemaVM extends SurveyBaseVM {
 	public void editedNodeChanged(@BindingParam("parentEntity") EntityDefinition parentEntity) {
 		if ( newNode ) {
 			if ( parentEntity == null ) {
+				selectedRootEntity = (EntityDefinition) editedNode;
+				selectedVersion = null;
+				notifyChange("selectedRootEntity","selectedVersion");
 				updateTreeModel();
 			} else {
 				selectedTreeNode.setDetached(false);
@@ -614,6 +619,18 @@ public class SchemaVM extends SurveyBaseVM {
 	
 	public String getAttributeInstanceLabel(AttributeDefinition attrDefn) {
 		return attrDefn.getLabel(Type.INSTANCE, currentLanguageCode);
+	}
+	
+	public String getIcon(NodeDefinition nodeDefn) {
+		String result = "assets/images/node_types/";
+		if ( nodeDefn instanceof EntityDefinition ) {
+			result += "entity";
+		} else {
+			AttributeType attributeType = AttributeType.valueOf((AttributeDefinition) nodeDefn);
+			result += attributeType.name().toLowerCase();
+		}
+		result += "-small.png";
+		return result;
 	}
 	
 	public SchemaTreeNodeData getSelectedTreeNode() {
