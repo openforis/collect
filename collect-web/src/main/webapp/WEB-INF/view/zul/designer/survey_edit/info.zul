@@ -19,7 +19,8 @@
             <label value="${labels.survey.name}:" />
             <fieldErrorHandler message="@load(vmsgs['name'])">
               <textbox width="150px" value="@bind(fx.name)"
-                onChange="@command('applyChanges')" />
+                onChange="@command('applyChanges')" 
+                readonly="@load(fx.published)" />
             </fieldErrorHandler>
           </row>
           <row>

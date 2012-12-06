@@ -191,7 +191,7 @@ public class SurveyManager {
 //		CollectSurvey surveyWork = survey.clone();
 		CollectSurvey surveyWork = survey;
 		surveyWork.setId(null);
-		surveyWork.setPublished(false);
+		surveyWork.setPublished(true);
 		return surveyWork;
 	}
 	
