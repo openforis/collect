@@ -5,7 +5,9 @@ package org.openforis.collect.designer.viewmodel;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
@@ -19,6 +21,7 @@ import org.openforis.collect.designer.util.Resources;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.persistence.SurveyImportException;
+import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.zkoss.bind.BindUtils;
@@ -112,10 +115,12 @@ public class SurveyEditVM extends SurveyBaseVM {
 	}
 	
 	@GlobalCommand
-	public void openCodeListsManagerPopUp() {
+	public void openCodeListsManagerPopUp(@BindingParam("selectedCodeList") CodeList selectedCodeList) {
 		if ( codeListsPopUp == null ) { 
 			dispatchCurrentFormValidatedCommand(true);
-			codeListsPopUp = openPopUp(Resources.Component.CODE_LISTS_POPUP.getLocation(), true);
+			Map<String, Object> args = new HashMap<String, Object>();
+			args.put("selectedCodeList", selectedCodeList);
+			codeListsPopUp = openPopUp(Resources.Component.CODE_LISTS_POPUP.getLocation(), true, args);
 		}
 	}
 
