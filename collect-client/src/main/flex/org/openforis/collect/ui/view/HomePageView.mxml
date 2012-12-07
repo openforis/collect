@@ -89,7 +89,10 @@
 					<fx:Component>
 						<s:ItemRenderer width="100%">
 							<s:layout>
-								<s:HorizontalLayout />
+								<s:HorizontalLayout paddingBottom="5" 
+													paddingLeft="5" 
+													paddingRight="5"
+													paddingTop="5" />
 							</s:layout>
 							<s:Image source="{data.icon}" />
 							<s:Label styleName="functionLabel" 
