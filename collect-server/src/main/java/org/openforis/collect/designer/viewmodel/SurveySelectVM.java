@@ -10,6 +10,7 @@ import java.util.List;
 import org.openforis.collect.designer.model.SurveyManagerUtil;
 import org.openforis.collect.designer.model.SurveyWorkSummary;
 import org.openforis.collect.designer.session.SessionStatus;
+import org.openforis.collect.designer.util.PageUtil;
 import org.openforis.collect.designer.util.Resources;
 import org.openforis.collect.designer.util.Resources.Page;
 import org.openforis.collect.manager.SurveyManager;
@@ -17,6 +18,7 @@ import org.openforis.collect.model.CollectSurvey;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.DependsOn;
 import org.zkoss.bind.annotation.GlobalCommand;
+import org.zkoss.bind.annotation.Init;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zul.Filedownload;
@@ -41,6 +43,11 @@ public class SurveySelectVM extends BaseVM {
 	private SurveyWorkSummary selectedSurvey;
 
 	private Window surveyImportPopUp;
+	
+	@Init()
+	public void init() {
+		PageUtil.clearConfirmClose();
+	}
 	
 	@Command
 	public void editSelectedSurvey() throws IOException {

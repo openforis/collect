@@ -17,6 +17,7 @@ import org.openforis.collect.designer.model.SurveyManagerUtil;
 import org.openforis.collect.designer.model.SurveyWorkSummary;
 import org.openforis.collect.designer.session.SessionStatus;
 import org.openforis.collect.designer.util.MessageUtil;
+import org.openforis.collect.designer.util.PageUtil;
 import org.openforis.collect.designer.util.Resources;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectSurvey;
@@ -33,6 +34,7 @@ import org.zkoss.bind.annotation.ContextType;
 import org.zkoss.bind.annotation.GlobalCommand;
 import org.zkoss.bind.annotation.Init;
 import org.zkoss.bind.annotation.NotifyChange;
+import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.Execution;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
@@ -76,6 +78,8 @@ public class SurveyEditVM extends SurveyBaseVM {
 				SessionStatus sessionStatus = getSessionStatus();
 				sessionStatus.setCurrentLanguageCode(currentLanguageCode);
 			}
+			String confirmCloseMessage = Labels.getLabel("survey.edit.leave_page");
+			PageUtil.confirmClose(confirmCloseMessage);
 		}
 	}
 	
@@ -184,6 +188,7 @@ public class SurveyEditVM extends SurveyBaseVM {
 	
 	@Command
 	public void backToSurveysList() {
+		PageUtil.clearConfirmClose();
 		resetSessionStatus();
 		showMainPage();
 	}
