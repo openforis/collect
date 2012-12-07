@@ -6,13 +6,16 @@
     <vlayout>
       <listbox model="@load(vm.precisions)"
         selectedItem="@bind(vm.selectedPrecision)"
-        width="280px">
+        width="300px"
+        rows="3">
         <listhead height="22px">
-          <listheader width="80px"
+          <listheader 
+            width="80px"
             label="${labels.survey.schema.attribute.numeric.precisions.is_default}" />
-          <listheader width="100px"
+          <listheader 
+            width="100px"
             label="${labels.survey.schema.attribute.numeric.precisions.unit}"/>
-          <listheader width="100px"
+          <listheader
             label="${labels.survey.schema.attribute.numeric.precisions.decimal_digits}" />
         </listhead>
         <template name="model">
