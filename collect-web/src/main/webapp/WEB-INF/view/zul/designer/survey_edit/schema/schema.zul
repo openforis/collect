@@ -30,16 +30,14 @@
             </tree>
           </center>
           <south>
-            <menubar width="100%">
-              <menuitem image="/assets/images/arrow-up.png"
-                class="icon-button"
+            <toolbar width="100%" height="40px">
+              <toolbarbutton image="/assets/images/arrow-up.png"
                 disabled="@load(vm.moveNodeUpDisabled)"
                 onClick="@command('moveNodeUp')" />
-              <menuitem image="/assets/images/arrow-down.png"
-                class="icon-button"
+              <toolbarbutton image="/assets/images/arrow-down.png"
                 disabled="@load(vm.moveNodeDownDisabled)"
                 onClick="@command('moveNodeDown')" />
-            </menubar>
+            </toolbar>
           </south>
         </borderlayout>
       </west>
