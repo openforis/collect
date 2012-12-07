@@ -31,7 +31,7 @@ package org.openforis.collect.presenter {
 			label: Message.get('home.userAccounts'),
 			icon: Images.USER_MANAGEMENT};
 		private static const DESIGNER_MENU_ITEM:Object = {
-			label: Message.get('home.databaseDesigner'),
+			label: Message.get('home.surveyDesigner'),
 			icon: Images.DATABASE_DESIGNER};
 		
 		private var _view:HomePageView;
