@@ -5,9 +5,12 @@
       <div hflex="1" />
       <borderlayout width="960px" vflex="1">
       	<north height="102px" border="none">
-      		<div id="header" sclass="header">
+      		<box id="header" sclass="header">
       			<image src="/assets/images/designer-header.jpg" />
-      		</div>
+                <div width="100%" align="right">
+                  <image src="/assets/images/default-logo.png" />
+                </div>
+      		</box>
       	</north>
       	<center border="none">
       		<vlayout hflex="1" vflex="1">

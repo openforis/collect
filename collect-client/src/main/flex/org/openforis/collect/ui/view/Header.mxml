@@ -16,11 +16,9 @@
 			import org.openforis.collect.client.LogoClient;
 			import org.openforis.collect.i18n.Message;
 			import org.openforis.collect.model.proxy.UserProxy;
+			import org.openforis.collect.ui.Images;
 			import org.openforis.collect.util.ApplicationConstants;
 
-			[Bindable]
-			public var logoData:ByteArray;
-			
 			private function init():void  {
 				var client:LogoClient = ClientFactory.logoClient;
 				var logoResponder:AsyncResponder;
@@ -30,11 +28,16 @@
 			
 			protected function logoResultHandler(event:ResultEvent, token:Object):void {
 				var data:ByteArray = event.result as ByteArray;				
-				logoData = data;
+				if ( data == null ) {
+					image.source = Images.DEFAULT_LOGO;
+				} else {
+					image.source = data;
+				}
 			}
 			
 			protected function logoFaultHandler(event:FaultEvent, token:Object = null):void {
 				//AlertUtil.showError('error.logoNotFound'); 
+				image.source = Images.DEFAULT_LOGO;
 			}
 			
 		]]>
@@ -42,7 +45,17 @@
 	
 	<s:Group>
         <s:Image source="@Embed(source='/assets/images/banner.jpg')"/>
-        <s:Image source="{logoData}" right="0" /> 
+		<s:VGroup verticalCenter="0" 
+				  right="0" 
+				  paddingTop="5" 
+				  paddingBottom="5"
+				  paddingRight="5"
+				  paddingLeft="5">
+	        <s:Image id="image" 
+					 maxHeight="80"
+					 maxWidth="80"
+					 smooth="true" /> 
+		</s:VGroup>
 	</s:Group>
 	
 </s:Group>

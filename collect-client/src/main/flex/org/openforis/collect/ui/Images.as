@@ -8,6 +8,9 @@ package org.openforis.collect.ui {
 	 * */
 	public class Images {
 		
+		[Embed("/assets/images/default_logo.png")]
+		public static const DEFAULT_LOGO:Class;
+		
 		[Embed("/assets/images/data_workflow.jpg")]
 		public static const DATA_WORKFLOW:Class;
 		
