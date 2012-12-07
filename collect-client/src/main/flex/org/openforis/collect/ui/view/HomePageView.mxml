@@ -40,7 +40,7 @@
 							  includeIn="loading" 
 							  itemCreationPolicy="immediate"/>
 	
-	<s:Spacer height="20" />
+	<s:Spacer height="40" />
 	
 	<s:HGroup height="100%" width="100%" 
 			  gap="30">
