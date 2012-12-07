@@ -41,12 +41,13 @@
 							  itemCreationPolicy="immediate"/>
 	
 	<s:Spacer height="40" />
-	
 	<s:HGroup height="100%" width="100%" 
-			  gap="30">
+			  gap="20">
 		<s:VGroup height="100%" 
 				  width="70%"
 				  horizontalAlign="center"
+				  paddingLeft="10"
+				  paddingRight="10"
 				  gap="15">
 			<s:Label id="introWelcome"
 					 styleName="introWelcomeText"
@@ -56,11 +57,13 @@
 					 text="{Message.get('home.intro.mainFunctionalities')}"
 					 styleName="introText" 
 					 width="100%" />
+			<s:Spacer height="10" />
 			<s:Image id="introWorkflowImage" 
 					 source="{Images.DATA_WORKFLOW}"
 					 smooth="true"
 					 height="100"
 					 width="500" />
+			<s:Spacer height="10" />
 			<s:Label id="introInstallation" 
 					 text="{Message.get('home.intro.installation')}"
 					 styleName="introText" 
@@ -84,7 +87,7 @@
 				</s:layout>
 				<s:itemRenderer>
 					<fx:Component>
-						<s:ItemRenderer>
+						<s:ItemRenderer width="100%">
 							<s:layout>
 								<s:HorizontalLayout />
 							</s:layout>

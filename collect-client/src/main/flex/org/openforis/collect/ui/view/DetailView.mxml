@@ -37,7 +37,7 @@
 	</s:states>
 	
 	<s:VGroup gap="10" height="100%" width="100%">
-		
+		<s:Spacer height="1" />
 		<!-- Record id, form version, save msg, etc.. -->
 		<s:Group id="header" width="100%">
 			<s:HGroup gap="10" verticalAlign="middle">
