@@ -108,9 +108,9 @@ public class SurveyEditVM extends SurveyBaseVM {
 	
 	@GlobalCommand
 	public void closeSRSManagerPopUp() {
-		checkCanLeaveForm(new MessageUtil.ConfirmHandler() {
+		checkCanLeaveForm(new CanLeaveFormConfirmHandler() {
 			@Override
-			public void onOk() {
+			public void onOk(boolean confirmed) {
 				closePopUp(srsPopUp);
 				srsPopUp = null;
 				dispatchCurrentFormValidatedCommand(true);
@@ -131,9 +131,9 @@ public class SurveyEditVM extends SurveyBaseVM {
 	@GlobalCommand
 	public void closeCodeListsManagerPopUp(@ContextParam(ContextType.BINDER) Binder binder) {
 		if ( codeListsPopUp != null ) {
-			checkCanLeaveForm(new MessageUtil.ConfirmHandler() {
+			checkCanLeaveForm(new CanLeaveFormConfirmHandler() {
 				@Override
-				public void onOk() {
+				public void onOk(boolean confirmed) {
 					closePopUp(codeListsPopUp);
 					codeListsPopUp = null;
 					dispatchCurrentFormValidatedCommand(true);
@@ -153,9 +153,9 @@ public class SurveyEditVM extends SurveyBaseVM {
 	@GlobalCommand
 	public void closeUnitsManagerPopUp(@ContextParam(ContextType.BINDER) Binder binder) {
 		if ( unitsPopUp != null ) {
-			checkCanLeaveForm(new MessageUtil.ConfirmHandler() {
+			checkCanLeaveForm(new CanLeaveFormConfirmHandler() {
 				@Override
-				public void onOk() {
+				public void onOk(boolean confirmed) {
 					closePopUp(unitsPopUp);
 					unitsPopUp = null;
 					dispatchCurrentFormValidatedCommand(true);
@@ -175,9 +175,9 @@ public class SurveyEditVM extends SurveyBaseVM {
 	@GlobalCommand
 	public void closeVersioningManagerPopUp() {
 		if ( versioningPopUp != null ) {
-			checkCanLeaveForm(new MessageUtil.ConfirmHandler() {
+			checkCanLeaveForm(new CanLeaveFormConfirmHandler() {
 				@Override
-				public void onOk() {
+				public void onOk(boolean confirmed) {
 					closePopUp(versioningPopUp);
 					versioningPopUp = null;
 					dispatchCurrentFormValidatedCommand(true);
@@ -206,9 +206,9 @@ public class SurveyEditVM extends SurveyBaseVM {
 	@NotifyChange({"currentLanguageCode"})
 	public void languageCodeSelected(@BindingParam("code") final String selectedLanguageCode) {
 		final SessionStatus sessionStatus = getSessionStatus();
-		checkCanLeaveForm(new MessageUtil.ConfirmHandler() {
+		checkCanLeaveForm(new CanLeaveFormConfirmHandler() {
 			@Override
-			public void onOk() {
+			public void onOk(boolean confirmed) {
 				sessionStatus.setCurrentLanguageCode(selectedLanguageCode);
 				BindUtils.postGlobalCommand(null, null, SurveyLocaleVM.CURRENT_LANGUAGE_CHANGED_COMMAND, null);
 				currentLanguageCode = sessionStatus.getCurrentLanguageCode();

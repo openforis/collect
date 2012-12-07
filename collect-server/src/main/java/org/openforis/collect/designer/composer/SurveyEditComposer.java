@@ -1,6 +1,5 @@
 package org.openforis.collect.designer.composer;
 
-import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.viewmodel.SurveyBaseVM;
 import org.zkoss.bind.BindComposer;
 import org.zkoss.bind.BindUtils;
@@ -30,18 +29,18 @@ public class SurveyEditComposer extends BindComposer<Component> {
 	public void onSwitchTab(Event event) throws InterruptedException {
 		SurveyBaseVM vm = (SurveyBaseVM) getViewModel();
 		final Tab tab = (Tab) event.getTarget();
-		vm.checkCanLeaveForm(new MessageUtil.ConfirmHandler() {
+		vm.checkCanLeaveForm(new SurveyBaseVM.CanLeaveFormConfirmHandler() {
 			@Override
-			public void onOk() {
-				doSelectTab(tab);
+			public void onOk(boolean confirmed) {
+				doSelectTab(tab, confirmed);
 			}
 		});
 	}
 	
-	protected void doSelectTab(final Tab tab) {
-		SurveyBaseVM vm = (SurveyBaseVM) getViewModel();
-		BindUtils.postGlobalCommand(null, null, SurveyBaseVM.UNDO_LAST_CHANGES_GLOBAL_COMMAND, null);
-		vm.dispatchCurrentFormValidatedCommand(true);
+	protected void doSelectTab(final Tab tab, boolean undoChanges) {
+		if ( undoChanges ) {
+			BindUtils.postGlobalCommand(null, null, SurveyBaseVM.UNDO_LAST_CHANGES_GLOBAL_COMMAND, null);
+		}
 		Tabbox tabbox = tab.getTabbox();
 		tabbox.setSelectedTab(tab);
 	}

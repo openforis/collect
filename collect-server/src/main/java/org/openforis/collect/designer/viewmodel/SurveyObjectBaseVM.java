@@ -53,9 +53,9 @@ public abstract class SurveyObjectBaseVM<T> extends SurveyBaseVM {
 
 	@Command
 	public void newItem(@ContextParam(ContextType.BINDER) final Binder binder) {
-		checkCanLeaveForm(new MessageUtil.ConfirmHandler() {
+		checkCanLeaveForm(new CanLeaveFormConfirmHandler() {
 			@Override
-			public void onOk() {
+			public void onOk(boolean confirmed) {
 				performNewItemCreation(binder);
 			}
 		});
@@ -117,9 +117,9 @@ public abstract class SurveyObjectBaseVM<T> extends SurveyBaseVM {
 	
 	@Command
 	public void selectionChanged(@BindingParam("selectedItem") final T item) {
-		checkCanLeaveForm(new MessageUtil.CompleteConfirmHandler() {
+		checkCanLeaveForm(new CanLeaveFormCompleteConfirmHandler() {
 			@Override
-			public void onOk() {
+			public void onOk(boolean confirmed) {
 				performItemSelection(item);
 			}
 			@Override

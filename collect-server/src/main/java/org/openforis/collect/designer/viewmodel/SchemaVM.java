@@ -92,10 +92,12 @@ public class SchemaVM extends SurveyBaseVM {
 	@Command
 	public void nodeSelected(@ContextParam(ContextType.BINDER) final Binder binder, @BindingParam("data") final SchemaTreeNodeData data) {
 		if ( data != null ) {
-			checkCanLeaveForm(new MessageUtil.CompleteConfirmHandler() {
+			checkCanLeaveForm(new CanLeaveFormCompleteConfirmHandler() {
 				@Override
-				public void onOk() {
-					undoLastChanges();
+				public void onOk(boolean confirmed) {
+					if ( confirmed ) {
+						undoLastChanges();
+					}
 					performSelectNode(binder, data);
 				}
 				@Override
@@ -120,9 +122,9 @@ public class SchemaVM extends SurveyBaseVM {
 	}
 	
 	protected void nodesTreeFilterChanged(final EntityDefinition rootEntity, final ModelVersion version) {
-		if ( checkCanLeaveForm(new MessageUtil.CompleteConfirmHandler() {
+		if ( checkCanLeaveForm(new CanLeaveFormCompleteConfirmHandler() {
 			@Override
-			public void onOk() {
+			public void onOk(boolean confirmed) {
 				selectedRootEntity = rootEntity;
 				selectedVersion = version;
 				resetEditingStatus();
@@ -147,9 +149,9 @@ public class SchemaVM extends SurveyBaseVM {
 
 	@Command
 	public void addRootEntity(@ContextParam(ContextType.BINDER) final Binder binder) {
-		checkCanLeaveForm(new MessageUtil.ConfirmHandler() {
+		checkCanLeaveForm(new CanLeaveFormConfirmHandler() {
 			@Override
-			public void onOk() {
+			public void onOk(boolean confirmed) {
 				resetNodeSelection();
 				EntityDefinition newNode = createRootEntityDefinition();
 				selectedRootEntity = newNode;
@@ -174,9 +176,9 @@ public class SchemaVM extends SurveyBaseVM {
 	public void addChildEntity(@ContextParam(ContextType.BINDER) final Binder binder,
 			@BindingParam("multiple") final boolean multiple, 
 			@BindingParam("layout") final String layout) {
-		checkCanLeaveForm(new MessageUtil.ConfirmHandler() {
+		checkCanLeaveForm(new CanLeaveFormConfirmHandler() {
 			@Override
-			public void onOk() {
+			public void onOk(boolean confirmed) {
 				EntityDefinition newNode = createEntityDefinition();
 				newNode.setMultiple(multiple);
 				UIOptions uiOpts = survey.getUIOptions();
@@ -203,9 +205,9 @@ public class SchemaVM extends SurveyBaseVM {
 	@Command
 	public void addChildAttribute(@ContextParam(ContextType.BINDER) final Binder binder, 
 			@BindingParam("attributeType") final String attributeType) throws Exception {
-		checkCanLeaveForm(new MessageUtil.ConfirmHandler() {
+		checkCanLeaveForm(new CanLeaveFormConfirmHandler() {
 			@Override
-			public void onOk() {
+			public void onOk(boolean confirmed) {
 				AttributeType attributeTypeEnum = AttributeType.valueOf(attributeType);
 				AttributeDefinition newNode = (AttributeDefinition) NodeType.createNodeDefinition(survey, NodeType.ATTRIBUTE, attributeTypeEnum);
 				EntityDefinition parentEntity = (EntityDefinition) (selectedTreeNode == null ? selectedRootEntity: selectedTreeNode.getNodeDefinition());
@@ -231,14 +233,22 @@ public class SchemaVM extends SurveyBaseVM {
 				treeModel.select(editedNode);
 				treeModel.removeSelectedNode();
 			}
-			resetEditingStatus();
+			resetEditingStatus(false);
 		}
 	}
 
 	protected void resetEditingStatus() {
+		resetEditingStatus(true);
+	}
+	
+	protected void resetEditingStatus(boolean notifyChange) {
 		resetNodeSelection();
 		editedNode = null;
-		notifyChange("selectedTreeNode","editedNode");
+		editedNodeParentEntity = null;
+		refreshNodeForm();
+		if ( notifyChange ) {
+			notifyChange("editedNodeParentEntity","editedNode");
+		}
 	}
 	
 	protected void resetNodeSelection() {
@@ -277,15 +287,15 @@ public class SchemaVM extends SurveyBaseVM {
 		if ( ! newNode ) {
 			selectedTreeNode = treeModel.getNodeData(node);
 		}
-		refreshNodeForm(parentEntity);
+		refreshNodeForm();
 		validateForm(binder);
 		notifyChange("selectedTreeNode","editedNode");
 	}
 
-	protected void refreshNodeForm(EntityDefinition parentEntity) {
+	protected void refreshNodeForm() {
 		nodeFormInclude.setSrc(null);
 		if ( editedNode != null ) {
-			nodeFormInclude.setDynamicProperty("parentEntity", parentEntity);
+			nodeFormInclude.setDynamicProperty("parentEntity", editedNodeParentEntity);
 			nodeFormInclude.setDynamicProperty("item", editedNode);
 			nodeFormInclude.setDynamicProperty("newItem", newNode);
 			String location;

@@ -15,7 +15,6 @@ import java.util.Map;
 import org.openforis.collect.designer.form.FormObject;
 import org.openforis.collect.designer.session.SessionStatus;
 import org.openforis.collect.designer.util.MessageUtil;
-import org.openforis.collect.designer.util.MessageUtil.ConfirmHandler;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.EntityDefinition;
@@ -131,20 +130,31 @@ public abstract class SurveyBaseVM extends BaseVM {
 	 * @param confirmHandler
 	 * @return
 	 */
-	public boolean checkCanLeaveForm(ConfirmHandler confirmHandler) {
+	public boolean checkCanLeaveForm(CanLeaveFormConfirmHandler confirmHandler) {
 		return checkCanLeaveForm(confirmHandler, CONFIRM_LEAVE_PAGE_WITH_ERRORS);
 	}
 	
-	public boolean checkCanLeaveForm(ConfirmHandler confirmHandler, String messageKey) {
+	public boolean checkCanLeaveForm(final CanLeaveFormConfirmHandler confirmHandler, String messageKey) {
 		if ( currentFormValid ) {
 			if (confirmHandler != null ) {
-				confirmHandler.onOk();
+				confirmHandler.onOk(false);
 			}
 		} else {
 			if ( confirmHandler == null || currentFormBlocking ) {
 				MessageUtil.showWarning(ERRORS_IN_PAGE);
 			} else {
-				MessageUtil.showConfirm(confirmHandler, messageKey);
+				MessageUtil.showConfirm(new MessageUtil.CompleteConfirmHandler() {
+					@Override
+					public void onOk() {
+						confirmHandler.onOk(true);
+					}
+					
+					@Override
+					public void onCancel() {
+						//confirmHandler.onCancel();
+						
+					}
+				}, messageKey);
 			}
 		}
 		return currentFormValid;
@@ -283,4 +293,12 @@ public abstract class SurveyBaseVM extends BaseVM {
 		return currentFormBlocking;
 	}
 
+	
+	public interface CanLeaveFormConfirmHandler {
+		void onOk(boolean confirmed);
+	}
+	
+	public interface CanLeaveFormCompleteConfirmHandler extends CanLeaveFormConfirmHandler {
+		void onCancel();
+	}
 }
