@@ -8,6 +8,7 @@
   apply="org.zkoss.bind.BindComposer"
   viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SurveySelectVM')">
 
+  <space height="10px" />
   <label sclass="mainTitle" value="${labels.designer_title}" />
 
   <hlayout width="100%">
@@ -16,9 +17,6 @@
         image="/assets/images/back-small.png"
         label="${labels.surveys_list.go_to_index_page}"
         onClick="@command('goToIndex')" />
-    </box>
-    <box hflex="40" align="center">
-      <label sclass="sectionTitle" value="${labels.surveys_list.title}" />
     </box>
     <box hflex="30" align="right"></box>
   </hlayout>
