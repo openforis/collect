@@ -12,7 +12,6 @@ public class SurveyMainInfoFormValidator extends FormValidator {
 	protected static final String NAME_FIELD = "name";
 	protected static final String URI_FIELD = "uri";
 	protected static final String PROJECT_FIELD = "projectName";
-	protected static final String DESCRIPTION_FIELD = "description";
 
 	public SurveyMainInfoFormValidator() {
 		blocking = true;
@@ -22,7 +21,6 @@ public class SurveyMainInfoFormValidator extends FormValidator {
 	protected void internalValidate(ValidationContext ctx) {
 		validateName(ctx);
 		validateUri(ctx);
-		validateRequired(ctx, DESCRIPTION_FIELD);
 		validateRequired(ctx, PROJECT_FIELD);
 	}
 

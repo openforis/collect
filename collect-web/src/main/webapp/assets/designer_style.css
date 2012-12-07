@@ -11,8 +11,11 @@
 	.z-doublebox-focus, .z-doublebox-focus input {
 	border: 2px inset #41A4FF;
 }
-.z-textbox-readonly, .z-intbox-readonly, .z-longbox-readonly, 
-	.z-doublebox-readonly, .z-decimalbox-readonly {
+.z-textbox-readonly, .z-textbox-text-disd, 
+	.z-intbox-readonly, .z-intbox-text-disd, 
+	.z-longbox-readonly, .z-longbox-text-disd, 
+	.z-doublebox-readonly, .z-doublebox-text-disd, 
+	.z-decimalbox-readonly,	.z-decimalbox-text-disd {
 	background: #EEEEEE;
 }
 .nopadding {

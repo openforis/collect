@@ -120,7 +120,7 @@ public class SchemaVM extends SurveyBaseVM {
 	}
 	
 	protected void nodesTreeFilterChanged(final EntityDefinition rootEntity, final ModelVersion version) {
-		if(checkCanLeaveForm(new MessageUtil.CompleteConfirmHandler() {
+		if ( checkCanLeaveForm(new MessageUtil.CompleteConfirmHandler() {
 			@Override
 			public void onOk() {
 				selectedRootEntity = rootEntity;
@@ -151,11 +151,13 @@ public class SchemaVM extends SurveyBaseVM {
 			@Override
 			public void onOk() {
 				resetNodeSelection();
-				selectedRootEntity = null;
-				updateTreeModel();
 				EntityDefinition newNode = createRootEntityDefinition();
+				selectedRootEntity = newNode;
+				selectedVersion = null;
 				editNode(binder, true, null, newNode);
-				afterNewNodeCreated(newNode);
+				updateTreeModel();
+				selectTreeNode(newNode);
+				notifyChange("selectedRootEntity","selectedVersion");
 			}
 		});
 	}
@@ -216,9 +218,9 @@ public class SchemaVM extends SurveyBaseVM {
 	private void afterNewNodeCreated(NodeDefinition nodeDefn) {
 		treeModel.select(editedNodeParentEntity);
 		treeModel.appendNodeToSelected(nodeDefn, true);
-		selectedTreeNode = treeModel.getNodeData(nodeDefn);
+		selectTreeNode(nodeDefn);
+		//workaround: tree nodes not refreshed when adding child to "leaf" nodes (i.e. empty entity)
 		notifyChange("treeModel");
-		BindUtils.postNotifyChange(null, null, selectedTreeNode, "*");
 	}
 
 	@Override
@@ -249,6 +251,12 @@ public class SchemaVM extends SurveyBaseVM {
 		if ( treeModel != null ) {
 			treeModel.deselect();
 		}
+	}
+	
+	protected void selectTreeNode(NodeDefinition nodeDefn) {
+		treeModel.select(nodeDefn);
+		selectedTreeNode = treeModel.getNodeData(nodeDefn);
+		BindUtils.postNotifyChange(null, null, selectedTreeNode, "*");
 	}
 	
 	@Override
@@ -413,7 +421,6 @@ public class SchemaVM extends SurveyBaseVM {
 		if ( newNode ) {
 			if ( parentEntity == null ) {
 				selectedRootEntity = (EntityDefinition) editedNode;
-				selectedVersion = null;
 				notifyChange("selectedRootEntity","selectedVersion");
 				updateTreeModel();
 			} else {
@@ -454,11 +461,13 @@ public class SchemaVM extends SurveyBaseVM {
 		CollectSurvey survey = getSurvey();
 		if ( survey == null ) {
 			//TODO session expired...?
-		} else if ( survey.getVersions().size() == 0 || selectedVersion != null ) {
-			treeModel = SchemaTreeModel.createInstance(selectedRootEntity, selectedVersion, INCLUDE_ROOT_ENTITY_IN_TREE, true);
 		} else {
-			treeModel = null;
+			treeModel = SchemaTreeModel.createInstance(selectedRootEntity, selectedVersion, INCLUDE_ROOT_ENTITY_IN_TREE, true);
 		}
+	}
+
+	protected boolean isVersionSelected() {
+		return survey.getVersions().isEmpty() || selectedVersion != null;
 	}
 	
 	protected void updateTreeModel() {
