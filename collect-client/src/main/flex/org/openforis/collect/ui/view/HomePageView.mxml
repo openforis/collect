@@ -47,7 +47,7 @@
 		<s:VGroup height="100%" 
 				  width="70%"
 				  horizontalAlign="center"
-				  gap="30">
+				  gap="15">
 			<s:Label id="introWelcome"
 					 styleName="introWelcomeText"
 					 text="{Message.get('home.intro.welcome')}"
