@@ -35,8 +35,11 @@ import org.zkoss.bind.annotation.GlobalCommand;
 import org.zkoss.bind.annotation.Init;
 import org.zkoss.bind.annotation.NotifyChange;
 import org.zkoss.util.resource.Labels;
+import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Execution;
 import org.zkoss.zk.ui.Executions;
+import org.zkoss.zk.ui.IdSpace;
+import org.zkoss.zk.ui.Path;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zkplus.databind.BindingListModelList;
 import org.zkoss.zul.Filedownload;
@@ -64,6 +67,8 @@ public class SurveyEditVM extends SurveyBaseVM {
 	@WireVariable
 	private SurveyManager surveyManager;
 	
+	private boolean changed;
+
 	@Override
 	@Init(superclass=false)
 	public void init() {
@@ -71,6 +76,7 @@ public class SurveyEditVM extends SurveyBaseVM {
 		if ( survey == null ) {
 			backToSurveysList();
 		} else {
+			changed = false;
 			currentLanguageCode = survey.getDefaultLanguage();
 			if ( currentLanguageCode == null ) {
 				openLanguageManagerPopUp();
@@ -217,14 +223,30 @@ public class SurveyEditVM extends SurveyBaseVM {
 	}
 	
 	@Command
-	public void save() throws SurveyImportException {
+	public void save(@ContextParam(ContextType.BINDER) Binder binder) throws SurveyImportException {
+		dispatchValidateAllCommand();
+//		validateMainForm(binder);
 		if ( checkCanSave(false) ) {
 			surveyManager.saveSurveyWork(survey);
 			MessageUtil.showInfo(SURVEY_SUCCESSFULLY_SAVED_MESSAGE_KEY);
 			BindUtils.postNotifyChange(null, null, survey, "published");
+			changed = false;
 		}
 	}
 	
+	protected void validateMainForm(Binder binder) {
+		Component view = binder.getView();
+		IdSpace spaceOwner = view.getSpaceOwner();
+		Component mainInfoFormContainer = Path.getComponent(spaceOwner, "mainInfoInclude/formContainer");
+		Binder mainFormBinder = (Binder) mainInfoFormContainer.getAttribute("binder");
+		SurveyMainInfoVM mainFormVM = (SurveyMainInfoVM) mainFormBinder.getViewModel();
+		mainFormVM.validateForm(mainFormBinder);
+	}
+
+	protected void dispatchValidateAllCommand() {
+		BindUtils.postGlobalCommand(null, null, SurveyObjectBaseVM.VALIDATE_ALL_GLOBAL_COMMAND, null);
+	}
+
 	protected boolean checkCanSave(boolean publishing) {
 		if ( checkCanLeaveForm() ) {
 			List<SurveyWorkSummary> surveySummaries = SurveyManagerUtil.getSurveySummaries(surveyManager);
@@ -269,9 +291,7 @@ public class SurveyEditVM extends SurveyBaseVM {
 
 	@GlobalCommand
 	public void showPreview(@BindingParam("formVersion") ModelVersion formVersion, @BindingParam("rootEntity") EntityDefinition rootEntity) {
-		if ( rootEntity == null ) {
-			MessageUtil.showWarning(LabelKeys.PREVIEW_ROOT_ENTITY_NOT_SPECIFIED);
-		} else {
+		if ( validateShowPreview(rootEntity, formVersion) ) {
 			Execution current = Executions.getCurrent();
 			List<NameValuePair> params = new ArrayList<NameValuePair>();
 			params.add(new BasicNameValuePair("preview", "true"));
@@ -287,6 +307,21 @@ public class SurveyEditVM extends SurveyBaseVM {
 		}
 	}
 	
+	protected boolean validateShowPreview(EntityDefinition rootEntityDefn, ModelVersion version) {
+		if ( rootEntityDefn == null ) {
+			MessageUtil.showWarning(LabelKeys.PREVIEW_ROOT_ENTITY_NOT_SPECIFIED);
+			return false;
+		} else if (survey.getId() == null || changed)  {
+			MessageUtil.showWarning(LabelKeys.PREVIEW_ERROR_SAVE_SURVEY_FIRST);
+			return false;
+		} else if (version == null && survey.getVersions() != null && ! survey.getVersions().isEmpty() ) {
+			MessageUtil.showWarning(LabelKeys.PREVIEW_ERROR_VERSION_NOT_SPECIFIED);
+			return false;
+		} else {
+			return true;
+		}
+	}
+
 	@Command
 	public void openPreviewPreferencesPopUp() {
 		previewPreferencesPopUp = openPopUp(Resources.Component.PREVIEW_PREFERENCES_POP_UP.getLocation(), true);
@@ -298,6 +333,11 @@ public class SurveyEditVM extends SurveyBaseVM {
 		previewPreferencesPopUp = null;
 	}
 	
+	@GlobalCommand
+	public void surveyChanged() {
+		changed = true;
+	}
+
 	@Command
 	public void publish() {
 		if ( checkCanSave(true) ) {
@@ -336,5 +376,9 @@ public class SurveyEditVM extends SurveyBaseVM {
 			return new BindingListModelList<String>(languages, false);
 		}
 	}
-	
+
+	public boolean isChanged() {
+		return changed;
+	}
+
 }

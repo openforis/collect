@@ -185,18 +185,15 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 	}
 
 	protected void saveTabInfo(T dest) {
-		UIOptions uiOptions = getUIOptions(dest);
-		if ( tabName == null || tabName.equals(INHERIT_TAB_NAME) ) {
-			uiOptions.removeTabAssociation(dest);
-		} else {
-			UITabSet parentTabSet;
-			if ( parentDefinition == null ) {
-				parentTabSet = uiOptions.getAssignedRootTabSet((EntityDefinition) dest);
+		if ( parentDefinition != null ) {
+			UIOptions uiOptions = getUIOptions(dest);
+			if ( tabName == null || tabName.equals(INHERIT_TAB_NAME) ) {
+				uiOptions.removeTabAssociation(dest);
 			} else {
-				parentTabSet = uiOptions.getAssignedTabSet(parentDefinition);
+				UITabSet parentTabSet = uiOptions.getAssignedTabSet(parentDefinition);
+				UITab tab = parentTabSet.getTab(tabName);
+				uiOptions.assignToTab(dest, tab);
 			}
-			UITab tab = parentTabSet.getTab(tabName);
-			uiOptions.assignToTab(dest, tab);
 		}
 	}
 

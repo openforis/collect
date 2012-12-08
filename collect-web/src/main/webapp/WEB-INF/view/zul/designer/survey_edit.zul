@@ -32,13 +32,13 @@
     				    </tabs>
     				    <tabpanels>
     				        <tabpanel>
-    				        	<include src="survey_edit/info.zul" />
+    				        	<include id="mainInfoInclude" src="survey_edit/info.zul" />
     				        </tabpanel>
     				        <tabpanel>
-    				        	<include src="survey_edit/schema/schema.zul" />
+    				        	<include id="schemaInclude" src="survey_edit/schema/schema.zul" />
     				        </tabpanel>
     				        <tabpanel>
-    				        	<include src="survey_edit/layout_tabs.zul" />
+    				        	<include id="layoutTabsInclude" src="survey_edit/layout_tabs.zul" />
     				        </tabpanel>
     				    </tabpanels>
     				</tabbox>

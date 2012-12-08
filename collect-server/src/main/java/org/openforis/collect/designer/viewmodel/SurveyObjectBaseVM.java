@@ -30,6 +30,7 @@ import org.zkoss.zkplus.databind.BindingListModelList;
 public abstract class SurveyObjectBaseVM<T> extends SurveyBaseVM {
 	
 	public static final String VALIDATE_COMMAND = "validate";
+	public static final String VALIDATE_ALL_GLOBAL_COMMAND = "validateAll";
 	public static final String APPLY_CHANGES_COMMAND = "applyChanges";
 	public static final String COMMIT_CHANGES_COMMAND = "commitChanges";
 	
@@ -93,6 +94,11 @@ public abstract class SurveyObjectBaseVM<T> extends SurveyBaseVM {
 		}
 	}
 
+	@GlobalCommand
+	public void validateAll(@ContextParam(ContextType.BINDER) Binder binder) {
+		dispatchValidateCommand(binder);
+	}
+	
 	@Command
 	public void validate() {
 	}
@@ -111,8 +117,8 @@ public abstract class SurveyObjectBaseVM<T> extends SurveyBaseVM {
 			setSelectedItem(editedItem);
 			newItem = false;
 		}
-		changed = true;
 		notifyChange("items","selectedItem","changed");
+		dispatchSurveyChangedCommand();
 	}
 	
 	@Command

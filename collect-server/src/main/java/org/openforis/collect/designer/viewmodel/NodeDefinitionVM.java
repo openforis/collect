@@ -28,7 +28,6 @@ import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.Binder;
 import org.zkoss.bind.Form;
 import org.zkoss.bind.annotation.BindingParam;
-import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.ContextParam;
 import org.zkoss.bind.annotation.ContextType;
 import org.zkoss.bind.annotation.GlobalCommand;
@@ -79,8 +78,7 @@ public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyO
 	}
 	
 	@Override
-	@Command
-	public void applyChanges() {
+	protected void commitChanges() {
 		formObject.saveTo(editedItem, currentLanguageCode);
 		boolean editingRootEntity = parentEntity == null;
 		if ( newItem ) {
@@ -101,6 +99,7 @@ public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyO
 		Map<String, Object> args = new HashMap<String, Object>();
 		args.put("parentEntity", parentEntity);
 		BindUtils.postGlobalCommand(null, null, "editedNodeChanged", args);
+		dispatchSurveyChangedCommand();
 	}
 
 	protected void updateMainTabLabel(EntityDefinition rootEntityDefn) {

@@ -41,6 +41,7 @@ public abstract class SurveyBaseVM extends BaseVM {
 	
 	public static final String VERSIONS_UPDATED_GLOBAL_COMMAND = "versionsUpdated";
 	public static final String UNDO_LAST_CHANGES_GLOBAL_COMMAND = "undoLastChanges";
+	public static final String SURVEY_CHANGED_GLOBAL_COMMAND = "surveyChanged";
 	
 	public static final String DATE_FORMAT = Labels.getLabel("global.date_format");
 	
@@ -51,7 +52,7 @@ public abstract class SurveyBaseVM extends BaseVM {
 	
 	private boolean currentFormBlocking;
 	private boolean currentFormValid;
-	
+
 	public SurveyBaseVM() {
 		currentFormValid = true;
 		currentFormBlocking = false;
@@ -116,6 +117,10 @@ public abstract class SurveyBaseVM extends BaseVM {
 		args.put("valid", valid);
 		args.put("blocking", blocking);
 		BindUtils.postGlobalCommand(null, null, "currentFormValidated", args);
+	}
+
+	public void dispatchSurveyChangedCommand() {
+		BindUtils.postGlobalCommand(null, null, SURVEY_CHANGED_GLOBAL_COMMAND, null);
 	}
 
 	public boolean checkCanLeaveForm() {
@@ -293,7 +298,6 @@ public abstract class SurveyBaseVM extends BaseVM {
 		return currentFormBlocking;
 	}
 
-	
 	public interface CanLeaveFormConfirmHandler {
 		void onOk(boolean confirmed);
 	}

@@ -18,6 +18,8 @@ public interface LabelKeys {
 	String LAYOUT_NOT_SUPPORTED_MESSAGE_KEY = "survey.schema.entity.layout.not_supported_error";
 	String INHERIT_TAB = "survey.schema.node.tab.inherited";
 	String PREVIEW_ROOT_ENTITY_NOT_SPECIFIED = "survey.preview.preferences.error.root_entity_not_specified";
+	String PREVIEW_ERROR_SAVE_SURVEY_FIRST = "survey.preview.error.save_first";
+	String PREVIEW_ERROR_VERSION_NOT_SPECIFIED = "survey.preview.preferences.error.version_not_specified";
 	String SURVEY_SAVE_ERROR_DUPLICATE_URI = "survey.save.error.duplicate_uri";
 	String SURVEY_SAVE_ERROR_DUPLICATE_NAME = "survey.save.error.duplicate_name";
 	String SURVEY_PUBLISH_ERROR_DUPLICATE_URI = "survey.publish.error.duplicate_uri";

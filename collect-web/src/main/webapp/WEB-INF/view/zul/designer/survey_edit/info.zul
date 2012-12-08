@@ -1,7 +1,8 @@
 <?component name="fieldErrorHandler" class="org.openforis.collect.designer.component.FieldErrorHandler"?>
 <?component name="multilanguageLabel" class="org.openforis.collect.designer.component.MultilanguageLabel" macroURI="/WEB-INF/view/zul/designer/component/multilanguage_label.zul"?>
 <zk>
-  <div validationMessages="@id('vmsgs')"
+  <div id="formContainer"
+  	validationMessages="@id('vmsgs')"
     apply="org.zkoss.bind.BindComposer"
     viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SurveyMainInfoVM')"
     form="@id('fx') @load(vm.formObject) @save(vm.formObject, before={'validate','applyChanges'})
