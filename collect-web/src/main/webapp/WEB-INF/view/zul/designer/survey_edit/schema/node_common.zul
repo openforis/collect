@@ -21,15 +21,6 @@
               onChange="@command('applyChanges')" />
           </fieldErrorHandler>
         </row>
-        <row>
-          <multilanguageLabel value="${labels.global.item.description}" 
-              languageCode="@load(vm.currentLanguageCode)" />
-          <fieldErrorHandler message="@load(vmsgs['description'])">
-            <textbox width="300px" multiline="true" rows="4"
-              value="@bind(fx.description)"
-              onChange="@command('applyChanges')" />
-          </fieldErrorHandler>
-        </row>
       </rows>
     </grid>
 
@@ -112,9 +103,18 @@
                       onChange="@command('applyChanges')" />
                 </fieldErrorHandler>
 			</row>
+			<row>
+	          <multilanguageLabel value="${labels.global.item.description}" 
+	              languageCode="@load(vm.currentLanguageCode)" />
+	          <fieldErrorHandler message="@load(vmsgs['description'])">
+	            <textbox width="300px" multiline="true" rows="4"
+	              value="@bind(fx.description)"
+	              onChange="@command('applyChanges')" />
+	          </fieldErrorHandler>
+	        </row>
 		  </rows>
       </grid>
-      <groupbox closable="true" open="false"
+      <groupbox closable="true" open="false" visible="false"
       	sclass="collapsible"
       	mold="3d" width="100%">
       	<attribute name="onOpen"><![CDATA[
@@ -167,6 +167,7 @@
       	</grid>
       </groupbox>
     </groupbox>
+
     <groupbox width="100%" closable="false">
       <caption label="${labels.survey.schema.node.versioning}"/>
     	<grid class="inner">
