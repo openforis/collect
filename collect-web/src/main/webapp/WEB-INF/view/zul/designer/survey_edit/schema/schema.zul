@@ -20,7 +20,8 @@
               onSelect="@command('nodeSelected', data=self.selectedItem.value.data)">
               <template name="model">
                 <treeitem draggable="false"
-                  context="@load(vm.isEntity(each.data.nodeDefinition) ? entityPopup: attributePopup)">
+                  context="@load(each.data.detached eq true ? detachedNodePopup: 
+                  	vm.isEntity(each.data.nodeDefinition) ? entityPopup: attributePopup)">
                   <treerow>
                     <treecell label="@load(each.data.detached ? vm.newTreeNodeLabel : each.data.nodeDefinition.name)"
                         image="${vm.getIcon(each.data.nodeDefinition)}" />
@@ -103,6 +104,10 @@
         onClick="@command('removeNode')" />
     </menupopup>
     <menupopup id="attributePopup">
+      <menuitem label="${labels.survey.schema.remove_node}"
+        onClick="@command('removeNode')" />
+    </menupopup>
+    <menupopup id="detachedNodePopup">
       <menuitem label="${labels.survey.schema.remove_node}"
         onClick="@command('removeNode')" />
     </menupopup>

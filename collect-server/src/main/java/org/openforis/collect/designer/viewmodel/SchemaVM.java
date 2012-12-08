@@ -334,28 +334,32 @@ public class SchemaVM extends SurveyBaseVM {
 	}
 
 	public void removeNode(final SchemaTreeNodeData data) {
-		final NodeDefinition nodeDefn = data.getNodeDefinition();
-		if ( nodeDefn != null ) {
-			String confirmMessageKey;
-			if (nodeDefn instanceof EntityDefinition && !((EntityDefinition) nodeDefn).getChildDefinitions().isEmpty() ) {
-				confirmMessageKey = CONFIRM_REMOVE_NON_EMPTY_ENTITY_MESSAGE_KEY;
-			} else {
-				confirmMessageKey = CONFIRM_REMOVE_NODE_MESSAGE_KEY;
-			}
-			NodeType type = NodeType.valueOf(nodeDefn);
-			String typeLabel = type.getLabel().toLowerCase();
-			boolean isRootEntity = nodeDefn.getParentDefinition() == null;
-			if ( isRootEntity ) {
-				typeLabel = Labels.getLabel("survey.schema.root_entity");
-			}
-			Object[] messageArgs = new String[] {typeLabel, nodeDefn.getName()};
-			Object[] titleArgs = new String[] {typeLabel};
-			MessageUtil.showConfirm(new MessageUtil.ConfirmHandler() {
-				@Override
-				public void onOk() {
-					performRemoveNode(nodeDefn);
+		if ( data.isDetached() ) {
+			performRemoveDetachedNode();
+		} else {
+			final NodeDefinition nodeDefn = data.getNodeDefinition();
+			if ( nodeDefn != null ) {
+				String confirmMessageKey;
+				if (nodeDefn instanceof EntityDefinition && !((EntityDefinition) nodeDefn).getChildDefinitions().isEmpty() ) {
+					confirmMessageKey = CONFIRM_REMOVE_NON_EMPTY_ENTITY_MESSAGE_KEY;
+				} else {
+					confirmMessageKey = CONFIRM_REMOVE_NODE_MESSAGE_KEY;
 				}
-			}, confirmMessageKey, messageArgs, CONFIRM_REMOVE_NODE_TITLE_KEY, titleArgs);
+				NodeType type = NodeType.valueOf(nodeDefn);
+				String typeLabel = type.getLabel().toLowerCase();
+				boolean isRootEntity = nodeDefn.getParentDefinition() == null;
+				if ( isRootEntity ) {
+					typeLabel = Labels.getLabel("survey.schema.root_entity");
+				}
+				Object[] messageArgs = new String[] {typeLabel, nodeDefn.getName()};
+				Object[] titleArgs = new String[] {typeLabel};
+				MessageUtil.showConfirm(new MessageUtil.ConfirmHandler() {
+					@Override
+					public void onOk() {
+						performRemoveNode(nodeDefn);
+					}
+				}, confirmMessageKey, messageArgs, CONFIRM_REMOVE_NODE_TITLE_KEY, titleArgs);
+			}
 		}
 	}
 	
@@ -399,6 +403,13 @@ public class SchemaVM extends SurveyBaseVM {
 			Schema schema = rootEntity.getSchema();
 			schema.moveRootEntityDefinition(rootEntity, toIndex);
 		}
+	}
+	
+	protected void performRemoveDetachedNode() {
+		treeModel.removeSelectedNode();
+		notifyChange("treeModel");
+		resetEditingStatus();
+		dispatchCurrentFormValidatedCommand(true);
 	}
 	
 	protected void performRemoveNode(NodeDefinition nodeDefn) {
