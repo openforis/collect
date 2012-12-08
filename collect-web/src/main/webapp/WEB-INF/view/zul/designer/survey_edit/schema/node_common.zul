@@ -41,42 +41,37 @@
           <column />
         </columns>
         <rows>
-			<row>
+			<row visible="${not vm.rootEntity}">
 				<label value="${labels.survey.schema.node.multiple}:" />
                 <fieldErrorHandler message="@load(vmsgs['multiple'])">
     				<checkbox checked="@load(fx.multiple eq true) @save(fx.multiple)" 
-                      onCheck="@command('applyChanges')"
-                      disabled="${empty parentEntity}" />
+                      onCheck="@command('applyChanges')" />
                 </fieldErrorHandler>
 			</row>
-			<row visible="@load(fx.multiple ne true)">
+			<row visible="@load(not vm.rootEntity and fx.multiple ne true)">
 				<label value="${labels.survey.schema.node.required}:" />
 				<fieldErrorHandler message="@load(vmsgs['required'])">
                     <checkbox checked="@load(fx.required eq true) @save(fx.required)" 
-                        onCheck="@command('applyChanges')"
-                        disabled="${empty parentEntity}" />
+                        onCheck="@command('applyChanges')" />
                 </fieldErrorHandler>
 			</row>
-			<row visible="@load(fx.multiple ne true)">
+			<row visible="@load(not vm.rootEntity and fx.multiple ne true)">
 				<label value="${labels.survey.schema.node.required_expression}:" />
 				<fieldErrorHandler message="@load(vmsgs['requiredExpression'])">
                   <textbox width="150px" value="@bind(fx.requiredExpression)" 
-                      onChange="@command('applyChanges')"
-                      disabled="${empty parentEntity}" />
+                      onChange="@command('applyChanges')" />
                 </fieldErrorHandler>
 			</row>
-			<row visible="@load(fx.multiple eq true)">
+			<row visible="@load(not vm.rootEntity and fx.multiple eq true)">
 				<label value="${labels.survey.schema.node.min_count}:" />
 				<fieldErrorHandler message="@load(vmsgs['minCount'])">
-                    <intbox value="@bind(fx.minCount)" onChange="@command('applyChanges')"
-                      disabled="${empty parentEntity}" />
+                    <intbox value="@bind(fx.minCount)" onChange="@command('applyChanges')" />
                 </fieldErrorHandler>
 			</row>
-			<row visible="@load(fx.multiple eq true)">
+			<row visible="@load(not vm.rootEntity and fx.multiple eq true)">
 				<label value="${labels.survey.schema.node.max_count}:" />
 				<fieldErrorHandler message="@load(vmsgs['maxCount'])">
-                    <intbox value="@bind(fx.maxCount)" onChange="@command('applyChanges')"
-                      disabled="${empty parentEntity}" />
+                    <intbox value="@bind(fx.maxCount)" onChange="@command('applyChanges')" />
                 </fieldErrorHandler>
 			</row>
       </rows>
@@ -213,7 +208,9 @@
     		</rows>
     	</grid>
    </groupbox>
-   <groupbox width="100%" closable="false">
+   <groupbox width="100%" 
+   		closable="false"
+   		visible="@load(not vm.rootEntity)">
     <caption label="${labels.survey.schema.node.layout.$}"/>
     <vlayout width="100%">
       <grid class="inner">
@@ -227,8 +224,7 @@
             <fieldErrorHandler message="@load(vmsgs['tab'])">
                 <listbox width="150px" model="@load(vm.assignableTabNames)"
                   selectedItem="@bind(fx.tabName)" mold="select"
-                  onSelect="@command('applyChanges')"
-                  disabled="${empty parentEntity}">
+                  onSelect="@command('applyChanges')">
                 <template name="model">
                   <listitem label="@load(vm.getTabLabel(each))" />
                 </template>

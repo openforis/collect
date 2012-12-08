@@ -23,13 +23,13 @@ import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NodeLabel.Type;
 import org.openforis.idm.metamodel.Schema;
-import org.springframework.context.annotation.DependsOn;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.Binder;
 import org.zkoss.bind.Form;
 import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.ContextParam;
 import org.zkoss.bind.annotation.ContextType;
+import org.zkoss.bind.annotation.DependsOn;
 import org.zkoss.bind.annotation.GlobalCommand;
 import org.zkoss.bind.annotation.Init;
 import org.zkoss.util.resource.Labels;
@@ -268,5 +268,10 @@ public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyO
 		} else {
 			return null;
 		}
+	}
+	
+	@DependsOn("editedItem")
+	public boolean isRootEntity() {
+		return editedItem != null && parentEntity == null;
 	}
 }
