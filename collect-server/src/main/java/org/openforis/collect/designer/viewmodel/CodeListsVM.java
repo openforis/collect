@@ -136,7 +136,9 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 				editedItem.removeLevel(0);
 				CodeScope scope = CodeScope.SCHEME;
 				editedItem.setCodeScope(scope);
-				((CodeListFormObject) formObject).setCodeScope(scope.name());
+				CodeListFormObject fo = (CodeListFormObject) formObject;
+				fo.setCodeScope(scope.name());
+				fo.setType(type);
 				notifyChange("formObject");
 			}
 			break;
