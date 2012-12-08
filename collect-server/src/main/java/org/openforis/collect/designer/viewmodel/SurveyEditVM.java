@@ -243,10 +243,6 @@ public class SurveyEditVM extends SurveyBaseVM {
 		mainFormVM.validateForm(mainFormBinder);
 	}
 
-	protected void dispatchValidateAllCommand() {
-		BindUtils.postGlobalCommand(null, null, SurveyObjectBaseVM.VALIDATE_ALL_GLOBAL_COMMAND, null);
-	}
-
 	protected boolean checkCanSave(boolean publishing) {
 		if ( checkCanLeaveForm() ) {
 			List<SurveyWorkSummary> surveySummaries = SurveyManagerUtil.getSurveySummaries(surveyManager);

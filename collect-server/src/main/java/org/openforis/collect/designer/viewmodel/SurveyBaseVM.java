@@ -42,7 +42,8 @@ public abstract class SurveyBaseVM extends BaseVM {
 	public static final String VERSIONS_UPDATED_GLOBAL_COMMAND = "versionsUpdated";
 	public static final String UNDO_LAST_CHANGES_GLOBAL_COMMAND = "undoLastChanges";
 	public static final String SURVEY_CHANGED_GLOBAL_COMMAND = "surveyChanged";
-	
+	public static final String VALIDATE_ALL_GLOBAL_COMMAND = "validateAll";
+
 	public static final String DATE_FORMAT = Labels.getLabel("global.date_format");
 	
 	@WireVariable
@@ -121,6 +122,10 @@ public abstract class SurveyBaseVM extends BaseVM {
 
 	public void dispatchSurveyChangedCommand() {
 		BindUtils.postGlobalCommand(null, null, SURVEY_CHANGED_GLOBAL_COMMAND, null);
+	}
+
+	protected void dispatchValidateAllCommand() {
+		BindUtils.postGlobalCommand(null, null, VALIDATE_ALL_GLOBAL_COMMAND, null);
 	}
 
 	public boolean checkCanLeaveForm() {

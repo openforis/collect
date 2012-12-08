@@ -30,7 +30,6 @@ import org.zkoss.zkplus.databind.BindingListModelList;
 public abstract class SurveyObjectBaseVM<T> extends SurveyBaseVM {
 	
 	public static final String VALIDATE_COMMAND = "validate";
-	public static final String VALIDATE_ALL_GLOBAL_COMMAND = "validateAll";
 	public static final String APPLY_CHANGES_COMMAND = "applyChanges";
 	public static final String COMMIT_CHANGES_COMMAND = "commitChanges";
 	

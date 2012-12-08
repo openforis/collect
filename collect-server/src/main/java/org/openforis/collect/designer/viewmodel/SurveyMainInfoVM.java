@@ -8,6 +8,9 @@ import java.util.List;
 import org.openforis.collect.designer.form.FormObject;
 import org.openforis.collect.designer.form.SurveyMainInfoFormObject;
 import org.openforis.collect.model.CollectSurvey;
+import org.zkoss.bind.Binder;
+import org.zkoss.bind.annotation.ContextParam;
+import org.zkoss.bind.annotation.ContextType;
 import org.zkoss.bind.annotation.Init;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 
@@ -19,11 +22,17 @@ import org.zkoss.zk.ui.select.annotation.VariableResolver;
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class SurveyMainInfoVM extends SurveyObjectBaseVM<CollectSurvey> {
 	
-	@Override
 	@Init(superclass=false)
-	public void init() {
+	public void init(@ContextParam(ContextType.BINDER) Binder binder) {
 		super.init();
 		setEditedItem(getSurvey());
+		validateForm(binder);
+	}
+	
+	@Override
+	protected void performItemSelection(CollectSurvey item) {
+		super.performItemSelection(item);
+		dispatchValidateAllCommand();
 	}
 	
 	@Override
