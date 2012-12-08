@@ -46,10 +46,13 @@ public abstract class AbstractTreeModel<T> extends DefaultTreeModel<T> {
 		} else if ( parentNode.isLeaf() ) {
 			parentNode = recreateNode(parentNode);
 		}
-		AbstractTreeNode<T> newNode = createNode(data);
-		parentNode.add(newNode);
+		AbstractTreeNode<T> node = getNode(data);
+		if ( node == null ) {
+			node = createNode(data);
+			parentNode.add(node);
+		}
 		addOpenObject(parentNode);
-		setSelection(Arrays.asList(newNode));
+		setSelection(Arrays.asList(node));
 	}
 	
 	protected AbstractTreeNode<T> getSelectedNode() {
@@ -89,14 +92,22 @@ public abstract class AbstractTreeModel<T> extends DefaultTreeModel<T> {
 			return null;
 		} else {
 			int[] path = getNodePath(data);
-			return (AbstractTreeNode<T>) getChild(path);
+			if ( path == null ) {
+				return null;
+			} else {
+				return (AbstractTreeNode<T>) getChild(path);
+			}
 		}
 	}
 	
 	protected int[] getNodePath(T data) {
 		 TreeNode<T> treeNode = getTreeNode(data);
-		 int[] result = getPath(treeNode);
-		 return result;
+		 if ( treeNode == null ) {
+			 return null;
+		 } else {
+			 int[] result = getPath(treeNode);
+			 return result;
+		 }
 	}
 
 	protected TreeNode<T> getTreeNode(T data) {
