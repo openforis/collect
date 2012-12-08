@@ -19,6 +19,11 @@
 		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SurveyEditVM')">
 	 	<center border="none">
 			<absolutelayout hflex="1" vflex="1">
+                <absolutechildren hflex="1">
+                	<box width="100%" align="center">
+				      <label sclass="mainTitleEditing" value="${labels.designer_title}" />
+                	</box>
+			    </absolutechildren>
                 <absolutechildren hflex="1" vflex="1">
     				<!-- main tabs -->
     				<tabbox id="tb" hflex="1" vflex="1">
