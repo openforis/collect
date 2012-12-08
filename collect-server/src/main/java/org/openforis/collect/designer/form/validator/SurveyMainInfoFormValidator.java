@@ -25,7 +25,10 @@ public class SurveyMainInfoFormValidator extends FormValidator {
 	}
 
 	protected void validateName(ValidationContext ctx) {
-		validateRequired(ctx, NAME_FIELD);
+		String field = NAME_FIELD;
+		if ( validateRequired(ctx, field) ) {
+			validateInternalName(ctx, field);
+		}
 	}
 
 	protected void validateUri(ValidationContext ctx) {
