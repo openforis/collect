@@ -1,5 +1,6 @@
 package org.openforis.collect.designer.component;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -7,6 +8,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.Stack;
 
+import org.openforis.collect.metamodel.ui.UITabSet;
 import org.zkoss.zul.DefaultTreeModel;
 import org.zkoss.zul.DefaultTreeNode;
 import org.zkoss.zul.TreeNode;
@@ -29,6 +31,26 @@ public abstract class AbstractTreeModel<T> extends DefaultTreeModel<T> {
 		setSelection(emptySelection);
 	}
 
+	public Collection<TreeNode<T>> getAllItems() {
+		Collection<TreeNode<T>> result = new ArrayList<TreeNode<T>>();
+		Stack<TreeNode<T>> stack = new Stack<TreeNode<T>>();
+		stack.push(getRoot());
+		while ( ! stack.isEmpty() ) {
+			TreeNode<T> treeNode = stack.pop();
+			result.add(treeNode);
+			List<TreeNode<T>> children = treeNode.getChildren();
+			if ( children != null && ! children.isEmpty() ) {
+				stack.addAll(children);
+			}
+		}
+		return result;
+	}
+	
+	public void openAllItems() {
+		Collection<TreeNode<T>> allItems = getAllItems();
+		setOpenObjects(allItems);
+	}
+	
 	public void removeSelectedNode() {
 		int[] selectionPath = getSelectionPath();
 		if ( selectionPath != null ) {

@@ -9,6 +9,7 @@ import java.util.List;
 
 import org.openforis.collect.metamodel.ui.UITab;
 import org.openforis.collect.metamodel.ui.UITabSet;
+import org.zkoss.zul.TreeNode;
 
 /**
  * @author S. Ricci
@@ -27,9 +28,10 @@ public class UITabsTreeModel extends AbstractTreeModel<UITabSet> {
 		List<AbstractTreeNode<UITabSet>> treeNodes = UITabSetTreeNode.fromList(tabs);
 		UITabSetTreeNode root = new UITabSetTreeNode(null, treeNodes);
 		UITabsTreeModel result = new UITabsTreeModel(root);
+		result.openAllItems();
 		return result;
 	}
-	
+
 	@Override
 	protected AbstractTreeNode<UITabSet> createNode(
 			UITabSet data, boolean defineEmptyChildrenForLeaves) {
