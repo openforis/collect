@@ -19,12 +19,13 @@
 		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SurveyEditVM')">
 	 	<center border="none">
 			<absolutelayout hflex="1" vflex="1">
-                <absolutechildren hflex="1">
-                	<box width="100%" align="center">
-				      <label sclass="mainTitleEditing" value="${labels.designer_title}" />
-                	</box>
-			    </absolutechildren>
-                <absolutechildren hflex="1" vflex="1">
+         <absolutechildren hflex="1">
+         	<box width="100%" align="center">
+         		<label sclass="mainTitleEditing"
+         			value="${labels.designer_title}" />
+         	</box>
+         </absolutechildren>
+         <absolutechildren hflex="1" vflex="1">
     				<!-- main tabs -->
     				<tabbox id="tb" hflex="1" vflex="1">
     				    <tabs id="tabs">
@@ -47,23 +48,24 @@
     				        </tabpanel>
     				    </tabpanels>
     				</tabbox>
-                </absolutechildren>
-                <absolutechildren x="480" width="50%">
-                    <!-- language selector -->
-                    <hlayout id="languageSelector" hflex="1" style="text-align: right;">
-                      <listbox model="@load(vm.availableLanguages)"
-                        selectedItem="@load(vm.currentLanguageCode)"
-                        onSelect="@command('languageCodeSelected', code=self.selectedItem.value)"
-                        mold="select">
-                        <template name="model">
-                           <listitem label="${c:l(each)}" value="@load(each)" />
-                        </template>
-                      </listbox>
-                      <button tooltiptext="${labels.survey.language_manager}" 
-                          onClick="@command('openLanguageManagerPopUp')"
-                          image="/assets/images/pencil-small.png" />
-                    </hlayout>
-                </absolutechildren>
+         </absolutechildren>
+         <absolutechildren x="480" width="50%">
+             <!-- language selector -->
+             <hlayout id="languageSelector" hflex="1" style="text-align: right;">
+               <listbox model="@load(vm.availableLanguages)"
+                 selectedItem="@load(vm.currentLanguageCode)"
+                 onSelect="@command('languageCodeSelected', code=self.selectedItem.value)"
+                 mold="select">
+                 <template name="model">
+                    <listitem label="${c:l(each)}" value="@load(each)" />
+                 </template>
+               </listbox>
+               <button sclass="icon"
+               	tooltiptext="${labels.survey.language_manager}"
+               	onClick="@command('openLanguageManagerPopUp')"
+               	image="/assets/images/edit-language.png" />
+             </hlayout>
+         </absolutechildren>
 			</absolutelayout>
 	 	</center>
 		<south height="30px">
@@ -80,10 +82,10 @@
 					</box>
 				</center>
 				<east border="none" size="40%">
-                    <box width="100%" align="right">
-  						<button label="${labels.survey.publish.$}" 
-  							onClick="@command('publish')" />
-                    </box>
+           <box width="100%" align="right">
+           	  <button label="${labels.survey.publish.$}"
+           		 onClick="@command('publish')" />
+           </box>
 				</east>
 			</borderlayout>
 		</south>
