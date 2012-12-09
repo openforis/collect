@@ -51,7 +51,10 @@
          </absolutechildren>
          <absolutechildren x="480" width="50%">
              <!-- language selector -->
-             <hlayout id="languageSelector" hflex="1" style="text-align: right;">
+             <hlayout id="languageSelector" 
+                hflex="1" 
+                style="text-align: right;"
+                sclass="controlBar">
                <listbox model="@load(vm.availableLanguages)"
                  selectedItem="@load(vm.currentLanguageCode)"
                  onSelect="@command('languageCodeSelected', code=self.selectedItem.value)"
@@ -61,6 +64,7 @@
                  </template>
                </listbox>
                <button sclass="icon"
+                height="24px"
                	tooltiptext="${labels.survey.language_manager}"
                	onClick="@command('openLanguageManagerPopUp')"
                	image="/assets/images/edit-language.png" />

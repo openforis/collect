@@ -6,6 +6,9 @@ button.icon {
 	border: none;
 	cursor: pointer;
 }
+.z-hlayout.controlBar .z-hlayout-inner {
+	vertical-align: middle;
+}
 .z-textbox, .z-decimalbox, .z-intbox, .z-longbox, .z-doublebox {
 	border: 2px inset #E7E7E7;
 }

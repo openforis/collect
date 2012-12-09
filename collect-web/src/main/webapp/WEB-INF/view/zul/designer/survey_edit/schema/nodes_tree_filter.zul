@@ -1,6 +1,6 @@
 <zk>
   <custom-attributes canEditRootEntities="${arg.canEditRootEntities}" />
-  <hlayout>
+  <hlayout sclass="controlBar">
     <label value="${labels.survey.schema.root_entity}:" />
     <listbox width="150px" model="@load(vm.rootEntities)"
       selectedItem="@load(vm.selectedRootEntity)" mold="select"
@@ -26,7 +26,7 @@
     <button sclass="icon"
       tooltiptext="${labels.survey.versioning_manager}"
       onClick="@global-command('openVersioningManagerPopUp')"
-      image="/assets/images/edit.png" />
+      image="/assets/images/edit-small.png" />
     <button label="${labels.survey.preview.show_preview}"
       onClick="@global-command('showPreview', formVersion=vm.selectedVersion, rootEntity=vm.selectedRootEntity)" />
   </hlayout>
