@@ -113,7 +113,7 @@
                     					</listbox>
                     					<button tooltiptext="${labels.survey.versioning_manager}" 
                     						onClick="@global-command('openVersioningManagerPopUp')"
-                    						image="/assets/images/pencil-small.png" />
+                    						image="/assets/images/edit-small.png" />
                                     </fieldErrorHandler>
                     			</row>
                     			<row>
@@ -128,7 +128,7 @@
                     					</listbox>
                     					<button tooltiptext="${labels.survey.versioning_manager}" 
                     						onClick="@global-command('openVersioningManagerPopUp')"
-                    						image="/assets/images/pencil-small.png" />
+                    						image="/assets/images/edit-small.png" />
                                     </fieldErrorHandler>
                     			</row>
 					            <row>

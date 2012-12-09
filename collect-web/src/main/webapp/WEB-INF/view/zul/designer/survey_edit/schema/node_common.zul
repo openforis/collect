@@ -186,9 +186,10 @@
     							<listitem label="@load(vm.getVersionLabel(each))" />
     						</template>
     					</listbox>
-    					<button tooltiptext="${labels.survey.versioning_manager}" 
+    					<button sclass="icon"
+    					  tooltiptext="${labels.survey.versioning_manager}" 
     						onClick="@global-command('openVersioningManagerPopUp')"
-    						image="/assets/images/pencil-small.png" />
+    						image="/assets/images/edit-small.png" />
                     </fieldErrorHandler>
     			</row>
     			<row>
@@ -201,9 +202,10 @@
     							<listitem label="@load(vm.getVersionLabel(each))" />
     						</template>
     					</listbox>
-    					<button tooltiptext="${labels.survey.versioning_manager}" 
+    					<button sclass="icon"
+    					  tooltiptext="${labels.survey.versioning_manager}" 
     						onClick="@global-command('openVersioningManagerPopUp')"
-    						image="/assets/images/pencil-small.png" />
+    						image="/assets/images/edit-small.png" />
                     </fieldErrorHandler>
     			</row>
     		</rows>

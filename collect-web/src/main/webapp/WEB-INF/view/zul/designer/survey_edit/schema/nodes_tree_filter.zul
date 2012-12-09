@@ -10,9 +10,9 @@
       </template>
     </listbox>
     <hlayout visible="${canEditRootEntities}">
-      <button
+      <button sclass="icon"
         tooltiptext="${labels.survey.schema.add_root_entity}"
-        image="/assets/images/add-small.png"
+        image="/assets/images/add.png"
         onClick="@command('addRootEntity')" />
     </hlayout>
     <label value="${labels.survey.schema.form_version}:" />
@@ -23,9 +23,10 @@
         <listitem label="@load(each.name)" />
       </template>
     </listbox>
-    <button tooltiptext="${labels.survey.versioning_manager}"
+    <button sclass="icon"
+      tooltiptext="${labels.survey.versioning_manager}"
       onClick="@global-command('openVersioningManagerPopUp')"
-      image="/assets/images/edit-small.png" />
+      image="/assets/images/edit.png" />
     <button label="${labels.survey.preview.show_preview}"
       onClick="@global-command('showPreview', formVersion=vm.selectedVersion, rootEntity=vm.selectedRootEntity)" />
   </hlayout>

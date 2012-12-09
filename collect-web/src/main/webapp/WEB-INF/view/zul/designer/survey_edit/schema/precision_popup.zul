@@ -47,9 +47,10 @@
                   </template>
                 </listbox>
               </fieldErrorHandler>
-              <button tooltiptext="${labels.survey.unit.manager.title}"
+              <button sclass="icon"
+                tooltiptext="${labels.survey.unit.manager.title}"
                 onClick="@global-command('openUnitsManagerPopUp')"
-                image="/assets/images/pencil-small.png" />
+                image="/assets/images/edit-small.png" />
             </hlayout>
           </row>
           <row>

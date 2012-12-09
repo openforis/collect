@@ -68,34 +68,37 @@
         <row>
           <label value="${labels.survey.srs.$}:" />
           <cell>
-            <button tooltiptext="${labels.survey.srs.$}"
+            <button sclass="icon"
+              tooltiptext="${labels.survey.srs.$}"
               onClick="@global-command('openSRSManagerPopUp')"
-              image="/assets/images/pencil-small.png" />
+              image="/assets/images/edit-small.png" />
           </cell>
         </row>
         <row>
           <label value="${labels.survey.code_lists}:" />
           <cell>
-            <button
+            <button sclass="icon"
               tooltiptext="${labels.survey.code_list.manager.title}"
               onClick="@global-command('openCodeListsManagerPopUp')"
-              image="/assets/images/pencil-small.png" />
+              image="/assets/images/edit-small.png" />
           </cell>
         </row>
         <row>
           <label value="${labels.survey.units}:" />
           <cell>
-            <button tooltiptext="${labels.survey.unit.manager.title}"
+            <button sclass="icon" 
+              tooltiptext="${labels.survey.unit.manager.title}"
               onClick="@global-command('openUnitsManagerPopUp')"
-              image="/assets/images/pencil-small.png" />
+              image="/assets/images/edit-small.png" />
           </cell>
         </row>
         <row>
           <label value="${labels.survey.versioning_manager}:" />
           <cell>
-            <button tooltiptext="${labels.survey.versioning_manager}"
+            <button sclass="icon"
+              tooltiptext="${labels.survey.versioning_manager}"
               onClick="@global-command('openVersioningManagerPopUp')"
-              image="/assets/images/pencil-small.png" />
+              image="/assets/images/edit-small.png" />
           </cell>
         </row>
       </rows>

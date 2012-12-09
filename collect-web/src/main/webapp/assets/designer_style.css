@@ -1,6 +1,11 @@
 .error {
 	color: red;
 }
+button.icon {
+	background: none;
+	border: none;
+	cursor: pointer;
+}
 .z-textbox, .z-decimalbox, .z-intbox, .z-longbox, .z-doublebox {
 	border: 2px inset #E7E7E7;
 }
