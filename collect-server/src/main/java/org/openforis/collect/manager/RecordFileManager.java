@@ -161,8 +161,10 @@ public class RecordFileManager {
 			@Override
 			public void visit(Node<? extends NodeDefinition> node, int pos) {
 				if ( node instanceof FileAttribute ) {
-					java.io.File repositoryFile = getRepositoryFile(record, node.getId());
-					repositoryFile.delete();
+					java.io.File repositoryFile = getRepositoryFile(record, node.getInternalId());
+					if (repositoryFile != null ) {
+						repositoryFile.delete();
+					}
 				}
 			}
 		});

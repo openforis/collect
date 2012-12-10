@@ -178,10 +178,11 @@ public class DataService {
 	@Secured("ROLE_ENTRY")
 	public void deleteRecord(int id) throws RecordPersistenceException {
 		SessionState sessionState = sessionManager.getSessionState();
-		CollectRecord record = sessionState.getActiveRecord();
+		CollectSurvey survey = sessionState.getActiveSurvey();
+		//TODO check that the record is in ENTRY phase: only delete in ENTRY phase is allowed
+		CollectRecord record = recordManager.load(survey, id, Step.ENTRY.getStepNumber());
 		fileManager.deleteAllFiles(record);
 		recordManager.delete(id);
-		sessionManager.clearActiveRecord();
 	}
 	
 	@Transactional
