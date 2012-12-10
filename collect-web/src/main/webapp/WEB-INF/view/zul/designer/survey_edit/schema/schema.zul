@@ -69,7 +69,9 @@
       <menu label="${labels.survey.schema.add_attribute.label}">
         <menupopup>
           <zk forEach="${vm.attributeTypeValues}">
-            <menuitem label="${vm.getAttributeTypeLabel(each)}"
+            <menuitem 
+              image="${vm.getAttributeIcon(each)}"
+              label="${vm.getAttributeTypeLabel(each)}"
               value="${each}"
               onClick="@command('addAttribute', attributeType=self.value)" />
           </zk>
@@ -93,7 +95,9 @@
       <menu label="${labels.survey.schema.add_attribute.label}">
         <menupopup>
           <zk forEach="${vm.attributeTypeValues}">
-            <menuitem label="${vm.getAttributeTypeLabel(each)}"
+            <menuitem 
+              image="${vm.getAttributeIcon(each)}"
+              label="${vm.getAttributeTypeLabel(each)}"
               value="${each}"
               onClick="@command('addChildAttribute', attributeType=self.value)" />
           </zk>

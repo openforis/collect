@@ -55,6 +55,7 @@ public class SchemaVM extends SurveyBaseVM {
 
 	private static final boolean FILTER_BY_ROOT_ENTITY = true;
 	private static final boolean INCLUDE_ROOT_ENTITY_IN_TREE = true;
+	private static final String NODE_TYPES_IMAGES_PATH = "/assets/images/node_types/";
 
 	private static final String SCHEMA_CHANGED_GLOBAL_COMMAND = "schemaChanged";
 	private static final String VALIDATE_COMMAND = "validate";
@@ -652,14 +653,27 @@ public class SchemaVM extends SurveyBaseVM {
 	}
 	
 	public String getIcon(NodeDefinition nodeDefn) {
-		String result = "assets/images/node_types/";
 		if ( nodeDefn instanceof EntityDefinition ) {
-			result += "entity";
+			return getNodeTypeIcon(NodeType.ENTITY.name());
 		} else {
 			AttributeType attributeType = AttributeType.valueOf((AttributeDefinition) nodeDefn);
-			result += attributeType.name().toLowerCase();
+			return getAttributeIcon(attributeType.name());
 		}
-		result += "-small.png";
+	}
+	
+	public String getNodeTypeIcon(String type) {
+		NodeType nodeType = NodeType.valueOf(type);
+		switch (nodeType) {
+		case ENTITY:
+			return NODE_TYPES_IMAGES_PATH + "entity-small.png";
+		default:
+			return null;
+		}
+	}
+		
+	public String getAttributeIcon(String type) {
+		AttributeType attributeType = AttributeType.valueOf(type);
+		String result = NODE_TYPES_IMAGES_PATH + attributeType.name().toLowerCase() + "-small.png";
 		return result;
 	}
 	
