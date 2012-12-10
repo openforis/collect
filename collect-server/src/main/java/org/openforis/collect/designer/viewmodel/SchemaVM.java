@@ -275,8 +275,9 @@ public class SchemaVM extends SurveyBaseVM {
 	public void versionsUpdated() {
 		super.versionsUpdated();
 		if ( selectedVersion != null && ! survey.getVersions().contains(selectedVersion) ) {
+			resetEditingStatus();
 			selectedVersion = null;
-			buildTreeModel();
+			updateTreeModel();
 			notifyChange("selectedVersion");
 		}
 	}
