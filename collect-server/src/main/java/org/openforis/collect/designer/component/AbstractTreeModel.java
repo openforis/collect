@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.Stack;
 
-import org.openforis.collect.metamodel.ui.UITabSet;
 import org.zkoss.zul.DefaultTreeModel;
 import org.zkoss.zul.DefaultTreeNode;
 import org.zkoss.zul.TreeNode;
