@@ -70,8 +70,7 @@ package org.openforis.collect.presenter
 		override protected function updateView():void {
 			if(view.entityDefinition != null
 					&& view.entityDefinition.multiple
-					&& view.parentEntity != null 
-					&& view.modelVersion != null) {
+					&& view.parentEntity != null) {
 				var uiTab:UITabProxy = UIBuilder.getUITab(view.entityDefinition);
 				var uiTabs:IList = null;
 				if ( uiTab != null ) {
