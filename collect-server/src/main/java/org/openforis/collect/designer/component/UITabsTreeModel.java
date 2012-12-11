@@ -9,7 +9,6 @@ import java.util.List;
 
 import org.openforis.collect.metamodel.ui.UITab;
 import org.openforis.collect.metamodel.ui.UITabSet;
-import org.zkoss.zul.TreeNode;
 
 /**
  * @author S. Ricci
