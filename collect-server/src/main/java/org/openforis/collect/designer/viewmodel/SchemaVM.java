@@ -384,6 +384,7 @@ public class SchemaVM extends SurveyBaseVM {
 		int newIndex = up ? oldIndex - 1: oldIndex + 1;
 		moveNode(newIndex);
 		treeModel.moveSelectedNode(newIndex);
+		notifyChange("treeModel");
 		dispatchSchemaChangedCommand();
 	}
 	
