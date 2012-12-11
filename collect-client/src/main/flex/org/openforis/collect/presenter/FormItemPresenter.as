@@ -2,6 +2,7 @@ package org.openforis.collect.presenter
 {
 	import flash.events.Event;
 	
+	import mx.binding.utils.BindingUtils;
 	import mx.binding.utils.ChangeWatcher;
 	import mx.collections.IList;
 	import mx.rpc.AsyncResponder;
@@ -70,7 +71,8 @@ package org.openforis.collect.presenter
 			eventDispatcher.addEventListener(ApplicationEvent.UPDATE_RESPONSE_RECEIVED, updateResponseReceivedHandler);
 			eventDispatcher.addEventListener(ApplicationEvent.RECORD_SAVED, recordSavedHandler);
 			eventDispatcher.addEventListener(ApplicationEvent.ASK_FOR_SUBMIT, askForSubmitHandler);
-			ChangeWatcher.watch(_view, "parentEntity", parentEntityChangeHandler);
+			BindingUtils.bindSetter(parentEntitySetter, _view, "parentEntity");
+			//ChangeWatcher.watch(_view, "parentEntity", parentEntityChangeHandler);
 		}
 		
 		protected function updateResponseReceivedHandler(event:ApplicationEvent):void {
@@ -95,7 +97,7 @@ package org.openforis.collect.presenter
 			updateValidationDisplayManager();
 		}
 		
-		protected function parentEntityChangeHandler(event:Event):void {
+		protected function parentEntitySetter(parentEntity:EntityProxy):void {
 			updateView();
 		}
 		

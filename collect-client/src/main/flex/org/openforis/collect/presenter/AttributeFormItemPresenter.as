@@ -8,6 +8,7 @@ package org.openforis.collect.presenter
 	
 	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.model.proxy.AttributeProxy;
+	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.ui.component.detail.AttributeFormItem;
 	import org.openforis.collect.util.UIUtil;
 
@@ -37,7 +38,7 @@ package org.openforis.collect.presenter
 		protected function focusOutHandler(event:FocusEvent):void {
 		}
 		
-		override protected function parentEntityChangeHandler(event:Event):void {
+		override protected function parentEntitySetter(parentEntity:EntityProxy):void {
 			assignAttribute();
 		}
 		
@@ -51,10 +52,6 @@ package org.openforis.collect.presenter
 		
 		private function get view():AttributeFormItem {
 			return AttributeFormItem(_view);
-		}
-		
-		override protected function updateView():void {
-			super.updateView();
 		}
 		
 		override protected function updateRelevanceDisplayManager():void {

@@ -43,10 +43,6 @@ package org.openforis.collect.presenter
 			return MultipleEntityAsTableFormItem(_view);
 		}
 		
-		override protected function updateResponseReceivedHandler(event:ApplicationEvent):void {
-			super.updateResponseReceivedHandler(event);
-		}
-		
 		override protected function initValidationDisplayManager():void {
 			super.initValidationDisplayManager();
 			_validationDisplayManager.showMinMaxCountErrors = true;
@@ -55,8 +51,7 @@ package org.openforis.collect.presenter
 		override protected function updateView():void {
 			if(view.entityDefinition != null
 					&& view.entityDefinition.multiple
-					&& view.parentEntity != null 
-					&& view.modelVersion != null) {
+					&& view.parentEntity != null) {
 				var entities:IList = getEntities();
 				view.dataGroup.dataProvider = entities;
 			} else {

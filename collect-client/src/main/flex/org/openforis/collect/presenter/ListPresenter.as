@@ -19,7 +19,6 @@ package org.openforis.collect.presenter {
 	import mx.rpc.IResponder;
 	import mx.rpc.events.ResultEvent;
 	
-	import org.granite.validation.constraints.Null;
 	import org.openforis.collect.Application;
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.client.DataClient;
@@ -40,6 +39,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.ui.component.input.TextInput;
 	import org.openforis.collect.ui.view.ListView;
 	import org.openforis.collect.util.AlertUtil;
+	import org.openforis.collect.util.CollectionUtil;
 	import org.openforis.collect.util.PopUpUtil;
 	import org.openforis.collect.util.StringUtil;
 	
@@ -124,10 +124,12 @@ package org.openforis.collect.presenter {
 		 * */
 		protected function addButtonClickHandler(event:MouseEvent):void {
 			var versions:ListCollectionView = Application.activeSurvey.versions;
-			if(versions.length > 1) {
-				openSelectVersionPopUp();
-			} else {
+			if ( CollectionUtil.isEmpty(versions) ) {
+				addNewRecord();
+			} else if ( versions.length == 1) {
 				addNewRecord(versions.getItemAt(0) as ModelVersionProxy);
+			} else {
+				openSelectVersionPopUp();
 			}
 		}
 		protected function openSelectVersionPopUp():void {
@@ -172,7 +174,7 @@ package org.openforis.collect.presenter {
 			addNewRecord(version);
 		}
 
-		protected function addNewRecord(version:ModelVersionProxy):void {
+		protected function addNewRecord(version:ModelVersionProxy = null):void {
 			var rootEntityName:String = Application.activeRootEntity.name;
 			var versionName:String = version != null ? version.name: null;
 			_dataClient.createNewRecord(_newRecordResponder, rootEntityName, versionName);
