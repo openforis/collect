@@ -21,8 +21,17 @@ package org.openforis.collect.metamodel.proxy {
 		
 		public function getLabelText(language:String = null, firstIfNotFound:Boolean = true):String {
 			var labelTypes:Array = [NodeLabelProxy$Type.INSTANCE, NodeLabelProxy$Type.HEADING, null];
+			return getSpecificLabelText(labelTypes, language, firstIfNotFound);
+		}
+		
+		public function getHeadingLabelText(language:String = null, firstIfNotFound:Boolean = true):String {
+			var labelTypes:Array = [NodeLabelProxy$Type.HEADING, NodeLabelProxy$Type.INSTANCE, null];
+			return getSpecificLabelText(labelTypes, language, firstIfNotFound);
+		}
+		
+		public function getSpecificLabelText(typesStack:Array, language:String = null, firstIfNotFound:Boolean = true):String {
 			var label:NodeLabelProxy = null;
-			for each (var type:NodeLabelProxy$Type in labelTypes) {
+			for each (var type:NodeLabelProxy$Type in typesStack) {
 				label = getLabel(type, language, false);
 				if(label != null) {
 					break;
