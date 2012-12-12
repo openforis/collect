@@ -51,6 +51,7 @@ public class SchemaTreeModel extends AbstractTreeModel<SchemaTreeModel.SchemaTre
 			}
 			SchemaTreeNode root = new SchemaTreeNode(null, firstLevelTreeNodes);
 			SchemaTreeModel result = new SchemaTreeModel(root, version, true, includeAttributes);
+			result.openAllItems();
 			return result;
 		} else {
 			return null;
