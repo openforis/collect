@@ -54,6 +54,7 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 	private List<List<CodeListItem>> itemsPerLevel;
 	private boolean newChildItem;
 	private CodeListItem editedChildItem;
+	private CodeListItem editedChildItemParentItem;
 	private int editedChildItemLevel;
 	
 	private List<CodeListItem> selectedItemsPerLevel;
@@ -189,7 +190,12 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 			editedChildItemLevel = levelIndex;
 			editedChildItem = editedItem.createItem();
 			editedChildItem.setCodeList(editedItem);
-			openChildItemEditPopUp(editedChildItem);
+			if ( editedChildItemLevel == 0 ) {
+				editedChildItemParentItem = null;
+			} else {
+				editedChildItemParentItem = selectedItemsPerLevel.get(editedChildItemLevel - 1);
+			}
+			openChildItemEditPopUp();
 		}
 	}
 	
@@ -245,18 +251,21 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 	}
 	
 	@Command
-	public void codeListItemDoubleClicked(@BindingParam("item") CodeListItem item) {
+	public void editCodeListItem(@BindingParam("item") CodeListItem item) {
 		newChildItem = false;
-		openChildItemEditPopUp(item);
+		editedChildItem = item;
+		editedChildItemParentItem = item.getParentItem();
+		openChildItemEditPopUp();
 	}
 	
 	protected String generateItemCode(CodeListItem item) {
 		return "item_" + item.getId();
 	}
 
-	public void openChildItemEditPopUp(CodeListItem item) {
+	public void openChildItemEditPopUp() {
 		Map<String, Object> args = new HashMap<String, Object>();
-		args.put("item", item);
+		args.put("item", editedChildItem);
+		args.put("parentItem", editedChildItemParentItem);
 		codeListItemPopUp = openPopUp(Resources.Component.CODE_LIST_ITEM_EDIT_POP_UP.getLocation(), true, args);
 		Binder binder = (Binder) codeListItemPopUp.getAttribute("$BINDER$");
 		validateForm(binder);
@@ -322,17 +331,20 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 	public void closeCodeListItemPopUp(@BindingParam("undoChanges") boolean undoChanges) {
 		closePopUp(codeListItemPopUp);
 		codeListItemPopUp = null;
-		if ( newChildItem && ! undoChanges ) {
-			addChildItemToCodeList();
+		if ( ! undoChanges ) {
+			if ( newChildItem ) {
+				addChildItemToCodeList();
+			} else {
+				BindUtils.postNotifyChange(null, null, editedChildItem, "*");
+			}
 		}
 	}
 
 	private void addChildItemToCodeList() {
-		if ( editedChildItemLevel == 0 ) {
+		if ( editedChildItemParentItem == null ) {
 			editedItem.addItem(editedChildItem);
 		} else {
-			CodeListItem parentItem = selectedItemsPerLevel.get(editedChildItemLevel - 1);
-			parentItem.addChildItem(editedChildItem);
+			editedChildItemParentItem.addChildItem(editedChildItem);
 		}
 		List<CodeListItem> itemsForCurrentLevel = itemsPerLevel.get(editedChildItemLevel);
 		itemsForCurrentLevel.add(editedChildItem);

@@ -173,7 +173,7 @@
 												<template name="model">
 													<listitem draggable="level_${each.depth}" droppable="level_${each.depth}" 
 														onDrop="@command('moveChildItem')">
-														<listcell onDoubleClick="@command('codeListItemDoubleClicked', item=each)">
+														<listcell onDoubleClick="@command('editCodeListItem', item=each)">
 															<label value="@load(each.code)" />
 														</listcell>
 														<listcell style="padding: 0px">
@@ -187,18 +187,21 @@
 												</template>
 											</listbox>
 											<toolbar height="25px">
-												<toolbarbutton image="/assets/images/add-small.png" 
-														tooltiptext="${labels.survey.code_list.add_child_item}" 
-														visible="@load(empty vm.editedItem.lookupTable and forEachStatus.index le vm.lastSelectedLevelIndex + 1)"
-									 					onClick="@command('addItemInLevel', levelIndex=forEachStatus.index)" />
-                                                <toolbarbutton image="/assets/images/edit-small.png" 
-                                                        tooltiptext="${labels.global.edit_item}" 
-                                                        visible="@load(empty vm.editedItem.lookupTable and forEachStatus.index le vm.lastSelectedLevelIndex)" 
-											        	onClick="@command('codeListItemDoubleClicked', item=vm.selectedItemsPerLevel[forEachStatus.index])" />
-											    <toolbarbutton image="/assets/images/delete-small.png"
-									        			tooltiptext="${labels.global.delete_item}"
-														visible="@load(empty vm.editedItem.lookupTable and forEachStatus.index le vm.lastSelectedLevelIndex)" 
-											        	onClick="@command('removeItem', item=vm.selectedItemsPerLevel[forEachStatus.index])" />
+												<toolbarbutton
+													image="/assets/images/add-small.png"
+													tooltiptext="${labels.survey.code_list.add_child_item}"
+													visible="@load(empty vm.editedItem.lookupTable and forEachStatus.index le vm.lastSelectedLevelIndex + 1)"
+													onClick="@command('addItemInLevel', levelIndex=forEachStatus.index)" />
+												<toolbarbutton
+													image="/assets/images/edit-small.png"
+													tooltiptext="${labels.global.edit_item}"
+													visible="@load(empty vm.editedItem.lookupTable and forEachStatus.index le vm.lastSelectedLevelIndex)"
+													onClick="@command('editCodeListItem', item=vm.selectedItemsPerLevel[forEachStatus.index])" />
+												<toolbarbutton
+													image="/assets/images/delete-small.png"
+													tooltiptext="${labels.global.delete_item}"
+													visible="@load(empty vm.editedItem.lookupTable and forEachStatus.index le vm.lastSelectedLevelIndex)"
+													onClick="@command('removeItem', item=vm.selectedItemsPerLevel[forEachStatus.index])" />
 											</toolbar>
 										</groupbox>
 									</template>

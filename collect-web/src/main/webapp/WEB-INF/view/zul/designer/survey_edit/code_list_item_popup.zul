@@ -1,6 +1,7 @@
 <?component name="fieldErrorHandler" class="org.openforis.collect.designer.component.FieldErrorHandler"?>
 <?component name="multilanguageLabel" class="org.openforis.collect.designer.component.MultilanguageLabel" macroURI="/WEB-INF/view/zul/designer/component/multilanguage_label.zul"?>
 <zk>
+  <custom-attributes parentItem="${arg.parentItem}"/>
 	<window id="codeListItemManagerPopUp" title="${labels.survey.code_list.item.manager.title}" 
 		width="600px"
 		height="350px"
@@ -14,7 +15,7 @@
 		form="@id('fx') 
 			@load(vm.formObject) 
             @save(vm.formObject, before={'validate','applyChanges'})
-            @validator('org.openforis.collect.designer.form.validator.CodeListItemFormValidator')">
+            @validator('org.openforis.collect.designer.form.validator.CodeListItemFormValidator', parentItem=parentItem)">
 		<grid>
 			<columns>
 				<column width="150px" />

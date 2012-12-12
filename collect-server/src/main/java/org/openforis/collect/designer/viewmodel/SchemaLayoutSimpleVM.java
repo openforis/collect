@@ -107,6 +107,7 @@ public class SchemaLayoutSimpleVM extends SurveyBaseVM {
 			parent.addTab(tab);
 			treeModel.appendNodeToSelected(tab);
 			selectedTab = tab;
+			dispatchTabSetChangedCommand();
 		}
 	}
 	
