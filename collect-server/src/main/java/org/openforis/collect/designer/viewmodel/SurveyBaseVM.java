@@ -161,8 +161,9 @@ public abstract class SurveyBaseVM extends BaseVM {
 					
 					@Override
 					public void onCancel() {
-						//confirmHandler.onCancel();
-						
+						if ( confirmHandler instanceof CanLeaveFormCompleteConfirmHandler ) {
+							((CanLeaveFormCompleteConfirmHandler) confirmHandler).onCancel();
+						}
 					}
 				}, messageKey);
 			}
