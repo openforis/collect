@@ -15,6 +15,7 @@ import org.openforis.collect.designer.util.Resources;
 import org.openforis.collect.designer.util.Resources.Page;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectSurvey;
+import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.DependsOn;
 import org.zkoss.bind.annotation.GlobalCommand;
@@ -93,9 +94,12 @@ public class SurveySelectVM extends BaseVM {
 	}
 	
 	@GlobalCommand
-	public void closeSurveyImportPopUp() {
+	public void closeSurveyImportPopUp(@BindingParam("successfullyImported") Boolean successfullyImported) {
 		closePopUp(surveyImportPopUp);
 		surveyImportPopUp = null;
+		if ( successfullyImported != null && successfullyImported.booleanValue()) {
+			notifyChange("surveySummaries");
+		}
 	}
 	
 	protected CollectSurvey loadSelectedSurvey() {

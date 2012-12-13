@@ -5,7 +5,9 @@ package org.openforis.collect.designer.viewmodel;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.designer.util.MessageUtil;
@@ -106,7 +108,7 @@ public class SurveyImportVM extends SurveyBaseVM {
 		}
 		try {
 			surveyManager.saveSurveyWork(uploadedSurvey);
-			BindUtils.postGlobalCommand(null, null, SurveySelectVM.CLOSE_SURVEY_IMPORT_POP_UP_GLOBAL_COMMNAD, null);
+			closeImportPopUp(true);
 			Object[] args = new String[]{surveyName};
 			MessageUtil.showInfo("survey.import_survey.successfully_imported", args);
 		} catch (SurveyImportException e) {
@@ -114,6 +116,12 @@ public class SurveyImportVM extends SurveyBaseVM {
 			Object[] args = new String[]{e.getMessage()};
 			MessageUtil.showError("survey.import_survey.error", args);
 		}
+	}
+
+	protected void closeImportPopUp(boolean successfullyImported) {
+		Map<String, Object> args = new HashMap<String, Object>();
+		args.put("successfullyImported", successfullyImported);
+		BindUtils.postGlobalCommand(null, null, SurveySelectVM.CLOSE_SURVEY_IMPORT_POP_UP_GLOBAL_COMMNAD, args);
 	}
 	
 	protected boolean existsSurveyWithSameUriButDifferentName(String surveyName, String uri) {
