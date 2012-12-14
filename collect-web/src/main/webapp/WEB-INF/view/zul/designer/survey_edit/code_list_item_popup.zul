@@ -29,19 +29,24 @@
 					</fieldErrorHandler>
 				</row>
 				<row>
-                    <multilanguageLabel value="${labels.global.item.label}" 
-                      languageCode="@load(vm.currentLanguageCode)" />
-                    <fieldErrorHandler message="@load(vmsgs['label'])">
-						<textbox width="150px" value="@bind(fx.label)" onChange="@command('applyChanges')" />
+					<multilanguageLabel
+						value="${labels.global.item.label}"
+						languageCode="@load(vm.currentLanguageCode)" />
+					<fieldErrorHandler
+						message="@load(vmsgs['label'])">
+						<textbox width="150px" value="@bind(fx.label)"
+							onChange="@command('applyChanges')" />
 					</fieldErrorHandler>
 				</row>
 				<row>
-					<multilanguageLabel value="${labels.global.item.description}" 
-                      languageCode="@load(vm.currentLanguageCode)" />
-                    <fieldErrorHandler message="@load(vmsgs['description'])">
-						<textbox width="300px" value="@bind(fx.description)"
-                          multiline="true" rows="4"
-                          onChange="@command('applyChanges')" />
+					<multilanguageLabel
+						value="${labels.global.item.description}"
+						languageCode="@load(vm.currentLanguageCode)" />
+					<fieldErrorHandler
+						message="@load(vmsgs['description'])">
+						<textbox width="300px"
+							value="@bind(fx.description)" multiline="true" rows="4"
+							onChange="@command('applyChanges')" />
 					</fieldErrorHandler>
 				</row>
 				<row>

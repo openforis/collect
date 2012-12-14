@@ -15,6 +15,8 @@ import org.openforis.idm.metamodel.CodeListLevel;
  */
 public class CodeListFormObject extends VersionableItemFormObject<CodeList> {
 
+	protected static final CodeScope DEFAULT_SCOPE = CodeScope.SCHEME;
+	
 	private String name;
 	private String lookupTable;
 	private String itemLabel;
@@ -43,7 +45,7 @@ public class CodeListFormObject extends VersionableItemFormObject<CodeList> {
 		boolean hasMultipleLevels = levels.size() > 1;
 		type = hasMultipleLevels ? Type.HIERARCHICAL.name(): Type.FLAT.name();
 		CodeScope codeScopeEnum = source.getCodeScope();
-		codeScope = codeScopeEnum != null ? codeScopeEnum.name(): CodeScope.SCHEME.name();
+		codeScope = codeScopeEnum != null ? codeScopeEnum.name(): DEFAULT_SCOPE.name();
 	}
 	
 	@Override
@@ -54,7 +56,7 @@ public class CodeListFormObject extends VersionableItemFormObject<CodeList> {
 		dest.setLabel(CodeListLabel.Type.ITEM, languageCode, itemLabel);
 		dest.setLabel(CodeListLabel.Type.LIST, languageCode, listLabel);
 		dest.setDescription(languageCode, description);
-		CodeScope scope = StringUtils.isNotBlank(codeScope) ? CodeScope.valueOf(codeScope): null;
+		CodeScope scope = StringUtils.isNotBlank(codeScope) ? CodeScope.valueOf(codeScope): DEFAULT_SCOPE;
 		dest.setCodeScope(scope);
 	}
 	

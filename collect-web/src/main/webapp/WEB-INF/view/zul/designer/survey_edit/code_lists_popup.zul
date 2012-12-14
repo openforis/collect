@@ -204,19 +204,18 @@
 		        							<caption
 		        								visible="@load(fx.type eq 'HIERARCHICAL' ? true: false)">
 		        								<textbox inplace="true"
-		        									width="100%" value="@bind(each.name)" />
+		        									width="100%" 
+		        									value="@bind(each.name)" />
 		        							</caption>
 		        							<listbox
 		        								model="@load(vm.itemsPerLevel[forEachStatus.index])"
 		        								height="120px"
 		        								selectedItem="@load(vm.lastSelectedLevelIndex ge forEachStatus.index ? 
-													vm.selectedItemsPerLevel[forEachStatus.index]: null)"
+													       vm.selectedItemsPerLevel[forEachStatus.index]: null)"
 		        								onSelect="@command('listItemSelected', item=self.selectedItem.value, levelIndex=forEachStatus.index)">
 		        								<listhead>
-		        									<listheader
-		        										width="100px" />
-		        									<listheader
-		        										width="20px" />
+		        									<listheader width="100px" />
+		        									<listheader width="20px" />
 		        								</listhead>
 		        								<template
 		        									name="model">
@@ -233,10 +232,10 @@
 		        											style="padding: 0px">
 		        											<image
 		        												src="@load(each.hasChildItems() ? 
-																(vm.isCodeListItemSelected(each) ? 
-																	'/assets/images/arrow-right-selected-small.png': 
-																	'/assets/images/arrow-right-small.png'
-																): '')" />
+																			(vm.isCodeListItemSelected(each) ? 
+																				'/assets/images/arrow-right-selected-small.png': 
+																				'/assets/images/arrow-right-small.png'
+																			): '')" />
 		        										</listcell>
 		        									</listitem>
 		        								</template>
