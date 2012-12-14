@@ -42,9 +42,10 @@
 			<row visible="@load(not vm.rootEntity and fx.multiple ne true)">
 				<label value="${labels.survey.schema.node.required}:" />
 				<fieldErrorHandler message="@load(vmsgs['required'])">
-                    <checkbox checked="@load(fx.required eq true) @save(fx.required)" 
-                        onCheck="@command('applyChanges')" />
-                </fieldErrorHandler>
+					<checkbox
+						checked="@load(fx.required eq true) @save(fx.required)"
+						onCheck="@command('applyChanges')" />
+				</fieldErrorHandler>
 			</row>
 			<row visible="@load(not vm.rootEntity and fx.multiple ne true)">
 				<label value="${labels.survey.schema.node.required_expression}:" />
@@ -52,6 +53,15 @@
                   <textbox width="150px" value="@bind(fx.requiredExpression)" 
                       onChange="@command('applyChanges')" />
                 </fieldErrorHandler>
+			</row>
+			<row visible="@load(not vm.rootEntity)">
+				<label value="${labels.survey.schema.node.relevant_expression}:" />
+				<fieldErrorHandler
+					message="@load(vmsgs['relevantExpression'])">
+					<textbox width="150px"
+						value="@bind(fx.relevantExpression)"
+						onChange="@command('applyChanges')" />
+				</fieldErrorHandler>
 			</row>
 			<row visible="@load(not vm.rootEntity and fx.multiple eq true)">
 				<label value="${labels.survey.schema.node.min_count}:" />
