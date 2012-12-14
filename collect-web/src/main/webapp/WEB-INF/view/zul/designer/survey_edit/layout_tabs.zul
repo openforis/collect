@@ -31,8 +31,8 @@
                                 <treecell image="/assets/images/tab-small.png">
                                       <textbox 
                                           value="@load(vm.getTabLabel(each.data))" 
-                                          onChange="@command('tabLabelChanged', tab=each.data, label=self.value)"
-                                          onFocus="@command('tabSelected', tab=each.data)" />
+                                          onChange="@command('updateTabLabel', tab=each.data, label=self.value)"
+                                          onFocus="@command('selectTab', tab=each.data)" />
                                     </treecell>
                             </treerow>
                         </treeitem>
