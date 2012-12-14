@@ -199,13 +199,11 @@ public class SchemaLayoutSimpleVM extends SurveyBaseVM {
 	}
 
 	@Command
-	@NotifyChange({"treeModel","moveItemUpDisabled","moveItemDownDisabled"})
 	public void moveItemUp() {
 		moveItem(true);
 	}
 	
 	@Command
-	@NotifyChange({"treeModel","moveItemUpDisabled","moveItemDownDisabled"})
 	public void moveItemDown() {
 		moveItem(false);
 	}
@@ -222,6 +220,8 @@ public class SchemaLayoutSimpleVM extends SurveyBaseVM {
 		parent.moveTab(selectedTab, newIndex);
 		treeModel.moveSelectedNode(newIndex);
 		dispatchTabSetChangedCommand();
+		notifyChange("treeModel","moveItemUpDisabled","moveItemDownDisabled");
+		treeModel.select(selectedTab);
 	}
 	
 	public boolean isMainTab(UITab tab) {

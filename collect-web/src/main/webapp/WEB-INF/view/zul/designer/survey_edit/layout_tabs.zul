@@ -19,7 +19,7 @@
                         context="treeContextMenu"
                 width="100%" vflex="true"
                 model="@load(vm.treeModel)"
-                onSelect="@command('tabSelected', tab=self.selectedItem.value.data)">
+                onSelect="@command('selectTab', tab=self.selectedItem.value.data)">
                 <template name="model">
                         <treeitem context="${vm.isMainTab(each.data) ? mainTabContextMenu: treeItemContextMenu}">
                           <attribute w:name="setOpen">
