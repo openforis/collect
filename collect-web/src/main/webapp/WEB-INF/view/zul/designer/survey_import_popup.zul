@@ -32,8 +32,8 @@
 	          		<label value="@load(empty vm.fileName ? 
           				labels.survey.import_survey.file_not_selected : vm.fileName)" />
 	          	</hbox>
-				<button id="selectFileBtn" label="${labels.global.select_file_to_upload}"
-			      	upload="true,maxsize=-1" onUpload="@command('fileUploaded')" />
+				      <button id="selectFileBtn" label="${labels.global.select_file_to_upload}"
+			      	  upload="true,maxsize=-1" onUpload="@command('fileUploaded')" />
           	</hbox>
           </cell>
         </row>
