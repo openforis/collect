@@ -179,6 +179,9 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 			dest.setMinCount(minCount);
 			dest.setMaxCount(maxCount);
 		} else {
+			if (required) {
+				dest.setMinCount(1);
+			}
 			dest.setRequiredExpression(requiredExpression);
 		}
 		saveTabInfo(dest);
