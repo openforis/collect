@@ -52,7 +52,7 @@
 				var uiTab:UITabProxy = UIBuilder.getUITab(entityDefinition);
 				var tabLabel:String = null;
 				if ( uiTab != null ) {
-					tabLabel = uiTab.getLabelText(Application.locale);
+					tabLabel = uiTab.labelText;
 				}
 				if ( StringUtil.isNotBlank(tabLabel) ) {
 					this.label = tabLabel;
@@ -231,7 +231,7 @@
 								entityDefinition="{entityDefinition}"
 								nodeDefinitions="{IList(definitionsPerTab.getItemAt(tabsRP.currentIndex))}"
 								entity="{entity}"
-								label="{UITabProxy(tabsRP.currentItem).getLabelText(Application.locale)}"
+								label="{UITabProxy(tabsRP.currentItem).labelText}"
 								/>
 						</mx:Repeater>
 					</mx:ViewStack>
