@@ -96,6 +96,12 @@ button.icon {
 	border: none;
 	background: none;
 }
+.form.compact tr.z-row td.z-row-inner, 
+  .form.compact tr.z-row td.z-cell, 
+  .form.compact tr.z-group td.z-group-inner,
+  .form.compact tr.z-groupfoot td.z-groupfoot-inner {
+  padding: 1px 1px 1px 2px;
+}
 .form div.z-grid tr.z-grid-odd td.z-row-inner, 
 	.form div.z-grid tr.z-grid-odd .z-cell, 
 	.form div.z-grid tr.z-grid-odd {
