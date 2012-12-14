@@ -15,6 +15,8 @@ import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openforis.collect.metamodel.ui.UIOptions;
+import org.openforis.collect.metamodel.ui.UIOptions.Layout;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.State;
 import org.openforis.collect.model.CollectRecord.Step;
@@ -320,30 +322,30 @@ public class RecordManager {
 		addEmptyEnumeratedEntities(entity);
 		EntityDefinition entityDefn = entity.getDefinition();
 		List<NodeDefinition> childDefinitions = entityDefn.getChildDefinitions();
-		for (NodeDefinition nodeDefn : childDefinitions) {
-			if(version == null || version.isApplicable(nodeDefn)) {
-				String name = nodeDefn.getName();
-				if(entity.getCount(name) == 0) {
+		for (NodeDefinition childDefn : childDefinitions) {
+			if(version == null || version.isApplicable(childDefn)) {
+				String childName = childDefn.getName();
+				if(entity.getCount(childName) == 0) {
 					int count = 0;
-					int toBeInserted = entity.getEffectiveMinCount(name);
-					if ( count == 0 && (nodeDefn instanceof AttributeDefinition || ! nodeDefn.isMultiple()) ) {
+					int toBeInserted = entity.getEffectiveMinCount(childName);
+					if ( count == 0 && (childDefn instanceof AttributeDefinition || ! childDefn.isMultiple()) ) {
 						//insert at least one node
 						toBeInserted = 1;
 					}
 					while(count < toBeInserted) {
-						if(nodeDefn instanceof AttributeDefinition) {
-							Node<?> createNode = nodeDefn.createNode();
+						if(childDefn instanceof AttributeDefinition) {
+							Node<?> createNode = childDefn.createNode();
 							entity.add(createNode);
-						} else if(nodeDefn instanceof EntityDefinition) {
-							addEntity(entity, name);
+						} else if(childDefn instanceof EntityDefinition) {
+							addEntity(entity, childName);
 						}
 						count ++;
 					}
 				} else {
-					List<Node<?>> all = entity.getAll(name);
-					for (Node<?> node : all) {
-						if(node instanceof Entity) {
-							addEmptyNodes((Entity) node);
+					List<Node<?>> children = entity.getAll(childName);
+					for (Node<?> child : children) {
+						if(child instanceof Entity) {
+							addEmptyNodes((Entity) child);
 						}
 					}
 				}
@@ -415,13 +417,16 @@ public class RecordManager {
 	
 	private void addEmptyEnumeratedEntities(Entity parentEntity) {
 		Record record = parentEntity.getRecord();
+		CollectSurvey survey = (CollectSurvey) parentEntity.getSurvey();
+		UIOptions uiOptions = survey.getUIOptions();
 		ModelVersion version = record.getVersion();
 		EntityDefinition parentEntityDefn = parentEntity.getDefinition();
 		List<NodeDefinition> childDefinitions = parentEntityDefn.getChildDefinitions();
 		for (NodeDefinition childDefn : childDefinitions) {
 			if ( childDefn instanceof EntityDefinition && (version == null || version.isApplicable(childDefn)) ) {
 				EntityDefinition childEntityDefn = (EntityDefinition) childDefn;
-				if(childEntityDefn.isMultiple() && childEntityDefn.isEnumerable()) {
+				boolean tableLayout = uiOptions == null || uiOptions.getLayout(childEntityDefn) == Layout.TABLE;
+				if(childEntityDefn.isMultiple() && childEntityDefn.isEnumerable() && tableLayout) {
 					addEmptyEnumeratedEntities(parentEntity, childEntityDefn);
 				}
 			}
