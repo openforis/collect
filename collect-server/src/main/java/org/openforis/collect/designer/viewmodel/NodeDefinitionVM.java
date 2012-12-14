@@ -142,10 +142,15 @@ public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyO
 	
 	@GlobalCommand
 	public void tabSetChanged(@ContextParam(ContextType.BINDER) Binder binder, @BindingParam("tabSet") UITabSet tabSet) {
-		notifyChange("assignableTabs");
+		notifyChange("assignableTabNames");
 		if ( isEditingItem() ) {
-			dispatchApplyChangesCommand(binder);
+			validateForm(binder);
 		}
+	}
+	
+	@GlobalCommand
+	public void tabChanged(@ContextParam(ContextType.BINDER) Binder binder, @BindingParam("tab") UITab tab ) {
+		notifyChange("assignableTabNames");
 	}
 	
 	@GlobalCommand

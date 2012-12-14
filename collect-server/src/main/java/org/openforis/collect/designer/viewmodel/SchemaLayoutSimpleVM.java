@@ -52,7 +52,7 @@ public class SchemaLayoutSimpleVM extends SurveyBaseVM {
 	public void schemaChanged() {
 		checkSelectedRootEntityExistence();
 		initTreeModel();
-		tabSelected(null);
+		selectTab(null);
 	}
 
 	protected void checkSelectedRootEntityExistence() {
@@ -80,15 +80,11 @@ public class SchemaLayoutSimpleVM extends SurveyBaseVM {
 	
 	@Command
 	@NotifyChange({"selectedTab"})
-	public void tabSelected(@BindingParam("tab") UITab tab) {
+	public void selectTab(@BindingParam("tab") UITab tab) {
 		selectedTab = tab;
 		if ( treeModel != null ) {
 			treeModel.select(tab);
 		}
-//		List<ModelVersion> versions = survey.getVersions();
-//		setFormVersion(versions.isEmpty() ? null: versions.get(0));
-//		UITabSet tabSet = getRootTabSet(node);
-//		dispatchTabSetChangedCommand();
 	}
 
 	@Command
@@ -146,7 +142,7 @@ public class SchemaLayoutSimpleVM extends SurveyBaseVM {
 	}
 
 	@Command
-	public void tabLabelChanged(@BindingParam("tab") UITab tab, @BindingParam("label") String label) {
+	public void updateTabLabel(@BindingParam("tab") UITab tab, @BindingParam("label") String label) {
 		if ( validateTabLabel(label) ) {
 			performUpdateTabLabel(tab, label);
 		}
@@ -155,7 +151,6 @@ public class SchemaLayoutSimpleVM extends SurveyBaseVM {
 	protected void performUpdateTabLabel(UITab tab, String label) {
 		setTabLabel(tab, label);
 		dispatchTabChangedCommand(tab);
-		BindUtils.postNotifyChange(null, null, tab, "*");
 	}
 
 	protected void setTabLabel(UITab tab, String label) {
@@ -200,16 +195,15 @@ public class SchemaLayoutSimpleVM extends SurveyBaseVM {
 		Map<String, Object> args = new HashMap<String, Object>();
 		args.put("tab", tab);
 		BindUtils.postGlobalCommand(null, null, TAB_CHANGED_GLOBAL_COMMAND, args);
+		BindUtils.postNotifyChange(null, null, tab, "*");
 	}
 
 	@Command
-	@NotifyChange({"treeModel","moveItemUpDisabled","moveItemDownDisabled"})
 	public void moveItemUp() {
 		moveItem(true);
 	}
 	
 	@Command
-	@NotifyChange({"treeModel","moveItemUpDisabled","moveItemDownDisabled"})
 	public void moveItemDown() {
 		moveItem(false);
 	}
@@ -226,6 +220,8 @@ public class SchemaLayoutSimpleVM extends SurveyBaseVM {
 		parent.moveTab(selectedTab, newIndex);
 		treeModel.moveSelectedNode(newIndex);
 		dispatchTabSetChangedCommand();
+		notifyChange("treeModel","moveItemUpDisabled","moveItemDownDisabled");
+		treeModel.select(selectedTab);
 	}
 	
 	public boolean isMainTab(UITab tab) {

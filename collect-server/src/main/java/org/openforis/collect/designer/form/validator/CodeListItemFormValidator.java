@@ -60,17 +60,14 @@ public class CodeListItemFormValidator extends SurveyObjectFormValidator<CodeLis
 		CodeScope codeScope = codeList.getCodeScope();
 		CodeListItem parentItem = getParentItem(ctx);
 		CodeListItem existingItem = null;
-		switch ( codeScope ) {
-		case LOCAL:
+		if ( codeScope == CodeScope.LOCAL ) {
 			if ( parentItem == null ) {
 				existingItem = codeList.findItem(code);
 			} else {
 				existingItem = parentItem.findChildItem(code);
 			}
-			break;
-		case SCHEME:
+		} else {
 			existingItem = getCodeListItemInDescendants(codeList, code);
-			break;
 		}
 		return existingItem;
 	}

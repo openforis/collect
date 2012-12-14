@@ -125,25 +125,21 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 	@Command
 	public void typeChanged(@BindingParam("type") String type) {
 		Type typeEnum = CodeListFormObject.Type.valueOf(type);
-		List<CodeListLevel> levels = editedItem.getHierarchy();
+		CodeScope scope;
 		switch (typeEnum) {
 		case HIERARCHICAL:
-			if ( levels.size() == 0 ) {
-				addLevel();
-			}
+			scope = CodeScope.LOCAL;
+			addLevel();
 			break;
-		case FLAT:
-			if ( levels.size() == 1 ) {
-				editedItem.removeLevel(0);
-				CodeScope scope = CodeScope.SCHEME;
-				editedItem.setCodeScope(scope);
-				CodeListFormObject fo = (CodeListFormObject) formObject;
-				fo.setCodeScope(scope.name());
-				fo.setType(type);
-				notifyChange("formObject");
-			}
-			break;
+		default:
+			editedItem.removeLevel(0);
+			scope = CodeScope.SCHEME;
 		}
+		editedItem.setCodeScope(scope);
+		CodeListFormObject fo = (CodeListFormObject) formObject;
+		fo.setCodeScope(scope.name());
+		fo.setType(type);
+		notifyChange("formObject","listLevels");
 	}
 	
 	@Command
@@ -179,7 +175,8 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 	protected void performRemoveLevel(int levelIndex) {
 		editedItem.removeLevel(levelIndex);
 		deselectItemsAfterLevel(levelIndex);
-		notifyChange("listLevels","selectedItemsPerLevel");
+		initItemsPerLevel();
+		notifyChange("listLevels","selectedItemsPerLevel","itemsPerLevel");
 	}
 	
 	@Command
