@@ -1,0 +1,15 @@
+<zk>
+  <grid class="inner">
+    <columns>
+      <column width="150px" />
+      <column />
+    </columns>
+    <rows>
+      <row>
+        <label value="${labels.survey.schema.entity.count_in_record_summary}:" />
+        <checkbox checked="@load(fx.countInRecordSummary eq true) @save(fx.countInRecordSummary)"
+          onCheck="@command('applyChanges')" />
+      </row>
+    </rows>
+  </grid>
+</zk>

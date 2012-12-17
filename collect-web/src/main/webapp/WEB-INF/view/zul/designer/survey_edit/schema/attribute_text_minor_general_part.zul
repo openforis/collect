@@ -1,0 +1,19 @@
+<?component name="fieldErrorHandler" class="org.openforis.collect.designer.component.FieldErrorHandler"?>
+<zk>
+  <grid class="inner">
+    <columns>
+      <column width="150px" />
+      <column />
+    </columns>
+    <rows>
+      <row>
+        <label
+          value="${labels.survey.schema.attribute.text.autocomplete_group}:" />
+        <fieldErrorHandler message="@load(vmsgs['autocompleteGroup'])">
+          <textbox width="150px" value="@bind(fx.autocompleteGroup)"
+            onChange="@command('applyChanges')" />
+        </fieldErrorHandler>
+      </row>
+    </rows>
+  </grid>
+</zk>
