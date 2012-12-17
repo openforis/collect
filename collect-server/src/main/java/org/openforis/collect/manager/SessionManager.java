@@ -30,15 +30,12 @@ public class SessionManager {
 	private static Log LOG = LogFactory.getLog(SessionManager.class);
 
 	@Autowired
-	private UserManager userManager;
-	
+	private transient UserManager userManager;
 	@Autowired
-	protected RecordManager recordManager;
-
+	private transient RecordManager recordManager;
 	@Autowired
-	private RecordFileManager fileManager;
+	private transient RecordFileManager fileManager;
 
-	
 	public SessionState getSessionState() {
 		SessionState sessionState = (SessionState) getSessionAttribute(SessionState.SESSION_ATTRIBUTE_NAME);
 		if (sessionState == null) {

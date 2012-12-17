@@ -42,6 +42,10 @@ public class RecordIndexManagerIntegrationTest extends CollectIntegrationTest {
 	@Before
 	public void before() throws Exception {
 		indexManager.destroyIndex();
+		indexManager.init();
+		if ( ! indexManager.isInited() ) {
+			throw new Exception("Index manager not inited");
+		}
 	}
 	
 	@Test

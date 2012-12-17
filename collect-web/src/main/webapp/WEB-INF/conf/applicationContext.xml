@@ -75,6 +75,7 @@
 	<bean id="dataImportService" class="org.openforis.collect.remoting.service.DataImportService" autowire="byName" init-method="init" scope="session" />
 	<bean id="logoService" 	class="org.openforis.collect.remoting.service.LogoService" autowire="byName" />
 	<bean id="modelService"		class="org.openforis.collect.remoting.service.ModelService" autowire="byName" />
+	<bean id="recordIndexService"     class="org.openforis.collect.remoting.service.recordIndex.RecordIndexService" autowire="byName" scope="session" />
 	<bean id="sessionService" 	class="org.openforis.collect.remoting.service.SessionService" autowire="byName" />
 	<bean id="speciesService" 	class="org.openforis.collect.remoting.service.SpeciesService" autowire="byName" />
 	<bean id="userService" 		class="org.openforis.collect.remoting.service.UserService" autowire="byName" />
@@ -98,8 +99,8 @@
 	<bean id="recordManager"		class="org.openforis.collect.manager.RecordManager" init-method="init">
 		<property name="lockTimeoutMillis" value="60000" />
 	</bean>
-	<bean id="recordIndexManager" 	class="org.openforis.collect.manager.RecordIndexManager" init-method="init" lazy-init="false" autowire="byName" />
-	<bean id="sessionRecordIndexManager" 	class="org.openforis.collect.manager.RecordTemporaryIndexManager" init-method="init" scope="session" lazy-init="false" autowire="byName" />
+	<bean id="persistedRecordIndexManager" 	class="org.openforis.collect.manager.RecordIndexManager" init-method="init" lazy-init="false" autowire="byName" />
+	<bean id="volatileRecordIndexManager" 	class="org.openforis.collect.remoting.service.recordIndex.VolatileRecordIndexManager" init-method="init" scope="session" lazy-init="false" autowire="byName" />
 	<bean id="sessionManager"		class="org.openforis.collect.manager.SessionManager" scope="session" />
 	<bean id="speciesManager"		class="org.openforis.collect.manager.SpeciesManager" />
 	<bean id="surveyManager"		class="org.openforis.collect.manager.SurveyManager" init-method="init" />
