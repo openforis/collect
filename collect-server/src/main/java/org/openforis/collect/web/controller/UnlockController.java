@@ -7,6 +7,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.model.CollectRecord;
+import org.openforis.collect.remoting.service.DataService;
 import org.openforis.collect.web.session.SessionState;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -27,10 +28,6 @@ public class UnlockController {
 	
 	@Autowired
 	private RecordManager recordManager;
-	
-	public UnlockController() {
-		
-	}
 	
 	@RequestMapping(value = "/clearActiveRecord.htm", method = RequestMethod.POST)
 	public @ResponseBody String clearActiveRecord(HttpServletRequest request) {

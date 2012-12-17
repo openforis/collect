@@ -124,9 +124,11 @@ public class RecordProxy implements Proxy {
 	public boolean isEntryComplete() {
 		if(record.getStep() != null) {
 			switch(record.getStep()) {
-				case CLEANSING:
-				case ANALYSIS:
-					return true;
+			case ENTRY:
+				return false;
+			case CLEANSING:
+			case ANALYSIS:
+				return true;
 			}
 		}
 		return false;
