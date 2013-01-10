@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Stack;
 
 import org.openforis.collect.designer.form.CodeListFormObject;
 import org.openforis.collect.designer.form.CodeListFormObject.Type;
@@ -16,10 +17,15 @@ import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.MessageUtil.ConfirmHandler;
 import org.openforis.collect.designer.util.Resources;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeList.CodeScope;
 import org.openforis.idm.metamodel.CodeListItem;
 import org.openforis.idm.metamodel.CodeListLevel;
+import org.openforis.idm.metamodel.EntityDefinition;
+import org.openforis.idm.metamodel.NodeDefinition;
+import org.openforis.idm.metamodel.NodeDefinitionVisitor;
+import org.openforis.idm.metamodel.Schema;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.Binder;
 import org.zkoss.bind.annotation.BindingParam;
@@ -120,6 +126,39 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 	@Override
 	protected void moveSelectedItem(int indexTo) {
 		survey.moveCodeList(selectedItem, indexTo);
+	}
+	
+	@Override
+	@Command
+	public void deleteItem(@BindingParam("item") final CodeList item) {
+		boolean inUse = isInUse(item);
+		if ( inUse ) {
+			MessageUtil.showWarning("survey.code_list.alert.cannot_delete_used_list");
+		} else {
+			super.deleteItem(item);
+		}
+	}
+
+	protected boolean isInUse(CodeList item) {
+		Schema schema = survey.getSchema();
+		List<EntityDefinition> rootEntities = schema.getRootEntityDefinitions();
+		Stack<EntityDefinition> stack = new Stack<EntityDefinition>();
+		stack.addAll(rootEntities);
+		while ( ! stack.isEmpty() ) {
+			EntityDefinition entity = stack.pop();
+			List<NodeDefinition> children = entity.getChildDefinitions();
+			for (NodeDefinition defn : children) {
+				if ( defn instanceof CodeAttributeDefinition ) {
+					CodeList list = ((CodeAttributeDefinition) defn).getList();
+					if ( list.getId() == item.getId() ) {
+						return true;
+					}
+				} else if ( defn instanceof EntityDefinition ) {
+					stack.push((EntityDefinition) defn);
+				}
+			};
+		}
+		return false;
 	}
 	
 	@Command
