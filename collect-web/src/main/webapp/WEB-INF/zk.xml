@@ -4,6 +4,17 @@
 	<device-config>
 		<device-type>ajax</device-type>
 		<timeout-uri>/designer.htm</timeout-uri><!-- An empty URL can cause the browser to reload the same URL -->
+		
+		<!-- Always show the mask for progress box -->
+    <embed><![CDATA[
+     <script type="text/javascript">
+         var _progressbox = zUtl.progressbox;
+         
+         zUtl.progressbox = function (id, msg, mask, icon, opts) {
+             _progressbox(id, msg, true, icon, opts);
+         };
+     </script>
+     ]]></embed>
 	</device-config>
 	
 	<system-config>
@@ -16,7 +27,13 @@
 	<session-config>
 		<timer-keep-alive>true</timer-keep-alive>
 	</session-config>
-	
+
+	<!-- Center the progress box -->
+  <library-property>
+     <name>org.zkoss.zul.progressbox.position</name>
+     <value>center</value>
+  </library-property>
+  
 	<!-- Start of JavaScript debug part -->
 <!-- 	<client-config> -->
 <!-- 	    <debug-js>true</debug-js> -->
