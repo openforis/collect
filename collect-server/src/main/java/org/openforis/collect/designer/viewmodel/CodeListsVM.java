@@ -336,6 +336,12 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 			}
 		}
 	}
+	
+	@Override
+	protected void commitChanges() {
+		super.commitChanges();
+		dispatchCodeListsUpdatedCommand();
+	}
 
 	private void addChildItemToCodeList() {
 		if ( editedChildItemParentItem == null ) {
