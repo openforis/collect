@@ -10,7 +10,7 @@
       <row>
         <label value="${labels.survey.schema.attribute.bool.type_label}:" />
         <radiogroup selectedItem="@bind(fx.typeValue)"
-            onCheck="@command('applyChanges')">
+            onCheck="@command('changeType')">
           <radio id="threeStateRadioButton"
             label="${labels.survey.schema.attribute.bool.type.threeState}"
             value="THREE_STATE" />

@@ -279,4 +279,8 @@ public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyO
 	public boolean isRootEntity() {
 		return editedItem != null && parentEntity == null;
 	}
+	
+	public boolean isRequiredApplied() {
+		return true;
+	}
 }

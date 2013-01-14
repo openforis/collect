@@ -40,7 +40,7 @@
                       onCheck="@command('applyChanges')" />
                 </fieldErrorHandler>
 			</row>
-			<row visible="@load(not vm.rootEntity and fx.multiple ne true)">
+			<row visible="@load(not vm.rootEntity and fx.multiple ne true and vm.requiredApplied)">
 				<label value="${labels.survey.schema.node.required}:" />
 				<fieldErrorHandler message="@load(vmsgs['required'])">
 					<checkbox
