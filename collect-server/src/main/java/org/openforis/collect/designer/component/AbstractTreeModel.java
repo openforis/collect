@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.Stack;
@@ -55,7 +56,9 @@ public abstract class AbstractTreeModel<T> extends DefaultTreeModel<T> {
 		if ( selectionPath != null ) {
 			AbstractTreeNode<T> treeNode = (AbstractTreeNode<T>) getChild(selectionPath);
 			AbstractTreeNode<T> parentTreeNode = (AbstractTreeNode<T>) treeNode.getParent();
+			Set<TreeNode<T>> openObjects = getOpenObjects();
 			parentTreeNode.remove(treeNode);
+			setOpenObjects(openObjects);
 		}
 	}
 	
