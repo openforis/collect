@@ -14,7 +14,9 @@ import org.openforis.idm.metamodel.EntityDefinition;
  */
 public class EntityDefinitionFormObject<T extends EntityDefinition> extends NodeDefinitionFormObject<T> {
 
+	private boolean showRowNumbers;
 	private boolean countInRecordSummary;
+	
 	//layout
 	private String layoutType;
 
@@ -29,6 +31,7 @@ public class EntityDefinitionFormObject<T extends EntityDefinition> extends Node
 		Layout layout = Layout.valueOf(layoutType);
 		uiOptions.setLayout(dest, layout);
 		dest.setAnnotation(Annotation.COUNT_IN_SUMMARY_LIST.getQName(), Boolean.valueOf(countInRecordSummary).toString());
+		dest.setAnnotation(Annotation.SHOW_ROW_NUMBERS.getQName(), Boolean.valueOf(showRowNumbers).toString());
 	}
 	
 	@Override
@@ -38,6 +41,7 @@ public class EntityDefinitionFormObject<T extends EntityDefinition> extends Node
 		Layout layout = uiOptions.getLayout(source);
 		layoutType = layout.name();
 		countInRecordSummary = Boolean.valueOf(source.getAnnotation(Annotation.COUNT_IN_SUMMARY_LIST.getQName()));
+		showRowNumbers = Boolean.valueOf(source.getAnnotation(Annotation.SHOW_ROW_NUMBERS.getQName()));
 	}
 
 	@Override
@@ -54,6 +58,14 @@ public class EntityDefinitionFormObject<T extends EntityDefinition> extends Node
 		this.layoutType = layoutType;
 	}
 
+	public boolean isShowRowNumbers() {
+		return showRowNumbers;
+	}
+
+	public void setShowRowNumbers(boolean showRowNumbers) {
+		this.showRowNumbers = showRowNumbers;
+	}
+	
 	public boolean isCountInRecordSummary() {
 		return countInRecordSummary;
 	}
