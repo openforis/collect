@@ -381,11 +381,8 @@ public class SchemaVM extends SurveyBaseVM {
 		List<NodeDefinition> siblings = getSiblingsInTree(selectedTreeNode);
 		NodeDefinition selectedNodeDefn = selectedTreeNode.getNodeDefinition();
 		int oldIndex = siblings.indexOf(selectedNodeDefn);
-		int newIndex = up ? oldIndex - 1: oldIndex + 1;
-		moveNode(newIndex);
-		treeModel.moveSelectedNode(newIndex);
-		notifyChange("treeModel");
-		dispatchSchemaChangedCommand();
+		int newIndexInTree = up ? oldIndex - 1: oldIndex + 1;
+		moveNode(newIndexInTree);
 	}
 	
 	protected void moveNode(int newIndexInTree) {
@@ -406,6 +403,9 @@ public class SchemaVM extends SurveyBaseVM {
 			Schema schema = rootEntity.getSchema();
 			schema.moveRootEntityDefinition(rootEntity, toIndex);
 		}
+		treeModel.moveSelectedNode(newIndexInTree);
+		notifyChange("treeModel");
+		dispatchSchemaChangedCommand();
 	}
 	
 	protected void performRemoveDetachedNode() {
