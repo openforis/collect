@@ -186,6 +186,7 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 			}
 			dest.setRequiredExpression(requiredExpression);
 		}
+		dest.setRelevantExpression(relevantExpression);
 		saveTabInfo(dest);
 	}
 
