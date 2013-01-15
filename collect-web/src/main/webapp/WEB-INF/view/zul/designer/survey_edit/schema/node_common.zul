@@ -55,15 +55,6 @@
                       onChange="@command('applyChanges')" />
                 </fieldErrorHandler>
 			</row>
-			<row visible="@load(not vm.rootEntity)">
-				<label value="${labels.survey.schema.node.relevant_expression}:" />
-				<fieldErrorHandler
-					message="@load(vmsgs['relevantExpression'])">
-					<textbox width="150px"
-						value="@bind(fx.relevantExpression)"
-						onChange="@command('applyChanges')" />
-				</fieldErrorHandler>
-			</row>
 			<row visible="@load(not vm.rootEntity and fx.multiple eq true)">
 				<label value="${labels.survey.schema.node.min_count}:" />
 				<fieldErrorHandler message="@load(vmsgs['minCount'])">
@@ -76,6 +67,15 @@
                     <intbox value="@bind(fx.maxCount)" onChange="@command('applyChanges')" />
                 </fieldErrorHandler>
 			</row>
+            <row visible="@load(not vm.rootEntity)">
+              <label value="${labels.survey.schema.node.relevant_expression}:" />
+              <fieldErrorHandler
+                message="@load(vmsgs['relevantExpression'])">
+                <textbox width="150px"
+                  value="@bind(fx.relevantExpression)"
+                  onChange="@command('applyChanges')" />
+              </fieldErrorHandler>
+            </row>
       </rows>
      </grid>
 
