@@ -23,7 +23,7 @@
                   context="@load(each.data.detached eq true ? detachedNodePopup: 
                   	vm.isEntity(each.data.nodeDefinition) ? entityPopup: attributePopup)">
                   <treerow>
-                    <treecell label="@load(each.data.detached ? vm.newTreeNodeLabel : each.data.nodeDefinition.name)"
+                    <treecell label="@load(each.data.name)"
                         image="${vm.getIcon(each.data.nodeDefinition)}" />
                   </treerow>
                 </treeitem>

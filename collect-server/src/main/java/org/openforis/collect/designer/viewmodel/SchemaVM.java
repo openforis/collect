@@ -7,6 +7,7 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.designer.component.SchemaTreeModel;
@@ -44,6 +45,9 @@ import org.zkoss.zk.ui.select.Selectors;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zul.Include;
+import org.zkoss.zul.Tree;
+import org.zkoss.zul.TreeNode;
+import org.zkoss.zul.Treeitem;
 
 /**
  * 
@@ -59,6 +63,7 @@ public class SchemaVM extends SurveyBaseVM {
 
 	private static final String SCHEMA_CHANGED_GLOBAL_COMMAND = "schemaChanged";
 	private static final String VALIDATE_COMMAND = "validate";
+	private static final String APPLY_CHANGES_COMMAND = "applyChanges";
 	
 	private static final String CONFIRM_REMOVE_NODE_MESSAGE_KEY = "survey.schema.confirm_remove_node";
 	private static final String CONFIRM_REMOVE_NON_EMPTY_ENTITY_MESSAGE_KEY = "survey.schema.confirm_remove_non_empty_entity";
@@ -73,6 +78,8 @@ public class SchemaVM extends SurveyBaseVM {
 	
 	@Wire
 	private Include nodeFormInclude;
+	@Wire
+	private Tree nodesTree;
 	
 	private SchemaTreeModel treeModel;
 
@@ -160,6 +167,7 @@ public class SchemaVM extends SurveyBaseVM {
 				editNode(binder, true, null, newNode);
 				updateTreeModel();
 				selectTreeNode(newNode);
+				treeModel.markSelectedNodeAsDetached();
 				notifyChange("selectedRootEntity","selectedVersion");
 			}
 		});
@@ -236,6 +244,22 @@ public class SchemaVM extends SurveyBaseVM {
 			}
 			resetEditingStatus(false);
 		}
+	}
+	
+	@GlobalCommand
+	public void editedNodeNameChanging(@ContextParam(ContextType.BINDER) Binder binder, @BindingParam("name") String name) {
+		applyChangesToForm(binder);
+		treeModel.setSelectedNodeName(name);
+		//OFC-1140
+		refreshSelectedTreeNodeLabel();
+	}
+
+	protected void refreshSelectedTreeNodeLabel() {
+		Treeitem selectedItem = nodesTree.getSelectedItem();
+		Set<TreeNode<SchemaTreeNodeData>> selection = treeModel.getSelection();
+		TreeNode<SchemaTreeNodeData> selectedNode = selection.iterator().next();
+		String nodeName = selectedNode.getData().getName();
+		selectedItem.setLabel(nodeName);
 	}
 
 	protected void resetEditingStatus() {
@@ -323,13 +347,23 @@ public class SchemaVM extends SurveyBaseVM {
 	}
 		
 	protected void validateForm(@ContextParam(ContextType.BINDER) Binder binder) {
+		Binder formComponentBinder = getNodeFormBinder(binder);
+		formComponentBinder.postCommand(VALIDATE_COMMAND, null);
+	}
+
+	protected Binder getNodeFormBinder(Binder binder) {
 		Component view = binder.getView();
 		IdSpace currentIdSpace = view.getSpaceOwner();
 		Component formComponent = Path.getComponent(currentIdSpace, "nodeFormInclude/nodeFormContainer");
 		Binder formComponentBinder = (Binder) formComponent.getAttribute("binder");
-		formComponentBinder.postCommand(VALIDATE_COMMAND, null);
+		return formComponentBinder;
 	}
 
+	protected void applyChangesToForm(@ContextParam(ContextType.BINDER) Binder binder) {
+		Binder formComponentBinder = getNodeFormBinder(binder);
+		formComponentBinder.postCommand(APPLY_CHANGES_COMMAND, null);
+	}
+	
 	@Command
 	public void removeNode() {
 		removeNode(selectedTreeNode);
@@ -554,44 +588,8 @@ public class SchemaVM extends SurveyBaseVM {
 	
 	@DependsOn({"newNode","editedNode"})
 	public String getNodeTypeHeaderLabel() {
-		String result = null;
-		String nodeTypeStr = getNodeType();
-		String messageKey;
-		if ( nodeTypeStr != null ) {
-			String nodeTypeLabel = null;
-			NodeType nodeType = NodeType.valueOf(nodeTypeStr);
-			switch (nodeType) {
-			case ENTITY:
-				if ( editedNodeParentEntity == null ) {
-					messageKey = "survey.schema.node_detail_title.root_entity";
-				} else {
-					messageKey = "survey.schema.node_detail_title.entity";
-				}
-				nodeTypeLabel = Labels.getLabel(messageKey);
-				break;
-			case ATTRIBUTE:
-				messageKey = "survey.schema.node_detail_title.attribute";
-				Object[] args = new String[]{getAttributeTypeLabel()};
-				nodeTypeLabel = Labels.getLabel(messageKey, args);
-				break;
-			}
-			if ( newNode ) {
-				Object[] args = new String[]{nodeTypeLabel.toLowerCase()};
-				result = Labels.getLabel("survey.schema.node_detail_title.new_node", args);
-			} else {
-				result = nodeTypeLabel;
-			}
-		}
-		return result;
-	}
-	
-	@DependsOn({"newNode"})
-	public String getNewTreeNodeLabel() {
-		if ( newNode ) {
-			String nodeTypeLabel = getNodeTypeHeaderLabel();
-			Object[] args = new String[]{nodeTypeLabel};
-			String result = Labels.getLabel("survey.schema.tree.new_node_label", args);
-			return result;
+		if ( editedNode != null ) {
+			return NodeType.getHeaderLabel(editedNode, editedNodeParentEntity == null, newNode);
 		} else {
 			return null;
 		}
