@@ -1,6 +1,8 @@
 package org.openforis.collect.designer.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,7 +37,16 @@ public abstract class SurveyManagerUtil {
 				summaryWork.setPublishedSurveyId(summary.getId());
 			}
 		}
+		sortByName(result);
 		return result;
+	}
+
+	private static void sortByName(List<SurveyWorkSummary> result) {
+		Collections.sort(result, new Comparator<SurveyWorkSummary>() {
+	        @Override public int compare(SurveyWorkSummary s1, SurveyWorkSummary s2) {
+	            return s1.getName().compareTo(s2.getName());
+	        }
+		});
 	}
 
 }
