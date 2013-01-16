@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.manager.SurveyManager;
@@ -83,8 +84,12 @@ public class SurveyImportVM extends SurveyBaseVM {
 			InputStream is = getInputStream(media);
 			uploadedSurvey = unmarshalSurvey(is);
 			notifyChange("fileName","uploadedSurvey");
+			if ( StringUtils.isEmpty(surveyName) ) {
+				surveyName = FilenameUtils.removeExtension(fileName);
+				notifyChange("surveyName");
+			}
 		} else {
-			throw new IllegalArgumentException("File type not supported");
+			MessageUtil.showError("survey.import_survey.error_file_type_not_supported");
 		}
 	}
 

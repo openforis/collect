@@ -20,10 +20,6 @@
       </columns>
       <rows>
         <row>
-          <label value="${labels.survey.import_survey.survey_name}:" />
-          <textbox width="300px" value="@bind(vm.surveyName)" />
-        </row>
-        <row>
           <label value="${labels.survey.import_survey.file_name}:" />
           <cell>
           	<hbox hflex="1">
@@ -35,6 +31,10 @@
 			      	upload="true,maxsize=-1" onUpload="@command('fileUploaded')" />
           	</hbox>
           </cell>
+        </row>
+        <row>
+          <label value="${labels.survey.import_survey.survey_name}:" />
+          <textbox width="300px" value="@bind(vm.surveyName)" />
         </row>
         <row>
           <label value="${labels.survey.import_survey.uri}:" />
