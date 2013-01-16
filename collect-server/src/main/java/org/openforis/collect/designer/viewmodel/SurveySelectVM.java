@@ -22,9 +22,9 @@ import org.zkoss.bind.annotation.GlobalCommand;
 import org.zkoss.bind.annotation.Init;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
+import org.zkoss.zkplus.databind.BindingListModelList;
 import org.zkoss.zul.Filedownload;
 import org.zkoss.zul.ListModel;
-import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Window;
 
 /**
@@ -115,7 +115,7 @@ public class SurveySelectVM extends BaseVM {
 	
 	public ListModel<SurveyWorkSummary> getSurveySummaries() {
 		List<SurveyWorkSummary> summaries = SurveyManagerUtil.getSurveySummaries(surveyManager);
-		return new ListModelList<SurveyWorkSummary>(summaries);
+		return new BindingListModelList<SurveyWorkSummary>(summaries, false);
 	}
 
 	public SurveyWorkSummary getSelectedSurvey() {
