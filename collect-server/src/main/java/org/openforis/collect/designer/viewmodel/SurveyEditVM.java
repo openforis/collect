@@ -34,6 +34,7 @@ import org.zkoss.bind.annotation.ContextType;
 import org.zkoss.bind.annotation.GlobalCommand;
 import org.zkoss.bind.annotation.Init;
 import org.zkoss.bind.annotation.NotifyChange;
+import org.zkoss.bind.annotation.QueryParam;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Execution;
@@ -69,9 +70,8 @@ public class SurveyEditVM extends SurveyBaseVM {
 	
 	private boolean changed;
 
-	@Override
 	@Init(superclass=false)
-	public void init() {
+	public void init(@QueryParam("temp_id") Integer tempId) {
 		super.init();
 		if ( survey == null ) {
 			backToSurveysList();
@@ -194,6 +194,19 @@ public class SurveyEditVM extends SurveyBaseVM {
 	
 	@Command
 	public void backToSurveysList() {
+		if ( changed ) {
+			MessageUtil.showConfirm(new MessageUtil.ConfirmHandler() {
+				@Override
+				public void onOk() {
+					performBackToSurveysList();
+				}
+			}, "survey.edit.leave_page");
+		} else {
+			performBackToSurveysList();
+		}
+	}
+	
+	protected void performBackToSurveysList() {
 		PageUtil.clearConfirmClose();
 		resetSessionStatus();
 		showMainPage();
