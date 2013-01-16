@@ -43,7 +43,8 @@ public abstract class SurveyManagerUtil {
 
 	private static void sortByName(List<SurveyWorkSummary> result) {
 		Collections.sort(result, new Comparator<SurveyWorkSummary>() {
-	        @Override public int compare(SurveyWorkSummary s1, SurveyWorkSummary s2) {
+	        @Override 
+	        public int compare(SurveyWorkSummary s1, SurveyWorkSummary s2) {
 	            return s1.getName().compareTo(s2.getName());
 	        }
 		});
