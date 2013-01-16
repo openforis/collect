@@ -38,14 +38,6 @@
 								image="/assets/images/delete.png"
 								disabled="@load(empty vm.selectedItem)"
 								onClick="@command('deleteItem', item=vm.selectedItem)" />
-							<toolbarbutton
-								image="/assets/images/arrow-up.png"
-								disabled="@load(vm.moveSelectedItemUpDisabled)"
-								onClick="@command('moveSelectedItemUp')" />
-							<toolbarbutton
-								image="/assets/images/arrow-down.png"
-								disabled="@load(vm.moveSelectedItemDownDisabled)"
-								onClick="@command('moveSelectedItemDown')" />
 						</toolbar>
 					</south>
 				</borderlayout>
