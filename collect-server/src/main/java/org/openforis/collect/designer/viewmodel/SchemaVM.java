@@ -537,6 +537,15 @@ public class SchemaVM extends SurveyBaseVM {
 		return nodeDefn instanceof EntityDefinition;
 	}
 	
+	public boolean isTableEntity(NodeDefinition nodeDefn) {
+		UIOptions uiOptions = survey.getUIOptions();
+		if ( nodeDefn instanceof EntityDefinition ) {
+			Layout layout = uiOptions.getLayout((EntityDefinition) nodeDefn);
+			return layout == Layout.TABLE;
+		}
+		return  false;
+	}
+	
 	protected List<NodeDefinition> getSiblingsInTree(SchemaTreeNodeData data) {
 		NodeDefinition nodeDefn = data.getNodeDefinition();
 		List<NodeDefinition> result = new ArrayList<NodeDefinition>();
