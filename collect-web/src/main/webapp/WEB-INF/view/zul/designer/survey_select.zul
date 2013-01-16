@@ -94,5 +94,8 @@
       onClick="@command('exportSelectedSurvey')" />
     <menuitem label="${labels.survey.import_survey.$}"
       onClick="@command('openSurveyImportPopUp')" />
+    <menuitem label="${labels.survey.publish.$}"
+      disabled="@load(vm.publishDisabled)"
+      onClick="@command('publishSelectedSurvey')" />
   </menupopup>
 </vbox>

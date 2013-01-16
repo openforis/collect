@@ -86,10 +86,6 @@
 					</box>
 				</center>
 				<east border="none" size="40%">
-           <box width="100%" align="right">
-           	  <button label="${labels.survey.publish.$}"
-           		 onClick="@command('publish')" />
-           </box>
 				</east>
 			</borderlayout>
 		</south>

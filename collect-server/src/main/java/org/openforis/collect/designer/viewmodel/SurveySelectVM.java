@@ -10,11 +10,13 @@ import java.util.List;
 import org.openforis.collect.designer.model.SurveyManagerUtil;
 import org.openforis.collect.designer.model.SurveyWorkSummary;
 import org.openforis.collect.designer.session.SessionStatus;
+import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.PageUtil;
 import org.openforis.collect.designer.util.Resources;
 import org.openforis.collect.designer.util.Resources.Page;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.persistence.SurveyImportException;
 import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.DependsOn;
@@ -84,6 +86,28 @@ public class SurveySelectVM extends BaseVM {
 	}
 	
 	@Command
+	public void publishSelectedSurvey() throws IOException {
+		MessageUtil.showConfirm(new MessageUtil.ConfirmHandler() {
+			@Override
+			public void onOk() {
+				performSurveyPublishing();
+			}
+		}, "survey.publish.confirm");
+	}
+	
+	protected void performSurveyPublishing() {
+		try {
+			CollectSurvey survey = loadSelectedSurvey();
+			surveyManager.publish(survey);
+			notifyChange("surveySummaries");
+			Object[] args = new String[]{survey.getName()};
+			MessageUtil.showInfo("survey.successfully_published", args);
+		} catch (SurveyImportException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
+	@Command
 	public void goToIndex() {
 		Executions.sendRedirect(Page.INDEX.getLocation());
 	}
@@ -140,5 +164,11 @@ public class SurveySelectVM extends BaseVM {
 	public boolean isExportDisabled() {
 		return this.selectedSurvey == null;
 	}
-	
+
+	@DependsOn("selectedSurvey")
+	public boolean isPublishDisabled() {
+		//TODO check validity of survey
+		return this.selectedSurvey == null || ! this.selectedSurvey.isWorking();
+	}
+
 }

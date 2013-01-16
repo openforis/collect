@@ -347,27 +347,6 @@ public class SurveyEditVM extends SurveyBaseVM {
 		changed = true;
 	}
 
-	@Command
-	public void publish() {
-		if ( checkCanSave(true) ) {
-			MessageUtil.showConfirm(new MessageUtil.ConfirmHandler() {
-				@Override
-				public void onOk() {
-					performSurveyPublishing();
-				}
-			}, "survey.publish.confirm");
-		}
-	}
-
-	protected void performSurveyPublishing() {
-		try {
-			surveyManager.publish(survey);
-			backToSurveysList();
-		} catch (SurveyImportException e) {
-			throw new RuntimeException(e);
-		}
-	}
-	
 	@GlobalCommand
 	@NotifyChange({"availableLanguages"})
 	public void surveyLanguagesChanged() {
