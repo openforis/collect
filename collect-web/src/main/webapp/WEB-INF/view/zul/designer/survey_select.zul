@@ -34,8 +34,9 @@
 <!--     <box hflex="30" align="right"></box> -->
 <!--   </hlayout> -->
 
-  <listbox id="listbox" rows="10"
-    width="590px" 
+  <listbox id="listbox" 
+    rows="8"
+    width="600px" 
     model="@load(vm.surveySummaries)"
     selectedItem="@bind(vm.selectedSurvey)">
     <listhead>
