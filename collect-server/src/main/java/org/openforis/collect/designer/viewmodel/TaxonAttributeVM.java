@@ -14,8 +14,11 @@ import org.openforis.collect.designer.form.TaxonAttributeDefinitionFormObject;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.TaxonAttributeDefinition;
+import org.zkoss.bind.Binder;
 import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
+import org.zkoss.bind.annotation.ContextParam;
+import org.zkoss.bind.annotation.ContextType;
 import org.zkoss.bind.annotation.ExecutionArgParam;
 import org.zkoss.bind.annotation.Init;
 import org.zkoss.bind.annotation.NotifyChange;
@@ -58,12 +61,13 @@ public class TaxonAttributeVM extends AttributeVM<TaxonAttributeDefinition> {
 	
 	@Command
 	@NotifyChange({"selectedQualifier","qualifiers"})
-	public void updateQualifier(@BindingParam("text") String text) {
+	public void updateQualifier(@ContextParam(ContextType.BINDER) Binder binder, @BindingParam("text") String text) {
 		int index = qualifiers.indexOf(selectedQualifier);
 		if ( qualifiers.contains(text) && ! selectedQualifier.equals(text) ) {
 			MessageUtil.showWarning(DUPLICATED_QUALIFIER);
 		} else {
 			qualifiers.set(index, text);
+			dispatchApplyChangesCommand(binder);
 		}
 	}
 	
