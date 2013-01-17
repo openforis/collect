@@ -1,6 +1,6 @@
 <zk>
   <window id="surveyImportPopUp"
-  	title="${labels.survey.import_survey.title}"
+  	title="${labels.survey.validation.popup.title}"
     border="normal" 
     position="center"
     apply="org.zkoss.bind.BindComposer"
@@ -8,8 +8,6 @@
     onUpload="@command('fileUploaded')">
     
     <vbox align="center">
-      <label value="${labels.survey.validation.errors_in_survey}:" />
-      
       <listbox id="listbox" 
         rows="10"
         width="410px" 
@@ -28,7 +26,7 @@
         </template>
       </listbox>
   
-       <button id="okBtn" label="${labels.global.close}"
+      <button id="okBtn" label="${labels.global.close}"
         	onClick="@global-command('closeValidationResultsPopUp')" />
     </vbox>
   </window>
