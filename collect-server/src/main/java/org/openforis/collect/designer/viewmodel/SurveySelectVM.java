@@ -104,14 +104,8 @@ public class SurveySelectVM extends BaseVM {
 		}
 	}
 	
-	protected void openValidationResultsPopUp(List<SurveyValidationResult> validationResults) {
-		Map<String, Object> args = new HashMap<String, Object>();
-		args.put("validationResults", validationResults);
-		validationResultsPopUp = openPopUp(Resources.Component.SURVEY_VALIDATION_RESULTS_POPUP.getLocation(), true, args);
-	}
-	
 	protected boolean validateSurvey(CollectSurvey survey) {
-		SurveyValidator surveyValidator = new SurveyValidator();
+		SurveyValidator surveyValidator = new SurveyValidator(surveyManager);
 		List<SurveyValidationResult> validationResults = surveyValidator.validateSurvey(survey);
 		if ( validationResults.isEmpty() ) {
 			return true;
@@ -119,6 +113,12 @@ public class SurveySelectVM extends BaseVM {
 			openValidationResultsPopUp(validationResults);
 			return false;
 		}
+	}
+
+	protected void openValidationResultsPopUp(List<SurveyValidationResult> validationResults) {
+		Map<String, Object> args = new HashMap<String, Object>();
+		args.put("validationResults", validationResults);
+		validationResultsPopUp = openPopUp(Resources.Component.SURVEY_VALIDATION_RESULTS_POPUP.getLocation(), true, args);
 	}
 	
 	@GlobalCommand
