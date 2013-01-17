@@ -4,17 +4,17 @@
 package org.openforis.collect.manager;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
-import org.openforis.collect.model.CollectRecord;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.openforis.collect.model.CollectSurveyContext;
 import org.openforis.collect.persistence.TaxonDao;
 import org.openforis.collect.persistence.TaxonVernacularNameDao;
 import org.openforis.collect.persistence.TaxonomyDao;
-import org.openforis.idm.metamodel.SurveyContext;
 import org.openforis.idm.metamodel.TaxonAttributeDefinition;
 import org.openforis.idm.model.CodeAttribute;
-import org.openforis.idm.model.Node;
+import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.TaxonAttribute;
 import org.openforis.idm.model.TaxonOccurrence;
 import org.openforis.idm.model.expression.ExpressionFactory;
@@ -32,15 +32,17 @@ import org.springframework.transaction.annotation.Transactional;
  * 
  */
 public class SpeciesManager {
-
+	
+	private final Log log = LogFactory.getLog(SpeciesManager.class);
+	
 	@Autowired
 	private TaxonDao taxonDao;
-
 	@Autowired
 	private TaxonVernacularNameDao taxonVernacularNameDao;
-
 	@Autowired
 	private TaxonomyDao taxonomyDao;
+	@Autowired
+	private CollectSurveyContext surveyContext;
 
 	@Transactional
 	public List<TaxonOccurrence> findByCode(String taxonomyName, String searchString, int maxResults) {
@@ -67,45 +69,29 @@ public class SpeciesManager {
 	}
 
 	@Transactional
-	public List<TaxonOccurrence> findByVernacularName(String taxonomyName, CollectRecord record, int nodeId, String searchString, int maxResults) {
-		Node<?> node = record.getNodeByInternalId(nodeId);
+	public List<TaxonOccurrence> findByVernacularName(String taxonomyName, TaxonAttribute attr, String searchString, int maxResults) {
 		List<TaxonVernacularName> list = null;
-		if (node instanceof TaxonAttribute){
-			Taxonomy taxonomy = taxonomyDao.load(taxonomyName);
-			HashMap<String, String> hashQualifiers = new HashMap<String, String>();	
-			TaxonAttribute attr = (TaxonAttribute) node;
-			TaxonAttributeDefinition definition = attr.getDefinition();
-			List<String> q = definition.getQualifiers();
-			if(q != null){
-				int i = 1;
-				for (String qualifierExpression : q) {
-					String qualifierValue="";
-					SurveyContext context = record.getSurveyContext();
-					ExpressionFactory expressionFactory = context.getExpressionFactory();
-					
-					try {
-						CodeAttribute code = null;
-						ModelPathExpression expression = expressionFactory.createModelPathExpression(qualifierExpression);
-						code = (CodeAttribute) expression.evaluate(node, null);
-						qualifierValue = code.getValue().getCode();
-						hashQualifiers.put("qualifier" + i, qualifierValue);
-					} catch (Exception e) {
-						hashQualifiers.clear();
-						break;
-					}
-				}
-				//if anything happened, ignore qualifier
-				if(hashQualifiers.size()>0){
-					list = taxonVernacularNameDao.findByVernacularName(taxonomy.getId(), searchString, hashQualifiers, maxResults);
-				} else{
-					list = taxonVernacularNameDao.findByVernacularName(taxonomy.getId(), searchString, maxResults);
-				}
-			}else{
-				list = taxonVernacularNameDao.findByVernacularName(taxonomy.getId(), searchString, maxResults);
+		Taxonomy taxonomy = taxonomyDao.load(taxonomyName);
+		Integer taxonomyId = taxonomy.getId();
+		TaxonAttributeDefinition definition = attr.getDefinition();
+		List<String> qualifiers = definition.getQualifiers();
+		if (qualifiers != null){
+			String[] qualifierValues = extractQualifierValues(attr);
+			//if anything happened, ignore qualifier
+			if( qualifierValues == null){
+				list = taxonVernacularNameDao.findByVernacularName(taxonomyId, searchString, maxResults);
+			} else{
+				list = taxonVernacularNameDao.findByVernacularName(taxonomyId, searchString, qualifierValues, maxResults);
 			}
-		} else {
-			throw new IllegalArgumentException("Expected TaxonAttribute but got "+node.getClass());
+		}else{
+			list = taxonVernacularNameDao.findByVernacularName(taxonomyId, searchString, maxResults);
 		}
+		List<TaxonOccurrence> result = createOccurrenceList(list);
+		return result;
+	}
+
+	protected List<TaxonOccurrence> createOccurrenceList(
+			List<TaxonVernacularName> list) {
 		List<TaxonOccurrence> result = new ArrayList<TaxonOccurrence>();
 		for (TaxonVernacularName taxonVernacularName : list) {
 			Integer taxonId = taxonVernacularName.getTaxonSystemId();
@@ -115,6 +101,32 @@ public class SpeciesManager {
 			result.add(o);
 		}
 		return result;
+	}
+
+	protected String[] extractQualifierValues(TaxonAttribute attr) {
+		Entity parent = attr.getParent();
+		TaxonAttributeDefinition defn = attr.getDefinition();
+		List<String> qualifiers = defn.getQualifiers();
+		String[] qualifierValues = null;
+		if ( qualifiers != null && ! qualifiers.isEmpty() ) {
+			qualifierValues = new String[qualifiers.size()];
+			for (int i = 0; i < qualifiers.size(); i++) {
+				String qualifierExpr = qualifiers.get(i);
+				ExpressionFactory expressionFactory = surveyContext.getExpressionFactory();
+				try {
+					ModelPathExpression expression = expressionFactory.createModelPathExpression(qualifierExpr);
+					CodeAttribute code = (CodeAttribute) expression.evaluate(parent, null);
+					String qualifierValue = code.getValue().getCode();
+					qualifierValues[i] = qualifierValue;
+				} catch (Exception e) {
+					if ( log.isWarnEnabled() ) {
+						log.warn("Error evaluating taxon qualifiers: ", e);
+					}
+					break;
+				}
+			}
+		}
+		return qualifierValues;
 	}
 
 }

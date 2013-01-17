@@ -10,6 +10,9 @@ import org.openforis.collect.manager.SpeciesManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.proxy.TaxonOccurrenceProxy;
 import org.openforis.collect.web.session.SessionState;
+import org.openforis.idm.metamodel.NodeDefinition;
+import org.openforis.idm.model.Node;
+import org.openforis.idm.model.TaxonAttribute;
 import org.openforis.idm.model.TaxonOccurrence;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -41,9 +44,14 @@ public class SpeciesService {
 	public List<TaxonOccurrenceProxy> findByVernacularName(String taxonomy, int nodeId, String searchString, int maxResults) {
 		SessionState sessionState = sessionManager.getSessionState();
 		CollectRecord activeRecord = sessionState.getActiveRecord();
-		List<TaxonOccurrence> list = taxonManager.findByVernacularName(taxonomy, activeRecord, nodeId, searchString, maxResults);
-		List<TaxonOccurrenceProxy> result = TaxonOccurrenceProxy.fromList(list);
-		return result;
+		Node<? extends NodeDefinition> attr = activeRecord.getNodeByInternalId(nodeId);
+		if ( attr instanceof TaxonAttribute ) {
+			List<TaxonOccurrence> list = taxonManager.findByVernacularName(taxonomy, (TaxonAttribute) attr, searchString, maxResults);
+			List<TaxonOccurrenceProxy> result = TaxonOccurrenceProxy.fromList(list);
+			return result;
+		} else {
+			throw new IllegalArgumentException("TaxonAttribute expected");
+		}
 	}
 	
 }

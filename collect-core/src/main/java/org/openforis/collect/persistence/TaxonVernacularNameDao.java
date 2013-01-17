@@ -6,13 +6,11 @@ import static org.openforis.collect.persistence.jooq.tables.OfcTaxonVernacularNa
 
 import java.sql.Connection;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import org.jooq.Record;
 import org.jooq.Result;
 import org.jooq.SelectConditionStep;
-import org.jooq.SimpleSelectQuery;
 import org.jooq.StoreQuery;
 import org.jooq.TableField;
 import org.openforis.collect.persistence.jooq.MappingJooqDaoSupport;
@@ -39,7 +37,7 @@ public class TaxonVernacularNameDao extends MappingJooqDaoSupport<TaxonVernacula
 		return findByVernacularName(taxonomyId, searchString, null, maxResults);
 	}	
 	
-	public List<TaxonVernacularName> findByVernacularName(int taxonomyId, String searchString, HashMap<String, String> hashQualifier, int maxResults) {
+	public List<TaxonVernacularName> findByVernacularName(int taxonomyId, String searchString, String[] qualifierValues, int maxResults) {
 		JooqFactory jf = getMappingJooqFactory();
 		//find containing
 		searchString = "%" + searchString.toUpperCase() + "%";
@@ -50,17 +48,13 @@ public class TaxonVernacularNameDao extends MappingJooqDaoSupport<TaxonVernacula
 			.where(OFC_TAXON.TAXONOMY_ID.equal(taxonomyId)
 				.and(JooqFactory.upper(OFC_TAXON_VERNACULAR_NAME.VERNACULAR_NAME).like(searchString)));
 		
-		if ( hashQualifier != null ) {
-			for ( String s : hashQualifier.keySet()) {	
-				TableField field = null;
-				if(s.equals("qualifier1")){
-					field = OFC_TAXON_VERNACULAR_NAME.QUALIFIER1;
-				} else if(s.equals("qualifier2")){
-					field = OFC_TAXON_VERNACULAR_NAME.QUALIFIER2;
-				} else if(s.equals("qualifier3")){
-					field = OFC_TAXON_VERNACULAR_NAME.QUALIFIER3;
+		if ( qualifierValues != null ) {
+			for (int i = 0; i < qualifierValues.length; i++) {
+				String value = qualifierValues[i];
+				if ( value != null ) {
+					TableField field = QUALIFIER_FIELDS[i];
+					selectConditionStep.and(field.equal(value));
 				}
-				selectConditionStep.and(field.equal(hashQualifier.get(s)));				
 			}
 		}
 		selectConditionStep.limit(maxResults);
@@ -89,30 +83,6 @@ public class TaxonVernacularNameDao extends MappingJooqDaoSupport<TaxonVernacula
 		super.delete(id);
 	}
 	
-	protected List<TaxonVernacularName> findVernacularName(int taxonomId, String searchString, HashMap<String, String> hashQualifier,
-			int maxResults) {
-		TaxonVernacularNameDao.JooqFactory jf = getMappingJooqFactory();
-		SimpleSelectQuery<?> query = jf.selectContainsQuery(OFC_TAXON_VERNACULAR_NAME.VERNACULAR_NAME, searchString);
-		query.addLimit(maxResults);
-		
-		for ( String s : hashQualifier.keySet()) {	
-			TableField field = null;
-			if(s.equals("qualifier1")){
-				field = OFC_TAXON_VERNACULAR_NAME.QUALIFIER1;
-			}else if(s.equals("qualifier2")){
-				field = OFC_TAXON_VERNACULAR_NAME.QUALIFIER2;
-			}else if(s.equals("qualifier3")){
-				field = OFC_TAXON_VERNACULAR_NAME.QUALIFIER3;
-			}
-			query.addConditions(field.equal(hashQualifier.get(s)));				
-		}
-		
-		query.execute();
-		Result<?> result = query.getResult();
-		List<TaxonVernacularName> entities = jf.fromResult(result);
-		return entities;
-	}
-
 	protected static class JooqFactory extends MappingJooqFactory<TaxonVernacularName> {
 
 		private static final long serialVersionUID = 1L;
