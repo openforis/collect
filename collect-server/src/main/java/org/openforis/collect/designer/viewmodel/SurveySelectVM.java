@@ -5,8 +5,12 @@ package org.openforis.collect.designer.viewmodel;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.openforis.collect.designer.form.validator.SurveyValidator;
+import org.openforis.collect.designer.form.validator.SurveyValidator.SurveyValidationResult;
 import org.openforis.collect.designer.model.SurveyManagerUtil;
 import org.openforis.collect.designer.model.SurveyWorkSummary;
 import org.openforis.collect.designer.session.SessionStatus;
@@ -46,6 +50,8 @@ public class SurveySelectVM extends BaseVM {
 	private SurveyWorkSummary selectedSurvey;
 
 	private Window surveyImportPopUp;
+
+	private Window validationResultsPopUp;
 	
 	@Init()
 	public void init() {
@@ -87,17 +93,42 @@ public class SurveySelectVM extends BaseVM {
 	
 	@Command
 	public void publishSelectedSurvey() throws IOException {
-		MessageUtil.showConfirm(new MessageUtil.ConfirmHandler() {
-			@Override
-			public void onOk() {
-				performSurveyPublishing();
-			}
-		}, "survey.publish.confirm");
+		final CollectSurvey survey = loadSelectedSurvey();
+		if ( validateSurvey(survey) ) {
+			MessageUtil.showConfirm(new MessageUtil.ConfirmHandler() {
+				@Override
+				public void onOk() {
+					performSurveyPublishing(survey);
+				}
+			}, "survey.publish.confirm");
+		}
 	}
 	
-	protected void performSurveyPublishing() {
+	protected void openValidationResultsPopUp(List<SurveyValidationResult> validationResults) {
+		Map<String, Object> args = new HashMap<String, Object>();
+		args.put("validationResults", validationResults);
+		validationResultsPopUp = openPopUp(Resources.Component.SURVEY_VALIDATION_RESULTS_POPUP.getLocation(), true, args);
+	}
+	
+	protected boolean validateSurvey(CollectSurvey survey) {
+		SurveyValidator surveyValidator = new SurveyValidator();
+		List<SurveyValidationResult> validationResults = surveyValidator.validateSurvey(survey);
+		if ( validationResults.isEmpty() ) {
+			return true;
+		} else {
+			openValidationResultsPopUp(validationResults);
+			return false;
+		}
+	}
+	
+	@GlobalCommand
+	public void closeValidationResultsPopUp() {
+		closePopUp(validationResultsPopUp);
+		validationResultsPopUp = null;
+	}
+	
+	protected void performSurveyPublishing(CollectSurvey survey) {
 		try {
-			CollectSurvey survey = loadSelectedSurvey();
 			surveyManager.publish(survey);
 			notifyChange("surveySummaries");
 			Object[] args = new String[]{survey.getName()};
