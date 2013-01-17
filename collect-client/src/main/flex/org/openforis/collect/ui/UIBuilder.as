@@ -67,6 +67,7 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.ui.component.input.TaxonAttributeRenderer;
 	import org.openforis.collect.ui.component.input.TimeAttributeRenderer;
 	import org.openforis.collect.util.CollectionUtil;
+	import org.openforis.collect.util.StringUtil;
 	import org.openforis.collect.util.UIUtil;
 	
 	import spark.components.HGroup;
@@ -82,6 +83,7 @@ package org.openforis.collect.ui {
 	public class UIBuilder {
 		
 		private static const DATA_GROUP_HEADER_STYLE:String = "dataGroupHeader";
+		private static const NUMBERED_LABEL_SEPARATOR:String = ". ";
 		
 		public static function buildForm(rootEntity:EntityDefinitionProxy, version:ModelVersionProxy):FormContainer {
 			var formContainer:FormContainer = new FormContainer();
@@ -311,7 +313,7 @@ package org.openforis.collect.ui {
 			var parentEntityDefn:EntityDefinitionProxy = def.parent;
 			if(ancestorEntity != null && parentEntityDefn.enumerable && def.key && def is CodeAttributeDefinitionProxy) {
 				var enumeratedCodeWidth:Number = ancestorEntity.getEnumeratedCodeWidth(parentEntityDefn.name);
-				var headerText:String = def.getLabelText();
+				var headerText:String = StringUtil.concat(NUMBERED_LABEL_SEPARATOR, def.getNumberLabelText(), def.getLabelText());
 				var headerWidth:Number = UIUtil.measureGridHeaderWidth(headerText);
 				var width:Number = Math.max(headerWidth, enumeratedCodeWidth);
 				return width + 2;
@@ -445,9 +447,10 @@ package org.openforis.collect.ui {
 			result.percentHeight = 100;
 			var h:HGroup;
 			var l:Label;
+			var defnLabel:String = StringUtil.concat(NUMBERED_LABEL_SEPARATOR, defn.getNumberLabelText(), defn.getLabelText());
 			if(defn is TaxonAttributeDefinitionProxy) {
 				//attribute label
-				l = getLabel(defn.getLabelText(), 100, "dataGroupHeader");
+				l = getLabel(defnLabel, 100, "dataGroupHeader");
 				result.addElement(l);
 				//subheader
 				h = new HGroup();
@@ -465,7 +468,7 @@ package org.openforis.collect.ui {
 				result.addElement(h);
 			} else if(defn is CoordinateAttributeDefinitionProxy) {
 				//attribute label
-				l = getLabel(defn.getLabelText(), 100, "bold");
+				l = getLabel(defnLabel, 100, "bold");
 				result.addElement(l);
 				//subheader
 				h = new HGroup();
@@ -485,11 +488,11 @@ package org.openforis.collect.ui {
 				} else {
 					defaultUnit = RangeAttributeDefinitionProxy(defn).defaultUnit;
 				}
-				var labStr:String = defn.getLabelText() + " (" + defaultUnit.getAbbreviation() + ")";
+				var labStr:String = defnLabel + " (" + defaultUnit.getAbbreviation() + ")";
 				l = getLabel(labStr, width, "bold");
 				result.addElement(l);
 			} else {
-				l = getLabel(defn.getLabelText(), width, "bold");
+				l = getLabel(defnLabel, width, "bold");
 				result.addElement(l);
 			}
 			return result;

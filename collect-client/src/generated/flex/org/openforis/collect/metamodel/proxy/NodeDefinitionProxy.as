@@ -29,7 +29,12 @@ package org.openforis.collect.metamodel.proxy {
 			return getSpecificLabelText(labelTypes, language, firstIfNotFound);
 		}
 		
-		public function getSpecificLabelText(typesStack:Array, language:String = null, firstIfNotFound:Boolean = true):String {
+		public function getNumberLabelText(language:String = null):String {
+			var labelTypes:Array = [NodeLabelProxy$Type.NUMBER];
+			return getSpecificLabelText(labelTypes, language, false, false);
+		}
+		
+		public function getSpecificLabelText(typesStack:Array, language:String = null, firstIfNotFound:Boolean = true, nameIfNotFound = true):String {
 			var label:NodeLabelProxy = null;
 			for each (var type:NodeLabelProxy$Type in typesStack) {
 				label = getLabel(type, language, false);
@@ -42,8 +47,10 @@ package org.openforis.collect.metamodel.proxy {
 			}
 			if(label != null) {
 				return label.text;
-			} else {
+			} else if ( nameIfNotFound ) {
 				return name;
+			} else {
+				return null;
 			}
 		}
 		
