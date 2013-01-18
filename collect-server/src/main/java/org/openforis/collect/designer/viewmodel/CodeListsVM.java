@@ -66,6 +66,7 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 	
 	private List<CodeListItem> selectedItemsPerLevel;
 	private Window codeListItemPopUp;
+	private Window nodesReferencedNodesPopUp;
 	
 	@Init(superclass=false)
 	public void init(@ExecutionArgParam("selectedCodeList") CodeList selectedCodeList) {
@@ -144,34 +145,45 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 	@Override
 	@Command
 	public void deleteItem(@BindingParam("item") final CodeList item) {
-		boolean inUse = isInUse(item);
-		if ( inUse ) {
-			MessageUtil.showWarning("survey.code_list.alert.cannot_delete_used_list");
+		List<NodeDefinition> references = getReferences(item);
+		if ( ! references.isEmpty() ) {
+			String title = Labels.getLabel("global.message.title.warning");
+			String message = Labels.getLabel("survey.code_list.alert.cannot_delete_used_list");
+			nodesReferencedNodesPopUp = SurveyErrorsPopUpVM.openPopUp(title, message, 
+					references, new MessageUtil.ConfirmHandler() {
+				@Override
+				public void onOk() {
+					closeReferencedNodesPopUp();
+				}
+			}, true);
 		} else {
 			super.deleteItem(item);
 		}
 	}
 
-	protected boolean isInUse(CodeList item) {
+	protected void closeReferencedNodesPopUp() {
+		closePopUp(nodesReferencedNodesPopUp);
+		nodesReferencedNodesPopUp = null;
+	}
+
+	protected List<NodeDefinition> getReferences(CodeList item) {
+		List<NodeDefinition> references = new ArrayList<NodeDefinition>();
 		Schema schema = survey.getSchema();
 		List<EntityDefinition> rootEntities = schema.getRootEntityDefinitions();
-		Stack<EntityDefinition> stack = new Stack<EntityDefinition>();
+		Stack<NodeDefinition> stack = new Stack<NodeDefinition>();
 		stack.addAll(rootEntities);
 		while ( ! stack.isEmpty() ) {
-			EntityDefinition entity = stack.pop();
-			List<NodeDefinition> children = entity.getChildDefinitions();
-			for (NodeDefinition defn : children) {
-				if ( defn instanceof CodeAttributeDefinition ) {
-					CodeList list = ((CodeAttributeDefinition) defn).getList();
-					if ( list.getId() == item.getId() ) {
-						return true;
-					}
-				} else if ( defn instanceof EntityDefinition ) {
-					stack.push((EntityDefinition) defn);
+			NodeDefinition defn = stack.pop();
+			if ( defn instanceof EntityDefinition ) {
+				stack.addAll(((EntityDefinition) defn).getChildDefinitions());
+			} else if ( defn instanceof CodeAttributeDefinition ) {
+				CodeList list = ((CodeAttributeDefinition) defn).getList();
+				if ( list.equals(item) ) {
+					references.add(defn);
 				}
 			};
 		}
-		return false;
+		return references;
 	}
 	
 	@Command
