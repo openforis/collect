@@ -23,8 +23,10 @@
                   context="@load(each.data.detached eq true ? 
                       detachedNodePopup
                       : vm.isEntity(each.data.nodeDefinition) ?
-                         entityPopup
-                        : attributePopup)">
+                        (vm.isTableEntity(each.data.nodeDefinition) ?
+                         tableEntityPopup
+                         : entityPopup)
+                       : attributePopup)">
                   <treerow>
                     <treecell label="@load(each.data.name)"
                         image="${vm.getIcon(each.data.nodeDefinition)}" />
@@ -110,22 +112,29 @@
       <menuitem label="${labels.survey.schema.remove_node}"
         onClick="@command('removeNode')" />
     </menupopup>
-<!--     <menupopup id="tableEntityPopup"> -->
-<!--       <menu label="${labels.survey.schema.add_attribute.label}"> -->
-<!--         <menupopup> -->
-<!--           <zk forEach="${vm.attributeTypeValues}"> -->
-<!--             <menuitem  -->
-<!--               image="${vm.getAttributeIcon(each)}" -->
-<!--               label="${vm.getAttributeTypeLabel(each)}" -->
-<!--               value="${each}" -->
-<!--               onClick="@command('addChildAttribute', attributeType=self.value)" /> -->
-<!--           </zk> -->
-<!--         </menupopup> -->
-<!--       </menu> -->
-<!--       <menuseparator /> -->
-<!--       <menuitem label="${labels.survey.schema.remove_node}" -->
-<!--         onClick="@command('removeNode')" /> -->
-<!--     </menupopup> -->
+    <menupopup id="tableEntityPopup">
+      <menu label="${labels.survey.schema.add_entity}">
+        <menupopup>
+          <menuitem 
+            label="${labels.survey.schema.add_single_entity}"
+            onClick="@command('addChildEntity', multiple=false, layout='FORM')" />
+        </menupopup>
+      </menu>
+      <menu label="${labels.survey.schema.add_attribute.label}">
+        <menupopup>
+          <zk forEach="${vm.attributeTypeValues}">
+            <menuitem 
+              image="${vm.getAttributeIcon(each)}"
+              label="${vm.getAttributeTypeLabel(each)}"
+              value="${each}"
+              onClick="@command('addChildAttribute', attributeType=self.value)" />
+          </zk>
+        </menupopup>
+      </menu>
+      <menuseparator />
+      <menuitem label="${labels.survey.schema.remove_node}"
+        onClick="@command('removeNode')" />
+    </menupopup>
     <menupopup id="attributePopup">
       <menuitem label="${labels.survey.schema.remove_node}"
         onClick="@command('removeNode')" />

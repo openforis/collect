@@ -7,13 +7,14 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.designer.component.SchemaTreeModel;
 import org.openforis.collect.designer.component.SchemaTreeModel.SchemaTreeNodeData;
+import org.openforis.collect.designer.composer.SurveySchemaEditComposer;
 import org.openforis.collect.designer.model.AttributeType;
 import org.openforis.collect.designer.model.NodeType;
+import org.openforis.collect.designer.util.ComponentUtil;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.Resources;
 import org.openforis.collect.metamodel.ui.UIOptions;
@@ -45,9 +46,6 @@ import org.zkoss.zk.ui.select.Selectors;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zul.Include;
-import org.zkoss.zul.Tree;
-import org.zkoss.zul.TreeNode;
-import org.zkoss.zul.Treeitem;
 
 /**
  * 
@@ -78,8 +76,6 @@ public class SchemaVM extends SurveyBaseVM {
 	
 	@Wire
 	private Include nodeFormInclude;
-	@Wire
-	private Tree nodesTree;
 	
 	private SchemaTreeModel treeModel;
 
@@ -188,18 +184,18 @@ public class SchemaVM extends SurveyBaseVM {
 		checkCanLeaveForm(new CanLeaveFormConfirmHandler() {
 			@Override
 			public void onOk(boolean confirmed) {
+				EntityDefinition parentEntity = (EntityDefinition) (selectedTreeNode == null ? selectedRootEntity: selectedTreeNode.getNodeDefinition());
 				EntityDefinition newNode = createEntityDefinition();
 				newNode.setMultiple(multiple);
 				UIOptions uiOpts = survey.getUIOptions();
-				EntityDefinition parentEntity = (EntityDefinition) (selectedTreeNode == null ? selectedRootEntity: selectedTreeNode.getNodeDefinition());
 				Layout layoutEnum = Layout.valueOf(layout);
 //				if ( uiOpts.isLayoutSupported(parentEntity, newNode.getId(), (UITab) null, multiple, layoutEnum) ) {
 					uiOpts.setLayout(newNode, layoutEnum);
 					editNode(binder, true, parentEntity, newNode);
+					afterNewNodeCreated(newNode);
 //				} else {
 //					MessageUtil.showWarning(LabelKeys.LAYOUT_NOT_SUPPORTED_MESSAGE_KEY);
 //				}
-				afterNewNodeCreated(newNode);
 			}
 		});
 	}
@@ -247,19 +243,11 @@ public class SchemaVM extends SurveyBaseVM {
 	}
 	
 	@GlobalCommand
-	public void editedNodeNameChanging(@ContextParam(ContextType.BINDER) Binder binder, @BindingParam("name") String name) {
+	public void editedNodeNameChanging(@ContextParam(ContextType.BINDER) Binder binder, 
+			@ContextParam(ContextType.VIEW) Component view, @BindingParam("name") String name) {
 		applyChangesToForm(binder);
-		treeModel.setSelectedNodeName(name);
-		//OFC-1140
-		refreshSelectedTreeNodeLabel();
-	}
-
-	protected void refreshSelectedTreeNodeLabel() {
-		Treeitem selectedItem = nodesTree.getSelectedItem();
-		Set<TreeNode<SchemaTreeNodeData>> selection = treeModel.getSelection();
-		TreeNode<SchemaTreeNodeData> selectedNode = selection.iterator().next();
-		String nodeName = selectedNode.getData().getName();
-		selectedItem.setLabel(nodeName);
+		SurveySchemaEditComposer composer = ComponentUtil.getComposer(view);
+		composer.refreshSelectedTreeNodeLabel(name);
 	}
 
 	protected void resetEditingStatus() {
@@ -400,13 +388,11 @@ public class SchemaVM extends SurveyBaseVM {
 	}
 	
 	@Command
-	@NotifyChange({"moveNodeUpDisabled","moveNodeDownDisabled"})
 	public void moveNodeUp() {
 		moveNode(true);
 	}
 	
 	@Command
-	@NotifyChange({"moveNodeUpDisabled","moveNodeDownDisabled"})
 	public void moveNodeDown() {
 		moveNode(false);
 	}
@@ -438,7 +424,7 @@ public class SchemaVM extends SurveyBaseVM {
 			schema.moveRootEntityDefinition(rootEntity, toIndex);
 		}
 		treeModel.moveSelectedNode(newIndexInTree);
-		notifyChange("treeModel");
+		notifyChange("treeModel","moveNodeUpDisabled","moveNodeDownDisabled");
 		dispatchSchemaChangedCommand();
 	}
 	
@@ -475,7 +461,8 @@ public class SchemaVM extends SurveyBaseVM {
 
 	@GlobalCommand
 	@NotifyChange({"selectedTreeNode","newNode"})
-	public void editedNodeChanged(@BindingParam("parentEntity") EntityDefinition parentEntity) {
+	public void editedNodeChanged(@ContextParam(ContextType.VIEW) Component view, 
+			@BindingParam("parentEntity") EntityDefinition parentEntity) {
 		if ( newNode ) {
 			if ( parentEntity == null ) {
 				selectedRootEntity = (EntityDefinition) editedNode;
@@ -491,6 +478,13 @@ public class SchemaVM extends SurveyBaseVM {
 			notifyChange("newNode");
 		}
 		dispatchSchemaChangedCommand();
+		//to be called when not notifying changes on treeModel
+		refreshSelectedTreeNode(view);
+	}
+
+	protected void refreshSelectedTreeNode(Component view) {
+		SurveySchemaEditComposer composer = ComponentUtil.getComposer(view);
+		composer.refreshSelectedTreeNodeContextMenu();
 	}
 	
 	protected EntityDefinition createRootEntityDefinition() {

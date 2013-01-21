@@ -377,7 +377,7 @@ public class UIOptions implements ApplicationOptions, Serializable {
 	 * - Root entity: FORM
 	 * - Single entity: FORM and TABLE (only inside an entity with TABLE layout)
 	 * - Multiple entity: FORM only if it's the only multiple entity with FORM layout
-	 * 		into the tab
+	 * 		into the tab, TABLE only if there is not an ancestor entity with TABLE layout
 	 * 
 	 * @param parentEntityDefn
 	 * @param entityDefn
@@ -391,10 +391,17 @@ public class UIOptions implements ApplicationOptions, Serializable {
 			Layout parentLayout = getLayout(parentEntityDefn);
 			return layout == Layout.FORM || parentLayout == Layout.TABLE;
 		} else if ( layout == Layout.FORM) {
-			//UITab tab = getAssignedTab(parentEntityDefn, entityDefn, true);
-			EntityDefinition multipleEntity = getFormLayoutMultipleEntity(associatedTab);
+			UITab tab = associatedTab == null ? getAssignedTab(parentEntityDefn, true): associatedTab;
+			EntityDefinition multipleEntity = getFormLayoutMultipleEntity(tab);
 			return multipleEntity == null || multipleEntity.getId() == entityDefnId;
 		} else {
+			EntityDefinition ancestorEntity = parentEntityDefn;
+			while ( ancestorEntity != null ) {
+				if ( getLayout(ancestorEntity) == Layout.TABLE) {
+					return false;
+				}
+				ancestorEntity = (EntityDefinition) ancestorEntity.getParentDefinition();
+			}
 			return true;
 		}
 	}
