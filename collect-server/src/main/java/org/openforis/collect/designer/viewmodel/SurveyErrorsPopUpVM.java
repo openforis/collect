@@ -30,6 +30,7 @@ import org.zkoss.zul.Window;
  */
 public class SurveyErrorsPopUpVM {
 
+	private static final String ON_CLICK_EVENT = "onClick";
 	private static final String OK_BUTTON_ID = "okBtn";
 	private static final String CANCEL_BUTTON_ID = "cancelBtn";
 	
@@ -58,13 +59,13 @@ public class SurveyErrorsPopUpVM {
 	protected static void initEventListeners(Window popUp, final ConfirmHandler confirmHandler) {
 		IdSpace idSpace = popUp.getSpaceOwner();
 		Component okButton = Path.getComponent(idSpace, OK_BUTTON_ID);
-		okButton.addEventListener("onClick", new EventListener<Event>() {
+		okButton.addEventListener(ON_CLICK_EVENT, new EventListener<Event>() {
 			public void onEvent(Event arg0) throws Exception {
 				confirmHandler.onOk();
 			};
 		});
 		Component cancelButton = Path.getComponent(idSpace, CANCEL_BUTTON_ID);
-		cancelButton.addEventListener("onClick", new EventListener<Event>() {
+		cancelButton.addEventListener(ON_CLICK_EVENT, new EventListener<Event>() {
 			public void onEvent(Event arg0) throws Exception {
 				if ( confirmHandler instanceof CompleteConfirmHandler ) {
 					((CompleteConfirmHandler) confirmHandler).onCancel();
