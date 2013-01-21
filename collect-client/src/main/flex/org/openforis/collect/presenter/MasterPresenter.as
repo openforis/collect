@@ -43,6 +43,7 @@ package org.openforis.collect.presenter {
 		override internal function initEventListeners():void {
 			//eventDispatcher.addEventListener(ApplicationEvent.APPLICATION_INITIALIZED, applicationInitializedHandler);
 			eventDispatcher.addEventListener(UIEvent.ROOT_ENTITY_SELECTED, rootEntitySelectedHandler);
+			eventDispatcher.addEventListener(UIEvent.SHOW_ERROR_PAGE, showErrorPageHandler);
 			eventDispatcher.addEventListener(UIEvent.SHOW_HOME_PAGE, backToHomeHandler);
 			eventDispatcher.addEventListener(UIEvent.BACK_TO_LIST, backToListHandler);
 			eventDispatcher.addEventListener(UIEvent.RECORD_SELECTED, recordSelectedHandler);
@@ -107,6 +108,13 @@ package org.openforis.collect.presenter {
 		
 		internal function newRecordCreatedHandler(event:UIEvent):void {
 			_view.currentState = MasterView.DETAIL_STATE;
+		}
+		
+		internal function showErrorPageHandler(event:UIEvent):void {
+			Application.activeSurvey = null;
+			Application.activeRootEntity = null;
+			_view.currentState = MasterView.ERROR_STATE;
+			_view.errorView.errorLabel.text = String(event.obj);
 		}
 		
 		internal function backToHomeHandler(event:UIEvent):void {

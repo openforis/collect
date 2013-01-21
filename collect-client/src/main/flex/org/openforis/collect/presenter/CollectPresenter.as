@@ -49,6 +49,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.util.StringUtil;
 	import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
 	import org.openforis.collect.model.proxy.RecordProxy;
+	import org.openforis.collect.util.CollectionUtil;
 	
 	/**
 	 * 
@@ -194,12 +195,12 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function showListOfRecordsHandler(event:UIEvent):void {
-			if ( Application.activeSurvey == null || Application.activeRootEntity == null ) {
-				openSurveySelectionPopUp();
-			} else {
+			if ( Application.activeSurvey != null && Application.activeRootEntity != null ) {
 				var uiEvent:UIEvent = new UIEvent(UIEvent.ROOT_ENTITY_SELECTED);
 				uiEvent.obj = Application.activeRootEntity;
 				eventDispatcher.dispatchEvent(uiEvent);
+			} else {
+				openSurveySelectionPopUp();
 			}
 		}
 		
@@ -223,11 +224,20 @@ package org.openforis.collect.presenter {
 		internal function getSurveySummariesResultHandler(event:ResultEvent, token:Object = null):void {
 			var summaries:IList =  event.result as IList;
 			Application.surveySummaries = summaries;
-			if ( ! Application.user.hasEffectiveRole(UserProxy.ROLE_ADMIN) ) {
-				showListOfRecordsHandler(null);
+			if ( Application.user.hasEffectiveRole(UserProxy.ROLE_ADMIN) ) {
+				showHomePage();
+			} else if ( CollectionUtil.isEmpty(Application.surveySummaries) ) {
+				showErrorPage(Message.get("error.no_published_surveys_found"));
 			} else {
 				showHomePage();
+				showListOfRecordsHandler(null);
 			}
+		}
+		
+		protected function showErrorPage(errorMessage:String):void {
+			var uiEvent:UIEvent = new UIEvent(UIEvent.SHOW_ERROR_PAGE);
+			uiEvent.obj = errorMessage;
+			eventDispatcher.dispatchEvent(uiEvent);
 		}
 		
 		protected function showHomePage():void {

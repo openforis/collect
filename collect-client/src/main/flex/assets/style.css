@@ -54,6 +54,10 @@ s|Button.logout {
 	fontSize: 15px;
 	textAlign: justify;
 }
+.errorText {
+	fontSize: 18px;
+	fontWeight: bold;
+}
 .functionList{
 	/*skin-class: ClassReference('org.openforis.collect.ui.skin.FunctionListSkin');*/
 	borderVisible: false;
