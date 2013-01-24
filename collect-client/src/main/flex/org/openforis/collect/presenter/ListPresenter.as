@@ -242,10 +242,8 @@ package org.openforis.collect.presenter {
 			} else if ( currentKeyValuesFilter == null ) {
 				openFilterPopUp();
 			} else {
-				currentKeyValuesFilter = null;
-				_view.openFilterPopUpButton.selected = false;
-				currentPage = 1;
-				loadRecordSummariesCurrentPage();
+				resetCurrentFilter();
+				loadRecordSummaries();
 			}
 		}
 		
@@ -289,8 +287,7 @@ package org.openforis.collect.presenter {
 			var oldFilter:Array = currentKeyValuesFilter;
 			currentKeyValuesFilter = null;
 			if(oldFilter != null) {
-				currentPage = 1;
-				loadRecordSummariesCurrentPage();
+				loadRecordSummaries();
 			}
 			closeFilterPopUp();
 		}
@@ -310,8 +307,7 @@ package org.openforis.collect.presenter {
 			} else {
 				currentKeyValuesFilter = null;
 			}
-			currentPage = 1;
-			loadRecordSummariesCurrentPage();
+			loadRecordSummaries();
 			closeFilterPopUp();
 		}
 		
@@ -319,22 +315,34 @@ package org.openforis.collect.presenter {
 		 * Loads records summaries for active root entity
 		 * */
 		protected function loadRecordSummariesHandler(event:UIEvent):void {
+			if ( event.obj != null && event.obj.firstAccess ) {
+				resetCurrentFilter();
+			}
 			var surveyProjectName:String = Application.activeSurvey.getProjectName();
 			var rootEntityLabel:String = Application.activeRootEntity.getLabelText();
 			_view.titleLabel.text = Message.get("list.title", [surveyProjectName, rootEntityLabel]);
 			updateDataGrid();
-			currentPage = 1;
-			loadRecordSummariesCurrentPage();
+			loadRecordSummaries();
 		}
 		
 		protected function reloadRecordSummariesHandler(event:UIEvent):void {
 			loadRecordSummariesCurrentPage();
 		}
 		
+		protected function resetCurrentFilter():void {
+			currentKeyValuesFilter = null;
+			_view.openFilterPopUpButton.selected = false;
+		}
+		
 		protected function updateDataGrid():void {
 			var rootEntity:EntityDefinitionProxy = Application.activeRootEntity;
 			var columns:IList = UIBuilder.getRecordSummaryListColumns(rootEntity);
 			_view.dataGrid.columns = columns;
+		}
+		
+		protected function loadRecordSummaries():void {
+			currentPage = 1;
+			loadRecordSummariesCurrentPage();
 		}
 		
 		protected function loadRecordSummariesCurrentPage():void {
@@ -401,8 +409,7 @@ package org.openforis.collect.presenter {
 		 * Pagination bar events
 		 * */
 		protected function firstPageClickHandler(event:Event):void {
-			currentPage = 1;
-			loadRecordSummariesCurrentPage();
+			loadRecordSummaries();
 		}
 		
 		protected function previousPageClickHandler(event:Event):void {

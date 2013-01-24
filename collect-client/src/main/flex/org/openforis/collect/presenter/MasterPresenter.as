@@ -3,6 +3,8 @@ package org.openforis.collect.presenter {
 	 * 
 	 * @author Mino Togna
 	 * */
+	import mx.events.FlexEvent;
+	import mx.events.StateChangeEvent;
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.events.FaultEvent;
 	import mx.rpc.events.ResultEvent;
@@ -103,6 +105,7 @@ package org.openforis.collect.presenter {
 			_view.currentState = MasterView.LIST_STATE;
 			
 			var uiEvent:UIEvent = new UIEvent(UIEvent.LOAD_RECORD_SUMMARIES);
+			uiEvent.obj = {firstAccess: true};
 			eventDispatcher.dispatchEvent(uiEvent);
 		}
 		
