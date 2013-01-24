@@ -73,18 +73,11 @@ public class SpeciesManager {
 		List<TaxonVernacularName> list = null;
 		Taxonomy taxonomy = taxonomyDao.load(taxonomyName);
 		Integer taxonomyId = taxonomy.getId();
-		TaxonAttributeDefinition definition = attr.getDefinition();
-		List<String> qualifiers = definition.getQualifiers();
-		if (qualifiers != null){
-			String[] qualifierValues = extractQualifierValues(attr);
-			//if anything happened, ignore qualifier
-			if( qualifierValues == null){
-				list = taxonVernacularNameDao.findByVernacularName(taxonomyId, searchString, maxResults);
-			} else{
-				list = taxonVernacularNameDao.findByVernacularName(taxonomyId, searchString, qualifierValues, maxResults);
-			}
-		}else{
+		String[] qualifierValues = extractQualifierValues(attr);
+		if (qualifierValues == null){
 			list = taxonVernacularNameDao.findByVernacularName(taxonomyId, searchString, maxResults);
+		} else{
+			list = taxonVernacularNameDao.findByVernacularName(taxonomyId, searchString, qualifierValues, maxResults);
 		}
 		List<TaxonOccurrence> result = createOccurrenceList(list);
 		return result;
@@ -104,15 +97,15 @@ public class SpeciesManager {
 	}
 
 	protected String[] extractQualifierValues(TaxonAttribute attr) {
-		Entity parent = attr.getParent();
 		TaxonAttributeDefinition defn = attr.getDefinition();
 		List<String> qualifiers = defn.getQualifiers();
 		String[] qualifierValues = null;
 		if ( qualifiers != null && ! qualifiers.isEmpty() ) {
 			qualifierValues = new String[qualifiers.size()];
+			Entity parent = attr.getParent();
+			ExpressionFactory expressionFactory = surveyContext.getExpressionFactory();
 			for (int i = 0; i < qualifiers.size(); i++) {
 				String qualifierExpr = qualifiers.get(i);
-				ExpressionFactory expressionFactory = surveyContext.getExpressionFactory();
 				try {
 					ModelPathExpression expression = expressionFactory.createModelPathExpression(qualifierExpr);
 					CodeAttribute code = (CodeAttribute) expression.evaluate(parent, null);
