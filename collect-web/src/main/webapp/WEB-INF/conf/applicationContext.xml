@@ -4,7 +4,8 @@
 	xmlns:security="http://www.springframework.org/schema/security" 
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:context="http://www.springframework.org/schema/context" 
-	xmlns:p="http://www.springframework.org/schema/p" 
+	xmlns:mvc="http://www.springframework.org/schema/mvc" 
+    xmlns:p="http://www.springframework.org/schema/p" 
 	xmlns:util="http://www.springframework.org/schema/util"
     xmlns:tx="http://www.springframework.org/schema/tx"
 	xsi:schemaLocation="
@@ -14,6 +15,8 @@
     http://www.springframework.org/schema/security/spring-security-3.0.4.xsd
     http://www.springframework.org/schema/context
     http://www.springframework.org/schema/context/spring-context-3.0.xsd
+    http://www.springframework.org/schema/mvc
+    http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd
     http://www.springframework.org/schema/util
     http://www.springframework.org/schema/util/spring-util-3.0.xsd
     http://www.springframework.org/schema/tx 
@@ -22,7 +25,12 @@
 
 	<context:annotation-config />
 
-	<!-- <context:component-scan base-package="org.fao.openforis.service"/> -->
+    <mvc:resources mapping="collect.swf" location="collect.swf" />
+    <mvc:resources mapping="/assets/**" location="/assets/" />
+    <mvc:resources mapping="/images/**" location="/images/" />
+    <mvc:resources mapping="/script/**" location="/script/" />
+	
+    <!-- <context:component-scan base-package="org.fao.openforis.service"/> -->
 	<!-- <context:component-scan base-package="org.fao.openforis"/> -->
 
 <!-- 	<context:property-placeholder location="classpath:/app.properties" /> -->
@@ -37,12 +45,14 @@
 <!-- 		<entry key="**/messagebroker/**" value-ref="_messageBroker" /> -->
 		<entry key="/index.htm" value-ref="fileNameViewController" />
 		<entry key="/designer.htm" value-ref="fileNameViewController" />
-		<entry key="/editSurvey.htm" value-ref="fileNameViewController" />
+        <entry key="/editSurvey.htm" value-ref="fileNameViewController" />
 		<entry key="/error.htm" value-ref="fileNameViewController" />
 		<entry key="/accessDenied.htm" value-ref="fileNameViewController" />
 		<entry key="/exitUser.htm" value-ref="fileNameViewController" />
 		<entry key="/login.htm" value-ref="fileNameViewController" />
 		<entry key="/importSurvey.htm" value-ref="fileNameViewController" />
+        
+        <entry key="/surveys" value-ref="fileNameViewController" />
 	</util:map>
 
 	<bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
@@ -63,7 +73,7 @@
 	<bean id="dataExportDownloadController" class="org.openforis.collect.web.controller.DataExportDownloadController" />
 	<bean id="fileNameViewController" class="org.springframework.web.servlet.mvc.UrlFilenameViewController" />
 	<bean id="recordFileController" class="org.openforis.collect.web.controller.RecordFileController" scope="session" />
-	<bean id="surveyImportController" class="org.openforis.collect.web.controller.SurveyImportController" />
+	<bean id="surveyController" class="org.openforis.collect.web.controller.designer.SurveyController" />
 	<bean id="validationController" class="org.openforis.collect.web.controller.ValidationController" />
 	<bean id="unlockController" class="org.openforis.collect.web.controller.UnlockController" />
 

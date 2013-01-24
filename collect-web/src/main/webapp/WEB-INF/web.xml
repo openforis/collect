@@ -115,15 +115,11 @@
 		<servlet-class>org.zkoss.zk.au.http.DHtmlUpdateServlet</servlet-class>
 	</servlet>
 	
-	<servlet-mapping>
-		<servlet-name>dispatcher</servlet-name>
-		<url-pattern>/graniteamf/*</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>dispatcher</servlet-name>
-		<url-pattern>*.htm</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>dispatcher</servlet-name>
+        <url-pattern>/</url-pattern>
+    </servlet-mapping>
+  	<servlet-mapping>
 		<servlet-name>zkLoader</servlet-name>
 		<url-pattern>*.zul</url-pattern>
 	</servlet-mapping>
@@ -135,7 +131,7 @@
 		<servlet-name>auEngine</servlet-name>
 		<url-pattern>/zkau/*</url-pattern>
 	</servlet-mapping>
-	
+  	
 	<session-config>
 		<session-timeout>2</session-timeout>
 	</session-config>
