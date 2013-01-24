@@ -5,7 +5,7 @@
 					  height="20"
 					  >
 	<fx:Declarations>
-		<s:Fade id="showRecordSavedMessageEffect" 
+		<s:Fade id="showEffect" 
 				target="{this}"
 				startDelay="1000" 
 				alphaFrom="1" 
@@ -41,10 +41,13 @@
 				_text = value;
 			}
 			
-			public function show():void {
+			public function show(text:String = null):void {
+				if ( text != null ) {
+					this.text = text;
+				}
 				this.visible = true;
 				this.alpha = 1;
-				showRecordSavedMessageEffect.play();
+				showEffect.play();
 			}
 
 		]]>

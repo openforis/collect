@@ -111,8 +111,7 @@ package org.openforis.collect.presenter {
 		
 		protected function recordSavedHandler(event:ApplicationEvent):void {
 			var rootEntityLabel:String = Application.activeRootEntity.getLabelText()
-			_view.recordSavedMessage.text = Message.get("edit.recordSaved", [rootEntityLabel]);
-			_view.recordSavedMessage.show();
+			_view.messageDisplay.show(Message.get("edit.recordSaved", [rootEntityLabel]));
 		}
 		
 		protected function updateRecordKeyLabel(event:Event = null):void {

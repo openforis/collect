@@ -81,11 +81,12 @@ view|Footer {
 	padding-bottom: 5;
 }
 
-detail|RecordSavedMessage {
-	skin-class: ClassReference('org.openforis.collect.ui.skin.RecordSavedMessageSkin');
+component|MessageDisplay {
+	skin-class: ClassReference('org.openforis.collect.ui.skin.MessageDisplaySkin');
 	backgroundColor: haloBlue;
 }
-detail|RecordSavedMessage s|Label {
+
+component|MessageDisplay s|Label {
 	color: white;
 	fontSize: 12;
 	fontWeight: bold;

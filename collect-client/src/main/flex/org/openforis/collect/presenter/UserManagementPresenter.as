@@ -16,6 +16,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.client.UserClient;
 	import org.openforis.collect.event.UserManagementEvent;
+	import org.openforis.collect.i18n.Message;
 	import org.openforis.collect.model.UserPerRoleWrapper;
 	import org.openforis.collect.model.proxy.UserProxy;
 	import org.openforis.collect.ui.component.user.UserManagementPopUp;
@@ -340,9 +341,9 @@ package org.openforis.collect.presenter {
 				var selectedUserIndex:int = _loadedUsers.getItemIndex(selectedUser);
 				_loadedUsers.setItemAt(savedUser, selectedUserIndex);
 			} else {
-				AlertUtil.showMessage("usersManagement.userSaved");
 				loadAll();
 			}
+			view.usersListContainer.messageDisplay.show(Message.get("usersManagement.userSaved"));
 		}
 		
 		protected function saveUserFaultHandler(event:FaultEvent, token:Object = null):void {
