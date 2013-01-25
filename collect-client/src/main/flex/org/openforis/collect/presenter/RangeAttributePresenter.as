@@ -77,8 +77,8 @@ package org.openforis.collect.presenter {
 				result.parentEntityId = view.attribute.parentId;
 				result.nodeName = view.attributeDefinition.name;
 				result.nodeId = view.attribute.id;
-				result.fieldIndex = 2;
-				result.value = attrDefn.defaultUnit.name;
+				result.fieldIndex = 3;
+				result.value = attrDefn.defaultUnit.id;
 			}
 			return result;
 		}
@@ -99,7 +99,7 @@ package org.openforis.collect.presenter {
 					view.currentState = RangeAttributeRenderer.MULTIPLE_UNIT_STATE;
 					view.unitInputField.dataProvider = units;
 					if(attrDefn.defaultUnit != null) {
-						view.unitInputField.defaultValue = attrDefn.defaultUnit.name;
+						view.unitInputField.defaultValue = String(attrDefn.defaultUnit.id);
 					}
 				}
 			}

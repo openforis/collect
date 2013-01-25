@@ -64,6 +64,8 @@ public class RecordManager {
 	
 	@Autowired
 	private RecordDao recordDao;
+
+	private RecordConverter recordConverter = new RecordConverter();
 	
 	private Map<Integer, RecordLock> locks;
 	
@@ -123,12 +125,14 @@ public class RecordManager {
 		isLockAllowed(user, recordId, sessionId, forceUnlock);
 		lock(recordId, user, sessionId, forceUnlock);
 		CollectRecord record = recordDao.load(survey, recordId, step);
+		recordConverter.convertToLatestVersion(record);
 		return record;
 	}
 	
 	@Transactional
 	public CollectRecord load(CollectSurvey survey, int recordId, int step) throws RecordPersistenceException {
 		CollectRecord record = recordDao.load(survey, recordId, step);
+		recordConverter.convertToLatestVersion(record);
 		return record;
 	}
 	

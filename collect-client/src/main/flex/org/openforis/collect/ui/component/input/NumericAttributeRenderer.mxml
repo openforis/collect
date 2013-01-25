@@ -62,9 +62,9 @@
 								  attributeDefinition="{attributeDefinition}"
 								  parentEntity="{parentEntity}"
 								  attribute="{attribute}"
-								  fieldIndex="1"
+								  fieldIndex="2"
 								  width="70"
-								  dataField="name"
+								  dataField="id"
 								  labelFunction="{unitLabelFunction}"
 								  dropDownLabelFunction="{unitDropDownLabelFunction}"
 								  />

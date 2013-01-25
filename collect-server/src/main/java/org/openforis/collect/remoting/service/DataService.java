@@ -103,7 +103,7 @@ public class DataService {
 		if ( sessionState.isActiveRecordBeingEdited() ) {
 			throw new MultipleEditException();
 		}
-		CollectSurvey survey = sessionState.getActiveSurvey();
+		final CollectSurvey survey = sessionState.getActiveSurvey();
 		User user = sessionState.getUser();
 		CollectRecord record = recordManager.checkout(survey, user, id, step, sessionState.getSessionId(), forceUnlock);
 		Entity rootEntity = record.getRootEntity();
@@ -547,9 +547,9 @@ public class DataService {
 			fieldValue = val;
 		} else if(def instanceof NumberAttributeDefinition) {
 			NumericAttributeDefinition numberDef = (NumericAttributeDefinition) def;
-			if(fieldIndex != null && fieldIndex == 1) {
-				//unit name
-				fieldValue = value;
+			if(fieldIndex != null && fieldIndex == 2) {
+				//unit id
+				fieldValue = Integer.parseInt(value);
 			} else {
 				NumericAttributeDefinition.Type type = numberDef.getType();
 				Number number = null;
@@ -566,9 +566,9 @@ public class DataService {
 				}
 			}
 		} else if(def instanceof RangeAttributeDefinition) {
-			if(fieldIndex != null && fieldIndex == 2) {
-				//unit name
-				fieldValue = value;
+			if(fieldIndex != null && fieldIndex == 3) {
+				//unit id
+				fieldValue = Integer.parseInt(value);
 			} else {
 				RangeAttributeDefinition.Type type = ((RangeAttributeDefinition) def).getType();
 				Number number = null;
