@@ -55,7 +55,7 @@ public class RecordConverter {
 		});
 	}
 	
-	protected void moveDataToNewUnitField(CollectSurvey survey, Field<String> unitNameField, Field<Integer> unitField) {
+	protected void moveDataToNewUnitField(CollectSurvey survey, Field<String> unitNameField, Field<Integer> unitField) throws RecordConversionException {
 		unitField.setRemarks(unitNameField.getRemarks());
 		unitField.setSymbol(unitNameField.getSymbol());
 		unitField.getState().set(unitNameField.getState().intValue());
@@ -64,6 +64,8 @@ public class RecordConverter {
 			Unit unit = survey.getUnit(unitName);
 			if ( unit != null ) {
 				unitField.setValue(unit.getId());
+			} else {
+				throw new RecordConversionException("Cannot find unit with name: " + unitName);
 			}
 		}
 		unitNameField.getState().set(0);
