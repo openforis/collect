@@ -7,6 +7,7 @@
 
 package org.openforis.collect.metamodel.proxy {
 	import org.openforis.collect.util.CollectionUtil;
+	import org.openforis.collect.util.TextUtil;
 	import org.openforis.collect.util.UIUtil;
 	
 	/**
@@ -46,7 +47,7 @@ package org.openforis.collect.metamodel.proxy {
 				label = getLabel(null, language, true);
 			}
 			if(label != null) {
-				return label.text;
+				return TextUtil.trimLeadingWhitespace(label.text);
 			} else if ( nameIfNotFound ) {
 				return name;
 			} else {
@@ -70,6 +71,7 @@ package org.openforis.collect.metamodel.proxy {
 		
 		public function getDescription(language:String = null):String {
 			var result:String = LanguageSpecificTextProxy.getLocalizedText(descriptions, language);
+			result = TextUtil.trimLeadingWhitespace(result);
 			return result;
 		}
 		
