@@ -23,6 +23,11 @@ package org.openforis.collect.ui.component.detail {
 		
 		public function CollectFormItem() {
 			this.addEventListener(FlexEvent.CREATION_COMPLETE, creationCompleteHandler);
+			this.addEventListener(FlexEvent.INITIALIZE, initializeHandler);
+		}
+		
+		protected function initializeHandler(event:FlexEvent):void {
+			
 		}
 		
 		protected function creationCompleteHandler(event:FlexEvent):void {

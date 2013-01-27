@@ -26,6 +26,7 @@
 			import org.openforis.collect.util.ApplicationConstants;
 			import org.openforis.collect.util.CollectionUtil;
 			import org.openforis.collect.util.StringUtil;
+			import org.openforis.collect.util.UIUtil;
 			
 			public static const STATE_WITH_TABS:String = "withTabs";
 			public static const STATE_WITHOUT_TABS:String = "withoutTabs";
@@ -196,8 +197,10 @@
 		<component:AddEntityControlBar id="addSection"
 									   entityDefinition="{entityDefinition}"
 									   entities="{entities}"
-									   includeInLayout="{entityDefinition.multiple &amp;&amp; entityDefinition.parent != null}" 
-									   visible="{entityDefinition.multiple &amp;&amp; entityDefinition.parent != null}" />
+									   includeInLayout="{entityDefinition.multiple &amp;&amp; entityDefinition.parent != null
+									   		&amp;&amp; entityDefinition.layout == UIUtil.LAYOUT_FORM}" 
+									   visible="{entityDefinition.multiple &amp;&amp; entityDefinition.parent != null
+									   		&amp;&amp; entityDefinition.layout == UIUtil.LAYOUT_FORM}" />
 		<s:Group id="internalContainer" 
 				 height="100%" width="100%"
 				 showEffect="{showFormEffect}" 

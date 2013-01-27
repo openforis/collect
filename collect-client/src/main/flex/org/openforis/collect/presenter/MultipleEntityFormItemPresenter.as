@@ -11,6 +11,7 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.event.InputFieldEvent;
+	import org.openforis.collect.metamodel.proxy.UIOptionsProxy;
 	import org.openforis.collect.metamodel.proxy.UITabProxy;
 	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.remoting.service.UpdateRequest;
@@ -71,17 +72,16 @@ package org.openforis.collect.presenter
 			if(view.entityDefinition != null
 					&& view.entityDefinition.multiple
 					&& view.parentEntity != null) {
-				var uiTab:UITabProxy = UIBuilder.getUITab(view.entityDefinition);
 				var uiTabs:IList = null;
-				if ( uiTab != null ) {
-					uiTabs = uiTab.tabs;
+				if ( view.uiTab != null ) {
+					uiTabs = view.uiTab.tabs;
 				}
 				if ( CollectionUtil.isEmpty(uiTabs) ) {
 					view.currentState = MultipleEntityFormItem.STATE_WITHOUT_TABS;
-					view.definitionsPerMainTab = UIBuilder.getDefinitionsPerMainTab(view.entityDefinition, view.modelVersion);
+					view.definitionsPerMainTab = UIOptionsProxy.getDefinitionsPerMainTab(view.entityDefinition, view.modelVersion);
 				} else {
 					view.uiTabs = uiTabs;
-					view.definitionsPerTab = UIBuilder.getDefinitionsPerEachSubTab(view.entityDefinition, view.modelVersion);
+					view.definitionsPerTab = UIOptionsProxy.getDefinitionsPerEachSubTab(view.entityDefinition, view.modelVersion);
 					view.currentState = MultipleEntityFormItem.STATE_WITH_TABS;
 				}
 				var entities:IList = getEntities();

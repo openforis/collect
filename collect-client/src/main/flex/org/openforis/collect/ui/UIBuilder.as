@@ -48,6 +48,7 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.ui.component.detail.MultipleEntityFormItem;
 	import org.openforis.collect.ui.component.detail.SingleAttributeFormItem;
 	import org.openforis.collect.ui.component.detail.SingleEntityFormItem;
+	import org.openforis.collect.ui.component.detail.TabContentContainer;
 	import org.openforis.collect.ui.component.input.AutoCompleteInputField;
 	import org.openforis.collect.ui.component.input.BooleanInputField;
 	import org.openforis.collect.ui.component.input.CodeInputField;
@@ -72,6 +73,7 @@ package org.openforis.collect.ui {
 	
 	import spark.components.HGroup;
 	import spark.components.Label;
+	import spark.components.NavigatorContent;
 	import spark.components.SkinnableContainer;
 	import spark.components.gridClasses.GridColumn;
 	
@@ -88,10 +90,15 @@ package org.openforis.collect.ui {
 		public static function buildForm(rootEntity:EntityDefinitionProxy, version:ModelVersionProxy):FormContainer {
 			var formContainer:FormContainer = new FormContainer();
 			formContainer.initialize();
-			
+			var tabContentContainer:TabContentContainer = new TabContentContainer();
+			tabContentContainer.entityDefinition = rootEntity;
+			tabContentContainer.modelVersion = version;
+			tabContentContainer.uiTabSet = UIOptionsProxy.getRootEntityTabSet(rootEntity);
+			BindingUtils.bindProperty(tabContentContainer, "entity", formContainer, ["record", "rootEntity"]);
+			formContainer.addElement(tabContentContainer);
+			/*
 			addMainEntityFormContainer(formContainer, rootEntity, version);
-			
-			var rootTabSet:UITabSetProxy = getRootEntityTabSet(rootEntity);
+			var rootTabSet:UITabSetProxy = UIOptionsProxy.getRootEntityTabSet(rootEntity);
 			if ( rootTabSet != null && rootTabSet.tabs != null) {
 				for each (var tab:UITabProxy in rootTabSet.tabs) {
 					if ( ! isMainTab(rootTabSet, tab) ) {
@@ -99,6 +106,7 @@ package org.openforis.collect.ui {
 					}
 				}
 			}
+			*/
 			return formContainer;
 		}
 		
@@ -108,7 +116,7 @@ package org.openforis.collect.ui {
 		private static function isMainTab(rootTabSet:UITabSetProxy, tab:UITabProxy):Boolean {
 			return rootTabSet.tabs.getItemIndex(tab) == 0;
 		}
-		
+/*
 		private static function addMainEntityFormContainer(formContainer:FormContainer, rootEntity:EntityDefinitionProxy, version:ModelVersionProxy):void {
 			var form:EntityFormContainer = new EntityFormContainer();
 			form.entityDefinition = rootEntity;
@@ -116,10 +124,9 @@ package org.openforis.collect.ui {
 			
 			form.build();
 			formContainer.addEntityFormContainer(form);
-			/*
-			in this case the parentEntity of the formContainer will be null and 
-			the "entity" will be record's "rootEntity"
-			*/
+			
+			// in this case the parentEntity of the formContainer will be null and 
+			// the "entity" will be record's "rootEntity"
 			form.parentEntity = null;
 			BindingUtils.bindProperty(form, "entity", formContainer, ["record", "rootEntity"]);
 		}
@@ -133,13 +140,11 @@ package org.openforis.collect.ui {
 				childForm.modelVersion = version;
 				childForm.build();
 				formContainer.addEntityFormContainer(childForm);
-				/*
-				in this case the parentEntity will be the record's rootEntity
-				*/
+				//in this case the parentEntity will be the record's rootEntity
 				BindingUtils.bindProperty(childForm, "parentEntity", formContainer, ["record", "rootEntity"]);
 			}
 		}
-		
+*/		
 		public static function getRecordSummaryListColumns(rootEntity:EntityDefinitionProxy):IList {
 			var columns:IList = new ArrayList();
 			var column:GridColumn;
@@ -532,71 +537,6 @@ package org.openforis.collect.ui {
 				}
 			}
 			return result;
-		}
-		
-		/**
-		 * Returns a list of lists of NodeDefinitionProxy object.
-		 * Each item of the list is a list of node definitions associated to the tab in that index.
-		 **/
-		public static function getDefinitionsPerEachSubTab(entityDefinition:EntityDefinitionProxy, version:ModelVersionProxy):IList {
-			var result:IList = new ArrayCollection();
-			var uiTab:UITabProxy = getUITab(entityDefinition);
-			if ( uiTab != null ) {
-				var tabs:ListCollectionView = uiTab.tabs;
-				if ( CollectionUtil.isNotEmpty(tabs) ) {
-					var totalTabs:int = tabs.length;
-					for(var i:int = 0; i < totalTabs; i ++) {
-						result.addItemAt(new ArrayCollection(), i);
-					}
-					//put each definition in the corresponding list per tab
-					var childDefns:IList = UIBuilder.getDefinitionsInVersion(entityDefinition.childDefinitions, version);
-					for each (var defn:NodeDefinitionProxy in childDefns) {
-						var tabName:String = defn.uiTabName;
-						var tabIndex:int = CollectionUtil.getItemIndex(tabs, "name", tabName);
-						if(tabIndex >= 0) {
-							var nodeDefs:IList = result[tabIndex];
-							nodeDefs.addItem(defn);
-						}
-					}
-				}
-			}
-			return result;
-		}
-			
-		public static function getDefinitionsPerMainTab(entityDefinition:EntityDefinitionProxy, version:ModelVersionProxy):IList {
-			var result:IList = new ArrayCollection();
-			var uiTab:UITabProxy = getUITab(entityDefinition);
-			var childDefns:IList = UIBuilder.getDefinitionsInVersion(entityDefinition.childDefinitions, version);
-			for each (var defn:NodeDefinitionProxy in childDefns) {
-				var tabName:String = defn.uiTabName;
-				if ( tabName == uiTab.name ) {
-					result.addItem(defn);
-				}
-			}
-			return result;
-		}
-		
-		public static function getRootEntityTabSet(rootEntityDefinition:EntityDefinitionProxy):UITabSetProxy {
-			var survey:SurveyProxy = rootEntityDefinition.survey;
-			var uiOpts:UIOptionsProxy = survey.uiOptions;
-			var tabSet:UITabSetProxy = null;
-			if(uiOpts != null) {
-				var tabSetName:String = rootEntityDefinition.rootTabSetName;
-				tabSet = uiOpts.getTabSet(tabSetName);
-			}
-			return tabSet;
-		}
-		
-		public static function getUITab(nodeDefn:NodeDefinitionProxy):UITabProxy {
-			var survey:SurveyProxy = nodeDefn.survey;
-			var rootEntity:EntityDefinitionProxy = nodeDefn.rootEntity;
-			var tabSet:UITabSetProxy = getRootEntityTabSet(rootEntity);
-			if ( tabSet != null ) {
-				var tab:UITabProxy = tabSet.getTab(nodeDefn.uiTabName);
-				return tab;
-			} else {
-				return null;
-			}
 		}
 		
 	}

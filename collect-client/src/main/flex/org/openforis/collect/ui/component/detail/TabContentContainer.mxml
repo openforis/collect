@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:NavigatorContent xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 width="100%" height="100%" 
+		 xmlns:detail="org.openforis.collect.ui.component.detail.*" xmlns:layout="org.openforis.collect.ui.layout.*"
+		 creationComplete="creationCompleteHandler(event)">
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.collections.IList;
+			import mx.collections.ListCollectionView;
+			import mx.events.FlexEvent;
+			
+			import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
+			import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
+			import org.openforis.collect.metamodel.proxy.UITabProxy;
+			import org.openforis.collect.metamodel.proxy.UITabSetProxy;
+			import org.openforis.collect.model.proxy.EntityProxy;
+			import org.openforis.collect.presenter.TabContentPresenter;
+
+			private var _modelVersion:ModelVersionProxy;
+			private var _entityDefinition:EntityDefinitionProxy;
+			private var _uiTabSet:UITabSetProxy;
+			private var _innerUITabs:IList;
+			private var _definitionsPerTab:IList;
+			private var _definitionsPerCurrentTab:IList;
+			private var _parentEntity:EntityProxy;
+			private var _entity:EntityProxy;
+			
+			private var _presenter:TabContentPresenter;
+			
+			protected function creationCompleteHandler(event:FlexEvent):void {
+				_presenter = new TabContentPresenter(this);
+			}
+			
+			[Bindable]
+			public function get entityDefinition():EntityDefinitionProxy {
+				return _entityDefinition;
+			}
+			
+			public function set entityDefinition(value:EntityDefinitionProxy):void {
+				_entityDefinition = value;
+			}
+			
+			[Bindable]
+			public function get modelVersion():ModelVersionProxy {
+				return _modelVersion;
+			}
+			
+			public function set modelVersion(value:ModelVersionProxy):void {
+				_modelVersion = value;
+			}
+			
+			[Bindable]
+			public function get uiTabSet():UITabSetProxy {
+				return _uiTabSet;
+			}
+			
+			public function set uiTabSet(value:UITabSetProxy):void {
+				_uiTabSet = value;
+			}
+			
+			[Bindable]
+			public function get parentEntity():EntityProxy {
+				return _parentEntity;
+			}
+			
+			public function set parentEntity(value:EntityProxy):void {
+				_parentEntity = value;
+			}
+			
+			[Bindable]
+			public function get entity():EntityProxy {
+				return _entity;
+			}
+			
+			public function set entity(value:EntityProxy):void {
+				_entity = value;
+			}
+			
+			[Bindable]
+			public function get definitionsPerCurrentTab():IList {
+				return _definitionsPerCurrentTab;
+			}
+			
+			public function set definitionsPerCurrentTab(value:IList):void {
+				_definitionsPerCurrentTab = value;
+			}
+			
+			[Bindable]
+			public function get innerUITabs():IList {
+				return _innerUITabs;
+			}
+			
+			public function set innerUITabs(value:IList):void {
+				_innerUITabs = value;
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<s:VGroup width="100%" height="100%" 
+			  gap="0" 
+			  >
+		<detail:ScrollableFormContainer 
+			id="withoutTabsContainer"
+			modelVersion="{modelVersion}"
+			entityDefinition="{entityDefinition}"
+			nodeDefinitions="{definitionsPerCurrentTab}"
+			entity="{entity}"
+			includeInLayout="{definitionsPerCurrentTab.length > 0}"
+			/>
+		
+		<s:TabBar id="tabBar" 
+				  dataProvider="{viewStack}"
+				  width="100%"
+				  includeInLayout="{innerUITabs.length > 0}">
+			<s:layout>
+				<layout:FlowLayout />
+			</s:layout>
+		</s:TabBar>
+		
+		<s:BorderContainer
+			width="100%" 
+			height="100%"
+			styleName="entityForm"
+			includeInLayout="{innerUITabs.length > 0}"
+			>
+			<mx:ViewStack id="viewStack" width="100%" height="100%" 
+						  verticalGap="0"
+						  creationPolicy="auto">
+				<mx:Repeater id="tabsRP" dataProvider="{innerUITabs}">
+					<detail:TabContentContainer 
+						id="tabContentContainers"
+						modelVersion="{modelVersion}"
+						entityDefinition="{entityDefinition}"
+						entity="{entity}"
+						uiTabSet="{UITabProxy(tabsRP.currentItem)}"
+						label="{UITabProxy(tabsRP.currentItem).labelText}"
+						/>
+				</mx:Repeater>
+			</mx:ViewStack>
+		</s:BorderContainer>
+	</s:VGroup>
+</s:NavigatorContent>

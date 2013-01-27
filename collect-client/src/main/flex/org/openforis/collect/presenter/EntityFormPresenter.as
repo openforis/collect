@@ -66,13 +66,19 @@ package org.openforis.collect.presenter
 		protected function updateView():void {
 			if(_view.entityDefinition != null) {
 				var entities:IList = getEntities();
-				if ( _view.entityDefinition.multiple && _view.entityDefinition.parent != null ) {
-					_view.entities = EntityProxy.sortEntitiesByKey(entities);
-					selectEntity(null);
-					selectFirstTab();
-				} else if(CollectionUtil.isNotEmpty(entities)) {
-					_view.entity = entities.getItemAt(0) as EntityProxy;
-					_view.internalContainer.visible = true;
+				if (CollectionUtil.isNotEmpty(entities) ) {
+					if ( _view.entityDefinition.parent == null ) {
+						_view.entity = entities.getItemAt(0) as EntityProxy;
+						_view.internalContainer.visible = true;
+					} else {
+						_view.entities = EntityProxy.sortEntitiesByKey(entities);
+						if ( _view.entityDefinition.multiple && _view.entityDefinition.layout == UIUtil.LAYOUT_FORM ) {
+							selectEntity(null);
+							selectFirstTab();
+						} else {
+							_view.internalContainer.visible = true;
+						}
+					}
 				}
 			}
 		}

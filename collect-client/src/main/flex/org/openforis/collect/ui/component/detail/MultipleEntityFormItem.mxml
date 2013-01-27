@@ -17,12 +17,15 @@
 			
 			import org.openforis.collect.Application;
 			import org.openforis.collect.i18n.Message;
+			import org.openforis.collect.metamodel.proxy.UIOptionsProxy;
+			import org.openforis.collect.metamodel.proxy.UITabProxy;
 			import org.openforis.collect.model.proxy.EntityProxy;
 			import org.openforis.collect.presenter.MultipleEntityFormItemPresenter;
 			import org.openforis.collect.ui.Images;
 			
 			private var _entities:IList;
 			private var _selectedEntity:EntityProxy;
+			private var _uiTab:UITabProxy;
 			private var _uiTabs:IList;
 			private var _definitionsPerTab:IList;
 			private var _definitionsPerMainTab:IList;
@@ -31,6 +34,12 @@
 			public static const STATE_WITHOUT_TABS:String = "withoutTabs";
 			
 			//private var _constraintLayout:ConstraintLayout;
+			
+			override protected function initializeHandler(event:FlexEvent):void {
+				if (entityDefinition != null) {
+					uiTab = UIOptionsProxy.getUITab(entityDefinition);
+				}
+			}
 			
 			override protected function creationCompleteHandler(event:FlexEvent):void {
 				super.creationCompleteHandler(event);
@@ -87,6 +96,15 @@
 				_definitionsPerMainTab = value;
 			}
 			
+			[Bindable]
+			public function get uiTab():UITabProxy {
+				return _uiTab;
+			}
+			
+			public function set uiTab(value:UITabProxy):void {
+				_uiTab = value;
+			}
+			
 		]]>
 	</fx:Script>
 	
@@ -129,6 +147,18 @@
 									   entities="{entities}"
 									   includeInLayout="{entityDefinition.multiple &amp;&amp; entityDefinition.parent != null}" 
 									   visible="{entityDefinition.multiple &amp;&amp; entityDefinition.parent != null}" />
+		<detail:TabContentContainer 
+			id="internalContainer" 
+			height="100%" width="100%"
+			modelVersion="{modelVersion}"
+			entityDefinition="{entityDefinition}"
+			entity="{entity}"
+			uiTabSet="{uiTab}"
+			label="{uiTab.labelText}"
+			showEffect="{showFormEffect}" 
+			hideEffect="{hideFormEffect}"
+			/>
+		<!--
 		<s:Group id="internalContainer" 
 				 height="100%" width="100%"
 				 showEffect="{showFormEffect}" 
@@ -176,7 +206,7 @@
 				entity="{entity}"
 				includeIn="withoutTabs"
 				/>
-		</s:Group>	
+		</s:Group>
+		-->
 	</s:BorderContainer>
-	
 </detail:EntityFormItem>
