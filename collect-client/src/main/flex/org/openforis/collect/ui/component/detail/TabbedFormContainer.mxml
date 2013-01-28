@@ -9,7 +9,6 @@
 	<fx:Script>
 		<![CDATA[
 			import mx.collections.IList;
-			import mx.collections.ListCollectionView;
 			import mx.events.FlexEvent;
 			
 			import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
@@ -17,7 +16,7 @@
 			import org.openforis.collect.metamodel.proxy.UITabProxy;
 			import org.openforis.collect.metamodel.proxy.UITabSetProxy;
 			import org.openforis.collect.model.proxy.EntityProxy;
-			import org.openforis.collect.presenter.TabContentPresenter;
+			import org.openforis.collect.presenter.TabbedFormPresenter;
 
 			private var _modelVersion:ModelVersionProxy;
 			private var _entityDefinition:EntityDefinitionProxy;
@@ -28,10 +27,29 @@
 			private var _parentEntity:EntityProxy;
 			private var _entity:EntityProxy;
 			
-			private var _presenter:TabContentPresenter;
+			private var _presenter:TabbedFormPresenter;
 			
 			protected function creationCompleteHandler(event:FlexEvent):void {
-				_presenter = new TabContentPresenter(this);
+				_presenter = new TabbedFormPresenter(this);
+			}
+			
+			public function reset():void {
+				resetTabBar();
+				resetScrollbars();
+			}
+			
+			private function resetTabBar():void {
+				tabBar.selectedIndex = 0;
+			}
+			
+			public function resetScrollbars():void {
+				definitionsPerCurrentTabContainer.resetScrollBars();
+				var forms:Array = viewStack.getChildren();
+				if ( form != null ) {
+					for each (var form:TabbedFormContainer in forms) {
+						form.resetScrollbars();
+					}
+				}
 			}
 			
 			[Bindable]
@@ -71,15 +89,6 @@
 			}
 			
 			[Bindable]
-			public function get entity():EntityProxy {
-				return _entity;
-			}
-			
-			public function set entity(value:EntityProxy):void {
-				_entity = value;
-			}
-			
-			[Bindable]
 			public function get definitionsPerCurrentTab():IList {
 				return _definitionsPerCurrentTab;
 			}
@@ -101,20 +110,20 @@
 	</fx:Script>
 	
 	<s:VGroup width="100%" height="100%" 
-			  gap="0" 
-			  >
-		<detail:ScrollableFormContainer 
-			id="withoutTabsContainer"
+			  gap="0">
+		<detail:InnerFormContainer 
+			id="definitionsPerCurrentTabContainer"
 			modelVersion="{modelVersion}"
 			entityDefinition="{entityDefinition}"
 			nodeDefinitions="{definitionsPerCurrentTab}"
-			entity="{entity}"
-			includeInLayout="{definitionsPerCurrentTab.length > 0}"
-			/>
+			parentEntity="{parentEntity}"
+			visible="{definitionsPerCurrentTab != null &amp;&amp; definitionsPerCurrentTab.length > 0}"
+			includeInLayout="{definitionsPerCurrentTab != null &amp;&amp; definitionsPerCurrentTab.length > 0}" />
 		
 		<s:TabBar id="tabBar" 
 				  dataProvider="{viewStack}"
 				  width="100%"
+				  visible="{innerUITabs.length > 0}"
 				  includeInLayout="{innerUITabs.length > 0}">
 			<s:layout>
 				<layout:FlowLayout />
@@ -125,17 +134,18 @@
 			width="100%" 
 			height="100%"
 			styleName="entityForm"
-			includeInLayout="{innerUITabs.length > 0}"
-			>
+			visible="{innerUITabs.length > 0}"
+			includeInLayout="{innerUITabs.length > 0}">
+			
 			<mx:ViewStack id="viewStack" width="100%" height="100%" 
 						  verticalGap="0"
 						  creationPolicy="auto">
 				<mx:Repeater id="tabsRP" dataProvider="{innerUITabs}">
-					<detail:TabContentContainer 
+					<detail:TabbedFormContainer 
 						id="tabContentContainers"
 						modelVersion="{modelVersion}"
 						entityDefinition="{entityDefinition}"
-						entity="{entity}"
+						parentEntity="{parentEntity}"
 						uiTabSet="{UITabProxy(tabsRP.currentItem)}"
 						label="{UITabProxy(tabsRP.currentItem).labelText}"
 						/>

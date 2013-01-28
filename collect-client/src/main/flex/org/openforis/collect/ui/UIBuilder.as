@@ -21,12 +21,10 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.metamodel.proxy.NumberAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.NumericAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.RangeAttributeDefinitionProxy;
-	import org.openforis.collect.metamodel.proxy.SurveyProxy;
 	import org.openforis.collect.metamodel.proxy.TaxonAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.TextAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.TextAttributeDefinitionProxy$Type;
 	import org.openforis.collect.metamodel.proxy.TimeAttributeDefinitionProxy;
-	import org.openforis.collect.metamodel.proxy.UIOptionsProxy;
 	import org.openforis.collect.metamodel.proxy.UITabProxy;
 	import org.openforis.collect.metamodel.proxy.UITabSetProxy;
 	import org.openforis.collect.metamodel.proxy.UnitProxy;
@@ -39,7 +37,6 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.ui.component.detail.AttributeItemRenderer;
 	import org.openforis.collect.ui.component.detail.CodeAttributeFormItem;
 	import org.openforis.collect.ui.component.detail.CompositeAttributeFormItem;
-	import org.openforis.collect.ui.component.detail.EntityFormContainer;
 	import org.openforis.collect.ui.component.detail.EntityFormItem;
 	import org.openforis.collect.ui.component.detail.FormContainer;
 	import org.openforis.collect.ui.component.detail.MultipleAttributeDataGroupFormItem;
@@ -48,7 +45,6 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.ui.component.detail.MultipleEntityFormItem;
 	import org.openforis.collect.ui.component.detail.SingleAttributeFormItem;
 	import org.openforis.collect.ui.component.detail.SingleEntityFormItem;
-	import org.openforis.collect.ui.component.detail.TabContentContainer;
 	import org.openforis.collect.ui.component.input.AutoCompleteInputField;
 	import org.openforis.collect.ui.component.input.BooleanInputField;
 	import org.openforis.collect.ui.component.input.CodeInputField;
@@ -67,13 +63,11 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.ui.component.input.StringInputField;
 	import org.openforis.collect.ui.component.input.TaxonAttributeRenderer;
 	import org.openforis.collect.ui.component.input.TimeAttributeRenderer;
-	import org.openforis.collect.util.CollectionUtil;
 	import org.openforis.collect.util.StringUtil;
 	import org.openforis.collect.util.UIUtil;
 	
 	import spark.components.HGroup;
 	import spark.components.Label;
-	import spark.components.NavigatorContent;
 	import spark.components.SkinnableContainer;
 	import spark.components.gridClasses.GridColumn;
 	
@@ -89,24 +83,8 @@ package org.openforis.collect.ui {
 		
 		public static function buildForm(rootEntity:EntityDefinitionProxy, version:ModelVersionProxy):FormContainer {
 			var formContainer:FormContainer = new FormContainer();
-			formContainer.initialize();
-			var tabContentContainer:TabContentContainer = new TabContentContainer();
-			tabContentContainer.entityDefinition = rootEntity;
-			tabContentContainer.modelVersion = version;
-			tabContentContainer.uiTabSet = UIOptionsProxy.getRootEntityTabSet(rootEntity);
-			BindingUtils.bindProperty(tabContentContainer, "entity", formContainer, ["record", "rootEntity"]);
-			formContainer.addElement(tabContentContainer);
-			/*
-			addMainEntityFormContainer(formContainer, rootEntity, version);
-			var rootTabSet:UITabSetProxy = UIOptionsProxy.getRootEntityTabSet(rootEntity);
-			if ( rootTabSet != null && rootTabSet.tabs != null) {
-				for each (var tab:UITabProxy in rootTabSet.tabs) {
-					if ( ! isMainTab(rootTabSet, tab) ) {
-						addChildEntityFormContainer(formContainer, rootEntity, version, tab);
-					}
-				}
-			}
-			*/
+			formContainer.rootEntityDefinition = rootEntity;
+			formContainer.version = version;
 			return formContainer;
 		}
 		
@@ -116,35 +94,7 @@ package org.openforis.collect.ui {
 		private static function isMainTab(rootTabSet:UITabSetProxy, tab:UITabProxy):Boolean {
 			return rootTabSet.tabs.getItemIndex(tab) == 0;
 		}
-/*
-		private static function addMainEntityFormContainer(formContainer:FormContainer, rootEntity:EntityDefinitionProxy, version:ModelVersionProxy):void {
-			var form:EntityFormContainer = new EntityFormContainer();
-			form.entityDefinition = rootEntity;
-			form.modelVersion = version;
-			
-			form.build();
-			formContainer.addEntityFormContainer(form);
-			
-			// in this case the parentEntity of the formContainer will be null and 
-			// the "entity" will be record's "rootEntity"
-			form.parentEntity = null;
-			BindingUtils.bindProperty(form, "entity", formContainer, ["record", "rootEntity"]);
-		}
-		
-		private static function addChildEntityFormContainer(formContainer:FormContainer, rootEntity:EntityDefinitionProxy, version:ModelVersionProxy, tab:UITabProxy):void {
-			var childForm:EntityFormContainer = new EntityFormContainer();
-			var child:NodeDefinitionProxy = rootEntity.getChildDefinitionByTabName(tab.name);
-			if(child is EntityDefinitionProxy) {
-				var edp:EntityDefinitionProxy = child as EntityDefinitionProxy;
-				childForm.entityDefinition = edp;
-				childForm.modelVersion = version;
-				childForm.build();
-				formContainer.addEntityFormContainer(childForm);
-				//in this case the parentEntity will be the record's rootEntity
-				BindingUtils.bindProperty(childForm, "parentEntity", formContainer, ["record", "rootEntity"]);
-			}
-		}
-*/		
+
 		public static function getRecordSummaryListColumns(rootEntity:EntityDefinitionProxy):IList {
 			var columns:IList = new ArrayList();
 			var column:GridColumn;
@@ -179,17 +129,6 @@ package org.openforis.collect.ui {
 					}
 				}
 			}
-			/*
-			//errors count column
-			column = getGridColumn(Message.get("list.errors"), "errors", 80, UIUtil.gridColumnNumberLabelFunction);
-			columns.addItem(column);
-			//skipped count column
-			column = getGridColumn(Message.get("list.skipped"), "skipped", 80, UIUtil.gridColumnNumberLabelFunction);
-			columns.addItem(column);
-			//missing count column
-			column = getGridColumn(Message.get("list.missing"), "missing", 80, UIUtil.gridColumnNumberLabelFunction);
-			columns.addItem(column);
-			*/
 			//errors count column
 			column = getGridColumn(Message.get("list.errors"), "errors", 80, RecordSummaryDataGrid.errorsCountLabelFunction, false, new ClassFactory(RecordSummaryErrorsColumnItemRenderer));
 			columns.addItem(column);

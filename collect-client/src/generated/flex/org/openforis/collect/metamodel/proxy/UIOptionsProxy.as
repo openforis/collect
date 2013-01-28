@@ -31,7 +31,7 @@ package org.openforis.collect.metamodel.proxy {
 			return null;
 		}
 		
-		public static function getDefinitionsPerTab(entityDefinition:EntityDefinitionProxy, version:ModelVersionProxy, tabSet:UITabSetProxy):IList {
+		public static function getDefinitionsPerTab(entityDefinition:EntityDefinitionProxy, version:ModelVersionProxy, tabSet:UITabProxy):IList {
 			var result:IList = new ArrayCollection();
 			var tabName:String = tabSet.name;
 			var childDefns:IList = UIBuilder.getDefinitionsInVersion(entityDefinition.childDefinitions, version);

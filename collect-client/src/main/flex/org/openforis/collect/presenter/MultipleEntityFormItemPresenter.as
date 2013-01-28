@@ -11,16 +11,17 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.event.InputFieldEvent;
-	import org.openforis.collect.metamodel.proxy.UIOptionsProxy;
-	import org.openforis.collect.metamodel.proxy.UITabProxy;
 	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.remoting.service.UpdateRequest;
 	import org.openforis.collect.remoting.service.UpdateRequestOperation;
 	import org.openforis.collect.remoting.service.UpdateRequestOperation$Method;
-	import org.openforis.collect.ui.UIBuilder;
 	import org.openforis.collect.ui.component.detail.MultipleEntityFormItem;
 	import org.openforis.collect.ui.component.input.InputField;
 	import org.openforis.collect.util.AlertUtil;
+	import org.openforis.collect.util.CollectionUtil;
+	import org.openforis.collect.util.UIUtil;
+	
+	import spark.events.IndexChangeEvent;
 	import org.openforis.collect.util.CollectionUtil;
 	import org.openforis.collect.util.UIUtil;
 	
@@ -72,18 +73,6 @@ package org.openforis.collect.presenter
 			if(view.entityDefinition != null
 					&& view.entityDefinition.multiple
 					&& view.parentEntity != null) {
-				var uiTabs:IList = null;
-				if ( view.uiTab != null ) {
-					uiTabs = view.uiTab.tabs;
-				}
-				if ( CollectionUtil.isEmpty(uiTabs) ) {
-					view.currentState = MultipleEntityFormItem.STATE_WITHOUT_TABS;
-					view.definitionsPerMainTab = UIOptionsProxy.getDefinitionsPerMainTab(view.entityDefinition, view.modelVersion);
-				} else {
-					view.uiTabs = uiTabs;
-					view.definitionsPerTab = UIOptionsProxy.getDefinitionsPerEachSubTab(view.entityDefinition, view.modelVersion);
-					view.currentState = MultipleEntityFormItem.STATE_WITH_TABS;
-				}
 				var entities:IList = getEntities();
 				view.entities = EntityProxy.sortEntitiesByKey(entities);
 				selectEntity(null);
@@ -188,8 +177,8 @@ package org.openforis.collect.presenter
 			//select the inserted entity
 			_view.callLater(function():void {
 				var entities:IList = getEntities();
-				var lastEntity:EntityProxy = entities.getItemAt(entities.length -1) as EntityProxy; 
-				selectEntity(lastEntity);
+				var lastEntity:EntityProxy = entities.getItemAt(entities.length -1) as EntityProxy;
+				selectEntity(lastEntity, true);
 			});
 		}
 		
@@ -207,10 +196,10 @@ package org.openforis.collect.presenter
 			selectEntity(entity);
 		}
 		
-		protected function selectEntity(entity:EntityProxy):void {
-			view.selectedEntity = entity;
+		protected function selectEntity(entity:EntityProxy, resetView:Boolean = false):void {
 			view.addSection.dropDownList.selectedItem = entity;
 			view.entity = entity;
+			view.internalContainer.reset();
 			if(entity != null) {
 				if(view.internalContainer.visible) {
 					//internal container already visible, call programmatically the showEffect
