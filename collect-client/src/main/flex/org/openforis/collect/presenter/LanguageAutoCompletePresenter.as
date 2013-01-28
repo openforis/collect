@@ -6,6 +6,7 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.Application;
 	import org.openforis.collect.i18n.Languages;
 	import org.openforis.collect.model.LanguageItem;
+	import org.openforis.collect.model.proxy.FieldProxy;
 	import org.openforis.collect.ui.component.input.AutoCompletePopUp;
 	import org.openforis.collect.ui.component.input.LanguageAutoComplete;
 	import org.openforis.collect.ui.component.input.LanguageCodeAutoCompletePopUp;
@@ -36,7 +37,7 @@ package org.openforis.collect.presenter
 		
 		override protected function textToRequestValue():String {
 			var label:String = super.textToRequestValue();
-			if ( StringUtil.isNotBlank(label) ) {
+			if ( StringUtil.isNotBlank(label) && ! FieldProxy.isShortCutForReasonBlank(label) ) {
 				return Languages.getCode(label);
 			} else {
 				return label;
@@ -46,7 +47,12 @@ package org.openforis.collect.presenter
 		override protected function getTextFromValue():String {
 			var code:String = super.getTextFromValue();
 			if ( StringUtil.isNotBlank(code) ) {
-				return Languages.getLanguageLabel(code);
+				var language:String = Languages.getLanguageLabel(code);
+				if ( language != null ) {
+					return language;
+				} else {
+					return code;
+				}
 			} else {
 				return code;
 			}

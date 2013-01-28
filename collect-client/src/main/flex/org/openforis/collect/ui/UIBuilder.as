@@ -78,10 +78,10 @@ package org.openforis.collect.ui {
 	 * */
 	public class UIBuilder {
 		
+		public static const COMPOSITE_ATTRIBUTE_H_GAP:int = 6;
 		private static const DATA_GROUP_HEADER_STYLE:String = "dataGroupHeader";
 		private static const HEADER_LABEL_STYLE:String = "bold";
 		private static const NUMBERED_LABEL_SEPARATOR:String = ". ";
-		private static const COMPOSITE_ATTRIBUTE_HEADER_LABEL_GAP:int = 6;
 		
 		public static function buildForm(rootEntity:EntityDefinitionProxy, version:ModelVersionProxy):FormContainer {
 			var formContainer:FormContainer = new FormContainer();
@@ -209,7 +209,7 @@ package org.openforis.collect.ui {
 				}
 			} else if(def is CoordinateAttributeDefinitionProxy) {
 				if(parentLayout == UIUtil.LAYOUT_TABLE) {
-					return 100 + 70 + 70 + COMPOSITE_ATTRIBUTE_HEADER_LABEL_GAP * 2;
+					return 100 + 70 + 70 + COMPOSITE_ATTRIBUTE_H_GAP * 2;
 				} else {
 					return 100;
 				}
@@ -400,7 +400,7 @@ package org.openforis.collect.ui {
 				result.addElement(l);
 				//subheader
 				h = new HGroup();
-				h.gap = COMPOSITE_ATTRIBUTE_HEADER_LABEL_GAP;
+				h.gap = COMPOSITE_ATTRIBUTE_H_GAP;
 				l = getLabel(Message.get('edit.taxon.code'), 80, HEADER_LABEL_STYLE);
 				h.addElement(l);
 				l = getLabel(Message.get('edit.taxon.scientificName'), 100, HEADER_LABEL_STYLE);
@@ -414,11 +414,11 @@ package org.openforis.collect.ui {
 				result.addElement(h);
 			} else if(defn is CoordinateAttributeDefinitionProxy) {
 				//attribute label
-				l = getLabel(defnLabel, 100 + 70 + 70 + COMPOSITE_ATTRIBUTE_HEADER_LABEL_GAP * 2, HEADER_LABEL_STYLE);
+				l = getLabel(defnLabel, 100 + 70 + 70 + COMPOSITE_ATTRIBUTE_H_GAP * 2, HEADER_LABEL_STYLE);
 				result.addElement(l);
 				//subheader
 				h = new HGroup();
-				h.gap = COMPOSITE_ATTRIBUTE_HEADER_LABEL_GAP;
+				h.gap = COMPOSITE_ATTRIBUTE_H_GAP;
 				l = getLabel(Message.get('edit.coordinate.srs'), 100, HEADER_LABEL_STYLE);
 				h.addElement(l);
 				l = getLabel(Message.get('edit.coordinate.x'), 70, HEADER_LABEL_STYLE);

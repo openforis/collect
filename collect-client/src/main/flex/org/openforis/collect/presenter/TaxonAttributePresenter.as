@@ -88,7 +88,7 @@ package org.openforis.collect.presenter {
 		protected function inputFieldFocusOutHandler(event:FocusEvent):void {
 			var inputField:InputField = event.target.document;
 			if ( inputField != null && inputField.changed ) {
-				if ( ! autoCompletePopUpOpened && ! UIUtil.isFocusOnComponent(autoCompletePopUp) ) {
+				if ( ! autoCompletePopUpOpened && ! UIUtil.isFocussed(autoCompletePopUp) ) {
 					inputField.presenter.updateValue();
 					if ( inputField != view.codeTextInput && ! inputField.isEmpty() && 
 						(view.codeTextInput.isEmpty() || FieldProxy.isShortCutForReasonBlank(view.codeTextInput.text)) ) {

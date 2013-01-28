@@ -11,6 +11,7 @@
 		<![CDATA[
 			import org.openforis.collect.i18n.Message;
 			import org.openforis.collect.presenter.TaxonAttributePresenter;
+			import org.openforis.collect.ui.UIBuilder;
 			
 			override protected function initPresenter():void {
 				presenter = new TaxonAttributePresenter(this);
@@ -23,7 +24,7 @@
 		<s:State name="vertical" />
 	</detail:states>
 	
-	<s:HGroup includeIn="horizontal" gap="6">
+	<s:HGroup includeIn="horizontal" gap="{UIBuilder.COMPOSITE_ATTRIBUTE_H_GAP}">
 		<input:StringInputField id="codeTextInput" 
 								includeIn="horizontal"
 								attributeDefinition="{attributeDefinition}"
