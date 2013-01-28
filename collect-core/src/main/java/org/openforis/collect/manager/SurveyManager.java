@@ -7,7 +7,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -60,14 +59,24 @@ public class SurveyManager {
 		surveysByUri.clear();
 		surveys = surveyDao.loadAll();
 		for (CollectSurvey survey : surveys) {
-			initSurvey(survey);
+			addToCache(survey);
 		}
 	}
 
-	private void initSurvey(CollectSurvey survey) {
+	private void addToCache(CollectSurvey survey) {
+		if ( ! surveys.contains(survey) ) {
+			surveys.add(survey);
+		}
 		surveysById.put(survey.getId(), survey);
 		surveysByName.put(survey.getName(), survey);
 		surveysByUri.put(survey.getUri(), survey);
+	}
+	
+	protected void removeFromCache(CollectSurvey survey) {
+		surveys.remove(survey);
+		surveysById.remove(survey.getId());
+		surveysByName.remove(survey.getName());
+		surveysByUri.remove(survey.getUri());
 	}
 	
 	public List<CollectSurvey> getAll() {
@@ -89,25 +98,20 @@ public class SurveyManager {
 	@Transactional
 	public void importModel(CollectSurvey survey) throws SurveyImportException {
 		surveyDao.importModel(survey);
-		surveys.add(survey);
-		initSurvey(survey);
+		addToCache(survey);
 	}
 	
 	@Transactional
 	public void updateModel(CollectSurvey survey) throws SurveyImportException {
 		//remove old survey from surveys cache
-		String name = survey.getName();
-		Iterator<CollectSurvey> iterator = surveys.iterator();
-		while ( iterator.hasNext() ) {
-			CollectSurvey oldSurvey = iterator.next();
-			if (oldSurvey.getName().equals(name)) {
-				iterator.remove();
-				break;
-			}
+		CollectSurvey oldSurvey = surveysByName.get(survey.getName());
+		if ( oldSurvey != null ) {
+			removeFromCache(oldSurvey);
+		} else {
+			throw new SurveyImportException("Could not find survey to update");
 		}
 		surveyDao.updateModel(survey);
-		surveys.add(survey);
-		initSurvey(survey);
+		addToCache(survey);
 	}
 
 	@Transactional
