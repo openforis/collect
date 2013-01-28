@@ -50,7 +50,7 @@
 								  parentEntity="{parentEntity}"
 								  attribute="{attribute}"
 								  fieldIndex="2"
-								  width="70" 
+								  width="100" 
 								  dataField="id"
 								  includeIn="horizontal" 
 								  itemCreationPolicy="immediate"

@@ -209,7 +209,7 @@ package org.openforis.collect.ui {
 				if(parentLayout == UIUtil.LAYOUT_TABLE) {
 					return 260;
 				} else {
-					return 100;
+					return 130;
 				}
 			} else if(def is DateAttributeDefinitionProxy) {
 				return 130;
