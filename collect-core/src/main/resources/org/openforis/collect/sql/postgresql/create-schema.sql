@@ -32,7 +32,7 @@ CREATE TABLE "collect"."ofc_record"  (
 	"created_by_id"            	integer NULL,
 	"date_modified"            	timestamp NULL,
 	"modified_by_id"           	integer NULL,
-	"model_version"            	varchar(255) NOT NULL,
+	"model_version"            	varchar(255) NULL,
 	"step"                     	integer NULL,
 	"state"                    	char(1) NULL,
 	"skipped"                  	integer NULL,

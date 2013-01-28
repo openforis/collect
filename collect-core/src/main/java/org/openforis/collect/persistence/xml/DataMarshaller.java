@@ -53,8 +53,9 @@ public class DataMarshaller {
         serializer.startTag(null, rootEntityName);
         
         ModelVersion version = record.getVersion();
-		String versionName = version != null ? version.getName(): null;
-		serializer.attribute(null, RECORD_VERSION_ATTRIBUTE, versionName);
+        if ( version != null ) {
+        	serializer.attribute(null, RECORD_VERSION_ATTRIBUTE, version.getName());
+        }
         serializer.attribute(null, RECORD_STEP_ATTRIBUTE, Integer.toString(record.getStep().getStepNumber()));
         if ( record.getState() != null ) {
             serializer.attribute(null, STATE_ATTRIBUTE, record.getState().getCode());
