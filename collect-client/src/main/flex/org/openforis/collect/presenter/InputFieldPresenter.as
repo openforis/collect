@@ -15,6 +15,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.event.InputFieldEvent;
 	import org.openforis.collect.event.NodeEvent;
 	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
+	import org.openforis.collect.metamodel.proxy.NumericAttributeDefinitionProxy;
 	import org.openforis.collect.model.FieldSymbol;
 	import org.openforis.collect.model.proxy.AttributeProxy;
 	import org.openforis.collect.model.proxy.EntityProxy;
@@ -173,22 +174,24 @@ package org.openforis.collect.presenter {
 				var field:FieldProxy;
 				if(isNaN(fieldIdx) || fieldIdx < 0){
 					for(var index:int = 0; index < attr.fields.length; index ++) {
-						field = attr.fields[index];
-						if ( applyToNonEmptyNodes || (field.value == null && field.symbol == null)) {
-							o = new UpdateRequestOperation();
-							o.method = UpdateRequestOperation$Method.UPDATE;
-							o.parentEntityId = node.parentId;
-							o.nodeName = node.name;
-							o.nodeId = node.id;
-							o.fieldIndex = index;
-							o.remarks = field.remarks;
-							o.symbol = symbol;
-							if ( FieldProxy.isReasonBlankSymbol(symbol) ) {
-								o.value = null;
-							} else {
-								o.value = field.value != null ? field.value.toString(): null;
+						if ( ! skippedField(attr, index) ) {
+							field = attr.fields[index];
+							if ( applyToNonEmptyNodes || (field.value == null && field.symbol == null)) {
+								o = new UpdateRequestOperation();
+								o.method = UpdateRequestOperation$Method.UPDATE;
+								o.parentEntityId = node.parentId;
+								o.nodeName = node.name;
+								o.nodeId = node.id;
+								o.fieldIndex = index;
+								o.remarks = field.remarks;
+								o.symbol = symbol;
+								if ( FieldProxy.isReasonBlankSymbol(symbol) ) {
+									o.value = null;
+								} else {
+									o.value = field.value != null ? field.value.toString(): null;
+								}
+								updateRequest.addOperation(o);
 							}
-							updateRequest.addOperation(o);
 						}
 					}
 				} else {
@@ -210,6 +213,15 @@ package org.openforis.collect.presenter {
 						updateRequest.addOperation(o);
 					}
 				}
+			}
+		}
+		
+		private static function skippedField(attr:AttributeProxy, index:int):Boolean {
+			if ( attr.definition is NumericAttributeDefinitionProxy && index == 1 ) {
+				//OFC-720
+				return true;
+			} else {
+				return false;
 			}
 		}
 
