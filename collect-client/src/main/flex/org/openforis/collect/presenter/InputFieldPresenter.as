@@ -15,7 +15,9 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.event.InputFieldEvent;
 	import org.openforis.collect.event.NodeEvent;
 	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
+	import org.openforis.collect.metamodel.proxy.NumberAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.NumericAttributeDefinitionProxy;
+	import org.openforis.collect.metamodel.proxy.RangeAttributeDefinitionProxy;
 	import org.openforis.collect.model.FieldSymbol;
 	import org.openforis.collect.model.proxy.AttributeProxy;
 	import org.openforis.collect.model.proxy.EntityProxy;
@@ -210,7 +212,8 @@ package org.openforis.collect.presenter {
 		}
 		
 		private static function skippedField(attr:AttributeProxy, index:int):Boolean {
-			if ( attr.definition is NumericAttributeDefinitionProxy && index == 1 ) {
+			if ( attr.definition is NumberAttributeDefinitionProxy && index == 1 || 
+				attr.definition is RangeAttributeDefinitionProxy && index == 2 ) {
 				//OFC-720
 				return true;
 			} else {
