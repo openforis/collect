@@ -5,12 +5,12 @@
       <column />
     </columns>
     <rows>
-      <row>
+      <row visible="${not vm.rootEntity}">
         <label value="${labels.survey.schema.entity.show_row_numbers}:" />
         <checkbox checked="@bind(fx.showRowNumbers)"
           onCheck="@command('applyChanges')" />
       </row>
-      <row>
+      <row visible="${not vm.rootEntity}">
         <label value="${labels.survey.schema.entity.count_in_record_summary}:" />
         <checkbox checked="@bind(fx.countInRecordSummary)"
           onCheck="@command('applyChanges')" />
