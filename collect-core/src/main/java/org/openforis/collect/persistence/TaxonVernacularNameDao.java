@@ -33,6 +33,26 @@ public class TaxonVernacularNameDao extends MappingJooqDaoSupport<TaxonVernacula
 		super(TaxonVernacularNameDao.JooqFactory.class);
 	}
 
+	@Override
+	public TaxonVernacularName loadById(int id) {
+		return super.loadById(id);
+	}
+
+	@Override
+	public void insert(TaxonVernacularName entity) {
+		super.insert(entity);
+	}
+
+	@Override
+	public void update(TaxonVernacularName entity) {
+		super.update(entity);
+	}
+
+	@Override
+	public void delete(int id) {
+		super.delete(id);
+	}
+	
 	public List<TaxonVernacularName> findByVernacularName(int taxonomyId, String searchString, int maxResults) {
 		return findByVernacularName(taxonomyId, searchString, null, maxResults);
 	}	
@@ -63,24 +83,10 @@ public class TaxonVernacularNameDao extends MappingJooqDaoSupport<TaxonVernacula
 		return entities;
 	}
 
-	@Override
-	public TaxonVernacularName loadById(int id) {
-		return super.loadById(id);
-	}
-
-	@Override
-	public void insert(TaxonVernacularName entity) {
-		super.insert(entity);
-	}
-
-	@Override
-	public void update(TaxonVernacularName entity) {
-		super.update(entity);
-	}
-
-	@Override
-	public void delete(int id) {
-		super.delete(id);
+	public void deleteByTaxonomy(int taxonomyId) {
+		JooqFactory jf = getMappingJooqFactory();
+		SelectConditionStep selectTaxonIds = jf.select(OFC_TAXON.ID).from(OFC_TAXON).where(OFC_TAXON.TAXONOMY_ID.equal(taxonomyId));
+		jf.delete(OFC_TAXON_VERNACULAR_NAME).where(OFC_TAXON_VERNACULAR_NAME.TAXON_ID.in(selectTaxonIds)).execute();
 	}
 	
 	protected static class JooqFactory extends MappingJooqFactory<TaxonVernacularName> {

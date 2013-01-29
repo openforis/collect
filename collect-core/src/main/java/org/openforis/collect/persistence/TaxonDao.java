@@ -68,6 +68,11 @@ public class TaxonDao extends MappingJooqDaoSupport<Taxon, TaxonDao.JooqFactory>
 		List<Taxon> entities = jf.fromResult(result);
 		return entities;
 	}
+
+	public void deleteByTaxonomy(int taxonomyId) {
+		JooqFactory jf = getMappingJooqFactory();
+		jf.delete(OFC_TAXON).where(OFC_TAXON.TAXONOMY_ID.equal(taxonomyId)).execute();
+	}
 	
 	protected static class JooqFactory extends MappingJooqFactory<Taxon> {
 

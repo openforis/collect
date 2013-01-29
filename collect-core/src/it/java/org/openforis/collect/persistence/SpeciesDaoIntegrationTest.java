@@ -194,6 +194,41 @@ public class SpeciesDaoIntegrationTest {
 		// Remove taxonomy
 		testDeleteAndLoadTaxonomy(taxonomy1);
 	}
+	
+	@Test
+	public void testDeleteTaxonByTaxonomy() {
+		// Create taxonomy
+		Taxonomy t = new Taxonomy();
+		t.setName("it_trees");
+		taxonomyDao.insert(t);
+		Integer tId = t.getId();
+		
+		Taxonomy t2 = new Taxonomy();
+		t2.setName("it_bamboos");
+		taxonomyDao.insert(t2);
+		Integer t2Id = t2.getId();
+		
+		Taxon family1 = testInsertAndLoadTaxon(t, -1, "JUGLANDACAE", "Juglandaceae", TaxonRank.FAMILY, 9, null);
+		Taxon genus1 = testInsertAndLoadTaxon(t, -2, "JUG", "Juglans sp.",TaxonRank.GENUS, 9, family1);
+		testInsertAndLoadTaxon(t, -3, "JUG/REG", "Juglans regia", TaxonRank.SPECIES, 9, genus1);
+		
+		Taxon family2 = testInsertAndLoadTaxon(t2, -1, "JUGLANDACAE", "Juglandaceae", TaxonRank.FAMILY, 9, null);
+		Taxon genus2 = testInsertAndLoadTaxon(t2, -2, "JUG", "Juglans sp.",TaxonRank.GENUS, 9, family2);
+		testInsertAndLoadTaxon(t2, -3, "JUG/REG", "Juglans regia", TaxonRank.SPECIES, 9, genus2);
+		
+		//verify taxon records present
+		List<Taxon> results = taxonDao.findByCode(tId, "%", 10);
+		assertEquals(3, results.size());
+		taxonDao.deleteByTaxonomy(tId);
+		
+		//verify all taxon records deleted for taxonomy 1
+		List<Taxon> results2 = taxonDao.findByCode(tId, "%", 10);
+		assertTrue(results2 == null || results2.size() == 0);
+		
+		//verify all taxon records NOT deleted for taxonomy 2
+		List<Taxon> results3 = taxonDao.findByCode(t2Id, "%", 10);
+		assertEquals(3, results3.size());
+	}
 
 	private Taxonomy testInsertAndLoadTaxonomy(String name) {
 		// Insert

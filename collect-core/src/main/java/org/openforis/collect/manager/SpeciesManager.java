@@ -83,6 +83,44 @@ public class SpeciesManager {
 		return result;
 	}
 
+	public void save(Taxonomy taxonomy) {
+		if ( taxonomy.getId() == null ) {
+			taxonomyDao.insert(taxonomy);
+		} else {
+			taxonomyDao.update(taxonomy);
+		}
+	}
+	
+	public void delete(Taxonomy taxonomy) {
+		Integer id = taxonomy.getId();
+		taxonDao.deleteByTaxonomy(id);
+		taxonomyDao.delete(id);
+	}
+	
+	public void save(Taxon taxon) {
+		if ( taxon.getSystemId() == null ) {
+			taxonDao.insert(taxon);
+		} else {
+			taxonDao.update(taxon);
+		}
+	}
+
+	public void delete(Taxon taxon) {
+		taxonDao.delete(taxon.getSystemId());
+	}
+	
+	public void save(TaxonVernacularName vernacularName) {
+		if ( vernacularName.getId() == null ) {
+			taxonVernacularNameDao.insert(vernacularName);
+		} else {
+			taxonVernacularNameDao.update(vernacularName);
+		}
+	}
+	
+	public void delete(TaxonVernacularName vernacularName) {
+		taxonVernacularNameDao.delete(vernacularName.getId());
+	}
+	
 	protected List<TaxonOccurrence> createOccurrenceList(
 			List<TaxonVernacularName> list) {
 		List<TaxonOccurrence> result = new ArrayList<TaxonOccurrence>();
