@@ -148,9 +148,7 @@
 			nodeDefinitions="{definitionsPerCurrentTab}"
 			parentEntity="{parentEntity}"
 			width.default="100%"
-			width.innerTabs="{NaN}"
 			height.default="100%"
-			height.innerTabs="{NaN}"
 			includeIn="default,complete" />
 		
 		<s:TabBar id="tabBar" 

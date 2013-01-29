@@ -3,9 +3,7 @@
 				   	xmlns:s="library://ns.adobe.com/flex/spark" 
 				   	xmlns:mx="library://ns.adobe.com/flex/mx" 
 					xmlns:detail="org.openforis.collect.ui.component.detail.*"
-					creationComplete="creationCompleteHandler(event)"
-					width="100%" 
-				   	height="100%">
+					creationComplete="creationCompleteHandler(event)">
 	<fx:Script>
 		<![CDATA[
 			import mx.binding.utils.BindingUtils;
