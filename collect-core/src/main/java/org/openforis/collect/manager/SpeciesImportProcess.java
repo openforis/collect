@@ -52,18 +52,18 @@ public class SpeciesImportProcess implements Callable<Void> {
 	
 	private SpeciesManager speciesManager;
 	private String taxonomyName;
-	private String filePath;
+	private File file;
 	private String errorMessage;
 	private Step step;
 	
 	private Map<TaxonRank, Map<String, Taxon>> taxons;
 	private List<Integer> processedLineNumbers;
 	
-	public SpeciesImportProcess(SpeciesManager speciesManager, String taxonomyName, String filePath) {
+	public SpeciesImportProcess(SpeciesManager speciesManager, String taxonomyName, File file) {
 		super();
 		this.speciesManager = speciesManager;
 		this.taxonomyName = taxonomyName;
-		this.filePath = filePath;
+		this.file = file;
 		step = Step.STOPPED;
 	}
 
@@ -79,11 +79,18 @@ public class SpeciesImportProcess implements Callable<Void> {
 		return step == Step.COMPLETE;
 	}
 
+	public Step getStep() {
+		return step;
+	}
+
 	@Override
 	public Void call() throws Exception {
 		step = Step.RUNNING;
 		prepare();
 		processFile();
+		if ( step == Step.RUNNING ) {
+			step = Step.COMPLETE;
+		}
 		return null;
 	}
 
@@ -101,9 +108,9 @@ public class SpeciesImportProcess implements Callable<Void> {
 	}
 	
 	protected void processFile() throws IOException {
-		String extension = FilenameUtils.getExtension(filePath);
+		String fileName = file.getName();
+		String extension = FilenameUtils.getExtension(fileName);
 		if ( CSV.equalsIgnoreCase(extension) ) {
-			File file = new File(filePath);
 			processCSV(file);
 		} else if (ZIP.equals(extension) ) {
 			processPackagedFile();
@@ -114,12 +121,12 @@ public class SpeciesImportProcess implements Callable<Void> {
 	}
 
 	protected void processPackagedFile() throws IOException {
-		ZipFile zipFile = new ZipFile(filePath);
+		ZipFile zipFile = new ZipFile(file);
 		Enumeration<? extends ZipEntry> entries = zipFile.entries();
 		while (entries.hasMoreElements()) {
 			ZipEntry zipEntry = (ZipEntry) entries.nextElement();
 			InputStream is = zipFile.getInputStream(zipEntry);
-			String unzippedPath = filePath + "_unzipped.csv";
+			String unzippedPath = file.getAbsolutePath() + "_unzipped.csv";
 			FileOutputStream os = new FileOutputStream(unzippedPath);
 			IOUtils.copy(is, os);
 			processCSV(new File(unzippedPath));
@@ -130,9 +137,13 @@ public class SpeciesImportProcess implements Callable<Void> {
 	protected void processCSV(File file) {
 		TaxonRank[] ranks = new TaxonRank[] {TaxonRank.FAMILY, TaxonRank.GENUS, TaxonRank.SPECIES};
 		for (TaxonRank rank : ranks) {
-			processCSV(file, rank);
+			if ( step == Step.RUNNING ) {
+				processCSV(file, rank);
+			}
 		}
-		persistTaxa();
+		if ( step == Step.RUNNING ) {
+			persistTaxa();
+		}
 	}
 
 	protected void processCSV(File file, TaxonRank rank) {
@@ -142,6 +153,7 @@ public class SpeciesImportProcess implements Callable<Void> {
 			is = new FileInputStream(file);
 			reader = new InputStreamReader(is);
 			CsvReader csvReader = new CsvReader(reader);
+			csvReader.readHeaders();
 			CsvLine line = csvReader.readNextLine();
 			int count = 1;
 			while ( line != null ) {
@@ -151,11 +163,12 @@ public class SpeciesImportProcess implements Callable<Void> {
 						processedLineNumbers.add(count);
 					}
 				}
+				line = csvReader.readNextLine();
 				count ++;
 			}
 		} catch (Exception e) {
 			step = Step.ERROR;
-			LOG.error("Error importing species CSV file");
+			LOG.error("Error importing species CSV file", e);
 		} finally {
 			if ( reader != null ) {
 				try {
