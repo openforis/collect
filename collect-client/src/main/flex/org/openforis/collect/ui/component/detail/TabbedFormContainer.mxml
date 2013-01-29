@@ -4,7 +4,8 @@
 		 xmlns:mx="library://ns.adobe.com/flex/mx" 
 		 width="100%" height="100%" 
 		 xmlns:detail="org.openforis.collect.ui.component.detail.*" xmlns:layout="org.openforis.collect.ui.layout.*"
-		 creationComplete="creationCompleteHandler(event)">
+		 creationComplete="creationCompleteHandler(event)"
+		 currentState="{hasDefinitionsPerCurrentTab &amp;&amp; hasInnerUITabs ? STATE_COMPLETE: hasInnerUITabs ? STATE_INNER_TABS: STATE_DEFAULT}">
 	
 	<fx:Script>
 		<![CDATA[
@@ -17,7 +18,12 @@
 			import org.openforis.collect.metamodel.proxy.UITabSetProxy;
 			import org.openforis.collect.model.proxy.EntityProxy;
 			import org.openforis.collect.presenter.TabbedFormPresenter;
+			import org.openforis.collect.util.CollectionUtil;
 
+			private static const STATE_DEFAULT:String = "default";
+			private static const STATE_INNER_TABS:String = "innerTabs";
+			private static const STATE_COMPLETE:String = "complete";
+			
 			private var _modelVersion:ModelVersionProxy;
 			private var _entityDefinition:EntityDefinitionProxy;
 			private var _uiTabSet:UITabSetProxy;
@@ -34,7 +40,9 @@
 			}
 			
 			public function reset():void {
-				resetTabBar();
+				if ( tabBar != null ) {
+					resetTabBar();
+				}
 				resetScrollbars();
 			}
 			
@@ -43,11 +51,15 @@
 			}
 			
 			public function resetScrollbars():void {
-				definitionsPerCurrentTabContainer.resetScrollBars();
-				var forms:Array = viewStack.getChildren();
-				if ( form != null ) {
-					for each (var form:TabbedFormContainer in forms) {
-						form.resetScrollbars();
+				if ( definitionsPerCurrentTabContainer != null ) {
+					definitionsPerCurrentTabContainer.resetScrollBars();
+				}
+				if ( viewStack != null ) {
+					var forms:Array = viewStack.getChildren();
+					if ( forms != null ) {
+						for each (var form:TabbedFormContainer in forms) {
+							form.resetScrollbars();
+						}
 					}
 				}
 			}
@@ -88,26 +100,44 @@
 				_parentEntity = value;
 			}
 			
-			[Bindable]
+			[Bindable(event="definitionsPerCurrentTabChange")]
 			public function get definitionsPerCurrentTab():IList {
 				return _definitionsPerCurrentTab;
 			}
 			
 			public function set definitionsPerCurrentTab(value:IList):void {
 				_definitionsPerCurrentTab = value;
+				dispatchEvent(new Event("definitionsPerCurrentTabChange"));
+			}
+
+			[Bindable(event="definitionsPerCurrentTabChange")]
+			public function get hasDefinitionsPerCurrentTab():Boolean {
+				return CollectionUtil.isNotEmpty(_definitionsPerCurrentTab);
 			}
 			
-			[Bindable]
+			[Bindable(event="innerUITabsChanged")]
 			public function get innerUITabs():IList {
 				return _innerUITabs;
 			}
 			
 			public function set innerUITabs(value:IList):void {
 				_innerUITabs = value;
+				dispatchEvent(new Event("innerUITabsChanged"));
+			}
+			
+			[Bindable(event="innerUITabsChanged")]
+			public function get hasInnerUITabs():Boolean {
+				return CollectionUtil.isNotEmpty(_innerUITabs);
 			}
 			
 		]]>
 	</fx:Script>
+	
+	<s:states>
+		<s:State name="default" />
+		<s:State name="innerTabs" />
+		<s:State name="complete" basedOn="innerTabs" />
+	</s:states>
 	
 	<s:VGroup width="100%" height="100%" 
 			  gap="0">
@@ -117,14 +147,16 @@
 			entityDefinition="{entityDefinition}"
 			nodeDefinitions="{definitionsPerCurrentTab}"
 			parentEntity="{parentEntity}"
-			visible="{definitionsPerCurrentTab != null &amp;&amp; definitionsPerCurrentTab.length > 0}"
-			includeInLayout="{definitionsPerCurrentTab != null &amp;&amp; definitionsPerCurrentTab.length > 0}" />
+			width.default="100%"
+			width.innerTabs="{NaN}"
+			height.default="100%"
+			height.innerTabs="{NaN}"
+			includeIn="default,complete" />
 		
 		<s:TabBar id="tabBar" 
 				  dataProvider="{viewStack}"
 				  width="100%"
-				  visible="{innerUITabs.length > 0}"
-				  includeInLayout="{innerUITabs.length > 0}">
+				  includeIn="innerTabs">
 			<s:layout>
 				<layout:FlowLayout />
 			</s:layout>
@@ -134,12 +166,10 @@
 			width="100%" 
 			height="100%"
 			styleName="entityForm"
-			visible="{innerUITabs.length > 0}"
-			includeInLayout="{innerUITabs.length > 0}">
+			includeIn="innerTabs">
 			
 			<mx:ViewStack id="viewStack" width="100%" height="100%" 
-						  verticalGap="0"
-						  creationPolicy="auto">
+						  verticalGap="0">
 				<mx:Repeater id="tabsRP" dataProvider="{innerUITabs}">
 					<detail:TabbedFormContainer 
 						id="tabContentContainers"
