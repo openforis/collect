@@ -83,6 +83,19 @@ public class TaxonVernacularNameDao extends MappingJooqDaoSupport<TaxonVernacula
 		return entities;
 	}
 
+	public List<TaxonVernacularName> findByTaxon(int taxonId) {
+		JooqFactory jf = getMappingJooqFactory();
+		
+		SelectConditionStep selectConditionStep = jf.select(OFC_TAXON_VERNACULAR_NAME.getFields())
+			.from(OFC_TAXON_VERNACULAR_NAME)
+			.where(OFC_TAXON_VERNACULAR_NAME.TAXON_ID.equal(taxonId));
+		
+		Result<?> result = selectConditionStep.fetch();
+		List<TaxonVernacularName> entities = jf.fromResult(result);
+		return entities;
+	}
+
+	
 	public void deleteByTaxonomy(int taxonomyId) {
 		JooqFactory jf = getMappingJooqFactory();
 		SelectConditionStep selectTaxonIds = jf.select(OFC_TAXON.ID).from(OFC_TAXON).where(OFC_TAXON.TAXONOMY_ID.equal(taxonomyId));

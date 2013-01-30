@@ -1,3 +1,5 @@
-code,family,scientific_name,ita
-1,family1,Tree1,Albero
-2,family1,Tree2,"Alberello,Alberino"
+no,code,family,scientific_name,swh,eng,ksb
+12,ALB/SCH/amaniensis,Fabaceae,Albizia schimperiana var. amaniensis,,,
+8,AFZ/QUA,Fabaceae,Afzelia quanzensis Welw.,Mbambakofi ,Mahogany,
+10,ALB/ADI,Fabaceae,Albizia adianthifolia,,,"  Mchao ,  Mkengemshaa/Msai.,/Mshai,Mshai-mamba;"
+11,ALB/GLA,Fabaceae,Albizia glaberrima (Shumach.&Thonn)Benth,"Mgerenge,Mchani",,

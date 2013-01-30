@@ -50,7 +50,7 @@ public class SpeciesManager {
 		List<Taxon> list = taxonDao.findByCode(taxonomy.getId(), searchString, maxResults);
 		List<TaxonOccurrence> result = new ArrayList<TaxonOccurrence>();
 		for (Taxon taxon : list) {
-			TaxonOccurrence o = new TaxonOccurrence(taxon.getCode(), taxon.getScientificName());
+			TaxonOccurrence o = new TaxonOccurrence(taxon.getTaxonId(), taxon.getCode(), taxon.getScientificName());
 			result.add(o);
 		}
 		return result;
@@ -62,18 +62,26 @@ public class SpeciesManager {
 		List<Taxon> list = taxonDao.findByScientificName(taxonomy.getId(), searchString, maxResults);
 		List<TaxonOccurrence> result = new ArrayList<TaxonOccurrence>();
 		for (Taxon taxon : list) {
-			TaxonOccurrence o = new TaxonOccurrence(taxon.getCode(), taxon.getScientificName());
+			TaxonOccurrence o = new TaxonOccurrence(taxon.getTaxonId(), taxon.getCode(), taxon.getScientificName());
 			result.add(o);
 		}
 		return result;
 	}
 
 	@Transactional
+	public List<TaxonOccurrence> findByVernacularName(String taxonomyName, String searchString, int maxResults) {
+		return findByVernacularName(taxonomyName, null, searchString, maxResults);
+	}
+	
+	@Transactional
 	public List<TaxonOccurrence> findByVernacularName(String taxonomyName, TaxonAttribute attr, String searchString, int maxResults) {
 		List<TaxonVernacularName> list = null;
 		Taxonomy taxonomy = taxonomyDao.load(taxonomyName);
 		Integer taxonomyId = taxonomy.getId();
-		String[] qualifierValues = extractQualifierValues(attr);
+		String[] qualifierValues = null;
+		if ( attr != null ) {
+			qualifierValues = extractQualifierValues(attr);
+		}
 		if (qualifierValues == null){
 			list = taxonVernacularNameDao.findByVernacularName(taxonomyId, searchString, maxResults);
 		} else{
@@ -122,13 +130,12 @@ public class SpeciesManager {
 	}
 	
 	protected List<TaxonOccurrence> createOccurrenceList(
-			List<TaxonVernacularName> list) {
+			List<TaxonVernacularName> vernacularNames) {
 		List<TaxonOccurrence> result = new ArrayList<TaxonOccurrence>();
-		for (TaxonVernacularName taxonVernacularName : list) {
-			Integer taxonId = taxonVernacularName.getTaxonSystemId();
+		for (TaxonVernacularName vernacularName : vernacularNames) {
+			Integer taxonId = vernacularName.getTaxonSystemId();
 			Taxon taxon = taxonDao.loadById(taxonId);
-			TaxonOccurrence o = new TaxonOccurrence(taxon.getCode(), taxon.getScientificName(), taxonVernacularName.getVernacularName(), taxonVernacularName.getLanguageCode(),
-					taxonVernacularName.getLanguageVariety());
+			TaxonOccurrence o = new TaxonOccurrence(taxon, vernacularName);
 			result.add(o);
 		}
 		return result;
