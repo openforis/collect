@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Stack;
@@ -84,6 +85,7 @@ public class SpeciesImportProcess implements Callable<Void> {
 	
 	private TaxonTree taxonTree;
 	private List<Integer> processedLineNumbers;
+	private TaxonLineParser lineReader;
 	
 	public SpeciesImportProcess(SpeciesManager speciesManager, String taxonomyName, File file) {
 		super();
@@ -120,7 +122,7 @@ public class SpeciesImportProcess implements Callable<Void> {
 		return null;
 	}
 
-	protected void prepare() {
+	public void prepare() {
 		processedLineNumbers = new ArrayList<Integer>();
 		initCache();
 	}
@@ -173,18 +175,20 @@ public class SpeciesImportProcess implements Callable<Void> {
 		try {
 			is = new FileInputStream(file);
 			reader = new InputStreamReader(is);
+			
 			CsvReader csvReader = new CsvReader(reader);
 			validateHeaders(csvReader);
-			CsvLine line = csvReader.readNextLine();
+			lineReader = new TaxonLineParser(csvReader);
+			lineReader.readNextLine();
 			int count = 2;
-			while ( line != null ) {
+			while ( lineReader.isReady() ) {
 				if ( ! processedLineNumbers.contains(count) ) {
-					boolean processed = processLine(rank, line);
+					boolean processed = processLine(rank);
 					if (processed) {
 						processedLineNumbers.add(count);
 					}
 				}
-				line = csvReader.readNextLine();
+				lineReader.readNextLine();
 				count ++;
 			}
 		} catch (Exception e) {
@@ -219,6 +223,11 @@ public class SpeciesImportProcess implements Callable<Void> {
 				throw new RuntimeException("Invalid column name: " + colName + " - '"+ expectedColName +"' expected");
 			}
 		}
+		validateLanguageHeaders(colNames);
+	}
+
+	protected void validateLanguageHeaders(List<String> colNames) {
+		int fixedColsSize = Column.values().length;
 		for (int i = fixedColsSize; i < colNames.size(); i ++ ) {
 			String colName = colNames.get(i);
 			if ( ! Languages.exists(Languages.Standard.ISO_639_3, colName) ) {
@@ -227,34 +236,33 @@ public class SpeciesImportProcess implements Callable<Void> {
 		}
 	}
 	
-	protected boolean processLine(TaxonRank rank, CsvLine line) {
-		String familyName = normalize(line.getValue(Column.FAMILY.getIndex(), String.class));
-		String rawScientificName = normalize(line.getValue(Column.SCIENTIFIC_NAME.getIndex(), String.class));
-		boolean leaf = isLeaf(rank, line );
+	protected boolean processLine(TaxonRank rank) {
+		boolean leaf = lineReader.isLeaf(rank);
 		switch (rank) {
 		case FAMILY:
-			createTaxonFamily(null, familyName, line);
+			createTaxonFamily();
 			return leaf;
 		case GENUS:
-			createTaxonGenus(familyName, rawScientificName, line);
+			createTaxonGenus();
+			return leaf;
+		case SPECIES:
+			createTaxonSpecies();
 			return leaf;
 		default:
-			Taxon parent = findParentTaxon(line);
+			Taxon parent = findParentTaxon();
 			if ( parent == null ) {
 				return false;
 			} else {
-				createTaxon(line, rank, parent);
+				createTaxon(rank, parent);
 				return true;
 			}
 		}
 	}
 
-	protected void processVernacularNames(Taxon taxon, CsvLine line) {
-		List<String> columnNames = line.getColumnNames();
-		Column[] fixedColumns = Column.values();
-		for ( int i = fixedColumns.length; i < columnNames.size(); i++ ) {
-			String langCode = columnNames.get(i);
-			String colValue = line.getValue(i, String.class);
+	protected void processVernacularNames(Taxon taxon) {
+		List<String> languageColumnNames = lineReader.getLanguageColumnNames();
+		for (String langCode : languageColumnNames) {
+			String colValue = lineReader.getColumnValue(langCode);
 			if ( colValue != null ) {
 				List<String> vernacularNames = extractVernacularNames(colValue);
 				for (String vernacularName : vernacularNames) {
@@ -292,6 +300,7 @@ public class SpeciesImportProcess implements Callable<Void> {
 		if ( parent != null ) {
 			Taxon parentTaxon = parent.getTaxon();
 			taxon.setParentId(parentTaxon.getSystemId());
+			taxon.setStep(9);
 		}
 		speciesManager.save(taxon);
 		
@@ -321,17 +330,19 @@ public class SpeciesImportProcess implements Callable<Void> {
 		return StringUtils.normalizeSpace(vernacularName);
 	}
 
-	private Taxon findParentTaxon(CsvLine line) {
-		String rawScientificName = parseScientificName(line);
-		TaxonRank rank = parseRank(rawScientificName);
+	private Taxon findParentTaxon() {
+		TaxonRank rank = lineReader.parseRank();
 		TaxonRank parentRank = rank.getParent();
 		String scientificName;
 		switch ( parentRank ) {
 		case FAMILY:
-			scientificName = parseFamilyName(line);
+			scientificName = lineReader.parseFamilyName();
 			break;
 		case GENUS:
-			scientificName = parseGenus(rawScientificName);
+			scientificName = lineReader.parseGenus();
+			break;
+		case SPECIES:
+			scientificName = lineReader.parseSpeciesName();
 			break;
 		default:
 			throw new RuntimeException("Unsupported rank");
@@ -340,23 +351,30 @@ public class SpeciesImportProcess implements Callable<Void> {
 		return result;
 	}
 	
-	protected Taxon createTaxonFamily(Taxon parent, String familyName, CsvLine line) {
-		String normalizedScientificName = normalize(familyName);
-		return createTaxon(line, FAMILY, parent, normalizedScientificName);
+	protected Taxon createTaxonFamily() {
+		String familyName = lineReader.parseFamilyName();
+		return createTaxon(FAMILY, null, familyName);
 	}
 	
-	protected Taxon createTaxonGenus(String familyName, String scientificName, CsvLine line) {
-		Taxon parent = taxonTree.findTaxon(FAMILY, familyName);
-		String normalizedScientificName = parseGenus(scientificName);
-		return createTaxon(line, GENUS, parent, normalizedScientificName);
+	protected Taxon createTaxonGenus() {
+		Taxon taxonFamily = createTaxonFamily();
+		String rawScientificName = lineReader.parseScientificName();
+		String normalizedScientificName = lineReader.parseGenus(rawScientificName);
+		return createTaxon(GENUS, taxonFamily, normalizedScientificName);
 	}
 
-	protected Taxon createTaxon(CsvLine line, TaxonRank rank, Taxon parent) {
-		String normalizedScientificName = parseCanonicalScientificName(line);
-		return createTaxon(line, rank, parent, normalizedScientificName);
+	protected Taxon createTaxonSpecies() {
+		Taxon taxonGenus = createTaxonGenus();
+		String normalizedScientificName = lineReader.parseSpeciesName();
+		return createTaxon(SPECIES, taxonGenus, normalizedScientificName);
 	}
 	
-	protected Taxon createTaxon(CsvLine line, TaxonRank rank, Taxon parent, String normalizedScientificName) {
+	protected Taxon createTaxon(TaxonRank rank, Taxon parent) {
+		String normalizedScientificName = lineReader.parseCanonicalScientificName();
+		return createTaxon(rank, parent, normalizedScientificName);
+	}
+	
+	protected Taxon createTaxon(TaxonRank rank, Taxon parent, String normalizedScientificName) {
 		Taxon taxon = taxonTree.findTaxon(rank, normalizedScientificName);
 		if ( taxon == null ) {
 			taxon = new Taxon();
@@ -364,100 +382,17 @@ public class SpeciesImportProcess implements Callable<Void> {
 			taxon.setScientificName(normalizedScientificName);
 			taxonTree.addNode(parent, taxon);
 		}
-		if ( isLeaf(rank, line) ) {
-			String code = parseCode(line);
+		if ( lineReader.isLeaf(rank) ) {
+			String code = lineReader.parseCode();
 			taxon.setCode(code);
-			Integer taxonId = parseTaxonId(line);
+			Integer taxonId = lineReader.parseTaxonId();
 			taxon.setTaxonId(taxonId);
-			processVernacularNames(taxon, line);
+			processVernacularNames(taxon);
 		}
 		return taxon;
 	}
 
-	protected Integer parseTaxonId(CsvLine line) {
-		Integer value = line.getValue(Column.ID.getIndex(), Integer.class);
-		return value;
-	}
-	
-	protected String parseCode(CsvLine line) {
-		return normalize(line.getValue(Column.CODE.getIndex(), String.class));
-	}
-	
-	protected String parseFamilyName(CsvLine line) {
-		return normalize(line.getValue(Column.FAMILY.getIndex(), String.class));
-	}
-	
-	protected String parseScientificName(CsvLine line) {
-		String value = normalize(line.getValue(Column.SCIENTIFIC_NAME.getIndex(), String.class));
-		return value;
-	}
-	
-	protected TaxonRank parseRank(String rawScientificName) {
-		try {
-			NameParser nameParser = new NameParser();
-			ParsedName<Object> parsedName = nameParser.parse(rawScientificName);
-			Rank rank = parsedName.getRank();
-			TaxonRank taxonRank;
-			switch ( rank ) {
-			case FAMILY:
-				taxonRank = FAMILY;
-				break;
-			case GENUS:
-				taxonRank = GENUS;
-				break;
-			case SPECIES:
-				taxonRank = SPECIES;
-				break;
-			case SUBSPECIES:
-				taxonRank = SUBSPECIES;
-				break;
-			default:
-				taxonRank = SPECIES;
-			}
-			return taxonRank;
-		} catch (UnparsableException e) {
-			LOG.error("Error extracting rank from: " + rawScientificName, e);
-			throw new RuntimeException(e);
-		}
-	}
 
-	protected String parseCanonicalScientificName(CsvLine line) {
-		String rawName = parseScientificName(line);
-		return parseCanonicalScientificName(rawName);
-	}
-
-	protected String parseCanonicalScientificName(String rawScientificName) {
-		try {
-			NameParser nameParser = new NameParser();
-			ParsedName<Object> parsedName;
-			parsedName = nameParser.parse(rawScientificName);
-			String result = parsedName.canonicalName();
-			return result;
-		} catch (UnparsableException e) {
-			LOG.error("Error extracting scientific name from: " + rawScientificName, e);
-			throw new RuntimeException(e);
-		}
-	}
-	
-	protected String parseGenus(String scientificName) {
-		try {
-			NameParser nameParser = new NameParser();
-			ParsedName<Object> parsedName;
-			parsedName = nameParser.parse(scientificName);
-			String genus = parsedName.getGenusOrAbove();
-			return genus;
-		} catch (UnparsableException e) {
-			LOG.error("Error extracting genus from: " + scientificName, e);
-			throw new RuntimeException(e);
-		}
-	}
-
-	private boolean isLeaf(TaxonRank rank, CsvLine line) {
-		String rawScientificName = parseScientificName(line);
-		TaxonRank lineRank = parseRank(rawScientificName);
-		return lineRank == rank;
-	}
-	
 	class TaxonTree {
 		
 		List<Node> roots;
@@ -576,4 +511,157 @@ public class SpeciesImportProcess implements Callable<Void> {
 		
 	}
 
+	class TaxonLineParser {
+		
+		private CsvReader reader;
+		private CsvLine currentLine;
+		
+		public TaxonLineParser(CsvReader reader) {
+			super();
+			this.reader = reader;
+		}
+
+		public boolean isReady() {
+			return currentLine != null;
+		}
+
+		public String getColumnValue(String column) {
+			return currentLine.getValue(column, String.class);
+		}
+
+		public void readNextLine() {
+			try {
+				currentLine = reader.readNextLine();
+			} catch (IOException e) {
+				LOG.error("Error reading next line");
+			}
+		}
+		
+		public List<String> getLanguageColumnNames() {
+			List<String> columnNames = currentLine.getColumnNames();
+			int fixedColumnsLength = Column.values().length;
+			if ( columnNames.size() > fixedColumnsLength ) {
+				return columnNames.subList(fixedColumnsLength, columnNames.size());
+			} else {
+				return Collections.emptyList();
+			}
+		}
+		
+		public Integer parseTaxonId() {
+			Integer value = currentLine.getValue(Column.ID.getIndex(), Integer.class);
+			return value;
+		}
+		
+		public String parseCode() {
+			return normalize(currentLine.getValue(Column.CODE.getIndex(), String.class));
+		}
+		
+		public String parseFamilyName() {
+			return normalize(currentLine.getValue(Column.FAMILY.getIndex(), String.class));
+		}
+		
+		public String parseScientificName() {
+			String value = normalize(currentLine.getValue(Column.SCIENTIFIC_NAME.getIndex(), String.class));
+			return value;
+		}
+		
+		public TaxonRank parseRank() {
+			String rawScientificName = parseScientificName();
+			return parseRank(rawScientificName);
+		}
+		
+		public TaxonRank parseRank(String rawScientificName) {
+			try {
+				NameParser nameParser = new NameParser();
+				ParsedName<Object> parsedName = nameParser.parse(rawScientificName);
+				Rank rank = parsedName.getRank();
+				TaxonRank taxonRank;
+				switch ( rank ) {
+				case FAMILY:
+					taxonRank = FAMILY;
+					break;
+				case GENUS:
+					taxonRank = GENUS;
+					break;
+				case SPECIES:
+					taxonRank = SPECIES;
+					break;
+				case VARIETY:
+					taxonRank = SUBSPECIES;
+					break;
+				default:
+					taxonRank = SPECIES;
+				}
+				return taxonRank;
+			} catch (UnparsableException e) {
+				LOG.error("Error extracting rank from: " + rawScientificName, e);
+				throw new RuntimeException(e);
+			}
+		}
+
+		public String parseCanonicalScientificName() {
+			String rawName = parseScientificName();
+			return parseCanonicalScientificName(rawName);
+		}
+
+		public String parseCanonicalScientificName(String rawScientificName) {
+			try {
+				NameParser nameParser = new NameParser();
+				ParsedName<Object> parsedName;
+				parsedName = nameParser.parse(rawScientificName);
+				Rank rank = parsedName.getRank();
+				boolean showRankMarker = rank == Rank.GENUS || rank == Rank.VARIETY;
+				String result = parsedName.buildName(false, showRankMarker, false, false, false, true, true, false, false, false, false);
+				return result;
+			} catch (UnparsableException e) {
+				LOG.error("Error extracting scientific name from: " + rawScientificName, e);
+				throw new RuntimeException(e);
+			}
+		}
+		
+		public String parseGenus() {
+			String rawScientificName = parseScientificName();
+			return parseGenus(rawScientificName);
+		}
+		
+		public String parseGenus(String scientificName) {
+			try {
+				NameParser nameParser = new NameParser();
+				ParsedName<Object> parsedName;
+				parsedName = nameParser.parse(scientificName);
+				String genus = parsedName.getGenusOrAbove();
+				return genus;
+			} catch (UnparsableException e) {
+				LOG.error("Error extracting genus from: " + scientificName, e);
+				throw new RuntimeException(e);
+			}
+		}
+		
+		public String parseSpeciesName() {
+			String rawScientificName = parseScientificName();
+			return parseSpeciesName(rawScientificName);
+		}
+		
+		public String parseSpeciesName(String rawScientificName) {
+			try {
+				NameParser nameParser = new NameParser();
+				ParsedName<Object> parsedName;
+				parsedName = nameParser.parse(rawScientificName);
+				String speciesName = parsedName.canonicalSpeciesName();
+				return speciesName;
+			} catch (UnparsableException e) {
+				LOG.error("Error extracting genus from: " + rawScientificName, e);
+				throw new RuntimeException(e);
+			}
+		}
+
+		public boolean isLeaf(TaxonRank rank) {
+			String rawScientificName = parseScientificName();
+			TaxonRank lineRank = parseRank(rawScientificName);
+			return lineRank == rank;
+		}
+		
+		
+	}
+	
 }

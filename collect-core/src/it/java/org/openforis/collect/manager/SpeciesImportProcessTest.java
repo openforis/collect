@@ -67,14 +67,16 @@ public class SpeciesImportProcessTest {
 		TaxonOccurrence expected = new TaxonOccurrence(8, code, "Afzelia quanzensis");
 		assertEquals(expected, occurrence);
 
-		TaxonOccurrence occurrence2 = findByCode("ALB/GLA");
-		TaxonOccurrence expected2 = new TaxonOccurrence(11, "ALB/GLA", "Albizia glaberrima");
+		String code2 = "ALB/GLA";
+		TaxonOccurrence occurrence2 = findByCode(code2);
+		TaxonOccurrence expected2 = new TaxonOccurrence(11, code2, "Albizia glaberrima");
 		assertEquals(expected2, occurrence2);
 		
-		TaxonOccurrence occurrence3 = findByCode("ALB/SCH/amaniensis");
-		TaxonOccurrence expected3 = new TaxonOccurrence(12, "ALB/SCH/amaniensis", "Albizia schimperiana var. amaniensis");
+		String code3 = "ALB/SCH/amaniensis";
+		TaxonOccurrence occurrence3 = findByCode(code3);
+		TaxonOccurrence expected3 = new TaxonOccurrence(12, code3, "Albizia schimperiana var. amaniensis");
 		assertEquals(expected3, occurrence3);
-}
+	}
 
 	@Test
 	public void testVernacularNamesImport() {
@@ -120,12 +122,14 @@ public class SpeciesImportProcessTest {
 		Taxon subSpecies = findTaxonByCode("ALB/SCH/amaniensis");
 		assertNotNull(subSpecies);
 		assertEquals(SUBSPECIES, subSpecies.getTaxonRank());
+		
 		Integer speciesId = subSpecies.getParentId();
 		assertNotNull(speciesId);
 		Taxon species = taxonDao.loadById(speciesId);
 		assertNotNull(species);
+		assertNull(species.getCode());
 		assertEquals(SPECIES, species.getTaxonRank());
-		assertEquals("ALB/ADI", species.getCode());
+		assertEquals("Albizia schimperiana", species.getScientificName());
 		
 		Integer genusId = species.getParentId();
 		assertNotNull(genusId);
@@ -133,7 +137,7 @@ public class SpeciesImportProcessTest {
 		assertNotNull(genus);
 		assertNull(genus.getCode());
 		assertEquals(GENUS, genus.getTaxonRank());
-		assertEquals("Afzelia", genus.getScientificName());
+		assertEquals("Albizia", genus.getScientificName());
 		
 		Integer familyId = genus.getParentId();
 		assertNotNull(familyId);
