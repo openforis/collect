@@ -18,6 +18,10 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.openforis.collect.manager.speciesImport.SpeciesImportProcess;
+import org.openforis.collect.manager.speciesImport.SpeciesImportStatus;
+import org.openforis.collect.manager.speciesImport.TaxonFileColumn;
+import org.openforis.collect.manager.speciesImport.TaxonParsingError;
 import org.openforis.collect.persistence.TaxonDao;
 import org.openforis.collect.persistence.TaxonVernacularNameDao;
 import org.openforis.collect.persistence.TaxonomyDao;
@@ -51,17 +55,20 @@ public class SpeciesImportProcessTest {
 	@Autowired
 	private TaxonVernacularNameDao taxonVernacularNameDao;
 	
-	@Before
-	public void importCSVFile() throws Exception {
-		File file = getCSVTestFile();
+	public SpeciesImportProcess importCSVFile(String fileName) throws Exception {
+		File file = getTestFile(fileName);
 		String taxonomyName = TEST_TAXONOMY_NAME;
 		SpeciesImportProcess process = new SpeciesImportProcess(speciesManager, taxonomyName, file);
 		process.call();
-		assertEquals(SpeciesImportProcess.Step.COMPLETE, process.getStep());
+		return process;
 	}
 	
 	@Test
-	public void testSpeciesImport() {
+	public void testSpeciesImport() throws Exception {
+		SpeciesImportProcess process = importCSVFile("test-species.csv");
+		SpeciesImportStatus status = process.getStatus();
+		assertTrue(status.isComplete());
+		
 		String code = "AFZ/QUA";
 		TaxonOccurrence occurrence = findByCode(code);
 		TaxonOccurrence expected = new TaxonOccurrence(8, code, "Afzelia quanzensis");
@@ -79,7 +86,11 @@ public class SpeciesImportProcessTest {
 	}
 
 	@Test
-	public void testVernacularNamesImport() {
+	public void testVernacularNamesImport() throws Exception {
+		SpeciesImportProcess process = importCSVFile("test-species.csv");
+		SpeciesImportStatus status = process.getStatus();
+		assertTrue(status.isComplete());
+		
 		List<TaxonOccurrence> occurrences = speciesManager.findByVernacularName(TEST_TAXONOMY_NAME, "Mbamba", 10);
 		assertNotNull(occurrences);
 		assertEquals(1, occurrences.size());
@@ -107,18 +118,12 @@ public class SpeciesImportProcessTest {
 		assertFalse(contains(vernacularNames, "ksb", "Mahogany"));
 	}
 
-	protected boolean contains(List<TaxonVernacularName> taxonVernacularNames, String langCode, String vernacularName) {
-		for (TaxonVernacularName taxonVernacularName : taxonVernacularNames) {
-			if (vernacularName.equals(taxonVernacularName.getVernacularName()) && 
-					langCode.equals(taxonVernacularName.getLanguageCode())) {
-				return true;
-			}
-		}
-		return false;
-	}
-	
 	@Test
-	public void testHierarchyImport() {
+	public void testHierarchyImport() throws Exception {
+		SpeciesImportProcess process = importCSVFile("test-species.csv");
+		SpeciesImportStatus status = process.getStatus();
+		assertTrue(status.isComplete());
+		
 		Taxon subSpecies = findTaxonByCode("ALB/SCH/amaniensis");
 		assertNotNull(subSpecies);
 		assertEquals(SUBSPECIES, subSpecies.getTaxonRank());
@@ -147,6 +152,17 @@ public class SpeciesImportProcessTest {
 		assertEquals(FAMILY, family.getTaxonRank());
 		assertEquals("Fabaceae", family.getScientificName());
 	}
+	
+	@Test
+	public void testEmptyCells() throws Exception {
+		SpeciesImportProcess process = importCSVFile("test-wrong-species.csv");
+		SpeciesImportStatus status = process.getStatus();
+		List<TaxonParsingError> errors = status.getErrors();
+		assertEquals(2, errors.size());
+		TaxonParsingError error1 = errors.get(0);
+		assertEquals(2, error1.getRow());
+		assertEquals(TaxonFileColumn.CODE.getName(), error1.getColumn());
+	}
 
 	protected Taxon findTaxonByCode(String code) {
 		Taxonomy taxonomy = taxonomyDao.load(TEST_TAXONOMY_NAME);
@@ -165,9 +181,18 @@ public class SpeciesImportProcessTest {
 		return occurrence;
 	}
 	
-
-	protected File getCSVTestFile() throws URISyntaxException {
-		URL fileUrl = ClassLoader.getSystemResource("test-species.csv");
+	protected boolean contains(List<TaxonVernacularName> taxonVernacularNames, String langCode, String vernacularName) {
+		for (TaxonVernacularName taxonVernacularName : taxonVernacularNames) {
+			if (vernacularName.equals(taxonVernacularName.getVernacularName()) && 
+					langCode.equals(taxonVernacularName.getLanguageCode())) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	protected File getTestFile(String fileName) throws URISyntaxException {
+		URL fileUrl = ClassLoader.getSystemResource(fileName);
 		File file = new File(fileUrl.toURI());
 		return file;
 	}
