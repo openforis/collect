@@ -15,6 +15,7 @@ package org.openforis.collect.client {
 		private static var _modelClient:ModelClient;
 		private static var _sessionClient:SessionClient;
 		private static var _speciesClient:SpeciesClient;
+		private static var _speciesImportClient:SpeciesImportClient;
 		private static var _userClient:UserClient;
 		
 		public function ClientFactory() {
@@ -67,6 +68,13 @@ package org.openforis.collect.client {
 				_speciesClient = new SpeciesClient();
 			}
 			return _speciesClient;
+		}
+		
+		public static function get speciesImportClient():SpeciesImportClient {
+			if(_speciesImportClient == null){
+				_speciesImportClient = new SpeciesImportClient();
+			}
+			return _speciesImportClient;
 		}
 		
 		public static function get userClient():UserClient {

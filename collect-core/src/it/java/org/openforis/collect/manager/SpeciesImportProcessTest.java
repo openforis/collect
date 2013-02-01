@@ -44,6 +44,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class SpeciesImportProcessTest {
 
+	private static final String INVALID_TEST_SPECIES_CSV = "test-wrong-species.csv";
+	private static final String VALID_TEST_SPECIES_CSV = "test-species.csv";
+
 	private static final String TEST_TAXONOMY_NAME = "it_tree";
 	
 	@Autowired
@@ -65,7 +68,7 @@ public class SpeciesImportProcessTest {
 	
 	@Test
 	public void testSpeciesImport() throws Exception {
-		SpeciesImportProcess process = importCSVFile("test-species.csv");
+		SpeciesImportProcess process = importCSVFile(VALID_TEST_SPECIES_CSV);
 		SpeciesImportStatus status = process.getStatus();
 		assertTrue(status.isComplete());
 		
@@ -87,7 +90,7 @@ public class SpeciesImportProcessTest {
 
 	@Test
 	public void testVernacularNamesImport() throws Exception {
-		SpeciesImportProcess process = importCSVFile("test-species.csv");
+		SpeciesImportProcess process = importCSVFile(VALID_TEST_SPECIES_CSV);
 		SpeciesImportStatus status = process.getStatus();
 		assertTrue(status.isComplete());
 		
@@ -120,7 +123,7 @@ public class SpeciesImportProcessTest {
 
 	@Test
 	public void testHierarchyImport() throws Exception {
-		SpeciesImportProcess process = importCSVFile("test-species.csv");
+		SpeciesImportProcess process = importCSVFile(VALID_TEST_SPECIES_CSV);
 		SpeciesImportStatus status = process.getStatus();
 		assertTrue(status.isComplete());
 		
@@ -155,7 +158,7 @@ public class SpeciesImportProcessTest {
 	
 	@Test
 	public void testErrorHandling() throws Exception {
-		SpeciesImportProcess process = importCSVFile("test-wrong-species.csv");
+		SpeciesImportProcess process = importCSVFile(INVALID_TEST_SPECIES_CSV);
 		SpeciesImportStatus status = process.getStatus();
 		List<TaxonParsingError> errors = status.getErrors();
 		assertEquals(7, errors.size());

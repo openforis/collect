@@ -10,6 +10,7 @@ package org.openforis.collect.client {
 	 * */
 	public class SpeciesClient extends AbstractClient {
 		
+		private var _loadAllTaxonomiesOperation:Operation;
 		private var _findByCodeOperation:Operation;
 		private var _findByScientificNameOperation:Operation;
 		private var _findByVernacularNameOperation:Operation;
@@ -17,9 +18,15 @@ package org.openforis.collect.client {
 		public function SpeciesClient() {
 			super("speciesService");
 			
+			_loadAllTaxonomiesOperation = getOperation("loadAllTaxonomies", CONCURRENCY_LAST);
 			_findByCodeOperation = getOperation("findByCode", CONCURRENCY_LAST);
 			_findByScientificNameOperation = getOperation("findByScientificName", CONCURRENCY_LAST);
 			_findByVernacularNameOperation = getOperation("findByVernacularName", CONCURRENCY_LAST);
+		}
+		
+		public function loadAllTaxonomies(responder:IResponder):void {
+			var token:AsyncToken = this._loadAllTaxonomiesOperation.send();
+			token.addResponder(responder);
 		}
 		
 		public function findByCode(responder:IResponder, taxonomy:String, value:String, maxResults:int):void {

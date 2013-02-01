@@ -21,36 +21,36 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
 /**
+ * 
+ * Handles files upload into the "temp" folder (relative to the context path).
+ * The files are uploaded in a subfolder named #sessionid for each http session.
+ * 
+ * 
  * @author S. Ricci
  * 
  */
 @Controller
-public class DataImportController {
+public class FileUploadController {
 
-	//private static Log LOG = LogFactory.getLog(DataImportController.class);
+	//private static Log LOG = LogFactory.getLog(FileUploadController.class);
 
-	private static final String IMPORT_PATH = "import";
+	public static final String TEMP_PATH = "temp";
 
-	private static final String FILE_NAME = "data_import.zip";
-	
-	@RequestMapping(value = "/uploadData.htm", method = RequestMethod.POST)
+	@RequestMapping(value = "/uploadFile.htm", method = RequestMethod.POST)
 	public @ResponseBody String uploadData(UploadItem uploadItem, BindingResult result, HttpServletRequest request, @RequestParam String sessionId) 
 			throws IOException, SurveyImportException {
-		File file = creteTempFile(request, sessionId);
+		File file = creteTempFile(request, sessionId, uploadItem.getName());
 		writeToFile(uploadItem, file);
 		return "ok";
 	}
 
-	private File creteTempFile(HttpServletRequest request, String sessionId) throws IOException {
+	protected File creteTempFile(HttpServletRequest request, String sessionId, String fileName) throws IOException {
 		HttpSession session = request.getSession();
 		ServletContext servletContext = session.getServletContext();
-		String importRealPath = servletContext.getRealPath(IMPORT_PATH);
-		File importRootDirectory = new File(importRealPath);
-		File importDirectory = new File(importRootDirectory, sessionId);
-		if ( ! importDirectory.exists() ) {
-			importDirectory.mkdirs();
-		} 
-		File file = new File(importDirectory, FILE_NAME);
+		String importRealPath = servletContext.getRealPath(TEMP_PATH);
+		File tempRootDirectory = new File(importRealPath);
+		File sessionTempDirectory = getSessionTempDirectory(tempRootDirectory, sessionId);
+		File file = new File(sessionTempDirectory, fileName);
 		if ( file.exists() ) {
 			file.delete();
 		}
@@ -58,11 +58,19 @@ public class DataImportController {
 		return file;
 	}
 	
-	private void writeToFile(UploadItem uploadItem, File file) throws IOException {
+	public static File getSessionTempDirectory(File tempRootDirectory, String sessionId) {
+		File sessionTempDirectory = new File(tempRootDirectory, sessionId);
+		if ( ! sessionTempDirectory.exists() ) {
+			sessionTempDirectory.mkdirs();
+		} 
+		return sessionTempDirectory;
+	}
+	
+	protected void writeToFile(UploadItem uploadItem, File file) throws IOException {
 		CommonsMultipartFile fileData = uploadItem.getFileData();
 		InputStream is = fileData.getInputStream();
-		OutputStream out=new FileOutputStream(file);
-		byte buf[]=new byte[1024];
+		OutputStream out = new FileOutputStream(file);
+		byte buf[] = new byte[1024];
 		int len;
 		while ( ( len=is.read(buf) ) > 0 ) {
 			out.write(buf,0,len);

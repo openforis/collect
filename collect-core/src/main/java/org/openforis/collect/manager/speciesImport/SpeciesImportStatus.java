@@ -7,6 +7,11 @@ import java.util.List;
 
 import org.openforis.idm.util.CollectionUtil;
 
+/**
+ * 
+ * @author S. Ricci
+ *
+ */
 public class SpeciesImportStatus {
 	
 	enum Step {

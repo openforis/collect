@@ -4,11 +4,14 @@ import static org.openforis.collect.persistence.jooq.Sequences.OFC_TAXONOMY_ID_S
 import static org.openforis.collect.persistence.jooq.tables.OfcTaxonomy.OFC_TAXONOMY;
 
 import java.sql.Connection;
+import java.util.List;
 
 import org.jooq.Record;
+import org.jooq.Result;
 import org.jooq.StoreQuery;
 import org.openforis.collect.persistence.jooq.MappingJooqDaoSupport;
 import org.openforis.collect.persistence.jooq.MappingJooqFactory;
+import org.openforis.collect.persistence.jooq.tables.records.OfcTaxonomyRecord;
 import org.openforis.idm.model.species.Taxonomy;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,6 +33,17 @@ public class TaxonomyDao extends MappingJooqDaoSupport<Taxonomy, TaxonomyDao.Joo
 			return null;
 		} else {
 			return jf.fromRecord(r);
+		}
+	}
+	
+	public List<Taxonomy> loadAll() {
+		JooqFactory jf = getMappingJooqFactory();
+		Result<OfcTaxonomyRecord> r = jf.selectFrom(OFC_TAXONOMY)
+				.orderBy(OFC_TAXONOMY.NAME).fetch();
+		if ( r == null ) {
+			return null;
+		} else {
+			return jf.fromResult(r);
 		}
 	}
 	

@@ -19,6 +19,7 @@ package org.openforis.collect.util {
 		public static var COUNTRY_LOGO_ID:int = 1;
 
 		private static const DATA_IMPORT_UPLOAD_SERVLET_NAME:String = "uploadData.htm";
+		private static const SPECIES_IMPORT_UPLOAD_SERVLET_NAME:String = "uploadFile.htm";
 		
 		private static const RECORD_FILE_UPLOAD_SERVLET_NAME:String = "uploadRecordFile.htm";
 		private static const RECORD_FILE_DOWNLOAD_SERVLET_NAME:String = "downloadRecordFile.htm";
@@ -30,10 +31,11 @@ package org.openforis.collect.util {
 		
 		public static const DATE_TIME_PATTERN:String = "dd-MM-yyyy HH:mm";
 		
-		private static var _DATA_IMPORT_UPLOAD_URL:String; 
+		private static var _DATA_IMPORT_UPLOAD_URL:String;
 		private static var _RECORD_FILE_UPLOAD_URL:String; 
 		private static var _RECORD_FILE_DOWNLOAD_URL:String; 
 		private static var _RECORD_FILE_DELETE_URL:String; 
+		private static var _SPECIES_IMPORT_UPLOAD_URL:String;
 		private static var _DOWNLOAD_EXPORTED_DATA_URL:String;
 		private static var _DOWNLOAD_BACKUP_DATA_URL:String;
 		private static var _DESIGNER_URL:String;
@@ -49,6 +51,10 @@ package org.openforis.collect.util {
 		public static function init():void {
 			var url:String = FlexGlobals.topLevelApplication.url;
 			setUrl(url);
+		}
+		
+		public static function get SPECIES_IMPORT_UPLOAD_URL():String {
+			return _SPECIES_IMPORT_UPLOAD_URL;
 		}
 		
 		public static function get DATA_IMPORT_UPLOAD_URL():String {
@@ -105,6 +111,7 @@ package org.openforis.collect.util {
 			_URL = applicationUrl;
 			
 			_DATA_IMPORT_UPLOAD_URL = _URL + DATA_IMPORT_UPLOAD_SERVLET_NAME;
+			_SPECIES_IMPORT_UPLOAD_URL = _URL + SPECIES_IMPORT_UPLOAD_SERVLET_NAME;
 			
 			_RECORD_FILE_UPLOAD_URL = _URL + RECORD_FILE_UPLOAD_SERVLET_NAME;
 			_RECORD_FILE_DOWNLOAD_URL = _URL + RECORD_FILE_DOWNLOAD_SERVLET_NAME;

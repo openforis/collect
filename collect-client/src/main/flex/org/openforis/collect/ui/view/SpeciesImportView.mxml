@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx">
+
+	<fx:Script>
+		<![CDATA[
+			import mx.events.FlexEvent;
+			
+			import org.openforis.collect.presenter.SpeciesImportPresenter;
+			
+			public static const STATE_DEFAULT:String = "default";
+			public static const STATE_LOADING:String = "loading";
+			public static const STATE_SELECT_FILE:String = "selectFile";
+			public static const STATE_UPLOADING:String = "uploading";
+			public static const STATE_IMPORTING:String = "importing";
+
+			private var _presenter:SpeciesImportPresenter;
+			
+			protected function creationCompleteHandler(event:FlexEvent):void {
+				_presenter = new SpeciesImportPresenter(this);
+			}
+
+		]]>
+	</fx:Script>
+	
+	<s:states>
+		<s:State name="default" />
+		<s:State name="loading" />
+		<s:State name="selectFile" />
+		<s:State name="uploading" />
+		<s:State name="importing" />
+	</s:states>
+	
+	<s:VGroup includeIn="default"
+			  itemCreationPolicy="immediate"
+			  horizontalAlign="center"
+			  verticalAlign="middle"
+			  height="100%" width="100%"
+			  gap="30"
+			  >
+		<s:Label text="{Message.get('speciesImport.checklist')}" 
+				 styleName="formLabel" />
+		
+		<s:DropDownList id="checklistsDropDown" labelField="name" />
+		
+		<s:HGroup>
+			<s:Button id="newButton" 
+					  label="{Message.get('speciesImport.newCheckist')}"
+					  useHandCursor="true"
+					  buttonMode="true"
+					  />
+			<s:Button id="deleteButton" 
+					  label="{Message.get('speciesImport.deleteCheckist')}"
+					  useHandCursor="true"
+					  buttonMode="true"
+					  />
+			<s:Button id="editButton" 
+					  label="{Message.get('speciesImport.editCheckist')}"
+					  useHandCursor="true"
+					  buttonMode="true"
+					  />
+		</s:HGroup>
+		
+		<s:HGroup>
+			<s:Button id="importButton" 
+					  label="{Message.get('speciesImport.import')}"
+					  useHandCursor="true"
+					  buttonMode="true"
+					  />
+			
+			<s:Button id="exportButton" 
+					  label="{Message.get('speciesImport.export')}"
+					  useHandCursor="true"
+					  buttonMode="true"
+					  />
+		</s:HGroup>
+	</s:VGroup>
+	
+
+	
+	<s:VGroup width="100%" height="100%"
+			  includeIn="selectFile"
+			  itemCreationPolicy="immediate"
+			  horizontalAlign="center"
+			  verticalAlign="middle"
+			  gap="20"
+			  >
+		
+		<s:Button id="selectFileButton" 
+				  label="{Message.get('speciesImport.selectFile')}"
+				  includeIn="default"
+				  useHandCursor="true"
+				  buttonMode="true"
+				  />
+
+		<s:Button id="startButton" 
+				  label="{Message.get('speciesImport.start')}"
+				  includeIn="default"
+				  useHandCursor="true"
+				  buttonMode="true"
+				  />
+		
+		<s:Button id="cancelSelectFileButton" 
+				  label="{Message.get('global.cancel')}"
+				  includeIn="default"
+				  useHandCursor="true"
+				  buttonMode="true"
+				  />
+		
+	</s:VGroup>
+	
+	<s:VGroup width="100%" height="100%"
+			  includeIn="uploading, importing"
+			  itemCreationPolicy="immediate"
+			  horizontalAlign="center"
+			  verticalAlign="middle"
+			  gap="20"
+			  >
+		<s:Label id="progressTitle"
+				 styleName="formLabel" />
+		
+		<mx:ProgressBar id="progressBar"
+						horizontalCenter="0"
+						verticalCenter="0"
+						mode="manual"
+						label="%3%"
+						labelPlacement="center"
+						width="80%"
+						/>
+		
+		<s:Label id="progressLabel"
+				 styleName="formLabel" />
+		
+		<s:Button id="cancelImportButton"
+				  label="{Message.get('global.cancel')}"
+				  useHandCursor="true"
+				  buttonMode="true"
+				  />
+		
+	</s:VGroup>
+	
+</s:Group>
