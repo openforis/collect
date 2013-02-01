@@ -1,11 +1,16 @@
 package org.openforis.collect.manager.speciesImport;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Queue;
 import java.util.Stack;
 
+import org.openforis.collect.manager.speciesImport.TaxonCSVReader.Column;
+import org.openforis.collect.manager.speciesImport.TaxonParsingError.Type;
 import org.openforis.idm.model.species.Taxon;
-import org.openforis.idm.model.species.Taxon.TaxonRank;
 import org.openforis.idm.model.species.TaxonVernacularName;
 
 /**
@@ -16,54 +21,157 @@ import org.openforis.idm.model.species.TaxonVernacularName;
 class TaxonTree {
 
 	private List<Node> roots;
-	private TaxonRank[] ranks;
-	
-	TaxonTree(TaxonRank[] ranks) {
-		super();
-		this.ranks = ranks;
-		roots = new ArrayList<Node>();
-	}
-	
-	public Taxon findTaxon(TaxonRank taxonRank, String scientificName) {
-		List<Node> rankNodes = new ArrayList<Node>(roots);
-		List<Node> nextRankNodes = new ArrayList<Node>();
-		for (int rankIndex = 0; rankIndex < ranks.length; rankIndex++) {
-			TaxonRank currentRank = ranks[rankIndex];
-			for (Node node : rankNodes) {
-				if ( currentRank == taxonRank ) {
-					Taxon taxon = node.getTaxon();
-					if ( scientificName.equals(taxon.getScientificName()) ) {
-						return taxon;
-					}
-				}
-				List<Node> children = node.getChildren();
-				if ( children != null && children.size() > 0 ) {
-					nextRankNodes.addAll(children);
-				}
-			}
-			rankNodes.clear();
-			rankNodes = nextRankNodes;
-			nextRankNodes = new ArrayList<Node>();
-		}
-		return null;
-	}
 
+	Map<String, Node> scientificNameToNode;
+	Map<String, Node> codeToNode;
+	Map<Integer, Node> taxonIdToNode;
+
+	
+	TaxonTree() {
+		super();
+		roots = new ArrayList<Node>();
+		scientificNameToNode = new HashMap<String, TaxonTree.Node>();
+		codeToNode = new HashMap<String, TaxonTree.Node>();
+		taxonIdToNode = new HashMap<Integer, TaxonTree.Node>();
+	}
+	
 	public List<Node> getRoots() {
 		return roots;
 	}
 	
 	public void addNode(Taxon parent, Taxon taxon) {
-		Node parentNode = findNode(parent);
+		Node parentNode = findNodeByTaxon(parent);
+		Node newNode;
 		if ( parentNode == null ) {
-			roots.add(new Node(taxon));
+			newNode = new Node(taxon);
+			roots.add(newNode);
 		} else {
-			parentNode.addChild(taxon);
+			newNode = new Node(parentNode, taxon);
+			parentNode.addChild(newNode);
 		}
+		index(newNode);
 	}
 	
 	public void addVernacularName(Taxon taxon, TaxonVernacularName vernacularName) {
-		Node node = findNode(taxon);
+		Node node = findNodeByTaxon(taxon);
 		node.addVernacularName(vernacularName);
+	}
+	
+	public Node findNodeByTaxon(final Taxon taxon) {
+		NodeFinderVisitor visitor = new AbstractNodeFinderVisitor() {
+			@Override
+			public void visit(Node node) {
+				if ( node.getTaxon() == taxon ) {
+					foundNode(node);
+				}
+			}
+		};
+		bfs(visitor);
+		return visitor.getFoundNode();
+	}
+	
+	public Taxon findTaxonByScientificName(String scientificName) {
+		Node result = findNodeByScientificName(scientificName);
+		return result == null ? null : result.getTaxon();
+	}
+
+	protected Node findNodeByScientificName(String scientificName) {
+		Node result = scientificNameToNode.get(scientificName);
+		return result;
+	}
+
+	public Taxon findTaxonByCode(String code) {
+		Node result = codeToNode.get(code);
+		return result == null ? null : result.getTaxon();
+	}
+	
+	public Taxon findTaxonByTaxonId(Integer id) {
+		Node result = taxonIdToNode.get(id);
+		return result == null ? null : result.getTaxon();
+	}
+
+	public void dfs(NodeVisitor visitor) {
+		Queue<Node> queue = new LinkedList<TaxonTree.Node>();
+		queue.addAll(roots);
+		while ( ! queue.isEmpty() ) {
+			Node node = queue.poll();
+			visitor.visit(node);
+			if ( visitor instanceof NodeFinderVisitor && ((NodeFinderVisitor) visitor).isFound() ) {
+				break;
+			}
+			List<Node> children = node.getChildren();
+			if ( children != null && children.size() > 0 ) {
+				queue.addAll(children);
+			}
+		}
+	}
+
+	public void bfs(NodeVisitor visitor) {
+		Stack<Node> stack = new Stack<Node>();
+		stack.addAll(roots);
+		while ( ! stack.isEmpty() ) {
+			Node node = stack.pop();
+			visitor.visit(node);
+			if ( visitor instanceof NodeFinderVisitor && ((NodeFinderVisitor) visitor).isFound() ) {
+				break;
+			}
+			if ( node.children != null ) {
+				stack.addAll(node.children);
+			}
+		}
+	}
+	
+	public void index(Taxon taxon) {
+		Node node = findNodeByTaxon(taxon);
+		index(node);
+	}
+	
+	public void index(Node node) {
+		Taxon taxon = node.getTaxon();
+		scientificNameToNode.put(taxon.getScientificName(), node);
+		String code = taxon.getCode();
+		if ( code != null ) {
+			codeToNode.put(code, node);
+		}
+		Integer taxonId = taxon.getTaxonId();
+		if ( taxonId != null ) {
+			taxonIdToNode.put(taxonId, node);
+		}
+	}
+
+	public void checkDuplicateScienfificName(Taxon parent, String scientificName, long row) throws TaxonParsingException {
+		Node foundNode = findNodeByScientificName(scientificName);
+		if ( foundNode != null ) {
+			Node foundParentNode = foundNode.getParent();
+			Node parentNode = findNodeByTaxon(parent);
+			if ( foundParentNode == parentNode ) {
+				TaxonParsingError error = new TaxonParsingError(Type.DUPLICATE_VALUE, row, Column.SCIENTIFIC_NAME);
+				throw new TaxonParsingException(error);
+			}
+		}
+	}
+	
+	public void checkDuplicates(Integer taxonId, String code, long row) throws TaxonParsingException {
+		if ( taxonId != null ) {
+			checkDuplicateTaxonId(taxonId, row);
+		}
+		checkDuplicateCode(code, row);
+	}
+
+	protected void checkDuplicateTaxonId(Integer taxonId, long row) throws TaxonParsingException {
+		Taxon oldTaxon = findTaxonByTaxonId(taxonId);
+		if ( oldTaxon != null ) {
+			TaxonParsingError error = new TaxonParsingError(Type.DUPLICATE_VALUE, row, Column.NO);
+			throw new TaxonParsingException(error);
+		}
+	}
+	
+	private void checkDuplicateCode(String code, long row) throws TaxonParsingException {
+		Taxon oldTaxon = findTaxonByCode(code);
+		if ( oldTaxon != null ) {
+			TaxonParsingError error = new TaxonParsingError(Type.DUPLICATE_VALUE, row, Column.CODE);
+			throw new TaxonParsingException(error);
+		}
 	}
 	
 	static class Node {
@@ -101,6 +209,10 @@ class TaxonTree {
 		
 		public void addChild(Taxon taxon) {
 			Node node = new Node(this, taxon);
+			addChild(node);
+		}
+
+		protected void addChild(Node node) {
 			if ( children == null ) {
 				children = new ArrayList<Node>();
 			}
@@ -116,27 +228,6 @@ class TaxonTree {
 		
 	}
 
-	public Node findNode(final Taxon taxon) {
-		TaxonFinder visitor = new TaxonFinder(taxon);
-		bfs(visitor);
-		return visitor.getFoundNode();
-	}
-	
-	public void bfs(NodeVisitor visitor) {
-		Stack<Node> stack = new Stack<Node>();
-		stack.addAll(roots);
-		while ( ! stack.isEmpty() ) {
-			Node node = stack.pop();
-			visitor.visit(node);
-			if ( visitor instanceof NodeFinderVisitor && ((NodeFinderVisitor) visitor).isFound() ) {
-				break;
-			}
-			if ( node.children != null ) {
-				stack.addAll(node.children);
-			}
-		}
-	}
-	
 	static interface NodeVisitor {
 		void visit(Node node);
 	}
@@ -144,24 +235,12 @@ class TaxonTree {
 	static interface NodeFinderVisitor extends NodeVisitor {
 		boolean isFound();
 		Node getFoundNode();
+		void foundNode(Node foundNode);
 	}
 	
-	class TaxonFinder implements NodeFinderVisitor {
-		private Taxon searchItem;
-		private Node foundNode;
-		
-		public TaxonFinder(Taxon searchItem) {
-			super();
-			this.searchItem = searchItem;
-			this.foundNode = null;
-		}
+	abstract class AbstractNodeFinderVisitor implements NodeFinderVisitor {
 
-		@Override
-		public void visit(Node node) {
-			if ( node.taxon == searchItem) {
-				this.foundNode = node;
-			}
-		}
+		protected Node foundNode;
 		
 		@Override
 		public boolean isFound() {
@@ -172,9 +251,12 @@ class TaxonTree {
 		public Node getFoundNode() {
 			return foundNode;
 		}
+		
+		@Override
+		public void foundNode(Node foundNode) {
+			this.foundNode = foundNode;
+		}
+		
 	}
-	
-	
 
-	
 }

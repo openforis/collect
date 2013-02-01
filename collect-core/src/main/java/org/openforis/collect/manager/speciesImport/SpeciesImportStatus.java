@@ -1,6 +1,7 @@
 package org.openforis.collect.manager.speciesImport;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -15,13 +16,13 @@ public class SpeciesImportStatus {
 	private SpeciesImportStatus.Step step;
 	private int totalRows;
 	private int processedRows;
-	private LinkedHashMap<Integer, TaxonParsingError> rowToError;
-	private List<Integer> skippedRows;
+	private LinkedHashMap<Long, List<TaxonParsingError>> rowToErrors;
+	private List<Long> skippedRows;
 	
 	public SpeciesImportStatus() {
 		step = Step.INITED;
 		processedRows = 0;
-		rowToError = new LinkedHashMap<Integer, TaxonParsingError>();
+		rowToErrors = new LinkedHashMap<Long, List<TaxonParsingError>>();
 	}
 	
 	public void rowProcessed() {
@@ -44,12 +45,24 @@ public class SpeciesImportStatus {
 		step = Step.CANCELLED;
 	}
 
-	public void addError(int row, TaxonParsingError error) {
-		rowToError.put(row, error);
+	public void addError(long row, TaxonParsingError error) {
+		List<TaxonParsingError> list = rowToErrors.get(row);
+		if ( list == null ) {
+			list = new ArrayList<TaxonParsingError>();
+			rowToErrors.put(row, list);
+		}
+		if ( ! list.contains(error) ) {
+			list.add(error);
+		}
 	}
 	
 	public List<TaxonParsingError> getErrors() {
-		return new ArrayList<TaxonParsingError>(rowToError.values());
+		Collection<List<TaxonParsingError>> errorsPerRows = rowToErrors.values();
+		List<TaxonParsingError> result = new ArrayList<TaxonParsingError>();
+		for (List<TaxonParsingError> errros : errorsPerRows) {
+			result.addAll(errros);
+		}
+		return result;
 	}
 	
 	public boolean isRunning() {
@@ -60,6 +73,10 @@ public class SpeciesImportStatus {
 		return step == Step.COMPLETE;
 	}
 	
+	public boolean hasErrors() {
+		return rowToErrors != null && ! rowToErrors.isEmpty();
+	}
+	
 	public int getProcessedRows() {
 		return processedRows;
 	}
@@ -68,8 +85,8 @@ public class SpeciesImportStatus {
 		return totalRows;
 	}
 	
-	public List<Integer> getSkippedRows() {
+	public List<Long> getSkippedRows() {
 		return CollectionUtil.unmodifiableList(skippedRows);
 	}
-	
+
 }

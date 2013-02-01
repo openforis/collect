@@ -15,13 +15,13 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
 
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openforis.collect.manager.speciesImport.SpeciesImportProcess;
 import org.openforis.collect.manager.speciesImport.SpeciesImportStatus;
-import org.openforis.collect.manager.speciesImport.TaxonFileColumn;
+import org.openforis.collect.manager.speciesImport.TaxonCSVReader.Column;
 import org.openforis.collect.manager.speciesImport.TaxonParsingError;
+import org.openforis.collect.manager.speciesImport.TaxonParsingError.Type;
 import org.openforis.collect.persistence.TaxonDao;
 import org.openforis.collect.persistence.TaxonVernacularNameDao;
 import org.openforis.collect.persistence.TaxonomyDao;
@@ -154,16 +154,29 @@ public class SpeciesImportProcessTest {
 	}
 	
 	@Test
-	public void testEmptyCells() throws Exception {
+	public void testErrorHandling() throws Exception {
 		SpeciesImportProcess process = importCSVFile("test-wrong-species.csv");
 		SpeciesImportStatus status = process.getStatus();
 		List<TaxonParsingError> errors = status.getErrors();
-		assertEquals(2, errors.size());
-		TaxonParsingError error1 = errors.get(0);
-		assertEquals(2, error1.getRow());
-		assertEquals(TaxonFileColumn.CODE.getName(), error1.getColumn());
+		assertEquals(7, errors.size());
+		
+		assertTrue(containsError(errors, 3, Column.CODE, Type.EMPTY));
+		assertTrue(containsError(errors, 4, Column.SCIENTIFIC_NAME, Type.EMPTY));
+		assertTrue(containsError(errors, 6, Column.CODE, Type.DUPLICATE_VALUE));
+		assertTrue(containsError(errors, 7, Column.FAMILY, Type.EMPTY));
+		assertTrue(containsError(errors, 8, Column.NO, Type.DUPLICATE_VALUE));
+		assertTrue(containsError(errors, 9, Column.SCIENTIFIC_NAME, Type.DUPLICATE_VALUE));
 	}
 
+	protected boolean containsError(List<TaxonParsingError> errors, long row, Column column, Type type) {
+		for (TaxonParsingError taxonParsingError : errors) {
+			if ( taxonParsingError.getType() == type && taxonParsingError.getRow() == row && taxonParsingError.getColumn().equals(column.getName())) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	protected Taxon findTaxonByCode(String code) {
 		Taxonomy taxonomy = taxonomyDao.load(TEST_TAXONOMY_NAME);
 		List<Taxon> results = taxonDao.findByCode(taxonomy.getId(), code, 10);

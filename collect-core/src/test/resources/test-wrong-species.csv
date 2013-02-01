@@ -3,3 +3,8 @@ no,code,family,scientific_name,swh,eng,ksb
 8,,Fabaceae,Afzelia quanzensis Welw.,Mbambakofi ,Mahogany,
 10,ALB/ADI,Fabaceae,,,,"  Mchao ,  Mkengemshaa/Msai.,/Mshai,Mshai-mamba;"
 11,ALB/GLA,Fabaceae,Albizia glaberrima (Shumach.&Thonn)Benth,"Mgerenge,Mchani",,
+12,ALB/GLA,Fabaceae,Duplicate code,,,
+15,ALB/SCH,,Missing family,,,
+11,ALB/NEW,Fabaceae,Duplicate id,,,
+18,ALB/GL2,Fabaceae,Albizia glaberrima,,,
+20,ALB/OTH,Otherfamily,Albizia glaberrima,,,
