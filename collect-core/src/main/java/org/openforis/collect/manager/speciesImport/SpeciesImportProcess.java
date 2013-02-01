@@ -24,7 +24,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openforis.collect.manager.SpeciesManager;
-import org.openforis.collect.manager.speciesImport.TaxonCSVReader.Column;
 import org.openforis.collect.manager.speciesImport.TaxonCSVReader.TaxonCSVLine;
 import org.openforis.collect.manager.speciesImport.TaxonParsingError.Type;
 import org.openforis.collect.manager.speciesImport.TaxonTree.Node;
