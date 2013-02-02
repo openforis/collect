@@ -33,6 +33,9 @@ package org.openforis.collect.presenter {
 		private static const DESIGNER_MENU_ITEM:Object = {
 			label: Message.get('home.surveyDesigner'),
 			icon: Images.DATABASE_DESIGNER};
+		private static const SPECIES_IMPORT_MENU_ITEM:Object = {
+			label: Message.get('home.speciesImport'),
+				icon: null};
 		
 		private var _view:HomePageView;
 		
@@ -54,6 +57,7 @@ package org.openforis.collect.presenter {
 			if ( Application.user.hasEffectiveRole(UserProxy.ROLE_ADMIN) ) {
 				result.addItem(DESIGNER_MENU_ITEM);
 				result.addItem(USERS_MANAGEMENT_MENU_ITEM);
+				result.addItem(SPECIES_IMPORT_MENU_ITEM);
 			}
 			return result;
 		}
@@ -71,6 +75,9 @@ package org.openforis.collect.presenter {
 					break;
 				case DATA_MANAGEMENT_MENU_ITEM:
 					eventDispatcher.dispatchEvent(new UIEvent(UIEvent.SHOW_LIST_OF_RECORDS));
+					break;
+				case SPECIES_IMPORT_MENU_ITEM:
+					eventDispatcher.dispatchEvent(new UIEvent(UIEvent.OPEN_SPECIES_IMPORT_POPUP));
 					break;
 			}
 		}

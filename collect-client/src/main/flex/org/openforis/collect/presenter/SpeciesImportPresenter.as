@@ -12,36 +12,25 @@ package org.openforis.collect.presenter {
 	import flash.net.URLVariables;
 	import flash.utils.Timer;
 	
-	import mx.collections.ArrayCollection;
-	import mx.collections.IList;
-	import mx.controls.Alert;
-	import mx.managers.PopUpManager;
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.IResponder;
 	import mx.rpc.events.ResultEvent;
 	
 	import org.openforis.collect.Application;
 	import org.openforis.collect.client.ClientFactory;
-	import org.openforis.collect.client.DataImportClient;
+	import org.openforis.collect.client.SpeciesClient;
 	import org.openforis.collect.client.SpeciesImportClient;
-	import org.openforis.collect.event.DataImportEvent;
-	import org.openforis.collect.event.UIEvent;
 	import org.openforis.collect.i18n.Message;
-	import org.openforis.collect.model.CollectRecord$Step;
-	import org.openforis.collect.remoting.service.dataImport.DataImportState$MainStep;
-	import org.openforis.collect.remoting.service.dataImport.DataImportState$SubStep;
-	import org.openforis.collect.remoting.service.dataImport.DataImportStateProxy;
-	import org.openforis.collect.remoting.service.dataImport.DataImportSummaryItemProxy;
-	import org.openforis.collect.remoting.service.dataImport.DataImportSummaryProxy;
-	import org.openforis.collect.remoting.service.dataImport.FileUnmarshallingErrorProxy;
-	import org.openforis.collect.ui.component.DataImportNodeErrorsPopUp;
-	import org.openforis.collect.ui.component.DataImportPopUp;
+	import org.openforis.collect.manager.speciesImport.SpeciesImportStatus;
+	import org.openforis.collect.manager.speciesImport.SpeciesImportStatus$Step;
+	import org.openforis.collect.metamodel.proxy.SurveyProxy;
 	import org.openforis.collect.ui.view.DataImportView;
 	import org.openforis.collect.ui.view.SpeciesImportView;
 	import org.openforis.collect.util.AlertUtil;
 	import org.openforis.collect.util.ApplicationConstants;
-	import org.openforis.collect.util.PopUpUtil;
-	import org.openforis.collect.util.StringUtil;
+	import org.openforis.idm.model.species.Taxonomy;
+	
+	import spark.events.IndexChangeEvent;
 
 	/**
 	 * 
@@ -55,17 +44,20 @@ package org.openforis.collect.presenter {
 		private var _view:SpeciesImportView;
 		private var _fileReference:FileReference;
 		private var _speciesImportClient:SpeciesImportClient;
+		private var _speciesClient:SpeciesClient;
 		private var _progressTimer:Timer;
 		private var _state:SpeciesImportStatus;
 		
 		private var _getStatusResponder:IResponder;
 		private var _firstOpen:Boolean;
+		private var _selectedTaxonomy:Taxonomy;
 		
 		public function SpeciesImportPresenter(view:SpeciesImportView) {
 			this._view = view;
 			_firstOpen = true;
 			_fileReference = new FileReference();
 			_speciesImportClient = ClientFactory.speciesImportClient;
+			_speciesClient = ClientFactory.speciesClient;
 			
 			_getStatusResponder = new AsyncResponder(getStatusResultHandler, faultHandler);
 			
@@ -74,6 +66,7 @@ package org.openforis.collect.presenter {
 			//try to see if there is a process still running
 			_view.currentState = SpeciesImportView.STATE_LOADING;
 			updateStatus();
+			loadTaxonomies();
 		}
 		
 		override internal function initEventListeners():void {
@@ -81,6 +74,8 @@ package org.openforis.collect.presenter {
 			_fileReference.addEventListener(ProgressEvent.PROGRESS, fileReferenceProgressHandler);
 			_fileReference.addEventListener(IOErrorEvent.IO_ERROR, fileReferenceIoErrorHandler);
 			_fileReference.addEventListener(DataEvent.UPLOAD_COMPLETE_DATA, fileReferenceUploadCompleteDataHandler);
+			
+			_view.checklistsDropDown.addEventListener(IndexChangeEvent.CHANGE, checklistChangeHandler);
 			
 			_view.newButton.addEventListener(MouseEvent.CLICK, newButtonClickHandler);
 			_view.editButton.addEventListener(MouseEvent.CLICK, editButtonClickHandler);
@@ -93,6 +88,20 @@ package org.openforis.collect.presenter {
 			_view.startButton.addEventListener(MouseEvent.CLICK, startClickHandler);
 			_view.cancelSelectFileButton.addEventListener(MouseEvent.CLICK, cancelClickHandler);
 			_view.cancelImportButton.addEventListener(MouseEvent.CLICK, cancelClickHandler);
+		}
+		
+		protected function loadTaxonomies():void {
+			var responder:IResponder = new AsyncResponder(loadTaxonomiesSuccessHandler, faultHandler);
+			_speciesClient.loadAllTaxonomies(responder);
+		}
+		
+		protected function loadTaxonomiesSuccessHandler(event:ResultEvent, token:Object = null):void {
+			_view.checklistsDropDown.dataProvider = event.result;
+		}
+		
+		protected function checklistChangeHandler(event:IndexChangeEvent):void {
+			_selectedTaxonomy = event.target.selectedItem;
+			//reload taxonomy data
 		}
 		
 		protected function newButtonClickHandler(event:MouseEvent):void	{
@@ -175,12 +184,14 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function startSummaryCreationResultHandler(event:ResultEvent, token:Object = null):void {
-			_state = event.result as DataImportStateProxy;
+			_state = event.result as SpeciesImportStatus;
 			updateView();
 		}
 		
 		protected function startClickHandler(event:MouseEvent):void {
-			_speciesImportClient.start(responder, taxomyName);
+			var responder:AsyncResponder = new AsyncResponder(startResultHandler, faultHandler);
+			var taxonomyName:String = _view.checklistsDropDown.selectedItem.name;
+			_speciesImportClient.start(responder, taxonomyName);
 			_view.progressBar.setProgress(0, 0);
 			_view.currentState = SpeciesImportView.STATE_IMPORTING;
 		}
@@ -222,55 +233,33 @@ package org.openforis.collect.presenter {
 		}
 		
 		private function updateView():void {
-			if(_state == null || _state.mainStep == DataImportState$MainStep.INITED || 
-				(_firstOpen && _state.subStep != DataImportState$SubStep.RUNNING) ) {
+			if(_state == null || _state.step == SpeciesImportStatus$Step.INITED || 
+				(_firstOpen && _state.step != SpeciesImportStatus$Step.RUNNING) ) {
 				resetView();
 			} else {
-				var mainStep:DataImportState$MainStep = _state.mainStep;
-				var subStep:DataImportState$SubStep = _state.subStep;
-				switch ( subStep ) {
-					case DataImportState$SubStep.INITED:
-						switch ( mainStep ) {
-							case DataImportState$MainStep.SUMMARY_CREATION:
-								resetView();
-								break;
-							case DataImportState$MainStep.IMPORT:
-								updateViewSummaryCompleted();
-								break;
-						}
-						break;
-					case DataImportState$SubStep.PREPARING:
-						_view.currentState = DataImportView.STATE_LOADING;
-						startProgressTimer();
-						break;
-					case DataImportState$SubStep.RUNNING:
-						switch ( mainStep ) {
-							case DataImportState$MainStep.SUMMARY_CREATION:
-								updateViewForCreatingSummary();
-								break;
-							case DataImportState$MainStep.IMPORT:
-								updateViewForImporting();
-								break;
-						}
-						startProgressTimer();
-						break;
-					case DataImportState$SubStep.COMPLETE:
-						stopProgressTimer();
-						switch ( mainStep ) {
-							case DataImportState$MainStep.SUMMARY_CREATION:
-								updateViewSummaryCompleted();
-								break;
-							case DataImportState$MainStep.IMPORT:
-								updateViewImportCompleted();
-								break;
-						}
-						break;
-					case DataImportState$SubStep.ERROR:
-						AlertUtil.showError("dataImport.error", [_state.errorMessage]);
+				var step:SpeciesImportStatus$Step = _state.step;
+				switch ( step ) {
+					case SpeciesImportStatus$Step.INITED:
 						resetView();
 						break;
-					case DataImportState$SubStep.CANCELLED:
-						AlertUtil.showError("dataImport.cancelled");
+					case SpeciesImportStatus$Step.PREPARING:
+						_view.currentState = SpeciesImportView.STATE_LOADING;
+						startProgressTimer();
+						break;
+					case SpeciesImportStatus$Step.RUNNING:
+						updateViewForImporting();
+						startProgressTimer();
+						break;
+					case SpeciesImportStatus$Step.COMPLETE:
+						stopProgressTimer();
+						updateViewImportCompleted();
+						break;
+					case SpeciesImportStatus$Step.ERROR:
+						//AlertUtil.showError("dataImport.error", [_state.errorMessage]);
+						resetView();
+						break;
+					case SpeciesImportStatus$Step.CANCELLED:
+						AlertUtil.showError("speciesImport.cancelled");
 						resetView();
 						break;
 					default:
@@ -281,81 +270,38 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function updateViewImportCompleted():void {
-			_view.currentState = DataImportView.STATE_IMPORT_COMPLETE;
-			//reload record summaries
-			var uiEvent:UIEvent = new UIEvent(UIEvent.RELOAD_RECORD_SUMMARIES);
-			eventDispatcher.dispatchEvent(uiEvent);
+			_view.currentState = SpeciesImportView.STATE_DEFAULT;
+			//reload taxonomy
 		}
 		
 		private function updateViewForUploading():void {
-			_view.currentState = DataImportView.STATE_UPLOADING;
-			_view.progressTitle.text = Message.get("dataImport.uploadingFile");
+			_view.currentState = SpeciesImportView.STATE_UPLOADING;
+			_view.progressTitle.text = Message.get("speciesImport.uploadingFile");
 			_view.progressLabel.text = "";
 		}
 
 		private function updateViewForImporting():void {
-			_view.currentState = DataImportView.STATE_IMPORT_RUNNING;
-			_view.progressTitle.text = Message.get("dataImport.importingRecords");
-			_view.progressBar.setProgress(_state.count, _state.total);
-			updateProgressText("dataImport.importingRecordsProgressLabel");
-			updateErrorsTextArea()
+			_view.currentState = SpeciesImportView.STATE_IMPORTING;
+			_view.progressTitle.text = Message.get("speciesImport.importing");
+			_view.progressBar.setProgress(_state.processedRows, _state.totalRows);
+			updateProgressText("speciesImport.importingProgressLabel");
 		}
 
-		private function updateViewForCreatingSummary():void {
-			_view.currentState = DataImportView.STATE_SUMMARY_CREATIION_RUNNING;
-			_view.progressTitle.text = Message.get("dataImport.creatingSummary");
-			_view.progressBar.setProgress(_state.count, _state.total);
-			updateProgressText("dataImport.creatingSummaryProgressLabel");
-			updateErrorsTextArea()
-		}
-		
 		protected function updateProgressText(progressLabelResource:String):void {
 			var progressText:String;
-			if ( _state.total == 0 ) {
-				progressText = Message.get("dataImport.processing");
+			if ( _state.totalRows == 0 ) {
+				progressText = Message.get("speciesImport.processing");
 			} else {
-				progressText = Message.get(progressLabelResource, [_state.count, _state.total]);
+				progressText = Message.get(progressLabelResource, [_state.processedRows, _state.totalRows]);
 			}
 			_view.progressLabel.text = progressText;
 		}
 		
-		protected function updateErrorsTextArea():void {
-			/*
-			var result:String = "";
-			if ( _state != null && _state.errors != null ) {
-				var files:IList = _state.errors.keySet;
-				for each (var fileName:String in files ) {
-					var errorMessage:String = _state.errors.get(fileName);
-					result += Message.get('dataImport.errorInFile', [fileName, errorMessage]);
-				}
-			}
-			//_view.errorsTextArea.text = result;
-			*/
-		}
-		
 		protected function resetView():void {
 			_state = null;
-			_view.currentState = DataImportView.STATE_DEFAULT;
+			_view.currentState = SpeciesImportView.STATE_DEFAULT;
 			stopProgressTimer();
 		}
 		
-		protected function showImportWarningsPopUp(event:DataImportEvent):void {
-			var summaryItem:DataImportSummaryItemProxy = event.summaryItem;
-			var warnings:IList = summaryItem.warnings;
-			var popUp:DataImportNodeErrorsPopUp = DataImportNodeErrorsPopUp(PopUpUtil.createPopUp(DataImportNodeErrorsPopUp, false));
-			var recordKey:String = summaryItem.key;
-			popUp.title = Message.get("dataImport.warnings.title", [recordKey]);
-			popUp.dataGrid.dataProvider = warnings;
-		}
-		
-		protected function showSkippedFileErrorsPopUp(event:DataImportEvent):void {
-			var fileErrorItem:FileUnmarshallingErrorProxy = event.fileUnmarshallingError;
-			var errors:IList = fileErrorItem.errors;
-			var popUp:DataImportNodeErrorsPopUp = DataImportNodeErrorsPopUp(PopUpUtil.createPopUp(DataImportNodeErrorsPopUp, false));
-			var fileName:String = fileErrorItem.fileName;
-			popUp.title = Message.get("dataImport.skippedFileErrors.title", [fileName]);
-			popUp.showStep = false;
-			popUp.dataGrid.dataProvider = errors;
-		}
 	}
 }

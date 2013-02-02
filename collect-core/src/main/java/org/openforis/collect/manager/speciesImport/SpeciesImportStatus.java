@@ -34,6 +34,10 @@ public class SpeciesImportStatus {
 		processedRows ++;
 	}
 	
+	public SpeciesImportStatus.Step getStep() {
+		return step;
+	}
+	
 	public void error() {
 		step = Step.ERROR;			
 	}

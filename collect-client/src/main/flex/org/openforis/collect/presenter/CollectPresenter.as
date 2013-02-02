@@ -50,6 +50,8 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
 	import org.openforis.collect.model.proxy.RecordProxy;
 	import org.openforis.collect.util.CollectionUtil;
+	import org.openforis.collect.ui.component.SpeciesImportPopUp;
+	import mx.core.IFlexDisplayObject;
 	
 	/**
 	 * 
@@ -65,6 +67,7 @@ package org.openforis.collect.presenter {
 		private var _modelClient:ModelClient;
 		private var _sessionClient:SessionClient;
 		//private var _contextMenuPresenter:ContextMenuPresenter;
+		private var _speciedImportPopUp:SpeciesImportPopUp;
 		
 		private var _keepAliveTimer:Timer;
 		
@@ -108,6 +111,7 @@ package org.openforis.collect.presenter {
 			FlexGlobals.topLevelApplication.systemManager.addEventListener(MouseEvent.MOUSE_WHEEL, mouseWheelHandler, true);
 			eventDispatcher.addEventListener(UIEvent.LOGOUT_CLICK, logoutClickHandler);
 			eventDispatcher.addEventListener(UIEvent.SHOW_LIST_OF_RECORDS, showListOfRecordsHandler);
+			eventDispatcher.addEventListener(UIEvent.OPEN_SPECIES_IMPORT_POPUP, openSpeciesImportPopUpHandler);
 			
 			CONFIG::debugging {
 				_view.addEventListener(KeyboardEvent.KEY_DOWN, function(event:KeyboardEvent):void {
@@ -210,6 +214,10 @@ package org.openforis.collect.presenter {
 			popUp.automaticallySelect = automaticallySelect;
 			PopUpManager.addPopUp(popUp, FlexGlobals.topLevelApplication as DisplayObject, true);
 			PopUpManager.centerPopUp(popUp);
+		}
+		
+		protected function openSpeciesImportPopUpHandler(event:Event):void {
+			_speciedImportPopUp = PopUpUtil.createPopUp(SpeciesImportPopUp);
 		}
 		
 		/**

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
 		 xmlns:s="library://ns.adobe.com/flex/spark" 
-		 xmlns:mx="library://ns.adobe.com/flex/mx">
+		 xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:component="org.openforis.collect.ui.component.*">
 
 	<fx:Script>
 		<![CDATA[
@@ -24,6 +24,47 @@
 		]]>
 	</fx:Script>
 	
+	<fx:Declarations>
+		<component:PopUp id="uploadPopUp">
+			<s:VGroup width="100%" height="100%"
+					  horizontalAlign="center"
+					  verticalAlign="middle"
+					  gap="20"
+					  >
+				
+				<s:HGroup>
+					<s:Label text="{Message.get('speciesImport.checklist')}" 
+							 styleName="formLabel" />
+					<s:TextInput id="checkListTextInput" editable="false" />
+				</s:HGroup>
+				
+				<s:HGroup>
+					<s:Button id="selectFileButton" 
+							  label="{Message.get('speciesImport.selectFile')}"
+							  includeIn="default"
+							  useHandCursor="true"
+							  buttonMode="true"
+							  />
+					
+					<s:Button id="startButton" 
+							  label="{Message.get('speciesImport.start')}"
+							  includeIn="default"
+							  useHandCursor="true"
+							  buttonMode="true"
+							  />
+					
+					<s:Button id="cancelSelectFileButton" 
+							  label="{Message.get('global.cancel')}"
+							  includeIn="default"
+							  useHandCursor="true"
+							  buttonMode="true"
+							  />
+					
+				</s:HGroup>
+			</s:VGroup>
+		</component:PopUp>
+	</fx:Declarations>
+	
 	<s:states>
 		<s:State name="default" />
 		<s:State name="loading" />
@@ -39,10 +80,12 @@
 			  height="100%" width="100%"
 			  gap="30"
 			  >
-		<s:Label text="{Message.get('speciesImport.checklist')}" 
-				 styleName="formLabel" />
-		
-		<s:DropDownList id="checklistsDropDown" labelField="name" />
+		<s:HGroup>
+			<s:Label text="{Message.get('speciesImport.checklist')}" 
+					 styleName="formLabel" />
+			
+			<s:DropDownList id="checklistsDropDown" labelField="name" />
+		</s:HGroup>
 		
 		<s:HGroup>
 			<s:Button id="newButton" 
@@ -75,39 +118,6 @@
 					  buttonMode="true"
 					  />
 		</s:HGroup>
-	</s:VGroup>
-	
-
-	
-	<s:VGroup width="100%" height="100%"
-			  includeIn="selectFile"
-			  itemCreationPolicy="immediate"
-			  horizontalAlign="center"
-			  verticalAlign="middle"
-			  gap="20"
-			  >
-		
-		<s:Button id="selectFileButton" 
-				  label="{Message.get('speciesImport.selectFile')}"
-				  includeIn="default"
-				  useHandCursor="true"
-				  buttonMode="true"
-				  />
-
-		<s:Button id="startButton" 
-				  label="{Message.get('speciesImport.start')}"
-				  includeIn="default"
-				  useHandCursor="true"
-				  buttonMode="true"
-				  />
-		
-		<s:Button id="cancelSelectFileButton" 
-				  label="{Message.get('global.cancel')}"
-				  includeIn="default"
-				  useHandCursor="true"
-				  buttonMode="true"
-				  />
-		
 	</s:VGroup>
 	
 	<s:VGroup width="100%" height="100%"

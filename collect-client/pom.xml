@@ -80,10 +80,11 @@
 <!-- 								<includeClass>org.openforis.collect.session.**</includeClass> -->
 <!-- 								<includeClass>org.openforis.collect.model.**</includeClass> -->
 <!-- 								<includeClass>org.openforis.idm.model.**</includeClass> -->
-								<includeClass>org.openforis.idm.model.species.Taxon$TaxonRank</includeClass>
+								<includeClass>org.openforis.idm.model.species.Taxonomy</includeClass>
+                <includeClass>org.openforis.idm.model.species.Taxon$TaxonRank</includeClass>
 								<includeClass>org.openforis.idm.metamodel.validation.ValidationResultFlag</includeClass>
-                                <includeClass>org.openforis.collect.manager.speciesImport.SpeciesImportStatus</includeClass>
-                                <includeClass>org.openforis.collect.manager.speciesImport.SpeciesImportStatus$Step</includeClass>
+                <includeClass>org.openforis.collect.manager.speciesImport.SpeciesImportStatus</includeClass>
+                <includeClass>org.openforis.collect.manager.speciesImport.SpeciesImportStatus$Step</includeClass>
 								<includeClass>org.openforis.collect.model.CollectRecord$State</includeClass>
 								<includeClass>org.openforis.collect.model.RecordSummarySortField</includeClass>
 								<includeClass>org.openforis.collect.model.RecordSummarySortField$Sortable</includeClass>
