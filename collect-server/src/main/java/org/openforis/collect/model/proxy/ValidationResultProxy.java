@@ -53,15 +53,12 @@ public class ValidationResultProxy implements Proxy {
 
 	private transient ValidationResult validationResult;
 	private transient Attribute<?, ?> attribute;
-	private static Map<ValidationRule<?>, String[]> messageArgsCache;
+	private transient Map<ValidationRule<?>, String[]> messageArgsCache;
 
-	static {
-		messageArgsCache = new HashMap<ValidationRule<?>, String[]>();
-	}
-	
 	public ValidationResultProxy(Attribute<?, ?> attribute, ValidationResult validationResult) {
 		this.attribute = attribute;
 		this.validationResult = validationResult;
+		this.messageArgsCache = new HashMap<ValidationRule<?>, String[]>();
 	}
 
 	public static List<ValidationResultProxy> fromList(Attribute<?, ?> attribute, List<ValidationResult> list) {

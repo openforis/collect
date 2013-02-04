@@ -30,6 +30,16 @@
     <mvc:resources mapping="/images/**" location="/images/" />
     <mvc:resources mapping="/script/**" location="/script/" />
 	
+    <bean name="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+      <property name="basename">
+        <value>resourcebundles/validation</value>
+      </property>
+    </bean>
+
+    <!-- Resource Bundle Helpers -->
+    <bean id="messageBundleHelper" class="org.openforis.collect.util.MessageBundleHelper" />
+    <bean id="validationMessageHelper" class="org.openforis.collect.util.ValidationMessageHelper" />
+
     <!-- <context:component-scan base-package="org.fao.openforis.service"/> -->
 	<!-- <context:component-scan base-package="org.fao.openforis"/> -->
 
@@ -69,14 +79,14 @@
 	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver" />
 
 	<!-- Controllers -->
-	<bean id="dataImportController" class="org.openforis.collect.web.controller.DataImportController" />
+    <bean id="dataImportController" class="org.openforis.collect.web.controller.DataImportController" />
 	<bean id="dataExportDownloadController" class="org.openforis.collect.web.controller.DataExportDownloadController" />
 	<bean id="fileNameViewController" class="org.springframework.web.servlet.mvc.UrlFilenameViewController" />
 	<bean id="recordFileController" class="org.openforis.collect.web.controller.RecordFileController" scope="session" />
 	<bean id="surveyController" class="org.openforis.collect.web.controller.designer.SurveyController" />
 	<bean id="validationController" class="org.openforis.collect.web.controller.ValidationController" />
-	<bean id="unlockController" class="org.openforis.collect.web.controller.UnlockController" />
-
+  	<bean id="unlockController" class="org.openforis.collect.web.controller.UnlockController" />
+    
 	<!-- ===================================== -->
 	<!-- GraniteDs services -->
 	<!-- ===================================== -->
