@@ -121,6 +121,13 @@ package org.openforis.collect.presenter {
 					}
 				});
 			}
+			
+			_view.addEventListener(KeyboardEvent.KEY_DOWN, function(event:KeyboardEvent):void {
+				//open species import popup pressing CTRL+SHIFT+s
+				if ( event.ctrlKey && event.shiftKey && event.charCode == 115 ) {
+					eventDispatcher.dispatchEvent(new UIEvent(UIEvent.OPEN_SPECIES_IMPORT_POPUP));
+				}
+			});
 		}
 		
 		protected function canHaveSurveySelection():Boolean {
@@ -216,8 +223,8 @@ package org.openforis.collect.presenter {
 			PopUpManager.centerPopUp(popUp);
 		}
 		
-		protected function openSpeciesImportPopUpHandler(event:Event):void {
-			_speciedImportPopUp = PopUpUtil.createPopUp(SpeciesImportPopUp);
+		protected function openSpeciesImportPopUpHandler(event:Event = null):void {
+			_speciedImportPopUp = SpeciesImportPopUp(PopUpUtil.createPopUp(SpeciesImportPopUp));
 		}
 		
 		/**

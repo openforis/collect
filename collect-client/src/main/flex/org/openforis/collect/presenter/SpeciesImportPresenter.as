@@ -12,6 +12,7 @@ package org.openforis.collect.presenter {
 	import flash.net.URLVariables;
 	import flash.utils.Timer;
 	
+	import mx.collections.IList;
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.IResponder;
 	import mx.rpc.events.ResultEvent;
@@ -84,9 +85,6 @@ package org.openforis.collect.presenter {
 			_view.importButton.addEventListener(MouseEvent.CLICK, importButtonClickHandler);
 			_view.exportButton.addEventListener(MouseEvent.CLICK, exportButtonClickHandler);
 			
-			_view.selectFileButton.addEventListener(MouseEvent.CLICK, selectFileClickHandler);
-			_view.startButton.addEventListener(MouseEvent.CLICK, startClickHandler);
-			_view.cancelSelectFileButton.addEventListener(MouseEvent.CLICK, cancelClickHandler);
 			_view.cancelImportButton.addEventListener(MouseEvent.CLICK, cancelClickHandler);
 		}
 		
@@ -96,7 +94,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function loadTaxonomiesSuccessHandler(event:ResultEvent, token:Object = null):void {
-			_view.checklistsDropDown.dataProvider = event.result;
+			_view.checklistsDropDown.dataProvider = event.result as IList;
 		}
 		
 		protected function checklistChangeHandler(event:IndexChangeEvent):void {
@@ -116,12 +114,8 @@ package org.openforis.collect.presenter {
 			
 		}
 		
-		protected function selectFileClickHandler(event:MouseEvent):void {
-			_fileReference.browse();
-		}
-		
 		protected function importButtonClickHandler(event:MouseEvent):void {
-			
+			_fileReference.browse();
 		}
 		
 		protected function exportButtonClickHandler(event:MouseEvent):void {
