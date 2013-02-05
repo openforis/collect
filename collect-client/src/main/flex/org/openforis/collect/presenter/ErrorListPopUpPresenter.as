@@ -75,7 +75,7 @@ package org.openforis.collect.presenter
 		}
 		
 		protected function createAttributeDataGridItem(attribute:AttributeProxy):Object {
-			var messages:Array = attribute.validationResults.validationMessages;
+			var messages:IList = attribute.validationResults.validationMessages;
 			var message:String = StringUtil.concat(", ", messages);
 			var label:String = createNodeLabel(attribute);
 			var item:Object = {label:label, message: message};

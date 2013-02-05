@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+import org.openforis.collect.manager.process.ProcessStatus;
 import org.openforis.idm.util.CollectionUtil;
 
 /**
@@ -12,20 +13,15 @@ import org.openforis.idm.util.CollectionUtil;
  * @author S. Ricci
  *
  */
-public class SpeciesImportStatus {
+public class SpeciesImportStatus extends ProcessStatus {
 	
-	enum Step {
-		INITED, PREPARING, RUNNING, COMPLETE, CANCELLED, ERROR
-	}
-	
-	private SpeciesImportStatus.Step step;
 	private int totalRows;
 	private int processedRows;
 	private LinkedHashMap<Long, List<TaxonParsingError>> rowToErrors;
 	private List<Long> skippedRows;
 	
 	public SpeciesImportStatus() {
-		step = Step.INITED;
+		super();
 		processedRows = 0;
 		rowToErrors = new LinkedHashMap<Long, List<TaxonParsingError>>();
 	}
@@ -34,26 +30,6 @@ public class SpeciesImportStatus {
 		processedRows ++;
 	}
 	
-	public SpeciesImportStatus.Step getStep() {
-		return step;
-	}
-	
-	public void error() {
-		step = Step.ERROR;			
-	}
-
-	public void complete() {
-		step = Step.COMPLETE;
-	}
-
-	public void start() {
-		step = Step.RUNNING;
-	}
-
-	public void cancel() {
-		step = Step.CANCELLED;
-	}
-
 	public void addError(long row, TaxonParsingError error) {
 		List<TaxonParsingError> list = rowToErrors.get(row);
 		if ( list == null ) {
@@ -72,14 +48,6 @@ public class SpeciesImportStatus {
 			result.addAll(errros);
 		}
 		return result;
-	}
-	
-	public boolean isRunning() {
-		return step == Step.RUNNING;
-	}
-	
-	public boolean isComplete() {
-		return step == Step.COMPLETE;
 	}
 	
 	public boolean hasErrors() {

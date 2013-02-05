@@ -41,14 +41,11 @@
 			  height="100%" width="100%"
 			  gap="30"
 			  >
-		<s:HGroup>
+		<s:HGroup width="100%">
 			<s:Label text="{Message.get('speciesImport.checklist')}" 
 					 styleName="formLabel" />
 			
 			<s:DropDownList id="checklistsDropDown" labelField="name" />
-		</s:HGroup>
-		
-		<s:HGroup>
 			<s:Button id="newButton" 
 					  label="{Message.get('speciesImport.newCheckist')}"
 					  useHandCursor="true"
@@ -66,7 +63,7 @@
 					  />
 		</s:HGroup>
 		
-		<s:HGroup>
+		<s:HGroup gap="50">
 			<s:Button id="importButton" 
 					  label="{Message.get('speciesImport.import')}"
 					  useHandCursor="true"

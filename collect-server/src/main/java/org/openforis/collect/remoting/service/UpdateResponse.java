@@ -9,6 +9,7 @@ import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedPro
 import org.openforis.collect.Proxy;
 import org.openforis.collect.model.proxy.NodeProxy;
 import org.openforis.collect.model.proxy.ValidationResultsProxy;
+import org.openforis.collect.spring.MessageContextHolder;
 import org.openforis.idm.metamodel.validation.ValidationResults;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Node;
@@ -20,6 +21,7 @@ import org.openforis.idm.model.Node;
  */
 public class UpdateResponse implements Proxy {
 
+	private transient MessageContextHolder messageContextHolder;
 	private Integer nodeId;
 	private transient Node<?> node;
 	private transient Map<String, Object> relevantMap;
@@ -37,7 +39,8 @@ public class UpdateResponse implements Proxy {
 	private Integer missingWarnings;
 	private Integer warnings;
 	
-	public UpdateResponse(Node<?> node) {
+	public UpdateResponse(MessageContextHolder messageContextHolder, Node<?> node) {
+		this.messageContextHolder = messageContextHolder;
 		this.nodeId = node.getInternalId();
 		this.node = node;
 		relevantMap = new HashMap<String, Object>();
@@ -71,7 +74,7 @@ public class UpdateResponse implements Proxy {
 	@ExternalizedProperty
 	public ValidationResultsProxy getValidationResults() {
 		if (attributeValidationResults != null) {
-			return new ValidationResultsProxy((Attribute<?, ?>) node, attributeValidationResults);
+			return new ValidationResultsProxy(messageContextHolder, (Attribute<?, ?>) node, attributeValidationResults);
 		}
 		return null;
 	}

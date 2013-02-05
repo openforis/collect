@@ -23,7 +23,6 @@
     http://www.springframework.org/schema/tx/spring-tx-3.0.xsd"
 	default-lazy-init="true">
 
-    <context:component-scan base-package="org.openforis.collect" />
 	<context:annotation-config />
 
     <mvc:resources mapping="collect.swf" location="collect.swf" />
@@ -36,6 +35,17 @@
         <value>resourcebundles/validation</value>
       </property>
     </bean>
+
+    <!-- Resource Bundle Helpers -->
+    <bean id="messageBundleHelper" class="org.openforis.collect.util.MessageBundleHelper" />
+    <bean id="validationMessageHelper" class="org.openforis.collect.util.ValidationMessageHelper" />
+
+    <!-- <context:component-scan base-package="org.fao.openforis.service"/> -->
+	<!-- <context:component-scan base-package="org.fao.openforis"/> -->
+
+<!-- 	<context:property-placeholder location="classpath:/app.properties" /> -->
+
+<!-- 	<bean id="applicationContextProvider" class="org.openforis.collect.context.ApplicationContextAwareImpl" /> -->
 
 	<bean class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping" />
 	<bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter" />
@@ -69,8 +79,14 @@
 	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver" />
 
 	<!-- Controllers -->
+    <bean id="dataImportController" class="org.openforis.collect.web.controller.DataImportController" />
+	<bean id="dataExportDownloadController" class="org.openforis.collect.web.controller.DataExportDownloadController" />
 	<bean id="fileNameViewController" class="org.springframework.web.servlet.mvc.UrlFilenameViewController" />
-
+	<bean id="recordFileController" class="org.openforis.collect.web.controller.RecordFileController" scope="session" />
+	<bean id="surveyController" class="org.openforis.collect.web.controller.designer.SurveyController" />
+	<bean id="validationController" class="org.openforis.collect.web.controller.ValidationController" />
+  	<bean id="unlockController" class="org.openforis.collect.web.controller.UnlockController" />
+    
 	<!-- ===================================== -->
 	<!-- GraniteDs services -->
 	<!-- ===================================== -->

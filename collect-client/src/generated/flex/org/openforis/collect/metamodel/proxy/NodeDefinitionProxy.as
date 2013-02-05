@@ -35,7 +35,7 @@ package org.openforis.collect.metamodel.proxy {
 			return getSpecificLabelText(labelTypes, language, false, false);
 		}
 		
-		public function getSpecificLabelText(typesStack:Array, language:String = null, firstIfNotFound:Boolean = true, nameIfNotFound = true):String {
+		public function getSpecificLabelText(typesStack:Array, language:String = null, firstIfNotFound:Boolean = true, nameIfNotFound:Boolean = true):String {
 			var label:NodeLabelProxy = null;
 			for each (var type:NodeLabelProxy$Type in typesStack) {
 				label = getLabel(type, language, false);

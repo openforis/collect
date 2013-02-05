@@ -37,6 +37,7 @@ import org.openforis.collect.persistence.MultipleEditException;
 import org.openforis.collect.persistence.RecordPersistenceException;
 import org.openforis.collect.remoting.service.UpdateRequestOperation.Method;
 import org.openforis.collect.remoting.service.recordIndex.RecordIndexService;
+import org.openforis.collect.spring.MessageContextHolder;
 import org.openforis.collect.web.session.SessionState;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.BooleanAttributeDefinition;
@@ -81,16 +82,15 @@ public class DataService {
 	
 	@Autowired
 	private SessionManager sessionManager;
-
 	@Autowired
 	private transient RecordManager recordManager;
-	
 	@Autowired
 	private transient RecordFileManager fileManager;
-
 	@Autowired
 	private transient RecordIndexService recordIndexService;
-	
+	@Autowired
+	private MessageContextHolder messageContextHolder;
+
 	/**
 	 * it's true when the root entity definition of the record in session has some nodes with the "collect:index" annotation
 	 */
@@ -111,7 +111,7 @@ public class DataService {
 		sessionManager.setActiveRecord(record);
 		fileManager.reset();
 		prepareRecordIndexing();
-		return new RecordProxy(record);
+		return new RecordProxy(messageContextHolder, record);
 	}
 
 	protected void prepareRecordIndexing() throws RecordIndexException {
@@ -143,10 +143,7 @@ public class DataService {
 		String rootEntityDefinitionName = rootEntityDefinition.getName();
 		int count = recordManager.getRecordCount(activeSurvey, rootEntityDefinitionName, keyValues);
 		List<CollectRecord> summaries = recordManager.loadSummaries(activeSurvey, rootEntityDefinitionName, offset, maxNumberOfRows, sortFields, keyValues);
-		List<RecordProxy> proxies = new ArrayList<RecordProxy>();
-		for (CollectRecord summary : summaries) {
-			proxies.add(new RecordProxy(summary));
-		}
+		List<RecordProxy> proxies = RecordProxy.fromList(messageContextHolder, summaries);
 		result.put("count", count);
 		result.put("records", proxies);
 		return result;
@@ -169,7 +166,7 @@ public class DataService {
 		recordManager.addEmptyNodes(rootEntity);
 		sessionManager.setActiveRecord(record);
 		prepareRecordIndexing();
-		RecordProxy recordProxy = new RecordProxy(record);
+		RecordProxy recordProxy = new RecordProxy(messageContextHolder, record);
 		return recordProxy;
 	}
 	
@@ -281,7 +278,7 @@ public class DataService {
 				Node<?> createdNode = addNode(parentEntity, nodeDef, requestValue, symbol, remarks);
 				record.setMissingApproved(parentEntity, nodeName, false);
 				response = getUpdateResponse(responseMap, createdNode);
-				response.setCreatedNode(NodeProxy.fromNode(createdNode));
+				response.setCreatedNode(NodeProxy.fromNode(messageContextHolder, createdNode));
 				relReqDependencies = recordManager.clearRelevanceRequiredStates(createdNode);
 				if(createdNode instanceof Attribute){
 					attribute = (Attribute<? extends AttributeDefinition, ?>) createdNode;
@@ -492,7 +489,7 @@ public class DataService {
 		Integer nodeId = node.getInternalId();
 		UpdateResponse response = responseMap.get(nodeId);
 		if(response == null){
-			response = new UpdateResponse(node);
+			response = new UpdateResponse(messageContextHolder, node);
 			responseMap.put(nodeId, response);
 		}
 		return response;

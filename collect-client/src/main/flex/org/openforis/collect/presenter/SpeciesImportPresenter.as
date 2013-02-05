@@ -22,8 +22,8 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.client.SpeciesClient;
 	import org.openforis.collect.client.SpeciesImportClient;
 	import org.openforis.collect.i18n.Message;
+	import org.openforis.collect.manager.process.ProcessStatus$Step;
 	import org.openforis.collect.manager.speciesImport.SpeciesImportStatus;
-	import org.openforis.collect.manager.speciesImport.SpeciesImportStatus$Step;
 	import org.openforis.collect.metamodel.proxy.SurveyProxy;
 	import org.openforis.collect.ui.view.DataImportView;
 	import org.openforis.collect.ui.view.SpeciesImportView;
@@ -141,6 +141,11 @@ package org.openforis.collect.presenter {
 		}
 */		
 		protected function fileReferenceSelectHandler(event:Event):void {
+			AlertUtil.showConfirm("speciesImport.confirmImport.message", null, "speciesImport.confirmImport.title",
+				startUpload);
+		}
+		
+		protected function startUpload():void {
 			updateViewForUploading();
 			
 			var url:String = ApplicationConstants.SPECIES_IMPORT_UPLOAD_URL;
@@ -227,32 +232,32 @@ package org.openforis.collect.presenter {
 		}
 		
 		private function updateView():void {
-			if(_state == null || _state.step == SpeciesImportStatus$Step.INITED || 
-				(_firstOpen && _state.step != SpeciesImportStatus$Step.RUNNING) ) {
+			if(_state == null || _state.step == ProcessStatus$Step.INITED || 
+				(_firstOpen && _state.step != ProcessStatus$Step.RUNNING) ) {
 				resetView();
 			} else {
-				var step:SpeciesImportStatus$Step = _state.step;
+				var step:ProcessStatus$Step = _state.step;
 				switch ( step ) {
-					case SpeciesImportStatus$Step.INITED:
+					case ProcessStatus$Step.INITED:
 						resetView();
 						break;
-					case SpeciesImportStatus$Step.PREPARING:
+					case ProcessStatus$Step.PREPARING:
 						_view.currentState = SpeciesImportView.STATE_LOADING;
 						startProgressTimer();
 						break;
-					case SpeciesImportStatus$Step.RUNNING:
+					case ProcessStatus$Step.RUNNING:
 						updateViewForImporting();
 						startProgressTimer();
 						break;
-					case SpeciesImportStatus$Step.COMPLETE:
+					case ProcessStatus$Step.COMPLETE:
 						stopProgressTimer();
 						updateViewImportCompleted();
 						break;
-					case SpeciesImportStatus$Step.ERROR:
+					case ProcessStatus$Step.ERROR:
 						//AlertUtil.showError("dataImport.error", [_state.errorMessage]);
 						resetView();
 						break;
-					case SpeciesImportStatus$Step.CANCELLED:
+					case ProcessStatus$Step.CANCELLED:
 						AlertUtil.showError("speciesImport.cancelled");
 						resetView();
 						break;

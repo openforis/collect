@@ -7,8 +7,10 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.validation.RecordKeyUniquenessValidator;
 import org.openforis.collect.model.validation.SpecifiedValidator;
+import org.openforis.collect.spring.MessageContextHolder;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -32,6 +34,7 @@ import org.openforis.idm.metamodel.validation.TimeValidator;
 import org.openforis.idm.metamodel.validation.UniquenessCheck;
 import org.openforis.idm.metamodel.validation.ValidationResult;
 import org.openforis.idm.metamodel.validation.ValidationResultFlag;
+import org.openforis.idm.metamodel.validation.ValidationResults;
 import org.openforis.idm.metamodel.validation.ValidationRule;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Entity;
@@ -40,39 +43,81 @@ import org.openforis.idm.model.Node;
 import org.openforis.idm.model.Record;
 import org.openforis.idm.model.expression.ExpressionFactory;
 import org.openforis.idm.model.expression.ModelPathExpression;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.i18n.LocaleContextHolder;
 
 /**
  * 
  * @author S. Ricci
  *
  */
-public class ValidationMessageHelper {
+public class ValidationMessageBuilder {
 
-	private static final String VALIDATION_COMPARE_PREFIX = "validation.compare.";
-	private static final String PATH_SEPARATOR = " / ";
-	private static final String KEY_LABEL_SEPARATOR = "-";
-	@Autowired
-	private MessageBundleHelper messageBundleHelper;
+	private static final String VALIDATION_COMPARE_MESSAGES_PREFIX = "validation.compare.";
+	private static final String AND_OPERATOR_MESSAGE_KEY = VALIDATION_COMPARE_MESSAGES_PREFIX + "and";
+	private static final String MULTIPLE_MESSAGE_ARGS_SEPARATOR = ";";
+	private static final String PATH_SEPARATOR = "/";
+	private static final String PRETTY_PATH_SEPARATOR = " / ";
+	private static final String RECORD_KEYS_LABEL_SEPARATOR = "-";
 	
-	public String getValidationMessage(Attribute<?, ?> attribute, ValidationResult validationResult, Locale locale) {
-		String key = getMessageKey(attribute, validationResult);
-		String[] args = getMessageArgs(attribute, validationResult, locale);
-		String result = messageBundleHelper.getMessage(key, args, locale);
+	private MessageContextHolder messageContextHolder;
+	
+	protected ValidationMessageBuilder(MessageContextHolder messageContextHolder) {
+		super();
+		this.messageContextHolder = messageContextHolder;
+	}
+	
+	public static ValidationMessageBuilder createInstance(MessageContextHolder messageContextHolder) {
+		return new ValidationMessageBuilder(messageContextHolder);
+	}
+
+	public String getValidationMessage(Attribute<?, ?> attribute, ValidationResult validationResult) {
+		ValidationRule<?> validator = validationResult.getValidator();
+		if ( validator instanceof ComparisonCheck ) {
+			return getComparisonCheckMessage(attribute, validationResult);
+		} else {
+			String key = getMessageKey(attribute, validationResult);
+			if ( key != null ) {
+				Object[] args = getMessageArgs(attribute, validationResult);
+				String result = messageContextHolder.getMessage(key, args);
+				return result;
+			} else {
+				return validator.getClass().getSimpleName();
+			}
+		}
+	}
+	
+	public List<String> getValidationMessages(Attribute<?,?> attribute, ValidationResults validationResults) {
+		List<String> result = new ArrayList<String>();
+		List<ValidationResult> items = null;
+		List<ValidationResult> errors = validationResults.getErrors();
+		List<ValidationResult> warnings = validationResults.getWarnings();
+		if ( errors != null && ! errors.isEmpty() ) {
+			items = errors;
+		} else if ( warnings != null )  {
+			items = warnings;
+		}
+		if ( items != null ) {
+			for (ValidationResult validationResult : items) {
+				String message = getValidationMessage(attribute, validationResult);
+				if ( ! result.contains(message) ) {
+					result.add(message);
+				}
+			}
+		}
 		return result;
 	}
 	
 	public String getMaxCountValidationMessage(NodeDefinition defn) {
 		Integer maxCount = defn.getMaxCount();
-		Integer[] args = new Integer[]{maxCount > 0 ? maxCount: 1};
-		String message = messageBundleHelper.getMessage("edit.validation.maxCount", args);
+		Object[] args = new Integer[]{maxCount > 0 ? maxCount: 1};
+		String message = messageContextHolder.getMessage("edit.validation.maxCount", args);
 		return message;
 	}
 
 	public String getMinCountValidationMessage(NodeDefinition defn) {
 		Integer minCount = defn.getMinCount();
-		Integer[] args = new Integer[]{minCount > 0 ? minCount: 1};
-		String message = messageBundleHelper.getMessage("validation.minCount", args);
+		Object[] args = new Integer[]{minCount > 0 ? minCount: 1};
+		String message = messageContextHolder.getMessage("validation.minCount", args);
 		return message;
 	}
 	
@@ -130,27 +175,25 @@ public class ValidationMessageHelper {
 	}
 	
 	
-	protected String[] getMessageArgs(Attribute<?, ?> attribute, ValidationResult validationResult, Locale locale) {
+	protected String[] getMessageArgs(Attribute<?, ?> attribute, ValidationResult validationResult) {
 		ValidationRule<?> validator = validationResult.getValidator();
 		String[] result = null;
 		if(validator instanceof ComparisonCheck) {
 			ComparisonCheck check = (ComparisonCheck) validator;
 			ArrayList<String> args = new ArrayList<String>();
+			String labelText = getPrettyLabelText(attribute.getDefinition());
+			args.add(labelText);
 			Map<String, String> expressions = new HashMap<String, String>();
 			expressions.put("lt", check.getLessThanExpression());
 			expressions.put("lte", check.getLessThanOrEqualsExpression());
 			expressions.put("gt", check.getGreaterThanExpression());
 			expressions.put("gte", check.getGreaterThanOrEqualsExpression());
-			
-			String labelText = getPrettyLabelText(attribute.getDefinition(), locale);
-			args.add(labelText);
 			for (String key : expressions.keySet()) {
 				String expression = expressions.get(key);
 				if(expression != null) {
-					String arg, argPart1, argPart2;
-					argPart1 = key;
-					argPart2 = getComparisonCheckMessageArg(attribute, expression, locale);
-					arg = argPart1 + ";" + argPart2;
+					String argPart1 = key;
+					String argPart2 = getComparisonCheckMessageArg(attribute, expression);
+					String arg = StringUtils.join(argPart1, MULTIPLE_MESSAGE_ARGS_SEPARATOR, argPart2);
 					args.add(arg);
 				}
 			}
@@ -159,7 +202,7 @@ public class ValidationMessageHelper {
 		return result;
 	}
 	
-	protected String getComparisonCheckMessageArg(Attribute<?,?> attribute, String expression, Locale locale) {
+	protected String getComparisonCheckMessageArg(Attribute<?,?> attribute, String expression) {
 		String result = expression;
 		Record record = attribute.getRecord();
 		Survey survey = record.getSurvey();
@@ -172,9 +215,9 @@ public class ValidationMessageHelper {
 			ModelPathExpression modelPathExpression = expressionFactory.createModelPathExpression(expression);
 			List<String> referencedPaths = modelPathExpression.getReferencedPaths();
 			for (String path : referencedPaths) {
-				String absolutePath = parentDefinition.getPath() + "/" + path;
+				String absolutePath = parentDefinition.getPath() + PATH_SEPARATOR + path;
 				NodeDefinition nodeDefinition = schema.getDefinitionByPath(absolutePath);
-				String label = getPrettyLabelText(nodeDefinition, locale);
+				String label = getPrettyLabelText(nodeDefinition);
 				result = result.replaceAll(nodeDefinition.getName(), label);
 			}
 		} catch (Exception e) {
@@ -183,29 +226,38 @@ public class ValidationMessageHelper {
 		return result;
 	}
 	
-	protected String getComparisonCheckMessage(Attribute<?,?> attribute, ValidationResult validationResult, Locale locale) {
-		String[] messageArgs = getMessageArgs(attribute, validationResult, locale);
+	protected String getComparisonCheckMessage(Attribute<?,?> attribute, ValidationResult validationResult) {
+		String[] messageArgs = getMessageArgs(attribute, validationResult);
 		String nodeLabel = messageArgs[0];
 		String[] adaptedArgs = new String[messageArgs.length];
-		for (int i = 0; i < messageArgs.length; i++) {
+		for (int i = 1; i < messageArgs.length; i++) {
 			String arg = messageArgs[i];
-			String[] argParts = arg.split(";");
+			String[] argParts = arg.split(MULTIPLE_MESSAGE_ARGS_SEPARATOR);
 			String op = argParts[0];
 			String value = argParts[1];
-			String opMessageKey = VALIDATION_COMPARE_PREFIX + op;
-			String operator = messageBundleHelper.getMessage(opMessageKey, null, locale);
+			String opMessageKey = VALIDATION_COMPARE_MESSAGES_PREFIX + op;
+			String operator = messageContextHolder.getMessage(opMessageKey);
 			String argAdapted = StringUtils.join(new String[]{operator, value}, " ");
 			adaptedArgs[i] = argAdapted;
 		}
-		String andOperator = " " + messageBundleHelper.getMessage(VALIDATION_COMPARE_PREFIX + "and", null, locale) + " ";
+		String andOperator = StringUtils.join(" ", messageContextHolder.getMessage(AND_OPERATOR_MESSAGE_KEY), " ");
 		String argsConcat = StringUtils.join(adaptedArgs, andOperator);
 		String messageKey = getMessageKey(attribute, validationResult);
-		String result = messageBundleHelper.getMessage(messageKey, new String[]{nodeLabel, argsConcat}, locale);
+		String result = messageContextHolder.getMessage(messageKey, new Object[]{nodeLabel, argsConcat});
 		return result;
 	}
 
-	public String getInstanceLabelText(NodeDefinition definition, Locale locale) {
-		return getInstanceLabelText(definition, locale.getLanguage());
+	public String getRecordKey(CollectRecord record) {
+		record.updateRootEntityKeyValues();
+		List<String> rootEntityKeyValues = record.getRootEntityKeyValues();
+		List<String> cleanedKeys = new ArrayList<String>();
+		for (String key : rootEntityKeyValues) {
+			if ( StringUtils.isNotBlank(key) ) {
+				cleanedKeys.add(key);
+			}
+		}
+		String result = StringUtils.join(cleanedKeys, RECORD_KEYS_LABEL_SEPARATOR);
+		return result;
 	}
 	
 	public String getInstanceLabelText(NodeDefinition definition, String language) {
@@ -221,8 +273,10 @@ public class ValidationMessageHelper {
 		return result;
 	}
 	
-	public String getPrettyLabelText(NodeDefinition definition, Locale locale) {
-		return getPrettyLabelText(definition, locale.getLanguage());
+	public String getPrettyLabelText(NodeDefinition definition) {
+		Locale locale = LocaleContextHolder.getLocale();
+		String language = locale.getLanguage();
+		return getPrettyLabelText(definition, language);
 	}
 	
 	public String getPrettyLabelText(NodeDefinition definition, String language) {
@@ -244,11 +298,11 @@ public class ValidationMessageHelper {
 		return null;
 	}
 
-	public String getPrettyFormatPath(Node<? extends NodeDefinition> node, Locale locale) {
+	public String getPrettyFormatPath(Node<? extends NodeDefinition> node) {
 		NodeDefinition defn = node.getDefinition();
-		String label = getPrettyLabelText(defn, locale);
+		String label = getPrettyLabelText(defn);
 		if ( defn instanceof EntityDefinition ) {
-			String keyText = getKeyText((Entity) node, locale);
+			String keyText = getKeyText((Entity) node);
 			if ( StringUtils.isBlank(keyText) ) {
 				label += "[" + (node.getIndex() + 1) + "]";
 			} else {
@@ -258,24 +312,23 @@ public class ValidationMessageHelper {
 		if ( node.getParent() == null || node.getParent().getParent() == null ) {
 			return label;
 		} else {
-			return getPrettyFormatPath(node.getParent(), locale) + PATH_SEPARATOR + label;
+			return getPrettyFormatPath(node.getParent()) + PRETTY_PATH_SEPARATOR + label;
 		}
 	}
 	
-	public String getPrettyFormatPath(Entity parentEntity, String childName,
-			Locale locale) {
+	public String getPrettyFormatPath(Entity parentEntity, String childName) {
 		EntityDefinition parentEntityDefn = parentEntity.getDefinition();
 		NodeDefinition childDefn = parentEntityDefn.getChildDefinition(childName);
-		String label = getPrettyLabelText(childDefn, locale);
+		String label = getPrettyLabelText(childDefn);
 		if ( parentEntity.getParent() != null && parentEntity.getParent() != null ) {
-			String parentEntityPath = getPrettyFormatPath(parentEntity, locale);
-			return parentEntityPath + PATH_SEPARATOR + label;
+			String parentEntityPath = getPrettyFormatPath(parentEntity);
+			return parentEntityPath + PRETTY_PATH_SEPARATOR + label;
 		} else {
 			return label;
 		}
 	}
 
-	public String getKeyText(Entity entity, Locale locale) {
+	public String getKeyText(Entity entity) {
 		EntityDefinition defn = entity.getDefinition();
 		List<AttributeDefinition> keyDefns = defn.getKeyAttributeDefinitions();
 		if ( ! keyDefns.isEmpty() ) {
@@ -287,13 +340,13 @@ public class ValidationMessageHelper {
 					Object keyValue = getKeyLabelPart(keyAttr);
 					if ( keyValue != null && StringUtils.isNotBlank(keyValue.toString()) ) {
 						shortKeyParts.add(keyValue.toString());
-						String label = getPrettyLabelText(keyDefn, locale);
+						String label = getPrettyLabelText(keyDefn);
 						String fullKeyPart = label + " " + keyValue;
 						fullKeyParts.add(fullKeyPart);
 					}
 				}
 			}
-			return StringUtils.join(shortKeyParts, KEY_LABEL_SEPARATOR);
+			return StringUtils.join(shortKeyParts, RECORD_KEYS_LABEL_SEPARATOR);
 		} else if ( entity.getParent() != null ) {
 			return "" + (entity.getIndex() + 1);
 		} else {
@@ -308,5 +361,4 @@ public class ValidationMessageHelper {
 		result = value;
 		return result;
 	}
-
 }

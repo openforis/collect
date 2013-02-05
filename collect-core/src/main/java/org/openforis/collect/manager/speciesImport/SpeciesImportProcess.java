@@ -14,7 +14,6 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
-import java.util.concurrent.Callable;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -24,6 +23,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openforis.collect.manager.SpeciesManager;
+import org.openforis.collect.manager.process.AbstractProcess;
 import org.openforis.collect.manager.speciesImport.TaxonCSVReader.TaxonCSVLine;
 import org.openforis.collect.manager.speciesImport.TaxonParsingError.Type;
 import org.openforis.collect.manager.speciesImport.TaxonTree.Node;
@@ -37,7 +37,7 @@ import org.openforis.idm.model.species.Taxonomy;
  * @author S. Ricci
  * 
  */
-public class SpeciesImportProcess implements Callable<Void> {
+public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportStatus> {
 
 	private static Log LOG = LogFactory.getLog(SpeciesImportProcess.class);
 
@@ -50,7 +50,6 @@ public class SpeciesImportProcess implements Callable<Void> {
 	private String taxonomyName;
 	private File file;
 	private String errorMessage;
-	private SpeciesImportStatus status;
 	
 	private TaxonTree taxonTree;
 	private List<Long> processedLineNumbers;
@@ -62,17 +61,13 @@ public class SpeciesImportProcess implements Callable<Void> {
 		this.speciesManager = speciesManager;
 		this.taxonomyName = taxonomyName;
 		this.file = file;
+	}
+	
+	@Override
+	protected void initStatus() {
 		status = new SpeciesImportStatus();
 	}
 
-	public void cancel() {
-		status.cancel();
-	}
-
-	public SpeciesImportStatus getStatus() {
-		return status;
-	}
-	
 	@Override
 	public Void call() throws Exception {
 		status.start();
@@ -84,7 +79,7 @@ public class SpeciesImportProcess implements Callable<Void> {
 		return null;
 	}
 
-	public void prepare() {
+	protected void prepare() {
 		processedLineNumbers = new ArrayList<Long>();
 		initCache();
 	}
