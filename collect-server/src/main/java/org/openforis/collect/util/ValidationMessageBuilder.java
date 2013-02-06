@@ -18,6 +18,7 @@ import org.openforis.idm.metamodel.NodeLabel.Type;
 import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.SurveyContext;
+import org.openforis.idm.metamodel.validation.Check.Flag;
 import org.openforis.idm.metamodel.validation.CodeParentValidator;
 import org.openforis.idm.metamodel.validation.CodeValidator;
 import org.openforis.idm.metamodel.validation.ComparisonCheck;
@@ -86,16 +87,9 @@ public class ValidationMessageBuilder {
 		}
 	}
 	
-	public List<String> getValidationMessages(Attribute<?,?> attribute, ValidationResults validationResults) {
+	public List<String> getValidationMessages(Attribute<?,?> attribute, ValidationResults validationResults, Flag flag) {
 		List<String> result = new ArrayList<String>();
-		List<ValidationResult> items = null;
-		List<ValidationResult> errors = validationResults.getErrors();
-		List<ValidationResult> warnings = validationResults.getWarnings();
-		if ( errors != null && ! errors.isEmpty() ) {
-			items = errors;
-		} else if ( warnings != null )  {
-			items = warnings;
-		}
+		List<ValidationResult> items = flag == Flag.ERROR ? validationResults.getErrors(): validationResults.getWarnings();
 		if ( items != null ) {
 			for (ValidationResult validationResult : items) {
 				String message = getValidationMessage(attribute, validationResult);
@@ -114,9 +108,9 @@ public class ValidationMessageBuilder {
 		return message;
 	}
 
-	public String getMinCountValidationMessage(NodeDefinition defn) {
-		Integer minCount = defn.getMinCount();
-		Object[] args = new Integer[]{minCount > 0 ? minCount: 1};
+	public String getMinCountValidationMessage(Entity parentEntity, String childName) {
+		int effectiveMinCount = parentEntity.getEffectiveMinCount(childName);
+		Object[] args = new Integer[]{effectiveMinCount};
 		String message = messageContextHolder.getMessage("validation.minCount", args);
 		return message;
 	}

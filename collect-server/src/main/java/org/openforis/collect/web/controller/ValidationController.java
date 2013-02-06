@@ -87,8 +87,6 @@ public class ValidationController extends BasicController {
 	@RequestMapping(value = "/validationReport", method = RequestMethod.GET)
 	public void validationReport(HttpServletRequest request, HttpServletResponse response, 
 			@RequestParam(required=true) String s, @RequestParam(required=true) String r, @RequestParam(required=false, defaultValue="en_US") String locale) throws IOException {
-		response.setContentType("text/csv");
-		response.setHeader("Content-Disposition", "attachment; fileName=validation_report.csv");
 		ServletOutputStream outputStream = response.getOutputStream();
 		try {
 			if ( s == null || r == null || locale == null) {
@@ -100,11 +98,13 @@ public class ValidationController extends BasicController {
 				print(outputStream, "Survey not found");
 				return;
 			}
+			response.setContentType("text/csv");
+			response.setHeader("Content-Disposition", "attachment; fileName=validation_report.csv");
 			SessionState sessionState = getSessionState(request);
 			User user = sessionState.getUser();
 			String sessionId = sessionState.getSessionId();
 			ValidationReportProcess process = new ValidationReportProcess(outputStream, recordManager, messageContextHolder, 
-					ReportType.CSV, user, sessionId, survey, r);
+					ReportType.CSV, user, sessionId, survey, r, true);
 			process.call();
 		} catch (Exception e) {
 			//outputStream.println("ERROR - Validation of records not completed: " + e.getMessage());

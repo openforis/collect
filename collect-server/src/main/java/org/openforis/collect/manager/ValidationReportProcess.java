@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.openforis.collect.manager.process.AbstractProcess;
 import org.openforis.collect.manager.process.ProcessStatus;
 import org.openforis.collect.model.CollectRecord;
@@ -16,6 +18,7 @@ import org.openforis.commons.io.csv.CsvWriter;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.NodeDefinition;
+import org.openforis.idm.metamodel.validation.Check.Flag;
 import org.openforis.idm.metamodel.validation.ValidationResultFlag;
 import org.openforis.idm.metamodel.validation.ValidationResults;
 import org.openforis.idm.model.Attribute;
@@ -30,9 +33,9 @@ import org.openforis.idm.model.NodeVisitor;
  */
 public class ValidationReportProcess extends AbstractProcess<Void, ProcessStatus> {
 
-	private static final String[] VALIDATION_REPORT_HEADERS = new String[] {"Record","Field","Error message"};
+	private static final String[] VALIDATION_REPORT_HEADERS = new String[] {"Record","Phase","Field","Error message"};
 
-	//private static Log LOG = LogFactory.getLog(ValidationReportProcess.class);
+	private static Log LOG = LogFactory.getLog(ValidationReportProcess.class);
 	
 	private OutputStream outputStream;
 	private RecordManager recordManager;
@@ -41,9 +44,10 @@ public class ValidationReportProcess extends AbstractProcess<Void, ProcessStatus
 	private String rootEntityName;
 	private User user;
 	private String sessionId;
-	private CsvWriter csvWriter;
+	private boolean includeConfirmedErrors;
 
 	private ValidationMessageBuilder validationMessageBuilder;
+	private CsvWriter csvWriter;
 	
 	public enum ReportType {
 		CSV
@@ -54,7 +58,7 @@ public class ValidationReportProcess extends AbstractProcess<Void, ProcessStatus
 			MessageContextHolder messageContextHolder,
 			ReportType reportType, 
 			User user, String sessionId, 
-			CollectSurvey survey, String rootEntityName) {
+			CollectSurvey survey, String rootEntityName, boolean includeConfirmedErrors) {
 		super();
 		this.outputStream = outputStream;
 		this.recordManager = recordManager;
@@ -63,6 +67,7 @@ public class ValidationReportProcess extends AbstractProcess<Void, ProcessStatus
 		this.sessionId = sessionId;
 		this.survey = survey;
 		this.rootEntityName = rootEntityName;
+		this.includeConfirmedErrors = includeConfirmedErrors;
 		validationMessageBuilder = ValidationMessageBuilder.createInstance(messageContextHolder);
 	}
 	
@@ -73,22 +78,42 @@ public class ValidationReportProcess extends AbstractProcess<Void, ProcessStatus
 
 	@Override
 	public Void call() throws Exception {
+		status.start();
 		List<CollectRecord> summaries = recordManager.loadSummaries(survey, rootEntityName, (String) null);
 		if ( summaries != null ) {
-			initWriter();
-			writeHeader();
-			for (CollectRecord summary : summaries) {
-				//long start = System.currentTimeMillis();
-				//print(outputStream, "Start validating record: " + recordKey);
-				Integer id = summary.getId();
-				Step step = summary.getStep();
-				final CollectRecord record = recordManager.checkout(survey, user, id, step.getStepNumber(), sessionId, true);
-				printValidationReport(record);
-				recordManager.releaseLock(id);
-				//long elapsedMillis = System.currentTimeMillis() - start;
-				//print(outputStream, "Validation of record " + recordKey + " completed in " + elapsedMillis + " millis");
+			status.setTotal(summaries.size());
+			try {
+				initWriter();
+				writeHeader();
+				for (CollectRecord summary : summaries) {
+					//long start = System.currentTimeMillis();
+					//print(outputStream, "Start validating record: " + recordKey);
+					if ( status.isRunning() ) {
+						Step step = summary.getStep();
+						Integer recordId = summary.getId();
+						try {
+							final CollectRecord record = recordManager.checkout(survey, user, recordId, step.getStepNumber(), sessionId, true);
+							writeValidationReport(record);
+							status.incrementProcessed();
+						} finally {
+							recordManager.releaseLock(recordId);
+						}
+						//long elapsedMillis = System.currentTimeMillis() - start;
+						//print(outputStream, "Validation of record " + recordKey + " completed in " + elapsedMillis + " millis");
+					}
+				}
+				closeWriter();
+				if ( status.isRunning() ) {
+					status.complete();
+				}
+			} catch (IOException e) {
+				status.error();
+				String message = e.getMessage();
+				status.setErrorMessage(message);
+				if ( LOG.isErrorEnabled() ) {
+					LOG.error(message, e);
+				}
 			}
-			closeWriter();
 		}
 		return null;
 	}
@@ -110,7 +135,7 @@ public class ValidationReportProcess extends AbstractProcess<Void, ProcessStatus
 		
 	}
 
-	protected void printValidationReport(final CollectRecord record) throws IOException {
+	protected void writeValidationReport(final CollectRecord record) throws IOException {
 		final ModelVersion version = record.getVersion();
 		Entity rootEntity = record.getRootEntity();
 		recordManager.addEmptyNodes(rootEntity);
@@ -120,8 +145,9 @@ public class ValidationReportProcess extends AbstractProcess<Void, ProcessStatus
 				if ( node instanceof Attribute ) {
 					Attribute<?,?> attribute = (Attribute<?, ?>) node;
 					ValidationResults validationResults = attribute.validateValue();
-					if ( validationResults.hasErrors() ) {
-						writeValidationResults(attribute, validationResults);
+					boolean errorConfirmed = record.isErrorConfirmed(attribute);
+					if ( validationResults.hasErrors() || (includeConfirmedErrors && validationResults.hasWarnings() && errorConfirmed) ) {
+						writeErrors(attribute, validationResults);
 					}
 				} else if ( node instanceof Entity ) {
 					Entity entity = (Entity) node;
@@ -135,7 +161,8 @@ public class ValidationReportProcess extends AbstractProcess<Void, ProcessStatus
 								writeMaxCountError(entity, childName);
 							}
 							ValidationResultFlag validateMinCount = entity.validateMinCount( childName );
-							if ( validateMinCount.isError() ) {
+							boolean missingApproved = record.isMissingApproved(entity, childName);
+							if ( validateMinCount.isError() || (includeConfirmedErrors && validateMinCount.isWarning() && missingApproved) ) {
 								writeMinCountError(entity, childName);
 							}
 						}
@@ -153,14 +180,16 @@ public class ValidationReportProcess extends AbstractProcess<Void, ProcessStatus
 		}
 	}
 
-	protected void writeValidationResults(Attribute<?,?> attribute, ValidationResults validationResults) {
-		List<String> messages = validationMessageBuilder.getValidationMessages(attribute, validationResults);
+	protected void writeErrors(Attribute<?,?> attribute, ValidationResults validationResults) {
+		CollectRecord record = (CollectRecord) attribute.getRecord();
+		List<String> messages = validationMessageBuilder.getValidationMessages(attribute, validationResults, Flag.ERROR);
+		if ( messages.isEmpty() && record.isErrorConfirmed(attribute) ) {
+			messages = validationMessageBuilder.getValidationMessages(attribute, validationResults, Flag.WARN);
+		}
 		if ( ! messages.isEmpty() ) {
-			CollectRecord record = (CollectRecord) attribute.getRecord();
-			String recordKey = validationMessageBuilder.getRecordKey(record);
 			String path = validationMessageBuilder.getPrettyFormatPath(attribute);
 			for (String message : messages) {
-				writeValidationReportLine(recordKey, path, message);
+				writeValidationReportLine(record, path, message);
 			}
 		}
 	}
@@ -176,15 +205,21 @@ public class ValidationReportProcess extends AbstractProcess<Void, ProcessStatus
 	protected void writeCountError(boolean min, Entity parentEntity, String childName) {
 		EntityDefinition parentEntityDefn = parentEntity.getDefinition();
 		NodeDefinition childDefn = parentEntityDefn.getChildDefinition(childName);
-		String message = min ? validationMessageBuilder.getMinCountValidationMessage(childDefn) : validationMessageBuilder.getMaxCountValidationMessage(childDefn);
+		String message;
+		if ( min ) {
+			message = validationMessageBuilder.getMinCountValidationMessage(parentEntity, childName); 
+		} else {
+			message = validationMessageBuilder.getMaxCountValidationMessage(childDefn);
+		}
 		String path = validationMessageBuilder.getPrettyFormatPath(parentEntity, childName);
 		CollectRecord record = (CollectRecord) parentEntity.getRecord();
-		String recordKey = validationMessageBuilder.getRecordKey(record);
-		writeValidationReportLine(recordKey, path, message);
+		writeValidationReportLine(record, path, message);
 	}
 
-	protected void writeValidationReportLine(String recordKey, String path, String message) {
-		String[] line = new String[]{recordKey, path, message};
+	protected void writeValidationReportLine(CollectRecord record, String path, String message) {
+		String recordKey = validationMessageBuilder.getRecordKey(record);
+		String phase = record.getStep().name();
+		String[] line = new String[]{recordKey, phase, path, message};
 		switch (reportType) {
 		case CSV:
 			csvWriter.writeNext(line);
