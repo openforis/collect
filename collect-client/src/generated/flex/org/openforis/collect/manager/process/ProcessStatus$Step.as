@@ -13,15 +13,15 @@ package org.openforis.collect.manager.process {
     [RemoteClass(alias="org.openforis.collect.manager.process.ProcessStatus$Step")]
     public class ProcessStatus$Step extends Enum {
 
-        public static const INITED:ProcessStatus$Step = new ProcessStatus$Step("INITED", _);
-        public static const PREPARING:ProcessStatus$Step = new ProcessStatus$Step("PREPARING", _);
-        public static const RUNNING:ProcessStatus$Step = new ProcessStatus$Step("RUNNING", _);
+        public static const INIT:ProcessStatus$Step = new ProcessStatus$Step("INIT", _);
+        public static const PREPARE:ProcessStatus$Step = new ProcessStatus$Step("PREPARE", _);
+        public static const RUN:ProcessStatus$Step = new ProcessStatus$Step("RUN", _);
         public static const COMPLETE:ProcessStatus$Step = new ProcessStatus$Step("COMPLETE", _);
-        public static const CANCELLED:ProcessStatus$Step = new ProcessStatus$Step("CANCELLED", _);
+        public static const CANCEL:ProcessStatus$Step = new ProcessStatus$Step("CANCEL", _);
         public static const ERROR:ProcessStatus$Step = new ProcessStatus$Step("ERROR", _);
 
         function ProcessStatus$Step(value:String = null, restrictor:* = null) {
-            super((value || INITED.name), restrictor);
+            super((value || INIT.name), restrictor);
         }
 
         protected override function getConstants():Array {
@@ -29,11 +29,11 @@ package org.openforis.collect.manager.process {
         }
 
         public static function get constants():Array {
-            return [INITED, PREPARING, RUNNING, COMPLETE, CANCELLED, ERROR];
+            return [INIT, PREPARE, RUN, COMPLETE, CANCEL, ERROR];
         }
 
         public static function valueOf(name:String):ProcessStatus$Step {
-            return ProcessStatus$Step(INITED.constantOf(name));
+            return ProcessStatus$Step(INIT.constantOf(name));
         }
     }
 }

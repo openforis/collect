@@ -232,20 +232,20 @@ package org.openforis.collect.presenter {
 		}
 		
 		private function updateView():void {
-			if(_state == null || _state.step == ProcessStatus$Step.INITED || 
-				(_firstOpen && _state.step != ProcessStatus$Step.RUNNING) ) {
+			if(_state == null || _state.step == ProcessStatus$Step.INIT || 
+				(_firstOpen && _state.step != ProcessStatus$Step.RUN) ) {
 				resetView();
 			} else {
 				var step:ProcessStatus$Step = _state.step;
 				switch ( step ) {
-					case ProcessStatus$Step.INITED:
+					case ProcessStatus$Step.INIT:
 						resetView();
 						break;
-					case ProcessStatus$Step.PREPARING:
+					case ProcessStatus$Step.PREPARE:
 						_view.currentState = SpeciesImportView.STATE_LOADING;
 						startProgressTimer();
 						break;
-					case ProcessStatus$Step.RUNNING:
+					case ProcessStatus$Step.RUN:
 						updateViewForImporting();
 						startProgressTimer();
 						break;
@@ -257,7 +257,7 @@ package org.openforis.collect.presenter {
 						//AlertUtil.showError("dataImport.error", [_state.errorMessage]);
 						resetView();
 						break;
-					case ProcessStatus$Step.CANCELLED:
+					case ProcessStatus$Step.CANCEL:
 						AlertUtil.showError("speciesImport.cancelled");
 						resetView();
 						break;
