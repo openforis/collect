@@ -229,7 +229,7 @@ public class ValidationMessageBuilder {
 	protected String getComparisonCheckMessage(Attribute<?,?> attribute, ValidationResult validationResult) {
 		String[] messageArgs = getMessageArgs(attribute, validationResult);
 		String nodeLabel = messageArgs[0];
-		String[] adaptedArgs = new String[messageArgs.length];
+		String[] adaptedArgs = new String[messageArgs.length - 1];
 		for (int i = 1; i < messageArgs.length; i++) {
 			String arg = messageArgs[i];
 			String[] argParts = arg.split(MULTIPLE_MESSAGE_ARGS_SEPARATOR);
@@ -238,7 +238,7 @@ public class ValidationMessageBuilder {
 			String opMessageKey = VALIDATION_COMPARE_MESSAGES_PREFIX + op;
 			String operator = messageContextHolder.getMessage(opMessageKey);
 			String argAdapted = StringUtils.join(new String[]{operator, value}, " ");
-			adaptedArgs[i] = argAdapted;
+			adaptedArgs[i - 1] = argAdapted;
 		}
 		String andOperator = StringUtils.join(" ", messageContextHolder.getMessage(AND_OPERATOR_MESSAGE_KEY), " ");
 		String argsConcat = StringUtils.join(adaptedArgs, andOperator);
@@ -361,4 +361,5 @@ public class ValidationMessageBuilder {
 		result = value;
 		return result;
 	}
+	
 }
