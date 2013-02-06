@@ -3,6 +3,8 @@ package org.openforis.collect.client {
 	import mx.rpc.IResponder;
 	import mx.rpc.remoting.Operation;
 	
+	import org.openforis.collect.model.proxy.TaxonomyProxy;
+	
 	/**
 	 * 
 	 * @author S. Ricci
@@ -11,6 +13,8 @@ package org.openforis.collect.client {
 	public class SpeciesClient extends AbstractClient {
 		
 		private var _loadAllTaxonomiesOperation:Operation;
+		private var _saveTaxonomyOperation:Operation;
+		private var _deleteTaxonomyOperation:Operation;
 		private var _findByCodeOperation:Operation;
 		private var _findByScientificNameOperation:Operation;
 		private var _findByVernacularNameOperation:Operation;
@@ -19,6 +23,8 @@ package org.openforis.collect.client {
 			super("speciesService");
 			
 			_loadAllTaxonomiesOperation = getOperation("loadAllTaxonomies", CONCURRENCY_LAST);
+			_saveTaxonomyOperation = getOperation("saveTaxonomy");
+			_deleteTaxonomyOperation = getOperation("deleteTaxonomy");
 			_findByCodeOperation = getOperation("findByCode", CONCURRENCY_LAST);
 			_findByScientificNameOperation = getOperation("findByScientificName", CONCURRENCY_LAST);
 			_findByVernacularNameOperation = getOperation("findByVernacularName", CONCURRENCY_LAST);
@@ -26,6 +32,16 @@ package org.openforis.collect.client {
 		
 		public function loadAllTaxonomies(responder:IResponder):void {
 			var token:AsyncToken = this._loadAllTaxonomiesOperation.send();
+			token.addResponder(responder);
+		}
+		
+		public function saveTaxonomy(responder:IResponder, taxonomy:TaxonomyProxy):void {
+			var token:AsyncToken = this._saveTaxonomyOperation.send(taxonomy);
+			token.addResponder(responder);
+		}
+		
+		public function deleteTaxonomy(responder:IResponder, taxonomy:TaxonomyProxy):void {
+			var token:AsyncToken = this._deleteTaxonomyOperation.send(taxonomy);
 			token.addResponder(responder);
 		}
 		

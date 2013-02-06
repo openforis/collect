@@ -82,6 +82,7 @@
 	<bean id="recordIndexService"     class="org.openforis.collect.remoting.service.recordIndex.RecordIndexService" autowire="byName" scope="session" />
 	<bean id="sessionService" 	class="org.openforis.collect.remoting.service.SessionService" autowire="byName" />
 	<bean id="speciesService" 	class="org.openforis.collect.remoting.service.SpeciesService" autowire="byName" />
+    <bean id="speciesImportService"   class="org.openforis.collect.remoting.service.SpeciesImportService" autowire="byName" />
 	<bean id="userService" 		class="org.openforis.collect.remoting.service.UserService" autowire="byName" />
 	
 	<!-- <bean id="backupService" class="org.fao.openforis.web.service.BackupService"> -->

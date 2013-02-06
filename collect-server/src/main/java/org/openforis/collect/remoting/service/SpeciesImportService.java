@@ -1,4 +1,4 @@
-package org.openforis.collect.remoting.service.speciesImport;
+package org.openforis.collect.remoting.service;
 
 import java.io.File;
 
@@ -26,15 +26,12 @@ public class SpeciesImportService {
 	
 	@Autowired
 	private SessionManager sessionManager;
-	
 	@Autowired
 	private SpeciesManager speciesManager;
-	
 	@Autowired 
 	private ServletContext servletContext;
 	
 	private File tempDirectory;
-	
 	private SpeciesImportProcess importProcess;
 
 	protected void init() {

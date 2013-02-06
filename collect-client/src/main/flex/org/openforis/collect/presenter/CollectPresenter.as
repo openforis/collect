@@ -124,7 +124,8 @@ package org.openforis.collect.presenter {
 			
 			_view.addEventListener(KeyboardEvent.KEY_DOWN, function(event:KeyboardEvent):void {
 				//open species import popup pressing CTRL+SHIFT+s
-				if ( event.ctrlKey && event.shiftKey && event.charCode == 83 ) {
+				if ( event.ctrlKey && event.shiftKey && event.altKey && event.charCode == 83 && 
+						Application.user.hasEffectiveRole(UserProxy.ROLE_ADMIN) ) {
 					eventDispatcher.dispatchEvent(new UIEvent(UIEvent.OPEN_SPECIES_IMPORT_POPUP));
 				}
 			});

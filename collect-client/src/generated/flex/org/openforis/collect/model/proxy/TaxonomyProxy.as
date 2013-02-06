@@ -5,10 +5,10 @@
  * your custom code here.
  */
 
-package org.openforis.idm.model.species {
+package org.openforis.collect.model.proxy {
 
     [Bindable]
-    [RemoteClass(alias="org.openforis.idm.model.species.Taxonomy")]
-    public class Taxonomy extends TaxonomyBase {
+    [RemoteClass(alias="org.openforis.collect.model.proxy.TaxonomyProxy")]
+    public class TaxonomyProxy extends TaxonomyProxyBase {
     }
 }

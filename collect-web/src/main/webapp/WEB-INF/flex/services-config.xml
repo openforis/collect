@@ -82,7 +82,15 @@
 		            <scope>application</scope>
 		        </properties>
 			</destination>
-			
+
+            <destination id="speciesImportService">
+                  <properties>
+                    <factory>springFactory</factory>
+                      <source>speciesImportService</source>
+                      <scope>application</scope>
+                  </properties>
+            </destination>
+            
  			<destination id="userService">
 		        <properties>
 		        	<factory>springFactory</factory>

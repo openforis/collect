@@ -45,10 +45,15 @@ public class SpeciesManager {
 	private CollectSurveyContext surveyContext;
 
 	@Transactional
-	public List<Taxonomy> loadTaxonomies() {
+	public List<Taxonomy> loadAllTaxonomies() {
 		return taxonomyDao.loadAll();
 	}
 	
+	@Transactional
+	public Taxonomy loadTaxonomyById(int id) {
+		return taxonomyDao.loadById(id);
+	}
+
 	@Transactional
 	public List<TaxonOccurrence> findByCode(String taxonomyName, String searchString, int maxResults) {
 		Taxonomy taxonomy = taxonomyDao.load(taxonomyName);

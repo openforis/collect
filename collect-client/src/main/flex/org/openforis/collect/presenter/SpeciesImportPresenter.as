@@ -13,6 +13,8 @@ package org.openforis.collect.presenter {
 	import flash.utils.Timer;
 	
 	import mx.collections.IList;
+	import mx.core.IFlexDisplayObject;
+	import mx.managers.PopUpManager;
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.IResponder;
 	import mx.rpc.events.ResultEvent;
@@ -25,11 +27,16 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.manager.process.ProcessStatus$Step;
 	import org.openforis.collect.manager.speciesImport.SpeciesImportStatus;
 	import org.openforis.collect.metamodel.proxy.SurveyProxy;
+	import org.openforis.collect.model.proxy.TaxonomyProxy;
+	import org.openforis.collect.model.proxy.TaxonomyProxyBase;
+	import org.openforis.collect.ui.component.speciesImport.TaxonomyEditPopUp;
 	import org.openforis.collect.ui.view.DataImportView;
 	import org.openforis.collect.ui.view.SpeciesImportView;
 	import org.openforis.collect.util.AlertUtil;
 	import org.openforis.collect.util.ApplicationConstants;
-	import org.openforis.idm.model.species.Taxonomy;
+	import org.openforis.collect.util.CollectionUtil;
+	import org.openforis.collect.util.PopUpUtil;
+	import org.openforis.collect.util.StringUtil;
 	
 	import spark.events.IndexChangeEvent;
 
@@ -41,7 +48,8 @@ package org.openforis.collect.presenter {
 	public class SpeciesImportPresenter extends AbstractPresenter {
 		
 		private static const PROGRESS_UPDATE_DELAY:int = 2000;
-		
+		protected static const VALID_NAME_REGEX:RegExp = /[a-z][a-z0-9_]*/;
+				
 		private var _view:SpeciesImportView;
 		private var _fileReference:FileReference;
 		private var _speciesImportClient:SpeciesImportClient;
@@ -51,7 +59,8 @@ package org.openforis.collect.presenter {
 		
 		private var _getStatusResponder:IResponder;
 		private var _firstOpen:Boolean;
-		private var _selectedTaxonomy:Taxonomy;
+		private var _selectedTaxonomy:TaxonomyProxy;
+		private var taxonomyEditPopUp:TaxonomyEditPopUp; 
 		
 		public function SpeciesImportPresenter(view:SpeciesImportView) {
 			this._view = view;
@@ -94,24 +103,112 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function loadTaxonomiesSuccessHandler(event:ResultEvent, token:Object = null):void {
-			_view.checklistsDropDown.dataProvider = event.result as IList;
+			var taxonomies:IList = event.result as IList;
+			_view.checklistsDropDown.dataProvider = taxonomies;
+			if ( _selectedTaxonomy != null && CollectionUtil.isNotEmpty(taxonomies) ) {
+				selectTaxonomyInView(_selectedTaxonomy);
+			}
+		}
+		
+		protected function selectTaxonomyInView(taxonomy:TaxonomyProxy):void {
+			var taxonomies:IList = _view.checklistsDropDown.dataProvider;
+			var item:TaxonomyProxy = CollectionUtil.getItem(taxonomies, "id", taxonomy.id);
+			_view.checklistsDropDown.selectedItem = item;
 		}
 		
 		protected function checklistChangeHandler(event:IndexChangeEvent):void {
 			_selectedTaxonomy = event.target.selectedItem;
-			//reload taxonomy data
+			//TODO reload taxonomy data
 		}
 		
 		protected function newButtonClickHandler(event:MouseEvent):void	{
-			
+			openTaxonomyEditPopUp(true);
 		}
-
-		protected function editButtonClickHandler(event:MouseEvent):void	{
-			
+		
+		protected function openTaxonomyEditPopUp(newTaxonomy:Boolean = false):void {
+			taxonomyEditPopUp = TaxonomyEditPopUp(PopUpUtil.createPopUp(TaxonomyEditPopUp));
+			taxonomyEditPopUp.newTaxonomy = newTaxonomy;
+			taxonomyEditPopUp.okButton.addEventListener(MouseEvent.CLICK, taxonomyEditOkClickHandler);
+			taxonomyEditPopUp.cancelButton.addEventListener(MouseEvent.CLICK, taxonomyEditCancelClickHandler);
+		}
+		
+		protected function closeTaxonomyEditPopUp():void {
+			if ( taxonomyEditPopUp != null ) {
+				PopUpManager.removePopUp(taxonomyEditPopUp);
+			}
+		}
+		
+		protected function editButtonClickHandler(event:MouseEvent):void {
+			if ( checkTaxonomyIsSelected() ) {
+				openTaxonomyEditPopUp(false);
+				taxonomyEditPopUp.nameTextInput.text = _selectedTaxonomy.name;
+			}
 		}
 
 		protected function deleteButtonClickHandler(event:MouseEvent):void	{
-			
+			if ( checkTaxonomyIsSelected() ) {
+				var responder:IResponder = new AsyncResponder(deleteTaxonomyResultHandler, faultHandler);
+				_speciesClient.deleteTaxonomy(responder, _selectedTaxonomy);
+			}
+		}
+		
+		protected function deleteTaxonomyResultHandler(event:ResultEvent, token:Object = null):void {
+			_selectedTaxonomy = null;
+			loadTaxonomies();
+		}
+		
+		protected function taxonomyEditCancelClickHandler(event:MouseEvent):void {
+			closeTaxonomyEditPopUp();
+		}
+		
+		protected function taxonomyEditOkClickHandler(event:MouseEvent):void {
+			var newTaxonomy:Boolean = _selectedTaxonomy == null;
+			var name:String = taxonomyEditPopUp.nameTextInput.text;
+			name = StringUtil.trim(name);
+			if ( validateTaxonomyName(name, newTaxonomy) ) {
+				if ( newTaxonomy ) {
+					_selectedTaxonomy = new TaxonomyProxy();
+				} 
+				_selectedTaxonomy.name = name;
+				
+				var responder:IResponder = new AsyncResponder(taxonomySaveResultHandler, faultHandler);
+				_speciesClient.saveTaxonomy(responder, _selectedTaxonomy);
+			}
+		}
+		
+		protected function validateTaxonomyName(name:String, newTaxonomy:Boolean):Boolean {
+			if ( VALID_NAME_REGEX.test(name) ) {
+				return checkDuplicateTaxonomyName(name, newTaxonomy);
+			} else {
+				return false;
+			}
+		}
+		
+		protected function checkDuplicateTaxonomyName(name:String, newTaxonomy:Boolean):Boolean {
+			var taxonomies:IList = _view.checklistsDropDown.dataProvider;
+			var duplicateTaxonomy:TaxonomyProxy = CollectionUtil.getItem(taxonomies, "name", name);
+			if ( duplicateTaxonomy != null && (newTaxonomy || duplicateTaxonomy != _selectedTaxonomy )) {
+				AlertUtil.showError("speciesImport.duplicateTaxonomy");
+				return false;
+			} else {
+				return true;
+			}
+		}
+		
+		protected function taxonomySaveResultHandler(event:ResultEvent, token:Object = null):void {
+			var taxonomy:TaxonomyProxy = event.result as TaxonomyProxy;
+			_selectedTaxonomy = taxonomy;
+			closeTaxonomyEditPopUp();
+			loadTaxonomies();
+		}
+		
+		protected function checkTaxonomyIsSelected():Boolean {
+			if ( _selectedTaxonomy != null ) {
+				return true;
+			} else {
+				AlertUtil.showMessage("speciesImport.selectTaxonomy");
+				return false;
+			}
 		}
 		
 		protected function importButtonClickHandler(event:MouseEvent):void {
