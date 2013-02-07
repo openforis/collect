@@ -14,11 +14,15 @@ public class ProcessStatus {
 	}
 	
 	private Step step;
-	private int total;
-	private int processed;
+	private long total;
+	private long processed;
 	private String errorMessage;
 
 	public ProcessStatus() {
+		init();
+	}
+
+	protected void init() {
 		step = INIT;
 		total = -1;
 		processed = -1;
@@ -28,21 +32,28 @@ public class ProcessStatus {
 		processed ++;
 	}
 	
-	public void complete() {
-		step = COMPLETE;
+	public void prepare() {
+		step = PREPARE;
 	}
 
 	public void start() {
 		step = RUN;
-		processed = 0;
 	}
 
 	public void cancel() {
 		step = CANCEL;
 	}
 
+	public void complete() {
+		step = COMPLETE;
+	}
+
 	public void error() {
 		step = ERROR;			
+	}
+	
+	public boolean isInit() {
+		return step == INIT;
 	}
 
 	public boolean isRunning() {
@@ -53,19 +64,23 @@ public class ProcessStatus {
 		return step == COMPLETE;
 	}
 	
+	public boolean isError() {
+		return step == ERROR;
+	}
+
 	public Step getStep() {
 		return step;
 	}
 	
-	public int getTotal() {
+	public long getTotal() {
 		return total;
 	}
 	
-	public void setTotal(int value) {
+	public void setTotal(long value) {
 		total = value;
 	}
 
-	public int getProcessed() {
+	public long getProcessed() {
 		return processed;
 	}
 	

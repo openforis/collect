@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.openforis.collect.manager.process.ProcessStatus;
 import org.openforis.idm.util.CollectionUtil;
@@ -15,19 +16,12 @@ import org.openforis.idm.util.CollectionUtil;
  */
 public class SpeciesImportStatus extends ProcessStatus {
 	
-	private int totalRows;
-	private int processedRows;
-	private LinkedHashMap<Long, List<TaxonParsingError>> rowToErrors;
+	private Map<Long, List<TaxonParsingError>> rowToErrors;
 	private List<Long> skippedRows;
 	
 	public SpeciesImportStatus() {
 		super();
-		processedRows = 0;
 		rowToErrors = new LinkedHashMap<Long, List<TaxonParsingError>>();
-	}
-	
-	public void rowProcessed() {
-		processedRows ++;
 	}
 	
 	public void addError(long row, TaxonParsingError error) {
@@ -52,14 +46,6 @@ public class SpeciesImportStatus extends ProcessStatus {
 	
 	public boolean hasErrors() {
 		return rowToErrors != null && ! rowToErrors.isEmpty();
-	}
-	
-	public int getProcessedRows() {
-		return processedRows;
-	}
-	
-	public int getTotalRows() {
-		return totalRows;
 	}
 	
 	public List<Long> getSkippedRows() {

@@ -4,6 +4,7 @@
 				 xmlns:mx="library://ns.adobe.com/flex/mx" 
 				 xmlns:component="org.openforis.collect.ui.component.*" 
 				 title="{Message.get('speciesImport.checklist')}" 
+				 height="150" width="200"
 				>	
 	<fx:Script>
 		<![CDATA[

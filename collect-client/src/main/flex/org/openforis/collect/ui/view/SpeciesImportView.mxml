@@ -7,9 +7,11 @@
 
 	<fx:Script>
 		<![CDATA[
+			import org.openforis.collect.manager.speciesImport.TaxonParsingError$Type;
 			import mx.events.FlexEvent;
 			
 			import org.openforis.collect.i18n.Message;
+			import org.openforis.collect.manager.speciesImport.TaxonParsingError;
 			import org.openforis.collect.presenter.SpeciesImportPresenter;
 			
 			public static const STATE_DEFAULT:String = "default";
@@ -17,6 +19,7 @@
 			public static const STATE_SELECT_FILE:String = "selectFile";
 			public static const STATE_UPLOADING:String = "uploading";
 			public static const STATE_IMPORTING:String = "importing";
+			public static const STATE_ERROR:String = "error";
 
 			private var _presenter:SpeciesImportPresenter;
 			
@@ -24,6 +27,16 @@
 				_presenter = new SpeciesImportPresenter(this);
 			}
 
+			public function errorTypeLabelFunction(item:TaxonParsingError, gridColumn:GridColumn):String {
+				var type:TaxonParsingError$Type = item.type;
+				var messageKey:String = "speciesImport.parsingError.type." + type.name.toLowerCase();
+				return Message.get(messageKey);
+			}
+			
+			public function errorMessageLabelFunction(item:TaxonParsingError, gridColumn:GridColumn):String {
+				return Message.get(item.message);
+				
+			}
 		]]>
 	</fx:Script>
 	
@@ -34,6 +47,7 @@
 		<s:State name="selectFile" />
 		<s:State name="uploading" />
 		<s:State name="importing" />
+		<s:State name="error" />
 	</s:states>
 	
 	<s:VGroup includeIn="default"
@@ -49,17 +63,17 @@
 			
 			<s:DropDownList id="checklistsDropDown" labelField="name" />
 			<s:Button id="newButton" 
-					  label="{Message.get('speciesImport.newCheckist')}"
-					  useHandCursor="true"
-					  buttonMode="true"
-					  />
-			<s:Button id="deleteButton" 
-					  label="{Message.get('speciesImport.deleteCheckist')}"
+					  label="{Message.get('global.new')}"
 					  useHandCursor="true"
 					  buttonMode="true"
 					  />
 			<s:Button id="editButton" 
-					  label="{Message.get('speciesImport.editCheckist')}"
+					  label="{Message.get('global.edit')}"
+					  useHandCursor="true"
+					  buttonMode="true"
+					  />
+			<s:Button id="deleteButton" 
+					  label="{Message.get('global.delete')}"
 					  useHandCursor="true"
 					  buttonMode="true"
 					  />
@@ -77,6 +91,9 @@
 					  useHandCursor="true"
 					  buttonMode="true"
 					  />
+			
+			<s:Button id="closeButton"
+					  label="{Message.get('global.close')}"/>
 		</s:HGroup>
 	</s:VGroup>
 	
@@ -107,6 +124,36 @@
 				  useHandCursor="true"
 				  buttonMode="true"
 				  />
+		
+	</s:VGroup>
+	
+	<s:VGroup width="100%" height="100%"
+			 includeIn="error"
+			 itemCreationPolicy="immediate"
+			 horizontalAlign="center"
+			 verticalAlign="middle">
+		
+		<s:Label text="{Message.get('speciesImport.error.title')}" />
+		
+		<s:DataGrid id="errorsDataGrid">
+			<s:columns>
+				<s:ArrayList>
+					<s:GridColumn headerText="{Message.get('speciesImport.parsingError.row')}"
+								  dataField="row" />
+					<s:GridColumn headerText="{Message.get('speciesImport.parsingError.column')}"
+								  dataField="column" />
+					<s:GridColumn headerText="{Message.get('speciesImport.parsingError.type')}"
+								  labelFunction="{errorTypeLabelFunction}" />
+					<s:GridColumn headerText="{Message.get('speciesImport.parsingError.message')}"
+								  labelFunction="{errorMessageLabelFunction}" />
+				</s:ArrayList>
+			</s:columns>
+		</s:DataGrid>
+		
+		<s:Button id="errorsOkButton"
+				  label="{Message.get('global.ok')}"
+				  buttonMode="true"
+				  useHandCursor="true" />
 		
 	</s:VGroup>
 	

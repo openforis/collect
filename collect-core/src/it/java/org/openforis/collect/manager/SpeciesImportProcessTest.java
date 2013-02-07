@@ -61,7 +61,7 @@ public class SpeciesImportProcessTest {
 	public SpeciesImportProcess importCSVFile(String fileName) throws Exception {
 		File file = getTestFile(fileName);
 		String taxonomyName = TEST_TAXONOMY_NAME;
-		SpeciesImportProcess process = new SpeciesImportProcess(speciesManager, taxonomyName, file);
+		SpeciesImportProcess process = new SpeciesImportProcess(speciesManager, taxonomyName, file, true);
 		process.call();
 		return process;
 	}

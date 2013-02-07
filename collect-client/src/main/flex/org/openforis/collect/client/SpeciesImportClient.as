@@ -29,8 +29,8 @@ package org.openforis.collect.client {
 			token.addResponder(responder);
 		}
 		
-		public function start(responder:IResponder, taxonomyName:String):void {
-			var token:AsyncToken = this._startOperation.send(taxonomyName);
+		public function start(responder:IResponder, taxonomyName:String, overwriteAll:Boolean):void {
+			var token:AsyncToken = this._startOperation.send(taxonomyName, overwriteAll);
 			token.addResponder(responder);
 		}
 

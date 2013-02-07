@@ -82,9 +82,11 @@
 <!-- 								<includeClass>org.openforis.idm.model.**</includeClass> -->
                                 <includeClass>org.openforis.idm.model.species.Taxon$TaxonRank</includeClass>
                                 <includeClass>org.openforis.idm.metamodel.validation.ValidationResultFlag</includeClass>
-                                <includeClass>org.openforis.collect.manager.process.ProcessStatus</includeClass>
+                                <includeClass>org.openforis.collect.Proxy</includeClass>
                                 <includeClass>org.openforis.collect.manager.process.ProcessStatus$Step</includeClass>
-                                <includeClass>org.openforis.collect.manager.speciesImport.SpeciesImportStatus</includeClass>
+                                <includeClass>org.openforis.collect.manager.process.proxy.*</includeClass>
+                                <includeClass>org.openforis.collect.manager.speciesImport.TaxonParsingError</includeClass>
+                                <includeClass>org.openforis.collect.manager.speciesImport.TaxonParsingError$Type</includeClass>
                                 <includeClass>org.openforis.collect.model.CollectRecord$State</includeClass>
                                 <includeClass>org.openforis.collect.model.RecordSummarySortField</includeClass>
                                 <includeClass>org.openforis.collect.model.RecordSummarySortField$Sortable</includeClass>
@@ -92,7 +94,6 @@
                                 <includeClass>org.openforis.collect.metamodel.NodeDefinitionSummary</includeClass>
                                 <includeClass>org.openforis.collect.metamodel.proxy.*</includeClass>
                                 <includeClass>org.openforis.collect.model.proxy.*</includeClass>
-                                <includeClass>org.openforis.collect.Proxy</includeClass>
                                 <includeClass>org.openforis.collect.model.FieldSymbol</includeClass>
                                 <includeClass>org.openforis.collect.remoting.service.FileWrapper</includeClass>
                                 <includeClass>org.openforis.collect.remoting.service.UpdateRequest</includeClass>
@@ -110,6 +111,7 @@
                                 <includeClass>org.openforis.collect.remoting.service.dataImport.DataImportSummaryItemProxy</includeClass>
                                 <includeClass>org.openforis.collect.remoting.service.dataImport.FileUnmarshallingErrorProxy</includeClass>
                                 <includeClass>org.openforis.collect.remoting.service.dataImport.NodeUnmarshallingErrorProxy</includeClass>
+                                <includeClass>org.openforis.collect.remoting.service.speciesImport.proxy.SpeciesImportStatusProxy</includeClass>
 							</includeJavaClasses>
 						</configuration>
 					</execution>

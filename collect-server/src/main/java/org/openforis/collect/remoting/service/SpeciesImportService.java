@@ -9,6 +9,7 @@ import org.openforis.collect.manager.SpeciesManager;
 import org.openforis.collect.manager.speciesImport.SpeciesImportProcess;
 import org.openforis.collect.manager.speciesImport.SpeciesImportStatus;
 import org.openforis.collect.remoting.service.dataImport.DataImportExeption;
+import org.openforis.collect.remoting.service.speciesImport.proxy.SpeciesImportStatusProxy;
 import org.openforis.collect.util.ExecutorServiceUtil;
 import org.openforis.collect.web.controller.FileUploadController;
 import org.openforis.collect.web.session.SessionState;
@@ -22,6 +23,8 @@ import org.springframework.security.access.annotation.Secured;
  */
 public class SpeciesImportService {
 	
+	private static final String INTERNAL_ERROR_IMPORTING_FILE_MESSAGE_KEY = "speciesImport.error.internalErrorImportingFile";
+
 	private static final String FILE_NAME = "species.csv";
 	
 	@Autowired
@@ -46,23 +49,33 @@ public class SpeciesImportService {
 	}
 	
 	@Secured("ROLE_ADMIN")
-	public SpeciesImportStatus start(String taxonomyName, boolean overwriteAll) throws DataImportExeption {
+	public SpeciesImportStatusProxy start(String taxonomyName, boolean overwriteAll) throws DataImportExeption {
 		if ( importProcess == null || ! importProcess.getStatus().isRunning() ) {
 			SessionState sessionState = sessionManager.getSessionState();
 			File userImportFolder = FileUploadController.getSessionTempDirectory(tempDirectory, sessionState.getSessionId());
 			File importFile = new File(userImportFolder, FILE_NAME);
-			importProcess = new SpeciesImportProcess(speciesManager, taxonomyName, importFile);
-			ExecutorServiceUtil.executeInCachedPool(importProcess);
+			if ( importFile.exists() && importFile.canRead() ) {
+				importProcess = new SpeciesImportProcess(speciesManager, taxonomyName, importFile, overwriteAll);
+				startProcessThread();
+			} else {
+				SpeciesImportStatus status = importProcess.getStatus();
+				status.error();
+				status.setErrorMessage(INTERNAL_ERROR_IMPORTING_FILE_MESSAGE_KEY);
+			}
 		}
-		SpeciesImportStatus status = importProcess.getStatus();
-		return status;
+		return getStatus();
+	}
+
+	protected void startProcessThread() {
+		importProcess.prepare();
+		ExecutorServiceUtil.executeInCachedPool(importProcess);
 	}
 	
 	@Secured("ROLE_ADMIN")
-	public SpeciesImportStatus getStatus() {
+	public SpeciesImportStatusProxy getStatus() {
 		if ( importProcess != null ) {
 			SpeciesImportStatus status = importProcess.getStatus();
-			return status;
+			return new SpeciesImportStatusProxy(status);
 		} else {
 			return null;
 		}

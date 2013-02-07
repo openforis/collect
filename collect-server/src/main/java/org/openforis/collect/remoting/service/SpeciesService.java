@@ -40,7 +40,7 @@ public class SpeciesService {
 	}
 	
 	@Secured("ROLE_ADMIN")
-	public Taxonomy saveTaxonomy(TaxonomyProxy proxy) {
+	public TaxonomyProxy saveTaxonomy(TaxonomyProxy proxy) {
 		Integer taxonomyId = proxy.getId();
 		Taxonomy taxonomy;
 		if ( taxonomyId == null ) {
@@ -50,7 +50,8 @@ public class SpeciesService {
 		}
 		proxy.copyTo(taxonomy);
 		taxonManager.save(taxonomy);
-		return taxonomy;
+		TaxonomyProxy result = new TaxonomyProxy(taxonomy);
+		return result;
 	}
 
 	@Secured("ROLE_ADMIN")

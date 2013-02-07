@@ -5,20 +5,15 @@ import static org.openforis.idm.model.species.Taxon.TaxonRank.GENUS;
 import static org.openforis.idm.model.species.Taxon.TaxonRank.SPECIES;
 import static org.openforis.idm.model.species.Taxon.TaxonRank.SUBSPECIES;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.List;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -44,23 +39,26 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 	private static final TaxonRank[] TAXON_RANKS = new TaxonRank[] {FAMILY, GENUS, SPECIES, SUBSPECIES};
 
 	private static final String CSV = "csv";
-	private static final String ZIP = "zip";
+	//private static final String ZIP = "zip";
 
 	private SpeciesManager speciesManager;
 	private String taxonomyName;
 	private File file;
-	private String errorMessage;
+	private boolean overwriteAll;
 	
 	private TaxonTree taxonTree;
 	private List<Long> processedLineNumbers;
 	private TaxonCSVReader reader;
 	private TaxonCSVLine currentLine;
+	private String errorMessage;
+
 	
-	public SpeciesImportProcess(SpeciesManager speciesManager, String taxonomyName, File file) {
+	public SpeciesImportProcess(SpeciesManager speciesManager, String taxonomyName, File file, boolean overwriteAll) {
 		super();
 		this.speciesManager = speciesManager;
 		this.taxonomyName = taxonomyName;
 		this.file = file;
+		this.overwriteAll = overwriteAll;
 	}
 	
 	@Override
@@ -70,16 +68,23 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 
 	@Override
 	public Void call() throws Exception {
+		run();
+		return null;
+	}
+
+	protected void run() throws IOException {
+		if ( status.isInit() ) {
+			prepare();
+		}
 		status.start();
-		prepare();
 		processFile();
 		if ( status.isRunning() ) {
 			status.complete();
 		}
-		return null;
 	}
 
-	protected void prepare() {
+	public void prepare() {
+		status.prepare();
 		processedLineNumbers = new ArrayList<Long>();
 		initCache();
 	}
@@ -93,14 +98,20 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 		String extension = FilenameUtils.getExtension(fileName);
 		if ( CSV.equalsIgnoreCase(extension) ) {
 			processCSV(file);
-		} else if (ZIP.equals(extension) ) {
-			processPackagedFile();
+			if ( status.isRunning() ) {
+				status.complete();
+			}
+//		} else if (ZIP.equals(extension) ) {
+//			processPackagedFile();
+//			status.complete();
 		} else {
 			errorMessage = "File type not supported" + extension;
-			LOG.error(errorMessage);
+			status.setErrorMessage(errorMessage);
+			status.error();
+			LOG.error("Species import: " + errorMessage);
 		}
 	}
-
+	/*
 	protected void processPackagedFile() throws IOException {
 		File unzippedCsvFile = null;
 		ZipFile zipFile = new ZipFile(file);
@@ -116,7 +127,7 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 		}
 		zipFile.close();
 	}
-
+	*/
 	protected void processCSV(File file) {
 		for (TaxonRank rank : TAXON_RANKS) {
 			if ( status.isRunning() ) {
@@ -150,7 +161,7 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 						boolean processed = processCurrentLine(rank);
 						if (processed) {
 							processedLineNumbers.add(currentRowNumber);
-							status.rowProcessed();
+							status.incrementProcessed();
 						}
 					}
 				} catch (TaxonParsingException e) {
@@ -159,15 +170,18 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 					currentRowNumber ++;
 				}
 			}
+			if ( status.getTotal() <= 0 ) {
+				status.setTotal(currentRowNumber - 1);
+			}
 		} catch (IOException e) {
 			status.error();
 			status.addError(currentRowNumber, new TaxonParsingError(Type.IOERROR, e.getMessage()));
 			LOG.error("Error importing species CSV file", e);
 		} catch (TaxonParsingException e) {
+			status.error();
 			status.addError(1, e.getError());
 		} finally {
 			close(isReader);
-			close(is);
 		}
 	}
 	
@@ -208,6 +222,9 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 	}
 
 	protected void persistTaxa() {
+		if ( overwriteAll ) {
+			deleteOldTaxonomy();
+		}
 		Taxonomy taxonomy = new Taxonomy();
 		taxonomy.setName(taxonomyName);
 		speciesManager.save(taxonomy);
@@ -218,6 +235,13 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 				persistTaxonTreeNode(taxonomyId, node);
 			}
 		});
+	}
+
+	protected void deleteOldTaxonomy() {
+		Taxonomy oldTaxonomy = speciesManager.loadTaxonomyByName(taxonomyName);
+		if ( oldTaxonomy != null ) {
+			speciesManager.delete(oldTaxonomy);
+		}
 	}
 
 	protected void persistTaxonTreeNode(Integer taxonomyId, Node node) {
@@ -311,23 +335,14 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 		return reader.getLinesRead() + 1;
 	}
 
-	private void close(InputStreamReader reader) {
-		if ( reader != null ) {
+	private void close(Closeable closeable) {
+		if ( closeable != null ) {
 			try {
-				reader.close();
+				closeable.close();
 			} catch (IOException e) {
-				LOG.error("Error closing reader", e);
+				LOG.error("Error closing stream: ", e);
 			}
 		}
 	}
 	
-	private void close(InputStream is) {
-		if ( is != null ) {
-			try {
-				is.close();
-			} catch (IOException e) {
-				LOG.error("Error closing reader", e);
-			}
-		}
-	}
 }

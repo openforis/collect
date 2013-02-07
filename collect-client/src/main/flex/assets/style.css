@@ -136,8 +136,12 @@ mx|Alert {
 
 }*/
 
-component|BlockingMessagePopUp, component|SurveySelectionPopUp, component|SelectVersionPopUp, input|CodeListDialog, component|DataExportPopUp, 
-	component|BackupPopUp, component|DataImportPopUp, user|UserManagementPopUp {
+component|BlockingMessagePopUp, 
+	component|BackupPopUp, component|DataExportPopUp, component|DataImportPopUp, 
+	component|SelectVersionPopUp, component|SpeciesImportPopUp, 
+	component|SurveySelectionPopUp, 
+	input|CodeListDialog, 
+	user|UserManagementPopUp {
 	skin-class: ClassReference("org.openforis.collect.ui.skin.TitleWindowSkin");
 	title-style-name: dialogHeaderStyle;
 	border-color: #000000;

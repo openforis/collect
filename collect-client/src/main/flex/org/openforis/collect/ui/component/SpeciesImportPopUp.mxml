@@ -5,7 +5,7 @@
 		 xmlns:view="org.openforis.collect.ui.view.*"
 		 xmlns:component="org.openforis.collect.ui.component.*"
 		 title="{Message.get('speciesImport.popUp.title')}" 
-		 width="970" height="620" 
+		 width="500" height="250" 
 		 >
 	<fx:Script>
 		<![CDATA[
@@ -13,6 +13,8 @@
 		]]>
 	</fx:Script>
 	
-	<view:SpeciesImportView id="speciesImportView" />
+	<view:SpeciesImportView id="speciesImportView"
+							height="100%"
+							width="100%" />
 	
 </component:PopUp>

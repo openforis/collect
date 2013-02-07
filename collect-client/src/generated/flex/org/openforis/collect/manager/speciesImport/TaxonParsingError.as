@@ -8,7 +8,7 @@
 package org.openforis.collect.manager.speciesImport {
 
     [Bindable]
-    [RemoteClass(alias="org.openforis.collect.manager.speciesImport.SpeciesImportStatus")]
-    public class SpeciesImportStatus extends SpeciesImportStatusBase {
+    [RemoteClass(alias="org.openforis.collect.manager.speciesImport.TaxonParsingError")]
+    public class TaxonParsingError extends TaxonParsingErrorBase {
     }
 }

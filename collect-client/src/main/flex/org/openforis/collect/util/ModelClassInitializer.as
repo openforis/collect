@@ -52,6 +52,7 @@ package org.openforis.collect.util {
 	import org.openforis.collect.model.proxy.TaxonOccurrenceProxy;
 	import org.openforis.collect.model.proxy.TaxonProxy;
 	import org.openforis.collect.model.proxy.TaxonVernacularNameProxy;
+	import org.openforis.collect.model.proxy.TaxonomyProxy;
 	import org.openforis.collect.model.proxy.TimeProxy;
 	import org.openforis.collect.model.proxy.ValidationResultProxy;
 	import org.openforis.collect.model.proxy.ValidationResultsProxy;
@@ -123,6 +124,7 @@ package org.openforis.collect.util {
 				SurveySummary,
 				TaxonAttributeDefinitionProxy,
 				TaxonOccurrenceProxy,
+				TaxonomyProxy,
 				TaxonProxy,
 				TaxonVernacularNameProxy,
 				TextAttributeDefinitionProxy,

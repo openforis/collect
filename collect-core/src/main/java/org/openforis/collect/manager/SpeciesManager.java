@@ -55,6 +55,11 @@ public class SpeciesManager {
 	}
 
 	@Transactional
+	public Taxonomy loadTaxonomyByName(String name) {
+		return taxonomyDao.load(name);
+	}
+
+	@Transactional
 	public List<TaxonOccurrence> findByCode(String taxonomyName, String searchString, int maxResults) {
 		Taxonomy taxonomy = taxonomyDao.load(taxonomyName);
 		List<Taxon> list = taxonDao.findByCode(taxonomy.getId(), searchString, maxResults);
@@ -112,6 +117,7 @@ public class SpeciesManager {
 	public void delete(Taxonomy taxonomy) {
 		Integer id = taxonomy.getId();
 		taxonDao.deleteByTaxonomy(id);
+		taxonVernacularNameDao.deleteByTaxonomy(id);
 		taxonomyDao.delete(id);
 	}
 	
