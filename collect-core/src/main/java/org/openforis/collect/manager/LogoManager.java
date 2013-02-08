@@ -20,6 +20,10 @@ public class LogoManager {
 	@Transactional
 	public byte[] loadLogo(int id) {
 		Logo logo = logoDao.loadById(id);
-		return logo.getImage();
+		if ( logo == null ) {
+			return null;
+		} else {
+			return logo.getImage();
+		}
 	}
 }
