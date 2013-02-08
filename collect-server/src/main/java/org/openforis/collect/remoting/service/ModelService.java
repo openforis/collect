@@ -1,7 +1,6 @@
 package org.openforis.collect.remoting.service;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 
@@ -13,10 +12,8 @@ import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SurveySummary;
 import org.openforis.collect.web.session.SessionState;
 import org.openforis.idm.metamodel.EntityDefinition;
-import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.NodeLabel.Type;
 import org.openforis.idm.metamodel.Schema;
-import org.openforis.idm.metamodel.SpatialReferenceSystem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,18 +31,6 @@ public class ModelService {
 	@Autowired
 	private SessionManager sessionManager;
 
-	/**
-		 */
-	public Collection<SpatialReferenceSystem> getSpatialReferenceSystems() {
-		return null;
-	}
-
-	/**
-			 */
-	public Collection<ModelVersion> getModelVersions() {
-		return null;
-	}
-	
 	@Transactional
 	public SurveyProxy setActiveSurvey(String name) {
 		CollectSurvey survey = surveyManager.get(name);

@@ -105,7 +105,8 @@ public class SpeciesManager {
 		List<TaxonOccurrence> result = createOccurrenceList(list);
 		return result;
 	}
-
+	
+	@Transactional
 	public void save(Taxonomy taxonomy) {
 		if ( taxonomy.getId() == null ) {
 			taxonomyDao.insert(taxonomy);
@@ -114,13 +115,15 @@ public class SpeciesManager {
 		}
 	}
 	
+	@Transactional
 	public void delete(Taxonomy taxonomy) {
 		Integer id = taxonomy.getId();
-		taxonDao.deleteByTaxonomy(id);
 		taxonVernacularNameDao.deleteByTaxonomy(id);
+		taxonDao.deleteByTaxonomy(id);
 		taxonomyDao.delete(id);
 	}
 	
+	@Transactional
 	public void save(Taxon taxon) {
 		if ( taxon.getSystemId() == null ) {
 			taxonDao.insert(taxon);
@@ -129,10 +132,12 @@ public class SpeciesManager {
 		}
 	}
 
+	@Transactional
 	public void delete(Taxon taxon) {
 		taxonDao.delete(taxon.getSystemId());
 	}
 	
+	@Transactional
 	public void save(TaxonVernacularName vernacularName) {
 		if ( vernacularName.getId() == null ) {
 			taxonVernacularNameDao.insert(vernacularName);
@@ -141,6 +146,7 @@ public class SpeciesManager {
 		}
 	}
 	
+	@Transactional
 	public void delete(TaxonVernacularName vernacularName) {
 		taxonVernacularNameDao.delete(vernacularName.getId());
 	}
