@@ -67,7 +67,7 @@ package org.openforis.collect.presenter {
 		private var _modelClient:ModelClient;
 		private var _sessionClient:SessionClient;
 		//private var _contextMenuPresenter:ContextMenuPresenter;
-		private var _speciedImportPopUp:SpeciesImportPopUp;
+		private var _speciesImportPopUp:SpeciesImportPopUp;
 		
 		private var _keepAliveTimer:Timer;
 		
@@ -112,6 +112,7 @@ package org.openforis.collect.presenter {
 			eventDispatcher.addEventListener(UIEvent.LOGOUT_CLICK, logoutClickHandler);
 			eventDispatcher.addEventListener(UIEvent.SHOW_LIST_OF_RECORDS, showListOfRecordsHandler);
 			eventDispatcher.addEventListener(UIEvent.OPEN_SPECIES_IMPORT_POPUP, openSpeciesImportPopUpHandler);
+			eventDispatcher.addEventListener(UIEvent.CLOSE_SPECIES_IMPORT_POPUP, closeSpeciesImportPopUpHandler);
 			
 			CONFIG::debugging {
 				_view.addEventListener(KeyboardEvent.KEY_DOWN, function(event:KeyboardEvent):void {
@@ -225,7 +226,13 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function openSpeciesImportPopUpHandler(event:Event = null):void {
-			_speciedImportPopUp = SpeciesImportPopUp(PopUpUtil.createPopUp(SpeciesImportPopUp));
+			_speciesImportPopUp = SpeciesImportPopUp(PopUpUtil.createPopUp(SpeciesImportPopUp));
+		}
+		
+		protected function closeSpeciesImportPopUpHandler(event:Event = null):void {
+			if ( _speciesImportPopUp != null ) {
+				PopUpManager.removePopUp(_speciesImportPopUp);
+			}
 		}
 		
 		/**

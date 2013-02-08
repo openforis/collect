@@ -139,13 +139,13 @@
 			<s:columns>
 				<s:ArrayList>
 					<s:GridColumn headerText="{Message.get('speciesImport.parsingError.row')}"
-								  dataField="row" />
+								  dataField="row" width="50" />
 					<s:GridColumn headerText="{Message.get('speciesImport.parsingError.column')}"
-								  dataField="column" />
+								  dataField="column" width="50" />
 					<s:GridColumn headerText="{Message.get('speciesImport.parsingError.type')}"
-								  labelFunction="{errorTypeLabelFunction}" />
+								  labelFunction="{errorTypeLabelFunction}" width="100" />
 					<s:GridColumn headerText="{Message.get('speciesImport.parsingError.message')}"
-								  labelFunction="{errorMessageLabelFunction}" />
+								  labelFunction="{errorMessageLabelFunction}" width="400" />
 				</s:ArrayList>
 			</s:columns>
 		</s:DataGrid>

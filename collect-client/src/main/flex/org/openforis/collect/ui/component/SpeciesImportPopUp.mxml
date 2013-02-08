@@ -5,7 +5,7 @@
 		 xmlns:view="org.openforis.collect.ui.view.*"
 		 xmlns:component="org.openforis.collect.ui.component.*"
 		 title="{Message.get('speciesImport.popUp.title')}" 
-		 width="500" height="250" 
+		 width="650" height="250" 
 		 >
 	<fx:Script>
 		<![CDATA[

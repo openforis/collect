@@ -407,11 +407,11 @@ package org.openforis.collect.presenter {
 		
 		protected function updateViewForError():void {
 			if ( CollectionUtil.isEmpty(_state.errors) ) {
-				_view.currentState = SpeciesImportView.STATE_ERROR;
-				_view.errorsDataGrid.dataProvider = _state.errors;
+				_view.currentState = SpeciesImportView.STATE_DEFAULT;
+				AlertUtil.showError(MessageKeys.ERROR, [_state.errorMessage]);
 			} else {
 				_view.currentState = SpeciesImportView.STATE_ERROR;
-				AlertUtil.showError(MessageKeys.ERROR, [_state.errorMessage]);
+				_view.errorsDataGrid.dataProvider = _state.errors;
 			}
 		}
 		
