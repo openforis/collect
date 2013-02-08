@@ -349,9 +349,9 @@
 			<version>3.6.1</version>
 		</dependency>
         <dependency>
-          <groupId>org.gbif</groupId>
-          <artifactId>ecat-common</artifactId>
-          <version>1.6</version>
+            <groupId>org.gbif</groupId>
+            <artifactId>ecat-common</artifactId>
+            <version>1.6</version>
         </dependency>
 		
 		<!--  TEST DEPENDENCIES -->

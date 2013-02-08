@@ -189,6 +189,7 @@
             <artifactId>commons-validator</artifactId>
             <version>1.4.0</version>
         </dependency>
+                              
 		<!-- ZK dependencies -->
 		<dependency>
 			<groupId>org.zkoss.zk</groupId>
@@ -219,6 +220,20 @@
 			<groupId>org.zkoss.zk</groupId>
 			<artifactId>zkspring-core</artifactId>
 			<version>${zk.spring.version}</version>
+            <exclusions>
+              <exclusion>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-classic</artifactId>
+              </exclusion>
+              <exclusion>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-core</artifactId>
+              </exclusion>
+              <exclusion>
+                <groupId>com.google.collections</groupId>
+                <artifactId>google-collections</artifactId>
+              </exclusion>
+            </exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.zkoss.zk</groupId>
