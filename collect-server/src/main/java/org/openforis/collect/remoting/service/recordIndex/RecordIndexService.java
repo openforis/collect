@@ -1,5 +1,6 @@
 package org.openforis.collect.remoting.service.recordIndex;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -27,7 +28,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
  * @author S. Ricci
  *
  */
-public class RecordIndexService {
+public class RecordIndexService implements Serializable {
+
+	private static final long serialVersionUID = 1L;
 
 	@Autowired
 	@Qualifier("persistedRecordIndexManager")
