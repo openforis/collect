@@ -56,6 +56,7 @@ public class SpeciesImportService {
 			File importFile = new File(userImportFolder, FILE_NAME);
 			if ( importFile.exists() && importFile.canRead() ) {
 				importProcess = new SpeciesImportProcess(speciesManager, taxonomyName, importFile, overwriteAll);
+				importProcess.init();
 				startProcessThread();
 			} else {
 				SpeciesImportStatus status = importProcess.getStatus();
@@ -67,7 +68,6 @@ public class SpeciesImportService {
 	}
 
 	protected void startProcessThread() {
-		importProcess.prepare();
 		ExecutorServiceUtil.executeInCachedPool(importProcess);
 	}
 	

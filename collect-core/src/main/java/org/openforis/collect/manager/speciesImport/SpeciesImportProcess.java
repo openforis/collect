@@ -19,7 +19,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openforis.collect.manager.SpeciesManager;
 import org.openforis.collect.manager.process.AbstractProcess;
-import org.openforis.collect.manager.speciesImport.TaxonCSVReader.TaxonCSVLine;
+import org.openforis.collect.manager.speciesImport.TaxonCSVReader.TaxonLine;
 import org.openforis.collect.manager.speciesImport.TaxonParsingError.Type;
 import org.openforis.collect.manager.speciesImport.TaxonTree.Node;
 import org.openforis.idm.model.species.Taxon;
@@ -49,7 +49,7 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 	private TaxonTree taxonTree;
 	private List<Long> processedLineNumbers;
 	private TaxonCSVReader reader;
-	private TaxonCSVLine currentLine;
+	private TaxonLine currentLine;
 	private String errorMessage;
 
 	
@@ -62,37 +62,23 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 	}
 	
 	@Override
-	protected void initStatus() {
-		status = new SpeciesImportStatus();
-	}
-
-	@Override
-	public Void call() throws Exception {
-		run();
-		return null;
-	}
-
-	protected void run() throws IOException {
-		if ( status.isInit() ) {
-			prepare();
-		}
-		status.start();
-		processFile();
-		if ( status.isRunning() ) {
-			status.complete();
-		}
-	}
-
-	public void prepare() {
-		status.prepare();
+	public void init() {
+		super.init();
 		processedLineNumbers = new ArrayList<Long>();
-		initCache();
-	}
-
-	protected void initCache() {
 		taxonTree = new TaxonTree();
 	}
 	
+	@Override
+	protected void initStatus() {
+		status = new SpeciesImportStatus(taxonomyName);
+	}
+
+	@Override
+	public void startProcessing() throws Exception {
+		super.startProcessing();
+		processFile();
+	}
+
 	protected void processFile() throws IOException {
 		String fileName = file.getName();
 		String extension = FilenameUtils.getExtension(fileName);
@@ -173,13 +159,13 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 			if ( status.getTotal() <= 0 ) {
 				status.setTotal(currentRowNumber - 1);
 			}
-		} catch (IOException e) {
-			status.error();
-			status.addError(currentRowNumber, new TaxonParsingError(Type.IOERROR, e.getMessage()));
-			LOG.error("Error importing species CSV file", e);
 		} catch (TaxonParsingException e) {
 			status.error();
 			status.addError(1, e.getError());
+		} catch (Exception e) {
+			status.error();
+			status.addError(currentRowNumber, new TaxonParsingError(Type.IOERROR, e.getMessage()));
+			LOG.error("Error importing species CSV file", e);
 		} finally {
 			close(isReader);
 		}

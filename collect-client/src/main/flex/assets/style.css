@@ -152,7 +152,7 @@ component|BlockingMessagePopUp,
 	background-alpha: 1.0;
 }
 
-component|BlockingMessagePopUp, component|SurveySelectionPopUp, component|SelectVersionPopUp, input|CodeListDialog, component|DataExportPopUp, component|BackupPopUp {
+component|BlockingMessagePopUp, component|SurveySelectionPopUp, component|SelectVersionPopUp, input|CodeListDialog, component|DataExportPopUp, component|BackupPopUp, component|SpeciesImportPopUp {
 	showCloseButton: false;
 }
 

@@ -24,6 +24,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.client.SpeciesClient;
 	import org.openforis.collect.client.SpeciesImportClient;
+	import org.openforis.collect.event.UIEvent;
 	import org.openforis.collect.i18n.Message;
 	import org.openforis.collect.manager.process.ProcessStatus$Step;
 	import org.openforis.collect.metamodel.proxy.SurveyProxy;
@@ -251,7 +252,24 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function closeButtonClickHandler(event:MouseEvent):void {
-			closeTaxonomyEditPopUp();
+			if ( _state == null || _state.step == ProcessStatus$Step.RUN ) {
+				closePopUp();
+			} else {
+				AlertUtil.showConfirm(MessageKeys.CONFIRM_CLOSE, null, MessageKeys.CONFIRM_CLOSE_TITLE, performCancelThenClose);
+			}
+		}
+		
+		protected function performCancelThenClose():void {
+			var responder:AsyncResponder = new AsyncResponder(cancelResultHandler, faultHandler);
+			_speciesImportClient.cancel(responder);
+			
+			function cancelResultHandler(event:ResultEvent, token:Object = null):void {
+				closePopUp();
+			}
+		}
+		
+		protected function closePopUp():void {
+			eventDispatcher.dispatchEvent(new UIEvent(UIEvent.CLOSE_SPECIES_IMPORT_POPUP));
 		}
 		
 		protected function fileReferenceSelectHandler(event:Event):void {
@@ -343,26 +361,21 @@ package org.openforis.collect.presenter {
 		}
 		
 		private function updateView():void {
-			if(_state == null || _state.step == ProcessStatus$Step.INIT || 
-				(_firstOpen && _state.step != ProcessStatus$Step.RUN) ) {
+			if(_state == null || (_firstOpen && _state.step != ProcessStatus$Step.RUN) ) {
 				resetView();
 			} else {
 				var step:ProcessStatus$Step = _state.step;
 				switch ( step ) {
 					case ProcessStatus$Step.INIT:
-						resetView();
-						break;
-					case ProcessStatus$Step.PREPARE:
 						_view.currentState = SpeciesImportView.STATE_LOADING;
 						startProgressTimer();
 						break;
 					case ProcessStatus$Step.RUN:
-						updateViewForImporting();
-						startProgressTimer();
+						updateViewForRunning();
 						break;
 					case ProcessStatus$Step.COMPLETE:
 						stopProgressTimer();
-						updateViewImportCompleted();
+						updateViewProcessComplete();
 						break;
 					case ProcessStatus$Step.ERROR:
 						stopProgressTimer();
@@ -380,6 +393,18 @@ package org.openforis.collect.presenter {
 			_firstOpen = false;
 		}
 		
+		private function updateViewForUploading():void {
+			_view.currentState = SpeciesImportView.STATE_UPLOADING;
+			_view.progressTitle.text = Message.get(MessageKeys.UPLOADING_FILE);
+			_view.progressLabel.text = "";
+		}
+		
+		private function updateViewForRunning():void {
+			_view.currentState = SpeciesImportView.STATE_IMPORTING;
+			_view.progressTitle.text = Message.get(MessageKeys.IMPORTING);
+			updateProgressBar(MessageKeys.IMPORTING_PROGRESS_LABEL);
+		}
+		
 		protected function updateViewForError():void {
 			if ( CollectionUtil.isEmpty(_state.errors) ) {
 				_view.currentState = SpeciesImportView.STATE_ERROR;
@@ -390,31 +415,20 @@ package org.openforis.collect.presenter {
 			}
 		}
 		
-		protected function updateViewImportCompleted():void {
+		protected function updateViewProcessComplete():void {
 			_view.currentState = SpeciesImportView.STATE_DEFAULT;
 			AlertUtil.showMessage(MessageKeys.COMPLETED, [_state.processed, _state.total]);
 			//reload taxonomy
 		}
 		
-		private function updateViewForUploading():void {
-			_view.currentState = SpeciesImportView.STATE_UPLOADING;
-			_view.progressTitle.text = Message.get(MessageKeys.UPLOADING_FILE);
-			_view.progressLabel.text = "";
-		}
-
-		private function updateViewForImporting():void {
-			_view.currentState = SpeciesImportView.STATE_IMPORTING;
-			_view.progressTitle.text = Message.get(MessageKeys.IMPORTING);
-			_view.progressBar.setProgress(_state.processed, _state.total);
-			updateProgressText(MessageKeys.IMPORTING_PROGRESS_LABEL);
-		}
-
-		protected function updateProgressText(progressLabelResource:String):void {
+		protected function updateProgressBar(progressLabelResource:String):void {
 			var progressText:String;
 			if ( _state.total <= 0 ) {
 				progressText = Message.get(MessageKeys.PROCESSING);
+				_view.progressBar.setProgress(0, 0);
 			} else {
 				progressText = Message.get(progressLabelResource, [_state.processed, _state.total]);
+				_view.progressBar.setProgress(_state.processed, _state.total);
 			}
 			_view.progressLabel.text = progressText;
 		}
@@ -426,7 +440,6 @@ package org.openforis.collect.presenter {
 		}
 		
 	}
-	
 }
 
 class MessageKeys {
@@ -444,4 +457,6 @@ class MessageKeys {
 	public static const UPLOADING_FILE_ERROR:String = "speciesImport.file.error";
 	public static const CONFIRM_IMPORT_TITLE:String = "speciesImport.confirmImport.title";
 	public static const CONFIRM_IMPORT:String = "speciesImport.confirmImport.message";
+	public static const CONFIRM_CLOSE:String = "speciesImport.confirmClose.message";
+	public static const CONFIRM_CLOSE_TITLE:String = "speciesImport.confirmClose.title";
 }

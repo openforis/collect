@@ -11,10 +11,6 @@ public abstract class AbstractProcess<V, S extends ProcessStatus> implements org
 
 	protected S status;
 	
-	public AbstractProcess() {
-		init();
-	}
-
 	protected void init() {
 		initStatus();
 	}
@@ -29,6 +25,25 @@ public abstract class AbstractProcess<V, S extends ProcessStatus> implements org
 	@Override
 	public S getStatus() {
 		return status;
+	}
+	
+	@Override
+	public V call() throws Exception {
+		startProcessing();
+		if ( status.isRunning() ) {
+			status.complete();
+		}
+		return null;
+	}
+
+	@Override
+	public void startProcessing() throws Exception {
+		if ( status == null ) {
+			init();
+		} else if ( status.isRunning() ) {
+			throw new IllegalStateException("Process already running");
+		}
+		status.start();
 	}
 	
 

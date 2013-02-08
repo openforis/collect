@@ -22,10 +22,15 @@ public class SpeciesImportStatusProxy extends ProcessStatusProxy {
 		super(status);
 		this.status = status;
 	}
-
+	
 	@ExternalizedProperty
 	public List<TaxonParsingError> getErrors() {
 		return status.getErrors();
+	}
+
+	@ExternalizedProperty
+	public String getTaxonomyName() {
+		return status.getTaxonomyName();
 	}
 	
 }

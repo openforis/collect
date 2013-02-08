@@ -14,7 +14,6 @@ package org.openforis.collect.manager.process {
     public class ProcessStatus$Step extends Enum {
 
         public static const INIT:ProcessStatus$Step = new ProcessStatus$Step("INIT", _);
-        public static const PREPARE:ProcessStatus$Step = new ProcessStatus$Step("PREPARE", _);
         public static const RUN:ProcessStatus$Step = new ProcessStatus$Step("RUN", _);
         public static const COMPLETE:ProcessStatus$Step = new ProcessStatus$Step("COMPLETE", _);
         public static const CANCEL:ProcessStatus$Step = new ProcessStatus$Step("CANCEL", _);
@@ -29,7 +28,7 @@ package org.openforis.collect.manager.process {
         }
 
         public static function get constants():Array {
-            return [INIT, PREPARE, RUN, COMPLETE, CANCEL, ERROR];
+            return [INIT, RUN, COMPLETE, CANCEL, ERROR];
         }
 
         public static function valueOf(name:String):ProcessStatus$Step {

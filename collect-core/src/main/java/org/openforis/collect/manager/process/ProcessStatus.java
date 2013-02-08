@@ -10,7 +10,7 @@ import static org.openforis.collect.manager.process.ProcessStatus.Step.*;
 public class ProcessStatus {
 
 	public enum Step {
-		INIT, PREPARE, RUN, COMPLETE, CANCEL, ERROR;
+		INIT, RUN, COMPLETE, CANCEL, ERROR;
 	}
 	
 	private Step step;
@@ -32,10 +32,6 @@ public class ProcessStatus {
 		processed ++;
 	}
 	
-	public void prepare() {
-		step = PREPARE;
-	}
-
 	public void start() {
 		step = RUN;
 	}

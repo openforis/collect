@@ -18,10 +18,12 @@ public class SpeciesImportStatus extends ProcessStatus {
 	
 	private Map<Long, List<TaxonParsingError>> rowToErrors;
 	private List<Long> skippedRows;
+	private String taxonomyName;
 	
-	public SpeciesImportStatus() {
+	public SpeciesImportStatus(String taxonomyName) {
 		super();
-		rowToErrors = new LinkedHashMap<Long, List<TaxonParsingError>>();
+		this.taxonomyName = taxonomyName;
+		this.rowToErrors = new LinkedHashMap<Long, List<TaxonParsingError>>();
 	}
 	
 	public void addError(long row, TaxonParsingError error) {
@@ -46,6 +48,10 @@ public class SpeciesImportStatus extends ProcessStatus {
 	
 	public boolean hasErrors() {
 		return rowToErrors != null && ! rowToErrors.isEmpty();
+	}
+
+	public String getTaxonomyName() {
+		return taxonomyName;
 	}
 	
 	public List<Long> getSkippedRows() {

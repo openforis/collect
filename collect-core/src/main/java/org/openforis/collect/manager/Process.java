@@ -15,5 +15,7 @@ public interface Process<V> extends Callable<V> {
 	void cancel();
 	
 	ProcessStatus getStatus();
+
+	void startProcessing() throws Exception;
 	
 }
