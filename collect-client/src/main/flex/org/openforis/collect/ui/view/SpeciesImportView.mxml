@@ -29,8 +29,12 @@
 
 			public function errorTypeLabelFunction(item:TaxonParsingError, gridColumn:GridColumn):String {
 				var type:TaxonParsingError$Type = item.type;
-				var messageKey:String = "speciesImport.parsingError.type." + type.name.toLowerCase();
-				return Message.get(messageKey);
+				if ( type == null ) {
+					return "";
+				} else {
+					var messageKey:String = "speciesImport.parsingError.type." + type.name.toLowerCase();
+					return Message.get(messageKey);
+				}
 			}
 			
 			public function errorMessageLabelFunction(item:TaxonParsingError, gridColumn:GridColumn):String {
@@ -135,17 +139,17 @@
 		
 		<s:Label text="{Message.get('speciesImport.error.title')}" />
 		
-		<s:DataGrid id="errorsDataGrid">
+		<s:DataGrid id="errorsDataGrid" width="100%" height="100%">
 			<s:columns>
 				<s:ArrayList>
 					<s:GridColumn headerText="{Message.get('speciesImport.parsingError.row')}"
 								  dataField="row" width="50" />
 					<s:GridColumn headerText="{Message.get('speciesImport.parsingError.column')}"
-								  dataField="column" width="50" />
+								  dataField="column" width="100" />
 					<s:GridColumn headerText="{Message.get('speciesImport.parsingError.type')}"
 								  labelFunction="{errorTypeLabelFunction}" width="100" />
 					<s:GridColumn headerText="{Message.get('speciesImport.parsingError.message')}"
-								  labelFunction="{errorMessageLabelFunction}" width="400" />
+								  labelFunction="{errorMessageLabelFunction}" width="350" />
 				</s:ArrayList>
 			</s:columns>
 		</s:DataGrid>

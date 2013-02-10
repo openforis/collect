@@ -71,6 +71,7 @@ public class SpeciesImportProcessTest {
 		SpeciesImportProcess process = importCSVFile(VALID_TEST_SPECIES_CSV);
 		SpeciesImportStatus status = process.getStatus();
 		assertTrue(status.isComplete());
+		assertTrue(status.getSkippedRows().isEmpty());
 		
 		String code = "AFZ/QUA";
 		TaxonOccurrence occurrence = findByCode(code);

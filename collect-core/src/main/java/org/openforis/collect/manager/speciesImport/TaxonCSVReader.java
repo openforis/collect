@@ -149,7 +149,7 @@ public class TaxonCSVReader extends CsvReader {
 			taxonLine.genus = extractGenus();
 			taxonLine.speciesName = extractSpeciesName();
 			taxonLine.canonicalScientificName = extractCanonicalScientificName();
-			taxonLine.rank = parseRank();
+			taxonLine.rank = extractRank();
 			taxonLine.languageToVernacularNames = extractVernacularNames();
 			return taxonLine;
 		}
@@ -186,24 +186,28 @@ public class TaxonCSVReader extends CsvReader {
 			}
 		}
 		
-		protected TaxonRank parseRank() throws TaxonParsingException {
+		protected TaxonRank extractRank() throws TaxonParsingException {
 			Rank rank = parsedScientificName.getRank();
 			TaxonRank taxonRank;
-			switch ( rank ) {
-			case FAMILY:
-				taxonRank = FAMILY;
-				break;
-			case GENUS:
+			if ( rank == null ) {
 				taxonRank = GENUS;
-				break;
-			case SPECIES:
-				taxonRank = SPECIES;
-				break;
-			case VARIETY:
-				taxonRank = SUBSPECIES;
-				break;
-			default:
-				taxonRank = SPECIES;
+			} else {
+				switch ( rank ) {
+				case FAMILY:
+					taxonRank = FAMILY;
+					break;
+				case GENUS:
+					taxonRank = GENUS;
+					break;
+				case SPECIES:
+					taxonRank = SPECIES;
+					break;
+				case VARIETY:
+					taxonRank = SUBSPECIES;
+					break;
+				default:
+					taxonRank = SPECIES;
+				}
 			}
 			return taxonRank;
 		}

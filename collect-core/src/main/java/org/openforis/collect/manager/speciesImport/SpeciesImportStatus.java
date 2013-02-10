@@ -17,16 +17,17 @@ import org.openforis.idm.util.CollectionUtil;
 public class SpeciesImportStatus extends ProcessStatus {
 	
 	private Map<Long, List<TaxonParsingError>> rowToErrors;
-	private List<Long> skippedRows;
+	private List<Long> processedRows;
 	private String taxonomyName;
 	
 	public SpeciesImportStatus(String taxonomyName) {
 		super();
 		this.taxonomyName = taxonomyName;
+		this.processedRows = new ArrayList<Long>();
 		this.rowToErrors = new LinkedHashMap<Long, List<TaxonParsingError>>();
 	}
 	
-	public void addError(long row, TaxonParsingError error) {
+	public void addParsingError(long row, TaxonParsingError error) {
 		List<TaxonParsingError> list = rowToErrors.get(row);
 		if ( list == null ) {
 			list = new ArrayList<TaxonParsingError>();
@@ -34,6 +35,13 @@ public class SpeciesImportStatus extends ProcessStatus {
 		}
 		if ( ! list.contains(error) ) {
 			list.add(error);
+		}
+	}
+	
+	public void addProcessRow(long rowNumber) {
+		if ( !processedRows.contains(rowNumber)) {
+			incrementProcessed();
+			processedRows.add(rowNumber);
 		}
 	}
 	
@@ -55,7 +63,13 @@ public class SpeciesImportStatus extends ProcessStatus {
 	}
 	
 	public List<Long> getSkippedRows() {
-		return CollectionUtil.unmodifiableList(skippedRows);
+		List<Long> result = new ArrayList<Long>();
+		for (long i = 1; i <= getTotal(); i++) {
+			if ( ! processedRows.contains(i) ) {
+				result.add(i);
+			}
+		}
+		return CollectionUtil.unmodifiableList(result);
 	}
 
 }

@@ -47,11 +47,11 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 	private boolean overwriteAll;
 	
 	private TaxonTree taxonTree;
+	private List<String> languageColumnNames;
 	private List<Long> processedLineNumbers;
 	private TaxonCSVReader reader;
-	private TaxonLine currentLine;
 	private String errorMessage;
-
+	private List<TaxonLine> lines;
 	
 	public SpeciesImportProcess(SpeciesManager speciesManager, String taxonomyName, File file, boolean overwriteAll) {
 		super();
@@ -66,6 +66,7 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 		super.init();
 		processedLineNumbers = new ArrayList<Long>();
 		taxonTree = new TaxonTree();
+		lines = new ArrayList<TaxonLine>();
 	}
 	
 	@Override
@@ -83,10 +84,7 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 		String fileName = file.getName();
 		String extension = FilenameUtils.getExtension(fileName);
 		if ( CSV.equalsIgnoreCase(extension) ) {
-			processCSV(file);
-			if ( status.isRunning() ) {
-				status.complete();
-			}
+			parseTaxonCSVLines(file);
 //		} else if (ZIP.equals(extension) ) {
 //			processPackagedFile();
 //			status.complete();
@@ -95,6 +93,17 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 			status.setErrorMessage(errorMessage);
 			status.error();
 			LOG.error("Species import: " + errorMessage);
+		}
+		if ( status.isRunning() ) {
+			processLines();
+		}
+		if ( status.isRunning() && ! status.hasErrors() ) {
+			persistTaxa();
+		} else {
+			status.error();
+		}
+		if ( status.isRunning() ) {
+			status.complete();
 		}
 	}
 	/*
@@ -114,20 +123,8 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 		zipFile.close();
 	}
 	*/
-	protected void processCSV(File file) {
-		for (TaxonRank rank : TAXON_RANKS) {
-			if ( status.isRunning() ) {
-				processCSV(file, rank);
-			}
-		}
-		if ( status.isRunning() && ! status.hasErrors() ) {
-			persistTaxa();
-		} else {
-			status.error();
-		}
-	}
 
-	protected void processCSV(File file, TaxonRank rank) {
+	protected void parseTaxonCSVLines(File file) {
 		InputStreamReader isReader = null;
 		FileInputStream is = null;
 		long currentRowNumber = 0;
@@ -137,67 +134,78 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 			
 			reader = new TaxonCSVReader(isReader);
 			reader.init();
+			languageColumnNames = reader.getLanguageColumnNames();
+			status.addProcessRow(1);
 			currentRowNumber = 2;
 			while ( status.isRunning() && ! processedLineNumbers.contains(currentRowNumber) ) {
 				try {
-					currentLine = reader.readNextTaxonLine();
-					if ( currentLine == null ) {
+					TaxonLine line = reader.readNextTaxonLine();
+					if ( line == null ) {
 						break;
 					} else {
-						boolean processed = processCurrentLine(rank);
-						if (processed) {
-							processedLineNumbers.add(currentRowNumber);
-							status.incrementProcessed();
-						}
-					}
+						lines.add(line);
+					} 
 				} catch (TaxonParsingException e) {
-					status.addError(currentRowNumber, e.getError());
+					status.addParsingError(currentRowNumber, e.getError());
 				} finally {
 					currentRowNumber ++;
 				}
 			}
-			if ( status.getTotal() <= 0 ) {
-				status.setTotal(currentRowNumber - 1);
-			}
+			status.setTotal(reader.getLinesRead() + 1);
 		} catch (TaxonParsingException e) {
 			status.error();
-			status.addError(1, e.getError());
+			status.addParsingError(1, e.getError());
 		} catch (Exception e) {
 			status.error();
-			status.addError(currentRowNumber, new TaxonParsingError(Type.IOERROR, e.getMessage()));
+			status.addParsingError(currentRowNumber, new TaxonParsingError(Type.IOERROR, e.getMessage()));
 			LOG.error("Error importing species CSV file", e);
 		} finally {
 			close(isReader);
 		}
 	}
 	
-	protected boolean processCurrentLine(TaxonRank rank) throws TaxonParsingException {
-		boolean mostSpecificRank = currentLine.getRank() == rank;
+	protected void processLines() {
+		for (TaxonRank rank : TAXON_RANKS) {
+			for (TaxonLine line : lines) {
+				long lineNumber = line.getLineNumber();
+				try {
+					boolean processed = processLine(line, rank);
+					if (processed && ! processedLineNumbers.contains(lineNumber)) {
+						status.addProcessRow(lineNumber);
+					}
+				} catch (TaxonParsingException e) {
+					status.addParsingError(lineNumber, e.getError());
+				}
+			}
+		}
+	}
+	
+	protected boolean processLine(TaxonLine line, TaxonRank rank) throws TaxonParsingException {
+		boolean mostSpecificRank = line.getRank() == rank;
 		switch (rank) {
 		case FAMILY:
-			createTaxonFamily();
+			createTaxonFamily(line);
 			return mostSpecificRank;
 		case GENUS:
-			createTaxonGenus();
+			createTaxonGenus(line);
 			return mostSpecificRank;
 		case SPECIES:
-			createTaxonSpecies();
+			createTaxonSpecies(line);
 			return mostSpecificRank;
 		default:
-			Taxon parent = findParentTaxon();
+			Taxon parent = findParentTaxon(line);
 			if ( parent == null ) {
 				return false;
 			} else {
-				createTaxon(rank, parent);
+				createTaxon(line, rank, parent);
 				return true;
 			}
 		}
 	}
 
-	protected void processVernacularNames(Taxon taxon) {
-		List<String> languageColumnNames = reader.getLanguageColumnNames();
+	protected void processVernacularNames(TaxonLine line, Taxon taxon) {
 		for (String langCode : languageColumnNames) {
-			List<String> vernacularNames = currentLine.getVernacularNames(langCode);
+			List<String> vernacularNames = line.getVernacularNames(langCode);
 			for (String vernacularName : vernacularNames) {
 				TaxonVernacularName taxonVN = new TaxonVernacularName();
 				taxonVN.setLanguageCode(langCode);
@@ -250,19 +258,19 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 		}
 	}
 
-	private Taxon findParentTaxon() throws TaxonParsingException {
-		TaxonRank rank = currentLine.getRank();
+	private Taxon findParentTaxon(TaxonLine line) throws TaxonParsingException {
+		TaxonRank rank = line.getRank();
 		TaxonRank parentRank = rank.getParent();
 		String scientificName;
 		switch ( parentRank ) {
 		case FAMILY:
-			scientificName = currentLine.getFamilyName();
+			scientificName = line.getFamilyName();
 			break;
 		case GENUS:
-			scientificName = currentLine.getGenus();
+			scientificName = line.getGenus();
 			break;
 		case SPECIES:
-			scientificName = currentLine.getSpeciesName();
+			scientificName = line.getSpeciesName();
 			break;
 		default:
 			throw new RuntimeException("Unsupported rank");
@@ -271,30 +279,30 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 		return result;
 	}
 	
-	protected Taxon createTaxonFamily() throws TaxonParsingException {
-		String familyName = currentLine.getFamilyName();
-		return createTaxon(FAMILY, null, familyName);
+	protected Taxon createTaxonFamily(TaxonLine line) throws TaxonParsingException {
+		String familyName = line.getFamilyName();
+		return createTaxon(line, FAMILY, null, familyName);
 	}
 	
-	protected Taxon createTaxonGenus() throws TaxonParsingException {
-		Taxon taxonFamily = createTaxonFamily();
-		String normalizedScientificName = currentLine.getGenus();
-		return createTaxon(GENUS, taxonFamily, normalizedScientificName);
+	protected Taxon createTaxonGenus(TaxonLine line) throws TaxonParsingException {
+		Taxon taxonFamily = createTaxonFamily(line);
+		String normalizedScientificName = line.getGenus();
+		return createTaxon(line, GENUS, taxonFamily, normalizedScientificName);
 	}
 
-	protected Taxon createTaxonSpecies() throws TaxonParsingException {
-		Taxon taxonGenus = createTaxonGenus();
-		String normalizedScientificName = currentLine.getSpeciesName();
-		return createTaxon(SPECIES, taxonGenus, normalizedScientificName);
+	protected Taxon createTaxonSpecies(TaxonLine line) throws TaxonParsingException {
+		Taxon taxonGenus = createTaxonGenus(line);
+		String normalizedScientificName = line.getSpeciesName();
+		return createTaxon(line, SPECIES, taxonGenus, normalizedScientificName);
 	}
 	
-	protected Taxon createTaxon(TaxonRank rank, Taxon parent) throws TaxonParsingException {
-		String normalizedScientificName = currentLine.getCanonicalScientificName();
-		return createTaxon(rank, parent, normalizedScientificName);
+	protected Taxon createTaxon(TaxonLine line, TaxonRank rank, Taxon parent) throws TaxonParsingException {
+		String normalizedScientificName = line.getCanonicalScientificName();
+		return createTaxon(line, rank, parent, normalizedScientificName);
 	}
 	
-	protected Taxon createTaxon(TaxonRank rank, Taxon parent, String normalizedScientificName) throws TaxonParsingException {
-		boolean mostSpecificRank = currentLine.getRank() == rank;
+	protected Taxon createTaxon(TaxonLine line, TaxonRank rank, Taxon parent, String normalizedScientificName) throws TaxonParsingException {
+		boolean mostSpecificRank = line.getRank() == rank;
 		Taxon taxon = taxonTree.findTaxonByScientificName(normalizedScientificName);
 		boolean newTaxon = taxon == null;
 		if ( newTaxon ) {
@@ -303,22 +311,18 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 			taxon.setScientificName(normalizedScientificName);
 			taxonTree.addNode(parent, taxon);
 		} else if (mostSpecificRank) {
-			taxonTree.checkDuplicateScienfificName(parent, normalizedScientificName, getCurrentRowNumber());
+			taxonTree.checkDuplicateScienfificName(parent, normalizedScientificName, line.getLineNumber());
 		}
 		if ( mostSpecificRank ) {
-			String code = currentLine.getCode();
-			Integer taxonId = currentLine.getTaxonId();
-			taxonTree.checkDuplicates(taxonId, code, getCurrentRowNumber());
+			String code = line.getCode();
+			Integer taxonId = line.getTaxonId();
+			taxonTree.checkDuplicates(taxonId, code, line.getLineNumber());
 			taxon.setCode(code);
 			taxon.setTaxonId(taxonId);
 			taxonTree.index(taxon);
-			processVernacularNames(taxon);
+			processVernacularNames(line, taxon);
 		}
 		return taxon;
-	}
-
-	protected long getCurrentRowNumber() {
-		return reader.getLinesRead() + 1;
 	}
 
 	private void close(Closeable closeable) {

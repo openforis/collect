@@ -360,7 +360,7 @@ package org.openforis.collect.presenter {
 			updateStatus();
 		}
 		
-		private function updateView():void {
+		protected function updateView():void {
 			if(_state == null || (_firstOpen && _state.step != ProcessStatus$Step.RUN) ) {
 				resetView();
 			} else {
@@ -393,13 +393,13 @@ package org.openforis.collect.presenter {
 			_firstOpen = false;
 		}
 		
-		private function updateViewForUploading():void {
+		protected function updateViewForUploading():void {
 			_view.currentState = SpeciesImportView.STATE_UPLOADING;
 			_view.progressTitle.text = Message.get(MessageKeys.UPLOADING_FILE);
 			_view.progressLabel.text = "";
 		}
 		
-		private function updateViewForRunning():void {
+		protected function updateViewForRunning():void {
 			_view.currentState = SpeciesImportView.STATE_IMPORTING;
 			_view.progressTitle.text = Message.get(MessageKeys.IMPORTING);
 			updateProgressBar(MessageKeys.IMPORTING_PROGRESS_LABEL);
