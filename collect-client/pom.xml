@@ -86,7 +86,7 @@
                                 <includeClass>org.openforis.collect.manager.process.ProcessStatus$Step</includeClass>
                                 <includeClass>org.openforis.collect.manager.process.proxy.*</includeClass>
                                 <includeClass>org.openforis.collect.manager.speciesImport.TaxonParsingError</includeClass>
-                                <includeClass>org.openforis.collect.manager.speciesImport.TaxonParsingError$Type</includeClass>
+                                <includeClass>org.openforis.collect.manager.speciesImport.TaxonParsingError$ErrorType</includeClass>
                                 <includeClass>org.openforis.collect.model.CollectRecord$State</includeClass>
                                 <includeClass>org.openforis.collect.model.RecordSummarySortField</includeClass>
                                 <includeClass>org.openforis.collect.model.RecordSummarySortField$Sortable</includeClass>
@@ -125,13 +125,7 @@
 				</executions>
 				<configuration>
 					<debug>false</debug>
-					<showWarnings>false</showWarnings>					
-					<staticLinkRuntimeSharedLibraries>true</staticLinkRuntimeSharedLibraries>
-					<sourceDirectory>${basedir}/src/main/flex</sourceDirectory>
-					<sourceFile>collect.mxml</sourceFile>
 					<loadConfig>${project.build.outputDirectory}/flex-config.xml</loadConfig>
-					<resourceBundlePath>{basedir}/src/main/locales/{locale}</resourceBundlePath>
-					<mergeResourceBundle>true</mergeResourceBundle>
 					<locales>
 						<locale>en_US</locale>
 					</locales>
@@ -141,6 +135,20 @@
 					<includeResourceBundles>
 						<bundle>messages</bundle>
 					</includeResourceBundles>
+					<mergeResourceBundle>true</mergeResourceBundle>
+<!--                     <modules> -->
+<!--                       <module> -->
+<!--                         <finalName>SpeciesImport</finalName> -->
+<!--                         <sourceFile>org/openforis/collect/module/SpeciesImport.mxml</sourceFile> -->
+<!--                         <optimize>true</optimize> -->
+<!--                         <destinationPath>org/openforis/collect/module</destinationPath> -->
+<!--                       </module> -->
+<!--                     </modules> -->
+					<resourceBundlePath>{basedir}/src/main/locales/{locale}</resourceBundlePath>
+					<showWarnings>false</showWarnings>					
+					<sourceDirectory>${basedir}/src/main/flex</sourceDirectory>
+                    <sourceFile>collect.mxml</sourceFile>
+					<staticLinkRuntimeSharedLibraries>true</staticLinkRuntimeSharedLibraries>
 					<themes>
 						<filename>${project.build.outputDirectory}/dependencies/halo-${flex.framework.version}-theme.swc</filename>
 					</themes>

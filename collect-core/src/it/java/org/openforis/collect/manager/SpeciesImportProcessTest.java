@@ -21,7 +21,7 @@ import org.openforis.collect.manager.speciesImport.SpeciesImportProcess;
 import org.openforis.collect.manager.speciesImport.SpeciesImportStatus;
 import org.openforis.collect.manager.speciesImport.TaxonCSVReader.Column;
 import org.openforis.collect.manager.speciesImport.TaxonParsingError;
-import org.openforis.collect.manager.speciesImport.TaxonParsingError.Type;
+import org.openforis.collect.manager.speciesImport.TaxonParsingError.ErrorType;
 import org.openforis.collect.persistence.TaxonDao;
 import org.openforis.collect.persistence.TaxonVernacularNameDao;
 import org.openforis.collect.persistence.TaxonomyDao;
@@ -174,18 +174,18 @@ public class SpeciesImportProcessTest {
 		assertTrue(status.isRowProcessed(2));
 		assertTrue(status.isRowProcessed(5));
 		
-		assertTrue(containsError(errors, 3, Column.CODE, Type.EMPTY));
-		assertTrue(containsError(errors, 4, Column.SCIENTIFIC_NAME, Type.EMPTY));
-		assertTrue(containsError(errors, 6, Column.CODE, Type.DUPLICATE_VALUE));
-		assertTrue(containsError(errors, 7, Column.FAMILY, Type.EMPTY));
-		assertTrue(containsError(errors, 8, Column.NO, Type.DUPLICATE_VALUE));
-		assertTrue(containsError(errors, 9, Column.SCIENTIFIC_NAME, Type.DUPLICATE_VALUE));
-		assertTrue(containsError(errors, 10, Column.SCIENTIFIC_NAME, Type.DUPLICATE_VALUE));
+		assertTrue(containsError(errors, 3, Column.CODE, ErrorType.EMPTY));
+		assertTrue(containsError(errors, 4, Column.SCIENTIFIC_NAME, ErrorType.EMPTY));
+		assertTrue(containsError(errors, 6, Column.CODE, ErrorType.DUPLICATE_VALUE));
+		assertTrue(containsError(errors, 7, Column.FAMILY, ErrorType.EMPTY));
+		assertTrue(containsError(errors, 8, Column.NO, ErrorType.DUPLICATE_VALUE));
+		assertTrue(containsError(errors, 9, Column.SCIENTIFIC_NAME, ErrorType.DUPLICATE_VALUE));
+		assertTrue(containsError(errors, 10, Column.SCIENTIFIC_NAME, ErrorType.DUPLICATE_VALUE));
 	}
 
-	protected boolean containsError(List<TaxonParsingError> errors, long row, Column column, Type type) {
+	protected boolean containsError(List<TaxonParsingError> errors, long row, Column column, ErrorType type) {
 		for (TaxonParsingError taxonParsingError : errors) {
-			if ( taxonParsingError.getType() == type && taxonParsingError.getRow() == row && taxonParsingError.getColumn().equals(column.getName())) {
+			if ( taxonParsingError.getErrorType() == type && taxonParsingError.getRow() == row && taxonParsingError.getColumn().equals(column.getName())) {
 				return true;
 			}
 		}

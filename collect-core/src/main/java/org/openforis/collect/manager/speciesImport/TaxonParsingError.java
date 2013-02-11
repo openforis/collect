@@ -13,76 +13,64 @@ public class TaxonParsingError {
 	private long row;
 	private String column;
 	private String message;
-	private Type type;
+	private ErrorType errorType;
 	
-	public enum Type {
+	public enum ErrorType {
 		WRONG_HEADER, EMPTY, INVALID_VALUE, DUPLICATE_VALUE, IOERROR;
 	}
 	
-	public TaxonParsingError(Type type) {
+	public TaxonParsingError(ErrorType type) {
 		this(type, -1, (String) null, (String) null);
 	}
 	
-	public TaxonParsingError(Type type, String message) {
+	public TaxonParsingError(ErrorType type, String message) {
 		this(type, -1, (String) null, message);
 	}
 	
 	public TaxonParsingError(long row, String column) {
-		this(Type.INVALID_VALUE, row, column, (String) null);
+		this(ErrorType.INVALID_VALUE, row, column, (String) null);
 	}
 	
-	public TaxonParsingError(Type type, long row, String column, String message) {
+	public TaxonParsingError(ErrorType type, long row, String column, String message) {
 		super();
-		this.type = type;
+		this.errorType = type;
 		this.row = row;
 		this.column = column;
 		this.message = message;
 	}
 
-	public TaxonParsingError(Type type, long row, Column column) {
+	public TaxonParsingError(ErrorType type, long row, Column column) {
 		this(type, row, column, (String) null);
 	}	
 	
 	public TaxonParsingError(long row, Column column) {
-		this(Type.INVALID_VALUE, row, column, (String) null);
+		this(ErrorType.INVALID_VALUE, row, column, (String) null);
 	}	
 	
-	public TaxonParsingError(Type type, long row, Column column, String message) {
+	public TaxonParsingError(ErrorType type, long row, Column column, String message) {
 		this(type, row, column.getName(), message);
 	}
 	
 	public TaxonParsingError(long row, Column column, String message) {
-		this(Type.INVALID_VALUE, row, column.getName(), message);
+		this(ErrorType.INVALID_VALUE, row, column.getName(), message);
 	}	
 	
-	public Type getType() {
-		return type;
+	public ErrorType getErrorType() {
+		return errorType;
 	}
 	
 	public long getRow() {
 		return row;
 	}
 	
-	public void setRow(long row) {
-		this.row = row;
-	}
-	
 	public String getColumn() {
 		return column;
-	}
-	
-	public void setColumn(String column) {
-		this.column = column;
 	}
 	
 	public String getMessage() {
 		return message;
 	}
 	
-	public void setMessage(String message) {
-		this.message = message;
-	}
-
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -90,7 +78,7 @@ public class TaxonParsingError {
 		result = prime * result + ((column == null) ? 0 : column.hashCode());
 		result = prime * result + ((message == null) ? 0 : message.hashCode());
 		result = prime * result + (int) (row ^ (row >>> 32));
-		result = prime * result + ((type == null) ? 0 : type.hashCode());
+		result = prime * result + ((errorType == null) ? 0 : errorType.hashCode());
 		return result;
 	}
 
@@ -115,7 +103,7 @@ public class TaxonParsingError {
 			return false;
 		if (row != other.row)
 			return false;
-		if (type != other.type)
+		if (errorType != other.errorType)
 			return false;
 		return true;
 	}

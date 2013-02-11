@@ -103,7 +103,7 @@ package org.openforis.collect.presenter {
 			_view.errorsOkButton.addEventListener(MouseEvent.CLICK, errorsOkButtonClickHandler);
 			
 			_view.importButton.addEventListener(MouseEvent.CLICK, importButtonClickHandler);
-			_view.exportButton.addEventListener(MouseEvent.CLICK, exportButtonClickHandler);
+			//_view.exportButton.addEventListener(MouseEvent.CLICK, exportButtonClickHandler);
 			
 			_view.cancelImportButton.addEventListener(MouseEvent.CLICK, cancelClickHandler);
 		}
@@ -235,7 +235,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function exportButtonClickHandler(event:MouseEvent):void {
-			
+			//TODO
 		}
 		
 		protected function cancelClickHandler(event:MouseEvent):void {

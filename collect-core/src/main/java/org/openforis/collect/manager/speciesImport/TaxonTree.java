@@ -9,7 +9,7 @@ import java.util.Queue;
 import java.util.Stack;
 
 import org.openforis.collect.manager.speciesImport.TaxonCSVReader.Column;
-import org.openforis.collect.manager.speciesImport.TaxonParsingError.Type;
+import org.openforis.collect.manager.speciesImport.TaxonParsingError.ErrorType;
 import org.openforis.idm.model.species.Taxon;
 import org.openforis.idm.model.species.TaxonVernacularName;
 
@@ -145,7 +145,7 @@ class TaxonTree {
 			Node foundParentNode = foundNode.getParent();
 			Node parentNode = findNodeByTaxon(parent);
 			if ( foundParentNode == parentNode ) {
-				TaxonParsingError error = new TaxonParsingError(Type.DUPLICATE_VALUE, row, Column.SCIENTIFIC_NAME);
+				TaxonParsingError error = new TaxonParsingError(ErrorType.DUPLICATE_VALUE, row, Column.SCIENTIFIC_NAME);
 				throw new TaxonParsingException(error);
 			}
 		}
@@ -161,7 +161,7 @@ class TaxonTree {
 	protected void checkDuplicateTaxonId(Integer taxonId, long row) throws TaxonParsingException {
 		Taxon oldTaxon = findTaxonByTaxonId(taxonId);
 		if ( oldTaxon != null ) {
-			TaxonParsingError error = new TaxonParsingError(Type.DUPLICATE_VALUE, row, Column.NO);
+			TaxonParsingError error = new TaxonParsingError(ErrorType.DUPLICATE_VALUE, row, Column.NO);
 			throw new TaxonParsingException(error);
 		}
 	}
@@ -169,7 +169,7 @@ class TaxonTree {
 	private void checkDuplicateCode(String code, long row) throws TaxonParsingException {
 		Taxon oldTaxon = findTaxonByCode(code);
 		if ( oldTaxon != null ) {
-			TaxonParsingError error = new TaxonParsingError(Type.DUPLICATE_VALUE, row, Column.CODE);
+			TaxonParsingError error = new TaxonParsingError(ErrorType.DUPLICATE_VALUE, row, Column.CODE);
 			throw new TaxonParsingException(error);
 		}
 	}

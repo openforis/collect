@@ -2,7 +2,7 @@ package org.openforis.collect.util {
 	
 	import org.granite.collections.BasicMap;
 	import org.openforis.collect.manager.speciesImport.TaxonParsingError;
-	import org.openforis.collect.manager.speciesImport.TaxonParsingError$Type;
+	import org.openforis.collect.manager.speciesImport.TaxonParsingError$ErrorType;
 	import org.openforis.collect.metamodel.NodeDefinitionSummary;
 	import org.openforis.collect.metamodel.proxy.AttributeDefaultProxy;
 	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
@@ -128,7 +128,7 @@ package org.openforis.collect.util {
 				TaxonOccurrenceProxy,
 				TaxonomyProxy,
 				TaxonParsingError,
-				TaxonParsingError$Type,
+				TaxonParsingError$ErrorType,
 				TaxonProxy,
 				TaxonVernacularNameProxy,
 				TextAttributeDefinitionProxy,

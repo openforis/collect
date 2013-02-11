@@ -7,11 +7,11 @@
 
 	<fx:Script>
 		<![CDATA[
-			import org.openforis.collect.manager.speciesImport.TaxonParsingError$Type;
 			import mx.events.FlexEvent;
 			
 			import org.openforis.collect.i18n.Message;
 			import org.openforis.collect.manager.speciesImport.TaxonParsingError;
+			import org.openforis.collect.manager.speciesImport.TaxonParsingError$ErrorType;
 			import org.openforis.collect.presenter.SpeciesImportPresenter;
 			
 			public static const STATE_DEFAULT:String = "default";
@@ -22,13 +22,14 @@
 			public static const STATE_ERROR:String = "error";
 
 			private var _presenter:SpeciesImportPresenter;
+			private var _showCloseButton:Boolean;
 			
 			protected function creationCompleteHandler(event:FlexEvent):void {
 				_presenter = new SpeciesImportPresenter(this);
 			}
 
 			public function errorTypeLabelFunction(item:TaxonParsingError, gridColumn:GridColumn):String {
-				var type:TaxonParsingError$Type = item.type;
+				var type:TaxonParsingError$ErrorType = item.errorType;
 				if ( type == null ) {
 					return "";
 				} else {
@@ -41,6 +42,16 @@
 				return Message.get(item.message);
 				
 			}
+
+			[Bindable]
+			public function get showCloseButton():Boolean {
+				return _showCloseButton;
+			}
+
+			public function set showCloseButton(value:Boolean):void {
+				_showCloseButton = value;
+			}
+
 		]]>
 	</fx:Script>
 	
@@ -61,7 +72,8 @@
 			  height="100%" width="100%"
 			  gap="30"
 			  >
-		<s:HGroup width="100%">
+		<s:HGroup width="100%" 
+				  verticalAlign="middle">
 			<s:Label text="{Message.get('speciesImport.checklist')}" 
 					 styleName="formLabel" />
 			
@@ -90,14 +102,17 @@
 					  buttonMode="true"
 					  />
 			
-			<s:Button id="exportButton" 
+			<!--<s:Button id="exportButton" 
 					  label="{Message.get('speciesImport.export')}"
 					  useHandCursor="true"
 					  buttonMode="true"
-					  />
+					  />-->
 			
 			<s:Button id="closeButton"
-					  label="{Message.get('global.close')}"/>
+					  label="{Message.get('global.close')}"
+					  includeInLayout="{showCloseButton}"
+					  visible="{showCloseButton}"
+					  />
 		</s:HGroup>
 	</s:VGroup>
 	

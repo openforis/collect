@@ -54,9 +54,9 @@ public class SpeciesImportService {
 			SessionState sessionState = sessionManager.getSessionState();
 			File userImportFolder = FileUploadController.getSessionTempDirectory(tempDirectory, sessionState.getSessionId());
 			File importFile = new File(userImportFolder, FILE_NAME);
+			importProcess = new SpeciesImportProcess(speciesManager, taxonomyName, importFile, overwriteAll);
+			importProcess.init();
 			if ( importFile.exists() && importFile.canRead() ) {
-				importProcess = new SpeciesImportProcess(speciesManager, taxonomyName, importFile, overwriteAll);
-				importProcess.init();
 				startProcessThread();
 			} else {
 				SpeciesImportStatus status = importProcess.getStatus();

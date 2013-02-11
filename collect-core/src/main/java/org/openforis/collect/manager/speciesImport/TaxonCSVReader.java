@@ -269,7 +269,7 @@ public class TaxonCSVReader extends CsvReader {
 
 		protected void throwEmptyColumnParsingException(Column column)
 				throws TaxonParsingException {
-			TaxonParsingError error = new TaxonParsingError(TaxonParsingError.Type.EMPTY, lineNumber, column);
+			TaxonParsingError error = new TaxonParsingError(TaxonParsingError.ErrorType.EMPTY, lineNumber, column);
 			throw new TaxonParsingException(error);
 		}
 
@@ -350,7 +350,7 @@ public class TaxonCSVReader extends CsvReader {
 			int fixedColsSize = columns.length;
 			if ( colNames == null || colNames.size() < fixedColsSize ) {
 				String errorMessage = "Expected at least " + fixedColsSize + " columns";
-				TaxonParsingError error = new TaxonParsingError(TaxonParsingError.Type.WRONG_HEADER, errorMessage);
+				TaxonParsingError error = new TaxonParsingError(TaxonParsingError.ErrorType.WRONG_HEADER, errorMessage);
 				throw new TaxonParsingException(error);
 			}
 			for (int i = 0; i < fixedColsSize; i++) {

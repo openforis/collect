@@ -20,7 +20,7 @@ import org.apache.commons.logging.LogFactory;
 import org.openforis.collect.manager.SpeciesManager;
 import org.openforis.collect.manager.process.AbstractProcess;
 import org.openforis.collect.manager.speciesImport.TaxonCSVReader.TaxonLine;
-import org.openforis.collect.manager.speciesImport.TaxonParsingError.Type;
+import org.openforis.collect.manager.speciesImport.TaxonParsingError.ErrorType;
 import org.openforis.collect.manager.speciesImport.TaxonTree.Node;
 import org.openforis.idm.model.species.Taxon;
 import org.openforis.idm.model.species.Taxon.TaxonRank;
@@ -156,7 +156,7 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 			status.addParsingError(1, e.getError());
 		} catch (Exception e) {
 			status.error();
-			status.addParsingError(currentRowNumber, new TaxonParsingError(Type.IOERROR, e.getMessage()));
+			status.addParsingError(currentRowNumber, new TaxonParsingError(ErrorType.IOERROR, e.getMessage()));
 			LOG.error("Error importing species CSV file", e);
 		} finally {
 			close(isReader);
