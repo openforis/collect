@@ -3,8 +3,8 @@ package org.openforis.collect.presenter {
 	 * 
 	 * @author Mino Togna
 	 * */
-	import mx.events.FlexEvent;
-	import mx.events.StateChangeEvent;
+	import flash.events.Event;
+	
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.events.FaultEvent;
 	import mx.rpc.events.ResultEvent;
@@ -25,9 +25,8 @@ package org.openforis.collect.presenter {
 		private var _dataClient:DataClient;
 		
 		public function MasterPresenter(view:MasterView) {
-			super();
-			
 			this._view = view;
+			super();
 			this._dataClient = ClientFactory.dataClient;
 
 			_view.currentState = MasterView.LOADING_STATE;
@@ -48,8 +47,13 @@ package org.openforis.collect.presenter {
 			eventDispatcher.addEventListener(UIEvent.SHOW_ERROR_PAGE, showErrorPageHandler);
 			eventDispatcher.addEventListener(UIEvent.SHOW_HOME_PAGE, backToHomeHandler);
 			eventDispatcher.addEventListener(UIEvent.BACK_TO_LIST, backToListHandler);
+			eventDispatcher.addEventListener(UIEvent.SHOW_SPECIES_IMPORT, showSpeciesImportModuleHandler);
 			eventDispatcher.addEventListener(UIEvent.RECORD_SELECTED, recordSelectedHandler);
 			eventDispatcher.addEventListener(UIEvent.RECORD_CREATED, recordCreatedHandler);
+		}
+		
+		protected function showSpeciesImportModuleHandler(event:Event):void {
+			_view.currentState = MasterView.SPECIES_IMPORT_STATE;
 		}
 		
 		/**

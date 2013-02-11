@@ -30,6 +30,7 @@
     <mvc:resources mapping="/assets/**" location="/assets/" />
     <mvc:resources mapping="/images/**" location="/images/" />
     <mvc:resources mapping="/script/**" location="/script/" />
+    <mvc:resources mapping="/org/**" location="/org/" />
 	
     <bean name="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
       <property name="basename">
@@ -53,6 +54,7 @@
 		<entry key="/importSurvey.htm" value-ref="fileNameViewController" />
         
         <entry key="/surveys" value-ref="fileNameViewController" />
+        <entry key="/speciesImport" value-ref="fileNameViewController" />
 	</util:map>
 
 	<bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">

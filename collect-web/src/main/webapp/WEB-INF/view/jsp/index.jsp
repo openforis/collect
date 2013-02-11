@@ -31,6 +31,7 @@
             var xiSwfUrlStr = "flash/playerProductInstall.swf";
             var flashvars = {
             	lang: 'en_US',
+            	species_import: '<%=request.getParameter("species_import")%>',
             	preview: '<%=request.getParameter("preview")%>',
             	surveyId: '<%=request.getParameter("surveyId")%>',
             	rootEntityId: '<%=request.getParameter("rootEntityId")%>',

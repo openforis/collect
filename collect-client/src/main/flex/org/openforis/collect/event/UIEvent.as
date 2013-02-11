@@ -37,6 +37,7 @@ package org.openforis.collect.event {
 		
 		public static const OPEN_SPECIES_IMPORT_POPUP:String = "openSpeciesImportPopUp";
 		public static const CLOSE_SPECIES_IMPORT_POPUP:String = "closeSpeciesImportPopUp";
+		public static const SHOW_SPECIES_IMPORT:String = "showSpeciesImportModule";
 		
 		private var _obj:Object;
 		private var _params:Array;

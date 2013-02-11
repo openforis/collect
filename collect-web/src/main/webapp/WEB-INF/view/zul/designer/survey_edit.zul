@@ -29,8 +29,10 @@
     				<!-- main tabs -->
     				<tabbox id="tb" hflex="1" vflex="1">
     				    <tabs id="tabs">
-    				        <tab id="surveyTab" label="${labels.survey.$}"
+    				        <tab id="genericTab" label="${labels.survey.$}"
     				        	 w:_sel="switchTab" forward="onSwitchTab=onSwitchTab" />
+                            <tab id="speciesImportTab" label="${labels.survey.species_import}"
+                               w:_sel="switchTab" forward="onSwitchTab=onSwitchTab" />
     				        <tab id="schemaTab" label="${labels.survey.schema.$}"
     				        	 w:_sel="switchTab" forward="onSwitchTab=onSwitchTab" />
     				        <tab id="layoutTab" label="${labels.survey.layout.$}"
@@ -40,6 +42,9 @@
     				        <tabpanel>
     				        	<include id="mainInfoInclude" src="survey_edit/info.zul" />
     				        </tabpanel>
+                            <tabpanel>
+                              <flash src="/collect.swf?lang=en_US&amp;species_import=true" height="100%" width="100%" />
+                            </tabpanel>
     				        <tabpanel>
     				        	<include id="schemaInclude" src="survey_edit/schema/schema.zul" />
     				        </tabpanel>

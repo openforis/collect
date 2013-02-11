@@ -89,6 +89,7 @@ package org.openforis.collect.presenter {
 		internal function init():void {
 			var params:Object = FlexGlobals.topLevelApplication.parameters;
 			var preview:Boolean = params.preview == "true";
+			var speciesImport:Boolean = params.species_import == "true";
 			var localeString:String = params.lang as String;
 			if ( StringUtil.isEmpty(localeString) ) {
 				AlertUtil.showError("global.error.invalidLocaleSpecified");
@@ -100,6 +101,10 @@ package org.openforis.collect.presenter {
 				var token:Object = {surveyId: surveyId, rootEntityId: rootEntityId, versionId: versionId};
 				var previewResp:IResponder = new AsyncResponder(initSessionForPreviewResultHandler, faultHandler, token);
 				this._sessionClient.initSession(previewResp, localeString);
+			} else if ( speciesImport ) {
+				_view.currentState = collect.FULL_SCREEN_STATE;
+				var speciesImportSessionInitResponder:IResponder = new AsyncResponder(initSessionForSpeciesImportResultHandler, faultHandler);
+				this._sessionClient.initSession(speciesImportSessionInitResponder, localeString);
 			} else {
 				var responder:IResponder = new AsyncResponder(initSessionResultHandler, faultHandler);
 				this._sessionClient.initSession(responder, localeString);
@@ -174,6 +179,11 @@ package org.openforis.collect.presenter {
 			var surveyId:int = token.surveyId;
 			var responder:IResponder = new AsyncResponder(setActivePreviewSurveyResultHandler, faultHandler, token);
 			ClientFactory.sessionClient.setActivePreviewSurvey(responder, surveyId);
+		}
+		
+		internal function initSessionForSpeciesImportResultHandler(event:ResultEvent, token:Object = null):void {
+			initSessionCommonResultHandler(event, token);
+			eventDispatcher.dispatchEvent(new UIEvent(UIEvent.SHOW_SPECIES_IMPORT));
 		}
 		
 		protected function setActivePreviewSurveyResultHandler(event:ResultEvent, token:Object = null):void {
