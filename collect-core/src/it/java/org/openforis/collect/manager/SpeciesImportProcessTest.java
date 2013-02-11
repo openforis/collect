@@ -163,6 +163,16 @@ public class SpeciesImportProcessTest {
 		SpeciesImportStatus status = process.getStatus();
 		List<TaxonParsingError> errors = status.getErrors();
 		assertEquals(7, errors.size());
+		assertFalse(status.isRowProcessed(3));
+		assertFalse(status.isRowProcessed(4));
+		assertFalse(status.isRowProcessed(6));
+		assertFalse(status.isRowProcessed(7));
+		assertFalse(status.isRowProcessed(8));
+		assertFalse(status.isRowProcessed(9));
+		assertFalse(status.isRowProcessed(10));
+		assertTrue(status.isRowProcessed(1));
+		assertTrue(status.isRowProcessed(2));
+		assertTrue(status.isRowProcessed(5));
 		
 		assertTrue(containsError(errors, 3, Column.CODE, Type.EMPTY));
 		assertTrue(containsError(errors, 4, Column.SCIENTIFIC_NAME, Type.EMPTY));
@@ -170,6 +180,7 @@ public class SpeciesImportProcessTest {
 		assertTrue(containsError(errors, 7, Column.FAMILY, Type.EMPTY));
 		assertTrue(containsError(errors, 8, Column.NO, Type.DUPLICATE_VALUE));
 		assertTrue(containsError(errors, 9, Column.SCIENTIFIC_NAME, Type.DUPLICATE_VALUE));
+		assertTrue(containsError(errors, 10, Column.SCIENTIFIC_NAME, Type.DUPLICATE_VALUE));
 	}
 
 	protected boolean containsError(List<TaxonParsingError> errors, long row, Column column, Type type) {

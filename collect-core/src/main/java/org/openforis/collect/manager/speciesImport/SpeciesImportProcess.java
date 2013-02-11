@@ -48,7 +48,6 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 	
 	private TaxonTree taxonTree;
 	private List<String> languageColumnNames;
-	private List<Long> processedLineNumbers;
 	private TaxonCSVReader reader;
 	private String errorMessage;
 	private List<TaxonLine> lines;
@@ -64,7 +63,6 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 	@Override
 	public void init() {
 		super.init();
-		processedLineNumbers = new ArrayList<Long>();
 		taxonTree = new TaxonTree();
 		lines = new ArrayList<TaxonLine>();
 	}
@@ -135,16 +133,17 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 			reader = new TaxonCSVReader(isReader);
 			reader.init();
 			languageColumnNames = reader.getLanguageColumnNames();
-			status.addProcessRow(1);
+			status.addProcessedRow(1);
 			currentRowNumber = 2;
-			while ( status.isRunning() && ! processedLineNumbers.contains(currentRowNumber) ) {
+			while ( status.isRunning() ) {
 				try {
 					TaxonLine line = reader.readNextTaxonLine();
-					if ( line == null ) {
-						break;
-					} else {
+					if ( line != null ) {
 						lines.add(line);
-					} 
+					}
+					if ( ! reader.isReady() ) {
+						break;
+					}
 				} catch (TaxonParsingException e) {
 					status.addParsingError(currentRowNumber, e.getError());
 				} finally {
@@ -168,13 +167,15 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 		for (TaxonRank rank : TAXON_RANKS) {
 			for (TaxonLine line : lines) {
 				long lineNumber = line.getLineNumber();
-				try {
-					boolean processed = processLine(line, rank);
-					if (processed && ! processedLineNumbers.contains(lineNumber)) {
-						status.addProcessRow(lineNumber);
+				if ( ! status.isRowProcessed(lineNumber) && ! status.isRowInError(lineNumber) ) {
+					try {
+						boolean processed = processLine(line, rank);
+						if (processed ) {
+							status.addProcessedRow(lineNumber);
+						}
+					} catch (TaxonParsingException e) {
+						status.addParsingError(lineNumber, e.getError());
 					}
-				} catch (TaxonParsingException e) {
-					status.addParsingError(lineNumber, e.getError());
 				}
 			}
 		}

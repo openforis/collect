@@ -38,7 +38,7 @@ public class SpeciesImportStatus extends ProcessStatus {
 		}
 	}
 	
-	public void addProcessRow(long rowNumber) {
+	public void addProcessedRow(long rowNumber) {
 		if ( !processedRows.contains(rowNumber)) {
 			incrementProcessed();
 			processedRows.add(rowNumber);
@@ -60,6 +60,22 @@ public class SpeciesImportStatus extends ProcessStatus {
 
 	public String getTaxonomyName() {
 		return taxonomyName;
+	}
+	
+	public List<Long> getProcessedRows() {
+		return processedRows;
+	}
+	
+	public boolean isRowProcessed(long rowNumber) {
+		return processedRows.contains(rowNumber);
+	}
+	
+	public boolean isRowInError(long rowNumber) {
+		return rowToErrors.containsKey(rowNumber);
+	}
+	
+	public Collection<Long> getRowsInError() {
+		return rowToErrors.keySet();
 	}
 	
 	public List<Long> getSkippedRows() {

@@ -53,7 +53,8 @@ public class TaxonCSVReader extends CsvReader {
 		}
 	}
 
-	private TaxonLine currentLine;
+	private CsvLine currentLine;
+	private TaxonLine currentTaxonLine;
 
 	/**
 	 * @param filename
@@ -80,14 +81,13 @@ public class TaxonCSVReader extends CsvReader {
 	}
 	
 	public TaxonLine readNextTaxonLine() throws TaxonParsingException, IOException {
-		CsvLine line = super.readNextLine();
-		if ( line != null ) {
-			TaxonCSVLineParser lineParser = TaxonCSVLineParser.createInstance(this, line);
-			currentLine = lineParser.parse();
-		} else {
-			currentLine = null;
+		currentLine = super.readNextLine();
+		currentTaxonLine = null;
+		if ( currentLine != null ) {
+			TaxonCSVLineParser lineParser = TaxonCSVLineParser.createInstance(this, currentLine);
+			currentTaxonLine = lineParser.parse();
 		}
-		return currentLine;
+		return currentTaxonLine;
 	}
 	
 	public boolean validateAllFile() throws TaxonParsingException {
@@ -106,8 +106,8 @@ public class TaxonCSVReader extends CsvReader {
 		}
 	}
 	
-	public TaxonLine getCurrentLine() {
-		return currentLine;
+	public TaxonLine getCurrentTaxonLine() {
+		return currentTaxonLine;
 	}
 	
 	public boolean isReady() {
@@ -155,23 +155,19 @@ public class TaxonCSVReader extends CsvReader {
 		}
 
 		protected Integer parseTaxonId(boolean required) throws TaxonParsingException {
-			Integer value = csvLine.getValue(Column.NO.getName(), Integer.class);
-			if ( required && value == null ) {
-				throwEmptyColumnParsingException(Column.NO);
-			}
-			return value;
+			return getColumnValue(Column.NO, required, Integer.class);
 		}
-		
+
 		protected String extractCode() throws TaxonParsingException {
-			return getColumnValue(Column.CODE);
+			return getColumnValue(Column.CODE, true, String.class);
 		}
 		
 		protected String extractFamilyName() throws TaxonParsingException {
-			return getColumnValue(Column.FAMILY);
+			return getColumnValue(Column.FAMILY, true, String.class);
 		}
 
 		protected String extractRawScientificName() throws TaxonParsingException {
-			return getColumnValue(Column.SCIENTIFIC_NAME);
+			return getColumnValue(Column.SCIENTIFIC_NAME, true, String.class);
 		}
 		
 		protected ParsedName<Object> parseRawScienfificName() throws TaxonParsingException {
@@ -257,10 +253,9 @@ public class TaxonCSVReader extends CsvReader {
 			}
 		}
 
-		protected String getColumnValue(Column column)
-				throws TaxonParsingException {
-			String value = StringUtils.normalizeSpace(csvLine.getValue(column.getName(), String.class));
-			if ( StringUtils.isBlank(value) ) {
+		protected <T> T getColumnValue(Column column, boolean required, Class<T> type) throws TaxonParsingException {
+			T value = csvLine.getValue(column.getName(), type);
+			if ( required && ( value == null || value instanceof String && StringUtils.isBlank((String) value) )) {
 				throwEmptyColumnParsingException(column);
 			}
 			return value;
