@@ -131,6 +131,7 @@ package org.openforis.collect.presenter {
 			_view.checklistsDropDown.dataProvider = taxonomies;
 			if ( _selectedTaxonomy != null && CollectionUtil.isNotEmpty(taxonomies) ) {
 				selectTaxonomyInView(_selectedTaxonomy);
+				loadSummaries();
 			}
 		}
 		
@@ -174,7 +175,11 @@ package org.openforis.collect.presenter {
 			}
 			for each (var langCode:String in vernacularNamesLangCodes) {
 				var col:GridColumn = new GridColumn();
-				col.headerText = Languages.getLanguageLabel(langCode) + " (" + langCode + ")";
+				if ( StringUtil.isBlank(langCode) ) {
+					col.headerText = Message.get(MessageKeys.SYNONYM);
+				} else {
+					col.headerText = Languages.getLanguageLabel(langCode) + " (" + langCode + ")";
+				}
 				col.dataField = langCode;
 				col.labelFunction = vernacularNamesLabelFunction;
 				columns.addItem(col);
@@ -231,7 +236,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function taxonomyEditOkClickHandler(event:MouseEvent):void {
-			var newTaxonomy:Boolean = _selectedTaxonomy == null;
+			var newTaxonomy:Boolean = taxonomyEditPopUp.newTaxonomy;
 			var name:String = taxonomyEditPopUp.nameTextInput.text;
 			name = StringUtil.trim(name);
 			if ( checkValidTaxonomyName(name, newTaxonomy) ) {
@@ -471,7 +476,7 @@ package org.openforis.collect.presenter {
 		protected function updateViewProcessComplete():void {
 			_view.currentState = SpeciesImportView.STATE_DEFAULT;
 			AlertUtil.showMessage(MessageKeys.COMPLETED, [_state.processed, _state.total]);
-			//reload taxonomy
+			loadSummaries();
 		}
 		
 		protected function updateProgressBar(progressLabelResource:String):void {
@@ -512,4 +517,5 @@ class MessageKeys {
 	public static const CONFIRM_IMPORT:String = "speciesImport.confirmImport.message";
 	public static const CONFIRM_CLOSE:String = "speciesImport.confirmClose.message";
 	public static const CONFIRM_CLOSE_TITLE:String = "speciesImport.confirmClose.title";
+	public static const SYNONYM:String = "speciesImport.summaryList.synonym";
 }

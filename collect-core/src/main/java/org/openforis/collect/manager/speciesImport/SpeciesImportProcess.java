@@ -217,12 +217,18 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 	}
 
 	protected void persistTaxa() {
-		if ( overwriteAll ) {
-			deleteOldTaxonomy();
+		Taxonomy taxonomy = speciesManager.loadTaxonomyByName(taxonomyName);
+		if ( taxonomy != null ) {
+			if ( overwriteAll ) {
+				speciesManager.deleteTaxonsByTaxonomy(taxonomy);
+			} else {
+				throw new IllegalStateException("Taxonomy already existent but no 'overwriteAll' requested");
+			}
+		} else {
+			taxonomy = new Taxonomy();
+			taxonomy.setName(taxonomyName);
+			speciesManager.save(taxonomy);
 		}
-		Taxonomy taxonomy = new Taxonomy();
-		taxonomy.setName(taxonomyName);
-		speciesManager.save(taxonomy);
 		final Integer taxonomyId = taxonomy.getId();
 		taxonTree.bfs(new TaxonTree.NodeVisitor() {
 			@Override
@@ -230,13 +236,6 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 				persistTaxonTreeNode(taxonomyId, node);
 			}
 		});
-	}
-
-	protected void deleteOldTaxonomy() {
-		Taxonomy oldTaxonomy = speciesManager.loadTaxonomyByName(taxonomyName);
-		if ( oldTaxonomy != null ) {
-			speciesManager.delete(oldTaxonomy);
-		}
 	}
 
 	protected void persistTaxonTreeNode(Integer taxonomyId, Node node) {

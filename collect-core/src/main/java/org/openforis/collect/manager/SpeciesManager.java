@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openforis.collect.metamodel.TaxonSummaries;
@@ -136,7 +137,9 @@ public class SpeciesManager {
 		summary.setTaxonId(taxon.getTaxonId());
 		List<TaxonVernacularName> vernacularNames = taxonVernacularNameDao.findByTaxon(taxon.getSystemId());
 		for (TaxonVernacularName taxonVernacularName : vernacularNames) {
-			summary.addVernacularName(taxonVernacularName.getLanguageCode(), taxonVernacularName.getVernacularName());
+			//if lang code is blank, vernacular name will be considered as synonym
+			String languageCode = StringUtils.trimToEmpty(taxonVernacularName.getLanguageCode());
+			summary.addVernacularName(languageCode, taxonVernacularName.getVernacularName());
 		}
 		return summary;
 	}
@@ -153,9 +156,15 @@ public class SpeciesManager {
 	@Transactional
 	public void delete(Taxonomy taxonomy) {
 		Integer id = taxonomy.getId();
+		deleteTaxonsByTaxonomy(taxonomy);
+		taxonomyDao.delete(id);
+	}
+
+	@Transactional
+	public void deleteTaxonsByTaxonomy(Taxonomy taxonomy) {
+		Integer id = taxonomy.getId();
 		taxonVernacularNameDao.deleteByTaxonomy(id);
 		taxonDao.deleteByTaxonomy(id);
-		taxonomyDao.delete(id);
 	}
 	
 	@Transactional
