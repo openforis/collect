@@ -85,7 +85,6 @@
                                 <includeClass>org.openforis.collect.Proxy</includeClass>
                                 <includeClass>org.openforis.collect.manager.process.ProcessStatus$Step</includeClass>
                                 <includeClass>org.openforis.collect.manager.process.proxy.*</includeClass>
-                                <includeClass>org.openforis.collect.manager.speciesImport.TaxonParsingError</includeClass>
                                 <includeClass>org.openforis.collect.manager.speciesImport.TaxonParsingError$ErrorType</includeClass>
                                 <includeClass>org.openforis.collect.model.CollectRecord$State</includeClass>
                                 <includeClass>org.openforis.collect.model.RecordSummarySortField</includeClass>
@@ -112,6 +111,7 @@
                                 <includeClass>org.openforis.collect.remoting.service.dataImport.FileUnmarshallingErrorProxy</includeClass>
                                 <includeClass>org.openforis.collect.remoting.service.dataImport.NodeUnmarshallingErrorProxy</includeClass>
                                 <includeClass>org.openforis.collect.remoting.service.speciesImport.proxy.SpeciesImportStatusProxy</includeClass>
+                                <includeClass>org.openforis.collect.remoting.service.speciesImport.proxy.TaxonParsingErrorProxy</includeClass>
 							</includeJavaClasses>
 						</configuration>
 					</execution>

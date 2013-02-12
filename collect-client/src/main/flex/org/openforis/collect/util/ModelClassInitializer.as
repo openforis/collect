@@ -1,7 +1,6 @@
 package org.openforis.collect.util {
 	
 	import org.granite.collections.BasicMap;
-	import org.openforis.collect.manager.speciesImport.TaxonParsingError;
 	import org.openforis.collect.manager.speciesImport.TaxonParsingError$ErrorType;
 	import org.openforis.collect.metamodel.NodeDefinitionSummary;
 	import org.openforis.collect.metamodel.proxy.AttributeDefaultProxy;
@@ -65,6 +64,7 @@ package org.openforis.collect.util {
 	import org.openforis.collect.remoting.service.dataImport.DataImportSummaryProxy;
 	import org.openforis.collect.remoting.service.dataImport.FileUnmarshallingErrorProxy;
 	import org.openforis.collect.remoting.service.dataImport.NodeUnmarshallingErrorProxy;
+	import org.openforis.collect.remoting.service.speciesImport.proxy.TaxonParsingErrorProxy;
 	import org.openforis.idm.metamodel.validation.ValidationResultFlag;
 
 	/**
@@ -127,7 +127,7 @@ package org.openforis.collect.util {
 				TaxonAttributeDefinitionProxy,
 				TaxonOccurrenceProxy,
 				TaxonomyProxy,
-				TaxonParsingError,
+				TaxonParsingErrorProxy,
 				TaxonParsingError$ErrorType,
 				TaxonProxy,
 				TaxonVernacularNameProxy,

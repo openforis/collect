@@ -10,9 +10,9 @@
 			import mx.events.FlexEvent;
 			
 			import org.openforis.collect.i18n.Message;
-			import org.openforis.collect.manager.speciesImport.TaxonParsingError;
 			import org.openforis.collect.manager.speciesImport.TaxonParsingError$ErrorType;
 			import org.openforis.collect.presenter.SpeciesImportPresenter;
+			import org.openforis.collect.remoting.service.speciesImport.proxy.TaxonParsingErrorProxy;
 			
 			public static const STATE_DEFAULT:String = "default";
 			public static const STATE_LOADING:String = "loading";
@@ -28,7 +28,7 @@
 				_presenter = new SpeciesImportPresenter(this);
 			}
 
-			public function errorTypeLabelFunction(item:TaxonParsingError, gridColumn:GridColumn):String {
+			public function errorTypeLabelFunction(item:TaxonParsingErrorProxy, gridColumn:GridColumn):String {
 				var type:TaxonParsingError$ErrorType = item.errorType;
 				if ( type == null ) {
 					return "";
@@ -38,7 +38,7 @@
 				}
 			}
 			
-			public function errorMessageLabelFunction(item:TaxonParsingError, gridColumn:GridColumn):String {
+			public function errorMessageLabelFunction(item:TaxonParsingErrorProxy, gridColumn:GridColumn):String {
 				return Message.get(item.message);
 				
 			}

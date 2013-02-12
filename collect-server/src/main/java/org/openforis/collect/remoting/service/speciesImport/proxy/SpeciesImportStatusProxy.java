@@ -24,8 +24,9 @@ public class SpeciesImportStatusProxy extends ProcessStatusProxy {
 	}
 	
 	@ExternalizedProperty
-	public List<TaxonParsingError> getErrors() {
-		return status.getErrors();
+	public List<TaxonParsingErrorProxy> getErrors() {
+		List<TaxonParsingError> errors = status.getErrors();
+		return TaxonParsingErrorProxy.fromList(errors);
 	}
 
 	@ExternalizedProperty
