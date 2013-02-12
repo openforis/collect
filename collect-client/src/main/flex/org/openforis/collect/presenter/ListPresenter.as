@@ -22,6 +22,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.Application;
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.client.DataClient;
+	import org.openforis.collect.event.PaginationBarEvent;
 	import org.openforis.collect.event.UIEvent;
 	import org.openforis.collect.i18n.Message;
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
@@ -59,19 +60,6 @@ package org.openforis.collect.presenter {
 		private var _filterPopUp:RecordFilterPopUp;
 		
 		/**
-		 * The total number of records.
-		 */
-		private var totalRecords:int;
-		/**
-		 * The total pages of the pagination.
-		 */
-		private var totalPages:int;
-		/**
-		 * The current page of the pagination.
-		 * It starts from 1 
-		 */
-		private var currentPage:int;
-		/**
 		 * The current sortField
 		 */
 		private var currentSortFields:IList;
@@ -91,6 +79,7 @@ package org.openforis.collect.presenter {
 			this._view.dataGrid.requestedRowCount = MAX_RECORDS_PER_PAGE;
 			_newRecordResponder = new AsyncResponder(createRecordResultHandler, faultHandler);
 			createAdvancedFunctionMenu();
+			_view.paginationBar.maxRecordsPerPage = MAX_RECORDS_PER_PAGE;
 			super();
 		}
 
@@ -107,11 +96,7 @@ package org.openforis.collect.presenter {
 			
 			_view.dataGrid.addEventListener(GridSortEvent.SORT_CHANGING, dataGridSortChangingHandler);
 			
-			_view.paginationBar.firstPageButton.addEventListener(MouseEvent.CLICK, firstPageClickHandler);
-			_view.paginationBar.previousPageButton.addEventListener(MouseEvent.CLICK, previousPageClickHandler);
-			_view.paginationBar.nextPageButton.addEventListener(MouseEvent.CLICK, nextPageClickHandler);
-			_view.paginationBar.lastPageButton.addEventListener(MouseEvent.CLICK, lastPageClickHandler);
-			//_view.paginationBar.goToPageButton.addEventListener(MouseEvent.CLICK, goToPageClickHandler);
+			_view.paginationBar.addEventListener(PaginationBarEvent.PAGE_CHANGE, summaryPageChangeHandler);
 			_view.stage.addEventListener(MouseEvent.CLICK, stageClickHandler);
 		}
 		
@@ -326,7 +311,11 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function reloadRecordSummariesHandler(event:UIEvent):void {
-			loadRecordSummariesCurrentPage();
+			reloadRecordSummaries();
+		}
+		
+		protected function reloadRecordSummaries():void {
+			loadRecordSummaries(_view.paginationBar.offset);
 		}
 		
 		protected function resetCurrentFilter():void {
@@ -340,19 +329,14 @@ package org.openforis.collect.presenter {
 			_view.dataGrid.columns = columns;
 		}
 		
-		protected function loadRecordSummaries():void {
-			currentPage = 1;
-			loadRecordSummariesCurrentPage();
-		}
-		
-		protected function loadRecordSummariesCurrentPage():void {
-			_view.paginationBar.currentPageText.text = new String(currentPage);
+		protected function loadRecordSummaries(offset:int = 0):void {
+			if ( offset == 0 ) {
+				_view.paginationBar.showPage(1);
+			}
+			//_view.paginationBar.currentPageText.text = new String(currentPage);
 			
 			_view.currentState = ListView.INACTIVE_STATE;
 			_view.paginationBar.currentState = PaginationBar.LOADING_STATE;
-			
-			//offset starts from 0
-			var offset:int = (currentPage - 1) * MAX_RECORDS_PER_PAGE;
 			
 			var responder:IResponder = new AsyncResponder(getRecordsSummaryResultHandler, faultHandler);
 			var rootEntityName:String = Application.activeRootEntity.name;
@@ -363,77 +347,24 @@ package org.openforis.collect.presenter {
 		
 		protected function getRecordsSummaryResultHandler(event:ResultEvent, token:Object = null):void {
 			var result:Object = event.result;
-			var records:ListCollectionView = result.records;
-			totalRecords = result.count as int;
-			totalPages = Math.ceil(totalRecords / MAX_RECORDS_PER_PAGE);
 			
-			_view.dataGrid.dataProvider = records;
+			_view.dataGrid.dataProvider = IList(result.records);
 			_view.dataGrid.setSortedColumns(currentSortFields);
 			_view.currentState = ListView.DEFAULT_STATE;
 			
-			updatePaginationBar();
+			_view.paginationBar.totalRecords = result.count;
 			
-			if(totalRecords == 0 && currentKeyValuesFilter != null) {
+			if(result.totalCount == 0 && currentKeyValuesFilter != null) {
 				AlertUtil.showMessage("list.filter.noRecordsFound");
 			}
 		}
 		
 		protected function deleteRecordResultHandler(event:ResultEvent, token:Object = null):void {
-			loadRecordSummariesCurrentPage();
+			reloadRecordSummaries();
 		}
 
-		protected function updatePaginationBar():void {
-			var recordsFromPosition:int = ((currentPage - 1) * MAX_RECORDS_PER_PAGE) + 1;
-			var recordsToPosition:int = recordsFromPosition + _view.dataGrid.dataProvider.length - 1;
-			
-			//calculate pagination bar state
-			if(totalRecords == 0) {
-				//no records found
-				_view.paginationBar.currentState = PaginationBar.NO_PAGES_STATE;
-			} else if(totalPages == 1) {
-				//showing a single page
-				_view.paginationBar.currentState = PaginationBar.SINGLE_PAGE_STATE;
-			} else if(currentPage == 1) {
-				//showing first page
-				_view.paginationBar.currentState = PaginationBar.FIRST_PAGE_STATE;
-			} else if(currentPage == totalPages) {
-				//showing last page
-				_view.paginationBar.currentState = PaginationBar.LAST_PAGE_STATE;
-			} else {
-				//showing a page in the middle
-				_view.paginationBar.currentState = PaginationBar.MIDDLE_PAGE_STATE;
-			}
-		}
-		
-		/**
-		 * Pagination bar events
-		 * */
-		protected function firstPageClickHandler(event:Event):void {
-			loadRecordSummaries();
-		}
-		
-		protected function previousPageClickHandler(event:Event):void {
-			if(currentPage > 1) {
-				currentPage --;
-				loadRecordSummariesCurrentPage();
-			}
-		}
-		
-		protected function nextPageClickHandler(event:Event):void {
-			if(currentPage < totalPages) {
-				currentPage ++;
-				loadRecordSummariesCurrentPage();
-			}
-		}
-		
-		protected function lastPageClickHandler(event:Event):void {
-			currentPage = totalPages;
-			loadRecordSummariesCurrentPage();
-		}
-		
-		protected function goToPageClickHandler(event:Event):void {
-			//currentPage = _view.paginationBar.goToPageStepper.value;
-			loadRecordSummariesCurrentPage();
+		protected function summaryPageChangeHandler(event:PaginationBarEvent):void {
+			loadRecordSummaries(event.offset);
 		}
 		
 		protected function dataGridSortChangingHandler(event:GridSortEvent):void {
@@ -442,7 +373,7 @@ package org.openforis.collect.presenter {
 			var oldSortFields:IList = currentSortFields;
 			currentSortFields = RecordSummaryDataGrid.createRecordSummarySortFields(event.newSortFields, oldSortFields);;
 			
-			loadRecordSummariesCurrentPage();
+			reloadRecordSummaries();
 		}
 		
 		

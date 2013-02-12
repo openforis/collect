@@ -9,6 +9,7 @@
 	
 	<fx:Script>
 		<![CDATA[
+			import org.openforis.collect.event.PaginationBarEvent;
 			import org.openforis.collect.i18n.Message;
 			import org.openforis.collect.ui.Images;
 			
@@ -18,9 +19,119 @@
 			public static const FIRST_PAGE_STATE:String = "firstPage";
 			public static const LAST_PAGE_STATE:String = "lastPage";
 			public static const MIDDLE_PAGE_STATE:String = "middlePage";
+			
+			private var _totalRecords:int;
+			private var _totalPages:int;
+			private var _currentPage:int = 1;
+			private var _maxRecordsPerPage:int;
+			
+			public function updateView():void {
+				//var recordsFromPosition:int = ((currentPage - 1) * MAX_SUMMARIES_PER_PAGE) + 1;
+				//var recordsToPosition:int = recordsFromPosition + _view.summaryDataGrid.dataProvider.length - 1;
+				
+				if(_totalRecords == 0) {
+					currentState = NO_PAGES_STATE;
+				} else if(_totalPages == 1) {
+					currentState = SINGLE_PAGE_STATE;
+				} else if(_currentPage == 1) {
+					currentState = FIRST_PAGE_STATE;
+				} else if(_currentPage == _totalPages) {
+					currentState = LAST_PAGE_STATE;
+				} else {
+					currentState = MIDDLE_PAGE_STATE;
+				}
+			}
+
+			/**
+			 * Updates currentPage variable without firing the pageChange event
+			 */
+			public function showPage(value:int):void {
+				_currentPage = value;
+				dispatchEvent(new Event("currentPageChange"));
+				updateView();
+			}
+			
+			protected function dispatchPageChangeEvent():void {
+				var evt:PaginationBarEvent = new PaginationBarEvent(PaginationBarEvent.PAGE_CHANGE);
+				evt.currentPage = _currentPage;
+				evt.offset = offset;
+				dispatchEvent(evt);
+			}
+			
+			public function get offset():int {
+				return (_currentPage - 1) * maxRecordsPerPage;
+			}
+			
+			protected function firstPageClickHandler(event:Event):void {
+				currentPage = 1;
+			}
+			
+			protected function previousPageClickHandler(event:Event):void {
+				if ( _currentPage > 1) {
+					currentPage --;
+				}
+			}
+			
+			protected function nextPageClickHandler(event:Event):void {
+				if ( _currentPage < totalPages) {
+					currentPage ++;
+				}
+			}
+			
+			protected function lastPageClickHandler(event:Event):void {
+				currentPage = totalPages;
+			}
+			
+			protected function goToPageClickHandler(event:Event):void {
+				//currentPage = _view.paginationBar.goToPageStepper.value;
+			}
+			
+			public function get totalRecords():int {
+				return _totalRecords;
+			}
+
+			public function set totalRecords(value:int):void {
+				_totalRecords = value;
+				_totalPages = Math.ceil(_totalRecords / _maxRecordsPerPage);
+				updateView();
+			}
+
+			public function get totalPages():int {
+				return _totalPages;
+			}
+
+			[Bindable(event="currentPageChange")]
+			public function get currentPage():int {
+				return _currentPage;
+			}
+
+			public function set currentPage(value:int):void {
+				_currentPage = value;
+				dispatchEvent(new Event("currentPageChange"));
+				dispatchPageChangeEvent();
+			}
+			
+			[Bindable(event="currentPageChange")]
+			public function get currentPageText():String {
+				return _currentPage >=0 ? _currentPage.toString(): '';
+			}
+			
+			public function get maxRecordsPerPage():int {
+				return _maxRecordsPerPage;
+			}
+
+			public function set maxRecordsPerPage(value:int):void {
+				_maxRecordsPerPage = value;
+			}
+
+			
 		]]>
 	</fx:Script>
 	
+	<fx:Metadata>
+		[Event(name="pageChange", type="org.openforis.collect.event.PaginationBarEvent")]
+	</fx:Metadata>
+		
 	<s:states>
 		<s:State name="loading" stateGroups="inactive" />
 		<s:State name="noPages" stateGroups="inactive"/>
@@ -41,6 +152,7 @@
 			buttonMode="true"
 			enabled.inactive="false" 
 			enabled.firstPage="false" 
+			click="firstPageClickHandler(event)"
 			/>
 	
 	<s:Image 
@@ -53,12 +165,14 @@
 			buttonMode="true"
 			enabled.inactive="false" 
 			enabled.firstPage="false" 
+			click="previousPageClickHandler(event)"
 			/>
 	
 	<mx:Text 
 			fontSize="12" 
 			fontWeight="bold" 
-			id="currentPageText" 
+			id="currentPageTextField" 
+			text="{currentPageText}"
 			/>
 	
 	<s:Image 
@@ -71,6 +185,7 @@
 			buttonMode="true"
 			enabled.inactive="false" 
 			enabled.lastPage="false" 
+			click="nextPageClickHandler(event)"
 			/>
 	
 	<s:Image 
@@ -82,6 +197,8 @@
 			 useHandCursor="true" 
 			 buttonMode="true"
 			 enabled.inactive="false" 
-			 enabled.lastPage="false" />
+			 enabled.lastPage="false"
+			 click="lastPageClickHandler(event)"
+			 />
 	
 </s:Group>
