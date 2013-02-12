@@ -34,6 +34,7 @@ public class ProcessStatus {
 	
 	public void start() {
 		step = RUN;
+		processed = 0;
 	}
 
 	public void cancel() {
