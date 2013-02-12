@@ -4,10 +4,14 @@
 package org.openforis.collect.manager;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openforis.collect.metamodel.TaxonSummaries;
+import org.openforis.collect.metamodel.TaxonSummary;
 import org.openforis.collect.model.CollectSurveyContext;
 import org.openforis.collect.persistence.TaxonDao;
 import org.openforis.collect.persistence.TaxonVernacularNameDao;
@@ -104,6 +108,37 @@ public class SpeciesManager {
 		}
 		List<TaxonOccurrence> result = createOccurrenceList(list);
 		return result;
+	}
+	
+	@Transactional
+	public TaxonSummaries loadTaxonSummaries(int taxonomyId, int offset, int maxRecords) {
+		int totalCount = taxonDao.countTaxons(taxonomyId);
+		Set<String> vernacularNamesLanguageCodes = new HashSet<String>();
+		List<TaxonSummary> items = new ArrayList<TaxonSummary>();
+		if ( totalCount > 0 ) {
+			List<Taxon> taxons = taxonDao.loadTaxons(taxonomyId, offset, maxRecords);
+			for (Taxon taxon : taxons) {
+				TaxonSummary summary = createSummary(taxon);
+				Set<String> itemVernLangCodes = summary.getLanguageToVernacularNames().keySet();
+				vernacularNamesLanguageCodes.addAll(itemVernLangCodes);
+				items.add(summary);
+			}
+		}
+		TaxonSummaries result = new TaxonSummaries(totalCount, items, vernacularNamesLanguageCodes);
+		return result;
+	}
+
+	protected TaxonSummary createSummary(Taxon taxon) {
+		TaxonSummary summary = new TaxonSummary();
+		summary.setCode(taxon.getCode());
+		summary.setRank(taxon.getTaxonRank());
+		summary.setScientificName(taxon.getScientificName());
+		summary.setTaxonId(taxon.getTaxonId());
+		List<TaxonVernacularName> vernacularNames = taxonVernacularNameDao.findByTaxon(taxon.getSystemId());
+		for (TaxonVernacularName taxonVernacularName : vernacularNames) {
+			summary.addVernacularName(taxonVernacularName.getLanguageCode(), taxonVernacularName.getVernacularName());
+		}
+		return summary;
 	}
 	
 	@Transactional

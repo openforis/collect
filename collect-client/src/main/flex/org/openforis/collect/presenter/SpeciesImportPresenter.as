@@ -14,7 +14,6 @@ package org.openforis.collect.presenter {
 	import flash.utils.Timer;
 	
 	import mx.collections.IList;
-	import mx.core.IFlexDisplayObject;
 	import mx.managers.PopUpManager;
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.IResponder;
@@ -24,13 +23,16 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.client.SpeciesClient;
 	import org.openforis.collect.client.SpeciesImportClient;
+	import org.openforis.collect.event.PaginationBarEvent;
 	import org.openforis.collect.event.UIEvent;
+	import org.openforis.collect.i18n.Languages;
 	import org.openforis.collect.i18n.Message;
 	import org.openforis.collect.manager.process.ProcessStatus$Step;
-	import org.openforis.collect.metamodel.proxy.SurveyProxy;
+	import org.openforis.collect.metamodel.proxy.TaxonSummariesProxy;
+	import org.openforis.collect.metamodel.proxy.TaxonSummaryProxy;
 	import org.openforis.collect.model.proxy.TaxonomyProxy;
-	import org.openforis.collect.model.proxy.TaxonomyProxyBase;
 	import org.openforis.collect.remoting.service.speciesImport.proxy.SpeciesImportStatusProxy;
+	import org.openforis.collect.ui.component.datagrid.PaginationBar;
 	import org.openforis.collect.ui.component.speciesImport.TaxonomyEditPopUp;
 	import org.openforis.collect.ui.view.SpeciesImportView;
 	import org.openforis.collect.util.AlertUtil;
@@ -39,6 +41,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.util.PopUpUtil;
 	import org.openforis.collect.util.StringUtil;
 	
+	import spark.components.gridClasses.GridColumn;
 	import spark.events.IndexChangeEvent;
 
 	/**
@@ -52,6 +55,9 @@ package org.openforis.collect.presenter {
 		private static const VALID_NAME_REGEX:RegExp = /^[a-z][a-z0-9_]*$/;
 		private static const IMPORT_FILE_NAME_PREFIX:Object = "species";
 		private static const ALLOWED_IMPORT_FILE_EXTENSIONS:Array = ["*.csv"];
+		private static const MAX_SUMMARIES_PER_PAGE:int = 20;
+		private static const FIXED_SUMMARY_COLUMNS_LENGTH:int = 3;
+		private static const VERANCULAR_NAMES_SEPARATOR:String = ", ";
 		
 		private var _view:SpeciesImportView;
 		private var _fileReference:FileReference;
@@ -80,6 +86,7 @@ package org.openforis.collect.presenter {
 			
 			//try to see if there is a process still running
 			_view.currentState = SpeciesImportView.STATE_LOADING;
+			_view.paginationBar.maxRecordsPerPage = MAX_SUMMARIES_PER_PAGE;
 			updateStatus();
 			loadTaxonomies();
 		}
@@ -106,6 +113,12 @@ package org.openforis.collect.presenter {
 			//_view.exportButton.addEventListener(MouseEvent.CLICK, exportButtonClickHandler);
 			
 			_view.cancelImportButton.addEventListener(MouseEvent.CLICK, cancelClickHandler);
+			
+			_view.paginationBar.addEventListener(PaginationBarEvent.PAGE_CHANGE, summaryPageChangeHandler);
+		}
+		
+		protected function summaryPageChangeHandler(event:PaginationBarEvent):void {
+			loadSummaries(event.offset);
 		}
 		
 		protected function loadTaxonomies():void {
@@ -130,7 +143,47 @@ package org.openforis.collect.presenter {
 		
 		protected function checklistChangeHandler(event:IndexChangeEvent):void {
 			_selectedTaxonomy = event.target.selectedItem;
-			//TODO reload taxonomy data
+			_view.paginationBar.showPage(1);
+			loadSummaries();
+		}
+		
+		protected function loadSummaries(offset:int = 0):void {
+			if ( offset == 0 ) {
+				_view.paginationBar.showPage(1);
+			}
+			_view.summaryDataGrid.dataProvider = null;
+			
+			_view.paginationBar.currentState = PaginationBar.LOADING_STATE;
+			var taxonomyId:int = _selectedTaxonomy.id;
+			var responder:IResponder = new AsyncResponder(loadTaxonSummariesResultHandler, faultHandler);
+			_speciesClient.loadTaxonSummaries(responder, taxonomyId, offset, MAX_SUMMARIES_PER_PAGE);
+		}
+		
+		protected function loadTaxonSummariesResultHandler(event:ResultEvent, token:Object = null):void {
+			var result:TaxonSummariesProxy = TaxonSummariesProxy(event.result);
+			var records:IList = result.summaries;
+			updateSummaryColumns(result.vernacularNamesLanguageCodes);
+			_view.summaryDataGrid.dataProvider = records;
+			_view.paginationBar.totalRecords = result.totalCount;
+		}
+		
+		protected function updateSummaryColumns(vernacularNamesLangCodes:IList):void {
+			var columns:IList = _view.summaryDataGrid.columns;
+			for (var i:int = columns.length - 1; i > FIXED_SUMMARY_COLUMNS_LENGTH - 1; i --) {
+				columns.removeItemAt(i);
+			}
+			for each (var langCode:String in vernacularNamesLangCodes) {
+				var col:GridColumn = new GridColumn();
+				col.headerText = Languages.getLanguageLabel(langCode) + " (" + langCode + ")";
+				col.dataField = langCode;
+				col.labelFunction = vernacularNamesLabelFunction;
+				columns.addItem(col);
+			}
+		}
+		
+		public function vernacularNamesLabelFunction(item:TaxonSummaryProxy, gridColumn:GridColumn):String {
+			var names:IList = item.languageToVernacularNames.get(gridColumn.dataField);
+			return StringUtil.concat(VERANCULAR_NAMES_SEPARATOR, names);
 		}
 		
 		protected function newButtonClickHandler(event:MouseEvent):void	{

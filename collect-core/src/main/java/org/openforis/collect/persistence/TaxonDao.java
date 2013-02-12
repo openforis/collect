@@ -9,6 +9,7 @@ import java.util.List;
 import org.jooq.Record;
 import org.jooq.Result;
 import org.jooq.Select;
+import org.jooq.SelectQuery;
 import org.jooq.StoreQuery;
 import org.jooq.TableField;
 import org.openforis.collect.persistence.jooq.MappingJooqDaoSupport;
@@ -23,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Transactional
 public class TaxonDao extends MappingJooqDaoSupport<Taxon, TaxonDao.JooqFactory> {
+	
 	public TaxonDao() {
 		super(TaxonDao.JooqFactory.class);
 	}
@@ -68,7 +70,32 @@ public class TaxonDao extends MappingJooqDaoSupport<Taxon, TaxonDao.JooqFactory>
 		List<Taxon> entities = jf.fromResult(result);
 		return entities;
 	}
-
+	
+	public int countTaxons(int taxonomyId) {
+		JooqFactory f = getMappingJooqFactory();
+		SelectQuery q = f.selectCountQuery();
+		q.addConditions(OFC_TAXON.TAXONOMY_ID.equal(taxonomyId));
+		Record r = q.fetchOne();
+		return r.getValueAsInteger(0);
+	}
+	
+	public List<Taxon> loadTaxons(int taxonomyId, int offset, int maxRecords) {
+		JooqFactory jf = getMappingJooqFactory();
+		SelectQuery q = jf.selectQuery();	
+		q.addFrom(OFC_TAXON);
+		q.addConditions(OFC_TAXON.TAXONOMY_ID.equal(taxonomyId));
+		//always order by SCIENTIFIC_NAME to avoid pagination issues
+		q.addOrderBy(OFC_TAXON.SCIENTIFIC_NAME);
+		
+		//add limit
+		q.addLimit(offset, maxRecords);
+		
+		//fetch results
+		Result<Record> result = q.fetch();
+		
+		return jf.fromResult(result);
+	}
+	
 	public void deleteByTaxonomy(int taxonomyId) {
 		JooqFactory jf = getMappingJooqFactory();
 		jf.delete(OFC_TAXON).where(OFC_TAXON.TAXONOMY_ID.equal(taxonomyId)).execute();

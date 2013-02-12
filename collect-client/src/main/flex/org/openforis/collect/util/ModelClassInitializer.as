@@ -30,6 +30,8 @@ package org.openforis.collect.util {
 	import org.openforis.collect.metamodel.proxy.SpatialReferenceSystemProxy;
 	import org.openforis.collect.metamodel.proxy.SurveyProxy;
 	import org.openforis.collect.metamodel.proxy.TaxonAttributeDefinitionProxy;
+	import org.openforis.collect.metamodel.proxy.TaxonSummariesProxy;
+	import org.openforis.collect.metamodel.proxy.TaxonSummaryProxy;
 	import org.openforis.collect.metamodel.proxy.TextAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.TextAttributeDefinitionProxy$Type;
 	import org.openforis.collect.metamodel.proxy.TimeAttributeDefinitionProxy;
@@ -130,6 +132,8 @@ package org.openforis.collect.util {
 				TaxonParsingErrorProxy,
 				TaxonParsingError$ErrorType,
 				TaxonProxy,
+				TaxonSummariesProxy,
+				TaxonSummaryProxy,
 				TaxonVernacularNameProxy,
 				TextAttributeDefinitionProxy,
 				TextAttributeDefinitionProxy$Type,

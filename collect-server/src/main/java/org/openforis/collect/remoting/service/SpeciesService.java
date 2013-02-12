@@ -7,6 +7,8 @@ import java.util.List;
 
 import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.manager.SpeciesManager;
+import org.openforis.collect.metamodel.TaxonSummaries;
+import org.openforis.collect.metamodel.proxy.TaxonSummariesProxy;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.proxy.TaxonOccurrenceProxy;
 import org.openforis.collect.model.proxy.TaxonomyProxy;
@@ -37,6 +39,12 @@ public class SpeciesService {
 		List<Taxonomy> result = taxonManager.loadAllTaxonomies();
 		List<TaxonomyProxy> proxies = TaxonomyProxy.fromList(result);
 		return proxies;
+	}
+	
+	@Secured("ROLE_ADMIN")
+	public TaxonSummariesProxy loadTaxonSummaries(int taxonomyId, int offset, int maxRecords) {
+		TaxonSummaries summaries = taxonManager.loadTaxonSummaries(taxonomyId, offset, maxRecords);
+		return new TaxonSummariesProxy(summaries);
 	}
 	
 	@Secured("ROLE_ADMIN")

@@ -3,7 +3,7 @@
 		 xmlns:s="library://ns.adobe.com/flex/spark" 
 		 xmlns:mx="library://ns.adobe.com/flex/mx" 
 		 xmlns:component="org.openforis.collect.ui.component.*"
-		 creationComplete="creationCompleteHandler(event)">
+		 creationComplete="creationCompleteHandler(event)" xmlns:datagrid="org.openforis.collect.ui.component.datagrid.*">
 
 	<fx:Script>
 		<![CDATA[
@@ -11,6 +11,7 @@
 			
 			import org.openforis.collect.i18n.Message;
 			import org.openforis.collect.manager.speciesImport.TaxonParsingError$ErrorType;
+			import org.openforis.collect.metamodel.proxy.TaxonSummaryProxy;
 			import org.openforis.collect.presenter.SpeciesImportPresenter;
 			import org.openforis.collect.remoting.service.speciesImport.proxy.TaxonParsingErrorProxy;
 			
@@ -27,7 +28,16 @@
 			protected function creationCompleteHandler(event:FlexEvent):void {
 				_presenter = new SpeciesImportPresenter(this);
 			}
-
+			
+			public function rankLabelFunction(item:TaxonSummaryProxy, gridColumn:GridColumn):String {
+				if ( item.rank == null ) {
+					return "";
+				} else {
+					var messageKey:String = "speciesImport.summaryList.rank." + item.rank.toString().toLowerCase();
+					return Message.get(messageKey);
+				}
+			}
+			
 			public function errorTypeLabelFunction(item:TaxonParsingErrorProxy, gridColumn:GridColumn):String {
 				var type:TaxonParsingError$ErrorType = item.errorType;
 				if ( type == null ) {
@@ -94,6 +104,30 @@
 					  buttonMode="true"
 					  />
 		</s:HGroup>
+		
+		<s:VGroup height="465" width="100%" 
+				  visible="{checklistsDropDown.selectedItem != null}"
+				  horizontalAlign="center">
+			<s:DataGrid id="summaryDataGrid" 
+						width="100%" height="100%"
+						rowHeight="22">
+				<s:columns>
+					<s:ArrayList>
+						<s:GridColumn headerText="{Message.get('speciesImport.summaryList.code')}" 
+									  dataField="code" />
+						<s:GridColumn headerText="{Message.get('speciesImport.summaryList.scientificName')}" 
+									  dataField="scientificName" />
+						<s:GridColumn headerText="{Message.get('speciesImport.summaryList.rank')}" 
+									  labelFunction="rankLabelFunction" />
+					</s:ArrayList>
+				</s:columns>
+			</s:DataGrid>
+			
+			<datagrid:PaginationBar id="paginationBar" 
+									height="16"
+									horizontalCenter="0"
+									/>
+		</s:VGroup>
 		
 		<s:HGroup gap="50">
 			<s:Button id="importButton" 
