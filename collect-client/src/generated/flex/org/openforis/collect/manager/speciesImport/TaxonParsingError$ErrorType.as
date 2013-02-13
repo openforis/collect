@@ -13,14 +13,16 @@ package org.openforis.collect.manager.speciesImport {
     [RemoteClass(alias="org.openforis.collect.manager.speciesImport.TaxonParsingError$ErrorType")]
     public class TaxonParsingError$ErrorType extends Enum {
 
-        public static const WRONG_HEADER:TaxonParsingError$ErrorType = new TaxonParsingError$ErrorType("WRONG_HEADER", _);
+        public static const UNEXPECTED_COLUMNS:TaxonParsingError$ErrorType = new TaxonParsingError$ErrorType("UNEXPECTED_COLUMNS", _);
+        public static const WRONG_COLUMN_NAME:TaxonParsingError$ErrorType = new TaxonParsingError$ErrorType("WRONG_COLUMN_NAME", _);
         public static const EMPTY:TaxonParsingError$ErrorType = new TaxonParsingError$ErrorType("EMPTY", _);
         public static const INVALID_VALUE:TaxonParsingError$ErrorType = new TaxonParsingError$ErrorType("INVALID_VALUE", _);
         public static const DUPLICATE_VALUE:TaxonParsingError$ErrorType = new TaxonParsingError$ErrorType("DUPLICATE_VALUE", _);
+        public static const UNEXPECTED_SYNONYM:TaxonParsingError$ErrorType = new TaxonParsingError$ErrorType("UNEXPECTED_SYNONYM", _);
         public static const IOERROR:TaxonParsingError$ErrorType = new TaxonParsingError$ErrorType("IOERROR", _);
 
         function TaxonParsingError$ErrorType(value:String = null, restrictor:* = null) {
-            super((value || WRONG_HEADER.name), restrictor);
+            super((value || UNEXPECTED_COLUMNS.name), restrictor);
         }
 
         protected override function getConstants():Array {
@@ -28,11 +30,11 @@ package org.openforis.collect.manager.speciesImport {
         }
 
         public static function get constants():Array {
-            return [WRONG_HEADER, EMPTY, INVALID_VALUE, DUPLICATE_VALUE, IOERROR];
+            return [UNEXPECTED_COLUMNS, WRONG_COLUMN_NAME, EMPTY, INVALID_VALUE, DUPLICATE_VALUE, UNEXPECTED_SYNONYM, IOERROR];
         }
 
         public static function valueOf(name:String):TaxonParsingError$ErrorType {
-            return TaxonParsingError$ErrorType(WRONG_HEADER.constantOf(name));
+            return TaxonParsingError$ErrorType(UNEXPECTED_COLUMNS.constantOf(name));
         }
     }
 }

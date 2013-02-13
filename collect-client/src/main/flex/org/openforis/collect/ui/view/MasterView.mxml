@@ -48,6 +48,8 @@
 	<view:HomePageView id="homeView" includeIn="home" itemCreationPolicy="immediate" />
 	<view:ListView id="listView" includeIn="list" itemCreationPolicy="immediate" />
 	<view:DetailView id="detailView" includeIn="detail" itemCreationPolicy="immediate" />
-	<view:SpeciesImportView id="speciesImportView" includeIn="speciesImport" itemCreationPolicy="immediate" showCloseButton="false" />
+	<view:SpeciesImportView id="speciesImportView" includeIn="speciesImport" itemCreationPolicy="immediate" 
+							showCloseButton="false"
+							height="100%" width="100%" />
 	
 </s:Group>

@@ -16,7 +16,7 @@ public class TaxonParsingError {
 	private ErrorType errorType;
 	
 	public enum ErrorType {
-		WRONG_HEADER, EMPTY, INVALID_VALUE, DUPLICATE_VALUE, IOERROR;
+		UNEXPECTED_COLUMNS, WRONG_COLUMN_NAME, EMPTY, INVALID_VALUE, DUPLICATE_VALUE, UNEXPECTED_SYNONYM, IOERROR;
 	}
 	
 	public TaxonParsingError(ErrorType type) {
@@ -42,6 +42,10 @@ public class TaxonParsingError {
 	public TaxonParsingError(ErrorType type, long row, Column column) {
 		this(type, row, column, (String) null);
 	}	
+	
+	public TaxonParsingError(ErrorType type, long row, String column) {
+		this(type, row, column, (String) null);
+	}
 	
 	public TaxonParsingError(long row, Column column) {
 		this(ErrorType.INVALID_VALUE, row, column, (String) null);

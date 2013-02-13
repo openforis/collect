@@ -146,7 +146,7 @@ public class SpeciesImportProcessTest {
 		assertNotNull(genus);
 		assertNull(genus.getCode());
 		assertEquals(GENUS, genus.getTaxonRank());
-		assertEquals("Albizia", genus.getScientificName());
+		assertEquals("Albizia sp.", genus.getScientificName());
 		
 		Integer familyId = genus.getParentId();
 		assertNotNull(familyId);
@@ -162,7 +162,12 @@ public class SpeciesImportProcessTest {
 		SpeciesImportProcess process = importCSVFile(INVALID_TEST_SPECIES_CSV);
 		SpeciesImportStatus status = process.getStatus();
 		List<TaxonParsingError> errors = status.getErrors();
-		assertEquals(7, errors.size());
+		assertEquals(8, errors.size());
+		
+		assertTrue(status.isRowProcessed(1));
+		assertTrue(status.isRowProcessed(2));
+		assertTrue(status.isRowProcessed(5));
+		
 		assertFalse(status.isRowProcessed(3));
 		assertFalse(status.isRowProcessed(4));
 		assertFalse(status.isRowProcessed(6));
@@ -170,9 +175,9 @@ public class SpeciesImportProcessTest {
 		assertFalse(status.isRowProcessed(8));
 		assertFalse(status.isRowProcessed(9));
 		assertFalse(status.isRowProcessed(10));
-		assertTrue(status.isRowProcessed(1));
-		assertTrue(status.isRowProcessed(2));
-		assertTrue(status.isRowProcessed(5));
+		assertFalse(status.isRowProcessed(11));
+		//unexisting row
+		assertFalse(status.isRowProcessed(12));
 		
 		assertTrue(containsError(errors, 3, Column.CODE, ErrorType.EMPTY));
 		assertTrue(containsError(errors, 4, Column.SCIENTIFIC_NAME, ErrorType.EMPTY));
@@ -181,15 +186,21 @@ public class SpeciesImportProcessTest {
 		assertTrue(containsError(errors, 8, Column.NO, ErrorType.DUPLICATE_VALUE));
 		assertTrue(containsError(errors, 9, Column.SCIENTIFIC_NAME, ErrorType.DUPLICATE_VALUE));
 		assertTrue(containsError(errors, 10, Column.SCIENTIFIC_NAME, ErrorType.DUPLICATE_VALUE));
+		assertTrue(containsError(errors, 10, Column.SCIENTIFIC_NAME, ErrorType.DUPLICATE_VALUE));
+		assertTrue(containsError(errors, 11, "swh", ErrorType.UNEXPECTED_SYNONYM));
 	}
 
-	protected boolean containsError(List<TaxonParsingError> errors, long row, Column column, ErrorType type) {
+	protected boolean containsError(List<TaxonParsingError> errors, long row, String column, ErrorType type) {
 		for (TaxonParsingError taxonParsingError : errors) {
-			if ( taxonParsingError.getErrorType() == type && taxonParsingError.getRow() == row && taxonParsingError.getColumn().equals(column.getName())) {
+			if ( taxonParsingError.getErrorType() == type && taxonParsingError.getRow() == row && taxonParsingError.getColumn().equals(column)) {
 				return true;
 			}
 		}
 		return false;
+	}
+	
+	protected boolean containsError(List<TaxonParsingError> errors, long row, Column column, ErrorType type) {
+		return containsError(errors, row, column.getName(), type);
 	}
 	
 	protected Taxon findTaxonByCode(String code) {

@@ -37,6 +37,7 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 	private static Log LOG = LogFactory.getLog(SpeciesImportProcess.class);
 
 	private static final TaxonRank[] TAXON_RANKS = new TaxonRank[] {FAMILY, GENUS, SPECIES, SUBSPECIES};
+	public static final String GENUS_SUFFIX = "sp.";
 
 	private static final String CSV = "csv";
 	//private static final String ZIP = "zip";
@@ -210,7 +211,7 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 			for (String vernacularName : vernacularNames) {
 				TaxonVernacularName taxonVN = new TaxonVernacularName();
 				taxonVN.setLanguageCode(langCode);
-				taxonVN.setVernacularName(StringUtils.normalizeSpace(vernacularName));
+				taxonVN.setVernacularName(vernacularName);
 				taxonTree.addVernacularName(taxon, taxonVN);
 			}
 		}
@@ -286,7 +287,7 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 	
 	protected Taxon createTaxonGenus(TaxonLine line) throws TaxonParsingException {
 		Taxon taxonFamily = createTaxonFamily(line);
-		String normalizedScientificName = line.getGenus();
+		String normalizedScientificName = StringUtils.join(line.getGenus(), " ", GENUS_SUFFIX);
 		return createTaxon(line, GENUS, taxonFamily, normalizedScientificName);
 	}
 

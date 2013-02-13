@@ -4,6 +4,7 @@
 package org.openforis.collect.manager;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -120,12 +121,14 @@ public class SpeciesManager {
 			List<Taxon> taxons = taxonDao.loadTaxons(taxonomyId, offset, maxRecords);
 			for (Taxon taxon : taxons) {
 				TaxonSummary summary = createSummary(taxon);
-				Set<String> itemVernLangCodes = summary.getLanguageToVernacularNames().keySet();
+				List<String> itemVernLangCodes = summary.getVernacularLanguages();
 				vernacularNamesLanguageCodes.addAll(itemVernLangCodes);
 				items.add(summary);
 			}
 		}
-		TaxonSummaries result = new TaxonSummaries(totalCount, items, vernacularNamesLanguageCodes);
+		List<String> sortedVernacularNamesLanguageCodes = new ArrayList<String>(vernacularNamesLanguageCodes);
+		Collections.sort(sortedVernacularNamesLanguageCodes);
+		TaxonSummaries result = new TaxonSummaries(totalCount, items, sortedVernacularNamesLanguageCodes);
 		return result;
 	}
 

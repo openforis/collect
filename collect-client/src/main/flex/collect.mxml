@@ -7,8 +7,12 @@
 			   xmlns:presenter="org.openforis.collect.presenter.*"
 			   xmlns:view="org.openforis.collect.ui.view.*"
 			   
-			   width="100%" height="100%" 
-			   minWidth="955" minHeight="450"
+			   width="100%" 
+			   minWidth="955" 
+			   minWidth.fullScreen="{NaN}"
+			   height="100%" 
+			   minHeight="450"
+			   minHeight.fullScreen="{NaN}"
 			   
 			   creationComplete="creationCompleteHandler(event)" 
 			   initialize="initializeHandler(event)"
@@ -74,7 +78,7 @@
 					  width="100%"
 					  gap="0">
 				<view:Header id="header" 
-							 width="100%" />
+							 width="100%" includeIn="default" />
 				<view:MasterView id="masterView" width="100%" height="100%" 
 								 includeIn="default" />
 				<!--<view:Footer id="footer" width="100%"  />-->
@@ -82,9 +86,9 @@
 		</s:Group>
 	</s:Group>
 	
-	<s:Group includeIn="fullScreen" 
+	<s:VGroup includeIn="fullScreen" 
 			 width="100%" height="100%">
 		<fx:Reparent target="masterView" includeIn="fullScreen" />
-	</s:Group>
+	</s:VGroup>
 	
 </s:Application>

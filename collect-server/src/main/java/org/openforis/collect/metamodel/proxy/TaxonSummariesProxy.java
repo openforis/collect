@@ -1,7 +1,6 @@
 package org.openforis.collect.metamodel.proxy;
 
 import java.util.List;
-import java.util.Set;
 
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.collect.Proxy;
@@ -34,7 +33,7 @@ public class TaxonSummariesProxy implements Proxy {
 	}
 
 	@ExternalizedProperty
-	public Set<String> getVernacularNamesLanguageCodes() {
+	public List<String> getVernacularNamesLanguageCodes() {
 		return taxonSummaries.getVernacularNamesLanguageCodes();
 	}
 	

@@ -175,14 +175,24 @@ package org.openforis.collect.presenter {
 			}
 			for each (var langCode:String in vernacularNamesLangCodes) {
 				var col:GridColumn = new GridColumn();
-				if ( StringUtil.isBlank(langCode) ) {
-					col.headerText = Message.get(MessageKeys.SYNONYM);
-				} else {
-					col.headerText = Languages.getLanguageLabel(langCode) + " (" + langCode + ")";
-				}
+				col.headerText = getLanguageCodeHeaderText(langCode);
 				col.dataField = langCode;
 				col.labelFunction = vernacularNamesLabelFunction;
+				col.width = 100;
 				columns.addItem(col);
+			}
+		}
+		
+		private function getLanguageCodeHeaderText(langCode:String):String {
+			if ( StringUtil.isBlank(langCode) ) {
+				return Message.get(MessageKeys.SYNONYM);
+			} else {
+				var languageLabel:String = Languages.getLanguageLabel(langCode);
+				if ( languageLabel != null ) {
+					return languageLabel + " (" + langCode + ")";
+				} else {
+					return langCode;
+				}
 			}
 		}
 		

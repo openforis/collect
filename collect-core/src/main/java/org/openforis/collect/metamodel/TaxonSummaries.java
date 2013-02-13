@@ -1,7 +1,6 @@
 package org.openforis.collect.metamodel;
 
 import java.util.List;
-import java.util.Set;
 
 /**
  * 
@@ -12,9 +11,9 @@ public class TaxonSummaries {
 
 	private int totalCount;
 	private List<TaxonSummary> items;
-	private Set<String> vernacularNamesLanguageCodes;
+	private List<String> vernacularNamesLanguageCodes;
 	
-	public TaxonSummaries(int totalCount, List<TaxonSummary> items, Set<String> vernacularNamesLanguageCodes) {
+	public TaxonSummaries(int totalCount, List<TaxonSummary> items, List<String> vernacularNamesLanguageCodes) {
 		super();
 		this.totalCount = totalCount;
 		this.items = items;
@@ -29,12 +28,8 @@ public class TaxonSummaries {
 		return items;
 	}
 
-	public Set<String> getVernacularNamesLanguageCodes() {
+	public List<String> getVernacularNamesLanguageCodes() {
 		return vernacularNamesLanguageCodes;
 	}
 
-	public void setVernacularNamesLanguageCodes(Set<String> vernacularNamesLanguageCodes) {
-		this.vernacularNamesLanguageCodes = vernacularNamesLanguageCodes;
-	}
-	
 }

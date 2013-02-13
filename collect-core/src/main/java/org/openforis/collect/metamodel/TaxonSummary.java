@@ -5,10 +5,10 @@ package org.openforis.collect.metamodel;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 import org.openforis.idm.model.species.Taxon.TaxonRank;
 import org.openforis.idm.util.CollectionUtil;
@@ -28,7 +28,7 @@ public class TaxonSummary {
 	
 	public List<String> getVernacularLanguages() {
 		if ( languageToVernacularNames == null ) {
-			return null;
+			return Collections.emptyList();
 		} else {
 			Set<String> langCodes = languageToVernacularNames.keySet();
 			return CollectionUtil.unmodifiableList(new ArrayList<String>(langCodes));
@@ -37,7 +37,7 @@ public class TaxonSummary {
 	
 	public void addVernacularName(String langCode, String vernacularName) {
 		if ( languageToVernacularNames == null ) {
-			languageToVernacularNames = new HashMap<String, List<String>>();
+			languageToVernacularNames = new TreeMap<String, List<String>>();
 		}
 		List<String> vernacularNames = languageToVernacularNames.get(langCode);
 		if ( vernacularNames == null ) {

@@ -16,12 +16,15 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.gbif.ecat.model.ParsedName;
 import org.gbif.ecat.parser.NameParser;
 import org.gbif.ecat.parser.UnparsableException;
 import org.gbif.ecat.voc.Rank;
+import org.openforis.collect.manager.speciesImport.TaxonParsingError.ErrorType;
 import org.openforis.commons.io.csv.CsvLine;
 import org.openforis.commons.io.csv.CsvReader;
 import org.openforis.idm.metamodel.Languages;
@@ -116,7 +119,9 @@ public class TaxonCSVReader extends CsvReader {
 	
 	public static class TaxonCSVLineParser {
 		private static final String VERNACULAR_NAME_TRIM_EXPRESSION = "^\\s+|\\s+$|;+$|\\.+$";
-
+		private static final String SYNONYM_COL_NAME = "";
+		private static final Pattern SYNONYM_PATTERN = Pattern.compile("^syn\\.?\\s+", Pattern.CASE_INSENSITIVE);
+		
 		private static final String DEFAULT_VERNACULAR_NAMES_SEPARATOR = ",";
 		private static final String OTHER_VERNACULAR_NAMES_SEPARATOR_EXPRESSION = "/";
 
@@ -141,16 +146,16 @@ public class TaxonCSVReader extends CsvReader {
 			this.rawScientificName = extractRawScientificName();
 			this.parsedScientificName = parseRawScienfificName();
 			TaxonLine taxonLine = new TaxonLine();
-			taxonLine.lineNumber = this.lineNumber;
-			taxonLine.taxonId = parseTaxonId(false);
-			taxonLine.code = extractCode();
-			taxonLine.familyName = extractFamilyName();
-			taxonLine.rawScientificName = this.rawScientificName;
-			taxonLine.genus = extractGenus();
-			taxonLine.speciesName = extractSpeciesName();
-			taxonLine.canonicalScientificName = extractCanonicalScientificName();
-			taxonLine.rank = extractRank();
-			taxonLine.languageToVernacularNames = extractVernacularNames();
+			taxonLine.setLineNumber(this.lineNumber);
+			taxonLine.setTaxonId(parseTaxonId(false));
+			taxonLine.setCode(extractCode());
+			taxonLine.setFamilyName(extractFamilyName());
+			taxonLine.setRawScientificName(this.rawScientificName);
+			taxonLine.setGenus(extractGenus());
+			taxonLine.setSpeciesName(extractSpeciesName());
+			taxonLine.setCanonicalScientificName(extractCanonicalScientificName());
+			taxonLine.setRank(extractRank());
+			taxonLine.setLanguageToVernacularNames(extractVernacularNames());
 			return taxonLine;
 		}
 
@@ -225,7 +230,7 @@ public class TaxonCSVReader extends CsvReader {
 			return speciesName;
 		}
 		
-		protected Map<String, List<String>> extractVernacularNames() {
+		protected Map<String, List<String>> extractVernacularNames() throws TaxonParsingException {
 			Map<String, List<String>> result = new HashMap<String, List<String>>();
 			List<String> languageColumnNames = reader.getLanguageColumnNames();
 			for (String langCode : languageColumnNames) {
@@ -235,7 +240,7 @@ public class TaxonCSVReader extends CsvReader {
 			return result;
 		}
 
-		protected List<String> extractVernacularNames(String colName) {
+		protected List<String> extractVernacularNames(String colName) throws TaxonParsingException {
 			String colValue = StringUtils.normalizeSpace(csvLine.getValue(colName, String.class));
 			if ( StringUtils.isBlank(colValue) ) {
 				return Collections.emptyList();
@@ -244,12 +249,30 @@ public class TaxonCSVReader extends CsvReader {
 				String normalized = colValue.replaceAll(OTHER_VERNACULAR_NAMES_SEPARATOR_EXPRESSION, DEFAULT_VERNACULAR_NAMES_SEPARATOR);
 				String[] split = StringUtils.split(normalized, DEFAULT_VERNACULAR_NAMES_SEPARATOR);
 				for (String splitPart : split) {
-					String trimmed = splitPart.replaceAll(VERNACULAR_NAME_TRIM_EXPRESSION, "");
-					if ( trimmed.length() > 0 ) {
-						result.add(trimmed);
+					String trimmedPart = extractVernacularName(colName, splitPart);
+					if ( trimmedPart != null ) {
+						result.add(trimmedPart);
 					}
 				}
 				return result;
+			}
+		}
+
+		private String extractVernacularName(String colName, String splitPart) throws TaxonParsingException {
+			String trimmed = splitPart.replaceAll(VERNACULAR_NAME_TRIM_EXPRESSION, "");
+			if ( trimmed.length() > 0 ) {
+				Matcher matcher = SYNONYM_PATTERN.matcher(trimmed);
+				if ( matcher.find() ) {
+					if ( SYNONYM_COL_NAME.equals(colName) ) {
+						matcher.replaceAll("");
+					} else {
+						TaxonParsingError error = new TaxonParsingError(ErrorType.UNEXPECTED_SYNONYM, lineNumber, colName);
+						throw new TaxonParsingException(error);
+					}
+				}
+				return trimmed;
+			} else {
+				return null;
 			}
 		}
 
@@ -299,41 +322,86 @@ public class TaxonCSVReader extends CsvReader {
 				return null;
 			}
 		}
-		
+
 		public long getLineNumber() {
 			return lineNumber;
 		}
-		
+
+		public void setLineNumber(long lineNumber) {
+			this.lineNumber = lineNumber;
+		}
+
 		public Integer getTaxonId() {
 			return taxonId;
+		}
+
+		public void setTaxonId(Integer taxonId) {
+			this.taxonId = taxonId;
 		}
 
 		public String getCode() {
 			return code;
 		}
 
+		public void setCode(String code) {
+			this.code = code;
+		}
+
 		public TaxonRank getRank() {
 			return rank;
+		}
+
+		public void setRank(TaxonRank rank) {
+			this.rank = rank;
 		}
 
 		public String getFamilyName() {
 			return familyName;
 		}
-		
+
+		public void setFamilyName(String familyName) {
+			this.familyName = familyName;
+		}
+
 		public String getGenus() {
 			return genus;
 		}
-		
+
+		public void setGenus(String genus) {
+			this.genus = genus;
+		}
+
+		public String getSpeciesName() {
+			return speciesName;
+		}
+
+		public void setSpeciesName(String speciesName) {
+			this.speciesName = speciesName;
+		}
+
 		public String getRawScientificName() {
 			return rawScientificName;
+		}
+
+		public void setRawScientificName(String rawScientificName) {
+			this.rawScientificName = rawScientificName;
 		}
 
 		public String getCanonicalScientificName() {
 			return canonicalScientificName;
 		}
 
-		public String getSpeciesName() {
-			return speciesName;
+		public void setCanonicalScientificName(String canonicalScientificName) {
+			this.canonicalScientificName = canonicalScientificName;
+		}
+
+		public Map<String, List<String>> getLanguageToVernacularNames() {
+			return languageToVernacularNames;
+		}
+
+		public void setLanguageToVernacularNames(
+				Map<String, List<String>> languageToVernacularNames) {
+			this.languageToVernacularNames = languageToVernacularNames;
 		}
 		
 	}
@@ -346,18 +414,18 @@ public class TaxonCSVReader extends CsvReader {
 
 		protected void validateHeaders() throws TaxonParsingException {
 			List<String> colNames = getColumnNames();
-			Column[] columns = Column.values();
-			int fixedColsSize = columns.length;
+			Column[] expectedColumns = Column.values();
+			int fixedColsSize = expectedColumns.length;
 			if ( colNames == null || colNames.size() < fixedColsSize ) {
-				String errorMessage = "Expected at least " + fixedColsSize + " columns";
-				TaxonParsingError error = new TaxonParsingError(TaxonParsingError.ErrorType.WRONG_HEADER, errorMessage);
+				TaxonParsingError error = new TaxonParsingError(ErrorType.UNEXPECTED_COLUMNS);
 				throw new TaxonParsingException(error);
 			}
 			for (int i = 0; i < fixedColsSize; i++) {
-				String colName = colNames.get(i);
-				String expectedColName = columns[i].getName();
+				String colName = StringUtils.trimToEmpty(colNames.get(i));
+				String expectedColName = expectedColumns[i].getName();
 				if ( ! expectedColName.equals(colName) ) {
-					throw new RuntimeException("Invalid column name: " + colName + " - '"+ expectedColName +"' expected");
+					TaxonParsingError error = new TaxonParsingError(ErrorType.WRONG_COLUMN_NAME, 1, colName, expectedColName);
+					throw new TaxonParsingException(error);
 				}
 			}
 			validateLanguageHeaders(colNames);
