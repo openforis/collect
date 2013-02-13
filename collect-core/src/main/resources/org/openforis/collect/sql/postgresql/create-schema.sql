@@ -1,5 +1,6 @@
 CREATE SCHEMA "collect";
 CREATE SEQUENCE "collect"."ofc_record_id_seq";
+CREATE SEQUENCE "collect"."ofc_sampling_design_id_seq";
 CREATE SEQUENCE "collect"."ofc_survey_id_seq";
 CREATE SEQUENCE "collect"."ofc_survey_work_id_seq";
 CREATE SEQUENCE "collect"."ofc_taxonomy_id_seq";
@@ -49,6 +50,16 @@ CREATE TABLE "collect"."ofc_record"  (
 	"count5"                   	integer NULL,
 	"data1"                    	bytea NULL,
 	"data2"                    	bytea NULL,
+	PRIMARY KEY("id")
+);
+CREATE TABLE "collect"."ofc_sampling_desing"  ( 
+	"id"            	integer NOT NULL,
+	"survey_id"     	integer NULL,
+	"survey_work_id"	integer NULL,
+	"level1"       		varchar(256) NOT NULL,
+	"level2"       		varchar(256) NULL,
+	"level3"       		varchar(256) NULL,
+	"location"      	varchar(256) NOT NULL,
 	PRIMARY KEY("id")
 );
 CREATE TABLE "collect"."ofc_survey"  ( 
@@ -154,6 +165,14 @@ ALTER TABLE "collect"."ofc_record"
 	ADD CONSTRAINT "ofc_record_modified_by_user_fkey"
 	FOREIGN KEY("modified_by_id")
 	REFERENCES "collect"."ofc_user"("id");
+ALTER TABLE "collect"."ofc_sampling_desing"
+	ADD CONSTRAINT "ofc_sampling_design_survey_fkey"
+	FOREIGN KEY("survey_id")
+	REFERENCES "collect"."ofc_survey"("id");
+ALTER TABLE "collect"."ofc_sampling_desing"
+	ADD CONSTRAINT "ofc_sampling_design_survey_work_fkey"
+	FOREIGN KEY("survey_work_id")
+	REFERENCES "collect"."ofc_survey_work"("id");
 --------------------------
 --- END GENERATED CODE ---
 --------------------------

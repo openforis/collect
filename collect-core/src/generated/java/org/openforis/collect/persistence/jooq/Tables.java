@@ -33,6 +33,11 @@ public final class Tables {
 	public static org.openforis.collect.persistence.jooq.tables.OfcRecord OFC_RECORD = org.openforis.collect.persistence.jooq.tables.OfcRecord.OFC_RECORD;
 
 	/**
+	 * The table collect.ofc_sampling_desing
+	 */
+	public static org.openforis.collect.persistence.jooq.tables.OfcSamplingDesing OFC_SAMPLING_DESING = org.openforis.collect.persistence.jooq.tables.OfcSamplingDesing.OFC_SAMPLING_DESING;
+
+	/**
 	 * The table collect.ofc_survey
 	 */
 	public static org.openforis.collect.persistence.jooq.tables.OfcSurvey OFC_SURVEY = org.openforis.collect.persistence.jooq.tables.OfcSurvey.OFC_SURVEY;
@@ -66,6 +71,11 @@ public final class Tables {
 	 * The table collect.ofc_user_role
 	 */
 	public static org.openforis.collect.persistence.jooq.tables.OfcUserRole OFC_USER_ROLE = org.openforis.collect.persistence.jooq.tables.OfcUserRole.OFC_USER_ROLE;
+
+	/**
+	 * The table collect.sampling_design
+	 */
+	public static org.openforis.collect.persistence.jooq.tables.SamplingDesign SAMPLING_DESIGN = org.openforis.collect.persistence.jooq.tables.SamplingDesign.SAMPLING_DESIGN;
 
 	/**
 	 * No instances
