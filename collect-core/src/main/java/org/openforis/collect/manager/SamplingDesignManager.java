@@ -69,9 +69,13 @@ public class SamplingDesignManager {
 	}
 
 	@Transactional
-	public void deleteTaxonsByTaxonomy(SamplingDesignItem item) {
-		Integer id = item.getId();
-		samplingDesignDao.delete(id);
+	public void deleteBySurvey(int surveyId) {
+		samplingDesignDao.deleteBySurvey(surveyId);
+	}
+	
+	@Transactional
+	public void deleteBySurveyWork(int surveyId) {
+		samplingDesignDao.deleteBySurveyWork(surveyId);
 	}
 	
 }

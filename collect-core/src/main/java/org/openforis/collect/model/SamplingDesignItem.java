@@ -3,6 +3,8 @@ package org.openforis.collect.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.openforis.idm.util.CollectionUtil;
+
 /**
  * 
  * @author S. Ricci
@@ -21,6 +23,14 @@ public class SamplingDesignItem {
 			levelCodes = new ArrayList<String>();
 		}
 		levelCodes.add(code);
+	}
+	
+	public String getLevelCode(int level) {
+		if ( levelCodes == null || level < 0 || level > levelCodes.size()) {
+			throw new IllegalArgumentException("Level " + level + " is not accessible");
+		} else {
+			return levelCodes.get(level - 1);
+		}
 	}
 	
 	public Integer getId() {
@@ -48,7 +58,7 @@ public class SamplingDesignItem {
 	}
 
 	public List<String> getLevelCodes() {
-		return levelCodes;
+		return CollectionUtil.unmodifiableList(levelCodes);
 	}
 
 	public void setLevelCodes(List<String> levelCodes) {

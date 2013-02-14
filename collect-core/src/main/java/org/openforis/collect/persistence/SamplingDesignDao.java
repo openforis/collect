@@ -6,6 +6,7 @@ import static org.openforis.collect.persistence.jooq.tables.OfcSamplingDesing.OF
 import java.sql.Connection;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.jooq.Field;
 import org.jooq.Record;
 import org.jooq.Result;
@@ -68,7 +69,22 @@ public class SamplingDesignDao extends MappingJooqDaoSupport<SamplingDesignItem,
 		Record r = q.fetchOne();
 		return r.getValueAsInteger(0);
 	}
-		
+	
+	public void deleteBySurvey(int surveyId) {
+		deleteBySurvey(false, surveyId);
+	}
+	
+	public void deleteBySurveyWork(int surveyId) {
+		deleteBySurvey(true, surveyId);
+	}
+	
+	public void deleteBySurvey(boolean work, int surveyId) {
+		JooqFactory jf = getMappingJooqFactory();
+		TableField<OfcSamplingDesingRecord, Integer> surveyIdField = work ? OFC_SAMPLING_DESING.SURVEY_WORK_ID: OFC_SAMPLING_DESING.SURVEY_ID;
+		jf.delete(OFC_SAMPLING_DESING)
+			.where(surveyIdField.equal(surveyId))
+			.execute();
+	}
 	
 	public List<SamplingDesignItem> loadItemsBySurvey(int surveyId, int offset, int maxRecords) {
 		return loadItems(false, surveyId, offset, maxRecords);
@@ -113,7 +129,12 @@ public class SamplingDesignDao extends MappingJooqDaoSupport<SamplingDesignItem,
 			s.setSurveyWorkId(r.getValue(OFC_SAMPLING_DESING.SURVEY_WORK_ID));
 			s.setLocation(r.getValue(OFC_SAMPLING_DESING.LOCATION));
 			for (Field<String> field : LEVEL_CODE_FIELDS) {
-				s.addLevelCode(r.getValue(field));
+				String value = r.getValue(field);
+				if ( StringUtils.isNotBlank(value) ) {
+					s.addLevelCode(r.getValue(field));
+				} else {
+					break;
+				}
 			}
 		}
 
@@ -125,9 +146,16 @@ public class SamplingDesignDao extends MappingJooqDaoSupport<SamplingDesignItem,
 			q.addValue(OFC_SAMPLING_DESING.SURVEY_WORK_ID, s.getSurveyWorkId());
 			q.addValue(OFC_SAMPLING_DESING.LOCATION, s.getLocation());
 			List<String> levelCodes = s.getLevelCodes();
-			for (int i = 0; i < LEVEL_CODE_FIELDS.length; i++) {
-				Field<String> field = LEVEL_CODE_FIELDS[i];
-				q.addValue(field, levelCodes.get(i));
+			int levelsSize = levelCodes.size();
+			int maxLevelsSize = LEVEL_CODE_FIELDS.length;
+			if ( levelsSize > maxLevelsSize ) {
+				throw new IllegalArgumentException("Only " + LEVEL_CODE_FIELDS.length + " code level are supported");
+			} else {
+				for ( int i = 0; i < LEVEL_CODE_FIELDS.length; i++ ) {
+					Field<String> field = LEVEL_CODE_FIELDS[i];
+					String value = i >= levelsSize ? null: levelCodes.get(i);
+					q.addValue(field, value);
+				}
 			}
 		}
 
