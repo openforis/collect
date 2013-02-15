@@ -32,6 +32,8 @@
             var flashvars = {
             	lang: 'en_US',
             	species_import: '<%=request.getParameter("species_import")%>',
+            	sampling_design_import: '<%=request.getParameter("sampling_design_import")%>',
+            	work: '<%=request.getParameter("work")%>',
             	preview: '<%=request.getParameter("preview")%>',
             	surveyId: '<%=request.getParameter("surveyId")%>',
             	rootEntityId: '<%=request.getParameter("rootEntityId")%>',

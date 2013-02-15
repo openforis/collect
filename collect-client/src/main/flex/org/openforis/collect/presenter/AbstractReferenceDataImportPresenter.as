@@ -1,6 +1,5 @@
 package org.openforis.collect.presenter {
 	
-	import flash.display.DisplayObject;
 	import flash.events.DataEvent;
 	import flash.events.Event;
 	import flash.events.IOErrorEvent;
@@ -14,40 +13,21 @@ package org.openforis.collect.presenter {
 	import flash.net.URLVariables;
 	import flash.utils.Timer;
 	
-	import mx.collections.IList;
-	import mx.core.UIComponent;
-	import mx.managers.PopUpManager;
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.IResponder;
 	import mx.rpc.events.ResultEvent;
 	
 	import org.openforis.collect.Application;
-	import org.openforis.collect.client.ClientFactory;
-	import org.openforis.collect.client.SpeciesClient;
-	import org.openforis.collect.client.SpeciesImportClient;
 	import org.openforis.collect.event.PaginationBarEvent;
-	import org.openforis.collect.event.UIEvent;
-	import org.openforis.collect.i18n.Languages;
 	import org.openforis.collect.i18n.Message;
 	import org.openforis.collect.manager.process.ProcessStatus$Step;
 	import org.openforis.collect.manager.referenceDataImport.proxy.ReferenceDataImportStatusProxy;
-	import org.openforis.collect.metamodel.proxy.TaxonSummariesProxy;
-	import org.openforis.collect.metamodel.proxy.TaxonSummaryProxy;
-	import org.openforis.collect.model.proxy.TaxonomyProxy;
-	import org.openforis.collect.remoting.service.speciesImport.proxy.SpeciesImportStatusProxy;
+	import org.openforis.collect.model.proxy.AbstractSummariesProxy;
 	import org.openforis.collect.ui.component.datagrid.PaginationBar;
-	import org.openforis.collect.ui.component.speciesImport.TaxonomyEditPopUp;
-	import org.openforis.collect.ui.view.ReferenceDataImportView;
-	import org.openforis.collect.ui.view.SpeciesImportView;
+	import org.openforis.collect.ui.view.AbstractReferenceDataImportView;
 	import org.openforis.collect.util.AlertUtil;
 	import org.openforis.collect.util.ApplicationConstants;
 	import org.openforis.collect.util.CollectionUtil;
-	import org.openforis.collect.util.PopUpUtil;
-	import org.openforis.collect.util.StringUtil;
-	
-	import spark.components.DataGrid;
-	import spark.components.gridClasses.GridColumn;
-	import spark.events.IndexChangeEvent;
 
 	/**
 	 * 
@@ -58,28 +38,29 @@ package org.openforis.collect.presenter {
 		
 		private static const PROGRESS_UPDATE_DELAY:int = 2000;
 		private static const VALID_NAME_REGEX:RegExp = /^[a-z][a-z0-9_]*$/;
-		private static const IMPORT_FILE_NAME_PREFIX:Object = "species";
 		private static const ALLOWED_IMPORT_FILE_EXTENSIONS:Array = ["*.csv"];
 		private static const MAX_SUMMARIES_PER_PAGE:int = 20;
 		private static const FIXED_SUMMARY_COLUMNS_LENGTH:int = 3;
 		private static const VERANCULAR_NAMES_SEPARATOR:String = ", ";
 		
-		protected var _view:ReferenceDataImportView;
-		private var _fileReference:FileReference;
-		private var _progressTimer:Timer;
-		private var _state:ReferenceDataImportStatusProxy;
-		private var _messageKeys:MessageKeys;
+		protected var _view:AbstractReferenceDataImportView;
+		protected var _fileReference:FileReference;
+		protected var _progressTimer:Timer;
+		protected var _state:ReferenceDataImportStatusProxy;
+		protected var _messageKeys:ReferenceDataImportMessageKeys;
+		protected var _uploadUrl:String;
+		protected var _uploadFileNamePrefix:String;
 		
-		private var _getStatusResponder:IResponder;
-		private var _firstOpen:Boolean;
-		private var _selectedTaxonomy:TaxonomyProxy;
-		private var taxonomyEditPopUp:TaxonomyEditPopUp; 
-		private var fileFilter:FileFilter;
+		protected var _getStatusResponder:IResponder;
+		protected var _firstOpen:Boolean;
+		protected var _fileFilter:FileFilter;
 		
-		public function AbstractReferenceDataImportPresenter(view:ReferenceDataImportView, messageKeys:MessageKeys) {
+		public function AbstractReferenceDataImportPresenter(view:AbstractReferenceDataImportView, messageKeys:ReferenceDataImportMessageKeys) {
 			this._view = view;
 			this._messageKeys = messageKeys;
 			
+			_uploadUrl = ApplicationConstants.FILE_UPLOAD_URL;
+			_uploadFileNamePrefix = "importFile";
 			_firstOpen = true;
 			_fileReference = new FileReference();
 			initFileFilter();
@@ -88,16 +69,21 @@ package org.openforis.collect.presenter {
 			
 			super();
 			
-			//try to see if there is a process still running
-			_view.currentState = SpeciesImportView.STATE_LOADING;
+			//try to see if there is a still running process
+			_view.currentState = AbstractReferenceDataImportView.STATE_LOADING;
 			_view.paginationBar.maxRecordsPerPage = MAX_SUMMARIES_PER_PAGE;
+			
+			loadInitialData();
+		}
+		
+		protected function loadInitialData():void {
 			updateStatus();
 			loadSummaries();
 		}
 		
 		private function initFileFilter():void {
 			var description:String = ALLOWED_IMPORT_FILE_EXTENSIONS.join(", ");
-			fileFilter = new FileFilter(description, ALLOWED_IMPORT_FILE_EXTENSIONS.join("; "));
+			_fileFilter = new FileFilter(description, ALLOWED_IMPORT_FILE_EXTENSIONS.join("; "));
 		}
 		
 		override internal function initEventListeners():void {
@@ -106,7 +92,11 @@ package org.openforis.collect.presenter {
 			_fileReference.addEventListener(IOErrorEvent.IO_ERROR, fileReferenceIoErrorHandler);
 			_fileReference.addEventListener(DataEvent.UPLOAD_COMPLETE_DATA, fileReferenceUploadCompleteDataHandler);
 			
+			_view.importButton.addEventListener(MouseEvent.CLICK, importButtonClickHandler);
+			_view.cancelImportButton.addEventListener(MouseEvent.CLICK, cancelClickHandler);
 			_view.paginationBar.addEventListener(PaginationBarEvent.PAGE_CHANGE, summaryPageChangeHandler);
+			_view.errorsOkButton.addEventListener(MouseEvent.CLICK, errorsOkButtonClickHandler);
+			_view.closeButton.addEventListener(MouseEvent.CLICK, closeButtonClickHandler);
 		}
 		
 		protected function summaryPageChangeHandler(event:PaginationBarEvent):void {
@@ -120,16 +110,20 @@ package org.openforis.collect.presenter {
 			_view.summaryDataGrid.dataProvider = null;
 			
 			_view.paginationBar.currentState = PaginationBar.LOADING_STATE;
-			performSummariesLoad();
+			performSummariesLoad(offset);
 		}
 		
-		protected function performSummariesLoad():void {
+		protected function performSummariesLoad(offset:int = 0):void {
 			//to be implemented in sub-classes
 		}
 		
+		protected function loadSummariesResultHandler(event:ResultEvent, token:Object = null):void {
+			//to be implemented in sub-classes
+		}
+
 		protected function importButtonClickHandler(event:MouseEvent):void {
 			if ( checkCanImport() ) {
-				_fileReference.browse([fileFilter]);
+				_fileReference.browse([_fileFilter]);
 			}
 		}
 		
@@ -143,17 +137,17 @@ package org.openforis.collect.presenter {
 		
 		protected function cancelClickHandler(event:MouseEvent):void {
 			switch ( _view.currentState ) {
-				case SpeciesImportView.STATE_UPLOADING:
+				case AbstractReferenceDataImportView.STATE_UPLOADING:
 					_fileReference.cancel();
 					break;
-				case SpeciesImportView.STATE_IMPORTING:
+				case AbstractReferenceDataImportView.STATE_IMPORTING:
 					performImportCancel();
 					break;
 			}
-			_view.currentState = SpeciesImportView.STATE_DEFAULT;
+			_view.currentState = AbstractReferenceDataImportView.STATE_DEFAULT;
 		}
 		
-		private function performImportCancel():void {
+		protected function performImportCancel():void {
 			//to be implemented in sub-classes
 		}
 		
@@ -166,32 +160,32 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function performCancelThenClose():void {
+			//to be implemented in sub-classes
 		}
 		
 		protected function closePopUp():void {
-			eventDispatcher.dispatchEvent(new UIEvent(UIEvent.CLOSE_SPECIES_IMPORT_POPUP));
+			//to be implemented in sub-classes
 		}
 		
 		protected function fileReferenceSelectHandler(event:Event):void {
-			AlertUtil.showConfirm(MessageKeys.CONFIRM_IMPORT, null, 
-				MessageKeys.CONFIRM_IMPORT_TITLE,
+			AlertUtil.showConfirm(_messageKeys.CONFIRM_IMPORT, null, 
+				_messageKeys.CONFIRM_IMPORT_TITLE,
 				startUpload);
 		}
 		
 		protected function startUpload():void {
 			updateViewForUploading();
 			
-			var url:String = ApplicationConstants.SPECIES_IMPORT_UPLOAD_URL;
 			//workaround for firefox/chrome flahplayer bug
 			//url +=";jsessionid=" + Application.sessionId;
 			
-			var request:URLRequest = new URLRequest(url);
+			var request:URLRequest = new URLRequest(_uploadUrl);
 			//request paramters
 			request.method = URLRequestMethod.POST;
 			var parameters:URLVariables = new URLVariables();
 			//parameters.name = _fileReference.name;
 			var ext:String = getExtension(_fileReference.name);
-			parameters.name = IMPORT_FILE_NAME_PREFIX + ext;
+			parameters.name = _uploadFileNamePrefix + ext;
 			parameters.sessionId = Application.sessionId;
 			request.data = parameters;
 			_fileReference.upload(request, "fileData");
@@ -209,17 +203,18 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function fileReferenceUploadCompleteDataHandler(event:DataEvent):void {
-			_view.currentState = SpeciesImportView.STATE_LOADING;
+			_view.currentState = AbstractReferenceDataImportView.STATE_LOADING;
 			performProcessStart();
 			startProgressTimer();
 		}
 		
 		protected function performProcessStart():void {
+			//to be implemented in sub-classes
 		}
 		
 		protected function fileReferenceIoErrorHandler(event:IOErrorEvent):void {
-			_view.currentState = SpeciesImportView.STATE_DEFAULT;
-			AlertUtil.showError(MessageKeys.UPLOADING_FILE_ERROR, [event.text]);
+			_view.currentState = AbstractReferenceDataImportView.STATE_DEFAULT;
+			AlertUtil.showError(_messageKeys.UPLOADING_FILE_ERROR, [event.text]);
 		}
 		
 		protected function startResultHandler(event:ResultEvent, token:Object = null):void {
@@ -235,6 +230,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function updateStatus():void {
+			//implement in sub-class
 		}
 		
 		protected function getStatusResultHandler(event:ResultEvent, token:Object = null):void {
@@ -268,7 +264,7 @@ package org.openforis.collect.presenter {
 				var step:ProcessStatus$Step = _state.step;
 				switch ( step ) {
 					case ProcessStatus$Step.INIT:
-						_view.currentState = SpeciesImportView.STATE_LOADING;
+						_view.currentState = AbstractReferenceDataImportView.STATE_LOADING;
 						startProgressTimer();
 						break;
 					case ProcessStatus$Step.RUN:
@@ -284,7 +280,7 @@ package org.openforis.collect.presenter {
 						break;
 					case ProcessStatus$Step.CANCEL:
 						stopProgressTimer();
-						AlertUtil.showError(MessageKeys.CANCELLED);
+						AlertUtil.showError(_messageKeys.CANCELLED);
 						resetView();
 						break;
 					default:
@@ -295,37 +291,37 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function updateViewForUploading():void {
-			_view.currentState = SpeciesImportView.STATE_UPLOADING;
-			_view.progressTitleText = Message.get(MessageKeys.UPLOADING_FILE);
+			_view.currentState = AbstractReferenceDataImportView.STATE_UPLOADING;
+			_view.progressTitleText = Message.get(_messageKeys.UPLOADING_FILE);
 			_view.progressLabelText = "";
 		}
 		
 		protected function updateViewForRunning():void {
-			_view.currentState = SpeciesImportView.STATE_IMPORTING;
-			_view.progressTitleText = Message.get(MessageKeys.IMPORTING);
-			updateProgressBar(MessageKeys.IMPORTING_PROGRESS_LABEL);
+			_view.currentState = AbstractReferenceDataImportView.STATE_IMPORTING;
+			_view.progressTitleText = Message.get(_messageKeys.IMPORTING);
+			updateProgressBar(_messageKeys.IMPORTING_PROGRESS_LABEL);
 		}
 		
 		protected function updateViewForError():void {
 			if ( CollectionUtil.isEmpty(_state.errors) ) {
-				_view.currentState = SpeciesImportView.STATE_DEFAULT;
-				AlertUtil.showError(MessageKeys.ERROR, [_state.errorMessage]);
+				_view.currentState = AbstractReferenceDataImportView.STATE_DEFAULT;
+				AlertUtil.showError(_messageKeys.ERROR, [_state.errorMessage]);
 			} else {
-				_view.currentState = SpeciesImportView.STATE_ERROR;
+				_view.currentState = AbstractReferenceDataImportView.STATE_ERROR;
 				_view.errorsDataGrid.dataProvider = _state.errors;
 			}
 		}
 		
 		protected function updateViewProcessComplete():void {
-			_view.currentState = SpeciesImportView.STATE_DEFAULT;
-			AlertUtil.showMessage(MessageKeys.COMPLETED, [_state.processed, _state.total]);
+			_view.currentState = AbstractReferenceDataImportView.STATE_DEFAULT;
+			AlertUtil.showMessage(_messageKeys.COMPLETED, [_state.processed, _state.total]);
 			loadSummaries();
 		}
 		
 		protected function updateProgressBar(progressLabelResource:String):void {
 			var progressText:String;
 			if ( _state.total <= 0 ) {
-				progressText = Message.get(MessageKeys.PROCESSING);
+				progressText = Message.get(_messageKeys.PROCESSING);
 				_view.progressBar.setProgress(0, 0);
 			} else {
 				progressText = Message.get(progressLabelResource, [_state.processed, _state.total]);
@@ -336,29 +332,9 @@ package org.openforis.collect.presenter {
 		
 		protected function resetView():void {
 			_state = null;
-			_view.currentState = SpeciesImportView.STATE_DEFAULT;
+			_view.currentState = AbstractReferenceDataImportView.STATE_DEFAULT;
 			stopProgressTimer();
 		}
 		
 	}
-}
-
-class MessageKeys {
-	public var SELECT_TAXONOMY:String = "speciesImport.selectTaxonomy";
-	public var INVALID_TAXONOMY_NAME:String = "speciesImport.invalidTaxonomyName";
-	public var DUPLICATE_TAXONOMY_NAME:String = "speciesImport.duplicateTaxonomyName";
-	public var CONFIRM_DELETE_TAXONOMY:String = "speciesImport.confirmDeleteSeletectedTaxonomy";
-	public static const IMPORTING_PROGRESS_LABEL:String = "speciesImport.importingProgressLabel";
-	public static const COMPLETED:String = "speciesImport.completed";
-	public static const IMPORTING:String = "speciesImport.importing";
-	public static const PROCESSING:String = "speciesImport.processing";
-	public static const CANCELLED:String = "speciesImport.cancelled";
-	public static const UPLOADING_FILE:String = "speciesImport.uploadingFile";
-	public static const ERROR:String = "speciesImport.error";
-	public static const UPLOADING_FILE_ERROR:String = "speciesImport.file.error";
-	public static const CONFIRM_IMPORT_TITLE:String = "speciesImport.confirmImport.title";
-	public static const CONFIRM_IMPORT:String = "speciesImport.confirmImport.message";
-	public var CONFIRM_CLOSE:String = "speciesImport.confirmClose.message";
-	public static const CONFIRM_CLOSE_TITLE:String = "speciesImport.confirmClose.title";
-	public static const SYNONYM:String = "speciesImport.summaryList.synonym";
 }

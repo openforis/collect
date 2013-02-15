@@ -189,8 +189,9 @@ public class SamplingDesignImportProcess extends AbstractProcess<Void, SamplingD
 		ParsingError error = new ParsingError(
 			ErrorType.DUPLICATE_VALUE, 
 			line.getLineNumber(), 
-			column.getName(), 
-			Long.toString(duplicateLine.getLineNumber()));
+			column.getName());
+		String duplicateLineNumber = Long.toString(duplicateLine.getLineNumber());
+		error.setMessageArgs(new String[] {duplicateLineNumber});
 		throw new ParsingException(error);
 	}
 

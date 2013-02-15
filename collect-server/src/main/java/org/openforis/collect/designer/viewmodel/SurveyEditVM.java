@@ -5,10 +5,12 @@ package org.openforis.collect.designer.viewmodel;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.compress.utils.CharsetNames;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.message.BasicNameValuePair;
@@ -31,6 +33,7 @@ import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.ContextParam;
 import org.zkoss.bind.annotation.ContextType;
+import org.zkoss.bind.annotation.DependsOn;
 import org.zkoss.bind.annotation.GlobalCommand;
 import org.zkoss.bind.annotation.Init;
 import org.zkoss.bind.annotation.NotifyChange;
@@ -242,7 +245,9 @@ public class SurveyEditVM extends SurveyBaseVM {
 		if ( checkCanSave(false) ) {
 			surveyManager.saveSurveyWork(survey);
 			MessageUtil.showInfo(SURVEY_SUCCESSFULLY_SAVED_MESSAGE_KEY);
+			BindUtils.postNotifyChange(null, null, survey, "id");
 			BindUtils.postNotifyChange(null, null, survey, "published");
+			notifyChange("surveyId","surveyPublished");
 			changed = false;
 		}
 	}
@@ -367,6 +372,27 @@ public class SurveyEditVM extends SurveyBaseVM {
 
 	public boolean isChanged() {
 		return changed;
+	}
+	
+	@DependsOn({"surveyId","surveyPublished"})
+	public String getSamplingDesignImportModuleUrl() {
+		Integer surveyId = getSurveyId();
+		String surveyIdStr;
+		if ( surveyId == null ) {
+			surveyIdStr = "";
+		} else {
+			surveyIdStr = surveyId.toString();
+		}
+		String localStr = "en_US";
+		List<BasicNameValuePair> queryParams = Arrays.asList(
+				new BasicNameValuePair("sampling_design_import", "true"),
+				new BasicNameValuePair("lang", localStr),
+				new BasicNameValuePair("work", "" + ! isSurveyPublished()),
+				new BasicNameValuePair("surveyId", surveyIdStr)
+		);				
+		String queryString = URLEncodedUtils.format(queryParams, CharsetNames.UTF_8);	
+		String result = "/collect.swf?" + queryString;
+		return result;
 	}
 
 }

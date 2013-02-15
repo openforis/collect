@@ -52,6 +52,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.util.CollectionUtil;
 	import org.openforis.collect.ui.component.SpeciesImportPopUp;
 	import mx.core.IFlexDisplayObject;
+	import org.openforis.collect.util.ObjectUtil;
 	
 	/**
 	 * 
@@ -86,31 +87,6 @@ package org.openforis.collect.presenter {
 			init();
 		}
 		
-		internal function init():void {
-			var params:Object = FlexGlobals.topLevelApplication.parameters;
-			var preview:Boolean = params.preview == "true";
-			var speciesImport:Boolean = params.species_import == "true";
-			var localeString:String = params.lang as String;
-			if ( StringUtil.isEmpty(localeString) ) {
-				AlertUtil.showError("global.error.invalidLocaleSpecified");
-			} else if ( preview ) {
-				Application.preview = true;
-				var surveyId:int = int(params.surveyId);
-				var rootEntityId:int = int(params.rootEntityId);
-				var versionId:Number = Number(params.versionId);
-				var token:Object = {surveyId: surveyId, rootEntityId: rootEntityId, versionId: versionId};
-				var previewResp:IResponder = new AsyncResponder(initSessionForPreviewResultHandler, faultHandler, token);
-				this._sessionClient.initSession(previewResp, localeString);
-			} else if ( speciesImport ) {
-				_view.currentState = collect.FULL_SCREEN_STATE;
-				var speciesImportSessionInitResponder:IResponder = new AsyncResponder(initSessionForSpeciesImportResultHandler, faultHandler);
-				this._sessionClient.initSession(speciesImportSessionInitResponder, localeString);
-			} else {
-				var responder:IResponder = new AsyncResponder(initSessionResultHandler, faultHandler);
-				this._sessionClient.initSession(responder, localeString);
-			}
-		}
-		
 		override internal function initEventListeners():void {
 			//mouse wheel handler to increment scroll step size
 			FlexGlobals.topLevelApplication.systemManager.addEventListener(MouseEvent.MOUSE_WHEEL, mouseWheelHandler, true);
@@ -127,6 +103,52 @@ package org.openforis.collect.presenter {
 					}
 				});
 			}
+		}
+		
+		internal function init():void {
+			var params:Object = FlexGlobals.topLevelApplication.parameters;
+			var preview:Boolean = params.preview == "true";
+			var speciesImport:Boolean = params.species_import == "true";
+			var samplingDesignImport:Boolean = params.sampling_design_import == "true";
+			var localeString:String = params.lang as String;
+			if ( StringUtil.isEmpty(localeString) ) {
+				AlertUtil.showError("global.error.invalidLocaleSpecified");
+			} else if ( preview ) {
+				initForPreview(params, localeString);
+			} else if ( speciesImport ) {
+				_view.currentState = collect.FULL_SCREEN_STATE;
+				var speciesImportSessionInitResponder:IResponder = new AsyncResponder(initSessionForSpeciesImportResultHandler, faultHandler);
+				this._sessionClient.initSession(speciesImportSessionInitResponder, localeString);
+			} else if ( samplingDesignImport ) {
+				initForSamplingDesignImport(params, localeString);
+			} else {
+				var responder:IResponder = new AsyncResponder(initSessionResultHandler, faultHandler);
+				this._sessionClient.initSession(responder, localeString);
+			}
+		}
+		
+		protected function initForPreview(params:Object, localeString:String):void {
+			Application.preview = true;
+			var surveyId:int = int(params.surveyId);
+			var rootEntityId:int = int(params.rootEntityId);
+			var versionId:Number = Number(params.versionId);
+			var token:Object = {surveyId: surveyId, rootEntityId: rootEntityId, versionId: versionId};
+			var previewResp:IResponder = new AsyncResponder(initSessionForPreviewResultHandler, faultHandler, token);
+			this._sessionClient.initSession(previewResp, localeString);
+		}
+		
+		protected function initForSamplingDesignImport(params:Object, localeString:String):void {
+			_view.currentState = collect.FULL_SCREEN_STATE;
+			var surveyId:int = int(params.surveyId);
+			if ( surveyId > 0 && params.work != "null" ) {
+				var work:Boolean = params.work == "true";
+				var token:Object = {surveyId: surveyId, work: work};
+				var samplingDesignImportSessionInitResponder:IResponder = new AsyncResponder(initSessionForSamplingDesignImportResultHandler, faultHandler, token);
+				this._sessionClient.initSession(samplingDesignImportSessionInitResponder, localeString);
+			} else {
+				AlertUtil.showError("samplingDesignImport.saveSurveyBefore");
+			}
+			
 		}
 		
 		protected function canHaveSurveySelection():Boolean {
@@ -176,6 +198,13 @@ package org.openforis.collect.presenter {
 		internal function initSessionForSpeciesImportResultHandler(event:ResultEvent, token:Object = null):void {
 			initSessionCommonResultHandler(event, token);
 			eventDispatcher.dispatchEvent(new UIEvent(UIEvent.SHOW_SPECIES_IMPORT));
+		}
+		
+		internal function initSessionForSamplingDesignImportResultHandler(event:ResultEvent, token:Object = null):void {
+			initSessionCommonResultHandler(event, token);
+			var uiEvent:UIEvent = new UIEvent(UIEvent.SHOW_SAMPLING_DESIGN_IMPORT);
+			uiEvent.obj = token;
+			eventDispatcher.dispatchEvent(uiEvent);
 		}
 		
 		protected function setActivePreviewSurveyResultHandler(event:ResultEvent, token:Object = null):void {

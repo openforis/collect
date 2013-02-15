@@ -20,7 +20,8 @@ package org.openforis.collect.util {
 
 		private static const DATA_IMPORT_UPLOAD_SERVLET_NAME:String = "uploadData.htm";
 		private static const SPECIES_IMPORT_UPLOAD_SERVLET_NAME:String = "uploadFile.htm";
-		
+		private static const FILE_UPLOAD_SERVLET_NAME:String = "uploadFile.htm";
+
 		private static const RECORD_FILE_UPLOAD_SERVLET_NAME:String = "uploadRecordFile.htm";
 		private static const RECORD_FILE_DOWNLOAD_SERVLET_NAME:String = "downloadRecordFile.htm";
 		private static const RECORD_FILE_DELETE_SERVLET_NAME:String = "deleteRecordFile.htm";
@@ -36,6 +37,7 @@ package org.openforis.collect.util {
 		private static var _RECORD_FILE_DOWNLOAD_URL:String; 
 		private static var _RECORD_FILE_DELETE_URL:String; 
 		private static var _SPECIES_IMPORT_UPLOAD_URL:String;
+		private static var _FILE_UPLOAD_URL:String;
 		private static var _DOWNLOAD_EXPORTED_DATA_URL:String;
 		private static var _DOWNLOAD_BACKUP_DATA_URL:String;
 		private static var _DESIGNER_URL:String;
@@ -81,6 +83,10 @@ package org.openforis.collect.util {
 			return _DOWNLOAD_BACKUP_DATA_URL;
 		}
 		
+		public static function get FILE_UPLOAD_URL():String {
+			return _FILE_UPLOAD_URL;
+		}
+		
 		public static function get DESIGNER_URL():String {
 			return _DESIGNER_URL;
 		}
@@ -112,6 +118,7 @@ package org.openforis.collect.util {
 			
 			_DATA_IMPORT_UPLOAD_URL = _URL + DATA_IMPORT_UPLOAD_SERVLET_NAME;
 			_SPECIES_IMPORT_UPLOAD_URL = _URL + SPECIES_IMPORT_UPLOAD_SERVLET_NAME;
+			_FILE_UPLOAD_URL = _URL + FILE_UPLOAD_SERVLET_NAME;
 			
 			_RECORD_FILE_UPLOAD_URL = _URL + RECORD_FILE_UPLOAD_SERVLET_NAME;
 			_RECORD_FILE_DOWNLOAD_URL = _URL + RECORD_FILE_DOWNLOAD_SERVLET_NAME;

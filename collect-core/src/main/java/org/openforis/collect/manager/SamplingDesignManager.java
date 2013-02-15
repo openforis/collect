@@ -40,7 +40,7 @@ public class SamplingDesignManager {
 	}
 	
 	@Transactional
-	public SamplingDesignSummaries load(boolean work, int surveyId, int offset, int maxRecords) {
+	protected SamplingDesignSummaries load(boolean work, int surveyId, int offset, int maxRecords) {
 		int totalCount = work ? samplingDesignDao.countPerSurveyWork(surveyId): samplingDesignDao.countPerSurvey(surveyId);
 		List<SamplingDesignItem> records;
 		if ( totalCount > 0 ) {

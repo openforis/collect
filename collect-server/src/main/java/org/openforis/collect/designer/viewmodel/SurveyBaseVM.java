@@ -185,6 +185,22 @@ public abstract class SurveyBaseVM extends BaseVM {
 		return survey;
 	}
 
+	public Integer getSurveyId() {
+		if ( survey == null ) {
+			return null;
+		} else {
+			return survey.getId();
+		}
+	}
+	
+	public boolean isSurveyPublished() {
+		if ( survey == null ) {
+			return false;
+		} else {
+			return survey.isPublished();
+		}
+	}
+
 	@GlobalCommand
 	public void currentLanguageChanged() {
 		initCurrentLanguageCode();

@@ -1,190 +1,70 @@
 <?xml version="1.0" encoding="utf-8"?>
-<view:ReferenceDataImportView xmlns:fx="http://ns.adobe.com/mxml/2009" 
+<view:AbstractReferenceDataImportView xmlns:fx="http://ns.adobe.com/mxml/2009" 
 		 xmlns:s="library://ns.adobe.com/flex/spark" 
 		 xmlns:mx="library://ns.adobe.com/flex/mx" 
 		 xmlns:component="org.openforis.collect.ui.component.*"
 		 xmlns:datagrid="org.openforis.collect.ui.component.datagrid.*"
 		 xmlns:view="org.openforis.collect.ui.view.*"
-		 creationComplete="creationCompleteHandler(event)">
+		 creationComplete="creationCompleteHandler(event)"
+		 skinClass="org.openforis.collect.ui.skin.SamplingDesignImportViewSkin"
+		 >
 
 	<fx:Script>
 		<![CDATA[
 			import mx.events.FlexEvent;
 			
-			import org.openforis.collect.i18n.Message;
-			import org.openforis.collect.manager.referenceDataImport.ParsingError$ErrorType;
-			import org.openforis.collect.manager.referenceDataImport.proxy.ParsingErrorProxy;
+			import org.openforis.collect.model.proxy.SamplingDesignItemProxy;
 			import org.openforis.collect.presenter.SamplingDesignImportPresenter;
 			
-			public static const STATE_DEFAULT:String = "default";
-			public static const STATE_LOADING:String = "loading";
-			public static const STATE_SELECT_FILE:String = "selectFile";
-			public static const STATE_UPLOADING:String = "uploading";
-			public static const STATE_IMPORTING:String = "importing";
-			public static const STATE_ERROR:String = "error";
-
+			import spark.components.gridClasses.GridColumn;
+			
 			private var _presenter:SamplingDesignImportPresenter;
-			private var _showCloseButton:Boolean;
+			private var _surveyId:int;
+			private var _work:Boolean;
 			
 			protected function creationCompleteHandler(event:FlexEvent):void {
 				_presenter = new SamplingDesignImportPresenter(this);
 			}
 			
-			protected function errorTypeLabelFunction(item:ParsingErrorProxy, gridColumn:GridColumn):String {
-				var type:ParsingError$ErrorType = item.errorType;
-				if ( type == null ) {
-					return "";
+			public function levelLabelFunction(item:SamplingDesignItemProxy, column:GridColumn):String {
+				var dataField:String = column.dataField;
+				var parts:Array = dataField.split("_");
+				var levelPosString:String = parts[1];
+				var levelPosition:int = int(levelPosString);
+				if ( levelPosition <= item.levelCodes.length ) {
+					var result:Object = item.levelCodes.getItemAt(levelPosition - 1);
+					return String(result);
 				} else {
-					var messageKey:String = "referenceDataImport.parsingError.type." + type.name.toLowerCase();
-					return Message.get(messageKey);
-				}
-			}
-			
-			protected function errorMessageLabelFunction(item:ParsingErrorProxy, gridColumn:GridColumn):String {
-				switch (item.errorType) {
-					case ParsingError$ErrorType.WRONG_COLUMN_NAME:
-						var message:String = Message.get("referenceDataImport.parsingError.wrong_column_name.message", [message]);
-						return message;
-					default:
-						return Message.get(item.message);
+					return "";
 				}
 			}
 
-			[Bindable]
-			public function get showCloseButton():Boolean {
-				return _showCloseButton;
+			public function get surveyId():int {
+				return _surveyId;
 			}
 
-			public function set showCloseButton(value:Boolean):void {
-				_showCloseButton = value;
+			public function set surveyId(value:int):void {
+				_surveyId = value;
+			}
+
+			public function get work():Boolean {
+				return _work;
+			}
+
+			public function set work(value:Boolean):void {
+				_work = value;
 			}
 
 		]]>
 	</fx:Script>
 	
-	<s:states>
-		<s:State name="default" />
-		<s:State name="loading" />
-		<s:State name="selectFile" />
-		<s:State name="uploading" />
-		<s:State name="importing" />
-		<s:State name="error" />
-	</s:states>
+	<view:states>
+		<s:State name="default" enterState="invalidateSkinState()" />
+		<s:State name="loading" enterState="invalidateSkinState()" />
+		<s:State name="selectFile" enterState="invalidateSkinState()" />
+		<s:State name="uploading" enterState="invalidateSkinState()" />
+		<s:State name="importing" enterState="invalidateSkinState()" />
+		<s:State name="error" enterState="invalidateSkinState()" />
+	</view:states>
 	
-	<s:VGroup includeIn="default"
-			  itemCreationPolicy="immediate"
-			  horizontalAlign="center"
-			  height="100%" width="100%"
-			  gap="30"
-			  >
-
-		<s:VGroup height="100%" 
-				  maxHeight="500"
-				  width="100%"
-				  visible="{checklistsDropDown.selectedItem != null}"
-				  horizontalAlign="center">
-			<s:DataGrid id="summaryDataGrid" 
-						height="100%"
-						width="100%"
-						rowHeight="22">
-				<s:columns>
-					<s:ArrayList>
-						<s:GridColumn headerText="{Message.get('samplingDesignImport.summaryList.level1Code')}" 
-									  dataField="level1" labelFunction="levelLabelFunction" width="100" />
-						<s:GridColumn headerText="{Message.get('samplingDesignImport.summaryList.level1Code')}" 
-									  dataField="level2" labelFunction="levelLabelFunction" width="100" />
-						<s:GridColumn headerText="{Message.get('samplingDesignImport.summaryList.level3Code')}" 
-									  dataField="level3" labelFunction="levelLabelFunction" width="100" />
-						<s:GridColumn headerText="{Message.get('samplingDesignImport.summaryList.location')}" 
-									  dataField="location" width="250" />
-					</s:ArrayList>
-				</s:columns>
-			</s:DataGrid>
-			
-			<datagrid:PaginationBar id="paginationBar" 
-									height="16"
-									horizontalCenter="0"
-									/>
-		</s:VGroup>
-		
-		<s:HGroup gap="50">
-			<s:Button id="importButton" 
-					  label="{Message.get('refernceDataImport.import')}"
-					  useHandCursor="true"
-					  buttonMode="true"
-					  />
-			
-			<!--<s:Button id="exportButton" 
-					  label="{Message.get('speciesImport.export')}"
-					  useHandCursor="true"
-					  buttonMode="true"
-					  />-->
-			
-			<s:Button id="closeButton"
-					  label="{Message.get('global.close')}"
-					  includeInLayout="{showCloseButton}"
-					  visible="{showCloseButton}"
-					  />
-		</s:HGroup>
-	</s:VGroup>
-	
-	<s:VGroup width="100%" height="100%"
-			  includeIn="uploading, importing"
-			  itemCreationPolicy="immediate"
-			  horizontalAlign="center"
-			  verticalAlign="middle"
-			  gap="20"
-			  >
-		<s:Label id="progressTitle"
-				 styleName="formLabel" />
-		
-		<mx:ProgressBar id="progressBar"
-						horizontalCenter="0"
-						verticalCenter="0"
-						mode="manual"
-						label="%3%"
-						labelPlacement="center"
-						width="80%"
-						/>
-		
-		<s:Label id="progressLabel"
-				 styleName="formLabel" />
-		
-		<s:Button id="cancelImportButton"
-				  label="{Message.get('global.cancel')}"
-				  useHandCursor="true"
-				  buttonMode="true"
-				  />
-		
-	</s:VGroup>
-	
-	<s:VGroup width="100%" height="100%"
-			 includeIn="error"
-			 itemCreationPolicy="immediate"
-			 horizontalAlign="center">
-		
-		<s:Label text="{Message.get('refernceDataImport.error.title')}" />
-		
-		<s:DataGrid id="errorsDataGrid" width="100%" height="100%">
-			<s:columns>
-				<s:ArrayList>
-					<s:GridColumn headerText="{Message.get('refernceDataImport.parsingError.row')}"
-								  dataField="row" width="50" />
-					<s:GridColumn headerText="{Message.get('refernceDataImport.parsingError.column')}"
-								  dataField="column" width="100" />
-					<s:GridColumn headerText="{Message.get('refernceDataImport.parsingError.type')}"
-								  labelFunction="{errorTypeLabelFunction}" width="100" />
-					<s:GridColumn headerText="{Message.get('refernceDataImport.parsingError.message')}"
-								  labelFunction="{errorMessageLabelFunction}" width="350" />
-				</s:ArrayList>
-			</s:columns>
-		</s:DataGrid>
-		
-		<s:Button id="errorsOkButton"
-				  label="{Message.get('global.ok')}"
-				  buttonMode="true"
-				  useHandCursor="true" />
-		
-	</s:VGroup>
-	
-</view:ReferenceDataImportView>
+</view:AbstractReferenceDataImportView>

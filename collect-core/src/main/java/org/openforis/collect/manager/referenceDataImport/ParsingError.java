@@ -1,5 +1,7 @@
 package org.openforis.collect.manager.referenceDataImport;
 
+import java.util.Arrays;
+
 /**
  * 
  * @author S. Ricci
@@ -13,6 +15,7 @@ public class ParsingError {
 
 	private long row;
 	private String column;
+	private String[] messageArgs;
 	private String message;
 	private ErrorType errorType;
 	
@@ -55,6 +58,14 @@ public class ParsingError {
 	public String getMessage() {
 		return message;
 	}
+	
+	public String[] getMessageArgs() {
+		return messageArgs;
+	}
+
+	public void setMessageArgs(String[] messageArgs) {
+		this.messageArgs = messageArgs;
+	}
 
 	@Override
 	public int hashCode() {
@@ -64,6 +75,7 @@ public class ParsingError {
 		result = prime * result
 				+ ((errorType == null) ? 0 : errorType.hashCode());
 		result = prime * result + ((message == null) ? 0 : message.hashCode());
+		result = prime * result + Arrays.hashCode(messageArgs);
 		result = prime * result + (int) (row ^ (row >>> 32));
 		return result;
 	}
@@ -88,6 +100,8 @@ public class ParsingError {
 			if (other.message != null)
 				return false;
 		} else if (!message.equals(other.message))
+			return false;
+		if (!Arrays.equals(messageArgs, other.messageArgs))
 			return false;
 		if (row != other.row)
 			return false;

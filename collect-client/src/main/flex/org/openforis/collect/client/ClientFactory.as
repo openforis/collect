@@ -13,6 +13,8 @@ package org.openforis.collect.client {
 		private static var _dataImportClient:DataImportClient;
 		private static var _logoClient:LogoClient;
 		private static var _modelClient:ModelClient;
+		private static var _samplingDesignClient:SamplingDesignClient;
+		private static var _samplingDesignImportClient:SamplingDesignImportClient;
 		private static var _sessionClient:SessionClient;
 		private static var _speciesClient:SpeciesClient;
 		private static var _speciesImportClient:SpeciesImportClient;
@@ -54,6 +56,20 @@ package org.openforis.collect.client {
 				_logoClient = new LogoClient();
 			}
 			return _logoClient;
+		}
+		
+		public static function get samplingDesignImportClient():SamplingDesignImportClient {
+			if(_samplingDesignImportClient == null){
+				_samplingDesignImportClient = new SamplingDesignImportClient();
+			}
+			return _samplingDesignImportClient;
+		}
+		
+		public static function get samplingDesignClient():SamplingDesignClient {
+			if(_samplingDesignClient == null){
+				_samplingDesignClient = new SamplingDesignClient();
+			}
+			return _samplingDesignClient;
 		}
 		
 		public static function get sessionClient():SessionClient {

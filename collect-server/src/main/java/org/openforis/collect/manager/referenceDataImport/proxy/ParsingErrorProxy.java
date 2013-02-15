@@ -52,5 +52,10 @@ public class ParsingErrorProxy implements Proxy {
 	public String getMessage() {
 		return error.getMessage();
 	}
+
+	@ExternalizedProperty
+	public String[] getMessageArgs() {
+		return error.getMessageArgs();
+	}
 	
 }

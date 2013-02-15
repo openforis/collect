@@ -48,6 +48,7 @@ package org.openforis.collect.presenter {
 			eventDispatcher.addEventListener(UIEvent.SHOW_HOME_PAGE, backToHomeHandler);
 			eventDispatcher.addEventListener(UIEvent.BACK_TO_LIST, backToListHandler);
 			eventDispatcher.addEventListener(UIEvent.SHOW_SPECIES_IMPORT, showSpeciesImportModuleHandler);
+			eventDispatcher.addEventListener(UIEvent.SHOW_SAMPLING_DESIGN_IMPORT, showSamplingDesignImportHandler);
 			eventDispatcher.addEventListener(UIEvent.RECORD_SELECTED, recordSelectedHandler);
 			eventDispatcher.addEventListener(UIEvent.RECORD_CREATED, recordCreatedHandler);
 		}
@@ -55,7 +56,15 @@ package org.openforis.collect.presenter {
 		protected function showSpeciesImportModuleHandler(event:Event):void {
 			_view.currentState = MasterView.SPECIES_IMPORT_STATE;
 		}
-		
+
+		protected function showSamplingDesignImportHandler(event:UIEvent):void {
+			_view.currentState = MasterView.SAMPLING_DESIGN_IMPORT_STATE;
+			var surveyId:int = event.obj.surveyId;
+			var work:Boolean = event.obj.work;
+			_view.samplingDesignImportView.surveyId = surveyId;
+			_view.samplingDesignImportView.work = work;
+		}
+
 		/**
 		 * RecordSummary selected from list page
 		 * */

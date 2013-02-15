@@ -2,17 +2,11 @@ package org.openforis.collect.remoting.service;
 
 import java.io.File;
 
-import javax.servlet.ServletContext;
-
 import org.openforis.collect.manager.SamplingDesignManager;
-import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.manager.samplingDesignImport.SamplingDesignImportProcess;
 import org.openforis.collect.manager.samplingDesignImport.SamplingDesignImportStatus;
 import org.openforis.collect.remoting.service.dataImport.DataImportExeption;
 import org.openforis.collect.remoting.service.samplingDesignImport.proxy.SamplingDesignImportStatusProxy;
-import org.openforis.collect.util.ExecutorServiceUtil;
-import org.openforis.collect.web.controller.FileUploadController;
-import org.openforis.collect.web.session.SessionState;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
 
@@ -21,39 +15,23 @@ import org.springframework.security.access.annotation.Secured;
  * @author S. Ricci
  *
  */
-public class SamplingDesignImportService {
+public class SamplingDesignImportService extends ReferenceDataImportService<SamplingDesignImportStatusProxy, SamplingDesignImportProcess> {
 	
 	private static final String INTERNAL_ERROR_IMPORTING_FILE_MESSAGE_KEY = "samplingDesignImport.error.internalErrorImportingFile";
 
-	private static final String FILE_NAME = "sampling_design.csv";
+	private static final String IMPORT_FILE_NAME = "sampling_design.csv";
 	
-	@Autowired
-	private SessionManager sessionManager;
 	@Autowired
 	private SamplingDesignManager samplingDesignManager;
-	@Autowired 
-	private ServletContext servletContext;
 	
-	private File tempDirectory;
-	private SamplingDesignImportProcess importProcess;
-
-	protected void init() {
-		String tempRealPath = servletContext.getRealPath(FileUploadController.TEMP_PATH);
-		tempDirectory = new File(tempRealPath);
-		if ( tempDirectory.exists() ) {
-			tempDirectory.delete();
-		}
-		if ( ! tempDirectory.mkdirs() && ! tempDirectory.canRead() ) {
-			throw new IllegalStateException("Cannot access import directory: " + tempRealPath);
-		}
+	public SamplingDesignImportService() {
+		super(IMPORT_FILE_NAME);
 	}
 	
 	@Secured("ROLE_ADMIN")
 	public SamplingDesignImportStatusProxy start(int surveyId, boolean work, boolean overwriteAll) throws DataImportExeption {
 		if ( importProcess == null || ! importProcess.getStatus().isRunning() ) {
-			SessionState sessionState = sessionManager.getSessionState();
-			File userImportFolder = FileUploadController.getSessionTempDirectory(tempDirectory, sessionState.getSessionId());
-			File importFile = new File(userImportFolder, FILE_NAME);
+			File importFile = getImportFile();
 			importProcess = new SamplingDesignImportProcess(samplingDesignManager, surveyId, work, importFile, overwriteAll);
 			importProcess.init();
 			if ( importFile.exists() && importFile.canRead() ) {
@@ -67,10 +45,6 @@ public class SamplingDesignImportService {
 		return getStatus();
 	}
 
-	protected void startProcessThread() {
-		ExecutorServiceUtil.executeInCachedPool(importProcess);
-	}
-	
 	@Secured("ROLE_ADMIN")
 	public SamplingDesignImportStatusProxy getStatus() {
 		if ( importProcess != null ) {
@@ -81,11 +55,5 @@ public class SamplingDesignImportService {
 		}
 	}
 	
-	@Secured("ROLE_ADMIN")
-	public void cancel() {
-		if ( importProcess != null ) {
-			importProcess.cancel();
-		}
-	}
 	
 }

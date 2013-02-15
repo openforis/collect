@@ -82,7 +82,9 @@
 	<bean id="logoService" 	class="org.openforis.collect.remoting.service.LogoService" autowire="byName" />
 	<bean id="modelService"		class="org.openforis.collect.remoting.service.ModelService" autowire="byName" />
 	<bean id="recordIndexService"     class="org.openforis.collect.remoting.service.recordIndex.RecordIndexService" autowire="byName" scope="session" />
-	<bean id="sessionService" 	class="org.openforis.collect.remoting.service.SessionService" autowire="byName" />
+	<bean id="samplingDesignService"  class="org.openforis.collect.remoting.service.SamplingDesignService" autowire="byName" />
+    <bean id="samplingDesignImportService"   class="org.openforis.collect.remoting.service.SamplingDesignImportService" autowire="byName" init-method="init" />
+    <bean id="sessionService" 	class="org.openforis.collect.remoting.service.SessionService" autowire="byName" />
 	<bean id="speciesService" 	class="org.openforis.collect.remoting.service.SpeciesService" autowire="byName" />
     <bean id="speciesImportService"   class="org.openforis.collect.remoting.service.SpeciesImportService" autowire="byName" init-method="init" />
 	<bean id="userService" 		class="org.openforis.collect.remoting.service.UserService" autowire="byName" />
@@ -108,7 +110,8 @@
 	</bean>
 	<bean id="persistedRecordIndexManager" 	class="org.openforis.collect.manager.RecordIndexManager" init-method="init" lazy-init="false" autowire="byName" />
 	<bean id="volatileRecordIndexManager" 	class="org.openforis.collect.remoting.service.recordIndex.VolatileRecordIndexManager" init-method="init" scope="session" lazy-init="false" autowire="byName" />
-	<bean id="sessionManager"		class="org.openforis.collect.manager.SessionManager" scope="session" />
+    <bean id="samplingDesignManager"        class="org.openforis.collect.manager.SamplingDesignManager" />
+  	<bean id="sessionManager"		class="org.openforis.collect.manager.SessionManager" scope="session" />
 	<bean id="speciesManager"		class="org.openforis.collect.manager.SpeciesManager" />
 	<bean id="surveyManager"		class="org.openforis.collect.manager.SurveyManager" init-method="init" />
 	<bean id="userManager"			class="org.openforis.collect.manager.UserManager" />
@@ -150,7 +153,10 @@
 	<bean id="recordDao" class="org.openforis.collect.persistence.RecordDao">
     	<property name="dataSource" ref="dataSource"/>
 	</bean>
-	<bean id="surveyDao" class="org.openforis.collect.persistence.SurveyDao" init-method="init">
+    <bean id="samplingDesignDao" class="org.openforis.collect.persistence.SamplingDesignDao">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+    	<bean id="surveyDao" class="org.openforis.collect.persistence.SurveyDao" init-method="init">
     	<property name="dataSource" ref="dataSource"/>
 	</bean>
 	<bean id="surveyWorkDao" class="org.openforis.collect.persistence.SurveyWorkDao" init-method="init">

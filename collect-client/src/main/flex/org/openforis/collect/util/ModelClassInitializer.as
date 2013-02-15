@@ -52,6 +52,8 @@ package org.openforis.collect.util {
 	import org.openforis.collect.model.proxy.NodeProxy;
 	import org.openforis.collect.model.proxy.RealRangeProxy;
 	import org.openforis.collect.model.proxy.RecordProxy;
+	import org.openforis.collect.model.proxy.SamplingDesignItemProxy;
+	import org.openforis.collect.model.proxy.SamplingDesignSummariesProxy;
 	import org.openforis.collect.model.proxy.TaxonOccurrenceProxy;
 	import org.openforis.collect.model.proxy.TaxonProxy;
 	import org.openforis.collect.model.proxy.TaxonVernacularNameProxy;
@@ -66,6 +68,7 @@ package org.openforis.collect.util {
 	import org.openforis.collect.remoting.service.dataImport.DataImportSummaryProxy;
 	import org.openforis.collect.remoting.service.dataImport.FileUnmarshallingErrorProxy;
 	import org.openforis.collect.remoting.service.dataImport.NodeUnmarshallingErrorProxy;
+	import org.openforis.collect.remoting.service.samplingDesignImport.proxy.SamplingDesignImportStatusProxy;
 	import org.openforis.collect.remoting.service.speciesImport.proxy.TaxonParsingErrorProxy;
 	import org.openforis.idm.metamodel.validation.ValidationResultFlag;
 
@@ -122,6 +125,9 @@ package org.openforis.collect.util {
 				RangeAttributeDefinitionProxy,
 				RealRangeProxy,
 				RecordProxy,
+				SamplingDesignImportStatusProxy,
+				SamplingDesignItemProxy,
+				SamplingDesignSummariesProxy,
 				SchemaProxy,
 				SpatialReferenceSystemProxy,
 				SurveyProxy,
