@@ -14,8 +14,9 @@ import org.apache.commons.logging.LogFactory;
 import org.openforis.collect.manager.SamplingDesignManager;
 import org.openforis.collect.manager.process.AbstractProcess;
 import org.openforis.collect.manager.referenceDataImport.ParsingError;
-import org.openforis.collect.manager.referenceDataImport.ParsingException;
 import org.openforis.collect.manager.referenceDataImport.ParsingError.ErrorType;
+import org.openforis.collect.manager.referenceDataImport.ParsingException;
+import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SamplingDesignItem;
 
 /**
@@ -25,8 +26,11 @@ import org.openforis.collect.model.SamplingDesignItem;
  */
 public class SamplingDesignImportProcess extends AbstractProcess<Void, SamplingDesignImportStatus> {
 
+	private static final String SURVEY_NOT_FOUND_ERROR_MESSAGE_KEY = "samplingDesignImport.error.surveyNotFound";
+	private static final String IMPORTING_FILE_ERROR_MESSAGE_KEY = "samplingDesignImport.error.internalErrorImportingFile";
+	
 	private static Log LOG = LogFactory.getLog(SamplingDesignImportProcess.class);
-
+	
 	private static final String CSV = "csv";
 
 	private SamplingDesignManager samplingDesignManager;
@@ -37,14 +41,14 @@ public class SamplingDesignImportProcess extends AbstractProcess<Void, SamplingD
 	private String errorMessage;
 	private List<SamplingDesignLine> lines;
 
-	private int surveyId;
+	private CollectSurvey survey;
 	private boolean work;
 	
-	public SamplingDesignImportProcess(SamplingDesignManager samplingDesignManager, int surveyId, boolean work, File file, boolean overwriteAll) {
+	public SamplingDesignImportProcess(SamplingDesignManager samplingDesignManager, CollectSurvey survey, boolean work, File file, boolean overwriteAll) {
 		super();
-		this.surveyId = surveyId;
-		this.work = work;
 		this.samplingDesignManager = samplingDesignManager;
+		this.survey = survey;
+		this.work = work;
 		this.file = file;
 		this.overwriteAll = overwriteAll;
 	}
@@ -53,6 +57,17 @@ public class SamplingDesignImportProcess extends AbstractProcess<Void, SamplingD
 	public void init() {
 		super.init();
 		lines = new ArrayList<SamplingDesignLine>();
+		validateParameters();
+	}
+
+	protected void validateParameters() {
+		if ( ! file.exists() && ! file.canRead() ) {
+			status.error();
+			status.setErrorMessage(IMPORTING_FILE_ERROR_MESSAGE_KEY);
+		} else if ( survey == null ) {
+			status.error();
+			status.setErrorMessage(SURVEY_NOT_FOUND_ERROR_MESSAGE_KEY);
+		}
 	}
 	
 	@Override
@@ -149,6 +164,12 @@ public class SamplingDesignImportProcess extends AbstractProcess<Void, SamplingD
 	}
 	
 	protected boolean processLine(SamplingDesignLine line) throws ParsingException {
+		SamplingDesignLineValidator validator = SamplingDesignLineValidator.createInstance(survey);
+		validator.validate(line);
+		List<ParsingError> errors = validator.getErrors();
+		for (ParsingError error : errors) {
+			status.addParsingError(error);
+		}
 		checkDuplicateLine(line);
 		return true;
 	}
@@ -157,10 +178,10 @@ public class SamplingDesignImportProcess extends AbstractProcess<Void, SamplingD
 		for (SamplingDesignLine currentLine : lines) {
 			if ( currentLine.getLineNumber() != line.getLineNumber() ) {
 				if ( isDuplicateLocation(line, currentLine) ) {
-					throwDuplicateLineException(line, currentLine, SamplingDesignFileColumn.LOCATION);
+					throwDuplicateLineException(line, currentLine, SamplingDesignFileColumn.LOCATION_COLUMNS);
 				} else if ( line.getLevelCodes().equals(currentLine.getLevelCodes()) ) {
 					SamplingDesignFileColumn lastLevelCol = SamplingDesignCSVReader.LEVEL_COLUMNS[line.getLevelCodes().size() - 1];
-					throwDuplicateLineException(line, currentLine, lastLevelCol);
+					throwDuplicateLineException(line, currentLine, new SamplingDesignFileColumn[]{lastLevelCol});
 				}
 			}
 		}
@@ -185,11 +206,16 @@ public class SamplingDesignImportProcess extends AbstractProcess<Void, SamplingD
 	}
 
 	protected void throwDuplicateLineException(SamplingDesignLine line, SamplingDesignLine duplicateLine, 
-			SamplingDesignFileColumn column) throws ParsingException {
+			SamplingDesignFileColumn[] columns) throws ParsingException {
+		String[] colNames = new String[columns.length];
+		for (int i = 0; i < columns.length; i++) {
+			SamplingDesignFileColumn column = columns[i];
+			colNames[i] = column.getName();
+		}
 		ParsingError error = new ParsingError(
 			ErrorType.DUPLICATE_VALUE, 
 			line.getLineNumber(), 
-			column.getName());
+			colNames);
 		String duplicateLineNumber = Long.toString(duplicateLine.getLineNumber());
 		error.setMessageArgs(new String[] {duplicateLineNumber});
 		throw new ParsingException(error);
@@ -197,6 +223,7 @@ public class SamplingDesignImportProcess extends AbstractProcess<Void, SamplingD
 
 	protected void persistSamplingDesign() {
 		if ( overwriteAll ) {
+			Integer surveyId = survey.getId();
 			if ( work ) {
 				samplingDesignManager.deleteBySurveyWork(surveyId);
 			} else {
@@ -210,6 +237,7 @@ public class SamplingDesignImportProcess extends AbstractProcess<Void, SamplingD
 
 	protected void persistLine(SamplingDesignLine line) {
 		SamplingDesignItem item = new SamplingDesignItem();
+		Integer surveyId = survey.getId();
 		if ( work ) {
 			item.setSurveyWorkId(surveyId);
 		} else {

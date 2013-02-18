@@ -46,8 +46,12 @@
 									  dataField="level_2" labelFunction="{hostComponent.levelLabelFunction}" width="100" />
 						<s:GridColumn headerText="{Message.get('samplingDesignImport.summaryList.level3Code')}" 
 									  dataField="level_3" labelFunction="{hostComponent.levelLabelFunction}" width="100" />
-						<s:GridColumn headerText="{Message.get('samplingDesignImport.summaryList.location')}" 
-									  dataField="location" width="250" />
+						<s:GridColumn headerText="{Message.get('samplingDesignImport.summaryList.srsid')}" 
+									  dataField="srid" width="250" />
+						<s:GridColumn headerText="{Message.get('samplingDesignImport.summaryList.latitude')}" 
+									  dataField="latitude" width="250" />
+						<s:GridColumn headerText="{Message.get('samplingDesignImport.summaryList.longitude')}" 
+									  dataField="longitude" width="250" />
 					</s:ArrayList>
 				</s:columns>
 			</s:DataGrid>
@@ -60,7 +64,7 @@
 		
 		<s:HGroup gap="50">
 			<s:Button id="importButton" 
-					  label="{Message.get('refernceDataImport.import')}"
+					  label="{Message.get('referenceDataImport.import')}"
 					  useHandCursor="true"
 					  buttonMode="true"
 					  />
@@ -114,18 +118,18 @@
 			  itemCreationPolicy="immediate"
 			  horizontalAlign="center">
 		
-		<s:Label text="{Message.get('refernceDataImport.error.title')}" />
+		<s:Label text="{Message.get('referenceDataImport.error.title')}" />
 		
 		<s:DataGrid id="errorsDataGrid" width="100%" height="100%">
 			<s:columns>
 				<s:ArrayList>
-					<s:GridColumn headerText="{Message.get('refernceDataImport.parsingError.row')}"
+					<s:GridColumn headerText="{Message.get('referenceDataImport.parsingError.row')}"
 								  dataField="row" width="50" />
-					<s:GridColumn headerText="{Message.get('refernceDataImport.parsingError.column')}"
-								  dataField="column" width="100" />
-					<s:GridColumn headerText="{Message.get('refernceDataImport.parsingError.type')}"
+					<s:GridColumn headerText="{Message.get('referenceDataImport.parsingError.columns')}"
+								  labelFunction="{hostComponent.errorColumnsLabelFunction}" width="100" />
+					<s:GridColumn headerText="{Message.get('referenceDataImport.parsingError.type')}"
 								  labelFunction="{hostComponent.errorTypeLabelFunction}" width="100" />
-					<s:GridColumn headerText="{Message.get('refernceDataImport.parsingError.message')}"
+					<s:GridColumn headerText="{Message.get('referenceDataImport.parsingError.message')}"
 								  labelFunction="{hostComponent.errorMessageLabelFunction}" width="350" />
 				</s:ArrayList>
 			</s:columns>

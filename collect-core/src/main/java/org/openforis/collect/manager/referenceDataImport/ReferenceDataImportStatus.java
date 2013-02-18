@@ -36,6 +36,15 @@ public abstract class ReferenceDataImportStatus<E extends ParsingError> extends 
 		}
 	}
 	
+	public void addParsingError(E error) {
+		long row = error.getRow();
+		if ( row > 0 ) {
+			addParsingError(row, error);
+		} else {
+			throw new IllegalArgumentException("Error row must be greater than zero");
+		}
+	}
+	
 	public void addProcessedRow(long rowNumber) {
 		if ( !processedRows.contains(rowNumber)) {
 			incrementProcessed();

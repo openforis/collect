@@ -90,6 +90,12 @@ public class SurveyManager {
 	}
 	
 	@Transactional
+	public CollectSurvey getById(int id) {
+		CollectSurvey survey = surveysById.get(id);
+		return survey;
+	}
+	
+	@Transactional
 	public CollectSurvey getByUri(String uri) {
 		CollectSurvey survey = surveysByUri.get(uri);
 		return survey;

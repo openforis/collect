@@ -44,8 +44,8 @@ public class ParsingErrorProxy implements Proxy {
 	}
 
 	@ExternalizedProperty
-	public String getColumn() {
-		return error.getColumn();
+	public String[] getColumns() {
+		return error.getColumns();
 	}
 
 	@ExternalizedProperty

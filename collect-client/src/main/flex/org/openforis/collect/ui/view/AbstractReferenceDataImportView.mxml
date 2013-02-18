@@ -11,6 +11,9 @@
 			import org.openforis.collect.manager.referenceDataImport.ParsingError$ErrorType;
 			import org.openforis.collect.manager.referenceDataImport.proxy.ParsingErrorProxy;
 			import org.openforis.collect.ui.component.datagrid.PaginationBar;
+			import org.openforis.collect.util.ArrayUtil;
+			import org.openforis.collect.util.CollectionUtil;
+			import org.openforis.collect.util.StringUtil;
 			
 			import spark.components.Button;
 			import spark.components.DataGrid;
@@ -59,13 +62,27 @@
 				}
 			}
 			
+			public function errorColumnsLabelFunction(item:ParsingErrorProxy, gridColumn:GridColumn):String {
+				return StringUtil.concat(", ", item.columns);
+			}
+			
 			public function errorMessageLabelFunction(item:ParsingErrorProxy, gridColumn:GridColumn):String {
-				switch (item.errorType) {
-					case ParsingError$ErrorType.WRONG_COLUMN_NAME:
-						var message:String = Message.get("referenceDataImport.parsingError.wrong_column_name.message", [message]);
-						return message;
-					default:
-						return Message.get(item.message);
+				if ( ArrayUtil.isEmpty(item.messageArgs) ) {
+					return Message.get(item.message);
+				} else {
+					var messageKey:String;
+					switch (item.errorType) {
+						case ParsingError$ErrorType.WRONG_COLUMN_NAME:
+							messageKey = "referenceDataImport.parsingError.wrong_column_name.message";
+							break;
+						case ParsingError$ErrorType.DUPLICATE_VALUE:
+							messageKey = "referenceDataImport.parsingError.type.duplicate_value.message";
+							break;
+						default:
+							messageKey = item.message;
+					}
+					var message:String = Message.get(messageKey, item.messageArgs);
+					return message;
 				}
 			}
 			

@@ -3,8 +3,10 @@ package org.openforis.collect.remoting.service;
 import java.io.File;
 
 import org.openforis.collect.manager.SamplingDesignManager;
+import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.samplingDesignImport.SamplingDesignImportProcess;
 import org.openforis.collect.manager.samplingDesignImport.SamplingDesignImportStatus;
+import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.remoting.service.dataImport.DataImportExeption;
 import org.openforis.collect.remoting.service.samplingDesignImport.proxy.SamplingDesignImportStatusProxy;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,12 +19,12 @@ import org.springframework.security.access.annotation.Secured;
  */
 public class SamplingDesignImportService extends ReferenceDataImportService<SamplingDesignImportStatusProxy, SamplingDesignImportProcess> {
 	
-	private static final String INTERNAL_ERROR_IMPORTING_FILE_MESSAGE_KEY = "samplingDesignImport.error.internalErrorImportingFile";
-
 	private static final String IMPORT_FILE_NAME = "sampling_design.csv";
 	
 	@Autowired
 	private SamplingDesignManager samplingDesignManager;
+	@Autowired
+	private SurveyManager surveyManager;
 	
 	public SamplingDesignImportService() {
 		super(IMPORT_FILE_NAME);
@@ -32,15 +34,10 @@ public class SamplingDesignImportService extends ReferenceDataImportService<Samp
 	public SamplingDesignImportStatusProxy start(int surveyId, boolean work, boolean overwriteAll) throws DataImportExeption {
 		if ( importProcess == null || ! importProcess.getStatus().isRunning() ) {
 			File importFile = getImportFile();
-			importProcess = new SamplingDesignImportProcess(samplingDesignManager, surveyId, work, importFile, overwriteAll);
+			CollectSurvey survey = work ? surveyManager.loadSurveyWork(surveyId): surveyManager.getById(surveyId);
+			importProcess = new SamplingDesignImportProcess(samplingDesignManager, survey, work, importFile, overwriteAll);
 			importProcess.init();
-			if ( importFile.exists() && importFile.canRead() ) {
-				startProcessThread();
-			} else {
-				SamplingDesignImportStatus status = importProcess.getStatus();
-				status.error();
-				status.setErrorMessage(INTERNAL_ERROR_IMPORTING_FILE_MESSAGE_KEY);
-			}
+			startProcessThread();
 		}
 		return getStatus();
 	}

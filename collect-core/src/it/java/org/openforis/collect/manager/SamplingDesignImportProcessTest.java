@@ -48,18 +48,17 @@ public class SamplingDesignImportProcessTest extends CollectIntegrationTest {
 	@Autowired
 	private SurveyManager surveyManager;
 	
-	private Integer surveyWorkId;
+	private CollectSurvey survey;
 	
 	@Before
 	public void init() throws IdmlParseException, IOException, SurveyImportException {
-		CollectSurvey survey = loadSurvey();
+		survey = loadSurvey();
 		surveyManager.saveSurveyWork(survey);
-		surveyWorkId = survey.getId();
 	}
 	
 	public SamplingDesignImportProcess importCSVFile(String fileName) throws Exception {
 		File file = getTestFile(fileName);
-		SamplingDesignImportProcess process = new SamplingDesignImportProcess(samplingDesignManager, surveyWorkId, true, file, true);
+		SamplingDesignImportProcess process = new SamplingDesignImportProcess(samplingDesignManager, survey, true, file, true);
 		process.call();
 		return process;
 	}
@@ -72,7 +71,7 @@ public class SamplingDesignImportProcessTest extends CollectIntegrationTest {
 		assertTrue(status.getSkippedRows().isEmpty());
 		assertEquals(23, status.getProcessed());
 		
-		SamplingDesignSummaries samplingDesignSummaries = samplingDesignManager.loadBySurveyWork(surveyWorkId, 0, 30);
+		SamplingDesignSummaries samplingDesignSummaries = samplingDesignManager.loadBySurveyWork(survey.getId(), 0, 30);
 		assertNotNull(samplingDesignSummaries);
 		assertEquals(22, samplingDesignSummaries.getTotalCount());
 		
@@ -87,21 +86,34 @@ public class SamplingDesignImportProcessTest extends CollectIntegrationTest {
 		SamplingDesignImportStatus status = process.getStatus();
 		assertTrue(status.isError());
 		List<ParsingError> errors = status.getErrors();
-		assertEquals(8, errors.size());
+		assertEquals(12, errors.size());
 		
 		assertTrue(containsError(errors, 3, SamplingDesignFileColumn.LEVEL_2, ErrorType.DUPLICATE_VALUE));
 		assertTrue(containsError(errors, 4, SamplingDesignFileColumn.LEVEL_2, ErrorType.DUPLICATE_VALUE));
-		assertTrue(containsError(errors, 11, SamplingDesignFileColumn.LOCATION, ErrorType.DUPLICATE_VALUE));
-		assertTrue(containsError(errors, 13, SamplingDesignFileColumn.LOCATION, ErrorType.DUPLICATE_VALUE));
-		assertTrue(containsError(errors, 14, SamplingDesignFileColumn.LOCATION, ErrorType.DUPLICATE_VALUE));
+		assertTrue(containsError(errors, 11, SamplingDesignFileColumn.LOCATION_COLUMNS, ErrorType.DUPLICATE_VALUE));
+		assertTrue(containsError(errors, 13, SamplingDesignFileColumn.LOCATION_COLUMNS, ErrorType.DUPLICATE_VALUE));
+		assertTrue(containsError(errors, 14, SamplingDesignFileColumn.LOCATION_COLUMNS, ErrorType.DUPLICATE_VALUE));
 		assertTrue(containsError(errors, 17, SamplingDesignFileColumn.LEVEL_2, ErrorType.EMPTY));
 		assertTrue(containsError(errors, 20, SamplingDesignFileColumn.LEVEL_1, ErrorType.EMPTY));
-		assertTrue(containsError(errors, 21, SamplingDesignFileColumn.LOCATION, ErrorType.DUPLICATE_VALUE));
+		assertTrue(containsError(errors, 21, SamplingDesignFileColumn.LOCATION_COLUMNS, ErrorType.DUPLICATE_VALUE));
+		assertTrue(containsError(errors, 24, SamplingDesignFileColumn.SRS_ID, ErrorType.EMPTY));
+		assertTrue(containsError(errors, 25, SamplingDesignFileColumn.LATITUDE, ErrorType.EMPTY));
+		assertTrue(containsError(errors, 26, SamplingDesignFileColumn.LONGITUDE, ErrorType.EMPTY));
+		assertTrue(containsError(errors, 27, SamplingDesignFileColumn.SRS_ID, ErrorType.INVALID_VALUE));
 	}
 
 	protected boolean containsError(List<ParsingError> errors, long row, SamplingDesignFileColumn column, ErrorType type) {
+		return containsError(errors, row, new SamplingDesignFileColumn[] {column}, type);
+	}
+
+	protected boolean containsError(List<ParsingError> errors, long row, SamplingDesignFileColumn[] columns, ErrorType type) {
+		String[] colNames = new String[columns.length];
+		for (int i = 0; i < columns.length; i++) {
+			SamplingDesignFileColumn col = columns[i];
+			colNames[i] = col.getName();
+		}
 		for (ParsingError error : errors) {
-			if ( error.getErrorType() == type && error.getRow() == row && error.getColumn().equals(column.getName())) {
+			if ( error.getErrorType() == type && error.getRow() == row && Arrays.equals(colNames, error.getColumns())) {
 				return true;
 			}
 		}

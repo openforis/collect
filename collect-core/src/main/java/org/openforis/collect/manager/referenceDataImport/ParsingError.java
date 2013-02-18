@@ -14,11 +14,27 @@ public class ParsingError {
 	}
 
 	private long row;
-	private String column;
+	private String[] columns;
 	private String[] messageArgs;
 	private String message;
 	private ErrorType errorType;
 	
+	public ParsingError(ErrorType type, long row, String[] columns, String message) {
+		super();
+		this.errorType = type;
+		this.row = row;
+		this.columns = columns;
+		this.message = message;
+	}
+	
+	public ParsingError(ErrorType type, long row, String[] columns) {
+		this(type, row, columns, (String) null);
+	}
+	
+	public ParsingError(ErrorType type, long row, String column, String message) {
+		this(type, row, new String[]{column}, message);
+	}
+
 	public ParsingError(ErrorType type) {
 		this(type, -1, (String) null, (String) null);
 	}
@@ -31,14 +47,6 @@ public class ParsingError {
 		this(ErrorType.INVALID_VALUE, row, column, (String) null);
 	}
 	
-	public ParsingError(ErrorType type, long row, String column, String message) {
-		super();
-		this.errorType = type;
-		this.row = row;
-		this.column = column;
-		this.message = message;
-	}
-
 	public ParsingError(ErrorType type, long row, String column) {
 		this(type, row, column, (String) null);
 	}
@@ -51,8 +59,8 @@ public class ParsingError {
 		return row;
 	}
 	
-	public String getColumn() {
-		return column;
+	public String[] getColumns() {
+		return columns;
 	}
 	
 	public String getMessage() {
@@ -71,7 +79,7 @@ public class ParsingError {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((column == null) ? 0 : column.hashCode());
+		result = prime * result + Arrays.hashCode(columns);
 		result = prime * result
 				+ ((errorType == null) ? 0 : errorType.hashCode());
 		result = prime * result + ((message == null) ? 0 : message.hashCode());
@@ -89,10 +97,7 @@ public class ParsingError {
 		if (getClass() != obj.getClass())
 			return false;
 		ParsingError other = (ParsingError) obj;
-		if (column == null) {
-			if (other.column != null)
-				return false;
-		} else if (!column.equals(other.column))
+		if (!Arrays.equals(columns, other.columns))
 			return false;
 		if (errorType != other.errorType)
 			return false;
@@ -107,5 +112,5 @@ public class ParsingError {
 			return false;
 		return true;
 	}
-	
+
 }
