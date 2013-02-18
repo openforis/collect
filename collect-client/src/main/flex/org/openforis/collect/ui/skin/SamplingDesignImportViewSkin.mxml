@@ -46,12 +46,12 @@
 									  dataField="level_2" labelFunction="{hostComponent.levelLabelFunction}" width="100" />
 						<s:GridColumn headerText="{Message.get('samplingDesignImport.summaryList.level3Code')}" 
 									  dataField="level_3" labelFunction="{hostComponent.levelLabelFunction}" width="100" />
-						<s:GridColumn headerText="{Message.get('samplingDesignImport.summaryList.srsid')}" 
-									  dataField="srid" width="250" />
-						<s:GridColumn headerText="{Message.get('samplingDesignImport.summaryList.latitude')}" 
-									  dataField="latitude" width="250" />
-						<s:GridColumn headerText="{Message.get('samplingDesignImport.summaryList.longitude')}" 
-									  dataField="longitude" width="250" />
+						<s:GridColumn headerText="{Message.get('samplingDesignImport.summaryList.srsId')}" 
+									  dataField="srsId" width="100" />
+						<s:GridColumn headerText="{Message.get('samplingDesignImport.summaryList.x')}" 
+									  dataField="x" width="100" />
+						<s:GridColumn headerText="{Message.get('samplingDesignImport.summaryList.y')}" 
+									  dataField="y" width="100" />
 					</s:ArrayList>
 				</s:columns>
 			</s:DataGrid>
@@ -124,13 +124,17 @@
 			<s:columns>
 				<s:ArrayList>
 					<s:GridColumn headerText="{Message.get('referenceDataImport.parsingError.row')}"
-								  dataField="row" width="50" />
+								  dataField="row" 
+								  width="50" />
 					<s:GridColumn headerText="{Message.get('referenceDataImport.parsingError.columns')}"
-								  labelFunction="{hostComponent.errorColumnsLabelFunction}" width="100" />
+								  labelFunction="{hostComponent.errorColumnsLabelFunction}" 
+								  width="100" />
 					<s:GridColumn headerText="{Message.get('referenceDataImport.parsingError.type')}"
-								  labelFunction="{hostComponent.errorTypeLabelFunction}" width="100" />
+								  labelFunction="{hostComponent.errorTypeLabelFunction}" 
+								  width="150" />
 					<s:GridColumn headerText="{Message.get('referenceDataImport.parsingError.message')}"
-								  labelFunction="{hostComponent.errorMessageLabelFunction}" width="350" />
+								  labelFunction="{hostComponent.errorMessageLabelFunction}" 
+								  width="350" />
 				</s:ArrayList>
 			</s:columns>
 		</s:DataGrid>

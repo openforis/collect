@@ -69,8 +69,8 @@ public class SamplingDesignCSVReader extends CSVDataImportReader<SamplingDesignL
 		public SamplingDesignLine parse() throws ParsingException {
 			SamplingDesignLine line = super.parse();
 			line.setSrsId(getColumnValue(SamplingDesignFileColumn.SRS_ID.getName(), true, String.class));
-			line.setLatitude(getColumnValue(SamplingDesignFileColumn.LATITUDE.getName(), true, String.class));
-			line.setLongitude(getColumnValue(SamplingDesignFileColumn.LONGITUDE.getName(), true, String.class));
+			line.setX(getColumnValue(SamplingDesignFileColumn.X.getName(), true, String.class));
+			line.setY(getColumnValue(SamplingDesignFileColumn.Y.getName(), true, String.class));
 			List<String> levelCodes = parseLevelCodes(line);
 			line.setLevelCodes(levelCodes);
 			return line;

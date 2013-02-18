@@ -10,10 +10,10 @@ public enum SamplingDesignFileColumn {
 	LEVEL_2(1, "level2_code"), 
 	LEVEL_3(2, "level3_code"), 
 	SRS_ID(3, "srs_id"),
-	LATITUDE(4, "latitude"),
-	LONGITUDE(5, "longitude");
+	X(4, "x"),
+	Y(5, "y");
 	
-	public static final SamplingDesignFileColumn[] LOCATION_COLUMNS = {SRS_ID, LATITUDE, LONGITUDE};
+	public static final SamplingDesignFileColumn[] LOCATION_COLUMNS = {SRS_ID, X, Y};
 	
 	private int index;
 	private String name;

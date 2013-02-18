@@ -14,8 +14,8 @@ public class SamplingDesignLine extends Line {
 	
 	private List<String> levelCodes;
 	private String srsId;
-	private String latitude;
-	private String longitude;
+	private String x;
+	private String y;
 	
 	public List<String> getLevelCodes() {
 		return CollectionUtil.unmodifiableList(levelCodes);
@@ -27,9 +27,9 @@ public class SamplingDesignLine extends Line {
 		sb.append(srsId);
 		sb.append(";");
 		sb.append("POINT(");
-		sb.append(latitude);
+		sb.append(x);
 		sb.append(" ");
-		sb.append(longitude);
+		sb.append(y);
 		sb.append(")");
 		return sb.toString();
 	}
@@ -46,20 +46,20 @@ public class SamplingDesignLine extends Line {
 		this.srsId = srsId;
 	}
 
-	public String getLatitude() {
-		return latitude;
+	public String getX() {
+		return x;
 	}
 
-	public void setLatitude(String latitude) {
-		this.latitude = latitude;
+	public void setX(String x) {
+		this.x = x;
 	}
 
-	public String getLongitude() {
-		return longitude;
+	public String getY() {
+		return y;
 	}
 
-	public void setLongitude(String longitude) {
-		this.longitude = longitude;
+	public void setY(String y) {
+		this.y = y;
 	}
-	
+
 }

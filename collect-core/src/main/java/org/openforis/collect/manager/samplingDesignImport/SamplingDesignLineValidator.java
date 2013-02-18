@@ -16,8 +16,8 @@ import org.openforis.idm.metamodel.SpatialReferenceSystem;
 public class SamplingDesignLineValidator {
 	
 	private static final String INVALID_SRS_MESSAGE_KEY = "samplingDesignImport.parsingError.invalidSRS";
-	private static final String INVALID_LATITUDE_MESSAGE_KEY = "samplingDesignImport.parsingError.invalidLatitude";
-	private static final String INVALID_LONGITUDE_MESSAGE_KEY = "samplingDesignImport.parsingError.invalidLongitude";
+	private static final String INVALID_X_MESSAGE_KEY = "samplingDesignImport.parsingError.invalidX";
+	private static final String INVALID_Y_MESSAGE_KEY = "samplingDesignImport.parsingError.invalidY";
 	
 	private CollectSurvey survey;
 	private List<ParsingError> errors;
@@ -34,9 +34,8 @@ public class SamplingDesignLineValidator {
 
 	public void validate(SamplingDesignLine line) {
 		validateSRSId(line);
-		validateLatitude(line);
-		validateLatitude(line);
-		validateLongitude(line);
+		validateX(line);
+		validateY(line);
 	}
 	
 	protected void validateSRSId(SamplingDesignLine line) {
@@ -51,30 +50,28 @@ public class SamplingDesignLineValidator {
 		}
 	}
 
-	protected void validateLatitude(SamplingDesignLine line) {
-		String latitudeStr = line.getLatitude();
+	protected void validateX(SamplingDesignLine line) {
+		String xStr = line.getX();
 		try {
-			Integer.parseInt(latitudeStr);
-			//if ( latitude < )
+			Double.parseDouble(xStr);
 		} catch (NumberFormatException e) {
 			ParsingError error = new ParsingError(ErrorType.INVALID_VALUE, 
 					line.getLineNumber(), 
-					SamplingDesignFileColumn.LATITUDE.getName(), 
-					INVALID_LATITUDE_MESSAGE_KEY);
+					SamplingDesignFileColumn.X.getName(), 
+					INVALID_X_MESSAGE_KEY);
 			errors.add(error);
 		}
 	}
 
-	protected void validateLongitude(SamplingDesignLine line) {
-		String latitudeStr = line.getLongitude();
+	protected void validateY(SamplingDesignLine line) {
+		String yStr = line.getY();
 		try {
-			Integer.parseInt(latitudeStr);
-			//if ( latitude < )
+			Double.parseDouble(yStr);
 		} catch (NumberFormatException e) {
 			ParsingError error = new ParsingError(ErrorType.INVALID_VALUE, 
 					line.getLineNumber(), 
-					SamplingDesignFileColumn.LONGITUDE.getName(), 
-					INVALID_LONGITUDE_MESSAGE_KEY);
+					SamplingDesignFileColumn.Y.getName(), 
+					INVALID_Y_MESSAGE_KEY);
 			errors.add(error);
 		}
 	}

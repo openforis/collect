@@ -1,4 +1,4 @@
-level1_code,level2_code,level3_code,srs_id,latitude,longitude
+level1_code,level2_code,level3_code,srs_id,x,y
 7_81,,,EPSG:21035,792200,9484420
 7_81,2,,EPSG:21035,792200,9484420
 7_81,3,,EPSG:21035,792200,9484670

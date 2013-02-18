@@ -97,8 +97,8 @@ public class SamplingDesignImportProcessTest extends CollectIntegrationTest {
 		assertTrue(containsError(errors, 20, SamplingDesignFileColumn.LEVEL_1, ErrorType.EMPTY));
 		assertTrue(containsError(errors, 21, SamplingDesignFileColumn.LOCATION_COLUMNS, ErrorType.DUPLICATE_VALUE));
 		assertTrue(containsError(errors, 24, SamplingDesignFileColumn.SRS_ID, ErrorType.EMPTY));
-		assertTrue(containsError(errors, 25, SamplingDesignFileColumn.LATITUDE, ErrorType.EMPTY));
-		assertTrue(containsError(errors, 26, SamplingDesignFileColumn.LONGITUDE, ErrorType.EMPTY));
+		assertTrue(containsError(errors, 25, SamplingDesignFileColumn.X, ErrorType.EMPTY));
+		assertTrue(containsError(errors, 26, SamplingDesignFileColumn.Y, ErrorType.EMPTY));
 		assertTrue(containsError(errors, 27, SamplingDesignFileColumn.SRS_ID, ErrorType.INVALID_VALUE));
 	}
 
