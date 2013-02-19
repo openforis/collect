@@ -27,7 +27,6 @@ ALTER TABLE "collect"."ofc_taxonomy"
 	DROP CONSTRAINT "ofc_taxonomy_survey_fkey" CASCADE ;
 ALTER TABLE "collect"."ofc_taxonomy"
 	DROP CONSTRAINT "ofc_taxonomy_survey_work_fkey" CASCADE ;
-ALTER TABLE "collect"."ofc_taxon_vernacular_name"
 ALTER TABLE "collect"."ofc_user_role"
 	DROP CONSTRAINT "ofc_user_user_role_fkey" CASCADE;
 ALTER TABLE "collect"."ofc_record"

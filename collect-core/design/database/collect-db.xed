@@ -36,8 +36,8 @@
 </Table>
 <Table id="30" name="ofc_taxon" schema="collect" database="" background="16777165">
 <Column id="31" name="id" type="integer" length="25" nulls="false"/>
-<Column id="32" name="taxon_id" type="integer" length="25" nulls="false"/>
-<Column id="33" name="code" type="varchar" length="32" nulls="false"/>
+<Column id="32" name="taxon_id" type="integer" length="25" nulls="true"/>
+<Column id="33" name="code" type="varchar" length="32" nulls="true"/>
 <Column id="34" name="scientific_name" type="varchar" length="255" nulls="false"/>
 <Column id="35" name="taxon_rank" type="varchar" length="128" nulls="false"/>
 <Column id="36" name="taxonomy_id" type="integer" length="25" nulls="false"/>
@@ -215,34 +215,34 @@
 <ConstraintColumn id="78"/>
 </Constraint>
 <Sheet name="Data" id="96" disp_at="true" disp_ph="true" disp_co="true">
-<Place id="60" visible="false">10,19,211,91</Place>
-<Place id="87" visible="false">434,33,0,0</Place>
-<Place id="92" visible="true" options="429.0,140.0,191.0,92.0,90.0,130.0,181.0,151.0,4,429.0,170.0,324.0,170.0,324.0,170.0,271.0,170.0">500,0,0,0</Place>
 <Place id="93" visible="true" options="430.0,310.0,191.0,92.0,90.0,130.0,181.0,151.0,4,430.0,340.0,350.0,340.0,350.0,210.0,271.0,210.0">500,0,0,0</Place>
-<Place id="72" visible="true">430,310,191,92</Place>
-<Place id="5" visible="true">799,138,201,433</Place>
-<Place id="55" visible="false">680,168,191,90</Place>
-<Place id="0" visible="true">429,140,191,92</Place>
-<Place id="64" visible="false">80,99,120,60</Place>
 <Place id="77" visible="true">90,130,181,151</Place>
+<Place id="64" visible="false">80,99,120,60</Place>
+<Place id="87" visible="false">434,33,0,0</Place>
+<Place id="0" visible="true">429,140,191,92</Place>
+<Place id="72" visible="true">430,310,191,92</Place>
+<Place id="92" visible="true" options="429.0,140.0,191.0,92.0,90.0,130.0,181.0,151.0,4,429.0,170.0,324.0,170.0,324.0,170.0,271.0,170.0">500,0,0,0</Place>
 <Place id="91" visible="true" options="429.0,140.0,191.0,92.0,799.0,138.0,201.0,433.0,2,620.0,170.0,799.0,170.0">597,-20,0,0</Place>
-<Place id="88" visible="false">500,0,0,0</Place>
 <Place id="89" visible="false">500,0,0,0</Place>
+<Place id="5" visible="true">799,138,201,433</Place>
+<Place id="60" visible="false">10,19,211,91</Place>
+<Place id="55" visible="false">680,168,191,90</Place>
+<Place id="88" visible="false">500,0,0,0</Place>
 </Sheet>
 <Sheet name="Species" id="97" disp_at="true" disp_ph="true" disp_co="true" disp_rn="true">
-<Place id="39" visible="true">270,549,240,182</Place>
-<Place id="85" visible="true" options="278.0,280.0,230.0,161.0,270.0,549.0,240.0,182.0,5,400.0,441.0,400.0,440.5,395.0,440.5,395.0,549.0,390.0,549.0">500,0,0,0</Place>
-<Place id="94" visible="true">500,0,0,0</Place>
-<Place id="90" visible="true">500,0,0,0</Place>
-<Place id="30" visible="true">278,280,230,161</Place>
-<Place id="49" visible="true">300,58,170,113</Place>
 <Place id="86" visible="true" options="300.0,58.0,170.0,113.0,278.0,280.0,230.0,161.0,2,390.0,171.0,390.0,280.0">500,0,0,0</Place>
+<Place id="30" visible="true">278,280,230,161</Place>
+<Place id="90" visible="true">500,0,0,0</Place>
 <Place id="95" visible="true">500,0,0,0</Place>
+<Place id="94" visible="true">500,0,0,0</Place>
+<Place id="49" visible="true">300,58,170,113</Place>
+<Place id="85" visible="true" options="278.0,280.0,230.0,161.0,270.0,549.0,240.0,182.0,5,400.0,441.0,400.0,440.5,395.0,440.5,395.0,549.0,390.0,549.0">500,0,0,0</Place>
+<Place id="39" visible="true">270,549,240,182</Place>
 </Sheet>
 <Sheet name="Users" id="98" disp_at="true" disp_ph="true" disp_co="true" disp_rn="true">
+<Place id="55" visible="true">580,210,200,90</Place>
 <Place id="60" visible="true">180,190,160,80</Place>
 <Place id="87" visible="true">500,0,0,0</Place>
-<Place id="55" visible="true">580,210,200,90</Place>
 </Sheet>
 <Sheet name="UI" id="99" disp_at="true" disp_ph="true" disp_co="true" disp_rn="true">
 <Place id="64" visible="true">220,130,120,60</Place>
@@ -251,5 +251,5 @@
 <Place id="70" visible="true">280,70,191,60</Place>
 <Place id="67" visible="true">50,70,171,61</Place>
 </Sheet>
-<Settings sheet="96" zoom="1.0"/>
+<Settings sheet="97" zoom="1.0"/>
 </Diagram>

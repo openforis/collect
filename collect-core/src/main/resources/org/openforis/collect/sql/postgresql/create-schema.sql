@@ -78,8 +78,8 @@ CREATE TABLE "collect"."ofc_survey_work"  (
 );
 CREATE TABLE "collect"."ofc_taxon"  ( 
 	"id"             	integer NOT NULL,
-	"taxon_id"       	integer NOT NULL,
-	"code"           	varchar(32) NOT NULL,
+	"taxon_id"       	integer NULL,
+	"code"           	varchar(32) NULL,
 	"scientific_name"	varchar(255) NOT NULL,
 	"taxon_rank"     	varchar(128) NOT NULL,
 	"taxonomy_id"    	integer NOT NULL,
