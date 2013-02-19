@@ -53,8 +53,12 @@ package org.openforis.collect.presenter {
 			eventDispatcher.addEventListener(UIEvent.RECORD_CREATED, recordCreatedHandler);
 		}
 		
-		protected function showSpeciesImportModuleHandler(event:Event):void {
+		protected function showSpeciesImportModuleHandler(event:UIEvent):void {
 			_view.currentState = MasterView.SPECIES_IMPORT_STATE;
+			var surveyId:int = event.obj.surveyId;
+			var work:Boolean = event.obj.work;
+			_view.speciesImportView.surveyId = surveyId;
+			_view.speciesImportView.work = work;
 		}
 
 		protected function showSamplingDesignImportHandler(event:UIEvent):void {

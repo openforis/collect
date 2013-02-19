@@ -12,7 +12,7 @@ package org.openforis.collect.client {
 	 * */
 	public class SpeciesClient extends AbstractClient {
 		
-		private var _loadAllTaxonomiesOperation:Operation;
+		private var _loadTaxonomiesBySurveyOperation:Operation;
 		private var _loadTaxonSummariesOperation:Operation;
 		private var _saveTaxonomyOperation:Operation;
 		private var _deleteTaxonomyOperation:Operation;
@@ -23,7 +23,7 @@ package org.openforis.collect.client {
 		public function SpeciesClient() {
 			super("speciesService");
 			
-			_loadAllTaxonomiesOperation = getOperation("loadAllTaxonomies", CONCURRENCY_LAST);
+			_loadTaxonomiesBySurveyOperation = getOperation("loadTaxonomiesBySurvey", CONCURRENCY_LAST);
 			_loadTaxonSummariesOperation = getOperation("loadTaxonSummaries", CONCURRENCY_LAST);
 			_saveTaxonomyOperation = getOperation("saveTaxonomy");
 			_deleteTaxonomyOperation = getOperation("deleteTaxonomy");
@@ -32,13 +32,13 @@ package org.openforis.collect.client {
 			_findByVernacularNameOperation = getOperation("findByVernacularName", CONCURRENCY_LAST);
 		}
 		
-		public function loadAllTaxonomies(responder:IResponder):void {
-			var token:AsyncToken = this._loadAllTaxonomiesOperation.send();
+		public function loadTaxonomiesBySurvey(responder:IResponder, surveyId:int, work:Boolean):void {
+			var token:AsyncToken = this._loadTaxonomiesBySurveyOperation.send(surveyId, work);
 			token.addResponder(responder);
 		}
 		
 		public function loadTaxonSummaries(responder:IResponder, taxonomyId:int, offset:int = 1, maxRecords:int = 20):void {
-			var token:AsyncToken = this._loadTaxonSummariesOperation.send(taxonomyId, offset, maxRecords);
+			var token:AsyncToken = _loadTaxonSummariesOperation.send(taxonomyId, offset, maxRecords);
 			token.addResponder(responder);
 		}
 		

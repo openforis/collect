@@ -3,35 +3,26 @@
  */
 package org.openforis.collect.remoting.service.speciesImport.proxy;
 
-import java.util.List;
-
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
-import org.openforis.collect.manager.process.proxy.ProcessStatusProxy;
+import org.openforis.collect.manager.referenceDataImport.proxy.ReferenceDataImportStatusProxy;
 import org.openforis.collect.manager.speciesImport.SpeciesImportStatus;
-import org.openforis.collect.manager.speciesImport.TaxonParsingError;
 
 /**
  * @author S. Ricci
  *
  */
-public class SpeciesImportStatusProxy extends ProcessStatusProxy {
+public class SpeciesImportStatusProxy extends ReferenceDataImportStatusProxy {
 	
-	private transient SpeciesImportStatus status;
-
+	private transient SpeciesImportStatus speciesImportStatus;
+	
 	public SpeciesImportStatusProxy(SpeciesImportStatus status) {
 		super(status);
-		this.status = status;
+		this.speciesImportStatus = status;
 	}
 	
 	@ExternalizedProperty
-	public List<TaxonParsingErrorProxy> getErrors() {
-		List<TaxonParsingError> errors = status.getErrors();
-		return TaxonParsingErrorProxy.fromList(errors);
-	}
-
-	@ExternalizedProperty
-	public String getTaxonomyName() {
-		return status.getTaxonomyName();
+	public int getTaxonomyId() {
+		return speciesImportStatus.getTaxonomyId();
 	}
 	
 }

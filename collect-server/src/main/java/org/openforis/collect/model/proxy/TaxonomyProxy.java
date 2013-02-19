@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.openforis.collect.Proxy;
-import org.openforis.idm.model.species.Taxonomy;
+import org.openforis.collect.model.CollectTaxonomy;
 
 /**
  * 
@@ -16,30 +16,36 @@ public class TaxonomyProxy implements Proxy {
 	private Integer id;
 	private String name;
 	private String uri;
+	private Integer surveyId;
+	private Integer surveyWorkId;
 	
 	public TaxonomyProxy() {
 	}
 	
-	public TaxonomyProxy(Taxonomy taxonomy) {
+	public TaxonomyProxy(CollectTaxonomy taxonomy) {
 		super();
 		id = taxonomy.getId();
 		name = taxonomy.getName();
 		uri = taxonomy.getUri();
+		surveyId = taxonomy.getSurveyId();
+		surveyWorkId = taxonomy.getSurveyWorkId();
 	}
 	
-	public static List<TaxonomyProxy> fromList(List<Taxonomy> list) {
+	public static List<TaxonomyProxy> fromList(List<CollectTaxonomy> list) {
 		List<TaxonomyProxy> proxies = new ArrayList<TaxonomyProxy>();
 		if (list != null) {
-			for (Taxonomy item : list) {
+			for (CollectTaxonomy item : list) {
 				proxies.add(new TaxonomyProxy(item));
 			}
 		}
 		return proxies;
 	}
 	
-	public void copyTo(Taxonomy taxonomy) {
+	public void copyPropertiesForUpdate(CollectTaxonomy taxonomy) {
 		taxonomy.setName(name);
 		taxonomy.setUri(uri);
+		taxonomy.setSurveyId(surveyId);
+		taxonomy.setSurveyWorkId(surveyWorkId);
 	}
 
 	public Integer getId() {
@@ -64,6 +70,22 @@ public class TaxonomyProxy implements Proxy {
 
 	public void setUri(String uri) {
 		this.uri = uri;
+	}
+
+	public Integer getSurveyId() {
+		return surveyId;
+	}
+
+	public void setSurveyId(Integer surveyId) {
+		this.surveyId = surveyId;
+	}
+
+	public Integer getSurveyWorkId() {
+		return surveyWorkId;
+	}
+
+	public void setSurveyWorkId(Integer surveyWorkId) {
+		this.surveyWorkId = surveyWorkId;
 	}
 	
 }

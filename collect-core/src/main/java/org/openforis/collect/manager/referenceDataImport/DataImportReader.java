@@ -2,6 +2,7 @@ package org.openforis.collect.manager.referenceDataImport;
 
 
 
+
 /**
  * 
  * @author S. Ricci
@@ -24,7 +25,14 @@ public abstract class DataImportReader<T extends Line> {
 
 	public abstract long getLinesRead();
 	
-	protected abstract T parseCurrentLine() throws ParsingException;
+	protected T parseCurrentLine() throws ParsingException {
+		if ( isReady() ) {
+			LineParser<T> lineParser = createLineParserInstance();
+			return lineParser.parse();
+		} else {
+			return null;
+		}
+	}
 
 	protected abstract LineParser<T> createLineParserInstance();
 	

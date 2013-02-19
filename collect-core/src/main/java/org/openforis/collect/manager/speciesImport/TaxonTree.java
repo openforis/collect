@@ -8,8 +8,9 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Stack;
 
-import org.openforis.collect.manager.speciesImport.TaxonCSVReader.Column;
-import org.openforis.collect.manager.speciesImport.TaxonParsingError.ErrorType;
+import org.openforis.collect.manager.referenceDataImport.ParsingError;
+import org.openforis.collect.manager.referenceDataImport.ParsingError.ErrorType;
+import org.openforis.collect.manager.referenceDataImport.ParsingException;
 import org.openforis.idm.model.species.Taxon;
 import org.openforis.idm.model.species.TaxonVernacularName;
 
@@ -139,38 +140,38 @@ class TaxonTree {
 		}
 	}
 
-	public void checkDuplicateScienfificName(Taxon parent, String scientificName, long row) throws TaxonParsingException {
+	public void checkDuplicateScienfificName(Taxon parent, String scientificName, long row) throws ParsingException {
 		Node foundNode = findNodeByScientificName(scientificName);
 		if ( foundNode != null ) {
 			Node foundParentNode = foundNode.getParent();
 			Node parentNode = findNodeByTaxon(parent);
 			if ( foundParentNode == parentNode ) {
-				TaxonParsingError error = new TaxonParsingError(ErrorType.DUPLICATE_VALUE, row, Column.SCIENTIFIC_NAME);
-				throw new TaxonParsingException(error);
+				ParsingError error = new ParsingError(ErrorType.DUPLICATE_VALUE, row, SpeciesFileColumn.SCIENTIFIC_NAME.getName());
+				throw new ParsingException(error);
 			}
 		}
 	}
 	
-	public void checkDuplicates(Integer taxonId, String code, long row) throws TaxonParsingException {
+	public void checkDuplicates(Integer taxonId, String code, long row) throws ParsingException {
 		if ( taxonId != null ) {
 			checkDuplicateTaxonId(taxonId, row);
 		}
 		checkDuplicateCode(code, row);
 	}
 
-	protected void checkDuplicateTaxonId(Integer taxonId, long row) throws TaxonParsingException {
+	protected void checkDuplicateTaxonId(Integer taxonId, long row) throws ParsingException {
 		Taxon oldTaxon = findTaxonByTaxonId(taxonId);
 		if ( oldTaxon != null ) {
-			TaxonParsingError error = new TaxonParsingError(ErrorType.DUPLICATE_VALUE, row, Column.NO);
-			throw new TaxonParsingException(error);
+			ParsingError error = new ParsingError(ErrorType.DUPLICATE_VALUE, row, SpeciesFileColumn.NO.getName());
+			throw new ParsingException(error);
 		}
 	}
 	
-	private void checkDuplicateCode(String code, long row) throws TaxonParsingException {
+	private void checkDuplicateCode(String code, long row) throws ParsingException {
 		Taxon oldTaxon = findTaxonByCode(code);
 		if ( oldTaxon != null ) {
-			TaxonParsingError error = new TaxonParsingError(ErrorType.DUPLICATE_VALUE, row, Column.CODE);
-			throw new TaxonParsingException(error);
+			ParsingError error = new ParsingError(ErrorType.DUPLICATE_VALUE, row, SpeciesFileColumn.CODE.getName());
+			throw new ParsingException(error);
 		}
 	}
 	

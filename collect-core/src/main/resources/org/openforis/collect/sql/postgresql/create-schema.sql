@@ -101,9 +101,11 @@ CREATE TABLE "collect"."ofc_taxon_vernacular_name"  (
 );
 COMMENT ON COLUMN "collect"."ofc_taxon_vernacular_name"."language_variety" IS 'Dialect, lect, sublanguage or other';
 CREATE TABLE "collect"."ofc_taxonomy"  ( 
-	"id"      	integer NOT NULL,
-	"name"    	varchar(255) NOT NULL,
-	"metadata"	text NOT NULL,
+	"id"            	integer NOT NULL,
+	"name"          	varchar(255) NOT NULL,
+	"metadata"      	text NOT NULL,
+	"survey_work_id"	integer NULL,
+	"survey_id"     	integer NULL,
 	PRIMARY KEY("id")
 );
 CREATE TABLE "collect"."ofc_user"  ( 
@@ -135,8 +137,19 @@ ALTER TABLE "collect"."ofc_taxon"
 	ADD CONSTRAINT "ofc_taxon_id_key"
 	UNIQUE ("taxon_id", "taxonomy_id");
 ALTER TABLE "collect"."ofc_taxonomy"
+	ADD CONSTRAINT "ofc_taxonomy_survey_fkey"
+	FOREIGN KEY("survey_id")
+	REFERENCES "collect"."ofc_survey"("id");
+ALTER TABLE "collect"."ofc_taxonomy"
+	ADD CONSTRAINT "ofc_taxonomy_survey_work_fkey"
+	FOREIGN KEY("survey_work_id")
+	REFERENCES "collect"."ofc_survey_work"("id");
+ALTER TABLE "collect"."ofc_taxonomy"
 	ADD CONSTRAINT "ofc_taxonomy_name_key"
-	UNIQUE ("name");
+	UNIQUE ("survey_id", "name");
+ALTER TABLE "collect"."ofc_taxonomy"
+	ADD CONSTRAINT "ofc_taxonomy_name_work_key"
+	UNIQUE ("survey_work_id", "name");
 ALTER TABLE "collect"."ofc_taxon_vernacular_name"
 	ADD CONSTRAINT "ofc_taxon_vernacular_name_taxon_fkey"
 	FOREIGN KEY("taxon_id")

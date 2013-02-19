@@ -31,6 +31,10 @@ import org.springframework.transaction.annotation.Transactional;
 public class SurveyManager {
 
 	@Autowired
+	private SamplingDesignManager samplingDesignManager;
+	@Autowired
+	private SpeciesManager speciesManager;
+	@Autowired
 	private SurveyDao surveyDao;
 	@Autowired
 	private SurveyWorkDao surveyWorkDao;
@@ -210,6 +214,13 @@ public class SurveyManager {
 		Integer id = survey.getId();
 		if ( id == null ) {
 			surveyWorkDao.insert(survey);
+			CollectSurvey publishedSurvey = surveyDao.loadByUri(survey.getUri());
+			if ( publishedSurvey != null ) {
+				int surveyWorkId = survey.getId();
+				int publishedSurveyId = publishedSurvey.getId();
+				samplingDesignManager.duplicateSamplingDesignForWork(publishedSurveyId, surveyWorkId);
+				speciesManager.duplicateTaxonomyForWork(publishedSurveyId, surveyWorkId);
+			}
 		} else {
 			surveyWorkDao.update(survey);
 		}
@@ -226,6 +237,9 @@ public class SurveyManager {
 			initSurveysCache();
 		}
 		if ( surveyWorkId != null ) {
+			int publishedSurveyId = survey.getId();
+			samplingDesignManager.publishSamplingDesign(surveyWorkId, publishedSurveyId);
+			speciesManager.publishTaxonomies(surveyWorkId, publishedSurveyId);
 			surveyWorkDao.delete(surveyWorkId);
 		}
 	}

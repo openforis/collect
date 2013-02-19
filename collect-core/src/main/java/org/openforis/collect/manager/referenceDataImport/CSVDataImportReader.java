@@ -30,6 +30,10 @@ public abstract class CSVDataImportReader<T extends Line> extends DataImportRead
 		init();
 	}
 	
+	protected void init() throws IOException, ParsingException {
+		csvReader.readHeaders();
+	}
+	
 	@Override
 	public boolean isReady() {
 		return currentCSVLine != null;
@@ -38,10 +42,6 @@ public abstract class CSVDataImportReader<T extends Line> extends DataImportRead
 	@Override
 	public long getLinesRead() {
 		return csvReader.getLinesRead();
-	}
-	
-	public void init() throws IOException, ParsingException {
-		csvReader.readHeaders();
 	}
 	
 	public T readNextLine() throws ParsingException {

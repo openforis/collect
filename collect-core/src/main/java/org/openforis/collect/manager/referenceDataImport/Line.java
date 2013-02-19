@@ -1,6 +1,12 @@
 package org.openforis.collect.manager.referenceDataImport;
 
+/**
+ * 
+ * @author S. Ricci
+ *
+ */
 public abstract class Line {
+	
 	private long lineNumber;
 
 	public long getLineNumber() {

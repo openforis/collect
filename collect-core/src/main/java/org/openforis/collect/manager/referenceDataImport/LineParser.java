@@ -15,7 +15,7 @@ import org.openforis.collect.manager.referenceDataImport.ParsingError.ErrorType;
  */
 public abstract class LineParser<T extends Line> {
 	
-	private long lineNumber;
+	protected long lineNumber;
 
 	public LineParser(long lineNumber) {
 		super();

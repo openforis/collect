@@ -19,13 +19,14 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openforis.collect.manager.SpeciesManager;
 import org.openforis.collect.manager.process.AbstractProcess;
-import org.openforis.collect.manager.speciesImport.TaxonCSVReader.TaxonLine;
-import org.openforis.collect.manager.speciesImport.TaxonParsingError.ErrorType;
+import org.openforis.collect.manager.referenceDataImport.ParsingError;
+import org.openforis.collect.manager.referenceDataImport.ParsingError.ErrorType;
+import org.openforis.collect.manager.referenceDataImport.ParsingException;
 import org.openforis.collect.manager.speciesImport.TaxonTree.Node;
+import org.openforis.collect.model.CollectTaxonomy;
 import org.openforis.idm.model.species.Taxon;
 import org.openforis.idm.model.species.Taxon.TaxonRank;
 import org.openforis.idm.model.species.TaxonVernacularName;
-import org.openforis.idm.model.species.Taxonomy;
 
 /**
  * 
@@ -34,6 +35,9 @@ import org.openforis.idm.model.species.Taxonomy;
  */
 public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportStatus> {
 
+	private static final String TAXONOMY_NOT_FOUND_ERROR_MESSAGE_KEY = "speciesImport.error.taxonomyNotFound";
+	private static final String IMPORTING_FILE_ERROR_MESSAGE_KEY = "speciesImport.error.internalErrorImportingFile";
+	
 	private static Log LOG = LogFactory.getLog(SpeciesImportProcess.class);
 
 	private static final TaxonRank[] TAXON_RANKS = new TaxonRank[] {FAMILY, GENUS, SPECIES, SUBSPECIES};
@@ -43,7 +47,7 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 	//private static final String ZIP = "zip";
 
 	private SpeciesManager speciesManager;
-	private String taxonomyName;
+	private int taxonomyId;
 	private File file;
 	private boolean overwriteAll;
 	
@@ -53,10 +57,10 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 	private String errorMessage;
 	private List<TaxonLine> lines;
 	
-	public SpeciesImportProcess(SpeciesManager speciesManager, String taxonomyName, File file, boolean overwriteAll) {
+	public SpeciesImportProcess(SpeciesManager speciesManager, int taxonomyId, File file, boolean overwriteAll) {
 		super();
 		this.speciesManager = speciesManager;
-		this.taxonomyName = taxonomyName;
+		this.taxonomyId = taxonomyId;
 		this.file = file;
 		this.overwriteAll = overwriteAll;
 	}
@@ -66,11 +70,22 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 		super.init();
 		taxonTree = new TaxonTree();
 		lines = new ArrayList<TaxonLine>();
+		validateParameters();
+	}
+	
+	protected void validateParameters() {
+		if ( ! file.exists() && ! file.canRead() ) {
+			status.error();
+			status.setErrorMessage(IMPORTING_FILE_ERROR_MESSAGE_KEY);
+		} else if ( taxonomyId <= 0 ) {
+			status.error();
+			status.setErrorMessage(TAXONOMY_NOT_FOUND_ERROR_MESSAGE_KEY);
+		}
 	}
 	
 	@Override
 	protected void initStatus() {
-		status = new SpeciesImportStatus(taxonomyName);
+		status = new SpeciesImportStatus(taxonomyId);
 	}
 
 	@Override
@@ -132,32 +147,31 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 			isReader = new InputStreamReader(is);
 			
 			reader = new TaxonCSVReader(isReader);
-			reader.init();
 			languageColumnNames = reader.getLanguageColumnNames();
 			status.addProcessedRow(1);
 			currentRowNumber = 2;
 			while ( status.isRunning() ) {
 				try {
-					TaxonLine line = reader.readNextTaxonLine();
+					TaxonLine line = reader.readNextLine();
 					if ( line != null ) {
 						lines.add(line);
 					}
 					if ( ! reader.isReady() ) {
 						break;
 					}
-				} catch (TaxonParsingException e) {
+				} catch (ParsingException e) {
 					status.addParsingError(currentRowNumber, e.getError());
 				} finally {
 					currentRowNumber ++;
 				}
 			}
 			status.setTotal(reader.getLinesRead() + 1);
-		} catch (TaxonParsingException e) {
+		} catch (ParsingException e) {
 			status.error();
 			status.addParsingError(1, e.getError());
 		} catch (Exception e) {
 			status.error();
-			status.addParsingError(currentRowNumber, new TaxonParsingError(ErrorType.IOERROR, e.getMessage()));
+			status.addParsingError(currentRowNumber, new ParsingError(ErrorType.IOERROR, e.getMessage()));
 			LOG.error("Error importing species CSV file", e);
 		} finally {
 			close(isReader);
@@ -174,7 +188,7 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 						if (processed ) {
 							status.addProcessedRow(lineNumber);
 						}
-					} catch (TaxonParsingException e) {
+					} catch (ParsingException e) {
 						status.addParsingError(lineNumber, e.getError());
 					}
 				}
@@ -182,7 +196,7 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 		}
 	}
 	
-	protected boolean processLine(TaxonLine line, TaxonRank rank) throws TaxonParsingException {
+	protected boolean processLine(TaxonLine line, TaxonRank rank) throws ParsingException {
 		boolean mostSpecificRank = line.getRank() == rank;
 		switch (rank) {
 		case FAMILY:
@@ -218,17 +232,15 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 	}
 
 	protected void persistTaxa() {
-		Taxonomy taxonomy = speciesManager.loadTaxonomyByName(taxonomyName);
-		if ( taxonomy != null ) {
+		CollectTaxonomy taxonomy = speciesManager.loadTaxonomyById(taxonomyId);
+		if ( taxonomy == null ) {
+			throw new IllegalStateException("Taxonomy not found");
+		} else {
 			if ( overwriteAll ) {
 				speciesManager.deleteTaxonsByTaxonomy(taxonomy);
 			} else {
 				throw new IllegalStateException("Taxonomy already existent but no 'overwriteAll' requested");
 			}
-		} else {
-			taxonomy = new Taxonomy();
-			taxonomy.setName(taxonomyName);
-			speciesManager.save(taxonomy);
 		}
 		final Integer taxonomyId = taxonomy.getId();
 		taxonTree.bfs(new TaxonTree.NodeVisitor() {
@@ -259,7 +271,7 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 		}
 	}
 
-	private Taxon findParentTaxon(TaxonLine line) throws TaxonParsingException {
+	private Taxon findParentTaxon(TaxonLine line) throws ParsingException {
 		TaxonRank rank = line.getRank();
 		TaxonRank parentRank = rank.getParent();
 		String scientificName;
@@ -280,29 +292,29 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 		return result;
 	}
 	
-	protected Taxon createTaxonFamily(TaxonLine line) throws TaxonParsingException {
+	protected Taxon createTaxonFamily(TaxonLine line) throws ParsingException {
 		String familyName = line.getFamilyName();
 		return createTaxon(line, FAMILY, null, familyName);
 	}
 	
-	protected Taxon createTaxonGenus(TaxonLine line) throws TaxonParsingException {
+	protected Taxon createTaxonGenus(TaxonLine line) throws ParsingException {
 		Taxon taxonFamily = createTaxonFamily(line);
 		String normalizedScientificName = StringUtils.join(line.getGenus(), " ", GENUS_SUFFIX);
 		return createTaxon(line, GENUS, taxonFamily, normalizedScientificName);
 	}
 
-	protected Taxon createTaxonSpecies(TaxonLine line) throws TaxonParsingException {
+	protected Taxon createTaxonSpecies(TaxonLine line) throws ParsingException {
 		Taxon taxonGenus = createTaxonGenus(line);
 		String normalizedScientificName = line.getSpeciesName();
 		return createTaxon(line, SPECIES, taxonGenus, normalizedScientificName);
 	}
 	
-	protected Taxon createTaxon(TaxonLine line, TaxonRank rank, Taxon parent) throws TaxonParsingException {
+	protected Taxon createTaxon(TaxonLine line, TaxonRank rank, Taxon parent) throws ParsingException {
 		String normalizedScientificName = line.getCanonicalScientificName();
 		return createTaxon(line, rank, parent, normalizedScientificName);
 	}
 	
-	protected Taxon createTaxon(TaxonLine line, TaxonRank rank, Taxon parent, String normalizedScientificName) throws TaxonParsingException {
+	protected Taxon createTaxon(TaxonLine line, TaxonRank rank, Taxon parent, String normalizedScientificName) throws ParsingException {
 		boolean mostSpecificRank = line.getRank() == rank;
 		Taxon taxon = taxonTree.findTaxonByScientificName(normalizedScientificName);
 		boolean newTaxon = taxon == null;

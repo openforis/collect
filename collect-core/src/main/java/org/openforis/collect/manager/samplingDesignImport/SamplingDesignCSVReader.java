@@ -33,17 +33,6 @@ public class SamplingDesignCSVReader extends CSVDataImportReader<SamplingDesignL
 	}
 
 	@Override
-	protected SamplingDesignLine parseCurrentLine()
-			throws ParsingException {
-		if ( currentCSVLine != null ) {
-			SamplingDesignCSVLineParser lineParser = createLineParserInstance();
-			return lineParser.parse();
-		} else {
-			return null;
-		}
-	}
-	
-	@Override
 	protected SamplingDesignCSVLineParser createLineParserInstance() {
 		SamplingDesignCSVLineParser lineParser = SamplingDesignCSVLineParser.createInstance(this, currentCSVLine);
 		return lineParser;

@@ -15,6 +15,7 @@ import org.apache.commons.logging.LogFactory;
 import org.openforis.collect.metamodel.TaxonSummaries;
 import org.openforis.collect.metamodel.TaxonSummary;
 import org.openforis.collect.model.CollectSurveyContext;
+import org.openforis.collect.model.CollectTaxonomy;
 import org.openforis.collect.persistence.TaxonDao;
 import org.openforis.collect.persistence.TaxonVernacularNameDao;
 import org.openforis.collect.persistence.TaxonomyDao;
@@ -51,54 +52,79 @@ public class SpeciesManager {
 	private CollectSurveyContext surveyContext;
 
 	@Transactional
-	public List<Taxonomy> loadAllTaxonomies() {
-		return taxonomyDao.loadAll();
+	public List<CollectTaxonomy> loadTaxonomiesBySurvey(int surveyId) {
+		return taxonomyDao.loadAllBySurvey(surveyId);
 	}
 	
 	@Transactional
-	public Taxonomy loadTaxonomyById(int id) {
+	public List<CollectTaxonomy> loadTaxonomiesBySurveyWork(int surveyId) {
+		return taxonomyDao.loadAllBySurveyWork(surveyId);
+	}
+	
+	@Transactional
+	public CollectTaxonomy loadTaxonomyById(int id) {
 		return taxonomyDao.loadById(id);
 	}
 
 	@Transactional
-	public Taxonomy loadTaxonomyByName(String name) {
-		return taxonomyDao.load(name);
+	public CollectTaxonomy loadTaxonomyByName(int surveyId, String name) {
+		return taxonomyDao.load(surveyId, name);
 	}
 
 	@Transactional
-	public List<TaxonOccurrence> findByCode(String taxonomyName, String searchString, int maxResults) {
-		Taxonomy taxonomy = taxonomyDao.load(taxonomyName);
-		List<Taxon> list = taxonDao.findByCode(taxonomy.getId(), searchString, maxResults);
+	public CollectTaxonomy loadTaxonomyWorkByName(int surveyId, String name) {
+		return taxonomyDao.loadBySurveyWork(surveyId, name);
+	}
+
+	@Transactional
+	public List<TaxonOccurrence> findByCode(int surveyId, String taxonomyName, String searchString, int maxResults) {
+		Taxonomy taxonomy = taxonomyDao.load(surveyId, taxonomyName);
+		return findByCode(taxonomy.getId(), searchString, maxResults);
+	}
+
+	@Transactional
+	public List<TaxonOccurrence> findByCode(int taxonomyId, String searchString, int maxResults) {
+		List<Taxon> list = taxonDao.findByCode(taxonomyId, searchString, maxResults);
 		List<TaxonOccurrence> result = new ArrayList<TaxonOccurrence>();
 		for (Taxon taxon : list) {
 			TaxonOccurrence o = new TaxonOccurrence(taxon.getTaxonId(), taxon.getCode(), taxon.getScientificName());
 			result.add(o);
 		}
 		return result;
-	}
-
-	@Transactional
-	public List<TaxonOccurrence> findByScientificName(String taxonomyName, String searchString, int maxResults) {
-		Taxonomy taxonomy = taxonomyDao.load(taxonomyName);
-		List<Taxon> list = taxonDao.findByScientificName(taxonomy.getId(), searchString, maxResults);
-		List<TaxonOccurrence> result = new ArrayList<TaxonOccurrence>();
-		for (Taxon taxon : list) {
-			TaxonOccurrence o = new TaxonOccurrence(taxon.getTaxonId(), taxon.getCode(), taxon.getScientificName());
-			result.add(o);
-		}
-		return result;
-	}
-
-	@Transactional
-	public List<TaxonOccurrence> findByVernacularName(String taxonomyName, String searchString, int maxResults) {
-		return findByVernacularName(taxonomyName, null, searchString, maxResults);
 	}
 	
 	@Transactional
-	public List<TaxonOccurrence> findByVernacularName(String taxonomyName, TaxonAttribute attr, String searchString, int maxResults) {
-		List<TaxonVernacularName> list = null;
-		Taxonomy taxonomy = taxonomyDao.load(taxonomyName);
+	public List<TaxonOccurrence> findByScientificName(int surveyId, String taxonomyName, String searchString, int maxResults) {
+		Taxonomy taxonomy = taxonomyDao.load(surveyId, taxonomyName);
+		return findByScientificName(taxonomy.getId(), searchString, maxResults);
+	}
+
+	@Transactional
+	public List<TaxonOccurrence> findByScientificName(int taxonomyId, String searchString, int maxResults) {
+		List<Taxon> list = taxonDao.findByScientificName(taxonomyId, searchString, maxResults);
+		List<TaxonOccurrence> result = new ArrayList<TaxonOccurrence>();
+		for (Taxon taxon : list) {
+			TaxonOccurrence o = new TaxonOccurrence(taxon.getTaxonId(), taxon.getCode(), taxon.getScientificName());
+			result.add(o);
+		}
+		return result;
+	}
+
+	@Transactional
+	public List<TaxonOccurrence> findByVernacularName(int surveyId, String taxonomyName, String searchString, int maxResults) {
+		return findByVernacularName(surveyId, taxonomyName, (TaxonAttribute) null, searchString, maxResults);
+	}
+	
+	@Transactional
+	public List<TaxonOccurrence> findByVernacularName(int surveyId, String taxonomyName, TaxonAttribute attr, String searchString, int maxResults) {
+		Taxonomy taxonomy = taxonomyDao.load(surveyId, taxonomyName);
 		Integer taxonomyId = taxonomy.getId();
+		return findByVernacularName(taxonomyId, attr, searchString, maxResults);
+	}
+
+	@Transactional
+	public List<TaxonOccurrence> findByVernacularName(int taxonomyId, TaxonAttribute attr, String searchString, int maxResults) {
+		List<TaxonVernacularName> list = null;
 		String[] qualifierValues = null;
 		if ( attr != null ) {
 			qualifierValues = extractQualifierValues(attr);
@@ -148,7 +174,10 @@ public class SpeciesManager {
 	}
 	
 	@Transactional
-	public void save(Taxonomy taxonomy) {
+	public void save(CollectTaxonomy taxonomy) {
+		if ( taxonomy.getSurveyId() == null && taxonomy.getSurveyWorkId() == null ) {
+			throw new IllegalArgumentException("Cannot save taxonomy: surveyId or surveyWorkId must be defined");
+		}
 		if ( taxonomy.getId() == null ) {
 			taxonomyDao.insert(taxonomy);
 		} else {
@@ -157,14 +186,14 @@ public class SpeciesManager {
 	}
 	
 	@Transactional
-	public void delete(Taxonomy taxonomy) {
+	public void delete(CollectTaxonomy taxonomy) {
 		Integer id = taxonomy.getId();
 		deleteTaxonsByTaxonomy(taxonomy);
 		taxonomyDao.delete(id);
 	}
 
 	@Transactional
-	public void deleteTaxonsByTaxonomy(Taxonomy taxonomy) {
+	public void deleteTaxonsByTaxonomy(CollectTaxonomy taxonomy) {
 		Integer id = taxonomy.getId();
 		taxonVernacularNameDao.deleteByTaxonomy(id);
 		taxonDao.deleteByTaxonomy(id);
@@ -196,6 +225,35 @@ public class SpeciesManager {
 	@Transactional
 	public void delete(TaxonVernacularName vernacularName) {
 		taxonVernacularNameDao.delete(vernacularName.getId());
+	}
+	
+	@Transactional
+	public void publishTaxonomies(Integer surveyWorkId, int publishedSurveyId) {
+		deleteTaxonomies(publishedSurveyId);
+		List<CollectTaxonomy> taxonomies = taxonomyDao.loadAllBySurveyWork(surveyWorkId);
+		for (CollectTaxonomy taxonomy : taxonomies) {
+			taxonomy.setSurveyWorkId(null);
+			taxonomy.setSurveyId(publishedSurveyId);
+			taxonomyDao.update(taxonomy);
+		}
+	}
+
+	protected void deleteTaxonomies(int surveyId) {
+		List<CollectTaxonomy> publishedTaxonomies = taxonomyDao.loadAllBySurvey(surveyId);
+		for (CollectTaxonomy taxonomy : publishedTaxonomies) {
+			delete(taxonomy);
+		}
+	}
+	
+	@Transactional
+	public void duplicateTaxonomyForWork(int publishedSurveyId, Integer surveyWorkId) {
+		List<CollectTaxonomy> taxonomies = taxonomyDao.loadAllBySurvey(publishedSurveyId);
+		for (CollectTaxonomy taxonomy : taxonomies) {
+			taxonomy.setId(null);
+			taxonomy.setSurveyId(null);
+			taxonomy.setSurveyWorkId(surveyWorkId);
+			taxonomyDao.insert(taxonomy);
+		}
 	}
 	
 	protected List<TaxonOccurrence> createOccurrenceList(

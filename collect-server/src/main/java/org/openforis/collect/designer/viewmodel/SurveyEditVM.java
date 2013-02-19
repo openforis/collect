@@ -5,10 +5,11 @@ package org.openforis.collect.designer.viewmodel;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import org.apache.commons.compress.utils.CharsetNames;
 import org.apache.http.NameValuePair;
@@ -55,6 +56,7 @@ import org.zkoss.zul.Window;
  */
 public class SurveyEditVM extends SurveyBaseVM {
 
+	private static final String COLLECT_SWF_LOCATION = "/collect.swf";
 	private static final String TEXT_XML = "text/xml";
 	private static final String PREVIEW_WINDOW_ID = "collect_survey_preview";
 	public static final String SHOW_PREVIEW_POP_UP_GLOBAL_COMMAND = "showPreview";
@@ -376,23 +378,42 @@ public class SurveyEditVM extends SurveyBaseVM {
 	
 	@DependsOn({"surveyId","surveyPublished"})
 	public String getSamplingDesignImportModuleUrl() {
-		Integer surveyId = getSurveyId();
-		String surveyIdStr;
-		if ( surveyId == null ) {
-			surveyIdStr = "";
-		} else {
-			surveyIdStr = surveyId.toString();
+		Map<String, String> queryParams = createBasicModuleParameters();
+		queryParams.put("sampling_design_import", "true");
+		String url = createUrl(COLLECT_SWF_LOCATION, queryParams);
+		return url;
+	}
+
+	@DependsOn({"surveyId","surveyPublished"})
+	public String getSpeciesImportModuleUrl() {
+		Map<String, String> queryParams = createBasicModuleParameters();
+		queryParams.put("species_import", "true");
+		String url = createUrl(COLLECT_SWF_LOCATION, queryParams);
+		return url;
+	}
+
+	private String createUrl(String base, Map<String, String> queryParams) {
+		List<BasicNameValuePair> convertedParams = new ArrayList<BasicNameValuePair>();
+		Set<Entry<String, String>> paramsEntrySet = queryParams.entrySet();
+		for (Entry<String, String> param : paramsEntrySet) {
+			BasicNameValuePair valuePair = new BasicNameValuePair(param.getKey(), param.getValue());
+			convertedParams.add(valuePair);
 		}
-		String localStr = "en_US";
-		List<BasicNameValuePair> queryParams = Arrays.asList(
-				new BasicNameValuePair("sampling_design_import", "true"),
-				new BasicNameValuePair("lang", localStr),
-				new BasicNameValuePair("work", "" + ! isSurveyPublished()),
-				new BasicNameValuePair("surveyId", surveyIdStr)
-		);				
-		String queryString = URLEncodedUtils.format(queryParams, CharsetNames.UTF_8);	
-		String result = "/collect.swf?" + queryString;
+		String queryString = URLEncodedUtils.format(convertedParams, CharsetNames.UTF_8);
+		String result = base + "?" + queryString;
 		return result;
 	}
 
+	protected Map<String, String> createBasicModuleParameters() {
+		Integer surveyId = getSurveyId();
+		String surveyIdStr = surveyId == null ? "": surveyId.toString();
+		String localeStr = "en_US";
+		Map<String, String> result = new HashMap<String, String>();
+		result.put("lang", localeStr);
+		result.put("work", "" + true); //in the designer we are always working on "temporary" surveys
+		result.put("surveyId", surveyIdStr);
+		return result;
+	}
+
+	
 }

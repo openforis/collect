@@ -8,7 +8,6 @@ import static org.openforis.idm.model.species.Taxon.TaxonRank.GENUS;
 import static org.openforis.idm.model.species.Taxon.TaxonRank.SPECIES;
 import static org.openforis.idm.model.species.Taxon.TaxonRank.SUBSPECIES;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
@@ -24,9 +23,12 @@ import org.gbif.ecat.model.ParsedName;
 import org.gbif.ecat.parser.NameParser;
 import org.gbif.ecat.parser.UnparsableException;
 import org.gbif.ecat.voc.Rank;
-import org.openforis.collect.manager.speciesImport.TaxonParsingError.ErrorType;
+import org.openforis.collect.manager.referenceDataImport.CSVDataImportReader;
+import org.openforis.collect.manager.referenceDataImport.CSVLineParser;
+import org.openforis.collect.manager.referenceDataImport.ParsingError;
+import org.openforis.collect.manager.referenceDataImport.ParsingError.ErrorType;
+import org.openforis.collect.manager.referenceDataImport.ParsingException;
 import org.openforis.commons.io.csv.CsvLine;
-import org.openforis.commons.io.csv.CsvReader;
 import org.openforis.idm.metamodel.Languages;
 import org.openforis.idm.model.species.Taxon.TaxonRank;
 
@@ -34,74 +36,33 @@ import org.openforis.idm.model.species.Taxon.TaxonRank;
  * @author S. Ricci
  *
  */
-public class TaxonCSVReader extends CsvReader {
+public class TaxonCSVReader extends CSVDataImportReader<TaxonLine> {
 
-	public enum Column {
-		NO(0, "no"), CODE(1, "code"), FAMILY(2, "family"), SCIENTIFIC_NAME(3, "scientific_name");
-		
-		private int index;
-		private String name;
-		
-		private Column(int index, String name) {
-			this.index = index;
-			this.name = name;
-		}
-		
-		public int getIndex() {
-			return index;
-		}
-		
-		public String getName() {
-			return name;
-		}
-	}
-
-	private CsvLine currentLine;
-	private TaxonLine currentTaxonLine;
-
-	/**
-	 * @param filename
-	 * @throws FileNotFoundException
-	 */
-	public TaxonCSVReader(String filename) throws FileNotFoundException {
+	public TaxonCSVReader(String filename) throws IOException, ParsingException {
 		super(filename);
 	}
 
-	/**
-	 * @param reader
-	 */
-	public TaxonCSVReader(Reader reader) {
+	public TaxonCSVReader(Reader reader) throws IOException, ParsingException {
 		super(reader);
 	}
 	
-	public void init() throws IOException, TaxonParsingException {
-		readHeaders();
-	}
-	
 	@Override
-	public CsvLine readNextLine() throws IOException {
-		throw new UnsupportedOperationException();
+	protected TaxonCSVLineParser createLineParserInstance() {
+		TaxonCSVLineParser lineParser = TaxonCSVLineParser.createInstance(this, currentCSVLine);
+		return lineParser;
 	}
 	
-	public TaxonLine readNextTaxonLine() throws TaxonParsingException, IOException {
-		currentLine = super.readNextLine();
-		currentTaxonLine = null;
-		if ( currentLine != null ) {
-			TaxonCSVLineParser lineParser = TaxonCSVLineParser.createInstance(this, currentLine);
-			currentTaxonLine = lineParser.parse();
-		}
-		return currentTaxonLine;
-	}
-	
-	public boolean validateAllFile() throws TaxonParsingException {
+
+	@Override
+	public boolean validateAllFile() throws ParsingException {
 		Validator validator = new Validator();
 		validator.validate();
 		return true;
 	}
-
+	
 	public List<String> getLanguageColumnNames() {
 		List<String> columnNames = getColumnNames();
-		int fixedColumnsLength = Column.values().length;
+		int fixedColumnsLength = SpeciesFileColumn.values().length;
 		if ( columnNames.size() > fixedColumnsLength ) {
 			return columnNames.subList(fixedColumnsLength, columnNames.size());
 		} else {
@@ -109,15 +70,8 @@ public class TaxonCSVReader extends CsvReader {
 		}
 	}
 	
-	public TaxonLine getCurrentTaxonLine() {
-		return currentTaxonLine;
-	}
-	
-	public boolean isReady() {
-		return currentLine != null;
-	}
-	
-	public static class TaxonCSVLineParser {
+	public static class TaxonCSVLineParser extends CSVLineParser<TaxonLine> {
+		
 		private static final String VERNACULAR_NAME_TRIM_EXPRESSION = "^\\s+|\\s+$|;+$|\\.+$";
 		private static final String SYNONYM_COL_NAME = "";
 		private static final Pattern SYNONYM_PATTERN = Pattern.compile("^syn\\.?\\s+", Pattern.CASE_INSENSITIVE);
@@ -125,69 +79,62 @@ public class TaxonCSVReader extends CsvReader {
 		private static final String DEFAULT_VERNACULAR_NAMES_SEPARATOR = ",";
 		private static final String OTHER_VERNACULAR_NAMES_SEPARATOR_EXPRESSION = "/";
 
-		private TaxonCSVReader reader;
-		private CsvLine csvLine;
-		private long lineNumber;
 		private ParsedName<Object> parsedScientificName;
 		private String rawScientificName;
 		
 		TaxonCSVLineParser(TaxonCSVReader reader, CsvLine line) {
-			this.reader = reader;
-			this.csvLine = line;
-		
-			this.lineNumber = reader.getLinesRead() + 1;
+			super(reader, line);
 		}
 		
 		public static TaxonCSVLineParser createInstance(TaxonCSVReader reader, CsvLine line) {
 			return new TaxonCSVLineParser(reader, line);
 		}
 	
-		public TaxonLine parse() throws TaxonParsingException {
+		public TaxonLine parse() throws ParsingException {
+			TaxonLine line = super.parse();
 			this.rawScientificName = extractRawScientificName();
 			this.parsedScientificName = parseRawScienfificName();
-			TaxonLine taxonLine = new TaxonLine();
-			taxonLine.setLineNumber(this.lineNumber);
-			taxonLine.setTaxonId(parseTaxonId(false));
-			taxonLine.setCode(extractCode());
-			taxonLine.setFamilyName(extractFamilyName());
-			taxonLine.setRawScientificName(this.rawScientificName);
-			taxonLine.setGenus(extractGenus());
-			taxonLine.setSpeciesName(extractSpeciesName());
-			taxonLine.setCanonicalScientificName(extractCanonicalScientificName());
-			taxonLine.setRank(extractRank());
-			taxonLine.setLanguageToVernacularNames(extractVernacularNames());
-			return taxonLine;
+			line.setTaxonId(parseTaxonId(false));
+			line.setCode(extractCode());
+			line.setFamilyName(extractFamilyName());
+			line.setRawScientificName(this.rawScientificName);
+			line.setGenus(extractGenus());
+			line.setSpeciesName(extractSpeciesName());
+			line.setCanonicalScientificName(extractCanonicalScientificName());
+			line.setRank(extractRank());
+			line.setLanguageToVernacularNames(extractVernacularNames());
+			return line;
 		}
 
-		protected Integer parseTaxonId(boolean required) throws TaxonParsingException {
-			return getColumnValue(Column.NO, required, Integer.class);
+		protected Integer parseTaxonId(boolean required) throws ParsingException {
+			return getColumnValue(SpeciesFileColumn.NO, required, Integer.class);
 		}
 
-		protected String extractCode() throws TaxonParsingException {
-			return getColumnValue(Column.CODE, true, String.class);
+		protected String extractCode() throws ParsingException {
+			return getColumnValue(SpeciesFileColumn.CODE, true, String.class);
 		}
 		
-		protected String extractFamilyName() throws TaxonParsingException {
-			return getColumnValue(Column.FAMILY, true, String.class);
+		protected String extractFamilyName() throws ParsingException {
+			return getColumnValue(SpeciesFileColumn.FAMILY, true, String.class);
 		}
 
-		protected String extractRawScientificName() throws TaxonParsingException {
-			return getColumnValue(Column.SCIENTIFIC_NAME, true, String.class);
+		protected String extractRawScientificName() throws ParsingException {
+			return getColumnValue(SpeciesFileColumn.SCIENTIFIC_NAME, true, String.class);
 		}
 		
-		protected ParsedName<Object> parseRawScienfificName() throws TaxonParsingException {
+		protected ParsedName<Object> parseRawScienfificName() throws ParsingException {
 			try {
 				NameParser nameParser = new NameParser();
 				ParsedName<Object> parsedName = nameParser.parse(rawScientificName);
 				return parsedName;
 			} catch (UnparsableException e) {
-				TaxonParsingError error = createFieldParsingError(
-						Column.SCIENTIFIC_NAME, "scientific name", rawScientificName);
-				throw new TaxonParsingException(error);
+				ParsingError error = createFieldParsingError(
+						SpeciesFileColumn.SCIENTIFIC_NAME, "scientific name", rawScientificName);
+				throw new ParsingException(error);
 			}
 		}
 		
-		protected TaxonRank extractRank() throws TaxonParsingException {
+		protected TaxonRank extractRank() throws ParsingException {
 			Rank rank = parsedScientificName.getRank();
 			TaxonRank taxonRank;
 			if ( rank == null ) {
@@ -213,26 +160,26 @@ public class TaxonCSVReader extends CsvReader {
 			return taxonRank;
 		}
 
-		protected String extractCanonicalScientificName() throws TaxonParsingException {
+		protected String extractCanonicalScientificName() throws ParsingException {
 			Rank rank = parsedScientificName.getRank();
 			boolean showRankMarker = rank == Rank.GENUS || rank == Rank.VARIETY;
 			String result = parsedScientificName.buildName(false, showRankMarker, false, false, false, true, true, false, false, false, false);
 			return result;
 		}
 		
-		protected String extractGenus() throws TaxonParsingException {
+		protected String extractGenus() throws ParsingException {
 			String genus = parsedScientificName.getGenusOrAbove();
 			return genus;
 		}
 		
-		protected String extractSpeciesName() throws TaxonParsingException {
+		protected String extractSpeciesName() throws ParsingException {
 			String speciesName = parsedScientificName.canonicalSpeciesName();
 			return speciesName;
 		}
 		
-		protected Map<String, List<String>> extractVernacularNames() throws TaxonParsingException {
+		protected Map<String, List<String>> extractVernacularNames() throws ParsingException {
 			Map<String, List<String>> result = new HashMap<String, List<String>>();
-			List<String> languageColumnNames = reader.getLanguageColumnNames();
+			List<String> languageColumnNames = ((TaxonCSVReader) getReader()).getLanguageColumnNames();
 			for (String langCode : languageColumnNames) {
 				List<String> vernacularNames = extractVernacularNames(langCode);
 				result.put(langCode, vernacularNames);
@@ -240,8 +187,8 @@ public class TaxonCSVReader extends CsvReader {
 			return result;
 		}
 
-		protected List<String> extractVernacularNames(String colName) throws TaxonParsingException {
-			String colValue = StringUtils.normalizeSpace(csvLine.getValue(colName, String.class));
+		protected List<String> extractVernacularNames(String colName) throws ParsingException {
+			String colValue = StringUtils.normalizeSpace(getColumnValue(colName, false, String.class));
 			if ( StringUtils.isBlank(colValue) ) {
 				return Collections.emptyList();
 			} else {
@@ -258,7 +205,7 @@ public class TaxonCSVReader extends CsvReader {
 			}
 		}
 
-		private String extractVernacularName(String colName, String splitPart) throws TaxonParsingException {
+		private String extractVernacularName(String colName, String splitPart) throws ParsingException {
 			String trimmed = splitPart.replaceAll(VERNACULAR_NAME_TRIM_EXPRESSION, "");
 			if ( trimmed.length() > 0 ) {
 				Matcher matcher = SYNONYM_PATTERN.matcher(trimmed);
@@ -266,8 +213,8 @@ public class TaxonCSVReader extends CsvReader {
 					if ( SYNONYM_COL_NAME.equals(colName) ) {
 						matcher.replaceAll("");
 					} else {
-						TaxonParsingError error = new TaxonParsingError(ErrorType.UNEXPECTED_SYNONYM, lineNumber, colName);
-						throw new TaxonParsingException(error);
+						ParsingError error = new ParsingError(ErrorType.UNEXPECTED_SYNONYM, lineNumber, colName);
+						throw new ParsingException(error);
 					}
 				}
 				return trimmed;
@@ -276,7 +223,7 @@ public class TaxonCSVReader extends CsvReader {
 			}
 		}
 
-		protected <T> T getColumnValue(Column column, boolean required, Class<T> type) throws TaxonParsingException {
+		protected <T> T getColumnValue(SpeciesFileColumn column, boolean required, Class<T> type) throws ParsingException {
 			T value = csvLine.getValue(column.getName(), type);
 			if ( required && ( value == null || value instanceof String && StringUtils.isBlank((String) value) )) {
 				throwEmptyColumnParsingException(column);
@@ -284,148 +231,40 @@ public class TaxonCSVReader extends CsvReader {
 			return value;
 		}
 		
-		protected TaxonParsingError createFieldParsingError(Column column, String fieldName, String value) {
-			TaxonParsingError error = new TaxonParsingError(lineNumber, 
-					column, "Error parsing " + fieldName +" from " + value);
+		protected ParsingError createFieldParsingError(SpeciesFileColumn column, String fieldName, String value) {
+			ParsingError error = new ParsingError(ErrorType.INVALID_VALUE, lineNumber, 
+					column.getName(), "Error parsing " + fieldName +" from " + value);
 			return error;
 		}
 
-		protected void throwEmptyColumnParsingException(Column column)
-				throws TaxonParsingException {
-			TaxonParsingError error = new TaxonParsingError(TaxonParsingError.ErrorType.EMPTY, lineNumber, column);
-			throw new TaxonParsingException(error);
+		protected void throwEmptyColumnParsingException(SpeciesFileColumn column)
+				throws ParsingException {
+			ParsingError error = new ParsingError(ErrorType.EMPTY, lineNumber, column.getName());
+			throw new ParsingException(error);
 		}
 
-		public TaxonCSVReader getReader() {
-			return reader;
-		}
-		
-	}
-	
-	public static class TaxonLine {
-		
-		private long lineNumber;
-		private Integer taxonId;
-		private String code;
-		private TaxonRank rank;
-		private String familyName;
-		private String genus;
-		private String speciesName;
-		private String rawScientificName;
-		private String canonicalScientificName;
-		private Map<String, List<String>> languageToVernacularNames;
-
-		public List<String> getVernacularNames(String langCode) {
-			if ( languageToVernacularNames != null ) {
-				return languageToVernacularNames.get(langCode);
-			} else {
-				return null;
-			}
-		}
-
-		public long getLineNumber() {
-			return lineNumber;
-		}
-
-		public void setLineNumber(long lineNumber) {
-			this.lineNumber = lineNumber;
-		}
-
-		public Integer getTaxonId() {
-			return taxonId;
-		}
-
-		public void setTaxonId(Integer taxonId) {
-			this.taxonId = taxonId;
-		}
-
-		public String getCode() {
-			return code;
-		}
-
-		public void setCode(String code) {
-			this.code = code;
-		}
-
-		public TaxonRank getRank() {
-			return rank;
-		}
-
-		public void setRank(TaxonRank rank) {
-			this.rank = rank;
-		}
-
-		public String getFamilyName() {
-			return familyName;
-		}
-
-		public void setFamilyName(String familyName) {
-			this.familyName = familyName;
-		}
-
-		public String getGenus() {
-			return genus;
-		}
-
-		public void setGenus(String genus) {
-			this.genus = genus;
-		}
-
-		public String getSpeciesName() {
-			return speciesName;
-		}
-
-		public void setSpeciesName(String speciesName) {
-			this.speciesName = speciesName;
-		}
-
-		public String getRawScientificName() {
-			return rawScientificName;
-		}
-
-		public void setRawScientificName(String rawScientificName) {
-			this.rawScientificName = rawScientificName;
-		}
-
-		public String getCanonicalScientificName() {
-			return canonicalScientificName;
-		}
-
-		public void setCanonicalScientificName(String canonicalScientificName) {
-			this.canonicalScientificName = canonicalScientificName;
-		}
-
-		public Map<String, List<String>> getLanguageToVernacularNames() {
-			return languageToVernacularNames;
-		}
-
-		public void setLanguageToVernacularNames(
-				Map<String, List<String>> languageToVernacularNames) {
-			this.languageToVernacularNames = languageToVernacularNames;
-		}
-		
 	}
 	
 	class Validator {
 		
-		public void validate() throws TaxonParsingException {
+		public void validate() throws ParsingException {
 			validateHeaders();
 		}
 
-		protected void validateHeaders() throws TaxonParsingException {
+		protected void validateHeaders() throws ParsingException {
 			List<String> colNames = getColumnNames();
-			Column[] expectedColumns = Column.values();
+			SpeciesFileColumn[] expectedColumns = SpeciesFileColumn.values();
 			int fixedColsSize = expectedColumns.length;
 			if ( colNames == null || colNames.size() < fixedColsSize ) {
-				TaxonParsingError error = new TaxonParsingError(ErrorType.UNEXPECTED_COLUMNS);
-				throw new TaxonParsingException(error);
+				ParsingError error = new ParsingError(ErrorType.UNEXPECTED_COLUMNS);
+				throw new ParsingException(error);
 			}
 			for (int i = 0; i < fixedColsSize; i++) {
 				String colName = StringUtils.trimToEmpty(colNames.get(i));
 				String expectedColName = expectedColumns[i].getName();
 				if ( ! expectedColName.equals(colName) ) {
-					TaxonParsingError error = new TaxonParsingError(ErrorType.WRONG_COLUMN_NAME, 1, colName, expectedColName);
-					throw new TaxonParsingException(error);
+					ParsingError error = new ParsingError(ErrorType.WRONG_COLUMN_NAME, 1, colName, expectedColName);
+					throw new ParsingException(error);
 				}
 			}
 			validateLanguageHeaders(colNames);

@@ -87,11 +87,11 @@
                                 <includeClass>org.openforis.collect.manager.process.proxy.*</includeClass>
                                 <includeClass>org.openforis.collect.manager.referenceDataImport.ParsingError$ErrorType</includeClass>
                                 <includeClass>org.openforis.collect.manager.referenceDataImport.proxy.*</includeClass>
-                                <includeClass>org.openforis.collect.manager.speciesImport.TaxonParsingError$ErrorType</includeClass>
                                 <includeClass>org.openforis.collect.metamodel.NodeDefinitionSummary</includeClass>
                                 <includeClass>org.openforis.collect.metamodel.proxy.*</includeClass>
                                 <includeClass>org.openforis.collect.model.AbstractSummaries</includeClass>
                                 <includeClass>org.openforis.collect.model.CollectRecord$State</includeClass>
+                                <includeClass>org.openforis.collect.model.CollectTaxonomy</includeClass>
                                 <includeClass>org.openforis.collect.model.RecordSummarySortField</includeClass>
                                 <includeClass>org.openforis.collect.model.RecordSummarySortField$Sortable</includeClass>
                                 <includeClass>org.openforis.collect.model.SurveySummary</includeClass>

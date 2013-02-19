@@ -48,8 +48,7 @@
                    src="survey_edit/info.zul" />
                </tabpanel>
                <tabpanel>
-                 <flash
-                   src="/collect.swf?lang=en_US&amp;species_import=true"
+                 <flash src="@load(vm.speciesImportModuleUrl)"
                    height="100%" width="100%" />
                </tabpanel>
                <tabpanel>

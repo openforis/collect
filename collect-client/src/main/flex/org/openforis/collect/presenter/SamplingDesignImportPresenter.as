@@ -78,10 +78,11 @@ package org.openforis.collect.presenter
 import org.openforis.collect.presenter.ReferenceDataImportMessageKeys;
 
 class MessageKeys extends ReferenceDataImportMessageKeys {
-	
+	/*
 	override public function get CONFIRM_CLOSE_TITLE():String {
-		return "";
+		return "samplingDesignImport.confirmClose.title";
 	}
+	*/
 	
 }
 

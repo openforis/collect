@@ -116,9 +116,7 @@ package org.openforis.collect.presenter {
 			} else if ( preview ) {
 				initForPreview(params, localeString);
 			} else if ( speciesImport ) {
-				_view.currentState = collect.FULL_SCREEN_STATE;
-				var speciesImportSessionInitResponder:IResponder = new AsyncResponder(initSessionForSpeciesImportResultHandler, faultHandler);
-				this._sessionClient.initSession(speciesImportSessionInitResponder, localeString);
+				initForSpeciesImport();
 			} else if ( samplingDesignImport ) {
 				initForSamplingDesignImport(params, localeString);
 			} else {
@@ -137,6 +135,21 @@ package org.openforis.collect.presenter {
 			this._sessionClient.initSession(previewResp, localeString);
 		}
 		
+		protected function initForSpeciesImport():void {
+			_view.currentState = collect.FULL_SCREEN_STATE;
+			var params:Object = FlexGlobals.topLevelApplication.parameters;
+			var surveyId:int = int(params.surveyId);
+			if ( surveyId > 0 && params.work != "null" ) {
+				var localeString:String = params.lang as String;
+				var work:Boolean = params.work == "true";
+				var token:Object = {surveyId: surveyId, work: work};
+				var speciesImportSessionInitResponder:IResponder = new AsyncResponder(initSessionForSpeciesImportResultHandler, faultHandler, token);
+				this._sessionClient.initSession(speciesImportSessionInitResponder, localeString);
+			} else {
+				AlertUtil.showError("referenceDataImport.saveSurveyBefore");
+			}
+		}
+		
 		protected function initForSamplingDesignImport(params:Object, localeString:String):void {
 			_view.currentState = collect.FULL_SCREEN_STATE;
 			var surveyId:int = int(params.surveyId);
@@ -146,7 +159,7 @@ package org.openforis.collect.presenter {
 				var samplingDesignImportSessionInitResponder:IResponder = new AsyncResponder(initSessionForSamplingDesignImportResultHandler, faultHandler, token);
 				this._sessionClient.initSession(samplingDesignImportSessionInitResponder, localeString);
 			} else {
-				AlertUtil.showError("samplingDesignImport.saveSurveyBefore");
+				AlertUtil.showError("referenceDataImport.saveSurveyBefore");
 			}
 			
 		}
@@ -197,7 +210,9 @@ package org.openforis.collect.presenter {
 		
 		internal function initSessionForSpeciesImportResultHandler(event:ResultEvent, token:Object = null):void {
 			initSessionCommonResultHandler(event, token);
-			eventDispatcher.dispatchEvent(new UIEvent(UIEvent.SHOW_SPECIES_IMPORT));
+			var uiEvent:UIEvent = new UIEvent(UIEvent.SHOW_SPECIES_IMPORT);
+			uiEvent.obj = token;
+			eventDispatcher.dispatchEvent(uiEvent);
 		}
 		
 		internal function initSessionForSamplingDesignImportResultHandler(event:ResultEvent, token:Object = null):void {

@@ -11,20 +11,28 @@ import static org.openforis.idm.model.species.Taxon.TaxonRank.SPECIES;
 import static org.openforis.idm.model.species.Taxon.TaxonRank.SUBSPECIES;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.List;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.openforis.collect.CollectIntegrationTest;
+import org.openforis.collect.manager.referenceDataImport.ParsingError;
+import org.openforis.collect.manager.referenceDataImport.ParsingError.ErrorType;
+import org.openforis.collect.manager.speciesImport.SpeciesFileColumn;
 import org.openforis.collect.manager.speciesImport.SpeciesImportProcess;
 import org.openforis.collect.manager.speciesImport.SpeciesImportStatus;
-import org.openforis.collect.manager.speciesImport.TaxonCSVReader.Column;
-import org.openforis.collect.manager.speciesImport.TaxonParsingError;
-import org.openforis.collect.manager.speciesImport.TaxonParsingError.ErrorType;
+import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.CollectTaxonomy;
+import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.collect.persistence.TaxonDao;
 import org.openforis.collect.persistence.TaxonVernacularNameDao;
 import org.openforis.collect.persistence.TaxonomyDao;
+import org.openforis.idm.metamodel.xml.IdmlParseException;
 import org.openforis.idm.model.TaxonOccurrence;
 import org.openforis.idm.model.species.Taxon;
 import org.openforis.idm.model.species.TaxonVernacularName;
@@ -42,13 +50,15 @@ import org.springframework.transaction.annotation.Transactional;
 @ContextConfiguration( locations = {"classpath:test-context.xml"} )
 @TransactionConfiguration(defaultRollback=true)
 @Transactional
-public class SpeciesImportProcessTest {
+public class SpeciesImportProcessTest extends CollectIntegrationTest {
 
 	private static final String INVALID_TEST_SPECIES_CSV = "test-wrong-species.csv";
 	private static final String VALID_TEST_SPECIES_CSV = "test-species.csv";
 
 	private static final String TEST_TAXONOMY_NAME = "it_tree";
 	
+	@Autowired
+	private SurveyManager surveyManager;
 	@Autowired
 	private SpeciesManager speciesManager;
 	@Autowired
@@ -58,10 +68,21 @@ public class SpeciesImportProcessTest {
 	@Autowired
 	private TaxonVernacularNameDao taxonVernacularNameDao;
 	
+	private CollectSurvey survey;
+	
+	@Before
+	public void init() throws IdmlParseException, IOException, SurveyImportException {
+		survey = loadSurvey();
+		surveyManager.importModel(survey);
+	}
+	
 	public SpeciesImportProcess importCSVFile(String fileName) throws Exception {
 		File file = getTestFile(fileName);
-		String taxonomyName = TEST_TAXONOMY_NAME;
-		SpeciesImportProcess process = new SpeciesImportProcess(speciesManager, taxonomyName, file, true);
+		CollectTaxonomy taxonomy = new CollectTaxonomy();
+		taxonomy.setSurveyId(survey.getId());
+		taxonomy.setName(TEST_TAXONOMY_NAME);
+		speciesManager.save(taxonomy);
+		SpeciesImportProcess process = new SpeciesImportProcess(speciesManager, taxonomy.getId(), file, true);
 		process.call();
 		return process;
 	}
@@ -95,14 +116,15 @@ public class SpeciesImportProcessTest {
 		SpeciesImportStatus status = process.getStatus();
 		assertTrue(status.isComplete());
 		
-		List<TaxonOccurrence> occurrences = speciesManager.findByVernacularName(TEST_TAXONOMY_NAME, "Mbamba", 10);
+		int surveyId = survey.getId();
+		List<TaxonOccurrence> occurrences = speciesManager.findByVernacularName(surveyId, TEST_TAXONOMY_NAME, "Mbamba", 10);
 		assertNotNull(occurrences);
 		assertEquals(1, occurrences.size());
 		TaxonOccurrence stored = occurrences.get(0);
 		TaxonOccurrence expected = new TaxonOccurrence(8, "AFZ/QUA", "Afzelia quanzensis", "Mbambakofi", "swh", null);
 		assertEquals(expected, stored);
 		
-		List<TaxonOccurrence> occurrences2 = speciesManager.findByVernacularName(TEST_TAXONOMY_NAME, "Mshai-mamba", 10);
+		List<TaxonOccurrence> occurrences2 = speciesManager.findByVernacularName(surveyId, TEST_TAXONOMY_NAME, "Mshai-mamba", 10);
 		assertNotNull(occurrences2);
 		assertEquals(1, occurrences2.size());
 		TaxonOccurrence stored2 = occurrences2.get(0);
@@ -161,7 +183,7 @@ public class SpeciesImportProcessTest {
 	public void testErrorHandling() throws Exception {
 		SpeciesImportProcess process = importCSVFile(INVALID_TEST_SPECIES_CSV);
 		SpeciesImportStatus status = process.getStatus();
-		List<TaxonParsingError> errors = status.getErrors();
+		List<ParsingError> errors = status.getErrors();
 		assertEquals(8, errors.size());
 		
 		assertTrue(status.isRowProcessed(1));
@@ -179,32 +201,33 @@ public class SpeciesImportProcessTest {
 		//unexisting row
 		assertFalse(status.isRowProcessed(12));
 		
-		assertTrue(containsError(errors, 3, Column.CODE, ErrorType.EMPTY));
-		assertTrue(containsError(errors, 4, Column.SCIENTIFIC_NAME, ErrorType.EMPTY));
-		assertTrue(containsError(errors, 6, Column.CODE, ErrorType.DUPLICATE_VALUE));
-		assertTrue(containsError(errors, 7, Column.FAMILY, ErrorType.EMPTY));
-		assertTrue(containsError(errors, 8, Column.NO, ErrorType.DUPLICATE_VALUE));
-		assertTrue(containsError(errors, 9, Column.SCIENTIFIC_NAME, ErrorType.DUPLICATE_VALUE));
-		assertTrue(containsError(errors, 10, Column.SCIENTIFIC_NAME, ErrorType.DUPLICATE_VALUE));
-		assertTrue(containsError(errors, 10, Column.SCIENTIFIC_NAME, ErrorType.DUPLICATE_VALUE));
+		assertTrue(containsError(errors, 3, SpeciesFileColumn.CODE, ErrorType.EMPTY));
+		assertTrue(containsError(errors, 4, SpeciesFileColumn.SCIENTIFIC_NAME, ErrorType.EMPTY));
+		assertTrue(containsError(errors, 6, SpeciesFileColumn.CODE, ErrorType.DUPLICATE_VALUE));
+		assertTrue(containsError(errors, 7, SpeciesFileColumn.FAMILY, ErrorType.EMPTY));
+		assertTrue(containsError(errors, 8, SpeciesFileColumn.NO, ErrorType.DUPLICATE_VALUE));
+		assertTrue(containsError(errors, 9, SpeciesFileColumn.SCIENTIFIC_NAME, ErrorType.DUPLICATE_VALUE));
+		assertTrue(containsError(errors, 10, SpeciesFileColumn.SCIENTIFIC_NAME, ErrorType.DUPLICATE_VALUE));
+		assertTrue(containsError(errors, 10, SpeciesFileColumn.SCIENTIFIC_NAME, ErrorType.DUPLICATE_VALUE));
 		assertTrue(containsError(errors, 11, "swh", ErrorType.UNEXPECTED_SYNONYM));
 	}
 
-	protected boolean containsError(List<TaxonParsingError> errors, long row, String column, ErrorType type) {
-		for (TaxonParsingError taxonParsingError : errors) {
-			if ( taxonParsingError.getErrorType() == type && taxonParsingError.getRow() == row && taxonParsingError.getColumn().equals(column)) {
+	protected boolean containsError(List<ParsingError> errors, long row, String column, ErrorType type) {
+		String[] columnArr = new String[] {column};
+		for (ParsingError error : errors) {
+			if ( error.getErrorType() == type && error.getRow() == row && Arrays.equals(columnArr, error.getColumns()) ) {
 				return true;
 			}
 		}
 		return false;
 	}
 	
-	protected boolean containsError(List<TaxonParsingError> errors, long row, Column column, ErrorType type) {
+	protected boolean containsError(List<ParsingError> errors, long row, SpeciesFileColumn column, ErrorType type) {
 		return containsError(errors, row, column.getName(), type);
 	}
 	
 	protected Taxon findTaxonByCode(String code) {
-		Taxonomy taxonomy = taxonomyDao.load(TEST_TAXONOMY_NAME);
+		Taxonomy taxonomy = taxonomyDao.load(survey.getId(), TEST_TAXONOMY_NAME);
 		List<Taxon> results = taxonDao.findByCode(taxonomy.getId(), code, 10);
 		assertNotNull(results);
 		assertEquals(1, results.size());
@@ -213,7 +236,7 @@ public class SpeciesImportProcessTest {
 	}
 	
 	protected TaxonOccurrence findByCode(String code) {
-		List<TaxonOccurrence> occurrences = speciesManager.findByCode(TEST_TAXONOMY_NAME, code, 10);
+		List<TaxonOccurrence> occurrences = speciesManager.findByCode(survey.getId(), TEST_TAXONOMY_NAME, code, 10);
 		assertNotNull(occurrences);
 		assertEquals(1, occurrences.size());
 		TaxonOccurrence occurrence = occurrences.get(0);

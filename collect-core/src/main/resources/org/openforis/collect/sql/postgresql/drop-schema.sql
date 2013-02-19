@@ -23,6 +23,11 @@ ALTER TABLE "collect"."ofc_taxon"
 	DROP CONSTRAINT "ofc_taxon_parent_fkey" CASCADE;
 ALTER TABLE "collect"."ofc_taxon"
 	DROP CONSTRAINT "ofc_taxon_taxonomy_fkey" CASCADE;
+ALTER TABLE "collect"."ofc_taxonomy"
+	DROP CONSTRAINT "ofc_taxonomy_survey_fkey" CASCADE ;
+ALTER TABLE "collect"."ofc_taxonomy"
+	DROP CONSTRAINT "ofc_taxonomy_survey_work_fkey" CASCADE ;
+ALTER TABLE "collect"."ofc_taxon_vernacular_name"
 ALTER TABLE "collect"."ofc_user_role"
 	DROP CONSTRAINT "ofc_user_user_role_fkey" CASCADE;
 ALTER TABLE "collect"."ofc_record"
@@ -41,6 +46,8 @@ ALTER TABLE "collect"."ofc_taxon"
 	DROP CONSTRAINT "ofc_taxon_id_key" CASCADE;
 ALTER TABLE "collect"."ofc_taxonomy"
 	DROP CONSTRAINT "ofc_taxonomy_name_key" CASCADE;
+ALTER TABLE "collect"."ofc_taxonomy"
+	DROP CONSTRAINT "ofc_taxonomy_name_work_key" CASCADE;
 
 DROP TABLE IF EXISTS "collect"."ofc_application_info";
 DROP TABLE IF EXISTS "collect"."ofc_config";
