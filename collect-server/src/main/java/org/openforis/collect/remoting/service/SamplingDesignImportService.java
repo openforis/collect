@@ -37,7 +37,10 @@ public class SamplingDesignImportService extends ReferenceDataImportService<Samp
 			CollectSurvey survey = work ? surveyManager.loadSurveyWork(surveyId): surveyManager.getById(surveyId);
 			importProcess = new SamplingDesignImportProcess(samplingDesignManager, survey, work, importFile, overwriteAll);
 			importProcess.init();
-			startProcessThread();
+			SamplingDesignImportStatus status = importProcess.getStatus();
+			if ( status != null && ! importProcess.getStatus().isError() ) {
+				startProcessThread();
+			}
 		}
 		return getStatus();
 	}

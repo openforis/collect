@@ -67,7 +67,7 @@ public class SamplingDesignManager {
 		Integer id = item.getId();
 		samplingDesignDao.delete(id);
 	}
-
+	
 	@Transactional
 	public void deleteBySurvey(int surveyId) {
 		samplingDesignDao.deleteBySurvey(surveyId);
@@ -78,4 +78,26 @@ public class SamplingDesignManager {
 		samplingDesignDao.deleteBySurveyWork(surveyId);
 	}
 	
+	@Transactional
+	public void publishSamplingDesign(Integer surveyWorkId, int publishedSurveyId) {
+		List<SamplingDesignItem> items = samplingDesignDao.loadItemsBySurveyWork(surveyWorkId, 0, Integer.MAX_VALUE);
+		samplingDesignDao.deleteBySurvey(publishedSurveyId);
+		samplingDesignDao.deleteBySurveyWork(surveyWorkId);
+		for (SamplingDesignItem item : items) {
+			item.setSurveyWorkId(null);
+			item.setSurveyId(publishedSurveyId);
+			samplingDesignDao.update(item);
+		}
+	}
+	
+	@Transactional
+	public void duplicateSamplingDesignForWork(int publishedSurveyId, Integer surveyWorkId) {
+		List<SamplingDesignItem> items = samplingDesignDao.loadItemsBySurvey(publishedSurveyId, 0, Integer.MAX_VALUE);
+		for (SamplingDesignItem item : items) {
+			item.setId(null);
+			item.setSurveyId(null);
+			item.setSurveyWorkId(surveyWorkId);
+			samplingDesignDao.insert(item);
+		}
+	}
 }

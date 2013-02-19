@@ -58,13 +58,4 @@
 		]]>
 	</fx:Script>
 	
-	<view:states>
-		<s:State name="default" enterState="invalidateSkinState()" />
-		<s:State name="loading" enterState="invalidateSkinState()" />
-		<s:State name="selectFile" enterState="invalidateSkinState()" />
-		<s:State name="uploading" enterState="invalidateSkinState()" />
-		<s:State name="importing" enterState="invalidateSkinState()" />
-		<s:State name="error" enterState="invalidateSkinState()" />
-	</view:states>
-	
 </view:AbstractReferenceDataImportView>
