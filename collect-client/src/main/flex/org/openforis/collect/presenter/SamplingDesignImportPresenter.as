@@ -9,6 +9,7 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.client.SamplingDesignImportClient;
 	import org.openforis.collect.model.proxy.SamplingDesignSummariesProxy;
 	import org.openforis.collect.ui.view.SamplingDesignImportView;
+	import org.openforis.collect.util.AlertUtil;
 	
 	public class SamplingDesignImportPresenter extends AbstractReferenceDataImportPresenter {
 		
@@ -31,6 +32,24 @@ package org.openforis.collect.presenter
 			return SamplingDesignImportView(_view);
 		}
 		
+		private function get messageKeys():MessageKeys {
+			return MessageKeys(_messageKeys);
+		}
+		
+		override protected function checkCanImport():Boolean {
+			var result:Boolean = checkIsWork();
+			return result;
+		}
+		
+		protected function checkIsWork():Boolean {
+			if ( view.work ) {
+				return true;
+			} else {
+				AlertUtil.showMessage(messageKeys.SAVE_SURVEY_BEFORE_EDIT);
+				return false;
+			}
+		}
+
 		override protected function performSummariesLoad(offset:int = 0):void {
 			var surveyId:int = view.surveyId;
 			var work:Boolean = view.work;
@@ -83,6 +102,8 @@ class MessageKeys extends ReferenceDataImportMessageKeys {
 		return "samplingDesignImport.confirmClose.title";
 	}
 	*/
-	
+	public function get SAVE_SURVEY_BEFORE_EDIT():String {
+		return "samplingDesignImport.saveSurveyBeforeEdit";
+	}
 }
 

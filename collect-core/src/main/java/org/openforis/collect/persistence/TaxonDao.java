@@ -10,6 +10,7 @@ import org.jooq.Record;
 import org.jooq.Result;
 import org.jooq.Select;
 import org.jooq.SelectQuery;
+import org.jooq.SortField;
 import org.jooq.StoreQuery;
 import org.jooq.TableField;
 import org.openforis.collect.persistence.jooq.MappingJooqDaoSupport;
@@ -80,12 +81,20 @@ public class TaxonDao extends MappingJooqDaoSupport<Taxon, TaxonDao.JooqFactory>
 	}
 	
 	public List<Taxon> loadTaxons(int taxonomyId, int offset, int maxRecords) {
+		return loadTaxons(taxonomyId, offset, maxRecords, OFC_TAXON.SCIENTIFIC_NAME.asc());
+	}
+	
+	public List<Taxon> loadTaxonsForTreeBuilding(int taxonomyId) {
+		return loadTaxons(taxonomyId, 0, Integer.MAX_VALUE, OFC_TAXON.PARENT_ID.asc().nullsFirst());
+	}
+	
+	public List<Taxon> loadTaxons(int taxonomyId, int offset, int maxRecords, SortField<?> sortField) {
 		JooqFactory jf = getMappingJooqFactory();
 		SelectQuery q = jf.selectQuery();	
 		q.addFrom(OFC_TAXON);
 		q.addConditions(OFC_TAXON.TAXONOMY_ID.equal(taxonomyId));
 		//always order by SCIENTIFIC_NAME to avoid pagination issues
-		q.addOrderBy(OFC_TAXON.SCIENTIFIC_NAME);
+		q.addOrderBy(sortField);
 		
 		//add limit
 		q.addLimit(offset, maxRecords);
@@ -98,7 +107,9 @@ public class TaxonDao extends MappingJooqDaoSupport<Taxon, TaxonDao.JooqFactory>
 	
 	public void deleteByTaxonomy(int taxonomyId) {
 		JooqFactory jf = getMappingJooqFactory();
-		jf.delete(OFC_TAXON).where(OFC_TAXON.TAXONOMY_ID.equal(taxonomyId)).execute();
+		jf.delete(OFC_TAXON)
+			.where(OFC_TAXON.TAXONOMY_ID.equal(taxonomyId))
+			.execute();
 	}
 	
 	protected static class JooqFactory extends MappingJooqFactory<Taxon> {

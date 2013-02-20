@@ -82,7 +82,6 @@ public class SamplingDesignManager {
 	public void publishSamplingDesign(Integer surveyWorkId, int publishedSurveyId) {
 		List<SamplingDesignItem> items = samplingDesignDao.loadItemsBySurveyWork(surveyWorkId, 0, Integer.MAX_VALUE);
 		samplingDesignDao.deleteBySurvey(publishedSurveyId);
-		samplingDesignDao.deleteBySurveyWork(surveyWorkId);
 		for (SamplingDesignItem item : items) {
 			item.setSurveyWorkId(null);
 			item.setSurveyId(publishedSurveyId);

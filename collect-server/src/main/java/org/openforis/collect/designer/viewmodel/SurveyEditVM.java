@@ -406,11 +406,18 @@ public class SurveyEditVM extends SurveyBaseVM {
 
 	protected Map<String, String> createBasicModuleParameters() {
 		Integer surveyId = getSurveyId();
+		SessionStatus sessionStatus = getSessionStatus();
+		Integer publishedSurveyId = sessionStatus.getPublishedSurveyId();
+		if ( surveyId == null ) {
+			//not yet saved
+			surveyId = publishedSurveyId;
+		}
+		boolean work = surveyId != null && ! surveyId.equals(publishedSurveyId);
 		String surveyIdStr = surveyId == null ? "": surveyId.toString();
 		String localeStr = "en_US";
 		Map<String, String> result = new HashMap<String, String>();
 		result.put("lang", localeStr);
-		result.put("work", "" + true); //in the designer we are always working on "temporary" surveys
+		result.put("work", "" + work);
 		result.put("surveyId", surveyIdStr);
 		return result;
 	}

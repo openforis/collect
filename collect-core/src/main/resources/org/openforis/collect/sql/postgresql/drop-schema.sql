@@ -53,7 +53,6 @@ DROP TABLE IF EXISTS "collect"."ofc_config";
 DROP TABLE IF EXISTS "collect"."ofc_logo";
 DROP TABLE IF EXISTS "collect"."ofc_record";
 DROP TABLE IF EXISTS "collect"."ofc_sampling_desing";
-DROP TABLE IF EXISTS "collect"."ofc_schema_definition";
 DROP TABLE IF EXISTS "collect"."ofc_survey_work";
 DROP TABLE IF EXISTS "collect"."ofc_survey";
 DROP TABLE IF EXISTS "collect"."ofc_taxon";

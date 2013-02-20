@@ -1,4 +1,4 @@
-package org.openforis.collect.manager.speciesImport;
+package org.openforis.collect.model;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,6 +11,7 @@ import java.util.Stack;
 import org.openforis.collect.manager.referenceDataImport.ParsingError;
 import org.openforis.collect.manager.referenceDataImport.ParsingError.ErrorType;
 import org.openforis.collect.manager.referenceDataImport.ParsingException;
+import org.openforis.collect.manager.speciesImport.SpeciesFileColumn;
 import org.openforis.idm.model.species.Taxon;
 import org.openforis.idm.model.species.TaxonVernacularName;
 
@@ -19,7 +20,7 @@ import org.openforis.idm.model.species.TaxonVernacularName;
  * @author S. Ricci
  *
  */
-class TaxonTree {
+public class TaxonTree {
 
 	private List<Node> roots;
 
@@ -28,7 +29,7 @@ class TaxonTree {
 	Map<Integer, Node> taxonIdToNode;
 
 	
-	TaxonTree() {
+	public TaxonTree() {
 		super();
 		roots = new ArrayList<Node>();
 		scientificNameToNode = new HashMap<String, TaxonTree.Node>();
@@ -40,7 +41,7 @@ class TaxonTree {
 		return roots;
 	}
 	
-	public void addNode(Taxon parent, Taxon taxon) {
+	public Node addNode(Taxon parent, Taxon taxon) {
 		Node parentNode = findNodeByTaxon(parent);
 		Node newNode;
 		if ( parentNode == null ) {
@@ -51,6 +52,7 @@ class TaxonTree {
 			parentNode.addChild(newNode);
 		}
 		index(newNode);
+		return newNode;
 	}
 	
 	public void addVernacularName(Taxon taxon, TaxonVernacularName vernacularName) {
@@ -175,7 +177,7 @@ class TaxonTree {
 		}
 	}
 	
-	static class Node {
+	public static class Node {
 		
 		Node parent;
 		Taxon taxon;
@@ -208,6 +210,10 @@ class TaxonTree {
 			return vernacularNames;
 		}
 		
+		public void setVernacularNames(List<TaxonVernacularName> vernacularNames) {
+			this.vernacularNames = vernacularNames;
+		}
+		
 		public void addChild(Taxon taxon) {
 			Node node = new Node(this, taxon);
 			addChild(node);
@@ -229,17 +235,17 @@ class TaxonTree {
 		
 	}
 
-	static interface NodeVisitor {
+	public static interface NodeVisitor {
 		void visit(Node node);
 	}
 	
-	static interface NodeFinderVisitor extends NodeVisitor {
+	public static interface NodeFinderVisitor extends NodeVisitor {
 		boolean isFound();
 		Node getFoundNode();
 		void foundNode(Node foundNode);
 	}
 	
-	abstract class AbstractNodeFinderVisitor implements NodeFinderVisitor {
+	public abstract class AbstractNodeFinderVisitor implements NodeFinderVisitor {
 
 		protected Node foundNode;
 		

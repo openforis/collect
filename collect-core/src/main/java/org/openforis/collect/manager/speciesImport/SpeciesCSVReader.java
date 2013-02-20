@@ -36,19 +36,19 @@ import org.openforis.idm.model.species.Taxon.TaxonRank;
  * @author S. Ricci
  *
  */
-public class TaxonCSVReader extends CSVDataImportReader<TaxonLine> {
+public class SpeciesCSVReader extends CSVDataImportReader<SpeciesLine> {
 
-	public TaxonCSVReader(String filename) throws IOException, ParsingException {
+	public SpeciesCSVReader(String filename) throws IOException, ParsingException {
 		super(filename);
 	}
 
-	public TaxonCSVReader(Reader reader) throws IOException, ParsingException {
+	public SpeciesCSVReader(Reader reader) throws IOException, ParsingException {
 		super(reader);
 	}
 	
 	@Override
-	protected TaxonCSVLineParser createLineParserInstance() {
-		TaxonCSVLineParser lineParser = TaxonCSVLineParser.createInstance(this, currentCSVLine);
+	protected SpeciesCSVLineParser createLineParserInstance() {
+		SpeciesCSVLineParser lineParser = SpeciesCSVLineParser.createInstance(this, currentCSVLine);
 		return lineParser;
 	}
 	
@@ -70,7 +70,7 @@ public class TaxonCSVReader extends CSVDataImportReader<TaxonLine> {
 		}
 	}
 	
-	public static class TaxonCSVLineParser extends CSVLineParser<TaxonLine> {
+	public static class SpeciesCSVLineParser extends CSVLineParser<SpeciesLine> {
 		
 		private static final String VERNACULAR_NAME_TRIM_EXPRESSION = "^\\s+|\\s+$|;+$|\\.+$";
 		private static final String SYNONYM_COL_NAME = "";
@@ -82,16 +82,16 @@ public class TaxonCSVReader extends CSVDataImportReader<TaxonLine> {
 		private ParsedName<Object> parsedScientificName;
 		private String rawScientificName;
 		
-		TaxonCSVLineParser(TaxonCSVReader reader, CsvLine line) {
+		SpeciesCSVLineParser(SpeciesCSVReader reader, CsvLine line) {
 			super(reader, line);
 		}
 		
-		public static TaxonCSVLineParser createInstance(TaxonCSVReader reader, CsvLine line) {
-			return new TaxonCSVLineParser(reader, line);
+		public static SpeciesCSVLineParser createInstance(SpeciesCSVReader reader, CsvLine line) {
+			return new SpeciesCSVLineParser(reader, line);
 		}
 	
-		public TaxonLine parse() throws ParsingException {
-			TaxonLine line = super.parse();
+		public SpeciesLine parse() throws ParsingException {
+			SpeciesLine line = super.parse();
 			this.rawScientificName = extractRawScientificName();
 			this.parsedScientificName = parseRawScienfificName();
 			line.setTaxonId(parseTaxonId(false));
@@ -179,7 +179,7 @@ public class TaxonCSVReader extends CSVDataImportReader<TaxonLine> {
 		
 		protected Map<String, List<String>> extractVernacularNames() throws ParsingException {
 			Map<String, List<String>> result = new HashMap<String, List<String>>();
-			List<String> languageColumnNames = ((TaxonCSVReader) getReader()).getLanguageColumnNames();
+			List<String> languageColumnNames = ((SpeciesCSVReader) getReader()).getLanguageColumnNames();
 			for (String langCode : languageColumnNames) {
 				List<String> vernacularNames = extractVernacularNames(langCode);
 				result.put(langCode, vernacularNames);

@@ -11,7 +11,7 @@ import org.openforis.idm.model.species.Taxon.TaxonRank;
  * @author S. Ricci
  *
  */
-public class TaxonLine extends Line {
+public class SpeciesLine extends Line {
 	
 	private Integer taxonId;
 	private String code;

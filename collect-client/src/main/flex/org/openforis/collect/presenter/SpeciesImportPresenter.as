@@ -149,7 +149,9 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function newButtonClickHandler(event:MouseEvent):void	{
-			openTaxonomyEditPopUp(true);
+			if ( checkIsWork() ) {
+				openTaxonomyEditPopUp(true);
+			}
 		}
 		
 		protected function openTaxonomyEditPopUp(newTaxonomy:Boolean = false):void {
@@ -166,14 +168,14 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function editButtonClickHandler(event:MouseEvent):void {
-			if ( checkTaxonomyIsSelected() ) {
+			if ( checkTaxonomyIsSelected() && checkIsWork() ) {
 				openTaxonomyEditPopUp(false);
 				_taxonomyEditPopUp.nameTextInput.text = _selectedTaxonomy.name;
 			}
 		}
 
 		protected function deleteButtonClickHandler(event:MouseEvent):void	{
-			if ( checkTaxonomyIsSelected() ) {
+			if ( checkTaxonomyIsSelected() && checkIsWork() ) {
 				AlertUtil.showConfirm(messageKeys.CONFIRM_DELETE_TAXONOMY, null, null, performDeleteSelectedTaxonomy);
 			}
 		}
@@ -236,7 +238,20 @@ package org.openforis.collect.presenter {
 		}
 		
 		override protected function checkCanImport():Boolean {
-			return checkTaxonomyIsSelected();
+			var result:Boolean = checkIsWork();
+			if ( result ) {
+				result = checkTaxonomyIsSelected();
+			}
+			return result;
+		}
+		
+		protected function checkIsWork():Boolean {
+			if ( view.work ) {
+				return true;
+			} else {
+				AlertUtil.showMessage(messageKeys.SAVE_SURVEY_BEFORE_EDIT);
+				return false;
+			}
 		}
 		
 		protected function checkTaxonomyIsSelected():Boolean {
@@ -310,5 +325,9 @@ class MessageKeys extends ReferenceDataImportMessageKeys {
 	
 	public function get SYNONYM():String {
 		return "speciesImport.summaryList.synonym";
+	}
+	
+	public function get SAVE_SURVEY_BEFORE_EDIT():String {
+		return "speciesImport.saveSurveyBeforeEdit";
 	}
 }

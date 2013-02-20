@@ -5,8 +5,10 @@ package org.openforis.collect.manager;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
@@ -16,6 +18,8 @@ import org.openforis.collect.metamodel.TaxonSummaries;
 import org.openforis.collect.metamodel.TaxonSummary;
 import org.openforis.collect.model.CollectSurveyContext;
 import org.openforis.collect.model.CollectTaxonomy;
+import org.openforis.collect.model.TaxonTree;
+import org.openforis.collect.model.TaxonTree.Node;
 import org.openforis.collect.persistence.TaxonDao;
 import org.openforis.collect.persistence.TaxonVernacularNameDao;
 import org.openforis.collect.persistence.TaxonomyDao;
@@ -249,10 +253,42 @@ public class SpeciesManager {
 	public void duplicateTaxonomyForWork(int publishedSurveyId, Integer surveyWorkId) {
 		List<CollectTaxonomy> taxonomies = taxonomyDao.loadAllBySurvey(publishedSurveyId);
 		for (CollectTaxonomy taxonomy : taxonomies) {
+			int oldTaxonomyId = taxonomy.getId();
 			taxonomy.setId(null);
 			taxonomy.setSurveyId(null);
 			taxonomy.setSurveyWorkId(surveyWorkId);
 			taxonomyDao.insert(taxonomy);
+			Integer newTaxonomyId = taxonomy.getId();
+			duplicateTaxons(oldTaxonomyId, newTaxonomyId);
+
+		}
+	}
+
+	protected void duplicateTaxons(int oldTaxonomyId, Integer newTaxonomyId) {
+		List<Taxon> taxons = taxonDao.loadTaxonsForTreeBuilding(oldTaxonomyId);
+		Map<Integer, Taxon> oldIdToNewTaxon = new HashMap<Integer, Taxon>();
+		for (Taxon taxon : taxons) {
+			Integer oldId = taxon.getSystemId();
+			Integer oldParentId = taxon.getParentId();
+			if ( oldParentId != null ) {
+				Taxon newParent = oldIdToNewTaxon.get(oldParentId);
+				taxon.setParentId(newParent.getSystemId());
+			}
+			taxon.setSystemId(null);
+			taxon.setTaxonomyId(newTaxonomyId);
+			taxonDao.insert(taxon);
+			int newTaxonId = taxon.getSystemId();
+			duplicateVernacularNames(oldId, newTaxonId);
+			oldIdToNewTaxon.put(oldId, taxon);
+		}
+	}
+
+	protected void duplicateVernacularNames(int oldTaxonId, int newTaxonId) {
+		List<TaxonVernacularName> vernacularNames = taxonVernacularNameDao.findByTaxon(oldTaxonId);
+		for (TaxonVernacularName vernacularName : vernacularNames) {
+			vernacularName.setId(null);
+			vernacularName.setTaxonSystemId(newTaxonId);
+			taxonVernacularNameDao.insert(vernacularName);
 		}
 	}
 	
@@ -294,4 +330,21 @@ public class SpeciesManager {
 		return qualifierValues;
 	}
 
+	@Transactional
+	public TaxonTree createTaxonTree(int taxonomyId) {
+		List<Taxon> taxons = taxonDao.loadTaxonsForTreeBuilding(taxonomyId);
+		TaxonTree tree = new TaxonTree();
+		Map<Integer, Taxon> idToTaxon = new HashMap<Integer, Taxon>();
+		for (Taxon taxon : taxons) {
+			Integer systemId = taxon.getSystemId();
+			Integer parentId = taxon.getParentId();
+			Taxon parent = parentId == null ? null: idToTaxon.get(parentId);
+			Node newNode = tree.addNode(parent, taxon);
+			List<TaxonVernacularName> vernacularNames = taxonVernacularNameDao.findByTaxon(systemId);
+			newNode.setVernacularNames(vernacularNames);
+			idToTaxon.put(systemId, taxon);
+		}
+		return tree;
+	}
+	
 }
