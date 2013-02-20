@@ -73,11 +73,6 @@ public final class Tables {
 	public static org.openforis.collect.persistence.jooq.tables.OfcUserRole OFC_USER_ROLE = org.openforis.collect.persistence.jooq.tables.OfcUserRole.OFC_USER_ROLE;
 
 	/**
-	 * The table collect.sampling_design
-	 */
-	public static org.openforis.collect.persistence.jooq.tables.SamplingDesign SAMPLING_DESIGN = org.openforis.collect.persistence.jooq.tables.SamplingDesign.SAMPLING_DESIGN;
-
-	/**
 	 * No instances
 	 */
 	private Tables() {}

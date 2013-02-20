@@ -58,11 +58,6 @@ public final class Sequences {
 	public static final org.jooq.Sequence<java.lang.Long> OFC_USER_ROLE_ID_SEQ = new org.jooq.impl.SequenceImpl<java.lang.Long>("ofc_user_role_id_seq", org.openforis.collect.persistence.jooq.Collect.COLLECT, org.jooq.impl.SQLDataType.BIGINT);
 
 	/**
-	 * The sequence collect.collect.sampling_design_id_seq
-	 */
-	public static final org.jooq.Sequence<java.lang.Long> SAMPLING_DESIGN_ID_SEQ = new org.jooq.impl.SequenceImpl<java.lang.Long>("sampling_design_id_seq", org.openforis.collect.persistence.jooq.Collect.COLLECT, org.jooq.impl.SQLDataType.BIGINT);
-
-	/**
 	 * No instances
 	 */
 	private Sequences() {}
