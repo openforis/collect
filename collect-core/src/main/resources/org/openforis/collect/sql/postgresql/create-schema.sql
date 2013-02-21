@@ -104,8 +104,8 @@ CREATE TABLE "collect"."ofc_taxonomy"  (
 	"id"            	integer NOT NULL,
 	"name"          	varchar(255) NOT NULL,
 	"metadata"      	text NOT NULL,
-	"survey_work_id"	integer NULL,
 	"survey_id"     	integer NULL,
+	"survey_work_id"	integer NULL,
 	PRIMARY KEY("id")
 );
 CREATE TABLE "collect"."ofc_user"  ( 
