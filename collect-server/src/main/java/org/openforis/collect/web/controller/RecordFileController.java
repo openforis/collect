@@ -11,6 +11,8 @@ import org.openforis.collect.manager.RecordFileManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.web.session.SessionState;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -22,6 +24,8 @@ import org.springframework.web.multipart.MultipartFile;
  * @author S. Ricci
  *
  */
+@Controller
+@Scope("session")
 public class RecordFileController extends BasicController {
 	
 	private static Log LOG = LogFactory.getLog(RecordFileController.class);
