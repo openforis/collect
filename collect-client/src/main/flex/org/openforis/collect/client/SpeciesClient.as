@@ -14,6 +14,7 @@ package org.openforis.collect.client {
 		
 		private var _loadTaxonomiesBySurveyOperation:Operation;
 		private var _loadTaxonSummariesOperation:Operation;
+		private var _isTaxonomyInUseOperation:Operation;
 		private var _saveTaxonomyOperation:Operation;
 		private var _deleteTaxonomyOperation:Operation;
 		private var _findByCodeOperation:Operation;
@@ -25,6 +26,7 @@ package org.openforis.collect.client {
 			
 			_loadTaxonomiesBySurveyOperation = getOperation("loadTaxonomiesBySurvey", CONCURRENCY_LAST);
 			_loadTaxonSummariesOperation = getOperation("loadTaxonSummaries", CONCURRENCY_LAST);
+			_isTaxonomyInUseOperation = getOperation("isTaxonomyInUse", CONCURRENCY_LAST);
 			_saveTaxonomyOperation = getOperation("saveTaxonomy");
 			_deleteTaxonomyOperation = getOperation("deleteTaxonomy");
 			_findByCodeOperation = getOperation("findByCode", CONCURRENCY_LAST);
@@ -39,6 +41,11 @@ package org.openforis.collect.client {
 		
 		public function loadTaxonSummaries(responder:IResponder, taxonomyId:int, offset:int = 1, maxRecords:int = 20):void {
 			var token:AsyncToken = _loadTaxonSummariesOperation.send(taxonomyId, offset, maxRecords);
+			token.addResponder(responder);
+		}
+		
+		public function isTaxonomyInUse(responder:IResponder, taxonomyName:String):void {
+			var token:AsyncToken = this._isTaxonomyInUseOperation.send(taxonomyName);
 			token.addResponder(responder);
 		}
 		

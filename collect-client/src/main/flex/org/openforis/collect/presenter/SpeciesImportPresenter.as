@@ -176,7 +176,13 @@ package org.openforis.collect.presenter {
 
 		protected function deleteButtonClickHandler(event:MouseEvent):void	{
 			if ( checkTaxonomyIsSelected() && checkIsWork() ) {
-				AlertUtil.showConfirm(messageKeys.CONFIRM_DELETE_TAXONOMY, null, null, performDeleteSelectedTaxonomy);
+				_speciesClient.isTaxonomyInUse(new AsyncResponder(checkTaxonomyIsInUseResultHandler, faultHandler), _selectedTaxonomy.name);
+				
+				function checkTaxonomyIsInUseResultHandler(event:ResultEvent, token:Object = null):void {
+					var inUse:Boolean = event.result as Boolean;
+					var messageKey:String = inUse ? messageKeys.CONFIRM_DELETE_IN_USE_TAXONOMY : messageKeys.CONFIRM_DELETE_TAXONOMY;
+					AlertUtil.showConfirm(messageKey, null, null, performDeleteSelectedTaxonomy);
+				}
 			}
 		}
 		
@@ -317,6 +323,10 @@ class MessageKeys extends ReferenceDataImportMessageKeys {
 
 	public function get CONFIRM_DELETE_TAXONOMY():String {
 		return "speciesImport.confirmDeleteSeletectedTaxonomy";
+	}
+	
+	public function get CONFIRM_DELETE_IN_USE_TAXONOMY():String {
+		return "speciesImport.confirmDeleteSeletectedInUseTaxonomy";
 	}
 	
 	public function get INVALID_TAXONOMY_NAME():String {

@@ -205,14 +205,15 @@ package org.openforis.collect.presenter {
 			initSessionCommonResultHandler(event, token);
 			var surveyId:int = token.surveyId;
 			var responder:IResponder = new AsyncResponder(setActivePreviewSurveyResultHandler, faultHandler, token);
-			ClientFactory.modelClient.setActivePreviewSurvey(responder, surveyId);
+			ClientFactory.sessionClient.setActivePreviewSurvey(responder, surveyId);
 		}
 		
 		internal function initSessionForSpeciesImportResultHandler(event:ResultEvent, token:Object = null):void {
 			initSessionCommonResultHandler(event, token);
-			var uiEvent:UIEvent = new UIEvent(UIEvent.SHOW_SPECIES_IMPORT);
-			uiEvent.obj = token;
-			eventDispatcher.dispatchEvent(uiEvent);
+			var surveyId:int = token.surveyId;
+			var work:Boolean = token.work;
+			var responder:IResponder = new AsyncResponder(setActiveSurveyForSpeciesImportResultHandler, faultHandler, token);
+			ClientFactory.sessionClient.setDesignerSurveyAsActive(responder, surveyId, work);
 		}
 		
 		internal function initSessionForSamplingDesignImportResultHandler(event:ResultEvent, token:Object = null):void {
@@ -239,6 +240,15 @@ package org.openforis.collect.presenter {
 			ClientFactory.dataClient.createNewRecord(newRecordResponder, rootEntityDef.name, versionName);
 		}
 		
+		internal function setActiveSurveyForSpeciesImportResultHandler(event:ResultEvent, token:Object = null):void {
+			var survey:SurveyProxy = event.result as SurveyProxy;
+			Application.activeSurvey = survey;
+			survey.init();
+			var uiEvent:UIEvent = new UIEvent(UIEvent.SHOW_SPECIES_IMPORT);
+			uiEvent.obj = token;
+			eventDispatcher.dispatchEvent(uiEvent);
+		}
+
 		protected function createRecordResultHandler(event:ResultEvent, token:Object = null):void {
 			var record:RecordProxy = event.result as RecordProxy;
 			record.survey = Application.activeSurvey;

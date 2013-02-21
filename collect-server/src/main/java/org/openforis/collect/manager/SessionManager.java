@@ -11,9 +11,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.granite.context.GraniteContext;
 import org.granite.messaging.webapp.HttpGraniteContext;
+import org.openforis.collect.designer.session.SessionStatus;
 import org.openforis.collect.model.CollectRecord;
+import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.RecordUnlockedException;
+import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.collect.web.session.InvalidSessionException;
 import org.openforis.collect.web.session.SessionState;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +32,8 @@ public class SessionManager {
 
 	private static Log LOG = LogFactory.getLog(SessionManager.class);
 
+	@Autowired
+	private transient SurveyManager surveyManager;
 	@Autowired
 	private transient UserManager userManager;
 	@Autowired
@@ -47,6 +52,25 @@ public class SessionManager {
 		return sessionState;
 	}
 	
+	public CollectRecord getActiveRecord() {
+		SessionState sessionState = getSessionState();
+		return sessionState.getActiveRecord();
+	}
+
+	public CollectSurvey getActiveDesignerSurvey() {
+		SessionStatus designerSessionStatus = (SessionStatus) getSessionAttribute(SessionStatus.SESSION_KEY);
+		if ( designerSessionStatus == null ) {
+			return null;
+		} else {
+			return designerSessionStatus.getSurvey();
+		}
+	}
+
+	public CollectSurvey getActiveSurvey() {
+		SessionState sessionState = getSessionState();
+		return sessionState.getActiveSurvey();
+	}
+	
 	public void setActiveRecord(CollectRecord record) {
 		SessionState sessionState = getSessionState();
 		sessionState.setActiveRecord(record);
@@ -58,6 +82,21 @@ public class SessionManager {
 		sessionState.setActiveRecord(null);
 	}
 
+	public void saveActiveDesignerSurvey() {
+		try {
+			SessionState sessionState = getSessionState();
+			CollectSurvey survey = getActiveDesignerSurvey();
+			boolean activeSurveyWork = sessionState.isActiveSurveyWork();
+			if ( activeSurveyWork ) {
+				surveyManager.saveSurveyWork(survey);
+			} else {
+				throw new IllegalArgumentException("Active designer survey should be a 'work' survey");
+			}
+		} catch ( SurveyImportException e ) {
+			LOG.error("Error updating taxonomy related attributes.", e);
+		}
+	}
+	
 	public void keepSessionAlive() {
 		getSessionState();
 		if (LOG.isDebugEnabled()) {

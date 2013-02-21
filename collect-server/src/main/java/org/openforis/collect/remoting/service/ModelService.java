@@ -7,7 +7,6 @@ import java.util.Locale;
 import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.metamodel.NodeDefinitionSummary;
-import org.openforis.collect.metamodel.proxy.SurveyProxy;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SurveySummary;
 import org.openforis.collect.web.session.SessionState;
@@ -30,26 +29,6 @@ public class ModelService {
 
 	@Autowired
 	private SessionManager sessionManager;
-
-	@Transactional
-	public SurveyProxy setActiveSurvey(String name, boolean work) {
-		CollectSurvey survey = surveyManager.get(name);
-		SessionState sessionState = sessionManager.getSessionState();
-		sessionState.setActiveSurvey(survey);
-		sessionState.setActiveSurveyWork(false);
-		SurveyProxy proxy = new SurveyProxy(survey);
-		return proxy;
-	}
-	
-	@Transactional
-	public SurveyProxy setActivePreviewSurvey(int surveyId) {
-		CollectSurvey survey = surveyManager.loadSurveyWork(surveyId);
-		SessionState sessionState = sessionManager.getSessionState();
-		sessionState.setActiveSurvey(survey);
-		sessionState.setActiveSurveyWork(true);
-		SurveyProxy proxy = new SurveyProxy(survey);
-		return proxy;
-	}
 
 	@Transactional
 	public List<SurveySummary> getSurveySummaries() {

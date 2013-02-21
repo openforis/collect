@@ -181,6 +181,8 @@ public class SpeciesManager {
 	public void save(CollectTaxonomy taxonomy) {
 		if ( taxonomy.getSurveyId() == null && taxonomy.getSurveyWorkId() == null ) {
 			throw new IllegalArgumentException("Cannot save taxonomy: surveyId or surveyWorkId must be defined");
+		} else if ( taxonomy.getSurveyId() != null && taxonomy.getSurveyWorkId() != null ) {
+			throw new IllegalArgumentException("Cannot save taxonomy: surveyId and surveyWorkId must not be both defined");
 		}
 		if ( taxonomy.getId() == null ) {
 			taxonomyDao.insert(taxonomy);

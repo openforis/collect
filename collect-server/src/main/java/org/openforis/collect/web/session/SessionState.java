@@ -12,6 +12,7 @@ import org.openforis.collect.model.User;
 /**
  * @author M. Togna
  * @author G. Miceli
+ * @author S. Ricci
  */
 public class SessionState {
 

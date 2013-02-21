@@ -15,7 +15,10 @@ import org.openforis.collect.model.CollectTaxonomy;
 import org.openforis.collect.model.proxy.TaxonOccurrenceProxy;
 import org.openforis.collect.model.proxy.TaxonomyProxy;
 import org.openforis.collect.web.session.SessionState;
+import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
+import org.openforis.idm.metamodel.Schema;
+import org.openforis.idm.metamodel.TaxonAttributeDefinition;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.TaxonAttribute;
 import org.openforis.idm.model.TaxonOccurrence;
@@ -61,19 +64,45 @@ public class SpeciesService {
 		} else {
 			taxonomy = speciesManager.loadTaxonomyById(taxonomyId);
 		}
+		String oldName = taxonomy.getName();
+		String newName = proxy.getName();
+		if ( oldName != null && ! oldName.equals(newName) ) {
+			updateTaxonAttributeDefinitions(oldName, newName);
+		}
 		proxy.copyPropertiesForUpdate(taxonomy);
 		speciesManager.save(taxonomy);
 		TaxonomyProxy result = new TaxonomyProxy(taxonomy);
 		return result;
 	}
 
+	protected void updateTaxonAttributeDefinitions(String oldName, String newName) {
+		List<TaxonAttributeDefinition> defns = getTaxonAttributeDefinitionsForDesignerSurvey(oldName);
+		if ( ! defns.isEmpty() ) {
+			for (TaxonAttributeDefinition defn : defns) {
+				if ( defn.getTaxonomy().equals(oldName) ) {
+					defn.setTaxonomy(newName);
+				}
+			}
+			sessionManager.saveActiveDesignerSurvey();
+		}
+	}
+
+	@Secured("ROLE_ADMIN")
+	public boolean isTaxonomyInUse(String taxonomyName) {
+		CollectSurvey survey = sessionManager.getActiveDesignerSurvey();
+		Schema schema = survey.getSchema();
+		List<TaxonAttributeDefinition> defns = schema.getTaxonAttributeDefinitions(taxonomyName);
+		return ! defns.isEmpty();
+	}
+	
 	@Secured("ROLE_ADMIN")
 	public void deleteTaxonomy(TaxonomyProxy proxy) {
 		Integer taxonomyId = proxy.getId();
 		CollectTaxonomy taxonomy = speciesManager.loadTaxonomyById(taxonomyId);
 		speciesManager.delete(taxonomy);
+		deleteReferencingAttributes(taxonomy);
 	}
-	
+
 	@Secured("ROLE_ENTRY")
 	public List<TaxonOccurrenceProxy> findByCode(String taxonomyName, String searchString, int maxResults) {
 		CollectTaxonomy taxonomy = getTaxonomyByActiveSurvey(taxonomyName);
@@ -93,8 +122,7 @@ public class SpeciesService {
 	@Secured("ROLE_ENTRY")
 	public List<TaxonOccurrenceProxy> findByVernacularName(String taxonomyName, int nodeId, String searchString, int maxResults) {
 		CollectTaxonomy taxonomy = getTaxonomyByActiveSurvey(taxonomyName);
-		SessionState sessionState = sessionManager.getSessionState();
-		CollectRecord activeRecord = sessionState.getActiveRecord();
+		CollectRecord activeRecord = sessionManager.getActiveRecord();
 		Node<? extends NodeDefinition> attr = activeRecord.getNodeByInternalId(nodeId);
 		if ( attr instanceof TaxonAttribute ) {
 			List<TaxonOccurrence> list = speciesManager.findByVernacularName(taxonomy.getId(), (TaxonAttribute) attr, searchString, maxResults);
@@ -112,11 +140,29 @@ public class SpeciesService {
 		Integer surveyId = activeSurvey.getId();
 		CollectTaxonomy taxonomy;
 		if ( activeSurveyWork ) {
-			taxonomy = speciesManager.loadTaxonomyByName(surveyId, taxonomyName);
-		} else {
 			taxonomy = speciesManager.loadTaxonomyWorkByName(surveyId, taxonomyName);
+		} else {
+			taxonomy = speciesManager.loadTaxonomyByName(surveyId, taxonomyName);
 		}
 		return taxonomy;
+	}
+
+	protected List<TaxonAttributeDefinition> getTaxonAttributeDefinitionsForDesignerSurvey(String oldName) {
+		CollectSurvey survey = sessionManager.getActiveDesignerSurvey();
+		Schema schema = survey.getSchema();
+		List<TaxonAttributeDefinition> defns = schema.getTaxonAttributeDefinitions(oldName);
+		return defns;
+	}
+
+	protected void deleteReferencingAttributes(CollectTaxonomy taxonomy) {
+		List<TaxonAttributeDefinition> defns = getTaxonAttributeDefinitionsForDesignerSurvey(taxonomy.getName());
+		if ( ! defns.isEmpty() ) {
+			for (TaxonAttributeDefinition defn : defns) {
+				EntityDefinition parent = (EntityDefinition) defn.getParentDefinition();
+				parent.removeChildDefinition(defn);
+			}
+			sessionManager.saveActiveDesignerSurvey();
+		}
 	}
 	
 }

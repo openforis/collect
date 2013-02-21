@@ -9,6 +9,9 @@ import java.util.Map;
 import org.openforis.collect.manager.DatabaseVersionManager;
 import org.openforis.collect.manager.DatabaseVersionNotCompatibleException;
 import org.openforis.collect.manager.SessionManager;
+import org.openforis.collect.manager.SurveyManager;
+import org.openforis.collect.metamodel.proxy.SurveyProxy;
+import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.User;
 import org.openforis.collect.model.proxy.UserProxy;
 import org.openforis.collect.persistence.RecordUnlockedException;
@@ -26,6 +29,8 @@ public class SessionService {
 	//private static Log LOG = LogFactory.getLog(SessionService.class);
 	@Autowired
 	protected SessionManager sessionManager;
+	@Autowired
+	protected SurveyManager surveyManager;
 	@Autowired
 	protected DatabaseVersionManager databaseVersionManager;
 
@@ -62,6 +67,39 @@ public class SessionService {
 		result.put("user", userProxy);
 		result.put("sessionId", sessionId);
 		return result;
+	}
+	
+	@Transactional
+	public SurveyProxy setActiveSurvey(String name) {
+		CollectSurvey survey = surveyManager.get(name);
+		return setActiveSurvey(survey, false);
+	}
+
+	@Transactional
+	public SurveyProxy setActivePreviewSurvey(int surveyId) {
+		CollectSurvey survey = surveyManager.loadSurveyWork(surveyId);
+		return setActiveSurvey(survey, true);
+	}
+
+	@Transactional
+	public SurveyProxy setDesignerSurveyAsActive(int surveyId, boolean work) {
+		CollectSurvey survey = sessionManager.getActiveDesignerSurvey();
+		if ( survey == null ) {
+			if ( work ) {
+				survey = surveyManager.loadSurveyWork(surveyId);
+			} else {
+				survey = surveyManager.getById(surveyId);
+			}
+		}
+		return setActiveSurvey(survey, work);
+	}
+
+	protected SurveyProxy setActiveSurvey(CollectSurvey survey, boolean work) {
+		SessionState sessionState = sessionManager.getSessionState();
+		sessionState.setActiveSurvey(survey);
+		sessionState.setActiveSurveyWork(work);
+		SurveyProxy proxy = new SurveyProxy(survey);
+		return proxy;
 	}
 	
 	//@Secured("isAuthenticated()")

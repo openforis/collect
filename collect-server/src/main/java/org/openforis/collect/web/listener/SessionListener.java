@@ -30,7 +30,6 @@ public class SessionListener implements HttpSessionListener {
 		String sessionId = session.getId();
 		SessionState sessionState = new SessionState(sessionId);
 		session.setAttribute(SessionState.SESSION_ATTRIBUTE_NAME, sessionState);
-		
 		//remove user from security conxtext holder
 		SecurityContextHolder.getContext().setAuthentication(null);
 	}
