@@ -11,18 +11,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.openforis.collect.designer.form.TaxonAttributeDefinitionFormObject;
+import org.openforis.collect.designer.session.SessionStatus;
 import org.openforis.collect.designer.util.MessageUtil;
+import org.openforis.collect.manager.SpeciesManager;
+import org.openforis.collect.model.CollectTaxonomy;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.TaxonAttributeDefinition;
+import org.openforis.idm.model.species.Taxonomy;
 import org.zkoss.bind.Binder;
 import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.ContextParam;
 import org.zkoss.bind.annotation.ContextType;
+import org.zkoss.bind.annotation.DependsOn;
 import org.zkoss.bind.annotation.ExecutionArgParam;
 import org.zkoss.bind.annotation.Init;
 import org.zkoss.bind.annotation.NotifyChange;
 import org.zkoss.util.resource.Labels;
+import org.zkoss.zk.ui.select.annotation.WireVariable;
 
 /**
  * @author S. Ricci
@@ -35,6 +41,9 @@ public class TaxonAttributeVM extends AttributeVM<TaxonAttributeDefinition> {
 	public enum Rank {
 		FAMILY, GENUS, SPECIES
 	}
+	
+	@WireVariable
+	private SpeciesManager speciesManager;
 	
 	private List<String> qualifiers;
 	private String selectedQualifier;
@@ -110,6 +119,24 @@ public class TaxonAttributeVM extends AttributeVM<TaxonAttributeDefinition> {
 			String labelKey = RANK_PREFIX + rank.name().toLowerCase();
 			String label = Labels.getLabel(labelKey);
 			result.add(label);
+		}
+		return result;
+	}
+	
+	@DependsOn("surveyId")
+	public List<String> getTaxonomyNames() {
+		Integer surveyId = getSurveyId();
+		List<CollectTaxonomy> taxonomies;
+		if  (surveyId == null ) {
+			SessionStatus sessionStatus = getSessionStatus();
+			Integer publishedSurveyId = sessionStatus.getPublishedSurveyId();
+			taxonomies = speciesManager.loadTaxonomiesBySurvey(publishedSurveyId);
+		} else {
+			taxonomies = speciesManager.loadTaxonomiesBySurveyWork(surveyId);
+		}
+		List<String> result = new ArrayList<String>();
+		for (CollectTaxonomy taxonomy : taxonomies) {
+			result.add(taxonomy.getName());
 		}
 		return result;
 	}
