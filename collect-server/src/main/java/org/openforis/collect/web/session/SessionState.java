@@ -23,6 +23,7 @@ public class SessionState {
 	private CollectRecord activeRecord;
 	private long lastHeartBeatTime;
 	private CollectSurvey activeSurvey;
+	private boolean activeSurveyWork;
 	private Locale locale;
 
 	public boolean isActiveRecordBeingEdited() {
@@ -81,6 +82,14 @@ public class SessionState {
 
 	public void setLocale(Locale locale) {
 		this.locale = locale;
+	}
+
+	public boolean isActiveSurveyWork() {
+		return activeSurveyWork;
+	}
+
+	public void setActiveSurveyWork(boolean surveyWork) {
+		this.activeSurveyWork = surveyWork;
 	}
 
 }

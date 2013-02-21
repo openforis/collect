@@ -9,9 +9,6 @@ import java.util.Map;
 import org.openforis.collect.manager.DatabaseVersionManager;
 import org.openforis.collect.manager.DatabaseVersionNotCompatibleException;
 import org.openforis.collect.manager.SessionManager;
-import org.openforis.collect.manager.SurveyManager;
-import org.openforis.collect.metamodel.proxy.SurveyProxy;
-import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.User;
 import org.openforis.collect.model.proxy.UserProxy;
 import org.openforis.collect.persistence.RecordUnlockedException;
@@ -29,8 +26,6 @@ public class SessionService {
 	//private static Log LOG = LogFactory.getLog(SessionService.class);
 	@Autowired
 	protected SessionManager sessionManager;
-	@Autowired
-	private SurveyManager surveyManager;
 	@Autowired
 	protected DatabaseVersionManager databaseVersionManager;
 
@@ -69,15 +64,6 @@ public class SessionService {
 		return result;
 	}
 	
-	@Transactional
-	public SurveyProxy setActivePreviewSurvey(int surveyId) {
-		CollectSurvey survey = surveyManager.loadSurveyWork(surveyId);
-		SessionState sessionState = sessionManager.getSessionState();
-		sessionState.setActiveSurvey(survey);
-		SurveyProxy proxy = new SurveyProxy(survey);
-		return proxy;
-	}
-
 	//@Secured("isAuthenticated()")
 	public void logout() {
 		sessionManager.invalidateSession();

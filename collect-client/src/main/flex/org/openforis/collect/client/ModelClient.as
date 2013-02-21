@@ -15,6 +15,7 @@ package org.openforis.collect.client {
 		
 		private var _getSurveysOperation:Operation;
 		private var _setActiveSurveyOperation:Operation;
+		private var _setActivePreviewSurveyOperation:Operation;
 		private var _getRootEntitiesSummariesOperation:Operation;
 		
 		public function ModelClient() {
@@ -22,6 +23,7 @@ package org.openforis.collect.client {
 			
 			this._getSurveysOperation = getOperation("getSurveySummaries");
 			this._setActiveSurveyOperation = getOperation("setActiveSurvey");
+			this._setActivePreviewSurveyOperation = getOperation("setActivePreviewSurvey");
 			this._getRootEntitiesSummariesOperation = getOperation("getRootEntitiesSummaries");
 		}
 		
@@ -32,6 +34,11 @@ package org.openforis.collect.client {
 		
 		public function setActiveSurvey(responder:IResponder, name:String):void {
 			var token:AsyncToken = this._setActiveSurveyOperation.send(name);
+			token.addResponder(responder);
+		}
+		
+		public function setActivePreviewSurvey(responder:IResponder, surveyId:int):void {
+			var token:AsyncToken = this._setActivePreviewSurveyOperation.send(surveyId);
 			token.addResponder(responder);
 		}
 		

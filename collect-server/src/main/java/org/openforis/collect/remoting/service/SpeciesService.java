@@ -31,7 +31,6 @@ public class SpeciesService {
 
 	@Autowired
 	private SpeciesManager speciesManager;
-	
 	@Autowired
 	private SessionManager sessionManager;
 	
@@ -107,27 +106,17 @@ public class SpeciesService {
 	}
 	
 	protected CollectTaxonomy getTaxonomyByActiveSurvey(String taxonomyName) {
-		CollectSurvey activeSurvey = getActiveSurvey();
+		SessionState sessionState = sessionManager.getSessionState();
+		CollectSurvey activeSurvey = sessionState.getActiveSurvey();
+		boolean activeSurveyWork = sessionState.isActiveSurveyWork();
 		Integer surveyId = activeSurvey.getId();
 		CollectTaxonomy taxonomy;
-		if ( activeSurvey.isPublished() ) {
+		if ( activeSurveyWork ) {
 			taxonomy = speciesManager.loadTaxonomyByName(surveyId, taxonomyName);
 		} else {
 			taxonomy = speciesManager.loadTaxonomyWorkByName(surveyId, taxonomyName);
 		}
 		return taxonomy;
-	}
-	
-	protected CollectSurvey getActiveSurvey() {
-		SessionState sessionState = sessionManager.getSessionState();
-		CollectSurvey survey = sessionState.getActiveSurvey();
-		return survey;
-	}
-
-	protected int getActiveSurveyId() {
-		CollectSurvey survey = getActiveSurvey();
-		int surveyId = survey.getId();
-		return surveyId;
 	}
 	
 }

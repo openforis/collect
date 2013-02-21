@@ -205,7 +205,7 @@ package org.openforis.collect.presenter {
 			initSessionCommonResultHandler(event, token);
 			var surveyId:int = token.surveyId;
 			var responder:IResponder = new AsyncResponder(setActivePreviewSurveyResultHandler, faultHandler, token);
-			ClientFactory.sessionClient.setActivePreviewSurvey(responder, surveyId);
+			ClientFactory.modelClient.setActivePreviewSurvey(responder, surveyId);
 		}
 		
 		internal function initSessionForSpeciesImportResultHandler(event:ResultEvent, token:Object = null):void {
