@@ -1,4 +1,4 @@
-package org.openforis.collect.persistence;
+package org.openforis.collect.persistence.xml;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -17,14 +17,13 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.openforis.collect.CollectIntegrationTest;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.FieldSymbol;
-import org.openforis.collect.persistence.xml.DataMarshaller;
 import org.openforis.idm.model.Code;
 import org.openforis.idm.model.CodeAttribute;
 import org.openforis.idm.model.Coordinate;
@@ -33,22 +32,22 @@ import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.EntityBuilder;
 import org.openforis.idm.model.RealAttribute;
 import org.openforis.idm.model.Time;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.transaction.TransactionConfiguration;
-import org.springframework.transaction.annotation.Transactional;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
-@RunWith( SpringJUnit4ClassRunner.class )
-@ContextConfiguration( locations = {"classpath:test-context.xml"} )
-@TransactionConfiguration(defaultRollback=true)
-@Transactional
+/**
+ * 
+ * @author S. Ricci
+ *
+ */
 public class DataMarshallerTest extends CollectIntegrationTest {
 	
-	@Autowired
 	private DataMarshaller dataMarshaller;
+	
+	@Before
+	public void init() {
+		dataMarshaller = new DataMarshaller();
+	}
 	
 	@Test
 	public void testMarshal() throws Exception  {
