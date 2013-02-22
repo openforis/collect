@@ -25,9 +25,10 @@ import org.xml.sax.XMLReader;
  */
 public class DataUnmarshaller {
 
+	private static final String NAMESPACES_FEATURE = "http://xml.org/sax/features/namespaces";
+	private static final Log log = LogFactory.getLog(DataUnmarshaller.class);
+
 	private DataHandler handler;
-	
-	private final Log log = LogFactory.getLog(getClass());
 
 	public DataUnmarshaller(DataHandler handler) {
 		this.handler = handler;
@@ -65,6 +66,7 @@ public class DataUnmarshaller {
 		SAXParser parser = factory.newSAXParser();
 		// create the reader (scanner)
 		XMLReader reader = parser.getXMLReader();
+		reader.setFeature(NAMESPACES_FEATURE, true);
 		reader.setContentHandler(handler);
 		return reader;
 	}

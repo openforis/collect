@@ -31,6 +31,8 @@ import org.xmlpull.v1.XmlSerializer;
  * @author S. Ricci
  */
 public class DataMarshaller {
+	
+	private static final String INDENT_FEATURE = "http://xmlpull.org/v1/doc/features.html#indent-output";
 
 	private static final String RECORD_VERSION_ATTRIBUTE = "version";
 	private static final String RECORD_STEP_ATTRIBUTE = "step";
@@ -45,6 +47,7 @@ public class DataMarshaller {
 	public void write(CollectRecord record, Writer out) throws IOException, XmlPullParserException {
 		XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
 		XmlSerializer serializer = factory.newSerializer();
+		serializer.setFeature(INDENT_FEATURE, true);
 		serializer.setOutput(out);
 		serializer.startDocument("UTF-8", true);
 		

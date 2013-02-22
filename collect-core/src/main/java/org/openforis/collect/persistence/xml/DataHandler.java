@@ -66,6 +66,7 @@ public class DataHandler extends DefaultHandler {
 	}
 	
 	public DataHandler(CollectSurvey currentSurvey, CollectSurvey recordSurvey, Map<String, User> users) {
+		super();
 		this.currentSurvey = currentSurvey;
 		this.recordSurvey = recordSurvey;
 		this.users = users;
