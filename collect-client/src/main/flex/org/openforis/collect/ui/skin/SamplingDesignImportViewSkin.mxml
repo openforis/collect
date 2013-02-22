@@ -31,27 +31,36 @@
 			  >
 		
 		<s:VGroup height="100%" 
-				  maxHeight="500"
+				  maxHeight="490"
 				  width="100%"
 				  horizontalAlign="center">
 			<s:DataGrid id="summaryDataGrid" 
 						height="100%"
-						width="100%"
 						rowHeight="22">
 				<s:columns>
 					<s:ArrayList>
 						<s:GridColumn headerText="{Message.get('samplingDesignImport.summaryList.level1Code')}" 
-									  dataField="level_1" labelFunction="{hostComponent.levelLabelFunction}" width="100" />
+									  dataField="level_1"
+									  labelFunction="{hostComponent.levelLabelFunction}"
+									  width="100" />
 						<s:GridColumn headerText="{Message.get('samplingDesignImport.summaryList.level1Code')}" 
-									  dataField="level_2" labelFunction="{hostComponent.levelLabelFunction}" width="100" />
+									  dataField="level_2"
+									  labelFunction="{hostComponent.levelLabelFunction}"
+									  width="100" />
 						<s:GridColumn headerText="{Message.get('samplingDesignImport.summaryList.level3Code')}" 
-									  dataField="level_3" labelFunction="{hostComponent.levelLabelFunction}" width="100" />
-						<s:GridColumn headerText="{Message.get('samplingDesignImport.summaryList.srsId')}" 
-									  dataField="srsId" width="100" />
+									  dataField="level_3"
+									  labelFunction="{hostComponent.levelLabelFunction}"
+									  width="100" />
+						<s:GridColumn headerText="{Message.get('samplingDesignImport.summaryList.srs')}" 
+									  dataField="srsId"
+									  labelFunction="{hostComponent.samplingDesignSrsLabelFunction}"
+									  width="100" />
 						<s:GridColumn headerText="{Message.get('samplingDesignImport.summaryList.x')}" 
-									  dataField="x" width="100" />
+									  dataField="x"
+									  width="100" />
 						<s:GridColumn headerText="{Message.get('samplingDesignImport.summaryList.y')}" 
-									  dataField="y" width="100" />
+									  dataField="y"
+									  width="100" />
 					</s:ArrayList>
 				</s:columns>
 			</s:DataGrid>

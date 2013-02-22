@@ -4,6 +4,8 @@ import static org.openforis.collect.persistence.jooq.Sequences.OFC_SAMPLING_DESI
 import static org.openforis.collect.persistence.jooq.tables.OfcSamplingDesing.OFC_SAMPLING_DESING;
 
 import java.sql.Connection;
+import java.text.DecimalFormat;
+import java.text.MessageFormat;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -17,6 +19,7 @@ import org.openforis.collect.model.SamplingDesignItem;
 import org.openforis.collect.persistence.jooq.MappingJooqDaoSupport;
 import org.openforis.collect.persistence.jooq.MappingJooqFactory;
 import org.openforis.collect.persistence.jooq.tables.records.OfcSamplingDesingRecord;
+import org.openforis.idm.model.Coordinate;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -115,8 +118,12 @@ public class SamplingDesignDao extends MappingJooqDaoSupport<SamplingDesignItem,
 	
 	protected static class JooqFactory extends MappingJooqFactory<SamplingDesignItem> {
 
-		private static final long serialVersionUID = 1L;
+		private static final String LOCATION_FORMAT = "#";
 
+		private static final long serialVersionUID = 1L;
+		
+		private static final String LOCATION_FORMAT_PATTERN = "SRID={0};POINT({1} {2})";
+		
 		public JooqFactory(Connection connection) {
 			super(connection, OFC_SAMPLING_DESING.ID, OFC_SAMPLING_DESIGN_ID_SEQ, SamplingDesignItem.class);
 		}
@@ -127,7 +134,11 @@ public class SamplingDesignDao extends MappingJooqDaoSupport<SamplingDesignItem,
 			s.setId(r.getValue(OFC_SAMPLING_DESING.ID));
 			s.setSurveyId(r.getValue(OFC_SAMPLING_DESING.SURVEY_ID));
 			s.setSurveyWorkId(r.getValue(OFC_SAMPLING_DESING.SURVEY_WORK_ID));
-			s.setLocation(r.getValue(OFC_SAMPLING_DESING.LOCATION));
+			String locationValue = r.getValue(OFC_SAMPLING_DESING.LOCATION);
+			Coordinate coordinate = Coordinate.parseCoordinate(locationValue);
+			s.setSrsId(coordinate == null ? null : coordinate.getSrsId());
+			s.setX(coordinate == null ? null : coordinate.getX());
+			s.setY(coordinate == null ? null : coordinate.getY());
 			for (Field<String> field : LEVEL_CODE_FIELDS) {
 				String value = r.getValue(field);
 				if ( StringUtils.isNotBlank(value) ) {
@@ -144,7 +155,7 @@ public class SamplingDesignDao extends MappingJooqDaoSupport<SamplingDesignItem,
 			q.addValue(OFC_SAMPLING_DESING.ID, s.getId());
 			q.addValue(OFC_SAMPLING_DESING.SURVEY_ID, s.getSurveyId());
 			q.addValue(OFC_SAMPLING_DESING.SURVEY_WORK_ID, s.getSurveyWorkId());
-			q.addValue(OFC_SAMPLING_DESING.LOCATION, s.getLocation());
+			q.addValue(OFC_SAMPLING_DESING.LOCATION, extractLocation(s));
 			List<String> levelCodes = s.getLevelCodes();
 			int levelsSize = levelCodes.size();
 			int maxLevelsSize = LEVEL_CODE_FIELDS.length;
@@ -168,6 +179,21 @@ public class SamplingDesignDao extends MappingJooqDaoSupport<SamplingDesignItem,
 		protected Integer getId(SamplingDesignItem t) {
 			return t.getId();
 		}
+		
+		public String extractLocation(SamplingDesignItem i) {
+			if ( i.getSrsId() == null || i.getX() == null || i.getY() == null ) {
+				return null;
+			} else {
+				DecimalFormat formatter = new DecimalFormat(LOCATION_FORMAT);
+				String result = MessageFormat.format(LOCATION_FORMAT_PATTERN, 
+						i.getSrsId(), 
+						formatter.format(i.getX()),
+						formatter.format(i.getY())
+						);
+				return result;
+			}
+		}
+		
 	}
 }
 

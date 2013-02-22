@@ -6,7 +6,6 @@ import java.util.List;
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.collect.Proxy;
 import org.openforis.collect.model.SamplingDesignItem;
-import org.openforis.idm.model.Coordinate;
 
 /**
  * 
@@ -23,10 +22,9 @@ public class SamplingDesignItemProxy implements Proxy {
 	public SamplingDesignItemProxy(SamplingDesignItem item) {
 		super();
 		this.item = item;
-		Coordinate coordinate = Coordinate.parseCoordinate(item.getLocation());
-		srsId = coordinate.getSrsId();
-		x = coordinate.getX();
-		y = coordinate.getY();
+		srsId = item.getSrsId();
+		x = item.getX();
+		y = item.getY();
 		
 	}
 
@@ -51,11 +49,6 @@ public class SamplingDesignItemProxy implements Proxy {
 		return item.getLevelCodes();
 	}
 
-	@ExternalizedProperty
-	public String getLocation() {
-		return item.getLocation();
-	}
-	
 	public String getSrsId() {
 		return srsId;
 	}

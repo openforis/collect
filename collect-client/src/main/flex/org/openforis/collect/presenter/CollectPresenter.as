@@ -218,6 +218,18 @@ package org.openforis.collect.presenter {
 		
 		internal function initSessionForSamplingDesignImportResultHandler(event:ResultEvent, token:Object = null):void {
 			initSessionCommonResultHandler(event, token);
+			var surveyId:int = token.surveyId;
+			var work:Boolean = token.work;
+			var responder:IResponder = new AsyncResponder(setDesignerSurveyAsActiveResultHandler, faultHandler, token);
+			ClientFactory.sessionClient.setDesignerSurveyAsActive(responder, surveyId, work);
+			function setDesignerSurveyAsActiveResultHandler(event:ResultEvent, token:Object = null):void {
+				var survey:SurveyProxy = event.result as SurveyProxy;
+				Application.activeSurvey = survey;
+				showSamplingDesignImport(token);
+			}
+		}
+		
+		internal function showSamplingDesignImport(token:Object):void {
 			var uiEvent:UIEvent = new UIEvent(UIEvent.SHOW_SAMPLING_DESIGN_IMPORT);
 			uiEvent.obj = token;
 			eventDispatcher.dispatchEvent(uiEvent);

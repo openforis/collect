@@ -123,8 +123,12 @@ package org.openforis.collect.presenter {
 
 		protected function importButtonClickHandler(event:MouseEvent):void {
 			if ( checkCanImport() ) {
-				_fileReference.browse([_fileFilter]);
+				browseFileToImport();
 			}
+		}
+		
+		protected function browseFileToImport():void {
+			_fileReference.browse([_fileFilter]);
 		}
 		
 		protected function checkCanImport():Boolean {

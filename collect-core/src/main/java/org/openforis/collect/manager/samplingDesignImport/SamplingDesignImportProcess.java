@@ -43,12 +43,14 @@ public class SamplingDesignImportProcess extends AbstractProcess<Void, SamplingD
 
 	private CollectSurvey survey;
 	private boolean work;
+	private String srsId;
 	
-	public SamplingDesignImportProcess(SamplingDesignManager samplingDesignManager, CollectSurvey survey, boolean work, File file, boolean overwriteAll) {
+	public SamplingDesignImportProcess(SamplingDesignManager samplingDesignManager, CollectSurvey survey, boolean work, String srsId, File file, boolean overwriteAll) {
 		super();
 		this.samplingDesignManager = samplingDesignManager;
 		this.survey = survey;
 		this.work = work;
+		this.srsId = srsId;
 		this.file = file;
 		this.overwriteAll = overwriteAll;
 	}
@@ -190,7 +192,8 @@ public class SamplingDesignImportProcess extends AbstractProcess<Void, SamplingD
 	protected boolean isDuplicateLocation(SamplingDesignLine line1, SamplingDesignLine line2) throws ParsingException {
 		List<String> line1LevelCodes = line1.getLevelCodes();
 		List<String> line2LevelCodes = line2.getLevelCodes();
-		if ( line2.getLocation().equals(line1.getLocation()) ) {
+		if ( line1.getX().equals(line2.getX()) && 
+				line1.getY().equals(line2.getY()) ) {
 			if ( line2LevelCodes.size() == line1LevelCodes.size()) {
 				return true;
 			} else {
@@ -243,7 +246,9 @@ public class SamplingDesignImportProcess extends AbstractProcess<Void, SamplingD
 		} else {
 			item.setSurveyId(surveyId);
 		}
-		item.setLocation(line.getLocation());
+		item.setSrsId(srsId);
+		item.setX(Double.parseDouble(line.getX()));
+		item.setY(Double.parseDouble(line.getY()));
 		item.setLevelCodes(line.getLevelCodes());
 		samplingDesignManager.save(item);
 	}

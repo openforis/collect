@@ -11,8 +11,11 @@
 
 	<fx:Script>
 		<![CDATA[
+			import mx.collections.IList;
 			import mx.events.FlexEvent;
 			
+			import org.openforis.collect.i18n.Message;
+			import org.openforis.collect.metamodel.proxy.SpatialReferenceSystemProxy;
 			import org.openforis.collect.model.proxy.SamplingDesignItemProxy;
 			import org.openforis.collect.presenter.SamplingDesignImportPresenter;
 			
@@ -21,6 +24,7 @@
 			private var _presenter:SamplingDesignImportPresenter;
 			private var _surveyId:int;
 			private var _work:Boolean;
+			private var _spatialReferenceSystems:IList;
 			
 			protected function creationCompleteHandler(event:FlexEvent):void {
 				_presenter = new SamplingDesignImportPresenter(this);
@@ -39,6 +43,15 @@
 				}
 			}
 
+			public function srsLabelFunction(item:SpatialReferenceSystemProxy):String {
+				//TODO use label
+				return item.id;
+			}
+			
+			public function samplingDesignSrsLabelFunction(item:SamplingDesignItemProxy, column:GridColumn = null):String {
+				return item.srsId;
+			}
+			
 			public function get surveyId():int {
 				return _surveyId;
 			}
@@ -55,7 +68,52 @@
 				_work = value;
 			}
 
+			[Bindable]
+			public function get spatialReferenceSystems():IList {
+				return _spatialReferenceSystems;
+			}
+			
+			public function set spatialReferenceSystems(value:IList):void {
+				_spatialReferenceSystems = value;
+			}
+			
 		]]>
 	</fx:Script>
+	
+	<fx:Declarations>
+		<component:PopUp id="importPopUp" 
+						 title="{Message.get('samplingDesignImport.importPopUpTitle')}">
+			<component:layout>
+				<s:VerticalLayout horizontalAlign="center" verticalAlign="middle" />
+			</component:layout>
+			
+			<s:Form>
+				<s:FormItem label="{Message.get('samplingDesignImport.sourceFile')}">
+					<s:layout>
+						<s:HorizontalLayout />
+					</s:layout>
+					<s:TextInput id="sourceFileTextInput"
+								 editable="false"
+								 />
+					<s:Button id="browseButton"
+							  label="{Message.get('global.browse')}"
+							  buttonMode="true"
+							  useHandCursor="true"
+							  />
+				</s:FormItem>
+				<s:FormItem label="{Message.get('samplingDesignImport.srs')}">
+					<s:DropDownList id="srsDropDown"
+									labelFunction="srsLabelFunction"
+									dataProvider="{spatialReferenceSystems}" />	
+				</s:FormItem>
+			</s:Form>
+			
+			<s:Button id="uploadButton"
+					  label="{Message.get('global.upload')}"
+					  buttonMode="true"
+					  useHandCursor="true"
+					  />
+		</component:PopUp>
+	</fx:Declarations>
 	
 </view:AbstractReferenceDataImportView>

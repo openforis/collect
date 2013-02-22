@@ -43,6 +43,8 @@ public class SamplingDesignImportProcessTest extends CollectIntegrationTest {
 	private static final String VALID_TEST_CSV = "test-sampling-design.csv";
 	private static final String INVALID_TEST_CSV = "test-invalid-sampling-design.csv";
 
+	private static final String SRS_EPSG_21035 = "EPSG:21035";
+
 	@Autowired
 	private SamplingDesignManager samplingDesignManager;
 	@Autowired
@@ -58,7 +60,7 @@ public class SamplingDesignImportProcessTest extends CollectIntegrationTest {
 	
 	public SamplingDesignImportProcess importCSVFile(String fileName) throws Exception {
 		File file = getTestFile(fileName);
-		SamplingDesignImportProcess process = new SamplingDesignImportProcess(samplingDesignManager, survey, true, file, true);
+		SamplingDesignImportProcess process = new SamplingDesignImportProcess(samplingDesignManager, survey, true, SRS_EPSG_21035, file, true);
 		process.call();
 		return process;
 	}
@@ -76,8 +78,8 @@ public class SamplingDesignImportProcessTest extends CollectIntegrationTest {
 		assertEquals(22, samplingDesignSummaries.getTotalCount());
 		
 		List<SamplingDesignItem> items = samplingDesignSummaries.getRecords();
-		assertNotNull(findItem(items, "SRID=EPSG:21035;POINT(806090 9320050)", "10_114", "7"));
-		assertNotNull(findItem(items, "SRID=EPSG:21035;POINT(805680 9305020)", "10_117", "6"));
+		assertNotNull(findItem(items, 806090d, 9320050d, "10_114", "7"));
+		assertNotNull(findItem(items, 805680d, 9305020d, "10_117", "6"));
 	}
 	
 	@Test
@@ -86,7 +88,7 @@ public class SamplingDesignImportProcessTest extends CollectIntegrationTest {
 		SamplingDesignImportStatus status = process.getStatus();
 		assertTrue(status.isError());
 		List<ParsingError> errors = status.getErrors();
-		assertEquals(12, errors.size());
+		assertEquals(10, errors.size());
 		
 		assertTrue(containsError(errors, 3, SamplingDesignFileColumn.LEVEL_2, ErrorType.DUPLICATE_VALUE));
 		assertTrue(containsError(errors, 4, SamplingDesignFileColumn.LEVEL_2, ErrorType.DUPLICATE_VALUE));
@@ -96,10 +98,8 @@ public class SamplingDesignImportProcessTest extends CollectIntegrationTest {
 		assertTrue(containsError(errors, 17, SamplingDesignFileColumn.LEVEL_2, ErrorType.EMPTY));
 		assertTrue(containsError(errors, 20, SamplingDesignFileColumn.LEVEL_1, ErrorType.EMPTY));
 		assertTrue(containsError(errors, 21, SamplingDesignFileColumn.LOCATION_COLUMNS, ErrorType.DUPLICATE_VALUE));
-		assertTrue(containsError(errors, 24, SamplingDesignFileColumn.SRS_ID, ErrorType.EMPTY));
 		assertTrue(containsError(errors, 25, SamplingDesignFileColumn.X, ErrorType.EMPTY));
 		assertTrue(containsError(errors, 26, SamplingDesignFileColumn.Y, ErrorType.EMPTY));
-		assertTrue(containsError(errors, 27, SamplingDesignFileColumn.SRS_ID, ErrorType.INVALID_VALUE));
 	}
 
 	protected boolean containsError(List<ParsingError> errors, long row, SamplingDesignFileColumn column, ErrorType type) {
@@ -120,11 +120,11 @@ public class SamplingDesignImportProcessTest extends CollectIntegrationTest {
 		return false;
 	}
 	
-	protected SamplingDesignItem findItem(List<SamplingDesignItem> items, String location,
+	protected SamplingDesignItem findItem(List<SamplingDesignItem> items, Double x, Double y,
 			String... levelCodes) {
 		List<String> levelCodesList = Arrays.asList(levelCodes);
 		for (SamplingDesignItem item : items) {
-			if ( item.getLevelCodes().equals(levelCodesList) && item.getLocation().equals(location) ) {
+			if ( item.getLevelCodes().equals(levelCodesList) && x.equals(item.getX()) && y.equals(item.getY()) ) {
 				return item;
 			}
 		}

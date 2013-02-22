@@ -31,11 +31,11 @@ public class SamplingDesignImportService extends ReferenceDataImportService<Samp
 	}
 	
 	@Secured("ROLE_ADMIN")
-	public SamplingDesignImportStatusProxy start(int surveyId, boolean work, boolean overwriteAll) throws DataImportExeption {
+	public SamplingDesignImportStatusProxy start(int surveyId, boolean work, String srsId, boolean overwriteAll) throws DataImportExeption {
 		if ( importProcess == null || ! importProcess.getStatus().isRunning() ) {
 			File importFile = getImportFile();
 			CollectSurvey survey = work ? surveyManager.loadSurveyWork(surveyId): surveyManager.getById(surveyId);
-			importProcess = new SamplingDesignImportProcess(samplingDesignManager, survey, work, importFile, overwriteAll);
+			importProcess = new SamplingDesignImportProcess(samplingDesignManager, survey, work, srsId, importFile, overwriteAll);
 			importProcess.init();
 			SamplingDesignImportStatus status = importProcess.getStatus();
 			if ( status != null && ! importProcess.getStatus().isError() ) {

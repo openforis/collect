@@ -16,7 +16,9 @@ public class SamplingDesignItem {
 	private Integer surveyId;
 	private Integer surveyWorkId;
 	private List<String> levelCodes;
-	private String location;
+	private String srsId;
+	private Double x;
+	private Double y;
 
 	public void addLevelCode(String code) {
 		if ( levelCodes == null ) {
@@ -65,11 +67,29 @@ public class SamplingDesignItem {
 		this.levelCodes = levelCodes;
 	}
 	
-	public String getLocation() {
-		return location;
+	public String getSrsId() {
+		return srsId;
 	}
+
+	public void setSrsId(String srsId) {
+		this.srsId = srsId;
+	}
+
+	public Double getX() {
+		return x;
+	}
+
+	public void setX(Double x) {
+		this.x = x;
+	}
+
+	public Double getY() {
+		return y;
+	}
+
+	public void setY(Double y) {
+		this.y = y;
+	}
+
 	
-	public void setLocation(String location) {
-		this.location = location;
-	}
 }

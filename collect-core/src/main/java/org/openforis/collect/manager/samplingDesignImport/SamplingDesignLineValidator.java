@@ -6,7 +6,6 @@ import java.util.List;
 import org.openforis.collect.manager.referenceDataImport.ParsingError;
 import org.openforis.collect.manager.referenceDataImport.ParsingError.ErrorType;
 import org.openforis.collect.model.CollectSurvey;
-import org.openforis.idm.metamodel.SpatialReferenceSystem;
 
 /**
  * 
@@ -15,16 +14,13 @@ import org.openforis.idm.metamodel.SpatialReferenceSystem;
  */
 public class SamplingDesignLineValidator {
 	
-	private static final String INVALID_SRS_MESSAGE_KEY = "samplingDesignImport.parsingError.invalidSRS";
 	private static final String INVALID_X_MESSAGE_KEY = "samplingDesignImport.parsingError.invalidX";
 	private static final String INVALID_Y_MESSAGE_KEY = "samplingDesignImport.parsingError.invalidY";
 	
-	private CollectSurvey survey;
 	private List<ParsingError> errors;
 	
 	SamplingDesignLineValidator(CollectSurvey survey) {
 		super();
-		this.survey = survey;
 		this.errors = new ArrayList<ParsingError>();
 	}
 
@@ -33,23 +29,10 @@ public class SamplingDesignLineValidator {
 	}
 
 	public void validate(SamplingDesignLine line) {
-		validateSRSId(line);
 		validateX(line);
 		validateY(line);
 	}
 	
-	protected void validateSRSId(SamplingDesignLine line) {
-		String srsId = line.getSrsId();
-		SpatialReferenceSystem srs = survey.getSpatialReferenceSystem(srsId);
-		if ( srs == null ) {
-			ParsingError error = new ParsingError(ErrorType.INVALID_VALUE, 
-					line.getLineNumber(), 
-					SamplingDesignFileColumn.SRS_ID.getName(), 
-					INVALID_SRS_MESSAGE_KEY);
-			errors.add(error);
-		}
-	}
-
 	protected void validateX(SamplingDesignLine line) {
 		String xStr = line.getX();
 		try {

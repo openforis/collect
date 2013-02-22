@@ -91,6 +91,9 @@ public class SessionService {
 				survey = surveyManager.getById(surveyId);
 			}
 		}
+		if ( survey == null ) {
+			throw new IllegalArgumentException("Survey not found");
+		}
 		return setActiveSurvey(survey, work);
 	}
 

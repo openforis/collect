@@ -13,7 +13,6 @@ import org.openforis.idm.util.CollectionUtil;
 public class SamplingDesignLine extends Line {
 	
 	private List<String> levelCodes;
-	private String srsId;
 	private String x;
 	private String y;
 	
@@ -21,29 +20,8 @@ public class SamplingDesignLine extends Line {
 		return CollectionUtil.unmodifiableList(levelCodes);
 	}
 	
-	public String getLocation() {
-		StringBuilder sb = new StringBuilder();
-		sb.append("SRID=");
-		sb.append(srsId);
-		sb.append(";");
-		sb.append("POINT(");
-		sb.append(x);
-		sb.append(" ");
-		sb.append(y);
-		sb.append(")");
-		return sb.toString();
-	}
-	
 	public void setLevelCodes(List<String> levelCodes) {
 		this.levelCodes = levelCodes;
-	}
-
-	public String getSrsId() {
-		return srsId;
-	}
-
-	public void setSrsId(String srsId) {
-		this.srsId = srsId;
 	}
 
 	public String getX() {
