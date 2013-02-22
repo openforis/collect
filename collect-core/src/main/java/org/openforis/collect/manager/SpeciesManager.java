@@ -16,7 +16,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openforis.collect.metamodel.TaxonSummaries;
 import org.openforis.collect.metamodel.TaxonSummary;
-import org.openforis.collect.model.CollectSurveyContext;
 import org.openforis.collect.model.CollectTaxonomy;
 import org.openforis.collect.model.TaxonTree;
 import org.openforis.collect.model.TaxonTree.Node;
@@ -53,7 +52,7 @@ public class SpeciesManager {
 	@Autowired
 	private TaxonomyDao taxonomyDao;
 	@Autowired
-	private CollectSurveyContext surveyContext;
+	private ExpressionFactory expressionFactory;
 
 	@Transactional
 	public List<CollectTaxonomy> loadTaxonomiesBySurvey(int surveyId) {
@@ -313,7 +312,6 @@ public class SpeciesManager {
 		if ( qualifiers != null && ! qualifiers.isEmpty() ) {
 			qualifierValues = new String[qualifiers.size()];
 			Entity parent = attr.getParent();
-			ExpressionFactory expressionFactory = surveyContext.getExpressionFactory();
 			for (int i = 0; i < qualifiers.size(); i++) {
 				String qualifierExpr = qualifiers.get(i);
 				try {
