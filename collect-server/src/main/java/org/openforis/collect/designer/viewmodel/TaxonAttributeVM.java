@@ -17,7 +17,6 @@ import org.openforis.collect.manager.SpeciesManager;
 import org.openforis.collect.model.CollectTaxonomy;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.TaxonAttributeDefinition;
-import org.openforis.idm.model.species.Taxonomy;
 import org.zkoss.bind.Binder;
 import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
