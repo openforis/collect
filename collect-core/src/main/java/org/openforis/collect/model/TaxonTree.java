@@ -28,7 +28,6 @@ public class TaxonTree {
 	Map<String, Node> codeToNode;
 	Map<Integer, Node> taxonIdToNode;
 
-	
 	public TaxonTree() {
 		super();
 		roots = new ArrayList<Node>();
@@ -190,6 +189,34 @@ public class TaxonTree {
 			this.taxon = taxon;
 		}
 
+		public Node getRoot() {
+			Node currentNode = this;
+			Node parent = null;
+			do {
+				parent = currentNode.parent;
+			} while ( parent != null );
+			return currentNode;
+		}
+		
+		public void addChild(Taxon taxon) {
+			Node node = new Node(this, taxon);
+			addChild(node);
+		}
+
+		protected void addChild(Node node) {
+			if ( children == null ) {
+				children = new ArrayList<Node>();
+			}
+			children.add(node);
+		}
+		
+		public void addVernacularName(TaxonVernacularName vernacularName) {
+			if ( vernacularNames  == null ) {
+				vernacularNames = new ArrayList<TaxonVernacularName>();
+			}
+			vernacularNames.add(vernacularName);
+		}
+		
 		public Node(Taxon taxon) {
 			this(null, taxon);
 		}
@@ -212,25 +239,6 @@ public class TaxonTree {
 		
 		public void setVernacularNames(List<TaxonVernacularName> vernacularNames) {
 			this.vernacularNames = vernacularNames;
-		}
-		
-		public void addChild(Taxon taxon) {
-			Node node = new Node(this, taxon);
-			addChild(node);
-		}
-
-		protected void addChild(Node node) {
-			if ( children == null ) {
-				children = new ArrayList<Node>();
-			}
-			children.add(node);
-		}
-		
-		public void addVernacularName(TaxonVernacularName vernacularName) {
-			if ( vernacularNames  == null ) {
-				vernacularNames = new ArrayList<TaxonVernacularName>();
-			}
-			vernacularNames.add(vernacularName);
 		}
 		
 	}
