@@ -143,11 +143,11 @@
 	<bean id="recordDao" class="org.openforis.collect.persistence.RecordDao">
     	<property name="dataSource" ref="dataSource"/>
 	</bean>
-    <bean id="samplingDesignDao" class="org.openforis.collect.persistence.SamplingDesignDao">
-        <property name="dataSource" ref="dataSource"/>
-    </bean>
-    	<bean id="surveyDao" class="org.openforis.collect.persistence.SurveyDao" init-method="init">
-    	<property name="dataSource" ref="dataSource"/>
+  <bean id="samplingDesignDao" class="org.openforis.collect.persistence.SamplingDesignDao">
+      <property name="dataSource" ref="dataSource"/>
+  </bean>
+	<bean id="surveyDao" class="org.openforis.collect.persistence.SurveyDao" init-method="init">
+  	<property name="dataSource" ref="dataSource"/>
 	</bean>
 	<bean id="surveyWorkDao" class="org.openforis.collect.persistence.SurveyWorkDao" init-method="init">
     	<property name="dataSource" ref="dataSource"/>
