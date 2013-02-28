@@ -2,14 +2,18 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-	    <artifactId>collect</artifactId>
-	    <groupId>org.openforis.collect</groupId>
-	    <version>3.0-Alpha5-SNAPSHOT</version>
-	    <relativePath>..</relativePath>
-  	</parent>
-	  
+    <artifactId>collect</artifactId>
+    <groupId>org.openforis.collect</groupId>
+    <version>3.0-Alpha5-SNAPSHOT</version>
+    <relativePath>..</relativePath>
+  </parent>
+	
 	<artifactId>collect-web</artifactId>
 	<packaging>war</packaging>
+
+  <properties>
+    <tomcat.version>6.0.36</tomcat.version>
+  </properties>
 
 	<build>
 		<finalName>collect</finalName>
@@ -21,6 +25,7 @@
 			<plugin>
 				<groupId>org.codehaus.mojo.jspc</groupId>
 				<artifactId>jspc-maven-plugin</artifactId>
+        <version>2.0-alpha-3</version>
 				<executions>
 					<execution>
 						<phase>prepare-package</phase>
@@ -45,6 +50,11 @@
 				<configuration>
 					<webXml>${basedir}/target/jspweb.xml</webXml>
 					<failOnMissingWebXml>false</failOnMissingWebXml>
+          <packagingExcludes>
+            WEB-INF/lib/commons-dbcp-*.jar,
+            WEB-INF/lib/commons-pool-*.jar,
+            WEB-INF/lib/postgresql-*.jar
+          </packagingExcludes>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -63,18 +73,73 @@
 				</configuration>
 			</plugin>
 			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>tomcat-maven-plugin</artifactId>
+				<groupId>org.apache.tomcat.maven</groupId>
+        <artifactId>tomcat6-maven-plugin</artifactId>
+        <version>2.2-SNAPSHOT</version>
 				<configuration>
 					<url>http://localhost:8080/manager/html</url>
 					<warFile>${basedir}/target/collect.war</warFile>	
 					<server>localhost</server>
 					<path>/collect</path>
 				</configuration>
-			</plugin>
+      </plugin>
 		</plugins>
 	</build>
 
+  <profiles>
+    <profile>
+      <id>assembly</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-dependency-plugin</artifactId>
+            <version>2.6</version>
+            <executions>
+              <execution>
+                <id>unpack-tomcat</id>
+                <phase>process-sources</phase>
+                <goals>
+                  <goal>unpack</goal>
+                </goals>
+                <configuration>
+                  <artifactItems>
+                    <artifactItem>
+                      <groupId>org.apache</groupId>
+                      <artifactId>tomcat</artifactId>
+                      <version>${tomcat.version}</version>
+                      <type>zip</type>
+                      <overWrite>false</overWrite>
+                      <outputDirectory>${project.build.directory}/</outputDirectory>
+                    </artifactItem>
+                  </artifactItems>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-assembly-plugin</artifactId>
+            <version>2.4</version>
+            <executions>
+              <execution>
+                <phase>package</phase>
+                <goals>
+                  <goal>single</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <descriptors>
+                <descriptor>src/main/assembly/assembly.xml</descriptor>
+              </descriptors>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+  
 	<dependencies>
 		<dependency>
 			<groupId>org.openforis.collect</groupId>
@@ -99,22 +164,12 @@
 			<artifactId>standard</artifactId>
 			<version>1.1.2</version>
 		</dependency>
-<!--         <dependency> -->
-<!--           <groupId>ch.qos.logback</groupId> -->
-<!--           <artifactId>logback-classic</artifactId> -->
-<!--           <version>1.0.3</version> -->
-<!--         </dependency> -->
-<!--         <dependency> -->
-<!--             <groupId>ch.qos.logback</groupId> -->
-<!--             <artifactId>logback-core</artifactId> -->
-<!--             <version>1.0.3</version> -->
-<!--         </dependency> -->
-        <dependency>
-          <groupId>org.slf4j</groupId>
-          <artifactId>slf4j-log4j12</artifactId>
-          <version>1.6.4</version>
-        </dependency>
-                    
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-log4j12</artifactId>
+      <version>1.6.4</version>
+    </dependency>
+    <!-- Provided by the application server -->
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>servlet-api</artifactId>
@@ -133,5 +188,22 @@
 			<version>2.2</version>
 			<scope>provided</scope>
 		</dependency>
+    <!-- Assembly dependencies: includeded in application server libs, excluded from war -->
+    <dependency>
+      <groupId>commons-dbcp</groupId>
+      <artifactId>commons-dbcp</artifactId>
+      <version>1.4</version>
+    </dependency>
+    <dependency>
+      <groupId>commons-pool</groupId>
+      <artifactId>commons-pool</artifactId>
+      <version>1.5.4</version>
+    </dependency>
+    <dependency>
+      <groupId>postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+      <version>9.1-901.jdbc4</version>
+    </dependency>
+              
 	</dependencies>
 </project>
