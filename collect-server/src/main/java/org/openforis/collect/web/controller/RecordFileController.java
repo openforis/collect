@@ -1,6 +1,7 @@
 package org.openforis.collect.web.controller;
 
 import java.io.File;
+import java.io.Serializable;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -26,8 +27,10 @@ import org.springframework.web.multipart.MultipartFile;
  */
 @Controller
 @Scope("session")
-public class RecordFileController extends BasicController {
+public class RecordFileController extends BasicController implements Serializable {
 	
+	private static final long serialVersionUID = 1L;
+
 	private static Log LOG = LogFactory.getLog(RecordFileController.class);
 	
 	@Autowired
@@ -50,7 +53,7 @@ public class RecordFileController extends BasicController {
 		if(file != null && file.exists()) {
 			writeFileToResponse(response, file);
 		} else {
-			Exception e = new Exception("File not found");
+			Exception e = new Exception("File not found: " + file.getName() + " record id: " + record.getId() + " node id: " + nodeId);
 			LOG.error(e);
 			throw e;
 		}
