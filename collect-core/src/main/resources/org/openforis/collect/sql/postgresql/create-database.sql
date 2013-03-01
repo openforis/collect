@@ -1,1 +1,1 @@
-CREATE DATABASE "collect";
+CREATE DATABASE collect OWNER collect;
