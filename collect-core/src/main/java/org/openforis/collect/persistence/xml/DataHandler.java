@@ -131,30 +131,44 @@ public class DataHandler extends DefaultHandler {
 		if ( defn == null ) {
 			fail("Unknown root entity: "+localName);
 		} else {
-			String version = attributes.getValue(ATTRIBUTE_VERSION);
-			if ( StringUtils.isBlank(version) ) {
-				fail("Missing version number");
-			} else {
-				record = new CollectRecord(currentSurvey, version);
-				String stateAttr = attributes.getValue(ATTRIBUTE_STATE);
-				State state = State.fromCode(stateAttr);
-				record.setState(state);
+			String versionName = extractVersionName(attributes);
+			record = new CollectRecord(currentSurvey, versionName);
+			String stateAttr = attributes.getValue(ATTRIBUTE_STATE);
+			State state = State.fromCode(stateAttr);
+			record.setState(state);
 
-				Date created = parseDateTime(attributes.getValue(ATTRIBUTE_DATE_CREATED));
-				Date modified = parseDateTime(attributes.getValue(ATTRIBUTE_DATE_MODIFIED));
-				record.setCreationDate(created);
-				record.setModifiedDate(modified);
-				if (users != null) {
-					String createdByUserName = attributes.getValue(ATTRIBUTE_CREATED_BY);
-					User createdBy = users.get(createdByUserName);
-					record.setCreatedBy(createdBy);
-					String modifiedByUserName = attributes.getValue(ATTRIBUTE_MODIFIED_BY);
-					User modifiedBy = users.get(modifiedByUserName);
-					record.setModifiedBy(modifiedBy);
-				}				
-				node = record.createRootEntity(localName);
-			}
+			Date created = parseDateTime(attributes.getValue(ATTRIBUTE_DATE_CREATED));
+			Date modified = parseDateTime(attributes.getValue(ATTRIBUTE_DATE_MODIFIED));
+			record.setCreationDate(created);
+			record.setModifiedDate(modified);
+			if (users != null) {
+				String createdByUserName = attributes.getValue(ATTRIBUTE_CREATED_BY);
+				User createdBy = users.get(createdByUserName);
+				record.setCreatedBy(createdBy);
+				String modifiedByUserName = attributes.getValue(ATTRIBUTE_MODIFIED_BY);
+				User modifiedBy = users.get(modifiedByUserName);
+				record.setModifiedBy(modifiedBy);
+			}				
+			node = record.createRootEntity(localName);
 		}
+	}
+
+	protected String extractVersionName(Attributes attributes) {
+		String versionName = null;
+		String recordVersionName = attributes.getValue(ATTRIBUTE_VERSION);
+		if ( StringUtils.isNotBlank(recordVersionName) ) {
+			ModelVersion recordVersion = recordSurvey.getVersion(recordVersionName);
+			if ( recordVersion == null ) {
+				throw new IllegalArgumentException("Record version not found in the survey");
+			}
+			int versionId = recordVersion.getId();
+			ModelVersion version = currentSurvey.getVersionById(versionId);
+			if ( version == null ) {
+				throw new IllegalArgumentException("Record version not found in the current survey");
+			}
+			versionName = version.getName();
+		}
+		return versionName;
 	}
 
 	public void startChildNode(String localName, Attributes attributes) {
