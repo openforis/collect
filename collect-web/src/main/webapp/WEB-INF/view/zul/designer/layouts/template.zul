@@ -2,9 +2,10 @@
 <zk>
   <zscript><![CDATA[
       import java.awt.image.*;
-      import javax.imageio.*;
-      import org.zkoss.spring.*;
       import java.io.*;
+      import javax.imageio.*;
+      import org.openforis.collect.manager.LogoManager;
+      import org.zkoss.spring.*;
       
       static final int TOP_RIGHT_CORNER_LOGO_POSITION = 1;
       
@@ -18,7 +19,7 @@
       }
       
       BufferedImage loadLogoData(int position) {
-          SpringUtil.getBean("logoManager");
+    	  LogoManager logoManager = (LogoManager) SpringUtil.getBean("logoManager");
     	  byte[] data = logoManager.loadLogo(position);
         if ( data == null ) {
         	return null;

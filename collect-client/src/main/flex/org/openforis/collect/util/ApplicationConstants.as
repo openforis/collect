@@ -1,7 +1,6 @@
 package org.openforis.collect.util {
 	import mx.core.FlexGlobals;
 	import mx.utils.URLUtil;
-	import flash.net.URLRequest;
 	
 	/**
 	 * 
@@ -14,8 +13,6 @@ package org.openforis.collect.util {
 		public static const DEBUGGING:Boolean = CONFIG::debugging;
 		public static const VERSION:String = CONFIG::version;
 		
-		internal static const CONTEXT_NAME:String = "collect";
-
 		public static var COUNTRY_LOGO_ID:int = 1;
 
 		private static const DATA_IMPORT_UPLOAD_SERVLET_NAME:String = "uploadData.htm";
@@ -105,15 +102,18 @@ package org.openforis.collect.util {
 		
 		internal static function setUrl(url:String):void {
 			var protocol:String = URLUtil.getProtocol(url);
-			
-			_PORT = URLUtil.getPort(url);
-			_HOST = URLUtil.getServerName(url); 
-			
-			if(_PORT == 0){
+			var urlPort:uint = URLUtil.getPort(url);
+			if(urlPort == 0){
 				_PORT = 80;
+			} else {
+				_PORT = urlPort;
 			}
-			
-			var applicationUrl:String = protocol + "://"+ _HOST + ":" + _PORT + "/" + CONTEXT_NAME + "/"; 
+			_HOST = URLUtil.getServerName(url); 
+			var originalRootUrl:String = protocol + "://"+ _HOST + (urlPort > 0 ? (":" + urlPort): "") + "/";
+			var contextNameLenght:int = url.indexOf("/", originalRootUrl.length) - originalRootUrl.length;
+			var contextName:String = url.substr(originalRootUrl.length, contextNameLenght);
+			var rootUrl:String = protocol + "://"+ _HOST + ":" + _PORT + "/";
+			var applicationUrl:String = rootUrl + contextName + "/";
 			_URL = applicationUrl;
 			
 			_DATA_IMPORT_UPLOAD_URL = _URL + DATA_IMPORT_UPLOAD_SERVLET_NAME;
