@@ -52,6 +52,7 @@
 		<entry key="/exitUser.htm" value-ref="fileNameViewController" />
 		<entry key="/login.htm" value-ref="fileNameViewController" />
 		<entry key="/importSurvey.htm" value-ref="fileNameViewController" />
+    <entry key="/logoUpload" value-ref="fileNameViewController" />
         
     <entry key="/surveys" value-ref="fileNameViewController" />
     <entry key="/speciesImport" value-ref="fileNameViewController" />
