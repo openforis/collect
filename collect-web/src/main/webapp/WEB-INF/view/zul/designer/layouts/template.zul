@@ -1,16 +1,54 @@
 <?page docType="html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd""?>
 <zk>
+  <zscript><![CDATA[
+      import java.awt.image.*;
+      import javax.imageio.*;
+      import org.zkoss.spring.*;
+      import java.io.*;
+      
+      static final int TOP_RIGHT_CORNER_LOGO_POSITION = 1;
+      
+      void updateHeaderImages() {
+        BufferedImage content = loadLogoData(TOP_RIGHT_CORNER_LOGO_POSITION);
+        if ( content == null ) {
+        	headerTopRightImage.setSrc("/assets/images/default-logo.png");
+        } else {
+         	headerTopRightImage.setContent(content);
+        }
+      }
+      
+      BufferedImage loadLogoData(int position) {
+          SpringUtil.getBean("logoManager");
+    	  byte[] data = logoManager.loadLogo(position);
+        if ( data == null ) {
+        	return null;
+        } else {
+          ByteArrayInputStream is = new ByteArrayInputStream(data);
+          BufferedImage content = ImageIO.read(is);
+          return content;
+        }
+      }
+  ]]></zscript>
 	<style src="/assets/designer_style.css" />
-    <hlayout hflex="1" vflex="1">
+    <hlayout hflex="1" vflex="1" onCreate="updateHeaderImages()" >
       <div hflex="1" />
       <borderlayout width="960px" vflex="1">
       	<north height="102px" border="none">
-      		<box id="header" sclass="header">
-      			<image src="/assets/images/designer-header.jpg" />
-                <div width="100%" align="right">
-                  <image src="/assets/images/default-logo.png" />
+      		<absolutelayout id="header" sclass="header">
+            <absolutechildren>
+        			<image src="/assets/images/designer-header.jpg" />
+            </absolutechildren>
+            <absolutechildren width="100%" height="100%">
+              <vlayout width="100%" height="100%" spacing="0px">
+                <space height="100%" style="max-height: 10px" />
+                <div width="100%" height="100%" align="right">  
+                    <image id="headerTopRightImage" 
+                        style="max-height: 80px; max-width: 80px;" />
                 </div>
-      		</box>
+                <space height="100%" style="max-height: 10px" />
+              </vlayout> 
+            </absolutechildren>
+      		</absolutelayout>
       	</north>
       	<center border="none">
       		<vlayout hflex="1" vflex="1">
