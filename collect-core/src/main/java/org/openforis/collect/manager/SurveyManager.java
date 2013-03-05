@@ -17,9 +17,9 @@ import org.openforis.collect.model.SurveySummary;
 import org.openforis.collect.persistence.SurveyDao;
 import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.collect.persistence.SurveyWorkDao;
+import org.openforis.commons.collection.CollectionUtils;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.xml.IdmlParseException;
-import org.openforis.idm.util.CollectionUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -84,7 +84,7 @@ public class SurveyManager {
 	}
 	
 	public List<CollectSurvey> getAll() {
-		return CollectionUtil.unmodifiableList(surveys);
+		return CollectionUtils.unmodifiableList(surveys);
 	}
 	
 	@Transactional

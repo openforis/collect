@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.openforis.collect.manager.process.ProcessStatus;
-import org.openforis.idm.util.CollectionUtil;
+import org.openforis.commons.collection.CollectionUtils;
 
 /**
  * 
@@ -88,7 +88,7 @@ public abstract class ReferenceDataImportStatus<E extends ParsingError> extends 
 				result.add(i);
 			}
 		}
-		return CollectionUtil.unmodifiableList(result);
+		return CollectionUtils.unmodifiableList(result);
 	}
 
 }

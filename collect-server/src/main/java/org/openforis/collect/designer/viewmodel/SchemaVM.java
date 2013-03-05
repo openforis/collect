@@ -438,11 +438,11 @@ public class SchemaVM extends SurveyBaseVM {
 	protected void performRemoveNode(NodeDefinition nodeDefn) {
 		EntityDefinition parentDefn = (EntityDefinition) nodeDefn.getParentDefinition();
 		if ( parentDefn != null ) {
-			parentDefn.removeChildDefinition(nodeDefn);
 			if ( treeModel != null ) {
 				treeModel.removeSelectedNode();
 				notifyChange("treeModel");
 			}
+			parentDefn.removeChildDefinition(nodeDefn);
 		} else {
 			UIOptions uiOpts = survey.getUIOptions();
 			UITabSet tabSet = uiOpts.getAssignedRootTabSet((EntityDefinition) nodeDefn);

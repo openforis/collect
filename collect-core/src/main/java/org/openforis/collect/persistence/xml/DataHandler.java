@@ -17,6 +17,7 @@ import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.FieldSymbol;
 import org.openforis.collect.model.User;
+import org.openforis.commons.collection.CollectionUtils;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -25,7 +26,6 @@ import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Field;
 import org.openforis.idm.model.Node;
-import org.openforis.idm.util.CollectionUtil;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -385,11 +385,11 @@ public class DataHandler extends DefaultHandler {
 	}
 
 	public List<NodeUnmarshallingError> getFailures() {
-		return CollectionUtil.unmodifiableList(failures);
+		return CollectionUtils.unmodifiableList(failures);
 	}
 	
 	public List<NodeUnmarshallingError> getWarnings() {
-		return CollectionUtil.unmodifiableList(warnings);
+		return CollectionUtils.unmodifiableList(warnings);
 	}
 	
 	public static class NodeUnmarshallingError {

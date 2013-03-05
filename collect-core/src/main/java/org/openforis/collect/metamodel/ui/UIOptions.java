@@ -16,6 +16,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.commons.collection.CollectionUtils;
 import org.openforis.idm.metamodel.ApplicationOptions;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.LanguageSpecificText;
@@ -23,7 +24,6 @@ import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NodeDefinitionVisitor;
 import org.openforis.idm.metamodel.NodeLabel;
 import org.openforis.idm.metamodel.Schema;
-import org.openforis.idm.util.CollectionUtil;
 
 
 /**
@@ -86,7 +86,7 @@ public class UIOptions implements ApplicationOptions, Serializable {
 	}
 	
 	public List<UITabSet> getTabSets() {
-		return CollectionUtil.unmodifiableList(tabSets);
+		return CollectionUtils.unmodifiableList(tabSets);
 	}
 	
 	public UITabSet createTabSet() {

@@ -10,8 +10,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import org.openforis.commons.collection.CollectionUtils;
 import org.openforis.idm.model.species.Taxon.TaxonRank;
-import org.openforis.idm.util.CollectionUtil;
 
 /**
  * @author riccist
@@ -31,7 +31,7 @@ public class TaxonSummary {
 			return Collections.emptyList();
 		} else {
 			Set<String> langCodes = languageToVernacularNames.keySet();
-			return CollectionUtil.unmodifiableList(new ArrayList<String>(langCodes));
+			return CollectionUtils.unmodifiableList(new ArrayList<String>(langCodes));
 		}
 	}
 	
@@ -52,7 +52,7 @@ public class TaxonSummary {
 			return Collections.emptyList();
 		} else {
 			List<String> names = languageToVernacularNames.get(langCode);
-			return CollectionUtil.unmodifiableList(names);
+			return CollectionUtils.unmodifiableList(names);
 		}
 	}
 	

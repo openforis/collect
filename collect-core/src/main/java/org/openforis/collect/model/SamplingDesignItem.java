@@ -3,7 +3,7 @@ package org.openforis.collect.model;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.openforis.idm.util.CollectionUtil;
+import org.openforis.commons.collection.CollectionUtils;
 
 /**
  * 
@@ -60,7 +60,7 @@ public class SamplingDesignItem {
 	}
 
 	public List<String> getLevelCodes() {
-		return CollectionUtil.unmodifiableList(levelCodes);
+		return CollectionUtils.unmodifiableList(levelCodes);
 	}
 
 	public void setLevelCodes(List<String> levelCodes) {

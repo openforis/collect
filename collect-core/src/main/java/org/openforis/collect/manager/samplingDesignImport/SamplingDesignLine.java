@@ -3,7 +3,7 @@ package org.openforis.collect.manager.samplingDesignImport;
 import java.util.List;
 
 import org.openforis.collect.manager.referenceDataImport.Line;
-import org.openforis.idm.util.CollectionUtil;
+import org.openforis.commons.collection.CollectionUtils;
 
 /**
  * 
@@ -17,7 +17,7 @@ public class SamplingDesignLine extends Line {
 	private String y;
 	
 	public List<String> getLevelCodes() {
-		return CollectionUtil.unmodifiableList(levelCodes);
+		return CollectionUtils.unmodifiableList(levelCodes);
 	}
 	
 	public void setLevelCodes(List<String> levelCodes) {

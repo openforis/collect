@@ -80,19 +80,8 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 	protected List<CodeList> getItemsInternal() {
 		CollectSurvey survey = getSurvey();
 		List<CodeList> codeLists = survey.getCodeLists();
-		codeLists = sortByName(codeLists);
+		codeLists = sort(codeLists);
 		return codeLists;
-	}
-
-	protected List<CodeList> sortByName(List<CodeList> codeLists) {
-		List<CodeList> result = new ArrayList<CodeList>(codeLists);
-		Collections.sort(result, new Comparator<CodeList>() {
-			@Override 
-	        public int compare(CodeList c1, CodeList c2) {
-	            return c1.getName().compareTo(c2.getName());
-	        }
-		});
-		return result;
 	}
 
 	@Override

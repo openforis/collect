@@ -8,6 +8,8 @@ import static org.openforis.collect.designer.model.LabelKeys.EMPTY_OPTION;
 import static org.openforis.collect.designer.model.LabelKeys.ERRORS_IN_PAGE;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -274,6 +276,7 @@ public abstract class SurveyBaseVM extends BaseVM {
 	public List<CodeList> getCodeLists() {
 		CollectSurvey survey = getSurvey();
 		List<CodeList> result = new ArrayList<CodeList>(survey.getCodeLists());
+		result = sort(result);
 		return new BindingListModelList<CodeList>(result, false);
 	}
 	
@@ -326,5 +329,16 @@ public abstract class SurveyBaseVM extends BaseVM {
 	
 	public interface CanLeaveFormCompleteConfirmHandler extends CanLeaveFormConfirmHandler {
 		void onCancel();
+	}
+	
+	protected List<CodeList> sort(List<CodeList> codeLists) {
+		List<CodeList> result = new ArrayList<CodeList>(codeLists);
+		Collections.sort(result, new Comparator<CodeList>() {
+			@Override 
+	        public int compare(CodeList c1, CodeList c2) {
+	            return c1.getName().compareTo(c2.getName());
+	        }
+		});
+		return result;
 	}
 }
