@@ -2,7 +2,7 @@ package org.openforis.collect.persistence.xml;
 
 import java.util.List;
 
-import org.openforis.idm.util.CollectionUtil;
+import org.openforis.commons.collection.CollectionUtils;
 
 /**
  * 
@@ -35,7 +35,7 @@ public class DataUnmarshallerException extends Exception {
 	}
 	
 	public List<String> getMessages() {
-		return CollectionUtil.unmodifiableList(messages);
+		return CollectionUtils.unmodifiableList(messages);
 //		StringBuilder sb = new StringBuilder();
 //		if ( messages == null ) {
 //			sb.append(getCause().getMessage());
