@@ -25,14 +25,18 @@
 			[Bindable]
 			protected var _description:String;
 			
+			protected var _showHeadingLabel:Boolean;
+			
 			protected function init():void {
 				if(_nodeDefinition != null) {
 					var numberLabelProxy:NodeLabelProxy = _nodeDefinition.getLabel(NodeLabelProxy$Type.NUMBER);
 					if(numberLabelProxy != null) {
 						_numberLabelText = numberLabelProxy.text + NUMBER_SUFFIX;
-						_instanceLabelText = _nodeDefinition.getLabelText(null, false);
+					}
+					if ( showHeadingLabel ) {
+						_instanceLabelText = _nodeDefinition.getHeadingOrInstanceLabelText();
 					} else {
-						_instanceLabelText = _nodeDefinition.getLabelText(null, true);
+						_instanceLabelText = _nodeDefinition.getInstanceOrHeadingLabelText();
 					}
 					_description = _nodeDefinition.getDescription();
 				} else {
@@ -51,6 +55,15 @@
 				_nodeDefinition = value;
 				init();
 			}
+
+			public function get showHeadingLabel():Boolean {
+				return _showHeadingLabel;
+			}
+
+			public function set showHeadingLabel(value:Boolean):void {
+				_showHeadingLabel = value;
+			}
+
 
 		]]>
 	</fx:Script>

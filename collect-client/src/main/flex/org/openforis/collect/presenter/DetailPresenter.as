@@ -110,13 +110,13 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function recordSavedHandler(event:ApplicationEvent):void {
-			var rootEntityLabel:String = Application.activeRootEntity.getLabelText()
+			var rootEntityLabel:String = Application.activeRootEntity.getInstanceOrHeadingLabelText()
 			_view.messageDisplay.show(Message.get("edit.recordSaved", [rootEntityLabel]));
 		}
 		
 		protected function updateRecordKeyLabel(event:Event = null):void {
 			var result:String;
-			var rootEntityLabel:String = Application.activeRootEntity.getLabelText();
+			var rootEntityLabel:String = Application.activeRootEntity.getInstanceOrHeadingLabelText();
 			var keyText:String = Application.activeRecord.rootEntity.keyText;
 			if(StringUtil.isBlank(keyText) && isNaN(Application.activeRecord.id)) {
 				result = Message.get('edit.newRecordKeyLabel', [rootEntityLabel]);
@@ -227,7 +227,7 @@ package org.openforis.collect.presenter {
 		
 		internal function promoteRecordResultHandler(event:ResultEvent, token:Object = null):void {
 			var rootEntity:EntityDefinitionProxy = Application.activeRootEntity;
-			var rootEntityLabel:String = rootEntity.getLabelText();
+			var rootEntityLabel:String = rootEntity.getInstanceOrHeadingLabelText();
 			var r:RecordProxy = Application.activeRecord;
 			var keyLabel:String = r.rootEntity.keyText;
 			var actualStep:CollectRecord$Step = getNextStep(r.step);
@@ -240,7 +240,7 @@ package org.openforis.collect.presenter {
 		
 		internal function rejectRecordResultHandler(event:ResultEvent, token:Object = null):void {
 			var rootEntity:EntityDefinitionProxy = Application.activeRootEntity;
-			var rootEntityLabel:String = rootEntity.getLabelText();
+			var rootEntityLabel:String = rootEntity.getInstanceOrHeadingLabelText();
 			var r:RecordProxy = Application.activeRecord;
 			var keyLabel:String = r.rootEntity.keyText;
 			var actualStep:CollectRecord$Step = getPreviousStep(r.step);

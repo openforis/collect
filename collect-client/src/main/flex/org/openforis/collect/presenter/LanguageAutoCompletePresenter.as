@@ -25,7 +25,7 @@ package org.openforis.collect.presenter
 		private static var languages:ArrayCollection;
 		{
 			//init static vars
-			languages = Languages.getLanguageCodes(Application.locale);
+			languages = Languages.getLanguageCodes(Application.localeString);
 		}
 		
 		public function LanguageAutoCompletePresenter(view:LanguageAutoComplete) {

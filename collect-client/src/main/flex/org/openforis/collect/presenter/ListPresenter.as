@@ -127,7 +127,7 @@ package org.openforis.collect.presenter {
 			} else {
 				PopUpManager.addPopUp(_selectVersionPopUp, FlexGlobals.topLevelApplication as DisplayObject, true);
 			}
-			var rootEntityLabel:String = Application.activeRootEntity.getLabelText();
+			var rootEntityLabel:String = Application.activeRootEntity.getInstanceOrHeadingLabelText();
 			_selectVersionPopUp.versionsDropDownList.dataProvider = Application.activeSurvey.versions;
 			_selectVersionPopUp.title = Message.get('list.newRecordPopUp.title', [rootEntityLabel]);
 			PopUpManager.centerPopUp(_selectVersionPopUp);
@@ -197,7 +197,7 @@ package org.openforis.collect.presenter {
 		 * Delete Button clicked 
 		 * */
 		protected function deleteButtonClickHandler(event:MouseEvent):void {
-			var rootEntityLabel:String = Application.activeRootEntity.getLabelText();
+			var rootEntityLabel:String = Application.activeRootEntity.getInstanceOrHeadingLabelText();
 			var selectedRecord:RecordProxy = _view.dataGrid.selectedItem as RecordProxy;
 			if(selectedRecord == null) {
 				AlertUtil.showError("list.error.recordNotSelected");
@@ -304,7 +304,7 @@ package org.openforis.collect.presenter {
 				resetCurrentFilter();
 			}
 			var surveyProjectName:String = Application.activeSurvey.getProjectName();
-			var rootEntityLabel:String = Application.activeRootEntity.getLabelText();
+			var rootEntityLabel:String = Application.activeRootEntity.getInstanceOrHeadingLabelText();
 			_view.titleLabel.text = Message.get("list.title", [surveyProjectName, rootEntityLabel]);
 			updateDataGrid();
 			loadRecordSummaries();

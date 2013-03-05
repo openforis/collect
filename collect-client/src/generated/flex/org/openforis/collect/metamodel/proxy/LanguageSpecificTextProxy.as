@@ -12,17 +12,13 @@ package org.openforis.collect.metamodel.proxy {
     [RemoteClass(alias="org.openforis.collect.metamodel.proxy.LanguageSpecificTextProxy")]
     public class LanguageSpecificTextProxy extends LanguageSpecificTextProxyBase {
 		
-		public static function getLocalizedText(list:IList, language:String = null, firstIfNotFound:Boolean = true):String {
+		public static function getLocalizedText(list:IList, language:String = null, defaultLanguage:Boolean = true):String {
 			for each (var item:LanguageSpecificTextProxy in list) {
-				if(item.language == language) {
+				if(item.language == null && defaultLanguage || item.language == language) {
 					return item.text;
 				}
 			}
-			if(firstIfNotFound && list != null && list.length > 0) {
-				return LanguageSpecificTextProxy(list.getItemAt(0)).text;
-			} else {
-				return null;
-			}
+			return null;
 		}
 		
     }

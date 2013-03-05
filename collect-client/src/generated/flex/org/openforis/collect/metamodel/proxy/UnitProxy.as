@@ -6,17 +6,22 @@
  */
 
 package org.openforis.collect.metamodel.proxy {
+	import org.openforis.collect.Application;
 
     [Bindable]
     [RemoteClass(alias="org.openforis.collect.metamodel.proxy.UnitProxy")]
     public class UnitProxy extends UnitProxyBase {
 		
-		public function getLabelText(language:String = null):String {
-			return LanguageSpecificTextProxy.getLocalizedText(labels, language);
+		public function getLabelText():String {
+			var langCode:String = Application.localeLanguageCode;
+			var defaultLanguage:Boolean = Application.activeSurvey.defaultLanguageCode == langCode;
+			return LanguageSpecificTextProxy.getLocalizedText(labels, langCode, defaultLanguage);
 		}
 		
-		public function getAbbreviation(language:String = null):String {
-			var result:String = LanguageSpecificTextProxy.getLocalizedText(abbreviations, language);
+		public function getAbbreviation():String {
+			var langCode:String = Application.localeLanguageCode;
+			var defaultLanguage:Boolean = Application.activeSurvey.defaultLanguageCode == langCode;
+			var result:String = LanguageSpecificTextProxy.getLocalizedText(abbreviations, langCode, defaultLanguage);
 			if ( result == null ) {
 				result = name;
 			}

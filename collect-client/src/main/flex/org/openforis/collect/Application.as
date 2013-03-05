@@ -7,6 +7,7 @@ package org.openforis.collect {
 	import mx.core.FlexGlobals;
 	import mx.managers.CursorManager;
 	import mx.managers.ToolTipManager;
+	import mx.resources.Locale;
 	import mx.utils.URLUtil;
 	
 	import org.openforis.collect.i18n.Message;
@@ -36,7 +37,9 @@ package org.openforis.collect {
 		private static var _activeRootEntity:EntityDefinitionProxy;
 		private static var _activeStep:CollectRecord$Step;
 		private static var _serverOffline:Boolean;
-		private static var _locale:String;
+		private static var _locale:Locale;
+		private static var _localeString:String;
+		private static var _localeLanguageCode:String;
 		
 		private static var initialized:Boolean = false;
 		
@@ -186,14 +189,30 @@ package org.openforis.collect {
 		}
 		
 		[Bindable]
-		public static function get locale():String {
+		public static function get locale():Locale {
 			return _locale;
 		}
 		
-		public static function set locale(value:String):void {
+		public static function set locale(value:Locale):void {
 			_locale = value;
+			if ( _locale != null ) {
+				_localeString = value.toString();
+				_localeLanguageCode = _locale.language;
+			} else {
+				_localeString = null;
+				_localeLanguageCode = null;
+			}
 		}
 		
-
+		[Bindable(event="localeChange")]
+		public static function get localeString():String {
+			return _localeString;
+		}
+		
+		[Bindable(event="localeChange")]
+		public static function get localeLanguageCode():String {
+			return _localeLanguageCode;
+		}
+		
 	}
 }

@@ -9,6 +9,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.remoting.service.UpdateRequest;
 	import org.openforis.collect.remoting.service.UpdateRequestOperation;
 	import org.openforis.collect.remoting.service.UpdateRequestOperation$Method;
+	import org.openforis.collect.ui.UIBuilder;
 	import org.openforis.collect.ui.component.input.FixedCodeInputField;
 	import org.openforis.collect.util.StringUtil;
 	
@@ -52,8 +53,8 @@ package org.openforis.collect.presenter {
 				var entityName:String = _view.parentEntity.name;
 				var ancestorEntityId:Number = _view.parentEntity.parentId;
 				var ancestorEntity:EntityProxy = Application.activeRecord.getNode(ancestorEntityId) as EntityProxy;
-				var maxWidth:Number = ancestorEntity.getEnumeratedCodeWidth(entityName);
-				_view.width = maxWidth;
+				var width:Number = UIBuilder.getEnumeratedCodeHeaderWidth(_view.attributeDefinition, ancestorEntity);
+				_view.width = width;
 			}
 		}
 		

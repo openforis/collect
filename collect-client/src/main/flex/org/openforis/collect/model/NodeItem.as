@@ -28,7 +28,7 @@ package org.openforis.collect.model
 										   includeSingleEntities:Boolean = true):NodeItem {
 			var item:NodeItem = new NodeItem();
 			item.id = nodeDef.id;
-			item.label = nodeDef.getLabelText();
+			item.label = nodeDef.getInstanceOrHeadingLabelText();
 			if(includeChildren) {
 				var children:IList = new ArrayCollection();
 				var childDefinitions:ListCollectionView = EntityDefinitionProxy(nodeDef).childDefinitions;

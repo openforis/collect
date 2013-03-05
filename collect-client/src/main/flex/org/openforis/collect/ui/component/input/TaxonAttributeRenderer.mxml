@@ -73,7 +73,7 @@
 	</s:HGroup>
 	
 	<s:VGroup includeIn="vertical">
-		<s:Label styleName="bold" text="{attributeDefinition.getLabelText()}" />
+		<s:Label styleName="bold" text="{attributeDefinition.getInstanceOrHeadingLabelText()}" />
 		<s:VGroup>
 			<s:HGroup>
 				<s:Label width="{subLabelWidth}" styleName="bold" text="{Message.get('edit.taxon.code')}"/>

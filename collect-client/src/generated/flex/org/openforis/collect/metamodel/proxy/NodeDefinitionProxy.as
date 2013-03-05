@@ -6,7 +6,12 @@
  */
 
 package org.openforis.collect.metamodel.proxy {
+	import mx.collections.ArrayCollection;
+	import mx.collections.IList;
+	
+	import org.openforis.collect.Application;
 	import org.openforis.collect.util.CollectionUtil;
+	import org.openforis.collect.util.StringUtil;
 	import org.openforis.collect.util.TextUtil;
 	import org.openforis.collect.util.UIUtil;
 	
@@ -18,33 +23,43 @@ package org.openforis.collect.metamodel.proxy {
     [RemoteClass(alias="org.openforis.collect.metamodel.proxy.NodeDefinitionProxy")]
     public class NodeDefinitionProxy extends NodeDefinitionProxyBase {
 		
+		private static const NUMBERED_LABEL_SEPARATOR:String = ". ";
+		
 		private var _survey:SurveyProxy;
 		
-		public function getLabelText(language:String = null, firstIfNotFound:Boolean = true):String {
-			var labelTypes:Array = [NodeLabelProxy$Type.INSTANCE, NodeLabelProxy$Type.HEADING, null];
-			return getSpecificLabelText(labelTypes, language, firstIfNotFound);
+		public function getNumberAndHeadingLabelText():String {
+			var numberPart:String = getSpecificLabelText([NodeLabelProxy$Type.NUMBER], false);
+			var labelPart:String = getSpecificLabelText([NodeLabelProxy$Type.HEADING, NodeLabelProxy$Type.INSTANCE], false);
+			if ( numberPart == null && labelPart == null ) {
+				labelPart = name;
+			}
+			var result:String = StringUtil.concat(NUMBERED_LABEL_SEPARATOR, numberPart, labelPart);
+			return result;
+		}
+			
+		
+		public function getInstanceOrHeadingLabelText():String {
+			var labelTypes:Array = [NodeLabelProxy$Type.INSTANCE, NodeLabelProxy$Type.HEADING];
+			return getSpecificLabelText(labelTypes);
 		}
 		
-		public function getHeadingLabelText(language:String = null, firstIfNotFound:Boolean = true):String {
-			var labelTypes:Array = [NodeLabelProxy$Type.HEADING, NodeLabelProxy$Type.INSTANCE, null];
-			return getSpecificLabelText(labelTypes, language, firstIfNotFound);
+		public function getHeadingOrInstanceLabelText():String {
+			var labelTypes:Array = [NodeLabelProxy$Type.HEADING, NodeLabelProxy$Type.INSTANCE];
+			return getSpecificLabelText(labelTypes);
 		}
 		
-		public function getNumberLabelText(language:String = null):String {
+		public function getNumberLabelText():String {
 			var labelTypes:Array = [NodeLabelProxy$Type.NUMBER];
-			return getSpecificLabelText(labelTypes, language, false, false);
+			return getSpecificLabelText(labelTypes, false);
 		}
 		
-		public function getSpecificLabelText(typesStack:Array, language:String = null, firstIfNotFound:Boolean = true, nameIfNotFound:Boolean = true):String {
+		public function getSpecificLabelText(typesStack:Array, nameIfNotFound:Boolean = true):String {
 			var label:NodeLabelProxy = null;
 			for each (var type:NodeLabelProxy$Type in typesStack) {
-				label = getLabel(type, language, false);
+				label = getLabel(type);
 				if(label != null) {
 					break;
 				}
-			}
-			if(label == null && firstIfNotFound) {
-				label = getLabel(null, language, true);
 			}
 			if(label != null) {
 				return TextUtil.trimLeadingWhitespace(label.text);
@@ -55,22 +70,33 @@ package org.openforis.collect.metamodel.proxy {
 			}
 		}
 		
-		public function getLabel(type:NodeLabelProxy$Type = null, language:String = null, firstIfNotFound:Boolean = false):NodeLabelProxy {
+		public function getLabel(type:NodeLabelProxy$Type):NodeLabelProxy {
 			if(CollectionUtil.isNotEmpty(labels)) {
-				for each(var label:NodeLabelProxy in labels) {
-					if(label.type == type && (language == null || label.language == language)) {
+				var labelsPerType:IList = getLabelsByType(type);
+				var langCode:String = Application.localeLanguageCode;
+				var isDefaultLang:Boolean = langCode == Application.activeSurvey.defaultLanguageCode;
+				for each(var label:NodeLabelProxy in labelsPerType) {
+					if ( label.language == null && isDefaultLang || label.language == langCode) {
 						return label;
 					}
-				}
-				if(firstIfNotFound) {
-					return (labels.getItemAt(0) as NodeLabelProxy);
 				}
 			}
 			return null;
 		}
 		
-		public function getDescription(language:String = null):String {
-			var result:String = LanguageSpecificTextProxy.getLocalizedText(descriptions, language);
+		public function getLabelsByType(type:NodeLabelProxy$Type):IList {
+			var result:IList = new ArrayCollection();
+			for each(var label:NodeLabelProxy in labels) {
+				if(label.type == type) {
+					result.addItem(label);
+				}
+			}
+			return result;
+		}
+		
+		public function getDescription():String {
+			var langCode:String = Application.localeLanguageCode;
+			var result:String = LanguageSpecificTextProxy.getLocalizedText(descriptions, langCode);
 			result = TextUtil.trimLeadingWhitespace(result);
 			return result;
 		}

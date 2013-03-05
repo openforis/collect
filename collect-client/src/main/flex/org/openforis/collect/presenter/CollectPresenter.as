@@ -53,6 +53,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.ui.component.SpeciesImportPopUp;
 	import mx.core.IFlexDisplayObject;
 	import org.openforis.collect.util.ObjectUtil;
+	import mx.resources.Locale;
 	
 	/**
 	 * 
@@ -193,7 +194,8 @@ package org.openforis.collect.presenter {
 		internal function initSessionCommonResultHandler(event:ResultEvent, token:Object = null):void {
 			Application.user = event.result.user;
 			Application.sessionId = event.result.sessionId;
-			Application.locale = FlexGlobals.topLevelApplication.parameters.lang as String;
+			var locale:Locale = new Locale(FlexGlobals.topLevelApplication.parameters.lang as String);
+			Application.locale = locale;
 		}
 		
 		internal function initSessionResultHandler(event:ResultEvent, token:Object = null):void {

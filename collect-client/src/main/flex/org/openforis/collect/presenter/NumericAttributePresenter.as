@@ -77,7 +77,7 @@ package org.openforis.collect.presenter {
 				result.nodeName = view.attributeDefinition.name;
 				result.nodeId = view.attribute.id;
 				result.fieldIndex = 2;
-				result.value = attrDefn.defaultUnit.id;
+				result.value = String(attrDefn.defaultUnit.id);
 			}
 			return result;
 		}

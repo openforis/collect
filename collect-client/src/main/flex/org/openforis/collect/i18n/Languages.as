@@ -49,7 +49,7 @@ package org.openforis.collect.i18n {
 
 		protected static function getLanguagesMap(locale:String = null):Object {
 			if ( locale == null ) {
-				locale = Application.locale;
+				locale = Application.localeString;
 			}
 			var rm:IResourceManager = ResourceManager.getInstance();
 			var resource:IResourceBundle = rm.getResourceBundle(locale, LANGUAGE_CODES_RESOURCE);

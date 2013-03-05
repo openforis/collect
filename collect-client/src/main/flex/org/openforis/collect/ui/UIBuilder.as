@@ -25,8 +25,6 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.metamodel.proxy.TextAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.TextAttributeDefinitionProxy$Type;
 	import org.openforis.collect.metamodel.proxy.TimeAttributeDefinitionProxy;
-	import org.openforis.collect.metamodel.proxy.UITabProxy;
-	import org.openforis.collect.metamodel.proxy.UITabSetProxy;
 	import org.openforis.collect.metamodel.proxy.UnitProxy;
 	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.ui.component.datagrid.CompleteColumnItemRenderer;
@@ -63,7 +61,6 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.ui.component.input.StringInputField;
 	import org.openforis.collect.ui.component.input.TaxonAttributeRenderer;
 	import org.openforis.collect.ui.component.input.TimeAttributeRenderer;
-	import org.openforis.collect.util.StringUtil;
 	import org.openforis.collect.util.UIUtil;
 	
 	import spark.components.HGroup;
@@ -81,7 +78,6 @@ package org.openforis.collect.ui {
 		public static const COMPOSITE_ATTRIBUTE_H_GAP:int = 6;
 		private static const DATA_GROUP_HEADER_STYLE:String = "dataGroupHeader";
 		private static const HEADER_LABEL_STYLE:String = "bold";
-		private static const NUMBERED_LABEL_SEPARATOR:String = ". ";
 		
 		public static function buildForm(rootEntity:EntityDefinitionProxy, version:ModelVersionProxy):FormContainer {
 			var formContainer:FormContainer = new FormContainer();
@@ -90,13 +86,6 @@ package org.openforis.collect.ui {
 			return formContainer;
 		}
 		
-		/**
-		 * Returns true if the tab is the first tab in the corresponding root tab set
-		 */
-		private static function isMainTab(rootTabSet:UITabSetProxy, tab:UITabProxy):Boolean {
-			return rootTabSet.tabs.getItemIndex(tab) == 0;
-		}
-
 		public static function getRecordSummaryListColumns(rootEntity:EntityDefinitionProxy):IList {
 			var columns:IList = new ArrayList();
 			var column:GridColumn;
@@ -105,7 +94,7 @@ package org.openforis.collect.ui {
 			var keyAttributeDefs:IList = rootEntity.keyAttributeDefinitions;
 			var headerText:String, dataField:String, width:Number, labelFunction:Function;
 			for each(var keyAttributeDef:AttributeDefinitionProxy in keyAttributeDefs) {
-				headerText = keyAttributeDef.getLabelText();
+				headerText = keyAttributeDef.getInstanceOrHeadingLabelText();
 				dataField = "key" + position;
 				width = NaN;
 				labelFunction = RecordSummaryDataGrid.keyLabelFunction;
@@ -121,7 +110,7 @@ package org.openforis.collect.ui {
 					var entityDef:EntityDefinitionProxy = EntityDefinitionProxy(nodeDef);
 					if(entityDef.countInSummaryList) {
 						//headerText = Message.get("list.headerCount", [entityDef.getLabelText()]);
-						headerText = entityDef.getHeadingLabelText();
+						headerText = entityDef.getHeadingOrInstanceLabelText();
 						dataField = "count" + position;
 						width = 80;
 						labelFunction = RecordSummaryDataGrid.entityCountLabelFunction;
@@ -192,7 +181,7 @@ package org.openforis.collect.ui {
 		public static function getInputFieldWidth(def:AttributeDefinitionProxy):Number {
 			var parentLayout:String = def.parentLayout;
 			if(def is BooleanAttributeDefinitionProxy) {
-				var headerText:String = def.getLabelText();
+				var headerText:String = def.getInstanceOrHeadingLabelText();
 				var headerWidth:Number = UIUtil.measureGridHeaderWidth(headerText);
 				var width:Number = Math.max(headerWidth, 20);
 				return width;
@@ -258,10 +247,7 @@ package org.openforis.collect.ui {
 		public static function getAttributeDataGroupHeaderWidth(def:AttributeDefinitionProxy, ancestorEntity:EntityProxy):Number {
 			var parentEntityDefn:EntityDefinitionProxy = def.parent;
 			if(ancestorEntity != null && parentEntityDefn.enumerable && def.key && def is CodeAttributeDefinitionProxy) {
-				var enumeratedCodeWidth:Number = ancestorEntity.getEnumeratedCodeWidth(parentEntityDefn.name);
-				var headerText:String = StringUtil.concat(NUMBERED_LABEL_SEPARATOR, def.getNumberLabelText(), def.getLabelText());
-				var headerWidth:Number = UIUtil.measureGridHeaderWidth(headerText);
-				var width:Number = Math.max(headerWidth, enumeratedCodeWidth);
+				var width:Number = getEnumeratedCodeHeaderWidth(def, ancestorEntity);
 				return width + 2;
 			} else {
 				var inputFieldWidth:Number = getInputFieldWidth(def);
@@ -271,6 +257,15 @@ package org.openforis.collect.ui {
 					return NaN;
 				}
 			}
+		}
+		
+		public static function getEnumeratedCodeHeaderWidth(def:AttributeDefinitionProxy, ancestorEntity:EntityProxy):Number {
+			var parentEntityDefn:EntityDefinitionProxy = def.parent;
+			var enumeratedCodeWidth:Number = ancestorEntity.getEnumeratedCodeWidth(parentEntityDefn.name);
+			var headerText:String = def.getNumberAndHeadingLabelText();
+			var headerWidth:Number = UIUtil.measureGridHeaderWidth(headerText);
+			var width:Number = Math.max(headerWidth, enumeratedCodeWidth);
+			return width;
 		}
 		
 		public static function getInputField(def:AttributeDefinitionProxy):InputField {
@@ -368,7 +363,7 @@ package org.openforis.collect.ui {
 			result.percentHeight = 100;
 			var l:Label = new Label();
 			l.styleName = HEADER_LABEL_STYLE;
-			l.text = defn.getLabelText();
+			l.text = defn.getInstanceOrHeadingLabelText();
 			result.addElement(l);
 			
 			var childDefinitionsContainer:HGroup = new HGroup();
@@ -393,7 +388,7 @@ package org.openforis.collect.ui {
 			result.percentHeight = 100;
 			var h:HGroup;
 			var l:Label;
-			var defnLabel:String = StringUtil.concat(NUMBERED_LABEL_SEPARATOR, defn.getNumberLabelText(), defn.getLabelText());
+			var defnLabel:String = defn.getNumberAndHeadingLabelText();
 			if(defn is TaxonAttributeDefinitionProxy) {
 				//attribute label
 				l = getLabel(defnLabel, 100, "dataGroupHeader");

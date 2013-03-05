@@ -57,6 +57,7 @@
 		</s:layout>
 
 		<detail:FormItemLabel id="formItemLabel"
+							  showHeadingLabel="true"
 			  				  nodeDefinition="{entityDefinition}"
 							  visible="{! occupyEntirePage}"
 							  includeInLayout="{! occupyEntirePage}"
