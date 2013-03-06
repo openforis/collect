@@ -223,10 +223,14 @@ public class SpeciesCSVReader extends CSVDataImportReader<SpeciesLine> {
 			}
 		}
 
+		@SuppressWarnings("unchecked")
 		protected <T> T getColumnValue(SpeciesFileColumn column, boolean required, Class<T> type) throws ParsingException {
 			T value = csvLine.getValue(column.getName(), type);
 			if ( required && ( value == null || value instanceof String && StringUtils.isBlank((String) value) )) {
 				throwEmptyColumnParsingException(column);
+			}
+			if ( value instanceof String ) {
+				value = (T) value.toString().trim();
 			}
 			return value;
 		}

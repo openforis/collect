@@ -36,16 +36,21 @@ import org.openforis.idm.model.species.TaxonVernacularName;
  */
 public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportStatus> {
 
+	private static final int CONFIRMED_TAXON_STEP_NUMBER = 9;
 	private static final String TAXONOMY_NOT_FOUND_ERROR_MESSAGE_KEY = "speciesImport.error.taxonomyNotFound";
+	private static final String INVALID_FAMILY_NAME_ERROR_MESSAGE_KEY = "speciesImport.error.invalidFamilyName";
+	private static final String INVALID_GENUS_NAME_ERROR_MESSAGE_KEY = "speciesImport.error.invalidGenusName";
+	private static final String INVALID_SPECIES_NAME_ERROR_MESSAGE_KEY = "speciesImport.error.invalidSpeciesName";
+	private static final String INVALID_SCIENTIFIC_NAME_ERROR_MESSAGE_KEY = "speciesImport.error.invalidScientificNameName";
 	private static final String IMPORTING_FILE_ERROR_MESSAGE_KEY = "speciesImport.error.internalErrorImportingFile";
 	
-	private static Log LOG = LogFactory.getLog(SpeciesImportProcess.class);
-
 	private static final TaxonRank[] TAXON_RANKS = new TaxonRank[] {FAMILY, GENUS, SPECIES, SUBSPECIES};
 	public static final String GENUS_SUFFIX = "sp.";
 
 	private static final String CSV = "csv";
 	//private static final String ZIP = "zip";
+	
+	private static Log LOG = LogFactory.getLog(SpeciesImportProcess.class);
 
 	private SpeciesManager speciesManager;
 	private int taxonomyId;
@@ -247,28 +252,36 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 		taxonTree.bfs(new TaxonTree.NodeVisitor() {
 			@Override
 			public void visit(Node node) {
-				persistTaxonTreeNode(taxonomyId, node);
+				if ( status.isRunning() ) {
+					persistTaxonTreeNode(taxonomyId, node);
+				}
 			}
 		});
 	}
 
 	protected void persistTaxonTreeNode(Integer taxonomyId, Node node) {
-		Taxon taxon = node.getTaxon();
-		taxon.setTaxonomyId(taxonomyId);
-		Node parent = node.getParent();
-		if ( parent != null ) {
-			Taxon parentTaxon = parent.getTaxon();
-			taxon.setParentId(parentTaxon.getSystemId());
-			taxon.setStep(9);
-		}
-		speciesManager.save(taxon);
-		
-		List<TaxonVernacularName> vernacularNames = node.getVernacularNames();
-		if ( vernacularNames != null ) {
-			for (TaxonVernacularName vernacularName : vernacularNames) {
-				vernacularName.setTaxonSystemId(taxon.getSystemId());
-				speciesManager.save(vernacularName);
+		try {
+			Taxon taxon = node.getTaxon();
+			taxon.setTaxonomyId(taxonomyId);
+			Node parent = node.getParent();
+			if ( parent != null ) {
+				Taxon parentTaxon = parent.getTaxon();
+				taxon.setParentId(parentTaxon.getSystemId());
+				taxon.setStep(CONFIRMED_TAXON_STEP_NUMBER);
 			}
+			speciesManager.save(taxon);
+			
+			List<TaxonVernacularName> vernacularNames = node.getVernacularNames();
+			if ( vernacularNames != null ) {
+				for (TaxonVernacularName vernacularName : vernacularNames) {
+					vernacularName.setTaxonSystemId(taxon.getSystemId());
+					speciesManager.save(vernacularName);
+				}
+			}
+		} catch (Exception e) {
+			LOG.error(e);
+			status.error();
+			status.setErrorMessage(e.getMessage());
 		}
 	}
 
@@ -295,23 +308,40 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 	
 	protected Taxon createTaxonFamily(SpeciesLine line) throws ParsingException {
 		String familyName = line.getFamilyName();
+		if ( familyName == null ) {
+			ParsingError error = new ParsingError(ErrorType.INVALID_VALUE, line.getLineNumber(), SpeciesFileColumn.SCIENTIFIC_NAME.getName(), INVALID_FAMILY_NAME_ERROR_MESSAGE_KEY);
+			throw new ParsingException(error);
+		}
 		return createTaxon(line, FAMILY, null, familyName);
 	}
 	
 	protected Taxon createTaxonGenus(SpeciesLine line) throws ParsingException {
+		String genus = line.getGenus();
+		if ( genus == null ) {
+			ParsingError error = new ParsingError(ErrorType.INVALID_VALUE, line.getLineNumber(), SpeciesFileColumn.SCIENTIFIC_NAME.getName(), INVALID_GENUS_NAME_ERROR_MESSAGE_KEY);
+			throw new ParsingException(error);
+		}
 		Taxon taxonFamily = createTaxonFamily(line);
-		String normalizedScientificName = StringUtils.join(line.getGenus(), " ", GENUS_SUFFIX);
+		String normalizedScientificName = StringUtils.join(genus, " ", GENUS_SUFFIX);
 		return createTaxon(line, GENUS, taxonFamily, normalizedScientificName);
 	}
 
 	protected Taxon createTaxonSpecies(SpeciesLine line) throws ParsingException {
+		String speciesName = line.getSpeciesName();
+		if ( speciesName == null ) {
+			ParsingError error = new ParsingError(ErrorType.INVALID_VALUE, line.getLineNumber(), SpeciesFileColumn.SCIENTIFIC_NAME.getName(), INVALID_SPECIES_NAME_ERROR_MESSAGE_KEY);
+			throw new ParsingException(error);
+		}
 		Taxon taxonGenus = createTaxonGenus(line);
-		String normalizedScientificName = line.getSpeciesName();
-		return createTaxon(line, SPECIES, taxonGenus, normalizedScientificName);
+		return createTaxon(line, SPECIES, taxonGenus, speciesName);
 	}
 	
 	protected Taxon createTaxon(SpeciesLine line, TaxonRank rank, Taxon parent) throws ParsingException {
 		String normalizedScientificName = line.getCanonicalScientificName();
+		if ( normalizedScientificName == null ) {
+			ParsingError error = new ParsingError(ErrorType.INVALID_VALUE, line.getLineNumber(), SpeciesFileColumn.SCIENTIFIC_NAME.getName(), INVALID_SCIENTIFIC_NAME_ERROR_MESSAGE_KEY);
+			throw new ParsingException(error);
+		}
 		return createTaxon(line, rank, parent, normalizedScientificName);
 	}
 	

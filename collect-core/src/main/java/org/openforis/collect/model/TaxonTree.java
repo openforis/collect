@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Stack;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.openforis.collect.manager.referenceDataImport.ParsingError;
 import org.openforis.collect.manager.referenceDataImport.ParsingError.ErrorType;
 import org.openforis.collect.manager.referenceDataImport.ParsingException;
@@ -146,7 +147,7 @@ public class TaxonTree {
 		if ( foundNode != null ) {
 			Node foundParentNode = foundNode.getParent();
 			Node parentNode = findNodeByTaxon(parent);
-			if ( foundParentNode == parentNode ) {
+			if ( ObjectUtils.equals(foundParentNode, parentNode) ) {
 				ParsingError error = new ParsingError(ErrorType.DUPLICATE_VALUE, row, SpeciesFileColumn.SCIENTIFIC_NAME.getName());
 				throw new ParsingException(error);
 			}
