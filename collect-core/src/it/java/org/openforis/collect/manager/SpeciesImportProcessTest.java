@@ -115,33 +115,54 @@ public class SpeciesImportProcessTest extends CollectIntegrationTest {
 		SpeciesImportProcess process = importCSVFile(VALID_TEST_SPECIES_CSV);
 		SpeciesImportStatus status = process.getStatus();
 		assertTrue(status.isComplete());
-		
 		int surveyId = survey.getId();
-		List<TaxonOccurrence> occurrences = speciesManager.findByVernacularName(surveyId, TEST_TAXONOMY_NAME, "Mbamba", 10);
-		assertNotNull(occurrences);
-		assertEquals(1, occurrences.size());
-		TaxonOccurrence stored = occurrences.get(0);
-		TaxonOccurrence expected = new TaxonOccurrence(8, "AFZ/QUA", "Afzelia quanzensis", "Mbambakofi", "swh", null);
-		assertEquals(expected, stored);
-		
-		List<TaxonOccurrence> occurrences2 = speciesManager.findByVernacularName(surveyId, TEST_TAXONOMY_NAME, "Mshai-mamba", 10);
-		assertNotNull(occurrences2);
-		assertEquals(1, occurrences2.size());
-		TaxonOccurrence stored2 = occurrences2.get(0);
-		TaxonOccurrence expected2 = new TaxonOccurrence(10, "ALB/ADI", "Albizia adianthifolia", "Mshai-mamba", "ksb", null);
-		assertEquals(expected2, stored2);
-		
-		Taxon taxon = findTaxonByCode("ALB/ADI");
-		Integer taxonId = taxon.getSystemId();
-		List<TaxonVernacularName> vernacularNames = taxonVernacularNameDao.findByTaxon(taxonId);
-		assertTrue(contains(vernacularNames, "ksb", "Mchao"));
-		assertTrue(contains(vernacularNames, "ksb", "Mkengemshaa"));
-		assertTrue(contains(vernacularNames, "ksb", "Msai"));
-		assertTrue(contains(vernacularNames, "ksb", "Mshai"));
-		assertTrue(contains(vernacularNames, "ksb", "Mshai-mamba"));
-		
-		assertFalse(contains(vernacularNames, "eng", "Mahogany"));
-		assertFalse(contains(vernacularNames, "ksb", "Mahogany"));
+		{
+			List<TaxonOccurrence> occurrences = speciesManager.findByVernacularName(surveyId, TEST_TAXONOMY_NAME, "Mbamba", 10);
+			assertNotNull(occurrences);
+			assertEquals(1, occurrences.size());
+			TaxonOccurrence stored = occurrences.get(0);
+			TaxonOccurrence expected = new TaxonOccurrence(8, "AFZ/QUA", "Afzelia quanzensis", "Mbambakofi", "swh", null);
+			assertEquals(expected, stored);
+		}
+		{
+			List<TaxonOccurrence> occurrences = speciesManager.findByVernacularName(surveyId, TEST_TAXONOMY_NAME, "Mshai-mamba", 10);
+			assertNotNull(occurrences);
+			assertEquals(1, occurrences.size());
+			TaxonOccurrence stored = occurrences.get(0);
+			TaxonOccurrence expected = new TaxonOccurrence(10, "ALB/ADI", "Albizia adianthifolia", "Mshai-mamba", "ksb", null);
+			assertEquals(expected, stored);
+		}
+		{
+			Taxon taxon = findTaxonByCode("ALB/ADI");
+			Integer taxonId = taxon.getSystemId();
+			List<TaxonVernacularName> vernacularNames = taxonVernacularNameDao.findByTaxon(taxonId);
+			assertTrue(contains(vernacularNames, "ksb", "Mchao"));
+			assertTrue(contains(vernacularNames, "ksb", "Mkengemshaa"));
+			assertTrue(contains(vernacularNames, "ksb", "Msai"));
+			assertTrue(contains(vernacularNames, "ksb", "Mshai"));
+			assertTrue(contains(vernacularNames, "ksb", "Mshai-mamba"));
+			
+			assertFalse(contains(vernacularNames, "eng", "Mahogany"));
+			assertFalse(contains(vernacularNames, "ksb", "Mahogany"));
+		}
+		{
+			Taxon taxon = findTaxonByCode("BOU/PET");
+			assertEquals("Bourreria petiolaris", taxon.getScientificName());
+			Integer taxonId = taxon.getSystemId();
+			List<TaxonVernacularName> vernacularNames = taxonVernacularNameDao.findByTaxon(taxonId);
+			assertEquals(2, vernacularNames.size());
+			assertTrue(contains(vernacularNames, "swh", "Mpanda jongoo"));
+			assertTrue(contains(vernacularNames, "lat", "Ehretia petiolaris"));
+		}
+		{
+			Taxon taxon = findTaxonByCode("BOM/RHO");
+			assertEquals("Bombax rhodognaphalon", taxon.getScientificName());
+			Integer taxonId = taxon.getSystemId();
+			List<TaxonVernacularName> vernacularNames = taxonVernacularNameDao.findByTaxon(taxonId);
+			assertEquals(2, vernacularNames.size());
+			assertTrue(contains(vernacularNames, "swh", "Msufi mwitu"));
+			assertTrue(contains(vernacularNames, "lat", "Rhodognaphalon schumannianum"));
+		}
 	}
 
 	@Test
@@ -166,7 +187,7 @@ public class SpeciesImportProcessTest extends CollectIntegrationTest {
 		assertNotNull(genusId);
 		Taxon genus = taxonDao.loadById(genusId);
 		assertNotNull(genus);
-		assertNull(genus.getCode());
+		assertEquals("ALB", genus.getCode());
 		assertEquals(GENUS, genus.getTaxonRank());
 		assertEquals("Albizia sp.", genus.getScientificName());
 		

@@ -72,9 +72,11 @@ public class SpeciesCSVReader extends CSVDataImportReader<SpeciesLine> {
 	
 	public static class SpeciesCSVLineParser extends CSVLineParser<SpeciesLine> {
 		
+		private static final String LATIN_LANGUAGE_CODE = "lat";
 		private static final String VERNACULAR_NAME_TRIM_EXPRESSION = "^\\s+|\\s+$|;+$|\\.+$";
 		private static final String SYNONYM_COL_NAME = "";
-		private static final Pattern SYNONYM_PATTERN = Pattern.compile("^syn\\.?\\s+", Pattern.CASE_INSENSITIVE);
+		private static final String SYNONYM_SPLIT_EXPRESSION = "((syn|Syn)(\\.\\:|\\.|\\:|\\s))";
+		private static final Pattern SYNONYM_PATTERN = Pattern.compile("^" + SYNONYM_SPLIT_EXPRESSION, Pattern.CASE_INSENSITIVE);
 		
 		private static final String DEFAULT_VERNACULAR_NAMES_SEPARATOR = ",";
 		private static final String OTHER_VERNACULAR_NAMES_SEPARATOR_EXPRESSION = "/";
@@ -100,10 +102,17 @@ public class SpeciesCSVReader extends CSVDataImportReader<SpeciesLine> {
 			line.setRawScientificName(this.rawScientificName);
 			line.setGenus(extractGenus());
 			line.setSpeciesName(extractSpeciesName());
-			line.setCanonicalScientificName(extractCanonicalScientificName());
 			line.setRank(extractRank());
+			normalizeRank(line);
+			line.setCanonicalScientificName(extractCanonicalScientificName(line.getRank(), parsedScientificName));
 			line.setLanguageToVernacularNames(extractVernacularNames());
 			return line;
+		}
+
+		protected void normalizeRank(SpeciesLine line) {
+			if ( line.getRank() == TaxonRank.SPECIES && line.getSpeciesName() == null ) {
+				line.setRank(GENUS);
+			}
 		}
 
 		protected Integer parseTaxonId(boolean required) throws ParsingException {
@@ -123,6 +132,10 @@ public class SpeciesCSVReader extends CSVDataImportReader<SpeciesLine> {
 		}
 		
 		protected ParsedName<Object> parseRawScienfificName() throws ParsingException {
+			return parseRawScienfificName(rawScientificName);
+		}
+		
+		protected ParsedName<Object> parseRawScienfificName(String rawScientificName) throws ParsingException {
 			try {
 				NameParser nameParser = new NameParser();
 				ParsedName<Object> parsedName = nameParser.parse(rawScientificName);
@@ -135,7 +148,11 @@ public class SpeciesCSVReader extends CSVDataImportReader<SpeciesLine> {
 		}
 		
 		protected TaxonRank extractRank() throws ParsingException {
-			Rank rank = parsedScientificName.getRank();
+			return extractRank(parsedScientificName);
+		}
+		
+		protected TaxonRank extractRank(ParsedName<Object> parsedName) throws ParsingException {
+			Rank rank = parsedName.getRank();
 			TaxonRank taxonRank;
 			if ( rank == null ) {
 				taxonRank = GENUS;
@@ -159,11 +176,18 @@ public class SpeciesCSVReader extends CSVDataImportReader<SpeciesLine> {
 			}
 			return taxonRank;
 		}
-
+		
 		protected String extractCanonicalScientificName() throws ParsingException {
-			Rank rank = parsedScientificName.getRank();
-			boolean showRankMarker = rank == Rank.GENUS || rank == Rank.VARIETY;
-			String result = parsedScientificName.buildName(false, showRankMarker, false, false, false, true, true, false, false, false, false);
+			return extractCanonicalScientificName(parsedScientificName);
+		}
+
+		protected String extractCanonicalScientificName(ParsedName<Object> parsedName) throws ParsingException {
+			return extractCanonicalScientificName(extractRank(parsedName), parsedName);
+		}
+
+		protected String extractCanonicalScientificName(TaxonRank rank, ParsedName<Object> parsedName) throws ParsingException {
+			boolean showRankMarker = rank == GENUS || rank == SUBSPECIES;
+			String result = parsedName.buildName(false, showRankMarker, false, false, false, true, true, false, false, false, false);
 			return result;
 		}
 		
@@ -178,6 +202,35 @@ public class SpeciesCSVReader extends CSVDataImportReader<SpeciesLine> {
 		}
 		
 		protected Map<String, List<String>> extractVernacularNames() throws ParsingException {
+			Map<String, List<String>> result = extractVernacularNamesFromColumns();
+			List<String> synonyms = extractSynonyms();
+			if ( ! synonyms.isEmpty() ) {
+				List<String> oldSynonyms = result.get(LATIN_LANGUAGE_CODE);
+				if ( oldSynonyms == null ) {
+					result.put(LATIN_LANGUAGE_CODE, synonyms);
+				} else {
+					oldSynonyms.addAll(synonyms);
+				}
+			}
+			return result;
+		}
+
+		private List<String> extractSynonyms() throws ParsingException {
+			List<String> result = new ArrayList<String>();
+			String[] splitted = rawScientificName.split(SYNONYM_SPLIT_EXPRESSION);
+			if ( splitted != null && splitted.length > 1 ) {
+				for (int i = 1; i < splitted.length; i++) {
+					String synonym = splitted[i];
+					ParsedName<Object> parsed = parseRawScienfificName(synonym);
+					String canonicalNameSyn = extractCanonicalScientificName(parsed);
+					result.add(canonicalNameSyn);
+				}
+			}
+			return result;
+		}
+
+		protected Map<String, List<String>> extractVernacularNamesFromColumns()
+				throws ParsingException {
 			Map<String, List<String>> result = new HashMap<String, List<String>>();
 			List<String> languageColumnNames = ((SpeciesCSVReader) getReader()).getLanguageColumnNames();
 			for (String langCode : languageColumnNames) {

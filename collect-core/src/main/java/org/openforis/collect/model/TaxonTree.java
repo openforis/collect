@@ -144,7 +144,7 @@ public class TaxonTree {
 
 	public void checkDuplicateScienfificName(Taxon parent, String scientificName, long row) throws ParsingException {
 		Node foundNode = findNodeByScientificName(scientificName);
-		if ( foundNode != null ) {
+		if ( foundNode != null && (foundNode.getTaxon().getCode() != null || foundNode.getTaxon().getTaxonId() != null) ) {
 			Node foundParentNode = foundNode.getParent();
 			Node parentNode = findNodeByTaxon(parent);
 			if ( ObjectUtils.equals(foundParentNode, parentNode) ) {

@@ -12,6 +12,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -58,7 +60,6 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 	private boolean overwriteAll;
 	
 	private TaxonTree taxonTree;
-	private List<String> languageColumnNames;
 	private SpeciesCSVReader reader;
 	private String errorMessage;
 	private List<SpeciesLine> lines;
@@ -153,7 +154,6 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 			isReader = new InputStreamReader(is);
 			
 			reader = new SpeciesCSVReader(isReader);
-			languageColumnNames = reader.getLanguageColumnNames();
 			status.addProcessedRow(1);
 			currentRowNumber = 2;
 			while ( status.isRunning() ) {
@@ -226,8 +226,10 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 	}
 
 	protected void processVernacularNames(SpeciesLine line, Taxon taxon) {
-		for (String langCode : languageColumnNames) {
-			List<String> vernacularNames = line.getVernacularNames(langCode);
+		Map<String, List<String>> langToVernacularName = line.getLanguageToVernacularNames();
+		Set<String> vernacularLangCodes = langToVernacularName.keySet();
+		for (String langCode : vernacularLangCodes) {
+			List<String> vernacularNames = langToVernacularName.get(langCode);
 			for (String vernacularName : vernacularNames) {
 				TaxonVernacularName taxonVN = new TaxonVernacularName();
 				taxonVN.setLanguageCode(langCode);

@@ -35,6 +35,7 @@ package org.openforis.collect.presenter {
 	public class SpeciesImportPresenter extends AbstractReferenceDataImportPresenter {
 		
 		private static const MAX_SUMMARIES_PER_PAGE:int = 20;
+		private static const LATIN_LANGUAGE_CODE:String = "lat";
 		private static const UPLOAD_FILE_NAME_PREFIX:String = "species";
 		private static const VALID_NAME_REGEX:RegExp = /^[a-z][a-z0-9_]*$/;
 		private static const FIXED_SUMMARY_COLUMNS_LENGTH:int = 3;
@@ -120,6 +121,7 @@ package org.openforis.collect.presenter {
 			for (var i:int = columns.length - 1; i > FIXED_SUMMARY_COLUMNS_LENGTH - 1; i --) {
 				columns.removeItemAt(i);
 			}
+			sortVernacularLanguageCodes(vernacularNamesLangCodes);
 			for each (var langCode:String in vernacularNamesLangCodes) {
 				var col:GridColumn = new GridColumn();
 				col.headerText = getLanguageCodeHeaderText(langCode);
@@ -130,8 +132,14 @@ package org.openforis.collect.presenter {
 			}
 		}
 		
+		protected function sortVernacularLanguageCodes(vernacularNamesLangCodes:IList):void {
+			if ( CollectionUtil.contains(vernacularNamesLangCodes, LATIN_LANGUAGE_CODE) ) {
+				CollectionUtil.moveItem(vernacularNamesLangCodes, LATIN_LANGUAGE_CODE, 0);
+			}
+		}
+		
 		private function getLanguageCodeHeaderText(langCode:String):String {
-			if ( StringUtil.isBlank(langCode) ) {
+			if ( StringUtil.isBlank(langCode) || langCode == LATIN_LANGUAGE_CODE ) {
 				return Message.get(messageKeys.SYNONYM);
 			} else {
 				var languageLabel:String = Languages.getLanguageLabel(langCode);
