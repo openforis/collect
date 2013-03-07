@@ -1,24 +1,15 @@
 package org.openforis.collect.presenter
 {
-	import flash.events.Event;
-	import flash.events.MouseEvent;
-	
-	import mx.core.IFlexDisplayObject;
-	import mx.managers.PopUpManager;
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.IResponder;
 	import mx.rpc.events.ResultEvent;
 	
-	import org.openforis.collect.Application;
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.client.SamplingDesignClient;
 	import org.openforis.collect.client.SamplingDesignImportClient;
-	import org.openforis.collect.metamodel.proxy.SurveyProxy;
 	import org.openforis.collect.model.proxy.SamplingDesignSummariesProxy;
 	import org.openforis.collect.ui.view.SamplingDesignImportView;
 	import org.openforis.collect.util.AlertUtil;
-	import org.openforis.collect.util.PopUpUtil;
-	import org.openforis.collect.util.StringUtil;
 	
 	/**
 	 * 
@@ -32,10 +23,8 @@ package org.openforis.collect.presenter
 		
 		private var _samplingDesignClient:SamplingDesignClient;
 		private var _samplingDesignImportClient:SamplingDesignImportClient;
-		private var _importPopUpFirstOpen:Boolean;
 		
 		public function SamplingDesignImportPresenter(view:SamplingDesignImportView) {
-			_importPopUpFirstOpen = true;
 			_samplingDesignClient = ClientFactory.samplingDesignClient;
 			_samplingDesignImportClient = ClientFactory.samplingDesignImportClient;
 
@@ -77,28 +66,17 @@ package org.openforis.collect.presenter
 			}
 		}
 		
-		override protected function importButtonClickHandler(event:MouseEvent):void {
-			if ( checkCanImport() ) {
-				PopUpUtil.showPopUp(view.importPopUp);
-				if ( _importPopUpFirstOpen ) {
-					view.browseButton.addEventListener(MouseEvent.CLICK, browseButtonClickHandler);
-					view.uploadButton.addEventListener(MouseEvent.CLICK, uploadButtonClickHandler);
-				} else {
-					view.sourceFileTextInput.text = null;
-					view.srsDropDown.selectedItem = null;
-				}
-				_importPopUpFirstOpen = false;
-				var survey:SurveyProxy = Application.activeSurvey;
-				view.spatialReferenceSystems = survey.spatialReferenceSystems;
-			}
+		override protected function loadSummariesResultHandler(event:ResultEvent, token:Object=null):void {
+			var result:SamplingDesignSummariesProxy = event.result as SamplingDesignSummariesProxy;
+			_view.summaryDataGrid.dataProvider = result.records;
+			_view.paginationBar.totalRecords = result.totalCount;
 		}
 		
 		override protected function performProcessStart():void {
 			var responder:AsyncResponder = new AsyncResponder(startResultHandler, faultHandler);
 			var surveyId:int = view.surveyId;
 			var work:Boolean = view.work;
-			var srsId:String = view.srsDropDown.selectedItem.id;
-			_samplingDesignImportClient.start(responder, surveyId, work, srsId, true);
+			_samplingDesignImportClient.start(responder, surveyId, work, true);
 		}
 		
 		override protected function performImportCancel():void {
@@ -119,44 +97,6 @@ package org.openforis.collect.presenter
 			_samplingDesignImportClient.getStatus(_getStatusResponder);
 		}
 		
-		override protected function loadSummariesResultHandler(event:ResultEvent, token:Object=null):void {
-			var result:SamplingDesignSummariesProxy = event.result as SamplingDesignSummariesProxy;
-			_view.summaryDataGrid.dataProvider = result.records;
-			_view.paginationBar.totalRecords = result.totalCount;
-		}
-		
-		override protected function fileReferenceSelectHandler(event:Event):void {
-			view.sourceFileTextInput.text = _fileReference.name;
-		}
-		
-		override protected function updateViewForUploading():void {
-			super.updateViewForUploading();
-			PopUpManager.removePopUp(view.importPopUp);
-		}
-		
-		protected function browseButtonClickHandler(event:MouseEvent):void {
-			browseFileToImport();
-		}
-		
-		protected function uploadButtonClickHandler(event:MouseEvent):void {
-			if ( validateImportForm() ) {
-				AlertUtil.showConfirm(_messageKeys.CONFIRM_IMPORT, null, 
-					_messageKeys.CONFIRM_IMPORT_TITLE,
-					startUpload);
-			}
-		}
-		
-		protected function validateImportForm():Boolean {
-			if ( StringUtil.isBlank(view.sourceFileTextInput.text) ) {
-				AlertUtil.showMessage(messageKeys.FILE_NOT_SELECTED, null, messageKeys.IMPORT_POPUP_TITLE);
-				return false;
-			}
-			if ( view.srsDropDown.selectedItem == null ) {
-				AlertUtil.showMessage(messageKeys.SRS_NOT_SELECTED, null, messageKeys.IMPORT_POPUP_TITLE);
-				return false;
-			}
-			return true;
-		}
 	}
 }
 import org.openforis.collect.presenter.ReferenceDataImportMessageKeys;

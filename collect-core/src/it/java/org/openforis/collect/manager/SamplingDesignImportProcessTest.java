@@ -43,8 +43,6 @@ public class SamplingDesignImportProcessTest extends CollectIntegrationTest {
 	private static final String VALID_TEST_CSV = "test-sampling-design.csv";
 	private static final String INVALID_TEST_CSV = "test-invalid-sampling-design.csv";
 
-	private static final String SRS_EPSG_21035 = "EPSG:21035";
-
 	@Autowired
 	private SamplingDesignManager samplingDesignManager;
 	@Autowired
@@ -60,7 +58,7 @@ public class SamplingDesignImportProcessTest extends CollectIntegrationTest {
 	
 	public SamplingDesignImportProcess importCSVFile(String fileName) throws Exception {
 		File file = getTestFile(fileName);
-		SamplingDesignImportProcess process = new SamplingDesignImportProcess(samplingDesignManager, survey, true, SRS_EPSG_21035, file, true);
+		SamplingDesignImportProcess process = new SamplingDesignImportProcess(samplingDesignManager, survey, true, file, true);
 		process.call();
 		return process;
 	}
@@ -71,11 +69,11 @@ public class SamplingDesignImportProcessTest extends CollectIntegrationTest {
 		SamplingDesignImportStatus status = process.getStatus();
 		assertTrue(status.isComplete());
 		assertTrue(status.getSkippedRows().isEmpty());
-		assertEquals(23, status.getProcessed());
+		assertEquals(25, status.getProcessed());
 		
 		SamplingDesignSummaries samplingDesignSummaries = samplingDesignManager.loadBySurveyWork(survey.getId(), 0, 30);
 		assertNotNull(samplingDesignSummaries);
-		assertEquals(22, samplingDesignSummaries.getTotalCount());
+		assertEquals(24, samplingDesignSummaries.getTotalCount());
 		
 		List<SamplingDesignItem> items = samplingDesignSummaries.getRecords();
 		assertNotNull(findItem(items, 806090d, 9320050d, "10_114", "7"));

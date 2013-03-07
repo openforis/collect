@@ -15,6 +15,7 @@ public class SamplingDesignLine extends Line {
 	private List<String> levelCodes;
 	private String x;
 	private String y;
+	private String srsId;
 	
 	public List<String> getLevelCodes() {
 		return CollectionUtils.unmodifiableList(levelCodes);
@@ -38,6 +39,14 @@ public class SamplingDesignLine extends Line {
 
 	public void setY(String y) {
 		this.y = y;
+	}
+
+	public String getSrsId() {
+		return srsId;
+	}
+
+	public void setSrsId(String srsId) {
+		this.srsId = srsId;
 	}
 
 }

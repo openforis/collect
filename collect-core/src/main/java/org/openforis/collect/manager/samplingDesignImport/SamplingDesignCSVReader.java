@@ -59,6 +59,7 @@ public class SamplingDesignCSVReader extends CSVDataImportReader<SamplingDesignL
 			SamplingDesignLine line = super.parse();
 			line.setX(getColumnValue(SamplingDesignFileColumn.X.getName(), true, String.class));
 			line.setY(getColumnValue(SamplingDesignFileColumn.Y.getName(), true, String.class));
+			line.setSrsId(getColumnValue(SamplingDesignFileColumn.SRS_ID.getName(), true, String.class));
 			List<String> levelCodes = parseLevelCodes(line);
 			line.setLevelCodes(levelCodes);
 			return line;
@@ -85,8 +86,6 @@ public class SamplingDesignCSVReader extends CSVDataImportReader<SamplingDesignL
 			}
 			return levelCodes;
 		}
-
-
 	}
 	
 	class Validator {

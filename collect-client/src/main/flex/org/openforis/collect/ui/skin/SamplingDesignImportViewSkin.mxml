@@ -41,10 +41,12 @@
 					<s:ArrayList>
 						<s:GridColumn headerText="{Message.get('samplingDesignImport.summaryList.level1Code')}" 
 									  dataField="level_1"
+									  sortable="false"
 									  labelFunction="{hostComponent.levelLabelFunction}"
 									  width="100" />
 						<s:GridColumn headerText="{Message.get('samplingDesignImport.summaryList.level1Code')}" 
 									  dataField="level_2"
+									  sortable="false"
 									  labelFunction="{hostComponent.levelLabelFunction}"
 									  width="100" />
 						<s:GridColumn headerText="{Message.get('samplingDesignImport.summaryList.level3Code')}" 
@@ -53,13 +55,16 @@
 									  width="100" />
 						<s:GridColumn headerText="{Message.get('samplingDesignImport.summaryList.srs')}" 
 									  dataField="srsId"
+									  sortable="false"
 									  labelFunction="{hostComponent.samplingDesignSrsLabelFunction}"
 									  width="100" />
 						<s:GridColumn headerText="{Message.get('samplingDesignImport.summaryList.x')}" 
 									  dataField="x"
+									  sortable="false"
 									  width="100" />
 						<s:GridColumn headerText="{Message.get('samplingDesignImport.summaryList.y')}" 
 									  dataField="y"
+									  sortable="false"
 									  width="100" />
 					</s:ArrayList>
 				</s:columns>

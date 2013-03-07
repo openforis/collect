@@ -43,14 +43,12 @@ public class SamplingDesignImportProcess extends AbstractProcess<Void, SamplingD
 
 	private CollectSurvey survey;
 	private boolean work;
-	private String srsId;
 	
-	public SamplingDesignImportProcess(SamplingDesignManager samplingDesignManager, CollectSurvey survey, boolean work, String srsId, File file, boolean overwriteAll) {
+	public SamplingDesignImportProcess(SamplingDesignManager samplingDesignManager, CollectSurvey survey, boolean work, File file, boolean overwriteAll) {
 		super();
 		this.samplingDesignManager = samplingDesignManager;
 		this.survey = survey;
 		this.work = work;
-		this.srsId = srsId;
 		this.file = file;
 		this.overwriteAll = overwriteAll;
 	}
@@ -246,9 +244,9 @@ public class SamplingDesignImportProcess extends AbstractProcess<Void, SamplingD
 		} else {
 			item.setSurveyId(surveyId);
 		}
-		item.setSrsId(srsId);
 		item.setX(Double.parseDouble(line.getX()));
 		item.setY(Double.parseDouble(line.getY()));
+		item.setSrsId(line.getSrsId());
 		item.setLevelCodes(line.getLevelCodes());
 		samplingDesignManager.save(item);
 	}
