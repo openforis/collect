@@ -58,12 +58,17 @@ public class SessionManager {
 	}
 
 	public CollectSurvey getActiveDesignerSurvey() {
-		SessionStatus designerSessionStatus = (SessionStatus) getSessionAttribute(SessionStatus.SESSION_KEY);
+		SessionStatus designerSessionStatus = getDesignerSessionStatus();
 		if ( designerSessionStatus == null ) {
 			return null;
 		} else {
 			return designerSessionStatus.getSurvey();
 		}
+	}
+
+	public SessionStatus getDesignerSessionStatus() {
+		SessionStatus designerSessionStatus = (SessionStatus) getSessionAttribute(SessionStatus.SESSION_KEY);
+		return designerSessionStatus;
 	}
 
 	public CollectSurvey getActiveSurvey() {
