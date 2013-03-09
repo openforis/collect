@@ -19,8 +19,6 @@ import org.openforis.collect.model.SurveySummary;
 import org.openforis.collect.persistence.SurveyImportException;
 import org.zkoss.bind.BindContext;
 import org.zkoss.bind.BindUtils;
-import org.zkoss.bind.Form;
-import org.zkoss.bind.SimpleForm;
 import org.zkoss.bind.ValidationContext;
 import org.zkoss.bind.Validator;
 import org.zkoss.bind.annotation.Command;
