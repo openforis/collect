@@ -4,7 +4,7 @@
     border="normal" 
     position="center"
     apply="org.zkoss.bind.BindComposer"
-    viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SchemaErrorsPopUpVM')"
+    viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SurveyErrorsPopUpVM')"
     onUpload="@command('fileUploaded')">
     
     <vbox align="center">
