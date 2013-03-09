@@ -128,6 +128,16 @@
 		<!-- </snapshots> -->
 		<!-- </repository> -->
 		<repository>
+      <id>openforis-releases-repository</id>
+      <name>Open Foris Repository</name>
+      <url>http://www.openforis.org/nexus/content/repositories/releases/</url>
+    </repository>
+    <repository>
+      <id>openforis-snapshots-repository</id>
+      <name>Open Foris Snapshots Repository</name>
+      <url>http://www.openforis.org/nexus/content/repositories/snapshots/</url>
+    </repository>
+		<repository>
 			<id>spring-snapshot</id>
 			<url>http://maven.springframework.org/snapshot/</url>
 			<releases>
