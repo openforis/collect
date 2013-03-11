@@ -8,10 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
 
-import org.apache.commons.compress.utils.CharsetNames;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.message.BasicNameValuePair;
@@ -19,6 +16,7 @@ import org.openforis.collect.designer.model.LabelKeys;
 import org.openforis.collect.designer.model.SurveyManagerUtil;
 import org.openforis.collect.designer.model.SurveyWorkSummary;
 import org.openforis.collect.designer.session.SessionStatus;
+import org.openforis.collect.designer.util.ComponentUtil;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.PageUtil;
 import org.openforis.collect.designer.util.Resources;
@@ -56,7 +54,6 @@ import org.zkoss.zul.Window;
  */
 public class SurveyEditVM extends SurveyBaseVM {
 
-	private static final String COLLECT_SWF_LOCATION = "/collect.swf";
 	private static final String TEXT_XML = "text/xml";
 	private static final String PREVIEW_WINDOW_ID = "collect_survey_preview";
 	public static final String SHOW_PREVIEW_POP_UP_GLOBAL_COMMAND = "showPreview";
@@ -380,7 +377,7 @@ public class SurveyEditVM extends SurveyBaseVM {
 	public String getSamplingDesignImportModuleUrl() {
 		Map<String, String> queryParams = createBasicModuleParameters();
 		queryParams.put("sampling_design_import", "true");
-		String url = createUrl(COLLECT_SWF_LOCATION, queryParams);
+		String url = ComponentUtil.createUrl(Resources.Page.COLLECT_SWF.getLocation(), queryParams);
 		return url;
 	}
 
@@ -388,39 +385,8 @@ public class SurveyEditVM extends SurveyBaseVM {
 	public String getSpeciesImportModuleUrl() {
 		Map<String, String> queryParams = createBasicModuleParameters();
 		queryParams.put("species_import", "true");
-		String url = createUrl(COLLECT_SWF_LOCATION, queryParams);
+		String url = ComponentUtil.createUrl(Resources.Page.COLLECT_SWF.getLocation(), queryParams);
 		return url;
 	}
 
-	private String createUrl(String base, Map<String, String> queryParams) {
-		List<BasicNameValuePair> convertedParams = new ArrayList<BasicNameValuePair>();
-		Set<Entry<String, String>> paramsEntrySet = queryParams.entrySet();
-		for (Entry<String, String> param : paramsEntrySet) {
-			BasicNameValuePair valuePair = new BasicNameValuePair(param.getKey(), param.getValue());
-			convertedParams.add(valuePair);
-		}
-		String queryString = URLEncodedUtils.format(convertedParams, CharsetNames.UTF_8);
-		String result = base + "?" + queryString;
-		return result;
-	}
-
-	protected Map<String, String> createBasicModuleParameters() {
-		Integer surveyId = getSurveyId();
-		SessionStatus sessionStatus = getSessionStatus();
-		Integer publishedSurveyId = sessionStatus.getPublishedSurveyId();
-		if ( surveyId == null ) {
-			//not yet saved
-			surveyId = publishedSurveyId;
-		}
-		boolean work = surveyId != null && ! surveyId.equals(publishedSurveyId);
-		String surveyIdStr = surveyId == null ? "": surveyId.toString();
-		String localeStr = "en_US";
-		Map<String, String> result = new HashMap<String, String>();
-		result.put("lang", localeStr);
-		result.put("work", "" + work);
-		result.put("surveyId", surveyIdStr);
-		return result;
-	}
-
-	
 }

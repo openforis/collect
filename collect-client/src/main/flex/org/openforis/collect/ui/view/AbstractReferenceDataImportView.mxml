@@ -12,7 +12,6 @@
 			import org.openforis.collect.manager.referenceDataImport.proxy.ParsingErrorProxy;
 			import org.openforis.collect.ui.component.datagrid.PaginationBar;
 			import org.openforis.collect.util.ArrayUtil;
-			import org.openforis.collect.util.CollectionUtil;
 			import org.openforis.collect.util.StringUtil;
 			
 			import spark.components.Button;
@@ -29,9 +28,9 @@
 			private var _progressLabelText:String;
 			private var _progressTitleText:String;
 			
-			[SkinPart(required="true", type="org.openforis.collect.ui.component.datagrid.PaginationBar")]
+			[SkinPart(type="org.openforis.collect.ui.component.datagrid.PaginationBar")]
 			public var paginationBar:PaginationBar;
-			[SkinPart(required="true", type="spark.components.DataGrid")]
+			[SkinPart(type="spark.components.DataGrid")]
 			public var summaryDataGrid:DataGrid;
 			[SkinPart(required="true", type="mx.controls.ProgressBar")]
 			public var progressBar:ProgressBar;
@@ -46,8 +45,10 @@
 			[SkinPart(required="true", type="spark.components.Button")]
 			public var errorsOkButton:Button;
 
+			private var _surveyId:int;
+			private var _work:Boolean;
 			private var _showCloseButton:Boolean;
-			
+
 			override protected function getCurrentSkinState():String {
 				return currentState;
 			}
@@ -86,6 +87,22 @@
 				}
 			}
 			
+			public function get surveyId():int {
+				return _surveyId;
+			}
+			
+			public function set surveyId(value:int):void {
+				_surveyId = value;
+			}
+			
+			public function get work():Boolean {
+				return _work;
+			}
+			
+			public function set work(value:Boolean):void {
+				_work = value;
+			}
+			
 			[Bindable]
 			public function get showCloseButton():Boolean {
 				return _showCloseButton;
@@ -112,7 +129,7 @@
 			public function set progressLabelText(value:String):void {
 				_progressLabelText = value;
 			}
-
+			
 		]]>
 	</fx:Script>
 	

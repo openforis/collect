@@ -32,8 +32,6 @@
 			public var deleteButton:Button;
 			
 			private var _presenter:SpeciesImportPresenter;
-			private var _surveyId:int;
-			private var _work:Boolean;
 			
 			protected function creationCompleteHandler(event:FlexEvent):void {
 				_presenter = new SpeciesImportPresenter(this);
@@ -55,22 +53,6 @@
 					var messageKey:String = "speciesImport.summaryList.rank." + item.rank.toString().toLowerCase();
 					return Message.get(messageKey);
 				}
-			}
-			
-			public function get surveyId():int {
-				return _surveyId;
-			}
-			
-			public function set surveyId(value:int):void {
-				_surveyId = value;
-			}
-			
-			public function get work():Boolean {
-				return _work;
-			}
-			
-			public function set work(value:Boolean):void {
-				_work = value;
 			}
 			
 		]]>

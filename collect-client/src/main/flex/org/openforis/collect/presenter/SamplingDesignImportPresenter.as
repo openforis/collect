@@ -28,9 +28,7 @@ package org.openforis.collect.presenter
 			_samplingDesignClient = ClientFactory.samplingDesignClient;
 			_samplingDesignImportClient = ClientFactory.samplingDesignImportClient;
 
-			super(view, new MessageKeys());
-
-			_uploadFileNamePrefix = UPLOAD_FILE_NAME_PREFIX;
+			super(view, new MessageKeys(), UPLOAD_FILE_NAME_PREFIX);
 		}
 		
 		private function get view():SamplingDesignImportView {

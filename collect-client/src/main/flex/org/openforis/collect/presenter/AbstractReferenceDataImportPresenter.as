@@ -55,12 +55,12 @@ package org.openforis.collect.presenter {
 		protected var _firstOpen:Boolean;
 		protected var _fileFilter:FileFilter;
 		
-		public function AbstractReferenceDataImportPresenter(view:AbstractReferenceDataImportView, messageKeys:ReferenceDataImportMessageKeys) {
+		public function AbstractReferenceDataImportPresenter(view:AbstractReferenceDataImportView, messageKeys:ReferenceDataImportMessageKeys, uploadFileNamePrefix:String) {
 			this._view = view;
 			this._messageKeys = messageKeys;
 			
 			_uploadUrl = ApplicationConstants.FILE_UPLOAD_URL;
-			_uploadFileNamePrefix = "importFile";
+			_uploadFileNamePrefix = uploadFileNamePrefix;
 			_firstOpen = true;
 			_fileReference = new FileReference();
 			initFileFilter();
@@ -71,8 +71,9 @@ package org.openforis.collect.presenter {
 			
 			//try to see if there is a still running process
 			_view.currentState = AbstractReferenceDataImportView.STATE_LOADING;
-			_view.paginationBar.maxRecordsPerPage = MAX_SUMMARIES_PER_PAGE;
-			
+			if ( _view.paginationBar != null ) {
+				_view.paginationBar.maxRecordsPerPage = MAX_SUMMARIES_PER_PAGE;
+			}
 			loadInitialData();
 		}
 		
@@ -94,7 +95,9 @@ package org.openforis.collect.presenter {
 			
 			_view.importButton.addEventListener(MouseEvent.CLICK, importButtonClickHandler);
 			_view.cancelImportButton.addEventListener(MouseEvent.CLICK, cancelClickHandler);
-			_view.paginationBar.addEventListener(PaginationBarEvent.PAGE_CHANGE, summaryPageChangeHandler);
+			if ( _view.paginationBar != null ) {
+				_view.paginationBar.addEventListener(PaginationBarEvent.PAGE_CHANGE, summaryPageChangeHandler);
+			}
 			_view.errorsOkButton.addEventListener(MouseEvent.CLICK, errorsOkButtonClickHandler);
 			_view.closeButton.addEventListener(MouseEvent.CLICK, closeButtonClickHandler);
 		}

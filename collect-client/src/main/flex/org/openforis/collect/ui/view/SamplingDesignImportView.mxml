@@ -21,8 +21,6 @@
 			import spark.components.gridClasses.GridColumn;
 			
 			private var _presenter:SamplingDesignImportPresenter;
-			private var _surveyId:int;
-			private var _work:Boolean;
 			private var _spatialReferenceSystems:IList;
 			
 			protected function creationCompleteHandler(event:FlexEvent):void {
@@ -51,22 +49,6 @@
 				return item.srsId;
 			}
 			
-			public function get surveyId():int {
-				return _surveyId;
-			}
-
-			public function set surveyId(value:int):void {
-				_surveyId = value;
-			}
-
-			public function get work():Boolean {
-				return _work;
-			}
-
-			public function set work(value:Boolean):void {
-				_work = value;
-			}
-
 			[Bindable]
 			public function get spatialReferenceSystems():IList {
 				return _spatialReferenceSystems;

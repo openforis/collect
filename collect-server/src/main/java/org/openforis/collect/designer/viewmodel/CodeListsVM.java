@@ -53,8 +53,7 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 	private static final String CODE_LISTS_UPDATED_GLOBAL_COMMAND = "codeListsUpdated";
 	private static final String SURVEY_CODE_LIST_GENERATED_LEVEL_NAME_LABEL_KEY = "survey.code_list.generated_level_name";
 	public static final String CLOSE_CODE_LIST_ITEM_POP_UP_COMMAND = "closeCodeListItemPopUp";
-
-//	private DefaultTreeModel<CodeListItem> treeModel;
+	public static final String CLOSE_CODE_LIST_IMPORT_POP_UP_COMMAND = "closeCodeListImportPopUp";
 	
 	private List<List<CodeListItem>> itemsPerLevel;
 	private boolean newChildItem;
@@ -65,6 +64,7 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 	private List<CodeListItem> selectedItemsPerLevel;
 	private Window codeListItemPopUp;
 	private Window nodesReferencedNodesPopUp;
+	private Window codeListImportPopUp;
 	
 	@Init(superclass=false)
 	public void init(@ExecutionArgParam("selectedCodeList") CodeList selectedCodeList) {
@@ -394,6 +394,22 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 		dispatchCodeListsUpdatedCommand();
 	}
 
+	@Command
+	public void openCodeListImportPopUp() {
+		Map<String, Object> args = new HashMap<String, Object>();
+		args.put("codeListId", editedItem.getId());
+		codeListImportPopUp = openPopUp(Resources.Component.CODE_LIST_IMPORT_POPUP.getLocation(), true, args);
+	}
+	
+	@GlobalCommand
+	public void closeCodeListImportPopUp() {
+		closePopUp(codeListImportPopUp);
+		codeListImportPopUp = null;
+		selectedItemsPerLevel = new ArrayList<CodeListItem>();
+		initItemsPerLevel();
+		notifyChange("listLevels","selectedItemsPerLevel");
+	}
+	
 	private void addChildItemToCodeList() {
 		if ( editedChildItemParentItem == null ) {
 			editedItem.addItem(editedChildItem);

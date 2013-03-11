@@ -32,11 +32,13 @@
             var flashvars = {
             	lang: 'en_US',
             	species_import: '<%=request.getParameter("species_import")%>',
+            	code_list_import: '<%=request.getParameter("code_list_import")%>',
             	sampling_design_import: '<%=request.getParameter("sampling_design_import")%>',
             	work: '<%=request.getParameter("work")%>',
             	preview: '<%=request.getParameter("preview")%>',
             	surveyId: '<%=request.getParameter("surveyId")%>',
             	rootEntityId: '<%=request.getParameter("rootEntityId")%>',
+            	code_list_id: '<%=request.getParameter("code_list_id")%>',
             	versionId: '<%=request.getParameter("versionId")%>'
             };
             var params = {};

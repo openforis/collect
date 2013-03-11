@@ -102,6 +102,7 @@
                                 <includeClass>org.openforis.collect.remoting.service.UpdateRequestOperation</includeClass>
                                 <includeClass>org.openforis.collect.remoting.service.UpdateRequestOperation$Method</includeClass>
                                 <includeClass>org.openforis.collect.remoting.service.UpdateResponse</includeClass>
+                                <includeClass>org.openforis.collect.remoting.service.codeListImport.proxy.*</includeClass>
                                 <includeClass>org.openforis.collect.remoting.service.dataProcessing.DataProcessingState</includeClass>
                                 <includeClass>org.openforis.collect.remoting.service.dataExport.DataExportState</includeClass>
                                 <includeClass>org.openforis.collect.remoting.service.dataExport.DataExportState$Format</includeClass>

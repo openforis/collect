@@ -49,8 +49,7 @@ package org.openforis.collect.presenter {
 		public function SpeciesImportPresenter(view:SpeciesImportView) {
 			_speciesImportClient = ClientFactory.speciesImportClient;
 			_speciesClient = ClientFactory.speciesClient;
-			super(view, new MessageKeys());
-			_uploadFileNamePrefix = UPLOAD_FILE_NAME_PREFIX;
+			super(view, new MessageKeys(), UPLOAD_FILE_NAME_PREFIX);
 		}
 		
 		private function get view():SpeciesImportView {

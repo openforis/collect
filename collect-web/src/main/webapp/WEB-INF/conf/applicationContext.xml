@@ -76,7 +76,8 @@
 	<!-- ===================================== -->
 	<!-- GraniteDs services -->
 	<!-- ===================================== -->
-	<bean id="dataService" 		class="org.openforis.collect.remoting.service.DataService" autowire="byName" scope="session" />
+	<bean id="codeListImportService"  class="org.openforis.collect.remoting.service.CodeListImportService" autowire="byName" init-method="init" />
+  <bean id="dataService" 		class="org.openforis.collect.remoting.service.DataService" autowire="byName" scope="session" />
 	<bean id="dataExportService" class="org.openforis.collect.remoting.service.DataExportService" autowire="byName" init-method="init" scope="session" />
 	<bean id="dataImportService" class="org.openforis.collect.remoting.service.DataImportService" autowire="byName" init-method="init" scope="session" />
 	<bean id="logoService" 	class="org.openforis.collect.remoting.service.LogoService" autowire="byName" />

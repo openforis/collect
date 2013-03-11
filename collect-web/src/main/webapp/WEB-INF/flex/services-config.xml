@@ -18,7 +18,15 @@
             id="granite-service"
             class="flex.messaging.services.RemotingService"
             messageTypes="flex.messaging.messages.RemotingMessage">
-            
+      
+      <destination id="codeListImportService">
+        <properties>
+          <factory>springFactory</factory>
+            <source>codeListImportService</source>
+            <scope>application</scope>
+        </properties>
+      </destination>
+      
 			<destination id="dataService">
         <properties>
         	<factory>springFactory</factory>

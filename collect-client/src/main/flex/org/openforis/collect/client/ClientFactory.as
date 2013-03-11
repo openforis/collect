@@ -8,6 +8,7 @@ package org.openforis.collect.client {
 	 * */
 	public class ClientFactory {
 		
+		private static var _codeListImportClient:CodeListImportClient;
 		private static var _dataClient:DataClient;
 		private static var _dataExportClient:DataExportClient;
 		private static var _dataImportClient:DataImportClient;
@@ -20,7 +21,11 @@ package org.openforis.collect.client {
 		private static var _speciesImportClient:SpeciesImportClient;
 		private static var _userClient:UserClient;
 		
-		public function ClientFactory() {
+		public static function get codeListImportClient():CodeListImportClient {
+			if(_codeListImportClient == null){
+				_codeListImportClient = new CodeListImportClient();
+			}
+			return _codeListImportClient;
 		}
 		
 		public static function get dataClient():DataClient {

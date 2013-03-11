@@ -61,6 +61,7 @@ package org.openforis.collect.util {
 	import org.openforis.collect.model.proxy.ValidationResultProxy;
 	import org.openforis.collect.model.proxy.ValidationResultsProxy;
 	import org.openforis.collect.remoting.service.UpdateResponse;
+	import org.openforis.collect.remoting.service.codeListImport.proxy.CodeListImportStatusProxy;
 	import org.openforis.collect.remoting.service.dataExport.DataExportState;
 	import org.openforis.collect.remoting.service.dataImport.DataImportStateProxy;
 	import org.openforis.collect.remoting.service.dataImport.DataImportSummaryItemProxy;
@@ -88,6 +89,7 @@ package org.openforis.collect.util {
 				BooleanAttributeDefinitionProxy,
 				CodeAttributeDefinitionProxy,
 				CodeAttributeProxy,
+				CodeListImportStatusProxy,
 				CodeListItemProxy,
 				CodeListLabelProxy,
 				CodeListLabelProxy$Type,

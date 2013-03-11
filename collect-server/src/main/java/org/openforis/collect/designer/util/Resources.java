@@ -15,7 +15,8 @@ public class Resources {
 	
 		INDEX("index.htm"),
 		DESIGNER("designer.htm"),
-		SURVEY_EDIT("editSurvey.htm");
+		SURVEY_EDIT("editSurvey.htm"),
+		COLLECT_SWF("/collect.swf");
 
 		private String location;
 	
@@ -29,7 +30,6 @@ public class Resources {
 	}
 	
 	public enum Component {
-		
 		SELECT_LANGUAGE_POP_UP("survey_edit/select_language_popup.zul"),
 		PREVIEW_PREFERENCES_POP_UP("survey_edit/preview_preferences_popup.zul"),
 		TABSGROUP("survey_edit/schema_layout/tabsgroup.zul"),
@@ -37,8 +37,9 @@ public class Resources {
 		TABSGROUP_LIST_OF_NODES("survey_edit/schema_layout/editablenodeslist.zul"),
 		SRS_MANAGER_POP_UP("survey_edit/srs_popup.zul"),
 		VERSIONING_POPUP("survey_edit/versioning_popup.zul"),
+		CODE_LIST_IMPORT_POPUP("survey_edit/code_list_import_popup.zul"), 
 		CODE_LIST_ITEM_EDIT_POP_UP("survey_edit/code_list_item_popup.zul"),
-		CODE_LISTS_POPUP("survey_edit/code_lists_popup.zul"), 
+		CODE_LISTS_POPUP("survey_edit/code_lists_popup.zul"),
 		UNITS_MANAGER_POP_UP("survey_edit/units_popup.zul"), 
 		ENTITY("survey_edit/schema/entity.zul"),
 		ATTRIBUTE("survey_edit/schema/attribute_{0}.zul"),

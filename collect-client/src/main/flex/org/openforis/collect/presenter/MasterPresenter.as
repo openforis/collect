@@ -49,25 +49,28 @@ package org.openforis.collect.presenter {
 			eventDispatcher.addEventListener(UIEvent.BACK_TO_LIST, backToListHandler);
 			eventDispatcher.addEventListener(UIEvent.SHOW_SPECIES_IMPORT, showSpeciesImportModuleHandler);
 			eventDispatcher.addEventListener(UIEvent.SHOW_SAMPLING_DESIGN_IMPORT, showSamplingDesignImportHandler);
+			eventDispatcher.addEventListener(UIEvent.SHOW_CODE_LIST_IMPORT, showCodeListImportModuleHandler);
 			eventDispatcher.addEventListener(UIEvent.RECORD_SELECTED, recordSelectedHandler);
 			eventDispatcher.addEventListener(UIEvent.RECORD_CREATED, recordCreatedHandler);
 		}
 		
 		protected function showSpeciesImportModuleHandler(event:UIEvent):void {
 			_view.currentState = MasterView.SPECIES_IMPORT_STATE;
-			var surveyId:int = event.obj.surveyId;
-			var work:Boolean = event.obj.work;
-			_view.speciesImportView.surveyId = surveyId;
-			_view.speciesImportView.work = work;
+			_view.speciesImportView.surveyId = event.obj.surveyId;
+			_view.speciesImportView.work = event.obj.work;
+		}
+
+		protected function showCodeListImportModuleHandler(event:UIEvent):void {
+			_view.currentState = MasterView.CODE_LIST_IMPORT_STATE;
+			_view.codeListImportView.surveyId = event.obj.surveyId;
+			_view.codeListImportView.work = event.obj.work;
+			_view.codeListImportView.codeListId = event.obj.codeListId;
 		}
 
 		protected function showSamplingDesignImportHandler(event:UIEvent):void {
 			_view.currentState = MasterView.SAMPLING_DESIGN_IMPORT_STATE;
-			var surveyId:int = event.obj.surveyId;
-			var work:Boolean = event.obj.work;
-			_view.samplingDesignImportView.surveyId = surveyId;
-			_view.samplingDesignImportView.work = work;
-		}
+			_view.samplingDesignImportView.surveyId = event.obj.surveyId;
+			_view.samplingDesignImportView.work = event.obj.work;		}
 
 		/**
 		 * RecordSummary selected from list page
