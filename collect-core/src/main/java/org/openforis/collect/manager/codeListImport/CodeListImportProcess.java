@@ -38,11 +38,13 @@ public class CodeListImportProcess extends AbstractProcess<Void, CodeListImportS
 	private CodeList codeList;
 	private String langCode;
 	private String errorMessage;
+	private boolean overwriteData;
 	
-	public CodeListImportProcess(CodeList codeList, String langCode, File file) {
+	public CodeListImportProcess(CodeList codeList, String langCode, File file, boolean overwriteData) {
 		this.codeList = codeList;
 		this.langCode = langCode;
 		this.file = file;
+		this.overwriteData = overwriteData;
 	}
 	
 	@Override
@@ -66,6 +68,9 @@ public class CodeListImportProcess extends AbstractProcess<Void, CodeListImportS
 	@Override
 	public void startProcessing() throws Exception {
 		super.startProcessing();
+		if ( overwriteData ) {
+			codeList.removeAllItems();
+		}
 		processFile();
 	}
 

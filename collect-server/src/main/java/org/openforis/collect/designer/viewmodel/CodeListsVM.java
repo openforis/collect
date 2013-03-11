@@ -405,9 +405,13 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 	public void closeCodeListImportPopUp() {
 		closePopUp(codeListImportPopUp);
 		codeListImportPopUp = null;
+		boolean hasMultipleLevels = editedItem.getHierarchy().size() > 1;
+		Type type = hasMultipleLevels ? Type.HIERARCHICAL: Type.FLAT;
+		CodeListFormObject fo = (CodeListFormObject) formObject;
+		fo.setType(type.name());
 		selectedItemsPerLevel = new ArrayList<CodeListItem>();
 		initItemsPerLevel();
-		notifyChange("listLevels","selectedItemsPerLevel");
+		notifyChange("formObject","listLevels","selectedItemsPerLevel");
 	}
 	
 	private void addChildItemToCodeList() {

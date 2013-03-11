@@ -30,14 +30,14 @@ public class CodeListImportService extends ReferenceDataImportService<CodeListIm
 	}
 	
 	@Secured("ROLE_ADMIN")
-	public CodeListImportStatusProxy start(int codeListId) throws DataImportExeption {
+	public CodeListImportStatusProxy start(int codeListId, boolean overwriteData) throws DataImportExeption {
 		if ( importProcess == null || ! importProcess.getStatus().isRunning() ) {
 			File importFile = getImportFile();
 			SessionStatus designerSessionStatus = sessionManager.getDesignerSessionStatus();
 			CollectSurvey survey = designerSessionStatus.getSurvey();
 			String langCode = designerSessionStatus.getCurrentLanguageCode();
 			CodeList codeList = survey.getCodeListById(codeListId);
-			importProcess = new CodeListImportProcess(codeList, langCode, importFile);
+			importProcess = new CodeListImportProcess(codeList, langCode, importFile, overwriteData);
 			importProcess.init();
 			CodeListImportStatus status = importProcess.getStatus();
 			if ( status != null && ! importProcess.getStatus().isError() ) {

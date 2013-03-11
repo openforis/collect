@@ -56,7 +56,7 @@ public class CodeListImportProcessTest extends CollectIntegrationTest {
 		File file = getTestFile(fileName);
 		CodeList codeList = survey.createCodeList();
 		codeList.setName(TEST_CODE_LIST_NAME);
-		CodeListImportProcess process = new CodeListImportProcess(codeList, LANG, file);
+		CodeListImportProcess process = new CodeListImportProcess(codeList, LANG, file, true);
 		survey.addCodeList(codeList);
 		process.call();
 		return process;
