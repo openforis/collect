@@ -22,7 +22,10 @@ import org.openforis.commons.io.csv.CsvLine;
  */
 public class CodeListCSVReader extends CSVDataImportReader<CodeListLine> {
 
-	private static final String CODE_COLUMN_SUFFIX = "_code";
+	public static final String CODE_COLUMN_SUFFIX = "_code";
+	public static final String LEVEL_NAME_COLUMN_EXPR = "[a-z][a-z0-9_]*";
+	public static final String CODE_COLUMN_EXPR = "^" + LEVEL_NAME_COLUMN_EXPR + CODE_COLUMN_SUFFIX + "$";
+	public static final String LABEL_COLUMN_EXPR = "^" + LEVEL_NAME_COLUMN_EXPR + "$";
 
 	private List<String> levels;
 	
@@ -106,14 +109,14 @@ public class CodeListCSVReader extends CSVDataImportReader<CodeListLine> {
 				boolean codeColumn = i % 2 == 0;
 				if ( codeColumn ) {
 					//code column
-					if ( ! colName.endsWith(CODE_COLUMN_SUFFIX) || colName.length() - CODE_COLUMN_SUFFIX.length() == 0 ) {
+					if ( colName.matches(CODE_COLUMN_EXPR) ) {
+						levelName = colName.substring(0, colName.toLowerCase().lastIndexOf(CODE_COLUMN_SUFFIX.toLowerCase()));
+					} else {
 						String expectedColName = colName + CODE_COLUMN_SUFFIX;
 						ParsingError error = new ParsingError(ErrorType.WRONG_COLUMN_NAME, 1, colName, expectedColName);
 						throw new ParsingException(error);
-					} else {
-						levelName = colName.substring(0, colName.indexOf(CODE_COLUMN_SUFFIX));
 					}
-				} else if (! colName.equals(levelName) ) {
+				} else if (! colName.equalsIgnoreCase(levelName) ) {
 					ParsingError error = new ParsingError(ErrorType.WRONG_COLUMN_NAME, 1, colName, levelName);
 					throw new ParsingException(error);
 				}

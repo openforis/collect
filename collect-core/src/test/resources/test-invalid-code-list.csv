@@ -1,0 +1,7 @@
+region_code,region,district_code,district
+1,Dodoma,1,Kondoa
+1,Dodoma,2,Mpwapwa
+1,Duplicate Region,1,Other district
+2,Arusha,1,Monduli
+2,Arusha,2,Arumeru
+2,Arusha,2,Other district

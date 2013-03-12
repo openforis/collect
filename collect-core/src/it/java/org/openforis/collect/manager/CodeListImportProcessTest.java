@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Before;
@@ -16,10 +17,12 @@ import org.junit.runner.RunWith;
 import org.openforis.collect.CollectIntegrationTest;
 import org.openforis.collect.manager.codeListImport.CodeListImportProcess;
 import org.openforis.collect.manager.codeListImport.CodeListImportStatus;
+import org.openforis.collect.manager.referenceDataImport.ParsingError;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
+import org.openforis.idm.metamodel.CodeList.CodeScope;
 import org.openforis.idm.metamodel.xml.IdmlParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -37,7 +40,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class CodeListImportProcessTest extends CollectIntegrationTest {
 
 	private static final String VALID_TEST_CSV = "test-code-list.csv";
-	//private static final String INVALID_TEST_CSV = "test-code-list.csv";
+	private static final String INVALID_TEST_CSV = "test-invalid-code-list.csv";
+	private static final String INVALID_SCHEME_SCOPE_TEST_CSV = "test-invalid-code-list-scope-scheme.csv";
 	private static final String LANG = "en";
 	private static final String TEST_CODE_LIST_NAME = "test";
 
@@ -52,24 +56,23 @@ public class CodeListImportProcessTest extends CollectIntegrationTest {
 		surveyManager.saveSurveyWork(survey);
 	}
 	
-	public CodeListImportProcess importCSVFile(String fileName) throws Exception {
+	public CodeListImportProcess importCSVFile(String fileName, CodeList codeList, CodeScope codeScope) throws Exception {
 		File file = getTestFile(fileName);
-		CodeList codeList = survey.createCodeList();
-		codeList.setName(TEST_CODE_LIST_NAME);
-		CodeListImportProcess process = new CodeListImportProcess(codeList, LANG, file, true);
-		survey.addCodeList(codeList);
+		CodeListImportProcess process = new CodeListImportProcess(codeList, codeScope, LANG, file, true);
 		process.call();
 		return process;
 	}
 	
 	@Test
 	public void testImport() throws Exception {
-		CodeListImportProcess process = importCSVFile(VALID_TEST_CSV);
+		CodeList codeList = survey.createCodeList();
+		codeList.setName(TEST_CODE_LIST_NAME);
+		survey.addCodeList(codeList);
+		CodeListImportProcess process = importCSVFile(VALID_TEST_CSV, codeList, CodeScope.LOCAL);
 		CodeListImportStatus status = process.getStatus();
 		assertTrue(status.isComplete());
 		assertTrue(status.getSkippedRows().isEmpty());
 		assertEquals(5, status.getProcessed());
-		CodeList codeList = survey.getCodeList(TEST_CODE_LIST_NAME);
 		List<CodeListItem> items = codeList.getItems();
 		assertEquals(2, items.size());
 		{
@@ -98,6 +101,45 @@ public class CodeListImportProcessTest extends CollectIntegrationTest {
 			assertEquals("002", childItem.getCode());
 			assertEquals("Arumeru", childItem.getLabel(LANG));
 		}
+	}
+	
+	@Test
+	public void testDuplicateValues() throws Exception {
+		CodeList codeList = survey.createCodeList();
+		codeList.setName(TEST_CODE_LIST_NAME);
+		survey.addCodeList(codeList);
+		CodeListImportProcess process = importCSVFile(INVALID_TEST_CSV, codeList, CodeScope.LOCAL);
+		CodeListImportStatus status = process.getStatus();
+		assertTrue(status.isError());
+		List<ParsingError> errors = status.getErrors();
+		assertTrue(containsError(errors, 4, "region_code"));
+		assertTrue(containsError(errors, 4, "district_code"));
+		assertTrue(containsError(errors, 7, "district_code"));
+	}
+	
+	@Test
+	public void testDuplicateValuesSchemeScope() throws Exception {
+		CodeList codeList = survey.createCodeList();
+		codeList.setName(TEST_CODE_LIST_NAME);
+		survey.addCodeList(codeList);
+		CodeListImportProcess process = importCSVFile(INVALID_SCHEME_SCOPE_TEST_CSV, codeList, CodeScope.SCHEME);
+		CodeListImportStatus status = process.getStatus();
+		assertTrue(status.isError());
+		List<ParsingError> errors = status.getErrors();
+		assertTrue(containsError(errors, 4, "region_code"));
+		assertTrue(containsError(errors, 5, "district_code"));
+		assertTrue(containsError(errors, 6, "district_code"));
+	}
+	
+
+	protected boolean containsError(List<ParsingError> errors, long row,
+			String column) {
+		for (ParsingError error : errors) {
+			if ( error.getRow() == row && Arrays.asList(error.getColumns()).contains(column) ) {
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	protected File getTestFile(String fileName) throws URISyntaxException {

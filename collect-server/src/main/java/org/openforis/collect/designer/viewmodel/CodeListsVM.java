@@ -379,7 +379,9 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 	public void closeCodeListItemPopUp(@BindingParam("undoChanges") boolean undoChanges) {
 		closePopUp(codeListItemPopUp);
 		codeListItemPopUp = null;
-		if ( ! undoChanges ) {
+		if ( undoChanges ) {
+			dispatchCurrentFormValidatedCommand(true);
+		} else {
 			if ( newChildItem ) {
 				addChildItemToCodeList();
 			} else {
@@ -407,8 +409,10 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 		codeListImportPopUp = null;
 		boolean hasMultipleLevels = editedItem.getHierarchy().size() > 1;
 		Type type = hasMultipleLevels ? Type.HIERARCHICAL: Type.FLAT;
+		String codeScope = editedItem.getCodeScope().name();
 		CodeListFormObject fo = (CodeListFormObject) formObject;
 		fo.setType(type.name());
+		fo.setCodeScope(codeScope);
 		selectedItemsPerLevel = new ArrayList<CodeListItem>();
 		initItemsPerLevel();
 		notifyChange("formObject","listLevels","selectedItemsPerLevel");

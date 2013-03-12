@@ -6,8 +6,10 @@ package org.openforis.collect.presenter
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.events.ResultEvent;
 	
+	import org.openforis.collect.Application;
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.client.CodeListImportClient;
+	import org.openforis.collect.metamodel.proxy.CodeListProxy$CodeScope;
 	import org.openforis.collect.ui.view.CodeListImportView;
 	import org.openforis.collect.util.AlertUtil;
 	import org.openforis.collect.util.StringUtil;
