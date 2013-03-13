@@ -5,6 +5,7 @@ package org.openforis.collect.designer.viewmodel;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.io.Reader;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -108,8 +109,8 @@ public class SurveyImportVM extends SurveyBaseVM {
 		String contentType = media.getContentType();
 		if ( contentType.equals(TEXT_XML_CONTENT) ) {
 			fileName = media.getName();
-			InputStream is = getInputStream(media);
-			uploadedSurvey = unmarshalSurvey(is);
+			Reader reader = media.getReaderData();
+			uploadedSurvey = unmarshalSurvey(reader);
 			notifyChange("fileName","uploadedSurvey");
 			String surveyName = getSurveyNameValue();
 			if ( StringUtils.isEmpty(surveyName) ) {
@@ -124,6 +125,7 @@ public class SurveyImportVM extends SurveyBaseVM {
 
 	protected InputStream getInputStream(Media media) {
 		try {
+			media.getStreamData();
 			String stringData = media.getStringData();
 			byte[] bytes = stringData.getBytes("UTF-8");
 			ByteArrayInputStream is = new ByteArrayInputStream(bytes);
@@ -163,10 +165,10 @@ public class SurveyImportVM extends SurveyBaseVM {
 		return  collidingSurvey != null && ! collidingSurvey.getName().equals(surveyName);
 	}
 
-	protected CollectSurvey unmarshalSurvey(InputStream is) {
+	protected CollectSurvey unmarshalSurvey(Reader reader) {
 		CollectSurvey survey = null;
 		try {
-			survey = surveyManager.unmarshalSurvey(is);
+			survey = surveyManager.unmarshalSurvey(reader);
 		} catch(Exception e) {
 			log.error(e);
 			Object[] args = new String[]{e.getMessage()};

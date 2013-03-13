@@ -5,6 +5,7 @@ package org.openforis.collect.manager;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -163,6 +164,10 @@ public class SurveyManager {
 
 	public CollectSurvey unmarshalSurvey(InputStream is) throws IdmlParseException {
 		return surveyDao.unmarshalIdml(is);
+	}
+	
+	public CollectSurvey unmarshalSurvey(Reader reader) throws IdmlParseException {
+		return surveyDao.unmarshalIdml(reader);
 	}
 	
 	@Transactional

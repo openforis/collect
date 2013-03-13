@@ -5,6 +5,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 
 import org.jooq.Record;
@@ -46,6 +47,11 @@ abstract class SurveyBaseDao extends JooqDaoSupport {
 	public CollectSurvey unmarshalIdml(InputStream is) throws IdmlParseException {
 		CollectSurveyIdmlBinder binder = new CollectSurveyIdmlBinder(surveyContext);
 		return (CollectSurvey) binder.unmarshal(is);
+	}
+
+	public CollectSurvey unmarshalIdml(Reader reader) throws IdmlParseException {
+		CollectSurveyIdmlBinder binder = new CollectSurveyIdmlBinder(surveyContext);
+		return (CollectSurvey) binder.unmarshal(reader);
 	}
 
 	public String marshalSurvey(Survey survey) throws SurveyImportException {
