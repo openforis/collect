@@ -1,5 +1,6 @@
 package org.openforis.collect.designer.form;
 
+import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.designer.model.AttributeType;
 import org.openforis.collect.designer.model.NodeType;
 import org.openforis.collect.metamodel.ui.UIOptions;
@@ -183,9 +184,9 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 			if (required) {
 				dest.setMinCount(1);
 			}
-			dest.setRequiredExpression(requiredExpression);
+			dest.setRequiredExpression(StringUtils.trimToNull(requiredExpression));
 		}
-		dest.setRelevantExpression(relevantExpression);
+		dest.setRelevantExpression(StringUtils.trimToNull(requiredExpression));
 		saveTabInfo(dest);
 	}
 
