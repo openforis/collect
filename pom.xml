@@ -99,7 +99,12 @@
 										</goals>
 									</pluginExecutionFilter>
 									<action>
-										<execute />
+										<ignore/>
+										<!-- 
+										Must ignore since m2e fails on copy-flex-resource
+										https://issues.sonatype.org/browse/MNGECLIPSE-1375
+										 -->
+<!-- 										<execute /> -->
 									</action>
 								</pluginExecution>
 							</pluginExecutions>
