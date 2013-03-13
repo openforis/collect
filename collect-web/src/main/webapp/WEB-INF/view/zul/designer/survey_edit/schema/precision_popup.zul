@@ -1,0 +1,77 @@
+<?component name="fieldErrorHandler" class="org.openforis.collect.designer.component.FieldErrorHandler"?>
+<zk>
+  <custom-attributes parentDefinition="${arg.parentDefinition}" />
+  <custom-attributes precision="${arg.precision}" />
+  <custom-attributes newItem="${arg.newItem}" />
+  <window id="attributeDefaultPopUp"
+    title="${labels.survey.schema.attribute.numeric.precisions.popup.title}"
+    width="500px" 
+    border="normal" 
+    position="center" 
+    closable="false"
+    apply="org.zkoss.bind.BindComposer"
+    viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.PrecisionVM')"
+    validationMessages="@id('vmsgs')"
+    form="@id('fx') 
+            @load(vm.formObject) 
+            @save(vm.formObject, before={'validate','applyChanges'})
+            @validator('org.openforis.collect.designer.form.validator.PrecisionFormValidator', parentDefinition=parentDefinition)">
+
+    <vlayout id="formContainer"
+      sclass="form">
+      <grid>
+        <columns>
+          <column width="150px" />
+          <column />
+        </columns>
+        <rows>
+          <row>
+            <label
+              value="${labels.survey.schema.attribute.numeric.precisions.is_default}:" />
+            <fieldErrorHandler message="@load(vmsgs['defaultPrecision'])">
+              <checkbox
+                checked="@load(fx.defaultPrecision eq true) @save(fx.defaultPrecision)"
+                onCheck="@command('applyChanges')" />
+            </fieldErrorHandler>
+          </row>
+          <row>
+            <label
+              value="${labels.survey.schema.attribute.numeric.precisions.unit}:" />
+            <hlayout>
+              <fieldErrorHandler message="@load(vmsgs['unit'])">
+                <listbox width="120px" model="@load(vm.units)"
+                  selectedItem="@bind(fx.unit)" mold="select"
+                  onSelect="@command('applyChanges')">
+                  <template name="model">
+                    <listitem label="${vm.getUnitLabel(each)}" />
+                  </template>
+                </listbox>
+              </fieldErrorHandler>
+              <button sclass="icon"
+                tooltiptext="${labels.survey.unit.manager.title}"
+                onClick="@global-command('openUnitsManagerPopUp')"
+                image="/assets/images/edit-small.png" />
+            </hlayout>
+          </row>
+          <row>
+            <label
+              value="${labels.survey.schema.attribute.numeric.precisions.decimal_digits}:" />
+            <fieldErrorHandler message="@load(vmsgs['decimalDigits'])">
+              <intbox width="50px" value="@bind(fx.decimalDigits)"
+                onChange="@command('applyChanges')" />
+            </fieldErrorHandler>
+          </row>
+        </rows>
+      </grid>
+      <box width="100%" align="center">
+        <hbox>
+          <button label="${labels.global.apply}"
+            onClick="@command('commitChanges')" />
+          <separator width="30px" />
+          <button label="${labels.global.cancel}"
+            onClick="@global-command('cancelChangesToEditedPrecision')" />
+        </hbox>
+      </box>
+    </vlayout>
+  </window>
+</zk>

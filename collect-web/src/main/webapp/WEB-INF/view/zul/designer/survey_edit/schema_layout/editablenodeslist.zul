@@ -63,7 +63,7 @@
 	                    	</hlayout>
 	                    	<hlayout>
 	                    		<separator width="150px" />
-	                    		<!-- table rapresentation of the entity -->
+	                    		<!-- table representation of the entity -->
 		                    	<listbox nonselectableTags="*">
 		                    		<listhead children="@load(each.childDefinitions)">
 			                    		<template name="children">

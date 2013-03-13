@@ -8,6 +8,21 @@ package org.openforis.collect.ui {
 	 * */
 	public class Images {
 		
+		[Embed("/assets/images/default_logo.png")]
+		public static const DEFAULT_LOGO:Class;
+		
+		[Embed("/assets/images/data_workflow.jpg")]
+		public static const DATA_WORKFLOW:Class;
+		
+		[Embed("/assets/images/data_management.png")]
+		public static const DATA_MANAGEMENT:Class;
+		
+		[Embed("/assets/images/database_designer.png")]
+		public static const DATABASE_DESIGNER:Class;
+		
+		[Embed("/assets/images/user_management.png")]
+		public static const USER_MANAGEMENT:Class;
+		
 		[Embed("/assets/images/delete.png")]
 		public static const DELETE:Class;
 		
@@ -64,6 +79,12 @@ package org.openforis.collect.ui {
 		
 		[Embed("/assets/images/reject.png")]
 		public static const REJECT:Class;
+		
+		[Embed("/assets/images/approved.png")]
+		public static const APPROVED:Class;
+		
+		[Embed("/assets/images/rejected.png")]
+		public static const REJECTED:Class;
 		
 		[Embed("/assets/images/dash.png")]
 		public static const DASH:Class;

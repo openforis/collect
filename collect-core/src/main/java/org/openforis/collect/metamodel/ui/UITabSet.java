@@ -15,11 +15,18 @@ public class UITabSet implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
 	
+	protected UIOptions uiOptions;
 	protected String name;
-
 	protected List<UITab> tabs;
-
 	protected UITabSet parent;
+	
+	UITabSet(UIOptions uiOptions) {
+		this.uiOptions = uiOptions;
+	}
+	
+	public UIOptions getUIOptions() {
+		return uiOptions;
+	}
 	
 	public String getName() {
 		return name;
@@ -57,7 +64,15 @@ public class UITabSet implements Serializable {
 	}
 	
 	public void removeTab(UITab tab) {
+		tab.detatch();
 		tabs.remove(tab);
+	}
+	
+	public void detatch() {
+	}
+
+	public void moveTab(UITab tab, int newIndex) {
+		CollectionUtil.moveItem(tabs, tab, newIndex);
 	}
 
 	public UITab updateTab(String tabName, String newName, String newLabel, String language) {
@@ -85,6 +100,7 @@ public class UITabSet implements Serializable {
 		UITabSet prnt = getParent();
 		while ( prnt != null ) {
 			result ++;
+			prnt = prnt.getParent();
 		}
 		return result;
 	}

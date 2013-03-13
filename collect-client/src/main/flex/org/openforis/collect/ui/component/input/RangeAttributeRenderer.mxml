@@ -5,11 +5,7 @@
 				xmlns:mx="library://ns.adobe.com/flex/mx" 
 				xmlns:input="org.openforis.collect.ui.component.input.*" 
 				xmlns:detail="org.openforis.collect.ui.component.detail.*"
-				inputFields="{[rangeInputField, unitInputField]}"
-				width="122"
-				width.singleUnit="149"
-				width.multipleUnits="244"
-				>
+				inputFields="{[rangeInputField, unitInputField]}">
 	<fx:Script>
 		<![CDATA[
 			import org.openforis.collect.metamodel.proxy.UnitProxy;
@@ -25,8 +21,15 @@
 			
 			protected function unitLabelFunction(item:Object):String {
 				if(item is UnitProxy) {
-					var unit:UnitProxy = UnitProxy(item);
-					return unit.name;
+					return UnitProxy(item).getAbbreviation();
+				} else {
+					return item.shortLabel;
+				}
+			}
+			
+			protected function unitDropDownLabelFunction(item:Object):String {
+				if(item is UnitProxy) {
+					return UnitProxy(item).getAbbreviation();
 				} else {
 					return item.label;
 				}
@@ -56,9 +59,10 @@
 								  parentEntity="{parentEntity}"
 								  attribute="{attribute}"
 								  fieldIndex="2"
-								  width="120" 
+								  width="70" 
 								  dataField="name"
 								  labelFunction="{unitLabelFunction}"
+								  dropDownLabelFunction="{unitDropDownLabelFunction}"
 								  />
 		
 		<s:Label id="unitLabel"

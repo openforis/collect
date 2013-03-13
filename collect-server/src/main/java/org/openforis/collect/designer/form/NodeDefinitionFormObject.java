@@ -2,28 +2,45 @@ package org.openforis.collect.designer.form;
 
 import org.openforis.collect.designer.model.AttributeType;
 import org.openforis.collect.designer.model.NodeType;
+import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.metamodel.ui.UITab;
-import org.openforis.idm.metamodel.ModelVersion;
+import org.openforis.collect.metamodel.ui.UITabSet;
+import org.openforis.collect.model.CollectSurvey;
+import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NodeLabel.Type;
 import org.openforis.idm.metamodel.Prompt;
-import org.zkoss.util.resource.Labels;
 
 /**
  * 
  * @author S. Ricci
  *
  */
-public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends SurveyObjectFormObject<T> {
+public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends VersionableItemFormObject<T> {
 	
+	public static final String INHERIT_TAB_NAME = "inherit";
+	
+	//public static NamedObject INHERIT_TAB;
 	public static UITab INHERIT_TAB;
-	{
+	
+	static {
 		//init static variables
+		//INHERIT_TAB = new NamedObject(LabelKeys.INHERIT_TAB);
 		INHERIT_TAB = new UITab();
-		INHERIT_TAB.setName(Labels.getLabel("survey.configuration.tab.inherit"));
 	};
 	
+	private EntityDefinition parentDefinition;
+	
+	//generic
 	private String name;
+	private String description;
+	private boolean multiple;
+	private boolean required;
+	private String requiredExpression;
+	private String relevantExpression;
+	private Integer minCount;
+	private Integer maxCount;
+	//labels
 	private String headingLabel;
 	private String instanceLabel;
 	private String numberLabel;
@@ -31,88 +48,120 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 	private String paperPromptLabel;
 	private String handheldPromptLabel;
 	private String pcPromptLabel;
-	private String description;
-	private boolean multiple;
-	private boolean required;
-	private String requiredExpression;
-	private String relevantExpression;
-	private Object sinceVersion;
-	private Object deprecatedVersion;
-	private Integer minCount;
-	private Integer maxCount;
+	//layout
+	private String tabName;
+	
+	NodeDefinitionFormObject(EntityDefinition parentDefn) {
+		this.parentDefinition = parentDefn;
+	}
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public static NodeDefinitionFormObject<NodeDefinition> newInstance(NodeType nodeType, AttributeType attributeType) {
+	public static NodeDefinitionFormObject<? extends NodeDefinition> newInstance(EntityDefinition parentDefn, NodeType nodeType, AttributeType attributeType) {
 		NodeDefinitionFormObject<NodeDefinition> formObject = null;
 		if ( nodeType != null ) {
 			switch ( nodeType) {
 			case ENTITY:
-				formObject = new EntityDefinitionFormObject();
+				formObject = new EntityDefinitionFormObject(parentDefn);
 				break;
 			case ATTRIBUTE:
-				if ( attributeType != null ) {
-					switch (attributeType) {
-					case BOOLEAN:
-						formObject = new BooleanAttributeDefinitionFormObject();
-						break;
-					case CODE:
-						formObject = new CodeAttributeDefinitionFormObject();
-						break;
-					case COORDINATE:
-						formObject = new CoordinateAttributeDefinitionFormObject();
-						break;
-					case DATE:
-						formObject = new DateAttributeDefinitionFormObject();
-						break;
-					case FILE:
-						formObject = new FileAttributeDefinitionFormObject();
-						break;
-					case NUMBER:
-						formObject = new NumberAttributeDefinitionFormObject();
-						break;
-					case RANGE:
-						formObject = new RangeAttributeDefinitionFormObject();
-						break;
-					case TEXT:
-						formObject = new TextAttributeDefinitionFormObject();
-						break;
-					case TIME:
-						formObject = new TimeAttributeDefinitionFormObject();
-						break;
-					default:
-						throw new IllegalStateException("Attribute type not supported");
-					}
-				}
-				break;
+				return (NodeDefinitionFormObject<NodeDefinition>) newInstance(parentDefn, attributeType);
 			}
 		}
 		return formObject;
 	}
 	
+	@SuppressWarnings({ "rawtypes" })
+	public static AttributeDefinitionFormObject<?> newInstance(EntityDefinition parentDefn, AttributeType attributeType) {
+		if ( attributeType != null ) {
+			switch (attributeType) {
+			case BOOLEAN:
+				return new BooleanAttributeDefinitionFormObject(parentDefn);
+			case CODE:
+				return new CodeAttributeDefinitionFormObject(parentDefn);
+			case COORDINATE:
+				return new CoordinateAttributeDefinitionFormObject(parentDefn);
+			case DATE:
+				return new DateAttributeDefinitionFormObject(parentDefn);
+			case FILE:
+				return new FileAttributeDefinitionFormObject(parentDefn);
+			case NUMBER:
+				return new NumberAttributeDefinitionFormObject(parentDefn);
+			case RANGE:
+				return new RangeAttributeDefinitionFormObject(parentDefn);
+			case TAXON:
+				return new TaxonAttributeDefinitionFormObject(parentDefn);
+			case TEXT:
+				return new TextAttributeDefinitionFormObject(parentDefn);
+			case TIME:
+				return new TimeAttributeDefinitionFormObject(parentDefn);
+			default:
+				throw new IllegalStateException("Attribute type not supported");
+			}
+		} else {
+			return null;
+		}
+	}
+	
 	@Override
-	public void loadFrom(T source, String languageCode) {
+	public void loadFrom(T source, String language, String defaultLanguage) {
+		super.loadFrom(source, language, defaultLanguage);
+		//generic
 		name = source.getName();
-		headingLabel = source.getLabel(Type.HEADING, languageCode);
-		instanceLabel = source.getLabel(Type.INSTANCE, languageCode);
-		numberLabel = source.getLabel(Type.NUMBER, languageCode);
-		interviewPromptLabel = source.getPrompt(Prompt.Type.INTERVIEW, languageCode);
-		paperPromptLabel = source.getPrompt(Prompt.Type.PAPER, languageCode);
-		handheldPromptLabel = source.getPrompt(Prompt.Type.HANDHELD, languageCode);
-		pcPromptLabel = source.getPrompt(Prompt.Type.PC, languageCode);
-		description = source.getDescription(languageCode);
 		multiple = source.isMultiple();
 		Integer nodeMinCount = source.getMinCount();
-		required = nodeMinCount != null && nodeMinCount.intValue() == 1;
+		required = nodeMinCount != null && nodeMinCount.intValue() > 0;
 		requiredExpression = source.getRequiredExpression();
 		relevantExpression = source.getRelevantExpression();
 		minCount = nodeMinCount;
 		maxCount = source.getMaxCount();
-		sinceVersion = source.getSinceVersion();
-		deprecatedVersion = source.getDeprecatedVersion();
+		if (! multiple ) {
+			maxCount = null;
+		}
+		//labels
+		headingLabel = getLabel(source, Type.HEADING, language, defaultLanguage);
+		instanceLabel = getLabel(source, Type.INSTANCE, language, defaultLanguage);
+		numberLabel = getLabel(source, Type.NUMBER, language, defaultLanguage);
+		interviewPromptLabel = getPrompt(source, Prompt.Type.INTERVIEW, language, defaultLanguage);
+		paperPromptLabel = getPrompt(source, Prompt.Type.PAPER, language, defaultLanguage);
+		handheldPromptLabel = getPrompt(source, Prompt.Type.HANDHELD, language, defaultLanguage);
+		pcPromptLabel = getPrompt(source, Prompt.Type.PC, language, defaultLanguage);
+		description = getDescription(source, language, defaultLanguage);
+		//layout
+		UIOptions uiOptions = getUIOptions(source);
+		UITab tab = uiOptions.getAssignedTab(parentDefinition, source, false);
+		tabName = tab != null ? tab.getName(): INHERIT_TAB_NAME;
+	}
+
+	protected String getLabel(T source, Type type, String languageCode, String defaultLanguage) {
+		String result = source.getLabel(type, languageCode);
+		if ( result == null && languageCode != null && languageCode.equals(defaultLanguage) ) {
+			//try to get the label associated to default language
+			result = source.getLabel(type, null);
+		}
+		return result;
+	}
+
+	protected String getPrompt(T source, Prompt.Type type, String languageCode, String defaultLanguage) {
+		String result = source.getPrompt(type, languageCode);
+		if ( result == null && languageCode != null && languageCode.equals(defaultLanguage) ) {
+			//try to get the label associated to default language
+			result = source.getPrompt(type, null);
+		}
+		return result;
+	}
+	
+	protected String getDescription(T source, String languageCode, String defaultLanguage) {
+		String result = source.getDescription(languageCode);
+		if ( result == null && languageCode != null && languageCode.equals(defaultLanguage) ) {
+			//try to get the label associated to default language
+			result = source.getDescription(null);
+		}
+		return result;
 	}
 	
 	@Override
 	public void saveTo(T dest, String languageCode) {
+		super.saveTo(dest, languageCode);
 		dest.setName(name);
 		dest.setLabel(Type.HEADING, languageCode, headingLabel);
 		dest.setLabel(Type.INSTANCE, languageCode, instanceLabel);
@@ -123,27 +172,43 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 		dest.setPrompt(Prompt.Type.PC, languageCode, pcPromptLabel);
 		dest.setDescription(languageCode, description);
 		dest.setMultiple(multiple);
+		dest.setMinCount(null);
+		dest.setMaxCount(null);
+		dest.setRequiredExpression(null);
 		if ( multiple ) {
 			dest.setMinCount(minCount);
 			dest.setMaxCount(maxCount);
-//			dest.setRequired(null);
-			dest.setRequiredExpression(null);
 		} else {
-			dest.setMinCount(null);
-			dest.setMaxCount(null);
-//			dest.setRequired(required);
+			if (required) {
+				dest.setMinCount(1);
+			}
 			dest.setRequiredExpression(requiredExpression);
 		}
-		if ( sinceVersion != null && sinceVersion != VERSION_EMPTY_SELECTION ) {
-			dest.setSinceVersion((ModelVersion) sinceVersion);
-		} else {
-			dest.setSinceVersion(null);
+		saveTabInfo(dest);
+	}
+
+	protected void saveTabInfo(T dest) {
+		if ( parentDefinition != null ) {
+			UIOptions uiOptions = getUIOptions(dest);
+			if ( tabName == null || tabName.equals(INHERIT_TAB_NAME) ) {
+				uiOptions.removeTabAssociation(dest);
+			} else {
+				UITabSet parentTabSet = uiOptions.getAssignedTabSet(parentDefinition);
+				UITab tab = parentTabSet.getTab(tabName);
+				uiOptions.assignToTab(dest, tab);
+			}
 		}
-		if ( deprecatedVersion != null && deprecatedVersion != VERSION_EMPTY_SELECTION ) {
-			dest.setDeprecatedVersion((ModelVersion) deprecatedVersion);
-		} else {
-			dest.setDeprecatedVersion(null);
-		}
+	}
+
+	@Override
+	protected void reset() {
+		//TODO
+	}
+	
+	protected UIOptions getUIOptions(NodeDefinition nodeDefn) {
+		CollectSurvey survey = (CollectSurvey) nodeDefn.getSurvey();
+		UIOptions uiOptions = survey.getUIOptions();
+		return uiOptions;
 	}
 	
 	public String getName() {
@@ -194,22 +259,6 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 		this.multiple = multiple;
 	}
 	
-	public Object getSinceVersion() {
-		return sinceVersion;
-	}
-	
-	public void setSinceVersion(Object sinceVersion) {
-		this.sinceVersion = sinceVersion;
-	}
-	
-	public Object getDeprecatedVersion() {
-		return deprecatedVersion;
-	}
-	
-	public void setDeprecatedVersion(Object deprecatedVersion) {
-		this.deprecatedVersion = deprecatedVersion;
-	}
-
 	public String getInterviewPromptLabel() {
 		return interviewPromptLabel;
 	}
@@ -280,6 +329,14 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 
 	public void setMaxCount(Integer maxCount) {
 		this.maxCount = maxCount;
+	}
+
+	public String getTabName() {
+		return tabName;
+	}
+
+	public void setTabName(String tabName) {
+		this.tabName = tabName;
 	}
 
 }

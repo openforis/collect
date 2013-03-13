@@ -64,5 +64,24 @@ package org.openforis.collect.model.proxy {
 				hasEffectiveRole(ROLE_ANALYSIS) && record.step == CollectRecord$Step.ANALYSIS;
 		}
 
+		public function canEdit(record:RecordProxy):Boolean {
+			var step:CollectRecord$Step = record.step;
+			var result:Boolean = false;
+			switch ( step ) {
+				case CollectRecord$Step.ENTRY:
+					result = hasEffectiveRole(UserProxy.ROLE_ENTRY) || 
+					hasEffectiveRole(UserProxy.ROLE_CLEANSING) || 
+					hasEffectiveRole(UserProxy.ROLE_ADMIN);
+					break;
+				case CollectRecord$Step.CLEANSING:
+					result = hasEffectiveRole(UserProxy.ROLE_CLEANSING) || 
+						hasEffectiveRole(UserProxy.ROLE_ADMIN);
+					break;
+				case CollectRecord$Step.ANALYSIS:
+					result = false
+					break;
+			}
+			return result;
+		}
 	}
 }

@@ -7,7 +7,7 @@ import org.openforis.idm.metamodel.SpatialReferenceSystem;
  * @author S. Ricci
  *
  */
-public class SpatialReferenceSystemFormObject extends SurveyObjectFormObject<SpatialReferenceSystem> {
+public class SpatialReferenceSystemFormObject extends FormObject<SpatialReferenceSystem> {
 
 	private String id;
 	private String label;
@@ -15,10 +15,10 @@ public class SpatialReferenceSystemFormObject extends SurveyObjectFormObject<Spa
 	private String wellKnownText;
 	
 	@Override
-	public void loadFrom(SpatialReferenceSystem source, String languageCode) {
+	public void loadFrom(SpatialReferenceSystem source, String languageCode, String defaultLanguage) {
 		id = source.getId();
-		label = source.getLabel(languageCode);
-		description = source.getDescription(languageCode);
+		label = getLabel(source, languageCode, defaultLanguage);
+		description = getDescription(source, languageCode, defaultLanguage);
 		wellKnownText = source.getWellKnownText();
 	}
 	
@@ -29,6 +29,30 @@ public class SpatialReferenceSystemFormObject extends SurveyObjectFormObject<Spa
 		dest.setDescription(languageCode, description);
 		dest.setWellKnownText(wellKnownText);
 	}
+	
+	@Override
+	protected void reset() {
+		// TODO Auto-generated method stub
+	}
+
+	protected String getLabel(SpatialReferenceSystem source, String languageCode, String defaultLanguage) {
+		String result = source.getLabel(languageCode);
+		if ( result == null && languageCode != null && languageCode.equals(defaultLanguage) ) {
+			//try to get the label associated to default language
+			result = source.getLabel(null);
+		}
+		return result;
+	}
+
+	protected String getDescription(SpatialReferenceSystem source, String languageCode, String defaultLanguage) {
+		String result = source.getDescription(languageCode);
+		if ( result == null && languageCode != null && languageCode.equals(defaultLanguage) ) {
+			//try to get the label associated to default language
+			result = source.getDescription(null);
+		}
+		return result;
+	}
+	
 
 	public String getId() {
 		return id;

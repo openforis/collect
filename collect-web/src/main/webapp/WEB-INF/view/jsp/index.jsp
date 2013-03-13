@@ -30,7 +30,11 @@
             // To use express install, set to playerProductInstall.swf, otherwise the empty string. 
             var xiSwfUrlStr = "flash/playerProductInstall.swf";
             var flashvars = {
-            	lang: 'en_US'
+            	lang: 'en_US',
+            	preview: '<%=request.getParameter("preview")%>',
+            	surveyId: '<%=request.getParameter("surveyId")%>',
+            	rootEntityId: '<%=request.getParameter("rootEntityId")%>',
+            	versionId: '<%=request.getParameter("versionId")%>'
             };
             var params = {};
            // params.wmode = "opaque";

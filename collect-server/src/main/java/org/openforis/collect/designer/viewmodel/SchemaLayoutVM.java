@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.openforis.collect.designer.component.SchemaTreeModel;
+import org.openforis.collect.designer.component.SchemaTreeModel.SchemaTreeNodeData;
 import org.openforis.collect.designer.session.SessionStatus;
 import org.openforis.collect.designer.util.Resources;
 import org.openforis.collect.metamodel.ui.UIOptions;
@@ -114,7 +115,7 @@ public class SchemaLayoutVM extends SurveyBaseVM {
 			NodeDefinition nodeDefn = treeNode.getData();
 			UIOptions uiOptions = survey.getUIOptions();
 			EntityDefinition rootEntity = nodeDefn.getRootEntity();
-			return uiOptions.getTabSet(rootEntity);
+			return uiOptions.getAssignedRootTabSet(rootEntity);
 		} else {
 			return null;
 		}
@@ -127,7 +128,7 @@ public class SchemaLayoutVM extends SurveyBaseVM {
 			NodeDefinition node = ((Listitem) dragged).getValue();
 			CollectSurvey survey = getSurvey();
 			UIOptions uiOpts = survey.getUIOptions();
-			UITab oldTab = uiOpts.getTab(node, false);
+			UITab oldTab = uiOpts.getAssignedTab(node, false);
 			uiOpts.removeTabAssociation(node);
 			if ( oldTab != null ) {
 				postNodePerTabChangedCommand(oldTab);
@@ -145,7 +146,7 @@ public class SchemaLayoutVM extends SurveyBaseVM {
 		return rootTabSet;
 	}
 	
-	public DefaultTreeModel<NodeDefinition> getNodes() {
+	public DefaultTreeModel<SchemaTreeNodeData> getNodes() {
 		if ( treeModel == null ) {
 			initTreeModel();
 		}
@@ -167,7 +168,7 @@ public class SchemaLayoutVM extends SurveyBaseVM {
 	protected void initTreeModel() {
 		CollectSurvey survey = getSurvey();
 		ModelVersion formVersion = getFormVersion();
-		treeModel = SchemaTreeModel.createInstance(survey, formVersion);
+		treeModel = SchemaTreeModel.createInstance(survey, formVersion, true);
 	}
 
 	public ModelVersion getFormVersion() {

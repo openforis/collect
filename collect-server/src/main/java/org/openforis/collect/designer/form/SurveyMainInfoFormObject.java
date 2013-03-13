@@ -7,7 +7,7 @@ import org.openforis.collect.model.CollectSurvey;
  * @author S. Ricci
  *
  */
-public class SurveyMainInfoFormObject extends SurveyObjectFormObject<CollectSurvey> {
+public class SurveyMainInfoFormObject extends FormObject<CollectSurvey> {
 
 	private String name;
 	private boolean published;
@@ -17,12 +17,12 @@ public class SurveyMainInfoFormObject extends SurveyObjectFormObject<CollectSurv
 	private String projectCycle;
 	
 	@Override
-	public void loadFrom(CollectSurvey source, String languageCode) {
+	public void loadFrom(CollectSurvey source, String languageCode, String defaultLanguage) {
 		name = source.getName();
-		description = source.getDescription(languageCode);
+		description = getDescription(source, languageCode, defaultLanguage);
 		uri = source.getUri();
 		published = source.isPublished();
-		projectName = source.getProjectName(languageCode);
+		projectName = getProjectName(source, languageCode, defaultLanguage);
 		projectCycle = source.getCycle();
 	}
 	
@@ -35,7 +35,30 @@ public class SurveyMainInfoFormObject extends SurveyObjectFormObject<CollectSurv
 		dest.setCycle(projectCycle);
 		dest.setPublished(published);
 	}
+	
+	@Override
+	protected void reset() {
+		// TODO Auto-generated method stub
+	}
 
+	protected String getDescription(CollectSurvey source, String languageCode, String defaultLanguage) {
+		String result = source.getDescription(languageCode);
+		if ( result == null && languageCode != null && languageCode.equals(defaultLanguage) ) {
+			//try to get the label associated to default language
+			result = source.getDescription(null);
+		}
+		return result;
+	}
+
+	protected String getProjectName(CollectSurvey source, String languageCode, String defaultLanguage) {
+		String result = source.getProjectName(languageCode);
+		if ( result == null && languageCode != null && languageCode.equals(defaultLanguage) ) {
+			//try to get the label associated to default language
+			result = source.getDescription(null);
+		}
+		return result;
+	}
+	
 	public String getName() {
 		return name;
 	}

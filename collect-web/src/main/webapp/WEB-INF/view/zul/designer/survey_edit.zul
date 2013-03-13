@@ -1,5 +1,7 @@
-<?page title="Openforis Collect Designer - Edit Survey" contentType="text/html;charset=UTF-8"?>
+<?page title="Open Foris Collect Database Designer - Edit Survey" contentType="text/html;charset=UTF-8"?>
 <?init class="org.zkoss.zk.ui.util.Composition" arg0="layouts/template.zul"?>
+<?component name="extendedTextbox" class="org.openforis.collect.designer.component.ExtendedTextbox"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
 <zk xmlns:w="client">
 	<script type="text/javascript"><![CDATA[
 		function switchTab(notify, init){
@@ -15,50 +17,66 @@
 		self="@define(content)"
 		apply="org.openforis.collect.designer.composer.SurveyEditComposer"
 		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SurveyEditVM')">
-	 	<center>
-			<vlayout hflex="1" vflex="1">
-				<!-- language selector -->
-<!-- 				<hlayout width="100%" style="text-align: right;"> -->
-<!-- 					<label value="${labels.survey.selected_language}:" /> -->
-<!-- 					<radiogroup model="@load(vm.availableLanguages)" -->
-<!-- 						selectedItem="@load(vm.currentLanguageCode)" -->
-<!-- 						onCheck="@command('languageCodeSelected', code=self.selectedItem.value)"> -->
-<!-- 						<template name="model"> -->
-<!-- 							<radio label="@load(each)" value="@load(each)" /> -->
-<!-- 						</template> -->
-<!-- 					</radiogroup> -->
-<!-- 					<button tooltiptext="${labels.survey.language_manager}"  -->
-<!-- 							onClick="@command('openLanguageManagerPopUp')" -->
-<!-- 							image="/assets/images/pencil-small.png" /> -->
-<!-- 				</hlayout> -->
-				<!-- main tabs -->
-				<tabbox id="tb" hflex="1" vflex="1">
-				    <tabs id="tabs">
-				        <tab id="surveyTab" label="${labels.survey.$}"
-				        	 w:_sel="switchTab" forward="onSwitchTab=onSwitchTab" />
-				        <tab id="schemaTab" label="${labels.survey.schema.$}"
-				        	 w:_sel="switchTab" forward="onSwitchTab=onSwitchTab" />
-				        <tab id="layoutTab" label="${labels.survey.layout.$}"
-				        	 w:_sel="switchTab" forward="onSwitchTab=onSwitchTab"  />
-				    </tabs>
-				    <tabpanels>
-				        <tabpanel>
-				        	<include src="survey_edit/info.zul" />
-				        </tabpanel>
-				        <tabpanel>
-				        	<include src="survey_edit/schema/schema.zul" />
-				        </tabpanel>
-				        <tabpanel>
-				        	<include src="survey_edit/layout.zul" />
-				        </tabpanel>
-				    </tabpanels>
-				</tabbox>
-			</vlayout>
+	 	<center border="none">
+			<absolutelayout hflex="1" vflex="1">
+         <absolutechildren hflex="1">
+         	<box width="100%" align="center">
+         		<label sclass="mainTitleEditing"
+         			value="${labels.designer_title}" />
+         	</box>
+         </absolutechildren>
+         <absolutechildren hflex="1" vflex="1">
+    				<!-- main tabs -->
+    				<tabbox id="tb" hflex="1" vflex="1">
+    				    <tabs id="tabs">
+    				        <tab id="surveyTab" label="${labels.survey.$}"
+    				        	 w:_sel="switchTab" forward="onSwitchTab=onSwitchTab" />
+    				        <tab id="schemaTab" label="${labels.survey.schema.$}"
+    				        	 w:_sel="switchTab" forward="onSwitchTab=onSwitchTab" />
+    				        <tab id="layoutTab" label="${labels.survey.layout.$}"
+    				        	 w:_sel="switchTab" forward="onSwitchTab=onSwitchTab"  />
+    				    </tabs>
+    				    <tabpanels>
+    				        <tabpanel>
+    				        	<include id="mainInfoInclude" src="survey_edit/info.zul" />
+    				        </tabpanel>
+    				        <tabpanel>
+    				        	<include id="schemaInclude" src="survey_edit/schema/schema.zul" />
+    				        </tabpanel>
+    				        <tabpanel>
+    				        	<include id="layoutTabsInclude" src="survey_edit/layout_tabs.zul" />
+    				        </tabpanel>
+    				    </tabpanels>
+    				</tabbox>
+         </absolutechildren>
+         <absolutechildren x="480" width="50%">
+             <!-- language selector -->
+             <hlayout id="languageSelector" 
+                hflex="1" 
+                style="text-align: right;"
+                sclass="controlBar">
+               <listbox model="@load(vm.availableLanguages)"
+                 selectedItem="@load(vm.currentLanguageCode)"
+                 onSelect="@command('languageCodeSelected', code=self.selectedItem.value)"
+                 mold="select">
+                 <template name="model">
+                    <listitem label="${c:l(each)}" value="@load(each)" />
+                 </template>
+               </listbox>
+               <button sclass="icon"
+                height="24px"
+               	tooltiptext="${labels.survey.language_manager}"
+               	onClick="@command('openLanguageManagerPopUp')"
+               	image="/assets/images/edit-language.png" />
+             </hlayout>
+         </absolutechildren>
+			</absolutelayout>
 	 	</center>
 		<south height="30px">
 			<borderlayout hflex="1">
-				<west border="none" size="20%">
-					<button label="${labels.survey.list_of_surveys}" 
+				<west border="none" size="40%">
+					<button label="${labels.survey.back_to_list}" 
+                        image="/assets/images/back-small.png"
 						onClick="@command('backToSurveysList')" />
 				</west>
 				<center border="none">
@@ -67,11 +85,11 @@
 							onClick="@command('save')" />
 					</box>
 				</center>
-				<east border="none" size="20%">
-					<box width="100%" align="right">
-						<button label="${labels.survey.publish.$}" 
-							onClick="@command('publish')" />
-					</box>
+				<east border="none" size="40%">
+           <box width="100%" align="right">
+           	  <button label="${labels.survey.publish.$}"
+           		 onClick="@command('publish')" />
+           </box>
 				</east>
 			</borderlayout>
 		</south>

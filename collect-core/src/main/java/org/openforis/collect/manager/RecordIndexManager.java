@@ -75,24 +75,24 @@ public class RecordIndexManager {
 
 	@Autowired
 	private RecordManager recordManager;
-	
 	protected String indexRootPath;
-	
 	private Directory indexDirectory;
-	
+	private boolean inited;
 	private boolean cancelled;
 	
 	protected void init() throws RecordIndexException {
 		Configuration configuration = configurationManager.getConfiguration();
 		indexRootPath = configuration.get(INDEX_PATH_CONFIGURATION_KEY);
 		if ( indexRootPath == null ) {
-			throw new RuntimeException("Record index path not configured properly");
+			LOG.warn("Record index path not configured properly");
+		} else {
+			indexDirectory = createIndexDirectory();
+			unlock();
+			IndexWriter indexWriter = createIndexWriter();
+			close(indexWriter);
+			cancelled = false;
+			inited = true;
 		}
-		indexDirectory = createIndexDirectory();
-		unlock();
-		IndexWriter indexWriter = createIndexWriter();
-		close(indexWriter);
-		cancelled = false;
 	}
 
 	protected void initStatics() throws RecordIndexException {
@@ -415,6 +415,10 @@ public class RecordIndexManager {
 				LOG.error(e.getMessage(), e);
 			}
 		}
+	}
+	
+	public boolean isInited() {
+		return inited;
 	}
 
 }

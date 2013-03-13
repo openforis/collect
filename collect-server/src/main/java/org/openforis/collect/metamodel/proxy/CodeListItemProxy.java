@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
-import org.openforis.collect.Proxy;
 import org.openforis.idm.metamodel.CodeListItem;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.model.Code;
@@ -18,7 +17,7 @@ import org.openforis.idm.model.Node;
  * @author S. Ricci
  *
  */
-public class CodeListItemProxy implements Proxy {
+public class CodeListItemProxy extends VersionableSurveyObjectProxy {
 
 	private transient CodeListItem codeListItem;
 
@@ -26,7 +25,7 @@ public class CodeListItemProxy implements Proxy {
 	private String qualifier;
 	
 	public CodeListItemProxy(CodeListItem codeListItem) {
-		super();
+		super(codeListItem);
 		this.codeListItem = codeListItem;
 	}
 

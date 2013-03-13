@@ -5,9 +5,12 @@ package org.openforis.collect.designer.viewmodel;
 
 import java.util.List;
 
-import org.openforis.collect.designer.form.SurveyObjectFormObject;
+import org.openforis.collect.designer.form.FormObject;
 import org.openforis.collect.designer.form.SurveyMainInfoFormObject;
 import org.openforis.collect.model.CollectSurvey;
+import org.zkoss.bind.Binder;
+import org.zkoss.bind.annotation.ContextParam;
+import org.zkoss.bind.annotation.ContextType;
 import org.zkoss.bind.annotation.Init;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 
@@ -19,21 +22,17 @@ import org.zkoss.zk.ui.select.annotation.VariableResolver;
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class SurveyMainInfoVM extends SurveyObjectBaseVM<CollectSurvey> {
 	
-	@Override
 	@Init(superclass=false)
-	public void init() {
+	public void init(@ContextParam(ContextType.BINDER) Binder binder) {
 		super.init();
-		editedItem = getSurvey();
+		setEditedItem(getSurvey());
+		validateForm(binder);
 	}
-
+	
 	@Override
-	public SurveyObjectFormObject<CollectSurvey> getFormObject() {
-		if ( formObject == null ) {
-			CollectSurvey survey = getSurvey();
-			formObject = createFormObject();
-			formObject.loadFrom(survey, currentLanguageCode);
-		}
-		return formObject;
+	protected void performItemSelection(CollectSurvey item) {
+		super.performItemSelection(item);
+		dispatchValidateAllCommand();
 	}
 	
 	@Override
@@ -43,13 +42,12 @@ public class SurveyMainInfoVM extends SurveyObjectBaseVM<CollectSurvey> {
 	}
 	
 	@Override
-	protected SurveyObjectFormObject<CollectSurvey> createFormObject() {
+	protected FormObject<CollectSurvey> createFormObject() {
 		return new SurveyMainInfoFormObject();
 	}
 
 	@Override
 	protected List<CollectSurvey> getItemsInternal() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 	

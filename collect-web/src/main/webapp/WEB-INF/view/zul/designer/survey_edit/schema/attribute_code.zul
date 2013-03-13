@@ -1,58 +1,19 @@
+<?component name="fieldErrorHandler" class="org.openforis.collect.designer.component.FieldErrorHandler"?>
 <zk>
-	<vlayout 
+	<custom-attributes parentEntity="${arg.parentEntity}"/>
+    <vlayout 
 		id="nodeFormContainer"
-		apply="org.zkoss.bind.BindComposer"
-		viewModel="@id('vm') @init(vm)"
+		sclass="form"
+        apply="org.zkoss.bind.BindComposer"
+        viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.CodeAttributeVM')"
 		validationMessages="@id('vmsgs')"
 		form="@id('fx')
 			@init(vm.tempFormObject)
 			@load(vm.formObject) 
-			@save(vm.formObject, before='applyChanges')
-			@validator('org.openforis.collect.designer.form.validator.CodeAttributeDefinitionFormValidator')">
+			@save(vm.formObject, before={'validate','applyChanges'})
+            @validator('org.openforis.collect.designer.form.validator.CodeAttributeDefinitionFormValidator', parentEntity=parentEntity)">
 		
-		<include src="survey_edit/schema/attribute_common.zul" />
-		
-		<grid>
-			<columns>
-				<column label="" width="150px" />
-				<column label="" />
-			</columns>
-			<rows>
-				<row>
-					<label value="${labels.survey.schema.attribute.code.key}:" />
-					<checkbox checked="@load(fx.key eq true) @save(fx.key)" onCheck="@command('applyChanges')" />
-				</row>
-				<row>
-					<label value="${labels.survey.schema.attribute.code.code_list}:" />
-					<cell>
-						<listbox width="150px" model="@load(vm.codeLists)"
-							selectedItem="@bind(fx.list)" mold="select"
-							onSelect="@command('applyChanges')">
-							<template name="model">
-								<listitem label="@load(each.name)" />
-							</template>
-						</listbox>
-						<button tooltiptext="${labels.survey.code_lists_manager}" 
-							onClick="@command('openCodeListsManagerPopUp')"
-							image="/assets/images/pencil-small.png" />
-						<label class="error" value="@load(vmsgs['list'])" />
-					</cell>
-				</row>
-				<row>
-					<label value="${labels.survey.schema.attribute.code.strict}:" />
-					<cell>
-						<checkbox checked="@load(fx.strict eq true) @save(fx.strict)" onCheck="@command('applyChanges')" />
-						<label class="error" value="@load(vmsgs['strict'])" />
-					</cell>
-				</row>
-				<row>
-					<label value="${labels.survey.schema.attribute.code.parent_expression}:" />
-					<cell>
-						<textbox width="150px" value="@bind(fx.parentExpression)" onChange="@command('applyChanges')" />
-						<label class="error" value="@load(vmsgs['parentExpression'])" />
-					</cell>
-				</row>
-			</rows>
-		</grid>
+		<include src="survey_edit/schema/attribute_common.zul" otherGeneralDetailsForm="survey_edit/schema/attribute_code_general_part.zul" />
+
 	</vlayout>
 </zk>

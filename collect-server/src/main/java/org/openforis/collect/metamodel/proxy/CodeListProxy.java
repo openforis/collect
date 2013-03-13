@@ -7,15 +7,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
-import org.openforis.collect.Proxy;
 import org.openforis.idm.metamodel.CodeList;
-import org.openforis.idm.metamodel.ModelVersion;
 
 /**
  * @author M. Togna
  * @author S. Ricci
  */
-public class CodeListProxy implements Proxy {
+public class CodeListProxy extends VersionableSurveyObjectProxy {
 
 	private transient CodeList codeList;
 
@@ -24,7 +22,7 @@ public class CodeListProxy implements Proxy {
 	}
 
 	public CodeListProxy(CodeList codeList) {
-		super();
+		super(codeList);
 		this.codeList = codeList;
 	}
 
@@ -36,34 +34,6 @@ public class CodeListProxy implements Proxy {
 			}
 		}
 		return proxies;
-	}
-
-	@ExternalizedProperty
-	public String getSinceVersionName() {
-		ModelVersion sinceVersion = codeList.getSinceVersion();
-		return sinceVersion != null ? sinceVersion.getName(): null;
-	}
-
-	@ExternalizedProperty
-	public String getDeprecatedVersionName() {
-		ModelVersion deprecatedVersion = codeList.getDeprecatedVersion();
-		return deprecatedVersion != null ? deprecatedVersion.getName(): null;
-	}
-
-	@ExternalizedProperty
-	public ModelVersionProxy getSinceVersion() {
-		if (codeList.getSinceVersion() != null) {
-			return new ModelVersionProxy(codeList.getSinceVersion());
-		} else
-			return null;
-	}
-
-	@ExternalizedProperty
-	public ModelVersionProxy getDeprecatedVersion() {
-		if (codeList.getDeprecatedVersion() != null) {
-			return new ModelVersionProxy(codeList.getDeprecatedVersion());
-		} else
-			return null;
 	}
 
 	@ExternalizedProperty

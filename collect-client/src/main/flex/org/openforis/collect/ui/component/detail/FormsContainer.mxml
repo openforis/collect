@@ -49,7 +49,10 @@
 			}
 			
 			private function getFormName(version:ModelVersionProxy, entity:EntityDefinitionProxy):String {
-				var name:String = entity.name + "_" + version.name;
+				var name:String = entity.name;
+				if ( version != null ) {
+					name += "_" + version.name;
+				}
 				return name;
 			}
 			

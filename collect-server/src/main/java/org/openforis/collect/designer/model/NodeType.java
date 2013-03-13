@@ -4,6 +4,7 @@ import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.Survey;
+import org.zkoss.util.resource.Labels;
 
 /**
  * 
@@ -13,7 +14,22 @@ import org.openforis.idm.metamodel.Survey;
 public enum NodeType {
 	ENTITY, ATTRIBUTE;
 	
-	public static NodeType typeOf(NodeDefinition nodeDefn) {
+	public String getLabel() {
+		String labelKey;
+		switch(this) {
+		case ATTRIBUTE:
+			labelKey = "survey.schema.node.type.attribute";
+			break;
+		case ENTITY:
+			labelKey = "survey.schema.node.type.entity";
+			break;
+		default:
+			throw new IllegalArgumentException("Standard not supported: " + this.name());
+		}
+		return Labels.getLabel(labelKey);
+	}
+	
+	public static NodeType valueOf(NodeDefinition nodeDefn) {
 		if ( nodeDefn instanceof EntityDefinition ) {
 			return ENTITY;
 		} else {
@@ -69,5 +85,5 @@ public enum NodeType {
 		}
 		return result;
 	}
-	
+
 }

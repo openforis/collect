@@ -1,0 +1,19 @@
+<?component name="fieldErrorHandler" class="org.openforis.collect.designer.component.FieldErrorHandler"?>
+<zk>
+    <vlayout width="100%">
+      <grid class="inner">
+        <columns>
+          <column width="150px" />
+          <column />
+        </columns>
+        <rows>
+          <row>
+            <label value="${labels.survey.schema.attribute.number.key}:" />
+            <checkbox checked="@load(fx.key eq true) @save(fx.key)" onCheck="@command('applyChanges')" />
+          </row>
+        </rows>
+      </grid>
+      
+      <include src="survey_edit/schema/attribute_numeric_common_other_general_form.zul" />
+    </vlayout>
+</zk>

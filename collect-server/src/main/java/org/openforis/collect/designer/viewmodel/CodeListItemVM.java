@@ -3,10 +3,12 @@
  */
 package org.openforis.collect.designer.viewmodel;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.openforis.collect.designer.form.CodeListItemFormObject;
-import org.openforis.collect.designer.form.SurveyObjectFormObject;
+import org.openforis.collect.designer.form.FormObject;
 import org.openforis.idm.metamodel.CodeListItem;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.annotation.Command;
@@ -20,8 +22,9 @@ import org.zkoss.bind.annotation.Init;
  */
 public class CodeListItemVM extends SurveyObjectBaseVM<CodeListItem> {
 
-	@Init
+	@Init(superclass=false)
 	public void init(@ExecutionArgParam("item") CodeListItem item) {
+		super.init();
 		setEditedItem(item);
 	}
 	
@@ -53,15 +56,20 @@ public class CodeListItemVM extends SurveyObjectBaseVM<CodeListItem> {
 	}
 	
 	@Override
-	protected SurveyObjectFormObject<CodeListItem> createFormObject() {
+	protected FormObject<CodeListItem> createFormObject() {
 		return new CodeListItemFormObject();
 	}
 
 	@Command
 	public void close() {
-		if ( checkCurrentFormValid() ) {
-			BindUtils.postGlobalCommand(null, null, CodeListsVM.CLOSE_CODE_LIST_ITEM_POP_UP_COMMAND, null);
-		}
+		checkCanLeaveForm(new CanLeaveFormConfirmHandler() {
+			@Override
+			public void onOk(boolean confirmed) {
+				Map<String, Object> args = new HashMap<String, Object>();
+				args.put("undoChanges", confirmed);
+				BindUtils.postGlobalCommand(null, null, CodeListsVM.CLOSE_CODE_LIST_ITEM_POP_UP_COMMAND, args);
+			}
+		});
 	}
 	
 }

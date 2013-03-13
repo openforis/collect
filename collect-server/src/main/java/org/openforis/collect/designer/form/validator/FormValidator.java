@@ -1,14 +1,13 @@
 package org.openforis.collect.designer.form.validator;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.validator.routines.UrlValidator;
+import org.openforis.collect.designer.viewmodel.SurveyBaseVM;
 import org.zkoss.bind.BindContext;
-import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.Binder;
 import org.zkoss.bind.Property;
 import org.zkoss.bind.ValidationContext;
@@ -29,7 +28,11 @@ public abstract class FormValidator extends AbstractValidator {
 	protected static final String INVALID_URI_MESSAGE_KEY = "global.item.validation.invalid_uri";
 	protected static final String GREATER_THAN_MESSAGE_KEY = "global.item.validation.greater_than";
 	protected static final String GREATER_THAN_EQUAL_MESSAGE_KEY = "global.item.validation.greater_than_equal";
+	protected static final String LESS_THAN_MESSAGE_KEY = "global.item.validation.less_than";
+	protected static final String LESS_THAN_EQUAL_MESSAGE_KEY = "global.item.validation.less_than_equal";
 	protected static final String ITEM_NAME_ALREADY_DEFINED_MESSAGE_KEY = "global.item.validation.name_already_defined";
+
+	protected boolean blocking;
 	
 	@Override
 	public void validate(ValidationContext ctx) {
@@ -38,9 +41,10 @@ public abstract class FormValidator extends AbstractValidator {
 	}
 	
 	protected void afterValidate(ValidationContext ctx) {
-		Map<String, Object> args = new HashMap<String, Object>();
-		args.put("valid", ctx.isValid());
-		BindUtils.postGlobalCommand(null, null, "currentFormValidated", args);
+		Object vm = getVM(ctx);
+		if ( vm instanceof SurveyBaseVM) {
+			((SurveyBaseVM) vm).dispatchCurrentFormValidatedCommand(ctx.isValid(), blocking);
+		}
 	}
 
 	protected abstract void internalValidate(ValidationContext ctx);
@@ -93,36 +97,91 @@ public abstract class FormValidator extends AbstractValidator {
 	
 	protected boolean validateGreaterThan(ValidationContext ctx,
 			String fieldName, Number value) {
-		return validateGreaterThan(ctx, fieldName, value, false);
+		return validateGreaterThan(ctx, fieldName, value, null, true);
 	}
 	
 	protected boolean validateGreaterThan(ValidationContext ctx,
-			String fieldName, Number value, boolean equal) {
+			String fieldName, Number value, boolean strict) {
+		return validateGreaterThan(ctx, fieldName, value, null, strict);
+	}
+	
+	protected boolean validateGreaterThan(ValidationContext ctx, String fieldName, 
+			String compareFieldName, String compareFieldLabel, boolean strict) {
+		Integer compareValue = getValue(ctx, compareFieldName);
+		return validateGreaterThan(ctx, fieldName, compareValue, compareFieldLabel, strict);
+	}
+
+	protected boolean validateGreaterThan(ValidationContext ctx,
+			String fieldName, Number compareValue, String compareValueLabel, boolean strict) {
 		Object fieldValue = getValue(ctx, fieldName);
-		if ( fieldValue != null ) {
-			if ( fieldValue instanceof Number ) {
-				double fieldDoubleValue = ((Number) fieldValue).doubleValue();
-				if ( fieldDoubleValue < value.doubleValue() || ! equal && fieldDoubleValue == value.doubleValue()) {
-					String messageKey = equal ? GREATER_THAN_EQUAL_MESSAGE_KEY: GREATER_THAN_MESSAGE_KEY;
-					String message = Labels.getLabel(messageKey, new Object[] {value});
-					addInvalidMessage(ctx, fieldName, message);
-					return false;
-				} else {
-					return true;
-				}
-			} else {
-				throw new IllegalArgumentException("Number field value expected: " + fieldName);
-			}
-		} else {
+		if ( fieldValue == null ) {
 			return true;
+		}
+		if ( ! (fieldValue instanceof Number) ) {
+			throw new IllegalArgumentException("Number field value expected: " + fieldName);				
+		} else {
+			double fieldDoubleValue = ((Number) fieldValue).doubleValue();
+			if ( fieldDoubleValue < compareValue.doubleValue() || strict && fieldDoubleValue == compareValue.doubleValue()) {
+				String message = createCompareMessage(GREATER_THAN_MESSAGE_KEY, GREATER_THAN_EQUAL_MESSAGE_KEY, strict, 
+						compareValue, compareValueLabel);
+				addInvalidMessage(ctx, fieldName, message );
+				return false;
+			} else {
+				return true;
+			}
 		}
 	}
 	
-	protected Object getValue(ValidationContext ctx, String fieldName) {
+	protected boolean validateLessThan(ValidationContext ctx, String fieldName, Number value) {
+		return validateLessThan(ctx, fieldName, value, null, true);
+	}
+
+	protected boolean validateLessThan(ValidationContext ctx,
+			String fieldName, Number value, boolean strict) {
+		return validateLessThan(ctx, fieldName, value, null, strict);
+	}
+	
+	protected boolean validateLessThan(ValidationContext ctx, String fieldName, 
+			String compareFieldName, String compareFieldLabel, boolean strict) {
+		Integer compareValue = getValue(ctx, compareFieldName);
+		return validateLessThan(ctx, fieldName, compareValue, compareFieldLabel, strict);
+	}
+
+	protected boolean validateLessThan(ValidationContext ctx,
+			String fieldName, Number compareValue, String compareValueLabel, boolean strict) {
+		Object fieldValue = getValue(ctx, fieldName);
+		if ( fieldValue == null ) {
+			return true;
+		}
+		if ( ! (fieldValue instanceof Number) ) {
+			throw new IllegalArgumentException("Number field value expected: " + fieldName);				
+		} else {
+			double fieldDoubleValue = ((Number) fieldValue).doubleValue();
+			if ( fieldDoubleValue > compareValue.doubleValue() || strict && fieldDoubleValue == compareValue.doubleValue()) {
+				String message = createCompareMessage(LESS_THAN_MESSAGE_KEY, LESS_THAN_EQUAL_MESSAGE_KEY, strict, 
+						compareValue, compareValueLabel);
+				addInvalidMessage(ctx, fieldName, message );
+				return false;
+			} else {
+				return true;
+			}
+		}
+	}
+	
+	protected String createCompareMessage(String strictMessageKey, String notStrictMessageKey, boolean strict, 
+			Number compareValue, String compareValueLabel) {
+		String messageKey = strict ? strictMessageKey: notStrictMessageKey;
+		String compareValueParam = compareValueLabel == null ? compareValue.toString(): compareValueLabel;
+		String message = Labels.getLabel(messageKey, new Object[] {compareValueParam});
+		return message;
+	}
+	
+	@SuppressWarnings("unchecked")
+	protected <T> T getValue(ValidationContext ctx, String fieldName) {
 		Map<String, Property> properties = getProperties(ctx);
 		Property property = properties.get(fieldName);
 		Object value = property.getValue();
-		return value;
+		return (T) value;
 	}
 
 	protected Map<String, Property> getProperties(ValidationContext ctx) {
@@ -141,4 +200,8 @@ public abstract class FormValidator extends AbstractValidator {
 		return vmObject;
 	}
 
+	public boolean isBlocking() {
+		return blocking;
+	}
+	
 }

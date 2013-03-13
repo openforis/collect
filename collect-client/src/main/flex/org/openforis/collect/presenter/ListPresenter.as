@@ -7,11 +7,13 @@ package org.openforis.collect.presenter {
 	import flash.events.Event;
 	import flash.events.MouseEvent;
 	
+	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
 	import mx.collections.ListCollectionView;
 	import mx.core.FlexGlobals;
 	import mx.events.CloseEvent;
 	import mx.events.FlexEvent;
+	import mx.events.MenuEvent;
 	import mx.managers.PopUpManager;
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.IResponder;
@@ -26,8 +28,10 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
 	import org.openforis.collect.model.CollectRecord$Step;
 	import org.openforis.collect.model.proxy.RecordProxy;
+	import org.openforis.collect.model.proxy.UserProxy;
 	import org.openforis.collect.ui.UIBuilder;
 	import org.openforis.collect.ui.component.DataExportPopUp;
+	import org.openforis.collect.ui.component.DataImportPopUp;
 	import org.openforis.collect.ui.component.RecordFilterPopUp;
 	import org.openforis.collect.ui.component.SelectVersionPopUp;
 	import org.openforis.collect.ui.component.datagrid.PaginationBar;
@@ -35,6 +39,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.ui.component.input.TextInput;
 	import org.openforis.collect.ui.view.ListView;
 	import org.openforis.collect.util.AlertUtil;
+	import org.openforis.collect.util.CollectionUtil;
 	import org.openforis.collect.util.PopUpUtil;
 	import org.openforis.collect.util.StringUtil;
 	
@@ -42,6 +47,9 @@ package org.openforis.collect.presenter {
 
 
 	public class ListPresenter extends AbstractPresenter {
+		
+		private const EXPORT_DATA_MENU_ITEM:String = Message.get("list.admin.exportData");
+		private const IMPORT_DATA_MENU_ITEM:String = Message.get("list.admin.importData");
 		
 		private var _view:ListView;
 		private var _dataClient:DataClient;
@@ -82,27 +90,33 @@ package org.openforis.collect.presenter {
 			this._dataClient = ClientFactory.dataClient;
 			this._view.dataGrid.requestedRowCount = MAX_RECORDS_PER_PAGE;
 			_newRecordResponder = new AsyncResponder(createRecordResultHandler, faultHandler);
+			createAdvancedFunctionMenu();
 			super();
 		}
 
 		override internal function initEventListeners():void {
 			eventDispatcher.addEventListener(UIEvent.LOAD_RECORD_SUMMARIES, loadRecordSummariesHandler);
 			eventDispatcher.addEventListener(UIEvent.RELOAD_RECORD_SUMMARIES, reloadRecordSummariesHandler);
-
-			this._view.addButton.addEventListener(MouseEvent.CLICK, addButtonClickHandler);
-			this._view.editButton.addEventListener(MouseEvent.CLICK, editButtonClickHandler);
-			this._view.deleteButton.addEventListener(MouseEvent.CLICK, deleteButtonClickHandler);
-			this._view.exportButton.addEventListener(MouseEvent.CLICK, exportButtonClickHandler);
-			this._view.openFilterPopUpButton.addEventListener(MouseEvent.CLICK, openFilterPopUpButtonClickHandler);
 			
-			this._view.dataGrid.addEventListener(GridSortEvent.SORT_CHANGING, dataGridSortChangingHandler);
+			_view.backToMainMenuButton.addEventListener(MouseEvent.CLICK, backToMainMenuClickHandler);
+			_view.addButton.addEventListener(MouseEvent.CLICK, addButtonClickHandler);
+			_view.editButton.addEventListener(MouseEvent.CLICK, editButtonClickHandler);
+			_view.deleteButton.addEventListener(MouseEvent.CLICK, deleteButtonClickHandler);
+			_view.advancedFunctionsButton.addEventListener(MenuEvent.ITEM_CLICK, advancedFunctionItemClickHandler);
+			_view.openFilterPopUpButton.addEventListener(MouseEvent.CLICK, openFilterPopUpButtonClickHandler);
 			
-			this._view.paginationBar.firstPageButton.addEventListener(MouseEvent.CLICK, firstPageClickHandler);
-			this._view.paginationBar.previousPageButton.addEventListener(MouseEvent.CLICK, previousPageClickHandler);
-			this._view.paginationBar.nextPageButton.addEventListener(MouseEvent.CLICK, nextPageClickHandler);
-			this._view.paginationBar.lastPageButton.addEventListener(MouseEvent.CLICK, lastPageClickHandler);
-			//this._view.paginationBar.goToPageButton.addEventListener(MouseEvent.CLICK, goToPageClickHandler);
+			_view.dataGrid.addEventListener(GridSortEvent.SORT_CHANGING, dataGridSortChangingHandler);
+			
+			_view.paginationBar.firstPageButton.addEventListener(MouseEvent.CLICK, firstPageClickHandler);
+			_view.paginationBar.previousPageButton.addEventListener(MouseEvent.CLICK, previousPageClickHandler);
+			_view.paginationBar.nextPageButton.addEventListener(MouseEvent.CLICK, nextPageClickHandler);
+			_view.paginationBar.lastPageButton.addEventListener(MouseEvent.CLICK, lastPageClickHandler);
+			//_view.paginationBar.goToPageButton.addEventListener(MouseEvent.CLICK, goToPageClickHandler);
 			_view.stage.addEventListener(MouseEvent.CLICK, stageClickHandler);
+		}
+		
+		protected function backToMainMenuClickHandler(event:Event):void {
+			eventDispatcher.dispatchEvent(new UIEvent(UIEvent.SHOW_HOME_PAGE));
 		}
 		
 		/**
@@ -110,10 +124,12 @@ package org.openforis.collect.presenter {
 		 * */
 		protected function addButtonClickHandler(event:MouseEvent):void {
 			var versions:ListCollectionView = Application.activeSurvey.versions;
-			if(versions.length > 1) {
-				openSelectVersionPopUp();
-			} else {
+			if ( CollectionUtil.isEmpty(versions) ) {
+				addNewRecord();
+			} else if ( versions.length == 1) {
 				addNewRecord(versions.getItemAt(0) as ModelVersionProxy);
+			} else {
+				openSelectVersionPopUp();
 			}
 		}
 		protected function openSelectVersionPopUp():void {
@@ -121,7 +137,7 @@ package org.openforis.collect.presenter {
 				_selectVersionPopUp = new SelectVersionPopUp();
 				PopUpManager.addPopUp(_selectVersionPopUp, FlexGlobals.topLevelApplication as DisplayObject, true);
 				_selectVersionPopUp.addEventListener(CloseEvent.CLOSE, cancelSelectVersionClickHandler);
-				_selectVersionPopUp.addButton.addEventListener(MouseEvent.CLICK, newRecordVersionSelectedHandler);
+				_selectVersionPopUp.addButton.addEventListener(MouseEvent.CLICK, addRecordButtonClickHandler);
 				_selectVersionPopUp.cancelButton.addEventListener(MouseEvent.CLICK, cancelSelectVersionClickHandler);
 			} else {
 				PopUpManager.addPopUp(_selectVersionPopUp, FlexGlobals.topLevelApplication as DisplayObject, true);
@@ -132,15 +148,36 @@ package org.openforis.collect.presenter {
 			PopUpManager.centerPopUp(_selectVersionPopUp);
 		}
 		
-		protected function newRecordVersionSelectedHandler(event:Event):void {
+		protected function createAdvancedFunctionMenu():void {
+			var result:ArrayCollection = new ArrayCollection();
+			result.addItem(EXPORT_DATA_MENU_ITEM);
+			if ( Application.user.hasEffectiveRole(UserProxy.ROLE_ADMIN) ) {
+				result.addItem(IMPORT_DATA_MENU_ITEM);
+			}
+			_view.advancedFunctionsButton.dataProvider = result;
+		}
+		
+		protected function advancedFunctionItemClickHandler(event:MenuEvent):void {
+			switch ( event.item ) {
+				case IMPORT_DATA_MENU_ITEM:
+					PopUpUtil.createPopUp(DataImportPopUp, true);
+					break;
+				case EXPORT_DATA_MENU_ITEM:
+					PopUpUtil.createPopUp(DataExportPopUp, true);
+					break;
+			}
+		}
+		
+		protected function addRecordButtonClickHandler(event:Event):void {
 			var version:ModelVersionProxy = ModelVersionProxy(_selectVersionPopUp.versionsDropDownList.selectedItem);
 			PopUpManager.removePopUp(_selectVersionPopUp);
 			addNewRecord(version);
 		}
 
-		protected function addNewRecord(version:ModelVersionProxy):void {
+		protected function addNewRecord(version:ModelVersionProxy = null):void {
 			var rootEntityName:String = Application.activeRootEntity.name;
-			_dataClient.createNewRecord(_newRecordResponder, rootEntityName, version.name);
+			var versionName:String = version != null ? version.name: null;
+			_dataClient.createNewRecord(_newRecordResponder, rootEntityName, versionName);
 		}
 		
 		protected function cancelSelectVersionClickHandler(event:Event):void {
@@ -156,7 +193,6 @@ package org.openforis.collect.presenter {
 			eventDispatcher.dispatchEvent(uiEvent);
 			PopUpManager.removePopUp(_view);
 		}
-		
 		
 		/**
 		 * Edit Button clicked 

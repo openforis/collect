@@ -24,6 +24,15 @@
 					var srs:SpatialReferenceSystemProxy = SpatialReferenceSystemProxy(item);
 					return srs.getLabelText();
 				} else {
+					return item.shortLabel;
+				}
+			}
+			
+			protected function srsDropDownLabelFunction(item:Object):String {
+				if(item is SpatialReferenceSystemProxy) {
+					var srs:SpatialReferenceSystemProxy = SpatialReferenceSystemProxy(item);
+					return srs.getLabelText();
+				} else {
 					return item.label;
 				}
 			}
@@ -41,11 +50,12 @@
 								  parentEntity="{parentEntity}"
 								  attribute="{attribute}"
 								  fieldIndex="2"
-								  width="150" 
+								  width="70" 
 								  dataField="id"
 								  includeIn="horizontal" 
 								  itemCreationPolicy="immediate"
 								  labelFunction="{srsLabelFunction}"
+								  dropDownLabelFunction="{srsDropDownLabelFunction}"
 								  dataProvider="{Application.activeSurvey.spatialReferenceSystems}"
 								  />
 		<input:NumericInputField id="yTextInput" includeIn="horizontal" itemCreationPolicy="immediate" 

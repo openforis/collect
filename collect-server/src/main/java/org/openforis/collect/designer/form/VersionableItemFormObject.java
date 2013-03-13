@@ -4,6 +4,7 @@
 package org.openforis.collect.designer.form;
 
 import org.openforis.idm.metamodel.ModelVersion;
+import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.VersionableSurveyObject;
 
 /**
@@ -12,33 +13,52 @@ import org.openforis.idm.metamodel.VersionableSurveyObject;
  */
 public class VersionableItemFormObject<T extends VersionableSurveyObject> extends SurveyObjectFormObject<T> {
 
-	private ModelVersion sinceVersion;
+	private int sinceVersionId;
+	private int deprecatedVersionId;
 	
-	private ModelVersion deprecatedVersion;
-	
-	public void loadFrom(T source, String languageCode) {
-		sinceVersion = source.getSinceVersion();
-		deprecatedVersion = source.getDeprecatedVersion();
+	@Override
+	public void loadFrom(T source, String languageCode, String defaultLanguage) {
+		ModelVersion sinceVersion = source.getSinceVersion();
+		sinceVersionId = sinceVersion != null ? sinceVersion.getId(): -1;
+		ModelVersion deprecatedVersion = source.getDeprecatedVersion();
+		deprecatedVersionId = deprecatedVersion != null ? deprecatedVersion.getId(): -1;
 	}
 	
+	@Override
 	public void saveTo(T dest, String languageCode) {
+		Survey survey = dest.getSurvey();
+		ModelVersion sinceVersion = null;
+		if ( sinceVersionId > 0 ) {
+			sinceVersion = survey.getVersionById(sinceVersionId);
+		}
 		dest.setSinceVersion(sinceVersion);
+		ModelVersion deprecatedVersion = null;
+		if ( deprecatedVersionId > 0 ) {
+			deprecatedVersion = survey.getVersionById(deprecatedVersionId);
+		}
 		dest.setDeprecatedVersion(deprecatedVersion);
 	}
 
-	public ModelVersion getSinceVersion() {
-		return sinceVersion;
+	@Override
+	protected void reset() {
+		sinceVersionId = -1;
+		deprecatedVersionId = -1;
 	}
 
-	public void setSinceVersion(ModelVersion sinceVersion) {
-		this.sinceVersion = sinceVersion;
+	public int getSinceVersionId() {
+		return sinceVersionId;
 	}
 
-	public ModelVersion getDeprecatedVersion() {
-		return deprecatedVersion;
+	public void setSinceVersionId(int sinceVersionId) {
+		this.sinceVersionId = sinceVersionId;
 	}
 
-	public void setDeprecatedVersion(ModelVersion deprecatedVersion) {
-		this.deprecatedVersion = deprecatedVersion;
+	public int getDeprecatedVersionId() {
+		return deprecatedVersionId;
 	}
+
+	public void setDeprecatedVersionId(int deprecatedVersionId) {
+		this.deprecatedVersionId = deprecatedVersionId;
+	}
+	
 }

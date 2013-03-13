@@ -22,6 +22,7 @@ import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.SurveyContext;
 import org.openforis.idm.metamodel.validation.Check;
+import org.openforis.idm.metamodel.validation.CodeParentValidator;
 import org.openforis.idm.metamodel.validation.CodeValidator;
 import org.openforis.idm.metamodel.validation.ComparisonCheck;
 import org.openforis.idm.metamodel.validation.CoordinateValidator;
@@ -86,6 +87,8 @@ public class ValidationResultProxy implements Proxy {
 		ValidationRule<?> validator = validationResult.getValidator();
 		if(validator instanceof CodeValidator) {
 			key = "edit.validation.codeError";
+		} else if(validator instanceof CodeParentValidator) {
+				key = "edit.validation.codeParentError";
 		} else if(validator instanceof ComparisonCheck) {
 			key = "edit.validation.comparisonError";
 		} else if(validator instanceof CoordinateValidator) {

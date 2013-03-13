@@ -2,17 +2,20 @@ package org.openforis.collect.designer.viewmodel;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.designer.session.SessionStatus;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.Languages;
+import org.openforis.idm.metamodel.Languages.Standard;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.Init;
-import org.zkoss.bind.annotation.NotifyChange;
+import org.zkoss.util.resource.Labels;
 import org.zkoss.zkplus.databind.BindingListModelListModel;
 import org.zkoss.zul.ListModelList;
 
@@ -26,104 +29,123 @@ public class SurveyLocaleVM extends BaseVM {
 	public static final String CURRENT_LANGUAGE_CHANGED_COMMAND = "currentLanguageChanged";
 	public static final String SURVEY_LANGUAGES_CHANGED_COMMAND = "surveyLanguagesChanged";
 
-	private List<String> assignableLanguageCodes;
-	private List<String> assignedLanguageCodes;
-
-	private String selectedAssignableLanguageCode;
-	private String selectedCurrentLanguageCode;
+	private List<LanguageItem> languages;
+	private BindingListModelListModel<LanguageItem> languagesModel;
 	
 	@Init
 	public void init() {
-		initAssignedLanguageCodes();
-		initAssignableLanguageCodes();
-		initSelectedDefaultLanguageCode();
+		languages = new ArrayList<LanguageItem>();
+		List<String> codes = Languages.getCodes(Standard.ISO_639_1);
+		for (String code : codes) {
+			LanguageItem item = new LanguageItem(code, Labels.getLabel(code));
+			languages.add(item);
+		}
+		Collections.sort(languages, new LanguageComparator());
+		languagesModel = new BindingListModelListModel<LanguageItem>(new ListModelList<LanguageItem>(languages));
+		languagesModel.setMultiple(true);
+		List<LanguageItem> assignedLanguages = getAssignedLanguages();
+		languagesModel.setSelection(assignedLanguages);
 	}
 	
-	protected void initAssignedLanguageCodes() {
-		assignedLanguageCodes = new ArrayList<String>();
+	protected List<String> getAssignedLanguageCodes() {
 		SessionStatus sessionStatus = getSessionStatus();
 		CollectSurvey survey = sessionStatus.getSurvey();
-		if ( survey != null ) {
-			assignedLanguageCodes.addAll(survey.getLanguages());
+		if ( survey == null ) {
+			return null;
+		} else {
+			return survey.getLanguages();
 		}
 	}
 	
-	protected void initAssignableLanguageCodes() {
-		assignableLanguageCodes = new ArrayList<String>();
-		assignableLanguageCodes.addAll(Languages.LANGUAGE_CODES);
-		for (String assignedCode : assignedLanguageCodes) {
-			assignableLanguageCodes.remove(assignedCode);
+	protected List<LanguageItem> getAssignedLanguages() {
+		List<LanguageItem> result = new ArrayList<LanguageItem>();
+		List<String> assignedLanguageCodes = getAssignedLanguageCodes();
+		for (String code : assignedLanguageCodes) {
+			for (LanguageItem item : languages) {
+				if ( item.code.equals(code)) { 
+					result.add(item);
+				}
+			}
 		}
+		return result;
 	}
 	
-	protected void initSelectedDefaultLanguageCode() {
-		SessionStatus sessionStatus = getSessionStatus();
-		selectedCurrentLanguageCode = sessionStatus.getCurrentLanguageCode();
-	}
-
-	public BindingListModelListModel<String> getAssignableLanguageCodes() {
-		return new BindingListModelListModel<String>(new ListModelList<String>(assignableLanguageCodes));
+	public BindingListModelListModel<LanguageItem> getLanguagesModel() {
+		return languagesModel;
 	}
 	
-	public BindingListModelListModel<String> getAssignedLanguageCodes() {
-		return new BindingListModelListModel<String>(new ListModelList<String>(assignedLanguageCodes));
+	public List<String> getSelectedLanguageCodes() {
+		List<String> result = new ArrayList<String>();
+		Set<LanguageItem> languages = languagesModel.getSelection();
+		if ( languages != null ) {
+			for (LanguageItem item : languages) {
+				result.add(item.code);
+			}
+		}
+		//TODO sort...
+		return result;
 	}
 	
-	@Command
-	@NotifyChange({"assignedLanguageCodes","assignableLanguageCodes"})
-	public void assignLanguage() {
-		assignedLanguageCodes.add(selectedAssignableLanguageCode);
-		assignableLanguageCodes.remove(selectedAssignableLanguageCode);
-	}
-	
-	@Command
-	@NotifyChange({"assignedLanguageCodes","assignableLanguageCodes"})
-	public void removeLanguage() {
-		assignedLanguageCodes.remove(selectedCurrentLanguageCode);
-		assignableLanguageCodes.add(selectedCurrentLanguageCode);
-		Collections.sort(assignableLanguageCodes);
-	}
-
 	@Command
 	public void applyChanges() {
 		SessionStatus sessionStatus = getSessionStatus();
 		CollectSurvey survey = sessionStatus.getSurvey();
-		List<String> oldLanguages = survey.getLanguages();
-		for (String lang : oldLanguages) {
-			if (! assignedLanguageCodes.contains(lang)) {
-				survey.removeLanguage(lang);
+		List<String> selectedLanguageCodes = getSelectedLanguageCodes();
+		List<String> oldLangCodes = new ArrayList<String>(survey.getLanguages());
+		for (String oldLangCode : oldLangCodes) {
+			if (! selectedLanguageCodes.contains(oldLangCode)) {
+				survey.removeLanguage(oldLangCode);
 			}
 		}
-		for (String lang : assignedLanguageCodes) {
-			if ( ! oldLanguages.contains(lang) ) {
+		for (String lang : selectedLanguageCodes) {
+			if ( ! oldLangCodes.contains(lang) ) {
 				survey.addLanguage(lang);
 			}
 		}
+		String selectedCurrentLanguageCode = selectedLanguageCodes.isEmpty() ? null: selectedLanguageCodes.iterator().next();
 		if ( StringUtils.isNotBlank(selectedCurrentLanguageCode) ) {
 			sessionStatus.setCurrentLanguageCode(selectedCurrentLanguageCode);
 			BindUtils.postGlobalCommand(null, null, SURVEY_LANGUAGES_CHANGED_COMMAND, null);
 			BindUtils.postGlobalCommand(null, null, CURRENT_LANGUAGE_CHANGED_COMMAND, null);
 		} else {
-			MessageUtil.showWarning("survey.language.error.language_not_selected");
+			MessageUtil.showWarning("survey.language.error.select_at_least_one_language");
 		}
 	}
 
-	public String getSelectedAssignableLanguageCode() {
-		return selectedAssignableLanguageCode;
-	}
+	public static class LanguageItem {
+		private String code;
+		private String label;
 
-	public void setSelectedAssignableLanguageCode(
-			String selectedAssignableLanguageCode) {
-		this.selectedAssignableLanguageCode = selectedAssignableLanguageCode;
-	}
+		public LanguageItem(String code, String label) {
+			this.code = code;
+			this.label = label;
+		}
 
-	public String getSelectedCurrentLanguageCode() {
-		return selectedCurrentLanguageCode;
-	}
+		public String getCode() {
+			return code;
+		}
 
-	public void setSelectedCurrentLanguageCode(String selectedDefaultLanguageCode) {
-		this.selectedCurrentLanguageCode = selectedDefaultLanguageCode;
-	}
+		public void setCode(String code) {
+			this.code = code;
+		}
 
+		public String getLabel() {
+			return label;
+		}
+
+		public void setLabel(String label) {
+			this.label = label;
+		}
+		
+	}
+	
+	private class LanguageComparator implements Comparator<LanguageItem> {
+
+		@Override
+		public int compare(LanguageItem item1, LanguageItem item2) {
+			return item1.label.compareTo(item2.label);
+		}
+		
+	}
 	
 }

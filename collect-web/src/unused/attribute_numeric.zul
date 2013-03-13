@@ -1,0 +1,72 @@
+<zk>
+	<vlayout
+		id="nodeFormContainer"
+		apply="org.zkoss.bind.BindComposer"
+		viewModel="@id('vm') @init(vm)"
+		validationMessages="@id('vmsgs')"
+		form="@id('fx') 
+			@init(vm.tempFormObject)
+			@load(vm.formObject) 
+			@save(vm.formObject, before='saveNode')
+			@validator('org.openforis.collect.designer.form.validator.AttributeDefinitionFormValidator')">
+
+		<include src="survey_edit/schema/attribute_common.zul" />
+		
+		<grid>
+			<columns>
+				<column label="" width="150px" />
+				<column label="" width="100%" />
+			</columns>
+			<rows>
+				<row>
+					<label value="${labels.survey.schema.attribute.numeric.type_label}:" />
+					<cell>
+						<radiogroup selectedItem="@bind(fx.type)" onCheck="@command('applyChanges')">
+							<radio label="${labels.survey.schema.attribute.numeric.type.real}"
+								value="REAL" />
+							<radio label="${labels.survey.schema.attribute.numeric.type.integer}"
+								value="INTEGER" />
+						</radiogroup>
+					</cell>
+				</row>
+				<row>
+					<label value="${labels.survey.schema.attribute.numeric.precisions}:" />
+					<cell>
+						<vlayout>
+							<grid width="210px" model="@load(vm.numericAttributePrecisions)">
+								<columns height="22px">
+									<column width="150px"
+										label="${labels.survey.schema.attribute.numeric.precisions.default}" />
+									<column width="150px"
+										label="${labels.survey.schema.attribute.numeric.precisions.unit}" />
+									<column width="150px"
+										label="${labels.survey.schema.attribute.numeric.precisions.decimal_digits}" />
+									<column width="60px"
+										label="${labels.global.delete_item}" />
+								</columns>
+								<template name="model">
+									<row>
+										<checkbox checked="@bind(each.defaultPrecision)" />
+										<listbox width="150px" model="@load(vm.units)"
+											selectedItem="@bind(each.unit)" mold="select">
+											<template name="model">
+												<listitem label="@load(each.name)" />
+											</template>
+										</listbox>
+										<intbox inplace="true" value="@bind(each.decimalDigits)"
+											width="99%" />
+										<button image="/assets/images/cross-small.png"
+											onClick="@command('deleteNumericAttributePrecision', precision=each)" />
+									</row>
+								</template>
+							</grid>
+							<button label="${labels.survey.schema.attribute.numeric.precisions.add_precision}"
+									onClick="@command('addNumericAttributePrecision')" />
+						</vlayout>
+						<label class="error" value="@load(vmsgs['precisions'])" />
+					</cell>
+				</row>
+			</rows>
+		</grid>
+	</vlayout>
+</zk>

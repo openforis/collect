@@ -1,0 +1,77 @@
+<?component name="fieldErrorHandler" class="org.openforis.collect.designer.component.FieldErrorHandler"?>
+<?component name="multilanguageLabel" class="org.openforis.collect.designer.component.MultilanguageLabel" macroURI="/WEB-INF/view/zul/designer/component/multilanguage_label.zul"?>
+<zk>
+  <custom-attributes parentDefinition="${arg.parentDefinition}"/>
+  <custom-attributes check="${arg.check}"/>
+  <custom-attributes newItem="${arg.newItem}"/>
+  <vlayout
+    id="formContainer"
+    sclass="form"
+    apply="org.zkoss.bind.BindComposer"
+    viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.ComparisonCheckVM')"
+    validationMessages="@id('vmsgs')"
+    form="@id('fx') 
+      @load(vm.formObject) 
+      @save(vm.formObject, before={'validate','applyChanges'})
+      @validator('org.openforis.collect.designer.form.validator.ComparisonCheckFormValidator', parentDefinition=parentDefinition)">
+    <grid>
+      <columns>
+        <column width="150px" />
+        <column />
+      </columns>
+      <rows>
+        <row>
+          <label value="${labels.survey.schema.node.check.flag.$}:" />
+          <listbox width="60px"
+              selectedItem="@bind(fx.flag)"
+              mold="select" onSelect="@command('applyChanges')">
+              <listitem
+                label="${labels.survey.schema.node.check.flag.error}"
+                value="ERROR" />
+              <listitem
+                label="${labels.survey.schema.node.check.flag.warning}"
+                value="WARN" />
+          </listbox>
+        </row>
+        <row>
+          <multilanguageLabel value="${labels.survey.schema.node.check.message}" 
+              languageCode="@load(vm.currentLanguageCode)" />
+          <fieldErrorHandler message="@load(vmsgs['message'])">
+            <textbox width="250px" value="@bind(fx.message)" onChange="@command('applyChanges')" />
+          </fieldErrorHandler>
+        </row>
+        <row>
+          <label value="${labels.survey.schema.node.check.condition}:" />
+          <fieldErrorHandler message="@load(vmsgs['condition'])">
+            <textbox width="250px" value="@bind(fx.condition)" onChange="@command('applyChanges')" />
+          </fieldErrorHandler>
+        </row>
+        <row>
+          <cell>
+            <label value="${labels.survey.schema.node.check.comparison.greaterThan}" />
+            <label value="(" />
+            <label value="${labels.survey.schema.node.check.comparison.equal}" />
+            <checkbox checked="@bind(fx.greaterThanEqual)" onCheck="@command('applyChanges')" />
+            <label value="):" />
+          </cell>
+          <fieldErrorHandler message="@load(vmsgs['greaterThan'])">
+            <textbox width="150px" value="@bind(fx.greaterThan)" onChange="@command('applyChanges')" />
+          </fieldErrorHandler>
+        </row>
+        <row>
+          <cell>
+            <label value="${labels.survey.schema.node.check.comparison.lessThan}" />
+            <label value="(" />
+            <label value="${labels.survey.schema.node.check.comparison.equal}" />
+            <checkbox checked="@bind(fx.lessThanEqual)" onCheck="@command('applyChanges')" />
+            <label value="):" />
+          </cell>
+          <fieldErrorHandler message="@load(vmsgs['lessThan'])">
+         	<textbox width="150px" value="@bind(fx.lessThan)"
+                    onChange="@command('applyChanges')" />
+          </fieldErrorHandler>
+        </row>            
+      </rows>
+    </grid>
+  </vlayout>
+</zk>

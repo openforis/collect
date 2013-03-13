@@ -67,7 +67,13 @@ public class MessageUtil {
 
 	public static void showMessage(MessageType type, String messageKey, Object[] args, String titleKey, Object[] titleArgs) {
 		String message = Labels.getLabel(messageKey, args);
+		if ( message == null ) {
+			message = messageKey;
+		}
 		String title = Labels.getLabel(titleKey, titleArgs);
+		if ( title == null ) {
+			title = titleKey;
+		}
 		String icon;
 		switch ( type ) {
 		case ERROR:

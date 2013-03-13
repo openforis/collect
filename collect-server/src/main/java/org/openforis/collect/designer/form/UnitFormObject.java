@@ -14,7 +14,7 @@ public class UnitFormObject extends SurveyObjectFormObject<Unit> {
 	private String label;
 	private String abbreviation;
 	private String dimensionLabel;
-	private Number conversionFactor;
+	private Double conversionFactor;
 	
 	public enum Dimension {
 		LENGTH, ANGLE, AREA, RATIO, CURRENCY, TIME;
@@ -38,10 +38,10 @@ public class UnitFormObject extends SurveyObjectFormObject<Unit> {
 	}
 	
 	@Override
-	public void loadFrom(Unit source, String languageCode) {
+	public void loadFrom(Unit source, String languageCode, String defaultLanguage) {
 		name = source.getName();
-		label = source.getLabel(languageCode);
-		abbreviation = source.getAbbreviation(languageCode);
+		label = getLabel(source, languageCode, defaultLanguage);
+		abbreviation = getAbbreviation(source, languageCode, defaultLanguage);
 		String dimensionValue = source.getDimension();
 		if ( dimensionValue != null ) {
 			Dimension dimension = Dimension.valueOf(dimensionValue.toUpperCase());
@@ -59,7 +59,30 @@ public class UnitFormObject extends SurveyObjectFormObject<Unit> {
 		dest.setAbbreviation(languageCode, abbreviation);
 		Dimension dimension = Dimension.fromLabel(dimensionLabel);
 		dest.setDimension(dimension != null ? dimension.name().toLowerCase(): null);
-		dest.setConversionFactor(conversionFactor != null ? conversionFactor.floatValue(): null);
+		dest.setConversionFactor(conversionFactor);
+	}
+	
+	@Override
+	protected void reset() {
+		// TODO Auto-generated method stub
+	}
+	
+	protected String getLabel(Unit source, String languageCode, String defaultLanguage) {
+		String result = source.getLabel(languageCode);
+		if ( result == null && languageCode != null && languageCode.equals(defaultLanguage) ) {
+			//try to get the label associated to default language
+			result = source.getLabel(null);
+		}
+		return result;
+	}
+
+	protected String getAbbreviation(Unit source, String languageCode, String defaultLanguage) {
+		String result = source.getAbbreviation(languageCode);
+		if ( result == null && languageCode != null && languageCode.equals(defaultLanguage) ) {
+			//try to get the label associated to default language
+			result = source.getAbbreviation(null);
+		}
+		return result;
 	}
 
 	public String getName() {
@@ -86,11 +109,11 @@ public class UnitFormObject extends SurveyObjectFormObject<Unit> {
 		this.abbreviation = abbreviation;
 	}
 
-	public Number getConversionFactor() {
+	public Double getConversionFactor() {
 		return conversionFactor;
 	}
 
-	public void setConversionFactor(Number conversionFactor) {
+	public void setConversionFactor(Double conversionFactor) {
 		this.conversionFactor = conversionFactor;
 	}
 

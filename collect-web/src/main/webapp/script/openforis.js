@@ -32,15 +32,16 @@ var OPENFORIS = {
 		//if there is an item being edited, show a confirm before exiting page
 		var mainApp = OPENFORIS.getFlexApp();
 		var leavingPageMessage = mainApp.getLeavingPageMessage();
-		OPENFORIS.isEditingRecord = mainApp != null && mainApp.isEditingRecord();
-		if(OPENFORIS.isEditingRecord) {
+		OPENFORIS.editingRecord = mainApp != null && mainApp.isEditingRecord();
+		var preview = OPENFORIS.editingRecord && mainApp.isPreview();
+		if(OPENFORIS.editingRecord && ! preview) {
 			return leavingPageMessage;
 		}
 	},
 	
 	onUnloadFun: function() {
 		//unlock current item being edited (if any)
-		if(OPENFORIS.isEditingRecord) {
+		if(OPENFORIS.editingRecord) {
 			$.ajax({
 			  async: false,
 			  type: "POST",

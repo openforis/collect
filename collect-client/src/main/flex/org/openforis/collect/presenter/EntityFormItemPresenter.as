@@ -45,7 +45,7 @@ package org.openforis.collect.presenter
 		
 		protected function initNodeDefinitions():void {
 			var temp:IList = null;
-			if(view.entityDefinition != null && view.modelVersion != null) {
+			if(view.entityDefinition != null) {
 				temp = UIBuilder.getDefinitionsInVersion(view.entityDefinition.childDefinitions, view.modelVersion);
 			}
 			view.nodeDefinitions = temp;

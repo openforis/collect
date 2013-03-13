@@ -23,8 +23,15 @@
 			
 			protected function unitLabelFunction(item:Object):String {
 				if(item is UnitProxy) {
-					var unit:UnitProxy = UnitProxy(item);
-					return unit.name;
+					return UnitProxy(item).getAbbreviation();
+				} else {
+					return item.shortLabel;
+				}
+			}
+			
+			protected function unitDropDownLabelFunction(item:Object):String {
+				if(item is UnitProxy) {
+					return UnitProxy(item).getAbbreviation();
 				} else {
 					return item.label;
 				}
@@ -56,9 +63,10 @@
 								  parentEntity="{parentEntity}"
 								  attribute="{attribute}"
 								  fieldIndex="1"
-								  width="120" 
+								  width="70"
 								  dataField="name"
 								  labelFunction="{unitLabelFunction}"
+								  dropDownLabelFunction="{unitDropDownLabelFunction}"
 								  />
 		
 		<s:Label id="unitLabel"

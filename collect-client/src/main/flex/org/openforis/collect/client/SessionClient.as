@@ -13,6 +13,7 @@ package org.openforis.collect.client {
 		
 		private var _keepAliveOperation:Operation;
 		private var _initSessionOperation:Operation;
+		private var _setActivePreviewSurveyOperation:Operation;
 		private var _logoutOperation:Operation;
 		
 		public function SessionClient() {
@@ -20,6 +21,7 @@ package org.openforis.collect.client {
 			
 			this._keepAliveOperation = getOperation("keepAlive", CONCURRENCY_LAST);
 			this._initSessionOperation = getOperation("initSession");
+			this._setActivePreviewSurveyOperation = getOperation("setActivePreviewSurvey");
 			this._logoutOperation = getOperation("logout");
 		}
 		
@@ -35,6 +37,11 @@ package org.openforis.collect.client {
 		
 		public function initSession(responder:IResponder, localeString:String):void {
 			var token:AsyncToken = this._initSessionOperation.send(localeString);
+			token.addResponder(responder);
+		}
+		
+		public function setActivePreviewSurvey(responder:IResponder, surveyId:int):void {
+			var token:AsyncToken = this._setActivePreviewSurveyOperation.send(surveyId);
 			token.addResponder(responder);
 		}
 		

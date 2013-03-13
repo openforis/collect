@@ -11,6 +11,7 @@ import org.openforis.idm.metamodel.RangeAttributeDefinition;
 import org.openforis.idm.metamodel.TaxonAttributeDefinition;
 import org.openforis.idm.metamodel.TextAttributeDefinition;
 import org.openforis.idm.metamodel.TimeAttributeDefinition;
+import org.zkoss.util.resource.Labels;
 
 /**
  * 
@@ -20,7 +21,7 @@ import org.openforis.idm.metamodel.TimeAttributeDefinition;
 public enum AttributeType {
 	BOOLEAN, CODE, COORDINATE, DATE, FILE, NUMBER, RANGE, TAXON, TEXT, TIME;
 	
-	public static AttributeType typeOf(AttributeDefinition defn) {
+	public static AttributeType valueOf(AttributeDefinition defn) {
 		if ( defn instanceof BooleanAttributeDefinition ) {
 			return BOOLEAN;
 		} else if ( defn instanceof CodeAttributeDefinition ) {
@@ -42,7 +43,44 @@ public enum AttributeType {
 		} else if ( defn instanceof TimeAttributeDefinition ) {
 			return TIME;
 		} else {
-			throw new IllegalArgumentException("Type not supported for " + defn.getClass().getSimpleName());
+			throw new IllegalArgumentException("Standard not supported for " + defn.getClass().getSimpleName());
 		}
+	}
+
+	public String getLabel() {
+		String labelKey = null;
+		switch (this) {
+		case BOOLEAN:
+			labelKey = "survey.schema.attribute.type.bool";
+			break;
+		case CODE:
+			labelKey = "survey.schema.attribute.type.code";
+			break;
+		case COORDINATE:
+			labelKey = "survey.schema.attribute.type.coordinate";
+			break;
+		case DATE:
+			labelKey = "survey.schema.attribute.type.date";
+			break;
+		case FILE:
+			labelKey = "survey.schema.attribute.type.file";
+			break;
+		case NUMBER:
+			labelKey = "survey.schema.attribute.type.number";
+			break;
+		case RANGE:
+			labelKey = "survey.schema.attribute.type.range";
+			break;
+		case TAXON:
+			labelKey = "survey.schema.attribute.type.taxon";
+			break;
+		case TEXT:
+			labelKey = "survey.schema.attribute.type.text";
+			break;
+		case TIME:
+			labelKey = "survey.schema.attribute.type.time";
+			break;
+		}
+		return Labels.getLabel(labelKey);
 	}
 }

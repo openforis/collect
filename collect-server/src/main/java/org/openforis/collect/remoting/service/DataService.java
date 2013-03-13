@@ -67,7 +67,6 @@ import org.openforis.idm.model.Node;
 import org.openforis.idm.model.NodePointer;
 import org.openforis.idm.model.NumericRange;
 import org.openforis.idm.model.RealRange;
-import org.openforis.idm.model.Record;
 import org.openforis.idm.model.Value;
 import org.openforis.idm.model.expression.ExpressionFactory;
 import org.openforis.idm.model.expression.ModelPathExpression;
@@ -103,7 +102,7 @@ public class DataService {
 	/**
 	 * it's true when the root entity definition of the record in session has some nodes with the "collect:index" annotation
 	 */
-	private boolean indexingEnabled;
+	private boolean hasIndexedNodes;
 
 	private RecordIndexProcess indexProcess;
 	
@@ -121,7 +120,7 @@ public class DataService {
 		recordManager.addEmptyNodes(rootEntity);
 		sessionManager.setActiveRecord(record);
 		fileManager.reset();
-		indexingEnabled = sessionIndexManager.hasIndexableNodes(rootEntity.getDefinition());
+		hasIndexedNodes = sessionIndexManager.hasIndexableNodes(rootEntity.getDefinition());
 		return new RecordProxy(record);
 	}
 	
@@ -165,10 +164,9 @@ public class DataService {
 		String sessionId = sessionState.getSessionId();
 		CollectSurvey activeSurvey = sessionState.getActiveSurvey();
 		User user = sessionState.getUser();
-		ModelVersion version = activeSurvey.getVersion(versionName);
 		Schema schema = activeSurvey.getSchema();
 		EntityDefinition rootEntityDefinition = schema.getRootEntityDefinition(rootEntityName);
-		CollectRecord record = recordManager.create(activeSurvey, rootEntityDefinition, user, version.getName(), sessionId);
+		CollectRecord record = recordManager.create(activeSurvey, rootEntityDefinition, user, versionName, sessionId);
 		Entity rootEntity = record.getRootEntity();
 		recordManager.addEmptyNodes(rootEntity);
 		sessionManager.setActiveRecord(record);
@@ -180,10 +178,11 @@ public class DataService {
 	@Secured("ROLE_ENTRY")
 	public void deleteRecord(int id) throws RecordPersistenceException {
 		SessionState sessionState = sessionManager.getSessionState();
-		CollectRecord record = sessionState.getActiveRecord();
+		CollectSurvey survey = sessionState.getActiveSurvey();
+		//TODO check that the record is in ENTRY phase: only delete in ENTRY phase is allowed
+		CollectRecord record = recordManager.load(survey, id, Step.ENTRY.getStepNumber());
 		fileManager.deleteAllFiles(record);
 		recordManager.delete(id);
-		sessionManager.clearActiveRecord();
 	}
 	
 	@Transactional
@@ -198,7 +197,7 @@ public class DataService {
 		String sessionId = sessionState.getSessionId();
 		recordManager.save(record, sessionId);
 		fileManager.commitChanges(sessionId, record);
-		if ( indexingEnabled ) {
+		if ( isIndexingEnabled() ) {
 			permanentlyIndex(record);
 		}
 	}
@@ -230,7 +229,7 @@ public class DataService {
 			firstResp.setMissingWarnings(activeRecord.getMissingWarnings());
 			firstResp.setSkipped(activeRecord.getSkipped());
 			firstResp.setWarnings(activeRecord.getWarnings());
-			if ( indexingEnabled ) {
+			if ( hasIndexedNodes ) {
 				sessionIndexManager.index(activeRecord);
 			}
 		}
@@ -243,16 +242,17 @@ public class DataService {
 		CollectRecord record = sessionState.getActiveRecord();
 
 		Integer parentEntityId = operation.getParentEntityId();
-		Entity parentEntity = (Entity) record.getNodeByInternalId(parentEntityId);
 		Integer nodeId = operation.getNodeId();
 		Integer fieldIndex = operation.getFieldIndex();
 		String nodeName = operation.getNodeName();
 		
+		Entity parentEntity = (Entity) record.getNodeByInternalId(parentEntityId);
+		EntityDefinition parentEntityDefn = parentEntity.getDefinition();
+		NodeDefinition nodeDef = parentEntityDefn.getChildDefinition(nodeName);
 		Node<?> node = null;
 		if(nodeId != null) {
 			node = record.getNodeByInternalId(nodeId);
 		}
-		NodeDefinition nodeDef = ((EntityDefinition) parentEntity.getDefinition()).getChildDefinition(nodeName);
 		Object requestValue = operation.getValue();
 		String remarks = operation.getRemarks();
 		
@@ -606,9 +606,7 @@ public class DataService {
 		if(defn instanceof CodeAttributeDefinition) {
 			if ( value instanceof String) {
 				String stringVal = (String) value;
-				Record record = parentEntity.getRecord();
-				ModelVersion version = record .getVersion();
-				result = parseCode(parentEntity, (CodeAttributeDefinition) defn, stringVal, version );
+				result = parseCode(parentEntity, (CodeAttributeDefinition) defn, stringVal );
 			} else {
 				throw new IllegalArgumentException("Invalid value type: expected String");
 			}
@@ -659,7 +657,7 @@ public class DataService {
 			recordManager.promote(record, user);
 			recordManager.releaseLock(record.getId());
 			sessionManager.clearActiveRecord();
-			if ( indexingEnabled ) {
+			if ( isIndexingEnabled() ) {
 				permanentlyIndex(record);
 			}
 		} else {
@@ -667,6 +665,10 @@ public class DataService {
 		}
 	}
 	
+	protected boolean isIndexingEnabled() {
+		return hasIndexedNodes && indexManager.isInited();
+	}
+
 	@Secured("ROLE_ANALYSIS")
 	public void demoteToCleansing() throws RecordPersistenceException {
 		demote(Step.CLEANSING);
@@ -816,8 +818,6 @@ public class DataService {
 	 */
 	private List<CodeListItem> getAssignableCodeListItems(Entity parent, CodeAttributeDefinition def) {
 		CollectRecord record = getActiveRecord();
-		ModelVersion version = record.getVersion();
-		
 		List<CodeListItem> items = null;
 		if(StringUtils.isEmpty(def.getParentExpression())){
 			items = def.getList().getItems();
@@ -833,8 +833,9 @@ public class DataService {
 		}
 		List<CodeListItem> result = new ArrayList<CodeListItem>();
 		if(items != null) {
+			ModelVersion version = record.getVersion();
 			for (CodeListItem item : items) {
-				if(version.isApplicable(item)) {
+				if (version == null || version.isApplicable(item)) {
 					result.add(item);
 				}
 			}
@@ -875,13 +876,13 @@ public class DataService {
 		return null;
 	}
 	
-	private Code parseCode(Entity parent, CodeAttributeDefinition def, String value, ModelVersion version) {
+	private Code parseCode(Entity parent, CodeAttributeDefinition def, String value) {
 		List<CodeListItem> items = getAssignableCodeListItems(parent, def);
-		Code code = parseCode(value, items, version);
+		Code code = parseCode(value, items);
 		return code;
 	}
 	
-	private Code parseCode(String value, List<CodeListItem> codeList, ModelVersion version) {
+	private Code parseCode(String value, List<CodeListItem> codeList) {
 		Code code = null;
 		String[] strings = value.split(":");
 		String codeStr = null;

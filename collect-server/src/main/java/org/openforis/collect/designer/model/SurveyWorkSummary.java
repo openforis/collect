@@ -9,8 +9,9 @@ import org.openforis.collect.model.SurveySummary;
  */
 public class SurveyWorkSummary extends SurveySummary {
 	
-	private boolean published;
 	private boolean working;
+	private boolean published;
+	private Integer publishedSurveyId;
 	
 	public SurveyWorkSummary(Integer id, String name, String uri,
 			boolean published, boolean working) {
@@ -33,6 +34,14 @@ public class SurveyWorkSummary extends SurveySummary {
 	
 	public void setWorking(boolean working) {
 		this.working = working;
+	}
+
+	public Integer getPublishedSurveyId() {
+		return publishedSurveyId;
+	}
+
+	public void setPublishedSurveyId(Integer publishedSurveyId) {
+		this.publishedSurveyId = publishedSurveyId;
 	}
 
 }

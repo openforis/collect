@@ -70,8 +70,7 @@ package org.openforis.collect.presenter
 		override protected function updateView():void {
 			if(view.entityDefinition != null
 					&& view.entityDefinition.multiple
-					&& view.parentEntity != null 
-					&& view.modelVersion != null) {
+					&& view.parentEntity != null) {
 				var uiTab:UITabProxy = UIBuilder.getUITab(view.entityDefinition);
 				var uiTabs:IList = null;
 				if ( uiTab != null ) {
@@ -149,6 +148,7 @@ package org.openforis.collect.presenter
 			var o:UpdateRequestOperation = new UpdateRequestOperation();
 			o.method = UpdateRequestOperation$Method.DELETE;
 			o.parentEntityId = _view.parentEntity.id;
+			o.nodeName = view.entity.name;
 			o.nodeId = view.entity.id;
 			var req:UpdateRequest = new UpdateRequest(o);
 			ClientFactory.dataClient.updateActiveRecord(req, deleteResultHandler, faultHandler);

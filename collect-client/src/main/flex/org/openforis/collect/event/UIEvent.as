@@ -9,11 +9,14 @@ package org.openforis.collect.event {
 	public class UIEvent extends Event {
 		
 		//?
+		public static const LOGOUT_CLICK:String = "logoutClick";
 		public static const SHOW_SURVEY_SELECTION:String = "showSurveySelection";
 		public static const SHOW_ROOT_ENTITY_SELECTION:String = "showRootEntitySelection";
 		public static const SURVEY_SELECTED:String = "surveySelected";
 		public static const ROOT_ENTITY_SELECTED:String = "rootEntitySelected";
 		public static const BACK_TO_LIST:String = "backToList";
+		public static const SHOW_HOME_PAGE:String = "backToHome";
+		public static const SHOW_LIST_OF_RECORDS:String = "showListOfRecords";
 		
 		public static const RECORD_SELECTED:String = "recordSelected";
 		public static const RECORD_CREATED:String = "recordCreated";
@@ -27,6 +30,9 @@ package org.openforis.collect.event {
 		public static const BUILD_FORM:String = "buildForm";
 		
 		public static const ITEM_SELECT:String = "itemSelect";
+		
+		//survey preveiw
+		public static const SHOW_SURVEY_PREVIEW:String = "showSurveyPreview";
 		
 		private var _obj:Object;
 		private var _params:Array;

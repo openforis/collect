@@ -6,10 +6,10 @@ package org.openforis.collect.designer.viewmodel;
 
 import java.util.List;
 
-import org.openforis.collect.designer.form.SurveyObjectFormObject;
+import org.openforis.collect.designer.form.FormObject;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.MessageUtil.ConfirmHandler;
-import org.zkoss.bind.BindUtils;
+import org.openforis.collect.model.CollectSurvey;
 import org.zkoss.bind.Binder;
 import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
@@ -29,10 +29,20 @@ import org.zkoss.zkplus.databind.BindingListModelList;
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public abstract class SurveyObjectBaseVM<T> extends SurveyBaseVM {
 	
+	public static final String VALIDATE_COMMAND = "validate";
+	public static final String APPLY_CHANGES_COMMAND = "applyChanges";
+	public static final String COMMIT_CHANGES_COMMAND = "commitChanges";
+	
 	protected boolean newItem;
 	protected T selectedItem;
 	protected T editedItem;
-	protected SurveyObjectFormObject<T> formObject;
+	protected boolean changed;
+	protected FormObject<T> formObject;
+	private boolean commitChangesOnApply;
+	
+	public SurveyObjectBaseVM() {
+		commitChangesOnApply = true;
+	}
 	
 	public BindingListModelList<T> getItems() {
 		List<T> items = getItemsInternal();
@@ -42,10 +52,13 @@ public abstract class SurveyObjectBaseVM<T> extends SurveyBaseVM {
 	protected abstract List<T> getItemsInternal();
 
 	@Command
-	public void newItem(@ContextParam(ContextType.BINDER) Binder binder) {
-		if ( checkCurrentFormValid() ) {
-			performNewItemCreation(binder);
-		}
+	public void newItem(@ContextParam(ContextType.BINDER) final Binder binder) {
+		checkCanLeaveForm(new CanLeaveFormConfirmHandler() {
+			@Override
+			public void onOk(boolean confirmed) {
+				performNewItemCreation(binder);
+			}
+		});
 	}
 
 	protected void performNewItemCreation(Binder binder) {
@@ -53,17 +66,22 @@ public abstract class SurveyObjectBaseVM<T> extends SurveyBaseVM {
 		newItem = true;
 		setEditedItem(newInstance);
 		setSelectedItem(null);
-		notifyChange("editedItem","formObject","items","selectedItem");
+		changed = false;
+		notifyChange("editedItem","formObject","items","selectedItem","changed");
 		validateForm(binder);
 	}
 
 	protected void validateForm(Binder binder) {
 		//post apply changes command to force validation
-		dispatchApplyChangesCommand(binder);
+		dispatchValidateCommand(binder);
+	}
+
+	protected void dispatchValidateCommand(Binder binder) {
+		binder.postCommand(VALIDATE_COMMAND, null);
 	}
 
 	protected void dispatchApplyChangesCommand(Binder binder) {
-		binder.postCommand("applyChanges", null);
+		binder.postCommand(APPLY_CHANGES_COMMAND, null);
 	}
 	
 	@Override
@@ -75,32 +93,55 @@ public abstract class SurveyObjectBaseVM<T> extends SurveyBaseVM {
 		}
 	}
 
+	@GlobalCommand
+	public void validateAll(@ContextParam(ContextType.BINDER) Binder binder) {
+		dispatchValidateCommand(binder);
+	}
+	
+	@Command
+	public void validate() {
+	}
+	
 	@Command
 	public void applyChanges() {
+		if ( commitChangesOnApply ) {
+			commitChanges();
+		}
+	}
+
+	protected void commitChanges() {
 		formObject.saveTo(editedItem, currentLanguageCode);
 		if ( newItem ) {
 			addNewItemToSurvey();
 			setSelectedItem(editedItem);
 			newItem = false;
 		}
-		notifyChange("items","selectedItem");
+		notifyChange("items","selectedItem","changed");
+		dispatchSurveyChangedCommand();
 	}
 	
 	@Command
-	public void selectionChanged(@BindingParam("selectedItem") T item) {
-		if ( checkCurrentFormValid() ) {
-			performItemSelection(item);
-		} else {
-			setSelectedItem(this.selectedItem);
-			BindUtils.postNotifyChange(null, null, this, "selectedItem");
-		}
+	public void selectionChanged(@BindingParam("selectedItem") final T item) {
+		checkCanLeaveForm(new CanLeaveFormCompleteConfirmHandler() {
+			@Override
+			public void onOk(boolean confirmed) {
+				performItemSelection(item);
+			}
+			@Override
+			public void onCancel() {
+				setSelectedItem(selectedItem);
+				notifyChange("selectedItem");
+			}
+		});
 	}
 
 	protected void performItemSelection(T item) {
 		newItem = false;
+		changed = false;
 		setSelectedItem(item);
 		setEditedItem(item);
 		notifyChange("selectedItem","formObject","editedItem");
+		dispatchCurrentFormValidatedCommand(true);
 	}
 	
 	@Command
@@ -147,7 +188,7 @@ public abstract class SurveyObjectBaseVM<T> extends SurveyBaseVM {
 		}
 	}
 
-	protected abstract SurveyObjectFormObject<T> createFormObject();
+	protected abstract FormObject<T> createFormObject();
 	
 	protected abstract T createItemInstance();
 	
@@ -156,23 +197,17 @@ public abstract class SurveyObjectBaseVM<T> extends SurveyBaseVM {
 	
 	@Command
 	public void deleteItem(@BindingParam("item") final T item) {
-		boolean deleteEditedItem = item.equals(selectedItem);
-		if ( deleteEditedItem || checkCurrentFormValid() ) {
-			ConfirmHandler handler = new ConfirmHandler() {
-				@Override
-				public void onOk() {
-					performDeleteItem(item);
-				}
-			};
-			MessageUtil.showConfirm(handler, "global.item.confirm_remove");
-		} else {
-			//TODO show confirm cancel changes message
-		}
+		MessageUtil.showConfirm(new ConfirmHandler() {
+			@Override
+			public void onOk() {
+				performDeleteItem(item);
+			}}, "global.item.confirm_remove");
 	}
 
 	protected void performDeleteItem(T item) {
 		deleteItemFromSurvey(item);
-		notifyChange("items");
+		changed = false;
+		notifyChange("items","changed");
 		if ( item.equals(selectedItem) ) {
 			formObject = null;
 			editedItem = null;
@@ -192,7 +227,7 @@ public abstract class SurveyObjectBaseVM<T> extends SurveyBaseVM {
 		selectedItem = item;
 	}
 	
-	public SurveyObjectFormObject<T> getFormObject() {
+	public FormObject<T> getFormObject() {
 		return formObject;
 	}
 
@@ -200,18 +235,36 @@ public abstract class SurveyObjectBaseVM<T> extends SurveyBaseVM {
 		return editedItem;
 	}
 
-	@NotifyChange({"editedItem","formObject"})
 	public void setEditedItem(T editedItem) {
 		this.editedItem = editedItem;
 		formObject = createFormObject();
 		if ( editedItem != null ) {
-			formObject.loadFrom(editedItem, currentLanguageCode);
+			CollectSurvey survey = getSurvey();
+			if ( survey == null ) {
+				//session expired
+			} else {
+				String defaultLanguage = survey.getDefaultLanguage();
+				formObject.loadFrom(editedItem, currentLanguageCode, defaultLanguage);
+			}
 		}
+		notifyChange("editedItem","formObject");
 	}
 	
 	@DependsOn("editedItem")
 	public boolean isEditingItem() {
 		return this.editedItem != null;
+	}
+	
+	public boolean isChanged() {
+		return changed;
+	}
+
+	public boolean isCommitChangesOnApply() {
+		return commitChangesOnApply;
+	}
+
+	public void setCommitChangesOnApply(boolean commitChangesOnApply) {
+		this.commitChangesOnApply = commitChangesOnApply;
 	}
 	
 }

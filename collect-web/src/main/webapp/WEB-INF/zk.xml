@@ -10,14 +10,14 @@
         <disable-event-thread/>
 		<!-- labels -->
         <label-location>/WEB-INF/labels/designer/label_en.properties</label-location>
-        <label-location>/WEB-INF/labels/language_codes_iso_639_3.properties</label-location>
+        <label-location>/WEB-INF/labels/language_codes_iso_639_1.properties</label-location>
     </system-config>
     
 	<session-config>
 		<timer-keep-alive>true</timer-keep-alive>
 	</session-config>
 	
-	<!-- JavaScript debug -->
+	<!-- Start of JavaScript debug part -->
 <!-- 	<client-config> -->
 <!-- 	    <debug-js>true</debug-js> -->
 <!-- 	</client-config> -->
@@ -25,7 +25,7 @@
 <!-- 	    <name>org.zkoss.web.classWebResource.cache</name> -->
 <!-- 	    <value>false</value> -->
 <!-- 	</library-property> -->
-
+    <!-- End of JavaScript debug part -->
 <!-- 	<library-property> -->
 <!-- 	    <name>org.zkoss.theme.preferred</name> -->
 <!-- 	    <value>silvertail</value> -->

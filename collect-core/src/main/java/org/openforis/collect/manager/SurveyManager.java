@@ -18,7 +18,6 @@ import org.openforis.collect.model.SurveySummary;
 import org.openforis.collect.persistence.SurveyDao;
 import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.collect.persistence.SurveyWorkDao;
-import org.openforis.idm.metamodel.LanguageSpecificText;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.xml.IdmlParseException;
 import org.openforis.idm.util.CollectionUtil;
@@ -116,7 +115,7 @@ public class SurveyManager {
 		List<SurveySummary> summaries = new ArrayList<SurveySummary>();
 		for (Survey survey : surveys) {
 			Integer id = survey.getId();
-			String projectName = getProjectName(survey, lang);
+			String projectName = survey.getProjectName(lang);
 			String name = survey.getName();
 			String uri = survey.getUri();
 			SurveySummary summary = new SurveySummary(id, name, uri, projectName);
@@ -157,7 +156,7 @@ public class SurveyManager {
 		List<SurveySummary> summaries = new ArrayList<SurveySummary>();
 		for (Survey survey : surveys) {
 			Integer id = survey.getId();
-			String projectName = getProjectName(survey, lang);
+			String projectName = survey.getProjectName(lang);
 			String name = survey.getName();
 			SurveySummary summary = new SurveySummary(id, name, projectName);
 			summaries.add(summary);
@@ -173,19 +172,17 @@ public class SurveyManager {
 	
 	@Transactional
 	public CollectSurvey loadPublishedSurveyForEdit(String uri) {
-		CollectSurvey survey = (CollectSurvey) surveyDao.loadByUri(uri);
-		CollectSurvey tempSurvey = surveyWorkDao.loadByUri(uri);
-		if ( tempSurvey != null ) {
-			return tempSurvey;
-		} else {
-			CollectSurvey surveyWork = createSurveyWork(survey);
-			return surveyWork;
+		CollectSurvey surveyWork = surveyWorkDao.loadByUri(uri);
+		if ( surveyWork == null ) {
+			CollectSurvey publishedSurvey = (CollectSurvey) surveyDao.loadByUri(uri);
+			surveyWork = createSurveyWork(publishedSurvey);
 		}
+		return surveyWork;
 	}
 
 	public CollectSurvey createSurveyWork() {
 		CollectSurvey survey = (CollectSurvey) collectSurveyContext.createSurvey();
-		UIOptions uiOptions = new UIOptions();
+		UIOptions uiOptions = survey.createUIOptions();
 		survey.addApplicationOptions(uiOptions);
 		return survey;
 	}
@@ -194,6 +191,7 @@ public class SurveyManager {
 //		CollectSurvey surveyWork = survey.clone();
 		CollectSurvey surveyWork = survey;
 		surveyWork.setId(null);
+		surveyWork.setPublished(true);
 		return surveyWork;
 	}
 	
@@ -222,20 +220,4 @@ public class SurveyManager {
 		}
 	}
 	
-	private String getProjectName(Survey survey, String lang) {
-		List<LanguageSpecificText> names = survey.getProjectNames();
-		if (names == null || names.size() == 0) {
-			return "";
-		} else if (names.size() == 1) {
-			return names.get(0).getText();
-		} else {
-			for (LanguageSpecificText text : names) {
-				if (lang.equalsIgnoreCase(text.getLanguage())) {
-					return text.getText();
-				}
-			}
-		}
-		return "";
-	}
-
 }

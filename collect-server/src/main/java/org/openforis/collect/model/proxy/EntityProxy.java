@@ -24,14 +24,10 @@ import org.openforis.idm.model.Record;
 public class EntityProxy extends NodeProxy {
 
 	private transient Entity entity;
-	private transient Record record;
-	private transient ModelVersion version;
 	
 	public EntityProxy(EntityProxy parent, Entity entity) {
 		super(parent, entity);
 		this.entity = entity;
-		record = entity.getRecord();
-		version = record.getVersion();
 	}
 	
 	@ExternalizedProperty
@@ -39,7 +35,7 @@ public class EntityProxy extends NodeProxy {
 		Map<String, List<NodeProxy>> result = new HashMap<String, List<NodeProxy>>();
 		List<NodeDefinition> childDefinitions = getChildDefinitions();
 		for (NodeDefinition childDefinition : childDefinitions) {
-			if ( version.isApplicable(childDefinition) ) {
+			if ( isAppliable(childDefinition) ) {
 				String name = childDefinition.getName();
 				List<Node<?>> childrenByName = this.entity.getAll(name);
 				List<NodeProxy> proxies = NodeProxy.fromList(this, childrenByName);
@@ -54,7 +50,7 @@ public class EntityProxy extends NodeProxy {
 		List<NodeDefinition> childDefinitions = getChildDefinitions();
 		Map<String, Boolean> map = new HashMap<String, Boolean>();
 		for (NodeDefinition childDefinition : childDefinitions) {
-			if ( version.isApplicable(childDefinition) ) {
+			if ( isAppliable(childDefinition) ) {
 				String childName = childDefinition.getName();
 				boolean relevant = entity.isRelevant(childName );
 				map.put(childName, relevant);
@@ -68,7 +64,7 @@ public class EntityProxy extends NodeProxy {
 		List<NodeDefinition> childDefinitions = getChildDefinitions();
 		Map<String, Boolean> map = new HashMap<String, Boolean>();
 		for (NodeDefinition childDefinition : childDefinitions) {
-			if ( version.isApplicable(childDefinition) ) {
+			if ( isAppliable(childDefinition) ) {
 				String childName = childDefinition.getName();
 				boolean required = entity.isRequired(childName );
 				map.put(childName, required);
@@ -82,7 +78,7 @@ public class EntityProxy extends NodeProxy {
 		List<NodeDefinition> childDefinitions = getChildDefinitions();
 		Map<String, ValidationResultFlag> map = new HashMap<String, ValidationResultFlag>();
 		for (NodeDefinition childDefinition : childDefinitions) {
-			if ( version.isApplicable(childDefinition) ) {
+			if ( isAppliable(childDefinition) ) {
 				String childName = childDefinition.getName();
 				ValidationResultFlag valid = entity.validateMinCount(childName);
 				map.put(childName, valid);
@@ -96,7 +92,7 @@ public class EntityProxy extends NodeProxy {
 		List<NodeDefinition> childDefinitions = getChildDefinitions();
 		Map<String, ValidationResultFlag> map = new HashMap<String, ValidationResultFlag>();
 		for (NodeDefinition childDefinition : childDefinitions) {
-			if ( version.isApplicable(childDefinition) ) {
+			if ( isAppliable(childDefinition) ) {
 				String childName = childDefinition.getName();
 				ValidationResultFlag valid = entity.validateMaxCount(childName);
 				map.put(childName, valid);
@@ -110,12 +106,18 @@ public class EntityProxy extends NodeProxy {
 		List<NodeDefinition> childDefinitions = getChildDefinitions();
 		Map<String, Boolean> map = new HashMap<String, Boolean>();
 		for (NodeDefinition childDefinition : childDefinitions) {
-			if ( version.isApplicable(childDefinition) ) {
+			if ( isAppliable(childDefinition) ) {
 				String childName = childDefinition.getName();
 				map.put(childName, Boolean.FALSE);
 			}
 		}
 		return map;
+	}
+
+	protected boolean isAppliable(NodeDefinition childDefinition) {
+		Record record = entity.getRecord();
+		ModelVersion version = record.getVersion();
+		return version == null || version.isApplicable(childDefinition);
 	}
 	
 	@ExternalizedProperty

@@ -4,6 +4,7 @@
 package org.openforis.collect.designer.form;
 
 import org.openforis.idm.metamodel.BooleanAttributeDefinition;
+import org.openforis.idm.metamodel.EntityDefinition;
 
 /**
  * @author S. Ricci
@@ -17,7 +18,8 @@ public class BooleanAttributeDefinitionFormObject<T extends BooleanAttributeDefi
 	
 	private String typeValue;
 	
-	public BooleanAttributeDefinitionFormObject() {
+	BooleanAttributeDefinitionFormObject(EntityDefinition parentDefn) {
+		super(parentDefn);
 		typeValue = Type.THREE_STATE.name();
 	}
 	
@@ -35,8 +37,8 @@ public class BooleanAttributeDefinitionFormObject<T extends BooleanAttributeDefi
 	}
 	
 	@Override
-	public void loadFrom(T source, String languageCode) {
-		super.loadFrom(source, languageCode);
+	public void loadFrom(T source, String languageCode, String defaultLanguage) {
+		super.loadFrom(source, languageCode, defaultLanguage);
 		typeValue = source.isAffirmativeOnly() ? Type.AFFIRMATIVE_ONLY.name(): Type.THREE_STATE.name();
 	}
 

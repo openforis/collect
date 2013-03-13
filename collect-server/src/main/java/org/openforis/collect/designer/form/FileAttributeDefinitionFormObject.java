@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.FileAttributeDefinition;
 
 /**
@@ -15,9 +16,14 @@ import org.openforis.idm.metamodel.FileAttributeDefinition;
  */
 public class FileAttributeDefinitionFormObject<T extends FileAttributeDefinition> extends AttributeDefinitionFormObject<T> {
 	
-	private static final String EXTENSIONS_SEPARATOR = ",";
-	private int maxSize;
+	private static final String EXTENSIONS_SEPARATOR = " ";
+	
+	private Integer maxSize;
 	private String extensions;
+	
+	FileAttributeDefinitionFormObject(EntityDefinition parentDefn) {
+		super(parentDefn);
+	}
 	
 	@Override
 	public void saveTo(T dest, String languageCode) {
@@ -32,18 +38,18 @@ public class FileAttributeDefinitionFormObject<T extends FileAttributeDefinition
 	}
 	
 	@Override
-	public void loadFrom(T source, String languageCode) {
-		super.loadFrom(source, languageCode);
+	public void loadFrom(T source, String languageCode, String defaultLanguage) {
+		super.loadFrom(source, languageCode, defaultLanguage);
 		maxSize = source.getMaxSize();
 		List<String> extensionsList = source.getExtensions();
 		extensions = StringUtils.join(extensionsList, EXTENSIONS_SEPARATOR);
 	}
 
-	public int getMaxSize() {
+	public Integer getMaxSize() {
 		return maxSize;
 	}
 
-	public void setMaxSize(int maxSize) {
+	public void setMaxSize(Integer maxSize) {
 		this.maxSize = maxSize;
 	}
 

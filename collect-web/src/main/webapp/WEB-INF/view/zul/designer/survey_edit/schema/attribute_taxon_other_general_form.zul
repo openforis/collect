@@ -1,0 +1,29 @@
+<?component name="fieldErrorHandler" class="org.openforis.collect.designer.component.FieldErrorHandler"?>
+<zk>
+  <grid class="inner">
+    <columns>
+      <column label="" width="150px" />
+      <column label="" />
+    </columns>
+    <rows>
+      <row>
+        <label
+          value="${labels.survey.schema.attribute.taxon.taxonomy}:" />
+        <fieldErrorHandler message="@load(vmsgs['taxonomy'])">
+          <textbox width="150px" value="@bind(fx.taxonomy)"
+            onChange="@command('applyChanges')" />
+        </fieldErrorHandler>
+      </row>
+      <row>
+        <label
+          value="${labels.survey.schema.attribute.taxon.highest_rank}:" />
+        <fieldErrorHandler message="@load(vmsgs['highestRank'])">
+          <listbox width="150px" model="@load(vm.ranks)"
+            selectedItem="@bind(fx.highestRank)" mold="select"
+            onSelect="@command('applyChanges')">
+          </listbox>
+        </fieldErrorHandler>
+      </row>
+    </rows>
+  </grid>
+</zk>

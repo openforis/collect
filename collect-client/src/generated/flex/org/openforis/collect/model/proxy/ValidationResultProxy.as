@@ -22,12 +22,10 @@ package org.openforis.collect.model.proxy {
 			if(StringUtil.isBlank(result)) {
 				if(ruleName == "ComparisonCheck") {
 					result = getComparisonCheckMessage();
+				} else if(messageKey != null) {
+					result = Message.get(messageKey, messageArgs);
 				} else {
-					if(messageKey != null) {
-						result = Message.get(messageKey, messageArgs);
-					} else {
-						result = ruleName;
-					}
+					result = ruleName;
 				}
 			}
 			return result;

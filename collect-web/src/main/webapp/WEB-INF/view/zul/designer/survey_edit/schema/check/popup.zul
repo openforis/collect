@@ -1,0 +1,27 @@
+<zk>
+	<custom-attributes parentDefinition="${arg.parentDefinition}"/>
+	<custom-attributes check="${arg.check}"/>
+	<custom-attributes newItem="${arg.newItem}"/>
+	<window id="checkPopUp" title="${labels.survey.schema.node.check.popup.title}" 
+		width="500px"
+		border="normal"
+		position="center" 
+		closable="false"
+        apply="org.openforis.collect.designer.composer.CheckPopUpComposer">
+    
+        <vlayout>
+           	<include id="detailsInclude" 
+              src="survey_edit/schema/check/${$composer.typeShort}.zul"
+   		      parentDefinition="${parentDefinition}" 
+              newItem="${newItem}" 
+              check="${check}" />
+            <box width="100%" align="center">
+              <hbox>
+        		<button label="${labels.global.apply}" onClick="@command('applyChanges')" />
+                <separator width="30px" />
+                <button label="${labels.global.cancel}" onClick="@command('cancelChanges')" />
+              </hbox>
+            </box>
+        </vlayout>
+	</window>
+</zk>

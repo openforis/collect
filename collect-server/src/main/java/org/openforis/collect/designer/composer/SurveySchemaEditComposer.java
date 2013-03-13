@@ -1,6 +1,6 @@
 package org.openforis.collect.designer.composer;
 
-import org.openforis.collect.designer.viewmodel.SurveySchemaEditVM;
+import org.openforis.collect.designer.viewmodel.SchemaVM;
 import org.zkoss.bind.BindComposer;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.event.Event;
@@ -26,8 +26,8 @@ public class SurveySchemaEditComposer extends BindComposer<Component> {
 	
 	@Listen("onSelectTreeNode")
 	public void onSelectTreeNode(Event event) throws InterruptedException {
-		SurveySchemaEditVM vm = (SurveySchemaEditVM) getViewModel();
-		if ( vm.checkCurrentFormValid() ) {
+		SchemaVM vm = (SchemaVM) getViewModel();
+		if ( vm.checkCanLeaveForm() ) {
 			Tab tab = (Tab) event.getTarget();
 			Tabbox tabbox = tab.getTabbox();
 			tabbox.setSelectedTab(tab);

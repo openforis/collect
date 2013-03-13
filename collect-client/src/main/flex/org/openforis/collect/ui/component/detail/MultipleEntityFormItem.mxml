@@ -162,7 +162,7 @@
 								entityDefinition="{entityDefinition}"
 								nodeDefinitions="{IList(definitionsPerTab.getItemAt(tabsRP.currentIndex))}"
 								entity="{entity}"
-								label="{tabsRP.currentItem.label}"
+								label="{tabsRP.currentItem.labelText}"
 								/>
 						</mx:Repeater>
 					</mx:ViewStack>

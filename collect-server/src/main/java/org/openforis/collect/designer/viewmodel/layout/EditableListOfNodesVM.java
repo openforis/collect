@@ -67,8 +67,8 @@ public class EditableListOfNodesVM extends BaseVM {
 				NodeDefinition nodeDefn = (NodeDefinition) data;
 				UIOptions uiOpts = getUIOptions();
 				if ( uiOpts.isAssignableTo(nodeDefn, tab) ) {
-					UITab oldTab = uiOpts.getTab(nodeDefn);
-					uiOpts.associateWithTab(nodeDefn, tab);
+					UITab oldTab = uiOpts.getAssignedTab(nodeDefn);
+					uiOpts.assignToTab(nodeDefn, tab);
 					Map<String, Object> args = new HashMap<String, Object>();
 					args.put("oldTab", oldTab);
 					args.put("newTab", tab);
@@ -86,13 +86,13 @@ public class EditableListOfNodesVM extends BaseVM {
 	
 	public boolean isTabInherited(NodeDefinition nodeDefn) {
 		UIOptions uiOpts = getUIOptions();
-		UITab tab = uiOpts.getTab(nodeDefn, false);
+		UITab tab = uiOpts.getAssignedTab(nodeDefn, false);
 		return tab != null;
 	}
 	
 	@Command
 	@NotifyChange({"nodesPerTab"})
-	public void setLayout(@BindingParam("type") String type, @BindingParam("node") NodeDefinition node) {
+	public void setLayout(@BindingParam("type") String type, @BindingParam("node") EntityDefinition node) {
 		UIOptions uiOpts = getUIOptions();
 		Layout layout = Layout.valueOf(type);
 		uiOpts.setLayout(node, layout);
@@ -149,7 +149,7 @@ public class EditableListOfNodesVM extends BaseVM {
 		ModelVersion formVersion = getLayoutFormVersion();
 		for (NodeDefinition nodeDefn : childDefinitions) {
 			if ( formVersion == null || formVersion.isApplicable(nodeDefn) ) {
-				UITab nodeTab = uiOpts.getTab(nodeDefn);
+				UITab nodeTab = uiOpts.getAssignedTab(nodeDefn);
 				if ( nodeTab == tab ) {
 					result.add(nodeDefn);
 				}

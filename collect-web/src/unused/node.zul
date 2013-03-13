@@ -1,0 +1,32 @@
+<zk>
+	<borderlayout>
+		<north height="@load(vm.nodeType eq 'ATTRIBUTE' ? '60px': '30px')">
+			<grid height="@load(vm.nodeType eq 'ATTRIBUTE' ? '60px': '30px')">
+				<columns>
+					<column label="" width="150px" />
+					<column label="" width="100%" />
+				</columns>
+				<rows>
+					<row>
+						<label value="${labels.survey.schema.node.type_label}:" />
+						<label value="@load(vm.nodeType eq 'ENTITY' ? 
+								labels.survey.schema.node.type.entity: 
+								labels.survey.schema.node.type.attribute)" />
+					</row>
+					<row visible="@load(vm.nodeType eq 'ATTRIBUTE')">
+						<label value="${labels.survey.schema.attribute.type_label}:" />
+						<label visible="@laod(vm.nodeType eq 'ATTRIBUTE')" 
+								value="@load(vm.getAttributeTypeLabel(attributeType))" />
+					</row>
+				</rows>
+			</grid>
+		</north>
+		<center>
+			<div visible="@load(not empty vm.nodeType and (vm.nodeType eq 'ENTITY' or not empty vm.attributeType))"
+				height="100%" width="100%"
+				style="overflow:auto;">
+				<include id="nodeDetailFormInclude" />
+			</div>
+		</center>
+	</borderlayout>
+</zk>

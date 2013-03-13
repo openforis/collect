@@ -6,6 +6,7 @@
  */
 
 package org.openforis.collect.metamodel.proxy {
+	import org.openforis.collect.util.CollectionUtil;
 	
 	/**
 	 * @author S. Ricci
@@ -33,6 +34,14 @@ package org.openforis.collect.metamodel.proxy {
 			}
 		}
 		
+		public function getVersion(versionId:int):ModelVersionProxy {
+			if ( versions != null ) {
+				var version:ModelVersionProxy = CollectionUtil.getItem(versions, "id", versionId);
+				return version;
+			} else {
+				return null;
+			}
+		}
 		
 	}
 }

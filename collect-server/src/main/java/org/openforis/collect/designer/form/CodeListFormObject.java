@@ -2,7 +2,10 @@ package org.openforis.collect.designer.form;
 
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.openforis.idm.metamodel.CodeList;
+import org.openforis.idm.metamodel.CodeList.CodeScope;
+import org.openforis.idm.metamodel.CodeListLabel;
 import org.openforis.idm.metamodel.CodeListLevel;
 
 /**
@@ -12,12 +15,15 @@ import org.openforis.idm.metamodel.CodeListLevel;
  */
 public class CodeListFormObject extends VersionableItemFormObject<CodeList> {
 
+	protected static final CodeScope DEFAULT_SCOPE = CodeScope.SCHEME;
+	
 	private String name;
 	private String lookupTable;
 	private String itemLabel;
 	private String listLabel;
 	private String description;
 	private String type;
+	private String codeScope;
 	
 	public enum Type {
 		FLAT, HIERARCHICAL;
@@ -28,16 +34,18 @@ public class CodeListFormObject extends VersionableItemFormObject<CodeList> {
 	}
 	
 	@Override
-	public void loadFrom(CodeList source, String languageCode) {
-		super.loadFrom(source, languageCode);
+	public void loadFrom(CodeList source, String languageCode, String defaultLanguage) {
+		super.loadFrom(source, languageCode, defaultLanguage);
 		name = source.getName();
 		lookupTable = source.getLookupTable();
-		itemLabel = source.getLabel(org.openforis.idm.metamodel.CodeListLabel.Type.ITEM, languageCode);
-		listLabel = source.getLabel(org.openforis.idm.metamodel.CodeListLabel.Type.LIST, languageCode);
+		itemLabel = getLabel(source, CodeListLabel.Type.ITEM, languageCode, defaultLanguage);
+		listLabel = getLabel(source, CodeListLabel.Type.LIST, languageCode, defaultLanguage);
 		description = source.getDescription(languageCode);
 		List<CodeListLevel> levels = source.getHierarchy();
 		boolean hasMultipleLevels = levels.size() > 1;
 		type = hasMultipleLevels ? Type.HIERARCHICAL.name(): Type.FLAT.name();
+		CodeScope codeScopeEnum = source.getCodeScope();
+		codeScope = codeScopeEnum != null ? codeScopeEnum.name(): DEFAULT_SCOPE.name();
 	}
 	
 	@Override
@@ -45,9 +53,20 @@ public class CodeListFormObject extends VersionableItemFormObject<CodeList> {
 		super.saveTo(dest, languageCode);
 		dest.setName(name);
 		dest.setLookupTable(lookupTable);
-		dest.setLabel(org.openforis.idm.metamodel.CodeListLabel.Type.ITEM, languageCode, itemLabel);
-		dest.setLabel(org.openforis.idm.metamodel.CodeListLabel.Type.LIST, languageCode, listLabel);
+		dest.setLabel(CodeListLabel.Type.ITEM, languageCode, itemLabel);
+		dest.setLabel(CodeListLabel.Type.LIST, languageCode, listLabel);
 		dest.setDescription(languageCode, description);
+		CodeScope scope = StringUtils.isNotBlank(codeScope) ? CodeScope.valueOf(codeScope): DEFAULT_SCOPE;
+		dest.setCodeScope(scope);
+	}
+	
+	protected String getLabel(CodeList source, CodeListLabel.Type type, String languageCode, String defaultLanguage) {
+		String result = source.getLabel(type, languageCode);
+		if ( result == null && languageCode != null && languageCode.equals(defaultLanguage) ) {
+			//try to get the label associated to default language
+			result = source.getLabel(type, null);
+		}
+		return result;
 	}
 
 	public String getName() {
@@ -96,6 +115,14 @@ public class CodeListFormObject extends VersionableItemFormObject<CodeList> {
 
 	public void setType(String type) {
 		this.type = type;
+	}
+
+	public String getCodeScope() {
+		return codeScope;
+	}
+
+	public void setCodeScope(String codeScope) {
+		this.codeScope = codeScope;
 	}
 
 	

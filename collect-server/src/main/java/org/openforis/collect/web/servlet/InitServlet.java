@@ -10,11 +10,17 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * @author M. Togna
+ * @author S. Ricci
  * 
  */
 public class InitServlet extends HttpServlet {
+
+	private final Log LOG = LogFactory.getLog(InitServlet.class);
 
 	/**
 	 * 
@@ -30,11 +36,15 @@ public class InitServlet extends HttpServlet {
 	public void init() throws ServletException {
 		super.init();
 
-		System.out.println("============= Open Foris Collect Initialization =============");
-
-		// String basePath = getServletContext().getRealPath("/");
-
-		System.out.println("====================================================");
+		if ( LOG.isInfoEnabled() ) {
+			LOG.info("============= Open Foris Collect Initialization =============");
+		}
+		
+		//add initialization code here... 
+		
+		if ( LOG.isInfoEnabled() ) {
+			LOG.info("====================================================");
+		}
 	}
 
 

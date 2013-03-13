@@ -5,7 +5,9 @@ import static org.openforis.collect.metamodel.ui.UIOptionsConstants.NAME;
 
 import java.io.IOException;
 
+import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.metamodel.ui.UITab;
+import org.openforis.collect.persistence.xml.UIOptionsBinder;
 import org.openforis.idm.metamodel.LanguageSpecificText;
 import org.openforis.idm.metamodel.xml.XmlParseException;
 import org.xmlpull.v1.XmlPullParserException;
@@ -17,8 +19,8 @@ import org.xmlpull.v1.XmlPullParserException;
  */
 class UITabPR extends UITabSetPRBase {
 		
-	public UITabPR() {
-		super("tab");
+	public UITabPR(UIOptionsBinder binder) {
+		super("tab", binder);
 		
 		addChildPullReaders(
 			new LabelPR(),
@@ -29,8 +31,8 @@ class UITabPR extends UITabSetPRBase {
 	@Override
 	protected void onStartTag() throws XmlParseException, XmlPullParserException, IOException {
 		String name = getAttribute(NAME, false);
-		tabSet = new UITab();
-		tabSet.setName(name);
+		UIOptions uiOptions = parentTabSet.getUIOptions();
+		tabSet = uiOptions.createTab(name);
 	}
 	
 	@Override

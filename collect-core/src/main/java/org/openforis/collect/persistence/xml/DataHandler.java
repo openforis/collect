@@ -18,6 +18,7 @@ import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.FieldSymbol;
 import org.openforis.collect.model.User;
 import org.openforis.idm.metamodel.EntityDefinition;
+import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.model.Attribute;
@@ -84,6 +85,7 @@ public class DataHandler extends DefaultHandler {
 	
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
+		String name = localName.isEmpty() ? qName : localName;
 		try {
 			if ( failed ) {
 				return; 
@@ -92,14 +94,14 @@ public class DataHandler extends DefaultHandler {
 				return;
 			} else if ( node == null ) {
 				// if root element, read audit data, version, and 
-				startRecord(localName, attributes);
+				startRecord(name, attributes);
 			} else {
 				this.content = new StringBuilder();
 				this.attributes = attributes;
 				if ( node instanceof Entity ) {
-					startChildNode(localName, attributes);
+					startChildNode(name, attributes);
 				} else if ( node instanceof Attribute ) {
-					startAttributeField(localName, attributes);
+					startAttributeField(name, attributes);
 				}
 			}
 		} catch ( NullPointerException e ) {
@@ -161,17 +163,20 @@ public class DataHandler extends DefaultHandler {
 		if ( childDefn == null ) {
 			warn(localName, "Undefined node");
 			pushIgnore();
-		} else if ( record.getVersion().isApplicable(childDefn)) {
-			Node<?> newNode = childDefn.createNode();
-			entity.add(newNode);
-			Integer stateValue = getNodeState();
-			if ( stateValue != null ) {
-				entity.setChildState(localName, stateValue);
-			}
-			this.node = newNode;
 		} else {
-			warn(localName, "Node definition is not applicable to the record version");
-			pushIgnore();
+			ModelVersion version = record.getVersion();
+			if ( version == null || version.isApplicable(childDefn)) {
+				Node<?> newNode = childDefn.createNode();
+				entity.add(newNode);
+				Integer stateValue = getNodeState();
+				if ( stateValue != null ) {
+					entity.setChildState(localName, stateValue);
+				}
+				this.node = newNode;
+			} else {
+				warn(localName, "Node definition is not applicable to the record version");
+				pushIgnore();
+			}
 		}
 	}
 
@@ -204,7 +209,8 @@ public class DataHandler extends DefaultHandler {
 
 	protected void fail(String msg) {
 		String path = getPath();
-		NodeUnmarshallingError nodeErrorItem = new NodeUnmarshallingError(record.getStep(), path, msg);
+		Step step = record == null ? null : record.getStep();
+		NodeUnmarshallingError nodeErrorItem = new NodeUnmarshallingError(step, path, msg);
 		failures.add(nodeErrorItem);
 		failed = true;
 	}

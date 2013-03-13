@@ -7,19 +7,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
-import org.openforis.collect.Proxy;
 import org.openforis.idm.metamodel.ModelVersion;
 
 /**
  * @author M. Togna
+ * @author S. Ricci
  * 
  */
-public class ModelVersionProxy implements Proxy {
+public class ModelVersionProxy extends IdentifiableSurveyObjectProxy {
 
 	private transient ModelVersion version;
 
 	public ModelVersionProxy(ModelVersion version) {
-		super();
+		super(version);
 		this.version = version;
 	}
 

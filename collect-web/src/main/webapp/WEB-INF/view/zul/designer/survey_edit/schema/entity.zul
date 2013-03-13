@@ -1,15 +1,20 @@
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<?component name="fieldErrorHandler" class="org.openforis.collect.designer.component.FieldErrorHandler"?>
 <zk>
+    <custom-attributes parentEntity="${arg.parentEntity}"/>
 	<vlayout
 		id="nodeFormContainer"
-		apply="org.zkoss.bind.BindComposer"
-		viewModel="@id('vm') @init(vm)"
+		sclass="form"
+        apply="org.zkoss.bind.BindComposer"
+        viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.EntityDefinitionVM')"
 		validationMessages="@id('vmsgs')"
 		form="@id('fx') 
 			@init(vm.tempFormObject)
 			@load(vm.formObject) 
-			@save(vm.formObject, before='applyChanges')
-			@validator('org.openforis.collect.designer.form.validator.NodeDefinitionFormValidator')">
+			@save(vm.formObject, before={'validate','applyChanges'})
+            @validator('org.openforis.collect.designer.form.validator.EntityDefinitionFormValidator', parentEntity=parentEntity)">
 		
-		<include src="survey_edit/schema/node_common.zul" />
+      <include src="survey_edit/schema/node_common.zul" otherLayoutForm="survey_edit/schema/entity_layout_part.zul" />
+
 	</vlayout>
 </zk>

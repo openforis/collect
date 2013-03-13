@@ -1,7 +1,9 @@
+<?component name="fieldErrorHandler" class="org.openforis.collect.designer.component.FieldErrorHandler"?>
+<?component name="multilanguageLabel" class="org.openforis.collect.designer.component.MultilanguageLabel" macroURI="/WEB-INF/view/zul/designer/component/multilanguage_label.zul"?>
 <zk>
 	<window id="unitsManagerPopUp" title="${labels.survey.unit.manager.title}" 
-		width="800px"
-		height="470px"
+		width="600px"
+		height="370px"
 		border="normal"
 		position="center" 
 		closable="false"
@@ -9,69 +11,77 @@
 		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.UnitsVM')"
 		validationMessages="@id('vmsgs')">
 		<borderlayout>
-			<west width="300px">
-				<vlayout>
-			        <listbox id="itemsListBox"
-			        	selectedItem="@load(vm.selectedItem)"
-			        	model="@load(vm.items)"
-			        	onSelect="@command('selectionChanged', selectedItem=self.selectedItem.value)"
-			        	height="300px"
-			        	width="100%">
-			        	<listhead>
-							<listheader label="" width="100%" />
-							<listheader label="" width="50px" />
-						</listhead>
-			            <template name="model">
-			                <listitem>
-			                    <listcell label="@load(each.name)" />
-			                    <listcell>
-			                    	<button image="/assets/images/cross-small.png"
-			                     		onClick="@command('deleteItem', item=each)" />
-			                    </listcell>
-			                </listitem>
-			            </template>
-			        </listbox>
-			        <button label="${labels.global.add_item}" onClick="@command('newItem')" />
-			    </vlayout>
+			<west width="220px">
+				<borderlayout>
+					<center border="none">
+    			        <listbox id="itemsListBox"
+    			        	selectedItem="@load(vm.selectedItem)"
+    			        	model="@load(vm.items)"
+    			        	onSelect="@command('selectionChanged', selectedItem=self.selectedItem.value)"
+    			        	width="220px"
+			        		vflex="true">
+    			        	<listhead>
+    							<listheader label="" width="100%" />
+    						</listhead>
+    			            <template name="model">
+    			                <listitem>
+    			                    <listcell label="@load(each.name)" />
+    			                </listitem>
+    			            </template>
+    			        </listbox>
+                    </center>
+                    <south border="none">
+		              <toolbar height="30px">
+      			       <toolbarbutton tooltiptext="${labels.global.add_item}" 
+                            image="/assets/images/add.png"
+                            onClick="@command('newItem')" />
+                        <toolbarbutton tooltiptext="${labels.global.delete_item}"
+                            image="/assets/images/delete.png"
+                            disabled="@load(empty vm.selectedItem)"
+                            onClick="@command('deleteItem', item=vm.selectedItem)" />
+                      </toolbar>
+                    </south>
+                </borderlayout>
 			</west>
 		    <center>
 		        <vlayout
 		        	id="formContainer"
 		        	visible="@load(vm.editingItem)"
+                    sclass="form"
 					form="@id('fx') 
-						@load(vm.formObject) @save(vm.formObject, before='applyChanges')
+						@load(vm.formObject)
+                        @save(vm.formObject, before={'validate','applyChanges'})
 						@validator('org.openforis.collect.designer.form.validator.UnitFormValidator')"
 					width="100%">
 					<grid>
 						<columns>
-							<column label="" width="150px" />
-							<column label="" width="100%" />
+							<column width="150px" />
+							<column />
 						</columns>
 						<rows>
 							<row>
 								<label value="${labels.survey.unit.name}:" />
-								<cell>
+                                <fieldErrorHandler message="@load(vmsgs['name'])">
 									<textbox width="150px" value="@bind(fx.name)" onChange="@command('applyChanges')" />
-									<label class="error" value="@load(vmsgs['name'])" />
-								</cell>
+                                </fieldErrorHandler>
 							</row>
 							<row>
-								<label value="${labels.survey.unit.label}:" />
-								<cell>
+								<multilanguageLabel value="${labels.survey.unit.label}" 
+                                  languageCode="@load(vm.currentLanguageCode)" />
+                                <fieldErrorHandler message="@load(vmsgs['label'])">
 									<textbox id="labelTextBox" width="150px" value="@bind(fx.label)" onChange="@command('applyChanges')" />
-									<label class="error" value="@load(vmsgs['label'])" />
-								</cell>
+                                </fieldErrorHandler>
 							</row>
 							<row>
-								<label value="${labels.survey.unit.abbreviation}:" />
-								<cell>
+								<multilanguageLabel value="${labels.survey.unit.abbreviation}" 
+                                  languageCode="@load(vm.currentLanguageCode)" />
+                                <fieldErrorHandler message="@load(vmsgs['abbreviation'])">
 									<textbox width="150px" value="@bind(fx.abbreviation)" onChange="@command('applyChanges')" />
-									<label class="error" value="@load(vmsgs['abbreviation'])" />
-								</cell>
+                                </fieldErrorHandler>
 							</row>
 							<row>
 								<label value="${labels.survey.unit.dimension.$}:" />
-								<cell>
+                                <fieldErrorHandler message="@load(vmsgs['dimensionLabel'])">
 									<listbox width="150px" model="@load(vm.availableDimensions)"
 										selectedItem="@bind(fx.dimensionLabel)" mold="select"
 										onSelect="@command('applyChanges')" >
@@ -79,15 +89,13 @@
 											<listitem label="@load(each)" />
 										</template>
 									</listbox>
-									<label class="error" value="@load(vmsgs['dimensionLabel'])" />
-								</cell>
+                                </fieldErrorHandler>
 							</row>
 							<row>
 								<label value="${labels.survey.unit.conversionFactor}:" />
-								<cell>
-									<decimalbox width="150px" value="@bind(fx.conversionFactor)" onChange="@command('applyChanges')" />
-									<label class="error" value="@load(vmsgs['conversionFactor'])" />
-								</cell>
+                                <fieldErrorHandler message="@load(vmsgs['conversionFactor'])">
+									<doublebox width="150px" value="@bind(fx.conversionFactor)" onChange="@command('applyChanges')" />
+                                </fieldErrorHandler>
 							</row>
 						</rows>
 					</grid>
@@ -95,7 +103,7 @@
 			</center>
 			<south>
 				<box align="center" width="100%">
-					<button label="${labels.global.close}" 
+					<button label="${labels.global.ok}" 
 						onClick="@global-command('closeUnitsManagerPopUp')" />
 				</box>
 			</south>

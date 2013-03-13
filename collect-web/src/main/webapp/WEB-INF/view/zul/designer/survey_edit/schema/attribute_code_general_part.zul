@@ -1,0 +1,50 @@
+<?component name="fieldErrorHandler" class="org.openforis.collect.designer.component.FieldErrorHandler"?>
+<zk>
+  <grid class="inner">
+    <columns>
+      <column width="150px" />
+      <column />
+    </columns>
+    <rows>
+      <row>
+        <label value="${labels.survey.schema.attribute.code.key}:" />
+        <checkbox checked="@load(fx.key eq true) @save(fx.key)"
+          onCheck="@command('applyChanges')" />
+      </row>
+      <row>
+        <label
+          value="${labels.survey.schema.attribute.code.code_list}:" />
+        <cell>
+          <hlayout>
+            <fieldErrorHandler message="@load(vmsgs['list'])">
+              <listbox width="150px" model="@load(vm.codeLists)"
+                selectedItem="@bind(fx.list)" mold="select"
+                onSelect="@command('applyChanges')">
+                <template name="model">
+                  <listitem label="@load(each.name)" />
+                </template>
+              </listbox>
+            </fieldErrorHandler>
+            <button sclass="icon"
+              tooltiptext="${labels.survey.code_list.manager.title}"
+              onClick="@global-command('openCodeListsManagerPopUp', selectedCodeList=fx.list)"
+              image="/assets/images/edit-small.png" />
+          </hlayout>
+        </cell>
+      </row>
+      <row>
+        <label value="${labels.survey.schema.attribute.code.strict}:" />
+        <checkbox checked="@load(fx.strict eq true) @save(fx.strict)"
+          onCheck="@command('applyChanges')" />
+      </row>
+      <row>
+        <label
+          value="${labels.survey.schema.attribute.code.parent_expression}:" />
+        <fieldErrorHandler message="@load(vmsgs['parentExpression'])">
+          <textbox width="150px" value="@bind(fx.parentExpression)"
+            onChange="@command('applyChanges')" />
+        </fieldErrorHandler>
+      </row>
+    </rows>
+  </grid>
+</zk>

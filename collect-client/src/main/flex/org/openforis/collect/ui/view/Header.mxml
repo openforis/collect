@@ -16,24 +16,28 @@
 			import org.openforis.collect.client.LogoClient;
 			import org.openforis.collect.i18n.Message;
 			import org.openforis.collect.model.proxy.UserProxy;
+			import org.openforis.collect.ui.Images;
+			import org.openforis.collect.util.ApplicationConstants;
 
-			[Bindable]
-			public var logoData:ByteArray;
-			
 			private function init():void  {
 				var client:LogoClient = ClientFactory.logoClient;
 				var logoResponder:AsyncResponder;
 				logoResponder = new AsyncResponder(logoResultHandler, logoFaultHandler);
-				client.loadLogo(logoResponder, 0);
+				client.loadLogo(logoResponder, ApplicationConstants.COUNTRY_LOGO_ID);
 			}
 			
 			protected function logoResultHandler(event:ResultEvent, token:Object):void {
 				var data:ByteArray = event.result as ByteArray;				
-				logoData = data;
+				if ( data == null ) {
+					image.source = Images.DEFAULT_LOGO;
+				} else {
+					image.source = data;
+				}
 			}
 			
 			protected function logoFaultHandler(event:FaultEvent, token:Object = null):void {
 				//AlertUtil.showError('error.logoNotFound'); 
+				image.source = Images.DEFAULT_LOGO;
 			}
 			
 		]]>
@@ -41,33 +45,16 @@
 	
 	<s:Group>
         <s:Image source="@Embed(source='/assets/images/banner.jpg')"/>
-        <s:Image source="{logoData}" right="0" /> 
-		
-		<s:VGroup right="0" horizontalAlign="right">
-			<s:HGroup verticalAlign="middle">
-				<!--<s:Label text="{Message.get('global.loggedAsLabel')}" />-->
-				
-				<s:Label id="loggedAsText"
-						 text="{Application.user.name}"
-						 styleName="formLabel"
-						 />
-				<!--<s:Button id="logoutButton"
-						  useHandCursor="true"
-						  buttonMode="true"
-						  toolTip="{Message.get('settings.logout')}"
-						  styleName="logout"
-						  verticalCenter="0"
-						  right="0"
-						  />-->
-				<mx:PopUpMenuButton id="settingsButton"
-									openAlways="true"
-									toolTip="{Message.get('settings.tooltip')}" 
-									useHandCursor="true" buttonMode="true" 
-									styleName="settings"
-									arrowButtonWidth="20"
-									width="20"
-									/>
-			</s:HGroup>
+		<s:VGroup verticalCenter="0" 
+				  right="0" 
+				  paddingTop="5" 
+				  paddingBottom="5"
+				  paddingRight="5"
+				  paddingLeft="5">
+	        <s:Image id="image" 
+					 maxHeight="80"
+					 maxWidth="80"
+					 smooth="true" /> 
 		</s:VGroup>
 	</s:Group>
 	

@@ -1,38 +1,19 @@
+<?component name="fieldErrorHandler" class="org.openforis.collect.designer.component.FieldErrorHandler"?>
 <zk>
+    <custom-attributes parentEntity="${arg.parentEntity}"/>
 	<vlayout 
 		id="nodeFormContainer"
-		apply="org.zkoss.bind.BindComposer"
-		viewModel="@id('vm') @init(vm)"
+		sclass="form"
+        apply="org.zkoss.bind.BindComposer"
+		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.DefaultAttributeVM')"
 		validationMessages="@id('vmsgs')"
 		form="@id('fx')
 			@init(vm.tempFormObject)
 			@load(vm.formObject) 
-			@save(vm.formObject, before='applyChanges')
-			@validator('org.openforis.collect.designer.form.validator.AttributeDefinitionFormValidator')">
+			@save(vm.formObject, before={'validate','applyChanges'})
+            @validator('org.openforis.collect.designer.form.validator.FileAttributeDefinitionFormValidator', parentEntity=parentEntity)">
 		
-		<include src="survey_edit/schema/attribute_common.zul" />
-		
-		<grid>
-			<columns>
-				<column label="" width="150px" />
-				<column label="" />
-			</columns>
-			<rows>
-				<row>
-					<label value="${labels.survey.schema.attribute.file.max_size}:" />
-					<cell>
-						<intbox value="@bind(fx.maxSize)" />
-						<label class="error" value="@load(vmsgs['maxSize'])" onChange="@command('applyChanges')" />
-					</cell>
-				</row>
-				<row>
-					<label value="${labels.survey.schema.attribute.file.extensions}:" />
-					<cell>
-						<textbox width="150px" value="@bind(fx.extensions)" onChange="@command('applyChanges')" />
-						<label class="error" value="@load(vmsgs['extensions'])" />
-					</cell>
-				</row>
-			</rows>
-		</grid>
+        <include src="survey_edit/schema/attribute_common.zul" otherGeneralDetailsForm="survey_edit/schema/attribute_file_general_part.zul" />
+        
 	</vlayout>
 </zk>

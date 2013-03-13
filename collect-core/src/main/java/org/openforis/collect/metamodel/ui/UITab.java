@@ -13,6 +13,14 @@ import org.openforis.idm.metamodel.LanguageSpecificTextMap;
  */
 public class UITab extends UITabSet {
 
+	public UITab() {
+		super(null);
+	}
+	
+	UITab(UIOptions uiOptions) {
+		super(uiOptions);
+	}
+
 	private static final long serialVersionUID = 1L;
 
 	private LanguageSpecificTextMap labels;
@@ -46,7 +54,24 @@ public class UITab extends UITabSet {
 	public void removeLabel(String language) {
 		labels.remove(language);
 	}
+	
+	public List<UITab> getSiblings() {
+		UITabSet parent = getParent();
+		return parent.getTabs();
+	}
+	
+	public int getIndex() {
+		List<UITab> siblings = getSiblings();
+		int index = siblings.indexOf(this);
+		return index;
+	}
 
+	@Override
+	public void detatch() {
+		super.detatch();
+		uiOptions.removeTabAssociation(this);
+	}
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -72,5 +97,4 @@ public class UITab extends UITabSet {
 		return true;
 	}
 
-	
 }

@@ -7,19 +7,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
-import org.openforis.collect.Proxy;
 import org.openforis.idm.metamodel.Unit;
 
 /**
  * @author M. Togna
+ * @author S. Ricci
  * 
  */
-public class UnitProxy implements Proxy {
+public class UnitProxy extends IdentifiableSurveyObjectProxy {
 
 	private transient Unit unit;
 
 	public UnitProxy(Unit unit) {
-		super();
+		super(unit);
 		this.unit = unit;
 	}
 
@@ -44,7 +44,7 @@ public class UnitProxy implements Proxy {
 	}
 
 	@ExternalizedProperty
-	public Number getConversionFactor() {
+	public Double getConversionFactor() {
 		return unit.getConversionFactor();
 	}
 

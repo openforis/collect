@@ -1,6 +1,8 @@
+<?component name="fieldErrorHandler" class="org.openforis.collect.designer.component.FieldErrorHandler"?>
+<?component name="multilanguageLabel" class="org.openforis.collect.designer.component.MultilanguageLabel" macroURI="/WEB-INF/view/zul/designer/component/multilanguage_label.zul"?>
 <zk>
 	<window 
-		title="${labels.survey.srs.manager.title}" 
+		title="${labels.survey.srs.$}" 
 		height="400px"
 		width="700px"
 		border="normal"
@@ -9,37 +11,40 @@
 		apply="org.zkoss.bind.BindComposer"
 		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SpatialReferenceSystemsVM')">
 		<borderlayout>
-			<west width="220px">
+			<west width="180px">
 				<borderlayout>
 					<center border="none">
 						<listbox id="itemsListBox"
 				        	selectedItem="@load(vm.selectedItem)"
 				        	model="@load(vm.items)"
 				        	onSelect="@command('selectionChanged', selectedItem=self.selectedItem.value)"
-				        	width="220px"
+				        	width="100%"
 				        	vflex="true">
 				        	<listhead>
-								<listheader label="" width="150px" />
-								<listheader label="" width="50px" />
+								<listheader label="" width="100%" />
 							</listhead>
 				            <template name="model">
 				                <listitem>
 				                    <listcell label="@load(each.id)" />
-				                    <listcell>
-				                    	<button image="/assets/images/cross-small.png"
-				                     		onClick="@command('deleteItem', item=each)" />
-				                    </listcell>
 				                </listitem>
 				            </template>
 				        </listbox>
 					</center>
 					<south border="none">
-				        <toolbar>
-				        	<toolbarbutton label="${labels.global.add_item}" onClick="@command('newItem')" />
-				        	<toolbarbutton image="/assets/images/arrow-up.png"
+				        <toolbar height="30px">
+				        	<toolbarbutton tooltiptext="${labels.global.add_item}" 
+                                    image="/assets/images/add.png"
+                                    onClick="@command('newItem')" />
+                            <toolbarbutton tooltiptext="${labels.global.delete_item}" 
+                                    image="/assets/images/delete.png"
+                                    disabled="@load(empty vm.selectedItem)" 
+                                    onClick="@command('deleteItem', item=vm.selectedItem)" />
+				        	<toolbarbutton tooltiptext="${labels.global.item.move_up}" 
+                                    image="/assets/images/arrow-up.png"
 									disabled="@load(vm.moveSelectedItemUpDisabled)" 
 						        	onClick="@command('moveSelectedItemUp')" />
-				        	<toolbarbutton image="/assets/images/arrow-down.png"
+				        	<toolbarbutton tooltiptext="${labels.global.item.move_down}" 
+                                    image="/assets/images/arrow-down.png"
 									disabled="@load(vm.moveSelectedItemDownDisabled)" 
 						        	onClick="@command('moveSelectedItemDown')" />
 				        </toolbar>
@@ -49,45 +54,46 @@
 	        <center>
 		        <div 
 		        	visible="@load(vm.editingItem)"
+                    sclass="form"
 					form="@id('fx') 
-						@load(vm.formObject) @save(vm.formObject, before='applyChanges')
-						@validator('org.openforis.collect.designer.form.validator.SRSFormValidator')"
+						@load(vm.formObject) 
+                        @save(vm.formObject, before={'validate','applyChanges'})
+                        @validator('org.openforis.collect.designer.form.validator.SRSFormValidator')"
 					width="500px">
 					<grid>
 						<columns>
-							<column label="" width="100px" />
-							<column label="" width="100%" />
+							<column width="100px" />
+							<column />
 						</columns>
 						<rows>
 							<row>
 								<label value="${labels.survey.srs.id}:" />
-								<cell>
+								<fieldErrorHandler message="@load(vmsgs['id'])">
 									<textbox width="150px" value="@bind(fx.id)" onChange="@command('applyChanges')" />
-									<label class="error" value="@load(vmsgs['id'])" />
-								</cell>
+								</fieldErrorHandler>
 							</row>
 							<row>
-								<label value="${labels.survey.srs.label}:" />
-								<cell>
+								<multilanguageLabel value="${labels.survey.srs.label}" 
+                                  languageCode="@load(vm.currentLanguageCode)" />
+                                <fieldErrorHandler message="@load(vmsgs['label'])">
 									<textbox width="150px" value="@bind(fx.label)" onChange="@command('applyChanges')" />
-									<label class="error" value="@load(vmsgs['label'])" />
-								</cell>
+								</fieldErrorHandler>
 							</row>
 							<row>
-								<label value="${labels.survey.srs.description}:" />
-								<cell>
-									<textbox width="150px" value="@bind(fx.description)" onChange="@command('applyChanges')" />
-									<label class="error" value="@load(vmsgs['description'])" />
-								</cell>
+								<multilanguageLabel value="${labels.survey.srs.description}" 
+                                  languageCode="@load(vm.currentLanguageCode)" />
+                                <fieldErrorHandler message="@load(vmsgs['description'])">
+									<textbox width="300px" multiline="true" rows="4"
+                                      value="@bind(fx.description)" onChange="@command('applyChanges')" />
+								</fieldErrorHandler>
 							</row>
 							<row>
 								<label value="${labels.survey.srs.wkt}:" />
-								<cell>
-									<textbox width="250px" value="@bind(fx.wellKnownText)" 
+                                <fieldErrorHandler message="@load(vmsgs['wellKnownText'])">
+									<textbox width="300px" value="@bind(fx.wellKnownText)" 
 										multiline="true" rows="10" cols="40"
 										onChange="@command('applyChanges')" />
-									<label class="error" value="@load(vmsgs['wellKnownText'])" />
-								</cell>
+								</fieldErrorHandler>
 							</row>
 						</rows>
 					</grid>
@@ -95,7 +101,7 @@
 			</center>
 			<south>
 				<box align="center" width="100%">
-					<button label="${labels.global.close}" 
+					<button label="${labels.global.ok}" 
 						onClick="@global-command('closeSRSManagerPopUp')" />
 				</box>
 			</south>

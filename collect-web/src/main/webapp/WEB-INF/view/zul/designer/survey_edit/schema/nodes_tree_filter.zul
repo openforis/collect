@@ -1,0 +1,33 @@
+<zk>
+  <custom-attributes canEditRootEntities="${arg.canEditRootEntities}" />
+  <hlayout sclass="controlBar">
+    <label value="${labels.survey.schema.root_entity}:" />
+    <listbox width="150px" model="@load(vm.rootEntities)"
+      selectedItem="@load(vm.selectedRootEntity)" mold="select"
+      onSelect="@command('rootEntitySelected', rootEntity=self.selectedItem.value)">
+      <template name="model">
+        <listitem label="@load(each.name)" />
+      </template>
+    </listbox>
+    <hlayout visible="${canEditRootEntities}">
+      <button sclass="icon"
+        tooltiptext="${labels.survey.schema.add_root_entity}"
+        image="/assets/images/add.png"
+        onClick="@command('addRootEntity')" />
+    </hlayout>
+    <label value="${labels.survey.schema.form_version}:" />
+    <listbox width="150px" model="@load(vm.formVersions)"
+      selectedItem="@load(vm.selectedVersion)" mold="select"
+      onSelect="@command('versionSelected', version=self.selectedItem.value)">
+      <template name="model">
+        <listitem label="@load(each.name)" />
+      </template>
+    </listbox>
+    <button sclass="icon"
+      tooltiptext="${labels.survey.versioning_manager}"
+      onClick="@global-command('openVersioningManagerPopUp')"
+      image="/assets/images/edit-small.png" />
+    <button label="${labels.survey.preview.show_preview}"
+      onClick="@global-command('showPreview', formVersion=vm.selectedVersion, rootEntity=vm.selectedRootEntity)" />
+  </hlayout>
+</zk>

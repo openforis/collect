@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Stack;
 
 import org.apache.commons.lang3.StringUtils;
+import org.openforis.collect.designer.model.NamedObject;
 import org.openforis.collect.designer.session.SessionStatus;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.Resources;
@@ -46,23 +47,16 @@ public class TabsGroupVM extends BaseVM {
 	private static final String TAB_NAME_SEPARATOR = "_";
 	public static final String TAB_CHANGED_GLOBAL_COMMAND = "tabChanged";
 	
-	public static UITab FAKE_ADD_TAB;
+	public static NamedObject FAKE_ADD_TAB;
 	
 	static {
-		FAKE_ADD_TAB = new UITab();
-		FAKE_ADD_TAB.setLabel(null, "+");
+		FAKE_ADD_TAB = new NamedObject("survey.layout.tab.add_short");
 	}
 	
 	@Wire
 	private Tabbox tabbox;
 	
-	@AfterCompose
-	public void afterCompose(@ContextParam(ContextType.VIEW) Component view){
-		 Selectors.wireComponents(view, this, false);
-	}
-	
 	private UITabSet tabSet;
-
 	private Window tabLabelPopUp;
 	
 	@Init
@@ -70,10 +64,16 @@ public class TabsGroupVM extends BaseVM {
 		this.tabSet = tabSet;
 	}
 	
+	@AfterCompose
+	public void afterCompose(@ContextParam(ContextType.VIEW) Component view){
+		 Selectors.wireComponents(view, this, false);
+	}
+	
 	@Command
 	@NotifyChange({"tabs"})
 	public void addTab() {
-		UITab tab = new UITab();
+		UIOptions uiOptions = tabSet.getUIOptions();
+		UITab tab = uiOptions.createTab();
 		String tabName = generateNewTabName(tabSet);
 		tab.setName(tabName);
 		tabSet.addTab(tab);
@@ -93,7 +93,7 @@ public class TabsGroupVM extends BaseVM {
 			SessionStatus sessionStatus = getSessionStatus();
 			CollectSurvey survey = sessionStatus.getSurvey();
 			UIOptions uiOpts = survey.getUIOptions();
-			List<NodeDefinition> nodesPerTab = uiOpts.getNodesPerTab(survey, tab, false);
+			List<NodeDefinition> nodesPerTab = uiOpts.getNodesPerTab(tab, false);
 			if ( nodesPerTab.isEmpty() ) {
 				UITabSet parent = tab.getParent();
 				parent.removeTab(tab);
@@ -172,8 +172,8 @@ public class TabsGroupVM extends BaseVM {
 	}
 	
 	@DependsOn("tabs")
-	public List<UITab> getTabsPlusAddButton() {
-		List<UITab> tabs = new ArrayList<UITab>();
+	public List<Object> getTabsPlusAddButton() {
+		List<Object> tabs = new ArrayList<Object>();
 		if ( tabSet != null ) {
 			tabs.addAll(tabSet.getTabs());
 		}
@@ -181,7 +181,7 @@ public class TabsGroupVM extends BaseVM {
 		return tabs;
 	}
 
-	public UITab getFakeAddTab() {
+	public NamedObject getFakeAddTab() {
 		return FAKE_ADD_TAB;
 	}
 

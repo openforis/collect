@@ -91,7 +91,7 @@ package org.openforis.collect.presenter {
 					if ( attrDefn.parentLayout == UIUtil.LAYOUT_FORM ) {
 						view.currentState = RangeAttributeRenderer.SINGLE_UNIT_STATE;
 						var unit:UnitProxy = UnitProxy(units.getItemAt(0));
-						view.unitLabel.text = unit.name;
+						view.unitLabel.text = unit.getAbbreviation();
 					} else {
 						view.currentState = RangeAttributeRenderer.NO_UNIT_STATE;
 					}

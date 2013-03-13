@@ -1,12 +1,16 @@
 package org.openforis.collect.metamodel.ui;
 
-import java.io.Serializable;
+import static org.openforis.collect.metamodel.ui.UIOptionsConstants.UI_NAMESPACE_URI;
+import static org.openforis.collect.metamodel.ui.UIOptionsConstants.UI_TYPE;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.Stack;
 
 import javax.xml.namespace.QName;
 
@@ -14,11 +18,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.ApplicationOptions;
 import org.openforis.idm.metamodel.EntityDefinition;
+import org.openforis.idm.metamodel.LanguageSpecificText;
 import org.openforis.idm.metamodel.NodeDefinition;
+import org.openforis.idm.metamodel.NodeDefinitionVisitor;
+import org.openforis.idm.metamodel.NodeLabel;
 import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.util.CollectionUtil;
-
-import static org.openforis.collect.metamodel.ui.UIOptionsConstants.*;
 
 
 /**
@@ -30,6 +35,9 @@ public class UIOptions implements ApplicationOptions, Serializable {
 
 	private static final long serialVersionUID = 1L;
 	
+	private static final String TABSET_NAME_PREFIX = "tabset_";
+	private static final String TAB_NAME_PREFIX = "tab_";
+
 	public enum Annotation {
 		TAB_SET(new QName(UI_NAMESPACE_URI, UIOptionsConstants.TAB_SET_NAME)),
 		TAB_NAME(new QName(UI_NAMESPACE_URI, UIOptionsConstants.TAB)),
@@ -53,123 +61,292 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		FORM, TABLE
 	}
 	
+	private CollectSurvey survey;
 	private List<UITabSet> tabSets;
+	
+	public UIOptions() {
+	}
+	
+	public UIOptions(CollectSurvey survey) {
+		this();
+		this.survey = survey;
+	}
 
 	@Override
 	public String getType() {
 		return UI_TYPE;
 	}
 
-	public void init() {
-		initParentRefernces();
+	public CollectSurvey getSurvey() {
+		return survey;
 	}
-
-	protected void initParentRefernces() {
-		if ( tabSets != null ) {
-			for (UITabSet group : tabSets) {
-				setParentInChildrenTabs(group);
-			}
-		}
-	}
-
-	protected void setParentInChildrenTabs(UITabSet group) {
-		List<UITab> tabs = group.getTabs();
-		for (UITab uiTab : tabs) {
-			uiTab.setParent(group);
-			setParentInChildrenTabs(uiTab);
-		}
+	
+	public void setSurvey(CollectSurvey survey) {
+		this.survey = survey;
 	}
 	
 	public List<UITabSet> getTabSets() {
 		return CollectionUtil.unmodifiableList(tabSets);
 	}
 	
-	public UITab getTab(NodeDefinition nodeDefn) {
-		return getTab(nodeDefn, true);
+	public UITabSet createTabSet() {
+		return createTabSet(TABSET_NAME_PREFIX + survey.nextId());
 	}
 	
-	public UITab getTab(NodeDefinition nodeDefn, boolean includeInherited) {
-		UITab tab = null;
-		EntityDefinition rootEntity = nodeDefn.getRootEntity();
-		UITabSet tabSet = getTabSet(rootEntity);
-		if ( tabSet != null ) {
-			String tabName = nodeDefn.getAnnotation(Annotation.TAB_NAME.getQName());
-			NodeDefinition parentDefn = nodeDefn.getParentDefinition();
-			if ( StringUtils.isNotBlank(tabName) && ( parentDefn == null || parentDefn.getParentDefinition() == null ) ) {
-				tab = tabSet.getTab(tabName);
-			} else if ( parentDefn != null ) {
-				UITab parentTab = getTab(parentDefn);
-				if ( parentTab != null && StringUtils.isNotBlank(tabName) ) {
-					tab = parentTab.getTab(tabName);
-				} else if ( includeInherited ) {
-					tab = parentTab;
-				}
-			}
-		}
+	public UITabSet createTabSet(String name) {
+		UITabSet result = new UITabSet(this);
+		result.setName(name);
+		return result;
+	}
+	
+	public UITab createTab() {
+		return createTab(TAB_NAME_PREFIX + survey.nextId());
+	}
+
+	public UITab createTab(String name) {
+		UITab result = new UITab(this);
+		result.setName(name);
+		return result;
+	}
+	
+	public UITabSet createRootTabSet(EntityDefinition rootEntity) {
+		UIOptions uiOpts = survey.getUIOptions();
+		UITabSet tabSet = uiOpts.createTabSet();
+		UITab mainTab = createMainTab(rootEntity, tabSet);
+		uiOpts.addTabSet(tabSet);
+		uiOpts.assignToTabSet(rootEntity, tabSet);
+		uiOpts.assignToTab(rootEntity, mainTab);
+		return tabSet;
+	}
+
+	protected UITab createMainTab(EntityDefinition nodeDefn,
+			UITabSet tabSet) {
+		UITab tab = createTab();
+		copyLabels(nodeDefn, tab);
+		tabSet.addTab(tab);
 		return tab;
 	}
 
-	public UITabSet getTabSet(EntityDefinition rootEntityDefn) {
+	protected void copyLabels(EntityDefinition nodeDefn, UITab tab) {
+		removeLabels(tab);
+		List<NodeLabel> labels = nodeDefn.getLabels();
+		for (NodeLabel label : labels) {
+			if ( label.getType() == NodeLabel.Type.INSTANCE ) {
+				tab.setLabel(label.getLanguage(), label.getText());
+			}
+		}
+	}
+
+	protected void removeLabels(UITab tab) {
+		List<LanguageSpecificText> labels = tab.getLabels();
+		for (LanguageSpecificText label : labels) {
+			tab.removeLabel(label.getLanguage());
+		}
+	}
+	
+	public UITab getMainTab(UITabSet rootTabSet) {
+		List<UITab> tabs = rootTabSet.getTabs();
+		if ( tabs.isEmpty() ) {
+			return null;
+		} else {
+			return tabs.get(0);
+		}
+	}
+	
+	public boolean isMainTab(UITab tab) {
+		return tab.getIndex() == 0 && tab.getDepth() == 1;
+	}
+	
+	public UITab getAssignedTab(NodeDefinition nodeDefn) {
+		return getAssignedTab(nodeDefn, true);
+	}
+	
+	public UITab getAssignedTab(NodeDefinition nodeDefn, boolean includeInherited) {
+		EntityDefinition parentDefn = (EntityDefinition) nodeDefn.getParentDefinition();
+		return getAssignedTab(parentDefn, nodeDefn, includeInherited);
+	}
+	
+	public UITab getAssignedTab(EntityDefinition parentDefn, NodeDefinition nodeDefn, boolean includeInherited) {
+		UITab result = null;
+		UITabSet rootTabSet = getAssignedRootTabSet(parentDefn, nodeDefn);
+		if ( rootTabSet != null ) {
+			String tabName = nodeDefn.getAnnotation(Annotation.TAB_NAME.getQName());
+			if ( StringUtils.isNotBlank(tabName) && ( parentDefn == null || parentDefn.getParentDefinition() == null ) ) {
+				result = rootTabSet.getTab(tabName);
+			} else if ( parentDefn != null ) {
+				UITab parentTab = getAssignedTab(parentDefn);
+				if ( parentTab != null && StringUtils.isNotBlank(tabName) ) {
+					result = parentTab.getTab(tabName);
+				} else if ( includeInherited ) {
+					result = parentTab;
+				}
+			}
+		}
+		return result;
+	}
+
+	protected UITabSet getAssignedRootTabSet(EntityDefinition parentDefn, NodeDefinition nodeDefn) {
+		EntityDefinition rootEntityDefn;
+		if ( parentDefn != null ) {
+			rootEntityDefn = parentDefn.getRootEntity();
+		} else if ( nodeDefn instanceof EntityDefinition ) {
+			rootEntityDefn = (EntityDefinition) nodeDefn;
+		} else {
+			throw new IllegalArgumentException("Parent entity definition not specified");
+		}
+		UITabSet tabSet = getAssignedRootTabSet(rootEntityDefn);
+		return tabSet;
+	}
+
+	public UITabSet getAssignedRootTabSet(EntityDefinition rootEntityDefn) {
 		String tabSetName = rootEntityDefn.getAnnotation(Annotation.TAB_SET.getQName());
 		UITabSet tabSet = getTabSet(tabSetName);
 		return tabSet;
 	}
 	
-	public List<UITab> getAllowedTabs(NodeDefinition nodeDefn) {
-		EntityDefinition rootEntity = nodeDefn.getRootEntity();
-		UITabSet tabSet = getTabSet(rootEntity);
-		if ( tabSet != null ) {
-			NodeDefinition parentDefn = nodeDefn.getParentDefinition();
-			if ( parentDefn == null || parentDefn.getParentDefinition() == null ) {
-				return tabSet.getTabs();
-			} else {
-				UITab parentTab = getTab(parentDefn);
-				if ( parentTab != null ) {
-					return parentTab.getTabs();
-				}
-			}
-		}
-		return Collections.emptyList();
+	public List<UITab> getAssignableTabs(EntityDefinition parentEntity, NodeDefinition contextNode) {
+		boolean contextNodeIsMultipleEntity = contextNode instanceof EntityDefinition && contextNode.isMultiple();
+		Layout contextNodeLayout = contextNode instanceof EntityDefinition ? getLayout((EntityDefinition) contextNode): null;
+		int contextNodeId = contextNode.getId();
+		return getAssignableTabs(parentEntity, contextNodeIsMultipleEntity,
+				contextNodeLayout, contextNodeId);
 	}
 
+	public List<UITab> getAssignableTabs(EntityDefinition parentEntity,
+			boolean contextNodeIsMultipleEntity, Layout contextNodeLayout,
+			int contextNodeId) {
+		List<UITab> result = new ArrayList<UITab>(getTabsAssignableToChildren(parentEntity));
+		Iterator<UITab> it = result.iterator();
+		while (it.hasNext()) {
+			UITab tab = (UITab) it.next();
+			boolean mainTab = isMainTab(tab);
+			EntityDefinition associatedMultipleEntityForm = getFormLayoutMultipleEntity(tab);
+			if ( mainTab && contextNodeIsMultipleEntity && 
+					contextNodeLayout == Layout.FORM ||
+					associatedMultipleEntityForm != null && associatedMultipleEntityForm.getId() != contextNodeId ) {
+				it.remove();
+			}
+		}
+		return result;
+	}
+	
+	public UITabSet getAssignedTabSet(EntityDefinition entityDefn) {
+		if ( entityDefn.getParentDefinition() == null ) {
+			return getAssignedRootTabSet(entityDefn);
+		} else {
+			return getAssignedTab(entityDefn);
+		}
+	}
+
+	public List<UITab> getTabsAssignableToChildren(EntityDefinition entityDefn) {
+		EntityDefinition rootEntity = entityDefn.getRootEntity();
+		UITabSet rootTabSet = getAssignedRootTabSet(rootEntity);
+		UITabSet parentTabSet = null;
+		if ( rootTabSet != null ) {
+			if ( entityDefn == null || entityDefn.getParentDefinition() == null ) {
+				parentTabSet = rootTabSet;
+			} else {
+				UITab assignedTab = getAssignedTab(entityDefn);
+				parentTabSet = assignedTab;
+			}
+		}
+		if (parentTabSet == null) {
+			return Collections.emptyList();
+		} else {
+			return parentTabSet.getTabs();
+		}
+	}
+	
 	public boolean isAssignableTo(NodeDefinition nodeDefn, UITab tab) {
-		List<UITab> allowedTabs = getAllowedTabs(nodeDefn);
+		EntityDefinition parentEntityDefn = (EntityDefinition) nodeDefn.getParentDefinition();
+		List<UITab> allowedTabs = getTabsAssignableToChildren(parentEntityDefn);
 		boolean result = allowedTabs.contains(tab);
 		return result;
 	}
 
-	public List<NodeDefinition> getNodesPerTab(CollectSurvey survey, UITab tab, boolean includeChildrenOfEntities) {
+	
+	public boolean isAssociatedWithMultipleEntityForm(UITab tab) {
+		return getFormLayoutMultipleEntity(tab) != null;
+	}
+	
+	public List<NodeDefinition> getNodesPerTab(UITab tab, boolean includeDescendants) {
 		List<NodeDefinition> result = new ArrayList<NodeDefinition>();
 		UITabSet tabSet = tab.getRootTabSet();
-		EntityDefinition rootEntity = getRootEntityDefinition(survey, tabSet);
+		EntityDefinition rootEntity = getRootEntityDefinition(tabSet);
 		Queue<NodeDefinition> queue = new LinkedList<NodeDefinition>();
 		queue.addAll(rootEntity.getChildDefinitions());
 		while ( ! queue.isEmpty() ) {
 			NodeDefinition defn = queue.remove();
-			UITab nodeTab = getTab(defn);
+			UITab nodeTab = getAssignedTab(defn);
 			boolean nodeInTab = false;
 			if ( nodeTab != null && nodeTab.equals(tab) ) {
 				result.add(defn);
 				nodeInTab = true;
 			}
-			if ( defn instanceof EntityDefinition && (includeChildrenOfEntities || !nodeInTab) ) {
+			if ( defn instanceof EntityDefinition && (includeDescendants || !nodeInTab) ) {
 				queue.addAll(((EntityDefinition) defn).getChildDefinitions());
 			}
 		}
 		return result;
 	}
 
-	public void associateWithTab(NodeDefinition nodeDefn, UITab tab) {
+	public void assignToTabSet(EntityDefinition rootEntity, UITabSet tabSet) {
+		String name = tabSet.getName();
+		rootEntity.setAnnotation(Annotation.TAB_SET.getQName(), name);
+	}
+
+	public void assignToTab(NodeDefinition nodeDefn, UITab tab) {
 		String tabName = tab.getName();
 		nodeDefn.setAnnotation(Annotation.TAB_NAME.getQName(), tabName);
+		
+		afterTabAssociationChanged(nodeDefn);
+	}
+
+	protected void afterTabAssociationChanged(NodeDefinition nodeDefn) {
+		if ( nodeDefn instanceof EntityDefinition ) {
+			removeInvalidTabAssociationInDescendants((EntityDefinition) nodeDefn);
+		}
+	}
+
+	protected void removeInvalidTabAssociationInDescendants(EntityDefinition nodeDefn) {
+		((EntityDefinition) nodeDefn).traverse(new NodeDefinitionVisitor() {
+			@Override
+			public void visit(NodeDefinition descendantDefn) {
+				UITab descendantTab = getAssignedTab(descendantDefn, false);
+				if ( descendantTab == null ) {
+					//tab not set or not found
+					performTabAssociationRemoval(descendantDefn);
+				}
+			}
+		});
 	}
 	
 	public void removeTabAssociation(NodeDefinition nodeDefn) {
+		performTabAssociationRemoval(nodeDefn);
+		
+		afterTabAssociationChanged(nodeDefn);
+	}
+
+	protected void performTabAssociationRemoval(NodeDefinition nodeDefn) {
 		nodeDefn.setAnnotation(Annotation.TAB_NAME.getQName(), null);
 	}
 	
+	public void removeTabAssociation(UITab tab) {
+		Stack<UITab> stack = new Stack<UITab>();
+		stack.push(tab);
+		while ( ! stack.isEmpty() ) {
+			UITab currentTab = stack.pop();
+			List<NodeDefinition> nodesPerTab = getNodesPerTab(currentTab, true);
+			for (NodeDefinition nodeDefn : nodesPerTab) {
+				performTabAssociationRemoval(nodeDefn);
+			}
+			List<UITab> childTabs = currentTab.getTabs();
+			stack.addAll(childTabs);
+		}
+	}
+
 	public boolean isAssociatedToTab(NodeDefinition nodeDefn) {
-		UITab tab = getTab(nodeDefn);
+		UITab tab = getAssignedTab(nodeDefn);
 		return tab != null;
 	}
 	
@@ -190,17 +367,56 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		return layoutValue != null ? Layout.valueOf(layoutValue.toUpperCase()): null;
 	}
 
-	public void setLayout(NodeDefinition nodeDefn, Layout layout) {
+	public void setLayout(EntityDefinition entityDefn, Layout layout) {
 		String layoutValue = layout != null ? layout.name().toLowerCase(): null;
-		nodeDefn.setAnnotation(Annotation.LAYOUT.getQName(), layoutValue);
+		entityDefn.setAnnotation(Annotation.LAYOUT.getQName(), layoutValue);
+	}
+	
+	/**
+	 * Supported layouts are:
+	 * - Root entity: FORM
+	 * - Single entity: FORM and TABLE (only inside an entity with TABLE layout)
+	 * - Multiple entity: FORM only if it's the only multiple entity with FORM layout
+	 * 		into the tab
+	 * 
+	 * @param parentEntityDefn
+	 * @param entityDefn
+	 * @param layout
+	 * @return 
+	 */
+	public boolean isLayoutSupported(EntityDefinition parentEntityDefn, int entityDefnId, UITab associatedTab, boolean multiple, Layout layout) {
+		if ( parentEntityDefn == null ) {
+			return layout == Layout.FORM;
+		} else if ( ! multiple ) {
+			Layout parentLayout = getLayout(parentEntityDefn);
+			return layout == Layout.FORM || parentLayout == Layout.TABLE;
+		} else if ( layout == Layout.FORM) {
+			//UITab tab = getAssignedTab(parentEntityDefn, entityDefn, true);
+			EntityDefinition multipleEntity = getFormLayoutMultipleEntity(associatedTab);
+			return multipleEntity == null || multipleEntity.getId() == entityDefnId;
+		} else {
+			return true;
+		}
 	}
 
-	public EntityDefinition getRootEntityDefinition(CollectSurvey survey,
-			UITabSet tabSet) {
+	protected EntityDefinition getFormLayoutMultipleEntity(UITab tab) {
+		List<NodeDefinition> nodesPerTab = getNodesPerTab(tab, false);
+		for (NodeDefinition nodeDefn : nodesPerTab) {
+			if ( nodeDefn instanceof EntityDefinition && nodeDefn.isMultiple() ) {
+				Layout nodeLayout = getLayout((EntityDefinition) nodeDefn);
+				if ( nodeLayout == Layout.FORM ) {
+					return (EntityDefinition) nodeDefn;
+				}
+			}
+		}
+		return null;
+	}
+
+	public EntityDefinition getRootEntityDefinition(UITabSet tabSet) {
 		Schema schema = survey.getSchema();
 		List<EntityDefinition> rootEntityDefinitions = schema.getRootEntityDefinitions();
 		for (EntityDefinition defn : rootEntityDefinitions) {
-			UITabSet entityTabSet = getTabSet(defn);
+			UITabSet entityTabSet = getAssignedRootTabSet(defn);
 			if ( entityTabSet != null && entityTabSet.equals(tabSet) ) {
 				return defn;
 			}

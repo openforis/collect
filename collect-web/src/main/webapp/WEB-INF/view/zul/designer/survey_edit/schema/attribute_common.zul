@@ -1,19 +1,20 @@
+<?component name="fieldErrorHandler" class="org.openforis.collect.designer.component.FieldErrorHandler"?>
 <zk>
-	<include src="survey_edit/schema/node_common.zul" />
-
-	<grid>
-		<columns>
-			<column label="" width="150px" />
-			<column label="" width="100%" />
-		</columns>
-		<rows>
-			<row>
-				<label value="${labels.survey.schema.attribute.default_values}:" />
-				<cell>
-					<include src="survey_edit/schema/attribute_defaults_simple.zul" />
-					<label class="error" value="@load(vmsgs['attributeDefaults'])" />
-				</cell>
-			</row>
-		</rows>
-	</grid>
+	<custom-attributes otherGeneralDetailsForm="${arg.otherGeneralDetailsForm}"/>
+    <custom-attributes otherAttributesForm="${arg.otherAttributesForm}"/>
+  
+    <include src="survey_edit/schema/node_common.zul" 
+      otherGeneralDetailsForm="${otherGeneralDetailsForm}"
+      otherAttributesForm="${otherAttributesForm}" />
+    
+    <groupbox width="100%" closable="false" class="tableFieldSet">
+      <caption label="${labels.survey.schema.attribute.attribute_default.heading}"/>
+      <include src="survey_edit/schema/attribute_defaults_list.zul" />
+    </groupbox>
+    
+    <groupbox width="100%" closable="false" class="tableFieldSet">
+      <caption label="${labels.survey.schema.node.checks}:"/>
+      <include src="survey_edit/schema/check/list.zul" />
+    </groupbox>
+    
 </zk>

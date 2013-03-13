@@ -1,47 +1,56 @@
+<?component name="fieldErrorHandler" class="org.openforis.collect.designer.component.FieldErrorHandler"?>
+<?component name="multilanguageLabel" class="org.openforis.collect.designer.component.MultilanguageLabel" macroURI="/WEB-INF/view/zul/designer/component/multilanguage_label.zul"?>
 <zk>
 	<window id="versioningManagerPopUp" title="${labels.survey.versioning_manager}" 
 		apply="org.zkoss.bind.BindComposer"
 		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.VersioningVM')"
 		validationMessages="@id('vmsgs')"
-		width="800px" 
+		width="750px" 
 		height="300px"
 		border="normal"
 		position="center" 
 		closable="false">
 		<borderlayout>
-			<west width="220px">
+			<west width="180px">
 				<borderlayout>
 					<center border="none">
 						<listbox id="itemsListBox"
 				        	selectedItem="@load(vm.selectedItem)"
 				        	model="@load(vm.items)"
 				        	onSelect="@command('selectionChanged', selectedItem=self.selectedItem.value)"
-				        	width="220px"
+				        	width="100%px"
 				        	vflex="true">
 				        	<listhead>
-								<listheader label="" width="150px" />
-								<listheader label="" width="50px" />
+								<listheader label="" width="100%" />
 							</listhead>
 				            <template name="model">
 				                <listitem>
 				                    <listcell label="@load(each.name)" />
-				                    <listcell>
-				                    	<button image="/assets/images/cross-small.png"
-				                     		onClick="@command('deleteItem', item=each)" />
-				                    </listcell>
 				                </listitem>
 				            </template>
 				        </listbox>
 					</center>
 					<south border="none">
-				        <toolbar>
-				        	<toolbarbutton label="${labels.global.add_item}" onClick="@command('newItem')" />
-				        	<toolbarbutton image="/assets/images/arrow-up.png"
-									disabled="@load(vm.moveSelectedItemUpDisabled)" 
-						        	onClick="@command('moveSelectedItemUp')" />
-				        	<toolbarbutton image="/assets/images/arrow-down.png"
-									disabled="@load(vm.moveSelectedItemDownDisabled)" 
-						        	onClick="@command('moveSelectedItemDown')" />
+				        <toolbar height="30px">
+				        	<toolbarbutton
+				        	  tooltiptext="${labels.global.add_item}"
+				        	  image="/assets/images/add.png"
+				        	  onClick="@command('newItem')" />
+				        	<toolbarbutton
+				        	  tooltiptext="${labels.global.delete_item}"
+				        	  image="/assets/images/delete.png"
+				        	  disabled="@load(empty vm.selectedItem)"
+				        	  onClick="@command('deleteItem', item=vm.selectedItem)" />
+				        	<toolbarbutton
+                              tooltiptext="${labels.global.item.move_up}"
+                              image="/assets/images/arrow-up.png"
+                              disabled="@load(vm.moveSelectedItemUpDisabled)"
+                              onClick="@command('moveSelectedItemUp')" />
+                            <toolbarbutton
+                              tooltiptext="${labels.global.item.move_down}"
+                              image="/assets/images/arrow-down.png"
+                              disabled="@load(vm.moveSelectedItemDownDisabled)"
+                              onClick="@command('moveSelectedItemDown')" />
 				        </toolbar>
 					</south>
 				</borderlayout>
@@ -49,44 +58,45 @@
 	        <center>
 				<vlayout
 					visible="@load(vm.editingItem)"
+                    sclass="form"
 					form="@id('fx') 
-						@load(vm.formObject) @save(vm.formObject, before='applyChanges')
+						@load(vm.formObject)
+                        @save(vm.formObject, before={'validate','applyChanges'})
 						@validator('org.openforis.collect.designer.form.validator.ModelVersionFormValidator')"
 					width="100%">
 					<grid>
 						<columns>
-							<column label="" width="150px" />
-							<column label="" width="100%" />
+							<column width="150px" />
+							<column />
 						</columns>
 						<rows>
 							<row>
 								<label value="${labels.survey.versioning.name}:" />
-								<cell>
+      			                <fieldErrorHandler message="@load(vmsgs['name'])">
 									<textbox width="150px" value="@bind(fx.name)" onChange="@command('applyChanges')" />
-									<label class="error" value="@load(vmsgs['name'])" />
-								</cell>
+                                </fieldErrorHandler>
 							</row>
 							<row>
-								<label value="${labels.survey.versioning.label}:" />
-								<cell>
+								<multilanguageLabel value="${labels.survey.versioning.label}" 
+                                  languageCode="@load(vm.currentLanguageCode)" />
+      			                <fieldErrorHandler message="@load(vmsgs['label'])">
 									<textbox id="labelTextBox" width="150px" value="@bind(fx.label)" onChange="@command('applyChanges')" />
-									<label class="error" value="@load(vmsgs['label'])" />
-								</cell>
+                                </fieldErrorHandler>
 							</row>
 							<row>
-								<label value="${labels.survey.versioning.description}:" />
-								<cell>
-									<textbox width="150px" value="@bind(fx.description)" onChange="@command('applyChanges')" />
-									<label class="error" value="@load(vmsgs['description'])" />
-								</cell>
+								<multilanguageLabel value="${labels.survey.versioning.description}" 
+                                  languageCode="@load(vm.currentLanguageCode)" />
+      			                <fieldErrorHandler message="@load(vmsgs['description'])">
+									<textbox width="300px" multiline="true" rows="4"
+                                      value="@bind(fx.description)" onChange="@command('applyChanges')" />
+                                </fieldErrorHandler>
 							</row>
 							<row>
 								<label value="${labels.survey.versioning.date}:" />
-								<cell>
+      			                <fieldErrorHandler message="@load(vmsgs['date'])">
 									<datebox width="100px" compact="false" buttonVisible="true" format="@load(vm.dateFormat)" 
 			                    		value="@bind(fx.date)" onChange="@command('applyChanges')" />
-									<label class="error" value="@load(vmsgs['date'])" />
-								</cell>
+                                </fieldErrorHandler>
 							</row>
 						</rows>
 					</grid>
@@ -94,7 +104,7 @@
 			</center>
 			<south>
 				<box align="center" width="100%">
-					<button label="${labels.global.close}" 
+					<button label="${labels.global.ok}" 
 						onClick="@global-command('closeVersioningManagerPopUp')" />
 				</box>
 			</south>

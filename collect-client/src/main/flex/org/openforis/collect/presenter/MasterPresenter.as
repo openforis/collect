@@ -3,8 +3,6 @@ package org.openforis.collect.presenter {
 	 * 
 	 * @author Mino Togna
 	 * */
-	import flash.events.Event;
-	
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.events.FaultEvent;
 	import mx.rpc.events.ResultEvent;
@@ -14,7 +12,6 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.client.DataClient;
 	import org.openforis.collect.event.UIEvent;
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
-	import org.openforis.collect.model.CollectRecord$Step;
 	import org.openforis.collect.model.proxy.RecordProxy;
 	import org.openforis.collect.model.proxy.UserProxy;
 	import org.openforis.collect.ui.view.MasterView;
@@ -45,20 +42,11 @@ package org.openforis.collect.presenter {
 		
 		override internal function initEventListeners():void {
 			//eventDispatcher.addEventListener(ApplicationEvent.APPLICATION_INITIALIZED, applicationInitializedHandler);
-			eventDispatcher.addEventListener(UIEvent.SHOW_SURVEY_SELECTION, showSurveySelectionHandler);
-			eventDispatcher.addEventListener(UIEvent.SHOW_ROOT_ENTITY_SELECTION, showRootEntitySelectionHandler);
 			eventDispatcher.addEventListener(UIEvent.ROOT_ENTITY_SELECTED, rootEntitySelectedHandler);
+			eventDispatcher.addEventListener(UIEvent.SHOW_HOME_PAGE, backToHomeHandler);
 			eventDispatcher.addEventListener(UIEvent.BACK_TO_LIST, backToListHandler);
 			eventDispatcher.addEventListener(UIEvent.RECORD_SELECTED, recordSelectedHandler);
 			eventDispatcher.addEventListener(UIEvent.RECORD_CREATED, recordCreatedHandler);
-		}
-		
-		protected function showSurveySelectionHandler(event:Event):void {
-			_view.currentState = MasterView.SURVEY_SELECTION_STATE;
-		}
-		
-		protected function showRootEntitySelectionHandler(event:Event):void {
-			_view.currentState = MasterView.SURVEY_SELECTION_STATE;
 		}
 		
 		/**
@@ -91,22 +79,12 @@ package org.openforis.collect.presenter {
 		
 		protected function setActiveRecord(record:RecordProxy):void {
 			Application.activeRecord = record;
-			var user:UserProxy = Application.user;
-			var step:CollectRecord$Step = record.step;
 			var editable:Boolean = false;
-			switch ( step ) {
-				case CollectRecord$Step.ENTRY:
-					editable = user.hasEffectiveRole(UserProxy.ROLE_ENTRY) || 
-						user.hasEffectiveRole(UserProxy.ROLE_CLEANSING) || 
-						user.hasEffectiveRole(UserProxy.ROLE_ADMIN);
-					break;
-				case CollectRecord$Step.CLEANSING:
-					editable = user.hasEffectiveRole(UserProxy.ROLE_CLEANSING) || 
-						user.hasEffectiveRole(UserProxy.ROLE_ADMIN);
-					break;
-				case CollectRecord$Step.ANALYSIS:
-					editable = false
-					break;
+			if ( Application.preview ) {
+				editable = true;
+			} else {
+				var user:UserProxy = Application.user;
+				editable = user.canEdit(record);
 			}
 			Application.activeRecordEditable = editable;
 			_view.currentState = MasterView.DETAIL_STATE;
@@ -131,6 +109,12 @@ package org.openforis.collect.presenter {
 			_view.currentState = MasterView.DETAIL_STATE;
 		}
 		
+		internal function backToHomeHandler(event:UIEvent):void {
+			Application.activeSurvey = null;
+			Application.activeRootEntity = null;
+			_view.currentState = MasterView.HOME_STATE;
+		}
+			
 		internal function backToListHandler(event:UIEvent):void {
 			//reload record summaries 
 			_view.currentState = MasterView.LIST_STATE;
