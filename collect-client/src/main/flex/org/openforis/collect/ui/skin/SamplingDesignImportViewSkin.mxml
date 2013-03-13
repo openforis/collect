@@ -105,6 +105,7 @@
 			  gap="20"
 			  >
 		<s:Label id="progressTitle"
+				 text="{hostComponent.progressTitleText}"
 				 styleName="formLabel" />
 		
 		<mx:ProgressBar id="progressBar"
@@ -117,6 +118,7 @@
 						/>
 		
 		<s:Label id="progressLabel"
+				 text="{hostComponent.progressLabelText}"
 				 styleName="formLabel" />
 		
 		<s:Button id="cancelImportButton"

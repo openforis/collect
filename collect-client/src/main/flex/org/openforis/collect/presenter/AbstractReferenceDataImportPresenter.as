@@ -328,7 +328,11 @@ package org.openforis.collect.presenter {
 		protected function updateProgressBar(progressLabelResource:String):void {
 			var progressText:String;
 			if ( _state.total <= 0 ) {
-				progressText = Message.get(_messageKeys.PROCESSING);
+				if ( _state.processed > 0 ) {
+					progressText = Message.get(progressLabelResource, [_state.processed, '-']);
+				} else {
+					progressText = Message.get(_messageKeys.PROCESSING);
+				}
 				_view.progressBar.setProgress(0, 0);
 			} else {
 				progressText = Message.get(progressLabelResource, [_state.processed, _state.total]);

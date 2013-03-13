@@ -142,10 +142,10 @@ package org.openforis.collect.presenter {
 				return Message.get(messageKeys.SYNONYM);
 			} else {
 				var languageLabel:String = Languages.getLanguageLabel(langCode);
-				if ( languageLabel != null ) {
-					return languageLabel + " (" + langCode + ")";
-				} else {
+				if ( languageLabel == null ) {
 					return langCode;
+				} else {
+					return languageLabel + " (" + langCode + ")";
 				}
 			}
 		}
