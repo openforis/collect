@@ -8,7 +8,6 @@ package org.openforis.collect {
 	import mx.managers.CursorManager;
 	import mx.managers.ToolTipManager;
 	import mx.resources.Locale;
-	import mx.utils.URLUtil;
 	
 	import org.openforis.collect.i18n.Message;
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
@@ -67,6 +66,12 @@ package org.openforis.collect {
 				ExternalInterface.addCallback("isPreview", isPreview);
 				ExternalInterface.addCallback("getLeavingPageMessage", getLeavingPageMessage);
 			}
+		}
+		
+		public static function initLocale():void {
+			var localeString:String = FlexGlobals.topLevelApplication.parameters.locale as String;
+			var locale:Locale = new Locale(localeString);
+			Application.locale = locale;
 		}
 		
 		//called from External Interface (javascript)
@@ -195,12 +200,12 @@ package org.openforis.collect {
 		
 		public static function set locale(value:Locale):void {
 			_locale = value;
-			if ( _locale != null ) {
-				_localeString = value.toString();
-				_localeLanguageCode = _locale.language;
-			} else {
+			if ( _locale == null ) {
 				_localeString = null;
 				_localeLanguageCode = null;
+			} else {
+				_localeString = value.toString();
+				_localeLanguageCode = _locale.language;
 			}
 		}
 		

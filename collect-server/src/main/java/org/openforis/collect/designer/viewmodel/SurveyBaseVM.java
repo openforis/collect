@@ -352,9 +352,9 @@ public abstract class SurveyBaseVM extends BaseVM {
 		}
 		boolean work = surveyId != null && ! surveyId.equals(publishedSurveyId);
 		String surveyIdStr = surveyId == null ? "": surveyId.toString();
-		String localeStr = "en_US";
+		String localeStr = sessionStatus.getCurrentLanguageCode();
 		Map<String, String> result = new HashMap<String, String>();
-		result.put("lang", localeStr);
+		result.put("locale", localeStr);
 		result.put("work", "" + work);
 		result.put("surveyId", surveyIdStr);
 		return result;

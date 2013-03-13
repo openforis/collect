@@ -7,6 +7,7 @@
 
 package org.openforis.collect.metamodel.proxy {
 	import org.openforis.collect.Application;
+	import org.openforis.collect.util.CollectionUtil;
 
     [Bindable]
     [RemoteClass(alias="org.openforis.collect.metamodel.proxy.UITabProxy")]
@@ -16,11 +17,14 @@ package org.openforis.collect.metamodel.proxy {
 			var langCode:String = Application.localeLanguageCode;
 			var defaultLanguage:Boolean = Application.activeSurvey.defaultLanguageCode == langCode;
 			var result:String = LanguageSpecificTextProxy.getLocalizedText(this.labels, langCode, defaultLanguage);
+			if ( result == null ) {
+				return name;
+			}
 			return result;
 		}
 		
 		public function hasChildTab(name:String):Boolean {
-			if(this.tabs == null || this.tabs.length ==0){
+			if( CollectionUtil.isEmpty(this.tabs) ){
 				return false;
 			} else {
 				for each (var tab:UITabProxy in this.tabs) {

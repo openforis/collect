@@ -4,14 +4,10 @@
 package org.openforis.collect.designer.viewmodel;
 
 import java.io.ByteArrayOutputStream;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.http.NameValuePair;
-import org.apache.http.client.utils.URLEncodedUtils;
-import org.apache.http.message.BasicNameValuePair;
 import org.openforis.collect.designer.model.LabelKeys;
 import org.openforis.collect.designer.model.SurveyManagerUtil;
 import org.openforis.collect.designer.model.SurveyWorkSummary;
@@ -305,17 +301,17 @@ public class SurveyEditVM extends SurveyBaseVM {
 	@GlobalCommand
 	public void showPreview(@BindingParam("formVersion") ModelVersion formVersion, @BindingParam("rootEntity") EntityDefinition rootEntity) {
 		if ( validateShowPreview(rootEntity, formVersion) ) {
-			Execution current = Executions.getCurrent();
-			List<NameValuePair> params = new ArrayList<NameValuePair>();
-			params.add(new BasicNameValuePair("preview", "true"));
-			params.add(new BasicNameValuePair("surveyId", Integer.toString(survey.getId())));
-			params.add(new BasicNameValuePair("rootEntityId", Integer.toString(rootEntity.getId())));
+			Map<String, String> params = createBasicModuleParameters();
+			params.put("preview", "true");
+			params.put("surveyId", Integer.toString(survey.getId()));
+			params.put("work", "true");
+			params.put("rootEntityId", Integer.toString(rootEntity.getId()));
 			if ( formVersion != null ) {
-				params.add(new BasicNameValuePair("versionId", Integer.toString(formVersion.getId())));
+				params.put("versionId", Integer.toString(formVersion.getId()));
 			}
-			String uri = Resources.PREVIEW_PATH + "?" + URLEncodedUtils.format(params, "UTF-8");
-			current.sendRedirect(uri, PREVIEW_WINDOW_ID);
-			
+			String url = ComponentUtil.createUrl(Resources.Page.PREVIEW_PATH.getLocation(), params);
+			Execution current = Executions.getCurrent();
+			current.sendRedirect(url, PREVIEW_WINDOW_ID);
 			closePreviewPreferencesPopUp();
 		}
 	}

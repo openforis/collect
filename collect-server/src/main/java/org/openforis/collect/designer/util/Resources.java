@@ -9,15 +9,15 @@ public class Resources {
 	
 	public static final String PAGES_BASE_PATH = "/";
 	public static final String COMPONENTS_BASE_PATH = "/WEB-INF/view/zul/designer/";
-	public static final String PREVIEW_PATH = "index.htm";
 	
 	public enum Page {
 	
 		INDEX("index.htm"),
 		DESIGNER("designer.htm"),
 		SURVEY_EDIT("editSurvey.htm"),
-		COLLECT_SWF("/collect.swf");
-
+		COLLECT_SWF("collect.swf"),
+		PREVIEW_PATH("index.htm");
+		
 		private String location;
 	
 		private Page(String location) {
