@@ -6,18 +6,23 @@
  */
 
 package org.openforis.collect.metamodel.proxy {
+	import org.openforis.collect.Application;
 
     [Bindable]
     [RemoteClass(alias="org.openforis.collect.metamodel.proxy.CodeListItemProxy")]
     public class CodeListItemProxy extends CodeListItemProxyBase {
 		
-		public function getLabelText(language:String="en"):String {
-			var result:String = LanguageSpecificTextProxy.getLocalizedText(this.labels, language);
+		public function getLabelText():String {
+			var langCode:String = Application.localeLanguageCode;
+			var defaultLanguage:Boolean = Application.activeSurvey.defaultLanguageCode == langCode;
+			var result:String = LanguageSpecificTextProxy.getLocalizedText(labels, langCode, defaultLanguage);
 			return result;
 		}
 		
-		public function getDescriptionText(language:String = null):String {
-			var result:String = LanguageSpecificTextProxy.getLocalizedText(this.descriptions, language);
+		public function getDescriptionText():String {
+			var langCode:String = Application.localeLanguageCode;
+			var defaultLanguage:Boolean = Application.activeSurvey.defaultLanguageCode == langCode;
+			var result:String = LanguageSpecificTextProxy.getLocalizedText(descriptions, langCode, defaultLanguage);
 			return result;
 		}
 		

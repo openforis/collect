@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Context path="/collect" reloadable="false">
+	 <Resource 
+	   name="jdbc/collectDs" 
+	   auth="Container"
+	   type="javax.sql.DataSource"
+	   factory="org.apache.commons.dbcp.BasicDataSourceFactory"
+	   driverClassName="org.postgresql.Driver"
+	   url="jdbc:postgresql://localhost:5432/collect"
+	   username="postgres"
+	   password="postgres"
+	   initialSize="5"
+	   maxActive="20"
+	   maxIdle="5">
+	 </Resource>
+</Context>

@@ -21,14 +21,10 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.metamodel.proxy.NumberAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.NumericAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.RangeAttributeDefinitionProxy;
-	import org.openforis.collect.metamodel.proxy.SurveyProxy;
 	import org.openforis.collect.metamodel.proxy.TaxonAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.TextAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.TextAttributeDefinitionProxy$Type;
 	import org.openforis.collect.metamodel.proxy.TimeAttributeDefinitionProxy;
-	import org.openforis.collect.metamodel.proxy.UIOptionsProxy;
-	import org.openforis.collect.metamodel.proxy.UITabProxy;
-	import org.openforis.collect.metamodel.proxy.UITabSetProxy;
 	import org.openforis.collect.metamodel.proxy.UnitProxy;
 	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.ui.component.datagrid.CompleteColumnItemRenderer;
@@ -39,7 +35,6 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.ui.component.detail.AttributeItemRenderer;
 	import org.openforis.collect.ui.component.detail.CodeAttributeFormItem;
 	import org.openforis.collect.ui.component.detail.CompositeAttributeFormItem;
-	import org.openforis.collect.ui.component.detail.EntityFormContainer;
 	import org.openforis.collect.ui.component.detail.EntityFormItem;
 	import org.openforis.collect.ui.component.detail.FormContainer;
 	import org.openforis.collect.ui.component.detail.MultipleAttributeDataGroupFormItem;
@@ -66,7 +61,6 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.ui.component.input.StringInputField;
 	import org.openforis.collect.ui.component.input.TaxonAttributeRenderer;
 	import org.openforis.collect.ui.component.input.TimeAttributeRenderer;
-	import org.openforis.collect.util.CollectionUtil;
 	import org.openforis.collect.util.UIUtil;
 	
 	import spark.components.HGroup;
@@ -81,61 +75,15 @@ package org.openforis.collect.ui {
 	 * */
 	public class UIBuilder {
 		
+		public static const COMPOSITE_ATTRIBUTE_H_GAP:int = 6;
 		private static const DATA_GROUP_HEADER_STYLE:String = "dataGroupHeader";
+		private static const HEADER_LABEL_STYLE:String = "bold";
 		
 		public static function buildForm(rootEntity:EntityDefinitionProxy, version:ModelVersionProxy):FormContainer {
 			var formContainer:FormContainer = new FormContainer();
-			formContainer.initialize();
-			
-			addMainEntityFormContainer(formContainer, rootEntity, version);
-			
-			var rootTabSet:UITabSetProxy = getRootEntityTabSet(rootEntity);
-			if ( rootTabSet != null && rootTabSet.tabs != null) {
-				for each (var tab:UITabProxy in rootTabSet.tabs) {
-					if ( ! isMainTab(rootTabSet, tab) ) {
-						addChildEntityFormContainer(formContainer, rootEntity, version, tab);
-					}
-				}
-			}
+			formContainer.rootEntityDefinition = rootEntity;
+			formContainer.version = version;
 			return formContainer;
-		}
-		
-		/**
-		 * Returns true if the tab is the first tab in the corresponding root tab set
-		 */
-		private static function isMainTab(rootTabSet:UITabSetProxy, tab:UITabProxy):Boolean {
-			return rootTabSet.tabs.getItemIndex(tab) == 0;
-		}
-		
-		private static function addMainEntityFormContainer(formContainer:FormContainer, rootEntity:EntityDefinitionProxy, version:ModelVersionProxy):void {
-			var form:EntityFormContainer = new EntityFormContainer();
-			form.entityDefinition = rootEntity;
-			form.modelVersion = version;
-			
-			form.build();
-			formContainer.addEntityFormContainer(form);
-			/*
-			in this case the parentEntity of the formContainer will be null and 
-			the "entity" will be record's "rootEntity"
-			*/
-			form.parentEntity = null;
-			BindingUtils.bindProperty(form, "entity", formContainer, ["record", "rootEntity"]);
-		}
-		
-		private static function addChildEntityFormContainer(formContainer:FormContainer, rootEntity:EntityDefinitionProxy, version:ModelVersionProxy, tab:UITabProxy):void {
-			var childForm:EntityFormContainer = new EntityFormContainer();
-			var child:NodeDefinitionProxy = rootEntity.getChildDefinitionByTabName(tab.name);
-			if(child is EntityDefinitionProxy) {
-				var edp:EntityDefinitionProxy = child as EntityDefinitionProxy;
-				childForm.entityDefinition = edp;
-				childForm.modelVersion = version;
-				childForm.build();
-				formContainer.addEntityFormContainer(childForm);
-				/*
-				in this case the parentEntity will be the record's rootEntity
-				*/
-				BindingUtils.bindProperty(childForm, "parentEntity", formContainer, ["record", "rootEntity"]);
-			}
 		}
 		
 		public static function getRecordSummaryListColumns(rootEntity:EntityDefinitionProxy):IList {
@@ -146,7 +94,7 @@ package org.openforis.collect.ui {
 			var keyAttributeDefs:IList = rootEntity.keyAttributeDefinitions;
 			var headerText:String, dataField:String, width:Number, labelFunction:Function;
 			for each(var keyAttributeDef:AttributeDefinitionProxy in keyAttributeDefs) {
-				headerText = keyAttributeDef.getLabelText();
+				headerText = keyAttributeDef.getInstanceOrHeadingLabelText();
 				dataField = "key" + position;
 				width = NaN;
 				labelFunction = RecordSummaryDataGrid.keyLabelFunction;
@@ -162,7 +110,7 @@ package org.openforis.collect.ui {
 					var entityDef:EntityDefinitionProxy = EntityDefinitionProxy(nodeDef);
 					if(entityDef.countInSummaryList) {
 						//headerText = Message.get("list.headerCount", [entityDef.getLabelText()]);
-						headerText = entityDef.getHeadingLabelText();
+						headerText = entityDef.getHeadingOrInstanceLabelText();
 						dataField = "count" + position;
 						width = 80;
 						labelFunction = RecordSummaryDataGrid.entityCountLabelFunction;
@@ -172,17 +120,6 @@ package org.openforis.collect.ui {
 					}
 				}
 			}
-			/*
-			//errors count column
-			column = getGridColumn(Message.get("list.errors"), "errors", 80, UIUtil.gridColumnNumberLabelFunction);
-			columns.addItem(column);
-			//skipped count column
-			column = getGridColumn(Message.get("list.skipped"), "skipped", 80, UIUtil.gridColumnNumberLabelFunction);
-			columns.addItem(column);
-			//missing count column
-			column = getGridColumn(Message.get("list.missing"), "missing", 80, UIUtil.gridColumnNumberLabelFunction);
-			columns.addItem(column);
-			*/
 			//errors count column
 			column = getGridColumn(Message.get("list.errors"), "errors", 80, RecordSummaryDataGrid.errorsCountLabelFunction, false, new ClassFactory(RecordSummaryErrorsColumnItemRenderer));
 			columns.addItem(column);
@@ -244,7 +181,7 @@ package org.openforis.collect.ui {
 		public static function getInputFieldWidth(def:AttributeDefinitionProxy):Number {
 			var parentLayout:String = def.parentLayout;
 			if(def is BooleanAttributeDefinitionProxy) {
-				var headerText:String = def.getLabelText();
+				var headerText:String = def.getInstanceOrHeadingLabelText();
 				var headerWidth:Number = UIUtil.measureGridHeaderWidth(headerText);
 				var width:Number = Math.max(headerWidth, 20);
 				return width;
@@ -261,7 +198,7 @@ package org.openforis.collect.ui {
 				}
 			} else if(def is CoordinateAttributeDefinitionProxy) {
 				if(parentLayout == UIUtil.LAYOUT_TABLE) {
-					return 260;
+					return 100 + 70 + 70 + COMPOSITE_ATTRIBUTE_H_GAP * 2;
 				} else {
 					return 100;
 				}
@@ -310,10 +247,7 @@ package org.openforis.collect.ui {
 		public static function getAttributeDataGroupHeaderWidth(def:AttributeDefinitionProxy, ancestorEntity:EntityProxy):Number {
 			var parentEntityDefn:EntityDefinitionProxy = def.parent;
 			if(ancestorEntity != null && parentEntityDefn.enumerable && def.key && def is CodeAttributeDefinitionProxy) {
-				var enumeratedCodeWidth:Number = ancestorEntity.getEnumeratedCodeWidth(parentEntityDefn.name);
-				var headerText:String = def.getLabelText();
-				var headerWidth:Number = UIUtil.measureGridHeaderWidth(headerText);
-				var width:Number = Math.max(headerWidth, enumeratedCodeWidth);
+				var width:Number = getEnumeratedCodeHeaderWidth(def, ancestorEntity);
 				return width + 2;
 			} else {
 				var inputFieldWidth:Number = getInputFieldWidth(def);
@@ -323,6 +257,15 @@ package org.openforis.collect.ui {
 					return NaN;
 				}
 			}
+		}
+		
+		public static function getEnumeratedCodeHeaderWidth(def:AttributeDefinitionProxy, ancestorEntity:EntityProxy):Number {
+			var parentEntityDefn:EntityDefinitionProxy = def.parent;
+			var enumeratedCodeWidth:Number = ancestorEntity.getEnumeratedCodeWidth(parentEntityDefn.name);
+			var headerText:String = def.getNumberAndHeadingLabelText();
+			var headerWidth:Number = UIUtil.measureGridHeaderWidth(headerText);
+			var width:Number = Math.max(headerWidth, enumeratedCodeWidth);
+			return width;
 		}
 		
 		public static function getInputField(def:AttributeDefinitionProxy):InputField {
@@ -419,8 +362,8 @@ package org.openforis.collect.ui {
 			result.styleName = DATA_GROUP_HEADER_STYLE;
 			result.percentHeight = 100;
 			var l:Label = new Label();
-			l.styleName = "bold";
-			l.text = defn.getLabelText();
+			l.styleName = HEADER_LABEL_STYLE;
+			l.text = defn.getInstanceOrHeadingLabelText();
 			result.addElement(l);
 			
 			var childDefinitionsContainer:HGroup = new HGroup();
@@ -445,36 +388,37 @@ package org.openforis.collect.ui {
 			result.percentHeight = 100;
 			var h:HGroup;
 			var l:Label;
+			var defnLabel:String = defn.getNumberAndHeadingLabelText();
 			if(defn is TaxonAttributeDefinitionProxy) {
 				//attribute label
-				l = getLabel(defn.getLabelText(), 100, "dataGroupHeader");
+				l = getLabel(defnLabel, 100, "dataGroupHeader");
 				result.addElement(l);
 				//subheader
 				h = new HGroup();
-				h.gap = 6;
-				l = getLabel(Message.get('edit.taxon.code'), 80, "bold");
+				h.gap = COMPOSITE_ATTRIBUTE_H_GAP;
+				l = getLabel(Message.get('edit.taxon.code'), 80, HEADER_LABEL_STYLE);
 				h.addElement(l);
-				l = getLabel(Message.get('edit.taxon.scientificName'), 100, "bold");
+				l = getLabel(Message.get('edit.taxon.scientificName'), 100, HEADER_LABEL_STYLE);
 				h.addElement(l);
-				l = getLabel(Message.get('edit.taxon.vernacularName'), 100, "bold");
+				l = getLabel(Message.get('edit.taxon.vernacularName'), 100, HEADER_LABEL_STYLE);
 				h.addElement(l);
-				l = getLabel(Message.get('edit.taxon.languageCode'), 100, "bold");
+				l = getLabel(Message.get('edit.taxon.languageCode'), 100, HEADER_LABEL_STYLE);
 				h.addElement(l);
-				l = getLabel(Message.get('edit.taxon.languageVariety'), 100, "bold");
+				l = getLabel(Message.get('edit.taxon.languageVariety'), 100, HEADER_LABEL_STYLE);
 				h.addElement(l);
 				result.addElement(h);
 			} else if(defn is CoordinateAttributeDefinitionProxy) {
 				//attribute label
-				l = getLabel(defn.getLabelText(), 100, "bold");
+				l = getLabel(defnLabel, 100 + 70 + 70 + COMPOSITE_ATTRIBUTE_H_GAP * 2, HEADER_LABEL_STYLE);
 				result.addElement(l);
 				//subheader
 				h = new HGroup();
-				h.gap = 6;
-				l = getLabel(Message.get('edit.coordinate.srs'), 100, "bold");
+				h.gap = COMPOSITE_ATTRIBUTE_H_GAP;
+				l = getLabel(Message.get('edit.coordinate.srs'), 100, HEADER_LABEL_STYLE);
 				h.addElement(l);
-				l = getLabel(Message.get('edit.coordinate.x'), 100, "bold");
+				l = getLabel(Message.get('edit.coordinate.x'), 70, HEADER_LABEL_STYLE);
 				h.addElement(l);
-				l = getLabel(Message.get('edit.coordinate.y'), 100, "bold");
+				l = getLabel(Message.get('edit.coordinate.y'), 70, HEADER_LABEL_STYLE);
 				h.addElement(l);
 				result.addElement(h);
 			} else if (defn is NumberAttributeDefinitionProxy && NumberAttributeDefinitionProxy(defn).defaultUnit != null || 
@@ -485,11 +429,11 @@ package org.openforis.collect.ui {
 				} else {
 					defaultUnit = RangeAttributeDefinitionProxy(defn).defaultUnit;
 				}
-				var labStr:String = defn.getLabelText() + " (" + defaultUnit.getAbbreviation() + ")";
-				l = getLabel(labStr, width, "bold");
+				var labStr:String = defnLabel + " (" + defaultUnit.getAbbreviation() + ")";
+				l = getLabel(labStr, width, HEADER_LABEL_STYLE);
 				result.addElement(l);
 			} else {
-				l = getLabel(defn.getLabelText(), width, "bold");
+				l = getLabel(defnLabel, width, HEADER_LABEL_STYLE);
 				result.addElement(l);
 			}
 			return result;
@@ -529,71 +473,6 @@ package org.openforis.collect.ui {
 				}
 			}
 			return result;
-		}
-		
-		/**
-		 * Returns a list of lists of NodeDefinitionProxy object.
-		 * Each item of the list is a list of node definitions associated to the tab in that index.
-		 **/
-		public static function getDefinitionsPerEachSubTab(entityDefinition:EntityDefinitionProxy, version:ModelVersionProxy):IList {
-			var result:IList = new ArrayCollection();
-			var uiTab:UITabProxy = getUITab(entityDefinition);
-			if ( uiTab != null ) {
-				var tabs:ListCollectionView = uiTab.tabs;
-				if ( CollectionUtil.isNotEmpty(tabs) ) {
-					var totalTabs:int = tabs.length;
-					for(var i:int = 0; i < totalTabs; i ++) {
-						result.addItemAt(new ArrayCollection(), i);
-					}
-					//put each definition in the corresponding list per tab
-					var childDefns:IList = UIBuilder.getDefinitionsInVersion(entityDefinition.childDefinitions, version);
-					for each (var defn:NodeDefinitionProxy in childDefns) {
-						var tabName:String = defn.uiTabName;
-						var tabIndex:int = CollectionUtil.getItemIndex(tabs, "name", tabName);
-						if(tabIndex >= 0) {
-							var nodeDefs:IList = result[tabIndex];
-							nodeDefs.addItem(defn);
-						}
-					}
-				}
-			}
-			return result;
-		}
-			
-		public static function getDefinitionsPerMainTab(entityDefinition:EntityDefinitionProxy, version:ModelVersionProxy):IList {
-			var result:IList = new ArrayCollection();
-			var uiTab:UITabProxy = getUITab(entityDefinition);
-			var childDefns:IList = UIBuilder.getDefinitionsInVersion(entityDefinition.childDefinitions, version);
-			for each (var defn:NodeDefinitionProxy in childDefns) {
-				var tabName:String = defn.uiTabName;
-				if ( tabName == uiTab.name ) {
-					result.addItem(defn);
-				}
-			}
-			return result;
-		}
-		
-		public static function getRootEntityTabSet(rootEntityDefinition:EntityDefinitionProxy):UITabSetProxy {
-			var survey:SurveyProxy = rootEntityDefinition.survey;
-			var uiOpts:UIOptionsProxy = survey.uiOptions;
-			var tabSet:UITabSetProxy = null;
-			if(uiOpts != null) {
-				var tabSetName:String = rootEntityDefinition.rootTabSetName;
-				tabSet = uiOpts.getTabSet(tabSetName);
-			}
-			return tabSet;
-		}
-		
-		public static function getUITab(nodeDefn:NodeDefinitionProxy):UITabProxy {
-			var survey:SurveyProxy = nodeDefn.survey;
-			var rootEntity:EntityDefinitionProxy = nodeDefn.rootEntity;
-			var tabSet:UITabSetProxy = getRootEntityTabSet(rootEntity);
-			if ( tabSet != null ) {
-				var tab:UITabProxy = tabSet.getTab(nodeDefn.uiTabName);
-				return tab;
-			} else {
-				return null;
-			}
 		}
 		
 	}

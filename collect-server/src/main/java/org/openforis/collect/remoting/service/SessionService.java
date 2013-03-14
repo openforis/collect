@@ -30,7 +30,7 @@ public class SessionService {
 	@Autowired
 	protected SessionManager sessionManager;
 	@Autowired
-	private SurveyManager surveyManager;
+	protected SurveyManager surveyManager;
 	@Autowired
 	protected DatabaseVersionManager databaseVersionManager;
 
@@ -70,14 +70,41 @@ public class SessionService {
 	}
 	
 	@Transactional
+	public SurveyProxy setActiveSurvey(String name) {
+		CollectSurvey survey = surveyManager.get(name);
+		return setActiveSurvey(survey, false);
+	}
+
+	@Transactional
 	public SurveyProxy setActivePreviewSurvey(int surveyId) {
 		CollectSurvey survey = surveyManager.loadSurveyWork(surveyId);
+		return setActiveSurvey(survey, true);
+	}
+
+	@Transactional
+	public SurveyProxy setDesignerSurveyAsActive(int surveyId, boolean work) {
+		CollectSurvey survey = sessionManager.getActiveDesignerSurvey();
+		if ( survey == null ) {
+			if ( work ) {
+				survey = surveyManager.loadSurveyWork(surveyId);
+			} else {
+				survey = surveyManager.getById(surveyId);
+			}
+		}
+		if ( survey == null ) {
+			throw new IllegalArgumentException("Survey not found");
+		}
+		return setActiveSurvey(survey, work);
+	}
+
+	protected SurveyProxy setActiveSurvey(CollectSurvey survey, boolean work) {
 		SessionState sessionState = sessionManager.getSessionState();
 		sessionState.setActiveSurvey(survey);
+		sessionState.setActiveSurveyWork(work);
 		SurveyProxy proxy = new SurveyProxy(survey);
 		return proxy;
 	}
-
+	
 	//@Secured("isAuthenticated()")
 	public void logout() {
 		sessionManager.invalidateSession();

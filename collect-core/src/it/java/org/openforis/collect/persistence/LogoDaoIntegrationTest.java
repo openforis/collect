@@ -1,13 +1,14 @@
 package org.openforis.collect.persistence;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Arrays;
 
+import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openforis.collect.model.Logo;
@@ -22,52 +23,30 @@ import org.springframework.transaction.annotation.Transactional;
 @TransactionConfiguration(defaultRollback=true)
 @Transactional
 public class LogoDaoIntegrationTest {
-	//private final Log log = LogFactory.getLog(LogoDaoIntegrationTest.class);
-	
+
+	private static final int TEST_LOGO_POSITION = 100;
 	@Autowired
 	protected LogoDao logoDao;
-	
+
 	@Test
 	public void testCRUD() throws Exception  {
 		// SAVE NEW
-		Logo logo = createTestLogo(1, "test_logo.jpg");
+		Logo logo = createTestLogo(TEST_LOGO_POSITION, "test_logo.jpg");
+		byte[] savedData = logo.getImage();
 		logoDao.insert(logo);
-		
-		byte[] saved = logo.getImage();
-		
+
 		// RELOAD
-		logo = logoDao.loadById(1);
-		byte[] reloaded = logo.getImage();
-		boolean equals = Arrays.equals(saved, reloaded);
-		
-		assertEquals(true, equals);
+		Logo reloadedLogo = logoDao.loadById(TEST_LOGO_POSITION);
+		assertNotNull(reloadedLogo);
+		byte[] reloadedData = reloadedLogo.getImage();
+		assertTrue(Arrays.equals(savedData, reloadedData));
 	}
-	
-	private Logo createTestLogo(int i, String fileName) throws IOException {
-		URL idm = ClassLoader.getSystemResource(fileName);
-		InputStream is = null;
-		ByteArrayOutputStream bos = null;
-		try {
-			is = idm.openStream();
-	        bos = new ByteArrayOutputStream();
-	        byte[] buf = new byte[1024];
-	        for (int readNum; (readNum = is.read(buf)) != -1;) {
-	            bos.write(buf, 0, readNum); //no doubt here is 0
-	        }
-	        byte[] bytes = bos.toByteArray();
-	        Logo logo = new Logo(i, bytes);
-	        return logo;
-		} catch (IOException e) {
-			try {
-				if(is != null) {
-					is.close();
-				}
-				if(bos != null) {
-					bos.close();
-				}
-			} catch (IOException e1) {
-			}
-			throw new IOException("Error creating test logo");
-		}
+
+	private Logo createTestLogo(int position, String fileName) throws IOException {
+		URL imageUrl = ClassLoader.getSystemResource(fileName);
+		InputStream is = imageUrl.openStream();
+		byte[] data = IOUtils.toByteArray(is);
+		Logo logo = new Logo(position, data);
+		return logo;
 	}
 }

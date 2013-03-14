@@ -4,18 +4,15 @@
 package org.openforis.collect.designer.viewmodel;
 
 import java.io.ByteArrayOutputStream;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.http.NameValuePair;
-import org.apache.http.client.utils.URLEncodedUtils;
-import org.apache.http.message.BasicNameValuePair;
 import org.openforis.collect.designer.model.LabelKeys;
 import org.openforis.collect.designer.model.SurveyManagerUtil;
 import org.openforis.collect.designer.model.SurveyWorkSummary;
 import org.openforis.collect.designer.session.SessionStatus;
+import org.openforis.collect.designer.util.ComponentUtil;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.PageUtil;
 import org.openforis.collect.designer.util.Resources;
@@ -31,9 +28,11 @@ import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.ContextParam;
 import org.zkoss.bind.annotation.ContextType;
+import org.zkoss.bind.annotation.DependsOn;
 import org.zkoss.bind.annotation.GlobalCommand;
 import org.zkoss.bind.annotation.Init;
 import org.zkoss.bind.annotation.NotifyChange;
+import org.zkoss.bind.annotation.QueryParam;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Execution;
@@ -69,9 +68,8 @@ public class SurveyEditVM extends SurveyBaseVM {
 	
 	private boolean changed;
 
-	@Override
 	@Init(superclass=false)
-	public void init() {
+	public void init(@QueryParam("temp_id") Integer tempId) {
 		super.init();
 		if ( survey == null ) {
 			backToSurveysList();
@@ -194,6 +192,19 @@ public class SurveyEditVM extends SurveyBaseVM {
 	
 	@Command
 	public void backToSurveysList() {
+		if ( changed ) {
+			MessageUtil.showConfirm(new MessageUtil.ConfirmHandler() {
+				@Override
+				public void onOk() {
+					performBackToSurveysList();
+				}
+			}, "survey.edit.leave_page");
+		} else {
+			performBackToSurveysList();
+		}
+	}
+	
+	protected void performBackToSurveysList() {
 		PageUtil.clearConfirmClose();
 		resetSessionStatus();
 		showMainPage();
@@ -229,7 +240,9 @@ public class SurveyEditVM extends SurveyBaseVM {
 		if ( checkCanSave(false) ) {
 			surveyManager.saveSurveyWork(survey);
 			MessageUtil.showInfo(SURVEY_SUCCESSFULLY_SAVED_MESSAGE_KEY);
+			BindUtils.postNotifyChange(null, null, survey, "id");
 			BindUtils.postNotifyChange(null, null, survey, "published");
+			notifyChange("surveyId","surveyPublished");
 			changed = false;
 		}
 	}
@@ -288,17 +301,17 @@ public class SurveyEditVM extends SurveyBaseVM {
 	@GlobalCommand
 	public void showPreview(@BindingParam("formVersion") ModelVersion formVersion, @BindingParam("rootEntity") EntityDefinition rootEntity) {
 		if ( validateShowPreview(rootEntity, formVersion) ) {
-			Execution current = Executions.getCurrent();
-			List<NameValuePair> params = new ArrayList<NameValuePair>();
-			params.add(new BasicNameValuePair("preview", "true"));
-			params.add(new BasicNameValuePair("surveyId", Integer.toString(survey.getId())));
-			params.add(new BasicNameValuePair("rootEntityId", Integer.toString(rootEntity.getId())));
+			Map<String, String> params = createBasicModuleParameters();
+			params.put("preview", "true");
+			params.put("surveyId", Integer.toString(survey.getId()));
+			params.put("work", "true");
+			params.put("rootEntityId", Integer.toString(rootEntity.getId()));
 			if ( formVersion != null ) {
-				params.add(new BasicNameValuePair("versionId", Integer.toString(formVersion.getId())));
+				params.put("versionId", Integer.toString(formVersion.getId()));
 			}
-			String uri = Resources.PREVIEW_PATH + "?" + URLEncodedUtils.format(params, "UTF-8");
-			current.sendRedirect(uri, PREVIEW_WINDOW_ID);
-			
+			String url = ComponentUtil.createUrl(Resources.Page.PREVIEW_PATH.getLocation(), params);
+			Execution current = Executions.getCurrent();
+			current.sendRedirect(url, PREVIEW_WINDOW_ID);
 			closePreviewPreferencesPopUp();
 		}
 	}
@@ -334,27 +347,6 @@ public class SurveyEditVM extends SurveyBaseVM {
 		changed = true;
 	}
 
-	@Command
-	public void publish() {
-		if ( checkCanSave(true) ) {
-			MessageUtil.showConfirm(new MessageUtil.ConfirmHandler() {
-				@Override
-				public void onOk() {
-					performSurveyPublishing();
-				}
-			}, "survey.publish.confirm");
-		}
-	}
-
-	protected void performSurveyPublishing() {
-		try {
-			surveyManager.publish(survey);
-			backToSurveysList();
-		} catch (SurveyImportException e) {
-			throw new RuntimeException(e);
-		}
-	}
-	
 	@GlobalCommand
 	@NotifyChange({"availableLanguages"})
 	public void surveyLanguagesChanged() {
@@ -375,6 +367,22 @@ public class SurveyEditVM extends SurveyBaseVM {
 
 	public boolean isChanged() {
 		return changed;
+	}
+	
+	@DependsOn({"surveyId","surveyPublished"})
+	public String getSamplingDesignImportModuleUrl() {
+		Map<String, String> queryParams = createBasicModuleParameters();
+		queryParams.put("sampling_design_import", "true");
+		String url = ComponentUtil.createUrl(Resources.Page.COLLECT_SWF.getLocation(), queryParams);
+		return url;
+	}
+
+	@DependsOn({"surveyId","surveyPublished"})
+	public String getSpeciesImportModuleUrl() {
+		Map<String, String> queryParams = createBasicModuleParameters();
+		queryParams.put("species_import", "true");
+		String url = ComponentUtil.createUrl(Resources.Page.COLLECT_SWF.getLocation(), queryParams);
+		return url;
 	}
 
 }

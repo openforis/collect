@@ -6,6 +6,7 @@ package org.openforis.collect.model.proxy;
 import org.apache.commons.lang3.StringUtils;
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.collect.metamodel.proxy.CodeListItemProxy;
+import org.openforis.collect.spring.MessageContextHolder;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeListItem;
 import org.openforis.idm.metamodel.EntityDefinition;
@@ -19,8 +20,8 @@ public class CodeAttributeProxy extends AttributeProxy {
 
 	private transient CodeAttribute codeAttribute;
 	
-	public CodeAttributeProxy(EntityProxy parent, CodeAttribute attribute) {
-		super(parent, attribute);
+	public CodeAttributeProxy(MessageContextHolder messageContextHolder, EntityProxy parent, CodeAttribute attribute) {
+		super(messageContextHolder, parent, attribute);
 		this.codeAttribute = attribute;
 	}
 

@@ -238,10 +238,14 @@ package org.openforis.collect.util
 			return measure.width;
 		}
 		
-		public static function isFocusOnComponent(component:UIComponent):Boolean {
-			var app:Application = FlexGlobals.topLevelApplication as Application;
-			var focussed:UIComponent = app.focusManager.getFocus() as UIComponent;
-			return focussed != null && ( focussed == component || isDescendantOf(component, focussed) );
+		public static function isFocussed(component:UIComponent):Boolean {
+			if ( component != null ) {
+				var app:Application = FlexGlobals.topLevelApplication as Application;
+				var focussed:UIComponent = app.focusManager.getFocus() as UIComponent;
+				return focussed != null && ( focussed == component || isDescendantOf(component, focussed) );
+			} else {
+				return false;
+			}
 		}
 		
 		public static function gridColumnDateTimeLabelFunction(item:Object, column:Object):String {

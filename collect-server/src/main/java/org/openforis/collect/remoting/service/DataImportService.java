@@ -18,6 +18,7 @@ import org.openforis.collect.remoting.service.dataImport.DataImportState;
 import org.openforis.collect.remoting.service.dataImport.DataImportStateProxy;
 import org.openforis.collect.remoting.service.dataImport.DataImportSummary;
 import org.openforis.collect.remoting.service.dataImport.DataImportSummaryProxy;
+import org.openforis.collect.spring.MessageContextHolder;
 import org.openforis.collect.util.ExecutorServiceUtil;
 import org.openforis.collect.web.session.SessionState;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,26 +37,21 @@ public class DataImportService {
 	
 	@Autowired
 	private SessionManager sessionManager;
-	
 	@Autowired
 	private SurveyManager surveyManager;
-	
 	@Autowired
 	private RecordManager recordManager;
-	
 	@Autowired
 	private RecordDao recordDao;
-	
 	@Autowired
 	private UserManager userManager;
-	
-	private File packagedFile;
-	
 	@Autowired 
 	private ServletContext servletContext;
+	@Autowired
+	private MessageContextHolder messageContextHolder;
 	
+	private File packagedFile;
 	private File importDirectory;
-	
 	private DataImportProcess dataImportProcess;
 
 	protected void init() {
@@ -115,7 +111,7 @@ public class DataImportService {
 	public DataImportSummaryProxy getSummary() {
 		if ( dataImportProcess != null ) {
 			DataImportSummary summary = dataImportProcess.getSummary();
-			DataImportSummaryProxy proxy = new DataImportSummaryProxy(summary);
+			DataImportSummaryProxy proxy = new DataImportSummaryProxy(messageContextHolder, summary);
 			return proxy;
 		} else {
 			return null;

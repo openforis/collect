@@ -20,7 +20,7 @@ package org.openforis.collect.util {
 		public static const STYLE_NAME_WARNING:String = "warning";
 		public static const STYLE_NAME_WARNING_CONFIRMED_ERROR:String = "warningConfirmedError";
 		
-		public static function create(object:DisplayObject, messages:Array, styleName:String = STYLE_NAME_ERROR):ToolTip {
+		public static function create(object:DisplayObject, messages:IList, styleName:String = STYLE_NAME_ERROR):ToolTip {
 			var pt:Rectangle = object.stage.getBounds(object);
 			var yPos:Number = -(pt.y);
 			var xPos:Number = -(pt.x);
@@ -71,7 +71,7 @@ package org.openforis.collect.util {
 			return title;
 		}
 		
-		private static function getValidationToolTipContent(title:String, messages:Array):String {
+		private static function getValidationToolTipContent(title:String, messages:IList):String {
 			var content:String = title;
 			if(messages.length == 1) {
 				content += " " + messages[0];

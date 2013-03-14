@@ -6,7 +6,18 @@
  */
 
 package org.openforis.collect.metamodel.proxy {
+	import mx.collections.ArrayCollection;
+	import mx.collections.IList;
+	import mx.collections.ListCollectionView;
+	
+	import org.openforis.collect.ui.UIBuilder;
+	import org.openforis.collect.util.CollectionUtil;
 
+	/**
+	 * 
+	 * @author S. Ricci
+	 * 
+	 */
     [Bindable]
     [RemoteClass(alias="org.openforis.collect.metamodel.proxy.UIOptionsProxy")]
     public class UIOptionsProxy extends UIOptionsProxyBase {
@@ -19,6 +30,94 @@ package org.openforis.collect.metamodel.proxy {
 			}
 			return null;
 		}
+		
+		public static function getDefinitionsPerTab(entityDefinition:EntityDefinitionProxy, version:ModelVersionProxy, tabSet:UITabProxy):IList {
+			var result:IList = new ArrayCollection();
+			var tabName:String = tabSet.name;
+			var childDefns:IList = UIBuilder.getDefinitionsInVersion(entityDefinition.childDefinitions, version);
+			for each (var defn:NodeDefinitionProxy in childDefns) {
+				if ( defn.uiTabName == tabName ) {
+					result.addItem(defn);
+				}
+			}
+			return result;
+		}
+		
+		/**
+		 * Returns a list of lists of NodeDefinitionProxy object.
+		 * Each item of the list is a list of node definitions associated to the tab in that index.
+		 **/
+		public static function getDefinitionsPerEachSubTab(entityDefinition:EntityDefinitionProxy, version:ModelVersionProxy):IList {
+			var result:IList = new ArrayCollection();
+			var uiTab:UITabProxy = getUITab(entityDefinition);
+			if ( uiTab != null ) {
+				var tabs:ListCollectionView = uiTab.tabs;
+				if ( CollectionUtil.isNotEmpty(tabs) ) {
+					var totalTabs:int = tabs.length;
+					for(var i:int = 0; i < totalTabs; i ++) {
+						result.addItemAt(new ArrayCollection(), i);
+					}
+					//put each definition in the corresponding list per tab
+					var childDefns:IList = UIBuilder.getDefinitionsInVersion(entityDefinition.childDefinitions, version);
+					for each (var defn:NodeDefinitionProxy in childDefns) {
+						var tabName:String = defn.uiTabName;
+						var tabIndex:int = CollectionUtil.getItemIndex(tabs, "name", tabName);
+						if(tabIndex >= 0) {
+							var nodeDefs:IList = result[tabIndex];
+							nodeDefs.addItem(defn);
+						}
+					}
+				}
+			}
+			return result;
+		}
+		
+		public static function getDefinitionsPerMainTab(entityDefinition:EntityDefinitionProxy, version:ModelVersionProxy):IList {
+			var result:IList = new ArrayCollection();
+			var uiTab:UITabProxy = getUITab(entityDefinition);
+			var childDefns:IList = UIBuilder.getDefinitionsInVersion(entityDefinition.childDefinitions, version);
+			for each (var defn:NodeDefinitionProxy in childDefns) {
+				var tabName:String = defn.uiTabName;
+				if ( tabName == uiTab.name ) {
+					result.addItem(defn);
+				}
+			}
+			return result;
+		}
+		
+		public static function getRootEntityTabSet(rootEntityDefinition:EntityDefinitionProxy):UITabSetProxy {
+			var survey:SurveyProxy = rootEntityDefinition.survey;
+			var uiOpts:UIOptionsProxy = survey.uiOptions;
+			var tabSet:UITabSetProxy = null;
+			if(uiOpts != null) {
+				var tabSetName:String = rootEntityDefinition.rootTabSetName;
+				tabSet = uiOpts.getTabSet(tabSetName);
+			}
+			return tabSet;
+		}
+		
+		public static function getUITab(nodeDefn:NodeDefinitionProxy):UITabProxy {
+			var survey:SurveyProxy = nodeDefn.survey;
+			var rootEntity:EntityDefinitionProxy = nodeDefn.rootEntity;
+			var tabSet:UITabSetProxy = getRootEntityTabSet(rootEntity);
+			if ( tabSet != null ) {
+				var tab:UITabProxy = tabSet.getTab(nodeDefn.uiTabName);
+				return tab;
+			} else {
+				return null;
+			}
+		}
 
-    }
+		public static function getInnerTabs(entityDefinition:EntityDefinitionProxy, modelVersion:ModelVersionProxy, uiTabSet:UITabSetProxy):IList {
+			var result:IList = new ArrayCollection();
+			var tabs:ListCollectionView = uiTabSet.tabs;
+			for each (var tab:UITabProxy in tabs) {
+				var definitionsPerTab:IList = getDefinitionsPerTab(entityDefinition, modelVersion, tab);
+				if ( definitionsPerTab.length > 0 ) {
+					result.addItem(tab);
+				}
+			}
+			return result;
+		}
+	}
 }

@@ -11,6 +11,7 @@ package org.openforis.collect.presenter {
 	import flash.net.URLVariables;
 	import flash.net.navigateToURL;
 	
+	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.IResponder;
@@ -27,6 +28,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.ui.component.input.FileInputField;
 	import org.openforis.collect.util.AlertUtil;
 	import org.openforis.collect.util.ApplicationConstants;
+	import org.openforis.collect.util.CollectionUtil;
 	import org.openforis.collect.util.StringUtil;
 	
 	import spark.formatters.NumberFormatter;
@@ -66,7 +68,11 @@ package org.openforis.collect.presenter {
 		
 		private function initFileFilter():void {
 			var attrDefn:FileAttributeDefinitionProxy = FileAttributeDefinitionProxy(_view.attributeDefinition);
-			var extensions:IList = attrDefn.extensions
+			var extensions:IList = attrDefn.extensions;
+			if ( CollectionUtil.isEmpty(extensions) || 
+					extensions.length == 1 && StringUtil.isBlank(extensions.getItemAt(0) as String) ) {
+				extensions = new ArrayCollection(["*"]);
+			}
 			var extensionsAdapted:Array = new Array();
 			for each(var extension:String in extensions) {
 				extensionsAdapted.push("*." + extension);

@@ -4,9 +4,10 @@
 	xmlns:security="http://www.springframework.org/schema/security" 
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:context="http://www.springframework.org/schema/context" 
-	xmlns:p="http://www.springframework.org/schema/p" 
+	xmlns:mvc="http://www.springframework.org/schema/mvc" 
+  xmlns:p="http://www.springframework.org/schema/p" 
 	xmlns:util="http://www.springframework.org/schema/util"
-    xmlns:tx="http://www.springframework.org/schema/tx"
+  xmlns:tx="http://www.springframework.org/schema/tx"
 	xsi:schemaLocation="
     http://www.springframework.org/schema/beans
     http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
@@ -14,20 +15,28 @@
     http://www.springframework.org/schema/security/spring-security-3.0.4.xsd
     http://www.springframework.org/schema/context
     http://www.springframework.org/schema/context/spring-context-3.0.xsd
+    http://www.springframework.org/schema/mvc
+    http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd
     http://www.springframework.org/schema/util
     http://www.springframework.org/schema/util/spring-util-3.0.xsd
     http://www.springframework.org/schema/tx 
     http://www.springframework.org/schema/tx/spring-tx-3.0.xsd"
 	default-lazy-init="true">
 
+  <context:component-scan base-package="org.openforis.collect" />
 	<context:annotation-config />
 
-	<!-- <context:component-scan base-package="org.fao.openforis.service"/> -->
-	<!-- <context:component-scan base-package="org.fao.openforis"/> -->
-
-<!-- 	<context:property-placeholder location="classpath:/app.properties" /> -->
-
-<!-- 	<bean id="applicationContextProvider" class="org.openforis.collect.context.ApplicationContextAwareImpl" /> -->
+  <mvc:resources mapping="collect.swf" location="collect.swf" />
+  <mvc:resources mapping="/assets/**" location="/assets/" />
+  <mvc:resources mapping="/images/**" location="/images/" />
+  <mvc:resources mapping="/script/**" location="/script/" />
+  <mvc:resources mapping="/org/**" location="/org/" />
+	
+  <bean name="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+    <property name="basename">
+      <value>resourcebundles/validation</value>
+    </property>
+  </bean>
 
 	<bean class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping" />
 	<bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter" />
@@ -37,12 +46,16 @@
 <!-- 		<entry key="**/messagebroker/**" value-ref="_messageBroker" /> -->
 		<entry key="/index.htm" value-ref="fileNameViewController" />
 		<entry key="/designer.htm" value-ref="fileNameViewController" />
-		<entry key="/editSurvey.htm" value-ref="fileNameViewController" />
+    <entry key="/editSurvey.htm" value-ref="fileNameViewController" />
 		<entry key="/error.htm" value-ref="fileNameViewController" />
 		<entry key="/accessDenied.htm" value-ref="fileNameViewController" />
 		<entry key="/exitUser.htm" value-ref="fileNameViewController" />
 		<entry key="/login.htm" value-ref="fileNameViewController" />
 		<entry key="/importSurvey.htm" value-ref="fileNameViewController" />
+    <entry key="/logoUpload" value-ref="fileNameViewController" />
+        
+    <entry key="/surveys" value-ref="fileNameViewController" />
+    <entry key="/speciesImport" value-ref="fileNameViewController" />
 	</util:map>
 
 	<bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
@@ -52,42 +65,31 @@
 	</bean>
 
 	<bean class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
-		<property name="urlMap" ref="urlMappings">
-		</property>
+		<property name="urlMap" ref="urlMappings" />
 	</bean>
 	
 	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver" />
 
 	<!-- Controllers -->
-	<bean id="dataImportController" class="org.openforis.collect.web.controller.DataImportController" />
-	<bean id="dataExportDownloadController" class="org.openforis.collect.web.controller.DataExportDownloadController" />
 	<bean id="fileNameViewController" class="org.springframework.web.servlet.mvc.UrlFilenameViewController" />
-	<bean id="recordFileController" class="org.openforis.collect.web.controller.RecordFileController" scope="session" />
-	<bean id="surveyImportController" class="org.openforis.collect.web.controller.SurveyImportController" />
-	<bean id="validationController" class="org.openforis.collect.web.controller.ValidationController" />
-	<bean id="unlockController" class="org.openforis.collect.web.controller.UnlockController" />
 
 	<!-- ===================================== -->
 	<!-- GraniteDs services -->
 	<!-- ===================================== -->
-	<bean id="dataService" 		class="org.openforis.collect.remoting.service.DataService" autowire="byName" scope="session" />
+	<bean id="codeListImportService"  class="org.openforis.collect.remoting.service.CodeListImportService" autowire="byName" init-method="init" />
+  <bean id="dataService" 		class="org.openforis.collect.remoting.service.DataService" autowire="byName" scope="session" />
 	<bean id="dataExportService" class="org.openforis.collect.remoting.service.DataExportService" autowire="byName" init-method="init" scope="session" />
 	<bean id="dataImportService" class="org.openforis.collect.remoting.service.DataImportService" autowire="byName" init-method="init" scope="session" />
 	<bean id="logoService" 	class="org.openforis.collect.remoting.service.LogoService" autowire="byName" />
 	<bean id="modelService"		class="org.openforis.collect.remoting.service.ModelService" autowire="byName" />
-	<bean id="sessionService" 	class="org.openforis.collect.remoting.service.SessionService" autowire="byName" />
+	<bean id="recordIndexService"     class="org.openforis.collect.remoting.service.recordIndex.RecordIndexService" autowire="byName" scope="session" />
+	<bean id="samplingDesignService"  class="org.openforis.collect.remoting.service.SamplingDesignService" autowire="byName" />
+  <bean id="samplingDesignImportService"   class="org.openforis.collect.remoting.service.SamplingDesignImportService" autowire="byName" init-method="init" />
+  <bean id="sessionService" 	class="org.openforis.collect.remoting.service.SessionService" autowire="byName" />
 	<bean id="speciesService" 	class="org.openforis.collect.remoting.service.SpeciesService" autowire="byName" />
+	<bean id="speciesImportService"   class="org.openforis.collect.remoting.service.SpeciesImportService" autowire="byName" init-method="init" />
 	<bean id="userService" 		class="org.openforis.collect.remoting.service.UserService" autowire="byName" />
 	
-	<!-- <bean id="backupService" class="org.fao.openforis.web.service.BackupService"> -->
-	<!-- <property name="backupDirectory" value="backup" /> -->
-	<!-- </bean> -->
-
-	<!-- <bean id="restoreService" class="org.fao.openforis.web.service.RestoreService"> -->
-	<!-- <property name="tmpDir" value="backup/tmp" /> -->
-	<!-- <property name="applicationDao" ref="applicationDao" /> -->
-	<!-- </bean> -->
-
 	<!-- ===================================== -->
 	<!-- Managers -->
 	<!-- ===================================== -->
@@ -98,8 +100,9 @@
 	<bean id="recordManager"		class="org.openforis.collect.manager.RecordManager" init-method="init">
 		<property name="lockTimeoutMillis" value="60000" />
 	</bean>
-	<bean id="recordIndexManager" 	class="org.openforis.collect.manager.RecordIndexManager" init-method="init" lazy-init="false" autowire="byName" />
-	<bean id="sessionRecordIndexManager" 	class="org.openforis.collect.manager.RecordTemporaryIndexManager" init-method="init" scope="session" lazy-init="false" autowire="byName" />
+	<bean id="persistedRecordIndexManager" 	class="org.openforis.collect.manager.RecordIndexManager" init-method="init" lazy-init="false" autowire="byName" />
+	<bean id="volatileRecordIndexManager" 	class="org.openforis.collect.remoting.service.recordIndex.VolatileRecordIndexManager" init-method="init" scope="session" lazy-init="false" autowire="byName" />
+  <bean id="samplingDesignManager"        class="org.openforis.collect.manager.SamplingDesignManager" />
 	<bean id="sessionManager"		class="org.openforis.collect.manager.SessionManager" scope="session" />
 	<bean id="speciesManager"		class="org.openforis.collect.manager.SpeciesManager" />
 	<bean id="surveyManager"		class="org.openforis.collect.manager.SurveyManager" init-method="init" />
@@ -115,14 +118,14 @@
 	<!-- ===================================== -->
 	<bean id="dataSource" class="org.springframework.jndi.JndiObjectFactoryBean">
 		<property name="jndiName" value="java:comp/env/jdbc/collectDs"/>   
-      	<property name="resourceRef" value="true" />
+  	<property name="resourceRef" value="true" />
 	</bean>
 	
-    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
-    	<property name="dataSource" ref="dataSource"/>
-    </bean>
+  <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+  	<property name="dataSource" ref="dataSource"/>
+  </bean>
     
-    <tx:annotation-driven transaction-manager="transactionManager" proxy-target-class="true" />
+  <tx:annotation-driven transaction-manager="transactionManager" proxy-target-class="true" />
     
     <!-- ===================================== -->
 	<!-- Daos -->
@@ -142,8 +145,11 @@
 	<bean id="recordDao" class="org.openforis.collect.persistence.RecordDao">
     	<property name="dataSource" ref="dataSource"/>
 	</bean>
+  <bean id="samplingDesignDao" class="org.openforis.collect.persistence.SamplingDesignDao">
+      <property name="dataSource" ref="dataSource"/>
+  </bean>
 	<bean id="surveyDao" class="org.openforis.collect.persistence.SurveyDao" init-method="init">
-    	<property name="dataSource" ref="dataSource"/>
+  	<property name="dataSource" ref="dataSource"/>
 	</bean>
 	<bean id="surveyWorkDao" class="org.openforis.collect.persistence.SurveyWorkDao" init-method="init">
     	<property name="dataSource" ref="dataSource"/>
@@ -171,11 +177,11 @@
 	<bean id="lookupProvider" 				class="org.openforis.collect.persistence.DatabaseLookupProvider" />
 	<bean id="externalCodeListProvider" 	class="org.openforis.collect.persistence.DatabaseExternalCodeListProvider" />
 	
-    <bean id="collectSurveyContext" class="org.openforis.collect.model.CollectSurveyContext">
-        <constructor-arg><ref bean="expressionFactory"/></constructor-arg>
-        <constructor-arg><ref bean="validator"/></constructor-arg>
-        <constructor-arg><ref bean="externalCodeListProvider"/></constructor-arg>
-    </bean>
+  <bean id="collectSurveyContext" class="org.openforis.collect.model.CollectSurveyContext">
+    <constructor-arg><ref bean="expressionFactory"/></constructor-arg>
+    <constructor-arg><ref bean="validator"/></constructor-arg>
+    <constructor-arg><ref bean="externalCodeListProvider"/></constructor-arg>
+  </bean>
     
 	<!-- ===================================== -->
 	<!-- Security -->

@@ -1,5 +1,6 @@
 CREATE SCHEMA "collect";
 CREATE SEQUENCE "collect"."ofc_record_id_seq";
+CREATE SEQUENCE "collect"."ofc_sampling_design_id_seq";
 CREATE SEQUENCE "collect"."ofc_survey_id_seq";
 CREATE SEQUENCE "collect"."ofc_survey_work_id_seq";
 CREATE SEQUENCE "collect"."ofc_taxonomy_id_seq";
@@ -32,7 +33,7 @@ CREATE TABLE "collect"."ofc_record"  (
 	"created_by_id"            	integer NULL,
 	"date_modified"            	timestamp NULL,
 	"modified_by_id"           	integer NULL,
-	"model_version"            	varchar(255) NOT NULL,
+	"model_version"            	varchar(255) NULL,
 	"step"                     	integer NULL,
 	"state"                    	char(1) NULL,
 	"skipped"                  	integer NULL,
@@ -51,6 +52,16 @@ CREATE TABLE "collect"."ofc_record"  (
 	"data2"                    	bytea NULL,
 	PRIMARY KEY("id")
 );
+CREATE TABLE "collect"."ofc_sampling_desing"  ( 
+	"id"            	integer NOT NULL,
+	"survey_id"     	integer NULL,
+	"survey_work_id"	integer NULL,
+	"level1"       		varchar(256) NOT NULL,
+	"level2"       		varchar(256) NULL,
+	"level3"       		varchar(256) NULL,
+	"location"      	varchar(256) NOT NULL,
+	PRIMARY KEY("id")
+);
 CREATE TABLE "collect"."ofc_survey"  ( 
 	"id"  	integer NOT NULL,
 	"name"	varchar(255) NOT NULL,
@@ -67,8 +78,8 @@ CREATE TABLE "collect"."ofc_survey_work"  (
 );
 CREATE TABLE "collect"."ofc_taxon"  ( 
 	"id"             	integer NOT NULL,
-	"taxon_id"       	integer NOT NULL,
-	"code"           	varchar(32) NOT NULL,
+	"taxon_id"       	integer NULL,
+	"code"           	varchar(32) NULL,
 	"scientific_name"	varchar(255) NOT NULL,
 	"taxon_rank"     	varchar(128) NOT NULL,
 	"taxonomy_id"    	integer NOT NULL,
@@ -90,9 +101,11 @@ CREATE TABLE "collect"."ofc_taxon_vernacular_name"  (
 );
 COMMENT ON COLUMN "collect"."ofc_taxon_vernacular_name"."language_variety" IS 'Dialect, lect, sublanguage or other';
 CREATE TABLE "collect"."ofc_taxonomy"  ( 
-	"id"      	integer NOT NULL,
-	"name"    	varchar(255) NOT NULL,
-	"metadata"	text NOT NULL,
+	"id"            	integer NOT NULL,
+	"name"          	varchar(255) NOT NULL,
+	"metadata"      	text NOT NULL,
+	"survey_id"     	integer NULL,
+	"survey_work_id"	integer NULL,
 	PRIMARY KEY("id")
 );
 CREATE TABLE "collect"."ofc_user"  ( 
@@ -124,8 +137,19 @@ ALTER TABLE "collect"."ofc_taxon"
 	ADD CONSTRAINT "ofc_taxon_id_key"
 	UNIQUE ("taxon_id", "taxonomy_id");
 ALTER TABLE "collect"."ofc_taxonomy"
+	ADD CONSTRAINT "ofc_taxonomy_survey_fkey"
+	FOREIGN KEY("survey_id")
+	REFERENCES "collect"."ofc_survey"("id");
+ALTER TABLE "collect"."ofc_taxonomy"
+	ADD CONSTRAINT "ofc_taxonomy_survey_work_fkey"
+	FOREIGN KEY("survey_work_id")
+	REFERENCES "collect"."ofc_survey_work"("id");
+ALTER TABLE "collect"."ofc_taxonomy"
 	ADD CONSTRAINT "ofc_taxonomy_name_key"
-	UNIQUE ("name");
+	UNIQUE ("survey_id", "name");
+ALTER TABLE "collect"."ofc_taxonomy"
+	ADD CONSTRAINT "ofc_taxonomy_name_work_key"
+	UNIQUE ("survey_work_id", "name");
 ALTER TABLE "collect"."ofc_taxon_vernacular_name"
 	ADD CONSTRAINT "ofc_taxon_vernacular_name_taxon_fkey"
 	FOREIGN KEY("taxon_id")
@@ -154,26 +178,14 @@ ALTER TABLE "collect"."ofc_record"
 	ADD CONSTRAINT "ofc_record_modified_by_user_fkey"
 	FOREIGN KEY("modified_by_id")
 	REFERENCES "collect"."ofc_user"("id");
+ALTER TABLE "collect"."ofc_sampling_desing"
+	ADD CONSTRAINT "ofc_sampling_design_survey_fkey"
+	FOREIGN KEY("survey_id")
+	REFERENCES "collect"."ofc_survey"("id");
+ALTER TABLE "collect"."ofc_sampling_desing"
+	ADD CONSTRAINT "ofc_sampling_design_survey_work_fkey"
+	FOREIGN KEY("survey_work_id")
+	REFERENCES "collect"."ofc_survey_work"("id");
 --------------------------
 --- END GENERATED CODE ---
---------------------------
-
-----------------------------
---- BEGIN DEFAULT VALUES ---
-----------------------------
-INSERT INTO "collect"."ofc_application_info" ("version")
-VALUES ('3.0-Alpha5');
-
-INSERT INTO "collect"."ofc_config" ("name", "value") VALUES 
-	('upload_path', '/home/openforis/collect-upload'), 
-	('index_path', '/home/openforis/collect-index');
-
-INSERT INTO collect.ofc_user(id, username, password ,enabled)
-VALUES (nextval('collect.ofc_user_id_seq'), 'admin', '21232f297a57a5a743894a0e4a801fc3', 'Y');
-
-INSERT INTO collect.ofc_user_role(id, user_id, role)
-VALUES (nextval('collect.ofc_user_role_id_seq'), currval('collect.ofc_user_id_seq'), 'ROLE_ADMIN');
-
---------------------------
---- END DEFAULT VALUES ---
 --------------------------

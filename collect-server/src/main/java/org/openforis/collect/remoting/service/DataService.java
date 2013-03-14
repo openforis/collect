@@ -20,11 +20,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.manager.RecordFileException;
 import org.openforis.collect.manager.RecordFileManager;
 import org.openforis.collect.manager.RecordIndexException;
-import org.openforis.collect.manager.RecordIndexManager;
 import org.openforis.collect.manager.RecordIndexManager.SearchType;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.RecordPromoteException;
-import org.openforis.collect.manager.RecordTemporaryIndexManager;
 import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.metamodel.proxy.CodeListItemProxy;
 import org.openforis.collect.model.CollectRecord;
@@ -38,7 +36,8 @@ import org.openforis.collect.model.proxy.RecordProxy;
 import org.openforis.collect.persistence.MultipleEditException;
 import org.openforis.collect.persistence.RecordPersistenceException;
 import org.openforis.collect.remoting.service.UpdateRequestOperation.Method;
-import org.openforis.collect.util.ExecutorServiceUtil;
+import org.openforis.collect.remoting.service.recordIndex.RecordIndexService;
+import org.openforis.collect.spring.MessageContextHolder;
 import org.openforis.collect.web.session.SessionState;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.BooleanAttributeDefinition;
@@ -71,7 +70,6 @@ import org.openforis.idm.model.Value;
 import org.openforis.idm.model.expression.ExpressionFactory;
 import org.openforis.idm.model.expression.ModelPathExpression;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -84,28 +82,20 @@ public class DataService {
 	
 	@Autowired
 	private SessionManager sessionManager;
-
 	@Autowired
-	private RecordManager recordManager;
-	
+	private transient RecordManager recordManager;
 	@Autowired
-	private RecordFileManager fileManager;
-
+	private transient RecordFileManager fileManager;
 	@Autowired
-	@Qualifier("recordIndexManager")
-	private RecordIndexManager indexManager;
-	
+	private transient RecordIndexService recordIndexService;
 	@Autowired
-	@Qualifier("sessionRecordIndexManager")
-	private RecordTemporaryIndexManager sessionIndexManager;
+	private MessageContextHolder messageContextHolder;
 
 	/**
 	 * it's true when the root entity definition of the record in session has some nodes with the "collect:index" annotation
 	 */
-	private boolean hasIndexedNodes;
+	private boolean hasActiveSurveyIndexedNodes;
 
-	private RecordIndexProcess indexProcess;
-	
 	@Transactional
 	@Secured("ROLE_ENTRY")
 	public RecordProxy loadRecord(int id, int step, boolean forceUnlock) throws RecordPersistenceException, RecordIndexException {
@@ -113,15 +103,23 @@ public class DataService {
 		if ( sessionState.isActiveRecordBeingEdited() ) {
 			throw new MultipleEditException();
 		}
-		CollectSurvey survey = sessionState.getActiveSurvey();
+		final CollectSurvey survey = sessionState.getActiveSurvey();
 		User user = sessionState.getUser();
 		CollectRecord record = recordManager.checkout(survey, user, id, step, sessionState.getSessionId(), forceUnlock);
 		Entity rootEntity = record.getRootEntity();
 		recordManager.addEmptyNodes(rootEntity);
 		sessionManager.setActiveRecord(record);
 		fileManager.reset();
-		hasIndexedNodes = sessionIndexManager.hasIndexableNodes(rootEntity.getDefinition());
-		return new RecordProxy(record);
+		prepareRecordIndexing();
+		return new RecordProxy(messageContextHolder, record);
+	}
+
+	protected void prepareRecordIndexing() throws RecordIndexException {
+		CollectRecord record = getActiveRecord();
+		Entity rootEntity = record.getRootEntity();
+		EntityDefinition rootEntityDefn = rootEntity.getDefinition();
+		hasActiveSurveyIndexedNodes = recordIndexService.hasIndexableNodes(rootEntityDefn);
+		recordIndexService.cleanTemporaryIndex();
 	}
 	
 	/**
@@ -145,10 +143,7 @@ public class DataService {
 		String rootEntityDefinitionName = rootEntityDefinition.getName();
 		int count = recordManager.getRecordCount(activeSurvey, rootEntityDefinitionName, keyValues);
 		List<CollectRecord> summaries = recordManager.loadSummaries(activeSurvey, rootEntityDefinitionName, offset, maxNumberOfRows, sortFields, keyValues);
-		List<RecordProxy> proxies = new ArrayList<RecordProxy>();
-		for (CollectRecord summary : summaries) {
-			proxies.add(new RecordProxy(summary));
-		}
+		List<RecordProxy> proxies = RecordProxy.fromList(messageContextHolder, summaries);
 		result.put("count", count);
 		result.put("records", proxies);
 		return result;
@@ -156,7 +151,7 @@ public class DataService {
 
 	@Transactional
 	@Secured("ROLE_ENTRY")
-	public RecordProxy createRecord(String rootEntityName, String versionName) throws RecordPersistenceException {
+	public RecordProxy createRecord(String rootEntityName, String versionName) throws RecordPersistenceException, RecordIndexException {
 		SessionState sessionState = sessionManager.getSessionState();
 		if ( sessionState.isActiveRecordBeingEdited() ) {
 			throw new MultipleEditException();
@@ -170,7 +165,8 @@ public class DataService {
 		Entity rootEntity = record.getRootEntity();
 		recordManager.addEmptyNodes(rootEntity);
 		sessionManager.setActiveRecord(record);
-		RecordProxy recordProxy = new RecordProxy(record);
+		prepareRecordIndexing();
+		RecordProxy recordProxy = new RecordProxy(messageContextHolder, record);
 		return recordProxy;
 	}
 	
@@ -197,17 +193,9 @@ public class DataService {
 		String sessionId = sessionState.getSessionId();
 		recordManager.save(record, sessionId);
 		fileManager.commitChanges(sessionId, record);
-		if ( isIndexingEnabled() ) {
-			permanentlyIndex(record);
+		if ( isCurrentRecordIndexable() ) {
+			recordIndexService.permanentlyIndex(record);
 		}
-	}
-
-	protected void permanentlyIndex(CollectRecord record) {
-		if ( indexProcess != null && indexProcess.isRunning() ) {
-			indexProcess.cancel();
-		}
-		indexProcess = new RecordIndexProcess(indexManager, record);
-		ExecutorServiceUtil.executeInCachedPool(indexProcess);
 	}
 
 	@Transactional
@@ -229,8 +217,8 @@ public class DataService {
 			firstResp.setMissingWarnings(activeRecord.getMissingWarnings());
 			firstResp.setSkipped(activeRecord.getSkipped());
 			firstResp.setWarnings(activeRecord.getWarnings());
-			if ( hasIndexedNodes ) {
-				sessionIndexManager.index(activeRecord);
+			if ( isCurrentRecordIndexable() ) {
+				recordIndexService.temporaryIndex(activeRecord);
 			}
 		}
 		return updateResponses;
@@ -290,7 +278,7 @@ public class DataService {
 				Node<?> createdNode = addNode(parentEntity, nodeDef, requestValue, symbol, remarks);
 				record.setMissingApproved(parentEntity, nodeName, false);
 				response = getUpdateResponse(responseMap, createdNode);
-				response.setCreatedNode(NodeProxy.fromNode(createdNode));
+				response.setCreatedNode(NodeProxy.fromNode(messageContextHolder, createdNode));
 				relReqDependencies = recordManager.clearRelevanceRequiredStates(createdNode);
 				if(createdNode instanceof Attribute){
 					attribute = (Attribute<? extends AttributeDefinition, ?>) createdNode;
@@ -501,7 +489,7 @@ public class DataService {
 		Integer nodeId = node.getInternalId();
 		UpdateResponse response = responseMap.get(nodeId);
 		if(response == null){
-			response = new UpdateResponse(node);
+			response = new UpdateResponse(messageContextHolder, node);
 			responseMap.put(nodeId, response);
 		}
 		return response;
@@ -556,9 +544,9 @@ public class DataService {
 			fieldValue = val;
 		} else if(def instanceof NumberAttributeDefinition) {
 			NumericAttributeDefinition numberDef = (NumericAttributeDefinition) def;
-			if(fieldIndex != null && fieldIndex == 1) {
-				//unit name
-				fieldValue = value;
+			if(fieldIndex != null && fieldIndex == 2) {
+				//unit id
+				fieldValue = Integer.parseInt(value);
 			} else {
 				NumericAttributeDefinition.Type type = numberDef.getType();
 				Number number = null;
@@ -575,9 +563,9 @@ public class DataService {
 				}
 			}
 		} else if(def instanceof RangeAttributeDefinition) {
-			if(fieldIndex != null && fieldIndex == 2) {
-				//unit name
-				fieldValue = value;
+			if(fieldIndex != null && fieldIndex == 3) {
+				//unit id
+				fieldValue = Integer.parseInt(value);
 			} else {
 				RangeAttributeDefinition.Type type = ((RangeAttributeDefinition) def).getType();
 				Number number = null;
@@ -657,16 +645,20 @@ public class DataService {
 			recordManager.promote(record, user);
 			recordManager.releaseLock(record.getId());
 			sessionManager.clearActiveRecord();
-			if ( isIndexingEnabled() ) {
-				permanentlyIndex(record);
+			if ( isCurrentRecordIndexable() ) {
+				recordIndexService.permanentlyIndex(record);
 			}
 		} else {
 			throw new IllegalStateException("The active record cannot be submitted: it is not in the exptected phase: " + exptectedStep);
 		}
 	}
 	
-	protected boolean isIndexingEnabled() {
-		return hasIndexedNodes && indexManager.isInited();
+	protected boolean isRecordIndexEnabled() {
+		return recordIndexService.isInited();
+	}
+	
+	protected boolean isCurrentRecordIndexable() {
+		return isRecordIndexEnabled() && hasActiveSurveyIndexedNodes;
 	}
 
 	@Secured("ROLE_ANALYSIS")
@@ -701,10 +693,14 @@ public class DataService {
 	/**
 	 * remove the active record from the current session
 	 * @throws RecordPersistenceException 
+	 * @throws RecordIndexException 
 	 */
 	@Secured("ROLE_ENTRY")
-	public void clearActiveRecord() throws RecordPersistenceException {
+	public void clearActiveRecord() throws RecordPersistenceException, RecordIndexException {
 		sessionManager.releaseRecord();
+		if ( isCurrentRecordIndexable() ) {
+			recordIndexService.cleanTemporaryIndex();
+		}
 	}
 	
 	@Secured("ROLE_ENTRY")
@@ -792,7 +788,7 @@ public class DataService {
 		SessionState sessionState = sessionManager.getSessionState();
 		CollectSurvey survey = sessionState.getActiveSurvey();
 		int maxResults = 10;
-		List<String> result = sessionIndexManager.search(SearchType.STARTS_WITH, survey, attributeDefnId, fieldIndex, searchText, maxResults);
+		List<String> result = recordIndexService.search(SearchType.STARTS_WITH, survey, attributeDefnId, fieldIndex, searchText, maxResults);
 		return result;
 	}
 	

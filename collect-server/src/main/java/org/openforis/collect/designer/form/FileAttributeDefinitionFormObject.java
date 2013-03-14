@@ -30,7 +30,7 @@ public class FileAttributeDefinitionFormObject<T extends FileAttributeDefinition
 		super.saveTo(dest, languageCode);
 		dest.setMaxSize(maxSize);
 		dest.removeAllExtensions();
-		if  ( extensions != null ) {
+		if  ( StringUtils.isNotBlank(extensions) ) {
 			String[] extensionsArr = extensions.split(EXTENSIONS_SEPARATOR);
 			List<String> extensionsList = Arrays.asList(extensionsArr);
 			dest.addExtensions(extensionsList);

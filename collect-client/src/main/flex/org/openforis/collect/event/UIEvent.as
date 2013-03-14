@@ -15,6 +15,7 @@ package org.openforis.collect.event {
 		public static const SURVEY_SELECTED:String = "surveySelected";
 		public static const ROOT_ENTITY_SELECTED:String = "rootEntitySelected";
 		public static const BACK_TO_LIST:String = "backToList";
+		public static const SHOW_ERROR_PAGE:String = "showErrorPage";
 		public static const SHOW_HOME_PAGE:String = "backToHome";
 		public static const SHOW_LIST_OF_RECORDS:String = "showListOfRecords";
 		
@@ -33,6 +34,12 @@ package org.openforis.collect.event {
 		
 		//survey preveiw
 		public static const SHOW_SURVEY_PREVIEW:String = "showSurveyPreview";
+		
+		public static const OPEN_SPECIES_IMPORT_POPUP:String = "openSpeciesImportPopUp";
+		public static const CLOSE_SPECIES_IMPORT_POPUP:String = "closeSpeciesImportPopUp";
+		public static const SHOW_SPECIES_IMPORT:String = "showSpeciesImport";
+		public static const SHOW_SAMPLING_DESIGN_IMPORT:String = "showSamplingDesignImport";
+		public static const SHOW_CODE_LIST_IMPORT:String = "showCodeListImport";
 		
 		private var _obj:Object;
 		private var _params:Array;

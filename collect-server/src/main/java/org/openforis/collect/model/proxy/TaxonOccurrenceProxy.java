@@ -33,8 +33,6 @@ public class TaxonOccurrenceProxy implements Proxy {
 		return proxies;
 	}
 
-
-
 	@ExternalizedProperty
 	public String getCode() {
 		return occurrence.getCode();

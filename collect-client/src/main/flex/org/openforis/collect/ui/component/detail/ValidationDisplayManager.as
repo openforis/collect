@@ -2,6 +2,7 @@ package org.openforis.collect.ui.component.detail
 {
 	import flash.events.MouseEvent;
 	
+	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
 	import mx.core.IToolTip;
 	import mx.core.UIComponent;
@@ -42,10 +43,8 @@ package org.openforis.collect.ui.component.detail
 		 */
 		private var _toolTip:IToolTip;
 		private var _toolTipStyleName:String;
-		private var _toolTipMessages:Array;
+		private var _toolTipMessages:IList;
 		private var _displayStyleName:String;
-		
-
 		
 		public function ValidationDisplayManager(toolTipTrigger:UIComponent, display:UIComponent) {
 			_toolTipTrigger = toolTipTrigger;
@@ -54,7 +53,7 @@ package org.openforis.collect.ui.component.detail
 		
 		public function displayAttributeValidation(parentEntity:EntityProxy, defn:NodeDefinitionProxy, attribute:AttributeProxy):void {
 			var flag:ValidationResultFlag = null;
-			var validationMessages:Array = null;
+			var validationMessages:IList = null;
 			if(parentEntity != null && defn != null) {
 				var hasErrors:Boolean = attribute != null ? attribute.hasErrors(): false;
 				var hasWarnings:Boolean = attribute != null ? attribute.hasWarnings(): false;
@@ -82,18 +81,18 @@ package org.openforis.collect.ui.component.detail
 		
 		public function displayAttributesValidation(parentEntity:EntityProxy, defn:NodeDefinitionProxy):void {
 			var flag:ValidationResultFlag = null;
-			var validationMessages:Array = null;
+			var validationMessages:IList = null;
 			if(parentEntity != null && defn != null) {
-				var errorMessages:Array = new Array();
-				var warningMessages:Array = new Array();
+				var errorMessages:ArrayCollection = new ArrayCollection();
+				var warningMessages:ArrayCollection = new ArrayCollection();
 				var attributes:IList = parentEntity.getChildren(defn.name);
 				var confirmedError:Boolean = false;
 				for each (var a:AttributeProxy in attributes) {
 					if (a.hasErrors()) {
-						errorMessages = errorMessages.concat(a.validationResults.validationMessages);
+						errorMessages.addAll(a.validationResults.validationMessages);
 					}
 					if (a.hasWarnings()) {
-						warningMessages = warningMessages.concat(a.validationResults.validationMessages);
+						warningMessages.addAll(a.validationResults.validationMessages);
 						if ( a.errorConfirmed ) {
 							confirmedError = true;
 						}
@@ -122,7 +121,7 @@ package org.openforis.collect.ui.component.detail
 		
 		public function displayMinMaxCountValidationErrors(parentEntity:EntityProxy, defn:NodeDefinitionProxy):void {
 			var flag:ValidationResultFlag = null;
-			var validationMessages:Array = null;
+			var validationMessages:IList = null;
 			var name:String = defn.name;
 			var minCountValid:ValidationResultFlag = parentEntity.childrenMinCountValidationMap.get(name);
 			var maxCountValid:ValidationResultFlag = parentEntity.childrenMaxCountValidationMap.get(name);
@@ -130,13 +129,13 @@ package org.openforis.collect.ui.component.detail
 				if(minCountValid != ValidationResultFlag.OK) {
 					flag = minCountValid;
 					if ( defn.minCount == 1 ) {
-						validationMessages = [Message.get("edit.validation.requiredField")];
+						validationMessages = new ArrayCollection([Message.get("edit.validation.requiredField")]);
 					} else {
-						validationMessages = [Message.get("edit.validation.minCount", [defn.minCount])];
+						validationMessages = new ArrayCollection([Message.get("edit.validation.minCount", [defn.minCount])]);
 					}
 				} else {
 					flag = maxCountValid;
-					validationMessages = [Message.get("edit.validation.maxCount", [defn.maxCount > 0 ? defn.maxCount: 1])];
+					validationMessages = new ArrayCollection([Message.get("edit.validation.maxCount", [defn.maxCount > 0 ? defn.maxCount: 1])]);
 				}
 				apply(flag, validationMessages);
 			} else {
@@ -144,7 +143,7 @@ package org.openforis.collect.ui.component.detail
 			}
 		}
 
-		protected function apply(flag:ValidationResultFlag, messages:Array, confirmedError:Boolean = false):void {
+		protected function apply(flag:ValidationResultFlag, messages:IList, confirmedError:Boolean = false):void {
 			if(_active) {
 				var newStyleName:String;
 				switch(flag) {

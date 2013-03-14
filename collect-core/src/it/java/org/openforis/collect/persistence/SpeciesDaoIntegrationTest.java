@@ -10,6 +10,9 @@ import java.util.Stack;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.openforis.collect.CollectIntegrationTest;
+import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.CollectTaxonomy;
 import org.openforis.idm.model.species.Taxon;
 import org.openforis.idm.model.species.Taxon.TaxonRank;
 import org.openforis.idm.model.species.TaxonVernacularName;
@@ -29,8 +32,11 @@ import org.springframework.transaction.annotation.Transactional;
 @ContextConfiguration( locations = {"classpath:test-context.xml"} )
 @TransactionConfiguration(defaultRollback=true)
 @Transactional
-public class SpeciesDaoIntegrationTest {
+public class SpeciesDaoIntegrationTest extends CollectIntegrationTest {
 //	private final Log log = LogFactory.getLog(ModelDaoIntegrationTest.class);
+
+	@Autowired
+	private SurveyDao surveyDao;
 
 	@Autowired
 	private TaxonomyDao taxonomyDao;
@@ -43,7 +49,7 @@ public class SpeciesDaoIntegrationTest {
 
 	private void testFindCode(String match, int maxResults, int expectedResults) {
 		// Create taxonomy
-		Taxonomy taxonomy1 = testInsertAndLoadTaxonomy("it_bamboo");
+		CollectTaxonomy taxonomy1 = testInsertAndLoadTaxonomy("it_bamboo");
 		testUpdateAndLoadTaxonomy(taxonomy1, "it_trees");
 		Taxon family1 = testInsertAndLoadTaxon(taxonomy1, -1, "JUGLANDACAE","Juglandaceae", TaxonRank.FAMILY, 9, null);
 		Taxon genus1 = testInsertAndLoadTaxon(taxonomy1, -2, "JUG", "Juglans sp.", TaxonRank.GENUS, 9, family1);
@@ -86,7 +92,7 @@ public class SpeciesDaoIntegrationTest {
 	
 	private void testFindScientificName(String match, int maxResults, int expectedResults) {
 		// Create taxonomy
-		Taxonomy taxonomy1 = testInsertAndLoadTaxonomy("it_bamboo");
+		CollectTaxonomy taxonomy1 = testInsertAndLoadTaxonomy("it_bamboo");
 		testUpdateAndLoadTaxonomy(taxonomy1, "it_trees");
 		Taxon family1 = testInsertAndLoadTaxon(taxonomy1, -1, "JUGLANDACAE","Juglandaceae", TaxonRank.FAMILY, 9, null);
 		Taxon genus1 = testInsertAndLoadTaxon(taxonomy1, -2, "JUG", "Juglans sp.",TaxonRank.GENUS, 9, family1);
@@ -115,7 +121,7 @@ public class SpeciesDaoIntegrationTest {
 
 	private void testFindVernacularName(String match, int maxResults, int expectedResults) {
 		// Create taxonomy
-		Taxonomy taxonomy1 = testInsertAndLoadTaxonomy("it_bamboo");
+		CollectTaxonomy taxonomy1 = testInsertAndLoadTaxonomy("it_bamboo");
 		testUpdateAndLoadTaxonomy(taxonomy1, "it_trees");
 		Taxon family1 = testInsertAndLoadTaxon(taxonomy1, -1, "JUGLANDACAE","Juglandaceae", TaxonRank.FAMILY, 9, null);
 		Taxon genus1 = testInsertAndLoadTaxon(taxonomy1, -2, "JUG", "Juglans sp.", TaxonRank.GENUS, 9, family1);
@@ -160,7 +166,7 @@ public class SpeciesDaoIntegrationTest {
 	@Test
 	public void testCRUD() throws Exception  {
 		// Create taxonomy
-		Taxonomy taxonomy1 = testInsertAndLoadTaxonomy("it_bamboo");
+		CollectTaxonomy taxonomy1 = testInsertAndLoadTaxonomy("it_bamboo");
 		testUpdateAndLoadTaxonomy(taxonomy1, "it_trees");
 		
 		// Create taxa
@@ -194,22 +200,67 @@ public class SpeciesDaoIntegrationTest {
 		// Remove taxonomy
 		testDeleteAndLoadTaxonomy(taxonomy1);
 	}
+	
+	@Test
+	public void testDeleteTaxonByTaxonomy() {
+		CollectSurvey survey = createAndStoreSurvey();
+		Integer surveyId = survey.getId();
+		
+		// Create taxonomy
+		CollectTaxonomy t = new CollectTaxonomy();
+		t.setSurveyId(surveyId);
+		
+		t.setName("it_trees");
+		taxonomyDao.insert(t);
+		Integer tId = t.getId();
+		
+		CollectTaxonomy t2 = new CollectTaxonomy();
+		t.setSurveyId(surveyId);
+		t2.setName("it_bamboos");
+		taxonomyDao.insert(t2);
+		Integer t2Id = t2.getId();
+		
+		Taxon family1 = testInsertAndLoadTaxon(t, -1, "JUGLANDACAE", "Juglandaceae", TaxonRank.FAMILY, 9, null);
+		Taxon genus1 = testInsertAndLoadTaxon(t, -2, "JUG", "Juglans sp.",TaxonRank.GENUS, 9, family1);
+		testInsertAndLoadTaxon(t, -3, "JUG/REG", "Juglans regia", TaxonRank.SPECIES, 9, genus1);
+		
+		Taxon family2 = testInsertAndLoadTaxon(t2, -1, "JUGLANDACAE", "Juglandaceae", TaxonRank.FAMILY, 9, null);
+		Taxon genus2 = testInsertAndLoadTaxon(t2, -2, "JUG", "Juglans sp.",TaxonRank.GENUS, 9, family2);
+		testInsertAndLoadTaxon(t2, -3, "JUG/REG", "Juglans regia", TaxonRank.SPECIES, 9, genus2);
+		
+		//verify taxon records present
+		List<Taxon> results = taxonDao.findByCode(tId, "%", 10);
+		assertEquals(3, results.size());
+		taxonDao.deleteByTaxonomy(tId);
+		
+		//verify all taxon records deleted for taxonomy 1
+		List<Taxon> results2 = taxonDao.findByCode(tId, "%", 10);
+		assertTrue(results2 == null || results2.size() == 0);
+		
+		//verify all taxon records NOT deleted for taxonomy 2
+		List<Taxon> results3 = taxonDao.findByCode(t2Id, "%", 10);
+		assertEquals(3, results3.size());
+	}
 
-	private Taxonomy testInsertAndLoadTaxonomy(String name) {
+	private CollectTaxonomy testInsertAndLoadTaxonomy(String name) {
+		CollectSurvey survey = createAndStoreSurvey();
+		
+		Integer surveyId = survey.getId();
 		// Insert
-		Taxonomy t1 = new Taxonomy();
+		CollectTaxonomy t1 = new CollectTaxonomy();
 		t1.setName(name);
+		t1.setSurveyId(surveyId);
 		taxonomyDao.insert(t1);
-		Taxonomy t = t1;
+		CollectTaxonomy t = t1;
 
 		// Confirm saved
-		Taxonomy t2 = taxonomyDao.loadById(t.getId());
+		CollectTaxonomy t2 = taxonomyDao.loadById(t.getId());
 		assertEquals(t.getId(), t2.getId());
 		assertEquals(t.getName(), t2.getName());
 		return t2;
 	}
 
-	private void testUpdateAndLoadTaxonomy(Taxonomy t, String newName) {
+	private void testUpdateAndLoadTaxonomy(CollectTaxonomy t, String newName) {
 		// Update
 		Integer id = t.getId();
 		t.setName(newName);
@@ -338,6 +389,19 @@ public class SpeciesDaoIntegrationTest {
 		t = taxonomyDao.loadById(t.getId());
 		assertNull(t);
 	}
+
+	protected CollectSurvey createAndStoreSurvey() {
+		CollectSurvey survey = createSurvey();
+		survey.setName("surveyTest");
+		survey.setUri("http://www.openforis.org/idm/species_dao_it");
+		try {
+			surveyDao.importModel(survey);
+		} catch (SurveyImportException e) {
+			throw new RuntimeException(e);
+		}
+		return survey;
+	}
+
 	/*
 	private TaxonVernacularName testInsertAndLoadVernacularNameWithQualifier(TaxonVernacularName tvn, Taxon taxon1, String name, String lang, String variety, int step, String qualifer1) {
 		// Insert

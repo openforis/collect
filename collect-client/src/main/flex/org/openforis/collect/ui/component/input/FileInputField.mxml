@@ -60,12 +60,13 @@
 					itemCreationPolicy="immediate"
 					/>
 	
-	<s:HGroup id="controlsContainer" 
+	<s:VGroup id="controlsContainer" 
 			  visible="{editable}" 
 			  includeInLayout="{editable}" gap="20">
 		
 		<s:Group excludeFrom="uploading"
-				 itemCreationPolicy="immediate">
+				 itemCreationPolicy="immediate"
+				 width="100%">
 			<s:Button id="browseButton" 
 					  useHandCursor="true"
 					  buttonMode="true"
@@ -86,12 +87,14 @@
 						itemCreationPolicy="immediate"
 						/>
 		
-		<s:HGroup id="fileUploadedControlsContainer" gap="20"
+		<s:VGroup id="fileUploadedControlsContainer" gap="20"
 				  includeIn="fileUploaded"
-				  itemCreationPolicy="immediate">
+				  itemCreationPolicy="immediate"
+				  horizontalAlign="center"
+				  width="100%">
 			<s:Button id="downloadButton" label="{Message.get('global.download')}" />
 			<s:Button id="removeButton" label="{Message.get('global.delete')}" />
-		</s:HGroup>
-	</s:HGroup>
+		</s:VGroup>
+	</s:VGroup>
 	
 </input:InputField>

@@ -29,6 +29,8 @@ package org.openforis.collect.util {
 	import org.openforis.collect.metamodel.proxy.SpatialReferenceSystemProxy;
 	import org.openforis.collect.metamodel.proxy.SurveyProxy;
 	import org.openforis.collect.metamodel.proxy.TaxonAttributeDefinitionProxy;
+	import org.openforis.collect.metamodel.proxy.TaxonSummariesProxy;
+	import org.openforis.collect.metamodel.proxy.TaxonSummaryProxy;
 	import org.openforis.collect.metamodel.proxy.TextAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.TextAttributeDefinitionProxy$Type;
 	import org.openforis.collect.metamodel.proxy.TimeAttributeDefinitionProxy;
@@ -49,19 +51,25 @@ package org.openforis.collect.util {
 	import org.openforis.collect.model.proxy.NodeProxy;
 	import org.openforis.collect.model.proxy.RealRangeProxy;
 	import org.openforis.collect.model.proxy.RecordProxy;
+	import org.openforis.collect.model.proxy.SamplingDesignItemProxy;
+	import org.openforis.collect.model.proxy.SamplingDesignSummariesProxy;
 	import org.openforis.collect.model.proxy.TaxonOccurrenceProxy;
 	import org.openforis.collect.model.proxy.TaxonProxy;
 	import org.openforis.collect.model.proxy.TaxonVernacularNameProxy;
+	import org.openforis.collect.model.proxy.TaxonomyProxy;
 	import org.openforis.collect.model.proxy.TimeProxy;
 	import org.openforis.collect.model.proxy.ValidationResultProxy;
 	import org.openforis.collect.model.proxy.ValidationResultsProxy;
 	import org.openforis.collect.remoting.service.UpdateResponse;
+	import org.openforis.collect.remoting.service.codeListImport.proxy.CodeListImportStatusProxy;
 	import org.openforis.collect.remoting.service.dataExport.DataExportState;
 	import org.openforis.collect.remoting.service.dataImport.DataImportStateProxy;
 	import org.openforis.collect.remoting.service.dataImport.DataImportSummaryItemProxy;
 	import org.openforis.collect.remoting.service.dataImport.DataImportSummaryProxy;
 	import org.openforis.collect.remoting.service.dataImport.FileUnmarshallingErrorProxy;
 	import org.openforis.collect.remoting.service.dataImport.NodeUnmarshallingErrorProxy;
+	import org.openforis.collect.remoting.service.samplingDesignImport.proxy.SamplingDesignImportStatusProxy;
+	import org.openforis.collect.remoting.service.speciesImport.proxy.SpeciesImportStatusProxy;
 	import org.openforis.idm.metamodel.validation.ValidationResultFlag;
 
 	/**
@@ -81,6 +89,7 @@ package org.openforis.collect.util {
 				BooleanAttributeDefinitionProxy,
 				CodeAttributeDefinitionProxy,
 				CodeAttributeProxy,
+				CodeListImportStatusProxy,
 				CodeListItemProxy,
 				CodeListLabelProxy,
 				CodeListLabelProxy$Type,
@@ -117,13 +126,20 @@ package org.openforis.collect.util {
 				RangeAttributeDefinitionProxy,
 				RealRangeProxy,
 				RecordProxy,
+				SamplingDesignImportStatusProxy,
+				SamplingDesignItemProxy,
+				SamplingDesignSummariesProxy,
 				SchemaProxy,
 				SpatialReferenceSystemProxy,
+				SpeciesImportStatusProxy,
 				SurveyProxy,
 				SurveySummary,
 				TaxonAttributeDefinitionProxy,
 				TaxonOccurrenceProxy,
+				TaxonomyProxy,
 				TaxonProxy,
+				TaxonSummariesProxy,
+				TaxonSummaryProxy,
 				TaxonVernacularNameProxy,
 				TextAttributeDefinitionProxy,
 				TextAttributeDefinitionProxy$Type,

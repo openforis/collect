@@ -16,6 +16,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.commons.collection.CollectionUtils;
 import org.openforis.idm.metamodel.ApplicationOptions;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.LanguageSpecificText;
@@ -23,7 +24,6 @@ import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NodeDefinitionVisitor;
 import org.openforis.idm.metamodel.NodeLabel;
 import org.openforis.idm.metamodel.Schema;
-import org.openforis.idm.util.CollectionUtil;
 
 
 /**
@@ -86,7 +86,7 @@ public class UIOptions implements ApplicationOptions, Serializable {
 	}
 	
 	public List<UITabSet> getTabSets() {
-		return CollectionUtil.unmodifiableList(tabSets);
+		return CollectionUtils.unmodifiableList(tabSets);
 	}
 	
 	public UITabSet createTabSet() {
@@ -155,6 +155,22 @@ public class UIOptions implements ApplicationOptions, Serializable {
 	
 	public boolean isMainTab(UITab tab) {
 		return tab.getIndex() == 0 && tab.getDepth() == 1;
+	}
+	
+	public UITab getTab(String name) {
+		Stack<UITab> stack = new Stack<UITab>();
+		List<UITabSet> tabSets = getTabSets();
+		for (UITabSet tabSet : tabSets) {
+			stack.addAll(tabSet.getTabs());
+			while ( ! stack.isEmpty() ) {
+				UITab tab = stack.pop();
+				if ( name.equals(tab.getName()) ) {
+					return tab;
+				}
+				stack.addAll(tab.getTabs());
+			}
+		}
+		return null;
 	}
 	
 	public UITab getAssignedTab(NodeDefinition nodeDefn) {
@@ -241,19 +257,19 @@ public class UIOptions implements ApplicationOptions, Serializable {
 	public List<UITab> getTabsAssignableToChildren(EntityDefinition entityDefn) {
 		EntityDefinition rootEntity = entityDefn.getRootEntity();
 		UITabSet rootTabSet = getAssignedRootTabSet(rootEntity);
-		UITabSet parentTabSet = null;
 		if ( rootTabSet != null ) {
 			if ( entityDefn == null || entityDefn.getParentDefinition() == null ) {
-				parentTabSet = rootTabSet;
+				List<UITab> tabs = new ArrayList<UITab>(rootTabSet.getTabs());
+				UITab mainTab = getMainTab(rootTabSet);
+				tabs.addAll(mainTab.getTabs());
+				return tabs;
 			} else {
 				UITab assignedTab = getAssignedTab(entityDefn);
-				parentTabSet = assignedTab;
+				List<UITab> tabs = assignedTab.getTabs();
+				return tabs;
 			}
-		}
-		if (parentTabSet == null) {
-			return Collections.emptyList();
 		} else {
-			return parentTabSet.getTabs();
+			return Collections.emptyList();
 		}
 	}
 	
@@ -377,7 +393,7 @@ public class UIOptions implements ApplicationOptions, Serializable {
 	 * - Root entity: FORM
 	 * - Single entity: FORM and TABLE (only inside an entity with TABLE layout)
 	 * - Multiple entity: FORM only if it's the only multiple entity with FORM layout
-	 * 		into the tab
+	 * 		into the tab, TABLE only if there is not an ancestor entity with TABLE layout
 	 * 
 	 * @param parentEntityDefn
 	 * @param entityDefn
@@ -391,10 +407,17 @@ public class UIOptions implements ApplicationOptions, Serializable {
 			Layout parentLayout = getLayout(parentEntityDefn);
 			return layout == Layout.FORM || parentLayout == Layout.TABLE;
 		} else if ( layout == Layout.FORM) {
-			//UITab tab = getAssignedTab(parentEntityDefn, entityDefn, true);
-			EntityDefinition multipleEntity = getFormLayoutMultipleEntity(associatedTab);
+			UITab tab = associatedTab == null ? getAssignedTab(parentEntityDefn, true): associatedTab;
+			EntityDefinition multipleEntity = getFormLayoutMultipleEntity(tab);
 			return multipleEntity == null || multipleEntity.getId() == entityDefnId;
 		} else {
+			EntityDefinition ancestorEntity = parentEntityDefn;
+			while ( ancestorEntity != null ) {
+				if ( getLayout(ancestorEntity) == Layout.TABLE) {
+					return false;
+				}
+				ancestorEntity = (EntityDefinition) ancestorEntity.getParentDefinition();
+			}
 			return true;
 		}
 	}

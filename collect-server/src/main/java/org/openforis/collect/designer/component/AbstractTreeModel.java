@@ -55,7 +55,9 @@ public abstract class AbstractTreeModel<T> extends DefaultTreeModel<T> {
 		if ( selectionPath != null ) {
 			AbstractTreeNode<T> treeNode = (AbstractTreeNode<T>) getChild(selectionPath);
 			AbstractTreeNode<T> parentTreeNode = (AbstractTreeNode<T>) treeNode.getParent();
+			Set<TreeNode<T>> openObjects = getOpenObjects();
 			parentTreeNode.remove(treeNode);
+			setOpenObjects(openObjects);
 		}
 	}
 	

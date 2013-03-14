@@ -64,6 +64,8 @@ public class RecordManager {
 	
 	@Autowired
 	private RecordDao recordDao;
+
+	private RecordConverter recordConverter = new RecordConverter();
 	
 	private Map<Integer, RecordLock> locks;
 	
@@ -123,12 +125,14 @@ public class RecordManager {
 		isLockAllowed(user, recordId, sessionId, forceUnlock);
 		lock(recordId, user, sessionId, forceUnlock);
 		CollectRecord record = recordDao.load(survey, recordId, step);
+		recordConverter.convertToLatestVersion(record);
 		return record;
 	}
 	
 	@Transactional
 	public CollectRecord load(CollectSurvey survey, int recordId, int step) throws RecordPersistenceException {
 		CollectRecord record = recordDao.load(survey, recordId, step);
+		recordConverter.convertToLatestVersion(record);
 		return record;
 	}
 	
@@ -318,7 +322,6 @@ public class RecordManager {
 	public void addEmptyNodes(Entity entity) {
 		Record record = entity.getRecord();
 		ModelVersion version = record.getVersion();
-		
 		addEmptyEnumeratedEntities(entity);
 		EntityDefinition entityDefn = entity.getDefinition();
 		List<NodeDefinition> childDefinitions = entityDefn.getChildDefinitions();
@@ -326,21 +329,12 @@ public class RecordManager {
 			if(version == null || version.isApplicable(childDefn)) {
 				String childName = childDefn.getName();
 				if(entity.getCount(childName) == 0) {
-					int count = 0;
 					int toBeInserted = entity.getEffectiveMinCount(childName);
-					if ( count == 0 && (childDefn instanceof AttributeDefinition || ! childDefn.isMultiple()) ) {
+					if ( toBeInserted <= 0 && childDefn instanceof AttributeDefinition || ! childDefn.isMultiple() ) {
 						//insert at least one node
 						toBeInserted = 1;
 					}
-					while(count < toBeInserted) {
-						if(childDefn instanceof AttributeDefinition) {
-							Node<?> createNode = childDefn.createNode();
-							entity.add(createNode);
-						} else if(childDefn instanceof EntityDefinition) {
-							addEntity(entity, childName);
-						}
-						count ++;
-					}
+					addEmptyChildren(entity, childDefn, toBeInserted);
 				} else {
 					List<Node<?>> children = entity.getAll(childName);
 					for (Node<?> child : children) {
@@ -351,6 +345,27 @@ public class RecordManager {
 				}
 			}
 		}
+	}
+
+	protected int addEmptyChildren(Entity entity, NodeDefinition childDefn, int toBeInserted) {
+		String childName = childDefn.getName();
+		CollectSurvey survey = (CollectSurvey) entity.getSurvey();
+		UIOptions uiOptions = survey.getUIOptions();
+		int count = 0;
+		boolean multipleEntityFormLayout = childDefn instanceof EntityDefinition && childDefn.isMultiple() && 
+				uiOptions != null && uiOptions.getLayout((EntityDefinition) childDefn) == Layout.FORM;
+		if ( ! multipleEntityFormLayout ) {
+			while(count < toBeInserted) {
+				if(childDefn instanceof AttributeDefinition) {
+					Node<?> createNode = childDefn.createNode();
+					entity.add(createNode);
+				} else if(childDefn instanceof EntityDefinition ) {
+					addEntity(entity, childName);
+				}
+				count ++;
+			}
+		}
+		return count;
 	}
 	
 	@SuppressWarnings("unchecked")

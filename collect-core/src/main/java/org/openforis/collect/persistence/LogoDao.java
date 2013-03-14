@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Transactional
 public class LogoDao extends MappingJooqDaoSupport<Logo, LogoDao.JooqFactory> {
+	
 	public LogoDao() {
 		super(LogoDao.JooqFactory.class);
 	}

@@ -223,8 +223,8 @@ public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyO
 	}
 
 	protected UITab getTab(String tabName) {
-		UITabSet parentTabSet = getParentTabSet();
-		UITab tab = parentTabSet != null ? parentTabSet.getTab(tabName): null;
+		UIOptions uiOptions = survey.getUIOptions();
+		UITab tab = uiOptions.getTab(tabName);
 		return tab;
 	}
 	
@@ -278,5 +278,9 @@ public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyO
 	@DependsOn("editedItem")
 	public boolean isRootEntity() {
 		return editedItem != null && parentEntity == null;
+	}
+	
+	public boolean isRequiredApplied() {
+		return true;
 	}
 }

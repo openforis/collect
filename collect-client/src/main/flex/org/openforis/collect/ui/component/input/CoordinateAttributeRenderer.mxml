@@ -50,7 +50,7 @@
 								  parentEntity="{parentEntity}"
 								  attribute="{attribute}"
 								  fieldIndex="2"
-								  width="70" 
+								  width="100" 
 								  dataField="id"
 								  includeIn="horizontal" 
 								  itemCreationPolicy="immediate"
@@ -63,12 +63,14 @@
 								 parentEntity="{parentEntity}"
 								 attribute="{attribute}"
 								 fieldIndex="1"
+								 width="70"
 								 />
 		<input:NumericInputField id="xTextInput" includeIn="horizontal" itemCreationPolicy="immediate"
 								 attributeDefinition="{attributeDefinition}"
 								 parentEntity="{parentEntity}"
 								 attribute="{attribute}"
 								 fieldIndex="0"
+								 width="70"
 								 />
 	</s:HGroup>
 	

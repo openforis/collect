@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:SkinnableContainer xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		  xmlns:s="library://ns.adobe.com/flex/spark" 
+		  xmlns:mx="library://ns.adobe.com/flex/mx">
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.controls.ProgressBar;
+			
+			import org.openforis.collect.i18n.Message;
+			import org.openforis.collect.manager.referenceDataImport.ParsingError$ErrorType;
+			import org.openforis.collect.manager.referenceDataImport.proxy.ParsingErrorProxy;
+			import org.openforis.collect.ui.component.datagrid.PaginationBar;
+			import org.openforis.collect.util.ArrayUtil;
+			import org.openforis.collect.util.StringUtil;
+			
+			import spark.components.Button;
+			import spark.components.DataGrid;
+			import spark.components.gridClasses.GridColumn;
+			
+			public static const STATE_DEFAULT:String = "default";
+			public static const STATE_LOADING:String = "loading";
+			public static const STATE_SELECT_FILE:String = "selectFile";
+			public static const STATE_UPLOADING:String = "uploading";
+			public static const STATE_IMPORTING:String = "importing";
+			public static const STATE_ERROR:String = "error";
+			
+			private var _progressLabelText:String;
+			private var _progressTitleText:String;
+			
+			[SkinPart(type="org.openforis.collect.ui.component.datagrid.PaginationBar")]
+			public var paginationBar:PaginationBar;
+			[SkinPart(type="spark.components.DataGrid")]
+			public var summaryDataGrid:DataGrid;
+			[SkinPart(required="true", type="mx.controls.ProgressBar")]
+			public var progressBar:ProgressBar;
+			[SkinPart(required="true", type="spark.components.DataGrid")]
+			public var errorsDataGrid:DataGrid;
+			[SkinPart(required="true", type="spark.components.Button")]
+			public var importButton:Button;
+			[SkinPart(required="true", type="spark.components.Button")]
+			public var cancelImportButton:Button;
+			[SkinPart(required="true", type="spark.components.Button")]
+			public var closeButton:Button;
+			[SkinPart(required="true", type="spark.components.Button")]
+			public var errorsOkButton:Button;
+
+			private var _surveyId:int;
+			private var _work:Boolean;
+			private var _showCloseButton:Boolean;
+
+			override protected function getCurrentSkinState():String {
+				return currentState;
+			}
+			
+			public function errorTypeLabelFunction(item:ParsingErrorProxy, gridColumn:GridColumn):String {
+				var type:ParsingError$ErrorType = item.errorType;
+				if ( type == null ) {
+					return "";
+				} else {
+					var messageKey:String = "referenceDataImport.parsingError.type." + type.name.toLowerCase();
+					return Message.get(messageKey);
+				}
+			}
+			
+			public function errorColumnsLabelFunction(item:ParsingErrorProxy, gridColumn:GridColumn):String {
+				return StringUtil.concat(", ", item.columns);
+			}
+			
+			public function errorMessageLabelFunction(item:ParsingErrorProxy, gridColumn:GridColumn):String {
+				if ( ArrayUtil.isEmpty(item.messageArgs) ) {
+					return Message.get(item.message);
+				} else {
+					var messageKey:String;
+					switch (item.errorType) {
+						case ParsingError$ErrorType.WRONG_COLUMN_NAME:
+							messageKey = "referenceDataImport.parsingError.wrong_column_name.message";
+							break;
+						case ParsingError$ErrorType.DUPLICATE_VALUE:
+							messageKey = "referenceDataImport.parsingError.type.duplicate_value.message";
+							break;
+						default:
+							messageKey = item.message;
+					}
+					var message:String = Message.get(messageKey, item.messageArgs);
+					return message;
+				}
+			}
+			
+			public function get surveyId():int {
+				return _surveyId;
+			}
+			
+			public function set surveyId(value:int):void {
+				_surveyId = value;
+			}
+			
+			public function get work():Boolean {
+				return _work;
+			}
+			
+			public function set work(value:Boolean):void {
+				_work = value;
+			}
+			
+			[Bindable]
+			public function get showCloseButton():Boolean {
+				return _showCloseButton;
+			}
+			
+			public function set showCloseButton(value:Boolean):void {
+				_showCloseButton = value;
+			}
+
+			[Bindable]
+			public function get progressTitleText():String {
+				return _progressTitleText;
+			}
+
+			public function set progressTitleText(value:String):void {
+				_progressTitleText = value;
+			}
+
+			[Bindable]
+			public function get progressLabelText():String {
+				return _progressLabelText;
+			}
+
+			public function set progressLabelText(value:String):void {
+				_progressLabelText = value;
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<fx:Metadata>
+		[SkinState("default")]
+		[SkinState("loading")]
+		[SkinState("selectFile")]
+		[SkinState("uploading")]
+		[SkinState("importing")]
+		[SkinState("error")]
+	</fx:Metadata>
+	
+	<s:states>
+		<s:State name="default" enterState="invalidateSkinState()" />
+		<s:State name="loading" enterState="invalidateSkinState()" />
+		<s:State name="selectFile" enterState="invalidateSkinState()" />
+		<s:State name="uploading" enterState="invalidateSkinState()" />
+		<s:State name="importing" enterState="invalidateSkinState()" />
+		<s:State name="error" enterState="invalidateSkinState()" />
+	</s:states>
+	
+</s:SkinnableContainer>

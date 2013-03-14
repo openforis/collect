@@ -1,5 +1,6 @@
 package org.openforis.collect.designer.model;
 
+import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Schema;
@@ -27,6 +28,36 @@ public enum NodeType {
 			throw new IllegalArgumentException("Standard not supported: " + this.name());
 		}
 		return Labels.getLabel(labelKey);
+	}
+	
+	public static String getHeaderLabel(NodeDefinition nodeDefn, boolean rootEntity, boolean detached) {
+		String messageKey;
+		String nodeTypeLabel = null;
+		NodeType nodeType = NodeType.valueOf(nodeDefn);
+		switch (nodeType) {
+		case ENTITY:
+			if ( rootEntity ) {
+				messageKey = "survey.schema.node_detail_title.root_entity";
+			} else {
+				messageKey = "survey.schema.node_detail_title.entity";
+			}
+			nodeTypeLabel = Labels.getLabel(messageKey);
+			break;
+		case ATTRIBUTE:
+			messageKey = "survey.schema.node_detail_title.attribute";
+			AttributeType attrType = AttributeType.valueOf((AttributeDefinition) nodeDefn);
+			Object[] args = new String[]{attrType.getLabel()};
+			nodeTypeLabel = Labels.getLabel(messageKey, args);
+			break;
+		}
+		String result;
+		if ( detached ) {
+			Object[] args = new String[]{nodeTypeLabel.toLowerCase()};
+			result = Labels.getLabel("survey.schema.node_detail_title.new_node", args);
+		} else {
+			result = nodeTypeLabel;
+		}
+		return result;
 	}
 	
 	public static NodeType valueOf(NodeDefinition nodeDefn) {

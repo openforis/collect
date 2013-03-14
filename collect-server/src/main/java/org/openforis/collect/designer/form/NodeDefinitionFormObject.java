@@ -1,10 +1,10 @@
 package org.openforis.collect.designer.form;
 
+import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.designer.model.AttributeType;
 import org.openforis.collect.designer.model.NodeType;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.metamodel.ui.UITab;
-import org.openforis.collect.metamodel.ui.UITabSet;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -17,6 +17,8 @@ import org.openforis.idm.metamodel.Prompt;
  *
  */
 public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends VersionableItemFormObject<T> {
+	
+	public static final String REQUIRED_FIELD = "required";
 	
 	public static final String INHERIT_TAB_NAME = "inherit";
 	
@@ -182,8 +184,9 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 			if (required) {
 				dest.setMinCount(1);
 			}
-			dest.setRequiredExpression(requiredExpression);
+			dest.setRequiredExpression(StringUtils.trimToNull(requiredExpression));
 		}
+		dest.setRelevantExpression(StringUtils.trimToNull(requiredExpression));
 		saveTabInfo(dest);
 	}
 
@@ -193,8 +196,7 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 			if ( tabName == null || tabName.equals(INHERIT_TAB_NAME) ) {
 				uiOptions.removeTabAssociation(dest);
 			} else {
-				UITabSet parentTabSet = uiOptions.getAssignedTabSet(parentDefinition);
-				UITab tab = parentTabSet.getTab(tabName);
+				UITab tab = uiOptions.getTab(tabName);
 				uiOptions.assignToTab(dest, tab);
 			}
 		}

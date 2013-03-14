@@ -1,7 +1,1 @@
 CREATE USER "collect" WITH PASSWORD 'collect';
-
-GRANT USAGE ON SCHEMA "collect" TO "collect";
-
-GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA "collect" to "collect";
-
-GRANT SELECT, UPDATE ON ALL SEQUENCES IN SCHEMA "collect" to "collect";

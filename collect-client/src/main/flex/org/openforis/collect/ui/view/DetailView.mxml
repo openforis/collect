@@ -63,7 +63,7 @@
 			</s:HGroup>
 			
 			<!-- save message -->
-			<detail:RecordSavedMessage id="recordSavedMessage"
+			<component:MessageDisplay id="messageDisplay"
 									   horizontalCenter="0"
 									   visible="false" />
 			

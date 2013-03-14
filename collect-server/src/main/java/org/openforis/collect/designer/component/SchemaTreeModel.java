@@ -7,11 +7,14 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Stack;
 
+import org.openforis.collect.designer.model.NodeType;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Schema;
+import org.zkoss.bind.BindUtils;
+import org.zkoss.util.resource.Labels;
 import org.zkoss.zul.TreeNode;
 
 /**
@@ -122,10 +125,26 @@ public class SchemaTreeModel extends AbstractTreeModel<SchemaTreeModel.SchemaTre
 	}
 	
 	public void appendNodeToSelected(NodeDefinition nodeDefn, boolean detached) {
-		SchemaTreeNodeData data = new SchemaTreeNodeData(nodeDefn, detached);
+		AbstractTreeNode<?> selectedNode = getSelectedNode();
+		boolean root = selectedNode == null;
+		SchemaTreeNodeData data = new SchemaTreeNodeData(nodeDefn, root, detached);
 		super.appendNodeToSelected(data);
 	}
 	
+	public void setSelectedNodeName(String name) {
+		AbstractTreeNode<SchemaTreeNodeData> selectedNode = getSelectedNode();
+		if ( selectedNode != null ) {
+			SchemaTreeNodeData data = selectedNode.getData();
+			data.setName(name);
+			BindUtils.postNotifyChange(null, null, data, "name");
+		}
+	}
+	
+	public void markSelectedNodeAsDetached() {
+		SchemaTreeNode selectedNode = (SchemaTreeNode) getSelectedNode();
+		selectedNode.markAsDetached();
+	}
+
 	protected int getIndexInTree(EntityDefinition parent, NodeDefinition node) {
 		List<NodeDefinition> siblings;
 		if ( parent == null ) {
@@ -183,6 +202,14 @@ public class SchemaTreeModel extends AbstractTreeModel<SchemaTreeModel.SchemaTre
 			super(data, children);
 		}
 		
+		public void markAsDetached() {
+			TreeNode<SchemaTreeNodeData> parent = getParent();
+			TreeNode<SchemaTreeNodeData> root = getModel().getRoot();
+			SchemaTreeNodeData data = getData();
+			boolean rootEntity = parent == root;
+			data.markAsDetached(rootEntity);
+		}
+		
 		public static SchemaTreeNode createNode(SchemaTreeNodeData data, ModelVersion version,
 				boolean includeAttributes, boolean defineEmptyChildrenForLeaves) {
 			SchemaTreeNode node = null;
@@ -235,18 +262,36 @@ public class SchemaTreeModel extends AbstractTreeModel<SchemaTreeModel.SchemaTre
 	public static class SchemaTreeNodeData {
 		
 		private boolean detached;
+		private String name;
 		private NodeDefinition nodeDefinition;
 		
 		protected SchemaTreeNodeData(NodeDefinition nodeDefinition) {
 			super();
 			this.nodeDefinition = nodeDefinition;
+			this.name = nodeDefinition == null ? null: nodeDefinition.getName();
 		}
 		
-		protected SchemaTreeNodeData(NodeDefinition nodeDefinition, boolean detached) {
+		protected SchemaTreeNodeData(NodeDefinition nodeDefinition, boolean root, boolean detached) {
 			this(nodeDefinition);
 			this.detached = detached;
+			if ( detached ) {
+				this.name = getDetachedLabel(nodeDefinition, root);
+			}
 		}
 
+		protected String getDetachedLabel(NodeDefinition nodeDefn, boolean root) {
+			String nodeTypeLabel = NodeType.getHeaderLabel(nodeDefn, root, true);
+			Object[] args = new String[]{nodeTypeLabel};
+			String result = Labels.getLabel("survey.schema.tree.new_node_label", args);
+			return result;
+		}
+
+		public void markAsDetached(boolean root) {
+			if ( name == null ) {
+				name = getDetachedLabel(nodeDefinition, root);
+			}
+		}
+		
 		public boolean isDetached() {
 			return detached;
 		}
@@ -258,8 +303,15 @@ public class SchemaTreeModel extends AbstractTreeModel<SchemaTreeModel.SchemaTre
 		public NodeDefinition getNodeDefinition() {
 			return nodeDefinition;
 		}
-		
+
+		public String getName() {
+			return name;
+		}
+
+		public void setName(String name) {
+			this.name = name;
+		}
 		
 	}
-	
+
 }

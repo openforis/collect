@@ -248,7 +248,7 @@ package org.openforis.collect.model.proxy {
 						var keyValue:Object = getKeyLabelPart(def, keyAttr);
 						if(keyValue != null && StringUtil.isNotBlank(keyValue.toString())) {
 							shortKeyParts.push(keyValue.toString());
-							var label:String = def.getLabelText();
+							var label:String = def.getInstanceOrHeadingLabelText();
 							var fullKeyPart:String = label + " " + keyValue;
 							fullKeyParts.push(fullKeyPart);
 						}

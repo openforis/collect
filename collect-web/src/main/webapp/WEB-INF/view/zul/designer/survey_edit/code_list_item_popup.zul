@@ -52,7 +52,7 @@
 				<row>
 					<label value="${labels.survey.code_list.qualifiable}:" />
                     <fieldErrorHandler message="@load(vmsgs['qualifiable'])">
-						<checkbox value="@bind(fx.qualifiable)" onCheck="@command('applyChanges')" />
+						<checkbox checked="@bind(fx.qualifiable)" onCheck="@command('applyChanges')" />
 					</fieldErrorHandler>
 				</row>
     			<row>

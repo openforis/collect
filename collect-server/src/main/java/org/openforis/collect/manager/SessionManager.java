@@ -11,9 +11,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.granite.context.GraniteContext;
 import org.granite.messaging.webapp.HttpGraniteContext;
+import org.openforis.collect.designer.session.SessionStatus;
 import org.openforis.collect.model.CollectRecord;
+import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.RecordUnlockedException;
+import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.collect.web.session.InvalidSessionException;
 import org.openforis.collect.web.session.SessionState;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,15 +33,14 @@ public class SessionManager {
 	private static Log LOG = LogFactory.getLog(SessionManager.class);
 
 	@Autowired
-	private UserManager userManager;
-	
+	private transient SurveyManager surveyManager;
 	@Autowired
-	protected RecordManager recordManager;
-
+	private transient UserManager userManager;
 	@Autowired
-	private RecordFileManager fileManager;
+	private transient RecordManager recordManager;
+	@Autowired
+	private transient RecordFileManager fileManager;
 
-	
 	public SessionState getSessionState() {
 		SessionState sessionState = (SessionState) getSessionAttribute(SessionState.SESSION_ATTRIBUTE_NAME);
 		if (sessionState == null) {
@@ -48,6 +50,30 @@ public class SessionManager {
 		sessionState.setUser(user);
 
 		return sessionState;
+	}
+	
+	public CollectRecord getActiveRecord() {
+		SessionState sessionState = getSessionState();
+		return sessionState.getActiveRecord();
+	}
+
+	public CollectSurvey getActiveDesignerSurvey() {
+		SessionStatus designerSessionStatus = getDesignerSessionStatus();
+		if ( designerSessionStatus == null ) {
+			return null;
+		} else {
+			return designerSessionStatus.getSurvey();
+		}
+	}
+
+	public SessionStatus getDesignerSessionStatus() {
+		SessionStatus designerSessionStatus = (SessionStatus) getSessionAttribute(SessionStatus.SESSION_KEY);
+		return designerSessionStatus;
+	}
+
+	public CollectSurvey getActiveSurvey() {
+		SessionState sessionState = getSessionState();
+		return sessionState.getActiveSurvey();
 	}
 	
 	public void setActiveRecord(CollectRecord record) {
@@ -61,6 +87,21 @@ public class SessionManager {
 		sessionState.setActiveRecord(null);
 	}
 
+	public void saveActiveDesignerSurvey() {
+		try {
+			SessionState sessionState = getSessionState();
+			CollectSurvey survey = getActiveDesignerSurvey();
+			boolean activeSurveyWork = sessionState.isActiveSurveyWork();
+			if ( activeSurveyWork ) {
+				surveyManager.saveSurveyWork(survey);
+			} else {
+				throw new IllegalArgumentException("Active designer survey should be a 'work' survey");
+			}
+		} catch ( SurveyImportException e ) {
+			LOG.error("Error updating taxonomy related attributes.", e);
+		}
+	}
+	
 	public void keepSessionAlive() {
 		getSessionState();
 		if (LOG.isDebugEnabled()) {

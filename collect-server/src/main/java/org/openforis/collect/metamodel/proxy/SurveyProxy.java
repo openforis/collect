@@ -70,4 +70,14 @@ public class SurveyProxy implements Proxy {
 		return new UIOptionsProxy(uiOptions);
 	}
 
+	@ExternalizedProperty
+	public List<String> getLanguages() {
+		return survey.getLanguages();
+	}
+	
+	@ExternalizedProperty
+	public String getDefaultLanguageCode() {
+		return survey.getLanguages().get(0);
+	}
+	
 }

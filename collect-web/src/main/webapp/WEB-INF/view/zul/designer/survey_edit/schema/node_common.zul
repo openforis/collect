@@ -3,7 +3,8 @@
 <?component name="multilanguageLabel" class="org.openforis.collect.designer.component.MultilanguageLabel" macroURI="/WEB-INF/view/zul/designer/component/multilanguage_label.zul"?>
 <zk>
   <custom-attributes otherGeneralDetailsForm="${arg.otherGeneralDetailsForm}"/>
-  <custom-attributes otherGeneralDetailsForm="${arg.otherLayoutForm}"/>
+  <custom-attributes otherMinorGeneralDetailsForm="${arg.otherMinorGeneralDetailsForm}"/>
+  <custom-attributes otherLayoutForm="${arg.otherLayoutForm}"/>
   <custom-attributes otherAttributesForm="${arg.otherAttributesForm}"/>
   
   <groupbox width="100%" closable="false">
@@ -18,7 +19,7 @@
           <label value="${labels.global.item.name}:" />
           <fieldErrorHandler message="@load(vmsgs['name'])">
             <textbox width="200px" maxlength="40" value="@bind(fx.name)"
-              onChange="@command('applyChanges')" />
+              onChange="@global-command('editedNodeNameChanging', name=self.value)" />
           </fieldErrorHandler>
         </row>
       </rows>
@@ -39,7 +40,7 @@
                       onCheck="@command('applyChanges')" />
                 </fieldErrorHandler>
 			</row>
-			<row visible="@load(not vm.rootEntity and fx.multiple ne true)">
+			<row visible="@load(not vm.rootEntity and fx.multiple ne true and vm.requiredApplied)">
 				<label value="${labels.survey.schema.node.required}:" />
 				<fieldErrorHandler message="@load(vmsgs['required'])">
 					<checkbox
@@ -54,15 +55,6 @@
                       onChange="@command('applyChanges')" />
                 </fieldErrorHandler>
 			</row>
-			<row visible="@load(not vm.rootEntity)">
-				<label value="${labels.survey.schema.node.relevant_expression}:" />
-				<fieldErrorHandler
-					message="@load(vmsgs['relevantExpression'])">
-					<textbox width="150px"
-						value="@bind(fx.relevantExpression)"
-						onChange="@command('applyChanges')" />
-				</fieldErrorHandler>
-			</row>
 			<row visible="@load(not vm.rootEntity and fx.multiple eq true)">
 				<label value="${labels.survey.schema.node.min_count}:" />
 				<fieldErrorHandler message="@load(vmsgs['minCount'])">
@@ -75,8 +67,19 @@
                     <intbox value="@bind(fx.maxCount)" onChange="@command('applyChanges')" />
                 </fieldErrorHandler>
 			</row>
+            <row visible="@load(not vm.rootEntity)">
+              <label value="${labels.survey.schema.node.relevant_expression}:" />
+              <fieldErrorHandler
+                message="@load(vmsgs['relevantExpression'])">
+                <textbox width="150px"
+                  value="@bind(fx.relevantExpression)"
+                  onChange="@command('applyChanges')" />
+              </fieldErrorHandler>
+            </row>
       </rows>
      </grid>
+
+     <include src="${arg.otherMinorGeneralDetailsForm}" />
     </groupbox>
     
     <include src="${arg.otherAttributesForm}" />

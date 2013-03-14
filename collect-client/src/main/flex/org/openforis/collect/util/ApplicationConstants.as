@@ -1,7 +1,6 @@
 package org.openforis.collect.util {
 	import mx.core.FlexGlobals;
 	import mx.utils.URLUtil;
-	import flash.net.URLRequest;
 	
 	/**
 	 * 
@@ -14,12 +13,12 @@ package org.openforis.collect.util {
 		public static const DEBUGGING:Boolean = CONFIG::debugging;
 		public static const VERSION:String = CONFIG::version;
 		
-		internal static const CONTEXT_NAME:String = "collect";
-
 		public static var COUNTRY_LOGO_ID:int = 1;
 
 		private static const DATA_IMPORT_UPLOAD_SERVLET_NAME:String = "uploadData.htm";
-		
+		private static const SPECIES_IMPORT_UPLOAD_SERVLET_NAME:String = "uploadFile.htm";
+		private static const FILE_UPLOAD_SERVLET_NAME:String = "uploadFile.htm";
+
 		private static const RECORD_FILE_UPLOAD_SERVLET_NAME:String = "uploadRecordFile.htm";
 		private static const RECORD_FILE_DOWNLOAD_SERVLET_NAME:String = "downloadRecordFile.htm";
 		private static const RECORD_FILE_DELETE_SERVLET_NAME:String = "deleteRecordFile.htm";
@@ -30,10 +29,12 @@ package org.openforis.collect.util {
 		
 		public static const DATE_TIME_PATTERN:String = "dd-MM-yyyy HH:mm";
 		
-		private static var _DATA_IMPORT_UPLOAD_URL:String; 
+		private static var _DATA_IMPORT_UPLOAD_URL:String;
 		private static var _RECORD_FILE_UPLOAD_URL:String; 
 		private static var _RECORD_FILE_DOWNLOAD_URL:String; 
 		private static var _RECORD_FILE_DELETE_URL:String; 
+		private static var _SPECIES_IMPORT_UPLOAD_URL:String;
+		private static var _FILE_UPLOAD_URL:String;
 		private static var _DOWNLOAD_EXPORTED_DATA_URL:String;
 		private static var _DOWNLOAD_BACKUP_DATA_URL:String;
 		private static var _DESIGNER_URL:String;
@@ -49,6 +50,10 @@ package org.openforis.collect.util {
 		public static function init():void {
 			var url:String = FlexGlobals.topLevelApplication.url;
 			setUrl(url);
+		}
+		
+		public static function get SPECIES_IMPORT_UPLOAD_URL():String {
+			return _SPECIES_IMPORT_UPLOAD_URL;
 		}
 		
 		public static function get DATA_IMPORT_UPLOAD_URL():String {
@@ -75,6 +80,10 @@ package org.openforis.collect.util {
 			return _DOWNLOAD_BACKUP_DATA_URL;
 		}
 		
+		public static function get FILE_UPLOAD_URL():String {
+			return _FILE_UPLOAD_URL;
+		}
+		
 		public static function get DESIGNER_URL():String {
 			return _DESIGNER_URL;
 		}
@@ -93,18 +102,23 @@ package org.openforis.collect.util {
 		
 		internal static function setUrl(url:String):void {
 			var protocol:String = URLUtil.getProtocol(url);
-			
-			_PORT = URLUtil.getPort(url);
-			_HOST = URLUtil.getServerName(url); 
-			
-			if(_PORT == 0){
+			var urlPort:uint = URLUtil.getPort(url);
+			if(urlPort == 0){
 				_PORT = 80;
+			} else {
+				_PORT = urlPort;
 			}
-			
-			var applicationUrl:String = protocol + "://"+ _HOST + ":" + _PORT + "/" + CONTEXT_NAME + "/"; 
+			_HOST = URLUtil.getServerName(url); 
+			var originalRootUrl:String = protocol + "://"+ _HOST + (urlPort > 0 ? (":" + urlPort): "") + "/";
+			var contextNameLenght:int = url.indexOf("/", originalRootUrl.length) - originalRootUrl.length;
+			var contextName:String = url.substr(originalRootUrl.length, contextNameLenght);
+			var rootUrl:String = protocol + "://"+ _HOST + ":" + _PORT + "/";
+			var applicationUrl:String = rootUrl + contextName + "/";
 			_URL = applicationUrl;
 			
 			_DATA_IMPORT_UPLOAD_URL = _URL + DATA_IMPORT_UPLOAD_SERVLET_NAME;
+			_SPECIES_IMPORT_UPLOAD_URL = _URL + SPECIES_IMPORT_UPLOAD_SERVLET_NAME;
+			_FILE_UPLOAD_URL = _URL + FILE_UPLOAD_SERVLET_NAME;
 			
 			_RECORD_FILE_UPLOAD_URL = _URL + RECORD_FILE_UPLOAD_SERVLET_NAME;
 			_RECORD_FILE_DOWNLOAD_URL = _URL + RECORD_FILE_DOWNLOAD_SERVLET_NAME;

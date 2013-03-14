@@ -5,9 +5,9 @@ package org.openforis.collect.manager;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -18,9 +18,9 @@ import org.openforis.collect.model.SurveySummary;
 import org.openforis.collect.persistence.SurveyDao;
 import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.collect.persistence.SurveyWorkDao;
+import org.openforis.commons.collection.CollectionUtils;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.xml.IdmlParseException;
-import org.openforis.idm.util.CollectionUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,6 +31,10 @@ import org.springframework.transaction.annotation.Transactional;
  */
 public class SurveyManager {
 
+	@Autowired
+	private SamplingDesignManager samplingDesignManager;
+	@Autowired
+	private SpeciesManager speciesManager;
 	@Autowired
 	private SurveyDao surveyDao;
 	@Autowired
@@ -60,23 +64,39 @@ public class SurveyManager {
 		surveysByUri.clear();
 		surveys = surveyDao.loadAll();
 		for (CollectSurvey survey : surveys) {
-			initSurvey(survey);
+			addToCache(survey);
 		}
 	}
 
-	private void initSurvey(CollectSurvey survey) {
+	private void addToCache(CollectSurvey survey) {
+		if ( ! surveys.contains(survey) ) {
+			surveys.add(survey);
+		}
 		surveysById.put(survey.getId(), survey);
 		surveysByName.put(survey.getName(), survey);
 		surveysByUri.put(survey.getUri(), survey);
 	}
 	
+	protected void removeFromCache(CollectSurvey survey) {
+		surveys.remove(survey);
+		surveysById.remove(survey.getId());
+		surveysByName.remove(survey.getName());
+		surveysByUri.remove(survey.getUri());
+	}
+	
 	public List<CollectSurvey> getAll() {
-		return CollectionUtil.unmodifiableList(surveys);
+		return CollectionUtils.unmodifiableList(surveys);
 	}
 	
 	@Transactional
 	public CollectSurvey get(String name) {
 		CollectSurvey survey = surveysByName.get(name);
+		return survey;
+	}
+	
+	@Transactional
+	public CollectSurvey getById(int id) {
+		CollectSurvey survey = surveysById.get(id);
 		return survey;
 	}
 	
@@ -89,25 +109,20 @@ public class SurveyManager {
 	@Transactional
 	public void importModel(CollectSurvey survey) throws SurveyImportException {
 		surveyDao.importModel(survey);
-		surveys.add(survey);
-		initSurvey(survey);
+		addToCache(survey);
 	}
 	
 	@Transactional
 	public void updateModel(CollectSurvey survey) throws SurveyImportException {
 		//remove old survey from surveys cache
-		String name = survey.getName();
-		Iterator<CollectSurvey> iterator = surveys.iterator();
-		while ( iterator.hasNext() ) {
-			CollectSurvey oldSurvey = iterator.next();
-			if (oldSurvey.getName().equals(name)) {
-				iterator.remove();
-				break;
-			}
+		CollectSurvey oldSurvey = surveysByName.get(survey.getName());
+		if ( oldSurvey != null ) {
+			removeFromCache(oldSurvey);
+		} else {
+			throw new SurveyImportException("Could not find survey to update");
 		}
 		surveyDao.updateModel(survey);
-		surveys.add(survey);
-		initSurvey(survey);
+		addToCache(survey);
 	}
 
 	@Transactional
@@ -149,6 +164,10 @@ public class SurveyManager {
 
 	public CollectSurvey unmarshalSurvey(InputStream is) throws IdmlParseException {
 		return surveyDao.unmarshalIdml(is);
+	}
+	
+	public CollectSurvey unmarshalSurvey(Reader reader) throws IdmlParseException {
+		return surveyDao.unmarshalIdml(reader);
 	}
 	
 	@Transactional
@@ -200,6 +219,13 @@ public class SurveyManager {
 		Integer id = survey.getId();
 		if ( id == null ) {
 			surveyWorkDao.insert(survey);
+			CollectSurvey publishedSurvey = surveyDao.loadByUri(survey.getUri());
+			if ( publishedSurvey != null ) {
+				int surveyWorkId = survey.getId();
+				int publishedSurveyId = publishedSurvey.getId();
+				samplingDesignManager.duplicateSamplingDesignForWork(publishedSurveyId, surveyWorkId);
+				speciesManager.duplicateTaxonomyForWork(publishedSurveyId, surveyWorkId);
+			}
 		} else {
 			surveyWorkDao.update(survey);
 		}
@@ -216,6 +242,9 @@ public class SurveyManager {
 			initSurveysCache();
 		}
 		if ( surveyWorkId != null ) {
+			int publishedSurveyId = survey.getId();
+			samplingDesignManager.publishSamplingDesign(surveyWorkId, publishedSurveyId);
+			speciesManager.publishTaxonomies(surveyWorkId, publishedSurveyId);
 			surveyWorkDao.delete(surveyWorkId);
 		}
 	}

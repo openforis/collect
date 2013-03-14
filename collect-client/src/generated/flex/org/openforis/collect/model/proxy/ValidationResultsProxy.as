@@ -6,38 +6,34 @@
  */
 
 package org.openforis.collect.model.proxy {
+	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
 	
 	import org.openforis.collect.util.ArrayUtil;
 	import org.openforis.collect.util.CollectionUtil;
-	import org.openforis.idm.metamodel.validation.ValidationResultFlag;
 
-	/**
-	 * @author S. Ricci
-	 * */
     [Bindable]
     [RemoteClass(alias="org.openforis.collect.model.proxy.ValidationResultsProxy")]
     public class ValidationResultsProxy extends ValidationResultsProxyBase {
 		
-		public function get validationMessages():Array {
+		public function get validationMessages():IList {
 			var results:IList = null;
-			if(CollectionUtil.isNotEmpty(errors)) {
+			if ( CollectionUtil.isNotEmpty(errors) ) {
 				results = errors;
 			} else if(CollectionUtil.isNotEmpty(warnings)) {
 				results = warnings;
 			}
-			var messages:Array = null;
+			var messages:IList = null;
 			if(results != null) {
-				messages = new Array();
+				messages = new ArrayCollection();
 				for each (var r:ValidationResultProxy in results) {
-					var message:String = r.getMessage();
+					var message:String = r.validationMessage;
 					if ( ! ArrayUtil.contains(messages, message) ) {
-						messages.push(message);
+						messages.addItem(message);
 					}
 				}
 			}
 			return messages;
 		}
-
     }
 }

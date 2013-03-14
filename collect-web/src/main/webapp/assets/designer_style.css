@@ -55,7 +55,7 @@ button.icon {
 	color: grey;
 	font-style: italic;
 }
-.z-textbox.error, .z-intbox.error, .z-select.error {
+.z-textbox.error, .z-intbox.error, .z-select.error, .z-datebox.error {
 	border: 2px inset #FF0000;
 	color: #000000;
 }

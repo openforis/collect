@@ -15,6 +15,13 @@
 		<jooq-codegen.version>2.0.1</jooq-codegen.version>
 	</properties>
 
+    <repositories>
+      <repository>
+        <id>gbif-all</id>
+        <url>http://repository.gbif.org/content/groups/gbif</url>
+      </repository>
+    </repositories>
+
 	<build>
 		<plugins>
 			<!-- Read dev properties -->
@@ -179,7 +186,7 @@
 		            </configuration>
 		          </execution>
 		    	</executions>
-		    </plugin>			
+		    </plugin>
 		</plugins>
 		<pluginManagement>
 			<plugins>
@@ -273,6 +280,10 @@
 
 	<dependencies>
 		<dependency>
+          <groupId>org.openforis.commons</groupId>
+          <artifactId>commons-io</artifactId>
+        </dependency>
+        <dependency>
 			<groupId>org.openforis.idm</groupId>
 			<artifactId>idm-api</artifactId>
 		</dependency>
@@ -337,6 +348,11 @@
 			<artifactId>lucene-core</artifactId>
 			<version>3.6.1</version>
 		</dependency>
+        <dependency>
+            <groupId>org.gbif</groupId>
+            <artifactId>ecat-common</artifactId>
+            <version>1.6</version>
+        </dependency>
 		
 		<!--  TEST DEPENDENCIES -->
 		<dependency>

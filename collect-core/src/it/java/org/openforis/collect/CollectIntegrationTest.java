@@ -49,4 +49,10 @@ public abstract class CollectIntegrationTest {
 		surveyDao.importModel(survey);
 		return survey;
 	}
+	
+	protected CollectSurvey createSurvey() {
+		CollectSurvey createSurvey = (CollectSurvey) collectSurveyContext.createSurvey();
+		return createSurvey;
+	}
+	
 }

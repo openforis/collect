@@ -5,6 +5,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -37,8 +38,10 @@ import org.springframework.web.multipart.MultipartFile;
  * to the current edited record (one per session)
  *
  */
-public class RecordFileManager {
+public class RecordFileManager implements Serializable {
 	
+	private static final long serialVersionUID = 1L;
+
 	private static final String TEMP_PATH = "temp" + java.io.File.separator + "recordFiles";
 
 	private static final String UPLOAD_PATH_CONFIGURATION_KEY = "upload_path";

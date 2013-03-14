@@ -10,8 +10,9 @@
         <label
           value="${labels.survey.schema.attribute.taxon.taxonomy}:" />
         <fieldErrorHandler message="@load(vmsgs['taxonomy'])">
-          <textbox width="150px" value="@bind(fx.taxonomy)"
-            onChange="@command('applyChanges')" />
+          <listbox width="150px" model="@load(vm.taxonomyNames)"
+            selectedItem="@bind(fx.taxonomy)" mold="select"
+            onSelect="@command('applyChanges')" />
         </fieldErrorHandler>
       </row>
       <row>

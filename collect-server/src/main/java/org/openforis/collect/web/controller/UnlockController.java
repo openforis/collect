@@ -28,10 +28,6 @@ public class UnlockController {
 	@Autowired
 	private RecordManager recordManager;
 	
-	public UnlockController() {
-		
-	}
-	
 	@RequestMapping(value = "/clearActiveRecord.htm", method = RequestMethod.POST)
 	public @ResponseBody String clearActiveRecord(HttpServletRequest request) {
 		try {
