@@ -52,8 +52,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class SpeciesImportProcessTest extends CollectIntegrationTest {
 
-	private static final String INVALID_TEST_SPECIES_CSV = "test-wrong-species.csv";
-	private static final String VALID_TEST_SPECIES_CSV = "test-species.csv";
+	private static final String VALID_TEST_SPECIES_CSV = "species-test.csv";
+	private static final String INVALID_TEST_SPECIES_CSV = "species-invalid-test.csv";
 
 	private static final String TEST_TAXONOMY_NAME = "it_tree";
 	

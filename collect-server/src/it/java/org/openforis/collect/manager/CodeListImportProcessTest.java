@@ -39,9 +39,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class CodeListImportProcessTest extends CollectIntegrationTest {
 
-	private static final String VALID_TEST_CSV = "test-code-list.csv";
-	private static final String INVALID_TEST_CSV = "test-invalid-code-list.csv";
-	private static final String INVALID_SCHEME_SCOPE_TEST_CSV = "test-invalid-code-list-scope-scheme.csv";
+	private static final String VALID_TEST_CSV = "code-list-test.csv";
+	private static final String INVALID_TEST_CSV = "code-list-invali-test.csv";
+	private static final String INVALID_SCHEME_SCOPE_TEST_CSV = "code-list-invalid-scheme-scope-test.csv";
 	private static final String LANG = "en";
 	private static final String TEST_CODE_LIST_NAME = "test";
 

@@ -40,8 +40,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class SamplingDesignImportProcessTest extends CollectIntegrationTest {
 
-	private static final String VALID_TEST_CSV = "test-sampling-design.csv";
-	private static final String INVALID_TEST_CSV = "test-invalid-sampling-design.csv";
+	private static final String VALID_TEST_CSV = "sampling-design-test.csv";
+	private static final String INVALID_TEST_CSV = "sampling-design-invalid-test.csv";
 
 	@Autowired
 	private SamplingDesignManager samplingDesignManager;

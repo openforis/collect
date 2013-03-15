@@ -357,18 +357,43 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 			taxon.setScientificName(normalizedScientificName);
 			taxonTree.addNode(parent, taxon);
 		} else if (mostSpecificRank) {
-			taxonTree.checkDuplicateScienfificName(parent, normalizedScientificName, line.getLineNumber());
+			checkDuplicateScientificName(line, parent, normalizedScientificName);
 		}
 		if ( mostSpecificRank ) {
 			String code = line.getCode();
 			Integer taxonId = line.getTaxonId();
-			taxonTree.checkDuplicates(taxonId, code, line.getLineNumber());
+			checkDuplicates(line, code, taxonId);
 			taxon.setCode(code);
 			taxon.setTaxonId(taxonId);
 			taxonTree.index(taxon);
 			processVernacularNames(line, taxon);
 		}
 		return taxon;
+	}
+
+	protected void checkDuplicates(SpeciesLine line, String code,
+			Integer taxonId) throws ParsingException {
+		long lineNumber = line.getLineNumber();
+		Node foundNode = null;
+		foundNode = taxonTree.getNodeByTaxonId(taxonId);
+		if ( foundNode != null ) {
+			ParsingError error = new ParsingError(ErrorType.DUPLICATE_VALUE, lineNumber, SpeciesFileColumn.NO.getName());
+			throw new ParsingException(error);
+		}
+		foundNode = taxonTree.getNodeByCode(code);
+		if ( foundNode != null ) {
+			ParsingError error = new ParsingError(ErrorType.DUPLICATE_VALUE, lineNumber, SpeciesFileColumn.CODE.getName());
+			throw new ParsingException(error);
+		}
+	}
+
+	protected void checkDuplicateScientificName(SpeciesLine line, Taxon parent,
+			String normalizedScientificName) throws ParsingException {
+		Node duplicateNode = taxonTree.getDuplicateScienfificNameNode(parent, normalizedScientificName);
+		if ( duplicateNode != null ) {
+			ParsingError error = new ParsingError(ErrorType.DUPLICATE_VALUE, line.getLineNumber(), SpeciesFileColumn.SCIENTIFIC_NAME.getName());
+			throw new ParsingException(error);
+		}
 	}
 
 	private void close(Closeable closeable) {

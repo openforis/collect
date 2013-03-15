@@ -363,7 +363,7 @@ package org.openforis.collect.ui {
 			result.percentHeight = 100;
 			var l:Label = new Label();
 			l.styleName = HEADER_LABEL_STYLE;
-			l.text = defn.getInstanceOrHeadingLabelText();
+			l.text = defn.getNumberAndHeadingLabelText();
 			result.addElement(l);
 			
 			var childDefinitionsContainer:HGroup = new HGroup();

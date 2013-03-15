@@ -5,10 +5,10 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
-import java.util.TreeMap;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.logging.Log;
@@ -59,7 +59,7 @@ public class CodeListImportProcess extends AbstractProcess<Void, CodeListImportS
 	public void init() {
 		super.init();
 		validateParameters();
-		codeToRootItem = new TreeMap<String, CodeListItem>();
+		codeToRootItem = new LinkedHashMap<String, CodeListItem>();
 	}
 	
 	protected void validateParameters() {
