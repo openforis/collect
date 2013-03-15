@@ -96,8 +96,8 @@ public class SpeciesCSVReader extends CSVDataImportReader<SpeciesLine> {
 			SpeciesLine line = super.parse();
 			this.rawScientificName = extractRawScientificName();
 			this.parsedScientificName = parseRawScienfificName();
-			line.setTaxonId(parseTaxonId(false));
-			line.setCode(extractCode());
+			line.setTaxonId(extractTaxonId(false));
+			line.setCode(extractCode(false));
 			line.setFamilyName(extractFamilyName());
 			line.setRawScientificName(this.rawScientificName);
 			line.setGenus(extractGenus());
@@ -115,20 +115,20 @@ public class SpeciesCSVReader extends CSVDataImportReader<SpeciesLine> {
 			}
 		}
 
-		protected Integer parseTaxonId(boolean required) throws ParsingException {
-			return getColumnValue(SpeciesFileColumn.NO, required, Integer.class);
+		protected Integer extractTaxonId(boolean required) throws ParsingException {
+			return getColumnValue(SpeciesFileColumn.NO.getName(), required, Integer.class);
 		}
 
-		protected String extractCode() throws ParsingException {
-			return getColumnValue(SpeciesFileColumn.CODE, true, String.class);
+		protected String extractCode(boolean required) throws ParsingException {
+			return getColumnValue(SpeciesFileColumn.CODE.getName(), required, String.class);
 		}
 		
 		protected String extractFamilyName() throws ParsingException {
-			return getColumnValue(SpeciesFileColumn.FAMILY, true, String.class);
+			return getColumnValue(SpeciesFileColumn.FAMILY.getName(), true, String.class);
 		}
 
 		protected String extractRawScientificName() throws ParsingException {
-			return getColumnValue(SpeciesFileColumn.SCIENTIFIC_NAME, true, String.class);
+			return getColumnValue(SpeciesFileColumn.SCIENTIFIC_NAME.getName(), true, String.class);
 		}
 		
 		protected ParsedName<Object> parseRawScienfificName() throws ParsingException {
@@ -276,18 +276,6 @@ public class SpeciesCSVReader extends CSVDataImportReader<SpeciesLine> {
 			}
 		}
 
-		@SuppressWarnings("unchecked")
-		protected <T> T getColumnValue(SpeciesFileColumn column, boolean required, Class<T> type) throws ParsingException {
-			T value = csvLine.getValue(column.getName(), type);
-			if ( required && ( value == null || value instanceof String && StringUtils.isBlank((String) value) )) {
-				throwEmptyColumnParsingException(column);
-			}
-			if ( value instanceof String ) {
-				value = (T) value.toString().trim();
-			}
-			return value;
-		}
-		
 		protected ParsingError createFieldParsingError(SpeciesFileColumn column, String fieldName, String value) {
 			ParsingError error = new ParsingError(ErrorType.INVALID_VALUE, lineNumber, 
 					column.getName(), "Error parsing " + fieldName +" from " + value);
