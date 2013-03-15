@@ -1,6 +1,5 @@
 package org.openforis.collect.designer.util;
 
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -10,6 +9,7 @@ import java.util.Set;
 import org.apache.commons.compress.utils.CharsetNames;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.message.BasicNameValuePair;
+import org.zkoss.bind.Binder;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.HtmlBasedComponent;
 
@@ -21,10 +21,16 @@ import org.zkoss.zk.ui.HtmlBasedComponent;
 public class ComponentUtil {
 	
 	public static final String COMPOSER_ID = "$composer";
+	private static final String BINDER_ID = "$BINDER$";
 
 	@SuppressWarnings("unchecked")
 	public static <T> T getComposer(Component view)  {
 		return (T) view.getAttribute(COMPOSER_ID);
+	}
+	
+	public static Binder getBinder(Component component) {
+		Binder binder = (Binder) component.getAttribute(BINDER_ID);
+		return binder;
 	}
 	
 	public static void addClass(HtmlBasedComponent component, String className) {
@@ -63,4 +69,5 @@ public class ComponentUtil {
 		String result = base + "?" + queryString;
 		return result;
 	}
+
 }

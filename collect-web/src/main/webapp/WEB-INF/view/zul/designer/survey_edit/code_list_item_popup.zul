@@ -2,6 +2,8 @@
 <?component name="multilanguageLabel" class="org.openforis.collect.designer.component.MultilanguageLabel" macroURI="/WEB-INF/view/zul/designer/component/multilanguage_label.zul"?>
 <zk>
   <custom-attributes parentItem="${arg.parentItem}"/>
+  <custom-attributes enumeratingCodeList="${arg.enumeratingCodeList}"/>
+  
 	<window id="codeListItemManagerPopUp" title="${labels.survey.code_list.item.manager.title}" 
 		width="600px"
 		height="350px"
@@ -25,7 +27,11 @@
 				<row>
 					<label value="${labels.global.item.code}:" />
 					<fieldErrorHandler message="@load(vmsgs['code'])">
-                          <textbox width="150px" value="@bind(fx.code)" onChange="@command('applyChanges')" />
+            <textbox width="150px" 
+              value="@bind(fx.code)" 
+              onChange="@command('applyChanges')"
+              readonly="${enumeratingCodeList}"
+               />
 					</fieldErrorHandler>
 				</row>
 				<row>

@@ -448,19 +448,19 @@ public class RecordManager {
 		}
 	}
 
-	private void addEmptyEnumeratedEntities(Entity parentEntity, EntityDefinition enuberableEntityDefn) {
+	private void addEmptyEnumeratedEntities(Entity parentEntity, EntityDefinition enumerableEntityDefn) {
 		Record record = parentEntity.getRecord();
 		ModelVersion version = record.getVersion();
-		String enumeratedEntityName = enuberableEntityDefn.getName();
-		CodeAttributeDefinition enumeratingCodeDefn = getEnumeratingKeyCodeAttribute(enuberableEntityDefn, version);
+		CodeAttributeDefinition enumeratingCodeDefn = enumerableEntityDefn.getEnumeratingKeyCodeAttribute(version);
 		if(enumeratingCodeDefn != null) {
+			String enumeratedEntityName = enumerableEntityDefn.getName();
 			CodeList list = enumeratingCodeDefn.getList();
 			List<CodeListItem> items = list.getItems();
 			for (int i = 0; i < items.size(); i++) {
 				CodeListItem item = items.get(i);
 				if(version == null || version.isApplicable(item)) {
 					String code = item.getCode();
-					Entity enumeratedEntity = getEnumeratedEntity(parentEntity, enuberableEntityDefn, enumeratingCodeDefn, code);
+					Entity enumeratedEntity = getEnumeratedEntity(parentEntity, enumerableEntityDefn, enumeratingCodeDefn, code);
 					if( enumeratedEntity == null ) {
 						Entity addedEntity = addEntity(parentEntity, enumeratedEntityName, i);
 						//set the value of the key CodeAttribute
@@ -474,19 +474,6 @@ public class RecordManager {
 		}
 	}
 
-	private CodeAttributeDefinition getEnumeratingKeyCodeAttribute(EntityDefinition entity, ModelVersion version) {
-		List<AttributeDefinition> keys = entity.getKeyAttributeDefinitions();
-		for (AttributeDefinition key: keys) {
-			if(key instanceof CodeAttributeDefinition && (version == null || version.isApplicable(key))) {
-				CodeAttributeDefinition codeDefn = (CodeAttributeDefinition) key;
-				if(codeDefn.getList().getLookupTable() == null) {
-					return codeDefn;
-				}
-			}
-		}
-		return null;
-	}
-	
 	private Entity getEnumeratedEntity(Entity parentEntity, EntityDefinition childEntityDefn, 
 			CodeAttributeDefinition enumeratingCodeAttributeDef, String value) {
 		List<Node<?>> children = parentEntity.getAll(childEntityDefn.getName());

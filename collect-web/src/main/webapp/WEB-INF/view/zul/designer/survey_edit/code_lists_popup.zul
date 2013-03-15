@@ -252,7 +252,7 @@
 		        									image="/assets/images/delete-small.png"
 		        									tooltiptext="${labels.global.delete_item}"
 		        									visible="@load(empty vm.editedItem.lookupTable and forEachStatus.index le vm.lastSelectedLevelIndex)"
-		        									onClick="@command('removeItem', item=vm.selectedItemsPerLevel[forEachStatus.index])" />
+		        									onClick="@command('deleteCodeListItem', item=vm.selectedItemsPerLevel[forEachStatus.index])" />
 		        							</toolbar>
 		        						</groupbox>
 		        					</template>

@@ -13,6 +13,7 @@ import java.util.Stack;
 import org.openforis.collect.designer.form.CodeListFormObject;
 import org.openforis.collect.designer.form.CodeListFormObject.Type;
 import org.openforis.collect.designer.form.FormObject;
+import org.openforis.collect.designer.util.ComponentUtil;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.MessageUtil.ConfirmHandler;
 import org.openforis.collect.designer.util.Resources;
@@ -249,22 +250,46 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 	
 	@Command
 	@NotifyChange({"itemsPerLevel"})
-	public void removeItem(@BindingParam("item") final CodeListItem item) {
-		String messageKey;
-		if ( item.hasChildItems() ) {
-			messageKey = "survey.code_list.confirm.delete_non_empty_item";
+	public void deleteCodeListItem(@BindingParam("item") final CodeListItem item) {
+		if ( isEnumeratingCodeList() ) {
+			MessageUtil.showWarning("survey.code_list.cannot_delete_enumerating_code_list_items");
 		} else {
-			messageKey = "survey.code_list.confirm.delete_item";
-		}
-		MessageUtil.showConfirm(new MessageUtil.ConfirmHandler() {
-			@Override
-			public void onOk() {
-				performRemoveItem(item);
+			String messageKey;
+			if ( item.hasChildItems() ) {
+				messageKey = "survey.code_list.confirm.delete_non_empty_item";
+			} else {
+				messageKey = "survey.code_list.confirm.delete_item";
 			}
-		}, messageKey);
+			MessageUtil.showConfirm(new MessageUtil.ConfirmHandler() {
+				@Override
+				public void onOk() {
+					performDeleteCodeListItem(item);
+				}
+			}, messageKey);
+		}
 	}
 
-	protected void performRemoveItem(CodeListItem item) {
+	protected boolean isEnumeratingCodeList() {
+		Schema schema = survey.getSchema();
+		Stack<NodeDefinition> stack = new Stack<NodeDefinition>();
+		List<EntityDefinition> rootEntityDefinitions = schema.getRootEntityDefinitions();
+		stack.addAll(rootEntityDefinitions);
+		while ( ! stack.isEmpty() ) {
+			NodeDefinition node = stack.pop();
+			if ( node instanceof EntityDefinition ) {
+				EntityDefinition entityDefn = (EntityDefinition) node;
+				CodeAttributeDefinition enumeratingKeyCodeAttribute = entityDefn.getEnumeratingKeyCodeAttribute();
+				if ( isSurveyPublished() && enumeratingKeyCodeAttribute != null && 
+						enumeratingKeyCodeAttribute.getList().getId() == editedItem.getId() ) {
+					return true;
+				}
+				stack.addAll(entityDefn.getChildDefinitions());
+			}
+		}
+		return false;
+	}
+
+	protected void performDeleteCodeListItem(CodeListItem item) {
 		if ( isCodeListItemSelected(item) ) {
 			int itemLevelIndex = item.getDepth() - 1;
 			deselectItemsAfterLevel(itemLevelIndex);
@@ -312,10 +337,11 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 
 	public void openChildItemEditPopUp() {
 		Map<String, Object> args = new HashMap<String, Object>();
-		args.put("item", editedChildItem);
-		args.put("parentItem", editedChildItemParentItem);
+		args.put(CodeListItemVM.ITEM_ARG, editedChildItem);
+		args.put(CodeListItemVM.PARENT_ITEM_ARG, editedChildItemParentItem);
+		args.put(CodeListItemVM.ENUMERATING_CODE_LIST_ARG, isEnumeratingCodeList());
 		codeListItemPopUp = openPopUp(Resources.Component.CODE_LIST_ITEM_EDIT_POP_UP.getLocation(), true, args);
-		Binder binder = (Binder) codeListItemPopUp.getAttribute("$BINDER$");
+		Binder binder = ComponentUtil.getBinder(codeListItemPopUp);
 		validateForm(binder);
 	}
 

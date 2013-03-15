@@ -22,8 +22,12 @@ import org.zkoss.bind.annotation.Init;
  */
 public class CodeListItemVM extends SurveyObjectBaseVM<CodeListItem> {
 
+	public static final String ITEM_ARG = "item";
+	public static final String PARENT_ITEM_ARG = "parentItem";
+	public static final String ENUMERATING_CODE_LIST_ARG = "enumeratingCodeList";
+	
 	@Init(superclass=false)
-	public void init(@ExecutionArgParam("item") CodeListItem item) {
+	public void init(@ExecutionArgParam(ITEM_ARG) CodeListItem item) {
 		super.init();
 		setEditedItem(item);
 	}
