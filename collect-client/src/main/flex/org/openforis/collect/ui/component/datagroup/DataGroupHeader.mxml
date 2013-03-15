@@ -3,21 +3,29 @@
 		 xmlns:s="library://ns.adobe.com/flex/spark" 
 		 xmlns:mx="library://ns.adobe.com/flex/mx" 
 		 xmlns:datagroup="org.openforis.collect.ui.component.datagroup.*"
+		 currentState="{STATE_BY_COLUMNS}"
 		 >
 	
 	<fx:Script>
 		<![CDATA[
 			import mx.collections.ArrayCollection;
-			
 			import org.openforis.collect.model.proxy.EntityProxy;
-			
 			import mx.collections.IList;
-			
 			import spark.layouts.ConstraintLayout;
+			
+			public static const DISPOSITION_BY_COLUMNS:String = "byColumns";
+			public static const DISPOSITION_BY_ROWS:String = "byRows";
+			
+			public static const STATE_BY_COLUMNS:String = "byColumns";
+			public static const STATE_BY_ROWS:String = "byRows";
 			
 			private var _parentEntity:EntityProxy;
 			private var _nodeDefinitions:IList;
+			private var _labelsDisposition:String = DISPOSITION_BY_COLUMNS;
 			
+			protected function updateCurrentState():void {
+				currentState = _labelsDisposition == DISPOSITION_BY_COLUMNS ? STATE_BY_COLUMNS: STATE_BY_ROWS;
+			}
 			//private var _constraintLayout:ConstraintLayout;
 			
 			[Bindable]
@@ -38,6 +46,16 @@
 				_parentEntity = value;
 			}
 
+			[Bindable(event="labelsDispositionChange")]
+			public function get labelsDisposition():String {
+				return _labelsDisposition;
+			}
+			
+			public function set labelsDisposition(value:String):void {
+				_labelsDisposition = value;
+				dispatchEvent(new Event("labelsDispositionChange"));
+				updateCurrentState();
+			}
 			/*
 			[Bindable]
 			public function get constraintLayout():ConstraintLayout {
@@ -52,19 +70,28 @@
 		]]>
 	</fx:Script>
 	
+	<s:states>
+		<s:State name="byColumns" />
+		<s:State name="byRows" />
+	</s:states>
+	
 	<s:DataGroup dataProvider="{nodeDefinitions}"
 				 height="100%">
-		<s:layout>
+		<s:layout.byColumns>
 			<s:HorizontalLayout 
-								gap="4" 
-								verticalAlign="bottom" />
-		</s:layout>
+				gap="4" 
+				verticalAlign="bottom" />
+		</s:layout.byColumns>
+		<s:layout.byRows>
+			<s:VerticalLayout 
+				gap="4" />
+		</s:layout.byRows>
 		<s:itemRenderer>
 			<fx:Component>
 				<datagroup:DataGroupHeaderItemRenderer
 					height="100%"
 					parentEntity="{outerDocument.parentEntity}"
-					/>
+					direction="{outerDocument.labelsDisposition}" />
 			</fx:Component>
 		</s:itemRenderer>
 	</s:DataGroup>

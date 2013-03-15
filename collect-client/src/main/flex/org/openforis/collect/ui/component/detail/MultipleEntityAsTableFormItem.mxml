@@ -4,6 +4,7 @@
 					   xmlns:mx="library://ns.adobe.com/flex/mx"
 					   xmlns:datagroup="org.openforis.collect.ui.component.datagroup.*"
 					   xmlns:detail="org.openforis.collect.ui.component.detail.*"
+					   currentState="{STATE_BY_ROWS}"
 					   >
 	
 	<fx:Script>
@@ -16,6 +17,13 @@
 			import org.openforis.collect.presenter.MultipleEntityAsTableFormItemPresenter;
 			import org.openforis.collect.ui.Images;
 			
+			public static const DISPOSITION_BY_COLUMNS:String = "byColumns";
+			public static const DISPOSITION_BY_ROWS:String = "byRows";
+			
+			public static const STATE_BY_COLUMNS:String = "byColumns";
+			public static const STATE_BY_ROWS:String = "byRows";
+			
+			private var _entitiesDisposition:String = DISPOSITION_BY_ROWS;
 			//private var _constraintLayout:ConstraintLayout;
 			
 			override protected function creationCompleteHandler(event:FlexEvent):void {
@@ -25,11 +33,19 @@
 				BindingUtils.bindProperty(
 					headerScroller.horizontalScrollBar, "value", 
 					scroller, ["horizontalScrollBar", "value"]);
+				BindingUtils.bindProperty(
+					headerScroller.verticalScrollBar, "value", 
+					scroller, ["verticalScrollBar", "value"]);
 			}
 			
 			override protected function initPresenter():void {
 				presenter = new MultipleEntityAsTableFormItemPresenter(this);
 			}
+			
+			protected function updateCurrentState():void {
+				currentState = _entitiesDisposition == DISPOSITION_BY_COLUMNS ? STATE_BY_COLUMNS: STATE_BY_ROWS;
+			}
+			
 			/*
 			[Bindable]
 			public function get constraintLayout():ConstraintLayout {
@@ -40,8 +56,24 @@
 				_constraintLayout = value;
 			}
 			*/
+			
+			[Bindable(event="entitisDispositionChange")]
+			public function get entitiesDisposition():String {
+				return _entitiesDisposition;
+			}
+			
+			public function set entitiesDisposition(value:String):void {
+				_entitiesDisposition = value;
+				dispatchEvent(new Event("entitisDispositionChange"));
+				updateCurrentState();
+			}
 		]]>
 	</fx:Script>
+	
+	<detail:states>
+		<s:State name="byColumns" />
+		<s:State name="byRows" />
+	</detail:states>
 	
 	<detail:layout>
 		<s:VerticalLayout />
@@ -63,18 +95,33 @@
 							  includeInLayout="{! occupyEntirePage}"
 							  />
 
-		<s:VGroup paddingLeft="{occupyEntirePage ? 0: 30}" 
-				  paddingRight="0"
-				  height="100%" 
-				  width="100%">
+		<s:Group height="100%" 
+				 width="100%">
+			<s:layout.byColumns>
+				<s:HorizontalLayout paddingLeft="{occupyEntirePage ? 0: 30}" 
+									paddingRight="0"/>
+			</s:layout.byColumns>
+			<s:layout.byRows>
+				<s:VerticalLayout paddingLeft="{occupyEntirePage ? 0: 30}" 
+								  paddingRight="0"/>
+			</s:layout.byRows>
+			
 			<s:Scroller id="headerScroller" 
 						horizontalScrollPolicy="off" 
 						verticalScrollPolicy="off"
-						width="100%"
+						width.byRows="100%"
+						height.byColumns="100%"
 						includeInLayout="{dataGroup.dataProvider.length > 0}"
 						visible="{dataGroup.dataProvider.length > 0}"
 						>
-				<s:HGroup gap="2">
+				<s:Group>
+					<s:layout.byColumns>
+						<s:VerticalLayout gap="2" />
+					</s:layout.byColumns>
+					<s:layout.byRows>
+						<s:HorizontalLayout gap="2" />
+					</s:layout.byRows>
+					
 					<s:Spacer id="dragAnchorSpacer"
 							  includeInLayout="{Application.activeRecordEditable &amp;&amp; ! entityDefinition.enumerable}"
 						width="11" />
@@ -84,12 +131,13 @@
 					<datagroup:DataGroupHeader id="header" 
 											   nodeDefinitions="{nodeDefinitions}"
 											   parentEntity="{parentEntity}"
+											   labelsDisposition="{entitiesDisposition == DISPOSITION_BY_ROWS ? DISPOSITION_BY_COLUMNS: DISPOSITION_BY_ROWS}"
 											   />
 					<!-- spacer to ensure correct alignment of the headerScroller with the dataGroup scroller -->
 					<s:Spacer 
 						includeInLayout="{scroller.verticalScrollBar != null}" 
 						width="{scroller.verticalScrollBar.width}" />
-				</s:HGroup>
+				</s:Group>
 			</s:Scroller>
 				
 			<s:Scroller id="scroller" 
@@ -97,9 +145,12 @@
 						height="100%"
 						>
 				<s:DataGroup id="dataGroup">
-					<s:layout>
+					<s:layout.byColumns>
 						<s:VerticalLayout gap="2" />
-					</s:layout> 
+					</s:layout.byColumns>
+					<s:layout.byRows>
+						<s:HorizontalLayout gap="2" />
+					</s:layout.byRows> 
 					<s:itemRenderer>
 						<fx:Component>
 							<detail:EntityDataGroupItemRenderer
@@ -108,6 +159,7 @@
 								modelVersion="{outerDocument.modelVersion}"
 								nodeDefinitions="{outerDocument.nodeDefinitions}"
 								dragEnabled="{Application.activeRecordEditable &amp;&amp; ! outerDocument.entityDefinition.enumerable}"
+								nodesDisposition="{outerDocument.entitiesDisposition}"
 								>
 								<fx:Script>
 									<![CDATA[
@@ -130,7 +182,7 @@
 				visible="{Application.activeRecordEditable &amp;&amp; ! entityDefinition.enumerable}"
 				includeInLayout="{Application.activeRecordEditable &amp;&amp; ! entityDefinition.enumerable}"
 				/>
-		</s:VGroup>
+		</s:Group>
 		
 			
 	</s:BorderContainer>

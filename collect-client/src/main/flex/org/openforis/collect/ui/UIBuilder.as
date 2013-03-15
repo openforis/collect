@@ -170,6 +170,7 @@ package org.openforis.collect.ui {
 					entityFormItem = new MultipleEntityFormItem();
 				} else {
 					entityFormItem = new MultipleEntityAsTableFormItem();
+					(entityFormItem as MultipleEntityAsTableFormItem).entitiesDisposition = MultipleEntityAsTableFormItem.DISPOSITION_BY_COLUMNS;
 				}
 			} else {
 				entityFormItem = new SingleEntityFormItem();
