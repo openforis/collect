@@ -57,14 +57,14 @@
 			}
 			*/
 			
-			[Bindable(event="entitisDispositionChange")]
+			[Bindable(event="entitiesDispositionChange")]
 			public function get entitiesDisposition():String {
 				return _entitiesDisposition;
 			}
 			
 			public function set entitiesDisposition(value:String):void {
 				_entitiesDisposition = value;
-				dispatchEvent(new Event("entitisDispositionChange"));
+				dispatchEvent(new Event("entitiesDispositionChange"));
 				updateCurrentState();
 			}
 		]]>
@@ -116,10 +116,10 @@
 						>
 				<s:Group>
 					<s:layout.byColumns>
-						<s:VerticalLayout gap="2" />
+						<s:HorizontalLayout gap="2" />
 					</s:layout.byColumns>
 					<s:layout.byRows>
-						<s:HorizontalLayout gap="2" />
+						<s:VerticalLayout gap="2" />
 					</s:layout.byRows>
 					
 					<s:Spacer id="dragAnchorSpacer"
@@ -129,9 +129,12 @@
 							  includeInLayout="{entityDefinition.showRowNumbers}"
 							  width="20" />
 					<datagroup:DataGroupHeader id="header" 
+											   styleName="{entitiesDisposition == MultipleEntityAsTableFormItem.DISPOSITION_BY_ROWS ? 
+												   'horizontal': 'vertical'}"
 											   nodeDefinitions="{nodeDefinitions}"
 											   parentEntity="{parentEntity}"
-											   labelsDisposition="{entitiesDisposition == DISPOSITION_BY_ROWS ? DISPOSITION_BY_COLUMNS: DISPOSITION_BY_ROWS}"
+											   labelsDisposition="{entitiesDisposition == MultipleEntityAsTableFormItem.DISPOSITION_BY_ROWS ? 
+											   		DataGroupHeader.DISPOSITION_HORIZONTAL: DataGroupHeader.DISPOSITION_VERTICAL}"
 											   />
 					<!-- spacer to ensure correct alignment of the headerScroller with the dataGroup scroller -->
 					<s:Spacer 
@@ -146,10 +149,10 @@
 						>
 				<s:DataGroup id="dataGroup">
 					<s:layout.byColumns>
-						<s:VerticalLayout gap="2" />
+						<s:HorizontalLayout gap="2" />
 					</s:layout.byColumns>
 					<s:layout.byRows>
-						<s:HorizontalLayout gap="2" />
+						<s:VerticalLayout gap="2" />
 					</s:layout.byRows> 
 					<s:itemRenderer>
 						<fx:Component>
@@ -159,7 +162,8 @@
 								modelVersion="{outerDocument.modelVersion}"
 								nodeDefinitions="{outerDocument.nodeDefinitions}"
 								dragEnabled="{Application.activeRecordEditable &amp;&amp; ! outerDocument.entityDefinition.enumerable}"
-								nodesDisposition="{outerDocument.entitiesDisposition}"
+								nodesDisposition="{outerDocument.entitiesDisposition == MultipleEntityAsTableFormItem.DISPOSITION_BY_COLUMNS ? 
+									EntityDataGroupItemRenderer.DISPOSITION_VERTICAL: EntityDataGroupItemRenderer.DISPOSITION_HORIZONTAL}"
 								>
 								<fx:Script>
 									<![CDATA[

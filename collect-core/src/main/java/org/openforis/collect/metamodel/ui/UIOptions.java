@@ -42,6 +42,7 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		TAB_SET(new QName(UI_NAMESPACE_URI, UIOptionsConstants.TAB_SET_NAME)),
 		TAB_NAME(new QName(UI_NAMESPACE_URI, UIOptionsConstants.TAB)),
 		LAYOUT(new QName(UI_NAMESPACE_URI, UIOptionsConstants.LAYOUT)),
+		DISPOSITION(new QName(UI_NAMESPACE_URI, UIOptionsConstants.DISPOSITION)),
 		COUNT_IN_SUMMARY_LIST(new QName(UI_NAMESPACE_URI, UIOptionsConstants.COUNT)),
 		SHOW_ROW_NUMBERS(new QName(UI_NAMESPACE_URI, UIOptionsConstants.SHOW_ROW_NUMBERS)),
 		AUTOCOMPLETE(new QName(UI_NAMESPACE_URI, UIOptionsConstants.AUTOCOMPLETE));
@@ -59,6 +60,21 @@ public class UIOptions implements ApplicationOptions, Serializable {
 	
 	public enum Layout {
 		FORM, TABLE
+	}
+	
+	public enum Disposition {
+		BY_ROWS("byRows"), 
+		BY_COLUMNS("byColumns");
+		
+		private String value;
+
+		private Disposition(String value) {
+			this.value = value;
+		}
+		
+		public String getValue() {
+			return value;
+		}
 	}
 	
 	private CollectSurvey survey;
@@ -386,6 +402,44 @@ public class UIOptions implements ApplicationOptions, Serializable {
 	public void setLayout(EntityDefinition entityDefn, Layout layout) {
 		String layoutValue = layout != null ? layout.name().toLowerCase(): null;
 		entityDefn.setAnnotation(Annotation.LAYOUT.getQName(), layoutValue);
+	}
+	
+	public Disposition getDisposition(EntityDefinition defn) {
+		String dispositionValue = defn.getAnnotation(Annotation.DISPOSITION.getQName());
+		if ( dispositionValue == null ) {
+			EntityDefinition parentDefn = (EntityDefinition) defn.getParentDefinition();
+			if ( parentDefn == null ) {
+				return Disposition.BY_ROWS;
+			} else {
+				return getDisposition(parentDefn);
+			}
+		} else if ( dispositionValue.equals(Disposition.BY_COLUMNS.getValue())) {
+			return Disposition.BY_COLUMNS;
+		} else {
+			return Disposition.BY_ROWS;
+		}
+	}
+	
+	public void setDisposition(EntityDefinition defn, Disposition disposition) {
+		defn.setAnnotation(Annotation.DISPOSITION.getQName(), disposition.getValue());
+	}
+	
+	public boolean getShowRowNumbersValue(EntityDefinition defn) {
+		String annotationValue = defn.getAnnotation(Annotation.SHOW_ROW_NUMBERS.getQName());
+		return Boolean.valueOf(annotationValue);
+	}
+	
+	public void setShowRowNumbersValue(EntityDefinition defn, boolean value) {
+		defn.setAnnotation(Annotation.SHOW_ROW_NUMBERS.getQName(), Boolean.toString(value));
+	}
+	
+	public boolean getCountInSumamryListValue(EntityDefinition defn) {
+		String annotationValue = defn.getAnnotation(Annotation.COUNT_IN_SUMMARY_LIST.getQName());
+		return Boolean.valueOf(annotationValue);
+	}
+	
+	public void setCountInSummaryListValue(EntityDefinition defn, boolean value) {
+		defn.setAnnotation(Annotation.COUNT_IN_SUMMARY_LIST.getQName(), Boolean.toString(value));
 	}
 	
 	/**

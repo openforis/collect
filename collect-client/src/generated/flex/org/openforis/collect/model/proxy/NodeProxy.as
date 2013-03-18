@@ -18,7 +18,6 @@ package org.openforis.collect.model.proxy {
     public class NodeProxy extends NodeProxyBase {
 		
 		private var _definition:NodeDefinitionProxy;
-		
 		private var _index:int;
 		
 		public function init():void {
@@ -81,6 +80,21 @@ package org.openforis.collect.model.proxy {
 			return result;
 		}
 		
+		public function setParentReferencesOnChildren():void {
+			//to be implemented in subclasses
+		}
+		
+		public function getParentMultipleEntity():EntityProxy {
+			var currentParent:EntityProxy = parent;
+			while ( currentParent != null ) {
+				if ( currentParent.definition.multiple ) {
+					return currentParent;
+				}
+				currentParent = currentParent.parent;
+			}
+			return null;
+		}
+		
 		public function getSiblings():IList {
 			if ( parent != null ) {
 				var result:IList = parent.getChildren(name);
@@ -97,7 +111,7 @@ package org.openforis.collect.model.proxy {
 		public function set definition(value:NodeDefinitionProxy):void {
 			_definition = value;
 		}
-		
+
     }
 
 }

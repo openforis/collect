@@ -6,6 +6,7 @@
  */
 
 package org.openforis.collect.model.proxy {
+	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 	import org.openforis.collect.util.CollectionUtil;
 
 	/**
@@ -15,11 +16,22 @@ package org.openforis.collect.model.proxy {
     [RemoteClass(alias="org.openforis.collect.model.proxy.AttributeProxy")]
     public class AttributeProxy extends AttributeProxyBase {
 		
+		override public function setParentReferencesOnChildren():void {
+			for each (var field:FieldProxy in fields) {
+				field.parent = this;
+			}
+			
+		}
+		
 		public function getField(index:int):FieldProxy {
 			if(index < 0) {
 				index = 0;
 			}
 			return fields.getItemAt(index) as FieldProxy;
+		}
+		
+		public function getFieldIndex(field:FieldProxy):int {
+			return fields.getItemIndex(field);
 		}
 		
 		override public function hasErrors():Boolean {
@@ -63,5 +75,16 @@ package org.openforis.collect.model.proxy {
 			return true;
 		}
 		
-    }
+		public function getParentMutipleEntity():EntityProxy {
+			var p:EntityProxy = parent;
+			while ( p != null ) {
+				if ( p.definition.multiple ) {
+					return p;
+				}
+				p = p.parent;
+			}
+			return null;
+		}
+		
+	}
 }

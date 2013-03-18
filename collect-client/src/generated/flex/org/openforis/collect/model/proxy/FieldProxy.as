@@ -32,6 +32,8 @@ package org.openforis.collect.model.proxy {
 		public static const SHORTCUT_DASH_ON_FORM:String = "-";
 		public static const SHORTCUT_ILLEGIBLE:String = "?";
 		
+		private var _parent:AttributeProxy;
+		
 		public static function getShortCutForReasonBlank(symbol:FieldSymbol):String {
 			switch(symbol) {
 				case FieldSymbol.BLANK_ON_FORM:
@@ -87,6 +89,15 @@ package org.openforis.collect.model.proxy {
 			}
 			return "";
 		}
+
+		public function get parent():AttributeProxy {
+			return _parent;
+		}
+
+		public function set parent(value:AttributeProxy):void {
+			_parent = value;
+		}
+
 		
     }
 }

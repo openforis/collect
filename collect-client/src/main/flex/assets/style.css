@@ -341,6 +341,14 @@ s|Label.indent {
 	skinClass: ClassReference("org.openforis.collect.ui.skin.DataGroupHeaderSkin");
 }
 
+.dataGroupHeader.horizontal {
+	verticalAlign: bottom;
+}
+
+.dataGroupHeader.vertical {
+	verticalAlign: top;
+}
+
 s|Label.dataGroupHeader {
 	fontWeight: bold;
 	font-size: 10;

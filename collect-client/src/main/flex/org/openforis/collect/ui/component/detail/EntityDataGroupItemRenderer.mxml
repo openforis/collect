@@ -5,7 +5,7 @@
 				xmlns:mx="library://ns.adobe.com/flex/mx"
 				xmlns:detail="org.openforis.collect.ui.component.detail.*" 
 				xmlns:datagroup="org.openforis.collect.ui.component.datagroup.*"
-				currentState="{STATE_BY_COLUMNS}"
+				currentState="{STATE_HORIZONTAL}"
 				>
 	
 	<fx:Script>
@@ -16,17 +16,17 @@
 			import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
 			import org.openforis.collect.model.proxy.EntityProxy;
 
-			public static const DISPOSITION_BY_COLUMNS:String = "byColumns";
-			public static const DISPOSITION_BY_ROWS:String = "byRows";
+			public static const DISPOSITION_HORIZONTAL:String = "horizontal";
+			public static const DISPOSITION_VERTICAL:String = "vertical";
 			
-			public static const STATE_BY_COLUMNS:String = "byColumns";
-			public static const STATE_BY_ROWS:String = "byRows";
+			public static const STATE_HORIZONTAL:String = "horizontal";
+			public static const STATE_VERTICAL:String = "vertical";
 			
 			private var _entityDefinition:EntityDefinitionProxy;
 			private var _nodeDefinitions:IList;
 			private var _modelVersion:ModelVersionProxy;
 			private var _entity:EntityProxy;
-			private var _nodesDisposition:String = DISPOSITION_BY_COLUMNS;
+			private var _nodesDisposition:String = DISPOSITION_HORIZONTAL;
 			
 			override protected function createChildren():void {
 				super.createChildren();
@@ -35,7 +35,7 @@
 			}
 			
 			protected function updateCurrentState():void {
-				currentState = _nodesDisposition == DISPOSITION_BY_COLUMNS ? STATE_BY_COLUMNS: STATE_BY_ROWS;
+				currentState = _nodesDisposition == DISPOSITION_HORIZONTAL ? STATE_HORIZONTAL: STATE_VERTICAL;
 			}
 			
 			[Bindable]
@@ -100,12 +100,12 @@
 				 />
 		
 		<s:DataGroup id="dataGroup" dataProvider="{nodeDefinitions}">
-			<s:layout.byColumns>
+			<s:layout.horizontal>
 				<s:HorizontalLayout gap="4" />
-			</s:layout.byColumns>
-			<s:layout.byRows>
-				<s:VerticalLayout gap="4" />
-			</s:layout.byRows> 
+			</s:layout.horizontal>
+			<s:layout.vertical>
+				<s:VerticalLayout gap="2" />
+			</s:layout.vertical> 
 			<s:itemRenderer>
 				<fx:Component>
 					<detail:FormDataGroupItemRenderer
@@ -118,8 +118,8 @@
 	</fx:Declarations>
 	
 	<datagroup:states>
-		<s:State name="byRows" />
-		<s:State name="byColumns" />
+		<s:State name="vertical" />
+		<s:State name="horizontal" />
 	</datagroup:states>
 	
 </datagroup:MultipleNodesDataGroupItemRenderer>

@@ -60,6 +60,7 @@ package org.openforis.collect.model.proxy {
 		
 		protected function initNode(node:NodeProxy):void {
 			_nodesMap[node.id] = node;
+			node.setParentReferencesOnChildren();
 			node.init();
 		}
 		
@@ -142,6 +143,7 @@ package org.openforis.collect.model.proxy {
 				}
 				parent = getNode(node.parentId) as EntityProxy;
 				parent.addChild(node);
+				node.parent = parent;
 				initNode(node);
 				if(node is EntityProxy) {
 					EntityProxy(node).traverse(initNode);
