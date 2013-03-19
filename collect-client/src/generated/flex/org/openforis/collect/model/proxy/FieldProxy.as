@@ -97,7 +97,14 @@ package org.openforis.collect.model.proxy {
 		public function set parent(value:AttributeProxy):void {
 			_parent = value;
 		}
-
+		
+		public function get index():int {
+			if ( _parent != null ) {
+				return _parent.fields.getItemIndex(this);
+			} else {
+				return -1;
+			}
+		}
 		
     }
 }

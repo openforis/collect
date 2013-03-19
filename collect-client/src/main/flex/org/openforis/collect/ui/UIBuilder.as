@@ -1,6 +1,5 @@
 package org.openforis.collect.ui {
 	import mx.binding.utils.BindingUtils;
-	import mx.collections.ArrayCollection;
 	import mx.collections.ArrayList;
 	import mx.collections.IList;
 	import mx.collections.ListCollectionView;
@@ -529,15 +528,5 @@ package org.openforis.collect.ui {
 			return l;
 		}
 
-		public static function getDefinitionsInVersion(defs:IList, version:ModelVersionProxy):IList {
-			var result:IList = new ArrayCollection();
-			for each (var defn:NodeDefinitionProxy in defs) {
-				if(version == null || version.isApplicable(defn)){
-					result.addItem(defn);
-				}
-			}
-			return result;
-		}
-		
 	}
 }

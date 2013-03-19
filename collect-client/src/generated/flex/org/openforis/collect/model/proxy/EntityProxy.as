@@ -10,11 +10,11 @@ package org.openforis.collect.model.proxy {
 	import mx.collections.IList;
 	import mx.collections.ListCollectionView;
 	import mx.collections.Sort;
-	import mx.controls.List;
 	
 	import org.granite.collections.IMap;
 	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
+	import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.NumberAttributeDefinitionProxy;
 	import org.openforis.collect.util.ArrayUtil;
 	import org.openforis.collect.util.CollectionUtil;
@@ -121,15 +121,28 @@ package org.openforis.collect.model.proxy {
 			return null;
 		}
 		
+		public function getDescendantSingleAttribute(defnId:int):AttributeProxy {
+			var leafAttrs:IList = getLeafAttributes();
+			for each (var attr:AttributeProxy in leafAttrs) {
+				if ( attr.definition.id == defnId ) {
+					return attr;
+				}
+			}
+			return null;
+		}
+		
 		public function getChildren(nodeName:String = null):IList {
 			var result:ArrayCollection;
 			if(nodeName != null) {
 				result = childrenByName.get(nodeName);
 			} else {
 				result = new ArrayCollection();
-				var listsOfChildren:ArrayCollection = childrenByName.values;
-				for each (var list:IList in listsOfChildren) {
-					result.addAll(list);
+				var childDefns:IList = EntityDefinitionProxy(definition).childDefinitions;
+				for each (var childDefn:NodeDefinitionProxy in childDefns) {
+					var childrenPart:IList = childrenByName.get(childDefn.name);
+					if ( CollectionUtil.isNotEmpty(childrenPart) ) {
+						result.addAll(childrenPart);
+					}
 				}
 			}
 			return result;
@@ -146,7 +159,7 @@ package org.openforis.collect.model.proxy {
 					children = EntityProxy(node).getChildren();
 					ArrayUtil.addAll(stack, children.toArray());
 				} else {
-					result.addItem(node);
+					result.addItemAt(node, 0);
 				}
 			}
 			return result;

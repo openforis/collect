@@ -116,15 +116,15 @@
 						>
 				<s:Group>
 					<s:layout.byColumns>
-						<s:HorizontalLayout gap="2" />
+						<s:VerticalLayout gap="2" />
 					</s:layout.byColumns>
 					<s:layout.byRows>
-						<s:VerticalLayout gap="2" />
+						<s:HorizontalLayout gap="2" />
 					</s:layout.byRows>
 					
 					<s:Spacer id="dragAnchorSpacer"
 							  includeInLayout="{Application.activeRecordEditable &amp;&amp; ! entityDefinition.enumerable}"
-						width="11" />
+							  width="11" />
 					<s:Spacer id="rowNumberSpacer"
 							  includeInLayout="{entityDefinition.showRowNumbers}"
 							  width="20" />
@@ -136,7 +136,7 @@
 											   labelsDisposition="{entitiesDisposition == MultipleEntityAsTableFormItem.DISPOSITION_BY_ROWS ? 
 											   		DataGroupHeader.DISPOSITION_HORIZONTAL: DataGroupHeader.DISPOSITION_VERTICAL}"
 											   />
-					<!-- spacer to ensure correct alignment of the headerScroller with the dataGroup scroller -->
+					<!-- spacer that ensures the correct alignment of the headerScroller with the dataGroup scroller -->
 					<s:Spacer 
 						includeInLayout="{scroller.verticalScrollBar != null}" 
 						width="{scroller.verticalScrollBar.width}" />

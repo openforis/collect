@@ -10,7 +10,6 @@ package org.openforis.collect.metamodel.proxy {
 	import mx.collections.IList;
 	import mx.collections.ListCollectionView;
 	
-	import org.openforis.collect.ui.UIBuilder;
 	import org.openforis.collect.util.CollectionUtil;
 
 	/**
@@ -34,7 +33,7 @@ package org.openforis.collect.metamodel.proxy {
 		public static function getDefinitionsPerTab(entityDefinition:EntityDefinitionProxy, version:ModelVersionProxy, tabSet:UITabProxy):IList {
 			var result:IList = new ArrayCollection();
 			var tabName:String = tabSet.name;
-			var childDefns:IList = UIBuilder.getDefinitionsInVersion(entityDefinition.childDefinitions, version);
+			var childDefns:IList = entityDefinition.getDefinitionsInVersion(version);
 			for each (var defn:NodeDefinitionProxy in childDefns) {
 				if ( defn.uiTabName == tabName ) {
 					result.addItem(defn);
@@ -58,7 +57,7 @@ package org.openforis.collect.metamodel.proxy {
 						result.addItemAt(new ArrayCollection(), i);
 					}
 					//put each definition in the corresponding list per tab
-					var childDefns:IList = UIBuilder.getDefinitionsInVersion(entityDefinition.childDefinitions, version);
+					var childDefns:IList = entityDefinition.getDefinitionsInVersion(version);
 					for each (var defn:NodeDefinitionProxy in childDefns) {
 						var tabName:String = defn.uiTabName;
 						var tabIndex:int = CollectionUtil.getItemIndex(tabs, "name", tabName);
@@ -75,7 +74,7 @@ package org.openforis.collect.metamodel.proxy {
 		public static function getDefinitionsPerMainTab(entityDefinition:EntityDefinitionProxy, version:ModelVersionProxy):IList {
 			var result:IList = new ArrayCollection();
 			var uiTab:UITabProxy = getUITab(entityDefinition);
-			var childDefns:IList = UIBuilder.getDefinitionsInVersion(entityDefinition.childDefinitions, version);
+			var childDefns:IList = entityDefinition.getDefinitionsInVersion(version);
 			for each (var defn:NodeDefinitionProxy in childDefns) {
 				var tabName:String = defn.uiTabName;
 				if ( tabName == uiTab.name ) {

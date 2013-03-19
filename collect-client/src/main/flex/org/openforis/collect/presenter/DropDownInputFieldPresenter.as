@@ -2,6 +2,7 @@ package org.openforis.collect.presenter {
 	import flash.events.Event;
 	import flash.events.FocusEvent;
 	import flash.events.KeyboardEvent;
+	import flash.ui.Keyboard;
 	
 	import mx.binding.utils.BindingUtils;
 	import mx.collections.ArrayCollection;
@@ -154,6 +155,9 @@ package org.openforis.collect.presenter {
 				case FieldProxy.SHORTCUT_ILLEGIBLE:
 					item = ILLEGIBLE_ITEM;
 					break;
+			}
+			if ( event.charCode == Keyboard.TAB ) {
+				handleTabKey(event.shiftKey);
 			}
 			if(item != null) {
 				_view.dropDownList.selectedItem = item;

@@ -31,6 +31,16 @@ package org.openforis.collect.metamodel.proxy {
 			return null;
 		}
 		
+		public function getDefinitionsInVersion(version:ModelVersionProxy):IList {
+			var result:IList = new ArrayCollection();
+			for each (var defn:NodeDefinitionProxy in childDefinitions) {
+				if(version == null || version.isApplicable(defn)){
+					result.addItem(defn);
+				}
+			}
+			return result;
+		}
+		
 		public function get keyAttributeDefinitions():IList {
 			var list:ArrayCollection = new ArrayCollection();
 			for each(var nodeDef:NodeDefinitionProxy in childDefinitions) {

@@ -10,6 +10,7 @@ package org.openforis.collect.util
 	import mx.core.IVisualElement;
 	import mx.core.UIComponent;
 	import mx.core.UITextFormat;
+	import mx.managers.IFocusManager;
 	import mx.managers.IFocusManagerComponent;
 	import mx.styles.CSSStyleDeclaration;
 	import mx.styles.IStyleManager2;
@@ -248,6 +249,13 @@ package org.openforis.collect.util
 			}
 		}
 		
+		public static function moveFocus(backward:Boolean = false):Boolean {
+			var focusManager:IFocusManager = FlexGlobals.topLevelApplication.focusManager;
+			var focusManagerComponent:IFocusManagerComponent = focusManager.getNextFocusManagerComponent(backward);
+			focusManager.setFocus(focusManagerComponent);
+			return focusManager.getFocus() == focusManagerComponent;
+		}
+
 		public static function gridColumnDateTimeLabelFunction(item:Object, column:Object):String {
 			var result:String = null;
 			var value:* = ObjectUtil.getValue(item, column.dataField);
