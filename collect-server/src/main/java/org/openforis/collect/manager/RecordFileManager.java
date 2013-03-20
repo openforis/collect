@@ -5,7 +5,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -13,12 +12,9 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
 
-import javax.servlet.ServletContext;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.model.CollectRecord;
-import org.openforis.collect.model.Configuration;
 import org.openforis.idm.metamodel.FileAttributeDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Survey;
@@ -38,29 +34,26 @@ import org.springframework.web.multipart.MultipartFile;
  * to the current edited record (one per session)
  *
  */
-public class RecordFileManager implements Serializable {
+public class RecordFileManager extends BaseStorageManager {
 	
 	private static final long serialVersionUID = 1L;
 
-	private static final String TEMP_PATH = "temp" + java.io.File.separator + "recordFiles";
-
 	private static final String UPLOAD_PATH_CONFIGURATION_KEY = "upload_path";
+
+	private static final String TEMP_RECORD_FILES_SUBFOLDER = "collect_upload";
+	private static final String DEFAULT_RECORD_FILES_SUBFOLDER = "collect_upload";
 	
 	@Autowired
 	private ConfigurationManager configurationManager;
-	
-	@Autowired 
-	private ServletContext servletContext;
 	
 	private Map<Integer, String> tempFiles;
 	private Map<Integer, String> filesToDelete;
 
 	protected java.io.File tempRootDir;
-	protected java.io.File respositoryRootDir;
 	
 	protected void init() {
 		initTempDir();
-		initRepositoryDir();
+		initStoragePath(UPLOAD_PATH_CONFIGURATION_KEY, DEFAULT_RECORD_FILES_SUBFOLDER);
 		reset();
 	}
 
@@ -70,28 +63,21 @@ public class RecordFileManager implements Serializable {
 	}
 
 	protected void initTempDir() {
-		String tempRealPath = servletContext.getRealPath(TEMP_PATH);
-		tempRootDir = new java.io.File(tempRealPath);
-		if ( ! tempRootDir.exists() ) {
-			tempRootDir.mkdirs();
-		}	
-		if ( ! tempRootDir.canRead() ) {
-			throw new IllegalStateException("Cannot access temp directory: " + tempRealPath);
+		String baseOrTempPath = getBaseOrTempPath();
+		if ( baseOrTempPath == null ) {
+			throw new IllegalStateException("Cannot init temp folder");
+		} else {
+			String tempPath = baseOrTempPath + java.io.File.separator + TEMP_RECORD_FILES_SUBFOLDER;
+			tempRootDir = new java.io.File(tempPath);
+			if ( ! tempRootDir.exists() ) {
+				tempRootDir.mkdirs();
+			}	
+			if ( ! tempRootDir.canRead() ) {
+				throw new IllegalStateException("Cannot access temp directory: " + tempPath);
+			}
 		}
 	}
 	
-	protected void initRepositoryDir() {
-		Configuration configuration = configurationManager.getConfiguration();
-		String repositoryRootPath = configuration.get(UPLOAD_PATH_CONFIGURATION_KEY);
-		respositoryRootDir = new java.io.File(repositoryRootPath);
-		if ( ! respositoryRootDir.exists() ) {
-			respositoryRootDir.mkdirs();
-		}
-		if ( ! respositoryRootDir.canRead() ) {
-			throw new IllegalStateException("Cannot access repository directory: " + repositoryRootPath);
-		}
-	}
-
 	public File saveToTempFolder(byte[] data, String originalFileName, String sessionId, CollectRecord record, int nodeId) throws RecordFileException {
 		File file = saveToTempFolder(new ByteArrayInputStream(data), originalFileName, sessionId, record, nodeId);
 		return file;
@@ -251,7 +237,7 @@ public class RecordFileManager implements Serializable {
 	}
 	
 	protected java.io.File getRepositoryDir(Integer surveyId, Integer nodeDefnId) {
-		java.io.File file = new java.io.File(respositoryRootDir, surveyId + java.io.File.separator + nodeDefnId);
+		java.io.File file = new java.io.File(storageDirectory, surveyId + java.io.File.separator + nodeDefnId);
 		return file;
 	}
 	

@@ -17,8 +17,6 @@ import java.util.Stack;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.analysis.SimpleAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
@@ -40,7 +38,6 @@ import org.apache.lucene.util.Version;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectSurvey;
-import org.openforis.collect.model.Configuration;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -57,13 +54,13 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author S. Ricci
  *
  */
-public class RecordIndexManager {
-	
-	private static final String JAVA_IO_TMPDIR = "java.io.tmpdir";
+public class RecordIndexManager extends BaseStorageManager {
+
+	private static final long serialVersionUID = 1L;
 
 	private static final String COLLECT_INDEX_DEFAULT_FOLDER = "collect_index";
-
-	private static final String CATALINA_BASE = "catalina.base";
+	protected static final String INDEX_PATH_CONFIGURATION_KEY = "index_path";
+	protected static final String RECORD_ID_FIELD = "_record_id";
 
 	private static final Version LUCENE_VERSION = Version.LUCENE_36;
 
@@ -71,29 +68,19 @@ public class RecordIndexManager {
 		EQUAL, STARTS_WITH, CONTAINS;
 	}
 
-	protected static Log LOG = LogFactory.getLog(RecordIndexManager.class);
-
-	protected static final String INDEX_PATH_CONFIGURATION_KEY = "index_path";
-	
-	protected static final String RECORD_ID_FIELD = "_record_id";
-	
-	@Autowired
-	private transient ConfigurationManager configurationManager;
-
 	@Autowired
 	private transient RecordManager recordManager;
 	
-	protected String indexRootPath;
 	protected Directory indexDirectory;
 	protected boolean inited;
 	protected boolean cancelled;
 	
 	protected synchronized void init() throws RecordIndexException {
 		unlock();
-		initRootPath();
-		if ( indexRootPath != null ) {
+		initStoragePath(INDEX_PATH_CONFIGURATION_KEY, COLLECT_INDEX_DEFAULT_FOLDER);
+		if ( storagePath != null ) {
 			if ( LOG.isInfoEnabled() ) {
-				LOG.info("Record index stored in: " + indexRootPath);
+				LOG.info("Record index stored in: " + storagePath);
 			}
 			initIndexDirectory();
 			cancelled = false;
@@ -105,38 +92,6 @@ public class RecordIndexManager {
 		}
 	}
 	
-	protected void initRootPath() {
-		Configuration configuration = configurationManager.getConfiguration();
-		indexRootPath = configuration.get(INDEX_PATH_CONFIGURATION_KEY);
-		if ( indexRootPath == null ) {
-			if ( LOG.isInfoEnabled() ) {
-				LOG.info("Record index path not configured in config table");
-			}
-			String base = getSystemBasePath();
-			if ( base == null ) {
-				indexRootPath = null;
-			} else {
-				indexRootPath = base + File.separator + COLLECT_INDEX_DEFAULT_FOLDER;
-			}
-		}
-	}
-
-	protected String getSystemBasePath() {
-		String base = null;
-		String[] systemProps = new String[]{CATALINA_BASE, JAVA_IO_TMPDIR};
-		for (int i = 0; i < systemProps.length; i++) {
-			String prop= systemProps[i];
-			base = System.getProperty(prop);
-			if ( base != null ) {
-				if ( LOG.isInfoEnabled() ) {
-					LOG.info("Using " + prop + " root directory");
-				}
-				break;
-			}
-		}
-		return base;
-	}
-	
 	protected void initIndexDirectory() throws RecordIndexException {
 		indexDirectory = createIndexDirectory();
 		prepareIndexDirectory();
@@ -144,12 +99,12 @@ public class RecordIndexManager {
 
 	protected Directory createIndexDirectory() throws RecordIndexException {
 		try {
-			File indexDir = new File(indexRootPath);
+			File indexDir = storageDirectory;
 			if ( indexDir.exists() || indexDir.mkdirs() ) {
 				Directory directory = new SimpleFSDirectory(indexDir);
 				return directory;
 			} else {
-				throw new RecordIndexException("Cannot create index directory: " + indexRootPath);
+				throw new RecordIndexException("Cannot create index directory: " + storagePath);
 			}
 		} catch (IOException e) {
 			throw new RecordIndexException(e);
@@ -167,9 +122,9 @@ public class RecordIndexManager {
 	}
 
 	public synchronized void unlock() throws RecordIndexException {
-		if ( indexRootPath != null ) {
+		if ( storagePath != null ) {
 			try {
-				File indexRootDir = new File(indexRootPath);
+				File indexRootDir = new File(storagePath);
 				if ( indexRootDir.exists() ) {
 					Directory directory = new SimpleFSDirectory(indexRootDir);
 					if ( IndexWriter.isLocked(directory) ) {
@@ -191,9 +146,9 @@ public class RecordIndexManager {
 	}
 
 	protected void deleteIndexRootDirectory() throws RecordIndexException {
-		if ( indexRootPath != null ) {
+		if ( storagePath != null ) {
 			try {
-				File indexDir = new File(indexRootPath);
+				File indexDir = new File(storagePath);
 				FileUtils.forceDelete(indexDir);
 			} catch (IOException e1) {
 				throw new RecordIndexException(e1);
