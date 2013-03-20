@@ -16,11 +16,10 @@ package org.openforis.collect.model.proxy {
     [RemoteClass(alias="org.openforis.collect.model.proxy.AttributeProxy")]
     public class AttributeProxy extends AttributeProxyBase {
 		
-		override public function setParentReferencesOnChildren():void {
+		override protected function setParentReferencesOnChildren():void {
 			for each (var field:FieldProxy in fields) {
 				field.parent = this;
 			}
-			
 		}
 		
 		public function getField(index:int):FieldProxy {

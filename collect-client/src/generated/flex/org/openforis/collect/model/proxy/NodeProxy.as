@@ -23,6 +23,7 @@ package org.openforis.collect.model.proxy {
 		
 		public function init():void {
 			updateIndex();
+			setParentReferencesOnChildren();
 		}
 
 		public function hasErrors():Boolean {
@@ -84,7 +85,7 @@ package org.openforis.collect.model.proxy {
 			return result;
 		}
 		
-		public function setParentReferencesOnChildren():void {
+		protected function setParentReferencesOnChildren():void {
 			//to be implemented in subclasses
 		}
 		

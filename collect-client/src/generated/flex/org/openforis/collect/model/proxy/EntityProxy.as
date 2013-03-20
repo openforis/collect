@@ -101,7 +101,7 @@ package org.openforis.collect.model.proxy {
 			}
 		}
 		
-		override public function setParentReferencesOnChildren():void {
+		override protected function setParentReferencesOnChildren():void {
 			var children:IList = getChildren();
 			for each (var child:NodeProxy in children) {
 				child.parent = this;
