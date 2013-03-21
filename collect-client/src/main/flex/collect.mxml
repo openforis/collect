@@ -8,11 +8,7 @@
 			   xmlns:view="org.openforis.collect.ui.view.*"
 			   
 			   width="100%" 
-			   minWidth="955" 
-			   minWidth.fullScreen="{NaN}"
 			   height="100%" 
-			   minHeight="450"
-			   minHeight.fullScreen="{NaN}"
 			   
 			   creationComplete="creationCompleteHandler(event)" 
 			   initialize="initializeHandler(event)"
