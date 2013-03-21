@@ -49,11 +49,11 @@
                </tabpanel>
                <tabpanel>
                  <flash src="@load(vm.speciesImportModuleUrl)"
-                   height="100%" width="100%" />
+                   sclass="maximised" height="100%" width="100%" />
                </tabpanel>
                <tabpanel>
                  <flash src="@load(vm.samplingDesignImportModuleUrl)"
-                   height="100%" width="100%" />
+                   sclass="maximised" height="100%" width="100%" />
                </tabpanel>
                <tabpanel>
                  <include id="schemaInclude"

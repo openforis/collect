@@ -126,3 +126,8 @@ button.icon {
 	padding: 1px;
 }
 /* END OF LANGUAGES LIST STYLE */
+
+.z-flash.maximised {
+	height: 100%;
+	width: 100%;
+}
