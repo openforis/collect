@@ -75,8 +75,7 @@ public class ValidationMessageBuilder {
 	public String getValidationMessage(Attribute<?, ?> attribute, ValidationResult validationResult) {
 		ValidationRule<?> validator = validationResult.getValidator();
 		if ( validator instanceof Check ) {
-			Check<?> check = (Check<?>) validator;
-			String message = getCustomMessage(check);
+			String message = getCustomMessage((Check<?>) validator);
 			if (message != null ) {
 				return message;
 			}
