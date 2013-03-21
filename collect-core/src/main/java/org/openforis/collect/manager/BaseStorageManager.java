@@ -57,7 +57,7 @@ public abstract class BaseStorageManager implements Serializable {
 		}
 	}
 	
-	protected void initStoragePath(String pathConfigurationKey, String subFolder) {
+	protected void initStorageDirectory(String pathConfigurationKey, String subFolder) {
 		Configuration configuration = configurationManager.getConfiguration();
 		String storagePath = configuration.get(pathConfigurationKey);
 		if ( StringUtils.isBlank(storagePath) ) {
@@ -66,7 +66,7 @@ public abstract class BaseStorageManager implements Serializable {
 			}
 			File rootDir = getCatalinaBaseTempFolder();
 			if ( rootDir != null ) {
-				LOG.info("Using system property " + CATALINA_BASE + " folder as root storage directory: " + rootDir.getAbsolutePath());
+				LOG.info("Using system property " + CATALINA_BASE + "/temp folder as root storage directory: " + rootDir.getAbsolutePath());
 			} else {
 				rootDir = getTempFolder();
 				if ( rootDir != null ) {

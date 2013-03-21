@@ -49,7 +49,7 @@ public class RecordFileManager extends BaseStorageManager {
 	
 	protected void init() {
 		initTempDir();
-		initStoragePath(UPLOAD_PATH_CONFIGURATION_KEY, DEFAULT_RECORD_FILES_SUBFOLDER);
+		initStorageDirectory(UPLOAD_PATH_CONFIGURATION_KEY, DEFAULT_RECORD_FILES_SUBFOLDER);
 		reset();
 	}
 
