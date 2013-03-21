@@ -30,16 +30,23 @@ public class MessageContextHolder {
 	
 	public String getMessage(String code, Object... args){
 		Locale locale = getCurrentLocale();
-		String message = null;
+		String message = getMessage(locale, code, args);
+		if ( message == null ) {
+			message = getMessage(DEFAULT_LOCALE, code, args);
+		}
+		return message;
+	}
+
+	public String getMessage(Locale locale, String code, Object[] args) {
 		try {
-			message = context.getMessage(code, args, locale);
+			String message = context.getMessage(code, args, locale);
+			return message;
 		} catch ( NoSuchMessageException e ) {
 			if ( log.isInfoEnabled() ) {
 				log.info("Message with key '" + code + "' not found for locale '" + locale + "'");
 			}
-			message = context.getMessage(code, args, DEFAULT_LOCALE);
+			return null;
 		}
-		return message;
 	}
 
 	public Locale getCurrentLocale() {
