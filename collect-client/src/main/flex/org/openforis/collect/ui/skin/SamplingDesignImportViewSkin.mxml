@@ -44,7 +44,7 @@
 									  sortable="false"
 									  labelFunction="{hostComponent.levelLabelFunction}"
 									  width="100" />
-						<s:GridColumn headerText="{Message.get('samplingDesignImport.summaryList.level1Code')}" 
+						<s:GridColumn headerText="{Message.get('samplingDesignImport.summaryList.level2Code')}" 
 									  dataField="level_2"
 									  sortable="false"
 									  labelFunction="{hostComponent.levelLabelFunction}"
