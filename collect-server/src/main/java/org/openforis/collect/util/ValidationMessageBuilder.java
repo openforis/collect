@@ -18,6 +18,7 @@ import org.openforis.idm.metamodel.NodeLabel.Type;
 import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.SurveyContext;
+import org.openforis.idm.metamodel.validation.Check;
 import org.openforis.idm.metamodel.validation.Check.Flag;
 import org.openforis.idm.metamodel.validation.CodeParentValidator;
 import org.openforis.idm.metamodel.validation.CodeValidator;
@@ -73,6 +74,13 @@ public class ValidationMessageBuilder {
 
 	public String getValidationMessage(Attribute<?, ?> attribute, ValidationResult validationResult) {
 		ValidationRule<?> validator = validationResult.getValidator();
+		if ( validator instanceof Check ) {
+			Check<?> check = (Check<?>) validator;
+			String message = getCustomMessage(check);
+			if (message != null ) {
+				return message;
+			}
+		}
 		if ( validator instanceof ComparisonCheck ) {
 			return getComparisonCheckMessage(attribute, validationResult);
 		} else {
@@ -85,6 +93,15 @@ public class ValidationMessageBuilder {
 				return validator.getClass().getSimpleName();
 			}
 		}
+	}
+
+	private String getCustomMessage(Check<?> check) {
+		String langCode = messageContextHolder.getCurrentLanguageCode();
+		String customMessage = check.getMessage(langCode);
+		if ( customMessage == null ) {
+			customMessage = check.getMessage(null);
+		}
+		return customMessage;
 	}
 	
 	public List<String> getValidationMessages(Attribute<?,?> attribute, ValidationResults validationResults, Flag flag) {
@@ -167,7 +184,6 @@ public class ValidationMessageBuilder {
 		}
 		return key;
 	}
-	
 	
 	protected String[] getMessageArgs(Attribute<?, ?> attribute, ValidationResult validationResult) {
 		ValidationRule<?> validator = validationResult.getValidator();
