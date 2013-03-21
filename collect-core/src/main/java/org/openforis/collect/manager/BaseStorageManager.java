@@ -16,6 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public abstract class BaseStorageManager implements Serializable {
 
+	private static final String DEFAULT_BASE_TEMP_SUBDIR = "temp";
+
 	private static final long serialVersionUID = 1L;
 
 	private static final String JAVA_IO_TMPDIR = "java.io.tmpdir";
@@ -26,37 +28,53 @@ public abstract class BaseStorageManager implements Serializable {
 	@Autowired
 	protected transient ConfigurationManager configurationManager;
 
-	protected String storagePath;
 	protected File storageDirectory;
+	
+	protected File getTempFolder() {
+		return getReadableSysPropLocation(JAVA_IO_TMPDIR, null);
+	}
+	
+	protected File getCatalinaBaseTempFolder() {
+		return getReadableSysPropLocation(CATALINA_BASE, DEFAULT_BASE_TEMP_SUBDIR);
+	}
 
-	protected String getBaseOrTempPath() {
-		String base = null;
-		String[] systemProps = new String[]{CATALINA_BASE, JAVA_IO_TMPDIR};
-		for (int i = 0; i < systemProps.length; i++) {
-			String prop = systemProps[i];
-			base = System.getProperty(prop);
-			if ( base != null ) {
-				if ( LOG.isInfoEnabled() ) {
-					LOG.info("Using " + prop + " directory: " + base);
-				}
-				break;
-			}
+	protected File getReadableSysPropLocation(String sysProp, String subDir) {
+		String base = System.getProperty(sysProp);
+		if ( base != null ) {
+			String path = base + subDir != null ? (File.separator + subDir): "";
+			return getLocationIfAccessible(path);
+		} else {
+			return null;
 		}
-		return base;
+	}
+
+	protected File getLocationIfAccessible(String path) {
+		File result = new File(path);
+		if ( (result.exists() || result.mkdirs()) && result.canWrite() ) {
+			return result;
+		} else {
+			return null;
+		}
 	}
 	
 	protected void initStoragePath(String pathConfigurationKey, String subFolder) {
-		storageDirectory = null;
 		Configuration configuration = configurationManager.getConfiguration();
-		storagePath = configuration.get(pathConfigurationKey);
+		String storagePath = configuration.get(pathConfigurationKey);
 		if ( StringUtils.isBlank(storagePath) ) {
 			if ( LOG.isInfoEnabled() ) {
 				LOG.info("Path with key '" + pathConfigurationKey+ "' not configured in config table");
 			}
-			String base = getBaseOrTempPath();
-			if ( base != null ) {
-				storagePath = base + File.separator + subFolder;
-				storageDirectory = new File(storagePath);
+			File rootDir = getCatalinaBaseTempFolder();
+			if ( rootDir != null ) {
+				LOG.info("Using system property " + CATALINA_BASE + " folder as root storage directory: " + rootDir.getAbsolutePath());
+			} else {
+				rootDir = getTempFolder();
+				if ( rootDir != null ) {
+					LOG.info("Using system property " + JAVA_IO_TMPDIR + " folder as root storage directory: " + rootDir.getAbsolutePath());
+				}
+			}
+			if ( rootDir != null ) {
+				storageDirectory = new File(rootDir, subFolder);
 			}
 		}
 	}

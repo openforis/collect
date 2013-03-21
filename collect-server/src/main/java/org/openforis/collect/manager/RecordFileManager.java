@@ -23,7 +23,6 @@ import org.openforis.idm.model.File;
 import org.openforis.idm.model.FileAttribute;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.NodeVisitor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -43,9 +42,6 @@ public class RecordFileManager extends BaseStorageManager {
 	private static final String TEMP_RECORD_FILES_SUBFOLDER = "collect_upload";
 	private static final String DEFAULT_RECORD_FILES_SUBFOLDER = "collect_upload";
 	
-	@Autowired
-	private ConfigurationManager configurationManager;
-	
 	private Map<Integer, String> tempFiles;
 	private Map<Integer, String> filesToDelete;
 
@@ -63,17 +59,18 @@ public class RecordFileManager extends BaseStorageManager {
 	}
 
 	protected void initTempDir() {
-		String baseOrTempPath = getBaseOrTempPath();
-		if ( baseOrTempPath == null ) {
+		java.io.File systemTempRootDir = getTempFolder();
+		if ( systemTempRootDir == null ) {
+			systemTempRootDir = getCatalinaBaseTempFolder();
+		}
+		if ( systemTempRootDir == null ) {
 			throw new IllegalStateException("Cannot init temp folder");
 		} else {
-			String tempPath = baseOrTempPath + java.io.File.separator + TEMP_RECORD_FILES_SUBFOLDER;
-			tempRootDir = new java.io.File(tempPath);
-			if ( ! tempRootDir.exists() ) {
-				tempRootDir.mkdirs();
-			}	
-			if ( ! tempRootDir.canRead() ) {
-				throw new IllegalStateException("Cannot access temp directory: " + tempPath);
+			tempRootDir = new java.io.File(systemTempRootDir, TEMP_RECORD_FILES_SUBFOLDER);
+			if ( (tempRootDir.exists() || tempRootDir.mkdirs()) && tempRootDir.canWrite() ) {
+				LOG.info("Temporary directory: " + tempRootDir.getAbsolutePath());
+			} else {
+				throw new IllegalStateException("Cannot access temp directory: " + tempRootDir);
 			}
 		}
 	}

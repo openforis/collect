@@ -78,9 +78,9 @@ public class RecordIndexManager extends BaseStorageManager {
 	protected synchronized void init() throws RecordIndexException {
 		unlock();
 		initStoragePath(INDEX_PATH_CONFIGURATION_KEY, COLLECT_INDEX_DEFAULT_FOLDER);
-		if ( storagePath != null ) {
+		if ( storageDirectory != null ) {
 			if ( LOG.isInfoEnabled() ) {
-				LOG.info("Record index stored in: " + storagePath);
+				LOG.info("Record index stored in: " + storageDirectory.getAbsolutePath());
 			}
 			initIndexDirectory();
 			cancelled = false;
