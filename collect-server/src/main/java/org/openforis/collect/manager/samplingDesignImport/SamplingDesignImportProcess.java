@@ -211,7 +211,7 @@ public class SamplingDesignImportProcess extends AbstractProcess<Void, SamplingD
 		String[] colNames = new String[columns.length];
 		for (int i = 0; i < columns.length; i++) {
 			SamplingDesignFileColumn column = columns[i];
-			colNames[i] = column.getName();
+			colNames[i] = column.getColumnName();
 		}
 		ParsingError error = new ParsingError(
 			ErrorType.DUPLICATE_VALUE, 

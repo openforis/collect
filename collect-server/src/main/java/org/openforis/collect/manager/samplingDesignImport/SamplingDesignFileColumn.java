@@ -6,28 +6,33 @@ package org.openforis.collect.manager.samplingDesignImport;
  *
  */
 public enum SamplingDesignFileColumn {
-	LEVEL_1(0, "level1_code"), 
-	LEVEL_2(1, "level2_code"), 
-	LEVEL_3(2, "level3_code"), 
-	X(3, "x"),
-	Y(4, "y"),
-	SRS_ID(5, "srs_id");
+	LEVEL_1("level1_code"), 
+	LEVEL_2("level2_code"), 
+	LEVEL_3("level3_code"), 
+	X("x"),
+	Y("y"),
+	SRS_ID("srs_id");
 	
 	public static final SamplingDesignFileColumn[] LOCATION_COLUMNS = {X, Y};
+	public static final SamplingDesignFileColumn[] REQUIRED_COLUMNS = {LEVEL_1, X, Y, SRS_ID};
 	
-	private int index;
-	private String name;
-	
-	private SamplingDesignFileColumn(int index, String name) {
-		this.index = index;
-		this.name = name;
+	public static final String[] REQUIRED_COLUMN_NAMES;
+	static {
+		String [] requiredColNames = new String[REQUIRED_COLUMNS.length];
+		for (int i = 0 ; i < REQUIRED_COLUMNS.length; i ++) {
+			SamplingDesignFileColumn column = REQUIRED_COLUMNS[i];
+			requiredColNames[i] = column.getColumnName();
+		}
+		REQUIRED_COLUMN_NAMES = requiredColNames;
 	}
 	
-	public int getIndex() {
-		return index;
+	private String columnName;
+	
+	private SamplingDesignFileColumn(String columnName) {
+		this.columnName = columnName;
 	}
 	
-	public String getName() {
-		return name;
+	public String getColumnName() {
+		return columnName;
 	}
 }

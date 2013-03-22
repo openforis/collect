@@ -311,7 +311,7 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 	protected Taxon createTaxonFamily(SpeciesLine line) throws ParsingException {
 		String familyName = line.getFamilyName();
 		if ( familyName == null ) {
-			ParsingError error = new ParsingError(ErrorType.INVALID_VALUE, line.getLineNumber(), SpeciesFileColumn.SCIENTIFIC_NAME.getName(), INVALID_FAMILY_NAME_ERROR_MESSAGE_KEY);
+			ParsingError error = new ParsingError(ErrorType.INVALID_VALUE, line.getLineNumber(), SpeciesFileColumn.SCIENTIFIC_NAME.getColumnName(), INVALID_FAMILY_NAME_ERROR_MESSAGE_KEY);
 			throw new ParsingException(error);
 		}
 		return createTaxon(line, FAMILY, null, familyName);
@@ -320,7 +320,7 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 	protected Taxon createTaxonGenus(SpeciesLine line) throws ParsingException {
 		String genus = line.getGenus();
 		if ( genus == null ) {
-			ParsingError error = new ParsingError(ErrorType.INVALID_VALUE, line.getLineNumber(), SpeciesFileColumn.SCIENTIFIC_NAME.getName(), INVALID_GENUS_NAME_ERROR_MESSAGE_KEY);
+			ParsingError error = new ParsingError(ErrorType.INVALID_VALUE, line.getLineNumber(), SpeciesFileColumn.SCIENTIFIC_NAME.getColumnName(), INVALID_GENUS_NAME_ERROR_MESSAGE_KEY);
 			throw new ParsingException(error);
 		}
 		Taxon taxonFamily = createTaxonFamily(line);
@@ -331,7 +331,7 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 	protected Taxon createTaxonSpecies(SpeciesLine line) throws ParsingException {
 		String speciesName = line.getSpeciesName();
 		if ( speciesName == null ) {
-			ParsingError error = new ParsingError(ErrorType.INVALID_VALUE, line.getLineNumber(), SpeciesFileColumn.SCIENTIFIC_NAME.getName(), INVALID_SPECIES_NAME_ERROR_MESSAGE_KEY);
+			ParsingError error = new ParsingError(ErrorType.INVALID_VALUE, line.getLineNumber(), SpeciesFileColumn.SCIENTIFIC_NAME.getColumnName(), INVALID_SPECIES_NAME_ERROR_MESSAGE_KEY);
 			throw new ParsingException(error);
 		}
 		Taxon taxonGenus = createTaxonGenus(line);
@@ -341,7 +341,7 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 	protected Taxon createTaxon(SpeciesLine line, TaxonRank rank, Taxon parent) throws ParsingException {
 		String normalizedScientificName = line.getCanonicalScientificName();
 		if ( normalizedScientificName == null ) {
-			ParsingError error = new ParsingError(ErrorType.INVALID_VALUE, line.getLineNumber(), SpeciesFileColumn.SCIENTIFIC_NAME.getName(), INVALID_SCIENTIFIC_NAME_ERROR_MESSAGE_KEY);
+			ParsingError error = new ParsingError(ErrorType.INVALID_VALUE, line.getLineNumber(), SpeciesFileColumn.SCIENTIFIC_NAME.getColumnName(), INVALID_SCIENTIFIC_NAME_ERROR_MESSAGE_KEY);
 			throw new ParsingException(error);
 		}
 		return createTaxon(line, rank, parent, normalizedScientificName);
@@ -377,12 +377,12 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 		Node foundNode = null;
 		foundNode = taxonTree.getNodeByTaxonId(taxonId);
 		if ( foundNode != null ) {
-			ParsingError error = new ParsingError(ErrorType.DUPLICATE_VALUE, lineNumber, SpeciesFileColumn.NO.getName());
+			ParsingError error = new ParsingError(ErrorType.DUPLICATE_VALUE, lineNumber, SpeciesFileColumn.NO.getColumnName());
 			throw new ParsingException(error);
 		}
 		foundNode = taxonTree.getNodeByCode(code);
 		if ( foundNode != null ) {
-			ParsingError error = new ParsingError(ErrorType.DUPLICATE_VALUE, lineNumber, SpeciesFileColumn.CODE.getName());
+			ParsingError error = new ParsingError(ErrorType.DUPLICATE_VALUE, lineNumber, SpeciesFileColumn.CODE.getColumnName());
 			throw new ParsingException(error);
 		}
 	}
@@ -391,7 +391,7 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 			String normalizedScientificName) throws ParsingException {
 		Node duplicateNode = taxonTree.getDuplicateScienfificNameNode(parent, normalizedScientificName);
 		if ( duplicateNode != null ) {
-			ParsingError error = new ParsingError(ErrorType.DUPLICATE_VALUE, line.getLineNumber(), SpeciesFileColumn.SCIENTIFIC_NAME.getName());
+			ParsingError error = new ParsingError(ErrorType.DUPLICATE_VALUE, line.getLineNumber(), SpeciesFileColumn.SCIENTIFIC_NAME.getColumnName());
 			throw new ParsingException(error);
 		}
 	}

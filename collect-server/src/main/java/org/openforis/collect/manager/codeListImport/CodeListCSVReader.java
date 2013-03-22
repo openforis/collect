@@ -93,6 +93,8 @@ public class CodeListCSVReader extends CSVDataImportReader<CodeListLine> {
 	
 	class Validator {
 		
+		private static final String MISSING_REQUIRED_COLUMNS_MESSAGE_KEY = "codeListImport.parsingError.missing_required_columns.message";
+
 		public void validate() throws ParsingException {
 			validateHeaders();
 		}
@@ -100,7 +102,7 @@ public class CodeListCSVReader extends CSVDataImportReader<CodeListLine> {
 		protected void validateHeaders() throws ParsingException {
 			List<String> colNames = getColumnNames();
 			if ( colNames == null || colNames.size() % 2 != 0 ) {
-				ParsingError error = new ParsingError(ErrorType.UNEXPECTED_COLUMNS);
+				ParsingError error = new ParsingError(ErrorType.MISSING_REQUIRED_COLUMNS, 1, MISSING_REQUIRED_COLUMNS_MESSAGE_KEY);
 				throw new ParsingException(error);
 			}
 			String levelName = null;

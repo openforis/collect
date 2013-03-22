@@ -68,23 +68,23 @@
 			}
 			
 			public function errorMessageLabelFunction(item:ParsingErrorProxy, gridColumn:GridColumn):String {
-				if ( ArrayUtil.isEmpty(item.messageArgs) ) {
-					return Message.get(item.message);
-				} else {
-					var messageKey:String;
+				var messageKey:String;
+				if ( StringUtil.isBlank(item.message) ) {
 					switch (item.errorType) {
 						case ParsingError$ErrorType.WRONG_COLUMN_NAME:
 							messageKey = "referenceDataImport.parsingError.wrong_column_name.message";
 							break;
-						case ParsingError$ErrorType.DUPLICATE_VALUE:
-							messageKey = "referenceDataImport.parsingError.type.duplicate_value.message";
+						case ParsingError$ErrorType.MISSING_REQUIRED_COLUMNS:
+							messageKey = "referenceDataImport.parsingError.type.missing_required_columns.message";
 							break;
 						default:
 							messageKey = item.message;
 					}
-					var message:String = Message.get(messageKey, item.messageArgs);
-					return message;
+				} else {
+					messageKey = item.message;
 				}
+				var message:String = Message.get(messageKey, item.messageArgs);
+				return message;
 			}
 			
 			public function get surveyId():int {

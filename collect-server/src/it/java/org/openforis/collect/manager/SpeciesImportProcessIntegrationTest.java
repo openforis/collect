@@ -50,11 +50,13 @@ import org.springframework.transaction.annotation.Transactional;
 @ContextConfiguration( locations = {"classpath:test-context.xml"} )
 @TransactionConfiguration(defaultRollback=true)
 @Transactional
-public class SpeciesImportProcessTest extends CollectIntegrationTest {
+public class SpeciesImportProcessIntegrationTest extends CollectIntegrationTest {
 
-	private static final String VALID_TEST_SPECIES_CSV = "species-test.csv";
-	private static final String INVALID_TEST_SPECIES_CSV = "species-invalid-test.csv";
-
+	private static final String VALID_TEST_CSV = "species-test.csv";
+	private static final String VALID_EXTRA_COLUMNS_TEST_CSV = "species-valid-extra-columns-test.csv";
+	private static final String INVALID_TEST_CSV = "species-invalid-test.csv";
+	private static final String INVALID_MISSING_COLUMNS_TEST_CSV = "species-invalid-missing-columns-test.csv";
+	
 	private static final String TEST_TAXONOMY_NAME = "it_tree";
 	
 	@Autowired
@@ -89,7 +91,7 @@ public class SpeciesImportProcessTest extends CollectIntegrationTest {
 	
 	@Test
 	public void testSpeciesImport() throws Exception {
-		SpeciesImportProcess process = importCSVFile(VALID_TEST_SPECIES_CSV);
+		SpeciesImportProcess process = importCSVFile(VALID_TEST_CSV);
 		SpeciesImportStatus status = process.getStatus();
 		assertTrue(status.isComplete());
 		assertTrue(status.getSkippedRows().isEmpty());
@@ -111,8 +113,31 @@ public class SpeciesImportProcessTest extends CollectIntegrationTest {
 	}
 
 	@Test
+	public void testSpeciesImportWithExtraColumns() throws Exception {
+		SpeciesImportProcess process = importCSVFile(VALID_EXTRA_COLUMNS_TEST_CSV);
+		SpeciesImportStatus status = process.getStatus();
+		assertTrue(status.isComplete());
+		assertTrue(status.getSkippedRows().isEmpty());
+		
+		String code = "AFZ/QUA";
+		TaxonOccurrence occurrence = findByCode(code);
+		TaxonOccurrence expected = new TaxonOccurrence(8, code, "Afzelia quanzensis");
+		assertEquals(expected, occurrence);
+
+		String code2 = "ALB/GLA";
+		TaxonOccurrence occurrence2 = findByCode(code2);
+		TaxonOccurrence expected2 = new TaxonOccurrence(11, code2, "Albizia glaberrima");
+		assertEquals(expected2, occurrence2);
+		
+		String code3 = "ALB/SCH/amaniensis";
+		TaxonOccurrence occurrence3 = findByCode(code3);
+		TaxonOccurrence expected3 = new TaxonOccurrence(12, code3, "Albizia schimperiana var. amaniensis");
+		assertEquals(expected3, occurrence3);
+	}
+	
+	@Test
 	public void testVernacularNamesImport() throws Exception {
-		SpeciesImportProcess process = importCSVFile(VALID_TEST_SPECIES_CSV);
+		SpeciesImportProcess process = importCSVFile(VALID_TEST_CSV);
 		SpeciesImportStatus status = process.getStatus();
 		assertTrue(status.isComplete());
 		int surveyId = survey.getId();
@@ -167,7 +192,7 @@ public class SpeciesImportProcessTest extends CollectIntegrationTest {
 
 	@Test
 	public void testHierarchyImport() throws Exception {
-		SpeciesImportProcess process = importCSVFile(VALID_TEST_SPECIES_CSV);
+		SpeciesImportProcess process = importCSVFile(VALID_TEST_CSV);
 		SpeciesImportStatus status = process.getStatus();
 		assertTrue(status.isComplete());
 		
@@ -201,8 +226,20 @@ public class SpeciesImportProcessTest extends CollectIntegrationTest {
 	}
 	
 	@Test
+	public void testInvalidColumns() throws Exception {
+		SpeciesImportProcess process = importCSVFile(INVALID_MISSING_COLUMNS_TEST_CSV);
+		SpeciesImportStatus status = process.getStatus();
+		assertTrue(status.isError());
+		List<ParsingError> errors = status.getErrors();
+		assertEquals(1, errors.size());
+		ParsingError error = errors.get(0);
+		ErrorType errorType = error.getErrorType();
+		assertEquals(ErrorType.MISSING_REQUIRED_COLUMNS, errorType);
+	}
+	
+	@Test
 	public void testErrorHandling() throws Exception {
-		SpeciesImportProcess process = importCSVFile(INVALID_TEST_SPECIES_CSV);
+		SpeciesImportProcess process = importCSVFile(INVALID_TEST_CSV);
 		SpeciesImportStatus status = process.getStatus();
 		List<ParsingError> errors = status.getErrors();
 		assertEquals(8, errors.size());
@@ -230,7 +267,7 @@ public class SpeciesImportProcessTest extends CollectIntegrationTest {
 		assertTrue(containsError(errors, 9, SpeciesFileColumn.SCIENTIFIC_NAME, ErrorType.DUPLICATE_VALUE));
 		assertTrue(containsError(errors, 10, SpeciesFileColumn.SCIENTIFIC_NAME, ErrorType.DUPLICATE_VALUE));
 		assertTrue(containsError(errors, 10, SpeciesFileColumn.SCIENTIFIC_NAME, ErrorType.DUPLICATE_VALUE));
-		assertTrue(containsError(errors, 11, "swh", ErrorType.UNEXPECTED_SYNONYM));
+		assertTrue(containsError(errors, 11, "swh", ErrorType.INVALID_VALUE));
 	}
 
 	protected boolean containsError(List<ParsingError> errors, long row, String column, ErrorType type) {
@@ -244,7 +281,7 @@ public class SpeciesImportProcessTest extends CollectIntegrationTest {
 	}
 	
 	protected boolean containsError(List<ParsingError> errors, long row, SpeciesFileColumn column, ErrorType type) {
-		return containsError(errors, row, column.getName(), type);
+		return containsError(errors, row, column.getColumnName(), type);
 	}
 	
 	protected Taxon findTaxonByCode(String code) {

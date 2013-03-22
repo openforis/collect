@@ -37,10 +37,10 @@ import org.springframework.transaction.annotation.Transactional;
 @ContextConfiguration( locations = {"classpath:test-context.xml"} )
 @TransactionConfiguration(defaultRollback=true)
 @Transactional
-public class CodeListImportProcessTest extends CollectIntegrationTest {
+public class CodeListImportProcessIntegrationTest extends CollectIntegrationTest {
 
 	private static final String VALID_TEST_CSV = "code-list-test.csv";
-	private static final String INVALID_TEST_CSV = "code-list-invali-test.csv";
+	private static final String INVALID_TEST_CSV = "code-list-invalid-test.csv";
 	private static final String INVALID_SCHEME_SCOPE_TEST_CSV = "code-list-invalid-scheme-scope-test.csv";
 	private static final String LANG = "en";
 	private static final String TEST_CODE_LIST_NAME = "test";
@@ -130,7 +130,6 @@ public class CodeListImportProcessTest extends CollectIntegrationTest {
 		assertTrue(containsError(errors, 5, "district_code"));
 		assertTrue(containsError(errors, 6, "district_code"));
 	}
-	
 
 	protected boolean containsError(List<ParsingError> errors, long row,
 			String column) {

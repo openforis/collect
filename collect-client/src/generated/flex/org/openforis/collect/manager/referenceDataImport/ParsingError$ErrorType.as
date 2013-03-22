@@ -13,16 +13,15 @@ package org.openforis.collect.manager.referenceDataImport {
     [RemoteClass(alias="org.openforis.collect.manager.referenceDataImport.ParsingError$ErrorType")]
     public class ParsingError$ErrorType extends Enum {
 
-        public static const UNEXPECTED_COLUMNS:ParsingError$ErrorType = new ParsingError$ErrorType("UNEXPECTED_COLUMNS", _);
+        public static const MISSING_REQUIRED_COLUMNS:ParsingError$ErrorType = new ParsingError$ErrorType("MISSING_REQUIRED_COLUMNS", _);
         public static const WRONG_COLUMN_NAME:ParsingError$ErrorType = new ParsingError$ErrorType("WRONG_COLUMN_NAME", _);
         public static const EMPTY:ParsingError$ErrorType = new ParsingError$ErrorType("EMPTY", _);
         public static const INVALID_VALUE:ParsingError$ErrorType = new ParsingError$ErrorType("INVALID_VALUE", _);
         public static const DUPLICATE_VALUE:ParsingError$ErrorType = new ParsingError$ErrorType("DUPLICATE_VALUE", _);
-        public static const UNEXPECTED_SYNONYM:ParsingError$ErrorType = new ParsingError$ErrorType("UNEXPECTED_SYNONYM", _);
         public static const IOERROR:ParsingError$ErrorType = new ParsingError$ErrorType("IOERROR", _);
 
         function ParsingError$ErrorType(value:String = null, restrictor:* = null) {
-            super((value || UNEXPECTED_COLUMNS.name), restrictor);
+            super((value || MISSING_REQUIRED_COLUMNS.name), restrictor);
         }
 
         protected override function getConstants():Array {
@@ -30,11 +29,11 @@ package org.openforis.collect.manager.referenceDataImport {
         }
 
         public static function get constants():Array {
-            return [UNEXPECTED_COLUMNS, WRONG_COLUMN_NAME, EMPTY, INVALID_VALUE, DUPLICATE_VALUE, UNEXPECTED_SYNONYM, IOERROR];
+            return [MISSING_REQUIRED_COLUMNS, WRONG_COLUMN_NAME, EMPTY, INVALID_VALUE, DUPLICATE_VALUE, IOERROR];
         }
 
         public static function valueOf(name:String):ParsingError$ErrorType {
-            return ParsingError$ErrorType(UNEXPECTED_COLUMNS.constantOf(name));
+            return ParsingError$ErrorType(MISSING_REQUIRED_COLUMNS.constantOf(name));
         }
     }
 }

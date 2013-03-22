@@ -45,7 +45,7 @@ public class SamplingDesignLineValidator {
 		} catch (NumberFormatException e) {
 			ParsingError error = new ParsingError(ErrorType.INVALID_VALUE, 
 					line.getLineNumber(), 
-					SamplingDesignFileColumn.X.getName(), 
+					SamplingDesignFileColumn.X.getColumnName(), 
 					INVALID_X_MESSAGE_KEY);
 			errors.add(error);
 		}
@@ -58,7 +58,7 @@ public class SamplingDesignLineValidator {
 		} catch (NumberFormatException e) {
 			ParsingError error = new ParsingError(ErrorType.INVALID_VALUE, 
 					line.getLineNumber(), 
-					SamplingDesignFileColumn.Y.getName(), 
+					SamplingDesignFileColumn.Y.getColumnName(), 
 					INVALID_Y_MESSAGE_KEY);
 			errors.add(error);
 		}
@@ -70,7 +70,7 @@ public class SamplingDesignLineValidator {
 		if ( srs == null ) {
 			ParsingError error = new ParsingError(ErrorType.INVALID_VALUE, 
 					line.getLineNumber(), 
-					SamplingDesignFileColumn.SRS_ID.getName(), 
+					SamplingDesignFileColumn.SRS_ID.getColumnName(), 
 					INVALID_SRS_ID_MESSAGE_KEY);
 			errors.add(error);
 		}

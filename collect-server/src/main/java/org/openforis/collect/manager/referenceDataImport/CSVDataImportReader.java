@@ -40,8 +40,6 @@ public abstract class CSVDataImportReader<T extends Line> extends DataImportRead
 		return currentCSVLine != null;
 	}
 	
-	
-	
 	@Override
 	public long getLinesRead() {
 		return csvReader.getLinesRead();

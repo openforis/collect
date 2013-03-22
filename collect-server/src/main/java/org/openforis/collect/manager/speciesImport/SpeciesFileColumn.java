@@ -1,21 +1,26 @@
 package org.openforis.collect.manager.speciesImport;
 
+/**
+ * 
+ * @author S. Ricci
+ *
+ */
 public enum SpeciesFileColumn {
-	NO(0, "no"), CODE(1, "code"), FAMILY(2, "family"), SCIENTIFIC_NAME(3, "scientific_name");
+	NO("no"), CODE("code"), FAMILY("family"), SCIENTIFIC_NAME("scientific_name");
+
+	public static final SpeciesFileColumn[] REQUIRED_COLUMNS = {CODE, FAMILY, SCIENTIFIC_NAME};
 	
-	private int index;
-	private String name;
+	public static final String[] REQUIRED_COLUMN_NAMES = new String[] {
+		CODE.getColumnName(), FAMILY.getColumnName(), SCIENTIFIC_NAME.getColumnName()
+	};
 	
-	private SpeciesFileColumn(int index, String name) {
-		this.index = index;
-		this.name = name;
+	private String columnName;
+	
+	private SpeciesFileColumn(String columnName) {
+		this.columnName = columnName;
 	}
 	
-	public int getIndex() {
-		return index;
-	}
-	
-	public String getName() {
-		return name;
+	public String getColumnName() {
+		return columnName;
 	}
 }

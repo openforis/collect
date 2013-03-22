@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.gbif.ecat.model.ParsedName;
 import org.gbif.ecat.parser.NameParser;
@@ -51,7 +52,6 @@ public class SpeciesCSVReader extends CSVDataImportReader<SpeciesLine> {
 		SpeciesCSVLineParser lineParser = SpeciesCSVLineParser.createInstance(this, currentCSVLine);
 		return lineParser;
 	}
-	
 
 	@Override
 	public boolean validateAllFile() throws ParsingException {
@@ -62,12 +62,14 @@ public class SpeciesCSVReader extends CSVDataImportReader<SpeciesLine> {
 	
 	public List<String> getLanguageColumnNames() {
 		List<String> columnNames = getColumnNames();
-		int fixedColumnsLength = SpeciesFileColumn.values().length;
-		if ( columnNames.size() > fixedColumnsLength ) {
-			return columnNames.subList(fixedColumnsLength, columnNames.size());
-		} else {
-			return Collections.emptyList();
+		List<String> result = new ArrayList<String>();
+		for (String colName : columnNames) {
+			String colNameAdapted = StringUtils.trimToEmpty(colName).toLowerCase();
+			if ( Languages.exists(Languages.Standard.ISO_639_3, colNameAdapted) ) {
+				result.add(colName);
+			}
 		}
+		return result;
 	}
 	
 	public static class SpeciesCSVLineParser extends CSVLineParser<SpeciesLine> {
@@ -77,9 +79,11 @@ public class SpeciesCSVReader extends CSVDataImportReader<SpeciesLine> {
 		private static final String SYNONYM_COL_NAME = "";
 		private static final String SYNONYM_SPLIT_EXPRESSION = "((syn|Syn)(\\.\\:|\\.|\\:|\\s))";
 		private static final Pattern SYNONYM_PATTERN = Pattern.compile("^" + SYNONYM_SPLIT_EXPRESSION, Pattern.CASE_INSENSITIVE);
-		
+
 		private static final String DEFAULT_VERNACULAR_NAMES_SEPARATOR = ",";
 		private static final String OTHER_VERNACULAR_NAMES_SEPARATOR_EXPRESSION = "/";
+		
+		public static final String UNEXPECTED_SYNONYM_MESSAGE_KEY = "speciesImport.parsingError.unexpected_synonym.message";
 
 		private ParsedName<Object> parsedScientificName;
 		private String rawScientificName;
@@ -97,7 +101,7 @@ public class SpeciesCSVReader extends CSVDataImportReader<SpeciesLine> {
 			this.rawScientificName = extractRawScientificName();
 			this.parsedScientificName = parseRawScienfificName();
 			line.setTaxonId(extractTaxonId(false));
-			line.setCode(extractCode(false));
+			line.setCode(extractCode(true));
 			line.setFamilyName(extractFamilyName());
 			line.setRawScientificName(this.rawScientificName);
 			line.setGenus(extractGenus());
@@ -116,19 +120,19 @@ public class SpeciesCSVReader extends CSVDataImportReader<SpeciesLine> {
 		}
 
 		protected Integer extractTaxonId(boolean required) throws ParsingException {
-			return getColumnValue(SpeciesFileColumn.NO.getName(), required, Integer.class);
+			return getColumnValue(SpeciesFileColumn.NO.getColumnName(), required, Integer.class);
 		}
 
 		protected String extractCode(boolean required) throws ParsingException {
-			return getColumnValue(SpeciesFileColumn.CODE.getName(), required, String.class);
+			return getColumnValue(SpeciesFileColumn.CODE.getColumnName(), required, String.class);
 		}
 		
 		protected String extractFamilyName() throws ParsingException {
-			return getColumnValue(SpeciesFileColumn.FAMILY.getName(), true, String.class);
+			return getColumnValue(SpeciesFileColumn.FAMILY.getColumnName(), true, String.class);
 		}
 
 		protected String extractRawScientificName() throws ParsingException {
-			return getColumnValue(SpeciesFileColumn.SCIENTIFIC_NAME.getName(), true, String.class);
+			return getColumnValue(SpeciesFileColumn.SCIENTIFIC_NAME.getColumnName(), true, String.class);
 		}
 		
 		protected ParsedName<Object> parseRawScienfificName() throws ParsingException {
@@ -266,7 +270,7 @@ public class SpeciesCSVReader extends CSVDataImportReader<SpeciesLine> {
 					if ( SYNONYM_COL_NAME.equals(colName) ) {
 						matcher.replaceAll("");
 					} else {
-						ParsingError error = new ParsingError(ErrorType.UNEXPECTED_SYNONYM, lineNumber, colName);
+						ParsingError error = new ParsingError(ErrorType.INVALID_VALUE, lineNumber, colName, UNEXPECTED_SYNONYM_MESSAGE_KEY);
 						throw new ParsingException(error);
 					}
 				}
@@ -278,13 +282,13 @@ public class SpeciesCSVReader extends CSVDataImportReader<SpeciesLine> {
 
 		protected ParsingError createFieldParsingError(SpeciesFileColumn column, String fieldName, String value) {
 			ParsingError error = new ParsingError(ErrorType.INVALID_VALUE, lineNumber, 
-					column.getName(), "Error parsing " + fieldName +" from " + value);
+					column.getColumnName(), "Error parsing " + fieldName +" from " + value);
 			return error;
 		}
 
 		protected void throwEmptyColumnParsingException(SpeciesFileColumn column)
 				throws ParsingException {
-			ParsingError error = new ParsingError(ErrorType.EMPTY, lineNumber, column.getName());
+			ParsingError error = new ParsingError(ErrorType.EMPTY, lineNumber, column.getColumnName());
 			throw new ParsingException(error);
 		}
 
@@ -298,32 +302,17 @@ public class SpeciesCSVReader extends CSVDataImportReader<SpeciesLine> {
 
 		protected void validateHeaders() throws ParsingException {
 			List<String> colNames = getColumnNames();
-			SpeciesFileColumn[] expectedColumns = SpeciesFileColumn.values();
-			int fixedColsSize = expectedColumns.length;
-			if ( colNames == null || colNames.size() < fixedColsSize ) {
-				ParsingError error = new ParsingError(ErrorType.UNEXPECTED_COLUMNS);
-				throw new ParsingException(error);
-			}
-			for (int i = 0; i < fixedColsSize; i++) {
-				String colName = StringUtils.trimToEmpty(colNames.get(i));
-				String expectedColName = expectedColumns[i].getName();
-				if ( ! expectedColName.equals(colName) ) {
-					ParsingError error = new ParsingError(ErrorType.WRONG_COLUMN_NAME, 1, colName, expectedColName);
+			String[] requiredColumnNames = SpeciesFileColumn.REQUIRED_COLUMN_NAMES;
+			for (String requiredColumnName : requiredColumnNames) {
+				if ( ! colNames.contains(requiredColumnName) ) {
+					ParsingError error = new ParsingError(ErrorType.MISSING_REQUIRED_COLUMNS, 1, (String) null);
+					String messageArg = StringUtils.join(requiredColumnNames, ", ");
+					error.setMessageArgs(new String[]{messageArg});
 					throw new ParsingException(error);
 				}
 			}
-			validateLanguageHeaders(colNames);
 		}
 
-		protected void validateLanguageHeaders(List<String> colNames) {
-			List<String> languageColumnNames = getLanguageColumnNames();
-			for (String colName : languageColumnNames) {
-				if ( ! Languages.exists(Languages.Standard.ISO_639_3, colName) ) {
-					throw new RuntimeException("Invalid column name: " + colName + " - valid lanugage code (ISO-639-3) expected");
-				}
-			}
-		}
-		
 	}
 
 }

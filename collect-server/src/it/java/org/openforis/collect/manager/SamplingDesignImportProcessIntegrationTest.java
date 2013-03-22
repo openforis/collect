@@ -38,7 +38,7 @@ import org.springframework.transaction.annotation.Transactional;
 @ContextConfiguration( locations = {"classpath:test-context.xml"} )
 @TransactionConfiguration(defaultRollback=true)
 @Transactional
-public class SamplingDesignImportProcessTest extends CollectIntegrationTest {
+public class SamplingDesignImportProcessIntegrationTest extends CollectIntegrationTest {
 
 	private static final String VALID_TEST_CSV = "sampling-design-test.csv";
 	private static final String INVALID_TEST_CSV = "sampling-design-invalid-test.csv";
@@ -69,13 +69,15 @@ public class SamplingDesignImportProcessTest extends CollectIntegrationTest {
 		SamplingDesignImportStatus status = process.getStatus();
 		assertTrue(status.isComplete());
 		assertTrue(status.getSkippedRows().isEmpty());
-		assertEquals(25, status.getProcessed());
+		assertEquals(27, status.getProcessed());
 		
 		SamplingDesignSummaries samplingDesignSummaries = samplingDesignManager.loadBySurveyWork(survey.getId(), 0, 30);
 		assertNotNull(samplingDesignSummaries);
-		assertEquals(24, samplingDesignSummaries.getTotalCount());
+		assertEquals(26, samplingDesignSummaries.getTotalCount());
 		
 		List<SamplingDesignItem> items = samplingDesignSummaries.getRecords();
+		assertNotNull(findItem(items, -10000d, 100000d, "1_01", "1"));
+		assertNotNull(findItem(items, 200000d, -2000000d, "1_02", "1"));
 		assertNotNull(findItem(items, 806090d, 9320050d, "10_114", "7"));
 		assertNotNull(findItem(items, 805680d, 9305020d, "10_117", "6"));
 	}
@@ -108,7 +110,7 @@ public class SamplingDesignImportProcessTest extends CollectIntegrationTest {
 		String[] colNames = new String[columns.length];
 		for (int i = 0; i < columns.length; i++) {
 			SamplingDesignFileColumn col = columns[i];
-			colNames[i] = col.getName();
+			colNames[i] = col.getColumnName();
 		}
 		for (ParsingError error : errors) {
 			if ( error.getErrorType() == type && error.getRow() == row && Arrays.equals(colNames, error.getColumns())) {
