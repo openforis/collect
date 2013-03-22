@@ -52,7 +52,7 @@ CREATE TABLE "collect"."ofc_record"  (
 	"data2"                    	bytea NULL,
 	PRIMARY KEY("id")
 );
-CREATE TABLE "collect"."ofc_sampling_desing"  ( 
+CREATE TABLE "collect"."ofc_sampling_design"  ( 
 	"id"            	integer NOT NULL,
 	"survey_id"     	integer NULL,
 	"survey_work_id"	integer NULL,
@@ -178,11 +178,11 @@ ALTER TABLE "collect"."ofc_record"
 	ADD CONSTRAINT "ofc_record_modified_by_user_fkey"
 	FOREIGN KEY("modified_by_id")
 	REFERENCES "collect"."ofc_user"("id");
-ALTER TABLE "collect"."ofc_sampling_desing"
+ALTER TABLE "collect"."ofc_sampling_design"
 	ADD CONSTRAINT "ofc_sampling_design_survey_fkey"
 	FOREIGN KEY("survey_id")
 	REFERENCES "collect"."ofc_survey"("id");
-ALTER TABLE "collect"."ofc_sampling_desing"
+ALTER TABLE "collect"."ofc_sampling_design"
 	ADD CONSTRAINT "ofc_sampling_design_survey_work_fkey"
 	FOREIGN KEY("survey_work_id")
 	REFERENCES "collect"."ofc_survey_work"("id");

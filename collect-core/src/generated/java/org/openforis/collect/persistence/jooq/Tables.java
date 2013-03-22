@@ -33,9 +33,9 @@ public final class Tables {
 	public static org.openforis.collect.persistence.jooq.tables.OfcRecord OFC_RECORD = org.openforis.collect.persistence.jooq.tables.OfcRecord.OFC_RECORD;
 
 	/**
-	 * The table collect.ofc_sampling_desing
+	 * The table collect.ofc_sampling_design
 	 */
-	public static org.openforis.collect.persistence.jooq.tables.OfcSamplingDesing OFC_SAMPLING_DESING = org.openforis.collect.persistence.jooq.tables.OfcSamplingDesing.OFC_SAMPLING_DESING;
+	public static org.openforis.collect.persistence.jooq.tables.OfcSamplingDesign OFC_SAMPLING_DESIGN = org.openforis.collect.persistence.jooq.tables.OfcSamplingDesign.OFC_SAMPLING_DESIGN;
 
 	/**
 	 * The table collect.ofc_survey
