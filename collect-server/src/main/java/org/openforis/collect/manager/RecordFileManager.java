@@ -14,6 +14,8 @@ import java.util.UUID;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.idm.metamodel.FileAttributeDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -23,7 +25,6 @@ import org.openforis.idm.model.File;
 import org.openforis.idm.model.FileAttribute;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.NodeVisitor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -38,22 +39,21 @@ public class RecordFileManager extends BaseStorageManager {
 	
 	private static final long serialVersionUID = 1L;
 
-	private static final String UPLOAD_PATH_CONFIGURATION_KEY = "upload_path";
+	protected static Log LOG = LogFactory.getLog(RecordFileManager.class);
 
+	private static final String UPLOAD_PATH_CONFIGURATION_KEY = "upload_path";
 	private static final String TEMP_RECORD_FILES_SUBFOLDER = "collect_upload";
 	private static final String DEFAULT_RECORD_FILES_SUBFOLDER = "collect_upload";
-	
-	@Autowired
-	private ConfigurationManager configurationManager;
 	
 	private Map<Integer, String> tempFiles;
 	private Map<Integer, String> filesToDelete;
 
 	protected java.io.File tempRootDir;
 	
+
 	protected void init() {
 		initTempDir();
-		initStoragePath(UPLOAD_PATH_CONFIGURATION_KEY, DEFAULT_RECORD_FILES_SUBFOLDER);
+		initStorageDirectory(UPLOAD_PATH_CONFIGURATION_KEY, DEFAULT_RECORD_FILES_SUBFOLDER);
 		reset();
 	}
 
@@ -62,18 +62,33 @@ public class RecordFileManager extends BaseStorageManager {
 		filesToDelete = new HashMap<Integer, String>();
 	}
 
+	@Override
+	protected void initStorageDirectory(String pathConfigurationKey, String subFolder) {
+		super.initStorageDirectory(pathConfigurationKey, subFolder);
+		if ( storageDirectory == null ) {
+			String message = "Upload directory not configured conrrectly";
+			LOG.error(message);
+			throw new IllegalStateException(message);
+		} else if ( LOG.isInfoEnabled() ) {
+			LOG.info("Using storage directory: " + storageDirectory.getAbsolutePath());
+		}
+	}
+	
 	protected void initTempDir() {
-		String baseOrTempPath = getBaseOrTempPath();
-		if ( baseOrTempPath == null ) {
+		java.io.File systemTempRootDir = getTempFolder();
+		if ( systemTempRootDir == null ) {
+			systemTempRootDir = getCatalinaBaseTempFolder();
+		}
+		if ( systemTempRootDir == null ) {
 			throw new IllegalStateException("Cannot init temp folder");
 		} else {
-			String tempPath = baseOrTempPath + java.io.File.separator + TEMP_RECORD_FILES_SUBFOLDER;
-			tempRootDir = new java.io.File(tempPath);
-			if ( ! tempRootDir.exists() ) {
-				tempRootDir.mkdirs();
-			}	
-			if ( ! tempRootDir.canRead() ) {
-				throw new IllegalStateException("Cannot access temp directory: " + tempPath);
+			tempRootDir = new java.io.File(systemTempRootDir, TEMP_RECORD_FILES_SUBFOLDER);
+			if ( (tempRootDir.exists() || tempRootDir.mkdirs()) && tempRootDir.canWrite() ) {
+				if ( LOG.isInfoEnabled() ) {
+					LOG.info("Using temp directory: " + tempRootDir.getAbsolutePath());
+				}
+			} else {
+				throw new IllegalStateException("Cannot access temp folder: " + tempRootDir.getAbsolutePath());
 			}
 		}
 	}
