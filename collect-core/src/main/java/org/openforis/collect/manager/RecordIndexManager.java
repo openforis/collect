@@ -16,6 +16,8 @@ import java.util.Stack;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.analysis.SimpleAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
@@ -60,8 +62,9 @@ public class RecordIndexManager extends BaseStorageManager {
 	private static final String COLLECT_INDEX_DEFAULT_FOLDER = "collect_index";
 	protected static final String INDEX_PATH_CONFIGURATION_KEY = "index_path";
 	protected static final String RECORD_ID_FIELD = "_record_id";
-
 	private static final Version LUCENE_VERSION = Version.LUCENE_36;
+
+	protected static Log LOG = LogFactory.getLog(RecordIndexManager.class);
 
 	public enum SearchType {
 		EQUAL, STARTS_WITH, CONTAINS;
@@ -79,7 +82,7 @@ public class RecordIndexManager extends BaseStorageManager {
 		initStorageDirectory(INDEX_PATH_CONFIGURATION_KEY, COLLECT_INDEX_DEFAULT_FOLDER);
 		if ( storageDirectory != null ) {
 			if ( LOG.isInfoEnabled() ) {
-				LOG.info("Record index stored in: " + storageDirectory.getAbsolutePath());
+				LOG.info("Using storage directory: " + storageDirectory.getAbsolutePath());
 			}
 			initIndexDirectory();
 			cancelled = false;

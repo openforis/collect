@@ -4,8 +4,6 @@ import java.io.File;
 import java.io.Serializable;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.openforis.collect.model.Configuration;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -16,14 +14,12 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public abstract class BaseStorageManager implements Serializable {
 
-	private static final String DEFAULT_BASE_TEMP_SUBDIR = "temp";
-
 	private static final long serialVersionUID = 1L;
+
+	private static final String DEFAULT_BASE_TEMP_SUBDIR = "temp";
 
 	private static final String JAVA_IO_TMPDIR = "java.io.tmpdir";
 	private static final String CATALINA_BASE = "catalina.base";
-
-	protected static Log LOG = LogFactory.getLog(BaseStorageManager.class);
 
 	@Autowired
 	protected transient ConfigurationManager configurationManager;
@@ -41,7 +37,10 @@ public abstract class BaseStorageManager implements Serializable {
 	protected File getReadableSysPropLocation(String sysProp, String subDir) {
 		String base = System.getProperty(sysProp);
 		if ( base != null ) {
-			String path = base + subDir != null ? (File.separator + subDir): "";
+			String path = base;
+			if ( subDir != null ) {
+				path = path + File.separator + subDir;
+			}
 			return getLocationIfAccessible(path);
 		} else {
 			return null;
@@ -61,21 +60,17 @@ public abstract class BaseStorageManager implements Serializable {
 		Configuration configuration = configurationManager.getConfiguration();
 		String storagePath = configuration.get(pathConfigurationKey);
 		if ( StringUtils.isBlank(storagePath) ) {
-			if ( LOG.isInfoEnabled() ) {
-				LOG.info("Path with key '" + pathConfigurationKey+ "' not configured in config table");
-			}
 			File rootDir = getCatalinaBaseTempFolder();
-			if ( rootDir != null ) {
-				LOG.info("Using system property " + CATALINA_BASE + "/temp folder as root storage directory: " + rootDir.getAbsolutePath());
-			} else {
+			if ( rootDir == null ) {
 				rootDir = getTempFolder();
-				if ( rootDir != null ) {
-					LOG.info("Using system property " + JAVA_IO_TMPDIR + " folder as root storage directory: " + rootDir.getAbsolutePath());
-				}
 			}
-			if ( rootDir != null ) {
+			if ( rootDir == null ) {
+				storageDirectory = null;
+			} else {
 				storageDirectory = new File(rootDir, subFolder);
 			}
+		} else {
+			storageDirectory = new File(storagePath, subFolder);
 		}
 	}
 	

@@ -14,6 +14,8 @@ import java.util.UUID;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.idm.metamodel.FileAttributeDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -37,8 +39,9 @@ public class RecordFileManager extends BaseStorageManager {
 	
 	private static final long serialVersionUID = 1L;
 
-	private static final String UPLOAD_PATH_CONFIGURATION_KEY = "upload_path";
+	protected static Log LOG = LogFactory.getLog(RecordFileManager.class);
 
+	private static final String UPLOAD_PATH_CONFIGURATION_KEY = "upload_path";
 	private static final String TEMP_RECORD_FILES_SUBFOLDER = "collect_upload";
 	private static final String DEFAULT_RECORD_FILES_SUBFOLDER = "collect_upload";
 	
@@ -47,6 +50,7 @@ public class RecordFileManager extends BaseStorageManager {
 
 	protected java.io.File tempRootDir;
 	
+
 	protected void init() {
 		initTempDir();
 		initStorageDirectory(UPLOAD_PATH_CONFIGURATION_KEY, DEFAULT_RECORD_FILES_SUBFOLDER);
@@ -58,6 +62,18 @@ public class RecordFileManager extends BaseStorageManager {
 		filesToDelete = new HashMap<Integer, String>();
 	}
 
+	@Override
+	protected void initStorageDirectory(String pathConfigurationKey, String subFolder) {
+		super.initStorageDirectory(pathConfigurationKey, subFolder);
+		if ( storageDirectory == null ) {
+			String message = "Upload directory not configured conrrectly";
+			LOG.error(message);
+			throw new IllegalStateException(message);
+		} else if ( LOG.isInfoEnabled() ) {
+			LOG.info("Using storage directory: " + storageDirectory.getAbsolutePath());
+		}
+	}
+	
 	protected void initTempDir() {
 		java.io.File systemTempRootDir = getTempFolder();
 		if ( systemTempRootDir == null ) {
@@ -68,9 +84,11 @@ public class RecordFileManager extends BaseStorageManager {
 		} else {
 			tempRootDir = new java.io.File(systemTempRootDir, TEMP_RECORD_FILES_SUBFOLDER);
 			if ( (tempRootDir.exists() || tempRootDir.mkdirs()) && tempRootDir.canWrite() ) {
-				LOG.info("Temporary directory: " + tempRootDir.getAbsolutePath());
+				if ( LOG.isInfoEnabled() ) {
+					LOG.info("Using temp directory: " + tempRootDir.getAbsolutePath());
+				}
 			} else {
-				throw new IllegalStateException("Cannot access temp directory: " + tempRootDir);
+				throw new IllegalStateException("Cannot access temp folder: " + tempRootDir.getAbsolutePath());
 			}
 		}
 	}
