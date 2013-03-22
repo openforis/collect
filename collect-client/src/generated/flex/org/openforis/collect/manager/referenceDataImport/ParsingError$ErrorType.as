@@ -5,12 +5,12 @@
  * THE GENERATOR.
  */
 
-package org.openforis.collect.manager.referenceDataImport {
+package org.openforis.collect.manager.referencedataimport {
 
     import org.granite.util.Enum;
 
     [Bindable]
-    [RemoteClass(alias="org.openforis.collect.manager.referenceDataImport.ParsingError$ErrorType")]
+    [RemoteClass(alias="org.openforis.collect.manager.referencedataimport.ParsingError$ErrorType")]
     public class ParsingError$ErrorType extends Enum {
 
         public static const MISSING_REQUIRED_COLUMNS:ParsingError$ErrorType = new ParsingError$ErrorType("MISSING_REQUIRED_COLUMNS", _);

@@ -6,7 +6,7 @@ import javax.servlet.ServletContext;
 
 import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.manager.process.AbstractProcess;
-import org.openforis.collect.manager.referenceDataImport.proxy.ReferenceDataImportStatusProxy;
+import org.openforis.collect.manager.referencedataimport.proxy.ReferenceDataImportStatusProxy;
 import org.openforis.collect.util.ExecutorServiceUtil;
 import org.openforis.collect.web.controller.FileUploadController;
 import org.openforis.collect.web.session.SessionState;

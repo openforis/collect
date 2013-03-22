@@ -5,10 +5,10 @@
  * your custom code here.
  */
 
-package org.openforis.collect.remoting.service.dataProcessing {
+package org.openforis.collect.remoting.service.dataprocessing {
 
     [Bindable]
-    [RemoteClass(alias="org.openforis.collect.remoting.service.dataProcessing.DataProcessingState")]
+    [RemoteClass(alias="org.openforis.collect.remoting.service.dataprocessing.DataProcessingState")]
     public class DataProcessingState extends DataProcessingStateBase {
     }
 }

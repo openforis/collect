@@ -4,11 +4,11 @@ import java.io.File;
 
 import org.openforis.collect.designer.session.SessionStatus;
 import org.openforis.collect.manager.SessionManager;
-import org.openforis.collect.manager.codeListImport.CodeListImportProcess;
-import org.openforis.collect.manager.codeListImport.CodeListImportStatus;
+import org.openforis.collect.manager.codelistimport.CodeListImportProcess;
+import org.openforis.collect.manager.codelistimport.CodeListImportStatus;
 import org.openforis.collect.model.CollectSurvey;
-import org.openforis.collect.remoting.service.codeListImport.proxy.CodeListImportStatusProxy;
-import org.openforis.collect.remoting.service.dataImport.DataImportExeption;
+import org.openforis.collect.remoting.service.codelistimport.proxy.CodeListImportStatusProxy;
+import org.openforis.collect.remoting.service.dataimport.DataImportExeption;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeList.CodeScope;
 import org.springframework.beans.factory.annotation.Autowired;

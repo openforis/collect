@@ -5,10 +5,10 @@
  * your custom code here.
  */
 
-package org.openforis.collect.remoting.service.dataImport {
+package org.openforis.collect.remoting.service.dataimport {
 
     [Bindable]
-    [RemoteClass(alias="org.openforis.collect.remoting.service.dataImport.FileUnmarshallingErrorProxy")]
+    [RemoteClass(alias="org.openforis.collect.remoting.service.dataimport.FileUnmarshallingErrorProxy")]
     public class FileUnmarshallingErrorProxy extends FileUnmarshallingErrorProxyBase {
     }
 }

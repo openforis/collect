@@ -5,11 +5,11 @@
  * your custom code here.
  */
 
-package org.openforis.collect.remoting.service.dataImport {
+package org.openforis.collect.remoting.service.dataimport {
 	import org.openforis.collect.util.StringUtil;
 
     [Bindable]
-    [RemoteClass(alias="org.openforis.collect.remoting.service.dataImport.DataImportSummaryItemProxy")]
+    [RemoteClass(alias="org.openforis.collect.remoting.service.dataimport.DataImportSummaryItemProxy")]
     public class DataImportSummaryItemProxy extends DataImportSummaryItemProxyBase {
 		
 		private var _selected:Boolean;

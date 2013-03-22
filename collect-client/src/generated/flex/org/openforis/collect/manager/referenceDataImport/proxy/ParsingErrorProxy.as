@@ -5,10 +5,10 @@
  * your custom code here.
  */
 
-package org.openforis.collect.manager.referenceDataImport.proxy {
+package org.openforis.collect.manager.referencedataimport.proxy {
 
     [Bindable]
-    [RemoteClass(alias="org.openforis.collect.manager.referenceDataImport.proxy.ParsingErrorProxy")]
+    [RemoteClass(alias="org.openforis.collect.manager.referencedataimport.proxy.ParsingErrorProxy")]
     public class ParsingErrorProxy extends ParsingErrorProxyBase {
     }
 }

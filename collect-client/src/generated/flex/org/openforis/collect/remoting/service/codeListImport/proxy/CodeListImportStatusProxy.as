@@ -5,10 +5,10 @@
  * your custom code here.
  */
 
-package org.openforis.collect.remoting.service.codeListImport.proxy {
+package org.openforis.collect.remoting.service.codelistimport.proxy {
 
     [Bindable]
-    [RemoteClass(alias="org.openforis.collect.remoting.service.codeListImport.proxy.CodeListImportStatusProxy")]
+    [RemoteClass(alias="org.openforis.collect.remoting.service.codelistimport.proxy.CodeListImportStatusProxy")]
     public class CodeListImportStatusProxy extends CodeListImportStatusProxyBase {
     }
 }

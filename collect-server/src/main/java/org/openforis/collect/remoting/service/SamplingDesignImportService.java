@@ -4,11 +4,11 @@ import java.io.File;
 
 import org.openforis.collect.manager.SamplingDesignManager;
 import org.openforis.collect.manager.SurveyManager;
-import org.openforis.collect.manager.samplingDesignImport.SamplingDesignImportProcess;
-import org.openforis.collect.manager.samplingDesignImport.SamplingDesignImportStatus;
+import org.openforis.collect.manager.samplingdesignimport.SamplingDesignImportProcess;
+import org.openforis.collect.manager.samplingdesignimport.SamplingDesignImportStatus;
 import org.openforis.collect.model.CollectSurvey;
-import org.openforis.collect.remoting.service.dataImport.DataImportExeption;
-import org.openforis.collect.remoting.service.samplingDesignImport.proxy.SamplingDesignImportStatusProxy;
+import org.openforis.collect.remoting.service.dataimport.DataImportExeption;
+import org.openforis.collect.remoting.service.samplingdesignimport.proxy.SamplingDesignImportStatusProxy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
 

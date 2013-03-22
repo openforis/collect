@@ -5,10 +5,10 @@
  * your custom code here.
  */
 
-package org.openforis.collect.remoting.service.samplingDesignImport.proxy {
+package org.openforis.collect.remoting.service.samplingdesignimport.proxy {
 
     [Bindable]
-    [RemoteClass(alias="org.openforis.collect.remoting.service.samplingDesignImport.proxy.SamplingDesignImportStatusProxy")]
+    [RemoteClass(alias="org.openforis.collect.remoting.service.samplingdesignimport.proxy.SamplingDesignImportStatusProxy")]
     public class SamplingDesignImportStatusProxy extends SamplingDesignImportStatusProxyBase {
     }
 }

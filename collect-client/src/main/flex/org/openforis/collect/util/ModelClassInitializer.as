@@ -61,15 +61,15 @@ package org.openforis.collect.util {
 	import org.openforis.collect.model.proxy.ValidationResultProxy;
 	import org.openforis.collect.model.proxy.ValidationResultsProxy;
 	import org.openforis.collect.remoting.service.UpdateResponse;
-	import org.openforis.collect.remoting.service.codeListImport.proxy.CodeListImportStatusProxy;
-	import org.openforis.collect.remoting.service.dataExport.DataExportState;
-	import org.openforis.collect.remoting.service.dataImport.DataImportStateProxy;
-	import org.openforis.collect.remoting.service.dataImport.DataImportSummaryItemProxy;
-	import org.openforis.collect.remoting.service.dataImport.DataImportSummaryProxy;
-	import org.openforis.collect.remoting.service.dataImport.FileUnmarshallingErrorProxy;
-	import org.openforis.collect.remoting.service.dataImport.NodeUnmarshallingErrorProxy;
-	import org.openforis.collect.remoting.service.samplingDesignImport.proxy.SamplingDesignImportStatusProxy;
-	import org.openforis.collect.remoting.service.speciesImport.proxy.SpeciesImportStatusProxy;
+	import org.openforis.collect.remoting.service.codelistimport.proxy.CodeListImportStatusProxy;
+	import org.openforis.collect.remoting.service.dataimport.DataImportStateProxy;
+	import org.openforis.collect.remoting.service.dataimport.DataImportSummaryProxy;
+	import org.openforis.collect.remoting.service.dataimport.NodeUnmarshallingErrorProxy;
+	import org.openforis.collect.remoting.service.dataexport.DataExportState;
+	import org.openforis.collect.remoting.service.dataimport.DataImportSummaryItemProxy;
+	import org.openforis.collect.remoting.service.dataimport.FileUnmarshallingErrorProxy;
+	import org.openforis.collect.remoting.service.samplingdesignimport.proxy.SamplingDesignImportStatusProxy;
+	import org.openforis.collect.remoting.service.speciesimport.proxy.SpeciesImportStatusProxy;
 	import org.openforis.idm.metamodel.validation.ValidationResultFlag;
 
 	/**

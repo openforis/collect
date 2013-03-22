@@ -21,7 +21,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.event.PaginationBarEvent;
 	import org.openforis.collect.i18n.Message;
 	import org.openforis.collect.manager.process.ProcessStatus$Step;
-	import org.openforis.collect.manager.referenceDataImport.proxy.ReferenceDataImportStatusProxy;
+	import org.openforis.collect.manager.referencedataimport.proxy.ReferenceDataImportStatusProxy;
 	import org.openforis.collect.model.proxy.AbstractSummariesProxy;
 	import org.openforis.collect.ui.component.datagrid.PaginationBar;
 	import org.openforis.collect.ui.view.AbstractReferenceDataImportView;

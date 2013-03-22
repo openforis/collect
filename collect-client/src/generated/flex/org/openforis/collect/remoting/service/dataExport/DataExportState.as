@@ -5,10 +5,10 @@
  * your custom code here.
  */
 
-package org.openforis.collect.remoting.service.dataExport {
+package org.openforis.collect.remoting.service.dataexport {
 
     [Bindable]
-    [RemoteClass(alias="org.openforis.collect.remoting.service.dataExport.DataExportState")]
+    [RemoteClass(alias="org.openforis.collect.remoting.service.dataexport.DataExportState")]
     public class DataExportState extends DataExportStateBase {
     }
 }

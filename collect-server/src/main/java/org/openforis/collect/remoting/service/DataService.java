@@ -36,7 +36,7 @@ import org.openforis.collect.model.proxy.RecordProxy;
 import org.openforis.collect.persistence.MultipleEditException;
 import org.openforis.collect.persistence.RecordPersistenceException;
 import org.openforis.collect.remoting.service.UpdateRequestOperation.Method;
-import org.openforis.collect.remoting.service.recordIndex.RecordIndexService;
+import org.openforis.collect.remoting.service.recordindex.RecordIndexService;
 import org.openforis.collect.spring.MessageContextHolder;
 import org.openforis.collect.web.session.SessionState;
 import org.openforis.idm.metamodel.AttributeDefinition;

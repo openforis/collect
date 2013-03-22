@@ -5,10 +5,10 @@
  * your custom code here.
  */
 
-package org.openforis.collect.remoting.service.speciesImport.proxy {
+package org.openforis.collect.remoting.service.speciesimport.proxy {
 
     [Bindable]
-    [RemoteClass(alias="org.openforis.collect.remoting.service.speciesImport.proxy.SpeciesImportStatusProxy")]
+    [RemoteClass(alias="org.openforis.collect.remoting.service.speciesimport.proxy.SpeciesImportStatusProxy")]
     public class SpeciesImportStatusProxy extends SpeciesImportStatusProxyBase {
     }
 }

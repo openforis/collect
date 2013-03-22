@@ -5,10 +5,10 @@
  * your custom code here.
  */
 
-package org.openforis.collect.remoting.service.dataImport {
+package org.openforis.collect.remoting.service.dataimport {
 
     [Bindable]
-    [RemoteClass(alias="org.openforis.collect.remoting.service.dataImport.DataImportSummaryProxy")]
+    [RemoteClass(alias="org.openforis.collect.remoting.service.dataimport.DataImportSummaryProxy")]
     public class DataImportSummaryProxy extends DataImportSummaryProxyBase {
     }
 }

@@ -1,9 +1,8 @@
 package org.openforis.collect.event
 {
 	import org.openforis.collect.model.proxy.RecordProxy;
-	import org.openforis.collect.remoting.service.dataImport.DataImportSummaryItemProxy;
-	import org.openforis.collect.remoting.service.dataImport.DataImportSummaryProxy;
-	import org.openforis.collect.remoting.service.dataImport.FileUnmarshallingErrorProxy;
+	import org.openforis.collect.remoting.service.dataimport.DataImportSummaryItemProxy;
+	import org.openforis.collect.remoting.service.dataimport.FileUnmarshallingErrorProxy;
 	
 	/**
 	 * 
