@@ -5,6 +5,7 @@ package org.openforis.collect.presenter {
 	import flash.ui.Keyboard;
 	
 	import mx.binding.utils.BindingUtils;
+	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
 	import mx.rpc.events.ResultEvent;
 	
@@ -15,11 +16,13 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.event.InputFieldEvent;
 	import org.openforis.collect.event.NodeEvent;
 	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
+	import org.openforis.collect.metamodel.proxy.CodeAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.NumberAttributeDefinitionProxy;
-	import org.openforis.collect.metamodel.proxy.NumericAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.RangeAttributeDefinitionProxy;
+	import org.openforis.collect.metamodel.ui.UIOptions$Disposition;
 	import org.openforis.collect.model.FieldSymbol;
 	import org.openforis.collect.model.proxy.AttributeProxy;
+	import org.openforis.collect.model.proxy.CodeAttributeProxy;
 	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.model.proxy.FieldProxy;
 	import org.openforis.collect.model.proxy.NodeProxy;
@@ -76,6 +79,7 @@ package org.openforis.collect.presenter {
 				_view.textInput.addEventListener(FocusEvent.FOCUS_OUT, focusOutHandler);
 				_view.textInput.addEventListener(FocusEvent.FOCUS_IN, focusInHandler);
 			}
+			_view.addEventListener(FocusEvent.KEY_FOCUS_CHANGE, keyFocusChangeHandler);
 			
 			BindingUtils.bindSetter(setAttribute, _view, "attribute");
 		}
@@ -298,6 +302,12 @@ package org.openforis.collect.presenter {
 			_dataClient.updateActiveRecord(updRequest, null, faultHandler);
 		}
 		
+		protected function keyFocusChangeHandler(event:FocusEvent):void {
+			//handled by tabKeyHandler
+			event.preventDefault();
+			event.stopImmediatePropagation();
+		}
+		
 		protected function updateResponseReceivedHandler(event:ApplicationEvent):void {
 			if(_view.attribute != null) {
 				var responses:IList = IList(event.result);
@@ -340,53 +350,132 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function keyDownHandler(event:KeyboardEvent):void {
+			var dispositionByColumns:Boolean = _view.attributeDefinition.parent != null && _view.attributeDefinition.parent.disposition == UIOptions$Disposition.BY_COLUMNS;
 			var keyCode:uint = event.keyCode;
+			var offset:int = 0;
+			var moveByEntity:Boolean = ! dispositionByColumns;
 			switch(keyCode) {
 				case Keyboard.ESCAPE:
 					undoLastChange();
 					break;
+				case Keyboard.TAB:
+					handleTabKey(event.shiftKey);
+					break;
 				case Keyboard.DOWN:
-					setFocusOnNextSiblingEntity();
+					offset = 1;
 					break;
 				case Keyboard.UP:
-					setFocusOnPreviousSiblingEntity();
+					offset = -1;
 					break;
 				case Keyboard.PAGE_DOWN:
-					setFocusOnNextSiblingEntity(10);
+					offset = 10;
 					break;
 				case Keyboard.PAGE_UP:
-					setFocusOnPreviousSiblingEntity(10);
+					offset = - 10;
 					break;
+			}
+			if ( offset != 0 ) {
+				if ( moveByEntity ) {
+					setFocusOnSiblingEntity(offset);
+				} else {
+					setFocusOnSiblingAttribute(offset);
+				}
 			}
 		}
 		
-		protected function setFocusOnNextSiblingEntity(offset:int = 1):void {
-			setFocusOnSiblingEntity(offset);
+		protected function handleTabKey(shiftKey:Boolean = false):void {
+			var dispositionByColumns:Boolean = _view.attributeDefinition.parent != null && _view.attributeDefinition.parent.disposition == UIOptions$Disposition.BY_COLUMNS;
+			var focusChanged:Boolean = false;
+			if ( dispositionByColumns ) {
+				var offset:int = shiftKey ? -1: 1;
+				focusChanged = setFocusOnSiblingEntity(offset, true);
+			}
+			if ( !focusChanged ) {
+				UIUtil.moveFocus(shiftKey);
+			}
 		}
 		
-		protected function setFocusOnPreviousSiblingEntity(offset:int = 1):void {
-			setFocusOnSiblingEntity(- offset);
+		protected function setFocusOnSiblingAttribute(offset:int):Boolean {
+			var currentField:FieldProxy = _view.attribute.getField(_view.fieldIndex);
+			var fieldToFocusIn:FieldProxy = getSiblingFocusableField(currentField, offset);
+			if ( fieldToFocusIn != null ) {
+				dispatchFocusSetEvent(fieldToFocusIn);
+				return true;
+			} else {
+				return false;
+			}
 		}
 		
-		protected function setFocusOnSiblingEntity(offset:int):void {
-			var attributeName:String = _view.attributeDefinition.name;
+		protected function getSiblingFocusableField(field:FieldProxy, offset:int):FieldProxy {
+			var parentMultipleEntity:EntityProxy = field.parent.getParentMultipleEntity();
+			if ( parentMultipleEntity != null ) {
+				var siblingFields:IList = getLeafFocusableFields(parentMultipleEntity);
+				var currentFieldIndex:int = siblingFields.getItemIndex(field);
+				var siblingFieldIndex:int = currentFieldIndex + offset;
+				if ( siblingFieldIndex < 0 ) {
+					siblingFieldIndex = 0;
+				} else if ( siblingFieldIndex > siblingFields.length - 1 ) {
+					siblingFieldIndex = siblingFields.length - 1;
+				}
+				if ( siblingFieldIndex != currentFieldIndex ) {
+					return siblingFields.getItemAt(siblingFieldIndex) as FieldProxy;
+				} else {
+					return null;
+				}
+			} else {
+				return null;
+			}
+		}
+		
+		protected function dispatchFocusSetEvent(field:FieldProxy):void {
+			var attributeToFocusIn:AttributeProxy = field.parent;
 			var inputFieldEvent:InputFieldEvent = new InputFieldEvent(InputFieldEvent.SET_FOCUS);
-			inputFieldEvent.nodeName = attributeName;
-			inputFieldEvent.fieldIdx = _view.fieldIndex;
+			inputFieldEvent.fieldIdx = attributeToFocusIn is CodeAttributeProxy ? -1: field.index;
+			inputFieldEvent.attributeId = attributeToFocusIn.id;
+			inputFieldEvent.nodeName = attributeToFocusIn.name;
+			inputFieldEvent.parentEntityId = attributeToFocusIn.parentId;
+			eventDispatcher.dispatchEvent(inputFieldEvent);
+		}
+		
+		public static function getLeafFocusableFields(entity:EntityProxy):IList {
+			var result:ArrayCollection = new ArrayCollection();
+			var leafFields:IList = entity.getLeafFields();
+			for each (var f:FieldProxy in leafFields) {
+				if ( ! (f.parent is CodeAttributeProxy) || 
+					! (f.parent.definition as CodeAttributeDefinitionProxy).enumeratingAttribute && f.index == 0 ) {
+					result.addItem(f);
+				}
+			}
+			return result;
+		}
+		
+		protected function setFocusOnSiblingEntity(offset:int, circularLookup:Boolean = false):Boolean {
 			var attributeToFocusIn:AttributeProxy;
 			if ( _view.attributeDefinition.multiple ) {
 				var attribute:AttributeProxy = _view.attribute;
 				attributeToFocusIn = AttributeProxy(attribute.getSibling(offset));
 			} else {
-				var siblingEntity:EntityProxy = EntityProxy(_view.parentEntity.getSibling(offset));
+				var parentMultipleEntity:EntityProxy = _view.attribute.getParentMultipleEntity();
+				var siblingEntity:EntityProxy = EntityProxy(parentMultipleEntity.getSibling(offset, circularLookup));
 				if ( siblingEntity != null ) {
-					attributeToFocusIn = siblingEntity.getSingleAttribute(attributeName);
+					attributeToFocusIn = siblingEntity.getDescendantSingleAttribute(_view.attributeDefinition.id);
+					var circularLookupApplied:Boolean = circularLookup && siblingEntity.index - parentMultipleEntity.index != offset;
+					if ( circularLookupApplied ) {
+						var siblingField:FieldProxy = getSiblingFocusableField(attributeToFocusIn.getField(0), offset > 0 ? 1: -1);
+						if ( siblingField == null ) {
+							attributeToFocusIn = null;
+						} else {
+							attributeToFocusIn = siblingField.parent;
+						}
+					}
 				}
 			}
 			if ( attributeToFocusIn != null ) {
-				inputFieldEvent.attributeId = attributeToFocusIn.id;
-				inputFieldEvent.parentEntityId = attributeToFocusIn.parentId;
-				eventDispatcher.dispatchEvent(inputFieldEvent);
+				var fieldToFocusIn:FieldProxy = attributeToFocusIn.getField(_view.fieldIndex);
+				dispatchFocusSetEvent(fieldToFocusIn);
+				return true;
+			} else {
+				return false;
 			}
 		}
 		

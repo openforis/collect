@@ -3,21 +3,33 @@
 		 xmlns:s="library://ns.adobe.com/flex/spark" 
 		 xmlns:mx="library://ns.adobe.com/flex/mx" 
 		 xmlns:datagroup="org.openforis.collect.ui.component.datagroup.*"
+		 currentState="{STATE_VERTICAL}"
 		 >
+	
+	<fx:Metadata>
+		[Style(name="verticalAlign",type="String")]
+	</fx:Metadata>
 	
 	<fx:Script>
 		<![CDATA[
 			import mx.collections.ArrayCollection;
-			
 			import org.openforis.collect.model.proxy.EntityProxy;
-			
 			import mx.collections.IList;
-			
 			import spark.layouts.ConstraintLayout;
+			
+			public static const DISPOSITION_VERTICAL:String = "vertical";
+			public static const DISPOSITION_HORIZONTAL:String = "horizontal";
+			
+			public static const STATE_VERTICAL:String = "vertical";
+			public static const STATE_HORIZONTAL:String = "horizontal";
 			
 			private var _parentEntity:EntityProxy;
 			private var _nodeDefinitions:IList;
+			private var _labelsDisposition:String = DISPOSITION_VERTICAL;
 			
+			protected function updateCurrentState():void {
+				currentState = _labelsDisposition == DISPOSITION_VERTICAL ? STATE_VERTICAL: STATE_HORIZONTAL;
+			}
 			//private var _constraintLayout:ConstraintLayout;
 			
 			[Bindable]
@@ -38,6 +50,16 @@
 				_parentEntity = value;
 			}
 
+			[Bindable(event="labelsDispositionChange")]
+			public function get labelsDisposition():String {
+				return _labelsDisposition;
+			}
+			
+			public function set labelsDisposition(value:String):void {
+				_labelsDisposition = value;
+				dispatchEvent(new Event("labelsDispositionChange"));
+				updateCurrentState();
+			}
 			/*
 			[Bindable]
 			public function get constraintLayout():ConstraintLayout {
@@ -52,19 +74,30 @@
 		]]>
 	</fx:Script>
 	
+	<s:states>
+		<s:State name="vertical" />
+		<s:State name="horizontal" />
+	</s:states>
+	
 	<s:DataGroup dataProvider="{nodeDefinitions}"
-				 height="100%">
-		<s:layout>
+				 height.horizontal="100%"
+				 height.vertical="{NaN}">
+		<s:layout.horizontal>
 			<s:HorizontalLayout 
-								gap="4" 
-								verticalAlign="bottom" />
-		</s:layout>
+				gap="4" 
+				verticalAlign="bottom" />
+		</s:layout.horizontal>
+		<s:layout.vertical>
+			<s:VerticalLayout 
+				gap="2"
+				verticalAlign="middle" />
+		</s:layout.vertical>
 		<s:itemRenderer>
 			<fx:Component>
 				<datagroup:DataGroupHeaderItemRenderer
-					height="100%"
-					parentEntity="{outerDocument.parentEntity}"
-					/>
+					height="{outerDocument.labelsDisposition == DataGroupHeader.DISPOSITION_HORIZONTAL &amp;&amp; 
+						outerDocument.height &gt; 0 ? outerDocument.height: NaN}"
+					parentEntity="{outerDocument.parentEntity}" />
 			</fx:Component>
 		</s:itemRenderer>
 	</s:DataGroup>

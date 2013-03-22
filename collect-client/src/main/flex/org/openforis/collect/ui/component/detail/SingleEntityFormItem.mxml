@@ -6,23 +6,17 @@
 		xmlns:detail="org.openforis.collect.ui.component.detail.*"
 		width="100%"
 		>
-	<fx:Declarations>
-		<s:VerticalLayout id="verticalLayout" 
-						  gap="2" 
-						  paddingLeft="20" 
-						  />
-		<s:HorizontalLayout id="horizontalLayout" 
-							gap="4" />
-	</fx:Declarations>
 	
 	<fx:Script>
 		<![CDATA[
 			import mx.events.FlexEvent;
 			
+			import org.openforis.collect.metamodel.ui.UIOptions$Disposition;
 			import org.openforis.collect.util.UIUtil;
 			
 			private static const STATE_HORIZONTAL:String = "horizontal";
 			private static const STATE_VERTICAL:String = "vertical";
+			private static const STATE_VERTICAL_FORM_LAYOUT:String = "verticalFormLayout";
 
 			override protected function creationCompleteHandler(event:FlexEvent):void {
 				super.creationCompleteHandler(event);
@@ -31,9 +25,13 @@
 
 			protected function checkState(event:Event = null):void {
 				if(entityDefinition.parentLayout == UIUtil.LAYOUT_TABLE) {
-					currentState = STATE_HORIZONTAL;
+					if ( entityDefinition.disposition == UIOptions$Disposition.BY_COLUMNS ) {
+						currentState = STATE_VERTICAL;
+					} else {
+						currentState = STATE_HORIZONTAL;
+					}
 				} else {
-					currentState = STATE_VERTICAL;
+					currentState = STATE_VERTICAL_FORM_LAYOUT;
 				}
 			}
 			
@@ -44,6 +42,7 @@
 	<detail:states>
 		<s:State name="horizontal" />
 		<s:State name="vertical" />
+		<s:State name="verticalFormLayout" basedOn="vertical" />
 	</detail:states>
 	
 	<detail:layout>
@@ -59,12 +58,22 @@
 	
 	<detail:FormItemLabel id="formItemLabel"
 		  				  nodeDefinition="{entityDefinition}" 
-						  includeIn="vertical" />
+						  includeIn="verticalFormLayout"
+						/>
 
 	<s:DataGroup 
-		dataProvider="{nodeDefinitions}" 
-		layout.horizontal="{horizontalLayout}" 
-		layout.vertical="{verticalLayout}">
+		dataProvider="{nodeDefinitions}">
+		<s:layout.horizontal>
+			<s:HorizontalLayout gap="4" />
+		</s:layout.horizontal>
+		<s:layout.vertical>
+			<s:VerticalLayout gap="2" />
+		</s:layout.vertical>
+		<s:layout.verticalFormLayout>
+			<s:VerticalLayout gap="2" 
+							  paddingLeft="20" 
+							  />
+		</s:layout.verticalFormLayout>
 		<s:itemRenderer>
 			<fx:Component>
 				<detail:FormDataGroupItemRenderer

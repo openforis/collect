@@ -10,5 +10,10 @@ package org.openforis.collect.metamodel.proxy {
     [Bindable]
     [RemoteClass(alias="org.openforis.collect.metamodel.proxy.CodeAttributeDefinitionProxy")]
     public class CodeAttributeDefinitionProxy extends CodeAttributeDefinitionProxyBase {
+		
+		public function get enumeratingAttribute():Boolean {
+			return parent.enumerable && this.key;
+		}
+		
     }
 }

@@ -7,7 +7,6 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
 	import org.openforis.collect.model.proxy.EntityProxy;
-	import org.openforis.collect.ui.UIBuilder;
 	import org.openforis.collect.ui.component.detail.EntityFormItem;
 	
 	/**
@@ -46,7 +45,7 @@ package org.openforis.collect.presenter
 		protected function initNodeDefinitions():void {
 			var temp:IList = null;
 			if(view.entityDefinition != null) {
-				temp = UIBuilder.getDefinitionsInVersion(view.entityDefinition.childDefinitions, view.modelVersion);
+				temp = view.entityDefinition.getDefinitionsInVersion(view.modelVersion);
 			}
 			view.nodeDefinitions = temp;
 		}

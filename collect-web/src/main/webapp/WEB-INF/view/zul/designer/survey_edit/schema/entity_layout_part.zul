@@ -21,6 +21,20 @@
           </div>
         </fieldErrorHandler>
       </row>
+      <row>
+        <label value="${labels.survey.schema.entity.layout.disposition_label}:" />
+        <fieldErrorHandler message="@load(vmsgs['disposition'])">
+          <div>
+            <radiogroup selectedItem="@bind(fx.disposition)"
+              onCheck="@command('applyChanges')">
+              <radio value="byRows" disabled="${empty parentEntity}"
+                label="${labels.survey.schema.entity.layout.disposition.byRows}" />
+              <radio value="byColumns" disabled="${empty parentEntity}"
+                label="${labels.survey.schema.entity.layout.disposition.byColumns}" />
+            </radiogroup>
+          </div>
+        </fieldErrorHandler>
+      </row>
     </rows>
   </grid>
 </zk>

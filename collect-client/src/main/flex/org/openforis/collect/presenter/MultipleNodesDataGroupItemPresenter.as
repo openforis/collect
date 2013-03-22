@@ -102,9 +102,9 @@ package org.openforis.collect.presenter {
 		
 		protected function showDropIndicator(event:DragEvent):void {
 			if(isDropOnTopOfElement(_view, event.localY)) {
-				_view.currentState = "droppingTop";
+				_view.currentState = MultipleNodesDataGroupItemRenderer.STATE_DROPPING_TOP;
 			} else {
-				_view.currentState = "droppingBottom";
+				_view.currentState = MultipleNodesDataGroupItemRenderer.STATE_DROPPING_BOTTOM;
 			}
 		}
 		
@@ -113,7 +113,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function hideDropIndicator():void {
-			_view.currentState = "normal";
+			_view.currentState = MultipleNodesDataGroupItemRenderer.STATE_NORMAL;
 		}
 		
 		protected function mouseOverHandler(event:MouseEvent):void {
