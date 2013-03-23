@@ -421,7 +421,8 @@ public class UIOptions implements ApplicationOptions, Serializable {
 	}
 	
 	public void setDisposition(EntityDefinition defn, Disposition disposition) {
-		defn.setAnnotation(Annotation.DISPOSITION.getQName(), disposition.getValue());
+		String value = disposition == null ? null: disposition.getValue();
+		defn.setAnnotation(Annotation.DISPOSITION.getQName(), value);
 	}
 	
 	public boolean getShowRowNumbersValue(EntityDefinition defn) {
