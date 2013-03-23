@@ -94,7 +94,7 @@
 	<bean id="collectSurveyContext" class="org.openforis.collect.model.CollectSurveyContext">
     <constructor-arg><ref bean="expressionFactory"/></constructor-arg>
     <constructor-arg><ref bean="validator"/></constructor-arg>
-    <constructor-arg><ref bean="externalCodeListProvider"/></constructor-arg>
+    <property name="externalCodeListProvider" ref="externalCodeListProvider" />
 	</bean>
 	
 	<!-- XML DataMarshaller -->

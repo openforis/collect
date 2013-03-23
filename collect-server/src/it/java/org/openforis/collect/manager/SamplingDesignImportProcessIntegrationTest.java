@@ -41,6 +41,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class SamplingDesignImportProcessIntegrationTest extends CollectIntegrationTest {
 
 	private static final String VALID_TEST_CSV = "sampling-design-test.csv";
+	private static final String VALID_FLAT_TEST_CSV = "sampling-design-flat-test.csv";
 	private static final String INVALID_TEST_CSV = "sampling-design-invalid-test.csv";
 
 	@Autowired
@@ -80,6 +81,24 @@ public class SamplingDesignImportProcessIntegrationTest extends CollectIntegrati
 		assertNotNull(findItem(items, 200000d, -2000000d, "1_02", "1"));
 		assertNotNull(findItem(items, 806090d, 9320050d, "10_114", "7"));
 		assertNotNull(findItem(items, 805680d, 9305020d, "10_117", "6"));
+	}
+	
+	@Test
+	public void testFlatImport() throws Exception {
+		SamplingDesignImportProcess process = importCSVFile(VALID_FLAT_TEST_CSV);
+		SamplingDesignImportStatus status = process.getStatus();
+		assertTrue(status.isComplete());
+		assertTrue(status.getSkippedRows().isEmpty());
+		
+		SamplingDesignSummaries samplingDesignSummaries = samplingDesignManager.loadBySurveyWork(survey.getId(), 0, 30);
+		assertNotNull(samplingDesignSummaries);
+		assertEquals(5, samplingDesignSummaries.getTotalCount());
+		
+		List<SamplingDesignItem> items = samplingDesignSummaries.getRecords();
+		assertNotNull(findItem(items, -10000d, 100000d, "1_01"));
+		assertNotNull(findItem(items, 200000d, -2000000d, "1_02"));
+		assertNotNull(findItem(items, 806340d, 9320050d, "10_114"));
+		assertNotNull(findItem(items, 806680d, 9305020d, "10_117"));
 	}
 	
 	@Test

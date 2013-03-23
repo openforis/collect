@@ -3,6 +3,9 @@
  */
 package org.openforis.collect.persistence.jooq.tables;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.jooq.TableField;
 import org.jooq.impl.UpdatableTableImpl;
 import org.openforis.collect.persistence.jooq.Collect;
@@ -15,11 +18,16 @@ import org.openforis.collect.persistence.jooq.tables.records.LookupRecord;
 public class Lookup extends UpdatableTableImpl<LookupRecord> {
 
 	private static final long serialVersionUID = 1L;
-	private static Lookup lookup;
+	private static Map<String, Lookup> nameToLookup;
 
 	public static Lookup getInstance(String name) {
-		if (lookup == null) {
+		if (nameToLookup == null) {
+			nameToLookup = new HashMap<String, Lookup>();
+		}
+		Lookup lookup = nameToLookup.get(name);
+		if ( lookup == null ) {
 			lookup = new Lookup(name);
+			nameToLookup.put(name, lookup);
 		}
 		return lookup;
 	}
@@ -40,6 +48,10 @@ public class Lookup extends UpdatableTableImpl<LookupRecord> {
 
 	public TableField<LookupRecord, String> getFieldByName(String name) {
 		return createField(name, org.jooq.impl.SQLDataType.VARCHAR, this);
+	}
+
+	public TableField<LookupRecord, Integer> createIntegerField(String name) {
+		return createField(name, org.jooq.impl.SQLDataType.INTEGER, this);
 	}
 
 }

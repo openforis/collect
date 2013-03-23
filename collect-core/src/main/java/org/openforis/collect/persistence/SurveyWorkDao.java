@@ -70,6 +70,28 @@ public class SurveyWorkDao extends SurveyBaseDao {
 		}
 		return surveys;
 	}
+	
+	@Transactional
+	public SurveySummary loadSurveySummary(int id) {
+		Factory jf = getJooqFactory();
+		Record record = jf.select()
+				.from(OFC_SURVEY_WORK)
+				.where(OFC_SURVEY_WORK.ID.equal(id))
+				.fetchOne();
+		SurveySummary result = processSurveySummaryRow(record);
+		return result;
+	}
+
+	@Transactional
+	public SurveySummary loadSurveySummaryByName(String name) {
+		Factory jf = getJooqFactory();
+		Record record = jf.select()
+				.from(OFC_SURVEY_WORK)
+				.where(OFC_SURVEY_WORK.NAME.equal(name))
+				.fetchOne();
+		SurveySummary result = processSurveySummaryRow(record);
+		return result;
+	}
 
 	@Transactional
 	public void insert(CollectSurvey survey) throws SurveyImportException {

@@ -139,12 +139,6 @@ public class SurveyManager {
 		return summaries;
 	}
 	
-	@Transactional
-	public List<SurveySummary> getSurveyWorkSummaries() {
-		List<SurveySummary> result = surveyWorkDao.loadSummaries();
-		return result;
-	}
-	
 	public String marshalSurvey(Survey survey)  {
 		try {
 			String result = surveyDao.marshalSurvey(survey);
@@ -185,8 +179,23 @@ public class SurveyManager {
 	
 	@Transactional
 	public CollectSurvey loadSurveyWork(int id) {
-		CollectSurvey survey = surveyWorkDao.load(id);
-		return survey;
+		return surveyWorkDao.load(id);
+	}
+	
+	@Transactional
+	public List<SurveySummary> getSurveyWorkSummaries() {
+		List<SurveySummary> result = surveyWorkDao.loadSummaries();
+		return result;
+	}
+	
+	@Transactional
+	public SurveySummary loadSurveyWorkSummary(int id) {
+		return surveyWorkDao.loadSurveySummary(id);
+	}
+	
+	@Transactional
+	public SurveySummary loadSurveyWorkSummaryByName(String name) {
+		return surveyWorkDao.loadSurveySummaryByName(name);
 	}
 	
 	@Transactional
@@ -199,6 +208,24 @@ public class SurveyManager {
 		return surveyWork;
 	}
 
+	@Transactional
+	public boolean isSurveyWork(CollectSurvey survey) {
+		Integer id = survey.getId();
+		String name = survey.getName();
+		SurveySummary workSurveySummary = loadSurveyWorkSummaryByName(name);
+		if (workSurveySummary == null || workSurveySummary.getId() != id ) {
+			CollectSurvey publishedSurvey = get(name);
+			if (publishedSurvey == null || publishedSurvey.getId() != id ) {
+				throw new IllegalStateException("Survey with name '" + name
+						+ "' not found");
+			} else {
+				return false;
+			}
+		} else {
+			return true;
+		}
+	}
+	
 	public CollectSurvey createSurveyWork() {
 		CollectSurvey survey = (CollectSurvey) collectSurveyContext.createSurvey();
 		UIOptions uiOptions = survey.createUIOptions();

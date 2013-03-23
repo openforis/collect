@@ -3,6 +3,7 @@ package org.openforis.collect.persistence;
 import static org.openforis.collect.persistence.jooq.Sequences.OFC_SURVEY_ID_SEQ;
 import static org.openforis.collect.persistence.jooq.tables.OfcRecord.OFC_RECORD;
 import static org.openforis.collect.persistence.jooq.tables.OfcSurvey.OFC_SURVEY;
+import static org.openforis.collect.persistence.jooq.tables.OfcSurveyWork.OFC_SURVEY_WORK;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -74,6 +75,26 @@ public class SurveyDao extends SurveyBaseDao {
 				.where(OFC_SURVEY.URI.equal(uri)).fetchOne();
 		CollectSurvey survey = processSurveyRow(record);
 		return survey;
+	}
+	
+	public SurveySummary loadSurveySummary(int id) {
+		Factory jf = getJooqFactory();
+		Record record = jf.select()
+				.from(OFC_SURVEY)
+				.where(OFC_SURVEY.ID.equal(id))
+				.fetchOne();
+		SurveySummary result = processSurveySummaryRow(record);
+		return result;
+	}
+	
+	public SurveySummary loadSurveySummaryByName(String name) {
+		Factory jf = getJooqFactory();
+		Record record = jf.select()
+				.from(OFC_SURVEY)
+				.where(OFC_SURVEY.NAME.equal(name))
+				.fetchOne();
+		SurveySummary result = processSurveySummaryRow(record);
+		return result;
 	}
 	
 	@Transactional

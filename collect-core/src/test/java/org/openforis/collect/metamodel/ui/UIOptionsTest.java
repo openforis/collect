@@ -36,7 +36,7 @@ public class UIOptionsTest {
 	}
 
 	protected void initSurvey() {
-		SurveyContext ctx = new CollectSurveyContext(new ExpressionFactory(), new CollectValidator(), null);
+		SurveyContext ctx = new CollectSurveyContext(new ExpressionFactory(), new CollectValidator());
 		survey = (CollectSurvey) ctx.createSurvey();
 		schema = survey.getSchema();
 		populateSchema();
