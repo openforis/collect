@@ -7,9 +7,11 @@ package org.openforis.collect.presenter {
 	import mx.binding.utils.BindingUtils;
 	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
+	import mx.controls.Alert;
 	import mx.rpc.events.ResultEvent;
 	
 	import org.openforis.collect.Application;
+	import org.openforis.collect.Proxy;
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.client.DataClient;
 	import org.openforis.collect.event.ApplicationEvent;
@@ -17,6 +19,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.event.NodeEvent;
 	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.CodeAttributeDefinitionProxy;
+	import org.openforis.collect.metamodel.proxy.DateAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.NumberAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.RangeAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.ui.UIOptions$Disposition;
@@ -388,7 +391,10 @@ package org.openforis.collect.presenter {
 			var focusChanged:Boolean = false;
 			if ( dispositionByColumns ) {
 				var offset:int = shiftKey ? -1: 1;
-				focusChanged = setFocusOnSiblingEntity(offset, true);
+				var siblingFocusableField:FieldProxy = getSiblingFocusableFieldInAttribute(getField(), ! shiftKey);
+				if ( siblingFocusableField == null ) {
+					focusChanged = setFocusOnSiblingEntity(offset, true, false);
+				}
 			}
 			if ( !focusChanged ) {
 				UIUtil.moveFocus(shiftKey);
@@ -406,16 +412,24 @@ package org.openforis.collect.presenter {
 			}
 		}
 		
-		protected function getSiblingFocusableField(field:FieldProxy, offset:int):FieldProxy {
+		protected function getSiblingFocusableField(field:FieldProxy, offset:int, limit:Boolean = true):FieldProxy {
 			var parentMultipleEntity:EntityProxy = field.parent.getParentMultipleEntity();
 			if ( parentMultipleEntity != null ) {
 				var siblingFields:IList = getLeafFocusableFields(parentMultipleEntity);
 				var currentFieldIndex:int = siblingFields.getItemIndex(field);
 				var siblingFieldIndex:int = currentFieldIndex + offset;
 				if ( siblingFieldIndex < 0 ) {
-					siblingFieldIndex = 0;
+					if ( limit ) {
+						siblingFieldIndex = 0;
+					} else {
+						return null;
+					}
 				} else if ( siblingFieldIndex > siblingFields.length - 1 ) {
-					siblingFieldIndex = siblingFields.length - 1;
+					if ( limit ) {
+						siblingFieldIndex = siblingFields.length - 1;
+					} else {
+						return null;
+					}
 				}
 				if ( siblingFieldIndex != currentFieldIndex ) {
 					return siblingFields.getItemAt(siblingFieldIndex) as FieldProxy;
@@ -441,15 +455,67 @@ package org.openforis.collect.presenter {
 			var result:ArrayCollection = new ArrayCollection();
 			var leafFields:IList = entity.getLeafFields();
 			for each (var f:FieldProxy in leafFields) {
-				if ( ! (f.parent is CodeAttributeProxy) || 
-					! (f.parent.definition as CodeAttributeDefinitionProxy).enumeratingAttribute && f.index == 0 ) {
+				if ( isFieldFocusable(f) ) {
 					result.addItem(f);
 				}
 			}
 			return result;
 		}
 		
-		protected function setFocusOnSiblingEntity(offset:int, circularLookup:Boolean = false):Boolean {
+		public static function isFieldFocusable(field:FieldProxy):Boolean {
+			if ( ! (field.parent is CodeAttributeProxy) || 
+				! (field.parent.definition as CodeAttributeDefinitionProxy).enumeratingAttribute && field.index == 0 ) {
+				return true;
+			} else {
+				return false;
+			}
+		}
+		
+		public static function getSiblingFocusableFieldInAttribute(field:FieldProxy, forward:Boolean = true):FieldProxy {
+			var attr:AttributeProxy = field.parent;
+			var siblingFieldIndex:int;
+			if ( attr.definition is DateAttributeDefinitionProxy ) {
+				switch ( field.index ) {
+					case 0: //year
+						siblingFieldIndex = forward ? -1: 1;
+						break;
+					case 1: //month
+						siblingFieldIndex = forward ? 0: 2;
+						break;
+					case 2: //date
+						siblingFieldIndex = forward ? 1: -1;
+						break;
+				}
+			} else if ( attr.definition is CodeAttributeDefinitionProxy ) {
+				//a single field is focusable
+				siblingFieldIndex = -1;
+			} else {
+				siblingFieldIndex = field.index + forward ? 1: -1;
+			}
+			if ( siblingFieldIndex >= 0 && siblingFieldIndex < attr.fields.length ) {
+				return attr.getField(siblingFieldIndex);
+			} else {
+				return null;
+			}
+		}
+		
+		public static function getFirstFocusableFieldIndex(attrDefn:AttributeDefinitionProxy):int {
+			if ( attrDefn is DateAttributeDefinitionProxy ) {
+				return 2;
+			} else {
+				return 0;
+			}
+		}
+		
+		public static function getLastFocusableFieldIndex(attrDefn:AttributeDefinitionProxy):int {
+			if ( attrDefn is DateAttributeDefinitionProxy ) {
+				return 0;
+			} else {
+				return 0;
+			}
+		}
+		
+		protected function setFocusOnSiblingEntity(offset:int, circularLookup:Boolean = false, sameFieldIndex:Boolean = true):Boolean {
 			var attributeToFocusIn:AttributeProxy;
 			if ( _view.attributeDefinition.multiple ) {
 				var attribute:AttributeProxy = _view.attribute;
@@ -461,8 +527,8 @@ package org.openforis.collect.presenter {
 					attributeToFocusIn = siblingEntity.getDescendantSingleAttribute(_view.attributeDefinition.id);
 					var circularLookupApplied:Boolean = circularLookup && siblingEntity.index - parentMultipleEntity.index != offset;
 					if ( circularLookupApplied ) {
-						var siblingField:FieldProxy = getSiblingFocusableField(attributeToFocusIn.getField(0), offset > 0 ? 1: -1);
-						if ( siblingField == null ) {
+						var siblingField:FieldProxy = getSiblingFocusableField(attributeToFocusIn.getField(0), offset > 0 ? 1: -1, false);
+						if ( siblingField == null || siblingField.parent == attributeToFocusIn ) {
 							attributeToFocusIn = null;
 						} else {
 							attributeToFocusIn = siblingField.parent;
@@ -471,7 +537,15 @@ package org.openforis.collect.presenter {
 				}
 			}
 			if ( attributeToFocusIn != null ) {
-				var fieldToFocusIn:FieldProxy = attributeToFocusIn.getField(_view.fieldIndex);
+				var fieldIndex:int;
+				if ( sameFieldIndex ) {
+					fieldIndex = _view.fieldIndex;
+				} else if ( offset > 0 ) {
+					fieldIndex = getFirstFocusableFieldIndex(_view.attributeDefinition);
+				} else {
+					fieldIndex = getLastFocusableFieldIndex(_view.attributeDefinition);
+				}
+				var fieldToFocusIn:FieldProxy = attributeToFocusIn.getField(fieldIndex);
 				dispatchFocusSetEvent(fieldToFocusIn);
 				return true;
 			} else {

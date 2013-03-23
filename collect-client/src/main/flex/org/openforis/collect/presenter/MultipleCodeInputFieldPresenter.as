@@ -56,7 +56,7 @@ package org.openforis.collect.presenter {
 			}
 		}
 		
-		override protected function setFocusOnSiblingEntity(offset:int, circularLookup:Boolean = false):Boolean {
+		override protected function setFocusOnSiblingEntity(offset:int, circularLookup:Boolean = false, sameFieldIndex:Boolean = true):Boolean {
 			var attributeName:String = _view.attributeDefinition.name;
 			var inputFieldEvent:InputFieldEvent = new InputFieldEvent(InputFieldEvent.SET_FOCUS);
 			inputFieldEvent.nodeName = attributeName;
