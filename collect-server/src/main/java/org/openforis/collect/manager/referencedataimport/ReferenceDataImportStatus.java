@@ -25,7 +25,7 @@ public abstract class ReferenceDataImportStatus<E extends ParsingError> extends 
 		this.rowToErrors = new LinkedHashMap<Long, List<E>>();
 	}
 	
-	public void addParsingError(long row, E error) {
+	public synchronized void addParsingError(long row, E error) {
 		List<E> list = rowToErrors.get(row);
 		if ( list == null ) {
 			list = new ArrayList<E>();
@@ -45,14 +45,14 @@ public abstract class ReferenceDataImportStatus<E extends ParsingError> extends 
 		}
 	}
 	
-	public void addProcessedRow(long rowNumber) {
+	public synchronized void addProcessedRow(long rowNumber) {
 		if ( !processedRows.contains(rowNumber)) {
 			incrementProcessed();
 			processedRows.add(rowNumber);
 		}
 	}
 	
-	public List<E> getErrors() {
+	public synchronized List<E> getErrors() {
 		Collection<List<E>> errorsPerRows = rowToErrors.values();
 		List<E> result = new ArrayList<E>();
 		for (List<E> errros : errorsPerRows) {
@@ -61,27 +61,27 @@ public abstract class ReferenceDataImportStatus<E extends ParsingError> extends 
 		return result;
 	}
 	
-	public boolean hasErrors() {
+	public synchronized boolean hasErrors() {
 		return rowToErrors != null && ! rowToErrors.isEmpty();
 	}
 
-	public List<Long> getProcessedRows() {
+	public synchronized List<Long> getProcessedRows() {
 		return processedRows;
 	}
 	
-	public boolean isRowProcessed(long rowNumber) {
+	public synchronized boolean isRowProcessed(long rowNumber) {
 		return processedRows.contains(rowNumber);
 	}
 	
-	public boolean isRowInError(long rowNumber) {
+	public synchronized boolean isRowInError(long rowNumber) {
 		return rowToErrors.containsKey(rowNumber);
 	}
 	
-	public Collection<Long> getRowsInError() {
+	public synchronized Collection<Long> getRowsInError() {
 		return rowToErrors.keySet();
 	}
 	
-	public List<Long> getSkippedRows() {
+	public synchronized List<Long> getSkippedRows() {
 		List<Long> result = new ArrayList<Long>();
 		for (long i = 1; i <= getTotal(); i++) {
 			if ( ! processedRows.contains(i) ) {
