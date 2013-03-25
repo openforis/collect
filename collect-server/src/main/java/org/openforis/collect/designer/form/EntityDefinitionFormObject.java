@@ -4,7 +4,7 @@
 package org.openforis.collect.designer.form;
 
 import org.openforis.collect.metamodel.ui.UIOptions;
-import org.openforis.collect.metamodel.ui.UIOptions.Disposition;
+import org.openforis.collect.metamodel.ui.UIOptions.Direction;
 import org.openforis.collect.metamodel.ui.UIOptions.Layout;
 import org.openforis.idm.metamodel.EntityDefinition;
 
@@ -16,7 +16,7 @@ public class EntityDefinitionFormObject<T extends EntityDefinition> extends Node
 
 	private boolean showRowNumbers;
 	private boolean countInRecordSummary;
-	private String disposition;
+	private String direction;
 	
 	//layout
 	private String layoutType;
@@ -33,9 +33,9 @@ public class EntityDefinitionFormObject<T extends EntityDefinition> extends Node
 		uiOptions.setLayout(dest, layout);
 		uiOptions.setCountInSummaryListValue(dest, countInRecordSummary);
 		uiOptions.setShowRowNumbersValue(dest, showRowNumbers);
-		Disposition dispositionEnum = super.isMultiple() && layout == Layout.TABLE &&
-				Disposition.BY_COLUMNS.getValue().equals(this.disposition) ? Disposition.BY_COLUMNS: null;
-		uiOptions.setDisposition(dest, dispositionEnum);
+		Direction directionEnum = super.isMultiple() && layout == Layout.TABLE &&
+				Direction.BY_COLUMNS.getValue().equals(this.direction) ? Direction.BY_COLUMNS: null;
+		uiOptions.setDirection(dest, directionEnum);
 	}
 	
 	@Override
@@ -46,7 +46,7 @@ public class EntityDefinitionFormObject<T extends EntityDefinition> extends Node
 		layoutType = layout.name();
 		countInRecordSummary = uiOptions.getCountInSumamryListValue(source);
 		showRowNumbers = uiOptions.getShowRowNumbersValue(source);
-		disposition = uiOptions.getDisposition(source).getValue();
+		direction = uiOptions.getDirection(source).getValue();
 	}
 
 	@Override
@@ -79,12 +79,12 @@ public class EntityDefinitionFormObject<T extends EntityDefinition> extends Node
 		this.countInRecordSummary = countInRecordSummary;
 	}
 
-	public String getDisposition() {
-		return disposition;
+	public String getDirection() {
+		return direction;
 	}
 	
-	public void setDisposition(String disposition) {
-		this.disposition = disposition;
+	public void setDirection(String direction) {
+		this.direction = direction;
 	}
 	
 }

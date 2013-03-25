@@ -42,7 +42,7 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		TAB_SET(new QName(UI_NAMESPACE_URI, UIOptionsConstants.TAB_SET_NAME)),
 		TAB_NAME(new QName(UI_NAMESPACE_URI, UIOptionsConstants.TAB)),
 		LAYOUT(new QName(UI_NAMESPACE_URI, UIOptionsConstants.LAYOUT)),
-		DISPOSITION(new QName(UI_NAMESPACE_URI, UIOptionsConstants.DISPOSITION)),
+		DIRECTION(new QName(UI_NAMESPACE_URI, UIOptionsConstants.DIRECTION)),
 		COUNT_IN_SUMMARY_LIST(new QName(UI_NAMESPACE_URI, UIOptionsConstants.COUNT)),
 		SHOW_ROW_NUMBERS(new QName(UI_NAMESPACE_URI, UIOptionsConstants.SHOW_ROW_NUMBERS)),
 		AUTOCOMPLETE(new QName(UI_NAMESPACE_URI, UIOptionsConstants.AUTOCOMPLETE));
@@ -62,13 +62,13 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		FORM, TABLE
 	}
 	
-	public enum Disposition {
+	public enum Direction {
 		BY_ROWS("byRows"), 
 		BY_COLUMNS("byColumns");
 		
 		private String value;
 
-		private Disposition(String value) {
+		private Direction(String value) {
 			this.value = value;
 		}
 		
@@ -404,25 +404,25 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		entityDefn.setAnnotation(Annotation.LAYOUT.getQName(), layoutValue);
 	}
 	
-	public Disposition getDisposition(EntityDefinition defn) {
-		String dispositionValue = defn.getAnnotation(Annotation.DISPOSITION.getQName());
-		if ( dispositionValue == null ) {
+	public Direction getDirection(EntityDefinition defn) {
+		String value = defn.getAnnotation(Annotation.DIRECTION.getQName());
+		if ( value == null ) {
 			EntityDefinition parentDefn = (EntityDefinition) defn.getParentDefinition();
 			if ( parentDefn == null ) {
-				return Disposition.BY_ROWS;
+				return Direction.BY_ROWS;
 			} else {
-				return getDisposition(parentDefn);
+				return getDirection(parentDefn);
 			}
-		} else if ( dispositionValue.equals(Disposition.BY_COLUMNS.getValue())) {
-			return Disposition.BY_COLUMNS;
+		} else if ( value.equals(Direction.BY_COLUMNS.getValue())) {
+			return Direction.BY_COLUMNS;
 		} else {
-			return Disposition.BY_ROWS;
+			return Direction.BY_ROWS;
 		}
 	}
 	
-	public void setDisposition(EntityDefinition defn, Disposition disposition) {
-		String value = disposition == null ? null: disposition.getValue();
-		defn.setAnnotation(Annotation.DISPOSITION.getQName(), value);
+	public void setDirection(EntityDefinition defn, Direction direction) {
+		String value = direction == null ? null: direction.getValue();
+		defn.setAnnotation(Annotation.DIRECTION.getQName(), value);
 	}
 	
 	public boolean getShowRowNumbersValue(EntityDefinition defn) {

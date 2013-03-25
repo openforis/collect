@@ -22,15 +22,15 @@
         </fieldErrorHandler>
       </row>
       <row>
-        <label value="${labels.survey.schema.entity.layout.disposition_label}:" />
-        <fieldErrorHandler message="@load(vmsgs['disposition'])">
+        <label value="${labels.survey.schema.entity.layout.direction_label}:" />
+        <fieldErrorHandler message="@load(vmsgs['direction'])">
           <div>
-            <radiogroup selectedItem="@bind(fx.disposition)"
+            <radiogroup selectedItem="@bind(fx.direction)"
               onCheck="@command('applyChanges')">
               <radio value="byRows" disabled="${empty parentEntity}"
-                label="${labels.survey.schema.entity.layout.disposition.byRows}" />
+                label="${labels.survey.schema.entity.layout.direction.byRows}" />
               <radio value="byColumns" disabled="${empty parentEntity}"
-                label="${labels.survey.schema.entity.layout.disposition.byColumns}" />
+                label="${labels.survey.schema.entity.layout.direction.byColumns}" />
             </radiogroup>
           </div>
         </fieldErrorHandler>

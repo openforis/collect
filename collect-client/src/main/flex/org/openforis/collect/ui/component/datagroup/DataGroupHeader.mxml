@@ -17,18 +17,18 @@
 			import mx.collections.IList;
 			import spark.layouts.ConstraintLayout;
 			
-			public static const DISPOSITION_VERTICAL:String = "vertical";
-			public static const DISPOSITION_HORIZONTAL:String = "horizontal";
+			public static const DIRECTION_VERTICAL:String = "vertical";
+			public static const DIRECTION_HORIZONTAL:String = "horizontal";
 			
 			public static const STATE_VERTICAL:String = "vertical";
 			public static const STATE_HORIZONTAL:String = "horizontal";
 			
 			private var _parentEntity:EntityProxy;
 			private var _nodeDefinitions:IList;
-			private var _labelsDisposition:String = DISPOSITION_VERTICAL;
+			private var _labelsDirection:String = DIRECTION_VERTICAL;
 			
 			protected function updateCurrentState():void {
-				currentState = _labelsDisposition == DISPOSITION_VERTICAL ? STATE_VERTICAL: STATE_HORIZONTAL;
+				currentState = _labelsDirection == DIRECTION_VERTICAL ? STATE_VERTICAL: STATE_HORIZONTAL;
 			}
 			//private var _constraintLayout:ConstraintLayout;
 			
@@ -50,14 +50,14 @@
 				_parentEntity = value;
 			}
 
-			[Bindable(event="labelsDispositionChange")]
-			public function get labelsDisposition():String {
-				return _labelsDisposition;
+			[Bindable(event="labelsDirectionChange")]
+			public function get labelsDirection():String {
+				return _labelsDirection;
 			}
 			
-			public function set labelsDisposition(value:String):void {
-				_labelsDisposition = value;
-				dispatchEvent(new Event("labelsDispositionChange"));
+			public function set labelsDirection(value:String):void {
+				_labelsDirection = value;
+				dispatchEvent(new Event("labelsDirectionChange"));
 				updateCurrentState();
 			}
 			/*
@@ -95,7 +95,7 @@
 		<s:itemRenderer>
 			<fx:Component>
 				<datagroup:DataGroupHeaderItemRenderer
-					height="{outerDocument.labelsDisposition == DataGroupHeader.DISPOSITION_HORIZONTAL &amp;&amp; 
+					height="{outerDocument.labelsDirection == DataGroupHeader.DIRECTION_HORIZONTAL &amp;&amp; 
 						outerDocument.height &gt; 0 ? outerDocument.height: NaN}"
 					parentEntity="{outerDocument.parentEntity}" />
 			</fx:Component>

@@ -8,7 +8,7 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.collect.metamodel.ui.UIOptions;
-import org.openforis.collect.metamodel.ui.UIOptions.Disposition;
+import org.openforis.collect.metamodel.ui.UIOptions.Direction;
 import org.openforis.collect.metamodel.ui.UIOptions.Layout;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.EntityDefinition;
@@ -52,11 +52,11 @@ public class EntityDefinitionProxy extends NodeDefinitionProxy {
 	}
 	
 	@ExternalizedProperty
-	public Disposition getDisposition() {
+	public Direction getDirection() {
 		CollectSurvey survey = (CollectSurvey) entityDefinition.getSurvey();
 		UIOptions uiOpts = survey.getUIOptions();
-		Disposition disposition = uiOpts.getDisposition(entityDefinition);
-		return disposition;
+		Direction result = uiOpts.getDirection(entityDefinition);
+		return result;
 	}
 	
 	@ExternalizedProperty

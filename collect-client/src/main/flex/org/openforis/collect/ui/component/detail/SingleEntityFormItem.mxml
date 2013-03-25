@@ -11,7 +11,7 @@
 		<![CDATA[
 			import mx.events.FlexEvent;
 			
-			import org.openforis.collect.metamodel.ui.UIOptions$Disposition;
+			import org.openforis.collect.metamodel.ui.UIOptions$Direction;
 			import org.openforis.collect.util.UIUtil;
 			
 			private static const STATE_HORIZONTAL:String = "horizontal";
@@ -25,7 +25,7 @@
 
 			protected function checkState(event:Event = null):void {
 				if(entityDefinition.parentLayout == UIUtil.LAYOUT_TABLE) {
-					if ( entityDefinition.disposition == UIOptions$Disposition.BY_COLUMNS ) {
+					if ( entityDefinition.direction == UIOptions$Direction.BY_COLUMNS ) {
 						currentState = STATE_VERTICAL;
 					} else {
 						currentState = STATE_HORIZONTAL;

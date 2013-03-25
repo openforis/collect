@@ -25,7 +25,7 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.metamodel.proxy.TextAttributeDefinitionProxy$Type;
 	import org.openforis.collect.metamodel.proxy.TimeAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.UnitProxy;
-	import org.openforis.collect.metamodel.ui.UIOptions$Disposition;
+	import org.openforis.collect.metamodel.ui.UIOptions$Direction;
 	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.ui.component.datagrid.CompleteColumnItemRenderer;
 	import org.openforis.collect.ui.component.datagrid.RecordSummaryDataGrid;
@@ -90,6 +90,8 @@ package org.openforis.collect.ui {
 		private static const VALIDATION_DISPLAY_DOUBLE_BORDER_SIZE:Number = 2 * VALIDATION_DISPLAY_BORDER_SIZE;
 		private static const ATTRIBUTE_RENDERER_HEIGHT:Number = ATTRIBUTE_INPUT_FIELD_HEIGHT + VALIDATION_DISPLAY_DOUBLE_BORDER_SIZE;
 		public static const COMPOSITE_ATTRIBUTE_H_GAP:int = TABLE_HORIZONTAL_GAP + VALIDATION_DISPLAY_DOUBLE_BORDER_SIZE;
+		public static const COMPOSITE_ATTRIBUTE_LABELS_V_GAP:int = 6;
+		public static const GROUPING_LABEL_PADDING_TOP:int = 4;
 		
 		public static function buildForm(rootEntity:EntityDefinitionProxy, version:ModelVersionProxy):FormContainer {
 			var formContainer:FormContainer = new FormContainer();
@@ -182,10 +184,10 @@ package org.openforis.collect.ui {
 					entityFormItem = new MultipleEntityFormItem();
 				} else {
 					entityFormItem = new MultipleEntityAsTableFormItem();
-					MultipleEntityAsTableFormItem(entityFormItem).entitiesDisposition = 
-						definition.disposition == UIOptions$Disposition.BY_COLUMNS ? 
-							MultipleEntityAsTableFormItem.DISPOSITION_BY_COLUMNS:
-							MultipleEntityAsTableFormItem.DISPOSITION_BY_ROWS;
+					MultipleEntityAsTableFormItem(entityFormItem).entitiesDirection = 
+						definition.direction == UIOptions$Direction.BY_COLUMNS ? 
+							MultipleEntityAsTableFormItem.DIRECTION_BY_COLUMNS:
+							MultipleEntityAsTableFormItem.DIRECTION_BY_ROWS;
 				}
 			} else {
 				entityFormItem = new SingleEntityFormItem();
@@ -262,9 +264,12 @@ package org.openforis.collect.ui {
 		
 		public static function getAttributeDataGroupHeaderWidth(def:AttributeDefinitionProxy, ancestorEntity:EntityProxy):Number {
 			var parentEntityDefn:EntityDefinitionProxy = def.parent;
+			var directionByColumns:Boolean = parentEntityDefn != null && parentEntityDefn.direction == UIOptions$Direction.BY_COLUMNS;
 			if(ancestorEntity != null && parentEntityDefn.enumerable && def.key && def is CodeAttributeDefinitionProxy) {
 				var width:Number = getEnumeratedCodeHeaderWidth(def, ancestorEntity);
 				return width + VALIDATION_DISPLAY_DOUBLE_BORDER_SIZE;
+			} else if ( directionByColumns ) {
+				return NaN;
 			} else {
 				var inputFieldWidth:Number = getInputFieldWidth(def);
 				if(!isNaN(inputFieldWidth)) {
@@ -277,12 +282,12 @@ package org.openforis.collect.ui {
 
 		public static function getAttributeDataGroupHeaderHeight(defn:AttributeDefinitionProxy, ancestorEntity:EntityProxy):Number {
 			var result:Number;
-			var dispositionByColumns:Boolean = defn.parent != null && defn.parent.disposition == UIOptions$Disposition.BY_COLUMNS;
-			if ( dispositionByColumns ) {
+			var directionByColumns:Boolean = defn.parent != null && defn.parent.direction == UIOptions$Direction.BY_COLUMNS;
+			if ( directionByColumns ) {
 				if ( defn is CoordinateAttributeDefinitionProxy ) {
-					result = 3 * ATTRIBUTE_INPUT_FIELD_HEIGHT;
+					result = 3 * ATTRIBUTE_INPUT_FIELD_HEIGHT + 3 * COMPOSITE_ATTRIBUTE_LABELS_V_GAP;
 				} else if ( defn is TaxonAttributeDefinitionProxy ) {
-					result = 5 * ATTRIBUTE_INPUT_FIELD_HEIGHT;
+					result = 5 * ATTRIBUTE_INPUT_FIELD_HEIGHT + 4 * COMPOSITE_ATTRIBUTE_LABELS_V_GAP;
 				} else {
 					result = ATTRIBUTE_INPUT_FIELD_HEIGHT;
 				}
@@ -392,14 +397,14 @@ package org.openforis.collect.ui {
 		}
 		
 		private static function getEntityDataGroupHeader(defn:EntityDefinitionProxy, parentEntity:EntityProxy = null):IVisualElement {
-			var dispositionByColumns:Boolean = defn.parent != null && defn.parent.disposition == UIOptions$Disposition.BY_COLUMNS;
+			var directionByColumns:Boolean = defn.parent != null && defn.parent.direction == UIOptions$Direction.BY_COLUMNS;
 			var result:SkinnableContainer = new SkinnableContainer();
 			result.styleName = DATA_GROUP_HEADER_STYLE;
 			var l:Label = new Label();
 			l.styleName = HEADER_LABEL_STYLE;
 			l.text = defn.getNumberAndHeadingLabelText();
 			var layout:LayoutBase;
-			if ( dispositionByColumns ) {
+			if ( directionByColumns ) {
 				layout = new HorizontalLayout();
 				l.width = 200;
 			} else {
@@ -414,7 +419,7 @@ package org.openforis.collect.ui {
 			result.addElement(entityLabelContainer);
 			
 			var childDefinitionsContainer:Group;
-			if ( dispositionByColumns ) {
+			if ( directionByColumns ) {
 				var vGroup:VGroup = new VGroup();
 				vGroup.gap = TABLE_VERTICAL_GAP;
 				childDefinitionsContainer = vGroup;
@@ -440,47 +445,62 @@ package org.openforis.collect.ui {
 			result.styleName = DATA_GROUP_HEADER_STYLE;
 			var width:Number = getAttributeDataGroupHeaderWidth(defn, parentEntity);
 			result.width = width;
-			var dispositionByColumns:Boolean = defn.parent != null && defn.parent.disposition == UIOptions$Disposition.BY_COLUMNS;
-			if ( dispositionByColumns ) {
+			var directionByColumns:Boolean = defn.parent != null && defn.parent.direction == UIOptions$Direction.BY_COLUMNS;
+			if ( directionByColumns ) {
 				result.height = getAttributeDataGroupHeaderHeight(defn, parentEntity);
+				var layout:HorizontalLayout = new HorizontalLayout();
+				layout.paddingTop = GROUPING_LABEL_PADDING_TOP;
+				result.layout = layout;
 			} else {
 				result.percentHeight = 100;
 			}
-			var h:HGroup;
+			var compositeAttributeLabelsGroup:Group;
+			if ( directionByColumns ) {
+				compositeAttributeLabelsGroup = new VGroup();
+				(compositeAttributeLabelsGroup as VGroup).gap = COMPOSITE_ATTRIBUTE_LABELS_V_GAP;
+			} else {
+				compositeAttributeLabelsGroup = new HGroup();
+				(compositeAttributeLabelsGroup as HGroup).gap = COMPOSITE_ATTRIBUTE_H_GAP;
+			}
+			
 			var l:Label;
 			var defnLabel:String = defn.getNumberAndHeadingLabelText();
 			if(defn is TaxonAttributeDefinitionProxy) {
 				//attribute label
-				l = getLabel(defnLabel, 100, MAIN_HEADER_STYLE, dispositionByColumns);
+				l = getLabel(defnLabel, 100, MAIN_HEADER_STYLE, directionByColumns);
 				result.addElement(l);
 				//subheader
-				h = new HGroup();
-				h.gap = COMPOSITE_ATTRIBUTE_H_GAP;
-				l = getLabel(Message.get('edit.taxon.code'), 80, HEADER_LABEL_STYLE, dispositionByColumns);
-				h.addElement(l);
-				l = getLabel(Message.get('edit.taxon.scientificName'), 100, HEADER_LABEL_STYLE, dispositionByColumns);
-				h.addElement(l);
-				l = getLabel(Message.get('edit.taxon.vernacularName'), 100, HEADER_LABEL_STYLE, dispositionByColumns);
-				h.addElement(l);
-				l = getLabel(Message.get('edit.taxon.languageCode'), 100, HEADER_LABEL_STYLE, dispositionByColumns);
-				h.addElement(l);
-				l = getLabel(Message.get('edit.taxon.languageVariety'), 100, HEADER_LABEL_STYLE, dispositionByColumns);
-				h.addElement(l);
-				result.addElement(h);
+				l = getLabel(Message.get('edit.taxon.code'), 80, HEADER_LABEL_STYLE, directionByColumns);
+				l.height = ATTRIBUTE_INPUT_FIELD_HEIGHT;
+				compositeAttributeLabelsGroup.addElement(l);
+				l = getLabel(Message.get('edit.taxon.scientificName'), 100, HEADER_LABEL_STYLE, directionByColumns);
+				l.height = ATTRIBUTE_INPUT_FIELD_HEIGHT;
+				compositeAttributeLabelsGroup.addElement(l);
+				l = getLabel(Message.get('edit.taxon.vernacularName'), 100, HEADER_LABEL_STYLE, directionByColumns);
+				l.height = ATTRIBUTE_INPUT_FIELD_HEIGHT;
+				compositeAttributeLabelsGroup.addElement(l);
+				l = getLabel(Message.get('edit.taxon.languageCode'), 100, HEADER_LABEL_STYLE, directionByColumns);
+				l.height = ATTRIBUTE_INPUT_FIELD_HEIGHT;
+				compositeAttributeLabelsGroup.addElement(l);
+				l = getLabel(Message.get('edit.taxon.languageVariety'), 100, HEADER_LABEL_STYLE, directionByColumns);
+				l.height = ATTRIBUTE_INPUT_FIELD_HEIGHT;
+				compositeAttributeLabelsGroup.addElement(l);
+				result.addElement(compositeAttributeLabelsGroup);
 			} else if(defn is CoordinateAttributeDefinitionProxy) {
 				//attribute label
-				l = getLabel(defnLabel, 100 + 70 + 70 + COMPOSITE_ATTRIBUTE_H_GAP * 2, HEADER_LABEL_STYLE, dispositionByColumns);
+				l = getLabel(defnLabel, 100 + 70 + 70 + COMPOSITE_ATTRIBUTE_H_GAP * 2, HEADER_LABEL_STYLE, directionByColumns);
 				result.addElement(l);
 				//subheader
-				h = new HGroup();
-				h.gap = COMPOSITE_ATTRIBUTE_H_GAP;
-				l = getLabel(Message.get('edit.coordinate.srs'), 100, HEADER_LABEL_STYLE, dispositionByColumns);
-				h.addElement(l);
-				l = getLabel(Message.get('edit.coordinate.x'), 70, HEADER_LABEL_STYLE, dispositionByColumns);
-				h.addElement(l);
-				l = getLabel(Message.get('edit.coordinate.y'), 70, HEADER_LABEL_STYLE, dispositionByColumns);
-				h.addElement(l);
-				result.addElement(h);
+				l = getLabel(Message.get('edit.coordinate.srs'), 100, HEADER_LABEL_STYLE, directionByColumns);
+				l.height = ATTRIBUTE_INPUT_FIELD_HEIGHT;
+				compositeAttributeLabelsGroup.addElement(l);
+				l = getLabel(Message.get('edit.coordinate.x'), 70, HEADER_LABEL_STYLE, directionByColumns);
+				l.height = ATTRIBUTE_INPUT_FIELD_HEIGHT;
+				compositeAttributeLabelsGroup.addElement(l);
+				l = getLabel(Message.get('edit.coordinate.y'), 70, HEADER_LABEL_STYLE, directionByColumns);
+				l.height = ATTRIBUTE_INPUT_FIELD_HEIGHT;
+				compositeAttributeLabelsGroup.addElement(l);
+				result.addElement(compositeAttributeLabelsGroup);
 			} else if (defn is NumberAttributeDefinitionProxy && NumberAttributeDefinitionProxy(defn).defaultUnit != null || 
 				defn is RangeAttributeDefinitionProxy && RangeAttributeDefinitionProxy(defn).defaultUnit != null ) {
 				var defaultUnit:UnitProxy;
@@ -490,10 +510,10 @@ package org.openforis.collect.ui {
 					defaultUnit = RangeAttributeDefinitionProxy(defn).defaultUnit;
 				}
 				var labStr:String = defnLabel + " (" + defaultUnit.getAbbreviation() + ")";
-				l = getLabel(labStr, width, HEADER_LABEL_STYLE, dispositionByColumns);
+				l = getLabel(labStr, width, HEADER_LABEL_STYLE, directionByColumns);
 				result.addElement(l);
 			} else {
-				l = getLabel(defnLabel, width, HEADER_LABEL_STYLE, dispositionByColumns);
+				l = getLabel(defnLabel, width, HEADER_LABEL_STYLE, directionByColumns);
 				result.addElement(l);
 			}
 			return result;

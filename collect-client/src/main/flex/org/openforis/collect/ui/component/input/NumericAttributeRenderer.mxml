@@ -41,7 +41,8 @@
 
 	<detail:states>
 		<s:State name="horizontal" />
-		<s:State name="vertical" />
+		<s:State name="vertical_table" />
+		<s:State name="vertical_form" />
 		<s:State name="noUnit" />
 		<s:State name="singleUnit" />
 		<s:State name="multipleUnits" />

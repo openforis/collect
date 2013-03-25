@@ -22,7 +22,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.metamodel.proxy.DateAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.NumberAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.RangeAttributeDefinitionProxy;
-	import org.openforis.collect.metamodel.ui.UIOptions$Disposition;
+	import org.openforis.collect.metamodel.ui.UIOptions$Direction;
 	import org.openforis.collect.model.FieldSymbol;
 	import org.openforis.collect.model.proxy.AttributeProxy;
 	import org.openforis.collect.model.proxy.CodeAttributeProxy;
@@ -353,10 +353,10 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function keyDownHandler(event:KeyboardEvent):void {
-			var dispositionByColumns:Boolean = _view.attributeDefinition.parent != null && _view.attributeDefinition.parent.disposition == UIOptions$Disposition.BY_COLUMNS;
+			var directionByColumns:Boolean = _view.attributeDefinition.parent != null && _view.attributeDefinition.parent.direction == UIOptions$Direction.BY_COLUMNS;
 			var keyCode:uint = event.keyCode;
 			var offset:int = 0;
-			var moveByEntity:Boolean = ! dispositionByColumns;
+			var moveByEntity:Boolean = ! directionByColumns;
 			switch(keyCode) {
 				case Keyboard.ESCAPE:
 					undoLastChange();
@@ -387,9 +387,9 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function handleTabKey(shiftKey:Boolean = false):void {
-			var dispositionByColumns:Boolean = _view.attributeDefinition.parent != null && _view.attributeDefinition.parent.disposition == UIOptions$Disposition.BY_COLUMNS;
+			var directionByColumns:Boolean = _view.attributeDefinition.parent != null && _view.attributeDefinition.parent.direction == UIOptions$Direction.BY_COLUMNS;
 			var focusChanged:Boolean = false;
-			if ( dispositionByColumns ) {
+			if ( directionByColumns ) {
 				var offset:int = shiftKey ? -1: 1;
 				var siblingFocusableField:FieldProxy = getSiblingFocusableFieldInAttribute(getField(), ! shiftKey);
 				if ( siblingFocusableField == null ) {
@@ -458,6 +458,15 @@ package org.openforis.collect.presenter {
 				if ( isFieldFocusable(f) ) {
 					result.addItem(f);
 				}
+			}
+			return result;
+		}
+		
+		public static function getLeafFocusableAttributes(entity:EntityProxy):IList {
+			var result:ArrayCollection = new ArrayCollection();
+			var leafAttributes:IList = entity.getLeafAttributes();
+			for each (var a:AttributeProxy in leafAttributes) {
+				result.addItem(a);
 			}
 			return result;
 		}

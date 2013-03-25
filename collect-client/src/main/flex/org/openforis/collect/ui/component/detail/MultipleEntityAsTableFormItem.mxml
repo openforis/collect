@@ -17,13 +17,13 @@
 			import org.openforis.collect.presenter.MultipleEntityAsTableFormItemPresenter;
 			import org.openforis.collect.ui.Images;
 			
-			public static const DISPOSITION_BY_COLUMNS:String = "byColumns";
-			public static const DISPOSITION_BY_ROWS:String = "byRows";
+			public static const DIRECTION_BY_COLUMNS:String = "byColumns";
+			public static const DIRECTION_BY_ROWS:String = "byRows";
 			
 			public static const STATE_BY_COLUMNS:String = "byColumns";
 			public static const STATE_BY_ROWS:String = "byRows";
 			
-			private var _entitiesDisposition:String = DISPOSITION_BY_ROWS;
+			private var _entitiesDirection:String = DIRECTION_BY_ROWS;
 			//private var _constraintLayout:ConstraintLayout;
 			
 			override protected function creationCompleteHandler(event:FlexEvent):void {
@@ -43,7 +43,7 @@
 			}
 			
 			protected function updateCurrentState():void {
-				currentState = _entitiesDisposition == DISPOSITION_BY_COLUMNS ? STATE_BY_COLUMNS: STATE_BY_ROWS;
+				currentState = _entitiesDirection == DIRECTION_BY_COLUMNS ? STATE_BY_COLUMNS: STATE_BY_ROWS;
 			}
 			
 			/*
@@ -57,14 +57,14 @@
 			}
 			*/
 			
-			[Bindable(event="entitiesDispositionChange")]
-			public function get entitiesDisposition():String {
-				return _entitiesDisposition;
+			[Bindable(event="entitiesDirectionChange")]
+			public function get entitiesDirection():String {
+				return _entitiesDirection;
 			}
 			
-			public function set entitiesDisposition(value:String):void {
-				_entitiesDisposition = value;
-				dispatchEvent(new Event("entitiesDispositionChange"));
+			public function set entitiesDirection(value:String):void {
+				_entitiesDirection = value;
+				dispatchEvent(new Event("entitiesDirectionChange"));
 				updateCurrentState();
 			}
 		]]>
@@ -129,12 +129,12 @@
 							  includeInLayout="{entityDefinition.showRowNumbers}"
 							  width="20" />
 					<datagroup:DataGroupHeader id="header" 
-											   styleName="{entitiesDisposition == MultipleEntityAsTableFormItem.DISPOSITION_BY_ROWS ? 
+											   styleName="{entitiesDirection == MultipleEntityAsTableFormItem.DIRECTION_BY_ROWS ? 
 												   'horizontal': 'vertical'}"
 											   nodeDefinitions="{nodeDefinitions}"
 											   parentEntity="{parentEntity}"
-											   labelsDisposition="{entitiesDisposition == MultipleEntityAsTableFormItem.DISPOSITION_BY_ROWS ? 
-											   		DataGroupHeader.DISPOSITION_HORIZONTAL: DataGroupHeader.DISPOSITION_VERTICAL}"
+											   labelsDirection="{entitiesDirection == MultipleEntityAsTableFormItem.DIRECTION_BY_ROWS ? 
+											   		DataGroupHeader.DIRECTION_HORIZONTAL: DataGroupHeader.DIRECTION_VERTICAL}"
 											   />
 					<!-- spacer that ensures the correct alignment of the headerScroller with the dataGroup scroller -->
 					<s:Spacer 
@@ -162,8 +162,8 @@
 								modelVersion="{outerDocument.modelVersion}"
 								nodeDefinitions="{outerDocument.nodeDefinitions}"
 								dragEnabled="{Application.activeRecordEditable &amp;&amp; ! outerDocument.entityDefinition.enumerable}"
-								nodesDisposition="{outerDocument.entitiesDisposition == MultipleEntityAsTableFormItem.DISPOSITION_BY_COLUMNS ? 
-									EntityDataGroupItemRenderer.DISPOSITION_VERTICAL: EntityDataGroupItemRenderer.DISPOSITION_HORIZONTAL}"
+								nodesDirection="{outerDocument.entitiesDirection == MultipleEntityAsTableFormItem.DIRECTION_BY_COLUMNS ? 
+									EntityDataGroupItemRenderer.DIRECTION_VERTICAL: EntityDataGroupItemRenderer.DIRECTION_HORIZONTAL}"
 								>
 								<fx:Script>
 									<![CDATA[

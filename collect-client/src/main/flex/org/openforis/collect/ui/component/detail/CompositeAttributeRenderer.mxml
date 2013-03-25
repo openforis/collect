@@ -9,7 +9,8 @@
 			import org.openforis.collect.presenter.CompositeAttributePresenter;
 			
 			public static const STATE_HORIZONTAL:String = "horizontal";
-			public static const STATE_VERTICAL:String = "vertical";
+			public static const STATE_VERTICAL_TABLE:String = "vertical_table";
+			public static const STATE_VERTICAL_FORM:String = "vertical_form";
 			
 			private var _subLabelWidth:Number = 130;
 			private var _inputFields:Array;
@@ -40,7 +41,8 @@
 	
 	<detail:states>
 		<s:State name="horizontal" />
-		<s:State name="vertical" />
+		<s:State name="vertical_table" />
+		<s:State name="vertical_form" basedOn="vertical_table" />
 	</detail:states>
 	
 </detail:AttributeItemRenderer>

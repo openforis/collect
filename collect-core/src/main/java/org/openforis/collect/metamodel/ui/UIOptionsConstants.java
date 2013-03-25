@@ -17,7 +17,7 @@ public interface UIOptionsConstants {
 	String TAB_SET_NAME = "tabSet";
 	String TAB = "tab";
 	String LAYOUT = "layout";
-	String DISPOSITION = "disposition";
+	String DIRECTION = "direction";
 	String COUNT = "count";
 	String SHOW_ROW_NUMBERS = "showRowNumbers";
 
