@@ -190,7 +190,7 @@ ALTER TABLE "collect"."ofc_user"
 ----------------------------
 --- APPLICATION VERSION
 ----------------------------
-INSERT INTO "collect"."ofc_application_info" ("version") VALUES ('3.0-Alpha5');
+INSERT INTO "collect"."ofc_application_info" ("version") VALUES ('3.0-Alpha6');
 
 -- INSERT INTO "collect"."ofc_config" ("name", "value") VALUES 
 --	('upload_path', '/home/openforis/collect-upload'),
