@@ -9,9 +9,6 @@ CREATE SEQUENCE "collect"."ofc_taxon_vernacular_name_id_seq";
 CREATE SEQUENCE "collect"."ofc_user_id_seq"	;
 CREATE SEQUENCE "collect"."ofc_user_role_id_seq";
 
-----------------------------
---- BEGIN GENERATED CODE ---
-----------------------------
 CREATE TABLE "collect"."ofc_application_info"  ( 
 	"version"	varchar(25) NOT NULL 
 );
@@ -167,7 +164,7 @@ ALTER TABLE "collect"."ofc_user_role"
 	FOREIGN KEY("user_id")
 	REFERENCES "collect"."ofc_user"("id");
 ALTER TABLE "collect"."ofc_record"
-    ADD CONSTRAINT "ofc_record_survey_fkey"
+  ADD CONSTRAINT "ofc_record_survey_fkey"
 	FOREIGN KEY("survey_id")
 	REFERENCES "collect"."ofc_survey"("id");
 ALTER TABLE "collect"."ofc_record"
@@ -186,6 +183,24 @@ ALTER TABLE "collect"."ofc_sampling_design"
 	ADD CONSTRAINT "ofc_sampling_design_survey_work_fkey"
 	FOREIGN KEY("survey_work_id")
 	REFERENCES "collect"."ofc_survey_work"("id");
---------------------------
---- END GENERATED CODE ---
---------------------------
+ALTER TABLE "collect"."ofc_user"
+	ADD CONSTRAINT "ofc_user_username_key"
+	UNIQUE ("username");
+
+----------------------------
+--- APPLICATION VERSION
+----------------------------
+INSERT INTO "collect"."ofc_application_info" ("version") VALUES ('3.0-Alpha5');
+
+-- INSERT INTO "collect"."ofc_config" ("name", "value") VALUES 
+--	('upload_path', '/home/openforis/collect-upload'),
+--  ('index_path', '/home/openforis/collect-index');
+
+----------------------------
+--- ADMIN USER
+----------------------------
+INSERT INTO collect.ofc_user(id, username, password ,enabled) VALUES 
+	(nextval('collect.ofc_user_id_seq'), 'admin', '21232f297a57a5a743894a0e4a801fc3', 'Y');
+
+INSERT INTO collect.ofc_user_role(id, user_id, role) VALUES 
+	(nextval('collect.ofc_user_role_id_seq'), currval('collect.ofc_user_id_seq'), 'ROLE_ADMIN');

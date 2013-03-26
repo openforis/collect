@@ -341,6 +341,11 @@
 			<artifactId>lucene-core</artifactId>
 			<version>3.6.1</version>
 		</dependency>
+    <dependency>
+    	<groupId>org.liquibase</groupId>
+    	<artifactId>liquibase-core</artifactId>
+    	<version>2.0.5</version>
+    </dependency>
 		<!--  TEST DEPENDENCIES -->
 		<dependency>
 			<groupId>org.springframework</groupId>

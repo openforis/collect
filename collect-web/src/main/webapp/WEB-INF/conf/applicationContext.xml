@@ -130,7 +130,9 @@
     <!-- ===================================== -->
 	<!-- Daos -->
 	<!-- ===================================== -->
-	<bean id="applicationInfoDao" class="org.openforis.collect.persistence.ApplicationInfoDao">
+	<bean id="applicationInfoDao" class="org.openforis.collect.persistence.ApplicationInfoDao"
+      lazy-init="false"
+      depends-on="liquibase">
     	<property name="dataSource" ref="dataSource"/>
 	</bean>
 	<bean id="configurationDao" class="org.openforis.collect.persistence.ConfigurationDao">
@@ -188,4 +190,13 @@
 	<!-- ===================================== -->
 	<bean id="userDetailsService"	class="org.openforis.collect.security.CollectUserDetailsService" />
 	
+  <!-- ===================================== -->
+  <!-- Liquibase -->
+  <!-- ===================================== -->
+  <bean id="liquibase" class="liquibase.integration.spring.SpringLiquibase">
+      <property name="dataSource" ref="dataSource" />
+      <property name="changeLog" value="classpath:org/openforis/collect/liquibase/db-changelog.xml" />
+      <property name="defaultSchema" value="collect" />
+  </bean>
+  
 </beans>
