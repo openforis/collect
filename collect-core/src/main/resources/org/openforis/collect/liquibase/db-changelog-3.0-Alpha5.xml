@@ -6,8 +6,7 @@
   <changeSet author="ricci" id="1">
 
     <preConditions onFail="HALT">
-      <sqlCheck expectedResult="3.0-Alpha5">select version from
-        collect.ofc_application_info</sqlCheck>
+      <sqlCheck expectedResult="3.0-Alpha5">select version from collect.ofc_application_info</sqlCheck>
     </preConditions>
   
     <dropNotNullConstraint tableName="ofc_taxon"
