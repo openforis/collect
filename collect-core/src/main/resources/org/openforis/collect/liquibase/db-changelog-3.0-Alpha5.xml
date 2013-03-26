@@ -5,7 +5,7 @@
 
   <changeSet author="ricci" id="1">
 
-    <preConditions onFail="HALT">
+    <preConditions onFail="MARK_RAN">
       <sqlCheck expectedResult="3.0-Alpha5">select version from collect.ofc_application_info</sqlCheck>
     </preConditions>
   
