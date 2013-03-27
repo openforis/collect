@@ -7,6 +7,6 @@
     <sqlCheck expectedResult="1">select count(*) from collect.ofc_application_info where version >= '3.0-Alpha5'</sqlCheck>
   </preConditions>
   
-  <include file="org/openforis/collect/liquibase/db-changelog-3.0-Alpha5.xml" />
+  <include file="org/openforis/collect/db/changelog/db.changelog-3.0-Alpha5.xml" />
   
 </databaseChangeLog> 
