@@ -283,7 +283,7 @@
 		<dependency>
 			<groupId>org.openforis.idm</groupId>
 			<artifactId>idm-api-protostuff</artifactId>
-			<version>3.1</version>
+			<version>3.0-Alpha6</version>
 		</dependency>
 		<dependency>
 			<groupId>org.openforis.idm</groupId>
