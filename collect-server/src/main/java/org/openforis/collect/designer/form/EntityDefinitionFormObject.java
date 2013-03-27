@@ -35,6 +35,7 @@ public class EntityDefinitionFormObject<T extends EntityDefinition> extends Node
 		uiOptions.setShowRowNumbersValue(dest, showRowNumbers);
 		Direction directionEnum = super.isMultiple() && layout == Layout.TABLE &&
 				Direction.BY_COLUMNS.getValue().equals(this.direction) ? Direction.BY_COLUMNS: null;
+		direction = directionEnum == null ? null: directionEnum.getValue();
 		uiOptions.setDirection(dest, directionEnum);
 	}
 	

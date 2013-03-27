@@ -21,7 +21,7 @@
           </div>
         </fieldErrorHandler>
       </row>
-      <row>
+      <row visible="@load(fx.layoutType eq 'TABLE')">
         <label value="${labels.survey.schema.entity.layout.direction_label}:" />
         <fieldErrorHandler message="@load(vmsgs['direction'])">
           <div>

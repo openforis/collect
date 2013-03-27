@@ -84,7 +84,6 @@ package org.openforis.collect.ui {
 		private static const TABLE_HORIZONTAL_GAP:int = 4;
 		private static const DATA_GROUP_HEADER_STYLE:String = "dataGroupHeader";
 		private static const HEADER_LABEL_STYLE:String = "bold";
-		private static const MAIN_HEADER_STYLE:String = "dataGroupHeader";
 		private static const ATTRIBUTE_INPUT_FIELD_HEIGHT:Number = 22;
 		private static const VALIDATION_DISPLAY_BORDER_SIZE:Number = 1;
 		private static const VALIDATION_DISPLAY_DOUBLE_BORDER_SIZE:Number = 2 * VALIDATION_DISPLAY_BORDER_SIZE;
@@ -467,7 +466,7 @@ package org.openforis.collect.ui {
 			var defnLabel:String = defn.getNumberAndHeadingLabelText();
 			if(defn is TaxonAttributeDefinitionProxy) {
 				//attribute label
-				l = getLabel(defnLabel, 100, MAIN_HEADER_STYLE, directionByColumns);
+				l = getLabel(defnLabel, 100, HEADER_LABEL_STYLE, directionByColumns);
 				result.addElement(l);
 				//subheader
 				l = getLabel(Message.get('edit.taxon.code'), 80, HEADER_LABEL_STYLE, directionByColumns);
@@ -488,7 +487,8 @@ package org.openforis.collect.ui {
 				result.addElement(compositeAttributeLabelsGroup);
 			} else if(defn is CoordinateAttributeDefinitionProxy) {
 				//attribute label
-				l = getLabel(defnLabel, 100 + 70 + 70 + COMPOSITE_ATTRIBUTE_H_GAP * 2, HEADER_LABEL_STYLE, directionByColumns);
+				//l = getLabel(defnLabel, 100 + 70 + 70 + COMPOSITE_ATTRIBUTE_H_GAP * 2, HEADER_LABEL_STYLE, directionByColumns);
+				l = getLabel(defnLabel, 100, HEADER_LABEL_STYLE, directionByColumns);
 				result.addElement(l);
 				//subheader
 				l = getLabel(Message.get('edit.coordinate.srs'), 100, HEADER_LABEL_STYLE, directionByColumns);
@@ -544,6 +544,7 @@ package org.openforis.collect.ui {
 			l.styleName = styleName;
 			if ( displayOneRow ) {
 				l.maxDisplayedLines = 1;
+				l.showTruncationTip = true;
 			}
 			return l;
 		}

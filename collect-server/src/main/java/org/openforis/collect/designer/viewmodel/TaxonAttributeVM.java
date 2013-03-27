@@ -8,6 +8,7 @@ import static org.openforis.collect.designer.model.LabelKeys.EMPTY_OPTION;
 import static org.openforis.collect.designer.model.LabelKeys.RANK_PREFIX;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.openforis.collect.designer.form.TaxonAttributeDefinitionFormObject;
@@ -129,7 +130,11 @@ public class TaxonAttributeVM extends AttributeVM<TaxonAttributeDefinition> {
 		if  (surveyId == null ) {
 			SessionStatus sessionStatus = getSessionStatus();
 			Integer publishedSurveyId = sessionStatus.getPublishedSurveyId();
-			taxonomies = speciesManager.loadTaxonomiesBySurvey(publishedSurveyId);
+			if ( publishedSurveyId == null ) {
+				return Collections.emptyList();
+			} else {
+				taxonomies = speciesManager.loadTaxonomiesBySurvey(publishedSurveyId);
+			}
 		} else {
 			taxonomies = speciesManager.loadTaxonomiesBySurveyWork(surveyId);
 		}

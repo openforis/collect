@@ -21,8 +21,8 @@
 	
 	<detail:states>
 		<s:State name="horizontal" />
-		<s:State name="vertical_table" />
-		<s:State name="vertical_form" basedOn="vertical_table" />
+		<s:State name="vertical" />
+		<s:State name="vertical_form" basedOn="vertical" />
 	</detail:states>
 	
 	<s:HGroup includeIn="horizontal" gap="{UIBuilder.COMPOSITE_ATTRIBUTE_H_GAP}">
@@ -73,7 +73,7 @@
 								/>
 	</s:HGroup>
 	
-	<s:VGroup includeIn="vertical_table, vertical_form">
+	<s:VGroup includeIn="vertical, vertical_form">
 		<s:Label styleName="bold" 
 				 text="{attributeDefinition.getInstanceOrHeadingLabelText()}"
 				 includeIn="vertical_form" />
@@ -83,27 +83,27 @@
 						 styleName="bold" 
 						 text="{Message.get('edit.taxon.code')}"
 						 includeIn="vertical_form" />
-				<fx:Reparent target="codeTextInput" includeIn="vertical_table" />
+				<fx:Reparent target="codeTextInput" includeIn="vertical" />
 			</s:HGroup>
 			<s:HGroup>
 				<s:Label width="{subLabelWidth}" styleName="bold" text="{Message.get('edit.taxon.scientificName')}"
 						 includeIn="vertical_form" />
-				<fx:Reparent target="scientificNameTextInput" includeIn="vertical_table" />
+				<fx:Reparent target="scientificNameTextInput" includeIn="vertical" />
 			</s:HGroup>
 			<s:HGroup>
 				<s:Label width="{subLabelWidth}" styleName="bold" text="{Message.get('edit.taxon.vernacularName')}"
 						 includeIn="vertical_form" />
-				<fx:Reparent target="vernacularNameTextInput" includeIn="vertical_table" />
+				<fx:Reparent target="vernacularNameTextInput" includeIn="vertical" />
 			</s:HGroup>
 			<s:HGroup>
 				<s:Label width="{subLabelWidth}" styleName="bold" text="{Message.get('edit.taxon.languageCode')}"
 						 includeIn="vertical_form" />
-				<fx:Reparent target="languageAutocomplete" includeIn="vertical_table" />
+				<fx:Reparent target="languageAutocomplete" includeIn="vertical" />
 			</s:HGroup>
 			<s:HGroup>
 				<s:Label width="{subLabelWidth}" styleName="bold" text="{Message.get('edit.taxon.languageVariety')}"
 						 includeIn="vertical_form" />
-				<fx:Reparent target="languageVarietyTextInput" includeIn="vertical_table" />
+				<fx:Reparent target="languageVarietyTextInput" includeIn="vertical" />
 			</s:HGroup>
 		</s:VGroup>
 	</s:VGroup>

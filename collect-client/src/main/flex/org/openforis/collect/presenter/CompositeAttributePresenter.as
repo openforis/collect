@@ -26,7 +26,7 @@ package org.openforis.collect.presenter
 		protected function initViewState():void {
 			if(_view.attributeDefinition.parentLayout == UIUtil.LAYOUT_TABLE) {
 				if ( _view.attributeDefinition.parent.direction == UIOptions$Direction.BY_COLUMNS ) {
-					_view.currentState = CompositeAttributeRenderer.STATE_VERTICAL_TABLE;
+					_view.currentState = CompositeAttributeRenderer.STATE_VERTICAL;
 				} else {
 					_view.currentState = CompositeAttributeRenderer.STATE_HORIZONTAL;
 				}
