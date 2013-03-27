@@ -3,10 +3,6 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
    
-  <preConditions onFail="HALT">
-    <sqlCheck expectedResult="1">select count(*) from collect.ofc_application_info where version >= '3.0-Alpha5'</sqlCheck>
-  </preConditions>
+  <include file="org/openforis/collect/db/changelog/db.changelog-20130326.1500.xml" />
   
-  <include file="org/openforis/collect/db/changelog/db.changelog-3.0-Alpha5.xml" />
-  
-</databaseChangeLog> 
+</databaseChangeLog>
