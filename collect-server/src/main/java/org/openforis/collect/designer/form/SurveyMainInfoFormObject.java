@@ -54,7 +54,7 @@ public class SurveyMainInfoFormObject extends FormObject<CollectSurvey> {
 		String result = source.getProjectName(languageCode);
 		if ( result == null && languageCode != null && languageCode.equals(defaultLanguage) ) {
 			//try to get the label associated to default language
-			result = source.getDescription(null);
+			result = source.getProjectName(null);
 		}
 		return result;
 	}
