@@ -33,8 +33,19 @@
   <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
   	<property name="dataSource" ref="dataSource"/>
   </bean>
-    
-	<bean id="configurationDao" class="org.openforis.collect.persistence.ConfigurationDao">
+
+	<!-- ===================================== -->
+	<!-- Liquibase -->
+	<!-- ===================================== -->
+	<bean id="liquibase" class="liquibase.integration.spring.SpringLiquibase">
+		<property name="dataSource" ref="dataSource" />
+		<property name="changeLog"
+			value="classpath:org/openforis/collect/db/changelog/db.changelog-master.xml" />
+		<property name="defaultSchema" value="collect" />
+	</bean>
+  
+	<bean id="configurationDao" class="org.openforis.collect.persistence.ConfigurationDao" 
+		lazy-init="false" depends-on="liquibase">
   	<property name="dataSource" ref="dataSource"/>
 	</bean>
 	

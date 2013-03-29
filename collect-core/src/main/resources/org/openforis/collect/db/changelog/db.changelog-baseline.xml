@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+	<changeSet author="collect" id="baseline">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<tableExists tableName="ofc_application_info" />
+			</not>
+		</preConditions>
+		<createTable schemaName="collect" tableName="ofc_application_info">
+			<column name="version" type="VARCHAR(25)">
+				<constraints nullable="false" />
+			</column>
+		</createTable>
+		<createTable schemaName="collect" tableName="ofc_config">
+			<column name="name" type="VARCHAR(25)">
+				<constraints nullable="false" primaryKey="true"
+					primaryKeyName="ofc_config_pkey" />
+			</column>
+			<column name="value" type="VARCHAR(255)">
+				<constraints nullable="false" />
+			</column>
+		</createTable>
+		<createTable schemaName="collect" tableName="ofc_logo">
+			<column name="pos" type="int4">
+				<constraints nullable="false" primaryKey="true"
+					primaryKeyName="ofc_logo_pkey" />
+			</column>
+			<column name="image" type="bytea">
+				<constraints nullable="false" />
+			</column>
+		</createTable>
+		<createTable schemaName="collect" tableName="ofc_record">
+			<column name="id" type="int4">
+				<constraints nullable="false" primaryKey="true"
+					primaryKeyName="ofc_record_pkey" />
+			</column>
+			<column name="survey_id" type="int4">
+				<constraints nullable="false" />
+			</column>
+			<column name="root_entity_definition_id" type="int4">
+				<constraints nullable="false" />
+			</column>
+			<column name="date_created" type="TIMESTAMP" />
+			<column name="created_by_id" type="int4" />
+			<column name="date_modified" type="TIMESTAMP" />
+			<column name="modified_by_id" type="int4" />
+			<column name="model_version" type="VARCHAR(255)" />
+			<column name="step" type="int4" />
+			<column name="state" type="char(1)" />
+			<column name="skipped" type="int4" />
+			<column name="missing" type="int4" />
+			<column name="errors" type="int4" />
+			<column name="warnings" type="int4" />
+			<column name="key1" type="VARCHAR(2048)" />
+			<column name="key2" type="VARCHAR(2048)" />
+			<column name="key3" type="VARCHAR(2048)" />
+			<column name="count1" type="int4" />
+			<column name="count2" type="int4" />
+			<column name="count3" type="int4" />
+			<column name="count4" type="int4" />
+			<column name="count5" type="int4" />
+			<column name="data1" type="bytea" />
+			<column name="data2" type="bytea" />
+		</createTable>
+		<createTable schemaName="collect" tableName="ofc_survey">
+			<column name="id" type="int4">
+				<constraints nullable="false" primaryKey="true"
+					primaryKeyName="ofc_survey_pkey" />
+			</column>
+			<column name="name" type="VARCHAR(255)">
+				<constraints nullable="false" />
+			</column>
+			<column name="uri" type="VARCHAR(255)">
+				<constraints nullable="false" />
+			</column>
+			<column name="idml" type="TEXT">
+				<constraints nullable="false" />
+			</column>
+		</createTable>
+		<createTable schemaName="collect" tableName="ofc_survey_work">
+			<column name="id" type="int4">
+				<constraints nullable="false" primaryKey="true"
+					primaryKeyName="ofc_survey_work_pkey" />
+			</column>
+			<column name="name" type="VARCHAR(255)">
+				<constraints nullable="false" />
+			</column>
+			<column name="uri" type="VARCHAR(255)">
+				<constraints nullable="false" />
+			</column>
+			<column name="idml" type="TEXT">
+				<constraints nullable="false" />
+			</column>
+		</createTable>
+		<createTable schemaName="collect" tableName="ofc_taxon">
+			<column name="id" type="int4">
+				<constraints nullable="false" primaryKey="true"
+					primaryKeyName="ofc_taxon_pkey" />
+			</column>
+			<column name="taxon_id" type="int4">
+				<constraints nullable="false" />
+			</column>
+			<column name="code" type="VARCHAR(32)">
+				<constraints nullable="false" />
+			</column>
+			<column name="scientific_name" type="VARCHAR(255)">
+				<constraints nullable="false" />
+			</column>
+			<column name="taxon_rank" type="VARCHAR(128)">
+				<constraints nullable="false" />
+			</column>
+			<column name="taxonomy_id" type="int4">
+				<constraints nullable="false" />
+			</column>
+			<column name="step" type="int4">
+				<constraints nullable="false" />
+			</column>
+			<column name="parent_id" type="int4" />
+		</createTable>
+		<createTable schemaName="collect" tableName="ofc_taxon_vernacular_name">
+			<column name="id" type="int4">
+				<constraints nullable="false" primaryKey="true"
+					primaryKeyName="ofc_taxon_vernacular_name_pkey" />
+			</column>
+			<column name="vernacular_name" type="VARCHAR(255)" />
+			<column name="language_code" type="VARCHAR(3)">
+				<constraints nullable="false" />
+			</column>
+			<column name="language_variety" remarks="Dialect, lect, sublanguage or other"
+				type="VARCHAR(255)" />
+			<column name="taxon_id" type="int4" />
+			<column name="step" type="int4">
+				<constraints nullable="false" />
+			</column>
+			<column name="qualifier1" type="VARCHAR(255)" />
+			<column name="qualifier2" type="VARCHAR(255)" />
+			<column name="qualifier3" type="VARCHAR(255)" />
+		</createTable>
+		<createTable schemaName="collect" tableName="ofc_taxonomy">
+			<column name="id" type="int4">
+				<constraints nullable="false" primaryKey="true"
+					primaryKeyName="ofc_taxonomy_pkey" />
+			</column>
+			<column name="name" type="VARCHAR(255)">
+				<constraints nullable="false" />
+			</column>
+			<column name="metadata" type="TEXT">
+				<constraints nullable="false" />
+			</column>
+		</createTable>
+		<createTable schemaName="collect" tableName="ofc_user">
+			<column name="id" type="int4">
+				<constraints nullable="false" primaryKey="true"
+					primaryKeyName="ofc_user_pkey" />
+			</column>
+			<column name="username" type="VARCHAR(255)">
+				<constraints nullable="false" />
+			</column>
+			<column name="password" type="VARCHAR(255)">
+				<constraints nullable="false" />
+			</column>
+			<column defaultValue="Y" name="enabled" type="char(1)">
+				<constraints nullable="false" />
+			</column>
+		</createTable>
+		<createTable schemaName="collect" tableName="ofc_user_role">
+			<column name="id" type="int4">
+				<constraints nullable="false" primaryKey="true"
+					primaryKeyName="ofc_user_role_pkey" />
+			</column>
+			<column name="user_id" type="int4">
+				<constraints nullable="false" />
+			</column>
+			<column name="role" type="VARCHAR(255)" />
+		</createTable>
+		<addUniqueConstraint columnNames="name"
+			constraintName="ofc_survey_name_key" deferrable="false" disabled="false"
+			initiallyDeferred="false" schemaName="collect" tableName="ofc_survey" />
+		<addUniqueConstraint columnNames="uri"
+			constraintName="ofc_survey_uri_key" deferrable="false" disabled="false"
+			initiallyDeferred="false" schemaName="collect" tableName="ofc_survey" />
+		<addUniqueConstraint columnNames="name"
+			constraintName="ofc_survey_work_name_key" deferrable="false"
+			disabled="false" initiallyDeferred="false" schemaName="collect"
+			tableName="ofc_survey_work" />
+		<addUniqueConstraint columnNames="uri"
+			constraintName="ofc_survey_work_uri_key" deferrable="false" disabled="false"
+			initiallyDeferred="false" schemaName="collect" tableName="ofc_survey_work" />
+		<addUniqueConstraint columnNames="taxon_id, taxonomy_id"
+			constraintName="ofc_taxon_id_key" deferrable="false" disabled="false"
+			initiallyDeferred="false" schemaName="collect" tableName="ofc_taxon" />
+		<addUniqueConstraint columnNames="name"
+			constraintName="ofc_taxonomy_name_key" deferrable="false" disabled="false"
+			initiallyDeferred="false" schemaName="collect" tableName="ofc_taxonomy" />
+		<addForeignKeyConstraint baseColumnNames="created_by_id"
+			baseTableName="ofc_record" baseTableSchemaName="collect"
+			constraintName="ofc_record_created_by_user_fkey" deferrable="false"
+			initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+			referencedColumnNames="id" referencedTableName="ofc_user"
+			referencedTableSchemaName="collect" referencesUniqueColumn="false" />
+		<addForeignKeyConstraint baseColumnNames="modified_by_id"
+			baseTableName="ofc_record" baseTableSchemaName="collect"
+			constraintName="ofc_record_modified_by_user_fkey" deferrable="false"
+			initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+			referencedColumnNames="id" referencedTableName="ofc_user"
+			referencedTableSchemaName="collect" referencesUniqueColumn="false" />
+		<addForeignKeyConstraint baseColumnNames="survey_id"
+			baseTableName="ofc_record" baseTableSchemaName="collect"
+			constraintName="ofc_record_survey_fkey" deferrable="false"
+			initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+			referencedColumnNames="id" referencedTableName="ofc_survey"
+			referencedTableSchemaName="collect" referencesUniqueColumn="false" />
+		<addForeignKeyConstraint baseColumnNames="parent_id"
+			baseTableName="ofc_taxon" baseTableSchemaName="collect"
+			constraintName="ofc_taxon_parent_fkey" deferrable="false"
+			initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+			referencedColumnNames="id" referencedTableName="ofc_taxon"
+			referencedTableSchemaName="collect" referencesUniqueColumn="false" />
+		<addForeignKeyConstraint baseColumnNames="taxonomy_id"
+			baseTableName="ofc_taxon" baseTableSchemaName="collect"
+			constraintName="ofc_taxon_taxonomy_fkey" deferrable="false"
+			initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+			referencedColumnNames="id" referencedTableName="ofc_taxonomy"
+			referencedTableSchemaName="collect" referencesUniqueColumn="false" />
+		<addForeignKeyConstraint baseColumnNames="taxon_id"
+			baseTableName="ofc_taxon_vernacular_name" baseTableSchemaName="collect"
+			constraintName="ofc_taxon_vernacular_name_taxon_fkey" deferrable="false"
+			initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+			referencedColumnNames="id" referencedTableName="ofc_taxon"
+			referencedTableSchemaName="collect" referencesUniqueColumn="false" />
+		<addForeignKeyConstraint baseColumnNames="user_id"
+			baseTableName="ofc_user_role" baseTableSchemaName="collect"
+			constraintName="ofc_user_user_role_fkey" deferrable="false"
+			initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+			referencedColumnNames="id" referencedTableName="ofc_user"
+			referencedTableSchemaName="collect" referencesUniqueColumn="false" />
+		<createSequence schemaName="collect" sequenceName="ofc_record_id_seq" />
+		<createSequence schemaName="collect" sequenceName="ofc_survey_id_seq" />
+		<createSequence schemaName="collect" sequenceName="ofc_survey_work_id_seq" />
+		<createSequence schemaName="collect" sequenceName="ofc_taxon_id_seq" />
+		<createSequence schemaName="collect"
+			sequenceName="ofc_taxon_vernacular_name_id_seq" />
+		<createSequence schemaName="collect" sequenceName="ofc_taxonomy_id_seq" />
+		<createSequence schemaName="collect" sequenceName="ofc_user_id_seq" />
+		<createSequence schemaName="collect" sequenceName="ofc_user_role_id_seq" />
+		
+		<!-- INSERT VERSION -->
+		<insert schemaName="collect" tableName="ofc_application_info">
+			<column name="version" value="3.0-Alpha5" />
+		</insert>
+		<!-- INSERT admin" USER WITH PASSWORD "admin" -->
+		<insert schemaName="collect" tableName="ofc_user">
+			<column name="id" valueComputed="nextval('collect.ofc_user_id_seq')" />
+			<column name="username" value="admin" />
+			<column name="password" value="21232f297a57a5a743894a0e4a801fc3" />
+			<column name="enabled" value="Y" />
+		</insert>
+		<insert schemaName="collect" tableName="ofc_user_role">
+			<column name="id" valueComputed="nextval('collect.ofc_user_role_id_seq')" />
+			<column name="user_id" valueComputed="currval('collect.ofc_user_id_seq')" />
+			<column name="role" value="ROLE_ADMIN" />
+		</insert>
+	</changeSet>
+</databaseChangeLog>
