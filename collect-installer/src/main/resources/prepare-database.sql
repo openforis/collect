@@ -1,5 +1,5 @@
-CREATE DATABASE "collect" OWNER "collect";
+CREATE ROLE "collect" WITH PASSWORD "collect";
 
-CREATE USER "collect" WITH PASSWORD "collect";
+CREATE DATABASE "collect" OWNER "collect";
 
 CREATE SCHEMA "collect" AUTHORIZATION "collect";
