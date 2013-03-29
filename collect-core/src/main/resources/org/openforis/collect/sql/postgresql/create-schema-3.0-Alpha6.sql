@@ -53,10 +53,10 @@ CREATE TABLE "collect"."ofc_sampling_design"  (
 	"id"            	integer NOT NULL,
 	"survey_id"     	integer NULL,
 	"survey_work_id"	integer NULL,
-	"level1"       		varchar(256) NOT NULL,
-	"level2"       		varchar(256) NULL,
-	"level3"       		varchar(256) NULL,
-	"location"      	varchar(256) NOT NULL,
+	"level1"       		varchar(255) NOT NULL,
+	"level2"       		varchar(255) NULL,
+	"level3"       		varchar(255) NULL,
+	"location"      	varchar(255) NOT NULL,
 	PRIMARY KEY("id")
 );
 CREATE TABLE "collect"."ofc_survey"  ( 
