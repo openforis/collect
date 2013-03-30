@@ -24,6 +24,7 @@
 				<version>1.0-alpha-2</version>
 				<configuration>
 					<files>
+                        <file>default-dev.properties</file>
 						<file>dev.properties</file>
 					</files>
 					<quiet>true</quiet>
