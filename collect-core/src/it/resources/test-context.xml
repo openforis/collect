@@ -24,13 +24,13 @@
 <!-- 		<property name="location" value="file:${user.dir}/dev/default-dev.properties"/> -->
 <!-- 	</bean> -->
 
-	<bean id="devPropertyOverrideConfigurer"
+	<bean id="devPropertyConfigurer"
 		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
 		<!-- <property name="location" value="file:${user.dir}/dev.properties"/> -->
 		<property name="ignoreResourceNotFound" value="true"/>
 		<property name="locations">
 			<list>
-				<value>file:${user.dir}/dev/default-dev.properties</value>
+				<value>classpath:/default-dev.properties</value>
 				<value>file:${user.dir}/dev.properties</value>
 			</list>
 		</property>
