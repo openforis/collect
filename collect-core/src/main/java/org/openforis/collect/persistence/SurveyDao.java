@@ -17,6 +17,8 @@ import org.jooq.impl.Factory;
 import org.jooq.impl.SQLDataType;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SurveySummary;
+import org.openforis.collect.persistence.jooq.DialectAwareJooqFactory;
+import org.openforis.collect.persistence.jooq.MappingJooqFactory;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.xml.IdmlParseException;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,8 +43,8 @@ public class SurveyDao extends SurveyBaseDao {
 		String idml = marshalSurvey(survey);
 
 		// Insert into OFC_SURVEY table
-		Factory jf = getJooqFactory();
-		int surveyId = jf.nextval(OFC_SURVEY_ID_SEQ).intValue();
+		MappingJooqFactory<?> jf = (MappingJooqFactory<?>) getJooqFactory();
+		int surveyId = jf.nextId();
 		jf.insertInto(OFC_SURVEY).set(OFC_SURVEY.ID, surveyId)				
 				.set(OFC_SURVEY.NAME, survey.getName())
 				.set(OFC_SURVEY.URI, survey.getUri())
@@ -138,7 +140,8 @@ public class SurveyDao extends SurveyBaseDao {
 			LOG.debug("Checking survey");
 		}
 		if (result.isEmpty()) { // we should insert it now			
-			surveyId = jf.nextval(OFC_SURVEY_ID_SEQ).intValue();
+			MappingJooqFactory<?> jf = (MappingJooqFactory<?>) getJooqFactory();
+			surveyId = jf.nextId();
 			if ( LOG.isDebugEnabled() ) {
 				LOG.debug("    Survey " +  name + " not exist. Inserting with ID = " + surveyId );
 			}

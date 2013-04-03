@@ -8,6 +8,7 @@ import org.jooq.DeleteQuery;
 import org.jooq.InsertQuery;
 import org.jooq.Record;
 import org.jooq.Result;
+import org.jooq.SQLDialect;
 import org.jooq.SelectQuery;
 import org.jooq.Sequence;
 import org.jooq.SimpleSelectQuery;
@@ -139,8 +140,21 @@ public abstract class MappingJooqFactory<E> extends DialectAwareJooqFactory {
 		return entities;
 	}
 
-	private int nextId() {
-		return nextval(idSequence).intValue();
+	public int nextId() {
+		if (getDialect() == SQLDialect.SQLITE){
+			Integer id = fetchLastIdInTable();
+			if ( id == null ) {
+				return 1;
+			} else {
+				return id + 1;
+			}
+		} else {
+			return nextval(idSequence).intValue();	
+		}	
+	}
+
+	private Integer fetchLastIdInTable() {
+		return select(max(idField)).from(getTable()).fetchOne(idField);
 	}
 
 	private E newEntity() {

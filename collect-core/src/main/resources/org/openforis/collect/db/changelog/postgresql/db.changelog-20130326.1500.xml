@@ -2,8 +2,8 @@
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
-
-	<changeSet id="wrong-sampling-design-table-name" author="ricci">
+ 
+	<changeSet id="wrong-sampling-design-table-name" author="ricci" dbms="postgresql">
 
 	    <preConditions onFail="MARK_RAN">
 	    	<tableExists tableName="ofc_sampling_desing" />
@@ -34,7 +34,7 @@
 	    
 	</changeSet>
 	
-	<changeSet id="sampling-design-import-tool" author="ricci">
+	<changeSet id="sampling-design-import-tool" author="ricci" dbms="postgresql">
 
 		<preConditions onFail="MARK_RAN">
 	    	<not>
@@ -78,7 +78,7 @@
 		
 	</changeSet>
 	
-  	<changeSet id="species-import-tool" author="ricci">
+  	<changeSet id="species-import-tool" author="ricci" dbms="postgresql">
 
 	    <preConditions onFail="MARK_RAN">
 	    	<not>
@@ -124,7 +124,7 @@
 	  
 	</changeSet>
   
-	<changeSet id="username-key" author="ricci">
+	<changeSet id="username-key" author="ricci" dbms="postgresql">
 		<comment>Add unique constraint to ofc_user.username column</comment>
 		
 		<addUniqueConstraint constraintName="ofc_user_username_key"
