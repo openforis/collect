@@ -5,6 +5,8 @@ import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 
 import org.jooq.SQLDialect;
+import org.jooq.Sequence;
+import org.jooq.TableField;
 import org.jooq.conf.Settings;
 import org.jooq.impl.Factory;
 
@@ -48,4 +50,18 @@ public class DialectAwareJooqFactory extends Factory {
 		}  
 		return settings;
 	}
+	
+	public int nextId(TableField<?, Integer> idField, Sequence<? extends Number> idSequence) {
+		if (getDialect() == SQLDialect.SQLITE){
+			Integer id = (Integer) select(max(idField)).from(idField.getTable()).fetchOne(0);
+			if ( id == null ) {
+				return 1;
+			} else {
+				return id + 1;
+			}
+		} else {
+			return nextval(idSequence).intValue();	
+		}	
+	}
+
 }

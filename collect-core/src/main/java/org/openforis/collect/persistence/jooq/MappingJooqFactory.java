@@ -8,7 +8,6 @@ import org.jooq.DeleteQuery;
 import org.jooq.InsertQuery;
 import org.jooq.Record;
 import org.jooq.Result;
-import org.jooq.SQLDialect;
 import org.jooq.SelectQuery;
 import org.jooq.Sequence;
 import org.jooq.SimpleSelectQuery;
@@ -25,10 +24,10 @@ public abstract class MappingJooqFactory<E> extends DialectAwareJooqFactory {
 	private static final long serialVersionUID = 1L;
 	
 	private TableField<?,Integer> idField;
-	private Sequence<?> idSequence;
+	private Sequence<? extends Number> idSequence;
 	private Class<E> clazz;
 	
-	public MappingJooqFactory(Connection conn, TableField<?,Integer> idField, Sequence<?> idSequence, Class<E> clazz) {
+	public MappingJooqFactory(Connection conn, TableField<?,Integer> idField, Sequence<? extends Number> idSequence, Class<E> clazz) {
 		super(conn);
 		this.idField = idField;
 		this.idSequence = idSequence;
@@ -111,6 +110,10 @@ public abstract class MappingJooqFactory<E> extends DialectAwareJooqFactory {
 		fromObject(object, insert);
 		return insert;
 	}
+
+	protected int nextId() {
+		return nextId(idField, idSequence);
+	}
 	
 	@SuppressWarnings({"rawtypes"})
 	public UpdateQuery updateQuery(E object) {
@@ -138,23 +141,6 @@ public abstract class MappingJooqFactory<E> extends DialectAwareJooqFactory {
 			entities.add(result);
 		}
 		return entities;
-	}
-
-	public int nextId() {
-		if (getDialect() == SQLDialect.SQLITE){
-			Integer id = fetchLastIdInTable();
-			if ( id == null ) {
-				return 1;
-			} else {
-				return id + 1;
-			}
-		} else {
-			return nextval(idSequence).intValue();	
-		}	
-	}
-
-	private Integer fetchLastIdInTable() {
-		return select(max(idField)).from(getTable()).fetchOne(idField);
 	}
 
 	private E newEntity() {
