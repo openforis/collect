@@ -35,8 +35,8 @@
  	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
 		<property name="driverClassName" value="${collect.devdb.driver}" />
 		<property name="url" value="${collect.devdb.url}"/>
-<!-- 		<property name="username" value="${collect.devdb.username}" /> -->
-<!-- 		<property name="password" value="${collect.devdb.password}" /> -->
+		<property name="username" value="${collect.devdb.username}" />
+		<property name="password" value="${collect.devdb.password}" />
 	</bean>
 	
   <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
@@ -46,10 +46,10 @@
     <!-- ===================================== -->
 	<!-- Liquibase -->
 	<!-- ===================================== -->
-	<bean id="liquibase" class="liquibase.integration.spring.SpringLiquibase">
+	<bean id="liquibase" class="org.openforis.collect.persistence.liquibase.DatabaseAwareSpringLiquibase">
 		<property name="dataSource" ref="dataSource" />
 		<property name="changeLog" value="classpath:org/openforis/collect/db/changelog/db.changelog-master.xml" />
-<!-- 		<property name="defaultSchema" value="collect" /> -->
+		<property name="defaultSchema" value="collect" />
 	</bean>
 	
 	<bean id="configurationDao" class="org.openforis.collect.persistence.ConfigurationDao"

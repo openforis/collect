@@ -92,7 +92,7 @@
 	<!-- ===================================== -->
 	<!-- Liquibase -->
 	<!-- ===================================== -->
-	<bean id="liquibase" class="liquibase.integration.spring.SpringLiquibase">
+	<bean id="liquibase" class="org.openforis.collect.persistence.liquibase.DatabaseAwareSpringLiquibase">
 		<property name="dataSource" ref="dataSource" />
 		<property name="changeLog"
 			value="classpath:org/openforis/collect/db/changelog/db.changelog-master.xml" />
