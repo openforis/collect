@@ -16,9 +16,38 @@ import org.jooq.impl.Factory;
 public class DialectAwareJooqFactory extends Factory {
 	
 	private static final long serialVersionUID = 1L;
-	private static final String POSTGRESQL_DBNAME = "PostgreSQL";
-	private static final Object SQLITE_DBNAME = "SQLite";
 
+	private enum Database {
+		POSTGRES("PostgreSQL", SQLDialect.POSTGRES),
+		DERBY("Apache Derby", SQLDialect.DERBY),
+		SQLITE("SQLite", SQLDialect.SQLITE);
+		
+		private String productName;
+		private SQLDialect dialect;
+
+		Database(String productName, SQLDialect dialect) {
+			this.productName = productName;
+			this.dialect = dialect;
+		}
+		
+		public static Database getByProductName(String name) {
+			for (Database db : Database.values()) {
+				if ( name.equals(db.getProductName())) {
+					return db;
+				}
+			}
+			return null;
+		}
+		
+		public String getProductName() {
+			return productName;
+		}
+		
+		public SQLDialect getDialect() {
+			return dialect;
+		}
+	}
+	
 	public DialectAwareJooqFactory(Connection connection) {
 		this(connection, getDialect(connection));
 	}
@@ -31,18 +60,16 @@ public class DialectAwareJooqFactory extends Factory {
 		try {
 			DatabaseMetaData metaData = conn.getMetaData();
 			String dbName = metaData.getDatabaseProductName();
-			if ( dbName.equals(POSTGRESQL_DBNAME) ) {
-				return SQLDialect.POSTGRES;
-			} else if ( dbName.equals(SQLITE_DBNAME) ) {
-				return SQLDialect.SQLITE;
-			} else {
-				throw new IllegalArgumentException("Unsupported database: "+dbName);
+			Database db = Database.getByProductName(dbName);
+			if ( db == null ) {
+				throw new IllegalArgumentException("Unknown database "+dbName);
 			}
+			return db.getDialect();
 		} catch (SQLException e) {
 			throw new RuntimeException("Error getting database name", e);
 		}
 	}
-
+	
 	private static Settings createSettings(SQLDialect dialect) {
 		Settings settings = new Settings();
 		if ( dialect == SQLDialect.SQLITE ) {
