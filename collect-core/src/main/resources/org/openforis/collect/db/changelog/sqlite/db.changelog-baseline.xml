@@ -75,7 +75,8 @@
 		</createTable>
 		<createTable tableName="ofc_sampling_design">
 			<column name="id" type="INTEGER">
-				<constraints nullable="false" primaryKey="true" />
+				<constraints nullable="false" primaryKey="true"
+					primaryKeyName="ofc_sampling_design_pkey" />
 			</column>
 			<column name="survey_id" type="INTEGER">
 				<constraints foreignKeyName="ofc_sampling_design_survey_fkey" 
@@ -100,10 +101,12 @@
 					primaryKeyName="ofc_survey_pkey" />
 			</column>
 			<column name="name" type="VARCHAR(255)">
-				<constraints nullable="false" />
+				<constraints nullable="false" unique="true" 
+					uniqueConstraintName="ofc_survey_name_key" />
 			</column>
 			<column name="uri" type="VARCHAR(255)">
-				<constraints nullable="false" />
+				<constraints nullable="false" unique="true"
+					uniqueConstraintName="ofc_survey_uri_key" />
 			</column>
 			<column name="idml" type="TEXT">
 				<constraints nullable="false" />
@@ -115,10 +118,12 @@
 					primaryKeyName="ofc_survey_work_pkey" />
 			</column>
 			<column name="name" type="VARCHAR(255)">
-				<constraints nullable="false" />
+				<constraints nullable="false" unique="true"
+					uniqueConstraintName="ofc_survey_work_name_key" />
 			</column>
 			<column name="uri" type="VARCHAR(255)">
-				<constraints nullable="false" />
+				<constraints nullable="false" unique="true"
+					uniqueConstraintName="ofc_survey_work_uri_key" />
 			</column>
 			<column name="idml" type="TEXT">
 				<constraints nullable="false" />
@@ -198,7 +203,8 @@
 					primaryKeyName="ofc_user_pkey" />
 			</column>
 			<column name="username" type="VARCHAR(255)">
-				<constraints nullable="false" />
+				<constraints nullable="false" unique="true"
+					uniqueConstraintName="ofc_user_username_key" />
 			</column>
 			<column name="password" type="VARCHAR(255)">
 				<constraints nullable="false" />
@@ -220,26 +226,16 @@
 			<column name="role" type="VARCHAR(255)" />
 		</createTable>
 		
-		<!--  TODO move these into the create table statements -->
-<!-- 		<addUniqueConstraint columnNames="name" -->
-<!-- 			constraintName="ofc_survey_name_key" deferrable="false" disabled="false" -->
-<!-- 			initiallyDeferred="false" tableName="ofc_survey" /> -->
-<!-- 		<addUniqueConstraint columnNames="uri" -->
-<!-- 			constraintName="ofc_survey_uri_key" deferrable="false" disabled="false" -->
-<!-- 			initiallyDeferred="false" tableName="ofc_survey" /> -->
-<!-- 		<addUniqueConstraint columnNames="name" -->
-<!-- 			constraintName="ofc_survey_work_name_key" deferrable="false" -->
-<!-- 			disabled="false" initiallyDeferred="false" -->
-<!-- 			tableName="ofc_survey_work" /> -->
-<!-- 		<addUniqueConstraint columnNames="uri" -->
-<!-- 			constraintName="ofc_survey_work_uri_key" deferrable="false" disabled="false" -->
-<!-- 			initiallyDeferred="false" tableName="ofc_survey_work" /> -->
+		<!-- SQLite does not support addUniqueConstrain, cannot add these constraints while creating tables -->
 <!-- 		<addUniqueConstraint columnNames="taxon_id, taxonomy_id" -->
 <!-- 			constraintName="ofc_taxon_id_key" deferrable="false" disabled="false" -->
-<!-- 			initiallyDeferred="false" tableName="ofc_taxon" /> -->
-<!-- 		<addUniqueConstraint columnNames="name" -->
-<!-- 			constraintName="ofc_taxonomy_name_key" deferrable="false" disabled="false" -->
-<!-- 			initiallyDeferred="false" tableName="ofc_taxonomy" /> -->
+<!-- 			initiallyDeferred="false" schemaName="collect" tableName="ofc_taxon" /> -->
+<!-- 		<addUniqueConstraint constraintName="ofc_taxonomy_name_key" -->
+<!-- 			tableName="ofc_taxonomy" -->
+<!-- 			columnNames="survey_id,name" /> -->
+<!-- 	    <addUniqueConstraint constraintName="ofc_taxonomy_name_work_key" -->
+<!-- 			tableName="ofc_taxonomy" -->
+<!-- 			columnNames="survey_work_id,name" /> -->
 		
 		<!-- INSERT VERSION -->
 		<insert tableName="ofc_application_info">
