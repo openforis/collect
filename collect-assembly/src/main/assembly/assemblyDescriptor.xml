@@ -11,7 +11,7 @@
 		<!-- Include files from unpacked Tomcat distribution -->
 		<fileSet>
 			<directory>${project.build.directory}/apache-tomcat-${tomcat.version}</directory>
-			<outputDirectory>${output.directory}</outputDirectory>
+			<outputDirectory>${output.directory}/tomcat</outputDirectory>
 			<excludes>
 				<exclude>**/webapps/ROOT/**</exclude>
 				<exclude>**/webapps/docs/**</exclude>
@@ -21,7 +21,7 @@
 		<!-- Include Collect context config -->
 		<fileSet>
 			<directory>${basedir}/src/main/assembly/resources/tomcat/conf</directory>
-			<outputDirectory>${output.directory}/conf</outputDirectory>
+			<outputDirectory>${output.directory}/tomcat/conf</outputDirectory>
 			<includes>
 				<include>**/**</include>
 			</includes>
@@ -29,13 +29,13 @@
 		<!-- Include empty data directory -->
 		<fileSet>
 			<directory>${basedir}/src/main/assembly/resources/tomcat/data</directory>
-			<outputDirectory>${output.directory}/data</outputDirectory>
+			<outputDirectory>${output.directory}/tomcat/data</outputDirectory>
 		</fileSet>
 	</fileSets>
 	<dependencySets>
 		<dependencySet>
 			<!-- Add SQLite, PostgreSQL and connection pool dependencies for server installations -->
-			<outputDirectory>${output.directory}/lib</outputDirectory>
+			<outputDirectory>${output.directory}/tomcat/lib</outputDirectory>
 			<includes>
 				<include>org.xerial:sqlite-jdbc:jar</include>
 				<include>postgresql:postgresql:jar</include>
@@ -45,7 +45,7 @@
 		</dependencySet>
 		<!-- Add the actual Collect webapp (unpacked) -->
 		<dependencySet>
-			<outputDirectory>${output.directory}/webapps/collect</outputDirectory>
+			<outputDirectory>${output.directory}/tomcat/webapps/collect</outputDirectory>
 			<includes>
 				<include>org.openforis.collect:collect-web</include>
 			</includes>
