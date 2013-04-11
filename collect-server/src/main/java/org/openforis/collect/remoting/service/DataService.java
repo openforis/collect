@@ -345,13 +345,12 @@ public class DataService {
 			UpdateRequestOperation operation) {
 		CollectRecord record = getActiveRecord();
 		String nodeName = operation.getNodeName();
-
 		Entity parentEntity = (Entity) record.getNodeByInternalId(operation.getParentEntityId());
-		EntityDefinition parentEntityDefn = parentEntity.getDefinition();
-		NodeDefinition nodeDef = parentEntityDefn.getChildDefinition(nodeName);
 		
-		Node<?> createdNode = addNode(parentEntity, nodeDef, operation.getValue(), operation.getSymbol(), operation.getRemarks());
+		Node<?> createdNode = addNode(parentEntity, nodeName, operation.getValue(), operation.getSymbol(), operation.getRemarks());
+		
 		record.setMissingApproved(parentEntity, nodeName, false);
+		
 		Map<Integer, UpdateResponse> responseMap = new HashMap<Integer, UpdateResponse>();
 		UpdateResponse response = getOrCreateUpdateResponse(responseMap, createdNode);
 		response.setCreatedNode(NodeProxy.fromNode(messageContextHolder, createdNode));
@@ -388,7 +387,7 @@ public class DataService {
 		List<NodePointer> cardinalityNodePointers = createCardinalityNodePointers(parentEntity);
 		cardinalityNodePointers.add(new NodePointer(parentEntity, nodeName));
 		Map<Integer, UpdateResponse> responseMap = new HashMap<Integer, UpdateResponse>();
-		validateCardinalityRelevanceAndRequiredState(responseMap, cardinalityNodePointers);
+		validateCardinalityRelevanceAndRequirenessState(responseMap, cardinalityNodePointers);
 		return responseMap.values();
 	}
 
@@ -490,8 +489,8 @@ public class DataService {
 	
 	protected void prepareUpdateResponse(Map<Integer, UpdateResponse> responseMap, Set<NodePointer> relevanceRequiredDependencies, 
 				Set<Attribute<?, ?>> checkDependencies, List<NodePointer> cardinalityDependencies) {
-		validateCardinalityRelevanceAndRequiredState(responseMap, cardinalityDependencies);
-		validateCardinalityRelevanceRequiredStateAndChecks(responseMap, relevanceRequiredDependencies);
+		validateCardinalityRelevanceAndRequirenessState(responseMap, cardinalityDependencies);
+		validateAll(responseMap, relevanceRequiredDependencies);
 		validateChecks(responseMap, checkDependencies);
 	}
 
@@ -524,7 +523,7 @@ public class DataService {
 		}
 	}
 	
-	protected void validateCardinalityRelevanceRequiredStateAndChecks(
+	protected void validateAll(
 			Map<Integer, UpdateResponse> responseMap,
 			Set<NodePointer> nodePointers) {
 		if (nodePointers != null) {
@@ -534,7 +533,6 @@ public class DataService {
 					String childName = nodePointer.getChildName();
 					validateCardinalityRelevanceAndRequiredState(
 							responseMap, nodePointer);
-					
 					validateChecks(responseMap, entity, childName);
 				}
 			}
@@ -553,7 +551,7 @@ public class DataService {
 		return childName;
 	}
 
-	protected void validateCardinalityRelevanceAndRequiredState(Map<Integer, UpdateResponse> responseMap,
+	protected void validateCardinalityRelevanceAndRequirenessState(Map<Integer, UpdateResponse> responseMap,
 			List<NodePointer> nodePointers) {
 		if (nodePointers != null) {
 			for (NodePointer nodePointer : nodePointers) {
@@ -582,7 +580,9 @@ public class DataService {
 	}
 	
 	@SuppressWarnings("unchecked")
-	protected Node<?> addNode(Entity parentEntity, NodeDefinition nodeDefn, Object requestValue, FieldSymbol symbol, String remarks) {
+	protected Node<?> addNode(Entity parentEntity, String nodeName, Object requestValue, FieldSymbol symbol, String remarks) {
+		EntityDefinition parentEntityDefn = parentEntity.getDefinition();
+		NodeDefinition nodeDefn = parentEntityDefn.getChildDefinition(nodeName);
 		if(nodeDefn instanceof AttributeDefinition) {
 			AttributeDefinition def = (AttributeDefinition) nodeDefn;
 			Attribute<?, ?> attribute = (Attribute<?, ?>) def.createNode();
@@ -605,7 +605,7 @@ public class DataService {
 			}
 			return attribute;
 		} else {
-			Entity e = recordManager.addEntity(parentEntity, nodeDefn.getName());
+			Entity e = recordManager.addEntity(parentEntity, nodeName);
 			return e;
 		}
 	}
