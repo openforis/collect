@@ -251,13 +251,54 @@ public class DataService {
 			UpdateRequestOperation operation) {
 		CollectRecord record = getActiveRecord();
 		Node<?> node = record.getNodeByInternalId(operation.getNodeId());
-		Map<Integer, UpdateResponse> responseMap = new HashMap<Integer, UpdateResponse>();
-		HashSet<NodePointer> relevanceRequiredDependencies = new HashSet<NodePointer>();
+
+		Set<NodePointer> relevantDependencies = new HashSet<NodePointer>();
+		Set<NodePointer> requiredDependencies = new HashSet<NodePointer>();
 		HashSet<Attribute<?, ?>> checkDependencies = new HashSet<Attribute<?,?>>();
+		
+		Map<Integer, UpdateResponse> responseMap = new HashMap<Integer, UpdateResponse>();
 		List<NodePointer> cardinalityNodePointers = createCardinalityNodePointers(node);
-		deleteNode(responseMap, node, relevanceRequiredDependencies, checkDependencies);
+		Stack<Node<?>> depthFirstDescendants = getDepthFirstDescendants(node);
+		while ( !depthFirstDescendants.isEmpty() ) {
+			Node<?> n = depthFirstDescendants.pop();
+			relevantDependencies.addAll(n.getRelevantDependencies());
+			requiredDependencies.addAll(n.getRequiredDependencies());
+			if ( n instanceof Attribute ) {
+				checkDependencies.addAll(((Attribute<?, ?>) n).getCheckDependencies());
+			}
+			record.deleteNode(n);
+			
+			UpdateResponse resp = getOrCreateUpdateResponse(responseMap, node);
+			resp.setDeletedNodeId(node.getInternalId());
+		}
+		//clear dependencies
+		recordManager.clearRelevantDependencies(relevantDependencies);
+		HashSet<NodePointer> relevanceRequiredDependencies = new HashSet<NodePointer>();
+		relevanceRequiredDependencies.addAll(relevantDependencies);
+		relevanceRequiredDependencies.addAll(requiredDependencies);
+		recordManager.clearRequiredDependencies(relevanceRequiredDependencies);
+		recordManager.clearValidationResults(checkDependencies);
+		
 		prepareUpdateResponse(responseMap, relevanceRequiredDependencies, checkDependencies, cardinalityNodePointers);
 		return responseMap.values();
+	}
+	
+	protected Stack<Node<?>> getDepthFirstDescendants(Node<?> node) {
+		Stack<Node<?>> result = new Stack<Node<?>>();
+		Stack<Node<?>> stack = new Stack<Node<?>>();
+		stack.push(node);
+		while(!stack.isEmpty()){
+			Node<?> n = stack.pop();
+			result.push(n);
+			if(n instanceof Entity){
+				Entity entity = (Entity) n;
+				List<Node<? extends NodeDefinition>> children = entity.getChildren();
+				for (Node<? extends NodeDefinition> child : children) {
+					stack.push(child);
+				}
+			}
+		}
+		return result;
 	}
 
 	protected Collection<UpdateResponse> processApplyDefaultValue(
@@ -387,7 +428,7 @@ public class DataService {
 		List<NodePointer> cardinalityNodePointers = createCardinalityNodePointers(parentEntity);
 		cardinalityNodePointers.add(new NodePointer(parentEntity, nodeName));
 		Map<Integer, UpdateResponse> responseMap = new HashMap<Integer, UpdateResponse>();
-		validateCardinalityRelevanceAndRequirenessState(responseMap, cardinalityNodePointers);
+		validateAll(responseMap, cardinalityNodePointers, false);
 		return responseMap.values();
 	}
 
@@ -444,58 +485,15 @@ public class DataService {
 		return nodePointers;
 	}
 
-	protected void deleteNode(Map<Integer, UpdateResponse> responseMap, Node<?> node, Set<NodePointer> relevanceRequiredDependencies, Set<Attribute<?,?>> checkDependencies){
-		CollectRecord record = getActiveRecord();
-		Stack<Node<?>> dependenciesStack = new Stack<Node<?>>();
-		Stack<Node<?>> nodesToRemove = new Stack<Node<?>>();
-		dependenciesStack.push(node);
-		
-		Set<NodePointer> relevantDependencies = new HashSet<NodePointer>();
-		Set<NodePointer> requiredDependencies = new HashSet<NodePointer>();
-		while(!dependenciesStack.isEmpty()){
-			Node<?> n = dependenciesStack.pop();
-			nodesToRemove.push(n);
-			
-			relevantDependencies.addAll(n.getRelevantDependencies());
-			requiredDependencies.addAll(n.getRequiredDependencies());
-			if(n instanceof Entity){
-				Entity entity = (Entity) n;
-				List<Node<? extends NodeDefinition>> children = entity.getChildren();
-				for (Node<? extends NodeDefinition> child : children) {
-					dependenciesStack.push(child);
-				}
-			} else {
-				Attribute<?,?> attr = (Attribute<?, ?>) n;
-				checkDependencies.addAll(attr.getCheckDependencies());
-			}
-		}
-		
-		while(!nodesToRemove.isEmpty()){
-			Node<?> n = nodesToRemove.pop();
-			record.deleteNode(n);
-			
-			UpdateResponse resp = getOrCreateUpdateResponse(responseMap, node);
-			resp.setDeletedNodeId(node.getInternalId());
-		}
-		
-		//clear dependencies
-		recordManager.clearRelevantDependencies(relevantDependencies);
-		requiredDependencies.addAll(relevantDependencies);
-		recordManager.clearRequiredDependencies(requiredDependencies);
-		recordManager.clearValidationResults(checkDependencies);
-		
-		relevanceRequiredDependencies.addAll(requiredDependencies);
-	}
-	
 	protected void prepareUpdateResponse(Map<Integer, UpdateResponse> responseMap, Set<NodePointer> relevanceRequiredDependencies, 
-				Set<Attribute<?, ?>> checkDependencies, List<NodePointer> cardinalityDependencies) {
-		validateCardinalityRelevanceAndRequirenessState(responseMap, cardinalityDependencies);
-		validateAll(responseMap, relevanceRequiredDependencies);
+			Collection<Attribute<?, ?>> checkDependencies, Collection<NodePointer> cardinalityDependencies) {
+		validateAll(responseMap, cardinalityDependencies, false);
+		validateAll(responseMap, relevanceRequiredDependencies, true);
 		validateChecks(responseMap, checkDependencies);
 	}
 
 	protected void validateChecks(Map<Integer, UpdateResponse> responseMap,
-			Set<Attribute<?, ?>> attributes) {
+			Collection<Attribute<?, ?>> attributes) {
 		if (attributes != null) {
 			for (Attribute<?, ?> attr : attributes) {
 				validateAttribute(responseMap, attr);
@@ -523,46 +521,45 @@ public class DataService {
 		}
 	}
 	
-	protected void validateAll(
-			Map<Integer, UpdateResponse> responseMap,
-			Set<NodePointer> nodePointers) {
+	protected void validateAll(Map<Integer, UpdateResponse> responseMap,
+			Collection<NodePointer> nodePointers, boolean validateChecks) {
 		if (nodePointers != null) {
 			for (NodePointer nodePointer : nodePointers) {
-				Entity entity = nodePointer.getEntity();
-				if (!entity.isDetached()) {
-					String childName = nodePointer.getChildName();
-					validateCardinalityRelevanceAndRequiredState(
-							responseMap, nodePointer);
-					validateChecks(responseMap, entity, childName);
+				Entity parent = nodePointer.getEntity();
+				if ( parent != null && ! parent.isDetached()) {
+					validateCardinality(responseMap, nodePointer);
+					validateRelevanceState(responseMap, nodePointer);
+					validateRequirenessState(responseMap, nodePointer);
+					if ( validateChecks ) {
+						validateChecks(responseMap, parent, nodePointer.getChildName());
+					}
 				}
 			}
 		}
 	}
 
-	protected String validateCardinalityRelevanceAndRequiredState(
+	protected void validateCardinality(Map<Integer, UpdateResponse> responseMap, NodePointer nodePointer) {
+		Entity entity = nodePointer.getEntity();
+		String childName = nodePointer.getChildName();
+		UpdateResponse response = getOrCreateUpdateResponse(responseMap, entity);
+		response.setMinCountValid(childName, entity.validateMinCount(childName));
+		response.setMaxCountValid(childName, entity.validateMaxCount(childName));
+	}
+
+	protected void validateRelevanceState(
 			Map<Integer, UpdateResponse> responseMap, NodePointer nodePointer) {
 		Entity entity = nodePointer.getEntity();
 		String childName = nodePointer.getChildName();
 		UpdateResponse response = getOrCreateUpdateResponse(responseMap, entity);
 		response.setRelevant(childName, entity.isRelevant(childName));
-		response.setRequired(childName, entity.isRequired(childName));
-		response.setMinCountValid(childName, entity.validateMinCount(childName));
-		response.setMaxCountValid(childName, entity.validateMaxCount(childName));
-		return childName;
 	}
 
-	protected void validateCardinalityRelevanceAndRequirenessState(Map<Integer, UpdateResponse> responseMap,
-			List<NodePointer> nodePointers) {
-		if (nodePointers != null) {
-			for (NodePointer nodePointer : nodePointers) {
-				// entity could be root definition
-				Entity parent = nodePointer.getEntity();
-				if (parent != null && !parent.isDetached()) {
-					validateCardinalityRelevanceAndRequiredState(
-							responseMap, nodePointer);
-				}
-			}
-		}
+	protected void validateRequirenessState(
+			Map<Integer, UpdateResponse> responseMap, NodePointer nodePointer) {
+		Entity entity = nodePointer.getEntity();
+		String childName = nodePointer.getChildName();
+		UpdateResponse response = getOrCreateUpdateResponse(responseMap, entity);
+		response.setRequired(childName, entity.isRequired(childName));
 	}
 
 	protected UpdateResponse getOrCreateUpdateResponse(Map<Integer, UpdateResponse> responseMap, Node<?> node){
