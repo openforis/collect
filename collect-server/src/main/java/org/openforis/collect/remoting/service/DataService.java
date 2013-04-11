@@ -5,6 +5,7 @@ package org.openforis.collect.remoting.service;
 
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -370,17 +371,11 @@ public class DataService {
 	protected Collection<UpdateResponse> processUpdateRemarks(
 			UpdateRequestOperation operation) {
 		CollectRecord record = getActiveRecord();
-		Integer nodeId = operation.getNodeId();
-		Node<?> node = null;
-		if(nodeId != null) {
-			node = record.getNodeByInternalId(nodeId);
-		}
-		Attribute<?, ?> attribute = (Attribute<?, ?>) node;
+		Attribute<?, ?> attribute = (Attribute<?, ?>) record.getNodeByInternalId(operation.getNodeId());
 		Field<?> fld = attribute.getField(operation.getFieldIndex());
 		fld.setRemarks(operation.getRemarks());
-		Map<Integer, UpdateResponse> responseMap = new HashMap<Integer, UpdateResponse>();
-		getOrCreateUpdateResponse(responseMap, attribute);
-		return responseMap.values();
+		UpdateResponse response = createUpdateResponse(attribute);
+		return Arrays.asList(response);
 	}
 
 	protected Collection<UpdateResponse> processApproveMissingValue(
@@ -576,10 +571,14 @@ public class DataService {
 		Integer nodeId = node.getInternalId();
 		UpdateResponse response = responseMap.get(nodeId);
 		if(response == null){
-			response = new UpdateResponse(messageContextHolder, node);
+			response = createUpdateResponse(node);
 			responseMap.put(nodeId, response);
 		}
 		return response;
+	}
+
+	protected UpdateResponse createUpdateResponse(Node<?> node) {
+		return new UpdateResponse(messageContextHolder, node);
 	}
 	
 	@SuppressWarnings("unchecked")
