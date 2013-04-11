@@ -224,7 +224,7 @@ public class DataService {
 		return updateResponses;
 	}
 	
-	private Collection<UpdateResponse> processUpdateRequestOperation(UpdateRequestOperation operation) throws RecordPersistenceException {
+	protected Collection<UpdateResponse> processUpdateRequestOperation(UpdateRequestOperation operation) throws RecordPersistenceException {
 		Method method = operation.getMethod();
 		switch (method) {
 			case CONFIRM_ERROR:
@@ -251,11 +251,11 @@ public class DataService {
 		CollectRecord record = getActiveRecord();
 		Node<?> node = record.getNodeByInternalId(operation.getNodeId());
 		Map<Integer, UpdateResponse> responseMap = new HashMap<Integer, UpdateResponse>();
-		HashSet<NodePointer> relReqDependencies = new HashSet<NodePointer>();
-		List<NodePointer> cardinalityNodePointers = createCardinalityNodePointers(node);
+		HashSet<NodePointer> relevanceRequiredDependencies = new HashSet<NodePointer>();
 		HashSet<Attribute<?, ?>> checkDependencies = new HashSet<Attribute<?,?>>();
-		deleteNode(node, relReqDependencies, checkDependencies, responseMap);
-		prepareUpdateResponse(responseMap, relReqDependencies, checkDependencies, cardinalityNodePointers);
+		List<NodePointer> cardinalityNodePointers = createCardinalityNodePointers(node);
+		deleteNode(responseMap, node, relevanceRequiredDependencies, checkDependencies);
+		prepareUpdateResponse(responseMap, relevanceRequiredDependencies, checkDependencies, cardinalityNodePointers);
 		return responseMap.values();
 	}
 
@@ -274,10 +274,10 @@ public class DataService {
 				fieldValues.put(idx, field.getValue());
 			}
 			Map<Integer, UpdateResponse> responseMap = new HashMap<Integer, UpdateResponse>();
-			UpdateResponse response = getUpdateResponse(responseMap, attribute);
+			UpdateResponse response = getOrCreateUpdateResponse(responseMap, attribute);
 			response.setUpdatedFieldValues(fieldValues);
 			List<NodePointer> cardinalityNodePointers = createCardinalityNodePointers(attribute);
-			Set<NodePointer> relevanceRequiredDependencies = recordManager.clearRelevanceRequiredStates(attribute);
+			Set<NodePointer> relevanceRequiredDependencies = recordManager.clearRelevanceRequiredDependencies(attribute);
 			Set<Attribute<?, ?>> checkDependencies = recordManager.clearValidationResults(attribute);
 			relevanceRequiredDependencies.add(new NodePointer(attribute.getParent(), attribute.getName()));
 			checkDependencies.add(attribute);
@@ -329,9 +329,9 @@ public class DataService {
 			updatedFieldValues.put(fieldIndex, field.getValue());
 		}
 		Map<Integer, UpdateResponse> responseMap = new HashMap<Integer, UpdateResponse>();
-		UpdateResponse response = getUpdateResponse(responseMap, attribute);
+		UpdateResponse response = getOrCreateUpdateResponse(responseMap, attribute);
 		response.setUpdatedFieldValues(updatedFieldValues);
-		Set<NodePointer> relevanceRequiredDependencies = recordManager.clearRelevanceRequiredStates(attribute);
+		Set<NodePointer> relevanceRequiredDependencies = recordManager.clearRelevanceRequiredDependencies(attribute);
 		Set<Attribute<?, ?>> checkDependencies = recordManager.clearValidationResults(attribute);
 		relevanceRequiredDependencies.add(new NodePointer(attribute.getParent(), attribute.getName()));
 		checkDependencies.add(attribute);
@@ -352,9 +352,9 @@ public class DataService {
 		Node<?> createdNode = addNode(parentEntity, nodeDef, operation.getValue(), operation.getSymbol(), operation.getRemarks());
 		record.setMissingApproved(parentEntity, nodeName, false);
 		Map<Integer, UpdateResponse> responseMap = new HashMap<Integer, UpdateResponse>();
-		UpdateResponse response = getUpdateResponse(responseMap, createdNode);
+		UpdateResponse response = getOrCreateUpdateResponse(responseMap, createdNode);
 		response.setCreatedNode(NodeProxy.fromNode(messageContextHolder, createdNode));
-		Set<NodePointer> relevanceRequiredDependencies = recordManager.clearRelevanceRequiredStates(createdNode);
+		Set<NodePointer> relevanceRequiredDependencies = recordManager.clearRelevanceRequiredDependencies(createdNode);
 		Set<Attribute<?, ?>> checkDependencies = null;
 		if(createdNode instanceof Attribute){
 			Attribute<?, ?> attribute = (Attribute<?, ?>) createdNode;
@@ -367,7 +367,7 @@ public class DataService {
 		return responseMap.values();
 	}
 
-	private Collection<UpdateResponse> processUpdateRemarks(
+	protected Collection<UpdateResponse> processUpdateRemarks(
 			UpdateRequestOperation operation) {
 		CollectRecord record = getActiveRecord();
 		Integer nodeId = operation.getNodeId();
@@ -379,11 +379,11 @@ public class DataService {
 		Field<?> fld = attribute.getField(operation.getFieldIndex());
 		fld.setRemarks(operation.getRemarks());
 		Map<Integer, UpdateResponse> responseMap = new HashMap<Integer, UpdateResponse>();
-		getUpdateResponse(responseMap, attribute);
+		getOrCreateUpdateResponse(responseMap, attribute);
 		return responseMap.values();
 	}
 
-	private Collection<UpdateResponse> processApproveMissingValue(
+	protected Collection<UpdateResponse> processApproveMissingValue(
 			UpdateRequestOperation operation) {
 		CollectRecord record = getActiveRecord();
 		String nodeName = operation.getNodeName();
@@ -397,7 +397,7 @@ public class DataService {
 		return responseMap.values();
 	}
 
-	private Collection<UpdateResponse> processConfirmError(UpdateRequestOperation op) {
+	protected Collection<UpdateResponse> processConfirmError(UpdateRequestOperation op) {
 		CollectRecord record = getActiveRecord();
 		Integer nodeId = op.getNodeId();
 		Node<?> node = null;
@@ -411,12 +411,12 @@ public class DataService {
 		attribute.clearValidationResults();
 		checkDependencies.add(attribute);
 		
-		getUpdateResponse(responseMap, attribute);
+		getOrCreateUpdateResponse(responseMap, attribute);
 		validateChecks(responseMap, checkDependencies);
 		return responseMap.values();
 	}
 
-	private Object parseFileAttributeValue(Integer nodeId, Object requestValue) throws RecordFileException {
+	protected Object parseFileAttributeValue(Integer nodeId, Object requestValue) throws RecordFileException {
 		Object result;
 		SessionState sessionState = sessionManager.getSessionState();
 		CollectRecord record = sessionState.getActiveRecord();
@@ -435,7 +435,7 @@ public class DataService {
 		return result;
 	}
 	
-	private List<NodePointer> createCardinalityNodePointers(Node<?> node){
+	protected List<NodePointer> createCardinalityNodePointers(Node<?> node){
 		List<NodePointer> nodePointers = new ArrayList<NodePointer>();
 		
 		Entity parent = node.getParent();
@@ -450,7 +450,7 @@ public class DataService {
 		return nodePointers;
 	}
 
-	private void deleteNode(Node<?> node,Set<NodePointer> relevanceRequiredDependencies, Set<Attribute<?,?>> checkDependencies, Map<Integer, UpdateResponse> responseMap){
+	protected void deleteNode(Map<Integer, UpdateResponse> responseMap, Node<?> node, Set<NodePointer> relevanceRequiredDependencies, Set<Attribute<?,?>> checkDependencies){
 		CollectRecord record = getActiveRecord();
 		Stack<Node<?>> dependenciesStack = new Stack<Node<?>>();
 		Stack<Node<?>> nodesToRemove = new Stack<Node<?>>();
@@ -480,7 +480,7 @@ public class DataService {
 			Node<?> n = nodesToRemove.pop();
 			record.deleteNode(n);
 			
-			UpdateResponse resp = getUpdateResponse(responseMap, node);
+			UpdateResponse resp = getOrCreateUpdateResponse(responseMap, node);
 			resp.setDeletedNodeId(node.getInternalId());
 		}
 		
@@ -514,7 +514,7 @@ public class DataService {
 		if ( !attr.isDetached() ) {
 			attr.clearValidationResults();
 			ValidationResults results = attr.validateValue();
-			UpdateResponse response = getUpdateResponse(responseMap, attr);
+			UpdateResponse response = getOrCreateUpdateResponse(responseMap, attr);
 			response.setAttributeValidationResults(results);
 		}
 	}
@@ -529,7 +529,7 @@ public class DataService {
 		}
 	}
 	
-	private void validateCardinalityRelevanceRequiredStateAndChecks(
+	protected void validateCardinalityRelevanceRequiredStateAndChecks(
 			Map<Integer, UpdateResponse> responseMap,
 			Set<NodePointer> nodePointers) {
 		if (nodePointers != null) {
@@ -550,7 +550,7 @@ public class DataService {
 			Map<Integer, UpdateResponse> responseMap, NodePointer nodePointer) {
 		Entity entity = nodePointer.getEntity();
 		String childName = nodePointer.getChildName();
-		UpdateResponse response = getUpdateResponse(responseMap, entity);
+		UpdateResponse response = getOrCreateUpdateResponse(responseMap, entity);
 		response.setRelevant(childName, entity.isRelevant(childName));
 		response.setRequired(childName, entity.isRequired(childName));
 		response.setMinCountValid(childName, entity.validateMinCount(childName));
@@ -572,7 +572,7 @@ public class DataService {
 		}
 	}
 
-	private UpdateResponse getUpdateResponse(Map<Integer, UpdateResponse> responseMap, Node<?> node){
+	protected UpdateResponse getOrCreateUpdateResponse(Map<Integer, UpdateResponse> responseMap, Node<?> node){
 		Integer nodeId = node.getInternalId();
 		UpdateResponse response = responseMap.get(nodeId);
 		if(response == null){
@@ -583,7 +583,7 @@ public class DataService {
 	}
 	
 	@SuppressWarnings("unchecked")
-	private Node<?> addNode(Entity parentEntity, NodeDefinition nodeDefn, Object requestValue, FieldSymbol symbol, String remarks) {
+	protected Node<?> addNode(Entity parentEntity, NodeDefinition nodeDefn, Object requestValue, FieldSymbol symbol, String remarks) {
 		if(nodeDefn instanceof AttributeDefinition) {
 			AttributeDefinition def = (AttributeDefinition) nodeDefn;
 			Attribute<?, ?> attribute = (Attribute<?, ?>) def.createNode();
@@ -611,7 +611,7 @@ public class DataService {
 		}
 	}
 	
-	private Object parseFieldValue(Entity parentEntity, AttributeDefinition def, String value, Integer fieldIndex) {
+	protected Object parseFieldValue(Entity parentEntity, AttributeDefinition def, String value, Integer fieldIndex) {
 		Object fieldValue = null;
 		if(StringUtils.isBlank(value)) {
 			return null;
@@ -676,7 +676,7 @@ public class DataService {
 		return fieldValue;
 	}
 	
-	private Value parseCompositeAttributeValue(Entity parentEntity, AttributeDefinition defn, Object value) {
+	protected Value parseCompositeAttributeValue(Entity parentEntity, AttributeDefinition defn, Object value) {
 		Value result;
 		if(defn instanceof CodeAttributeDefinition) {
 			if ( value instanceof String) {
@@ -721,7 +721,7 @@ public class DataService {
 	}
 	
 	@Transactional
-	private void promote(Step to) throws RecordPersistenceException, RecordPromoteException  {
+	protected void promote(Step to) throws RecordPersistenceException, RecordPromoteException  {
 		sessionManager.checkIsActiveRecordLocked();
 		SessionState sessionState = sessionManager.getSessionState();
 		CollectRecord record = sessionState.getActiveRecord();
@@ -759,7 +759,7 @@ public class DataService {
 	}
 		
 	@Transactional
-	private void demote(Step to) throws RecordPersistenceException {
+	protected void demote(Step to) throws RecordPersistenceException {
 		sessionManager.checkIsActiveRecordLocked();
 		SessionState sessionState = sessionManager.getSessionState();
 		CollectRecord record = sessionState.getActiveRecord();
@@ -899,7 +899,7 @@ public class DataService {
 	 * 
 	 * TODO move them to a better location
 	 */
-	private List<CodeListItem> getAssignableCodeListItems(Entity parent, CodeAttributeDefinition def) {
+	protected List<CodeListItem> getAssignableCodeListItems(Entity parent, CodeAttributeDefinition def) {
 		CollectRecord record = getActiveRecord();
 		List<CodeListItem> items = null;
 		if(StringUtils.isEmpty(def.getParentExpression())){
@@ -926,7 +926,7 @@ public class DataService {
 		return result;
 	}
 	
-	private CodeAttribute getCodeParent(Entity context, CodeAttributeDefinition def) {
+	protected CodeAttribute getCodeParent(Entity context, CodeAttributeDefinition def) {
 		try {
 			String parentExpr = def.getParentExpression();
 			ExpressionFactory expressionFactory = context.getRecord().getSurveyContext().getExpressionFactory();
@@ -941,7 +941,7 @@ public class DataService {
 		return null;
 	}
 
-	private CodeListItem findCodeListItem(List<CodeListItem> siblings, String code) {
+	protected CodeListItem findCodeListItem(List<CodeListItem> siblings, String code) {
 		String adaptedCode = code.trim();
 		adaptedCode = adaptedCode.toUpperCase();
 		//remove initial zeros
@@ -959,13 +959,13 @@ public class DataService {
 		return null;
 	}
 	
-	private Code parseCode(Entity parent, CodeAttributeDefinition def, String value) {
+	protected Code parseCode(Entity parent, CodeAttributeDefinition def, String value) {
 		List<CodeListItem> items = getAssignableCodeListItems(parent, def);
 		Code code = parseCode(value, items);
 		return code;
 	}
 	
-	private Code parseCode(String value, List<CodeListItem> codeList) {
+	protected Code parseCode(String value, List<CodeListItem> codeList) {
 		Code code = null;
 		String[] strings = value.split(":");
 		String codeStr = null;

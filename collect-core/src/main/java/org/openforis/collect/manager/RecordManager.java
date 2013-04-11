@@ -262,7 +262,7 @@ public class RecordManager {
 						attribute.setValue(value);
 						CollectRecord record = (CollectRecord) attribute.getRecord();
 						record.setDefaultValueApplied(attribute, true);
-						clearRelevanceRequiredStates(attribute);
+						clearRelevanceRequiredDependencies(attribute);
 						clearValidationResults(attribute);
 					}
 				} catch (InvalidExpressionException e) {
@@ -407,7 +407,7 @@ public class RecordManager {
 		}
 	}
 	
-	public Set<NodePointer> clearRelevanceRequiredStates(Node<?> node){
+	public Set<NodePointer> clearRelevanceRequiredDependencies(Node<?> node){
 		Set<NodePointer> relevantDependencies = node.getRelevantDependencies();
 		clearRelevantDependencies(relevantDependencies);
 		Set<NodePointer> requiredDependencies = node.getRequiredDependencies();
