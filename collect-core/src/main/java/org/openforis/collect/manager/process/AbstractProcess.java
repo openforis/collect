@@ -4,7 +4,9 @@ package org.openforis.collect.manager.process;
 /**
  * 
  * @author S. Ricci
- * @param <V>
+ * 
+ * @param <V> the result type of method <tt>call</tt>
+ * @param <S> the type of ProcessStatus object return by <tt>getStatus</tt>
  *
  */
 public abstract class AbstractProcess<V, S extends ProcessStatus> implements org.openforis.collect.manager.Process<V> {
@@ -46,5 +48,4 @@ public abstract class AbstractProcess<V, S extends ProcessStatus> implements org
 		status.start();
 	}
 	
-
 }

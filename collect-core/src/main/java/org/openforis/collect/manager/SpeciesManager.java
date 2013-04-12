@@ -142,6 +142,11 @@ public class SpeciesManager {
 	}
 	
 	@Transactional
+	public TaxonSummaries loadTaxonSummaries(int taxonomyId) {
+		return loadTaxonSummaries(taxonomyId, 0, Integer.MAX_VALUE);
+	}
+	
+	@Transactional
 	public TaxonSummaries loadTaxonSummaries(int taxonomyId, int offset, int maxRecords) {
 		int totalCount = taxonDao.countTaxons(taxonomyId);
 		Set<String> vernacularNamesLanguageCodes = new HashSet<String>();

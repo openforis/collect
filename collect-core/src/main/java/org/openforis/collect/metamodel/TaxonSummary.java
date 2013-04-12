@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import org.apache.commons.lang3.StringUtils;
 import org.openforis.commons.collection.CollectionUtils;
 import org.openforis.idm.model.species.Taxon.TaxonRank;
 
@@ -18,6 +19,9 @@ import org.openforis.idm.model.species.Taxon.TaxonRank;
  *
  */
 public class TaxonSummary {
+
+	private static final String SYNONYM_VERNACULAR_LANG_CODE = "";
+	private static final String VERNACULAR_NAMES_SEPARATOR = ", ";
 
 	private int taxonSystemId;
 	private Integer taxonId;
@@ -62,6 +66,28 @@ public class TaxonSummary {
 		} else {
 			return Collections.unmodifiableMap(languageToVernacularNames);
 		}
+	}
+	
+	public String getJointVernacularNames(String langCode) {
+		return getJointVernacularNames(langCode, VERNACULAR_NAMES_SEPARATOR);
+	}
+	
+	public String getJointVernacularNames(String langCode, String separator) {
+		List<String> vernacularNames = getVernacularNames(langCode);
+		String jointVernacularNames = StringUtils.join(vernacularNames, separator);
+		return jointVernacularNames;
+	}
+	
+	public List<String> getSynonyms() {
+		return getVernacularNames(SYNONYM_VERNACULAR_LANG_CODE);
+	}
+	
+	public String getJointSynonyms() {
+		return getJointSynonyms(VERNACULAR_NAMES_SEPARATOR);
+	}
+	
+	public String getJointSynonyms(String separator) {
+		return getJointVernacularNames(SYNONYM_VERNACULAR_LANG_CODE, separator);
 	}
 	
 	public int getTaxonSystemId() {
