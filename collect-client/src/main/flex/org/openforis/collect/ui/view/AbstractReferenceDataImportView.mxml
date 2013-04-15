@@ -48,6 +48,7 @@
 			private var _surveyId:int;
 			private var _work:Boolean;
 			private var _showCloseButton:Boolean;
+			private var _importFileFormatInfo:String;
 
 			override protected function getCurrentSkinState():String {
 				return currentState;
@@ -128,6 +129,15 @@
 
 			public function set progressLabelText(value:String):void {
 				_progressLabelText = value;
+			}
+			
+			[Bindable]
+			public function get importFileFormatInfo():String {
+				return _importFileFormatInfo;
+			}
+			
+			public function set importFileFormatInfo(value:String):void {
+				_importFileFormatInfo = value;
 			}
 			
 		]]>

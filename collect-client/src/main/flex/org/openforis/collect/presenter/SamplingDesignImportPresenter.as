@@ -7,6 +7,7 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.client.SamplingDesignClient;
 	import org.openforis.collect.client.SamplingDesignImportClient;
+	import org.openforis.collect.i18n.Message;
 	import org.openforis.collect.model.proxy.SamplingDesignSummariesProxy;
 	import org.openforis.collect.ui.view.SamplingDesignImportView;
 	import org.openforis.collect.util.AlertUtil;
@@ -27,8 +28,8 @@ package org.openforis.collect.presenter
 		public function SamplingDesignImportPresenter(view:SamplingDesignImportView) {
 			_samplingDesignClient = ClientFactory.samplingDesignClient;
 			_samplingDesignImportClient = ClientFactory.samplingDesignImportClient;
-
 			super(view, new MessageKeys(), UPLOAD_FILE_NAME_PREFIX);
+			view.importFileFormatInfo = Message.get(messageKeys.IMPORT_FILE_FORMAT_INFO);
 		}
 		
 		private function get view():SamplingDesignImportView {
@@ -119,6 +120,10 @@ class MessageKeys extends ReferenceDataImportMessageKeys {
 	
 	public function get IMPORT_POPUP_TITLE():String {
 		return "samplingDesignImport.importPopUpTitle";
+	}
+
+	public function get IMPORT_FILE_FORMAT_INFO():String {
+		return "samplingDesignImport.importFileFormatInfo";
 	}
 
 }

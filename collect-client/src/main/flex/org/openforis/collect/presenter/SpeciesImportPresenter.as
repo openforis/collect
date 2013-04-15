@@ -50,6 +50,7 @@ package org.openforis.collect.presenter {
 			_speciesImportClient = ClientFactory.speciesImportClient;
 			_speciesClient = ClientFactory.speciesClient;
 			super(view, new MessageKeys(), UPLOAD_FILE_NAME_PREFIX);
+			view.importFileFormatInfo = Message.get(messageKeys.IMPORT_FILE_FORMAT_INFO);
 		}
 		
 		private function get view():SpeciesImportView {
@@ -71,6 +72,11 @@ package org.openforis.collect.presenter {
 		override protected function loadInitialData():void {
 			updateStatus();
 			loadTaxonomies();
+		}
+		
+		override protected function browseFileToImport():void {
+			AlertUtil.showMessage("");
+			super.browseFileToImport();
 		}
 		
 		protected function loadTaxonomies():void {
@@ -346,5 +352,9 @@ class MessageKeys extends ReferenceDataImportMessageKeys {
 	
 	public function get SAVE_SURVEY_BEFORE_EDIT():String {
 		return "speciesImport.saveSurveyBeforeEdit";
+	}
+	
+	public function get IMPORT_FILE_FORMAT_INFO():String {
+		return "speciesImport.importFileFormatInfo";
 	}
 }
