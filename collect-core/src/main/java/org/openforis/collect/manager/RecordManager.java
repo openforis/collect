@@ -64,13 +64,9 @@ public class RecordManager {
 	
 	@Autowired
 	private RecordDao recordDao;
-
-	private RecordConverter recordConverter = new RecordConverter();
-	
+	private RecordConverter recordConverter;
 	private Map<Integer, RecordLock> locks;
-	
-	private long lockTimeoutMillis = 60000;
-	
+	private long lockTimeoutMillis;
 	private boolean lockingEnabled;
 	
 	public RecordManager() {
@@ -80,6 +76,8 @@ public class RecordManager {
 	public RecordManager(boolean recordLockingEnabled) {
 		super();
 		this.lockingEnabled = recordLockingEnabled;
+		lockTimeoutMillis = 60000;
+		recordConverter = new RecordConverter();
 	}
 
 	protected void init() {
