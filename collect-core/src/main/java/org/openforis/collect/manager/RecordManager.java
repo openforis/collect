@@ -651,5 +651,13 @@ public class RecordManager {
 	public void setLockingEnabled(boolean lockingEnabled) {
 		this.lockingEnabled = lockingEnabled;
 	}
+	
+	public RecordDao getRecordDao() {
+		return recordDao;
+	}
+	
+	public void setRecordDao(RecordDao recordDao) {
+		this.recordDao = recordDao;
+	}
 }
 
