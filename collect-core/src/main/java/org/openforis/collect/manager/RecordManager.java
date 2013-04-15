@@ -71,6 +71,17 @@ public class RecordManager {
 	
 	private long lockTimeoutMillis = 60000;
 	
+	private boolean lockingEnabled;
+	
+	public RecordManager() {
+		this(true);
+	}
+	
+	public RecordManager(boolean recordLockingEnabled) {
+		super();
+		this.lockingEnabled = recordLockingEnabled;
+	}
+
 	protected void init() {
 		locks = new HashMap<Integer, RecordLock>();
 	}
@@ -89,16 +100,20 @@ public class RecordManager {
 			recordDao.insert(record);
 			id = record.getId();
 			//todo fix: concurrency problem may occur..
-			lock(id, user, sessionId);
+			if ( isLockingEnabled() ) {
+				lock(id, user, sessionId);
+			}
 		} else {
-			checkIsLocked(id, user, sessionId);
+			if ( isLockingEnabled() ) {
+				checkIsLocked(id, user, sessionId);
+			}
 			recordDao.update(record);
 		}
 	}
 
 	@Transactional
 	public void delete(int recordId) throws RecordPersistenceException {
-		if ( isLocked(recordId) ) {
+		if ( isLockingEnabled() && isLocked(recordId) ) {
 			RecordLock lock = getLock(recordId);
 			User lockUser = lock.getUser();
 			throw new RecordLockedException(lockUser.getName());
@@ -122,15 +137,15 @@ public class RecordManager {
 	 */
 	@Transactional
 	public synchronized CollectRecord checkout(CollectSurvey survey, User user, int recordId, int step, String sessionId, boolean forceUnlock) throws RecordLockedException, MultipleEditException {
-		isLockAllowed(user, recordId, sessionId, forceUnlock);
-		lock(recordId, user, sessionId, forceUnlock);
-		CollectRecord record = recordDao.load(survey, recordId, step);
-		recordConverter.convertToLatestVersion(record);
-		return record;
+		if ( isLockingEnabled() ) {
+			isLockAllowed(user, recordId, sessionId, forceUnlock);
+			lock(recordId, user, sessionId, forceUnlock);
+		}
+		return load(survey, recordId, step);
 	}
 	
 	@Transactional
-	public CollectRecord load(CollectSurvey survey, int recordId, int step) throws RecordPersistenceException {
+	public CollectRecord load(CollectSurvey survey, int recordId, int step) {
 		CollectRecord record = recordDao.load(survey, recordId, step);
 		recordConverter.convertToLatestVersion(record);
 		return record;
@@ -286,8 +301,10 @@ public class RecordManager {
 	
 	@Transactional
 	public void validate(CollectSurvey survey, User user, String sessionId, int recordId, Step step) throws RecordLockedException, MultipleEditException {
-		isLockAllowed(user, recordId, sessionId, true);
-		lock(recordId, user, sessionId, true);
+		if ( isLockingEnabled() ) {
+			isLockAllowed(user, recordId, sessionId, true);
+			lock(recordId, user, sessionId, true);
+		}
 		CollectRecord record = recordDao.load(survey, recordId, step.getStepNumber());
 		Entity rootEntity = record.getRootEntity();
 		addEmptyNodes(rootEntity);
@@ -295,7 +312,9 @@ public class RecordManager {
 		record.updateRootEntityKeyValues();
 		record.updateEntityCounts();
 		recordDao.update(record);
-		releaseLock(recordId);
+		if ( isLockingEnabled() ) {
+			releaseLock(recordId);
+		}
 	}
 	
 	public Entity addEntity(Entity parentEntity, String nodeName) {
@@ -623,6 +642,14 @@ public class RecordManager {
 
 	public void setLockTimeoutMillis(long timeoutMillis) {
 		this.lockTimeoutMillis = timeoutMillis;
+	}
+	
+	public boolean isLockingEnabled() {
+		return lockingEnabled;
+	}
+	
+	public void setLockingEnabled(boolean lockingEnabled) {
+		this.lockingEnabled = lockingEnabled;
 	}
 }
 

@@ -74,4 +74,12 @@ abstract class SurveyBaseDao extends JooqDaoSupport {
 		}
 	}
 	
+	public CollectSurveyContext getSurveyContext() {
+		return surveyContext;
+	}
+	
+	public void setSurveyContext(CollectSurveyContext surveyContext) {
+		this.surveyContext = surveyContext;
+	}
+	
 }
