@@ -16,10 +16,6 @@ package org.openforis.collect.model.proxy {
 	import org.openforis.collect.event.EventDispatcherFactory;
 	import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.SurveyProxy;
-	import org.openforis.collect.remoting.service.UpdateRequest;
-	import org.openforis.collect.remoting.service.UpdateRequestOperation;
-	import org.openforis.collect.remoting.service.UpdateRequestOperation$Method;
-	import org.openforis.collect.remoting.service.UpdateResponse;
 	import org.openforis.collect.util.ArrayUtil;
 
     [Bindable]
@@ -67,42 +63,38 @@ package org.openforis.collect.model.proxy {
 			return _nodesMap[id];
 		}
 		
-		public function update(responses:IList, req:UpdateRequest):void {
+		public function update(responseSet:RecordUpdateResponseSetProxy, req:RecordUpdateRequestSetProxy):void {
 			updateNodes(req);
 			
-			for each (var response:UpdateResponse in responses)	{
+			for each (var response:RecordUpdateResponseProxy in responseSet.responses)	{
 				processResponse(response);
 			}
 			
-			if ( responses != null && responses.length > 0 ) {
-				var firstResp:UpdateResponse = UpdateResponse(responses.getItemAt(0));
-				this.errors = firstResp.errors;
-				this.skipped = firstResp.skipped;
-				this.missing = firstResp.missing;
-				this.missingErrors = firstResp.missingErrors;
-				this.missingWarnings = firstResp.missingWarnings;
-				this.warnings = firstResp.warnings;
-			}
+			this.skipped = responseSet.skipped;
+			this.missing = responseSet.missing;
+			this.missingErrors = responseSet.missingErrors;
+			this.missingWarnings = responseSet.missingWarnings;
+			this.warnings = responseSet.warnings;
 			
 			_updated = true;
 			
 			var appEvt:ApplicationEvent = new ApplicationEvent(ApplicationEvent.UPDATE_RESPONSE_RECEIVED);
-			appEvt.result = responses;
+			appEvt.result = responseSet;
 			EventDispatcherFactory.getEventDispatcher().dispatchEvent(appEvt);
 		}
 		
-		private function updateNodes(req:UpdateRequest):void {
-			var reqOperations:ListCollectionView = req.operations;
+		private function updateNodes(req:RecordUpdateRequestSetProxy):void {
+			var reqOperations:ListCollectionView = req.requests;
 			var attr:AttributeProxy;
 			var field:FieldProxy;
-			for each (var reqOp:UpdateRequestOperation in reqOperations) {
+			for each (var reqOp:RecordUpdateRequestProxy in reqOperations) {
 				switch(reqOp.method) {
-					case UpdateRequestOperation$Method.UPDATE_REMARKS:
+					case RecordUpdateRequestProxy$Method.UPDATE_REMARKS:
 						attr = getNode(reqOp.nodeId) as AttributeProxy;
 						field = attr.getField(reqOp.fieldIndex);
 						field.remarks = reqOp.remarks;
 						break;
-					case UpdateRequestOperation$Method.UPDATE:
+					case RecordUpdateRequestProxy$Method.UPDATE:
 						attr = getNode(reqOp.nodeId) as AttributeProxy;
 						if(reqOp.fieldIndex >= 0) {
 							field = attr.getField(reqOp.fieldIndex);
@@ -115,14 +107,14 @@ package org.openforis.collect.model.proxy {
 							}
 						}
 						break;
-					case UpdateRequestOperation$Method.APPLY_DEFAULT_VALUE:
+					case RecordUpdateRequestProxy$Method.APPLY_DEFAULT_VALUE:
 						//nullify the symbol (if any)
 						attr = getNode(reqOp.nodeId) as AttributeProxy;
 						for each (field in attr.fields) {
 							field.symbol = null;
 						}
 						break;
-					case UpdateRequestOperation$Method.CONFIRM_ERROR:
+					case RecordUpdateRequestProxy$Method.CONFIRM_ERROR:
 						attr = getNode(reqOp.nodeId) as AttributeProxy;
 						if ( attr != null ) {
 							attr.errorConfirmed = true;
@@ -132,7 +124,7 @@ package org.openforis.collect.model.proxy {
 			}
 		}
 		
-		private function processResponse(response:UpdateResponse):void {
+		private function processResponse(response:RecordUpdateResponseProxy):void {
 			var node:NodeProxy, oldNode:NodeProxy, parent:EntityProxy;
 			if(response.createdNode != null) {
 				node = response.createdNode;

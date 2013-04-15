@@ -7,9 +7,9 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.metamodel.proxy.NumberAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.UnitProxy;
-	import org.openforis.collect.remoting.service.UpdateRequest;
-	import org.openforis.collect.remoting.service.UpdateRequestOperation;
-	import org.openforis.collect.remoting.service.UpdateRequestOperation$Method;
+	import org.openforis.collect.model.proxy.RecordUpdateRequestProxy;
+	import org.openforis.collect.model.proxy.RecordUpdateRequestProxy$Method;
+	import org.openforis.collect.model.proxy.RecordUpdateRequestSetProxy;
 	import org.openforis.collect.ui.component.input.IntegerInputField;
 	import org.openforis.collect.ui.component.input.NumericAttributeRenderer;
 	import org.openforis.collect.ui.component.input.NumericInputField;
@@ -51,28 +51,28 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function updateValue():void {
-			var updReq:UpdateRequest = new UpdateRequest();
-			var updateValueOp:UpdateRequestOperation = view.numericInputField.presenter.createUpdateValueOperation();
-			updReq.addOperation(updateValueOp);
-			var updateUnitOp:UpdateRequestOperation = createUpdateUnitOperation();
+			var updReqSet:RecordUpdateRequestSetProxy = new RecordUpdateRequestSetProxy();
+			var updateValueOp:RecordUpdateRequestProxy = view.numericInputField.presenter.createUpdateValueOperation();
+			updReqSet.addRequest(updateValueOp);
+			var updateUnitOp:RecordUpdateRequestProxy = createUpdateUnitOperation();
 			if ( updateUnitOp != null ) {
 				if(updateValueOp.value == null) {
 					//clear unit
 					updateUnitOp.value = null;
 				}
-				updReq.addOperation(updateUnitOp);
+				updReqSet.addRequest(updateUnitOp);
 			}
-			ClientFactory.dataClient.updateActiveRecord(updReq, null, faultHandler);
+			ClientFactory.dataClient.updateActiveRecord(updReqSet, null, faultHandler);
 		}
 		
-		protected function createUpdateUnitOperation():UpdateRequestOperation {
+		protected function createUpdateUnitOperation():RecordUpdateRequestProxy {
 			var attrDefn:NumberAttributeDefinitionProxy = NumberAttributeDefinitionProxy(view.attributeDefinition);
-			var result:UpdateRequestOperation = null;
+			var result:RecordUpdateRequestProxy = null;
 			if(view.unitInputField != null) {
 				result = view.unitInputField.presenter.createUpdateValueOperation();
 			} else if ( attrDefn.defaultUnit != null ) {
-				result = new UpdateRequestOperation();
-				result.method = UpdateRequestOperation$Method.UPDATE;
+				result = new RecordUpdateRequestProxy();
+				result.method = RecordUpdateRequestProxy$Method.UPDATE;
 				result.parentEntityId = view.attribute.parentId;
 				result.nodeName = view.attributeDefinition.name;
 				result.nodeId = view.attribute.id;

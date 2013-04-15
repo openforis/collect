@@ -17,7 +17,8 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.model.proxy.NodeProxy;
 	import org.openforis.collect.model.proxy.RecordProxy;
-	import org.openforis.collect.remoting.service.UpdateResponse;
+	import org.openforis.collect.model.proxy.RecordUpdateResponseProxy;
+	import org.openforis.collect.model.proxy.RecordUpdateResponseSetProxy;
 	import org.openforis.collect.ui.component.detail.CollectFormItem;
 	import org.openforis.collect.ui.component.detail.RelevanceDisplayManager;
 	import org.openforis.collect.ui.component.detail.ValidationDisplayManager;
@@ -77,8 +78,8 @@ package org.openforis.collect.presenter
 		
 		protected function updateResponseReceivedHandler(event:ApplicationEvent):void {
 			if(_view.parentEntity != null) {
-				var responses:IList = IList(event.result);
-				for each (var response:UpdateResponse in responses) {
+				var responseSet:RecordUpdateResponseSetProxy = RecordUpdateResponseSetProxy(event.result);
+				for each (var response:RecordUpdateResponseProxy in responseSet.responses) {
 					if(response.nodeId == _view.parentEntity.id) {
 						updateValidationDisplayManager();
 						updateRelevanceDisplayManager();

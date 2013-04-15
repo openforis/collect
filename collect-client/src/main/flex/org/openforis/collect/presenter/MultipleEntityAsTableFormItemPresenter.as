@@ -7,14 +7,12 @@ package org.openforis.collect.presenter
 	import mx.rpc.events.ResultEvent;
 	
 	import org.openforis.collect.client.ClientFactory;
-	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.event.InputFieldEvent;
 	import org.openforis.collect.model.proxy.EntityProxy;
-	import org.openforis.collect.remoting.service.UpdateRequest;
-	import org.openforis.collect.remoting.service.UpdateRequestOperation;
-	import org.openforis.collect.remoting.service.UpdateRequestOperation$Method;
+	import org.openforis.collect.model.proxy.RecordUpdateRequestProxy;
+	import org.openforis.collect.model.proxy.RecordUpdateRequestProxy$Method;
+	import org.openforis.collect.model.proxy.RecordUpdateRequestSetProxy;
 	import org.openforis.collect.ui.component.detail.MultipleEntityAsTableFormItem;
-	import org.openforis.collect.ui.component.detail.MultipleEntityFormItem;
 	import org.openforis.collect.ui.component.input.InputField;
 	import org.openforis.collect.util.AlertUtil;
 	import org.openforis.collect.util.CollectionUtil;
@@ -77,12 +75,12 @@ package org.openforis.collect.presenter
 			var entities:IList = getEntities();
 			var maxCount:Number = view.entityDefinition.maxCount
 			if(isNaN(maxCount) || CollectionUtil.isEmpty(entities) || entities.length < maxCount) {
-				var o:UpdateRequestOperation = new UpdateRequestOperation();
-				o.method = UpdateRequestOperation$Method.ADD;
-				o.parentEntityId = view.parentEntity.id;
-				o.nodeName = view.entityDefinition.name;
-				var req:UpdateRequest = new UpdateRequest(o);
-				ClientFactory.dataClient.updateActiveRecord(req, addResultHandler, faultHandler);
+				var r:RecordUpdateRequestProxy = new RecordUpdateRequestProxy();
+				r.method = RecordUpdateRequestProxy$Method.ADD;
+				r.parentEntityId = view.parentEntity.id;
+				r.nodeName = view.entityDefinition.name;
+				var reqSet:RecordUpdateRequestSetProxy = new RecordUpdateRequestSetProxy(r);
+				ClientFactory.dataClient.updateActiveRecord(reqSet, addResultHandler, faultHandler);
 			} else {
 				var labelText:String = view.entityDefinition.getInstanceOrHeadingLabelText();
 				AlertUtil.showError("edit.maxCountExceed", [maxCount, labelText]);

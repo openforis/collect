@@ -22,9 +22,9 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.model.proxy.AttributeProxy;
 	import org.openforis.collect.model.proxy.FieldProxy;
 	import org.openforis.collect.model.proxy.FileProxy;
+	import org.openforis.collect.model.proxy.RecordUpdateRequestProxy;
+	import org.openforis.collect.model.proxy.RecordUpdateRequestProxy$Method;
 	import org.openforis.collect.remoting.service.FileWrapper;
-	import org.openforis.collect.remoting.service.UpdateRequestOperation;
-	import org.openforis.collect.remoting.service.UpdateRequestOperation$Method;
 	import org.openforis.collect.ui.component.input.FileInputField;
 	import org.openforis.collect.util.AlertUtil;
 	import org.openforis.collect.util.ApplicationConstants;
@@ -157,7 +157,7 @@ package org.openforis.collect.presenter {
 			fileWrapper.data = fileReference.data;
 			fileWrapper.fileName = fileReference.name;
 			var nodeId:Number = _view.attribute.id;
-			var updateReq:UpdateRequestOperation = createFileUpdateRequestOperation(fileWrapper);
+			var updateReq:RecordUpdateRequestProxy = createFileUpdateRequestOperation(fileWrapper);
 			sendUpdateRequest(updateReq);
 		}
 		
@@ -198,7 +198,7 @@ package org.openforis.collect.presenter {
 		
 		protected function performDelete():void {
 			var nodeId:Number = _view.attribute.id;
-			var updateReq:UpdateRequestOperation = createFileUpdateRequestOperation(null);
+			var updateReq:RecordUpdateRequestProxy = createFileUpdateRequestOperation(null);
 			sendUpdateRequest(updateReq);
 
 			//var responder:IResponder = new AsyncResponder(deleteResultHandler, faultHandler);
@@ -223,18 +223,18 @@ package org.openforis.collect.presenter {
 			fileAttribute.getField(0).value = null;
 		}
 		
-		protected function createFileUpdateRequestOperation(fileWrapper:FileWrapper):UpdateRequestOperation {
-			var o:UpdateRequestOperation = new UpdateRequestOperation();
+		protected function createFileUpdateRequestOperation(fileWrapper:FileWrapper):RecordUpdateRequestProxy {
+			var r:RecordUpdateRequestProxy = new RecordUpdateRequestProxy();
 			var def:AttributeDefinitionProxy = _view.attributeDefinition;
-			o.method = UpdateRequestOperation$Method.UPDATE;
-			o.parentEntityId = _view.parentEntity.id;
-			o.nodeName = def.name;
-			o.nodeId = _view.attribute.id;
-			o.fieldIndex = -1;
-			o.value = fileWrapper;
-			o.symbol = null;
-			o.remarks = getRemarks();
-			return o;
+			r.method = RecordUpdateRequestProxy$Method.UPDATE;
+			r.parentEntityId = _view.parentEntity.id;
+			r.nodeName = def.name;
+			r.nodeId = _view.attribute.id;
+			r.fieldIndex = -1;
+			r.value = fileWrapper;
+			r.symbol = null;
+			r.remarks = getRemarks();
+			return r;
 		}
 		
 	}

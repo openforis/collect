@@ -6,13 +6,9 @@ package org.openforis.collect.client {
 	import mx.rpc.remoting.Operation;
 	
 	import org.openforis.collect.Application;
-	import org.openforis.collect.event.ApplicationEvent;
-	import org.openforis.collect.event.EventDispatcherFactory;
 	import org.openforis.collect.model.CollectRecord$Step;
-	import org.openforis.collect.model.proxy.FieldProxy;
-	import org.openforis.collect.model.proxy.NodeProxy;
-	import org.openforis.collect.model.proxy.RecordProxy;
-	import org.openforis.collect.remoting.service.UpdateRequest;
+	import org.openforis.collect.model.proxy.RecordUpdateRequestSetProxy;
+	import org.openforis.collect.model.proxy.RecordUpdateResponseSetProxy;
 	
 	/**
 	 * 
@@ -90,8 +86,8 @@ package org.openforis.collect.client {
 			token.addResponder(responder);
 		}
 		
-		public function updateActiveRecord(request:UpdateRequest, resultHandler:Function = null, faultHandler:Function = null):void {
-			this._queueProcessor.appendOperation(request, resultHandler, faultHandler, _updateActiveRecordOperation, request);
+		public function updateActiveRecord(requestSet:RecordUpdateRequestSetProxy, resultHandler:Function = null, faultHandler:Function = null):void {
+			this._queueProcessor.appendOperation(requestSet, resultHandler, faultHandler, _updateActiveRecordOperation, requestSet);
 		}
 		
 		public function moveNode(responder:IResponder, nodeId:int, index:int):void {
@@ -145,15 +141,15 @@ package org.openforis.collect.client {
 			if(lastCall != null) {
 				switch(lastCall.operation) {
 					case _updateActiveRecordOperation:
-						updateActiveRecordResultHandler(event, token as UpdateRequest);
+						updateActiveRecordResultHandler(event, token as RecordUpdateRequestSetProxy);
 						break;
 				}
 			}
 		}
 			
-		protected function updateActiveRecordResultHandler(event:ResultEvent, token:UpdateRequest):void {
-			var responses:IList = IList(event.result);
-			Application.activeRecord.update(responses, token);
+		protected function updateActiveRecordResultHandler(event:ResultEvent, token:RecordUpdateRequestSetProxy):void {
+			var responseSet:RecordUpdateResponseSetProxy = RecordUpdateResponseSetProxy(event.result);
+			Application.activeRecord.update(responseSet, token);
 		}
 
 	}

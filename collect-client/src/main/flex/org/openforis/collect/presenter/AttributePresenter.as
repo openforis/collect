@@ -9,7 +9,8 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.CodeAttributeDefinitionProxy;
 	import org.openforis.collect.model.proxy.AttributeProxy;
-	import org.openforis.collect.remoting.service.UpdateResponse;
+	import org.openforis.collect.model.proxy.RecordUpdateResponseProxy;
+	import org.openforis.collect.model.proxy.RecordUpdateResponseSetProxy;
 	import org.openforis.collect.ui.component.detail.AttributeItemRenderer;
 	import org.openforis.collect.ui.component.detail.ValidationDisplayManager;
 	import org.openforis.collect.ui.component.input.InputField;
@@ -66,17 +67,17 @@ package org.openforis.collect.presenter {
 		
 		protected function updateResponseReceivedHandler(event:ApplicationEvent):void {
 			if(_view.parentEntity != null && _view.attribute != null || _view.attributes != null) {
-				var responses:IList = IList(event.result);
-				if ( nodeUpdated(responses) ) {
+				var responseSet:RecordUpdateResponseSetProxy = RecordUpdateResponseSetProxy(event.result);
+				if ( nodeUpdated(responseSet) ) {
 					updateView();
-				} else if ( parentEntityUpdated(responses) ) {
+				} else if ( parentEntityUpdated(responseSet) ) {
 					updateValidationDisplayManager();
 				}
 			}
 		}
 		
-		protected function nodeUpdated(responses:IList):Boolean {
-			for each (var response:UpdateResponse in responses) {
+		protected function nodeUpdated(responseSet:RecordUpdateResponseSetProxy):Boolean {
+			for each (var response:RecordUpdateResponseProxy in responseSet.responses) {
 				if ( _view.attribute != null && _view.attribute.id == response.nodeId ||
 					 _view.attributes != null && CollectionUtil.containsItemWith(_view.attributes, "id", response.nodeId) ) {
 					return true;
@@ -85,8 +86,8 @@ package org.openforis.collect.presenter {
 			return false;
 		}
 		
-		protected function parentEntityUpdated(responses:IList):Boolean {
-			for each (var response:UpdateResponse in responses) {
+		protected function parentEntityUpdated(responseSet:RecordUpdateResponseSetProxy):Boolean {
+			for each (var response:RecordUpdateResponseProxy in responseSet.responses) {
 				if ( response.nodeId == _view.parentEntity.id ) {
 					return true;
 				}

@@ -51,6 +51,10 @@ package org.openforis.collect.util {
 	import org.openforis.collect.model.proxy.NodeProxy;
 	import org.openforis.collect.model.proxy.RealRangeProxy;
 	import org.openforis.collect.model.proxy.RecordProxy;
+	import org.openforis.collect.model.proxy.RecordUpdateRequestProxy;
+	import org.openforis.collect.model.proxy.RecordUpdateRequestSetProxy;
+	import org.openforis.collect.model.proxy.RecordUpdateResponseProxy;
+	import org.openforis.collect.model.proxy.RecordUpdateResponseSetProxy;
 	import org.openforis.collect.model.proxy.SamplingDesignItemProxy;
 	import org.openforis.collect.model.proxy.SamplingDesignSummariesProxy;
 	import org.openforis.collect.model.proxy.TaxonOccurrenceProxy;
@@ -60,14 +64,13 @@ package org.openforis.collect.util {
 	import org.openforis.collect.model.proxy.TimeProxy;
 	import org.openforis.collect.model.proxy.ValidationResultProxy;
 	import org.openforis.collect.model.proxy.ValidationResultsProxy;
-	import org.openforis.collect.remoting.service.UpdateResponse;
 	import org.openforis.collect.remoting.service.codelistimport.proxy.CodeListImportStatusProxy;
-	import org.openforis.collect.remoting.service.dataimport.DataImportStateProxy;
-	import org.openforis.collect.remoting.service.dataimport.DataImportSummaryProxy;
-	import org.openforis.collect.remoting.service.dataimport.NodeUnmarshallingErrorProxy;
 	import org.openforis.collect.remoting.service.dataexport.DataExportState;
+	import org.openforis.collect.remoting.service.dataimport.DataImportStateProxy;
 	import org.openforis.collect.remoting.service.dataimport.DataImportSummaryItemProxy;
+	import org.openforis.collect.remoting.service.dataimport.DataImportSummaryProxy;
 	import org.openforis.collect.remoting.service.dataimport.FileUnmarshallingErrorProxy;
+	import org.openforis.collect.remoting.service.dataimport.NodeUnmarshallingErrorProxy;
 	import org.openforis.collect.remoting.service.samplingdesignimport.proxy.SamplingDesignImportStatusProxy;
 	import org.openforis.collect.remoting.service.speciesimport.proxy.SpeciesImportStatusProxy;
 	import org.openforis.idm.metamodel.validation.ValidationResultFlag;
@@ -126,6 +129,10 @@ package org.openforis.collect.util {
 				RangeAttributeDefinitionProxy,
 				RealRangeProxy,
 				RecordProxy,
+				RecordUpdateRequestProxy,
+				RecordUpdateRequestSetProxy,
+				RecordUpdateResponseProxy,
+				RecordUpdateResponseSetProxy,
 				SamplingDesignImportStatusProxy,
 				SamplingDesignItemProxy,
 				SamplingDesignSummariesProxy,
@@ -149,7 +156,6 @@ package org.openforis.collect.util {
 				UITabSetProxy,
 				UITabProxy,
 				UnitProxy,
-				UpdateResponse,
 				ValidationResultsProxy,
 				ValidationResultProxy,
 				ValidationResultFlag

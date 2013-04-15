@@ -429,7 +429,7 @@ public class DataImportProcess implements Callable<Void> {
 		ParseRecordResult result = dataUnmarshaller.parse(reader);
 		if ( result.isSuccess() ) {
 			CollectRecord record = result.getRecord();
-			recordManager.addEmptyNodes(record.getRootEntity());
+			record.addEmptyNodes(record.getRootEntity());
 			try {
 				record.updateDerivedStates();
 			} catch (Exception e) {

@@ -1,14 +1,13 @@
 package org.openforis.collect.presenter {
-	import flash.events.Event;
 	import flash.events.FocusEvent;
 	
 	import org.openforis.collect.Application;
 	import org.openforis.collect.model.proxy.CodeAttributeProxy;
 	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.model.proxy.FieldProxy;
-	import org.openforis.collect.remoting.service.UpdateRequest;
-	import org.openforis.collect.remoting.service.UpdateRequestOperation;
-	import org.openforis.collect.remoting.service.UpdateRequestOperation$Method;
+	import org.openforis.collect.model.proxy.RecordUpdateRequestProxy;
+	import org.openforis.collect.model.proxy.RecordUpdateRequestProxy$Method;
+	import org.openforis.collect.model.proxy.RecordUpdateRequestSetProxy;
 	import org.openforis.collect.ui.UIBuilder;
 	import org.openforis.collect.ui.component.input.FixedCodeInputField;
 	import org.openforis.collect.util.StringUtil;
@@ -74,15 +73,15 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function applyQualifier(value:String):void {
-			var o:UpdateRequestOperation = new UpdateRequestOperation();
-			o.method = UpdateRequestOperation$Method.UPDATE;
-			o.parentEntityId = _view.parentEntity.id;
-			o.nodeName = _view.attribute.name;
-			o.nodeId = _view.attribute.id;
-			o.fieldIndex = 1;
-			o.value = value;
-			var req:UpdateRequest = new UpdateRequest(o);
-			dataClient.updateActiveRecord(req, null, faultHandler);
+			var r:RecordUpdateRequestProxy = new RecordUpdateRequestProxy();
+			r.method = RecordUpdateRequestProxy$Method.UPDATE;
+			r.parentEntityId = _view.parentEntity.id;
+			r.nodeName = _view.attribute.name;
+			r.nodeId = _view.attribute.id;
+			r.fieldIndex = 1;
+			r.value = value;
+			var reqSet:RecordUpdateRequestSetProxy = new RecordUpdateRequestSetProxy(r);
+			dataClient.updateActiveRecord(reqSet, null, faultHandler);
 		}
 		
 	}

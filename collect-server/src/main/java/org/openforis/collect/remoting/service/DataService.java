@@ -5,20 +5,11 @@ package org.openforis.collect.remoting.service;
 
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.Stack;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-import org.apache.commons.lang3.StringUtils;
-import org.openforis.collect.manager.RecordFileException;
 import org.openforis.collect.manager.RecordFileManager;
 import org.openforis.collect.manager.RecordIndexException;
 import org.openforis.collect.manager.RecordIndexManager.SearchType;
@@ -29,47 +20,24 @@ import org.openforis.collect.metamodel.proxy.CodeListItemProxy;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
-import org.openforis.collect.model.FieldSymbol;
 import org.openforis.collect.model.RecordSummarySortField;
+import org.openforis.collect.model.RecordUpdateRequestSet;
+import org.openforis.collect.model.RecordUpdateResponseSet;
 import org.openforis.collect.model.User;
-import org.openforis.collect.model.proxy.NodeProxy;
 import org.openforis.collect.model.proxy.RecordProxy;
+import org.openforis.collect.model.proxy.RecordUpdateRequestSetProxy;
+import org.openforis.collect.model.proxy.RecordUpdateResponseSetProxy;
 import org.openforis.collect.persistence.MultipleEditException;
 import org.openforis.collect.persistence.RecordPersistenceException;
-import org.openforis.collect.remoting.service.UpdateRequestOperation.Method;
 import org.openforis.collect.remoting.service.recordindex.RecordIndexService;
 import org.openforis.collect.spring.MessageContextHolder;
 import org.openforis.collect.web.session.SessionState;
-import org.openforis.idm.metamodel.AttributeDefinition;
-import org.openforis.idm.metamodel.BooleanAttributeDefinition;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeListItem;
-import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
-import org.openforis.idm.metamodel.DateAttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
-import org.openforis.idm.metamodel.FileAttributeDefinition;
-import org.openforis.idm.metamodel.ModelVersion;
-import org.openforis.idm.metamodel.NodeDefinition;
-import org.openforis.idm.metamodel.NumberAttributeDefinition;
-import org.openforis.idm.metamodel.NumericAttributeDefinition;
-import org.openforis.idm.metamodel.RangeAttributeDefinition;
 import org.openforis.idm.metamodel.Schema;
-import org.openforis.idm.metamodel.TimeAttributeDefinition;
-import org.openforis.idm.metamodel.Unit;
-import org.openforis.idm.metamodel.validation.ValidationResults;
-import org.openforis.idm.model.Attribute;
-import org.openforis.idm.model.Code;
-import org.openforis.idm.model.CodeAttribute;
 import org.openforis.idm.model.Entity;
-import org.openforis.idm.model.Field;
-import org.openforis.idm.model.IntegerRange;
 import org.openforis.idm.model.Node;
-import org.openforis.idm.model.NodePointer;
-import org.openforis.idm.model.NumericRange;
-import org.openforis.idm.model.RealRange;
-import org.openforis.idm.model.Value;
-import org.openforis.idm.model.expression.ExpressionFactory;
-import org.openforis.idm.model.expression.ModelPathExpression;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.transaction.annotation.Transactional;
@@ -108,7 +76,7 @@ public class DataService {
 		User user = sessionState.getUser();
 		CollectRecord record = recordManager.checkout(survey, user, id, step, sessionState.getSessionId(), forceUnlock);
 		Entity rootEntity = record.getRootEntity();
-		recordManager.addEmptyNodes(rootEntity);
+		record.addEmptyNodes(rootEntity);
 		sessionManager.setActiveRecord(record);
 		fileManager.reset();
 		prepareRecordIndexing();
@@ -164,7 +132,7 @@ public class DataService {
 		EntityDefinition rootEntityDefinition = schema.getRootEntityDefinition(rootEntityName);
 		CollectRecord record = recordManager.create(activeSurvey, rootEntityDefinition, user, versionName, sessionId);
 		Entity rootEntity = record.getRootEntity();
-		recordManager.addEmptyNodes(rootEntity);
+		record.addEmptyNodes(rootEntity);
 		sessionManager.setActiveRecord(record);
 		prepareRecordIndexing();
 		RecordProxy recordProxy = new RecordProxy(messageContextHolder, record);
@@ -201,260 +169,24 @@ public class DataService {
 
 	@Transactional
 	@Secured("ROLE_ENTRY")
-	public List<UpdateResponse> updateActiveRecord(UpdateRequest request) throws RecordPersistenceException, RecordIndexException {
+	public RecordUpdateResponseSetProxy updateActiveRecord(RecordUpdateRequestSetProxy requestSet) throws RecordPersistenceException, RecordIndexException {
 		sessionManager.checkIsActiveRecordLocked();
-		List<UpdateRequestOperation> operations = request.getOperations();
-		List<UpdateResponse> updateResponses = new ArrayList<UpdateResponse>();
-		for (UpdateRequestOperation operation : operations) {
-			Collection<UpdateResponse> responses = processUpdateRequestOperation(operation);
-			updateResponses.addAll(responses);
-		}
-		if ( updateResponses.size() > 0 ) {
-			CollectRecord activeRecord = getActiveRecord();
-			UpdateResponse firstResp = updateResponses.get(0);
-			firstResp.setErrors(activeRecord.getErrors());
-			firstResp.setMissing(activeRecord.getMissing());
-			firstResp.setMissingErrors(activeRecord.getMissingErrors());
-			firstResp.setMissingWarnings(activeRecord.getMissingWarnings());
-			firstResp.setSkipped(activeRecord.getSkipped());
-			firstResp.setWarnings(activeRecord.getWarnings());
+		CollectRecord activeRecord = getActiveRecord();
+		RecordUpdateRequestSet reqSet = requestSet.toRecordUpdateResponseSet(activeRecord);
+		RecordUpdateResponseSet responseSet = activeRecord.update(reqSet);
+		if ( ! responseSet.getResponses().isEmpty() ) {
 			if ( isCurrentRecordIndexable() ) {
 				recordIndexService.temporaryIndex(activeRecord);
 			}
 		}
-		return updateResponses;
+		return new RecordUpdateResponseSetProxy(messageContextHolder, responseSet);
 	}
 	
-	protected Collection<UpdateResponse> processUpdateRequestOperation(UpdateRequestOperation operation) throws RecordPersistenceException {
-		Method method = operation.getMethod();
-		switch (method) {
-			case CONFIRM_ERROR:
-				return processConfirmError(operation);
-			case APPROVE_MISSING:
-				return processApproveMissingValue(operation);
-			case UPDATE_REMARKS:
-				return processUpdateRemarks(operation);
-			case ADD:
-				return processAddNode(operation);
-			case UPDATE:
-				return processUpdateAttribute(operation);
-			case APPLY_DEFAULT_VALUE: 
-				return processApplyDefaultValue(operation);
-			case DELETE:
-				return processDeleteNode(operation);
-			default:
-				throw new IllegalArgumentException("UpdateRequestOperation method not supported: " + method);
-		}
-	}
-
-	protected Collection<UpdateResponse> processDeleteNode(
-			UpdateRequestOperation operation) {
-		CollectRecord record = getActiveRecord();
-		Node<?> node = record.getNodeByInternalId(operation.getNodeId());
-
-		Set<NodePointer> relevantDependencies = new HashSet<NodePointer>();
-		Set<NodePointer> requiredDependencies = new HashSet<NodePointer>();
-		HashSet<Attribute<?, ?>> checkDependencies = new HashSet<Attribute<?,?>>();
-		
-		Map<Integer, UpdateResponse> responseMap = new HashMap<Integer, UpdateResponse>();
-		List<NodePointer> cardinalityNodePointers = createCardinalityNodePointers(node);
-		Stack<Node<?>> depthFirstDescendants = getDepthFirstDescendants(node);
-		while ( !depthFirstDescendants.isEmpty() ) {
-			Node<?> n = depthFirstDescendants.pop();
-			relevantDependencies.addAll(n.getRelevantDependencies());
-			requiredDependencies.addAll(n.getRequiredDependencies());
-			if ( n instanceof Attribute ) {
-				checkDependencies.addAll(((Attribute<?, ?>) n).getCheckDependencies());
-			}
-			record.deleteNode(n);
-			
-			UpdateResponse resp = getOrCreateUpdateResponse(responseMap, node);
-			resp.setDeletedNodeId(node.getInternalId());
-		}
-		//clear dependencies
-		recordManager.clearRelevantDependencies(relevantDependencies);
-		HashSet<NodePointer> relevanceRequiredDependencies = new HashSet<NodePointer>();
-		relevanceRequiredDependencies.addAll(relevantDependencies);
-		relevanceRequiredDependencies.addAll(requiredDependencies);
-		recordManager.clearRequiredDependencies(relevanceRequiredDependencies);
-		recordManager.clearValidationResults(checkDependencies);
-		
-		prepareUpdateResponse(responseMap, relevanceRequiredDependencies, checkDependencies, cardinalityNodePointers);
-		return responseMap.values();
-	}
-	
-	protected Stack<Node<?>> getDepthFirstDescendants(Node<?> node) {
-		Stack<Node<?>> result = new Stack<Node<?>>();
-		Stack<Node<?>> stack = new Stack<Node<?>>();
-		stack.push(node);
-		while(!stack.isEmpty()){
-			Node<?> n = stack.pop();
-			result.push(n);
-			if(n instanceof Entity){
-				Entity entity = (Entity) n;
-				List<Node<? extends NodeDefinition>> children = entity.getChildren();
-				for (Node<? extends NodeDefinition> child : children) {
-					stack.push(child);
-				}
-			}
-		}
-		return result;
-	}
-
-	protected Collection<UpdateResponse> processApplyDefaultValue(
-			UpdateRequestOperation operation) {
-		CollectRecord record = getActiveRecord();
-		Integer nodeId = operation.getNodeId();
-		Node<?> node = record.getNodeByInternalId(nodeId);
-		if ( node instanceof Attribute ) {
-			Attribute<?, ?> attribute = (Attribute<?, ?>) node;
-			recordManager.applyDefaultValue(attribute);
-			Map<Integer, Object> fieldValues = new HashMap<Integer, Object>();
-			int fieldCount = attribute.getFieldCount();
-			for (int idx = 0; idx < fieldCount; idx ++) {
-				Field<?> field = attribute.getField(idx);
-				fieldValues.put(idx, field.getValue());
-			}
-			Map<Integer, UpdateResponse> responseMap = new HashMap<Integer, UpdateResponse>();
-			UpdateResponse response = getOrCreateUpdateResponse(responseMap, attribute);
-			response.setUpdatedFieldValues(fieldValues);
-			List<NodePointer> cardinalityNodePointers = createCardinalityNodePointers(attribute);
-			Set<NodePointer> relevanceRequiredDependencies = recordManager.clearRelevanceRequiredDependencies(attribute);
-			Set<Attribute<?, ?>> checkDependencies = recordManager.clearValidationResults(attribute);
-			relevanceRequiredDependencies.add(new NodePointer(attribute.getParent(), attribute.getName()));
-			checkDependencies.add(attribute);
-			prepareUpdateResponse(responseMap, relevanceRequiredDependencies, checkDependencies, cardinalityNodePointers);
-			return responseMap.values();
-		} else {
-			throw new IllegalArgumentException("This method is applicable only to attributes");
-		}
-	}
-
-	protected Collection<UpdateResponse> processUpdateAttribute(
-			UpdateRequestOperation operation) throws RecordFileException {
-		CollectRecord record = getActiveRecord();
-		Integer nodeId = operation.getNodeId();
-		Attribute<?, ?> attribute = (Attribute<?, ?>) record.getNodeByInternalId(nodeId);
-		NodeDefinition nodeDef = attribute.getDefinition();
-		Integer parentEntityId = operation.getParentEntityId();
-		Entity parentEntity = (Entity) record.getNodeByInternalId(parentEntityId);
-
-		record.setErrorConfirmed(attribute, false);
-		record.setMissingApproved(parentEntity, attribute.getName(), false);
-		record.setDefaultValueApplied(attribute, false);
-		
-		Map<Integer, Object> updatedFieldValues = new HashMap<Integer, Object>();
-		
-		Integer fieldIndex = operation.getFieldIndex();
-		Object requestValue = operation.getValue();
-		String remarks = operation.getRemarks();
-		FieldSymbol symbol = operation.getSymbol();
-
-		if (fieldIndex < 0) {
-			Object value = null;
-			if ( nodeDef instanceof FileAttributeDefinition) {
-				value = parseFileAttributeValue(nodeId, requestValue);
-			} else if (requestValue != null) {
-				value = parseCompositeAttributeValue(parentEntity, attribute.getDefinition(), requestValue);
-			}
-			recordManager.setAttributeValue(attribute, value, remarks);
-			for (int idx = 0; idx < attribute.getFieldCount(); idx++) {
-				Field<?> field = attribute.getField(idx);
-				Object fieldValue = field.getValue();
-				updatedFieldValues.put(idx, fieldValue);
-				recordManager.setFieldValue(attribute, fieldValue, remarks, symbol, idx);
-			}
-		} else {
-			Object value = parseFieldValue(parentEntity, attribute.getDefinition(), (String) requestValue, fieldIndex);
-			recordManager.setFieldValue(attribute, value, remarks, symbol, fieldIndex);
-			Field<?> field = attribute.getField(fieldIndex);
-			updatedFieldValues.put(fieldIndex, field.getValue());
-		}
-		Map<Integer, UpdateResponse> responseMap = new HashMap<Integer, UpdateResponse>();
-		UpdateResponse response = getOrCreateUpdateResponse(responseMap, attribute);
-		response.setUpdatedFieldValues(updatedFieldValues);
-		Set<NodePointer> relevanceRequiredDependencies = recordManager.clearRelevanceRequiredDependencies(attribute);
-		Set<Attribute<?, ?>> checkDependencies = recordManager.clearValidationResults(attribute);
-		relevanceRequiredDependencies.add(new NodePointer(attribute.getParent(), attribute.getName()));
-		checkDependencies.add(attribute);
-		List<NodePointer> cardinalityDependencies = createCardinalityNodePointers(attribute);
-		prepareUpdateResponse(responseMap, relevanceRequiredDependencies, checkDependencies, cardinalityDependencies);
-		return responseMap.values();
-	}
-
-	protected Collection<UpdateResponse> processAddNode(
-			UpdateRequestOperation operation) {
-		CollectRecord record = getActiveRecord();
-		String nodeName = operation.getNodeName();
-		Entity parentEntity = (Entity) record.getNodeByInternalId(operation.getParentEntityId());
-		
-		Node<?> createdNode = addNode(parentEntity, nodeName, operation.getValue(), operation.getSymbol(), operation.getRemarks());
-		
-		record.setMissingApproved(parentEntity, nodeName, false);
-		
-		Map<Integer, UpdateResponse> responseMap = new HashMap<Integer, UpdateResponse>();
-		UpdateResponse response = getOrCreateUpdateResponse(responseMap, createdNode);
-		response.setCreatedNode(NodeProxy.fromNode(messageContextHolder, createdNode));
-		Set<NodePointer> relevanceRequiredDependencies = recordManager.clearRelevanceRequiredDependencies(createdNode);
-		Set<Attribute<?, ?>> checkDependencies = null;
-		if(createdNode instanceof Attribute){
-			Attribute<?, ?> attribute = (Attribute<?, ?>) createdNode;
-			checkDependencies = recordManager.clearValidationResults(attribute);
-			checkDependencies.add(attribute);
-		}
-		relevanceRequiredDependencies.add(new NodePointer(createdNode.getParent(), nodeName));
-		List<NodePointer> cardinalityDependencies = createCardinalityNodePointers(createdNode);
-		prepareUpdateResponse(responseMap, relevanceRequiredDependencies, checkDependencies, cardinalityDependencies);
-		return responseMap.values();
-	}
-
-	protected Collection<UpdateResponse> processUpdateRemarks(
-			UpdateRequestOperation operation) {
-		CollectRecord record = getActiveRecord();
-		Attribute<?, ?> attribute = (Attribute<?, ?>) record.getNodeByInternalId(operation.getNodeId());
-		Field<?> fld = attribute.getField(operation.getFieldIndex());
-		fld.setRemarks(operation.getRemarks());
-		UpdateResponse response = createUpdateResponse(attribute);
-		return Arrays.asList(response);
-	}
-
-	protected Collection<UpdateResponse> processApproveMissingValue(
-			UpdateRequestOperation operation) {
-		CollectRecord record = getActiveRecord();
-		String nodeName = operation.getNodeName();
-		Integer parentEntityId = operation.getParentEntityId();
-		Entity parentEntity = (Entity) record.getNodeByInternalId(parentEntityId);
-		record.setMissingApproved(parentEntity, nodeName, true);
-		List<NodePointer> cardinalityNodePointers = createCardinalityNodePointers(parentEntity);
-		cardinalityNodePointers.add(new NodePointer(parentEntity, nodeName));
-		Map<Integer, UpdateResponse> responseMap = new HashMap<Integer, UpdateResponse>();
-		validateAll(responseMap, cardinalityNodePointers, false);
-		return responseMap.values();
-	}
-
-	protected Collection<UpdateResponse> processConfirmError(UpdateRequestOperation op) {
-		CollectRecord record = getActiveRecord();
-		Integer nodeId = op.getNodeId();
-		Node<?> node = null;
-		if(nodeId != null) {
-			node = record.getNodeByInternalId(nodeId);
-		}
-		Map<Integer, UpdateResponse> responseMap = new HashMap<Integer, UpdateResponse>();
-		Set<Attribute<?,?>> checkDependencies = new HashSet<Attribute<?,?>>();
-		Attribute<?, ?> attribute = (Attribute<?, ?>) node;
-		record.setErrorConfirmed(attribute, true);
-		attribute.clearValidationResults();
-		checkDependencies.add(attribute);
-		
-		getOrCreateUpdateResponse(responseMap, attribute);
-		validateChecks(responseMap, checkDependencies);
-		return responseMap.values();
-	}
-
+	//TODO manage FileAttribute values
+	/*
 	protected Object parseFileAttributeValue(Integer nodeId, Object requestValue) throws RecordFileException {
 		Object result;
 		SessionState sessionState = sessionManager.getSessionState();
-		CollectRecord record = sessionState.getActiveRecord();
 		String sessionId = sessionState.getSessionId();
 		if ( requestValue != null ) {
 			if ( requestValue instanceof FileWrapper ) {
@@ -469,242 +201,7 @@ public class DataService {
 		}
 		return result;
 	}
-	
-	protected List<NodePointer> createCardinalityNodePointers(Node<?> node){
-		List<NodePointer> nodePointers = new ArrayList<NodePointer>();
-		
-		Entity parent = node.getParent();
-		String childName = node.getName();
-		while(parent != null){
-			NodePointer nodePointer = new NodePointer(parent, childName );
-			nodePointers.add(nodePointer);
-			
-			childName = parent.getName();
-			parent = parent.getParent();
-		}
-		return nodePointers;
-	}
-
-	protected void prepareUpdateResponse(Map<Integer, UpdateResponse> responseMap, Set<NodePointer> relevanceRequiredDependencies, 
-			Collection<Attribute<?, ?>> checkDependencies, Collection<NodePointer> cardinalityDependencies) {
-		validateAll(responseMap, cardinalityDependencies, false);
-		validateAll(responseMap, relevanceRequiredDependencies, true);
-		validateChecks(responseMap, checkDependencies);
-	}
-
-	protected void validateChecks(Map<Integer, UpdateResponse> responseMap,
-			Collection<Attribute<?, ?>> attributes) {
-		if (attributes != null) {
-			for (Attribute<?, ?> attr : attributes) {
-				validateAttribute(responseMap, attr);
-			}
-		}
-	}
-
-	protected void validateAttribute(Map<Integer, UpdateResponse> responseMap,
-			Attribute<?, ?> attr) {
-		if ( !attr.isDetached() ) {
-			attr.clearValidationResults();
-			ValidationResults results = attr.validateValue();
-			UpdateResponse response = getOrCreateUpdateResponse(responseMap, attr);
-			response.setAttributeValidationResults(results);
-		}
-	}
-
-	protected void validateChecks(Map<Integer, UpdateResponse> responseMap,
-			Entity entity, String childName) {
-		List<Node<?>> children = entity.getAll(childName);
-		for ( Node<?> node : children ) {
-			if ( node instanceof Attribute ){
-				validateAttribute(responseMap, (Attribute<?, ?>) node);
-			}
-		}
-	}
-	
-	protected void validateAll(Map<Integer, UpdateResponse> responseMap,
-			Collection<NodePointer> nodePointers, boolean validateChecks) {
-		if (nodePointers != null) {
-			for (NodePointer nodePointer : nodePointers) {
-				Entity parent = nodePointer.getEntity();
-				if ( parent != null && ! parent.isDetached()) {
-					validateCardinality(responseMap, nodePointer);
-					validateRelevanceState(responseMap, nodePointer);
-					validateRequirenessState(responseMap, nodePointer);
-					if ( validateChecks ) {
-						validateChecks(responseMap, parent, nodePointer.getChildName());
-					}
-				}
-			}
-		}
-	}
-
-	protected void validateCardinality(Map<Integer, UpdateResponse> responseMap, NodePointer nodePointer) {
-		Entity entity = nodePointer.getEntity();
-		String childName = nodePointer.getChildName();
-		UpdateResponse response = getOrCreateUpdateResponse(responseMap, entity);
-		response.setMinCountValid(childName, entity.validateMinCount(childName));
-		response.setMaxCountValid(childName, entity.validateMaxCount(childName));
-	}
-
-	protected void validateRelevanceState(
-			Map<Integer, UpdateResponse> responseMap, NodePointer nodePointer) {
-		Entity entity = nodePointer.getEntity();
-		String childName = nodePointer.getChildName();
-		UpdateResponse response = getOrCreateUpdateResponse(responseMap, entity);
-		response.setRelevant(childName, entity.isRelevant(childName));
-	}
-
-	protected void validateRequirenessState(
-			Map<Integer, UpdateResponse> responseMap, NodePointer nodePointer) {
-		Entity entity = nodePointer.getEntity();
-		String childName = nodePointer.getChildName();
-		UpdateResponse response = getOrCreateUpdateResponse(responseMap, entity);
-		response.setRequired(childName, entity.isRequired(childName));
-	}
-
-	protected UpdateResponse getOrCreateUpdateResponse(Map<Integer, UpdateResponse> responseMap, Node<?> node){
-		Integer nodeId = node.getInternalId();
-		UpdateResponse response = responseMap.get(nodeId);
-		if(response == null){
-			response = createUpdateResponse(node);
-			responseMap.put(nodeId, response);
-		}
-		return response;
-	}
-
-	protected UpdateResponse createUpdateResponse(Node<?> node) {
-		return new UpdateResponse(messageContextHolder, node);
-	}
-	
-	@SuppressWarnings("unchecked")
-	protected Node<?> addNode(Entity parentEntity, String nodeName, Object requestValue, FieldSymbol symbol, String remarks) {
-		EntityDefinition parentEntityDefn = parentEntity.getDefinition();
-		NodeDefinition nodeDefn = parentEntityDefn.getChildDefinition(nodeName);
-		if(nodeDefn instanceof AttributeDefinition) {
-			AttributeDefinition def = (AttributeDefinition) nodeDefn;
-			Attribute<?, ?> attribute = (Attribute<?, ?>) def.createNode();
-			parentEntity.add(attribute);
-			if(requestValue != null) {
-				Value value = parseCompositeAttributeValue(parentEntity, (AttributeDefinition) nodeDefn, requestValue);
-				((Attribute<?, Value> ) attribute).setValue(value);
-			}
-			if(symbol != null || remarks != null) {
-				Character symbolChar = null;
-				if(symbol != null) {
-					symbolChar = symbol.getCode();
-				}
-				int fieldCount = attribute.getFieldCount();
-				for (int idx = 0; idx < fieldCount; idx++) {
-					Field<?> field = attribute.getField(idx);
-					field.setSymbol(symbolChar);
-					field.setRemarks(remarks);
-				}
-			}
-			return attribute;
-		} else {
-			Entity e = recordManager.addEntity(parentEntity, nodeName);
-			return e;
-		}
-	}
-	
-	protected Object parseFieldValue(Entity parentEntity, AttributeDefinition def, String value, Integer fieldIndex) {
-		Object fieldValue = null;
-		if(StringUtils.isBlank(value)) {
-			return null;
-		}
-		if(def instanceof BooleanAttributeDefinition) {
-			fieldValue = Boolean.parseBoolean(value);
-		} else if(def instanceof CoordinateAttributeDefinition) {
-			if(fieldIndex != null) {
-				if(fieldIndex == 2) {
-					fieldValue = value;
-				} else {
-					fieldValue = Double.valueOf(value);
-				}
-			}
-		} else if(def instanceof DateAttributeDefinition) {
-			Integer val = Integer.valueOf(value);
-			fieldValue = val;
-		} else if(def instanceof NumberAttributeDefinition) {
-			NumericAttributeDefinition numberDef = (NumericAttributeDefinition) def;
-			if(fieldIndex != null && fieldIndex == 2) {
-				//unit id
-				fieldValue = Integer.parseInt(value);
-			} else {
-				NumericAttributeDefinition.Type type = numberDef.getType();
-				Number number = null;
-				switch(type) {
-					case INTEGER:
-						number = Integer.valueOf(value);
-						break;
-					case REAL:
-						number = Double.valueOf(value);
-						break;
-				}
-				if(number != null) {
-					fieldValue = number;
-				}
-			}
-		} else if(def instanceof RangeAttributeDefinition) {
-			if(fieldIndex != null && fieldIndex == 3) {
-				//unit id
-				fieldValue = Integer.parseInt(value);
-			} else {
-				RangeAttributeDefinition.Type type = ((RangeAttributeDefinition) def).getType();
-				Number number = null;
-				switch(type) {
-					case INTEGER:
-						number = Integer.valueOf(value);
-						break;
-					case REAL:
-						number = Double.valueOf(value);
-						break;
-				}
-				if(number != null) {
-					fieldValue = number;
-				}
-			}
-		} else if(def instanceof TimeAttributeDefinition) {
-			fieldValue = Integer.valueOf(value);
-		} else {
-			fieldValue = value;
-		}
-		return fieldValue;
-	}
-	
-	protected Value parseCompositeAttributeValue(Entity parentEntity, AttributeDefinition defn, Object value) {
-		Value result;
-		if(defn instanceof CodeAttributeDefinition) {
-			if ( value instanceof String) {
-				String stringVal = (String) value;
-				result = parseCode(parentEntity, (CodeAttributeDefinition) defn, stringVal );
-			} else {
-				throw new IllegalArgumentException("Invalid value type: expected String");
-			}
-		} else if(defn instanceof RangeAttributeDefinition) {
-			if ( value instanceof String) {
-				String stringVal = (String) value;
-				RangeAttributeDefinition rangeDef = (RangeAttributeDefinition) defn;
-				RangeAttributeDefinition.Type type = rangeDef.getType();
-				NumericRange<?> range = null;
-				Unit unit = null; //todo check if unit is required here or is set later by the client
-				switch(type) {
-					case INTEGER:
-						range = IntegerRange.parseIntegerRange(stringVal, unit);
-						break;
-					case REAL:
-						range = RealRange.parseRealRange(stringVal, unit);
-						break;
-				}
-				result = range;
-			} else {
-				throw new IllegalArgumentException("Invalid value type: expected String");
-			}
-		} else {
-			throw new IllegalArgumentException("Invalid AttributeDefinition: expected CodeAttributeDefinition or RangeAttributeDefinition");
-		}
-		return result;
-	}
+	*/
 	
 	@Secured("ROLE_ENTRY")
 	public void promoteToCleansing() throws RecordPersistenceException, RecordPromoteException  {
@@ -806,7 +303,7 @@ public class DataService {
 		CollectRecord record = getActiveRecord();
 		Entity parent = (Entity) record.getNodeByInternalId(parentEntityId);
 		CodeAttributeDefinition def = (CodeAttributeDefinition) parent.getDefinition().getChildDefinition(attrName);
-		List<CodeListItem> items = getAssignableCodeListItems(parent, def);
+		List<CodeListItem> items = record.getAssignableCodeListItems(parent, def);
 		List<CodeListItem> filteredItems = new ArrayList<CodeListItem>();
 		if(codes != null && codes.length > 0) {
 			//filter by specified codes
@@ -834,7 +331,7 @@ public class DataService {
 		CollectRecord record = getActiveRecord();
 		Entity parent = (Entity) record.getNodeByInternalId(parentEntityId);
 		CodeAttributeDefinition def = (CodeAttributeDefinition) parent.getDefinition().getChildDefinition(attrName);
-		List<CodeListItem> items = getAssignableCodeListItems(parent, def);
+		List<CodeListItem> items = record.getAssignableCodeListItems(parent, def);
 		List<CodeListItemProxy> result = CodeListItemProxy.fromList(items);
 		List<Node<?>> selectedCodes = parent.getAll(attrName);
 		CodeListItemProxy.setSelectedItems(result, selectedCodes);
@@ -854,10 +351,10 @@ public class DataService {
 		CollectRecord record = getActiveRecord();
 		Entity parent = (Entity) record.getNodeByInternalId(parentEntityId);
 		CodeAttributeDefinition def = (CodeAttributeDefinition) parent.getDefinition().getChildDefinition(attributeName);
-		List<CodeListItem> items = getAssignableCodeListItems(parent, def);
+		List<CodeListItem> items = record.getAssignableCodeListItems(parent, def);
 		List<CodeListItemProxy> result = new ArrayList<CodeListItemProxy>();
 		for (String code : codes) {
-			CodeListItem item = findCodeListItem(items, code);
+			CodeListItem item = record.findCodeListItem(items, code);
 			if(item != null) {
 				CodeListItemProxy proxy = new CodeListItemProxy(item);
 				result.add(proxy);
@@ -890,99 +387,4 @@ public class DataService {
 		return recordManager;
 	}
 
-	/**
-	 * Start of CodeList utility methods
-	 * 
-	 * TODO move them to a better location
-	 */
-	protected List<CodeListItem> getAssignableCodeListItems(Entity parent, CodeAttributeDefinition def) {
-		CollectRecord record = getActiveRecord();
-		List<CodeListItem> items = null;
-		if(StringUtils.isEmpty(def.getParentExpression())){
-			items = def.getList().getItems();
-		} else {
-			CodeAttribute parentCodeAttribute = getCodeParent(parent, def);
-			if(parentCodeAttribute!=null){
-				CodeListItem parentCodeListItem = parentCodeAttribute.getCodeListItem();
-				if(parentCodeListItem != null) {
-					//TODO exception if parent not specified
-					items = parentCodeListItem.getChildItems();
-				}
-			}
-		}
-		List<CodeListItem> result = new ArrayList<CodeListItem>();
-		if(items != null) {
-			ModelVersion version = record.getVersion();
-			for (CodeListItem item : items) {
-				if (version == null || version.isApplicable(item)) {
-					result.add(item);
-				}
-			}
-		}
-		return result;
-	}
-	
-	protected CodeAttribute getCodeParent(Entity context, CodeAttributeDefinition def) {
-		try {
-			String parentExpr = def.getParentExpression();
-			ExpressionFactory expressionFactory = context.getRecord().getSurveyContext().getExpressionFactory();
-			ModelPathExpression expression = expressionFactory.createModelPathExpression(parentExpr);
-			Node<?> parentNode = expression.evaluate(context, null);
-			if (parentNode != null && parentNode instanceof CodeAttribute) {
-				return (CodeAttribute) parentNode;
-			}
-		} catch (Exception e) {
-			// return null;
-		}
-		return null;
-	}
-
-	protected CodeListItem findCodeListItem(List<CodeListItem> siblings, String code) {
-		String adaptedCode = code.trim();
-		adaptedCode = adaptedCode.toUpperCase();
-		//remove initial zeros
-		adaptedCode = adaptedCode.replaceFirst("^0+", "");
-		adaptedCode = Pattern.quote(adaptedCode);
-
-		for (CodeListItem item : siblings) {
-			String itemCode = item.getCode();
-			Pattern pattern = Pattern.compile("^[0]*" + adaptedCode + "$", Pattern.CASE_INSENSITIVE);
-			Matcher matcher = pattern.matcher(itemCode);
-			if(matcher.find()) {
-				return item;
-			}
-		}
-		return null;
-	}
-	
-	protected Code parseCode(Entity parent, CodeAttributeDefinition def, String value) {
-		List<CodeListItem> items = getAssignableCodeListItems(parent, def);
-		Code code = parseCode(value, items);
-		return code;
-	}
-	
-	protected Code parseCode(String value, List<CodeListItem> codeList) {
-		Code code = null;
-		String[] strings = value.split(":");
-		String codeStr = null;
-		String qualifier = null;
-		switch(strings.length) {
-			case 2:
-				qualifier = strings[1].trim();
-			case 1:
-				codeStr = strings[0].trim();
-				break;
-			default:
-				//TODO throw error: invalid parameter
-		}
-		CodeListItem codeListItem = findCodeListItem(codeList, codeStr);
-		if(codeListItem != null) {
-			code = new Code(codeListItem.getCode(), qualifier);
-		}
-		if (code == null) {
-			code = new Code(codeStr, qualifier);
-		}
-		return code;
-	}
-	
 }

@@ -9,10 +9,11 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.event.InputFieldEvent;
-	import org.openforis.collect.remoting.service.UpdateRequest;
-	import org.openforis.collect.remoting.service.UpdateRequestOperation;
-	import org.openforis.collect.remoting.service.UpdateRequestOperation$Method;
-	import org.openforis.collect.remoting.service.UpdateResponse;
+	import org.openforis.collect.model.proxy.RecordUpdateRequestProxy;
+	import org.openforis.collect.model.proxy.RecordUpdateRequestProxy$Method;
+	import org.openforis.collect.model.proxy.RecordUpdateRequestSetProxy;
+	import org.openforis.collect.model.proxy.RecordUpdateResponseProxy;
+	import org.openforis.collect.model.proxy.RecordUpdateResponseSetProxy;
 	import org.openforis.collect.ui.component.detail.MultipleAttributeFormItem;
 	import org.openforis.collect.ui.component.input.InputField;
 	import org.openforis.collect.util.AlertUtil;
@@ -45,8 +46,8 @@ package org.openforis.collect.presenter
 		override protected function updateResponseReceivedHandler(event:ApplicationEvent):void {
 			super.updateResponseReceivedHandler(event);
 			if(_view.parentEntity != null) {
-				var responses:IList = IList(event.result);
-				for each (var response:UpdateResponse in responses) {
+				var responseSet:RecordUpdateResponseSetProxy = RecordUpdateResponseSetProxy(event.result);
+				for each (var response:RecordUpdateResponseProxy in responseSet.responses) {
 					if(response.nodeId == _view.parentEntity.id) {
 						updateValidationDisplayManager();
 						updateRelevanceDisplayManager();
@@ -89,12 +90,12 @@ package org.openforis.collect.presenter
 			var attributes:IList = getAttributes();
 			var maxCount:Number = view.attributeDefinition.maxCount
 			if(isNaN(maxCount) || CollectionUtil.isEmpty(attributes) || attributes.length < maxCount) {
-				var o:UpdateRequestOperation = new UpdateRequestOperation();
-				o.method = UpdateRequestOperation$Method.ADD;
-				o.parentEntityId = view.parentEntity.id;
-				o.nodeName = view.attributeDefinition.name;
-				var req:UpdateRequest = new UpdateRequest(o);
-				ClientFactory.dataClient.updateActiveRecord(req, addResultHandler, faultHandler);
+				var r:RecordUpdateRequestProxy = new RecordUpdateRequestProxy();
+				r.method = RecordUpdateRequestProxy$Method.ADD;
+				r.parentEntityId = view.parentEntity.id;
+				r.nodeName = view.attributeDefinition.name;
+				var reqSet:RecordUpdateRequestSetProxy = new RecordUpdateRequestSetProxy(r);
+				ClientFactory.dataClient.updateActiveRecord(reqSet, addResultHandler, faultHandler);
 			} else {
 				var labelText:String = view.attributeDefinition.getInstanceOrHeadingLabelText();
 				AlertUtil.showError("edit.maxCountExceed", [maxCount, labelText]);
