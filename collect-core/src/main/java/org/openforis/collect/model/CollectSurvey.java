@@ -5,8 +5,6 @@ package org.openforis.collect.model;
 
 import java.util.List;
 
-import javax.xml.bind.annotation.XmlRootElement;
-
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.metamodel.ui.UIOptionsConstants;
 import org.openforis.idm.metamodel.ApplicationOptions;
@@ -18,7 +16,6 @@ import org.openforis.idm.metamodel.SurveyContext;
  * @author S. Ricci
  * 
  */
-@XmlRootElement(name = "survey")
 public class CollectSurvey extends Survey {
 	
 	protected CollectSurvey(SurveyContext surveyContext) {
