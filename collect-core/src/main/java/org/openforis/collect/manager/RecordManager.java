@@ -631,9 +631,6 @@ public class RecordManager {
 
 	/* --- END OF LOCKING METHODS --- */
 
-	/**
-	 * GETTERS AND SETTERS
-	 */
 	public long getLockTimeoutMillis() {
 		return lockTimeoutMillis;
 	}

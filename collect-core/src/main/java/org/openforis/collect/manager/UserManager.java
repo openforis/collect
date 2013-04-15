@@ -105,4 +105,21 @@ public class UserManager {
 		}
 		userDao.delete(id);
 	}
+
+	public UserDao getUserDao() {
+		return userDao;
+	}
+
+	public void setUserDao(UserDao userDao) {
+		this.userDao = userDao;
+	}
+
+	public RecordDao getRecordDao() {
+		return recordDao;
+	}
+
+	public void setRecordDao(RecordDao recordDao) {
+		this.recordDao = recordDao;
+	}
+	
 }
