@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.openforis.collect.Proxy;
+import org.openforis.collect.manager.RecordFileManager;
+import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.RecordUpdateRequest;
 import org.openforis.collect.model.RecordUpdateRequestSet;
@@ -19,11 +21,11 @@ public class RecordUpdateRequestSetProxy implements Proxy {
 
 	private List<RecordUpdateRequestProxy> requests;
 	
-	public RecordUpdateRequestSet toRecordUpdateResponseSet(CollectRecord record) {
+	public RecordUpdateRequestSet toRecordUpdateResponseSet(CollectRecord record, RecordFileManager fileManager, SessionManager sessionManager) {
 		RecordUpdateRequestSet requestSet = new RecordUpdateRequestSet();
 		List<RecordUpdateRequest> convertedRequests = new ArrayList<RecordUpdateRequest>();
 		for (RecordUpdateRequestProxy requestProxy : requests) {
-			RecordUpdateRequest convertedRequest = requestProxy.toUpdateRequest(record);
+			RecordUpdateRequest convertedRequest = requestProxy.toUpdateRequest(record, fileManager, sessionManager);
 			convertedRequests.add(convertedRequest);
 		}
 		requestSet.setRequests(convertedRequests);

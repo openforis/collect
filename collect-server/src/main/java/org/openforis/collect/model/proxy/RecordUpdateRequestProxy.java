@@ -6,18 +6,23 @@ package org.openforis.collect.model.proxy;
 import java.util.List;
 
 import org.openforis.collect.Proxy;
+import org.openforis.collect.manager.RecordFileException;
+import org.openforis.collect.manager.RecordFileManager;
+import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.FieldSymbol;
 import org.openforis.collect.model.RecordUpdateRequest;
-import org.openforis.collect.model.RecordUpdateRequest.AddAttributeUpdateRequest;
-import org.openforis.collect.model.RecordUpdateRequest.AddEntityUpdateRequest;
-import org.openforis.collect.model.RecordUpdateRequest.ApplyDefaultValueUpdateRequest;
-import org.openforis.collect.model.RecordUpdateRequest.ApproveMissingValueUpdateRequest;
-import org.openforis.collect.model.RecordUpdateRequest.ConfirmErrorUpdateRequest;
-import org.openforis.collect.model.RecordUpdateRequest.DeleteNodeUpdateRequest;
-import org.openforis.collect.model.RecordUpdateRequest.UpdateAttributeUpdateRequest;
-import org.openforis.collect.model.RecordUpdateRequest.UpdateFieldUpdateRequest;
-import org.openforis.collect.model.RecordUpdateRequest.UpdateRemarksUpdateRequest;
+import org.openforis.collect.model.RecordUpdateRequest.AddAttributeRequest;
+import org.openforis.collect.model.RecordUpdateRequest.AddEntityRequest;
+import org.openforis.collect.model.RecordUpdateRequest.ApplyDefaultValueRequest;
+import org.openforis.collect.model.RecordUpdateRequest.ApproveMissingValueRequest;
+import org.openforis.collect.model.RecordUpdateRequest.ConfirmErrorRequest;
+import org.openforis.collect.model.RecordUpdateRequest.DeleteNodeRequest;
+import org.openforis.collect.model.RecordUpdateRequest.UpdateAttributeRequest;
+import org.openforis.collect.model.RecordUpdateRequest.UpdateFieldRequest;
+import org.openforis.collect.model.RecordUpdateRequest.UpdateRemarksRequest;
+import org.openforis.collect.remoting.service.FileWrapper;
+import org.openforis.collect.web.session.SessionState;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeListItem;
@@ -28,6 +33,8 @@ import org.openforis.idm.metamodel.Unit;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Code;
 import org.openforis.idm.model.Entity;
+import org.openforis.idm.model.File;
+import org.openforis.idm.model.FileAttribute;
 import org.openforis.idm.model.IntegerRange;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.NumericRange;
@@ -54,7 +61,9 @@ public class RecordUpdateRequestProxy implements Proxy {
 	private String remarks;
 	private FieldSymbol symbol;
 	
-	public RecordUpdateRequest toUpdateRequest(CollectRecord record) {
+	@SuppressWarnings("unchecked")
+	//TODO use RecordUpdateRequestProxy subclasses instead
+	public RecordUpdateRequest toUpdateRequest(CollectRecord record, RecordFileManager fileManager, SessionManager sessionManager) {
 		switch (method) {
 		case ADD: 
 			{
@@ -62,12 +71,12 @@ public class RecordUpdateRequestProxy implements Proxy {
 				EntityDefinition parentEntityDefn = parentEntity.getDefinition();
 				NodeDefinition childDefn = parentEntityDefn.getChildDefinition(nodeName);
 				if ( childDefn instanceof EntityDefinition ) {
-					AddEntityUpdateRequest request = new RecordUpdateRequest.AddEntityUpdateRequest();
+					AddEntityRequest request = new RecordUpdateRequest.AddEntityRequest();
 					request.setParentEntityId(parentEntityId);
 					request.setNodeName(nodeName);
 					return request;		
 				} else {
-					AddAttributeUpdateRequest<Value> request = new RecordUpdateRequest.AddAttributeUpdateRequest<Value>();
+					AddAttributeRequest<Value> request = new RecordUpdateRequest.AddAttributeRequest<Value>();
 					request.setParentEntityId(parentEntityId);
 					request.setNodeName(nodeName);
 					request.setRemarks(remarks);
@@ -81,28 +90,28 @@ public class RecordUpdateRequestProxy implements Proxy {
 			}
 		case APPLY_DEFAULT_VALUE:
 			{
-			ApplyDefaultValueUpdateRequest request = new RecordUpdateRequest.ApplyDefaultValueUpdateRequest();
+			ApplyDefaultValueRequest request = new RecordUpdateRequest.ApplyDefaultValueRequest();
 			Attribute<?, ?> attribute = (Attribute<?, ?>) record.getNodeByInternalId(nodeId);
 			request.setAttribute(attribute);
 			return request;
 			}
 		case APPROVE_MISSING:
 			{
-			ApproveMissingValueUpdateRequest request = new RecordUpdateRequest.ApproveMissingValueUpdateRequest();
+			ApproveMissingValueRequest request = new RecordUpdateRequest.ApproveMissingValueRequest();
 			request.setParentEntityId(parentEntityId);
 			request.setNodeName(nodeName);
 			return request;
 			}
 		case CONFIRM_ERROR:
 			{
-			ConfirmErrorUpdateRequest request = new RecordUpdateRequest.ConfirmErrorUpdateRequest();
+			ConfirmErrorRequest request = new RecordUpdateRequest.ConfirmErrorRequest();
 			Attribute<?, ?> attribute = (Attribute<?, ?>) record.getNodeByInternalId(nodeId);
 			request.setAttribute(attribute);
 			return request;
 			}
 		case DELETE:
 			{
-			DeleteNodeUpdateRequest request = new RecordUpdateRequest.DeleteNodeUpdateRequest();
+			DeleteNodeRequest request = new RecordUpdateRequest.DeleteNodeRequest();
 			Node<?> node = record.getNodeByInternalId(nodeId);
 			request.setNode(node);
 			return request;
@@ -110,19 +119,23 @@ public class RecordUpdateRequestProxy implements Proxy {
 		case UPDATE:
 			{
 			if ( fieldIndex < 0 ) {
-				UpdateAttributeUpdateRequest<Value> request = new RecordUpdateRequest.UpdateAttributeUpdateRequest<Value>();
-				@SuppressWarnings("unchecked")
-				Attribute<AttributeDefinition, Value> attribute = (Attribute<AttributeDefinition, Value>) record.getNodeByInternalId(nodeId);
-				request.setAttribute(attribute);
+				UpdateAttributeRequest<Value> request = new RecordUpdateRequest.UpdateAttributeRequest<Value>();
+				Attribute<?, ?> attribute = (Attribute<AttributeDefinition, Value>) record.getNodeByInternalId(nodeId);
+				request.setAttribute((Attribute<?, Value>) attribute);
 				if ( value != null ) {
-					Value parsedValue = parseCompositeAttributeValue(attribute.getParent(), attribute.getDefinition(), value);
+					Value parsedValue;
+					if ( attribute instanceof FileAttribute ) {
+						parsedValue = parseFileAttributeValue(record, fileManager, sessionManager, nodeId, value);
+					} else {
+						parsedValue = parseCompositeAttributeValue(attribute.getParent(), attribute.getDefinition(), value);
+					}
 					request.setValue(parsedValue);
 				}
 				request.setSymbol(symbol);
 				request.setRemarks(remarks);
 				return request;
 			} else {
-				UpdateFieldUpdateRequest request = new RecordUpdateRequest.UpdateFieldUpdateRequest();
+				UpdateFieldRequest request = new RecordUpdateRequest.UpdateFieldRequest();
 				Attribute<?, ?> attribute = (Attribute<?, ?>) record.getNodeByInternalId(nodeId);
 				request.setAttribute(attribute);
 				request.setFieldIndex(fieldIndex);
@@ -134,7 +147,7 @@ public class RecordUpdateRequestProxy implements Proxy {
 		}
 		case UPDATE_REMARKS:
 			{
-			UpdateRemarksUpdateRequest request = new RecordUpdateRequest.UpdateRemarksUpdateRequest();
+			UpdateRemarksRequest request = new RecordUpdateRequest.UpdateRemarksRequest();
 			Attribute<?, ?> attribute = (Attribute<?, ?>) record.getNodeByInternalId(nodeId);
 			request.setAttribute(attribute);
 			request.setFieldIndex(fieldIndex);
@@ -144,6 +157,29 @@ public class RecordUpdateRequestProxy implements Proxy {
 		default:
 			throw new IllegalArgumentException("Method not supported: " + method);
 		} 
+	}
+	
+	protected File parseFileAttributeValue(CollectRecord record, RecordFileManager fileManager, 
+			SessionManager sessionManager, Integer nodeId, Object requestValue) {
+		File result;
+		SessionState sessionState = sessionManager.getSessionState();
+		String sessionId = sessionState.getSessionId();
+		if ( requestValue != null ) {
+			if ( requestValue instanceof FileWrapper ) {
+				FileWrapper fileWrapper = (FileWrapper) requestValue;
+				try {
+					result = fileManager.saveToTempFolder(fileWrapper.getData(), fileWrapper.getFileName(), sessionId, record, nodeId);
+				} catch (RecordFileException e) {
+					throw new RuntimeException("Error parsing saving temporary file", e);
+				}
+			} else {
+				throw new IllegalArgumentException("Invalid value type: expected byte[]");
+			}
+		} else {
+			fileManager.prepareDeleteFile(sessionId, record, nodeId);
+			result = null;
+		}
+		return result;
 	}
 	
 	protected Value parseCompositeAttributeValue(Entity parentEntity, AttributeDefinition defn, Object value) {

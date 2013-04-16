@@ -22,6 +22,7 @@ import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.RecordSummarySortField;
 import org.openforis.collect.model.RecordUpdateRequestSet;
+import org.openforis.collect.model.RecordUpdateResponse;
 import org.openforis.collect.model.RecordUpdateResponseSet;
 import org.openforis.collect.model.User;
 import org.openforis.collect.model.proxy.RecordProxy;
@@ -172,35 +173,15 @@ public class DataService {
 	public RecordUpdateResponseSetProxy updateActiveRecord(RecordUpdateRequestSetProxy requestSet) throws RecordPersistenceException, RecordIndexException {
 		sessionManager.checkIsActiveRecordLocked();
 		CollectRecord activeRecord = getActiveRecord();
-		RecordUpdateRequestSet reqSet = requestSet.toRecordUpdateResponseSet(activeRecord);
+		RecordUpdateRequestSet reqSet = requestSet.toRecordUpdateResponseSet(activeRecord, fileManager, sessionManager);
 		RecordUpdateResponseSet responseSet = activeRecord.update(reqSet);
-		if ( ! responseSet.getResponses().isEmpty() && isCurrentRecordIndexable() ) {
+		List<RecordUpdateResponse> responses = responseSet.getResponses();
+		if ( ! responses.isEmpty() && isCurrentRecordIndexable() ) {
 			recordIndexService.temporaryIndex(activeRecord);
 		}
 		return new RecordUpdateResponseSetProxy(messageContextHolder, responseSet);
 	}
-	
-	//TODO manage FileAttribute values
-	/*
-	protected Object parseFileAttributeValue(Integer nodeId, Object requestValue) throws RecordFileException {
-		Object result;
-		SessionState sessionState = sessionManager.getSessionState();
-		String sessionId = sessionState.getSessionId();
-		if ( requestValue != null ) {
-			if ( requestValue instanceof FileWrapper ) {
-				FileWrapper fileWrapper = (FileWrapper) requestValue;
-				result = fileManager.saveToTempFolder(fileWrapper.getData(), fileWrapper.getFileName(), sessionId, record, nodeId);
-			} else {
-				throw new IllegalArgumentException("Invalid value type: expected byte[]");
-			}
-		} else {
-			fileManager.prepareDeleteFile(sessionId, record, nodeId);
-			result = null;
-		}
-		return result;
-	}
-	*/
-	
+
 	@Secured("ROLE_ENTRY")
 	public void promoteToCleansing() throws RecordPersistenceException, RecordPromoteException  {
 		promote(Step.CLEANSING);

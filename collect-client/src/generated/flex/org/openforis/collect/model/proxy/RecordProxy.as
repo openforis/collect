@@ -63,31 +63,27 @@ package org.openforis.collect.model.proxy {
 			return _nodesMap[id];
 		}
 		
-		public function update(responseSet:RecordUpdateResponseSetProxy, req:RecordUpdateRequestSetProxy):void {
-			updateNodes(req);
-			
-			for each (var response:RecordUpdateResponseProxy in responseSet.responses)	{
-				processResponse(response);
-			}
-			
+		public function update(responseSet:RecordUpdateResponseSetProxy, requestSet:RecordUpdateRequestSetProxy):void {
+			updateNodes(requestSet);
 			this.skipped = responseSet.skipped;
 			this.missing = responseSet.missing;
 			this.missingErrors = responseSet.missingErrors;
 			this.missingWarnings = responseSet.missingWarnings;
 			this.warnings = responseSet.warnings;
-			
+			for each (var response:RecordUpdateResponseProxy in responseSet.responses)	{
+				processResponse(response);
+			}
 			_updated = true;
-			
 			var appEvt:ApplicationEvent = new ApplicationEvent(ApplicationEvent.UPDATE_RESPONSE_RECEIVED);
 			appEvt.result = responseSet;
 			EventDispatcherFactory.getEventDispatcher().dispatchEvent(appEvt);
 		}
 		
-		private function updateNodes(req:RecordUpdateRequestSetProxy):void {
-			var reqOperations:ListCollectionView = req.requests;
+		private function updateNodes(reqSet:RecordUpdateRequestSetProxy):void {
+			var requests:ListCollectionView = reqSet.requests;
 			var attr:AttributeProxy;
 			var field:FieldProxy;
-			for each (var reqOp:RecordUpdateRequestProxy in reqOperations) {
+			for each (var reqOp:RecordUpdateRequestProxy in requests) {
 				switch(reqOp.method) {
 					case RecordUpdateRequestProxy$Method.UPDATE_REMARKS:
 						attr = getNode(reqOp.nodeId) as AttributeProxy;

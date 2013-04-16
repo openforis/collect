@@ -16,15 +16,15 @@ import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.manager.RecordIndexException;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.metamodel.ui.UIOptions.Layout;
-import org.openforis.collect.model.RecordUpdateRequest.AddAttributeUpdateRequest;
-import org.openforis.collect.model.RecordUpdateRequest.AddEntityUpdateRequest;
-import org.openforis.collect.model.RecordUpdateRequest.ApplyDefaultValueUpdateRequest;
-import org.openforis.collect.model.RecordUpdateRequest.ApproveMissingValueUpdateRequest;
-import org.openforis.collect.model.RecordUpdateRequest.ConfirmErrorUpdateRequest;
-import org.openforis.collect.model.RecordUpdateRequest.DeleteNodeUpdateRequest;
-import org.openforis.collect.model.RecordUpdateRequest.UpdateAttributeUpdateRequest;
-import org.openforis.collect.model.RecordUpdateRequest.UpdateFieldUpdateRequest;
-import org.openforis.collect.model.RecordUpdateRequest.UpdateRemarksUpdateRequest;
+import org.openforis.collect.model.RecordUpdateRequest.AddAttributeRequest;
+import org.openforis.collect.model.RecordUpdateRequest.AddEntityRequest;
+import org.openforis.collect.model.RecordUpdateRequest.ApplyDefaultValueRequest;
+import org.openforis.collect.model.RecordUpdateRequest.ApproveMissingValueRequest;
+import org.openforis.collect.model.RecordUpdateRequest.ConfirmErrorRequest;
+import org.openforis.collect.model.RecordUpdateRequest.DeleteNodeRequest;
+import org.openforis.collect.model.RecordUpdateRequest.UpdateAttributeRequest;
+import org.openforis.collect.model.RecordUpdateRequest.UpdateFieldRequest;
+import org.openforis.collect.model.RecordUpdateRequest.UpdateRemarksRequest;
 import org.openforis.collect.model.RecordUpdateResponse.AttributeUpdateResponse;
 import org.openforis.collect.model.RecordUpdateResponse.DeleteNodeResponse;
 import org.openforis.collect.model.RecordUpdateResponse.EntityUpdateResponse;
@@ -650,31 +650,31 @@ public class CollectRecord extends Record {
 	
 	@SuppressWarnings("unchecked")
 	protected Collection<RecordUpdateResponse> update(RecordUpdateRequest req) throws RecordPersistenceException {
-		if ( req instanceof ConfirmErrorUpdateRequest ) {
-			return confirmError((ConfirmErrorUpdateRequest) req);
-		} else if ( req instanceof ApproveMissingValueUpdateRequest ) {
-			return approveMissingValue((ApproveMissingValueUpdateRequest) req);
-		} else if ( req instanceof UpdateRemarksUpdateRequest ) {
-			return updateRemarks((UpdateRemarksUpdateRequest) req);
-		} else if ( req instanceof AddAttributeUpdateRequest ) {
-			return addAttribute((AddAttributeUpdateRequest<Value>) req);
-		} else if ( req instanceof AddEntityUpdateRequest ) {
-			return addEntity((AddEntityUpdateRequest) req);
-		} else if ( req instanceof UpdateAttributeUpdateRequest ) {
-			return updateAttribute((UpdateAttributeUpdateRequest<?>) req);
-		} else if ( req instanceof UpdateFieldUpdateRequest ) {
-			return updateField((UpdateFieldUpdateRequest) req);
-		} else if ( req instanceof ApplyDefaultValueUpdateRequest ) {
-			return applyDefaultValue((ApplyDefaultValueUpdateRequest) req);
-		} else if ( req instanceof DeleteNodeUpdateRequest ) {
-			return deleteNode((DeleteNodeUpdateRequest) req);
+		if ( req instanceof ConfirmErrorRequest ) {
+			return confirmError((ConfirmErrorRequest) req);
+		} else if ( req instanceof ApproveMissingValueRequest ) {
+			return approveMissingValue((ApproveMissingValueRequest) req);
+		} else if ( req instanceof UpdateRemarksRequest ) {
+			return updateRemarks((UpdateRemarksRequest) req);
+		} else if ( req instanceof AddAttributeRequest ) {
+			return addAttribute((AddAttributeRequest<Value>) req);
+		} else if ( req instanceof AddEntityRequest ) {
+			return addEntity((AddEntityRequest) req);
+		} else if ( req instanceof UpdateAttributeRequest ) {
+			return updateAttribute((UpdateAttributeRequest<?>) req);
+		} else if ( req instanceof UpdateFieldRequest ) {
+			return updateField((UpdateFieldRequest) req);
+		} else if ( req instanceof ApplyDefaultValueRequest ) {
+			return applyDefaultValue((ApplyDefaultValueRequest) req);
+		} else if ( req instanceof DeleteNodeRequest ) {
+			return deleteNode((DeleteNodeRequest) req);
 		} else {
 			throw new IllegalArgumentException("RecordUpdateRequest not supported: " + req.getClass().getSimpleName());
 		}
 	}
 
 	protected Collection<RecordUpdateResponse> deleteNode(
-			DeleteNodeUpdateRequest req) {
+			DeleteNodeRequest req) {
 		Set<NodePointer> relevantDependencies = new HashSet<NodePointer>();
 		Set<NodePointer> requiredDependencies = new HashSet<NodePointer>();
 		HashSet<Attribute<?, ?>> checkDependencies = new HashSet<Attribute<?,?>>();
@@ -725,7 +725,7 @@ public class CollectRecord extends Record {
 	}
 
 	protected Collection<RecordUpdateResponse> applyDefaultValue(
-			ApplyDefaultValueUpdateRequest req) {
+			ApplyDefaultValueRequest req) {
 		Attribute<?, ?> attribute = req.getAttribute();
 		applyDefaultValue(attribute);
 		Map<Integer, Object> fieldValues = new HashMap<Integer, Object>();
@@ -748,7 +748,7 @@ public class CollectRecord extends Record {
 	}
 
 	protected Collection<RecordUpdateResponse> updateAttribute(
-			UpdateAttributeUpdateRequest<?> req) {
+			UpdateAttributeRequest<?> req) {
 		@SuppressWarnings("unchecked")
 		Attribute<? extends NodeDefinition, Value> attribute = (Attribute<?, Value>) req.getAttribute();
 		Entity parentEntity = attribute.getParent();
@@ -783,7 +783,7 @@ public class CollectRecord extends Record {
 	}
 
 	protected Collection<RecordUpdateResponse> updateField(
-			UpdateFieldUpdateRequest operation) {
+			UpdateFieldRequest operation) {
 		Attribute<?, ?> attribute = operation.getAttribute();
 		Entity parentEntity = attribute.getParent();
 
@@ -816,7 +816,7 @@ public class CollectRecord extends Record {
 	}
 	
 	protected Collection<RecordUpdateResponse> addEntity(
-			AddEntityUpdateRequest req) {
+			AddEntityRequest req) {
 		String nodeName = req.getNodeName();
 		Entity parentEntity = (Entity) getNodeByInternalId(req.getParentEntityId());
 		
@@ -836,7 +836,7 @@ public class CollectRecord extends Record {
 	}
 
 	protected Collection<RecordUpdateResponse> addAttribute(
-			AddAttributeUpdateRequest<Value> req) {
+			AddAttributeRequest<Value> req) {
 		String nodeName = req.getNodeName();
 		Entity parentEntity = (Entity) getNodeByInternalId(req.getParentEntityId());
 		
@@ -861,7 +861,7 @@ public class CollectRecord extends Record {
 	}
 
 	protected Collection<RecordUpdateResponse> updateRemarks(
-			UpdateRemarksUpdateRequest req) {
+			UpdateRemarksRequest req) {
 		Attribute<?, ?> attribute = req.getAttribute();
 		Field<?> fld = attribute.getField(req.getFieldIndex());
 		fld.setRemarks(req.getRemarks());
@@ -871,7 +871,7 @@ public class CollectRecord extends Record {
 	}
 
 	protected Collection<RecordUpdateResponse> approveMissingValue(
-			ApproveMissingValueUpdateRequest req) {
+			ApproveMissingValueRequest req) {
 		String nodeName = req.getNodeName();
 		Integer parentEntityId = req.getParentEntityId();
 		Entity parentEntity = (Entity) getNodeByInternalId(parentEntityId);
@@ -883,7 +883,7 @@ public class CollectRecord extends Record {
 		return responseMap.values();
 	}
 
-	protected Collection<RecordUpdateResponse> confirmError(ConfirmErrorUpdateRequest req) {
+	protected Collection<RecordUpdateResponse> confirmError(ConfirmErrorRequest req) {
 		RecordUpdateResponseMap responseMap = new RecordUpdateResponseMap();
 		Set<Attribute<?,?>> checkDependencies = new HashSet<Attribute<?,?>>();
 		Attribute<?, ?> attribute = req.getAttribute();

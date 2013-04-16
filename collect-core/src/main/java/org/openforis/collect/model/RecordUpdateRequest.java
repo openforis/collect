@@ -12,7 +12,8 @@ import org.openforis.idm.model.Value;
  */
 public abstract class RecordUpdateRequest {
 	
-	public static class AddEntityUpdateRequest extends RecordUpdateRequest {
+	public static class AddEntityRequest extends RecordUpdateRequest {
+		
 		private Integer parentEntityId;
 		private String nodeName;
 		
@@ -33,31 +34,13 @@ public abstract class RecordUpdateRequest {
 		}
 
 	}
+	
+	public static abstract class BaseAttributeRequest<V extends Value> extends RecordUpdateRequest {
 		
-	public static class AddAttributeUpdateRequest<V extends Value> extends RecordUpdateRequest {
-
-		private Integer parentEntityId;
-		private String nodeName;
 		private V value;
 		private String remarks;
 		private FieldSymbol symbol;
 		
-		public Integer getParentEntityId() {
-			return parentEntityId;
-		}
-
-		public void setParentEntityId(Integer parentEntityId) {
-			this.parentEntityId = parentEntityId;
-		}
-
-		public String getNodeName() {
-			return nodeName;
-		}
-
-		public void setNodeName(String nodeName) {
-			this.nodeName = nodeName;
-		}
-
 		public String getRemarks() {
 			return remarks;
 		}
@@ -81,15 +64,35 @@ public abstract class RecordUpdateRequest {
 		public void setValue(V value) {
 			this.value = value;
 		}
+		
+	}
+	
+	public static class AddAttributeRequest<V extends Value> extends BaseAttributeRequest<V> {
+
+		private Integer parentEntityId;
+		private String nodeName;
+		
+		public Integer getParentEntityId() {
+			return parentEntityId;
+		}
+
+		public void setParentEntityId(Integer parentEntityId) {
+			this.parentEntityId = parentEntityId;
+		}
+
+		public String getNodeName() {
+			return nodeName;
+		}
+
+		public void setNodeName(String nodeName) {
+			this.nodeName = nodeName;
+		}
 
 	}
 	
-	public static class UpdateAttributeUpdateRequest<V extends Value> extends RecordUpdateRequest {
+	public static class UpdateAttributeRequest<V extends Value>  extends BaseAttributeRequest<V> {
 		
 		private Attribute<?, V> attribute;
-		private V value;
-		private String remarks;
-		private FieldSymbol symbol;
 		
 		public Attribute<?, V> getAttribute() {
 			return attribute;
@@ -98,34 +101,10 @@ public abstract class RecordUpdateRequest {
 		public void setAttribute(Attribute<?, V> attribute) {
 			this.attribute = attribute;
 		}
-		
-		public String getRemarks() {
-			return remarks;
-		}
-
-		public void setRemarks(String remarks) {
-			this.remarks = remarks;
-		}
-
-		public FieldSymbol getSymbol() {
-			return symbol;
-		}
-
-		public void setSymbol(FieldSymbol symbol) {
-			this.symbol = symbol;
-		}
-
-		public V getValue() {
-			return value;
-		}
-
-		public void setValue(V value) {
-			this.value = value;
-		}
 
 	}
 	
-	public static class UpdateFieldUpdateRequest extends RecordUpdateRequest {
+	public static class UpdateFieldRequest extends RecordUpdateRequest {
 		
 		private Attribute<?, ?> attribute;
 		private Integer fieldIndex;
@@ -175,7 +154,7 @@ public abstract class RecordUpdateRequest {
 
 	}
 	
-	public static class DeleteNodeUpdateRequest extends RecordUpdateRequest {
+	public static class DeleteNodeRequest extends RecordUpdateRequest {
 		
 		private Node<?> node;
 
@@ -189,7 +168,7 @@ public abstract class RecordUpdateRequest {
 
 	}
 	
-	public static class ApproveMissingValueUpdateRequest extends RecordUpdateRequest {
+	public static class ApproveMissingValueRequest extends RecordUpdateRequest {
 		
 		private Integer parentEntityId;
 		private String nodeName;
@@ -212,7 +191,7 @@ public abstract class RecordUpdateRequest {
 
 	}
 	
-	public static class UpdateRemarksUpdateRequest extends RecordUpdateRequest {
+	public static class UpdateRemarksRequest extends RecordUpdateRequest {
 		
 		private Attribute<?, ?> attribute;
 		private Integer fieldIndex;
@@ -244,7 +223,7 @@ public abstract class RecordUpdateRequest {
 		
 	}
 	
-	public static class ConfirmErrorUpdateRequest extends RecordUpdateRequest {
+	public static class ConfirmErrorRequest extends RecordUpdateRequest {
 		
 		private Attribute<?, ?> attribute;
 
@@ -258,7 +237,7 @@ public abstract class RecordUpdateRequest {
 
 	}
 	
-	public static class ApplyDefaultValueUpdateRequest extends RecordUpdateRequest {
+	public static class ApplyDefaultValueRequest extends RecordUpdateRequest {
 		
 		private Attribute<?, ?> attribute;
 
