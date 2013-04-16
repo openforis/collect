@@ -22,6 +22,7 @@
 		access-decision-manager-ref="accessDecisionManager">
 		<intercept-url pattern="/error.htm" access="permitAll" />
 		<intercept-url pattern="/login.htm*" access="permitAll" />
+		<intercept-url pattern="/samplingdesign/export/*" access="hasRole('ROLE_ADMIN')" />
 		<intercept-url pattern="/surveys" access="hasRole('ROLE_ADMIN')" />
 		<intercept-url pattern="/species/export/*" access="hasRole('ROLE_ADMIN')" />
 		<intercept-url pattern="/designer.htm" access="hasRole('ROLE_ADMIN')" />

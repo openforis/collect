@@ -28,7 +28,7 @@ public class SamplingDesignItem {
 	}
 	
 	public String getLevelCode(int level) {
-		if ( levelCodes == null || level < 0 || level > levelCodes.size()) {
+		if ( levelCodes == null || level <= 0 || level > levelCodes.size()) {
 			throw new IllegalArgumentException("Level " + level + " is not accessible");
 		} else {
 			return levelCodes.get(level - 1);

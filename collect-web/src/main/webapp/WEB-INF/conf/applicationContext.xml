@@ -54,6 +54,7 @@
 		<entry key="/surveys" value-ref="fileNameViewController" />
 		<entry key="/speciesImport" value-ref="fileNameViewController" />
 		<entry key="/species/export/*" value-ref="fileNameViewController" />
+		<entry key="/samplingdesign/export/*" value-ref="fileNameViewController" />
 	</util:map>
 
 	<bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
