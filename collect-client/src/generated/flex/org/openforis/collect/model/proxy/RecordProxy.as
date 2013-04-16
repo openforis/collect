@@ -175,7 +175,6 @@ package org.openforis.collect.model.proxy {
 				var parent:EntityProxy = getNode(node.parentId) as EntityProxy;
 				parent.updateKeyText();
 			}
-
 		}
 		
 		protected function processEntityUpdateResponse(response:EntityUpdateResponseProxy):void {

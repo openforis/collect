@@ -80,11 +80,12 @@ package org.openforis.collect.presenter {
 		
 		protected function nodeUpdated(responseSet:RecordUpdateResponseSetProxy):Boolean {
 			for each (var response:RecordUpdateResponseProxy in responseSet.responses) {
-				if ( response is AttributeUpdateResponseProxy && 
-					_view.attribute != null && _view.attribute.id == AttributeUpdateResponseProxy(response).nodeId ||
-					 _view.attributes != null && 
-					 CollectionUtil.containsItemWith(_view.attributes, "id", AttributeUpdateResponseProxy(response).nodeId) ) {
-					return true;
+				if ( response is AttributeUpdateResponseProxy) {
+					var attrResp:AttributeUpdateResponseProxy = AttributeUpdateResponseProxy(response);
+					if (_view.attribute != null && _view.attribute.id == attrResp.nodeId ||
+					 	_view.attributes != null && CollectionUtil.containsItemWith(_view.attributes, "id", attrResp.nodeId) ) {
+						return true;
+					}
 				}
 			}
 			return false;

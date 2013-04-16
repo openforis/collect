@@ -15,6 +15,7 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.model.proxy.RecordUpdateRequestProxy;
 	import org.openforis.collect.model.proxy.RecordUpdateRequestProxy$Method;
 	import org.openforis.collect.model.proxy.RecordUpdateRequestSetProxy;
+	import org.openforis.collect.model.proxy.RecordUpdateResponseSetProxy;
 	import org.openforis.collect.ui.component.detail.MultipleEntityFormItem;
 	import org.openforis.collect.ui.component.input.InputField;
 	import org.openforis.collect.util.AlertUtil;
@@ -180,9 +181,9 @@ package org.openforis.collect.presenter
 		}
 		
 		protected function deleteResultHandler(event:ResultEvent, token:Object = null):void {
-			var responses:IList = IList(event.result);
+			var responseSet:RecordUpdateResponseSetProxy = RecordUpdateResponseSetProxy(event.result);
 			var appEvt:ApplicationEvent = new ApplicationEvent(ApplicationEvent.UPDATE_RESPONSE_RECEIVED);
-			appEvt.result = responses;
+			appEvt.result = responseSet;
 			eventDispatcher.dispatchEvent(appEvt);
 			selectEntity(null);
 			updateViewEntities();
