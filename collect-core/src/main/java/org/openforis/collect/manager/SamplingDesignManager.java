@@ -30,8 +30,18 @@ public class SamplingDesignManager {
 	}
 
 	@Transactional
+	public SamplingDesignSummaries loadBySurvey(int surveyId) {
+		return loadBySurvey(surveyId, 0, Integer.MAX_VALUE);
+	}
+
+	@Transactional
 	public SamplingDesignSummaries loadBySurvey(int surveyId, int offset, int maxRecords) {
 		return load(false, surveyId, offset, maxRecords);
+	}
+	
+	@Transactional
+	public SamplingDesignSummaries loadBySurveyWork(int surveyWorkId) {
+		return loadBySurveyWork(surveyWorkId, 0, Integer.MAX_VALUE);
 	}
 	
 	@Transactional

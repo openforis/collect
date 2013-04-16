@@ -142,6 +142,11 @@ public class SpeciesManager {
 	}
 	
 	@Transactional
+	public TaxonSummaries loadTaxonSummaries(int taxonomyId) {
+		return loadTaxonSummaries(taxonomyId, 0, Integer.MAX_VALUE);
+	}
+	
+	@Transactional
 	public TaxonSummaries loadTaxonSummaries(int taxonomyId, int offset, int maxRecords) {
 		int totalCount = taxonDao.countTaxons(taxonomyId);
 		Set<String> vernacularNamesLanguageCodes = new HashSet<String>();
@@ -345,6 +350,39 @@ public class SpeciesManager {
 			idToTaxon.put(systemId, taxon);
 		}
 		return tree;
+	}
+
+	public TaxonDao getTaxonDao() {
+		return taxonDao;
+	}
+
+	public void setTaxonDao(TaxonDao taxonDao) {
+		this.taxonDao = taxonDao;
+	}
+
+	public TaxonVernacularNameDao getTaxonVernacularNameDao() {
+		return taxonVernacularNameDao;
+	}
+
+	public void setTaxonVernacularNameDao(
+			TaxonVernacularNameDao taxonVernacularNameDao) {
+		this.taxonVernacularNameDao = taxonVernacularNameDao;
+	}
+
+	public TaxonomyDao getTaxonomyDao() {
+		return taxonomyDao;
+	}
+
+	public void setTaxonomyDao(TaxonomyDao taxonomyDao) {
+		this.taxonomyDao = taxonomyDao;
+	}
+
+	public ExpressionFactory getExpressionFactory() {
+		return expressionFactory;
+	}
+
+	public void setExpressionFactory(ExpressionFactory expressionFactory) {
+		this.expressionFactory = expressionFactory;
 	}
 	
 }

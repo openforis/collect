@@ -181,7 +181,7 @@
       <dependency>
         <groupId>org.openforis.commons</groupId>
         <artifactId>commons-io</artifactId>
-        <version>0.0.2</version>
+        <version>0.0.4-SNAPSHOT</version>
       </dependency>
       <dependency>
 				<groupId>junit</groupId>
@@ -226,17 +226,17 @@
 			<dependency>
 				<groupId>org.openforis.idm</groupId>
 				<artifactId>idm-api</artifactId>
-				<version>3.0-Alpha6</version>
+				<version>3.0-CR1-SNAPSHOT</version>
 			</dependency>
 			<dependency>
 				<groupId>org.openforis.idm</groupId>
 				<artifactId>idm-transform</artifactId>
-				<version>3.0-Alpha6</version>
+				<version>3.0-CR1-SNAPSHOT</version>
 			</dependency>
 			<dependency>
 				<groupId>org.openforis.idm</groupId>
 				<artifactId>idm-test</artifactId>
-				<version>3.0-Alpha6</version>
+				<version>3.0-CR1-SNAPSHOT</version>
 				<scope>test</scope>
 			</dependency>
 			<dependency>

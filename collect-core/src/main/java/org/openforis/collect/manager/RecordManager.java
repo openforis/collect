@@ -46,13 +46,22 @@ public class RecordManager {
 	
 	@Autowired
 	private RecordDao recordDao;
-
-	private RecordConverter recordConverter = new RecordConverter();
-	
+	private RecordConverter recordConverter;
 	private Map<Integer, RecordLock> locks;
+	private long lockTimeoutMillis;
+	private boolean lockingEnabled;
 	
-	private long lockTimeoutMillis = 60000;
+	public RecordManager() {
+		this(true);
+	}
 	
+	public RecordManager(boolean recordLockingEnabled) {
+		super();
+		this.lockingEnabled = recordLockingEnabled;
+		lockTimeoutMillis = 60000;
+		recordConverter = new RecordConverter();
+	}
+
 	protected void init() {
 		locks = new HashMap<Integer, RecordLock>();
 	}
@@ -71,16 +80,20 @@ public class RecordManager {
 			recordDao.insert(record);
 			id = record.getId();
 			//todo fix: concurrency problem may occur..
-			lock(id, user, sessionId);
+			if ( isLockingEnabled() ) {
+				lock(id, user, sessionId);
+			}
 		} else {
-			checkIsLocked(id, user, sessionId);
+			if ( isLockingEnabled() ) {
+				checkIsLocked(id, user, sessionId);
+			}
 			recordDao.update(record);
 		}
 	}
 
 	@Transactional
 	public void delete(int recordId) throws RecordPersistenceException {
-		if ( isLocked(recordId) ) {
+		if ( isLockingEnabled() && isLocked(recordId) ) {
 			RecordLock lock = getLock(recordId);
 			User lockUser = lock.getUser();
 			throw new RecordLockedException(lockUser.getName());
@@ -104,15 +117,15 @@ public class RecordManager {
 	 */
 	@Transactional
 	public synchronized CollectRecord checkout(CollectSurvey survey, User user, int recordId, int step, String sessionId, boolean forceUnlock) throws RecordLockedException, MultipleEditException {
-		isLockAllowed(user, recordId, sessionId, forceUnlock);
-		lock(recordId, user, sessionId, forceUnlock);
-		CollectRecord record = recordDao.load(survey, recordId, step);
-		recordConverter.convertToLatestVersion(record);
-		return record;
+		if ( isLockingEnabled() ) {
+			isLockAllowed(user, recordId, sessionId, forceUnlock);
+			lock(recordId, user, sessionId, forceUnlock);
+		}
+		return load(survey, recordId, step);
 	}
 	
 	@Transactional
-	public CollectRecord load(CollectSurvey survey, int recordId, int step) throws RecordPersistenceException {
+	public CollectRecord load(CollectSurvey survey, int recordId, int step) {
 		CollectRecord record = recordDao.load(survey, recordId, step);
 		recordConverter.convertToLatestVersion(record);
 		return record;
@@ -214,8 +227,10 @@ public class RecordManager {
 	
 	@Transactional
 	public void validate(CollectSurvey survey, User user, String sessionId, int recordId, Step step) throws RecordLockedException, MultipleEditException {
-		isLockAllowed(user, recordId, sessionId, true);
-		lock(recordId, user, sessionId, true);
+		if ( isLockingEnabled() ) {
+			isLockAllowed(user, recordId, sessionId, true);
+			lock(recordId, user, sessionId, true);
+		}
 		CollectRecord record = recordDao.load(survey, recordId, step.getStepNumber());
 		Entity rootEntity = record.getRootEntity();
 		record.addEmptyNodes(rootEntity);
@@ -223,7 +238,9 @@ public class RecordManager {
 		record.updateRootEntityKeyValues();
 		record.updateEntityCounts();
 		recordDao.update(record);
-		releaseLock(recordId);
+		if ( isLockingEnabled() ) {
+			releaseLock(recordId);
+		}
 	}
 	
 	public void moveNode(CollectRecord record, int nodeId, int index) {
@@ -352,15 +369,28 @@ public class RecordManager {
 
 	/* --- END OF LOCKING METHODS --- */
 
-	/**
-	 * GETTERS AND SETTERS
-	 */
 	public long getLockTimeoutMillis() {
 		return lockTimeoutMillis;
 	}
 
 	public void setLockTimeoutMillis(long timeoutMillis) {
 		this.lockTimeoutMillis = timeoutMillis;
+	}
+	
+	public boolean isLockingEnabled() {
+		return lockingEnabled;
+	}
+	
+	public void setLockingEnabled(boolean lockingEnabled) {
+		this.lockingEnabled = lockingEnabled;
+	}
+	
+	public RecordDao getRecordDao() {
+		return recordDao;
+	}
+	
+	public void setRecordDao(RecordDao recordDao) {
+		this.recordDao = recordDao;
 	}
 }
 

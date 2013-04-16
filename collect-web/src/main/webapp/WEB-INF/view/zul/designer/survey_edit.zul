@@ -32,10 +32,10 @@
                <tab id="genericTab" label="${labels.survey.$}"
                  w:_sel="switchTab" forward="onSwitchTab=onSwitchTab" />
                <tab id="speciesImportTab"
-                 label="${labels.survey.species_import}"
+                 label="${labels.survey.species_import.$}"
                  w:_sel="switchTab" forward="onSwitchTab=onSwitchTab" />
                <tab id="samplingDesignImportTab"
-                 label="${labels.survey.sampling_desgign_import}"
+                 label="${labels.survey.sampling_design_import.$}"
                  w:_sel="switchTab" forward="onSwitchTab=onSwitchTab" />
                <tab id="schemaTab" label="${labels.survey.schema.$}"
                  w:_sel="switchTab" forward="onSwitchTab=onSwitchTab" />
@@ -48,12 +48,18 @@
                    src="survey_edit/info.zul" />
                </tabpanel>
                <tabpanel>
+               	<label value="${labels.survey.species_import.save_survey_before}" 
+               		visible="@load(empty vm.surveyId)" />
                  <flash src="@load(vm.speciesImportModuleUrl)"
-                   sclass="maximised" height="100%" width="100%" />
+                   sclass="maximised" height="100%" width="100%"
+                   visible="@load(not empty vm.surveyId)" />
                </tabpanel>
                <tabpanel>
+               	<label value="${labels.survey.sampling_design_import.save_survey_before}" 
+               		visible="@load(empty vm.surveyId)" />
                  <flash src="@load(vm.samplingDesignImportModuleUrl)"
-                   sclass="maximised" height="100%" width="100%" />
+                   sclass="maximised" height="100%" width="100%"
+                   visible="@load(not empty vm.surveyId)" />
                </tabpanel>
                <tabpanel>
                  <include id="schemaInclude"

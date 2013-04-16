@@ -18,31 +18,36 @@
 		<protect-pointcut expression="execution(* org.openforis.collect.remoting.service.*Service.*(..))" access="ROLE_USER"/>
 	</global-method-security>
 
-  <http use-expressions="true" auto-config="true" access-decision-manager-ref="accessDecisionManager">
-    <intercept-url pattern="/error.htm" access="permitAll" />
-    <intercept-url pattern="/login.htm*" access="permitAll" />
-    <intercept-url pattern="/surveys" access="hasRole('ROLE_ADMIN')" />
-    <intercept-url pattern="/designer.htm" access="hasRole('ROLE_ADMIN')" />
-    <intercept-url pattern="/editSurvey.htm" access="hasRole('ROLE_ADMIN')" />
-    <intercept-url pattern="/importSurvey.htm" access="hasRole('ROLE_ADMIN')" />
-    <intercept-url pattern="/logoUpload" access="hasRole('ROLE_ADMIN')" />
-    <intercept-url pattern="/speciesImport" access="hasRole('ROLE_ADMIN')" />
-    <intercept-url pattern="/uploadData.htm" access="permitAll" />
-    <intercept-url pattern="/uploadFile.htm" access="permitAll" />
-    <intercept-url pattern="/validateAllRecords.htm" access="hasRole('ROLE_ADMIN')" />
-    <intercept-url pattern="/validationReport" access="hasRole('ROLE_ADMIN')" />
-        
+	<http use-expressions="true" auto-config="true"
+		access-decision-manager-ref="accessDecisionManager">
+		<intercept-url pattern="/error.htm" access="permitAll" />
+		<intercept-url pattern="/login.htm*" access="permitAll" />
+		<intercept-url pattern="/samplingdesign/export/*" access="hasRole('ROLE_ADMIN')" />
+		<intercept-url pattern="/surveys" access="hasRole('ROLE_ADMIN')" />
+		<intercept-url pattern="/species/export/*" access="hasRole('ROLE_ADMIN')" />
+		<intercept-url pattern="/designer.htm" access="hasRole('ROLE_ADMIN')" />
+		<intercept-url pattern="/editSurvey.htm" access="hasRole('ROLE_ADMIN')" />
+		<intercept-url pattern="/importSurvey.htm" access="hasRole('ROLE_ADMIN')" />
+		<intercept-url pattern="/logoUpload" access="hasRole('ROLE_ADMIN')" />
+		<intercept-url pattern="/speciesImport" access="hasRole('ROLE_ADMIN')" />
+		<intercept-url pattern="/uploadData.htm" access="permitAll" />
+		<intercept-url pattern="/uploadFile.htm" access="permitAll" />
+		<intercept-url pattern="/validateAllRecords.htm" access="hasRole('ROLE_ADMIN')" />
+		<intercept-url pattern="/validationReport" access="hasRole('ROLE_ADMIN')" />
+
 		<!-- security disabled for these urls because of an issue with flash player 
 			for netscape compatible browser and uplaod to a secured url -->
 		<intercept-url pattern="/uploadRecordFile.htm" access="permitAll" />
 		<intercept-url pattern="/downlodRecordFile.htm" access="permitAll" />
-		
+
 		<intercept-url pattern="/index.htm" access="hasRole('ROLE_USER')" />
 		<intercept-url pattern="/*" access="hasRole('ROLE_USER')" />
 		<intercept-url pattern="/**/*.swf" access="hasRole('ROLE_USER')" />
-		<!-- <intercept-url pattern="/script/**" access="hasAnyRole('ROLE_ADMIN','ROLE_EDITOR','ROLE_USER')" /> -->
-		
-		<form-login login-page="/login.htm" authentication-failure-url="/login.htm?login_error=1"  />
+		<!-- <intercept-url pattern="/script/**" access="hasAnyRole('ROLE_ADMIN','ROLE_EDITOR','ROLE_USER')" 
+			/> -->
+
+		<form-login login-page="/login.htm"
+			authentication-failure-url="/login.htm?login_error=1" />
 		<http-basic />
 		<logout logout-success-url="/index.htm" />
 		<!-- remember-me / -->
