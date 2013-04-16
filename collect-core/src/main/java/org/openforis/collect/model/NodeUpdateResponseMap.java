@@ -7,10 +7,9 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.openforis.collect.model.RecordUpdateResponse.AttributeUpdateResponse;
-import org.openforis.collect.model.RecordUpdateResponse.DeleteNodeResponse;
-import org.openforis.collect.model.RecordUpdateResponse.EntityUpdateResponse;
-import org.openforis.collect.model.RecordUpdateResponse.NodeUpdateResponse;
+import org.openforis.collect.model.NodeUpdateResponse.AttributeUpdateResponse;
+import org.openforis.collect.model.NodeUpdateResponse.DeleteNodeResponse;
+import org.openforis.collect.model.NodeUpdateResponse.EntityUpdateResponse;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Node;
@@ -19,45 +18,43 @@ import org.openforis.idm.model.Node;
  * @author S. Ricci
  *
  */
-public class RecordUpdateResponseMap {
+public class NodeUpdateResponseMap {
 	
-	private Map<Integer, RecordUpdateResponse> nodeIdToResponse;
+	private Map<Integer, NodeUpdateResponse<?>> nodeIdToResponse;
 	
-	public RecordUpdateResponseMap() {
-		nodeIdToResponse = new HashMap<Integer, RecordUpdateResponse>();
+	public NodeUpdateResponseMap() {
+		nodeIdToResponse = new HashMap<Integer, NodeUpdateResponse<?>>();
 	}
 	
 	public EntityUpdateResponse prepareEntityResponse(Entity entity) {
-		EntityUpdateResponse response = (EntityUpdateResponse) getNodeResponse(entity);
+		EntityUpdateResponse response = (EntityUpdateResponse) getResponse(entity);
 		if(response == null){
-			response = new RecordUpdateResponse.EntityUpdateResponse(entity);
+			response = new NodeUpdateResponse.EntityUpdateResponse(entity);
 			putResponse(response);
 		}
 		return response;
 	}
 
 	public AttributeUpdateResponse prepareAttributeResponse(Attribute<?, ?> attribute) {
-		AttributeUpdateResponse response = (AttributeUpdateResponse) getNodeResponse(attribute);
+		AttributeUpdateResponse response = (AttributeUpdateResponse) getResponse(attribute);
 		if(response == null){
-			response = new RecordUpdateResponse.AttributeUpdateResponse(attribute);
+			response = new NodeUpdateResponse.AttributeUpdateResponse(attribute);
 			putResponse(response);
 		}
 		return response;
 	}
 	
 	public DeleteNodeResponse prepareDeleteNodeResponse(Node<?> node) {
-		Integer nodeId = node.getInternalId();
-		DeleteNodeResponse response = new RecordUpdateResponse.DeleteNodeResponse();
-		response.setDeletedNodeId(nodeId);
-		nodeIdToResponse.put(nodeId, response); //overwrite response if already present
+		DeleteNodeResponse response = new NodeUpdateResponse.DeleteNodeResponse(node);
+		nodeIdToResponse.put(node.getInternalId(), response); //overwrite response if already present
 		return response;
 	}
 	
 	public NodeUpdateResponse<?> prepareAddEntityResponse(Entity node) {
 		Integer nodeId = node.getInternalId();
-		NodeUpdateResponse<?> response = getNodeResponse(node);
+		NodeUpdateResponse<?> response = getResponse(node);
 		if ( response == null ) {
-			response = new RecordUpdateResponse.AddEntityResponse(node);
+			response = new NodeUpdateResponse.AddEntityResponse(node);
 			nodeIdToResponse.put(nodeId, response);
 			return response;
 		} else {
@@ -67,9 +64,9 @@ public class RecordUpdateResponseMap {
 
 	public NodeUpdateResponse<?> prepareAddAttributeResponse(Attribute<?, ?> node) {
 		Integer nodeId = node.getInternalId();
-		NodeUpdateResponse<?> response = getNodeResponse(node);
+		NodeUpdateResponse<?> response = getResponse(node);
 		if ( response == null ) {
-			response = new RecordUpdateResponse.AddAttributeResponse(node);
+			response = new NodeUpdateResponse.AddAttributeResponse(node);
 			nodeIdToResponse.put(nodeId, response);
 			return response;
 		} else {
@@ -77,11 +74,11 @@ public class RecordUpdateResponseMap {
 		}
 	}
 	
-	public Collection<RecordUpdateResponse> values() {
+	public Collection<NodeUpdateResponse<?>> values() {
 		return nodeIdToResponse.values();
 	}
 
-	protected NodeUpdateResponse<?> getNodeResponse(Node<?> node) {
+	protected NodeUpdateResponse<?> getResponse(Node<?> node) {
 		Integer nodeId = node.getInternalId();
 		NodeUpdateResponse<?> response = (NodeUpdateResponse<?>) nodeIdToResponse.get(nodeId);
 		return response;

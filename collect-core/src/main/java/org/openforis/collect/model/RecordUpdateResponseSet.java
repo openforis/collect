@@ -3,9 +3,9 @@
  */
 package org.openforis.collect.model;
 
-import java.util.List;
+import java.util.Collection;
 
-import org.openforis.commons.collection.CollectionUtils;
+import org.openforis.idm.model.Node;
 
 /**
  * @author S. Ricci
@@ -13,22 +13,30 @@ import org.openforis.commons.collection.CollectionUtils;
  */
 public class RecordUpdateResponseSet {
 
-	private List<RecordUpdateResponse> responses;
+	private NodeUpdateResponseMap responseMap;
 	private Integer errors;
 	private Integer skipped;
 	private Integer missing;
 	private Integer missingErrors;
 	private Integer missingWarnings;
 	private Integer warnings;
+
+	public RecordUpdateResponseSet() {
+		responseMap = new NodeUpdateResponseMap();
+	}
 	
-	public List<RecordUpdateResponse> getResponses() {
-		return CollectionUtils.unmodifiableList(responses);
+	public Collection<NodeUpdateResponse<?>> getResponses() {
+		return responseMap.values();
 	}
 
-	public void setResponses(List<RecordUpdateResponse> responses) {
-		this.responses = responses;
+	public void addResponse(NodeUpdateResponse<?> response) {
+		responseMap.putResponse(response);
 	}
-
+	
+	public NodeUpdateResponse<?> getResponse(Node<?> node) {
+		return responseMap.getResponse(node);
+	}
+	
 	public Integer getErrors() {
 		return errors;
 	}

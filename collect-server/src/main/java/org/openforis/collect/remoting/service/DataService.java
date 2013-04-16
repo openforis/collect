@@ -5,6 +5,7 @@ package org.openforis.collect.remoting.service;
 
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -20,9 +21,9 @@ import org.openforis.collect.metamodel.proxy.CodeListItemProxy;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.NodeUpdateResponse;
 import org.openforis.collect.model.RecordSummarySortField;
 import org.openforis.collect.model.RecordUpdateRequestSet;
-import org.openforis.collect.model.RecordUpdateResponse;
 import org.openforis.collect.model.RecordUpdateResponseSet;
 import org.openforis.collect.model.User;
 import org.openforis.collect.model.proxy.RecordProxy;
@@ -175,7 +176,7 @@ public class DataService {
 		CollectRecord activeRecord = getActiveRecord();
 		RecordUpdateRequestSet reqSet = requestSet.toRecordUpdateResponseSet(activeRecord, fileManager, sessionManager);
 		RecordUpdateResponseSet responseSet = activeRecord.update(reqSet);
-		List<RecordUpdateResponse> responses = responseSet.getResponses();
+		Collection<NodeUpdateResponse<?>> responses = responseSet.getResponses();
 		if ( ! responses.isEmpty() && isCurrentRecordIndexable() ) {
 			recordIndexService.temporaryIndex(activeRecord);
 		}

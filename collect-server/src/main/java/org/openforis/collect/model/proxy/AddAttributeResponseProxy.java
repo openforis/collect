@@ -1,7 +1,7 @@
 package org.openforis.collect.model.proxy;
 
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
-import org.openforis.collect.model.RecordUpdateResponse.AddAttributeResponse;
+import org.openforis.collect.model.NodeUpdateResponse.AddAttributeResponse;
 import org.openforis.collect.spring.MessageContextHolder;
 
 /**

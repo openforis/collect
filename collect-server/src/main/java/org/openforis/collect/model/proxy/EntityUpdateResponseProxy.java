@@ -3,8 +3,9 @@ package org.openforis.collect.model.proxy;
 import java.util.Map;
 
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
-import org.openforis.collect.model.RecordUpdateResponse.EntityUpdateResponse;
+import org.openforis.collect.model.NodeUpdateResponse.EntityUpdateResponse;
 import org.openforis.collect.spring.MessageContextHolder;
+import org.openforis.idm.metamodel.validation.ValidationResultFlag;
 
 /**
  * 
@@ -20,23 +21,23 @@ public class EntityUpdateResponseProxy extends NodeUpdateResponseProxy<EntityUpd
 	}
 	
 	@ExternalizedProperty
-	public Map<String, Object> getRelevant() {
-		return response.getRelevant();
+	public Map<String, Boolean> getRelevant() {
+		return response.getChildrenRelevance();
 	}
 
 	@ExternalizedProperty
-	public Map<String, Object> getRequired() {
-		return response.getRequired();
+	public Map<String, Boolean> getRequired() {
+		return response.getChildrenRequireness();
 	}
 
 	@ExternalizedProperty
-	public Map<String, Object> getMinCountValidation() {
-		return response.getMinCountValidation();
+	public Map<String, ValidationResultFlag> getMinCountValidation() {
+		return response.getChildrenMinCountValidation();
 	}
 
 	@ExternalizedProperty
-	public Map<String, Object> getMaxCountValidation() {
-		return response.getMaxCountValidation();
+	public Map<String, ValidationResultFlag> getMaxCountValidation() {
+		return response.getChildrenMaxCountValidation();
 	}
 
 }

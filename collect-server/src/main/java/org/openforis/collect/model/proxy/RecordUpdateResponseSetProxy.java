@@ -28,8 +28,8 @@ public class RecordUpdateResponseSetProxy implements Proxy {
 	}
 
 	@ExternalizedProperty
-	public List<RecordUpdateResponseProxy<?>> getResponses() {
-		return RecordUpdateResponseProxy.fromList(messageContextHolder, responseSet.getResponses());
+	public List<NodeUpdateResponseProxy<?>> getResponses() {
+		return NodeUpdateResponseProxy.fromList(messageContextHolder, responseSet.getResponses());
 	}
 
 	@ExternalizedProperty
