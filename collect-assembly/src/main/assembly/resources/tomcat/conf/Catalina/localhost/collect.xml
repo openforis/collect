@@ -2,28 +2,29 @@
 <Context path="/collect" reloadable="false">
 	
 	<!-- PostgreSQL database configuration -->
-<!-- 	<Resource  -->
-<!-- 	   name="jdbc/collectDs"  -->
-<!-- 	   auth="Container" -->
-<!-- 	   type="javax.sql.DataSource" -->
-<!-- 	   factory="org.apache.commons.dbcp.BasicDataSourceFactory" -->
-<!-- 	   driverClassName="org.postgresql.Driver" -->
-<!-- 	   url="jdbc:postgresql://localhost:5432/collect" -->
-<!-- 	   username="collect" -->
-<!-- 	   password="collect123" -->
-<!-- 	   initialSize="5" -->
-<!-- 	   maxActive="20" -->
-<!-- 	   maxIdle="5"> -->
-<!-- 	 </Resource> -->
-
+	<!--
+	<Resource 
+		name="jdbc/collectDs" 
+		auth="Container"
+		type="javax.sql.DataSource"
+		factory="org.apache.commons.dbcp.BasicDataSourceFactory"
+		driverClassName="org.postgresql.Driver"
+		url="jdbc:postgresql://localhost:5432/collect"
+		username="collect"
+		password="collect123"
+		initialSize="5"
+		maxActive="20"
+		maxIdle="5">
+	</Resource>
+	-->
 	<!-- SQLite database stored in CATALINA_HOME/data/collect.db file -->
-	 <Resource 
-	   name="jdbc/collectDs" 
-	   auth="Container"
-	   type="javax.sql.DataSource"
-	   factory="org.apache.commons.dbcp.BasicDataSourceFactory"
-	   driverClassName="org.sqlite.JDBC"
-       url="jdbc:sqlite:${catalina.home}/data/collect.db">
-	 </Resource>
+	<Resource 
+		name="jdbc/collectDs" 
+		auth="Container"
+		type="javax.sql.DataSource"
+		factory="org.apache.commons.dbcp.BasicDataSourceFactory"
+		driverClassName="org.sqlite.JDBC"
+		url="jdbc:sqlite:${catalina.home}/data/collect.db">
+	</Resource>
 	 
 </Context>
