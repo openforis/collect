@@ -23,6 +23,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.metamodel.ui.UIOptions$Direction;
 	import org.openforis.collect.model.FieldSymbol;
 	import org.openforis.collect.model.proxy.AttributeProxy;
+	import org.openforis.collect.model.proxy.AttributeUpdateResponseProxy;
 	import org.openforis.collect.model.proxy.CodeAttributeProxy;
 	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.model.proxy.FieldProxy;
@@ -314,7 +315,8 @@ package org.openforis.collect.presenter {
 			if(_view.attribute != null) {
 				var responseSet:RecordUpdateResponseSetProxy = RecordUpdateResponseSetProxy(event.result);
 				for each (var response:RecordUpdateResponseProxy in responseSet.responses) {
-					if(response.nodeId == _view.attribute.id) {
+					if ( response is AttributeUpdateResponseProxy && 
+							AttributeUpdateResponseProxy(response).nodeId == _view.attribute.id) {
 						_view.changed = false
 						updateView();
 						return;

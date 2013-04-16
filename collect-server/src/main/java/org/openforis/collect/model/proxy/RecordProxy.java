@@ -144,6 +144,8 @@ public class RecordProxy implements Proxy {
 			switch(record.getStep()) {
 				case ANALYSIS:
 					return true;
+				default:
+					return false;
 			}
 		}
 		return false;

@@ -10,7 +10,7 @@ import org.openforis.idm.model.Value;
  * @author S. Ricci
  *
  */
-public class RecordUpdateRequest {
+public abstract class RecordUpdateRequest {
 	
 	public static class AddEntityUpdateRequest extends RecordUpdateRequest {
 		private Integer parentEntityId;

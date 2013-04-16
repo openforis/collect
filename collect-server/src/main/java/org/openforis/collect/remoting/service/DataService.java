@@ -174,10 +174,8 @@ public class DataService {
 		CollectRecord activeRecord = getActiveRecord();
 		RecordUpdateRequestSet reqSet = requestSet.toRecordUpdateResponseSet(activeRecord);
 		RecordUpdateResponseSet responseSet = activeRecord.update(reqSet);
-		if ( ! responseSet.getResponses().isEmpty() ) {
-			if ( isCurrentRecordIndexable() ) {
-				recordIndexService.temporaryIndex(activeRecord);
-			}
+		if ( ! responseSet.getResponses().isEmpty() && isCurrentRecordIndexable() ) {
+			recordIndexService.temporaryIndex(activeRecord);
 		}
 		return new RecordUpdateResponseSetProxy(messageContextHolder, responseSet);
 	}

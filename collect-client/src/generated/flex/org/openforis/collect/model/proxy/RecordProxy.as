@@ -125,60 +125,77 @@ package org.openforis.collect.model.proxy {
 		}
 		
 		private function processResponse(response:RecordUpdateResponseProxy):void {
-			var node:NodeProxy, oldNode:NodeProxy, parent:EntityProxy;
-			if(response.createdNode != null) {
-				node = response.createdNode;
-				associateDefinition(node);
-				if ( node is EntityProxy ) {
-					EntityProxy(node).traverse(associateDefinition);
-				}
-				parent = getNode(node.parentId) as EntityProxy;
-				parent.addChild(node);
-				node.parent = parent;
-				initNode(node);
-				if(node is EntityProxy) {
-					EntityProxy(node).traverse(initNode);
-				}
+			if ( response is AddNodeResponseProxy ) {
+				processAddNodeResponse(AddNodeResponseProxy(response));
 			}
-			if(response.deletedNodeId > 0) {
-				node = getNode(response.deletedNodeId);
-				if(node != null) {
-					parent = getNode(node.parentId) as EntityProxy;
+			if ( response is DeleteNodeResponseProxy ) {
+				processDeleteNodeResponse(DeleteNodeResponseProxy(response));
+			} else if ( response is AttributeUpdateResponseProxy ) {
+				processAttributeUpdateResponse(AttributeUpdateResponseProxy(response));
+			} else if ( response is EntityUpdateResponseProxy ) {
+				processEntityUpdateResponse(EntityUpdateResponseProxy(response));
+			}
+		}
+		
+		protected function processAddNodeResponse(response:AddNodeResponseProxy):void {
+			var node:NodeProxy = AddNodeResponseProxy(response).createdNode;
+			associateDefinition(node);
+			if ( node is EntityProxy ) {
+				EntityProxy(node).traverse(associateDefinition);
+			}
+			var parent:EntityProxy = getNode(node.parentId) as EntityProxy;
+			parent.addChild(node);
+			node.parent = parent;
+			initNode(node);
+			if(node is EntityProxy) {
+				EntityProxy(node).traverse(initNode);
+			}
+		}
+		
+		protected function processDeleteNodeResponse(response:DeleteNodeResponseProxy):void {
+			if ( response.deletedNodeId > 0 ) {
+				var node:NodeProxy = getNode(response.deletedNodeId);
+				if (node != null ) {
+					var parent:EntityProxy = getNode(node.parentId) as EntityProxy;
 					parent.removeChild(node);
 					_nodesMap[node.id] = null;
 				}
-			} else {
-				node = getNode(response.nodeId);
-				if(node is AttributeProxy) {
-					var a:AttributeProxy = AttributeProxy(node);
-					if(response.validationResults != null) {
-						a.validationResults = response.validationResults;
-					}
-					if(response.updatedFieldValues != null) {
-						var fieldIdxs:ArrayCollection = response.updatedFieldValues.keySet;
-						for each (var i:int in fieldIdxs) {
-							var f:FieldProxy = a.getField(i);
-							f.value = response.updatedFieldValues.get(i);
-						}
-						a.errorConfirmed = false;
-						parent = getNode(node.parentId) as EntityProxy;
-						parent.updateKeyText();
-					}
-				} else if(node is EntityProxy) {
-					var e:EntityProxy = EntityProxy(node);
-					if(response.maxCountValidation != null && response.maxCountValidation.length > 0) {
-						e.updateChildrenMaxCountValiditationMap(response.maxCountValidation);
-					}
-					if(response.minCountValidation != null && response.minCountValidation.length > 0) {
-						e.updateChildrenMinCountValiditationMap(response.minCountValidation);
-					}
-					if(response.relevant != null && response.relevant.length > 0) {
-						e.updateChildrenRelevanceMap(response.relevant);
-					}
-					if(response.required != null && response.required.length > 0) {
-						e.updateChildrenRequiredMap(response.required);
-					}
+			}
+		}
+		
+		protected function processAttributeUpdateResponse(response:AttributeUpdateResponseProxy):void {
+			var node:NodeProxy = getNode(response.nodeId);
+			var a:AttributeProxy = AttributeProxy(node);
+			if ( response.validationResults != null ) {
+				a.validationResults = response.validationResults;
+			}
+			if ( response.updatedFieldValues != null ) {
+				var fieldIdxs:ArrayCollection = response.updatedFieldValues.keySet;
+				for each (var i:int in fieldIdxs) {
+					var f:FieldProxy = a.getField(i);
+					f.value = response.updatedFieldValues.get(i);
 				}
+				a.errorConfirmed = false;
+				var parent:EntityProxy = getNode(node.parentId) as EntityProxy;
+				parent.updateKeyText();
+			}
+
+		}
+		
+		protected function processEntityUpdateResponse(response:EntityUpdateResponseProxy):void {
+			var node:NodeProxy = getNode(response.nodeId);
+			var e:EntityProxy = node as EntityProxy;
+			if ( response.maxCountValidation != null && response.maxCountValidation.length > 0 ) {
+				e.updateChildrenMaxCountValiditationMap(response.maxCountValidation);
+			}
+			if ( response.minCountValidation != null && response.minCountValidation.length > 0 ) {
+				e.updateChildrenMinCountValiditationMap(response.minCountValidation);
+			}
+			if ( response.relevant != null && response.relevant.length > 0 ) {
+				e.updateChildrenRelevanceMap(response.relevant);
+			}
+			if ( response.required != null && response.required.length > 0 ) {
+				e.updateChildrenRequiredMap(response.required);
 			}
 		}
 		

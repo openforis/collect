@@ -11,6 +11,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.event.InputFieldEvent;
 	import org.openforis.collect.model.FieldSymbol;
 	import org.openforis.collect.model.proxy.AttributeProxy;
+	import org.openforis.collect.model.proxy.AttributeUpdateResponseProxy;
 	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.model.proxy.FieldProxy;
 	import org.openforis.collect.model.proxy.RecordUpdateRequestProxy;
@@ -76,10 +77,13 @@ package org.openforis.collect.presenter {
 			if(_view.attributes != null) {
 				var responseSet:RecordUpdateResponseSetProxy = RecordUpdateResponseSetProxy(event.result);
 				for each (var response:RecordUpdateResponseProxy in responseSet.responses) {
-					var attribute:AttributeProxy = CollectionUtil.getItem(_view.attributes, "id", response.nodeId) as AttributeProxy;
-					if(attribute != null) {
-						updateView();
-						return;
+					if ( response is AttributeUpdateResponseProxy ) {
+						var nodeId:int = AttributeUpdateResponseProxy(response).nodeId;
+						var attribute:AttributeProxy = CollectionUtil.getItem(_view.attributes, "id", nodeId) as AttributeProxy;
+						if(attribute != null) {
+							updateView();
+							return;
+						}
 					}
 				}
 			}

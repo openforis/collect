@@ -9,6 +9,7 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.event.InputFieldEvent;
+	import org.openforis.collect.model.proxy.EntityUpdateResponseProxy;
 	import org.openforis.collect.model.proxy.RecordUpdateRequestProxy;
 	import org.openforis.collect.model.proxy.RecordUpdateRequestProxy$Method;
 	import org.openforis.collect.model.proxy.RecordUpdateRequestSetProxy;
@@ -48,7 +49,8 @@ package org.openforis.collect.presenter
 			if(_view.parentEntity != null) {
 				var responseSet:RecordUpdateResponseSetProxy = RecordUpdateResponseSetProxy(event.result);
 				for each (var response:RecordUpdateResponseProxy in responseSet.responses) {
-					if(response.nodeId == _view.parentEntity.id) {
+					if( response is EntityUpdateResponseProxy && 
+							EntityUpdateResponseProxy(response).nodeId == _view.parentEntity.id) {
 						updateValidationDisplayManager();
 						updateRelevanceDisplayManager();
 						break;

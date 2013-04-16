@@ -28,7 +28,7 @@ public class RecordUpdateResponseSetProxy implements Proxy {
 	}
 
 	@ExternalizedProperty
-	public List<RecordUpdateResponseProxy> getResponses() {
+	public List<RecordUpdateResponseProxy<?>> getResponses() {
 		return RecordUpdateResponseProxy.fromList(messageContextHolder, responseSet.getResponses());
 	}
 

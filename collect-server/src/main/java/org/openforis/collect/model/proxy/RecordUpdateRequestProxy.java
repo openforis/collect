@@ -72,8 +72,10 @@ public class RecordUpdateRequestProxy implements Proxy {
 					request.setNodeName(nodeName);
 					request.setRemarks(remarks);
 					request.setSymbol(symbol);
-					Value parsedValue = parseCompositeAttributeValue(parentEntity, (AttributeDefinition) childDefn, value);
-					request.setValue(parsedValue);
+					if ( value != null ) {
+						Value parsedValue = parseCompositeAttributeValue(parentEntity, (AttributeDefinition) childDefn, value);
+						request.setValue(parsedValue);
+					}
 					return request;
 				}
 			}
@@ -112,8 +114,10 @@ public class RecordUpdateRequestProxy implements Proxy {
 				@SuppressWarnings("unchecked")
 				Attribute<AttributeDefinition, Value> attribute = (Attribute<AttributeDefinition, Value>) record.getNodeByInternalId(nodeId);
 				request.setAttribute(attribute);
-				Value parsedValue = parseCompositeAttributeValue(attribute.getParent(), attribute.getDefinition(), value);
-				request.setValue(parsedValue);
+				if ( value != null ) {
+					Value parsedValue = parseCompositeAttributeValue(attribute.getParent(), attribute.getDefinition(), value);
+					request.setValue(parsedValue);
+				}
 				request.setSymbol(symbol);
 				request.setRemarks(remarks);
 				return request;

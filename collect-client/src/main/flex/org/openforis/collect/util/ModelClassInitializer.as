@@ -39,12 +39,17 @@ package org.openforis.collect.util {
 	import org.openforis.collect.metamodel.proxy.UITabSetProxy;
 	import org.openforis.collect.metamodel.proxy.UnitProxy;
 	import org.openforis.collect.model.SurveySummary;
+	import org.openforis.collect.model.proxy.AddAttributeResponseProxy;
+	import org.openforis.collect.model.proxy.AddEntityResponseProxy;
 	import org.openforis.collect.model.proxy.AttributeProxy;
+	import org.openforis.collect.model.proxy.AttributeUpdateResponseProxy;
 	import org.openforis.collect.model.proxy.CodeAttributeProxy;
 	import org.openforis.collect.model.proxy.CodeProxy;
 	import org.openforis.collect.model.proxy.CoordinateProxy;
 	import org.openforis.collect.model.proxy.DateProxy;
+	import org.openforis.collect.model.proxy.DeleteNodeResponseProxy;
 	import org.openforis.collect.model.proxy.EntityProxy;
+	import org.openforis.collect.model.proxy.EntityUpdateResponseProxy;
 	import org.openforis.collect.model.proxy.FieldProxy;
 	import org.openforis.collect.model.proxy.FileProxy;
 	import org.openforis.collect.model.proxy.IntegerRangeProxy;
@@ -85,9 +90,12 @@ package org.openforis.collect.util {
 
 		public static function init():void {
 			var array:Array = [
+				AddAttributeResponseProxy,
+				AddEntityResponseProxy,
 				AttributeDefaultProxy,
 				AttributeDefinitionProxy,
 				AttributeProxy,
+				AttributeUpdateResponseProxy,
 				BasicMap, 
 				BooleanAttributeDefinitionProxy,
 				CodeAttributeDefinitionProxy,
@@ -109,7 +117,9 @@ package org.openforis.collect.util {
 				DataImportSummaryItemProxy,
 				DateAttributeDefinitionProxy,
 				DateProxy,
+				DeleteNodeResponseProxy,
 				EntityDefinitionProxy,
+				EntityUpdateResponseProxy,
 				EntityProxy,
 				FieldProxy,
 				FileAttributeDefinitionProxy,

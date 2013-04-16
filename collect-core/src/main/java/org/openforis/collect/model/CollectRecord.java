@@ -25,6 +25,9 @@ import org.openforis.collect.model.RecordUpdateRequest.DeleteNodeUpdateRequest;
 import org.openforis.collect.model.RecordUpdateRequest.UpdateAttributeUpdateRequest;
 import org.openforis.collect.model.RecordUpdateRequest.UpdateFieldUpdateRequest;
 import org.openforis.collect.model.RecordUpdateRequest.UpdateRemarksUpdateRequest;
+import org.openforis.collect.model.RecordUpdateResponse.AttributeUpdateResponse;
+import org.openforis.collect.model.RecordUpdateResponse.DeleteNodeResponse;
+import org.openforis.collect.model.RecordUpdateResponse.EntityUpdateResponse;
 import org.openforis.collect.persistence.RecordPersistenceException;
 import org.openforis.idm.metamodel.AttributeDefault;
 import org.openforis.idm.metamodel.AttributeDefinition;
@@ -260,12 +263,14 @@ public class CollectRecord extends Record {
 		Set<String> errors = clearEntityValidationCounts(minCountErrorCounts, entityId, childName);
 		Set<String> warnings = clearEntityValidationCounts(minCountWarningCounts, entityId, childName);
 		switch (flag) {
-			case ERROR:
-				errors.add(childName);
-				break;
-			case WARNING:
-				warnings.add(childName);
-				break;
+		case ERROR:
+			errors.add(childName);
+			break;
+		case WARNING:
+			warnings.add(childName);
+			break;
+		default:
+			//do nothing
 		}
 		this.missing = null;
 		this.missingErrors = null;
@@ -285,6 +290,8 @@ public class CollectRecord extends Record {
 		case WARNING:
 			warnings.add(childName);
 			break;
+		default:
+			//do nothing
 		}
 		this.errors = null;
 		this.warnings = null;
@@ -684,7 +691,7 @@ public class CollectRecord extends Record {
 			}
 			deleteNode(n);
 			
-			RecordUpdateResponse resp = responseMap.prepareResponse(node);
+			DeleteNodeResponse resp = responseMap.prepareDeleteNodeResponse(node);
 			resp.setDeletedNodeId(node.getInternalId());
 		}
 		//clear dependencies
@@ -728,8 +735,9 @@ public class CollectRecord extends Record {
 			fieldValues.put(idx, field.getValue());
 		}
 		RecordUpdateResponseMap responseMap = new RecordUpdateResponseMap();
-		RecordUpdateResponse response = responseMap.prepareResponse(attribute);
+		AttributeUpdateResponse response = responseMap.prepareAttributeResponse(attribute);
 		response.setUpdatedFieldValues(fieldValues);
+		
 		List<NodePointer> cardinalityNodePointers = createCardinalityNodePointers(attribute);
 		Set<NodePointer> relevanceRequiredDependencies = clearRelevanceRequiredDependencies(attribute);
 		Set<Attribute<?, ?>> checkDependencies = clearValidationResults(attribute);
@@ -762,8 +770,9 @@ public class CollectRecord extends Record {
 			setFieldValue(attribute, fieldValue, remarks, symbol, idx);
 		}
 		RecordUpdateResponseMap responseMap = new RecordUpdateResponseMap();
-		RecordUpdateResponse response = responseMap.prepareResponse(attribute);
+		AttributeUpdateResponse response = responseMap.prepareAttributeResponse(attribute);
 		response.setUpdatedFieldValues(updatedFieldValues);
+		
 		Set<NodePointer> relevanceRequiredDependencies = clearRelevanceRequiredDependencies(attribute);
 		Set<Attribute<?, ?>> checkDependencies = clearValidationResults(attribute);
 		relevanceRequiredDependencies.add(new NodePointer(attribute.getParent(), attribute.getName()));
@@ -795,7 +804,7 @@ public class CollectRecord extends Record {
 		updatedFieldValues.put(fieldIndex, field.getValue());
 		
 		RecordUpdateResponseMap responseMap = new RecordUpdateResponseMap();
-		RecordUpdateResponse response = responseMap.prepareResponse(attribute);
+		AttributeUpdateResponse response = responseMap.prepareAttributeResponse(attribute);
 		response.setUpdatedFieldValues(updatedFieldValues);
 		Set<NodePointer> relevanceRequiredDependencies = clearRelevanceRequiredDependencies(attribute);
 		Set<Attribute<?, ?>> checkDependencies = clearValidationResults(attribute);
@@ -816,8 +825,8 @@ public class CollectRecord extends Record {
 		setMissingApproved(parentEntity, nodeName, false);
 		
 		RecordUpdateResponseMap responseMap = new RecordUpdateResponseMap();
-		RecordUpdateResponse response = responseMap.prepareResponse(createdNode);
-		response.setCreatedNode(createdNode);
+		responseMap.prepareAddEntityResponse(createdNode);
+		
 		Set<NodePointer> relevanceRequiredDependencies = clearRelevanceRequiredDependencies(createdNode);
 		Set<Attribute<?, ?>> checkDependencies = null;
 		relevanceRequiredDependencies.add(new NodePointer(createdNode.getParent(), nodeName));
@@ -836,8 +845,8 @@ public class CollectRecord extends Record {
 		setMissingApproved(parentEntity, nodeName, false);
 		
 		RecordUpdateResponseMap responseMap = new RecordUpdateResponseMap();
-		RecordUpdateResponse response = responseMap.prepareResponse(createdNode);
-		response.setCreatedNode(createdNode);
+		responseMap.prepareAddAttributeResponse(createdNode);
+		
 		Set<NodePointer> relevanceRequiredDependencies = clearRelevanceRequiredDependencies(createdNode);
 		Set<Attribute<?, ?>> checkDependencies = null;
 		if(createdNode instanceof Attribute){
@@ -857,7 +866,7 @@ public class CollectRecord extends Record {
 		Field<?> fld = attribute.getField(req.getFieldIndex());
 		fld.setRemarks(req.getRemarks());
 		RecordUpdateResponseMap responseMap = new RecordUpdateResponseMap();
-		responseMap.prepareResponse(attribute);
+		responseMap.prepareAttributeResponse(attribute);
 		return responseMap.values();
 	}
 
@@ -882,7 +891,7 @@ public class CollectRecord extends Record {
 		attribute.clearValidationResults();
 		checkDependencies.add(attribute);
 		
-		responseMap.prepareResponse(attribute);
+		responseMap.prepareAttributeResponse(attribute);
 		validateChecks(responseMap, checkDependencies);
 		return responseMap.values();
 	}
@@ -923,8 +932,8 @@ public class CollectRecord extends Record {
 		if ( !attr.isDetached() ) {
 			attr.clearValidationResults();
 			ValidationResults results = attr.validateValue();
-			RecordUpdateResponse response = responseMap.prepareResponse(attr);
-			response.setAttributeValidationResults(results);
+			AttributeUpdateResponse response = responseMap.prepareAttributeResponse(attr);
+			response.setValidationResults(results);
 		}
 	}
 
@@ -958,7 +967,7 @@ public class CollectRecord extends Record {
 	protected void validateCardinality(RecordUpdateResponseMap responseMap, NodePointer nodePointer) {
 		Entity entity = nodePointer.getEntity();
 		String childName = nodePointer.getChildName();
-		RecordUpdateResponse response = responseMap.prepareResponse(entity);
+		EntityUpdateResponse response = responseMap.prepareEntityResponse(entity);
 		response.setMinCountValid(childName, entity.validateMinCount(childName));
 		response.setMaxCountValid(childName, entity.validateMaxCount(childName));
 	}
@@ -967,7 +976,7 @@ public class CollectRecord extends Record {
 			RecordUpdateResponseMap responseMap, NodePointer nodePointer) {
 		Entity entity = nodePointer.getEntity();
 		String childName = nodePointer.getChildName();
-		RecordUpdateResponse response = responseMap.prepareResponse(entity);
+		EntityUpdateResponse response = responseMap.prepareEntityResponse(entity);
 		response.setRelevant(childName, entity.isRelevant(childName));
 	}
 
@@ -975,7 +984,7 @@ public class CollectRecord extends Record {
 			RecordUpdateResponseMap responseMap, NodePointer nodePointer) {
 		Entity entity = nodePointer.getEntity();
 		String childName = nodePointer.getChildName();
-		RecordUpdateResponse response = responseMap.prepareResponse(entity);
+		EntityUpdateResponse response = responseMap.prepareEntityResponse(entity);
 		response.setRequired(childName, entity.isRequired(childName));
 	}
 
@@ -985,7 +994,9 @@ public class CollectRecord extends Record {
 		@SuppressWarnings("unchecked")
 		Attribute<?, Value> attribute = (Attribute<?, Value>) def.createNode();
 		parentEntity.add(attribute);
-		attribute.setValue(requestValue);
+		if ( requestValue != null ) {
+			attribute.setValue(requestValue);
+		}
 		if(symbol != null || remarks != null) {
 			Character symbolChar = null;
 			if(symbol != null) {

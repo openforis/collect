@@ -16,6 +16,7 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.metamodel.proxy.SchemaProxy;
 	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.model.proxy.NodeProxy;
+	import org.openforis.collect.model.proxy.NodeUpdateResponseProxy;
 	import org.openforis.collect.model.proxy.RecordProxy;
 	import org.openforis.collect.model.proxy.RecordUpdateResponseProxy;
 	import org.openforis.collect.model.proxy.RecordUpdateResponseSetProxy;
@@ -80,7 +81,8 @@ package org.openforis.collect.presenter
 			if(_view.parentEntity != null) {
 				var responseSet:RecordUpdateResponseSetProxy = RecordUpdateResponseSetProxy(event.result);
 				for each (var response:RecordUpdateResponseProxy in responseSet.responses) {
-					if(response.nodeId == _view.parentEntity.id) {
+					if ( response is NodeUpdateResponseProxy && 
+							NodeUpdateResponseProxy(response).nodeId == _view.parentEntity.id) {
 						updateValidationDisplayManager();
 						updateRelevanceDisplayManager();
 						_contextMenu.updateItems();
