@@ -261,12 +261,13 @@ public class SurveyManager {
 	@Transactional
 	public void publish(CollectSurvey survey) throws SurveyImportException {
 		Integer surveyWorkId = survey.getId();
-		if ( survey.isPublished() ) {
-			updateModel(survey);
-		} else {
+		CollectSurvey publishedSurvey = get(survey.getName());
+		if ( publishedSurvey == null ) {
 			survey.setPublished(true);
 			importModel(survey);
 			initSurveysCache();
+		} else {
+			updateModel(survey);
 		}
 		if ( surveyWorkId != null ) {
 			int publishedSurveyId = survey.getId();
