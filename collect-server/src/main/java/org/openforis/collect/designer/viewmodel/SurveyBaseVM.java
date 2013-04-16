@@ -346,16 +346,13 @@ public abstract class SurveyBaseVM extends BaseVM {
 		Integer surveyId = getSurveyId();
 		SessionStatus sessionStatus = getSessionStatus();
 		Integer publishedSurveyId = sessionStatus.getPublishedSurveyId();
-		if ( surveyId == null ) {
-			//not yet saved
-			surveyId = publishedSurveyId;
-		}
-		boolean work = surveyId != null && ! surveyId.equals(publishedSurveyId);
-		String surveyIdStr = surveyId == null ? "": surveyId.toString();
+		boolean work = surveyId != null;
+		Integer usedSurveyId = surveyId != null ? surveyId: publishedSurveyId;
+		String surveyIdStr = usedSurveyId == null ? "": usedSurveyId.toString();
 		String localeStr = sessionStatus.getCurrentLanguageCode();
 		Map<String, String> result = new HashMap<String, String>();
 		result.put("locale", localeStr);
-		result.put("work", "" + work);
+		result.put("work", Boolean.toString(work));
 		result.put("surveyId", surveyIdStr);
 		return result;
 	}
