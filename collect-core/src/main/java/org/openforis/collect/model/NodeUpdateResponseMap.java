@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.openforis.collect.model.NodeUpdateResponse.AttributeUpdateResponse;
-import org.openforis.collect.model.NodeUpdateResponse.DeleteNodeResponse;
+import org.openforis.collect.model.NodeUpdateResponse.NodeDeleteResponse;
 import org.openforis.collect.model.NodeUpdateResponse.EntityUpdateResponse;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Entity;
@@ -44,8 +44,8 @@ public class NodeUpdateResponseMap {
 		return response;
 	}
 	
-	public DeleteNodeResponse prepareDeleteNodeResponse(Node<?> node) {
-		DeleteNodeResponse response = new NodeUpdateResponse.DeleteNodeResponse(node);
+	public NodeDeleteResponse prepareDeleteNodeResponse(Node<?> node) {
+		NodeDeleteResponse response = new NodeUpdateResponse.NodeDeleteResponse(node);
 		nodeIdToResponse.put(node.getInternalId(), response); //overwrite response if already present
 		return response;
 	}
@@ -54,7 +54,7 @@ public class NodeUpdateResponseMap {
 		Integer nodeId = node.getInternalId();
 		NodeUpdateResponse<?> response = getResponse(node);
 		if ( response == null ) {
-			response = new NodeUpdateResponse.AddEntityResponse(node);
+			response = new NodeUpdateResponse.EntityAddResponse(node);
 			nodeIdToResponse.put(nodeId, response);
 			return response;
 		} else {
@@ -66,7 +66,7 @@ public class NodeUpdateResponseMap {
 		Integer nodeId = node.getInternalId();
 		NodeUpdateResponse<?> response = getResponse(node);
 		if ( response == null ) {
-			response = new NodeUpdateResponse.AddAttributeResponse(node);
+			response = new NodeUpdateResponse.AttributeAddResponse(node);
 			nodeIdToResponse.put(nodeId, response);
 			return response;
 		} else {

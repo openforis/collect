@@ -223,29 +223,29 @@ public abstract class NodeUpdateResponse<T extends Node<?>> {
 		
 	}
 	
-	public static class DeleteNodeResponse extends NodeUpdateResponse<Node<?>> {
+	public static class NodeDeleteResponse extends NodeUpdateResponse<Node<?>> {
 		
-		public DeleteNodeResponse(Node<?> node) {
+		public NodeDeleteResponse(Node<?> node) {
 			super(node);
 		}
 		
 	}
 	
-	public static interface AddNodeResponse {
+	public static interface NodeAddResponse {
 		
 	}
 
-	public static class AddAttributeResponse extends AttributeUpdateResponse implements AddNodeResponse {
+	public static class AttributeAddResponse extends AttributeUpdateResponse implements NodeAddResponse {
 		
-		public AddAttributeResponse(Attribute<?, ?> node) {
+		public AttributeAddResponse(Attribute<?, ?> node) {
 			super(node);
 		}
 
 	}
 	
-	public static class AddEntityResponse extends EntityUpdateResponse implements AddNodeResponse {
+	public static class EntityAddResponse extends EntityUpdateResponse implements NodeAddResponse {
 		
-		public AddEntityResponse(Entity node) {
+		public EntityAddResponse(Entity node) {
 			super(node);
 		}
 

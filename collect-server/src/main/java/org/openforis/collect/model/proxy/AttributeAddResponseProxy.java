@@ -1,7 +1,7 @@
 package org.openforis.collect.model.proxy;
 
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
-import org.openforis.collect.model.NodeUpdateResponse.AddEntityResponse;
+import org.openforis.collect.model.NodeUpdateResponse.AttributeAddResponse;
 import org.openforis.collect.spring.MessageContextHolder;
 
 /**
@@ -9,11 +9,11 @@ import org.openforis.collect.spring.MessageContextHolder;
  * @author S. Ricci
  *
  */
-public class AddEntityResponseProxy extends EntityUpdateResponseProxy implements AddNodeResponseProxy {
+public class AttributeAddResponseProxy extends AttributeUpdateResponseProxy implements NodeAddResponseProxy {
 
-	public AddEntityResponseProxy(
+	public AttributeAddResponseProxy(
 			MessageContextHolder messageContextHolder,
-			AddEntityResponse response) {
+			AttributeAddResponse response) {
 		super(messageContextHolder, response);
 	}
 
@@ -22,5 +22,5 @@ public class AddEntityResponseProxy extends EntityUpdateResponseProxy implements
 	public NodeProxy getCreatedNode() {
 		return NodeProxy.fromNode(messageContextHolder, response.getNode());
 	}
-	
+
 }

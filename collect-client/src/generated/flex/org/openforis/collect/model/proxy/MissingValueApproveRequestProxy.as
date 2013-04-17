@@ -8,7 +8,7 @@
 package org.openforis.collect.model.proxy {
 
     [Bindable]
-    [RemoteClass(alias="org.openforis.collect.model.proxy.AddAttributeResponseProxy")]
-    public class AddAttributeResponseProxy extends AddAttributeResponseProxyBase {
+    [RemoteClass(alias="org.openforis.collect.model.proxy.MissingValueApproveRequestProxy")]
+    public class MissingValueApproveRequestProxy extends MissingValueApproveRequestProxyBase {
     }
 }

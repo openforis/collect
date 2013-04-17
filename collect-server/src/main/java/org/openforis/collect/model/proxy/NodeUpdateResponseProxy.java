@@ -7,10 +7,10 @@ import java.util.List;
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.collect.Proxy;
 import org.openforis.collect.model.NodeUpdateResponse;
-import org.openforis.collect.model.NodeUpdateResponse.AddAttributeResponse;
-import org.openforis.collect.model.NodeUpdateResponse.AddEntityResponse;
+import org.openforis.collect.model.NodeUpdateResponse.AttributeAddResponse;
+import org.openforis.collect.model.NodeUpdateResponse.EntityAddResponse;
 import org.openforis.collect.model.NodeUpdateResponse.AttributeUpdateResponse;
-import org.openforis.collect.model.NodeUpdateResponse.DeleteNodeResponse;
+import org.openforis.collect.model.NodeUpdateResponse.NodeDeleteResponse;
 import org.openforis.collect.model.NodeUpdateResponse.EntityUpdateResponse;
 import org.openforis.collect.spring.MessageContextHolder;
 
@@ -35,16 +35,16 @@ public class NodeUpdateResponseProxy<T extends NodeUpdateResponse<?>> implements
 		if ( items != null ) {
 			for (NodeUpdateResponse<?> item : items) {
 				NodeUpdateResponseProxy<?> proxy;
-				if ( item instanceof AddAttributeResponse ) {
-					proxy = new AddAttributeResponseProxy(messageContextHolder, (AddAttributeResponse) item);
-				} else if ( item instanceof AddEntityResponse ) {
-					proxy = new AddEntityResponseProxy(messageContextHolder, (AddEntityResponse) item);
+				if ( item instanceof AttributeAddResponse ) {
+					proxy = new AttributeAddResponseProxy(messageContextHolder, (AttributeAddResponse) item);
+				} else if ( item instanceof EntityAddResponse ) {
+					proxy = new EntityAddResponseProxy(messageContextHolder, (EntityAddResponse) item);
 				} else if ( item instanceof AttributeUpdateResponse ) {
 					proxy = new AttributeUpdateResponseProxy(messageContextHolder, (AttributeUpdateResponse) item);
 				} else if ( item instanceof EntityUpdateResponse ) {
 					proxy = new EntityUpdateResponseProxy(messageContextHolder, (EntityUpdateResponse) item);
-				} else if ( item instanceof DeleteNodeResponse ) {
-					proxy = new DeleteNodeResponseProxy(messageContextHolder, (DeleteNodeResponse) item);
+				} else if ( item instanceof NodeDeleteResponse ) {
+					proxy = new NodeDeleteResponseProxy(messageContextHolder, (NodeDeleteResponse) item);
 				} else {
 					throw new IllegalArgumentException("RecordUpdateResponse not supported: " + item.getClass().getSimpleName());
 				}

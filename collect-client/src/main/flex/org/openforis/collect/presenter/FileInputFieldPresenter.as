@@ -13,17 +13,14 @@ package org.openforis.collect.presenter {
 	
 	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
-	import mx.rpc.AsyncResponder;
-	import mx.rpc.IResponder;
 	import mx.rpc.events.ResultEvent;
 	
 	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.FileAttributeDefinitionProxy;
 	import org.openforis.collect.model.proxy.AttributeProxy;
+	import org.openforis.collect.model.proxy.AttributeUpdateRequestProxy;
 	import org.openforis.collect.model.proxy.FieldProxy;
-	import org.openforis.collect.model.proxy.FileProxy;
 	import org.openforis.collect.model.proxy.RecordUpdateRequestProxy;
-	import org.openforis.collect.model.proxy.RecordUpdateRequestProxy$Method;
 	import org.openforis.collect.remoting.service.FileWrapper;
 	import org.openforis.collect.ui.component.input.FileInputField;
 	import org.openforis.collect.util.AlertUtil;
@@ -224,13 +221,9 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function createFileUpdateRequestOperation(fileWrapper:FileWrapper):RecordUpdateRequestProxy {
-			var r:RecordUpdateRequestProxy = new RecordUpdateRequestProxy();
+			var r:AttributeUpdateRequestProxy = new AttributeUpdateRequestProxy();
 			var def:AttributeDefinitionProxy = _view.attributeDefinition;
-			r.method = RecordUpdateRequestProxy$Method.UPDATE;
-			r.parentEntityId = _view.parentEntity.id;
-			r.nodeName = def.name;
 			r.nodeId = _view.attribute.id;
-			r.fieldIndex = -1;
 			r.value = fileWrapper;
 			r.symbol = null;
 			r.remarks = getRemarks();

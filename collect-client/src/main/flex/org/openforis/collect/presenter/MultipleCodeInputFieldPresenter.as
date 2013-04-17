@@ -14,10 +14,10 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.model.proxy.AttributeUpdateResponseProxy;
 	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.model.proxy.FieldProxy;
+	import org.openforis.collect.model.proxy.NodeDeleteRequestProxy;
+	import org.openforis.collect.model.proxy.NodeUpdateResponseProxy;
 	import org.openforis.collect.model.proxy.RecordUpdateRequestProxy;
-	import org.openforis.collect.model.proxy.RecordUpdateRequestProxy$Method;
 	import org.openforis.collect.model.proxy.RecordUpdateRequestSetProxy;
-	import org.openforis.collect.model.proxy.RecordUpdateResponseProxy;
 	import org.openforis.collect.model.proxy.RecordUpdateResponseSetProxy;
 	import org.openforis.collect.ui.component.input.MultipleCodeInputField;
 	import org.openforis.collect.util.CollectionUtil;
@@ -76,7 +76,7 @@ package org.openforis.collect.presenter {
 		override protected function updateResponseReceivedHandler(event:ApplicationEvent):void {
 			if(_view.attributes != null) {
 				var responseSet:RecordUpdateResponseSetProxy = RecordUpdateResponseSetProxy(event.result);
-				for each (var response:RecordUpdateResponseProxy in responseSet.responses) {
+				for each (var response:NodeUpdateResponseProxy in responseSet.responses) {
 					if ( response is AttributeUpdateResponseProxy ) {
 						var nodeId:int = AttributeUpdateResponseProxy(response).nodeId;
 						var attribute:AttributeProxy = CollectionUtil.getItem(_view.attributes, "id", nodeId) as AttributeProxy;
@@ -118,7 +118,8 @@ package org.openforis.collect.presenter {
 			var r:RecordUpdateRequestProxy;
 			//remove old attributes
 			for each (var a:AttributeProxy in _view.attributes) {
-				r = getUpdateRequestOperation(RecordUpdateRequestProxy$Method.DELETE, a.id);
+				r = new NodeDeleteRequestProxy();
+				NodeDeleteRequestProxy(r).nodeId = a.id;
 				removeAttributesOperations.addItem(r);
 			}
 			//add new attributes
@@ -129,24 +130,24 @@ package org.openforis.collect.presenter {
 				var parts:Array = text.split(",");
 				if(parts.length == 1 && FieldProxy.isShortCutForReasonBlank(text)) {
 					symbol = FieldProxy.parseShortCutForReasonBlank(text);
-					r = getUpdateRequestOperation(RecordUpdateRequestProxy$Method.ADD, NaN, null, symbol, remarks);
+					r = getUpdateValueOperation(null, symbol, remarks);
 					addAttributesOperations.addItem(r);
 				} else {
 					for each (var part:String in parts) {
 						var trimmedPart:String = StringUtil.trim(part);
 						if(StringUtil.isNotBlank(trimmedPart)) {
-							r = getUpdateRequestOperation(RecordUpdateRequestProxy$Method.ADD, NaN, trimmedPart, null, remarks);
+							r = getUpdateValueOperation(trimmedPart, null, remarks);
 							addAttributesOperations.addItem(r);
 						}
 					}
 				}
 			} else if(StringUtil.isNotBlank(remarks)) {
-				r = getUpdateRequestOperation(RecordUpdateRequestProxy$Method.ADD, NaN, null, null, remarks);
+				r = getUpdateValueOperation(null, null, remarks);
 				addAttributesOperations.addItem(r);
 			}
 			if ( addAttributesOperations.length == 0 ) {
 				//add empty attribute
-				r = getUpdateRequestOperation(RecordUpdateRequestProxy$Method.ADD, NaN);
+				r = getUpdateValueOperation(null, null, remarks);
 				addAttributesOperations.addItem(r);
 			}
 			var requests:ArrayCollection = new ArrayCollection();

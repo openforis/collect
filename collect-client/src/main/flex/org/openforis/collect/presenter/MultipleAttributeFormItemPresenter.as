@@ -9,11 +9,10 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.event.InputFieldEvent;
+	import org.openforis.collect.model.proxy.AttributeAddRequestProxy;
 	import org.openforis.collect.model.proxy.EntityUpdateResponseProxy;
-	import org.openforis.collect.model.proxy.RecordUpdateRequestProxy;
-	import org.openforis.collect.model.proxy.RecordUpdateRequestProxy$Method;
+	import org.openforis.collect.model.proxy.NodeUpdateResponseProxy;
 	import org.openforis.collect.model.proxy.RecordUpdateRequestSetProxy;
-	import org.openforis.collect.model.proxy.RecordUpdateResponseProxy;
 	import org.openforis.collect.model.proxy.RecordUpdateResponseSetProxy;
 	import org.openforis.collect.ui.component.detail.MultipleAttributeFormItem;
 	import org.openforis.collect.ui.component.input.InputField;
@@ -48,7 +47,7 @@ package org.openforis.collect.presenter
 			super.updateResponseReceivedHandler(event);
 			if(_view.parentEntity != null) {
 				var responseSet:RecordUpdateResponseSetProxy = RecordUpdateResponseSetProxy(event.result);
-				for each (var response:RecordUpdateResponseProxy in responseSet.responses) {
+				for each (var response:NodeUpdateResponseProxy in responseSet.responses) {
 					if( response is EntityUpdateResponseProxy && 
 							EntityUpdateResponseProxy(response).nodeId == _view.parentEntity.id) {
 						updateValidationDisplayManager();
@@ -92,8 +91,7 @@ package org.openforis.collect.presenter
 			var attributes:IList = getAttributes();
 			var maxCount:Number = view.attributeDefinition.maxCount
 			if(isNaN(maxCount) || CollectionUtil.isEmpty(attributes) || attributes.length < maxCount) {
-				var r:RecordUpdateRequestProxy = new RecordUpdateRequestProxy();
-				r.method = RecordUpdateRequestProxy$Method.ADD;
+				var r:AttributeAddRequestProxy = new AttributeAddRequestProxy();
 				r.parentEntityId = view.parentEntity.id;
 				r.nodeName = view.attributeDefinition.name;
 				var reqSet:RecordUpdateRequestSetProxy = new RecordUpdateRequestSetProxy(r);

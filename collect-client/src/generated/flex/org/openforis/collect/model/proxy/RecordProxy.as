@@ -70,7 +70,7 @@ package org.openforis.collect.model.proxy {
 			this.missingErrors = responseSet.missingErrors;
 			this.missingWarnings = responseSet.missingWarnings;
 			this.warnings = responseSet.warnings;
-			for each (var response:RecordUpdateResponseProxy in responseSet.responses)	{
+			for each (var response:NodeUpdateResponseProxy in responseSet.responses)	{
 				processResponse(response);
 			}
 			_updated = true;
@@ -84,48 +84,44 @@ package org.openforis.collect.model.proxy {
 			var attr:AttributeProxy;
 			var field:FieldProxy;
 			for each (var reqOp:RecordUpdateRequestProxy in requests) {
-				switch(reqOp.method) {
-					case RecordUpdateRequestProxy$Method.UPDATE_REMARKS:
-						attr = getNode(reqOp.nodeId) as AttributeProxy;
-						field = attr.getField(reqOp.fieldIndex);
-						field.remarks = reqOp.remarks;
-						break;
-					case RecordUpdateRequestProxy$Method.UPDATE:
-						attr = getNode(reqOp.nodeId) as AttributeProxy;
-						if(reqOp.fieldIndex >= 0) {
-							field = attr.getField(reqOp.fieldIndex);
-							field.symbol = reqOp.symbol;
-							field.remarks = reqOp.remarks;
-						} else {
-							for each (field in attr.fields) {
-								field.symbol = reqOp.symbol;
-								field.remarks = reqOp.remarks;
-							}
-						}
-						break;
-					case RecordUpdateRequestProxy$Method.APPLY_DEFAULT_VALUE:
-						//nullify the symbol (if any)
-						attr = getNode(reqOp.nodeId) as AttributeProxy;
-						for each (field in attr.fields) {
-							field.symbol = null;
-						}
-						break;
-					case RecordUpdateRequestProxy$Method.CONFIRM_ERROR:
-						attr = getNode(reqOp.nodeId) as AttributeProxy;
-						if ( attr != null ) {
-							attr.errorConfirmed = true;
-						}
-						break;
+				if ( reqOp is RemarksUpdateRequestProxy ) {
+					var updRemarksReq:RemarksUpdateRequestProxy = RemarksUpdateRequestProxy(reqOp);
+					attr = getNode(updRemarksReq.nodeId) as AttributeProxy;
+					field = attr.getField(updRemarksReq.fieldIndex);
+					field.remarks = updRemarksReq.remarks;
+				} else if ( reqOp is FieldUpdateRequestProxy ) {
+					var updFieldReq:FieldUpdateRequestProxy = FieldUpdateRequestProxy(reqOp);
+					attr = getNode(updFieldReq.nodeId) as AttributeProxy;
+					field = attr.getField(updFieldReq.fieldIndex);
+					field.symbol = updFieldReq.symbol;
+					field.remarks = updFieldReq.remarks;
+				} else if ( reqOp is AttributeUpdateRequestProxy ) {
+					var updAttrReq:AttributeUpdateRequestProxy = AttributeUpdateRequestProxy(reqOp);
+					attr = getNode(updAttrReq.nodeId) as AttributeProxy;
+					for each (field in attr.fields) {
+						field.symbol = updAttrReq.symbol;
+						field.remarks = updAttrReq.remarks;
+					}
+				} else if ( reqOp is DefaultValueApplyRequestProxy ) {
+					attr = getNode(DefaultValueApplyRequestProxy(reqOp).nodeId) as AttributeProxy;
+					for each (field in attr.fields) {
+						field.symbol = null;
+					}
+				} else if ( reqOp is ConfirmErrorRequestProxy ) {
+					attr = getNode(ConfirmErrorRequestProxy(reqOp).nodeId) as AttributeProxy;
+					if ( attr != null ) {
+						attr.errorConfirmed = true;
+					}
 				}
 			}
 		}
 		
-		private function processResponse(response:RecordUpdateResponseProxy):void {
-			if ( response is AddNodeResponseProxy ) {
-				processAddNodeResponse(AddNodeResponseProxy(response));
+		private function processResponse(response:NodeUpdateResponseProxy):void {
+			if ( response is NodeAddResponseProxy ) {
+				processNodeAddResponse(NodeAddResponseProxy(response));
 			}
-			if ( response is DeleteNodeResponseProxy ) {
-				processDeleteNodeResponse(DeleteNodeResponseProxy(response));
+			if ( response is NodeDeleteResponseProxy ) {
+				processNodeDeleteResponse(NodeDeleteResponseProxy(response));
 			} else if ( response is AttributeUpdateResponseProxy ) {
 				processAttributeUpdateResponse(AttributeUpdateResponseProxy(response));
 			} else if ( response is EntityUpdateResponseProxy ) {
@@ -133,8 +129,8 @@ package org.openforis.collect.model.proxy {
 			}
 		}
 		
-		protected function processAddNodeResponse(response:AddNodeResponseProxy):void {
-			var node:NodeProxy = AddNodeResponseProxy(response).createdNode;
+		protected function processNodeAddResponse(response:NodeAddResponseProxy):void {
+			var node:NodeProxy = NodeAddResponseProxy(response).createdNode;
 			associateDefinition(node);
 			if ( node is EntityProxy ) {
 				EntityProxy(node).traverse(associateDefinition);
@@ -148,7 +144,7 @@ package org.openforis.collect.model.proxy {
 			}
 		}
 		
-		protected function processDeleteNodeResponse(response:DeleteNodeResponseProxy):void {
+		protected function processNodeDeleteResponse(response:NodeDeleteResponseProxy):void {
 			if ( response.deletedNodeId > 0 ) {
 				var node:NodeProxy = getNode(response.deletedNodeId);
 				if (node != null ) {

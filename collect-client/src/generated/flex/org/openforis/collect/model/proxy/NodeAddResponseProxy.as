@@ -7,7 +7,7 @@
 
 package org.openforis.collect.model.proxy {
 
-    public interface AddNodeResponseProxy {
+    public interface NodeAddResponseProxy {
 
         function get createdNode():NodeProxy;
     }

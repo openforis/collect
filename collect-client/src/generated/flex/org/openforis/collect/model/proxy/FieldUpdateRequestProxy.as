@@ -8,7 +8,7 @@
 package org.openforis.collect.model.proxy {
 
     [Bindable]
-    [RemoteClass(alias="org.openforis.collect.model.proxy.DeleteNodeResponseProxy")]
-    public class DeleteNodeResponseProxy extends DeleteNodeResponseProxyBase {
+    [RemoteClass(alias="org.openforis.collect.model.proxy.FieldUpdateRequestProxy")]
+    public class FieldUpdateRequestProxy extends FieldUpdateRequestProxyBase {
     }
 }

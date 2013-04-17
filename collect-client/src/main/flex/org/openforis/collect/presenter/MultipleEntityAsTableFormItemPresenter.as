@@ -8,9 +8,8 @@ package org.openforis.collect.presenter
 	
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.event.InputFieldEvent;
+	import org.openforis.collect.model.proxy.EntityAddRequestProxy;
 	import org.openforis.collect.model.proxy.EntityProxy;
-	import org.openforis.collect.model.proxy.RecordUpdateRequestProxy;
-	import org.openforis.collect.model.proxy.RecordUpdateRequestProxy$Method;
 	import org.openforis.collect.model.proxy.RecordUpdateRequestSetProxy;
 	import org.openforis.collect.ui.component.detail.MultipleEntityAsTableFormItem;
 	import org.openforis.collect.ui.component.input.InputField;
@@ -75,8 +74,7 @@ package org.openforis.collect.presenter
 			var entities:IList = getEntities();
 			var maxCount:Number = view.entityDefinition.maxCount
 			if(isNaN(maxCount) || CollectionUtil.isEmpty(entities) || entities.length < maxCount) {
-				var r:RecordUpdateRequestProxy = new RecordUpdateRequestProxy();
-				r.method = RecordUpdateRequestProxy$Method.ADD;
+				var r:EntityAddRequestProxy = new EntityAddRequestProxy();
 				r.parentEntityId = view.parentEntity.id;
 				r.nodeName = view.entityDefinition.name;
 				var reqSet:RecordUpdateRequestSetProxy = new RecordUpdateRequestSetProxy(r);

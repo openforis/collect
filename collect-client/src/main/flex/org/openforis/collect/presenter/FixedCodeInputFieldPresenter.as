@@ -5,8 +5,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.model.proxy.CodeAttributeProxy;
 	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.model.proxy.FieldProxy;
-	import org.openforis.collect.model.proxy.RecordUpdateRequestProxy;
-	import org.openforis.collect.model.proxy.RecordUpdateRequestProxy$Method;
+	import org.openforis.collect.model.proxy.FieldUpdateRequestProxy;
 	import org.openforis.collect.model.proxy.RecordUpdateRequestSetProxy;
 	import org.openforis.collect.ui.UIBuilder;
 	import org.openforis.collect.ui.component.input.FixedCodeInputField;
@@ -19,6 +18,8 @@ package org.openforis.collect.presenter {
 	 * */
 	public class FixedCodeInputFieldPresenter extends InputFieldPresenter {
 		
+		private static const QUALIFIER_FIELD_IDX:int = 1;
+
 		private var _view:FixedCodeInputField;
 		
 		public function FixedCodeInputFieldPresenter(inputField:FixedCodeInputField) {
@@ -73,12 +74,9 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function applyQualifier(value:String):void {
-			var r:RecordUpdateRequestProxy = new RecordUpdateRequestProxy();
-			r.method = RecordUpdateRequestProxy$Method.UPDATE;
-			r.parentEntityId = _view.parentEntity.id;
-			r.nodeName = _view.attribute.name;
+			var r:FieldUpdateRequestProxy = new FieldUpdateRequestProxy();
 			r.nodeId = _view.attribute.id;
-			r.fieldIndex = 1;
+			r.fieldIndex = QUALIFIER_FIELD_IDX;
 			r.value = value;
 			var reqSet:RecordUpdateRequestSetProxy = new RecordUpdateRequestSetProxy(r);
 			dataClient.updateActiveRecord(reqSet, null, faultHandler);

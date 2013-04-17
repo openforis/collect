@@ -23,16 +23,22 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.metamodel.ui.UIOptions$Direction;
 	import org.openforis.collect.model.FieldSymbol;
 	import org.openforis.collect.model.proxy.AttributeProxy;
+	import org.openforis.collect.model.proxy.AttributeUpdateRequestProxy;
 	import org.openforis.collect.model.proxy.AttributeUpdateResponseProxy;
 	import org.openforis.collect.model.proxy.CodeAttributeProxy;
+	import org.openforis.collect.model.proxy.ConfirmErrorRequestProxy;
+	import org.openforis.collect.model.proxy.DefaultValueApplyRequestProxy;
 	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.model.proxy.FieldProxy;
+	import org.openforis.collect.model.proxy.FieldUpdateRequestProxy;
+	import org.openforis.collect.model.proxy.MissingValueApproveRequestProxy;
+	import org.openforis.collect.model.proxy.NodeDeleteRequestProxy;
 	import org.openforis.collect.model.proxy.NodeProxy;
+	import org.openforis.collect.model.proxy.NodeUpdateResponseProxy;
 	import org.openforis.collect.model.proxy.RecordUpdateRequestProxy;
-	import org.openforis.collect.model.proxy.RecordUpdateRequestProxy$Method;
 	import org.openforis.collect.model.proxy.RecordUpdateRequestSetProxy;
-	import org.openforis.collect.model.proxy.RecordUpdateResponseProxy;
 	import org.openforis.collect.model.proxy.RecordUpdateResponseSetProxy;
+	import org.openforis.collect.model.proxy.RemarksUpdateRequestProxy;
 	import org.openforis.collect.ui.component.input.InputField;
 	import org.openforis.collect.ui.component.input.InputFieldContextMenu;
 	import org.openforis.collect.util.StringUtil;
@@ -108,8 +114,7 @@ package org.openforis.collect.presenter {
 				}
 				prepareApproveMissingRequests(reqSet, node, event.fieldIdx, event.applyToNonEmptyNodes);
 			} else {
-				var r:RecordUpdateRequestProxy = new RecordUpdateRequestProxy();
-				r.method = RecordUpdateRequestProxy$Method.APPROVE_MISSING;
+				var r:MissingValueApproveRequestProxy = new MissingValueApproveRequestProxy();
 				r.parentEntityId = event.parentEntity.id;
 				r.nodeName = event.nodeName;
 				reqSet.addRequest(r);
@@ -119,10 +124,7 @@ package org.openforis.collect.presenter {
 		
 		protected static function applyDefaultValueHandler(event:NodeEvent):void {
 			var node:NodeProxy = event.node;
-			var r:RecordUpdateRequestProxy = new RecordUpdateRequestProxy();
-			r.method = RecordUpdateRequestProxy$Method.APPLY_DEFAULT_VALUE;
-			r.parentEntityId = node.parentId;
-			r.nodeName = node.name;
+			var r:DefaultValueApplyRequestProxy = new DefaultValueApplyRequestProxy();
 			r.nodeId = node.id;
 			
 			var reqSet:RecordUpdateRequestSetProxy = new RecordUpdateRequestSetProxy(r);
@@ -154,10 +156,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected static function prepareUpdateRemarksRequest(reqSet:RecordUpdateRequestSetProxy, node:NodeProxy, remarks:String, fieldIdx:Number = NaN):void {
-			var r:RecordUpdateRequestProxy = new RecordUpdateRequestProxy();
-			r.method = RecordUpdateRequestProxy$Method.UPDATE_REMARKS;
-			r.parentEntityId = node.parentId;
-			r.nodeName = node.name;
+			var r:RemarksUpdateRequestProxy = new RemarksUpdateRequestProxy();
 			r.nodeId = node.id;
 			r.fieldIndex = fieldIdx;
 			r.remarks = remarks;
@@ -202,10 +201,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		private static function createUpdateSymbolOperation(node:NodeProxy, field:FieldProxy, fieldIdx:int, symbol:FieldSymbol):RecordUpdateRequestProxy {
-			var r:RecordUpdateRequestProxy = new RecordUpdateRequestProxy();
-			r.method = RecordUpdateRequestProxy$Method.UPDATE;
-			r.parentEntityId = node.parentId;
-			r.nodeName = node.name;
+			var r:FieldUpdateRequestProxy = new FieldUpdateRequestProxy();
 			r.nodeId = node.id;
 			r.fieldIndex = fieldIdx;
 			r.remarks = field.remarks;
@@ -258,12 +254,9 @@ package org.openforis.collect.presenter {
 		}
 		
 		private static function createApproveMissingOperation(node:NodeProxy, fieldIdx:int):RecordUpdateRequestProxy {
-			var r:RecordUpdateRequestProxy = new RecordUpdateRequestProxy();
-			r.method = RecordUpdateRequestProxy$Method.APPROVE_MISSING;
+			var r:MissingValueApproveRequestProxy = new MissingValueApproveRequestProxy();
 			r.parentEntityId = node.parentId;
 			r.nodeName = node.name;
-			r.nodeId = node.id;
-			r.fieldIndex = fieldIdx;
 			return r;
 		}
 		
@@ -286,20 +279,14 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected static function createConfirmErrorOperation(node:NodeProxy):RecordUpdateRequestProxy {
-			var updRequestOp:RecordUpdateRequestProxy = new RecordUpdateRequestProxy();
-			updRequestOp.method = RecordUpdateRequestProxy$Method.CONFIRM_ERROR;
-			updRequestOp.parentEntityId = node.parentId;
-			updRequestOp.nodeName = node.name;
+			var updRequestOp:ConfirmErrorRequestProxy = new ConfirmErrorRequestProxy();
 			updRequestOp.nodeId = node.id;
 			return updRequestOp;
 		}
 		
 		protected static function deleteNodeHandler(event:NodeEvent):void {
 			var node:NodeProxy = event.node;
-			var updRequestOp:RecordUpdateRequestProxy = new RecordUpdateRequestProxy();
-			updRequestOp.method = RecordUpdateRequestProxy$Method.DELETE;
-			updRequestOp.parentEntityId = node.parentId;
-			updRequestOp.nodeName = node.name;
+			var updRequestOp:NodeDeleteRequestProxy = new NodeDeleteRequestProxy();
 			updRequestOp.nodeId = node.id;
 			var updRequest:RecordUpdateRequestSetProxy = new RecordUpdateRequestSetProxy(updRequestOp);
 			_dataClient.updateActiveRecord(updRequest, null, faultHandler);
@@ -314,7 +301,7 @@ package org.openforis.collect.presenter {
 		protected function updateResponseReceivedHandler(event:ApplicationEvent):void {
 			if(_view.attribute != null) {
 				var responseSet:RecordUpdateResponseSetProxy = RecordUpdateResponseSetProxy(event.result);
-				for each (var response:RecordUpdateResponseProxy in responseSet.responses) {
+				for each (var response:NodeUpdateResponseProxy in responseSet.responses) {
 					if ( response is AttributeUpdateResponseProxy && 
 							AttributeUpdateResponseProxy(response).nodeId == _view.attribute.id) {
 						_view.changed = false
@@ -583,35 +570,33 @@ package org.openforis.collect.presenter {
 				value = text;
 			}
 			var remarks:String = getRemarks(); //preserve old remarks
-			var r:RecordUpdateRequestProxy = getUpdateFieldOperation(value, symbol, remarks);
+			var r:RecordUpdateRequestProxy = getUpdateValueOperation(value, symbol, remarks);
 			return r;
 		}
 
-		protected function getUpdateFieldOperation(value:String, symbol:FieldSymbol = null, remarks:String = null):RecordUpdateRequestProxy {
-			var nodeId:Number = _view.attribute != null ? _view.attribute.id: NaN;
-			var r:RecordUpdateRequestProxy = getUpdateRequestOperation(RecordUpdateRequestProxy$Method.UPDATE, nodeId, value, symbol, remarks);
-			return r;
-		}
-		
 		protected function sendUpdateRequest(o:RecordUpdateRequestProxy):void {
 			var req:RecordUpdateRequestSetProxy = new RecordUpdateRequestSetProxy(o);
 			dataClient.updateActiveRecord(req, updateResultHandler, faultHandler);
 			_view.updating = true;
 		}
 		
-		protected function getUpdateRequestOperation(method:RecordUpdateRequestProxy$Method, nodeId:Number, 
-								 value:String = null, symbol:FieldSymbol = null, remarks:String = null):RecordUpdateRequestProxy {
-			var r:RecordUpdateRequestProxy = new RecordUpdateRequestProxy();
-			var def:AttributeDefinitionProxy = _view.attributeDefinition;
-			r.method = method;
-			r.parentEntityId = _view.parentEntity.id;
-			r.nodeName = def.name;
-			r.nodeId = nodeId;
-			r.fieldIndex = _view.fieldIndex;
-			r.value = value;
-			r.symbol = symbol;
-			r.remarks = remarks;
-			return r;
+		protected function getUpdateValueOperation(value:String, symbol:FieldSymbol = null, remarks:String = null):RecordUpdateRequestProxy {
+			if ( _view.fieldIndex >= 0 ) {
+				var fieldUpdReq:FieldUpdateRequestProxy = new FieldUpdateRequestProxy();
+				fieldUpdReq.nodeId = _view.attribute.id;
+				fieldUpdReq.fieldIndex = _view.fieldIndex;
+				fieldUpdReq.value = value;
+				fieldUpdReq.symbol = symbol;
+				fieldUpdReq.remarks = remarks;
+				return fieldUpdReq;
+			} else {
+				var attrUpdReq:AttributeUpdateRequestProxy = new AttributeUpdateRequestProxy();
+				attrUpdReq.nodeId = _view.attribute.id;
+				attrUpdReq.value = value;
+				attrUpdReq.symbol = symbol;
+				attrUpdReq.remarks = remarks;
+				return attrUpdReq;	
+			}
 		}
 		
 		protected function updateResultHandler(event:ResultEvent, token:Object = null):void {

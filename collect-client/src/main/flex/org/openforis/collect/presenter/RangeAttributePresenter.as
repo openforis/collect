@@ -7,8 +7,9 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.metamodel.proxy.RangeAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.UnitProxy;
+	import org.openforis.collect.model.proxy.AttributeUpdateRequestProxy;
+	import org.openforis.collect.model.proxy.FieldUpdateRequestProxy;
 	import org.openforis.collect.model.proxy.RecordUpdateRequestProxy;
-	import org.openforis.collect.model.proxy.RecordUpdateRequestProxy$Method;
 	import org.openforis.collect.model.proxy.RecordUpdateRequestSetProxy;
 	import org.openforis.collect.ui.component.input.RangeAttributeRenderer;
 	import org.openforis.collect.util.UIUtil;
@@ -18,6 +19,8 @@ package org.openforis.collect.presenter {
 	 * @author S. Ricci
 	 * */
 	public class RangeAttributePresenter extends CompositeAttributePresenter {
+		
+		private var UNIT_FIELD_IDX:int = 3;
 		
 		public function RangeAttributePresenter(view:RangeAttributeRenderer) {
 			_view = view;
@@ -55,9 +58,9 @@ package org.openforis.collect.presenter {
 			var updReqSet:RecordUpdateRequestSetProxy = new RecordUpdateRequestSetProxy();
 			var updateValueOp:RecordUpdateRequestProxy = view.rangeInputField.presenter.createUpdateValueOperation();
 			updReqSet.addRequest(updateValueOp);
-			var updateUnitOp:RecordUpdateRequestProxy = createUpdateUnitOperation();
+			var updateUnitOp:FieldUpdateRequestProxy = createUpdateUnitOperation();
 			if ( updateUnitOp != null ) {
-				if(updateValueOp.value == null) {
+				if ( updateValueOp is AttributeUpdateRequestProxy && AttributeUpdateRequestProxy(updateValueOp).value == null) {
 					//clear unit
 					updateUnitOp.value = null;
 				}
@@ -66,18 +69,15 @@ package org.openforis.collect.presenter {
 			ClientFactory.dataClient.updateActiveRecord(updReqSet, null, faultHandler);
 		}
 
-		protected function createUpdateUnitOperation():RecordUpdateRequestProxy {
+		protected function createUpdateUnitOperation():FieldUpdateRequestProxy {
 			var attrDefn:RangeAttributeDefinitionProxy = RangeAttributeDefinitionProxy(view.attributeDefinition);
-			var result:RecordUpdateRequestProxy = null;
+			var result:FieldUpdateRequestProxy = null;
 			if(view.unitInputField) {
-				result = view.unitInputField.presenter.createUpdateValueOperation();
+				result = view.unitInputField.presenter.createUpdateValueOperation() as FieldUpdateRequestProxy;
 			} else if ( attrDefn.defaultUnit != null ) {
-				result = new RecordUpdateRequestProxy();
-				result.method = RecordUpdateRequestProxy$Method.UPDATE;
-				result.parentEntityId = view.attribute.parentId;
-				result.nodeName = view.attributeDefinition.name;
+				result = new FieldUpdateRequestProxy();
 				result.nodeId = view.attribute.id;
-				result.fieldIndex = 3;
+				result.fieldIndex = UNIT_FIELD_IDX;
 				result.value = String(attrDefn.defaultUnit.id);
 			}
 			return result;

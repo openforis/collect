@@ -1,10 +1,6 @@
 package org.openforis.collect.presenter
 {
-	import flash.events.Event;
-	
 	import mx.binding.utils.BindingUtils;
-	import mx.binding.utils.ChangeWatcher;
-	import mx.collections.IList;
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.IResponder;
 	import mx.rpc.events.ResultEvent;
@@ -18,7 +14,6 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.model.proxy.NodeProxy;
 	import org.openforis.collect.model.proxy.NodeUpdateResponseProxy;
 	import org.openforis.collect.model.proxy.RecordProxy;
-	import org.openforis.collect.model.proxy.RecordUpdateResponseProxy;
 	import org.openforis.collect.model.proxy.RecordUpdateResponseSetProxy;
 	import org.openforis.collect.ui.component.detail.CollectFormItem;
 	import org.openforis.collect.ui.component.detail.RelevanceDisplayManager;
@@ -80,7 +75,7 @@ package org.openforis.collect.presenter
 		protected function updateResponseReceivedHandler(event:ApplicationEvent):void {
 			if(_view.parentEntity != null) {
 				var responseSet:RecordUpdateResponseSetProxy = RecordUpdateResponseSetProxy(event.result);
-				for each (var response:RecordUpdateResponseProxy in responseSet.responses) {
+				for each (var response:NodeUpdateResponseProxy in responseSet.responses) {
 					if ( response is NodeUpdateResponseProxy && 
 							NodeUpdateResponseProxy(response).nodeId == _view.parentEntity.id) {
 						updateValidationDisplayManager();

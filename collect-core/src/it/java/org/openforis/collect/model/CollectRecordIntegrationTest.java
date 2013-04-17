@@ -17,11 +17,11 @@ import java.util.Map;
 import org.junit.Test;
 import org.openforis.collect.CollectIntegrationTest;
 import org.openforis.collect.model.CollectRecord.Step;
-import org.openforis.collect.model.NodeUpdateResponse.AddNodeResponse;
-import org.openforis.collect.model.NodeUpdateResponse.DeleteNodeResponse;
+import org.openforis.collect.model.NodeUpdateResponse.NodeAddResponse;
+import org.openforis.collect.model.NodeUpdateResponse.NodeDeleteResponse;
 import org.openforis.collect.model.NodeUpdateResponse.EntityUpdateResponse;
-import org.openforis.collect.model.RecordUpdateRequest.AddEntityRequest;
-import org.openforis.collect.model.RecordUpdateRequest.DeleteNodeRequest;
+import org.openforis.collect.model.RecordUpdateRequest.EntityAddRequest;
+import org.openforis.collect.model.RecordUpdateRequest.NodeDeleteRequest;
 import org.openforis.idm.metamodel.validation.ValidationResultFlag;
 import org.openforis.idm.model.Code;
 import org.openforis.idm.model.Coordinate;
@@ -44,7 +44,7 @@ public class CollectRecordIntegrationTest extends CollectIntegrationTest {
 		CollectRecord record = createTestRecord(survey);
 		RecordUpdateRequestSet requestSet = new RecordUpdateRequestSet();
 		List<RecordUpdateRequest> requests = new ArrayList<RecordUpdateRequest>();
-		AddEntityRequest r = new RecordUpdateRequest.AddEntityRequest();
+		EntityAddRequest r = new RecordUpdateRequest.EntityAddRequest();
 		Entity cluster = record.getRootEntity();
 		r.setParentEntityId(cluster.getInternalId());
 		r.setNodeName("plot");
@@ -69,7 +69,7 @@ public class CollectRecordIntegrationTest extends CollectIntegrationTest {
 		}
 		{
 			NodeUpdateResponse<?> plotUpdateResponse = respIt.next();
-			assertTrue(plotUpdateResponse instanceof AddNodeResponse);
+			assertTrue(plotUpdateResponse instanceof NodeAddResponse);
 			assertTrue(plotUpdateResponse instanceof EntityUpdateResponse);
 			EntityUpdateResponse plotUpdateResp = (EntityUpdateResponse) plotUpdateResponse;
 			Entity plot = plotUpdateResp.getNode();
@@ -84,7 +84,7 @@ public class CollectRecordIntegrationTest extends CollectIntegrationTest {
 		CollectRecord record = createTestRecord(survey);
 		RecordUpdateRequestSet requestSet = new RecordUpdateRequestSet();
 		List<RecordUpdateRequest> requests = new ArrayList<RecordUpdateRequest>();
-		AddEntityRequest r = new RecordUpdateRequest.AddEntityRequest();
+		EntityAddRequest r = new RecordUpdateRequest.EntityAddRequest();
 		Entity cluster = record.getRootEntity();
 		r.setParentEntityId(cluster.getInternalId());
 		r.setNodeName("time_study");
@@ -109,7 +109,7 @@ public class CollectRecordIntegrationTest extends CollectIntegrationTest {
 		}
 		{
 			NodeUpdateResponse<?> timeStudyUpdateResponse = respIt.next();
-			assertTrue(timeStudyUpdateResponse instanceof AddNodeResponse);
+			assertTrue(timeStudyUpdateResponse instanceof NodeAddResponse);
 			assertTrue(timeStudyUpdateResponse instanceof EntityUpdateResponse);
 			EntityUpdateResponse timeStudyUpdateResp = (EntityUpdateResponse) timeStudyUpdateResponse;
 			Entity timeStudy = timeStudyUpdateResp.getNode();
@@ -125,11 +125,11 @@ public class CollectRecordIntegrationTest extends CollectIntegrationTest {
 		RecordUpdateRequestSet requestSet = new RecordUpdateRequestSet();
 		List<RecordUpdateRequest> requests = new ArrayList<RecordUpdateRequest>();
 		Entity cluster = record.getRootEntity();
-		DeleteNodeRequest r1 = new RecordUpdateRequest.DeleteNodeRequest();
+		NodeDeleteRequest r1 = new RecordUpdateRequest.NodeDeleteRequest();
 		Entity timeStudy1 = (Entity) cluster.get("time_study", 0);
 		r1.setNode(timeStudy1);
 		requests.add(r1);
-		DeleteNodeRequest r2 = new RecordUpdateRequest.DeleteNodeRequest();
+		NodeDeleteRequest r2 = new RecordUpdateRequest.NodeDeleteRequest();
 		Entity timeStudy2 = (Entity) cluster.get("time_study", 1);
 		r2.setNode(timeStudy2);
 		requests.add(r2);
@@ -152,8 +152,8 @@ public class CollectRecordIntegrationTest extends CollectIntegrationTest {
 		}
 		{
 			NodeUpdateResponse<?> timeStudyDeleteResponse = responseSet.getResponse(timeStudy1);
-			assertTrue(timeStudyDeleteResponse instanceof DeleteNodeResponse);
-			DeleteNodeResponse timeStudyDeleteResp = (DeleteNodeResponse) timeStudyDeleteResponse;
+			assertTrue(timeStudyDeleteResponse instanceof NodeDeleteResponse);
+			NodeDeleteResponse timeStudyDeleteResp = (NodeDeleteResponse) timeStudyDeleteResponse;
 			Node<?> deletedNode = timeStudyDeleteResp.getNode();
 			assertEquals(timeStudy1.getInternalId(), deletedNode.getInternalId());
 		}

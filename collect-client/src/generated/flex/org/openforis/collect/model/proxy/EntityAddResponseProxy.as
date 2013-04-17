@@ -8,7 +8,7 @@
 package org.openforis.collect.model.proxy {
 
     [Bindable]
-    [RemoteClass(alias="org.openforis.collect.model.proxy.AddEntityResponseProxy")]
-    public class AddEntityResponseProxy extends AddEntityResponseProxyBase {
+    [RemoteClass(alias="org.openforis.collect.model.proxy.EntityAddResponseProxy")]
+    public class EntityAddResponseProxy extends EntityAddResponseProxyBase {
     }
 }

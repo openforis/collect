@@ -8,7 +8,7 @@
 package org.openforis.collect.model.proxy {
 
     [Bindable]
-    [RemoteClass(alias="org.openforis.collect.model.proxy.RecordUpdateResponseProxy")]
-    public class RecordUpdateResponseProxy extends RecordUpdateResponseProxyBase {
+    [RemoteClass(alias="org.openforis.collect.model.proxy.NodeDeleteResponseProxy")]
+    public class NodeDeleteResponseProxy extends NodeDeleteResponseProxyBase {
     }
 }

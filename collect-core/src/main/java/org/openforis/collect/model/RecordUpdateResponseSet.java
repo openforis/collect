@@ -5,6 +5,7 @@ package org.openforis.collect.model;
 
 import java.util.Collection;
 
+import org.openforis.collect.model.NodeUpdateResponse.NodeDeleteResponse;
 import org.openforis.idm.model.Node;
 
 /**
@@ -30,7 +31,10 @@ public class RecordUpdateResponseSet {
 	}
 
 	public void addResponse(NodeUpdateResponse<?> response) {
-		responseMap.putResponse(response);
+		NodeUpdateResponse<?> oldResponse = responseMap.getResponse(response.getNode());
+		if ( ! (oldResponse instanceof NodeDeleteResponse) ) {
+			responseMap.putResponse(response);
+		}
 	}
 	
 	public NodeUpdateResponse<?> getResponse(Node<?> node) {

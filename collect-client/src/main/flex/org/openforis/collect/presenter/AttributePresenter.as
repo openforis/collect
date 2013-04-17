@@ -11,7 +11,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.model.proxy.AttributeProxy;
 	import org.openforis.collect.model.proxy.AttributeUpdateResponseProxy;
 	import org.openforis.collect.model.proxy.EntityUpdateResponseProxy;
-	import org.openforis.collect.model.proxy.RecordUpdateResponseProxy;
+	import org.openforis.collect.model.proxy.NodeUpdateResponseProxy;
 	import org.openforis.collect.model.proxy.RecordUpdateResponseSetProxy;
 	import org.openforis.collect.ui.component.detail.AttributeItemRenderer;
 	import org.openforis.collect.ui.component.detail.ValidationDisplayManager;
@@ -79,7 +79,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function nodeUpdated(responseSet:RecordUpdateResponseSetProxy):Boolean {
-			for each (var response:RecordUpdateResponseProxy in responseSet.responses) {
+			for each (var response:NodeUpdateResponseProxy in responseSet.responses) {
 				if ( response is AttributeUpdateResponseProxy) {
 					var attrResp:AttributeUpdateResponseProxy = AttributeUpdateResponseProxy(response);
 					if (_view.attribute != null && _view.attribute.id == attrResp.nodeId ||
@@ -92,7 +92,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function parentEntityUpdated(responseSet:RecordUpdateResponseSetProxy):Boolean {
-			for each (var response:RecordUpdateResponseProxy in responseSet.responses) {
+			for each (var response:NodeUpdateResponseProxy in responseSet.responses) {
 				if ( response is EntityUpdateResponseProxy && EntityUpdateResponseProxy(response).nodeId == _view.parentEntity.id ) {
 					return true;
 				}

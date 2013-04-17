@@ -12,7 +12,7 @@ import org.openforis.idm.model.Value;
  */
 public abstract class RecordUpdateRequest {
 	
-	public static class AddEntityRequest extends RecordUpdateRequest {
+	public static class EntityAddRequest extends RecordUpdateRequest {
 		
 		private Integer parentEntityId;
 		private String nodeName;
@@ -67,7 +67,7 @@ public abstract class RecordUpdateRequest {
 		
 	}
 	
-	public static class AddAttributeRequest<V extends Value> extends BaseAttributeRequest<V> {
+	public static class AttributeAddRequest<V extends Value> extends BaseAttributeRequest<V> {
 
 		private Integer parentEntityId;
 		private String nodeName;
@@ -90,7 +90,7 @@ public abstract class RecordUpdateRequest {
 
 	}
 	
-	public static class UpdateAttributeRequest<V extends Value>  extends BaseAttributeRequest<V> {
+	public static class AttributeUpdateRequest<V extends Value>  extends BaseAttributeRequest<V> {
 		
 		private Attribute<?, V> attribute;
 		
@@ -104,7 +104,7 @@ public abstract class RecordUpdateRequest {
 
 	}
 	
-	public static class UpdateFieldRequest extends RecordUpdateRequest {
+	public static class FieldUpdateRequest extends RecordUpdateRequest {
 		
 		private Attribute<?, ?> attribute;
 		private Integer fieldIndex;
@@ -154,7 +154,7 @@ public abstract class RecordUpdateRequest {
 
 	}
 	
-	public static class DeleteNodeRequest extends RecordUpdateRequest {
+	public static class NodeDeleteRequest extends RecordUpdateRequest {
 		
 		private Node<?> node;
 
@@ -168,7 +168,7 @@ public abstract class RecordUpdateRequest {
 
 	}
 	
-	public static class ApproveMissingValueRequest extends RecordUpdateRequest {
+	public static class MissingValueApproveRequest extends RecordUpdateRequest {
 		
 		private Integer parentEntityId;
 		private String nodeName;
@@ -191,7 +191,7 @@ public abstract class RecordUpdateRequest {
 
 	}
 	
-	public static class UpdateRemarksRequest extends RecordUpdateRequest {
+	public static class RemarksUpdateRequest extends RecordUpdateRequest {
 		
 		private Attribute<?, ?> attribute;
 		private Integer fieldIndex;
@@ -223,7 +223,7 @@ public abstract class RecordUpdateRequest {
 		
 	}
 	
-	public static class ConfirmErrorRequest extends RecordUpdateRequest {
+	public static class ErrorConfirmRequest extends RecordUpdateRequest {
 		
 		private Attribute<?, ?> attribute;
 
@@ -237,7 +237,7 @@ public abstract class RecordUpdateRequest {
 
 	}
 	
-	public static class ApplyDefaultValueRequest extends RecordUpdateRequest {
+	public static class DefaultValueApplyRequest extends RecordUpdateRequest {
 		
 		private Attribute<?, ?> attribute;
 
