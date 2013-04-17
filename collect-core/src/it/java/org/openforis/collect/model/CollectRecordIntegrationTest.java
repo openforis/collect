@@ -17,9 +17,10 @@ import java.util.Map;
 import org.junit.Test;
 import org.openforis.collect.CollectIntegrationTest;
 import org.openforis.collect.model.CollectRecord.Step;
+import org.openforis.collect.model.NodeUpdateResponse.EntityUpdateResponse;
 import org.openforis.collect.model.NodeUpdateResponse.NodeAddResponse;
 import org.openforis.collect.model.NodeUpdateResponse.NodeDeleteResponse;
-import org.openforis.collect.model.NodeUpdateResponse.EntityUpdateResponse;
+import org.openforis.collect.model.RecordUpdateRequest.AttributeAddRequest;
 import org.openforis.collect.model.RecordUpdateRequest.EntityAddRequest;
 import org.openforis.collect.model.RecordUpdateRequest.NodeDeleteRequest;
 import org.openforis.idm.metamodel.validation.ValidationResultFlag;
@@ -57,6 +58,15 @@ public class CollectRecordIntegrationTest extends CollectIntegrationTest {
 		assertEquals(2, responses.size());
 		Iterator<NodeUpdateResponse<?>> respIt = responses.iterator();
 		{
+			NodeUpdateResponse<?> plotUpdateResponse = respIt.next();
+			assertTrue(plotUpdateResponse instanceof NodeAddResponse);
+			assertTrue(plotUpdateResponse instanceof EntityUpdateResponse);
+			EntityUpdateResponse plotUpdateResp = (EntityUpdateResponse) plotUpdateResponse;
+			Entity plot = plotUpdateResp.getNode();
+			assertNotNull(plot);
+			assertEquals("plot", plot.getName());
+		}
+		{
 			NodeUpdateResponse<?> clusterUpdateResponse = respIt.next();
 			assertTrue(clusterUpdateResponse instanceof EntityUpdateResponse);
 			EntityUpdateResponse clusterEntityResp = (EntityUpdateResponse) clusterUpdateResponse;
@@ -67,15 +77,6 @@ public class CollectRecordIntegrationTest extends CollectIntegrationTest {
 			ValidationResultFlag plotMaxCountValid = childrenMaxCountValid.get("plot");
 			assertTrue(plotMaxCountValid == ValidationResultFlag.OK);
 		}
-		{
-			NodeUpdateResponse<?> plotUpdateResponse = respIt.next();
-			assertTrue(plotUpdateResponse instanceof NodeAddResponse);
-			assertTrue(plotUpdateResponse instanceof EntityUpdateResponse);
-			EntityUpdateResponse plotUpdateResp = (EntityUpdateResponse) plotUpdateResponse;
-			Entity plot = plotUpdateResp.getNode();
-			assertNotNull(plot);
-			assertEquals("plot", plot.getName());
-		}
 	}
 	
 	@Test
@@ -83,19 +84,26 @@ public class CollectRecordIntegrationTest extends CollectIntegrationTest {
 		CollectSurvey survey = loadSurvey();
 		CollectRecord record = createTestRecord(survey);
 		RecordUpdateRequestSet requestSet = new RecordUpdateRequestSet();
-		List<RecordUpdateRequest> requests = new ArrayList<RecordUpdateRequest>();
 		EntityAddRequest r = new RecordUpdateRequest.EntityAddRequest();
 		Entity cluster = record.getRootEntity();
 		r.setParentEntityId(cluster.getInternalId());
 		r.setNodeName("time_study");
-		requests.add(r);
-		requestSet.setRequests(requests);
+		requestSet.addRequest(r);
 		RecordUpdateResponseSet responseSet = record.update(requestSet);
 		assertNotNull(responseSet);
 		Collection<NodeUpdateResponse<?>> responses = responseSet.getResponses();
 		assertNotNull(responses);
 		assertEquals(2, responses.size());
 		Iterator<NodeUpdateResponse<?>> respIt = responses.iterator();
+		{
+			NodeUpdateResponse<?> timeStudyUpdateResponse = respIt.next();
+			assertTrue(timeStudyUpdateResponse instanceof NodeAddResponse);
+			assertTrue(timeStudyUpdateResponse instanceof EntityUpdateResponse);
+			EntityUpdateResponse timeStudyUpdateResp = (EntityUpdateResponse) timeStudyUpdateResponse;
+			Entity timeStudy = timeStudyUpdateResp.getNode();
+			assertNotNull(timeStudy);
+			assertEquals("time_study", timeStudy.getName());
+		}
 		{
 			NodeUpdateResponse<?> clusterUpdateResponse = respIt.next();
 			assertTrue(clusterUpdateResponse instanceof EntityUpdateResponse);
@@ -107,15 +115,6 @@ public class CollectRecordIntegrationTest extends CollectIntegrationTest {
 			ValidationResultFlag plotMaxCountValid = childrenMaxCountValid.get("time_study");
 			assertTrue(plotMaxCountValid == ValidationResultFlag.ERROR);
 		}
-		{
-			NodeUpdateResponse<?> timeStudyUpdateResponse = respIt.next();
-			assertTrue(timeStudyUpdateResponse instanceof NodeAddResponse);
-			assertTrue(timeStudyUpdateResponse instanceof EntityUpdateResponse);
-			EntityUpdateResponse timeStudyUpdateResp = (EntityUpdateResponse) timeStudyUpdateResponse;
-			Entity timeStudy = timeStudyUpdateResp.getNode();
-			assertNotNull(timeStudy);
-			assertEquals("time_study", timeStudy.getName());
-		}
 	}
 	
 	@Test
@@ -123,20 +122,18 @@ public class CollectRecordIntegrationTest extends CollectIntegrationTest {
 		CollectSurvey survey = loadSurvey();
 		CollectRecord record = createTestRecord(survey);
 		RecordUpdateRequestSet requestSet = new RecordUpdateRequestSet();
-		List<RecordUpdateRequest> requests = new ArrayList<RecordUpdateRequest>();
 		Entity cluster = record.getRootEntity();
 		NodeDeleteRequest r1 = new RecordUpdateRequest.NodeDeleteRequest();
 		Entity timeStudy1 = (Entity) cluster.get("time_study", 0);
 		r1.setNode(timeStudy1);
-		requests.add(r1);
+		requestSet.addRequest(r1);
 		NodeDeleteRequest r2 = new RecordUpdateRequest.NodeDeleteRequest();
 		Entity timeStudy2 = (Entity) cluster.get("time_study", 1);
 		r2.setNode(timeStudy2);
-		requests.add(r2);
-		requestSet.setRequests(requests);
+		requestSet.addRequest(r2);
 		RecordUpdateResponseSet responseSet = record.update(requestSet);
 		assertNotNull(responseSet);
-		Collection<NodeUpdateResponse<?>> responses = responseSet.getResponses();
+		List<NodeUpdateResponse<?>> responses = responseSet.getResponses();
 		assertNotNull(responses);
 		assertEquals(3, responses.size());
 		{
@@ -156,6 +153,47 @@ public class CollectRecordIntegrationTest extends CollectIntegrationTest {
 			NodeDeleteResponse timeStudyDeleteResp = (NodeDeleteResponse) timeStudyDeleteResponse;
 			Node<?> deletedNode = timeStudyDeleteResp.getNode();
 			assertEquals(timeStudy1.getInternalId(), deletedNode.getInternalId());
+		}
+	}
+	
+	@Test
+	public void testUpdateMultipleCodeAttributeStudy() throws Exception {
+		CollectSurvey survey = loadSurvey();
+		CollectRecord record = createTestRecord(survey);
+		Entity cluster = record.getRootEntity();
+		Entity plot = (Entity) cluster.get("plot", 1);
+		Entity humanImpact = (Entity) plot.get("human_impact", 0);
+		Integer humanImpactId = humanImpact.getInternalId();
+		RecordUpdateRequestSet requestSet = new RecordUpdateRequestSet();
+		NodeDeleteRequest nodeToDeleteReq = new NodeDeleteRequest();
+		Node<?> typeNodeToDelete = humanImpact.get("type", 0);
+		nodeToDeleteReq.setNode(typeNodeToDelete);
+		requestSet.addRequest(nodeToDeleteReq);
+		{
+			AttributeAddRequest<Code> r = new AttributeAddRequest<Code>();
+			r.setParentEntityId(humanImpactId);
+			r.setNodeName("type");
+			r.setValue(new Code("0"));
+			requestSet.addRequest(r);
+		}
+		{
+			AttributeAddRequest<Code> r = new AttributeAddRequest<Code>();
+			r.setParentEntityId(humanImpactId);
+			r.setNodeName("type");
+			r.setValue(new Code("1"));
+			requestSet.addRequest(r);
+		}
+		RecordUpdateResponseSet responseSet = record.update(requestSet);
+		assertNotNull(responseSet);
+		List<NodeUpdateResponse<?>> responses = responseSet.getResponses();
+		assertNotNull(responses);
+		assertEquals(6, responses.size());
+		{
+			NodeUpdateResponse<?> response = responses.get(0);
+			assertTrue(response instanceof NodeDeleteResponse);
+			NodeDeleteResponse deleteResp = (NodeDeleteResponse) response;
+			Node<?> deletedNode = deleteResp.getNode();
+			assertEquals(typeNodeToDelete.getInternalId(), deletedNode.getInternalId());
 		}
 	}
 	
@@ -226,6 +264,11 @@ public class CollectRecordIntegrationTest extends CollectIntegrationTest {
 			EntityBuilder.addValue(tree2, "tree_no", 2);
 			EntityBuilder.addValue(tree2, "dbh", 85.8);
 			EntityBuilder.addValue(tree2, "total_height", 4.0);
+			
+			{
+				Entity humanImpact = EntityBuilder.addEntity(plot, "human_impact");
+				EntityBuilder.addValue(humanImpact, "type", new Code("0"));
+			}
 		}
 	}
 

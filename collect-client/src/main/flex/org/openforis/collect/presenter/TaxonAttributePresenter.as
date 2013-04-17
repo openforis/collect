@@ -273,7 +273,7 @@ package org.openforis.collect.presenter {
 			var reqSet:RecordUpdateRequestSetProxy = new RecordUpdateRequestSetProxy();
 			//update code
 			view.codeTextInput.text = taxonOccurrence.code;
-			reqSet.addRequest(view.codeTextInput.presenter.createUpdateValueOperation());
+			reqSet.addRequest(view.codeTextInput.presenter.createValueUpdateRequest());
 			
 			if ( ( taxonOccurrence != UNKNOWN_ITEM && taxonOccurrence != UNLISTED_ITEM )  || 
 				_lastSearchType != SEARCH_BY_SCIENTIFIC_NAME && _lastSearchType != SEARCH_BY_VERNACULAR_NAME ) {
@@ -286,10 +286,10 @@ package org.openforis.collect.presenter {
 				//update language variety
 				view.languageVarietyTextInput.text = taxonOccurrence.languageVariety;
 			}
-			reqSet.addRequest(view.scientificNameTextInput.presenter.createUpdateValueOperation());
-			reqSet.addRequest(view.vernacularNameTextInput.presenter.createUpdateValueOperation());
-			reqSet.addRequest(view.languageAutocomplete.presenter.createUpdateValueOperation());
-			reqSet.addRequest(view.languageVarietyTextInput.presenter.createUpdateValueOperation());
+			reqSet.addRequest(view.scientificNameTextInput.presenter.createValueUpdateRequest());
+			reqSet.addRequest(view.vernacularNameTextInput.presenter.createValueUpdateRequest());
+			reqSet.addRequest(view.languageAutocomplete.presenter.createValueUpdateRequest());
+			reqSet.addRequest(view.languageVarietyTextInput.presenter.createValueUpdateRequest());
 			ClientFactory.dataClient.updateActiveRecord(reqSet, null, faultHandler);
 		}
 		

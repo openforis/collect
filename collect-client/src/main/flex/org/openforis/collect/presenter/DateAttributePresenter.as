@@ -74,7 +74,7 @@ package org.openforis.collect.presenter {
 			var fields:Array = [view.year, view.month, view.day];
 			var requests:ListCollectionView = new ArrayCollection();
 			for each (var field:InputField in fields) {
-				var r:RecordUpdateRequestProxy = field.presenter.createUpdateValueOperation();
+				var r:RecordUpdateRequestProxy = field.presenter.createValueUpdateRequest();
 				requests.addItem(r);
 			}
 			var req:RecordUpdateRequestSetProxy = new RecordUpdateRequestSetProxy();

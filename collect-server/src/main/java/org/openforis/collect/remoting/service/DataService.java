@@ -5,7 +5,6 @@ package org.openforis.collect.remoting.service;
 
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -176,7 +175,7 @@ public class DataService {
 		CollectRecord activeRecord = getActiveRecord();
 		RecordUpdateRequestSet reqSet = requestSet.toRecordUpdateResponseSet(activeRecord, fileManager, sessionManager);
 		RecordUpdateResponseSet responseSet = activeRecord.update(reqSet);
-		Collection<NodeUpdateResponse<?>> responses = responseSet.getResponses();
+		List<NodeUpdateResponse<?>> responses = responseSet.getResponses();
 		if ( ! responses.isEmpty() && isCurrentRecordIndexable() ) {
 			recordIndexService.temporaryIndex(activeRecord);
 		}

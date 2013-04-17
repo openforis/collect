@@ -22,6 +22,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.metamodel.proxy.RangeAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.ui.UIOptions$Direction;
 	import org.openforis.collect.model.FieldSymbol;
+	import org.openforis.collect.model.proxy.AttributeAddRequestProxy;
 	import org.openforis.collect.model.proxy.AttributeProxy;
 	import org.openforis.collect.model.proxy.AttributeUpdateRequestProxy;
 	import org.openforis.collect.model.proxy.AttributeUpdateResponseProxy;
@@ -556,11 +557,21 @@ package org.openforis.collect.presenter {
 		}
 		
 		public function updateValue():void {
-			var r:RecordUpdateRequestProxy = createUpdateValueOperation();
+			var r:RecordUpdateRequestProxy = createValueUpdateRequest();
 			sendUpdateRequest(r);
 		}
 		
-		public function createUpdateValueOperation():RecordUpdateRequestProxy {
+		public function createAttributeAddRequest(value:String = null, symbol:FieldSymbol = null, remarks:String = null):AttributeAddRequestProxy {
+			var r:AttributeAddRequestProxy = new AttributeAddRequestProxy();
+			r.parentEntityId = _view.parentEntity.id;
+			r.nodeName = _view.attributeDefinition.name;
+			r.value = value;
+			r.symbol = symbol;
+			r.remarks = remarks;
+			return r;
+		}
+		
+		public function createValueUpdateRequest():RecordUpdateRequestProxy {
 			var symbol:FieldSymbol = null;
 			var value:String = null;
 			var text:String = textToRequestValue();
@@ -570,7 +581,7 @@ package org.openforis.collect.presenter {
 				value = text;
 			}
 			var remarks:String = getRemarks(); //preserve old remarks
-			var r:RecordUpdateRequestProxy = getUpdateValueOperation(value, symbol, remarks);
+			var r:RecordUpdateRequestProxy = createSpecificValueUpdateRequest(value, symbol, remarks);
 			return r;
 		}
 
@@ -580,7 +591,7 @@ package org.openforis.collect.presenter {
 			_view.updating = true;
 		}
 		
-		protected function getUpdateValueOperation(value:String, symbol:FieldSymbol = null, remarks:String = null):RecordUpdateRequestProxy {
+		protected function createSpecificValueUpdateRequest(value:String, symbol:FieldSymbol = null, remarks:String = null):RecordUpdateRequestProxy {
 			if ( _view.fieldIndex >= 0 ) {
 				var fieldUpdReq:FieldUpdateRequestProxy = new FieldUpdateRequestProxy();
 				fieldUpdReq.nodeId = _view.attribute.id;

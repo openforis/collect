@@ -3,13 +3,14 @@
  */
 package org.openforis.collect.model;
 
-import java.util.Collection;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.openforis.collect.model.NodeUpdateResponse.AttributeUpdateResponse;
-import org.openforis.collect.model.NodeUpdateResponse.NodeDeleteResponse;
 import org.openforis.collect.model.NodeUpdateResponse.EntityUpdateResponse;
+import org.openforis.collect.model.NodeUpdateResponse.NodeDeleteResponse;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Node;
@@ -23,7 +24,7 @@ public class NodeUpdateResponseMap {
 	private Map<Integer, NodeUpdateResponse<?>> nodeIdToResponse;
 	
 	public NodeUpdateResponseMap() {
-		nodeIdToResponse = new HashMap<Integer, NodeUpdateResponse<?>>();
+		nodeIdToResponse = new LinkedHashMap<Integer, NodeUpdateResponse<?>>();
 	}
 	
 	public EntityUpdateResponse prepareEntityResponse(Entity entity) {
@@ -74,8 +75,8 @@ public class NodeUpdateResponseMap {
 		}
 	}
 	
-	public Collection<NodeUpdateResponse<?>> values() {
-		return nodeIdToResponse.values();
+	public List<NodeUpdateResponse<?>> values() {
+		return new ArrayList<NodeUpdateResponse<?>>(nodeIdToResponse.values());
 	}
 
 	protected NodeUpdateResponse<?> getResponse(Node<?> node) {

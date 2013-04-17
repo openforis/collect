@@ -3,8 +3,12 @@
  */
 package org.openforis.collect.model;
 
-import java.util.Collection;
+import java.util.List;
 
+import org.openforis.collect.model.NodeUpdateResponse.AttributeAddResponse;
+import org.openforis.collect.model.NodeUpdateResponse.AttributeUpdateResponse;
+import org.openforis.collect.model.NodeUpdateResponse.EntityAddResponse;
+import org.openforis.collect.model.NodeUpdateResponse.EntityUpdateResponse;
 import org.openforis.collect.model.NodeUpdateResponse.NodeDeleteResponse;
 import org.openforis.idm.model.Node;
 
@@ -26,14 +30,20 @@ public class RecordUpdateResponseSet {
 		responseMap = new NodeUpdateResponseMap();
 	}
 	
-	public Collection<NodeUpdateResponse<?>> getResponses() {
+	public List<NodeUpdateResponse<?>> getResponses() {
 		return responseMap.values();
 	}
 
 	public void addResponse(NodeUpdateResponse<?> response) {
 		NodeUpdateResponse<?> oldResponse = responseMap.getResponse(response.getNode());
-		if ( ! (oldResponse instanceof NodeDeleteResponse) ) {
-			responseMap.putResponse(response);
+		if ( oldResponse == null || ! (oldResponse instanceof NodeDeleteResponse) ) {
+			if ( oldResponse instanceof AttributeAddResponse && response instanceof AttributeUpdateResponse ) {
+				((AttributeAddResponse) oldResponse).merge((AttributeUpdateResponse) response);
+			} else if ( oldResponse instanceof EntityAddResponse && response instanceof EntityUpdateResponse ) {
+				((EntityAddResponse) oldResponse).merge((EntityUpdateResponse) response);
+			} else {
+				responseMap.putResponse(response);
+			}
 		}
 	}
 	

@@ -19,13 +19,13 @@ import org.openforis.collect.metamodel.ui.UIOptions.Layout;
 import org.openforis.collect.model.NodeUpdateResponse.AttributeUpdateResponse;
 import org.openforis.collect.model.NodeUpdateResponse.EntityUpdateResponse;
 import org.openforis.collect.model.RecordUpdateRequest.AttributeAddRequest;
-import org.openforis.collect.model.RecordUpdateRequest.EntityAddRequest;
-import org.openforis.collect.model.RecordUpdateRequest.DefaultValueApplyRequest;
-import org.openforis.collect.model.RecordUpdateRequest.MissingValueApproveRequest;
-import org.openforis.collect.model.RecordUpdateRequest.ErrorConfirmRequest;
-import org.openforis.collect.model.RecordUpdateRequest.NodeDeleteRequest;
 import org.openforis.collect.model.RecordUpdateRequest.AttributeUpdateRequest;
+import org.openforis.collect.model.RecordUpdateRequest.DefaultValueApplyRequest;
+import org.openforis.collect.model.RecordUpdateRequest.EntityAddRequest;
+import org.openforis.collect.model.RecordUpdateRequest.ErrorConfirmRequest;
 import org.openforis.collect.model.RecordUpdateRequest.FieldUpdateRequest;
+import org.openforis.collect.model.RecordUpdateRequest.MissingValueApproveRequest;
+import org.openforis.collect.model.RecordUpdateRequest.NodeDeleteRequest;
 import org.openforis.collect.model.RecordUpdateRequest.RemarksUpdateRequest;
 import org.openforis.collect.persistence.RecordPersistenceException;
 import org.openforis.idm.metamodel.AttributeDefault;
@@ -634,7 +634,7 @@ public class CollectRecord extends Record {
 		List<RecordUpdateRequest> requests = requestSet.getRequests();
 		RecordUpdateResponseSet responseSet = new RecordUpdateResponseSet();
 		for (RecordUpdateRequest req : requests) {
-			Collection<NodeUpdateResponse<?>> responses = update(req);
+			List<NodeUpdateResponse<?>> responses = update(req);
 			for (NodeUpdateResponse<?> resp : responses) {
 				responseSet.addResponse(resp);
 			}
@@ -649,7 +649,7 @@ public class CollectRecord extends Record {
 	}
 	
 	@SuppressWarnings("unchecked")
-	protected Collection<NodeUpdateResponse<?>> update(RecordUpdateRequest req) throws RecordPersistenceException {
+	protected List<NodeUpdateResponse<?>> update(RecordUpdateRequest req) throws RecordPersistenceException {
 		if ( req instanceof ErrorConfirmRequest ) {
 			return confirmError((ErrorConfirmRequest) req);
 		} else if ( req instanceof MissingValueApproveRequest ) {
@@ -673,13 +673,14 @@ public class CollectRecord extends Record {
 		}
 	}
 
-	protected Collection<NodeUpdateResponse<?>> deleteNode(
+	protected List<NodeUpdateResponse<?>> deleteNode(
 			NodeDeleteRequest req) {
 		Set<NodePointer> relevantDependencies = new HashSet<NodePointer>();
 		Set<NodePointer> requiredDependencies = new HashSet<NodePointer>();
 		HashSet<Attribute<?, ?>> checkDependencies = new HashSet<Attribute<?,?>>();
 		Node<?> node = req.getNode();
 		NodeUpdateResponseMap responseMap = new NodeUpdateResponseMap();
+		responseMap.prepareDeleteNodeResponse(node);
 		List<NodePointer> cardinalityNodePointers = createCardinalityNodePointers(node);
 		Stack<Node<?>> depthFirstDescendants = getDepthFirstDescendants(node);
 		while ( !depthFirstDescendants.isEmpty() ) {
@@ -690,8 +691,6 @@ public class CollectRecord extends Record {
 				checkDependencies.addAll(((Attribute<?, ?>) n).getCheckDependencies());
 			}
 			deleteNode(n);
-			
-			responseMap.prepareDeleteNodeResponse(node);
 		}
 		//clear dependencies
 		clearRelevantDependencies(relevantDependencies);
@@ -723,7 +722,7 @@ public class CollectRecord extends Record {
 		return result;
 	}
 
-	protected Collection<NodeUpdateResponse<?>> applyDefaultValue(
+	protected List<NodeUpdateResponse<?>> applyDefaultValue(
 			DefaultValueApplyRequest req) {
 		Attribute<?, ?> attribute = req.getAttribute();
 		applyDefaultValue(attribute);
@@ -746,7 +745,7 @@ public class CollectRecord extends Record {
 		return responseMap.values();
 	}
 
-	protected Collection<NodeUpdateResponse<?>> updateAttribute(
+	protected List<NodeUpdateResponse<?>> updateAttribute(
 			AttributeUpdateRequest<?> req) {
 		@SuppressWarnings("unchecked")
 		Attribute<? extends NodeDefinition, Value> attribute = (Attribute<?, Value>) req.getAttribute();
@@ -780,7 +779,7 @@ public class CollectRecord extends Record {
 		return responseMap.values();
 	}
 
-	protected Collection<NodeUpdateResponse<?>> updateField(
+	protected List<NodeUpdateResponse<?>> updateField(
 			FieldUpdateRequest operation) {
 		Attribute<?, ?> attribute = operation.getAttribute();
 		Entity parentEntity = attribute.getParent();
@@ -812,7 +811,7 @@ public class CollectRecord extends Record {
 		return responseMap.values();
 	}
 	
-	protected Collection<NodeUpdateResponse<?>> addEntity(
+	protected List<NodeUpdateResponse<?>> addEntity(
 			EntityAddRequest req) {
 		String nodeName = req.getNodeName();
 		Entity parentEntity = (Entity) getNodeByInternalId(req.getParentEntityId());
@@ -832,7 +831,7 @@ public class CollectRecord extends Record {
 		return responseMap.values();
 	}
 
-	protected Collection<NodeUpdateResponse<?>> addAttribute(
+	protected List<NodeUpdateResponse<?>> addAttribute(
 			AttributeAddRequest<Value> req) {
 		String nodeName = req.getNodeName();
 		Entity parentEntity = (Entity) getNodeByInternalId(req.getParentEntityId());
@@ -857,7 +856,7 @@ public class CollectRecord extends Record {
 		return responseMap.values();
 	}
 
-	protected Collection<NodeUpdateResponse<?>> updateRemarks(
+	protected List<NodeUpdateResponse<?>> updateRemarks(
 			RemarksUpdateRequest req) {
 		Attribute<?, ?> attribute = req.getAttribute();
 		Field<?> fld = attribute.getField(req.getFieldIndex());
@@ -867,7 +866,7 @@ public class CollectRecord extends Record {
 		return responseMap.values();
 	}
 
-	protected Collection<NodeUpdateResponse<?>> approveMissingValue(
+	protected List<NodeUpdateResponse<?>> approveMissingValue(
 			MissingValueApproveRequest req) {
 		String nodeName = req.getNodeName();
 		Integer parentEntityId = req.getParentEntityId();
@@ -880,7 +879,7 @@ public class CollectRecord extends Record {
 		return responseMap.values();
 	}
 
-	protected Collection<NodeUpdateResponse<?>> confirmError(ErrorConfirmRequest req) {
+	protected List<NodeUpdateResponse<?>> confirmError(ErrorConfirmRequest req) {
 		NodeUpdateResponseMap responseMap = new NodeUpdateResponseMap();
 		Set<Attribute<?,?>> checkDependencies = new HashSet<Attribute<?,?>>();
 		Attribute<?, ?> attribute = req.getAttribute();
@@ -965,8 +964,8 @@ public class CollectRecord extends Record {
 		Entity entity = nodePointer.getEntity();
 		String childName = nodePointer.getChildName();
 		EntityUpdateResponse response = responseMap.prepareEntityResponse(entity);
-		response.setChildrenMinCountValid(childName, entity.validateMinCount(childName));
-		response.setChildrenMaxCountValid(childName, entity.validateMaxCount(childName));
+		response.setChildrenMinCountValidation(childName, entity.validateMinCount(childName));
+		response.setChildrenMaxCountValidation(childName, entity.validateMaxCount(childName));
 	}
 
 	protected void validateRelevanceState(
@@ -982,7 +981,7 @@ public class CollectRecord extends Record {
 		Entity entity = nodePointer.getEntity();
 		String childName = nodePointer.getChildName();
 		EntityUpdateResponse response = responseMap.prepareEntityResponse(entity);
-		response.setRequired(childName, entity.isRequired(childName));
+		response.setChildrenRequireness(childName, entity.isRequired(childName));
 	}
 
 	protected Attribute<?, ?> addAttribute(Entity parentEntity, String nodeName, Value requestValue, FieldSymbol symbol, String remarks) {

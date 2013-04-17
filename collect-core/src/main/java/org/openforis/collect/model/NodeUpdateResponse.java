@@ -118,71 +118,87 @@ public abstract class NodeUpdateResponse<T extends Node<?>> {
 	
 	public static class EntityUpdateResponse extends NodeUpdateResponse<Entity> {
 		
-		private Map<String, Boolean> childrenRelevaceMap;
-		private Map<String, Boolean> childrenRequirenessMap;
-		private Map<String, ValidationResultFlag> childrenMinCountValidMap;
-		private Map<String, ValidationResultFlag> childrenMaxCountValidMap;
+		private Map<String, Boolean> childrenRelevance;
+		private Map<String, Boolean> childrenRequireness;
+		private Map<String, ValidationResultFlag> childrenMinCountValidation;
+		private Map<String, ValidationResultFlag> childrenMaxCountValidation;
 		
 		public EntityUpdateResponse(Entity node) {
 			super(node);
-			childrenRelevaceMap = new HashMap<String, Boolean>();
-			childrenRequirenessMap = new HashMap<String, Boolean>();
-			childrenMinCountValidMap = new HashMap<String, ValidationResultFlag>();
-			childrenMaxCountValidMap = new HashMap<String, ValidationResultFlag>();
+			childrenRelevance = new HashMap<String, Boolean>();
+			childrenRequireness = new HashMap<String, Boolean>();
+			childrenMinCountValidation = new HashMap<String, ValidationResultFlag>();
+			childrenMaxCountValidation = new HashMap<String, ValidationResultFlag>();
 		}
 		
 		public Map<String, Boolean> getChildrenRelevance() {
-			return childrenRelevaceMap;
+			return childrenRelevance;
 		}
 
 		public void setChildrenRelevance(String childName, Boolean relevant) {
-			childrenRelevaceMap.put(childName, relevant);
+			childrenRelevance.put(childName, relevant);
+		}
+		
+		public void setChildrenRelevance(Map<String, Boolean> map) {
+			childrenRelevance = map;
 		}
 
 		public Map<String, Boolean> getChildrenRequireness() {
-			return childrenRequirenessMap;
+			return childrenRequireness;
 		}
 
-		public void setRequired(String childName, Boolean required) {
-			childrenRequirenessMap.put(childName, required);
+		public void setChildrenRequireness(String childName, Boolean required) {
+			childrenRequireness.put(childName, required);
+		}
+		
+		public void setChildrenRequireness(Map<String, Boolean> map) {
+			childrenRequireness = map;
 		}
 
 		public Map<String, ValidationResultFlag> getChildrenMinCountValidation() {
-			return childrenMinCountValidMap;
+			return childrenMinCountValidation;
 		}
 
-		public void setChildrenMinCountValid(String childName, ValidationResultFlag minCountValid) {
-			childrenMinCountValidMap.put(childName, minCountValid);
+		public void setChildrenMinCountValidation(String childName, ValidationResultFlag minCountValid) {
+			childrenMinCountValidation.put(childName, minCountValid);
 		}
 
+		public void setChildrenMinCountValidation(Map<String, ValidationResultFlag> map) {
+			childrenMinCountValidation = map;
+		}
+	
 		public Map<String, ValidationResultFlag> getChildrenMaxCountValidation() {
-			return childrenMaxCountValidMap;
+			return childrenMaxCountValidation;
 		}
 
-		public void setChildrenMaxCountValid(String childName, ValidationResultFlag maxCountValid) {
-			childrenMaxCountValidMap.put(childName, maxCountValid);
+		public void setChildrenMaxCountValidation(String childName, ValidationResultFlag maxCountValid) {
+			childrenMaxCountValidation.put(childName, maxCountValid);
 		}
 
+		public void setChildrenMaxCountValidation(Map<String, ValidationResultFlag> map) {
+			childrenMaxCountValidation = map;
+		}
+	
 		@Override
 		public int hashCode() {
 			final int prime = 31;
 			int result = super.hashCode();
 			result = prime
 					* result
-					+ ((childrenMaxCountValidMap == null) ? 0
-							: childrenMaxCountValidMap.hashCode());
+					+ ((childrenMaxCountValidation == null) ? 0
+							: childrenMaxCountValidation.hashCode());
 			result = prime
 					* result
-					+ ((childrenMinCountValidMap == null) ? 0
-							: childrenMinCountValidMap.hashCode());
+					+ ((childrenMinCountValidation == null) ? 0
+							: childrenMinCountValidation.hashCode());
 			result = prime
 					* result
-					+ ((childrenRelevaceMap == null) ? 0 : childrenRelevaceMap
+					+ ((childrenRelevance == null) ? 0 : childrenRelevance
 							.hashCode());
 			result = prime
 					* result
-					+ ((childrenRequirenessMap == null) ? 0
-							: childrenRequirenessMap.hashCode());
+					+ ((childrenRequireness == null) ? 0
+							: childrenRequireness.hashCode());
 			return result;
 		}
 
@@ -195,28 +211,28 @@ public abstract class NodeUpdateResponse<T extends Node<?>> {
 			if (getClass() != obj.getClass())
 				return false;
 			EntityUpdateResponse other = (EntityUpdateResponse) obj;
-			if (childrenMaxCountValidMap == null) {
-				if (other.childrenMaxCountValidMap != null)
+			if (childrenMaxCountValidation == null) {
+				if (other.childrenMaxCountValidation != null)
 					return false;
-			} else if (!childrenMaxCountValidMap
-					.equals(other.childrenMaxCountValidMap))
+			} else if (!childrenMaxCountValidation
+					.equals(other.childrenMaxCountValidation))
 				return false;
-			if (childrenMinCountValidMap == null) {
-				if (other.childrenMinCountValidMap != null)
+			if (childrenMinCountValidation == null) {
+				if (other.childrenMinCountValidation != null)
 					return false;
-			} else if (!childrenMinCountValidMap
-					.equals(other.childrenMinCountValidMap))
+			} else if (!childrenMinCountValidation
+					.equals(other.childrenMinCountValidation))
 				return false;
-			if (childrenRelevaceMap == null) {
-				if (other.childrenRelevaceMap != null)
+			if (childrenRelevance == null) {
+				if (other.childrenRelevance != null)
 					return false;
-			} else if (!childrenRelevaceMap.equals(other.childrenRelevaceMap))
+			} else if (!childrenRelevance.equals(other.childrenRelevance))
 				return false;
-			if (childrenRequirenessMap == null) {
-				if (other.childrenRequirenessMap != null)
+			if (childrenRequireness == null) {
+				if (other.childrenRequireness != null)
 					return false;
-			} else if (!childrenRequirenessMap
-					.equals(other.childrenRequirenessMap))
+			} else if (!childrenRequireness
+					.equals(other.childrenRequireness))
 				return false;
 			return true;
 		}
@@ -241,12 +257,24 @@ public abstract class NodeUpdateResponse<T extends Node<?>> {
 			super(node);
 		}
 
+		public void merge(AttributeUpdateResponse newResponse) {
+			this.setUpdatedFieldValues(newResponse.getUpdatedFieldValues());
+			this.setValidationResults(newResponse.getValidationResults());
+		}
+		
 	}
 	
 	public static class EntityAddResponse extends EntityUpdateResponse implements NodeAddResponse {
 		
 		public EntityAddResponse(Entity node) {
 			super(node);
+		}
+		
+		public void merge(EntityUpdateResponse newResponse) {
+			this.setChildrenMinCountValidation(newResponse.getChildrenMinCountValidation());
+			this.setChildrenMaxCountValidation(newResponse.getChildrenMaxCountValidation());
+			this.setChildrenRelevance(newResponse.getChildrenRelevance());
+			this.setChildrenRequireness(newResponse.getChildrenRequireness());
 		}
 
 	}

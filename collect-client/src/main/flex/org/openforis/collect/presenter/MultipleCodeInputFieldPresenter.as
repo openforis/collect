@@ -10,6 +10,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.event.InputFieldEvent;
 	import org.openforis.collect.model.FieldSymbol;
+	import org.openforis.collect.model.proxy.AttributeAddRequestProxy;
 	import org.openforis.collect.model.proxy.AttributeProxy;
 	import org.openforis.collect.model.proxy.AttributeUpdateResponseProxy;
 	import org.openforis.collect.model.proxy.EntityProxy;
@@ -130,24 +131,24 @@ package org.openforis.collect.presenter {
 				var parts:Array = text.split(",");
 				if(parts.length == 1 && FieldProxy.isShortCutForReasonBlank(text)) {
 					symbol = FieldProxy.parseShortCutForReasonBlank(text);
-					r = getUpdateValueOperation(null, symbol, remarks);
+					r = createAttributeAddRequest(null, symbol, remarks);
 					addAttributesOperations.addItem(r);
 				} else {
 					for each (var part:String in parts) {
 						var trimmedPart:String = StringUtil.trim(part);
 						if(StringUtil.isNotBlank(trimmedPart)) {
-							r = getUpdateValueOperation(trimmedPart, null, remarks);
+							r = createAttributeAddRequest(trimmedPart, symbol, remarks);
 							addAttributesOperations.addItem(r);
 						}
 					}
 				}
 			} else if(StringUtil.isNotBlank(remarks)) {
-				r = getUpdateValueOperation(null, null, remarks);
+				r = createAttributeAddRequest(null, null, remarks);
 				addAttributesOperations.addItem(r);
 			}
 			if ( addAttributesOperations.length == 0 ) {
 				//add empty attribute
-				r = getUpdateValueOperation(null, null, remarks);
+				r = createAttributeAddRequest(null, null, remarks);
 				addAttributesOperations.addItem(r);
 			}
 			var requests:ArrayCollection = new ArrayCollection();

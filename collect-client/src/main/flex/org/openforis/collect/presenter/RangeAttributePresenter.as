@@ -56,7 +56,7 @@ package org.openforis.collect.presenter {
 		
 		protected function updateValue():void {
 			var updReqSet:RecordUpdateRequestSetProxy = new RecordUpdateRequestSetProxy();
-			var updateValueOp:RecordUpdateRequestProxy = view.rangeInputField.presenter.createUpdateValueOperation();
+			var updateValueOp:RecordUpdateRequestProxy = view.rangeInputField.presenter.createValueUpdateRequest();
 			updReqSet.addRequest(updateValueOp);
 			var updateUnitOp:FieldUpdateRequestProxy = createUpdateUnitOperation();
 			if ( updateUnitOp != null ) {
@@ -73,7 +73,7 @@ package org.openforis.collect.presenter {
 			var attrDefn:RangeAttributeDefinitionProxy = RangeAttributeDefinitionProxy(view.attributeDefinition);
 			var result:FieldUpdateRequestProxy = null;
 			if(view.unitInputField) {
-				result = view.unitInputField.presenter.createUpdateValueOperation() as FieldUpdateRequestProxy;
+				result = view.unitInputField.presenter.createValueUpdateRequest() as FieldUpdateRequestProxy;
 			} else if ( attrDefn.defaultUnit != null ) {
 				result = new FieldUpdateRequestProxy();
 				result.nodeId = view.attribute.id;
