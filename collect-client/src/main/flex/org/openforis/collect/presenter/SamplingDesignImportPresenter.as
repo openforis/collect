@@ -1,5 +1,10 @@
 package org.openforis.collect.presenter
 {
+	import flash.events.MouseEvent;
+	import flash.net.URLRequest;
+	import flash.net.URLRequestMethod;
+	import flash.net.navigateToURL;
+	
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.IResponder;
 	import mx.rpc.events.ResultEvent;
@@ -11,6 +16,7 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.model.proxy.SamplingDesignSummariesProxy;
 	import org.openforis.collect.ui.view.SamplingDesignImportView;
 	import org.openforis.collect.util.AlertUtil;
+	import org.openforis.collect.util.ApplicationConstants;
 	
 	/**
 	 * 
@@ -96,6 +102,19 @@ package org.openforis.collect.presenter
 			_samplingDesignImportClient.getStatus(_getStatusResponder);
 		}
 		
+		override protected function exportButtonClickHandler(event:MouseEvent):void {
+			var request:URLRequest = getExportUrlRequest();
+			if(request != null) {
+				navigateToURL(request, "_new");
+			}
+		}
+		
+		protected function getExportUrlRequest():URLRequest {
+			var url:String = ApplicationConstants.getSamplingDesignExportUrl(view.surveyId, view.work);
+			var request:URLRequest = new URLRequest(url);
+			request.method = URLRequestMethod.GET;
+			return request;
+		}
 	}
 }
 import org.openforis.collect.presenter.ReferenceDataImportMessageKeys;

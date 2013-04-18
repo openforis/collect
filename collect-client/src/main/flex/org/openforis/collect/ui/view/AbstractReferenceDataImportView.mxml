@@ -38,6 +38,8 @@
 			public var errorsDataGrid:DataGrid;
 			[SkinPart(required="true", type="spark.components.Button")]
 			public var importButton:Button;
+			[SkinPart(required="false", type="spark.components.Button")]
+			public var exportButton:Button;
 			[SkinPart(required="true", type="spark.components.Button")]
 			public var cancelImportButton:Button;
 			[SkinPart(required="true", type="spark.components.Button")]
