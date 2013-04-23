@@ -21,11 +21,11 @@ import org.openforis.commons.io.csv.CsvWriter;
  */
 public class SpeciesExportProcess {
 	
-	private final Log log = LogFactory.getLog(SpeciesExportProcess.class);
-	
-	private static final String SYNOMYMS_COL_NAME = "synomyms";
+	private static final String LATIN_LANG_CODE = "lat";
 	private static final String VERNACULAR_NAMES_SEPARATOR = " / ";
 
+	private final Log log = LogFactory.getLog(SpeciesExportProcess.class);
+	
 	private SpeciesManager speciesManager;
 	
 	public SpeciesExportProcess(SpeciesManager speciesManager) {
@@ -37,14 +37,15 @@ public class SpeciesExportProcess {
 		CsvWriter writer = null;
 		try {
 			writer = new CsvWriter(out);
-			TaxonSummaries summaries = speciesManager.loadTaxonSummaries(taxonomyId);
+			TaxonSummaries summaries = speciesManager.loadFullTaxonSummaries(taxonomyId);
 			ArrayList<String> colNames = new ArrayList<String>();
 			colNames.add(SpeciesFileColumn.NO.getColumnName());
 			colNames.add(SpeciesFileColumn.CODE.getColumnName());
-			//colNames.add(SpeciesFileColumn.FAMILY.getColumnName());
+			colNames.add(SpeciesFileColumn.FAMILY.getColumnName());
 			colNames.add(SpeciesFileColumn.SCIENTIFIC_NAME.getColumnName());
-			colNames.add(SYNOMYMS_COL_NAME);
+			colNames.add(SpeciesFileColumn.SYNONYMS.getColumnName());
 			List<String> vernacularNamesLangCodes = getNotEmptyValues(summaries.getVernacularNamesLanguageCodes());
+			vernacularNamesLangCodes.remove(LATIN_LANG_CODE); //consider Latin vernacular name as synonym
 			colNames.addAll(vernacularNamesLangCodes);
 			writer.writeHeaders(colNames.toArray(new String[0]));
 			List<TaxonSummary> items = summaries.getItems();
@@ -75,6 +76,7 @@ public class SpeciesExportProcess {
 		List<String> lineValues = new ArrayList<String>();
 		lineValues.add(item.getTaxonId() == null ? null: item.getTaxonId().toString());
 		lineValues.add(item.getCode());
+		lineValues.add(item.getFamilyName());
 		lineValues.add(item.getScientificName());
 		lineValues.add(item.getJointSynonyms(VERNACULAR_NAMES_SEPARATOR));
 		for (String langCode : vernacularNamesLangCodes) {

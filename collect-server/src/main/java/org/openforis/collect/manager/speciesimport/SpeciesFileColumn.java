@@ -6,7 +6,7 @@ package org.openforis.collect.manager.speciesimport;
  *
  */
 public enum SpeciesFileColumn {
-	NO("no"), CODE("code"), FAMILY("family"), SCIENTIFIC_NAME("scientific_name");
+	NO("no"), CODE("code"), FAMILY("family"), SCIENTIFIC_NAME("scientific_name"), SYNONYMS("synonyms");
 
 	public static final SpeciesFileColumn[] REQUIRED_COLUMNS = {CODE, FAMILY, SCIENTIFIC_NAME};
 	

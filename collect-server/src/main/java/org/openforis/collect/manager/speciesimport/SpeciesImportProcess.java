@@ -251,7 +251,7 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 			}
 		}
 		final Integer taxonomyId = taxonomy.getId();
-		taxonTree.bfs(new TaxonTree.NodeVisitor() {
+		taxonTree.depthFirstVisit(new TaxonTree.NodeVisitor() {
 			@Override
 			public void visit(Node node) {
 				if ( status.isRunning() ) {
@@ -274,11 +274,9 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 			speciesManager.save(taxon);
 			
 			List<TaxonVernacularName> vernacularNames = node.getVernacularNames();
-			if ( vernacularNames != null ) {
-				for (TaxonVernacularName vernacularName : vernacularNames) {
-					vernacularName.setTaxonSystemId(taxon.getSystemId());
-					speciesManager.save(vernacularName);
-				}
+			for (TaxonVernacularName vernacularName : vernacularNames) {
+				vernacularName.setTaxonSystemId(taxon.getSystemId());
+				speciesManager.save(vernacularName);
 			}
 		} catch (Exception e) {
 			LOG.error(e);
@@ -365,7 +363,7 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 			checkDuplicates(line, code, taxonId);
 			taxon.setCode(code);
 			taxon.setTaxonId(taxonId);
-			taxonTree.index(taxon);
+			taxonTree.updateNodeInfo(taxon);
 			processVernacularNames(line, taxon);
 		}
 		return taxon;

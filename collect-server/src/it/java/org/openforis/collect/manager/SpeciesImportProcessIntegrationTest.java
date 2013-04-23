@@ -26,6 +26,7 @@ import org.openforis.collect.manager.referencedataimport.ParsingError.ErrorType;
 import org.openforis.collect.manager.speciesimport.SpeciesFileColumn;
 import org.openforis.collect.manager.speciesimport.SpeciesImportProcess;
 import org.openforis.collect.manager.speciesimport.SpeciesImportStatus;
+import org.openforis.collect.metamodel.TaxonSummaries;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.CollectTaxonomy;
 import org.openforis.collect.persistence.SurveyImportException;
@@ -268,6 +269,16 @@ public class SpeciesImportProcessIntegrationTest extends CollectIntegrationTest 
 		assertTrue(containsError(errors, 10, SpeciesFileColumn.SCIENTIFIC_NAME, ErrorType.DUPLICATE_VALUE));
 		assertTrue(containsError(errors, 10, SpeciesFileColumn.SCIENTIFIC_NAME, ErrorType.DUPLICATE_VALUE));
 		assertTrue(containsError(errors, 11, "swh", ErrorType.INVALID_VALUE));
+	}
+	
+	@Test
+	public void testExport() throws Exception {
+		SpeciesImportProcess process = importCSVFile(VALID_TEST_CSV);
+		SpeciesImportStatus status = process.getStatus();
+		assertTrue(status.isComplete());
+		Taxonomy taxonomy = taxonomyDao.load(survey.getId(), TEST_TAXONOMY_NAME);
+		TaxonSummaries summaries = speciesManager.loadFullTaxonSummaries(taxonomy.getId());
+		assertNotNull(summaries);
 	}
 
 	protected boolean containsError(List<ParsingError> errors, long row, String column, ErrorType type) {

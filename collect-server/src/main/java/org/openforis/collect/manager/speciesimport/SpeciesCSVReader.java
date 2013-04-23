@@ -11,7 +11,6 @@ import static org.openforis.idm.model.species.Taxon.TaxonRank.SUBSPECIES;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,8 +25,8 @@ import org.gbif.ecat.voc.Rank;
 import org.openforis.collect.manager.referencedataimport.CSVDataImportReader;
 import org.openforis.collect.manager.referencedataimport.CSVLineParser;
 import org.openforis.collect.manager.referencedataimport.ParsingError;
-import org.openforis.collect.manager.referencedataimport.ParsingException;
 import org.openforis.collect.manager.referencedataimport.ParsingError.ErrorType;
+import org.openforis.collect.manager.referencedataimport.ParsingException;
 import org.openforis.commons.io.csv.CsvLine;
 import org.openforis.idm.metamodel.Languages;
 import org.openforis.idm.model.species.Taxon.TaxonRank;
@@ -73,7 +72,6 @@ public class SpeciesCSVReader extends CSVDataImportReader<SpeciesLine> {
 	
 	public static class SpeciesCSVLineParser extends CSVLineParser<SpeciesLine> {
 		
-		private static final String LATIN_LANGUAGE_CODE = "lat";
 		private static final String VERNACULAR_NAME_TRIM_EXPRESSION = "^\\s+|\\s+$|;+$|\\.+$";
 		private static final String SYNONYM_COL_NAME = "";
 		private static final String SYNONYM_SPLIT_EXPRESSION = "((syn|Syn)(\\.\\:|\\.|\\:|\\s))";
@@ -205,20 +203,15 @@ public class SpeciesCSVReader extends CSVDataImportReader<SpeciesLine> {
 		}
 		
 		protected Map<String, List<String>> extractVernacularNames() throws ParsingException {
-			Map<String, List<String>> result = extractVernacularNamesFromColumns();
-			List<String> synonyms = extractSynonyms();
+			VernacularLanguagesMap result = extractVernacularNamesFromColumns();
+			List<String> synonyms = extractSynonymsFromScientificName();
 			if ( ! synonyms.isEmpty() ) {
-				List<String> oldSynonyms = result.get(LATIN_LANGUAGE_CODE);
-				if ( oldSynonyms == null ) {
-					result.put(LATIN_LANGUAGE_CODE, synonyms);
-				} else {
-					oldSynonyms.addAll(synonyms);
-				}
+				result.addSynonyms(synonyms);
 			}
-			return result;
+			return result.getMap();
 		}
 
-		private List<String> extractSynonyms() throws ParsingException {
+		private List<String> extractSynonymsFromScientificName() throws ParsingException {
 			List<String> result = new ArrayList<String>();
 			String[] splitted = rawScientificName.split(SYNONYM_SPLIT_EXPRESSION);
 			if ( splitted != null && splitted.length > 1 ) {
@@ -232,21 +225,23 @@ public class SpeciesCSVReader extends CSVDataImportReader<SpeciesLine> {
 			return result;
 		}
 
-		protected Map<String, List<String>> extractVernacularNamesFromColumns()
+		protected VernacularLanguagesMap extractVernacularNamesFromColumns()
 				throws ParsingException {
-			Map<String, List<String>> result = new HashMap<String, List<String>>();
+			VernacularLanguagesMap result = new VernacularLanguagesMap();
 			List<String> languageColumnNames = ((SpeciesCSVReader) getReader()).getLanguageColumnNames();
 			for (String langCode : languageColumnNames) {
 				List<String> vernacularNames = extractVernacularNames(langCode);
 				result.put(langCode, vernacularNames);
 			}
+			List<String> synonyms = extractVernacularNames(SpeciesFileColumn.SYNONYMS.getColumnName());
+			result.addSynonyms(synonyms);
 			return result;
 		}
 
 		protected List<String> extractVernacularNames(String colName) throws ParsingException {
 			String colValue = StringUtils.normalizeSpace(getColumnValue(colName, false, String.class));
 			if ( StringUtils.isBlank(colValue) ) {
-				return Collections.emptyList();
+				return new ArrayList<String>();
 			} else {
 				List<String> result = new ArrayList<String>();
 				String normalized = colValue.replaceAll(OTHER_VERNACULAR_NAMES_SEPARATOR_EXPRESSION, DEFAULT_VERNACULAR_NAMES_SEPARATOR);
@@ -312,6 +307,34 @@ public class SpeciesCSVReader extends CSVDataImportReader<SpeciesLine> {
 			}
 		}
 
+	}
+	
+	static class VernacularLanguagesMap {
+		private static final String LATIN_LANGUAGE_CODE = "lat";
+		
+		private Map<String, List<String>> langCodeToVernacularNames;
+		
+		public VernacularLanguagesMap() {
+			langCodeToVernacularNames = new HashMap<String, List<String>>();
+		}
+
+		public Map<String, List<String>> getMap() {
+			return langCodeToVernacularNames;
+		}
+
+		public void put(String langCode, List<String> vernacularNames) {
+			langCodeToVernacularNames.put(langCode, vernacularNames);
+		}
+
+		public void addSynonyms(List<String> synonyms) {
+			List<String> oldSynonyms = langCodeToVernacularNames.get(LATIN_LANGUAGE_CODE);
+			if ( oldSynonyms == null ) {
+				langCodeToVernacularNames.put(LATIN_LANGUAGE_CODE, synonyms);
+			} else {
+				oldSynonyms.addAll(synonyms);
+			}
+		}
+		
 	}
 
 }
