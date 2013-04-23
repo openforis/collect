@@ -233,6 +233,13 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 	public void delete(int id) {
 		super.delete(id);
 	}
+	
+	public void deleteBySurvey(int id) {
+		JooqFactory jf = getMappingJooqFactory();
+		jf.delete(OFC_RECORD)
+			.where(OFC_RECORD.SURVEY_ID.equal(id))
+			.execute();
+	}
 
 	public static class JooqFactory extends MappingJooqFactory<CollectRecord> {
 
@@ -424,4 +431,5 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 			return new ModelSerializer(SERIALIZATION_BUFFER_SIZE);
 		}
 	}
+
 }

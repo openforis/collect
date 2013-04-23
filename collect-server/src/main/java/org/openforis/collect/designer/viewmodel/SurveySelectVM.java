@@ -104,6 +104,35 @@ public class SurveySelectVM extends BaseVM {
 		}
 	}
 	
+	@Command
+	public void deleteSelectedSurvey() {
+		String messageKey;
+		if ( selectedSurvey.isWorking() ) {
+			if ( selectedSurvey.isPublished() ) {
+				messageKey = "survey.delete.published_work.confirm";
+			} else {
+				messageKey = "survey.delete.work.confirm";
+			}
+		} else {
+			messageKey = "survey.delete.confirm";
+		}
+		MessageUtil.showConfirm(new MessageUtil.ConfirmHandler() {
+			@Override
+			public void onOk() {
+				performSelectedSurveyDeletion();
+			}
+		}, messageKey, new String[]{selectedSurvey.getName()});
+	}
+	
+	protected void performSelectedSurveyDeletion() {
+		if ( selectedSurvey.isWorking() ) {
+			surveyManager.deleteSurveyWork(selectedSurvey.getId());
+		} else {
+			surveyManager.deleteSurvey(selectedSurvey.getId());
+		}
+		notifyChange("surveySummaries");
+	}
+
 	protected boolean validateSurvey(CollectSurvey survey) {
 		SurveyValidator surveyValidator = new SurveyValidator(surveyManager);
 		List<SurveyValidationResult> validationResults = surveyValidator.validateSurvey(survey);

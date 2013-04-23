@@ -250,7 +250,7 @@ public class SpeciesManager {
 	
 	@Transactional
 	public void publishTaxonomies(Integer surveyWorkId, int publishedSurveyId) {
-		deleteTaxonomies(publishedSurveyId);
+		deleteTaxonomiesBySurvey(publishedSurveyId);
 		List<CollectTaxonomy> taxonomies = taxonomyDao.loadAllBySurveyWork(surveyWorkId);
 		for (CollectTaxonomy taxonomy : taxonomies) {
 			taxonomy.setSurveyWorkId(null);
@@ -259,9 +259,18 @@ public class SpeciesManager {
 		}
 	}
 
-	protected void deleteTaxonomies(int surveyId) {
-		List<CollectTaxonomy> publishedTaxonomies = taxonomyDao.loadAllBySurvey(surveyId);
-		for (CollectTaxonomy taxonomy : publishedTaxonomies) {
+	@Transactional
+	public void deleteTaxonomiesBySurvey(int surveyId) {
+		List<CollectTaxonomy> taxonomies = taxonomyDao.loadAllBySurvey(surveyId);
+		for (CollectTaxonomy taxonomy : taxonomies) {
+			delete(taxonomy);
+		}
+	}
+	
+	@Transactional
+	public void deleteTaxonomiesBySurveyWork(int surveyId) {
+		List<CollectTaxonomy> taxonomies = taxonomyDao.loadAllBySurveyWork(surveyId);
+		for (CollectTaxonomy taxonomy : taxonomies) {
 			delete(taxonomy);
 		}
 	}
