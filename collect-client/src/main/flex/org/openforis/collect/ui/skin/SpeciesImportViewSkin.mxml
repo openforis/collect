@@ -103,11 +103,11 @@
 						 verticalCenter="0"
 						 />
 			</s:HGroup>
-			<!--<s:Button id="exportButton" 
+			<s:Button id="exportButton" 
 					  label="{Message.get('referenceDataImport.export')}"
 					  useHandCursor="true"
 					  buttonMode="true"
-					  />-->
+					  />
 			<s:Button id="closeButton"
 					  label="{Message.get('global.close')}"
 					  includeInLayout="{hostComponent.showCloseButton}"
