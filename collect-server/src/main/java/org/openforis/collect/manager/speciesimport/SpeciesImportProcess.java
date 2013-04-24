@@ -4,6 +4,7 @@ import static org.openforis.idm.model.species.Taxon.TaxonRank.FAMILY;
 import static org.openforis.idm.model.species.Taxon.TaxonRank.GENUS;
 import static org.openforis.idm.model.species.Taxon.TaxonRank.SPECIES;
 import static org.openforis.idm.model.species.Taxon.TaxonRank.SUBSPECIES;
+import static org.openforis.idm.model.species.Taxon.TaxonRank.VARIETY;
 
 import java.io.Closeable;
 import java.io.File;
@@ -43,10 +44,12 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 	private static final String INVALID_FAMILY_NAME_ERROR_MESSAGE_KEY = "speciesImport.error.invalidFamilyName";
 	private static final String INVALID_GENUS_NAME_ERROR_MESSAGE_KEY = "speciesImport.error.invalidGenusName";
 	private static final String INVALID_SPECIES_NAME_ERROR_MESSAGE_KEY = "speciesImport.error.invalidSpeciesName";
+	private static final String INVALID_SUBSPECIES_NAME_ERROR_MESSAGE_KEY = "speciesImport.error.invalidSubspeciesName";
+	private static final String INVALID_VARIETY_NAME_ERROR_MESSAGE_KEY = "speciesImport.error.invalidVarietyName";
 	private static final String INVALID_SCIENTIFIC_NAME_ERROR_MESSAGE_KEY = "speciesImport.error.invalidScientificNameName";
 	private static final String IMPORTING_FILE_ERROR_MESSAGE_KEY = "speciesImport.error.internalErrorImportingFile";
 	
-	private static final TaxonRank[] TAXON_RANKS = new TaxonRank[] {FAMILY, GENUS, SPECIES, SUBSPECIES};
+	private static final TaxonRank[] TAXON_RANKS = new TaxonRank[] {FAMILY, GENUS, SPECIES, SUBSPECIES, VARIETY};
 	public static final String GENUS_SUFFIX = "sp.";
 
 	private static final String CSV = "csv";
@@ -214,14 +217,17 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 		case SPECIES:
 			createTaxonSpecies(line);
 			return mostSpecificRank;
-		default:
+		case SUBSPECIES:
+		case VARIETY:
 			Taxon parent = findParentTaxon(line);
-			if ( parent == null ) {
+			if ( ! mostSpecificRank || parent == null ) {
 				return false;
 			} else {
 				createTaxon(line, rank, parent);
 				return true;
 			}
+		default: 
+			return false;
 		}
 	}
 
@@ -297,6 +303,7 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 			scientificName = line.getGenus();
 			break;
 		case SPECIES:
+		case SUBSPECIES:
 			scientificName = line.getSpeciesName();
 			break;
 		default:
@@ -334,6 +341,26 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 		}
 		Taxon taxonGenus = createTaxonGenus(line);
 		return createTaxon(line, SPECIES, taxonGenus, speciesName);
+	}
+	
+	protected Taxon createTaxonSubspecies(SpeciesLine line) throws ParsingException {
+		String speciesName = line.getCanonicalScientificName();
+		if ( speciesName == null ) {
+			ParsingError error = new ParsingError(ErrorType.INVALID_VALUE, line.getLineNumber(), SpeciesFileColumn.SCIENTIFIC_NAME.getColumnName(), INVALID_SUBSPECIES_NAME_ERROR_MESSAGE_KEY);
+			throw new ParsingException(error);
+		}
+		Taxon parent = createTaxonSpecies(line);
+		return createTaxon(line, SUBSPECIES, parent, speciesName);
+	}
+	
+	protected Taxon createTaxonVariety(SpeciesLine line) throws ParsingException {
+		String speciesName = line.getCanonicalScientificName();
+		if ( speciesName == null ) {
+			ParsingError error = new ParsingError(ErrorType.INVALID_VALUE, line.getLineNumber(), SpeciesFileColumn.SCIENTIFIC_NAME.getColumnName(), INVALID_VARIETY_NAME_ERROR_MESSAGE_KEY);
+			throw new ParsingException(error);
+		}
+		Taxon parent = createTaxonSpecies(line);
+		return createTaxon(line, VARIETY, parent, speciesName);
 	}
 	
 	protected Taxon createTaxon(SpeciesLine line, TaxonRank rank, Taxon parent) throws ParsingException {

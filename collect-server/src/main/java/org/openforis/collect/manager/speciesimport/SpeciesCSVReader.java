@@ -7,6 +7,7 @@ import static org.openforis.idm.model.species.Taxon.TaxonRank.FAMILY;
 import static org.openforis.idm.model.species.Taxon.TaxonRank.GENUS;
 import static org.openforis.idm.model.species.Taxon.TaxonRank.SPECIES;
 import static org.openforis.idm.model.species.Taxon.TaxonRank.SUBSPECIES;
+import static org.openforis.idm.model.species.Taxon.TaxonRank.VARIETY;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -168,8 +169,11 @@ public class SpeciesCSVReader extends CSVDataImportReader<SpeciesLine> {
 				case SPECIES:
 					taxonRank = SPECIES;
 					break;
-				case VARIETY:
+				case SUBSPECIES:
 					taxonRank = SUBSPECIES;
+					break;
+				case VARIETY:
+					taxonRank = VARIETY;
 					break;
 				default:
 					taxonRank = SPECIES;
@@ -187,7 +191,7 @@ public class SpeciesCSVReader extends CSVDataImportReader<SpeciesLine> {
 		}
 
 		protected String extractCanonicalScientificName(TaxonRank rank, ParsedName<Object> parsedName) throws ParsingException {
-			boolean showRankMarker = rank == GENUS || rank == SUBSPECIES;
+			boolean showRankMarker = rank == GENUS || rank == SUBSPECIES || rank == VARIETY;
 			String result = parsedName.buildName(false, showRankMarker, false, false, false, true, true, false, false, false, false);
 			return result;
 		}

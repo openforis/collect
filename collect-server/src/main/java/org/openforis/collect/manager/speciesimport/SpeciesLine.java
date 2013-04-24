@@ -78,7 +78,7 @@ public class SpeciesLine extends Line {
 	public void setSpeciesName(String speciesName) {
 		this.speciesName = speciesName;
 	}
-
+	
 	public String getRawScientificName() {
 		return rawScientificName;
 	}
@@ -103,5 +103,5 @@ public class SpeciesLine extends Line {
 			Map<String, List<String>> languageToVernacularNames) {
 		this.languageToVernacularNames = languageToVernacularNames;
 	}
-	
+
 }
