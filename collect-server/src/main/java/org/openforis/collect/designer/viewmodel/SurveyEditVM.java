@@ -55,6 +55,7 @@ public class SurveyEditVM extends SurveyBaseVM {
 	public static final String SHOW_PREVIEW_POP_UP_GLOBAL_COMMAND = "showPreview";
 	private static final String SURVEY_SUCCESSFULLY_SAVED_MESSAGE_KEY = "survey.successfully_saved";
 //	private static final String SURVEY_SUCCESSFULLY_PUBLISHED_MESSAGE_KEY = "survey.successfully_published";
+	private static final String CODE_LISTS_POP_UP_CLOSED_COMMAND = "codeListsPopUpClosed";
 	
 	private Window selectLanguagePopUp;
 	private Window previewPreferencesPopUp;
@@ -133,7 +134,8 @@ public class SurveyEditVM extends SurveyBaseVM {
 	}
 
 	@GlobalCommand
-	public void closeCodeListsManagerPopUp(@ContextParam(ContextType.BINDER) Binder binder) {
+	public void closeCodeListsManagerPopUp(@ContextParam(ContextType.BINDER) Binder binder,
+			@BindingParam("selectedCodeList") final CodeList selectedCodeList) {
 		if ( codeListsPopUp != null ) {
 			checkCanLeaveForm(new CanLeaveFormConfirmHandler() {
 				@Override
@@ -141,9 +143,16 @@ public class SurveyEditVM extends SurveyBaseVM {
 					closePopUp(codeListsPopUp);
 					codeListsPopUp = null;
 					dispatchCurrentFormValidatedCommand(true);
+					dispatchCodeListsPopUpClosedCommand(selectedCodeList);
 				}
 			});
 		}
+	}
+
+	public void dispatchCodeListsPopUpClosedCommand(CodeList selectedCodeList) {
+		Map<String, Object> args = new HashMap<String, Object>();
+		args.put("selectedCodeList", selectedCodeList);
+		BindUtils.postGlobalCommand(null, null, CODE_LISTS_POP_UP_CLOSED_COMMAND, args);
 	}
 	
 	@GlobalCommand

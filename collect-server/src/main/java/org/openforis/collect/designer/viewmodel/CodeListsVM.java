@@ -64,7 +64,7 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 	
 	private List<CodeListItem> selectedItemsPerLevel;
 	private Window codeListItemPopUp;
-	private Window nodesReferencedNodesPopUp;
+	private Window referencedNodesPopUp;
 	private Window codeListImportPopUp;
 	
 	@Init(superclass=false)
@@ -137,7 +137,7 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 		if ( ! references.isEmpty() ) {
 			String title = Labels.getLabel("global.message.title.warning");
 			String message = Labels.getLabel("survey.code_list.alert.cannot_delete_used_list");
-			nodesReferencedNodesPopUp = SurveyErrorsPopUpVM.openPopUp(title, message, 
+			referencedNodesPopUp = SurveyErrorsPopUpVM.openPopUp(title, message, 
 					references, new MessageUtil.ConfirmHandler() {
 				@Override
 				public void onOk() {
@@ -150,8 +150,8 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 	}
 
 	protected void closeReferencedNodesPopUp() {
-		closePopUp(nodesReferencedNodesPopUp);
-		nodesReferencedNodesPopUp = null;
+		closePopUp(referencedNodesPopUp);
+		referencedNodesPopUp = null;
 	}
 
 	protected List<NodeDefinition> getReferences(CodeList item) {
@@ -498,6 +498,5 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 	public boolean isCodeListItemSelected(CodeListItem item) {
 		return selectedItemsPerLevel.contains(item);
 	}
-	
 	
 }
