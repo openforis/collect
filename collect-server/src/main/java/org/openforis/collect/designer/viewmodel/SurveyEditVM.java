@@ -124,18 +124,22 @@ public class SurveyEditVM extends SurveyBaseVM {
 	}
 	
 	@GlobalCommand
-	public void openCodeListsManagerPopUp(@BindingParam("selectedCodeList") CodeList selectedCodeList) {
+	public void openCodeListsManagerPopUp(
+			@BindingParam(CodeListsVM.EDITING_ATTRIBUTE_PARAM) Boolean editingAttribute, 
+			@BindingParam(CodeListsVM.SELECTED_CODE_LIST_PARAM) CodeList selectedCodeList) {
 		if ( codeListsPopUp == null ) { 
 			dispatchCurrentFormValidatedCommand(true);
 			Map<String, Object> args = new HashMap<String, Object>();
-			args.put("selectedCodeList", selectedCodeList);
+			args.put(CodeListsVM.EDITING_ATTRIBUTE_PARAM, editingAttribute);
+			args.put(CodeListsVM.SELECTED_CODE_LIST_PARAM, selectedCodeList);
 			codeListsPopUp = openPopUp(Resources.Component.CODE_LISTS_POPUP.getLocation(), true, args);
 		}
 	}
 
 	@GlobalCommand
 	public void closeCodeListsManagerPopUp(@ContextParam(ContextType.BINDER) Binder binder,
-			@BindingParam("selectedCodeList") final CodeList selectedCodeList) {
+			@BindingParam(CodeListsVM.EDITING_ATTRIBUTE_PARAM) final Boolean editingAttribute,
+			@BindingParam(CodeListsVM.SELECTED_CODE_LIST_PARAM) final CodeList selectedCodeList) {
 		if ( codeListsPopUp != null ) {
 			checkCanLeaveForm(new CanLeaveFormConfirmHandler() {
 				@Override
@@ -143,15 +147,16 @@ public class SurveyEditVM extends SurveyBaseVM {
 					closePopUp(codeListsPopUp);
 					codeListsPopUp = null;
 					dispatchCurrentFormValidatedCommand(true);
-					dispatchCodeListsPopUpClosedCommand(selectedCodeList);
+					dispatchCodeListsPopUpClosedCommand(editingAttribute, selectedCodeList);
 				}
 			});
 		}
 	}
 
-	public void dispatchCodeListsPopUpClosedCommand(CodeList selectedCodeList) {
+	public void dispatchCodeListsPopUpClosedCommand(Boolean editingAttribute, CodeList selectedCodeList) {
 		Map<String, Object> args = new HashMap<String, Object>();
-		args.put("selectedCodeList", selectedCodeList);
+		args.put(CodeListsVM.EDITING_ATTRIBUTE_PARAM, editingAttribute);
+		args.put(CodeListsVM.SELECTED_CODE_LIST_PARAM, selectedCodeList);
 		BindUtils.postGlobalCommand(null, null, CODE_LISTS_POP_UP_CLOSED_COMMAND, args);
 	}
 	

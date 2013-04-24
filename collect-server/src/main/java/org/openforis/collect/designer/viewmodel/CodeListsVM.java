@@ -51,6 +51,8 @@ import org.zkoss.zul.Window;
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 
+	public static final String EDITING_ATTRIBUTE_PARAM = "editingAttribute";
+	public static final String SELECTED_CODE_LIST_PARAM = "selectedCodeList";
 	private static final String CODE_LISTS_UPDATED_GLOBAL_COMMAND = "codeListsUpdated";
 	private static final String SURVEY_CODE_LIST_GENERATED_LEVEL_NAME_LABEL_KEY = "survey.code_list.generated_level_name";
 	public static final String CLOSE_CODE_LIST_ITEM_POP_UP_COMMAND = "closeCodeListItemPopUp";
@@ -66,13 +68,16 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 	private Window codeListItemPopUp;
 	private Window referencedNodesPopUp;
 	private Window codeListImportPopUp;
+	private boolean editingAttribute;
 	
 	@Init(superclass=false)
-	public void init(@ExecutionArgParam("selectedCodeList") CodeList selectedCodeList) {
+	public void init(@ExecutionArgParam(EDITING_ATTRIBUTE_PARAM) Boolean editingAttribute, 
+			@ExecutionArgParam(SELECTED_CODE_LIST_PARAM) CodeList selectedCodeList) {
 		super.init();
 		if ( selectedCodeList != null ) {
 			selectionChanged(selectedCodeList);
 		}
+		this.editingAttribute = editingAttribute != null && editingAttribute.booleanValue();
 	}
 	
 	@Override
@@ -507,4 +512,9 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 		}
 		return label;
 	}
+
+	public boolean isEditingAttribute() {
+		return editingAttribute;
+	}
+	
 }

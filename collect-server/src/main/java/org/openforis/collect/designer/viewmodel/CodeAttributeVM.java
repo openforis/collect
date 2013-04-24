@@ -35,12 +35,15 @@ public class CodeAttributeVM extends AttributeVM<CodeAttributeDefinition> {
 
 	@GlobalCommand
 	public void codeListsPopUpClosed(@ContextParam(ContextType.BINDER) Binder binder, 
-			@BindingParam("selectedCodeList") CodeList selectedCodeList) {
-		if ( selectedCodeList != null ) {
-			Form form = getForm(binder);
-			setValueOnField(form, LIST_FIELD, selectedCodeList);
+			@BindingParam(CodeListsVM.EDITING_ATTRIBUTE_PARAM) Boolean editingAttribute, 
+			@BindingParam(CodeListsVM.SELECTED_CODE_LIST_PARAM) CodeList selectedCodeList) {
+		if ( editingAttribute ) {
+			if ( selectedCodeList != null ) {
+				Form form = getForm(binder);
+				setValueOnField(form, LIST_FIELD, selectedCodeList);
+			}
+			validateForm(binder);
 		}
-		validateForm(binder);
 	}
 
 	protected Form getForm(Binder binder) {

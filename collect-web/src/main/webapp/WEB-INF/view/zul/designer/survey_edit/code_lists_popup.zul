@@ -280,7 +280,9 @@
 			<south border="none">
 				<box align="center" width="100%">
 					<button label="${labels.global.ok}" 
-						onClick="@global-command('closeCodeListsManagerPopUp', selectedCodeList=vm.selectedItem)" />
+						onClick="@global-command('closeCodeListsManagerPopUp', 
+							editingAttribute=vm.editingAttribute, 
+							selectedCodeList=vm.selectedItem)" />
 				</box>
 			</south>
 		</borderlayout>
