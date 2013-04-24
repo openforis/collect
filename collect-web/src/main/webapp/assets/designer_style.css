@@ -6,6 +6,9 @@ button.icon {
 	border: none;
 	cursor: pointer;
 }
+.nowrap {
+	white-space: nowrap;
+}
 .z-hlayout.controlBar .z-hlayout-inner {
 	vertical-align: middle;
 }

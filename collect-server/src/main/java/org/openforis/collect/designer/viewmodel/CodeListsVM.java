@@ -500,9 +500,11 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 	}
 	
 	public String getCodeListItemLabel(CodeListItem item) {
-		String code = item.getCode();
 		String label = item.getLabel(currentLanguageCode);
-		String result = code + (label == null ? "": "- " + label);
-		return result;
+		if ( label == null && isDefaultLanguage() ) {
+			//try to get the label associated to default language
+			label = item.getLabel(null);
+		}
+		return label;
 	}
 }
