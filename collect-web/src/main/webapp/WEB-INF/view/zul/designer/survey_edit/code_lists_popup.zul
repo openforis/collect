@@ -223,7 +223,7 @@
 		        										<listcell
 		        											onDoubleClick="@command('editCodeListItem', item=each)">
 		        											<label
-		        												value="@load(each.code)" />
+		        												value="@load(vm.getCodeListItemLabel(each))" />
 		        										</listcell>
 		        										<listcell
 		        											style="padding: 0px">

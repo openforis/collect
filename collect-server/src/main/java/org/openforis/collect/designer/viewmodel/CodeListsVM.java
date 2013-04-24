@@ -499,4 +499,10 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 		return selectedItemsPerLevel.contains(item);
 	}
 	
+	public String getCodeListItemLabel(CodeListItem item) {
+		String code = item.getCode();
+		String label = item.getLabel(currentLanguageCode);
+		String result = code + (label == null ? "": "- " + label);
+		return result;
+	}
 }
