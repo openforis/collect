@@ -12,12 +12,16 @@
 			import org.openforis.collect.Application;
 			import org.openforis.collect.i18n.Message;
 			import org.openforis.collect.metamodel.proxy.SpatialReferenceSystemProxy;
+			import org.openforis.collect.presenter.CoordinateAttributePresenter;
 			
-			/*
+			public static const STATE_HORIZONTAL_SRS_Y_X:String = "horizontal_srs_y_x";
+			public static const STATE_VERTICAL_SRS_Y_X:String = "vertical_srs_y_x";
+			public static const STATE_VERTICAL_FORM_SRS_Y_X:String = "vertical_form_srs_y_x";
+			
+			
 			override protected function initPresenter():void {
-				this.presenter = new CoordinateInputFieldPresenter(this);
+				this.presenter = new CoordinateAttributePresenter(this);
 			}
-			*/
 			
 			protected function srsLabelFunction(item:Object):String {
 				if(item is SpatialReferenceSystemProxy) {
@@ -41,8 +45,11 @@
 	
 	<detail:states>
 		<s:State name="horizontal" />
+		<s:State name="horizontal_srs_y_x" />
 		<s:State name="vertical" />
+		<s:State name="vertical_srs_y_x" />
 		<s:State name="vertical_form" basedOn="vertical" />
+		<s:State name="vertical_form_srs_y_x" basedOn="vertical_srs_y_x" />
 	</detail:states>
 	
 	<s:HGroup includeIn="horizontal" gap="6">
@@ -75,6 +82,12 @@
 								 />
 	</s:HGroup>
 	
+	<s:HGroup includeIn="horizontal_srs_y_x" gap="6">
+		<fx:Reparent target="srsDropDownList" includeIn="horizontal_srs_y_x" />
+		<fx:Reparent target="yTextInput" includeIn="horizontal_srs_y_x" />
+		<fx:Reparent target="xTextInput" includeIn="horizontal_srs_y_x" />
+	</s:HGroup>
+	
 	<s:VGroup includeIn="vertical, vertical_form" gap="2">
 		<s:VGroup>
 			<s:HGroup gap="0">
@@ -89,19 +102,47 @@
 				<s:Label width="{subLabelWidth}" 
 						 styleName="bold" 
 						 showTruncationTip="true"
+						 text="{Message.get('edit.coordinate.x')}"
+						 includeIn="vertical_form" />
+				<fx:Reparent target="xTextInput" includeIn="vertical" />
+			</s:HGroup>
+			<s:HGroup gap="0">
+				<s:Label width="{subLabelWidth}" 
+						 styleName="bold" 
+						 showTruncationTip="true"
 						 text="{Message.get('edit.coordinate.y')}"
 						 includeIn="vertical_form" />
 				<fx:Reparent target="yTextInput" includeIn="vertical" />
+			</s:HGroup>
+		</s:VGroup>
+	</s:VGroup>
+	
+	<s:VGroup includeIn="vertical_srs_y_x, vertical_form_srs_y_x" gap="2">
+		<s:VGroup>
+			<s:HGroup gap="0">
+				<s:Label width="{subLabelWidth}" 
+						 styleName="bold" 
+						 showTruncationTip="true"
+						 text="{Message.get('edit.coordinate.srs')}"
+						 includeIn="vertical_form_srs_y_x" />
+				<fx:Reparent target="srsDropDownList" includeIn="vertical_srs_y_x" />
+			</s:HGroup>
+			<s:HGroup gap="0">
+				<s:Label width="{subLabelWidth}" 
+						 styleName="bold" 
+						 showTruncationTip="true"
+						 text="{Message.get('edit.coordinate.y')}"
+						 includeIn="vertical_form_srs_y_x" />
+				<fx:Reparent target="yTextInput" includeIn="vertical_srs_y_x" />
 			</s:HGroup>
 			<s:HGroup gap="0">
 				<s:Label width="{subLabelWidth}" 
 						 styleName="bold" 
 						 showTruncationTip="true"
 						 text="{Message.get('edit.coordinate.x')}"
-						 includeIn="vertical_form" />
-				<fx:Reparent target="xTextInput" includeIn="vertical" />
+						 includeIn="vertical_form_srs_y_x" />
+				<fx:Reparent target="xTextInput" includeIn="vertical_srs_y_x" />
 			</s:HGroup>
 		</s:VGroup>
 	</s:VGroup>
-	
 </detail:CompositeAttributeRenderer>

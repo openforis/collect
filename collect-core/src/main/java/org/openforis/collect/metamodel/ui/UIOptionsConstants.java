@@ -20,6 +20,7 @@ public interface UIOptionsConstants {
 	String DIRECTION = "direction";
 	String COUNT = "count";
 	String SHOW_ROW_NUMBERS = "showRowNumbers";
+	String FIELDS_ORDER = "fieldsOrder";
 
 	String TAB_SET = "tabSet";
 	String NAME = "name";
