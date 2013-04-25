@@ -23,8 +23,8 @@ import org.apache.commons.logging.LogFactory;
 import org.openforis.collect.manager.SpeciesManager;
 import org.openforis.collect.manager.process.AbstractProcess;
 import org.openforis.collect.manager.referencedataimport.ParsingError;
-import org.openforis.collect.manager.referencedataimport.ParsingException;
 import org.openforis.collect.manager.referencedataimport.ParsingError.ErrorType;
+import org.openforis.collect.manager.referencedataimport.ParsingException;
 import org.openforis.collect.model.CollectTaxonomy;
 import org.openforis.collect.model.TaxonTree;
 import org.openforis.collect.model.TaxonTree.Node;
@@ -44,8 +44,6 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 	private static final String INVALID_FAMILY_NAME_ERROR_MESSAGE_KEY = "speciesImport.error.invalidFamilyName";
 	private static final String INVALID_GENUS_NAME_ERROR_MESSAGE_KEY = "speciesImport.error.invalidGenusName";
 	private static final String INVALID_SPECIES_NAME_ERROR_MESSAGE_KEY = "speciesImport.error.invalidSpeciesName";
-	private static final String INVALID_SUBSPECIES_NAME_ERROR_MESSAGE_KEY = "speciesImport.error.invalidSubspeciesName";
-	private static final String INVALID_VARIETY_NAME_ERROR_MESSAGE_KEY = "speciesImport.error.invalidVarietyName";
 	private static final String INVALID_SCIENTIFIC_NAME_ERROR_MESSAGE_KEY = "speciesImport.error.invalidScientificNameName";
 	private static final String IMPORTING_FILE_ERROR_MESSAGE_KEY = "speciesImport.error.internalErrorImportingFile";
 	
@@ -303,7 +301,6 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 			scientificName = line.getGenus();
 			break;
 		case SPECIES:
-		case SUBSPECIES:
 			scientificName = line.getSpeciesName();
 			break;
 		default:
@@ -341,26 +338,6 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 		}
 		Taxon taxonGenus = createTaxonGenus(line);
 		return createTaxon(line, SPECIES, taxonGenus, speciesName);
-	}
-	
-	protected Taxon createTaxonSubspecies(SpeciesLine line) throws ParsingException {
-		String speciesName = line.getCanonicalScientificName();
-		if ( speciesName == null ) {
-			ParsingError error = new ParsingError(ErrorType.INVALID_VALUE, line.getLineNumber(), SpeciesFileColumn.SCIENTIFIC_NAME.getColumnName(), INVALID_SUBSPECIES_NAME_ERROR_MESSAGE_KEY);
-			throw new ParsingException(error);
-		}
-		Taxon parent = createTaxonSpecies(line);
-		return createTaxon(line, SUBSPECIES, parent, speciesName);
-	}
-	
-	protected Taxon createTaxonVariety(SpeciesLine line) throws ParsingException {
-		String speciesName = line.getCanonicalScientificName();
-		if ( speciesName == null ) {
-			ParsingError error = new ParsingError(ErrorType.INVALID_VALUE, line.getLineNumber(), SpeciesFileColumn.SCIENTIFIC_NAME.getColumnName(), INVALID_VARIETY_NAME_ERROR_MESSAGE_KEY);
-			throw new ParsingException(error);
-		}
-		Taxon parent = createTaxonSpecies(line);
-		return createTaxon(line, VARIETY, parent, speciesName);
 	}
 	
 	protected Taxon createTaxon(SpeciesLine line, TaxonRank rank, Taxon parent) throws ParsingException {
