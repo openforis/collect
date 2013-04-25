@@ -96,6 +96,8 @@ package org.openforis.collect.presenter {
 			}
 			_view.saveButton.visible = canSave;
 			_view.updateStatusLabel.text = null;
+			_view.autoSaveCheckBox.visible = canSave;
+			_view.updateStatusLabel.visible = canSave;
 			
 			var rootEntityDefn:EntityDefinitionProxy = Application.activeRootEntity;
 			var form:FormContainer = null;
