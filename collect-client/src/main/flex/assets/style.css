@@ -102,6 +102,12 @@ component|MessageDisplay s|Label {
 	fontSize: 9;
 }
 
+.updateStatusLabel {
+	fontStyle: italic;
+	fontWeight: bold;
+	fontSize: 10;
+}
+
 .currentPhase {
 	fontSize: 12;
 	fontWeight: bold;

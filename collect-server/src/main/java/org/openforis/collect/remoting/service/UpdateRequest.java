@@ -12,7 +12,12 @@ import org.openforis.collect.Proxy;
  */
 public class UpdateRequest implements Proxy {
 
+	private boolean autoSave;
 	private List<UpdateRequestOperation> operations;
+	
+	public UpdateRequest() {
+		autoSave = false;
+	}
 
 	public List<UpdateRequestOperation> getOperations() {
 		return operations;
@@ -20,5 +25,13 @@ public class UpdateRequest implements Proxy {
 
 	public void setOperations(List<UpdateRequestOperation> operations) {
 		this.operations = operations;
+	}
+
+	public boolean isAutoSave() {
+		return autoSave;
+	}
+
+	public void setAutoSave(boolean autoSave) {
+		this.autoSave = autoSave;
 	}
 }

@@ -38,6 +38,7 @@ public class UpdateResponse implements Proxy {
 	private Integer missingErrors;
 	private Integer missingWarnings;
 	private Integer warnings;
+	private boolean recordSaved;
 	
 	public UpdateResponse(MessageContextHolder messageContextHolder, Node<?> node) {
 		this.messageContextHolder = messageContextHolder;
@@ -189,6 +190,14 @@ public class UpdateResponse implements Proxy {
 
 	public void setMissingWarnings(Integer missingWarnings) {
 		this.missingWarnings = missingWarnings;
+	}
+
+	public boolean isRecordSaved() {
+		return recordSaved;
+	}
+
+	public void setRecordSaved(boolean recordSaved) {
+		this.recordSaved = recordSaved;
 	}
 
 }

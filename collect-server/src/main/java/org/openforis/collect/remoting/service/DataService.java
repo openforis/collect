@@ -220,6 +220,14 @@ public class DataService {
 			if ( isCurrentRecordIndexable() ) {
 				recordIndexService.temporaryIndex(activeRecord);
 			}
+			if ( request.isAutoSave() ) {
+				try {
+					saveActiveRecord();
+					firstResp.setRecordSaved(true);
+				} catch(Exception e) {
+					firstResp.setRecordSaved(false);
+				}
+			}
 		}
 		return updateResponses;
 	}

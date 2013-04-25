@@ -6,12 +6,7 @@ package org.openforis.collect.client {
 	import mx.rpc.remoting.Operation;
 	
 	import org.openforis.collect.Application;
-	import org.openforis.collect.event.ApplicationEvent;
-	import org.openforis.collect.event.EventDispatcherFactory;
 	import org.openforis.collect.model.CollectRecord$Step;
-	import org.openforis.collect.model.proxy.FieldProxy;
-	import org.openforis.collect.model.proxy.NodeProxy;
-	import org.openforis.collect.model.proxy.RecordProxy;
 	import org.openforis.collect.remoting.service.UpdateRequest;
 	
 	/**

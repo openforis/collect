@@ -28,12 +28,13 @@ package org.openforis.collect.model.proxy {
 		
 		private var _survey:SurveyProxy;
 		private var _nodesMap:Dictionary;
-		private var _updated:Boolean = false;
+		private var _updated:Boolean;
 		
 		private var validationResults:ValidationResultsProxy;
 
 		public function RecordProxy():void {
 			super();
+			_updated = false;
 		}
 		
 		public function init():void {
@@ -69,11 +70,9 @@ package org.openforis.collect.model.proxy {
 		
 		public function update(responses:IList, req:UpdateRequest):void {
 			updateNodes(req);
-			
 			for each (var response:UpdateResponse in responses)	{
 				processResponse(response);
 			}
-			
 			if ( responses != null && responses.length > 0 ) {
 				var firstResp:UpdateResponse = UpdateResponse(responses.getItemAt(0));
 				this.errors = firstResp.errors;
@@ -82,10 +81,8 @@ package org.openforis.collect.model.proxy {
 				this.missingErrors = firstResp.missingErrors;
 				this.missingWarnings = firstResp.missingWarnings;
 				this.warnings = firstResp.warnings;
+				_updated = ! firstResp.recordSaved;
 			}
-			
-			_updated = true;
-			
 			var appEvt:ApplicationEvent = new ApplicationEvent(ApplicationEvent.UPDATE_RESPONSE_RECEIVED);
 			appEvt.result = responses;
 			EventDispatcherFactory.getEventDispatcher().dispatchEvent(appEvt);
@@ -219,5 +216,6 @@ package org.openforis.collect.model.proxy {
 		public function set updated(value:Boolean):void {
 			 _updated = value;
 		}
+
     }
 }

@@ -35,6 +35,7 @@ package org.openforis.collect {
 		private static var _activeRecordEditable:Boolean;
 		private static var _activeRootEntity:EntityDefinitionProxy;
 		private static var _activeStep:CollectRecord$Step;
+		private static var _autoSave:Boolean;
 		private static var _serverOffline:Boolean;
 		private static var _locale:Locale;
 		private static var _localeString:String;
@@ -191,6 +192,15 @@ package org.openforis.collect {
 		
 		public static function set serverOffline(value:Boolean):void {
 			_serverOffline = value;
+		}
+		
+		[Bindable]
+		public static function get autoSave():Boolean {
+			return _autoSave;
+		}
+		
+		public static function set autoSave(value:Boolean):void {
+			_autoSave = value;
 		}
 		
 		[Bindable]
