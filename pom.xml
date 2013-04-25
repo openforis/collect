@@ -23,24 +23,24 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 	</properties>
 
-  <distributionManagement>
-    <repository>
-      <id>openforis-releases-repository</id>
-      <name>Open Foris Repository</name>
-      <url>http://www.openforis.org/nexus/content/repositories/releases/</url>
-    </repository>
-    <snapshotRepository>
-      <id>openforis-snapshots-repository</id>
-      <name>Open Foris Snapshots Repository</name>
-      <url>http://www.openforis.org/nexus/content/repositories/snapshots/</url>
-    </snapshotRepository>
-  </distributionManagement>
+	<distributionManagement>
+		<repository>
+			<id>openforis-releases-repository</id>
+			<name>Open Foris Repository</name>
+			<url>http://www.openforis.org/nexus/content/repositories/releases/</url>
+		</repository>
+		<snapshotRepository>
+			<id>openforis-snapshots-repository</id>
+			<name>Open Foris Snapshots Repository</name>
+			<url>http://www.openforis.org/nexus/content/repositories/snapshots/</url>
+		</snapshotRepository>
+	</distributionManagement>
 
 	<scm>
-    <connection>scm:git:git@github.com:openforis/collect.git</connection>
-    <url>scm:git:git@github.com:openforis/collect.git</url>
-	  <developerConnection>scm:git:git@github.com:openforis/collect.git</developerConnection>
-  	<tag>HEAD</tag>
+		<connection>scm:git:git@github.com:openforis/collect.git</connection>
+		<url>scm:git:git@github.com:openforis/collect.git</url>
+		<developerConnection>scm:git:git@github.com:openforis/collect.git</developerConnection>
+		<tag>HEAD</tag>
 	</scm>
 	
 	<build>
@@ -55,17 +55,17 @@
 						<file>
 							<name>.settings/org.eclipse.core.resources.prefs</name>
 							<content>
-                <![CDATA[eclipse.preferences.version=1${line.separator}encoding/<project>=${project.build.sourceEncoding}${line.separator}]]>
+                				<![CDATA[eclipse.preferences.version=1${line.separator}encoding/<project>=${project.build.sourceEncoding}${line.separator}]]>
 							</content>
 						</file>
 					</additionalConfig>
 				</configuration>
 			</plugin>
 			<plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-release-plugin</artifactId>
-        <version>2.3</version>
-    	</plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-release-plugin</artifactId>
+				<version>2.3</version>
+	    	</plugin>
 		</plugins>
 		<pluginManagement>
 			<plugins>
@@ -110,7 +110,7 @@
 										Must ignore since m2e fails on copy-flex-resource
 										https://issues.sonatype.org/browse/MNGECLIPSE-1375
 										 -->
-<!-- 										<execute /> -->
+										<!-- <execute /> -->
 									</action>
 								</pluginExecution>
 							</pluginExecutions>
@@ -120,37 +120,17 @@
 			</plugins>
 		</pluginManagement>
 	</build>
-  
+
 	<repositories>
-		<!-- <repository> -->
-		<!-- <id>flex-mojos-repository</id> -->
-		<!-- <url>https://oss.sonatype.org/content/groups/staging/</url> -->
-		<!-- <releases> -->
-		<!-- <enabled>true</enabled> -->
-		<!-- </releases> -->
-		<!-- <snapshots> -->
-		<!-- <enabled>true</enabled> -->
-		<!-- </snapshots> -->
-		<!-- </repository> -->
 		<repository>
-      <id>openforis-releases-repository</id>
-      <name>Open Foris Repository</name>
-      <url>http://www.openforis.org/nexus/content/repositories/releases/</url>
-    </repository>
-    <repository>
-      <id>openforis-snapshots-repository</id>
-      <name>Open Foris Snapshots Repository</name>
-      <url>http://www.openforis.org/nexus/content/repositories/snapshots/</url>
-    </repository>
+			<id>openforis-releases-repository</id>
+			<name>Open Foris Repository</name>
+			<url>http://www.openforis.org/nexus/content/repositories/releases/</url>
+		</repository>
 		<repository>
-			<id>spring-snapshot</id>
-			<url>http://maven.springframework.org/snapshot/</url>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
+			<id>openforis-snapshots-repository</id>
+			<name>Open Foris Snapshots Repository</name>
+			<url>http://www.openforis.org/nexus/content/repositories/snapshots/</url>
 		</repository>
 		<repository>
 			<id>flex-compiler-repository</id>
@@ -163,6 +143,7 @@
 			</snapshots>
 		</repository>
 	</repositories>
+	
 	<pluginRepositories>
 		<pluginRepository>
 			<id>flex-mojo-plugins-repository</id>
@@ -177,13 +158,13 @@
 	</pluginRepositories>
 
 	<dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.openforis.commons</groupId>
-        <artifactId>commons-io</artifactId>
-        <version>0.0.4-SNAPSHOT</version>
-      </dependency>
-      <dependency>
+		<dependencies>
+			<dependency>
+				<groupId>org.openforis.commons</groupId>
+				<artifactId>commons-io</artifactId>
+				<version>0.0.4-SNAPSHOT</version>
+			</dependency>
+			<dependency>
 				<groupId>junit</groupId>
 				<artifactId>junit</artifactId>
 				<version>4.10</version>
