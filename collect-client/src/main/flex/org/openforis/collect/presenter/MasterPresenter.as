@@ -3,6 +3,8 @@ package org.openforis.collect.presenter {
 	 * 
 	 * @author Mino Togna
 	 * */
+	import flash.events.Event;
+	
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.events.FaultEvent;
 	import mx.rpc.events.ResultEvent;
@@ -23,9 +25,8 @@ package org.openforis.collect.presenter {
 		private var _dataClient:DataClient;
 		
 		public function MasterPresenter(view:MasterView) {
-			super();
-			
 			this._view = view;
+			super();
 			this._dataClient = ClientFactory.dataClient;
 
 			_view.currentState = MasterView.LOADING_STATE;
@@ -43,12 +44,34 @@ package org.openforis.collect.presenter {
 		override internal function initEventListeners():void {
 			//eventDispatcher.addEventListener(ApplicationEvent.APPLICATION_INITIALIZED, applicationInitializedHandler);
 			eventDispatcher.addEventListener(UIEvent.ROOT_ENTITY_SELECTED, rootEntitySelectedHandler);
+			eventDispatcher.addEventListener(UIEvent.SHOW_ERROR_PAGE, showErrorPageHandler);
 			eventDispatcher.addEventListener(UIEvent.SHOW_HOME_PAGE, backToHomeHandler);
 			eventDispatcher.addEventListener(UIEvent.BACK_TO_LIST, backToListHandler);
+			eventDispatcher.addEventListener(UIEvent.SHOW_SPECIES_IMPORT, showSpeciesImportModuleHandler);
+			eventDispatcher.addEventListener(UIEvent.SHOW_SAMPLING_DESIGN_IMPORT, showSamplingDesignImportHandler);
+			eventDispatcher.addEventListener(UIEvent.SHOW_CODE_LIST_IMPORT, showCodeListImportModuleHandler);
 			eventDispatcher.addEventListener(UIEvent.RECORD_SELECTED, recordSelectedHandler);
 			eventDispatcher.addEventListener(UIEvent.RECORD_CREATED, recordCreatedHandler);
 		}
 		
+		protected function showSpeciesImportModuleHandler(event:UIEvent):void {
+			_view.currentState = MasterView.SPECIES_IMPORT_STATE;
+			_view.speciesImportView.surveyId = event.obj.surveyId;
+			_view.speciesImportView.work = event.obj.work;
+		}
+
+		protected function showCodeListImportModuleHandler(event:UIEvent):void {
+			_view.currentState = MasterView.CODE_LIST_IMPORT_STATE;
+			_view.codeListImportView.surveyId = event.obj.surveyId;
+			_view.codeListImportView.work = event.obj.work;
+			_view.codeListImportView.codeListId = event.obj.codeListId;
+		}
+
+		protected function showSamplingDesignImportHandler(event:UIEvent):void {
+			_view.currentState = MasterView.SAMPLING_DESIGN_IMPORT_STATE;
+			_view.samplingDesignImportView.surveyId = event.obj.surveyId;
+			_view.samplingDesignImportView.work = event.obj.work;		}
+
 		/**
 		 * RecordSummary selected from list page
 		 * */
@@ -102,11 +125,19 @@ package org.openforis.collect.presenter {
 			_view.currentState = MasterView.LIST_STATE;
 			
 			var uiEvent:UIEvent = new UIEvent(UIEvent.LOAD_RECORD_SUMMARIES);
+			uiEvent.obj = {firstAccess: true};
 			eventDispatcher.dispatchEvent(uiEvent);
 		}
 		
 		internal function newRecordCreatedHandler(event:UIEvent):void {
 			_view.currentState = MasterView.DETAIL_STATE;
+		}
+		
+		internal function showErrorPageHandler(event:UIEvent):void {
+			Application.activeSurvey = null;
+			Application.activeRootEntity = null;
+			_view.currentState = MasterView.ERROR_STATE;
+			_view.errorView.errorLabel.text = String(event.obj);
 		}
 		
 		internal function backToHomeHandler(event:UIEvent):void {

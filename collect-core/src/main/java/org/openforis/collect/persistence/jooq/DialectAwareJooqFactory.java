@@ -5,6 +5,9 @@ import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 
 import org.jooq.SQLDialect;
+import org.jooq.Sequence;
+import org.jooq.TableField;
+import org.jooq.conf.Settings;
 import org.jooq.impl.Factory;
 
 /**
@@ -13,29 +16,79 @@ import org.jooq.impl.Factory;
 public class DialectAwareJooqFactory extends Factory {
 	
 	private static final long serialVersionUID = 1L;
-	private static final String POSTGRESQL_DBNAME = "PostgreSQL";
-	private static final String APACHE_DERBY_DBNAME = "Apache Derby";
 
+	private enum Database {
+		POSTGRES("PostgreSQL", SQLDialect.POSTGRES),
+		DERBY("Apache Derby", SQLDialect.DERBY),
+		SQLITE("SQLite", SQLDialect.SQLITE);
+		
+		private String productName;
+		private SQLDialect dialect;
+
+		Database(String productName, SQLDialect dialect) {
+			this.productName = productName;
+			this.dialect = dialect;
+		}
+		
+		public static Database getByProductName(String name) {
+			for (Database db : Database.values()) {
+				if ( name.equals(db.getProductName())) {
+					return db;
+				}
+			}
+			return null;
+		}
+		
+		public String getProductName() {
+			return productName;
+		}
+		
+		public SQLDialect getDialect() {
+			return dialect;
+		}
+	}
+	
 	public DialectAwareJooqFactory(Connection connection) {
-		super(connection, getDialect(connection));
+		this(connection, getDialect(connection));
+	}
+
+	public DialectAwareJooqFactory(Connection connection, SQLDialect dialect) {
+		super(connection, dialect, createSettings(dialect));
 	}
 
 	private static SQLDialect getDialect(Connection conn) {
 		try {
 			DatabaseMetaData metaData = conn.getMetaData();
 			String dbName = metaData.getDatabaseProductName();
-			if ( dbName.equals(APACHE_DERBY_DBNAME) ) {
-				return SQLDialect.DERBY;
-			} else if ( dbName.equals(POSTGRESQL_DBNAME) ) {
-				return SQLDialect.POSTGRES;
-			} else {
+			Database db = Database.getByProductName(dbName);
+			if ( db == null ) {
 				throw new IllegalArgumentException("Unknown database "+dbName);
 			}
+			return db.getDialect();
 		} catch (SQLException e) {
 			throw new RuntimeException("Error getting database name", e);
 		}
 	}
-
-
+	
+	private static Settings createSettings(SQLDialect dialect) {
+		Settings settings = new Settings();
+		if ( dialect == SQLDialect.SQLITE ) {
+			settings.withRenderSchema(false);
+		}  
+		return settings;
+	}
+	
+	public int nextId(TableField<?, Integer> idField, Sequence<? extends Number> idSequence) {
+		if (getDialect() == SQLDialect.SQLITE){
+			Integer id = (Integer) select(max(idField)).from(idField.getTable()).fetchOne(0);
+			if ( id == null ) {
+				return 1;
+			} else {
+				return id + 1;
+			}
+		} else {
+			return nextval(idSequence).intValue();	
+		}	
+	}
 
 }

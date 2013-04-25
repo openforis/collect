@@ -75,7 +75,7 @@ package org.openforis.collect.presenter
 		}
 		
 		protected function createAttributeDataGridItem(attribute:AttributeProxy):Object {
-			var messages:Array = attribute.validationResults.validationMessages;
+			var messages:IList = attribute.validationResults.validationMessages;
 			var message:String = StringUtil.concat(", ", messages);
 			var label:String = createNodeLabel(attribute);
 			var item:Object = {label:label, message: message};
@@ -99,7 +99,7 @@ package org.openforis.collect.presenter
 						messages = [Message.get("edit.validation.maxCount", [childDefn.maxCount > 0 ? childDefn.maxCount: 1])];
 					}
 					var message:String = StringUtil.concat(", ", messages);
-					var label:String = (entity.parent != null ? createNodeLabel(entity) + " / ": "") + childDefn.getLabelText();
+					var label:String = (entity.parent != null ? createNodeLabel(entity) + " / ": "") + childDefn.getInstanceOrHeadingLabelText();
 					var item:Object = {label:label, message: message};
 					result.addItem(item);
 				}
@@ -109,7 +109,7 @@ package org.openforis.collect.presenter
 		
 		protected function createNodeLabel(node:NodeProxy):String {
 			var defn:NodeDefinitionProxy = Application.activeSurvey.schema.getDefinitionById(node.definitionId);
-			var label:String = defn.getLabelText();
+			var label:String = defn.getInstanceOrHeadingLabelText();
 			if ( defn is EntityDefinitionProxy ) {
 				var keyText:String = EntityProxy(node).keyText;
 				if ( StringUtil.isBlank(keyText) ) {

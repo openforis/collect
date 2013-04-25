@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:NavigatorContent xmlns:fx="http://ns.adobe.com/mxml/2009" 
+				   	xmlns:s="library://ns.adobe.com/flex/spark" 
+				   	xmlns:mx="library://ns.adobe.com/flex/mx" 
+					xmlns:detail="org.openforis.collect.ui.component.detail.*"
+					creationComplete="creationCompleteHandler(event)">
+	<fx:Script>
+		<![CDATA[
+			import mx.binding.utils.BindingUtils;
+			import mx.collections.IList;
+			import mx.events.FlexEvent;
+			
+			import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
+			import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
+			import org.openforis.collect.model.proxy.EntityProxy;
+			import org.openforis.collect.util.UIUtil;
+			
+			private var _entityDefinition:EntityDefinitionProxy;
+			private var _modelVersion:ModelVersionProxy;
+			private var _nodeDefinitions:IList;
+			private var _parentEntity:EntityProxy;
+			private var _enlarged:Boolean;
+			
+			public static const STATE_DEFAULT:String = "default";
+			public static const STATE_ENLARGED:String = "enlarged";
+			
+			protected function creationCompleteHandler(event:FlexEvent):void {
+				BindingUtils.bindSetter(nodeDefinitionsSetter, this, "nodeDefinitions");
+			}
+			
+			protected function nodeDefinitionsSetter(value:IList):void {
+				updateCurrentState();
+			}
+			
+			protected function updateCurrentState():void {
+				enlarged = calculateContainsOnlyOneMultipleEntity()/* || isInsideFormLayoutEntity()*/;
+				currentState = enlarged ? STATE_ENLARGED: STATE_DEFAULT;
+			}
+			
+			protected function calculateContainsOnlyOneMultipleEntity():Boolean {
+				if(nodeDefinitions != null && nodeDefinitions.length == 1) {
+					var firstNode:Object = nodeDefinitions.getItemAt(0);
+					if(firstNode is EntityDefinitionProxy) {
+						var entity:EntityDefinitionProxy = EntityDefinitionProxy(firstNode);
+						if(entity.multiple /*&& entity.layout == UIUtil.LAYOUT_TABLE*/) {
+							return true;
+						}
+					}
+				}
+				return false;
+			}
+			
+			private function isInsideFormLayoutEntity():Boolean {
+				if ( entityDefinition != null && entityDefinition.parent != null && 
+					entityDefinition.parent.multiple && entityDefinition.parentLayout == UIUtil.LAYOUT_FORM ) {
+					return true;
+				} else {
+					return false;
+				}
+			}
+			
+			public function resetScrollBars():void {
+				if(scroller != null) {
+					UIUtil.resetScrollBars(scroller);
+				}
+			}
+			
+			[Bindable]
+			public function get entityDefinition():EntityDefinitionProxy {
+				return _entityDefinition;
+			}
+
+			public function set entityDefinition(value:EntityDefinitionProxy):void {
+				_entityDefinition = value;
+			}
+
+			[Bindable]
+			public function get modelVersion():ModelVersionProxy {
+				return _modelVersion;
+			}
+			
+			public function set modelVersion(value:ModelVersionProxy):void {
+				_modelVersion = value;
+			}
+			
+			[Bindable]
+			public function get nodeDefinitions():IList {
+				return _nodeDefinitions;
+			}
+			
+			public function set nodeDefinitions(value:IList):void {
+				_nodeDefinitions = value;
+			}
+			
+			[Bindable]
+			public function get parentEntity():EntityProxy {
+				return _parentEntity;
+			}
+			
+			public function set parentEntity(value:EntityProxy):void {
+				_parentEntity = value;
+			}
+			
+			[Bindable]
+			public function get enlarged():Boolean {
+				return _enlarged;
+			}
+			
+			public function set enlarged(value:Boolean):void {
+				_enlarged = value;
+			}
+			
+		]]>
+	</fx:Script>
+ 	
+	<s:states>
+		<s:State name="default" />
+		<s:State name="enlarged" />
+	</s:states>
+	
+	<s:Scroller id="scroller"
+				width.default="100%"
+				height.default="100%"
+				horizontalScrollPolicy.enlarged="off"
+				verticalScrollPolicy.enlarged="off">
+		<s:Group>
+			<s:DataGroup id="formDataGroup" 
+						 dataProvider="{nodeDefinitions}">
+				<s:layout>
+					<s:VerticalLayout gap="5" 
+									  paddingBottom="10" 
+									  paddingLeft="10" 
+									  paddingRight="10"
+									  paddingTop="10"
+									  paddingBottom.enlarged="0" 
+									  paddingLeft.enlarged="0" 
+									  paddingRight.enlarged="0" 
+									  paddingTop.enlarged="0" />
+				</s:layout>
+				<s:itemRenderer>
+					<fx:Component>
+						<detail:FormDataGroupItemRenderer
+							occupyEntirePage="{parentDocument.enlarged}"
+							width="{parentDocument.enlarged ? parentDocument.width: NaN}"
+							height="{parentDocument.enlarged ? parentDocument.height: NaN}"
+							modelVersion="{parentDocument.modelVersion}"
+							entity="{parentDocument.parentEntity}" />
+					</fx:Component>
+				</s:itemRenderer>
+			</s:DataGroup>
+		</s:Group>
+	</s:Scroller>
+	
+</s:NavigatorContent>

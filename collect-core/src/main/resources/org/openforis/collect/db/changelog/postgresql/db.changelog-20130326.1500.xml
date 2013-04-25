@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+ 
+	<changeSet id="wrong-sampling-design-table-name" author="ricci" dbms="postgresql">
+
+	    <preConditions onFail="MARK_RAN">
+	    	<tableExists tableName="ofc_sampling_desing" />
+	    </preConditions>
+	    
+	    <comment>Fix wrong sampling design table name (it was sampling_desing, Jira OFC-1228)</comment>
+	    
+	    <dropForeignKeyConstraint baseTableName="ofc_sampling_desing"
+	    	constraintName="ofc_sampling_design_survey_fkey" />
+	    	
+	   	<dropForeignKeyConstraint baseTableName="ofc_sampling_desing"
+	    	constraintName="ofc_sampling_design_survey_work_fkey" />
+	    
+	    <renameTable oldTableName="ofc_sampling_desing"
+	    	newTableName="ofc_sampling_design" />
+	    
+	    <addForeignKeyConstraint constraintName="ofc_sampling_design_survey_fkey" 
+	    	baseTableName="ofc_sampling_design" 
+	    	baseColumnNames="survey_id" 
+	    	referencedTableName="ofc_survey" 
+	    	referencedColumnNames="id" />
+
+	    <addForeignKeyConstraint constraintName="ofc_sampling_design_survey_work_fkey" 
+	    	baseTableName="ofc_sampling_design" 
+	    	baseColumnNames="survey_work_id" 
+	    	referencedTableName="ofc_survey_work" 
+	    	referencedColumnNames="id" />
+	    
+	</changeSet>
+	
+	<changeSet id="sampling-design-import-tool" author="ricci" dbms="postgresql">
+
+		<preConditions onFail="MARK_RAN">
+	    	<not>
+		    	<tableExists tableName="ofc_sampling_design" />
+	    	</not>
+	    </preConditions>
+  		
+  		<comment>Sampling design import tool tables</comment>
+  		
+	  	<createSequence sequenceName="ofc_sampling_design_id_seq" />
+	  
+	    <createTable tableName="ofc_sampling_design">
+			<column name="id" type="INTEGER">
+				<constraints nullable="false" primaryKey="true" />
+			</column>
+			<column name="survey_id" type="INTEGER" />
+			<column name="survey_work_id" type="INTEGER" />
+			<column name="level1" type="VARCHAR(255)">
+				<constraints nullable="false" />
+			</column>
+			<column name="level2" type="VARCHAR(255)" />
+			<column name="level3" type="VARCHAR(255)" />
+			<column name="location" type="VARCHAR(255)">
+			  <constraints nullable="false" />
+			</column>
+	    </createTable>
+	
+		<addForeignKeyConstraint 
+			constraintName="ofc_sampling_design_survey_fkey"
+			baseTableName="ofc_sampling_design" 
+			baseColumnNames="survey_id"
+			referencedTableName="ofc_survey" 
+			referencedColumnNames="id" />
+	
+		<addForeignKeyConstraint 
+			constraintName="ofc_sampling_design_survey_work_fkey"
+			baseTableName="ofc_sampling_design" 
+			baseColumnNames="survey_work_id"
+			referencedTableName="ofc_survey_work" 
+			referencedColumnNames="id" />
+		
+	</changeSet>
+	
+  	<changeSet id="species-import-tool" author="ricci" dbms="postgresql">
+
+	    <preConditions onFail="MARK_RAN">
+	    	<not>
+	    		<foreignKeyConstraintExists foreignKeyName="ofc_taxonomy_survey_fkey"/>
+	    	</not>
+	    </preConditions>
+	    
+	  	<comment>Species import tool tables</comment>
+	  	
+	    <dropNotNullConstraint tableName="ofc_taxon"
+			columnName="taxon_id" />
+	  
+	    <dropNotNullConstraint tableName="ofc_taxon"
+			columnName="code" />
+	  
+	    <dropUniqueConstraint constraintName="ofc_taxonomy_name_key"
+			tableName="ofc_taxonomy" />
+	  
+	    <addColumn tableName="ofc_taxonomy">
+			<column name="survey_id" type="INTEGER" />
+			<column name="survey_work_id" type="INTEGER" />
+	    </addColumn>
+	        
+	    <addUniqueConstraint constraintName="ofc_taxonomy_name_key"
+			tableName="ofc_taxonomy"
+			columnNames="survey_id,name" />
+	    
+	    <addUniqueConstraint constraintName="ofc_taxonomy_name_work_key"
+			tableName="ofc_taxonomy"
+			columnNames="survey_work_id,name" />
+	        
+	    <addForeignKeyConstraint constraintName="ofc_taxonomy_survey_fkey"
+			baseTableName="ofc_taxonomy" 
+			baseColumnNames="survey_id"
+			referencedTableName="ofc_survey" 
+			referencedColumnNames="id" />
+	
+	    <addForeignKeyConstraint constraintName="ofc_taxonomy_survey_work_fkey"
+			baseTableName="ofc_taxonomy" 
+			baseColumnNames="survey_work_id"
+			referencedTableName="ofc_survey_work" 
+			referencedColumnNames="id" />
+	  
+	</changeSet>
+  
+	<changeSet id="username-key" author="ricci" dbms="postgresql">
+		<comment>Add unique constraint to ofc_user.username column</comment>
+		
+		<addUniqueConstraint constraintName="ofc_user_username_key"
+			tableName="ofc_user"
+			columnNames="username" />
+	</changeSet>
+  
+</databaseChangeLog>

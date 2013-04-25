@@ -2,6 +2,7 @@ package org.openforis.collect.i18n {
 	import mx.collections.ArrayCollection;
 	import mx.collections.Sort;
 	import mx.collections.SortField;
+	import mx.controls.Alert;
 	import mx.resources.IResourceBundle;
 	import mx.resources.IResourceManager;
 	import mx.resources.ResourceManager;
@@ -15,6 +16,7 @@ package org.openforis.collect.i18n {
 	public class Languages {
 		
 		public static const LANGUAGE_CODES_RESOURCE:String = "language_codes_iso_639_3";
+		public static const DEFAULT_LOCALE:String = "en_US";
 		
 		public static function getLanguageCodes(locale:String = null):ArrayCollection {
 			var result:ArrayCollection  = new ArrayCollection();
@@ -49,10 +51,13 @@ package org.openforis.collect.i18n {
 
 		protected static function getLanguagesMap(locale:String = null):Object {
 			if ( locale == null ) {
-				locale = Application.locale;
+				locale = Application.localeString;
 			}
 			var rm:IResourceManager = ResourceManager.getInstance();
 			var resource:IResourceBundle = rm.getResourceBundle(locale, LANGUAGE_CODES_RESOURCE);
+			if ( resource == null ) {
+				resource = rm.getResourceBundle(DEFAULT_LOCALE, LANGUAGE_CODES_RESOURCE);
+			}
 			var content:Object = resource.content;
 			return content;
 		}

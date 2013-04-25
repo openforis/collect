@@ -36,6 +36,12 @@ package org.openforis.collect.util
 			UIComponent(popUp).setFocus();
 			return popUp;
 		}
+
+		public static function showPopUp(popUp:IFlexDisplayObject, modal:Boolean = true):void {
+			PopUpManager.addPopUp(popUp, DisplayObject(FlexGlobals.topLevelApplication), modal);
+			PopUpManager.centerPopUp(popUp);
+			UIComponent(popUp).setFocus();
+		}
 		
 		public static function center(parent:DisplayObject, popup:UIComponent):void {
 			var pt:Point = new Point(0, 0);

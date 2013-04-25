@@ -5,9 +5,9 @@ package org.openforis.collect.manager;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -15,12 +15,13 @@ import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.CollectSurveyContext;
 import org.openforis.collect.model.SurveySummary;
+import org.openforis.collect.persistence.RecordDao;
 import org.openforis.collect.persistence.SurveyDao;
 import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.collect.persistence.SurveyWorkDao;
+import org.openforis.commons.collection.CollectionUtils;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.xml.IdmlParseException;
-import org.openforis.idm.util.CollectionUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,9 +33,15 @@ import org.springframework.transaction.annotation.Transactional;
 public class SurveyManager {
 
 	@Autowired
+	private SamplingDesignManager samplingDesignManager;
+	@Autowired
+	private SpeciesManager speciesManager;
+	@Autowired
 	private SurveyDao surveyDao;
 	@Autowired
 	private SurveyWorkDao surveyWorkDao;
+	@Autowired
+	private RecordDao recordDao;
 	@Autowired
 	private CollectSurveyContext collectSurveyContext;
 	
@@ -60,23 +67,39 @@ public class SurveyManager {
 		surveysByUri.clear();
 		surveys = surveyDao.loadAll();
 		for (CollectSurvey survey : surveys) {
-			initSurvey(survey);
+			addToCache(survey);
 		}
 	}
 
-	private void initSurvey(CollectSurvey survey) {
+	private void addToCache(CollectSurvey survey) {
+		if ( ! surveys.contains(survey) ) {
+			surveys.add(survey);
+		}
 		surveysById.put(survey.getId(), survey);
 		surveysByName.put(survey.getName(), survey);
 		surveysByUri.put(survey.getUri(), survey);
 	}
 	
+	protected void removeFromCache(CollectSurvey survey) {
+		surveys.remove(survey);
+		surveysById.remove(survey.getId());
+		surveysByName.remove(survey.getName());
+		surveysByUri.remove(survey.getUri());
+	}
+	
 	public List<CollectSurvey> getAll() {
-		return CollectionUtil.unmodifiableList(surveys);
+		return CollectionUtils.unmodifiableList(surveys);
 	}
 	
 	@Transactional
 	public CollectSurvey get(String name) {
 		CollectSurvey survey = surveysByName.get(name);
+		return survey;
+	}
+	
+	@Transactional
+	public CollectSurvey getById(int id) {
+		CollectSurvey survey = surveysById.get(id);
 		return survey;
 	}
 	
@@ -89,25 +112,20 @@ public class SurveyManager {
 	@Transactional
 	public void importModel(CollectSurvey survey) throws SurveyImportException {
 		surveyDao.importModel(survey);
-		surveys.add(survey);
-		initSurvey(survey);
+		addToCache(survey);
 	}
 	
 	@Transactional
 	public void updateModel(CollectSurvey survey) throws SurveyImportException {
 		//remove old survey from surveys cache
-		String name = survey.getName();
-		Iterator<CollectSurvey> iterator = surveys.iterator();
-		while ( iterator.hasNext() ) {
-			CollectSurvey oldSurvey = iterator.next();
-			if (oldSurvey.getName().equals(name)) {
-				iterator.remove();
-				break;
-			}
+		CollectSurvey oldSurvey = surveysByName.get(survey.getName());
+		if ( oldSurvey != null ) {
+			removeFromCache(oldSurvey);
+		} else {
+			throw new SurveyImportException("Could not find survey to update");
 		}
 		surveyDao.updateModel(survey);
-		surveys.add(survey);
-		initSurvey(survey);
+		addToCache(survey);
 	}
 
 	@Transactional
@@ -122,12 +140,6 @@ public class SurveyManager {
 			summaries.add(summary);
 		}
 		return summaries;
-	}
-	
-	@Transactional
-	public List<SurveySummary> getSurveyWorkSummaries() {
-		List<SurveySummary> result = surveyWorkDao.loadSummaries();
-		return result;
 	}
 	
 	public String marshalSurvey(Survey survey)  {
@@ -151,6 +163,10 @@ public class SurveyManager {
 		return surveyDao.unmarshalIdml(is);
 	}
 	
+	public CollectSurvey unmarshalSurvey(Reader reader) throws IdmlParseException {
+		return surveyDao.unmarshalIdml(reader);
+	}
+	
 	@Transactional
 	public List<SurveySummary> loadSurveyWorkSummaries(String lang) {
 		List<SurveySummary> summaries = new ArrayList<SurveySummary>();
@@ -166,8 +182,23 @@ public class SurveyManager {
 	
 	@Transactional
 	public CollectSurvey loadSurveyWork(int id) {
-		CollectSurvey survey = surveyWorkDao.load(id);
-		return survey;
+		return surveyWorkDao.load(id);
+	}
+	
+	@Transactional
+	public List<SurveySummary> getSurveyWorkSummaries() {
+		List<SurveySummary> result = surveyWorkDao.loadSummaries();
+		return result;
+	}
+	
+	@Transactional
+	public SurveySummary loadSurveyWorkSummary(int id) {
+		return surveyWorkDao.loadSurveySummary(id);
+	}
+	
+	@Transactional
+	public SurveySummary loadSurveyWorkSummaryByName(String name) {
+		return surveyWorkDao.loadSurveySummaryByName(name);
 	}
 	
 	@Transactional
@@ -180,6 +211,24 @@ public class SurveyManager {
 		return surveyWork;
 	}
 
+	@Transactional
+	public boolean isSurveyWork(CollectSurvey survey) {
+		Integer id = survey.getId();
+		String name = survey.getName();
+		SurveySummary workSurveySummary = loadSurveyWorkSummaryByName(name);
+		if (workSurveySummary == null || workSurveySummary.getId() != id ) {
+			CollectSurvey publishedSurvey = get(name);
+			if (publishedSurvey == null || publishedSurvey.getId() != id ) {
+				throw new IllegalStateException("Survey with name '" + name
+						+ "' not found");
+			} else {
+				return false;
+			}
+		} else {
+			return true;
+		}
+	}
+	
 	public CollectSurvey createSurveyWork() {
 		CollectSurvey survey = (CollectSurvey) collectSurveyContext.createSurvey();
 		UIOptions uiOptions = survey.createUIOptions();
@@ -200,6 +249,13 @@ public class SurveyManager {
 		Integer id = survey.getId();
 		if ( id == null ) {
 			surveyWorkDao.insert(survey);
+			CollectSurvey publishedSurvey = surveyDao.loadByUri(survey.getUri());
+			if ( publishedSurvey != null ) {
+				int surveyWorkId = survey.getId();
+				int publishedSurveyId = publishedSurvey.getId();
+				samplingDesignManager.duplicateSamplingDesignForWork(publishedSurveyId, surveyWorkId);
+				speciesManager.duplicateTaxonomyForWork(publishedSurveyId, surveyWorkId);
+			}
 		} else {
 			surveyWorkDao.update(survey);
 		}
@@ -208,16 +264,83 @@ public class SurveyManager {
 	@Transactional
 	public void publish(CollectSurvey survey) throws SurveyImportException {
 		Integer surveyWorkId = survey.getId();
-		if ( survey.isPublished() ) {
-			updateModel(survey);
-		} else {
+		CollectSurvey publishedSurvey = get(survey.getName());
+		if ( publishedSurvey == null ) {
 			survey.setPublished(true);
 			importModel(survey);
 			initSurveysCache();
+		} else {
+			updateModel(survey);
 		}
 		if ( surveyWorkId != null ) {
+			int publishedSurveyId = survey.getId();
+			samplingDesignManager.publishSamplingDesign(surveyWorkId, publishedSurveyId);
+			speciesManager.publishTaxonomies(surveyWorkId, publishedSurveyId);
 			surveyWorkDao.delete(surveyWorkId);
 		}
 	}
+
+	@Transactional
+	public void deleteSurvey(Integer id) {
+		CollectSurvey survey = getById(id);
+		if ( survey != null ) {
+			recordDao.deleteBySurvey(id);
+			speciesManager.deleteTaxonomiesBySurvey(id);
+			samplingDesignManager.deleteBySurvey(id);
+			surveyDao.delete(id);
+			removeFromCache(survey);
+		}
+	}
 	
+	@Transactional
+	public void deleteSurveyWork(Integer id) {
+		speciesManager.deleteTaxonomiesBySurveyWork(id);
+		samplingDesignManager.deleteBySurveyWork(id);
+		surveyWorkDao.delete(id);
+	}
+	
+	/*
+	 * Getters and setters
+	 * 
+	 */
+	public SamplingDesignManager getSamplingDesignManager() {
+		return samplingDesignManager;
+	}
+
+	public void setSamplingDesignManager(SamplingDesignManager samplingDesignManager) {
+		this.samplingDesignManager = samplingDesignManager;
+	}
+
+	public SpeciesManager getSpeciesManager() {
+		return speciesManager;
+	}
+
+	public void setSpeciesManager(SpeciesManager speciesManager) {
+		this.speciesManager = speciesManager;
+	}
+
+	public SurveyDao getSurveyDao() {
+		return surveyDao;
+	}
+
+	public void setSurveyDao(SurveyDao surveyDao) {
+		this.surveyDao = surveyDao;
+	}
+
+	public SurveyWorkDao getSurveyWorkDao() {
+		return surveyWorkDao;
+	}
+
+	public void setSurveyWorkDao(SurveyWorkDao surveyWorkDao) {
+		this.surveyWorkDao = surveyWorkDao;
+	}
+
+	public CollectSurveyContext getCollectSurveyContext() {
+		return collectSurveyContext;
+	}
+
+	public void setCollectSurveyContext(CollectSurveyContext collectSurveyContext) {
+		this.collectSurveyContext = collectSurveyContext;
+	}
+
 }

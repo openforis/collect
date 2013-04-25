@@ -56,16 +56,19 @@ package org.openforis.collect.presenter {
 			}
 		}
 		
-		override protected function setFocusOnSiblingEntity(offset:int):void {
+		override protected function setFocusOnSiblingEntity(offset:int, circularLookup:Boolean = false, sameFieldIndex:Boolean = true):Boolean {
 			var attributeName:String = _view.attributeDefinition.name;
 			var inputFieldEvent:InputFieldEvent = new InputFieldEvent(InputFieldEvent.SET_FOCUS);
 			inputFieldEvent.nodeName = attributeName;
 			inputFieldEvent.fieldIdx = _view.fieldIndex;
 			var attributeToFocusIn:AttributeProxy;
-			var siblingEntity:EntityProxy = EntityProxy(_view.parentEntity.getSibling(offset));
+			var siblingEntity:EntityProxy = EntityProxy(_view.parentEntity.getSibling(offset, circularLookup));
 			if ( siblingEntity != null ) {
 				inputFieldEvent.parentEntityId = siblingEntity.id;
 				eventDispatcher.dispatchEvent(inputFieldEvent);
+				return true;
+			} else {
+				return false;
 			}
 		}
 		

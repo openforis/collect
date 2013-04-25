@@ -49,6 +49,12 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.util.StringUtil;
 	import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
 	import org.openforis.collect.model.proxy.RecordProxy;
+	import org.openforis.collect.util.CollectionUtil;
+	import org.openforis.collect.ui.component.SpeciesImportPopUp;
+	import mx.core.IFlexDisplayObject;
+	import org.openforis.collect.util.ObjectUtil;
+	import mx.resources.Locale;
+	import mx.controls.Alert;
 	
 	/**
 	 * 
@@ -64,6 +70,7 @@ package org.openforis.collect.presenter {
 		private var _modelClient:ModelClient;
 		private var _sessionClient:SessionClient;
 		//private var _contextMenuPresenter:ContextMenuPresenter;
+		private var _speciesImportPopUp:SpeciesImportPopUp;
 		
 		private var _keepAliveTimer:Timer;
 		
@@ -82,31 +89,13 @@ package org.openforis.collect.presenter {
 			init();
 		}
 		
-		internal function init():void {
-			var params:Object = FlexGlobals.topLevelApplication.parameters;
-			var preview:Boolean = params.preview == "true";
-			var localeString:String = params.lang as String;
-			if ( StringUtil.isEmpty(localeString) ) {
-				AlertUtil.showError("global.error.invalidLocaleSpecified");
-			} else if ( preview ) {
-				Application.preview = true;
-				var surveyId:int = int(params.surveyId);
-				var rootEntityId:int = int(params.rootEntityId);
-				var versionId:Number = Number(params.versionId);
-				var token:Object = {surveyId: surveyId, rootEntityId: rootEntityId, versionId: versionId};
-				var previewResp:IResponder = new AsyncResponder(initSessionForPreviewResultHandler, faultHandler, token);
-				this._sessionClient.initSession(previewResp, localeString);
-			} else {
-				var responder:IResponder = new AsyncResponder(initSessionResultHandler, faultHandler);
-				this._sessionClient.initSession(responder, localeString);
-			}
-		}
-		
 		override internal function initEventListeners():void {
 			//mouse wheel handler to increment scroll step size
 			FlexGlobals.topLevelApplication.systemManager.addEventListener(MouseEvent.MOUSE_WHEEL, mouseWheelHandler, true);
 			eventDispatcher.addEventListener(UIEvent.LOGOUT_CLICK, logoutClickHandler);
 			eventDispatcher.addEventListener(UIEvent.SHOW_LIST_OF_RECORDS, showListOfRecordsHandler);
+			eventDispatcher.addEventListener(UIEvent.OPEN_SPECIES_IMPORT_POPUP, openSpeciesImportPopUpHandler);
+			eventDispatcher.addEventListener(UIEvent.CLOSE_SPECIES_IMPORT_POPUP, closeSpeciesImportPopUpHandler);
 			
 			CONFIG::debugging {
 				_view.addEventListener(KeyboardEvent.KEY_DOWN, function(event:KeyboardEvent):void {
@@ -115,6 +104,95 @@ package org.openforis.collect.presenter {
 						FlexSpy.show();
 					}
 				});
+			}
+		}
+		
+		internal function init():void {
+			var params:Object = FlexGlobals.topLevelApplication.parameters;
+			var preview:Boolean = params.preview == "true";
+			var speciesImport:Boolean = params.species_import == "true";
+			var codeListImport:Boolean = params.code_list_import == "true";
+			var samplingDesignImport:Boolean = params.sampling_design_import == "true";
+			var localeString:String = params.locale as String;
+			if ( StringUtil.isEmpty(localeString) ) {
+				AlertUtil.showError("global.error.invalidLocaleSpecified");
+			} else if ( preview ) {
+				initPreview(params, localeString);
+			} else if ( speciesImport ) {
+				initSpeciesImport();
+			} else if ( samplingDesignImport ) {
+				initSamplingDesignImport();
+			} else if ( codeListImport ) {
+				initCodeListImport();
+			} else {
+				var responder:IResponder = new AsyncResponder(initSessionResultHandler, faultHandler);
+				this._sessionClient.initSession(responder, localeString);
+			}
+		}
+		
+		protected function initPreview(params:Object, localeString:String):void {
+			Application.preview = true;
+			var surveyId:int = int(params.surveyId);
+			var work:Boolean = params.work == "true";
+			var rootEntityId:int = int(params.rootEntityId);
+			var versionId:Number = Number(params.versionId);
+			var token:Object = {surveyId: surveyId, work: work, rootEntityId: rootEntityId, versionId: versionId};
+			var previewResp:IResponder = new AsyncResponder(initSessionForPreviewResultHandler, faultHandler, token);
+			this._sessionClient.initSession(previewResp, localeString);
+		}
+		
+		protected function initSpeciesImport():void {
+			var token:ReferenceDataImportToken = new ReferenceDataImportToken();
+			if ( fillRefereceDataImportToken(token) ) {
+				token.uiEventName = UIEvent.SHOW_SPECIES_IMPORT;
+				initReferenceDataImport(token);
+			}
+		}
+		
+		protected function initSamplingDesignImport():void {
+			var token:ReferenceDataImportToken = new ReferenceDataImportToken();
+			if ( fillRefereceDataImportToken(token) ) {
+				token.uiEventName = UIEvent.SHOW_SAMPLING_DESIGN_IMPORT;
+				initReferenceDataImport(token);
+			}
+		}
+
+		protected function initCodeListImport():void {
+			var token:CodeListImportToken = new CodeListImportToken();
+			fillRefereceDataImportToken(token);
+			token.uiEventName = UIEvent.SHOW_CODE_LIST_IMPORT;
+			var params:Object = FlexGlobals.topLevelApplication.parameters;
+			token.codeListId = int(params.code_list_id);
+			if ( token.codeListId > 0 ) {
+				initReferenceDataImport(token);
+			} else {
+				AlertUtil.showError("referenceDataImport.invalidParameters");
+			}
+		}
+		
+		protected function initReferenceDataImport(token:ReferenceDataImportToken):void {
+			_view.currentState = collect.FULL_SCREEN_STATE;
+			if ( token == null ) {
+				AlertUtil.showError("referenceDataImport.saveSurveyBefore");
+			} else {
+				var sessionInitResponder:IResponder = new AsyncResponder(initSessionForReferenceDataImportResultHandler, faultHandler, token);
+				this._sessionClient.initSession(sessionInitResponder, token.localeString);
+			}
+		}
+		
+		protected function fillRefereceDataImportToken(token:ReferenceDataImportToken):Boolean {
+			var params:Object = FlexGlobals.topLevelApplication.parameters;
+			var localeString:String = params.locale as String;
+			var surveyId:int = int(params.surveyId);
+			var work:Boolean = params.work == "true";
+			if ( surveyId > 0 && params.work != "null" ) {
+				token.localeString = localeString;
+				token.surveyId = surveyId;
+				token.work = work;
+				return true;
+			} else {
+				AlertUtil.showError("referenceDataImport.invalidParameters");
+				return false;
 			}
 		}
 		
@@ -147,7 +225,7 @@ package org.openforis.collect.presenter {
 		internal function initSessionCommonResultHandler(event:ResultEvent, token:Object = null):void {
 			Application.user = event.result.user;
 			Application.sessionId = event.result.sessionId;
-			Application.locale = FlexGlobals.topLevelApplication.parameters.lang as String;
+			Application.initLocale();
 		}
 		
 		internal function initSessionResultHandler(event:ResultEvent, token:Object = null):void {
@@ -158,12 +236,37 @@ package org.openforis.collect.presenter {
 		internal function initSessionForPreviewResultHandler(event:ResultEvent, token:Object = null):void {
 			initSessionCommonResultHandler(event, token);
 			var surveyId:int = token.surveyId;
+			var work:Boolean = token.work;
 			var responder:IResponder = new AsyncResponder(setActivePreviewSurveyResultHandler, faultHandler, token);
-			ClientFactory.sessionClient.setActivePreviewSurvey(responder, surveyId);
+			ClientFactory.sessionClient.setDesignerSurveyAsActive(responder, surveyId, work);
+		}
+		
+		
+		internal function initSessionForReferenceDataImportResultHandler(event:ResultEvent, token:ReferenceDataImportToken):void {
+			initSessionCommonResultHandler(event, token);
+			var surveyId:int = token.surveyId;
+			var work:Boolean = token.work;
+			var responder:IResponder = new AsyncResponder(setDesignerSurveyAsActiveResultHandler, faultHandler, token);
+			ClientFactory.sessionClient.setDesignerSurveyAsActive(responder, surveyId, work);
+			
+			function setDesignerSurveyAsActiveResultHandler(event:ResultEvent, token:ReferenceDataImportToken):void {
+				var survey:SurveyProxy = event.result as SurveyProxy;
+				Application.activeSurvey = survey;
+				var uiEvent:UIEvent = new UIEvent(token.uiEventName);
+				uiEvent.obj = token;
+				eventDispatcher.dispatchEvent(uiEvent);
+			}
+		}
+		
+		internal function showSamplingDesignImport(token:Object):void {
+			var uiEvent:UIEvent = new UIEvent(UIEvent.SHOW_SAMPLING_DESIGN_IMPORT);
+			uiEvent.obj = token;
+			eventDispatcher.dispatchEvent(uiEvent);
 		}
 		
 		protected function setActivePreviewSurveyResultHandler(event:ResultEvent, token:Object = null):void {
 			var survey:SurveyProxy = event.result as SurveyProxy;
+			adjustLocaleForSurvey(survey);
 			Application.activeSurvey = survey;
 			survey.init();
 			var versionName:String = null;
@@ -194,12 +297,12 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function showListOfRecordsHandler(event:UIEvent):void {
-			if ( Application.activeSurvey == null || Application.activeRootEntity == null ) {
-				openSurveySelectionPopUp();
-			} else {
+			if ( Application.activeSurvey != null && Application.activeRootEntity != null ) {
 				var uiEvent:UIEvent = new UIEvent(UIEvent.ROOT_ENTITY_SELECTED);
 				uiEvent.obj = Application.activeRootEntity;
 				eventDispatcher.dispatchEvent(uiEvent);
+			} else {
+				openSurveySelectionPopUp();
 			}
 		}
 		
@@ -209,6 +312,16 @@ package org.openforis.collect.presenter {
 			popUp.automaticallySelect = automaticallySelect;
 			PopUpManager.addPopUp(popUp, FlexGlobals.topLevelApplication as DisplayObject, true);
 			PopUpManager.centerPopUp(popUp);
+		}
+		
+		protected function openSpeciesImportPopUpHandler(event:Event = null):void {
+			_speciesImportPopUp = SpeciesImportPopUp(PopUpUtil.createPopUp(SpeciesImportPopUp));
+		}
+		
+		protected function closeSpeciesImportPopUpHandler(event:Event = null):void {
+			if ( _speciesImportPopUp != null ) {
+				PopUpManager.removePopUp(_speciesImportPopUp);
+			}
 		}
 		
 		/**
@@ -223,11 +336,20 @@ package org.openforis.collect.presenter {
 		internal function getSurveySummariesResultHandler(event:ResultEvent, token:Object = null):void {
 			var summaries:IList =  event.result as IList;
 			Application.surveySummaries = summaries;
-			if ( ! Application.user.hasEffectiveRole(UserProxy.ROLE_ADMIN) ) {
-				showListOfRecordsHandler(null);
+			if ( Application.user.hasEffectiveRole(UserProxy.ROLE_ADMIN) ) {
+				showHomePage();
+			} else if ( CollectionUtil.isEmpty(Application.surveySummaries) ) {
+				showErrorPage(Message.get("error.no_published_surveys_found"));
 			} else {
 				showHomePage();
+				showListOfRecordsHandler(null);
 			}
+		}
+		
+		protected function showErrorPage(errorMessage:String):void {
+			var uiEvent:UIEvent = new UIEvent(UIEvent.SHOW_ERROR_PAGE);
+			uiEvent.obj = errorMessage;
+			eventDispatcher.dispatchEvent(uiEvent);
 		}
 		
 		protected function showHomePage():void {
@@ -249,5 +371,69 @@ package org.openforis.collect.presenter {
 				_keepAliveTimer.stop();
 			}
 		}
+		
+		protected function adjustLocaleForSurvey(survey:SurveyProxy):void {
+			var locale:Locale = Application.locale;
+			var currentLangCode:String = locale.language;
+			if ( ! survey.languages.contains(currentLangCode) ) {
+				var surveyDefaultLocale:Locale = new Locale(survey.defaultLanguageCode);
+				Application.locale = surveyDefaultLocale;
+			}
+		}
+
 	}
+}
+
+class ReferenceDataImportToken {
+	private var _surveyId:int;
+	private var _work:Boolean;
+	private var _localeString:String;
+	private var _uiEventName:String;
+	
+	public function get surveyId():int {
+		return _surveyId;
+	}
+
+	public function set surveyId(value:int):void {
+		_surveyId = value;
+	}
+
+	public function get work():Boolean {
+		return _work;
+	}
+
+	public function set work(value:Boolean):void {
+		_work = value;
+	}
+
+	public function get localeString():String {
+		return _localeString;
+	}
+
+	public function set localeString(value:String):void {
+		_localeString = value;
+	}
+
+	public function get uiEventName():String
+	{
+		return _uiEventName;
+	}
+
+	public function set uiEventName(value:String):void {
+		_uiEventName = value;
+	}
+
+}
+
+class CodeListImportToken extends ReferenceDataImportToken {
+	private var _codeListId:int;
+	
+	public function get codeListId():int {
+		return _codeListId;
+	}
+
+	public function set codeListId(value:int):void {
+		_codeListId = value;
+	}
+
 }

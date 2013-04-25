@@ -1,7 +1,11 @@
 package org.openforis.collect.persistence;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import java.io.IOException;
 import java.io.StringReader;
+import java.io.StringWriter;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Map;
@@ -35,6 +39,11 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.transaction.TransactionConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * 
+ * @author S. Ricci
+ *
+ */
 @RunWith( SpringJUnit4ClassRunner.class )
 @ContextConfiguration( locations = {"classpath:test-context.xml"} )
 @TransactionConfiguration(defaultRollback=true)
@@ -62,30 +71,24 @@ public class DataMarshallerIntegrationTest extends CollectIntegrationTest {
 	@Test
 	public void testMarshal() throws Exception  {
 		// LOAD MODEL
-		CollectSurvey survey = surveyDao.load("archenland1");
-
-		if ( survey == null ) {
-			// IMPORT MODEL
-			survey = importModel();
-		}
+		CollectSurvey survey = loadSurvey();
+		CollectRecord record = createTestRecord(survey);
 		
-//		CollectRecord record = createTestRecord(survey);
-//		
-//		StringWriter out = new StringWriter();
-//
-//		dataMarshaller.write(record, out);
-//		String xml = out.toString();
-//		assertNotNull(xml);
-//		
-//		ParseRecordResult parseRecordResult = parseRecord(survey, xml);
-//		
-//		assertNotNull(parseRecordResult);
-//		
-//		CollectRecord record2 = parseRecordResult.getRecord();
-//
-//		assertNotNull(record2);
-//		
-//		assertEquals(record, record2);
+		StringWriter out = new StringWriter();
+
+		dataMarshaller.write(record, out);
+		String xml = out.toString();
+		assertNotNull(xml);
+		
+		ParseRecordResult parseRecordResult = parseRecord(survey, xml);
+		
+		assertNotNull(parseRecordResult);
+		
+		CollectRecord record2 = parseRecordResult.getRecord();
+
+		assertNotNull(record2);
+		
+		assertEquals(record, record2);
 	}
 	
 	private ParseRecordResult parseRecord(CollectSurvey survey, String xml) throws IOException, DataUnmarshallerException {
@@ -170,5 +173,4 @@ public class DataMarshallerIntegrationTest extends CollectIntegrationTest {
 			EntityBuilder.addValue(tree2, "total_height", 4.0);
 		}
 	}
-	
 }

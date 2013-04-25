@@ -1,64 +1,43 @@
-<?xml version="1.0" encoding="UTF-8"?><!-- This is the configuration for LOG4J --><!-- $Id: log4j.xml 10418 2009-11-09 16:18:59Z ixitar $ -->
+<?xml version="1.0" encoding="UTF-8"?><!-- This is the configuration for 
+  LOG4J --><!-- $Id: log4j.xml 10418 2009-11-09 
+  16:18:59Z ixitar $ -->
 <!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
-<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/" threshold="null" debug="null">
-    
-    <!-- Section: APPENDERS -->
-    
-    <!-- 
-         writes log messages to the console. It outputs file name,
-         method name and line number of the caller. This is slow,
-         so just use it for debugging. 
-    -->
-    <appender name="console" class="org.apache.log4j.ConsoleAppender">
-        <layout class="org.apache.log4j.PatternLayout">
-            <param name="ConversionPattern" value="%d{DATE} [%t] %-5p (%F [%M]:%L) - %m %n"/>
-        </layout>
-    </appender>
-    
-    <!-- 
-         the following appenders write to files  
-    -->
-    <appender name="openforis" class="org.apache.log4j.DailyRollingFileAppender">
-        <param name="File" value="${collect.root}/WEB-INF/logs/application.log"/>
-        <param name="Encoding" value="UTF-8"/>
-        <param name="DatePattern" value="'.'yyyy-MM-dd" />
-        <layout class="org.apache.log4j.PatternLayout">
-            <param name="ConversionPattern" value="%d [%t] %-5p (%F [%M]:%L) - %m %n"/>
-        </layout>
-    </appender>
-<!--    <appender name="openforis" class="org.apache.log4j.RollingFileAppender">-->
-<!--        <param value="loggerdir/openforis.log" name="File"/>-->
-<!--        <param name="MaxFileSize" value="5MB"/>-->
-<!--        <param name="MaxBackupIndex" value="3"/>-->
-<!--        <param name="Encoding" value="UTF-8"/>-->
-<!--        <layout class="org.apache.log4j.PatternLayout">-->
-<!--            <param name="ConversionPattern" value="%d [%t] %-5p (%F [%M]:%L) - %m %n"/>-->
-<!--        </layout>-->
-<!--    </appender>      -->
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/"
+  threshold="null" debug="null">
 
-<!--     <category name="org.springframework"> -->
-<!--     	<priority value="error"/> -->
-<!--         <appender-ref ref="console"/> -->
-<!--     </category> -->
-    
-    <category name="flex.messaging">
-    	<priority value="error"/>
-        <appender-ref ref="console"/>
-    </category>
-    
-<!--     <category name="httpclient" additivity="false"> -->
-<!--         <priority value="info"/> -->
-<!--         <appender-ref ref="openforis"/>         -->
-<!--     </category> -->
-    
-    <category name="org.apache" additivity="false">
-        <priority value="off"/>
-        <appender-ref ref="openforis"/>
-    </category>
+  <!-- Section: APPENDERS -->
 
-    <!-- Section: ROOT logger -->
-    <root>
-        <priority value="info"/>
-        <appender-ref ref="openforis"/>
-    </root>
+  <!-- writes log messages to the console. It outputs file name, method name 
+    and line number of the caller. This is slow, so just use it for debugging. -->
+  <appender name="console" class="org.apache.log4j.ConsoleAppender">
+    <layout class="org.apache.log4j.PatternLayout">
+      <param name="ConversionPattern" value="%d{DATE} [%t] %-5p (%F [%M]:%L) - %m %n" />
+    </layout>
+  </appender>
+
+  <!-- the following appenders write to files -->
+  <appender name="openforis" class="org.apache.log4j.DailyRollingFileAppender">
+    <param name="File" value="${collect.root}/WEB-INF/logs/application.log" />
+    <param name="Encoding" value="UTF-8" />
+    <param name="DatePattern" value="'.'yyyy-MM-dd" />
+    <layout class="org.apache.log4j.PatternLayout">
+      <param name="ConversionPattern" value="%d [%t] %-5p (%F [%M]:%L) - %m %n" />
+    </layout>
+  </appender>
+
+  <category name="flex.messaging">
+    <priority value="error" />
+    <appender-ref ref="openforis" />
+  </category>
+
+  <category name="org.apache" additivity="false">
+    <priority value="off" />
+    <appender-ref ref="openforis" />
+  </category>
+
+  <!-- Section: ROOT logger -->
+  <root>
+    <priority value="info" />
+    <appender-ref ref="openforis" />
+  </root>
 </log4j:configuration>

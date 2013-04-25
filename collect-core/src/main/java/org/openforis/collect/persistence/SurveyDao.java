@@ -1,7 +1,6 @@
 package org.openforis.collect.persistence;
 
 import static org.openforis.collect.persistence.jooq.Sequences.OFC_SURVEY_ID_SEQ;
-import static org.openforis.collect.persistence.jooq.tables.OfcRecord.OFC_RECORD;
 import static org.openforis.collect.persistence.jooq.tables.OfcSurvey.OFC_SURVEY;
 
 import java.util.ArrayList;
@@ -17,6 +16,7 @@ import org.jooq.impl.Factory;
 import org.jooq.impl.SQLDataType;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SurveySummary;
+import org.openforis.collect.persistence.jooq.DialectAwareJooqFactory;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.xml.IdmlParseException;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,8 +41,8 @@ public class SurveyDao extends SurveyBaseDao {
 		String idml = marshalSurvey(survey);
 
 		// Insert into OFC_SURVEY table
-		Factory jf = getJooqFactory();
-		int surveyId = jf.nextval(OFC_SURVEY_ID_SEQ).intValue();
+		DialectAwareJooqFactory jf = getJooqFactory();
+		int surveyId = jf.nextId(OFC_SURVEY.ID, OFC_SURVEY_ID_SEQ);
 		jf.insertInto(OFC_SURVEY).set(OFC_SURVEY.ID, surveyId)				
 				.set(OFC_SURVEY.NAME, survey.getName())
 				.set(OFC_SURVEY.URI, survey.getUri())
@@ -76,6 +76,26 @@ public class SurveyDao extends SurveyBaseDao {
 		return survey;
 	}
 	
+	public SurveySummary loadSurveySummary(int id) {
+		Factory jf = getJooqFactory();
+		Record record = jf.select()
+				.from(OFC_SURVEY)
+				.where(OFC_SURVEY.ID.equal(id))
+				.fetchOne();
+		SurveySummary result = processSurveySummaryRow(record);
+		return result;
+	}
+	
+	public SurveySummary loadSurveySummaryByName(String name) {
+		Factory jf = getJooqFactory();
+		Record record = jf.select()
+				.from(OFC_SURVEY)
+				.where(OFC_SURVEY.NAME.equal(name))
+				.fetchOne();
+		SurveySummary result = processSurveySummaryRow(record);
+		return result;
+	}
+	
 	@Transactional
 	public List<CollectSurvey> loadAll() {
 		Factory jf = getJooqFactory();
@@ -91,10 +111,11 @@ public class SurveyDao extends SurveyBaseDao {
 		return surveys;
 	}
 
-	public void clearModel() {
-		Factory jf = getJooqFactory();
-		jf.delete(OFC_RECORD).execute();
-		jf.delete(OFC_SURVEY).execute();
+	public void delete(int id) {
+		DialectAwareJooqFactory jf = getJooqFactory();
+		jf.delete(OFC_SURVEY)
+			.where(OFC_SURVEY.ID.equal(id))
+			.execute();
 	}
 
 	public void updateModel(CollectSurvey survey) throws SurveyImportException {
@@ -107,7 +128,7 @@ public class SurveyDao extends SurveyBaseDao {
 		String idml = marshalSurvey(survey);
 
 		// Get OFC_SURVEY table id for name
-		Factory jf = getJooqFactory();
+		DialectAwareJooqFactory jf = getJooqFactory();
 		int surveyId = 0;
 		SelectConditionStep query = jf.select(OFC_SURVEY.ID).from(OFC_SURVEY)
 				.where(OFC_SURVEY.NAME.equal(name));
@@ -118,7 +139,7 @@ public class SurveyDao extends SurveyBaseDao {
 			LOG.debug("Checking survey");
 		}
 		if (result.isEmpty()) { // we should insert it now			
-			surveyId = jf.nextval(OFC_SURVEY_ID_SEQ).intValue();
+			surveyId = jf.nextId(OFC_SURVEY.ID, OFC_SURVEY_ID_SEQ);
 			if ( LOG.isDebugEnabled() ) {
 				LOG.debug("    Survey " +  name + " not exist. Inserting with ID = " + surveyId );
 			}

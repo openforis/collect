@@ -88,7 +88,7 @@ package org.openforis.collect.presenter {
 				if ( rootEntitySummary != null ) {
 					var name:String = survey.name;
 					var responder:IResponder = new ItemResponder(setActiveSurveyResultHandler, faultHandler);
-					ClientFactory.modelClient.setActiveSurvey(responder, name);
+					ClientFactory.sessionClient.setActiveSurvey(responder, name);
 				} else {
 					AlertUtil.showMessage("surveySelection.selectRootEntity");
 				}

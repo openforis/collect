@@ -17,7 +17,7 @@ public class UnitFormObject extends SurveyObjectFormObject<Unit> {
 	private Double conversionFactor;
 	
 	public enum Dimension {
-		LENGTH, ANGLE, AREA, RATIO, CURRENCY, TIME;
+		ANGLE, AREA, CURRENCY, LENGTH, MASS, RATIO, TIME;
 		
 		public String getLabel() {
 			String labelKey = "survey.unit.dimension." + this.name().toLowerCase();

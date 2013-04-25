@@ -9,14 +9,15 @@ public class Resources {
 	
 	public static final String PAGES_BASE_PATH = "/";
 	public static final String COMPONENTS_BASE_PATH = "/WEB-INF/view/zul/designer/";
-	public static final String PREVIEW_PATH = "index.htm";
 	
 	public enum Page {
 	
 		INDEX("index.htm"),
 		DESIGNER("designer.htm"),
-		SURVEY_EDIT("editSurvey.htm");
-
+		SURVEY_EDIT("editSurvey.htm"),
+		COLLECT_SWF("collect.swf"),
+		PREVIEW_PATH("index.htm");
+		
 		private String location;
 	
 		private Page(String location) {
@@ -29,7 +30,6 @@ public class Resources {
 	}
 	
 	public enum Component {
-		
 		SELECT_LANGUAGE_POP_UP("survey_edit/select_language_popup.zul"),
 		PREVIEW_PREFERENCES_POP_UP("survey_edit/preview_preferences_popup.zul"),
 		TABSGROUP("survey_edit/schema_layout/tabsgroup.zul"),
@@ -37,8 +37,9 @@ public class Resources {
 		TABSGROUP_LIST_OF_NODES("survey_edit/schema_layout/editablenodeslist.zul"),
 		SRS_MANAGER_POP_UP("survey_edit/srs_popup.zul"),
 		VERSIONING_POPUP("survey_edit/versioning_popup.zul"),
+		CODE_LIST_IMPORT_POPUP("survey_edit/code_list_import_popup.zul"), 
 		CODE_LIST_ITEM_EDIT_POP_UP("survey_edit/code_list_item_popup.zul"),
-		CODE_LISTS_POPUP("survey_edit/code_lists_popup.zul"), 
+		CODE_LISTS_POPUP("survey_edit/code_lists_popup.zul"),
 		UNITS_MANAGER_POP_UP("survey_edit/units_popup.zul"), 
 		ENTITY("survey_edit/schema/entity.zul"),
 		ATTRIBUTE("survey_edit/schema/attribute_{0}.zul"),
@@ -46,7 +47,9 @@ public class Resources {
 		CHECK_POPUP("survey_edit/schema/check/popup.zul"), 
 		SURVEY_IMPORT_POPUP("survey_import_popup.zul"),
 		ATTRIBUTE_DEFAULT_POPUP("survey_edit/schema/attribute_default_popup.zul"), 
-		PRECISION_POPUP("survey_edit/schema/precision_popup.zul");
+		PRECISION_POPUP("survey_edit/schema/precision_popup.zul"),
+		SURVEY_VALIDATION_RESULTS_POPUP("survey_validation_results_popup.zul"),
+		CONFIRM_SURVEY_ERRORS_POPUP("component/confirm_survey_errors_popup.zul");
 		
 		private String location;
 		

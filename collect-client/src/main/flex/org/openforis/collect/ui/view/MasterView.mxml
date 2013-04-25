@@ -12,14 +12,16 @@
 		<![CDATA[
 			import mx.events.FlexEvent;
 			
-			import org.openforis.collect.i18n.Message;
 			import org.openforis.collect.presenter.MasterPresenter;
 			
-			
 			public static const LOADING_STATE:String = "loading";
+			public static const ERROR_STATE:String = "error";
 			public static const HOME_STATE:String = "home";
 			public static const LIST_STATE:String = "list";
 			public static const DETAIL_STATE:String = "detail";
+			public static const SPECIES_IMPORT_STATE:String = "speciesImport";
+			public static const SAMPLING_DESIGN_IMPORT_STATE:String = "samplingDesignImport";
+			public static const CODE_LIST_IMPORT_STATE:String = "codeListImport";
 			
 			private var _masterPresenter:MasterPresenter;
 			
@@ -30,20 +32,36 @@
 	</fx:Script>
 	
 	<s:layout>
-		<s:VerticalLayout horizontalAlign="center" />
+		<s:VerticalLayout horizontalAlign="center" gap="0" />
 	</s:layout>
 	
 	<s:states>
 		<s:State name="loading" />
+		<s:State name="error" />
 		<s:State name="home" />
 		<s:State name="list" />
 		<s:State name="detail" />
+		<s:State name="speciesImport" />
+		<s:State name="samplingDesignImport" />
+		<s:State name="codeListImport" />
 	</s:states>
 	
 	<component:LoadingContent width="100%" height="100%" includeIn="loading" itemCreationPolicy="immediate"/>
 	
+	<view:ErrorView id="errorView" includeIn="error" itemCreationPolicy="immediate" />
 	<view:HomePageView id="homeView" includeIn="home" itemCreationPolicy="immediate" />
 	<view:ListView id="listView" includeIn="list" itemCreationPolicy="immediate" />
 	<view:DetailView id="detailView" includeIn="detail" itemCreationPolicy="immediate" />
-	
+	<view:SpeciesImportView id="speciesImportView" 
+							includeIn="speciesImport" itemCreationPolicy="immediate" 
+							showCloseButton="false"
+							height="100%" width="100%" />
+	<view:SamplingDesignImportView id="samplingDesignImportView" 
+								   includeIn="samplingDesignImport" itemCreationPolicy="immediate" 
+								   showCloseButton="false"
+								   height="100%" width="100%" />
+	<view:CodeListImportView id="codeListImportView" 
+							 includeIn="codeListImport" itemCreationPolicy="immediate" 
+							 showCloseButton="false"
+							 height="100%" width="100%" />
 </s:Group>

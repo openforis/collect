@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram version="1.0" type="POSTGRES" versionMajor="9" versionMinor="0" groupSchema="false">
+<Table id="0" name="ofc_survey" schema="collect" database="" background="16777165">
+<Column id="1" name="id" type="integer" length="25" nulls="false"/>
+<Column id="2" name="name" type="varchar" length="255" nulls="false"/>
+<Column id="3" name="uri" type="varchar" length="255" nulls="true"/>
+<Column id="4" name="idml" type="text" length="25" nulls="false"/>
+<Storage name="TempTable" value="false"/>
+</Table>
+<Table id="5" name="ofc_record" schema="collect" database="" background="16777165">
+<Column id="6" name="id" type="integer" length="25" nulls="false"/>
+<Column id="7" name="survey_id" type="integer" length="25" nulls="false"/>
+<Column id="8" name="root_entity_definition_id" type="integer" length="25" nulls="false"/>
+<Column id="9" name="date_created" type="timestamp" length="25" nulls="true"/>
+<Column id="10" name="created_by_id" type="integer" length="255" nulls="true"/>
+<Column id="11" name="date_modified" type="timestamp" length="25" nulls="true"/>
+<Column id="12" name="modified_by_id" type="integer" length="255" nulls="true"/>
+<Column id="13" name="model_version" type="varchar" length="255" nulls="false"/>
+<Column id="14" name="step" type="integer" length="25" nulls="true"/>
+<Column id="15" name="state" type="char" length="1" nulls="true"/>
+<Column id="16" name="skipped" type="integer" length="25" nulls="true"/>
+<Column id="17" name="missing" type="integer" length="25" nulls="true"/>
+<Column id="18" name="errors" type="integer" length="25" nulls="true"/>
+<Column id="19" name="warnings" type="integer" length="25" nulls="true"/>
+<Column id="20" name="key1" type="varchar" length="2048" nulls="true"/>
+<Column id="21" name="key2" type="varchar" length="2048" nulls="true"/>
+<Column id="22" name="key3" type="varchar" length="2048" nulls="true"/>
+<Column id="23" name="count1" type="integer" length="25" nulls="true"/>
+<Column id="24" name="count2" type="integer" length="25" nulls="true"/>
+<Column id="25" name="count3" type="integer" length="25" nulls="true"/>
+<Column id="26" name="count4" type="integer" length="25" nulls="true"/>
+<Column id="27" name="count5" type="integer" length="25" nulls="true"/>
+<Column id="28" name="data1" type="bytea" length="25" nulls="true"/>
+<Column id="29" name="data2" type="bytea" length="25" nulls="true"/>
+<Storage name="TempTable" value="false"/>
+</Table>
+<Table id="30" name="ofc_taxon" schema="collect" database="" background="16777165">
+<Column id="31" name="id" type="integer" length="25" nulls="false"/>
+<Column id="32" name="taxon_id" type="integer" length="25" nulls="true"/>
+<Column id="33" name="code" type="varchar" length="32" nulls="true"/>
+<Column id="34" name="scientific_name" type="varchar" length="255" nulls="false"/>
+<Column id="35" name="taxon_rank" type="varchar" length="128" nulls="false"/>
+<Column id="36" name="taxonomy_id" type="integer" length="25" nulls="false"/>
+<Column id="37" name="step" type="integer" length="25" nulls="false"/>
+<Column id="38" name="parent_id" type="integer" length="25" nulls="true"/>
+<Storage name="TempTable" value="false"/>
+</Table>
+<Table id="39" name="ofc_taxon_vernacular_name" schema="collect" database="" background="16777165">
+<Column id="40" name="id" type="integer" length="25" nulls="false"/>
+<Column id="41" name="vernacular_name" type="varchar" length="255" nulls="true"/>
+<Column id="42" name="language_code" type="varchar" length="3" nulls="false"/>
+<Column id="43" name="language_variety" type="varchar" length="255" nulls="true">
+<CP name="COMMENTS">Dialect, lect, sublanguage or other</CP>
+</Column>
+<Column id="44" name="taxon_id" type="integer" length="25" nulls="true"/>
+<Column id="45" name="step" type="integer" length="25" nulls="false"/>
+<Column id="46" name="qualifier1" type="varchar" length="255" nulls="true"/>
+<Column id="47" name="qualifier2" type="varchar" length="255" nulls="true"/>
+<Column id="48" name="qualifier3" type="varchar" length="255" nulls="true"/>
+<Storage name="TempTable" value="false"/>
+</Table>
+<Table id="49" name="ofc_taxonomy" schema="collect" database="" background="16777165">
+<Column id="50" name="id" type="integer" length="25" nulls="false"/>
+<Column id="51" name="name" type="varchar" length="255" nulls="false"/>
+<Column id="52" name="metadata" type="text" length="25" nulls="false"/>
+<Column id="53" name="survey_id" type="integer" length="25" nulls="true"/>
+<Column id="54" name="survey_work_id" type="integer" length="25" nulls="true"/>
+<Storage name="TempTable" value="false"/>
+</Table>
+<Table id="55" name="ofc_user" schema="collect" database="" background="16777165">
+<Column id="56" name="id" type="integer" length="25" nulls="false"/>
+<Column id="57" name="username" type="varchar" length="255" nulls="false"/>
+<Column id="58" name="password" type="varchar" length="255" nulls="false"/>
+<Column id="59" name="enabled" type="char" length="1" nulls="false">
+<CP name="DEFAULT_VALUE">'Y'</CP>
+</Column>
+<Storage name="TempTable" value="false"/>
+</Table>
+<Table id="60" name="ofc_user_role" schema="collect" database="" background="16777165">
+<Column id="61" name="id" type="integer" length="25" nulls="false"/>
+<Column id="62" name="user_id" type="integer" length="25" nulls="false"/>
+<Column id="63" name="role" type="varchar" length="256" nulls="true"/>
+<Storage name="TempTable" value="false"/>
+</Table>
+<Table id="64" name="ofc_logo" schema="collect" database="" background="16777165">
+<Column id="65" name="pos" type="integer" length="25" nulls="false"/>
+<Column id="66" name="image" type="bytea" length="25" nulls="false"/>
+<Storage name="TempTable" value="false"/>
+</Table>
+<Table id="67" name="ofc_config" schema="collect" database="" background="16777165">
+<Column id="68" name="name" type="varchar" length="25" nulls="false"/>
+<Column id="69" name="value" type="varchar" length="255" nulls="false"/>
+<Storage name="TempTable" value="false"/>
+</Table>
+<Table id="70" name="ofc_application_info" schema="collect" database="" background="16777165">
+<Column id="71" name="version" type="varchar" length="25" nulls="false"/>
+<Storage name="TempTable" value="false"/>
+</Table>
+<Table id="72" name="ofc_survey_work" schema="collect" database="" background="16777165">
+<Column id="73" name="id" type="integer" length="25" nulls="false"/>
+<Column id="74" name="name" type="varchar" length="255" nulls="false"/>
+<Column id="75" name="uri" type="varchar" length="255" nulls="true"/>
+<Column id="76" name="idml" type="text" length="25" nulls="false"/>
+<Storage name="TempTable" value="false"/>
+</Table>
+<Table id="77" name="ofc_sampling_desing" schema="collect" database="" background="16777165">
+<Column id="78" name="id" type="integer" length="25" nulls="false"/>
+<Column id="79" name="survey_id" type="integer" length="25" nulls="true"/>
+<Column id="80" name="survey_work_id" type="integer" length="25" nulls="true"/>
+<Column id="81" name="level_1" type="varchar" length="256" nulls="false"/>
+<Column id="82" name="level_2" type="varchar" length="256" nulls="true"/>
+<Column id="83" name="level_3" type="varchar" length="256" nulls="true"/>
+<Column id="84" name="location" type="varchar" length="256" nulls="false"/>
+<Storage name="TempTable" value="false"/>
+</Table>
+<Relation id="85" name="ofc_taxon_vernacular_name_taxon_fkey" cardinality="-2" identifying="true" nulls="false">
+<FK>31</FK>
+<PK>44</PK>
+</Relation>
+<Relation id="86" name="ofc_taxon_taxonomy_fkey" cardinality="-2" identifying="false" nulls="false">
+<FK>50</FK>
+<PK>36</PK>
+</Relation>
+<Relation id="87" name="ofc_user_user_role_fkey" cardinality="-2" identifying="true" nulls="false">
+<FK>56</FK>
+<PK>62</PK>
+</Relation>
+<Relation id="88" name="ofc_record_created_by_user_fkey" cardinality="-2" identifying="false" nulls="false">
+<FK>56</FK>
+<PK>10</PK>
+</Relation>
+<Relation id="89" name="ofc_record_modified_by_user_fkey" cardinality="-1" identifying="false" nulls="false">
+<FK>56</FK>
+<PK>12</PK>
+</Relation>
+<Relation id="90" name="ofc_taxon_parent_fkey" cardinality="-2" identifying="false" nulls="true">
+<FK>31</FK>
+<PK>38</PK>
+</Relation>
+<Relation id="91" name="ofc_record_survey_fkey" cardinality="-2" identifying="true" nulls="false">
+<FK>1</FK>
+<PK>7</PK>
+</Relation>
+<Relation id="92" name="ofc_sampling_design_survey_fkey" cardinality="-3" identifying="true" nulls="false">
+<FK>1</FK>
+<PK>79</PK>
+</Relation>
+<Relation id="93" name="ofc_sampling_design_survey_work_fkey" cardinality="-3" identifying="true" nulls="false">
+<FK>73</FK>
+<PK>80</PK>
+</Relation>
+<Relation id="94" name="ofc_taxonomy_survey_fkey" cardinality="-1" identifying="true" nulls="false">
+<FK>1</FK>
+<PK>53</PK>
+</Relation>
+<Relation id="95" name="ofc_taxonomy_survey_work_fkey" cardinality="-1" identifying="true" nulls="false">
+<FK>73</FK>
+<PK>54</PK>
+</Relation>
+<Constraint table="0" name="ofc_survey_pkey" type="PrimKey">
+<ConstraintColumn id="1"/>
+</Constraint>
+<Constraint table="0" name="ofc_survey_name_key" type="Unique">
+<ConstraintColumn id="2"/>
+</Constraint>
+<Constraint table="0" name="ofc_survey_uri_key" type="Unique">
+<ConstraintColumn id="3"/>
+</Constraint>
+<Constraint table="5" name="ofc_record_pkey" type="PrimKey">
+<ConstraintColumn id="6"/>
+</Constraint>
+<Constraint table="30" name="ofc_taxon_pkey" type="PrimKey">
+<ConstraintColumn id="31"/>
+</Constraint>
+<Constraint table="30" name="ofc_taxon_id_key" type="Unique">
+<ConstraintColumn id="32"/>
+<ConstraintColumn id="36"/>
+</Constraint>
+<Constraint table="39" name="ofc_taxon_name_pkey" type="PrimKey">
+<ConstraintColumn id="40"/>
+</Constraint>
+<Constraint table="49" name="ofc_taxonomy_pkey" type="PrimKey">
+<ConstraintColumn id="50"/>
+</Constraint>
+<Constraint table="49" name="ofc_taxonomy_name_key" type="Unique">
+<ConstraintColumn id="53"/>
+<ConstraintColumn id="51"/>
+</Constraint>
+<Constraint table="49" name="ofc_taxonomy_name_work_key" type="Unique">
+<ConstraintColumn id="54"/>
+<ConstraintColumn id="51"/>
+</Constraint>
+<Constraint table="55" name="ofc_user_pkey" type="PrimKey">
+<ConstraintColumn id="56"/>
+</Constraint>
+<Constraint table="60" name="ofc_user_role_pkey" type="PrimKey">
+<ConstraintColumn id="61"/>
+</Constraint>
+<Constraint table="64" name="ofc_logo_pkey" type="PrimKey">
+<ConstraintColumn id="65"/>
+</Constraint>
+<Constraint table="67" name="ofc_config_pkey" type="PrimKey">
+<ConstraintColumn id="68"/>
+</Constraint>
+<Constraint table="72" name="ofc_survey_work_pkey" type="PrimKey">
+<ConstraintColumn id="73"/>
+</Constraint>
+<Constraint table="72" name="ofc_survey_work_name_key" type="Unique">
+<ConstraintColumn id="74"/>
+</Constraint>
+<Constraint table="72" name="ofc_survey_work_uri_key" type="Unique">
+<ConstraintColumn id="75"/>
+</Constraint>
+<Constraint table="77" name="ofc_sampling_desing_key" type="PrimKey">
+<ConstraintColumn id="78"/>
+</Constraint>
+<Sheet name="Data" id="96" disp_at="true" disp_ph="true" disp_co="true">
+<Place id="93" visible="true" options="430.0,310.0,191.0,92.0,90.0,130.0,181.0,151.0,4,430.0,340.0,350.0,340.0,350.0,210.0,271.0,210.0">500,0,0,0</Place>
+<Place id="77" visible="true">90,130,181,151</Place>
+<Place id="64" visible="false">80,99,120,60</Place>
+<Place id="87" visible="false">434,33,0,0</Place>
+<Place id="0" visible="true">429,140,191,92</Place>
+<Place id="72" visible="true">430,310,191,92</Place>
+<Place id="92" visible="true" options="429.0,140.0,191.0,92.0,90.0,130.0,181.0,151.0,4,429.0,170.0,324.0,170.0,324.0,170.0,271.0,170.0">500,0,0,0</Place>
+<Place id="91" visible="true" options="429.0,140.0,191.0,92.0,799.0,138.0,201.0,433.0,2,620.0,170.0,799.0,170.0">597,-20,0,0</Place>
+<Place id="89" visible="false">500,0,0,0</Place>
+<Place id="5" visible="true">799,138,201,433</Place>
+<Place id="60" visible="false">10,19,211,91</Place>
+<Place id="55" visible="false">680,168,191,90</Place>
+<Place id="88" visible="false">500,0,0,0</Place>
+</Sheet>
+<Sheet name="Species" id="97" disp_at="true" disp_ph="true" disp_co="true" disp_rn="true">
+<Place id="86" visible="true" options="300.0,58.0,170.0,113.0,278.0,280.0,230.0,161.0,2,390.0,171.0,390.0,280.0">500,0,0,0</Place>
+<Place id="30" visible="true">278,280,230,161</Place>
+<Place id="90" visible="true">500,0,0,0</Place>
+<Place id="95" visible="true">500,0,0,0</Place>
+<Place id="94" visible="true">500,0,0,0</Place>
+<Place id="49" visible="true">300,58,170,113</Place>
+<Place id="85" visible="true" options="278.0,280.0,230.0,161.0,270.0,549.0,240.0,182.0,5,400.0,441.0,400.0,440.5,395.0,440.5,395.0,549.0,390.0,549.0">500,0,0,0</Place>
+<Place id="39" visible="true">270,549,240,182</Place>
+</Sheet>
+<Sheet name="Users" id="98" disp_at="true" disp_ph="true" disp_co="true" disp_rn="true">
+<Place id="55" visible="true">580,210,200,90</Place>
+<Place id="60" visible="true">180,190,160,80</Place>
+<Place id="87" visible="true">500,0,0,0</Place>
+</Sheet>
+<Sheet name="UI" id="99" disp_at="true" disp_ph="true" disp_co="true" disp_rn="true">
+<Place id="64" visible="true">220,130,120,60</Place>
+</Sheet>
+<Sheet name="Config" id="100" disp_at="true" disp_ph="true" disp_co="true" disp_rn="true">
+<Place id="70" visible="true">280,70,191,60</Place>
+<Place id="67" visible="true">50,70,171,61</Place>
+</Sheet>
+<Settings sheet="97" zoom="1.0"/>
+</Diagram>

@@ -13,16 +13,20 @@ package org.openforis.collect.client {
 		
 		private var _keepAliveOperation:Operation;
 		private var _initSessionOperation:Operation;
-		private var _setActivePreviewSurveyOperation:Operation;
 		private var _logoutOperation:Operation;
+		private var _setActiveSurveyOperation:Operation;
+		private var _setDesignerSurveyAsActiveOperation:Operation;
+		private var _setActivePreviewSurveyOperation:Operation;
 		
 		public function SessionClient() {
 			super("sessionService");
 			
 			this._keepAliveOperation = getOperation("keepAlive", CONCURRENCY_LAST);
 			this._initSessionOperation = getOperation("initSession");
-			this._setActivePreviewSurveyOperation = getOperation("setActivePreviewSurvey");
 			this._logoutOperation = getOperation("logout");
+			this._setActiveSurveyOperation = getOperation("setActiveSurvey");
+			this._setDesignerSurveyAsActiveOperation = getOperation("setDesignerSurveyAsActive");
+			this._setActivePreviewSurveyOperation = getOperation("setActivePreviewSurvey");
 		}
 		
 		public function keepAlive(responder:IResponder):void {
@@ -40,13 +44,23 @@ package org.openforis.collect.client {
 			token.addResponder(responder);
 		}
 		
-		public function setActivePreviewSurvey(responder:IResponder, surveyId:int):void {
-			var token:AsyncToken = this._setActivePreviewSurveyOperation.send(surveyId);
+		public function logout(responder:IResponder):void {
+			var token:AsyncToken = this._logoutOperation.send();
 			token.addResponder(responder);
 		}
 		
-		public function logout(responder:IResponder):void {
-			var token:AsyncToken = this._logoutOperation.send();
+		public function setActiveSurvey(responder:IResponder, name:String):void {
+			var token:AsyncToken = this._setActiveSurveyOperation.send(name);
+			token.addResponder(responder);
+		}
+		
+		public function setDesignerSurveyAsActive(responder:IResponder, id:int, work:Boolean):void {
+			var token:AsyncToken = this._setDesignerSurveyAsActiveOperation.send(id, work);
+			token.addResponder(responder);
+		}
+		
+		public function setActivePreviewSurvey(responder:IResponder, surveyId:int):void {
+			var token:AsyncToken = this._setActivePreviewSurveyOperation.send(surveyId);
 			token.addResponder(responder);
 		}
 		

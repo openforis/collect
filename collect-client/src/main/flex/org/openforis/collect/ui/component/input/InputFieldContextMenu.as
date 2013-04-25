@@ -187,13 +187,13 @@ package org.openforis.collect.ui.component.input {
 					break;
 				case DELETE_ATTRIBUTE:
 					if(checkCanDelete(attribute, attrDefn)) {
-						var attrLabel:String = attrDefn.getLabelText();
+						var attrLabel:String = attrDefn.getInstanceOrHeadingLabelText();
 						AlertUtil.showConfirm("global.confirmDelete", [attrLabel], "global.confirmAlertTitle", performDeleteNode, [attribute]);
 					}
 					break;
 				case DELETE_ENTITY:
 					if(checkCanDelete(parentEntity, parentEntityDefn)) {
-						var entityLabel:String = attrDefn.parent.getLabelText();
+						var entityLabel:String = attrDefn.parent.getInstanceOrHeadingLabelText();
 						AlertUtil.showConfirm("global.confirmDelete", [entityLabel], "global.confirmAlertTitle", performDeleteNode, [parentEntity]);
 					}
 					break;
@@ -240,7 +240,7 @@ package org.openforis.collect.ui.component.input {
 		
 		private static function checkCanDelete(node:NodeProxy, nodeDefn:NodeDefinitionProxy):Boolean {
 			var parent:EntityProxy = node.parent;
-			var label:String = nodeDefn.getLabelText();
+			var label:String = nodeDefn.getInstanceOrHeadingLabelText();
 			var count:int = parent.getCount(nodeDefn.name);
 			var minCount:Number = nodeDefn.minCount;
 			if((isNaN(minCount) || minCount == 0) && node.parent.isRequired(nodeDefn.name)) {

@@ -32,6 +32,18 @@
     ]]>
     </fx:Metadata> 
     
+	<fx:Script>
+		<![CDATA[
+			override protected function updateDisplayList(unscaledWidth:Number, unscaledHeight:Number):void {
+				var verticalAlign:String = getStyle("verticalAlign");
+				if ( verticalAlign != null ) {
+					contentLayout.verticalAlign = verticalAlign;
+				}
+				super.updateDisplayList(unscaledWidth, unscaledHeight);
+			}
+		]]>
+	</fx:Script>
+	
     <s:states>
         <s:State name="normal" />
         <s:State name="disabled" />
@@ -73,7 +85,10 @@
     <!--- @copy spark.components.SkinnableContainer#contentGroup -->
     <s:Group id="contentGroup" left="0" right="0" top="0" bottom="0" minWidth="0" minHeight="0">
         <s:layout>
-            <s:VerticalLayout verticalAlign="bottom" />
+            <s:VerticalLayout id="contentLayout" 
+							  verticalAlign="bottom"
+							  paddingTop="4"
+							  />
         </s:layout>
     </s:Group>
 

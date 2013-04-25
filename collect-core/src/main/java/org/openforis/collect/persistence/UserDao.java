@@ -164,7 +164,7 @@ public class UserDao extends MappingJooqDaoSupport<User, JooqFactory> {
 			deleteRoles(userId);
 			List<String> roles = user.getRoles();
 			for (String role : roles) {
-				int userRoleId = nextval(OFC_USER_ROLE_ID_SEQ).intValue();
+				int userRoleId = nextId(OFC_USER_ROLE.ID, OFC_USER_ROLE_ID_SEQ);
 				insertInto(OFC_USER_ROLE, 
 							OFC_USER_ROLE.ID, 
 							OFC_USER_ROLE.USER_ID, 

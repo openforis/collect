@@ -13,14 +13,12 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.openforis.collect.web.session.SessionState;
-import org.springframework.stereotype.Controller;
 
 /**
  * @author S. Ricci
  * 
  */
-@Controller
-public class BasicController {
+public abstract class BasicController {
 
 	protected SessionState getSessionState(HttpServletRequest request) {
 		HttpSession session = request.getSession();

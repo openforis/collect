@@ -6,6 +6,9 @@ button.icon {
 	border: none;
 	cursor: pointer;
 }
+.nowrap {
+	white-space: nowrap;
+}
 .z-hlayout.controlBar .z-hlayout-inner {
 	vertical-align: middle;
 }
@@ -55,7 +58,7 @@ button.icon {
 	color: grey;
 	font-style: italic;
 }
-.z-textbox.error, .z-intbox.error, .z-select.error {
+.z-textbox.error, .z-intbox.error, .z-select.error, .z-datebox.error {
 	border: 2px inset #FF0000;
 	color: #000000;
 }
@@ -126,3 +129,8 @@ button.icon {
 	padding: 1px;
 }
 /* END OF LANGUAGES LIST STYLE */
+
+.z-flash.maximised {
+	height: 100%;
+	width: 100%;
+}

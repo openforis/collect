@@ -95,7 +95,7 @@ package org.openforis.collect.presenter {
 			_popUp.editable = Application.activeRecordEditable;
 			_popUp.multiple = _view.attributeDefinition.multiple;
 			_popUp.maxSpecified = _view.attributeDefinition.maxCount;
-			_popUp.title = _view.attributeDefinition.getLabelText();
+			_popUp.title = _view.attributeDefinition.getInstanceOrHeadingLabelText();
 			_popUp.codeInputField = _view;
 			_popUp.setFocus();
 			loadCodes();

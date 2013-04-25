@@ -10,6 +10,7 @@
 			
 			public static const STATE_HORIZONTAL:String = "horizontal";
 			public static const STATE_VERTICAL:String = "vertical";
+			public static const STATE_VERTICAL_FORM:String = "vertical_form";
 			
 			private var _subLabelWidth:Number = 130;
 			private var _inputFields:Array;
@@ -41,6 +42,7 @@
 	<detail:states>
 		<s:State name="horizontal" />
 		<s:State name="vertical" />
+		<s:State name="vertical_form" basedOn="vertical" />
 	</detail:states>
 	
 </detail:AttributeItemRenderer>

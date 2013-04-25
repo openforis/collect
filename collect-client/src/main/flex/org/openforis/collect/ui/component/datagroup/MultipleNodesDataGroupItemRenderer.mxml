@@ -45,6 +45,10 @@
 			import org.openforis.collect.presenter.MultipleNodesDataGroupItemPresenter;
 			import org.openforis.collect.ui.Images;
 
+			public static const STATE_NORMAL:String = "normal";
+			public static const STATE_DROPPING_TOP:String = "droppingTop";
+			public static const STATE_DROPPING_BOTTOM:String = "droppingBottom";
+			
 			private var _presenter:MultipleNodesDataGroupItemPresenter;
 			private var _dragEnabled:Boolean = true;
 			

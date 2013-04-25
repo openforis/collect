@@ -5,16 +5,22 @@ package org.openforis.collect.designer.viewmodel;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.openforis.collect.designer.form.validator.SurveyValidator;
+import org.openforis.collect.designer.form.validator.SurveyValidator.SurveyValidationResult;
 import org.openforis.collect.designer.model.SurveyManagerUtil;
 import org.openforis.collect.designer.model.SurveyWorkSummary;
 import org.openforis.collect.designer.session.SessionStatus;
+import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.PageUtil;
 import org.openforis.collect.designer.util.Resources;
 import org.openforis.collect.designer.util.Resources.Page;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.persistence.SurveyImportException;
 import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.DependsOn;
@@ -22,9 +28,9 @@ import org.zkoss.bind.annotation.GlobalCommand;
 import org.zkoss.bind.annotation.Init;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
+import org.zkoss.zkplus.databind.BindingListModelList;
 import org.zkoss.zul.Filedownload;
 import org.zkoss.zul.ListModel;
-import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Window;
 
 /**
@@ -44,6 +50,8 @@ public class SurveySelectVM extends BaseVM {
 	private SurveyWorkSummary selectedSurvey;
 
 	private Window surveyImportPopUp;
+
+	private Window validationResultsPopUp;
 	
 	@Init()
 	public void init() {
@@ -84,6 +92,82 @@ public class SurveySelectVM extends BaseVM {
 	}
 	
 	@Command
+	public void publishSelectedSurvey() throws IOException {
+		final CollectSurvey survey = loadSelectedSurvey();
+		if ( validateSurvey(survey) ) {
+			MessageUtil.showConfirm(new MessageUtil.ConfirmHandler() {
+				@Override
+				public void onOk() {
+					performSurveyPublishing(survey);
+				}
+			}, "survey.publish.confirm");
+		}
+	}
+	
+	@Command
+	public void deleteSelectedSurvey() {
+		String messageKey;
+		if ( selectedSurvey.isWorking() ) {
+			if ( selectedSurvey.isPublished() ) {
+				messageKey = "survey.delete.published_work.confirm";
+			} else {
+				messageKey = "survey.delete.work.confirm";
+			}
+		} else {
+			messageKey = "survey.delete.confirm";
+		}
+		MessageUtil.showConfirm(new MessageUtil.ConfirmHandler() {
+			@Override
+			public void onOk() {
+				performSelectedSurveyDeletion();
+			}
+		}, messageKey, new String[]{selectedSurvey.getName()});
+	}
+	
+	protected void performSelectedSurveyDeletion() {
+		if ( selectedSurvey.isWorking() ) {
+			surveyManager.deleteSurveyWork(selectedSurvey.getId());
+		} else {
+			surveyManager.deleteSurvey(selectedSurvey.getId());
+		}
+		notifyChange("surveySummaries");
+	}
+
+	protected boolean validateSurvey(CollectSurvey survey) {
+		SurveyValidator surveyValidator = new SurveyValidator(surveyManager);
+		List<SurveyValidationResult> validationResults = surveyValidator.validateSurvey(survey);
+		if ( validationResults.isEmpty() ) {
+			return true;
+		} else {
+			openValidationResultsPopUp(validationResults);
+			return false;
+		}
+	}
+
+	protected void openValidationResultsPopUp(List<SurveyValidationResult> validationResults) {
+		Map<String, Object> args = new HashMap<String, Object>();
+		args.put("validationResults", validationResults);
+		validationResultsPopUp = openPopUp(Resources.Component.SURVEY_VALIDATION_RESULTS_POPUP.getLocation(), true, args);
+	}
+	
+	@GlobalCommand
+	public void closeValidationResultsPopUp() {
+		closePopUp(validationResultsPopUp);
+		validationResultsPopUp = null;
+	}
+	
+	protected void performSurveyPublishing(CollectSurvey survey) {
+		try {
+			surveyManager.publish(survey);
+			notifyChange("surveySummaries");
+			Object[] args = new String[]{survey.getName()};
+			MessageUtil.showInfo("survey.successfully_published", args);
+		} catch (SurveyImportException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
+	@Command
 	public void goToIndex() {
 		Executions.sendRedirect(Page.INDEX.getLocation());
 	}
@@ -115,7 +199,7 @@ public class SurveySelectVM extends BaseVM {
 	
 	public ListModel<SurveyWorkSummary> getSurveySummaries() {
 		List<SurveyWorkSummary> summaries = SurveyManagerUtil.getSurveySummaries(surveyManager);
-		return new ListModelList<SurveyWorkSummary>(summaries);
+		return new BindingListModelList<SurveyWorkSummary>(summaries, false);
 	}
 
 	public SurveyWorkSummary getSelectedSurvey() {
@@ -140,5 +224,11 @@ public class SurveySelectVM extends BaseVM {
 	public boolean isExportDisabled() {
 		return this.selectedSurvey == null;
 	}
-	
+
+	@DependsOn("selectedSurvey")
+	public boolean isPublishDisabled() {
+		//TODO check validity of survey
+		return this.selectedSurvey == null || ! this.selectedSurvey.isWorking();
+	}
+
 }

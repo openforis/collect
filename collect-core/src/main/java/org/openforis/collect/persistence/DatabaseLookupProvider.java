@@ -16,9 +16,6 @@ public class DatabaseLookupProvider implements LookupProvider {
 	@Autowired
 	private DynamicTableDao dynamicTableDao;
 
-	public DatabaseLookupProvider() {
-	}
-
 	@Override
 	public Object lookup(String name, String attribute, Object... columns) {
 		Object object = dynamicTableDao.load(name, attribute, columns);

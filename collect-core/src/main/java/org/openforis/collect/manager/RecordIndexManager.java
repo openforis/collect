@@ -4,8 +4,8 @@
 package org.openforis.collect.manager;
 
 import java.io.Closeable;
-import java.io.File;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -39,7 +39,6 @@ import org.apache.lucene.util.Version;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectSurvey;
-import org.openforis.collect.model.Configuration;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -56,86 +55,94 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author S. Ricci
  *
  */
-public class RecordIndexManager {
-	
+public class RecordIndexManager extends BaseStorageManager {
+
+	private static final long serialVersionUID = 1L;
+
+	private static final String COLLECT_INDEX_DEFAULT_FOLDER = "collect_index";
+	protected static final String INDEX_PATH_CONFIGURATION_KEY = "index_path";
+	protected static final String RECORD_ID_FIELD = "_record_id";
 	private static final Version LUCENE_VERSION = Version.LUCENE_36;
+
+	protected static Log LOG = LogFactory.getLog(RecordIndexManager.class);
 
 	public enum SearchType {
 		EQUAL, STARTS_WITH, CONTAINS;
 	}
 
-	protected static Log LOG = LogFactory.getLog(RecordIndexManager.class);
-
-	protected static final String INDEX_PATH_CONFIGURATION_KEY = "index_path";
-	
-	protected static final String RECORD_ID_FIELD = "_record_id";
-	
 	@Autowired
-	private ConfigurationManager configurationManager;
-
-	@Autowired
-	private RecordManager recordManager;
-	protected String indexRootPath;
-	private Directory indexDirectory;
-	private boolean inited;
-	private boolean cancelled;
+	private transient RecordManager recordManager;
 	
-	protected void init() throws RecordIndexException {
-		Configuration configuration = configurationManager.getConfiguration();
-		indexRootPath = configuration.get(INDEX_PATH_CONFIGURATION_KEY);
-		if ( indexRootPath == null ) {
-			LOG.warn("Record index path not configured properly");
-		} else {
-			indexDirectory = createIndexDirectory();
-			unlock();
-			IndexWriter indexWriter = createIndexWriter();
-			close(indexWriter);
+	protected Directory indexDirectory;
+	protected boolean inited;
+	protected boolean cancelled;
+	
+	protected synchronized void init() throws RecordIndexException {
+		unlock();
+		initStorageDirectory(INDEX_PATH_CONFIGURATION_KEY, COLLECT_INDEX_DEFAULT_FOLDER);
+		if ( storageDirectory != null ) {
+			if ( LOG.isInfoEnabled() ) {
+				LOG.info("Using storage directory: " + storageDirectory.getAbsolutePath());
+			}
+			initIndexDirectory();
 			cancelled = false;
 			inited = true;
+		} else {
+			LOG.warn("Record index manager not inited correctly");
+			indexDirectory = null;
+			inited = false;
 		}
 	}
-
-	protected void initStatics() throws RecordIndexException {
-		Configuration configuration = configurationManager.getConfiguration();
-		indexRootPath = configuration.get(INDEX_PATH_CONFIGURATION_KEY);
-		unlock();
-		IndexWriter indexWriter = createIndexWriter();
-		close(indexWriter);
-	}
 	
+	protected void initIndexDirectory() throws RecordIndexException {
+		indexDirectory = createIndexDirectory();
+		prepareIndexDirectory();
+	}
+
 	protected Directory createIndexDirectory() throws RecordIndexException {
 		try {
-			File indexDir = new File(indexRootPath);
-			if ( indexDir.exists() || indexDir.mkdirs() ) {
-				Directory directory = new SimpleFSDirectory(indexDir);
-				return directory;
-			} else {
-				throw new RecordIndexException("Cannot create index directory: " + indexRootPath);
-			}
+			Directory directory = new SimpleFSDirectory(storageDirectory);
+			return directory;
 		} catch (IOException e) {
 			throw new RecordIndexException(e);
 		}
 	}
 	
-	public void unlock() throws RecordIndexException {
-		try {
-			File indexRootDir = new File(indexRootPath);
-			Directory directory = new SimpleFSDirectory(indexRootDir);
-			if ( IndexWriter.isLocked(directory) ) {
-				IndexWriter.unlock(directory);
+	/**
+	 * Prepare the index Directory for the first usage
+	 * 
+	 * @throws RecordIndexException
+	 */
+	protected void prepareIndexDirectory() throws RecordIndexException {
+		IndexWriter indexWriter = createIndexWriter();
+		close(indexWriter);
+	}
+
+	public synchronized void unlock() throws RecordIndexException {
+		if ( storageDirectory != null ) {
+			try {
+				Directory directory = new SimpleFSDirectory(storageDirectory);
+				if ( IndexWriter.isLocked(directory) ) {
+					IndexWriter.unlock(directory);
+				}
+			} catch(Exception e) {
+				deleteIndexRootDirectory();
 			}
-		} catch(Exception e) {
-			destroyIndex();
 		}
 	}
 	
-	public void destroyIndex() throws RecordIndexException {
+	public void destroyIndex() {
 		try {
-			cleanIndex();
+			deleteIndexRootDirectory();
 		} catch (RecordIndexException e) {
+			LOG.error("Error destroying index", e);
+		}
+	}
+
+	protected void deleteIndexRootDirectory() throws RecordIndexException {
+		if ( storageDirectory != null ) {
 			try {
-				File indexDir = new File(indexRootPath);
-				FileUtils.forceDelete(indexDir);
+				FileUtils.forceDelete(storageDirectory);
 			} catch (IOException e1) {
 				throw new RecordIndexException(e1);
 			}
@@ -144,10 +151,10 @@ public class RecordIndexManager {
 	
 	public void cleanIndex() throws RecordIndexException {
 		IndexWriter indexWriter = createIndexWriter();
-		destroyIndex(indexWriter);
+		deleteAllItems(indexWriter);
 	}
 	
-	protected void destroyIndex(IndexWriter indexWriter) throws RecordIndexException {
+	protected void deleteAllItems(IndexWriter indexWriter) throws RecordIndexException {
 		try {
 			indexWriter.deleteAll();
 		} catch (Exception e) {
@@ -421,4 +428,14 @@ public class RecordIndexManager {
 		return inited;
 	}
 
+	public void printAllDocuments(IndexReader r, PrintStream out) throws IOException {
+		int num = r.numDocs();
+		for ( int i = 0; i < num; i++) {
+			if ( ! r.isDeleted( i)) {
+				Document d = r.document( i);
+		        out.println( "d=" +d);
+			}
+		}
+		r.close();
+	}
 }

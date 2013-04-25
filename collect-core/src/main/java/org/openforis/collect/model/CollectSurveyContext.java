@@ -24,12 +24,11 @@ public class CollectSurveyContext implements SurveyContext, Serializable {
 	private Validator validator;
 	private ExternalCodeListProvider externalCodeListProvider;
 
-	public CollectSurveyContext(ExpressionFactory expressionFactory, Validator validator, ExternalCodeListProvider externalCodeListProvider) {
+	public CollectSurveyContext(ExpressionFactory expressionFactory, Validator validator) {
 		this.expressionFactory = expressionFactory;
 		this.validator = validator;
-		this.externalCodeListProvider = externalCodeListProvider;
 	}
-
+	
 	@Override
 	public Survey createSurvey() {
 		CollectSurvey survey = new CollectSurvey(this);

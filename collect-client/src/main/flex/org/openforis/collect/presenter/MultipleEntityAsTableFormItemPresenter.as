@@ -84,7 +84,7 @@ package org.openforis.collect.presenter
 				var req:UpdateRequest = new UpdateRequest(o);
 				ClientFactory.dataClient.updateActiveRecord(req, addResultHandler, faultHandler);
 			} else {
-				var labelText:String = view.entityDefinition.getLabelText();
+				var labelText:String = view.entityDefinition.getInstanceOrHeadingLabelText();
 				AlertUtil.showError("edit.maxCountExceed", [maxCount, labelText]);
 			}
 		}

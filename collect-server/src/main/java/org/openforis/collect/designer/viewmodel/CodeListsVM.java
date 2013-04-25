@@ -8,18 +8,24 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Stack;
 
 import org.openforis.collect.designer.form.CodeListFormObject;
 import org.openforis.collect.designer.form.CodeListFormObject.Type;
 import org.openforis.collect.designer.form.FormObject;
+import org.openforis.collect.designer.util.ComponentUtil;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.MessageUtil.ConfirmHandler;
 import org.openforis.collect.designer.util.Resources;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeList.CodeScope;
 import org.openforis.idm.metamodel.CodeListItem;
 import org.openforis.idm.metamodel.CodeListLevel;
+import org.openforis.idm.metamodel.EntityDefinition;
+import org.openforis.idm.metamodel.NodeDefinition;
+import org.openforis.idm.metamodel.Schema;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.Binder;
 import org.zkoss.bind.annotation.BindingParam;
@@ -45,11 +51,12 @@ import org.zkoss.zul.Window;
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 
+	public static final String EDITING_ATTRIBUTE_PARAM = "editingAttribute";
+	public static final String SELECTED_CODE_LIST_PARAM = "selectedCodeList";
 	private static final String CODE_LISTS_UPDATED_GLOBAL_COMMAND = "codeListsUpdated";
 	private static final String SURVEY_CODE_LIST_GENERATED_LEVEL_NAME_LABEL_KEY = "survey.code_list.generated_level_name";
 	public static final String CLOSE_CODE_LIST_ITEM_POP_UP_COMMAND = "closeCodeListItemPopUp";
-
-//	private DefaultTreeModel<CodeListItem> treeModel;
+	public static final String CLOSE_CODE_LIST_IMPORT_POP_UP_COMMAND = "closeCodeListImportPopUp";
 	
 	private List<List<CodeListItem>> itemsPerLevel;
 	private boolean newChildItem;
@@ -59,19 +66,25 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 	
 	private List<CodeListItem> selectedItemsPerLevel;
 	private Window codeListItemPopUp;
+	private Window referencedNodesPopUp;
+	private Window codeListImportPopUp;
+	private boolean editingAttribute;
 	
 	@Init(superclass=false)
-	public void init(@ExecutionArgParam("selectedCodeList") CodeList selectedCodeList) {
+	public void init(@ExecutionArgParam(EDITING_ATTRIBUTE_PARAM) Boolean editingAttribute, 
+			@ExecutionArgParam(SELECTED_CODE_LIST_PARAM) CodeList selectedCodeList) {
 		super.init();
 		if ( selectedCodeList != null ) {
 			selectionChanged(selectedCodeList);
 		}
+		this.editingAttribute = editingAttribute != null && editingAttribute.booleanValue();
 	}
 	
 	@Override
 	protected List<CodeList> getItemsInternal() {
 		CollectSurvey survey = getSurvey();
 		List<CodeList> codeLists = survey.getCodeLists();
+		codeLists = sort(codeLists);
 		return codeLists;
 	}
 
@@ -120,6 +133,50 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 	@Override
 	protected void moveSelectedItem(int indexTo) {
 		survey.moveCodeList(selectedItem, indexTo);
+	}
+	
+	@Override
+	@Command
+	public void deleteItem(@BindingParam("item") final CodeList item) {
+		List<NodeDefinition> references = getReferences(item);
+		if ( ! references.isEmpty() ) {
+			String title = Labels.getLabel("global.message.title.warning");
+			String message = Labels.getLabel("survey.code_list.alert.cannot_delete_used_list");
+			referencedNodesPopUp = SurveyErrorsPopUpVM.openPopUp(title, message, 
+					references, new MessageUtil.ConfirmHandler() {
+				@Override
+				public void onOk() {
+					closeReferencedNodesPopUp();
+				}
+			}, true);
+		} else {
+			super.deleteItem(item);
+		}
+	}
+
+	protected void closeReferencedNodesPopUp() {
+		closePopUp(referencedNodesPopUp);
+		referencedNodesPopUp = null;
+	}
+
+	protected List<NodeDefinition> getReferences(CodeList item) {
+		List<NodeDefinition> references = new ArrayList<NodeDefinition>();
+		Schema schema = survey.getSchema();
+		List<EntityDefinition> rootEntities = schema.getRootEntityDefinitions();
+		Stack<NodeDefinition> stack = new Stack<NodeDefinition>();
+		stack.addAll(rootEntities);
+		while ( ! stack.isEmpty() ) {
+			NodeDefinition defn = stack.pop();
+			if ( defn instanceof EntityDefinition ) {
+				stack.addAll(((EntityDefinition) defn).getChildDefinitions());
+			} else if ( defn instanceof CodeAttributeDefinition ) {
+				CodeList list = ((CodeAttributeDefinition) defn).getList();
+				if ( list.equals(item) ) {
+					references.add(defn);
+				}
+			};
+		}
+		return references;
 	}
 	
 	@Command
@@ -198,22 +255,46 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 	
 	@Command
 	@NotifyChange({"itemsPerLevel"})
-	public void removeItem(@BindingParam("item") final CodeListItem item) {
-		String messageKey;
-		if ( item.hasChildItems() ) {
-			messageKey = "survey.code_list.confirm.delete_non_empty_item";
+	public void deleteCodeListItem(@BindingParam("item") final CodeListItem item) {
+		if ( isEnumeratingCodeList() ) {
+			MessageUtil.showWarning("survey.code_list.cannot_delete_enumerating_code_list_items");
 		} else {
-			messageKey = "survey.code_list.confirm.delete_item";
-		}
-		MessageUtil.showConfirm(new MessageUtil.ConfirmHandler() {
-			@Override
-			public void onOk() {
-				performRemoveItem(item);
+			String messageKey;
+			if ( item.hasChildItems() ) {
+				messageKey = "survey.code_list.confirm.delete_non_empty_item";
+			} else {
+				messageKey = "survey.code_list.confirm.delete_item";
 			}
-		}, messageKey);
+			MessageUtil.showConfirm(new MessageUtil.ConfirmHandler() {
+				@Override
+				public void onOk() {
+					performDeleteCodeListItem(item);
+				}
+			}, messageKey);
+		}
 	}
 
-	protected void performRemoveItem(CodeListItem item) {
+	protected boolean isEnumeratingCodeList() {
+		Schema schema = survey.getSchema();
+		Stack<NodeDefinition> stack = new Stack<NodeDefinition>();
+		List<EntityDefinition> rootEntityDefinitions = schema.getRootEntityDefinitions();
+		stack.addAll(rootEntityDefinitions);
+		while ( ! stack.isEmpty() ) {
+			NodeDefinition node = stack.pop();
+			if ( node instanceof EntityDefinition ) {
+				EntityDefinition entityDefn = (EntityDefinition) node;
+				CodeAttributeDefinition enumeratingKeyCodeAttribute = entityDefn.getEnumeratingKeyCodeAttribute();
+				if ( isSurveyPublished() && enumeratingKeyCodeAttribute != null && 
+						enumeratingKeyCodeAttribute.getList().getId() == editedItem.getId() ) {
+					return true;
+				}
+				stack.addAll(entityDefn.getChildDefinitions());
+			}
+		}
+		return false;
+	}
+
+	protected void performDeleteCodeListItem(CodeListItem item) {
 		if ( isCodeListItemSelected(item) ) {
 			int itemLevelIndex = item.getDepth() - 1;
 			deselectItemsAfterLevel(itemLevelIndex);
@@ -261,10 +342,11 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 
 	public void openChildItemEditPopUp() {
 		Map<String, Object> args = new HashMap<String, Object>();
-		args.put("item", editedChildItem);
-		args.put("parentItem", editedChildItemParentItem);
+		args.put(CodeListItemVM.ITEM_ARG, editedChildItem);
+		args.put(CodeListItemVM.PARENT_ITEM_ARG, editedChildItemParentItem);
+		args.put(CodeListItemVM.ENUMERATING_CODE_LIST_ARG, isEnumeratingCodeList());
 		codeListItemPopUp = openPopUp(Resources.Component.CODE_LIST_ITEM_EDIT_POP_UP.getLocation(), true, args);
-		Binder binder = (Binder) codeListItemPopUp.getAttribute("$BINDER$");
+		Binder binder = ComponentUtil.getBinder(codeListItemPopUp);
 		validateForm(binder);
 	}
 
@@ -328,7 +410,9 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 	public void closeCodeListItemPopUp(@BindingParam("undoChanges") boolean undoChanges) {
 		closePopUp(codeListItemPopUp);
 		codeListItemPopUp = null;
-		if ( ! undoChanges ) {
+		if ( undoChanges ) {
+			dispatchCurrentFormValidatedCommand(true);
+		} else {
 			if ( newChildItem ) {
 				addChildItemToCodeList();
 			} else {
@@ -336,7 +420,35 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 			}
 		}
 	}
+	
+	@Override
+	protected void commitChanges() {
+		super.commitChanges();
+		dispatchCodeListsUpdatedCommand();
+	}
 
+	@Command
+	public void openCodeListImportPopUp() {
+		Map<String, Object> args = new HashMap<String, Object>();
+		args.put("codeListId", editedItem.getId());
+		codeListImportPopUp = openPopUp(Resources.Component.CODE_LIST_IMPORT_POPUP.getLocation(), true, args);
+	}
+	
+	@GlobalCommand
+	public void closeCodeListImportPopUp() {
+		closePopUp(codeListImportPopUp);
+		codeListImportPopUp = null;
+		boolean hasMultipleLevels = editedItem.getHierarchy().size() > 1;
+		Type type = hasMultipleLevels ? Type.HIERARCHICAL: Type.FLAT;
+		String codeScope = editedItem.getCodeScope().name();
+		CodeListFormObject fo = (CodeListFormObject) formObject;
+		fo.setType(type.name());
+		fo.setCodeScope(codeScope);
+		selectedItemsPerLevel = new ArrayList<CodeListItem>();
+		initItemsPerLevel();
+		notifyChange("formObject","listLevels","selectedItemsPerLevel");
+	}
+	
 	private void addChildItemToCodeList() {
 		if ( editedChildItemParentItem == null ) {
 			editedItem.addItem(editedChildItem);
@@ -392,5 +504,17 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 		return selectedItemsPerLevel.contains(item);
 	}
 	
+	public String getCodeListItemLabel(CodeListItem item) {
+		String label = item.getLabel(currentLanguageCode);
+		if ( label == null && isDefaultLanguage() ) {
+			//try to get the label associated to default language
+			label = item.getLabel(null);
+		}
+		return label;
+	}
+
+	public boolean isEditingAttribute() {
+		return editingAttribute;
+	}
 	
 }

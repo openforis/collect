@@ -15,7 +15,7 @@
 			
 			import org.openforis.collect.i18n.Message;
 			import org.openforis.collect.presenter.DataImportPresenter;
-			import org.openforis.collect.remoting.service.dataImport.DataImportSummaryItemProxy;
+			import org.openforis.collect.remoting.service.dataimport.DataImportSummaryItemProxy;
 			import org.openforis.collect.util.UIUtil;
 			
 			public static const STATE_DEFAULT:String = "default";
@@ -152,7 +152,7 @@
 											<![CDATA[
 												import org.openforis.collect.event.DataImportEvent;
 												import org.openforis.collect.event.EventDispatcherFactory;
-												import org.openforis.collect.remoting.service.dataImport.DataImportSummaryItemProxy;
+												import org.openforis.collect.remoting.service.dataimport.DataImportSummaryItemProxy;
 											]]>
 										</fx:Script>
 										<s:Button horizontalCenter="0" verticalCenter="0"
@@ -236,7 +236,7 @@
 										<![CDATA[
 											import org.openforis.collect.event.DataImportEvent;
 											import org.openforis.collect.event.EventDispatcherFactory;
-											import org.openforis.collect.remoting.service.dataImport.DataImportSummaryItemProxy;
+											import org.openforis.collect.remoting.service.dataimport.DataImportSummaryItemProxy;
 										]]>
 									</fx:Script>
 									<s:Button horizontalCenter="0" verticalCenter="0"
@@ -296,7 +296,7 @@
 											<![CDATA[
 												import org.openforis.collect.event.DataImportEvent;
 												import org.openforis.collect.event.EventDispatcherFactory;
-												import org.openforis.collect.remoting.service.dataImport.FileUnmarshallingErrorProxy;
+												import org.openforis.collect.remoting.service.dataimport.FileUnmarshallingErrorProxy;
 											]]>
 										</fx:Script>
 										<s:Button horizontalCenter="0" verticalCenter="0"

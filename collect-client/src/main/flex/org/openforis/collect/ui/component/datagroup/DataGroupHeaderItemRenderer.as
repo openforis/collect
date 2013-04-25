@@ -10,6 +10,12 @@ package org.openforis.collect.ui.component.datagroup
 	
 	import spark.components.supportClasses.ItemRenderer;
 	
+	/**
+	 * 
+	 * @author S. Ricci
+	 * 
+	 * 
+	 **/
 	public class DataGroupHeaderItemRenderer extends ItemRenderer {
 		
 		private var _parentEntity:EntityProxy;

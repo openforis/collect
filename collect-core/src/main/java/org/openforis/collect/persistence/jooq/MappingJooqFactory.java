@@ -24,10 +24,10 @@ public abstract class MappingJooqFactory<E> extends DialectAwareJooqFactory {
 	private static final long serialVersionUID = 1L;
 	
 	private TableField<?,Integer> idField;
-	private Sequence<?> idSequence;
+	private Sequence<? extends Number> idSequence;
 	private Class<E> clazz;
 	
-	public MappingJooqFactory(Connection conn, TableField<?,Integer> idField, Sequence<?> idSequence, Class<E> clazz) {
+	public MappingJooqFactory(Connection conn, TableField<?,Integer> idField, Sequence<? extends Number> idSequence, Class<E> clazz) {
 		super(conn);
 		this.idField = idField;
 		this.idSequence = idSequence;
@@ -110,6 +110,10 @@ public abstract class MappingJooqFactory<E> extends DialectAwareJooqFactory {
 		fromObject(object, insert);
 		return insert;
 	}
+
+	protected int nextId() {
+		return nextId(idField, idSequence);
+	}
 	
 	@SuppressWarnings({"rawtypes"})
 	public UpdateQuery updateQuery(E object) {
@@ -137,10 +141,6 @@ public abstract class MappingJooqFactory<E> extends DialectAwareJooqFactory {
 			entities.add(result);
 		}
 		return entities;
-	}
-
-	private int nextId() {
-		return nextval(idSequence).intValue();
 	}
 
 	private E newEntity() {

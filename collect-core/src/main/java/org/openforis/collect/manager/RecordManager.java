@@ -64,11 +64,22 @@ public class RecordManager {
 	
 	@Autowired
 	private RecordDao recordDao;
-	
+	private RecordConverter recordConverter;
 	private Map<Integer, RecordLock> locks;
+	private long lockTimeoutMillis;
+	private boolean lockingEnabled;
 	
-	private long lockTimeoutMillis = 60000;
+	public RecordManager() {
+		this(true);
+	}
 	
+	public RecordManager(boolean recordLockingEnabled) {
+		super();
+		this.lockingEnabled = recordLockingEnabled;
+		lockTimeoutMillis = 60000;
+		recordConverter = new RecordConverter();
+	}
+
 	protected void init() {
 		locks = new HashMap<Integer, RecordLock>();
 	}
@@ -87,16 +98,20 @@ public class RecordManager {
 			recordDao.insert(record);
 			id = record.getId();
 			//todo fix: concurrency problem may occur..
-			lock(id, user, sessionId);
+			if ( isLockingEnabled() ) {
+				lock(id, user, sessionId);
+			}
 		} else {
-			checkIsLocked(id, user, sessionId);
+			if ( isLockingEnabled() ) {
+				checkIsLocked(id, user, sessionId);
+			}
 			recordDao.update(record);
 		}
 	}
 
 	@Transactional
 	public void delete(int recordId) throws RecordPersistenceException {
-		if ( isLocked(recordId) ) {
+		if ( isLockingEnabled() && isLocked(recordId) ) {
 			RecordLock lock = getLock(recordId);
 			User lockUser = lock.getUser();
 			throw new RecordLockedException(lockUser.getName());
@@ -120,15 +135,17 @@ public class RecordManager {
 	 */
 	@Transactional
 	public synchronized CollectRecord checkout(CollectSurvey survey, User user, int recordId, int step, String sessionId, boolean forceUnlock) throws RecordLockedException, MultipleEditException {
-		isLockAllowed(user, recordId, sessionId, forceUnlock);
-		lock(recordId, user, sessionId, forceUnlock);
-		CollectRecord record = recordDao.load(survey, recordId, step);
-		return record;
+		if ( isLockingEnabled() ) {
+			isLockAllowed(user, recordId, sessionId, forceUnlock);
+			lock(recordId, user, sessionId, forceUnlock);
+		}
+		return load(survey, recordId, step);
 	}
 	
 	@Transactional
-	public CollectRecord load(CollectSurvey survey, int recordId, int step) throws RecordPersistenceException {
+	public CollectRecord load(CollectSurvey survey, int recordId, int step) {
 		CollectRecord record = recordDao.load(survey, recordId, step);
+		recordConverter.convertToLatestVersion(record);
 		return record;
 	}
 	
@@ -282,8 +299,10 @@ public class RecordManager {
 	
 	@Transactional
 	public void validate(CollectSurvey survey, User user, String sessionId, int recordId, Step step) throws RecordLockedException, MultipleEditException {
-		isLockAllowed(user, recordId, sessionId, true);
-		lock(recordId, user, sessionId, true);
+		if ( isLockingEnabled() ) {
+			isLockAllowed(user, recordId, sessionId, true);
+			lock(recordId, user, sessionId, true);
+		}
 		CollectRecord record = recordDao.load(survey, recordId, step.getStepNumber());
 		Entity rootEntity = record.getRootEntity();
 		addEmptyNodes(rootEntity);
@@ -291,7 +310,9 @@ public class RecordManager {
 		record.updateRootEntityKeyValues();
 		record.updateEntityCounts();
 		recordDao.update(record);
-		releaseLock(recordId);
+		if ( isLockingEnabled() ) {
+			releaseLock(recordId);
+		}
 	}
 	
 	public Entity addEntity(Entity parentEntity, String nodeName) {
@@ -318,7 +339,6 @@ public class RecordManager {
 	public void addEmptyNodes(Entity entity) {
 		Record record = entity.getRecord();
 		ModelVersion version = record.getVersion();
-		
 		addEmptyEnumeratedEntities(entity);
 		EntityDefinition entityDefn = entity.getDefinition();
 		List<NodeDefinition> childDefinitions = entityDefn.getChildDefinitions();
@@ -326,21 +346,12 @@ public class RecordManager {
 			if(version == null || version.isApplicable(childDefn)) {
 				String childName = childDefn.getName();
 				if(entity.getCount(childName) == 0) {
-					int count = 0;
 					int toBeInserted = entity.getEffectiveMinCount(childName);
-					if ( count == 0 && (childDefn instanceof AttributeDefinition || ! childDefn.isMultiple()) ) {
+					if ( toBeInserted <= 0 && childDefn instanceof AttributeDefinition || ! childDefn.isMultiple() ) {
 						//insert at least one node
 						toBeInserted = 1;
 					}
-					while(count < toBeInserted) {
-						if(childDefn instanceof AttributeDefinition) {
-							Node<?> createNode = childDefn.createNode();
-							entity.add(createNode);
-						} else if(childDefn instanceof EntityDefinition) {
-							addEntity(entity, childName);
-						}
-						count ++;
-					}
+					addEmptyChildren(entity, childDefn, toBeInserted);
 				} else {
 					List<Node<?>> children = entity.getAll(childName);
 					for (Node<?> child : children) {
@@ -351,6 +362,27 @@ public class RecordManager {
 				}
 			}
 		}
+	}
+
+	protected int addEmptyChildren(Entity entity, NodeDefinition childDefn, int toBeInserted) {
+		String childName = childDefn.getName();
+		CollectSurvey survey = (CollectSurvey) entity.getSurvey();
+		UIOptions uiOptions = survey.getUIOptions();
+		int count = 0;
+		boolean multipleEntityFormLayout = childDefn instanceof EntityDefinition && childDefn.isMultiple() && 
+				uiOptions != null && uiOptions.getLayout((EntityDefinition) childDefn) == Layout.FORM;
+		if ( ! multipleEntityFormLayout ) {
+			while(count < toBeInserted) {
+				if(childDefn instanceof AttributeDefinition) {
+					Node<?> createNode = childDefn.createNode();
+					entity.add(createNode);
+				} else if(childDefn instanceof EntityDefinition ) {
+					addEntity(entity, childName);
+				}
+				count ++;
+			}
+		}
+		return count;
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -433,19 +465,19 @@ public class RecordManager {
 		}
 	}
 
-	private void addEmptyEnumeratedEntities(Entity parentEntity, EntityDefinition enuberableEntityDefn) {
+	private void addEmptyEnumeratedEntities(Entity parentEntity, EntityDefinition enumerableEntityDefn) {
 		Record record = parentEntity.getRecord();
 		ModelVersion version = record.getVersion();
-		String enumeratedEntityName = enuberableEntityDefn.getName();
-		CodeAttributeDefinition enumeratingCodeDefn = getEnumeratingKeyCodeAttribute(enuberableEntityDefn, version);
+		CodeAttributeDefinition enumeratingCodeDefn = enumerableEntityDefn.getEnumeratingKeyCodeAttribute(version);
 		if(enumeratingCodeDefn != null) {
+			String enumeratedEntityName = enumerableEntityDefn.getName();
 			CodeList list = enumeratingCodeDefn.getList();
 			List<CodeListItem> items = list.getItems();
 			for (int i = 0; i < items.size(); i++) {
 				CodeListItem item = items.get(i);
 				if(version == null || version.isApplicable(item)) {
 					String code = item.getCode();
-					Entity enumeratedEntity = getEnumeratedEntity(parentEntity, enuberableEntityDefn, enumeratingCodeDefn, code);
+					Entity enumeratedEntity = getEnumeratedEntity(parentEntity, enumerableEntityDefn, enumeratingCodeDefn, code);
 					if( enumeratedEntity == null ) {
 						Entity addedEntity = addEntity(parentEntity, enumeratedEntityName, i);
 						//set the value of the key CodeAttribute
@@ -459,19 +491,6 @@ public class RecordManager {
 		}
 	}
 
-	private CodeAttributeDefinition getEnumeratingKeyCodeAttribute(EntityDefinition entity, ModelVersion version) {
-		List<AttributeDefinition> keys = entity.getKeyAttributeDefinitions();
-		for (AttributeDefinition key: keys) {
-			if(key instanceof CodeAttributeDefinition && (version == null || version.isApplicable(key))) {
-				CodeAttributeDefinition codeDefn = (CodeAttributeDefinition) key;
-				if(codeDefn.getList().getLookupTable() == null) {
-					return codeDefn;
-				}
-			}
-		}
-		return null;
-	}
-	
 	private Entity getEnumeratedEntity(Entity parentEntity, EntityDefinition childEntityDefn, 
 			CodeAttributeDefinition enumeratingCodeAttributeDef, String value) {
 		List<Node<?>> children = parentEntity.getAll(childEntityDefn.getName());
@@ -612,15 +631,28 @@ public class RecordManager {
 
 	/* --- END OF LOCKING METHODS --- */
 
-	/**
-	 * GETTERS AND SETTERS
-	 */
 	public long getLockTimeoutMillis() {
 		return lockTimeoutMillis;
 	}
 
 	public void setLockTimeoutMillis(long timeoutMillis) {
 		this.lockTimeoutMillis = timeoutMillis;
+	}
+	
+	public boolean isLockingEnabled() {
+		return lockingEnabled;
+	}
+	
+	public void setLockingEnabled(boolean lockingEnabled) {
+		this.lockingEnabled = lockingEnabled;
+	}
+	
+	public RecordDao getRecordDao() {
+		return recordDao;
+	}
+	
+	public void setRecordDao(RecordDao recordDao) {
+		this.recordDao = recordDao;
 	}
 }
 

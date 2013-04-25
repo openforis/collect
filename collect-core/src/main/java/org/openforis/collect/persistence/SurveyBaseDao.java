@@ -5,6 +5,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 
 import org.jooq.Record;
@@ -48,6 +49,11 @@ abstract class SurveyBaseDao extends JooqDaoSupport {
 		return (CollectSurvey) binder.unmarshal(is);
 	}
 
+	public CollectSurvey unmarshalIdml(Reader reader) throws IdmlParseException {
+		CollectSurveyIdmlBinder binder = new CollectSurveyIdmlBinder(surveyContext);
+		return (CollectSurvey) binder.unmarshal(reader);
+	}
+
 	public String marshalSurvey(Survey survey) throws SurveyImportException {
 		try {
 			// Serialize Survey to XML
@@ -66,6 +72,14 @@ abstract class SurveyBaseDao extends JooqDaoSupport {
 		} catch (IOException e) {
 			throw new SurveyImportException("Error marshalling survey", e);
 		}
+	}
+	
+	public CollectSurveyContext getSurveyContext() {
+		return surveyContext;
+	}
+	
+	public void setSurveyContext(CollectSurveyContext surveyContext) {
+		this.surveyContext = surveyContext;
 	}
 	
 }

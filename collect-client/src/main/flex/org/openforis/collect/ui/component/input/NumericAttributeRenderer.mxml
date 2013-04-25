@@ -42,6 +42,7 @@
 	<detail:states>
 		<s:State name="horizontal" />
 		<s:State name="vertical" />
+		<s:State name="vertical_form" />
 		<s:State name="noUnit" />
 		<s:State name="singleUnit" />
 		<s:State name="multipleUnits" />
@@ -62,9 +63,9 @@
 								  attributeDefinition="{attributeDefinition}"
 								  parentEntity="{parentEntity}"
 								  attribute="{attribute}"
-								  fieldIndex="1"
+								  fieldIndex="2"
 								  width="70"
-								  dataField="name"
+								  dataField="id"
 								  labelFunction="{unitLabelFunction}"
 								  dropDownLabelFunction="{unitDropDownLabelFunction}"
 								  />

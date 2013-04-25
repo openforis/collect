@@ -15,10 +15,14 @@
 			import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
 			import org.openforis.collect.model.proxy.EntityProxy;
 
+			public static const DIRECTION_HORIZONTAL:String = "horizontal";
+			public static const DIRECTION_VERTICAL:String = "vertical";
+			
 			private var _entityDefinition:EntityDefinitionProxy;
 			private var _nodeDefinitions:IList;
 			private var _modelVersion:ModelVersionProxy;
 			private var _entity:EntityProxy;
+			private var _nodesDirection:String = DIRECTION_HORIZONTAL;
 			
 			override protected function createChildren():void {
 				super.createChildren();
@@ -62,10 +66,22 @@
 				_entity = value;
 			}
 			
+			[Bindable]
+			public function get nodesDirection():String {
+				return _nodesDirection;
+			}
+			
+			public function set nodesDirection(value:String):void {
+				_nodesDirection = value;
+			}
 		]]>
 	</fx:Script>
 	
 	<fx:Declarations>
+		
+		<s:HorizontalLayout id="horizontalLayout" gap="4" />
+		<s:VerticalLayout id="verticalLayout" gap="2" />
+		
 		<s:Label id="rowNumberLabel"
 				 styleName="formLabel"
 				 visible="{entityDefinition.showRowNumbers}"
@@ -77,10 +93,8 @@
 				 textAlign="right"
 				 />
 		
-		<s:DataGroup id="dataGroup" dataProvider="{nodeDefinitions}">
-			<s:layout>
-				<s:HorizontalLayout gap="4" />
-			</s:layout>
+		<s:DataGroup id="dataGroup" dataProvider="{nodeDefinitions}" 
+					 layout="{nodesDirection == DIRECTION_HORIZONTAL ? horizontalLayout: verticalLayout}">
 			<s:itemRenderer>
 				<fx:Component>
 					<detail:FormDataGroupItemRenderer

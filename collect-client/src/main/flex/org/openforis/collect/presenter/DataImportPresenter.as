@@ -27,12 +27,12 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.event.UIEvent;
 	import org.openforis.collect.i18n.Message;
 	import org.openforis.collect.model.CollectRecord$Step;
-	import org.openforis.collect.remoting.service.dataImport.DataImportState$MainStep;
-	import org.openforis.collect.remoting.service.dataImport.DataImportState$SubStep;
-	import org.openforis.collect.remoting.service.dataImport.DataImportStateProxy;
-	import org.openforis.collect.remoting.service.dataImport.DataImportSummaryItemProxy;
-	import org.openforis.collect.remoting.service.dataImport.DataImportSummaryProxy;
-	import org.openforis.collect.remoting.service.dataImport.FileUnmarshallingErrorProxy;
+	import org.openforis.collect.remoting.service.dataimport.DataImportState$MainStep;
+	import org.openforis.collect.remoting.service.dataimport.DataImportState$SubStep;
+	import org.openforis.collect.remoting.service.dataimport.DataImportStateProxy;
+	import org.openforis.collect.remoting.service.dataimport.DataImportSummaryItemProxy;
+	import org.openforis.collect.remoting.service.dataimport.DataImportSummaryProxy;
+	import org.openforis.collect.remoting.service.dataimport.FileUnmarshallingErrorProxy;
 	import org.openforis.collect.ui.component.DataImportNodeErrorsPopUp;
 	import org.openforis.collect.ui.component.DataImportPopUp;
 	import org.openforis.collect.ui.view.DataImportView;

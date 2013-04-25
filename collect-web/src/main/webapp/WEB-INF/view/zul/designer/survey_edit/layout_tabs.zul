@@ -59,7 +59,7 @@
             onClick="@command('addTab', parent=null)" />
         </menupopup>
         <menupopup id="mainTabContextMenu">
-          <menuitem label="${labels.survey.layout.tab.add}" 
+           <menuitem label="${labels.survey.layout.tab.add}" 
             image="/assets/images/add-small.png"
             onClick="@command('addTab', parent=vm.selectedTab)" />
         </menupopup>

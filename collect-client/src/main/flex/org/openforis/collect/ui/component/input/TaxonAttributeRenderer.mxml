@@ -11,6 +11,7 @@
 		<![CDATA[
 			import org.openforis.collect.i18n.Message;
 			import org.openforis.collect.presenter.TaxonAttributePresenter;
+			import org.openforis.collect.ui.UIBuilder;
 			
 			override protected function initPresenter():void {
 				presenter = new TaxonAttributePresenter(this);
@@ -21,9 +22,10 @@
 	<detail:states>
 		<s:State name="horizontal" />
 		<s:State name="vertical" />
+		<s:State name="vertical_form" basedOn="vertical" />
 	</detail:states>
 	
-	<s:HGroup includeIn="horizontal" gap="6">
+	<s:HGroup includeIn="horizontal" gap="{UIBuilder.COMPOSITE_ATTRIBUTE_H_GAP}">
 		<input:StringInputField id="codeTextInput" 
 								includeIn="horizontal"
 								attributeDefinition="{attributeDefinition}"
@@ -71,27 +73,36 @@
 								/>
 	</s:HGroup>
 	
-	<s:VGroup includeIn="vertical">
-		<s:Label styleName="bold" text="{attributeDefinition.getLabelText()}" />
+	<s:VGroup includeIn="vertical, vertical_form">
+		<s:Label styleName="bold" 
+				 text="{attributeDefinition.getInstanceOrHeadingLabelText()}"
+				 includeIn="vertical_form" />
 		<s:VGroup>
 			<s:HGroup>
-				<s:Label width="{subLabelWidth}" styleName="bold" text="{Message.get('edit.taxon.code')}"/>
+				<s:Label width="{subLabelWidth}" 
+						 styleName="bold" 
+						 text="{Message.get('edit.taxon.code')}"
+						 includeIn="vertical_form" />
 				<fx:Reparent target="codeTextInput" includeIn="vertical" />
 			</s:HGroup>
 			<s:HGroup>
-				<s:Label width="{subLabelWidth}" styleName="bold" text="{Message.get('edit.taxon.scientificName')}"/>
+				<s:Label width="{subLabelWidth}" styleName="bold" text="{Message.get('edit.taxon.scientificName')}"
+						 includeIn="vertical_form" />
 				<fx:Reparent target="scientificNameTextInput" includeIn="vertical" />
 			</s:HGroup>
 			<s:HGroup>
-				<s:Label width="{subLabelWidth}" styleName="bold" text="{Message.get('edit.taxon.vernacularName')}"/>
+				<s:Label width="{subLabelWidth}" styleName="bold" text="{Message.get('edit.taxon.vernacularName')}"
+						 includeIn="vertical_form" />
 				<fx:Reparent target="vernacularNameTextInput" includeIn="vertical" />
 			</s:HGroup>
 			<s:HGroup>
-				<s:Label width="{subLabelWidth}" styleName="bold" text="{Message.get('edit.taxon.languageCode')}"/>
+				<s:Label width="{subLabelWidth}" styleName="bold" text="{Message.get('edit.taxon.languageCode')}"
+						 includeIn="vertical_form" />
 				<fx:Reparent target="languageAutocomplete" includeIn="vertical" />
 			</s:HGroup>
 			<s:HGroup>
-				<s:Label width="{subLabelWidth}" styleName="bold" text="{Message.get('edit.taxon.languageVariety')}"/>
+				<s:Label width="{subLabelWidth}" styleName="bold" text="{Message.get('edit.taxon.languageVariety')}"
+						 includeIn="vertical_form" />
 				<fx:Reparent target="languageVarietyTextInput" includeIn="vertical" />
 			</s:HGroup>
 		</s:VGroup>

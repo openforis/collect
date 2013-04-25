@@ -9,6 +9,7 @@ package org.openforis.collect.model.proxy {
 	import mx.collections.IList;
 	
 	import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
+	import org.openforis.collect.util.MathUtil;
 
 	/**
 	 * @author S. Ricci
@@ -18,11 +19,11 @@ package org.openforis.collect.model.proxy {
     public class NodeProxy extends NodeProxyBase {
 		
 		private var _definition:NodeDefinitionProxy;
-		
 		private var _index:int;
 		
 		public function init():void {
 			updateIndex();
+			setParentReferencesOnChildren();
 		}
 
 		public function hasErrors():Boolean {
@@ -63,22 +64,40 @@ package org.openforis.collect.model.proxy {
 			return getSibling(-offset);
 		}
 
-		public function getSibling(offset:int):NodeProxy {
+		public function getSibling(offset:int, circularLookup:Boolean = false):NodeProxy {
 			var result:NodeProxy = null;
 			var siblings:IList = getSiblings();
 			if ( siblings != null ) {
 				var itemIndex:int = siblings.getItemIndex(this);
+				var numSiblings:int = siblings.length;
 				var resultIndex:int = itemIndex + offset;
-				if ( resultIndex < 0 ) {
+				if ( circularLookup ) {
+					resultIndex = MathUtil.module(resultIndex, numSiblings);
+				} else if ( resultIndex < 0 ) {
 					resultIndex = 0;
-				} else if ( resultIndex > siblings.length - 1 ) {
-					resultIndex = siblings.length - 1;
+				} else if ( resultIndex >= numSiblings ) {
+					resultIndex = numSiblings - 1;
 				}
 				if ( resultIndex != itemIndex ) {
 					result = NodeProxy(siblings.getItemAt(resultIndex));
 				}
 			}
 			return result;
+		}
+		
+		protected function setParentReferencesOnChildren():void {
+			//to be implemented in subclasses
+		}
+		
+		public function getParentMultipleEntity():EntityProxy {
+			var currentParent:EntityProxy = parent;
+			while ( currentParent != null ) {
+				if ( currentParent.definition.multiple ) {
+					return currentParent;
+				}
+				currentParent = currentParent.parent;
+			}
+			return null;
 		}
 		
 		public function getSiblings():IList {
@@ -97,7 +116,7 @@ package org.openforis.collect.model.proxy {
 		public function set definition(value:NodeDefinitionProxy):void {
 			_definition = value;
 		}
-		
+
     }
 
 }

@@ -14,9 +14,11 @@ import org.zkoss.util.resource.Labels;
 public class ModelVersionFormValidator extends SurveyObjectFormValidator<ModelVersion> {
 	
 	protected static final String NAME_FIELD = "name";
+	protected static final String DATE_FIELD = "date";
 	
 	@Override
 	protected void internalValidate(ValidationContext ctx) {
+		validateRequired(ctx, DATE_FIELD);
 		validateName(ctx);
 	}
 

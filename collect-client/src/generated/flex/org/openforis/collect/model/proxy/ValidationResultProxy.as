@@ -6,48 +6,10 @@
  */
 
 package org.openforis.collect.model.proxy {
-	import org.openforis.collect.i18n.Message;
-	import org.openforis.collect.metamodel.proxy.LanguageSpecificTextProxy;
-	import org.openforis.collect.util.StringUtil;
 
-	/**
-	 * @author S. Ricci
-	 * */
     [Bindable]
     [RemoteClass(alias="org.openforis.collect.model.proxy.ValidationResultProxy")]
     public class ValidationResultProxy extends ValidationResultProxyBase {
 		
-		public function getMessage():String {
-			var result:String = LanguageSpecificTextProxy.getLocalizedText(messages);
-			if(StringUtil.isBlank(result)) {
-				if(ruleName == "ComparisonCheck") {
-					result = getComparisonCheckMessage();
-				} else if(messageKey != null) {
-					result = Message.get(messageKey, messageArgs);
-				} else {
-					result = ruleName;
-				}
-			}
-			return result;
-		}
-		
-		private function getComparisonCheckMessage():String {
-			var nodeLabel:String = messageArgs[0];
-			var argsAdapted:Array = [];
-			for (var index:int = 1; index < messageArgs.length; index ++) {
-				var arg:String = messageArgs[index];
-				var argParts:Array = arg.split(";");
-				var op:String = argParts[0];
-				var value:String = argParts[1];
-				var opMessageKey:String =  "edit.validation.compare." + op;
-				var operator:String = Message.get(opMessageKey);
-				var argAdapted:String = StringUtil.concat(" ", operator, value);
-				argsAdapted.push(argAdapted);
-			}
-			var andOperator:String = " " + Message.get("edit.validation.compare.and") + " ";
-			var argsConcat:String = StringUtil.concat(andOperator, argsAdapted);
-			var result:String = Message.get(messageKey, [nodeLabel, argsConcat]);
-			return result;
-		}
     }
 }

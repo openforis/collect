@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.openforis.idm.util.CollectionUtil;
+import org.openforis.commons.collection.CollectionUtils;
 
 /**
  * 
@@ -37,7 +37,7 @@ public class UITabSet implements Serializable {
 	}
 
 	public List<UITab> getTabs() {
-		return CollectionUtil.unmodifiableList(tabs);
+		return CollectionUtils.unmodifiableList(tabs);
 	}
 	
 	public UITab getTab(String name) {
@@ -72,7 +72,7 @@ public class UITabSet implements Serializable {
 	}
 
 	public void moveTab(UITab tab, int newIndex) {
-		CollectionUtil.moveItem(tabs, tab, newIndex);
+		CollectionUtils.shiftItem(tabs, tab, newIndex);
 	}
 
 	public UITab updateTab(String tabName, String newName, String newLabel, String language) {

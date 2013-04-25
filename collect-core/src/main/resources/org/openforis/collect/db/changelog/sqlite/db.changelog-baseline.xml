@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+	
+	<changeSet author="collect" id="baseline" dbms="sqlite">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<tableExists tableName="ofc_application_info" />
+			</not>
+		</preConditions>
+		<createTable tableName="ofc_application_info">
+			<column name="version" type="VARCHAR(25)">
+				<constraints nullable="false" />
+			</column>
+		</createTable>
+		<createTable tableName="ofc_config">
+			<column name="name" type="VARCHAR(25)">
+				<constraints nullable="false" primaryKey="true"
+					primaryKeyName="ofc_config_pkey" />
+			</column>
+			<column name="value" type="VARCHAR(255)">
+				<constraints nullable="false" />
+			</column>
+		</createTable>
+		<createTable tableName="ofc_logo">
+			<column name="pos" type="int4">
+				<constraints nullable="false" primaryKey="true"
+					primaryKeyName="ofc_logo_pkey" />
+			</column>
+			<column name="image" type="bytea">
+				<constraints nullable="false" />
+			</column>
+		</createTable>
+		<createTable tableName="ofc_record">
+			<column name="id" type="int4">
+				<constraints nullable="false" primaryKey="true"
+					primaryKeyName="ofc_record_pkey" />
+			</column>
+			<column name="survey_id" type="int4">
+				<constraints nullable="false"
+					foreignKeyName="ofc_record_survey_fkey" 
+					references="ofc_survey(id)" />
+			</column>
+			<column name="root_entity_definition_id" type="int4">
+				<constraints nullable="false" />
+			</column>
+			<column name="date_created" type="TIMESTAMP" />
+			<column name="created_by_id" type="int4">
+				<constraints foreignKeyName="ofc_record_created_by_user_fkey" 
+					references="ofc_user(id)" />
+			</column>
+			<column name="date_modified" type="TIMESTAMP" />
+			<column name="modified_by_id" type="int4">
+				<constraints foreignKeyName="ofc_record_modified_by_user_fkey" 
+					references="ofc_user(id)" />
+			</column>
+			<column name="model_version" type="VARCHAR(255)" />
+			<column name="step" type="int4" />
+			<column name="state" type="char(1)" />
+			<column name="skipped" type="int4" />
+			<column name="missing" type="int4" />
+			<column name="errors" type="int4" />
+			<column name="warnings" type="int4" />
+			<column name="key1" type="VARCHAR(2048)" />
+			<column name="key2" type="VARCHAR(2048)" />
+			<column name="key3" type="VARCHAR(2048)" />
+			<column name="count1" type="int4" />
+			<column name="count2" type="int4" />
+			<column name="count3" type="int4" />
+			<column name="count4" type="int4" />
+			<column name="count5" type="int4" />
+			<column name="data1" type="bytea" />
+			<column name="data2" type="bytea" />
+		</createTable>
+		<createTable tableName="ofc_sampling_design">
+			<column name="id" type="INTEGER">
+				<constraints nullable="false" primaryKey="true"
+					primaryKeyName="ofc_sampling_design_pkey" />
+			</column>
+			<column name="survey_id" type="INTEGER">
+				<constraints foreignKeyName="ofc_sampling_design_survey_fkey" 
+					references="ofc_survey(id)" />
+			</column>
+			<column name="survey_work_id" type="INTEGER">
+				<constraints foreignKeyName="ofc_sampling_design_survey_work_fkey" 
+					references="ofc_survey_work(id)" />
+			</column>
+			<column name="level1" type="VARCHAR(255)">
+				<constraints nullable="false" />
+			</column>
+			<column name="level2" type="VARCHAR(255)" />
+			<column name="level3" type="VARCHAR(255)" />
+			<column name="location" type="VARCHAR(255)">
+			  <constraints nullable="false" />
+			</column>
+	    </createTable>
+		<createTable tableName="ofc_survey">
+			<column name="id" type="int4">
+				<constraints nullable="false" primaryKey="true"
+					primaryKeyName="ofc_survey_pkey" />
+			</column>
+			<column name="name" type="VARCHAR(255)">
+				<constraints nullable="false" unique="true" 
+					uniqueConstraintName="ofc_survey_name_key" />
+			</column>
+			<column name="uri" type="VARCHAR(255)">
+				<constraints nullable="false" unique="true"
+					uniqueConstraintName="ofc_survey_uri_key" />
+			</column>
+			<column name="idml" type="TEXT">
+				<constraints nullable="false" />
+			</column>
+		</createTable>
+		<createTable tableName="ofc_survey_work">
+			<column name="id" type="int4">
+				<constraints nullable="false" primaryKey="true"
+					primaryKeyName="ofc_survey_work_pkey" />
+			</column>
+			<column name="name" type="VARCHAR(255)">
+				<constraints nullable="false" unique="true"
+					uniqueConstraintName="ofc_survey_work_name_key" />
+			</column>
+			<column name="uri" type="VARCHAR(255)">
+				<constraints nullable="false" unique="true"
+					uniqueConstraintName="ofc_survey_work_uri_key" />
+			</column>
+			<column name="idml" type="TEXT">
+				<constraints nullable="false" />
+			</column>
+		</createTable>
+		<createTable tableName="ofc_taxon">
+			<column name="id" type="int4">
+				<constraints nullable="false" primaryKey="true"
+					primaryKeyName="ofc_taxon_pkey" />
+			</column>
+			<column name="taxon_id" type="int4" />
+			<column name="code" type="VARCHAR(32)" />
+			<column name="scientific_name" type="VARCHAR(255)">
+				<constraints nullable="false" />
+			</column>
+			<column name="taxon_rank" type="VARCHAR(128)">
+				<constraints nullable="false" />
+			</column>
+			<column name="taxonomy_id" type="int4">
+				<constraints nullable="false" 
+					foreignKeyName="ofc_taxon_taxonomy_fkey" 
+					references="ofc_taxonomy(id)" />
+			</column>
+			<column name="step" type="int4">
+				<constraints nullable="false" />
+			</column>
+			<column name="parent_id" type="int4">
+				<constraints foreignKeyName="ofc_taxon_parent_fkey" 
+					references="ofc_taxon(id)" />
+			</column>
+		</createTable>
+		<createTable tableName="ofc_taxon_vernacular_name">
+			<column name="id" type="int4">
+				<constraints nullable="false" primaryKey="true"
+					primaryKeyName="ofc_taxon_vernacular_name_pkey" />
+			</column>
+			<column name="vernacular_name" type="VARCHAR(255)" />
+			<column name="language_code" type="VARCHAR(3)">
+				<constraints nullable="false" />
+			</column>
+			<column name="language_variety" remarks="Dialect, lect, sublanguage or other"
+				type="VARCHAR(255)" />
+			<column name="taxon_id" type="int4">
+				<constraints foreignKeyName="ofc_taxon_vernacular_name_taxon_fkey" 
+					references="ofc_taxon(id)" />
+			</column>
+			<column name="step" type="int4">
+				<constraints nullable="false" />
+			</column>
+			<column name="qualifier1" type="VARCHAR(255)" />
+			<column name="qualifier2" type="VARCHAR(255)" />
+			<column name="qualifier3" type="VARCHAR(255)" />
+		</createTable>
+		<createTable tableName="ofc_taxonomy">
+			<column name="id" type="int4">
+				<constraints nullable="false" primaryKey="true"
+					primaryKeyName="ofc_taxonomy_pkey" />
+			</column>
+			<column name="survey_id" type="INTEGER">
+				<constraints foreignKeyName="ofc_taxonomy_survey_fkey" 
+					references="ofc_survey_work(id)" />
+			</column>
+			<column name="survey_work_id" type="INTEGER">
+				<constraints foreignKeyName="ofc_taxonomy_survey_work_fkey" 
+					references="ofc_survey_work(id)" />
+			</column>
+			<column name="name" type="VARCHAR(255)">
+				<constraints nullable="false" />
+			</column>
+			<column name="metadata" type="TEXT">
+				<constraints nullable="false" />
+			</column>
+		</createTable>
+		<createTable tableName="ofc_user">
+			<column name="id" type="int4">
+				<constraints nullable="false" primaryKey="true"
+					primaryKeyName="ofc_user_pkey" />
+			</column>
+			<column name="username" type="VARCHAR(255)">
+				<constraints nullable="false" unique="true"
+					uniqueConstraintName="ofc_user_username_key" />
+			</column>
+			<column name="password" type="VARCHAR(255)">
+				<constraints nullable="false" />
+			</column>
+			<column defaultValue="Y" name="enabled" type="char(1)">
+				<constraints nullable="false" />
+			</column>
+		</createTable>
+		<createTable tableName="ofc_user_role">
+			<column name="id" type="int4">
+				<constraints nullable="false" primaryKey="true"
+					primaryKeyName="ofc_user_role_pkey" />
+			</column>
+			<column name="user_id" type="int4">
+				<constraints nullable="false"
+					foreignKeyName="ofc_user_user_role_fkey" 
+					references="ofc_user(id)" />
+			</column>
+			<column name="role" type="VARCHAR(255)" />
+		</createTable>
+		
+		<!-- SQLite does not support addUniqueConstrain, cannot add these constraints while creating tables -->
+<!-- 		<addUniqueConstraint columnNames="taxon_id, taxonomy_id" -->
+<!-- 			constraintName="ofc_taxon_id_key" deferrable="false" disabled="false" -->
+<!-- 			initiallyDeferred="false" schemaName="collect" tableName="ofc_taxon" /> -->
+<!-- 		<addUniqueConstraint constraintName="ofc_taxonomy_name_key" -->
+<!-- 			tableName="ofc_taxonomy" -->
+<!-- 			columnNames="survey_id,name" /> -->
+<!-- 	    <addUniqueConstraint constraintName="ofc_taxonomy_name_work_key" -->
+<!-- 			tableName="ofc_taxonomy" -->
+<!-- 			columnNames="survey_work_id,name" /> -->
+		
+		<!-- INSERT VERSION -->
+		<insert tableName="ofc_application_info">
+			<column name="version" value="3.0-Alpha5" />
+		</insert>
+		<!-- INSERT "admin" USER WITH DEFAULT PASSWORD "admin" -->
+		<insert tableName="ofc_user">
+			<column name="id" value="1" />
+			<column name="username" value="admin" />
+			<column name="password" value="21232f297a57a5a743894a0e4a801fc3" />
+			<column name="enabled" value="Y" />
+		</insert>
+		<insert tableName="ofc_user_role">
+			<column name="id" value="1" />
+			<column name="user_id" value="1" />
+			<column name="role" value="ROLE_ADMIN" />
+		</insert>
+	</changeSet>
+</databaseChangeLog>

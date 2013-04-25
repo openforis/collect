@@ -9,6 +9,7 @@ package org.openforis.collect.presenter {
 	import flash.ui.Keyboard;
 	
 	import mx.binding.utils.ChangeWatcher;
+	import mx.collections.IList;
 	import mx.managers.PopUpManager;
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.events.ResultEvent;
@@ -25,6 +26,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.model.proxy.RecordProxy;
 	import org.openforis.collect.model.proxy.UserProxy;
+	import org.openforis.collect.remoting.service.UpdateResponse;
 	import org.openforis.collect.ui.UIBuilder;
 	import org.openforis.collect.ui.component.ErrorListPopUp;
 	import org.openforis.collect.ui.component.detail.FormContainer;
@@ -49,6 +51,7 @@ package org.openforis.collect.presenter {
 		override internal function initEventListeners():void {
 			_view.backToListButton.addEventListener(MouseEvent.CLICK, backToListButtonClickHandler);
 			_view.saveButton.addEventListener(MouseEvent.CLICK, saveButtonClickHandler);
+			_view.autoSaveCheckBox.addEventListener(MouseEvent.CLICK, autoSaveCheckBoxClickHandler);
 			_view.submitButton.addEventListener(MouseEvent.CLICK, submitButtonClickHandler);
 			_view.rejectButton.addEventListener(MouseEvent.CLICK, rejectButtonClickHandler);
 			eventDispatcher.addEventListener(ApplicationEvent.UPDATE_RESPONSE_RECEIVED, updateResponseReceivedHandler);
@@ -92,6 +95,9 @@ package org.openforis.collect.presenter {
 				_view.rejectButton.label = step == CollectRecord$Step.ANALYSIS ? Message.get("edit.unlock"): Message.get("edit.reject");
 			}
 			_view.saveButton.visible = canSave;
+			_view.updateStatusLabel.text = null;
+			_view.autoSaveCheckBox.visible = canSave;
+			_view.updateStatusLabel.visible = canSave;
 			
 			var rootEntityDefn:EntityDefinitionProxy = Application.activeRootEntity;
 			var form:FormContainer = null;
@@ -110,14 +116,17 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function recordSavedHandler(event:ApplicationEvent):void {
-			var rootEntityLabel:String = Application.activeRootEntity.getLabelText()
-			_view.recordSavedMessage.text = Message.get("edit.recordSaved", [rootEntityLabel]);
-			_view.recordSavedMessage.show();
+			var rootEntityLabel:String = Application.activeRootEntity.getInstanceOrHeadingLabelText();
+			_view.messageDisplay.show(Message.get("edit.recordSaved", [rootEntityLabel]));
+		}
+		
+		protected function autoSaveCheckBoxClickHandler(event:MouseEvent):void {
+			Application.autoSave = _view.autoSaveCheckBox.selected;
 		}
 		
 		protected function updateRecordKeyLabel(event:Event = null):void {
 			var result:String;
-			var rootEntityLabel:String = Application.activeRootEntity.getLabelText();
+			var rootEntityLabel:String = Application.activeRootEntity.getInstanceOrHeadingLabelText();
 			var keyText:String = Application.activeRecord.rootEntity.keyText;
 			if(StringUtil.isBlank(keyText) && isNaN(Application.activeRecord.id)) {
 				result = Message.get('edit.newRecordKeyLabel', [rootEntityLabel]);
@@ -151,7 +160,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function performSaveActiveRecord():void {
-			_dataClient.saveActiveRecord(saveActiveRecordResultHandler, faultHandler);
+			_dataClient.saveActiveRecord(saveActiveRecordResultHandler, faultHandler, Application.autoSave);
 		}
 		
 		protected function submitButtonClickHandler(event:MouseEvent):void {
@@ -228,7 +237,7 @@ package org.openforis.collect.presenter {
 		
 		internal function promoteRecordResultHandler(event:ResultEvent, token:Object = null):void {
 			var rootEntity:EntityDefinitionProxy = Application.activeRootEntity;
-			var rootEntityLabel:String = rootEntity.getLabelText();
+			var rootEntityLabel:String = rootEntity.getInstanceOrHeadingLabelText();
 			var r:RecordProxy = Application.activeRecord;
 			var keyLabel:String = r.rootEntity.keyText;
 			var actualStep:CollectRecord$Step = getNextStep(r.step);
@@ -241,7 +250,7 @@ package org.openforis.collect.presenter {
 		
 		internal function rejectRecordResultHandler(event:ResultEvent, token:Object = null):void {
 			var rootEntity:EntityDefinitionProxy = Application.activeRootEntity;
-			var rootEntityLabel:String = rootEntity.getLabelText();
+			var rootEntityLabel:String = rootEntity.getInstanceOrHeadingLabelText();
 			var r:RecordProxy = Application.activeRecord;
 			var keyLabel:String = r.rootEntity.keyText;
 			var actualStep:CollectRecord$Step = getPreviousStep(r.step);
@@ -253,7 +262,13 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function updateResponseReceivedHandler(event:ApplicationEvent):void {
-			//update 
+			var updateMessageKey:String;
+			if ( Application.activeRecord.updated ) {
+				updateMessageKey = "edit.changes_not_saved";
+			} else {
+				updateMessageKey = "edit.all_changes_saved";
+			}
+			_view.updateStatusLabel.text = Message.get(updateMessageKey);
 		}
 		
 		protected function stageKeyDownHandler(event:KeyboardEvent):void {
@@ -272,7 +287,6 @@ package org.openforis.collect.presenter {
 					return CollectRecord$Step.ANALYSIS;
 				default:
 					return null;
-					
 			}
 		}
 		

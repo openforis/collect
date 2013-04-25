@@ -5,17 +5,23 @@ package org.openforis.collect.designer.viewmodel;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.io.Reader;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.openforis.collect.designer.form.validator.FormValidator;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SurveySummary;
 import org.openforis.collect.persistence.SurveyImportException;
+import org.zkoss.bind.BindContext;
 import org.zkoss.bind.BindUtils;
+import org.zkoss.bind.ValidationContext;
+import org.zkoss.bind.Validator;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.ContextParam;
 import org.zkoss.bind.annotation.ContextType;
@@ -30,21 +36,27 @@ import org.zkoss.zk.ui.select.annotation.WireVariable;
  */
 public class SurveyImportVM extends SurveyBaseVM {
 
-	private static final Log log = Log.lookup(SurveyImportVM.class);
-
+	private static final String SURVEY_NAME_FIELD = "surveyName";
 	private static final String TEXT_XML_CONTENT = "text/xml";
+
+	private static final Log log = Log.lookup(SurveyImportVM.class);
 	
 	@WireVariable
 	private SurveyManager surveyManager;
 
-	private String surveyName;
+	private Map<String,String> form;
+	
 	private String fileName;
 	private CollectSurvey uploadedSurvey;
-
+	
+	public SurveyImportVM() {
+		form = new HashMap<String, String>();
+	}
+	
 	@Command
-	public void importSurvey() {
-		if ( validateForm() ) {
-			final String name = surveyName;
+	public void importSurvey(@ContextParam(ContextType.BIND_CONTEXT) BindContext ctx) {
+		if ( validateForm(ctx) ) {
+			final String name = getSurveyNameValue();
 			if ( existsSurveyWithName(name) ) {
 				Object[] args = new String[] {name};
 				MessageUtil.showConfirm(new MessageUtil.ConfirmHandler() {
@@ -59,8 +71,9 @@ public class SurveyImportVM extends SurveyBaseVM {
 		}
 	}
 	
-	protected boolean validateForm() {
-		if (StringUtils.isBlank(surveyName) ) {
+	protected boolean validateForm(BindContext ctx) {
+		String surveyName = getSurveyNameValue();
+		if (StringUtils.isBlank(surveyName ) ) {
 			MessageUtil.showWarning("survey.import_survey.specify_name");
 			return false;
 		} else if ( uploadedSurvey == null ) {
@@ -74,22 +87,45 @@ public class SurveyImportVM extends SurveyBaseVM {
 		}
 	}
 
+	private String getSurveyNameValue() {
+		return (String) form.get(SURVEY_NAME_FIELD);
+	}
+	
+	public Validator getNameValidator() {
+		return new FormValidator() {
+			@Override
+			protected void internalValidate(ValidationContext ctx) {
+				boolean result = validateRequired(ctx, SURVEY_NAME_FIELD);
+				if ( result ) {
+					result = validateInternalName(ctx, SURVEY_NAME_FIELD);
+				}
+			}
+		};
+	}
+
 	@Command
 	public void fileUploaded(@ContextParam(ContextType.TRIGGER_EVENT) UploadEvent event) {
-		Media media = event.getMedia();
+ 		Media media = event.getMedia();
 		String contentType = media.getContentType();
 		if ( contentType.equals(TEXT_XML_CONTENT) ) {
 			fileName = media.getName();
-			InputStream is = getInputStream(media);
-			uploadedSurvey = unmarshalSurvey(is);
+			Reader reader = media.getReaderData();
+			uploadedSurvey = unmarshalSurvey(reader);
 			notifyChange("fileName","uploadedSurvey");
+			String surveyName = getSurveyNameValue();
+			if ( StringUtils.isEmpty(surveyName) ) {
+				surveyName = FilenameUtils.removeExtension(fileName);
+				form.put(SURVEY_NAME_FIELD, surveyName);
+				notifyChange("form");
+			}
 		} else {
-			throw new IllegalArgumentException("File type not supported");
+			MessageUtil.showError("survey.import_survey.error_file_type_not_supported");
 		}
 	}
 
 	protected InputStream getInputStream(Media media) {
 		try {
+			media.getStreamData();
 			String stringData = media.getStringData();
 			byte[] bytes = stringData.getBytes("UTF-8");
 			ByteArrayInputStream is = new ByteArrayInputStream(bytes);
@@ -129,10 +165,10 @@ public class SurveyImportVM extends SurveyBaseVM {
 		return  collidingSurvey != null && ! collidingSurvey.getName().equals(surveyName);
 	}
 
-	protected CollectSurvey unmarshalSurvey(InputStream is) {
+	protected CollectSurvey unmarshalSurvey(Reader reader) {
 		CollectSurvey survey = null;
 		try {
-			survey = surveyManager.unmarshalSurvey(is);
+			survey = surveyManager.unmarshalSurvey(reader);
 		} catch(Exception e) {
 			log.error(e);
 			Object[] args = new String[]{e.getMessage()};
@@ -174,14 +210,6 @@ public class SurveyImportVM extends SurveyBaseVM {
 		return null;
 	}
 	
-	public String getSurveyName() {
-		return surveyName;
-	}
-
-	public void setSurveyName(String surveyName) {
-		this.surveyName = surveyName;
-	}
-	
 	public String getFileName() {
 		return fileName;
 	}
@@ -190,4 +218,11 @@ public class SurveyImportVM extends SurveyBaseVM {
 		return uploadedSurvey;
 	}
 	
+	public Map<String, String> getForm() {
+		return form;
+	}
+	
+	public void setForm(Map<String, String> form) {
+		this.form = form;
+	}
 }

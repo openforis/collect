@@ -12,7 +12,9 @@ import org.openforis.idm.metamodel.EntityDefinition;
  */
 public class BooleanAttributeDefinitionFormObject<T extends BooleanAttributeDefinition> extends AttributeDefinitionFormObject<T> {
 	
-	enum Type {
+	public static final String TYPE_FIELD = "typeValue";
+
+	public enum Type {
 		THREE_STATE, AFFIRMATIVE_ONLY
 	}
 	

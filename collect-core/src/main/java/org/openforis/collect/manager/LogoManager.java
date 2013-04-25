@@ -20,6 +20,27 @@ public class LogoManager {
 	@Transactional
 	public byte[] loadLogo(int id) {
 		Logo logo = logoDao.loadById(id);
-		return logo.getImage();
+		if ( logo == null ) {
+			return null;
+		} else {
+			return logo.getImage();
+		}
+	}
+	
+	@Transactional
+	public void save(Logo logo) {
+		int position = logo.getPosition();
+		Logo oldLogo = logoDao.loadById(position);
+		if ( oldLogo == null ) {
+			logoDao.insert(logo);
+		} else {
+			logoDao.update(logo);
+		}
+	}
+	
+	@Transactional
+	public void delete(Logo logo) {
+		int position = logo.getPosition();
+		logoDao.delete(position);
 	}
 }

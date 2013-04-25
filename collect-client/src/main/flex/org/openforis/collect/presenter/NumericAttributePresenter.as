@@ -66,18 +66,18 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function createUpdateUnitOperation():UpdateRequestOperation {
-			var numberAttrDefn:NumberAttributeDefinitionProxy = NumberAttributeDefinitionProxy(view.attributeDefinition);
+			var attrDefn:NumberAttributeDefinitionProxy = NumberAttributeDefinitionProxy(view.attributeDefinition);
 			var result:UpdateRequestOperation = null;
 			if(view.unitInputField != null) {
 				result = view.unitInputField.presenter.createUpdateValueOperation();
-			} else if ( numberAttrDefn.defaultUnit != null ) {
+			} else if ( attrDefn.defaultUnit != null ) {
 				result = new UpdateRequestOperation();
 				result.method = UpdateRequestOperation$Method.UPDATE;
 				result.parentEntityId = view.attribute.parentId;
 				result.nodeName = view.attributeDefinition.name;
 				result.nodeId = view.attribute.id;
-				result.fieldIndex = 1;
-				result.value = numberAttrDefn.defaultUnit.name;
+				result.fieldIndex = 2;
+				result.value = String(attrDefn.defaultUnit.id);
 			}
 			return result;
 		}
@@ -108,7 +108,7 @@ package org.openforis.collect.presenter {
 					view.currentState = NumericAttributeRenderer.MULTIPLE_UNIT_STATE;
 					view.unitInputField.dataProvider = units;
 					if(attrDefn.defaultUnit != null) {
-						view.unitInputField.defaultValue = attrDefn.defaultUnit.name;
+						view.unitInputField.defaultValue = String(attrDefn.defaultUnit.id);
 					}
 				}
 			}

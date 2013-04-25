@@ -38,10 +38,11 @@
 			}
 		]]>
 	</fx:Script>
-
+	
 	<detail:states>
 		<s:State name="horizontal" />
 		<s:State name="vertical" />
+		<s:State name="vertical_form" basedOn="vertical" />
 	</detail:states>
 	
 	<s:HGroup includeIn="horizontal" gap="6">
@@ -50,7 +51,7 @@
 								  parentEntity="{parentEntity}"
 								  attribute="{attribute}"
 								  fieldIndex="2"
-								  width="70" 
+								  width="100" 
 								  dataField="id"
 								  includeIn="horizontal" 
 								  itemCreationPolicy="immediate"
@@ -63,27 +64,41 @@
 								 parentEntity="{parentEntity}"
 								 attribute="{attribute}"
 								 fieldIndex="1"
+								 width="70"
 								 />
 		<input:NumericInputField id="xTextInput" includeIn="horizontal" itemCreationPolicy="immediate"
 								 attributeDefinition="{attributeDefinition}"
 								 parentEntity="{parentEntity}"
 								 attribute="{attribute}"
 								 fieldIndex="0"
+								 width="70"
 								 />
 	</s:HGroup>
 	
-	<s:VGroup includeIn="vertical" gap="2">
+	<s:VGroup includeIn="vertical, vertical_form" gap="2">
 		<s:VGroup>
 			<s:HGroup gap="0">
-				<s:Label width="{subLabelWidth}" styleName="bold" text="{Message.get('edit.coordinate.srs')}"/>
+				<s:Label width="{subLabelWidth}" 
+						 styleName="bold" 
+						 showTruncationTip="true"
+						 text="{Message.get('edit.coordinate.srs')}"
+						 includeIn="vertical_form" />
 				<fx:Reparent target="srsDropDownList" includeIn="vertical" />
 			</s:HGroup>
 			<s:HGroup gap="0">
-				<s:Label width="{subLabelWidth}" styleName="bold" text="{Message.get('edit.coordinate.y')}"/>
+				<s:Label width="{subLabelWidth}" 
+						 styleName="bold" 
+						 showTruncationTip="true"
+						 text="{Message.get('edit.coordinate.y')}"
+						 includeIn="vertical_form" />
 				<fx:Reparent target="yTextInput" includeIn="vertical" />
 			</s:HGroup>
 			<s:HGroup gap="0">
-				<s:Label width="{subLabelWidth}" styleName="bold" text="{Message.get('edit.coordinate.x')}"/>
+				<s:Label width="{subLabelWidth}" 
+						 styleName="bold" 
+						 showTruncationTip="true"
+						 text="{Message.get('edit.coordinate.x')}"
+						 includeIn="vertical_form" />
 				<fx:Reparent target="xTextInput" includeIn="vertical" />
 			</s:HGroup>
 		</s:VGroup>

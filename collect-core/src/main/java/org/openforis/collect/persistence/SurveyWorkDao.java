@@ -13,6 +13,7 @@ import org.jooq.impl.Factory;
 import org.jooq.impl.SQLDataType;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SurveySummary;
+import org.openforis.collect.persistence.jooq.DialectAwareJooqFactory;
 import org.openforis.idm.metamodel.xml.IdmlParseException;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -70,12 +71,34 @@ public class SurveyWorkDao extends SurveyBaseDao {
 		}
 		return surveys;
 	}
+	
+	@Transactional
+	public SurveySummary loadSurveySummary(int id) {
+		Factory jf = getJooqFactory();
+		Record record = jf.select()
+				.from(OFC_SURVEY_WORK)
+				.where(OFC_SURVEY_WORK.ID.equal(id))
+				.fetchOne();
+		SurveySummary result = processSurveySummaryRow(record);
+		return result;
+	}
+
+	@Transactional
+	public SurveySummary loadSurveySummaryByName(String name) {
+		Factory jf = getJooqFactory();
+		Record record = jf.select()
+				.from(OFC_SURVEY_WORK)
+				.where(OFC_SURVEY_WORK.NAME.equal(name))
+				.fetchOne();
+		SurveySummary result = processSurveySummaryRow(record);
+		return result;
+	}
 
 	@Transactional
 	public void insert(CollectSurvey survey) throws SurveyImportException {
 		String idml = marshalSurvey(survey);
-		Factory jf = getJooqFactory();
-		int surveyId = jf.nextval(OFC_SURVEY_WORK_ID_SEQ).intValue();
+		DialectAwareJooqFactory jf = getJooqFactory();
+		int surveyId = jf.nextId(OFC_SURVEY_WORK.ID, OFC_SURVEY_WORK_ID_SEQ);
 		jf.insertInto(OFC_SURVEY_WORK).set(OFC_SURVEY_WORK.ID, surveyId)				
 				.set(OFC_SURVEY_WORK.NAME, survey.getName())
 				.set(OFC_SURVEY_WORK.URI, survey.getUri())

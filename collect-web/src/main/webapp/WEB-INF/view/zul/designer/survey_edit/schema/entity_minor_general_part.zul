@@ -1,0 +1,20 @@
+<zk>
+  <grid class="inner">
+    <columns>
+      <column width="150px" />
+      <column />
+    </columns>
+    <rows>
+      <row visible="${not vm.rootEntity}">
+        <label value="${labels.survey.schema.entity.show_row_numbers}:" />
+        <checkbox checked="@bind(fx.showRowNumbers)"
+          onCheck="@command('applyChanges')" />
+      </row>
+      <row visible="${not vm.rootEntity}">
+        <label value="${labels.survey.schema.entity.count_in_record_summary}:" />
+        <checkbox checked="@bind(fx.countInRecordSummary)"
+          onCheck="@command('applyChanges')" />
+      </row>
+    </rows>
+  </grid>
+</zk>
