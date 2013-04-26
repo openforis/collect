@@ -8,6 +8,7 @@ import liquibase.database.structure.Column;
 import liquibase.database.structure.ForeignKey;
 import liquibase.database.structure.PrimaryKey;
 import liquibase.database.structure.Table;
+import liquibase.database.typeconversion.TypeConverterFactory;
 import liquibase.diff.DiffStatusListener;
 import liquibase.exception.DatabaseException;
 import liquibase.snapshot.DatabaseSnapshot;
@@ -73,7 +74,8 @@ public class CollectDatabaseSnapshotGenerator implements DatabaseSnapshotGenerat
 		// Create table
 		for (org.openforis.collect.relational.model.Table<?> itable : schema.getTables()) {
 			Table ltable = new Table(itable.getName());
-			ltable.setDatabase(snapshot.getDatabase());
+			Database db = snapshot.getDatabase();
+			ltable.setDatabase(db);
 			ltable.setSchema(schema.getName());
 			ltable.setRawSchemaName(schema.getName());
 			// Create columns
@@ -83,6 +85,7 @@ public class CollectDatabaseSnapshotGenerator implements DatabaseSnapshotGenerat
 				lcolumn.setName(icolumn.getName());
 				lcolumn.setNullable(icolumn.isNullable());
 				lcolumn.setDataType(icolumn.getType());
+				lcolumn.setTypeName(icolumn.getTypeName());
 				if ( icolumn.getLength() != null ) {
 					lcolumn.setColumnSize(icolumn.getLength());
 				}

@@ -8,7 +8,6 @@ import javax.xml.namespace.QName;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
-import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
 import org.openforis.idm.metamodel.DateAttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.FieldDefinition;
@@ -29,7 +28,6 @@ import org.openforis.idm.path.Path;
  */
 
 // ASAP:
-// TODO map coordinate fields to 3 columns
 // TODO finish schema generation (to Postgresql)
 // TODO Collect RDB <==> jOOQ adapters
 // TODO insert data into database with jOOQ adapters
@@ -50,7 +48,7 @@ public class RelationalSchemaGenerator {
 	private String dataTablePrefix = "";
 	private String otherColumnSuffix = "other";
 	private int textMaxLength = 255;
-	private Integer memoMaxLength = 2048;
+	private int memoMaxLength = 2048;
 	
 	public RelationalSchema generateSchema(Survey survey, String schemaName) throws SchemaGenerationException {
 		RelationalSchema rs = new RelationalSchema(survey, schemaName);
@@ -62,7 +60,6 @@ public class RelationalSchemaGenerator {
 	public String getIdColumnName() {
 		return idColumnName;
 	}
-
 
 	public void setIdColumnName(String idColumnName) {
 		this.idColumnName = idColumnName;
@@ -94,7 +91,6 @@ public class RelationalSchemaGenerator {
 
 	private void addCodeListTables(RelationalSchema rs) throws SchemaGenerationException {
 		// TODO Auto-generated method stub
-		
 	}
 
 	private void addDataTables(RelationalSchema rs) throws SchemaGenerationException {
@@ -168,7 +164,6 @@ public class RelationalSchemaGenerator {
 		}
 		return table;
 	}
-
 	
 	private String getDataTableName(DataTable parentTable, NodeDefinition defn) {
 		String name = defn.getAnnotation(TABLE_NAME_QNAME);
@@ -200,8 +195,7 @@ public class RelationalSchemaGenerator {
 		} else if ( defn instanceof NumericAttributeDefinition ) {
 			addDataColumns(table, (NumericAttributeDefinition) defn, relativePath);
 		} else if ( defn instanceof DateAttributeDefinition || 
-					defn instanceof TimeAttributeDefinition || 
-					defn instanceof CoordinateAttributeDefinition ) {
+					defn instanceof TimeAttributeDefinition ) {
 			addDataColumn(table, defn, relativePath);
 		} else {
 			for (FieldDefinition<?> field : fieldDefinitions) {
@@ -280,8 +274,6 @@ public class RelationalSchemaGenerator {
 				} 
 				return textMaxLength;
 			} 
-		} else if ( defn instanceof CoordinateAttributeDefinition ) {
-			return 255;
 		} 
 		return null;
 	}
