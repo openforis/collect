@@ -42,8 +42,10 @@ public class CoordinateAttributeVM extends AttributeVM<CoordinateAttributeDefini
 			messageKey = "survey.schema.attribute.coordinate.fields_order.srs_x_y";
 			break;
 		case SRS_Y_X:
-		default:
 			messageKey = "survey.schema.attribute.coordinate.fields_order.srs_y_x";
+			break;
+		default:
+			messageKey = enumValue.name();
 		}
 		return Labels.getLabel(messageKey);
 	}

@@ -3,11 +3,13 @@
 	<custom-attributes otherGeneralDetailsForm="${arg.otherGeneralDetailsForm}" />
 	<custom-attributes otherMinorGeneralDetailsForm="${arg.otherMinorGeneralDetailsForm}" />
 	<custom-attributes otherAttributesForm="${arg.otherAttributesForm}" />
-
+	<custom-attributes otherLayoutForm="${arg.otherLayoutForm}"/>
+  
 	<include src="survey_edit/schema/node_common.zul"
 		otherGeneralDetailsForm="${otherGeneralDetailsForm}"
 		otherMinorGeneralDetailsForm="${otherMinorGeneralDetailsForm}"
-		otherAttributesForm="${otherAttributesForm}" />
+		otherAttributesForm="${otherAttributesForm}"
+		otherLayoutForm="${otherLayoutForm}" />
 
 	<groupbox width="100%" closable="false" class="tableFieldSet">
 		<caption label="${labels.survey.schema.attribute.attribute_default.heading}" />

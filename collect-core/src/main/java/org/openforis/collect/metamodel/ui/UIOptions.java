@@ -65,7 +65,7 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		SRS_X_Y("srs_x_y"), 
 		SRS_Y_X("srs_y_x");
 		
-		public static final CoordinateAttributeFieldsOrder DEFAULT = SRS_X_Y;
+		public static final CoordinateAttributeFieldsOrder DEFAULT = SRS_Y_X;
 		
 		private String value;
 
