@@ -1,4 +1,4 @@
-package org.openforis.collect.liquibase;
+package org.openforis.collect.relational.liquibase;
 
 import java.util.List;
 import java.util.Set;
@@ -13,24 +13,27 @@ import liquibase.exception.DatabaseException;
 import liquibase.snapshot.DatabaseSnapshot;
 import liquibase.snapshot.DatabaseSnapshotGenerator;
 
-import org.openforis.collect.model.CollectSurvey;
-import org.openforis.collect.relational.DataPrimaryKeyColumn;
-import org.openforis.collect.relational.ReferentialConstraint;
-import org.openforis.collect.relational.RelationalSchema;
-import org.openforis.collect.relational.RelationalSchemaGenerator;
-import org.openforis.collect.relational.SchemaGenerationException;
+import org.openforis.collect.relational.model.DataPrimaryKeyColumn;
+import org.openforis.collect.relational.model.ReferentialConstraint;
+import org.openforis.collect.relational.model.RelationalSchema;
+import org.openforis.collect.relational.model.RelationalSchemaGenerator;
+import org.openforis.collect.relational.model.SchemaGenerationException;
+import org.openforis.idm.metamodel.Survey;
 
-public class IdmDatabaseSnapshotGenerator implements DatabaseSnapshotGenerator {
+/**
+ * @author G. Miceli
+ */
+public class CollectDatabaseSnapshotGenerator implements DatabaseSnapshotGenerator {
 
 	private RelationalSchemaGenerator relationalSchemaGenerator;
 
-	public IdmDatabaseSnapshotGenerator(RelationalSchemaGenerator relationalSchemaGenerator) {
+	public CollectDatabaseSnapshotGenerator(RelationalSchemaGenerator relationalSchemaGenerator) {
 		this.relationalSchemaGenerator = relationalSchemaGenerator;
 	}
 
 	@Override
 	public boolean supports(Database database) {
-		return database instanceof IdmDatabase;
+		return database instanceof CollectDatabase;
 	}
 
 	@Override
@@ -41,8 +44,8 @@ public class IdmDatabaseSnapshotGenerator implements DatabaseSnapshotGenerator {
 	@Override
 	public DatabaseSnapshot createSnapshot(Database database, String surveyUri, Set<DiffStatusListener> listeners)
 			throws DatabaseException {
-		IdmDatabase db = (IdmDatabase) database;
-		CollectSurvey survey = db.getSurvey(surveyUri);
+		CollectDatabase db = (CollectDatabase) database;
+		Survey survey = db.getSurvey(surveyUri);
 		if ( survey == null ) {
 			throw new DatabaseException("Survey not found for "+surveyUri);
 		}
@@ -68,13 +71,13 @@ public class IdmDatabaseSnapshotGenerator implements DatabaseSnapshotGenerator {
 
 	private void createDataTables(DatabaseSnapshot snapshot, RelationalSchema schema) {
 		// Create table
-		for (org.openforis.collect.relational.Table<?> itable : schema.getTables()) {
+		for (org.openforis.collect.relational.model.Table<?> itable : schema.getTables()) {
 			Table ltable = new Table(itable.getName());
 			ltable.setDatabase(snapshot.getDatabase());
 			ltable.setSchema(schema.getName());
 			ltable.setRawSchemaName(schema.getName());
 			// Create columns
-			for (org.openforis.collect.relational.Column<?> icolumn : itable.getColumns()) {
+			for (org.openforis.collect.relational.model.Column<?> icolumn : itable.getColumns()) {
 				Column lcolumn = new Column();
 				lcolumn.setTable(ltable);
 				lcolumn.setName(icolumn.getName());

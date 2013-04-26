@@ -1,4 +1,4 @@
-package org.openforis.collect.relational;
+package org.openforis.collect.relational.model;
 
 import java.util.Arrays;
 import java.util.Collections;

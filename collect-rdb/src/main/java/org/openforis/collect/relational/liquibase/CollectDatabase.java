@@ -1,4 +1,4 @@
-package org.openforis.collect.liquibase;
+package org.openforis.collect.relational.liquibase;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -28,11 +28,14 @@ import liquibase.sql.visitor.SqlVisitor;
 import liquibase.statement.DatabaseFunction;
 import liquibase.statement.SqlStatement;
 
-import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.persistence.SurveyDao;
+import org.openforis.idm.metamodel.Survey;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public class IdmDatabase implements Database {
+/**
+ * @author G. Miceli
+ */
+public class CollectDatabase implements Database {
 
 	@Autowired
 	private SurveyDao surveyDao;
@@ -103,12 +106,12 @@ public class IdmDatabase implements Database {
 
 	@Override
 	public String getDatabaseProductName() {
-		return "Open Foris Inventory Data Model";
+		return "Open Foris Collect";
 	}
 
 	@Override
 	public String getDatabaseProductVersion() throws DatabaseException {
-		return "3.1";
+		return "3.0";
 	}
 
 	@Override
@@ -118,7 +121,7 @@ public class IdmDatabase implements Database {
 
 	@Override
 	public int getDatabaseMinorVersion() throws DatabaseException {
-		return 1;
+		return 0;
 	}
 
 	@Override
@@ -603,7 +606,7 @@ public class IdmDatabase implements Database {
 		return false;
 	}
 
-	public CollectSurvey getSurvey(String surveyUri) {
+	public Survey getSurvey(String surveyUri) {
 		return surveyDao.loadByUri(surveyUri);
 	}
 

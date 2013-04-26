@@ -1,4 +1,4 @@
-package org.openforis.collect.relational;
+package org.openforis.collect.relational.model;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
@@ -26,7 +26,7 @@ public final class Dataset {
 		rows.add(row);
 	}
 	
-	void printDebug(PrintStream out) {
+	public void print(PrintStream out) {
 		for (Row row : rows) {
 			row.printDebug(out);
 		}

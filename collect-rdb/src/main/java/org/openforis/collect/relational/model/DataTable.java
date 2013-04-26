@@ -1,4 +1,4 @@
-package org.openforis.collect.relational;
+package org.openforis.collect.relational.model;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
@@ -13,7 +13,7 @@ import org.openforis.idm.path.Path;
  * @author G. Miceli
  *
  */
-class DataTable extends AbstractTable<Node<?>> {
+public class DataTable extends AbstractTable<Node<?>> {
 
 	private NodeDefinition definition;
 	private Path relativePath;
@@ -32,7 +32,7 @@ class DataTable extends AbstractTable<Node<?>> {
 		return definition;
 	}
 
-	void printDebug(PrintStream out) {
+	public void print(PrintStream out) {
 		out.printf("%-43s%s\n", getFullName()+":", getRelativePath());
 		for (Column<?> col : getColumns()) {
 			String name = col.getName();

@@ -1,25 +1,24 @@
 package org.openforis.collect.liquibase;
 
-import java.io.FileInputStream;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.GregorianCalendar;
-import java.util.List;
 
 import liquibase.snapshot.DatabaseSnapshot;
 
-import org.junit.BeforeClass;
 import org.junit.Test;
-import static org.mockito.Mockito.*;
 import org.openforis.collect.model.CollectRecord;
+import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.CollectSurveyContext;
-import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.persistence.xml.CollectSurveyIdmlBinder;
-import org.openforis.collect.relational.Dataset;
-import org.openforis.collect.relational.RelationalSchema;
-import org.openforis.collect.relational.RelationalSchemaGenerator;
-import org.openforis.collect.relational.Table;
+import org.openforis.collect.relational.liquibase.CollectDatabase;
+import org.openforis.collect.relational.liquibase.CollectDatabaseSnapshotGenerator;
+import org.openforis.collect.relational.model.RelationalSchemaGenerator;
+import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.xml.IdmlParseException;
 import org.openforis.idm.model.Code;
 import org.openforis.idm.model.Coordinate;
@@ -37,12 +36,13 @@ import org.openforis.idm.model.expression.ExpressionFactory;
  */
 public class DatabaseSyncTest {
 
-	public CollectSurvey loadSurvey() throws IdmlParseException, FileNotFoundException {
-//		InputStream is = ClassLoader.getSystemResourceAsStream("test.idm.xml");
+	public Survey loadSurvey() throws IdmlParseException, FileNotFoundException {
+		InputStream is = ClassLoader.getSystemResourceAsStream("test.idm.xml");
 //		InputStream is = new FileInputStream("/home/gino/workspace/of/idm/idm-test/src/main/resources/test.idm.xml");
-		InputStream is = new FileInputStream("D:/data/workspace/idm/idm-test/src/main/resources/test.idm.xml");
+//		InputStream is = new FileInputStream("D:/data/workspace/idm/idm-test/src/main/resources/test.idm.xml");
 //		InputStream is = new FileInputStream("/home/gino/workspace/faofin/tz/naforma-idm/tanzania-naforma.idm.xml");
-		CollectSurveyContext ctx = new CollectSurveyContext(new ExpressionFactory(), null, null);
+		CollectSurveyContext ctx = new CollectSurveyContext(new ExpressionFactory(), null);
+//		DefaultSurveyContext ctx = new DefaultSurveyContext();
 		CollectSurveyIdmlBinder binder = new CollectSurveyIdmlBinder(ctx);
 		return (CollectSurvey) binder.unmarshal(is);
 	}
@@ -121,12 +121,12 @@ public class DatabaseSyncTest {
 
 	@Test
 	public void testSync() throws Exception {
-		IdmDatabase db = mock(IdmDatabase.class);
-		CollectSurvey survey = loadSurvey();
+		CollectDatabase db = mock(CollectDatabase.class);
+		Survey survey = loadSurvey();
 		String testSurveyUri = "http://www.openforis.org/idm/archenland";
 		when(db.getSurvey(testSurveyUri)).thenReturn(survey);
 		RelationalSchemaGenerator rsg = new RelationalSchemaGenerator();
-		IdmDatabaseSnapshotGenerator snapshotGen = new IdmDatabaseSnapshotGenerator(rsg);
+		CollectDatabaseSnapshotGenerator snapshotGen = new CollectDatabaseSnapshotGenerator(rsg);
 		DatabaseSnapshot snapshot = snapshotGen.createSnapshot(db, testSurveyUri, null);
 		System.out.println("ok");
 //		RelationalSchema rs = rsg.generateSchema(survey, "archenland1");

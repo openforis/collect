@@ -1,4 +1,4 @@
-package org.openforis.collect.relational;
+package org.openforis.collect.relational.model;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -49,10 +49,6 @@ public final class RelationalSchema {
 		return null;
 	}
 	
-	public Dataset toDataset(Record record) {
-		return null;
-	}
-
 	public boolean containsTable(String name) {
 		return tables.containsKey(name);
 	}
@@ -74,7 +70,7 @@ public final class RelationalSchema {
 		}
 	}
 
-	public Dataset getData(Record record) {
+	public Dataset createDataset(Record record) {
 		Entity root = record.getRootEntity();
 		EntityDefinition rootDefn = root.getDefinition();
 		String name = rootDefn.getName();

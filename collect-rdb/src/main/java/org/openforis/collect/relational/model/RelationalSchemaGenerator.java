@@ -1,4 +1,4 @@
-package org.openforis.collect.relational;
+package org.openforis.collect.relational.model;
 
 import java.sql.Types;
 import java.util.List;
@@ -13,6 +13,7 @@ import org.openforis.idm.metamodel.DateAttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.FieldDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
+import org.openforis.idm.metamodel.NumberAttributeDefinition;
 import org.openforis.idm.metamodel.NumericAttributeDefinition;
 import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.Survey;
@@ -26,6 +27,19 @@ import org.openforis.idm.path.Path;
  * @author G. Miceli
  *
  */
+
+// ASAP:
+// TODO map coordinate fields to 3 columns
+// TODO finish schema generation (to Postgresql)
+// TODO Collect RDB <==> jOOQ adapters
+// TODO insert data into database with jOOQ adapters
+
+// Later:
+// TODO insert dates and times
+// TODO SRS table
+// TODO 
+// TODO Code list tables
+// TODO Move schema config to RelationalSchemaConfig
 public class RelationalSchemaGenerator {
 	private static final String RDB_NAMESPACE = "http://www.openforis.org/collect/3.0/rdb";
 	private static final QName TABLE_NAME_QNAME = new QName(RDB_NAMESPACE, "table");
@@ -33,7 +47,10 @@ public class RelationalSchemaGenerator {
 	private String idColumnName = "id";
 	private String pkConstraintPrefix = "pk_";
 	private String fkConstraintPrefix = "fk_";
-	private String dataTablePrefix = "fd_";
+	private String dataTablePrefix = "";
+	private String otherColumnSuffix = "other";
+	private int textMaxLength = 255;
+	private Integer memoMaxLength = 2048;
 	
 	public RelationalSchema generateSchema(Survey survey, String schemaName) throws SchemaGenerationException {
 		RelationalSchema rs = new RelationalSchema(survey, schemaName);
@@ -41,7 +58,6 @@ public class RelationalSchemaGenerator {
 		addDataTables(rs);
 		return rs;
 	}
-
 	
 	public String getIdColumnName() {
 		return idColumnName;
@@ -207,7 +223,9 @@ public class RelationalSchemaGenerator {
 		List<FieldDefinition<?>> fieldDefinitions = defn.getFieldDefinitions();
 		boolean variableUnit = defn.isVariableUnit();
 		for (FieldDefinition<?> field : fieldDefinitions) {
-			if ( variableUnit || !field.getName().equals("unit") ) {
+			String name = field.getName();
+			if ( variableUnit || ! 
+					(name.equals(NumberAttributeDefinition.UNIT_FIELD) || name.equals(NumberAttributeDefinition.UNIT_NAME_FIELD)) ) {
 				addDataColumn(table, field, relativePath);
 			}
 		}
@@ -257,10 +275,10 @@ public class RelationalSchemaGenerator {
 				if ( attr instanceof TextAttributeDefinition ) {
 					TextAttributeDefinition textAttr = (TextAttributeDefinition) attr;
 					if ( textAttr.getType() == Type.MEMO ) {
-						return 2048;
+						return memoMaxLength;
 					}
 				} 
-				return 255;
+				return textMaxLength;
 			} 
 		} else if ( defn instanceof CoordinateAttributeDefinition ) {
 			return 255;
@@ -307,10 +325,11 @@ public class RelationalSchemaGenerator {
 	 */
 	private String getDataColumnSuffix(FieldDefinition<?> defn) {
 		String fld = defn.getName();
-		if ( fld .equals("code") || fld .equals("value") ) {
+		if ( fld.equals(CodeAttributeDefinition.CODE_FIELD) || 
+				fld.equals(NumberAttributeDefinition.VALUE_FIELD) ) {
 			return null;
 		}  else if ( fld.equals("qualifier") ) {
-			return "other";
+			return otherColumnSuffix;
 		} else {
 			return fld;
 		}
@@ -323,10 +342,10 @@ public class RelationalSchemaGenerator {
 	 */
 	private String getAttributeTableColumnName(DataTable table, FieldDefinition<?> defn) {
 		String fld = defn.getName();
-		if ( fld.equals("value") ) {
+		if ( fld.equals(NumberAttributeDefinition.VALUE_FIELD) ) {
 			return getDataColumnName(table, defn.getAttributeDefinition());
-		} else if ( fld.equals("qualifier") ) {
-			return "other";
+		} else if ( fld.equals(CodeAttributeDefinition.QUALIFIER_FIELD) ) {
+			return otherColumnSuffix;
 		} else {
 			return fld;
 		}
