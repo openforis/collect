@@ -16,10 +16,10 @@ public class DataColumn extends AbstractColumn<Node<?>> {
 	private NodeDefinition nodeDefinition;
 	private Path relativePath;
 	
-	DataColumn(String name, int type, Integer length, boolean allowNulls, NodeDefinition defn, Path relativePath) {
-		super(name, type, length, allowNulls);
+	DataColumn(String name, int type, String typeName, NodeDefinition defn, Path relPath, Integer length, boolean nullable) {
+		super(name, type, typeName, length, nullable);
 		this.nodeDefinition = defn;
-		this.relativePath = relativePath;
+		this.relativePath = relPath;
 	}
 
 	public NodeDefinition getNodeDefinition() {
@@ -38,4 +38,5 @@ public class DataColumn extends AbstractColumn<Node<?>> {
 		}
 		return vals.isEmpty() ? null : vals.get(0);
 	}
+	
 }

@@ -13,7 +13,7 @@ import org.openforis.idm.model.Node;
 public class DataParentKeyColumn extends AbstractColumn<Node<?>> {
 
 	DataParentKeyColumn(String name) {
-		super(name, Types.INTEGER, null, false);
+		super(name, Types.INTEGER, "integer", null, false);
 	}
 
 	@Override
