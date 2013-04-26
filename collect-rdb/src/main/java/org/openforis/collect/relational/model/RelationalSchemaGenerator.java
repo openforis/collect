@@ -25,6 +25,7 @@ import org.openforis.idm.path.Path;
 /**
  * 
  * @author G. Miceli
+ * @author S. Ricci
  *
  */
 
@@ -50,7 +51,8 @@ public class RelationalSchemaGenerator {
 	private String dataTablePrefix = "";
 	private String otherColumnSuffix = "other";
 	private int textMaxLength = 255;
-	private Integer memoMaxLength = 2048;
+	private int memoMaxLength = 2048;
+	private int floatingPointPrecision = 24;
 	
 	public RelationalSchema generateSchema(Survey survey, String schemaName) throws SchemaGenerationException {
 		RelationalSchema rs = new RelationalSchema(survey, schemaName);
@@ -237,65 +239,14 @@ public class RelationalSchemaGenerator {
 	}
 	
 	private void addDataColumn(DataTable table, NodeDefinition defn, Path relativePath) throws SchemaGenerationException {
-		String name = getDataColumnName(table, defn);
-		int type = getDataColumnType(defn);
-		Integer length = getDataColumnLength(defn);
-		DataColumn column = new DataColumn(name, type, length, true, defn, relativePath);
+		DataColumn column = createDataColumn(table, defn, relativePath);
+		String name = column.getName();
 		if ( table.containsColumn(name) ) {
 			throw new SchemaGenerationException("Duplicate column '"+name+"' in table '"+table.getName()+"'");
-		}
-
+		}		
 		table.addColumn(column);
 	}
 
-	private int getDataColumnType(NodeDefinition defn) {
-		if ( defn instanceof FieldDefinition ) {
-			Class<?> type = ((FieldDefinition<?>) defn).getValueType();
-			if ( type == Integer.class ) {
-				return Types.INTEGER;
-			} else if ( type == Double.class ) {
-				return Types.FLOAT;
-			} else if ( type == Boolean.class ) {
-				return Types.BOOLEAN;
-			} 
-		} else if ( defn instanceof DateAttributeDefinition ) {
-			return Types.DATE;
-		} else if ( defn instanceof TimeAttributeDefinition ) {
-			return Types.TIME;
-		}
-		return Types.VARCHAR;
-	}
-
-	private Integer getDataColumnLength(NodeDefinition defn) {
-		if ( defn instanceof FieldDefinition<?> ) {
-			FieldDefinition<?> fld = (FieldDefinition<?>) defn;
-			Class<?> type = fld.getValueType();
-			if ( type == String.class ) {
-				AttributeDefinition attr = fld.getAttributeDefinition();
-				if ( attr instanceof TextAttributeDefinition ) {
-					TextAttributeDefinition textAttr = (TextAttributeDefinition) attr;
-					if ( textAttr.getType() == Type.MEMO ) {
-						return memoMaxLength;
-					}
-				} 
-				return textMaxLength;
-			} 
-		} else if ( defn instanceof CoordinateAttributeDefinition ) {
-			return 255;
-		} 
-		return null;
-	}
-
-	private String getDataColumnName(DataTable table, NodeDefinition defn) {
-		if ( defn instanceof AttributeDefinition ) {
-			return getDataColumnName(table, (AttributeDefinition) defn); 
-		} else if ( defn instanceof FieldDefinition ) {
-			return getDataColumnName(table, (FieldDefinition<?>) defn);
-		} else {
-			throw new UnsupportedOperationException("Column "+defn.getClass());
-		}
-	}
-	
 	private String getDataColumnName(DataTable table, AttributeDefinition defn) {
 		String name = defn.getAnnotation(COLUMN_NAME_QNAME);
 		if ( name == null ) {
@@ -317,7 +268,78 @@ public class RelationalSchemaGenerator {
 			return name;
 		}
 	}
+
+	private DataColumn createDataColumn(DataTable table, NodeDefinition defn, Path relativePath) {
+		if ( defn instanceof FieldDefinition ) {
+			return createDataColumn(table, (FieldDefinition<?>) defn, relativePath);
+		} else if ( defn instanceof AttributeDefinition ) {
+			return createDataColumn(table, (AttributeDefinition) defn, relativePath);
+		} else {
+			throw new UnsupportedOperationException("Unknown defn "+defn.getClass());			
+		}
+	}
+
+
+	private DataColumn createDataColumn(DataTable table, FieldDefinition<?> defn, Path relativePath) {
+		String name = getDataColumnName(table, (FieldDefinition<?>) defn); 
+		int jdbcType;
+		String typeName;
+		Integer length = null;
+		boolean nullable = true;
+		
+		Class<?> type = defn.getValueType();
+		if ( type == Integer.class ) {
+			jdbcType = Types.INTEGER;
+			typeName =  "integer";
+		} else if ( type == Double.class ) {
+			jdbcType = Types.FLOAT;
+			typeName =  "float";
+			length = floatingPointPrecision ;
+		} else if ( type == Boolean.class ) {
+			jdbcType = Types.BOOLEAN;
+			typeName =  "boolean";
+		} else if ( type == String.class ) {
+			jdbcType = Types.VARCHAR;
+			typeName =  "varchar";
+			AttributeDefinition attr = ((FieldDefinition<?>) defn).getAttributeDefinition();
+			if ( attr instanceof TextAttributeDefinition ) {
+				TextAttributeDefinition textAttr = (TextAttributeDefinition) attr;
+				if ( textAttr.getType() == Type.MEMO ) {
+					length = memoMaxLength;
+				} else {
+					length = textMaxLength;
+				}
+			} else {
+				// default for string-like types (code, qualifier)
+				length = textMaxLength;
+			}
+		} else {
+			throw new UnsupportedOperationException("Unknown field type "+type);				
+		}
+		
+		return new DataColumn(name, jdbcType, typeName, defn, relativePath, length, nullable);
+	}
+
+	private DataColumn createDataColumn(DataTable table, AttributeDefinition defn, Path relativePath) {
+		String name = getDataColumnName(table, defn);;
+		int jdbcType;
+		String typeName;
+		Integer length = null;
+		boolean nullable = true;
+		
+		if ( defn instanceof DateAttributeDefinition ) {
+			jdbcType = Types.DATE;
+			typeName =  "date";
+		} else if ( defn instanceof TimeAttributeDefinition ) {
+			jdbcType = Types.TIME;
+			typeName =  "time";
+		} else {
+			throw new UnsupportedOperationException("Unknown defn "+defn.getClass());
+		}
 	
+		return new DataColumn(name, jdbcType, typeName, defn, relativePath, length, nullable);
+	}
+
 	/**
 	 * 
 	 * @param defn

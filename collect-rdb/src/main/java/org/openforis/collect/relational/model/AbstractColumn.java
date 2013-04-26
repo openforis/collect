@@ -9,20 +9,16 @@ abstract class AbstractColumn<T> implements Column<T> {
 
 	private String name;
 	private int type;
+	private String typeName;
 	private Integer length;
 	private boolean nullable;
 
-	AbstractColumn(String name, int type, Integer length, boolean nullable) {
+	AbstractColumn(String name, int type, String typeName, Integer length, boolean nullable) {
 		this.name = name;
 		this.type = type;
+		this.typeName = typeName;
 		this.length = length;
 		this.nullable = nullable;
-	}
-
-	AbstractColumn(String name, int type, boolean allowNulls) {
-		this.name = name;
-		this.type = type;
-		this.nullable = allowNulls;
 	}
 
 	@Override
@@ -35,6 +31,11 @@ abstract class AbstractColumn<T> implements Column<T> {
 		return type;
 	}
 
+	@Override
+	public String getTypeName() {
+		return typeName;
+	}
+	
 	@Override
 	public Integer getLength() {
 		return length;

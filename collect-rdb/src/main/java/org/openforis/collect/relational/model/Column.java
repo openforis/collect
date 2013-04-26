@@ -16,6 +16,8 @@ public interface Column<T> {
 	 */
 	int getType();
 
+	String getTypeName();
+	
 	Integer getLength();
 
 	boolean isNullable();
