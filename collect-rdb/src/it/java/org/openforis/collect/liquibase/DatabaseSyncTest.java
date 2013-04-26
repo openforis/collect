@@ -5,9 +5,21 @@ import static org.mockito.Mockito.when;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.util.GregorianCalendar;
 
+import liquibase.Liquibase;
+import liquibase.database.Database;
+import liquibase.database.DatabaseConnection;
+import liquibase.database.DatabaseFactory;
+import liquibase.database.core.PostgresDatabase;
+import liquibase.database.jvm.JdbcConnection;
+import liquibase.diff.Diff;
+import liquibase.diff.DiffResult;
+import liquibase.resource.FileSystemResourceAccessor;
 import liquibase.snapshot.DatabaseSnapshot;
+import liquibase.snapshot.DatabaseSnapshotGeneratorFactory;
 
 import org.junit.Test;
 import org.openforis.collect.model.CollectRecord;
@@ -128,6 +140,24 @@ public class DatabaseSyncTest {
 		RelationalSchemaGenerator rsg = new RelationalSchemaGenerator();
 		CollectDatabaseSnapshotGenerator snapshotGen = new CollectDatabaseSnapshotGenerator(rsg);
 		DatabaseSnapshot snapshot = snapshotGen.createSnapshot(db, testSurveyUri, null);
+//		Database idmDb = snapshot.getDatabase();
+		
+//		Connection conn = DriverManager.getConnection("jdbc:postgresql://localhost:5433/archenland1","postgres","postgres");
+//		DatabaseConnection dbconn = new JdbcConnection(conn);
+//		DatabaseFactory dbFactory = DatabaseFactory.getInstance();
+//		PostgresDatabase rdb = (PostgresDatabase) dbFactory.findCorrectDatabaseImplementation(dbconn);
+//		DatabaseSnapshotGeneratorFactory snapshotGeneratorFactory = DatabaseSnapshotGeneratorFactory.getInstance();
+//		DatabaseSnapshot rdbSnapshot = snapshotGeneratorFactory.createSnapshot(rdb, null, null);
+//		
+//		Liquibase liq = new Liquibase("changes.log", new FileSystemResourceAccessor("c:/temp/ofc"), idmDb);		
+//		Diff diff = new Diff(snapshot, rdbSnapshot);
+//		DiffResult diffResult = diff.compare();
+//		diffResult.setChangeSetAuthor("collect-rdb-3.1-SNAPSHOT");
+//		diffResult.printChangeLog(System.out, rdb);
+//		diffResult.printResult(System.out);
+//		System.out.println(diffResult);
+//		liq.update("changes");
+		
 		System.out.println("ok");
 //		RelationalSchema rs = rsg.generateSchema(survey, "archenland1");
 //		CollectRecord record = createTestRecord(survey, "123_456");
