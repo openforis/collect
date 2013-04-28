@@ -3,7 +3,6 @@ package org.openforis.collect.relational;
 import java.sql.Connection;
 
 import org.openforis.collect.relational.model.RelationalSchema;
-import org.openforis.collect.relational.model.SchemaGenerationException;
 
 /**
  * 
@@ -11,5 +10,5 @@ import org.openforis.collect.relational.model.SchemaGenerationException;
  *
  */
 public interface RelationalSchemaCreator {
-	void createRelationalSchema(RelationalSchema schema, Connection targetConn) throws SchemaGenerationException;
+	void createRelationalSchema(RelationalSchema schema, Connection conn) throws CollectRdbException;
 }

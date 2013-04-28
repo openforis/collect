@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.xml.namespace.QName;
 
+import org.openforis.collect.relational.CollectRdbException;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
@@ -52,7 +53,7 @@ public class RelationalSchemaGenerator {
 	private int memoMaxLength = 2048;
 	private int floatingPointPrecision = 24;
 	
-	public RelationalSchema generateSchema(Survey survey, String schemaName) throws SchemaGenerationException {
+	public RelationalSchema generateSchema(Survey survey, String schemaName) throws CollectRdbException {
 		RelationalSchema rs = new RelationalSchema(survey, schemaName);
 		addCodeListTables(rs);
 		addDataTables(rs);
@@ -123,11 +124,11 @@ public class RelationalSchemaGenerator {
 		this.dataTablePrefix = dataTablePrefix;
 	}
 
-	private void addCodeListTables(RelationalSchema rs) throws SchemaGenerationException {
+	private void addCodeListTables(RelationalSchema rs) throws CollectRdbException {
 		// TODO Auto-generated method stub
 	}
 
-	private void addDataTables(RelationalSchema rs) throws SchemaGenerationException {
+	private void addDataTables(RelationalSchema rs) throws CollectRdbException {
 		Survey survey = rs.getSurvey();
 		Schema schema = survey.getSchema();
 		// Recursively create tables, columns and constraints
@@ -144,9 +145,9 @@ public class RelationalSchemaGenerator {
 	 * @param rs
 	 * @param parentTable
 	 * @param defn
-	 * @throws SchemaGenerationException
+	 * @throws CollectRdbException
 	 */
-	private void addDataObjects(RelationalSchema rs, DataTable table, NodeDefinition defn, Path relativePath) throws SchemaGenerationException {
+	private void addDataObjects(RelationalSchema rs, DataTable table, NodeDefinition defn, Path relativePath) throws CollectRdbException {
 		if ( defn instanceof EntityDefinition  ) {
 			// Create table for all entities 
 			table = createDataTable(rs, table, defn, relativePath);
@@ -171,11 +172,11 @@ public class RelationalSchemaGenerator {
 	}
 
 	private DataTable createDataTable(RelationalSchema rs, DataTable parentTable, NodeDefinition defn, Path relativePath)
-			throws SchemaGenerationException {
+			throws CollectRdbException {
 		String name = getDataTableName(parentTable, defn);
 		DataTable table = new DataTable(dataTablePrefix, name, parentTable, defn, relativePath);
 		if ( rs.containsTable(name) ) {
-			throw new SchemaGenerationException("Duplicate table '"+name+"' for "+defn.getPath());
+			throw new CollectRdbException("Duplicate table '"+name+"' for "+defn.getPath());
 		}
 		// Create PK column
 		Column<?> pkColumn = new DataPrimaryKeyColumn(name + idColumnSuffix);
@@ -222,7 +223,7 @@ public class RelationalSchemaGenerator {
 		return name;
 	}
 
-	private void addDataColumns(DataTable table, AttributeDefinition defn, Path relativePath) throws SchemaGenerationException {
+	private void addDataColumns(DataTable table, AttributeDefinition defn, Path relativePath) throws CollectRdbException {
 		List<FieldDefinition<?>> fieldDefinitions = defn.getFieldDefinitions();
 		if ( defn instanceof CodeAttributeDefinition ) {
 			addDataColumns(table, (CodeAttributeDefinition) defn, relativePath);
@@ -238,7 +239,7 @@ public class RelationalSchemaGenerator {
 		}
 	}
 	
-	private void addDataColumns(DataTable table, CodeAttributeDefinition defn, Path relativePath) throws SchemaGenerationException {
+	private void addDataColumns(DataTable table, CodeAttributeDefinition defn, Path relativePath) throws CollectRdbException {
 		List<FieldDefinition<?>> fieldDefinitions = defn.getFieldDefinitions();
 		addDataColumn(table, fieldDefinitions.get(0), relativePath);
 		CodeList list = defn.getList();
@@ -247,7 +248,7 @@ public class RelationalSchemaGenerator {
 		}
 	}
 	
-	private void addDataColumns(DataTable table, NumericAttributeDefinition defn, Path relativePath) throws SchemaGenerationException {
+	private void addDataColumns(DataTable table, NumericAttributeDefinition defn, Path relativePath) throws CollectRdbException {
 		List<FieldDefinition<?>> fieldDefinitions = defn.getFieldDefinitions();
 		boolean variableUnit = defn.isVariableUnit();
 		for (FieldDefinition<?> field : fieldDefinitions) {
@@ -259,16 +260,16 @@ public class RelationalSchemaGenerator {
 		}
 	}	
 	
-	private void addDataColumn(DataTable table, FieldDefinition<?> defn, Path relativePath) throws SchemaGenerationException {
+	private void addDataColumn(DataTable table, FieldDefinition<?> defn, Path relativePath) throws CollectRdbException {
 		relativePath = relativePath.appendElement(defn.getName());
 		addDataColumn(table, (NodeDefinition) defn, relativePath);
 	}
 	
-	private void addDataColumn(DataTable table, NodeDefinition defn, Path relativePath) throws SchemaGenerationException {
+	private void addDataColumn(DataTable table, NodeDefinition defn, Path relativePath) throws CollectRdbException {
 		DataColumn column = createDataColumn(table, defn, relativePath);
 		String name = column.getName();
 		if ( table.containsColumn(name) ) {
-			throw new SchemaGenerationException("Duplicate column '"+name+"' in table '"+table.getName()+"'");
+			throw new CollectRdbException("Duplicate column '"+name+"' in table '"+table.getName()+"'");
 		}		
 		table.addColumn(column);
 	}

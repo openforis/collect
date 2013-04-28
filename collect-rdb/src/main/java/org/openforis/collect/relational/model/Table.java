@@ -25,4 +25,5 @@ public interface Table<T> {
 //	Dataset extractData(T source);
 	
 	Row extractRow(T source);
+	
 }

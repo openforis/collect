@@ -4,6 +4,7 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.openforis.collect.relational.CollectRdbException;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.path.Path;
@@ -20,7 +21,7 @@ public class DataTable extends AbstractTable<Node<?>> {
 	private DataTable parent;
 	private List<DataTable> childTables;
 	
-	DataTable(String prefix, String name, DataTable parent, NodeDefinition defn, Path relativePath) throws SchemaGenerationException {
+	DataTable(String prefix, String name, DataTable parent, NodeDefinition defn, Path relativePath) throws CollectRdbException {
 		super(prefix, name);
 		this.definition = defn;
 		this.parent = parent;
@@ -80,8 +81,10 @@ public class DataTable extends AbstractTable<Node<?>> {
 	}
 
 	private void extractDataInternal(Node<?> source, Dataset data) {
+		// Extract data from this node
 		Row row = extractRow(source);
 		data.addRow(row);
+		// Extract data from descendants
 		for (DataTable childTable : childTables) {
 			Path path = childTable.getRelativePath();
 			List<Node<?>> children = path.evaluate(source);

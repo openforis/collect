@@ -18,8 +18,8 @@ import liquibase.resource.FileSystemResourceAccessor;
 import liquibase.snapshot.DatabaseSnapshot;
 
 import org.openforis.collect.relational.RelationalSchemaCreator;
+import org.openforis.collect.relational.CollectRdbException;
 import org.openforis.collect.relational.model.RelationalSchema;
-import org.openforis.collect.relational.model.SchemaGenerationException;
 
 /**
  * 
@@ -28,8 +28,9 @@ import org.openforis.collect.relational.model.SchemaGenerationException;
  */
 public class LiquibaseRelationalSchemaCreator implements RelationalSchemaCreator {
 
+	
 	@Override
-	public void createRelationalSchema(RelationalSchema schema, Connection targetConn) throws SchemaGenerationException {
+	public void createRelationalSchema(RelationalSchema schema, Connection targetConn) throws CollectRdbException {
 		PrintStream ps = null;
 		try {
 			LiquidbaseDatabaseSnapshotBuilder snapshotGen = new LiquidbaseDatabaseSnapshotBuilder();
@@ -58,11 +59,11 @@ public class LiquibaseRelationalSchemaCreator implements RelationalSchemaCreator
 			Liquibase liq = new Liquibase(tmpFile.getName(), new FileSystemResourceAccessor(tmpFile.getParent()), rdb);		
 			liq.update("schemagen");
 		} catch (LiquibaseException e) {
-			throw new SchemaGenerationException("Failed to updata schema", e);
+			throw new CollectRdbException("Failed to updata schema", e);
 		} catch (IOException e) {
-			throw new SchemaGenerationException("Failed to create temp db changelog file", e);
+			throw new CollectRdbException("Failed to create temp db changelog file", e);
 		} catch (ParserConfigurationException e) {
-			throw new SchemaGenerationException("Failed to write temp db changelog file", e);
+			throw new CollectRdbException("Failed to write temp db changelog file", e);
 		} finally {
 			if ( ps != null ) {
 				ps.close();

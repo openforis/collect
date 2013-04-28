@@ -7,6 +7,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.openforis.collect.relational.CollectRdbException;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Survey;
@@ -25,7 +26,7 @@ public final class RelationalSchema {
 	private LinkedHashMap<String, Table<?>> tables;
 	private Map<String, DataTable> rootDataTables;
 	
-	RelationalSchema(Survey survey, String name) throws SchemaGenerationException {
+	RelationalSchema(Survey survey, String name) throws CollectRdbException {
 		this.survey = survey;
 		this.name = name;
 		this.tables = new LinkedHashMap<String, Table<?>>();

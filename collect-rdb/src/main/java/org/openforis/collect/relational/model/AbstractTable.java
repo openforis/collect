@@ -5,6 +5,8 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+import org.openforis.collect.relational.CollectRdbException;
+
 /**
  * 
  * @author G. Miceli
@@ -44,7 +46,7 @@ abstract class AbstractTable<T> implements Table<T>  {
 	/**
 	 * Adds a column or replaces existing column with same name
 	 * @param column
-	 * @throws SchemaGenerationException
+	 * @throws CollectRdbException
 	 */
 	void addColumn(Column<?> column) {
 		String columnName = column.getName();
