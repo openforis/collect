@@ -13,15 +13,15 @@ import java.util.List;
 abstract class AbstractTable<T> implements Table<T>  {
 
 	private String prefix;
-	private String name;
+	private String baseName;
 	private LinkedHashMap<String, Column<?>> columns;
 	private PrimaryKeyConstraint primaryKeyConstraint;
 //	private List<UniquenessConstraint> uniquenessConstraints;
 	private List<ReferentialConstraint> referentialConstraints;
 	
-	AbstractTable(String prefix, String name) {
+	AbstractTable(String prefix, String baseName) {
 		this.prefix = prefix;
-		this.name = name;
+		this.baseName = baseName;
 		this.columns = new LinkedHashMap<String, Column<?>>();
 //		this.uniquenessConstraints = new ArrayList<UniquenessConstraint>();
 		this.referentialConstraints = new ArrayList<ReferentialConstraint>();
@@ -33,13 +33,13 @@ abstract class AbstractTable<T> implements Table<T>  {
 	}
 	
 	@Override
-	public String getName() {
-		return name;
+	public String getBaseName() {
+		return baseName;
 	}
 
 	@Override
-	public String getFullName() {
-		return prefix+name;
+	public String getName() {
+		return prefix+baseName;
 	}
 	/**
 	 * Adds a column or replaces existing column with same name

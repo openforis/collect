@@ -11,9 +11,9 @@ public interface Table<T> {
 
 	String getPrefix();
 	
-	String getName();
+	String getBaseName();
 
-	String getFullName();
+	String getName();
 	
 	List<Column<?>> getColumns();
 

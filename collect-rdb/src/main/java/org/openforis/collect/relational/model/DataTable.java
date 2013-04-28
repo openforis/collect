@@ -33,7 +33,7 @@ public class DataTable extends AbstractTable<Node<?>> {
 	}
 
 	public void print(PrintStream out) {
-		out.printf("%-43s%s\n", getFullName()+":", getRelativePath());
+		out.printf("%-43s%s\n", getName()+":", getRelativePath());
 		for (Column<?> col : getColumns()) {
 			String name = col.getName();
 			int type = col.getType();

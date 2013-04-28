@@ -35,7 +35,7 @@ public final class Row {
 	
 	void printDebug(PrintStream out) {
 		List<Column<?>> cols = table.getColumns();
-		out.print(table.getFullName());
+		out.print(table.getName());
 		out.print(": ");
 		for (int i=0; i < cols.size(); i++) {
 			if ( i>0 ) out.print(", ");

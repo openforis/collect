@@ -43,7 +43,7 @@ public class RelationalSchemaGenerator {
 	private static final String RDB_NAMESPACE = "http://www.openforis.org/collect/3.0/rdb";
 	private static final QName TABLE_NAME_QNAME = new QName(RDB_NAMESPACE, "table");
 	private static final QName COLUMN_NAME_QNAME = new QName(RDB_NAMESPACE, "column");
-	private String idColumnName = "id";
+	private String idColumnSuffix = "_id";
 	private String pkConstraintPrefix = "pk_";
 	private String fkConstraintPrefix = "fk_";
 	private String dataTablePrefix = "";
@@ -59,12 +59,44 @@ public class RelationalSchemaGenerator {
 		return rs;
 	}
 	
-	public String getIdColumnName() {
-		return idColumnName;
+	public String getIdColumnSuffix() {
+		return idColumnSuffix;
 	}
 
-	public void setIdColumnName(String idColumnName) {
-		this.idColumnName = idColumnName;
+	public void setIdColumnSuffix(String idColumnSuffix) {
+		this.idColumnSuffix = idColumnSuffix;
+	}
+
+	public String getOtherColumnSuffix() {
+		return otherColumnSuffix;
+	}
+
+	public void setOtherColumnSuffix(String otherColumnSuffix) {
+		this.otherColumnSuffix = otherColumnSuffix;
+	}
+
+	public int getTextMaxLength() {
+		return textMaxLength;
+	}
+
+	public void setTextMaxLength(int textMaxLength) {
+		this.textMaxLength = textMaxLength;
+	}
+
+	public int getMemoMaxLength() {
+		return memoMaxLength;
+	}
+
+	public void setMemoMaxLength(int memoMaxLength) {
+		this.memoMaxLength = memoMaxLength;
+	}
+
+	public int getFloatingPointPrecision() {
+		return floatingPointPrecision;
+	}
+
+	public void setFloatingPointPrecision(int floatingPointPrecision) {
+		this.floatingPointPrecision = floatingPointPrecision;
 	}
 
 	public String getPkConstraintPrefix() {
@@ -146,19 +178,19 @@ public class RelationalSchemaGenerator {
 			throw new SchemaGenerationException("Duplicate table '"+name+"' for "+defn.getPath());
 		}
 		// Create PK column
-		Column<?> pkColumn = new DataPrimaryKeyColumn(idColumnName);
+		Column<?> pkColumn = new DataPrimaryKeyColumn(name + idColumnSuffix);
 		table.addColumn(pkColumn);
 		// Create PK constraint
-		String pkConstraintName = pkConstraintPrefix+table.getName();
+		String pkConstraintName = pkConstraintPrefix + table.getBaseName();
 		PrimaryKeyConstraint pkConstraint = new PrimaryKeyConstraint(pkConstraintName, table, pkColumn);
 		table.setPrimaryKeyConstraint(pkConstraint);
 		if ( parentTable != null ) {
 			// Create FK column
-			String fkColumnName = parentTable.getName()+"_"+idColumnName;
+			String fkColumnName = parentTable.getBaseName() + idColumnSuffix;
 			Column<?> fkColumn = new DataParentKeyColumn(fkColumnName);
 			table.addColumn(fkColumn);
 			// Create FK constraint
-			String fkConstraintName = fkConstraintPrefix+parentTable.getName();
+			String fkConstraintName = fkConstraintPrefix+parentTable.getBaseName();
 			ReferentialConstraint fkConstraint = new ReferentialConstraint(fkConstraintName, table, pkConstraint, fkColumn);
 			table.addConstraint(fkConstraint);
 			// Attach to parent table
@@ -183,7 +215,7 @@ public class RelationalSchemaGenerator {
 			// For multiple attribute tables, prepend parent table name to table name 
 			if ( defn instanceof AttributeDefinition ) {
 				sb.insert(0, '_');
-				sb.insert(0, parentTable.getName());
+				sb.insert(0, parentTable.getBaseName());
 			}
 			name = sb.toString();
 		}
