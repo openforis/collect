@@ -4,7 +4,7 @@
 		id="nodeFormContainer"
 		sclass="form"
         apply="org.zkoss.bind.BindComposer"
-		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.DefaultAttributeVM')"
+		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.CoordinateAttributeVM')"
 		validationMessages="@id('vmsgs')"
 		form="@id('fx') 
 			@init(vm.tempFormObject)
@@ -12,7 +12,8 @@
 			@save(vm.formObject, before={'validate','applyChanges'})
             @validator('org.openforis.collect.designer.form.validator.AttributeDefinitionFormValidator', parentEntity=parentEntity)">
 
-		<include src="survey_edit/schema/attribute_common.zul" />
+		<include src="survey_edit/schema/attribute_common.zul" 
+			otherLayoutForm="survey_edit/schema/attribute_coordinate_layout_part.zul"/>
 		
   </vlayout>
 </zk>

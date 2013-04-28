@@ -25,6 +25,7 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.metamodel.proxy.TextAttributeDefinitionProxy$Type;
 	import org.openforis.collect.metamodel.proxy.TimeAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.UnitProxy;
+	import org.openforis.collect.metamodel.ui.UIOptions$CoordinateAttributeFieldsOrder;
 	import org.openforis.collect.metamodel.ui.UIOptions$Direction;
 	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.ui.component.datagrid.CompleteColumnItemRenderer;
@@ -491,15 +492,7 @@ package org.openforis.collect.ui {
 				l = getLabel(defnLabel, 100, HEADER_LABEL_STYLE, directionByColumns);
 				result.addElement(l);
 				//subheader
-				l = getLabel(Message.get('edit.coordinate.srs'), 100, HEADER_LABEL_STYLE, directionByColumns);
-				l.height = ATTRIBUTE_INPUT_FIELD_HEIGHT;
-				compositeAttributeLabelsGroup.addElement(l);
-				l = getLabel(Message.get('edit.coordinate.x'), 70, HEADER_LABEL_STYLE, directionByColumns);
-				l.height = ATTRIBUTE_INPUT_FIELD_HEIGHT;
-				compositeAttributeLabelsGroup.addElement(l);
-				l = getLabel(Message.get('edit.coordinate.y'), 70, HEADER_LABEL_STYLE, directionByColumns);
-				l.height = ATTRIBUTE_INPUT_FIELD_HEIGHT;
-				compositeAttributeLabelsGroup.addElement(l);
+				addCoordinateAttributeLabels(compositeAttributeLabelsGroup, CoordinateAttributeDefinitionProxy(defn), directionByColumns);
 				result.addElement(compositeAttributeLabelsGroup);
 			} else if (defn is NumberAttributeDefinitionProxy && NumberAttributeDefinitionProxy(defn).defaultUnit != null || 
 				defn is RangeAttributeDefinitionProxy && RangeAttributeDefinitionProxy(defn).defaultUnit != null ) {
@@ -517,6 +510,29 @@ package org.openforis.collect.ui {
 				result.addElement(l);
 			}
 			return result;
+		}
+		
+		private static function addCoordinateAttributeLabels(compositeAttributeLabelsGroup:Group, 
+															 defn:CoordinateAttributeDefinitionProxy, directionByColumns:Boolean):void {
+			var fieldsOrder:UIOptions$CoordinateAttributeFieldsOrder = CoordinateAttributeDefinitionProxy(defn).fieldsOrder; 
+			var srsLabel:Label = getLabel(Message.get('edit.coordinate.srs'), 100, HEADER_LABEL_STYLE, directionByColumns);
+			srsLabel.height = ATTRIBUTE_INPUT_FIELD_HEIGHT;
+			var xLabel:Label = getLabel(Message.get('edit.coordinate.x'), 70, HEADER_LABEL_STYLE, directionByColumns);
+			xLabel.height = ATTRIBUTE_INPUT_FIELD_HEIGHT;
+			var yLabel:Label = getLabel(Message.get('edit.coordinate.y'), 70, HEADER_LABEL_STYLE, directionByColumns);
+			yLabel.height = ATTRIBUTE_INPUT_FIELD_HEIGHT;
+			switch(fieldsOrder) {
+				case UIOptions$CoordinateAttributeFieldsOrder.SRS_X_Y:
+					compositeAttributeLabelsGroup.addElement(srsLabel);
+					compositeAttributeLabelsGroup.addElement(xLabel);
+					compositeAttributeLabelsGroup.addElement(yLabel);
+					break;
+				case UIOptions$CoordinateAttributeFieldsOrder.SRS_Y_X:
+					compositeAttributeLabelsGroup.addElement(srsLabel);
+					compositeAttributeLabelsGroup.addElement(yLabel);
+					compositeAttributeLabelsGroup.addElement(xLabel);
+					break;
+			}
 		}
 		
 		public static function getGridColumn(headerText:String, dataField:String, width:Number, 
