@@ -17,10 +17,8 @@ import liquibase.exception.LiquibaseException;
 import liquibase.resource.FileSystemResourceAccessor;
 import liquibase.snapshot.DatabaseSnapshot;
 
-import org.openforis.collect.model.CollectSurvey;
-import org.openforis.collect.relational.liquibase.CollectPostgresDatabase;
+import org.openforis.collect.relational.RelationalSchemaCreator;
 import org.openforis.collect.relational.model.RelationalSchema;
-import org.openforis.collect.relational.model.RelationalSchemaGenerator;
 import org.openforis.collect.relational.model.SchemaGenerationException;
 
 /**
@@ -28,8 +26,9 @@ import org.openforis.collect.relational.model.SchemaGenerationException;
  * @author G. Miceli
  *
  */
-public class RelationalSchemaCreator {
+public class LiquibaseRelationalSchemaCreator implements RelationalSchemaCreator {
 
+	@Override
 	public void createRelationalSchema(RelationalSchema schema, Connection targetConn) throws SchemaGenerationException {
 		PrintStream ps = null;
 		try {

@@ -22,7 +22,7 @@ public class DatabaseSyncTest extends CollectRelationalTest {
 		
 		RelationalSchemaGenerator rsg = new RelationalSchemaGenerator();
 		RelationalSchema schema = rsg.generateSchema(survey, targetSchema);
-		RelationalSchemaCreator relationalSchemaCreator = new RelationalSchemaCreator();
+		LiquibaseRelationalSchemaCreator relationalSchemaCreator = new LiquibaseRelationalSchemaCreator();
 		relationalSchemaCreator.createRelationalSchema(schema, targetConn);
 		System.out.println("ok");
 //		CollectRecord record = createTestRecord(survey, "123_456");
