@@ -8,7 +8,7 @@ import liquibase.database.core.PostgresDatabase;
  * @author G. Miceli
  *
  */
-public class CollectPostgresDatabase extends PostgresDatabase {
+class CollectPostgresDatabase extends PostgresDatabase {
 
 	public CollectPostgresDatabase(DatabaseConnection dbconn) {
 		setConnection(dbconn);

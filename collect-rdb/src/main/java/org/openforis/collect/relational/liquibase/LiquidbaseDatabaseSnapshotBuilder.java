@@ -18,7 +18,7 @@ import org.openforis.collect.relational.model.RelationalSchema;
 /**
  * @author G. Miceli
  */
-public class LiquidbaseDatabaseSnapshotBuilder {
+class LiquidbaseDatabaseSnapshotBuilder {
 
 	private RelationalSchema schema;
 	DatabaseSnapshot snapshot;
