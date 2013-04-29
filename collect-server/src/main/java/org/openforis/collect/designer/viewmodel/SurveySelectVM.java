@@ -94,7 +94,8 @@ public class SurveySelectVM extends BaseVM {
 	@Command
 	public void publishSelectedSurvey() throws IOException {
 		final CollectSurvey survey = loadSelectedSurvey();
-		if ( validateSurvey(survey) ) {
+		final CollectSurvey publishedSurvey = selectedSurvey.isPublished() ? surveyManager.getByUri(survey.getUri()): null;
+		if ( validateSurvey(survey, publishedSurvey) ) {
 			MessageUtil.showConfirm(new MessageUtil.ConfirmHandler() {
 				@Override
 				public void onOk() {
@@ -133,9 +134,9 @@ public class SurveySelectVM extends BaseVM {
 		notifyChange("surveySummaries");
 	}
 
-	protected boolean validateSurvey(CollectSurvey survey) {
+	protected boolean validateSurvey(CollectSurvey survey, CollectSurvey oldPublishedSurvey) {
 		SurveyValidator surveyValidator = new SurveyValidator(surveyManager);
-		List<SurveyValidationResult> validationResults = surveyValidator.validateSurvey(survey);
+		List<SurveyValidationResult> validationResults = surveyValidator.validateSurveyForPublishing(oldPublishedSurvey, survey);
 		if ( validationResults.isEmpty() ) {
 			return true;
 		} else {
