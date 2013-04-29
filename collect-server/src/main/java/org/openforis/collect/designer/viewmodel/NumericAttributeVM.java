@@ -190,6 +190,11 @@ public class NumericAttributeVM extends AttributeVM<NumericAttributeDefinition> 
 	}
 	
 	public boolean isTypeChangeDisabled() {
+		NodeDefinition oldNodeDefn = getOldNodeDefinition();
+		return oldNodeDefn != null;
+	}
+	
+	protected NodeDefinition getOldNodeDefinition() {
 		SessionStatus sessionStatus = getSessionStatus();
 		Integer publishedSurveyId = sessionStatus.getPublishedSurveyId();
 		if ( publishedSurveyId != null ) {
@@ -197,9 +202,9 @@ public class NumericAttributeVM extends AttributeVM<NumericAttributeDefinition> 
 			Schema schema = publishedSurvey.getSchema();
 			int nodeId = editedItem.getId();
 			NodeDefinition oldDefn = schema.getDefinitionById(nodeId);
-			return oldDefn != null;
+			return oldDefn;
 		} else {
-			return false;
+			return null;
 		}
 	}
 	

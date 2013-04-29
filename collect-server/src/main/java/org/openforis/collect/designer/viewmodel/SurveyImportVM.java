@@ -13,6 +13,8 @@ import java.util.Map;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.designer.form.validator.FormValidator;
+import org.openforis.collect.designer.form.validator.SurveyValidator;
+import org.openforis.collect.designer.form.validator.SurveyValidator.SurveyValidationResult;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectSurvey;
@@ -137,21 +139,41 @@ public class SurveyImportVM extends SurveyBaseVM {
 	}
 	
 	protected void processSurveyImport(String surveyName, boolean overwrite) {
-		uploadedSurvey.setName(surveyName);
-		if ( overwrite ) {
-			Integer id = getSurveyWorkId(surveyName);
-			uploadedSurvey.setId(id);
+		CollectSurvey publishedSurvey = surveyManager.get(surveyName);
+		if ( validateSurveyForPublishing(uploadedSurvey, publishedSurvey) ) {
+			uploadedSurvey.setName(surveyName);
+			if ( overwrite ) {
+				Integer id = getSurveyWorkId(surveyName);
+				uploadedSurvey.setId(id);
+			}
+			try {
+				surveyManager.saveSurveyWork(uploadedSurvey);
+				closeImportPopUp(true);
+				Object[] args = new String[]{surveyName};
+				MessageUtil.showInfo("survey.import_survey.successfully_imported", args);
+			} catch (SurveyImportException e) {
+				log.error(e);
+				Object[] args = new String[]{e.getMessage()};
+				MessageUtil.showError("survey.import_survey.error", args);
+			}
 		}
-		try {
-			surveyManager.saveSurveyWork(uploadedSurvey);
-			closeImportPopUp(true);
-			Object[] args = new String[]{surveyName};
-			MessageUtil.showInfo("survey.import_survey.successfully_imported", args);
-		} catch (SurveyImportException e) {
-			log.error(e);
-			Object[] args = new String[]{e.getMessage()};
-			MessageUtil.showError("survey.import_survey.error", args);
+	}
+	
+	protected boolean validateSurveyForPublishing(CollectSurvey survey, CollectSurvey oldPublishedSurvey) {
+		SurveyValidator surveyValidator = new SurveyValidator(surveyManager);
+		List<SurveyValidationResult> validationResults = surveyValidator.validateSurveyForPublishing(oldPublishedSurvey, survey);
+		if ( validationResults.isEmpty() ) {
+			return true;
+		} else {
+			openValidationResultsPopUp(validationResults);
+			return false;
 		}
+	}
+
+	protected void openValidationResultsPopUp(List<SurveyValidationResult> validationResults) {
+		Map<String, Object> args = new HashMap<String, Object>();
+		args.put("validationResults", validationResults);
+		BindUtils.postGlobalCommand(null, null, "openValidationResultsPopUp", args);
 	}
 
 	protected void closeImportPopUp(boolean successfullyImported) {

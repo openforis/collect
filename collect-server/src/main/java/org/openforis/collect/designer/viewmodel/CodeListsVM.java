@@ -13,10 +13,12 @@ import java.util.Stack;
 import org.openforis.collect.designer.form.CodeListFormObject;
 import org.openforis.collect.designer.form.CodeListFormObject.Type;
 import org.openforis.collect.designer.form.FormObject;
+import org.openforis.collect.designer.session.SessionStatus;
 import org.openforis.collect.designer.util.ComponentUtil;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.MessageUtil.ConfirmHandler;
 import org.openforis.collect.designer.util.Resources;
+import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
@@ -40,6 +42,7 @@ import org.zkoss.bind.annotation.NotifyChange;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.event.DropEvent;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
+import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zul.Listitem;
 import org.zkoss.zul.Window;
 
@@ -69,6 +72,9 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 	private Window referencedNodesPopUp;
 	private Window codeListImportPopUp;
 	private boolean editingAttribute;
+	
+	@WireVariable
+	private SurveyManager surveyManager;
 	
 	@Init(superclass=false)
 	public void init(@ExecutionArgParam(EDITING_ATTRIBUTE_PARAM) Boolean editingAttribute, 
@@ -256,7 +262,7 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 	@Command
 	@NotifyChange({"itemsPerLevel"})
 	public void deleteCodeListItem(@BindingParam("item") final CodeListItem item) {
-		if ( isEnumeratingCodeList() ) {
+		if ( isSurveyPublished() && isEditingItemEnumeratingCodeList() ) {
 			MessageUtil.showWarning("survey.code_list.cannot_delete_enumerating_code_list_items");
 		} else {
 			String messageKey;
@@ -274,26 +280,10 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 		}
 	}
 
-	protected boolean isEnumeratingCodeList() {
-		Schema schema = survey.getSchema();
-		Stack<NodeDefinition> stack = new Stack<NodeDefinition>();
-		List<EntityDefinition> rootEntityDefinitions = schema.getRootEntityDefinitions();
-		stack.addAll(rootEntityDefinitions);
-		while ( ! stack.isEmpty() ) {
-			NodeDefinition node = stack.pop();
-			if ( node instanceof EntityDefinition ) {
-				EntityDefinition entityDefn = (EntityDefinition) node;
-				CodeAttributeDefinition enumeratingKeyCodeAttribute = entityDefn.getEnumeratingKeyCodeAttribute();
-				if ( isSurveyPublished() && enumeratingKeyCodeAttribute != null && 
-						enumeratingKeyCodeAttribute.getList().getId() == editedItem.getId() ) {
-					return true;
-				}
-				stack.addAll(entityDefn.getChildDefinitions());
-			}
-		}
-		return false;
+	protected boolean isEditingItemEnumeratingCodeList() {
+		return editedItem.isEnumeratingList();
 	}
-
+	
 	protected void performDeleteCodeListItem(CodeListItem item) {
 		if ( isCodeListItemSelected(item) ) {
 			int itemLevelIndex = item.getDepth() - 1;
@@ -344,7 +334,7 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 		Map<String, Object> args = new HashMap<String, Object>();
 		args.put(CodeListItemVM.ITEM_ARG, editedChildItem);
 		args.put(CodeListItemVM.PARENT_ITEM_ARG, editedChildItemParentItem);
-		args.put(CodeListItemVM.ENUMERATING_CODE_LIST_ARG, isEnumeratingCodeList());
+		args.put(CodeListItemVM.ENUMERATING_CODE_LIST_ARG, isSurveyPublished() && isEditingItemEnumeratingCodeList());
 		codeListItemPopUp = openPopUp(Resources.Component.CODE_LIST_ITEM_EDIT_POP_UP.getLocation(), true, args);
 		Binder binder = ComponentUtil.getBinder(codeListItemPopUp);
 		validateForm(binder);
@@ -429,11 +419,31 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 
 	@Command
 	public void openCodeListImportPopUp() {
-		Map<String, Object> args = new HashMap<String, Object>();
-		args.put("codeListId", editedItem.getId());
-		codeListImportPopUp = openPopUp(Resources.Component.CODE_LIST_IMPORT_POPUP.getLocation(), true, args);
+		if ( canImportCodeList() ) {
+			MessageUtil.showWarning("survey.code_list.cannot_import_items_on_enumerating_code_list");
+		} else {
+			Map<String, Object> args = new HashMap<String, Object>();
+			args.put("codeListId", editedItem.getId());
+			codeListImportPopUp = openPopUp(Resources.Component.CODE_LIST_IMPORT_POPUP.getLocation(), true, args);
+		}
+	}
+
+	protected boolean canImportCodeList() {
+		return isSurveyPublished() && isEditingItemEnumeratingCodeList() && isCodeListInPublishedSurvey();
 	}
 	
+	protected boolean isCodeListInPublishedSurvey() {
+		SessionStatus sessionStatus = getSessionStatus();
+		Integer publishedSurveyId = sessionStatus.getPublishedSurveyId();
+		if ( publishedSurveyId != null ) {
+			CollectSurvey publishedSurvey = surveyManager.getById(publishedSurveyId);
+			CodeList oldPublishedCodeList = publishedSurvey.getCodeListById(editedItem.getId());
+			return oldPublishedCodeList != null;
+		} else {
+			return false;
+		}
+	}
+
 	@GlobalCommand
 	public void closeCodeListImportPopUp() {
 		closePopUp(codeListImportPopUp);

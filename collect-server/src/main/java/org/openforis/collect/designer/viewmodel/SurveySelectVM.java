@@ -62,11 +62,15 @@ public class SurveySelectVM extends BaseVM {
 	public void editSelectedSurvey() throws IOException {
 		CollectSurvey surveyWork = loadSelectedSurvey();
 		SessionStatus sessionStatus = getSessionStatus();
-		if ( selectedSurvey.isPublished() && ! selectedSurvey.isWorking() ) {
-			sessionStatus.setPublishedSurveyId(selectedSurvey.getId());
-		} else {
-			sessionStatus.setPublishedSurveyId(null);
+		Integer publishedSurveyId = null;
+		if ( selectedSurvey.isPublished() ) {
+			if ( selectedSurvey.isWorking() ) {
+				publishedSurveyId = selectedSurvey.getPublishedSurveyId();
+			} else {
+				publishedSurveyId = selectedSurvey.getId();
+			}
 		}
+		sessionStatus.setPublishedSurveyId(publishedSurveyId);
 		sessionStatus.setSurvey(surveyWork);
 		sessionStatus.setCurrentLanguageCode(null);
 		Executions.sendRedirect(Page.SURVEY_EDIT.getLocation());
@@ -144,8 +148,9 @@ public class SurveySelectVM extends BaseVM {
 			return false;
 		}
 	}
-
-	protected void openValidationResultsPopUp(List<SurveyValidationResult> validationResults) {
+	
+	@GlobalCommand
+	public void openValidationResultsPopUp(@BindingParam("validationResults") List<SurveyValidationResult> validationResults) {
 		Map<String, Object> args = new HashMap<String, Object>();
 		args.put("validationResults", validationResults);
 		validationResultsPopUp = openPopUp(Resources.Component.SURVEY_VALIDATION_RESULTS_POPUP.getLocation(), true, args);
