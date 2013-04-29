@@ -14,6 +14,7 @@
 			[Bindable]
 			private var _toolTip:String;
 			
+			
 			override public function set data(value:Object): void {
 				super.data = value;
 				var tempToolTip:String = null;
@@ -25,12 +26,13 @@
 							break;
 						case CollectRecord$Step.CLEANSING:
 						case CollectRecord$Step.ANALYSIS:
-							tempToolTip = Message.get("list.errorsToolTipCleansing", [record.errors, record.missingErrors]);
+							tempToolTip = Message.get("list.errorsToolTipCleansing", [record.errors, record.missing]);
 							break;
 					}
 				}
 				_toolTip = tempToolTip;
 			}
+			
 		]]>
 	</fx:Script>
 	

@@ -391,7 +391,7 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 			q.addValue(OFC_RECORD.STEP, record.getStep().getStepNumber());
 			q.addValue(OFC_RECORD.STATE, record.getState() != null ? record.getState().getCode(): null);
 			q.addValue(OFC_RECORD.SKIPPED, record.getSkipped());
-			q.addValue(OFC_RECORD.MISSING, record.getMissing());
+			q.addValue(OFC_RECORD.MISSING, record.getMissingErrors());
 			q.addValue(OFC_RECORD.ERRORS, record.getErrors());
 			q.addValue(OFC_RECORD.WARNINGS, record.getWarnings());
 
