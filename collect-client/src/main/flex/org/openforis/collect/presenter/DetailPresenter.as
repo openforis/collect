@@ -231,6 +231,7 @@ package org.openforis.collect.presenter {
 		internal function saveActiveRecordResultHandler(event:ResultEvent, token:Object = null):void {
 			Application.activeRecord.showErrors();
 			Application.activeRecord.updated = false;
+			updateStatusLabel();
 			var applicationEvent:ApplicationEvent = new ApplicationEvent(ApplicationEvent.RECORD_SAVED);
 			eventDispatcher.dispatchEvent(applicationEvent);
 		}
@@ -262,13 +263,17 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function updateResponseReceivedHandler(event:ApplicationEvent):void {
+			updateStatusLabel();
+		}
+		
+		protected function updateStatusLabel():void {
 			var updateMessageKey:String;
 			if ( Application.activeRecord.updated ) {
 				updateMessageKey = "edit.changes_not_saved";
 			} else {
 				updateMessageKey = "edit.all_changes_saved";
 			}
-			_view.updateStatusLabel.text = Message.get(updateMessageKey);
+			_view.updateStatusLabel.text = Message.get(updateMessageKey);			
 		}
 		
 		protected function stageKeyDownHandler(event:KeyboardEvent):void {
