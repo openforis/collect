@@ -14,6 +14,7 @@ import liquibase.snapshot.DatabaseSnapshot;
 import org.openforis.collect.relational.model.DataPrimaryKeyColumn;
 import org.openforis.collect.relational.model.ReferentialConstraint;
 import org.openforis.collect.relational.model.RelationalSchema;
+import org.openforis.collect.relational.model.UniquenessConstraint;
 
 /**
  * @author G. Miceli
@@ -34,6 +35,9 @@ class LiquidbaseDatabaseSnapshotBuilder {
 
 		createCodeListTables();
 		createDataTables();
+		
+		//createForeignKeys();
+		
 		// TODO
 		
 		return snapshot;
@@ -77,15 +81,34 @@ class LiquidbaseDatabaseSnapshotBuilder {
 				// Add column
 				ltable.getColumns().add(lcolumn);
 			}
-			// Add FKs
+			// Add table
+			snapshot.getTables().add(ltable);
+		}
+	}
+
+	protected void createForeignKeys() {
+		for (org.openforis.collect.relational.model.Table<?> itable : schema.getTables()) {
+			Table ltable = snapshot.getTable(itable.getName());
 			List<ReferentialConstraint> ifks = itable.getReferentialContraints();
 			for (ReferentialConstraint ifk : ifks) {
 				ForeignKey lfk = new ForeignKey();
 				lfk.setName(ifk.getName());
-				// TODO create FKs
+				//set base table columns
+				lfk.setForeignKeyTable(ltable);
+				for (org.openforis.collect.relational.model.Column<?> ifcCol : ifk.getColumns()) {
+					lfk.addForeignKeyColumn(ifcCol.getName());
+				}
+				//set referenced key columns
+				UniquenessConstraint iReferencedKey = ifk.getReferencedKey();
+				org.openforis.collect.relational.model.Table<?> iReferencedTable = iReferencedKey.getTable();
+				Table lReferencedTable = snapshot.getTable(iReferencedTable.getName());
+				lfk.setPrimaryKeyTable(lReferencedTable);
+				for (org.openforis.collect.relational.model.Column<?> refCol : iReferencedKey.getColumns()) {
+					lfk.addPrimaryKeyColumn(refCol.getName());
+				}
+				//Add fk
+				snapshot.getForeignKeys().add(lfk);
 			}
-			// Add table
-			snapshot.getTables().add(ltable);
 		}
 	}
 }

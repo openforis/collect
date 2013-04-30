@@ -192,7 +192,8 @@ public class RelationalSchemaGenerator {
 			table.addColumn(fkColumn);
 			// Create FK constraint
 			String fkConstraintName = fkConstraintPrefix+parentTable.getBaseName();
-			ReferentialConstraint fkConstraint = new ReferentialConstraint(fkConstraintName, table, pkConstraint, fkColumn);
+			PrimaryKeyConstraint parentPKConstraint = parentTable.getPrimaryKeyConstraint();
+			ReferentialConstraint fkConstraint = new ReferentialConstraint(fkConstraintName, table, parentPKConstraint, fkColumn);
 			table.addConstraint(fkConstraint);
 			// Attach to parent table
 			parentTable.addChildTable(table);

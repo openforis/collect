@@ -55,7 +55,7 @@ public class JooqDatabaseExporter implements DatabaseExporter {
 					Object val = values.get(colno);
 					if ( val != null ) {
 						String col = cols.get(colno).getName();
-						insert.addValue(field(col), val);
+						insert.addValue(fieldByName(col), val);
 					}
 				}
 				inserts.add(insert);

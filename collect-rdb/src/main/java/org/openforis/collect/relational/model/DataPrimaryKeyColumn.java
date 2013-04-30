@@ -3,6 +3,7 @@ package org.openforis.collect.relational.model;
 import java.sql.Types;
 
 import org.openforis.idm.model.Node;
+import org.openforis.idm.model.Record;
 
 /**
  * 
@@ -21,6 +22,7 @@ public class DataPrimaryKeyColumn extends AbstractColumn<Node<?>> {
 		if ( id == null ) {
 			throw new NullPointerException("Node id");
 		}
-		return id;
+		Record record = context.getRecord();
+		return record.getId() * 1000000 + id;
 	}
 }
