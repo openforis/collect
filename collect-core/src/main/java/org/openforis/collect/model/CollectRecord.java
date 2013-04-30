@@ -230,6 +230,7 @@ public class CollectRecord extends Record {
 			case WARNING:
 				warnings.add(childName);
 				break;
+			default:
 		}
 		this.missing = null;
 		this.missingErrors = null;
@@ -241,7 +242,6 @@ public class CollectRecord extends Record {
 	public void updateValidationMaxCounts(Integer entityId, String childName, ValidationResultFlag flag) {
 		Set<String> errors = clearEntityValidationCounts(maxCountErrorCounts, entityId, childName);
 		Set<String> warnings = clearEntityValidationCounts(maxCountWarningCounts, entityId, childName);
-		
 		switch(flag) {
 		case ERROR:
 			errors.add(childName);
@@ -249,6 +249,7 @@ public class CollectRecord extends Record {
 		case WARNING:
 			warnings.add(childName);
 			break;
+		default:
 		}
 		this.errors = null;
 		this.warnings = null;
@@ -353,23 +354,21 @@ public class CollectRecord extends Record {
 
 	public Integer getMissing() {
 		if (missing == null) {
-			Integer errors = getMissingErrors();
-			Integer warnings = getMissingWarnings();
-			missing = errors + warnings;
+			missing = getMissingErrors();
 		}
 		return missing;
 	}
 	
 	public Integer getMissingErrors() {
 		if ( missingErrors == null ) {
-			missingErrors = getMissingCount( minCountErrorCounts );
+			missingErrors = getMissingCount(minCountErrorCounts);
 		}
 		return missingErrors;
 	}
 	
 	public Integer getMissingWarnings() {
 		if ( missingWarnings == null ) {
-			missingWarnings = getMissingCount( minCountWarningCounts);
+			missingWarnings = getMissingCount(minCountWarningCounts);
 		}
 		return missingWarnings;
 	}
@@ -393,6 +392,7 @@ public class CollectRecord extends Record {
 	public Integer getWarnings() {
 		if(warnings == null) {
 			warnings = getAttributeValidationCount(warningCounts);
+			warnings += getEntityValidationCount(minCountWarningCounts);
 			warnings += getEntityValidationCount(maxCountWarningCounts);
 		}
 		return warnings;
