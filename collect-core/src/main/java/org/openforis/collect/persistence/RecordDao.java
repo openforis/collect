@@ -111,12 +111,29 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 	}
 
 	@Transactional
-	public List<CollectRecord> loadSummaries(CollectSurvey survey, String rootEntity, String... keyValues) {
-		return loadSummaries(survey, rootEntity, 0, Integer.MAX_VALUE, null, keyValues);
+	public List<CollectRecord> loadSummaries(CollectSurvey survey, String rootEntity) {
+		return loadSummaries(survey, rootEntity, (String[]) null);
 	}
 
 	@Transactional
-	public List<CollectRecord> loadSummaries(CollectSurvey survey, String rootEntity, int offset, int maxRecords, List<RecordSummarySortField> sortFields, String... keyValues) {
+	public List<CollectRecord> loadSummaries(CollectSurvey survey, String rootEntity, Step step) {
+		return loadSummaries(survey, rootEntity, step, 0, Integer.MAX_VALUE, (List<RecordSummarySortField>) null, (String[]) null);
+	}
+
+	@Transactional
+	public List<CollectRecord> loadSummaries(CollectSurvey survey, String rootEntity, String... keyValues) {
+		return loadSummaries(survey, rootEntity, (Step) null, 0, Integer.MAX_VALUE, (List<RecordSummarySortField>) null, keyValues);
+	}
+
+	@Transactional
+	public List<CollectRecord> loadSummaries(CollectSurvey survey, String rootEntity, int offset, int maxRecords, 
+			List<RecordSummarySortField> sortFields, String... keyValues) {
+		return loadSummaries(survey, rootEntity, (Step) null, offset, maxRecords, sortFields, keyValues);
+	}
+	
+	@Transactional
+	public List<CollectRecord> loadSummaries(CollectSurvey survey, String rootEntity, Step step, int offset, int maxRecords, 
+			List<RecordSummarySortField> sortFields, String... keyValues) {
 		JooqFactory jf = getMappingJooqFactory(survey);
 		SelectQuery q = jf.selectQuery();	
 		q.addFrom(OFC_RECORD);
@@ -127,7 +144,9 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 		Integer rootEntityDefnId = rootEntityDefn.getId();
 		q.addConditions(OFC_RECORD.SURVEY_ID.equal(survey.getId()));
 		q.addConditions(OFC_RECORD.ROOT_ENTITY_DEFINITION_ID.equal(rootEntityDefnId));
-
+		if ( step != null ) {
+			q.addConditions(OFC_RECORD.STEP.equal(step.getStepNumber()));
+		}
 		addFilterByKeyConditions(q, keyValues);
 		
 		if ( sortFields != null ) {

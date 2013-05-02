@@ -1,5 +1,6 @@
 package org.openforis.collect.relational.model;
 
+import java.math.BigInteger;
 import java.sql.Types;
 
 import org.openforis.idm.model.Node;
@@ -12,8 +13,10 @@ import org.openforis.idm.model.Record;
  */
 public class DataPrimaryKeyColumn extends AbstractColumn<Node<?>> {
 
+	private static final int NODE_ID_MAX_VALUE = 1000000;
+
 	DataPrimaryKeyColumn(String name) {
-		super(name, Types.INTEGER, "integer", null, false);
+		super(name, Types.BIGINT, "bigint", null, false);
 	}
 
 	@Override
@@ -23,6 +26,9 @@ public class DataPrimaryKeyColumn extends AbstractColumn<Node<?>> {
 			throw new NullPointerException("Node id");
 		}
 		Record record = context.getRecord();
-		return record.getId() * 1000000 + id;
+		BigInteger result = BigInteger.valueOf(id);
+		//result = id + recordId * NODE_ID_MAX_VALUE
+		result = result.add(BigInteger.valueOf(record.getId()).multiply(BigInteger.valueOf(NODE_ID_MAX_VALUE)));
+		return result;
 	}
 }

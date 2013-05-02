@@ -30,7 +30,6 @@
 			</list>
 		</property>
 	</bean>
-
      
  	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
 		<property name="driverClassName" value="${collect.devdb.driver}" />
@@ -38,11 +37,32 @@
 		<property name="username" value="${collect.devdb.username}" />
 		<property name="password" value="${collect.devdb.password}" />
 	</bean>
+
+	<bean id="transactionManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+	<!-- enables interpretation of the @Transactional annotations for declarative transaction management-->
+	<tx:annotation-driven transaction-manager="transactionManager" proxy-target-class="true"/>
 	
-  <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
-  	<property name="dataSource" ref="dataSource"/>
-  </bean>
-    
+	<!-- RDB DataSource -->
+	<bean id="rdbDataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+		<property name="driverClassName" value="${collect.devrdb.driver}" />
+		<property name="url" value="${collect.devrdb.url}"/>
+		<property name="username" value="${collect.devrdb.username}" />
+		<property name="password" value="${collect.devrdb.password}" />
+	</bean>
+
+	<bean id="rdbTransactionManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<qualifier value="rdbTransactionManager" />
+		<property name="dataSource" ref="rdbDataSource" />
+	</bean>
+
+	<!-- enables interpretation of the @Transactional annotations for declarative transaction management-->
+	<tx:annotation-driven transaction-manager="rdbTransactionManager" proxy-target-class="true"/>
+	
     <!-- ===================================== -->
 	<!-- Liquibase -->
 	<!-- ===================================== -->
@@ -102,9 +122,11 @@
 	<bean id="recordManager" 			class="org.openforis.collect.manager.RecordManager" init-method="init" />	
 	<bean id="recordIndexManager" 		class="org.openforis.collect.manager.RecordIndexManager" lazy-init="false" init-method="init" />
 	<bean id="samplingDesignManager"    class="org.openforis.collect.manager.SamplingDesignManager" />
-  <bean id="speciesManager"           class="org.openforis.collect.manager.SpeciesManager" />
+  	<bean id="speciesManager"           class="org.openforis.collect.manager.SpeciesManager" />
 	<bean id="surveyManager"	 		class="org.openforis.collect.manager.SurveyManager" init-method="init" />
-
+	<!-- RDB -->
+	<bean id="rdbPublisher" class="org.openforis.collect.manager.CollectRDBPublisher" />
+	
 	<!-- Expression Factory -->
 	<bean id="expressionFactory" class="org.openforis.idm.model.expression.ExpressionFactory" />
 	<bean id="validator" 					class="org.openforis.idm.metamodel.validation.Validator" />
@@ -119,6 +141,4 @@
 	<!-- XML DataMarshaller -->
 	<bean id="dataMarshaller" class="org.openforis.collect.persistence.xml.DataMarshaller" lazy-init="false" autowire-candidate="true" autowire="byName" />
 	
-	<!-- enables interpretation of the @Transactional annotations for declarative transaction management-->
-	<tx:annotation-driven transaction-manager="transactionManager" proxy-target-class="true"/>
 </beans>

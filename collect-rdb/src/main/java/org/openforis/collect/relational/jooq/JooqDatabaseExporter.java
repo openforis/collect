@@ -1,6 +1,7 @@
-package org.openforis.collect.jooq;
+package org.openforis.collect.relational.jooq;
 
-import static org.jooq.impl.Factory.*;
+import static org.jooq.impl.Factory.fieldByName;
+import static org.jooq.impl.Factory.tableByName;
 
 import java.sql.BatchUpdateException;
 import java.util.ArrayList;
@@ -28,15 +29,14 @@ public class JooqDatabaseExporter implements DatabaseExporter {
 
 	private Factory create;
 	
-	
-	public JooqDatabaseExporter(Factory jooqFactory) {
-		this.create = jooqFactory;
+	public JooqDatabaseExporter(Factory create) {
+		super();
+		this.create = create;
 	}
 
 	@Override
 	public void insertReferenceData(RelationalSchema schema) throws CollectRdbException {
 		// TODO Auto-generated method stub
-		
 	}
 
 	@Override

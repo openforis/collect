@@ -1,15 +1,7 @@
 package org.openforis.collect.relational.liquibase;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-
 import org.junit.Test;
-import org.openforis.collect.jooq.JooqDatabaseExporter;
-import org.openforis.collect.model.CollectRecord;
-import org.openforis.collect.persistence.jooq.DialectAwareJooqFactory;
 import org.openforis.collect.relational.CollectRelationalTest;
-import org.openforis.collect.relational.model.RelationalSchema;
-import org.openforis.collect.relational.model.RelationalSchemaGenerator;
 
 /**
  * 
@@ -20,6 +12,7 @@ public class DatabaseSyncTest extends CollectRelationalTest {
 
 	@Test
 	public void testSync() throws Exception {
+		/*
 		// Inputs
 		String targetSchema = "archenland";
 		Connection targetConn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/archenland1", "postgres","postgres");
@@ -38,5 +31,6 @@ public class DatabaseSyncTest extends CollectRelationalTest {
 		JooqDatabaseExporter exporter = new JooqDatabaseExporter(new DialectAwareJooqFactory(targetConn));
 		exporter.insertData(schema, record);
 		System.out.println("inserts ok");
+		*/
 	}
 }

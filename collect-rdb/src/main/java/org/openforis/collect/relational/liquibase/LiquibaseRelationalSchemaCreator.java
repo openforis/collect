@@ -59,7 +59,7 @@ public class LiquibaseRelationalSchemaCreator implements RelationalSchemaCreator
 			Liquibase liq = new Liquibase(tmpFile.getName(), new FileSystemResourceAccessor(tmpFile.getParent()), rdb);		
 			liq.update("schemagen");
 		} catch (LiquibaseException e) {
-			throw new CollectRdbException("Failed to updata schema", e);
+			throw new CollectRdbException("Failed to update schema", e);
 		} catch (IOException e) {
 			throw new CollectRdbException("Failed to create temp db changelog file", e);
 		} catch (ParserConfigurationException e) {

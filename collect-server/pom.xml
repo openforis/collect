@@ -113,6 +113,11 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.openforis.collect</groupId>
+      <artifactId>collect-rdb</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
       <groupId>org.openforis.idm</groupId>
       <artifactId>idm-transform</artifactId>
     </dependency>

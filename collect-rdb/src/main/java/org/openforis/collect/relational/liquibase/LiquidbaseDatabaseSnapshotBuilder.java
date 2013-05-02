@@ -36,7 +36,7 @@ class LiquidbaseDatabaseSnapshotBuilder {
 		createCodeListTables();
 		createDataTables();
 		
-		//createForeignKeys();
+		createForeignKeys();
 		
 		// TODO
 		
