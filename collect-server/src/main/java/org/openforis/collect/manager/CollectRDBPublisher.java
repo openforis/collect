@@ -20,6 +20,7 @@ import org.openforis.collect.relational.liquibase.LiquibaseRelationalSchemaCreat
 import org.openforis.collect.relational.model.RelationalSchema;
 import org.openforis.collect.relational.model.RelationalSchemaGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author S. Ricci
  *
  */
+@Transactional
 public class CollectRDBPublisher {
 	
 	protected static Log LOG = LogFactory.getLog(CollectRDBPublisher.class);
@@ -37,10 +39,17 @@ public class CollectRDBPublisher {
 	@Autowired
 	private RecordDao recordDao;
 	@Autowired
+	@Qualifier("rdbDataSource")
 	private DataSource rdbDataSource;
 	
 	public void export(String surveyName, String rootEntityName, Step step,
 			String targetSchemaName) throws CollectRdbException {
+		Connection targetConn = DataSourceUtils.getConnection(rdbDataSource);
+		export(surveyName, rootEntityName, step, targetSchemaName, targetConn);
+	}
+	
+	public void export(String surveyName, String rootEntityName, Step step,
+			String targetSchemaName, Connection targetConn) throws CollectRdbException {
 		CollectSurvey survey = surveyManager.get(surveyName);
 		
 		// Generate relational model
@@ -55,7 +64,7 @@ public class CollectRDBPublisher {
 		if ( LOG.isInfoEnabled() ) {
 			LOG.info("Total records: " + total);
 		}
-		insertRecords(survey, summaries, step, targetSchema);
+		insertRecords(survey, summaries, step, targetSchema, targetConn);
 		if ( LOG.isInfoEnabled() ) {
 			LOG.info("\nAll records exported");
 		}
@@ -70,13 +79,12 @@ public class CollectRDBPublisher {
 	
 	@Transactional("rdbTransactionManager")
 	protected void insertRecords(CollectSurvey survey, List<CollectRecord> summaries, Step step, 
-			RelationalSchema targetSchema) throws CollectRdbException {
+			RelationalSchema targetSchema, Connection targetConn) throws CollectRdbException {
 		int count = 0;
-		Connection rdbTargetConn = DataSourceUtils.getConnection(rdbDataSource);
-		DatabaseExporter databaseExporter = new JooqDatabaseExporter(new DialectAwareJooqFactory(rdbTargetConn));
+		DatabaseExporter databaseExporter = new JooqDatabaseExporter(new DialectAwareJooqFactory(targetConn));
 		for (CollectRecord summary : summaries) {
 			if ( LOG.isInfoEnabled() ) {
-				LOG.info("Exporting record " + (++count));
+				LOG.info("Exporting record #" + (++count) + " id: " + summary.getId());
 			}
 			CollectRecord record = recordDao.load(survey, summary.getId(), step.getStepNumber());
 			databaseExporter.insertData(targetSchema, record);
@@ -88,5 +96,5 @@ public class CollectRDBPublisher {
 //			e.printStackTrace();
 //		}
 	}
-
+	
 }

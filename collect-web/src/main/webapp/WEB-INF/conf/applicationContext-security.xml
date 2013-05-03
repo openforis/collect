@@ -29,6 +29,8 @@
 		<intercept-url pattern="/editSurvey.htm" access="hasRole('ROLE_ADMIN')" />
 		<intercept-url pattern="/importSurvey.htm" access="hasRole('ROLE_ADMIN')" />
 		<intercept-url pattern="/logoUpload" access="hasRole('ROLE_ADMIN')" />
+		<intercept-url pattern="/publishToRdb" access="hasRole('ROLE_ADMIN')" />
+		<intercept-url pattern="/submitPublishToRdb" access="hasRole('ROLE_ADMIN')" />
 		<intercept-url pattern="/speciesImport" access="hasRole('ROLE_ADMIN')" />
 		<intercept-url pattern="/uploadData.htm" access="permitAll" />
 		<intercept-url pattern="/uploadFile.htm" access="permitAll" />

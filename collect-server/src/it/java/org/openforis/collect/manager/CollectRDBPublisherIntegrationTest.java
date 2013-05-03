@@ -29,9 +29,9 @@ public class CollectRDBPublisherIntegrationTest {
 				"naforma1",
 				"cluster",
 				Step.ANALYSIS,
-				//DriverManager.getConnection("jdbc:postgresql://localhost:5433/archenland1", "postgres","postgres"), 
 				"naforma1");
 		*/
+		//DriverManager.getConnection("jdbc:postgresql://localhost:5433/archenland1", "postgres","postgres")); 
 	}
 	
 }
