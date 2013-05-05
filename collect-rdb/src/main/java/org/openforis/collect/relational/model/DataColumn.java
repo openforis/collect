@@ -57,7 +57,9 @@ public class DataColumn extends AbstractColumn<Node<?>> {
 	}
 
 	private Object convert(Node<?> valNode) {
-		if ( valNode instanceof Field ) {
+		if ( valNode == null ) {
+			return null;
+		} else if ( valNode instanceof Field ) {
 			return ((Field<?>) valNode).getValue();
 		} else if ( valNode instanceof DateAttribute ) {
 			Date date = ((DateAttribute) valNode).getValue();

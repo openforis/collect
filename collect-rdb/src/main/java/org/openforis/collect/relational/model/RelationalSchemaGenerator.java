@@ -48,7 +48,7 @@ public class RelationalSchemaGenerator {
 	private String pkConstraintPrefix = "pk_";
 	private String fkConstraintPrefix = "fk_";
 	private String dataTablePrefix = "";
-	private String otherColumnSuffix = "other";
+	private String otherColumnSuffix = "_other";
 	private int textMaxLength = 255;
 	private int memoMaxLength = 2048;
 	private int floatingPointPrecision = 24;
@@ -149,15 +149,22 @@ public class RelationalSchemaGenerator {
 	 */
 	private void addDataObjects(RelationalSchema rs, DataTable table, NodeDefinition defn, Path relativePath) throws CollectRdbException {
 		if ( defn instanceof EntityDefinition  ) {
-			// Create table for all entities 
-			table = createDataTable(rs, table, defn, relativePath);
-			rs.addTable(table);
-			
+			if ( defn.isMultiple() ) {
+				// Create table for multiple entity 
+				table = createDataTable(rs, table, defn, relativePath);
+				rs.addTable(table);
+			}
+				
 			// Add child tables and columns
 			EntityDefinition entityDefn = (EntityDefinition) defn;
 			for (NodeDefinition child : entityDefn.getChildDefinitions()) {
-				relativePath = Path.relative(child.getName());
-				addDataObjects(rs, table, child, relativePath);
+				Path childPath;
+				if ( defn.isMultiple() ) {
+					childPath = Path.relative(child.getName());
+				} else {
+					childPath = relativePath.appendElement(child.getName());
+				}
+				addDataObjects(rs, table, child, childPath);
 			}
 		} else if ( defn instanceof AttributeDefinition ) {
 			if ( defn.isMultiple() ) {
@@ -171,8 +178,7 @@ public class RelationalSchemaGenerator {
 		}
 	}
 
-	private DataTable createDataTable(RelationalSchema rs, DataTable parentTable, NodeDefinition defn, Path relativePath)
-			throws CollectRdbException {
+	private DataTable createDataTable(RelationalSchema rs, DataTable parentTable, NodeDefinition defn, Path relativePath) throws CollectRdbException {
 		String name = getDataTableName(parentTable, defn);
 		DataTable table = new DataTable(dataTablePrefix, name, parentTable, defn, relativePath);
 		if ( rs.containsTable(name) ) {
@@ -275,10 +281,11 @@ public class RelationalSchemaGenerator {
 		table.addColumn(column);
 	}
 
-	private String getDataColumnName(DataTable table, AttributeDefinition defn) {
-		String name = defn.getAnnotation(COLUMN_NAME_QNAME);
+	private String getDataColumnName(DataTable table, AttributeDefinition defn) {		
+		String name = defn.getAnnotation(COLUMN_NAME_QNAME);		
 		if ( name == null ) {
-			return defn.getName();
+			String prefix = getDataColumnNamePrefix(table, defn);
+			return prefix + defn.getName();
 		}
 		return name;
 	}
@@ -290,11 +297,20 @@ public class RelationalSchemaGenerator {
 		} else {
 			String name = getDataColumnName(table, attr);
 			String suffix = getDataColumnSuffix((FieldDefinition<?>) fld);
-			if ( suffix != null ) {
-				name = name +"_" + suffix;
-			}
-			return name;
+			return name + suffix;
 		}
+	}
+	
+	private String getDataColumnNamePrefix(DataTable table, AttributeDefinition defn) {
+		StringBuilder sb = new StringBuilder();
+		NodeDefinition ptr = defn.getParentDefinition();
+		while ( !ptr.isMultiple() ) {
+			sb.insert(0, '_');
+			sb.insert(0, ptr.getName());
+			
+			ptr = ptr.getParentDefinition();
+		}
+		return sb.toString();
 	}
 
 	private DataColumn createDataColumn(DataTable table, NodeDefinition defn, Path relativePath) {
@@ -377,11 +393,11 @@ public class RelationalSchemaGenerator {
 		String fld = defn.getName();
 		if ( fld.equals(CodeAttributeDefinition.CODE_FIELD) || 
 				fld.equals(NumberAttributeDefinition.VALUE_FIELD) ) {
-			return null;
+			return "";
 		}  else if ( fld.equals("qualifier") ) {
 			return otherColumnSuffix;
 		} else {
-			return fld;
+			return "_" + fld;
 		}
 	}
 	

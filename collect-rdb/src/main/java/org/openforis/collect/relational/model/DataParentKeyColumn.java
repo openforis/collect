@@ -3,6 +3,7 @@ package org.openforis.collect.relational.model;
 import java.math.BigInteger;
 import java.sql.Types;
 
+import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.Record;
@@ -25,6 +26,11 @@ public class DataParentKeyColumn extends AbstractColumn<Node<?>> {
 		Entity parent = context.getParent();
 		if ( parent == null ) {
 			throw new NullPointerException("Parent node");
+		}
+		// For attributes and entities inside single entities, recurse up to first multiple entity
+		EntityDefinition parentDefn = parent.getDefinition();
+		if ( !parentDefn.isMultiple() ) {
+			return extractValue(parent);
 		}
 		Integer parentId = parent.getInternalId();
 		if ( parentId == null ) {

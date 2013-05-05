@@ -1,6 +1,7 @@
 package org.openforis.collect.manager;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -90,12 +91,12 @@ public class CollectRDBPublisher {
 			CollectRecord record = recordDao.load(survey, summary.getId(), step.getStepNumber());
 			databaseExporter.insertData(targetSchema, record);
 		}
-//		try {
-//			rdbTargetConn.commit();
-//		} catch (SQLException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
+		try {
+			targetConn.commit();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 }
