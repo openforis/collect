@@ -33,6 +33,11 @@ public class CollectSurvey extends Survey {
 		}
 	}
 	
+	public boolean isDefaultLanguage(String langCode) {
+		String defaultLanguage = getDefaultLanguage();
+		return defaultLanguage.equals(langCode);
+	}
+	
 	public UIOptions createUIOptions() {
 		return new UIOptions(this);
 	}

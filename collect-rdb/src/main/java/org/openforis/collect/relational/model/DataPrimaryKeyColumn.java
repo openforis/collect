@@ -1,7 +1,6 @@
 package org.openforis.collect.relational.model;
 
 import java.math.BigInteger;
-import java.sql.Types;
 
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.Record;
@@ -11,12 +10,12 @@ import org.openforis.idm.model.Record;
  * @author G. Miceli
  *
  */
-public class DataPrimaryKeyColumn extends AbstractColumn<Node<?>> {
+public class DataPrimaryKeyColumn extends IdColumn<Node<?>> implements PrimaryKeyColumn {
 
 	private static final int NODE_ID_MAX_VALUE = 1000000;
 
 	DataPrimaryKeyColumn(String name) {
-		super(name, Types.BIGINT, "bigint", null, false);
+		super(name);
 	}
 
 	@Override

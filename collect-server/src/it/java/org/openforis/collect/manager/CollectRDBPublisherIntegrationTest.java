@@ -24,12 +24,13 @@ public class CollectRDBPublisherIntegrationTest {
 	
 	@Test
 	public void test() throws CollectRdbException {
+		/*
 		rdbPublisher.export(
 				"naforma1",
 				"cluster",
 				Step.ANALYSIS,
 				"naforma1");
-		
+		*/
 //		DriverManager.getConnection("jdbc:postgresql://localhost:5433/archenland1", "postgres","postgres")); 
 	}
 	

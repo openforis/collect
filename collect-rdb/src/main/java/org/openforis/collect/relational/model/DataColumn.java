@@ -38,6 +38,17 @@ public class DataColumn extends AbstractColumn<Node<?>> {
 
 	@Override
 	public Object extractValue(Node<?> context) {
+		Node<?> valNode = extractValueNode(context);
+		Object val = convert(valNode);
+		if ( getTypeName().equals("varchar") && val != null && val.toString().length() > getLength()) {
+			System.out.println("Record: " + context.getRecord().getId() + ". Value of node " + context.getPath() + 
+					" : length " + val.toString().length() + " exceeds max allowed (" + getLength() + "): " + val );
+			val = ((String) val).substring(0, getLength());
+		}
+		return val;
+	}
+
+	protected Node<?> extractValueNode(Node<?> context) {
 		List<Node<?>> vals = relativePath.evaluate(context);
 		if ( vals.size() > 1 ) {
 			throw new RuntimeException("Path "+relativePath+" returned more than one value");
@@ -46,16 +57,10 @@ public class DataColumn extends AbstractColumn<Node<?>> {
 			return null;
 		} else {
 			Node<?> valNode = vals.get(0);
-			Object val = convert(valNode);
-			if ( getTypeName().equals("varchar") && val != null && val.toString().length() > getLength()) {
-				System.out.println("Record: " + context.getRecord().getId() + ". Value of node " + context.getPath() + 
-						" : length " + val.toString().length() + " exceeds max allowed (" + getLength() + "): " + val );
-				val = ((String) val).substring(0, getLength());
-			}
-			return val;
+			return valNode;
 		}
 	}
-
+	
 	private Object convert(Node<?> valNode) {
 		if ( valNode == null ) {
 			return null;

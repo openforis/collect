@@ -40,6 +40,7 @@ public class LiquibaseRelationalSchemaCreator implements RelationalSchemaCreator
 			
 			CollectPostgresDatabase rdb = new CollectPostgresDatabase(dbconn);
 			String targetSchema = schema.getName();
+			rdb.setDefaultSchemaName(targetSchema);
 			DatabaseSnapshot emptyDbSnapshot = new DatabaseSnapshot(rdb, targetSchema);
 			
 			// Generate change set
@@ -56,7 +57,7 @@ public class LiquibaseRelationalSchemaCreator implements RelationalSchemaCreator
 			ps.flush();
 			
 			// Execute change set
-			Liquibase liq = new Liquibase(tmpFile.getName(), new FileSystemResourceAccessor(tmpFile.getParent()), rdb);		
+			Liquibase liq = new Liquibase(tmpFile.getName(), new FileSystemResourceAccessor(tmpFile.getParent()), rdb);
 			liq.update("schemagen");
 		} catch (LiquibaseException e) {
 			throw new CollectRdbException("Failed to update schema", e);

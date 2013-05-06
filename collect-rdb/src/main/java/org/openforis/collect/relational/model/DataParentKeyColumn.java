@@ -1,7 +1,6 @@
 package org.openforis.collect.relational.model;
 
 import java.math.BigInteger;
-import java.sql.Types;
 
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.model.Entity;
@@ -13,12 +12,12 @@ import org.openforis.idm.model.Record;
  * @author G. Miceli
  *
  */
-public class DataParentKeyColumn extends AbstractColumn<Node<?>> {
+public class DataParentKeyColumn extends IdColumn<Node<?>> {
 
 	private static final int NODE_ID_MAX_VALUE = 1000000;
 
 	DataParentKeyColumn(String name) {
-		super(name, Types.BIGINT, "bigint", null, false);
+		super(name);
 	}
 
 	@Override

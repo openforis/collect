@@ -11,7 +11,7 @@ import liquibase.database.structure.Table;
 import liquibase.exception.DatabaseException;
 import liquibase.snapshot.DatabaseSnapshot;
 
-import org.openforis.collect.relational.model.DataPrimaryKeyColumn;
+import org.openforis.collect.relational.model.PrimaryKeyColumn;
 import org.openforis.collect.relational.model.ReferentialConstraint;
 import org.openforis.collect.relational.model.RelationalSchema;
 import org.openforis.collect.relational.model.UniquenessConstraint;
@@ -68,7 +68,7 @@ class LiquidbaseDatabaseSnapshotBuilder {
 					lcolumn.setColumnSize(icolumn.getLength());
 				}
 				// Set PK
-				if ( icolumn instanceof DataPrimaryKeyColumn ) {
+				if ( icolumn instanceof PrimaryKeyColumn ) {
 					lcolumn.setPrimaryKey(true);
 					lcolumn.setUnique(true);
 					// Add PK constraint

@@ -22,7 +22,7 @@ import org.openforis.collect.relational.model.RelationalSchema;
 import org.openforis.collect.relational.model.RelationalSchemaGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Required;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -58,7 +58,7 @@ public class CollectRDBPublisher {
 		RelationalSchemaGenerator rsg = new RelationalSchemaGenerator();
 		RelationalSchema targetSchema = rsg.generateSchema(survey, targetSchemaName);
 		
-		createTargetDBSchema(targetSchema);
+		createTargetDBSchema(targetSchema, targetConn);
 		
 		// Insert data
 		List<CollectRecord> summaries = recordDao.loadSummaries(survey, rootEntityName, step);
@@ -72,11 +72,10 @@ public class CollectRDBPublisher {
 		}
 	}
 
-	protected void createTargetDBSchema(RelationalSchema targetSchema)
+	protected void createTargetDBSchema(RelationalSchema targetSchema, Connection targetConn)
 			throws CollectRdbException {
-		Connection rdbTargetConn = DataSourceUtils.getConnection(rdbDataSource);
 		RelationalSchemaCreator relationalSchemaCreator = new LiquibaseRelationalSchemaCreator();
-		relationalSchemaCreator.createRelationalSchema(targetSchema, rdbTargetConn);
+		relationalSchemaCreator.createRelationalSchema(targetSchema, targetConn);
 	}
 	
 	@Transactional("rdbTransactionManager")
@@ -97,6 +96,17 @@ public class CollectRDBPublisher {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	public static void main(String[] args) throws CollectRdbException {
+		ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext("application-context.xml");
+		CollectRDBPublisher publisher = ctx.getBean(CollectRDBPublisher.class);
+		publisher.export(
+				"naforma1",
+				"cluster",
+				Step.ANALYSIS,
+				"naforma1");
+//		DriverManager.getConnection("jdbc:postgresql://localhost:5433/archenland1", "postgres","postgres")); 
 	}
 	
 }
