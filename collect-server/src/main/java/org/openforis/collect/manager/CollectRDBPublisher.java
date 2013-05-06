@@ -83,6 +83,7 @@ public class CollectRDBPublisher {
 			RelationalSchema targetSchema, Connection targetConn) throws CollectRdbException {
 		int count = 0;
 		DatabaseExporter databaseExporter = new JooqDatabaseExporter(new DialectAwareJooqFactory(targetConn));
+		databaseExporter.insertReferenceData(targetSchema);
 		for (CollectRecord summary : summaries) {
 			if ( LOG.isInfoEnabled() ) {
 				LOG.info("Exporting record #" + (++count) + " id: " + summary.getId());

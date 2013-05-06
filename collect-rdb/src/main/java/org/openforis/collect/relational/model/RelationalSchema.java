@@ -49,13 +49,24 @@ public final class RelationalSchema {
 		return Collections.unmodifiableList(tableList);
 	}
 	
+	public List<CodeListTable> getCodeListTables() {
+		List<CodeListTable> tableList = new ArrayList<CodeListTable>(codeListTables.values());
+		return Collections.unmodifiableList(tableList);
+	}
+	
 	public CodeListTable getCodeListTable(CodeList list, Integer levelIdx) {
 		CodeListTableKey key = new CodeListTableKey(list.getId(), levelIdx);
 		return codeListTables.get(key);
 	}
 
 	public Dataset getReferenceData() {
-		return null;
+		Dataset dataset = new Dataset();
+		List<CodeListTable> codeListTables = getCodeListTables();
+		for (CodeListTable codeListTable : codeListTables) {
+			Dataset codeListDataset = codeListTable.extractData();
+			dataset.addRows(codeListDataset.getRows());
+		}
+		return dataset;
 	}
 	
 	public boolean containsTable(String name) {

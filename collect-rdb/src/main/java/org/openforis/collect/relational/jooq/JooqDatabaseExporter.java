@@ -36,15 +36,20 @@ public class JooqDatabaseExporter implements DatabaseExporter {
 
 	@Override
 	public void insertReferenceData(RelationalSchema schema) throws CollectRdbException {
-		// TODO Auto-generated method stub
+		Dataset dataset = schema.getReferenceData();
+		insertDataset(schema, dataset);
 	}
 
 	@Override
 	public void insertData(RelationalSchema schema, CollectRecord record) throws CollectRdbException  {
+		Dataset dataset = schema.createDataset(record);
+		insertDataset(schema, dataset);
+	}
+
+	private void insertDataset(RelationalSchema schema, Dataset dataset) throws CollectRdbException {
+		List<Row> rows = dataset.getRows();
+		List<InsertQuery<Record>> inserts = new ArrayList<InsertQuery<Record>>(rows.size());
 		try {
-			Dataset dataset = schema.createDataset(record);
-			List<Row> rows = dataset.getRows();
-			List<InsertQuery<Record>> inserts = new ArrayList<InsertQuery<Record>>(rows.size());
 			for (int rowno = 0; rowno < rows.size(); rowno++) {
 				Row row = rows.get(rowno);
 				Table<?> table = row.getTable();

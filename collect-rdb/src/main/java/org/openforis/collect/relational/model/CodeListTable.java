@@ -1,5 +1,7 @@
 package org.openforis.collect.relational.model;
 
+import java.util.List;
+
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
 
@@ -31,7 +33,7 @@ public class CodeListTable extends AbstractTable<CodeListItem> {
 	public Integer getLevelIdx() {
 		Integer result = null;
 		if ( codeList.isHierarchical() ) {
-			result = 1;
+			result = 0;
 			CodeListTable cp = parent;
 			while ( cp != null ) {
 				result++;
@@ -41,10 +43,28 @@ public class CodeListTable extends AbstractTable<CodeListItem> {
 		return result;
 	}
 	
+	public Dataset extractData() {
+		Dataset data = new Dataset();
+		Integer levelIdx = getLevelIdx();
+		List<CodeListItem> items = codeList.getItems(levelIdx);
+		for (CodeListItem item : items) {
+			Row row = extractRow(item);
+			data.addRow(row);
+		}
+		return data;
+	}
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	public Row extractRow(CodeListItem source) {
-		// TODO Auto-generated method stub
-		return null;
+		Row row = new Row(this);
+		List<Column<?>> columns = getColumns();
+		for (int i=0; i < columns.size(); i++) {
+			Column col = columns.get(i);
+			Object val = col.extractValue(source);
+			row.setValue(i, val);
+		}
+		return row;
 	}
 	
 	

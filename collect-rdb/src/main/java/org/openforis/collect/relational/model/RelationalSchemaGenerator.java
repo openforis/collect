@@ -351,8 +351,8 @@ public class RelationalSchemaGenerator {
 	private void addDataColumns(RelationalSchema rs, DataTable table, CodeAttributeDefinition defn, Path relativePath) throws CollectRdbException {
 		List<FieldDefinition<?>> fieldDefinitions = defn.getFieldDefinitions();
 		addDataColumn(table, fieldDefinitions.get(0), relativePath);
-		CodeListItemFKColumn codeListItemIdColumn = createCodeListItemFKColumn(rs, table, defn, relativePath);
-		table.addColumn(codeListItemIdColumn);
+		CodeListItemFKColumn codeListItemFKColumn = createCodeListItemFKColumn(rs, table, defn, relativePath);
+		table.addColumn(codeListItemFKColumn);
 		CodeList list = defn.getList();
 		if ( list.isQualifiable() ) {
 			addDataColumn(table, fieldDefinitions.get(1), relativePath);			
@@ -429,11 +429,8 @@ public class RelationalSchemaGenerator {
 
 	private CodeListItemFKColumn createCodeListItemFKColumn(RelationalSchema rs, DataTable table, 
 			CodeAttributeDefinition attrDefn, Path relativePath) {
-		Integer levelIdx = null;
 		CodeList list = attrDefn.getList();
-		if ( list.isHierarchical() ) {
-			levelIdx = attrDefn.getListLevelIndex();
-		}
+		Integer levelIdx = attrDefn.getListLevelIndex();
 		String codeListTableNamePrefix = getCodeListTableNamePrefix(list, levelIdx);
 		String codeListTableName = codeListTableNamePrefix + codeListTableSuffix;
 		CodeListItemFKColumn col = new CodeListItemFKColumn(codeListTableName + idColumnSuffix, attrDefn, relativePath);

@@ -26,6 +26,10 @@ public final class Dataset {
 		rows.add(row);
 	}
 	
+	void addRows(List<Row> rows) {
+		this.rows.addAll(rows);
+	}
+	
 	public void print(PrintStream out) {
 		for (Row row : rows) {
 			row.printDebug(out);
