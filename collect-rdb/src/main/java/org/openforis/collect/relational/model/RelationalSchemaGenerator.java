@@ -52,6 +52,7 @@ public class RelationalSchemaGenerator {
 	private String codeListTableSuffix = "_code";
 	private String codeListTablePrefix = "";
 	private String labelColumnMiddleSuffix = "_label_";
+	private String descriptionColumnMiddleSuffix = "_desc_";
 	private String dataTablePrefix = "";
 	private String otherColumnSuffix = "_other";
 	private int textMaxLength = 255;
@@ -193,11 +194,16 @@ public class RelationalSchemaGenerator {
 		Survey survey = codeList.getSurvey();
 		List<String> langCodes = survey.getLanguages();
 		for (String langCode : langCodes) {
-			String labelColName = tableNamePrefix + labelColumnMiddleSuffix + langCode;
-			LabelColumn labelCol = new LabelColumn(langCode, labelColName);
-			table.addColumn(labelCol);
+			String colName = tableNamePrefix + labelColumnMiddleSuffix + langCode;
+			CodeListItemLabelColumn col = new CodeListItemLabelColumn(langCode, colName);
+			table.addColumn(col);
 		}
-		//TODO add description columns
+		//add description columns
+		for (String langCode : langCodes) {
+			String colName = tableNamePrefix + descriptionColumnMiddleSuffix + langCode;
+			CodeListItemDescriptionColumn col = new CodeListItemDescriptionColumn(langCode, colName);
+			table.addColumn(col);
+		}
 		return table;
 	}
 
@@ -319,15 +325,8 @@ public class RelationalSchemaGenerator {
 			}
 		} else {
 			List<CodeListLevel> hierarchy = codeList.getHierarchy();
-			StringBuilder sb = new StringBuilder();
-			for ( int idx = 0; idx <= levelIdx; idx ++ ) {
-				CodeListLevel currentLevel = hierarchy.get(idx);
-				sb.append(currentLevel.getName());
-				if ( idx < levelIdx ) {
-					sb.append("_");
-				}
-			}
-			name = sb.toString();
+			CodeListLevel currentLevel = hierarchy.get(levelIdx);
+			name = currentLevel.getName();
 		}
 		return name;
 	}
@@ -351,9 +350,11 @@ public class RelationalSchemaGenerator {
 	private void addDataColumns(RelationalSchema rs, DataTable table, CodeAttributeDefinition defn, Path relativePath) throws CollectRdbException {
 		List<FieldDefinition<?>> fieldDefinitions = defn.getFieldDefinitions();
 		addDataColumn(table, fieldDefinitions.get(0), relativePath);
-		CodeListItemFKColumn codeListItemFKColumn = createCodeListItemFKColumn(rs, table, defn, relativePath);
-		table.addColumn(codeListItemFKColumn);
 		CodeList list = defn.getList();
+		if ( StringUtils.isBlank(list.getLookupTable()) ) {
+			CodeListItemFKColumn codeListItemFKColumn = createCodeListItemFKColumn(rs, table, defn, relativePath);
+			table.addColumn(codeListItemFKColumn);
+		}
 		if ( list.isQualifiable() ) {
 			addDataColumn(table, fieldDefinitions.get(1), relativePath);			
 		}

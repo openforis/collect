@@ -5,7 +5,6 @@ import java.math.BigInteger;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Node;
-import org.openforis.idm.model.Record;
 
 /**
  * 
@@ -13,8 +12,6 @@ import org.openforis.idm.model.Record;
  *
  */
 public class DataParentKeyColumn extends IdColumn<Node<?>> {
-
-	private static final int NODE_ID_MAX_VALUE = 1000000;
 
 	DataParentKeyColumn(String name) {
 		super(name);
@@ -31,14 +28,7 @@ public class DataParentKeyColumn extends IdColumn<Node<?>> {
 		if ( !parentDefn.isMultiple() ) {
 			return extractValue(parent);
 		}
-		Integer parentId = parent.getInternalId();
-		if ( parentId == null ) {
-			throw new NullPointerException("Parent node id");
-		}
-		Record record = context.getRecord();
-		BigInteger result = BigInteger.valueOf(parentId);
-		//result = parentId + recordId * NODE_ID_MAX_VALUE
-		result = result.add(BigInteger.valueOf(record.getId()).multiply(BigInteger.valueOf(NODE_ID_MAX_VALUE)));
-		return result;
+		BigInteger parentId = DataPrimaryKeyColumn.getArtificialId(parent);
+		return parentId;
 	}
 }

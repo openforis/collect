@@ -6,20 +6,20 @@ package org.openforis.collect.relational.model;
 import java.sql.Types;
 
 import org.openforis.collect.model.CollectSurvey;
-import org.openforis.idm.metamodel.Labelable;
+import org.openforis.idm.metamodel.CodeListItem;
 import org.openforis.idm.metamodel.SurveyObject;
 
 /**
  * @author S. Ricci
  *
  */
-public class LabelColumn extends AbstractColumn<Labelable> {
+public class CodeListItemDescriptionColumn extends AbstractColumn<CodeListItem> {
 
-	private static final int MAX_LENGTH = 255;
+	private static final int MAX_LENGTH = 511;
 	
 	private String languageCode;
 
-	LabelColumn(String languageCode, String name) {
+	CodeListItemDescriptionColumn(String languageCode, String name) {
 		super(name, Types.VARCHAR, "varchar", MAX_LENGTH, true);
 		this.languageCode = languageCode;
 	}
@@ -29,12 +29,12 @@ public class LabelColumn extends AbstractColumn<Labelable> {
 	}
 
 	@Override
-	public Object extractValue(Labelable source) {
-		String label = source.getLabel(languageCode);
+	public Object extractValue(CodeListItem source) {
+		String label = source.getDescription(languageCode);
 		if ( label == null && source instanceof SurveyObject ) {
 			CollectSurvey survey = (CollectSurvey) ((SurveyObject) source).getSurvey();
 			if ( survey.isDefaultLanguage(languageCode) ) {
-				label = source.getLabel(null);
+				label = source.getDescription(null);
 			}
 		}
 		return label;

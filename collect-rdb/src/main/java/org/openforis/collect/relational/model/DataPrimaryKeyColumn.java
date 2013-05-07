@@ -20,14 +20,20 @@ public class DataPrimaryKeyColumn extends IdColumn<Node<?>> implements PrimaryKe
 
 	@Override
 	public Object extractValue(Node<?> context) {
-		Integer id = context.getInternalId();
+		BigInteger id = getArtificialId(context);
+		return id;
+	}
+	
+	static BigInteger getArtificialId(Node<?> node) {
+		Integer id = node.getInternalId();
 		if ( id == null ) {
 			throw new NullPointerException("Node id");
 		}
-		Record record = context.getRecord();
-		BigInteger result = BigInteger.valueOf(id);
+		Record record = node.getRecord();
 		//result = id + recordId * NODE_ID_MAX_VALUE
-		result = result.add(BigInteger.valueOf(record.getId()).multiply(BigInteger.valueOf(NODE_ID_MAX_VALUE)));
+		BigInteger result = BigInteger.valueOf(id).add(
+				BigInteger.valueOf(record.getId()).multiply(BigInteger.valueOf(NODE_ID_MAX_VALUE))
+		);
 		return result;
 	}
 }
