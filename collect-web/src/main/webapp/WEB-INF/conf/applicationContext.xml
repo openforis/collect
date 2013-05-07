@@ -55,6 +55,8 @@
 		<entry key="/speciesImport" value-ref="fileNameViewController" />
 		<entry key="/species/export/*" value-ref="fileNameViewController" />
 		<entry key="/samplingdesign/export/*" value-ref="fileNameViewController" />
+		<entry key="/publishToRdb" value-ref="fileNameViewController" />
+		<entry key="/submitPublishToRdb" value-ref="fileNameViewController" />
 	</util:map>
 
 	<bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
@@ -88,6 +90,22 @@
 	<tx:annotation-driven transaction-manager="transactionManager"
 		proxy-target-class="true" />
 
+	<!-- ===================================== -->
+	<!-- RDB Data Source -->
+	<!-- ===================================== -->
+	<bean id="rdbDataSource" class="org.springframework.jndi.JndiObjectFactoryBean">
+		<property name="jndiName" value="java:comp/env/jdbc/collectRDBDs" />
+		<property name="resourceRef" value="true" />
+	</bean>
+
+	<bean id="rdbTransactionManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<qualifier value="rdbTransactionManager" />
+		<property name="dataSource" ref="rdbDataSource" />
+	</bean>
+
+	<tx:annotation-driven transaction-manager="rdbTransactionManager" proxy-target-class="true"/>
+	
 	<!-- ===================================== -->
 	<!-- Liquibase -->
 	<!-- ===================================== -->
@@ -168,7 +186,10 @@
 	<bean id="surveyManager" class="org.openforis.collect.manager.SurveyManager"
 		init-method="init" />
 	<bean id="userManager" class="org.openforis.collect.manager.UserManager" />
-
+	
+	<!-- RDB -->
+	<bean id="rdbPublisher" class="org.openforis.collect.manager.CollectRDBPublisher" />
+	
 	<!-- <bean id="recordContext" class="org.openforis.collect.model.CollectRecordContext" 
 		/> -->
 
