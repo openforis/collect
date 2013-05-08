@@ -103,7 +103,7 @@ public class RelationalSchemaGenerator {
 		}
 		addPKColumn(table);
 		//add code column
-		CodeColumn codeColumn = new CodeColumn(tableNamePrefix);
+		CodeListCodeColumn codeColumn = new CodeListCodeColumn(tableNamePrefix);
 		table.addColumn(codeColumn);
 		if ( parent != null ) {
 			String parentName = parent.getName();
