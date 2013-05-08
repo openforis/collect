@@ -19,15 +19,21 @@ public class ComparisonCheckFormObject extends CheckFormObject<ComparisonCheck> 
 	public void saveTo(ComparisonCheck dest, String languageCode) {
 		super.saveTo(dest, languageCode);
 		resetExpressions(dest);
-		if ( greaterThanEqual ) {
-			dest.setGreaterThanOrEqualsExpression(greaterThan);
-		} else {
-			dest.setGreaterThanExpression(greaterThan);
+		String trimmedGreaterThanExpr = StringUtils.trimToNull(greaterThan);
+		if ( trimmedGreaterThanExpr != null ) {
+			if ( greaterThanEqual ) {
+				dest.setGreaterThanOrEqualsExpression(trimmedGreaterThanExpr);
+			} else {
+				dest.setGreaterThanExpression(trimmedGreaterThanExpr);
+			}
 		}
-		if ( lessThanEqual ) {
-			dest.setLessThanOrEqualsExpression(lessThan);
-		} else {
-			dest.setLessThanExpression(lessThan);
+		String trimmedLessThanExpr = StringUtils.trimToNull(lessThan);
+		if ( trimmedLessThanExpr != null ) {
+			if ( lessThanEqual ) {
+				dest.setLessThanOrEqualsExpression(trimmedLessThanExpr);
+			} else {
+				dest.setLessThanExpression(trimmedLessThanExpr);
+			}
 		}
 	}
 	

@@ -1,5 +1,7 @@
 package org.openforis.collect.designer.form;
 
+import liquibase.util.StringUtils;
+
 import org.openforis.idm.metamodel.validation.CustomCheck;
 
 /**
@@ -14,7 +16,7 @@ public class CustomCheckFormObject extends CheckFormObject<CustomCheck> {
 	@Override
 	public void saveTo(CustomCheck dest, String languageCode) {
 		super.saveTo(dest, languageCode);
-		dest.setExpression(expression);
+		dest.setExpression(StringUtils.trimToNull(expression));
 	}
 	
 	@Override

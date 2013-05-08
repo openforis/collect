@@ -3,6 +3,7 @@
  */
 package org.openforis.collect.designer.form;
 
+import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.designer.model.CheckType;
 import org.openforis.idm.metamodel.validation.Check;
 import org.openforis.idm.metamodel.validation.Check.Flag;
@@ -27,8 +28,8 @@ public class CheckFormObject<T extends Check<?>> extends FormObject<T> {
 	@Override
 	public void saveTo(T dest, String languageCode) {
 		dest.setFlag(Flag.valueOf(flag));
-		dest.setCondition(condition);
-		dest.setMessage(languageCode, message);
+		dest.setCondition(StringUtils.trimToNull(condition));
+		dest.setMessage(languageCode, StringUtils.trimToNull(message));
 	}
 	
 	protected String getMessage(T source, String languageCode, String defaultLanguage) {

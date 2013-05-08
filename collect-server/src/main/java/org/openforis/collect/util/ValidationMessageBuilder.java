@@ -212,27 +212,31 @@ public class ValidationMessageBuilder {
 	}
 	
 	protected String getComparisonCheckMessageArg(Attribute<?,?> attribute, String expression) {
-		String result = expression;
-		Record record = attribute.getRecord();
-		Survey survey = record.getSurvey();
-		Schema schema = survey.getSchema();
-		SurveyContext recordContext = record.getSurveyContext();
-		ExpressionFactory expressionFactory = recordContext.getExpressionFactory();
-		try {
-			Entity parentEntity = attribute.getParent();
-			EntityDefinition parentDefinition = parentEntity.getDefinition();
-			ModelPathExpression modelPathExpression = expressionFactory.createModelPathExpression(expression);
-			List<String> referencedPaths = modelPathExpression.getReferencedPaths();
-			for (String path : referencedPaths) {
-				String absolutePath = parentDefinition.getPath() + PATH_SEPARATOR + path;
-				NodeDefinition nodeDefinition = schema.getDefinitionByPath(absolutePath);
-				String label = getPrettyLabelText(nodeDefinition);
-				result = result.replaceAll(nodeDefinition.getName(), label);
+		if ( StringUtils.isNotBlank(expression) ) {
+			String result = expression;
+			Record record = attribute.getRecord();
+			Survey survey = record.getSurvey();
+			Schema schema = survey.getSchema();
+			SurveyContext recordContext = record.getSurveyContext();
+			ExpressionFactory expressionFactory = recordContext.getExpressionFactory();
+			try {
+				Entity parentEntity = attribute.getParent();
+				EntityDefinition parentDefinition = parentEntity.getDefinition();
+				ModelPathExpression modelPathExpression = expressionFactory.createModelPathExpression(expression);
+				List<String> referencedPaths = modelPathExpression.getReferencedPaths();
+				for (String path : referencedPaths) {
+					String absolutePath = parentDefinition.getPath() + PATH_SEPARATOR + path;
+					NodeDefinition nodeDefinition = schema.getDefinitionByPath(absolutePath);
+					String label = getPrettyLabelText(nodeDefinition);
+					result = result.replaceAll(nodeDefinition.getName(), label);
+				}
+			} catch (Exception e) {
+				throw new RuntimeException(e);
 			}
-		} catch (Exception e) {
-			throw new RuntimeException(e);
+			return result;
+		} else {
+			return expression;
 		}
-		return result;
 	}
 	
 	protected String getComparisonCheckMessage(Attribute<?,?> attribute, ValidationResult validationResult) {
