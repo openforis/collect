@@ -2,6 +2,7 @@ package org.openforis.collect.relational.model;
 
 import java.util.List;
 
+import org.openforis.collect.relational.DatabaseExporterConfig;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
 
@@ -43,10 +44,22 @@ public class CodeListTable extends AbstractTable<CodeListItem> {
 		return result;
 	}
 	
-	public Dataset extractData() {
+	public Dataset extractData(DatabaseExporterConfig config) {
 		Dataset data = new Dataset();
 		Integer levelIdx = getLevelIdx();
 		List<CodeListItem> items = codeList.getItems(levelIdx);
+		String defaultCode = config.getDefaultCode();
+		boolean containsDefaultAlready = false;
+		for (CodeListItem item : items) {
+			if ( defaultCode.equals(item.getCode()) ) {
+				containsDefaultAlready = true;
+				break;
+			}
+		}
+		if ( !containsDefaultAlready ) {
+			Row defaultCodeRow = createDefaultCodeRow(config);
+			data.addRow(defaultCodeRow);
+		}
 		for (CodeListItem item : items) {
 			Row row = extractRow(item);
 			data.addRow(row);
@@ -55,7 +68,6 @@ public class CodeListTable extends AbstractTable<CodeListItem> {
 	}
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	@Override
 	public Row extractRow(CodeListItem source) {
 		Row row = new Row(this);
 		List<Column<?>> columns = getColumns();
@@ -67,6 +79,25 @@ public class CodeListTable extends AbstractTable<CodeListItem> {
 		return row;
 	}
 	
-	
+	protected Row createDefaultCodeRow(DatabaseExporterConfig config) {
+		Row row = new Row(this);
+		List<Column<?>> columns = getColumns();
+		for (int i=0; i < columns.size(); i++) {
+			@SuppressWarnings("rawtypes")
+			Column col = columns.get(i);
+			Object val;
+			if ( col instanceof CodeListPrimaryKeyColumn ) {
+				val = CodeListPrimaryKeyColumn.getDefaultCodeId(codeList);
+			} else if ( col instanceof CodeListCodeColumn ) {
+				val = config.getDefaultCode();
+			} else if ( col instanceof CodeListItemLabelColumn ) {
+				val = config.getDefaultCodeLabel(((CodeListItemLabelColumn) col).getLanguageCode());
+			} else {
+				val = null;
+			}
+			row.setValue(i, val);
+		}
+		return row;
+	}
 
 }

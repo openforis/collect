@@ -43,6 +43,7 @@ abstract class AbstractTable<T> implements Table<T>  {
 	public String getName() {
 		return prefix+baseName;
 	}
+	
 	/**
 	 * Adds a column or replaces existing column with same name
 	 * @param column

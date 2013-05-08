@@ -11,11 +11,11 @@ import org.openforis.idm.metamodel.CodeListItem;
  * @author S. Ricci
  *
  */
-public class CodeColumn extends AbstractColumn<CodeListItem> {
+public class CodeListCodeColumn extends AbstractColumn<CodeListItem> {
 
 	private static final int MAX_LENGTH = 255;
 
-	CodeColumn(String name) {
+	CodeListCodeColumn(String name) {
 		super(name, Types.VARCHAR, "varchar", MAX_LENGTH, false);
 	}
 

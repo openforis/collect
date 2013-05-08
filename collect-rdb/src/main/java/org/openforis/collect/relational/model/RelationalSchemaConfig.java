@@ -1,5 +1,6 @@
 package org.openforis.collect.relational.model;
 
+
 /**
  * 
  * @author S. Ricci
@@ -19,8 +20,8 @@ public class RelationalSchemaConfig implements Cloneable {
 	private int textMaxLength;
 	private int memoMaxLength;
 	private int floatingPointPrecision;
-
-	private static RelationalSchemaConfig DEFAULT;
+	
+	private static final RelationalSchemaConfig DEFAULT;
 	static {
 		RelationalSchemaConfig config = new RelationalSchemaConfig();
 		config.idColumnSuffix = "_id";

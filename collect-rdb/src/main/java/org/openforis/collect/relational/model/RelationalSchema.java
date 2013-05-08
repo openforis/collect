@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.openforis.collect.relational.CollectRdbException;
+import org.openforis.collect.relational.DatabaseExporterConfig;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -59,11 +60,11 @@ public final class RelationalSchema {
 		return codeListTables.get(key);
 	}
 
-	public Dataset getReferenceData() {
+	public Dataset getReferenceData(DatabaseExporterConfig config) {
 		Dataset dataset = new Dataset();
 		List<CodeListTable> codeListTables = getCodeListTables();
 		for (CodeListTable codeListTable : codeListTables) {
-			Dataset codeListDataset = codeListTable.extractData();
+			Dataset codeListDataset = codeListTable.extractData(config);
 			dataset.addRows(codeListDataset.getRows());
 		}
 		return dataset;
@@ -96,6 +97,10 @@ public final class RelationalSchema {
 	}
 
 	public Dataset createDataset(Record record) {
+		return createDataset(DatabaseExporterConfig.createDefault(), record);
+	}
+	
+	public Dataset createDataset(DatabaseExporterConfig config, Record record) {
 		Entity root = record.getRootEntity();
 		EntityDefinition rootDefn = root.getDefinition();
 		String name = rootDefn.getName();

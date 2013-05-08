@@ -12,7 +12,11 @@ import java.sql.Types;
 public abstract class IdColumn<T> extends AbstractColumn<T> {
 
 	IdColumn(String name) {
-		super(name, Types.BIGINT, "bigint", null, false);
+		this(name, false);
+	}
+	
+	IdColumn(String name, boolean nullable) {
+		super(name, Types.BIGINT, "bigint", null, nullable);
 	}
 	
 }

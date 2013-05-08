@@ -4,13 +4,13 @@ import org.openforis.idm.metamodel.CodeListItem;
 
 /**
  * 
- * @author G. Miceli
+ * @author S. Ricci
  *
  */
 public class CodeListParentKeyColumn extends IdColumn<CodeListItem> {
 
 	CodeListParentKeyColumn(String name) {
-		super(name);
+		super(name, true);
 	}
 
 	@Override
@@ -25,4 +25,5 @@ public class CodeListParentKeyColumn extends IdColumn<CodeListItem> {
 		}
 		return parentId;
 	}
+	
 }
