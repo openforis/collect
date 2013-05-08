@@ -31,34 +31,24 @@ import org.openforis.idm.path.Path;
  *
  */
 
-// ASAP:
-// TODO finish schema generation (to Postgresql)
-// TODO Collect RDB <==> jOOQ adapters
-// TODO insert data into database with jOOQ adapters
-
 // Later:
 // TODO insert dates and times
 // TODO SRS table
-// TODO 
-// TODO Code list tables
-// TODO Move schema config to RelationalSchemaConfig
 public class RelationalSchemaGenerator {
 	private static final String RDB_NAMESPACE = "http://www.openforis.org/collect/3.0/rdb";
 	private static final QName TABLE_NAME_QNAME = new QName(RDB_NAMESPACE, "table");
 	private static final QName COLUMN_NAME_QNAME = new QName(RDB_NAMESPACE, "column");
-	private String idColumnSuffix = "_id";
-	private String pkConstraintPrefix = "pk_";
-	private String fkConstraintPrefix = "fk_";
-	private String codeListTableSuffix = "_code";
-	private String codeListTablePrefix = "";
-	private String labelColumnMiddleSuffix = "_label_";
-	private String descriptionColumnMiddleSuffix = "_desc_";
-	private String dataTablePrefix = "";
-	private String otherColumnSuffix = "_other";
-	private int textMaxLength = 255;
-	private int memoMaxLength = 2048;
-	private int floatingPointPrecision = 24;
 	
+	private RelationalSchemaConfig config; 
+	
+	public RelationalSchemaGenerator() {
+		this(RelationalSchemaConfig.createDefault());
+	}
+	
+	public RelationalSchemaGenerator(RelationalSchemaConfig config) {
+		this.config = config;
+	}
+
 	public RelationalSchema generateSchema(Survey survey, String schemaName) throws CollectRdbException {
 		RelationalSchema rs = new RelationalSchema(survey, schemaName);
 		addCodeListTables(rs);
@@ -66,70 +56,6 @@ public class RelationalSchemaGenerator {
 		return rs;
 	}
 	
-	public String getIdColumnSuffix() {
-		return idColumnSuffix;
-	}
-
-	public void setIdColumnSuffix(String idColumnSuffix) {
-		this.idColumnSuffix = idColumnSuffix;
-	}
-
-	public String getOtherColumnSuffix() {
-		return otherColumnSuffix;
-	}
-
-	public void setOtherColumnSuffix(String otherColumnSuffix) {
-		this.otherColumnSuffix = otherColumnSuffix;
-	}
-
-	public int getTextMaxLength() {
-		return textMaxLength;
-	}
-
-	public void setTextMaxLength(int textMaxLength) {
-		this.textMaxLength = textMaxLength;
-	}
-
-	public int getMemoMaxLength() {
-		return memoMaxLength;
-	}
-
-	public void setMemoMaxLength(int memoMaxLength) {
-		this.memoMaxLength = memoMaxLength;
-	}
-
-	public int getFloatingPointPrecision() {
-		return floatingPointPrecision;
-	}
-
-	public void setFloatingPointPrecision(int floatingPointPrecision) {
-		this.floatingPointPrecision = floatingPointPrecision;
-	}
-
-	public String getPkConstraintPrefix() {
-		return pkConstraintPrefix;
-	}
-
-	public void setPkConstraintPrefix(String pkConstraintPrefix) {
-		this.pkConstraintPrefix = pkConstraintPrefix;
-	}
-
-	public String getFkConstraintPrefix() {
-		return fkConstraintPrefix;
-	}
-
-	public void setFkConstraintPrefix(String fkConstraintPrefix) {
-		this.fkConstraintPrefix = fkConstraintPrefix;
-	}
-
-	public String getDataTablePrefix() {
-		return dataTablePrefix;
-	}
-
-	public void setDataTablePrefix(String dataTablePrefix) {
-		this.dataTablePrefix = dataTablePrefix;
-	}
-
 	private void addCodeListTables(RelationalSchema rs) throws CollectRdbException {
 		Survey survey = rs.getSurvey();
 		List<CodeList> codeLists = survey.getCodeLists();
@@ -170,8 +96,8 @@ public class RelationalSchemaGenerator {
 			CodeList codeList, CodeListTable parent, Integer hierarchyIdx)
 			throws CollectRdbException {
 		String tableNamePrefix = getCodeListTableNamePrefix(codeList, hierarchyIdx);
-		String tableName = tableNamePrefix + codeListTableSuffix;
-		CodeListTable table = new CodeListTable(codeListTablePrefix, tableName, codeList, parent);
+		String tableName = tableNamePrefix + config.getCodeListTableSuffix();
+		CodeListTable table = new CodeListTable(config.getCodeListTablePrefix(), tableName, codeList, parent);
 		if ( rs.containsTable(tableName) ) {
 			throw new CollectRdbException("Duplicate table '"+tableName+"' for CodeList "+codeList.getName());
 		}
@@ -182,10 +108,10 @@ public class RelationalSchemaGenerator {
 		if ( parent != null ) {
 			String parentName = parent.getName();
 			// Create Parent FK column
-			Column<?> parentIdColumn = new CodeListParentKeyColumn(parentName + idColumnSuffix);
+			Column<?> parentIdColumn = new CodeListParentKeyColumn(parentName + config.getIdColumnSuffix());
 			table.addColumn(parentIdColumn);
 			// Create FK constraint
-			String fkConstraintName = fkConstraintPrefix + table.getBaseName() + "_" + parent.getBaseName();
+			String fkConstraintName = config.getFkConstraintPrefix() + table.getBaseName() + "_" + parent.getBaseName();
 			PrimaryKeyConstraint parentPkConstraint = parent.getPrimaryKeyConstraint();
 			ReferentialConstraint fkConstraint = new ReferentialConstraint(fkConstraintName, table, parentPkConstraint, parentIdColumn);
 			table.addConstraint(fkConstraint);
@@ -194,13 +120,13 @@ public class RelationalSchemaGenerator {
 		Survey survey = codeList.getSurvey();
 		List<String> langCodes = survey.getLanguages();
 		for (String langCode : langCodes) {
-			String colName = tableNamePrefix + labelColumnMiddleSuffix + langCode;
+			String colName = tableNamePrefix + config.getLabelColumnMiddleSuffix() + langCode;
 			CodeListItemLabelColumn col = new CodeListItemLabelColumn(langCode, colName);
 			table.addColumn(col);
 		}
 		//add description columns
 		for (String langCode : langCodes) {
-			String colName = tableNamePrefix + descriptionColumnMiddleSuffix + langCode;
+			String colName = tableNamePrefix + config.getDescriptionColumnMiddleSuffix() + langCode;
 			CodeListItemDescriptionColumn col = new CodeListItemDescriptionColumn(langCode, colName);
 			table.addColumn(col);
 		}
@@ -248,18 +174,18 @@ public class RelationalSchemaGenerator {
 
 	private DataTable createDataTable(RelationalSchema rs, DataTable parentTable, NodeDefinition defn, Path relativePath) throws CollectRdbException {
 		String name = getDataTableName(parentTable, defn);
-		DataTable table = new DataTable(dataTablePrefix, name, parentTable, defn, relativePath);
+		DataTable table = new DataTable(config.getDataTablePrefix(), name, parentTable, defn, relativePath);
 		if ( rs.containsTable(name) ) {
 			throw new CollectRdbException("Duplicate table '"+name+"' for "+defn.getPath());
 		}
 		addPKColumn(table);
 		if ( parentTable != null ) {
 			// Create FK column
-			String fkColumnName = parentTable.getBaseName() + idColumnSuffix;
+			String fkColumnName = parentTable.getBaseName() + config.getIdColumnSuffix();
 			Column<?> fkColumn = new DataParentKeyColumn(fkColumnName);
 			table.addColumn(fkColumn);
 			// Create FK constraint
-			String fkConstraintName = fkConstraintPrefix + table.getBaseName() + "_" + parentTable.getBaseName();
+			String fkConstraintName = config.getFkConstraintPrefix() + table.getBaseName() + "_" + parentTable.getBaseName();
 			PrimaryKeyConstraint parentPKConstraint = parentTable.getPrimaryKeyConstraint();
 			ReferentialConstraint fkConstraint = new ReferentialConstraint(fkConstraintName, table, parentPKConstraint, fkColumn);
 			table.addConstraint(fkConstraint);
@@ -270,7 +196,7 @@ public class RelationalSchemaGenerator {
 	}
 
 	protected void addPKColumn(DataTable table) {
-		String name = table.getName() + idColumnSuffix;
+		String name = table.getName() + config.getIdColumnSuffix();
 		// Create PK column
 		Column<?> pkColumn = new DataPrimaryKeyColumn(name);
 		table.addColumn(pkColumn);
@@ -279,7 +205,7 @@ public class RelationalSchemaGenerator {
 	}
 	
 	protected void addPKColumn(CodeListTable table) {
-		String name = table.getName() + idColumnSuffix;
+		String name = table.getName() + config.getIdColumnSuffix();
 		// Create PK column
 		Column<?> pkColumn = new CodeListPrimaryKeyColumn(name);
 		table.addColumn(pkColumn);
@@ -288,7 +214,7 @@ public class RelationalSchemaGenerator {
 	}
 
 	protected void addPKConstraint(AbstractTable<?> table, Column<?> pkColumn) {
-		String pkConstraintName = pkConstraintPrefix + table.getBaseName();
+		String pkConstraintName = config.getPkConstraintPrefix() + table.getBaseName();
 		PrimaryKeyConstraint pkConstraint = new PrimaryKeyConstraint(pkConstraintName, table, pkColumn);
 		table.setPrimaryKeyConstraint(pkConstraint);
 	}
@@ -433,13 +359,13 @@ public class RelationalSchemaGenerator {
 		CodeList list = attrDefn.getList();
 		Integer levelIdx = attrDefn.getListLevelIndex();
 		String codeListTableNamePrefix = getCodeListTableNamePrefix(list, levelIdx);
-		String codeListTableName = codeListTableNamePrefix + codeListTableSuffix;
-		CodeListItemFKColumn col = new CodeListItemFKColumn(codeListTableName + idColumnSuffix, attrDefn, relativePath);
+		String codeListTableName = codeListTableNamePrefix + config.getCodeListTableSuffix();
+		CodeListItemFKColumn col = new CodeListItemFKColumn(codeListTableName + config.getIdColumnSuffix(), attrDefn, relativePath);
 		table.addColumn(col);
 		// Create FK constraint
 		CodeListTable codeListTable = rs.getCodeListTable(list, levelIdx);
 		if ( codeListTable != null ) {
-			String fkConstraintName = fkConstraintPrefix + table.getBaseName() + "_" + codeListTableName;
+			String fkConstraintName = config.getFkConstraintPrefix() + table.getBaseName() + "_" + codeListTableName;
 			PrimaryKeyConstraint codeListPkConstraint = codeListTable.getPrimaryKeyConstraint();
 			ReferentialConstraint fkConstraint = new ReferentialConstraint(fkConstraintName, table, codeListPkConstraint, col);
 			table.addConstraint(fkConstraint);
@@ -464,7 +390,7 @@ public class RelationalSchemaGenerator {
 		} else if ( type == Double.class ) {
 			jdbcType = Types.FLOAT;
 			typeName =  "float";
-			length = floatingPointPrecision ;
+			length = config.getFloatingPointPrecision();
 		} else if ( type == Boolean.class ) {
 			jdbcType = Types.BOOLEAN;
 			typeName =  "boolean";
@@ -475,13 +401,13 @@ public class RelationalSchemaGenerator {
 			if ( attr instanceof TextAttributeDefinition ) {
 				TextAttributeDefinition textAttr = (TextAttributeDefinition) attr;
 				if ( textAttr.getType() == Type.MEMO ) {
-					length = memoMaxLength;
+					length = config.getMemoMaxLength();
 				} else {
-					length = textMaxLength;
+					length = config.getTextMaxLength();
 				}
 			} else {
 				// default for string-like types (code, qualifier)
-				length = textMaxLength;
+				length = config.getTextMaxLength();
 			}
 		} else {
 			throw new UnsupportedOperationException("Unknown field type "+type);				
@@ -521,7 +447,7 @@ public class RelationalSchemaGenerator {
 				fld.equals(NumberAttributeDefinition.VALUE_FIELD) ) {
 			return "";
 		}  else if ( fld.equals("qualifier") ) {
-			return otherColumnSuffix;
+			return config.getOtherColumnSuffix();
 		} else {
 			return "_" + fld;
 		}
@@ -537,9 +463,13 @@ public class RelationalSchemaGenerator {
 		if ( fld.equals(NumberAttributeDefinition.VALUE_FIELD) ) {
 			return getDataColumnName(table, defn.getAttributeDefinition());
 		} else if ( fld.equals(CodeAttributeDefinition.QUALIFIER_FIELD) ) {
-			return otherColumnSuffix;
+			return config.getOtherColumnSuffix();
 		} else {
 			return fld;
 		}
+	}
+	
+	public void setConfig(RelationalSchemaConfig config) {
+		this.config = config;
 	}
 }
