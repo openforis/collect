@@ -2,7 +2,6 @@ package org.openforis.collect.relational.model;
 
 import java.math.BigInteger;
 
-import org.openforis.collect.relational.DatabaseExporterConfig;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Node;
@@ -20,11 +19,6 @@ public class DataParentKeyColumn extends IdColumn<Node<?>> {
 
 	@Override
 	public Object extractValue(Node<?> source) {
-		return extractValue(DatabaseExporterConfig.createDefault(), source);
-	}
-
-	@Override
-	public Object extractValue(DatabaseExporterConfig config, Node<?> source) {
 		Entity parent = source.getParent();
 		if ( parent == null ) {
 			throw new NullPointerException("Parent node");

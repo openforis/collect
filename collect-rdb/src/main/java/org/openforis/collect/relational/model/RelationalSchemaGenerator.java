@@ -79,12 +79,12 @@ public class RelationalSchemaGenerator {
 		if ( StringUtils.isBlank(codeList.getLookupTable()) ) {
 			List<CodeListLevel> hierarchy = codeList.getHierarchy();
 			if ( hierarchy.size() == 0 ) {
-				CodeListTable table = createCodeListTable(rs, codeList, null, null);
+				CodeTable table = createCodeListTable(rs, codeList, null, null);
 				rs.addTable(table);
 			}
-			CodeListTable parent = null;
+			CodeTable parent = null;
 			for (int hierarchyIdx = 0; hierarchyIdx < hierarchy.size(); hierarchyIdx++) {
-				CodeListTable table = createCodeListTable(rs, codeList, parent,
+				CodeTable table = createCodeListTable(rs, codeList, parent,
 						hierarchyIdx);
 				rs.addTable(table);
 				parent = table;
@@ -92,12 +92,13 @@ public class RelationalSchemaGenerator {
 		}
 	}
 
-	protected CodeListTable createCodeListTable(RelationalSchema rs,
-			CodeList codeList, CodeListTable parent, Integer hierarchyIdx)
+	protected CodeTable createCodeListTable(RelationalSchema rs,
+			CodeList codeList, CodeTable parent, Integer hierarchyIdx)
 			throws CollectRdbException {
 		String tableNamePrefix = getCodeListTableNamePrefix(codeList, hierarchyIdx);
 		String tableName = tableNamePrefix + config.getCodeListTableSuffix();
-		CodeListTable table = new CodeListTable(config.getCodeListTablePrefix(), tableName, codeList, parent);
+		CodeTable table = new CodeTable(config.getCodeListTablePrefix(), tableName, codeList, parent, 
+				config.getDefaultCode(), config.getDefaultCodeLabels());
 		if ( rs.containsTable(tableName) ) {
 			throw new CollectRdbException("Duplicate table '"+tableName+"' for CodeList "+codeList.getName());
 		}
@@ -108,8 +109,8 @@ public class RelationalSchemaGenerator {
 		if ( parent != null ) {
 			String parentName = parent.getName();
 			// Create Parent FK column
-			Column<?> parentIdColumn = new CodeListParentKeyColumn(parentName + config.getIdColumnSuffix());
-			table.addColumn(parentIdColumn);
+			Column<?> parentIdColumn = new CodeParentKeyColumn(parentName + config.getIdColumnSuffix());
+			addColumn(table, parentIdColumn);
 			// Create FK constraint
 			String fkConstraintName = config.getFkConstraintPrefix() + table.getBaseName() + "_" + parent.getBaseName();
 			PrimaryKeyConstraint parentPkConstraint = parent.getPrimaryKeyConstraint();
@@ -121,13 +122,13 @@ public class RelationalSchemaGenerator {
 		List<String> langCodes = survey.getLanguages();
 		for (String langCode : langCodes) {
 			String colName = tableNamePrefix + config.getLabelColumnMiddleSuffix() + langCode;
-			CodeListItemLabelColumn col = new CodeListItemLabelColumn(langCode, colName);
-			table.addColumn(col);
+			CodeLabelColumn col = new CodeLabelColumn(langCode, colName);
+			addColumn(table, col);
 		}
 		//add description columns
 		for (String langCode : langCodes) {
 			String colName = tableNamePrefix + config.getDescriptionColumnMiddleSuffix() + langCode;
-			CodeListItemDescriptionColumn col = new CodeListItemDescriptionColumn(langCode, colName);
+			CodeListDescriptionColumn col = new CodeListDescriptionColumn(langCode, colName);
 			table.addColumn(col);
 		}
 		return table;
@@ -204,10 +205,10 @@ public class RelationalSchemaGenerator {
 		addPKConstraint(table, pkColumn);
 	}
 	
-	protected void addPKColumn(CodeListTable table) {
+	protected void addPKColumn(CodeTable table) {
 		String name = table.getName() + config.getIdColumnSuffix();
 		// Create PK column
-		Column<?> pkColumn = new CodeListPrimaryKeyColumn(name);
+		Column<?> pkColumn = new CodePrimaryKeyColumn(name);
 		table.addColumn(pkColumn);
 		// Create PK constraint
 		addPKConstraint(table, pkColumn);
@@ -278,7 +279,7 @@ public class RelationalSchemaGenerator {
 		addCodeColumn(table, codeField, relativePath);
 		CodeList list = defn.getList();
 		if ( StringUtils.isBlank(list.getLookupTable()) ) {
-			addCodeIdColumn(rs, table, defn, relativePath);
+			addCodeValueFKColumn(rs, table, defn, relativePath);
 		}
 		if ( list.isQualifiable() ) {
 			addDataColumn(table, defn.getFieldDefinition(CodeAttributeDefinition.QUALIFIER_FIELD), relativePath);			
@@ -300,8 +301,8 @@ public class RelationalSchemaGenerator {
 	private void addCodeColumn(DataTable table, FieldDefinition<?> defn, Path relativePath) throws CollectRdbException {
 		relativePath = relativePath.appendElement(defn.getName());
 		String name = getDataColumnName(table, (FieldDefinition<?>) defn);
-		CodeColumn column = new CodeColumn(name, defn, relativePath,  config.getTextMaxLength()); 
-		addDataColumn(table, column);
+		CodeColumn column = new CodeColumn(name, defn, relativePath,  config.getTextMaxLength(), config.getDefaultCode()); 
+		addColumn(table, column);
 	}
 	
 	private void addDataColumn(DataTable table, FieldDefinition<?> defn, Path relativePath) throws CollectRdbException {
@@ -311,10 +312,10 @@ public class RelationalSchemaGenerator {
 	
 	private void addDataColumn(DataTable table, NodeDefinition defn, Path relativePath) throws CollectRdbException {
 		DataColumn column = createDataColumn(table, defn, relativePath);
-		addDataColumn(table, column);
+		addColumn(table, column);
 	}
 
-	private void addDataColumn(DataTable table, DataColumn column)
+	private void addColumn(AbstractTable<?> table, Column<?> column)
 			throws CollectRdbException {
 		String name = column.getName();
 		if ( table.containsColumn(name) ) {
@@ -365,24 +366,26 @@ public class RelationalSchemaGenerator {
 		}
 	}
 
-	private void addCodeIdColumn(RelationalSchema rs, DataTable table, 
-			CodeAttributeDefinition attrDefn, Path relativePath) {
+	private void addCodeValueFKColumn(RelationalSchema rs, DataTable table, 
+			CodeAttributeDefinition attrDefn, Path relativePath) throws CollectRdbException {
 		CodeList list = attrDefn.getList();
 		Integer levelIdx = attrDefn.getListLevelIndex();
 		String codeListTableNamePrefix = getCodeListTableNamePrefix(list, levelIdx);
 		String codeListTableName = codeListTableNamePrefix + config.getCodeListTableSuffix();
-		CodeIdColumn col = new CodeIdColumn(codeListTableName + config.getIdColumnSuffix(), attrDefn, relativePath);
-		table.addColumn(col);
+		String codeValueColumnName = getDataColumnName(table, attrDefn);
+		String fkColumnName = codeValueColumnName + config.getCodeListTableSuffix() + config.getIdColumnSuffix();
+		CodeValueFKColumn col = new CodeValueFKColumn(fkColumnName, attrDefn, relativePath,
+				config.getDefaultCode());
+		addColumn(table, col);
 		// Create FK constraint
-		CodeListTable codeListTable = rs.getCodeListTable(list, levelIdx);
+		CodeTable codeListTable = rs.getCodeListTable(list, levelIdx);
 		if ( codeListTable != null ) {
-			String fkConstraintName = config.getFkConstraintPrefix() + table.getBaseName() + "_" + codeListTableName;
+			String fkConstraintName = config.getFkConstraintPrefix() + codeValueColumnName + "_" + codeListTableName;
 			PrimaryKeyConstraint codeListPkConstraint = codeListTable.getPrimaryKeyConstraint();
 			ReferentialConstraint fkConstraint = new ReferentialConstraint(fkConstraintName, table, codeListPkConstraint, col);
 			table.addConstraint(fkConstraint);
 		}
 	}
-	
 
 	private DataColumn createDataColumn(DataTable table, FieldDefinition<?> defn, Path relativePath) {
 		String name = getDataColumnName(table, (FieldDefinition<?>) defn); 

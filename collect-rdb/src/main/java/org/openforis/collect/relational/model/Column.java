@@ -1,6 +1,5 @@
 package org.openforis.collect.relational.model;
 
-import org.openforis.collect.relational.DatabaseExporterConfig;
 
 /**
  * 
@@ -26,6 +25,4 @@ public interface Column<T> {
 	
 	Object extractValue(T source);
 	
-	Object extractValue(DatabaseExporterConfig config, T source);
-
 }

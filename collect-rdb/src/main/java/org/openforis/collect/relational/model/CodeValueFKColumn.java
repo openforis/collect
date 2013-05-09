@@ -6,7 +6,6 @@ package org.openforis.collect.relational.model;
 import java.sql.Types;
 
 import org.apache.commons.lang3.StringUtils;
-import org.openforis.collect.relational.DatabaseExporterConfig;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
@@ -21,45 +20,46 @@ import org.openforis.idm.path.Path;
  * @author S. Ricci
  *
  */
-public class CodeIdColumn extends DataColumn {
+public class CodeValueFKColumn extends DataColumn {
+	
+	private String defaultCodeValue;
 
-	CodeIdColumn(String name, CodeAttributeDefinition defn, Path relPath) {
+	CodeValueFKColumn(String name, CodeAttributeDefinition defn, Path relPath, String defaultCodeValue) {
 		super(name, Types.BIGINT, "bigint", defn, relPath, null, true);
+		this.defaultCodeValue = defaultCodeValue;
 	}
 
 	@Override
-	public Object extractValue(DatabaseExporterConfig config, Node<?> context) {
+	public Object extractValue(Node<?> context) {
 		NodeDefinition defn = getNodeDefinition();
 		if ( defn instanceof CodeAttributeDefinition ) {
 			Node<?> valNode = super.extractValueNode(context);
 			if ( valNode != null && valNode instanceof CodeAttribute ) {
-				return extractValue(config, (CodeAttribute) valNode);
-			} else if ( config.getDefaultCode() != null ) {
+				return extractValue((CodeAttribute) valNode);
+			} else if ( defaultCodeValue != null ) {
 				ModelVersion version = context.getRecord().getVersion();
-				return getDefaultCodeId(config, (CodeAttributeDefinition) defn, version);
+				return getDefaultCodeId((CodeAttributeDefinition) defn, version);
 			}
 		}
 		return null;
 	}
 
-	protected Object extractValue(DatabaseExporterConfig config,
-			CodeAttribute valNode) {
+	protected Object extractValue(CodeAttribute valNode) {
 		ModelVersion version = valNode.getRecord().getVersion();
 		CodeAttributeDefinition defn = valNode.getDefinition();
 		Field<String> codeField = valNode.getCodeField();
 		String code = codeField.getValue();
-		String defaultCode = config.getDefaultCode();
 		if ( StringUtils.isBlank(code) ) {
-			if ( defaultCode == null ) {
+			if ( defaultCodeValue == null ) {
 				return null;
 			} else {
-				return getDefaultCodeId(config, defn, version);
+				return getDefaultCodeId(defn, version);
 			}
 		} else {
 			CodeListItem codeListItem = valNode.getCodeListItem();
 			if ( codeListItem == null ) {
-				if ( code.equals(defaultCode)) {
-					return getDefaultCodeId(config, defn, version);
+				if ( code.equals(defaultCodeValue)) {
+					return getDefaultCodeId(defn, version);
 				} else {
 					return null;
 				}
@@ -69,12 +69,11 @@ public class CodeIdColumn extends DataColumn {
 		}
 	}
 
-	protected Integer getDefaultCodeId(DatabaseExporterConfig config, CodeAttributeDefinition defn,
+	protected Integer getDefaultCodeId(CodeAttributeDefinition defn,
 			ModelVersion version) {
 		CodeList list = defn.getList();
 		int levelIdx = defn.getCodeListLevel();
-		String defaultCode = config.getDefaultCode();
-		CodeListItem defaultCodeItem = list.getItem(defaultCode, levelIdx, version);
+		CodeListItem defaultCodeItem = list.getItem(defaultCodeValue, levelIdx, version);
 		return defaultCodeItem == null ? -1: defaultCodeItem.getId();
 	}
 

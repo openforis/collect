@@ -2,7 +2,6 @@ package org.openforis.collect.relational.model;
 
 import java.math.BigInteger;
 
-import org.openforis.collect.relational.DatabaseExporterConfig;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.Record;
 
@@ -21,11 +20,6 @@ public class DataPrimaryKeyColumn extends IdColumn<Node<?>> implements PrimaryKe
 
 	@Override
 	public Object extractValue(Node<?> source) {
-		return extractValue(DatabaseExporterConfig.createDefault(), source);
-	}
-	
-	@Override
-	public Object extractValue(DatabaseExporterConfig config, Node<?> source) {
 		BigInteger id = getArtificialId(source);
 		return id;
 	}

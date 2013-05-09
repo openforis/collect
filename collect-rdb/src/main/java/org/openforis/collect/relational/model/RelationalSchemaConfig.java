@@ -1,5 +1,8 @@
 package org.openforis.collect.relational.model;
 
+import org.openforis.idm.metamodel.LanguageSpecificText;
+import org.openforis.idm.metamodel.LanguageSpecificTextMap;
+
 
 /**
  * 
@@ -20,6 +23,8 @@ public class RelationalSchemaConfig implements Cloneable {
 	private int textMaxLength;
 	private int memoMaxLength;
 	private int floatingPointPrecision;
+	private String defaultCode;
+	private LanguageSpecificTextMap defaultCodeLabels;
 	
 	private static final RelationalSchemaConfig DEFAULT;
 	static {
@@ -36,6 +41,9 @@ public class RelationalSchemaConfig implements Cloneable {
 		config.textMaxLength = 255;
 		config.memoMaxLength = 2048;
 		config.floatingPointPrecision = 24;
+		config.defaultCode = "NA";
+		config.defaultCodeLabels = new LanguageSpecificTextMap();
+		config.defaultCodeLabels.add(new LanguageSpecificText("en", "N/A"));
 		DEFAULT = config;
 	}
 	
@@ -51,6 +59,14 @@ public class RelationalSchemaConfig implements Cloneable {
 	@Override
 	protected Object clone() throws CloneNotSupportedException {
 		return super.clone();
+	}
+	
+	public String getDefaultCodeLabel(String langCode) {
+		if ( defaultCodeLabels == null ) {
+			return null;
+		} else {
+			return defaultCodeLabels.getText(langCode);
+		}
 	}
 	
 	public String getIdColumnSuffix() {
@@ -150,4 +166,20 @@ public class RelationalSchemaConfig implements Cloneable {
 		this.floatingPointPrecision = floatingPointPrecision;
 	}
 	
+	public String getDefaultCode() {
+		return defaultCode;
+	}
+
+	public void setDefaultCode(String defaultCode) {
+		this.defaultCode = defaultCode;
+	}
+
+	public LanguageSpecificTextMap getDefaultCodeLabels() {
+		return defaultCodeLabels;
+	}
+
+	public void setDefaultCodeLabels(LanguageSpecificTextMap defaultCodeLabels) {
+		this.defaultCodeLabels = defaultCodeLabels;
+	}
+
 }

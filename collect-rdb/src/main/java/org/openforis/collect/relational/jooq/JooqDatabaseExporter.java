@@ -14,7 +14,6 @@ import org.jooq.impl.Factory;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.relational.CollectRdbException;
 import org.openforis.collect.relational.DatabaseExporter;
-import org.openforis.collect.relational.DatabaseExporterConfig;
 import org.openforis.collect.relational.model.Column;
 import org.openforis.collect.relational.model.Dataset;
 import org.openforis.collect.relational.model.RelationalSchema;
@@ -37,23 +36,13 @@ public class JooqDatabaseExporter implements DatabaseExporter {
 
 	@Override
 	public void insertReferenceData(RelationalSchema schema) throws CollectRdbException {
-		insertReferenceData(schema, DatabaseExporterConfig.createDefault());
-	}
-	
-	@Override
-	public void insertReferenceData(RelationalSchema schema, DatabaseExporterConfig config) throws CollectRdbException {
-		Dataset dataset = schema.getReferenceData(config);
+		Dataset dataset = schema.getReferenceData();
 		insertDataset(schema, dataset);
 	}
 
 	@Override
 	public void insertData(RelationalSchema schema, CollectRecord record) throws CollectRdbException  {
-		insertData(schema, DatabaseExporterConfig.createDefault(), record);
-	}
-	
-	@Override
-	public void insertData(RelationalSchema schema, DatabaseExporterConfig config, CollectRecord record) throws CollectRdbException  {
-		Dataset dataset = schema.createDataset(config, record);
+		Dataset dataset = schema.createDataset(record);
 		insertDataset(schema, dataset);
 	}
 

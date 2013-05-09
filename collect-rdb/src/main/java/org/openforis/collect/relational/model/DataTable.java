@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.openforis.collect.relational.CollectRdbException;
-import org.openforis.collect.relational.DatabaseExporterConfig;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.path.Path;
@@ -62,14 +61,9 @@ public class DataTable extends AbstractTable<Node<?>> {
 		childTables.add(table);
 	}
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public Row extractRow(Node<?> source) {
-		return extractRow(DatabaseExporterConfig.createDefault(), source);
-	}
-	
-	@Override
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public Row extractRow(DatabaseExporterConfig config, Node<?> source) {
 		List<Column<?>> columns = getColumns();
 		Row row = new Row(this);
 		for (int i=0; i < columns.size(); i++) {
@@ -82,10 +76,6 @@ public class DataTable extends AbstractTable<Node<?>> {
 
 	@Override
 	public Dataset extractData(Node<?> source) {
-		return extractData(DatabaseExporterConfig.createDefault(), source);
-	}
-	
-	public Dataset extractData(DatabaseExporterConfig config, Node<?> source) {
 		Dataset data = new Dataset();
 		extractDataInternal(source, data);
 		return data;

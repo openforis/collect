@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.openforis.collect.relational.CollectRdbException;
-import org.openforis.collect.relational.DatabaseExporterConfig;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -26,14 +25,14 @@ public final class RelationalSchema {
 	private Survey survey;
 	private String name;
 	private LinkedHashMap<String, Table<?>> tables;
-	private Map<CodeListTableKey, CodeListTable> codeListTables;
+	private Map<CodeListTableKey, CodeTable> codeListTables;
 	private Map<String, DataTable> rootDataTables;
 	
 	RelationalSchema(Survey survey, String name) throws CollectRdbException {
 		this.survey = survey;
 		this.name = name;
 		this.tables = new LinkedHashMap<String, Table<?>>();
-		this.codeListTables = new HashMap<CodeListTableKey, CodeListTable>();
+		this.codeListTables = new HashMap<CodeListTableKey, CodeTable>();
 		this.rootDataTables = new HashMap<String, DataTable>();
 	}
 
@@ -50,21 +49,21 @@ public final class RelationalSchema {
 		return Collections.unmodifiableList(tableList);
 	}
 	
-	public List<CodeListTable> getCodeListTables() {
-		List<CodeListTable> tableList = new ArrayList<CodeListTable>(codeListTables.values());
+	public List<CodeTable> getCodeListTables() {
+		List<CodeTable> tableList = new ArrayList<CodeTable>(codeListTables.values());
 		return Collections.unmodifiableList(tableList);
 	}
 	
-	public CodeListTable getCodeListTable(CodeList list, Integer levelIdx) {
+	public CodeTable getCodeListTable(CodeList list, Integer levelIdx) {
 		CodeListTableKey key = new CodeListTableKey(list.getId(), levelIdx);
 		return codeListTables.get(key);
 	}
 
-	public Dataset getReferenceData(DatabaseExporterConfig config) {
+	public Dataset getReferenceData() {
 		Dataset dataset = new Dataset();
-		List<CodeListTable> codeListTables = getCodeListTables();
-		for (CodeListTable codeListTable : codeListTables) {
-			Dataset codeListDataset = codeListTable.extractData(config);
+		List<CodeTable> codeListTables = getCodeListTables();
+		for (CodeTable codeListTable : codeListTables) {
+			Dataset codeListDataset = codeListTable.extractData();
 			dataset.addRows(codeListDataset.getRows());
 		}
 		return dataset;
@@ -88,8 +87,8 @@ public final class RelationalSchema {
 				NodeDefinition defn = dataTable.getNodeDefinition();
 				rootDataTables.put(defn.getName(), dataTable);
 			}
-		} else if ( table instanceof CodeListTable ) {
-			CodeListTable codeListTable = (CodeListTable) table;
+		} else if ( table instanceof CodeTable ) {
+			CodeTable codeListTable = (CodeTable) table;
 			CodeList codeList = codeListTable.getCodeList();
 			CodeListTableKey key = new CodeListTableKey(codeList.getId(), codeListTable.getLevelIdx());
 			codeListTables.put(key, codeListTable);
@@ -97,10 +96,6 @@ public final class RelationalSchema {
 	}
 
 	public Dataset createDataset(Record record) {
-		return createDataset(DatabaseExporterConfig.createDefault(), record);
-	}
-	
-	public Dataset createDataset(DatabaseExporterConfig config, Record record) {
 		Entity root = record.getRootEntity();
 		EntityDefinition rootDefn = root.getDefinition();
 		String name = rootDefn.getName();
@@ -108,7 +103,7 @@ public final class RelationalSchema {
 		if ( dataTable == null ) {
 			throw new IllegalArgumentException("Invalid root entity "+name);
 		}
-		return dataTable.extractData(config, root);
+		return dataTable.extractData(root);
 	}
 	
 	private static class CodeListTableKey {

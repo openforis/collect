@@ -15,11 +15,11 @@ import org.openforis.collect.persistence.RecordDao;
 import org.openforis.collect.persistence.jooq.DialectAwareJooqFactory;
 import org.openforis.collect.relational.CollectRdbException;
 import org.openforis.collect.relational.DatabaseExporter;
-import org.openforis.collect.relational.DatabaseExporterConfig;
 import org.openforis.collect.relational.RelationalSchemaCreator;
 import org.openforis.collect.relational.jooq.JooqDatabaseExporter;
 import org.openforis.collect.relational.liquibase.LiquibaseRelationalSchemaCreator;
 import org.openforis.collect.relational.model.RelationalSchema;
+import org.openforis.collect.relational.model.RelationalSchemaConfig;
 import org.openforis.collect.relational.model.RelationalSchemaGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -47,21 +47,21 @@ public class CollectRDBPublisher {
 	
 	public void export(String surveyName, String rootEntityName, Step step,
 			String targetSchemaName) throws CollectRdbException {
-		export(surveyName, rootEntityName, step, targetSchemaName, DatabaseExporterConfig.createDefault());
+		export(surveyName, rootEntityName, step, targetSchemaName, RelationalSchemaConfig.createDefault());
 	}
 	
 	public void export(String surveyName, String rootEntityName, Step step,
-			String targetSchemaName, DatabaseExporterConfig config) throws CollectRdbException {
+			String targetSchemaName, RelationalSchemaConfig config) throws CollectRdbException {
 		Connection targetConn = DataSourceUtils.getConnection(rdbDataSource);
-		export(surveyName, rootEntityName, step, targetSchemaName, config, targetConn);
+		export(surveyName, rootEntityName, step, targetSchemaName, targetConn, config);
 	}
 	
 	public void export(String surveyName, String rootEntityName, Step step,
-			String targetSchemaName, DatabaseExporterConfig config, Connection targetConn) throws CollectRdbException {
+			String targetSchemaName, Connection targetConn, RelationalSchemaConfig config) throws CollectRdbException {
 		CollectSurvey survey = surveyManager.get(surveyName);
 		
 		// Generate relational model
-		RelationalSchemaGenerator rsg = new RelationalSchemaGenerator();
+		RelationalSchemaGenerator rsg = new RelationalSchemaGenerator(config);
 		RelationalSchema targetSchema = rsg.generateSchema(survey, targetSchemaName);
 		
 		createTargetDBSchema(targetSchema, targetConn);
@@ -108,9 +108,8 @@ public class CollectRDBPublisher {
 	public static void main(String[] args) throws CollectRdbException {
 		ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext("application-context.xml");
 		CollectRDBPublisher publisher = ctx.getBean(CollectRDBPublisher.class);
-		DatabaseExporterConfig config = DatabaseExporterConfig.createDefault();
+		RelationalSchemaConfig config = RelationalSchemaConfig.createDefault();
 //		config.setDefaultCode(null);
-//		config.setDefaultCodeLabels(null);
 		publisher.export(
 				"naforma1",
 				"cluster",
