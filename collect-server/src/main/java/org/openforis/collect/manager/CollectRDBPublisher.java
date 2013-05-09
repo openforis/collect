@@ -15,6 +15,7 @@ import org.openforis.collect.persistence.RecordDao;
 import org.openforis.collect.persistence.jooq.DialectAwareJooqFactory;
 import org.openforis.collect.relational.CollectRdbException;
 import org.openforis.collect.relational.DatabaseExporter;
+import org.openforis.collect.relational.DatabaseExporterConfig;
 import org.openforis.collect.relational.RelationalSchemaCreator;
 import org.openforis.collect.relational.jooq.JooqDatabaseExporter;
 import org.openforis.collect.relational.liquibase.LiquibaseRelationalSchemaCreator;
@@ -46,12 +47,17 @@ public class CollectRDBPublisher {
 	
 	public void export(String surveyName, String rootEntityName, Step step,
 			String targetSchemaName) throws CollectRdbException {
-		Connection targetConn = DataSourceUtils.getConnection(rdbDataSource);
-		export(surveyName, rootEntityName, step, targetSchemaName, targetConn);
+		export(surveyName, rootEntityName, step, targetSchemaName, DatabaseExporterConfig.createDefault());
 	}
 	
 	public void export(String surveyName, String rootEntityName, Step step,
-			String targetSchemaName, Connection targetConn) throws CollectRdbException {
+			String targetSchemaName, DatabaseExporterConfig config) throws CollectRdbException {
+		Connection targetConn = DataSourceUtils.getConnection(rdbDataSource);
+		export(surveyName, rootEntityName, step, targetSchemaName, config, targetConn);
+	}
+	
+	public void export(String surveyName, String rootEntityName, Step step,
+			String targetSchemaName, DatabaseExporterConfig config, Connection targetConn) throws CollectRdbException {
 		CollectSurvey survey = surveyManager.get(surveyName);
 		
 		// Generate relational model
@@ -102,11 +108,15 @@ public class CollectRDBPublisher {
 	public static void main(String[] args) throws CollectRdbException {
 		ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext("application-context.xml");
 		CollectRDBPublisher publisher = ctx.getBean(CollectRDBPublisher.class);
+		DatabaseExporterConfig config = DatabaseExporterConfig.createDefault();
+//		config.setDefaultCode(null);
+//		config.setDefaultCodeLabels(null);
 		publisher.export(
 				"naforma1",
 				"cluster",
 				Step.ANALYSIS,
-				"naforma1");
+				"naforma1",
+				config);
 //		DriverManager.getConnection("jdbc:postgresql://localhost:5433/archenland1", "postgres","postgres")); 
 	}
 	

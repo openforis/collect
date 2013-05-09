@@ -43,15 +43,42 @@ public class CodeListTable extends AbstractTable<CodeListItem> {
 		}
 		return result;
 	}
+
+	@Override
+	public Dataset extractData(CodeListItem source) {
+		return extractData();
+	}
+
+	@Override
+	public Dataset extractData(DatabaseExporterConfig config,
+			CodeListItem source) {
+		return extractData(config);
+	}
+	
+	public Dataset extractData() {
+		return extractData(DatabaseExporterConfig.createDefault());
+	}
 	
 	public Dataset extractData(DatabaseExporterConfig config) {
 		Dataset data = new Dataset();
 		Integer levelIdx = getLevelIdx();
 		List<CodeListItem> items = codeList.getItems(levelIdx);
 		String defaultCode = config.getDefaultCode();
+		if ( defaultCode != null ) {
+			addDefaultCodeRow(config, data, items);
+		}
+		for (CodeListItem item : items) {
+			Row row = extractRow(config, item);
+			data.addRow(row);
+		}
+		return data;
+	}
+
+	protected void addDefaultCodeRow(DatabaseExporterConfig config,
+			Dataset data, List<CodeListItem> items) {
 		boolean containsDefaultAlready = false;
 		for (CodeListItem item : items) {
-			if ( defaultCode.equals(item.getCode()) ) {
+			if ( item.getCode().equals(config.getDefaultCode()) ) {
 				containsDefaultAlready = true;
 				break;
 			}
@@ -60,15 +87,16 @@ public class CodeListTable extends AbstractTable<CodeListItem> {
 			Row defaultCodeRow = createDefaultCodeRow(config);
 			data.addRow(defaultCodeRow);
 		}
-		for (CodeListItem item : items) {
-			Row row = extractRow(item);
-			data.addRow(row);
-		}
-		return data;
+	}
+	
+	@Override
+	public Row extractRow(CodeListItem source) {
+		return extractRow(DatabaseExporterConfig.createDefault(), source);
 	}
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public Row extractRow(CodeListItem source) {
+	@Override
+	public Row extractRow(DatabaseExporterConfig config, CodeListItem source) {
 		Row row = new Row(this);
 		List<Column<?>> columns = getColumns();
 		for (int i=0; i < columns.size(); i++) {
@@ -87,7 +115,7 @@ public class CodeListTable extends AbstractTable<CodeListItem> {
 			Column col = columns.get(i);
 			Object val;
 			if ( col instanceof CodeListPrimaryKeyColumn ) {
-				val = CodeListPrimaryKeyColumn.getDefaultCodeId(codeList);
+				val = -1;
 			} else if ( col instanceof CodeListCodeColumn ) {
 				val = config.getDefaultCode();
 			} else if ( col instanceof CodeListItemLabelColumn ) {

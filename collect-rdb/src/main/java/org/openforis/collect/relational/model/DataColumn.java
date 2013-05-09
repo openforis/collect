@@ -2,6 +2,7 @@ package org.openforis.collect.relational.model;
 
 import java.util.List;
 
+import org.openforis.collect.relational.DatabaseExporterConfig;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Date;
@@ -38,6 +39,11 @@ public class DataColumn extends AbstractColumn<Node<?>> {
 
 	@Override
 	public Object extractValue(Node<?> context) {
+		return extractValue(DatabaseExporterConfig.createDefault(), context);
+	}
+	
+	@Override
+	public Object extractValue(DatabaseExporterConfig config, Node<?> context) {
 		Node<?> valNode = extractValueNode(context);
 		Object val = convert(valNode);
 		if ( getTypeName().equals("varchar") && val != null && val.toString().length() > getLength()) {

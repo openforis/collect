@@ -16,9 +16,9 @@ public class DatabaseExporterConfig implements Cloneable {
 	private static final DatabaseExporterConfig DEFAULT;
 	static {
 		DatabaseExporterConfig config = new DatabaseExporterConfig();
-		config.defaultCode = "-1";
+		config.defaultCode = "NA";
 		config.defaultCodeLabels = new LanguageSpecificTextMap();
-		config.defaultCodeLabels.add(new LanguageSpecificText("en", "NA"));
+		config.defaultCodeLabels.add(new LanguageSpecificText("en", "N/A"));
 		DEFAULT = config;
 	}
 	

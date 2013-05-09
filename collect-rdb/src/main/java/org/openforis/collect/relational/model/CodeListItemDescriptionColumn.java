@@ -6,6 +6,7 @@ package org.openforis.collect.relational.model;
 import java.sql.Types;
 
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.relational.DatabaseExporterConfig;
 import org.openforis.idm.metamodel.CodeListItem;
 import org.openforis.idm.metamodel.SurveyObject;
 
@@ -30,6 +31,12 @@ public class CodeListItemDescriptionColumn extends AbstractColumn<CodeListItem> 
 
 	@Override
 	public Object extractValue(CodeListItem source) {
+		return extractValue(DatabaseExporterConfig.createDefault(), source);
+	}
+	
+	@Override
+	public Object extractValue(DatabaseExporterConfig config,
+			CodeListItem source) {
 		String label = source.getDescription(languageCode);
 		if ( label == null && source instanceof SurveyObject ) {
 			CollectSurvey survey = (CollectSurvey) ((SurveyObject) source).getSurvey();

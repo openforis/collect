@@ -1,8 +1,6 @@
 package org.openforis.collect.relational.model;
 
-import java.math.BigInteger;
-
-import org.openforis.idm.metamodel.CodeList;
+import org.openforis.collect.relational.DatabaseExporterConfig;
 import org.openforis.idm.metamodel.CodeListItem;
 
 /**
@@ -18,16 +16,18 @@ public class CodeListPrimaryKeyColumn extends IdColumn<CodeListItem> implements 
 	}
 
 	@Override
-	public Object extractValue(CodeListItem context) {
-		Integer id = context.getId();
+	public Object extractValue(CodeListItem source) {
+		return extractValue(DatabaseExporterConfig.createDefault(), source);
+	}
+	
+	@Override
+	public Object extractValue(DatabaseExporterConfig config,
+			CodeListItem source) {
+		Integer id = source.getId();
 		if ( id == null ) {
 			throw new NullPointerException("Node id");
 		}
 		return id;
 	}
 	
-	public static BigInteger getDefaultCodeId(CodeList codeList) {
-		//use code list id as default code id
-		return BigInteger.valueOf(codeList.getId());
-	}
 }

@@ -108,7 +108,7 @@ public final class RelationalSchema {
 		if ( dataTable == null ) {
 			throw new IllegalArgumentException("Invalid root entity "+name);
 		}
-		return dataTable.extractData(root);
+		return dataTable.extractData(config, root);
 	}
 	
 	private static class CodeListTableKey {

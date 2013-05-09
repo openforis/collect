@@ -1,5 +1,7 @@
 package org.openforis.collect.relational.model;
 
+import org.openforis.collect.relational.DatabaseExporterConfig;
+
 /**
  * 
  * @author G. Miceli
@@ -23,5 +25,7 @@ public interface Column<T> {
 	boolean isNullable();
 	
 	Object extractValue(T source);
+	
+	Object extractValue(DatabaseExporterConfig config, T source);
 
 }
