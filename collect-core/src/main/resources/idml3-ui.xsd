@@ -14,7 +14,7 @@
   </xs:annotation>
 
   <xs:import namespace="http://www.openforis.org/idml/3.0" 
-    schemaLocation="https://raw.github.com/openforis/idm/alpha5/idm-api/src/main/resources/idml3.xsd"/>
+    schemaLocation="https://raw.github.com/openforis/idm/master/idm-api/src/main/resources/idml3.xsd"/>
   
   <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
   <!-- Types used throughout this schema -->
