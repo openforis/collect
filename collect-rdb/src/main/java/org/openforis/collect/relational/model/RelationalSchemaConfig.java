@@ -25,6 +25,10 @@ public class RelationalSchemaConfig implements Cloneable {
 	private int floatingPointPrecision;
 	private String defaultCode;
 	private LanguageSpecificTextMap defaultCodeLabels;
+	private boolean renderBooleanAsVarchar; 
+	private String trueValue;
+	private String falseValue;
+	private String defaultBooleanValue;
 	
 	private static final RelationalSchemaConfig DEFAULT;
 	static {
@@ -44,6 +48,10 @@ public class RelationalSchemaConfig implements Cloneable {
 		config.defaultCode = "NA";
 		config.defaultCodeLabels = new LanguageSpecificTextMap();
 		config.defaultCodeLabels.add(new LanguageSpecificText("en", "N/A"));
+		config.renderBooleanAsVarchar = true;
+		config.defaultBooleanValue = "NA";
+		config.trueValue = "TRUE";
+		config.falseValue = "FALSE";
 		DEFAULT = config;
 	}
 	
@@ -182,4 +190,35 @@ public class RelationalSchemaConfig implements Cloneable {
 		this.defaultCodeLabels = defaultCodeLabels;
 	}
 
+	public boolean getRenderBooleanAsVarchar() {
+		return renderBooleanAsVarchar;
+	}
+
+	public void setRenderBooleanAsVarchar(boolean renderBooleanAsVarchar) {
+		this.renderBooleanAsVarchar = renderBooleanAsVarchar;
+	}
+
+	public String getTrueValue() {
+		return trueValue;
+	}
+
+	public void setTrueValue(String trueValue) {
+		this.trueValue = trueValue;
+	}
+
+	public String getFalseValue() {
+		return falseValue;
+	}
+
+	public void setFalseValue(String falseValue) {
+		this.falseValue = falseValue;
+	}
+
+	public String getDefaultBooleanValue() {
+		return defaultBooleanValue;
+	}
+
+	public void setDefaultBooleanValue(String defaultBooleanValue) {
+		this.defaultBooleanValue = defaultBooleanValue;
+	}
 }

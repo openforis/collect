@@ -34,6 +34,7 @@ import org.openforis.idm.path.Path;
 // Later:
 // TODO insert dates and times
 // TODO SRS table
+// TODO refactor into CodeListTableGenerator, DataTableGenerator, etc.
 public class RelationalSchemaGenerator {
 	private static final String RDB_NAMESPACE = "http://www.openforis.org/collect/3.0/rdb";
 	private static final QName TABLE_NAME_QNAME = new QName(RDB_NAMESPACE, "table");
@@ -301,7 +302,9 @@ public class RelationalSchemaGenerator {
 	private void addCodeColumn(DataTable table, FieldDefinition<?> defn, Path relativePath) throws CollectRdbException {
 		relativePath = relativePath.appendElement(defn.getName());
 		String name = getDataColumnName(table, (FieldDefinition<?>) defn);
-		CodeColumn column = new CodeColumn(name, defn, relativePath,  config.getTextMaxLength(), config.getDefaultCode()); 
+		CodeColumn column = new CodeColumn(name, defn, relativePath);
+		column.setLength(config.getTextMaxLength());
+		column.setDefaultValue(config.getDefaultCode());
 		addColumn(table, column);
 	}
 	
@@ -387,6 +390,7 @@ public class RelationalSchemaGenerator {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	private DataColumn createDataColumn(DataTable table, FieldDefinition<?> defn, Path relativePath) {
 		String name = getDataColumnName(table, (FieldDefinition<?>) defn); 
 		int jdbcType;
@@ -403,8 +407,13 @@ public class RelationalSchemaGenerator {
 			typeName =  "float";
 			length = config.getFloatingPointPrecision();
 		} else if ( type == Boolean.class ) {
-			jdbcType = Types.BOOLEAN;
-			typeName =  "boolean";
+			if ( config.getRenderBooleanAsVarchar() ) {
+				return new BooleanVarcharColumn(name, (FieldDefinition<Boolean>) defn, relativePath, 
+						config.getTrueValue(), config.getFalseValue(), config.getDefaultBooleanValue());				
+			} else {
+				jdbcType = Types.BOOLEAN;
+				typeName =  "boolean";
+			}
 		} else if ( type == String.class ) {
 			jdbcType = Types.VARCHAR;
 			typeName =  "varchar";
@@ -424,15 +433,16 @@ public class RelationalSchemaGenerator {
 			throw new UnsupportedOperationException("Unknown field type "+type);				
 		}
 		
-		return new DataColumn(name, jdbcType, typeName, defn, relativePath, length, nullable);
+		DataColumn col = new DataColumn(name, jdbcType, typeName, defn, relativePath);		
+		col.setLength(length);
+		col.setNullable(nullable);
+		return col;
 	}
 
 	private DataColumn createDataColumn(DataTable table, AttributeDefinition defn, Path relativePath) {
 		String name = getDataColumnName(table, defn);;
 		int jdbcType;
 		String typeName;
-		Integer length = null;
-		boolean nullable = true;
 		
 		if ( defn instanceof DateAttributeDefinition ) {
 			jdbcType = Types.DATE;
@@ -444,7 +454,9 @@ public class RelationalSchemaGenerator {
 			throw new UnsupportedOperationException("Unknown defn "+defn.getClass());
 		}
 	
-		return new DataColumn(name, jdbcType, typeName, defn, relativePath, length, nullable);
+		DataColumn col = new DataColumn(name, jdbcType, typeName, defn, relativePath);
+		col.setNullable(true);
+		return col;
 	}
 
 	/**

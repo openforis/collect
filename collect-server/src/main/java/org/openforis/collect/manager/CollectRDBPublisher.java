@@ -114,7 +114,7 @@ public class CollectRDBPublisher {
 				"naforma1",
 				"cluster",
 				Step.ANALYSIS,
-				"naforma1",
+				"naforma1_se",
 				config);
 //		DriverManager.getConnection("jdbc:postgresql://localhost:5433/archenland1", "postgres","postgres")); 
 	}

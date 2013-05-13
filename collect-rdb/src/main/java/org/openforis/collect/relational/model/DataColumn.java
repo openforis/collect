@@ -17,21 +17,17 @@ import org.openforis.idm.path.Path;
  * @author G. Miceli
  *
  */
+// TODO refactor into different types of data columns (integer, float, etc.)
 public class DataColumn extends AbstractColumn<Node<?>> {
 	
 	private Object defaultValue;
 	private NodeDefinition nodeDefinition;
 	private Path relativePath;
 
-	DataColumn(String name, int type, String typeName, NodeDefinition defn, Path relPath, Integer length, boolean nullable) {
-		this(name, type, typeName, defn, relPath, length, nullable, null);
-	}
-
-	DataColumn(String name, int type, String typeName, NodeDefinition defn, Path relPath, Integer length, boolean nullable, Object defaultValue) {
-		super(name, type, typeName, length, nullable);
+	DataColumn(String name, int type, String typeName, NodeDefinition defn, Path relPath) {
+		super(name, type, typeName);
 		this.nodeDefinition = defn;
 		this.relativePath = relPath;
-		this.defaultValue = defaultValue;
 	}
 
 	public NodeDefinition getNodeDefinition() {
@@ -51,8 +47,10 @@ public class DataColumn extends AbstractColumn<Node<?>> {
 		Node<?> valNode = extractValueNode(context);
 		Object val = convert(valNode);
 		if ( getTypeName().equals("varchar") && val != null && val.toString().length() > getLength()) {
+			// TODO report in log
 			System.out.println("Record: " + context.getRecord().getId() + ". Value of node " + context.getPath() + 
 					" : length " + val.toString().length() + " exceeds max allowed (" + getLength() + "): " + val );
+			// Truncate text if too long
 			val = ((String) val).substring(0, getLength());
 		}
 		if ( val == null && defaultValue != null) {
@@ -75,7 +73,7 @@ public class DataColumn extends AbstractColumn<Node<?>> {
 		}
 	}
 	
-	private Object convert(Node<?> valNode) {
+	protected Object convert(Node<?> valNode) {
 		if ( valNode == null ) {
 			return null;
 		} else if ( valNode instanceof Field ) {
@@ -92,5 +90,8 @@ public class DataColumn extends AbstractColumn<Node<?>> {
 			throw new RuntimeException("Unknown data node type "+valNode.getClass());
 		}
 	}
-	
+
+	protected void setDefaultValue(Object defaultValue) {
+		this.defaultValue = defaultValue;
+	}
 }

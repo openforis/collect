@@ -25,7 +25,8 @@ public class CodeValueFKColumn extends DataColumn {
 	private String defaultCodeValue;
 
 	CodeValueFKColumn(String name, CodeAttributeDefinition defn, Path relPath, String defaultCodeValue) {
-		super(name, Types.BIGINT, "bigint", defn, relPath, null, true);
+		super(name, Types.BIGINT, "bigint", defn, relPath);
+		setNullable(true);
 		this.defaultCodeValue = defaultCodeValue;
 	}
 

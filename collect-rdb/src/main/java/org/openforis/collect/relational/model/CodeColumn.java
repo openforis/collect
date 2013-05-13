@@ -14,9 +14,8 @@ import org.openforis.idm.path.Path;
  */
 public class CodeColumn extends DataColumn {
 	
-	CodeColumn(String name, NodeDefinition defn,
-			Path relPath, Integer length, String defaultValue) {
-		super(name, Types.VARCHAR, "varchar", defn, relPath, length, true, defaultValue);
+	CodeColumn(String name, NodeDefinition defn, Path relPath) {
+		super(name, Types.VARCHAR, "varchar", defn, relPath);
 	}
 	
 }

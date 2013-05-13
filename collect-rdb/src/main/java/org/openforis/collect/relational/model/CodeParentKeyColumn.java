@@ -10,7 +10,8 @@ import org.openforis.idm.metamodel.CodeListItem;
 public class CodeParentKeyColumn extends IdColumn<CodeListItem> {
 
 	CodeParentKeyColumn(String name) {
-		super(name, true);
+		super(name);
+		setNullable(true);
 	}
 
 	@Override

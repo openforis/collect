@@ -20,7 +20,9 @@ public class CodeLabelColumn extends AbstractColumn<CodeListItem> {
 	private String languageCode;
 
 	CodeLabelColumn(String languageCode, String name) {
-		super(name, Types.VARCHAR, "varchar", MAX_LENGTH, true);
+		super(name, Types.VARCHAR, "varchar");
+		setLength(MAX_LENGTH);
+		setNullable(true);
 		this.languageCode = languageCode;
 	}
 
