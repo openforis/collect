@@ -76,6 +76,20 @@ public class SurveyDao extends SurveyBaseDao {
 		return survey;
 	}
 	
+	@Transactional
+	public List<SurveySummary> loadSummaries() {
+		Factory jf = getJooqFactory();
+		List<SurveySummary> surveys = new ArrayList<SurveySummary>();
+		Result<Record> results = jf.select().from(OFC_SURVEY).fetch();
+		for (Record row : results) {
+			SurveySummary survey = processSurveySummaryRow(row);
+			if (survey != null) {
+				surveys.add(survey);
+			}
+		}
+		return surveys;
+	}
+	
 	public SurveySummary loadSurveySummary(int id) {
 		Factory jf = getJooqFactory();
 		Record record = jf.select()
