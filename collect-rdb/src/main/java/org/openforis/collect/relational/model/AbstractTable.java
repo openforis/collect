@@ -1,5 +1,6 @@
 package org.openforis.collect.relational.model;
 
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -16,14 +17,16 @@ abstract class AbstractTable<T> implements Table<T>  {
 
 	private String prefix;
 	private String baseName;
+	private String suffix;
 	private LinkedHashMap<String, Column<?>> columns;
 	private PrimaryKeyConstraint primaryKeyConstraint;
 //	private List<UniquenessConstraint> uniquenessConstraints;
 	private List<ReferentialConstraint> referentialConstraints;
 	
-	AbstractTable(String prefix, String baseName) {
+	AbstractTable(String prefix, String baseName, String suffix) {
 		this.prefix = prefix;
 		this.baseName = baseName;
+		this.suffix = suffix;
 		this.columns = new LinkedHashMap<String, Column<?>>();
 //		this.uniquenessConstraints = new ArrayList<UniquenessConstraint>();
 		this.referentialConstraints = new ArrayList<ReferentialConstraint>();
@@ -41,7 +44,7 @@ abstract class AbstractTable<T> implements Table<T>  {
 
 	@Override
 	public String getName() {
-		return prefix+baseName;
+		return (prefix==null ? "" : prefix) + baseName + (suffix==null ? "" : suffix);
 	}
 	
 	/**
@@ -89,5 +92,24 @@ abstract class AbstractTable<T> implements Table<T>  {
 
 	public boolean containsColumn(String name) {
 		return columns.containsKey(name);
+	}
+	
+	public String getSuffix() {
+		return suffix;
+	}
+	
+	protected void printColumns(PrintStream out) {
+		for (Column<?> col : getColumns()) {
+			String name = col.getName();
+			int type = col.getType();
+			Integer length = col.getLength();
+			String path = "";
+			if ( col instanceof DataColumn ) {
+				DataColumn dcol = (DataColumn) col;
+				path = dcol.getRelativePath()+"";
+			}
+			out.printf("\t%-35s%-8s%-8s%s\n", name, type, length==null?"":length, path);
+		}
+		out.flush();
 	}
 }

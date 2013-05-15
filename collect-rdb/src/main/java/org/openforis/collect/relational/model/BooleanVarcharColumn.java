@@ -41,6 +41,11 @@ public class BooleanVarcharColumn extends DataColumn {
 	}
 	
 	@SuppressWarnings("unchecked")
+	public FieldDefinition<Boolean> getFieldDefinition() {
+		return (FieldDefinition<Boolean>) getNodeDefinition();
+	}
+	
+	@SuppressWarnings("unchecked")
 	@Override
 	protected Object convert(Node<?> valNode) {
 		if ( valNode == null ) {

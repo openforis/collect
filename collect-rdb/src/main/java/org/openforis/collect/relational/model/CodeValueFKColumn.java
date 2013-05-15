@@ -23,9 +23,11 @@ import org.openforis.idm.path.Path;
 public class CodeValueFKColumn extends DataColumn {
 	
 	private String defaultCodeValue;
+	private CodeListTable codeListTable;
 
-	CodeValueFKColumn(String name, CodeAttributeDefinition defn, Path relPath, String defaultCodeValue) {
+	CodeValueFKColumn(String name, CodeAttributeDefinition defn, CodeListTable codeListTable, Path relPath, String defaultCodeValue) {
 		super(name, Types.BIGINT, "bigint", defn, relPath);
+		this.codeListTable = codeListTable;
 		setNullable(true);
 		this.defaultCodeValue = defaultCodeValue;
 	}
@@ -78,4 +80,7 @@ public class CodeValueFKColumn extends DataColumn {
 		return defaultCodeItem == null ? -1: defaultCodeItem.getId();
 	}
 
+	public CodeListTable getCodeListTable() {
+		return codeListTable;
+	}
 }

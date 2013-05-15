@@ -21,8 +21,9 @@ public class DataTable extends AbstractTable<Node<?>> {
 	private DataTable parent;
 	private List<DataTable> childTables;
 	
-	DataTable(String prefix, String name, DataTable parent, NodeDefinition defn, Path relativePath) throws CollectRdbException {
-		super(prefix, name);
+	DataTable(String prefix, String name, String suffix, DataTable parent, 
+			NodeDefinition defn, Path relativePath) throws CollectRdbException {
+		super(prefix, name, suffix);
 		this.definition = defn;
 		this.parent = parent;
 		this.relativePath = relativePath;
@@ -33,22 +34,6 @@ public class DataTable extends AbstractTable<Node<?>> {
 		return definition;
 	}
 
-	public void print(PrintStream out) {
-		out.printf("%-43s%s\n", getName()+":", getRelativePath());
-		for (Column<?> col : getColumns()) {
-			String name = col.getName();
-			int type = col.getType();
-			Integer length = col.getLength();
-			String path = "";
-			if ( col instanceof DataColumn ) {
-				DataColumn dcol = (DataColumn) col;
-				path = dcol.getRelativePath()+"";
-			}
-			out.printf("\t%-35s%-8s%-8s%s\n", name, type, length==null?"":length, path);
-		}
-		out.flush();
-	}
-	
 	public DataTable getParent() {
 		return parent;
 	}
@@ -93,5 +78,11 @@ public class DataTable extends AbstractTable<Node<?>> {
 				childTable.extractDataInternal(child, data);
 			}
 		}
+	}
+
+	@Override
+	public void print(PrintStream out) {
+		out.printf("%-43s%s\n", getName()+":", getRelativePath());
+		printColumns(out);
 	}
 }

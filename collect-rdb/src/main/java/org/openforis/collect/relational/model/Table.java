@@ -1,5 +1,6 @@
 package org.openforis.collect.relational.model;
 
+import java.io.PrintStream;
 import java.util.List;
 
 /**
@@ -26,4 +27,5 @@ public interface Table<T> {
 	
 	Row extractRow(T source);
 
+	void print(PrintStream out);
 }

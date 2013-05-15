@@ -1,5 +1,6 @@
 package org.openforis.collect.relational.model;
 
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -25,14 +26,14 @@ public final class RelationalSchema {
 	private Survey survey;
 	private String name;
 	private LinkedHashMap<String, Table<?>> tables;
-	private Map<CodeListTableKey, CodeTable> codeListTables;
+	private Map<CodeListTableKey, CodeListTable> codeListTables;
 	private Map<String, DataTable> rootDataTables;
 	
 	RelationalSchema(Survey survey, String name) throws CollectRdbException {
 		this.survey = survey;
 		this.name = name;
 		this.tables = new LinkedHashMap<String, Table<?>>();
-		this.codeListTables = new HashMap<CodeListTableKey, CodeTable>();
+		this.codeListTables = new HashMap<CodeListTableKey, CodeListTable>();
 		this.rootDataTables = new HashMap<String, DataTable>();
 	}
 
@@ -49,20 +50,20 @@ public final class RelationalSchema {
 		return Collections.unmodifiableList(tableList);
 	}
 	
-	public List<CodeTable> getCodeListTables() {
-		List<CodeTable> tableList = new ArrayList<CodeTable>(codeListTables.values());
+	public List<CodeListTable> getCodeListTables() {
+		List<CodeListTable> tableList = new ArrayList<CodeListTable>(codeListTables.values());
 		return Collections.unmodifiableList(tableList);
 	}
 	
-	public CodeTable getCodeListTable(CodeList list, Integer levelIdx) {
+	public CodeListTable getCodeListTable(CodeList list, Integer levelIdx) {
 		CodeListTableKey key = new CodeListTableKey(list.getId(), levelIdx);
 		return codeListTables.get(key);
 	}
 
 	public Dataset getReferenceData() {
 		Dataset dataset = new Dataset();
-		List<CodeTable> codeListTables = getCodeListTables();
-		for (CodeTable codeListTable : codeListTables) {
+		List<CodeListTable> codeListTables = getCodeListTables();
+		for (CodeListTable codeListTable : codeListTables) {
 			Dataset codeListDataset = codeListTable.extractData();
 			dataset.addRows(codeListDataset.getRows());
 		}
@@ -87,8 +88,8 @@ public final class RelationalSchema {
 				NodeDefinition defn = dataTable.getNodeDefinition();
 				rootDataTables.put(defn.getName(), dataTable);
 			}
-		} else if ( table instanceof CodeTable ) {
-			CodeTable codeListTable = (CodeTable) table;
+		} else if ( table instanceof CodeListTable ) {
+			CodeListTable codeListTable = (CodeListTable) table;
 			CodeList codeList = codeListTable.getCodeList();
 			CodeListTableKey key = new CodeListTableKey(codeList.getId(), codeListTable.getLevelIdx());
 			codeListTables.put(key, codeListTable);
@@ -145,5 +146,10 @@ public final class RelationalSchema {
 		}
 		
 	}
-	
+
+	public void print(PrintStream out) {
+		for (Table<?> table : getTables()) {
+			table.print(System.out);
+		}
+	}
 }

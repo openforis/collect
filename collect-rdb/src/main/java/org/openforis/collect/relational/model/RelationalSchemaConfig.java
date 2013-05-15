@@ -29,6 +29,7 @@ public class RelationalSchemaConfig implements Cloneable {
 	private String trueValue;
 	private String falseValue;
 	private String defaultBooleanValue;
+	private String dataTableSuffix;
 	
 	private static final RelationalSchemaConfig DEFAULT;
 	static {
@@ -41,6 +42,7 @@ public class RelationalSchemaConfig implements Cloneable {
 		config.labelColumnMiddleSuffix = "_label_";
 		config.descriptionColumnMiddleSuffix = "_desc_";
 		config.dataTablePrefix = "";
+		config.dataTableSuffix = "";
 		config.otherColumnSuffix = "_other";
 		config.textMaxLength = 255;
 		config.memoMaxLength = 2048;
@@ -220,5 +222,13 @@ public class RelationalSchemaConfig implements Cloneable {
 
 	public void setDefaultBooleanValue(String defaultBooleanValue) {
 		this.defaultBooleanValue = defaultBooleanValue;
+	}
+
+	public String getDataTableSuffix() {
+		return dataTableSuffix;
+	}
+
+	public void setDataTableSuffix(String dataTableSuffix) {
+		this.dataTableSuffix = dataTableSuffix;
 	}
 }

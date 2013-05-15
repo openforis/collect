@@ -1,5 +1,6 @@
 package org.openforis.collect.relational.model;
 
+import java.io.PrintStream;
 import java.util.List;
 
 import org.openforis.idm.metamodel.CodeList;
@@ -12,15 +13,17 @@ import org.openforis.idm.metamodel.LanguageSpecificTextMap;
  * @author A. Sanchez-Paus
  *
  */
-public class CodeTable extends AbstractTable<CodeListItem> {
+// TODO Rename to CodeListTable
+public class CodeListTable extends AbstractTable<CodeListItem> {
 	
 	private CodeList codeList;
-	private CodeTable parent;
+	private CodeListTable parent;
 	private String defaultCode;
 	private LanguageSpecificTextMap defaultCodeLabels;
 
-	CodeTable(String prefix, String baseName, CodeList codeList, CodeTable parent, String defaultCode, LanguageSpecificTextMap defaultCodeLabels) {
-		super(prefix, baseName);
+	CodeListTable(String prefix, String baseName, String suffix, CodeList codeList, CodeListTable parent, 
+			String defaultCode, LanguageSpecificTextMap defaultCodeLabels) {
+		super(prefix, baseName, suffix);
 		this.codeList = codeList;
 		this.parent = parent;
 		this.defaultCode = defaultCode;
@@ -31,7 +34,7 @@ public class CodeTable extends AbstractTable<CodeListItem> {
 		return codeList;
 	}
 
-	public CodeTable getParent() {
+	public CodeListTable getParent() {
 		return parent;
 	}
 	
@@ -55,7 +58,7 @@ public class CodeTable extends AbstractTable<CodeListItem> {
 		Integer result = null;
 		if ( codeList.isHierarchical() ) {
 			result = 0;
-			CodeTable cp = parent;
+			CodeListTable cp = parent;
 			while ( cp != null ) {
 				result++;
 				cp = cp.parent;
@@ -131,4 +134,9 @@ public class CodeTable extends AbstractTable<CodeListItem> {
 		return row;
 	}
 
+	@Override
+	public void print(PrintStream out) {
+		out.printf("%-43s%s\n", getName(), getCodeList().getName());
+		printColumns(out);
+	}
 }
