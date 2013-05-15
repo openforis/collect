@@ -51,13 +51,14 @@ public class SurveyManager {
 	private Map<String, CollectSurvey> surveysByUri;
 
 	public SurveyManager() {
+		surveys = new ArrayList<CollectSurvey>();
 		surveysById = new HashMap<Integer, CollectSurvey>();
 		surveysByName = new HashMap<String, CollectSurvey>();
 		surveysByUri = new HashMap<String, CollectSurvey>();
 	}
 
 	@Transactional
-	protected void init() {
+	public void init() {
 		initSurveysCache();
 	}
 
