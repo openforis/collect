@@ -93,13 +93,15 @@
 	<!-- ===================================== -->
 	<!-- RDB Data Source -->
 	<!-- ===================================== -->
-	<bean id="rdbDataSource" class="org.springframework.jndi.JndiObjectFactoryBean">
-		<property name="jndiName" value="java:comp/env/jdbc/collectRDBDs" />
+	<bean id="rdbDataSource" class="org.springframework.jndi.JndiObjectFactoryBean"
+		lazy-init="true">
+		<property name="jndiName" value="java:comp/env/jdbc/collectRdbDs" />
 		<property name="resourceRef" value="true" />
 	</bean>
 
 	<bean id="rdbTransactionManager"
-		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager"
+		lazy-init="true">
 		<qualifier value="rdbTransactionManager" />
 		<property name="dataSource" ref="rdbDataSource" />
 	</bean>
@@ -188,7 +190,7 @@
 	<bean id="userManager" class="org.openforis.collect.manager.UserManager" />
 	
 	<!-- RDB -->
-	<bean id="rdbPublisher" class="org.openforis.collect.manager.CollectRDBPublisher" />
+	<bean id="rdbPublisher" class="org.openforis.collect.manager.CollectRDBPublisher" lazy-init="true" />
 	
 	<!-- <bean id="recordContext" class="org.openforis.collect.model.CollectRecordContext" 
 		/> -->

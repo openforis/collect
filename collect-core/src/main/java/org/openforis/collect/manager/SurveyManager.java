@@ -169,16 +169,9 @@ public class SurveyManager {
 	}
 	
 	@Transactional
-	public List<SurveySummary> loadSurveyWorkSummaries(String lang) {
-		List<SurveySummary> summaries = new ArrayList<SurveySummary>();
-		for (Survey survey : surveys) {
-			Integer id = survey.getId();
-			String projectName = survey.getProjectName(lang);
-			String name = survey.getName();
-			SurveySummary summary = new SurveySummary(id, name, projectName);
-			summaries.add(summary);
-		}
-		return summaries;
+	public List<SurveySummary> loadSurveySummaries() {
+		List<SurveySummary> result = surveyDao.loadSummaries();
+		return CollectionUtils.unmodifiableList(result);
 	}
 	
 	@Transactional
