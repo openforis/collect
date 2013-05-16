@@ -42,6 +42,9 @@ public class CollectRDBPublisher {
 	@Autowired
 	private RecordDao recordDao;
 	@Autowired
+	@Qualifier("dataSource")
+	private DataSource dataSource;
+	@Autowired(required=false)
 	@Qualifier("rdbDataSource")
 	private DataSource rdbDataSource;
 	
@@ -52,10 +55,10 @@ public class CollectRDBPublisher {
 	
 	public void export(String surveyName, String rootEntityName, Step step,
 			String targetSchemaName, RelationalSchemaConfig config) throws CollectRdbException {
-		Connection targetConn = DataSourceUtils.getConnection(rdbDataSource);
+		Connection targetConn = getTargetConnection();
 		export(surveyName, rootEntityName, step, targetSchemaName, targetConn, config);
 	}
-	
+
 	public void export(String surveyName, String rootEntityName, Step step,
 			String targetSchemaName, Connection targetConn, RelationalSchemaConfig config) throws CollectRdbException {
 		CollectSurvey survey = surveyManager.get(surveyName);
@@ -103,6 +106,12 @@ public class CollectRDBPublisher {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	protected Connection getTargetConnection() {
+		DataSource targetDataSource = rdbDataSource == null ? dataSource: rdbDataSource;
+		Connection targetConn = DataSourceUtils.getConnection(targetDataSource);
+		return targetConn;
 	}
 	
 	public static void main(String[] args) throws CollectRdbException {
